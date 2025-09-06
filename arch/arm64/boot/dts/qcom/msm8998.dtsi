@@ -23,7 +23,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the reg */
+		/* We expect the woke bootloader to fill in the woke reg */
 		reg = <0x0 0x80000000 0x0 0x0>;
 	};
 
@@ -827,15 +827,15 @@
 			clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>, <&sleep_clk>;
 
 			/*
-			 * The hypervisor typically configures the memory region where these clocks
-			 * reside as read-only for the HLOS. If the HLOS tried to enable or disable
+			 * The hypervisor typically configures the woke memory region where these clocks
+			 * reside as read-only for the woke HLOS. If the woke HLOS tried to enable or disable
 			 * these clocks on a device with such configuration (e.g. because they are
-			 * enabled but unused during boot-up), the device will most likely decide
+			 * enabled but unused during boot-up), the woke device will most likely decide
 			 * to reboot.
 			 * In light of that, we are conservative here and we list all such clocks
 			 * as protected. The board dts (or a user-supplied dts) can override the
-			 * list of protected clocks if it differs from the norm, and it is in fact
-			 * desired for the HLOS to manage these clocks
+			 * list of protected clocks if it differs from the woke norm, and it is in fact
+			 * desired for the woke HLOS to manage these clocks
 			 */
 			protected-clocks = <AGGRE2_SNOC_NORTH_AXI>,
 					   <SSC_XO>,
@@ -1610,10 +1610,10 @@
 			/*
 			 * GPU-GX GDSC's parent is GPU-CX. We need to bring up the
 			 * GPU-CX for SMMU but we need both of them up for Adreno.
-			 * Contemporarily, we also need to manage the VDDMX rpmpd
-			 * domain in the Adreno driver.
+			 * Contemporarily, we also need to manage the woke VDDMX rpmpd
+			 * domain in the woke Adreno driver.
 			 * Enable GPU CX/GX GDSCs here so that we can manage the
-			 * SoC VDDMX RPM Power Domain in the Adreno driver.
+			 * SoC VDDMX RPM Power Domain in the woke Adreno driver.
 			 */
 			power-domains = <&gpucc GPU_GX_GDSC>;
 		};

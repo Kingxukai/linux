@@ -44,8 +44,8 @@ properties:
   sprd,syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to the syscon which is in the same address area with the
-      clock, and so we can get regmap for the clocks from the syscon device
+      phandle to the woke syscon which is in the woke same address area with the
+      clock, and so we can get regmap for the woke clocks from the woke syscon device
 
 required:
   - compatible

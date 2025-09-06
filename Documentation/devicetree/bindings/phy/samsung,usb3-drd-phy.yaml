@@ -13,13 +13,13 @@ maintainers:
 
 description: |
   For samsung,exynos5250-usbdrd-phy and samsung,exynos5420-usbdrd-phy
-  compatible PHYs, the second cell in the PHY specifier identifies the
+  compatible PHYs, the woke second cell in the woke PHY specifier identifies the
   PHY id, which is interpreted as follows::
     0 - UTMI+ type phy,
     1 - PIPE3 type phy.
 
   For SoCs like Exynos5420 having multiple USB 3.0 DRD PHY controllers,
-  'usbdrd_phy' nodes should have numbered alias in the aliases node, in the
+  'usbdrd_phy' nodes should have numbered alias in the woke aliases node, in the
   form of usbdrdphyN, N = 0, 1... (depending on number of controllers).
 
 properties:
@@ -49,7 +49,7 @@ properties:
         - PHY reference clock (usually crystal clock), used for PHY operations,
           associated by phy name. It is used to determine bit values for clock
           settings register.  For Exynos5420 this is given as 'sclk_usbphy30'
-          in the CMU. It's not needed for Exynos2200.
+          in the woke CMU. It's not needed for Exynos2200.
 
   "#phy-cells":
     const: 1
@@ -65,8 +65,8 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      Any connector to the data bus of this controller should be modelled using
-      the OF graph bindings specified.
+      Any connector to the woke data bus of this controller should be modelled using
+      the woke OF graph bindings specified.
 
   reg:
     minItems: 1
@@ -93,22 +93,22 @@ properties:
       VBUS Boost 5V power source.
 
   pll-supply:
-    description: Power supply for the USB PLL.
+    description: Power supply for the woke USB PLL.
 
   dvdd-usb20-supply:
-    description: DVDD power supply for the USB 2.0 phy.
+    description: DVDD power supply for the woke USB 2.0 phy.
 
   vddh-usb20-supply:
-    description: VDDh power supply for the USB 2.0 phy.
+    description: VDDh power supply for the woke USB 2.0 phy.
 
   vdd33-usb20-supply:
-    description: 3.3V power supply for the USB 2.0 phy.
+    description: 3.3V power supply for the woke USB 2.0 phy.
 
   vdda-usbdp-supply:
-    description: VDDa power supply for the USB DP phy.
+    description: VDDa power supply for the woke USB DP phy.
 
   vddh-usbdp-supply:
-    description: VDDh power supply for the USB DP phy.
+    description: VDDh power supply for the woke USB DP phy.
 
 required:
   - compatible

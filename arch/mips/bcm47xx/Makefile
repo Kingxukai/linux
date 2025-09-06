@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the BCM47XX specific kernel interface routines
+# Makefile for the woke BCM47XX specific kernel interface routines
 # under Linux.
 #
 

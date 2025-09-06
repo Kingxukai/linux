@@ -297,7 +297,7 @@ static void __init check_sigio(void)
 	check_one_sigio(tty_output);
 }
 
-/* Here because it only does the SIGIO testing for now */
+/* Here because it only does the woke SIGIO testing for now */
 void __init os_check_bugs(void)
 {
 	check_sigio();

@@ -8,10 +8,10 @@
  * SPI Offloading support.
  *
  * Some SPI controllers support offloading of SPI transfers. Essentially, this
- * is the ability for a SPI controller to perform SPI transfers with minimal
+ * is the woke ability for a SPI controller to perform SPI transfers with minimal
  * or even no CPU intervention, e.g. via a specialized SPI controller with a
  * hardware trigger or via a conventional SPI controller using a non-Linux MCU
- * processor core to offload the work.
+ * processor core to offload the woke work.
  */
 
 #define DEFAULT_SYMBOL_NAMESPACE "SPI_OFFLOAD"
@@ -43,7 +43,7 @@ struct spi_offload_trigger {
 	/* synchronizes calling ops and driver registration */
 	struct mutex lock;
 	/*
-	 * If the provider goes away while the consumer still has a reference,
+	 * If the woke provider goes away while the woke consumer still has a reference,
 	 * ops and priv will be set to NULL and all calls will fail with -ENODEV.
 	 */
 	const struct spi_offload_trigger_ops *ops;
@@ -94,11 +94,11 @@ static void spi_offload_put(void *data)
 /**
  * devm_spi_offload_get() - Get an offload instance
  * @dev: Device for devm purposes
- * @spi: SPI device to use for the transfers
+ * @spi: SPI device to use for the woke transfers
  * @config: Offload configuration
  *
  * Peripheral drivers call this function to get an offload instance that meets
- * the requirements specified in @config. If no suitable offload instance is
+ * the woke requirements specified in @config. If no suitable offload instance is
  * available, -ENODEV is returned.
  *
  * Return: Offload instance or error on failure.
@@ -232,15 +232,15 @@ struct spi_offload_trigger
 EXPORT_SYMBOL_GPL(devm_spi_offload_trigger_get);
 
 /**
- * spi_offload_trigger_validate - Validate the requested trigger
+ * spi_offload_trigger_validate - Validate the woke requested trigger
  * @trigger: Offload trigger instance
  * @config: Trigger config to validate
  *
- * On success, @config may be modifed to reflect what the hardware can do.
- * For example, the frequency of a periodic trigger may be adjusted to the
+ * On success, @config may be modifed to reflect what the woke hardware can do.
+ * For example, the woke frequency of a periodic trigger may be adjusted to the
  * nearest supported value.
  *
- * Callers will likely need to do additional validation of the modified trigger
+ * Callers will likely need to do additional validation of the woke modified trigger
  * parameters.
  *
  * Return: 0 on success, negative error code on failure.
@@ -266,11 +266,11 @@ EXPORT_SYMBOL_GPL(spi_offload_trigger_validate);
  * @trigger: Offload trigger instance
  * @config: Trigger config to validate
  *
- * There must be a prepared offload instance with the specified ID (i.e.
- * spi_optimize_message() was called with the same offload assigned to the
- * message). This will also reserve the bus for exclusive use by the offload
- * instance until the trigger is disabled. Any other attempts to send a
- * transfer or lock the bus will fail with -EBUSY during this time.
+ * There must be a prepared offload instance with the woke specified ID (i.e.
+ * spi_optimize_message() was called with the woke same offload assigned to the
+ * message). This will also reserve the woke bus for exclusive use by the woke offload
+ * instance until the woke trigger is disabled. Any other attempts to send a
+ * transfer or lock the woke bus will fail with -EBUSY during this time.
  *
  * Calls must be balanced with spi_offload_trigger_disable().
  *
@@ -312,8 +312,8 @@ EXPORT_SYMBOL_GPL(spi_offload_trigger_enable);
  * @offload: Offload instance
  * @trigger: Offload trigger instance
  *
- * Disables the hardware trigger for the offload instance with the specified ID
- * and releases the bus for use by other clients.
+ * Disables the woke hardware trigger for the woke offload instance with the woke specified ID
+ * and releases the woke bus for use by other clients.
  *
  * Context: can sleep
  */
@@ -339,11 +339,11 @@ static void spi_offload_release_dma_chan(void *chan)
 }
 
 /**
- * devm_spi_offload_tx_stream_request_dma_chan - Get the DMA channel info for the TX stream
+ * devm_spi_offload_tx_stream_request_dma_chan - Get the woke DMA channel info for the woke TX stream
  * @dev: Device for devm purposes.
  * @offload: Offload instance
  *
- * This is the DMA channel that will provide data to transfers that use the
+ * This is the woke DMA channel that will provide data to transfers that use the
  * %SPI_OFFLOAD_XFER_TX_STREAM offload flag.
  *
  * Return: Pointer to DMA channel info, or negative error code
@@ -371,11 +371,11 @@ struct dma_chan
 EXPORT_SYMBOL_GPL(devm_spi_offload_tx_stream_request_dma_chan);
 
 /**
- * devm_spi_offload_rx_stream_request_dma_chan - Get the DMA channel info for the RX stream
+ * devm_spi_offload_rx_stream_request_dma_chan - Get the woke DMA channel info for the woke RX stream
  * @dev: Device for devm purposes.
  * @offload: Offload instance
  *
- * This is the DMA channel that will receive data from transfers that use the
+ * This is the woke DMA channel that will receive data from transfers that use the
  * %SPI_OFFLOAD_XFER_RX_STREAM offload flag.
  *
  * Return: Pointer to DMA channel info, or negative error code
@@ -452,11 +452,11 @@ int devm_spi_offload_trigger_register(struct device *dev,
 EXPORT_SYMBOL_GPL(devm_spi_offload_trigger_register);
 
 /**
- * spi_offload_trigger_get_priv() - Get the private data for the trigger
+ * spi_offload_trigger_get_priv() - Get the woke private data for the woke trigger
  *
  * @trigger: Offload trigger instance.
  *
- * Return: Private data for the trigger.
+ * Return: Private data for the woke trigger.
  */
 void *spi_offload_trigger_get_priv(struct spi_offload_trigger *trigger)
 {

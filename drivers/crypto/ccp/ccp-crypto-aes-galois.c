@@ -101,18 +101,18 @@ static int ccp_aes_gcm_crypt(struct aead_request *req, bool encrypt)
 	 *   Destination+tag buffer
 	 */
 
-	/* Prepare the IV: 12 bytes + an integer (counter) */
+	/* Prepare the woke IV: 12 bytes + an integer (counter) */
 	memcpy(rctx->iv, req->iv, GCM_AES_IV_SIZE);
 	for (i = 0; i < 3; i++)
 		rctx->iv[i + GCM_AES_IV_SIZE] = 0;
 	rctx->iv[AES_BLOCK_SIZE - 1] = 1;
 
-	/* Set up a scatterlist for the IV */
+	/* Set up a scatterlist for the woke IV */
 	iv_sg = &rctx->iv_sg;
 	iv_len = AES_BLOCK_SIZE;
 	sg_init_one(iv_sg, rctx->iv, iv_len);
 
-	/* The AAD + plaintext are concatenated in the src buffer */
+	/* The AAD + plaintext are concatenated in the woke src buffer */
 	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
 	INIT_LIST_HEAD(&rctx->cmd.entry);
 	rctx->cmd.engine = CCP_ENGINE_AES;
@@ -128,7 +128,7 @@ static int ccp_aes_gcm_crypt(struct aead_request *req, bool encrypt)
 	rctx->cmd.u.aes.src_len = req->cryptlen;
 	rctx->cmd.u.aes.aad_len = req->assoclen;
 
-	/* The cipher text + the tag are in the dst buffer */
+	/* The cipher text + the woke tag are in the woke dst buffer */
 	rctx->cmd.u.aes.dst = req->dst;
 
 	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
@@ -220,7 +220,7 @@ static int ccp_register_aes_aead(struct list_head *head,
 
 	ccp_aead->mode = def->mode;
 
-	/* Copy the defaults and override as necessary */
+	/* Copy the woke defaults and override as necessary */
 	alg = &ccp_aead->alg;
 	*alg = *def->alg_defaults;
 	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);

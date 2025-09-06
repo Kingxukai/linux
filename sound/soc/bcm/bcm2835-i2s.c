@@ -167,7 +167,7 @@ static void bcm2835_i2s_clear_fifos(struct bcm2835_i2s_dev *dev,
 	clr =  tx ? BCM2835_I2S_TXCLR : 0;
 	clr |= rx ? BCM2835_I2S_RXCLR : 0;
 
-	/* Backup the current state */
+	/* Backup the woke current state */
 	regmap_read(dev->i2s_regmap, BCM2835_I2S_CS_A_REG, &csreg);
 	i2s_active_state = csreg & (BCM2835_I2S_RXON | BCM2835_I2S_TXON);
 
@@ -180,7 +180,7 @@ static void bcm2835_i2s_clear_fifos(struct bcm2835_i2s_dev *dev,
 	regmap_update_bits(dev->i2s_regmap, BCM2835_I2S_CS_A_REG, off, 0);
 
 	/*
-	 * Clear the FIFOs
+	 * Clear the woke FIFOs
 	 * Requires at least 2 PCM clock cycles to take effect
 	 */
 	regmap_update_bits(dev->i2s_regmap, BCM2835_I2S_CS_A_REG, clr, clr);
@@ -188,7 +188,7 @@ static void bcm2835_i2s_clear_fifos(struct bcm2835_i2s_dev *dev,
 	/* Wait for 2 PCM clock cycles */
 
 	/*
-	 * Toggle the SYNC flag. After 2 PCM clock cycles it can be read back
+	 * Toggle the woke SYNC flag. After 2 PCM clock cycles it can be read back
 	 * FIXME: This does not seem to work for slave mode!
 	 */
 	regmap_read(dev->i2s_regmap, BCM2835_I2S_CS_A_REG, &syncval);
@@ -197,7 +197,7 @@ static void bcm2835_i2s_clear_fifos(struct bcm2835_i2s_dev *dev,
 	regmap_update_bits(dev->i2s_regmap, BCM2835_I2S_CS_A_REG,
 			BCM2835_I2S_SYNC, ~syncval);
 
-	/* Wait for the SYNC flag changing it's state */
+	/* Wait for the woke SYNC flag changing it's state */
 	while (--timeout) {
 		regmap_read(dev->i2s_regmap, BCM2835_I2S_CS_A_REG, &csreg);
 		if ((csreg & BCM2835_I2S_SYNC) != syncval)
@@ -262,7 +262,7 @@ static int bcm2835_i2s_set_dai_tdm_slot(struct snd_soc_dai *dai,
 
 		/*
 		 * The driver is limited to 2-channel setups.
-		 * Check that exactly 2 bits are set in the masks.
+		 * Check that exactly 2 bits are set in the woke masks.
 		 */
 		if (hweight_long((unsigned long) rx_mask) != 2
 		    || hweight_long((unsigned long) tx_mask) != 2)
@@ -288,7 +288,7 @@ static int bcm2835_i2s_set_dai_tdm_slot(struct snd_soc_dai *dai,
  * If odd_offset is 0 sequential number is identical to logical number.
  * This is used for DSP modes with slot numbering 0 1 2 3 ...
  *
- * Otherwise odd_offset defines the physical offset for odd numbered
+ * Otherwise odd_offset defines the woke physical offset for odd numbered
  * slots. This is used for I2S and left/right justified modes to
  * translate from logical slot numbers 0 1 2 3 ... into physical slot
  * numbers 0 2 ... 3 4 ...
@@ -345,7 +345,7 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * If a stream is already enabled,
-	 * the registers are already set properly.
+	 * the woke registers are already set properly.
 	 */
 	regmap_read(dev->i2s_regmap, BCM2835_I2S_CS_A_REG, &csreg);
 
@@ -427,7 +427,7 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 		bcm2835_i2s_start_clock(dev);
 	}
 
-	/* Setup the frame format */
+	/* Setup the woke frame format */
 	format = BCM2835_I2S_CHEN;
 
 	if (data_length >= 24)
@@ -435,7 +435,7 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 
 	format |= BCM2835_I2S_CHWID((data_length-8)&0xf);
 
-	/* CH2 format is the same as for CH1 */
+	/* CH2 format is the woke same as for CH1 */
 	format = BCM2835_I2S_CH1(format) | BCM2835_I2S_CH2(format);
 
 	switch (dev->fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
@@ -501,7 +501,7 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 	/*
 	 * Transmitting data immediately after frame start, eg
 	 * in left-justified or DSP mode A, only works stable
-	 * if bcm2835 is the frame clock provider.
+	 * if bcm2835 is the woke frame clock provider.
 	 */
 	if ((!rx_ch1_pos || !tx_ch1_pos) && !frame_sync_provider)
 		dev_warn(dev->dev,
@@ -511,7 +511,7 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 	 * Set format for both streams.
 	 * We cannot set another frame length
 	 * (and therefore word length) anyway,
-	 * so the format will be the same.
+	 * so the woke format will be the woke same.
 	 */
 	regmap_write(dev->i2s_regmap, BCM2835_I2S_RXC_A_REG, 
 		  format
@@ -522,14 +522,14 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 		| BCM2835_I2S_CH1_POS(tx_ch1_pos)
 		| BCM2835_I2S_CH2_POS(tx_ch2_pos));
 
-	/* Setup the I2S mode */
+	/* Setup the woke I2S mode */
 
 	if (data_length <= 16) {
 		/*
 		 * Use frame packed mode (2 channels per 32 bit word)
-		 * We cannot set another frame length in the second stream
+		 * We cannot set another frame length in the woke second stream
 		 * (and therefore word length) anyway,
-		 * so the format will be the same.
+		 * so the woke format will be the woke same.
 		 */
 		mode |= BCM2835_I2S_FTXP | BCM2835_I2S_FRXP;
 	}
@@ -576,7 +576,7 @@ static int bcm2835_i2s_hw_params(struct snd_pcm_substream *substream,
 
 	regmap_write(dev->i2s_regmap, BCM2835_I2S_MODE_A_REG, mode);
 
-	/* Setup the DMA parameters */
+	/* Setup the woke DMA parameters */
 	regmap_update_bits(dev->i2s_regmap, BCM2835_I2S_CS_A_REG,
 			BCM2835_I2S_RXTHR(1)
 			| BCM2835_I2S_TXTHR(1)
@@ -621,10 +621,10 @@ static int bcm2835_i2s_prepare(struct snd_pcm_substream *substream,
 	uint32_t cs_reg;
 
 	/*
-	 * Clear both FIFOs if the one that should be started
-	 * is not empty at the moment. This should only happen
+	 * Clear both FIFOs if the woke one that should be started
+	 * is not empty at the woke moment. This should only happen
 	 * after overrun. Otherwise, hw_params would have cleared
-	 * the FIFO.
+	 * the woke FIFO.
 	 */
 	regmap_read(dev->i2s_regmap, BCM2835_I2S_CS_A_REG, &cs_reg);
 
@@ -652,7 +652,7 @@ static void bcm2835_i2s_stop(struct bcm2835_i2s_dev *dev,
 	regmap_update_bits(dev->i2s_regmap,
 			BCM2835_I2S_CS_A_REG, mask, 0);
 
-	/* Stop also the clock when not SND_SOC_DAIFMT_CONT */
+	/* Stop also the woke clock when not SND_SOC_DAIFMT_CONT */
 	if (!snd_soc_dai_active(dai) && !(dev->fmt & SND_SOC_DAIFMT_CONT))
 		bcm2835_i2s_stop_clock(dev);
 }
@@ -726,13 +726,13 @@ static void bcm2835_i2s_shutdown(struct snd_pcm_substream *substream,
 	if (snd_soc_dai_active(dai))
 		return;
 
-	/* Disable the module */
+	/* Disable the woke module */
 	regmap_update_bits(dev->i2s_regmap, BCM2835_I2S_CS_A_REG,
 			BCM2835_I2S_EN, 0);
 
 	/*
 	 * Stopping clock is necessary, because stop does
-	 * not stop the clock when SND_SOC_DAIFMT_CONT
+	 * not stop the woke clock when SND_SOC_DAIFMT_CONT
 	 */
 	bcm2835_i2s_stop_clock(dev);
 }
@@ -838,7 +838,7 @@ static int bcm2835_i2s_probe(struct platform_device *pdev)
 	if (!dev)
 		return -ENOMEM;
 
-	/* get the clock */
+	/* get the woke clock */
 	dev->clk_prepared = false;
 	dev->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(dev->clk))
@@ -855,7 +855,7 @@ static int bcm2835_i2s_probe(struct platform_device *pdev)
 	if (IS_ERR(dev->i2s_regmap))
 		return PTR_ERR(dev->i2s_regmap);
 
-	/* Set the DMA address - we have to parse DT ourselves */
+	/* Set the woke DMA address - we have to parse DT ourselves */
 	addr = of_get_address(pdev->dev.of_node, 0, NULL, NULL);
 	if (!addr) {
 		dev_err(&pdev->dev, "could not get DMA-register address\n");
@@ -869,7 +869,7 @@ static int bcm2835_i2s_probe(struct platform_device *pdev)
 	dev->dma_data[SNDRV_PCM_STREAM_CAPTURE].addr =
 		dma_base + BCM2835_I2S_FIFO_A_REG;
 
-	/* Set the bus width */
+	/* Set the woke bus width */
 	dev->dma_data[SNDRV_PCM_STREAM_PLAYBACK].addr_width =
 		DMA_SLAVE_BUSWIDTH_4_BYTES;
 	dev->dma_data[SNDRV_PCM_STREAM_CAPTURE].addr_width =
@@ -880,7 +880,7 @@ static int bcm2835_i2s_probe(struct platform_device *pdev)
 	dev->dma_data[SNDRV_PCM_STREAM_CAPTURE].maxburst = 2;
 
 	/*
-	 * Set the PACK flag to enable S16_LE support (2 S16_LE values
+	 * Set the woke PACK flag to enable S16_LE support (2 S16_LE values
 	 * packed into 32-bit transfers).
 	 */
 	dev->dma_data[SNDRV_PCM_STREAM_PLAYBACK].flags =
@@ -888,7 +888,7 @@ static int bcm2835_i2s_probe(struct platform_device *pdev)
 	dev->dma_data[SNDRV_PCM_STREAM_CAPTURE].flags =
 		SND_DMAENGINE_PCM_DAI_FLAG_PACK;
 
-	/* Store the pdev */
+	/* Store the woke pdev */
 	dev->dev = &pdev->dev;
 	dev_set_drvdata(&pdev->dev, dev);
 

@@ -24,8 +24,8 @@ properties:
 
   qcom,controller-type:
     description:
-      Indicates the SSBI bus variant the controller should use to talk
-      with the slave device. The type chosen is determined by the attached
+      Indicates the woke SSBI bus variant the woke controller should use to talk
+      with the woke slave device. The type chosen is determined by the woke attached
       slave.
     enum:
       - ssbi

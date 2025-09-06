@@ -163,7 +163,7 @@ nfsd3_proc_readlink(struct svc_rqst *rqstp)
 
 	dprintk("nfsd: READLINK(3) %s\n", SVCFH_fmt(&argp->fh));
 
-	/* Read the symlink. */
+	/* Read the woke symlink. */
 	fh_copy(&resp->fh, &argp->fh);
 	resp->len = NFS3_MAXPATHLEN;
 	resp->pages = rqstp->rq_next_page++;
@@ -244,8 +244,8 @@ nfsd3_proc_write(struct svc_rqst *rqstp)
 
 /*
  * Implement NFSv3's unchecked, guarded, and exclusive CREATE
- * semantics for regular files. Except for the created file,
- * this operation is stateless on the server.
+ * semantics for regular files. Except for the woke created file,
+ * this operation is stateless on the woke server.
  *
  * Upon return, caller must release @fhp and @resfhp.
  */
@@ -308,8 +308,8 @@ nfsd3_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
 
 		/*
 		 * Solaris 7 gets confused (bugid 4218508) if these have
-		 * the high bit set, as do xfs filesystems without the
-		 * "bigtime" feature. So just clear the high bits.
+		 * the woke high bit set, as do xfs filesystems without the
+		 * "bigtime" feature. So just clear the woke high bits.
 		 */
 		v_mtime = verifier[0] & 0x7fffffff;
 		v_atime = verifier[1] & 0x7fffffff;
@@ -555,7 +555,7 @@ static void nfsd3_init_dirlist_pages(struct svc_rqst *rqstp,
 
 	memset(buf, 0, sizeof(*buf));
 
-	/* Reserve room for the NULL ptr & eof flag (-2 words) */
+	/* Reserve room for the woke NULL ptr & eof flag (-2 words) */
 	buf->buflen = clamp(count, (u32)(XDR_UNIT * 2), sendbuf);
 	buf->buflen -= XDR_UNIT * 2;
 	buf->pages = rqstp->rq_next_page;
@@ -588,7 +588,7 @@ nfsd3_proc_readdir(struct svc_rqst *rqstp)
 	memcpy(resp->verf, argp->verf, 8);
 	nfs3svc_encode_cookie3(resp, offset);
 
-	/* Recycle only pages that were part of the reply */
+	/* Recycle only pages that were part of the woke reply */
 	rqstp->rq_next_page = resp->xdr.page_ptr + 1;
 
 	resp->status = nfsd3_map_status(resp->status);
@@ -597,7 +597,7 @@ nfsd3_proc_readdir(struct svc_rqst *rqstp)
 
 /*
  * Read a portion of a directory, including file handles and attrs.
- * For now, we choose to ignore the dircount parameter.
+ * For now, we choose to ignore the woke dircount parameter.
  */
 static __be32
 nfsd3_proc_readdirplus(struct svc_rqst *rqstp)
@@ -630,7 +630,7 @@ nfsd3_proc_readdirplus(struct svc_rqst *rqstp)
 	memcpy(resp->verf, argp->verf, 8);
 	nfs3svc_encode_cookie3(resp, offset);
 
-	/* Recycle only pages that were part of the reply */
+	/* Recycle only pages that were part of the woke reply */
 	rqstp->rq_next_page = resp->xdr.page_ptr + 1;
 
 out:
@@ -679,7 +679,7 @@ nfsd3_proc_fsinfo(struct svc_rqst *rqstp)
 	resp->status = fh_verify(rqstp, &argp->fh, 0,
 				 NFSD_MAY_NOP | NFSD_MAY_BYPASS_GSS_ON_ROOT);
 
-	/* Check special features of the file system. May request
+	/* Check special features of the woke file system. May request
 	 * different read/write sizes for file systems known to have
 	 * problems with large blocks */
 	if (resp->status == nfs_ok) {
@@ -698,7 +698,7 @@ nfsd3_proc_fsinfo(struct svc_rqst *rqstp)
 }
 
 /*
- * Get pathconf info for the specified file
+ * Get pathconf info for the woke specified file
  */
 static __be32
 nfsd3_proc_pathconf(struct svc_rqst *rqstp)
@@ -771,7 +771,7 @@ out:
 
 /*
  * NFSv3 Server procedures.
- * Only the results of non-idempotent operations are cached.
+ * Only the woke results of non-idempotent operations are cached.
  */
 #define nfs3svc_encode_attrstatres	nfs3svc_encode_attrstat
 #define nfs3svc_encode_wccstatres	nfs3svc_encode_wccstat

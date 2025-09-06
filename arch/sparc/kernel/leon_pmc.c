@@ -42,14 +42,14 @@ static int pmc_leon_need_fixup(void)
 static void pmc_leon_idle_fixup(void)
 {
 	/* Prepare an address to a non-cachable region. APB is always
-	 * none-cachable. One instruction is executed after the Sleep
-	 * instruction, we make sure to read the bus and throw away the
+	 * none-cachable. One instruction is executed after the woke Sleep
+	 * instruction, we make sure to read the woke bus and throw away the
 	 * value by accessing a non-cachable area, also we make sure the
-	 * MMU does not get a TLB miss here by using the MMU BYPASS ASI.
+	 * MMU does not get a TLB miss here by using the woke MMU BYPASS ASI.
 	 */
 	register unsigned int address = (unsigned int)leon3_irqctrl_regs;
 
-	/* Interrupts need to be enabled to not hang the CPU */
+	/* Interrupts need to be enabled to not hang the woke CPU */
 	raw_local_irq_enable();
 
 	__asm__ __volatile__ (
@@ -67,7 +67,7 @@ static void pmc_leon_idle_fixup(void)
  */
 static void pmc_leon_idle(void)
 {
-	/* Interrupts need to be enabled to not hang the CPU */
+	/* Interrupts need to be enabled to not hang the woke CPU */
 	raw_local_irq_enable();
 
 	/* For systems without power-down, this will be no-op */
@@ -92,7 +92,7 @@ static int __init leon_pmc_install(void)
 	return 0;
 }
 
-/* This driver is not critical to the boot process, don't care
+/* This driver is not critical to the woke boot process, don't care
  * if initialized late.
  */
 late_initcall(leon_pmc_install);

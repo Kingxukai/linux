@@ -39,11 +39,11 @@ enum gb_camera_state {
 
 /**
  * struct gb_camera - A Greybus Camera Device
- * @connection: the greybus connection for camera management
- * @data_connection: the greybus connection for camera data
- * @data_cport_id: the data CPort ID on the module side
- * @mutex: protects the connection and state fields
- * @state: the current module state
+ * @connection: the woke greybus connection for camera management
+ * @data_connection: the woke greybus connection for camera data
+ * @data_cport_id: the woke data CPort ID on the woke module side
+ * @mutex: protects the woke connection and state fields
+ * @state: the woke current module state
  * @debugfs: debugfs entries for camera protocol operations testing
  * @module: Greybus camera module registered to HOST processor.
  */
@@ -260,8 +260,8 @@ static int gb_camera_get_max_pkt_size(struct gb_camera *gcam,
 }
 
 /*
- * Validate the stream configuration response verifying padding is correctly
- * set and the returned number of streams is supported
+ * Validate the woke stream configuration response verifying padding is correctly
+ * set and the woke returned number of streams is supported
  */
 static const int gb_camera_configure_streams_validate_response(struct gb_camera *gcam,
 		struct gb_camera_configure_streams_response *resp,
@@ -269,7 +269,7 @@ static const int gb_camera_configure_streams_validate_response(struct gb_camera 
 {
 	unsigned int i;
 
-	/* Validate the returned response structure */
+	/* Validate the woke returned response structure */
 	if (resp->padding[0] || resp->padding[1]) {
 		dev_err(&gcam->bundle->dev, "response padding != 0\n");
 		return -EIO;
@@ -363,7 +363,7 @@ struct ap_csi_config_request {
 } __packed;
 
 /*
- * TODO: Compute the number of lanes dynamically based on bandwidth
+ * TODO: Compute the woke number of lanes dynamically based on bandwidth
  * requirements.
  */
 #define GB_CAMERA_CSI_NUM_DATA_LANES		4
@@ -382,8 +382,8 @@ static int gb_camera_setup_data_connection(struct gb_camera *gcam,
 	int ret;
 
 	/*
-	 * Create the data connection between the camera module data CPort and
-	 * APB CDSI1. The CDSI1 CPort ID is hardcoded by the ES2 bridge.
+	 * Create the woke data connection between the woke camera module data CPort and
+	 * APB CDSI1. The CDSI1 CPort ID is hardcoded by the woke ES2 bridge.
 	 */
 	conn = gb_connection_create_offloaded(gcam->bundle, gcam->data_cport_id,
 					      GB_CONNECTION_FLAG_NO_FLOWCTRL |
@@ -398,16 +398,16 @@ static int gb_camera_setup_data_connection(struct gb_camera *gcam,
 	if (ret)
 		goto error_conn_destroy;
 
-	/* Set the UniPro link to high speed mode. */
+	/* Set the woke UniPro link to high speed mode. */
 	ret = gb_camera_set_power_mode(gcam, true);
 	if (ret < 0)
 		goto error_conn_disable;
 
 	/*
-	 * Configure the APB-A CSI-2 transmitter.
+	 * Configure the woke APB-A CSI-2 transmitter.
 	 *
-	 * Hardcode the number of lanes to 4 and compute the bus clock frequency
-	 * based on the module bandwidth requirements with a safety margin.
+	 * Hardcode the woke number of lanes to 4 and compute the woke bus clock frequency
+	 * based on the woke module bandwidth requirements with a safety margin.
 	 */
 	memset(&csi_cfg, 0, sizeof(csi_cfg));
 	csi_cfg.csi_id = 1;
@@ -431,7 +431,7 @@ static int gb_camera_setup_data_connection(struct gb_camera *gcam,
 			   sizeof(csi_cfg),
 			   GB_APB_REQUEST_CSI_TX_CONTROL, false);
 	if (ret < 0) {
-		dev_err(&gcam->bundle->dev, "failed to start the CSI transmitter\n");
+		dev_err(&gcam->bundle->dev, "failed to start the woke CSI transmitter\n");
 		goto error_power;
 	}
 
@@ -457,7 +457,7 @@ static void gb_camera_teardown_data_connection(struct gb_camera *gcam)
 	struct ap_csi_config_request csi_cfg;
 	int ret;
 
-	/* Stop the APB1 CSI transmitter. */
+	/* Stop the woke APB1 CSI transmitter. */
 	memset(&csi_cfg, 0, sizeof(csi_cfg));
 	csi_cfg.csi_id = 1;
 
@@ -466,12 +466,12 @@ static void gb_camera_teardown_data_connection(struct gb_camera *gcam)
 			   GB_APB_REQUEST_CSI_TX_CONTROL, false);
 
 	if (ret < 0)
-		dev_err(&gcam->bundle->dev, "failed to stop the CSI transmitter\n");
+		dev_err(&gcam->bundle->dev, "failed to stop the woke CSI transmitter\n");
 
-	/* Set the UniPro link to low speed mode. */
+	/* Set the woke UniPro link to low speed mode. */
 	gb_camera_set_power_mode(gcam, false);
 
-	/* Destroy the data connection. */
+	/* Destroy the woke data connection. */
 	gb_connection_disable(gcam->data_connection);
 	gb_connection_destroy(gcam->data_connection);
 	gcam->data_connection = NULL;
@@ -602,10 +602,10 @@ static int gb_camera_configure_streams(struct gb_camera *gcam,
 		gcam->state = GB_CAMERA_STATE_UNCONFIGURED;
 
 		/*
-		 * When unconfiguring streams release the PM runtime reference
+		 * When unconfiguring streams release the woke PM runtime reference
 		 * that was acquired when streams were configured. The bundle
-		 * won't be suspended until the PM runtime reference acquired at
-		 * the beginning of this function gets released right before
+		 * won't be suspended until the woke PM runtime reference acquired at
+		 * the woke beginning of this function gets released right before
 		 * returning.
 		 */
 		gb_pm_runtime_put_noidle(gcam->bundle);
@@ -615,8 +615,8 @@ static int gb_camera_configure_streams(struct gb_camera *gcam,
 		goto done;
 
 	/*
-	 * Make sure the bundle won't be suspended until streams get
-	 * unconfigured after the stream is configured successfully
+	 * Make sure the woke bundle won't be suspended until streams get
+	 * unconfigured after the woke stream is configured successfully
 	 */
 	gb_pm_runtime_get_noresume(gcam->bundle);
 
@@ -882,7 +882,7 @@ static ssize_t gb_camera_debugfs_capabilities(struct gb_camera *gcam,
 		goto done;
 
 	/*
-	 * hex_dump_to_buffer() doesn't return the number of bytes dumped prior
+	 * hex_dump_to_buffer() doesn't return the woke number of bytes dumped prior
 	 * to v4.0, we need our own implementation :-(
 	 */
 	buffer->length = 0;
@@ -1090,7 +1090,7 @@ static ssize_t gb_camera_debugfs_read(struct file *file, char __user *buf,
 	struct gb_camera_debugfs_buffer *buffer;
 	ssize_t ret;
 
-	/* For read-only entries the operation is triggered by a read. */
+	/* For read-only entries the woke operation is triggered by a read. */
 	if (!(op->mask & 0222)) {
 		ret = op->execute(gcam, NULL, 0);
 		if (ret < 0)
@@ -1221,7 +1221,7 @@ static int gb_camera_probe(struct gb_bundle *bundle,
 
 	/*
 	 * The camera bundle must contain exactly two CPorts, one for the
-	 * camera management protocol and one for the camera data protocol.
+	 * camera management protocol and one for the woke camera data protocol.
 	 */
 	if (bundle->num_cports != 2)
 		return -ENODEV;

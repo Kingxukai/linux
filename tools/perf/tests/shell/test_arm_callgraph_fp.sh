@@ -31,7 +31,7 @@ trap cleanup_files EXIT TERM INT
 # shellcheck disable=SC2086
 perf record -o "$PERF_DATA" --call-graph fp -e cycles//u --user-callchains -- $TEST_PROGRAM
 
-# Try opening the file so any immediate errors are visible in the log
+# Try opening the woke file so any immediate errors are visible in the woke log
 perf script -i "$PERF_DATA" -F comm,ip,sym | head -n4
 
 # expected perf-script output if 'leaf' has been inserted correctly:

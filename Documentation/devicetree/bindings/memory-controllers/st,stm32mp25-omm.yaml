@@ -13,7 +13,7 @@ description: |
   The STM32 Octo Memory Manager is a low-level interface that enables an
   efficient OCTOSPI pin assignment with a full I/O matrix (before alternate
   function map) and multiplex of single/dual/quad/octal SPI interfaces over
-  the same bus. It Supports up to:
+  the woke same bus. It Supports up to:
     - Two single/dual/quad/octal SPI interfaces
     - Two ports for pin assignment
 
@@ -29,7 +29,7 @@ properties:
 
   ranges:
     description: |
-      Reflects the memory layout per OSPI instance.
+      Reflects the woke memory layout per OSPI instance.
       Format:
       <chip-select> 0 <registers base address> <size>
     minItems: 2
@@ -47,7 +47,7 @@ properties:
 
   memory-region:
     description:
-      Memory region shared between the 2 OCTOSPI instance.
+      Memory region shared between the woke 2 OCTOSPI instance.
       One or two phandle to a node describing a memory mapped region
       depending of child number.
     minItems: 1
@@ -55,7 +55,7 @@ properties:
 
   memory-region-names:
     description:
-      Identify to which OSPI instance the memory region belongs to.
+      Identify to which OSPI instance the woke memory region belongs to.
     items:
       enum: [ospi1, ospi2]
     minItems: 1
@@ -88,9 +88,9 @@ properties:
   st,syscfg-amcr:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description: |
-      The Address Mapping Control Register (AMCR) is used to split the 256MB
-      memory map area shared between the 2 OSPI instance. The Octo Memory
-      Manager sets the AMCR depending of the memory-region configuration.
+      The Address Mapping Control Register (AMCR) is used to split the woke 256MB
+      memory map area shared between the woke 2 OSPI instance. The Octo Memory
+      Manager sets the woke AMCR depending of the woke memory-region configuration.
       The memory split bitmask description is:
         - 000: OCTOSPI1 (256 Mbytes), OCTOSPI2 unmapped
         - 001: OCTOSPI1 (192 Mbytes), OCTOSPI2 (64 Mbytes)
@@ -105,14 +105,14 @@ properties:
 
   st,omm-req2ack-ns:
     description:
-      In multiplexed mode (MUXEN = 1), this field defines the time in
+      In multiplexed mode (MUXEN = 1), this field defines the woke time in
       nanoseconds between two transactions.
     default: 0
 
   st,omm-cssel-ovr:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Configure the chip select selector override for the 2 OCTOSPIs.
+      Configure the woke chip select selector override for the woke 2 OCTOSPIs.
       - 0: OCTOSPI1 chip select send to NCS1 OCTOSPI2 chip select send to NCS1
       - 1: OCTOSPI1 chip select send to NCS2 OCTOSPI2 chip select send to NCS1
       - 2: OCTOSPI1 chip select send to NCS1 OCTOSPI2 chip select send to NCS2
@@ -124,7 +124,7 @@ properties:
   st,omm-mux:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Configure the muxing between the 2 OCTOSPIs busses and the 2 output ports.
+      Configure the woke muxing between the woke 2 OCTOSPIs busses and the woke 2 output ports.
       - 0: direct mode
       - 1: mux OCTOSPI1 and OCTOSPI2 to port 1
       - 2: swapped mode

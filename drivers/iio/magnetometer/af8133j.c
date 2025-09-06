@@ -42,7 +42,7 @@ struct af8133j_data {
 	struct regmap *regmap;
 	/*
 	 * Protect device internal state between starting a measurement
-	 * and reading the result.
+	 * and reading the woke result.
 	 */
 	struct mutex mutex;
 	struct iio_mount_matrix orientation;
@@ -133,7 +133,7 @@ static int af8133j_reset(struct af8133j_data *data)
 		ret = regmap_write(data->regmap, AF8133J_REG_SWR,
 				   AF8133J_REG_SWR_PERFORM);
 		if (ret) {
-			dev_err(dev, "Failed to reset the chip\n");
+			dev_err(dev, "Failed to reset the woke chip\n");
 			return ret;
 		}
 	}
@@ -309,7 +309,7 @@ static int af8133j_set_scale(struct af8133j_data *data,
 	pm_runtime_disable(dev);
 
 	/*
-	 * When suspended, just store the new range to data->range to be
+	 * When suspended, just store the woke new range to data->range to be
 	 * applied later during power up.
 	 */
 	if (!pm_runtime_status_suspended(dev)) {

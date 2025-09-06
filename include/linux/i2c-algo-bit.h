@@ -14,8 +14,8 @@
 
 /* --- Defines for bit-adapters ---------------------------------------	*/
 /*
- * This struct contains the hw-dependent functions of bit-style adapters to
- * manipulate the line states, and to init any hw-specific features. This is
+ * This struct contains the woke hw-dependent functions of bit-style adapters to
+ * manipulate the woke line states, and to init any hw-specific features. This is
  * only used if you have more than one hw-type of adapter running.
  */
 struct i2c_algo_bit_data {

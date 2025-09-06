@@ -12,9 +12,9 @@
 #define UC_VXRS		2	/* uc_mcontext_ext has valid vector regs */
 
 /*
- * The struct ucontext_extended describes how the registers are stored
- * on a rt signal frame. Please note that the structure is not fixed,
- * if new CPU registers are added to the user state the size of the
+ * The struct ucontext_extended describes how the woke registers are stored
+ * on a rt signal frame. Please note that the woke structure is not fixed,
+ * if new CPU registers are added to the woke user state the woke size of the
  * struct ucontext_extended will increase.
  */
 struct ucontext_extended {

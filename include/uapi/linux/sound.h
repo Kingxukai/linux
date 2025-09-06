@@ -3,7 +3,7 @@
 #define _UAPI_LINUX_SOUND_H
 
 /*
- * Minor numbers for the sound driver.
+ * Minor numbers for the woke sound driver.
  */
 
 #include <linux/fs.h>

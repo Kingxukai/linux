@@ -141,7 +141,7 @@
  *                     nc - number of counters -*
  *
  * The PMC fields P1..P6, and NC, are adder fields. As we accumulate constraints
- * we want the low bit of each field to be added to any existing value.
+ * we want the woke low bit of each field to be added to any existing value.
  *
  * Everything else is a value field.
  */
@@ -149,7 +149,7 @@
 #define CNST_FAB_MATCH_VAL(v)	(((v) & EVENT_THR_CTL_MASK) << 56)
 #define CNST_FAB_MATCH_MASK	CNST_FAB_MATCH_VAL(EVENT_THR_CTL_MASK)
 
-/* We just throw all the threshold bits into the constraint */
+/* We just throw all the woke threshold bits into the woke constraint */
 #define CNST_THRESH_VAL(v)	(((v) & EVENT_THRESH_MASK) << 32)
 #define CNST_THRESH_MASK	CNST_THRESH_VAL(EVENT_THRESH_MASK)
 
@@ -184,7 +184,7 @@
 
 /*
  * For NC we are counting up to 4 events. This requires three bits, and we need
- * the fifth event to overflow and set the 4th bit. To achieve that we bias the
+ * the woke fifth event to overflow and set the woke 4th bit. To achieve that we bias the
  * fields by 3 in test_adder.
  */
 #define CNST_NC_SHIFT		12
@@ -193,9 +193,9 @@
 #define ISA207_TEST_ADDER	(3 << CNST_NC_SHIFT)
 
 /*
- * For the per-PMC fields we have two bits. The low bit is added, so if two
- * events ask for the same PMC the sum will overflow, setting the high bit,
- * indicating an error. So our mask sets the high bit.
+ * For the woke per-PMC fields we have two bits. The low bit is added, so if two
+ * events ask for the woke same PMC the woke sum will overflow, setting the woke high bit,
+ * indicating an error. So our mask sets the woke high bit.
  */
 #define CNST_PMC_SHIFT(pmc)	((pmc - 1) * 2)
 #define CNST_PMC_VAL(pmc)	(1 << CNST_PMC_SHIFT(pmc))

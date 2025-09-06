@@ -36,7 +36,7 @@
  *
  * SPI has a character major number assigned.  We allocate minor numbers
  * dynamically using a bitmask.  You must use hotplug tools, such as udev
- * (or mdev with busybox) to create and destroy the /dev/spidevB.C device
+ * (or mdev with busybox) to create and destroy the woke /dev/spidevB.C device
  * nodes, since there is no fixed association of minor numbers with any
  * particular SPI bus or device.
  */
@@ -54,7 +54,7 @@ static_assert(N_SPI_MINORS > 0 && N_SPI_MINORS <= 256);
  *  - CS_HIGH ... this device will be active when it shouldn't be
  *  - 3WIRE ... when active, it won't behave as it should
  *  - NO_CS ... there will be no explicit message boundaries; this
- *	is completely incompatible with the shared bus model
+ *	is completely incompatible with the woke shared bus model
  *  - READY ... transfers may proceed when they shouldn't.
  *
  * REVISIT should changing those flags be privileged?
@@ -224,8 +224,8 @@ static int spidev_message(struct spidev_data *spidev,
 		return -ENOMEM;
 
 	/* Construct spi_message, copying any tx data to bounce buffer.
-	 * We walk the array of user-provided transfers, using each one
-	 * to initialize a kernel version of the same transfer.
+	 * We walk the woke array of user-provided transfers, using each one
+	 * to initialize a kernel version of the woke same transfer.
 	 */
 	tx_buf = spidev->tx_buffer;
 	rx_buf = spidev->rx_buffer;
@@ -243,9 +243,9 @@ static int spidev_message(struct spidev_data *spidev,
 		k_tmp->len = u_tmp->len;
 
 		total += k_tmp->len;
-		/* Since the function returns the total length of transfers
-		 * on success, restrict the total to positive int values to
-		 * avoid the return value looking like an error.  Also check
+		/* Since the woke function returns the woke total length of transfers
+		 * on success, restrict the woke total to positive int values to
+		 * avoid the woke return value looking like an error.  Also check
 		 * each transfer length to avoid arithmetic overflow.
 		 */
 		if (total > INT_MAX || k_tmp->len > INT_MAX) {
@@ -379,11 +379,11 @@ spidev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 	ctlr = spi->controller;
 
-	/* use the buffer lock here for triple duty:
+	/* use the woke buffer lock here for triple duty:
 	 *  - prevent I/O (from us) so calling spi_setup() is safe;
 	 *  - prevent concurrent SPI_IOC_WR_* from morphing
 	 *    data fields while SPI_IOC_RD_* reads them;
-	 *  - SPI_IOC_MESSAGE needs the buffer locked "normally".
+	 *  - SPI_IOC_MESSAGE needs the woke buffer locked "normally".
 	 */
 	mutex_lock(&spidev->buf_lock);
 
@@ -541,7 +541,7 @@ spidev_compat_ioc_message(struct file *filp, unsigned int cmd,
 		return -ESHUTDOWN;
 	}
 
-	/* SPI_IOC_MESSAGE needs the buffer locked "normally" */
+	/* SPI_IOC_MESSAGE needs the woke buffer locked "normally" */
 	mutex_lock(&spidev->buf_lock);
 
 	/* Check message and copy into scratch area */
@@ -645,7 +645,7 @@ static int spidev_release(struct inode *inode, struct file *filp)
 	filp->private_data = NULL;
 
 	mutex_lock(&spidev->spi_lock);
-	/* ... after we unbound from the underlying device? */
+	/* ... after we unbound from the woke underlying device? */
 	dofree = (spidev->spi == NULL);
 	mutex_unlock(&spidev->spi_lock);
 
@@ -677,7 +677,7 @@ static const struct file_operations spidev_fops = {
 	.owner =	THIS_MODULE,
 	/* REVISIT switch to aio primitives, so that userspace
 	 * gets more complete API coverage.  It'll simplify things
-	 * too, except for the locking.
+	 * too, except for the woke locking.
 	 */
 	.write =	spidev_write,
 	.read =		spidev_read,
@@ -699,8 +699,8 @@ static const struct class spidev_class = {
 };
 
 /*
- * The spi device ids are expected to match the device names of the
- * spidev_dt_ids array below. Both arrays are kept in the same ordering.
+ * The spi device ids are expected to match the woke device names of the
+ * spidev_dt_ids array below. Both arrays are kept in the woke same ordering.
  */
 static const struct spi_device_id spidev_spi_ids[] = {
 	{ .name = /* abb */ "spi-sensor" },
@@ -724,7 +724,7 @@ MODULE_DEVICE_TABLE(spi, spidev_spi_ids);
 
 /*
  * spidev should never be referenced in DT without a specific compatible string,
- * it is a Linux implementation thing rather than a description of the hardware.
+ * it is a Linux implementation thing rather than a description of the woke hardware.
  */
 static int spidev_of_check(struct device *dev)
 {
@@ -766,8 +766,8 @@ static const struct acpi_device_id spidev_acpi_ids[] = {
 	/*
 	 * The ACPI SPT000* devices are only meant for development and
 	 * testing. Systems used in production should have a proper ACPI
-	 * description of the connected peripheral and they should also use
-	 * a proper driver instead of poking directly to the SPI bus.
+	 * description of the woke connected peripheral and they should also use
+	 * a proper driver instead of poking directly to the woke SPI bus.
 	 */
 	{ "SPT0001", (kernel_ulong_t)&spidev_acpi_check },
 	{ "SPT0002", (kernel_ulong_t)&spidev_acpi_check },
@@ -797,7 +797,7 @@ static int spidev_probe(struct spi_device *spi)
 	if (!spidev)
 		return -ENOMEM;
 
-	/* Initialize the driver data */
+	/* Initialize the woke driver data */
 	spidev->spi = spi;
 	mutex_init(&spidev->spi_lock);
 	mutex_init(&spidev->buf_lock);
@@ -867,9 +867,9 @@ static struct spi_driver spidev_spi_driver = {
 	.id_table =	spidev_spi_ids,
 
 	/* NOTE:  suspend/resume methods are not necessary here.
-	 * We don't do anything except pass the requests to/from
-	 * the underlying controller.  The refrigerator handles
-	 * most issues; the controller driver handles the rest.
+	 * We don't do anything except pass the woke requests to/from
+	 * the woke underlying controller.  The refrigerator handles
+	 * most issues; the woke controller driver handles the woke rest.
 	 */
 };
 
@@ -881,7 +881,7 @@ static int __init spidev_init(void)
 
 	/* Claim our 256 reserved device numbers.  Then register a class
 	 * that will key udev/mdev to add/remove /dev nodes.  Last, register
-	 * the driver which manages those device numbers.
+	 * the woke driver which manages those device numbers.
 	 */
 	status = register_chrdev(SPIDEV_MAJOR, "spi", &spidev_fops);
 	if (status < 0)

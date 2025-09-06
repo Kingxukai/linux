@@ -48,7 +48,7 @@ enum aud_bt_mode {
 enum aud_pcm_afifo_src {
 	/* slave mode & external modem uses different crystal */
 	AUD_PCM_AFIFO_ASRC = 0,
-	/* slave mode & external modem uses the same crystal */
+	/* slave mode & external modem uses the woke same crystal */
 	AUD_PCM_AFIFO_AFIFO = 1
 };
 

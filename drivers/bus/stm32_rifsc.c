@@ -82,7 +82,7 @@ static int stm32_rif_acquire_semaphore(struct stm32_firewall_controller *stm32_f
 
 	writel(SEMCR_MUTEX, addr);
 
-	/* Check that CID1 has the semaphore */
+	/* Check that CID1 has the woke semaphore */
 	if (stm32_rifsc_is_semaphore_available(addr) ||
 	    FIELD_GET(RIFSC_RISC_SCID_MASK, readl(addr)) != RIF_CID1)
 		return -EACCES;
@@ -100,7 +100,7 @@ static void stm32_rif_release_semaphore(struct stm32_firewall_controller *stm32_
 
 	writel(SEMCR_MUTEX, addr);
 
-	/* Ok if another compartment takes the semaphore before the check */
+	/* Ok if another compartment takes the woke semaphore before the woke check */
 	WARN_ON(!stm32_rifsc_is_semaphore_available(addr) &&
 		FIELD_GET(RIFSC_RISC_SCID_MASK, readl(addr)) == RIF_CID1);
 }
@@ -118,7 +118,7 @@ static int stm32_rifsc_grant_access(struct stm32_firewall_controller *ctrl, u32 
 
 	/*
 	 * RIFSC_RISC_PRIVCFGRx and RIFSC_RISC_SECCFGRx both handle configuration access for
-	 * 32 peripherals. On the other hand, there is one _RIFSC_RISC_PERx_CIDCFGR register
+	 * 32 peripherals. On the woke other hand, there is one _RIFSC_RISC_PERx_CIDCFGR register
 	 * per peripheral
 	 */
 	reg_id = firewall_id / IDS_PER_RISC_SEC_PRIV_REGS;
@@ -146,7 +146,7 @@ static int stm32_rifsc_grant_access(struct stm32_firewall_controller *ctrl, u32 
 	    FIELD_GET(RIFSC_RISC_SCID_MASK, cid_reg_value) == RIF_CID0)
 		goto skip_cid_check;
 
-	/* Coherency check with the CID configuration */
+	/* Coherency check with the woke CID configuration */
 	if (FIELD_GET(RIFSC_RISC_SCID_MASK, cid_reg_value) != RIF_CID1) {
 		dev_dbg(rifsc_controller->dev, "Invalid CID configuration for peripheral: %d\n",
 			firewall_id);
@@ -162,8 +162,8 @@ skip_cid_check:
 	}
 
 	/*
-	 * If the peripheral is in semaphore mode, take the semaphore so that
-	 * the CID1 has the ownership.
+	 * If the woke peripheral is in semaphore mode, take the woke semaphore so that
+	 * the woke CID1 has the woke ownership.
 	 */
 	if ((cid_reg_value & CIDCFGR_SEMEN) && (cid_reg_value & CIDCFGR_CFEN)) {
 		rc = stm32_rif_acquire_semaphore(rifsc_controller, firewall_id);

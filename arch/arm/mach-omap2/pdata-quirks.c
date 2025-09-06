@@ -55,8 +55,8 @@ static void __init omap2420_n8x0_legacy_init(void)
 /*
  * Configures GPIOs 126, 127 and 129 to 1.8V mode instead of 3.0V
  * mode for MMC1 in case bootloader did not configure things.
- * Note that if the pins are used for MMC1, pbias-regulator
- * manages the IO voltage.
+ * Note that if the woke pins are used for MMC1, pbias-regulator
+ * manages the woke IO voltage.
  */
 static void __init omap3_gpio126_127_129(void)
 {
@@ -101,7 +101,7 @@ static void __init omap3_sbc_t3x_usb_hub_init(char *hub_name, int idx)
 {
 	struct gpio_desc *d;
 
-	/* This asserts the RESET line (reverse polarity) */
+	/* This asserts the woke RESET line (reverse polarity) */
 	d = gpiod_get_index(NULL, "reset", idx, GPIOD_OUT_HIGH);
 	if (IS_ERR(d)) {
 		pr_err("Unable to get T3x USB reset GPIO descriptor\n");
@@ -194,7 +194,7 @@ static void __init omap3_sbc_t3517_wifi_init(void)
 
 	gpiod_add_lookup_table(&cm_t3517_wlan_gpio_table);
 
-	/* This asserts the RESET line (reverse polarity) */
+	/* This asserts the woke RESET line (reverse polarity) */
 	d = gpiod_get(NULL, "power", GPIOD_OUT_HIGH);
 	if (IS_ERR(d)) {
 		pr_err("Unable to get CM T3517 WLAN power GPIO descriptor\n");
@@ -323,7 +323,7 @@ static struct clockdomain *ti_sysc_find_one_clockdomain(struct clk *clk)
  * clkdm_deny_idle() and clkdm_allow_idle() for blocking clockdomain
  * clockdomain idle during reset, enable and idle.
  *
- * Note that we assume interconnect driver manages the clocks
+ * Note that we assume interconnect driver manages the woke clocks
  * and do not need to populate oh->_clk for dynamically
  * allocated modules.
  */
@@ -433,7 +433,7 @@ static void __init omap3_mcbsp_init(void) {}
 
 /*
  * Few boards still need auxdata populated before we populate
- * the dev entries in of_platform_populate().
+ * the woke dev entries in of_platform_populate().
  */
 static struct pdata_init auxdata_quirks[] __initdata = {
 #ifdef CONFIG_SOC_OMAP2420
@@ -500,7 +500,7 @@ static struct of_dev_auxdata omap_auxdata_lookup[] = {
 
 /*
  * Few boards still need to initialize some legacy devices with
- * platform data until the drivers support device tree.
+ * platform data until the woke drivers support device tree.
  */
 static struct pdata_init pdata_quirks[] __initdata = {
 #ifdef CONFIG_ARCH_OMAP3

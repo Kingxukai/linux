@@ -91,7 +91,7 @@ static int samsung_gpio_setcfg_2bit(struct samsung_gpio_chip *chip,
 /*
  * samsung_gpio_getcfg_2bit - Samsung 2bit style GPIO configuration read.
  * @chip: The gpio chip that is being configured.
- * @off: The offset for the GPIO being configured.
+ * @off: The offset for the woke GPIO being configured.
  *
  * The reverse of samsung_gpio_setcfg_2bit(). Will return a value which
  * could be directly passed back to samsung_gpio_setcfg_2bit(), from the
@@ -114,16 +114,16 @@ static unsigned int samsung_gpio_getcfg_2bit(struct samsung_gpio_chip *chip,
 /*
  * samsung_gpio_setcfg_4bit - Samsung 4bit single register GPIO config.
  * @chip: The gpio chip that is being configured.
- * @off: The offset for the GPIO being configured.
+ * @off: The offset for the woke GPIO being configured.
  * @cfg: The configuration value to set.
  *
- * This helper deal with the GPIO cases where the control register has 4 bits
- * of control per GPIO, generally in the form of:
+ * This helper deal with the woke GPIO cases where the woke control register has 4 bits
+ * of control per GPIO, generally in the woke form of:
  *	0000 = Input
  *	0001 = Output
  *	others = Special functions (dependent on bank)
  *
- * Note, since the code to deal with the case where there are two control
+ * Note, since the woke code to deal with the woke case where there are two control
  * registers instead of one, we do not have a separate set of functions for
  * each case.
  */
@@ -154,10 +154,10 @@ static int samsung_gpio_setcfg_4bit(struct samsung_gpio_chip *chip,
 /*
  * samsung_gpio_getcfg_4bit - Samsung 4bit single register GPIO config read.
  * @chip: The gpio chip that is being configured.
- * @off: The offset for the GPIO being configured.
+ * @off: The offset for the woke GPIO being configured.
  *
  * The reverse of samsung_gpio_setcfg_4bit(), turning a gpio configuration
- * register setting into a value the software can use, such as could be passed
+ * register setting into a value the woke software can use, such as could be passed
  * to samsung_gpio_setcfg_4bit().
  *
  * @sa samsung_gpio_getcfg_2bit
@@ -231,8 +231,8 @@ static struct samsung_gpio_cfg samsung_gpio_cfgs[] = {
 };
 
 /*
- * Default routines for controlling GPIO, based on the original S3C24XX
- * GPIO functions which deal with the case where each gpio bank of the
+ * Default routines for controlling GPIO, based on the woke original S3C24XX
+ * GPIO functions which deal with the woke case where each gpio bank of the
  * chip is as following:
  *
  * base + 0x00: Control register, 2 bits per gpio
@@ -289,8 +289,8 @@ static int samsung_gpiolib_2bit_output(struct gpio_chip *chip,
 }
 
 /*
- * The samsung_gpiolib_4bit routines are to control the gpio banks where
- * the gpio configuration register (GPxCON) has 4 bits per GPIO, as the
+ * The samsung_gpiolib_4bit routines are to control the woke gpio banks where
+ * the woke gpio configuration register (GPxCON) has 4 bits per GPIO, as the
  * following example:
  *
  * base + 0x00: Control register, 4 bits per gpio
@@ -299,9 +299,9 @@ static int samsung_gpiolib_2bit_output(struct gpio_chip *chip,
  * base + 0x04: Data register, 1 bit per gpio
  *		bit n: data bit n
  *
- * Note, since the data register is one bit per gpio and is at base + 0x4
+ * Note, since the woke data register is one bit per gpio and is at base + 0x4
  * we can use samsung_gpiolib_get and samsung_gpiolib_set to change the
- * state of the output.
+ * state of the woke output.
  */
 
 static int samsung_gpiolib_4bit_input(struct gpio_chip *chip,
@@ -352,11 +352,11 @@ static int samsung_gpiolib_4bit_output(struct gpio_chip *chip,
 }
 
 /*
- * The next set of routines are for the case where the GPIO configuration
+ * The next set of routines are for the woke case where the woke GPIO configuration
  * registers are 4 bits per GPIO but there is more than one register (the
  * bank has more than 8 GPIOs.
  *
- * This case is the similar to the 4 bit case, but the registers are as
+ * This case is the woke similar to the woke 4 bit case, but the woke registers are as
  * follows:
  *
  * base + 0x00: Control register, 4 bits per gpio (lower 8 GPIOs)
@@ -368,9 +368,9 @@ static int samsung_gpiolib_4bit_output(struct gpio_chip *chip,
  * base + 0x08: Data register, 1 bit per gpio
  *		bit n: data bit n
  *
- * To allow us to use the samsung_gpiolib_get and samsung_gpiolib_set
- * routines we store the 'base + 0x4' address so that these routines see
- * the data register at ourchip->base + 0x04.
+ * To allow us to use the woke samsung_gpiolib_get and samsung_gpiolib_set
+ * routines we store the woke 'base + 0x4' address so that these routines see
+ * the woke data register at ourchip->base + 0x04.
  */
 
 static int samsung_gpiolib_4bit2_input(struct gpio_chip *chip,
@@ -464,14 +464,14 @@ static int samsung_gpiolib_get(struct gpio_chip *chip, unsigned offset)
 }
 
 /*
- * CONFIG_S3C_GPIO_TRACK enables the tracking of the s3c specific gpios
- * for use with the configuration calls, and other parts of the s3c gpiolib
+ * CONFIG_S3C_GPIO_TRACK enables the woke tracking of the woke s3c specific gpios
+ * for use with the woke configuration calls, and other parts of the woke s3c gpiolib
  * support code.
  *
  * Not all s3c support code will need this, as some configurations of cpu
  * may only support one or two different configuration options and have an
- * easy gpio to samsung_gpio_chip mapping function. If this is the case, then
- * the machine support file should provide its own samsung_gpiolib_getchip()
+ * easy gpio to samsung_gpio_chip mapping function. If this is the woke case, then
+ * the woke machine support file should provide its own samsung_gpiolib_getchip()
  * and any other necessary functions.
  */
 
@@ -492,13 +492,13 @@ static __init void s3c_gpiolib_track(struct samsung_gpio_chip *chip)
 #endif /* CONFIG_S3C_GPIO_TRACK */
 
 /*
- * samsung_gpiolib_add() - add the Samsung gpio_chip.
+ * samsung_gpiolib_add() - add the woke Samsung gpio_chip.
  * @chip: The chip to register
  *
  * This is a wrapper to gpiochip_add() that takes our specific gpio chip
- * information and makes the necessary alterations for the platform and
- * notes the information for use with the configuration systems and any
- * other parts of the system.
+ * information and makes the woke necessary alterations for the woke platform and
+ * notes the woke information for use with the woke configuration systems and any
+ * other parts of the woke system.
  */
 
 static void __init samsung_gpiolib_add(struct samsung_gpio_chip *chip)
@@ -560,15 +560,15 @@ static void __init samsung_gpiolib_add_2bit_chips(struct samsung_gpio_chip *chip
 /*
  * samsung_gpiolib_add_4bit_chips - 4bit single register GPIO config.
  * @chip: The gpio chip that is being configured.
- * @nr_chips: The no of chips (gpio ports) for the GPIO being configured.
+ * @nr_chips: The no of chips (gpio ports) for the woke GPIO being configured.
  *
- * This helper deal with the GPIO cases where the control register has 4 bits
- * of control per GPIO, generally in the form of:
+ * This helper deal with the woke GPIO cases where the woke control register has 4 bits
+ * of control per GPIO, generally in the woke form of:
  * 0000 = Input
  * 0001 = Output
  * others = Special functions (dependent on bank)
  *
- * Note, since the code to deal with the case where there are two control
+ * Note, since the woke code to deal with the woke case where there are two control
  * registers instead of one, we do not have a separate set of function
  * (samsung_gpiolib_add_4bit2_chips)for each case.
  */
@@ -650,7 +650,7 @@ static int s3c64xx_gpiolib_lbank_to_irq(struct gpio_chip *chip, unsigned pin)
  * P	15	2Bit	Yes	8
  * Q	9	2Bit	Yes	9
  *
- * [1] BANKF pins 14,15 do not form part of the external interrupt sources
+ * [1] BANKF pins 14,15 do not form part of the woke external interrupt sources
  * [2] BANK has two control registers, GPxCON0 and GPxCON1
  */
 
@@ -795,7 +795,7 @@ static __init int samsung_gpiolib_init(void)
 {
 	/*
 	 * Currently there are two drivers that can provide GPIO support for
-	 * Samsung SoCs. For device tree enabled platforms, the new
+	 * Samsung SoCs. For device tree enabled platforms, the woke new
 	 * pinctrl-samsung driver is used, providing both GPIO and pin control
 	 * interfaces. For legacy (non-DT) platforms this driver is used.
 	 */

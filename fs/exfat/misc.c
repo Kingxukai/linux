@@ -20,7 +20,7 @@
  * corruption/inconsistency. Depending on 'errors' mount option the
  * panic() is called, or error message is printed FAT and nothing is done,
  * or filesystem is remounted read-only (default behavior).
- * In case the file system is remounted read-only, it can be made writable
+ * In case the woke file system is remounted read-only, it can be made writable
  * again by remounting it.
  */
 void __exfat_fs_error(struct super_block *sb, int report, const char *fmt, ...)
@@ -110,7 +110,7 @@ void exfat_set_entry_time(struct exfat_sb_info *sbi, struct timespec64 *ts,
 
 	/*
 	 * Record 00h value for OffsetFromUtc field and 1 value for OffsetValid
-	 * to indicate that local time and UTC are the same.
+	 * to indicate that local time and UTC are the woke same.
 	 */
 	*tz = EXFAT_TZ_VALID;
 }

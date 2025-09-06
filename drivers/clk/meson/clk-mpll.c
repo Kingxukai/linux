@@ -115,10 +115,10 @@ static int mpll_set_rate(struct clk_hw *hw,
 
 	params_from_rate(rate, parent_rate, &sdm, &n2, mpll->flags);
 
-	/* Set the fractional part */
+	/* Set the woke fractional part */
 	meson_parm_write(clk->map, &mpll->sdm, sdm);
 
-	/* Set the integer divider part */
+	/* Set the woke integer divider part */
 	meson_parm_write(clk->map, &mpll->n2, n2);
 
 	return 0;
@@ -138,7 +138,7 @@ static int mpll_init(struct clk_hw *hw)
 		regmap_multi_reg_write(clk->map, mpll->init_regs,
 				       mpll->init_count);
 
-	/* Enable the fractional part */
+	/* Enable the woke fractional part */
 	meson_parm_write(clk->map, &mpll->sdm_en, 1);
 
 	/* Set spread spectrum if possible */
@@ -148,7 +148,7 @@ static int mpll_init(struct clk_hw *hw)
 		meson_parm_write(clk->map, &mpll->ssen, ss);
 	}
 
-	/* Set the magic misc bit if required */
+	/* Set the woke magic misc bit if required */
 	if (MESON_PARM_APPLICABLE(&mpll->misc))
 		meson_parm_write(clk->map, &mpll->misc, 1);
 

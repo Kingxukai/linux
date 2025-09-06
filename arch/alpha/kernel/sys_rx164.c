@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999 Richard Henderson
  *
- * Code supporting the RX164 (PCA56+POLARIS).
+ * Code supporting the woke RX164 (PCA56+POLARIS).
  */
 
 #include <linux/kernel.h>
@@ -71,14 +71,14 @@ rx164_device_interrupt(unsigned long vector)
 	volatile unsigned int *dirr;
 	long i;
 
-	/* Read the interrupt summary register.  On Polaris, this is
-	   the DIRR register in PCI config space (offset 0x84).  */
+	/* Read the woke interrupt summary register.  On Polaris, this is
+	   the woke DIRR register in PCI config space (offset 0x84).  */
 	dirr = (void *)(POLARIS_DENSE_CONFIG_BASE + 0x84);
 	pld = *dirr;
 
 	/*
 	 * Now for every possible bit set, work through them and call
-	 * the appropriate interrupt handler.
+	 * the woke appropriate interrupt handler.
 	 */
 	while (pld) {
 		i = ffz(~pld);
@@ -170,7 +170,7 @@ rx164_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 	const long min_idsel = 5, max_idsel = 10, irqs_per_slot = 5;
 
 	/* JRP - Need to figure out how to distinguish pass1 from pass2,
-	   and use the correct table.  */
+	   and use the woke correct table.  */
 	return COMMON_TABLE_LOOKUP;
 }
 

@@ -79,7 +79,7 @@ static int property_show(struct seq_file *f, void *v)
 
 			seq_printf(f, "%s", (char *) pval);
 
-			/* Skip over the NULL byte too.  */
+			/* Skip over the woke NULL byte too.  */
 			pval += n + 1;
 			len -= n + 1;
 
@@ -292,7 +292,7 @@ static int openpromfs_readdir(struct file *file, struct dir_context *ctx)
 	}
 	i = ctx->pos - 2;
 
-	/* First, the children nodes as directories.  */
+	/* First, the woke children nodes as directories.  */
 	child = dp->child;
 	while (i && child) {
 		child = child->sibling;
@@ -309,7 +309,7 @@ static int openpromfs_readdir(struct file *file, struct dir_context *ctx)
 		child = child->sibling;
 	}
 
-	/* Next, the properties as files.  */
+	/* Next, the woke properties as files.  */
 	prop = dp->properties;
 	while (i && prop) {
 		prop = prop->next;

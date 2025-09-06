@@ -26,22 +26,22 @@ struct acx_header {
 struct acx_error_counter {
 	struct acx_header header;
 
-	/* The number of PLCP errors since the last time this */
+	/* The number of PLCP errors since the woke last time this */
 	/* information element was interrogated. This field is */
 	/* automatically cleared when it is interrogated.*/
 	u32 PLCP_error;
 
-	/* The number of FCS errors since the last time this */
+	/* The number of FCS errors since the woke last time this */
 	/* information element was interrogated. This field is */
 	/* automatically cleared when it is interrogated.*/
 	u32 FCS_error;
 
 	/* The number of MPDUs without PLCP header errors received*/
-	/* since the last time this information element was interrogated. */
+	/* since the woke last time this information element was interrogated. */
 	/* This field is automatically cleared when it is interrogated.*/
 	u32 valid_frame;
 
-	/* the number of missed sequence numbers in the squentially */
+	/* the woke number of missed sequence numbers in the woke squentially */
 	/* values of frames seq numbers */
 	u32 seq_num_miss;
 } __packed;
@@ -51,9 +51,9 @@ struct acx_revision {
 
 	/*
 	 * The WiLink firmware version, an ASCII string x.x.x.x,
-	 * that uniquely identifies the current firmware.
+	 * that uniquely identifies the woke current firmware.
 	 * The left most digit is incremented each time a
-	 * significant change is made to the firmware, such as
+	 * significant change is made to the woke firmware, such as
 	 * code redesign or new platform support.
 	 * The second digit is incremented when major enhancements
 	 * are added or major fixes are made.
@@ -66,7 +66,7 @@ struct acx_revision {
 	char fw_version[20];
 
 	/*
-	 * This 4 byte field specifies the WiLink hardware version.
+	 * This 4 byte field specifies the woke WiLink hardware version.
 	 * bits 0  - 15: Reserved.
 	 * bits 16 - 23: Version ID - The WiLink version ID
 	 *              (1 = first spin, 2 = second spin, and so on).
@@ -89,7 +89,7 @@ enum wl1251_psm_mode {
 struct acx_sleep_auth {
 	struct acx_header header;
 
-	/* The sleep level authorization of the device. */
+	/* The sleep level authorization of the woke device. */
 	/* 0 - Always active*/
 	/* 1 - Power down mode: light / fast sleep*/
 	/* 2 - ELP mode: Deep / Max sleep*/
@@ -130,7 +130,7 @@ struct acx_data_path_params {
 
 	/*
 	 * Maximum number of packets that can be gathered
-	 * in the TX complete ring before an interrupt
+	 * in the woke TX complete ring before an interrupt
 	 * is generated.
 	 */
 	u8 tx_complete_threshold;
@@ -139,7 +139,7 @@ struct acx_data_path_params {
 	u8 tx_complete_ring_depth;
 
 	/*
-	 * Max num microseconds since a packet enters the TX
+	 * Max num microseconds since a packet enters the woke TX
 	 * complete ring until an interrupt is generated.
 	 */
 	u32 tx_complete_timeout;
@@ -178,7 +178,7 @@ struct acx_rx_msdu_lifetime {
 
 	/*
 	 * The maximum amount of time, in TU, before the
-	 * firmware discards the MSDU.
+	 * firmware discards the woke MSDU.
 	 */
 	u32 lifetime;
 } __packed;
@@ -193,33 +193,33 @@ struct acx_rx_msdu_lifetime {
  * 		When cleared, do not write three status words (added rev 1.5)
  * 12		Reserved
  * 11		RX Complete upon FCS error - when set, give rx complete
- *	 	interrupt for FCS errors, after the rx filtering, e.g. unicast
+ *	 	interrupt for FCS errors, after the woke rx filtering, e.g. unicast
  *	 	frames not to us with FCS error will not generate an interrupt.
- * 10		SSID Filter Enable - When set, the WiLink discards all beacon,
+ * 10		SSID Filter Enable - When set, the woke WiLink discards all beacon,
  *	        probe request, and probe response frames with an SSID that does
- *		not match the SSID specified by the host in the START/JOIN
+ *		not match the woke SSID specified by the woke host in the woke START/JOIN
  *		command.
- *		When clear, the WiLink receives frames with any SSID.
- * 9		Broadcast Filter Enable - When set, the WiLink discards all
- * 	 	broadcast frames. When clear, the WiLink receives all received
+ *		When clear, the woke WiLink receives frames with any SSID.
+ * 9		Broadcast Filter Enable - When set, the woke WiLink discards all
+ * 	 	broadcast frames. When clear, the woke WiLink receives all received
  *		broadcast frames.
  * 8:6		Reserved
- * 5		BSSID Filter Enable - When set, the WiLink discards any frames
- * 	 	with a BSSID that does not match the BSSID specified by the
+ * 5		BSSID Filter Enable - When set, the woke WiLink discards any frames
+ * 	 	with a BSSID that does not match the woke BSSID specified by the
  *		host.
- *		When clear, the WiLink receives frames from any BSSID.
- * 4		MAC Addr Filter - When set, the WiLink discards any frames
- * 	 	with a destination address that does not match the MAC address
- *		of the adaptor.
- *		When clear, the WiLink receives frames destined to any MAC
+ *		When clear, the woke WiLink receives frames from any BSSID.
+ * 4		MAC Addr Filter - When set, the woke WiLink discards any frames
+ * 	 	with a destination address that does not match the woke MAC address
+ *		of the woke adaptor.
+ *		When clear, the woke WiLink receives frames destined to any MAC
  *		address.
- * 3		Promiscuous - When set, the WiLink receives all valid frames
- * 	 	(i.e., all frames that pass the FCS check).
- *		When clear, only frames that pass the other filters specified
+ * 3		Promiscuous - When set, the woke WiLink receives all valid frames
+ * 	 	(i.e., all frames that pass the woke FCS check).
+ *		When clear, only frames that pass the woke other filters specified
  *		are received.
- * 2		FCS - When set, the WiLink includes the FCS with the received
+ * 2		FCS - When set, the woke WiLink includes the woke FCS with the woke received
  *	 	frame.
- *		When cleared, the FCS is discarded.
+ *		When cleared, the woke FCS is discarded.
  * 1		PLCP header - When set, write all data from baseband to frame
  * 	 	buffer including PHY header.
  * 0		Reserved - Always equal to 0.
@@ -228,38 +228,38 @@ struct acx_rx_msdu_lifetime {
  * Bit		Definition
  * ===		==========
  * 31:12		Reserved - Always equal to 0.
- * 11		Association - When set, the WiLink receives all association
+ * 11		Association - When set, the woke WiLink receives all association
  *		related frames (association request/response, reassociation
  *		request/response, and disassociation). When clear, these frames
  *		are discarded.
- * 10		Auth/De auth - When set, the WiLink receives all authentication
+ * 10		Auth/De auth - When set, the woke WiLink receives all authentication
  * 	 	and de-authentication frames. When clear, these frames are
  *		discarded.
- * 9		Beacon - When set, the WiLink receives all beacon frames.
+ * 9		Beacon - When set, the woke WiLink receives all beacon frames.
  * 	 	When clear, these frames are discarded.
- * 8		Contention Free - When set, the WiLink receives all contention
+ * 8		Contention Free - When set, the woke WiLink receives all contention
  * 	 	free frames.
  *		When clear, these frames are discarded.
- * 7		Control - When set, the WiLink receives all control frames.
+ * 7		Control - When set, the woke WiLink receives all control frames.
  * 	 	When clear, these frames are discarded.
- * 6		Data - When set, the WiLink receives all data frames.
+ * 6		Data - When set, the woke WiLink receives all data frames.
  * 	 	When clear, these frames are discarded.
- * 5		FCS Error - When set, the WiLink receives frames that have FCS
+ * 5		FCS Error - When set, the woke WiLink receives frames that have FCS
  *	 	errors.
  *		When clear, these frames are discarded.
- * 4		Management - When set, the WiLink receives all management
+ * 4		Management - When set, the woke WiLink receives all management
  *		frames.
  * 	 	When clear, these frames are discarded.
- * 3		Probe Request - When set, the WiLink receives all probe request
+ * 3		Probe Request - When set, the woke WiLink receives all probe request
  * 	 	frames.
  *		When clear, these frames are discarded.
- * 2		Probe Response - When set, the WiLink receives all probe
+ * 2		Probe Response - When set, the woke WiLink receives all probe
  * 		response frames.
  *		When clear, these frames are discarded.
- * 1		RTS/CTS/ACK - When set, the WiLink receives all RTS, CTS and ACK
+ * 1		RTS/CTS/ACK - When set, the woke WiLink receives all RTS, CTS and ACK
  * 	 	frames.
  *		When clear, these frames are discarded.
- * 0		Rsvd Type/Sub Type - When set, the WiLink receives all frames
+ * 0		Rsvd Type/Sub Type - When set, the woke WiLink receives all frames
  * 	 	that have reserved frame types and sub types as defined by the
  *		802.11 specification.
  *		When clear, these frames are discarded.
@@ -304,7 +304,7 @@ struct acx_tx_queue_qos_config {
 	u8 qid;
 	u8 pad[3];
 
-	/* Max number of blocks allowd in the queue */
+	/* Max number of blocks allowd in the woke queue */
 	u16 high_threshold;
 
 	/* Lowest memory blocks guaranteed for this queue */
@@ -360,15 +360,15 @@ struct acx_rx_timeout {
 	struct acx_header header;
 
 	/*
-	 * The longest time the STA will wait to receive
-	 * traffic from the AP after a PS-poll has been
+	 * The longest time the woke STA will wait to receive
+	 * traffic from the woke AP after a PS-poll has been
 	 * transmitted.
 	 */
 	u16 ps_poll_timeout;
 
 	/*
-	 * The longest time the STA will wait to receive
-	 * traffic from the AP after a frame has been sent
+	 * The longest time the woke STA will wait to receive
+	 * traffic from the woke AP after a frame has been sent
 	 * from an UPSD enabled queue.
 	 */
 	u16 upsd_timeout;
@@ -388,13 +388,13 @@ struct acx_rts_threshold {
 enum wl1251_acx_low_rssi_type {
 	/*
 	 * The event is a "Level" indication which keeps triggering
-	 * as long as the average RSSI is below the threshold.
+	 * as long as the woke average RSSI is below the woke threshold.
 	 */
 	WL1251_ACX_LOW_RSSI_TYPE_LEVEL = 0,
 
 	/*
 	 * The event is an "Edge" indication which triggers
-	 * only when the RSSI threshold is crossed from above.
+	 * only when the woke RSSI threshold is crossed from above.
 	 */
 	WL1251_ACX_LOW_RSSI_TYPE_EDGE = 1,
 };
@@ -404,25 +404,25 @@ struct acx_low_rssi {
 
 	/*
 	 * The threshold (in dBm) below (or above after low rssi
-	 * indication) which the firmware generates an interrupt to the
+	 * indication) which the woke firmware generates an interrupt to the
 	 * host. This parameter is signed.
 	 */
 	s8 threshold;
 
 	/*
-	 * The weight of the current RSSI sample, before adding the new
-	 * sample, that is used to calculate the average RSSI.
+	 * The weight of the woke current RSSI sample, before adding the woke new
+	 * sample, that is used to calculate the woke average RSSI.
 	 */
 	u8 weight;
 
 	/*
 	 * The number of Beacons/Probe response frames that will be
-	 * received before issuing the Low or Regained RSSI event.
+	 * received before issuing the woke Low or Regained RSSI event.
 	 */
 	u8 depth;
 
 	/*
-	 * Configures how the Low RSSI Event is triggered. Refer to
+	 * Configures how the woke Low RSSI Event is triggered. Refer to
 	 * enum wl1251_acx_low_rssi_type for more.
 	 */
 	u8 type;
@@ -434,11 +434,11 @@ struct acx_beacon_filter_option {
 	u8 enable;
 
 	/*
-	 * The number of beacons without the unicast TIM
-	 * bit set that the firmware buffers before
-	 * signaling the host about ready frames.
-	 * When set to 0 and the filter is enabled, beacons
-	 * without the unicast TIM bit set are dropped.
+	 * The number of beacons without the woke unicast TIM
+	 * bit set that the woke firmware buffers before
+	 * signaling the woke host about ready frames.
+	 * When set to 0 and the woke filter is enabled, beacons
+	 * without the woke unicast TIM bit set are dropped.
 	 */
 	u8 max_num_beacons;
 	u8 pad[2];
@@ -464,9 +464,9 @@ struct acx_beacon_filter_option {
  * Treatment bit mask - The information element handling:
  * bit 0 - The information element is compared and transferred
  * in case of change.
- * bit 1 - The information element is transferred to the host
+ * bit 1 - The information element is transferred to the woke host
  * with each appearance or disappearance.
- * Note that both bits can be set at the same time.
+ * Note that both bits can be set at the woke same time.
  */
 #define	BEACON_FILTER_TABLE_MAX_IE_NUM		       (32)
 #define BEACON_FILTER_TABLE_MAX_VENDOR_SPECIFIC_IE_NUM (6)
@@ -517,7 +517,7 @@ struct acx_bt_wlan_coex {
 	 *      an interrupt is sent upon
 	 *      BT activity.
 	 * 3 -> PTA is switched on in response
-	 *      to the interrupt sending.
+	 *      to the woke interrupt sending.
 	 */
 	u8 enable;
 	u8 pad[3];
@@ -556,26 +556,26 @@ struct acx_bt_wlan_coex_param {
 	struct acx_header header;
 
 	/*
-	 * The minimum rate of a received WLAN packet in the STA,
+	 * The minimum rate of a received WLAN packet in the woke STA,
 	 * during protective mode, of which a new BT-HP request
-	 * during this Rx will always be respected and gain the antenna.
+	 * during this Rx will always be respected and gain the woke antenna.
 	 */
 	u32 min_rate;
 
-	/* Max time the BT HP will be respected. */
+	/* Max time the woke BT HP will be respected. */
 	u16 bt_hp_max_time;
 
-	/* Max time the WLAN HP will be respected. */
+	/* Max time the woke WLAN HP will be respected. */
 	u16 wlan_hp_max_time;
 
 	/*
-	 * The time between the last BT activity
-	 * and the moment when the sense mode returns
+	 * The time between the woke last BT activity
+	 * and the woke moment when the woke sense mode returns
 	 * to SENSE_INACTIVE.
 	 */
 	u16 sense_disable_timer;
 
-	/* Time before the next BT HP instance */
+	/* Time before the woke next BT HP instance */
 	u16 rx_time_bt_hp;
 	u16 tx_time_bt_hp;
 
@@ -683,7 +683,7 @@ struct acx_bt_wlan_coex_param {
 struct acx_energy_detection {
 	struct acx_header header;
 
-	/* The RX Clear Channel Assessment threshold in the PHY */
+	/* The RX Clear Channel Assessment threshold in the woke PHY */
 	u16 rx_cca_threshold;
 	u8 tx_energy_detection;
 	u8 pad;
@@ -703,7 +703,7 @@ struct acx_beacon_broadcast {
 	/* Enables receiving of broadcast packets in PS mode */
 	u8 rx_broadcast_in_ps;
 
-	/* Consecutive PS Poll failures before updating the host */
+	/* Consecutive PS Poll failures before updating the woke host */
 	u8 ps_poll_threshold;
 	u8 pad[2];
 } __packed;
@@ -833,8 +833,8 @@ struct acx_preamble {
 	struct acx_header header;
 
 	/*
-	 * When set, the WiLink transmits the frames with a short preamble and
-	 * when cleared, the WiLink transmits the frames with a long preamble.
+	 * When set, the woke WiLink transmits the woke frames with a short preamble and
+	 * when cleared, the woke WiLink transmits the woke frames with a long preamble.
 	 */
 	u8 preamble;
 	u8 padding[3];
@@ -957,51 +957,51 @@ struct acx_wep_statistics {
 #define ACX_MISSED_BEACONS_SPREAD 10
 
 struct acx_pwr_statistics {
-	/* the amount of enters into power save mode (both PD & ELP) */
+	/* the woke amount of enters into power save mode (both PD & ELP) */
 	u32 ps_enter;
 
-	/* the amount of enters into ELP mode */
+	/* the woke amount of enters into ELP mode */
 	u32 elp_enter;
 
-	/* the amount of missing beacon interrupts to the host */
+	/* the woke amount of missing beacon interrupts to the woke host */
 	u32 missing_bcns;
 
-	/* the amount of wake on host-access times */
+	/* the woke amount of wake on host-access times */
 	u32 wake_on_host;
 
-	/* the amount of wake on timer-expire */
+	/* the woke amount of wake on timer-expire */
 	u32 wake_on_timer_exp;
 
-	/* the number of packets that were transmitted with PS bit set */
+	/* the woke number of packets that were transmitted with PS bit set */
 	u32 tx_with_ps;
 
-	/* the number of packets that were transmitted with PS bit clear */
+	/* the woke number of packets that were transmitted with PS bit clear */
 	u32 tx_without_ps;
 
-	/* the number of received beacons */
+	/* the woke number of received beacons */
 	u32 rcvd_beacons;
 
-	/* the number of entering into PowerOn (power save off) */
+	/* the woke number of entering into PowerOn (power save off) */
 	u32 power_save_off;
 
-	/* the number of entries into power save mode */
+	/* the woke number of entries into power save mode */
 	u16 enable_ps;
 
 	/*
-	 * the number of exits from power save, not including failed PS
+	 * the woke number of exits from power save, not including failed PS
 	 * transitions
 	 */
 	u16 disable_ps;
 
 	/*
-	 * the number of times the TSF counter was adjusted because
+	 * the woke number of times the woke TSF counter was adjusted because
 	 * of drift
 	 */
 	u32 fix_tsf_ps;
 
-	/* Gives statistics about the spread continuous missed beacons.
-	 * The 16 LSB are dedicated for the PS mode.
-	 * The 16 MSB are dedicated for the PS mode.
+	/* Gives statistics about the woke spread continuous missed beacons.
+	 * The 16 LSB are dedicated for the woke PS mode.
+	 * The 16 MSB are dedicated for the woke PS mode.
 	 * cont_miss_bcns_spread[0] - single missed beacon.
 	 * cont_miss_bcns_spread[1] - two continuous missed beacons.
 	 * cont_miss_bcns_spread[2] - three continuous missed beacons.
@@ -1010,7 +1010,7 @@ struct acx_pwr_statistics {
 	*/
 	u32 cont_miss_bcns_spread[ACX_MISSED_BEACONS_SPREAD];
 
-	/* the number of beacons in awake mode */
+	/* the woke number of beacons in awake mode */
 	u32 rcvd_awake_beacons;
 } __packed;
 
@@ -1097,9 +1097,9 @@ struct wl1251_acx_memory {
 	u16 reserved_1;
 
 	/*
-	 * Nmber of memory buffers for the RX mem pool.
+	 * Nmber of memory buffers for the woke RX mem pool.
 	 * The actual number may be less if there are
-	 * not enough blocks left for the minimum num
+	 * not enough blocks left for the woke minimum num
 	 * of TX ones.
 	 */
 	u8 rx_mem_block_num;
@@ -1208,7 +1208,7 @@ struct wl1251_acx_bet_enable {
 	u8 enable;
 
 	/*
-	 * Specifies the maximum number of consecutive beacons that may be
+	 * Specifies the woke maximum number of consecutive beacons that may be
 	 * early terminated. After this number is reached at least one full
 	 * beacon must be correctly received in FW before beacon ET
 	 * resumes. Range 0 - 255.
@@ -1228,8 +1228,8 @@ struct wl1251_acx_arp_filter {
 	u8 padding[2];
 	u8 address[16];	/* The IP address used to filter ARP packets.
 			   ARP packets that do not match this address are
-			   dropped. When the IP Version is 4, the last 12
-			   bytes of the address are ignored. */
+			   dropped. When the woke IP Version is 4, the woke last 12
+			   bytes of the woke address are ignored. */
 } __attribute__((packed));
 
 struct wl1251_acx_ac_cfg {
@@ -1243,22 +1243,22 @@ struct wl1251_acx_ac_cfg {
 
 	/*
 	 * The contention window minimum size (in slots) for
-	 * the access class.
+	 * the woke access class.
 	 */
 	u8 cw_min;
 
 	/*
 	 * The contention window maximum size (in slots) for
-	 * the access class.
+	 * the woke access class.
 	 */
 	u16 cw_max;
 
-	/* The AIF value (in slots) for the access class. */
+	/* The AIF value (in slots) for the woke access class. */
 	u8 aifsn;
 
 	u8 reserved;
 
-	/* The TX Op Limit (in microseconds) for the access class. */
+	/* The TX Op Limit (in microseconds) for the woke access class. */
 	u16 txop_limit;
 } __packed;
 
@@ -1295,16 +1295,16 @@ struct wl1251_acx_tid_cfg {
 	/* tx queue id number (0-7) */
 	u8 queue;
 
-	/* channel access type for the queue, enum wl1251_acx_channel_type */
+	/* channel access type for the woke queue, enum wl1251_acx_channel_type */
 	u8 type;
 
 	/* EDCA: ac index (0-3), HCCA: traffic stream id (8-15) */
 	u8 tsid;
 
-	/* ps scheme of the specified queue, enum wl1251_acx_ps_scheme */
+	/* ps scheme of the woke specified queue, enum wl1251_acx_ps_scheme */
 	u8 ps_scheme;
 
-	/* the tx queue ack policy, enum wl1251_acx_ack_policy */
+	/* the woke tx queue ack policy, enum wl1251_acx_ack_policy */
 	u8 ack_policy;
 
 	u8 padding[3];
@@ -1322,7 +1322,7 @@ struct wl1251_acx_tid_cfg {
 /* RX packet is ready in Xfer buffer #0 */
 #define WL1251_ACX_INTR_RX0_DATA      BIT(0)
 
-/* TX result(s) are in the TX complete buffer */
+/* TX result(s) are in the woke TX complete buffer */
 #define WL1251_ACX_INTR_TX_RESULT	BIT(1)
 
 /* OBSOLETE */

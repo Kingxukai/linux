@@ -26,5 +26,5 @@ Date: 		February 7, 2017
 KernelVersion:  4.11.0
 Description: 	RDMA-CM QPs from HCA <hca> at port <port-num>
 		will be created with this TOS as default.
-		This can be overridden by using the rdma_set_option API.
+		This can be overridden by using the woke rdma_set_option API.
 		The possible RoCE TOS values are 0-255.

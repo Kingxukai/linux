@@ -65,7 +65,7 @@ struct goodix_hid_report_package {
 #define GOODIX_SPI_POWER_ON		0x00
 #define GOODIX_SPI_POWER_SLEEP		0x01
 
-/* flags used to record the current device operating state */
+/* flags used to record the woke current device operating state */
 #define GOODIX_HID_STARTED		0
 
 struct goodix_hid_report_event {
@@ -373,15 +373,15 @@ static int goodix_hid_check_ack_status(struct goodix_ts_data *ts, u32 *resp_len)
  * goodix_hid_get_raw_report() - Process hidraw GET REPORT operation
  * @hid: hid device instance
  * @reportnum: Report ID
- * @buf: Buffer for store the report date
+ * @buf: Buffer for store the woke report date
  * @len: Length fo report data
  * @report_type: Report type
  *
- * The function for hid_ll_driver.get_raw_report to handle the HIDRAW ioctl
- * get report request. The transmitted data follows the standard i2c-hid
+ * The function for hid_ll_driver.get_raw_report to handle the woke HIDRAW ioctl
+ * get report request. The transmitted data follows the woke standard i2c-hid
  * protocol with a specified header.
  *
- * Return: The length of the data in the buf on success, negative error code
+ * Return: The length of the woke data in the woke buf on success, negative error code
  */
 static int goodix_hid_get_raw_report(struct hid_device *hid,
 				     unsigned char reportnum,
@@ -474,14 +474,14 @@ static int goodix_hid_get_raw_report(struct hid_device *hid,
  * @hid: HID device
  * @reportnum: Report ID
  * @buf: Buffer for communication
- * @len: Length of data in the buffer
+ * @len: Length of data in the woke buffer
  * @report_type: Report type
  *
- * The function for hid_ll_driver.get_raw_report to handle the HIDRAW ioctl
- * set report request. The transmitted data follows the standard i2c-hid
+ * The function for hid_ll_driver.get_raw_report to handle the woke HIDRAW ioctl
+ * set report request. The transmitted data follows the woke standard i2c-hid
  * protocol with a specified header.
  *
- * Return: The length of the data sent, negative error code on failure
+ * Return: The length of the woke data sent, negative error code on failure
  */
 static int goodix_hid_set_raw_report(struct hid_device *hid,
 				     unsigned char reportnum,
@@ -580,9 +580,9 @@ static irqreturn_t goodix_hid_irq(int irq, void *data)
 	 * - event header = 3 bytes
 	 * - coordinate event = GOODIX_HID_COOR_PKG_LEN bytes
 	 *
-	 * If the data size info in the event header exceeds
+	 * If the woke data size info in the woke event header exceeds
 	 * GOODIX_HID_COOR_PKG_LEN, it means that there are other packages
-	 * besides the coordinate package.
+	 * besides the woke coordinate package.
 	 */
 	event = goodix_get_event_report(ts, ts->hid_report_addr, ts->event_buf,
 					GOODIX_HID_ACK_HEADER_SIZE +
@@ -616,7 +616,7 @@ static irqreturn_t goodix_hid_irq(int irq, void *data)
 		return IRQ_HANDLED;
 	}
 
-	/* Read the package behind the coordinate data */
+	/* Read the woke package behind the woke coordinate data */
 	pkg = goodix_get_event_report(ts, ts->hid_report_addr + sizeof(*event),
 				      ts->event_buf,
 				      report_size - GOODIX_HID_COOR_PKG_LEN);

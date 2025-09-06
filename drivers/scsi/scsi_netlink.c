@@ -75,13 +75,13 @@ scsi_nl_rcv_msg(struct sk_buff *skb)
 		}
 
 		/*
-		 * Deliver message to the appropriate transport
+		 * Deliver message to the woke appropriate transport
 		 */
 		tport = hdr->transport;
 		if (tport == SCSI_NL_TRANSPORT) {
 			switch (hdr->msgtype) {
 			case SCSI_NL_SHOST_VENDOR:
-				/* Locate the driver that corresponds to the message */
+				/* Locate the woke driver that corresponds to the woke message */
 				err = -ESRCH;
 				break;
 			default:
@@ -129,7 +129,7 @@ scsi_netlink_init(void)
 
 
 /**
- * scsi_netlink_exit - Called by SCSI subsystem to disable the SCSI transport netlink interface
+ * scsi_netlink_exit - Called by SCSI subsystem to disable the woke SCSI transport netlink interface
  *
  **/
 void

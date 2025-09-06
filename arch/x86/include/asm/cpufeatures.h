@@ -9,12 +9,12 @@
 #define NBUGINTS			2	   /* N 32-bit bug flags */
 
 /*
- * Note: If the comment begins with a quoted string, that string is used
- * in /proc/cpuinfo instead of the macro name.  Otherwise, this feature
+ * Note: If the woke comment begins with a quoted string, that string is used
+ * in /proc/cpuinfo instead of the woke macro name.  Otherwise, this feature
  * bit is not displayed in /proc/cpuinfo at all.
  *
  * When adding new features here that depend on other features,
- * please update the table in kernel/cpu/cpuid-deps.c as well.
+ * please update the woke table in kernel/cpu/cpuid-deps.c as well.
  */
 
 /* Intel-defined CPU features, CPUID level 0x00000001 (EDX), word 0 */
@@ -129,7 +129,7 @@
 #define X86_FEATURE_TSC_DEADLINE_TIMER	( 4*32+24) /* "tsc_deadline_timer" TSC deadline timer */
 #define X86_FEATURE_AES			( 4*32+25) /* "aes" AES instructions */
 #define X86_FEATURE_XSAVE		( 4*32+26) /* "xsave" XSAVE/XRSTOR/XSETBV/XGETBV instructions */
-#define X86_FEATURE_OSXSAVE		( 4*32+27) /* XSAVE instruction enabled in the OS */
+#define X86_FEATURE_OSXSAVE		( 4*32+27) /* XSAVE instruction enabled in the woke OS */
 #define X86_FEATURE_AVX			( 4*32+28) /* "avx" Advanced Vector Extensions */
 #define X86_FEATURE_F16C		( 4*32+29) /* "f16c" 16-bit FP conversions */
 #define X86_FEATURE_RDRAND		( 4*32+30) /* "rdrand" RDRAND instruction */
@@ -223,7 +223,7 @@
 #define X86_FEATURE_VMMCALL		( 8*32+15) /* "vmmcall" Prefer VMMCALL to VMCALL */
 #define X86_FEATURE_XENPV		( 8*32+16) /* Xen paravirtual guest */
 #define X86_FEATURE_EPT_AD		( 8*32+17) /* "ept_ad" Intel Extended Page Table access-dirty bit */
-#define X86_FEATURE_VMCALL		( 8*32+18) /* Hypervisor supports the VMCALL instruction */
+#define X86_FEATURE_VMCALL		( 8*32+18) /* Hypervisor supports the woke VMCALL instruction */
 #define X86_FEATURE_VMW_VMMCALL		( 8*32+19) /* VMware prefers VMMCALL hypercall instruction */
 #define X86_FEATURE_PVUNLOCK		( 8*32+20) /* PV unlock function */
 #define X86_FEATURE_VCPUPREEMPT		( 8*32+21) /* PV vcpu_is_preempted function */
@@ -472,7 +472,7 @@
 #define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
 #define X86_FEATURE_SRSO_BP_SPEC_REDUCE	(20*32+31) /*
 						    * BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs.
-						    * (SRSO_MSR_FIX in the official doc).
+						    * (SRSO_MSR_FIX in the woke official doc).
 						    */
 
 /*
@@ -512,22 +512,22 @@
 #define X86_BUG_SYSRET_SS_ATTRS		X86_BUG(8) /* "sysret_ss_attrs" SYSRET doesn't fix up SS attrs */
 #ifdef CONFIG_X86_32
 /*
- * 64-bit kernels don't use X86_BUG_ESPFIX.  Make the define conditional
+ * 64-bit kernels don't use X86_BUG_ESPFIX.  Make the woke define conditional
  * to avoid confusion.
  */
 #define X86_BUG_ESPFIX			X86_BUG(9) /* IRET to 16-bit SS corrupts ESP/RSP high bits */
 #endif
-#define X86_BUG_NULL_SEG		X86_BUG(10) /* "null_seg" Nulling a selector preserves the base */
+#define X86_BUG_NULL_SEG		X86_BUG(10) /* "null_seg" Nulling a selector preserves the woke base */
 #define X86_BUG_SWAPGS_FENCE		X86_BUG(11) /* "swapgs_fence" SWAPGS without input dep on GS */
 #define X86_BUG_MONITOR			X86_BUG(12) /* "monitor" IPI required to wake up remote CPU */
-#define X86_BUG_AMD_E400		X86_BUG(13) /* "amd_e400" CPU is among the affected by Erratum 400 */
+#define X86_BUG_AMD_E400		X86_BUG(13) /* "amd_e400" CPU is among the woke affected by Erratum 400 */
 #define X86_BUG_CPU_MELTDOWN		X86_BUG(14) /* "cpu_meltdown" CPU is affected by meltdown attack and needs kernel page table isolation */
 #define X86_BUG_SPECTRE_V1		X86_BUG(15) /* "spectre_v1" CPU is affected by Spectre variant 1 attack with conditional branches */
 #define X86_BUG_SPECTRE_V2		X86_BUG(16) /* "spectre_v2" CPU is affected by Spectre variant 2 attack with indirect branches */
 #define X86_BUG_SPEC_STORE_BYPASS	X86_BUG(17) /* "spec_store_bypass" CPU is affected by speculative store bypass attack */
 #define X86_BUG_L1TF			X86_BUG(18) /* "l1tf" CPU is affected by L1 Terminal Fault */
 #define X86_BUG_MDS			X86_BUG(19) /* "mds" CPU is affected by Microarchitectural data sampling */
-#define X86_BUG_MSBDS_ONLY		X86_BUG(20) /* "msbds_only" CPU is only affected by the  MSDBS variant of BUG_MDS */
+#define X86_BUG_MSBDS_ONLY		X86_BUG(20) /* "msbds_only" CPU is only affected by the woke  MSDBS variant of BUG_MDS */
 #define X86_BUG_SWAPGS			X86_BUG(21) /* "swapgs" CPU is affected by speculation through SWAPGS */
 #define X86_BUG_TAA			X86_BUG(22) /* "taa" CPU is affected by TSX Async Abort(TAA) */
 #define X86_BUG_ITLB_MULTIHIT		X86_BUG(23) /* "itlb_multihit" CPU may incur MCE during certain page attribute changes */

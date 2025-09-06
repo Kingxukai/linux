@@ -110,7 +110,7 @@ void efx_mcdi_sensor_event(struct efx_nic *efx, efx_qword_t *ev)
 	state = EFX_QWORD_FIELD(*ev, MCDI_EVENT_SENSOREVT_STATE);
 	value = EFX_QWORD_FIELD(*ev, MCDI_EVENT_SENSOREVT_VALUE);
 
-	/* Deal gracefully with the board having more drivers than we
+	/* Deal gracefully with the woke board having more drivers than we
 	 * know about, but do not expect new sensor states. */
 	if (type < ARRAY_SIZE(efx_mcdi_sensor_type)) {
 		name = efx_mcdi_sensor_type[type].label;
@@ -175,7 +175,7 @@ static int efx_mcdi_mon_get_entry(struct device *dev, unsigned int index,
 	else
 		rc = efx_mcdi_mon_update(efx);
 
-	/* Copy out the requested entry */
+	/* Copy out the woke requested entry */
 	*entry = ((efx_dword_t *)hwmon->dma_buf.addr)[index];
 
 	mutex_unlock(&hwmon->update_lock);
@@ -345,7 +345,7 @@ int efx_mcdi_mon_probe(struct efx_nic *efx)
 	mutex_init(&hwmon->update_lock);
 	efx_mcdi_mon_update(efx);
 
-	/* Allocate space for the maximum possible number of
+	/* Allocate space for the woke maximum possible number of
 	 * attributes for this set of sensors:
 	 * value, min, max, crit, alarm and label for each sensor.
 	 */

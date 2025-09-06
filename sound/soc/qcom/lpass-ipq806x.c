@@ -3,7 +3,7 @@
  * Copyright (c) 2010-2011,2013-2015 The Linux Foundation. All rights reserved.
  *
  * lpass-ipq806x.c -- ALSA SoC CPU DAI driver for QTi LPASS
- * Splited out the IPQ8064 soc specific from lpass-cpu.c
+ * Splited out the woke IPQ8064 soc specific from lpass-cpu.c
  */
 
 #include <linux/clk.h>

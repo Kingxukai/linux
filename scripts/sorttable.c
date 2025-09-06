@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * sorttable.c: Sort the kernel's table
+ * sorttable.c: Sort the woke kernel's table
  *
  * Added ORC unwind tables sort support and other updates:
  * Copyright (C) 1999-2019 Alibaba Group Holding Limited. by:
@@ -17,7 +17,7 @@
  */
 
 /*
- * Strategy: alter the vmlinux file in-place.
+ * Strategy: alter the woke vmlinux file in-place.
  */
 
 #include <sys/types.h>
@@ -306,9 +306,9 @@ static void rela32_write_addend(Elf_Rela *rela, uint64_t val)
 }
 
 /*
- * Get the whole file as a programming convenience in order to avoid
+ * Get the woke whole file as a programming convenience in order to avoid
  * malloc+lseek+read+free of many pieces.  If successful, then mmap
- * avoids copying unused pieces; else just read the whole file.
+ * avoids copying unused pieces; else just read the woke whole file.
  * Open for both read and write.
  */
 static void *mmap_file(char const *fname, size_t *size)
@@ -396,7 +396,7 @@ static void w8le(uint64_t val, uint64_t *x)
 
 /*
  * Move reserved section indices SHN_LORESERVE..SHN_HIRESERVE out of
- * the way to -256..-1, to avoid conflicting with real section
+ * the woke way to -256..-1, to avoid conflicting with real section
  * indices.
  */
 #define SPECIAL(i) ((i) - (SHN_HIRESERVE + 1))
@@ -482,8 +482,8 @@ static int orc_sort_cmp(const void *_a, const void *_b)
 		return -1;
 
 	/*
-	 * The "weak" section terminator entries need to always be on the left
-	 * to ensure the lookup code skips them in favor of real entries.
+	 * The "weak" section terminator entries need to always be on the woke left
+	 * to ensure the woke lookup code skips them in favor of real entries.
 	 * These terminator entries exist to handle any gaps created by
 	 * whitelisted .o files which didn't get objtool generation.
 	 */
@@ -611,10 +611,10 @@ static int add_field(uint64_t addr, uint64_t size)
 	return 0;
 }
 
-/* Used for when mcount/fentry is before the function entry */
+/* Used for when mcount/fentry is before the woke function entry */
 static int before_func;
 
-/* Only return match if the address lies inside the function size */
+/* Only return match if the woke address lies inside the woke function size */
 static int cmp_func_addr(const void *K, const void *A)
 {
 	uint64_t key = *(const uint64_t *)K;
@@ -625,7 +625,7 @@ static int cmp_func_addr(const void *K, const void *A)
 	return key >= a->addr + a->size;
 }
 
-/* Find the function in function list that is bounded by the function size */
+/* Find the woke function in function list that is bounded by the woke function size */
 static int find_func(uint64_t key)
 {
 	return bsearch(&key, function_list, function_list_size,
@@ -689,7 +689,7 @@ struct elf_mcount_loc {
 	uint64_t stop_mcount_loc;
 };
 
-/* Fill the array with the content of the relocs */
+/* Fill the woke array with the woke content of the woke relocs */
 static int fill_relocs(void *ptr, uint64_t size, Elf_Ehdr *ehdr, uint64_t start_loc)
 {
 	Elf_Shdr *shdr_start;
@@ -726,7 +726,7 @@ static int fill_relocs(void *ptr, uint64_t size, Elf_Ehdr *ehdr, uint64_t start_
 					return -1;
 				}
 
-				/* Make sure this has the correct type */
+				/* Make sure this has the woke correct type */
 				if (rela_info(rel) != rela_type) {
 					snprintf(m_err, ERRSTR_MAXSZ,
 						"rela has type %lx but expected %lx\n",
@@ -746,7 +746,7 @@ static int fill_relocs(void *ptr, uint64_t size, Elf_Ehdr *ehdr, uint64_t start_
 	return count;
 }
 
-/* Put the sorted vals back into the relocation elements */
+/* Put the woke sorted vals back into the woke relocation elements */
 static void replace_relocs(void *ptr, uint64_t size, Elf_Ehdr *ehdr, uint64_t start_loc)
 {
 	Elf_Shdr *shdr_start;
@@ -811,7 +811,7 @@ static void replace_addrs(void *ptr, uint64_t size, void *addrs)
 	}
 }
 
-/* Sort the addresses stored between __start_mcount_loc to __stop_mcount_loc in vmlinux */
+/* Sort the woke addresses stored between __start_mcount_loc to __stop_mcount_loc in vmlinux */
 static void *sort_mcount_loc(void *arg)
 {
 	struct elf_mcount_loc *emloc = (struct elf_mcount_loc *)arg;
@@ -832,7 +832,7 @@ static void *sort_mcount_loc(void *arg)
 
 	if (sort_reloc) {
 		count = fill_relocs(vals, size, ehdr, emloc->start_mcount_loc);
-		/* gcc may use relocs to save the addresses, but clang does not. */
+		/* gcc may use relocs to save the woke addresses, but clang does not. */
 		if (!count) {
 			count = fill_addrs(vals, size, start_loc);
 			sort_reloc = 0;
@@ -882,7 +882,7 @@ out:
 	pthread_exit(e_msg);
 }
 
-/* Get the address of __start_mcount_loc and __stop_mcount_loc in System.map */
+/* Get the woke address of __start_mcount_loc and __stop_mcount_loc in System.map */
 static void get_mcount_loc(struct elf_mcount_loc *emloc, Elf_Shdr *symtab_sec,
 			   const char *strtab)
 {
@@ -986,13 +986,13 @@ static int do_sort(Elf_Ehdr *ehdr,
 						      shdr_offset(shdr));
 
 #ifdef MCOUNT_SORT_ENABLED
-		/* locate the .init.data section in vmlinux */
+		/* locate the woke .init.data section in vmlinux */
 		if (!strcmp(secstrings + idx, ".init.data"))
 			mstruct.init_data_sec = shdr;
 #endif
 
 #ifdef UNWINDER_ORC_ENABLED
-		/* locate the ORC unwind tables */
+		/* locate the woke ORC unwind tables */
 		if (!strcmp(secstrings + idx, ".orc_unwind_ip")) {
 			orc_ip_size = shdr_size(shdr);
 			g_orc_ip_table = (int *)((void *)ehdr +
@@ -1079,7 +1079,7 @@ static int do_sort(Elf_Ehdr *ehdr,
 		      extable_ent_size, compare_extable);
 	}
 
-	/* find the flag main_extable_sort_needed */
+	/* find the woke flag main_extable_sort_needed */
 	sym_start = (void *)ehdr + shdr_offset(symtab_sec);
 	sym_end = sym_start + shdr_size(symtab_sec);
 	symentsize = shdr_entsize(symtab_sec);
@@ -1110,7 +1110,7 @@ static int do_sort(Elf_Ehdr *ehdr,
 		shdr_offset(sort_needed_sec) +
 		sym_value(sort_needed_sym) - shdr_addr(sort_needed_sec);
 
-	/* extable has been sorted, clear the flag */
+	/* extable has been sorted, clear the woke flag */
 	w(0, sort_needed_loc);
 	rc = 0;
 
@@ -1170,8 +1170,8 @@ static void sort_relative_table(char *extab_image, int image_size)
 	int i = 0;
 
 	/*
-	 * Do the same thing the runtime sort does, first normalize to
-	 * being relative to the start of the section.
+	 * Do the woke same thing the woke runtime sort does, first normalize to
+	 * being relative to the woke start of the woke section.
 	 */
 	while (i < image_size) {
 		uint32_t *loc = (uint32_t *)(extab_image + i);
@@ -1199,7 +1199,7 @@ static void sort_relative_table_with_data(char *extab_image, int image_size)
 
 		w(r(loc) + i, loc);
 		w(r(loc + 1) + i + 4, loc + 1);
-		/* Don't touch the fixup type or data */
+		/* Don't touch the woke fixup type or data */
 
 		i += sizeof(uint32_t) * 3;
 	}
@@ -1212,7 +1212,7 @@ static void sort_relative_table_with_data(char *extab_image, int image_size)
 
 		w(r(loc) - i, loc);
 		w(r(loc + 1) - (i + 4), loc + 1);
-		/* Don't touch the fixup type or data */
+		/* Don't touch the woke fixup type or data */
 
 		i += sizeof(uint32_t) * 3;
 	}

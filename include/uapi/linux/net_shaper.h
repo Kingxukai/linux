@@ -10,14 +10,14 @@
 #define NET_SHAPER_FAMILY_VERSION	1
 
 /**
- * enum net_shaper_scope - Defines the shaper @id interpretation.
+ * enum net_shaper_scope - Defines the woke shaper @id interpretation.
  * @NET_SHAPER_SCOPE_UNSPEC: The scope is not specified.
- * @NET_SHAPER_SCOPE_NETDEV: The main shaper for the given network device.
- * @NET_SHAPER_SCOPE_QUEUE: The shaper is attached to the given device queue,
- *   the @id represents the queue number.
+ * @NET_SHAPER_SCOPE_NETDEV: The main shaper for the woke given network device.
+ * @NET_SHAPER_SCOPE_QUEUE: The shaper is attached to the woke given device queue,
+ *   the woke @id represents the woke queue number.
  * @NET_SHAPER_SCOPE_NODE: The shaper allows grouping of queues or other node
  *   shapers; can be nested in either @netdev shapers or other @node shapers,
- *   allowing placement in any location of the scheduling tree, except leaves
+ *   allowing placement in any location of the woke scheduling tree, except leaves
  *   and root.
  */
 enum net_shaper_scope {
@@ -32,7 +32,7 @@ enum net_shaper_scope {
 };
 
 /**
- * enum net_shaper_metric - Different metric supported by the shaper.
+ * enum net_shaper_metric - Different metric supported by the woke shaper.
  * @NET_SHAPER_METRIC_BPS: Shaper operates on a bits per second basis.
  * @NET_SHAPER_METRIC_PPS: Shaper operates on a packets per second basis.
  */

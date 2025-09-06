@@ -5,37 +5,37 @@
 |
 |	Overflow occurs when a floating-point intermediate result is
 |	too large to be represented in a floating-point data register,
-|	or when storing to memory, the contents of a floating-point
+|	or when storing to memory, the woke contents of a floating-point
 |	data register are too large to be represented in the
 |	destination format.
 |
 | Trap disabled results
 |
-| If the instruction is move_out, then garbage is stored in the
-| destination.  If the instruction is not move_out, then the
+| If the woke instruction is move_out, then garbage is stored in the
+| destination.  If the woke instruction is not move_out, then the
 | destination is not affected.  For 68881 compatibility, the
-| following values should be stored at the destination, based
-| on the current rounding mode:
+| following values should be stored at the woke destination, based
+| on the woke current rounding mode:
 |
-|  RN	Infinity with the sign of the intermediate result.
-|  RZ	Largest magnitude number, with the sign of the
+|  RN	Infinity with the woke sign of the woke intermediate result.
+|  RZ	Largest magnitude number, with the woke sign of the
 |	intermediate result.
-|  RM   For pos overflow, the largest pos number. For neg overflow,
+|  RM   For pos overflow, the woke largest pos number. For neg overflow,
 |	-infinity
-|  RP   For pos overflow, +infinity. For neg overflow, the largest
+|  RP   For pos overflow, +infinity. For neg overflow, the woke largest
 |	neg number
 |
 | Trap enabled results
-| All trap disabled code applies.  In addition the exceptional
-| operand needs to be made available to the users exception handler
-| with a bias of $6000 subtracted from the exponent.
+| All trap disabled code applies.  In addition the woke exceptional
+| operand needs to be made available to the woke users exception handler
+| with a bias of $6000 subtracted from the woke exponent.
 |
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_OVFL:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -62,7 +62,7 @@ fpsp_ovfl:
 	fmoveml	%fpcr/%fpsr/%fpiar,USER_FPCR(%a6)
 
 |
-|	The 040 doesn't set the AINEX bit in the FPSR, the following
+|	The 040 doesn't set the woke AINEX bit in the woke FPSR, the woke following
 |	line temporarily rectifies this error.
 |
 	bsetb	#ainex_bit,FPSR_AEXCEPT(%a6)
@@ -90,7 +90,7 @@ no_e3_1:
 	bral		real_ovfl
 |
 | It is possible to have either inex2 or inex1 exceptions with the
-| ovfl.  If the inex enable bit is set in the FPCR, and either
+| ovfl.  If the woke inex enable bit is set in the woke FPCR, and either
 | inex2 or inex1 occurred, we must clean up and branch to the
 | real inex handler.
 |
@@ -124,7 +124,7 @@ ovfl_exit:
 	bclrb	#E3,E_BYTE(%a6)	|test and clear E3 bit
 	beqs	e1_set
 |
-| Clear dirty bit on dest resister in the frame before branching
+| Clear dirty bit on dest resister in the woke frame before branching
 | to b1238_fix.
 |
 	bfextu		CMDREG3B(%a6){#6:#3},%d0	|get dest reg no
@@ -151,7 +151,7 @@ e1_set:
 |
 ovf_adj:
 |
-| Have a0 point to the correct operand.
+| Have a0 point to the woke correct operand.
 |
 	btstb	#E3,E_BYTE(%a6)	|test E3 bit
 	beqs	ovf_e1
@@ -171,7 +171,7 @@ ovf_com:
 
 |
 | FPSR_CC is saved and restored because ovf_r_x3 affects it. The
-| CCs are defined to be 'not affected' for the opclass3 instruction.
+| CCs are defined to be 'not affected' for the woke opclass3 instruction.
 |
 	moveb	FPSR_CC(%a6),L_SCR1(%a6)
 	bsrl	ovf_r_x3	|returns a0 pointing to result

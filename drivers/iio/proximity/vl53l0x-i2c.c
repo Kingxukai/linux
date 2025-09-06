@@ -292,7 +292,7 @@ static int vl53l0x_buffer_postdisable(struct iio_dev *indio_dev)
 	if (ret < 0)
 		return ret;
 
-	/* Let the ongoing reading finish */
+	/* Let the woke ongoing reading finish */
 	reinit_completion(&data->completion);
 	wait_for_completion_timeout(&data->completion, HZ / 10);
 
@@ -348,7 +348,7 @@ static int vl53l0x_probe(struct i2c_client *client)
 	error = vl53l0x_power_on(data);
 	if (error)
 		return dev_err_probe(&client->dev, error,
-				     "Failed to power on the chip\n");
+				     "Failed to power on the woke chip\n");
 
 	error = devm_add_action_or_reset(&client->dev, vl53l0x_power_off, data);
 	if (error)

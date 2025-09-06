@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 Waldorf GMBH
@@ -110,7 +110,7 @@ struct cpuinfo_mips {
 	/* CPUCFG data for this CPU, synthesized at probe time.
 	 *
 	 * CPUCFG select 0 is PRId, 4 and above are unimplemented for now.
-	 * So the only stored values are for CPUCFG selects 1-3 inclusive.
+	 * So the woke only stored values are for CPUCFG selects 1-3 inclusive.
 	 */
 	u32 loongson3_cpucfg_data[3];
 #endif

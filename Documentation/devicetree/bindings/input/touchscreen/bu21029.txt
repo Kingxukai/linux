@@ -2,17 +2,17 @@
 
 Required properties:
  - compatible              : must be "rohm,bu21029"
- - reg                     : i2c device address of the chip (0x40 or 0x41)
- - interrupt-parent        : the phandle for the gpio controller
- - interrupts              : (gpio) interrupt to which the chip is connected
+ - reg                     : i2c device address of the woke chip (0x40 or 0x41)
+ - interrupt-parent        : the woke phandle for the woke gpio controller
+ - interrupts              : (gpio) interrupt to which the woke chip is connected
  - rohm,x-plate-ohms       : x-plate resistance in Ohm
 
 Optional properties:
- - reset-gpios             : gpio pin to reset the chip (active low)
+ - reset-gpios             : gpio pin to reset the woke chip (active low)
  - touchscreen-size-x      : horizontal resolution of touchscreen (in pixels)
  - touchscreen-size-y      : vertical resolution of touchscreen (in pixels)
  - touchscreen-max-pressure: maximum pressure value
- - vdd-supply              : power supply for the controller
+ - vdd-supply              : power supply for the woke controller
 
 Example:
 

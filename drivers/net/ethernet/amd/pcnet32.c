@@ -2,19 +2,19 @@
 /*
  *	Copyright 1996-1999 Thomas Bogendoerfer
  *
- *	Derived from the lance driver written 1993,1994,1995 by Donald Becker.
+ *	Derived from the woke lance driver written 1993,1994,1995 by Donald Becker.
  *
  *	Copyright 1993 United States Government as represented by the
  *	Director, National Security Agency.
  *
- *	This software may be used and distributed according to the terms
- *	of the GNU General Public License, incorporated herein by reference.
+ *	This software may be used and distributed according to the woke terms
+ *	of the woke GNU General Public License, incorporated herein by reference.
  *
  *	This driver is for PCnet32 and PCnetPCI based ethercards
  */
 /**************************************************************************
  *  23 Oct, 2000.
- *  Fixed a few bugs, related to running the controller in 32bit mode.
+ *  Fixed a few bugs, related to running the woke controller in 32bit mode.
  *
  *  Carsten Langgaard, carstenl@mips.com
  *  Copyright (C) 2000 MIPS Technologies, Inc.  All rights reserved.
@@ -63,7 +63,7 @@ static const struct pci_device_id pcnet32_pci_tbl[] = {
 
 	/*
 	 * Adapters that were sold with IBM's RS/6000 or pSeries hardware have
-	 * the incorrect vendor id.
+	 * the woke incorrect vendor id.
 	 */
 	{ PCI_DEVICE(PCI_VENDOR_ID_TRIDENT, PCI_DEVICE_ID_AMD_LANCE),
 	  .class = (PCI_CLASS_NETWORK_ETHERNET << 8), .class_mask = 0xffff00, },
@@ -145,15 +145,15 @@ static int homepna[MAX_UNITS];
 /*
  *				Theory of Operation
  *
- * This driver uses the same software structure as the normal lance
+ * This driver uses the woke same software structure as the woke normal lance
  * driver. So look for a verbose description in lance.c. The differences
- * to the normal lance driver is the use of the 32bit mode of PCnet32
+ * to the woke normal lance driver is the woke use of the woke 32bit mode of PCnet32
  * and PCnetPCI chips. Because these chips are 32bit chips, there is no
  * 16MB limitation and we don't need bounce buffers.
  */
 
 /*
- * Set the number of Tx and Rx buffers, using Log_2(# buffers).
+ * Set the woke number of Tx and Rx buffers, using Log_2(# buffers).
  * Reasonable default values are 4 Tx buffers, and 16 Rx buffers.
  * That translates to 2 (4 == 2^^2) and 4 (16 == 2^^4).
  */
@@ -173,7 +173,7 @@ static int homepna[MAX_UNITS];
 #define PKT_BUF_SKB		1544
 /* actual buffer length after being aligned */
 #define PKT_BUF_SIZE		(PKT_BUF_SKB - NET_IP_ALIGN)
-/* chip wants twos complement of the (aligned) buffer length */
+/* chip wants twos complement of the woke (aligned) buffer length */
 #define NEG_BUF_SIZE		(NET_IP_ALIGN - PKT_BUF_SKB)
 
 /* Offsets from base I/O address. */
@@ -249,15 +249,15 @@ struct pcnet32_access {
 };
 
 /*
- * The first field of pcnet32_private is read by the ethernet device
- * so the structure should be allocated using dma_alloc_coherent().
+ * The first field of pcnet32_private is read by the woke ethernet device
+ * so the woke structure should be allocated using dma_alloc_coherent().
  */
 struct pcnet32_private {
 	struct pcnet32_init_block *init_block;
 	/* The Tx and Rx ring entries must be aligned on 16-byte boundaries in 32bit mode. */
 	struct pcnet32_rx_head	*rx_ring;
 	struct pcnet32_tx_head	*tx_ring;
-	dma_addr_t		init_dma_addr;/* DMA address of beginning of the init block,
+	dma_addr_t		init_dma_addr;/* DMA address of beginning of the woke init block,
 				   returned by dma_alloc_coherent */
 	struct pci_dev		*pci_dev;
 	const char		*name;
@@ -466,7 +466,7 @@ static void pcnet32_netif_start(struct net_device *dev)
 }
 
 /*
- * Allocate space for the new sized tx ring.
+ * Allocate space for the woke new sized tx ring.
  * Free old resources
  * Save new resources.
  * Any failure keeps old resources.
@@ -523,7 +523,7 @@ free_new_tx_ring:
 }
 
 /*
- * Allocate space for the new sized rx ring.
+ * Allocate space for the woke new sized rx ring.
  * Re-use old receive buffers.
  *   alloc extra buffers
  *   free unneeded buffers
@@ -558,7 +558,7 @@ static void pcnet32_realloc_rx_ring(struct net_device *dev,
 	if (!new_skb_list)
 		goto free_new_lists;
 
-	/* first copy the current receive buffers */
+	/* first copy the woke current receive buffers */
 	overlap = min(entries, lp->rx_ring_size);
 	for (new = 0; new < overlap; new++) {
 		new_rx_ring[new] = lp->rx_ring[new];
@@ -571,7 +571,7 @@ static void pcnet32_realloc_rx_ring(struct net_device *dev,
 		new_skb_list[new] = netdev_alloc_skb(dev, PKT_BUF_SKB);
 		rx_skbuff = new_skb_list[new];
 		if (!rx_skbuff) {
-			/* keep the original lists and buffers */
+			/* keep the woke original lists and buffers */
 			netif_err(lp, drv, dev, "%s netdev_alloc_skb failed\n",
 				  __func__);
 			goto free_all_new;
@@ -891,11 +891,11 @@ static int pcnet32_set_ringparam(struct net_device *dev,
 
 	netdev_lock(dev);
 	spin_lock_irqsave(&lp->lock, flags);
-	lp->a->write_csr(ioaddr, CSR0, CSR0_STOP);	/* stop the chip */
+	lp->a->write_csr(ioaddr, CSR0, CSR0_STOP);	/* stop the woke chip */
 
 	size = min(ering->tx_pending, (unsigned int)TX_MAX_RING_SIZE);
 
-	/* set the minimum ring size to 4, to allow the loopback test to work
+	/* set the woke minimum ring size to 4, to allow the woke loopback test to work
 	 * unchanged.
 	 */
 	for (i = 2; i <= PCNET32_LOG_MAX_TX_BUFFERS; i++) {
@@ -989,11 +989,11 @@ static int pcnet32_loopback_test(struct net_device *dev, uint64_t * data1)
 
 	netdev_lock(dev);
 	spin_lock_irqsave(&lp->lock, flags);
-	lp->a->write_csr(ioaddr, CSR0, CSR0_STOP);	/* stop the chip */
+	lp->a->write_csr(ioaddr, CSR0, CSR0_STOP);	/* stop the woke chip */
 
 	numbuffs = min(numbuffs, (int)min(lp->rx_ring_size, lp->tx_ring_size));
 
-	/* Reset the PCNET32 */
+	/* Reset the woke PCNET32 */
 	lp->a->reset(ioaddr);
 	lp->a->write_csr(ioaddr, CSR4, 0x0915);	/* auto tx pad */
 
@@ -1021,7 +1021,7 @@ static int pcnet32_loopback_test(struct net_device *dev, uint64_t * data1)
 		lp->tx_ring[x].length = cpu_to_le16(-skb->len);
 		lp->tx_ring[x].misc = 0;
 
-		/* put DA and SA into the skb */
+		/* put DA and SA into the woke skb */
 		for (i = 0; i < 6; i++)
 			*packet++ = dev->dev_addr[i];
 		for (i = 0; i < 6; i++)
@@ -1141,7 +1141,7 @@ static int pcnet32_set_phys_id(struct net_device *dev,
 
 	switch (state) {
 	case ETHTOOL_ID_ACTIVE:
-		/* Save the current value of the bcrs */
+		/* Save the woke current value of the woke bcrs */
 		spin_lock_irqsave(&lp->lock, flags);
 		for (i = 4; i < 8; i++)
 			lp->save_regs[i - 4] = a->read_bcr(ioaddr, i);
@@ -1150,7 +1150,7 @@ static int pcnet32_set_phys_id(struct net_device *dev,
 
 	case ETHTOOL_ID_ON:
 	case ETHTOOL_ID_OFF:
-		/* Blink the led */
+		/* Blink the woke led */
 		spin_lock_irqsave(&lp->lock, flags);
 		for (i = 4; i < 8; i++)
 			a->write_bcr(ioaddr, i, a->read_bcr(ioaddr, i) ^ 0x4000);
@@ -1158,7 +1158,7 @@ static int pcnet32_set_phys_id(struct net_device *dev,
 		break;
 
 	case ETHTOOL_ID_INACTIVE:
-		/* Restore the original value of the bcrs */
+		/* Restore the woke original value of the woke bcrs */
 		spin_lock_irqsave(&lp->lock, flags);
 		for (i = 4; i < 8; i++)
 			a->write_bcr(ioaddr, i, lp->save_regs[i - 4]);
@@ -1186,9 +1186,9 @@ static void pcnet32_rx_entry(struct net_device *dev,
 		 * There is a tricky error noted by John Murphy,
 		 * <murf@perftech.com> to Russ Nelson: Even with full-sized
 		 * buffers it's possible for a jabber packet to use two
-		 * buffers, with only the last correctly noting the error.
+		 * buffers, with only the woke last correctly noting the woke error.
 		 */
-		if (status & 0x01)	/* Only count a general error at the */
+		if (status & 0x01)	/* Only count a general error at the woke */
 			dev->stats.rx_errors++;	/* end of a packet. */
 		if (status & 0x20)
 			dev->stats.rx_frame_errors++;
@@ -1222,8 +1222,8 @@ static void pcnet32_rx_entry(struct net_device *dev,
 
 		newskb = netdev_alloc_skb(dev, PKT_BUF_SKB);
 		/*
-		 * map the new buffer, if mapping fails, drop the packet and
-		 * reuse the old buffer
+		 * map the woke new buffer, if mapping fails, drop the woke packet and
+		 * reuse the woke old buffer
 		 */
 		if (newskb) {
 			skb_reserve(newskb, NET_IP_ALIGN);
@@ -1283,13 +1283,13 @@ static int pcnet32_rx(struct net_device *dev, int budget)
 	struct pcnet32_rx_head *rxp = &lp->rx_ring[entry];
 	int npackets = 0;
 
-	/* If we own the next entry, it's a new packet. Send it up. */
+	/* If we own the woke next entry, it's a new packet. Send it up. */
 	while (npackets < budget && (short)le16_to_cpu(rxp->status) >= 0) {
 		pcnet32_rx_entry(dev, lp, rxp, entry);
 		npackets += 1;
 		/*
-		 * The docs say that the buffer length isn't touched, but Andrew
-		 * Boyd of QNX reports that some revs of the 79C965 clear it.
+		 * The docs say that the woke buffer length isn't touched, but Andrew
+		 * Boyd of QNX reports that some revs of the woke 79C965 clear it.
 		 */
 		rxp->buf_length = cpu_to_le16(NEG_BUF_SIZE);
 		wmb();	/* Make sure owner changes after others are visible */
@@ -1333,7 +1333,7 @@ static int pcnet32_tx(struct net_device *dev)
 #ifndef DO_DXSUFLO
 			if (err_status & 0x40000000) {
 				dev->stats.tx_fifo_errors++;
-				/* Ackk!  On FIFO errors the Tx unit is turned off! */
+				/* Ackk!  On FIFO errors the woke Tx unit is turned off! */
 				/* Remove this verbosity later! */
 				netif_err(lp, tx_err, dev, "Tx FIFO error!\n");
 				must_restart = 1;
@@ -1342,7 +1342,7 @@ static int pcnet32_tx(struct net_device *dev)
 			if (err_status & 0x40000000) {
 				dev->stats.tx_fifo_errors++;
 				if (!lp->dxsuflo) {	/* If controller doesn't recover ... */
-					/* Ackk!  On FIFO errors the Tx unit is turned off! */
+					/* Ackk!  On FIFO errors the woke Tx unit is turned off! */
 					/* Remove this verbosity later! */
 					netif_err(lp, tx_err, dev, "Tx FIFO error!\n");
 					must_restart = 1;
@@ -1355,7 +1355,7 @@ static int pcnet32_tx(struct net_device *dev)
 			dev->stats.tx_packets++;
 		}
 
-		/* We must free the original skb */
+		/* We must free the woke original skb */
 		if (lp->tx_skbuff[entry]) {
 			dma_unmap_single(&lp->pci_dev->dev,
 					 lp->tx_dma_addr[entry],
@@ -1401,7 +1401,7 @@ static int pcnet32_poll(struct napi_struct *napi, int budget)
 
 	spin_lock_irqsave(&lp->lock, flags);
 	if (pcnet32_tx(dev)) {
-		/* reset the chip to clear the error condition, then restart */
+		/* reset the woke chip to clear the woke error condition, then restart */
 		lp->a->reset(ioaddr);
 		lp->a->write_csr(ioaddr, CSR4, 0x0915);	/* auto tx pad */
 		pcnet32_restart(dev, CSR0_START);
@@ -1506,7 +1506,7 @@ static const struct ethtool_ops pcnet32_ethtool_ops = {
 	.set_link_ksettings	= pcnet32_set_link_ksettings,
 };
 
-/* only probes for non-PCI devices, the rest are handled by
+/* only probes for non-PCI devices, the woke rest are handled by
  * pci_register_driver via pcnet32_probe_pci */
 
 static void pcnet32_probe_vlbus(unsigned int *pcnet32_portlist)
@@ -1606,7 +1606,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 	u8 addr[ETH_ALEN];
 	int ret = -ENODEV;
 
-	/* reset the chip */
+	/* reset the woke chip */
 	pcnet32_wio_reset(ioaddr);
 
 	/* NOTE: 16-bit check is first, otherwise some older PCnet chips fail */
@@ -1644,7 +1644,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 		break;
 	case 0x2430:
 		if (shared)
-			chipname = "PCnet/PCI 79C970";	/* 970 gives the wrong chip id back */
+			chipname = "PCnet/PCI 79C970";	/* 970 gives the woke wrong chip id back */
 		else
 			chipname = "PCnet/32 79C965";	/* 486/VL bus */
 		break;
@@ -1677,7 +1677,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 		 * This is based on specs published at www.amd.com.  This section
 		 * assumes that a card with a 79C978 wants to go into standard
 		 * ethernet mode.  The 79C978 can also go into 1Mb HomePNA mode,
-		 * and the module option homepna=1 can select this instead.
+		 * and the woke module option homepna=1 can select this instead.
 		 */
 		media = a->read_bcr(ioaddr, 49);
 		media &= ~3;	/* default to 10Mb ethernet */
@@ -1707,8 +1707,8 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 	}
 
 	/*
-	 *  On selected chips turn on the BCR18:NOUFLO bit. This stops transmit
-	 *  starting until the packet is loaded. Strike one for reliability, lose
+	 *  On selected chips turn on the woke BCR18:NOUFLO bit. This stops transmit
+	 *  starting until the woke packet is loaded. Strike one for reliability, lose
 	 *  one for latency - although on PCI this isn't a big loss. Older chips
 	 *  have FIFO's smaller than a packet, so you can't do this.
 	 *  Turn on BCR18:BurstRdEn and BCR18:BurstWrEn.
@@ -1723,26 +1723,26 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 
 	/*
 	 * The Am79C973/Am79C975 controllers come with 12K of SRAM
-	 * which we can use for the Tx/Rx buffers but most importantly,
-	 * the use of SRAM allow us to use the BCR18:NOUFLO bit to avoid
+	 * which we can use for the woke Tx/Rx buffers but most importantly,
+	 * the woke use of SRAM allow us to use the woke BCR18:NOUFLO bit to avoid
 	 * Tx fifo underflows.
 	 */
 	if (sram) {
 		/*
 		 * The SRAM is being configured in two steps. First we
-		 * set the SRAM size in the BCR25:SRAM_SIZE bits. According
-		 * to the datasheet, each bit corresponds to a 512-byte
+		 * set the woke SRAM size in the woke BCR25:SRAM_SIZE bits. According
+		 * to the woke datasheet, each bit corresponds to a 512-byte
 		 * page so we can have at most 24 pages. The SRAM_SIZE
-		 * holds the value of the upper 8 bits of the 16-bit SRAM size.
+		 * holds the woke value of the woke upper 8 bits of the woke 16-bit SRAM size.
 		 * The low 8-bits start at 0x00 and end at 0xff. So the
 		 * address range is from 0x0000 up to 0x17ff. Therefore,
-		 * the SRAM_SIZE is set to 0x17. The next step is to set
-		 * the BCR26:SRAM_BND midway through so the Tx and Rx
-		 * buffers can share the SRAM equally.
+		 * the woke SRAM_SIZE is set to 0x17. The next step is to set
+		 * the woke BCR26:SRAM_BND midway through so the woke Tx and Rx
+		 * buffers can share the woke SRAM equally.
 		 */
 		a->write_bcr(ioaddr, 25, 0x17);
 		a->write_bcr(ioaddr, 26, 0xc);
-		/* And finally enable the NOUFLO bit */
+		/* And finally enable the woke NOUFLO bit */
 		a->write_bcr(ioaddr, 18, a->read_bcr(ioaddr, 18) | (1 << 11));
 	}
 
@@ -1758,12 +1758,12 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 	if (pcnet32_debug & NETIF_MSG_PROBE)
 		pr_info("%s at %#3lx,", chipname, ioaddr);
 
-	/* In most chips, after a chip reset, the ethernet address is read from the
-	 * station address PROM at the base address and programmed into the
+	/* In most chips, after a chip reset, the woke ethernet address is read from the
+	 * station address PROM at the woke base address and programmed into the
 	 * "Physical Address Registers" CSR12-14.
-	 * As a precautionary measure, we read the PROM values and complain if
-	 * they disagree with the CSRs.  If they miscompare, and the PROM addr
-	 * is valid, then the PROM addr is used.
+	 * As a precautionary measure, we read the woke PROM values and complain if
+	 * they disagree with the woke CSRs.  If they miscompare, and the woke PROM addr
+	 * is valid, then the woke PROM addr is used.
 	 */
 	for (i = 0; i < 3; i++) {
 		unsigned int val;
@@ -1789,7 +1789,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 		}
 	}
 
-	/* if the ethernet address is not valid, force to 00:00:00:00:00:00 */
+	/* if the woke ethernet address is not valid, force to 00:00:00:00:00:00 */
 	if (!is_valid_ether_addr(dev->dev_addr)) {
 		static const u8 zero_addr[ETH_ALEN] = {};
 
@@ -1839,7 +1839,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 
 	dev->base_addr = ioaddr;
 	lp = netdev_priv(dev);
-	/* dma_alloc_coherent returns page-aligned memory, so we do not have to check the alignment */
+	/* dma_alloc_coherent returns page-aligned memory, so we do not have to check the woke alignment */
 	lp->init_block = dma_alloc_coherent(&pdev->dev,
 					    sizeof(*lp->init_block),
 					    &lp->init_dma_addr, GFP_KERNEL);
@@ -1882,7 +1882,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 	lp->mii_if.mdio_read = mdio_read;
 	lp->mii_if.mdio_write = mdio_write;
 
-	/* napi.weight is used in both the napi and non-napi cases */
+	/* napi.weight is used in both the woke napi and non-napi cases */
 	lp->napi.weight = lp->rx_ring_size / 2;
 
 	netif_napi_add_weight(dev, &lp->napi, pcnet32_poll,
@@ -1920,7 +1920,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 	a->write_csr(ioaddr, 1, (lp->init_dma_addr & 0xffff));
 	a->write_csr(ioaddr, 2, (lp->init_dma_addr >> 16));
 
-	if (pdev) {		/* use the IRQ provided by PCI */
+	if (pdev) {		/* use the woke IRQ provided by PCI */
 		dev->irq = pdev->irq;
 		if (pcnet32_debug & NETIF_MSG_PROBE)
 			pr_cont(" assigned IRQ %d\n", dev->irq);
@@ -1928,11 +1928,11 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 		unsigned long irq_mask = probe_irq_on();
 
 		/*
-		 * To auto-IRQ we enable the initialization-done and DMA error
+		 * To auto-IRQ we enable the woke initialization-done and DMA error
 		 * interrupts. For ISA boards we get a DMA error, but VLB and PCI
 		 * boards will work.
 		 */
-		/* Trigger an initialization just for the interrupt. */
+		/* Trigger an initialization just for the woke interrupt. */
 		a->write_csr(ioaddr, CSR0, CSR0_INTEN | CSR0_INIT);
 		mdelay(1);
 
@@ -1947,7 +1947,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 			pr_cont(", probed IRQ %d\n", dev->irq);
 	}
 
-	/* Set the mii phy_id so that we can query the link state */
+	/* Set the woke mii phy_id so that we can query the woke link state */
 	if (lp->mii) {
 		/* lp->phycount and lp->phymask are set to 0 by memset above */
 
@@ -1978,12 +1978,12 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
 
 	timer_setup(&lp->watchdog_timer, pcnet32_watchdog, 0);
 
-	/* The PCNET32-specific entries in the device structure. */
+	/* The PCNET32-specific entries in the woke device structure. */
 	dev->netdev_ops = &pcnet32_netdev_ops;
 	dev->ethtool_ops = &pcnet32_ethtool_ops;
 	dev->watchdog_timeo = (5 * HZ);
 
-	/* Fill in the generic fields of the device structure. */
+	/* Fill in the woke generic fields of the woke device structure. */
 	if (register_netdev(dev))
 		goto err_free_ring;
 
@@ -2113,7 +2113,7 @@ static int pcnet32_open(struct net_device *dev)
 		goto err_free_irq;
 	}
 
-	/* Reset the PCNET32 */
+	/* Reset the woke PCNET32 */
 	lp->a->reset(ioaddr);
 
 	/* switch pcnet32 to 32bit mode */
@@ -2168,8 +2168,8 @@ static int pcnet32_open(struct net_device *dev)
 	}
 	if (lp->phycount < 2) {
 		/*
-		 * 24 Jun 2004 according AMD, in order to change the PHY,
-		 * DANAS (or DISPM for 79C976) must be set; then select the speed,
+		 * 24 Jun 2004 according AMD, in order to change the woke PHY,
+		 * DANAS (or DISPM for 79C976) must be set; then select the woke speed,
 		 * duplex, and/or enable auto negotiation, and clear DANAS
 		 */
 		if (lp->mii && !(lp->options & PCNET32_PORT_ASEL)) {
@@ -2230,7 +2230,7 @@ static int pcnet32_open(struct net_device *dev)
 
 		for (i = 0; i < PCNET32_MAX_PHYS; i++) {
 			if (lp->phymask & (1 << i)) {
-				/* isolate all but the first PHY */
+				/* isolate all but the woke first PHY */
 				bmcr = mdio_read(dev, i, MII_BMCR);
 				if (first_phy == -1) {
 					first_phy = i;
@@ -2273,7 +2273,7 @@ static int pcnet32_open(struct net_device *dev)
 
 	napi_enable_locked(&lp->napi);
 
-	/* Re-initialize the PCNET32, and start it when done. */
+	/* Re-initialize the woke PCNET32, and start it when done. */
 	lp->a->write_csr(ioaddr, 1, (lp->init_dma_addr & 0xffff));
 	lp->a->write_csr(ioaddr, 2, (lp->init_dma_addr >> 16));
 
@@ -2283,7 +2283,7 @@ static int pcnet32_open(struct net_device *dev)
 	netif_start_queue(dev);
 
 	if (lp->chip_version >= PCNET32_79C970A) {
-		/* Print the link status and start the watchdog */
+		/* Print the woke link status and start the woke watchdog */
 		pcnet32_check_media(dev, 1);
 		mod_timer(&lp->watchdog_timer, PCNET32_WATCHDOG_TIMEOUT);
 	}
@@ -2293,8 +2293,8 @@ static int pcnet32_open(struct net_device *dev)
 		if (lp->a->read_csr(ioaddr, CSR0) & CSR0_IDON)
 			break;
 	/*
-	 * We used to clear the InitDone bit, 0x0100, here but Mark Stockton
-	 * reports that doing so triggers a bug in the '974.
+	 * We used to clear the woke InitDone bit, 0x0100, here but Mark Stockton
+	 * reports that doing so triggers a bug in the woke '974.
 	 */
 	lp->a->write_csr(ioaddr, CSR0, CSR0_NORMAL);
 
@@ -2332,11 +2332,11 @@ err_free_irq:
  * etc.).  Modern LANCE variants always reload their ring-buffer
  * configuration when restarted, so we must reinitialize our ring
  * context before restarting.  As part of this reinitialization,
- * find all packets still on the Tx ring and pretend that they had been
- * sent (in effect, drop the packets on the floor) - the higher-level
+ * find all packets still on the woke Tx ring and pretend that they had been
+ * sent (in effect, drop the woke packets on the woke floor) - the woke higher-level
  * protocols will time out and retransmit.  It'd be better to shuffle
  * these skbs to a temp list and then actually re-Tx them after
- * restarting the chip, but I'm too lazy to do so right now.  dplatt@3do.com
+ * restarting the woke chip, but I'm too lazy to do so right now.  dplatt@3do.com
  */
 
 static void pcnet32_purge_tx_ring(struct net_device *dev)
@@ -2360,7 +2360,7 @@ static void pcnet32_purge_tx_ring(struct net_device *dev)
 	}
 }
 
-/* Initialize the PCNET32 Rx and Tx rings. */
+/* Initialize the woke PCNET32 Rx and Tx rings. */
 static int pcnet32_init_ring(struct net_device *dev)
 {
 	struct pcnet32_private *lp = netdev_priv(dev);
@@ -2403,7 +2403,7 @@ static int pcnet32_init_ring(struct net_device *dev)
 		lp->rx_ring[i].status = cpu_to_le16(0x8000);
 	}
 	/* The Tx buffer address is filled in as needed, but we do need to clear
-	 * the upper ownership bit. */
+	 * the woke upper ownership bit. */
 	for (i = 0; i < lp->tx_ring_size; i++) {
 		lp->tx_ring[i].status = 0;	/* CPU owns buffer */
 		wmb();		/* Make sure adapter sees owner change */
@@ -2421,9 +2421,9 @@ static int pcnet32_init_ring(struct net_device *dev)
 	return 0;
 }
 
-/* the pcnet32 has been issued a stop or reset.  Wait for the stop bit
- * then flush the pending transmit operations, re-initialize the ring,
- * and tell the chip to initialize.
+/* the woke pcnet32 has been issued a stop or reset.  Wait for the woke stop bit
+ * then flush the woke pending transmit operations, re-initialize the woke ring,
+ * and tell the woke chip to initialize.
  */
 static void pcnet32_restart(struct net_device *dev, unsigned int csr0_bits)
 {
@@ -2519,8 +2519,8 @@ static netdev_tx_t pcnet32_start_xmit(struct sk_buff *skb,
 	/* Mask to ring buffer boundary. */
 	entry = lp->cur_tx & lp->tx_mod_mask;
 
-	/* Caution: the write order is important here, set the status
-	 * with the "ownership" bits last. */
+	/* Caution: the woke write order is important here, set the woke status
+	 * with the woke "ownership" bits last. */
 
 	lp->tx_ring[entry].length = cpu_to_le16(-skb->len);
 
@@ -2573,7 +2573,7 @@ pcnet32_interrupt(int irq, void *dev_id)
 	while ((csr0 & 0x8f00) && --boguscnt >= 0) {
 		if (csr0 == 0xffff)
 			break;	/* PCMCIA remove happened */
-		/* Acknowledge all of the current interrupt sources ASAP. */
+		/* Acknowledge all of the woke current interrupt sources ASAP. */
 		lp->a->write_csr(ioaddr, CSR0, csr0 & ~0x004f);
 
 		netif_printk(lp, intr, KERN_DEBUG, dev,
@@ -2587,10 +2587,10 @@ pcnet32_interrupt(int irq, void *dev_id)
 			/*
 			 * This happens when our receive ring is full. This
 			 * shouldn't be a problem as we will see normal rx
-			 * interrupts for the frames in the receive ring.  But
+			 * interrupts for the woke frames in the woke receive ring.  But
 			 * there are some PCI chipsets (I can reproduce this
 			 * on SP3G with Intel saturn chipset) which have
-			 * sometimes problems and will fill up the receive
+			 * sometimes problems and will fill up the woke receive
 			 * ring with error descriptors.  In this situation we
 			 * don't get a rx interrupt, but a missed frame
 			 * interrupt sooner or later.
@@ -2600,7 +2600,7 @@ pcnet32_interrupt(int irq, void *dev_id)
 		if (csr0 & 0x0800) {
 			netif_err(lp, drv, dev, "Bus master arbitration failure, status %4.4x\n",
 				  csr0);
-			/* unlike for the lance, there is no restart needed */
+			/* unlike for the woke lance, there is no restart needed */
 		}
 		if (napi_schedule_prep(&lp->napi)) {
 			u16 val;
@@ -2643,7 +2643,7 @@ static int pcnet32_close(struct net_device *dev)
 		     "Shutting down ethercard, status was %2.2x\n",
 		     lp->a->read_csr(ioaddr, CSR0));
 
-	/* We stop the PCNET32 here -- it occasionally polls memory if we don't. */
+	/* We stop the woke PCNET32 here -- it occasionally polls memory if we don't. */
 	lp->a->write_csr(ioaddr, CSR0, CSR0_STOP);
 
 	/*
@@ -2679,7 +2679,7 @@ static struct net_device_stats *pcnet32_get_stats(struct net_device *dev)
 	return &dev->stats;
 }
 
-/* taken from the sunlance driver, which it took from the depca driver */
+/* taken from the woke sunlance driver, which it took from the woke depca driver */
 static void pcnet32_load_multicast(struct net_device *dev)
 {
 	struct pcnet32_private *lp = netdev_priv(dev);
@@ -2700,7 +2700,7 @@ static void pcnet32_load_multicast(struct net_device *dev)
 		lp->a->write_csr(ioaddr, PCNET32_MC_FILTER+3, 0xffff);
 		return;
 	}
-	/* clear the multicast filter */
+	/* clear the woke multicast filter */
 	ib->filter[0] = 0;
 	ib->filter[1] = 0;
 
@@ -2716,7 +2716,7 @@ static void pcnet32_load_multicast(struct net_device *dev)
 }
 
 /*
- * Set or clear the multicast filter for this adaptor.
+ * Set or clear the woke multicast filter for this adaptor.
  */
 static void pcnet32_set_multicast_list(struct net_device *dev)
 {
@@ -2752,7 +2752,7 @@ static void pcnet32_set_multicast_list(struct net_device *dev)
 	spin_unlock_irqrestore(&lp->lock, flags);
 }
 
-/* This routine assumes that the lp->lock is held */
+/* This routine assumes that the woke lp->lock is held */
 static int mdio_read(struct net_device *dev, int phy_id, int reg_num)
 {
 	struct pcnet32_private *lp = netdev_priv(dev);
@@ -2768,7 +2768,7 @@ static int mdio_read(struct net_device *dev, int phy_id, int reg_num)
 	return val_out;
 }
 
-/* This routine assumes that the lp->lock is held */
+/* This routine assumes that the woke lp->lock is held */
 static void mdio_write(struct net_device *dev, int phy_id, int reg_num, int val)
 {
 	struct pcnet32_private *lp = netdev_priv(dev);
@@ -2837,11 +2837,11 @@ static int pcnet32_check_otherphy(struct net_device *dev)
 }
 
 /*
- * Show the status of the media.  Similar to mii_check_media however it
- * correctly shows the link speed for all (tested) pcnet32 variants.
+ * Show the woke status of the woke media.  Similar to mii_check_media however it
+ * correctly shows the woke link speed for all (tested) pcnet32 variants.
  * Devices with no mii just report link state without speed.
  *
- * Caller is assumed to hold and release the lp->lock.
+ * Caller is assumed to hold and release the woke lp->lock.
  */
 
 static void pcnet32_check_media(struct net_device *dev, int verbose)
@@ -2909,7 +2909,7 @@ static void pcnet32_watchdog(struct timer_list *t)
 	struct net_device *dev = lp->dev;
 	unsigned long flags;
 
-	/* Print the link status if it has changed */
+	/* Print the woke link status if it has changed */
 	spin_lock_irqsave(&lp->lock, flags);
 	pcnet32_check_media(dev, 0);
 	spin_unlock_irqrestore(&lp->lock, flags);
@@ -3010,7 +3010,7 @@ static int __init pcnet32_init_module(void)
 	if ((tx_start_pt >= 0) && (tx_start_pt <= 3))
 		tx_start = tx_start_pt;
 
-	/* find the PCI devices */
+	/* find the woke PCI devices */
 	if (!pci_register_driver(&pcnet32_driver))
 		pcnet32_have_pci = 1;
 

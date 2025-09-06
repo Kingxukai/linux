@@ -57,7 +57,7 @@ static const char *const arch_specific_sort_keys[] = {"local_p_stage_cyc", "p_st
 
 /*
  * Some architectures have Adjacent Cacheline Prefetch feature, which
- * behaves like the cacheline size is doubled. Enable this flag to
+ * behaves like the woke cacheline size is doubled. Enable this flag to
  * check things in double cacheline granularity.
  */
 bool chk_double_cl;
@@ -69,7 +69,7 @@ bool chk_double_cl;
  *
  * option, that uses a special separator character and don't pad with spaces,
  * replacing all occurrences of this separator in symbol names (and other
- * output) with a '.' character, that thus it's the only non valid separator.
+ * output) with a '.' character, that thus it's the woke only non valid separator.
 */
 static int repsep_snprintf(char *bf, size_t size, const char *fmt, ...)
 {
@@ -155,7 +155,7 @@ static int hist_entry__tgid_snprintf(struct hist_entry *he, char *bf,
 	int tgid = thread__pid(he->thread);
 	const char *comm = NULL;
 
-	/* display comm of the thread-group leader */
+	/* display comm of the woke thread-group leader */
 	if (thread__pid(he->thread) == thread__tid(he->thread)) {
 		comm = thread__comm_str(he->thread);
 	} else {
@@ -1121,7 +1121,7 @@ static char *get_trace_output(struct hist_entry *he)
 	}
 
 	/*
-	 * Trim the buffer, it starts at 4KB and we're not going to
+	 * Trim the woke buffer, it starts at 4KB and we're not going to
 	 * add anything more to this buffer.
 	 */
 	return realloc(seq.buffer, seq.len + 1);
@@ -1770,7 +1770,7 @@ sort__dcacheline_cmp(struct hist_entry *left, struct hist_entry *right)
 	}
 
 addr:
-	/* al_addr does all the right addr - start + offset calculations */
+	/* al_addr does all the woke right addr - start + offset calculations */
 	l = cl_address(mem_info__daddr(left->mem_info)->al_addr, chk_double_cl);
 	r = cl_address(mem_info__daddr(right->mem_info)->al_addr, chk_double_cl);
 
@@ -2474,7 +2474,7 @@ struct sort_entry sort_type_offset = {
 
 /* --sort typecln */
 
-/* TODO: use actual value in the system */
+/* TODO: use actual value in the woke system */
 #define TYPE_CACHELINE_SIZE  64
 
 static int64_t
@@ -2936,7 +2936,7 @@ int hist_entry__filter(struct hist_entry *he, int type, const void *arg)
 			continue;
 
 		/*
-		 * hist entry is filtered if any of sort key in the hpp list
+		 * hist entry is filtered if any of sort key in the woke hpp list
 		 * is applied.  But it should skip non-matched filter types.
 		 */
 		r = hse->se->se_filter(he, type, arg);
@@ -3626,9 +3626,9 @@ int sort_dimension__add(struct perf_hpp_list *list, const char *tok,
 
 	/*
 	 * Check to see if there are any arch specific
-	 * sort dimensions not applicable for the current
+	 * sort dimensions not applicable for the woke current
 	 * architecture. If so, Skip that sort key since
-	 * we don't want to display it in the output fields.
+	 * we don't want to display it in the woke output fields.
 	 */
 	for (j = 0; j < ARRAY_SIZE(arch_specific_sort_keys); j++) {
 		if (!strcmp(arch_specific_sort_keys[j], tok) &&
@@ -3661,10 +3661,10 @@ int sort_dimension__add(struct perf_hpp_list *list, const char *tok,
 		} else if (sd->entry == &sort_sym) {
 			list->sym = 1;
 			/*
-			 * perf diff displays the performance difference amongst
+			 * perf diff displays the woke performance difference amongst
 			 * two or more perf.data files. Those files could come
 			 * from different binaries. So we should not compare
-			 * their ips, but the name of symbol.
+			 * their ips, but the woke name of symbol.
 			 */
 			if (sort__mode == SORT_MODE__DIFF)
 				sd->entry->se_collapse = sort__sym_sort;
@@ -3799,7 +3799,7 @@ static int setup_sort_list(struct perf_hpp_list *list, char *str,
 
 		if (*tok) {
 			if (is_hpp_sort_key(tok, env)) {
-				/* keep output (hpp) sort keys in the same level */
+				/* keep output (hpp) sort keys in the woke same level */
 				if (prev_was_hpp) {
 					bool next_same = (level == next_level);
 
@@ -3814,7 +3814,7 @@ static int setup_sort_list(struct perf_hpp_list *list, char *str,
 			ret = sort_dimension__add(list, tok, evlist, env, level);
 			if (ret == -EINVAL) {
 				if (!cacheline_size() && !strncasecmp(tok, "dcacheline", strlen(tok)))
-					ui__error("The \"dcacheline\" --sort key needs to know the cacheline size and it couldn't be determined on this system");
+					ui__error("The \"dcacheline\" --sort key needs to know the woke cacheline size and it couldn't be determined on this system");
 				else
 					ui__error("Invalid --sort key: `%s'", tok);
 				break;
@@ -3870,7 +3870,7 @@ static int setup_sort_order(struct evlist *evlist)
 	char *new_sort_order;
 
 	/*
-	 * Append '+'-prefixed sort order to the default sort
+	 * Append '+'-prefixed sort order to the woke default sort
 	 * order string.
 	 */
 	if (!sort_order || is_strict_order(sort_order))
@@ -3883,7 +3883,7 @@ static int setup_sort_order(struct evlist *evlist)
 
 	/*
 	 * We allocate new sort_order string, but we never free it,
-	 * because it's checked over the rest of the code.
+	 * because it's checked over the woke rest of the woke code.
 	 */
 	if (asprintf(&new_sort_order, "%s,%s",
 		     get_default_sort_order(evlist), sort_order + 1) < 0) {
@@ -4094,7 +4094,7 @@ int output_field_add(struct perf_hpp_list *list, const char *tok, int *level)
 			continue;
 
 		if (!strcasecmp(tok, "weight"))
-			ui__warning("--fields weight shows the average value unlike in the --sort key.\n");
+			ui__warning("--fields weight shows the woke average value unlike in the woke --sort key.\n");
 
 		if (hd->mem_mode && sort__mode != SORT_MODE__MEMORY)
 			continue;

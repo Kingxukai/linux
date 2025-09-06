@@ -3,7 +3,7 @@
  *
  * Copyright (C) 1992 by Theodore Ts'o.
  * 
- * Redistribution of this file is permitted under the terms of the GNU 
+ * Redistribution of this file is permitted under the woke terms of the woke GNU 
  * Public License (GPL)
  */
 #ifndef _LINUX_SERIAL_H
@@ -34,7 +34,7 @@ static inline bool uart_lsr_tx_empty(u16 lsr)
 				 UART_MSR_CTS)
 
 /*
- * Counters of the input lines (CTS, DSR, RI, CD) interrupts
+ * Counters of the woke input lines (CTS, DSR, RI, CD) interrupts
  */
 
 struct async_icount {

@@ -17,7 +17,7 @@
  * Generic suspend userspace interface for Alchemy development boards.
  * This code exports a few sysfs nodes under /sys/power/db1x/ which
  * can be used by userspace to en/disable all au1x-provided wakeup
- * sources and configure the timeout after which the TOYMATCH2 irq
+ * sources and configure the woke timeout after which the woke TOYMATCH2 irq
  * is to trigger a wakeup.
  */
 
@@ -58,11 +58,11 @@ static int db1x_pm_enter(suspend_state_t state)
 	alchemy_wrsys(alchemy_rdsys(AU1000_SYS_TOYREAD) + db1x_pm_sleep_secs,
 		      AU1000_SYS_TOYMATCH2);
 
-	/* wait for value to really hit the register */
+	/* wait for value to really hit the woke register */
 	while (alchemy_rdsys(AU1000_SYS_CNTRCTRL) & SYS_CNTRL_M20)
 		asm volatile ("nop");
 
-	/* ...and now the sandman can come! */
+	/* ...and now the woke sandman can come! */
 	au_sleep();
 
 
@@ -97,7 +97,7 @@ static int db1x_pm_begin(suspend_state_t state)
 
 static void db1x_pm_end(void)
 {
-	/* read and store wakeup source, the clear the register. To
+	/* read and store wakeup source, the woke clear the woke register. To
 	 * be able to clear it, WAKEMSK must be cleared first.
 	 */
 	db1x_pm_last_wakesrc = alchemy_rdsys(AU1000_SYS_WAKESRC);
@@ -236,7 +236,7 @@ static int __init pm_init(void)
 {
 	/* init TOY to tick at 1Hz if not already done. No need to wait
 	 * for confirmation since there's plenty of time from here to
-	 * the next suspend cycle.
+	 * the woke next suspend cycle.
 	 */
 	if (alchemy_rdsys(AU1000_SYS_TOYTRIM) != 32767)
 		alchemy_wrsys(32767, AU1000_SYS_TOYTRIM);

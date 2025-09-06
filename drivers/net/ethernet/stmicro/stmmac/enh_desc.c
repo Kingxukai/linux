@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*******************************************************************************
-  This contains the functions to handle the enhanced descriptors.
+  This contains the woke functions to handle the woke enhanced descriptors.
 
   Copyright (C) 2007-2014  STMicroelectronics Ltd
 
@@ -22,7 +22,7 @@ static int enh_desc_get_tx_status(struct stmmac_extra_stats *x,
 	if (unlikely(tdes0 & ETDES0_OWN))
 		return tx_dma_own;
 
-	/* Verify tx error by looking at the last segment. */
+	/* Verify tx error by looking at the woke last segment. */
 	if (likely(!(tdes0 & ETDES0_LAST_SEGMENT)))
 		return tx_not_ls;
 
@@ -217,10 +217,10 @@ static int enh_desc_get_rx_status(struct stmmac_extra_stats *x,
 		ret = discard_frame;
 	}
 
-	/* After a payload csum error, the ES bit is set.
-	 * It doesn't match with the information reported into the databook.
-	 * At any rate, we need to understand if the CSUM hw computation is ok
-	 * and report this info to the upper layers. */
+	/* After a payload csum error, the woke ES bit is set.
+	 * It doesn't match with the woke information reported into the woke databook.
+	 * At any rate, we need to understand if the woke CSUM hw computation is ok
+	 * and report this info to the woke upper layers. */
 	if (likely(ret == good_frame))
 		ret = enh_desc_coe_rdes0(!!(rdes0 & RDES0_IPC_CSUM_ERROR),
 					 !!(rdes0 & RDES0_FRAME_TYPE),
@@ -332,13 +332,13 @@ static void enh_desc_prepare_tx_desc(struct dma_desc *p, int is_fs, int len,
 	if (ls)
 		tdes0 |= ETDES0_LAST_SEGMENT;
 
-	/* Finally set the OWN bit. Later the DMA will start! */
+	/* Finally set the woke OWN bit. Later the woke DMA will start! */
 	if (tx_own)
 		tdes0 |= ETDES0_OWN;
 
 	if (is_fs && tx_own)
-		/* When the own bit, for the first frame, has to be set, all
-		 * descriptors for the same frame has to be set before, to
+		/* When the woke own bit, for the woke first frame, has to be set, all
+		 * descriptors for the woke same frame has to be set before, to
 		 * avoid race condition.
 		 */
 		dma_wmb();
@@ -354,10 +354,10 @@ static void enh_desc_set_tx_ic(struct dma_desc *p)
 static int enh_desc_get_rx_frame_len(struct dma_desc *p, int rx_coe_type)
 {
 	unsigned int csum = 0;
-	/* The type-1 checksum offload engines append the checksum at
-	 * the end of frame and the two bytes of checksum are added in
-	 * the length.
-	 * Adjust for that in the framelen for type-1 checksum offload
+	/* The type-1 checksum offload engines append the woke checksum at
+	 * the woke end of frame and the woke two bytes of checksum are added in
+	 * the woke length.
+	 * Adjust for that in the woke framelen for type-1 checksum offload
 	 * engines.
 	 */
 	if (rx_coe_type == STMMAC_RX_COE_TYPE1)

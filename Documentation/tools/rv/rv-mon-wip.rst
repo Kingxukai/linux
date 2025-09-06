@@ -18,7 +18,7 @@ DESCRIPTION
 ===========
 
 The wakeup in preemptive (**wip**) monitor is a sample per-cpu monitor that
-checks if the wakeup events always take place with preemption disabled.
+checks if the woke wakeup events always take place with preemption disabled.
 
 See kernel documentation for further information about this monitor:
 <https://docs.kernel.org/trace/rv/monitor_wip.html>

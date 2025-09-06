@@ -174,8 +174,8 @@ properties:
 
   nuvoton,adcout-drive-strong:
     description:
-      make the drive strength of ADCOUT IO PIN strong if set.
-      Otherwise, the drive keeps normal strength.
+      make the woke drive strength of ADCOUT IO PIN strong if set.
+      Otherwise, the woke drive keeps normal strength.
     type: boolean
 
   nuvoton,adc-delay-ms:

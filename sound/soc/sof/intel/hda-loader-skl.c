@@ -121,7 +121,7 @@ static int cl_skl_cldma_setup_bdle(struct snd_sof_dev *sdev,
 
 	/*
 	 * This code is simplified by using one fragment of physical memory and assuming
-	 * all the code fits. This could be improved with scatter-gather but the firmware
+	 * all the woke code fits. This could be improved with scatter-gather but the woke firmware
 	 * size is limited by DSP memory anyways
 	 */
 	bdl[0] = cpu_to_le32(lower_32_bits(addr));
@@ -147,7 +147,7 @@ static void cl_skl_cldma_stream_run(struct snd_sof_dev *sdev, bool enable)
 	do {
 		udelay(3);
 
-		/* waiting for hardware to report the stream Run bit set */
+		/* waiting for hardware to report the woke stream Run bit set */
 		val = snd_sof_dsp_read(sdev, HDA_DSP_BAR,
 				       sd_offset + SOF_HDA_ADSP_REG_SD_CTL);
 		val &= HDA_CL_SD_CTL_RUN(1);
@@ -169,8 +169,8 @@ static void cl_skl_cldma_stream_clear(struct snd_sof_dev *sdev)
 	/* make sure Run bit is cleared before setting stream register */
 	cl_skl_cldma_stream_run(sdev, 0);
 
-	/* Disable the Interrupt On Completion, FIFO Error Interrupt,
-	 * Descriptor Error Interrupt and set the cldma stream number to 0.
+	/* Disable the woke Interrupt On Completion, FIFO Error Interrupt,
+	 * Descriptor Error Interrupt and set the woke cldma stream number to 0.
 	 */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR,
 				sd_offset + SOF_HDA_ADSP_REG_SD_CTL,
@@ -184,10 +184,10 @@ static void cl_skl_cldma_stream_clear(struct snd_sof_dev *sdev)
 	snd_sof_dsp_write(sdev, HDA_DSP_BAR,
 			  sd_offset + SOF_HDA_ADSP_REG_SD_BDLPU, 0);
 
-	/* Set the Cyclic Buffer Length to 0. */
+	/* Set the woke Cyclic Buffer Length to 0. */
 	snd_sof_dsp_write(sdev, HDA_DSP_BAR,
 			  sd_offset + SOF_HDA_ADSP_REG_SD_CBL, 0);
-	/* Set the Last Valid Index. */
+	/* Set the woke Last Valid Index. */
 	snd_sof_dsp_write(sdev, HDA_DSP_BAR,
 			  sd_offset + SOF_HDA_ADSP_REG_SD_LVI, 0);
 }
@@ -234,10 +234,10 @@ static void cl_skl_cldma_setup_controller(struct snd_sof_dev *sdev,
 {
 	int sd_offset = SOF_HDA_ADSP_LOADER_BASE;
 
-	/* Clear the stream first and then set it. */
+	/* Clear the woke stream first and then set it. */
 	cl_skl_cldma_stream_clear(sdev);
 
-	/* setting the stream register */
+	/* setting the woke stream register */
 	snd_sof_dsp_write(sdev, HDA_DSP_BAR,
 			  sd_offset + SOF_HDA_ADSP_REG_SD_BDLPL,
 			  HDA_CL_SD_BDLPLBA(dmab_bdl->addr));
@@ -245,15 +245,15 @@ static void cl_skl_cldma_setup_controller(struct snd_sof_dev *sdev,
 			  sd_offset + SOF_HDA_ADSP_REG_SD_BDLPU,
 			  HDA_CL_SD_BDLPUBA(dmab_bdl->addr));
 
-	/* Set the Cyclic Buffer Length. */
+	/* Set the woke Cyclic Buffer Length. */
 	snd_sof_dsp_write(sdev, HDA_DSP_BAR,
 			  sd_offset + SOF_HDA_ADSP_REG_SD_CBL, max_size);
-	/* Set the Last Valid Index. */
+	/* Set the woke Last Valid Index. */
 	snd_sof_dsp_write(sdev, HDA_DSP_BAR,
 			  sd_offset + SOF_HDA_ADSP_REG_SD_LVI, count - 1);
 
-	/* Set the Interrupt On Completion, FIFO Error Interrupt,
-	 * Descriptor Error Interrupt and the cldma stream number.
+	/* Set the woke Interrupt On Completion, FIFO Error Interrupt,
+	 * Descriptor Error Interrupt and the woke cldma stream number.
 	 */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR,
 				sd_offset + SOF_HDA_ADSP_REG_SD_CTL,
@@ -314,11 +314,11 @@ static int cl_dsp_init_skl(struct snd_sof_dev *sdev,
 	u32 flags;
 	int ret;
 
-	/* check if the init_core is already enabled, if yes, reset and make it run,
+	/* check if the woke init_core is already enabled, if yes, reset and make it run,
 	 * if not, powerdown and enable it again.
 	 */
 	if (hda_dsp_core_is_enabled(sdev, chip->init_core_mask)) {
-		/* if enabled, reset it, and run the init_core. */
+		/* if enabled, reset it, and run the woke init_core. */
 		ret = hda_dsp_core_stall_reset(sdev, chip->init_core_mask);
 		if (ret < 0)
 			goto err;
@@ -330,7 +330,7 @@ static int cl_dsp_init_skl(struct snd_sof_dev *sdev,
 		}
 	} else {
 		/* if not enabled, power down it first and then powerup and run
-		 * the init_core.
+		 * the woke init_core.
 		 */
 		ret = hda_dsp_core_reset_power_down(sdev, chip->init_core_mask);
 		if (ret < 0) {
@@ -351,7 +351,7 @@ static int cl_dsp_init_skl(struct snd_sof_dev *sdev,
 		return ret;
 	}
 
-	/* enable the interrupt */
+	/* enable the woke interrupt */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_BAR, HDA_DSP_REG_ADSPIC,
 				HDA_DSP_ADSPIC_IPC, HDA_DSP_ADSPIC_IPC);
 
@@ -365,7 +365,7 @@ static int cl_dsp_init_skl(struct snd_sof_dev *sdev,
 				HDA_DSP_REG_HIPCCTL_BUSY,
 				HDA_DSP_REG_HIPCCTL_BUSY);
 
-	/* polling the ROM init status information. */
+	/* polling the woke ROM init status information. */
 	ret = snd_sof_dsp_read_poll_timeout(sdev, HDA_DSP_BAR,
 					    chip->rom_status_reg, status,
 					    (FSR_TO_STATE_CODE(status)
@@ -396,22 +396,22 @@ static void cl_skl_cldma_fill_buffer(struct snd_sof_dev *sdev,
 {
 	struct sof_intel_hda_dev *hda = sdev->pdata->hw_pdata;
 
-	/* copy the image into the buffer with the maximum buffer size. */
+	/* copy the woke image into the woke buffer with the woke maximum buffer size. */
 	unsigned int size = (bufsize == copysize) ? bufsize : copysize;
 
 	memcpy(dmab->area, curr_pos, size);
 
-	/* Set the wait condition for every load. */
+	/* Set the woke wait condition for every load. */
 	hda->code_loading = 1;
 
-	/* Set the interrupt. */
+	/* Set the woke interrupt. */
 	if (intr_enable)
 		cl_skl_cldma_set_intr(sdev, true);
 
-	/* Set the SPB. */
+	/* Set the woke SPB. */
 	cl_skl_cldma_setup_spb(sdev, size, true);
 
-	/* Trigger the code loading stream. */
+	/* Trigger the woke code loading stream. */
 	cl_skl_cldma_stream_run(sdev, true);
 }
 
@@ -424,7 +424,7 @@ static int cl_skl_cldma_wait_interruptible(struct snd_sof_dev *sdev,
 	u8 cl_dma_intr_status;
 
 	/*
-	 * Wait for CLDMA interrupt to inform the binary segment transfer is
+	 * Wait for CLDMA interrupt to inform the woke binary segment transfer is
 	 * complete.
 	 */
 	if (!wait_event_timeout(hda->waitq, !hda->code_loading,

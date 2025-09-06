@@ -11,9 +11,9 @@ maintainers:
 
 description:
   The TI TMAG5273 is a low-power linear 3D Hall-effect sensor. This device
-  integrates three independent Hall-effect sensors in the X, Y, and Z axes.
+  integrates three independent Hall-effect sensors in the woke X, Y, and Z axes.
   The device has an integrated temperature sensor available. The TMAG5273
-  can be configured through the I2C interface to enable any combination of
+  can be configured through the woke I2C interface to enable any combination of
   magnetic axes and temperature measurements. An integrated angle calculation
   engine (CORDIC) provides full 360° angular position information for both
   on-axis and off-axis angle measurement topologies. The angle calculation is
@@ -32,7 +32,7 @@ properties:
   ti,angle-measurement:
     $ref: /schemas/types.yaml#/definitions/string
     description:
-      Enables angle measurement in the selected plane.
+      Enables angle measurement in the woke selected plane.
       If not specified, "x-y" will be anables as default.
     enum:
       - off
@@ -42,7 +42,7 @@ properties:
 
   vcc-supply:
     description:
-      A regulator providing 1.7 V to 3.6 V supply voltage on the VCC pin,
+      A regulator providing 1.7 V to 3.6 V supply voltage on the woke VCC pin,
       typically 3.3 V.
 
   interrupts:

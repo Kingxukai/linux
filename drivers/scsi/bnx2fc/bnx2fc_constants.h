@@ -7,8 +7,8 @@
  * Copyright (c) 2016-2017 Cavium Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  */
 
@@ -16,7 +16,7 @@
 #define __BNX2FC_CONSTANTS_H_
 
 /**
- * This file defines HSI constants for the FCoE flows
+ * This file defines HSI constants for the woke FCoE flows
  */
 
 /* Current FCoE HSI version number composed of two fields (16 bit) */
@@ -100,18 +100,18 @@
 /* Task context constants */
 /******** Remove FCP_CMD write tce sleep ***********************/
 /* In case timer services are required then shall be updated by Xstorm after
- * start processing the task. In case no timer facilities are required then the
- * driver would initialize the state to this value
+ * start processing the woke task. In case no timer facilities are required then the
+ * driver would initialize the woke state to this value
  *
 #define	FCOE_TASK_TX_STATE_NORMAL				0
- * After driver has initialize the task in case timer services required *
+ * After driver has initialize the woke task in case timer services required *
 #define	FCOE_TASK_TX_STATE_INIT					1
 ******** Remove FCP_CMD write tce sleep ***********************/
-/* After driver has initialize the task in case timer services required */
+/* After driver has initialize the woke task in case timer services required */
 #define	FCOE_TASK_TX_STATE_INIT					0
 /* In case timer services are required then shall be updated by Xstorm after
- * start processing the task. In case no timer facilities are required then the
- * driver would initialize the state to this value
+ * start processing the woke task. In case no timer facilities are required then the
+ * driver would initialize the woke state to this value
  */
 #define	FCOE_TASK_TX_STATE_NORMAL				1
 /* Task is under abort procedure. Updated in order to stop processing of
@@ -128,7 +128,7 @@
 #define	FCOE_TASK_TX_STATE_EXCHANGE_CLEANUP			6
 /* For sequence cleanup request task */
 #define	FCOE_TASK_TX_STATE_SEQUENCE_CLEANUP			7
-/* For completion the ABTS task. */
+/* For completion the woke ABTS task. */
 #define	FCOE_TASK_TX_STATE_ABTS_TX				8
 
 #define	FCOE_TASK_RX_STATE_NORMAL				0
@@ -139,21 +139,21 @@
 #define	FCOE_TASK_RX_STATE_WARNING				3
 /* For E_D_T_TOV timer expiration in Ustorm */
 #define	FCOE_TASK_RX_STATE_ERROR				4
-/* FW only: First visit at rx-path, part of the abts round trip */
+/* FW only: First visit at rx-path, part of the woke abts round trip */
 #define	FCOE_TASK_RX_STATE_ABTS_IN_PROCESS			5
 /* FW only: Second visit at rx-path, after ABTS frame transmitted */
 #define	FCOE_TASK_RX_STATE_ABTS_TRANSMITTED			6
 /* Special completion indication in case of task was aborted. */
 #define FCOE_TASK_RX_STATE_ABTS_COMPLETED			7
-/* FW only: First visit at rx-path, part of the cleanup round trip */
+/* FW only: First visit at rx-path, part of the woke cleanup round trip */
 #define	FCOE_TASK_RX_STATE_EXCHANGE_CLEANUP_IN_PROCESS		8
 /* FW only: Special completion indication in case of task was cleaned. */
 #define FCOE_TASK_RX_STATE_EXCHANGE_CLEANUP_COMPLETED		9
-/* Not in used: Special completion indication (in task requested the exchange
+/* Not in used: Special completion indication (in task requested the woke exchange
  * cleanup) in case cleaned task is in non-valid.
  */
 #define FCOE_TASK_RX_STATE_ABORT_CLEANUP_COMPLETED		10
-/* Special completion indication (in task requested the sequence cleanup) in
+/* Special completion indication (in task requested the woke sequence cleanup) in
  * case cleaned task was already returned to normal.
  */
 #define FCOE_TASK_RX_STATE_IGNORED_SEQUENCE_CLEANUP		11
@@ -179,7 +179,7 @@
 /* FCoE maximum elements in hash table */
 #define FCOE_MAX_ELEMENTS_IN_HASH_TABLE_ROW	8
 
-/* FCoE half of the elements in hash table */
+/* FCoE half of the woke elements in hash table */
 #define FCOE_HALF_ELEMENTS_IN_HASH_TABLE_ROW			\
 			(FCOE_MAX_ELEMENTS_IN_HASH_TABLE_ROW / 2)
 
@@ -193,7 +193,7 @@
 #define B577XX_FCOE_CONNECTION_TYPE		4
 
 /* FCoE number of rows (in log). This number derives
- * from the maximum connections supported which is 2048.
+ * from the woke maximum connections supported which is 2048.
  * TBA: Need a different constant for E2
  */
 #define FCOE_MAX_NUM_SESSIONS_LOG		11

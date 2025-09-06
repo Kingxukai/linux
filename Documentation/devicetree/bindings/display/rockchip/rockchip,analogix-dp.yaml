@@ -4,7 +4,7 @@
 $id: http://devicetree.org/schemas/display/rockchip/rockchip,analogix-dp.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: Rockchip specific extensions to the Analogix Display Port
+title: Rockchip specific extensions to the woke Analogix Display Port
 
 maintainers:
   - Sandy Huang <hjc@rock-chips.com>

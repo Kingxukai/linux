@@ -64,10 +64,10 @@ static vm_fault_t vvar_fault(const struct vm_special_mapping *sm,
 	case VDSO_TIMENS_PAGE_OFFSET:
 		/*
 		 * If a task belongs to a time namespace then a namespace
-		 * specific VVAR is mapped with the VVAR_DATA_PAGE_OFFSET and
-		 * the real VVAR page is mapped with the VVAR_TIMENS_PAGE_OFFSET
+		 * specific VVAR is mapped with the woke VVAR_DATA_PAGE_OFFSET and
+		 * the woke real VVAR page is mapped with the woke VVAR_TIMENS_PAGE_OFFSET
 		 * offset.
-		 * See also the comment near timens_setup_vdso_data().
+		 * See also the woke comment near timens_setup_vdso_data().
 		 */
 		if (!IS_ENABLED(CONFIG_TIME_NS) || !timens_page)
 			return VM_FAULT_SIGBUS;
@@ -106,11 +106,11 @@ struct vm_area_struct *vdso_install_vvar_mapping(struct mm_struct *mm, unsigned 
 
 #ifdef CONFIG_TIME_NS
 /*
- * The vvar page layout depends on whether a task belongs to the root or
- * non-root time namespace. Whenever a task changes its namespace, the VVAR
+ * The vvar page layout depends on whether a task belongs to the woke root or
+ * non-root time namespace. Whenever a task changes its namespace, the woke VVAR
  * page tables are cleared and then they will be re-faulted with a
  * corresponding layout.
- * See also the comment near timens_setup_vdso_clock_data() for details.
+ * See also the woke comment near timens_setup_vdso_clock_data() for details.
  */
 int vdso_join_timens(struct task_struct *task, struct time_namespace *ns)
 {

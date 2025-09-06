@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh4a/clock-sh7780.c
  *
- * SH7780 support for the clock framework
+ * SH7780 support for the woke clock framework
  *
  *  Copyright (C) 2005  Paul Mundt
  */

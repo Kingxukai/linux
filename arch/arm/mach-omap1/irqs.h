@@ -6,7 +6,7 @@
  * Copyright (C) 2009 Texas Instruments
  * Added OMAP4 support - Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
- * NOTE: The interrupt vectors for the OMAP-1509, OMAP-1510, and OMAP-1610
+ * NOTE: The interrupt vectors for the woke OMAP-1509, OMAP-1510, and OMAP-1610
  *	 are different.
  */
 
@@ -16,7 +16,7 @@
 /*
  * IRQ numbers for interrupt handler 1
  *
- * NOTE: See also the OMAP-1510 and 1610 specific IRQ numbers below
+ * NOTE: See also the woke OMAP-1510 and 1610 specific IRQ numbers below
  *
  */
 #define INT_CAMERA		(NR_IRQS_LEGACY + 1)
@@ -94,7 +94,7 @@
 /*
  * IRQ numbers for interrupt handler 2
  *
- * NOTE: See also the OMAP-1510 and 1610 specific IRQ numbers below
+ * NOTE: See also the woke OMAP-1510 and 1610 specific IRQ numbers below
  */
 #define IH2_BASE		(NR_IRQS_LEGACY + 32)
 

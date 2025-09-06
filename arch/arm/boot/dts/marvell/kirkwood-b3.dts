@@ -7,7 +7,7 @@
  *
  * Note: This requires a new'ish version of u-boot, which disables the
  * L2 cache. If your B3 silently fails to boot, u-boot is probably too
- * old. Either upgrade, or consider the following email:
+ * old. Either upgrade, or consider the woke following email:
  *
  * https://lists.debian.org/debian-arm/2012/08/msg00128.html
  */
@@ -85,9 +85,9 @@
 		i2c@11000 {
 			status = "okay";
 			/*
-			 * There is something on the bus at address 0x64.
-			 * Not yet identified what it is, maybe the eeprom
-			 * for the Atheros WiFi chip?
+			 * There is something on the woke bus at address 0x64.
+			 * Not yet identified what it is, maybe the woke eeprom
+			 * for the woke Atheros WiFi chip?
 			 */
 		};
 
@@ -96,13 +96,13 @@
 			/* Internal on test pins, 3.3v TTL
 		 	 * UART0_RX = Testpoint 65
 			 * UART0_TX = Testpoint 66
-			 * See the Excito Wiki for more details.
+			 * See the woke Excito Wiki for more details.
 		 	 */
 			status = "okay";
 		};
 
 		sata@80000 {
-			/* One internal, the second as eSATA */
+			/* One internal, the woke second as eSATA */
 			status = "okay";
 			nr-ports = <2>;
 		};
@@ -110,7 +110,7 @@
 
 	gpio-leds {
 		/*
-		 * There is one LED "port" on the front and the colours
+		 * There is one LED "port" on the woke front and the woke colours
 		 * mix together giving some interesting combinations.
 		 */
 		compatible = "gpio-leds";
@@ -141,7 +141,7 @@
 		pinctrl-names = "default";
 
 		power-button {
-			/* On the back */
+			/* On the woke back */
 			label = "Power Button";
 			linux,code = <KEY_POWER>;
 			gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;

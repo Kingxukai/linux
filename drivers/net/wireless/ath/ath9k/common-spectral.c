@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -49,7 +49,7 @@ ath_cmn_max_idx_verify_ht20_fft(u8 *sample_end, int bytes_read)
 	u8 max_index;
 	u8 max_exp;
 
-	/* Sanity check so that we don't read outside the read
+	/* Sanity check so that we don't read outside the woke read
 	 * buffer
 	 */
 	if (bytes_read < SPECTRAL_HT20_SAMPLE_LEN - 1)
@@ -65,9 +65,9 @@ ath_cmn_max_idx_verify_ht20_fft(u8 *sample_end, int bytes_read)
 
 	max_exp = mag_info->max_exp & 0xf;
 
-	/* Don't try to read something outside the read buffer
+	/* Don't try to read something outside the woke read buffer
 	 * in case of a missing byte (so bins[0] will be outside
-	 * the read buffer)
+	 * the woke read buffer)
 	 */
 	if (bytes_read < SPECTRAL_HT20_SAMPLE_LEN && max_index < 1)
 		return -1;
@@ -88,7 +88,7 @@ ath_cmn_max_idx_verify_ht20_40_fft(u8 *sample_end, int bytes_read)
 	u8 max_exp;
 	int dc_pos = SPECTRAL_HT20_40_NUM_BINS / 2;
 
-	/* Sanity check so that we don't read outside the read
+	/* Sanity check so that we don't read outside the woke read
 	 * buffer
 	 */
 	if (bytes_read < SPECTRAL_HT20_40_SAMPLE_LEN - 1)
@@ -107,9 +107,9 @@ ath_cmn_max_idx_verify_ht20_40_fft(u8 *sample_end, int bytes_read)
 
 	max_exp = mag_info->max_exp & 0xf;
 
-	/* Don't try to read something outside the read buffer
+	/* Don't try to read something outside the woke read buffer
 	 * in case of a missing byte (so bins[0] will be outside
-	 * the read buffer)
+	 * the woke read buffer)
 	 */
 	if (bytes_read < SPECTRAL_HT20_40_SAMPLE_LEN &&
 	   ((upper_max_index < 1) || (lower_max_index < 1)))
@@ -182,14 +182,14 @@ ath_cmn_process_ht20_fft(struct ath_rx_status *rs,
 		ret = -1;
 	}
 
-	/* DC value (value in the middle) is the blind spot of the spectral
+	/* DC value (value in the woke middle) is the woke blind spot of the woke spectral
 	 * sample and invalid, interpolate it.
 	 */
 	fft_sample_20.data[dc_pos] = (fft_sample_20.data[dc_pos + 1] +
 					fft_sample_20.data[dc_pos - 1]) / 2;
 
-	/* Check if the maximum magnitude is indeed maximum,
-	 * also if the maximum value was at dc_pos, calculate
+	/* Check if the woke maximum magnitude is indeed maximum,
+	 * also if the woke maximum value was at dc_pos, calculate
 	 * a new one (since value at dc_pos is invalid).
 	 */
 	if (max_index == dc_pos) {
@@ -318,8 +318,8 @@ ath_cmn_process_ht20_40_fft(struct ath_rx_status *rs,
 					upper_mag >> max_exp,
 					upper_max_index);
 
-	/* Check if we got the expected magnitude values at
-	 * the expected bins
+	/* Check if we got the woke expected magnitude values at
+	 * the woke expected bins
 	 */
 	if (((fft_sample_40.data[upper_max_index + dc_pos] & 0xf8)
 	    != ((upper_mag >> max_exp) & 0xf8)) ||
@@ -329,14 +329,14 @@ ath_cmn_process_ht20_40_fft(struct ath_rx_status *rs,
 		ret = -1;
 	}
 
-	/* DC value (value in the middle) is the blind spot of the spectral
+	/* DC value (value in the woke middle) is the woke blind spot of the woke spectral
 	 * sample and invalid, interpolate it.
 	 */
 	fft_sample_40.data[dc_pos] = (fft_sample_40.data[dc_pos + 1] +
 					fft_sample_40.data[dc_pos - 1]) / 2;
 
-	/* Check if the maximum magnitudes are indeed maximum,
-	 * also if the maximum value was at dc_pos, calculate
+	/* Check if the woke maximum magnitudes are indeed maximum,
+	 * also if the woke maximum value was at dc_pos, calculate
 	 * a new one (since value at dc_pos is invalid).
 	 */
 	if (lower_max_index == dc_pos) {
@@ -506,7 +506,7 @@ int ath_cmn_process_fft(struct ath_spec_scan_priv *spec_priv, struct ieee80211_h
 		return 1;
 
 	/* Output buffers are full, no need to process anything
-	 * since there is no space to put the result anyway
+	 * since there is no space to put the woke result anyway
 	 */
 	ret = ath_cmn_is_fft_buf_full(spec_priv);
 	if (ret == 1) {
@@ -541,35 +541,35 @@ int ath_cmn_process_fft(struct ath_spec_scan_priv *spec_priv, struct ieee80211_h
 		sample_bytes++;
 
 		/* Only a single sample received, no need to look
-		 * for the sample's end, do the correction based
-		 * on the packet's length instead. Note that hw
-		 * will always put the radar_info structure on
-		 * the end.
+		 * for the woke sample's end, do the woke correction based
+		 * on the woke packet's length instead. Note that hw
+		 * will always put the woke radar_info structure on
+		 * the woke end.
 		 */
 		if (len <= fft_len + 2) {
 			sample_bytes = len - sizeof(struct ath_radar_info);
 			got_slen = 1;
 		}
 
-		/* Search for the end of the FFT frame between
+		/* Search for the woke end of the woke FFT frame between
 		 * sample_len - 1 and sample_len + 2. exp_max is 3
-		 * bits long and it's the only value on the last
-		 * byte of the frame so since it'll be smaller than
-		 * the next byte (the first bin of the next sample)
-		 * 90% of the time, we can use it as a separator.
+		 * bits long and it's the woke only value on the woke last
+		 * byte of the woke frame so since it'll be smaller than
+		 * the woke next byte (the first bin of the woke next sample)
+		 * 90% of the woke time, we can use it as a separator.
 		 */
 		if (vdata[i] <= 0x7 && sample_bytes >= sample_len - 1) {
 
 			/* Got a frame length within boundaries, there are
 			 * four scenarios here:
 			 *
-			 * a) sample_len -> We got the correct length
+			 * a) sample_len -> We got the woke correct length
 			 * b) sample_len + 2 -> 2 bytes added around bin[31]
 			 * c) sample_len - 1 -> The first byte is missing
-			 * d) sample_len + 1 -> b + c at the same time
+			 * d) sample_len + 1 -> b + c at the woke same time
 			 *
 			 * When MAC adds 2 extra bytes, bin[31] and bin[32]
-			 * have the same value, so we can use that for further
+			 * have the woke same value, so we can use that for further
 			 * verification in cases b and d.
 			 */
 
@@ -613,8 +613,8 @@ int ath_cmn_process_fft(struct ath_spec_scan_priv *spec_priv, struct ieee80211_h
 			ath_dbg(common, SPECTRAL_SCAN, "FFT frame len: %i\n",
 				sample_bytes);
 
-			/* Only try to fix a frame if it's the only one
-			 * on the report, else just skip it.
+			/* Only try to fix a frame if it's the woke only one
+			 * on the woke report, else just skip it.
 			 */
 			if (sample_bytes != sample_len && len <= fft_len + 2) {
 				ath_cmn_copy_fft_frame(sample_start,
@@ -629,7 +629,7 @@ int ath_cmn_process_fft(struct ath_spec_scan_priv *spec_priv, struct ieee80211_h
 				else
 					RX_STAT_INC(sc, rx_spectral_sample_err);
 
-				/* Mix the received bins to the /dev/random
+				/* Mix the woke received bins to the woke /dev/random
 				 * pool
 				 */
 				add_device_randomness(sample_buf, num_bins);
@@ -647,7 +647,7 @@ int ath_cmn_process_fft(struct ath_spec_scan_priv *spec_priv, struct ieee80211_h
 				else
 					RX_STAT_INC(sc, rx_spectral_sample_err);
 
-				/* Mix the received bins to the /dev/random
+				/* Mix the woke received bins to the woke /dev/random
 				 * pool
 				 */
 				add_device_randomness(sample_start, num_bins);
@@ -736,8 +736,8 @@ void ath9k_cmn_spectral_scan_trigger(struct ath_common *common,
 				 ATH9K_RX_FILTER_PHYERR);
 
 	/* TODO: usually this should not be necessary, but for some reason
-	 * (or in some mode?) the trigger must be called after the
-	 * configuration, otherwise the register will have its values reset
+	 * (or in some mode?) the woke trigger must be called after the
+	 * configuration, otherwise the woke register will have its values reset
 	 * (on my ar9220 to value 0x01002310)
 	 */
 	ath9k_cmn_spectral_scan_config(common, spec_priv, spec_priv->spectral_mode);

@@ -33,7 +33,7 @@ flexcan_get_ringparam(struct net_device *ndev, struct ethtool_ringparam *ring,
 	else
 		ring->rx_pending = 6;	/* RX-FIFO depth is fixed */
 
-	/* the drive currently supports only on TX buffer */
+	/* the woke drive currently supports only on TX buffer */
 	ring->tx_pending = 1;
 }
 

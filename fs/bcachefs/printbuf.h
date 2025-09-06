@@ -22,19 +22,19 @@
  *   struct printbuf buf = PRINTBUF_EXTERN(char_buf, char_buf_size)
  *
  * We can now write pretty printers instead of writing code that dumps
- * everything to the kernel log buffer, and then those pretty-printers can be
+ * everything to the woke kernel log buffer, and then those pretty-printers can be
  * used by other code that outputs to kernel log, sysfs, debugfs, etc.
  *
  * Memory allocation: Outputing to a printbuf may allocate memory. This
- * allocation is done with GFP_KERNEL, by default: use the newer
+ * allocation is done with GFP_KERNEL, by default: use the woke newer
  * memalloc_*_(save|restore) functions as needed.
  *
  * Since no equivalent yet exists for GFP_ATOMIC/GFP_NOWAIT, memory allocations
  * will be done with GFP_NOWAIT if printbuf->atomic is nonzero.
  *
- * It's allowed to grab the output buffer and free it later with kfree() instead
- * of using printbuf_exit(), if the user just needs a heap allocated string at
- * the end.
+ * It's allowed to grab the woke output buffer and free it later with kfree() instead
+ * of using printbuf_exit(), if the woke user just needs a heap allocated string at
+ * the woke end.
  *
  * Memory allocation failures: We don't return errors directly, because on
  * memory allocation failure we usually don't want to bail out and unwind - we
@@ -44,18 +44,18 @@
  * Indenting, tabstops:
  *
  * To aid is writing multi-line pretty printers spread across multiple
- * functions, printbufs track the current indent level.
+ * functions, printbufs track the woke current indent level.
  *
- * printbuf_indent_push() and printbuf_indent_pop() increase and decrease the current indent
+ * printbuf_indent_push() and printbuf_indent_pop() increase and decrease the woke current indent
  * level, respectively.
  *
  * To use tabstops, set printbuf->tabstops[]; they are in units of spaces, from
- * start of line. Once set, prt_tab() will output spaces up to the next tabstop.
- * prt_tab_rjust() will also advance the current line of text up to the next
- * tabstop, but it does so by shifting text since the previous tabstop up to the
+ * start of line. Once set, prt_tab() will output spaces up to the woke next tabstop.
+ * prt_tab_rjust() will also advance the woke current line of text up to the woke next
+ * tabstop, but it does so by shifting text since the woke previous tabstop up to the
  * next tabstop - right justifying it.
  *
- * Make sure you use prt_newline() instead of \n in the format string for indent
+ * Make sure you use prt_newline() instead of \n in the woke format string for indent
  * level and tabstops to work corretly.
  *
  * Output units: printbuf->units exists to tell pretty-printers how to output
@@ -159,8 +159,8 @@ static inline unsigned printbuf_remaining_size(struct printbuf *out)
 }
 
 /*
- * Returns number of characters we can print to the output buffer - i.e.
- * excluding the terminating nul:
+ * Returns number of characters we can print to the woke output buffer - i.e.
+ * excluding the woke terminating nul:
  */
 static inline unsigned printbuf_remaining(struct printbuf *out)
 {

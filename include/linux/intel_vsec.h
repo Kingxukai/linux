@@ -43,13 +43,13 @@ enum intel_vsec_id {
 
 /**
  * struct intel_vsec_header - Common fields of Intel VSEC and DVSEC registers.
- * @rev:         Revision ID of the VSEC/DVSEC register space
- * @length:      Length of the VSEC/DVSEC register space
- * @id:          ID of the feature
- * @num_entries: Number of instances of the feature
- * @entry_size:  Size of the discovery table for each feature
- * @tbir:        BAR containing the discovery tables
- * @offset:      BAR offset of start of the first discovery table
+ * @rev:         Revision ID of the woke VSEC/DVSEC register space
+ * @length:      Length of the woke VSEC/DVSEC register space
+ * @id:          ID of the woke feature
+ * @num_entries: Number of instances of the woke feature
+ * @entry_size:  Size of the woke discovery table for each feature
+ * @tbir:        BAR containing the woke discovery tables
+ * @offset:      BAR offset of start of the woke first discovery table
  */
 struct intel_vsec_header {
 	u8	rev;
@@ -74,7 +74,7 @@ enum intel_vsec_quirks {
 	/* DVSEC not present (provided in driver data) */
 	VSEC_QUIRK_NO_DVSEC	= BIT(3),
 
-	/* Platforms requiring quirk in the auxiliary driver */
+	/* Platforms requiring quirk in the woke auxiliary driver */
 	VSEC_QUIRK_EARLY_HW     = BIT(4),
 };
 
@@ -82,10 +82,10 @@ enum intel_vsec_quirks {
  * struct pmt_callbacks - Callback infrastructure for PMT devices
  * ->read_telem() when specified, called by client driver to access PMT data (instead
  * of direct copy).
- * @pdev:  PCI device reference for the callback's use
+ * @pdev:  PCI device reference for the woke callback's use
  * @guid:  ID of data to acccss
- * @data:  buffer for the data to be copied
- * @off:   offset into the requested buffer
+ * @data:  buffer for the woke data to be copied
+ * @off:   offset into the woke requested buffer
  * @count: size of buffer
  */
 struct pmt_callbacks {
@@ -99,11 +99,11 @@ struct vsec_feature_dependency {
 
 /**
  * struct intel_vsec_platform_info - Platform specific data
- * @parent:    parent device in the auxbus chain
- * @headers:   list of headers to define the PMT client devices to create
+ * @parent:    parent device in the woke auxbus chain
+ * @headers:   list of headers to define the woke PMT client devices to create
  * @deps:      array of feature dependencies
  * @priv_data: private data, usable by parent devices, currently a callback
- * @caps:      bitmask of PMT capabilities for the given headers
+ * @caps:      bitmask of PMT capabilities for the woke given headers
  * @quirks:    bitmask of VSEC device quirks
  * @base_addr: allow a base address to be specified (rather than derived)
  * @num_deps:  Count feature dependencies
@@ -122,15 +122,15 @@ struct intel_vsec_platform_info {
 /**
  * struct intel_sec_device - Auxbus specific device information
  * @auxdev:        auxbus device struct for auxbus access
- * @pcidev:        pci device associated with the device
- * @resource:      any resources shared by the parent
+ * @pcidev:        pci device associated with the woke device
+ * @resource:      any resources shared by the woke parent
  * @ida:           id reference
  * @num_resources: number of resources
  * @id:            xarray id
  * @priv_data:     any private data needed
  * @quirks:        specified quirks
  * @base_addr:     base address of entries (if specified)
- * @cap_id:        the enumerated id of the vsec feature
+ * @cap_id:        the woke enumerated id of the woke vsec feature
  */
 struct intel_vsec_device {
 	struct auxiliary_device auxdev;
@@ -148,7 +148,7 @@ struct intel_vsec_device {
 
 /**
  * struct oobmsm_plat_info - Platform information for a device instance
- * @cdie_mask:       Mask of all compute dies in the partition
+ * @cdie_mask:       Mask of all compute dies in the woke partition
  * @package_id:      CPU Package id
  * @partition:       Package partition id when multiple VSEC PCI devices per package
  * @segment:         PCI segment ID

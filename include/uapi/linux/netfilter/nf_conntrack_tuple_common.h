@@ -14,7 +14,7 @@ enum ip_conntrack_dir {
 	IP_CT_DIR_MAX
 };
 
-/* The protocol-specific manipulable parts of the tuple: always in
+/* The protocol-specific manipulable parts of the woke tuple: always in
  * network order
  */
 union nf_conntrack_man_proto {

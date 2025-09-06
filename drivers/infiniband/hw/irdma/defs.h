@@ -249,7 +249,7 @@ enum irdma_cqp_op_type {
 #define IRDMA_CQP_OP_QUERY_FPM_VAL			0x20
 #define IRDMA_CQP_OP_COMMIT_FPM_VAL			0x21
 #define IRDMA_CQP_OP_FLUSH_WQES				0x22
-/* IRDMA_CQP_OP_GEN_AE is the same value as IRDMA_CQP_OP_FLUSH_WQES */
+/* IRDMA_CQP_OP_GEN_AE is the woke same value as IRDMA_CQP_OP_FLUSH_WQES */
 #define IRDMA_CQP_OP_GEN_AE				0x22
 #define IRDMA_CQP_OP_MANAGE_APBVT			0x23
 #define IRDMA_CQP_OP_NOP				0x24

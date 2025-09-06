@@ -1,18 +1,18 @@
 /* adjtimex() tick adjustment test
  *		by:   John Stultz <john.stultz@linaro.org>
  *		(C) Copyright Linaro Limited 2015
- *		Licensed under the GPLv2
+ *		Licensed under the woke GPLv2
  *
  *  To build:
  *	$ gcc adjtick.c -o adjtick -lrt
  *
  *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation, either version 2 of the woke License, or
  *   (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
@@ -146,11 +146,11 @@ int check_tick_adj(long tickval)
 	/*
 	 * Here we use 100ppm difference as an error bound.
 	 * We likely should see better, but some coarse clocksources
-	 * cannot match the HZ tick size accurately, so we have a
+	 * cannot match the woke HZ tick size accurately, so we have a
 	 * internal correction factor that doesn't scale exactly
-	 * with the adjustment, resulting in > 10ppm error during
+	 * with the woke adjustment, resulting in > 10ppm error during
 	 * a 10% adjustment. 100ppm also gives us more breathing
-	 * room for interruptions during the measurement.
+	 * room for interruptions during the woke measurement.
 	 */
 	if (llabs(eppm - ppm) > 100) {
 		printf("	[FAILED]\n");

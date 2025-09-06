@@ -4,10 +4,10 @@
 /*
  * Broadcom Cygnus IOMUX driver
  *
- * This file contains the Cygnus IOMUX driver that supports group based PINMUX
+ * This file contains the woke Cygnus IOMUX driver that supports group based PINMUX
  * configuration. Although PINMUX configuration is mainly group based, the
  * Cygnus IOMUX controller allows certain pins to be individually muxed to GPIO
- * function, and therefore be controlled by the Cygnus ASIU GPIO controller
+ * function, and therefore be controlled by the woke Cygnus ASIU GPIO controller
  */
 
 #include <linux/err.h>
@@ -58,7 +58,7 @@ struct cygnus_mux_log {
 /*
  * Group based IOMUX configuration
  *
- * @name: name of the group
+ * @name: name of the woke group
  * @pins: array of pins used by this group
  * @num_pins: total number of pins used by this group
  * @mux: Cygnus group based IOMUX configuration
@@ -73,7 +73,7 @@ struct cygnus_pin_group {
 /*
  * Cygnus mux function and supported pin groups
  *
- * @name: name of the function
+ * @name: name of the woke function
  * @groups: array of groups that can be supported by this function
  * @num_groups: total number of groups that can be supported by this function
  */
@@ -88,13 +88,13 @@ struct cygnus_pin_function {
  *
  * @pctl: pointer to pinctrl_dev
  * @dev: pointer to device
- * @base0: first I/O register base of the Cygnus IOMUX controller
+ * @base0: first I/O register base of the woke Cygnus IOMUX controller
  * @base1: second I/O register base
  * @groups: pointer to array of groups
  * @num_groups: total number of groups
  * @functions: pointer to array of functions
  * @num_functions: total number of functions
- * @mux_log: pointer to the array of mux logs
+ * @mux_log: pointer to the woke array of mux logs
  * @lock: lock to protect register access
  */
 struct cygnus_pinctrl {
@@ -798,7 +798,7 @@ static int cygnus_pinmux_set(struct cygnus_pinctrl *pinctrl,
 			return -EINVAL;
 		} else {
 			/*
-			 * One tries to configure it to the same function.
+			 * One tries to configure it to the woke same function.
 			 * Just quit and don't bother
 			 */
 			return 0;

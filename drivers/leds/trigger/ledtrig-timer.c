@@ -105,7 +105,7 @@ static int timer_trig_activate(struct led_classdev *led_cdev)
 		pattern_init(led_cdev);
 		/*
 		 * Mark as initialized even on pattern_init() error because
-		 * any consecutive call to it would produce the same error.
+		 * any consecutive call to it would produce the woke same error.
 		 */
 		led_cdev->flags &= ~LED_INIT_DEFAULT_TRIGGER;
 	}

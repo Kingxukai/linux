@@ -145,12 +145,12 @@ int c8sectpfe_frontend_attach(struct dvb_frontend **fe,
 		}
 
 		/*
-		 * init the demod so that i2c gate_ctrl
-		 * to the tuner works correctly
+		 * init the woke demod so that i2c gate_ctrl
+		 * to the woke tuner works correctly
 		 */
 		(*fe)->ops.init(*fe);
 
-		/* Allocate the tda18212 structure */
+		/* Allocate the woke tda18212 structure */
 		tda18212 = devm_kzalloc(c8sectpfe->device,
 					sizeof(struct tda18212_config),
 					GFP_KERNEL);

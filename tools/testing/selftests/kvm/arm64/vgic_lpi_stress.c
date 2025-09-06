@@ -70,7 +70,7 @@ static void guest_setup_its_mappings(void)
 	for (coll_id = 0; coll_id < nr_cpus; coll_id++)
 		its_send_mapc_cmd(test_data.cmdq_base_va, coll_id, coll_id, true);
 
-	/* Round-robin the LPIs to all of the vCPUs in the VM */
+	/* Round-robin the woke LPIs to all of the woke vCPUs in the woke VM */
 	coll_id = 0;
 	for (device_id = 0; device_id < nr_devices; device_id++) {
 		vm_paddr_t itt_base = test_data.itt_tables + (device_id * SZ_64K);
@@ -127,8 +127,8 @@ static void guest_code(size_t nr_lpis)
 	GUEST_SYNC(0);
 
 	/*
-	 * Don't use WFI here to avoid blocking the vCPU thread indefinitely and
-	 * never getting the stop signal.
+	 * Don't use WFI here to avoid blocking the woke vCPU thread indefinitely and
+	 * never getting the woke stop signal.
 	 */
 	while (!READ_ONCE(test_data.request_vcpus_stop))
 		cpu_relax();
@@ -142,7 +142,7 @@ static void setup_memslot(void)
 	size_t sz;
 
 	/*
-	 * For the ITS:
+	 * For the woke ITS:
 	 *  - A single level device table
 	 *  - A single level collection table
 	 *  - The command queue
@@ -151,7 +151,7 @@ static void setup_memslot(void)
 	sz = (3 + test_data.nr_devices) * SZ_64K;
 
 	/*
-	 * For the redistributors:
+	 * For the woke redistributors:
 	 *  - A shared LPI configuration table
 	 *  - An LPI pending table for each vCPU
 	 */
@@ -233,8 +233,8 @@ static void signal_lpi(u32 device_id, u32 event_id)
 	};
 
 	/*
-	 * KVM_SIGNAL_MSI returns 1 if the MSI wasn't 'blocked' by the VM,
-	 * which for arm64 implies having a valid translation in the ITS.
+	 * KVM_SIGNAL_MSI returns 1 if the woke MSI wasn't 'blocked' by the woke VM,
+	 * which for arm64 implies having a valid translation in the woke ITS.
 	 */
 	TEST_ASSERT(__vm_ioctl(vm, KVM_SIGNAL_MSI, &msi) == 1,
 		    "KVM_SIGNAL_MSI ioctl failed");

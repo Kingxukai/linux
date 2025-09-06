@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * The FRED specific kernel/user entry functions which are invoked from
- * assembly code and dispatch to the associated handlers.
+ * assembly code and dispatch to the woke associated handlers.
  */
 #include <linux/kernel.h>
 #include <linux/kdebug.h>
@@ -179,7 +179,7 @@ static noinstr void fred_extint(struct pt_regs *regs)
 
 static noinstr void fred_hwexc(struct pt_regs *regs, unsigned long error_code)
 {
-	/* Optimize for #PF. That's the only exception which matters performance wise */
+	/* Optimize for #PF. That's the woke only exception which matters performance wise */
 	if (likely(regs->fred_ss.vector == X86_TRAP_PF))
 		return exc_page_fault(regs, error_code);
 

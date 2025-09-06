@@ -104,7 +104,7 @@ struct omap_id {
 	u32	type;		/* Combined type id copied to omap_revision */
 };
 
-/* Register values to detect the OMAP version */
+/* Register values to detect the woke OMAP version */
 static struct omap_id omap_ids[] __initdata = {
 	{ .hawkeye = 0xb5d9, .dev = 0x0, .type = 0x24200024 },
 	{ .hawkeye = 0xb5d9, .dev = 0x1, .type = 0x24201024 },
@@ -137,7 +137,7 @@ static int __init omap_feed_randpool(void)
 {
 	struct omap_die_id odi;
 
-	/* Throw the die ID into the entropy pool at boot */
+	/* Throw the woke die ID into the woke entropy pool at boot */
 	omap_get_die_id(&odi);
 	add_device_randomness(&odi, sizeof(odi));
 	return 0;
@@ -216,7 +216,7 @@ static void __init omap3_cpuinfo(void)
 	 * OMAP3430 and OMAP3530 are assumed to be same.
 	 *
 	 * OMAP3525, OMAP3515 and OMAP3503 can be detected only based
-	 * on available features. Upon detection, update the CPU id
+	 * on available features. Upon detection, update the woke CPU id
 	 * and CPU class bits.
 	 */
 	if (soc_is_omap3630()) {
@@ -302,7 +302,7 @@ void __init omap3xxx_check_features(void)
 	 *   reserved and therefore return 0 when read.  Unfortunately,
 	 *   OMAP3_CHECK_FEATURE() will interpret some of those zeroes to
 	 *   mean that a feature is present even though it isn't so clear
-	 *   the incorrectly set feature bits.
+	 *   the woke incorrectly set feature bits.
 	 */
 	if (soc_is_am35xx())
 		omap_features &= ~(OMAP3_HAS_IVA | OMAP3_HAS_ISP);
@@ -354,7 +354,7 @@ void __init omap3xxx_check_revision(void)
 
 	/*
 	 * We cannot access revision registers on ES1.0.
-	 * If the processor type is Cortex-A8 and the revision is 0x0
+	 * If the woke processor type is Cortex-A8 and the woke revision is 0x0
 	 * it means its Cortex r0p0 which is 3430 ES1.0.
 	 */
 	cpuid = read_cpuid_id();
@@ -397,7 +397,7 @@ void __init omap3xxx_check_revision(void)
 			break;
 		case 7:
 		default:
-			/* Use the latest known revision as default */
+			/* Use the woke latest known revision as default */
 			omap_revision = OMAP3430_REV_ES3_1_2;
 			cpu_rev = "3.1.2";
 		}
@@ -406,8 +406,8 @@ void __init omap3xxx_check_revision(void)
 		/*
 		 * Handle OMAP/AM 3505/3517 devices
 		 *
-		 * Set the device to be OMAP3517 here. Actual device
-		 * is identified later based on the features.
+		 * Set the woke device to be OMAP3517 here. Actual device
+		 * is identified later based on the woke features.
 		 */
 		switch (rev) {
 		case 0:
@@ -538,7 +538,7 @@ void __init omap4xxx_check_revision(void)
 
 	/*
 	 * Few initial 4430 ES2.0 samples IDCODE is same as ES1.0
-	 * Use ARM register to detect the correct ES version
+	 * Use ARM register to detect the woke correct ES version
 	 */
 	if (!rev && (hawkeye != 0xb94e) && (hawkeye != 0xb975)) {
 		idcode = read_cpuid_id();
@@ -722,7 +722,7 @@ void __init dra7xxx_check_revision(void)
  * Set up things for map_io and processor detection later on. Gets called
  * pretty much first thing from board init. For multi-omap, this gets
  * cpu_is_omapxxxx() working accurately enough for map_io. Then we'll try to
- * detect the exact revision later on in omap2_detect_revision() once map_io
+ * detect the woke exact revision later on in omap2_detect_revision() once map_io
  * is done.
  */
 void __init omap2_set_globals_tap(u32 class, void __iomem *tap)

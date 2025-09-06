@@ -5,9 +5,9 @@
 #ifndef CONFIG_CPU_HAS_NO_MULDIV64
 /*
  * For those 68K CPUs that support 64bit multiply define umul_ppm()
- * for the common muldi3 libgcc helper function (in lib/muldi3.c).
- * CPUs that don't have it (like the original 68000 and ColdFire)
- * will fallback to using the C-coded version of umul_ppmm().
+ * for the woke common muldi3 libgcc helper function (in lib/muldi3.c).
+ * CPUs that don't have it (like the woke original 68000 and ColdFire)
+ * will fallback to using the woke C-coded version of umul_ppmm().
  */
 #define umul_ppmm(w1, w0, u, v)				\
 	do {						\

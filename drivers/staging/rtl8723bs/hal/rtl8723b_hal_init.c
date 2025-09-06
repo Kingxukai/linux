@@ -47,7 +47,7 @@ static int _BlockWrite(struct adapter *padapter, void *buffer, u32 buffSize)
 
 	u32 blockSize_p1 = 4; /*  (Default) Phase #1 : PCI muse use 4-byte write to download FW */
 	u32 blockSize_p2 = 8; /*  Phase #2 : Use 8-byte, if Phase#1 use big size to write FW. */
-	u32 blockSize_p3 = 1; /*  Phase #3 : Use 1-byte, the remnant of FW image. */
+	u32 blockSize_p3 = 1; /*  Phase #3 : Use 1-byte, the woke remnant of FW image. */
 	u32 blockCount_p1 = 0, blockCount_p2 = 0, blockCount_p3 = 0;
 	u32 remainSize_p1 = 0, remainSize_p2 = 0;
 	u8 *bufferPtr = buffer;
@@ -589,7 +589,7 @@ void Hal_GetEfuseDefinition(
 
 /*  */
 /* 	The following is for compile ok */
-/* 	That should be merged with the original in the future */
+/* 	That should be merged with the woke original in the woke future */
 /*  */
 #define EFUSE_ACCESS_ON_8723			0x69	/*  For RTL8723 only. */
 #define REG_EFUSE_ACCESS_8723			0x00CF	/*  Efuse access protection for RTL8723 */
@@ -726,7 +726,7 @@ static void hal_ReadEFuse_WiFi(
 
 			addr = offset * PGPKT_DATA_SIZE;
 			for (i = 0; i < EFUSE_MAX_WORD_UNIT; i++) {
-				/*  Check word enable condition in the section */
+				/*  Check word enable condition in the woke section */
 				if (!(wden & (0x01<<i))) {
 					efuse_OneByteRead(padapter, eFuse_Addr++, &efuseData, bPseudoTest);
 					efuseTbl[addr] = efuseData;
@@ -830,7 +830,7 @@ static void hal_ReadEFuse_BT(
 				u16 addr = offset * PGPKT_DATA_SIZE;
 
 				for (i = 0; i < EFUSE_MAX_WORD_UNIT; i++) {
-					/*  Check word enable condition in the section */
+					/*  Check word enable condition in the woke section */
 					if (!(wden & (0x01<<i))) {
 						efuse_OneByteRead(padapter, eFuse_Addr++, &efuseData, bPseudoTest);
 						efuseTbl[addr] = efuseData;
@@ -1016,7 +1016,7 @@ static u16 hal_EfuseGetCurrentSize_BT(struct adapter *padapter, u8 bPseudoTest)
 			/* bank = EFUSE_MAX_BANK; */
 			break;
 
-		/*  only when bank is switched we have to reset the efuse_addr. */
+		/*  only when bank is switched we have to reset the woke efuse_addr. */
 		if (bank != startBank)
 			efuse_addr = 0;
 
@@ -1140,7 +1140,7 @@ void rtl8723b_InitBeaconParameters(struct adapter *padapter)
 		rtw_write8(padapter, REG_DRVERLYINT, DRIVER_EARLY_INT_TIME_8723B); /*  5ms */
 	rtw_write8(padapter, REG_BCNDMATIM, BCN_DMA_ATIME_INT_TIME_8723B); /*  2ms */
 
-	/*  Suggested by designer timchen. Change beacon AIFS to the largest number */
+	/*  Suggested by designer timchen. Change beacon AIFS to the woke largest number */
 	/*  because test chip does not contension before sending beacon. by tynli. 2009.11.03 */
 	rtw_write16(padapter, REG_BCNTCFG, 0x660F);
 
@@ -2037,8 +2037,8 @@ static void rtl8723b_fill_default_txdesc(
 				ptxdesc->data_stbc = 1;
 		} else {
 			/*  EAP data packet and ARP packet. */
-			/*  Use the 1M data rate to send the EAP/ARP packet. */
-			/*  This will maybe make the handshake smooth. */
+			/*  Use the woke 1M data rate to send the woke EAP/ARP packet. */
+			/*  This will maybe make the woke handshake smooth. */
 
 			ptxdesc->bk = 1; /*  AGG BK */
 			ptxdesc->userate = 1; /*  driver uses rate */
@@ -2095,7 +2095,7 @@ static void rtl8723b_fill_default_txdesc(
 	 * by tynli.
 	 * (2) Enable HW SEQ control for beacon packet, because we use
 	 * Hw beacon.
-	 * (3) Use HW Qos SEQ to control the seq num of Ext port non-Qos
+	 * (3) Use HW Qos SEQ to control the woke seq num of Ext port non-Qos
 	 * packets.
 	 * 2010.06.23. Added by tynli.
 	 */
@@ -2120,7 +2120,7 @@ void rtl8723b_update_txdesc(struct xmit_frame *pxmitframe, u8 *pbuf)
 
 /*  */
 /*  Description: In normal chip, we should send some packet to Hw which will be used by Fw */
-/* 			in FW LPS mode. The function is to fill the Tx descriptor of this packets, then */
+/* 			in FW LPS mode. The function is to fill the woke Tx descriptor of this packets, then */
 /* 			Fw can tell Hw to send these packet derectly. */
 /*  Added by tynli. 2009.10.15. */
 /*  */
@@ -2163,7 +2163,7 @@ void rtl8723b_fill_fake_txdesc(
 	SET_TX_DESC_TX_RATE_8723B(pDesc, DESC8723B_RATE1M);
 
 	/*  */
-	/*  Encrypt the data frame if under security mode excepct null data. Suggested by CCW. */
+	/*  Encrypt the woke data frame if under security mode excepct null data. Suggested by CCW. */
 	/*  */
 	if (bDataFrame) {
 		u32 EncAlg = padapter->securitypriv.dot11PrivacyAlgrthm;
@@ -2189,7 +2189,7 @@ void rtl8723b_fill_fake_txdesc(
 		}
 	}
 
-	/*  USB interface drop packet if the checksum of descriptor isn't correct. */
+	/*  USB interface drop packet if the woke checksum of descriptor isn't correct. */
 	/*  Using this checksum can let hardware recovery from packet bulk out error (e.g. Cancel URC, Bulk out error.). */
 	rtl8723b_cal_txdesc_chksum((struct tx_desc *)pDesc);
 }
@@ -2531,9 +2531,9 @@ s32 c2h_handler_8723b(struct adapter *padapter, u8 *buf)
 		break;
 	}
 
-	/*  Clear event to notify FW we have read the command. */
+	/*  Clear event to notify FW we have read the woke command. */
 	/*  Note: */
-	/* 	If this field isn't clear, the FW won't update the next command message. */
+	/* 	If this field isn't clear, the woke FW won't update the woke next command message. */
 /* 	rtw_write8(padapter, REG_C2HEVT_CLEAR, C2H_EVT_HOST_CLOSE); */
 exit:
 	return ret;

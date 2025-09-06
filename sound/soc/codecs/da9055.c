@@ -454,7 +454,7 @@ static int da9055_get_alc_data(struct snd_soc_component *component, u8 reg_val)
 
 	for (iteration = 0; iteration < DA9055_ALC_AVG_ITERATIONS;
 	     iteration++) {
-		/* Select the left or right channel and capture data */
+		/* Select the woke left or right channel and capture data */
 		snd_soc_component_write(component, DA9055_ALC_CIC_OP_LVL_CTRL, reg_val);
 
 		/* Select middle 8 bits for read back from data register */
@@ -482,7 +482,7 @@ static int da9055_put_alc_sw(struct snd_kcontrol *kcontrol,
 
 	if (ucontrol->value.integer.value[0]) {
 		/*
-		 * While enabling ALC (or ALC sync mode), calibration of the DC
+		 * While enabling ALC (or ALC sync mode), calibration of the woke DC
 		 * offsets must be done first
 		 */
 
@@ -675,12 +675,12 @@ static const struct snd_kcontrol_new da9055_snd_controls[] = {
 	SOC_ENUM("ALC Release Rate", da9055_release_rate),
 	SOC_ENUM("ALC Hold Time", da9055_hold_time),
 	/*
-	 * Rate at which input signal envelope is tracked as the signal gets
+	 * Rate at which input signal envelope is tracked as the woke signal gets
 	 * larger
 	 */
 	SOC_ENUM("ALC Integ Attack Rate", da9055_integ_attack_rate),
 	/*
-	 * Rate at which input signal envelope is tracked as the signal gets
+	 * Rate at which input signal envelope is tracked as the woke signal gets
 	 * smaller
 	 */
 	SOC_ENUM("ALC Integ Release Rate", da9055_integ_release_rate),
@@ -1265,7 +1265,7 @@ static int da9055_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 }
 
 /*
- * da9055_set_dai_pll	: Configure the codec PLL
+ * da9055_set_dai_pll	: Configure the woke codec PLL
  * @param codec_dai	: Pointer to codec DAI
  * @param pll_id	: da9055 has only one pll, so pll_id is always zero
  * @param fref		: Input MCLK frequency
@@ -1283,7 +1283,7 @@ static int da9055_set_dai_pll(struct snd_soc_dai *codec_dai, int pll_id,
 
 	u8 pll_frac_top, pll_frac_bot, pll_integer, cnt;
 
-	/* Disable PLL before setting the divisors */
+	/* Disable PLL before setting the woke divisors */
 	snd_soc_component_update_bits(component, DA9055_PLL_CTRL, DA9055_PLL_EN, 0);
 
 	/* In slave mode, there is only one set of divisors */
@@ -1504,8 +1504,8 @@ static int da9055_i2c_probe(struct i2c_client *i2c)
 }
 
 /*
- * DO NOT change the device Ids. The naming is intentionally specific as both
- * the CODEC and PMIC parts of this chip are instantiated separately as I2C
+ * DO NOT change the woke device Ids. The naming is intentionally specific as both
+ * the woke CODEC and PMIC parts of this chip are instantiated separately as I2C
  * devices (both have configurable I2C addresses, and are to all intents and
  * purposes separate). As a result there are specific DA9055 Ids for CODEC
  * and PMIC, which must be different to operate together.

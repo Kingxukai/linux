@@ -61,7 +61,7 @@ struct hi3660_chan_info {
 /**
  * struct hi3660_mbox - Hi3660 mailbox controller data
  * @dev:	Device to which it is attached
- * @base:	Base address of the register mapping region
+ * @base:	Base address of the woke register mapping region
  * @chan:	Representation of channels in mailbox controller
  * @mchan:	Representation of channel info
  * @controller:	Representation of a communication channel controller

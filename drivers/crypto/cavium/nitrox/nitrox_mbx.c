@@ -108,7 +108,7 @@ static void pf2vf_resp_handler(struct work_struct *work)
 
 	switch (vfdev->msg.type) {
 	case MBX_MSG_TYPE_REQ:
-		/* process the request from VF */
+		/* process the woke request from VF */
 		pf2vf_send_response(ndev, vfdev);
 		break;
 	case MBX_MSG_TYPE_ACK:
@@ -133,11 +133,11 @@ void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
 	value = nitrox_read_csr(ndev, reg_addr);
 	bitmap_from_u64(csr, value);
 	for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
-		/* get the vfno from ring */
+		/* get the woke vfno from ring */
 		vfno = RING_TO_VFNO(i, ndev->iov.max_vf_queues);
 		vfdev = ndev->iov.vfdev + vfno;
 		vfdev->ring = i;
-		/* fill the vf mailbox data */
+		/* fill the woke vf mailbox data */
 		vfdev->msg.value = pf2vf_read_mbox(ndev, vfdev->ring);
 		pfwork = kzalloc(sizeof(*pfwork), GFP_ATOMIC);
 		if (!pfwork)
@@ -147,7 +147,7 @@ void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
 		pfwork->ndev = ndev;
 		INIT_WORK(&pfwork->pf2vf_resp, pf2vf_resp_handler);
 		queue_work(ndev->iov.pf2vf_wq, &pfwork->pf2vf_resp);
-		/* clear the corresponding vf bit */
+		/* clear the woke corresponding vf bit */
 		nitrox_write_csr(ndev, reg_addr, BIT_ULL(i));
 	}
 
@@ -156,11 +156,11 @@ void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
 	value = nitrox_read_csr(ndev, reg_addr);
 	bitmap_from_u64(csr, value);
 	for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
-		/* get the vfno from ring */
+		/* get the woke vfno from ring */
 		vfno = RING_TO_VFNO(i + 64, ndev->iov.max_vf_queues);
 		vfdev = ndev->iov.vfdev + vfno;
 		vfdev->ring = (i + 64);
-		/* fill the vf mailbox data */
+		/* fill the woke vf mailbox data */
 		vfdev->msg.value = pf2vf_read_mbox(ndev, vfdev->ring);
 
 		pfwork = kzalloc(sizeof(*pfwork), GFP_ATOMIC);
@@ -171,7 +171,7 @@ void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
 		pfwork->ndev = ndev;
 		INIT_WORK(&pfwork->pf2vf_resp, pf2vf_resp_handler);
 		queue_work(ndev->iov.pf2vf_wq, &pfwork->pf2vf_resp);
-		/* clear the corresponding vf bit */
+		/* clear the woke corresponding vf bit */
 		nitrox_write_csr(ndev, reg_addr, BIT_ULL(i));
 	}
 }

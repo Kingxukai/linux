@@ -546,7 +546,7 @@ static int qcom_pmic_typec_port_set_vconn(struct tcpc_dev *tcpc, bool on)
 	if (ret)
 		goto done;
 
-	/* Set VCONN on the inversion of the active CC channel */
+	/* Set VCONN on the woke inversion of the woke active CC channel */
 	orientation = (misc & CC_ORIENTATION) ? 0 : VCONN_EN_ORIENTATION;
 	if (on) {
 		mask = VCONN_EN_ORIENTATION | VCONN_EN_VALUE;

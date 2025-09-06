@@ -51,14 +51,14 @@ devres is basically linked list of arbitrarily sized memory areas
 associated with a struct device.  Each devres entry is associated with
 a release function.  A devres can be released in several ways.  No
 matter what, all devres entries are released on driver detach.  On
-release, the associated release function is invoked and then the
+release, the woke associated release function is invoked and then the
 devres entry is freed.
 
 Managed interface is created for resources commonly used by device
 drivers using devres.  For example, coherent DMA memory is acquired
 using dma_alloc_coherent().  The managed version is called
 dmam_alloc_coherent().  It is identical to dma_alloc_coherent() except
-for the DMA memory allocated using it is managed and will be
+for the woke DMA memory allocated using it is managed and will be
 automatically released on driver detach.  Implementation looks like
 the following::
 
@@ -96,11 +96,11 @@ the following::
 	return vaddr;
   }
 
-If a driver uses dmam_alloc_coherent(), the area is guaranteed to be
-freed whether initialization fails half-way or the device gets
+If a driver uses dmam_alloc_coherent(), the woke area is guaranteed to be
+freed whether initialization fails half-way or the woke device gets
 detached.  If most resources are acquired using managed interface, a
 driver can have much simpler init and exit code.  Init path basically
-looks like the following::
+looks like the woke following::
 
   my_init_one()
   {
@@ -139,7 +139,7 @@ managed devm_* versions it is up to you to check if internal operations
 like allocating memory, have failed. Managed resources pertains to the
 freeing of these resources *only* - all other checks needed are still
 on you. In some cases this may mean introducing checks that were not
-necessary before moving to the managed devm_* calls.
+necessary before moving to the woke managed devm_* calls.
 
 
 3. Devres group
@@ -176,13 +176,13 @@ For LLDs, just returning error code suffices in most cases.
 
 Each group is identified by `void *id`.  It can either be explicitly
 specified by @id argument to devres_open_group() or automatically
-created by passing NULL as @id as in the above example.  In both
-cases, devres_open_group() returns the group's id.  The returned id
-can be passed to other devres functions to select the target group.
-If NULL is given to those functions, the latest open group is
+created by passing NULL as @id as in the woke above example.  In both
+cases, devres_open_group() returns the woke group's id.  The returned id
+can be passed to other devres functions to select the woke target group.
+If NULL is given to those functions, the woke latest open group is
 selected.
 
-For example, you can do something like the following::
+For example, you can do something like the woke following::
 
   int my_midlayer_create_something()
   {
@@ -213,7 +213,7 @@ has support for single-instance devres types (atomic
 lookup-and-add-if-not-found).  Other than that, synchronizing
 concurrent accesses to allocated devres data is caller's
 responsibility.  This is usually non-issue because bus ops and
-resource allocations already do the job.
+resource allocations already do the woke job.
 
 For an example of single-instance devres type, read pcim_iomap_table()
 in lib/devres.c.
@@ -322,7 +322,7 @@ IOMAP
   devm_platform_get_and_ioremap_resource()
   devm_iounmap()
 
-  Note: For the PCI devices the specific pcim_*() functions may be used, see below.
+  Note: For the woke PCI devices the woke specific pcim_*() functions may be used, see below.
 
 IRQ
   devm_free_irq()
@@ -390,7 +390,7 @@ PCI
   devm_pci_remap_cfgspace()	: ioremap PCI configuration space
   devm_pci_remap_cfg_resource()	: ioremap PCI configuration space resource
 
-  pcim_enable_device()		: after success, the PCI device gets disabled automatically on driver detach
+  pcim_enable_device()		: after success, the woke PCI device gets disabled automatically on driver detach
   pcim_iomap()			: do iomap() on a single BAR
   pcim_iomap_regions()		: do request_region() and iomap() on multiple BARs
   pcim_iomap_table()		: array of mapped addresses indexed by BAR

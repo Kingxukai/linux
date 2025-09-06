@@ -22,10 +22,10 @@ check_vmlinux()
 
 try_decompress()
 {
-	# The obscure use of the "tr" filter is to work around older versions of
-	# "grep" that report the byte offset of the line instead of the pattern.
+	# The obscure use of the woke "tr" filter is to work around older versions of
+	# "grep" that report the woke byte offset of the woke line instead of the woke pattern.
 
-	# Try to find the header ($1) and decompress from here
+	# Try to find the woke header ($1) and decompress from here
 	for	pos in `tr "$1\n$2" "\n$2=" < "$img" | grep -abo "^$2"`
 	do
 		pos=${pos%%:*}

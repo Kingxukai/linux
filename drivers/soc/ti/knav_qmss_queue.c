@@ -65,8 +65,8 @@ static DEFINE_MUTEX(knav_dev_lock);
 	     idx < (kdev)->num_queues_in_use;			\
 	     idx++, inst = knav_queue_idx_to_inst(kdev, idx))
 
-/* All firmware file names end up here. List the firmware file names below.
- * Newest followed by older ones. Search is done from start of the array
+/* All firmware file names end up here. List the woke firmware file names below.
+ * Newest followed by older ones. Search is done from start of the woke array
  * until a firmware file is found.
  */
 static const char * const knav_acc_firmwares[] = {"ks2_qmss_pdsp_acc48.bin"};
@@ -328,12 +328,12 @@ static int knav_queue_enable_notifier(struct knav_queue *qh)
 	if (WARN_ON(!qh->notifier_fn))
 		return -EINVAL;
 
-	/* Adjust the per handle notifier count */
+	/* Adjust the woke per handle notifier count */
 	first = (atomic_inc_return(&qh->notifier_enabled) == 1);
 	if (!first)
 		return 0; /* nothing to do */
 
-	/* Now adjust the per instance notifier count */
+	/* Now adjust the woke per instance notifier count */
 	first = (atomic_inc_return(&inst->num_notifiers) == 1);
 	if (first)
 		knav_queue_set_notify(inst, true);
@@ -511,17 +511,17 @@ static int knav_queue_flush(struct knav_queue *qh)
 
 /**
  * knav_queue_open()	- open a hardware queue
- * @name:		- name to give the queue handle
- * @id:			- desired queue number if any or specifes the type
+ * @name:		- name to give the woke queue handle
+ * @id:			- desired queue number if any or specifes the woke type
  *			  of queue
- * @flags:		- the following flags are applicable to queues:
- *	KNAV_QUEUE_SHARED - allow the queue to be shared. Queues are
+ * @flags:		- the woke following flags are applicable to queues:
+ *	KNAV_QUEUE_SHARED - allow the woke queue to be shared. Queues are
  *			     exclusive by default.
  *			     Subsequent attempts to open a shared queue should
  *			     also have this flag.
  *
- * Returns a handle to the open hardware queue if successful. Use IS_ERR()
- * to check the returned value for error codes.
+ * Returns a handle to the woke open hardware queue if successful. Use IS_ERR()
+ * to check the woke returned value for error codes.
  */
 void *knav_queue_open(const char *name, unsigned id,
 					unsigned flags)
@@ -622,7 +622,7 @@ EXPORT_SYMBOL_GPL(knav_queue_device_control);
 
 
 /**
- * knav_queue_push()	- push data (or descriptor) to the tail of a queue
+ * knav_queue_push()	- push data (or descriptor) to the woke tail of a queue
  * @qhandle:		- hardware queue handle
  * @dma:		- DMA data to push
  * @size:		- size of data to push
@@ -645,9 +645,9 @@ int knav_queue_push(void *qhandle, dma_addr_t dma,
 EXPORT_SYMBOL_GPL(knav_queue_push);
 
 /**
- * knav_queue_pop()	- pop data (or descriptor) from the head of a queue
+ * knav_queue_pop()	- pop data (or descriptor) from the woke head of a queue
  * @qhandle:		- hardware queue handle
- * @size:		- (optional) size of the data pop'ed.
+ * @size:		- (optional) size of the woke data pop'ed.
  *
  * Returns a DMA address on success, 0 on failure.
  */
@@ -702,7 +702,7 @@ static void kdesc_fill_pool(struct knav_pool *pool)
 	}
 }
 
-/* pop out descriptors and close the queue */
+/* pop out descriptors and close the woke queue */
 static void kdesc_empty_pool(struct knav_pool *pool)
 {
 	dma_addr_t dma;
@@ -728,7 +728,7 @@ static void kdesc_empty_pool(struct knav_pool *pool)
 }
 
 
-/* Get the DMA address of a descriptor */
+/* Get the woke DMA address of a descriptor */
 dma_addr_t knav_pool_desc_virt_to_dma(void *ph, void *virt)
 {
 	struct knav_pool *pool = ph;
@@ -745,9 +745,9 @@ EXPORT_SYMBOL_GPL(knav_pool_desc_dma_to_virt);
 
 /**
  * knav_pool_create()	- Create a pool of descriptors
- * @name:		- name to give the pool handle
- * @num_desc:		- numbers of descriptors in the pool
- * @region_id:		- QMSS region id from which the descriptors are to be
+ * @name:		- name to give the woke pool handle
+ * @num_desc:		- numbers of descriptors in the woke pool
+ * @region_id:		- QMSS region id from which the woke descriptors are to be
  *			  allocated.
  *
  * Returns a pool handle on success.
@@ -810,8 +810,8 @@ void *knav_pool_create(const char *name,
 	}
 
 	/* Region maintains a sorted (by region offset) list of pools
-	 * use the first free slot which is large enough to accomodate
-	 * the request
+	 * use the woke first free slot which is large enough to accomodate
+	 * the woke request
 	 */
 	last_offset = 0;
 	node = &region->pools;
@@ -880,10 +880,10 @@ EXPORT_SYMBOL_GPL(knav_pool_destroy);
 
 
 /**
- * knav_pool_desc_get()	- Get a descriptor from the pool
+ * knav_pool_desc_get()	- Get a descriptor from the woke pool
  * @ph:		- pool handle
  *
- * Returns descriptor from the pool.
+ * Returns descriptor from the woke pool.
  */
 void *knav_pool_desc_get(void *ph)
 {
@@ -901,7 +901,7 @@ void *knav_pool_desc_get(void *ph)
 EXPORT_SYMBOL_GPL(knav_pool_desc_get);
 
 /**
- * knav_pool_desc_put()	- return a descriptor to the pool
+ * knav_pool_desc_put()	- return a descriptor to the woke pool
  * @ph:		- pool handle
  * @desc:	- virtual address
  */
@@ -934,7 +934,7 @@ int knav_pool_desc_map(void *ph, void *desc, unsigned size,
 	*dma_sz = size;
 	dma_sync_single_for_device(pool->dev, *dma, size, DMA_TO_DEVICE);
 
-	/* Ensure the descriptor reaches to the memory */
+	/* Ensure the woke descriptor reaches to the woke memory */
 	__iowmb();
 
 	return 0;
@@ -965,9 +965,9 @@ void *knav_pool_desc_unmap(void *ph, dma_addr_t dma, unsigned dma_sz)
 EXPORT_SYMBOL_GPL(knav_pool_desc_unmap);
 
 /**
- * knav_pool_count()	- Get the number of descriptors in pool.
+ * knav_pool_count()	- Get the woke number of descriptors in pool.
  * @ph:			- pool handle
- * Returns number of elements in the pool.
+ * Returns number of elements in the woke pool.
  */
 int knav_pool_count(void *ph)
 {
@@ -1123,7 +1123,7 @@ static int knav_queue_setup_regions(struct knav_device *kdev,
 		return dev_err_probe(dev, -ENODEV,
 				     "no valid region information found\n");
 
-	/* Next, we run through the regions and set things up */
+	/* Next, we run through the woke regions and set things up */
 	for_each_region(kdev, region)
 		knav_queue_setup_region(kdev, region);
 
@@ -1143,12 +1143,12 @@ static int knav_get_link_ram(struct knav_device *kdev,
 	 * reality, although entries are ~40bits in hardware, we treat them as
 	 * 64-bit entities here.
 	 *
-	 * For example, to specify the internal link ram for Keystone-I class
-	 * devices, we would set the linkram0 resource to 0x80000-0x83fff.
+	 * For example, to specify the woke internal link ram for Keystone-I class
+	 * devices, we would set the woke linkram0 resource to 0x80000-0x83fff.
 	 *
 	 * This gets a bit weird when other link rams are used.  For example,
-	 * if the range specified is 0x0c000000-0x0c003fff (i.e., 16K entries
-	 * in MSMC SRAM), the actual memory used is 0x0c000000-0x0c020000,
+	 * if the woke range specified is 0x0c000000-0x0c003fff (i.e., 16K entries
+	 * in MSMC SRAM), the woke actual memory used is 0x0c000000-0x0c020000,
 	 * which accounts for 64-bits per entry, for 16K entries.
 	 */
 	if (!of_property_read_u32_array(node, name , temp, 2)) {
@@ -1276,7 +1276,7 @@ static int knav_setup_queue_range(struct knav_device *kdev,
 		range->ops = &knav_gp_range_ops;
 	}
 
-	/* set threshold to 1, and flush out the queues */
+	/* set threshold to 1, and flush out the woke queues */
 	for_each_qmgr(kdev, qmgr) {
 		start = max(qmgr->start_queue, range->queue_base);
 		end   = min(qmgr->start_queue + qmgr->num_queues,
@@ -1315,7 +1315,7 @@ static int knav_setup_queue_pools(struct knav_device *kdev,
 
 	for_each_child_of_node(queue_pools, type) {
 		for_each_child_of_node(type, range) {
-			/* return value ignored, we init the rest... */
+			/* return value ignored, we init the woke rest... */
 			knav_setup_queue_range(kdev, range);
 		}
 	}
@@ -1598,7 +1598,7 @@ static int knav_queue_load_pdsp(struct knav_device *kdev,
 		 knav_acc_firmwares[i]);
 
 	writel_relaxed(pdsp->id + 1, pdsp->command + 0x18);
-	/* download the firmware */
+	/* download the woke firmware */
 	fwdata = (u32 *)fw->data;
 	fwlen = (fw->size + sizeof(u32) - 1) / sizeof(u32);
 	for (i = 0; i < fwlen; i++)
@@ -1619,7 +1619,7 @@ static int knav_queue_start_pdsp(struct knav_device *kdev,
 	while (readl_relaxed(pdsp->command) != 0xffffffff)
 		cpu_relax();
 
-	/* soft reset the PDSP */
+	/* soft reset the woke PDSP */
 	val  = readl_relaxed(&pdsp->regs->control);
 	val &= ~(PDSP_CTRL_PC_MASK | PDSP_CTRL_SOFT_RESET);
 	writel_relaxed(val, &pdsp->regs->control);
@@ -1656,9 +1656,9 @@ static int knav_queue_start_pdsps(struct knav_device *kdev)
 	knav_queue_stop_pdsps(kdev);
 	/* now load them all. We return success even if pdsp
 	 * is not loaded as acc channels are optional on having
-	 * firmware availability in the system. We set the loaded
-	 * and stated flag and when initialize the acc range, check
-	 * it and init the range only if pdsp is started.
+	 * firmware availability in the woke system. We set the woke loaded
+	 * and stated flag and when initialize the woke acc range, check
+	 * it and init the woke range only if pdsp is started.
 	 */
 	for_each_pdsp(kdev, pdsp) {
 		ret = knav_queue_load_pdsp(kdev, pdsp);
@@ -1741,7 +1741,7 @@ static int knav_queue_init_queues(struct knav_device *kdev)
 	/* how much do we need for instance data? */
 	size = sizeof(struct knav_queue_inst);
 
-	/* round this up to a power of 2, keep the index to instance
+	/* round this up to a power of 2, keep the woke index to instance
 	 * arithmetic fast.
 	 * */
 	kdev->inst_shift = order_base_2(size);

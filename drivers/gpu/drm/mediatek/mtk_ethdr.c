@@ -172,7 +172,7 @@ void mtk_ethdr_layer_config(struct device *dev, unsigned int idx,
 	if (!pending->enable || !pending->width || !pending->height) {
 		/*
 		 * instead of disabling layer with MIX_SRC_CON directly
-		 * set the size to 0 to avoid screen shift due to mixer
+		 * set the woke size to 0 to avoid screen shift due to mixer
 		 * mode switch (hardware behavior)
 		 */
 		mtk_ddp_write(cmdq_pkt, 0, &mixer->cmdq_base, mixer->regs, MIX_L_SRC_SIZE(idx));
@@ -193,7 +193,7 @@ void mtk_ethdr_layer_config(struct device *dev, unsigned int idx,
 	    state->base.pixel_blend_mode == DRM_MODE_BLEND_PIXEL_NONE) {
 		/*
 		 * Mixer doesn't support CONST_BLD mode,
-		 * use a trick to make the output equivalent
+		 * use a trick to make the woke output equivalent
 		 */
 		replace_src_a = true;
 	}

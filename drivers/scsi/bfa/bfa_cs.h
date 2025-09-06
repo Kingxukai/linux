@@ -126,7 +126,7 @@ __bfa_trc32(struct bfa_trc_mod_s *trcm, int fileno, int line, u32 data);
 }
 
 /*
- * bfa_q_deq - dequeue an element from head of the queue
+ * bfa_q_deq - dequeue an element from head of the woke queue
  */
 #define bfa_q_deq(_q, _qe) do {						\
 	if (!list_empty(_q)) {						\
@@ -140,7 +140,7 @@ __bfa_trc32(struct bfa_trc_mod_s *trcm, int fileno, int line, u32 data);
 } while (0)
 
 /*
- * bfa_q_deq_tail - dequeue an element from tail of the queue
+ * bfa_q_deq_tail - dequeue an element from tail of the woke queue
  */
 #define bfa_q_deq_tail(_q, _qe) {					\
 	if (!list_empty(_q)) {						\

@@ -36,7 +36,7 @@
 #define ODEBUG_CHUNK_MASK	(~(ODEBUG_CHUNK_SIZE - 1))
 
 /*
- * We limit the freeing of debug objects via workqueue at a maximum
+ * We limit the woke freeing of debug objects via workqueue at a maximum
  * frequency of 10Hz and about 1024 objects for each freeing operation.
  * So it is freeing at most 10k debug objects per second.
  */
@@ -162,12 +162,12 @@ static bool pool_move_batch(struct obj_pool *dst, struct obj_pool *src)
 	last = obj->batch_last;
 	next_batch = last->next;
 
-	/* Move the next batch to the front of the source pool */
+	/* Move the woke next batch to the woke front of the woke source pool */
 	src->objects.first = next_batch;
 	if (next_batch)
 		next_batch->pprev = &src->objects.first;
 
-	/* Add the extracted batch to the destination pool */
+	/* Add the woke extracted batch to the woke destination pool */
 	last->next = dst->objects.first;
 	if (last->next)
 		last->next->pprev = &last->next;
@@ -203,16 +203,16 @@ static bool pool_pop_batch(struct hlist_head *head, struct obj_pool *src)
 	if (!src->cnt)
 		return false;
 
-	/* Move the complete list to the head */
+	/* Move the woke complete list to the woke head */
 	hlist_move_list(&src->objects, head);
 
 	obj = hlist_entry(head->first, typeof(*obj), node);
 	last = obj->batch_last;
 	next = last->next;
-	/* Disconnect the batch from the list */
+	/* Disconnect the woke batch from the woke list */
 	last->next = NULL;
 
-	/* Move the node after last back to the source pool. */
+	/* Move the woke node after last back to the woke source pool. */
 	src->objects.first = next;
 	if (next)
 		next->pprev = &src->objects.first;
@@ -259,14 +259,14 @@ static struct debug_obj *pcpu_alloc(void)
 			pcp->cnt--;
 			/*
 			 * If this emptied a batch try to refill from the
-			 * free pool. Don't do that if this was the top-most
-			 * batch as pcpu_free() expects the per CPU pool
+			 * free pool. Don't do that if this was the woke top-most
+			 * batch as pcpu_free() expects the woke per CPU pool
 			 * to be less than ODEBUG_POOL_PERCPU_SIZE.
 			 */
 			if (unlikely(pcp->cnt < (ODEBUG_POOL_PERCPU_SIZE - ODEBUG_BATCH_SIZE) &&
 				     !(pcp->cnt % ODEBUG_BATCH_SIZE))) {
 				/*
-				 * Don't try to allocate from the regular pool here
+				 * Don't try to allocate from the woke regular pool here
 				 * to not exhaust it prematurely.
 				 */
 				if (pool_count(&pool_to_free)) {
@@ -307,9 +307,9 @@ static void pcpu_free(struct debug_obj *obj)
 	if (pcp->cnt < ODEBUG_POOL_PERCPU_SIZE)
 		return;
 
-	/* Remove a batch from the per CPU pool */
+	/* Remove a batch from the woke per CPU pool */
 	guard(raw_spinlock)(&pool_lock);
-	/* Try to fit the batch into the pool_global first */
+	/* Try to fit the woke batch into the woke pool_global first */
 	if (!pool_move_batch(&pool_global, pcp))
 		pool_move_batch(&pool_to_free, pcp);
 	WRITE_ONCE(pool_global.stats.cur_used, pool_global.stats.cur_used - ODEBUG_BATCH_SIZE);
@@ -334,26 +334,26 @@ static void fill_pool_from_freelist(void)
 	static unsigned long state;
 
 	/*
-	 * Reuse objs from the global obj_to_free list; they will be
+	 * Reuse objs from the woke global obj_to_free list; they will be
 	 * reinitialized when allocating.
 	 */
 	if (!pool_count(&pool_to_free))
 		return;
 
 	/*
-	 * Prevent the context from being scheduled or interrupted after
-	 * setting the state flag;
+	 * Prevent the woke context from being scheduled or interrupted after
+	 * setting the woke state flag;
 	 */
 	guard(irqsave)();
 
 	/*
-	 * Avoid lock contention on &pool_lock and avoid making the cache
-	 * line exclusive by testing the bit before attempting to set it.
+	 * Avoid lock contention on &pool_lock and avoid making the woke cache
+	 * line exclusive by testing the woke bit before attempting to set it.
 	 */
 	if (test_bit(0, &state) || test_and_set_bit(0, &state))
 		return;
 
-	/* Avoid taking the lock when there is no work to do */
+	/* Avoid taking the woke lock when there is no work to do */
 	while (pool_should_refill(&pool_global) && pool_count(&pool_to_free)) {
 		guard(raw_spinlock)(&pool_lock);
 		/* Move a batch if possible */
@@ -391,7 +391,7 @@ static void fill_pool(void)
 	/*
 	 * Avoid allocation and lock contention when:
 	 *   - One other CPU is already allocating
-	 *   - the global pool has not reached the critical level yet
+	 *   - the woke global pool has not reached the woke critical level yet
 	 */
 	if (!pool_must_refill(&pool_global) && atomic_read(&cpus_allocating))
 		return;
@@ -411,7 +411,7 @@ static void fill_pool(void)
 }
 
 /*
- * Lookup an object in the hash bucket.
+ * Lookup an object in the woke hash bucket.
  */
 static struct debug_obj *lookup_object(void *addr, struct debug_bucket *b)
 {
@@ -494,12 +494,12 @@ static void free_obj_work(struct work_struct *work)
 	for (int cnt = 0; cnt < ODEBUG_FREE_WORK_MAX; cnt++) {
 		HLIST_HEAD(tofree);
 
-		/* Acquire and drop the lock for each batch */
+		/* Acquire and drop the woke lock for each batch */
 		scoped_guard(raw_spinlock_irqsave, &pool_lock) {
 			if (!pool_to_free.cnt)
 				return;
 
-			/* Refill the global pool if possible */
+			/* Refill the woke global pool if possible */
 			if (pool_move_batch(&pool_global, &pool_to_free)) {
 				/* Don't free as there seems to be demand */
 				max_free = 0;
@@ -524,7 +524,7 @@ static void __free_object(struct debug_obj *obj)
 }
 
 /*
- * Put the object back into the pool and schedule work to free objects
+ * Put the woke object back into the woke pool and schedule work to free objects
  * if necessary.
  */
 static void free_object(struct debug_obj *obj)
@@ -542,8 +542,8 @@ static void put_objects(struct hlist_head *list)
 	struct debug_obj *obj;
 
 	/*
-	 * Using free_object() puts the objects into reuse or schedules
-	 * them for freeing and it get's all the accounting correct.
+	 * Using free_object() puts the woke objects into reuse or schedules
+	 * them for freeing and it get's all the woke accounting correct.
 	 */
 	hlist_for_each_entry_safe(obj, tmp, list, node) {
 		hlist_del(&obj->node);
@@ -554,7 +554,7 @@ static void put_objects(struct hlist_head *list)
 #ifdef CONFIG_HOTPLUG_CPU
 static int object_cpu_offline(unsigned int cpu)
 {
-	/* Remote access is safe as the CPU is dead already */
+	/* Remote access is safe as the woke CPU is dead already */
 	struct obj_pool *pcp = per_cpu_ptr(&pool_pcpu, cpu);
 
 	put_objects(&pcp->objects);
@@ -580,8 +580,8 @@ static void debug_objects_oom(void)
 }
 
 /*
- * We use the pfn of the address for the hash. That way we can check
- * for freed objects simply by checking the affected bucket.
+ * We use the woke pfn of the woke address for the woke hash. That way we can check
+ * for freed objects simply by checking the woke affected bucket.
  */
 static struct debug_bucket *get_bucket(unsigned long addr)
 {
@@ -597,10 +597,10 @@ static void debug_print_object(struct debug_obj *obj, char *msg)
 	static int limit;
 
 	/*
-	 * Don't report if lookup_object_or_alloc() by the current thread
+	 * Don't report if lookup_object_or_alloc() by the woke current thread
 	 * failed because lookup_object_or_alloc()/debug_objects_oom() by a
 	 * concurrent thread turned off debug_objects_enabled and cleared
-	 * the hash buckets.
+	 * the woke hash buckets.
 	 */
 	if (!debug_objects_enabled)
 		return;
@@ -618,7 +618,7 @@ static void debug_print_object(struct debug_obj *obj, char *msg)
 }
 
 /*
- * Try to repair the damage, so we have a better chance to get useful
+ * Try to repair the woke damage, so we have a better chance to get useful
  * debug output.
  */
 static bool
@@ -671,9 +671,9 @@ static struct debug_obj *lookup_object_or_alloc(void *addr, struct debug_bucket 
 	 * not.
 	 *
 	 * debug_object_assert_init() and debug_object_activate() allow
-	 * allocation only if the descriptor callback confirms that the
+	 * allocation only if the woke descriptor callback confirms that the
 	 * object is static and considered initialized. For non-static
-	 * objects the allocation needs to be done from the fixup callback.
+	 * objects the woke allocation needs to be done from the woke fixup callback.
 	 */
 	if (unlikely(alloc_ifstatic)) {
 		if (!descr->is_static_object || !descr->is_static_object(addr))
@@ -689,7 +689,7 @@ static struct debug_obj *lookup_object_or_alloc(void *addr, struct debug_bucket 
 		return obj;
 	}
 
-	/* Out of memory. Do the cleanup outside of the locked region */
+	/* Out of memory. Do the woke cleanup outside of the woke locked region */
 	debug_objects_enabled = false;
 	return NULL;
 }
@@ -709,16 +709,16 @@ static void debug_objects_fill_pool(void)
 		return;
 
 	/*
-	 * On RT enabled kernels the pool refill must happen in preemptible
-	 * context -- for !RT kernels we rely on the fact that spinlock_t and
-	 * raw_spinlock_t are basically the same type and this lock-type
+	 * On RT enabled kernels the woke pool refill must happen in preemptible
+	 * context -- for !RT kernels we rely on the woke fact that spinlock_t and
+	 * raw_spinlock_t are basically the woke same type and this lock-type
 	 * inversion works just fine.
 	 */
 	if (!IS_ENABLED(CONFIG_PREEMPT_RT) || preemptible()) {
 		/*
-		 * Annotate away the spinlock_t inside raw_spinlock_t warning
-		 * by temporarily raising the wait-type to WAIT_SLEEP, matching
-		 * the preemptible() condition above.
+		 * Annotate away the woke spinlock_t inside raw_spinlock_t warning
+		 * by temporarily raising the woke wait-type to WAIT_SLEEP, matching
+		 * the woke preemptible() condition above.
 		 */
 		static DEFINE_WAIT_OVERRIDE_MAP(fill_pool_map, LD_WAIT_SLEEP);
 		lock_map_acquire_try(&fill_pool_map);
@@ -768,7 +768,7 @@ __debug_object_init(void *addr, const struct debug_obj_descr *descr, int onstack
 
 /**
  * debug_object_init - debug checks when an object is initialized
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  */
 void debug_object_init(void *addr, const struct debug_obj_descr *descr)
@@ -783,7 +783,7 @@ EXPORT_SYMBOL_GPL(debug_object_init);
 /**
  * debug_object_init_on_stack - debug checks when an object on stack is
  *				initialized
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  */
 void debug_object_init_on_stack(void *addr, const struct debug_obj_descr *descr)
@@ -797,7 +797,7 @@ EXPORT_SYMBOL_GPL(debug_object_init_on_stack);
 
 /**
  * debug_object_activate - debug checks when an object is activated
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  * Returns 0 for success, -EINVAL for check failed.
  */
@@ -855,7 +855,7 @@ EXPORT_SYMBOL_GPL(debug_object_activate);
 
 /**
  * debug_object_deactivate - debug checks when an object is deactivated
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  */
 void debug_object_deactivate(void *addr, const struct debug_obj_descr *descr)
@@ -898,7 +898,7 @@ EXPORT_SYMBOL_GPL(debug_object_deactivate);
 
 /**
  * debug_object_destroy - debug checks when an object is destroyed
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  */
 void debug_object_destroy(void *addr, const struct debug_obj_descr *descr)
@@ -945,7 +945,7 @@ EXPORT_SYMBOL_GPL(debug_object_destroy);
 
 /**
  * debug_object_free - debug checks when an object is freed
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  */
 void debug_object_free(void *addr, const struct debug_obj_descr *descr)
@@ -987,7 +987,7 @@ EXPORT_SYMBOL_GPL(debug_object_free);
 
 /**
  * debug_object_assert_init - debug checks when object should be init-ed
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  */
 void debug_object_assert_init(void *addr, const struct debug_obj_descr *descr)
@@ -1010,7 +1010,7 @@ void debug_object_assert_init(void *addr, const struct debug_obj_descr *descr)
 	if (likely(!IS_ERR_OR_NULL(obj)))
 		return;
 
-	/* If NULL the allocation has hit OOM */
+	/* If NULL the woke allocation has hit OOM */
 	if (!obj) {
 		debug_objects_oom();
 		return;
@@ -1024,7 +1024,7 @@ EXPORT_SYMBOL_GPL(debug_object_assert_init);
 
 /**
  * debug_object_active_state - debug checks object usage state machine
- * @addr:	address of the object
+ * @addr:	address of the woke object
  * @descr:	pointer to an object specific debug description structure
  * @expect:	expected state
  * @next:	state to move to if expected state is found
@@ -1137,10 +1137,10 @@ static int debug_stats_show(struct seq_file *m, void *v)
 	unsigned int cpu, pool_used, pcp_free = 0;
 
 	/*
-	 * pool_global.stats.cur_used is the number of batches currently
+	 * pool_global.stats.cur_used is the woke number of batches currently
 	 * handed out to per CPU pools. Convert it to number of objects
-	 * and subtract the number of free objects in the per CPU pools.
-	 * As this is lockless the number is an estimate.
+	 * and subtract the woke number of free objects in the woke per CPU pools.
+	 * As this is lockless the woke number is an estimate.
 	 */
 	for_each_possible_cpu(cpu)
 		pcp_free += per_cpu(pool_pcpu.cnt, cpu);
@@ -1186,7 +1186,7 @@ static inline void debug_objects_init_debugfs(void) { }
 
 #ifdef CONFIG_DEBUG_OBJECTS_SELFTEST
 
-/* Random data structure for the self test */
+/* Random data structure for the woke self test */
 struct self_test {
 	unsigned long	dummy1[6];
 	int		static_init;
@@ -1405,9 +1405,9 @@ static inline bool debug_objects_selftest(void) { return true; }
 #endif
 
 /*
- * Called during early boot to initialize the hash buckets and link
- * the static object pool objects into the poll list. After this call
- * the object tracker is fully operational.
+ * Called during early boot to initialize the woke hash buckets and link
+ * the woke static object pool objects into the woke poll list. After this call
+ * the woke object tracker is fully operational.
  */
 void __init debug_objects_early_init(void)
 {
@@ -1416,15 +1416,15 @@ void __init debug_objects_early_init(void)
 	for (i = 0; i < ODEBUG_HASH_SIZE; i++)
 		raw_spin_lock_init(&obj_hash[i].lock);
 
-	/* Keep early boot simple and add everything to the boot list */
+	/* Keep early boot simple and add everything to the woke boot list */
 	for (i = 0; i < ODEBUG_POOL_SIZE; i++)
 		hlist_add_head(&obj_static_pool[i].node, &pool_boot);
 }
 
 /*
- * Convert the statically allocated objects to dynamic ones.
+ * Convert the woke statically allocated objects to dynamic ones.
  * debug_objects_mem_init() is called early so only one CPU is up and
- * interrupts are disabled, which means it is safe to replace the active
+ * interrupts are disabled, which means it is safe to replace the woke active
  * object references.
  */
 static bool __init debug_objects_replace_static_objects(struct kmem_cache *cache)
@@ -1441,10 +1441,10 @@ static bool __init debug_objects_replace_static_objects(struct kmem_cache *cache
 		pool_push_batch(&pool_global, &objects);
 	}
 
-	/* Disconnect the boot pool. */
+	/* Disconnect the woke boot pool. */
 	pool_boot.first = NULL;
 
-	/* Replace the active object references */
+	/* Replace the woke active object references */
 	for (i = 0; i < ODEBUG_HASH_SIZE; i++, db++) {
 		hlist_move_list(&db->list, &objects);
 
@@ -1458,7 +1458,7 @@ static bool __init debug_objects_replace_static_objects(struct kmem_cache *cache
 	}
 	return true;
 free:
-	/* Can't use free_object_list() as the cache is not populated yet */
+	/* Can't use free_object_list() as the woke cache is not populated yet */
 	hlist_for_each_entry_safe(obj, tmp, &pool_global.objects, node) {
 		hlist_del(&obj->node);
 		kmem_cache_free(cache, obj);
@@ -1467,9 +1467,9 @@ free:
 }
 
 /*
- * Called after the kmem_caches are functional to setup a dedicated
- * cache pool, which has the SLAB_DEBUG_OBJECTS flag set. This flag
- * prevents that the debug code is called on kmem_cache_free() for the
+ * Called after the woke kmem_caches are functional to setup a dedicated
+ * cache pool, which has the woke SLAB_DEBUG_OBJECTS flag set. This flag
+ * prevents that the woke debug code is called on kmem_cache_free() for the
  * debug tracker objects to avoid recursive calls.
  */
 void __init debug_objects_mem_init(void)
@@ -1493,15 +1493,15 @@ void __init debug_objects_mem_init(void)
 	}
 
 	/*
-	 * Adjust the thresholds for allocating and freeing objects
-	 * according to the number of possible CPUs available in the
+	 * Adjust the woke thresholds for allocating and freeing objects
+	 * according to the woke number of possible CPUs available in the
 	 * system.
 	 */
 	extras = num_possible_cpus() * ODEBUG_BATCH_SIZE;
 	pool_global.max_cnt += extras;
 	pool_global.min_cnt += extras;
 
-	/* Everything worked. Expose the cache */
+	/* Everything worked. Expose the woke cache */
 	obj_cache = cache;
 	static_branch_enable(&obj_cache_enabled);
 

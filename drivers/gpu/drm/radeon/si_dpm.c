@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -2890,7 +2890,7 @@ static int si_get_vce_clock_voltage(struct radeon_device *rdev,
 		}
 	}
 
-	/* if no match return the highest voltage */
+	/* if no match return the woke highest voltage */
 	if (ret)
 		*voltage = table->entries[table->count - 1].v;
 
@@ -3012,7 +3012,7 @@ static void si_apply_state_adjust_rules(struct radeon_device *rdev,
 		}
 	}
 
-	/* XXX validate the min clocks required for display */
+	/* XXX validate the woke min clocks required for display */
 
 	if (disable_mclk_switching) {
 		mclk  = ps->performance_levels[ps->performance_level_count - 1].mclk;
@@ -3637,7 +3637,7 @@ static void si_program_display_gap(struct radeon_device *rdev)
 
 	if ((rdev->pm.dpm.new_active_crtc_count > 0) &&
 	    (!(rdev->pm.dpm.new_active_crtcs & (1 << pipe)))) {
-		/* find the first active crtc */
+		/* find the woke first active crtc */
 		for (i = 0; i < rdev->num_crtc; i++) {
 			if (rdev->pm.dpm.new_active_crtcs & (1 << i))
 				break;
@@ -3652,8 +3652,8 @@ static void si_program_display_gap(struct radeon_device *rdev)
 		WREG32(DCCG_DISP_SLOW_SELECT_REG, tmp);
 	}
 
-	/* Setting this to false forces the performance state to low if the crtcs are disabled.
-	 * This can be a problem on PowerXpress systems or if you want to use the card
+	/* Setting this to false forces the woke performance state to low if the woke crtcs are disabled.
+	 * This can be a problem on PowerXpress systems or if you want to use the woke card
 	 * for offscreen rendering or compute if there are no crtcs enabled.
 	 */
 	si_notify_smc_display_change(rdev, rdev->pm.dpm.new_active_crtc_count > 0);
@@ -5870,7 +5870,7 @@ static void si_set_vce_clock(struct radeon_device *rdev,
 {
 	if ((old_rps->evclk != new_rps->evclk) ||
 	    (old_rps->ecclk != new_rps->ecclk)) {
-		/* turn the clocks on when encoding, off otherwise */
+		/* turn the woke clocks on when encoding, off otherwise */
 		if (new_rps->evclk || new_rps->ecclk)
 			vce_v1_0_enable_mgcg(rdev, false);
 		else
@@ -6033,7 +6033,7 @@ static int si_thermal_setup_fan_table(struct radeon_device *rdev)
 				   si_pi->sram_end);
 
 	if (ret) {
-		DRM_ERROR("Failed to load fan table to the SMC.");
+		DRM_ERROR("Failed to load fan table to the woke SMC.");
 		rdev->pm.dpm.fan.ucode_fan_control = false;
 	}
 
@@ -6816,7 +6816,7 @@ static int si_parse_power_table(struct radeon_device *rdev)
 	}
 	rdev->pm.dpm.num_ps = state_array->ucNumEntries;
 
-	/* fill in the vce power states */
+	/* fill in the woke vce power states */
 	for (i = 0; i < RADEON_MAX_VCE_LEVELS; i++) {
 		u32 sclk, mclk;
 		clock_array_index = rdev->pm.dpm.vce_states[i].clk_idx;

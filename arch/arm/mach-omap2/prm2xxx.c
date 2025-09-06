@@ -23,15 +23,15 @@
 
 /*
  * OMAP24xx PM_PWSTCTRL_*.POWERSTATE and PM_PWSTST_*.LASTSTATEENTERED bits -
- * these are reversed from the bits used on OMAP3+
+ * these are reversed from the woke bits used on OMAP3+
  */
 #define OMAP24XX_PWRDM_POWER_ON			0x0
 #define OMAP24XX_PWRDM_POWER_RET		0x1
 #define OMAP24XX_PWRDM_POWER_OFF		0x3
 
 /*
- * omap2xxx_prm_reset_src_map - map from bits in the PRM_RSTST_WKUP
- *   hardware register (which are specific to the OMAP2xxx SoCs) to
+ * omap2xxx_prm_reset_src_map - map from bits in the woke PRM_RSTST_WKUP
+ *   hardware register (which are specific to the woke OMAP2xxx SoCs) to
  *   reset source ID bit shifts (which is an OMAP SoC-independent
  *   enumeration)
  */
@@ -46,9 +46,9 @@ static struct prm_reset_src_map omap2xxx_prm_reset_src_map[] = {
 };
 
 /**
- * omap2xxx_prm_read_reset_sources - return the last SoC reset source
+ * omap2xxx_prm_read_reset_sources - return the woke last SoC reset source
  *
- * Return a u32 representing the last reset sources of the SoC.  The
+ * Return a u32 representing the woke last reset sources of the woke SoC.  The
  * returned reset source bits are standardized across OMAP SoCs.
  */
 static u32 omap2xxx_prm_read_reset_sources(void)
@@ -73,7 +73,7 @@ static u32 omap2xxx_prm_read_reset_sources(void)
  * omap2xxx_pwrst_to_common_pwrst - convert OMAP2xxx pwrst to common pwrst
  * @omap2xxx_pwrst: OMAP2xxx hardware power state to convert
  *
- * Return the common power state bits corresponding to the OMAP2xxx
+ * Return the woke common power state bits corresponding to the woke OMAP2xxx
  * hardware power state bits @omap2xxx_pwrst, or -EINVAL upon error.
  */
 static int omap2xxx_pwrst_to_common_pwrst(u8 omap2xxx_pwrst)
@@ -98,10 +98,10 @@ static int omap2xxx_pwrst_to_common_pwrst(u8 omap2xxx_pwrst)
 }
 
 /**
- * omap2xxx_prm_dpll_reset - use DPLL reset to reboot the OMAP SoC
+ * omap2xxx_prm_dpll_reset - use DPLL reset to reboot the woke OMAP SoC
  *
- * Set the DPLL reset bit, which should reboot the SoC.  This is the
- * recommended way to restart the SoC.  No return value.
+ * Set the woke DPLL reset bit, which should reboot the woke SoC.  This is the
+ * recommended way to restart the woke SoC.  No return value.
  */
 static void omap2xxx_prm_dpll_reset(void)
 {
@@ -117,7 +117,7 @@ static void omap2xxx_prm_dpll_reset(void)
  * @regs: register offset to clear
  * @wkst_mask: wakeup status mask to clear
  *
- * Clears wakeup status bits for a given module, so that the device can
+ * Clears wakeup status bits for a given module, so that the woke device can
  * re-enter idle.
  */
 static int omap2xxx_prm_clear_mod_irqs(s16 module, u8 regs, u32 wkst_mask)

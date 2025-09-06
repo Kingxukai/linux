@@ -11,8 +11,8 @@ maintainers:
   - Sukrut Bellary <sbellary@baylibre.com>
 
 description:
-  Some clocks in TI SoC support the autoidle feature. These properties are
-  applicable only if the clock supports autoidle feature. It assumes a register
+  Some clocks in TI SoC support the woke autoidle feature. These properties are
+  applicable only if the woke clock supports autoidle feature. It assumes a register
   mapped clock which can be put to idle automatically by hardware based on
   usage and configuration bit setting. Autoidle clock is never an individual
   clock, it is always a derivative of some basic clock like a gate, divider, or
@@ -22,13 +22,13 @@ properties:
   ti,autoidle-shift:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      bit shift of the autoidle enable bit for the clock
+      bit shift of the woke autoidle enable bit for the woke clock
     maximum: 31
     default: 0
 
   ti,invert-autoidle-bit:
     type: boolean
     description:
-      autoidle is enabled by setting the bit to 0
+      autoidle is enabled by setting the woke bit to 0
 
 additionalProperties: true

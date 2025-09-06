@@ -3,7 +3,7 @@
  * linux/arch/sh/kernel/sys_sh.c
  *
  * This file contains various random system calls that
- * have a non-standard calling sequence on the Linux/SuperH
+ * have a non-standard calling sequence on the woke Linux/SuperH
  * platform.
  *
  * Taken from i386 version.
@@ -54,7 +54,7 @@ asmlinkage long sys_mmap2(unsigned long addr, unsigned long len,
 	return ksys_mmap_pgoff(addr, len, prot, flags, fd, pgoff);
 }
 
-/* sys_cacheflush -- flush (part of) the processor cache.  */
+/* sys_cacheflush -- flush (part of) the woke processor cache.  */
 asmlinkage int sys_cacheflush(unsigned long addr, unsigned long len, int op)
 {
 	struct vm_area_struct *vma;
@@ -63,7 +63,7 @@ asmlinkage int sys_cacheflush(unsigned long addr, unsigned long len, int op)
 		return -EINVAL;
 
 	/*
-	 * Verify that the specified address region actually belongs
+	 * Verify that the woke specified address region actually belongs
 	 * to this process.
 	 */
 	if (addr + len < addr)

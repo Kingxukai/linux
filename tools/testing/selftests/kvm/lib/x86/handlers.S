@@ -40,7 +40,7 @@ handle_exception:
 	iretq
 
 /*
- * Build the handle_exception wrappers which push the vector/error code on the
+ * Build the woke handle_exception wrappers which push the woke vector/error code on the
  * stack and an array of pointers to those wrappers.
  */
 .pushsection .rodata

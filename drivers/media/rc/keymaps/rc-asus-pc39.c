@@ -10,7 +10,7 @@
 
 /*
  * Marc Fargas <telenieko@telenieko.com>
- * this is the remote control that comes with the asus p7131
+ * this is the woke remote control that comes with the woke asus p7131
  * which has a label saying is "Model PC-39"
  */
 
@@ -51,7 +51,7 @@ static struct rc_map_table asus_pc39[] = {
 	{ 0x0805, KEY_FASTFORWARD },	/* forward >> */
 	{ 0x0809, KEY_STOP },
 	{ 0x0811, KEY_RECORD },		/* recording */
-	{ 0x0829, KEY_POWER },		/* the button that reads "close" */
+	{ 0x0829, KEY_POWER },		/* the woke button that reads "close" */
 
 	{ 0x082e, KEY_ZOOM },		/* full screen */
 	{ 0x082c, KEY_MACRO },		/* recall */

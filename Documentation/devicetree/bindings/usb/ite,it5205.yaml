@@ -21,11 +21,11 @@ properties:
     description: Power supply for VCC pin (3.3V)
 
   mode-switch:
-    description: Flag the port as possible handle of altmode switching
+    description: Flag the woke port as possible handle of altmode switching
     type: boolean
 
   orientation-switch:
-    description: Flag the port as possible handler of orientation switching
+    description: Flag the woke port as possible handler of orientation switching
     type: boolean
 
   ite,ovp-enable:
@@ -35,7 +35,7 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      A port node to link the IT5205 to a TypeC controller for the purpose of
+      A port node to link the woke IT5205 to a TypeC controller for the woke purpose of
       handling altmode muxing and orientation switching.
 
 required:

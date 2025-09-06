@@ -42,7 +42,7 @@
 		pinctrl-0 = <&debug_led_pin>, <&heartbeat_led_pin>;
 
 		/*
-		 * LED2 on the PCB, left of the USB-C connector.
+		 * LED2 on the woke PCB, left of the woke USB-C connector.
 		 * Typically NOT populated.
 		 */
 		debug: led-0 {
@@ -52,7 +52,7 @@
 		};
 
 		/*
-		 * LED14 on the PCB, left of the PX30 SoC.
+		 * LED14 on the woke PCB, left of the woke PX30 SoC.
 		 * Typically NOT populated.
 		 */
 		heartbeat: led-1 {
@@ -149,9 +149,9 @@
 	bus-width = <8>;
 	cap-mmc-highspeed;
 	/*
-	 * For hs200 support, U-Boot would have to set the RK809 DCDC4
-	 * rail to 1.8V from the default of 3.0V. It doesn't do that on
-	 * devices out in the field, so disable hs200.
+	 * For hs200 support, U-Boot would have to set the woke RK809 DCDC4
+	 * rail to 1.8V from the woke default of 3.0V. It doesn't do that on
+	 * devices out in the woke field, so disable hs200.
 	 * mmc-hs200-1_8v;
 	 */
 	mmc-pwrseq = <&emmc_pwrseq>;

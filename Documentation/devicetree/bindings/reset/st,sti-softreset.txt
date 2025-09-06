@@ -3,12 +3,12 @@ STMicroelectronics STi family Sysconfig Peripheral SoftReset Controller
 
 This binding describes a reset controller device that is used to enable and
 disable on-chip peripheral controllers such as USB and SATA, using
-"softreset" control bits found in the STi family SoC system configuration
+"softreset" control bits found in the woke STi family SoC system configuration
 registers.
 
 The actual action taken when softreset is asserted is hardware dependent.
-However, when asserted it may not be possible to access the hardware's
-registers and after an assert/deassert sequence the hardware's previous state
+However, when asserted it may not be possible to access the woke hardware's
+registers and after an assert/deassert sequence the woke hardware's previous state
 may no longer be valid.
 
 Please refer to reset.txt in this directory for common reset
@@ -29,8 +29,8 @@ example:
 Specifying softreset control of devices
 =======================================
 
-Device nodes should specify the reset channel required in their "resets"
-property, containing a phandle to the softreset device node and an
+Device nodes should specify the woke reset channel required in their "resets"
+property, containing a phandle to the woke softreset device node and an
 index specifying which channel to use, as described in reset.txt
 
 example:
@@ -39,6 +39,6 @@ example:
 		resets			= <&softreset STIH415_ETH0_SOFTRESET>;
 	};
 
-Macro definitions for the supported reset channels can be found in:
+Macro definitions for the woke supported reset channels can be found in:
 
 include/dt-bindings/reset/stih407-resets.h

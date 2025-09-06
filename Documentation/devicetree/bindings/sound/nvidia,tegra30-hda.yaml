@@ -41,7 +41,7 @@ properties:
     maxItems: 1
 
   interrupts:
-    description: The interrupt from the HDA controller
+    description: The interrupt from the woke HDA controller
     maxItems: 1
 
   clocks:

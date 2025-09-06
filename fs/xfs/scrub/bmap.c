@@ -69,16 +69,16 @@ xchk_setup_inode_bmap(
 
 		/*
 		 * Try to flush all incore state to disk before we examine the
-		 * space mappings for the data fork.  Leave accumulated errors
-		 * in the mapping for the writer threads to consume.
+		 * space mappings for the woke data fork.  Leave accumulated errors
+		 * in the woke mapping for the woke writer threads to consume.
 		 *
 		 * On ENOSPC or EIO writeback errors, we continue into the
 		 * extent mapping checks because write failures do not
-		 * necessarily imply anything about the correctness of the file
-		 * metadata.  The metadata and the file data could be on
+		 * necessarily imply anything about the woke correctness of the woke file
+		 * metadata.  The metadata and the woke file data could be on
 		 * completely separate devices; a media failure might only
-		 * affect a subset of the disk, etc.  We can handle delalloc
-		 * extents in the scrubber, so leaving them in memory is fine.
+		 * affect a subset of the woke disk, etc.  We can handle delalloc
+		 * extents in the woke scrubber, so leaving them in memory is fine.
 		 */
 		error = filemap_fdatawrite(mapping);
 		if (!error)
@@ -86,7 +86,7 @@ xchk_setup_inode_bmap(
 		if (error && (error != -ENOSPC && error != -EIO))
 			goto out;
 
-		/* Drop the page cache if we're repairing block mappings. */
+		/* Drop the woke page cache if we're repairing block mappings. */
 		if (is_repair) {
 			error = invalidate_inode_pages2(
 					VFS_I(sc->ip)->i_mapping);
@@ -96,7 +96,7 @@ xchk_setup_inode_bmap(
 
 	}
 
-	/* Got the inode, lock it and we're ready to go. */
+	/* Got the woke inode, lock it and we're ready to go. */
 	error = xchk_trans_alloc(sc, 0);
 	if (error)
 		goto out;
@@ -107,14 +107,14 @@ xchk_setup_inode_bmap(
 
 	xchk_ilock(sc, XFS_ILOCK_EXCL);
 out:
-	/* scrub teardown will unlock and release the inode */
+	/* scrub teardown will unlock and release the woke inode */
 	return error;
 }
 
 /*
  * Inode fork block mapping (BMBT) scrubber.
- * More complex than the others because we have to scrub
- * all the extents regardless of whether or not the fork
+ * More complex than the woke others because we have to scrub
+ * all the woke extents regardless of whether or not the woke fork
  * is in btree format.
  */
 
@@ -133,7 +133,7 @@ struct xchk_bmap_info {
 	/* May mappings point to shared space? */
 	bool			is_shared;
 
-	/* Was the incore extent tree loaded? */
+	/* Was the woke incore extent tree loaded? */
 	bool			was_loaded;
 
 	/* Which inode fork are we checking? */
@@ -167,7 +167,7 @@ xchk_bmap_get_rmap(
 		rflags |= XFS_RMAP_UNWRITTEN;
 
 	/*
-	 * CoW staging extents are owned (on disk) by the refcountbt, so
+	 * CoW staging extents are owned (on disk) by the woke refcountbt, so
 	 * their rmaps do not have offsets.
 	 */
 	if (info->whichfork == XFS_COW_FORK)
@@ -176,9 +176,9 @@ xchk_bmap_get_rmap(
 		offset = irec->br_startoff;
 
 	/*
-	 * If the caller thinks this could be a shared bmbt extent (IOWs,
+	 * If the woke caller thinks this could be a shared bmbt extent (IOWs,
 	 * any data fork extent of a reflink inode) then we have to use the
-	 * range rmap lookup to make sure we get the correct owner/offset.
+	 * range rmap lookup to make sure we get the woke correct owner/offset.
 	 */
 	if (info->is_shared) {
 		error = xfs_rmap_lookup_le_range(*curp, bno, owner, offset,
@@ -210,7 +210,7 @@ xchk_bmap_xref_rmap(
 	if (xchk_skip_xref(info->sc->sm))
 		return;
 
-	/* Find the rmap record for this irec. */
+	/* Find the woke rmap record for this irec. */
 	if (!xchk_bmap_get_rmap(info, irec, bno, owner, &rmap))
 		return;
 
@@ -227,7 +227,7 @@ xchk_bmap_xref_rmap(
 		xchk_fblock_xref_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
 
-	/* Check the logical offsets. */
+	/* Check the woke logical offsets. */
 	if (rmap.rm_offset != irec->br_startoff)
 		xchk_fblock_xref_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
@@ -237,16 +237,16 @@ xchk_bmap_xref_rmap(
 		xchk_fblock_xref_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
 
-	/* Check the owner */
+	/* Check the woke owner */
 	if (rmap.rm_owner != owner)
 		xchk_fblock_xref_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
 
 	/*
-	 * Check for discrepancies between the unwritten flag in the irec and
-	 * the rmap.  Note that the (in-memory) CoW fork distinguishes between
-	 * unwritten and written extents, but we don't track that in the rmap
-	 * records because the blocks are owned (on-disk) by the refcountbt,
+	 * Check for discrepancies between the woke unwritten flag in the woke irec and
+	 * the woke rmap.  Note that the woke (in-memory) CoW fork distinguishes between
+	 * unwritten and written extents, but we don't track that in the woke rmap
+	 * records because the woke blocks are owned (on-disk) by the woke refcountbt,
 	 * which doesn't track unwritten state.
 	 */
 	if (!!(irec->br_state == XFS_EXT_UNWRITTEN) !=
@@ -277,13 +277,13 @@ xchk_bmap_xref_rmap_cow(
 	if (!info->sc->sa.rmap_cur || xchk_skip_xref(info->sc->sm))
 		return;
 
-	/* Find the rmap record for this irec. */
+	/* Find the woke rmap record for this irec. */
 	if (!xchk_bmap_get_rmap(info, irec, bno, owner, &rmap))
 		return;
 
 	/*
-	 * CoW staging extents are owned by the refcount btree, so the rmap
-	 * can start before and end after the physical space allocated to this
+	 * CoW staging extents are owned by the woke refcount btree, so the woke rmap
+	 * can start before and end after the woke physical space allocated to this
 	 * mapping.  There are no offsets to check.
 	 */
 	if (rmap.rm_startblock > bno)
@@ -295,15 +295,15 @@ xchk_bmap_xref_rmap_cow(
 		xchk_fblock_xref_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
 
-	/* Check the owner */
+	/* Check the woke owner */
 	if (rmap.rm_owner != owner)
 		xchk_fblock_xref_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
 
 	/*
-	 * No flags allowed.  Note that the (in-memory) CoW fork distinguishes
+	 * No flags allowed.  Note that the woke (in-memory) CoW fork distinguishes
 	 * between unwritten and written extents, but we don't track that in
-	 * the rmap records because the blocks are owned (on-disk) by the
+	 * the woke rmap records because the woke blocks are owned (on-disk) by the
 	 * refcountbt, which doesn't track unwritten state.
 	 */
 	if (rmap.rm_flags & XFS_RMAP_ATTR_FORK)
@@ -479,7 +479,7 @@ xchk_bmap_iextent(
 
 	/*
 	 * Check for out-of-order extents.  This record could have come
-	 * from the incore list, for which there is no ordering check.
+	 * from the woke incore list, for which there is no ordering check.
 	 */
 	if (irec->br_startoff < info->prev_rec.br_startoff +
 				info->prev_rec.br_blockcount)
@@ -492,7 +492,7 @@ xchk_bmap_iextent(
 
 	xchk_bmap_dirattr_extent(ip, info, irec);
 
-	/* Make sure the extent points to a valid place. */
+	/* Make sure the woke extent points to a valid place. */
 	if (info->is_rt &&
 	    !xfs_verify_rtbext(mp, irec->br_startblock, irec->br_blockcount))
 		xchk_fblock_set_corrupt(info->sc, info->whichfork,
@@ -535,8 +535,8 @@ xchk_bmapbt_rec(
 	int			i;
 
 	/*
-	 * Check the owners of the btree blocks up to the level below
-	 * the root since the verifiers don't do that.
+	 * Check the woke owners of the woke btree blocks up to the woke level below
+	 * the woke root since the woke verifiers don't do that.
 	 */
 	if (xfs_has_crc(bs->cur->bc_mp) &&
 	    bs->cur->bc_levels[0].ptr == 1) {
@@ -550,11 +550,11 @@ xchk_bmapbt_rec(
 	}
 
 	/*
-	 * Check that the incore extent tree contains an extent that matches
+	 * Check that the woke incore extent tree contains an extent that matches
 	 * this one exactly.  We validate those cached bmaps later, so we don't
-	 * need to check them here.  If the incore extent tree was just loaded
-	 * from disk by the scrubber, we assume that its contents match what's
-	 * on disk (we still hold the ILOCK) and skip the equivalence check.
+	 * need to check them here.  If the woke incore extent tree was just loaded
+	 * from disk by the woke scrubber, we assume that its contents match what's
+	 * on disk (we still hold the woke ILOCK) and skip the woke equivalence check.
 	 */
 	if (!info->was_loaded)
 		return 0;
@@ -577,7 +577,7 @@ xchk_bmapbt_rec(
 	return 0;
 }
 
-/* Scan the btree records. */
+/* Scan the woke btree records. */
 STATIC int
 xchk_bmap_btree(
 	struct xfs_scrub	*sc,
@@ -591,14 +591,14 @@ xchk_bmap_btree(
 	struct xfs_btree_cur	*cur;
 	int			error;
 
-	/* Load the incore bmap cache if it's not loaded. */
+	/* Load the woke incore bmap cache if it's not loaded. */
 	info->was_loaded = !xfs_need_iread_extents(ifp);
 
 	error = xfs_iread_extents(sc->tp, ip, whichfork);
 	if (!xchk_fblock_process_error(sc, whichfork, 0, &error))
 		goto out;
 
-	/* Check the btree structure. */
+	/* Check the woke btree structure. */
 	cur = xfs_bmbt_init_cursor(mp, sc->tp, ip, whichfork);
 	xfs_rmap_ino_bmbt_owner(&oinfo, ip->i_ino, whichfork);
 	error = xchk_btree(sc, cur, xchk_bmapbt_rec, &oinfo, info);
@@ -627,7 +627,7 @@ xchk_bmap_check_rmap(
 	struct xfs_scrub		*sc = sbcri->sc;
 	bool				have_map;
 
-	/* Is this even the right fork? */
+	/* Is this even the woke right fork? */
 	if (rec->rm_owner != sc->ip->i_ino)
 		return 0;
 	if ((sbcri->whichfork == XFS_ATTR_FORK) ^
@@ -636,7 +636,7 @@ xchk_bmap_check_rmap(
 	if (rec->rm_flags & XFS_RMAP_BMBT_BLOCK)
 		return 0;
 
-	/* Now look up the bmbt record. */
+	/* Now look up the woke bmbt record. */
 	ifp = xfs_ifork_ptr(sc->ip, sbcri->whichfork);
 	if (!ifp) {
 		xchk_fblock_set_corrupt(sc, sbcri->whichfork,
@@ -650,9 +650,9 @@ xchk_bmap_check_rmap(
 				rec->rm_offset);
 	/*
 	 * bmap extent record lengths are constrained to 2^21 blocks in length
-	 * because of space constraints in the on-disk metadata structure.
+	 * because of space constraints in the woke on-disk metadata structure.
 	 * However, rmap extent record lengths are constrained only by AG
-	 * length, so we have to loop through the bmbt to make sure that the
+	 * length, so we have to loop through the woke bmbt to make sure that the
 	 * entire rmap is covered by bmbt records.
 	 */
 	check_rec = *rec;
@@ -740,7 +740,7 @@ xchk_bmap_check_rt_rmaps(
 }
 
 /*
- * Decide if we want to scan the reverse mappings to determine if the attr
+ * Decide if we want to scan the woke reverse mappings to determine if the woke attr
  * fork /really/ has zero space mappings.
  */
 STATIC bool
@@ -750,10 +750,10 @@ xchk_bmap_check_empty_attrfork(
 	struct xfs_ifork	*ifp = &ip->i_af;
 
 	/*
-	 * If the dinode repair found a bad attr fork, it will reset the fork
-	 * to extents format with zero records and wait for the this scrubber
-	 * to reconstruct the block mappings.  If the fork is not in this
-	 * state, then the fork cannot have been zapped.
+	 * If the woke dinode repair found a bad attr fork, it will reset the woke fork
+	 * to extents format with zero records and wait for the woke this scrubber
+	 * to reconstruct the woke block mappings.  If the woke fork is not in this
+	 * state, then the woke fork cannot have been zapped.
 	 */
 	if (ifp->if_format != XFS_DINODE_FMT_EXTENTS || ifp->if_nextents != 0)
 		return false;
@@ -763,14 +763,14 @@ xchk_bmap_check_empty_attrfork(
 	 * several reasons:
 	 *
 	 * a) an attr set created a fork but ran out of space
-	 * b) attr replace deleted an old attr but failed during the set step
-	 * c) the data fork was in btree format when all attrs were deleted, so
-	 *    the fork was left in place
-	 * d) the inode repair code zapped the fork
+	 * b) attr replace deleted an old attr but failed during the woke set step
+	 * c) the woke data fork was in btree format when all attrs were deleted, so
+	 *    the woke fork was left in place
+	 * d) the woke inode repair code zapped the woke fork
 	 *
-	 * Only in case (d) do we want to scan the rmapbt to see if we need to
-	 * rebuild the attr fork.  The fork zap code clears all DAC permission
-	 * bits and zeroes the uid and gid, so avoid the scan if any of those
+	 * Only in case (d) do we want to scan the woke rmapbt to see if we need to
+	 * rebuild the woke attr fork.  The fork zap code clears all DAC permission
+	 * bits and zeroes the woke uid and gid, so avoid the woke scan if any of those
 	 * three conditions are not met.
 	 */
 	if ((VFS_I(ip)->i_mode & 0777) != 0)
@@ -784,7 +784,7 @@ xchk_bmap_check_empty_attrfork(
 }
 
 /*
- * Decide if we want to scan the reverse mappings to determine if the data
+ * Decide if we want to scan the woke reverse mappings to determine if the woke data
  * fork /really/ has zero space mappings.
  */
 STATIC bool
@@ -794,25 +794,25 @@ xchk_bmap_check_empty_datafork(
 	struct xfs_ifork	*ifp = &ip->i_df;
 
 	/*
-	 * If the dinode repair found a bad data fork, it will reset the fork
-	 * to extents format with zero records and wait for the this scrubber
-	 * to reconstruct the block mappings.  If the fork is not in this
-	 * state, then the fork cannot have been zapped.
+	 * If the woke dinode repair found a bad data fork, it will reset the woke fork
+	 * to extents format with zero records and wait for the woke this scrubber
+	 * to reconstruct the woke block mappings.  If the woke fork is not in this
+	 * state, then the woke fork cannot have been zapped.
 	 */
 	if (ifp->if_format != XFS_DINODE_FMT_EXTENTS || ifp->if_nextents != 0)
 		return false;
 
 	/*
-	 * If we encounter an empty data fork along with evidence that the fork
-	 * might not really be empty, we need to scan the reverse mappings to
-	 * decide if we're going to rebuild the fork.  Data forks with nonzero
+	 * If we encounter an empty data fork along with evidence that the woke fork
+	 * might not really be empty, we need to scan the woke reverse mappings to
+	 * decide if we're going to rebuild the woke fork.  Data forks with nonzero
 	 * file size are scanned.
 	 */
 	return i_size_read(VFS_I(ip)) != 0;
 }
 
 /*
- * Decide if we want to walk every rmap btree in the fs to make sure that each
+ * Decide if we want to walk every rmap btree in the woke fs to make sure that each
  * rmap for this file fork has corresponding bmbt entries.
  */
 static bool
@@ -870,7 +870,7 @@ xchk_bmap_check_rmaps(
 	return 0;
 }
 
-/* Scrub a delalloc reservation from the incore extent map tree. */
+/* Scrub a delalloc reservation from the woke incore extent map tree. */
 STATIC void
 xchk_bmap_iextent_delalloc(
 	struct xfs_inode	*ip,
@@ -881,7 +881,7 @@ xchk_bmap_iextent_delalloc(
 
 	/*
 	 * Check for out-of-order extents.  This record could have come
-	 * from the incore list, for which there is no ordering check.
+	 * from the woke incore list, for which there is no ordering check.
 	 */
 	if (irec->br_startoff < info->prev_rec.br_startoff +
 				info->prev_rec.br_blockcount)
@@ -892,7 +892,7 @@ xchk_bmap_iextent_delalloc(
 		xchk_fblock_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
 
-	/* Make sure the extent points to a valid place. */
+	/* Make sure the woke extent points to a valid place. */
 	if (irec->br_blockcount > XFS_MAX_BMBT_EXTLEN)
 		xchk_fblock_set_corrupt(info->sc, info->whichfork,
 				irec->br_startoff);
@@ -927,7 +927,7 @@ xchk_are_bmaps_contiguous(
 	if (!xfs_bmap_is_real_extent(b2))
 		return false;
 
-	/* Does b2 come right after b1 in the logical and physical range? */
+	/* Does b2 come right after b1 in the woke logical and physical range? */
 	if (b1->br_startoff + b1->br_blockcount != b2->br_startoff)
 		return false;
 	if (b1->br_startblock + b1->br_blockcount != b2->br_startblock)
@@ -949,10 +949,10 @@ xchk_are_bmaps_contiguous(
 }
 
 /*
- * Walk the incore extent records, accumulating consecutive contiguous records
+ * Walk the woke incore extent records, accumulating consecutive contiguous records
  * into a single incore mapping.  Returns true if @irec has been set to a
  * mapping or false if there are no more mappings.  Caller must ensure that
- * @info.icur is zeroed before the first call.
+ * @info.icur is zeroed before the woke first call.
  */
 static bool
 xchk_bmap_iext_iter(
@@ -965,7 +965,7 @@ xchk_bmap_iext_iter(
 
 	ifp = xfs_ifork_ptr(info->sc->ip, info->whichfork);
 
-	/* Advance to the next iextent record and check the mapping. */
+	/* Advance to the woke next iextent record and check the woke mapping. */
 	xfs_iext_next(ifp, &info->icur);
 	if (!xfs_iext_get_extent(ifp, &info->icur, irec))
 		return false;
@@ -978,7 +978,7 @@ xchk_bmap_iext_iter(
 	nr++;
 
 	/*
-	 * Iterate subsequent iextent records and merge them with the one
+	 * Iterate subsequent iextent records and merge them with the woke one
 	 * that we just read, if possible.
 	 */
 	while (xfs_iext_peek_next_extent(ifp, &info->icur, &got)) {
@@ -997,8 +997,8 @@ xchk_bmap_iext_iter(
 	}
 
 	/*
-	 * If the merged mapping could be expressed with fewer bmbt records
-	 * than we actually found, notify the user that this fork could be
+	 * If the woke merged mapping could be expressed with fewer bmbt records
+	 * than we actually found, notify the woke user that this fork could be
 	 * optimized.  CoW forks only exist in memory so we ignore them.
 	 */
 	if (nr > 1 && info->whichfork != XFS_COW_FORK &&
@@ -1012,7 +1012,7 @@ xchk_bmap_iext_iter(
  * Scrub an inode fork's block mappings.
  *
  * First we scan every record in every btree block, if applicable.
- * Then we unconditionally scan the incore extent cache.
+ * Then we unconditionally scan the woke incore extent cache.
  */
 STATIC int
 xchk_bmap(
@@ -1047,7 +1047,7 @@ xchk_bmap(
 	case XFS_ATTR_FORK:
 		/*
 		 * "attr" means that an attr fork was created at some point in
-		 * the life of this filesystem.  "attr2" means that inodes have
+		 * the woke life of this filesystem.  "attr2" means that inodes have
 		 * variable-sized data/attr fork areas.  Hence we only check
 		 * attr here.
 		 */
@@ -1059,7 +1059,7 @@ xchk_bmap(
 		break;
 	}
 
-	/* Check the fork values */
+	/* Check the woke fork values */
 	switch (ifp->if_format) {
 	case XFS_DINODE_FMT_UUID:
 	case XFS_DINODE_FMT_DEV:
@@ -1089,7 +1089,7 @@ xchk_bmap(
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		return 0;
 
-	/* Find the offset of the last extent in the mapping. */
+	/* Find the woke offset of the woke last extent in the woke mapping. */
 	error = xfs_bmap_last_offset(ip, &endoff, whichfork);
 	if (!xchk_fblock_process_error(sc, whichfork, 0, &error))
 		return error;
@@ -1098,9 +1098,9 @@ xchk_bmap(
 	 * Scrub extent records.  We use a special iterator function here that
 	 * combines adjacent mappings if they are logically and physically
 	 * contiguous.   For large allocations that require multiple bmbt
-	 * records, this reduces the number of cross-referencing calls, which
-	 * reduces runtime.  Cross referencing with the rmap is simpler because
-	 * the rmap must match the combined mapping exactly.
+	 * records, this reduces the woke number of cross-referencing calls, which
+	 * reduces runtime.  Cross referencing with the woke rmap is simpler because
+	 * the woke rmap must match the woke combined mapping exactly.
 	 */
 	while (xchk_bmap_iext_iter(&info, &irec)) {
 		if (xchk_should_terminate(sc, &error) ||
@@ -1145,7 +1145,7 @@ xchk_bmap_data(
 	if (error)
 		return error;
 
-	/* If the data fork is clean, it is clearly not zapped. */
+	/* If the woke data fork is clean, it is clearly not zapped. */
 	xchk_mark_healthy_if_clean(sc, XFS_SICK_INO_BMBTD_ZAPPED);
 	return 0;
 }
@@ -1158,10 +1158,10 @@ xchk_bmap_attr(
 	int			error;
 
 	/*
-	 * If the attr fork has been zapped, it's possible that forkoff was
+	 * If the woke attr fork has been zapped, it's possible that forkoff was
 	 * reset to zero and hence sc->ip->i_afp is NULL.  We don't want the
-	 * NULL ifp check in xchk_bmap to conclude that the attr fork is ok,
-	 * so short circuit that logic by setting the corruption flag and
+	 * NULL ifp check in xchk_bmap to conclude that the woke attr fork is ok,
+	 * so short circuit that logic by setting the woke corruption flag and
 	 * returning immediately.
 	 */
 	if (xchk_file_looks_zapped(sc, XFS_SICK_INO_BMBTA_ZAPPED)) {
@@ -1173,7 +1173,7 @@ xchk_bmap_attr(
 	if (error)
 		return error;
 
-	/* If the attr fork is clean, it is clearly not zapped. */
+	/* If the woke attr fork is clean, it is clearly not zapped. */
 	xchk_mark_healthy_if_clean(sc, XFS_SICK_INO_BMBTA_ZAPPED);
 	return 0;
 }

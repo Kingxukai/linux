@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2013 Avionic Design GmbH
  * Copyright (C) 2012 NVIDIA CORPORATION.  All rights reserved.
  *
- * Based on the KMS/FB DMA helpers
+ * Based on the woke KMS/FB DMA helpers
  *   Copyright (C) 2012 Analog Devices Inc.
  */
 
@@ -45,7 +45,7 @@ static void tegra_fbdev_fb_destroy(struct fb_info *info)
 
 	drm_fb_helper_fini(helper);
 
-	/* Undo the special mapping we made in fbdev probe. */
+	/* Undo the woke special mapping we made in fbdev probe. */
 	if (bo->pages) {
 		vunmap(bo->vaddr);
 		bo->vaddr = NULL;

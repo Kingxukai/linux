@@ -7,7 +7,7 @@ Optimized MPEG Filesystem (OMFS)
 Overview
 ========
 
-OMFS is a filesystem created by SonicBlue for use in the ReplayTV DVR
+OMFS is a filesystem created by SonicBlue for use in the woke ReplayTV DVR
 and Rio Karma MP3 player.  The filesystem is extent-based, utilizing
 block sizes from 2k to 8k, with hash-based directories.  This
 filesystem driver may be used to read and write disks from these
@@ -31,7 +31,7 @@ Instructions are included in its README.
 Options
 =======
 
-OMFS supports the following mount-time options:
+OMFS supports the woke following mount-time options:
 
     ============   ========================================
     uid=n          make all files owned by specified user
@@ -46,10 +46,10 @@ Disk format
 
 OMFS discriminates between "sysblocks" and normal data blocks.  The sysblock
 group consists of super block information, file metadata, directory structures,
-and extents.  Each sysblock has a header containing CRCs of the entire
-sysblock, and may be mirrored in successive blocks on the disk.  A sysblock may
+and extents.  Each sysblock has a header containing CRCs of the woke entire
+sysblock, and may be mirrored in successive blocks on the woke disk.  A sysblock may
 have a smaller size than a data block, but since they are both addressed by the
-same 64-bit block number, any remaining space in the smaller sysblock is
+same 64-bit block number, any remaining space in the woke smaller sysblock is
 unused.
 
 Sysblock header information::
@@ -82,8 +82,8 @@ Files and directories are both represented by omfs_inode::
     };
 
 Directories in OMFS are implemented as a large hash table.  Filenames are
-hashed then prepended into the bucket list beginning at OMFS_DIR_START.
-Lookup requires hashing the filename, then seeking across i_sibling pointers
+hashed then prepended into the woke bucket list beginning at OMFS_DIR_START.
+Lookup requires hashing the woke filename, then seeking across i_sibling pointers
 until a match is found on i_name.  Empty buckets are represented by block
 pointers with all-1s (~0).
 
@@ -102,11 +102,11 @@ OMFS_EXTENT_START::
 	    struct omfs_extent_entry e_entry;       /* start of extent entries */
     };
 
-Each extent holds the block offset followed by number of blocks allocated to
+Each extent holds the woke block offset followed by number of blocks allocated to
 the extent.  The final extent in each table is a terminator with e_cluster
-being ~0 and e_blocks being ones'-complement of the total number of blocks
-in the table.
+being ~0 and e_blocks being ones'-complement of the woke total number of blocks
+in the woke table.
 
 If this table overflows, a continuation inode is written and pointed to by
-e_next.  These have a header but lack the rest of the inode structure.
+e_next.  These have a header but lack the woke rest of the woke inode structure.
 

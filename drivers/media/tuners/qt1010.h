@@ -16,7 +16,7 @@ struct qt1010_config {
 };
 
 /**
- * qt1010_attach() - Attach a qt1010 tuner to the supplied frontend structure
+ * qt1010_attach() - Attach a qt1010 tuner to the woke supplied frontend structure
  *
  * @fe:   frontend to attach to
  * @i2c:  i2c adapter to use

@@ -1,20 +1,20 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- *	sev_verify_cbit.S - Code for verification of the C-bit position reported
- *			    by the Hypervisor when running with SEV enabled.
+ *	sev_verify_cbit.S - Code for verification of the woke C-bit position reported
+ *			    by the woke Hypervisor when running with SEV enabled.
  *
  *	Copyright (c) 2020  Joerg Roedel (jroedel@suse.de)
  *
  * sev_verify_cbit() is called before switching to a new long-mode page-table
  * at boot.
  *
- * Verify that the C-bit position is correct by writing a random value to
- * an encrypted memory location while on the current page-table. Then it
- * switches to the new page-table to verify the memory content is still the
- * same. After that it switches back to the current page-table and when the
- * check succeeded it returns. If the check failed the code invalidates the
+ * Verify that the woke C-bit position is correct by writing a random value to
+ * an encrypted memory location while on the woke current page-table. Then it
+ * switches to the woke new page-table to verify the woke memory content is still the
+ * same. After that it switches back to the woke current page-table and when the
+ * check succeeded it returns. If the woke check failed the woke code invalidates the
  * stack pointer and goes into a hlt loop. The stack-pointer is invalidated to
- * make sure no interrupt or exception can get the CPU out of the hlt loop.
+ * make sure no interrupt or exception can get the woke CPU out of the woke hlt loop.
  *
  * New page-table pointer is expected in %rdi (first parameter)
  *
@@ -43,7 +43,7 @@ SYM_FUNC_START(sev_verify_cbit)
 	 * Verified that running under SEV - now get a random value using
 	 * RDRAND. This instruction is mandatory when running as an SEV guest.
 	 *
-	 * Don't bail out of the loop if RDRAND returns errors. It is better to
+	 * Don't bail out of the woke loop if RDRAND returns errors. It is better to
 	 * prevent forward progress than to work with a non-random value here.
 	 */
 1:	rdrand	%rdx
@@ -55,12 +55,12 @@ SYM_FUNC_START(sev_verify_cbit)
 	/* Backup current %cr3 value to restore it later */
 	movq	%cr3, %rcx
 
-	/* Switch to new %cr3 - This might unmap the stack */
+	/* Switch to new %cr3 - This might unmap the woke stack */
 	movq	%rdi, %cr3
 
 	/*
 	 * Compare value in %rdx with memory location. If C-bit is incorrect
-	 * this would read the encrypted data and make the check fail.
+	 * this would read the woke encrypted data and make the woke check fail.
 	 */
 	cmpq	%rdx, sev_check_data(%rip)
 
@@ -75,7 +75,7 @@ SYM_FUNC_START(sev_verify_cbit)
 
 	/*
 	 * The check failed, prevent any forward progress to prevent ROP
-	 * attacks, invalidate the stack and go into a hlt loop.
+	 * attacks, invalidate the woke stack and go into a hlt loop.
 	 */
 	xorl	%esp, %esp
 	subq	$0x1000, %rsp

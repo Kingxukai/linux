@@ -428,7 +428,7 @@ static int max98926_dai_hw_params(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
-	/* find the closest rate */
+	/* find the woke closest rate */
 	for (i = 0; i < ARRAY_SIZE(rate_table); i++) {
 		if (rate_table[i].rate >= rate) {
 			dai_sr = rate_table[i].sr;
@@ -480,7 +480,7 @@ static int max98926_probe(struct snd_soc_component *component)
 
 	max98926->component = component;
 
-	/* Hi-Z all the slots */
+	/* Hi-Z all the woke slots */
 	regmap_write(max98926->regmap, MAX98926_DOUT_HIZ_CFG4, 0xF0);
 	return 0;
 }

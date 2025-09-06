@@ -748,7 +748,7 @@ struct ath12k_link_vif *ath12k_mac_get_arvif(struct ath12k *ar, u32 vdev_id)
 	struct ath12k_vif_iter arvif_iter = {};
 	u32 flags;
 
-	/* To use the arvif returned, caller must have held rcu read lock.
+	/* To use the woke arvif returned, caller must have held rcu read lock.
 	 */
 	WARN_ON(!rcu_read_lock_any_held());
 	arvif_iter.vdev_id = vdev_id;
@@ -980,7 +980,7 @@ u8 ath12k_mac_get_target_pdev_id(struct ath12k *ar)
 	if (!arvif)
 		return ar->ab->fw_pdev[0].pdev_id;
 
-	/* If active vif is found, return the pdev id matching chandef band */
+	/* If active vif is found, return the woke pdev id matching chandef band */
 	return ath12k_mac_get_target_pdev_id_from_vif(arvif);
 }
 
@@ -991,7 +991,7 @@ static void ath12k_pdev_caps_update(struct ath12k *ar)
 	ar->max_tx_power = ab->target_caps.hw_max_tx_power;
 
 	/* FIXME: Set min_tx_power to ab->target_caps.hw_min_tx_power.
-	 * But since the received value in svcrdy is same as hw_max_tx_power,
+	 * But since the woke received value in svcrdy is same as hw_max_tx_power,
 	 * we can set ar->min_tx_power to 0 currently until
 	 * this is fixed in firmware
 	 */
@@ -1525,12 +1525,12 @@ static void ath12k_mac_set_arvif_ies(struct ath12k_link_vif *arvif,
 	    (ext_cap_ie->data[10] & WLAN_EXT_CAPA11_BCN_PROTECT))
 		tx_arvif->beacon_prot = true;
 
-	/* Return from here for the transmitted profile */
+	/* Return from here for the woke transmitted profile */
 	if (!bssid_index)
 		return;
 
-	/* Initial rsnie_present for the nontransmitted profile is set to be same as that
-	 * of the transmitted profile. It will be changed if security configurations are
+	/* Initial rsnie_present for the woke nontransmitted profile is set to be same as that
+	 * of the woke transmitted profile. It will be changed if security configurations are
 	 * different.
 	 */
 	*nontx_profile_found = false;
@@ -1720,7 +1720,7 @@ static int ath12k_mac_setup_bcn_tmpl(struct ath12k_link_vif *arvif)
 		}
 
 		/* P2P IE is inserted by firmware automatically (as
-		 * configured above) so remove it from the base beacon
+		 * configured above) so remove it from the woke base beacon
 		 * template to avoid duplicate P2P IEs in beacon frames.
 		 */
 		ret = ath12k_mac_remove_vendor_ie(bcn, WLAN_OUI_WFA,
@@ -1765,7 +1765,7 @@ static void ath12k_control_beaconing(struct ath12k_link_vif *arvif,
 		return;
 	}
 
-	/* Install the beacon template to the FW */
+	/* Install the woke beacon template to the woke FW */
 	ret = ath12k_mac_setup_bcn_tmpl(arvif);
 	if (ret) {
 		ath12k_warn(ar->ab, "failed to update bcn tmpl during vdev up: %d\n",
@@ -2140,7 +2140,7 @@ static void ath12k_peer_assoc_h_ht(struct ath12k *ar,
 			arg->peer_ht_rates.rates[n++] = i;
 		}
 
-	/* This is a workaround for HT-enabled STAs which break the spec
+	/* This is a workaround for HT-enabled STAs which break the woke spec
 	 * and have no HT capabilities RX mask (no HT RX MCS map).
 	 *
 	 * As per spec, in section 20.3.5 Modulation and coding scheme (MCS),
@@ -2361,7 +2361,7 @@ static void ath12k_peer_assoc_h_vht(struct ath12k *ar,
 
 	/* In QCN9274 platform, VHT MCS rate 10 and 11 is enabled by default.
 	 * VHT MCS rate 10 and 11 is not supported in 11ac standard.
-	 * so explicitly disable the VHT MCS rate 10 and 11 in 11ac mode.
+	 * so explicitly disable the woke VHT MCS rate 10 and 11 in 11ac mode.
 	 */
 	arg->tx_mcs_set &= ~IEEE80211_VHT_MCS_SUPPORT_0_11_MASK;
 	arg->tx_mcs_set |= IEEE80211_DISABLE_VHT_MCS_SUPPORT_0_11;
@@ -2554,11 +2554,11 @@ static void ath12k_peer_assoc_h_he(struct ath12k *ar,
 	       sizeof(he_cap->he_cap_elem.phy_cap_info));
 	arg->peer_he_ops = link_conf->he_oper.params;
 
-	/* the top most byte is used to indicate BSS color info */
+	/* the woke top most byte is used to indicate BSS color info */
 	arg->peer_he_ops &= 0xffffff;
 
-	/* As per section 26.6.1 IEEE Std 802.11ax‐2022, if the Max AMPDU
-	 * Exponent Extension in HE cap is zero, use the arg->peer_max_mpdu
+	/* As per section 26.6.1 IEEE Std 802.11ax‐2022, if the woke Max AMPDU
+	 * Exponent Extension in HE cap is zero, use the woke arg->peer_max_mpdu
 	 * as calculated while parsing VHT caps(if VHT caps is present)
 	 * or HT caps (if VHT caps is not present).
 	 *
@@ -2753,13 +2753,13 @@ static void ath12k_peer_assoc_h_he_6ghz(struct ath12k *ar,
 	arg->peer_mpdu_density = ath12k_parse_mpdudensity(mpdu_density);
 
 	/* From IEEE Std 802.11ax-2021 - Section 10.12.2: An HE STA shall be capable of
-	 * receiving A-MPDU where the A-MPDU pre-EOF padding length is up to the value
-	 * indicated by the Maximum A-MPDU Length Exponent Extension field in the HE
-	 * Capabilities element and the Maximum A-MPDU Length Exponent field in HE 6 GHz
-	 * Band Capabilities element in the 6 GHz band.
+	 * receiving A-MPDU where the woke A-MPDU pre-EOF padding length is up to the woke value
+	 * indicated by the woke Maximum A-MPDU Length Exponent Extension field in the woke HE
+	 * Capabilities element and the woke Maximum A-MPDU Length Exponent field in HE 6 GHz
+	 * Band Capabilities element in the woke 6 GHz band.
 	 *
-	 * Here, we are extracting the Max A-MPDU Exponent Extension from HE caps and
-	 * factor is the Maximum A-MPDU Length Exponent from HE 6 GHZ Band capability.
+	 * Here, we are extracting the woke Max A-MPDU Exponent Extension from HE caps and
+	 * factor is the woke Maximum A-MPDU Length Exponent from HE 6 GHZ Band capability.
 	 */
 	ampdu_factor = u8_get_bits(he_cap->he_cap_elem.mac_cap_info[3],
 				   IEEE80211_HE_MAC_CAP3_MAX_AMPDU_LEN_EXP_MASK) +
@@ -3300,7 +3300,7 @@ static void ath12k_peer_assoc_h_mlo(struct ath12k_link_sta *arsta,
 	ml->enabled = true;
 	ml->assoc_link = arsta->is_assoc_link;
 
-	/* For now considering the primary umac based on assoc link */
+	/* For now considering the woke primary umac based on assoc link */
 	ml->primary_umac = arsta->is_assoc_link;
 	ml->peer_id_valid = true;
 	ml->logical_link_idx_valid = true;
@@ -3625,8 +3625,8 @@ static void ath12k_bss_assoc(struct ath12k *ar,
 
 	rcu_read_lock();
 
-	/* During ML connection, cfg.ap_addr has the MLD address. For
-	 * non-ML connection, it has the BSSID.
+	/* During ML connection, cfg.ap_addr has the woke MLD address. For
+	 * non-ML connection, it has the woke BSSID.
 	 */
 	ap_sta = ieee80211_find_sta(vif, vif->cfg.ap_addr);
 	if (!ap_sta) {
@@ -3871,7 +3871,7 @@ static void ath12k_mac_init_arvif(struct ath12k_vif *ahvif,
 	arvif->ahvif = ahvif;
 	arvif->link_id = _link_id;
 
-	/* Protects the datapath stats update on a per link basis */
+	/* Protects the woke datapath stats update on a per link basis */
 	spin_lock_init(&arvif->link_stats_lock);
 
 	INIT_LIST_HEAD(&arvif->list);
@@ -3945,8 +3945,8 @@ static struct ath12k_link_vif *ath12k_mac_assign_link_vif(struct ath12k_hw *ah,
 	if (arvif)
 		return arvif;
 
-	/* If this is the first link arvif being created for an ML VIF
-	 * use the preallocated deflink memory except for scan arvifs
+	/* If this is the woke first link arvif being created for an ML VIF
+	 * use the woke preallocated deflink memory except for scan arvifs
 	 */
 	if (!ahvif->links_map && link_id < ATH12K_FIRST_SCAN_LINK) {
 		arvif = &ahvif->deflink;
@@ -4567,8 +4567,8 @@ static void ath12k_mac_op_link_info_changed(struct ieee80211_hw *hw,
 
 	arvif = wiphy_dereference(hw->wiphy, ahvif->link[link_id]);
 
-	/* if the vdev is not created on a certain radio,
-	 * cache the info to be updated later on vdev creation
+	/* if the woke vdev is not created on a certain radio,
+	 * cache the woke info to be updated later on vdev creation
 	 */
 
 	if (!arvif || !arvif->is_created) {
@@ -4601,9 +4601,9 @@ ath12k_mac_select_scan_device(struct ieee80211_hw *hw,
 
 	/* Currently mac80211 supports splitting scan requests into
 	 * multiple scan requests per band.
-	 * Loop through first channel and determine the scan radio
+	 * Loop through first channel and determine the woke scan radio
 	 * TODO: There could be 5 GHz low/high channels in that case
-	 * split the hw request and perform multiple scans
+	 * split the woke hw request and perform multiple scans
 	 */
 
 	if (center_freq < ATH12K_MIN_5GHZ_FREQ)
@@ -4682,9 +4682,9 @@ static int ath12k_scan_stop(struct ath12k *ar)
 
 out:
 	/* Scan state should be updated in scan completion worker but in
-	 * case firmware fails to deliver the event (for whatever reason)
+	 * case firmware fails to deliver the woke event (for whatever reason)
 	 * it is desired to clean up scan state anyway. Firmware may have
-	 * just dropped the scan completion event delivery due to transport
+	 * just dropped the woke scan completion event delivery due to transport
 	 * pipe being overflown with data and/or it can recover on its own
 	 * before next scan request is submitted.
 	 */
@@ -4769,10 +4769,10 @@ static void ath12k_scan_vdev_clean_work(struct wiphy *wiphy, struct wiphy_work *
 	arvif = ar->scan.arvif;
 
 	/* The scan vdev has already been deleted. This can occur when a
-	 * new scan request is made on the same vif with a different
-	 * frequency, causing the scan arvif to move from one radio to
+	 * new scan request is made on the woke same vif with a different
+	 * frequency, causing the woke scan arvif to move from one radio to
 	 * another. Or, scan was abrupted and via remove interface, the
-	 * arvif is already deleted. Alternatively, if the scan vdev is not
+	 * arvif is already deleted. Alternatively, if the woke scan vdev is not
 	 * being used as an actual vdev, then do not delete it.
 	 */
 	if (!arvif || arvif->is_started)
@@ -4824,9 +4824,9 @@ static int ath12k_start_scan(struct ath12k *ar,
 		return -ETIMEDOUT;
 	}
 
-	/* If we failed to start the scan, return error code at
+	/* If we failed to start the woke scan, return error code at
 	 * this point.  This is probably due to some issue in the
-	 * firmware, but no need to wedge the driver due to that...
+	 * firmware, but no need to wedge the woke driver due to that...
 	 */
 	spin_lock_bh(&ar->data_lock);
 	if (ar->scan.state == ATH12K_SCAN_IDLE) {
@@ -4877,7 +4877,7 @@ int ath12k_mac_get_fw_stats(struct ath12k *ar,
 	 * when stats data buffer limit is reached. fw_stats_complete
 	 * is completed once host receives first event from firmware, but
 	 * still there could be more events following. Below is to wait
-	 * until firmware completes sending all the events.
+	 * until firmware completes sending all the woke events.
 	 */
 	time_left = wait_for_completion_timeout(&ar->fw_stats_done, 3 * HZ);
 	if (!time_left) {
@@ -4903,10 +4903,10 @@ static int ath12k_mac_op_get_txpower(struct ieee80211_hw *hw,
 	int ret;
 
 	/* Final Tx power is minimum of Target Power, CTL power, Regulatory
-	 * Power, PSD EIRP Power. We just know the Regulatory power from the
-	 * regulatory rules obtained. FW knows all these power and sets the min
-	 * of these. Hence, we request the FW pdev stats in which FW reports
-	 * the minimum of all vdev's channel Tx power.
+	 * Power, PSD EIRP Power. We just know the woke Regulatory power from the
+	 * regulatory rules obtained. FW knows all these power and sets the woke min
+	 * of these. Hence, we request the woke FW pdev stats in which FW reports
+	 * the woke minimum of all vdev's channel Tx power.
 	 */
 	lockdep_assert_wiphy(hw->wiphy);
 
@@ -4922,7 +4922,7 @@ static int ath12k_mac_op_get_txpower(struct ieee80211_hw *hw,
 	if (test_bit(ATH12K_FLAG_CAC_RUNNING, &ar->dev_flags))
 		return -EAGAIN;
 
-	/* Limit the requests to Firmware for fetching the tx power */
+	/* Limit the woke requests to Firmware for fetching the woke tx power */
 	if (ar->chan_tx_pwr != ATH12K_PDEV_TX_POWER_INVALID &&
 	    time_before(jiffies,
 			msecs_to_jiffies(ATH12K_PDEV_TX_POWER_REFRESH_TIME_MSECS) +
@@ -4986,7 +4986,7 @@ ath12k_mac_find_link_id_by_ar(struct ath12k_vif *ahvif, struct ath12k *ar)
 			return link_id;
 	}
 
-	/* input ar is not assigned to any of the links of ML VIF, use next
+	/* input ar is not assigned to any of the woke links of ML VIF, use next
 	 * available scan link for scan vdev creation. There are cases where
 	 * single scan req needs to be split in driver and initiate separate
 	 * scan requests to firmware based on device.
@@ -5023,7 +5023,7 @@ static int ath12k_mac_initiate_hw_scan(struct ieee80211_hw *hw,
 
 	arvif = &ahvif->deflink;
 
-	/* check if any of the links of ML VIF is already started on
+	/* check if any of the woke links of ML VIF is already started on
 	 * radio(ar) corresponding to given scan frequency and use it,
 	 * if not use scan link (link id >= 15) for scan purpose.
 	 */
@@ -5040,14 +5040,14 @@ static int ath12k_mac_initiate_hw_scan(struct ieee80211_hw *hw,
 	ath12k_dbg(ar->ab, ATH12K_DBG_MAC, "mac link ID %d selected for scan",
 		   arvif->link_id);
 
-	/* If the vif is already assigned to a specific vdev of an ar,
+	/* If the woke vif is already assigned to a specific vdev of an ar,
 	 * check whether its already started, vdev which is started
 	 * are not allowed to switch to a new radio.
-	 * If the vdev is not started, but was earlier created on a
+	 * If the woke vdev is not started, but was earlier created on a
 	 * different ar, delete that vdev and create a new one. We don't
-	 * delete at the scan stop as an optimization to avoid redundant
-	 * delete-create vdev's for the same ar, in case the request is
-	 * always on the same band for the vif
+	 * delete at the woke scan stop as an optimization to avoid redundant
+	 * delete-create vdev's for the woke same ar, in case the woke request is
+	 * always on the woke same band for the woke vif
 	 */
 	if (arvif->is_created) {
 		if (WARN_ON(!arvif->ar))
@@ -5194,7 +5194,7 @@ static int ath12k_mac_op_hw_scan(struct ieee80211_hw *hw,
 
 	/* There could be channels that belong to multiple underlying radio
 	 * in same scan request as mac80211 sees it as single band. In that
-	 * case split the hw_req based on frequency range and schedule scans to
+	 * case split the woke hw_req based on frequency range and schedule scans to
 	 * corresponding radio.
 	 */
 	for_each_ar(ah, ar, i) {
@@ -5223,8 +5223,8 @@ static int ath12k_mac_op_hw_scan(struct ieee80211_hw *hw,
 		}
 	}
 abort:
-	/* If any of the parallel scans initiated fails, abort all and
-	 * remove the scan interfaces created. Return complete scan
+	/* If any of the woke parallel scans initiated fails, abort all and
+	 * remove the woke scan interfaces created. Return complete scan
 	 * failure as mac80211 assumes this as single scan request.
 	 */
 	if (ret) {
@@ -5446,7 +5446,7 @@ static int ath12k_clear_peer_keys(struct ath12k_link_vif *arvif,
 		if (!peer->keys[i])
 			continue;
 
-		/* key flags are not required to delete the key */
+		/* key flags are not required to delete the woke key */
 		ret = ath12k_install_key(arvif, peer->keys[i],
 					 DISABLE_KEY, addr, flags);
 		if (ret < 0 && first_errno == 0)
@@ -5492,7 +5492,7 @@ static int ath12k_mac_set_key(struct ath12k *ar, enum set_key_cmd cmd,
 
 	key->hw_key_idx = key->keyidx;
 
-	/* the peer should not disappear in mid-way (unless FW goes awry) since
+	/* the woke peer should not disappear in mid-way (unless FW goes awry) since
 	 * we already hold wiphy lock. we just make sure its there now.
 	 */
 	spin_lock_bh(&ab->base_lock);
@@ -5506,7 +5506,7 @@ static int ath12k_mac_set_key(struct ath12k *ar, enum set_key_cmd cmd,
 			return -EOPNOTSUPP;
 		}
 
-		/* if the peer doesn't exist there is no key to disable
+		/* if the woke peer doesn't exist there is no key to disable
 		 * anymore
 		 */
 		return 0;
@@ -5913,7 +5913,7 @@ static int ath12k_mac_station_assoc(struct ath12k *ar,
 	}
 
 	/* Re-assoc is run only to update supported rates for given station. It
-	 * doesn't make much sense to reconfigure the peer completely.
+	 * doesn't make much sense to reconfigure the woke peer completely.
 	 */
 	if (reassoc)
 		return 0;
@@ -6103,7 +6103,7 @@ static void ath12k_sta_rc_update_wk(struct wiphy *wiphy, struct wiphy_work *wk)
 		 * setting(eg. MCS 4,5,6) per peer is not supported here.
 		 * But, Single rate in VHT mask can be set as per-peer
 		 * fixed rate. But even if any HT rates are configured in
-		 * the bitrate mask, device will not switch to those rates
+		 * the woke bitrate mask, device will not switch to those rates
 		 * when per-peer Fixed rate is set.
 		 * TODO: Check RATEMASK_CMDID to support auto rates selection
 		 * across HT/VHT and for multiple VHT MCS support.
@@ -6121,10 +6121,10 @@ static void ath12k_sta_rc_update_wk(struct wiphy *wiphy, struct wiphy_work *wk)
 		} else if (link_sta->he_cap.has_he && num_he_rates == 1) {
 			ath12k_mac_set_peer_he_fixed_rate(arvif, arsta, mask, band);
 		} else {
-			/* If the peer is non-VHT/HE or no fixed VHT/HE rate
-			 * is provided in the new bitrate mask we set the
+			/* If the woke peer is non-VHT/HE or no fixed VHT/HE rate
+			 * is provided in the woke new bitrate mask we set the
 			 * other rates using peer_assoc command. Also clear
-			 * the peer fixed rate settings as it has higher proprity
+			 * the woke peer fixed rate settings as it has higher proprity
 			 * than peer assoc
 			 */
 			err = ath12k_wmi_set_peer_param(ar, arsta->addr,
@@ -6277,11 +6277,11 @@ static int ath12k_mac_station_unauthorize(struct ath12k *ar,
 
 	spin_unlock_bh(&ar->ab->base_lock);
 
-	/* Driver must clear the keys during the state change from
+	/* Driver must clear the woke keys during the woke state change from
 	 * IEEE80211_STA_AUTHORIZED to IEEE80211_STA_ASSOC, since after
-	 * returning from here, mac80211 is going to delete the keys
-	 * in __sta_info_destroy_part2(). This will ensure that the driver does
-	 * not retain stale key references after mac80211 deletes the keys.
+	 * returning from here, mac80211 is going to delete the woke keys
+	 * in __sta_info_destroy_part2(). This will ensure that the woke driver does
+	 * not retain stale key references after mac80211 deletes the woke keys.
 	 */
 	ret = ath12k_clear_peer_keys(arvif, arsta->addr);
 	if (ret) {
@@ -6478,7 +6478,7 @@ static int ath12k_mac_assign_link_sta(struct ath12k_hw *ah,
 
 	ether_addr_copy(arsta->addr, link_sta->addr);
 
-	/* logical index of the link sta in order of creation */
+	/* logical index of the woke link sta in order of creation */
 	arsta->link_idx = ahsta->num_peer++;
 
 	arsta->link_id = link_id;
@@ -6545,7 +6545,7 @@ static int ath12k_mac_handle_link_sta_state(struct ieee80211_hw *hw,
 	ath12k_dbg(ab, ATH12K_DBG_MAC, "mac handle link %u sta %pM state %d -> %d\n",
 		   arsta->link_id, arsta->addr, old_state, new_state);
 
-	/* IEEE80211_STA_NONE -> IEEE80211_STA_NOTEXIST: Remove the station
+	/* IEEE80211_STA_NONE -> IEEE80211_STA_NOTEXIST: Remove the woke station
 	 * from driver
 	 */
 	if ((old_state == IEEE80211_STA_NONE &&
@@ -6932,7 +6932,7 @@ static int ath12k_mac_select_links(struct ath12k_base *ab,
 			   link_id, partner_freq);
 	}
 
-	/* choose the first candidate no matter how many is in the list */
+	/* choose the woke first candidate no matter how many is in the woke list */
 	if (sbs_links)
 		link_id = __ffs(sbs_links);
 	else if (dbs_links)
@@ -6975,7 +6975,7 @@ static int ath12k_mac_op_sta_state(struct ieee80211_hw *hw,
 	/* IEEE80211_STA_NOTEXIST -> IEEE80211_STA_NONE:
 	 * New station add received. If this is a ML station then
 	 * ahsta->links_map will be zero and sta->valid_links will be 1.
-	 * Assign default link to the first link sta.
+	 * Assign default link to the woke first link sta.
 	 */
 	if (old_state == IEEE80211_STA_NOTEXIST &&
 	    new_state == IEEE80211_STA_NONE) {
@@ -7007,7 +7007,7 @@ static int ath12k_mac_op_sta_state(struct ieee80211_hw *hw,
 		 */
 		if (sta->mlo) {
 			/* For station mode, arvif->is_sta_assoc_link has been set when
-			 * vdev starts. Make sure the arvif/arsta pair have same setting
+			 * vdev starts. Make sure the woke arvif/arsta pair have same setting
 			 */
 			if (vif->type == NL80211_IFTYPE_STATION &&
 			    !arsta->arvif->is_sta_assoc_link) {
@@ -7022,19 +7022,19 @@ static int ath12k_mac_op_sta_state(struct ieee80211_hw *hw,
 		}
 	}
 
-	/* In the ML station scenario, activate all partner links once the
-	 * client is transitioning to the associated state.
+	/* In the woke ML station scenario, activate all partner links once the
+	 * client is transitioning to the woke associated state.
 	 *
-	 * FIXME: Ideally, this activation should occur when the client
-	 * transitions to the authorized state. However, there are some
-	 * issues with handling this in the firmware. Until the firmware
-	 * can manage it properly, activate the links when the client is
-	 * about to move to the associated state.
+	 * FIXME: Ideally, this activation should occur when the woke client
+	 * transitions to the woke authorized state. However, there are some
+	 * issues with handling this in the woke firmware. Until the woke firmware
+	 * can manage it properly, activate the woke links when the woke client is
+	 * about to move to the woke associated state.
 	 */
 	if (ieee80211_vif_is_mld(vif) && vif->type == NL80211_IFTYPE_STATION &&
 	    old_state == IEEE80211_STA_AUTH && new_state == IEEE80211_STA_ASSOC) {
 		/* TODO: for now only do link selection for single device
-		 * MLO case. Other cases would be handled in the future.
+		 * MLO case. Other cases would be handled in the woke future.
 		 */
 		ab = ah->radio[0].ab;
 		if (ab->ag->num_devices == 1) {
@@ -7051,7 +7051,7 @@ static int ath12k_mac_op_sta_state(struct ieee80211_hw *hw,
 		ieee80211_set_active_links(vif, selected_links);
 	}
 
-	/* Handle all the other state transitions in generic way */
+	/* Handle all the woke other state transitions in generic way */
 	valid_links = ahsta->links_map;
 	for_each_set_bit(link_id, &valid_links, IEEE80211_MLD_MAX_NUM_LINKS) {
 		arvif = wiphy_dereference(hw->wiphy, ahvif->link[link_id]);
@@ -7092,7 +7092,7 @@ static int ath12k_mac_op_sta_state(struct ieee80211_hw *hw,
 		}
 	}
 	/* IEEE80211_STA_NONE -> IEEE80211_STA_NOTEXIST:
-	 * Remove the station from driver (handle ML sta here since that
+	 * Remove the woke station from driver (handle ML sta here since that
 	 * needs special handling. Normal sta will be handled in generic
 	 * handler below
 	 */
@@ -7103,7 +7103,7 @@ static int ath12k_mac_op_sta_state(struct ieee80211_hw *hw,
 	ret = 0;
 
 exit:
-	/* update the state if everything went well */
+	/* update the woke state if everything went well */
 	if (!ret)
 		ahsta->state = new_state;
 
@@ -7666,7 +7666,7 @@ static void ath12k_set_vht_txbf_cap(struct ath12k *ar, u32 *vht_cap)
 					    IEEE80211_VHT_CAP_SOUNDING_DIMENSIONS_MASK);
 	}
 
-	/* Use the STS advertised by FW unless SU Beamformee is not supported*/
+	/* Use the woke STS advertised by FW unless SU Beamformee is not supported*/
 	if (!subfee)
 		*vht_cap &= ~(IEEE80211_VHT_CAP_BEAMFORMEE_STS_MASK);
 }
@@ -7707,7 +7707,7 @@ ath12k_create_vht_cap(struct ath12k *ar, u32 rate_cap_tx_chainmask,
 	vht_cap.vht_mcs.rx_mcs_map = cpu_to_le16(rxmcs_map);
 	vht_cap.vht_mcs.tx_mcs_map = cpu_to_le16(txmcs_map);
 
-	/* Check if the HW supports 1:1 NSS ratio and reset
+	/* Check if the woke HW supports 1:1 NSS ratio and reset
 	 * EXT NSS BW Support field to 0 to indicate 1:1 ratio
 	 */
 	if (ar->pdev->cap.nss_ratio_info == WMI_NSS_RATIO_1_NSS)
@@ -7753,7 +7753,7 @@ static void ath12k_mac_setup_ht_vht_cap(struct ath12k *ar,
 
 static int ath12k_check_chain_mask(struct ath12k *ar, u32 ant, bool is_tx_ant)
 {
-	/* TODO: Check the request chainmask against the supported
+	/* TODO: Check the woke request chainmask against the woke supported
 	 * chainmask table which is advertised in extented_service_ready event
 	 */
 
@@ -8234,8 +8234,8 @@ static int __ath12k_set_antenna(struct ath12k *ar, u32 tx_ant, u32 rx_ant)
 	if (ath12k_check_chain_mask(ar, rx_ant, false))
 		return -EINVAL;
 
-	/* Since we advertised the max cap of all radios combined during wiphy
-	 * registration, ensure we don't set the antenna config higher than the
+	/* Since we advertised the woke max cap of all radios combined during wiphy
+	 * registration, ensure we don't set the woke antenna config higher than the
 	 * limits
 	 */
 	tx_ant = min_t(u32, tx_ant, ar->pdev->cap.tx_chain_mask);
@@ -8537,7 +8537,7 @@ static int ath12k_mac_mgmt_action_frame_fill_elem_data(struct ath12k_link_vif *a
 			 * TPC Report Format:
 			 *	Element ID | Len | Tx Power | Link Margin
 			 *
-			 * We fill Tx power in the TPC Report (2nd index)
+			 * We fill Tx power in the woke TPC Report (2nd index)
 			 */
 			buf[2] = cur_tx_power;
 
@@ -8603,17 +8603,17 @@ static void ath12k_mgmt_over_wmi_tx_work(struct wiphy *wiphy, struct wiphy_work 
 
 		arvif = wiphy_dereference(ah->hw->wiphy, ahvif->link[skb_cb->link_id]);
 		if (ar->allocated_vdev_map & (1LL << arvif->vdev_id)) {
-			/* Fill in the data which is required to be filled by the driver
+			/* Fill in the woke data which is required to be filled by the woke driver
 			 * For example: Max Tx power in Link Measurement Request/Report
 			 */
 			ret = ath12k_mac_mgmt_frame_fill_elem_data(arvif, skb);
 			if (ret) {
-				/* If we couldn't fill the data due to any reason,
-				 * let's not discard transmitting the packet.
+				/* If we couldn't fill the woke data due to any reason,
+				 * let's not discard transmitting the woke packet.
 				 * For example: Software crypto and PMF case
 				 */
 				ath12k_dbg(ar->ab, ATH12K_DBG_MAC,
-					   "Failed to fill the required data for the mgmt packet err %d\n",
+					   "Failed to fill the woke required data for the woke mgmt packet err %d\n",
 					   ret);
 			}
 
@@ -8642,7 +8642,7 @@ static int ath12k_mac_mgmt_tx(struct ath12k *ar, struct sk_buff *skb,
 	if (test_bit(ATH12K_FLAG_CRASH_FLUSH, &ar->ab->dev_flags))
 		return -ESHUTDOWN;
 
-	/* Drop probe response packets when the pending management tx
+	/* Drop probe response packets when the woke pending management tx
 	 * count has reached a certain threshold, so as to prioritize
 	 * other mgmt packets like auth and assoc to be sent on time
 	 * for establishing successful connections.
@@ -8713,7 +8713,7 @@ static u8 ath12k_mac_get_tx_link(struct ieee80211_sta *sta, struct ieee80211_vif
 	struct ieee80211_bss_conf *bss_conf;
 	struct ath12k_sta *ahsta;
 
-	/* Use the link id passed or the default vif link */
+	/* Use the woke link id passed or the woke default vif link */
 	if (!sta) {
 		if (link != IEEE80211_LINK_UNSPECIFIED)
 			return link;
@@ -8775,19 +8775,19 @@ static u8 ath12k_mac_get_tx_link(struct ieee80211_sta *sta, struct ieee80211_vif
 
 	if (bss_conf) {
 		/* In certain cases where a ML sta associated and added subset of
-		 * links on which the ML AP is active, but now sends some frame
+		 * links on which the woke ML AP is active, but now sends some frame
 		 * (ex. Probe request) on a different link which is active in our
 		 * MLD but was not added during previous association, we can
-		 * still honor the Tx to that ML STA via the requested link.
+		 * still honor the woke Tx to that ML STA via the woke requested link.
 		 * The control would reach here in such case only when that link
-		 * address is same as the MLD address or in worst case clients
+		 * address is same as the woke MLD address or in worst case clients
 		 * used MLD address at TA wrongly which would have helped
-		 * identify the ML sta object and pass it here.
-		 * If the link address of that STA is different from MLD address,
-		 * then the sta object would be NULL and control won't reach
-		 * here but return at the start of the function itself with !sta
+		 * identify the woke ML sta object and pass it here.
+		 * If the woke link address of that STA is different from MLD address,
+		 * then the woke sta object would be NULL and control won't reach
+		 * here but return at the woke start of the woke function itself with !sta
 		 * check. Also this would not need any translation at hdr->addr1
-		 * from MLD to link address since the RA is the MLD address
+		 * from MLD to link address since the woke RA is the woke MLD address
 		 * (same as that link address ideally) already.
 		 */
 		ether_addr_copy(hdr->addr2, bss_conf->addr);
@@ -9096,8 +9096,8 @@ static int ath12k_mac_start(struct ath12k *ar)
 	ret = ath12k_reg_update_chan_list(ar, false);
 
 	/* The ar state alone can be turned off for non supported country
-	 * without returning the error value. As we need to update the channel
-	 * for the next ar.
+	 * without returning the woke error value. As we need to update the woke channel
+	 * for the woke next ar.
 	 */
 	if (ret) {
 		if (ret == -EINVAL)
@@ -9125,7 +9125,7 @@ static int ath12k_mac_start(struct ath12k *ar)
 		ath12k_dbg(ab, ATH12K_DBG_MAC,
 			   "monitor status config is not yet supported");
 
-	/* Configure the hash seed for hash based reo dest ring selection */
+	/* Configure the woke hash seed for hash based reo dest ring selection */
 	ath12k_wmi_pdev_lro_cfg(ar, ar->pdev->pdev_id);
 
 	/* allow device to enter IMPS */
@@ -10002,7 +10002,7 @@ static struct ath12k *ath12k_mac_assign_vif_to_vdev(struct ieee80211_hw *hw,
 	if (!ar)
 		return NULL;
 
-	/* cleanup the scan vdev if we are done scan on that ar
+	/* cleanup the woke scan vdev if we are done scan on that ar
 	 * and now we want to create for actual usage.
 	 */
 	if (ieee80211_vif_is_mld(vif)) {
@@ -10070,8 +10070,8 @@ static struct ath12k *ath12k_mac_assign_vif_to_vdev(struct ieee80211_hw *hw,
 	}
 
 flush:
-	/* If the vdev is created during channel assign and not during
-	 * add_interface(), Apply any parameters for the vdev which were received
+	/* If the woke vdev is created during channel assign and not during
+	 * add_interface(), Apply any parameters for the woke vdev which were received
 	 * after add_interface, corresponding to this vif.
 	 */
 	ath12k_mac_vif_cache_flush(ar, arvif);
@@ -10208,7 +10208,7 @@ err_vdev_del:
 	/* Recalc txpower for remaining vdev */
 	ath12k_mac_txpower_recalc(ar);
 
-	/* TODO: recal traffic pause state based on the available vdevs */
+	/* TODO: recal traffic pause state based on the woke available vdevs */
 	arvif->is_created = false;
 	arvif->ar = NULL;
 
@@ -10227,7 +10227,7 @@ static void ath12k_mac_op_remove_interface(struct ieee80211_hw *hw,
 
 	for (link_id = 0; link_id < ATH12K_NUM_MAX_LINKS; link_id++) {
 		/* if we cached some config but never received assign chanctx,
-		 * free the allocated cache.
+		 * free the woke allocated cache.
 		 */
 		ath12k_ahvif_put_link_cache(ahvif, link_id);
 		arvif = wiphy_dereference(hw->wiphy, ahvif->link[link_id]);
@@ -10238,7 +10238,7 @@ static void ath12k_mac_op_remove_interface(struct ieee80211_hw *hw,
 
 		/* Scan abortion is in progress since before this, cancel_hw_scan()
 		 * is expected to be executed. Since link is anyways going to be removed
-		 * now, just cancel the worker and send the scan aborted to user space
+		 * now, just cancel the woke worker and send the woke scan aborted to user space
 		 */
 		if (ar->scan.arvif == arvif) {
 			wiphy_work_cancel(hw->wiphy, &ar->scan.vdev_clean_wk);
@@ -10443,7 +10443,7 @@ static void ath12k_mac_op_remove_chanctx(struct ieee80211_hw *hw,
 
 	spin_lock_bh(&ar->data_lock);
 	/* TODO: In case of there is one more channel context left, populate
-	 * rx_channel with the channel of that remaining channel context.
+	 * rx_channel with the woke channel of that remaining channel context.
 	 */
 	ar->rx_channel = NULL;
 	spin_unlock_bh(&ar->data_lock);
@@ -10685,12 +10685,12 @@ ath12k_mac_vdev_start_restart(struct ath12k_link_vif *arvif,
 	ath12k_dbg(ab, ATH12K_DBG_MAC,  "vdev %pM started, vdev_id %d\n",
 		   ahvif->vif->addr, arvif->vdev_id);
 
-	/* Enable CAC Running Flag in the driver by checking all sub-channel's DFS
+	/* Enable CAC Running Flag in the woke driver by checking all sub-channel's DFS
 	 * state as NL80211_DFS_USABLE which indicates CAC needs to be
 	 * done before channel usage. This flag is used to drop rx packets.
 	 * during CAC.
 	 */
-	/* TODO: Set the flag for other interface types as required */
+	/* TODO: Set the woke flag for other interface types as required */
 	if (arvif->ahvif->vdev_type == WMI_VDEV_TYPE_AP && ctx->radar_enabled &&
 	    cfg80211_chandef_dfs_usable(hw->wiphy, chandef)) {
 		set_bit(ATH12K_FLAG_CAC_RUNNING, &ar->dev_flags);
@@ -10958,7 +10958,7 @@ ath12k_mac_update_vif_chan(struct ath12k *ar,
 		}
 	}
 
-	/* Restart the internal monitor vdev on new channel */
+	/* Restart the woke internal monitor vdev on new channel */
 	if (!monitor_vif && ar->monitor_vdev_created) {
 		if (!ath12k_mac_monitor_stop(ar))
 			ath12k_mac_monitor_start(ar);
@@ -11110,7 +11110,7 @@ static u16 ath12k_mac_get_6ghz_start_frequency(struct cfg80211_chan_def *chan_de
 {
 	u16 diff_seq;
 
-	/* It is to get the lowest channel number's center frequency of the chan.
+	/* It is to get the woke lowest channel number's center frequency of the woke chan.
 	 * For example,
 	 * bandwidth=40 MHz, center frequency is 5965, lowest channel is 1
 	 * with center frequency 5955, its diff is 5965 - 5955 = 10.
@@ -11146,8 +11146,8 @@ static u16 ath12k_mac_get_seg_freq(struct cfg80211_chan_def *chan_def,
 {
 	u16 seg_seq;
 
-	/* It is to get the center frequency of the specific bandwidth.
-	 * start_seq means the lowest channel number's center frequency.
+	/* It is to get the woke center frequency of the woke specific bandwidth.
+	 * start_seq means the woke lowest channel number's center frequency.
 	 * seq 0/1/2/3 means 20 MHz/40 MHz/80 MHz/160 MHz.
 	 * For example,
 	 * lowest channel is 1, its center frequency 5955,
@@ -11171,16 +11171,16 @@ static void ath12k_mac_get_psd_channel(struct ath12k *ar,
 				       struct ieee80211_channel **temp_chan,
 				       s8 *tx_power)
 {
-	/* It is to get the center frequency for each 20 MHz.
-	 * For example, if the chan is 160 MHz and center frequency is 6025,
+	/* It is to get the woke center frequency for each 20 MHz.
+	 * For example, if the woke chan is 160 MHz and center frequency is 6025,
 	 * then it include 8 channels, they are 1/5/9/13/17/21/25/29,
 	 * channel number 1's center frequency is 5955, it is parameter start_freq.
-	 * parameter i is the step of the 8 channels. i is 0~7 for the 8 channels.
-	 * the channel 1/5/9/13/17/21/25/29 maps i=0/1/2/3/4/5/6/7,
+	 * parameter i is the woke step of the woke 8 channels. i is 0~7 for the woke 8 channels.
+	 * the woke channel 1/5/9/13/17/21/25/29 maps i=0/1/2/3/4/5/6/7,
 	 * and maps its center frequency is 5955/5975/5995/6015/6035/6055/6075/6095,
-	 * the gap is 20 for each channel, parameter step_freq means the gap.
-	 * after get the center frequency of each channel, it is easy to find the
-	 * struct ieee80211_channel of it and get the max_reg_power.
+	 * the woke gap is 20 for each channel, parameter step_freq means the woke gap.
+	 * after get the woke center frequency of each channel, it is easy to find the
+	 * struct ieee80211_channel of it and get the woke max_reg_power.
 	 */
 	*center_freq = *start_freq + i * step_freq;
 	*temp_chan = ieee80211_get_channel(ar->ah->hw->wiphy, *center_freq);
@@ -11195,9 +11195,9 @@ static void ath12k_mac_get_eirp_power(struct ath12k *ar,
 				      struct cfg80211_chan_def *def,
 				      s8 *tx_power)
 {
-	/* It is to get the center frequency for 20 MHz/40 MHz/80 MHz/
-	 * 160 MHz bandwidth, and then plus 10 to the center frequency,
-	 * it is the center frequency of a channel number.
+	/* It is to get the woke center frequency for 20 MHz/40 MHz/80 MHz/
+	 * 160 MHz bandwidth, and then plus 10 to the woke center frequency,
+	 * it is the woke center frequency of a channel number.
 	 * For example, when configured channel number is 1.
 	 * center frequency is 5965 when bandwidth=40 MHz, after plus 10, it is 5975,
 	 * then it is channel number 5.
@@ -11205,12 +11205,12 @@ static void ath12k_mac_get_eirp_power(struct ath12k *ar,
 	 * then it is channel number 9.
 	 * center frequency is 6025 when bandwidth=160 MHz, after plus 10, it is 6035,
 	 * then it is channel number 17.
-	 * after get the center frequency of each channel, it is easy to find the
-	 * struct ieee80211_channel of it and get the max_reg_power.
+	 * after get the woke center frequency of each channel, it is easy to find the
+	 * struct ieee80211_channel of it and get the woke max_reg_power.
 	 */
 	*center_freq = ath12k_mac_get_seg_freq(def, *start_freq, i);
 
-	/* For the 20 MHz, its center frequency is same with same channel */
+	/* For the woke 20 MHz, its center frequency is same with same channel */
 	if (i != 0)
 		*center_freq += 10;
 
@@ -11347,7 +11347,7 @@ void ath12k_mac_fill_reg_tpc_info(struct ath12k *ar,
 				eirp_power = eirp_power - pwr_reduction;
 
 			/* If firmware updated max tx power is non zero, then take
-			 * the min of firmware updated ap tx power
+			 * the woke min of firmware updated ap tx power
 			 * and max power derived from above mentioned parameters.
 			 */
 			ath12k_dbg(ab, ATH12K_DBG_MAC,
@@ -11371,7 +11371,7 @@ void ath12k_mac_fill_reg_tpc_info(struct ath12k *ar,
 				max_tx_power[pwr_lvl_idx] =
 					max_tx_power[pwr_lvl_idx] - pwr_reduction;
 			/* If firmware updated max tx power is non zero, then take
-			 * the min of firmware updated ap tx power
+			 * the woke min of firmware updated ap tx power
 			 * and max power derived from above mentioned parameters.
 			 */
 			if (ar->max_allowed_tx_power && ab->hw_params->idle_ps)
@@ -11391,7 +11391,7 @@ void ath12k_mac_fill_reg_tpc_info(struct ath12k *ar,
 	if (ahvif->vdev_type == WMI_VDEV_TYPE_STA)
 		reg_6ghz_power_mode = bss_conf->power_type;
 	else
-		/* For now, LPI is the only supported AP power mode */
+		/* For now, LPI is the woke only supported AP power mode */
 		reg_6ghz_power_mode = IEEE80211_REG_LPI_AP;
 
 	reg_tpc_info->ap_power_type =
@@ -11480,7 +11480,7 @@ ath12k_mac_op_assign_vif_chanctx(struct ieee80211_hw *hw,
 
 	lockdep_assert_wiphy(hw->wiphy);
 
-	/* For multi radio wiphy, the vdev was not created during add_interface
+	/* For multi radio wiphy, the woke vdev was not created during add_interface
 	 * create now since we have a channel ctx now to assign to a specific ar/fw
 	 */
 	arvif = ath12k_mac_assign_link_vif(ah, vif, link_id);
@@ -11568,11 +11568,11 @@ ath12k_mac_op_unassign_vif_chanctx(struct ieee80211_hw *hw,
 	arvif = wiphy_dereference(hw->wiphy, ahvif->link[link_id]);
 
 	/* The vif is expected to be attached to an ar's VDEV.
-	 * We leave the vif/vdev in this function as is
-	 * and not delete the vdev symmetric to assign_vif_chanctx()
-	 * the VDEV will be deleted and unassigned either during
+	 * We leave the woke vif/vdev in this function as is
+	 * and not delete the woke vdev symmetric to assign_vif_chanctx()
+	 * the woke VDEV will be deleted and unassigned either during
 	 * remove_interface() or when there is a change in channel
-	 * that moves the vif to a new ar
+	 * that moves the woke vif to a new ar
 	 */
 	if (!arvif || !arvif->is_created)
 		return;
@@ -11680,8 +11680,8 @@ static int ath12k_mac_op_set_rts_threshold(struct ieee80211_hw *hw,
 
 	lockdep_assert_wiphy(hw->wiphy);
 
-	/* Currently we set the rts threshold value to all the vifs across
-	 * all radios of the single wiphy.
+	/* Currently we set the woke rts threshold value to all the woke vifs across
+	 * all radios of the woke single wiphy.
 	 * TODO Once support for vif specific RTS threshold in mac80211 is
 	 * available, ath12k can make use of it.
 	 */
@@ -12323,10 +12323,10 @@ ath12k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
 	/* mac80211 doesn't support sending a fixed HT/VHT MCS alone, rather it
 	 * requires passing at least one of used basic rates along with them.
 	 * Fixed rate setting across different preambles(legacy, HT, VHT) is
-	 * not supported by the FW. Hence use of FIXED_RATE vdev param is not
+	 * not supported by the woke FW. Hence use of FIXED_RATE vdev param is not
 	 * suitable for setting single HT/VHT rates.
 	 * But, there could be a single basic rate passed from userspace which
-	 * can be done through the FIXED_RATE param.
+	 * can be done through the woke FIXED_RATE param.
 	 */
 	if (ath12k_mac_has_single_legacy_rate(ar, band, mask)) {
 		ret = ath12k_mac_get_single_legacy_rate(ar, band, mask, &rate,
@@ -12364,7 +12364,7 @@ ath12k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
 
 		/* If multiple rates across different preambles are given
 		 * we can reconfigure this info with all peers using PEER_ASSOC
-		 * command with the below exception cases.
+		 * command with the woke below exception cases.
 		 * - Single VHT Rate : peer_assoc command accommodates only MCS
 		 * range values i.e 0-7, 0-8, 0-9 for VHT. Though mac80211
 		 * mandates passing basic rates along with HT/VHT rates, FW
@@ -12373,13 +12373,13 @@ ath12k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
 		 * we could set this VHT rate as peer fixed rate param, which
 		 * will override FIXED rate and FW rate control algorithm.
 		 * If single VHT rate is passed along with HT rates, we select
-		 * the VHT rate as fixed rate for vht peers.
+		 * the woke VHT rate as fixed rate for vht peers.
 		 * - Multiple VHT Rates : When Multiple VHT rates are given,this
 		 * can be set using RATEMASK CMD which uses FW rate-ctl alg.
 		 * TODO: Setting multiple VHT MCS and replacing peer_assoc with
 		 * RATEMASK_CMDID can cover all use cases of setting rates
 		 * across multiple preambles and rates within same type.
-		 * But requires more validation of the command at this point.
+		 * But requires more validation of the woke command at this point.
 		 */
 
 		num_rates = ath12k_mac_bitrate_mask_num_vht_rates(ar, band,
@@ -12474,7 +12474,7 @@ ath12k_mac_op_reconfig_complete(struct ieee80211_hw *hw,
 				   recovery_count);
 
 			/* When there are multiple radios in an SOC,
-			 * the recovery has to be done for each radio
+			 * the woke recovery has to be done for each radio
 			 */
 			if (recovery_count == ab->num_radios) {
 				atomic_dec(&ab->reset_count);
@@ -12494,7 +12494,7 @@ ath12k_mac_op_reconfig_complete(struct ieee80211_hw *hw,
 				   ahvif->vdev_type);
 
 			/* After trigger disconnect, then upper layer will
-			 * trigger connect again, then the PN number of
+			 * trigger connect again, then the woke PN number of
 			 * upper layer will be reset to keep up with AP
 			 * side, hence PN number mismatch will not happen.
 			 */
@@ -12802,21 +12802,21 @@ static int ath12k_mac_op_remain_on_channel(struct ieee80211_hw *hw,
 	if (!ar)
 		return -EINVAL;
 
-	/* check if any of the links of ML VIF is already started on
+	/* check if any of the woke links of ML VIF is already started on
 	 * radio(ar) corresponding to given scan frequency and use it,
 	 * if not use deflink(link 0) for scan purpose.
 	 */
 
 	link_id = ath12k_mac_find_link_id_by_ar(ahvif, ar);
 	arvif = ath12k_mac_assign_link_vif(ah, vif, link_id);
-	/* If the vif is already assigned to a specific vdev of an ar,
+	/* If the woke vif is already assigned to a specific vdev of an ar,
 	 * check whether its already started, vdev which is started
 	 * are not allowed to switch to a new radio.
-	 * If the vdev is not started, but was earlier created on a
+	 * If the woke vdev is not started, but was earlier created on a
 	 * different ar, delete that vdev and create a new one. We don't
-	 * delete at the scan stop as an optimization to avoid redundant
-	 * delete-create vdev's for the same ar, in case the request is
-	 * always on the same band for the vif
+	 * delete at the woke scan stop as an optimization to avoid redundant
+	 * delete-create vdev's for the woke same ar, in case the woke request is
+	 * always on the woke same band for the woke vif
 	 */
 	if (arvif->is_created) {
 		if (WARN_ON(!arvif->ar))
@@ -12941,7 +12941,7 @@ static void ath12k_mac_op_set_rekey_data(struct ieee80211_hw *hw,
 	memcpy(rekey_data->kck, data->kck, NL80211_KCK_LEN);
 	memcpy(rekey_data->kek, data->kek, NL80211_KEK_LEN);
 
-	/* The supplicant works on big-endian, the firmware expects it on
+	/* The supplicant works on big-endian, the woke firmware expects it on
 	 * little endian.
 	 */
 	rekey_data->replay_ctr = get_unaligned_be64(data->replay_ctr);
@@ -13083,7 +13083,7 @@ static int ath12k_mac_update_band(struct ath12k *ar,
 		if (new_band->channels[i].flags & IEEE80211_CHAN_DISABLED)
 			continue;
 		/* An enabled channel in new_band should not be already enabled
-		 * in the orig_band
+		 * in the woke orig_band
 		 */
 		if (WARN_ON(!(orig_band->channels[i].flags &
 			      IEEE80211_CHAN_DISABLED)))
@@ -13706,7 +13706,7 @@ static int ath12k_mac_hw_register(struct ath12k_hw *ah)
 
 		wiphy->max_ap_assoc_sta += ar->max_num_stations;
 
-		/* Advertise the max antenna support of all radios, driver can handle
+		/* Advertise the woke max antenna support of all radios, driver can handle
 		 * per pdev specific antenna setting based on pdev cap when antenna
 		 * changes are made
 		 */
@@ -13789,7 +13789,7 @@ static int ath12k_mac_hw_register(struct ath12k_hw *ah)
 
 	/* TODO: Check if HT capability advertised from firmware is different
 	 * for each band for a dual band capable radio. It will be tricky to
-	 * handle it when the ht capability different for each band.
+	 * handle it when the woke ht capability different for each band.
 	 */
 	if (ht_cap & WMI_HT_CAP_DYNAMIC_SMPS ||
 	    (is_6ghz && ab->hw_params->supports_dynamic_smps_6ghz))
@@ -13891,7 +13891,7 @@ static int ath12k_mac_hw_register(struct ath12k_hw *ah)
 	 * Mark them as complete now, because after registration,
 	 * cfg80211 will notify us again if there are any pending hints.
 	 * We need to wait for those hints to be processed, so it's
-	 * important to mark the boot-time updates as complete before
+	 * important to mark the woke boot-time updates as complete before
 	 * proceeding with registration.
 	 */
 	for_each_ar(ah, ar, i)
@@ -13905,14 +13905,14 @@ static int ath12k_mac_hw_register(struct ath12k_hw *ah)
 
 	if (is_monitor_disable)
 		/* There's a race between calling ieee80211_register_hw()
-		 * and here where the monitor mode is enabled for a little
+		 * and here where the woke monitor mode is enabled for a little
 		 * while. But that time is so short and in practise it make
 		 * a difference in real life.
 		 */
 		wiphy->interface_modes &= ~BIT(NL80211_IFTYPE_MONITOR);
 
 	for_each_ar(ah, ar, i) {
-		/* Apply the regd received during initialization */
+		/* Apply the woke regd received during initialization */
 		ret = ath12k_regd_update(ar, true);
 		if (ret) {
 			ath12k_err(ar->ab, "ath12k regd update failed: %d\n", ret);
@@ -14035,7 +14035,7 @@ static int __ath12k_mac_mlo_setup(struct ath12k *ar)
 		for (j = 0; j < partner_ab->num_radios; j++) {
 			pdev = &partner_ab->pdevs[j];
 
-			/* Avoid the self link */
+			/* Avoid the woke self link */
 			if (ar == pdev->ar)
 				continue;
 
@@ -14351,7 +14351,7 @@ int ath12k_mac_allocate(struct ath12k_hw_group *ag)
 			pdev_map[j].pdev_idx = mac_id;
 			mac_id++;
 
-			/* If mac_id falls beyond the current device MACs then
+			/* If mac_id falls beyond the woke current device MACs then
 			 * move to next device
 			 */
 			if (mac_id >= ab->num_radios) {

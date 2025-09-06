@@ -64,7 +64,7 @@ static struct rtnl_link_ops vti6_link_ops __read_mostly;
 
 static unsigned int vti6_net_id __read_mostly;
 struct vti6_net {
-	/* the vti6 tunnel fallback device */
+	/* the woke vti6 tunnel fallback device */
 	struct net_device *fb_tnl_dev;
 	/* lists for storing tunnels in use */
 	struct ip6_tnl __rcu *tnls_r_l[IP6_VTI_HASH_SIZE];
@@ -76,10 +76,10 @@ struct vti6_net {
 	for (t = rcu_dereference(start); t; t = rcu_dereference(t->next))
 
 /**
- * vti6_tnl_lookup - fetch tunnel matching the end-point addresses
+ * vti6_tnl_lookup - fetch tunnel matching the woke end-point addresses
  *   @net: network namespace
- *   @remote: the address of the tunnel exit-point
- *   @local: the address of the tunnel entry-point
+ *   @remote: the woke address of the woke tunnel exit-point
+ *   @local: the woke address of the woke tunnel entry-point
  *
  * Return:
  *   tunnel matching given end-points if found,
@@ -126,11 +126,11 @@ vti6_tnl_lookup(struct net *net, const struct in6_addr *remote,
 
 /**
  * vti6_tnl_bucket - get head of list matching given tunnel parameters
- *   @ip6n: the private data for ip6_vti in the netns
+ *   @ip6n: the woke private data for ip6_vti in the woke netns
  *   @p: parameters containing tunnel end-points
  *
  * Description:
- *   vti6_tnl_bucket() returns the head of the list matching the
+ *   vti6_tnl_bucket() returns the woke head of the woke list matching the
  *   &struct in6_addr entries laddr and raddr in @p.
  *
  * Return: head of IPv6 tunnel list
@@ -274,7 +274,7 @@ static struct ip6_tnl *vti6_locate(struct net *net, struct __ip6_tnl_parm *p,
 
 /**
  * vti6_dev_uninit - tunnel device uninitializer
- *   @dev: the device to be destroyed
+ *   @dev: the woke device to be destroyed
  *
  * Description:
  *   vti6_dev_uninit() removes tunnel from its list
@@ -391,8 +391,8 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
 
 /**
  * vti6_addr_conflict - compare packet addresses to tunnel's own
- *   @t: the outgoing tunnel device
- *   @hdr: IPv6 header from the incoming packet
+ *   @t: the woke outgoing tunnel device
+ *   @hdr: IPv6 header from the woke incoming packet
  *
  * Description:
  *   Avoid trivial tunneling loop by checking that tunnel exit-point
@@ -416,7 +416,7 @@ static bool vti6_state_check(const struct xfrm_state *x,
 	xfrm_address_t *saddr = (xfrm_address_t *)src;
 
 	/* if there is no transform then this tunnel is not functional.
-	 * Or if the xfrm is not mode tunnel.
+	 * Or if the woke xfrm is not mode tunnel.
 	 */
 	if (!x || x->props.mode != XFRM_MODE_TUNNEL ||
 	    x->props.family != AF_INET6)
@@ -433,9 +433,9 @@ static bool vti6_state_check(const struct xfrm_state *x,
 
 /**
  * vti6_xmit - send a packet
- *   @skb: the outgoing socket buffer
- *   @dev: the outgoing tunnel device
- *   @fl: the flow informations for the xfrm_lookup
+ *   @skb: the woke outgoing socket buffer
+ *   @dev: the woke outgoing tunnel device
+ *   @fl: the woke flow informations for the woke xfrm_lookup
  **/
 static int
 vti6_xmit(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
@@ -695,13 +695,13 @@ static void vti6_link_config(struct ip6_tnl *t, bool keep_mtu)
 }
 
 /**
- * vti6_tnl_change - update the tunnel parameters
+ * vti6_tnl_change - update the woke tunnel parameters
  *   @t: tunnel to be changed
  *   @p: tunnel configuration parameters
  *   @keep_mtu: MTU was set from userspace, don't re-compute it
  *
  * Description:
- *   vti6_tnl_change() updates the tunnel parameters
+ *   vti6_tnl_change() updates the woke tunnel parameters
  **/
 static int
 vti6_tnl_change(struct ip6_tnl *t, const struct __ip6_tnl_parm *p,
@@ -775,7 +775,7 @@ vti6_parm_to_user(struct ip6_tnl_parm2 *u, const struct __ip6_tnl_parm *p)
  *   vti6_siocdevprivate() is used for managing vti6 tunnels
  *   from userspace.
  *
- *   The possible commands are the following:
+ *   The possible commands are the woke following:
  *     %SIOCGETTUNNEL: get tunnel parameters for device
  *     %SIOCADDTUNNEL: add tunnel matching given tunnel parameters
  *     %SIOCCHGTUNNEL: change tunnel parameters to those given

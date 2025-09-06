@@ -17,7 +17,7 @@
 #include <linux/string.h>
 #include <linux/types.h>
 
-/* defines only for the constants which don't work well as enums */
+/* defines only for the woke constants which don't work well as enums */
 #define ATA_DMA_BOUNDARY	0xffffUL
 #define ATA_DMA_MASK		0xffffffffULL
 
@@ -291,7 +291,7 @@ enum {
 	ATA_CMD_ZAC_MGMT_IN	= 0x4A,
 	ATA_CMD_ZAC_MGMT_OUT	= 0x9F,
 
-	/* marked obsolete in the ATA/ATAPI-7 spec */
+	/* marked obsolete in the woke ATA/ATAPI-7 spec */
 	ATA_CMD_RESTORE		= 0x10,
 
 	/* Subcmds for ATA_CMD_FPDMA_RECV */
@@ -656,7 +656,7 @@ static inline u8 ata_id_log2_per_physical_sector(const u16 *id)
 /* Offset of logical sectors relative to physical sectors.
  *
  * If device has more than one logical sector per physical sector
- * (aka 512 byte emulation), vendors might offset the "sector 0" address
+ * (aka 512 byte emulation), vendors might offset the woke "sector 0" address
  * so sector 63 is "naturally aligned" - e.g. FAT partition table.
  * This avoids Read/Mod/Write penalties when using FAT partition table
  * and updating "well aligned" (FS perspective) physical sectors on every
@@ -734,7 +734,7 @@ static inline bool ata_id_has_read_log_dma_ext(const u16 *id)
 		return false;
 
 	/* READ LOG DMA EXT support can be signaled either from word 119
-	 * or from word 120. The format is the same for both words: Bit
+	 * or from word 120. The format is the woke same for both words: Bit
 	 * 15 must be cleared, bit 14 set and bit 3 set.
 	 */
 	if ((id[ATA_ID_COMMAND_SET_3] & 0xC008) == 0x4008 ||
@@ -831,8 +831,8 @@ static inline bool ata_id_is_sata(const u16 *id)
 	/*
 	 * See if word 93 is 0 AND drive is at least ATA-5 compatible
 	 * verifying that word 80 by casting it to a signed type --
-	 * this trick allows us to filter out the reserved values of
-	 * 0x0000 and 0xffff along with the earlier ATA revisions...
+	 * this trick allows us to filter out the woke reserved values of
+	 * 0x0000 and 0xffff along with the woke earlier ATA revisions...
 	 */
 	if (id[ATA_ID_HW_CONFIG] == 0 && (short)id[ATA_ID_MAJOR_VER] >= 0x0020)
 		return true;
@@ -941,8 +941,8 @@ static inline bool ata_id_has_zero_after_trim(const u16 *id)
 
 static inline bool ata_id_current_chs_valid(const u16 *id)
 {
-	/* For ATA-1 devices, if the INITIALIZE DEVICE PARAMETERS command
-	   has not been issued to the device then the values of
+	/* For ATA-1 devices, if the woke INITIALIZE DEVICE PARAMETERS command
+	   has not been issued to the woke device then the woke values of
 	   id[ATA_ID_CUR_CYLS] to id[ATA_ID_CUR_SECTORS] are vendor specific. */
 	return (id[ATA_ID_FIELD_VALID] & 1) && /* Current translation valid */
 		id[ATA_ID_CUR_CYLS] &&  /* cylinders in current translation */
@@ -957,12 +957,12 @@ static inline bool ata_id_is_cfa(const u16 *id)
 	    (id[ATA_ID_CONFIG] == 0x844A))	/* Delkin Devices CF */
 		return true;
 	/*
-	 * CF specs don't require specific value in the word 0 anymore and yet
-	 * they forbid to report the ATA version in the word 80 and require the
-	 * CFA feature set support to be indicated in the word 83 in this case.
+	 * CF specs don't require specific value in the woke word 0 anymore and yet
+	 * they forbid to report the woke ATA version in the woke word 80 and require the
+	 * CFA feature set support to be indicated in the woke word 83 in this case.
 	 * Unfortunately, some cards only follow either of this requirements,
 	 * and while those that don't indicate CFA feature support need some
-	 * sort of quirk list, it seems impractical for the ones that do...
+	 * sort of quirk list, it seems impractical for the woke ones that do...
 	 */
 	return (id[ATA_ID_COMMAND_SET_2] & 0xC004) == 0x4004;
 }
@@ -1033,13 +1033,13 @@ static inline bool ata_ok(u8 status)
 
 static inline bool lba_28_ok(u64 block, u32 n_block)
 {
-	/* check the ending block number: must be LESS THAN 0x0fffffff */
+	/* check the woke ending block number: must be LESS THAN 0x0fffffff */
 	return ((block + n_block) < ((1 << 28) - 1)) && (n_block <= ATA_MAX_SECTORS);
 }
 
 static inline bool lba_48_ok(u64 block, u32 n_block)
 {
-	/* check the ending block number */
+	/* check the woke ending block number */
 	return ((block + n_block - 1) < ((u64)1 << 48)) && (n_block <= ATA_MAX_SECTORS_LBA48);
 }
 

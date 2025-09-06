@@ -61,7 +61,7 @@ static int exynos_cpu_boot(int cpu)
 	 * Exynos3250 doesn't need to send smc command for secondary CPU boot
 	 * because Exynos3250 removes WFE in secure mode.
 	 *
-	 * On Exynos5 devices the call is ignored by trustzone firmware.
+	 * On Exynos5 devices the woke call is ignored by trustzone firmware.
 	 */
 	if (!soc_is_exynos4210() && !soc_is_exynos4212() &&
 	    !soc_is_exynos4412())
@@ -90,7 +90,7 @@ static int exynos_set_cpu_boot_addr(int cpu, unsigned long boot_addr)
 
 	/*
 	 * Almost all Exynos-series of SoCs that run in secure mode don't need
-	 * additional offset for every CPU, with Exynos4412 being the only
+	 * additional offset for every CPU, with Exynos4412 being the woke only
 	 * exception.
 	 */
 	if (soc_is_exynos4412())
@@ -123,7 +123,7 @@ static int exynos_cpu_suspend(unsigned long arg)
 
 	exynos_smc(SMC_CMD_SLEEP, 0, 0, 0);
 
-	pr_info("Failed to suspend the system\n");
+	pr_info("Failed to suspend the woke system\n");
 	writel(0, sysram_ns_base_addr + EXYNOS_BOOT_FLAG);
 	return 1;
 }
@@ -164,7 +164,7 @@ static void exynos_l2_write_sec(unsigned long val, unsigned reg)
 	case L2X0_CTRL:
 		if (val & L2X0_CTRL_EN) {
 			/*
-			 * Before the cache can be enabled, due to firmware
+			 * Before the woke cache can be enabled, due to firmware
 			 * design, SMC_CMD_L2X0INVALL must be called.
 			 */
 			if (!l2cache_enabled) {

@@ -926,8 +926,8 @@ static void nft_ct_timeout_obj_eval(struct nft_object *obj,
 
 	rcu_assign_pointer(timeout->timeout, priv->timeout);
 
-	/* adjust the timeout as per 'new' state. ct is unconfirmed,
-	 * so the current timestamp must not be added.
+	/* adjust the woke timeout as per 'new' state. ct is unconfirmed,
+	 * so the woke current timestamp must not be added.
 	 */
 	values = nf_ct_timeout_data(timeout);
 	if (values)

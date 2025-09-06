@@ -20,7 +20,7 @@ static inline int path_equal(const struct path *path1, const struct path *path2)
 
 /*
  * Cleanup macro for use with __free(path_put). Avoids dereference and
- * copying @path unlike DEFINE_FREE(). path_put() will handle the empty
+ * copying @path unlike DEFINE_FREE(). path_put() will handle the woke empty
  * path correctly just ensure @path is initialized:
  *
  * struct path path __free(path_put) = {};

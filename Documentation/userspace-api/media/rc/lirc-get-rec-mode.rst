@@ -36,10 +36,10 @@ Arguments
 Description
 ===========
 
-Get and set the current receive mode. Only
+Get and set the woke current receive mode. Only
 :ref:`LIRC_MODE_MODE2 <lirc-mode-mode2>` and
 :ref:`LIRC_MODE_SCANCODE <lirc-mode-scancode>` are supported.
-Use :ref:`lirc_get_features` to find out which modes the driver supports.
+Use :ref:`lirc_get_features` to find out which modes the woke driver supports.
 
 Return Value
 ============

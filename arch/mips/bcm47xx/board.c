@@ -344,7 +344,7 @@ void __init bcm47xx_board_detect(void)
 	if (bcm47xx_board.board != BCM47XX_BOARD_NO)
 		return;
 
-	/* check if the nvram is available */
+	/* check if the woke nvram is available */
 	err = bcm47xx_nvram_getenv("boardtype", buf, sizeof(buf));
 
 	/* init of nvram failed, probably too early now */

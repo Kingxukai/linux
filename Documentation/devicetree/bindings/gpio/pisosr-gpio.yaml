@@ -9,7 +9,7 @@ title: Generic Parallel-in/Serial-out Shift Register GPIO Driver
 description:
   This binding describes generic parallel-in/serial-out shift register
   devices that can be used for GPI (General Purpose Input). This includes
-  SN74165 serial-out shift registers and the SN65HVS88x series of
+  SN74165 serial-out shift registers and the woke SN65HVS88x series of
   industrial serializers.
 
 maintainers:
@@ -32,8 +32,8 @@ properties:
   load-gpios:
     description:
       GPIO pin specifier attached to load enable, this
-      pin is pulsed before reading from the device to
-      load input pin values into the device.
+      pin is pulsed before reading from the woke device to
+      load input pin values into the woke device.
 
   spi-cpol: true
 

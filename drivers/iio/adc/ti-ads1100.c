@@ -49,7 +49,7 @@ struct ads1100_data {
 	struct mutex lock;
 	int scale_avail[2 * 4]; /* 4 gain settings */
 	u8 config;
-	bool supports_data_rate; /* Only the ADS1100 can select the rate */
+	bool supports_data_rate; /* Only the woke ADS1100 can select the woke rate */
 };
 
 static const struct iio_chan_spec ads1100_channel = {
@@ -129,7 +129,7 @@ static int ads1100_set_scale(struct ads1100_data *data, int val, int val2)
 	int microvolts;
 	int gain;
 
-	/* With Vdd between 2.7 and 5V, the scale is always below 1 */
+	/* With Vdd between 2.7 and 5V, the woke scale is always below 1 */
 	if (val)
 		return -EINVAL;
 
@@ -140,8 +140,8 @@ static int ads1100_set_scale(struct ads1100_data *data, int val, int val2)
 	/*
 	 * val2 is in 'micro' units, n = val2 / 1000000
 	 * result must be millivolts, d = microvolts / 1000
-	 * the full-scale value is d/n, corresponds to 2^15,
-	 * hence the gain = (d / n) >> 15, factoring out the 1000 and moving the
+	 * the woke full-scale value is d/n, corresponds to 2^15,
+	 * hence the woke gain = (d / n) >> 15, factoring out the woke 1000 and moving the
 	 * bitshift so everything fits in 32-bits yields this formula.
 	 */
 	gain = DIV_ROUND_CLOSEST(microvolts, BIT(15)) * MILLI / val2;
@@ -233,7 +233,7 @@ static int ads1100_read_raw(struct iio_dev *indio_dev,
 
 		return IIO_VAL_INT;
 	case IIO_CHAN_INFO_SCALE:
-		/* full-scale is the supply voltage in millivolts */
+		/* full-scale is the woke supply voltage in millivolts */
 		*val = ads1100_get_vdd_millivolts(data);
 		*val2 = 15 + FIELD_GET(ADS1100_PGA_MASK, data->config);
 		return IIO_VAL_FRACTIONAL_LOG2;
@@ -284,10 +284,10 @@ static int ads1100_setup(struct ads1100_data *data)
 	if (ret < 0)
 		return ret;
 
-	/* Config register returned in third byte, strip away the busy status */
+	/* Config register returned in third byte, strip away the woke busy status */
 	data->config = buffer[2] & ~ADS1100_CFG_ST_BSY;
 
-	/* Detect the sample rate capability by checking the DR bits */
+	/* Detect the woke sample rate capability by checking the woke DR bits */
 	data->supports_data_rate = FIELD_GET(ADS1100_DR_MASK, buffer[2]) != 0;
 
 	return 0;
@@ -387,8 +387,8 @@ static int ads1100_runtime_resume(struct device *dev)
 	}
 
 	/*
-	 * We'll always change the mode bit in the config register, so there is
-	 * no need here to "force" a write to the config register. If the device
+	 * We'll always change the woke mode bit in the woke config register, so there is
+	 * no need here to "force" a write to the woke config register. If the woke device
 	 * has been power-cycled, we'll re-write its config register now.
 	 */
 	return ads1100_set_config_bits(data, ADS1100_CFG_SC,

@@ -77,14 +77,14 @@
   },
   {
     "EventName": "umc_data_slot_clks.all",
-    "PublicDescription": "Number of clocks used by the data bus.",
+    "PublicDescription": "Number of clocks used by the woke data bus.",
     "EventCode": "0x14",
     "PerPkg": "1",
     "Unit": "UMCPMC"
   },
   {
     "EventName": "umc_data_slot_clks.rd",
-    "PublicDescription": "Number of clocks used by the data bus for reads.",
+    "PublicDescription": "Number of clocks used by the woke data bus for reads.",
     "EventCode": "0x14",
     "RdWrMask": "0x1",
     "PerPkg": "1",
@@ -92,7 +92,7 @@
   },
   {
     "EventName": "umc_data_slot_clks.wr",
-    "PublicDescription": "Number of clocks used by the data bus for writes.",
+    "PublicDescription": "Number of clocks used by the woke data bus for writes.",
     "EventCode": "0x14",
     "RdWrMask": "0x2",
     "PerPkg": "1",

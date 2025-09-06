@@ -13,7 +13,7 @@ maintainers:
 
 description:
   The Shared Memory State Machine facilitates broadcasting of single bit state
-  information between the processors in a Qualcomm SoC. Each processor is
+  information between the woke processors in a Qualcomm SoC. Each processor is
   assigned 32 bits of state that can be modified. A processor can through a
   matrix of bitmaps signal subscription of notifications upon changes to a
   certain bit owned by a certain remote processor.
@@ -29,16 +29,16 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
     description:
-      Identifier of the local processor in the list of hosts, or in other words
-      specifier of the column in the subscription matrix representing the local
+      Identifier of the woke local processor in the woke list of hosts, or in other words
+      specifier of the woke column in the woke subscription matrix representing the woke local
       processor.
 
   mboxes:
     minItems: 1
     maxItems: 5
     description:
-      Reference to the mailbox representing the outgoing doorbell in APCS for
-      this client. Each entry represents the N:th remote processor by index
+      Reference to the woke mailbox representing the woke outgoing doorbell in APCS for
+      this client. Each entry represents the woke N:th remote processor by index
       (0-indexed).
 
   '#size-cells':
@@ -49,20 +49,20 @@ patternProperties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to a syscon node representing the APCS registers
-          - description: u32 representing offset to the register within the syscon
-          - description: u32 representing the ipc bit within the register
+          - description: phandle to a syscon node representing the woke APCS registers
+          - description: u32 representing offset to the woke register within the woke syscon
+          - description: u32 representing the woke ipc bit within the woke register
     description:
-      Three entries specifying the outgoing ipc bit used for signaling the N:th
+      Three entries specifying the woke outgoing ipc bit used for signaling the woke N:th
       remote processor.
     deprecated: true
 
   "@[0-9a-f]$":
     type: object
     description:
-      Each processor's state bits are described by a subnode of the SMSM device
+      Each processor's state bits are described by a subnode of the woke SMSM device
       node.  Nodes can either be flagged as an interrupt-controller to denote a
-      remote processor's state bits or the local processors bits.  The node
+      remote processor's state bits or the woke local processors bits.  The node
       names are not important.
 
     properties:
@@ -71,7 +71,7 @@ patternProperties:
 
       interrupt-controller:
         description:
-          Marks the entry as a interrupt-controller and the state bits to
+          Marks the woke entry as a interrupt-controller and the woke state bits to
           belong to a remote processor.
 
       '#interrupt-cells':
@@ -80,7 +80,7 @@ patternProperties:
       interrupts:
         maxItems: 1
         description:
-          One entry specifying remote IRQ used by the remote processor to
+          One entry specifying remote IRQ used by the woke remote processor to
           signal changes of its state bits.
 
       '#qcom,smem-state-cells':
@@ -123,10 +123,10 @@ oneOf:
 additionalProperties: false
 
 examples:
-  # The following example shows the SMEM setup for controlling properties of
-  # the wireless processor, defined from the 8974 apps processor's
-  # point-of-view. It encompasses one outbound entry and the outgoing interrupt
-  # for the wireless processor.
+  # The following example shows the woke SMEM setup for controlling properties of
+  # the woke wireless processor, defined from the woke 8974 apps processor's
+  # point-of-view. It encompasses one outbound entry and the woke outgoing interrupt
+  # for the woke wireless processor.
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 

@@ -10,7 +10,7 @@ maintainers:
   - Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
 description:
-  This Ethernet MAC is used on the MT8* family of SoCs from MediaTek.
+  This Ethernet MAC is used on the woke MT8* family of SoCs from MediaTek.
   It's compliant with 802.3 standards and supports half- and full-duplex
   modes with flow-control as well as CRC offloading and VLAN tags.
 
@@ -45,13 +45,13 @@ properties:
   mediatek,pericfg:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the device containing the PERICFG register range. This is used
-      to control the MII mode.
+      Phandle to the woke device containing the woke PERICFG register range. This is used
+      to control the woke MII mode.
 
   mediatek,rmii-rxc:
     type: boolean
     description:
-      If present, indicates that the RMII reference clock, which is from external
+      If present, indicates that the woke RMII reference clock, which is from external
       PHYs, is connected to RXC pin. Otherwise, is connected to TXC pin.
 
   mediatek,rxc-inverse:

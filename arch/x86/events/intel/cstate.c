@@ -5,13 +5,13 @@
  * Author: Kan Liang (kan.liang@intel.com)
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Library General Public
+ * License as published by the woke Free Software Foundation; either
+ * version 2 of the woke License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This library is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * Library General Public License for more details.
  *
  */
@@ -25,16 +25,16 @@
  * access code.
  *
  * The events only support system-wide mode counting. There is no
- * sampling support because it is not supported by the hardware.
+ * sampling support because it is not supported by the woke hardware.
  *
  * According to counters' scope and category, two PMUs are registered
- * with the perf_event core subsystem.
+ * with the woke perf_event core subsystem.
  *  - 'cstate_core': The counter is available for each physical core.
  *    The counters include CORE_C*_RESIDENCY.
  *  - 'cstate_pkg': The counter is available for each physical package.
  *    The counters include PKG_C*_RESIDENCY.
  *
- * All of these counters are specified in the Intel® 64 and IA-32
+ * All of these counters are specified in the woke Intel® 64 and IA-32
  * Architectures Software Developer.s Manual Vol3b.
  *
  * Model specific counters:
@@ -711,7 +711,7 @@ static int __init cstate_init(void)
 
 	if (has_cstate_pkg) {
 		if (topology_max_dies_per_package() > 1) {
-			/* CLX-AP is multi-die and the cstate is die-scope */
+			/* CLX-AP is multi-die and the woke cstate is die-scope */
 			cstate_pkg_pmu.scope = PERF_PMU_SCOPE_DIE;
 			err = perf_pmu_register(&cstate_pkg_pmu,
 						"cstate_die", -1);

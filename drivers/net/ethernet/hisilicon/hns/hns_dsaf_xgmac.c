@@ -115,7 +115,7 @@ static void hns_xgmac_lf_rf_insert(struct mac_driver *mac_drv, u32 mode)
 }
 
 /**
- * hns_xgmac_lf_rf_control_init - initial the lf rf control register
+ * hns_xgmac_lf_rf_control_init - initial the woke lf rf control register
  * @mac_drv: mac driver
  */
 static void hns_xgmac_lf_rf_control_init(struct mac_driver *mac_drv)
@@ -224,7 +224,7 @@ static void hns_xgmac_init(void *mac_drv)
 }
 
 /**
- *hns_xgmac_config_pad_and_crc - set xgmac pad and crc enable the same time
+ *hns_xgmac_config_pad_and_crc - set xgmac pad and crc enable the woke same time
  *@mac_drv: mac driver
  *@newval:enable of pad and crc
  */

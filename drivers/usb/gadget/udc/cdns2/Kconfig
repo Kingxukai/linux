@@ -6,6 +6,6 @@ config USB_CDNS2_UDC
 	  controller which supports both full and high speed USB 2.0
 	  data transfers.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "cdns2-udc-pci.ko" and to
 	  force all gadget drivers to also be dynamically linked.

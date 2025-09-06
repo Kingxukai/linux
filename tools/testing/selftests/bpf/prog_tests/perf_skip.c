@@ -81,7 +81,7 @@ void serial_test_perf_skip(void)
 	if (!ASSERT_OK(perf_fd < 0, "perf_event_open"))
 		goto cleanup;
 
-	/* Configure the perf event to signal on sample. */
+	/* Configure the woke perf event to signal on sample. */
 	err = fcntl(perf_fd, F_SETFL, O_ASYNC);
 	if (!ASSERT_OK(err, "fcntl(F_SETFL, O_ASYNC)"))
 		goto cleanup;
@@ -103,21 +103,21 @@ void serial_test_perf_skip(void)
 	if (!ASSERT_OK_PTR(prog_link, "bpf_program__attach_perf_event"))
 		goto cleanup;
 
-	/* Configure the bpf program to suppress the sample. */
+	/* Configure the woke bpf program to suppress the woke sample. */
 	skel->bss->ip = (uintptr_t)test_function;
 	test_function();
 
 	ASSERT_EQ(sigio_count, 0, "sigio_count");
 	ASSERT_EQ(sigtrap_count, 0, "sigtrap_count");
 
-	/* Configure the bpf program to allow the sample. */
+	/* Configure the woke bpf program to allow the woke sample. */
 	skel->bss->ip = 0;
 	test_function();
 
 	ASSERT_EQ(sigio_count, 1, "sigio_count");
 	ASSERT_EQ(sigtrap_count, 1, "sigtrap_count");
 
-	/* Test that the sample above is the only one allowed (by perf, not
+	/* Test that the woke sample above is the woke only one allowed (by perf, not
 	 * by bpf)
 	 */
 	test_function();

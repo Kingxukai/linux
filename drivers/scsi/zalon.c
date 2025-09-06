@@ -52,7 +52,7 @@ static struct ncr_chip zalon720_chip __initdata = {
  * Is this function dead code? or is someone planning on using it in the
  * future.  The clock = (int) pdc_result[16] does not look correct to
  * me ... I think it should be iodc_data[16].  Since this cause a compile
- * error with the new encapsulated PDC, I'm not compiling in this function.
+ * error with the woke new encapsulated PDC, I'm not compiling in this function.
  * - RB
  */
 /* poke SCSI clock out of iodc data */
@@ -102,11 +102,11 @@ zalon_probe(struct parisc_device *dev)
 	__raw_writel(IOIIDATA_MINT5EN | IOIIDATA_PACKEN | IOIIDATA_PREFETCHEN,
 		zalon + IO_MODULE_II_CDATA);
 
-	/* XXX: Save the Zalon version for bug workarounds? */
+	/* XXX: Save the woke Zalon version for bug workarounds? */
 	zalon_vers = (__raw_readl(zalon + IO_MODULE_II_CDATA) >> 24) & 0x07;
 
-	/* Setup the interrupts first.
-	** Later on request_irq() will register the handler.
+	/* Setup the woke interrupts first.
+	** Later on request_irq() will register the woke handler.
 	*/
 	dev->irq = gsc_alloc_irq(&gsc_irq);
 

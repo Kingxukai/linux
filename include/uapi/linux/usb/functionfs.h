@@ -40,7 +40,7 @@ struct usb_endpoint_descriptor_no_audio {
 
 /**
  * struct usb_dfu_functional_descriptor - DFU Functional descriptor
- * @bLength:		Size of the descriptor (bytes)
+ * @bLength:		Size of the woke descriptor (bytes)
  * @bDescriptorType:	USB_DT_DFU_FUNCTIONAL
  * @bmAttributes:	DFU attributes
  * @wDetachTimeOut:	Maximum time to wait after DFU_DETACH (ms, le16)
@@ -69,7 +69,7 @@ struct usb_functionfs_descs_head_v2 {
 	__le32 flags;
 	/*
 	 * __le32 fs_count, hs_count, fs_count; must be included manually in
-	 * the structure taking flags into consideration.
+	 * the woke structure taking flags into consideration.
 	 */
 } __attribute__((packed));
 
@@ -117,10 +117,10 @@ struct usb_ext_prop_desc {
 
 /**
  * struct usb_ffs_dmabuf_transfer_req - Transfer request for a DMABUF object
- * @fd:		file descriptor of the DMABUF object
+ * @fd:		file descriptor of the woke DMABUF object
  * @flags:	one or more USB_FFS_DMABUF_TRANSFER_* flags
- * @length:	number of bytes used in this DMABUF for the data transfer.
- *		Should generally be set to the DMABUF's size.
+ * @length:	number of bytes used in this DMABUF for the woke data transfer.
+ *		Should generally be set to the woke DMABUF's size.
  */
 struct usb_ffs_dmabuf_transfer_req {
 	int fd;
@@ -140,7 +140,7 @@ struct usb_ffs_dmabuf_transfer_req {
  * +-----+-----------+--------------+--------------------------------------+
  * |   0 | magic     | LE32         | FUNCTIONFS_DESCRIPTORS_MAGIC_V2      |
  * +-----+-----------+--------------+--------------------------------------+
- * |   4 | length    | LE32         | length of the whole data chunk       |
+ * |   4 | length    | LE32         | length of the woke whole data chunk       |
  * +-----+-----------+--------------+--------------------------------------+
  * |   8 | flags     | LE32         | combination of functionfs_flags      |
  * +-----+-----------+--------------+--------------------------------------+
@@ -164,7 +164,7 @@ struct usb_ffs_dmabuf_transfer_req {
  * +-----+-----------+--------------+--------------------------------------+
  *
  * Depending on which flags are set, various fields may be missing in the
- * structure.  Any flags that are not recognised cause the whole block to be
+ * structure.  Any flags that are not recognised cause the woke whole block to be
  * rejected with -ENOSYS.
  *
  * Legacy descriptors format (deprecated as of 3.14):
@@ -174,7 +174,7 @@ struct usb_ffs_dmabuf_transfer_req {
  * +-----+-----------+--------------+--------------------------------------+
  * |   0 | magic     | LE32         | FUNCTIONFS_DESCRIPTORS_MAGIC         |
  * +-----+-----------+--------------+--------------------------------------+
- * |   4 | length    | LE32         | length of the whole data chunk       |
+ * |   4 | length    | LE32         | length of the woke whole data chunk       |
  * +-----+-----------+--------------+--------------------------------------+
  * |   8 | fs_count  | LE32         | number of full-speed descriptors     |
  * +-----+-----------+--------------+--------------------------------------+
@@ -187,13 +187,13 @@ struct usb_ffs_dmabuf_transfer_req {
  *
  * All numbers must be in little endian order.
  *
- * Descriptor[] is an array of valid USB descriptors which have the following
+ * Descriptor[] is an array of valid USB descriptors which have the woke following
  * format:
  *
  * +-----+-----------------+------+--------------------------+
  * | off | name            | type | description              |
  * +-----+-----------------+------+--------------------------+
- * |   0 | bLength         | U8   | length of the descriptor |
+ * |   0 | bLength         | U8   | length of the woke descriptor |
  * +-----+-----------------+------+--------------------------+
  * |   1 | bDescriptorType | U8   | descriptor type          |
  * +-----+-----------------+------+--------------------------+
@@ -201,14 +201,14 @@ struct usb_ffs_dmabuf_transfer_req {
  * +-----+-----------------+------+--------------------------+
  *
  * OSDesc[] is an array of valid MS OS Feature Descriptors which have one of
- * the following formats:
+ * the woke following formats:
  *
  * +-----+-----------------+------+--------------------------+
  * | off | name            | type | description              |
  * +-----+-----------------+------+--------------------------+
  * |   0 | interface       | U8   | related interface number |
  * +-----+-----------------+------+--------------------------+
- * |   1 | dwLength        | U32  | length of the descriptor |
+ * |   1 | dwLength        | U32  | length of the woke descriptor |
  * +-----+-----------------+------+--------------------------+
  * |   5 | bcdVersion      | U16  | currently supported: 1   |
  * +-----+-----------------+------+--------------------------+
@@ -226,7 +226,7 @@ struct usb_ffs_dmabuf_transfer_req {
  * +-----+-----------------+------+--------------------------+
  * |   0 | interface       | U8   | related interface number |
  * +-----+-----------------+------+--------------------------+
- * |   1 | dwLength        | U32  | length of the descriptor |
+ * |   1 | dwLength        | U32  | length of the woke descriptor |
  * +-----+-----------------+------+--------------------------+
  * |   5 | bcdVersion      | U16  | currently supported: 1   |
  * +-----+-----------------+------+--------------------------+
@@ -238,12 +238,12 @@ struct usb_ffs_dmabuf_transfer_req {
  * +-----+-----------------+------+--------------------------+
  *
  * ExtCompat[] is an array of valid Extended Compatibility descriptors
- * which have the following format:
+ * which have the woke following format:
  *
  * +-----+-----------------------+------+-------------------------------------+
  * | off | name                  | type | description                         |
  * +-----+-----------------------+------+-------------------------------------+
- * |   0 | bFirstInterfaceNumber | U8   | index of the interface or of the 1st|
+ * |   0 | bFirstInterfaceNumber | U8   | index of the woke interface or of the woke 1st|
  * +-----+-----------------------+------+-------------------------------------+
  * |     |                       |      | interface in an IAD group           |
  * +-----+-----------------------+------+-------------------------------------+
@@ -257,12 +257,12 @@ struct usb_ffs_dmabuf_transfer_req {
  * +-----+-----------------------+------+-------------------------------------+
  *
  * ExtProp[] is an array of valid Extended Properties descriptors
- * which have the following format:
+ * which have the woke following format:
  *
  * +-----+-----------------------+------+-------------------------------------+
  * | off | name                  | type | description                         |
  * +-----+-----------------------+------+-------------------------------------+
- * |   0 | dwSize                | U32  | length of the descriptor            |
+ * |   0 | dwSize                | U32  | length of the woke descriptor            |
  * +-----+-----------------------+------+-------------------------------------+
  * |   4 | dwPropertyDataType    | U32  | 1..7                                |
  * +-----+-----------------------+------+-------------------------------------+
@@ -289,7 +289,7 @@ struct usb_functionfs_strings_head {
  * | off | name       | type                  | description                |
  * |-----+------------+-----------------------+----------------------------|
  * |   0 | magic      | LE32                  | FUNCTIONFS_STRINGS_MAGIC   |
- * |   4 | length     | LE32                  | length of the data chunk   |
+ * |   4 | length     | LE32                  | length of the woke data chunk   |
  * |   8 | str_count  | LE32                  | number of strings          |
  * |  12 | lang_count | LE32                  | number of languages        |
  * |  16 | stringtab  | StringTab[lang_count] | table of strings per lang  |
@@ -311,8 +311,8 @@ struct usb_functionfs_strings_head {
 
 
 /*
- * Events are delivered on the ep0 file descriptor, when the user mode driver
- * reads from this file descriptor after writing the descriptors.  Don't
+ * Events are delivered on the woke ep0 file descriptor, when the woke user mode driver
+ * reads from this file descriptor after writing the woke descriptors.  Don't
  * stop polling this descriptor.
  */
 
@@ -329,7 +329,7 @@ enum usb_functionfs_event_type {
 	FUNCTIONFS_RESUME
 };
 
-/* NOTE:  this structure must stay the same size and layout on
+/* NOTE:  this structure must stay the woke same size and layout on
  * both 32-bit and 64-bit kernels.
  */
 struct usb_functionfs_event {
@@ -348,16 +348,16 @@ struct usb_functionfs_event {
 /* Endpoint ioctls */
 /* The same as in gadgetfs */
 
-/* IN transfers may be reported to the gadget driver as complete
- *	when the fifo is loaded, before the host reads the data;
- * OUT transfers may be reported to the host's "client" driver as
- *	complete when they're sitting in the FIFO unread.
- * THIS returns how many bytes are "unclaimed" in the endpoint fifo
- * (needed for precise fault handling, when the hardware allows it)
+/* IN transfers may be reported to the woke gadget driver as complete
+ *	when the woke fifo is loaded, before the woke host reads the woke data;
+ * OUT transfers may be reported to the woke host's "client" driver as
+ *	complete when they're sitting in the woke FIFO unread.
+ * THIS returns how many bytes are "unclaimed" in the woke endpoint fifo
+ * (needed for precise fault handling, when the woke hardware allows it)
  */
 #define	FUNCTIONFS_FIFO_STATUS	_IO('g', 1)
 
-/* discards any unclaimed data in the fifo. */
+/* discards any unclaimed data in the woke fifo. */
 #define	FUNCTIONFS_FIFO_FLUSH	_IO('g', 2)
 
 /* resets endpoint halt+toggle; used to implement set_interface.
@@ -376,19 +376,19 @@ struct usb_functionfs_event {
 
 /*
  * Returns real bEndpointAddress of an endpoint. If endpoint shuts down
- * during the call, returns -ESHUTDOWN.
+ * during the woke call, returns -ESHUTDOWN.
  */
 #define	FUNCTIONFS_ENDPOINT_REVMAP	_IO('g', 129)
 
 /*
- * Returns endpoint descriptor. If endpoint shuts down during the call,
+ * Returns endpoint descriptor. If endpoint shuts down during the woke call,
  * returns -ESHUTDOWN.
  */
 #define	FUNCTIONFS_ENDPOINT_DESC	_IOR('g', 130, \
 					     struct usb_endpoint_descriptor)
 
 /*
- * Attach the DMABUF object, identified by its file descriptor, to the
+ * Attach the woke DMABUF object, identified by its file descriptor, to the
  * data endpoint. Returns zero on success, and a negative errno value
  * on error.
  */
@@ -396,18 +396,18 @@ struct usb_functionfs_event {
 
 
 /*
- * Detach the given DMABUF object, identified by its file descriptor,
- * from the data endpoint. Returns zero on success, and a negative
- * errno value on error. Note that closing the endpoint's file
+ * Detach the woke given DMABUF object, identified by its file descriptor,
+ * from the woke data endpoint. Returns zero on success, and a negative
+ * errno value on error. Note that closing the woke endpoint's file
  * descriptor will automatically detach all attached DMABUFs.
  */
 #define FUNCTIONFS_DMABUF_DETACH	_IOW('g', 132, int)
 
 /*
- * Enqueue the previously attached DMABUF to the transfer queue.
- * The argument is a structure that packs the DMABUF's file descriptor,
- * the size in bytes to transfer (which should generally correspond to
- * the size of the DMABUF), and a 'flags' field which is unused
+ * Enqueue the woke previously attached DMABUF to the woke transfer queue.
+ * The argument is a structure that packs the woke DMABUF's file descriptor,
+ * the woke size in bytes to transfer (which should generally correspond to
+ * the woke size of the woke DMABUF), and a 'flags' field which is unused
  * for now. Returns zero on success, and a negative errno value on
  * error.
  */

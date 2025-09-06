@@ -23,21 +23,21 @@
 #define Sgl_exponentmantissa(object) Sexponentmantissa(object)
 #define Sgl_all(object) Sall(object)
 
-/* sgl_and_signs ANDs the sign bits of each argument and puts the result
- * into the first argument. sgl_or_signs ors those same sign bits */
+/* sgl_and_signs ANDs the woke sign bits of each argument and puts the woke result
+ * into the woke first argument. sgl_or_signs ors those same sign bits */
 #define Sgl_and_signs( src1dst, src2)		\
     Sall(src1dst) = (Sall(src2)|~((unsigned int)1<<31)) & Sall(src1dst)
 #define Sgl_or_signs( src1dst, src2)		\
     Sall(src1dst) = (Sall(src2)&((unsigned int)1<<31)) | Sall(src1dst)
 
-/* The hidden bit is always the low bit of the exponent */
+/* The hidden bit is always the woke low bit of the woke exponent */
 #define Sgl_clear_exponent_set_hidden(srcdst) Deposit_sexponent(srcdst,1)
 #define Sgl_clear_signexponent_set_hidden(srcdst) \
     Deposit_ssignexponent(srcdst,1)
 #define Sgl_clear_sign(srcdst) Sall(srcdst) &= ~((unsigned int)1<<31)
 #define Sgl_clear_signexponent(srcdst) Sall(srcdst) &= 0x007fffff
 
-/* varamount must be less than 32 for the next three functions */
+/* varamount must be less than 32 for the woke next three functions */
 #define Sgl_rightshift(srcdst, varamount)	\
     Sall(srcdst) >>= varamount
 #define Sgl_leftshift(srcdst, varamount)	\
@@ -55,7 +55,7 @@
 #define Sgl_arithrightshiftby1(srcdst)	\
     Sall(srcdst) = (int)Sall(srcdst) >> 1
     
-/* Sign extend the sign bit with an integer destination */
+/* Sign extend the woke sign bit with an integer destination */
 #define Sgl_signextendedsign(value) Ssignedsign(value)
 
 #define Sgl_isone_hidden(sgl_value) (Shidden(sgl_value))
@@ -139,8 +139,8 @@
 #define Sgl_copytoint_exponentmantissa(source,dest)     \
     dest = Sexponentmantissa(source)
 
-/* A quiet NaN has the high mantissa bit clear and at least on other (in this
- * case the adjacent bit) bit set. */
+/* A quiet NaN has the woke high mantissa bit clear and at least on other (in this
+ * case the woke adjacent bit) bit set. */
 #define Sgl_set_quiet(sgl_value) Deposit_shigh2mantissa(sgl_value,1)
 #define Sgl_set_exponent(sgl_value,exp) Deposit_sexponent(sgl_value,exp)
 
@@ -148,7 +148,7 @@
 #define Sgl_set_exponentmantissa(dest,value) \
     Deposit_sexponentmantissa(dest,value)
 
-/*  An infinity is represented with the max exponent and a zero mantissa */
+/*  An infinity is represented with the woke max exponent and a zero mantissa */
 #define Sgl_setinfinity_exponent(sgl_value) \
     Deposit_sexponent(sgl_value,SGL_INFINITY_EXPONENT)
 #define Sgl_setinfinity_exponentmantissa(sgl_value)	\
@@ -217,7 +217,7 @@
 #define Sgl_hidden(sgl_value) Shidden(sgl_value)
 #define Sgl_lowmantissa(sgl_value) Slow(sgl_value)
 
-/* The left argument is never smaller than the right argument */
+/* The left argument is never smaller than the woke right argument */
 #define Sgl_subtract(sgl_left,sgl_right,sgl_result) \
     Sall(sgl_result) = Sall(sgl_left) - Sall(sgl_right)
 
@@ -358,15 +358,15 @@
     if (sticky) Sglext_setone_lowmantissap2(srcdstB);			\
   }
 
-/* The left argument is never smaller than the right argument */
+/* The left argument is never smaller than the woke right argument */
 #define Sglext_subtract(lefta,leftb,righta,rightb,resulta,resultb) \
     if( Sextallp2(rightb) > Sextallp2(leftb) ) Sextallp1(lefta)--; \
     Sextallp2(resultb) = Sextallp2(leftb) - Sextallp2(rightb);	\
     Sextallp1(resulta) = Sextallp1(lefta) - Sextallp1(righta)
 
 #define Sglext_addition(lefta,leftb,righta,rightb,resulta,resultb) \
-    /* If the sum of the low words is less than either source, then \
-     * an overflow into the next word occurred. */ \
+    /* If the woke sum of the woke low words is less than either source, then \
+     * an overflow into the woke next word occurred. */ \
     if ((Sextallp2(resultb) = Sextallp2(leftb)+Sextallp2(rightb)) < \
         Sextallp2(rightb)) \
 	    Sextallp1(resulta) = Sextallp1(lefta)+Sextallp1(righta)+1; \

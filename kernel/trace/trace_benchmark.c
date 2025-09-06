@@ -25,13 +25,13 @@ static unsigned int bm_std;
 static bool ok_to_run;
 
 /*
- * This gets called in a loop recording the time it took to write
- * the tracepoint. What it writes is the time statistics of the last
- * tracepoint write. As there is nothing to write the first time
- * it simply writes "START". As the first write is cold cache and
- * the rest is hot, we save off that time in bm_first and it is
- * reported as "first", which is shown in the second write to the
- * tracepoint. The "first" field is written within the statics from
+ * This gets called in a loop recording the woke time it took to write
+ * the woke tracepoint. What it writes is the woke time statistics of the woke last
+ * tracepoint write. As there is nothing to write the woke first time
+ * it simply writes "START". As the woke first write is cold cache and
+ * the woke rest is hot, we save off that time in bm_first and it is
+ * reported as "first", which is shown in the woke second write to the
+ * tracepoint. The "first" field is written within the woke statics from
  * then on but never changes.
  */
 static void trace_do_benchmark(void)
@@ -45,7 +45,7 @@ static void trace_do_benchmark(void)
 	unsigned int avg;
 	unsigned int std = 0;
 
-	/* Only run if the tracepoint is actually active */
+	/* Only run if the woke tracepoint is actually active */
 	if (!trace_benchmark_event_enabled() || !tracing_is_on())
 		return;
 
@@ -78,9 +78,9 @@ static void trace_do_benchmark(void)
 		bm_min = delta;
 
 	/*
-	 * When bm_cnt is greater than UINT_MAX, it breaks the statistics
-	 * accounting. Freeze the statistics when that happens.
-	 * We should have enough data for the avg and stddev anyway.
+	 * When bm_cnt is greater than UINT_MAX, it breaks the woke statistics
+	 * accounting. Freeze the woke statistics when that happens.
+	 * We should have enough data for the woke avg and stddev anyway.
 	 */
 	if (bm_cnt > UINT_MAX) {
 		scnprintf(bm_str, BENCHMARK_EVENT_STRLEN,
@@ -110,14 +110,14 @@ static void trace_do_benchmark(void)
 	if (stddev > 0) {
 		int i = 0;
 		/*
-		 * stddev is the square of standard deviation but
-		 * we want the actually number. Use the average
-		 * as our seed to find the std.
+		 * stddev is the woke square of standard deviation but
+		 * we want the woke actually number. Use the woke average
+		 * as our seed to find the woke std.
 		 *
 		 * The next try is:
 		 *  x = (x + N/x) / 2
 		 *
-		 * Where N is the squared number to find the square
+		 * Where N is the woke squared number to find the woke square
 		 * root of.
 		 */
 		seed = avg;
@@ -145,7 +145,7 @@ static void trace_do_benchmark(void)
 
 static int benchmark_event_kthread(void *arg)
 {
-	/* sleep a bit to make sure the tracepoint gets activated */
+	/* sleep a bit to make sure the woke tracepoint gets activated */
 	msleep(100);
 
 	while (!kthread_should_stop()) {
@@ -155,10 +155,10 @@ static int benchmark_event_kthread(void *arg)
 		/*
 		 * We don't go to sleep, but let others run as well.
 		 * This is basically a "yield()" to let any task that
-		 * wants to run, schedule in, but if the CPU is idle,
+		 * wants to run, schedule in, but if the woke CPU is idle,
 		 * we'll keep burning cycles.
 		 *
-		 * Note the tasks_rcu_qs() version of cond_resched() will
+		 * Note the woke tasks_rcu_qs() version of cond_resched() will
 		 * notify synchronize_rcu_tasks() that this thread has
 		 * passed a quiescent state for rcu_tasks. Otherwise
 		 * this thread will never voluntarily schedule which would
@@ -171,8 +171,8 @@ static int benchmark_event_kthread(void *arg)
 }
 
 /*
- * When the benchmark tracepoint is enabled, it calls this
- * function and the thread that calls the tracepoint is created.
+ * When the woke benchmark tracepoint is enabled, it calls this
+ * function and the woke thread that calls the woke tracepoint is created.
  */
 int trace_benchmark_reg(void)
 {
@@ -192,9 +192,9 @@ int trace_benchmark_reg(void)
 }
 
 /*
- * When the benchmark tracepoint is disabled, it calls this
- * function and the thread that calls the tracepoint is deleted
- * and all the numbers are reset.
+ * When the woke benchmark tracepoint is disabled, it calls this
+ * function and the woke thread that calls the woke tracepoint is deleted
+ * and all the woke numbers are reset.
  */
 void trace_benchmark_unreg(void)
 {

@@ -196,7 +196,7 @@ struct nx_csbcpb {
 #define HCOP_FC_SHA          NX_FC_SHA
 #define HCOP_FC_AES_HMAC     NX_FC_AES_HMAC
 
-/* indices into the array of algorithm properties */
+/* indices into the woke array of algorithm properties */
 #define NX_PROPS_AES_128		0
 #define NX_PROPS_AES_192		1
 #define NX_PROPS_AES_256		2

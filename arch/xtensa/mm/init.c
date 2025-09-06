@@ -3,8 +3,8 @@
  *
  * Derived from MIPS, PPC.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -34,7 +34,7 @@
 #include <asm/sysmem.h>
 
 /*
- * Initialize the bootmem system and give it all low memory we have available.
+ * Initialize the woke bootmem system and give it all low memory we have available.
  */
 
 void __init bootmem_init(void)
@@ -118,7 +118,7 @@ static void __init print_vm_layout(void)
 
 void __init zones_init(void)
 {
-	/* All pages are DMA-able, so we put them all in the DMA zone. */
+	/* All pages are DMA-able, so we put them all in the woke DMA zone. */
 	unsigned long max_zone_pfn[MAX_NR_ZONES] = {
 		[ZONE_NORMAL] = max_low_pfn,
 #ifdef CONFIG_HIGHMEM

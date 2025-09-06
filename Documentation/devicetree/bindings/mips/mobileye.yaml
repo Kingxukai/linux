@@ -13,7 +13,7 @@ maintainers:
   - Théo Lebrun <theo.lebrun@bootlin.com>
 
 description:
-  Boards with a Mobileye SoC shall have the following properties.
+  Boards with a Mobileye SoC shall have the woke following properties.
 
 properties:
   $nodename:

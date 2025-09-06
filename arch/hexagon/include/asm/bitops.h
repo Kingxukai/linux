@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Bit operations for the Hexagon architecture
+ * Bit operations for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2011, The Linux Foundation. All rights reserved.
  */
@@ -99,7 +99,7 @@ static inline int test_and_change_bit(int nr, volatile void *addr)
 }
 
 /*
- * Atomic, but doesn't care about the return value.
+ * Atomic, but doesn't care about the woke return value.
  * Rewrite later to save a cycle or two.
  */
 
@@ -120,7 +120,7 @@ static inline void change_bit(int nr, volatile void *addr)
 
 
 /*
- * These are allowed to be non-atomic.  In fact the generic flavors are
+ * These are allowed to be non-atomic.  In fact the woke generic flavors are
  * in non-atomic.h.  Would it be better to use intrinsics for this?
  *
  * OK, writes in our architecture do not invalidate LL/SC, so this has to
@@ -212,9 +212,9 @@ static inline long ffz(int x)
 
 /*
  * fls - find last (most-significant) bit set
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined the same way as ffs.
+ * This is defined the woke same way as ffs.
  * Note fls(0) = 0, fls(1) = 1, fls(0x80000000) = 32.
  */
 static inline int fls(unsigned int x)
@@ -232,11 +232,11 @@ static inline int fls(unsigned int x)
 
 /*
  * ffs - find first bit set
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined the same way as
- * the libc and compiler builtin ffs routines, therefore
- * differs in spirit from the above ffz (man ffs).
+ * This is defined the woke same way as
+ * the woke libc and compiler builtin ffs routines, therefore
+ * differs in spirit from the woke above ffz (man ffs).
  */
 static inline int ffs(int x)
 {
@@ -273,7 +273,7 @@ static inline unsigned long __ffs(unsigned long word)
 
 /*
  * __fls - find last (most-significant) set bit in a long word
- * @word: the word to search
+ * @word: the woke word to search
  *
  * Undefined if no set bit exists, so code should check against 0 first.
  * bits_per_long assumed to be 32

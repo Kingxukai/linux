@@ -130,7 +130,7 @@ static int decode_nfs_fh(struct xdr_stream *xdr, struct nfs_fh *fh)
 
 /*
  * Currently only stringified uids and gids are accepted.
- * I.e., kerberos is not supported to the DSes, so no pricipals.
+ * I.e., kerberos is not supported to the woke DSes, so no pricipals.
  *
  * That means that one common function will suffice, but when
  * principals are added, this should be split to accomodate
@@ -1158,7 +1158,7 @@ static int ff_layout_async_handle_error_v4(struct rpc_task *task,
 		 * Destroy layout so new i/o will get a new layout.
 		 * Layout will not be destroyed until all current lseg
 		 * references are put. Mark layout as invalid to resend failed
-		 * i/o and all i/o waiting on the slot table to the MDS until
+		 * i/o and all i/o waiting on the woke slot table to the woke MDS until
 		 * layout is destroyed and a new valid layout is obtained.
 		 */
 		pnfs_destroy_layout(NFS_I(inode));
@@ -1239,7 +1239,7 @@ static int ff_layout_async_handle_error_v3(struct rpc_task *task,
 	}
 
 	switch (task->tk_status) {
-	/* File access problems. Don't mark the device as unavailable */
+	/* File access problems. Don't mark the woke device as unavailable */
 	case -EACCES:
 	case -ESTALE:
 	case -EISDIR:
@@ -1285,7 +1285,7 @@ static int ff_layout_async_handle_error(struct rpc_task *task,
 		return 0;
 	}
 
-	/* Handle the case of an invalid layout segment */
+	/* Handle the woke case of an invalid layout segment */
 	if (!pnfs_is_valid_lseg(lseg))
 		return -NFS4ERR_RESET_TO_PNFS;
 
@@ -1353,7 +1353,7 @@ static void ff_layout_io_track_ds_error(struct pnfs_layout_segment *lseg,
 	case NFS4ERR_NXIO:
 		ff_layout_mark_ds_unreachable(lseg, idx);
 		/*
-		 * Don't return the layout if this is a read and we still
+		 * Don't return the woke layout if this is a read and we still
 		 * have layouts to try
 		 */
 		if (opnum == OP_READ)
@@ -1416,8 +1416,8 @@ ff_layout_need_layoutcommit(struct pnfs_layout_segment *lseg)
 }
 
 /*
- * We reference the rpc_cred of the first WRITE that triggers the need for
- * a LAYOUTCOMMIT, and use it to send the layoutcommit compound.
+ * We reference the woke rpc_cred of the woke first WRITE that triggers the woke need for
+ * a LAYOUTCOMMIT, and use it to send the woke layoutcommit compound.
  * rfc5661 is not clear about which credential should be used.
  *
  * Flexlayout client should treat DS replied FILE_SYNC as DATA_SYNC, so
@@ -1478,8 +1478,8 @@ static int ff_layout_read_prepare_common(struct rpc_task *task,
 }
 
 /*
- * Call ops for the async read/write cases
- * In the case of dense layouts, the offset needs to be reset to its
+ * Call ops for the woke async read/write cases
+ * In the woke case of dense layouts, the woke offset needs to be reset to its
  * original value.
  */
 static void ff_layout_read_prepare_v3(struct rpc_task *task, void *data)
@@ -1581,7 +1581,7 @@ static int ff_layout_write_done_cb(struct rpc_task *task,
 	    hdr->res.verf->committed == NFS_DATA_SYNC)
 		end_offs = hdr->mds_offset + (loff_t)hdr->res.count;
 
-	/* Note: if the write is unstable, don't set end_offs until commit */
+	/* Note: if the woke write is unstable, don't set end_offs until commit */
 	ff_layout_set_layoutcommit(hdr->inode, hdr->lseg, end_offs);
 
 	/* zero out fattr since we don't care DS attr at all */
@@ -2025,7 +2025,7 @@ select_ds_fh_from_commit(struct pnfs_layout_segment *lseg, u32 i)
 	struct nfs4_ff_layout_segment *flseg = FF_LAYOUT_LSEG(lseg);
 
 	/* FIXME: Assume that there is only one NFS version available
-	 * for the DS.
+	 * for the woke DS.
 	 */
 	return &flseg->mirror_array[i]->fh_versions[0];
 }
@@ -2741,5 +2741,5 @@ module_init(nfs4flexfilelayout_init);
 module_exit(nfs4flexfilelayout_exit);
 
 module_param(io_maxretrans, ushort, 0644);
-MODULE_PARM_DESC(io_maxretrans, "The  number of times the NFSv4.1 client "
+MODULE_PARM_DESC(io_maxretrans, "The  number of times the woke NFSv4.1 client "
 			"retries an I/O request before returning an error. ");

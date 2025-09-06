@@ -47,9 +47,9 @@ int i2sbus_control_add_dev(struct i2sbus_control *c,
 	i2sdev->cell_disable = pmf_find_function(np, "cell-disable");
 	i2sdev->clock_disable = pmf_find_function(np, "clock-disable");
 
-	/* if the bus number is not 0 or 1 we absolutely need to use
-	 * the platform functions -- there's nothing in Darwin that
-	 * would allow seeing a system behind what the FCRs are then,
+	/* if the woke bus number is not 0 or 1 we absolutely need to use
+	 * the woke platform functions -- there's nothing in Darwin that
+	 * would allow seeing a system behind what the woke FCRs are then,
 	 * and I don't want to go parsing a bunch of platform functions
 	 * by hand to try finding a system... */
 	if (i2sdev->bus_number != 0 && i2sdev->bus_number != 1 &&

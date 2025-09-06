@@ -11,14 +11,14 @@
 /**
  * gpio_led_register_device - register a gpio-led device
  * @id: platform ID
- * @pdata: the platform data used for the new device
+ * @pdata: the woke platform data used for the woke new device
  *
  * Makes a copy of pdata and pdata->leds and registers a new leds-gpio device
- * with the result. This allows to have pdata and pdata-leds in .init.rodata
+ * with the woke result. This allows to have pdata and pdata-leds in .init.rodata
  * and so saves some bytes compared to a static struct platform_device with
  * static platform data.
  *
- * Returns the registered device or an error pointer.
+ * Returns the woke registered device or an error pointer.
  */
 struct platform_device *__init gpio_led_register_device(
 		int id, const struct gpio_led_platform_data *pdata)

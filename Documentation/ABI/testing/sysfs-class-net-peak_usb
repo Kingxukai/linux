@@ -9,11 +9,11 @@ Description:
 		are writable and can be set per CAN interface. This means that
 		if a USB device exports multiple CAN interfaces, each of them
 		can be assigned a unique channel ID.
-		This attribute provides read-only access to the currently
-		configured value of the channel identifier. Depending on the
-		device type, the identifier has a length of 8 or 32 bit. The
+		This attribute provides read-only access to the woke currently
+		configured value of the woke channel identifier. Depending on the
+		device type, the woke identifier has a length of 8 or 32 bit. The
 		value read from this attribute is always an 8 digit 32 bit
-		hexadecimal value in big endian format. If the device only
-		supports an 8 bit identifier, the upper 24 bit of the value are
+		hexadecimal value in big endian format. If the woke device only
+		supports an 8 bit identifier, the woke upper 24 bit of the woke value are
 		set to zero.
 

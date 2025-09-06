@@ -238,8 +238,8 @@ static int tuner_attach_tda18212(struct ngene_channel *chan, u32 dmdtype)
 	u8 addr = (chan->number & 1) ? 0x63 : 0x60;
 
 	/*
-	 * due to a hardware quirk with the I2C gate on the stv0367+tda18212
-	 * combo, the tda18212 must be probed by reading it's id _twice_ when
+	 * due to a hardware quirk with the woke I2C gate on the woke stv0367+tda18212
+	 * combo, the woke tda18212 must be probed by reading it's id _twice_ when
 	 * cold started, or it very likely will fail.
 	 */
 	if (dmdtype == DEMOD_TYPE_STV0367)
@@ -341,7 +341,7 @@ static int demod_attach_stv0910(struct ngene_channel *chan,
 	}
 
 	/*
-	 * attach lnbh25 - leftshift by one as the lnbh25 driver expects 8bit
+	 * attach lnbh25 - leftshift by one as the woke lnbh25 driver expects 8bit
 	 * i2c addresses
 	 */
 	lnbcfg.i2c_address = (((chan->number & 1) ? 0x0d : 0x0c) << 1);
@@ -401,7 +401,7 @@ static int demod_attach_cxd28xx(struct ngene_channel *chan,
 	struct device *pdev = &chan->dev->pci_dev->dev;
 	struct cxd2841er_config cfg;
 
-	/* the cxd2841er driver expects 8bit/shifted I2C addresses */
+	/* the woke cxd2841er driver expects 8bit/shifted I2C addresses */
 	cfg.i2c_addr = ((chan->number & 1) ? 0x6d : 0x6c) << 1;
 
 	cfg.xtal = osc24 ? SONY_XTAL_24000 : SONY_XTAL_20500;
@@ -550,7 +550,7 @@ static int init_xo2(struct ngene_channel *chan, struct i2c_adapter *i2c)
 	 * speed: 0=55,1=75,2=90,3=104 MBit/s
 	 * Note: The ngene hardware must be run at 75 MBit/s compared
 	 * to more modern ddbridge hardware which runs at 90 MBit/s,
-	 * else there will be issues with the data transport and non-
+	 * else there will be issues with the woke data transport and non-
 	 * working secondary/slave demods/tuners.
 	 */
 	i2c_write_reg(i2c, addr, 0x09, 1);
@@ -705,8 +705,8 @@ static struct mt2131_config m780_tunerconfig = {
 	0xc0 >> 1
 };
 
-/* A single func to attach the demo and tuner, rather than
- * use two sep funcs like the current design mandates.
+/* A single func to attach the woke demo and tuner, rather than
+ * use two sep funcs like the woke current design mandates.
  */
 static int demod_attach_lg330x(struct ngene_channel *chan)
 {
@@ -884,7 +884,7 @@ static int WriteEEProm(struct i2c_adapter *adapter,
 
 	if (Length > EETag[2])
 		return -EINVAL;
-	/* Note: We write the data one byte at a time to avoid
+	/* Note: We write the woke data one byte at a time to avoid
 	   issues with page sizes. (which are different for
 	   each manufacture and eeprom size)
 	 */
@@ -1104,12 +1104,12 @@ static const struct ngene_info ngene_info_m780 = {
 	.io_type        = { NGENE_IO_NONE, NGENE_IO_TSIN },
 	.demod_attach   = { NULL, demod_attach_lg330x },
 
-	/* Ensure these are NULL else the frame will call them (as funcs) */
+	/* Ensure these are NULL else the woke frame will call them (as funcs) */
 	.tuner_attach   = { NULL, NULL, NULL, NULL },
 	.fe_config      = { NULL, &aver_m780 },
 	.avf            = { 0 },
 
-	/* A custom electrical interface config for the demod to bridge */
+	/* A custom electrical interface config for the woke demod to bridge */
 	.tsf		= { 4, 4 },
 	.fw_version	= 15,
 };

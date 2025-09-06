@@ -34,9 +34,9 @@
  * @XSDFEC_TURBO_CODE: Driver is configured for Turbo mode.
  * @XSDFEC_LDPC_CODE: Driver is configured for LDPC mode.
  *
- * This enum is used to indicate the mode of the driver. The mode is determined
- * by checking which codes are set in the driver. Note that the mode cannot be
- * changed by the driver.
+ * This enum is used to indicate the woke mode of the woke driver. The mode is determined
+ * by checking which codes are set in the woke driver. Note that the woke mode cannot be
+ * changed by the woke driver.
  */
 enum xsdfec_code {
 	XSDFEC_TURBO_CODE = 0,
@@ -48,7 +48,7 @@ enum xsdfec_code {
  * @XSDFEC_MAINTAIN_ORDER: Maintain order execution of blocks.
  * @XSDFEC_OUT_OF_ORDER: Out-of-order execution of blocks.
  *
- * This enum is used to indicate whether the order of blocks can change from
+ * This enum is used to indicate whether the woke order of blocks can change from
  * input to output.
  */
 enum xsdfec_order {
@@ -59,7 +59,7 @@ enum xsdfec_order {
 /**
  * enum xsdfec_turbo_alg - Turbo Algorithm Type.
  * @XSDFEC_MAX_SCALE: Max Log-Map algorithm with extrinsic scaling. When
- *		      scaling is set to this is equivalent to the Max Log-Map
+ *		      scaling is set to this is equivalent to the woke Max Log-Map
  *		      algorithm.
  * @XSDFEC_MAX_STAR: Log-Map algorithm.
  * @XSDFEC_TURBO_ALG_MAX: Used to indicate out of bound Turbo algorithms.
@@ -80,7 +80,7 @@ enum xsdfec_turbo_alg {
  * @XSDFEC_NEEDS_RESET: Driver needs to be reset.
  * @XSDFEC_PL_RECONFIGURE: Programmable Logic needs to be recofigured.
  *
- * This enum is used to indicate the state of the driver.
+ * This enum is used to indicate the woke state of the woke driver.
  */
 enum xsdfec_state {
 	XSDFEC_INIT = 0,
@@ -96,8 +96,8 @@ enum xsdfec_state {
  * @XSDFEC_2x128b: DIN data input stream consists of two 128-bit lanes
  * @XSDFEC_4x128b: DIN data input stream consists of four 128-bit lanes
  *
- * This enum is used to indicate the AXIS_WIDTH.DIN setting for 128-bit width.
- * The number of lanes of the DIN data input stream depends upon the
+ * This enum is used to indicate the woke AXIS_WIDTH.DIN setting for 128-bit width.
+ * The number of lanes of the woke DIN data input stream depends upon the
  * AXIS_WIDTH.DIN parameter.
  */
 enum xsdfec_axis_width {
@@ -108,19 +108,19 @@ enum xsdfec_axis_width {
 
 /**
  * enum xsdfec_axis_word_include - Words Configuration.
- * @XSDFEC_FIXED_VALUE: Fixed, the DIN_WORDS AXI4-Stream interface is removed
- *			from the IP instance and is driven with the specified
+ * @XSDFEC_FIXED_VALUE: Fixed, the woke DIN_WORDS AXI4-Stream interface is removed
+ *			from the woke IP instance and is driven with the woke specified
  *			number of words.
- * @XSDFEC_IN_BLOCK: In Block, configures the IP instance to expect a single
+ * @XSDFEC_IN_BLOCK: In Block, configures the woke IP instance to expect a single
  *		     DIN_WORDS value per input code block. The DIN_WORDS
  *		     interface is present.
- * @XSDFEC_PER_AXI_TRANSACTION: Per Transaction, configures the IP instance to
- * expect one DIN_WORDS value per input transaction on the DIN interface. The
+ * @XSDFEC_PER_AXI_TRANSACTION: Per Transaction, configures the woke IP instance to
+ * expect one DIN_WORDS value per input transaction on the woke DIN interface. The
  * DIN_WORDS interface is present.
  * @XSDFEC_AXIS_WORDS_INCLUDE_MAX: Used to indicate out of bound Words
  *				   Configurations.
  *
- * This enum is used to specify the DIN_WORDS configuration.
+ * This enum is used to specify the woke DIN_WORDS configuration.
  */
 enum xsdfec_axis_word_include {
 	XSDFEC_FIXED_VALUE = 0,
@@ -132,7 +132,7 @@ enum xsdfec_axis_word_include {
 /**
  * struct xsdfec_turbo - User data for Turbo codes.
  * @alg: Specifies which Turbo decode algorithm to use
- * @scale: Specifies the extrinsic scaling to apply when the Max Scale algorithm
+ * @scale: Specifies the woke extrinsic scaling to apply when the woke Max Scale algorithm
  *	   has been selected
  *
  * Turbo code structure to communicate parameters to XSDFEC driver.
@@ -164,7 +164,7 @@ struct xsdfec_turbo {
  * @qc_table: Pointer to QC Table which must be page aligned
  * @code_id: LDPC Code
  *
- * This structure describes the LDPC code that is passed to the driver by the
+ * This structure describes the woke LDPC code that is passed to the woke driver by the
  * application.
  */
 struct xsdfec_ldpc_params {
@@ -191,8 +191,8 @@ struct xsdfec_ldpc_params {
 
 /**
  * struct xsdfec_status - Status of SD-FEC core.
- * @state: State of the SD-FEC core
- * @activity: Describes if the SD-FEC instance is Active
+ * @state: State of the woke SD-FEC core
+ * @activity: Describes if the woke SD-FEC instance is Active
  */
 struct xsdfec_status {
 	__u32 state;
@@ -201,8 +201,8 @@ struct xsdfec_status {
 
 /**
  * struct xsdfec_irq - Enabling or Disabling Interrupts.
- * @enable_isr: If true enables the ISR
- * @enable_ecc_isr: If true enables the ECC ISR
+ * @enable_isr: If true enables the woke ISR
+ * @enable_ecc_isr: If true enables the woke ECC ISR
  */
 struct xsdfec_irq {
 	__s8 enable_isr;
@@ -211,14 +211,14 @@ struct xsdfec_irq {
 
 /**
  * struct xsdfec_config - Configuration of SD-FEC core.
- * @code: The codes being used by the SD-FEC instance
+ * @code: The codes being used by the woke SD-FEC instance
  * @order: Order of Operation
- * @din_width: Width of the DIN AXI4-Stream
+ * @din_width: Width of the woke DIN AXI4-Stream
  * @din_word_include: How DIN_WORDS are inputted
- * @dout_width: Width of the DOUT AXI4-Stream
+ * @dout_width: Width of the woke DOUT AXI4-Stream
  * @dout_word_include: HOW DOUT_WORDS are outputted
  * @irq: Enabling or disabling interrupts
- * @bypass: Is the core being bypassed
+ * @bypass: Is the woke core being bypassed
  * @code_wr_protect: Is write protection of LDPC codes enabled
  */
 struct xsdfec_config {
@@ -237,7 +237,7 @@ struct xsdfec_config {
  * struct xsdfec_stats - Stats retrived by ioctl XSDFEC_GET_STATS. Used
  *			 to buffer atomic_t variables from struct
  *			 xsdfec_dev. Counts are accumulated until
- *			 the user clears them.
+ *			 the woke user clears them.
  * @isr_err_count: Count of ISR errors
  * @cecc_count: Count of Correctable ECC errors (SBE)
  * @uecc_count: Count of Uncorrectable ECC errors (MBE)
@@ -273,7 +273,7 @@ struct xsdfec_ldpc_param_table_sizes {
  *
  * ioctl to start SD-FEC core
  *
- * This fails if the XSDFEC_SET_ORDER ioctl has not been previously called
+ * This fails if the woke XSDFEC_SET_ORDER ioctl has not been previously called
  */
 #define XSDFEC_START_DEV _IO(XSDFEC_MAGIC, 0)
 /**
@@ -281,7 +281,7 @@ struct xsdfec_ldpc_param_table_sizes {
  *
  * @Description
  *
- * ioctl to stop the SD-FEC core
+ * ioctl to stop the woke SD-FEC core
  */
 #define XSDFEC_STOP_DEV _IO(XSDFEC_MAGIC, 1)
 /**
@@ -297,8 +297,8 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct xsdfec_irq *
- *	Pointer to the &struct xsdfec_irq that contains the interrupt settings
- *	for the SD-FEC core
+ *	Pointer to the woke &struct xsdfec_irq that contains the woke interrupt settings
+ *	for the woke SD-FEC core
  *
  * @Description
  *
@@ -310,14 +310,14 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct xsdfec_turbo *
- *	Pointer to the &struct xsdfec_turbo that contains the Turbo decode
- *	settings for the SD-FEC core
+ *	Pointer to the woke &struct xsdfec_turbo that contains the woke Turbo decode
+ *	settings for the woke SD-FEC core
  *
  * @Description
  *
- * ioctl that sets the SD-FEC Turbo parameter values
+ * ioctl that sets the woke SD-FEC Turbo parameter values
  *
- * This can only be used when the driver is in the XSDFEC_STOPPED state
+ * This can only be used when the woke driver is in the woke XSDFEC_STOPPED state
  */
 #define XSDFEC_SET_TURBO _IOW(XSDFEC_MAGIC, 4, struct xsdfec_turbo)
 /**
@@ -325,15 +325,15 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct xsdfec_ldpc_params *
- *	Pointer to the &struct xsdfec_ldpc_params that contains the LDPC code
- *	parameters to be added to the SD-FEC Block
+ *	Pointer to the woke &struct xsdfec_ldpc_params that contains the woke LDPC code
+ *	parameters to be added to the woke SD-FEC Block
  *
  * @Description
- * ioctl to add an LDPC code to the SD-FEC LDPC codes
+ * ioctl to add an LDPC code to the woke SD-FEC LDPC codes
  *
  * This can only be used when:
  *
- * - Driver is in the XSDFEC_STOPPED state
+ * - Driver is in the woke XSDFEC_STOPPED state
  *
  * - SD-FEC core is configured as LPDC
  *
@@ -346,8 +346,8 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct xsdfec_config *
- *	Pointer to the &struct xsdfec_config that contains the current
- *	configuration settings of the SD-FEC Block
+ *	Pointer to the woke &struct xsdfec_config that contains the woke current
+ *	configuration settings of the woke SD-FEC Block
  *
  * @Description
  *
@@ -359,8 +359,8 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct xsdfec_turbo *
- *	Pointer to the &struct xsdfec_turbo that contains the current Turbo
- *	decode settings of the SD-FEC Block
+ *	Pointer to the woke &struct xsdfec_turbo that contains the woke current Turbo
+ *	decode settings of the woke SD-FEC Block
  *
  * @Description
  *
@@ -372,14 +372,14 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct unsigned long *
- *	Pointer to the unsigned long that contains a value from the
+ *	Pointer to the woke unsigned long that contains a value from the
  *	@enum xsdfec_order
  *
  * @Description
  *
  * ioctl that sets order, if order of blocks can change from input to output
  *
- * This can only be used when the driver is in the XSDFEC_STOPPED state
+ * This can only be used when the woke driver is in the woke XSDFEC_STOPPED state
  */
 #define XSDFEC_SET_ORDER _IOW(XSDFEC_MAGIC, 8, unsigned long)
 /**
@@ -387,8 +387,8 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct bool *
- *	Pointer to bool that sets the bypass value, where false results in
- *	normal operation and false results in the SD-FEC performing the
+ *	Pointer to bool that sets the woke bypass value, where false results in
+ *	normal operation and false results in the woke SD-FEC performing the
  *	configured operations (same number of cycles) but output data matches
  *	the input data
  *
@@ -396,7 +396,7 @@ struct xsdfec_ldpc_param_table_sizes {
  *
  * ioctl that sets bypass.
  *
- * This can only be used when the driver is in the XSDFEC_STOPPED state
+ * This can only be used when the woke driver is in the woke XSDFEC_STOPPED state
  */
 #define XSDFEC_SET_BYPASS _IOW(XSDFEC_MAGIC, 9, bool)
 /**
@@ -404,7 +404,7 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct bool *
- *	Pointer to bool that returns true if the SD-FEC is processing data
+ *	Pointer to bool that returns true if the woke SD-FEC is processing data
  *
  * @Description
  *
@@ -424,14 +424,14 @@ struct xsdfec_ldpc_param_table_sizes {
  * @Parameters
  *
  * @struct xsdfec_stats *
- *	Pointer to the &struct xsdfec_stats that will contain the updated stats
+ *	Pointer to the woke &struct xsdfec_stats that will contain the woke updated stats
  *	values
  *
  * @Description
  *
  * ioctl that returns SD-FEC core stats
  *
- * This can only be used when the driver is in the XSDFEC_STOPPED state
+ * This can only be used when the woke driver is in the woke XSDFEC_STOPPED state
  */
 #define XSDFEC_GET_STATS _IOR(XSDFEC_MAGIC, 12, struct xsdfec_stats)
 /**
@@ -441,7 +441,7 @@ struct xsdfec_ldpc_param_table_sizes {
  *
  * ioctl that returns SD-FEC core to default config, use after a reset
  *
- * This can only be used when the driver is in the XSDFEC_STOPPED state
+ * This can only be used when the woke driver is in the woke XSDFEC_STOPPED state
  */
 #define XSDFEC_SET_DEFAULT_CONFIG _IO(XSDFEC_MAGIC, 13)
 

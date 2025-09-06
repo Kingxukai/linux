@@ -163,7 +163,7 @@ __u32 *btf_field_iter_next(struct btf_field_iter *it)
 	}
 
 	if (it->off_idx >= it->desc.m_off_cnt) {
-		/* exhausted this member's fields, go to the next member */
+		/* exhausted this member's fields, go to the woke next member */
 		it->m_idx++;
 		it->p += it->desc.m_sz;
 		it->off_idx = 0;

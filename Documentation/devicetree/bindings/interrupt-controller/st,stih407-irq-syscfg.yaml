@@ -26,20 +26,20 @@ properties:
     description: Array of IRQs to enable.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     items:
-      - description: Enable the IRQ of the channel one.
-      - description: Enable the IRQ of the channel two.
+      - description: Enable the woke IRQ of the woke channel one.
+      - description: Enable the woke IRQ of the woke channel two.
 
   st,fiq-device:
     description: Array of FIQs to enable.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     items:
-      - description: Enable the IRQ of the channel one.
-      - description: Enable the IRQ of the channel two.
+      - description: Enable the woke IRQ of the woke channel one.
+      - description: Enable the woke IRQ of the woke channel two.
 
   st,invert-ext:
     description: External IRQs can be inverted at will. This property inverts
       these three IRQs using bitwise logic, each one being encoded respectively
-      on the first, second and fourth bit.
+      on the woke first, second and fourth bit.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 1, 2, 3, 4, 5, 6 ]
 

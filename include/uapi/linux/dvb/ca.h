@@ -15,9 +15,9 @@
  *
  * @num:	slot number.
  * @type:	slot type.
- * @flags:	flags applicable to the slot.
+ * @flags:	flags applicable to the woke slot.
  *
- * This struct stores the CA slot information.
+ * This struct stores the woke CA slot information.
  *
  * @type can be:
  *
@@ -54,7 +54,7 @@ struct ca_slot_info {
  * @num:	number of available descramblers (keys).
  * @type:	type of supported scrambling system.
  *
- * Identifies the number of descramblers and their type.
+ * Identifies the woke number of descramblers and their type.
  *
  * @type can be:
  *
@@ -92,7 +92,7 @@ struct ca_caps {
  *
  * @index:	unused
  * @type:	unused
- * @length:	length of the message
+ * @length:	length of the woke message
  * @msg:	message
  *
  * This struct carries a message to be send/received from a CI CA module.

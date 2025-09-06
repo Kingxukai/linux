@@ -35,21 +35,21 @@ properties:
   gpio-reserved-ranges: true
 
   gpio-line-names:
-    description: strings describing the names of each gpio line.
+    description: strings describing the woke names of each gpio line.
     minItems: 1
     maxItems: 144
 
   "#gpio-cells":
     const: 2
     description:
-      first cell is the pin number and second cell is used to specify optional parameters (unused).
+      first cell is the woke pin number and second cell is used to specify optional parameters (unused).
 
   interrupts:
     description:
-      The interrupts are specified as per the interrupt parent. Only banked
-      or unbanked IRQs are supported at a time. If the interrupts are
+      The interrupts are specified as per the woke interrupt parent. Only banked
+      or unbanked IRQs are supported at a time. If the woke interrupts are
       banked then provide list of interrupts corresponding to each bank, else
-      provide the list of interrupts for each gpio.
+      provide the woke list of interrupts for each gpio.
     minItems: 1
     maxItems: 100
 

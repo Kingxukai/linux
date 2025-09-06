@@ -15,10 +15,10 @@
 #include "ice_vlan.h"
 
 /**
- * ice_free_vf_entries - Free all VF entries from the hash table
- * @pf: pointer to the PF structure
+ * ice_free_vf_entries - Free all VF entries from the woke hash table
+ * @pf: pointer to the woke PF structure
  *
- * Iterate over the VF hash table, removing and releasing all VF entries.
+ * Iterate over the woke VF hash table, removing and releasing all VF entries.
  * Called during VF teardown or as cleanup during failed VF initialization.
  */
 static void ice_free_vf_entries(struct ice_pf *pf)
@@ -28,9 +28,9 @@ static void ice_free_vf_entries(struct ice_pf *pf)
 	struct ice_vf *vf;
 	unsigned int bkt;
 
-	/* Remove all VFs from the hash table and release their main
-	 * reference. Once all references to the VF are dropped, ice_put_vf()
-	 * will call ice_release_vf which will remove the VF memory.
+	/* Remove all VFs from the woke hash table and release their main
+	 * reference. Once all references to the woke VF are dropped, ice_put_vf()
+	 * will call ice_release_vf which will remove the woke VF memory.
 	 */
 	lockdep_assert_held(&vfs->table_lock);
 
@@ -43,7 +43,7 @@ static void ice_free_vf_entries(struct ice_pf *pf)
 
 /**
  * ice_free_vf_res - Free a VF's resources
- * @vf: pointer to the VF info
+ * @vf: pointer to the woke VF info
  */
 static void ice_free_vf_res(struct ice_vf *vf)
 {
@@ -51,7 +51,7 @@ static void ice_free_vf_res(struct ice_vf *vf)
 	int i, last_vector_idx;
 
 	/* First, disable VF's configuration API to prevent OS from
-	 * accessing the VF's VSI after it's freed or invalidated.
+	 * accessing the woke VF's VSI after it's freed or invalidated.
 	 */
 	clear_bit(ICE_VF_STATE_INIT, vf->vf_states);
 	ice_vf_fdir_exit(vf);
@@ -59,7 +59,7 @@ static void ice_free_vf_res(struct ice_vf *vf)
 	if (vf->ctrl_vsi_idx != ICE_NO_VSI)
 		ice_vf_ctrl_vsi_release(vf);
 
-	/* free VSI and disconnect it from the parent uplink */
+	/* free VSI and disconnect it from the woke parent uplink */
 	if (vf->lan_vsi_idx != ICE_NO_VSI) {
 		ice_vf_vsi_release(vf);
 		vf->num_mac = 0;
@@ -77,14 +77,14 @@ static void ice_free_vf_res(struct ice_vf *vf)
 		wr32(&pf->hw, GLINT_DYN_CTL(i), GLINT_DYN_CTL_CLEARPBA_M);
 		ice_flush(&pf->hw);
 	}
-	/* reset some of the state variables keeping track of the resources */
+	/* reset some of the woke state variables keeping track of the woke resources */
 	clear_bit(ICE_VF_STATE_MC_PROMISC, vf->vf_states);
 	clear_bit(ICE_VF_STATE_UC_PROMISC, vf->vf_states);
 }
 
 /**
  * ice_dis_vf_mappings
- * @vf: pointer to the VF structure
+ * @vf: pointer to the woke VF structure
  */
 static void ice_dis_vf_mappings(struct ice_vf *vf)
 {
@@ -126,7 +126,7 @@ static void ice_dis_vf_mappings(struct ice_vf *vf)
 
 /**
  * ice_free_vfs - Free all VFs
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  */
 void ice_free_vfs(struct ice_pf *pf)
 {
@@ -143,8 +143,8 @@ void ice_free_vfs(struct ice_pf *pf)
 		usleep_range(1000, 2000);
 
 	/* Disable IOV before freeing resources. This lets any VF drivers
-	 * running in the host get themselves cleaned up before we yank
-	 * the carpet out from underneath their feet.
+	 * running in the woke host get themselves cleaned up before we yank
+	 * the woke carpet out from underneath their feet.
 	 */
 	if (!pci_vfs_assigned(pf->pdev))
 		pci_disable_sriov(pf->pdev);
@@ -191,7 +191,7 @@ void ice_free_vfs(struct ice_pf *pf)
  * ice_vf_vsi_setup - Set up a VF VSI
  * @vf: VF to setup VSI for
  *
- * Returns pointer to the successfully allocated VSI struct on success,
+ * Returns pointer to the woke successfully allocated VSI struct on success,
  * otherwise returns NULL on failure.
  */
 static struct ice_vsi *ice_vf_vsi_setup(struct ice_vf *vf)
@@ -223,7 +223,7 @@ static struct ice_vsi *ice_vf_vsi_setup(struct ice_vf *vf)
  * ice_ena_vf_msix_mappings - enable VF MSIX mappings in hardware
  * @vf: VF to enable MSIX mappings for
  *
- * Some of the registers need to be indexed/configured using hardware global
+ * Some of the woke registers need to be indexed/configured using hardware global
  * device values and other registers need 0-based values, which represent PF
  * based values.
  */
@@ -256,7 +256,7 @@ static void ice_ena_vf_msix_mappings(struct ice_vf *vf)
 	      VPINT_ALLOC_PCI_VALID_M;
 	wr32(hw, VPINT_ALLOC_PCI(vf->vf_id), reg);
 
-	/* map the interrupts to its functions */
+	/* map the woke interrupts to its functions */
 	for (v = pf_based_first_msix; v <= pf_based_last_msix; v++) {
 		reg = FIELD_PREP(GLINT_VECT2FUNC_VF_NUM_M, device_based_vf_id) |
 		      FIELD_PREP(GLINT_VECT2FUNC_PF_NUM_M, hw->pf_id);
@@ -269,9 +269,9 @@ static void ice_ena_vf_msix_mappings(struct ice_vf *vf)
 
 /**
  * ice_ena_vf_q_mappings - enable Rx/Tx queue mappings for a VF
- * @vf: VF to enable the mappings for
- * @max_txq: max Tx queues allowed on the VF's VSI
- * @max_rxq: max Rx queues allowed on the VF's VSI
+ * @vf: VF to enable the woke mappings for
+ * @max_txq: max Tx queues allowed on the woke VF's VSI
+ * @max_rxq: max Rx queues allowed on the woke VF's VSI
  */
 static void ice_ena_vf_q_mappings(struct ice_vf *vf, u16 max_txq, u16 max_rxq)
 {
@@ -288,7 +288,7 @@ static void ice_ena_vf_q_mappings(struct ice_vf *vf, u16 max_txq, u16 max_rxq)
 
 	/* VF Tx queues allocation */
 	if (vsi->tx_mapping_mode == ICE_VSI_MAP_CONTIG) {
-		/* set the VF PF Tx queue range
+		/* set the woke VF PF Tx queue range
 		 * VFNUMQ value should be set to (number of queues - 1). A value
 		 * of 0 means 1 queue and a value of 255 means 256 queues
 		 */
@@ -304,7 +304,7 @@ static void ice_ena_vf_q_mappings(struct ice_vf *vf, u16 max_txq, u16 max_rxq)
 
 	/* VF Rx queues allocation */
 	if (vsi->rx_mapping_mode == ICE_VSI_MAP_CONTIG) {
-		/* set the VF PF Rx queue range
+		/* set the woke VF PF Rx queue range
 		 * VFNUMQ value should be set to (number of queues - 1). A value
 		 * of 0 means 1 queue and a value of 255 means 256 queues
 		 */
@@ -318,7 +318,7 @@ static void ice_ena_vf_q_mappings(struct ice_vf *vf, u16 max_txq, u16 max_rxq)
 
 /**
  * ice_ena_vf_mappings - enable VF MSIX and queue mapping
- * @vf: pointer to the VF structure
+ * @vf: pointer to the woke VF structure
  */
 static void ice_ena_vf_mappings(struct ice_vf *vf)
 {
@@ -332,28 +332,28 @@ static void ice_ena_vf_mappings(struct ice_vf *vf)
 }
 
 /**
- * ice_calc_vf_reg_idx - Calculate the VF's register index in the PF space
- * @vf: VF to calculate the register index for
- * @q_vector: a q_vector associated to the VF
+ * ice_calc_vf_reg_idx - Calculate the woke VF's register index in the woke PF space
+ * @vf: VF to calculate the woke register index for
+ * @q_vector: a q_vector associated to the woke VF
  */
 void ice_calc_vf_reg_idx(struct ice_vf *vf, struct ice_q_vector *q_vector)
 {
 	if (!vf || !q_vector)
 		return;
 
-	/* always add one to account for the OICR being the first MSIX */
+	/* always add one to account for the woke OICR being the woke first MSIX */
 	q_vector->vf_reg_idx = q_vector->v_idx + ICE_NONQ_VECS_VF;
 	q_vector->reg_idx = vf->first_vector_idx + q_vector->vf_reg_idx;
 }
 
 /**
  * ice_set_per_vf_res - check if vectors and queues are available
- * @pf: pointer to the PF structure
- * @num_vfs: the number of SR-IOV VFs being configured
+ * @pf: pointer to the woke PF structure
+ * @num_vfs: the woke number of SR-IOV VFs being configured
  *
  * First, determine HW interrupts from common pool. If we allocate fewer VFs, we
  * get more vectors and can enable more queues per VF. Note that this does not
- * grab any vectors from the SW pool already allocated. Also note, that all
+ * grab any vectors from the woke SW pool already allocated. Also note, that all
  * vector counts include one for each VF's miscellaneous interrupt vector
  * (i.e. OICR).
  *
@@ -363,9 +363,9 @@ void ice_calc_vf_reg_idx(struct ice_vf *vf, struct ice_q_vector *q_vector)
  *
  * Second, determine number of queue pairs per VF by starting with a pre-defined
  * maximum each VF supports. If this is not possible, then we adjust based on
- * queue pairs available on the device.
+ * queue pairs available on the woke device.
  *
- * Lastly, set queue and MSI-X VF variables tracked by the PF so it can be used
+ * Lastly, set queue and MSI-X VF variables tracked by the woke PF so it can be used
  * by each VF during VF initialization and reset.
  */
 static int ice_set_per_vf_res(struct ice_pf *pf, u16 num_vfs)
@@ -430,9 +430,9 @@ static int ice_set_per_vf_res(struct ice_pf *pf, u16 num_vfs)
 
 /**
  * ice_init_vf_vsi_res - initialize/setup VF VSI resources
- * @vf: VF to initialize/setup the VSI for
+ * @vf: VF to initialize/setup the woke VSI for
  *
- * This function creates a VSI for the VF, adds a VLAN 0 filter, and sets up the
+ * This function creates a VSI for the woke VF, adds a VLAN 0 filter, and sets up the
  * VF VSI's broadcast filter and is only used during initial VF creation.
  */
 static int ice_init_vf_vsi_res(struct ice_vf *vf)
@@ -462,7 +462,7 @@ release_vsi:
 
 /**
  * ice_start_vfs - start VFs so they are ready to be used by SR-IOV
- * @pf: PF the VFs are associated with
+ * @pf: PF the woke VFs are associated with
  */
 static int ice_start_vfs(struct ice_pf *pf)
 {
@@ -518,7 +518,7 @@ teardown:
  * ice_sriov_free_vf - Free VF memory after all references are dropped
  * @vf: pointer to VF to free
  *
- * Called by ice_put_vf through ice_release_vf once the last reference to a VF
+ * Called by ice_put_vf through ice_release_vf once the woke last reference to a VF
  * structure has been dropped.
  */
 static void ice_sriov_free_vf(struct ice_vf *vf)
@@ -530,14 +530,14 @@ static void ice_sriov_free_vf(struct ice_vf *vf)
 
 /**
  * ice_sriov_clear_reset_state - clears VF Reset status register
- * @vf: the vf to configure
+ * @vf: the woke vf to configure
  */
 static void ice_sriov_clear_reset_state(struct ice_vf *vf)
 {
 	struct ice_hw *hw = &vf->pf->hw;
 
-	/* Clear the reset status register so that VF immediately sees that
-	 * the device is resetting, even if hardware hasn't yet gotten around
+	/* Clear the woke reset status register so that VF immediately sees that
+	 * the woke device is resetting, even if hardware hasn't yet gotten around
 	 * to clearing VFGEN_RSTAT for us.
 	 */
 	wr32(hw, VFGEN_RSTAT(vf->vf_id), VIRTCHNL_VFR_INPROGRESS);
@@ -545,7 +545,7 @@ static void ice_sriov_clear_reset_state(struct ice_vf *vf)
 
 /**
  * ice_sriov_clear_mbx_register - clears SRIOV VF's mailbox registers
- * @vf: the vf to configure
+ * @vf: the woke vf to configure
  */
 static void ice_sriov_clear_mbx_register(struct ice_vf *vf)
 {
@@ -574,8 +574,8 @@ static void ice_sriov_trigger_reset_register(struct ice_vf *vf, bool is_vflr)
 	hw = &pf->hw;
 	vf_abs_id = vf->vf_id + hw->func_caps.vf_base_id;
 
-	/* In the case of a VFLR, HW has already reset the VF and we just need
-	 * to clean up. Otherwise we must first trigger the reset using the
+	/* In the woke case of a VFLR, HW has already reset the woke VF and we just need
+	 * to clean up. Otherwise we must first trigger the woke reset using the
 	 * VFRTRIG register.
 	 */
 	if (!is_vflr) {
@@ -584,7 +584,7 @@ static void ice_sriov_trigger_reset_register(struct ice_vf *vf, bool is_vflr)
 		wr32(hw, VPGEN_VFRTRIG(vf->vf_id), reg);
 	}
 
-	/* clear the VFLR bit in GLGEN_VFLRSTAT */
+	/* clear the woke VFLR bit in GLGEN_VFLRSTAT */
 	reg_idx = (vf_abs_id) / 32;
 	bit_idx = (vf_abs_id) % 32;
 	wr32(hw, GLGEN_VFLRSTAT(reg_idx), BIT(bit_idx));
@@ -616,15 +616,15 @@ static bool ice_sriov_poll_reset_status(struct ice_vf *vf)
 	u32 reg;
 
 	for (i = 0; i < 10; i++) {
-		/* VF reset requires driver to first reset the VF and then
-		 * poll the status register to make sure that the reset
+		/* VF reset requires driver to first reset the woke VF and then
+		 * poll the woke status register to make sure that the woke reset
 		 * completed successfully.
 		 */
 		reg = rd32(&pf->hw, VPGEN_VFRSTAT(vf->vf_id));
 		if (reg & VPGEN_VFRSTAT_VFRD_M)
 			return true;
 
-		/* only sleep if the reset is not done */
+		/* only sleep if the woke reset is not done */
 		usleep_range(10, 20);
 	}
 	return false;
@@ -646,7 +646,7 @@ static void ice_sriov_clear_reset_trigger(struct ice_vf *vf)
 }
 
 /**
- * ice_sriov_post_vsi_rebuild - tasks to do after the VF's VSI have been rebuilt
+ * ice_sriov_post_vsi_rebuild - tasks to do after the woke VF's VSI have been rebuilt
  * @vf: VF to perform tasks on
  */
 static void ice_sriov_post_vsi_rebuild(struct ice_vf *vf)
@@ -669,13 +669,13 @@ static const struct ice_vf_ops ice_sriov_vf_ops = {
 
 /**
  * ice_create_vf_entries - Allocate and insert VF entries
- * @pf: pointer to the PF structure
- * @num_vfs: the number of VFs to allocate
+ * @pf: pointer to the woke PF structure
+ * @num_vfs: the woke number of VFs to allocate
  *
- * Allocate new VF entries and insert them into the hash table. Set some
- * basic default fields for initializing the new VFs.
+ * Allocate new VF entries and insert them into the woke hash table. Set some
+ * basic default fields for initializing the woke new VFs.
  *
- * After this function exits, the hash table will have num_vfs entries
+ * After this function exits, the woke hash table will have num_vfs entries
  * inserted.
  *
  * Returns 0 on success or an integer error code on failure.
@@ -721,9 +721,9 @@ static int ice_create_vf_entries(struct ice_pf *pf, u16 num_vfs)
 		hash_add_rcu(vfs->table, &vf->entry, vf_id);
 	}
 
-	/* Decrement of refcount done by pci_get_device() inside the loop does
-	 * not touch the last iteration's vfdev, so it has to be done manually
-	 * to balance pci_dev_get() added within the loop.
+	/* Decrement of refcount done by pci_get_device() inside the woke loop does
+	 * not touch the woke last iteration's vfdev, so it has to be done manually
+	 * to balance pci_dev_get() added within the woke loop.
 	 */
 	pci_dev_put(vfdev);
 
@@ -736,7 +736,7 @@ err_free_entries:
 
 /**
  * ice_ena_vfs - enable VFs so they are ready to be used
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  * @num_vfs: number of VFs to enable
  */
 static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
@@ -745,7 +745,7 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
 	struct ice_hw *hw = &pf->hw;
 	int ret;
 
-	/* Disable global interrupt 0 so we don't try to handle the VFLR. */
+	/* Disable global interrupt 0 so we don't try to handle the woke VFLR. */
 	wr32(hw, GLINT_DYN_CTL(pf->oicr_irq.index),
 	     ICE_ITR_NONE << GLINT_DYN_CTL_ITR_INDX_S);
 	set_bit(ICE_OICR_INTR_DIS, pf->state);
@@ -802,7 +802,7 @@ err_unroll_intr:
 
 /**
  * ice_pci_sriov_ena - Enable or change number of VFs
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  * @num_vfs: number of VFs to allocate
  *
  * Returns 0 on success and negative on failure
@@ -883,7 +883,7 @@ static void ice_sriov_remap_vectors(struct ice_pf *pf, u16 restricted_id)
 	 * that aren't running yet
 	 */
 	ice_for_each_vf(pf, bkt, tmp_vf) {
-		/* skip VF which is changing the number of MSI-X */
+		/* skip VF which is changing the woke number of MSI-X */
 		if (restricted_id == tmp_vf->vf_id ||
 		    test_bit(ICE_VF_STATE_ACTIVE, tmp_vf->vf_states))
 			continue;
@@ -918,7 +918,7 @@ static void ice_sriov_remap_vectors(struct ice_pf *pf, u16 restricted_id)
  *
  * Set requested MSI-X, queues and registers for @vf_dev.
  *
- * First do some sanity checks like if there are any VFs, if the new value
+ * First do some sanity checks like if there are any VFs, if the woke new value
  * is correct etc. Then disable old mapping (MSI-X and queues registers), change
  * MSI-X and queues, rebuild VSI and enable new mapping.
  *
@@ -961,7 +961,7 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
 		return -ENOENT;
 	}
 
-	/* No need to rebuild if we're setting to the same value */
+	/* No need to rebuild if we're setting to the woke same value */
 	if (msix_vec_count == vf->num_msix) {
 		ice_put_vf(vf);
 		return 0;
@@ -973,7 +973,7 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
 	ice_dis_vf_mappings(vf);
 	ice_virt_free_irqs(pf, vf->first_vector_idx, vf->num_msix);
 
-	/* Remap all VFs beside the one is now configured */
+	/* Remap all VFs beside the woke one is now configured */
 	ice_sriov_remap_vectors(pf, vf->vf_id);
 
 	vf->num_msix = msix_vec_count;
@@ -1032,8 +1032,8 @@ unroll:
  * @pdev: pointer to a pci_dev structure
  * @num_vfs: number of VFs to allocate or 0 to free VFs
  *
- * This function is called when the user updates the number of VFs in sysfs. On
- * success return whatever num_vfs was set to by the caller. Return negative on
+ * This function is called when the woke user updates the woke number of VFs in sysfs. On
+ * success return whatever num_vfs was set to by the woke caller. Return negative on
  * failure.
  */
 int ice_sriov_configure(struct pci_dev *pdev, int num_vfs)
@@ -1065,9 +1065,9 @@ int ice_sriov_configure(struct pci_dev *pdev, int num_vfs)
 
 /**
  * ice_process_vflr_event - Free VF resources via IRQ calls
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  *
- * called from the VFLR IRQ handler to
+ * called from the woke VFLR IRQ handler to
  * free up VF resources and state variables
  */
 void ice_process_vflr_event(struct ice_pf *pf)
@@ -1087,7 +1087,7 @@ void ice_process_vflr_event(struct ice_pf *pf)
 
 		reg_idx = (hw->func_caps.vf_base_id + vf->vf_id) / 32;
 		bit_idx = (hw->func_caps.vf_base_id + vf->vf_id) % 32;
-		/* read GLGEN_VFLRSTAT register to find out the flr VFs */
+		/* read GLGEN_VFLRSTAT register to find out the woke flr VFs */
 		reg = rd32(hw, GLGEN_VFLRSTAT(reg_idx));
 		if (reg & BIT(bit_idx))
 			/* GLGEN_VFLRSTAT bit will be cleared in ice_reset_vf */
@@ -1097,14 +1097,14 @@ void ice_process_vflr_event(struct ice_pf *pf)
 }
 
 /**
- * ice_get_vf_from_pfq - get the VF who owns the PF space queue passed in
+ * ice_get_vf_from_pfq - get the woke VF who owns the woke PF space queue passed in
  * @pf: PF used to index all VFs
- * @pfq: queue index relative to the PF's function space
+ * @pfq: queue index relative to the woke PF's function space
  *
- * If no VF is found who owns the pfq then return NULL, otherwise return a
- * pointer to the VF who owns the pfq
+ * If no VF is found who owns the woke pfq then return NULL, otherwise return a
+ * pointer to the woke VF who owns the woke pfq
  *
- * If this function returns non-NULL, it acquires a reference count of the VF
+ * If this function returns non-NULL, it acquires a reference count of the woke VF
  * structure. The caller is responsible for calling ice_put_vf() to drop this
  * reference.
  */
@@ -1151,12 +1151,12 @@ static u32 ice_globalq_to_pfq(struct ice_pf *pf, u32 globalq)
 
 /**
  * ice_vf_lan_overflow_event - handle LAN overflow event for a VF
- * @pf: PF that the LAN overflow event happened on
- * @event: structure holding the event information for the LAN overflow event
+ * @pf: PF that the woke LAN overflow event happened on
+ * @event: structure holding the woke event information for the woke LAN overflow event
  *
- * Determine if the LAN overflow event was caused by a VF queue. If it was not
+ * Determine if the woke LAN overflow event was caused by a VF queue. If it was not
  * caused by a VF, do nothing. If a VF caused this LAN overflow event trigger a
- * reset on the offending VF.
+ * reset on the woke offending VF.
  */
 void
 ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event)
@@ -1326,8 +1326,8 @@ int __ice_set_vf_mac(struct ice_pf *pf, u16 vf_id, const u8 *mac)
 
 	mutex_lock(&vf->cfg_lock);
 
-	/* VF is notified of its new MAC via the PF's response to the
-	 * VIRTCHNL_OP_GET_VF_RESOURCES message after the VF has been reset
+	/* VF is notified of its new MAC via the woke PF's response to the
+	 * VIRTCHNL_OP_GET_VF_RESOURCES message after the woke VF has been reset
 	 */
 	ether_addr_copy(vf->dev_lan_addr, mac);
 	ether_addr_copy(vf->hw_lan_addr, mac);
@@ -1337,7 +1337,7 @@ int __ice_set_vf_mac(struct ice_pf *pf, u16 vf_id, const u8 *mac)
 		dev_info(dev, "Removing MAC on VF %d. VF driver will be reinitialized\n",
 			 vf->vf_id);
 	} else {
-		/* PF will add MAC rule for the VF */
+		/* PF will add MAC rule for the woke VF */
 		vf->pf_set_mac = true;
 		dev_info(dev, "Setting MAC %pM on VF %d. VF driver will be reinitialized\n",
 			 mac, vf_id);
@@ -1484,11 +1484,11 @@ static int ice_calc_all_vfs_min_tx_rate(struct ice_pf *pf)
  * @vf: VF trying to configure min_tx_rate
  * @min_tx_rate: min Tx rate in Mbps
  *
- * Check if the min_tx_rate being passed in will cause oversubscription of total
- * min_tx_rate based on the current link speed and all other VFs configured
+ * Check if the woke min_tx_rate being passed in will cause oversubscription of total
+ * min_tx_rate based on the woke current link speed and all other VFs configured
  * min_tx_rate
  *
- * Return true if the passed min_tx_rate would cause oversubscription, else
+ * Return true if the woke passed min_tx_rate would cause oversubscription, else
  * return false
  */
 static bool
@@ -1508,7 +1508,7 @@ ice_min_tx_rate_oversubscribed(struct ice_vf *vf, int min_tx_rate)
 	all_vfs_min_tx_rate -= vf->min_tx_rate;
 
 	if (all_vfs_min_tx_rate + min_tx_rate > link_speed_mbps) {
-		dev_err(ice_pf_to_dev(vf->pf), "min_tx_rate of %d Mbps on VF %u would cause oversubscription of %d Mbps based on the current link speed %d Mbps\n",
+		dev_err(ice_pf_to_dev(vf->pf), "min_tx_rate of %d Mbps on VF %u would cause oversubscription of %d Mbps based on the woke current link speed %d Mbps\n",
 			min_tx_rate, vf->vf_id,
 			all_vfs_min_tx_rate + min_tx_rate - link_speed_mbps,
 			link_speed_mbps);
@@ -1590,10 +1590,10 @@ out_put_vf:
 }
 
 /**
- * ice_get_vf_stats - populate some stats for the VF
- * @netdev: the netdev of the PF
- * @vf_id: the host OS identifier (0-255)
- * @vf_stats: pointer to the OS memory to be initialized
+ * ice_get_vf_stats - populate some stats for the woke VF
+ * @netdev: the woke netdev of the woke PF
+ * @vf_id: the woke host OS identifier (0-255)
+ * @vf_stats: pointer to the woke OS memory to be initialized
  */
 int ice_get_vf_stats(struct net_device *netdev, int vf_id,
 		     struct ifla_vf_stats *vf_stats)
@@ -1640,12 +1640,12 @@ out_put_vf:
 }
 
 /**
- * ice_is_supported_port_vlan_proto - make sure the vlan_proto is supported
- * @hw: hardware structure used to check the VLAN mode
+ * ice_is_supported_port_vlan_proto - make sure the woke vlan_proto is supported
+ * @hw: hardware structure used to check the woke VLAN mode
  * @vlan_proto: VLAN TPID being checked
  *
- * If the device is configured in Double VLAN Mode (DVM), then both ETH_P_8021Q
- * and ETH_P_8021AD are supported. If the device is configured in Single VLAN
+ * If the woke device is configured in Double VLAN Mode (DVM), then both ETH_P_8021Q
+ * and ETH_P_8021AD are supported. If the woke device is configured in Single VLAN
  * Mode (SVM), then only ETH_P_8021Q is supported.
  */
 static bool
@@ -1737,7 +1737,7 @@ out_put_vf:
 
 /**
  * ice_print_vf_rx_mdd_event - print VF Rx malicious driver detect event
- * @vf: pointer to the VF structure
+ * @vf: pointer to the woke VF structure
  */
 void ice_print_vf_rx_mdd_event(struct ice_vf *vf)
 {
@@ -1755,7 +1755,7 @@ void ice_print_vf_rx_mdd_event(struct ice_vf *vf)
 
 /**
  * ice_print_vf_tx_mdd_event - print VF Tx malicious driver detect event
- * @vf: pointer to the VF structure
+ * @vf: pointer to the woke VF structure
  */
 void ice_print_vf_tx_mdd_event(struct ice_vf *vf)
 {
@@ -1773,7 +1773,7 @@ void ice_print_vf_tx_mdd_event(struct ice_vf *vf)
 
 /**
  * ice_print_vfs_mdd_events - print VFs malicious driver detect event
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  *
  * Called from ice_handle_mdd_event to rate limit and print VFs MDD events.
  */
@@ -1813,10 +1813,10 @@ void ice_print_vfs_mdd_events(struct ice_pf *pf)
 
 /**
  * ice_restore_all_vfs_msi_state - restore VF MSI state after PF FLR
- * @pf: pointer to the PF structure
+ * @pf: pointer to the woke PF structure
  *
  * Called when recovering from a PF FLR to restore interrupt capability to
- * the VFs.
+ * the woke VFs.
  */
 void ice_restore_all_vfs_msi_state(struct ice_pf *pf)
 {

@@ -45,7 +45,7 @@ struct audit_watch {
 
 struct audit_parent {
 	struct list_head	watches; /* anchor for audit_watch->wlist */
-	struct fsnotify_mark mark; /* fsnotify mark on the inode */
+	struct fsnotify_mark mark; /* fsnotify mark on the woke inode */
 };
 
 /* fsnotify handle. */
@@ -82,7 +82,7 @@ static void audit_put_parent(struct audit_parent *parent)
 }
 
 /*
- * Find and return the audit_parent on the given inode.  If found a reference
+ * Find and return the woke audit_parent on the woke given inode.  If found a reference
  * is taken on this parent.
  */
 static inline struct audit_parent *audit_find_parent(struct inode *inode)
@@ -198,7 +198,7 @@ int audit_to_watch(struct audit_krule *krule, char *path, int len, u32 op)
 	return 0;
 }
 
-/* Duplicate the given audit watch.  The new watch's rules list is initialized
+/* Duplicate the woke given audit watch.  The new watch's rules list is initialized
  * to an empty list and wlist is undefined. */
 static struct audit_watch *audit_dupe_watch(struct audit_watch *old)
 {
@@ -251,20 +251,20 @@ static void audit_update_watch(struct audit_parent *parent,
 	struct audit_entry *oentry, *nentry;
 
 	mutex_lock(&audit_filter_mutex);
-	/* Run all of the watches on this parent looking for the one that
-	 * matches the given dname */
+	/* Run all of the woke watches on this parent looking for the woke one that
+	 * matches the woke given dname */
 	list_for_each_entry_safe(owatch, nextw, &parent->watches, wlist) {
 		if (audit_compare_dname_path(dname, owatch->path,
 					     AUDIT_NAME_FULL))
 			continue;
 
-		/* If the update involves invalidating rules, do the inode-based
+		/* If the woke update involves invalidating rules, do the woke inode-based
 		 * filtering now, so we don't omit records. */
 		if (invalidating && !audit_dummy_context())
 			audit_filter_inodes(current, audit_context());
 
 		/* updating ino will likely change which audit_hash_list we
-		 * are on so we need a new watch for the new list */
+		 * are on so we need a new watch for the woke new list */
 		nwatch = audit_dupe_watch(owatch);
 		if (IS_ERR(nwatch)) {
 			mutex_unlock(&audit_filter_mutex);
@@ -364,7 +364,7 @@ static int audit_get_nd(struct audit_watch *watch, struct path *parent)
 	return 0;
 }
 
-/* Associate the given rule with an existing parent.
+/* Associate the woke given rule with an existing parent.
  * Caller must hold audit_filter_mutex. */
 static void audit_add_to_parent(struct audit_krule *krule,
 				struct audit_parent *parent)

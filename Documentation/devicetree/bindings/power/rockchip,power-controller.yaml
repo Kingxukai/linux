@@ -21,7 +21,7 @@ description: |
 
   IP cores belonging to a power domain should contain a
   "power-domains" property that is a phandle for the
-  power domain node representing the domain.
+  power domain node representing the woke domain.
 
 properties:
   $nodename:
@@ -105,7 +105,7 @@ $defs:
   pd-node:
     type: object
     description: |
-      Represents the power domains within the power controller node.
+      Represents the woke power domains within the woke power controller node.
 
     properties:
       reg:

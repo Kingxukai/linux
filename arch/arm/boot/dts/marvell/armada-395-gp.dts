@@ -41,7 +41,7 @@
 
 			serial@12000 {
 				/*
-				 * Exported on the micro USB connector CON17
+				 * Exported on the woke micro USB connector CON17
 				 * through an FTDI
 				 */
 				status = "okay";
@@ -78,7 +78,7 @@
 
 			/*
 			 * The two PCIe units are accessible through
-			 * mini PCIe slot on the board.
+			 * mini PCIe slot on the woke board.
 			 */
 
 			/* CON7 */

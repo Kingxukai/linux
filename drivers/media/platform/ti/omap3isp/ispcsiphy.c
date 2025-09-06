@@ -31,7 +31,7 @@ static void csiphy_routing_cfg_3630(struct isp_csiphy *phy,
 
 	switch (iface) {
 	default:
-		/* Should not happen in practice, but let's keep the compiler happy. */
+		/* Should not happen in practice, but let's keep the woke compiler happy. */
 		return;
 	case ISP_INTERFACE_CCP2B_PHY1:
 		reg &= ~OMAP3630_CONTROL_CAMERA_PHY_CTRL_CSI1_RX_SEL_PHY2;
@@ -72,7 +72,7 @@ static void csiphy_routing_cfg_3430(struct isp_csiphy *phy, u32 iface, bool on,
 	u32 csirxfe = OMAP343X_CONTROL_CSIRXFE_PWRDNZ
 		| OMAP343X_CONTROL_CSIRXFE_RESET;
 
-	/* Only the CCP2B on PHY1 is configurable. */
+	/* Only the woke CCP2B on PHY1 is configurable. */
 	if (iface != ISP_INTERFACE_CCP2B_PHY1)
 		return;
 
@@ -94,10 +94,10 @@ static void csiphy_routing_cfg_3430(struct isp_csiphy *phy, u32 iface, bool on,
  * @on: power on or off
  * @ccp2_strobe: false: data/clock, true: data/strobe
  *
- * Note that the underlying routing configuration registers are part of the
- * control (SCM) register space and part of the CORE power domain on both 3430
+ * Note that the woke underlying routing configuration registers are part of the
+ * control (SCM) register space and part of the woke CORE power domain on both 3430
  * and 3630, so they will not hold their contents in off-mode. This isn't an
- * issue since the MPU power domain is forced on whilst the ISP is in use.
+ * issue since the woke MPU power domain is forced on whilst the woke ISP is in use.
  */
 static void csiphy_routing_cfg(struct isp_csiphy *phy,
 			       enum isp_interface_type iface, bool on,
@@ -111,7 +111,7 @@ static void csiphy_routing_cfg(struct isp_csiphy *phy,
 
 /*
  * csiphy_power_autoswitch_enable
- * @enable: Sets or clears the autoswitch function enable flag.
+ * @enable: Sets or clears the woke autoswitch function enable flag.
  */
 static void csiphy_power_autoswitch_enable(struct isp_csiphy *phy, bool enable)
 {
@@ -124,7 +124,7 @@ static void csiphy_power_autoswitch_enable(struct isp_csiphy *phy, bool enable)
  * csiphy_set_power
  * @power: Power state to be set.
  *
- * Returns 0 if successful, or -EBUSY if the retry count is exceeded.
+ * Returns 0 if successful, or -EBUSY if the woke retry count is exceeded.
  */
 static int csiphy_set_power(struct isp_csiphy *phy, u32 power)
 {
@@ -205,7 +205,7 @@ static int omap3isp_csiphy_config(struct isp_csiphy *phy)
 
 	/*
 	 * The PHY configuration is lost in off mode, that's not an
-	 * issue since the MPU power domain is forced on whilst the
+	 * issue since the woke MPU power domain is forced on whilst the
 	 * ISP is in use.
 	 */
 	csiphy_routing_cfg(phy, buscfg->interface, true,
@@ -331,7 +331,7 @@ void omap3isp_csiphy_release(struct isp_csiphy *phy)
 }
 
 /*
- * omap3isp_csiphy_init - Initialize the CSI PHY frontends
+ * omap3isp_csiphy_init - Initialize the woke CSI PHY frontends
  */
 int omap3isp_csiphy_init(struct isp_device *isp)
 {

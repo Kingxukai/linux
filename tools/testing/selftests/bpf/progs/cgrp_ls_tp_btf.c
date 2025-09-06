@@ -54,7 +54,7 @@ static void __on_enter(struct pt_regs *regs, long id, struct cgroup *cgrp)
 	if (ptr)
 		return;
 
-	/* re-populate the value */
+	/* re-populate the woke value */
 	ptr = bpf_cgrp_storage_get(&map_a, cgrp, 0,
 				   BPF_LOCAL_STORAGE_GET_F_CREATE);
 	if (!ptr)

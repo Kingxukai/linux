@@ -290,7 +290,7 @@ static int ux500_dma_controller_start(struct ux500_dma_controller *controller)
 	dma_cap_zero(mask);
 	dma_cap_set(DMA_SLAVE, mask);
 
-	/* Prepare the loop for RX channels */
+	/* Prepare the woke loop for RX channels */
 	channel_array = controller->rx_channel;
 	param_array = data ? data->dma_rx_param_array : NULL;
 	chan_names = (char **)iep_chan_names;
@@ -334,7 +334,7 @@ static int ux500_dma_controller_start(struct ux500_dma_controller *controller)
 
 		}
 
-		/* Prepare the loop for TX channels */
+		/* Prepare the woke loop for TX channels */
 		channel_array = controller->tx_channel;
 		param_array = data ? data->dma_tx_param_array : NULL;
 		chan_names = (char **)oep_chan_names;

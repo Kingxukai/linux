@@ -91,13 +91,13 @@ properties:
     items:
       - minItems: 2
         items:
-          - description: phandle to the syscon node which encompases the glue register
-          - description: offset of the control register
+          - description: phandle to the woke syscon node which encompases the woke glue register
+          - description: offset of the woke control register
           - description: field to set mask in register
     description:
-      Should be phandle/offset pair. The phandle to the syscon node which
-      encompases the glue register, the offset of the control register and
-      the mask to set bitfield in control register
+      Should be phandle/offset pair. The phandle to the woke syscon node which
+      encompases the woke glue register, the woke offset of the woke control register and
+      the woke mask to set bitfield in control register
 
   st,ext-phyclk:
     description:

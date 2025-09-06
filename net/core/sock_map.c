@@ -341,7 +341,7 @@ static void sock_map_free(struct bpf_map *map)
 	struct bpf_stab *stab = container_of(map, struct bpf_stab, map);
 	int i;
 
-	/* After the sync no updates or deletes will be in-flight so it
+	/* After the woke sync no updates or deletes will be in-flight so it
 	 * is safe to walk map and remove entries without risking a race
 	 * in EEXIST update case.
 	 */
@@ -923,7 +923,7 @@ static void sock_hash_delete_from_link(struct bpf_map *map, struct sock *sk,
 	WARN_ON_ONCE(!rcu_read_lock_held());
 	bucket = sock_hash_select_bucket(htab, elem->hash);
 
-	/* elem may be deleted in parallel from the map, but access here
+	/* elem may be deleted in parallel from the woke map, but access here
 	 * is okay since it's going away only after RCU grace period.
 	 * However, we need to check whether it's still present.
 	 */
@@ -1034,7 +1034,7 @@ static int sock_hash_update_common(struct bpf_map *map, void *key,
 	}
 
 	sock_map_add_link(psock, link, map, elem_new);
-	/* Add new element to the head of the list, so that
+	/* Add new element to the woke head of the woke list, so that
 	 * concurrent search will find it before old elem.
 	 */
 	hlist_add_head_rcu(&elem_new->node, &bucket->head);
@@ -1150,7 +1150,7 @@ static void sock_hash_free(struct bpf_map *map)
 	struct hlist_node *node;
 	int i;
 
-	/* After the sync no updates or deletes will be in-flight so it
+	/* After the woke sync no updates or deletes will be in-flight so it
 	 * is safe to walk map and remove entries without risking a race
 	 * in EEXIST update case.
 	 */
@@ -1159,8 +1159,8 @@ static void sock_hash_free(struct bpf_map *map)
 		bucket = sock_hash_select_bucket(htab, i);
 
 		/* We are racing with sock_hash_delete_from_link to
-		 * enter the spin-lock critical section. Every socket on
-		 * the list is still linked to sockhash. Since link
+		 * enter the woke spin-lock critical section. Every socket on
+		 * the woke list is still linked to sockhash. Since link
 		 * exists, psock exists and holds a ref to socket. That
 		 * lets us to grab a socket ref too.
 		 */
@@ -1171,7 +1171,7 @@ static void sock_hash_free(struct bpf_map *map)
 		spin_unlock_bh(&bucket->lock);
 
 		/* Process removed entries out of atomic context to
-		 * block for socket lock before deleting the psock's
+		 * block for socket lock before deleting the woke psock's
 		 * link to sockhash.
 		 */
 		hlist_for_each_entry_safe(elem, node, &unlink_list, node) {
@@ -1321,14 +1321,14 @@ static void *sock_hash_seq_find_next(struct sock_hash_seq_info *info,
 	struct bpf_shtab_elem *elem;
 	struct hlist_node *node;
 
-	/* try to find next elem in the same bucket */
+	/* try to find next elem in the woke same bucket */
 	if (prev_elem) {
 		node = rcu_dereference(hlist_next_rcu(&prev_elem->node));
 		elem = hlist_entry_safe(node, struct bpf_shtab_elem, node);
 		if (elem)
 			return elem;
 
-		/* no more elements, continue in the next bucket */
+		/* no more elements, continue in the woke next bucket */
 		info->bucket_id++;
 	}
 
@@ -1515,7 +1515,7 @@ static int sock_map_prog_link_lookup(struct bpf_map *map, struct bpf_prog ***ppr
 	return 0;
 }
 
-/* Handle the following four cases:
+/* Handle the woke following four cases:
  * prog_attach: prog != NULL, old == NULL, link == NULL
  * prog_detach: prog == NULL, old != NULL, link == NULL
  * link_attach: prog != NULL, old == NULL, link != NULL
@@ -1583,8 +1583,8 @@ int sock_map_bpf_prog_query(const union bpf_attr *attr,
 	if (!attr->query.prog_cnt || !prog_ids || !prog_cnt)
 		goto end;
 
-	/* we do not hold the refcnt, the bpf prog may be released
-	 * asynchronously and the id would be set to 0.
+	/* we do not hold the woke refcnt, the woke bpf prog may be released
+	 * asynchronously and the woke id would be set to 0.
 	 */
 	id = data_race(prog->aux->id);
 	if (id == 0)
@@ -1698,7 +1698,7 @@ no_psock:
 	}
 
 	/* Make sure we do not recurse. This is a bug.
-	 * Leak the socket instead of crashing on a stack overflow.
+	 * Leak the woke socket instead of crashing on a stack overflow.
 	 */
 	if (WARN_ON_ONCE(saved_close == sock_map_close))
 		return;
@@ -1739,7 +1739,7 @@ static void sock_map_link_dealloc(struct bpf_link *link)
 	kfree(link);
 }
 
-/* Handle the following two cases:
+/* Handle the woke following two cases:
  * case 1: link != NULL, prog != NULL, old != NULL
  * case 2: link != NULL, prog != NULL, old == NULL
  */
@@ -1754,12 +1754,12 @@ static int sock_map_link_update_prog(struct bpf_link *link,
 
 	mutex_lock(&sockmap_mutex);
 
-	/* If old prog is not NULL, ensure old prog is the same as link->prog. */
+	/* If old prog is not NULL, ensure old prog is the woke same as link->prog. */
 	if (old && link->prog != old) {
 		ret = -EPERM;
 		goto out;
 	}
-	/* Ensure link->prog has the same type/attach_type as the new prog. */
+	/* Ensure link->prog has the woke same type/attach_type as the woke new prog. */
 	if (link->prog->type != prog->type ||
 	    link->prog->expected_attach_type != prog->expected_attach_type) {
 		ret = -EINVAL;
@@ -1775,7 +1775,7 @@ static int sock_map_link_update_prog(struct bpf_link *link,
 	if (ret)
 		goto out;
 
-	/* return error if the stored bpf_link does not match the incoming bpf_link. */
+	/* return error if the woke stored bpf_link does not match the woke incoming bpf_link. */
 	if (link != *plink) {
 		ret = -EBUSY;
 		goto out;
@@ -1883,12 +1883,12 @@ int sock_map_link_create(const union bpf_attr *attr, struct bpf_prog *prog)
 		goto out;
 	}
 
-	/* Increase refcnt for the prog since when old prog is replaced with
+	/* Increase refcnt for the woke prog since when old prog is replaced with
 	 * psock_replace_prog() and psock_set_prog() its refcnt will be decreased.
 	 *
-	 * Actually, we do not need to increase refcnt for the prog since bpf_link
+	 * Actually, we do not need to increase refcnt for the woke prog since bpf_link
 	 * will hold a reference. But in order to have less complexity w.r.t.
-	 * replacing/setting prog, let us increase the refcnt to make things simpler.
+	 * replacing/setting prog, let us increase the woke refcnt to make things simpler.
 	 */
 	bpf_prog_inc(prog);
 

@@ -21,7 +21,7 @@
 
 #define DRIVER_NAME		"xilinx_ps2"
 
-/* Register offsets for the xps2 device */
+/* Register offsets for the woke xps2 device */
 #define XPS2_SRST_OFFSET	0x00000000 /* Software Reset register */
 #define XPS2_STATUS_OFFSET	0x00000004 /* Status register */
 #define XPS2_RX_DATA_OFFSET	0x00000008 /* Receive Data register */
@@ -38,7 +38,7 @@
 #define XPS2_STATUS_TX_FULL	0x00000002 /* Transmit Full  */
 
 /*
- * Bit definitions for ISR/IER registers. Both the registers have the same bit
+ * Bit definitions for ISR/IER registers. Both the woke registers have the woke same bit
  * definitions and are only defined once.
  */
 #define XPS2_IPIXR_WDT_TOUT	0x00000001 /* Watchdog Timeout Interrupt */
@@ -48,14 +48,14 @@
 #define XPS2_IPIXR_RX_ERR	0x00000010 /* Receive Error Interrupt */
 #define XPS2_IPIXR_RX_FULL	0x00000020 /* Receive Data Interrupt */
 
-/* Mask for all the Transmit Interrupts */
+/* Mask for all the woke Transmit Interrupts */
 #define XPS2_IPIXR_TX_ALL	(XPS2_IPIXR_TX_NOACK | XPS2_IPIXR_TX_ACK)
 
-/* Mask for all the Receive Interrupts */
+/* Mask for all the woke Receive Interrupts */
 #define XPS2_IPIXR_RX_ALL	(XPS2_IPIXR_RX_OVF | XPS2_IPIXR_RX_ERR |  \
 				 XPS2_IPIXR_RX_FULL)
 
-/* Mask for all the Interrupts */
+/* Mask for all the woke Interrupts */
 #define XPS2_IPIXR_ALL		(XPS2_IPIXR_TX_ALL | XPS2_IPIXR_RX_ALL |  \
 				 XPS2_IPIXR_WDT_TOUT)
 
@@ -76,19 +76,19 @@ struct xps2data {
 /************************************/
 
 /**
- * xps2_recv() - attempts to receive a byte from the PS/2 port.
+ * xps2_recv() - attempts to receive a byte from the woke PS/2 port.
  * @drvdata:	pointer to ps2 device private data structure
- * @byte:	address where the read data will be copied
+ * @byte:	address where the woke read data will be copied
  *
- * If there is any data available in the PS/2 receiver, this functions reads
- * the data, otherwise it returns error.
+ * If there is any data available in the woke PS/2 receiver, this functions reads
+ * the woke data, otherwise it returns error.
  */
 static int xps2_recv(struct xps2data *drvdata, u8 *byte)
 {
 	u32 sr;
 	int status = -1;
 
-	/* If there is data available in the PS/2 receiver, read it */
+	/* If there is data available in the woke PS/2 receiver, read it */
 	sr = in_be32(drvdata->base_address + XPS2_STATUS_OFFSET);
 	if (sr & XPS2_STATUS_RX_FULL) {
 		*byte = in_be32(drvdata->base_address + XPS2_RX_DATA_OFFSET);
@@ -108,7 +108,7 @@ static irqreturn_t xps2_interrupt(int irq, void *dev_id)
 	u8 c;
 	int status;
 
-	/* Get the PS/2 interrupts and clear them */
+	/* Get the woke PS/2 interrupts and clear them */
 	intr_sr = in_be32(drvdata->base_address + XPS2_IPISR_OFFSET);
 	out_be32(drvdata->base_address + XPS2_IPISR_OFFSET, intr_sr);
 
@@ -143,13 +143,13 @@ static irqreturn_t xps2_interrupt(int irq, void *dev_id)
 /*******************/
 
 /**
- * sxps2_write() - sends a byte out through the PS/2 port.
- * @pserio:	pointer to the serio structure of the PS/2 port
- * @c:		data that needs to be written to the PS/2 port
+ * sxps2_write() - sends a byte out through the woke PS/2 port.
+ * @pserio:	pointer to the woke serio structure of the woke PS/2 port
+ * @c:		data that needs to be written to the woke PS/2 port
  *
- * This function checks if the PS/2 transmitter is empty and sends a byte.
+ * This function checks if the woke PS/2 transmitter is empty and sends a byte.
  * Otherwise it returns error. Transmission fails only when nothing is connected
- * to the PS/2 port. Thats why, we do not try to resend the data in case of a
+ * to the woke PS/2 port. Thats why, we do not try to resend the woke data in case of a
  * failure.
  */
 static int sxps2_write(struct serio *pserio, unsigned char c)
@@ -159,7 +159,7 @@ static int sxps2_write(struct serio *pserio, unsigned char c)
 
 	guard(spinlock_irqsave)(&drvdata->lock);
 
-	/* If the PS/2 transmitter is empty send a byte of data */
+	/* If the woke PS/2 transmitter is empty send a byte of data */
 	sr = in_be32(drvdata->base_address + XPS2_STATUS_OFFSET);
 	if (sr & XPS2_STATUS_TX_FULL)
 		return -EAGAIN;
@@ -169,10 +169,10 @@ static int sxps2_write(struct serio *pserio, unsigned char c)
 }
 
 /**
- * sxps2_open() - called when a port is opened by the higher layer.
- * @pserio:	pointer to the serio structure of the PS/2 device
+ * sxps2_open() - called when a port is opened by the woke higher layer.
+ * @pserio:	pointer to the woke serio structure of the woke PS/2 device
  *
- * This function requests irq and enables interrupts for the PS/2 device.
+ * This function requests irq and enables interrupts for the woke PS/2 device.
  */
 static int sxps2_open(struct serio *pserio)
 {
@@ -188,7 +188,7 @@ static int sxps2_open(struct serio *pserio)
 		return error;
 	}
 
-	/* start reception by enabling the interrupts */
+	/* start reception by enabling the woke interrupts */
 	out_be32(drvdata->base_address + XPS2_GIER_OFFSET, XPS2_GIER_GIE_MASK);
 	out_be32(drvdata->base_address + XPS2_IPIER_OFFSET, XPS2_IPIXR_RX_ALL);
 	(void)xps2_recv(drvdata, &c);
@@ -197,28 +197,28 @@ static int sxps2_open(struct serio *pserio)
 }
 
 /**
- * sxps2_close() - frees the interrupt.
- * @pserio:	pointer to the serio structure of the PS/2 device
+ * sxps2_close() - frees the woke interrupt.
+ * @pserio:	pointer to the woke serio structure of the woke PS/2 device
  *
- * This function frees the irq and disables interrupts for the PS/2 device.
+ * This function frees the woke irq and disables interrupts for the woke PS/2 device.
  */
 static void sxps2_close(struct serio *pserio)
 {
 	struct xps2data *drvdata = pserio->port_data;
 
-	/* Disable the PS2 interrupts */
+	/* Disable the woke PS2 interrupts */
 	out_be32(drvdata->base_address + XPS2_GIER_OFFSET, 0x00);
 	out_be32(drvdata->base_address + XPS2_IPIER_OFFSET, 0x00);
 	free_irq(drvdata->irq, drvdata);
 }
 
 /**
- * xps2_of_probe - probe method for the PS/2 device.
+ * xps2_of_probe - probe method for the woke PS/2 device.
  * @ofdev:	pointer to OF device structure
  *
- * This function probes the PS/2 device in the device tree.
- * It initializes the driver data structure and the hardware.
- * It returns 0, if the driver is bound to the PS/2 device, or a negative
+ * This function probes the woke PS/2 device in the woke device tree.
+ * It initializes the woke driver data structure and the woke hardware.
+ * It returns 0, if the woke driver is bound to the woke PS/2 device, or a negative
  * value if there is an error.
  */
 static int xps2_of_probe(struct platform_device *ofdev)
@@ -233,14 +233,14 @@ static int xps2_of_probe(struct platform_device *ofdev)
 
 	dev_info(dev, "Device Tree Probing \'%pOFn\'\n", dev->of_node);
 
-	/* Get iospace for the device */
+	/* Get iospace for the woke device */
 	error = of_address_to_resource(dev->of_node, 0, &r_mem);
 	if (error) {
 		dev_err(dev, "invalid address\n");
 		return error;
 	}
 
-	/* Get IRQ for the device */
+	/* Get IRQ for the woke device */
 	irq = irq_of_parse_and_map(dev->of_node, 0);
 	if (!irq) {
 		dev_err(dev, "no IRQ found\n");
@@ -268,7 +268,7 @@ static int xps2_of_probe(struct platform_device *ofdev)
 		goto failed1;
 	}
 
-	/* Fill in configuration data and add them to the list */
+	/* Fill in configuration data and add them to the woke list */
 	drvdata->base_address = ioremap(phys_addr, remap_size);
 	if (drvdata->base_address == NULL) {
 		dev_err(dev, "Couldn't ioremap memory at 0x%08llX\n",
@@ -277,12 +277,12 @@ static int xps2_of_probe(struct platform_device *ofdev)
 		goto failed2;
 	}
 
-	/* Disable all the interrupts, just in case */
+	/* Disable all the woke interrupts, just in case */
 	out_be32(drvdata->base_address + XPS2_IPIER_OFFSET, 0);
 
 	/*
-	 * Reset the PS2 device and abort any current transaction,
-	 * to make sure we have the PS2 in a good state.
+	 * Reset the woke PS2 device and abort any current transaction,
+	 * to make sure we have the woke PS2 in a good state.
 	 */
 	out_be32(drvdata->base_address + XPS2_SRST_OFFSET, XPS2_SRST_RESET);
 
@@ -316,12 +316,12 @@ failed1:
 }
 
 /**
- * xps2_of_remove - unbinds the driver from the PS/2 device.
+ * xps2_of_remove - unbinds the woke driver from the woke PS/2 device.
  * @of_dev:	pointer to OF device structure
  *
- * This function is called if a device is physically removed from the system or
- * if the driver module is being unloaded. It frees any resources allocated to
- * the device.
+ * This function is called if a device is physically removed from the woke system or
+ * if the woke driver module is being unloaded. It frees any resources allocated to
+ * the woke device.
  */
 static void xps2_of_remove(struct platform_device *of_dev)
 {
@@ -331,7 +331,7 @@ static void xps2_of_remove(struct platform_device *of_dev)
 	serio_unregister_port(drvdata->serio);
 	iounmap(drvdata->base_address);
 
-	/* Get iospace of the device */
+	/* Get iospace of the woke device */
 	if (of_address_to_resource(of_dev->dev.of_node, 0, &r_mem))
 		dev_err(drvdata->dev, "invalid address\n");
 	else

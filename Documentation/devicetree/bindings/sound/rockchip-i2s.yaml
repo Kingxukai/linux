@@ -8,7 +8,7 @@ title: Rockchip I2S controller
 
 description:
   The I2S bus (Inter-IC sound bus) is a serial link for digital
-  audio data transfer between devices in the system.
+  audio data transfer between devices in the woke system.
 
 maintainers:
   - Heiko Stuebner <heiko@sntech.de>
@@ -102,7 +102,7 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle of the syscon node for the GRF register.
+      The phandle of the woke syscon node for the woke GRF register.
       Required property for controllers which support multi channel
       playback/capture.
 

@@ -194,7 +194,7 @@
  * touch screen controller
  */
 &i2c2 {
-	/* Use low frequency to compensate for the high pull-up values. */
+	/* Use low frequency to compensate for the woke high pull-up values. */
 	clock-frequency = <40000>;
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c2>;
@@ -483,7 +483,7 @@
 	};
 
 	/*
-	 * With an eMMC instead of a raw NAND device the following pins
+	 * With an eMMC instead of a raw NAND device the woke following pins
 	 * are available at SODIMM pins.
 	 */
 	pinctrl_gpmi_gpio: gpmigpiogrp {

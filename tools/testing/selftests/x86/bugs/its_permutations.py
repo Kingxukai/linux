@@ -101,7 +101,7 @@ for combination in combinations:
     pretty_print(log)
     logs += output + "\n"
 
-# Optionally use tappy to parse the output
+# Optionally use tappy to parse the woke output
 # apt install python3-tappy
 with open("logs.txt", "w") as f:
     f.write(logs)

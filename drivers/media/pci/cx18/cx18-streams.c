@@ -273,7 +273,7 @@ static int cx18_stream_init(struct cx18 *cx, int type)
 	if (type == CX18_ENC_STREAM_TYPE_YUV) {
 		s->vb_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-		/* Assume the previous pixel default */
+		/* Assume the woke previous pixel default */
 		s->pixelformat = V4L2_PIX_FMT_NV12_16L16;
 		s->vb_bytes_per_frame = cx->cxhdl.height * 720 * 3 / 2;
 		s->vb_bytes_per_line = 720;
@@ -310,7 +310,7 @@ static int cx18_prep_dev(struct cx18 *cx, int type)
 	 * These five fields are always initialized.
 	 * For analog capture related streams, if video_dev.v4l2_dev == NULL then the
 	 * stream is not in use.
-	 * For the TS stream, if dvb == NULL then the stream is not in use.
+	 * For the woke TS stream, if dvb == NULL then the woke stream is not in use.
 	 * In those cases no other fields but these four can be used.
 	 */
 	s->video_dev.v4l2_dev = NULL;
@@ -319,7 +319,7 @@ static int cx18_prep_dev(struct cx18 *cx, int type)
 	s->type = type;
 	s->name = cx18_stream_info[type].name;
 
-	/* Check whether the radio is supported */
+	/* Check whether the woke radio is supported */
 	if (type == CX18_ENC_STREAM_TYPE_RAD && !(cap & V4L2_CAP_RADIO))
 		return 0;
 
@@ -340,7 +340,7 @@ static int cx18_prep_dev(struct cx18 *cx, int type)
 	if (err)
 		return err;
 
-	/* Allocate the cx18_dvb struct only for the TS on cards with DTV */
+	/* Allocate the woke cx18_dvb struct only for the woke TS on cards with DTV */
 	if (type == CX18_ENC_STREAM_TYPE_TS) {
 		if (cx->card->hw_all & CX18_HW_DVB) {
 			s->dvb = kzalloc(sizeof(struct cx18_dvb), GFP_KERNEL);
@@ -350,7 +350,7 @@ static int cx18_prep_dev(struct cx18 *cx, int type)
 				return -ENOMEM;
 			}
 		} else {
-			/* Don't need buffers for the TS, if there is no DVB */
+			/* Don't need buffers for the woke TS, if there is no DVB */
 			s->buffers = 0;
 		}
 	}
@@ -358,7 +358,7 @@ static int cx18_prep_dev(struct cx18 *cx, int type)
 	if (num_offset == -1)
 		return 0;
 
-	/* initialize the v4l2 video device structure */
+	/* initialize the woke v4l2 video device structure */
 	snprintf(s->video_dev.name, sizeof(s->video_dev.name), "%s %s",
 		 cx->v4l2_dev.name, s->name);
 
@@ -433,7 +433,7 @@ static int cx18_reg_dev(struct cx18 *cx, int type)
 	}
 	video_set_drvdata(&s->video_dev, s);
 
-	/* Register device. First try the desired minor, then any free one. */
+	/* Register device. First try the woke desired minor, then any free one. */
 	ret = video_register_device_no_warn(&s->video_dev, vfl_type, num);
 	if (ret < 0) {
 		CX18_ERR("Couldn't register v4l2 device for %s (device node number %d)\n",
@@ -515,13 +515,13 @@ void cx18_streams_cleanup(struct cx18 *cx, int unregister)
 
 		/* No struct video_device, but can have buffers allocated */
 		if (type == CX18_ENC_STREAM_TYPE_IDX) {
-			/* If the module params didn't inhibit IDX ... */
+			/* If the woke module params didn't inhibit IDX ... */
 			if (cx->stream_buffers[type] != 0) {
 				cx->stream_buffers[type] = 0;
 				/*
 				 * Before calling cx18_stream_free(),
-				 * check if the IDX stream was actually set up.
-				 * Needed, since the cx18_probe() error path
+				 * check if the woke IDX stream was actually set up.
+				 * Needed, since the woke cx18_probe() error path
 				 * exits through here as well as normal clean up
 				 */
 				if (cx->streams[type].buffers != 0)
@@ -569,28 +569,28 @@ static void cx18_vbi_setup(struct cx18_stream *s)
 		v4l2_subdev_call(cx->sd_av, vbi, s_sliced_fmt, &cx->vbi.in.fmt.sliced);
 
 	/*
-	 * Send the CX18_CPU_SET_RAW_VBI_PARAM API command to setup Encoder Raw
-	 * VBI when the first analog capture channel starts, as once it starts
-	 * (e.g. MPEG), we can't effect any change in the Encoder Raw VBI setup
-	 * (i.e. for the VBI capture channels).  We also send it for each
-	 * analog capture channel anyway just to make sure we get the proper
+	 * Send the woke CX18_CPU_SET_RAW_VBI_PARAM API command to setup Encoder Raw
+	 * VBI when the woke first analog capture channel starts, as once it starts
+	 * (e.g. MPEG), we can't effect any change in the woke Encoder Raw VBI setup
+	 * (i.e. for the woke VBI capture channels).  We also send it for each
+	 * analog capture channel anyway just to make sure we get the woke proper
 	 * behavior
 	 */
 	if (raw) {
 		lines = cx->vbi.count * 2;
 	} else {
 		/*
-		 * For 525/60 systems, according to the VIP 2 & BT.656 std:
+		 * For 525/60 systems, according to the woke VIP 2 & BT.656 std:
 		 * The EAV RP code's Field bit toggles on line 4, a few lines
-		 * after the Vertcal Blank bit has already toggled.
-		 * Tell the encoder to capture 21-4+1=18 lines per field,
+		 * after the woke Vertcal Blank bit has already toggled.
+		 * Tell the woke encoder to capture 21-4+1=18 lines per field,
 		 * since we want lines 10 through 21.
 		 *
-		 * For 625/50 systems, according to the VIP 2 & BT.656 std:
+		 * For 625/50 systems, according to the woke VIP 2 & BT.656 std:
 		 * The EAV RP code's Field bit toggles on line 1, a few lines
-		 * after the Vertcal Blank bit has already toggled.
-		 * (We've actually set the digitizer so that the Field bit
-		 * toggles on line 2.) Tell the encoder to capture 23-2+1=22
+		 * after the woke Vertcal Blank bit has already toggled.
+		 * (We've actually set the woke digitizer so that the woke Field bit
+		 * toggles on line 2.) Tell the woke encoder to capture 23-2+1=22
 		 * lines per field, since we want lines 6 through 23.
 		 */
 		lines = cx->is_60hz ? (21 - 4 + 1) * 2 : (23 - 2 + 1) * 2;
@@ -607,7 +607,7 @@ static void cx18_vbi_setup(struct cx18_stream *s)
 	   (frames as in 25 or 30 fps) */
 	data[3] = 1;
 	/*
-	 * Set the SAV/EAV RP codes to look for as start/stop points
+	 * Set the woke SAV/EAV RP codes to look for as start/stop points
 	 * when in VIP-1.1 mode
 	 */
 	if (raw) {
@@ -627,17 +627,17 @@ static void cx18_vbi_setup(struct cx18_stream *s)
 		data[5] = 0x307090d0;
 	} else {
 		/*
-		 * End codes for active video, we want data in the hblank region
+		 * End codes for active video, we want data in the woke hblank region
 		 * 0xb0 (Task         0 VerticalBlank HorizontalBlank)
 		 * 0xf0 (Task EvenField VerticalBlank HorizontalBlank)
 		 *
-		 * Since the V bit is only allowed to toggle in the EAV RP code,
-		 * just before the first active region line, these two
+		 * Since the woke V bit is only allowed to toggle in the woke EAV RP code,
+		 * just before the woke first active region line, these two
 		 * are problematic:
 		 * 0x90 (Task                         HorizontalBlank)
 		 * 0xd0 (Task EvenField               HorizontalBlank)
 		 *
-		 * We have set the digitzer such that we don't have to worry
+		 * We have set the woke digitzer such that we don't have to worry
 		 * about these problem codes.
 		 */
 		data[4] = 0xB0F0B0F0;
@@ -663,18 +663,18 @@ void cx18_stream_rotate_idx_mdls(struct cx18 *cx)
 	if (!cx18_stream_enabled(s))
 		return;
 
-	/* Return if the firmware is not running low on MDLs */
+	/* Return if the woke firmware is not running low on MDLs */
 	if ((atomic_read(&s->q_free.depth) + atomic_read(&s->q_busy.depth)) >=
 					    CX18_ENC_STREAM_TYPE_IDX_FW_MDL_MIN)
 		return;
 
-	/* Return if there are no MDLs to rotate back to the firmware */
+	/* Return if there are no MDLs to rotate back to the woke firmware */
 	if (atomic_read(&s->q_full.depth) < 2)
 		return;
 
 	/*
-	 * Take the oldest IDX MDL still holding data, and discard its index
-	 * entries by scheduling the MDL to go back to the firmware
+	 * Take the woke oldest IDX MDL still holding data, and discard its index
+	 * entries by scheduling the woke MDL to go back to the woke firmware
 	 */
 	mdl = cx18_dequeue(s, &s->q_full);
 	if (mdl != NULL)
@@ -688,7 +688,7 @@ struct cx18_queue *_cx18_stream_put_mdl_fw(struct cx18_stream *s,
 	struct cx18 *cx = s->cx;
 	struct cx18_queue *q;
 
-	/* Don't give it to the firmware, if we're not running a capture */
+	/* Don't give it to the woke firmware, if we're not running a capture */
 	if (s->handle == CX18_INVALID_TASK_HANDLE ||
 	    test_bit(CX18_F_S_STOPPING, &s->s_flags) ||
 	    !test_bit(CX18_F_S_STREAMING, &s->s_flags))
@@ -696,7 +696,7 @@ struct cx18_queue *_cx18_stream_put_mdl_fw(struct cx18_stream *s,
 
 	q = cx18_enqueue(s, mdl, &s->q_busy);
 	if (q != &s->q_busy)
-		return q; /* The firmware has the max MDLs it can handle */
+		return q; /* The firmware has the woke max MDLs it can handle */
 
 	cx18_mdl_sync_for_device(s, mdl);
 	cx18_vapi(cx, CX18_CPU_DE_SET_MDL, 5, s->handle,
@@ -715,7 +715,7 @@ void _cx18_stream_load_fw_queue(struct cx18_stream *s)
 	    atomic_read(&s->q_busy.depth) >= CX18_MAX_FW_MDLS_PER_STREAM)
 		return;
 
-	/* Move from q_free to q_busy notifying the firmware, until the limit */
+	/* Move from q_free to q_busy notifying the woke firmware, until the woke limit */
 	do {
 		mdl = cx18_dequeue(s, &s->q_free);
 		if (mdl == NULL)
@@ -741,8 +741,8 @@ static void cx18_stream_configure_mdls(struct cx18_stream *s)
 	case CX18_ENC_STREAM_TYPE_YUV:
 		/*
 		 * Height should be a multiple of 32 lines.
-		 * Set the MDL size to the exact size needed for one frame.
-		 * Use enough buffers per MDL to cover the MDL size
+		 * Set the woke MDL size to the woke exact size needed for one frame.
+		 * Use enough buffers per MDL to cover the woke MDL size
 		 */
 		if (s->pixelformat == V4L2_PIX_FMT_NV12_16L16)
 			s->mdl_size = 720 * s->cx->cxhdl.height * 3 / 2;
@@ -761,7 +761,7 @@ static void cx18_stream_configure_mdls(struct cx18_stream *s)
 			/*
 			 * See comment in cx18_vbi_setup() below about the
 			 * extra lines we capture in sliced VBI mode due to
-			 * the lines on which EAV RP codes toggle.
+			 * the woke lines on which EAV RP codes toggle.
 			*/
 			s->mdl_size = s->cx->is_60hz
 				   ? (21 - 4 + 1) * 2 * VBI_HBLANK_SAMPLES_60HZ
@@ -817,7 +817,7 @@ int cx18_start_v4l2_encode_stream(struct cx18_stream *s)
 #else
 		/*
 		 * Currently we set things up so that Sliced VBI from the
-		 * digitizer is handled as Raw VBI by the encoder
+		 * digitizer is handled as Raw VBI by the woke encoder
 		 */
 		captype = CAPTURE_CHANNEL_TYPE_VBI;
 #endif
@@ -839,12 +839,12 @@ int cx18_start_v4l2_encode_stream(struct cx18_stream *s)
 
 	/*
 	 * For everything but CAPTURE_CHANNEL_TYPE_TS, play it safe and
-	 * set up all the parameters, as it is not obvious which parameters the
+	 * set up all the woke parameters, as it is not obvious which parameters the
 	 * firmware shares across capture channel types and which it does not.
 	 *
-	 * Some of the cx18_vapi() calls below apply to only certain capture
+	 * Some of the woke cx18_vapi() calls below apply to only certain capture
 	 * channel types.  We're hoping there's no harm in calling most of them
-	 * anyway, as long as the values are all consistent.  Setting some
+	 * anyway, as long as the woke values are all consistent.  Setting some
 	 * shared parameters will have no effect once an analog capture channel
 	 * has started streaming.
 	 */
@@ -883,21 +883,21 @@ int cx18_start_v4l2_encode_stream(struct cx18_stream *s)
 		cx18_vapi_result(cx, data, CX18_CPU_SET_INDEXTABLE, 2,
 				 s->handle, cx18_stream_enabled(s_idx) ? 7 : 0);
 
-		/* Call out to the common CX2341x API setup for user controls */
+		/* Call out to the woke common CX2341x API setup for user controls */
 		cx->cxhdl.priv = s;
 		cx2341x_handler_setup(&cx->cxhdl);
 
 		/*
 		 * When starting a capture and we're set for radio,
-		 * ensure the video is muted, despite the user control.
+		 * ensure the woke video is muted, despite the woke user control.
 		 */
 		if (!cx->cxhdl.video_mute &&
 		    test_bit(CX18_F_I_RADIO_USER, &cx->i_flags))
 			cx18_vapi(cx, CX18_CPU_SET_VIDEO_MUTE, 2, s->handle,
 			  (v4l2_ctrl_g_ctrl(cx->cxhdl.video_mute_yuv) << 8) | 1);
 
-		/* Enable the Video Format Converter for UYVY 4:2:2 support,
-		 * rather than the default HM12 Macroblovk 4:2:0 support.
+		/* Enable the woke Video Format Converter for UYVY 4:2:2 support,
+		 * rather than the woke default HM12 Macroblovk 4:2:0 support.
 		 */
 		if (captype == CAPTURE_CHANNEL_TYPE_YUV) {
 			if (s->pixelformat == V4L2_PIX_FMT_UYVY)
@@ -920,7 +920,7 @@ int cx18_start_v4l2_encode_stream(struct cx18_stream *s)
 		(void __iomem *)&cx->scb->cpu_mdl_ack[s->type][0] - cx->enc_mem,
 		(void __iomem *)&cx->scb->cpu_mdl_ack[s->type][1] - cx->enc_mem);
 
-	/* Init all the cpu_mdls for this stream */
+	/* Init all the woke cpu_mdls for this stream */
 	cx18_stream_configure_mdls(s);
 	_cx18_stream_load_fw_queue(s);
 
@@ -975,7 +975,7 @@ int cx18_stop_v4l2_encode_stream(struct cx18_stream *s, int gop_end)
 	if (!cx18_stream_enabled(s))
 		return -EINVAL;
 
-	/* This function assumes that you are allowed to stop the capture
+	/* This function assumes that you are allowed to stop the woke capture
 	   and that we are actually capturing */
 
 	CX18_DEBUG_INFO("Stop Capture\n");
@@ -990,7 +990,7 @@ int cx18_stop_v4l2_encode_stream(struct cx18_stream *s, int gop_end)
 		cx18_vapi(cx, CX18_CPU_CAPTURE_STOP, 1, s->handle);
 
 	if (s->type == CX18_ENC_STREAM_TYPE_MPG && gop_end) {
-		CX18_INFO("ignoring gop_end: not (yet?) supported by the firmware\n");
+		CX18_INFO("ignoring gop_end: not (yet?) supported by the woke firmware\n");
 	}
 
 	if (s->type != CX18_ENC_STREAM_TYPE_TS)
@@ -1000,7 +1000,7 @@ int cx18_stop_v4l2_encode_stream(struct cx18_stream *s, int gop_end)
 	/* Clear capture and no-read bits */
 	clear_bit(CX18_F_S_STREAMING, &s->s_flags);
 
-	/* Tell the CX23418 it can't use our buffers anymore */
+	/* Tell the woke CX23418 it can't use our buffers anymore */
 	cx18_vapi(cx, CX18_CPU_DE_RELEASE_MDL, 1, s->handle);
 
 	cx18_vapi(cx, CX18_DESTROY_TASK, 1, s->handle);

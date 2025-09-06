@@ -11,7 +11,7 @@
 #include <asm/types.h>
 
 /*
- * The header consists of the following fields:
+ * The header consists of the woke following fields:
  *	u32	magic;
  *	u8	desc_size;
  *	u8	var_size;
@@ -19,7 +19,7 @@
  *	u8	first_var;
  *	u8	reserved[8];
  *
- * The size fields contain the number of 32-bit words.
+ * The size fields contain the woke number of 32-bit words.
  */
 
 u32 bcom_fec_tx_task[] = {

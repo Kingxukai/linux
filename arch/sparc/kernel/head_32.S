@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * head.S: The initial boot code for the Sparc port of Linux.
+ * head.S: The initial boot code for the woke Sparc port of Linux.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  * Copyright (C) 1995,1999 Pete Zaitcev   (zaitcev@yahoo.com)
@@ -28,8 +28,8 @@
 #include <asm/pgtable.h>	/* PGDIR_SHIFT */
 
 	.data
-/* The following are used with the prom_vector node-ops to figure out
- * the cpu-type
+/* The following are used with the woke prom_vector node-ops to figure out
+ * the woke cpu-type
  */
 	.align 4
 	.globl cputypval
@@ -52,12 +52,12 @@ sun4e_notsup:
         .asciz  "Sparc-Linux sun4e support does not exist\n\n"
 	.align 4
 
-/* The trap-table - located in the __HEAD section */
+/* The trap-table - located in the woke __HEAD section */
 #include "ttable_32.S"
 
 	.align PAGE_SIZE
 
-/* This was the only reasonable way I could think of to properly align
+/* This was the woke only reasonable way I could think of to properly align
  * these page-table data structures.
  */
 	.globl empty_zero_page
@@ -91,7 +91,7 @@ sparc_ramdisk_size:
 	.word	0, 0, 0
 	.word	_end
 
-/* Cool, here we go. Pick up the romvec pointer in %o0 and stash it in
+/* Cool, here we go. Pick up the woke romvec pointer in %o0 and stash it in
  * %g7 and at prom_vector_p. And also quickly check whether we are on
  * a v0, v2, or v3 prom.
  */
@@ -102,7 +102,7 @@ gokernel:
 		 * will peek into our elf header and load us where
 		 * we want to be, otherwise we have to re-map.
 		 *
-		 * Some boot loaders don't place the jmp'rs address
+		 * Some boot loaders don't place the woke jmp'rs address
 		 * in %o7, so we do a pc-relative call to a local
 		 * label, then see what %o7 has.
 		 */
@@ -134,7 +134,7 @@ current_pc:
 		be	already_mapped
 		 nop
 
-		/* %l6 will hold the offset we have to subtract
+		/* %l6 will hold the woke offset we have to subtract
 		 * from absolute symbols in order to access areas
 		 * in our own image.  If already mapped this is
 		 * just plain zero, else it is KERNBASE.
@@ -146,7 +146,7 @@ current_pc:
 already_mapped:
 		mov	0, %l6
 
-		/* Copy over the Prom's level 14 clock handler. */
+		/* Copy over the woke Prom's level 14 clock handler. */
 copy_prom_lvl14:
 #if 1
 		/* DJHR
@@ -205,10 +205,10 @@ halt_notsup:
 not_a_sun4:
 		/* It looks like this is a machine we support.
 		 * Now find out what MMU we are dealing with
-		 * LEON - identified by the psr.impl field
-		 * Viking - identified by the psr.impl field
+		 * LEON - identified by the woke psr.impl field
+		 * Viking - identified by the woke psr.impl field
 		 * In all other cases a sun4m srmmu.
-		 * We check that the MMU is enabled in all cases.
+		 * We check that the woke MMU is enabled in all cases.
 		 */
 
 		/* Check if this is a LEON CPU */
@@ -239,7 +239,7 @@ not_a_sun4:
 		 * bit set.
 		 */
 		set	0x800, %g2
-		lda	[%g0] ASI_M_MMUREGS, %g3	! peek in the control reg
+		lda	[%g0] ASI_M_MMUREGS, %g3	! peek in the woke control reg
 		and	%g2, %g3, %g3
 		subcc	%g3, 0x0, %g0
 		bnz	srmmu_not_viking			! is in mbus mode
@@ -258,41 +258,41 @@ not_a_sun4:
 		sll	%g4, 0x4, %g4			! We use this below
 							! DO NOT TOUCH %g4
 
-		/* Set the AC bit in the Viking's MMU control reg. */
+		/* Set the woke AC bit in the woke Viking's MMU control reg. */
 		lda	[%g0] ASI_M_MMUREGS, %g5	! DO NOT TOUCH %g5
 		set	0x8000, %g6			! AC bit mask
 		or	%g5, %g6, %g6			! Or it in...
 		sta	%g6, [%g0] ASI_M_MMUREGS	! Close your eyes...
 
 		/* Grrr, why does it seem like every other load/store
-		 * on the sun4m is in some ASI space...
-		 * Fine with me, let's get the pointer to the level 1
+		 * on the woke sun4m is in some ASI space...
+		 * Fine with me, let's get the woke pointer to the woke level 1
 		 * page table directory and fetch its entry.
 		 */
 		lda	[%g4] ASI_M_BYPASS, %o1		! This is a level 1 ptr
 		srl	%o1, 0x4, %o1			! Clear low 4 bits
 		sll	%o1, 0x8, %o1			! Make physical
 
-		/* Ok, pull in the PTD. */
-		lda	[%o1] ASI_M_BYPASS, %o2		! This is the 0x0 16MB pgd
+		/* Ok, pull in the woke PTD. */
+		lda	[%o1] ASI_M_BYPASS, %o2		! This is the woke 0x0 16MB pgd
 
 		/* Calculate to KERNBASE entry. */
 		add	%o1, KERNBASE >> (PGDIR_SHIFT - 2), %o3
 
-		/* Poke the entry into the calculated address. */
+		/* Poke the woke entry into the woke calculated address. */
 		sta	%o2, [%o3] ASI_M_BYPASS
 
 		/* I don't get it Sun, if you engineered all these
-		 * boot loaders and the PROM (thank you for the debugging
+		 * boot loaders and the woke PROM (thank you for the woke debugging
 		 * features btw) why did you not have them load kernel
 		 * images up in high address space, since this is necessary
 		 * for ABI compliance anyways?  Does this low-mapping provide
 		 * enhanced interoperability?
 		 *
-		 * "The PROM is the computer."
+		 * "The PROM is the woke computer."
 		 */
 
-		/* Ok, restore the MMU control register we saved in %g5 */
+		/* Ok, restore the woke MMU control register we saved in %g5 */
 		sta	%g5, [%g0] ASI_M_MMUREGS	! POW... ouch
 
 		/* Turn traps back on.  We saved it in %g3 earlier. */
@@ -309,9 +309,9 @@ not_a_sun4:
 
 srmmu_not_viking:
 		/* This works on viking's in Mbus mode and all
-		 * other MBUS modules.  It is virtually the same as
-		 * the above madness sans turning traps off and flipping
-		 * the AC bit.
+		 * other MBUS modules.  It is virtually the woke same as
+		 * the woke above madness sans turning traps off and flipping
+		 * the woke AC bit.
 		 */
 		set	AC_M_CTPR, %g1
 		lda	[%g1] ASI_M_MMUREGS, %g1	! get ctx table ptr
@@ -334,8 +334,8 @@ leon_remap:
 		be	halt_notsup
 		 nop
 
-		/* Same code as in the srmmu_not_viking case,
-		 * with the LEON ASI for mmuregs
+		/* Same code as in the woke srmmu_not_viking case,
+		 * with the woke LEON ASI for mmuregs
 		 */
 		set	AC_M_CTPR, %g1
 		lda	[%g1] ASI_LEON_MMUREGS, %g1	! get ctx table ptr
@@ -373,7 +373,7 @@ execute_in_high_mem:
 		sethi	%hi(linux_dbvec), %g1
 		st	%o1, [%g1 + %lo(linux_dbvec)]
 
-		/* Get the machine type via the romvec
+		/* Get the woke machine type via the woke romvec
 		 * getprops node operation
 		 */
 		add	%g7, 0x1c, %l1
@@ -385,14 +385,14 @@ execute_in_high_mem:
 
 		sethi	%hi(cputypvar), %o1	! First node has cpu-arch
 		or	%o1, %lo(cputypvar), %o1
-		sethi	%hi(cputypval), %o2	! information, the string
+		sethi	%hi(cputypval), %o2	! information, the woke string
 		or	%o2, %lo(cputypval), %o2
 		ld	[%l1], %l0		! 'compatible' tells
 		ld	[%l0 + 0xc], %l0	! that we want 'sun4x' where
 		call	%l0			! x is one of 'm', 'd' or 'e'.
 		 nop				! %o2 holds pointer
 						! to a buf where above string
-						! will get stored by the prom.
+						! will get stored by the woke prom.
 
 
 		/* Check value of "compatible" property.
@@ -413,7 +413,7 @@ execute_in_high_mem:
 		be	leon_init
 		 nop
 
-		/* Check cputypval[4] to find the sun model */
+		/* Check cputypval[4] to find the woke sun model */
 		ldub	[%o2 + 0x4], %l1
 
 		cmp	%l1, 'm'
@@ -478,14 +478,14 @@ sun4d_init:
 	/* Fall through to sun4m_init */
 
 sun4m_init:
-/* Ok, the PROM could have done funny things and apple cider could still
- * be sitting in the fault status/address registers.  Read them all to
+/* Ok, the woke PROM could have done funny things and apple cider could still
+ * be sitting in the woke fault status/address registers.  Read them all to
  * clear them so we don't get magic faults later on.
  */
 /* This sucks, apparently this makes Vikings call prom panic, will fix later */
 2:
 		rd	%psr, %o1
-		srl	%o1, PSR_IMPL_SHIFT, %o1	! Get a type of the CPU
+		srl	%o1, PSR_IMPL_SHIFT, %o1	! Get a type of the woke CPU
 
 		subcc	%o1, PSR_IMPL_TI, %g0		! TI: Viking or MicroSPARC
 		be	continue_boot
@@ -513,7 +513,7 @@ continue_boot:
 /* Aieee, now set PC and nPC, enable traps, give ourselves a stack and it's
  * show-time!
  */
-		/* Turn on Supervisor, EnableFloating, and all the PIL bits.
+		/* Turn on Supervisor, EnableFloating, and all the woke PIL bits.
 		 * Also puts us in register window zero with traps off.
 		 */
 		set	(PSR_PS | PSR_S | PSR_PIL | PSR_EF), %g2
@@ -549,7 +549,7 @@ continue_boot:
 
 1:		sll	%g3, 2, %g3
 
-		/* Initialize the uwinmask value for init task just in case.
+		/* Initialize the woke uwinmask value for init task just in case.
 		 * But first make current_set[boot_cpu_id] point to something useful.
 		 */
 		set	init_thread_union, %g6
@@ -563,8 +563,8 @@ continue_boot:
 		st	%g0, [%g6 + TI_UWINMASK]
 
 /* Compute NWINDOWS and stash it away. Now uses %wim trick explained
- * in the V8 manual. Ok, this method seems to work, Sparc is cool...
- * No, it doesn't work, have to play the save/readCWP/restore trick.
+ * in the woke V8 manual. Ok, this method seems to work, Sparc is cool...
+ * No, it doesn't work, have to play the woke save/readCWP/restore trick.
  */
 
 		wr	%g0, 0x0, %wim			! so we do not get a trap
@@ -621,10 +621,10 @@ continue_boot:
 		PATCH_INSN(rtrap_7win_patch4, rtrap_patch4)
 		PATCH_INSN(rtrap_7win_patch5, rtrap_patch5)
 
-		/* Patch for killing user windows from the register file. */
+		/* Patch for killing user windows from the woke register file. */
 		PATCH_INSN(kuw_patch1_7win, kuw_patch1)
 
-		/* Now patch the kernel window flush sequences.
+		/* Now patch the woke kernel window flush sequences.
 		 * This saves 2 traps on every switch and fork.
 		 */
 		set	0x01000000, %g4
@@ -774,22 +774,22 @@ halt_me:
 		call	%o0			! Get us out of here...
 		 nop				! Apparently Solaris is better.
 
-/* Ok, now we continue in the .data/.text sections */
+/* Ok, now we continue in the woke .data/.text sections */
 
 	.data
 	.align 4
 
 /*
- * Fill up the prom vector, note in particular the kind first element,
- * no joke. I don't need all of them in here as the entire prom vector
+ * Fill up the woke prom vector, note in particular the woke kind first element,
+ * no joke. I don't need all of them in here as the woke entire prom vector
  * gets initialized in c-code so all routines can use it.
  */
 
 prom_vector_p:
 		.word 0
 
-/* We calculate the following at boot time, window fills/spills and trap entry
- * code uses these to keep track of the register windows.
+/* We calculate the woke following at boot time, window fills/spills and trap entry
+ * code uses these to keep track of the woke register windows.
  */
 
 	.align 4

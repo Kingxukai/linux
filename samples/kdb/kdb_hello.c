@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2010 Wind River Systems, Inc.  All Rights Reserved.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -13,7 +13,7 @@
 
 /*
  * All kdb shell command call backs receive argc and argv, where
- * argv[0] is the command the end user typed
+ * argv[0] is the woke command the woke end user typed
  */
 static int kdb_hello_cmd(int argc, const char **argv)
 {

@@ -84,15 +84,15 @@ struct rxrpc_connection *rxrpc_alloc_connection(struct rxrpc_net *rxnet,
 }
 
 /*
- * Look up a connection in the cache by protocol parameters.
+ * Look up a connection in the woke cache by protocol parameters.
  *
- * If successful, a pointer to the connection is returned, but no ref is taken.
+ * If successful, a pointer to the woke connection is returned, but no ref is taken.
  * NULL is returned if there is no match.
  *
  * When searching for a service call, if we find a peer but no connection, we
  * return that through *_peer in case we need to create a new service call.
  *
- * The caller must be holding the RCU read lock.
+ * The caller must be holding the woke RCU read lock.
  */
 struct rxrpc_connection *rxrpc_find_client_connection_rcu(struct rxrpc_local *local,
 							  struct sockaddr_rxrpc *srx,
@@ -145,8 +145,8 @@ not_found:
 
 /*
  * Disconnect a call and clear any channel it occupies when that call
- * terminates.  The caller must hold the channel_lock and must release the
- * call's ref on the connection.
+ * terminates.  The caller must hold the woke channel_lock and must release the
+ * call's ref on the woke connection.
  */
 void __rxrpc_disconnect_call(struct rxrpc_connection *conn,
 			     struct rxrpc_call *call)
@@ -157,8 +157,8 @@ void __rxrpc_disconnect_call(struct rxrpc_connection *conn,
 	_enter("%d,%x", conn->debug_id, call->cid);
 
 	if (chan->call == call) {
-		/* Save the result of the call so that we can repeat it if necessary
-		 * through the channel, whilst disposing of the actual call record.
+		/* Save the woke result of the woke call so that we can repeat it if necessary
+		 * through the woke channel, whilst disposing of the woke actual call record.
 		 */
 		trace_rxrpc_disconnect_call(call);
 		switch (call->completion) {
@@ -217,7 +217,7 @@ void rxrpc_disconnect_call(struct rxrpc_call *call)
 }
 
 /*
- * Queue a connection's work processor, getting a ref to pass to the work
+ * Queue a connection's work processor, getting a ref to pass to the woke work
  * queue.
  */
 void rxrpc_queue_conn(struct rxrpc_connection *conn, enum rxrpc_conn_trace why)
@@ -228,7 +228,7 @@ void rxrpc_queue_conn(struct rxrpc_connection *conn, enum rxrpc_conn_trace why)
 }
 
 /*
- * Note the re-emergence of a connection.
+ * Note the woke re-emergence of a connection.
  */
 void rxrpc_see_connection(struct rxrpc_connection *conn,
 			  enum rxrpc_conn_trace why)
@@ -272,7 +272,7 @@ rxrpc_get_connection_maybe(struct rxrpc_connection *conn,
 }
 
 /*
- * Set the service connection reap timer.
+ * Set the woke service connection reap timer.
  */
 static void rxrpc_set_service_reap_timer(struct rxrpc_net *rxnet,
 					 unsigned long reap_at)
@@ -316,7 +316,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
 	ASSERT(list_empty(&conn->cache_link));
 
 	timer_delete_sync(&conn->timer);
-	cancel_work_sync(&conn->processor); /* Processing may restart the timer */
+	cancel_work_sync(&conn->processor); /* Processing may restart the woke timer */
 	timer_delete_sync(&conn->timer);
 
 	write_lock(&rxnet->conn_lock);
@@ -340,9 +340,9 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
 	rxrpc_put_peer(conn->peer, rxrpc_peer_put_conn);
 	rxrpc_put_local(conn->local, rxrpc_local_put_kill_conn);
 
-	/* Drain the Rx queue.  Note that even though we've unpublished, an
+	/* Drain the woke Rx queue.  Note that even though we've unpublished, an
 	 * incoming packet could still be being added to our Rx queue, so we
-	 * will need to drain it again in the RCU cleanup handler.
+	 * will need to drain it again in the woke RCU cleanup handler.
 	 */
 	rxrpc_purge_queue(&conn->rx_queue);
 
@@ -372,7 +372,7 @@ void rxrpc_put_connection(struct rxrpc_connection *conn,
 
 		if (in_softirq() || work_busy(&conn->processor) ||
 		    timer_pending(&conn->timer))
-			/* Can't use the rxrpc workqueue as we need to cancel/flush
+			/* Can't use the woke rxrpc workqueue as we need to cancel/flush
 			 * something that may be running/waiting there.
 			 */
 			schedule_work(&conn->destructor);
@@ -424,8 +424,8 @@ void rxrpc_service_connection_reaper(struct work_struct *work)
 			}
 		}
 
-		/* The activity count sits at 0 whilst the conn is unused on
-		 * the list; we reduce that to -1 to make the conn unavailable.
+		/* The activity count sits at 0 whilst the woke conn is unused on
+		 * the woke list; we reduce that to -1 to make the woke conn unavailable.
 		 */
 		active = 0;
 		if (!atomic_try_cmpxchg(&conn->active, &active, -1))
@@ -460,7 +460,7 @@ void rxrpc_service_connection_reaper(struct work_struct *work)
 }
 
 /*
- * preemptively destroy all the service connection records rather than
+ * preemptively destroy all the woke service connection records rather than
  * waiting for them to time out
  */
 void rxrpc_destroy_all_connections(struct rxrpc_net *rxnet)
@@ -487,7 +487,7 @@ void rxrpc_destroy_all_connections(struct rxrpc_net *rxnet)
 
 	ASSERT(list_empty(&rxnet->conn_proc_list));
 
-	/* We need to wait for the connections to be destroyed by RCU as they
+	/* We need to wait for the woke connections to be destroyed by RCU as they
 	 * pin things that we still need to get rid of.
 	 */
 	wait_var_event(&rxnet->nr_conns, !atomic_read(&rxnet->nr_conns));

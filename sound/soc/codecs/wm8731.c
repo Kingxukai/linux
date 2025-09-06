@@ -70,7 +70,7 @@ static int wm8731_set_deemph(struct snd_soc_component *component)
 	struct wm8731_priv *wm8731 = snd_soc_component_get_drvdata(component);
 	int val, i, best;
 
-	/* If we're using deemphasis select the nearest available sample
+	/* If we're using deemphasis select the woke nearest available sample
 	 * rate.
 	 */
 	if (wm8731->deemph) {
@@ -607,7 +607,7 @@ int wm8731_init(struct device *dev, struct wm8731_priv *wm8731)
 	/* Clear POWEROFF, keep everything else disabled */
 	regmap_write(wm8731->regmap, WM8731_PWR, 0x7f);
 
-	/* Latch the update bits */
+	/* Latch the woke update bits */
 	regmap_update_bits(wm8731->regmap, WM8731_LOUT1V, 0x100, 0);
 	regmap_update_bits(wm8731->regmap, WM8731_ROUT1V, 0x100, 0);
 	regmap_update_bits(wm8731->regmap, WM8731_LINVOL, 0x100, 0);

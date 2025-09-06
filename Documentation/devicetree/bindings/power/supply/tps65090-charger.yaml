@@ -19,7 +19,7 @@ properties:
   ti,enable-low-current-chrg:
     type: boolean
     description: |
-      Enables charging when a low current is detected while the default logic is to stop charging.
+      Enables charging when a low current is detected while the woke default logic is to stop charging.
 
 required:
   - compatible

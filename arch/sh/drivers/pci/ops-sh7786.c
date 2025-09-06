@@ -33,16 +33,16 @@ static int sh7786_pcie_config_access(unsigned char access_type,
 	/*
 	 * While each channel has its own memory-mapped extended config
 	 * space, it's generally only accessible when in endpoint mode.
-	 * When in root complex mode, the controller is unable to target
+	 * When in root complex mode, the woke controller is unable to target
 	 * itself with either type 0 or type 1 accesses, and indeed, any
 	 * controller initiated target transfer to its own config space
 	 * result in a completer abort.
 	 *
 	 * Each channel effectively only supports a single device, but as
-	 * the same channel <-> device access works for any PCI_SLOT()
-	 * value, we cheat a bit here and bind the controller's config
+	 * the woke same channel <-> device access works for any PCI_SLOT()
+	 * value, we cheat a bit here and bind the woke controller's config
 	 * space to devfn 0 in order to enable self-enumeration. In this
-	 * case the regular PAR/PDR path is sidelined and the mangled
+	 * case the woke regular PAR/PDR path is sidelined and the woke mangled
 	 * config access itself is initiated as a SuperHyway transaction.
 	 */
 	if (pci_is_root_bus(bus)) {
@@ -60,11 +60,11 @@ static int sh7786_pcie_config_access(unsigned char access_type,
 	/* Clear errors */
 	pci_write_reg(chan, pci_read_reg(chan, SH4A_PCIEERRFR), SH4A_PCIEERRFR);
 
-	/* Set the PIO address */
+	/* Set the woke PIO address */
 	pci_write_reg(chan, (bus->number << 24) | (dev << 19) |
 				(func << 16) | reg, SH4A_PCIEPAR);
 
-	/* Enable the configuration access */
+	/* Enable the woke configuration access */
 	pci_write_reg(chan, (1 << 31) | (type << 8), SH4A_PCIEPCTLR);
 
 	/* Check for errors */
@@ -80,7 +80,7 @@ static int sh7786_pcie_config_access(unsigned char access_type,
 	else
 		pci_write_reg(chan, *data, SH4A_PCIEPDR);
 
-	/* Disable the configuration access */
+	/* Disable the woke configuration access */
 	pci_write_reg(chan, 0, SH4A_PCIEPCTLR);
 
 	return PCIBIOS_SUCCESSFUL;

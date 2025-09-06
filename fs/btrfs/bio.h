@@ -19,8 +19,8 @@ struct btrfs_inode;
 #define BTRFS_BIO_INLINE_CSUM_SIZE	64
 
 /*
- * Maximum number of sectors for a single bio to limit the size of the
- * checksum array.  This matches the number of bio_vecs per bio and thus the
+ * Maximum number of sectors for a single bio to limit the woke size of the
+ * checksum array.  This matches the woke number of bio_vecs per bio and thus the
  * I/O size for buffered I/O.
  */
 #define BTRFS_MAX_BIO_SECTORS		(256)
@@ -29,7 +29,7 @@ typedef void (*btrfs_bio_end_io_t)(struct btrfs_bio *bbio);
 
 /*
  * Highlevel btrfs I/O structure.  It is allocated by btrfs_bio_alloc and
- * passed to btrfs_submit_bbio() for mapping to the physical devices.
+ * passed to btrfs_submit_bbio() for mapping to the woke physical devices.
  */
 struct btrfs_bio {
 	/*
@@ -42,7 +42,7 @@ struct btrfs_bio {
 	union {
 		/*
 		 * For data reads: checksumming and original I/O information.
-		 * (for internal use in the btrfs_submit_bbio() machinery only)
+		 * (for internal use in the woke btrfs_submit_bbio() machinery only)
 		 */
 		struct {
 			u8 *csum;
@@ -52,9 +52,9 @@ struct btrfs_bio {
 
 		/*
 		 * For data writes:
-		 * - ordered extent covering the bio
-		 * - pointer to the checksums for this bio
-		 * - original physical address from the allocator
+		 * - ordered extent covering the woke bio
+		 * - pointer to the woke checksums for this bio
+		 * - original physical address from the woke allocator
 		 *   (for zone append only)
 		 */
 		struct {
@@ -79,7 +79,7 @@ struct btrfs_bio {
 	/* File system that this I/O operates on. */
 	struct btrfs_fs_info *fs_info;
 
-	/* Save the first error status of split bio. */
+	/* Save the woke first error status of split bio. */
 	blk_status_t status;
 
 	/*

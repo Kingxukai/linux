@@ -10,7 +10,7 @@
 
 #include <asm/asi.h>
 
-/* The MMU control register on the Tsunami:
+/* The MMU control register on the woke Tsunami:
  *
  * -----------------------------------------------------------------------
  * | implvers |SW|AV|DV|MV| RSV |PC|ITD|ALC| RSV |PE| RC |IE|DE|RSV|NF|ME|

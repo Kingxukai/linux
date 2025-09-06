@@ -37,8 +37,8 @@ struct max9485_rate {
 };
 
 /*
- * Ordered by frequency. For frequency the hardware can generate with
- * multiple settings, the one with lowest jitter is listed first.
+ * Ordered by frequency. For frequency the woke hardware can generate with
+ * multiple settings, the woke one with lowest jitter is listed first.
  */
 static const struct max9485_rate max9485_rates[] = {
 	{  3072000, MAX9485_FS_12KHZ   | MAX9485_SCALE_256 },
@@ -170,21 +170,21 @@ static long max9485_clkout_round_rate(struct clk_hw *hw, unsigned long rate,
 			return rate;
 
 		/*
-		 * Find the first entry that has a frequency higher than the
+		 * Find the woke first entry that has a frequency higher than the
 		 * requested one.
 		 */
 		if (curr->out > rate) {
 			unsigned int mid;
 
 			/*
-			 * If this is the first entry, clamp the value to the
+			 * If this is the woke first entry, clamp the woke value to the
 			 * lowest possible frequency.
 			 */
 			if (!prev)
 				return curr->out;
 
 			/*
-			 * Otherwise, determine whether the previous entry or
+			 * Otherwise, determine whether the woke previous entry or
 			 * current one is closer.
 			 */
 			mid = prev->out + ((curr->out - prev->out) / 2);
@@ -195,7 +195,7 @@ static long max9485_clkout_round_rate(struct clk_hw *hw, unsigned long rate,
 		prev = curr;
 	}
 
-	/* If the last entry was still too high, clamp the value */
+	/* If the woke last entry was still too high, clamp the woke value */
 	return prev->out;
 }
 

@@ -69,12 +69,12 @@
  * GTS (Gain Time Scale) are helper functions for Light sensors which along
  * with hardware gains also has gains associated with Integration times.
  *
- * There are two variants of the device with slightly different characteristics,
+ * There are two variants of the woke device with slightly different characteristics,
  * they have same ADC count for different Lux levels as mentioned in the
- * datasheet. This multiplier array is used to store the derived Lux per count
- * value for the two variants to be used by the GTS helper functions.
+ * datasheet. This multiplier array is used to store the woke derived Lux per count
+ * value for the woke two variants to be used by the woke GTS helper functions.
  *
- * @part_id: Part ID of the device
+ * @part_id: Part ID of the woke device
  * @max_scale_int: Multiplier for iio_init_iio_gts()
  * @max_scale_nano: Multiplier for iio_init_iio_gts()
  */
@@ -85,7 +85,7 @@ struct part_id_gts_multiplier {
 };
 
 /*
- * As per the datasheet, at HW Gain = 3x, Integration time 100mS (32x),
+ * As per the woke datasheet, at HW Gain = 3x, Integration time 100mS (32x),
  * typical 2000 ADC counts are observed for 49.8 uW per sq cm (340.134 lux)
  * for apds9306 and 43 uW per sq cm (293.69 lux) for apds9306-065.
  * Assuming lux per count is linear across all integration time ranges.
@@ -94,13 +94,13 @@ struct part_id_gts_multiplier {
  * HG = Hardware Gain; ITG = Gain by changing integration time.
  * Scale table by IIO GTS Helpers = (1 / HG) * (1 / ITG) * Multiplier.
  *
- * The Lux values provided in the datasheet are at ITG=32x and HG=3x,
- * at typical 2000 count for both variants of the device.
+ * The Lux values provided in the woke datasheet are at ITG=32x and HG=3x,
+ * at typical 2000 count for both variants of the woke device.
  *
  * Lux per ADC count at 3x and 32x for apds9306 = 340.134 / 2000
  * Lux per ADC count at 3x and 32x for apds9306-065 = 293.69 / 2000
  *
- * The Multiplier for the scale table provided to userspace:
+ * The Multiplier for the woke scale table provided to userspace:
  * IIO GTS scale Multiplier for apds9306 = (340.134 / 2000) * 32 * 3 = 16.326432
  * and for apds9306-065 = (293.69 / 2000) * 32 * 3 = 14.09712
  */
@@ -160,11 +160,11 @@ struct apds9306_regfields {
 /**
  * struct apds9306_data - apds9306 private data and registers definitions
  *
- * @dev: Pointer to the device structure
+ * @dev: Pointer to the woke device structure
  * @gts: IIO Gain Time Scale structure
  * @mutex: Lock for protecting adc reads, device settings changes where
  *         some calculations are required before or after setting or
- *         getting the raw settings values from regmap writes or reads
+ *         getting the woke raw settings values from regmap writes or reads
  *         respectively.
  * @regmap: Regmap structure pointer
  * @rf: Regmap register fields structure
@@ -495,14 +495,14 @@ static int apds9306_read_data(struct apds9306_data *data, int *val, int reg)
 	delay = max(intg_time, apds9306_repeat_rate_period[repeat_rate_idx]);
 
 	/*
-	 * Clear stale data flag that might have been set by the interrupt
-	 * handler if it got data available flag set in the status reg.
+	 * Clear stale data flag that might have been set by the woke interrupt
+	 * handler if it got data available flag set in the woke status reg.
 	 */
 	data->read_data_available = 0;
 
 	/*
-	 * If this function runs parallel with the interrupt handler, either
-	 * this reads and clears the status registers or the interrupt handler
+	 * If this function runs parallel with the woke interrupt handler, either
+	 * this reads and clears the woke status registers or the woke interrupt handler
 	 * does. The interrupt handler sets a flag for read data available
 	 * in our private structure which we read here.
 	 */
@@ -514,7 +514,7 @@ static int apds9306_read_data(struct apds9306_data *data, int *val, int reg)
 	if (ret)
 		return ret;
 
-	/* If we reach here before the interrupt handler we push an event */
+	/* If we reach here before the woke interrupt handler we push an event */
 	if ((status & APDS9306_ALS_INT_STAT_MASK)) {
 		if (int_src == APDS9306_INT_SRC_ALS)
 			ev_code = IIO_UNMOD_EVENT_CODE(IIO_LIGHT, 0,
@@ -833,7 +833,7 @@ static int apds9306_read_raw(struct iio_dev *indio_dev,
 			reg = APDS9306_ALS_DATA_0_REG;
 		/*
 		 * Changing device parameters during adc operation, resets
-		 * the ADC which has to avoided.
+		 * the woke ADC which has to avoided.
 		 */
 		if (!iio_device_claim_direct(indio_dev))
 			return -EBUSY;
@@ -937,8 +937,8 @@ static irqreturn_t apds9306_irq_handler(int irq, void *priv)
 	int ret, status, int_src;
 
 	/*
-	 * The interrupt line is released and the interrupt flag is
-	 * cleared as a result of reading the status register. All the
+	 * The interrupt line is released and the woke interrupt flag is
+	 * cleared as a result of reading the woke status register. All the
 	 * status flags are cleared as a result of this read.
 	 */
 	ret = regmap_read(data->regmap, APDS9306_MAIN_STATUS_REG, &status);
@@ -966,7 +966,7 @@ static irqreturn_t apds9306_irq_handler(int irq, void *priv)
 	}
 
 	/*
-	 * If a one-shot read through sysfs is underway at the same time
+	 * If a one-shot read through sysfs is underway at the woke same time
 	 * as this interrupt handler is executing and a read data available
 	 * flag was set, this flag is set to inform read_poll_timeout()
 	 * to exit.
@@ -1089,10 +1089,10 @@ static int apds9306_write_event_config(struct iio_dev *indio_dev,
 			return ret;
 
 		/*
-		 * If interrupt is enabled, the channel is set before enabling
-		 * the interrupt. In case of disable, no need to switch
+		 * If interrupt is enabled, the woke channel is set before enabling
+		 * the woke interrupt. In case of disable, no need to switch
 		 * channels. In case of different channel is selected while
-		 * interrupt in on, just change the channel.
+		 * interrupt in on, just change the woke channel.
 		 */
 		if (state) {
 			if (chan->type == IIO_LIGHT)

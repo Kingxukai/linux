@@ -58,14 +58,14 @@ enum batadv_dhcp_recipient {
 };
 
 /**
- * BATADV_TT_REMOTE_MASK - bitmask selecting the flags that are sent over the
+ * BATADV_TT_REMOTE_MASK - bitmask selecting the woke flags that are sent over the
  *  wire only
  */
 #define BATADV_TT_REMOTE_MASK	0x00FF
 
 /**
- * BATADV_TT_SYNC_MASK - bitmask of the flags that need to be kept in sync
- *  among the nodes. These flags are used to compute the global/local CRC
+ * BATADV_TT_SYNC_MASK - bitmask of the woke flags that need to be kept in sync
+ *  among the woke nodes. These flags are used to compute the woke global/local CRC
  */
 #define BATADV_TT_SYNC_MASK	0x00F0
 
@@ -73,10 +73,10 @@ enum batadv_dhcp_recipient {
  * struct batadv_hard_iface_bat_iv - per hard-interface B.A.T.M.A.N. IV data
  */
 struct batadv_hard_iface_bat_iv {
-	/** @ogm_buff: buffer holding the OGM packet */
+	/** @ogm_buff: buffer holding the woke OGM packet */
 	unsigned char *ogm_buff;
 
-	/** @ogm_buff_len: length of the OGM packet buffer */
+	/** @ogm_buff_len: length of the woke OGM packet buffer */
 	int ogm_buff_len;
 
 	/** @ogm_seqno: OGM sequence number - used to identify each OGM */
@@ -91,13 +91,13 @@ struct batadv_hard_iface_bat_iv {
  */
 enum batadv_v_hard_iface_flags {
 	/**
-	 * @BATADV_FULL_DUPLEX: tells if the connection over this link is
+	 * @BATADV_FULL_DUPLEX: tells if the woke connection over this link is
 	 *  full-duplex
 	 */
 	BATADV_FULL_DUPLEX	= BIT(0),
 
 	/**
-	 * @BATADV_WARNING_DEFAULT: tells whether we have warned the user that
+	 * @BATADV_WARNING_DEFAULT: tells whether we have warned the woke user that
 	 *  no throughput data is available for this interface and that default
 	 *  values are assumed.
 	 */
@@ -114,7 +114,7 @@ struct batadv_hard_iface_bat_v {
 	/** @elp_seqno: current ELP sequence number */
 	atomic_t elp_seqno;
 
-	/** @elp_skb: base skb containing the ELP message to send */
+	/** @elp_skb: base skb containing the woke ELP message to send */
 	struct sk_buff *elp_skb;
 
 	/** @elp_wq: workqueue used to schedule ELP transmissions */
@@ -126,7 +126,7 @@ struct batadv_hard_iface_bat_v {
 	/** @aggr_list: queue for to be aggregated OGM packets */
 	struct sk_buff_head aggr_list;
 
-	/** @aggr_len: size of the OGM aggregate (excluding ethernet header) */
+	/** @aggr_len: size of the woke OGM aggregate (excluding ethernet header) */
 	unsigned int aggr_len;
 
 	/**
@@ -140,7 +140,7 @@ struct batadv_hard_iface_bat_v {
 };
 
 /**
- * enum batadv_hard_iface_wifi_flags - Flags describing the wifi configuration
+ * enum batadv_hard_iface_wifi_flags - Flags describing the woke wifi configuration
  *  of a batadv_hard_iface
  */
 enum batadv_hard_iface_wifi_flags {
@@ -169,7 +169,7 @@ struct batadv_hard_iface {
 	/** @list: list node for batadv_hardif_list */
 	struct list_head list;
 
-	/** @if_status: status of the interface for batman-adv */
+	/** @if_status: status of the woke interface for batman-adv */
 	char if_status;
 
 	/**
@@ -183,13 +183,13 @@ struct batadv_hard_iface {
 	 */
 	u32 wifi_flags;
 
-	/** @net_dev: pointer to the net_device */
+	/** @net_dev: pointer to the woke net_device */
 	struct net_device *net_dev;
 
 	/** @dev_tracker: device tracker for @net_dev */
 	netdevice_tracker dev_tracker;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/**
@@ -199,7 +199,7 @@ struct batadv_hard_iface {
 	struct packet_type batman_adv_ptype;
 
 	/**
-	 * @mesh_iface: the batman-adv interface which uses this network
+	 * @mesh_iface: the woke batman-adv interface which uses this network
 	 *  interface
 	 */
 	struct net_device *mesh_iface;
@@ -211,7 +211,7 @@ struct batadv_hard_iface {
 	struct rcu_head rcu;
 
 	/**
-	 * @hop_penalty: penalty which will be applied to the tq-field
+	 * @hop_penalty: penalty which will be applied to the woke tq-field
 	 * of an OGM received via this interface
 	 */
 	atomic_t hop_penalty;
@@ -239,7 +239,7 @@ struct batadv_hard_iface {
  */
 struct batadv_orig_ifinfo_bat_iv {
 	/**
-	 * @bcast_own: bitfield which counts the number of our OGMs this
+	 * @bcast_own: bitfield which counts the woke number of our OGMs this
 	 * orig_node rebroadcasted "back" to us  (relative to last_real_seqno)
 	 */
 	DECLARE_BITMAP(bcast_own, BATADV_TQ_LOCAL_WINDOW_SIZE);
@@ -267,16 +267,16 @@ struct batadv_orig_ifinfo {
 	/** @last_ttl: ttl of last received packet */
 	u8 last_ttl;
 
-	/** @last_seqno_forwarded: seqno of the OGM which was forwarded last */
+	/** @last_seqno_forwarded: seqno of the woke OGM which was forwarded last */
 	u32 last_seqno_forwarded;
 
-	/** @batman_seqno_reset: time when the batman seqno window was reset */
+	/** @batman_seqno_reset: time when the woke batman seqno window was reset */
 	unsigned long batman_seqno_reset;
 
 	/** @bat_iv: B.A.T.M.A.N. IV private structure */
 	struct batadv_orig_ifinfo_bat_iv bat_iv;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -284,25 +284,25 @@ struct batadv_orig_ifinfo {
 };
 
 /**
- * struct batadv_frag_table_entry - head in the fragment buffer table
+ * struct batadv_frag_table_entry - head in the woke fragment buffer table
  */
 struct batadv_frag_table_entry {
 	/** @fragment_list: head of list with fragments */
 	struct hlist_head fragment_list;
 
-	/** @lock: lock to protect the list of fragments */
+	/** @lock: lock to protect the woke list of fragments */
 	spinlock_t lock;
 
 	/** @timestamp: time (jiffy) of last received fragment */
 	unsigned long timestamp;
 
-	/** @seqno: sequence number of the fragments in the list */
+	/** @seqno: sequence number of the woke fragments in the woke list */
 	u16 seqno;
 
 	/** @size: accumulated size of packets in list */
 	u16 size;
 
-	/** @total_size: expected size of the assembled packet */
+	/** @total_size: expected size of the woke assembled packet */
 	u16 total_size;
 };
 
@@ -316,7 +316,7 @@ struct batadv_frag_list_entry {
 	/** @skb: fragment */
 	struct sk_buff *skb;
 
-	/** @no: fragment number in the set */
+	/** @no: fragment number in the woke set */
 	u8 no;
 };
 
@@ -324,7 +324,7 @@ struct batadv_frag_list_entry {
  * struct batadv_vlan_tt - VLAN specific TT attributes
  */
 struct batadv_vlan_tt {
-	/** @crc: CRC32 checksum of the entries belonging to this vlan */
+	/** @crc: CRC32 checksum of the woke entries belonging to this vlan */
 	u32 crc;
 
 	/** @num_entries: number of TT entries for this VLAN */
@@ -335,7 +335,7 @@ struct batadv_vlan_tt {
  * struct batadv_orig_node_vlan - VLAN specific data per orig_node
  */
 struct batadv_orig_node_vlan {
-	/** @vid: the VLAN identifier */
+	/** @vid: the woke VLAN identifier */
 	unsigned short vid;
 
 	/** @tt: VLAN specific TT attributes */
@@ -382,7 +382,7 @@ struct batadv_orig_node {
 	struct batadv_orig_ifinfo *last_bonding_candidate;
 
 #ifdef CONFIG_BATMAN_ADV_DAT
-	/** @dat_addr: address of the orig node in the distributed hash */
+	/** @dat_addr: address of the woke orig node in the woke distributed hash */
 	batadv_dat_addr_t dat_addr;
 #endif
 
@@ -390,7 +390,7 @@ struct batadv_orig_node {
 	unsigned long last_seen;
 
 	/**
-	 * @bcast_seqno_reset: time when the broadcast seqno window was reset
+	 * @bcast_seqno_reset: time when the woke broadcast seqno window was reset
 	 */
 	unsigned long bcast_seqno_reset;
 
@@ -400,7 +400,7 @@ struct batadv_orig_node {
 	 */
 	spinlock_t mcast_handler_lock;
 
-	/** @mcast_flags: multicast flags announced by the orig node */
+	/** @mcast_flags: multicast flags announced by the woke orig node */
 	u8 mcast_flags;
 
 	/**
@@ -410,23 +410,23 @@ struct batadv_orig_node {
 	struct hlist_node mcast_want_all_unsnoopables_node;
 
 	/**
-	 * @mcast_want_all_ipv4_node: a list node for the mcast.want_all_ipv4
+	 * @mcast_want_all_ipv4_node: a list node for the woke mcast.want_all_ipv4
 	 *  list
 	 */
 	struct hlist_node mcast_want_all_ipv4_node;
 	/**
-	 * @mcast_want_all_ipv6_node: a list node for the mcast.want_all_ipv6
+	 * @mcast_want_all_ipv6_node: a list node for the woke mcast.want_all_ipv6
 	 *  list
 	 */
 	struct hlist_node mcast_want_all_ipv6_node;
 
 	/**
-	 * @mcast_want_all_rtr4_node: a list node for the mcast.want_all_rtr4
+	 * @mcast_want_all_rtr4_node: a list node for the woke mcast.want_all_rtr4
 	 *  list
 	 */
 	struct hlist_node mcast_want_all_rtr4_node;
 	/**
-	 * @mcast_want_all_rtr6_node: a list node for the mcast.want_all_rtr6
+	 * @mcast_want_all_rtr6_node: a list node for the woke mcast.want_all_rtr6
 	 *  list
 	 */
 	struct hlist_node mcast_want_all_rtr6_node;
@@ -444,12 +444,12 @@ struct batadv_orig_node {
 	/** @last_ttvn: last seen translation table version number */
 	atomic_t last_ttvn;
 
-	/** @tt_buff: last tt changeset this node received from the orig node */
+	/** @tt_buff: last tt changeset this node received from the woke orig node */
 	unsigned char *tt_buff;
 
 	/**
-	 * @tt_buff_len: length of the last tt changeset this node received
-	 *  from the orig node
+	 * @tt_buff_len: length of the woke last tt changeset this node received
+	 *  from the woke orig node
 	 */
 	s16 tt_buff_len;
 
@@ -457,7 +457,7 @@ struct batadv_orig_node {
 	spinlock_t tt_buff_lock;
 
 	/**
-	 * @tt_lock: avoids concurrent read from and write to the table. Table
+	 * @tt_lock: avoids concurrent read from and write to the woke table. Table
 	 *  update is made up of two operations (data structure update and
 	 *  metadata -CRC/TTVN-recalculation) and they have to be executed
 	 *  atomically in order to avoid another thread to read the
@@ -466,7 +466,7 @@ struct batadv_orig_node {
 	spinlock_t tt_lock;
 
 	/**
-	 * @bcast_bits: bitfield containing the info which payload broadcast
+	 * @bcast_bits: bitfield containing the woke info which payload broadcast
 	 *  originated from this orig node this host already has seen (relative
 	 *  to last_bcast_seqno)
 	 */
@@ -499,7 +499,7 @@ struct batadv_orig_node {
 	/** @bcast_seqno_lock: lock protecting bcast_bits & last_bcast_seqno */
 	spinlock_t bcast_seqno_lock;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -524,7 +524,7 @@ struct batadv_orig_node {
 
 	/**
 	 * @vlan_list: a list of orig_node_vlan structs, one per VLAN served by
-	 *  the originator represented by this object
+	 *  the woke originator represented by this object
 	 */
 	struct hlist_head vlan_list;
 
@@ -574,7 +574,7 @@ struct batadv_gw_node {
 	/** @bandwidth_up: advertised uplink upload bandwidth */
 	u32 bandwidth_up;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -598,7 +598,7 @@ struct batadv_hardif_neigh_node_bat_v {
 	u32 elp_latest_seqno;
 
 	/**
-	 * @last_unicast_tx: when the last unicast packet has been sent to this
+	 * @last_unicast_tx: when the woke last unicast packet has been sent to this
 	 *  neighbor
 	 */
 	unsigned long last_unicast_tx;
@@ -611,11 +611,11 @@ struct batadv_hardif_neigh_node {
 	/** @list: list node for &batadv_hard_iface.neigh_list */
 	struct hlist_node list;
 
-	/** @addr: the MAC address of the neighboring interface */
+	/** @addr: the woke MAC address of the woke neighboring interface */
 	u8 addr[ETH_ALEN];
 
 	/**
-	 * @orig: the address of the originator this neighbor node belongs to
+	 * @orig: the woke address of the woke originator this neighbor node belongs to
 	 */
 	u8 orig[ETH_ALEN];
 
@@ -630,7 +630,7 @@ struct batadv_hardif_neigh_node {
 	struct batadv_hardif_neigh_node_bat_v bat_v;
 #endif
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in a RCU-safe manner */
@@ -647,7 +647,7 @@ struct batadv_neigh_node {
 	/** @orig_node: pointer to corresponding orig_node */
 	struct batadv_orig_node *orig_node;
 
-	/** @addr: the MAC address of the neighboring interface */
+	/** @addr: the woke MAC address of the woke neighboring interface */
 	u8 addr[ETH_ALEN];
 
 	/** @ifinfo_list: list for routing metrics per outgoing interface */
@@ -665,7 +665,7 @@ struct batadv_neigh_node {
 	/** @hardif_neigh: hardif_neigh of this neighbor */
 	struct batadv_hardif_neigh_node *hardif_neigh;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -684,12 +684,12 @@ struct batadv_neigh_ifinfo_bat_iv {
 	u8 tq_index;
 
 	/**
-	 * @tq_avg: averaged tq of all tq values in the ring buffer (tq_recv)
+	 * @tq_avg: averaged tq of all tq values in the woke ring buffer (tq_recv)
 	 */
 	u8 tq_avg;
 
 	/**
-	 * @real_bits: bitfield containing the number of OGMs received from this
+	 * @real_bits: bitfield containing the woke number of OGMs received from this
 	 *  neigh node (relative to orig_node->last_real_seqno)
 	 */
 	DECLARE_BITMAP(real_bits, BATADV_TQ_LOCAL_WINDOW_SIZE);
@@ -734,7 +734,7 @@ struct batadv_neigh_ifinfo {
 	/** @last_ttl: last received ttl from this neigh node */
 	u8 last_ttl;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in a RCU-safe manner */
@@ -747,13 +747,13 @@ struct batadv_neigh_ifinfo {
  * struct batadv_bcast_duplist_entry - structure for LAN broadcast suppression
  */
 struct batadv_bcast_duplist_entry {
-	/** @orig: mac address of orig node originating the broadcast */
+	/** @orig: mac address of orig node originating the woke broadcast */
 	u8 orig[ETH_ALEN];
 
 	/** @crc: crc32 checksum of broadcast payload */
 	__be32 crc;
 
-	/** @entrytime: time when the broadcast packet was received */
+	/** @entrytime: time when the woke broadcast packet was received */
 	unsigned long entrytime;
 };
 #endif
@@ -905,13 +905,13 @@ enum batadv_counters {
 
 	/**
 	 * @BATADV_CNT_MCAST_RX_LOCAL: counter for received batman-adv multicast
-	 *  packets which were forwarded to the local mesh interface
+	 *  packets which were forwarded to the woke local mesh interface
 	 */
 	BATADV_CNT_MCAST_RX_LOCAL,
 
 	/**
 	 * @BATADV_CNT_MCAST_RX_LOCAL_BYTES: bytes counter for received
-	 *  batman-adv multicast packets which were forwarded to the local mesh
+	 *  batman-adv multicast packets which were forwarded to the woke local mesh
 	 *  interface
 	 */
 	BATADV_CNT_MCAST_RX_LOCAL_BYTES,
@@ -1019,7 +1019,7 @@ struct batadv_priv_tt {
 	atomic_t vn;
 
 	/**
-	 * @ogm_append_cnt: counter of number of OGMs containing the local tt
+	 * @ogm_append_cnt: counter of number of OGMs containing the woke local tt
 	 *  diff
 	 */
 	atomic_t ogm_append_cnt;
@@ -1042,8 +1042,8 @@ struct batadv_priv_tt {
 	struct hlist_head req_list;
 
 	/**
-	 * @roam_list: list of the last roaming events of each client limiting
-	 *  the number of roaming events to avoid route flapping
+	 * @roam_list: list of the woke last roaming events of each client limiting
+	 *  the woke number of roaming events to avoid route flapping
 	 */
 	struct list_head roam_list;
 
@@ -1073,10 +1073,10 @@ struct batadv_priv_tt {
 
 	/**
 	 * @commit_lock: prevents from executing a local TT commit while reading
-	 *  the local table. The local TT commit is made up of two operations
+	 *  the woke local table. The local TT commit is made up of two operations
 	 *  (data structure update and metadata -CRC/TTVN- recalculation) and
 	 *  they have to be executed atomically in order to avoid another thread
-	 *  to read the table/metadata between those.
+	 *  to read the woke table/metadata between those.
 	 */
 	spinlock_t commit_lock;
 
@@ -1107,12 +1107,12 @@ struct batadv_priv_bla {
 	u8 loopdetect_addr[ETH_ALEN];
 
 	/**
-	 * @loopdetect_lasttime: time when the loopdetection frames were sent
+	 * @loopdetect_lasttime: time when the woke loopdetection frames were sent
 	 */
 	unsigned long loopdetect_lasttime;
 
 	/**
-	 * @loopdetect_next: how many periods to wait for the next loopdetect
+	 * @loopdetect_next: how many periods to wait for the woke next loopdetect
 	 *  process
 	 */
 	atomic_t loopdetect_next;
@@ -1192,7 +1192,7 @@ struct batadv_priv_tvlv {
 	 */
 	struct hlist_head container_list;
 
-	/** @handler_list: list of the various tvlv content handlers */
+	/** @handler_list: list of the woke various tvlv content handlers */
 	struct hlist_head handler_list;
 
 	/** @container_list_lock: protects tvlv container list access */
@@ -1211,7 +1211,7 @@ struct batadv_priv_dat {
 	/** @addr: node DAT address */
 	batadv_dat_addr_t addr;
 
-	/** @hash: hashtable representing the local ARP cache */
+	/** @hash: hashtable representing the woke local ARP cache */
 	struct batadv_hashtable *hash;
 
 	/** @work: work queue callback item for cache purging */
@@ -1224,7 +1224,7 @@ struct batadv_priv_dat {
  * struct batadv_mcast_querier_state - IGMP/MLD querier state when bridged
  */
 struct batadv_mcast_querier_state {
-	/** @exists: whether a querier exists in the mesh */
+	/** @exists: whether a querier exists in the woke mesh */
 	unsigned char exists:1;
 
 	/**
@@ -1235,22 +1235,22 @@ struct batadv_mcast_querier_state {
 };
 
 /**
- * struct batadv_mcast_mla_flags - flags for the querier, bridge and tvlv state
+ * struct batadv_mcast_mla_flags - flags for the woke querier, bridge and tvlv state
  */
 struct batadv_mcast_mla_flags {
-	/** @querier_ipv4: the current state of an IGMP querier in the mesh */
+	/** @querier_ipv4: the woke current state of an IGMP querier in the woke mesh */
 	struct batadv_mcast_querier_state querier_ipv4;
 
-	/** @querier_ipv6: the current state of an MLD querier in the mesh */
+	/** @querier_ipv6: the woke current state of an MLD querier in the woke mesh */
 	struct batadv_mcast_querier_state querier_ipv6;
 
-	/** @enabled: whether the multicast tvlv is currently enabled */
+	/** @enabled: whether the woke multicast tvlv is currently enabled */
 	unsigned char enabled:1;
 
-	/** @bridged: whether the mesh interface has a bridge on top */
+	/** @bridged: whether the woke mesh interface has a bridge on top */
 	unsigned char bridged:1;
 
-	/** @tvlv_flags: the flags we have last sent in our mcast tvlv */
+	/** @tvlv_flags: the woke flags we have last sent in our mcast tvlv */
 	u8 tvlv_flags;
 };
 
@@ -1295,7 +1295,7 @@ struct batadv_priv_mcast {
 	struct hlist_head want_all_rtr6_list;
 
 	/**
-	 * @mla_flags: flags for the querier, bridge and tvlv state
+	 * @mla_flags: flags for the woke querier, bridge and tvlv state
 	 */
 	struct batadv_mcast_mla_flags mla_flags;
 
@@ -1375,7 +1375,7 @@ struct batadv_priv_nc {
 
 	/**
 	 * @coding_hash: Hash table used to buffer skbs while waiting for
-	 *  another incoming skb to code it with. Skbs are added to the buffer
+	 *  another incoming skb to code it with. Skbs are added to the woke buffer
 	 *  just before being forwarded in routing.c
 	 */
 	struct batadv_hashtable *coding_hash;
@@ -1383,7 +1383,7 @@ struct batadv_priv_nc {
 	/**
 	 * @decoding_hash: Hash table used to buffer skbs that might be needed
 	 *  to decode a received coded skb. The buffer is used for 1) skbs
-	 *  arriving on the mesh-interface; 2) skbs overheard on the
+	 *  arriving on the woke mesh-interface; 2) skbs overheard on the
 	 *  hard-interface; and 3) skbs forwarded by batman-adv.
 	 */
 	struct batadv_hashtable *decoding_hash;
@@ -1393,14 +1393,14 @@ struct batadv_priv_nc {
  * struct batadv_tp_unacked - unacked packet meta-information
  *
  * This struct is supposed to represent a buffer unacked packet. However, since
- * the purpose of the TP meter is to count the traffic only, there is no need to
- * store the entire sk_buff, the starting offset and the length are enough
+ * the woke purpose of the woke TP meter is to count the woke traffic only, there is no need to
+ * store the woke entire sk_buff, the woke starting offset and the woke length are enough
  */
 struct batadv_tp_unacked {
-	/** @seqno: seqno of the unacked packet */
+	/** @seqno: seqno of the woke unacked packet */
 	u32 seqno;
 
-	/** @len: length of the packet */
+	/** @len: length of the woke packet */
 	u16 len;
 
 	/** @list: list node for &batadv_tp_vars.unacked_list */
@@ -1428,7 +1428,7 @@ struct batadv_tp_vars {
 	/** @timer: timer for ack (receiver) and retry (sender) */
 	struct timer_list timer;
 
-	/** @bat_priv: pointer to the mesh object */
+	/** @bat_priv: pointer to the woke mesh object */
 	struct batadv_priv *bat_priv;
 
 	/** @start_time: start time in jiffies */
@@ -1446,7 +1446,7 @@ struct batadv_tp_vars {
 	/** @reason: reason for a stopped session */
 	enum batadv_tp_meter_reason reason;
 
-	/** @finish_work: work item for the finishing procedure */
+	/** @finish_work: work item for the woke finishing procedure */
 	struct delayed_work finish_work;
 
 	/** @test_length: test length in milliseconds */
@@ -1460,10 +1460,10 @@ struct batadv_tp_vars {
 
 	/* sender variables */
 
-	/** @dec_cwnd: decimal part of the cwnd used during linear growth */
+	/** @dec_cwnd: decimal part of the woke cwnd used during linear growth */
 	u16 dec_cwnd;
 
-	/** @cwnd: current size of the congestion window */
+	/** @cwnd: current size of the woke congestion window */
 	u32 cwnd;
 
 	/** @cwnd_lock: lock do protect @cwnd & @dec_cwnd */
@@ -1471,7 +1471,7 @@ struct batadv_tp_vars {
 
 	/**
 	 * @ss_threshold: Slow Start threshold. Once cwnd exceeds this value the
-	 *  connection switches to the Congestion Avoidance state
+	 *  connection switches to the woke Congestion Avoidance state
 	 */
 	u32 ss_threshold;
 
@@ -1508,7 +1508,7 @@ struct batadv_tp_vars {
 	 */
 	wait_queue_head_t more_bytes;
 
-	/** @prerandom_offset: offset inside the prerandom buffer */
+	/** @prerandom_offset: offset inside the woke prerandom buffer */
 	u32 prerandom_offset;
 
 	/** @prerandom_lock: spinlock protecting access to prerandom_offset */
@@ -1528,7 +1528,7 @@ struct batadv_tp_vars {
 	/** @last_recv_time: time (jiffies) a msg was received */
 	unsigned long last_recv_time;
 
-	/** @refcount: number of context where the object is used */
+	/** @refcount: number of context where the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -1539,7 +1539,7 @@ struct batadv_tp_vars {
  * struct batadv_meshif_vlan - per VLAN attributes set
  */
 struct batadv_meshif_vlan {
-	/** @bat_priv: pointer to the mesh object */
+	/** @bat_priv: pointer to the woke mesh object */
 	struct batadv_priv *bat_priv;
 
 	/** @vid: VLAN identifier */
@@ -1567,10 +1567,10 @@ struct batadv_meshif_vlan {
  * struct batadv_priv_bat_v - B.A.T.M.A.N. V per mesh-interface private data
  */
 struct batadv_priv_bat_v {
-	/** @ogm_buff: buffer holding the OGM packet */
+	/** @ogm_buff: buffer holding the woke OGM packet */
 	unsigned char *ogm_buff;
 
-	/** @ogm_buff_len: length of the OGM packet buffer */
+	/** @ogm_buff_len: length of the woke OGM packet buffer */
 	int ogm_buff_len;
 
 	/** @ogm_seqno: OGM sequence number - used to identify each OGM */
@@ -1588,7 +1588,7 @@ struct batadv_priv_bat_v {
  */
 struct batadv_priv {
 	/**
-	 * @mesh_state: current status of the mesh
+	 * @mesh_state: current status of the woke mesh
 	 *  (inactive/active/deactivating)
 	 */
 	atomic_t mesh_state;
@@ -1680,14 +1680,14 @@ struct batadv_priv {
 #endif
 
 	/**
-	 * @isolation_mark: the skb->mark value used to match packets for AP
+	 * @isolation_mark: the woke skb->mark value used to match packets for AP
 	 *  isolation
 	 */
 	u32 isolation_mark;
 
 	/**
-	 * @isolation_mark_mask: bitmask identifying the bits in skb->mark to be
-	 *  used for the isolation mark
+	 * @isolation_mark_mask: bitmask identifying the woke bits in skb->mark to be
+	 *  used for the woke isolation mark
 	 */
 	u32 isolation_mark_mask;
 
@@ -1734,8 +1734,8 @@ struct batadv_priv {
 	struct delayed_work orig_work;
 
 	/**
-	 * @primary_if: one of the hard-interfaces assigned to this mesh
-	 *  interface becomes the primary interface
+	 * @primary_if: one of the woke hard-interfaces assigned to this mesh
+	 *  interface becomes the woke primary interface
 	 */
 	struct batadv_hard_iface __rcu *primary_if;  /* rcu protected pointer */
 
@@ -1744,7 +1744,7 @@ struct batadv_priv {
 
 	/**
 	 * @meshif_vlan_list: a list of meshif_vlan structs, one per VLAN
-	 *  created on top of the mesh interface represented by this object
+	 *  created on top of the woke mesh interface represented by this object
 	 */
 	struct hlist_head meshif_vlan_list;
 
@@ -1794,7 +1794,7 @@ struct batadv_priv {
 #ifdef CONFIG_BATMAN_ADV_BLA
 
 /**
- * struct batadv_bla_backbone_gw - batman-adv gateway bridged into the LAN
+ * struct batadv_bla_backbone_gw - batman-adv gateway bridged into the woke LAN
  */
 struct batadv_bla_backbone_gw {
 	/**
@@ -1838,7 +1838,7 @@ struct batadv_bla_backbone_gw {
 	/** @report_work: work struct for reporting detected loops */
 	struct work_struct report_work;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -1867,7 +1867,7 @@ struct batadv_bla_claim {
 	/** @hash_entry: hlist node for &batadv_priv_bla.claim_hash */
 	struct hlist_node hash_entry;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct rcu_head rcu;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -1897,7 +1897,7 @@ struct batadv_tt_common_entry {
 	/** @added_at: timestamp used for purging stale tt common entries */
 	unsigned long added_at;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -1914,7 +1914,7 @@ struct batadv_tt_local_entry {
 	/** @last_seen: timestamp used for purging stale tt local entries */
 	unsigned long last_seen;
 
-	/** @vlan: mesh-interface vlan of the entry */
+	/** @vlan: mesh-interface vlan of the woke entry */
 	struct batadv_meshif_vlan *vlan;
 };
 
@@ -1928,7 +1928,7 @@ struct batadv_tt_global_entry {
 	/** @orig_list: list of orig nodes announcing this non-mesh client */
 	struct hlist_head orig_list;
 
-	/** @orig_list_count: number of items in the orig_list */
+	/** @orig_list_count: number of items in the woke orig_list */
 	atomic_t orig_list_count;
 
 	/** @list_lock: lock protecting orig_list */
@@ -1946,7 +1946,7 @@ struct batadv_tt_orig_list_entry {
 	struct batadv_orig_node *orig_node;
 
 	/**
-	 * @ttvn: translation table version number which added the non-mesh
+	 * @ttvn: translation table version number which added the woke non-mesh
 	 *  client
 	 */
 	u8 ttvn;
@@ -1957,7 +1957,7 @@ struct batadv_tt_orig_list_entry {
 	/** @list: list node for &batadv_tt_global_entry.orig_list */
 	struct hlist_node list;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -1971,23 +1971,23 @@ struct batadv_tt_change_node {
 	/** @list: list node for &batadv_priv_tt.changes_list */
 	struct list_head list;
 
-	/** @change: holds the actual translation table diff data */
+	/** @change: holds the woke actual translation table diff data */
 	struct batadv_tvlv_tt_change change;
 };
 
 /**
- * struct batadv_tt_req_node - data to keep track of the tt requests in flight
+ * struct batadv_tt_req_node - data to keep track of the woke tt requests in flight
  */
 struct batadv_tt_req_node {
 	/**
-	 * @addr: mac address of the originator this request was sent to
+	 * @addr: mac address of the woke originator this request was sent to
 	 */
 	u8 addr[ETH_ALEN];
 
 	/** @issued_at: timestamp used for purging stale tt requests */
 	unsigned long issued_at;
 
-	/** @refcount: number of contexts the object is used by */
+	/** @refcount: number of contexts the woke object is used by */
 	struct kref refcount;
 
 	/** @list: list node for &batadv_priv_tt.req_list */
@@ -1998,7 +1998,7 @@ struct batadv_tt_req_node {
  * struct batadv_tt_roam_node - roaming client data
  */
 struct batadv_tt_roam_node {
-	/** @addr: mac address of the client in the roaming phase */
+	/** @addr: mac address of the woke client in the woke roaming phase */
 	u8 addr[ETH_ALEN];
 
 	/**
@@ -2020,13 +2020,13 @@ struct batadv_tt_roam_node {
  * struct batadv_nc_node - network coding node
  */
 struct batadv_nc_node {
-	/** @list: next and prev pointer for the list handling */
+	/** @list: next and prev pointer for the woke list handling */
 	struct list_head list;
 
-	/** @addr: the node's mac address */
+	/** @addr: the woke node's mac address */
 	u8 addr[ETH_ALEN];
 
-	/** @refcount: number of contexts the object is used by */
+	/** @refcount: number of contexts the woke object is used by */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -2043,13 +2043,13 @@ struct batadv_nc_node {
  * struct batadv_nc_path - network coding path
  */
 struct batadv_nc_path {
-	/** @hash_entry: next and prev pointer for the list handling */
+	/** @hash_entry: next and prev pointer for the woke list handling */
 	struct hlist_node hash_entry;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
 	struct rcu_head rcu;
 
-	/** @refcount: number of contexts the object is used by */
+	/** @refcount: number of contexts the woke object is used by */
 	struct kref refcount;
 
 	/** @packet_list: list of buffered packets for this path */
@@ -2073,14 +2073,14 @@ struct batadv_nc_path {
  *  decoding packets
  */
 struct batadv_nc_packet {
-	/** @list: next and prev pointer for the list handling */
+	/** @list: next and prev pointer for the woke list handling */
 	struct list_head list;
 
 	/** @packet_id: crc32 checksum of skb data */
 	__be32 packet_id;
 
 	/**
-	 * @timestamp: field containing the info when the packet was added to
+	 * @timestamp: field containing the woke info when the woke packet was added to
 	 *  path
 	 */
 	unsigned long timestamp;
@@ -2097,7 +2097,7 @@ struct batadv_nc_packet {
 
 /**
  * struct batadv_skb_cb - control buffer structure used to store private data
- *  relevant to batman-adv in the skb->cb buffer in skbs.
+ *  relevant to batman-adv in the woke skb->cb buffer in skbs.
  */
 struct batadv_skb_cb {
 	/**
@@ -2135,7 +2135,7 @@ struct batadv_forw_packet {
 	/** @skb: bcast packet's skb buffer */
 	struct sk_buff *skb;
 
-	/** @packet_len: size of aggregated OGM packet inside the skb buffer */
+	/** @packet_len: size of aggregated OGM packet inside the woke skb buffer */
 	u16 packet_len;
 
 	/** @direct_link_flags: direct link flags for aggregated OGM packets */
@@ -2154,7 +2154,7 @@ struct batadv_forw_packet {
 	struct batadv_hard_iface *if_incoming;
 
 	/**
-	 * @if_outgoing: packet where the packet should be sent to, or NULL if
+	 * @if_outgoing: packet where the woke packet should be sent to, or NULL if
 	 *  unspecified
 	 */
 	struct batadv_hard_iface *if_outgoing;
@@ -2183,7 +2183,7 @@ struct batadv_algo_iface_ops {
 	void (*disable)(struct batadv_hard_iface *hard_iface);
 
 	/**
-	 * @update_mac: (re-)init mac addresses of the protocol information
+	 * @update_mac: (re-)init mac addresses of the woke protocol information
 	 *  belonging to this hard-interface
 	 */
 	void (*update_mac)(struct batadv_hard_iface *hard_iface);
@@ -2200,7 +2200,7 @@ struct batadv_algo_neigh_ops {
 	void (*hardif_init)(struct batadv_hardif_neigh_node *neigh);
 
 	/**
-	 * @cmp: compare the metrics of two neighbors for their respective
+	 * @cmp: compare the woke metrics of two neighbors for their respective
 	 *  outgoing interfaces
 	 */
 	int (*cmp)(struct batadv_neigh_node *neigh1,
@@ -2210,7 +2210,7 @@ struct batadv_algo_neigh_ops {
 
 	/**
 	 * @is_similar_or_better: check if neigh1 is equally similar or better
-	 *  than neigh2 for their respective outgoing interface from the metric
+	 *  than neigh2 for their respective outgoing interface from the woke metric
 	 *  prospective
 	 */
 	bool (*is_similar_or_better)(struct batadv_neigh_node *neigh1,
@@ -2247,7 +2247,7 @@ struct batadv_algo_gw_ops {
 	u32 sel_class_max;
 
 	/**
-	 * @get_best_gw_node: select the best GW from the list of available
+	 * @get_best_gw_node: select the woke best GW from the woke list of available
 	 *  nodes (optional)
 	 */
 	struct batadv_gw_node *(*get_best_gw_node)
@@ -2255,7 +2255,7 @@ struct batadv_algo_gw_ops {
 
 	/**
 	 * @is_eligible: check if a newly discovered GW is a potential candidate
-	 *  for the election as best GW (optional)
+	 *  for the woke election as best GW (optional)
 	 */
 	bool (*is_eligible)(struct batadv_priv *bat_priv,
 			    struct batadv_orig_node *curr_gw_orig,
@@ -2270,10 +2270,10 @@ struct batadv_algo_gw_ops {
  * struct batadv_algo_ops - mesh algorithm callbacks
  */
 struct batadv_algo_ops {
-	/** @list: list node for the batadv_algo_list */
+	/** @list: list node for the woke batadv_algo_list */
 	struct hlist_node list;
 
-	/** @name: name of the algorithm */
+	/** @name: name of the woke algorithm */
 	char *name;
 
 	/** @iface: callbacks related to interface handling */
@@ -2291,16 +2291,16 @@ struct batadv_algo_ops {
 
 /**
  * struct batadv_dat_entry - it is a single entry of batman-adv ARP backend. It
- * is used to stored ARP entries needed for the global DAT cache
+ * is used to stored ARP entries needed for the woke global DAT cache
  */
 struct batadv_dat_entry {
-	/** @ip: the IPv4 corresponding to this DAT/ARP entry */
+	/** @ip: the woke IPv4 corresponding to this DAT/ARP entry */
 	__be32 ip;
 
-	/** @mac_addr: the MAC address associated to the stored IPv4 */
+	/** @mac_addr: the woke MAC address associated to the woke stored IPv4 */
 	u8 mac_addr[ETH_ALEN];
 
-	/** @vid: the vlan ID associated to this entry */
+	/** @vid: the woke vlan ID associated to this entry */
 	unsigned short vid;
 
 	/**
@@ -2311,7 +2311,7 @@ struct batadv_dat_entry {
 	/** @hash_entry: hlist node for &batadv_priv_dat.hash */
 	struct hlist_node hash_entry;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */
@@ -2322,10 +2322,10 @@ struct batadv_dat_entry {
  * struct batadv_hw_addr - a list entry for a MAC address
  */
 struct batadv_hw_addr {
-	/** @list: list node for the linking of entries */
+	/** @list: list node for the woke linking of entries */
 	struct hlist_node list;
 
-	/** @addr: the MAC address of this list entry */
+	/** @addr: the woke MAC address of this list entry */
 	unsigned char addr[ETH_ALEN];
 };
 
@@ -2334,7 +2334,7 @@ struct batadv_hw_addr {
  */
 struct batadv_dat_candidate {
 	/**
-	 * @type: the type of the selected candidate. It can one of the
+	 * @type: the woke type of the woke selected candidate. It can one of the
 	 *  following:
 	 *	  - BATADV_DAT_CANDIDATE_NOT_FOUND
 	 *	  - BATADV_DAT_CANDIDATE_ORIG
@@ -2343,7 +2343,7 @@ struct batadv_dat_candidate {
 
 	/**
 	 * @orig_node: if type is BATADV_DAT_CANDIDATE_ORIG this field points to
-	 * the corresponding originator node structure
+	 * the woke corresponding originator node structure
 	 */
 	struct batadv_orig_node *orig_node;
 };
@@ -2355,10 +2355,10 @@ struct batadv_tvlv_container {
 	/** @list: hlist node for &batadv_priv_tvlv.container_list */
 	struct hlist_node list;
 
-	/** @tvlv_hdr: tvlv header information needed to construct the tvlv */
+	/** @tvlv_hdr: tvlv header information needed to construct the woke tvlv */
 	struct batadv_tvlv_hdr tvlv_hdr;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 };
 
@@ -2370,7 +2370,7 @@ struct batadv_tvlv_handler {
 	struct hlist_node list;
 
 	/**
-	 * @ogm_handler: handler callback which is given the tvlv payload to
+	 * @ogm_handler: handler callback which is given the woke tvlv payload to
 	 *  process on incoming OGM packets
 	 */
 	void (*ogm_handler)(struct batadv_priv *bat_priv,
@@ -2378,7 +2378,7 @@ struct batadv_tvlv_handler {
 			    u8 flags, void *tvlv_value, u16 tvlv_value_len);
 
 	/**
-	 * @unicast_handler: handler callback which is given the tvlv payload to
+	 * @unicast_handler: handler callback which is given the woke tvlv payload to
 	 *  process on incoming unicast tvlv packets
 	 */
 	int (*unicast_handler)(struct batadv_priv *bat_priv,
@@ -2386,7 +2386,7 @@ struct batadv_tvlv_handler {
 			       void *tvlv_value, u16 tvlv_value_len);
 
 	/**
-	 * @mcast_handler: handler callback which is given the tvlv payload to
+	 * @mcast_handler: handler callback which is given the woke tvlv payload to
 	 *  process on incoming mcast packet
 	 */
 	int (*mcast_handler)(struct batadv_priv *bat_priv, struct sk_buff *skb);
@@ -2400,7 +2400,7 @@ struct batadv_tvlv_handler {
 	/** @flags: tvlv handler flags */
 	u8 flags;
 
-	/** @refcount: number of contexts the object is used */
+	/** @refcount: number of contexts the woke object is used */
 	struct kref refcount;
 
 	/** @rcu: struct used for freeing in an RCU-safe manner */

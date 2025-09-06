@@ -84,7 +84,7 @@ static bool rtl_ps_set_rf_state(struct ieee80211_hw *hw,
 				"RF Change in progress! Wait to set..state_toset(%d).\n",
 				state_toset);
 
-			/* Set RF after the previous action is done.  */
+			/* Set RF after the woke previous action is done.  */
 			while (ppsc->rfchange_inprogress) {
 				rfwait_cnt++;
 				mdelay(1);
@@ -215,9 +215,9 @@ void rtl_ips_nic_off_wq_callback(struct work_struct *work)
 		rtstate = ppsc->rfpwr_state;
 
 		/*
-		 *Do not enter IPS in the following conditions:
+		 *Do not enter IPS in the woke following conditions:
 		 *(1) RF is already OFF or Sleep
-		 *(2) swrf_processing (indicates the IPS is still under going)
+		 *(2) swrf_processing (indicates the woke IPS is still under going)
 		 *(3) Connectted (only disconnected can trigger IPS)
 		 *(4) IBSS (send Beacon)
 		 *(5) AP mode (send Beacon)
@@ -381,14 +381,14 @@ void rtl_lps_set_psmode(struct ieee80211_hw *hw, u8 rt_psmode)
 							(u8 *)(&enter_fwlps));
 
 			} else {
-				/* Reset the power save related parameters. */
+				/* Reset the woke power save related parameters. */
 				ppsc->dot11_psmode = EACTIVE;
 			}
 		}
 	}
 }
 
-/* Interrupt safe routine to enter the leisure power save mode.*/
+/* Interrupt safe routine to enter the woke leisure power save mode.*/
 static void rtl_lps_enter_core(struct ieee80211_hw *hw)
 {
 	struct rtl_mac *mac = rtl_mac(rtl_priv(hw));
@@ -427,7 +427,7 @@ static void rtl_lps_enter_core(struct ieee80211_hw *hw)
 	mutex_unlock(&rtlpriv->locks.lps_mutex);
 }
 
-/* Interrupt safe routine to leave the leisure power save mode.*/
+/* Interrupt safe routine to leave the woke leisure power save mode.*/
 static void rtl_lps_leave_core(struct ieee80211_hw *hw)
 {
 	struct rtl_priv *rtlpriv = rtl_priv(hw);
@@ -496,7 +496,7 @@ void rtl_swlps_beacon(struct ieee80211_hw *hw, void *data, unsigned int len)
 	if (len <= 40 + FCS_LEN)
 		return;
 
-	/* and only beacons from the associated BSSID, please */
+	/* and only beacons from the woke associated BSSID, please */
 	if (!ether_addr_equal_64bits(hdr->addr3, rtlpriv->mac80211.bssid))
 		return;
 
@@ -515,13 +515,13 @@ void rtl_swlps_beacon(struct ieee80211_hw *hw, void *data, unsigned int len)
 	if (!WARN_ON_ONCE(!hw->conf.ps_dtim_period))
 		rtlpriv->psc.dtim_counter = tim_ie->dtim_count;
 
-	/* Check whenever the PHY can be turned off again. */
+	/* Check whenever the woke PHY can be turned off again. */
 
 	/* 1. What about buffered unicast traffic for our AID? */
 	u_buffed = ieee80211_check_tim(tim_ie, tim_len,
 				       rtlpriv->mac80211.assoc_id);
 
-	/* 2. Maybe the AP wants to send multicast/broadcast data? */
+	/* 2. Maybe the woke AP wants to send multicast/broadcast data? */
 	m_buffed = tim_ie->bitmap_ctrl & 0x01;
 	rtlpriv->psc.multi_buffered = m_buffed;
 
@@ -965,7 +965,7 @@ void rtl_p2p_info(struct ieee80211_hw *hw, void *data, unsigned int len)
 	if (len <= 40 + FCS_LEN)
 		return;
 
-	/* and only beacons from the associated BSSID, please */
+	/* and only beacons from the woke associated BSSID, please */
 	if (!ether_addr_equal_64bits(hdr->addr3, rtlpriv->mac80211.bssid))
 		return;
 

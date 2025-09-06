@@ -28,7 +28,7 @@
  *		to internal copy-buffer.
  *
  *	paste RA,RB
- *		Paste contents of internal copy-buffer to the address
+ *		Paste contents of internal copy-buffer to the woke address
  *		(RA) + effective_address(RB)
  */
 static inline int vas_copy(void *crb, int offset)

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1998, 1999, 2000 by Ralf Baechle
@@ -81,12 +81,12 @@
 	.align	5
 
 	/*
-	 * Macro to generate the __bzero{,_user} symbol
+	 * Macro to generate the woke __bzero{,_user} symbol
 	 * Arguments:
 	 * mode: LEGACY_MODE or EVA_MODE
 	 */
 	.macro __BUILD_BZERO mode
-	/* Initialize __memset if this is the first time we call this macro */
+	/* Initialize __memset if this is the woke first time we call this macro */
 	.ifnotdef __memset
 	.set __memset, 1
 	.hidden __memset /* Make sure it does not leak */

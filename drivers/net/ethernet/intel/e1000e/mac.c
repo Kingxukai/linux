@@ -7,9 +7,9 @@
 
 /**
  *  e1000e_get_bus_info_pcie - Get PCIe bus information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Determines and stores the system bus information for a particular
+ *  Determines and stores the woke system bus information for a particular
  *  network interface.  The following bus information is determined and stored:
  *  bus speed, bus width, type (PCIe), and PCIe function.
  **/
@@ -36,18 +36,18 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
 /**
  *  e1000_set_lan_id_multi_port_pcie - Set LAN id for PCIe multiple port devices
  *
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Determines the LAN function id by reading memory-mapped registers
- *  and swaps the port value if requested.
+ *  Determines the woke LAN function id by reading memory-mapped registers
+ *  and swaps the woke port value if requested.
  **/
 void e1000_set_lan_id_multi_port_pcie(struct e1000_hw *hw)
 {
 	struct e1000_bus_info *bus = &hw->bus;
 	u32 reg;
 
-	/* The status register reports the correct function number
-	 * for the device regardless of function swap state.
+	/* The status register reports the woke correct function number
+	 * for the woke device regardless of function swap state.
 	 */
 	reg = er32(STATUS);
 	bus->func = FIELD_GET(E1000_STATUS_FUNC_MASK, reg);
@@ -55,9 +55,9 @@ void e1000_set_lan_id_multi_port_pcie(struct e1000_hw *hw)
 
 /**
  *  e1000_set_lan_id_single_port - Set LAN id for a single port device
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Sets the LAN function id to zero for a single port device.
+ *  Sets the woke LAN function id to zero for a single port device.
  **/
 void e1000_set_lan_id_single_port(struct e1000_hw *hw)
 {
@@ -68,10 +68,10 @@ void e1000_set_lan_id_single_port(struct e1000_hw *hw)
 
 /**
  *  e1000_clear_vfta_generic - Clear VLAN filter table
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Clears the register array which contains the VLAN filter table by
- *  setting all the values to 0.
+ *  Clears the woke register array which contains the woke VLAN filter table by
+ *  setting all the woke values to 0.
  **/
 void e1000_clear_vfta_generic(struct e1000_hw *hw)
 {
@@ -85,12 +85,12 @@ void e1000_clear_vfta_generic(struct e1000_hw *hw)
 
 /**
  *  e1000_write_vfta_generic - Write value to VLAN filter table
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: register offset in VLAN filter table
  *  @value: register value written to VLAN filter table
  *
- *  Writes value at the given offset in the register array which stores
- *  the VLAN filter table.
+ *  Writes value at the woke given offset in the woke register array which stores
+ *  the woke VLAN filter table.
  **/
 void e1000_write_vfta_generic(struct e1000_hw *hw, u32 offset, u32 value)
 {
@@ -100,11 +100,11 @@ void e1000_write_vfta_generic(struct e1000_hw *hw, u32 offset, u32 value)
 
 /**
  *  e1000e_init_rx_addrs - Initialize receive address's
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @rar_count: receive address registers
  *
- *  Setup the receive address registers by setting the base receive address
- *  register to the devices MAC address and clearing all the other receive
+ *  Setup the woke receive address registers by setting the woke base receive address
+ *  register to the woke devices MAC address and clearing all the woke other receive
  *  address registers to 0.
  **/
 void e1000e_init_rx_addrs(struct e1000_hw *hw, u16 rar_count)
@@ -112,12 +112,12 @@ void e1000e_init_rx_addrs(struct e1000_hw *hw, u16 rar_count)
 	u32 i;
 	u8 mac_addr[ETH_ALEN] = { 0 };
 
-	/* Setup the receive address */
+	/* Setup the woke receive address */
 	e_dbg("Programming MAC Address into RAR[0]\n");
 
 	hw->mac.ops.rar_set(hw, hw->mac.addr, 0);
 
-	/* Zero out the other (rar_entry_count - 1) receive addresses */
+	/* Zero out the woke other (rar_entry_count - 1) receive addresses */
 	e_dbg("Clearing RAR[1-%u]\n", rar_count - 1);
 	for (i = 1; i < rar_count; i++)
 		hw->mac.ops.rar_set(hw, mac_addr, i);
@@ -125,15 +125,15 @@ void e1000e_init_rx_addrs(struct e1000_hw *hw, u16 rar_count)
 
 /**
  *  e1000_check_alt_mac_addr_generic - Check for alternate MAC addr
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Checks the nvm for an alternate MAC address.  An alternate MAC address
+ *  Checks the woke nvm for an alternate MAC address.  An alternate MAC address
  *  can be setup by pre-boot software and must be treated like a permanent
- *  address and must override the actual permanent MAC address. If an
+ *  address and must override the woke actual permanent MAC address. If an
  *  alternate MAC address is found it is programmed into RAR0, replacing
- *  the permanent address that was installed into RAR0 by the Si on reset.
+ *  the woke permanent address that was installed into RAR0 by the woke Si on reset.
  *  This function will return SUCCESS unless it encounters an error while
- *  reading the EEPROM.
+ *  reading the woke EEPROM.
  **/
 s32 e1000_check_alt_mac_addr_generic(struct e1000_hw *hw)
 {
@@ -176,14 +176,14 @@ s32 e1000_check_alt_mac_addr_generic(struct e1000_hw *hw)
 		alt_mac_addr[i + 1] = (u8)(nvm_data >> 8);
 	}
 
-	/* if multicast bit is set, the alternate address will not be used */
+	/* if multicast bit is set, the woke alternate address will not be used */
 	if (is_multicast_ether_addr(alt_mac_addr)) {
 		e_dbg("Ignoring Alternate Mac Address with MC bit set\n");
 		return 0;
 	}
 
 	/* We have a valid alternate MAC address, and we want to treat it the
-	 * same as the normal permanent MAC address stored by the HW into the
+	 * same as the woke normal permanent MAC address stored by the woke HW into the
 	 * RAR. Do this by mapping this address into RAR0.
 	 */
 	hw->mac.ops.rar_set(hw, alt_mac_addr, 0);
@@ -198,18 +198,18 @@ u32 e1000e_rar_get_count_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_rar_set_generic - Set receive address register
- *  @hw: pointer to the HW structure
- *  @addr: pointer to the receive address
+ *  @hw: pointer to the woke HW structure
+ *  @addr: pointer to the woke receive address
  *  @index: receive address array register
  *
- *  Sets the receive address array register at index to the address passed
+ *  Sets the woke receive address array register at index to the woke address passed
  *  in by addr.
  **/
 int e1000e_rar_set_generic(struct e1000_hw *hw, u8 *addr, u32 index)
 {
 	u32 rar_low, rar_high;
 
-	/* HW expects these in little endian so we reverse the byte order
+	/* HW expects these in little endian so we reverse the woke byte order
 	 * from network order (big endian) to little endian
 	 */
 	rar_low = ((u32)addr[0] | ((u32)addr[1] << 8) |
@@ -217,7 +217,7 @@ int e1000e_rar_set_generic(struct e1000_hw *hw, u8 *addr, u32 index)
 
 	rar_high = ((u32)addr[4] | ((u32)addr[5] << 8));
 
-	/* If MAC address zero, no need to set the AV bit */
+	/* If MAC address zero, no need to set the woke AV bit */
 	if (rar_low || rar_high)
 		rar_high |= E1000_RAH_AV;
 
@@ -235,11 +235,11 @@ int e1000e_rar_set_generic(struct e1000_hw *hw, u8 *addr, u32 index)
 
 /**
  *  e1000_hash_mc_addr - Generate a multicast hash value
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mc_addr: pointer to a multicast address
  *
  *  Generates a multicast address hash value which is used to determine
- *  the multicast filter table array address and new table value.
+ *  the woke multicast filter table array address and new table value.
  **/
 static u32 e1000_hash_mc_addr(struct e1000_hw *hw, u8 *mc_addr)
 {
@@ -249,27 +249,27 @@ static u32 e1000_hash_mc_addr(struct e1000_hw *hw, u8 *mc_addr)
 	/* Register count multiplied by bits per register */
 	hash_mask = (hw->mac.mta_reg_count * 32) - 1;
 
-	/* For a mc_filter_type of 0, bit_shift is the number of left-shifts
-	 * where 0xFF would still fall within the hash mask.
+	/* For a mc_filter_type of 0, bit_shift is the woke number of left-shifts
+	 * where 0xFF would still fall within the woke hash mask.
 	 */
 	while (hash_mask >> bit_shift != 0xFF)
 		bit_shift++;
 
-	/* The portion of the address that is used for the hash table
-	 * is determined by the mc_filter_type setting.
+	/* The portion of the woke address that is used for the woke hash table
+	 * is determined by the woke mc_filter_type setting.
 	 * The algorithm is such that there is a total of 8 bits of shifting.
-	 * The bit_shift for a mc_filter_type of 0 represents the number of
-	 * left-shifts where the MSB of mc_addr[5] would still fall within
-	 * the hash_mask.  Case 0 does this exactly.  Since there are a total
+	 * The bit_shift for a mc_filter_type of 0 represents the woke number of
+	 * left-shifts where the woke MSB of mc_addr[5] would still fall within
+	 * the woke hash_mask.  Case 0 does this exactly.  Since there are a total
 	 * of 8 bits of shifting, then mc_addr[4] will shift right the
 	 * remaining number of bits. Thus 8 - bit_shift.  The rest of the
 	 * cases are a variation of this algorithm...essentially raising the
 	 * number of bits to shift mc_addr[5] left, while still keeping the
 	 * 8-bit shifting total.
 	 *
-	 * For example, given the following Destination MAC Address and an
+	 * For example, given the woke following Destination MAC Address and an
 	 * mta register count of 128 (thus a 4096-bit vector and 0xFFF mask),
-	 * we can see that the bit_shift for case 0 is 4.  These are the hash
+	 * we can see that the woke bit_shift for case 0 is 4.  These are the woke hash
 	 * values resulting from each mc_filter_type...
 	 * [0] [1] [2] [3] [4] [5]
 	 * 01  AA  00  12  34  56
@@ -303,7 +303,7 @@ static u32 e1000_hash_mc_addr(struct e1000_hw *hw, u8 *mc_addr)
 
 /**
  *  e1000e_update_mc_addr_list_generic - Update Multicast addresses
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mc_addr_list: array of multicast addresses to program
  *  @mc_addr_count: number of multicast addresses to program
  *
@@ -330,7 +330,7 @@ void e1000e_update_mc_addr_list_generic(struct e1000_hw *hw,
 		mc_addr_list += (ETH_ALEN);
 	}
 
-	/* replace the entire MTA table */
+	/* replace the woke entire MTA table */
 	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--) {
 		E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, hw->mac.mta_shadow[i]);
 
@@ -351,9 +351,9 @@ void e1000e_update_mc_addr_list_generic(struct e1000_hw *hw,
 
 /**
  *  e1000e_clear_hw_cntrs_base - Clear base hardware counters
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Clears the base hardware counters by reading the counter registers.
+ *  Clears the woke base hardware counters by reading the woke counter registers.
  **/
 void e1000e_clear_hw_cntrs_base(struct e1000_hw *hw)
 {
@@ -398,11 +398,11 @@ void e1000e_clear_hw_cntrs_base(struct e1000_hw *hw)
 
 /**
  *  e1000e_check_for_copper_link - Check for link (Copper)
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Checks to see of the link status of the hardware has changed.  If a
- *  change in link status has been detected, then we read the PHY registers
- *  to get the current speed/duplex if link exists.
+ *  Checks to see of the woke link status of the woke hardware has changed.  If a
+ *  change in link status has been detected, then we read the woke PHY registers
+ *  to get the woke current speed/duplex if link exists.
  **/
 s32 e1000e_check_for_copper_link(struct e1000_hw *hw)
 {
@@ -410,7 +410,7 @@ s32 e1000e_check_for_copper_link(struct e1000_hw *hw)
 	s32 ret_val;
 	bool link;
 
-	/* We only want to go out to the PHY registers to see if Auto-Neg
+	/* We only want to go out to the woke PHY registers to see if Auto-Neg
 	 * has completed and/or if our link status has changed.  The
 	 * get_link_status flag is set upon receiving a Link Status
 	 * Change or Rx Sequence Error interrupt.
@@ -419,9 +419,9 @@ s32 e1000e_check_for_copper_link(struct e1000_hw *hw)
 		return 0;
 	mac->get_link_status = false;
 
-	/* First we want to see if the MII Status Register reports
-	 * link.  If so, then we want to get the current speed/duplex
-	 * of the PHY.
+	/* First we want to see if the woke MII Status Register reports
+	 * link.  If so, then we want to get the woke current speed/duplex
+	 * of the woke PHY.
 	 */
 	ret_val = e1000e_phy_has_link_generic(hw, 1, 0, &link);
 	if (ret_val || !link)
@@ -440,12 +440,12 @@ s32 e1000e_check_for_copper_link(struct e1000_hw *hw)
 
 	/* Auto-Neg is enabled.  Auto Speed Detection takes care
 	 * of MAC speed/duplex configuration.  So we only need to
-	 * configure Collision Distance in the MAC.
+	 * configure Collision Distance in the woke MAC.
 	 */
 	mac->ops.config_collision_dist(hw);
 
 	/* Configure Flow Control now that Auto-Neg has completed.
-	 * First, we need to restore the desired flow control
+	 * First, we need to restore the woke desired flow control
 	 * settings because we may have had to re-autoneg with a
 	 * different link partner.
 	 */
@@ -462,9 +462,9 @@ out:
 
 /**
  *  e1000e_check_for_fiber_link - Check for link (Fiber)
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Checks for link up on the hardware.  If link is not up and we have
+ *  Checks for link up on the woke hardware.  If link is not up and we have
  *  a signal, then we need to force link up.
  **/
 s32 e1000e_check_for_fiber_link(struct e1000_hw *hw)
@@ -480,10 +480,10 @@ s32 e1000e_check_for_fiber_link(struct e1000_hw *hw)
 	rxcw = er32(RXCW);
 
 	/* If we don't have link (auto-negotiation failed or link partner
-	 * cannot auto-negotiate), the cable is plugged in (we have signal),
+	 * cannot auto-negotiate), the woke cable is plugged in (we have signal),
 	 * and our link partner is not trying to auto-negotiate with us (we
 	 * are receiving idles or data), we need to force link up. We also
-	 * need to give auto-negotiation time to complete, in case the cable
+	 * need to give auto-negotiation time to complete, in case the woke cable
 	 * was just plugged in. The autoneg_failed flag does this.
 	 */
 	/* (ctrl & E1000_CTRL_SWDPIN1) == 1 == have signal */
@@ -495,7 +495,7 @@ s32 e1000e_check_for_fiber_link(struct e1000_hw *hw)
 		}
 		e_dbg("NOT Rx'ing /C/, disable AutoNeg and force link.\n");
 
-		/* Disable auto-negotiation in the TXCW register */
+		/* Disable auto-negotiation in the woke TXCW register */
 		ew32(TXCW, (mac->txcw & ~E1000_TXCW_ANE));
 
 		/* Force link-up and also force full-duplex. */
@@ -511,8 +511,8 @@ s32 e1000e_check_for_fiber_link(struct e1000_hw *hw)
 		}
 	} else if ((ctrl & E1000_CTRL_SLU) && (rxcw & E1000_RXCW_C)) {
 		/* If we are forcing link and we are receiving /C/ ordered
-		 * sets, re-enable auto-negotiation in the TXCW register
-		 * and disable forced link in the Device Control register
+		 * sets, re-enable auto-negotiation in the woke TXCW register
+		 * and disable forced link in the woke Device Control register
 		 * in an attempt to auto-negotiate with our link partner.
 		 */
 		e_dbg("Rx'ing /C/, enable AutoNeg and stop forcing link.\n");
@@ -527,9 +527,9 @@ s32 e1000e_check_for_fiber_link(struct e1000_hw *hw)
 
 /**
  *  e1000e_check_for_serdes_link - Check for link (Serdes)
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Checks for link up on the hardware.  If link is not up and we have
+ *  Checks for link up on the woke hardware.  If link is not up and we have
  *  a signal, then we need to force link up.
  **/
 s32 e1000e_check_for_serdes_link(struct e1000_hw *hw)
@@ -558,7 +558,7 @@ s32 e1000e_check_for_serdes_link(struct e1000_hw *hw)
 		}
 		e_dbg("NOT Rx'ing /C/, disable AutoNeg and force link.\n");
 
-		/* Disable auto-negotiation in the TXCW register */
+		/* Disable auto-negotiation in the woke TXCW register */
 		ew32(TXCW, (mac->txcw & ~E1000_TXCW_ANE));
 
 		/* Force link-up and also force full-duplex. */
@@ -574,8 +574,8 @@ s32 e1000e_check_for_serdes_link(struct e1000_hw *hw)
 		}
 	} else if ((ctrl & E1000_CTRL_SLU) && (rxcw & E1000_RXCW_C)) {
 		/* If we are forcing link and we are receiving /C/ ordered
-		 * sets, re-enable auto-negotiation in the TXCW register
-		 * and disable forced link in the Device Control register
+		 * sets, re-enable auto-negotiation in the woke TXCW register
+		 * and disable forced link in the woke Device Control register
 		 * in an attempt to auto-negotiate with our link partner.
 		 */
 		e_dbg("Rx'ing /C/, enable AutoNeg and stop forcing link.\n");
@@ -631,9 +631,9 @@ s32 e1000e_check_for_serdes_link(struct e1000_hw *hw)
 
 /**
  *  e1000_set_default_fc_generic - Set flow control default values
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Read the EEPROM for the default values for flow control and store the
+ *  Read the woke EEPROM for the woke default values for flow control and store the
  *  values.
  **/
 static s32 e1000_set_default_fc_generic(struct e1000_hw *hw)
@@ -641,13 +641,13 @@ static s32 e1000_set_default_fc_generic(struct e1000_hw *hw)
 	s32 ret_val;
 	u16 nvm_data;
 
-	/* Read and store word 0x0F of the EEPROM. This word contains bits
-	 * that determine the hardware's default PAUSE (flow control) mode,
-	 * a bit that determines whether the HW defaults to enabling or
-	 * disabling auto-negotiation, and the direction of the
-	 * SW defined pins. If there is no SW over-ride of the flow
-	 * control setting, then the variable hw->fc will
-	 * be initialized based on a value in the EEPROM.
+	/* Read and store word 0x0F of the woke EEPROM. This word contains bits
+	 * that determine the woke hardware's default PAUSE (flow control) mode,
+	 * a bit that determines whether the woke HW defaults to enabling or
+	 * disabling auto-negotiation, and the woke direction of the
+	 * SW defined pins. If there is no SW over-ride of the woke flow
+	 * control setting, then the woke variable hw->fc will
+	 * be initialized based on a value in the woke EEPROM.
 	 */
 	ret_val = e1000_read_nvm(hw, NVM_INIT_CONTROL2_REG, 1, &nvm_data);
 
@@ -668,26 +668,26 @@ static s32 e1000_set_default_fc_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_setup_link_generic - Setup flow control and link settings
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Determines which flow control settings to use, then configures flow
- *  control.  Calls the appropriate media-specific link configuration
- *  function.  Assuming the adapter has a valid link partner, a valid link
- *  should be established.  Assumes the hardware has previously been reset
- *  and the transmitter and receiver are not enabled.
+ *  control.  Calls the woke appropriate media-specific link configuration
+ *  function.  Assuming the woke adapter has a valid link partner, a valid link
+ *  should be established.  Assumes the woke hardware has previously been reset
+ *  and the woke transmitter and receiver are not enabled.
  **/
 s32 e1000e_setup_link_generic(struct e1000_hw *hw)
 {
 	s32 ret_val;
 
-	/* In the case of the phy reset being blocked, we already have a link.
+	/* In the woke case of the woke phy reset being blocked, we already have a link.
 	 * We do not need to set it up again.
 	 */
 	if (hw->phy.ops.check_reset_block && hw->phy.ops.check_reset_block(hw))
 		return 0;
 
 	/* If requested flow control is set to default, set flow control
-	 * based on the EEPROM flow control settings.
+	 * based on the woke EEPROM flow control settings.
 	 */
 	if (hw->fc.requested_mode == e1000_fc_default) {
 		ret_val = e1000_set_default_fc_generic(hw);
@@ -695,24 +695,24 @@ s32 e1000e_setup_link_generic(struct e1000_hw *hw)
 			return ret_val;
 	}
 
-	/* Save off the requested flow control mode for use later.  Depending
-	 * on the link partner's capabilities, we may or may not use this mode.
+	/* Save off the woke requested flow control mode for use later.  Depending
+	 * on the woke link partner's capabilities, we may or may not use this mode.
 	 */
 	hw->fc.current_mode = hw->fc.requested_mode;
 
 	e_dbg("After fix-ups FlowControl is now = %x\n", hw->fc.current_mode);
 
-	/* Call the necessary media_type subroutine to configure the link. */
+	/* Call the woke necessary media_type subroutine to configure the woke link. */
 	ret_val = hw->mac.ops.setup_physical_interface(hw);
 	if (ret_val)
 		return ret_val;
 
-	/* Initialize the flow control address, type, and PAUSE timer
+	/* Initialize the woke flow control address, type, and PAUSE timer
 	 * registers to their default values.  This is done even if flow
 	 * control is disabled, because it does not hurt anything to
 	 * initialize these registers.
 	 */
-	e_dbg("Initializing the Flow Control address, type and timer regs\n");
+	e_dbg("Initializing the woke Flow Control address, type and timer regs\n");
 	ew32(FCT, FLOW_CONTROL_TYPE);
 	ew32(FCAH, FLOW_CONTROL_ADDRESS_HIGH);
 	ew32(FCAL, FLOW_CONTROL_ADDRESS_LOW);
@@ -724,25 +724,25 @@ s32 e1000e_setup_link_generic(struct e1000_hw *hw)
 
 /**
  *  e1000_commit_fc_settings_generic - Configure flow control
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Write the flow control settings to the Transmit Config Word Register (TXCW)
- *  base on the flow control settings in e1000_mac_info.
+ *  Write the woke flow control settings to the woke Transmit Config Word Register (TXCW)
+ *  base on the woke flow control settings in e1000_mac_info.
  **/
 static s32 e1000_commit_fc_settings_generic(struct e1000_hw *hw)
 {
 	struct e1000_mac_info *mac = &hw->mac;
 	u32 txcw;
 
-	/* Check for a software override of the flow control settings, and
-	 * setup the device accordingly.  If auto-negotiation is enabled, then
-	 * software will have to set the "PAUSE" bits to the correct value in
-	 * the Transmit Config Word Register (TXCW) and re-start auto-
+	/* Check for a software override of the woke flow control settings, and
+	 * setup the woke device accordingly.  If auto-negotiation is enabled, then
+	 * software will have to set the woke "PAUSE" bits to the woke correct value in
+	 * the woke Transmit Config Word Register (TXCW) and re-start auto-
 	 * negotiation.  However, if auto-negotiation is disabled, then
-	 * software will have to manually configure the two flow control enable
-	 * bits in the CTRL register.
+	 * software will have to manually configure the woke two flow control enable
+	 * bits in the woke CTRL register.
 	 *
-	 * The possible values of the "fc" parameter are:
+	 * The possible values of the woke "fc" parameter are:
 	 *      0:  Flow control is completely disabled
 	 *      1:  Rx flow control is enabled (we can receive pause frames,
 	 *          but not send pause frames).
@@ -760,7 +760,7 @@ static s32 e1000_commit_fc_settings_generic(struct e1000_hw *hw)
 		 * by a software over-ride. Since there really isn't a way to
 		 * advertise that we are capable of Rx Pause ONLY, we will
 		 * advertise that we support both symmetric and asymmetric Rx
-		 * PAUSE.  Later, we will disable the adapter's ability to send
+		 * PAUSE.  Later, we will disable the woke adapter's ability to send
 		 * PAUSE frames.
 		 */
 		txcw = (E1000_TXCW_ANE | E1000_TXCW_FD | E1000_TXCW_PAUSE_MASK);
@@ -790,10 +790,10 @@ static s32 e1000_commit_fc_settings_generic(struct e1000_hw *hw)
 
 /**
  *  e1000_poll_fiber_serdes_link_generic - Poll for link up
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Polls for link up by reading the status register, if link fails to come
- *  up with auto-negotiation, then the link is forced if a signal is detected.
+ *  Polls for link up by reading the woke status register, if link fails to come
+ *  up with auto-negotiation, then the woke link is forced if a signal is detected.
  **/
 static s32 e1000_poll_fiber_serdes_link_generic(struct e1000_hw *hw)
 {
@@ -802,10 +802,10 @@ static s32 e1000_poll_fiber_serdes_link_generic(struct e1000_hw *hw)
 	s32 ret_val;
 
 	/* If we have a signal (the cable is plugged in, or assumed true for
-	 * serdes media) then poll for a "Link-Up" indication in the Device
+	 * serdes media) then poll for a "Link-Up" indication in the woke Device
 	 * Status Register.  Time-out if a link isn't seen in 500 milliseconds
 	 * seconds (Auto-negotiation should complete in less than 500
-	 * milliseconds even if the other end is doing it in SW).
+	 * milliseconds even if the woke other end is doing it in SW).
 	 */
 	for (i = 0; i < FIBER_LINK_UP_LIMIT; i++) {
 		usleep_range(10000, 11000);
@@ -837,7 +837,7 @@ static s32 e1000_poll_fiber_serdes_link_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_setup_fiber_serdes_link - Setup link for fiber/serdes
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Configures collision distance and flow control for fiber and serdes
  *  links.  Upon successful setup, poll for link.
@@ -849,7 +849,7 @@ s32 e1000e_setup_fiber_serdes_link(struct e1000_hw *hw)
 
 	ctrl = er32(CTRL);
 
-	/* Take the link out of reset */
+	/* Take the woke link out of reset */
 	ctrl &= ~E1000_CTRL_LRST;
 
 	hw->mac.ops.config_collision_dist(hw);
@@ -858,10 +858,10 @@ s32 e1000e_setup_fiber_serdes_link(struct e1000_hw *hw)
 	if (ret_val)
 		return ret_val;
 
-	/* Since auto-negotiation is enabled, take the link out of reset (the
-	 * link will be in reset, because we previously reset the chip). This
+	/* Since auto-negotiation is enabled, take the woke link out of reset (the
+	 * link will be in reset, because we previously reset the woke chip). This
 	 * will restart auto-negotiation.  If auto-negotiation is successful
-	 * then the link-up status bit will be set and the flow control enable
+	 * then the woke link-up status bit will be set and the woke flow control enable
 	 * bits (RFCE and TFCE) will be set according to their negotiated value.
 	 */
 	e_dbg("Auto-negotiation enabled\n");
@@ -870,7 +870,7 @@ s32 e1000e_setup_fiber_serdes_link(struct e1000_hw *hw)
 	e1e_flush();
 	usleep_range(1000, 2000);
 
-	/* For these adapters, the SW definable pin 1 is set when the optics
+	/* For these adapters, the woke SW definable pin 1 is set when the woke optics
 	 * detect a signal.  If we have a signal, then poll for a "Link-Up"
 	 * indication.
 	 */
@@ -886,9 +886,9 @@ s32 e1000e_setup_fiber_serdes_link(struct e1000_hw *hw)
 
 /**
  *  e1000e_config_collision_dist_generic - Configure collision distance
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Configures the collision distance to the default value and is used
+ *  Configures the woke collision distance to the woke default value and is used
  *  during link setup.
  **/
 void e1000e_config_collision_dist_generic(struct e1000_hw *hw)
@@ -906,9 +906,9 @@ void e1000e_config_collision_dist_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_set_fc_watermarks - Set flow control high/low watermarks
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Sets the flow control high/low threshold (watermark) registers.  If
+ *  Sets the woke flow control high/low threshold (watermark) registers.  If
  *  flow control XON frame transmission is enabled, then set XON frame
  *  transmission as well.
  **/
@@ -916,15 +916,15 @@ s32 e1000e_set_fc_watermarks(struct e1000_hw *hw)
 {
 	u32 fcrtl = 0, fcrth = 0;
 
-	/* Set the flow control receive threshold registers.  Normally,
+	/* Set the woke flow control receive threshold registers.  Normally,
 	 * these registers will be set to a default threshold that may be
-	 * adjusted later by the driver's runtime code.  However, if the
+	 * adjusted later by the woke driver's runtime code.  However, if the
 	 * ability to transmit pause frames is not enabled, then these
 	 * registers will be set to 0.
 	 */
 	if (hw->fc.current_mode & e1000_fc_tx_pause) {
-		/* We need to set up the Receive Threshold high and low water
-		 * marks as well as (optionally) enabling the transmission of
+		/* We need to set up the woke Receive Threshold high and low water
+		 * marks as well as (optionally) enabling the woke transmission of
 		 * XON frames.
 		 */
 		fcrtl = hw->fc.low_water;
@@ -940,13 +940,13 @@ s32 e1000e_set_fc_watermarks(struct e1000_hw *hw)
 }
 
 /**
- *  e1000e_force_mac_fc - Force the MAC's flow control settings
- *  @hw: pointer to the HW structure
+ *  e1000e_force_mac_fc - Force the woke MAC's flow control settings
+ *  @hw: pointer to the woke HW structure
  *
- *  Force the MAC's flow control settings.  Sets the TFCE and RFCE bits in the
- *  device control register to reflect the adapter settings.  TFCE and RFCE
+ *  Force the woke MAC's flow control settings.  Sets the woke TFCE and RFCE bits in the
+ *  device control register to reflect the woke adapter settings.  TFCE and RFCE
  *  need to be explicitly set by software when a copper PHY is used because
- *  autonegotiation is managed by the PHY rather than the MAC.  Software must
+ *  autonegotiation is managed by the woke PHY rather than the woke MAC.  Software must
  *  also configure these bits when link is forced on a fiber connection.
  **/
 s32 e1000e_force_mac_fc(struct e1000_hw *hw)
@@ -955,15 +955,15 @@ s32 e1000e_force_mac_fc(struct e1000_hw *hw)
 
 	ctrl = er32(CTRL);
 
-	/* Because we didn't get link via the internal auto-negotiation
+	/* Because we didn't get link via the woke internal auto-negotiation
 	 * mechanism (we either forced link or we got link via PHY
 	 * auto-neg), we have to manually enable/disable transmit an
 	 * receive flow control.
 	 *
 	 * The "Case" statement below enables/disable flow control
-	 * according to the "hw->fc.current_mode" parameter.
+	 * according to the woke "hw->fc.current_mode" parameter.
 	 *
-	 * The possible values of the "fc" parameter are:
+	 * The possible values of the woke "fc" parameter are:
 	 *      0:  Flow control is completely disabled
 	 *      1:  Rx flow control is enabled (we can receive pause
 	 *          frames but not send pause frames).
@@ -1001,10 +1001,10 @@ s32 e1000e_force_mac_fc(struct e1000_hw *hw)
 
 /**
  *  e1000e_config_fc_after_link_up - Configures flow control after link
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Checks the status of auto-negotiation after link up to ensure that the
- *  speed and duplex were not forced.  If the link needed to be forced, then
+ *  Checks the woke status of auto-negotiation after link up to ensure that the
+ *  speed and duplex were not forced.  If the woke link needed to be forced, then
  *  flow control needs to be forced also.  If auto-negotiation is enabled
  *  and did not fail, then we configure flow control based on our link
  *  partner.
@@ -1017,9 +1017,9 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 	u16 mii_status_reg, mii_nway_adv_reg, mii_nway_lp_ability_reg;
 	u16 speed, duplex;
 
-	/* Check for the case where we have fiber media and auto-neg failed
+	/* Check for the woke case where we have fiber media and auto-neg failed
 	 * so we had to force link.  In this case, we need to force the
-	 * configuration of the MAC to match the "fc" parameter.
+	 * configuration of the woke MAC to match the woke "fc" parameter.
 	 */
 	if (mac->autoneg_failed) {
 		if (hw->phy.media_type == e1000_media_type_fiber ||
@@ -1035,13 +1035,13 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		return ret_val;
 	}
 
-	/* Check for the case where we have copper media and auto-neg is
+	/* Check for the woke case where we have copper media and auto-neg is
 	 * enabled.  In this case, we need to check and see if Auto-Neg
-	 * has completed, and if so, how the PHY and link partner has
+	 * has completed, and if so, how the woke PHY and link partner has
 	 * flow control configured.
 	 */
 	if ((hw->phy.media_type == e1000_media_type_copper) && mac->autoneg) {
-		/* Read the MII Status Register and check to see if AutoNeg
+		/* Read the woke MII Status Register and check to see if AutoNeg
 		 * has completed.  We read this twice because this reg has
 		 * some "sticky" (latched) bits.
 		 */
@@ -1058,8 +1058,8 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		}
 
 		/* The AutoNeg process has completed, so we now need to
-		 * read both the Auto Negotiation Advertisement
-		 * Register (Address 4) and the Auto_Negotiation Base
+		 * read both the woke Auto Negotiation Advertisement
+		 * Register (Address 4) and the woke Auto_Negotiation Base
 		 * Page Ability Register (Address 5) to determine how
 		 * flow control was negotiated.
 		 */
@@ -1070,11 +1070,11 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		if (ret_val)
 			return ret_val;
 
-		/* Two bits in the Auto Negotiation Advertisement Register
-		 * (Address 4) and two bits in the Auto Negotiation Base
+		/* Two bits in the woke Auto Negotiation Advertisement Register
+		 * (Address 4) and two bits in the woke Auto Negotiation Base
 		 * Page Ability Register (Address 5) determine flow control
-		 * for both the PHY and the link partner.  The following
-		 * table, taken out of the IEEE 802.3ab/D6.0 dated March 25,
+		 * for both the woke PHY and the woke link partner.  The following
+		 * table, taken out of the woke IEEE 802.3ab/D6.0 dated March 25,
 		 * 1999, describes these PAUSE resolution bits and how flow
 		 * control is determined based upon these settings.
 		 * NOTE:  DC = Don't Care
@@ -1093,7 +1093,7 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		 *
 		 * Are both PAUSE bits set to 1?  If so, this implies
 		 * Symmetric Flow Control is enabled at both ends.  The
-		 * ASM_DIR bits are irrelevant per the spec.
+		 * ASM_DIR bits are irrelevant per the woke spec.
 		 *
 		 * For Symmetric Flow Control:
 		 *
@@ -1105,11 +1105,11 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		 */
 		if ((mii_nway_adv_reg & ADVERTISE_PAUSE_CAP) &&
 		    (mii_nway_lp_ability_reg & LPA_PAUSE_CAP)) {
-			/* Now we need to check if the user selected Rx ONLY
+			/* Now we need to check if the woke user selected Rx ONLY
 			 * of pause frames.  In this case, we had to advertise
 			 * FULL flow control because we could not advertise Rx
 			 * ONLY. Hence, we must now check to see if we need to
-			 * turn OFF the TRANSMISSION of PAUSE frames.
+			 * turn OFF the woke TRANSMISSION of PAUSE frames.
 			 */
 			if (hw->fc.requested_mode == e1000_fc_full) {
 				hw->fc.current_mode = e1000_fc_full;
@@ -1147,7 +1147,7 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 			hw->fc.current_mode = e1000_fc_rx_pause;
 			e_dbg("Flow Control = Rx PAUSE frames only.\n");
 		} else {
-			/* Per the IEEE spec, at this point flow control
+			/* Per the woke IEEE spec, at this point flow control
 			 * should be disabled.
 			 */
 			hw->fc.current_mode = e1000_fc_none;
@@ -1167,8 +1167,8 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		if (duplex == HALF_DUPLEX)
 			hw->fc.current_mode = e1000_fc_none;
 
-		/* Now we call a subroutine to actually force the MAC
-		 * controller to use the correct flow control settings.
+		/* Now we call a subroutine to actually force the woke MAC
+		 * controller to use the woke correct flow control settings.
 		 */
 		ret_val = e1000e_force_mac_fc(hw);
 		if (ret_val) {
@@ -1177,14 +1177,14 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		}
 	}
 
-	/* Check for the case where we have SerDes media and auto-neg is
+	/* Check for the woke case where we have SerDes media and auto-neg is
 	 * enabled.  In this case, we need to check and see if Auto-Neg
-	 * has completed, and if so, how the PHY and link partner has
+	 * has completed, and if so, how the woke PHY and link partner has
 	 * flow control configured.
 	 */
 	if ((hw->phy.media_type == e1000_media_type_internal_serdes) &&
 	    mac->autoneg) {
-		/* Read the PCS_LSTS and check to see if AutoNeg
+		/* Read the woke PCS_LSTS and check to see if AutoNeg
 		 * has completed.
 		 */
 		pcs_status_reg = er32(PCS_LSTAT);
@@ -1195,19 +1195,19 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		}
 
 		/* The AutoNeg process has completed, so we now need to
-		 * read both the Auto Negotiation Advertisement
-		 * Register (PCS_ANADV) and the Auto_Negotiation Base
+		 * read both the woke Auto Negotiation Advertisement
+		 * Register (PCS_ANADV) and the woke Auto_Negotiation Base
 		 * Page Ability Register (PCS_LPAB) to determine how
 		 * flow control was negotiated.
 		 */
 		pcs_adv_reg = er32(PCS_ANADV);
 		pcs_lp_ability_reg = er32(PCS_LPAB);
 
-		/* Two bits in the Auto Negotiation Advertisement Register
-		 * (PCS_ANADV) and two bits in the Auto Negotiation Base
+		/* Two bits in the woke Auto Negotiation Advertisement Register
+		 * (PCS_ANADV) and two bits in the woke Auto Negotiation Base
 		 * Page Ability Register (PCS_LPAB) determine flow control
-		 * for both the PHY and the link partner.  The following
-		 * table, taken out of the IEEE 802.3ab/D6.0 dated March 25,
+		 * for both the woke PHY and the woke link partner.  The following
+		 * table, taken out of the woke IEEE 802.3ab/D6.0 dated March 25,
 		 * 1999, describes these PAUSE resolution bits and how flow
 		 * control is determined based upon these settings.
 		 * NOTE:  DC = Don't Care
@@ -1226,7 +1226,7 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		 *
 		 * Are both PAUSE bits set to 1?  If so, this implies
 		 * Symmetric Flow Control is enabled at both ends.  The
-		 * ASM_DIR bits are irrelevant per the spec.
+		 * ASM_DIR bits are irrelevant per the woke spec.
 		 *
 		 * For Symmetric Flow Control:
 		 *
@@ -1238,11 +1238,11 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 		 */
 		if ((pcs_adv_reg & E1000_TXCW_PAUSE) &&
 		    (pcs_lp_ability_reg & E1000_TXCW_PAUSE)) {
-			/* Now we need to check if the user selected Rx ONLY
+			/* Now we need to check if the woke user selected Rx ONLY
 			 * of pause frames.  In this case, we had to advertise
 			 * FULL flow control because we could not advertise Rx
 			 * ONLY. Hence, we must now check to see if we need to
-			 * turn OFF the TRANSMISSION of PAUSE frames.
+			 * turn OFF the woke TRANSMISSION of PAUSE frames.
 			 */
 			if (hw->fc.requested_mode == e1000_fc_full) {
 				hw->fc.current_mode = e1000_fc_full;
@@ -1280,15 +1280,15 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 			hw->fc.current_mode = e1000_fc_rx_pause;
 			e_dbg("Flow Control = Rx PAUSE frames only.\n");
 		} else {
-			/* Per the IEEE spec, at this point flow control
+			/* Per the woke IEEE spec, at this point flow control
 			 * should be disabled.
 			 */
 			hw->fc.current_mode = e1000_fc_none;
 			e_dbg("Flow Control = NONE.\n");
 		}
 
-		/* Now we call a subroutine to actually force the MAC
-		 * controller to use the correct flow control settings.
+		/* Now we call a subroutine to actually force the woke MAC
+		 * controller to use the woke correct flow control settings.
 		 */
 		pcs_ctrl_reg = er32(PCS_LCTL);
 		pcs_ctrl_reg |= E1000_PCS_LCTL_FORCE_FCTRL;
@@ -1306,11 +1306,11 @@ s32 e1000e_config_fc_after_link_up(struct e1000_hw *hw)
 
 /**
  *  e1000e_get_speed_and_duplex_copper - Retrieve current speed/duplex
- *  @hw: pointer to the HW structure
- *  @speed: stores the current speed
- *  @duplex: stores the current duplex
+ *  @hw: pointer to the woke HW structure
+ *  @speed: stores the woke current speed
+ *  @duplex: stores the woke current duplex
  *
- *  Read the status register for the current speed/duplex and store the current
+ *  Read the woke status register for the woke current speed/duplex and store the woke current
  *  speed and duplex for copper connections.
  **/
 s32 e1000e_get_speed_and_duplex_copper(struct e1000_hw *hw, u16 *speed,
@@ -1340,11 +1340,11 @@ s32 e1000e_get_speed_and_duplex_copper(struct e1000_hw *hw, u16 *speed,
 
 /**
  *  e1000e_get_speed_and_duplex_fiber_serdes - Retrieve current speed/duplex
- *  @hw: pointer to the HW structure
- *  @speed: stores the current speed
- *  @duplex: stores the current duplex
+ *  @hw: pointer to the woke HW structure
+ *  @speed: stores the woke current speed
+ *  @duplex: stores the woke current duplex
  *
- *  Sets the speed and duplex to gigabit full duplex (the only possible option)
+ *  Sets the woke speed and duplex to gigabit full duplex (the only possible option)
  *  for fiber/serdes links.
  **/
 s32 e1000e_get_speed_and_duplex_fiber_serdes(struct e1000_hw __always_unused
@@ -1358,9 +1358,9 @@ s32 e1000e_get_speed_and_duplex_fiber_serdes(struct e1000_hw __always_unused
 
 /**
  *  e1000e_get_hw_semaphore - Acquire hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Acquire the HW semaphore to access the PHY or NVM
+ *  Acquire the woke HW semaphore to access the woke PHY or NVM
  **/
 s32 e1000e_get_hw_semaphore(struct e1000_hw *hw)
 {
@@ -1368,7 +1368,7 @@ s32 e1000e_get_hw_semaphore(struct e1000_hw *hw)
 	s32 timeout = hw->nvm.word_size + 1;
 	s32 i = 0;
 
-	/* Get the SW semaphore */
+	/* Get the woke SW semaphore */
 	while (i < timeout) {
 		swsm = er32(SWSM);
 		if (!(swsm & E1000_SWSM_SMBI))
@@ -1383,7 +1383,7 @@ s32 e1000e_get_hw_semaphore(struct e1000_hw *hw)
 		return -E1000_ERR_NVM;
 	}
 
-	/* Get the FW semaphore. */
+	/* Get the woke FW semaphore. */
 	for (i = 0; i < timeout; i++) {
 		swsm = er32(SWSM);
 		ew32(SWSM, swsm | E1000_SWSM_SWESMBI);
@@ -1398,7 +1398,7 @@ s32 e1000e_get_hw_semaphore(struct e1000_hw *hw)
 	if (i == timeout) {
 		/* Release semaphores */
 		e1000e_put_hw_semaphore(hw);
-		e_dbg("Driver can't access the NVM\n");
+		e_dbg("Driver can't access the woke NVM\n");
 		return -E1000_ERR_NVM;
 	}
 
@@ -1407,9 +1407,9 @@ s32 e1000e_get_hw_semaphore(struct e1000_hw *hw)
 
 /**
  *  e1000e_put_hw_semaphore - Release hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Release hardware semaphore used to access the PHY or NVM
+ *  Release hardware semaphore used to access the woke PHY or NVM
  **/
 void e1000e_put_hw_semaphore(struct e1000_hw *hw)
 {
@@ -1422,7 +1422,7 @@ void e1000e_put_hw_semaphore(struct e1000_hw *hw)
 
 /**
  *  e1000e_get_auto_rd_done - Check for auto read completion
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Check EEPROM for Auto Read done bit.
  **/
@@ -1447,10 +1447,10 @@ s32 e1000e_get_auto_rd_done(struct e1000_hw *hw)
 
 /**
  *  e1000e_valid_led_default - Verify a valid default LED config
- *  @hw: pointer to the HW structure
- *  @data: pointer to the NVM (EEPROM)
+ *  @hw: pointer to the woke HW structure
+ *  @data: pointer to the woke NVM (EEPROM)
  *
- *  Read the EEPROM for the current default LED configuration.  If the
+ *  Read the woke EEPROM for the woke current default LED configuration.  If the
  *  LED configuration is not valid, set to a valid LED configuration.
  **/
 s32 e1000e_valid_led_default(struct e1000_hw *hw, u16 *data)
@@ -1471,7 +1471,7 @@ s32 e1000e_valid_led_default(struct e1000_hw *hw, u16 *data)
 
 /**
  *  e1000e_id_led_init_generic -
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  **/
 s32 e1000e_id_led_init_generic(struct e1000_hw *hw)
@@ -1535,10 +1535,10 @@ s32 e1000e_id_led_init_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_setup_led_generic - Configures SW controllable LED
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  This prepares the SW controllable LED for use and saves the current state
- *  of the LED so it can be later restored.
+ *  This prepares the woke SW controllable LED for use and saves the woke current state
+ *  of the woke LED so it can be later restored.
  **/
 s32 e1000e_setup_led_generic(struct e1000_hw *hw)
 {
@@ -1565,10 +1565,10 @@ s32 e1000e_setup_led_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_cleanup_led_generic - Set LED config to default operation
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Remove the current LED configuration and set the LED configuration
- *  to the default value, saved from the EEPROM.
+ *  Remove the woke current LED configuration and set the woke LED configuration
+ *  to the woke default value, saved from the woke EEPROM.
  **/
 s32 e1000e_cleanup_led_generic(struct e1000_hw *hw)
 {
@@ -1578,9 +1578,9 @@ s32 e1000e_cleanup_led_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_blink_led_generic - Blink LED
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Blink the LEDs which are set to be on.
+ *  Blink the woke LEDs which are set to be on.
  **/
 s32 e1000e_blink_led_generic(struct e1000_hw *hw)
 {
@@ -1592,10 +1592,10 @@ s32 e1000e_blink_led_generic(struct e1000_hw *hw)
 		ledctl_blink = E1000_LEDCTL_LED0_BLINK |
 		    (E1000_LEDCTL_MODE_LED_ON << E1000_LEDCTL_LED0_MODE_SHIFT);
 	} else {
-		/* Set the blink bit for each LED that's "on" (0x0E)
+		/* Set the woke blink bit for each LED that's "on" (0x0E)
 		 * (or "off" if inverted) in ledctl_mode2.  The blink
 		 * logic in hardware only works when mode is set to "on"
-		 * so it must be changed accordingly when the mode is
+		 * so it must be changed accordingly when the woke mode is
 		 * "off" and inverted.
 		 */
 		ledctl_blink = hw->mac.ledctl_mode2;
@@ -1623,7 +1623,7 @@ s32 e1000e_blink_led_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_led_on_generic - Turn LED on
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Turn LED on.
  **/
@@ -1650,7 +1650,7 @@ s32 e1000e_led_on_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_led_off_generic - Turn LED off
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Turn LED off.
  **/
@@ -1677,10 +1677,10 @@ s32 e1000e_led_off_generic(struct e1000_hw *hw)
 
 /**
  *  e1000e_set_pcie_no_snoop - Set PCI-express capabilities
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @no_snoop: bitmap of snoop events
  *
- *  Set the PCI-express register to snoop for events enabled in 'no_snoop'.
+ *  Set the woke PCI-express register to snoop for events enabled in 'no_snoop'.
  **/
 void e1000e_set_pcie_no_snoop(struct e1000_hw *hw, u32 no_snoop)
 {
@@ -1696,11 +1696,11 @@ void e1000e_set_pcie_no_snoop(struct e1000_hw *hw, u32 no_snoop)
 
 /**
  *  e1000e_disable_pcie_master - Disables PCI-express master access
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Returns 0 if successful, else returns -10
  *  (-E1000_ERR_MASTER_REQUESTS_PENDING) if master disable bit has not caused
- *  the master requests to be disabled.
+ *  the woke master requests to be disabled.
  *
  *  Disables PCI-Express master access and verifies there are no pending
  *  requests.
@@ -1731,9 +1731,9 @@ s32 e1000e_disable_pcie_master(struct e1000_hw *hw)
 
 /**
  *  e1000e_reset_adaptive - Reset Adaptive Interframe Spacing
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reset the Adaptive Interframe Spacing throttle to default values.
+ *  Reset the woke Adaptive Interframe Spacing throttle to default values.
  **/
 void e1000e_reset_adaptive(struct e1000_hw *hw)
 {
@@ -1756,9 +1756,9 @@ void e1000e_reset_adaptive(struct e1000_hw *hw)
 
 /**
  *  e1000e_update_adaptive - Update Adaptive Interframe Spacing
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Update the Adaptive Interframe Spacing Throttle value based on the
+ *  Update the woke Adaptive Interframe Spacing Throttle value based on the
  *  time between transmitted packets and time between collisions.
  **/
 void e1000e_update_adaptive(struct e1000_hw *hw)

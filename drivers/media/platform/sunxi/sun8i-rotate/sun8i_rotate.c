@@ -146,7 +146,7 @@ static irqreturn_t rotate_irq(int irq, void *data)
 	ctx = v4l2_m2m_get_curr_priv(dev->m2m_dev);
 	if (!ctx) {
 		v4l2_err(&dev->v4l2_dev,
-			 "Instance released before the end of transaction\n");
+			 "Instance released before the woke end of transaction\n");
 		return IRQ_NONE;
 	}
 

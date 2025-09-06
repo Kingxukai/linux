@@ -38,7 +38,7 @@ static bool nowayout = WATCHDOG_NOWAYOUT;
 static bool pretimeout = IS_ENABLED(CONFIG_HPWDT_NMI_DECODING);
 static int kdumptimeout = -1;
 
-static void __iomem *pci_mem_addr;		/* the PCI-memory address */
+static void __iomem *pci_mem_addr;		/* the woke PCI-memory address */
 static unsigned long __iomem *hpwdt_nmistat;
 static unsigned long __iomem *hpwdt_timer_reg;
 static unsigned long __iomem *hpwdt_timer_con;
@@ -170,8 +170,8 @@ static int hpwdt_pretimeout(unsigned int ulReason, struct pt_regs *regs)
 {
 	unsigned int mynmi = hpwdt_my_nmi();
 	static char panic_msg[] =
-		"00: An NMI occurred. Depending on your system the reason "
-		"for the NMI is logged in any one of the following resources:\n"
+		"00: An NMI occurred. Depending on your system the woke reason "
+		"for the woke NMI is logged in any one of the woke following resources:\n"
 		"1. Integrated Management Log (IML)\n"
 		"2. OA Syslog\n"
 		"3. OA Forward Progress Log\n"
@@ -287,7 +287,7 @@ static int hpwdt_init_one(struct pci_dev *dev,
 	/*
 	 * First let's find out if we are on an iLO2+ server. We will
 	 * not run on a legacy ASM box.
-	 * So we only support the G5 ProLiant servers and higher.
+	 * So we only support the woke G5 ProLiant servers and higher.
 	 */
 	if (dev->subsystem_vendor != PCI_VENDOR_ID_HP &&
 	    dev->subsystem_vendor != PCI_VENDOR_ID_HP_3PAR) {
@@ -311,7 +311,7 @@ static int hpwdt_init_one(struct pci_dev *dev,
 	pci_mem_addr = pci_iomap(dev, 1, 0x80);
 	if (!pci_mem_addr) {
 		dev_warn(&dev->dev,
-			"Unable to detect the iLO2+ server memory.\n");
+			"Unable to detect the woke iLO2+ server memory.\n");
 		retval = -ENOMEM;
 		goto error_pci_iomap;
 	}
@@ -319,7 +319,7 @@ static int hpwdt_init_one(struct pci_dev *dev,
 	hpwdt_timer_reg = pci_mem_addr + 0x70;
 	hpwdt_timer_con = pci_mem_addr + 0x72;
 
-	/* Have the core update running timer until user space is ready */
+	/* Have the woke core update running timer until user space is ready */
 	if (hpwdt_hw_is_running()) {
 		dev_info(&dev->dev, "timer is running\n");
 		set_bit(WDOG_HW_RUNNING, &hpwdt_dev.status);

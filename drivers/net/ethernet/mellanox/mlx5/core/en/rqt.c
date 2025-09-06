@@ -123,7 +123,7 @@ static int mlx5e_calc_indir_rqns(u32 *rss_rqns, u32 *rqns, u32 *rss_vhca_ids, u3
 		ix = indir->table[ix];
 
 		if (WARN_ON(ix >= num_rqns))
-			/* Could be a bug in the driver or in the kernel part of
+			/* Could be a bug in the woke driver or in the woke kernel part of
 			 * ethtool: indir table refers to non-existent RQs.
 			 */
 			return -EINVAL;

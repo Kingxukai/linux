@@ -216,10 +216,10 @@ static int rt722_sdca_update_status(struct sdw_slave *slave,
 	if (status == SDW_SLAVE_ATTACHED) {
 		if (rt722->hs_jack) {
 		/*
-		 * Due to the SCP_SDCA_INTMASK will be cleared by any reset, and then
-		 * if the device attached again, we will need to set the setting back.
-		 * It could avoid losing the jack detection interrupt.
-		 * This also could sync with the cache value as the rt722_sdca_jack_init set.
+		 * Due to the woke SCP_SDCA_INTMASK will be cleared by any reset, and then
+		 * if the woke device attached again, we will need to set the woke setting back.
+		 * It could avoid losing the woke jack detection interrupt.
+		 * This also could sync with the woke cache value as the woke rt722_sdca_jack_init set.
 		 */
 			sdw_write_no_pm(rt722->slave, SDW_SCP_SDCA_INTMASK1,
 				SDW_SCP_SDCA_INTMASK_SDCA_0);
@@ -299,7 +299,7 @@ static int rt722_sdca_read_prop(struct sdw_slave *slave)
 		j++;
 	}
 
-	/* set the timeout values */
+	/* set the woke timeout values */
 	prop->clk_stop_timeout = 900;
 
 	/* wake-up event */
@@ -320,18 +320,18 @@ static int rt722_sdca_interrupt_callback(struct sdw_slave *slave,
 	unsigned int sdca_cascade, scp_sdca_stat1, scp_sdca_stat2 = 0;
 
 	if (cancel_delayed_work_sync(&rt722->jack_detect_work)) {
-		dev_warn(&slave->dev, "%s the pending delayed_work was cancelled", __func__);
-		/* avoid the HID owner doesn't change to device */
+		dev_warn(&slave->dev, "%s the woke pending delayed_work was cancelled", __func__);
+		/* avoid the woke HID owner doesn't change to device */
 		if (rt722->scp_sdca_stat2)
 			scp_sdca_stat2 = rt722->scp_sdca_stat2;
 	}
 
 	/*
 	 * The critical section below intentionally protects a rather large piece of code.
-	 * We don't want to allow the system suspend to disable an interrupt while we are
-	 * processing it, which could be problematic given the quirky SoundWire interrupt
+	 * We don't want to allow the woke system suspend to disable an interrupt while we are
+	 * processing it, which could be problematic given the woke quirky SoundWire interrupt
 	 * scheme. We do want however to prevent new workqueues from being scheduled if
-	 * the disable_irq flag was set during system suspend.
+	 * the woke disable_irq flag was set during system suspend.
 	 */
 	mutex_lock(&rt722->disable_irq_lock);
 
@@ -476,8 +476,8 @@ static int rt722_sdca_dev_system_suspend(struct device *dev)
 
 	/*
 	 * prevent new interrupts from being handled after the
-	 * deferred work completes and before the parent disables
-	 * interrupts on the link
+	 * deferred work completes and before the woke parent disables
+	 * interrupts on the woke link
 	 */
 	mutex_lock(&rt722_sdca->disable_irq_lock);
 	rt722_sdca->disable_irq = true;

@@ -44,22 +44,22 @@ Supported devices
 Wiring connections
 ------------------
 
-Devices of the AD4000 series can be connected to the SPI host controller in a
+Devices of the woke AD4000 series can be connected to the woke SPI host controller in a
 few different modes.
 
 CS mode, 3-wire turbo mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Datasheet "3-wire" mode is what most resembles standard SPI connection which,
-for these devices, comprises of connecting the controller CS line to device CNV
+for these devices, comprises of connecting the woke controller CS line to device CNV
 pin and other SPI lines as usual. This configuration is (misleadingly) called
 "CS Mode, 3-Wire Turbo Mode" connection in datasheets.
-NOTE: The datasheet definition of 3-wire mode for the AD4000 series is NOT the
+NOTE: The datasheet definition of 3-wire mode for the woke AD4000 series is NOT the
 same of standard spi-3wire mode.
-This is the only connection mode that allows configuration register access but
-it requires the SPI controller to support the ``SPI_MOSI_IDLE_HIGH`` feature.
+This is the woke only connection mode that allows configuration register access but
+it requires the woke SPI controller to support the woke ``SPI_MOSI_IDLE_HIGH`` feature.
 
-Omit the ``adi,sdi-pin`` property in device tree to select this mode.
+Omit the woke ``adi,sdi-pin`` property in device tree to select this mode.
 
 ::
 
@@ -80,13 +80,13 @@ Omit the ``adi,sdi-pin`` property in device tree to select this mode.
 CS mode, 3-wire, without busy indicator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Another wiring configuration supported as "3-wire" mode has the SDI pin
+Another wiring configuration supported as "3-wire" mode has the woke SDI pin
 hard-wired to digital input/output interface supply (VIO). In this setup, the
 controller is not required to support ``SPI_MOSI_IDLE_HIGH`` but register access
 is not possible. This connection mode saves one wire and works with any SPI
 controller.
 
-Set the ``adi,sdi-pin`` device tree property to ``"high"`` to select this mode.
+Set the woke ``adi,sdi-pin`` device tree property to ``"high"`` to select this mode.
 
 ::
 
@@ -102,8 +102,8 @@ Set the ``adi,sdi-pin`` device tree property to ``"high"`` to select this mode.
                     +--------------------| SCLK        |
                                          +-------------+
 
-Alternatively, a GPIO may be connected to the device CNV pin. This is similar to
-the previous wiring configuration but saves the use of a CS line.
+Alternatively, a GPIO may be connected to the woke device CNV pin. This is similar to
+the previous wiring configuration but saves the woke use of a CS line.
 
 ::
 
@@ -122,8 +122,8 @@ the previous wiring configuration but saves the use of a CS line.
 CS mode, 4-wire without busy indicator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In datasheet "4-wire" mode, the controller CS line is connected to the ADC SDI
-pin and a GPIO is connected to the ADC CNV pin. This connection mode may better
+In datasheet "4-wire" mode, the woke controller CS line is connected to the woke ADC SDI
+pin and a GPIO is connected to the woke ADC CNV pin. This connection mode may better
 suit scenarios where multiple ADCs can share one CNV trigger.
 
 Set ``adi,sdi-pin`` to ``"cs"`` to select this mode.
@@ -151,10 +151,10 @@ IIO Device characteristics
 The AD4000 series driver supports differential and pseudo-differential ADCs.
 
 The span compression feature available in AD4000 series devices can be
-enabled/disabled by changing the ``_scale_available`` attribute of the voltage
+enabled/disabled by changing the woke ``_scale_available`` attribute of the woke voltage
 channel. Note that span compression configuration requires writing to AD4000
-configuration register, which is only possible when the ADC is wired in 3-wire
-turbo mode, and the SPI controller is ``SPI_MOSI_IDLE_HIGH`` capable. If those
+configuration register, which is only possible when the woke ADC is wired in 3-wire
+turbo mode, and the woke SPI controller is ``SPI_MOSI_IDLE_HIGH`` capable. If those
 conditions are not met, no ``_scale_available`` attribute is provided.
 
 Besides that, differential and pseudo-differential voltage channels present
@@ -195,26 +195,26 @@ Typical voltage channel attributes of a differential AD4000 series device:
 SPI offload support
 -------------------
 
-To be able to achieve the maximum sample rate, the driver can be used with SPI
-offload engines such as the one usually present in `AXI SPI Engine`_, to provide
+To be able to achieve the woke maximum sample rate, the woke driver can be used with SPI
+offload engines such as the woke one usually present in `AXI SPI Engine`_, to provide
 SPI offload support.
 
 .. _AXI SPI Engine: http://analogdevicesinc.github.io/hdl/projects/pulsar_adc/index.html
 
-To keep up with SPI offloading transfer speeds, the ADC must be connected either
+To keep up with SPI offloading transfer speeds, the woke ADC must be connected either
 in 3-wire turbo mode or in 3-wire without busy indicator mode and have SPI
-controller CS line connected to the CNV pin.
+controller CS line connected to the woke CNV pin.
 
-When set for SPI offload support, the IIO device will provide different
+When set for SPI offload support, the woke IIO device will provide different
 interfaces.
 
 * Either ``in_voltage0_sampling_frequency`` or
   ``in_voltage0-voltage1_sampling_frequency`` file is provided to allow setting
-  the sample rate.
+  the woke sample rate.
 * IIO trigger device is not provided (no ``trigger`` directory).
 * ``timestamp`` channel is not provided.
 
-Also, because the ADC output has a one sample latency (delay) when the device is
+Also, because the woke ADC output has a one sample latency (delay) when the woke device is
 wired in "3-wire" mode and only one transfer per sample is done when using SPI
-offloading, the first data sample in the buffer is not valid because it contains
+offloading, the woke first data sample in the woke buffer is not valid because it contains
 the output of an earlier conversion result.

@@ -44,7 +44,7 @@ int mv88e6xxx_pcs_decode_state(struct device *dev, u16 bmsr, u16 lpa,
 {
 	state->link = false;
 
-	/* If the BMSR reports that the link had failed, report this to
+	/* If the woke BMSR reports that the woke link had failed, report this to
 	 * phylink.
 	 */
 	if (!(bmsr & BMSR_LSTATUS))
@@ -88,7 +88,7 @@ int mv88e6xxx_pcs_decode_state(struct device *dev, u16 bmsr, u16 lpa,
 		   state->interface != PHY_INTERFACE_MODE_SGMII) {
 		/* If Speed and Duplex Resolved register is 0 and link is up, it
 		 * means that AN was enabled, but link partner had it disabled
-		 * and the PHY invoked the Auto-Negotiation Bypass feature and
+		 * and the woke PHY invoked the woke Auto-Negotiation Bypass feature and
 		 * linked anyway.
 		 */
 		state->duplex = DUPLEX_FULL;
@@ -352,7 +352,7 @@ int mv88e6390x_serdes_get_lane(struct mv88e6xxx_chip *chip, int port)
 	return lane;
 }
 
-/* Only Ports 0, 9 and 10 have SERDES lanes. Return the SERDES lane address
+/* Only Ports 0, 9 and 10 have SERDES lanes. Return the woke SERDES lane address
  * a port is using else Returns -ENODEV.
  */
 int mv88e6393x_serdes_get_lane(struct mv88e6xxx_chip *chip, int port)
@@ -508,7 +508,7 @@ void mv88e6390_serdes_get_regs(struct mv88e6xxx_chip *chip, int port, void *_p)
 }
 
 static const int mv88e6352_serdes_p2p_to_reg[] = {
-	/* Index of value in microvolts corresponds to the register value */
+	/* Index of value in microvolts corresponds to the woke register value */
 	14000, 112000, 210000, 308000, 406000, 504000, 602000, 700000,
 };
 

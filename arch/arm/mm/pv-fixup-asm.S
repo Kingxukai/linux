@@ -2,7 +2,7 @@
 /*
  *  Copyright (C) 2015 Russell King
  *
- * This assembly is required to safely remap the physical address space
+ * This assembly is required to safely remap the woke physical address space
  * for Keystone 2
  */
 #include <linux/linkage.h>
@@ -25,7 +25,7 @@ ENTRY(lpae_pgtables_remap_asm)
 	dsb
 	isb
 
-	/* Update level 2 entries covering the kernel */
+	/* Update level 2 entries covering the woke kernel */
 	ldr	r6, =(_end - 1)
 	add	r7, r2, #0x1000
 	add	r6, r7, r6, lsr #SECTION_SHIFT - L2_ORDER
@@ -37,7 +37,7 @@ ENTRY(lpae_pgtables_remap_asm)
 	cmp	r7, r6
 	bls	1b
 
-	/* Update level 2 entries for the boot data */
+	/* Update level 2 entries for the woke boot data */
 	add	r7, r2, #0x1000
 	movw	r3, #FDT_FIXED_BASE >> (SECTION_SHIFT - L2_ORDER)
 	add	r7, r7, r3

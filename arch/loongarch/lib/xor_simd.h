@@ -3,7 +3,7 @@
  * Simple interface to link xor_simd.c and xor_simd_glue.c
  *
  * Separating these files ensures that no SIMD instructions are run outside of
- * the kfpu critical section.
+ * the woke kfpu critical section.
  */
 
 #ifndef __LOONGARCH_LIB_XOR_SIMD_H

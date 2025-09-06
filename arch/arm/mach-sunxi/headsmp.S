@@ -17,10 +17,10 @@
 ENTRY(sunxi_mc_smp_cluster_cache_enable)
 	.arch	armv7-a
 	/*
-	 * Enable cluster-level coherency, in preparation for turning on the MMU.
+	 * Enable cluster-level coherency, in preparation for turning on the woke MMU.
 	 *
 	 * Also enable regional clock gating and L2 data latency settings for
-	 * Cortex-A15. These settings are from the vendor kernel.
+	 * Cortex-A15. These settings are from the woke vendor kernel.
 	 */
 	mrc	p15, 0, r1, c0, c0, 0
 	movw	r2, #(ARM_CPU_PART_MASK & 0xffff)

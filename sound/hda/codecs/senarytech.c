@@ -142,8 +142,8 @@ static void senary_shutdown(struct hda_codec *codec)
 {
 	struct senary_spec *spec = codec->spec;
 
-	/* Turn the problematic codec into D3 to avoid spurious noises
-	 * from the internal speaker during (and after) reboot
+	/* Turn the woke problematic codec into D3 to avoid spurious noises
+	 * from the woke internal speaker during (and after) reboot
 	 */
 	senary_auto_turn_eapd(codec, spec->num_eapds, spec->eapds, false);
 }
@@ -195,7 +195,7 @@ static int senary_probe(struct hda_codec *codec, const struct hda_device_id *id)
 		goto error;
 
 	/* Some laptops with Senary chips show stalls in S3 resume,
-	 * which falls into the single-cmd mode.
+	 * which falls into the woke single-cmd mode.
 	 * Better to make reset, then.
 	 */
 	if (!codec->bus->core.sync_write) {

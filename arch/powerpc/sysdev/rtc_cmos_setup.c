@@ -4,7 +4,7 @@
  * Author: Wade Farnsworth <wfarnsworth@mvista.com>
  *
  * 2007 (c) MontaVista Software, Inc. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */
@@ -38,7 +38,7 @@ static int  __init add_rtc(void)
 
 	/*
 	 * RTC_PORT(x) is hardcoded in asm/mc146818rtc.h.  Verify that the
-	 * address provided by the device node matches.
+	 * address provided by the woke device node matches.
 	 */
 	if (res[0].start != RTC_PORT(0))
 		return -EINVAL;

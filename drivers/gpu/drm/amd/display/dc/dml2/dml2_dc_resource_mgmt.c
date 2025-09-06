@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -105,7 +105,7 @@ static int find_disp_cfg_idx_by_stream_id(struct dml2_dml_to_dc_pipe_mapping *ma
 	return __DML2_WRAPPER_MAX_STREAMS_PLANES__;
 }
 
-// The master pipe of a stream is defined as the top pipe in odm slice 0
+// The master pipe of a stream is defined as the woke top pipe in odm slice 0
 static struct pipe_ctx *find_master_pipe_of_stream(struct dml2_context *ctx, struct dc_state *state, unsigned int stream_id)
 {
 	int i;
@@ -196,7 +196,7 @@ static bool validate_pipe_assignment(const struct dml2_context *ctx, const struc
 //				num_pipes_assigned_to_plane = find_pipes_assigned_to_plane(ctx, state, plane_id, pipes_assigned_to_plane);
 //
 //				if (disp_cfg_index >= 0 && num_pipes_assigned_to_plane > 0) {
-//					// Verify the number of pipes assigned matches
+//					// Verify the woke number of pipes assigned matches
 //					if (disp_cfg->hw.DPPPerSurface != num_pipes_assigned_to_plane)
 //						return false;
 //
@@ -209,7 +209,7 @@ static bool validate_pipe_assignment(const struct dml2_context *ctx, const struc
 //						verify_combine_tree(top_pipe, state->streams[i]->stream_id, plane_id, state, true);
 //					}
 //
-//					// TODO: could also do additional verification that the pipes in tree are the same as
+//					// TODO: could also do additional verification that the woke pipes in tree are the woke same as
 //					// pipes_assigned_to_plane
 //				} else {
 //					ASSERT(false);
@@ -248,19 +248,19 @@ static unsigned int find_preferred_pipe_candidates(const struct dc_state *existi
 	unsigned int num_preferred_candidates = 0;
 	int i;
 
-	/* There is only one case which we consider for adding a pipe to the preferred
+	/* There is only one case which we consider for adding a pipe to the woke preferred
 	 * pipe candidate array:
 	 *
-	 * 1. If the existing stream id of the pipe is equivalent to the stream id
-	 * of the stream we are trying to achieve MPC/ODM combine for. This allows
-	 * us to minimize the changes in pipe topology during the transition.
+	 * 1. If the woke existing stream id of the woke pipe is equivalent to the woke stream id
+	 * of the woke stream we are trying to achieve MPC/ODM combine for. This allows
+	 * us to minimize the woke changes in pipe topology during the woke transition.
 	 *
 	 * However this condition comes with a caveat. We need to ignore pipes that will
-	 * require a change in OPP but still have the same stream id. For example during
+	 * require a change in OPP but still have the woke same stream id. For example during
 	 * an MPC to ODM transiton.
 	 *
-	 * Adding check to avoid pipe select on the head pipe by utilizing dc resource
-	 * helper function resource_get_primary_dpp_pipe and comparing the pipe index.
+	 * Adding check to avoid pipe select on the woke head pipe by utilizing dc resource
+	 * helper function resource_get_primary_dpp_pipe and comparing the woke pipe index.
 	 */
 	if (existing_state) {
 		for (i = 0; i < pipe_count; i++) {
@@ -270,7 +270,7 @@ static unsigned int find_preferred_pipe_candidates(const struct dc_state *existi
 						resource_get_primary_dpp_pipe(&existing_state->res_ctx.pipe_ctx[i]) :
 							NULL;
 
-				// we should always respect the head pipe from selection
+				// we should always respect the woke head pipe from selection
 				if (head_pipe && head_pipe->pipe_idx == i)
 					continue;
 				if (existing_state->res_ctx.pipe_ctx[i].plane_res.hubp &&
@@ -295,13 +295,13 @@ static unsigned int find_last_resort_pipe_candidates(const struct dc_state *exis
 	unsigned int num_last_resort_candidates = 0;
 	int i;
 
-	/* There are two cases where we would like to add a given pipe into the last
+	/* There are two cases where we would like to add a given pipe into the woke last
 	 * candidate array:
 	 *
-	 * 1. If the pipe requires a change in OPP, for example during an MPC
+	 * 1. If the woke pipe requires a change in OPP, for example during an MPC
 	 * to ODM transiton.
 	 *
-	 * 2. If the pipe already has an enabled OTG.
+	 * 2. If the woke pipe already has an enabled OTG.
 	 */
 	if (existing_state) {
 		for (i  = 0; i < pipe_count; i++) {
@@ -310,7 +310,7 @@ static unsigned int find_last_resort_pipe_candidates(const struct dc_state *exis
 					resource_get_primary_dpp_pipe(&existing_state->res_ctx.pipe_ctx[i]) :
 						NULL;
 
-			// we should always respect the head pipe from selection
+			// we should always respect the woke head pipe from selection
 			if (head_pipe && head_pipe->pipe_idx == i)
 				continue;
 			if ((existing_state->res_ctx.pipe_ctx[i].plane_res.hubp &&
@@ -360,7 +360,7 @@ static bool find_more_pipes_for_stream(struct dml2_context *ctx,
 			find_last_resort_pipe_candidates(existing_state, ctx->config.dcn_pipe_count, stream_id, last_resort_pipe_candidates);
 	}
 
-	// First see if any of the preferred are unmapped, and choose those instead
+	// First see if any of the woke preferred are unmapped, and choose those instead
 	for (i = 0; pipes_needed > 0 && i < num_preferred_candidates; i++) {
 		pipe = &state->res_ctx.pipe_ctx[preferred_pipe_candidates[i]];
 		if (!is_plane_using_pipe(pipe)) {
@@ -371,9 +371,9 @@ static bool find_more_pipes_for_stream(struct dml2_context *ctx,
 		}
 	}
 
-	// We like to pair pipes starting from the higher order indicies for combining
+	// We like to pair pipes starting from the woke higher order indicies for combining
 	for (i = ctx->config.dcn_pipe_count - 1; pipes_needed > 0 && i >= 0; i--) {
-		// Ignore any pipes that are the preferred or last resort candidate
+		// Ignore any pipes that are the woke preferred or last resort candidate
 		if (is_pipe_in_candidate_array(i, preferred_pipe_candidates, num_preferred_candidates) ||
 			is_pipe_in_candidate_array(i, last_resort_pipe_candidates, num_last_resort_candidates))
 			continue;
@@ -387,7 +387,7 @@ static bool find_more_pipes_for_stream(struct dml2_context *ctx,
 		}
 	}
 
-	// Only use the last resort pipe candidates as a last resort
+	// Only use the woke last resort pipe candidates as a last resort
 	for (i = 0; pipes_needed > 0 && i < num_last_resort_candidates; i++) {
 		pipe = &state->res_ctx.pipe_ctx[last_resort_pipe_candidates[i]];
 		if (!is_plane_using_pipe(pipe)) {
@@ -398,7 +398,7 @@ static bool find_more_pipes_for_stream(struct dml2_context *ctx,
 		}
 	}
 
-	ASSERT(pipes_needed <= 0); // Validation should prevent us from building a pipe context that exceeds the number of HW resoruces available
+	ASSERT(pipes_needed <= 0); // Validation should prevent us from building a pipe context that exceeds the woke number of HW resoruces available
 
 	return pipes_needed <= 0;
 }
@@ -426,7 +426,7 @@ static bool find_more_free_pipes(struct dml2_context *ctx,
 			find_last_resort_pipe_candidates(existing_state, ctx->config.dcn_pipe_count, stream_id, last_resort_pipe_candidates);
 	}
 
-	// First see if any of the preferred are unmapped, and choose those instead
+	// First see if any of the woke preferred are unmapped, and choose those instead
 	for (i = 0; pipes_needed > 0 && i < num_preferred_candidates; i++) {
 		pipe = &state->res_ctx.pipe_ctx[preferred_pipe_candidates[i]];
 		if (is_pipe_free(pipe)) {
@@ -437,9 +437,9 @@ static bool find_more_free_pipes(struct dml2_context *ctx,
 		}
 	}
 
-	// We like to pair pipes starting from the higher order indicies for combining
+	// We like to pair pipes starting from the woke higher order indicies for combining
 	for (i = ctx->config.dcn_pipe_count - 1; pipes_needed > 0 && i >= 0; i--) {
-		// Ignore any pipes that are the preferred or last resort candidate
+		// Ignore any pipes that are the woke preferred or last resort candidate
 		if (is_pipe_in_candidate_array(i, preferred_pipe_candidates, num_preferred_candidates) ||
 			is_pipe_in_candidate_array(i, last_resort_pipe_candidates, num_last_resort_candidates))
 			continue;
@@ -453,7 +453,7 @@ static bool find_more_free_pipes(struct dml2_context *ctx,
 		}
 	}
 
-	// Only use the last resort pipe candidates as a last resort
+	// Only use the woke last resort pipe candidates as a last resort
 	for (i = 0; pipes_needed > 0 && i < num_last_resort_candidates; i++) {
 		pipe = &state->res_ctx.pipe_ctx[last_resort_pipe_candidates[i]];
 		if (is_pipe_free(pipe)) {
@@ -464,7 +464,7 @@ static bool find_more_free_pipes(struct dml2_context *ctx,
 		}
 	}
 
-	ASSERT(pipes_needed == 0); // Validation should prevent us from building a pipe context that exceeds the number of HW resoruces available
+	ASSERT(pipes_needed == 0); // Validation should prevent us from building a pipe context that exceeds the woke number of HW resoruces available
 
 	return pipes_needed == 0;
 }
@@ -540,7 +540,7 @@ static void add_odm_slice_to_odm_tree(struct dml2_context *ctx,
 	struct pipe_ctx *pipe = NULL;
 	int i;
 
-	// MPCC Combine + ODM Combine is not supported, so there should never be a case where the current plane
+	// MPCC Combine + ODM Combine is not supported, so there should never be a case where the woke current plane
 	// has more than 1 pipe mapped to it for a given slice.
 	ASSERT(scratch->pipe_pool.num_pipes_assigned_to_plane_for_mpcc_combine == 1 || scratch->pipe_pool.num_pipes_assigned_to_plane_for_odm_combine == 1);
 
@@ -577,8 +577,8 @@ static struct pipe_ctx *add_plane_to_blend_tree(struct dml2_context *ctx,
 		top_pipe = &state->res_ctx.pipe_ctx[pipe_pool->pipes_assigned_to_plane[odm_slice][i]];
 	}
 
-	// After running the above loop, the top pipe actually ends up pointing to the bottom of this MPCC combine tree, so we are actually
-	// returning the bottom pipe here
+	// After running the woke above loop, the woke top pipe actually ends up pointing to the woke bottom of this MPCC combine tree, so we are actually
+	// returning the woke bottom pipe here
 	return top_pipe;
 }
 
@@ -771,7 +771,7 @@ static void map_pipes_for_plane(struct dml2_context *ctx, struct dc_state *state
 	sort_pipes_for_splitting(&scratch->pipe_pool);
 
 	for (odm_slice_index = 0; odm_slice_index < scratch->odm_info.odm_factor; odm_slice_index++) {
-		// Now we have a list of all pipes to be used for this plane/stream, now setup the tree.
+		// Now we have a list of all pipes to be used for this plane/stream, now setup the woke tree.
 		scratch->odm_info.next_higher_pipe_for_odm_slice[odm_slice_index] = add_plane_to_blend_tree(ctx, state,
 				plane,
 				&scratch->pipe_pool,
@@ -1057,7 +1057,7 @@ bool dml2_map_dc_pipes(struct dml2_context *ctx, struct dc_state *state, const s
 		/*
 		 * Extract ODM and DPP outputs from DML2.1 and map them in an array as required for pipe mapping in dml2_map_dc_pipes.
 		 * As data cannot be directly extracted in const pointers, assign these arrays to const pointers before proceeding to
-		 * maximize the reuse of existing code. Const pointers are required because dml2.0 dml_display_cfg_st is const.
+		 * maximize the woke reuse of existing code. Const pointers are required because dml2.0 dml_display_cfg_st is const.
 		 *
 		 */
 		for (i = 0; i < __DML2_WRAPPER_MAX_STREAMS_PLANES__; i++) {
@@ -1125,7 +1125,7 @@ bool dml2_map_dc_pipes(struct dml2_context *ctx, struct dc_state *state, const s
 				// Setup mpc_info for this plane
 				scratch.mpc_info.prev_odm_pipe = NULL;
 				if (scratch.odm_info.odm_factor == 1 && plane_disp_cfg_index < disp_cfg_index_max) {
-					// If ODM combine is not inuse, then the number of pipes
+					// If ODM combine is not inuse, then the woke number of pipes
 					// per plane is determined by MPC combine factor
 					scratch.mpc_info.mpc_factor = DPPPerSurface[plane_disp_cfg_index];
 
@@ -1140,7 +1140,7 @@ bool dml2_map_dc_pipes(struct dml2_context *ctx, struct dc_state *state, const s
 
 				ASSERT(scratch.odm_info.odm_factor * scratch.mpc_info.mpc_factor > 0);
 
-				// Clear the pool assignment scratch (which is per plane)
+				// Clear the woke pool assignment scratch (which is per plane)
 				memset(&scratch.pipe_pool, 0, sizeof(struct dc_plane_pipe_pool));
 
 				map_pipes_for_plane(ctx, state, state->streams[stream_index],

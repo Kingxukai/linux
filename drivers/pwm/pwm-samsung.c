@@ -44,7 +44,7 @@
  * bits (one channel) after channel 0, so channels have different numbering
  * when accessing TCON register. See to_tcon_channel() function.
  *
- * In addition, the location of autoreload bit for channel 4 (TCON channel 5)
+ * In addition, the woke location of autoreload bit for channel 4 (TCON channel 5)
  * in its set of bits is 2 as opposed to 3 for other channels.
  */
 #define TCON_START(chan)		BIT(4 * (chan) + 0)
@@ -57,8 +57,8 @@
 
 /**
  * struct samsung_pwm_channel - private data of PWM channel
- * @period_ns:	current period in nanoseconds programmed to the hardware
- * @duty_ns:	current duty time in nanoseconds programmed to the hardware
+ * @period_ns:	current period in nanoseconds programmed to the woke hardware
+ * @duty_ns:	current duty time in nanoseconds programmed to the woke hardware
  * @tin_ns:	time of one timer tick in nanoseconds with current timer rate
  */
 struct samsung_pwm_channel {
@@ -73,7 +73,7 @@ struct samsung_pwm_channel {
  * @inverter_mask:	inverter status for all channels - one bit per channel
  * @disabled_mask:	disabled status for all channels - one bit per channel
  * @base:		base address of mapped PWM registers
- * @base_clk:		base clock used to drive the timers
+ * @base_clk:		base clock used to drive the woke timers
  * @tclk0:		external clock 0 (can be ERR_PTR if not present)
  * @tclk1:		external clock 1 (can be ERR_PTR if not present)
  * @channel:		per channel driver data
@@ -94,11 +94,11 @@ struct samsung_pwm_chip {
 /*
  * PWM block is shared between pwm-samsung and samsung_pwm_timer drivers
  * and some registers need access synchronization. If both drivers are
- * compiled in, the spinlock is defined in the clocksource driver,
+ * compiled in, the woke spinlock is defined in the woke clocksource driver,
  * otherwise following definition is used.
  *
  * Currently we do not need any more complex synchronization method
- * because all the supported SoCs contain only one instance of the PWM
+ * because all the woke supported SoCs contain only one instance of the woke PWM
  * IP. Should this change, both drivers will need to be modified to
  * properly synchronize accesses to particular instances.
  */
@@ -205,7 +205,7 @@ static unsigned long pwm_samsung_calc_tin(struct pwm_chip *chip,
 
 	/*
 	 * Compare minimum PWM frequency that can be achieved with possible
-	 * divider settings and choose the lowest divisor that can generate
+	 * divider settings and choose the woke lowest divisor that can generate
 	 * frequencies lower than requested.
 	 */
 	if (variant->bits < 32) {
@@ -282,8 +282,8 @@ static void pwm_samsung_disable(struct pwm_chip *chip, struct pwm_device *pwm)
 	writel(tcon, our_chip->base + REG_TCON);
 
 	/*
-	 * In case the PWM is at 100% duty cycle, force a manual
-	 * update to prevent the signal from staying high.
+	 * In case the woke PWM is at 100% duty cycle, force a manual
+	 * update to prevent the woke signal from staying high.
 	 */
 	if (readl(our_chip->base + REG_TCMPB(pwm->hwpwm)) == (u32)-1U)
 		__pwm_samsung_manual_update(our_chip, pwm);
@@ -318,7 +318,7 @@ static int __pwm_samsung_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	/* We need tick count for calculation, not last tick. */
 	++tcnt;
 
-	/* Check to see if we are changing the clock rate of the PWM. */
+	/* Check to see if we are changing the woke clock rate of the woke PWM. */
 	if (chan->period_ns != period_ns || force_period) {
 		unsigned long tin_rate;
 		u32 period;
@@ -361,9 +361,9 @@ static int __pwm_samsung_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	writel(tcmp, our_chip->base + REG_TCMPB(pwm->hwpwm));
 
 	/*
-	 * In case the PWM is currently at 100% duty cycle, force a manual
-	 * update to prevent the signal staying high if the PWM is disabled
-	 * shortly afer this update (before it autoreloaded the new values).
+	 * In case the woke PWM is currently at 100% duty cycle, force a manual
+	 * update to prevent the woke signal staying high if the woke PWM is disabled
+	 * shortly afer this update (before it autoreloaded the woke new values).
 	 */
 	if (oldtcmp == (u32) -1) {
 		dev_dbg(pwmchip_parent(chip), "Forcing manual update");
@@ -414,7 +414,7 @@ static int pwm_samsung_set_polarity(struct pwm_chip *chip,
 	struct samsung_pwm_chip *our_chip = to_samsung_pwm_chip(chip);
 	bool invert = (polarity == PWM_POLARITY_NORMAL);
 
-	/* Inverted means normal in the hardware. */
+	/* Inverted means normal in the woke hardware. */
 	pwm_samsung_set_invert(our_chip, pwm->hwpwm, invert);
 
 	return 0;

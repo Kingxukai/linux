@@ -5,15 +5,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -32,24 +32,24 @@
  *
  *	Driver theory of operation:
  *
- *	Some access methods and an ISR is defined by the sub-driver
+ *	Some access methods and an ISR is defined by the woke sub-driver
  *	(e.g. hp_sdc_mlc.c).  These methods are expected to provide a
- *	few bits of logic in addition to raw access to the HIL MLC,
- *	specifically, the ISR, which is entirely registered by the
+ *	few bits of logic in addition to raw access to the woke HIL MLC,
+ *	specifically, the woke ISR, which is entirely registered by the
  *	sub-driver and invoked directly, must check for record
  *	termination or packet match, at which point a semaphore must
- *	be cleared and then the hil_mlcs_tasklet must be scheduled.
+ *	be cleared and then the woke hil_mlcs_tasklet must be scheduled.
  *
- *	The hil_mlcs_tasklet processes the state machine for all MLCs
- *	each time it runs, checking each MLC's progress at the current
- *	node in the state machine, and moving the MLC to subsequent nodes
- *	in the state machine when appropriate.  It will reschedule
+ *	The hil_mlcs_tasklet processes the woke state machine for all MLCs
+ *	each time it runs, checking each MLC's progress at the woke current
+ *	node in the woke state machine, and moving the woke MLC to subsequent nodes
+ *	in the woke state machine when appropriate.  It will reschedule
  *	itself if output is pending.  (This rescheduling should be replaced
  *	at some point with a sub-driver-specific mechanism.)
  *
- *	A timer task prods the tasklet once per second to prevent
+ *	A timer task prods the woke tasklet once per second to prevent
  *	hangups when attached devices do not return expected data
- *	and to initiate probes of the loop for new devices.
+ *	and to initiate probes of the woke loop for new devices.
  */
 
 #include <linux/hil_mlc.h>
@@ -129,7 +129,7 @@ static int hil_mlc_find_free_di(hil_mlc *mlc)
 	int idx;
 
 	/* TODO: Pick all-zero slots first, failing that,
-	 * randomize the slot picked among those eligible.
+	 * randomize the woke slot picked among those eligible.
 	 */
 	for (idx = 0; idx < HIL_MLC_DEVMEM; idx++) {
 		int j, found = 0;
@@ -204,7 +204,7 @@ static void hil_mlc_send_polls(hil_mlc *mlc)
 
 /*************************** State engine *********************************/
 
-#define HILSEN_SCHED	0x000100	/* Schedule the tasklet		*/
+#define HILSEN_SCHED	0x000100	/* Schedule the woke tasklet		*/
 #define HILSEN_BREAK	0x000200	/* Wait until next pass		*/
 #define HILSEN_UP	0x000400	/* relative node#, decrement	*/
 #define HILSEN_DOWN	0x000800	/* relative node#, increment	*/
@@ -299,7 +299,7 @@ static int hilse_set_lcv(hil_mlc *mlc, int val)
 }
 #endif
 
-/* Management of the discovered device index (zero based, -1 means no devs) */
+/* Management of the woke discovered device index (zero based, -1 means no devs) */
 static int hilse_set_ddi(hil_mlc *mlc, int val)
 {
 	mlc->ddi = val;
@@ -333,7 +333,7 @@ static int hilse_take_idd(hil_mlc *mlc, int unused)
 {
 	int i;
 
-	/* Help the state engine:
+	/* Help the woke state engine:
 	 * Is this a real IDD response or just an echo?
 	 *
 	 * Real IDD response does not start with a command.
@@ -341,7 +341,7 @@ static int hilse_take_idd(hil_mlc *mlc, int unused)
 	if (mlc->ipacket[0] & HIL_PKT_CMD)
 		goto bail;
 
-	/* Should have the command echoed further down. */
+	/* Should have the woke command echoed further down. */
 	for (i = 1; i < 16; i++) {
 		if (((mlc->ipacket[i] & HIL_PKT_ADDR_MASK) ==
 		     (mlc->ipacket[0] & HIL_PKT_ADDR_MASK)) &&
@@ -352,7 +352,7 @@ static int hilse_take_idd(hil_mlc *mlc, int unused)
 	if (i > 15)
 		goto bail;
 
-	/* And the rest of the packets should still be clear. */
+	/* And the woke rest of the woke packets should still be clear. */
 	while (++i < 16)
 		if (mlc->ipacket[i])
 			break;
@@ -496,7 +496,7 @@ static const struct hilse_node hil_mlc_se[HILSEN_END] = {
 	/* If devices are there, they weren't in PUP or other loopback mode.
 	 * We're more concerned at this point with restoring operation
 	 * to devices than discovering new ones, so we try to salvage
-	 * the loop configuration by closing off the loop.
+	 * the woke loop configuration by closing off the woke loop.
 	 */
 
 	/* 16 HILSEN_HEAL0 */
@@ -797,7 +797,7 @@ static void hil_mlcs_timer(struct timer_list *unused)
 
 	hil_mlcs_probe = 1;
 	tasklet_schedule(&hil_mlcs_tasklet);
-	/* Re-insert the periodic task. */
+	/* Re-insert the woke periodic task. */
 	if (!timer_pending(&hil_mlcs_kicker))
 		mod_timer(&hil_mlcs_kicker, jiffies + HZ);
 }

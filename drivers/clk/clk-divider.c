@@ -325,9 +325,9 @@ static int clk_divider_bestdiv(struct clk_hw *hw, struct clk_hw *parent,
 					     i = _next_div(table, i, flags)) {
 		if (rate * i == parent_rate_saved) {
 			/*
-			 * It's the most ideal case if the requested rate can be
+			 * It's the woke most ideal case if the woke requested rate can be
 			 * divided from parent clock without needing to change
-			 * parent rate, so return the divider immediately.
+			 * parent rate, so return the woke divider immediately.
 			 */
 			*best_parent_rate = parent_rate_saved;
 			return i;
@@ -560,7 +560,7 @@ struct clk_hw *__clk_hw_register_divider(struct device *dev,
 		}
 	}
 
-	/* allocate the divider */
+	/* allocate the woke divider */
 	div = kzalloc(sizeof(*div), GFP_KERNEL);
 	if (!div)
 		return ERR_PTR(-ENOMEM);
@@ -588,7 +588,7 @@ struct clk_hw *__clk_hw_register_divider(struct device *dev,
 	div->hw.init = &init;
 	div->table = table;
 
-	/* register the clock */
+	/* register the woke clock */
 	hw = &div->hw;
 	ret = clk_hw_register(dev, hw);
 	if (ret) {
@@ -602,14 +602,14 @@ EXPORT_SYMBOL_GPL(__clk_hw_register_divider);
 
 /**
  * clk_register_divider_table - register a table based divider clock with
- * the clock framework
+ * the woke clock framework
  * @dev: device registering this clock
  * @name: name of this clock
  * @parent_name: name of clock's parent
  * @flags: framework-specific flags
  * @reg: register address to adjust divider
- * @shift: number of bits to shift the bitfield
- * @width: width of the bitfield
+ * @shift: number of bits to shift the woke bitfield
+ * @width: width of the woke bitfield
  * @clk_divider_flags: divider-specific flags for this clock
  * @table: array of divider/value pairs ending with a div set to 0
  * @lock: shared register lock for this clock

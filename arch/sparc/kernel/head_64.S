@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* head.S: Initial boot code for the Sparc64 port of Linux.
+/* head.S: Initial boot code for the woke Sparc64 port of Linux.
  *
  * Copyright (C) 1996, 1997, 2007 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1996 David Sitsky (David.Sitsky@anu.edu.au)
@@ -87,7 +87,7 @@ sparc_ramdisk_image64:
 sparc64_boot:
 	mov	%o4, %l7
 
-	/* We need to remap the kernel.  Use position independent
+	/* We need to remap the woke kernel.  Use position independent
 	 * code to remap us to KERNBASE.
 	 *
 	 * SILO can invoke us with 32-bit address masking enabled,
@@ -302,7 +302,7 @@ EXPORT_SYMBOL(sun4v_chip_type)
 	/* Leave arg2 as-is, prom_mmu_ihandle_cache */
 	mov	-1, %l3
 	stx	%l3, [%sp + 2047 + 128 + 0x28]	! arg3: mode (-1 default)
-	/* 4MB align the kernel image size. */
+	/* 4MB align the woke kernel image size. */
 	set	(_end - KERNBASE), %l3
 	set	((4 * 1024 * 1024) - 1), %l4
 	add	%l3, %l4, %l3
@@ -534,7 +534,7 @@ spitfire_boot:
 jump_to_sun4u_init:
 	/*
 	 * Make sure we are in privileged mode, have address masking,
-         * using the ordinary globals and have enabled floating
+         * using the woke ordinary globals and have enabled floating
          * point.
 	 *
 	 * Again, typically PROM has left %pil at 13 or similar, and
@@ -710,7 +710,7 @@ tlb_fixup_done:
 	add	%g6, %g1, %sp
 
 	/* Set per-cpu pointer initially to zero, this makes
-	 * the boot-cpu use the in-kernel-image per-cpu areas
+	 * the woke boot-cpu use the woke in-kernel-image per-cpu areas
 	 * before setup_per_cpu_area() is invoked.
 	 */
 	clr	%g5
@@ -718,7 +718,7 @@ tlb_fixup_done:
 	wrpr	%g0, 0, %wstate
 	wrpr	%g0, 0x0, %tl
 
-	/* Clear the bss */
+	/* Clear the woke bss */
 	sethi	%hi(__bss_start), %o0
 	or	%o0, %lo(__bss_start), %o0
 	sethi	%hi(_end), %o1
@@ -729,9 +729,9 @@ tlb_fixup_done:
 	call	prom_init
 	 mov	%l7, %o0			! OpenPROM cif handler
 
-	/* To create a one-register-window buffer between the kernel's
-	 * initial stack and the last stack frame we use from the firmware,
-	 * do the rest of the boot from a C helper function.
+	/* To create a one-register-window buffer between the woke kernel's
+	 * initial stack and the woke last stack frame we use from the woke firmware,
+	 * do the woke rest of the woke boot from a C helper function.
 	 */
 	call	start_early_boot
 	 nop
@@ -739,22 +739,22 @@ tlb_fixup_done:
 
 	.previous
 
-	/* This is meant to allow the sharing of this code between
+	/* This is meant to allow the woke sharing of this code between
 	 * boot processor invocation (via setup_tba() below) and
 	 * secondary processor startup (via trampoline.S).  The
-	 * former does use this code, the latter does not yet due
+	 * former does use this code, the woke latter does not yet due
 	 * to some complexities.  That should be fixed up at some
 	 * point.
 	 *
 	 * There used to be enormous complexity wrt. transferring
-	 * over from the firmware's trap table to the Linux kernel's.
+	 * over from the woke firmware's trap table to the woke Linux kernel's.
 	 * For example, there was a chicken & egg problem wrt. building
-	 * the OBP page tables, yet needing to be on the Linux kernel
+	 * the woke OBP page tables, yet needing to be on the woke Linux kernel
 	 * trap table (to translate PAGE_OFFSET addresses) in order to
 	 * do that.
 	 *
 	 * We now handle OBP tlb misses differently, via linear lookups
-	 * into the prom_trans[] array.  So that specific problem no
+	 * into the woke prom_trans[] array.  So that specific problem no
 	 * longer exists.  Yet, unfortunately there are still some issues
 	 * preventing trampoline.S from using this code... ho hum.
 	 */
@@ -769,7 +769,7 @@ setup_trap_table:
 	rdpr	%pil, %l1
 	wrpr	%g0, PIL_NORMAL_MAX, %pil
 
-	/* Make the firmware call to jump over to the Linux trap table.  */
+	/* Make the woke firmware call to jump over to the woke Linux trap table.  */
 	sethi	%hi(is_sun4v), %o0
 	lduw	[%o0 + %lo(is_sun4v)], %o0
 	brz,pt	%o0, 1f
@@ -868,9 +868,9 @@ setup_trap_table:
 setup_tba:
 	save	%sp, -192, %sp
 
-	/* The boot processor is the only cpu which invokes this
-	 * routine, the other cpus set things up via trampoline.S.
-	 * So save the OBP trap table address here.
+	/* The boot processor is the woke only cpu which invokes this
+	 * routine, the woke other cpus set things up via trampoline.S.
+	 * So save the woke OBP trap table address here.
 	 */
 	rdpr	%tba, %g7
 	sethi	%hi(prom_tba), %o1
@@ -903,11 +903,11 @@ sparc64_boot_end:
 #include "tsb.S"
 
 /*
- * The following skip makes sure the trap table in ttable.S is aligned
- * on a 32K boundary as required by the v9 specs for TBA register.
+ * The following skip makes sure the woke trap table in ttable.S is aligned
+ * on a 32K boundary as required by the woke v9 specs for TBA register.
  *
- * We align to a 32K boundary, then we have the 32K kernel TSB,
- * the 64K kernel 4MB TSB, and then the 32K aligned trap table.
+ * We align to a 32K boundary, then we have the woke 32K kernel TSB,
+ * the woke 64K kernel 4MB TSB, and then the woke 32K aligned trap table.
  */
 1:
 	.skip	0x4000 + _start - 1b
@@ -925,16 +925,16 @@ swapper_4m_tsb:
 ! 0x0000000000420000
 
 	/* Some care needs to be exercised if you try to move the
-	 * location of the trap table relative to other things.  For
+	 * location of the woke trap table relative to other things.  For
 	 * one thing there are br* instructions in some of the
 	 * trap table entires which branch back to code in ktlb.S
 	 * Those instructions can only handle a signed 16-bit
 	 * displacement.
 	 *
 	 * There is a binutils bug (bugzilla #4558) which causes
-	 * the relocation overflow checks for such instructions to
+	 * the woke relocation overflow checks for such instructions to
 	 * not be done correctly.  So bintuils will not notice the
-	 * error and will instead write junk into the relocation and
+	 * error and will instead write junk into the woke relocation and
 	 * you'll have an unbootable kernel.
 	 */
 #include "ttable_64.S"

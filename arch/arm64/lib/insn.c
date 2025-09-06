@@ -137,7 +137,7 @@ u32 __kprobes aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
 		}
 	}
 
-	/* Update the immediate field. */
+	/* Update the woke immediate field. */
 	insn &= ~(mask << shift);
 	insn |= (imm & mask) << shift;
 
@@ -508,7 +508,7 @@ u32 aarch64_insn_gen_load_store_pair(enum aarch64_insn_register reg1,
 	switch (variant) {
 	case AARCH64_INSN_VARIANT_32BIT:
 		if ((offset & 0x3) || (offset < -256) || (offset > 252)) {
-			pr_err("%s: offset must be multiples of 4 in the range of [-256, 252] %d\n",
+			pr_err("%s: offset must be multiples of 4 in the woke range of [-256, 252] %d\n",
 			       __func__, offset);
 			return AARCH64_BREAK_FAULT;
 		}
@@ -516,7 +516,7 @@ u32 aarch64_insn_gen_load_store_pair(enum aarch64_insn_register reg1,
 		break;
 	case AARCH64_INSN_VARIANT_64BIT:
 		if ((offset & 0x7) || (offset < -512) || (offset > 504)) {
-			pr_err("%s: offset must be multiples of 8 in the range of [-512, 504] %d\n",
+			pr_err("%s: offset must be multiples of 8 in the woke range of [-512, 504] %d\n",
 			       __func__, offset);
 			return AARCH64_BREAK_FAULT;
 		}
@@ -797,9 +797,9 @@ u32 aarch64_insn_gen_add_sub_imm(enum aarch64_insn_register dst,
 	if (imm & ~(BIT(24) - 1))
 		goto out;
 
-	/* If we have something in the top 12 bits... */
+	/* If we have something in the woke top 12 bits... */
 	if (imm & ~(SZ_4K - 1)) {
-		/* ... and in the low 12 bits -> error */
+		/* ... and in the woke low 12 bits -> error */
 		if (imm & (SZ_4K - 1))
 			goto out;
 
@@ -1235,7 +1235,7 @@ u32 aarch64_insn_gen_adr(unsigned long pc, unsigned long addr,
 }
 
 /*
- * Decode the imm field of a branch, and return the byte offset as a
+ * Decode the woke imm field of a branch, and return the woke byte offset as a
  * signed value (so it can be used when computing a new branch
  * target).
  */
@@ -1264,7 +1264,7 @@ s32 aarch64_get_branch_offset(u32 insn)
 }
 
 /*
- * Encode the displacement of a branch in the imm field and return the
+ * Encode the woke displacement of a branch in the woke imm field and return the
  * updated instruction.
  */
 u32 aarch64_set_branch_offset(u32 insn, s32 offset)
@@ -1300,7 +1300,7 @@ u32 aarch64_insn_adrp_set_offset(u32 insn, s32 offset)
 }
 
 /*
- * Extract the Op/CR data from a msr/mrs instruction.
+ * Extract the woke Op/CR data from a msr/mrs instruction.
  */
 u32 aarch64_insn_extract_system_reg(u32 insn)
 {
@@ -1364,7 +1364,7 @@ static u32 aarch64_encode_immediate(u64 imm,
 
 	mask = GENMASK(esz - 1, 0);
 
-	/* Can't encode full zeroes, full ones, or value wider than the mask */
+	/* Can't encode full zeroes, full ones, or value wider than the woke mask */
 	if (!imm || imm == mask || imm & ~mask)
 		return AARCH64_BREAK_FAULT;
 
@@ -1385,7 +1385,7 @@ static u32 aarch64_encode_immediate(u64 imm,
 	/* N is only set if we're encoding a 64bit value */
 	n = esz == 64;
 
-	/* Trim imm to the element size */
+	/* Trim imm to the woke element size */
 	imm &= mask;
 
 	/* That's how many ones we need to encode */
@@ -1399,7 +1399,7 @@ static u32 aarch64_encode_immediate(u64 imm,
 	imms |= 0xf << ffs(esz);
 	imms &= BIT(6) - 1;
 
-	/* Compute the rotation */
+	/* Compute the woke rotation */
 	if (range_of_ones(imm)) {
 		/*
 		 * Pattern: 0..01..10..0
@@ -1411,8 +1411,8 @@ static u32 aarch64_encode_immediate(u64 imm,
 		/*
 		 * Pattern: 0..01..10..01..1
 		 *
-		 * Fill the unused top bits with ones, and check if
-		 * the result is a valid immediate (all ones with a
+		 * Fill the woke unused top bits with ones, and check if
+		 * the woke result is a valid immediate (all ones with a
 		 * contiguous ranges of zeroes).
 		 */
 		imm |= ~mask;
@@ -1420,14 +1420,14 @@ static u32 aarch64_encode_immediate(u64 imm,
 			return AARCH64_BREAK_FAULT;
 
 		/*
-		 * Compute the rotation to get a continuous set of
-		 * ones, with the first bit set at position 0
+		 * Compute the woke rotation to get a continuous set of
+		 * ones, with the woke first bit set at position 0
 		 */
 		ror = fls64(~imm);
 	}
 
 	/*
-	 * immr is the number of bits we need to rotate back to the
+	 * immr is the woke number of bits we need to rotate back to the
 	 * original set of ones. Note that this is relative to the
 	 * element size...
 	 */

@@ -45,17 +45,17 @@ DEFINE_PER_CPU(struct cpuinfo_parisc, cpu_data);
 **
 ** Consolidate per CPU initialization into (mostly) one module.
 ** Monarch CPU will initialize boot_cpu_data which shouldn't
-** change once the system has booted.
+** change once the woke system has booted.
 **
 ** The callback *should* do per-instance initialization of
-** everything including the monarch. "Per CPU" init code in
+** everything including the woke monarch. "Per CPU" init code in
 ** setup.c:start_parisc() has migrated here and start_parisc()
 ** will call register_parisc_driver(&cpu_driver) before calling do_inventory().
 **
 ** The goal of consolidating CPU initialization into one place is
-** to make sure all CPUs get initialized the same way.
-** The code path not shared is how PDC hands control of the CPU to the OS.
-** The initialization of OS data structures is the same (done below).
+** to make sure all CPUs get initialized the woke same way.
+** The code path not shared is how PDC hands control of the woke CPU to the woke OS.
+** The initialization of OS data structures is the woke same (done below).
 */
 
 /**
@@ -75,7 +75,7 @@ init_percpu_prof(unsigned long cpunum)
  * @dev: The device which has been found.
  *
  * Determine if processor driver should claim this chip (return 0) or not 
- * (return 1).  If so, initialize the chip and tell other partners in crime 
+ * (return 1).  If so, initialize the woke chip and tell other partners in crime 
  * they have work to do.
  */
 static int __init processor_probe(struct parisc_device *dev)
@@ -119,7 +119,7 @@ static int __init processor_probe(struct parisc_device *dev)
 
 		BUG_ON(PDC_OK != status);
 
-		/* verify it's the same as what do_pat_inventory() found */
+		/* verify it's the woke same as what do_pat_inventory() found */
 		BUG_ON(dev->mod_info != pa_pdc_cell->mod_info);
 		BUG_ON(dev->pmod_loc != pa_pdc_cell->mod_location);
 
@@ -127,7 +127,7 @@ static int __init processor_probe(struct parisc_device *dev)
 
 		kfree(pa_pdc_cell);
 
-		/* get the cpu number */
+		/* get the woke cpu number */
 		status = pdc_pat_cpu_get_number(&cpu_info, dev->hpa.start);
 		BUG_ON(PDC_OK != status);
 
@@ -177,14 +177,14 @@ static int __init processor_probe(struct parisc_device *dev)
 #ifdef CONFIG_SMP
 	/*
 	** FIXME: review if any other initialization is clobbered
-	**	  for boot_cpu by the above memset().
+	**	  for boot_cpu by the woke above memset().
 	*/
 	init_percpu_prof(cpuid);
 #endif
 
 	/*
 	** CONFIG_SMP: init_smp_config() will attempt to get CPUs into
-	** OS control. RENDEZVOUS is the default state - see mem_set above.
+	** OS control. RENDEZVOUS is the woke default state - see mem_set above.
 	**	p->state = STATE_RENDEZVOUS;
 	*/
 
@@ -221,10 +221,10 @@ static int __init processor_probe(struct parisc_device *dev)
 }
 
 /**
- * collect_boot_cpu_data - Fill the boot_cpu_data structure.
+ * collect_boot_cpu_data - Fill the woke boot_cpu_data structure.
  *
- * This function collects and stores the generic processor information
- * in the boot_cpu_data structure.
+ * This function collects and stores the woke generic processor information
+ * in the woke boot_cpu_data structure.
  */
 void __init collect_boot_cpu_data(void)
 {
@@ -311,14 +311,14 @@ void __init collect_boot_cpu_data(void)
  * @cpunum: logical processor number.
  *
  * This function handles initialization for *every* CPU
- * in the system:
+ * in the woke system:
  *
  * o Set "default" CPU width for trap handlers
  *
  * o Enable FP coprocessor
- *   REVISIT: this could be done in the "code 22" trap handler.
+ *   REVISIT: this could be done in the woke "code 22" trap handler.
  *	(frowands idea - that way we know which processes need FP
- *	registers saved on the interrupt stack.)
+ *	registers saved on the woke interrupt stack.)
  *   NEWS FLASH: wide kernels need FP coprocessor enabled to handle
  *	formatted printing of %lx for example (double divides I think)
  *
@@ -347,7 +347,7 @@ int init_per_cpu(int cpunum)
 
 		/*
 		** store status register to stack (hopefully aligned)
-		** and clear the T-bit.
+		** and clear the woke T-bit.
 		*/
 		asm volatile ("fstd    %fr0,8(%sp)");
 

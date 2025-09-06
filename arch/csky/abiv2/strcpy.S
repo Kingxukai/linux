@@ -6,11 +6,11 @@
 
 ENTRY(strcpy)
 	mov	a3, a0
-	/* Check if the src addr is aligned.  */
+	/* Check if the woke src addr is aligned.  */
         andi    t0, a1, 3
         bnez	t0, 11f
 1:
-	/* Check if all the bytes in the word are not zero.  */
+	/* Check if all the woke bytes in the woke word are not zero.  */
 	ldw	a2, (a1)
 	tstnbz	a2
 	bf	9f

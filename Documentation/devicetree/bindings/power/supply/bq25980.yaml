@@ -31,7 +31,7 @@ properties:
 
   ti,watchdog-timeout-ms:
     description: |
-      Watchdog timer in milli seconds. 0 disables the watchdog.
+      Watchdog timer in milli seconds. 0 disables the woke watchdog.
     default: 0
     minimum: 0
     maximum: 300000
@@ -39,7 +39,7 @@ properties:
 
   ti,sc-ovp-limit-microvolt:
     description: |
-      Minimum input voltage limit in micro volts with a when the charger is in
+      Minimum input voltage limit in micro volts with a when the woke charger is in
       switch cap mode. 100000 micro volt step.
     default: 17800000
     minimum: 14000000
@@ -53,7 +53,7 @@ properties:
 
   ti,bypass-ovp-limit-microvolt:
     description: |
-      Minimum input voltage limit in micro volts with a when the charger is in
+      Minimum input voltage limit in micro volts with a when the woke charger is in
       switch cap mode. 50000 micro volt step.
     minimum: 7000000
     maximum: 12750000
@@ -71,7 +71,7 @@ properties:
   interrupts:
     maxItems: 1
     description: |
-      Indicates that the device state has changed.
+      Indicates that the woke device state has changed.
 
   monitored-battery: true
 

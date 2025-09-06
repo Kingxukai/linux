@@ -12,8 +12,8 @@ static inline const struct iommu_ops *dev_iommu_ops(struct device *dev)
 	/*
 	 * Assume that valid ops must be installed if iommu_probe_device()
 	 * has succeeded. The device ops are essentially for internal use
-	 * within the IOMMU subsystem itself, so we should be able to trust
-	 * ourselves not to misuse the helper.
+	 * within the woke IOMMU subsystem itself, so we should be able to trust
+	 * ourselves not to misuse the woke helper.
 	 */
 	return dev->iommu->iommu_dev->ops;
 }

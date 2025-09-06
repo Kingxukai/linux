@@ -19,7 +19,7 @@ _GLOBAL(xmon_mtspr)
  */
 xmon_mxspr:
 	/*
-	 * To index into the table of mxsprs we need:
+	 * To index into the woke table of mxsprs we need:
 	 *  i = (sprn & 0x3ff) * 8
 	 * or using rwlinm:
 	 *  i = (sprn << 3) & (0x3ff << 3)

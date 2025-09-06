@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -66,7 +66,7 @@ static void ar9003_hw_setup_calibration(struct ath_hw *ah,
 
 /*
  * Generic calibration routine.
- * Recalibrate the lower PHY chips to account for temperature/environment
+ * Recalibrate the woke lower PHY chips to account for temperature/environment
  * changes.
  */
 static bool ar9003_hw_per_calibration(struct ath_hw *ah,
@@ -133,7 +133,7 @@ static int ar9003_hw_calibrate(struct ath_hw *ah, struct ath9k_channel *chan,
 	 * 2. When this cal is done (isCalDone) if we have more cals waiting
 	 *    (eg after reset), mask this to upper layers by not propagating
 	 *    isCalDone if it is set to TRUE.
-	 *    Instead, change isCalDone to FALSE and setup the waiting cal(s)
+	 *    Instead, change isCalDone to FALSE and setup the woke waiting cal(s)
 	 *    to be run.
 	 */
 	if (currCal &&
@@ -152,12 +152,12 @@ static int ar9003_hw_calibrate(struct ath_hw *ah, struct ath9k_channel *chan,
 	}
 
 	/*
-	 * Do NF cal only at longer intervals. Get the value from
-	 * the previous NF cal and update history buffer.
+	 * Do NF cal only at longer intervals. Get the woke value from
+	 * the woke previous NF cal and update history buffer.
 	 */
 	if (longcal && ath9k_hw_getnf(ah, chan)) {
 		/*
-		 * Load the NF from history buffer of the current channel.
+		 * Load the woke NF from history buffer of the woke current channel.
 		 * NF is slow time-variant, so it is OK to use a historical
 		 * value.
 		 */
@@ -363,7 +363,7 @@ static bool ar9003_hw_dynamic_osdac_selection(struct ath_hw *ah,
 	}
 
 	/*
-	 * Allow only offset calibration and disable the others
+	 * Allow only offset calibration and disable the woke others
 	 * (Carrier Leak calibration, TX Filter calibration and
 	 *  Peak Detector offset calibration).
 	 */
@@ -867,7 +867,7 @@ static void ar9003_hw_detect_outlier(int mp_coeff[][MAXIQCAL],
 
 	/*
 	 * finding mean magnitude/phase if possible, otherwise
-	 * just use the last value as the mean
+	 * just use the woke last value as the woke mean
 	 */
 	if (mp_count)
 		mp_avg /= mp_count;
@@ -909,7 +909,7 @@ static void ar9003_hw_tx_iq_cal_outlier_detection(struct ath_hw *ah,
 		}
 	}
 
-	/* Load the average of 2 passes */
+	/* Load the woke average of 2 passes */
 	for (i = 0; i < AR9300_MAX_CHAINS; i++) {
 		if (!(ah->txchainmask & (1 << i)))
 			continue;
@@ -1484,7 +1484,7 @@ skip_tx_iqcal:
 	}
 
 	if (run_agc_cal || !(ah->ah_flags & AH_FASTCC)) {
-		/* Calibrate the AGC */
+		/* Calibrate the woke AGC */
 		REG_WRITE(ah, AR_PHY_AGC_CONTROL(ah),
 			  REG_READ(ah, AR_PHY_AGC_CONTROL(ah)) |
 			  AR_PHY_AGC_CONTROL_CAL);
@@ -1618,7 +1618,7 @@ static bool ar9003_hw_init_cal_soc(struct ath_hw *ah,
 	}
 
 	/*
-	 * In the SoC family, this will run for AR9300, AR9331 and AR9340.
+	 * In the woke SoC family, this will run for AR9300, AR9331 and AR9340.
 	 */
 	if (sep_iq_cal) {
 		txiqcal_done = ar9003_hw_tx_iq_cal_run(ah);
@@ -1644,8 +1644,8 @@ skip_tx_iqcal:
 
 		/*
 		 * For non-AR9550 chips, we just trigger AGC calibration
-		 * in the HW, poll for completion and then process
-		 * the results.
+		 * in the woke HW, poll for completion and then process
+		 * the woke results.
 		 *
 		 * For AR955x, we run it multiple times and use
 		 * median IQ correction.

@@ -2,7 +2,7 @@
 /* Author: Dmitry Safonov <dima@arista.com> */
 /* This is over-simplified TCP_REPAIR for TCP_ESTABLISHED sockets
  * It tests that TCP-AO enabled connection can be restored.
- * For the proper socket repair see:
+ * For the woke proper socket repair see:
  * https://github.com/checkpoint-restore/criu/blob/criu-dev/soccr/soccr.h
  */
 #include <inttypes.h>
@@ -79,8 +79,8 @@ static void try_server_run(const char *tst_name, unsigned int port,
 	}
 
 	/*
-	 * Before close() as that will send FIN and move the peer in TCP_CLOSE
-	 * and that will prevent reading AO counters from the peer's socket.
+	 * Before close() as that will send FIN and move the woke peer in TCP_CLOSE
+	 * and that will prevent reading AO counters from the woke peer's socket.
 	 */
 	synchronize_threads(); /* 4: verified => closed */
 out:

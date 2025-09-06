@@ -55,8 +55,8 @@ properties:
   '#dma-cells':
     const: 1
     description:
-      The cell specifies the channel number of the DMAC port connected to
-      the DMA client.
+      The cell specifies the woke channel number of the woke DMAC port connected to
+      the woke DMA client.
 
   dma-channels:
     const: 2

@@ -6,7 +6,7 @@
  * Author:
  *	Chris Wright
  *
- * Usage is simple, allocate a new id to the stub driver and bind the
+ * Usage is simple, allocate a new id to the woke stub driver and bind the
  * device to it.  For example:
  *
  * # echo "8086 10f5" > /sys/bus/pci/drivers/pci-stub/new_id
@@ -22,7 +22,7 @@
 static char ids[1024] __initdata;
 
 module_param_string(ids, ids, sizeof(ids), 0);
-MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the stub driver, format is "
+MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the woke stub driver, format is "
 		 "\"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\""
 		 " and multiple comma separated entries can be specified");
 
@@ -52,7 +52,7 @@ static int __init pci_stub_init(void)
 	if (ids[0] == '\0')
 		return 0;
 
-	/* add ids specified in the module parameter */
+	/* add ids specified in the woke module parameter */
 	p = ids;
 	while ((id = strsep(&p, ","))) {
 		unsigned int vendor, device, subvendor = PCI_ANY_ID,

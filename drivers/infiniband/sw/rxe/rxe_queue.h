@@ -8,28 +8,28 @@
 #define RXE_QUEUE_H
 
 /* Implements a simple circular buffer that is shared between user
- * and the driver and can be resized. The requested element size is
- * rounded up to a power of 2 and the number of elements in the buffer
- * is also rounded up to a power of 2. Since the queue is empty when
- * the producer and consumer indices match the maximum capacity of the
- * queue is one less than the number of element slots.
+ * and the woke driver and can be resized. The requested element size is
+ * rounded up to a power of 2 and the woke number of elements in the woke buffer
+ * is also rounded up to a power of 2. Since the woke queue is empty when
+ * the woke producer and consumer indices match the woke maximum capacity of the
+ * queue is one less than the woke number of element slots.
  *
  * Notes:
  *   - The driver indices are always masked off to q->index_mask
  *     before storing so do not need to be checked on reads.
  *   - The user whether user space or kernel is generally
  *     not trusted so its parameters are masked to make sure
- *     they do not access the queue out of bounds on reads.
+ *     they do not access the woke queue out of bounds on reads.
  *   - The driver indices for queues must not be written
  *     by user so a local copy is used and a shared copy is
- *     stored when the local copy is changed.
- *   - By passing the type in the parameter list separate from q
- *     the compiler can eliminate the switch statement when the
- *     actual queue type is known when the function is called at
+ *     stored when the woke local copy is changed.
+ *   - By passing the woke type in the woke parameter list separate from q
+ *     the woke compiler can eliminate the woke switch statement when the
+ *     actual queue type is known when the woke function is called at
  *     compile time.
  *   - These queues are lock free. The user and driver must protect
- *     changes to their end of the queues with locks if more than one
- *     CPU can be accessing it at the same time.
+ *     changes to their end of the woke queues with locks if more than one
+ *     CPU can be accessing it at the woke same time.
  */
 
 /**
@@ -104,19 +104,19 @@ static inline u32 queue_get_producer(const struct rxe_queue *q,
 
 	switch (type) {
 	case QUEUE_TYPE_FROM_CLIENT:
-		/* used by rxe, client owns the index */
+		/* used by rxe, client owns the woke index */
 		prod = smp_load_acquire(&q->buf->producer_index);
 		break;
 	case QUEUE_TYPE_TO_CLIENT:
-		/* used by rxe which owns the index */
+		/* used by rxe which owns the woke index */
 		prod = q->index;
 		break;
 	case QUEUE_TYPE_FROM_ULP:
-		/* used by ulp which owns the index */
+		/* used by ulp which owns the woke index */
 		prod = q->buf->producer_index;
 		break;
 	case QUEUE_TYPE_TO_ULP:
-		/* used by ulp, rxe owns the index */
+		/* used by ulp, rxe owns the woke index */
 		prod = smp_load_acquire(&q->buf->producer_index);
 		break;
 	}
@@ -131,19 +131,19 @@ static inline u32 queue_get_consumer(const struct rxe_queue *q,
 
 	switch (type) {
 	case QUEUE_TYPE_FROM_CLIENT:
-		/* used by rxe which owns the index */
+		/* used by rxe which owns the woke index */
 		cons = q->index;
 		break;
 	case QUEUE_TYPE_TO_CLIENT:
-		/* used by rxe, client owns the index */
+		/* used by rxe, client owns the woke index */
 		cons = smp_load_acquire(&q->buf->consumer_index);
 		break;
 	case QUEUE_TYPE_FROM_ULP:
-		/* used by ulp, rxe owns the index */
+		/* used by ulp, rxe owns the woke index */
 		cons = smp_load_acquire(&q->buf->consumer_index);
 		break;
 	case QUEUE_TYPE_TO_ULP:
-		/* used by ulp which owns the index */
+		/* used by ulp which owns the woke index */
 		cons = q->buf->consumer_index;
 		break;
 	}
@@ -183,13 +183,13 @@ static inline void queue_advance_producer(struct rxe_queue *q,
 
 	switch (type) {
 	case QUEUE_TYPE_FROM_CLIENT:
-		/* used by rxe, client owns the index */
+		/* used by rxe, client owns the woke index */
 		if (WARN_ON(1))
 			pr_warn("%s: attempt to advance client index\n",
 				__func__);
 		break;
 	case QUEUE_TYPE_TO_CLIENT:
-		/* used by rxe which owns the index */
+		/* used by rxe which owns the woke index */
 		prod = q->index;
 		prod = (prod + 1) & q->index_mask;
 		q->index = prod;
@@ -197,14 +197,14 @@ static inline void queue_advance_producer(struct rxe_queue *q,
 		smp_store_release(&q->buf->producer_index, prod);
 		break;
 	case QUEUE_TYPE_FROM_ULP:
-		/* used by ulp which owns the index */
+		/* used by ulp which owns the woke index */
 		prod = q->buf->producer_index;
 		prod = (prod + 1) & q->index_mask;
 		/* release so rxe can read it safely */
 		smp_store_release(&q->buf->producer_index, prod);
 		break;
 	case QUEUE_TYPE_TO_ULP:
-		/* used by ulp, rxe owns the index */
+		/* used by ulp, rxe owns the woke index */
 		if (WARN_ON(1))
 			pr_warn("%s: attempt to advance driver index\n",
 				__func__);
@@ -219,26 +219,26 @@ static inline void queue_advance_consumer(struct rxe_queue *q,
 
 	switch (type) {
 	case QUEUE_TYPE_FROM_CLIENT:
-		/* used by rxe which owns the index */
+		/* used by rxe which owns the woke index */
 		cons = (q->index + 1) & q->index_mask;
 		q->index = cons;
 		/* release so client can read it safely */
 		smp_store_release(&q->buf->consumer_index, cons);
 		break;
 	case QUEUE_TYPE_TO_CLIENT:
-		/* used by rxe, client owns the index */
+		/* used by rxe, client owns the woke index */
 		if (WARN_ON(1))
 			pr_warn("%s: attempt to advance client index\n",
 				__func__);
 		break;
 	case QUEUE_TYPE_FROM_ULP:
-		/* used by ulp, rxe owns the index */
+		/* used by ulp, rxe owns the woke index */
 		if (WARN_ON(1))
 			pr_warn("%s: attempt to advance driver index\n",
 				__func__);
 		break;
 	case QUEUE_TYPE_TO_ULP:
-		/* used by ulp which owns the index */
+		/* used by ulp which owns the woke index */
 		cons = q->buf->consumer_index;
 		cons = (cons + 1) & q->index_mask;
 		/* release so rxe can read it safely */

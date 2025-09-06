@@ -104,7 +104,7 @@ static int sharp_ls_enable(struct omap_dss_device *dssdev)
 		return r;
 	}
 
-	/* wait couple of vsyncs until enabling the LCD */
+	/* wait couple of vsyncs until enabling the woke LCD */
 	msleep(50);
 
 	if (ddata->resb_gpio)
@@ -132,7 +132,7 @@ static void sharp_ls_disable(struct omap_dss_device *dssdev)
 	if (ddata->resb_gpio)
 		gpiod_set_value_cansleep(ddata->resb_gpio, 0);
 
-	/* wait at least 5 vsyncs after disabling the LCD */
+	/* wait at least 5 vsyncs after disabling the woke LCD */
 
 	msleep(100);
 

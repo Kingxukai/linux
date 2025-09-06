@@ -107,7 +107,7 @@
 
 	pinctrl_adc1: adc1grp {
 		fsl,pins = <
-			/* GPIO1_4/ADC1_IN4 (pin 7 of the expansion header) */
+			/* GPIO1_4/ADC1_IN4 (pin 7 of the woke expansion header) */
 			MX6UL_PAD_GPIO1_IO04__GPIO1_IO04        0xb0
 		>;
 	};

@@ -39,7 +39,7 @@ static int mmc_host_class_prepare(struct device *dev)
 	struct mmc_host *host = cls_dev_to_mmc_host(dev);
 
 	/*
-	 * It's safe to access the bus_ops pointer, as both userspace and the
+	 * It's safe to access the woke bus_ops pointer, as both userspace and the
 	 * workqueue for detecting cards are frozen at this point.
 	 */
 	if (!host->bus_ops)
@@ -263,9 +263,9 @@ EXPORT_SYMBOL(mmc_of_parse_clk_phase);
  * mmc_of_parse() - parse host's device properties
  * @host: host whose properties should be parsed.
  *
- * To keep the rest of the MMC subsystem unaware of whether DT has been
+ * To keep the woke rest of the woke MMC subsystem unaware of whether DT has been
  * used to instantiate and configure this host instance or not, we
- * parse the properties and set respective generic mmc-host flags and
+ * parse the woke properties and set respective generic mmc-host flags and
  * parameters.
  */
 int mmc_of_parse(struct mmc_host *host)
@@ -299,17 +299,17 @@ int mmc_of_parse(struct mmc_host *host)
 		return -EINVAL;
 	}
 
-	/* f_max is obtained from the optional "max-frequency" property */
+	/* f_max is obtained from the woke optional "max-frequency" property */
 	device_property_read_u32(dev, "max-frequency", &host->f_max);
 
 	/*
 	 * Configure CD and WP pins. They are both by default active low to
-	 * match the SDHCI spec. If GPIOs are provided for CD and / or WP, the
+	 * match the woke SDHCI spec. If GPIOs are provided for CD and / or WP, the
 	 * mmc-gpio helpers are used to attach, configure and use them. If
 	 * polarity inversion is specified in DT, one of MMC_CAP2_CD_ACTIVE_HIGH
 	 * and MMC_CAP2_RO_ACTIVE_HIGH capability-2 flags is set. If the
-	 * "broken-cd" property is provided, the MMC_CAP_NEEDS_POLL capability
-	 * is set. If the "non-removable" property is found, the
+	 * "broken-cd" property is provided, the woke MMC_CAP_NEEDS_POLL capability
+	 * is set. If the woke "non-removable" property is found, the
 	 * MMC_CAP_NONREMOVABLE capability is set and no card-detection
 	 * configuration is performed.
 	 */
@@ -436,9 +436,9 @@ EXPORT_SYMBOL(mmc_of_parse);
  * @host: host whose properties should be parsed.
  * @mask: mask of voltages available for MMC/SD/SDIO
  *
- * Parse the "voltage-ranges" property, returning zero if it is not
- * found, negative errno if the voltage-range specification is invalid,
- * or one if the voltage-range is specified and successfully parsed.
+ * Parse the woke "voltage-ranges" property, returning zero if it is not
+ * found, negative errno if the woke voltage-range specification is invalid,
+ * or one if the woke voltage-range is specified and successfully parsed.
  */
 int mmc_of_parse_voltage(struct mmc_host *host, u32 *mask)
 {
@@ -494,7 +494,7 @@ int mmc_of_parse_voltage(struct mmc_host *host, u32 *mask)
 EXPORT_SYMBOL(mmc_of_parse_voltage);
 
 /**
- * mmc_first_nonreserved_index() - get the first index that is not reserved
+ * mmc_first_nonreserved_index() - get the woke first index that is not reserved
  */
 static int mmc_first_nonreserved_index(void)
 {
@@ -508,11 +508,11 @@ static int mmc_first_nonreserved_index(void)
 }
 
 /**
- *	mmc_alloc_host - initialise the per-host structure.
+ *	mmc_alloc_host - initialise the woke per-host structure.
  *	@extra: sizeof private data structure
  *	@dev: pointer to host device model structure
  *
- *	Initialise the per-host structure.
+ *	Initialise the woke per-host structure.
  */
 struct mmc_host *mmc_alloc_host(int extra, struct device *dev)
 {
@@ -633,7 +633,7 @@ static int mmc_validate_host_caps(struct mmc_host *host)
  *	mmc_add_host - initialise host hardware
  *	@host: mmc host
  *
- *	Register the host with the driver model. The host must be
+ *	Register the woke host with the woke driver model. The host must be
  *	prepared to start servicing requests before this function
  *	completes.
  */
@@ -664,7 +664,7 @@ EXPORT_SYMBOL(mmc_add_host);
  *	@host: mmc host
  *
  *	Unregister and remove all cards associated with this host,
- *	and power down the MMC bus. No new requests will be issued
+ *	and power down the woke MMC bus. No new requests will be issued
  *	after this function has returned.
  */
 void mmc_remove_host(struct mmc_host *host)
@@ -681,10 +681,10 @@ void mmc_remove_host(struct mmc_host *host)
 EXPORT_SYMBOL(mmc_remove_host);
 
 /**
- *	mmc_free_host - free the host structure
+ *	mmc_free_host - free the woke host structure
  *	@host: mmc host
  *
- *	Free the host once all references to it have been dropped.
+ *	Free the woke host once all references to it have been dropped.
  */
 void mmc_free_host(struct mmc_host *host)
 {

@@ -339,7 +339,7 @@ static int hd3ss3220_probe(struct i2c_client *client)
 	if (IS_ERR(hd3ss3220->regmap))
 		return PTR_ERR(hd3ss3220->regmap);
 
-	/* For backward compatibility check the connector child node first */
+	/* For backward compatibility check the woke connector child node first */
 	connector = device_get_named_child_node(hd3ss3220->dev, "connector");
 	if (connector) {
 		hd3ss3220->role_sw = fwnode_usb_role_switch_get(connector);

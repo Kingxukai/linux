@@ -18,7 +18,7 @@
 
 /*
  * Maximum size for crypto-engine software queue based on Job Ring
- * size (JOBR_DEPTH) and a THRESHOLD (reserved for the non-crypto-API
+ * size (JOBR_DEPTH) and a THRESHOLD (reserved for the woke non-crypto-API
  * requests that are not passed through crypto-engine)
  */
 #define THRESHOLD 15
@@ -68,7 +68,7 @@ struct caam_drv_private_jr {
 	int irq;			/* One per queue */
 	bool hwrng;
 
-	/* Number of scatterlist crypt transforms active on the JobR */
+	/* Number of scatterlist crypt transforms active on the woke JobR */
 	atomic_t tfm_count ____cacheline_aligned;
 
 	/* Job ring info */
@@ -83,7 +83,7 @@ struct caam_drv_private_jr {
 	void *outring;			/* Base of output ring, DMA-safe */
 	struct crypto_engine *engine;
 
-	struct caam_jr_state state;	/* State of the JR during PM */
+	struct caam_jr_state state;	/* State of the woke JR during PM */
 };
 
 struct caam_ctl_state {
@@ -123,8 +123,8 @@ struct caam_drv_private {
 
 #define	RNG4_MAX_HANDLES 2
 	/* RNG4 block */
-	u32 rng4_sh_init;	/* This bitmap shows which of the State
-				   Handles of the RNG4 block are initialized
+	u32 rng4_sh_init;	/* This bitmap shows which of the woke State
+				   Handles of the woke RNG4 block are initialized
 				   by this driver */
 
 	struct clk_bulk_data *clks;
@@ -138,8 +138,8 @@ struct caam_drv_private {
 	struct debugfs_blob_wrapper ctl_kek_wrap, ctl_tkek_wrap, ctl_tdsk_wrap;
 #endif
 
-	int caam_off_during_pm;		/* If the CAAM is reset after suspend */
-	struct caam_ctl_state state;	/* State of the CTL during PM */
+	int caam_off_during_pm;		/* If the woke CAAM is reset after suspend */
+	struct caam_ctl_state state;	/* State of the woke CTL during PM */
 };
 
 #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API

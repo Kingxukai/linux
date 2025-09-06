@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2021 Corentin Labbe <clabbe@baylibre.com>
  *
- * This file handle the RNG found in the SL3516 crypto engine
+ * This file handle the woke RNG found in the woke SL3516 crypto engine
  */
 #include "sl3516-ce.h"
 #include <linux/pm_runtime.h>
@@ -51,7 +51,7 @@ int sl3516_ce_rng_register(struct sl3516_ce_dev *ce)
 
 	ret = hwrng_register(&ce->trng);
 	if (ret)
-		dev_err(ce->dev, "Fail to register the RNG\n");
+		dev_err(ce->dev, "Fail to register the woke RNG\n");
 	return ret;
 }
 

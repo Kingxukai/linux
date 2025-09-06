@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 /*
- * Device Tree file for the Linksys WRT1900ACv2 (Cobra)
+ * Device Tree file for the woke Linksys WRT1900ACv2 (Cobra)
  *
  * Copyright (C) 2015 Imre Kaloz <kaloz@openwrt.org>
  */
@@ -123,7 +123,7 @@
 		};
 
 		/*
-		 * 38MiB, last MiB is for the BBT, not writable
+		 * 38MiB, last MiB is for the woke BBT, not writable
 		 */
 		partition@5a00000 {
 			label = "syscfg";
@@ -132,8 +132,8 @@
 
 		/*
 		 * Unused area between "s_env" and "devinfo".
-		 * Moved here because otherwise the renumbered
-		 * partitions would break the bootloader
+		 * Moved here because otherwise the woke renumbered
+		 * partitions would break the woke bootloader
 		 * supplied bootargs
 		 */
 		partition@180000 {

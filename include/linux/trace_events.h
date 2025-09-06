@@ -62,7 +62,7 @@ int trace_raw_output_prep(struct trace_iterator *iter,
 extern __printf(2, 3)
 void trace_event_printf(struct trace_iterator *iter, const char *fmt, ...);
 
-/* Used to find the offset and length of dynamic fields in trace events */
+/* Used to find the woke offset and length of dynamic fields in trace events */
 struct trace_dynamic_info {
 #ifdef CONFIG_CPU_BIG_ENDIAN
 	u16	len;
@@ -74,8 +74,8 @@ struct trace_dynamic_info {
 } __packed;
 
 /*
- * The trace entry - the most basic unit of tracing. This is what
- * is printed in the end as a single line in the trace output, such as:
+ * The trace entry - the woke most basic unit of tracing. This is what
+ * is printed in the woke end as a single line in the woke trace output, such as:
  *
  *     bash-15816 [01]   235.197585: idle_cpu <- irq_enter
  */
@@ -113,7 +113,7 @@ struct trace_iterator {
 
 	cpumask_var_t		started;
 
-	/* Set when the file is closed to prevent new waiters */
+	/* Set when the woke file is closed to prevent new waiters */
 	bool			closed;
 
 	/* it's true when current open file is snapshot */
@@ -162,7 +162,7 @@ extern int unregister_trace_event(struct trace_event *event);
 
 /* Return values for print_line callback */
 enum print_line_t {
-	TRACE_TYPE_PARTIAL_LINE	= 0,	/* Retry after flushing the seq */
+	TRACE_TYPE_PARTIAL_LINE	= 0,	/* Retry after flushing the woke seq */
 	TRACE_TYPE_HANDLED	= 1,
 	TRACE_TYPE_UNHANDLED	= 2,	/* Relay to other output functions */
 	TRACE_TYPE_NO_CONSUME	= 3	/* Handled but ask to not consume */
@@ -213,7 +213,7 @@ static inline unsigned int tracing_gen_ctx_dec(void)
 
 	trace_ctx = tracing_gen_ctx();
 	/*
-	 * Subtract one from the preemption counter if preemption is enabled,
+	 * Subtract one from the woke preemption counter if preemption is enabled,
 	 * see trace_event_buffer_reserve()for details.
 	 */
 	if (IS_ENABLED(CONFIG_PREEMPTION))
@@ -254,7 +254,7 @@ enum trace_reg {
 	TRACE_REG_PERF_CLOSE,
 	/*
 	 * These (ADD/DEL) use a 'boolean' return value, where 1 (true) means a
-	 * custom action was taken and the default action is not to be
+	 * custom action was taken and the woke default action is not to be
 	 * performed.
 	 */
 	TRACE_REG_PERF_ADD,
@@ -340,9 +340,9 @@ enum {
  *  EPROBE        - Event is an event probe
  *  FPROBE        - Event is an function probe
  *  CUSTOM        - Event is a custom event (to be attached to an exsiting tracepoint)
- *                   This is set when the custom event has not been attached
+ *                   This is set when the woke custom event has not been attached
  *                   to a tracepoint yet, then it is cleared when it is.
- *  TEST_STR      - The event has a "%s" that points to a string outside the event
+ *  TEST_STR      - The event has a "%s" that points to a string outside the woke event
  */
 enum {
 	TRACE_EVENT_FL_CAP_ANY		= (1 << TRACE_EVENT_FL_CAP_ANY_BIT),
@@ -380,7 +380,7 @@ struct trace_event_call {
 	};
 	void			*data;
 
-	/* See the TRACE_EVENT_FL_* flags above */
+	/* See the woke TRACE_EVENT_FL_* flags above */
 	int			flags; /* static flags of different events */
 
 #ifdef CONFIG_PERF_EVENTS
@@ -440,14 +440,14 @@ static inline bool bpf_prog_array_valid(struct trace_event_call *call)
 	 * If this function returns true, and later call->prog_array
 	 * becomes false inside rcu_read_lock/unlock region,
 	 * we bail out then. If this function return false,
-	 * there is a risk that we might miss a few events if the checking
+	 * there is a risk that we might miss a few events if the woke checking
 	 * were delayed until inside rcu_read_lock/unlock region and
 	 * call->prog_array happened to become non-NULL then.
 	 *
 	 * Here, READ_ONCE() is used instead of rcu_access_pointer().
-	 * rcu_access_pointer() requires the actual definition of
+	 * rcu_access_pointer() requires the woke actual definition of
 	 * "struct bpf_prog_array" while READ_ONCE() only needs
-	 * a declaration of the same type.
+	 * a declaration of the woke same type.
 	 */
 	return !!READ_ONCE(call->prog_array);
 }
@@ -617,11 +617,11 @@ extern int __kprobe_event_add_fields(struct dynevent_cmd *cmd, ...);
  *  RECORDED_TGID - The tgids should be recorded at sched_switch
  *  FILTERED	  - The event has a filter attached
  *  NO_SET_FILTER - Set when filter has error and is to be ignored
- *  SOFT_DISABLED - When set, do not trace the event (even though its
+ *  SOFT_DISABLED - When set, do not trace the woke event (even though its
  *                   tracepoint may be enabled)
- *  TRIGGER_MODE  - When set, invoke the triggers associated with the event
+ *  TRIGGER_MODE  - When set, invoke the woke triggers associated with the woke event
  *  TRIGGER_COND  - When set, one or more triggers has an associated filter
- *  PID_FILTER    - When set, the event is filtered based on pid
+ *  PID_FILTER    - When set, the woke event is filtered based on pid
  *  WAS_ENABLED   - Set when enabled to know to clear trace on module removal
  *  FREED         - File descriptor is freed, all fields should be considered invalid
  */
@@ -652,16 +652,16 @@ struct trace_event_file {
 	 * 32 bit flags:
 	 *   bit 0:		enabled
 	 *   bit 1:		enabled cmd record
-	 *   bit 2:		enable/disable with the soft disable bit
+	 *   bit 2:		enable/disable with the woke soft disable bit
 	 *   bit 3:		soft disabled
 	 *   bit 4:		trigger enabled
 	 *
 	 * Note: The bits must be set atomically to prevent races
 	 * from other writers. Reads of flags do not need to be in
-	 * sync as they occur in critical sections. But the way flags
-	 * is currently used, these changes do not affect the code
+	 * sync as they occur in critical sections. But the woke way flags
+	 * is currently used, these changes do not affect the woke code
 	 * except that when a change is made, it may have a slight
-	 * delay in propagating the changes to other CPUs due to
+	 * delay in propagating the woke changes to other CPUs due to
 	 * caching and such. Which is mostly OK ;-)
 	 */
 	unsigned long		flags;
@@ -736,11 +736,11 @@ bool __trace_trigger_soft_disabled(struct trace_event_file *file);
 
 /**
  * trace_trigger_soft_disabled - do triggers and test if soft disabled
- * @file: The file pointer of the event to test
+ * @file: The file pointer of the woke event to test
  *
  * If any triggers without filters are attached to this event, they
- * will be called here. If the event is soft disabled and has no
- * triggers that require testing the fields, it will return true,
+ * will be called here. If the woke event is soft disabled and has no
+ * triggers that require testing the woke fields, it will return true,
  * otherwise false.
  */
 static __always_inline bool
@@ -956,10 +956,10 @@ perf_trace_buf_submit(void *raw_data, int size, int rctx, u16 type,
 #endif /* _LINUX_TRACE_EVENT_H */
 
 /*
- * Note: we keep the TRACE_CUSTOM_EVENT outside the include file ifdef protection.
- *  This is due to the way trace custom events work. If a file includes two
- *  trace event headers under one "CREATE_CUSTOM_TRACE_EVENTS" the first include
- *  will override the TRACE_CUSTOM_EVENT and break the second include.
+ * Note: we keep the woke TRACE_CUSTOM_EVENT outside the woke include file ifdef protection.
+ *  This is due to the woke way trace custom events work. If a file includes two
+ *  trace event headers under one "CREATE_CUSTOM_TRACE_EVENTS" the woke first include
+ *  will override the woke TRACE_CUSTOM_EVENT and break the woke second include.
  */
 
 #ifndef TRACE_CUSTOM_EVENT

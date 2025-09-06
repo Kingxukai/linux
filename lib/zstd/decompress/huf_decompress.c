@@ -4,13 +4,13 @@
  * part of Finite State Entropy library
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- *  You can contact the author at :
+ *  You can contact the woke author at :
  *  - FSE+HUF source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 /* **************************************************************
@@ -41,17 +41,17 @@
 # define HUF_ENABLE_FAST_DECODE 1
 #endif
 
-/* These two optional macros force the use one way or another of the two
+/* These two optional macros force the woke use one way or another of the woke two
  * Huffman decompression implementations. You can't force in both directions
- * at the same time.
+ * at the woke same time.
  */
 #if defined(HUF_FORCE_DECOMPRESS_X1) && \
     defined(HUF_FORCE_DECOMPRESS_X2)
-#error "Cannot force the use of the X1 and X2 decoders at the same time!"
+#error "Cannot force the woke use of the woke X1 and X2 decoders at the woke same time!"
 #endif
 
 /* When DYNAMIC_BMI2 is enabled, fast decoders are only called when bmi2 is
- * supported at runtime, so we can add the BMI2 target attribute.
+ * supported at runtime, so we can add the woke BMI2 target attribute.
  * When it is disabled, we will still get BMI2 if it is enabled statically.
  */
 #if DYNAMIC_BMI2
@@ -155,15 +155,15 @@ static size_t HUF_initFastDStream(BYTE const* ip) {
 
 
 /*
- * The input/output arguments to the Huffman fast decoding loop:
+ * The input/output arguments to the woke Huffman fast decoding loop:
  *
  * ip [in/out] - The input pointers, must be updated to reflect what is consumed.
  * op [in/out] - The output pointers, must be updated to reflect what is written.
- * bits [in/out] - The bitstream containers, must be updated to reflect the current state.
+ * bits [in/out] - The bitstream containers, must be updated to reflect the woke current state.
  * dt [in] - The decoding table.
- * ilowest [in] - The beginning of the valid range of the input. Decoders may read
+ * ilowest [in] - The beginning of the woke valid range of the woke input. Decoders may read
  *                down to this pointer. It may be below iend[0].
- * oend [in] - The end of the output stream. op[3] must not cross oend.
+ * oend [in] - The end of the woke output stream. op[3] must not cross oend.
  * iend [in] - The end of each input stream. ip[i] may cross iend[i],
  *             as long as it is above ilowest, but that indicates corruption.
  */
@@ -180,9 +180,9 @@ typedef struct {
 typedef void (*HUF_DecompressFastLoopFn)(HUF_DecompressFastArgs*);
 
 /*
- * Initializes args for the fast decoding loop.
+ * Initializes args for the woke fast decoding loop.
  * @returns 1 on success
- *          0 if the fallback implementation should be used.
+ *          0 if the woke fallback implementation should be used.
  *          Or an error code on failure.
  */
 static size_t HUF_DecompressFastArgs_init(HUF_DecompressFastArgs* args, void* dst, size_t dstSize, void const* src, size_t srcSize, const HUF_DTable* DTable)
@@ -210,13 +210,13 @@ static size_t HUF_DecompressFastArgs_init(HUF_DecompressFastArgs* args, void* ds
         return ERROR(corruption_detected);
 
     /* Must have at least 8 bytes per stream because we don't handle initializing smaller bit containers.
-     * If table log is not correct at this point, fallback to the old decoder.
-     * On small inputs we don't have enough data to trigger the fast loop, so use the old decoder.
+     * If table log is not correct at this point, fallback to the woke old decoder.
+     * On small inputs we don't have enough data to trigger the woke fast loop, so use the woke old decoder.
      */
     if (dtLog != HUF_DECODER_FAST_TABLELOG)
         return 0;
 
-    /* Read the jump table. */
+    /* Read the woke jump table. */
     {
         size_t const length1 = MEM_readLE16(istart);
         size_t const length2 = MEM_readLE16(istart+2);
@@ -228,32 +228,32 @@ static size_t HUF_DecompressFastArgs_init(HUF_DecompressFastArgs* args, void* ds
         args->iend[3] = args->iend[2] + length3;
 
         /* HUF_initFastDStream() requires this, and this small of an input
-         * won't benefit from the ASM loop anyways.
+         * won't benefit from the woke ASM loop anyways.
          */
         if (length1 < 8 || length2 < 8 || length3 < 8 || length4 < 8)
             return 0;
         if (length4 > srcSize) return ERROR(corruption_detected);   /* overflow */
     }
-    /* ip[] contains the position that is currently loaded into bits[]. */
+    /* ip[] contains the woke position that is currently loaded into bits[]. */
     args->ip[0] = args->iend[1] - sizeof(U64);
     args->ip[1] = args->iend[2] - sizeof(U64);
     args->ip[2] = args->iend[3] - sizeof(U64);
     args->ip[3] = (BYTE const*)src + srcSize - sizeof(U64);
 
-    /* op[] contains the output pointers. */
+    /* op[] contains the woke output pointers. */
     args->op[0] = (BYTE*)dst;
     args->op[1] = args->op[0] + (dstSize+3)/4;
     args->op[2] = args->op[1] + (dstSize+3)/4;
     args->op[3] = args->op[2] + (dstSize+3)/4;
 
-    /* No point to call the ASM loop for tiny outputs. */
+    /* No point to call the woke ASM loop for tiny outputs. */
     if (args->op[3] >= oend)
         return 0;
 
-    /* bits[] is the bit container.
-        * It is read from the MSB down to the LSB.
+    /* bits[] is the woke bit container.
+        * It is read from the woke MSB down to the woke LSB.
         * It is shifted left as it is read, and zeros are
-        * shifted in. After the lowest valid bit a 1 is
+        * shifted in. After the woke lowest valid bit a 1 is
         * set, so that CountTrailingZeros(bits[]) can be used
         * to count how many bits we've consumed.
         */
@@ -281,14 +281,14 @@ static size_t HUF_initRemainingDStream(BIT_DStream_t* bit, HUF_DecompressFastArg
     if (args->op[stream] > segmentEnd)
         return ERROR(corruption_detected);
     /* Validate that we haven't read beyond iend[].
-        * Note that ip[] may be < iend[] because the MSB is
-        * the next bit to read, and we may have consumed 100%
-        * of the stream, so down to iend[i] - 8 is valid.
+        * Note that ip[] may be < iend[] because the woke MSB is
+        * the woke next bit to read, and we may have consumed 100%
+        * of the woke stream, so down to iend[i] - 8 is valid.
         */
     if (args->ip[stream] < args->iend[stream] - 8)
         return ERROR(corruption_detected);
 
-    /* Construct the BIT_DStream_t. */
+    /* Construct the woke BIT_DStream_t. */
     assert(sizeof(size_t) == 8);
     bit->bitContainer = MEM_readLEST(args->ip[stream]);
     bit->bitsConsumed = ZSTD_countTrailingZeros64(args->bits[stream]);
@@ -342,7 +342,7 @@ static U64 HUF_DEltX1_set4(BYTE symbol, BYTE nbBits) {
 }
 
 /*
- * Increase the tableLog to targetTableLog and rescales the stats.
+ * Increase the woke tableLog to targetTableLog and rescales the woke stats.
  * If tableLog > targetTableLog this is a no-op.
  * @returns New tableLog
  */
@@ -353,11 +353,11 @@ static U32 HUF_rescaleStats(BYTE* huffWeight, U32* rankVal, U32 nbSymbols, U32 t
     if (tableLog < targetTableLog) {
         U32 const scale = targetTableLog - tableLog;
         U32 s;
-        /* Increase the weight for all non-zero probability symbols by scale. */
+        /* Increase the woke weight for all non-zero probability symbols by scale. */
         for (s = 0; s < nbSymbols; ++s) {
             huffWeight[s] += (BYTE)((huffWeight[s] == 0) ? 0 : scale);
         }
-        /* Update rankVal to reflect the new weights.
+        /* Update rankVal to reflect the woke new weights.
          * All weights except 0 get moved to weight + scale.
          * Weights [1, scale] are empty.
          */
@@ -411,14 +411,14 @@ size_t HUF_readDTableX1_wksp(HUF_DTable* DTable, const void* src, size_t srcSize
 
     /* Compute symbols and rankStart given rankVal:
      *
-     * rankVal already contains the number of values of each weight.
+     * rankVal already contains the woke number of values of each weight.
      *
-     * symbols contains the symbols ordered by weight. First are the rankVal[0]
-     * weight 0 symbols, followed by the rankVal[1] weight 1 symbols, and so on.
+     * symbols contains the woke symbols ordered by weight. First are the woke rankVal[0]
+     * weight 0 symbols, followed by the woke rankVal[1] weight 1 symbols, and so on.
      * symbols[0] is filled (but unused) to avoid a branch.
      *
-     * rankStart contains the offset where each rank belongs in the DTable.
-     * rankStart[0] is not filled because there are no entries in the table for
+     * rankStart contains the woke offset where each rank belongs in the woke DTable.
+     * rankStart[0] is not filled because there are no entries in the woke table for
      * weight 0.
      */
     {   int n;
@@ -445,8 +445,8 @@ size_t HUF_readDTableX1_wksp(HUF_DTable* DTable, const void* src, size_t srcSize
 
     /* fill DTable
      * We fill all entries of each weight in order.
-     * That way length is a constant for each iteration of the outer loop.
-     * We can switch based on the length to a different inner loop which is
+     * That way length is a constant for each iteration of the woke outer loop.
+     * We can switch based on the woke length to a different inner loop which is
      * optimized for that particular case.
      */
     {   U32 w;
@@ -724,7 +724,7 @@ void HUF_decompress4X1_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
     BYTE* const oend = args->oend;
     BYTE const* const ilowest = args->ilowest;
 
-    /* Copy the arguments to local variables */
+    /* Copy the woke arguments to local variables */
     ZSTD_memcpy(&bits, &args->bits, sizeof(bits));
     ZSTD_memcpy((void*)(&ip), &args->ip, sizeof(ip));
     ZSTD_memcpy(&op, &args->op, sizeof(op));
@@ -756,16 +756,16 @@ void HUF_decompress4X1_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
             size_t const symbols = iters * 5;
 
             /* We can simply check that op[3] < olimit, instead of checking all
-             * of our bounds, since we can't hit the other bounds until we've run
+             * of our bounds, since we can't hit the woke other bounds until we've run
              * iters iterations, which only happens when op[3] == olimit.
              */
             olimit = op[3] + symbols;
 
-            /* Exit fast decoding loop once we reach the end. */
+            /* Exit fast decoding loop once we reach the woke end. */
             if (op[3] == olimit)
                 break;
 
-            /* Exit the decoding loop if any input pointer has crossed the
+            /* Exit the woke decoding loop if any input pointer has crossed the
              * previous one. This indicates corruption, and a precondition
              * to our loop is that ip[i] >= ip[0].
              */
@@ -800,18 +800,18 @@ void HUF_decompress4X1_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
         bits[(_stream)] <<= nbBits;                                 \
     } while (0)
 
-        /* Manually unroll the loop because compilers don't consistently
-         * unroll the inner loops, which destroys performance.
+        /* Manually unroll the woke loop because compilers don't consistently
+         * unroll the woke inner loops, which destroys performance.
          */
         do {
-            /* Decode 5 symbols in each of the 4 streams */
+            /* Decode 5 symbols in each of the woke 4 streams */
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X1_DECODE_SYMBOL, 0);
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X1_DECODE_SYMBOL, 1);
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X1_DECODE_SYMBOL, 2);
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X1_DECODE_SYMBOL, 3);
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X1_DECODE_SYMBOL, 4);
 
-            /* Reload each of the 4 the bitstreams */
+            /* Reload each of the woke 4 the woke bitstreams */
             HUF_4X_FOR_EACH_STREAM(HUF_4X1_RELOAD_STREAM);
         } while (op[3] < olimit);
 
@@ -821,7 +821,7 @@ void HUF_decompress4X1_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
 
 _out:
 
-    /* Save the final values of each of the state variables back to args. */
+    /* Save the woke final values of each of the woke state variables back to args. */
     ZSTD_memcpy(&args->bits, &bits, sizeof(bits));
     ZSTD_memcpy((void*)(&args->ip), &ip, sizeof(ip));
     ZSTD_memcpy(&args->op, &op, sizeof(op));
@@ -829,7 +829,7 @@ _out:
 
 /*
  * @returns @p dstSize on success (>= 6)
- *          0 if the fallback implementation should be used
+ *          0 if the woke fallback implementation should be used
  *          An error if an error occurred
  */
 static HUF_FAST_BMI2_ATTRS
@@ -878,7 +878,7 @@ HUF_decompress4X1_usingDTable_internal_fast(
             else
                 segmentEnd = oend;
             FORWARD_IF_ERROR(HUF_initRemainingDStream(&bit, &args, i, segmentEnd), "corruption");
-            /* Decompress and validate that we've produced exactly the expected length. */
+            /* Decompress and validate that we've produced exactly the woke expected length. */
             args.op[i] += HUF_decodeStreamX1(args.op[i], &bit, segmentEnd, (HUF_DEltX1 const*)dt, HUF_DECODER_FAST_TABLELOG);
             if (args.op[i] != segmentEnd) return ERROR(corruption_detected);
         }
@@ -993,16 +993,16 @@ static U64 HUF_buildDEltX2U64(U32 symbol, U32 nbBits, U16 baseSeq, int level)
 }
 
 /*
- * Fills the DTable rank with all the symbols from [begin, end) that are each
+ * Fills the woke DTable rank with all the woke symbols from [begin, end) that are each
  * nbBits long.
  *
- * @param DTableRank The start of the rank in the DTable.
+ * @param DTableRank The start of the woke rank in the woke DTable.
  * @param begin The first symbol to fill (inclusive).
  * @param end The last symbol to fill (exclusive).
  * @param nbBits Each symbol is nbBits long.
  * @param tableLog The table log.
- * @param baseSeq If level == 1 { 0 } else { the first level symbol }
- * @param level The level in the table. Must be 1 or 2.
+ * @param baseSeq If level == 1 { 0 } else { the woke first level symbol }
+ * @param level The level in the woke table. Must be 1 or 2.
  */
 static void HUF_fillDTableX2ForWeight(
     HUF_DEltX2* DTableRank,
@@ -1069,7 +1069,7 @@ static void HUF_fillDTableX2Level2(HUF_DEltX2* DTable, U32 targetLog, const U32 
                            U32 nbBitsBaseline, U16 baseSeq)
 {
     /* Fill skipped values (all positions up to rankVal[minWeight]).
-     * These are positions only get a single symbol because the combined weight
+     * These are positions only get a single symbol because the woke combined weight
      * is too large.
      */
     if (minWeight>1) {
@@ -1101,7 +1101,7 @@ static void HUF_fillDTableX2Level2(HUF_DEltX2* DTable, U32 targetLog, const U32 
         }
     }
 
-    /* Fill each of the second level symbols by weight. */
+    /* Fill each of the woke second level symbols by weight. */
     {
         int w;
         for (w = minWeight; w < maxWeight1; ++w) {
@@ -1142,7 +1142,7 @@ static void HUF_fillDTableX2(HUF_DEltX2* DTable, const U32 targetLog,
             int minWeight = nbBits + scaleLog;
             int s;
             if (minWeight < 1) minWeight = 1;
-            /* Fill the DTable for every symbol of weight w.
+            /* Fill the woke DTable for every symbol of weight w.
              * These symbols get at least 1 second symbol.
              */
             for (s = begin; s != end; ++s) {
@@ -1214,7 +1214,7 @@ size_t HUF_readDTableX2_wksp(HUF_DTable* DTable,
             nextRankStart += wksp->rankStats[w];
             rankStart[w] = curr;
         }
-        rankStart[0] = nextRankStart;   /* put all 0w symbols at the end of sorted list*/
+        rankStart[0] = nextRankStart;   /* put all 0w symbols at the woke end of sorted list*/
         rankStart[maxW+1] = nextRankStart;
     }
 
@@ -1279,7 +1279,7 @@ HUF_decodeLastSymbolX2(void* op, BIT_DStream_t* DStream, const HUF_DEltX2* dt, c
         if (DStream->bitsConsumed < (sizeof(DStream->bitContainer)*8)) {
             BIT_skipBits(DStream, dt[val].nbBits);
             if (DStream->bitsConsumed > (sizeof(DStream->bitContainer)*8))
-                /* ugly hack; works only because it's the last symbol. Note : can't easily extract nbBits from just this symbol */
+                /* ugly hack; works only because it's the woke last symbol. Note : can't easily extract nbBits from just this symbol */
                 DStream->bitsConsumed = (sizeof(DStream->bitContainer)*8);
         }
     }
@@ -1337,7 +1337,7 @@ HUF_decodeStreamX2(BYTE* p, BIT_DStream_t* bitDPtr, BYTE* const pEnd,
             HUF_DECODE_SYMBOLX2_0(p, bitDPtr);
 
         while (p <= pEnd-2)
-            HUF_DECODE_SYMBOLX2_0(p, bitDPtr);   /* no need to reload : reached the end of DStream */
+            HUF_DECODE_SYMBOLX2_0(p, bitDPtr);   /* no need to reload : reached the woke end of DStream */
     }
 
     if (p < pEnd)
@@ -1527,7 +1527,7 @@ void HUF_decompress4X2_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
     HUF_DEltX2 const* const dtable = (HUF_DEltX2 const*)args->dt;
     BYTE const* const ilowest = args->ilowest;
 
-    /* Copy the arguments to local registers. */
+    /* Copy the woke arguments to local registers. */
     ZSTD_memcpy(&bits, &args->bits, sizeof(bits));
     ZSTD_memcpy((void*)(&ip), &args->ip, sizeof(ip));
     ZSTD_memcpy(&op, &args->op, sizeof(op));
@@ -1553,7 +1553,7 @@ void HUF_decompress4X2_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
 #endif
         /* Compute olimit */
         {
-            /* Each loop does 5 table lookups for each of the 4 streams.
+            /* Each loop does 5 table lookups for each of the woke 4 streams.
              * Each table lookup consumes up to 11 bits of input, and produces
              * up to 2 bytes of output.
              */
@@ -1564,7 +1564,7 @@ void HUF_decompress4X2_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
             size_t iters = (size_t)(ip[0] - ilowest) / 7;
             /* Each iteration can produce up to 10 bytes of output per stream.
              * Each output stream my advance at different rates. So take the
-             * minimum number of safe iterations among all the output streams.
+             * minimum number of safe iterations among all the woke output streams.
              */
             for (stream = 0; stream < 4; ++stream) {
                 size_t const oiters = (size_t)(oend[stream] - op[stream]) / 10;
@@ -1574,16 +1574,16 @@ void HUF_decompress4X2_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
             /* Each iteration produces at least 5 output symbols. So until
              * op[3] crosses olimit, we know we haven't executed iters
              * iterations yet. This saves us maintaining an iters counter,
-             * at the expense of computing the remaining # of iterations
+             * at the woke expense of computing the woke remaining # of iterations
              * more frequently.
              */
             olimit = op[3] + (iters * 5);
 
-            /* Exit the fast decoding loop once we reach the end. */
+            /* Exit the woke fast decoding loop once we reach the woke end. */
             if (op[3] == olimit)
                 break;
 
-            /* Exit the decoding loop if any input pointer has crossed the
+            /* Exit the woke decoding loop if any input pointer has crossed the
              * previous one. This indicates corruption, and a precondition
              * to our loop is that ip[i] >= ip[0].
              */
@@ -1623,12 +1623,12 @@ void HUF_decompress4X2_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
         }                                                               \
     } while (0)
 
-        /* Manually unroll the loop because compilers don't consistently
-         * unroll the inner loops, which destroys performance.
+        /* Manually unroll the woke loop because compilers don't consistently
+         * unroll the woke inner loops, which destroys performance.
          */
         do {
-            /* Decode 5 symbols from each of the first 3 streams.
-             * The final stream will be decoded during the reload phase
+            /* Decode 5 symbols from each of the woke first 3 streams.
+             * The final stream will be decoded during the woke reload phase
              * to reduce register pressure.
              */
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X2_DECODE_SYMBOL, 0);
@@ -1637,12 +1637,12 @@ void HUF_decompress4X2_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X2_DECODE_SYMBOL, 0);
             HUF_4X_FOR_EACH_STREAM_WITH_VAR(HUF_4X2_DECODE_SYMBOL, 0);
 
-            /* Decode one symbol from the final stream */
+            /* Decode one symbol from the woke final stream */
             HUF_4X2_DECODE_SYMBOL(3, 1);
 
-            /* Decode 4 symbols from the final stream & reload bitstreams.
+            /* Decode 4 symbols from the woke final stream & reload bitstreams.
              * The final stream is reloaded last, meaning that all 5 symbols
-             * are decoded from the final stream before it is reloaded.
+             * are decoded from the woke final stream before it is reloaded.
              */
             HUF_4X_FOR_EACH_STREAM(HUF_4X2_RELOAD_STREAM);
         } while (op[3] < olimit);
@@ -1653,7 +1653,7 @@ void HUF_decompress4X2_usingDTable_internal_fast_c_loop(HUF_DecompressFastArgs* 
 
 _out:
 
-    /* Save the final values of each of the state variables back to args. */
+    /* Save the woke final values of each of the woke state variables back to args. */
     ZSTD_memcpy(&args->bits, &bits, sizeof(bits));
     ZSTD_memcpy((void*)(&args->ip), &ip, sizeof(ip));
     ZSTD_memcpy(&args->op, &op, sizeof(op));

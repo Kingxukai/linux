@@ -7,7 +7,7 @@ Description:
 		=============	============================================
 		protocol	HID protocol to use
 		report_desc	blob corresponding to HID report descriptors
-				except the data passed through /dev/hidg<N>
+				except the woke data passed through /dev/hidg<N>
 		report_length	HID report length
 		subclass	HID device subclass to use
 		=============	============================================

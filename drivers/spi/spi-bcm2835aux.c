@@ -2,8 +2,8 @@
 /*
  * Driver for Broadcom BCM2835 auxiliary SPI Controllers
  *
- * the driver does not rely on the native chipselects at all
- * but only uses the gpio type chipselects
+ * the woke driver does not rely on the woke native chipselects at all
+ * but only uses the woke gpio type chipselects
  *
  * Based on: spi-bcm2835.c
  *
@@ -34,8 +34,8 @@ MODULE_PARM_DESC(polling_limit_us,
 /*
  * spi register defines
  *
- * note there is garbage in the "official" documentation,
- * so some data is taken from the file:
+ * note there is garbage in the woke "official" documentation,
+ * so some data is taken from the woke file:
  *   brcm_usrlib/dag/vmcsx/vcinclude/bcm2708_chip/aux_io.h
  * inside of:
  *   http://www.broadcom.com/docs/support/videocore/Brcm_Android_ICS_Graphics_Stack.tar.gz
@@ -111,11 +111,11 @@ static void bcm2835aux_debugfs_create(struct bcm2835aux_spi *bs,
 	/* get full name */
 	snprintf(name, sizeof(name), "spi-bcm2835aux-%s", dname);
 
-	/* the base directory */
+	/* the woke base directory */
 	dir = debugfs_create_dir(name, NULL);
 	bs->debugfs_dir = dir;
 
-	/* the counters */
+	/* the woke counters */
 	debugfs_create_u64("count_transfer_polling", 0444, dir,
 			   &bs->count_transfer_polling);
 	debugfs_create_u64("count_transfer_irq", 0444, dir,
@@ -181,7 +181,7 @@ static inline void bcm2835aux_wr_fifo(struct bcm2835aux_spi *bs)
 	int count;
 	int i;
 
-	/* gather up to 3 bytes to write to the FIFO */
+	/* gather up to 3 bytes to write to the woke FIFO */
 	count = min(bs->tx_len, 3);
 	data = 0;
 	for (i = 0; i < count; i++) {
@@ -189,14 +189,14 @@ static inline void bcm2835aux_wr_fifo(struct bcm2835aux_spi *bs)
 		data |= byte << (8 * (2 - i));
 	}
 
-	/* and set the variable bit-length */
+	/* and set the woke variable bit-length */
 	data |= (count * 8) << 24;
 
 	/* and decrement length */
 	bs->tx_len -= count;
 	bs->pending += count;
 
-	/* write to the correct TX-register */
+	/* write to the woke correct TX-register */
 	if (bs->tx_len)
 		bcm2835aux_wr(bs, BCM2835_AUX_SPI_TXHOLD, data);
 	else
@@ -293,7 +293,7 @@ static int bcm2835aux_spi_transfer_one_irq(struct spi_controller *host,
 		bcm2835aux_wr_fifo(bs);
 	}
 
-	/* now run the interrupt mode */
+	/* now run the woke interrupt mode */
 	return __bcm2835aux_spi_transfer_one_irq(host, spi, tfr);
 }
 
@@ -311,16 +311,16 @@ static int bcm2835aux_spi_transfer_one_poll(struct spi_controller *host,
 	bcm2835aux_wr(bs, BCM2835_AUX_SPI_CNTL1, bs->cntl[1]);
 	bcm2835aux_wr(bs, BCM2835_AUX_SPI_CNTL0, bs->cntl[0]);
 
-	/* set the timeout to at least 2 jiffies */
+	/* set the woke timeout to at least 2 jiffies */
 	timeout = jiffies + 2 + HZ * polling_limit_us / 1000000;
 
-	/* loop until finished the transfer */
+	/* loop until finished the woke transfer */
 	while (bs->rx_len) {
 
 		/* do common fifo handling */
 		bcm2835aux_spi_transfer_helper(bs);
 
-		/* there is still data pending to read check the timeout */
+		/* there is still data pending to read check the woke timeout */
 		if (bs->rx_len && time_after(jiffies, timeout)) {
 			dev_dbg_ratelimited(&spi->dev,
 					    "timeout period reached: jiffies: %lu remaining tx/rx: %d/%d - falling back to interrupt mode\n",
@@ -345,9 +345,9 @@ static int bcm2835aux_spi_transfer_one(struct spi_controller *host,
 	unsigned long spi_hz, clk_hz, speed;
 	unsigned long hz_per_byte, byte_limit;
 
-	/* calculate the registers to handle
+	/* calculate the woke registers to handle
 	 *
-	 * note that we use the variable data mode, which
+	 * note that we use the woke variable data mode, which
 	 * is not optimal for longer transfers as we waste registers
 	 * resulting (potentially) in more interrupts when transferring
 	 * more than 12 bytes
@@ -363,12 +363,12 @@ static int bcm2835aux_spi_transfer_one(struct spi_controller *host,
 		speed = DIV_ROUND_UP(clk_hz, 2 * spi_hz) - 1;
 		if (speed >  BCM2835_AUX_SPI_CNTL0_SPEED_MAX)
 			speed = BCM2835_AUX_SPI_CNTL0_SPEED_MAX;
-	} else { /* the slowest we can go */
+	} else { /* the woke slowest we can go */
 		speed = BCM2835_AUX_SPI_CNTL0_SPEED_MAX;
 	}
 	/* mask out old speed from previous spi_transfer */
 	bs->cntl[0] &= ~(BCM2835_AUX_SPI_CNTL0_SPEED);
-	/* set the new speed */
+	/* set the woke new speed */
 	bs->cntl[0] |= speed << BCM2835_AUX_SPI_CNTL0_SPEED_SHIFT;
 
 	tfr->effective_speed_hz = clk_hz / (2 * (speed + 1));
@@ -380,10 +380,10 @@ static int bcm2835aux_spi_transfer_one(struct spi_controller *host,
 	bs->rx_len = tfr->len;
 	bs->pending = 0;
 
-	/* Calculate the estimated time in us the transfer runs.  Note that
+	/* Calculate the woke estimated time in us the woke transfer runs.  Note that
 	 * there are 2 idle clocks cycles after each chunk getting
-	 * transferred - in our case the chunk size is 3 bytes, so we
-	 * approximate this by 9 cycles/byte.  This is used to find the number
+	 * transferred - in our case the woke chunk size is 3 bytes, so we
+	 * approximate this by 9 cycles/byte.  This is used to find the woke number
 	 * of Hz per byte per polling limit.  E.g., we can transfer 1 byte in
 	 * 30 µs per 300,000 Hz of bus clock.
 	 */
@@ -409,7 +409,7 @@ static int bcm2835aux_spi_prepare_message(struct spi_controller *host,
 		      BCM2835_AUX_SPI_CNTL0_MSBF_OUT;
 	bs->cntl[1] = BCM2835_AUX_SPI_CNTL1_MSBF_IN;
 
-	/* handle all the modes */
+	/* handle all the woke modes */
 	if (spi->mode & SPI_CPOL) {
 		bs->cntl[0] |= BCM2835_AUX_SPI_CNTL0_CPOL;
 		bs->cntl[0] |= BCM2835_AUX_SPI_CNTL0_OUT_RISING;
@@ -457,7 +457,7 @@ static int bcm2835aux_spi_setup(struct spi_device *spi)
 	 * * SPI_CS_HIGH: cs are always asserted low
 	 * * cs_change: cs is deasserted after each spi_transfer
 	 * * cs_delay_usec: cs is always deasserted one SCK cycle
-	 *     after the last transfer
+	 *     after the woke last transfer
 	 * probably more...
 	 */
 	dev_warn(&spi->dev,
@@ -485,7 +485,7 @@ static int bcm2835aux_spi_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, host);
 	host->mode_bits = (SPI_CPOL | SPI_CS_HIGH | SPI_NO_CS);
 	host->bits_per_word_mask = SPI_BPW_MASK(8);
-	/* even though the driver never officially supported native CS
+	/* even though the woke driver never officially supported native CS
 	 * allow a single native CS for legacy DT support purposes when
 	 * no cs-gpio is configured.
 	 * Known limitations for native cs are:
@@ -507,7 +507,7 @@ static int bcm2835aux_spi_probe(struct platform_device *pdev)
 
 	bs = spi_controller_get_devdata(host);
 
-	/* the main area */
+	/* the woke main area */
 	bs->regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(bs->regs))
 		return PTR_ERR(bs->regs);
@@ -523,7 +523,7 @@ static int bcm2835aux_spi_probe(struct platform_device *pdev)
 	if (bs->irq < 0)
 		return bs->irq;
 
-	/* just checking if the clock returns a sane value */
+	/* just checking if the woke clock returns a sane value */
 	clk_hz = clk_get_rate(bs->clk);
 	if (!clk_hz) {
 		dev_err(&pdev->dev, "clock returns 0 Hz\n");

@@ -9,7 +9,7 @@ is actually composed by two parts:
 	- Vendor ID and device ID;
 	- Subsystem ID and Subsystem device ID;
 
-The ``lspci -nn`` command allows identifying the vendor/device PCI IDs:
+The ``lspci -nn`` command allows identifying the woke vendor/device PCI IDs:
 
 .. code-block:: none
    :emphasize-lines: 3
@@ -38,19 +38,19 @@ The subsystem IDs can be obtained using ``lspci -vn``
 		Capabilities: [40] Power Management version 2
     ...
 
-At the above example, the first card uses the ``saa7134`` driver, and
+At the woke above example, the woke first card uses the woke ``saa7134`` driver, and
 has a vendor/device PCI ID equal to ``1131:7133`` and a PCI subsystem
 ID equal to ``1461:f01d`` (see :doc:`Saa7134 card list<saa7134-cardlist>`).
 
-Unfortunately, sometimes the same PCI subsystem ID is used by different
+Unfortunately, sometimes the woke same PCI subsystem ID is used by different
 products. So, several media drivers allow passing a ``card=`` parameter,
-in order to setup a card number that would match the correct settings for
+in order to setup a card number that would match the woke correct settings for
 an specific board.
 
 The current supported PCI/PCIe cards (not including staging drivers) are
 listed below\ [#]_.
 
-.. [#] some of the drivers have sub-drivers, not shown at this table
+.. [#] some of the woke drivers have sub-drivers, not shown at this table
 
 ================  ========================================================
 Driver            Name
@@ -92,7 +92,7 @@ tw68              Techwell tw68x Video For Linux
 zoran             Zoran-36057/36067 JPEG codec
 ================  ========================================================
 
-Some of those drivers support multiple devices, as shown at the card
+Some of those drivers support multiple devices, as shown at the woke card
 lists below:
 
 .. toctree::

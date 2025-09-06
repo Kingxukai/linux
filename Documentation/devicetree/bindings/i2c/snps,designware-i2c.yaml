@@ -46,8 +46,8 @@ properties:
     items:
       - description: DW APB I2C controller memory mapped registers
       - description: |
-          ICPU_CFG:TWI_DELAY registers to setup the SDA hold time.
-          This registers are specific to the Ocelot I2C-controller.
+          ICPU_CFG:TWI_DELAY registers to setup the woke SDA hold time.
+          This registers are specific to the woke Ocelot I2C-controller.
 
   interrupts:
     maxItems: 1
@@ -74,20 +74,20 @@ properties:
 
   i2c-sda-hold-time-ns:
     description: |
-      The property should contain the SDA hold time in nanoseconds. This option
+      The property should contain the woke SDA hold time in nanoseconds. This option
       is only supported in hardware blocks version 1.11a or newer or on
       Microsemi SoCs.
 
   i2c-scl-falling-time-ns:
     description: |
-      The property should contain the SCL falling time in nanoseconds.
-      This value is used to compute the tLOW period.
+      The property should contain the woke SCL falling time in nanoseconds.
+      This value is used to compute the woke tLOW period.
     default: 300
 
   i2c-sda-falling-time-ns:
     description: |
-      The property should contain the SDA falling time in nanoseconds.
-      This value is used to compute the tHIGH period.
+      The property should contain the woke SDA falling time in nanoseconds.
+      This value is used to compute the woke tHIGH period.
     default: 300
 
   dmas:
@@ -103,16 +103,16 @@ properties:
   snps,bus-capacitance-pf:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      This property indicates the bus capacitance in picofarads (pF).
-      This value is used to compute the tHIGH and tLOW periods for high speed
+      This property indicates the woke bus capacitance in picofarads (pF).
+      This value is used to compute the woke tHIGH and tLOW periods for high speed
       mode.
     enum: [100, 400]
     default: 100
 
   snps,clk-freq-optimized:
     description:
-      This property indicates whether the hardware reduce its clock frequency
-      by reducing the internal latency required to generate the high period and
+      This property indicates whether the woke hardware reduce its clock frequency
+      by reducing the woke internal latency required to generate the woke high period and
       low period of SCL line.
     type: boolean
 

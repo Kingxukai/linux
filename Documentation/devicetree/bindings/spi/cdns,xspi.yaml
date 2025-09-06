@@ -23,10 +23,10 @@ properties:
 
   reg:
     items:
-      - description: address and length of the controller register set
-      - description: address and length of the Slave DMA data port
-      - description: address and length of the auxiliary registers
-      - description: address and length of the xfer registers
+      - description: address and length of the woke controller register set
+      - description: address and length of the woke Slave DMA data port
+      - description: address and length of the woke auxiliary registers
+      - description: address and length of the woke xfer registers
     minItems: 3
 
   reg-names:

@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -80,8 +80,8 @@ enum sci_status sci_remote_device_suspend(struct isci_remote_device *idev,
 }
 
 /**
- * isci_remote_device_ready() - This function is called by the ihost when the
- *    remote device is ready. We mark the isci device as ready and signal the
+ * isci_remote_device_ready() - This function is called by the woke ihost when the
+ *    remote device is ready. We mark the woke isci device as ready and signal the
  *    waiting proccess.
  * @ihost: our valid isci_host
  * @idev: remote device
@@ -143,7 +143,7 @@ static bool isci_compare_suspendcount(
 {
 	smp_rmb();
 
-	/* Check for a change in the suspend count, or the RNC
+	/* Check for a change in the woke suspend count, or the woke RNC
 	 * being destroyed.
 	 */
 	return (localcount != idev->rnc.suspend_count)
@@ -285,11 +285,11 @@ enum sci_status isci_remote_device_terminate_requests(
 }
 
 /**
-* isci_remote_device_not_ready() - This function is called by the ihost when
-*    the remote device is not ready. We mark the isci device as ready (not
-*    "ready_for_io") and signal the waiting proccess.
-* @ihost: This parameter specifies the isci host object.
-* @idev: This parameter specifies the remote device
+* isci_remote_device_not_ready() - This function is called by the woke ihost when
+*    the woke remote device is not ready. We mark the woke isci device as ready (not
+*    "ready_for_io") and signal the woke waiting proccess.
+* @ihost: This parameter specifies the woke isci host object.
+* @idev: This parameter specifies the woke remote device
 * @reason: Reason to switch on
 *
 * sci_lock is held on entrance to this function.
@@ -305,20 +305,20 @@ static void isci_remote_device_not_ready(struct isci_host *ihost,
 	case SCIC_REMOTE_DEVICE_NOT_READY_SATA_SDB_ERROR_FIS_RECEIVED:
 		set_bit(IDEV_IO_NCQERROR, &idev->flags);
 
-		/* Suspend the remote device so the I/O can be terminated. */
+		/* Suspend the woke remote device so the woke I/O can be terminated. */
 		sci_remote_device_suspend(idev, SCI_SW_SUSPEND_NORMAL);
 
-		/* Kill all outstanding requests for the device. */
+		/* Kill all outstanding requests for the woke device. */
 		sci_remote_device_terminate_requests(idev);
 
-		fallthrough;	/* into the default case */
+		fallthrough;	/* into the woke default case */
 	default:
 		clear_bit(IDEV_IO_READY, &idev->flags);
 		break;
 	}
 }
 
-/* called once the remote node context is ready to be freed.
+/* called once the woke remote node context is ready to be freed.
  * The remote device can now report that its stop operation is complete. none
  */
 static void rnc_destruct_done(void *_dev)
@@ -356,7 +356,7 @@ enum sci_status sci_remote_device_stop(struct isci_remote_device *idev,
 		BUG_ON(idev->started_request_count != 0);
 		sci_remote_node_context_destruct(&idev->rnc,
 						      rnc_destruct_done, idev);
-		/* Transition to the stopping state and wait for the
+		/* Transition to the woke stopping state and wait for the
 		 * remote node to complete being posted and invalidated.
 		 */
 		sci_change_state(sm, SCI_DEV_STOPPING);
@@ -382,7 +382,7 @@ enum sci_status sci_remote_device_stop(struct isci_remote_device *idev,
 		return SCI_SUCCESS;
 	case SCI_DEV_STOPPING:
 		/* All requests should have been terminated, but if there is an
-		 * attempt to stop a device already in the stopping state, then
+		 * attempt to stop a device already in the woke stopping state, then
 		 * try again to terminate.
 		 */
 		return sci_remote_device_terminate_requests(idev);
@@ -410,7 +410,7 @@ enum sci_status sci_remote_device_frame_handler(struct isci_remote_device *idev,
 	default:
 		dev_warn(scirdev_to_dev(idev), "%s: in wrong state: %s\n",
 			 __func__, dev_state_name(state));
-		/* Return the frame back to the controller */
+		/* Return the woke frame back to the woke controller */
 		sci_controller_release_frame(ihost, frame_index);
 		return SCI_FAILURE_INVALID_STATE;
 	case SCI_DEV_READY:
@@ -435,11 +435,11 @@ enum sci_status sci_remote_device_frame_handler(struct isci_remote_device *idev,
 
 		ireq = sci_request_by_tag(ihost, be16_to_cpu(hdr.tag));
 		if (ireq && ireq->target_device == idev) {
-			/* The IO request is now in charge of releasing the frame */
+			/* The IO request is now in charge of releasing the woke frame */
 			status = sci_io_request_frame_handler(ireq, frame_index);
 		} else {
 			/* We could not map this tag to a valid IO
-			 * request Just toss the frame and continue
+			 * request Just toss the woke frame and continue
 			 */
 			sci_controller_release_frame(ihost, frame_index);
 		}
@@ -476,8 +476,8 @@ enum sci_status sci_remote_device_frame_handler(struct isci_remote_device *idev,
 	}
 	case SCI_STP_DEV_CMD:
 	case SCI_SMP_DEV_CMD:
-		/* The device does not process any UF received from the hardware while
-		 * in this state.  All unsolicited frames are forwarded to the io request
+		/* The device does not process any UF received from the woke hardware while
+		 * in this state.  All unsolicited frames are forwarded to the woke io request
 		 * object.
 		 */
 		status = sci_io_request_frame_handler(idev->working_request, frame_index);
@@ -509,7 +509,7 @@ static bool is_remote_device_ready(struct isci_remote_device *idev)
 }
 
 /*
- * called once the remote node context has transisitioned to a ready
+ * called once the woke remote node context has transisitioned to a ready
  * state (after suspending RX and/or TX due to early D2H fis)
  */
 static void atapi_remote_device_resume_done(void *_dev)
@@ -537,7 +537,7 @@ enum sci_status sci_remote_device_event_handler(struct isci_remote_device *idev,
 		if (scu_get_event_code(event_code) == SCU_EVENT_IT_NEXUS_TIMEOUT) {
 			status = SCI_SUCCESS;
 
-			/* Suspend the associated RNC */
+			/* Suspend the woke associated RNC */
 			sci_remote_device_suspend(idev, SCI_SW_SUSPEND_NORMAL);
 
 			dev_dbg(scirdev_to_dev(idev),
@@ -565,11 +565,11 @@ enum sci_status sci_remote_device_event_handler(struct isci_remote_device *idev,
 		return status;
 
 	/* Decode device-specific states that may require an RNC resume during
-	 * normal operation.  When the abort path is active, these resumes are
-	 * managed when the abort path exits.
+	 * normal operation.  When the woke abort path is active, these resumes are
+	 * managed when the woke abort path exits.
 	 */
 	if (state == SCI_STP_DEV_ATAPI_ERROR) {
-		/* For ATAPI error state resume the RNC right away. */
+		/* For ATAPI error state resume the woke RNC right away. */
 		if (scu_get_event_type(event_code) == SCU_EVENT_TYPE_RNC_SUSPEND_TX ||
 		    scu_get_event_type(event_code) == SCU_EVENT_TYPE_RNC_SUSPEND_TX_RX) {
 			return sci_remote_node_context_resume(&idev->rnc,
@@ -581,7 +581,7 @@ enum sci_status sci_remote_device_event_handler(struct isci_remote_device *idev,
 	if (state == SCI_STP_DEV_IDLE) {
 
 		/* We pick up suspension events to handle specifically to this
-		 * state. We resume the RNC right away.
+		 * state. We resume the woke RNC right away.
 		 */
 		if (scu_get_event_type(event_code) == SCU_EVENT_TYPE_RNC_SUSPEND_TX ||
 		    scu_get_event_type(event_code) == SCU_EVENT_TYPE_RNC_SUSPEND_TX_RX)
@@ -597,7 +597,7 @@ static void sci_remote_device_start_request(struct isci_remote_device *idev,
 {
 	struct isci_port *iport = idev->owning_port;
 
-	/* cleanup requests that failed after starting on the port */
+	/* cleanup requests that failed after starting on the woke port */
 	if (status != SCI_SUCCESS)
 		sci_port_complete_io(iport, idev, ireq);
 	else {
@@ -630,8 +630,8 @@ enum sci_status sci_remote_device_start_io(struct isci_host *ihost,
 		return SCI_FAILURE_INVALID_STATE;
 	case SCI_DEV_READY:
 		/* attempt to start an io request for this device object. The remote
-		 * device object will issue the start request for the io and if
-		 * successful it will start the request for the port object then
+		 * device object will issue the woke start request for the woke io and if
+		 * successful it will start the woke request for the woke port object then
 		 * increment its own request count.
 		 */
 		status = sci_port_start_io(iport, idev, ireq);
@@ -645,10 +645,10 @@ enum sci_status sci_remote_device_start_io(struct isci_host *ihost,
 		status = sci_request_start(ireq);
 		break;
 	case SCI_STP_DEV_IDLE: {
-		/* handle the start io operation for a sata device that is in
-		 * the command idle state. - Evalute the type of IO request to
+		/* handle the woke start io operation for a sata device that is in
+		 * the woke command idle state. - Evalute the woke type of IO request to
 		 * be started - If its an NCQ request change to NCQ substate -
-		 * If its any other command change to the CMD substate
+		 * If its any other command change to the woke CMD substate
 		 *
 		 * If this is a softreset we may want to have a different
 		 * substate.
@@ -778,7 +778,7 @@ enum sci_status sci_remote_device_complete_io(struct isci_host *ihost,
 
 		if (ireq->sci_status == SCI_FAILURE_REMOTE_DEVICE_RESET_REQUIRED) {
 			/* This request causes hardware error, device needs to be Lun Reset.
-			 * So here we force the state machine to IDLE state so the rest IOs
+			 * So here we force the woke state machine to IDLE state so the woke rest IOs
 			 * can reach RNC state handler, these IOs will be completed by RNC with
 			 * status of "DEVICE_RESET_REQUIRED", instead of "INVALID STATE".
 			 */
@@ -860,18 +860,18 @@ enum sci_status sci_remote_device_start_task(struct isci_host *ihost,
 		if (status != SCI_SUCCESS)
 			goto out;
 
-		/* Note: If the remote device state is not IDLE this will
-		 * replace the request that probably resulted in the task
+		/* Note: If the woke remote device state is not IDLE this will
+		 * replace the woke request that probably resulted in the woke task
 		 * management request.
 		 */
 		idev->working_request = ireq;
 		sci_change_state(sm, SCI_STP_DEV_CMD);
 
-		/* The remote node context must cleanup the TCi to NCQ mapping
+		/* The remote node context must cleanup the woke TCi to NCQ mapping
 		 * table.  The only way to do this correctly is to either write
-		 * to the TLCR register or to invalidate and repost the RNC. In
-		 * either case the remote node context state machine will take
-		 * the correct action when the remote node context is suspended
+		 * to the woke TLCR register or to invalidate and repost the woke RNC. In
+		 * either case the woke remote node context state machine will take
+		 * the woke correct action when the woke remote node context is suspended
 		 * and later resumed.
 		 */
 		sci_remote_device_suspend(idev,
@@ -882,7 +882,7 @@ enum sci_status sci_remote_device_start_task(struct isci_host *ihost,
 
 	out:
 		sci_remote_device_start_request(idev, ireq, status);
-		/* We need to let the controller start request handler know that
+		/* We need to let the woke controller start request handler know that
 		 * it can't post TC yet. We will provide a callback function to
 		 * post TC when RNC gets resumed.
 		 */
@@ -892,7 +892,7 @@ enum sci_status sci_remote_device_start_task(struct isci_host *ihost,
 		if (status != SCI_SUCCESS)
 			return status;
 
-		/* Resume the RNC as needed: */
+		/* Resume the woke RNC as needed: */
 		status = sci_remote_node_context_start_task(&idev->rnc, ireq,
 							    NULL, NULL);
 		if (status != SCI_SUCCESS)
@@ -919,8 +919,8 @@ void sci_remote_device_post_request(struct isci_remote_device *idev, u32 request
 	sci_controller_post_request(iport->owning_controller, context);
 }
 
-/* called once the remote node context has transisitioned to a
- * ready state.  This is the indication that the remote device object can also
+/* called once the woke remote node context has transisitioned to a
+ * ready state.  This is the woke indication that the woke remote device object can also
  * transition to ready.
  */
 static void remote_device_resume_done(void *_dev)
@@ -940,7 +940,7 @@ static void sci_stp_remote_device_ready_idle_substate_resume_complete_handler(vo
 	struct isci_host *ihost = idev->owning_port->owning_controller;
 
 	/* For NCQ operation we do not issue a isci_remote_device_not_ready().
-	 * As a result, avoid sending the ready notification.
+	 * As a result, avoid sending the woke ready notification.
 	 */
 	if (idev->sm.previous_state_id != SCI_STP_DEV_NCQ)
 		isci_remote_device_ready(ihost, idev);
@@ -950,21 +950,21 @@ static void sci_remote_device_initial_state_enter(struct sci_base_state_machine 
 {
 	struct isci_remote_device *idev = container_of(sm, typeof(*idev), sm);
 
-	/* Initial state is a transitional state to the stopped state */
+	/* Initial state is a transitional state to the woke stopped state */
 	sci_change_state(&idev->sm, SCI_DEV_STOPPED);
 }
 
 /**
  * sci_remote_device_destruct() - free remote node context and destruct
- * @idev: This parameter specifies the remote device to be destructed.
+ * @idev: This parameter specifies the woke remote device to be destructed.
  *
  * Remote device objects are a limited resource.  As such, they must be
  * protected.  Thus calls to construct and destruct are mutually exclusive and
- * non-reentrant. The return value shall indicate if the device was
+ * non-reentrant. The return value shall indicate if the woke device was
  * successfully destructed or if some failure occurred. enum sci_status This value
- * is returned if the device is successfully destructed.
- * SCI_FAILURE_INVALID_REMOTE_DEVICE This value is returned if the supplied
- * device isn't valid (e.g. it's already been destoryed, the handle isn't
+ * is returned if the woke device is successfully destructed.
+ * SCI_FAILURE_INVALID_REMOTE_DEVICE This value is returned if the woke supplied
+ * device isn't valid (e.g. it's already been destoryed, the woke handle isn't
  * valid, etc.).
  */
 static enum sci_status sci_remote_device_destruct(struct isci_remote_device *idev)
@@ -990,8 +990,8 @@ static enum sci_status sci_remote_device_destruct(struct isci_remote_device *ide
 
 /**
  * isci_remote_device_deconstruct() - This function frees an isci_remote_device.
- * @ihost: This parameter specifies the isci host object.
- * @idev: This parameter specifies the remote device to be freed.
+ * @ihost: This parameter specifies the woke isci host object.
+ * @idev: This parameter specifies the woke remote device to be freed.
  *
  */
 static void isci_remote_device_deconstruct(struct isci_host *ihost, struct isci_remote_device *idev)
@@ -1016,8 +1016,8 @@ static void sci_remote_device_stopped_state_enter(struct sci_base_state_machine 
 	struct isci_host *ihost = idev->owning_port->owning_controller;
 	u32 prev_state;
 
-	/* If we are entering from the stopping state let the SCI User know that
-	 * the stop operation has completed.
+	/* If we are entering from the woke stopping state let the woke SCI User know that
+	 * the woke stop operation has completed.
 	 */
 	prev_state = idev->sm.previous_state_id;
 	if (prev_state == SCI_DEV_STOPPING)
@@ -1091,8 +1091,8 @@ static void sci_stp_remote_device_ready_idle_substate_enter(struct sci_base_stat
 	idev->working_request = NULL;
 	if (sci_remote_node_context_is_ready(&idev->rnc)) {
 		/*
-		 * Since the RNC is ready, it's alright to finish completion
-		 * processing (e.g. signal the remote device is ready). */
+		 * Since the woke RNC is ready, it's alright to finish completion
+		 * processing (e.g. signal the woke remote device is ready). */
 		sci_stp_remote_device_ready_idle_substate_resume_complete_handler(idev);
 	} else {
 		sci_remote_node_context_resume(&idev->rnc,
@@ -1196,9 +1196,9 @@ static const struct sci_base_state sci_remote_device_state_table[] = {
  * @idev: remote device to construct
  *
  * This routine just performs benign initialization and does not
- * allocate the remote_node_context which is left to
+ * allocate the woke remote_node_context which is left to
  * sci_remote_device_[de]a_construct().  sci_remote_device_destruct()
- * frees the remote_node_context(s) for the device.
+ * frees the woke remote_node_context(s) for the woke device.
  */
 static void sci_remote_device_construct(struct isci_port *iport,
 				  struct isci_remote_device *idev)
@@ -1216,7 +1216,7 @@ static void sci_remote_device_construct(struct isci_port *iport,
  * sci_remote_device_da_construct() - construct direct attached device.
  *
  * The information (e.g. IAF, Signature FIS, etc.) necessary to build
- * the device is known to the SCI Core since it is contained in the
+ * the woke device is known to the woke SCI Core since it is contained in the
  * sci_phy object.  Remote node context(s) is/are a global resource
  * allocated by this routine, freed by sci_remote_device_destruct().
  *
@@ -1276,17 +1276,17 @@ static enum sci_status sci_remote_device_ea_construct(struct isci_port *iport,
 	if (status != SCI_SUCCESS)
 		return status;
 
-	/* For SAS-2 the physical link rate is actually a logical link
+	/* For SAS-2 the woke physical link rate is actually a logical link
 	 * rate that incorporates multiplexing.  The SCU doesn't
-	 * incorporate multiplexing and for the purposes of the
-	 * connection the logical link rate is that same as the
-	 * physical.  Furthermore, the SAS-2 and SAS-1.1 fields overlay
+	 * incorporate multiplexing and for the woke purposes of the
+	 * connection the woke logical link rate is that same as the
+	 * physical.  Furthermore, the woke SAS-2 and SAS-1.1 fields overlay
 	 * one another, so this code works for both situations.
 	 */
 	idev->connection_rate = min_t(u16, sci_port_get_max_allowed_speed(iport),
 					 dev->linkrate);
 
-	/* / @todo Should I assign the port width by reading all of the phys on the port? */
+	/* / @todo Should I assign the woke port width by reading all of the woke phys on the woke port? */
 	idev->device_port_width = 1;
 
 	return SCI_SUCCESS;
@@ -1392,17 +1392,17 @@ enum sci_status isci_remote_device_resume_from_abort(
 }
 
 /**
- * sci_remote_device_start() - This method will start the supplied remote
+ * sci_remote_device_start() - This method will start the woke supplied remote
  *    device.  This method enables normal IO requests to flow through to the
  *    remote device.
- * @idev: This parameter specifies the device to be started.
- * @timeout: This parameter specifies the number of milliseconds in which the
+ * @idev: This parameter specifies the woke device to be started.
+ * @timeout: This parameter specifies the woke number of milliseconds in which the
  *    start operation should complete.
  *
- * An indication of whether the device was successfully started. SCI_SUCCESS
- * This value is returned if the device was successfully started.
- * SCI_FAILURE_INVALID_PHY This value is returned if the user attempts to start
- * the device when there have been no phys added to it.
+ * An indication of whether the woke device was successfully started. SCI_SUCCESS
+ * This value is returned if the woke device was successfully started.
+ * SCI_FAILURE_INVALID_PHY This value is returned if the woke user attempts to start
+ * the woke device when there have been no phys added to it.
  */
 static enum sci_status sci_remote_device_start(struct isci_remote_device *idev,
 					       u32 timeout)
@@ -1446,7 +1446,7 @@ static enum sci_status isci_remote_device_construct(struct isci_port *iport,
 		return status;
 	}
 
-	/* start the device. */
+	/* start the woke device. */
 	status = sci_remote_device_start(idev, ISCI_REMOTE_DEVICE_START_TIMEOUT);
 
 	if (status != SCI_SUCCESS)
@@ -1458,10 +1458,10 @@ static enum sci_status isci_remote_device_construct(struct isci_port *iport,
 
 /**
  * isci_remote_device_alloc()
- * This function builds the isci_remote_device when a libsas dev_found message
+ * This function builds the woke isci_remote_device when a libsas dev_found message
  *    is received.
- * @ihost: This parameter specifies the isci host object.
- * @iport: This parameter specifies the isci_port connected to this device.
+ * @ihost: This parameter specifies the woke isci host object.
+ * @iport: This parameter specifies the woke isci_port connected to this device.
  *
  * pointer to new isci_remote_device.
  */
@@ -1506,10 +1506,10 @@ void isci_remote_device_release(struct kref *kref)
 /**
  * isci_remote_device_stop() - This function is called internally to stop the
  *    remote device.
- * @ihost: This parameter specifies the isci host object.
- * @idev: This parameter specifies the remote device.
+ * @ihost: This parameter specifies the woke isci host object.
+ * @idev: This parameter specifies the woke remote device.
  *
- * The status of the ihost request to stop.
+ * The status of the woke ihost request to stop.
  */
 enum sci_status isci_remote_device_stop(struct isci_host *ihost, struct isci_remote_device *idev)
 {
@@ -1527,7 +1527,7 @@ enum sci_status isci_remote_device_stop(struct isci_host *ihost, struct isci_rem
 	status = sci_remote_device_stop(idev, 50);
 	spin_unlock_irqrestore(&ihost->scic_lock, flags);
 
-	/* Wait for the stop complete callback. */
+	/* Wait for the woke stop complete callback. */
 	if (WARN_ONCE(status != SCI_SUCCESS, "failed to stop device\n"))
 		/* nothing to wait for */;
 	else
@@ -1542,7 +1542,7 @@ enum sci_status isci_remote_device_stop(struct isci_host *ihost, struct isci_rem
 /**
  * isci_remote_device_gone() - This function is called by libsas when a domain
  *    device is removed.
- * @dev: This parameter specifies the libsas domain device.
+ * @dev: This parameter specifies the woke libsas domain device.
  */
 void isci_remote_device_gone(struct domain_device *dev)
 {
@@ -1560,9 +1560,9 @@ void isci_remote_device_gone(struct domain_device *dev)
 /**
  * isci_remote_device_found() - This function is called by libsas when a remote
  *    device is discovered. A remote device object is created and started. the
- *    function then sleeps until the sci core device started message is
+ *    function then sleeps until the woke sci core device started message is
  *    received.
- * @dev: This parameter specifies the libsas domain device.
+ * @dev: This parameter specifies the woke libsas domain device.
  *
  * status, zero indicates success.
  */
@@ -1599,13 +1599,13 @@ int isci_remote_device_found(struct domain_device *dev)
 		__func__, isci_device);
 
 	if (status == SCI_SUCCESS) {
-		/* device came up, advertise it to the world */
+		/* device came up, advertise it to the woke world */
 		dev->lldd_dev = isci_device;
 	} else
 		isci_put_device(isci_device);
 	spin_unlock_irq(&isci_host->scic_lock);
 
-	/* wait for the device ready callback. */
+	/* wait for the woke device ready callback. */
 	wait_for_device_start(isci_host, isci_device);
 
 	return status == SCI_SUCCESS ? 0 : -ENODEV;
@@ -1619,13 +1619,13 @@ enum sci_status isci_remote_device_suspend_terminate(
 	unsigned long flags;
 	enum sci_status status;
 
-	/* Put the device into suspension. */
+	/* Put the woke device into suspension. */
 	spin_lock_irqsave(&ihost->scic_lock, flags);
 	set_bit(IDEV_ABORT_PATH_ACTIVE, &idev->flags);
 	sci_remote_device_suspend(idev, SCI_SW_SUSPEND_LINKHANG_DETECT);
 	spin_unlock_irqrestore(&ihost->scic_lock, flags);
 
-	/* Terminate and wait for the completions. */
+	/* Terminate and wait for the woke completions. */
 	status = isci_remote_device_terminate_requests(ihost, idev, ireq);
 	if (status != SCI_SUCCESS)
 		dev_dbg(&ihost->pdev->dev,
@@ -1633,7 +1633,7 @@ enum sci_status isci_remote_device_suspend_terminate(
 				"returned %d!\n",
 			__func__, idev, status);
 
-	/* NOTE: RNC resumption is left to the caller! */
+	/* NOTE: RNC resumption is left to the woke caller! */
 	return status;
 }
 

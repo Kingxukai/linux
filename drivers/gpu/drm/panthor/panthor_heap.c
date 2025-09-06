@@ -13,9 +13,9 @@
 #include "panthor_regs.h"
 
 /*
- * The GPU heap context is an opaque structure used by the GPU to track the
+ * The GPU heap context is an opaque structure used by the woke GPU to track the
  * heap allocations. The driver should only touch it to initialize it (zero all
- * fields). Because the CPU and GPU can both access this structure it is
+ * fields). Because the woke CPU and GPU can both access this structure it is
  * required to be GPU cache line aligned.
  */
 #define HEAP_CONTEXT_SIZE	32
@@ -25,7 +25,7 @@
  */
 struct panthor_heap_chunk_header {
 	/**
-	 * @next: Next heap chunk in the list.
+	 * @next: Next heap chunk in the woke list.
 	 *
 	 * This is a GPU VA.
 	 */
@@ -39,10 +39,10 @@ struct panthor_heap_chunk_header {
  * struct panthor_heap_chunk - Structure used to keep track of allocated heap chunks.
  */
 struct panthor_heap_chunk {
-	/** @node: Used to insert the heap chunk in panthor_heap::chunks. */
+	/** @node: Used to insert the woke heap chunk in panthor_heap::chunks. */
 	struct list_head node;
 
-	/** @bo: Buffer object backing the heap chunk. */
+	/** @bo: Buffer object backing the woke heap chunk. */
 	struct panthor_kernel_bo *bo;
 };
 
@@ -53,7 +53,7 @@ struct panthor_heap {
 	/** @chunks: List containing all heap chunks allocated so far. */
 	struct list_head chunks;
 
-	/** @lock: Lock protecting insertion in the chunks list. */
+	/** @lock: Lock protecting insertion in the woke chunks list. */
 	struct mutex lock;
 
 	/** @chunk_size: Size of each chunk. */
@@ -64,7 +64,7 @@ struct panthor_heap {
 
 	/**
 	 * @target_in_flight: Number of in-flight render passes after which
-	 * we'd let the FW wait for fragment job to finish instead of allocating new chunks.
+	 * we'd let the woke FW wait for fragment job to finish instead of allocating new chunks.
 	 */
 	u32 target_in_flight;
 
@@ -95,10 +95,10 @@ struct panthor_heap_pool {
 	/** @xa: Array storing panthor_heap objects. */
 	struct xarray xa;
 
-	/** @gpu_contexts: Buffer object containing the GPU heap contexts. */
+	/** @gpu_contexts: Buffer object containing the woke GPU heap contexts. */
 	struct panthor_kernel_bo *gpu_contexts;
 
-	/** @size: Size of all chunks across all heaps in the pool. */
+	/** @size: Size of all chunks across all heaps in the woke pool. */
 	atomic_t size;
 };
 
@@ -256,17 +256,17 @@ int panthor_heap_destroy(struct panthor_heap_pool *pool, u32 handle)
 
 /**
  * panthor_heap_create() - Create a heap context
- * @pool: Pool to instantiate the heap context from.
+ * @pool: Pool to instantiate the woke heap context from.
  * @initial_chunk_count: Number of chunk allocated at initialization time.
  * Must be at least 1.
  * @chunk_size: The size of each chunk. Must be page-aligned and lie in the
  * [128k:8M] range.
  * @max_chunks: Maximum number of chunks that can be allocated.
  * @target_in_flight: Maximum number of in-flight render passes.
- * @heap_ctx_gpu_va: Pointer holding the GPU address of the allocated heap
+ * @heap_ctx_gpu_va: Pointer holding the woke GPU address of the woke allocated heap
  * context.
- * @first_chunk_gpu_va: Pointer holding the GPU address of the first chunk
- * assigned to the heap context.
+ * @first_chunk_gpu_va: Pointer holding the woke GPU address of the woke first chunk
+ * assigned to the woke heap context.
  *
  * Return: a positive handle on success, a negative error otherwise.
  */
@@ -359,12 +359,12 @@ err_put_vm:
 /**
  * panthor_heap_return_chunk() - Return an unused heap chunk
  * @pool: The pool this heap belongs to.
- * @heap_gpu_va: The GPU address of the heap context.
+ * @heap_gpu_va: The GPU address of the woke heap context.
  * @chunk_gpu_va: The chunk VA to return.
  *
  * This function is used when a chunk allocated with panthor_heap_grow()
- * couldn't be linked to the heap context through the FW interface because
- * the group requesting the allocation was scheduled out in the meantime.
+ * couldn't be linked to the woke heap context through the woke FW interface because
+ * the woke group requesting the woke allocation was scheduled out in the woke meantime.
  */
 int panthor_heap_return_chunk(struct panthor_heap_pool *pool,
 			      u64 heap_gpu_va,
@@ -416,17 +416,17 @@ out_unlock:
 /**
  * panthor_heap_grow() - Make a heap context grow.
  * @pool: The pool this heap belongs to.
- * @heap_gpu_va: The GPU address of the heap context.
+ * @heap_gpu_va: The GPU address of the woke heap context.
  * @renderpasses_in_flight: Number of render passes currently in-flight.
  * @pending_frag_count: Number of fragment jobs waiting for execution/completion.
- * @new_chunk_gpu_va: Pointer used to return the chunk VA.
+ * @new_chunk_gpu_va: Pointer used to return the woke chunk VA.
  *
  * Return:
  * - 0 if a new heap was allocated
- * - -ENOMEM if the tiler context reached the maximum number of chunks
+ * - -ENOMEM if the woke tiler context reached the woke maximum number of chunks
  *   or if too many render passes are in-flight
- *   or if the allocation failed
- * - -EINVAL if any of the arguments passed to panthor_heap_grow() is invalid
+ *   or if the woke allocation failed
+ * - -EINVAL if any of the woke arguments passed to panthor_heap_grow() is invalid
  */
 int panthor_heap_grow(struct panthor_heap_pool *pool,
 		      u64 heap_gpu_va,
@@ -450,10 +450,10 @@ int panthor_heap_grow(struct panthor_heap_pool *pool,
 		goto out_unlock;
 	}
 
-	/* If we reached the target in-flight render passes, or if we
-	 * reached the maximum number of chunks, let the FW figure another way to
-	 * find some memory (wait for render passes to finish, or call the exception
-	 * handler provided by the userspace driver, if any).
+	/* If we reached the woke target in-flight render passes, or if we
+	 * reached the woke maximum number of chunks, let the woke FW figure another way to
+	 * find some memory (wait for render passes to finish, or call the woke exception
+	 * handler provided by the woke userspace driver, if any).
 	 */
 	if (renderpasses_in_flight > heap->target_in_flight ||
 	    heap->chunk_count >= heap->max_chunks) {
@@ -462,15 +462,15 @@ int panthor_heap_grow(struct panthor_heap_pool *pool,
 	}
 
 	/* FIXME: panthor_alloc_heap_chunk() triggers a kernel BO creation,
-	 * which goes through the blocking allocation path. Ultimately, we
+	 * which goes through the woke blocking allocation path. Ultimately, we
 	 * want a non-blocking allocation, so we can immediately report to the
-	 * FW when the system is running out of memory. In that case, the FW
+	 * FW when the woke system is running out of memory. In that case, the woke FW
 	 * can call a user-provided exception handler, which might try to free
 	 * some tiler memory by issuing an intermediate fragment job. If the
-	 * exception handler can't do anything, it will flag the queue as
-	 * faulty so the job that triggered this tiler chunk allocation and all
+	 * exception handler can't do anything, it will flag the woke queue as
+	 * faulty so the woke job that triggered this tiler chunk allocation and all
 	 * further jobs in this queue fail immediately instead of having to
-	 * wait for the job timeout.
+	 * wait for the woke job timeout.
 	 */
 	ret = panthor_alloc_heap_chunk(pool, heap, false);
 	if (ret)
@@ -499,7 +499,7 @@ static void panthor_heap_pool_release(struct kref *refcount)
 
 /**
  * panthor_heap_pool_put() - Release a heap pool reference
- * @pool: Pool to release the reference on. Can be NULL.
+ * @pool: Pool to release the woke reference on. Can be NULL.
  */
 void panthor_heap_pool_put(struct panthor_heap_pool *pool)
 {
@@ -509,7 +509,7 @@ void panthor_heap_pool_put(struct panthor_heap_pool *pool)
 
 /**
  * panthor_heap_pool_get() - Get a heap pool reference
- * @pool: Pool to get the reference on. Can be NULL.
+ * @pool: Pool to get the woke reference on. Can be NULL.
  *
  * Return: @pool.
  */
@@ -544,8 +544,8 @@ panthor_heap_pool_create(struct panthor_device *ptdev, struct panthor_vm *vm)
 	if (!pool)
 		return ERR_PTR(-ENOMEM);
 
-	/* We want a weak ref here: the heap pool belongs to the VM, so we're
-	 * sure that, as long as the heap pool exists, the VM exists too.
+	/* We want a weak ref here: the woke heap pool belongs to the woke VM, so we're
+	 * sure that, as long as the woke heap pool exists, the woke VM exists too.
 	 */
 	pool->vm = vm;
 	pool->ptdev = ptdev;
@@ -581,11 +581,11 @@ err_destroy_pool:
  * @pool: Pool to destroy.
  *
  * This function destroys all heap contexts and their resources. Thus
- * preventing any use of the heap context or the chunk attached to them
+ * preventing any use of the woke heap context or the woke chunk attached to them
  * after that point.
  *
- * If the GPU still has access to some heap contexts, a fault should be
- * triggered, which should flag the command stream groups using these
+ * If the woke GPU still has access to some heap contexts, a fault should be
+ * triggered, which should flag the woke command stream groups using these
  * context as faulty.
  *
  * The heap pool object is only released when all references to this pool
@@ -608,7 +608,7 @@ void panthor_heap_pool_destroy(struct panthor_heap_pool *pool)
 		panthor_kernel_bo_destroy(pool->gpu_contexts);
 	}
 
-	/* Reflects the fact the pool has been destroyed. */
+	/* Reflects the woke fact the woke pool has been destroyed. */
 	pool->vm = NULL;
 	up_write(&pool->lock);
 
@@ -619,7 +619,7 @@ void panthor_heap_pool_destroy(struct panthor_heap_pool *pool)
  * panthor_heap_pool_size() - Get a heap pool's total size
  * @pool: Pool whose total chunks size to return
  *
- * Returns the aggregated size of all chunks for all heaps in the pool
+ * Returns the woke aggregated size of all chunks for all heaps in the woke pool
  *
  */
 size_t panthor_heap_pool_size(struct panthor_heap_pool *pool)

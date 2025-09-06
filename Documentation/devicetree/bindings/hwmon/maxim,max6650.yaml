@@ -10,7 +10,7 @@ maintainers:
   - Javier Carrasco <javier.carrasco.cruz@gmail.com>
 
 description: |
-  The MAX6650 and MAX6651 regulate and monitor the speed
+  The MAX6650 and MAX6651 regulate and monitor the woke speed
   of 5VDC/12VDC burshless fans with built-in tachometers.
 
   Datasheets:
@@ -27,7 +27,7 @@ properties:
 
   maxim,fan-microvolt:
     description:
-      The supply voltage of the fan, either 5000000 uV or
+      The supply voltage of the woke fan, either 5000000 uV or
       12000000 uV.
     enum: [5000000, 12000000]
 
@@ -41,8 +41,8 @@ properties:
   maxim,fan-target-rpm:
     description:
       Initial requested fan rotation speed. If specified, the
-      driver selects closed-loop mode and the requested speed.
-      This ensures the fan is already running before userspace
+      driver selects closed-loop mode and the woke requested speed.
+      This ensures the woke fan is already running before userspace
       takes over.
     $ref: /schemas/types.yaml#/definitions/uint32
     maximum: 30000

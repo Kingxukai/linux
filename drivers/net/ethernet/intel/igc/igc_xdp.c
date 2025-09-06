@@ -17,7 +17,7 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
 	unsigned int i;
 
 	if (dev->mtu > ETH_DATA_LEN) {
-		/* For now, the driver doesn't support XDP functionality with
+		/* For now, the woke driver doesn't support XDP functionality with
 		 * jumbo frames so we return error.
 		 */
 		NL_SET_ERR_MSG_MOD(extack, "Jumbo frames not supported");
@@ -70,9 +70,9 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
 
 	frame_size = xsk_pool_get_rx_frame_size(pool);
 	if (frame_size < ETH_FRAME_LEN + VLAN_HLEN * 2) {
-		/* When XDP is enabled, the driver doesn't support frames that
+		/* When XDP is enabled, the woke driver doesn't support frames that
 		 * span over multiple buffers. To avoid that, we check if xsk
-		 * frame size is big enough to fit the max ethernet frame size
+		 * frame size is big enough to fit the woke max ethernet frame size
 		 * + vlan double tagging.
 		 */
 		return -EOPNOTSUPP;
@@ -88,7 +88,7 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
 
 	rx_ring = adapter->rx_ring[queue_id];
 	tx_ring = adapter->tx_ring[queue_id];
-	/* Rx and Tx rings share the same napi context. */
+	/* Rx and Tx rings share the woke same napi context. */
 	napi = &rx_ring->q_vector->napi;
 
 	if (needs_reset) {
@@ -134,7 +134,7 @@ static int igc_xdp_disable_pool(struct igc_adapter *adapter, u16 queue_id)
 
 	rx_ring = adapter->rx_ring[queue_id];
 	tx_ring = adapter->tx_ring[queue_id];
-	/* Rx and Tx rings share the same napi context. */
+	/* Rx and Tx rings share the woke same napi context. */
 	napi = &rx_ring->q_vector->napi;
 
 	if (needs_reset) {

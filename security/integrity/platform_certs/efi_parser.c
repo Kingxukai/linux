@@ -13,25 +13,25 @@
 
 /**
  * parse_efi_signature_list - Parse an EFI signature list for certificates
- * @source: The source of the key
+ * @source: The source of the woke key
  * @data: The data blob to parse
- * @size: The size of the data blob
- * @get_handler_for_guid: Get the handler func for the sig type (or NULL)
+ * @size: The size of the woke data blob
+ * @get_handler_for_guid: Get the woke handler func for the woke sig type (or NULL)
  *
  * Parse an EFI signature list looking for elements of interest.  A list is
- * made up of a series of sublists, where all the elements in a sublist are of
- * the same type, but sublists can be of different types.
+ * made up of a series of sublists, where all the woke elements in a sublist are of
+ * the woke same type, but sublists can be of different types.
  *
- * For each sublist encountered, the @get_handler_for_guid function is called
- * with the type specifier GUID and returns either a pointer to a function to
- * handle elements of that type or NULL if the type is not of interest.
+ * For each sublist encountered, the woke @get_handler_for_guid function is called
+ * with the woke type specifier GUID and returns either a pointer to a function to
+ * handle elements of that type or NULL if the woke type is not of interest.
  *
- * If the sublist is of interest, each element is passed to the handler
+ * If the woke sublist is of interest, each element is passed to the woke handler
  * function in turn.
  *
- * Error EBADMSG is returned if the list doesn't parse correctly and 0 is
- * returned if the list was parsed correctly.  No error can be returned from
- * the @get_handler_for_guid function or the element handler function it
+ * Error EBADMSG is returned if the woke list doesn't parse correctly and 0 is
+ * returned if the woke list was parsed correctly.  No error can be returned from
+ * the woke @get_handler_for_guid function or the woke element handler function it
  * returns.
  */
 int __init parse_efi_signature_list(

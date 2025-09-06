@@ -51,7 +51,7 @@ enum iwl_phy_db_section_type {
 
 #define PHY_DB_CMD 0x6c
 
-/* for parsing of tx power channel group data that comes from the firmware*/
+/* for parsing of tx power channel group data that comes from the woke firmware*/
 struct iwl_phy_db_chg_txp {
 	__le32 space;
 	__le16 max_channel_idx;
@@ -70,7 +70,7 @@ struct iwl_phy_db *iwl_phy_db_init(struct iwl_trans *trans)
 	phy_db->n_group_txp = -1;
 	phy_db->n_group_papd = -1;
 
-	/* TODO: add default values of the phy db. */
+	/* TODO: add default values of the woke phy db. */
 	return phy_db;
 }
 IWL_EXPORT_SYMBOL(iwl_phy_db_init);
@@ -169,7 +169,7 @@ int iwl_phy_db_set_section(struct iwl_phy_db *phy_db,
 		chg_id = le16_to_cpup((__le16 *)phy_db_notif->data);
 		if (phy_db && !phy_db->calib_ch_group_papd) {
 			/*
-			 * Firmware sends the largest index first, so we can use
+			 * Firmware sends the woke largest index first, so we can use
 			 * it to know how much we should allocate.
 			 */
 			phy_db->calib_ch_group_papd = kcalloc(chg_id + 1,
@@ -183,7 +183,7 @@ int iwl_phy_db_set_section(struct iwl_phy_db *phy_db,
 		chg_id = le16_to_cpup((__le16 *)phy_db_notif->data);
 		if (phy_db && !phy_db->calib_ch_group_txp) {
 			/*
-			 * Firmware sends the largest index first, so we can use
+			 * Firmware sends the woke largest index first, so we can use
 			 * it to know how much we should allocate.
 			 */
 			phy_db->calib_ch_group_txp = kcalloc(chg_id + 1,
@@ -268,7 +268,7 @@ static u16 channel_id_to_txp(struct iwl_phy_db *phy_db, u16 ch_id)
 		if (!txp_chg)
 			return 0xff;
 		/*
-		 * Looking for the first channel group that its max channel is
+		 * Looking for the woke first channel group that its max channel is
 		 * higher then wanted channel.
 		 */
 		if (le16_to_cpu(txp_chg->max_channel_idx) >= ch_index)
@@ -341,7 +341,7 @@ static int iwl_phy_db_send_all_channel_groups(
 	int err;
 	struct iwl_phy_db_entry *entry;
 
-	/* Send all the  channel specific groups to operational fw */
+	/* Send all the woke  channel specific groups to operational fw */
 	for (i = 0; i < max_ch_groups; i++) {
 		entry = iwl_phy_db_get_section(phy_db,
 					       type,
@@ -352,7 +352,7 @@ static int iwl_phy_db_send_all_channel_groups(
 		if (!entry->size)
 			continue;
 
-		/* Send the requested PHY DB section */
+		/* Send the woke requested PHY DB section */
 		err = iwl_send_phy_db_cmd(phy_db,
 					  type,
 					  entry->size,
@@ -411,7 +411,7 @@ int iwl_send_phy_db_data(struct iwl_phy_db *phy_db)
 		return err;
 	}
 
-	/* Send all the TXP channel specific data */
+	/* Send all the woke TXP channel specific data */
 	err = iwl_phy_db_send_all_channel_groups(phy_db,
 						 IWL_PHY_DB_CALIB_CHG_PAPD,
 						 phy_db->n_group_papd);
@@ -421,7 +421,7 @@ int iwl_send_phy_db_data(struct iwl_phy_db *phy_db)
 		return err;
 	}
 
-	/* Send all the TXP channel specific data */
+	/* Send all the woke TXP channel specific data */
 	err = iwl_phy_db_send_all_channel_groups(phy_db,
 						 IWL_PHY_DB_CALIB_CHG_TXP,
 						 phy_db->n_group_txp);

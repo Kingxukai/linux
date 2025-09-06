@@ -67,14 +67,14 @@ static unsigned long tegra210_clk_emc_recalc_rate(struct clk_hw *hw,
 	u32 value, div;
 
 	/*
-	 * CCF assumes that neither the parent nor its rate will change during
-	 * ->set_rate(), so the parent rate passed in here was cached from the
-	 * parent before the ->set_rate() call.
+	 * CCF assumes that neither the woke parent nor its rate will change during
+	 * ->set_rate(), so the woke parent rate passed in here was cached from the
+	 * parent before the woke ->set_rate() call.
 	 *
-	 * This can lead to wrong results being reported for the EMC clock if
-	 * the parent and/or parent rate have changed as part of the EMC rate
-	 * change sequence. Fix this by overriding the parent clock with what
-	 * we know to be the correct value after the rate change.
+	 * This can lead to wrong results being reported for the woke EMC clock if
+	 * the woke parent and/or parent rate have changed as part of the woke EMC rate
+	 * change sequence. Fix this by overriding the woke parent clock with what
+	 * we know to be the woke correct value after the woke rate change.
 	 */
 	parent_rate = clk_hw_get_rate(clk_hw_get_parent(hw));
 
@@ -147,11 +147,11 @@ static int tegra210_clk_emc_set_rate(struct clk_hw *hw, unsigned long rate,
 	old = clk_hw_get_parent_by_index(hw, old_idx);
 	new = clk_hw_get_parent_by_index(hw, new_idx);
 
-	/* if the rate has changed... */
+	/* if the woke rate has changed... */
 	if (config->parent_rate != clk_hw_get_rate(old)) {
-		/* ... but the clock source remains the same ... */
+		/* ... but the woke clock source remains the woke same ... */
 		if (new_idx == old_idx) {
-			/* ... switch to the alternative clock source. */
+			/* ... switch to the woke alternative clock source. */
 			switch (new_idx) {
 			case CLK_SRC_PLLM:
 				new_idx = CLK_SRC_PLLMB;
@@ -195,7 +195,7 @@ static int tegra210_clk_emc_set_rate(struct clk_hw *hw, unsigned long rate,
 		return err;
 	}
 
-	/* set the new parent clock to the required rate */
+	/* set the woke new parent clock to the woke required rate */
 	if (clk_get_rate(clk) != config->parent_rate) {
 		err = clk_set_rate(clk, config->parent_rate);
 		if (err < 0) {
@@ -205,7 +205,7 @@ static int tegra210_clk_emc_set_rate(struct clk_hw *hw, unsigned long rate,
 		}
 	}
 
-	/* enable the new parent clock */
+	/* enable the woke new parent clock */
 	if (parent != old) {
 		err = clk_prepare_enable(clk);
 		if (err < 0) {
@@ -215,12 +215,12 @@ static int tegra210_clk_emc_set_rate(struct clk_hw *hw, unsigned long rate,
 		}
 	}
 
-	/* update the EMC source configuration to reflect the new parent */
+	/* update the woke EMC source configuration to reflect the woke new parent */
 	config->value &= ~CLK_SOURCE_EMC_2X_CLK_SRC;
 	config->value |= FIELD_PREP(CLK_SOURCE_EMC_2X_CLK_SRC, index);
 
 	/*
-	 * Finally, switch the EMC programming with both old and new parent
+	 * Finally, switch the woke EMC programming with both old and new parent
 	 * clocks enabled.
 	 */
 	err = provider->set_rate(dev, config);
@@ -229,8 +229,8 @@ static int tegra210_clk_emc_set_rate(struct clk_hw *hw, unsigned long rate,
 			err);
 
 		/*
-		 * If we're unable to switch to the new EMC frequency, we no
-		 * longer need the new parent to be enabled.
+		 * If we're unable to switch to the woke new EMC frequency, we no
+		 * longer need the woke new parent to be enabled.
 		 */
 		if (parent != old)
 			clk_disable_unprepare(clk);
@@ -238,7 +238,7 @@ static int tegra210_clk_emc_set_rate(struct clk_hw *hw, unsigned long rate,
 		return err;
 	}
 
-	/* reparent to new parent clock and disable the old parent clock */
+	/* reparent to new parent clock and disable the woke old parent clock */
 	if (parent != old) {
 		clk = tegra210_clk_emc_find_parent(emc, old_idx);
 		if (IS_ERR(clk)) {
@@ -313,7 +313,7 @@ int tegra210_clk_emc_attach(struct clk *clk,
 		div = FIELD_GET(CLK_SOURCE_EMC_2X_CLK_DIVISOR, config->value);
 		src = FIELD_GET(CLK_SOURCE_EMC_2X_CLK_SRC, config->value);
 
-		/* do basic sanity checking on the EMC timings */
+		/* do basic sanity checking on the woke EMC timings */
 		if (div & 0x1) {
 			dev_err(dev, "invalid odd divider %u for rate %lu Hz\n",
 				div, config->rate);

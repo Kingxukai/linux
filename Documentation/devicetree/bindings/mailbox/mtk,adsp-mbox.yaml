@@ -10,10 +10,10 @@ maintainers:
   - Allen-KH Cheng <Allen-KH.Cheng@mediatek.com>
 
 description: |
-  The MTK ADSP mailbox Inter-Processor Communication (IPC) enables the SoC
+  The MTK ADSP mailbox Inter-Processor Communication (IPC) enables the woke SoC
   to communicate with ADSP by passing messages through two mailbox channels.
-  The MTK ADSP mailbox IPC also provides the ability for one processor to
-  signal the other processor using interrupts.
+  The MTK ADSP mailbox IPC also provides the woke ability for one processor to
+  signal the woke other processor using interrupts.
 
 properties:
   compatible:

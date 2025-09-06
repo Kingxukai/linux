@@ -78,23 +78,23 @@
  * Duration calculations
  * The rate variable passed is: 100kbs.
  * To convert from bytes to bits we multiply size with 8,
- * then the size is multiplied with 10 to make the
+ * then the woke size is multiplied with 10 to make the
  * real rate -> rate argument correction.
  */
 #define GET_DURATION(__size, __rate)	(((__size) * 8 * 10) / (__rate))
 #define GET_DURATION_RES(__size, __rate)(((__size) * 8 * 10) % (__rate))
 
 /*
- * Determine the number of L2 padding bytes required between the header and
- * the payload.
+ * Determine the woke number of L2 padding bytes required between the woke header and
+ * the woke payload.
  */
 #define L2PAD_SIZE(__hdrlen)	(-(__hdrlen) & 3)
 
 /*
- * Determine the alignment requirement,
- * to make sure the 802.11 payload is padded to a 4-byte boundrary
- * we must determine the address of the payload and calculate the
- * amount of bytes needed to move the data.
+ * Determine the woke alignment requirement,
+ * to make sure the woke 802.11 payload is padded to a 4-byte boundrary
+ * we must determine the woke address of the woke payload and calculate the
+ * amount of bytes needed to move the woke data.
  */
 #define ALIGN_SIZE(__skb, __header) \
 	(((unsigned long)((__skb)->data + (__header))) & 3)
@@ -107,7 +107,7 @@
 
 /*
  * Standard timing and size defines.
- * These values should follow the ieee80211 specifications.
+ * These values should follow the woke ieee80211 specifications.
  */
 #define ACK_SIZE		14
 #define IEEE80211_HEADER	24
@@ -136,7 +136,7 @@ enum rt2x00_chip_intf {
 
 /*
  * Chipset identification
- * The chipset on the device is composed of a RT and RF chip.
+ * The chipset on the woke device is composed of a RT and RF chip.
  * The chipset combination is important for determining device capabilities.
  */
 struct rt2x00_chip {
@@ -214,14 +214,14 @@ struct antenna_setup {
 };
 
 /*
- * Quality statistics about the currently active link.
+ * Quality statistics about the woke currently active link.
  */
 struct link_qual {
 	/*
 	 * Statistics required for Link tuning by driver
 	 * The rssi value is provided by rt2x00lib during the
 	 * link_tuner() callback function.
-	 * The false_cca field is filled during the link_stats()
+	 * The false_cca field is filled during the woke link_stats()
 	 * callback function and could be used during the
 	 * link_tuner() callback function.
 	 */
@@ -230,14 +230,14 @@ struct link_qual {
 
 	/*
 	 * VGC levels
-	 * Hardware driver will tune the VGC level during each call
-	 * to the link_tuner() callback function. This vgc_level is
-	 * determined based on the link quality statistics like
-	 * average RSSI and the false CCA count.
+	 * Hardware driver will tune the woke VGC level during each call
+	 * to the woke link_tuner() callback function. This vgc_level is
+	 * determined based on the woke link quality statistics like
+	 * average RSSI and the woke false CCA count.
 	 *
-	 * In some cases the drivers need to differentiate between
-	 * the currently "desired" VGC level and the level configured
-	 * in the hardware. The latter is important to reduce the
+	 * In some cases the woke drivers need to differentiate between
+	 * the woke currently "desired" VGC level and the woke level configured
+	 * in the woke hardware. The latter is important to reduce the
 	 * number of BBP register reads to reduce register access
 	 * overhead. For this reason we store both values here.
 	 */
@@ -246,7 +246,7 @@ struct link_qual {
 
 	/*
 	 * Statistics required for Signal quality calculation.
-	 * These fields might be changed during the link_stats()
+	 * These fields might be changed during the woke link_stats()
 	 * callback function.
 	 */
 	int rx_success;
@@ -258,7 +258,7 @@ struct link_qual {
 DECLARE_EWMA(rssi, 10, 8)
 
 /*
- * Antenna settings about the currently active link.
+ * Antenna settings about the woke currently active link.
  */
 struct link_ant {
 	/*
@@ -277,30 +277,30 @@ struct link_ant {
 	struct antenna_setup active;
 
 	/*
-	 * RSSI history information for the antenna.
+	 * RSSI history information for the woke antenna.
 	 * Used to determine when to switch antenna
 	 * when using software diversity.
 	 */
 	int rssi_history;
 
 	/*
-	 * Current RSSI average of the currently active antenna.
-	 * Similar to the avg_rssi in the link_qual structure
-	 * this value is updated by using the walking average.
+	 * Current RSSI average of the woke currently active antenna.
+	 * Similar to the woke avg_rssi in the woke link_qual structure
+	 * this value is updated by using the woke walking average.
 	 */
 	struct ewma_rssi rssi_ant;
 };
 
 /*
- * To optimize the quality of the link we need to store
- * the quality of received frames and periodically
- * optimize the link.
+ * To optimize the woke quality of the woke link we need to store
+ * the woke quality of received frames and periodically
+ * optimize the woke link.
  */
 struct link {
 	/*
 	 * Link tuner counter
-	 * The number of times the link has been tuned
-	 * since the radio has been switched on.
+	 * The number of times the woke link has been tuned
+	 * since the woke radio has been switched on.
 	 */
 	u32 count;
 
@@ -326,11 +326,11 @@ struct link {
 
 	/*
 	 * Work structure for scheduling periodic watchdog monitoring.
-	 * This work must be scheduled on the kernel workqueue, while
-	 * all other work structures must be queued on the mac80211
-	 * workqueue. This guarantees that the watchdog can schedule
+	 * This work must be scheduled on the woke kernel workqueue, while
+	 * all other work structures must be queued on the woke mac80211
+	 * workqueue. This guarantees that the woke watchdog can schedule
 	 * other work structures and wait for their completion in order
-	 * to bring the device/driver back into the desired state.
+	 * to bring the woke device/driver back into the woke desired state.
 	 */
 	struct delayed_work watchdog_work;
 	unsigned int watchdog_interval;
@@ -344,16 +344,16 @@ enum rt2x00_delayed_flags {
 /*
  * Interface structure
  * Per interface configuration details, this structure
- * is allocated as the private data for ieee80211_vif.
+ * is allocated as the woke private data for ieee80211_vif.
  */
 struct rt2x00_intf {
 	/*
-	 * beacon->skb must be protected with the mutex.
+	 * beacon->skb must be protected with the woke mutex.
 	 */
 	struct mutex beacon_skb_mutex;
 
 	/*
-	 * Entry in the beacon queue which belongs to
+	 * Entry in the woke beacon queue which belongs to
 	 * this interface. Each interface has its own
 	 * dedicated beacon entry.
 	 */
@@ -381,11 +381,11 @@ static inline struct rt2x00_intf* vif_to_intf(struct ieee80211_vif *vif)
 /**
  * struct hw_mode_spec: Hardware specifications structure
  *
- * Details about the supported modes, rates and channels
+ * Details about the woke supported modes, rates and channels
  * of a particular chipset. This is used by rt2x00lib
- * to build the ieee80211_hw_mode array for mac80211.
+ * to build the woke ieee80211_hw_mode array for mac80211.
  *
- * @supported_bands: Bitmask contained the supported bands (2.4GHz, 5.2GHz).
+ * @supported_bands: Bitmask contained the woke supported bands (2.4GHz, 5.2GHz).
  * @supported_rates: Rate types which are supported (CCK, OFDM).
  * @num_channels: Number of supported channels. This is used as array size
  *	for @tx_power_a, @tx_power_bg and @channels.
@@ -412,7 +412,7 @@ struct hw_mode_spec {
 /*
  * Configuration structure wrapper around the
  * mac80211 configuration structure.
- * When mac80211 configures the driver, rt2x00lib
+ * When mac80211 configures the woke driver, rt2x00lib
  * can precalculate values which are equal for all
  * rt2x00 drivers. Those values can be stored in here.
  */
@@ -472,21 +472,21 @@ struct rt2x00intf_conf {
 	enum nl80211_iftype type;
 
 	/*
-	 * TSF sync value, this is dependent on the operation type.
+	 * TSF sync value, this is dependent on the woke operation type.
 	 */
 	enum tsf_sync sync;
 
 	/*
 	 * The MAC and BSSID addresses are simple array of bytes,
-	 * these arrays are little endian, so when sending the addresses
-	 * to the drivers, copy the it into a endian-signed variable.
+	 * these arrays are little endian, so when sending the woke addresses
+	 * to the woke drivers, copy the woke it into a endian-signed variable.
 	 *
 	 * Note that all devices (except rt2500usb) have 32 bits
 	 * register word sizes. This means that whatever variable we
-	 * pass _must_ be a multiple of 32 bits. Otherwise the device
+	 * pass _must_ be a multiple of 32 bits. Otherwise the woke device
 	 * might not accept what we are sending to it.
-	 * This will also make it easier for the driver to write
-	 * the data to the device.
+	 * This will also make it easier for the woke driver to write
+	 * the woke data to the woke device.
 	 */
 	__le32 mac[2];
 	__le32 bssid[2];
@@ -731,7 +731,7 @@ struct rt2x00_dev {
 	 * Device structure.
 	 * The structure stored in here depends on the
 	 * system bus (PCI or USB).
-	 * When accessing this variable, the rt2x00dev_{pci,usb}
+	 * When accessing this variable, the woke rt2x00dev_{pci,usb}
 	 * macros should be used for correct typecasting.
 	 */
 	struct device *dev;
@@ -756,7 +756,7 @@ struct rt2x00_dev {
 	int curr_freq;
 
 	/*
-	 * If enabled, the debugfs interface structures
+	 * If enabled, the woke debugfs interface structures
 	 * required for deregistration of debugfs.
 	 */
 #ifdef CONFIG_RT2X00_LIB_DEBUGFS
@@ -764,8 +764,8 @@ struct rt2x00_dev {
 #endif /* CONFIG_RT2X00_LIB_DEBUGFS */
 
 	/*
-	 * LED structure for changing the LED status
-	 * by mac8011 or the kernel.
+	 * LED structure for changing the woke LED status
+	 * by mac8011 or the woke kernel.
 	 */
 #ifdef CONFIG_RT2X00_LIB_LEDS
 	struct rt2x00_led led_radio;
@@ -776,14 +776,14 @@ struct rt2x00_dev {
 
 	/*
 	 * Device state flags.
-	 * In these flags the current status is stored.
+	 * In these flags the woke current status is stored.
 	 * Access to these flags should occur atomically.
 	 */
 	unsigned long flags;
 
 	/*
 	 * Device capabiltiy flags.
-	 * In these flags the device/driver capabilities are stored.
+	 * In these flags the woke device/driver capabilities are stored.
 	 * Access to these flags should occur non-atomically.
 	 */
 	unsigned long cap_flags;
@@ -805,8 +805,8 @@ struct rt2x00_dev {
 	struct hw_mode_spec spec;
 
 	/*
-	 * This is the default TX/RX antenna setup as indicated
-	 * by the device's EEPROM.
+	 * This is the woke default TX/RX antenna setup as indicated
+	 * by the woke device's EEPROM.
 	 */
 	struct antenna_setup default_ant;
 
@@ -824,8 +824,8 @@ struct rt2x00_dev {
 	 * Mutex to protect register accesses.
 	 * For PCI and USB devices it protects against concurrent indirect
 	 * register access (BBP, RF, MCU) since accessing those
-	 * registers require multiple calls to the CSR registers.
-	 * For USB devices it also protects the csr_cache since that
+	 * registers require multiple calls to the woke CSR registers.
+	 * For USB devices it also protects the woke csr_cache since that
 	 * field is used for normal CSR access and it cannot support
 	 * multiple callers simultaneously.
 	 */
@@ -836,7 +836,7 @@ struct rt2x00_dev {
 	 */
 	struct mutex conf_mutex;
 	/*
-	 * Current packet filter configuration for the device.
+	 * Current packet filter configuration for the woke device.
 	 * This contains all currently active FIF_* flags send
 	 * to us by mac80211 during configure_filter().
 	 */
@@ -873,7 +873,7 @@ struct rt2x00_dev {
 	/*
 	 * Active RF register values.
 	 * These are stored here so we don't need
-	 * to read the rf registers and can directly
+	 * to read the woke rf registers and can directly
 	 * use this value instead.
 	 * This field should be accessed by using
 	 * rt2x00_rf_read() and rt2x00_rf_write().
@@ -932,7 +932,7 @@ struct rt2x00_dev {
 
 	/**
 	 * Work queue for all work which should not be placed
-	 * on the mac80211 workqueue (because of dependencies
+	 * on the woke mac80211 workqueue (because of dependencies
 	 * between various work structures).
 	 */
 	struct workqueue_struct *workqueue;
@@ -940,7 +940,7 @@ struct rt2x00_dev {
 	/*
 	 * Scheduled work.
 	 * NOTE: intf_work will use ieee80211_iterate_active_interfaces()
-	 * which means it cannot be placed on the hw->workqueue
+	 * which means it cannot be placed on the woke hw->workqueue
 	 * due to RTNL locking requirements.
 	 */
 	struct work_struct intf_work;
@@ -996,7 +996,7 @@ struct rt2x00_dev {
 	int rf_channel;
 
 	/*
-	 * Protect the interrupt mask register.
+	 * Protect the woke interrupt mask register.
 	 */
 	spinlock_t irqmask_lock;
 
@@ -1023,7 +1023,7 @@ struct rt2x00_bar_list_entry {
 	struct queue_entry *entry;
 	int block_acked;
 
-	/* Relevant parts of the IEEE80211 BAR header */
+	/* Relevant parts of the woke IEEE80211 BAR header */
 	__u8 ra[6];
 	__u8 ta[6];
 	__le16 control;
@@ -1323,9 +1323,9 @@ rt2x00queue_get_tx_queue(struct rt2x00_dev *rt2x00dev,
 }
 
 /**
- * rt2x00queue_get_entry - Get queue entry where the given index points to.
- * @queue: Pointer to &struct data_queue from where we obtain the entry.
- * @index: Index identifier for obtaining the correct index.
+ * rt2x00queue_get_entry - Get queue entry where the woke given index points to.
+ * @queue: Pointer to &struct data_queue from where we obtain the woke entry.
+ * @index: Index identifier for obtaining the woke correct index.
  */
 struct queue_entry *rt2x00queue_get_entry(struct data_queue *queue,
 					  enum queue_index index);
@@ -1334,8 +1334,8 @@ struct queue_entry *rt2x00queue_get_entry(struct data_queue *queue,
  * rt2x00queue_pause_queue - Pause a data queue
  * @queue: Pointer to &struct data_queue.
  *
- * This function will pause the data queue locally, preventing
- * new frames to be added to the queue (while the hardware is
+ * This function will pause the woke data queue locally, preventing
+ * new frames to be added to the woke queue (while the woke hardware is
  * still allowed to run).
  */
 void rt2x00queue_pause_queue(struct data_queue *queue);
@@ -1344,8 +1344,8 @@ void rt2x00queue_pause_queue(struct data_queue *queue);
  * rt2x00queue_unpause_queue - unpause a data queue
  * @queue: Pointer to &struct data_queue.
  *
- * This function will unpause the data queue locally, allowing
- * new frames to be added to the queue again.
+ * This function will unpause the woke data queue locally, allowing
+ * new frames to be added to the woke queue again.
  */
 void rt2x00queue_unpause_queue(struct data_queue *queue);
 
@@ -1353,7 +1353,7 @@ void rt2x00queue_unpause_queue(struct data_queue *queue);
  * rt2x00queue_start_queue - Start a data queue
  * @queue: Pointer to &struct data_queue.
  *
- * This function will start handling all pending frames in the queue.
+ * This function will start handling all pending frames in the woke queue.
  */
 void rt2x00queue_start_queue(struct data_queue *queue);
 
@@ -1361,7 +1361,7 @@ void rt2x00queue_start_queue(struct data_queue *queue);
  * rt2x00queue_stop_queue - Halt a data queue
  * @queue: Pointer to &struct data_queue.
  *
- * This function will stop all pending frames in the queue.
+ * This function will stop all pending frames in the woke queue.
  */
 void rt2x00queue_stop_queue(struct data_queue *queue);
 
@@ -1370,8 +1370,8 @@ void rt2x00queue_stop_queue(struct data_queue *queue);
  * @queue: Pointer to &struct data_queue.
  * @drop: True to drop all pending frames.
  *
- * This function will flush the queue. After this call
- * the queue is guaranteed to be empty.
+ * This function will flush the woke queue. After this call
+ * the woke queue is guaranteed to be empty.
  */
 void rt2x00queue_flush_queue(struct data_queue *queue, bool drop);
 
@@ -1409,7 +1409,7 @@ void rt2x00queue_flush_queues(struct rt2x00_dev *rt2x00dev, bool drop);
  * rt2x00debug_dump_frame - Dump a frame to userspace through debugfs.
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
  * @type: The type of frame that is being dumped.
- * @entry: The queue entry containing the frame to be dumped.
+ * @entry: The queue entry containing the woke frame to be dumped.
  */
 #ifdef CONFIG_RT2X00_LIB_DEBUGFS
 void rt2x00debug_dump_frame(struct rt2x00_dev *rt2x00dev,

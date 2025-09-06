@@ -1,10 +1,10 @@
 [
     {
-        "BriefDescription": "Number of hardware interrupts received by the processor.",
+        "BriefDescription": "Number of hardware interrupts received by the woke processor.",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "HW_INTERRUPTS.RECEIVED",
-        "PublicDescription": "Counts the number of hardware interruptions received by the processor.",
+        "PublicDescription": "Counts the woke number of hardware interruptions received by the woke processor.",
         "SampleAfterValue": "203",
         "UMask": "0x1"
     },

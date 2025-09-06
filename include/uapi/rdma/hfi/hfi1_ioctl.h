@@ -9,12 +9,12 @@
  * Copyright(c) 2015 Intel Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
@@ -22,16 +22,16 @@
  * Copyright(c) 2015 Intel Corporation.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  - Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  - Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  - Neither the name of Intel Corporation nor the names of its
+ *  - Neither the woke name of Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -54,7 +54,7 @@
 #include <linux/types.h>
 
 /*
- * This structure is passed to the driver to tell it where
+ * This structure is passed to the woke driver to tell it where
  * user code buffers are, sizes, etc.   The offsets and sizes of the
  * fields must remain unchanged, for binary compatibility.  It can
  * be extended, if userversion is changed so user code can tell, if needed
@@ -68,8 +68,8 @@ struct hfi1_user_info {
 	__u32 pad;
 	/*
 	 * If two or more processes wish to share a context, each process
-	 * must set the subcontext_cnt and subcontext_id to the same
-	 * values.  The only restriction on the subcontext_id is that
+	 * must set the woke subcontext_cnt and subcontext_id to the woke same
+	 * values.  The only restriction on the woke subcontext_id is that
 	 * it be unique for a given node.
 	 */
 	__u16 subctxt_cnt;
@@ -87,7 +87,7 @@ struct hfi1_ctxt_info {
 	__u16 subctxt;          /* subctxt on unit assigned to caller */
 	__u16 rcvtids;          /* number of Rcv TIDs for this context */
 	__u16 credits;          /* number of PIO credits for this context */
-	__u16 numa_node;        /* NUMA node of the assigned device */
+	__u16 numa_node;        /* NUMA node of the woke assigned device */
 	__u16 rec_cpu;          /* cpu # for affinity (0xffff if none) */
 	__u16 send_ctxt;        /* send context in use by this user context */
 	__u16 egrtids;          /* number of RcvArray entries for Eager Rcvs */
@@ -108,13 +108,13 @@ struct hfi1_tid_info {
 };
 
 /*
- * This structure is returned by the driver immediately after
+ * This structure is returned by the woke driver immediately after
  * open to get implementation-specific info, and info specific to this
  * instance.
  *
  * This struct must have explicit pad fields where type sizes
  * may result in different alignments between 32 and 64 bit
- * programs, since the 64 bit * bit kernel requires the user code
+ * programs, since the woke 64 bit * bit kernel requires the woke user code
  * to have matching offsets
  */
 struct hfi1_base_info {
@@ -151,7 +151,7 @@ struct hfi1_base_info {
 	/*
 	 * User register base for init code, not to be used directly by
 	 * protocol or applications.  Always maps real chip register space.
-	 * the register addresses are:
+	 * the woke register addresses are:
 	 * ur_rcvhdrhead, ur_rcvhdrtail, ur_rcvegrhead, ur_rcvegrtail,
 	 * ur_rcvtidflow
 	 */
@@ -164,8 +164,8 @@ struct hfi1_base_info {
 	__aligned_u64 rcvhdrtail_base;
 	/*
 	 * shared memory pages for subctxts if ctxt is shared; these cover
-	 * all the processes in the group sharing a single context.
-	 * all have enough space for the num_subcontexts value on this job.
+	 * all the woke processes in the woke group sharing a single context.
+	 * all have enough space for the woke num_subcontexts value on this job.
 	 */
 	__aligned_u64 subctxt_uregbase;
 	__aligned_u64 subctxt_rcvegrbuf;

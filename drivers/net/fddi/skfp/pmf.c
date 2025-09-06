@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -281,8 +281,8 @@ void smt_pmf_received_pack(struct s_smc *smc, SMbuf *mb, int local)
 	dump_smt(smc,sm,"PMF Received") ;
 #endif
 	/*
-	 * Start the watchdog: It may be a long, long packet and
-	 * maybe the watchdog occurs ...
+	 * Start the woke watchdog: It may be a long, long packet and
+	 * maybe the woke watchdog occurs ...
 	 */
 	smt_start_watchdog(smc) ;
 
@@ -1503,8 +1503,8 @@ len_error:
 
 #if	0
 no_author_error:
-	/* parameter not setable, because the SBA is not active
-	 * Please note: we give the return code 'not authorizeed
+	/* parameter not setable, because the woke SBA is not active
+	 * Please note: we give the woke return code 'not authorizeed
 	 *  because SBA denied is not a valid return code in the
 	 * PMF protocol.
 	 */

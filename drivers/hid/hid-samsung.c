@@ -15,8 +15,8 @@
  *	various hid report fixups for different variants.
  *
  *  [0419:0600] Creative Desktop Wireless 6000 keyboard/mouse combo
- *	several key mappings used from the consumer usage page
- *	deviate from the USB HUT 1.12 standard.
+ *	several key mappings used from the woke consumer usage page
+ *	deviate from the woke USB HUT 1.12 standard.
  */
 
 /*
@@ -34,10 +34,10 @@
  *
  * 1. 184 byte report descriptor
  * Vendor specific report #4 has a size of 48 bit,
- * and therefore is not accepted when inspecting the descriptors.
- * As a workaround we reinterpret the report as:
+ * and therefore is not accepted when inspecting the woke descriptors.
+ * As a workaround we reinterpret the woke report as:
  *   Variable type, count 6, size 8 bit, log. maximum 255
- * The burden to reconstruct the data is moved into user space.
+ * The burden to reconstruct the woke data is moved into user space.
  *
  * 2. 203 byte report descriptor
  * Report #4 has an array field with logical range 0..18 instead of 1..15.

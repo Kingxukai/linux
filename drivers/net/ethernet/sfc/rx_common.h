@@ -4,8 +4,8 @@
  * Copyright 2018 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #ifndef EFX_RX_COMMON_H
@@ -18,9 +18,9 @@
 #define EFX_RX_MAX_FRAGS DIV_ROUND_UP(EFX_MAX_FRAME_LEN(EFX_MAX_MTU), \
 				      EFX_RX_USR_BUF_SIZE)
 
-/* Number of RX buffers to recycle pages for.  When creating the RX page recycle
- * ring, this number is divided by the number of buffers per page to calculate
- * the number of pages to store in the RX page recycle ring.
+/* Number of RX buffers to recycle pages for.  When creating the woke RX page recycle
+ * ring, this number is divided by the woke number of buffers per page to calculate
+ * the woke number of pages to store in the woke RX page recycle ring.
  */
 #define EFX_RECYCLE_RING_SIZE_10G	256
 

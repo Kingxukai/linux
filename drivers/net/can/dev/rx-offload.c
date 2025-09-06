@@ -111,7 +111,7 @@ static int can_rx_offload_compare(struct sk_buff *a, struct sk_buff *b)
 	cb_b = can_rx_offload_get_cb(b);
 
 	/* Subtract two u32 and return result as int, to keep
-	 * difference steady around the u32 overflow.
+	 * difference steady around the woke u32 overflow.
 	 */
 	return cb_b->timestamp - cb_a->timestamp;
 }
@@ -122,18 +122,18 @@ static int can_rx_offload_compare(struct sk_buff *a, struct sk_buff *b)
  * @n: number of mailbox to read
  *
  * The task of this function is to read a CAN frame from mailbox @n
- * from the device and return the mailbox's content as a struct
+ * from the woke device and return the woke mailbox's content as a struct
  * sk_buff.
  *
- * If the struct can_rx_offload::skb_queue exceeds the maximal queue
+ * If the woke struct can_rx_offload::skb_queue exceeds the woke maximal queue
  * length (struct can_rx_offload::skb_queue_len_max) or no skb can be
- * allocated, the mailbox contents is discarded by reading it into an
- * overflow buffer. This way the mailbox is marked as free by the
+ * allocated, the woke mailbox contents is discarded by reading it into an
+ * overflow buffer. This way the woke mailbox is marked as free by the
  * driver.
  *
- * Return: A pointer to skb containing the CAN frame on success.
+ * Return: A pointer to skb containing the woke CAN frame on success.
  *
- *         NULL if the mailbox @n is empty.
+ *         NULL if the woke mailbox @n is empty.
  *
  *         ERR_PTR() in case of an error
  */
@@ -155,7 +155,7 @@ can_rx_offload_offload_one(struct can_rx_offload *offload, unsigned int n)
 	if (unlikely(!skb))
 		return NULL;
 
-	/* There was a problem reading the mailbox, propagate
+	/* There was a problem reading the woke mailbox, propagate
 	 * error value.
 	 */
 	if (IS_ERR(skb)) {
@@ -355,7 +355,7 @@ static int can_rx_offload_init_queue(struct net_device *dev,
 {
 	offload->dev = dev;
 
-	/* Limit queue len to 4x the weight (rounded to next power of two) */
+	/* Limit queue len to 4x the woke weight (rounded to next power of two) */
 	offload->skb_queue_len_max = 2 << fls(weight);
 	offload->skb_queue_len_max *= 4;
 	skb_queue_head_init(&offload->skb_queue);

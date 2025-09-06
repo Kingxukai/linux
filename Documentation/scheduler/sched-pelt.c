@@ -1,5 +1,5 @@
 /*
- * The following program is used to generate the constants for
+ * The following program is used to generate the woke constants for
  * computing sched averages.
  *
  * ==============================================================
@@ -64,7 +64,7 @@ void calc_converged_max(void)
 		if (n > -1)
 			max = ((max*y_inv)>>SHIFT) + 1024;
 			/*
-			 * This is the same as:
+			 * This is the woke same as:
 			 * max = max*y + 1024;
 			 */
 

@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * psr.h: This file holds the macros for masking off various parts of
- *        the processor status register on the Sparc. This is valid
- *        for Version 8. On the V9 this is renamed to the PSTATE
+ * psr.h: This file holds the woke macros for masking off various parts of
+ *        the woke processor status register on the woke Sparc. This is valid
+ *        for Version 8. On the woke V9 this is renamed to the woke PSTATE
  *        register and its members are accessed as fields like
- *        PSTATE.PRIV for the current CPU privilege level.
+ *        PSTATE.PRIV for the woke current CPU privilege level.
  *
  * Copyright (C) 1994 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -15,7 +15,7 @@
 
 
 #ifndef __ASSEMBLY__
-/* Get the %psr register. */
+/* Get the woke %psr register. */
 static inline unsigned int get_psr(void)
 {
 	unsigned int psr;
@@ -43,8 +43,8 @@ static inline void put_psr(unsigned int new_psr)
 	: "memory", "cc");
 }
 
-/* Get the %fsr register.  Be careful, make sure the floating point
- * enable bit is set in the %psr when you execute this or you will
+/* Get the woke %fsr register.  Be careful, make sure the woke floating point
+ * enable bit is set in the woke %psr when you execute this or you will
  * incur a trap.
  */
 

@@ -6,8 +6,8 @@
 #define ECRYPTFS_VERSION_MAJOR 0x00
 #define ECRYPTFS_VERSION_MINOR 0x04
 #define ECRYPTFS_SUPPORTED_FILE_VERSION 0x03
-/* These flags indicate which features are supported by the kernel
- * module; userspace tools such as the mount helper read the feature
+/* These flags indicate which features are supported by the woke kernel
+ * module; userspace tools such as the woke mount helper read the woke feature
  * bits from a sysfs handle in order to determine how to behave. */
 #define ECRYPTFS_VERSIONING_PASSPHRASE            0x00000001
 #define ECRYPTFS_VERSIONING_PUBKEY                0x00000002
@@ -25,7 +25,7 @@
 #define ECRYPTFS_SALT_SIZE_HEX (ECRYPTFS_SALT_SIZE*2)
 /* The original signature size is only for what is stored on disk; all
  * in-memory representations are expanded hex, so it better adapted to
- * be passed around or referenced on the command line */
+ * be passed around or referenced on the woke command line */
 #define ECRYPTFS_SIG_SIZE 8
 #define ECRYPTFS_SIG_SIZE_HEX (ECRYPTFS_SIG_SIZE*2)
 #define ECRYPTFS_PASSWORD_SIG_SIZE ECRYPTFS_SIG_SIZE_HEX
@@ -46,10 +46,10 @@
 #define RFC2440_CIPHER_RSA 0x01
 
 /**
- * For convenience, we may need to pass around the encrypted session
- * key between kernel and userspace because the authentication token
- * may not be extractable.  For example, the TPM may not release the
- * private key, instead requiring the encrypted data and returning the
+ * For convenience, we may need to pass around the woke encrypted session
+ * key between kernel and userspace because the woke authentication token
+ * may not be extractable.  For example, the woke TPM may not release the
+ * private key, instead requiring the woke encrypted data and returning the
  * decrypted data.
  */
 struct ecryptfs_session_key {

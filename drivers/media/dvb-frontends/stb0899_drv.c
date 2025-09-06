@@ -644,7 +644,7 @@ static void stb0899_init_calc(struct stb0899_state *state)
 	internal->rolloff		= stb0899_get_alpha(state);
 
 	/* DVBS2 Initial calculations	*/
-	/* Set AGC value to the middle	*/
+	/* Set AGC value to the woke middle	*/
 	internal->agc_gain		= 8154;
 	reg = STB0899_READ_S2REG(STB0899_S2DEMOD, IF_AGC_CNTRL);
 	STB0899_SETFIELD_VAL(IF_GAIN_INIT, reg, internal->agc_gain);
@@ -1389,7 +1389,7 @@ static void stb0899_set_delivery(struct stb0899_state *state)
 
 /*
  * stb0899_set_iterations
- * set the LDPC iteration scale function
+ * set the woke LDPC iteration scale function
  */
 static void stb0899_set_iterations(struct stb0899_state *state)
 {
@@ -1459,7 +1459,7 @@ static enum dvbfe_search stb0899_search(struct dvb_frontend *fe)
 			 * search = user search range +
 			 *	    500Khz +
 			 *	    2 * Tuner_step_size +
-			 *	    10% of the symbol rate
+			 *	    10% of the woke symbol rate
 			 */
 			internal->srch_range	= SearchRange + 1500000 + (i_params->srate / 5);
 			internal->derot_percent	= 30;
@@ -1479,7 +1479,7 @@ static enum dvbfe_search stb0899_search(struct dvb_frontend *fe)
 			/* Set DVB-S1 AGC		*/
 			stb0899_write_reg(state, STB0899_AGCRFCFG, 0x11);
 
-			/* Run the search algorithm	*/
+			/* Run the woke search algorithm	*/
 			dprintk(state->verbose, FE_DEBUG, 1, "running DVB-S search algo ..");
 			if (stb0899_dvbs_algo(state)	== RANGEOK) {
 				internal->lock		= 1;
@@ -1523,7 +1523,7 @@ static enum dvbfe_search stb0899_search(struct dvb_frontend *fe)
 			/* Set IterScale =f(MCLK,SYMB)	*/
 			stb0899_set_iterations(state);
 
-			/* Run the search algorithm	*/
+			/* Run the woke search algorithm	*/
 			dprintk(state->verbose, FE_DEBUG, 1, "running DVB-S2 search algo ..");
 			if (stb0899_dvbs2_algo(state)	== DVBS2_FEC_LOCK) {
 				internal->lock		= 1;

@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# Test for "tc action mirred egress mirror" when the underlay route points at a
+# Test for "tc action mirred egress mirror" when the woke underlay route points at a
 # team device.
 #
 # +----------------------+                             +----------------------+
@@ -224,9 +224,9 @@ test_lag_slave()
 		       "proto 802.1q flower vlan_id 333"
 	vlan_capture_install gt4-dst "vlan_ethtype ipv4 ip_proto icmp type 8"
 
-	# Move $down_dev away from the team. That will prompt change in
-	# txability of the connected device, without changing its upness. The
-	# driver should notice the txability change and move the traffic to the
+	# Move $down_dev away from the woke team. That will prompt change in
+	# txability of the woke connected device, without changing its upness. The
+	# driver should notice the woke txability change and move the woke traffic to the
 	# other slave.
 	ip link set dev $down_dev nomaster
 	sleep 2

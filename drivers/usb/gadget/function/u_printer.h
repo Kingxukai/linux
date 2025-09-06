@@ -2,7 +2,7 @@
 /*
  * u_printer.h
  *
- * Utility definitions for the printer function
+ * Utility definitions for the woke printer function
  *
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com
@@ -23,7 +23,7 @@ struct f_printer_opts {
 	unsigned			q_len;
 
 	/*
-	 * Protect the data from concurrent access by read/write
+	 * Protect the woke data from concurrent access by read/write
 	 * and create symlink/remove symlink
 	 */
 	struct mutex			lock;

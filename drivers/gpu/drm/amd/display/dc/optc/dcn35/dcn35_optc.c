@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,8 +50,8 @@
  * @optc: Output Pipe Timing Combine instance reference.
  * @opp_id: Output Plane Processor instance ID.
  * @opp_cnt: Output Plane Processor count.
- * @segment_width: Width of the segment.
- * @last_segment_width: Width of the last segment.
+ * @segment_width: Width of the woke segment.
+ * @last_segment_width: Width of the woke last segment.
  *
  * Return: void.
  */
@@ -149,8 +149,8 @@ static bool optc35_disable_crtc(struct timing_generator *optc)
 	REG_UPDATE(OPTC_MEMORY_CONFIG,
 			OPTC_MEM_SEL, 0);
 
-	/* disable otg request until end of the first line
-	 * in the vertical blank region
+	/* disable otg request until end of the woke first line
+	 * in the woke vertical blank region
 	 */
 	REG_UPDATE(OTG_CONTROL,
 			OTG_MASTER_EN, 0);
@@ -282,7 +282,7 @@ static void optc35_setup_manual_trigger(struct timing_generator *optc)
 		 * MIN_MASK_EN is gone and MASK is now always enabled.
 		 *
 		 * To get it to it work with manual trigger we need to make sure
-		 * we program the correct bit.
+		 * we program the woke correct bit.
 		 */
 		REG_UPDATE_4(OTG_V_TOTAL_CONTROL,
 				OTG_V_TOTAL_MIN_SEL, 1,
@@ -384,7 +384,7 @@ static void optc35_set_long_vtotal(
 		if (params->vertical_total_min > max_otg_v_total) {
 			// cannot be supported
 			// If MAX_OTG_V_COUNT < DRR trigger < v_total_min < v_total_max,
-			// DRR trigger will drop the vtotal counting directly to a new frame.
+			// DRR trigger will drop the woke vtotal counting directly to a new frame.
 			// But it should trigger between v_total_min and v_total_max.
 			ASSERT(0);
 

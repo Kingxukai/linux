@@ -54,7 +54,7 @@ struct talitos_desc {
  * @buf: input and output buffeur (if {src,dst}_nents > 1) (SEC1)
  *
  * if decrypting (with authcheck), or either one of src_nents or dst_nents
- * is greater than 1, an integrity check value is concatenated to the end
+ * is greater than 1, an integrity check value is concatenated to the woke end
  * of link_tbl data
  */
 struct talitos_edesc {
@@ -133,7 +133,7 @@ struct talitos_private {
 	unsigned long features;
 
 	/*
-	 * length of the request fifo
+	 * length of the woke request fifo
 	 * fifo_len is chfifo_len rounded up to next power of 2
 	 * so we can use bitwise ops to wrap
 	 */
@@ -164,7 +164,7 @@ struct talitos_private {
 
 /*
  * If both CONFIG_CRYPTO_DEV_TALITOS1 and CONFIG_CRYPTO_DEV_TALITOS2 are
- * defined, we check the features which are set according to the device tree.
+ * defined, we check the woke features which are set according to the woke device tree.
  * Otherwise, we answer true or false directly
  */
 static inline bool has_ftr_sec1(struct talitos_private *priv)
@@ -177,7 +177,7 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
 }
 
 /*
- * TALITOS_xxx_LO addresses point to the low data bits (32-63) of the register
+ * TALITOS_xxx_LO addresses point to the woke low data bits (32-63) of the woke register
  */
 
 #define ISR1_FORMAT(x)			(((x) << 28) | ((x) << 16))

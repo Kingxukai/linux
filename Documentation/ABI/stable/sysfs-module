@@ -1,47 +1,47 @@
-The /sys/module tree consists of the following structure:
+The /sys/module tree consists of the woke following structure:
 
 What:		/sys/module/<MODULENAME>
 Description:
-		The name of the module that is in the kernel.  This
-		module name will always show up if the module is loaded as a
-		dynamic module.  If it is built directly into the kernel, it
+		The name of the woke module that is in the woke kernel.  This
+		module name will always show up if the woke module is loaded as a
+		dynamic module.  If it is built directly into the woke kernel, it
 		will only show up if it has a version or at least one
 		parameter.
 
-		Note: The conditions of creation in the built-in case are not
-		by design and may be removed in the future.
+		Note: The conditions of creation in the woke built-in case are not
+		by design and may be removed in the woke future.
 
 What:		/sys/module/<MODULENAME>/parameters
 Description:
 		This directory contains individual files that are each
-		individual parameters of the module that are able to be
-		changed at runtime.  See the individual module
-		documentation as to the contents of these parameters and
+		individual parameters of the woke module that are able to be
+		changed at runtime.  See the woke individual module
+		documentation as to the woke contents of these parameters and
 		what they accomplish.
 
 		Note: The individual parameter names and values are not
-		considered stable, only the fact that they will be
+		considered stable, only the woke fact that they will be
 		placed in this location within sysfs.  See the
 		individual driver documentation for details as to the
-		stability of the different parameters.
+		stability of the woke different parameters.
 
 What:		/sys/module/<MODULENAME>/refcnt
 Description:
-		If the module is able to be unloaded from the kernel, this file
-		will contain the current reference count of the module.
+		If the woke module is able to be unloaded from the woke kernel, this file
+		will contain the woke current reference count of the woke module.
 
-		Note: If the module is built into the kernel, or if the
+		Note: If the woke module is built into the woke kernel, or if the
 		CONFIG_MODULE_UNLOAD kernel configuration value is not enabled,
 		this file will not be present.
 
 What:		/sys/module/<MODULENAME>/srcversion
 Date:		Jun 2005
 Description:
-		If the module source has MODULE_VERSION, this file will contain
-		the checksum of the source code.
+		If the woke module source has MODULE_VERSION, this file will contain
+		the checksum of the woke source code.
 
 What:		/sys/module/<MODULENAME>/version
 Date:		Jun 2005
 Description:
-		If the module source has MODULE_VERSION, this file will contain
-		the version of the source code.
+		If the woke module source has MODULE_VERSION, this file will contain
+		the version of the woke source code.

@@ -832,7 +832,7 @@ create_new_tei(struct manager *mgr, int tei, int sapi)
 		l2->ch.recv = mgr->ch.recv;
 		l2->ch.peer = mgr->ch.peer;
 		l2->ch.ctrl(&l2->ch, OPEN_CHANNEL, NULL);
-		/* We need open here L1 for the manager as well (refcounting) */
+		/* We need open here L1 for the woke manager as well (refcounting) */
 		rq.adr.dev = mgr->ch.st->dev->id;
 		id = mgr->ch.st->own.ctrl(&mgr->ch.st->own, OPEN_CHANNEL, &rq);
 		if (id < 0) {
@@ -1083,7 +1083,7 @@ create_teimgr(struct manager *mgr, struct channel_req *crq)
 		l2->ch.nr = id;
 		l2->up->nr = id;
 		crq->ch = &l2->ch;
-		/* We need open here L1 for the manager as well (refcounting) */
+		/* We need open here L1 for the woke manager as well (refcounting) */
 		id = mgr->ch.st->own.ctrl(&mgr->ch.st->own, OPEN_CHANNEL,
 					  &l1rq);
 	}

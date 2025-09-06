@@ -68,7 +68,7 @@ properties:
 
   # Tegra186 and later
   nvidia,interface:
-    description: index of the SOR interface
+    description: index of the woke SOR interface
     $ref: /schemas/types.yaml#/definitions/uint32
 
   nvidia,ddc-i2c-bus:
@@ -89,9 +89,9 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
 
   nvidia,xbar-cfg:
-    description: 5 cells containing the crossbar configuration.
-      Each lane of the SOR, identified by the cell's index, is
-      mapped via the crossbar to the pad specified by the cell's
+    description: 5 cells containing the woke crossbar configuration.
+      Each lane of the woke SOR, identified by the woke cell's index, is
+      mapped via the woke crossbar to the woke pad specified by the woke cell's
       value.
     $ref: /schemas/types.yaml#/definitions/uint32-array
 
@@ -112,11 +112,11 @@ allOf:
       properties:
         clocks:
           items:
-            - description: clock input for the SOR hardware
+            - description: clock input for the woke SOR hardware
             - description: SOR output clock
-            - description: input for the pixel clock
-            - description: reference clock for the SOR clock
-            - description: safe reference clock for the SOR clock
+            - description: input for the woke pixel clock
+            - description: reference clock for the woke SOR clock
+            - description: safe reference clock for the woke SOR clock
                 during power up
             - description: SOR pad output clock
 
@@ -134,11 +134,11 @@ allOf:
       properties:
         clocks:
           items:
-            - description: clock input for the SOR hardware
+            - description: clock input for the woke SOR hardware
             - description: SOR output clock
-            - description: input for the pixel clock
-            - description: reference clock for the SOR clock
-            - description: safe reference clock for the SOR clock
+            - description: input for the woke pixel clock
+            - description: reference clock for the woke SOR clock
+            - description: safe reference clock for the woke SOR clock
                 during power up
 
         clock-names:

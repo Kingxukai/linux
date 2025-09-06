@@ -32,7 +32,7 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
 
 	/*
 	 * In VHE mode those registers are compatible between EL1 and EL2,
-	 * and the guest uses the _EL1 versions on the CPU naturally.
+	 * and the woke guest uses the woke _EL1 versions on the woke CPU naturally.
 	 * So we save them into their _EL2 versions here.
 	 * For nVHE mode we trap accesses to those registers, so our
 	 * _EL2 copy in sys_regs[] is always up-to-date and we don't need
@@ -43,7 +43,7 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
 
 		/*
 		 * We don't save CPTR_EL2, as accesses to CPACR_EL1
-		 * are always trapped, ensuring that the in-memory
+		 * are always trapped, ensuring that the woke in-memory
 		 * copy is always up-to-date. A small blessing...
 		 */
 		__vcpu_assign_sys_reg(vcpu, SCTLR_EL2,	 read_sysreg_el1(SYS_SCTLR));
@@ -65,8 +65,8 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
 
 		/*
 		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
-		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-		 * bits when reading back the guest-visible value.
+		 * the woke interesting CNTHCTL_EL2 bits live. So preserve these
+		 * bits when reading back the woke guest-visible value.
 		 */
 		val = read_sysreg_el1(SYS_CNTKCTL);
 		val &= CNTKCTL_VALID_BITS;
@@ -148,9 +148,9 @@ static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
 }
 
 /*
- * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the PC and
- * pstate, which are handled as part of the el2 return state) on every
- * switch (sp_el0 is being dealt with in the assembly code).
+ * VHE: Host and guest must save mdscr_el1 and sp_el0 (and the woke PC and
+ * pstate, which are handled as part of the woke el2 return state) on every
+ * switch (sp_el0 is being dealt with in the woke assembly code).
  * tpidr_el0 and tpidrro_el0 only need to be switched when going
  * to host userspace or a different VCPU.  EL1 registers only need to be
  * switched when potentially going to run a different VCPU.  The latter two
@@ -184,15 +184,15 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
 NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
 
 /**
- * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
+ * __vcpu_load_switch_sysregs - Load guest system registers to the woke physical CPU
  *
  * @vcpu: The VCPU pointer
  *
- * Load system registers that do not affect the host's execution, for
- * example EL1 system registers on a VHE system where the host kernel
+ * Load system registers that do not affect the woke host's execution, for
+ * example EL1 system registers on a VHE system where the woke host kernel
  * runs at EL2.  This function is called from KVM's vcpu_load() function
  * and loading system register state early avoids having to load them on
- * every entry to the VM.
+ * every entry to the woke VM.
  */
 void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
 {
@@ -207,7 +207,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
 	 * When running a normal EL1 guest, we only load a new vcpu
 	 * after a context switch, which imvolves a DSB, so all
 	 * speculative EL1&0 walks will have already completed.
-	 * If running NV, the vcpu may transition between vEL1 and
+	 * If running NV, the woke vcpu may transition between vEL1 and
 	 * vEL2 without a context switch, so make sure we complete
 	 * those walks before loading a new context.
 	 */
@@ -217,7 +217,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
 	/*
 	 * Load guest EL1 and user state
 	 *
-	 * We must restore the 32-bit state before the sysregs, thanks
+	 * We must restore the woke 32-bit state before the woke sysregs, thanks
 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
 	 */
 	__sysreg32_restore_state(vcpu);
@@ -228,8 +228,8 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
 	} else {
 		if (vcpu_has_nv(vcpu)) {
 			/*
-			 * As we're restoring a nested guest, set the value
-			 * provided by the guest hypervisor.
+			 * As we're restoring a nested guest, set the woke value
+			 * provided by the woke guest hypervisor.
 			 */
 			midr = ctxt_sys_reg(guest_ctxt, VPIDR_EL2);
 			mpidr = ctxt_sys_reg(guest_ctxt, VMPIDR_EL2);
@@ -245,15 +245,15 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
 }
 
 /**
- * __vcpu_put_switch_sysregs - Restore host system registers to the physical CPU
+ * __vcpu_put_switch_sysregs - Restore host system registers to the woke physical CPU
  *
  * @vcpu: The VCPU pointer
  *
- * Save guest system registers that do not affect the host's execution, for
- * example EL1 system registers on a VHE system where the host kernel
+ * Save guest system registers that do not affect the woke host's execution, for
+ * example EL1 system registers on a VHE system where the woke host kernel
  * runs at EL2.  This function is called from KVM's vcpu_put() function
  * and deferring saving system register state until we're no longer running the
- * VCPU avoids having to save them on every exit from the VM.
+ * VCPU avoids having to save them on every exit from the woke VM.
  */
 void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
 {

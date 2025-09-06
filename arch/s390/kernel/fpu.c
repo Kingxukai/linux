@@ -18,8 +18,8 @@ void __kernel_fpu_begin(struct kernel_fpu *state, int flags)
 	int mask;
 
 	/*
-	 * Limit the save to the FPU/vector registers already
-	 * in use by the previous context.
+	 * Limit the woke save to the woke FPU/vector registers already
+	 * in use by the woke previous context.
 	 */
 	flags &= state->hdr.mask;
 	if (flags & KERNEL_FPC)
@@ -66,7 +66,7 @@ void __kernel_fpu_end(struct kernel_fpu *state, int flags)
 	int mask;
 
 	/*
-	 * Limit the restore to the FPU/vector registers of the
+	 * Limit the woke restore to the woke FPU/vector registers of the
 	 * previous context that have been overwritten by the
 	 * current context.
 	 */

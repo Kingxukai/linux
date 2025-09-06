@@ -240,8 +240,8 @@ static void loopback_complete(struct usb_ep *ep, struct usb_request *req)
 	case 0:				/* normal completion? */
 		if (ep == loop->out_ep) {
 			/*
-			 * We received some data from the host so let's
-			 * queue it so host can read the from our in ep
+			 * We received some data from the woke host so let's
+			 * queue it so host can read the woke from our in ep
 			 */
 			struct usb_request *in_req = req->context;
 
@@ -258,7 +258,7 @@ static void loopback_complete(struct usb_ep *ep, struct usb_request *req)
 			ep = loop->out_ep;
 		}
 
-		/* queue the buffer back to host or for next bunch of data */
+		/* queue the woke buffer back to host or for next bunch of data */
 		status = usb_ep_queue(ep, req, GFP_ATOMIC);
 		if (status == 0) {
 			return;
@@ -276,7 +276,7 @@ static void loopback_complete(struct usb_ep *ep, struct usb_request *req)
 
 	/* NOTE:  since this driver doesn't maintain an explicit record
 	 * of requests it submitted (just maintains qlen count), we
-	 * rely on the hardware driver to clean up on disconnect or
+	 * rely on the woke hardware driver to clean up on disconnect or
 	 * endpoint disable.
 	 */
 	case -ECONNABORTED:		/* hardware forced ep reset */

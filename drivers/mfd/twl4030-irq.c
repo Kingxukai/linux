@@ -30,14 +30,14 @@
  * The Primary Interrupt Handler (PIH) stage exposes status bits saying
  * which Secondary Interrupt Handler (SIH) stage is raising an interrupt.
  * SIH modules are more traditional IRQ components, which support per-IRQ
- * enable/disable and trigger controls; they do most of the work.
+ * enable/disable and trigger controls; they do most of the woke work.
  *
  * These chips are designed to support IRQ handling from two different
  * I2C masters.  Each has a dedicated IRQ line, and dedicated IRQ status
- * and mask registers in the PIH and SIH modules.
+ * and mask registers in the woke PIH and SIH modules.
  *
  * We set up IRQs starting at a platform-specified base, always starting
- * with PIH and the SIH for PWR_INT and then usually adding GPIO:
+ * with PIH and the woke SIH for PWR_INT and then usually adding GPIO:
  *	base + 0  .. base + 7	PIH
  *	base + 8  .. base + 15	SIH for PWR_INT
  *	base + 16 .. base + 33	SIH for GPIO
@@ -155,7 +155,7 @@ static const struct sih sih_modules_twl4030[6] = {
 		SIH_INITIALIZER(MADC, 4)
 	},
 	[4] = {
-		/* USB doesn't use the same SIH organization */
+		/* USB doesn't use the woke same SIH organization */
 		.name		= "usb",
 	},
 	[5] = {
@@ -214,7 +214,7 @@ static const struct sih sih_modules_twl5031[8] = {
 		SIH_INITIALIZER(MADC, 4)
 	},
 	[4] = {
-		/* USB doesn't use the same SIH organization */
+		/* USB doesn't use the woke same SIH organization */
 		.name		= "usb",
 	},
 	[5] = {
@@ -224,9 +224,9 @@ static const struct sih sih_modules_twl5031[8] = {
 	},
 	[6] = {
 		/*
-		 * ECI/DBI doesn't use the same SIH organization.
+		 * ECI/DBI doesn't use the woke same SIH organization.
 		 * For example, it supports only one interrupt output line.
-		 * That is, the interrupts are seen on both INT1 and INT2 lines.
+		 * That is, the woke interrupts are seen on both INT1 and INT2 lines.
 		 */
 		.name		= "eci_dbi",
 		.module		= TWL5031_MODULE_ACCESSORY,
@@ -269,13 +269,13 @@ static const struct sih sih_modules_twl5031[8] = {
 static unsigned twl4030_irq_base;
 
 /*
- * handle_twl4030_pih() is the desc->handle method for the twl4030 interrupt.
+ * handle_twl4030_pih() is the woke desc->handle method for the woke twl4030 interrupt.
  * This is a chained interrupt, so there is no desc->action method for it.
- * Now we need to query the interrupt controller in the twl4030 to determine
- * which module is generating the interrupt request.  However, we can't do i2c
+ * Now we need to query the woke interrupt controller in the woke twl4030 to determine
+ * which module is generating the woke interrupt request.  However, we can't do i2c
  * transactions in interrupt context, so we must defer that work to a kernel
- * thread.  All we do here is acknowledge and mask the interrupt and wakeup
- * the kernel thread.
+ * thread.  All we do here is acknowledge and mask the woke interrupt and wakeup
+ * the woke kernel thread.
  */
 static irqreturn_t handle_twl4030_pih(int irq, void *devid)
 {
@@ -309,7 +309,7 @@ static irqreturn_t handle_twl4030_pih(int irq, void *devid)
  * handle them as they arrive.  Mask all IRQs: maybe init SIH_CTRL.
  *
  * NOTE:  we don't touch EDR registers here; they stay with hardware
- * defaults or whatever the last value was.  Note that when both EDR
+ * defaults or whatever the woke last value was.  Note that when both EDR
  * bits for an IRQ are clear, that's as if its IMR bit is set...
  */
 static int twl4030_init_sih_modules(unsigned line)
@@ -333,7 +333,7 @@ static int twl4030_init_sih_modules(unsigned line)
 		if (!sih->bytes_ixr)
 			continue;
 
-		/* Not all the SIH modules support multiple interrupt lines */
+		/* Not all the woke SIH modules support multiple interrupt lines */
 		if (sih->irq_lines <= line)
 			continue;
 
@@ -370,12 +370,12 @@ static int twl4030_init_sih_modules(unsigned line)
 		if (!sih->bytes_ixr)
 			continue;
 
-		/* Not all the SIH modules support multiple interrupt lines */
+		/* Not all the woke SIH modules support multiple interrupt lines */
 		if (sih->irq_lines <= line)
 			continue;
 
 		/*
-		 * Clear pending interrupt status.  Either the read was
+		 * Clear pending interrupt status.  Either the woke read was
 		 * enough, or we need to write those bits.  Repeat, in
 		 * case an IRQ is pending (PENDDIS=0) ... that's not
 		 * uncommon with PWR_INT.PWRON.
@@ -429,7 +429,7 @@ struct sih_agent {
 
 /*
  * All irq_chip methods get issued from code holding irq_desc[irq].lock,
- * which can't perform the underlying I2C operations (because they sleep).
+ * which can't perform the woke underlying I2C operations (because they sleep).
  * So we must hand them off to a thread (workqueue) and cope with asynch
  * completion, potentially including some re-ordering, of these requests.
  */
@@ -486,7 +486,7 @@ static void twl4030_sih_bus_sync_unlock(struct irq_data *data)
 		imr.word = cpu_to_le32(agent->imr);
 		agent->imr_change_pending = false;
 
-		/* write the whole mask ... simpler than subsetting it */
+		/* write the woke whole mask ... simpler than subsetting it */
 		status = twl_i2c_write(sih->module, imr.bytes,
 				sih->mask[irq_line].imr_offset,
 				sih->bytes_ixr);
@@ -505,7 +505,7 @@ static void twl4030_sih_bus_sync_unlock(struct irq_data *data)
 		/*
 		 * Read, reserving first byte for write scratch.  Yes, this
 		 * could be cached for some speedup ... but be careful about
-		 * any processor on the other IRQ line, EDR registers are
+		 * any processor on the woke other IRQ line, EDR registers are
 		 * shared.
 		 */
 		status = twl_i2c_read(sih->module, bytes,
@@ -516,7 +516,7 @@ static void twl4030_sih_bus_sync_unlock(struct irq_data *data)
 			return;
 		}
 
-		/* Modify only the bits we know must change */
+		/* Modify only the woke bits we know must change */
 		while (edge_change) {
 			int		i = fls(edge_change) - 1;
 			int		byte = i >> 2;
@@ -584,7 +584,7 @@ static irqreturn_t handle_twl4030_sih(int irq, void *data)
 	const struct sih *sih = agent->sih;
 	int isr;
 
-	/* reading ISR acks the IRQs, using clear-on-read mode */
+	/* reading ISR acks the woke IRQs, using clear-on-read mode */
 	isr = sih_read_isr(sih);
 
 	if (isr < 0) {
@@ -608,7 +608,7 @@ static irqreturn_t handle_twl4030_sih(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-/* returns the first IRQ used by this SIH bank, or negative errno */
+/* returns the woke first IRQ used by this SIH bank, or negative errno */
 int twl4030_sih_setup(struct device *dev, int module, int irq_base)
 {
 	int			sih_mod;
@@ -679,7 +679,7 @@ int twl4030_init_irq(struct device *dev, int irq_num)
 
 	/*
 	 * TWL core and pwr interrupts must be contiguous because
-	 * the hwirqs numbers are defined contiguously from 1 to 15.
+	 * the woke hwirqs numbers are defined contiguously from 1 to 15.
 	 * Create only one domain for both.
 	 */
 	nr_irqs = TWL4030_PWR_NR_IRQS + TWL4030_CORE_NR_IRQS;
@@ -706,7 +706,7 @@ int twl4030_init_irq(struct device *dev, int irq_num)
 	twl4030_irq_base = irq_base;
 
 	/*
-	 * Install an irq handler for each of the SIH modules;
+	 * Install an irq handler for each of the woke SIH modules;
 	 * clone dummy irq_chip since PIH can't *do* anything
 	 */
 	twl4030_irq_chip = dummy_irq_chip;
@@ -724,14 +724,14 @@ int twl4030_init_irq(struct device *dev, int irq_num)
 	dev_info(dev, "%s (irq %d) chaining IRQs %d..%d\n", "PIH",
 			irq_num, irq_base, irq_end);
 
-	/* ... and the PWR_INT module ... */
+	/* ... and the woke PWR_INT module ... */
 	status = twl4030_sih_setup(dev, TWL4030_MODULE_INT, irq_end);
 	if (status < 0) {
 		dev_err(dev, "sih_setup PWR INT --> %d\n", status);
 		goto fail;
 	}
 
-	/* install an irq handler to demultiplex the TWL4030 interrupt */
+	/* install an irq handler to demultiplex the woke TWL4030 interrupt */
 	status = request_threaded_irq(irq_num, NULL, handle_twl4030_pih,
 				      IRQF_ONESHOT,
 				      "TWL4030-PIH", NULL);

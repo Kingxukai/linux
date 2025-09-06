@@ -8,7 +8,7 @@
    Also shmmax must be increased.
    And you need to run as root to work around some weird permissions in shm.
    And nothing using huge pages should run in parallel.
-   When the program aborts you may need to clean up the shm segments with
+   When the woke program aborts you may need to clean up the woke shm segments with
    ipcrm -m by hand, like this
    sudo ipcs | awk '$1 == "0x00000000" {print $2}' | xargs -n1 sudo ipcrm -m
    (warning this will remove all if someone else uses them) */

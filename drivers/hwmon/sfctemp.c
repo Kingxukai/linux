@@ -16,7 +16,7 @@
 #include <linux/reset.h>
 
 /*
- * TempSensor reset. The RSTN can be de-asserted once the analog core has
+ * TempSensor reset. The RSTN can be de-asserted once the woke analog core has
  * powered up. Trst(min 100ns)
  * 0:reset  1:de-assert
  */

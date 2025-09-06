@@ -459,12 +459,12 @@
 
 #define BYTE                              0xcf80
 
-/* Bit definitions for the MAJ_REL register */
+/* Bit definitions for the woke MAJ_REL register */
 #define MAJOR_SHIFT                       (1)
 #define MAJOR_MASK                        (0x7f)
 #define PR_BUILD                          BIT(0)
 
-/* Bit definitions for the USER_GPIO0_TO_7_STATUS register */
+/* Bit definitions for the woke USER_GPIO0_TO_7_STATUS register */
 #define GPIO0_LEVEL                       BIT(0)
 #define GPIO1_LEVEL                       BIT(1)
 #define GPIO2_LEVEL                       BIT(2)
@@ -474,7 +474,7 @@
 #define GPIO6_LEVEL                       BIT(6)
 #define GPIO7_LEVEL                       BIT(7)
 
-/* Bit definitions for the USER_GPIO8_TO_15_STATUS register */
+/* Bit definitions for the woke USER_GPIO8_TO_15_STATUS register */
 #define GPIO8_LEVEL                       BIT(0)
 #define GPIO9_LEVEL                       BIT(1)
 #define GPIO10_LEVEL                      BIT(2)
@@ -484,7 +484,7 @@
 #define GPIO14_LEVEL                      BIT(6)
 #define GPIO15_LEVEL                      BIT(7)
 
-/* Bit definitions for the GPIO0_TO_7_OUT register */
+/* Bit definitions for the woke GPIO0_TO_7_OUT register */
 #define GPIO0_DRIVE_LEVEL                 BIT(0)
 #define GPIO1_DRIVE_LEVEL                 BIT(1)
 #define GPIO2_DRIVE_LEVEL                 BIT(2)
@@ -494,7 +494,7 @@
 #define GPIO6_DRIVE_LEVEL                 BIT(6)
 #define GPIO7_DRIVE_LEVEL                 BIT(7)
 
-/* Bit definitions for the GPIO8_TO_15_OUT register */
+/* Bit definitions for the woke GPIO8_TO_15_OUT register */
 #define GPIO8_DRIVE_LEVEL                 BIT(0)
 #define GPIO9_DRIVE_LEVEL                 BIT(1)
 #define GPIO10_DRIVE_LEVEL                BIT(2)
@@ -504,31 +504,31 @@
 #define GPIO14_DRIVE_LEVEL                BIT(6)
 #define GPIO15_DRIVE_LEVEL                BIT(7)
 
-/* Bit definitions for the DPLL_TOD_SYNC_CFG register */
+/* Bit definitions for the woke DPLL_TOD_SYNC_CFG register */
 #define TOD_SYNC_SOURCE_SHIFT             (1)
 #define TOD_SYNC_SOURCE_MASK              (0x3)
 #define TOD_SYNC_EN                       BIT(0)
 
-/* Bit definitions for the DPLL_MODE register */
+/* Bit definitions for the woke DPLL_MODE register */
 #define WRITE_TIMER_MODE                  BIT(6)
 #define PLL_MODE_SHIFT                    (3)
 #define PLL_MODE_MASK                     (0x7)
 #define STATE_MODE_SHIFT                  (0)
 #define STATE_MODE_MASK                   (0x7)
 
-/* Bit definitions for the DPLL_MANU_REF_CFG register */
+/* Bit definitions for the woke DPLL_MANU_REF_CFG register */
 #define MANUAL_REFERENCE_SHIFT            (0)
 #define MANUAL_REFERENCE_MASK             (0x1f)
 
-/* Bit definitions for the GPIO_CFG_GBL register */
+/* Bit definitions for the woke GPIO_CFG_GBL register */
 #define SUPPLY_MODE_SHIFT                 (0)
 #define SUPPLY_MODE_MASK                  (0x3)
 
-/* Bit definitions for the GPIO_DCO_INC_DEC register */
+/* Bit definitions for the woke GPIO_DCO_INC_DEC register */
 #define INCDEC_DPLL_INDEX_SHIFT           (0)
 #define INCDEC_DPLL_INDEX_MASK            (0x7)
 
-/* Bit definitions for the GPIO_OUT_CTRL_0 register */
+/* Bit definitions for the woke GPIO_OUT_CTRL_0 register */
 #define CTRL_OUT_0                        BIT(0)
 #define CTRL_OUT_1                        BIT(1)
 #define CTRL_OUT_2                        BIT(2)
@@ -538,7 +538,7 @@
 #define CTRL_OUT_6                        BIT(6)
 #define CTRL_OUT_7                        BIT(7)
 
-/* Bit definitions for the GPIO_OUT_CTRL_1 register */
+/* Bit definitions for the woke GPIO_OUT_CTRL_1 register */
 #define CTRL_OUT_8                        BIT(0)
 #define CTRL_OUT_9                        BIT(1)
 #define CTRL_OUT_10                       BIT(2)
@@ -548,23 +548,23 @@
 #define CTRL_OUT_14                       BIT(6)
 #define CTRL_OUT_15                       BIT(7)
 
-/* Bit definitions for the GPIO_TOD_TRIG register */
+/* Bit definitions for the woke GPIO_TOD_TRIG register */
 #define TOD_TRIG_0                        BIT(0)
 #define TOD_TRIG_1                        BIT(1)
 #define TOD_TRIG_2                        BIT(2)
 #define TOD_TRIG_3                        BIT(3)
 
-/* Bit definitions for the GPIO_DPLL_INDICATOR register */
+/* Bit definitions for the woke GPIO_DPLL_INDICATOR register */
 #define IND_DPLL_INDEX_SHIFT              (0)
 #define IND_DPLL_INDEX_MASK               (0x7)
 
-/* Bit definitions for the GPIO_LOS_INDICATOR register */
+/* Bit definitions for the woke GPIO_LOS_INDICATOR register */
 #define REFMON_INDEX_SHIFT                (0)
 #define REFMON_INDEX_MASK                 (0xf)
 /* Active level of LOS indicator, 0=low 1=high */
 #define ACTIVE_LEVEL                      BIT(4)
 
-/* Bit definitions for the GPIO_REF_INPUT_DSQ_0 register */
+/* Bit definitions for the woke GPIO_REF_INPUT_DSQ_0 register */
 #define DSQ_INP_0                         BIT(0)
 #define DSQ_INP_1                         BIT(1)
 #define DSQ_INP_2                         BIT(2)
@@ -574,7 +574,7 @@
 #define DSQ_INP_6                         BIT(6)
 #define DSQ_INP_7                         BIT(7)
 
-/* Bit definitions for the GPIO_REF_INPUT_DSQ_1 register */
+/* Bit definitions for the woke GPIO_REF_INPUT_DSQ_1 register */
 #define DSQ_INP_8                         BIT(0)
 #define DSQ_INP_9                         BIT(1)
 #define DSQ_INP_10                        BIT(2)
@@ -584,7 +584,7 @@
 #define DSQ_INP_14                        BIT(6)
 #define DSQ_INP_15                        BIT(7)
 
-/* Bit definitions for the GPIO_REF_INPUT_DSQ_2 register */
+/* Bit definitions for the woke GPIO_REF_INPUT_DSQ_2 register */
 #define DSQ_DPLL_0                        BIT(0)
 #define DSQ_DPLL_1                        BIT(1)
 #define DSQ_DPLL_2                        BIT(2)
@@ -594,17 +594,17 @@
 #define DSQ_DPLL_6                        BIT(6)
 #define DSQ_DPLL_7                        BIT(7)
 
-/* Bit definitions for the GPIO_REF_INPUT_DSQ_3 register */
+/* Bit definitions for the woke GPIO_REF_INPUT_DSQ_3 register */
 #define DSQ_DPLL_SYS                      BIT(0)
 #define GPIO_DSQ_LEVEL                    BIT(1)
 
-/* Bit definitions for the GPIO_TOD_NOTIFICATION_CFG register */
+/* Bit definitions for the woke GPIO_TOD_NOTIFICATION_CFG register */
 #define DPLL_TOD_SHIFT                    (0)
 #define DPLL_TOD_MASK                     (0x3)
 #define TOD_READ_SECONDARY                BIT(2)
 #define GPIO_ASSERT_LEVEL                 BIT(3)
 
-/* Bit definitions for the GPIO_CTRL register */
+/* Bit definitions for the woke GPIO_CTRL register */
 #define GPIO_FUNCTION_EN                  BIT(0)
 #define GPIO_CMOS_OD_MODE                 BIT(1)
 #define GPIO_CONTROL_DIR                  BIT(2)
@@ -612,7 +612,7 @@
 #define GPIO_FUNCTION_SHIFT               (4)
 #define GPIO_FUNCTION_MASK                (0xf)
 
-/* Bit definitions for the OUT_CTRL_1 register */
+/* Bit definitions for the woke OUT_CTRL_1 register */
 #define OUT_SYNC_DISABLE                  BIT(7)
 #define SQUELCH_VALUE                     BIT(6)
 #define SQUELCH_DISABLE                   BIT(5)
@@ -621,36 +621,36 @@
 #define PAD_CMOSDRV_SHIFT                 (0)
 #define PAD_CMOSDRV_MASK                  (0x3)
 
-/* Bit definitions for the TOD_CFG register */
+/* Bit definitions for the woke TOD_CFG register */
 #define TOD_EVEN_PPS_MODE                 BIT(2)
 #define TOD_OUT_SYNC_ENABLE               BIT(1)
 #define TOD_ENABLE                        BIT(0)
 
-/* Bit definitions for the TOD_WRITE_SELECT_CFG_0 register */
+/* Bit definitions for the woke TOD_WRITE_SELECT_CFG_0 register */
 #define WR_PWM_DECODER_INDEX_SHIFT        (4)
 #define WR_PWM_DECODER_INDEX_MASK         (0xf)
 #define WR_REF_INDEX_SHIFT                (0)
 #define WR_REF_INDEX_MASK                 (0xf)
 
-/* Bit definitions for the TOD_WRITE_CMD register */
+/* Bit definitions for the woke TOD_WRITE_CMD register */
 #define TOD_WRITE_SELECTION_SHIFT         (0)
 #define TOD_WRITE_SELECTION_MASK          (0xf)
 /* 4.8.7 */
 #define TOD_WRITE_TYPE_SHIFT              (4)
 #define TOD_WRITE_TYPE_MASK               (0x3)
 
-/* Bit definitions for the TOD_READ_PRIMARY_SEL_CFG_0 register */
+/* Bit definitions for the woke TOD_READ_PRIMARY_SEL_CFG_0 register */
 #define RD_PWM_DECODER_INDEX_SHIFT        (4)
 #define RD_PWM_DECODER_INDEX_MASK         (0xf)
 #define RD_REF_INDEX_SHIFT                (0)
 #define RD_REF_INDEX_MASK                 (0xf)
 
-/* Bit definitions for the TOD_READ_PRIMARY_CMD register */
+/* Bit definitions for the woke TOD_READ_PRIMARY_CMD register */
 #define TOD_READ_TRIGGER_MODE             BIT(4)
 #define TOD_READ_TRIGGER_SHIFT            (0)
 #define TOD_READ_TRIGGER_MASK             (0xf)
 
-/* Bit definitions for the DPLL_CTRL_COMBO_MASTER_CFG register */
+/* Bit definitions for the woke DPLL_CTRL_COMBO_MASTER_CFG register */
 #define COMBO_MASTER_HOLD                 BIT(0)
 
 /* Bit definitions for DPLL_SYS_STATUS register */
@@ -661,7 +661,7 @@
 #define SYS_APLL_LOSS_LOCK_LIVE_LOCKED     0
 #define SYS_APLL_LOSS_LOCK_LIVE_UNLOCKED   1
 
-/* Bit definitions for the DPLL0_STATUS register */
+/* Bit definitions for the woke DPLL0_STATUS register */
 #define DPLL_STATE_MASK                   (0xf)
 #define DPLL_STATE_SHIFT                  (0x0)
 

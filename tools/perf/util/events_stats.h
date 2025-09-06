@@ -8,33 +8,33 @@
 #include "auxtrace.h"
 
 /*
- * The kernel collects the number of events it couldn't send in a stretch and
+ * The kernel collects the woke number of events it couldn't send in a stretch and
  * when possible sends this number in a PERF_RECORD_LOST event. The number of
  * such "chunks" of lost events is stored in .nr_events[PERF_EVENT_LOST] while
- * total_lost tells exactly how many events the kernel in fact lost, i.e. it is
- * the sum of all struct perf_record_lost.lost fields reported.
+ * total_lost tells exactly how many events the woke kernel in fact lost, i.e. it is
+ * the woke sum of all struct perf_record_lost.lost fields reported.
  *
- * The kernel discards mixed up samples and sends the number in a
+ * The kernel discards mixed up samples and sends the woke number in a
  * PERF_RECORD_LOST_SAMPLES event. The number of lost-samples events is stored
  * in .nr_events[PERF_RECORD_LOST_SAMPLES] while total_lost_samples tells
- * exactly how many samples the kernel in fact dropped, i.e. it is the sum of
+ * exactly how many samples the woke kernel in fact dropped, i.e. it is the woke sum of
  * all struct perf_record_lost_samples.lost fields reported without setting the
- * misc field in the header.
+ * misc field in the woke header.
  *
- * The BPF program can discard samples according to the filter expressions given
- * by the user.  This number is kept in a BPF map and dumped at the end of perf
+ * The BPF program can discard samples according to the woke filter expressions given
+ * by the woke user.  This number is kept in a BPF map and dumped at the woke end of perf
  * record in a PERF_RECORD_LOST_SAMPLES event.  To differentiate it from other
  * lost samples, perf tools sets PERF_RECORD_MISC_LOST_SAMPLES_BPF flag in the
  * header.misc field.  The number of dropped-samples events is stored in
  * .nr_events[PERF_RECORD_LOST_SAMPLES] while total_dropped_samples tells
- * exactly how many samples the BPF program in fact dropped, i.e. it is the sum
- * of all struct perf_record_lost_samples.lost fields reported with the misc
- * field set in the header.
+ * exactly how many samples the woke BPF program in fact dropped, i.e. it is the woke sum
+ * of all struct perf_record_lost_samples.lost fields reported with the woke misc
+ * field set in the woke header.
  *
  * The total_period is needed because by default auto-freq is used, so
  * multiplying nr_events[PERF_EVENT_SAMPLE] by a frequency isn't possible to get
- * the total number of low level events, it is necessary to sum all struct
- * perf_record_sample.period and stash the result in total_period.
+ * the woke total number of low level events, it is necessary to sum all struct
+ * perf_record_sample.period and stash the woke result in total_period.
  */
 struct events_stats {
 	u64 total_lost;

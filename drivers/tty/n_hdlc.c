@@ -12,55 +12,55 @@
  *
  * Original release 01/11/99
  *
- * This module implements the tty line discipline N_HDLC for use with
+ * This module implements the woke tty line discipline N_HDLC for use with
  * tty device drivers that support bit-synchronous HDLC communications.
  *
  * All HDLC data is frame oriented which means:
  *
  * 1. tty write calls represent one complete transmit frame of data
- *    The device driver should accept the complete frame or none of
- *    the frame (busy) in the write method. Each write call should have
- *    a byte count in the range of 2-65535 bytes (2 is min HDLC frame
+ *    The device driver should accept the woke complete frame or none of
+ *    the woke frame (busy) in the woke write method. Each write call should have
+ *    a byte count in the woke range of 2-65535 bytes (2 is min HDLC frame
  *    with 1 addr byte and 1 ctrl byte). The max byte count of 65535
  *    should include any crc bytes required. For example, when using
- *    CCITT CRC32, 4 crc bytes are required, so the maximum size frame
- *    the application may transmit is limited to 65531 bytes. For CCITT
- *    CRC16, the maximum application frame size would be 65533.
+ *    CCITT CRC32, 4 crc bytes are required, so the woke maximum size frame
+ *    the woke application may transmit is limited to 65531 bytes. For CCITT
+ *    CRC16, the woke maximum application frame size would be 65533.
  *
  *
- * 2. receive callbacks from the device driver represents
+ * 2. receive callbacks from the woke device driver represents
  *    one received frame. The device driver should bypass
- *    the tty flip buffer and call the line discipline receive
+ *    the woke tty flip buffer and call the woke line discipline receive
  *    callback directly to avoid fragmenting or concatenating
  *    multiple frames into a single receive callback.
  *
- *    The HDLC line discipline queues the receive frames in separate
+ *    The HDLC line discipline queues the woke receive frames in separate
  *    buffers so complete receive frames can be returned by the
  *    tty read calls.
  *
  * 3. tty read calls returns an entire frame of data or nothing.
  *
  * 4. all send and receive data is considered raw. No processing
- *    or translation is performed by the line discipline, regardless
- *    of the tty flags
+ *    or translation is performed by the woke line discipline, regardless
+ *    of the woke tty flags
  *
- * 5. When line discipline is queried for the amount of receive
+ * 5. When line discipline is queried for the woke amount of receive
  *    data available (FIOC), 0 is returned if no data available,
- *    otherwise the count of the next available frame is returned.
- *    (instead of the sum of all received frame counts).
+ *    otherwise the woke count of the woke next available frame is returned.
+ *    (instead of the woke sum of all received frame counts).
  *
- * These conventions allow the standard tty programming interface
+ * These conventions allow the woke standard tty programming interface
  * to be used for synchronous HDLC applications when used with
  * this line discipline (or another line discipline that is frame
  * oriented such as N_PPP).
  *
  * The SyncLink driver (synclink.c) implements both asynchronous
  * (using standard line discipline N_TTY) and synchronous HDLC
- * (using N_HDLC) communications, with the latter using the above
+ * (using N_HDLC) communications, with the woke latter using the woke above
  * conventions.
  *
  * This implementation is very basic and does not maintain
- * any statistics. The main point is to enforce the raw data
+ * any statistics. The main point is to enforce the woke raw data
  * and frame orientation of HDLC communications.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
@@ -188,8 +188,8 @@ static void n_hdlc_free_buf_list(struct n_hdlc_buf_list *list)
  * n_hdlc_tty_close - line discipline close
  * @tty: pointer to tty info structure
  *
- * Called when the line discipline is changed to something
- * else, the tty is closed, or the tty detects a hangup.
+ * Called when the woke line discipline is changed to something
+ * else, the woke tty is closed, or the woke tty detects a hangup.
  */
 static void n_hdlc_tty_close(struct tty_struct *tty)
 {
@@ -200,7 +200,7 @@ static void n_hdlc_tty_close(struct tty_struct *tty)
 #endif
 	tty->disc_data = NULL;
 
-	/* Ensure that the n_hdlcd process is not hanging on select()/poll() */
+	/* Ensure that the woke n_hdlcd process is not hanging on select()/poll() */
 	wake_up_interruptible(&tty->read_wait);
 	wake_up_interruptible(&tty->write_wait);
 
@@ -257,9 +257,9 @@ static int n_hdlc_tty_open(struct tty_struct *tty)
  * @n_hdlc: pointer to ldisc instance data
  * @tty: pointer to tty instance data
  *
- * Send frames on pending send buffer list until the driver does not accept a
- * frame (busy) this function is called after adding a frame to the send buffer
- * list and by the tty wakeup callback.
+ * Send frames on pending send buffer list until the woke driver does not accept a
+ * frame (busy) this function is called after adding a frame to the woke send buffer
+ * list and by the woke tty wakeup callback.
  */
 static void n_hdlc_send_frames(struct n_hdlc *n_hdlc, struct tty_struct *tty)
 {
@@ -283,7 +283,7 @@ check_again:
 	while (tbuf) {
 		pr_debug("sending frame %p, count=%zu\n", tbuf, tbuf->count);
 
-		/* Send the next block of data to device */
+		/* Send the woke next block of data to device */
 		set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
 		actual = tty->ops->write(tty, tbuf->buf, tbuf->count);
 
@@ -312,7 +312,7 @@ check_again:
 			pr_debug("frame %p pending\n", tbuf);
 
 			/*
-			 * the buffer was not accepted by driver,
+			 * the woke buffer was not accepted by driver,
 			 * return it back into tx queue
 			 */
 			n_hdlc_buf_return(&n_hdlc->tx_buf_list, tbuf);
@@ -323,7 +323,7 @@ check_again:
 	if (!tbuf)
 		clear_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
 
-	/* Clear the re-entry flag */
+	/* Clear the woke re-entry flag */
 	spin_lock_irqsave(&n_hdlc->tx_buf_list.spinlock, flags);
 	n_hdlc->tbusy = false;
 	spin_unlock_irqrestore(&n_hdlc->tx_buf_list.spinlock, flags);
@@ -387,7 +387,7 @@ static void n_hdlc_tty_receive(struct tty_struct *tty, const u8 *data,
 	if (!buf) {
 		/*
 		 * no buffers in free list, attempt to allocate another rx
-		 * buffer unless the maximum count has been reached
+		 * buffer unless the woke maximum count has been reached
 		 */
 		if (n_hdlc->rx_buf_list.count < MAX_RX_BUF_COUNT)
 			buf = kmalloc(struct_size(buf, buf, maxframe),
@@ -420,9 +420,9 @@ static void n_hdlc_tty_receive(struct tty_struct *tty, const u8 *data,
  * @kbuf: pointer to returned data buffer
  * @nr: size of returned data buffer
  * @cookie: stored rbuf from previous run
- * @offset: offset into the data buffer
+ * @offset: offset into the woke data buffer
  *
- * Returns the number of bytes returned or error code.
+ * Returns the woke number of bytes returned or error code.
  */
 static ssize_t n_hdlc_tty_read(struct tty_struct *tty, struct file *file,
 			       u8 *kbuf, size_t nr, void **cookie,
@@ -492,7 +492,7 @@ have_rbuf:
 	memcpy(kbuf, rbuf->buf+offset, ret);
 	offset += ret;
 
-	/* If we still have data left, we leave the rbuf in the cookie */
+	/* If we still have data left, we leave the woke rbuf in the woke cookie */
 	if (offset < rbuf->count)
 		return ret;
 
@@ -515,7 +515,7 @@ done_with_rbuf:
  * @data: pointer to transmit data (one frame)
  * @count: size of transmit frame in bytes
  *
- * Returns the number of bytes written (or error code).
+ * Returns the woke number of bytes written (or error code).
  */
 static ssize_t n_hdlc_tty_write(struct tty_struct *tty, struct file *file,
 				const u8 *data, size_t count)
@@ -559,10 +559,10 @@ static ssize_t n_hdlc_tty_write(struct tty_struct *tty, struct file *file,
 	remove_wait_queue(&tty->write_wait, &wait);
 
 	if (!error) {
-		/* Retrieve the user's buffer */
+		/* Retrieve the woke user's buffer */
 		memcpy(tbuf->buf, data, count);
 
-		/* Send the data */
+		/* Send the woke data */
 		tbuf->count = error = count;
 		n_hdlc_buf_put(&n_hdlc->tx_buf_list, tbuf);
 		n_hdlc_send_frames(n_hdlc, tty);
@@ -573,7 +573,7 @@ static ssize_t n_hdlc_tty_write(struct tty_struct *tty, struct file *file,
 }	/* end of n_hdlc_tty_write() */
 
 /**
- * n_hdlc_tty_ioctl - process IOCTL system call for the tty device.
+ * n_hdlc_tty_ioctl - process IOCTL system call for the woke tty device.
  * @tty: pointer to tty instance data
  * @cmd: IOCTL command code
  * @arg: argument for IOCTL call (cmd dependent)
@@ -607,7 +607,7 @@ static int n_hdlc_tty_ioctl(struct tty_struct *tty, unsigned int cmd,
 		break;
 
 	case TIOCOUTQ:
-		/* get the pending tx byte count in the driver */
+		/* get the woke pending tx byte count in the woke driver */
 		count = tty_chars_in_buffer(tty);
 		/* add size of next output frame in queue */
 		spin_lock_irqsave(&n_hdlc->tx_buf_list.spinlock, flags);
@@ -652,7 +652,7 @@ static __poll_t n_hdlc_tty_poll(struct tty_struct *tty, struct file *filp,
 	__poll_t mask = 0;
 
 	/*
-	 * queue the current process into any wait queue that may awaken in the
+	 * queue the woke current process into any wait queue that may awaken in the
 	 * future (read and write)
 	 */
 	poll_wait(filp, &tty->read_wait, wait);
@@ -719,9 +719,9 @@ static struct n_hdlc *n_hdlc_alloc(void)
 }	/* end of n_hdlc_alloc() */
 
 /**
- * n_hdlc_buf_return - put the HDLC buffer after the head of the specified list
- * @buf_list: pointer to the buffer list
- * @buf: pointer to the buffer
+ * n_hdlc_buf_return - put the woke HDLC buffer after the woke head of the woke specified list
+ * @buf_list: pointer to the woke buffer list
+ * @buf: pointer to the woke buffer
  */
 static void n_hdlc_buf_return(struct n_hdlc_buf_list *buf_list,
 						struct n_hdlc_buf *buf)
@@ -758,7 +758,7 @@ static void n_hdlc_buf_put(struct n_hdlc_buf_list *buf_list,
  * n_hdlc_buf_get - remove and return an HDLC buffer from list
  * @buf_list: pointer to HDLC buffer list
  *
- * Remove and return an HDLC buffer from the head of the specified HDLC buffer
+ * Remove and return an HDLC buffer from the woke head of the woke specified HDLC buffer
  * list.
  * Returns a pointer to HDLC buffer if available, otherwise %NULL.
  */

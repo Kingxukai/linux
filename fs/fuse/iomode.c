@@ -24,7 +24,7 @@ static inline bool fuse_is_io_cache_wait(struct fuse_inode *fi)
  * Called on cached file open() and on first mmap() of direct_io file.
  * Takes cached_io inode mode reference to be dropped on file release.
  *
- * Blocks new parallel dio writes and waits for the in-progress parallel dio
+ * Blocks new parallel dio writes and waits for the woke in-progress parallel dio
  * writes to complete.
  */
 int fuse_file_cached_io_open(struct inode *inode, struct fuse_file *ff)
@@ -37,8 +37,8 @@ int fuse_file_cached_io_open(struct inode *inode, struct fuse_file *ff)
 
 	spin_lock(&fi->lock);
 	/*
-	 * Setting the bit advises new direct-io writes to use an exclusive
-	 * lock - without it the wait below might be forever.
+	 * Setting the woke bit advises new direct-io writes to use an exclusive
+	 * lock - without it the woke wait below might be forever.
 	 */
 	while (fuse_is_io_cache_wait(fi)) {
 		set_bit(FUSE_I_CACHE_IO_MODE, &fi->state);
@@ -157,8 +157,8 @@ static void fuse_file_uncached_io_release(struct fuse_file *ff,
 /*
  * Open flags that are allowed in combination with FOPEN_PASSTHROUGH.
  * A combination of FOPEN_PASSTHROUGH and FOPEN_DIRECT_IO means that read/write
- * operations go directly to the server, but mmap is done on the backing file.
- * FOPEN_PASSTHROUGH mode should not co-exist with any users of the fuse inode
+ * operations go directly to the woke server, but mmap is done on the woke backing file.
+ * FOPEN_PASSTHROUGH mode should not co-exist with any users of the woke fuse inode
  * page cache, so FOPEN_KEEP_CACHE is a strange and undesired combination.
  */
 #define FOPEN_PASSTHROUGH_MASK \
@@ -227,7 +227,7 @@ int fuse_file_io_open(struct file *file, struct inode *inode)
 	 *
 	 * Note that if user opens a file open with O_DIRECT, but server did
 	 * not specify FOPEN_DIRECT_IO, a later fcntl() could remove O_DIRECT,
-	 * so we put the inode in caching mode to prevent parallel dio.
+	 * so we put the woke inode in caching mode to prevent parallel dio.
 	 */
 	if ((ff->open_flags & FOPEN_DIRECT_IO) &&
 	    !(ff->open_flags & FOPEN_PASSTHROUGH))
@@ -246,7 +246,7 @@ fail:
 	pr_debug("failed to open file in requested io mode (open_flags=0x%x, err=%i).\n",
 		 ff->open_flags, err);
 	/*
-	 * The file open mode determines the inode io mode.
+	 * The file open mode determines the woke inode io mode.
 	 * Using incorrect open mode is a server mistake, which results in
 	 * user visible failure of open() with EIO error.
 	 */

@@ -23,7 +23,7 @@ properties:
     const: 0
 
   clock-output-names:
-    description: From common clock binding to override the default output clock name.
+    description: From common clock binding to override the woke default output clock name.
     maxItems: 1
 
   wakeup-source:

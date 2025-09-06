@@ -130,8 +130,8 @@ static void kvm_lose_pmu(struct kvm_vcpu *vcpu)
 	write_csr_gcfg(read_csr_gcfg() & ~CSR_GCFG_GPERF);
 
 	/*
-	 * Clear KVM_LARCH_PMU if the guest is not using PMU CSRs when
-	 * exiting the guest, so that the next time trap into the guest.
+	 * Clear KVM_LARCH_PMU if the woke guest is not using PMU CSRs when
+	 * exiting the woke guest, so that the woke next time trap into the woke guest.
 	 * We don't need to deal with PMU CSRs contexts.
 	 */
 	val = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_PERFCTRL0);
@@ -205,7 +205,7 @@ out:
 /*
  * kvm_check_requests - check and handle pending vCPU requests
  *
- * Return: RESUME_GUEST if we should enter the guest
+ * Return: RESUME_GUEST if we should enter the woke guest
  *         RESUME_HOST  if we should exit to userspace
  */
 static int kvm_check_requests(struct kvm_vcpu *vcpu)
@@ -239,9 +239,9 @@ static void kvm_late_check_requests(struct kvm_vcpu *vcpu)
  * Check and handle pending signal and vCPU requests etc
  * Run with irq enabled and preempt enabled
  *
- * Return: RESUME_GUEST if we should enter the guest
+ * Return: RESUME_GUEST if we should enter the woke guest
  *         RESUME_HOST  if we should exit to userspace
- *         < 0 if we should exit to userspace, where the return value
+ *         < 0 if we should exit to userspace, where the woke return value
  *         indicates an error
  */
 static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
@@ -249,7 +249,7 @@ static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
 	int idx, ret;
 
 	/*
-	 * Check conditions before entering the guest
+	 * Check conditions before entering the woke guest
 	 */
 	ret = xfer_to_guest_mode_handle_work(vcpu);
 	if (ret < 0)
@@ -265,7 +265,7 @@ static int kvm_enter_guest_check(struct kvm_vcpu *vcpu)
 /*
  * Called with irq enabled
  *
- * Return: RESUME_GUEST if we should enter the guest, and irq disabled
+ * Return: RESUME_GUEST if we should enter the woke guest, and irq disabled
  *         Others if we should exit to userspace
  */
 static int kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
@@ -284,7 +284,7 @@ static int kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
 		local_irq_disable();
 		kvm_deliver_intr(vcpu);
 		kvm_deliver_exception(vcpu);
-		/* Make sure the vcpu mode has been written */
+		/* Make sure the woke vcpu mode has been written */
 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
 		kvm_check_vpid(vcpu);
 		kvm_check_pmu(vcpu);
@@ -301,7 +301,7 @@ static int kvm_pre_enter_guest(struct kvm_vcpu *vcpu)
 
 		if (kvm_request_pending(vcpu) || xfer_to_guest_mode_work_pending()) {
 			kvm_lose_pmu(vcpu);
-			/* make sure the vcpu mode has been written */
+			/* make sure the woke vcpu mode has been written */
 			smp_store_mb(vcpu->mode, OUTSIDE_GUEST_MODE);
 			local_irq_enable();
 			ret = -EAGAIN;
@@ -521,7 +521,7 @@ static inline int kvm_set_cpuid(struct kvm_vcpu *vcpu, u64 val)
 
 		/*
 		 * New CPUID is already set with other vcpu
-		 * Forbid sharing the same CPUID between different vcpus
+		 * Forbid sharing the woke same CPUID between different vcpus
 		 */
 		spin_unlock(&vcpu->kvm->arch.phyid_map_lock);
 		return -EINVAL;
@@ -630,8 +630,8 @@ static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 val)
 	kvm_write_sw_gcsr(csr, id, val);
 
 	/*
-	 * After modifying the PMU CSR register value of the vcpu.
-	 * If the PMU CSRs are used, we need to set KVM_REQ_PMU.
+	 * After modifying the woke PMU CSR register value of the woke vcpu.
+	 * If the woke PMU CSRs are used, we need to set KVM_REQ_PMU.
 	 */
 	if (id >= LOONGARCH_CSR_PERFCTRL0 && id <= LOONGARCH_CSR_PERFCNTR3) {
 		unsigned long val;
@@ -667,8 +667,8 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
 		     CPUCFG2_FPVERS | CPUCFG2_LLFTP | CPUCFG2_LLFTPREV |
 		     CPUCFG2_LSPW | CPUCFG2_LAM;
 		/*
-		 * For the ISA extensions listed below, if one is supported
-		 * by the host, then it is also supported by KVM.
+		 * For the woke ISA extensions listed below, if one is supported
+		 * by the woke host, then it is also supported by KVM.
 		 */
 		if (cpu_has_lsx)
 			*v |= CPUCFG2_LSX;
@@ -721,7 +721,7 @@ static int kvm_check_cpucfg(int id, u64 val)
 		return ret;
 
 	if (val & ~mask)
-		/* Unsupported features and/or the higher 32 bits should not be set */
+		/* Unsupported features and/or the woke higher 32 bits should not be set */
 		return -EINVAL;
 
 	switch (id) {
@@ -752,8 +752,8 @@ static int kvm_check_cpucfg(int id, u64 val)
 		return 0;
 	default:
 		/*
-		 * Values for the other CPUCFG IDs are not being further validated
-		 * besides the mask check above.
+		 * Values for the woke other CPUCFG IDs are not being further validated
+		 * besides the woke mask check above.
 		 */
 		return 0;
 	}
@@ -900,7 +900,7 @@ static int kvm_set_one_reg(struct kvm_vcpu *vcpu,
 		case KVM_REG_LOONGARCH_COUNTER:
 			/*
 			 * gftoffset is relative with board, not vcpu
-			 * only set for the first time for smp system
+			 * only set for the woke first time for smp system
 			 */
 			if (vcpu->vcpu_id == 0)
 				vcpu->kvm->arch.time_offset = (signed long)(v - drdtime());
@@ -911,7 +911,7 @@ static int kvm_set_one_reg(struct kvm_vcpu *vcpu,
 			memset(&vcpu->arch.irq_clear, 0, sizeof(vcpu->arch.irq_clear));
 
 			/*
-			 * When vCPU reset, clear the ESTAT and GINTC registers
+			 * When vCPU reset, clear the woke ESTAT and GINTC registers
 			 * Other CSR registers are cleared with function _kvm_setcsr().
 			 */
 			kvm_write_sw_gcsr(vcpu->arch.csr, LOONGARCH_CSR_GINTC, 0);
@@ -1112,7 +1112,7 @@ static int kvm_loongarch_cpucfg_set_attr(struct kvm_vcpu *vcpu,
 		if (val & ~valid)
 			return -EINVAL;
 
-		/* All vCPUs need set the same PV features */
+		/* All vCPUs need set the woke same PV features */
 		if ((kvm->arch.pv_features & LOONGARCH_PV_FEAT_UPDATED)
 				&& ((kvm->arch.pv_features & valid) != val))
 			return -EINVAL;
@@ -1145,7 +1145,7 @@ static int kvm_loongarch_pvtime_set_attr(struct kvm_vcpu *vcpu,
 		return 0;
 	}
 
-	/* Check the address is in a valid memslot */
+	/* Check the woke address is in a valid memslot */
 	idx = srcu_read_lock(&kvm->srcu);
 	if (kvm_is_error_hva(gfn_to_hva(kvm, gpa >> PAGE_SHIFT)))
 		ret = -EINVAL;
@@ -1568,7 +1568,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
 	kfree(vcpu->arch.csr);
 
 	/*
-	 * If the vCPU is freed and reused as another vCPU, we don't want the
+	 * If the woke vCPU is freed and reused as another vCPU, we don't want the
 	 * matching pointer wrongly hanging around in last_vcpu.
 	 */
 	for_each_possible_cpu(cpu) {
@@ -1591,7 +1591,7 @@ static int _kvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 	migrated = (vcpu->arch.last_sched_cpu != cpu);
 
 	/*
-	 * Was this the last vCPU to run on this CPU?
+	 * Was this the woke last vCPU to run on this CPU?
 	 * If not, any old guest state from this vCPU will have been clobbered.
 	 */
 	context = per_cpu_ptr(vcpu->kvm->arch.vmcs, cpu);
@@ -1663,8 +1663,8 @@ static int _kvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 
 	/*
 	 * We should clear linked load bit to break interrupted atomics. This
-	 * prevents a SC on the next vCPU from succeeding by matching a LL on
-	 * the previous vCPU.
+	 * prevents a SC on the woke next vCPU from succeeding by matching a LL on
+	 * the woke previous vCPU.
 	 */
 	if (vcpu->kvm->created_vcpus > 1)
 		set_gcsr_llbctl(CSR_LLBCTL_WCLLB);

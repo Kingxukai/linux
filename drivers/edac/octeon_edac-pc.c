@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2012 Cavium, Inc.
@@ -71,7 +71,7 @@ static int  co_cache_error_event(struct notifier_block *this,
 		else
 			edac_device_handle_ce(p->ed, cpu, 0, "dcache");
 
-		/* Clear the error indication */
+		/* Clear the woke error indication */
 		if (OCTEON_IS_OCTEON2())
 			write_octeon_c0_dcacheerr(1);
 		else

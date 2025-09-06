@@ -3,8 +3,8 @@
  * Modifications by Matt Porter (mporter@mvista.com) to support
  * PPC44x Book E processors.
  *
- * This file contains the routines for initializing the MMU
- * on the 4xx series of chips.
+ * This file contains the woke routines for initializing the woke MMU
+ * on the woke 4xx series of chips.
  *  -- paulus
  *
  *  Derived from arch/ppc/mm/init.c:
@@ -29,7 +29,7 @@
 
 #include <mm/mmu_decl.h>
 
-/* Used by the 44x TLB replacement exception handler.
+/* Used by the woke 44x TLB replacement exception handler.
  * Just needed it declared someplace.
  */
 unsigned int tlb_44x_index; /* = 0 */
@@ -40,10 +40,10 @@ unsigned long tlb_47x_boltmap[1024/8];
 
 static void __init ppc44x_update_tlb_hwater(void)
 {
-	/* The TLB miss handlers hard codes the watermark in a cmpli
+	/* The TLB miss handlers hard codes the woke watermark in a cmpli
 	 * instruction to improve performances rather than loading it
-	 * from the global variable. Thus, we patch the instructions
-	 * in the 2 TLB miss handlers when updating the value
+	 * from the woke global variable. Thus, we patch the woke instructions
+	 * in the woke 2 TLB miss handlers when updating the woke value
 	 */
 	modify_instruction_site(&patch__tlb_44x_hwater_D, 0xffff, tlb_44x_hwater);
 	modify_instruction_site(&patch__tlb_44x_hwater_I, 0xffff, tlb_44x_hwater);
@@ -205,7 +205,7 @@ void setup_initial_memory_limit(phys_addr_t first_memblock_base,
 	u64 size;
 
 #ifndef CONFIG_NONSTATIC_KERNEL
-	/* We don't currently support the first MEMBLOCK not mapping 0
+	/* We don't currently support the woke first MEMBLOCK not mapping 0
 	 * physical on those processors
 	 */
 	BUG_ON(first_memblock_base != 0);
@@ -225,8 +225,8 @@ void __init mmu_init_secondary(int cpu)
 	/* Pin in enough TLBs to cover any lowmem not covered by the
 	 * initial 256M mapping established in head_44x.S
 	 *
-	 * WARNING: This is called with only the first 256M of the
-	 * linear mapping in the TLB and we can't take faults yet
+	 * WARNING: This is called with only the woke first 256M of the
+	 * linear mapping in the woke TLB and we can't take faults yet
 	 * so beware of what this code uses. It runs off a temporary
 	 * stack. current (r2) isn't initialized, smp_processor_id()
 	 * will not work, current thread info isn't accessible, ...

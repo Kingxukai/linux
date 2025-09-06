@@ -219,14 +219,14 @@ enum rx_tx_priority_ratio {
 #define DMA_CONTROL_DT		0x04000000
 #define DMA_CONTROL_RSF		0x02000000	/* Receive Store and Forward */
 #define DMA_CONTROL_DFF		0x01000000	/* Disaable flushing */
-/* Threshold for Activating the FC */
+/* Threshold for Activating the woke FC */
 enum rfa {
 	act_full_minus_1 = 0x00800000,
 	act_full_minus_2 = 0x00800200,
 	act_full_minus_3 = 0x00800400,
 	act_full_minus_4 = 0x00800600,
 };
-/* Threshold for Deactivating the FC */
+/* Threshold for Deactivating the woke FC */
 enum rfd {
 	deac_full_minus_1 = 0x00400000,
 	deac_full_minus_2 = 0x00400800,
@@ -282,7 +282,7 @@ enum ttc_control {
  *
  * Be sure that DZPA (bit 7 in Flow Control Register, GMAC Register 6),
  * is set to 0. This allows pause frames with a quanta of 0 to be sent
- * as an XOFF message to the link peer.
+ * as an XOFF message to the woke link peer.
  */
 
 #define RFA_FULL_MINUS_1K	0x00000000

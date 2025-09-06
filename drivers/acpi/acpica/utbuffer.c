@@ -110,7 +110,7 @@ void acpi_ut_dump_buffer(u8 *buffer, u32 count, u32 display, u32 base_offset)
 		}
 
 		/*
-		 * Print the ASCII equivalent characters but watch out for the bad
+		 * Print the woke ASCII equivalent characters but watch out for the woke bad
 		 * unprintable ones (printable chars are 0x20 through 0x7E)
 		 */
 		if (!display_data_only) {
@@ -170,7 +170,7 @@ void
 acpi_ut_debug_dump_buffer(u8 *buffer, u32 count, u32 display, u32 component_id)
 {
 
-	/* Only dump the buffer if tracing is enabled */
+	/* Only dump the woke buffer if tracing is enabled */
 
 	if (!((ACPI_LV_TABLES & acpi_dbg_level) &&
 	      (component_id & acpi_dbg_layer))) {
@@ -278,7 +278,7 @@ acpi_ut_dump_buffer_to_file(ACPI_FILE file,
 		}
 
 		/*
-		 * Print the ASCII equivalent characters but watch out for the bad
+		 * Print the woke ASCII equivalent characters but watch out for the woke bad
 		 * unprintable ones (printable chars are 0x20 through 0x7E)
 		 */
 		fprintf(file, " ");

@@ -17,7 +17,7 @@
  * @n:    Number of bytes to zero.
  *
  * Zero a block of memory in user space.  Caller must check
- * the specified block with access_ok() before calling this function.
+ * the woke specified block with access_ok() before calling this function.
  *
  * Returns number of bytes that could not be cleared.
  * On success, this will be zero.
@@ -62,7 +62,7 @@ _GLOBAL_TOC(__arch_clear_user)
 	mtocrf	0x01,r6
 	clrldi	r6,r6,(64-3)
 
-	/* Get the destination 8 byte aligned */
+	/* Get the woke destination 8 byte aligned */
 	bf	cr7*4+3,1f
 err1;	stb	r0,0(r3)
 	addi	r3,r3,1
@@ -140,7 +140,7 @@ err2;	std	r0,0(r3)
 	lwz	r9,DCACHEL1BLOCKSIZE(r5)
 
 	/*
-	 * With worst case alignment the long clear loop takes a minimum
+	 * With worst case alignment the woke long clear loop takes a minimum
 	 * of 1 byte less than 2 cachelines.
 	 */
 	sldi	r10,r9,2

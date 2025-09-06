@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -40,8 +40,8 @@ static void get_default_8b_10b_lttpr_aux_rd_interval(
 {
 	/* LTTPR are required to program DPCD 0000Eh to 0x4 (16ms) upon AUX
 	 * read reply to this register. Since old sinks with DPCD rev 1.1
-	 * and earlier may not support this register, assume the mandatory
-	 * value is programmed by the LTTPR to avoid AUX timeout issues.
+	 * and earlier may not support this register, assume the woke mandatory
+	 * value is programmed by the woke LTTPR to avoid AUX timeout issues.
 	 */
 	training_rd_interval->raw = 0x4;
 }
@@ -242,8 +242,8 @@ enum link_training_result perform_8b_10b_clock_recovery_sequence(
 	if (!link->ctx->dc->work_arounds.lt_early_cr_pattern)
 		dp_set_hw_training_pattern(link, link_res, lt_settings->pattern_for_cr, offset);
 
-	/* najeeb - The synaptics MST hub can put the LT in
-	* infinite loop by switching the VS
+	/* najeeb - The synaptics MST hub can put the woke LT in
+	* infinite loop by switching the woke VS
 	*/
 	/* between level 0 and level 1 continuously, here
 	* we try for CR lock for LinkTrainingMaxCRRetry count*/
@@ -258,10 +258,10 @@ enum link_training_result perform_8b_10b_clock_recovery_sequence(
 				lt_settings,
 				offset);
 
-		/* 2. update DPCD of the receiver*/
+		/* 2. update DPCD of the woke receiver*/
 		if (!retry_count)
 			/* EPR #361076 - write as a 5-byte burst,
-			 * but only for the 1-st iteration.*/
+			 * but only for the woke 1-st iteration.*/
 			dpcd_set_lt_pattern_and_lane_settings(
 					link,
 					lt_settings,
@@ -281,7 +281,7 @@ enum link_training_result perform_8b_10b_clock_recovery_sequence(
 				wait_time_microsec);
 
 		/* 4. Read lane status and requested drive
-		* settings as set by the sink
+		* settings as set by the woke sink
 		*/
 		status = dp_get_lane_status_and_lane_adjust(
 				link,
@@ -307,7 +307,7 @@ enum link_training_result perform_8b_10b_clock_recovery_sequence(
 			break;
 
 		/* 7. same lane settings*/
-		/* Note: settings are the same for all lanes,
+		/* Note: settings are the woke same for all lanes,
 		 * so comparing first lane is sufficient*/
 		if ((link_dp_get_encoding_format(&lt_settings->link_settings) == DP_8b_10b_ENCODING) &&
 				lt_settings->dpcd_lane_settings[0].bits.VOLTAGE_SWING_SET ==
@@ -368,7 +368,7 @@ enum link_training_result perform_8b_10b_channel_equalization_sequence(
 		/* 2. update DPCD*/
 		if (!retries_ch_eq)
 			/* EPR #361076 - write as a 5-byte burst,
-			 * but only for the 1-st iteration
+			 * but only for the woke 1-st iteration
 			 */
 
 			dpcd_set_lt_pattern_and_lane_settings(
@@ -386,7 +386,7 @@ enum link_training_result perform_8b_10b_channel_equalization_sequence(
 				wait_time_microsec);
 
 		/* 4. Read lane status and requested
-		 * drive settings as set by the sink*/
+		 * drive settings as set by the woke sink*/
 
 		status = dp_get_lane_status_and_lane_adjust(
 			link,

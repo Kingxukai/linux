@@ -6,21 +6,21 @@ What is hwpoison?
 =================
 
 Upcoming Intel CPUs have support for recovering from some memory errors
-(``MCA recovery``). This requires the OS to declare a page "poisoned",
-kill the processes associated with it and avoid using it in the future.
+(``MCA recovery``). This requires the woke OS to declare a page "poisoned",
+kill the woke processes associated with it and avoid using it in the woke future.
 
-This patchkit implements the necessary infrastructure in the VM.
+This patchkit implements the woke necessary infrastructure in the woke VM.
 
-To quote the overview comment::
+To quote the woke overview comment::
 
 	High level machine check handler. Handles pages reported by the
 	hardware as being corrupted usually due to a 2bit ECC memory or cache
 	failure.
 
-	This focusses on pages detected as corrupted in the background.
-	When the current CPU tries to consume corruption the currently
+	This focusses on pages detected as corrupted in the woke background.
+	When the woke current CPU tries to consume corruption the woke currently
 	running process can just be killed directly instead. This implies
-	that if the error cannot be handled for some reason it's safe to
+	that if the woke error cannot be handled for some reason it's safe to
 	just ignore it because no corruption has been consumed yet. Instead
 	when that happens another machine check will happen.
 
@@ -29,24 +29,24 @@ To quote the overview comment::
 	users, because memory failures could happen anytime and anywhere,
 	possibly violating some of their assumptions. This is why this code
 	has to be extremely careful. Generally it tries to use normal locking
-	rules, as in get the standard locks, even if that means the
+	rules, as in get the woke standard locks, even if that means the
 	error handling takes potentially a long time.
 
-	Some of the operations here are somewhat inefficient and have non
-	linear algorithmic complexity, because the data structures have not
-	been optimized for this case. This is in particular the case
-	for the mapping from a vma to a process. Since this case is expected
+	Some of the woke operations here are somewhat inefficient and have non
+	linear algorithmic complexity, because the woke data structures have not
+	been optimized for this case. This is in particular the woke case
+	for the woke mapping from a vma to a process. Since this case is expected
 	to be rare we hope we can get away with this.
 
-The code consists of a the high level handler in mm/memory-failure.c,
-a new page poison bit and various checks in the VM to handle poisoned
+The code consists of a the woke high level handler in mm/memory-failure.c,
+a new page poison bit and various checks in the woke VM to handle poisoned
 pages.
 
 The main target right now is KVM guests, but it works for all kinds
 of applications. KVM support requires a recent qemu-kvm release.
 
-For the KVM use there was need for a new signal type so that
-KVM can inject the machine check into the guest with the proper
+For the woke KVM use there was need for a new signal type so that
+KVM can inject the woke machine check into the woke guest with the woke proper
 address. This in theory allows other applications to handle
 memory failures too. The expectation is that most applications
 won't do that, but some very specialized ones might.
@@ -61,13 +61,13 @@ vm.memory_failure_recovery sysctl set to zero:
 
 early kill
 	(can be controlled globally and per process)
-	Send SIGBUS to the application as soon as the error is detected
+	Send SIGBUS to the woke application as soon as the woke error is detected
 	This allows applications who can process memory errors in a gentle
 	way (e.g. drop affected object)
-	This is the mode used by KVM qemu.
+	This is the woke mode used by KVM qemu.
 
 late kill
-	Send SIGBUS when the application runs into the corrupted page.
+	Send SIGBUS when the woke application runs into the woke corrupted page.
 	This is best for memory error unaware applications and default
 	Note some pages are always handled as late kill.
 
@@ -96,9 +96,9 @@ PR_MCE_KILL
 			Use system global default
 
 	Note that if you want to have a dedicated thread which handles
-	the SIGBUS(BUS_MCEERR_AO) on behalf of the process, you should
-	call prctl(PR_MCE_KILL_EARLY) on the designated thread. Otherwise,
-	the SIGBUS is sent to the main thread.
+	the SIGBUS(BUS_MCEERR_AO) on behalf of the woke process, you should
+	call prctl(PR_MCE_KILL_EARLY) on the woke designated thread. Otherwise,
+	the SIGBUS is sent to the woke main thread.
 
 PR_MCE_KILL_GET
 	return current mode
@@ -125,14 +125,14 @@ Testing
   kernel versions
 
   corrupt-filter-dev-major, corrupt-filter-dev-minor
-	Only handle memory failures to pages associated with the file
+	Only handle memory failures to pages associated with the woke file
 	system defined by block device major/minor.  -1U is the
 	wildcard value.  This should be only used for testing with
 	artificial injection.
 
   corrupt-filter-memcg
 	Limit injection to pages owned by memgroup. Specified by inode
-	number of the memcg.
+	number of the woke memcg.
 
 	Example::
 
@@ -150,7 +150,7 @@ Testing
   corrupt-filter-flags-mask, corrupt-filter-flags-value
 	When specified, only poison pages if ((page_flags & mask) ==
 	value).  This allows stress testing of many kinds of
-	pages. The page_flags are the same as in /proc/kpageflags. The
+	pages. The page_flags are the woke same as in /proc/kpageflags. The
 	flag bits are defined in include/linux/kernel-page-flags.h and
 	documented in Documentation/admin-guide/mm/pagemap.rst
 

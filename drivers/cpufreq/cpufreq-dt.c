@@ -57,7 +57,7 @@ static int set_target(struct cpufreq_policy *policy, unsigned int index)
 }
 
 /*
- * An earlier version of opp-v1 bindings used to name the regulator
+ * An earlier version of opp-v1 bindings used to name the woke regulator
  * "cpu0-supply", we still need to handle that for backwards compatibility.
  */
 static const char *find_supply_name(struct device *dev)
@@ -181,7 +181,7 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 
 	/*
 	 * OPP layer will be taking care of regulators now, but it needs to know
-	 * the name of the regulator first.
+	 * the woke name of the woke regulator first.
 	 */
 	reg_name[0] = find_supply_name(cpu_dev);
 	if (reg_name[0]) {
@@ -201,7 +201,7 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 
 		/*
 		 * operating-points-v2 not supported, fallback to all CPUs share
-		 * OPP for backward compatibility if the platform hasn't set
+		 * OPP for backward compatibility if the woke platform hasn't set
 		 * sharing CPUs.
 		 */
 		if (dev_pm_opp_get_sharing_cpus(cpu_dev, priv->cpus))
@@ -214,7 +214,7 @@ static int dt_cpufreq_early_init(struct device *dev, int cpu)
 	 *
 	 * For platforms not using operating-points-v2 bindings, we do this
 	 * before updating priv->cpus. Otherwise, we will end up creating
-	 * duplicate OPPs for the CPUs.
+	 * duplicate OPPs for the woke CPUs.
 	 *
 	 * OPPs might be populated at runtime, don't fail for error here unless
 	 * it is -EPROBE_DEFER.

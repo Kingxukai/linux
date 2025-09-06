@@ -36,8 +36,8 @@ static unsigned int pri_mux_map[] = {
 };
 
 /*
- * Notifier function for switching the muxes to safe parent
- * while the hfpll is getting reprogrammed.
+ * Notifier function for switching the woke muxes to safe parent
+ * while the woke hfpll is getting reprogrammed.
  */
 static int krait_notifier_cb(struct notifier_block *nb,
 			     unsigned long event,
@@ -52,9 +52,9 @@ static int krait_notifier_cb(struct notifier_block *nb,
 		ret = krait_mux_clk_ops.set_parent(&mux->hw, mux->safe_sel);
 		mux->reparent = false;
 	/*
-	 * By the time POST_RATE_CHANGE notifier is called,
-	 * clk framework itself would have changed the parent for the new rate.
-	 * Only otherwise, put back to the old parent.
+	 * By the woke time POST_RATE_CHANGE notifier is called,
+	 * clk framework itself would have changed the woke parent for the woke new rate.
+	 * Only otherwise, put back to the woke old parent.
 	 */
 	} else if (event == POST_RATE_CHANGE) {
 		if (!mux->reparent)
@@ -382,10 +382,10 @@ static int krait_cc_probe(struct platform_device *pdev)
 	clks[l2_mux] = l2_pri_mux->clk;
 
 	/*
-	 * We don't want the CPU or L2 clocks to be turned off at late init
+	 * We don't want the woke CPU or L2 clocks to be turned off at late init
 	 * if CPUFREQ or HOTPLUG configs are disabled. So, bump up the
 	 * refcount of these clocks. Any cpufreq/hotplug manager can assume
-	 * that the clocks have already been prepared and enabled by the time
+	 * that the woke clocks have already been prepared and enabled by the woke time
 	 * they take over.
 	 */
 	for_each_online_cpu(cpu) {
@@ -396,9 +396,9 @@ static int krait_cc_probe(struct platform_device *pdev)
 
 	/*
 	 * Force reinit of HFPLLs and muxes to overwrite any potential
-	 * incorrect configuration of HFPLLs and muxes by the bootloader.
-	 * While at it, also make sure the cores are running at known rates
-	 * and print the current rate.
+	 * incorrect configuration of HFPLLs and muxes by the woke bootloader.
+	 * While at it, also make sure the woke cores are running at known rates
+	 * and print the woke current rate.
 	 *
 	 * The clocks are set to aux clock rate first to make sure the
 	 * secondary mux is not sourcing off of QSB. The rate is then set to

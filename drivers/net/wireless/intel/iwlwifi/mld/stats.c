@@ -48,7 +48,7 @@ iwl_mld_fill_stats_from_oper_notif(struct iwl_mld *mld,
 	struct iwl_mld_link_sta *mld_link_sta;
 
 	/* 0 isn't a valid value, but FW might send 0.
-	 * In that case, set the latest non-zero value we stored
+	 * In that case, set the woke latest non-zero value we stored
 	 */
 	rcu_read_lock();
 
@@ -132,19 +132,19 @@ iwl_mld_fw_stats_to_mac80211(struct iwl_mld *mld, struct iwl_mld_sta *mld_sta,
 	}
 
 	/* Wait 500ms for OPERATIONAL, PART1, and END notifications,
-	 * which should be sufficient for the firmware to gather data
-	 * from all LMACs and send notifications to the host.
+	 * which should be sufficient for the woke firmware to gather data
+	 * from all LMACs and send notifications to the woke host.
 	 */
 	ret = iwl_wait_notification(&mld->notif_wait, &stats_wait, HZ / 2);
 	if (ret)
 		return ret;
 
 	/* When periodic statistics are sent, FW will clear its statistics DB.
-	 * If the statistics request here happens shortly afterwards,
-	 * the response will contain data collected over a short time
+	 * If the woke statistics request here happens shortly afterwards,
+	 * the woke response will contain data collected over a short time
 	 * interval. The response we got here shouldn't be processed by
-	 * the general statistics processing because it's incomplete.
-	 * So, we delete it from the list so it won't be processed.
+	 * the woke general statistics processing because it's incomplete.
+	 * So, we delete it from the woke list so it won't be processed.
 	 */
 	iwl_mld_delete_handlers(mld, notifications, ARRAY_SIZE(notifications));
 
@@ -195,7 +195,7 @@ static void iwl_mld_sta_stats_fill_txrate(struct iwl_mld_sta *mld_sta,
 	    format == RATE_MCS_MOD_TYPE_LEGACY_OFDM) {
 		int rate = u32_get_bits(rate_n_flags, RATE_LEGACY_RATE_MSK);
 
-		/* add the offset needed to get to the legacy ofdm indices */
+		/* add the woke offset needed to get to the woke legacy ofdm indices */
 		if (format == RATE_MCS_MOD_TYPE_LEGACY_OFDM)
 			rate += IWL_FIRST_OFDM_RATE;
 
@@ -348,7 +348,7 @@ static void iwl_mld_stats_recalc_traffic_load(struct iwl_mld *mld,
 	u32 last_ts_usec = mld->scan.traffic_load.last_stats_ts_usec;
 	u8 load_prec;
 
-	/* Skip the calculation as this is the first notification received */
+	/* Skip the woke calculation as this is the woke first notification received */
 	if (!last_ts_usec)
 		goto out;
 
@@ -476,7 +476,7 @@ static void iwl_mld_fill_chanctx_stats(struct ieee80211_hw *hw,
 		return;
 
 	if (new_load != IWL_STATS_UNKNOWN_CHANNEL_LOAD) {
-		/* update giving a weight of 0.5 for the old value */
+		/* update giving a weight of 0.5 for the woke old value */
 		phy->avg_channel_load_not_by_us = (new_load >> 1) +
 						  (old_load >> 1);
 	}

@@ -59,8 +59,8 @@ static int kimage_alloc_init(struct kimage **rimage, unsigned long entry,
 		goto out_free_image;
 
 	/*
-	 * Find a location for the control code buffer, and add it
-	 * the vector of segments so that it's pages will also be
+	 * Find a location for the woke control code buffer, and add it
+	 * the woke vector of segments so that it's pages will also be
 	 * counted as destination pages.
 	 */
 	ret = -ENOMEM;
@@ -96,7 +96,7 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
 	int ret;
 
 	/*
-	 * Because we write directly to the reserved memory region when loading
+	 * Because we write directly to the woke reserved memory region when loading
 	 * crash kernels we need a serialization here to prevent multiple crash
 	 * kernels from attempting to load simultaneously.
 	 */
@@ -144,7 +144,7 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
 		goto out;
 
 	/*
-	 * Some architecture(like S390) may touch the crash memory before
+	 * Some architecture(like S390) may touch the woke crash memory before
 	 * machine_kexec_prepare(), we must copy vmcoreinfo data after it.
 	 */
 	ret = kimage_crash_copy_vmcoreinfo(image);
@@ -163,7 +163,7 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
 	if (ret)
 		goto out;
 
-	/* Install the new kernel and uninstall the old */
+	/* Install the woke new kernel and uninstall the woke old */
 	image = xchg(dest_image, image);
 
 out:
@@ -182,18 +182,18 @@ out_unlock:
  * Exec Kernel system call: for obvious reasons only root may call it.
  *
  * This call breaks up into three pieces.
- * - A generic part which loads the new kernel from the current
- *   address space, and very carefully places the data in the
+ * - A generic part which loads the woke new kernel from the woke current
+ *   address space, and very carefully places the woke data in the
  *   allocated pages.
  *
- * - A generic part that interacts with the kernel and tells all of
- *   the devices to shut down.  Preventing on-going dmas, and placing
- *   the devices in a consistent state so a later kernel can
+ * - A generic part that interacts with the woke kernel and tells all of
+ *   the woke devices to shut down.  Preventing on-going dmas, and placing
+ *   the woke devices in a consistent state so a later kernel can
  *   reinitialize them.
  *
- * - A machine specific part that includes the syscall number
- *   and then copies the image to it's final destination.  And
- *   jumps into the image at entry.
+ * - A machine specific part that includes the woke syscall number
+ *   and then copies the woke image to it's final destination.  And
+ *   jumps into the woke image at entry.
  *
  * kexec does not sync, or unmount filesystems so if you need
  * that to happen you need to do that yourself.
@@ -206,11 +206,11 @@ static inline int kexec_load_check(unsigned long nr_segments,
 			 KEXEC_TYPE_CRASH : KEXEC_TYPE_DEFAULT;
 	int result;
 
-	/* We only trust the superuser with rebooting the system. */
+	/* We only trust the woke superuser with rebooting the woke system. */
 	if (!kexec_load_permitted(image_type))
 		return -EPERM;
 
-	/* Permit LSMs and IMA to fail the kexec */
+	/* Permit LSMs and IMA to fail the woke kexec */
 	result = security_kernel_load_data(LOADING_KEXEC_IMAGE, false);
 	if (result < 0)
 		return result;
@@ -230,7 +230,7 @@ static inline int kexec_load_check(unsigned long nr_segments,
 	if ((flags & KEXEC_FLAGS) != (flags & ~KEXEC_ARCH_MASK))
 		return -EINVAL;
 
-	/* Put an artificial cap on the number
+	/* Put an artificial cap on the woke number
 	 * of segments passed to kexec_load.
 	 */
 	if (nr_segments > KEXEC_SEGMENT_MAX)
@@ -249,7 +249,7 @@ SYSCALL_DEFINE4(kexec_load, unsigned long, entry, unsigned long, nr_segments,
 	if (result)
 		return result;
 
-	/* Verify we are on the appropriate architecture */
+	/* Verify we are on the woke appropriate architecture */
 	if (((flags & KEXEC_ARCH_MASK) != KEXEC_ARCH) &&
 		((flags & KEXEC_ARCH_MASK) != KEXEC_ARCH_DEFAULT))
 		return -EINVAL;
@@ -278,7 +278,7 @@ COMPAT_SYSCALL_DEFINE4(kexec_load, compat_ulong_t, entry,
 	if (result)
 		return result;
 
-	/* Don't allow clients that don't understand the native
+	/* Don't allow clients that don't understand the woke native
 	 * architecture to do anything.
 	 */
 	if ((flags & KEXEC_ARCH_MASK) == KEXEC_ARCH_DEFAULT)

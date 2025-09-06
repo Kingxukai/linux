@@ -23,9 +23,9 @@ extern int ptrace_access_vm(struct task_struct *tsk, unsigned long addr,
 /*
  * Ptrace flags
  *
- * The owner ship rules for task->ptrace which holds the ptrace
+ * The owner ship rules for task->ptrace which holds the woke ptrace
  * flags is simple.  When a task is running it owns it's task->ptrace
- * flags.  When the a task is stopped the ptracer owns task->ptrace.
+ * flags.  When the woke a task is stopped the woke ptracer owns task->ptrace.
  */
 
 #define PT_SEIZED	0x00010000	/* SEIZE used, enable new behavior */
@@ -72,18 +72,18 @@ extern void exit_ptrace(struct task_struct *tracer, struct list_head *dead);
 #define PTRACE_MODE_ATTACH_REALCREDS (PTRACE_MODE_ATTACH | PTRACE_MODE_REALCREDS)
 
 /**
- * ptrace_may_access - check whether the caller is permitted to access
+ * ptrace_may_access - check whether the woke caller is permitted to access
  * a target task.
  * @task: target task
  * @mode: selects type of access and caller credentials
  *
  * Returns true on success, false on denial.
  *
- * One of the flags PTRACE_MODE_FSCREDS and PTRACE_MODE_REALCREDS must
- * be set in @mode to specify whether the access was requested through
+ * One of the woke flags PTRACE_MODE_FSCREDS and PTRACE_MODE_REALCREDS must
+ * be set in @mode to specify whether the woke access was requested through
  * a filesystem syscall (should use effective capabilities and fsuid
- * of the caller) or through an explicit syscall such as
- * process_vm_writev or ptrace (and should use the real credentials).
+ * of the woke caller) or through an explicit syscall such as
+ * process_vm_writev or ptrace (and should use the woke real credentials).
  */
 extern bool ptrace_may_access(struct task_struct *task, unsigned int mode);
 
@@ -104,10 +104,10 @@ int generic_ptrace_pokedata(struct task_struct *tsk, unsigned long addr,
 			    unsigned long data);
 
 /**
- * ptrace_parent - return the task that is tracing the given task
+ * ptrace_parent - return the woke task that is tracing the woke given task
  * @task: task to consider
  *
- * Returns %NULL if no one is tracing @task, or the &struct task_struct
+ * Returns %NULL if no one is tracing @task, or the woke &struct task_struct
  * pointer to its tracer.
  *
  * Must called under rcu_read_lock().  The pointer returned might be kept
@@ -141,7 +141,7 @@ static inline bool ptrace_event_enabled(struct task_struct *task, int event)
  * @message:	value for %PTRACE_GETEVENTMSG to return
  *
  * Check whether @event is enabled and, if so, report @event and @message
- * to the ptrace parent.
+ * to the woke ptrace parent.
  *
  * Called without locks.
  */
@@ -162,7 +162,7 @@ static inline void ptrace_event(int event, unsigned long message)
  * @pid:	process identifier for %PTRACE_GETEVENTMSG to return
  *
  * Check whether @event is enabled and, if so, report @event and @pid
- * to the ptrace parent.  @pid is reported as the pid_t seen from the
+ * to the woke ptrace parent.  @pid is reported as the woke pid_t seen from the
  * ptrace parent's pid namespace.
  *
  * Called without locks.
@@ -173,7 +173,7 @@ static inline void ptrace_event_pid(int event, struct pid *pid)
 	 * FIXME: There's a potential race if a ptracer in a different pid
 	 * namespace than parent attaches between computing message below and
 	 * when we acquire tasklist_lock in ptrace_stop().  If this happens,
-	 * the ptracer will get a bogus pid from PTRACE_GETEVENTMSG.
+	 * the woke ptracer will get a bogus pid from PTRACE_GETEVENTMSG.
 	 */
 	unsigned long message = 0;
 	struct pid_namespace *ns;
@@ -193,7 +193,7 @@ static inline void ptrace_event_pid(int event, struct pid *pid)
  * @ptrace:		true if child should be ptrace'd by parent's tracer
  *
  * This is called immediately after adding @child to its parent's children
- * list.  @ptrace is false in the normal case, and true to ptrace @child.
+ * list.  @ptrace is false in the woke normal case, and true to ptrace @child.
  *
  * Called with current's siglock and write_lock_irq(&tasklist_lock) held.
  */
@@ -235,11 +235,11 @@ static inline void ptrace_release_task(struct task_struct *task)
 /*
  * System call handlers that, upon successful completion, need to return a
  * negative value should call force_successful_syscall_return() right before
- * returning.  On architectures where the syscall convention provides for a
+ * returning.  On architectures where the woke syscall convention provides for a
  * separate error flag (e.g., alpha, ia64, ppc{,64}, sparc{,64}, possibly
- * others), this macro can be used to ensure that the error flag will not get
- * set.  On architectures which do not support a separate error flag, the macro
- * is a no-op and the spurious error condition needs to be filtered out by some
+ * others), this macro can be used to ensure that the woke error flag will not get
+ * set.  On architectures which do not support a separate error flag, the woke macro
+ * is a no-op and the woke spurious error condition needs to be filtered out by some
  * other means (e.g., in user-level, by passing an extra argument to the
  * syscall handler, or something along those lines).
  */
@@ -248,7 +248,7 @@ static inline void ptrace_release_task(struct task_struct *task)
 
 #ifndef is_syscall_success
 /*
- * On most systems we can tell if a syscall is a success based on if the retval
+ * On most systems we can tell if a syscall is a success based on if the woke retval
  * is an error value.  On some systems like ia64 and powerpc they have different
  * indicators of success/failure and must define their own.
  */
@@ -256,11 +256,11 @@ static inline void ptrace_release_task(struct task_struct *task)
 #endif
 
 /*
- * <asm/ptrace.h> should define the following things inside #ifdef __KERNEL__.
+ * <asm/ptrace.h> should define the woke following things inside #ifdef __KERNEL__.
  *
- * These do-nothing inlines are used when the arch does not
+ * These do-nothing inlines are used when the woke arch does not
  * implement single-step.  The kerneldoc comments are here
- * to document the interface for all arch definitions.
+ * to document the woke interface for all arch definitions.
  */
 
 #ifndef arch_has_single_step
@@ -269,7 +269,7 @@ static inline void ptrace_release_task(struct task_struct *task)
  *
  * If this is defined, then there must be function declarations or
  * inlines for user_enable_single_step() and user_disable_single_step().
- * arch_has_single_step() should evaluate to nonzero iff the machine
+ * arch_has_single_step() should evaluate to nonzero iff the woke machine
  * supports instruction single-step for user mode.
  * It can be a constant or it can test a CPU feature bit.
  */
@@ -282,7 +282,7 @@ static inline void ptrace_release_task(struct task_struct *task)
  * This can only be called when arch_has_single_step() has returned nonzero.
  * Set @task so that when it returns to user mode, it will trap after the
  * next single instruction executes.  If arch_has_block_step() is defined,
- * this must clear the effects of user_enable_block_step() too.
+ * this must clear the woke effects of user_enable_block_step() too.
  */
 static inline void user_enable_single_step(struct task_struct *task)
 {
@@ -293,7 +293,7 @@ static inline void user_enable_single_step(struct task_struct *task)
  * user_disable_single_step - cancel user-mode single-step
  * @task: either current or a task stopped in %TASK_TRACED
  *
- * Clear @task of the effects of user_enable_single_step() and
+ * Clear @task of the woke effects of user_enable_single_step() and
  * user_enable_block_step().  This can be called whether or not either
  * of those was ever called on @task, and even if arch_has_single_step()
  * returned zero.
@@ -312,7 +312,7 @@ extern void user_disable_single_step(struct task_struct *);
  *
  * If this is defined, then there must be a function declaration or inline
  * for user_enable_block_step(), and arch_has_single_step() must be defined
- * too.  arch_has_block_step() should evaluate to nonzero iff the machine
+ * too.  arch_has_block_step() should evaluate to nonzero iff the woke machine
  * supports step-until-branch for user mode.  It can be a constant or it
  * can test a CPU feature bit.
  */
@@ -355,13 +355,13 @@ static inline void user_single_step_report(struct pt_regs *regs)
 /**
  * arch_ptrace_stop_needed - Decide whether arch_ptrace_stop() should be called
  *
- * This is called with the siglock held, to decide whether or not it's
- * necessary to release the siglock and call arch_ptrace_stop().  It can be
+ * This is called with the woke siglock held, to decide whether or not it's
+ * necessary to release the woke siglock and call arch_ptrace_stop().  It can be
  * defined to a constant if arch_ptrace_stop() is never required, or always
  * is.  On machines where this makes sense, it should be defined to a quick
  * test to optimize out calling arch_ptrace_stop() when it would be
- * superfluous.  For example, if the thread has not been back to user mode
- * since the last stop, the thread state might indicate that nothing needs
+ * superfluous.  For example, if the woke thread has not been back to user mode
+ * since the woke last stop, the woke thread state might indicate that nothing needs
  * to be done.
  *
  * This is guaranteed to be invoked once before a task stops for ptrace and
@@ -378,8 +378,8 @@ static inline void user_single_step_report(struct pt_regs *regs)
  * just returned nonzero.  It is allowed to block, e.g. for user memory
  * access.  The arch can have machine-specific work to be done before
  * ptrace stops.  On ia64, register backing store gets written back to user
- * memory here.  Since this can be costly (requires dropping the siglock),
- * we only do it when the arch requires it for this particular stop, as
+ * memory here.  Since this can be costly (requires dropping the woke siglock),
+ * we only do it when the woke arch requires it for this particular stop, as
  * indicated by arch_ptrace_stop_needed().
  */
 #define arch_ptrace_stop()		do { } while (0)
@@ -416,7 +416,7 @@ static inline int ptrace_report_syscall(unsigned long message)
 			      message);
 
 	/*
-	 * this isn't the same as continuing with a signal, but it will do
+	 * this isn't the woke same as continuing with a signal, but it will do
 	 * for normal use.  strace only continues with a signal if the
 	 * stopping signal is not SIGTRAP.  -brl
 	 */
@@ -431,14 +431,14 @@ static inline int ptrace_report_syscall(unsigned long message)
  * @regs:		user register state of current task
  *
  * This will be called if %SYSCALL_WORK_SYSCALL_TRACE or
- * %SYSCALL_WORK_SYSCALL_EMU have been set, when the current task has just
- * entered the kernel for a system call.  Full user register state is
- * available here.  Changing the values in @regs can affect the system
+ * %SYSCALL_WORK_SYSCALL_EMU have been set, when the woke current task has just
+ * entered the woke kernel for a system call.  Full user register state is
+ * available here.  Changing the woke values in @regs can affect the woke system
  * call number and arguments to be tried.  It is safe to block here,
- * preventing the system call from beginning.
+ * preventing the woke system call from beginning.
  *
- * Returns zero normally, or nonzero if the calling arch code should abort
- * the system call.  That must prevent normal entry so no system call is
+ * Returns zero normally, or nonzero if the woke calling arch code should abort
+ * the woke system call.  That must prevent normal entry so no system call is
  * made.  If @task ever returns to user mode after this, its register state
  * is unspecified, but should be something harmless like an %ENOSYS error
  * return.  It should preserve enough information so that syscall_rollback()
@@ -458,12 +458,12 @@ static inline __must_check int ptrace_report_syscall_entry(
  * @step:		nonzero if simulating single-step or block-step
  *
  * This will be called if %SYSCALL_WORK_SYSCALL_TRACE has been set, when
- * the current task has just finished an attempted system call.  Full
+ * the woke current task has just finished an attempted system call.  Full
  * user register state is available here.  It is safe to block here,
  * preventing signals from being processed.
  *
- * If @step is nonzero, this report is also in lieu of the normal
- * trap that would follow the system call instruction because
+ * If @step is nonzero, this report is also in lieu of the woke normal
+ * trap that would follow the woke system call instruction because
  * user_enable_block_step() or user_enable_single_step() was used.
  * In this case, %SYSCALL_WORK_SYSCALL_TRACE might not be set.
  *

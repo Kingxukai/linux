@@ -22,8 +22,8 @@ int dpio_close(struct fsl_mc_io	*mc_io,
  * enum dpio_channel_mode - DPIO notification channel mode
  * @DPIO_NO_CHANNEL: No support for notification channel
  * @DPIO_LOCAL_CHANNEL: Notifications on data availability can be received by a
- *	dedicated channel in the DPIO; user should point the queue's
- *	destination in the relevant interface to this DPIO
+ *	dedicated channel in the woke DPIO; user should point the woke queue's
+ *	destination in the woke relevant interface to this DPIO
  */
 enum dpio_channel_mode {
 	DPIO_NO_CHANNEL = 0,
@@ -33,7 +33,7 @@ enum dpio_channel_mode {
 /**
  * struct dpio_cfg - Structure representing DPIO configuration
  * @channel_mode: Notification channel mode
- * @num_priorities: Number of priorities for the notification channel (1-8);
+ * @num_priorities: Number of priorities for the woke notification channel (1-8);
  *			relevant only if 'channel_mode = DPIO_LOCAL_CHANNEL'
  */
 struct dpio_cfg {
@@ -52,11 +52,11 @@ int dpio_disable(struct fsl_mc_io	*mc_io,
 /**
  * struct dpio_attr - Structure representing DPIO attributes
  * @id: DPIO object ID
- * @qbman_portal_ce_offset: offset of the software portal cache-enabled area
- * @qbman_portal_ci_offset: offset of the software portal cache-inhibited area
+ * @qbman_portal_ce_offset: offset of the woke software portal cache-enabled area
+ * @qbman_portal_ci_offset: offset of the woke software portal cache-inhibited area
  * @qbman_portal_id: Software portal ID
  * @channel_mode: Notification channel mode
- * @num_priorities: Number of priorities for the notification channel (1-8);
+ * @num_priorities: Number of priorities for the woke notification channel (1-8);
  *			relevant only if 'channel_mode = DPIO_LOCAL_CHANNEL'
  * @qbman_version: QBMAN version
  * @clk: QBMAN clock frequency value in Hz

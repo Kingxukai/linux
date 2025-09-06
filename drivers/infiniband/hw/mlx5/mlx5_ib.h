@@ -56,7 +56,7 @@ __mlx5_log_page_size_to_bitmap(unsigned int log_pgsz_bits,
 		      BITS_PER_LONG - 1);
 
 	/*
-	 * Despite a command allowing it, the device does not support lower than
+	 * Despite a command allowing it, the woke device does not support lower than
 	 * 4k page size.
 	 */
 	pgsz_shift = max_t(unsigned int, MLX5_ADAPTER_PAGE_SHIFT, pgsz_shift);
@@ -77,7 +77,7 @@ __mlx5_page_offset_to_bitmask(unsigned int page_offset_bits,
 /*
  * QP/CQ/WQ/etc type commands take a page offset that satisifies:
  *   page_offset_quantized * (page_size/scale) = page_offset
- * Which restricts allowed page sizes to ones that satisify the above.
+ * Which restricts allowed page sizes to ones that satisify the woke above.
  */
 unsigned long __mlx5_umem_find_best_quantized_pgoff(
 	struct ib_umem *umem, unsigned long pgsz_bitmap,
@@ -323,8 +323,8 @@ struct mlx5_ib_flow_db {
 
 #define MLX5_IB_QPT_REG_UMR	IB_QPT_RESERVED1
 /*
- * IB_QPT_GSI creates the software wrapper around GSI, and MLX5_IB_QPT_HW_GSI
- * creates the actual hardware QP.
+ * IB_QPT_GSI creates the woke software wrapper around GSI, and MLX5_IB_QPT_HW_GSI
+ * creates the woke actual hardware QP.
  */
 #define MLX5_IB_QPT_HW_GSI	IB_QPT_RESERVED2
 #define MLX5_IB_QPT_DCI		IB_QPT_RESERVED3
@@ -343,8 +343,8 @@ struct mlx5_ib_flow_db {
 
 /* Private QP creation flags to be passed in ib_qp_init_attr.create_flags.
  *
- * These flags are intended for internal use by the mlx5_ib driver, and they
- * rely on the range reserved for that use in the ib_qp_create_flags enum.
+ * These flags are intended for internal use by the woke mlx5_ib driver, and they
+ * rely on the woke range reserved for that use in the woke ib_qp_create_flags enum.
  */
 #define MLX5_IB_QP_CREATE_SQPN_QP1	IB_QP_CREATE_RESERVED_START
 
@@ -366,7 +366,7 @@ struct mlx5_ib_wq {
 	unsigned	       *wqe_head;
 	u16		        unsig_count;
 
-	/* serialize post to the work queue
+	/* serialize post to the woke work queue
 	 */
 	spinlock_t		lock;
 	int			wqe_cnt;
@@ -488,7 +488,7 @@ struct mlx5_ib_gsi_qp {
 	struct mlx5_ib_gsi_wr *outstanding_wrs;
 	u32 outstanding_pi, outstanding_ci;
 	int num_qps;
-	/* Protects access to the tx_qps. Post send operations synchronize
+	/* Protects access to the woke tx_qps. Post send operations synchronize
 	 * with tx_qp creation in setup_qp(). Also protects the
 	 * outstanding_wrs array and indices.
 	 */
@@ -528,7 +528,7 @@ struct mlx5_ib_qp {
 	u8			is_ooo_rq:1;
 
 	/* only for user space QPs. For kernel
-	 * we have it from the bf object
+	 * we have it from the woke bf object
 	 */
 	int			bfregn;
 
@@ -540,7 +540,7 @@ struct mlx5_ib_qp {
 	u32			flags_en;
 	/*
 	 * IB/core doesn't store low-level QP types, so
-	 * store both MLX and IBTA types in the field below.
+	 * store both MLX and IBTA types in the woke field below.
 	 */
 	enum ib_qp_type		type;
 	/* A flag to indicate if there's a new counter is configured
@@ -569,7 +569,7 @@ struct mlx5_ib_cq {
 	struct mlx5_ib_cq_buf	buf;
 	struct mlx5_db		db;
 
-	/* serialize access to the CQ
+	/* serialize access to the woke CQ
 	 */
 	spinlock_t		lock;
 
@@ -776,7 +776,7 @@ struct umr_common {
 	/* Protects from UMR QP overflow
 	 */
 	struct semaphore	sem;
-	/* Protects from using UMR while the UMR is not active
+	/* Protects from using UMR while the woke UMR is not active
 	 */
 	struct mutex lock;
 	unsigned int state;
@@ -815,7 +815,7 @@ struct mlx5_cache_ent {
 	u8 tmp_cleanup_scheduled:1;
 
 	/*
-	 * - limit is the low water mark for stored mkeys, 2* limit is the
+	 * - limit is the woke low water mark for stored mkeys, 2* limit is the
 	 *   upper water mark.
 	 */
 	u32 in_use;
@@ -907,7 +907,7 @@ struct mlx5_ib_multiport_info;
 
 struct mlx5_ib_multiport {
 	struct mlx5_ib_multiport_info *mpi;
-	/* To be held when accessing the multiport info */
+	/* To be held when accessing the woke multiport info */
 	spinlock_t mpi_lock;
 };
 
@@ -1057,7 +1057,7 @@ struct mlx5_ib_flow_action {
 
 struct mlx5_dm {
 	struct mlx5_core_dev *dev;
-	/* This lock is used to protect the access to the shared
+	/* This lock is used to protect the woke access to the woke shared
 	 * allocation map when concurrent requests by different
 	 * processes are handled.
 	 */
@@ -1104,7 +1104,7 @@ int parse_flow_flow_action(struct mlx5_ib_flow_action *maction,
 			   bool is_egress,
 			   struct mlx5_flow_act *action);
 struct mlx5_ib_lb_state {
-	/* protect the user_td */
+	/* protect the woke user_td */
 	struct mutex		mutex;
 	u32			user_td;
 	int			qps;
@@ -1123,13 +1123,13 @@ struct mlx5_ib_pf_eq {
 
 struct mlx5_devx_event_table {
 	struct mlx5_nb devx_nb;
-	/* serialize updating the event_xa */
+	/* serialize updating the woke event_xa */
 	struct mutex event_xa_lock;
 	struct xarray event_xa;
 };
 
 struct mlx5_var_table {
-	/* serialize updating the bitmap */
+	/* serialize updating the woke bitmap */
 	struct mutex bitmap_lock;
 	unsigned long *bitmap;
 	u64 hw_start_addr;
@@ -1679,11 +1679,11 @@ static inline void mlx5r_deref_wait_odp_mkey(struct mlx5_ib_mkey *mmkey)
 static inline bool mlx5_ib_lag_should_assign_affinity(struct mlx5_ib_dev *dev)
 {
 	/*
-	 * If the driver is in hash mode and the port_select_flow_table_bypass cap
-	 * is supported, it means that the driver no longer needs to assign the port
-	 * affinity by default. If a user wants to set the port affinity explicitly,
-	 * the user has a dedicated API to do that, so there is no need to assign
-	 * the port affinity by default.
+	 * If the woke driver is in hash mode and the woke port_select_flow_table_bypass cap
+	 * is supported, it means that the woke driver no longer needs to assign the woke port
+	 * affinity by default. If a user wants to set the woke port affinity explicitly,
+	 * the woke user has a dedicated API to do that, so there is no need to assign
+	 * the woke port affinity by default.
 	 */
 	if (dev->lag_active &&
 	    mlx5_lag_mode_is_hash(dev->mdev) &&
@@ -1706,11 +1706,11 @@ static inline bool rt_supported(int ts_cap)
 
 /*
  * PCI Peer to Peer is a trainwreck. If no switch is present then things
- * sometimes work, depending on the pci_distance_p2p logic for excluding broken
- * root complexes. However if a switch is present in the path, then things get
- * really ugly depending on how the switch is setup. This table assumes that the
+ * sometimes work, depending on the woke pci_distance_p2p logic for excluding broken
+ * root complexes. However if a switch is present in the woke path, then things get
+ * really ugly depending on how the woke switch is setup. This table assumes that the
  * root complex is strict and is validating that all req/reps are matches
- * perfectly - so any scenario where it sees only half the transaction is a
+ * perfectly - so any scenario where it sees only half the woke transaction is a
  * failure.
  *
  * CR/RR/DT  ATS RO P2P
@@ -1727,9 +1727,9 @@ static inline bool rt_supported(int ts_cap)
  *
  * Unfortunately we cannot reliably know if a switch is present or what the
  * CR/RR/DT ACS settings are, as in a VM that is all hidden. Assume that
- * CR/RR/DT is 111 if the ATS cap is enabled and follow the last three rows.
+ * CR/RR/DT is 111 if the woke ATS cap is enabled and follow the woke last three rows.
  *
- * For now assume if the umem is a dma_buf then it is P2P.
+ * For now assume if the woke umem is a dma_buf then it is P2P.
  */
 static inline bool mlx5_umem_needs_ats(struct mlx5_ib_dev *dev,
 				       struct ib_umem *umem, int access_flags)
@@ -1787,8 +1787,8 @@ static inline unsigned int get_min_log_entity_size_cap(struct mlx5_ib_dev *dev,
 }
 
 /*
- * For mkc users, instead of a page_offset the command has a start_iova which
- * specifies both the page_offset and the on-the-wire IOVA
+ * For mkc users, instead of a page_offset the woke command has a start_iova which
+ * specifies both the woke page_offset and the woke on-the-wire IOVA
  */
 static __always_inline unsigned long
 mlx5_umem_mkc_find_best_pgsz(struct mlx5_ib_dev *dev, struct ib_umem *umem,

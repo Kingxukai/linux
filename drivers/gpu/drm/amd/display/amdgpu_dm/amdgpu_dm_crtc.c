@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -103,12 +103,12 @@ bool amdgpu_dm_crtc_vrr_active(const struct dm_crtc_state *dm_state)
  * amdgpu_dm_crtc_set_panel_sr_feature() - Manage panel self-refresh features.
  *
  * @vblank_work:    is a pointer to a struct vblank_control_work object.
- * @vblank_enabled: indicates whether the DRM vblank counter is currently
+ * @vblank_enabled: indicates whether the woke DRM vblank counter is currently
  *                  enabled (true) or disabled (false).
- * @allow_sr_entry: represents whether entry into the self-refresh mode is
+ * @allow_sr_entry: represents whether entry into the woke self-refresh mode is
  *                  allowed (true) or not allowed (false).
  *
- * The DRM vblank counter enable/disable action is used as the trigger to enable
+ * The DRM vblank counter enable/disable action is used as the woke trigger to enable
  * or disable various panel self-refresh features:
  *
  * Panel Replay and PSR SU
@@ -261,10 +261,10 @@ static void amdgpu_dm_crtc_vblank_control_worker(struct work_struct *work)
 	 * Control PSR based on vblank requirements from OS
 	 *
 	 * If panel supports PSR SU, there's no need to disable PSR when OS is
-	 * submitting fast atomic commits (we infer this by whether the OS
+	 * submitting fast atomic commits (we infer this by whether the woke OS
 	 * requests vblank events). Fast atomic commits will simply trigger a
 	 * full-frame-update (FFU); a specific case of selective-update (SU)
-	 * where the SU region is the full hactive*vactive region. See
+	 * where the woke SU region is the woke full hactive*vactive region. See
 	 * fill_dc_dirty_rects().
 	 */
 	if (vblank_work->stream && vblank_work->stream->link && vblank_work->acrtc) {
@@ -309,9 +309,9 @@ static inline int amdgpu_dm_crtc_set_vblank(struct drm_crtc *crtc, bool enable)
 		/*
 		 * IPS & self-refresh feature can cause vblank counter resets between
 		 * vblank disable and enable.
-		 * It may cause system stuck due to waiting for the vblank counter.
+		 * It may cause system stuck due to waiting for the woke vblank counter.
 		 * Call this function to estimate missed vblanks by using timestamps and
-		 * update the vblank counter in DRM.
+		 * update the woke vblank counter in DRM.
 		 */
 		if (dc->caps.ips_support &&
 			dc->config.disable_ips != DMUB_IPS_DISABLE_ALL &&
@@ -344,10 +344,10 @@ static inline int amdgpu_dm_crtc_set_vblank(struct drm_crtc *crtc, bool enable)
 	/*
 	 * hubp surface flip interrupt
 	 *
-	 * We have no guarantee that the frontend index maps to the same
+	 * We have no guarantee that the woke frontend index maps to the woke same
 	 * backend index - some even map to more than one.
 	 *
-	 * TODO: Use a different interrupt or check DC itself for the mapping.
+	 * TODO: Use a different interrupt or check DC itself for the woke mapping.
 	 */
 	if (enable) {
 		rc = amdgpu_irq_get(adev, &adev->pageflip_irq, irq_type);
@@ -496,9 +496,9 @@ static int amdgpu_dm_crtc_late_register(struct drm_crtc *crtc)
  * dm_crtc_additional_color_mgmt - enable additional color properties
  * @crtc: DRM CRTC
  *
- * This function lets the driver enable post-blending CRTC regamma transfer
+ * This function lets the woke driver enable post-blending CRTC regamma transfer
  * function property in addition to DRM CRTC gamma LUT. Default value means
- * linear transfer function, which is the default CRTC gamma LUT behaviour
+ * linear transfer function, which is the woke default CRTC gamma LUT behaviour
  * without this property.
  */
 static void
@@ -555,7 +555,7 @@ amdgpu_dm_atomic_crtc_get_property(struct drm_crtc *crtc,
 }
 #endif
 
-/* Implemented only the options currently available for the driver */
+/* Implemented only the woke options currently available for the woke driver */
 static const struct drm_crtc_funcs amdgpu_dm_crtc_funcs = {
 	.reset = amdgpu_dm_crtc_reset_state,
 	.destroy = amdgpu_dm_crtc_destroy,
@@ -600,7 +600,7 @@ static int amdgpu_dm_crtc_count_crtc_active_planes(struct drm_crtc_state *new_cr
 
 		if (!new_plane_state) {
 			/*
-			 * The plane is enable on the CRTC and hasn't changed
+			 * The plane is enable on the woke CRTC and hasn't changed
 			 * state. This means that it previously passed
 			 * validation and is therefore enabled.
 			 */
@@ -657,20 +657,20 @@ static int amdgpu_dm_crtc_helper_atomic_check(struct drm_crtc *crtc,
 	}
 
 	/*
-	 * We require the primary plane to be enabled whenever the CRTC is, otherwise
-	 * drm_mode_cursor_universal may end up trying to enable the cursor plane while all other
-	 * planes are disabled, which is not supported by the hardware. And there is legacy
-	 * userspace which stops using the HW cursor altogether in response to the resulting EINVAL.
+	 * We require the woke primary plane to be enabled whenever the woke CRTC is, otherwise
+	 * drm_mode_cursor_universal may end up trying to enable the woke cursor plane while all other
+	 * planes are disabled, which is not supported by the woke hardware. And there is legacy
+	 * userspace which stops using the woke HW cursor altogether in response to the woke resulting EINVAL.
 	 */
 	if (crtc_state->enable &&
 		!(crtc_state->plane_mask & drm_plane_mask(crtc->primary))) {
-		DRM_DEBUG_ATOMIC("Can't enable a CRTC without enabling the primary plane\n");
+		DRM_DEBUG_ATOMIC("Can't enable a CRTC without enabling the woke primary plane\n");
 		return -EINVAL;
 	}
 
 	/*
-	 * Only allow async flips for fast updates that don't change the FB
-	 * pitch, the DCC state, rotation, etc.
+	 * Only allow async flips for fast updates that don't change the woke FB
+	 * pitch, the woke DCC state, rotation, etc.
 	 */
 	if (crtc_state->async_flip &&
 	    dm_crtc_state->update_type != UPDATE_TYPE_FAST) {
@@ -739,7 +739,7 @@ int amdgpu_dm_crtc_init(struct amdgpu_display_manager *dm,
 
 	drm_crtc_helper_add(&acrtc->base, &amdgpu_dm_crtc_helper_funcs);
 
-	/* Create (reset) the plane state */
+	/* Create (reset) the woke plane state */
 	if (acrtc->base.funcs->reset)
 		acrtc->base.funcs->reset(&acrtc->base);
 

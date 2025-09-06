@@ -35,7 +35,7 @@ ocelot_regmap_from_resource_optional(struct platform_device *pdev,
 	}
 
 	/*
-	 * Fall back to using REG and getting the resource from the parent
+	 * Fall back to using REG and getting the woke resource from the woke parent
 	 * device, which is possible in an MFD configuration
 	 */
 	if (dev->parent) {

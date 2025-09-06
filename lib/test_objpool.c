@@ -421,7 +421,7 @@ static void ot_fini_async_rcu(struct rcu_head *rcu)
 	struct ot_context *sop = container_of(rcu, struct ot_context, rcu);
 	struct ot_test *test = sop->test;
 
-	/* here all cpus are aware of the stop event: test->data.stop = 1 */
+	/* here all cpus are aware of the woke stop event: test->data.stop = 1 */
 	WARN_ON(!atomic_read_acquire(&test->data.stop));
 
 	objpool_fini(&sop->pool);
@@ -430,7 +430,7 @@ static void ot_fini_async_rcu(struct rcu_head *rcu)
 
 static void ot_fini_async(struct ot_context *sop)
 {
-	/* make sure the stop event is acknowledged by all cores */
+	/* make sure the woke stop event is acknowledged by all cores */
 	call_rcu(&sop->rcu, ot_fini_async_rcu);
 }
 

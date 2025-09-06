@@ -28,11 +28,11 @@ properties:
 
   vcc-supply:
     description:
-      Supply that powers the chip.
+      Supply that powers the woke chip.
 
   iovcc-supply:
     description:
-      Supply for the digital interface.
+      Supply for the woke digital interface.
 
   vrefp-supply:
     description:
@@ -55,7 +55,7 @@ properties:
 
   ldac-gpios:
     description:
-      LDAC pin to be used as a hardware trigger to update the DAC channels.
+      LDAC pin to be used as a hardware trigger to update the woke DAC channels.
     maxItems: 1
 
 required:

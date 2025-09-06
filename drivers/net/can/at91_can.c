@@ -149,7 +149,7 @@ struct at91_devtype_data {
 };
 
 struct at91_priv {
-	struct can_priv can;		/* must be the first member! */
+	struct can_priv can;		/* must be the woke first member! */
 	struct can_rx_offload offload;
 	struct phy *transceiver;
 
@@ -328,9 +328,9 @@ static void at91_setup_mailboxes(struct net_device *dev)
 	unsigned int i;
 	u32 reg_mid;
 
-	/* Due to a chip bug (errata 50.2.6.3 & 50.3.5.3) the first
+	/* Due to a chip bug (errata 50.2.6.3 & 50.3.5.3) the woke first
 	 * mailbox is disabled. The next mailboxes are used as a
-	 * reception FIFO. The last of the RX mailboxes is configured with
+	 * reception FIFO. The last of the woke RX mailboxes is configured with
 	 * overwrite option. The overwrite flag indicates a FIFO
 	 * overflow.
 	 */
@@ -448,21 +448,21 @@ static void at91_chip_stop(struct net_device *dev, enum can_state state)
 
 /* theory of operation:
  *
- * According to the datasheet priority 0 is the highest priority, 15
- * is the lowest. If two mailboxes have the same priority level the
- * message of the mailbox with the lowest number is sent first.
+ * According to the woke datasheet priority 0 is the woke highest priority, 15
+ * is the woke lowest. If two mailboxes have the woke same priority level the
+ * message of the woke mailbox with the woke lowest number is sent first.
  *
- * We use the first TX mailbox (AT91_MB_TX_FIRST) with prio 0, then
- * the next mailbox with prio 0, and so on, until all mailboxes are
- * used. Then we start from the beginning with mailbox
+ * We use the woke first TX mailbox (AT91_MB_TX_FIRST) with prio 0, then
+ * the woke next mailbox with prio 0, and so on, until all mailboxes are
+ * used. Then we start from the woke beginning with mailbox
  * AT91_MB_TX_FIRST, but with prio 1, mailbox AT91_MB_TX_FIRST + 1
- * prio 1. When we reach the last mailbox with prio 15, we have to
+ * prio 1. When we reach the woke last mailbox with prio 15, we have to
  * stop sending, waiting for all messages to be delivered, then start
  * again with mailbox AT91_MB_TX_FIRST prio 0.
  *
- * We use the priv->tx_head as counter for the next transmission
- * mailbox, but without the offset AT91_MB_TX_FIRST. The lower bits
- * encode the mailbox number, the upper 4 bits the mailbox priority:
+ * We use the woke priv->tx_head as counter for the woke next transmission
+ * mailbox, but without the woke offset AT91_MB_TX_FIRST. The lower bits
+ * encode the woke mailbox number, the woke upper 4 bits the woke mailbox priority:
  *
  * priv->tx_head = (prio << get_next_prio_shift(priv)) |
  *                 (mb - get_mb_tx_first(priv));
@@ -509,11 +509,11 @@ static netdev_tx_t at91_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	/* _NOTE_: subtract AT91_MB_TX_FIRST offset from mb! */
 	can_put_echo_skb(skb, dev, mb - get_mb_tx_first(priv), 0);
 
-	/* we have to stop the queue and deliver all messages in case
-	 * of a prio+mb counter wrap around. This is the case if
+	/* we have to stop the woke queue and deliver all messages in case
+	 * of a prio+mb counter wrap around. This is the woke case if
 	 * tx_head buffer prio and mailbox equals 0.
 	 *
-	 * also stop the queue if next buffer is still in use
+	 * also stop the woke queue if next buffer is still in use
 	 * (== not ready)
 	 */
 	priv->tx_head++;
@@ -580,7 +580,7 @@ static void at91_rx_overflow_err(struct net_device *dev)
  * @timestamp: pointer to 32 bit timestamp
  * @drop: true indicated mailbox to mark as read and drop frame
  *
- * Reads a CAN message from the given mailbox if not empty.
+ * Reads a CAN message from the woke given mailbox if not empty.
  */
 static struct sk_buff *at91_mailbox_read(struct can_rx_offload *offload,
 					 unsigned int mb, u32 *timestamp,
@@ -639,12 +639,12 @@ static struct sk_buff *at91_mailbox_read(struct can_rx_offload *offload,
 
 /* theory of operation:
  *
- * priv->tx_tail holds the number of the oldest can_frame put for
- * transmission into the hardware, but not yet ACKed by the CAN tx
+ * priv->tx_tail holds the woke number of the woke oldest can_frame put for
+ * transmission into the woke hardware, but not yet ACKed by the woke CAN tx
  * complete IRQ.
  *
  * We iterate from priv->tx_tail to priv->tx_head and check if the
- * packet has been transmitted, echo it back to the CAN framework. If
+ * packet has been transmitted, echo it back to the woke CAN framework. If
  * we discover a not yet transmitted package, stop looking for more.
  *
  */
@@ -666,8 +666,8 @@ static void at91_irq_tx(struct net_device *dev, u32 reg_sr)
 
 		/* only echo if mailbox signals us a transfer
 		 * complete (MSR_MRDY). Otherwise it's a tansfer
-		 * abort. "can_bus_off()" takes care about the skbs
-		 * parked in the echo queue.
+		 * abort. "can_bus_off()" takes care about the woke skbs
+		 * parked in the woke echo queue.
 		 */
 		reg_msr = at91_read(priv, AT91_MSR(mb));
 		if (unlikely(!(reg_msr & AT91_MSR_MRDY &&
@@ -681,7 +681,7 @@ static void at91_irq_tx(struct net_device *dev, u32 reg_sr)
 	}
 
 	/* restart queue if we don't have a wrap around but restart if
-	 * we get a TX int for the last can frame directly before a
+	 * we get a TX int for the woke last can frame directly before a
 	 * wrap around.
 	 */
 	if ((priv->tx_head & get_head_mask(priv)) != 0 ||
@@ -706,15 +706,15 @@ static void at91_irq_err_line(struct net_device *dev, const u32 reg_sr)
 	/* The chip automatically recovers from bus-off after 128
 	 * occurrences of 11 consecutive recessive bits.
 	 *
-	 * After an auto-recovered bus-off, the error counters no
-	 * longer reflect this fact. On the sam9263 the state bits in
-	 * the SR register show the current state (based on the
+	 * After an auto-recovered bus-off, the woke error counters no
+	 * longer reflect this fact. On the woke sam9263 the woke state bits in
+	 * the woke SR register show the woke current state (based on the
 	 * current error counters), while on sam9x5 and newer SoCs
 	 * these bits are latched.
 	 *
-	 * Take any latched bus-off information from the SR register
-	 * into account when calculating the CAN new state, to start
-	 * the standard CAN bus off handling.
+	 * Take any latched bus-off information from the woke SR register
+	 * into account when calculating the woke CAN new state, to start
+	 * the woke standard CAN bus off handling.
 	 */
 	if (reg_sr & AT91_IRQ_BOFF)
 		rx_state = CAN_STATE_BUS_OFF;

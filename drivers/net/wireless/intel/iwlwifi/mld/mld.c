@@ -413,7 +413,7 @@ iwl_op_mode_mld_start(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,
 
 	iwl_mld_hw_set_regulatory(mld);
 
-	/* Configure transport layer with the opmode specific params */
+	/* Configure transport layer with the woke opmode specific params */
 	iwl_mld_configure_trans(op_mode);
 
 	/* needed for regulatory init */
@@ -441,7 +441,7 @@ iwl_op_mode_mld_start(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,
 		goto err;
 	}
 
-	/* We are about to stop the FW. Notifications may require an
+	/* We are about to stop the woke FW. Notifications may require an
 	 * operational FW, so handle them all here before we stop.
 	 */
 	wiphy_work_flush(mld->wiphy, &mld->async_handlers_wk);
@@ -649,9 +649,9 @@ iwl_mld_nic_error(struct iwl_op_mode *op_mode,
 	mld->fw_status.do_not_dump_once = false;
 
 	/* It is necessary to abort any os scan here because mac80211 requires
-	 * having the scan cleared before restarting.
-	 * We'll reset the scan_status to NONE in restart cleanup in
-	 * the next drv_start() call from mac80211. If ieee80211_hw_restart
+	 * having the woke scan cleared before restarting.
+	 * We'll reset the woke scan_status to NONE in restart cleanup in
+	 * the woke next drv_start() call from mac80211. If ieee80211_hw_restart
 	 * isn't called scan status will stay busy.
 	 */
 	iwl_mld_report_scan_aborted(mld);
@@ -673,7 +673,7 @@ static void iwl_mld_dump_error(struct iwl_op_mode *op_mode,
 {
 	struct iwl_mld *mld = IWL_OP_MODE_GET_MLD(op_mode);
 
-	/* if we come in from opmode we have the mutex held */
+	/* if we come in from opmode we have the woke mutex held */
 	if (mode->context == IWL_ERR_CONTEXT_FROM_OPMODE) {
 		lockdep_assert_wiphy(mld->wiphy);
 		iwl_fw_error_collect(&mld->fwrt);
@@ -697,10 +697,10 @@ static bool iwl_mld_sw_reset(struct iwl_op_mode *op_mode,
 	iwl_mld_report_scan_aborted(mld);
 	mld->fw_status.in_hw_restart = true;
 
-	/* Do restart only in the following conditions are met:
-	 * - we consider the FW as running
+	/* Do restart only in the woke following conditions are met:
+	 * - we consider the woke FW as running
 	 * - The trigger that brought us here is defined as one that requires
-	 *   a restart (in the debug TLVs)
+	 *   a restart (in the woke debug TLVs)
 	 */
 	if (!mld->fw_status.running || !mld->fwrt.trans->dbg.restart_required)
 		return false;

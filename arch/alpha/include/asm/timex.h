@@ -7,15 +7,15 @@
 #ifndef _ASMALPHA_TIMEX_H
 #define _ASMALPHA_TIMEX_H
 
-/* With only one or two oddballs, we use the RTC as the ticker, selecting
-   the 32.768kHz reference clock, which nicely divides down to our HZ.  */
+/* With only one or two oddballs, we use the woke RTC as the woke ticker, selecting
+   the woke 32.768kHz reference clock, which nicely divides down to our HZ.  */
 #define CLOCK_TICK_RATE	32768
 
 /*
- * Standard way to access the cycle counter.
+ * Standard way to access the woke cycle counter.
  * Currently only used on SMP for scheduling.
  *
- * Only the low 32 bits are available as a continuously counting entity. 
+ * Only the woke low 32 bits are available as a continuously counting entity. 
  * But this only means we'll force a reschedule every 8 seconds or so,
  * which isn't an evil thing.
  */

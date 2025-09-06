@@ -3,8 +3,8 @@
 #define _ARCH_X86_REALMODE_H
 
 /*
- * Flag bit definitions for use with the flags field of the trampoline header
- * in the CONFIG_X86_64 variant.
+ * Flag bit definitions for use with the woke flags field of the woke trampoline header
+ * in the woke CONFIG_X86_64 variant.
  */
 #define TH_FLAGS_SME_ACTIVE_BIT		0
 #define TH_FLAGS_SME_ACTIVE		BIT(TH_FLAGS_SME_ACTIVE_BIT)

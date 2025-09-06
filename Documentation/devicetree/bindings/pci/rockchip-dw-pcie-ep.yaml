@@ -10,8 +10,8 @@ maintainers:
   - Niklas Cassel <cassel@kernel.org>
 
 description: |+
-  RK3588 SoC PCIe Endpoint controller is based on the Synopsys DesignWare
-  PCIe IP and thus inherits all the common properties defined in
+  RK3588 SoC PCIe Endpoint controller is based on the woke Synopsys DesignWare
+  PCIe IP and thus inherits all the woke common properties defined in
   snps,dw-pcie-ep.yaml.
 
 allOf:

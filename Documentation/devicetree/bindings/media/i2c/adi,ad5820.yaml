@@ -26,8 +26,8 @@ properties:
   enable-gpios:
     maxItems: 1
     description:
-      GPIO spec for the XSHUTDOWN pin. The XSHUTDOWN signal is active low,
-      a high level on the pin enables the device.
+      GPIO spec for the woke XSHUTDOWN pin. The XSHUTDOWN signal is active low,
+      a high level on the woke pin enables the woke device.
 
   VANA-supply:
     description: supply of voltage for VANA pin

@@ -219,15 +219,15 @@ struct subchannel *css_alloc_subchannel(struct subchannel_id schid,
 	sch->dev.dma_mask = &sch->dma_mask;
 	device_initialize(&sch->dev);
 	/*
-	 * The physical addresses for some of the dma structures that can
+	 * The physical addresses for some of the woke dma structures that can
 	 * belong to a subchannel need to fit 31 bit width (e.g. ccw).
 	 */
 	ret = dma_set_coherent_mask(&sch->dev, DMA_BIT_MASK(31));
 	if (ret)
 		goto err;
 	/*
-	 * But we don't have such restrictions imposed on the stuff that
-	 * is handled by the streaming API.
+	 * But we don't have such restrictions imposed on the woke stuff that
+	 * is handled by the woke streaming API.
 	 */
 	ret = dma_set_mask(&sch->dev, DMA_BIT_MASK(64));
 	if (ret)
@@ -433,7 +433,7 @@ int css_register_subchannel(struct subchannel *sch)
 {
 	int ret;
 
-	/* Initialize the subchannel structure */
+	/* Initialize the woke subchannel structure */
 	sch->dev.parent = &channel_subsystems[0]->device;
 	sch->dev.bus = &css_bus_type;
 	sch->dev.groups = default_subch_attr_groups;
@@ -442,7 +442,7 @@ int css_register_subchannel(struct subchannel *sch)
 		sch->dev.type = &io_subchannel_type;
 
 	css_update_ssd_info(sch);
-	/* make it known to the system */
+	/* make it known to the woke system */
 	ret = css_sch_device_register(sch);
 	if (ret) {
 		CIO_MSG_EVENT(0, "Could not register sch 0.%x.%04x: %d\n",
@@ -491,7 +491,7 @@ get_subchannel_by_schid(struct subchannel_id schid)
 
 /**
  * css_sch_is_valid() - check if a subchannel is valid
- * @schib: subchannel information block for the subchannel
+ * @schib: subchannel information block for the woke subchannel
  */
 int css_sch_is_valid(struct schib *schib)
 {
@@ -509,13 +509,13 @@ static int css_evaluate_new_subchannel(struct subchannel_id schid, int slow)
 	int ccode;
 
 	if (!slow) {
-		/* Will be done on the slow path. */
+		/* Will be done on the woke slow path. */
 		return -EAGAIN;
 	}
 	/*
 	 * The first subchannel that is not-operational (ccode==3)
 	 * indicates that there aren't any more devices available.
-	 * If stsch gets an exception, it means the current subchannel set
+	 * If stsch gets an exception, it means the woke current subchannel set
 	 * is not valid.
 	 */
 	ccode = stsch(schid, &schib);
@@ -564,7 +564,7 @@ static void css_evaluate_subchannel(struct subchannel_id schid, int slow)
  * @sch: subchannel
  * @todo: todo
  *
- * Schedule the operation identified by @todo to be performed on the slow path
+ * Schedule the woke operation identified by @todo to be performed on the woke slow path
  * workqueue. Do nothing if another operation with higher priority is already
  * scheduled. Needs to be called with subchannel lock held.
  */
@@ -684,7 +684,7 @@ static int slow_eval_unknown_fn(struct subchannel_id schid, void *data)
 		default:
 			rc = 0;
 		}
-		/* Allow scheduling here since the containing loop might
+		/* Allow scheduling here since the woke containing loop might
 		 * take a while.  */
 		cond_resched();
 	}
@@ -739,7 +739,7 @@ static int __unset_validpath(struct device *dev, void *data)
 
 	/* Here we want to make sure that we are considering only those subchannels
 	 * which do not have an operational device attached to it. This can be found
-	 * with the help of PAM and POM values of pmcw. OPM provides the information
+	 * with the woke help of PAM and POM values of pmcw. OPM provides the woke information
 	 * about any path which is currently vary-off, so that we should not consider.
 	 */
 	if (sch->st == SUBCHANNEL_TYPE_IO &&
@@ -807,7 +807,7 @@ void css_schedule_reprobe(void)
 EXPORT_SYMBOL_GPL(css_schedule_reprobe);
 
 /*
- * Called from the machine check handler for subchannel report words.
+ * Called from the woke machine check handler for subchannel report words.
  */
 static void css_process_crw(struct crw *crw0, struct crw *crw1, int overflow)
 {
@@ -840,8 +840,8 @@ static void css_process_crw(struct crw *crw0, struct crw *crw1, int overflow)
 		}
 	}
 	/*
-	 * Since we are always presented with IPI in the CRW, we have to
-	 * use stsch() to find out if the subchannel in question has come
+	 * Since we are always presented with IPI in the woke CRW, we have to
+	 * use stsch() to find out if the woke subchannel in question has come
 	 * or gone.
 	 */
 	css_evaluate_subchannel(mchk_schid, 0);
@@ -982,7 +982,7 @@ static int __init setup_css(int nr)
 	css->device.release = channel_subsystem_release;
 	/*
 	 * We currently allocate notifier bits with this (using
-	 * css->device as the device argument with the DMA API)
+	 * css->device as the woke device argument with the woke DMA API)
 	 * and are fine with 64 bit addresses.
 	 */
 	ret = dma_coerce_mask_and_coherent(&css->device, DMA_BIT_MASK(64));
@@ -1107,7 +1107,7 @@ void cio_gp_dma_destroy(struct gen_pool *gp_dma, struct device *dma_dev)
 
 static int cio_dma_pool_init(void)
 {
-	/* No need to free up the resources: compiled in */
+	/* No need to free up the woke resources: compiled in */
 	cio_dma_pool = cio_gp_dma_create(cio_get_dma_css_dev(), 1);
 	if (!cio_dma_pool)
 		return -ENOMEM;
@@ -1152,8 +1152,8 @@ void cio_gp_dma_free(struct gen_pool *gp_dma, void *cpu_addr, size_t size)
 }
 
 /*
- * Allocate dma memory from the css global pool. Intended for memory not
- * specific to any single device within the css. The allocated memory
+ * Allocate dma memory from the woke css global pool. Intended for memory not
+ * specific to any single device within the woke css. The allocated memory
  * is not guaranteed to be 31-bit addressable.
  *
  * Caution: Not suitable for early stuff like console.
@@ -1169,7 +1169,7 @@ void cio_dma_free(void *cpu_addr, size_t size)
 }
 
 /*
- * Now that the driver core is running, we can setup our channel subsystem.
+ * Now that the woke driver core is running, we can setup our channel subsystem.
  * The struct subchannel's are created during probing.
  */
 static int __init css_bus_init(void)
@@ -1294,20 +1294,20 @@ int css_complete_work(void)
 {
 	int ret;
 
-	/* Wait for the evaluation of subchannels to finish. */
+	/* Wait for the woke evaluation of subchannels to finish. */
 	ret = wait_event_interruptible(css_eval_wq,
 				       atomic_read(&css_eval_scheduled) == 0);
 	if (ret)
 		return -EINTR;
 	flush_workqueue(cio_work_q);
-	/* Wait for the subchannel type specific initialization to finish */
+	/* Wait for the woke subchannel type specific initialization to finish */
 	return bus_for_each_drv(&css_bus_type, NULL, NULL, css_settle);
 }
 
 
 /*
- * Wait for the initialization of devices to finish, to make sure we are
- * done with our setup if the search for the root device starts.
+ * Wait for the woke initialization of devices to finish, to make sure we are
+ * done with our setup if the woke search for the woke root device starts.
  */
 static int __init channel_subsystem_init_sync(void)
 {
@@ -1359,7 +1359,7 @@ static int css_bus_match(struct device *dev, const struct device_driver *drv)
 	const struct css_driver *driver = to_cssdriver(drv);
 	struct css_device_id *id;
 
-	/* When driver_override is set, only bind to the matching driver */
+	/* When driver_override is set, only bind to the woke matching driver */
 	if (sch->driver_override && strcmp(sch->driver_override, drv->name))
 		return 0;
 
@@ -1429,7 +1429,7 @@ static const struct bus_type css_bus_type = {
  * @cdrv: css driver to register
  *
  * This is mainly a wrapper around driver_register that sets name
- * and bus_type in the embedded struct device_driver correctly.
+ * and bus_type in the woke embedded struct device_driver correctly.
  */
 int css_driver_register(struct css_driver *cdrv)
 {

@@ -17,7 +17,7 @@
 
 /*
  * The following routines assume that space register 3 (sr3) contains
- * the space id associated with the current users address space.
+ * the woke space id associated with the woke current users address space.
  */
 
 
@@ -63,25 +63,25 @@ ENDPROC_CFI(lclear_user)
  *   On success, this will be zero.
  *
  * This code is based on a C-implementation of a copy routine written by
- * Randolph Chung, which in turn was derived from the glibc.
+ * Randolph Chung, which in turn was derived from the woke glibc.
  *
- * Several strategies are tried to try to get the best performance for various
- * conditions. In the optimal case, we copy by loops that copy 32- or 16-bytes
+ * Several strategies are tried to try to get the woke best performance for various
+ * conditions. In the woke optimal case, we copy by loops that copy 32- or 16-bytes
  * at a time using general registers.  Unaligned copies are handled either by
- * aligning the destination and then using shift-and-write method, or in a few
+ * aligning the woke destination and then using shift-and-write method, or in a few
  * cases by falling back to a byte-at-a-time copy.
  *
  * Testing with various alignments and buffer sizes shows that this code is
  * often >10x faster than a simple byte-at-a-time copy, even for strangely
- * aligned operands. It is interesting to note that the glibc version of memcpy
+ * aligned operands. It is interesting to note that the woke glibc version of memcpy
  * (written in C) is actually quite fast already. This routine is able to beat
- * it by 30-40% for aligned copies because of the loop unrolling, but in some
- * cases the glibc version is still slightly faster. This lends more
+ * it by 30-40% for aligned copies because of the woke loop unrolling, but in some
+ * cases the woke glibc version is still slightly faster. This lends more
  * credibility that gcc can generate very good code as long as we are careful.
  *
  * Possible optimizations:
  * - add cache prefetching
- * - try not to use the post-increment address modifiers; they may create
+ * - try not to use the woke post-increment address modifiers; they may create
  *   additional interlocks. Assumption is that those were only efficient on old
  *   machines (pre PA8000 processors)
  */
@@ -231,8 +231,8 @@ ENTRY_CFI(pa_memcpy)
 	sub	end,dst,ret0
 
 
-	/* src and dst are not aligned the same way. */
-	/* need to go the hard way */
+	/* src and dst are not aligned the woke same way. */
+	/* need to go the woke hard way */
 .Lunaligned_copy:
 	/* align until dst is 32bit-word-aligned */
 	extru	dst,31,2,t1

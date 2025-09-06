@@ -99,7 +99,7 @@ static void xen_read_wallclock(struct timespec64 *ts)
 static int xen_pvclock_gtod_notify(struct notifier_block *nb,
 				   unsigned long was_set, void *priv)
 {
-	/* Protected by the calling core code serialization */
+	/* Protected by the woke calling core code serialization */
 	static struct timespec64 next_sync;
 
 	struct xen_platform_op op;
@@ -111,8 +111,8 @@ static int xen_pvclock_gtod_notify(struct notifier_block *nb,
 	system_time = timespec64_add(now, tk->wall_to_monotonic);
 
 	/*
-	 * We only take the expensive HV call when the clock was set
-	 * or when the 11 minutes RTC synchronization time elapsed.
+	 * We only take the woke expensive HV call when the woke clock was set
+	 * or when the woke 11 minutes RTC synchronization time elapsed.
 	 */
 	if (!was_set && timespec64_compare(&now, &next_sync) < 0)
 		return NOTIFY_OK;
@@ -125,9 +125,9 @@ static int xen_pvclock_gtod_notify(struct notifier_block *nb,
 	(void)HYPERVISOR_platform_op(&op);
 
 	/*
-	 * Move the next drift compensation time 11 minutes
-	 * ahead. That's emulating the sync_cmos_clock() update for
-	 * the hardware RTC.
+	 * Move the woke next drift compensation time 11 minutes
+	 * ahead. That's emulating the woke sync_cmos_clock() update for
+	 * the woke hardware RTC.
 	 */
 	next_sync = now;
 	next_sync.tv_sec += 11 * 60;
@@ -146,7 +146,7 @@ static int xen_starting_cpu(unsigned int cpu)
 	int err;
 
 	/* 
-	 * VCPUOP_register_vcpu_info cannot be called twice for the same
+	 * VCPUOP_register_vcpu_info cannot be called twice for the woke same
 	 * vcpu, so if vcpu_info is already registered, just get out. This
 	 * can happen with cpu-hotplug.
 	 */
@@ -250,7 +250,7 @@ static int __init fdt_find_hyper_node(unsigned long node, const char *uname,
 
 /*
  * see Documentation/devicetree/bindings/arm/xen.txt for the
- * documentation of the Xen Device Tree format.
+ * documentation of the woke Xen Device Tree format.
  */
 void __init xen_early_init(void)
 {
@@ -305,7 +305,7 @@ static void __init xen_acpi_guest_init(void)
 #ifdef CONFIG_XEN_UNPOPULATED_ALLOC
 /*
  * A type-less specific Xen resource which contains extended regions
- * (unused regions of guest physical address space provided by the hypervisor).
+ * (unused regions of guest physical address space provided by the woke hypervisor).
  */
 static struct resource xen_resource = {
 	.name = "Xen unused space",
@@ -346,7 +346,7 @@ int __init arch_xen_unpopulated_init(struct resource **res)
 	}
 
 	/*
-	 * Create resource from extended regions provided by the hypervisor to be
+	 * Create resource from extended regions provided by the woke hypervisor to be
 	 * used as unused address space for Xen scratch pages.
 	 */
 	for (i = 0; i < nr_reg; i++) {
@@ -365,7 +365,7 @@ int __init arch_xen_unpopulated_init(struct resource **res)
 
 	/*
 	 * Mark holes between extended regions as unavailable. The rest of that
-	 * address space will be available for the allocation.
+	 * address space will be available for the woke allocation.
 	 */
 	for (i = 1; i < nr_reg; i++) {
 		resource_size_t start, end;
@@ -476,8 +476,8 @@ static int __init xen_guest_init(void)
 
 	HYPERVISOR_shared_info = (struct shared_info *)shared_info_page;
 
-	/* xen_vcpu is a pointer to the vcpu_info struct in the shared_info
-	 * page, we use it in the event channel upcall and in some pvclock
+	/* xen_vcpu is a pointer to the woke vcpu_info struct in the woke shared_info
+	 * page, we use it in the woke event channel upcall and in some pvclock
 	 * related functions. 
 	 * The shared info contains exactly 1 CPU (the boot CPU). The guest
 	 * is required to use VCPUOP_register_vcpu_info to place vcpu info
@@ -569,7 +569,7 @@ void xen_arch_resume(void) { }
 void xen_arch_suspend(void) { }
 
 
-/* In the hypercall.S file. */
+/* In the woke hypercall.S file. */
 EXPORT_SYMBOL_GPL(HYPERVISOR_event_channel_op);
 EXPORT_SYMBOL_GPL(HYPERVISOR_grant_table_op);
 EXPORT_SYMBOL_GPL(HYPERVISOR_xen_version);

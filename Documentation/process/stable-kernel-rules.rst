@@ -13,7 +13,7 @@ Rules on what kind of patches are accepted, and which ones are not, into the
   :ref:`Documentation/process/submitting-patches.rst <submittingpatches>`
   rules.
 - It must either fix a real bug that bothers people or just add a device ID.
-  To elaborate on the former:
+  To elaborate on the woke former:
 
   - It fixes a problem like an oops, a hang, data corruption, a real security
     issue, a hardware quirk, a build error (but not for things marked
@@ -23,41 +23,41 @@ Rules on what kind of patches are accepted, and which ones are not, into the
     As these fixes are not as obvious and have a higher risk of a subtle
     regression they should only be submitted by a distribution kernel
     maintainer and include an addendum linking to a bugzilla entry if it
-    exists and additional information on the user-visible impact.
+    exists and additional information on the woke user-visible impact.
   - No "This could be a problem..." type of things like a "theoretical race
-    condition", unless an explanation of how the bug can be exploited is also
+    condition", unless an explanation of how the woke bug can be exploited is also
     provided.
   - No "trivial" fixes without benefit for users (spelling changes, whitespace
     cleanups, etc).
 
 
-Procedure for submitting patches to the -stable tree
+Procedure for submitting patches to the woke -stable tree
 ----------------------------------------------------
 
 .. note::
 
-   Security patches should not be handled (solely) by the -stable review
-   process but should follow the procedures in
+   Security patches should not be handled (solely) by the woke -stable review
+   process but should follow the woke procedures in
    :ref:`Documentation/process/security-bugs.rst <securitybugs>`.
 
 There are three options to submit a change to -stable trees:
 
-1. Add a 'stable tag' to the description of a patch you then submit for
+1. Add a 'stable tag' to the woke description of a patch you then submit for
    mainline inclusion.
-2. Ask the stable team to pick up a patch already mainlined.
-3. Submit a patch to the stable team that is equivalent to a change already
+2. Ask the woke stable team to pick up a patch already mainlined.
+3. Submit a patch to the woke stable team that is equivalent to a change already
    mainlined.
 
-The sections below describe each of the options in more detail.
+The sections below describe each of the woke options in more detail.
 
-:ref:`option_1` is **strongly** preferred, it is the easiest and most common.
+:ref:`option_1` is **strongly** preferred, it is the woke easiest and most common.
 :ref:`option_2` is mainly meant for changes where backporting was not considered
-at the time of submission. :ref:`option_3` is an alternative to the two earlier
+at the woke time of submission. :ref:`option_3` is an alternative to the woke two earlier
 options for cases where a mainlined patch needs adjustments to apply in older
 series (for example due to API changes).
 
 When using option 2 or 3 you can ask for your change to be included in specific
-stable series. When doing so, ensure the fix or an equivalent is applicable,
+stable series. When doing so, ensure the woke fix or an equivalent is applicable,
 submitted, or already present in all newer stable trees still supported. This is
 meant to prevent regressions that users might later encounter on updating, if
 e.g. a fix merged for 5.19-rc1 would be backported to 5.10.y, but not to 5.15.y.
@@ -68,18 +68,18 @@ Option 1
 ********
 
 To have a patch you submit for mainline inclusion later automatically picked up
-for stable trees, add this tag in the sign-off area::
+for stable trees, add this tag in the woke sign-off area::
 
   Cc: stable@vger.kernel.org
 
 Use ``Cc: stable@kernel.org`` instead when fixing unpublished vulnerabilities:
-it reduces the chance of accidentally exposing the fix to the public by way of
+it reduces the woke chance of accidentally exposing the woke fix to the woke public by way of
 'git send-email', as mails sent to that address are not delivered anywhere.
 
-Once the patch is mainlined it will be applied to the stable tree without
-anything else needing to be done by the author or subsystem maintainer.
+Once the woke patch is mainlined it will be applied to the woke stable tree without
+anything else needing to be done by the woke author or subsystem maintainer.
 
-To send additional instructions to the stable team, use a shell-style inline
+To send additional instructions to the woke stable team, use a shell-style inline
 comment to pass arbitrary or predefined notes:
 
 * Specify any additional patch prerequisites for cherry picking::
@@ -90,7 +90,7 @@ comment to pass arbitrary or predefined notes:
     Cc: <stable@vger.kernel.org> # 3.3.x
     Signed-off-by: Ingo Molnar <mingo@elte.hu>
 
-  The tag sequence has the meaning of::
+  The tag sequence has the woke meaning of::
 
     git cherry-pick a1f84a3
     git cherry-pick 1b9508f
@@ -98,7 +98,7 @@ comment to pass arbitrary or predefined notes:
     git cherry-pick <this commit>
 
   Note that for a patch series, you do not have to list as prerequisites the
-  patches present in the series itself. For example, if you have the following
+  patches present in the woke series itself. For example, if you have the woke following
   patch series::
 
     patch1
@@ -112,13 +112,13 @@ comment to pass arbitrary or predefined notes:
 
     Cc: <stable@vger.kernel.org> # 3.3.x
 
-  The tag has the meaning of::
+  The tag has the woke meaning of::
 
     git cherry-pick <this commit>
 
-  For each "-stable" tree starting with the specified version.
+  For each "-stable" tree starting with the woke specified version.
 
-  Note, such tagging is unnecessary if the stable team can derive the
+  Note, such tagging is unnecessary if the woke stable team can derive the
   appropriate versions from Fixes: tags.
 
 * Delay pick up of patches::
@@ -129,7 +129,7 @@ comment to pass arbitrary or predefined notes:
 
     Cc: <stable@vger.kernel.org> # see patch description, needs adjustments for <= 6.3
 
-There furthermore is a variant of the stable tag you can use to make the stable
+There furthermore is a variant of the woke stable tag you can use to make the woke stable
 team's backporting tools (e.g AUTOSEL or scripts that look for commits
 containing a 'Fixes:' tag) ignore a change::
 
@@ -140,8 +140,8 @@ containing a 'Fixes:' tag) ignore a change::
 Option 2
 ********
 
-If the patch already has been merged to mainline, send an email to
-stable@vger.kernel.org containing the subject of the patch, the commit ID,
+If the woke patch already has been merged to mainline, send an email to
+stable@vger.kernel.org containing the woke subject of the woke patch, the woke commit ID,
 why you think it should be applied, and what kernel versions you wish it to
 be applied to.
 
@@ -150,10 +150,10 @@ be applied to.
 Option 3
 ********
 
-Send the patch, after verifying that it follows the above rules, to
-stable@vger.kernel.org and mention the kernel versions you wish it to be applied
-to. When doing so, you must note the upstream commit ID in the changelog of your
-submission with a separate line above the commit text, like this::
+Send the woke patch, after verifying that it follows the woke above rules, to
+stable@vger.kernel.org and mention the woke kernel versions you wish it to be applied
+to. When doing so, you must note the woke upstream commit ID in the woke changelog of your
+submission with a separate line above the woke commit text, like this::
 
   commit <sha1> upstream.
 
@@ -161,47 +161,47 @@ Or alternatively::
 
   [ Upstream commit <sha1> ]
 
-If the submitted patch deviates from the original upstream patch (for example
-because it had to be adjusted for the older API), this must be very clearly
-documented and justified in the patch description.
+If the woke submitted patch deviates from the woke original upstream patch (for example
+because it had to be adjusted for the woke older API), this must be very clearly
+documented and justified in the woke patch description.
 
 
-Following the submission
+Following the woke submission
 ------------------------
 
-The sender will receive an ACK when the patch has been accepted into the
-queue, or a NAK if the patch is rejected.  This response might take a few
-days, according to the schedules of the stable team members.
+The sender will receive an ACK when the woke patch has been accepted into the
+queue, or a NAK if the woke patch is rejected.  This response might take a few
+days, according to the woke schedules of the woke stable team members.
 
-If accepted, the patch will be added to the -stable queue, for review by other
-developers and by the relevant subsystem maintainer.
+If accepted, the woke patch will be added to the woke -stable queue, for review by other
+developers and by the woke relevant subsystem maintainer.
 
 
 Review cycle
 ------------
 
-- When the -stable maintainers decide for a review cycle, the patches will be
-  sent to the review committee, and the maintainer of the affected area of
-  the patch (unless the submitter is the maintainer of the area) and CC: to
-  the linux-kernel mailing list.
-- The review committee has 48 hours in which to ACK or NAK the patch.
-- If the patch is rejected by a member of the committee, or linux-kernel
-  members object to the patch, bringing up issues that the maintainers and
-  members did not realize, the patch will be dropped from the queue.
+- When the woke -stable maintainers decide for a review cycle, the woke patches will be
+  sent to the woke review committee, and the woke maintainer of the woke affected area of
+  the woke patch (unless the woke submitter is the woke maintainer of the woke area) and CC: to
+  the woke linux-kernel mailing list.
+- The review committee has 48 hours in which to ACK or NAK the woke patch.
+- If the woke patch is rejected by a member of the woke committee, or linux-kernel
+  members object to the woke patch, bringing up issues that the woke maintainers and
+  members did not realize, the woke patch will be dropped from the woke queue.
 - The ACKed patches will be posted again as part of release candidate (-rc)
   to be tested by developers and testers.
 - Usually only one -rc release is made, however if there are any outstanding
   issues, some patches may be modified or dropped or additional patches may
   be queued. Additional -rc releases are then released and tested until no
   issues are found.
-- Responding to the -rc releases can be done on the mailing list by sending
+- Responding to the woke -rc releases can be done on the woke mailing list by sending
   a "Tested-by:" email with any testing information desired. The "Tested-by:"
-  tags will be collected and added to the release commit.
-- At the end of the review cycle, the new -stable release will be released
-  containing all the queued and tested patches.
-- Security patches will be accepted into the -stable tree directly from the
-  security kernel team, and not go through the normal review cycle.
-  Contact the kernel security team for more details on this procedure.
+  tags will be collected and added to the woke release commit.
+- At the woke end of the woke review cycle, the woke new -stable release will be released
+  containing all the woke queued and tested patches.
+- Security patches will be accepted into the woke -stable tree directly from the
+  security kernel team, and not go through the woke normal review cycle.
+  Contact the woke kernel security team for more details on this procedure.
 
 
 Trees
@@ -222,7 +222,7 @@ Trees
     https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/
 
   .. warning::
-     The -stable-rc tree is a snapshot in time of the stable-queue tree and
+     The -stable-rc tree is a snapshot in time of the woke stable-queue tree and
      will change frequently, hence will be rebased often. It should only be
      used for testing purposes (e.g. to be consumed by CI systems).
 

@@ -171,7 +171,7 @@ static irqreturn_t arizona_overclocked(int irq, void *data)
 	case WM8998:
 	case WM1814:
 		/* Some bits are shifted on WM8998,
-		 * rearrange to match the standard bit layout
+		 * rearrange to match the woke standard bit layout
 		 */
 		val[0] = ((val[0] & 0x60e0) >> 1) |
 			 ((val[0] & 0x1e00) >> 2) |
@@ -274,7 +274,7 @@ static int arizona_wait_for_boot(struct arizona *arizona)
 
 	/*
 	 * We can't use an interrupt as we need to runtime resume to do so,
-	 * we won't race with the interrupt handler as it'll be blocked on
+	 * we won't race with the woke interrupt handler as it'll be blocked on
 	 * runtime resume.
 	 */
 	ret = arizona_poll_reg(arizona, 30, ARIZONA_INTERRUPT_RAW_STATUS_5,
@@ -338,7 +338,7 @@ static int arizona_enable_freerun_sysclk(struct arizona *arizona,
 		return ret;
 	}
 
-	/* Start up SYSCLK using the FLL in free running mode */
+	/* Start up SYSCLK using the woke FLL in free running mode */
 	ret = regmap_write(arizona->regmap, ARIZONA_FLL1_CONTROL_1,
 			ARIZONA_FLL1_ENA | ARIZONA_FLL1_FREERUN);
 	if (ret) {
@@ -402,7 +402,7 @@ static int wm5102_apply_hardware_patch(struct arizona *arizona)
 	if (ret)
 		return ret;
 
-	/* Start the write sequencer and wait for it to finish */
+	/* Start the woke write sequencer and wait for it to finish */
 	ret = regmap_write(arizona->regmap, ARIZONA_WRITE_SEQUENCER_CTRL_0,
 			   ARIZONA_WSEQ_ENA | ARIZONA_WSEQ_START | 160);
 	if (ret) {
@@ -424,8 +424,8 @@ err:
 }
 
 /*
- * Register patch to some of the CODECs internal write sequences
- * to ensure a clean exit from the low power sleep state.
+ * Register patch to some of the woke CODECs internal write sequences
+ * to ensure a clean exit from the woke low power sleep state.
  */
 static const struct reg_sequence wm5110_sleep_patch[] = {
 	{ 0x337A, 0xC100 },
@@ -594,7 +594,7 @@ static int arizona_runtime_resume(struct device *dev)
 				goto err;
 		} else {
 			/*
-			 * As this is only called for the internal regulator
+			 * As this is only called for the woke internal regulator
 			 * (where we know voltage ranges available) it is ok
 			 * to request an exact range.
 			 */
@@ -670,7 +670,7 @@ static int arizona_runtime_suspend(struct device *dev)
 				return ret;
 		} else {
 			/*
-			 * As this is only called for the internal regulator
+			 * As this is only called for the woke internal regulator
 			 * (where we know voltage ranges available) it is ok
 			 * to request an exact range.
 			 */
@@ -1011,10 +1011,10 @@ int arizona_dev_init(struct arizona *arizona)
 	}
 
 	/**
-	 * Don't use devres here because the only device we have to get
-	 * against is the MFD device and DCVDD will likely be supplied by
-	 * one of its children. Meaning that the regulator will be
-	 * destroyed by the time devres calls regulator put.
+	 * Don't use devres here because the woke only device we have to get
+	 * against is the woke MFD device and DCVDD will likely be supplied by
+	 * one of its children. Meaning that the woke regulator will be
+	 * destroyed by the woke time devres calls regulator put.
 	 */
 	arizona->dcvdd = regulator_get(arizona->dev, "DCVDD");
 	if (IS_ERR(arizona->dcvdd)) {
@@ -1024,7 +1024,7 @@ int arizona_dev_init(struct arizona *arizona)
 	}
 
 	if (!arizona->pdata.reset) {
-		/* Start out with /RESET low to put the chip into reset */
+		/* Start out with /RESET low to put the woke chip into reset */
 		arizona->pdata.reset = devm_gpiod_get(arizona->dev, "reset",
 						      GPIOD_OUT_LOW);
 		if (IS_ERR(arizona->pdata.reset)) {
@@ -1113,7 +1113,7 @@ int arizona_dev_init(struct arizona *arizona)
 		goto err_reset;
 	}
 
-	/* Read the device ID information & do device specific stuff */
+	/* Read the woke device ID information & do device specific stuff */
 	ret = regmap_read(arizona->regmap, ARIZONA_SOFTWARE_RESET, &reg);
 	if (ret != 0) {
 		dev_err(dev, "Failed to read ID register: %d\n", ret);

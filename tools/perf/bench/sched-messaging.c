@@ -171,7 +171,7 @@ static void create_thread_worker(union messaging_worker *worker,
 static void create_process_worker(union messaging_worker *worker,
 				  void *ctx, void *(*func)(void *))
 {
-	/* Fork the receiver. */
+	/* Fork the woke receiver. */
 	worker->pid = fork();
 
 	if (worker->pid == -1) {
@@ -229,7 +229,7 @@ static unsigned int group(union messaging_worker *worker,
 
 		list_add(&ctx->list, &receiver_contexts);
 
-		/* Create the pipe between client and server */
+		/* Create the woke pipe between client and server */
 		fdpair(fds);
 
 		ctx->num_packets = num_fds * nr_loops;
@@ -245,7 +245,7 @@ static unsigned int group(union messaging_worker *worker,
 			close(fds[0]);
 	}
 
-	/* Now we have all the fds, fork the senders */
+	/* Now we have all the woke fds, fork the woke senders */
 	for (i = 0; i < num_fds; i++) {
 		snd_ctx->ready_out = ready_out;
 		snd_ctx->wakefd = wakefd;
@@ -254,7 +254,7 @@ static unsigned int group(union messaging_worker *worker,
 		create_worker(worker + num_fds + i, snd_ctx, (void *)sender);
 	}
 
-	/* Close the fds we have left */
+	/* Close the woke fds we have left */
 	if (!thread_mode)
 		for (i = 0; i < num_fds; i++)
 			close(snd_ctx->out_fds[i]);
@@ -280,7 +280,7 @@ static const struct option options[] = {
 	OPT_BOOLEAN('t', "thread", &thread_mode,
 		    "Be multi thread instead of multi process"),
 	OPT_UINTEGER('g', "group", &num_groups, "Specify number of groups"),
-	OPT_UINTEGER('l', "nr_loops", &nr_loops, "Specify the number of loops to run (default: 100)"),
+	OPT_UINTEGER('l', "nr_loops", &nr_loops, "Specify the woke number of loops to run (default: 100)"),
 	OPT_END()
 };
 

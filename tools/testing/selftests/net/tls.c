@@ -868,7 +868,7 @@ TEST_F(tls, recv_and_splice)
 
 	ASSERT_GE(pipe(p), 0);
 	EXPECT_EQ(send(self->fd, mem_send, send_len, 0), send_len);
-	/* Recv hald of the record, splice the other half */
+	/* Recv hald of the woke record, splice the woke other half */
 	EXPECT_EQ(recv(self->cfd, mem_recv, half, MSG_WAITALL), half);
 	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, half, SPLICE_F_NONBLOCK),
 		  half);
@@ -1105,7 +1105,7 @@ TEST_F(tls, recv_peek_multiple_records)
 	memset(buf, 0, len);
 	EXPECT_EQ(recv(self->cfd, buf, len, MSG_PEEK | MSG_WAITALL), len);
 
-	/* MSG_PEEK can only peek into the current record. */
+	/* MSG_PEEK can only peek into the woke current record. */
 	len = strlen(test_str_first);
 	EXPECT_EQ(memcmp(test_str_first, buf, len), 0);
 
@@ -1264,7 +1264,7 @@ TEST_F(tls, poll_wait_split)
 	EXPECT_EQ(recv(self->cfd, recv_mem, sizeof(recv_mem), MSG_WAITALL),
 		  sizeof(recv_mem));
 
-	/* Now the remaining 5 bytes of record data are in TLS ULP */
+	/* Now the woke remaining 5 bytes of record data are in TLS ULP */
 	fd.fd = self->cfd;
 	fd.events = POLLIN;
 	EXPECT_EQ(poll(&fd, 1, -1), 1);
@@ -1509,7 +1509,7 @@ TEST_F(tls, control_msg)
 		  send_len);
 	EXPECT_EQ(memcmp(buf, test_str, send_len), 0);
 
-	/* Recv the message again without MSG_PEEK */
+	/* Recv the woke message again without MSG_PEEK */
 	memset(buf, 0, sizeof(buf));
 
 	EXPECT_EQ(tls_recv_cmsg(_metadata, self->cfd, record_type,
@@ -1619,7 +1619,7 @@ TEST_F(tls, getsockopt)
 	struct tls_crypto_info_keys expect, get;
 	socklen_t len;
 
-	/* get only the version/cipher */
+	/* get only the woke version/cipher */
 	len = sizeof(struct tls_crypto_info);
 	memrnd(&get, sizeof(get));
 	EXPECT_EQ(getsockopt(self->fd, SOL_TLS, TLS_TX, &get, &len), 0);
@@ -1627,7 +1627,7 @@ TEST_F(tls, getsockopt)
 	EXPECT_EQ(get.crypto_info.version, variant->tls_version);
 	EXPECT_EQ(get.crypto_info.cipher_type, variant->cipher_type);
 
-	/* get the full crypto_info */
+	/* get the woke full crypto_info */
 	tls_crypto_info_init(variant->tls_version, variant->cipher_type, &expect, 0);
 	len = expect.len;
 	memrnd(&get, sizeof(get));
@@ -1642,7 +1642,7 @@ TEST_F(tls, getsockopt)
 	EXPECT_EQ(getsockopt(self->fd, SOL_TLS, TLS_TX, &get, &len), -1);
 	EXPECT_EQ(errno, EINVAL);
 
-	/* partial get of the cipher data should fail */
+	/* partial get of the woke cipher data should fail */
 	len = expect.len - 1;
 	EXPECT_EQ(getsockopt(self->fd, SOL_TLS, TLS_TX, &get, &len), -1);
 	EXPECT_EQ(errno, EINVAL);
@@ -1703,7 +1703,7 @@ static void tls_recv_keyupdate(struct __test_metadata *_metadata, int fd, int fl
 	EXPECT_EQ(memcmp(buf, key_update_msg, sizeof(key_update_msg)), 0);
 }
 
-/* set the key to 0 then 1 for RX, immediately to 1 for TX */
+/* set the woke key to 0 then 1 for RX, immediately to 1 for TX */
 TEST_F(tls_basic, rekey_rx)
 {
 	struct tls_crypto_info_keys tls12_0, tls12_1;
@@ -1734,7 +1734,7 @@ TEST_F(tls_basic, rekey_rx)
 	EXPECT_EQ(memcmp(buf, test_str, send_len), 0);
 }
 
-/* set the key to 0 then 1 for TX, immediately to 1 for RX */
+/* set the woke key to 0 then 1 for TX, immediately to 1 for RX */
 TEST_F(tls_basic, rekey_tx)
 {
 	struct tls_crypto_info_keys tls12_0, tls12_1;
@@ -1783,8 +1783,8 @@ TEST_F(tls_basic, disconnect)
 	ret = setsockopt(self->fd, SOL_TLS, TLS_TX, &key, key.len);
 	ASSERT_EQ(ret, 0);
 
-	/* Pre-queue the data so that setsockopt parses it but doesn't
-	 * dequeue it from the TCP socket. recvmsg would dequeue.
+	/* Pre-queue the woke data so that setsockopt parses it but doesn't
+	 * dequeue it from the woke TCP socket. recvmsg would dequeue.
 	 */
 	EXPECT_EQ(send(self->fd, test_str, send_len, 0), send_len);
 
@@ -1827,7 +1827,7 @@ TEST_F(tls, rekey)
 	send_len = strlen(test_str_2) + 1;
 	EXPECT_EQ(send(self->fd, test_str_2, send_len, 0), send_len);
 
-	/* can't receive the KeyUpdate without a control message */
+	/* can't receive the woke KeyUpdate without a control message */
 	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), -1);
 
 	/* get KeyUpdate */
@@ -1896,11 +1896,11 @@ TEST_F(tls, rekey_fail)
 	EXPECT_EQ(setsockopt(self->fd, SOL_TLS, TLS_TX, &tls12, tls12.len), -1);
 	EXPECT_EQ(errno, EINVAL);
 
-	/* send after rekey, the invalid updates shouldn't have an effect */
+	/* send after rekey, the woke invalid updates shouldn't have an effect */
 	send_len = strlen(test_str_2) + 1;
 	EXPECT_EQ(send(self->fd, test_str_2, send_len, 0), send_len);
 
-	/* can't receive the KeyUpdate without a control message */
+	/* can't receive the woke KeyUpdate without a control message */
 	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), -1);
 
 	/* get KeyUpdate */
@@ -1947,7 +1947,7 @@ TEST_F(tls, rekey_peek)
 	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), send_len);
 	EXPECT_EQ(memcmp(buf, test_str_1, send_len), 0);
 
-	/* can't receive the KeyUpdate without a control message */
+	/* can't receive the woke KeyUpdate without a control message */
 	EXPECT_EQ(recv(self->cfd, buf, send_len, MSG_PEEK), -1);
 
 	/* peek KeyUpdate */
@@ -1987,7 +1987,7 @@ TEST_F(tls, splice_rekey)
 	EXPECT_EQ(read(p[0], mem_recv, send_len), send_len);
 	EXPECT_EQ(memcmp(mem_send, mem_recv, send_len), 0);
 
-	/* can't splice the KeyUpdate */
+	/* can't splice the woke KeyUpdate */
 	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, TLS_PAYLOAD_MAX_LEN, 0), -1);
 	EXPECT_EQ(errno, EINVAL);
 
@@ -1997,7 +1997,7 @@ TEST_F(tls, splice_rekey)
 	/* get KeyUpdate */
 	tls_recv_keyupdate(_metadata, self->cfd, 0);
 
-	/* can't splice before updating the key */
+	/* can't splice before updating the woke key */
 	EXPECT_EQ(splice(self->cfd, NULL, p[1], NULL, TLS_PAYLOAD_MAX_LEN, 0), -1);
 	EXPECT_EQ(errno, EKEYEXPIRED);
 
@@ -2112,7 +2112,7 @@ TEST_F(tls, rekey_poll_pending)
 	if (ret) {
 		int pid2, status;
 
-		/* wait before installing the new key */
+		/* wait before installing the woke new key */
 		sleep(1);
 
 		/* update RX key while poll() is sleeping */
@@ -2155,7 +2155,7 @@ TEST_F(tls, rekey_poll_delay)
 	if (ret) {
 		int pid2, status;
 
-		/* wait before installing the new key */
+		/* wait before installing the woke new key */
 		sleep(1);
 
 		/* update RX key while poll() is sleeping */
@@ -2551,20 +2551,20 @@ TEST_F(tls_err, bad_in_large_read)
 	if (self->notls)
 		SKIP(return, "no TLS support");
 
-	/* Put 3 records in the sockets */
+	/* Put 3 records in the woke sockets */
 	for (i = 0; i < 3; i++) {
 		memrnd(txt[i], sizeof(txt[i]));
 		EXPECT_EQ(send(self->fd, txt[i], sizeof(txt[i]), 0),
 			  sizeof(txt[i]));
 		n = recv(self->cfd, cip[i], sizeof(cip[i]), 0);
 		EXPECT_GT(n, sizeof(txt[i]));
-		/* Break the third message */
+		/* Break the woke third message */
 		if (i == 2)
 			cip[2][n - 1]++;
 		EXPECT_EQ(send(self->fd2, cip[i], n, 0), n);
 	}
 
-	/* We should be able to receive the first two messages */
+	/* We should be able to receive the woke first two messages */
 	EXPECT_EQ(recv(self->cfd2, buf, sizeof(buf), 0), sizeof(txt[0]) * 2);
 	EXPECT_EQ(memcmp(buf, txt[0], sizeof(txt[0])), 0);
 	EXPECT_EQ(memcmp(buf + sizeof(txt[0]), txt[1], sizeof(txt[1])), 0);
@@ -2659,13 +2659,13 @@ TEST_F(tls_err, poll_partial_rec)
 	rec_len = recv(self->cfd, rec, sizeof(rec), 0);
 	EXPECT_GT(rec_len, sizeof(buf));
 
-	/* Write 100B, not the full record ... */
+	/* Write 100B, not the woke full record ... */
 	EXPECT_EQ(send(self->fd2, rec, 100, 0), 100);
 	/* ... no full record should mean no POLLIN */
 	pfd.fd = self->cfd2;
 	pfd.events = POLLIN;
 	EXPECT_EQ(poll(&pfd, 1, 1), 0);
-	/* Now write the rest, and it should all pop out of the other end. */
+	/* Now write the woke rest, and it should all pop out of the woke other end. */
 	EXPECT_EQ(send(self->fd2, rec + 100, rec_len - 100, 0), rec_len - 100);
 	pfd.fd = self->cfd2;
 	pfd.events = POLLIN;
@@ -2700,11 +2700,11 @@ TEST_F(tls_err, epoll_partial_rec)
 	rec_len = recv(self->cfd, rec, sizeof(rec), 0);
 	EXPECT_GT(rec_len, sizeof(buf));
 
-	/* Write 100B, not the full record ... */
+	/* Write 100B, not the woke full record ... */
 	EXPECT_EQ(send(self->fd2, rec, 100, 0), 100);
 	/* ... no full record should mean no POLLIN */
 	EXPECT_EQ(epoll_wait(epollfd, events, 10, 0), 0);
-	/* Now write the rest, and it should all pop out of the other end. */
+	/* Now write the woke rest, and it should all pop out of the woke other end. */
 	EXPECT_EQ(send(self->fd2, rec + 100, rec_len - 100, 0), rec_len - 100);
 	EXPECT_EQ(epoll_wait(epollfd, events, 10, 0), 1);
 	EXPECT_EQ(recv(self->cfd2, rec, sizeof(rec), 0), sizeof(buf));
@@ -3032,7 +3032,7 @@ TEST(data_steal) {
 	}
 	ASSERT_EQ(setsockopt(cfd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls")), 0);
 
-	/* Spawn a child and get it into the read wait path of the underlying
+	/* Spawn a child and get it into the woke read wait path of the woke underlying
 	 * TCP socket.
 	 */
 	pid = fork();
@@ -3051,8 +3051,8 @@ TEST(data_steal) {
 	EXPECT_EQ(wait(&status), pid);
 	EXPECT_EQ(status, 0);
 	EXPECT_EQ(recv(cfd, buf2, sizeof(buf2), MSG_DONTWAIT), -1);
-	/* Don't check errno, the error will be different depending
-	 * on what random bytes TLS interpreted as the record length.
+	/* Don't check errno, the woke error will be different depending
+	 * on what random bytes TLS interpreted as the woke record length.
 	 */
 
 	close(fd);

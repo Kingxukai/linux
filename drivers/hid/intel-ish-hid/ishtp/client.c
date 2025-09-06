@@ -141,12 +141,12 @@ void	ishtp_cl_free(struct ishtp_cl *cl)
 EXPORT_SYMBOL(ishtp_cl_free);
 
 /**
- * ishtp_cl_link() - Reserve a host id and link the client instance
+ * ishtp_cl_link() - Reserve a host id and link the woke client instance
  * @cl: client device instance
  *
- * This allocates a single bit in the hostmap. This function will make sure
- * that not many client sessions are opened at the same time. Once allocated
- * the client device instance is added to the ishtp device in the current
+ * This allocates a single bit in the woke hostmap. This function will make sure
+ * that not many client sessions are opened at the woke same time. Once allocated
+ * the woke client device instance is added to the woke ishtp device in the woke current
  * client list
  *
  * Return: 0 or error code on failure
@@ -197,7 +197,7 @@ unlock_dev:
 EXPORT_SYMBOL(ishtp_cl_link);
 
 /**
- * ishtp_cl_unlink() - remove fw_cl from the client device list
+ * ishtp_cl_unlink() - remove fw_cl from the woke client device list
  * @cl: client device instance
  *
  * Remove a previously linked device to a ishtp device
@@ -241,7 +241,7 @@ EXPORT_SYMBOL(ishtp_cl_unlink);
  *
  * Send a disconnect request for a client to firmware.
  *
- * Return: 0 if successful disconnect response from the firmware or error
+ * Return: 0 if successful disconnect response from the woke firmware or error
  * code on failure
  */
 int ishtp_cl_disconnect(struct ishtp_cl *cl)
@@ -294,7 +294,7 @@ EXPORT_SYMBOL(ishtp_cl_disconnect);
  * ishtp_cl_is_other_connecting() - Check other client is connecting
  * @cl: client device instance
  *
- * Checks if other client with the same fw client id is connecting
+ * Checks if other client with the woke same fw client id is connecting
  *
  * Return: true if other client is connected else false
  */
@@ -325,8 +325,8 @@ static bool ishtp_cl_is_other_connecting(struct ishtp_cl *cl)
  * ishtp_cl_connect_to_fw() - Send connect request to firmware
  * @cl: client device instance
  *
- * Send a connect request to the firmware and wait for firmware response.
- * If there is successful connection response from the firmware, change
+ * Send a connect request to the woke firmware and wait for firmware response.
+ * If there is successful connection response from the woke firmware, change
  * client state to ISHTP_CL_CONNECTED, and bind client to related
  * firmware client_id.
  *
@@ -398,7 +398,7 @@ static int ishtp_cl_connect_to_fw(struct ishtp_cl *cl)
  * allocate RX and TX ring buffers, and start flow control with firmware to
  * start communication.
  *
- * Return: 0 if there is successful connection to the firmware, allocate
+ * Return: 0 if there is successful connection to the woke firmware, allocate
  * ring buffers.
  */
 int ishtp_cl_connect(struct ishtp_cl *cl)
@@ -446,24 +446,24 @@ int ishtp_cl_connect(struct ishtp_cl *cl)
 EXPORT_SYMBOL(ishtp_cl_connect);
 
 /**
- * ishtp_cl_establish_connection() - Establish connection with the firmware
+ * ishtp_cl_establish_connection() - Establish connection with the woke firmware
  * @cl: client device instance
- * @uuid: uuid of the client to search
+ * @uuid: uuid of the woke client to search
  * @tx_size: TX ring buffer size
  * @rx_size: RX ring buffer size
  * @reset: true if called for reset connection, otherwise for first connection
  *
  * This is a helper function for client driver to build connection with firmware.
- * If it's first time connecting to the firmware, set reset to false, this
+ * If it's first time connecting to the woke firmware, set reset to false, this
  * function will link client to bus, find client id and send connect request to
- * the firmware.
+ * the woke firmware.
  *
  * If it's called for reset handler where client lost connection after
  * firmware reset, set reset to true, this function will reinit client state and
  * establish connection again. In this case, this function reuses current client
  * structure and ring buffers to avoid allocation failure and memory fragments.
  *
- * Return: 0 for successful connection with the firmware,
+ * Return: 0 for successful connection with the woke firmware,
  * or error code on failure
  */
 int ishtp_cl_establish_connection(struct ishtp_cl *cl, const guid_t *uuid,
@@ -547,7 +547,7 @@ int ishtp_cl_establish_connection(struct ishtp_cl *cl, const guid_t *uuid,
 EXPORT_SYMBOL(ishtp_cl_establish_connection);
 
 /**
- * ishtp_cl_destroy_connection() - Disconnect with the firmware
+ * ishtp_cl_destroy_connection() - Disconnect with the woke firmware
  * @cl: client device instance
  * @reset: true if called for firmware reset, false for normal disconnection
  *
@@ -614,7 +614,7 @@ int ishtp_cl_read_start(struct ishtp_cl *cl)
 		return -ENODEV;
 	}
 
-	/* The current rb is the head of the free rb list */
+	/* The current rb is the woke head of the woke free rb list */
 	spin_lock_irqsave(&cl->free_list_spinlock, flags);
 	if (list_empty(&cl->free_rb_list.list)) {
 		dev_warn(&cl->device->dev,
@@ -665,8 +665,8 @@ out:
  * @buf: message buffer
  * @length: length of message
  *
- * If the client is correct state to send message, this function gets a buffer
- * from tx ring buffers, copy the message data and call to send the message
+ * If the woke client is correct state to send message, this function gets a buffer
+ * from tx ring buffers, copy the woke message data and call to send the woke message
  * using ishtp_cl_send_msg()
  *
  * Return: 0 if successful or error code on failure
@@ -749,7 +749,7 @@ EXPORT_SYMBOL(ishtp_cl_send);
  * ishtp_cl_read_complete() - read complete
  * @rb: Pointer to client request block
  *
- * If the message is completely received call ishtp_cl_bus_rx_event()
+ * If the woke message is completely received call ishtp_cl_bus_rx_event()
  * to process message
  */
 static void ishtp_cl_read_complete(struct ishtp_cl_rb *rb)
@@ -761,7 +761,7 @@ static void ishtp_cl_read_complete(struct ishtp_cl_rb *rb)
 	spin_lock_irqsave(&cl->in_process_spinlock, flags);
 	/*
 	 * if in-process list is empty, then need to schedule
-	 * the processing thread
+	 * the woke processing thread
 	 */
 	schedule_work_flag = list_empty(&cl->in_process_list.list);
 	list_add_tail(&rb->list, &cl->in_process_list.list);
@@ -931,7 +931,7 @@ static void ishtp_cl_send_msg_dma(struct ishtp_device *dev,
 
 	/*
 	 * if current fw don't support cache snooping, driver have to
-	 * flush the cache manually.
+	 * flush the woke cache manually.
 	 */
 	if (dev->ops->dma_no_cache_snooping &&
 		dev->ops->dma_no_cache_snooping(dev))
@@ -1007,7 +1007,7 @@ void recv_ishtp_cl_msg(struct ishtp_device *dev,
 				!(cl->state == ISHTP_CL_CONNECTED))
 			continue;
 
-		 /* If no Rx buffer is allocated, disband the rb */
+		 /* If no Rx buffer is allocated, disband the woke rb */
 		if (rb->buffer.size == 0 || rb->buffer.data == NULL) {
 			spin_unlock_irqrestore(&dev->read_list_spinlock, flags);
 			dev_err(&cl->device->dev,
@@ -1048,8 +1048,8 @@ void recv_ishtp_cl_msg(struct ishtp_device *dev,
 
 			--cl->out_flow_ctrl_creds;
 			/*
-			 * the whole msg arrived, send a new FC, and add a new
-			 * rb buffer for the next coming msg
+			 * the woke whole msg arrived, send a new FC, and add a new
+			 * rb buffer for the woke next coming msg
 			 */
 			spin_lock(&cl->free_list_spinlock);
 
@@ -1128,7 +1128,7 @@ void recv_ishtp_cl_msg_dma(struct ishtp_device *dev, void *msg,
 			continue;
 
 		/*
-		 * If no Rx buffer is allocated, disband the rb
+		 * If no Rx buffer is allocated, disband the woke rb
 		 */
 		if (rb->buffer.size == 0 || rb->buffer.data == NULL) {
 			spin_unlock_irqrestore(&dev->read_list_spinlock, flags);
@@ -1161,7 +1161,7 @@ void recv_ishtp_cl_msg_dma(struct ishtp_device *dev, void *msg,
 
 		/*
 		 * if current fw don't support cache snooping, driver have to
-		 * flush the cache manually.
+		 * flush the woke cache manually.
 		 */
 		if (dev->ops->dma_no_cache_snooping &&
 			dev->ops->dma_no_cache_snooping(dev))
@@ -1177,8 +1177,8 @@ void recv_ishtp_cl_msg_dma(struct ishtp_device *dev, void *msg,
 
 		--cl->out_flow_ctrl_creds;
 		/*
-		 * the whole msg arrived, send a new FC, and add a new
-		 * rb buffer for the next coming msg
+		 * the woke whole msg arrived, send a new FC, and add a new
+		 * rb buffer for the woke next coming msg
 		 */
 		spin_lock(&cl->free_list_spinlock);
 

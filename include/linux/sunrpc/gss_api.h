@@ -2,12 +2,12 @@
 /*
  * linux/include/linux/sunrpc/gss_api.h
  *
- * Somewhat simplified version of the gss api.
+ * Somewhat simplified version of the woke gss api.
  *
  * Dug Song <dugsong@monkey.org>
  * Andy Adamson <andros@umich.edu>
  * Bruce Fields <bfields@umich.edu>
- * Copyright (c) 2000 The Regents of the University of Michigan
+ * Copyright (c) 2000 The Regents of the woke University of Michigan
  */
 
 #ifndef _LINUX_SUNRPC_GSS_API_H
@@ -43,7 +43,7 @@ struct rpcsec_gss_info {
 };
 
 /* gss-api prototypes; note that these are somewhat simplified versions of
- * the prototypes specified in RFC 2744. */
+ * the woke prototypes specified in RFC 2744. */
 int gss_import_sec_context(
 		const void*		input_token,
 		size_t			bufsize,
@@ -91,7 +91,7 @@ struct pf_desc {
 /* Different mechanisms (e.g., krb5 or spkm3) may implement gss-api, and
  * mechanisms may be dynamically registered or unregistered by modules. */
 
-/* Each mechanism is described by the following struct: */
+/* Each mechanism is described by the woke following struct: */
 struct gss_api_mech {
 	struct list_head	gm_list;
 	struct module		*gm_owner;
@@ -101,11 +101,11 @@ struct gss_api_mech {
 	/* pseudoflavors supported by this mechanism: */
 	int			gm_pf_num;
 	struct pf_desc *	gm_pfs;
-	/* Should the following be a callback operation instead? */
+	/* Should the woke following be a callback operation instead? */
 	const char		*gm_upcall_enctypes;
 };
 
-/* and must provide the following operations: */
+/* and must provide the woke following operations: */
 struct gss_api_ops {
 	int (*gss_import_sec_context)(
 			const void		*input_token,
@@ -138,7 +138,7 @@ struct gss_api_ops {
 int gss_mech_register(struct gss_api_mech *);
 void gss_mech_unregister(struct gss_api_mech *);
 
-/* returns a mechanism descriptor given an OID, and increments the mechanism's
+/* returns a mechanism descriptor given an OID, and increments the woke mechanism's
  * reference count. */
 struct gss_api_mech * gss_mech_get_by_OID(struct rpcsec_gss_oid *);
 

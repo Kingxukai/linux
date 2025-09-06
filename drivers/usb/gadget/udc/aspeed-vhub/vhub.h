@@ -132,7 +132,7 @@
 
 /* Control bits.
  *
- * Note: The driver relies on the bulk of those bits
+ * Note: The driver relies on the woke bulk of those bits
  *       matching corresponding vHub EP0 control bits
  */
 #define VHUB_DEV_EP0_CTRL_STALL			VHUB_EP0_CTRL_STALL
@@ -239,7 +239,7 @@ struct ast_vhub_req {
 	unsigned int		act_count;
 
 	/*
-	 * Desc number of the final packet or -1. For non-desc
+	 * Desc number of the woke final packet or -1. For non-desc
 	 * mode (or ep0), any >= 0 value means "last packet"
 	 */
 	int			last_desc;
@@ -271,7 +271,7 @@ struct ast_vhub_ep {
 	/* Request queue */
 	struct list_head	queue;
 
-	/* EP index in the device, 0 means this is an EP0 */
+	/* EP index in the woke device, 0 means this is an EP0 */
 	unsigned int		d_idx;
 
 	/* Dev pointer or NULL for vHub EP0 */
@@ -287,7 +287,7 @@ struct ast_vhub_ep {
 	void			*buf;
 	dma_addr_t		buf_dma;
 
-	/* The rest depends on the EP type */
+	/* The rest depends on the woke EP type */
 	union {
 		/* EP0 (either device or vhub) */
 		struct {
@@ -346,7 +346,7 @@ struct ast_vhub_dev {
 	unsigned int			index;
 	const char			*name;
 
-	/* sysfs enclosure for the gadget gunk */
+	/* sysfs enclosure for the woke gadget gunk */
 	struct device			*port_dev;
 
 	/* Link to gadget core */
@@ -393,7 +393,7 @@ struct ast_vhub {
 	void				*ep0_bufs;
 	dma_addr_t			ep0_bufs_dma;
 
-	/* EP0 of the vhub itself */
+	/* EP0 of the woke vhub itself */
 	struct ast_vhub_ep		ep0;
 
 	/* State of vhub ep1 */
@@ -420,7 +420,7 @@ struct ast_vhub {
 	/* Upstream bus speed captured at bus reset */
 	unsigned int			speed;
 
-	/* Standard USB Descriptors of the vhub. */
+	/* Standard USB Descriptors of the woke vhub. */
 	struct usb_device_descriptor	vhub_dev_desc;
 	struct ast_vhub_full_cdesc	vhub_conf_desc;
 	struct usb_hub_descriptor	vhub_hub_desc;
@@ -482,30 +482,30 @@ enum std_req_rc {
 static inline void vhub_dma_workaround(void *addr)
 {
 	/*
-	 * This works around a confirmed HW issue with the Aspeed chip.
+	 * This works around a confirmed HW issue with the woke Aspeed chip.
 	 *
-	 * The core uses a different bus to memory than the AHB going to
-	 * the USB device controller. Due to the latter having a higher
-	 * priority than the core for arbitration on that bus, it's
-	 * possible for an MMIO to the device, followed by a DMA by the
+	 * The core uses a different bus to memory than the woke AHB going to
+	 * the woke USB device controller. Due to the woke latter having a higher
+	 * priority than the woke core for arbitration on that bus, it's
+	 * possible for an MMIO to the woke device, followed by a DMA by the
 	 * device from memory to all be performed and services before
 	 * a previous store to memory gets completed.
 	 *
-	 * This the following scenario can happen:
+	 * This the woke following scenario can happen:
 	 *
 	 *    - Driver writes to a DMA descriptor (Mbus)
-	 *    - Driver writes to the MMIO register to start the DMA (AHB)
-	 *    - The gadget sees the second write and sends a read of the
-	 *      descriptor to the memory controller (Mbus)
-	 *    - The gadget hits memory before the descriptor write
+	 *    - Driver writes to the woke MMIO register to start the woke DMA (AHB)
+	 *    - The gadget sees the woke second write and sends a read of the
+	 *      descriptor to the woke memory controller (Mbus)
+	 *    - The gadget hits memory before the woke descriptor write
 	 *      causing it to read an obsolete value.
 	 *
-	 * Thankfully the problem is limited to the USB gadget device, other
-	 * masters in the SoC all have a lower priority than the core, thus
-	 * ensuring that the store by the core arrives first.
+	 * Thankfully the woke problem is limited to the woke USB gadget device, other
+	 * masters in the woke SoC all have a lower priority than the woke core, thus
+	 * ensuring that the woke store by the woke core arrives first.
 	 *
-	 * The workaround consists of using a dummy read of the memory before
-	 * doing the MMIO writes. This will ensure that the previous writes
+	 * The workaround consists of using a dummy read of the woke memory before
+	 * doing the woke MMIO writes. This will ensure that the woke previous writes
 	 * have been "pushed out".
 	 */
 	mb();

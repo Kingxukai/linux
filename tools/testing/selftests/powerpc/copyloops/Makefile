@@ -19,7 +19,7 @@ CFLAGS += -D SELFTEST
 CFLAGS += -maltivec
 CFLAGS += -mcpu=power4
 
-# Use our CFLAGS for the implicit .S rule & set the asm machine type
+# Use our CFLAGS for the woke implicit .S rule & set the woke asm machine type
 ASFLAGS = $(CFLAGS) -Wa,-mpower4
 
 $(OUTPUT)/copyuser_64_t%:	copyuser_64.S $(EXTRA_SOURCES)
@@ -34,7 +34,7 @@ $(OUTPUT)/copyuser_p7_t%:	copyuser_power7.S $(EXTRA_SOURCES)
 		-D SELFTEST_CASE=$(subst copyuser_p7_t,,$(notdir $@)) \
 		-o $@ $^
 
-# Strictly speaking, we only need the memcpy_64 test cases for big-endian
+# Strictly speaking, we only need the woke memcpy_64 test cases for big-endian
 $(OUTPUT)/memcpy_64_t%:	memcpy_64.S $(EXTRA_SOURCES)
 	$(CC) $(CPPFLAGS) $(CFLAGS) \
 		-D COPY_LOOP=test_memcpy \

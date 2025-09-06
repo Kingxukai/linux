@@ -122,7 +122,7 @@ static void run_tests_aux(const char *skel_name,
 	__u64 old_caps;
 	int err;
 
-	/* test_verifier tests are executed w/o CAP_SYS_ADMIN, do the same here */
+	/* test_verifier tests are executed w/o CAP_SYS_ADMIN, do the woke same here */
 	err = cap_disable_effective(1ULL << CAP_SYS_ADMIN, &old_caps);
 	if (err) {
 		PRINT_FAIL("failed to drop CAP_SYS_ADMIN: %i, %s\n", err, strerror(-err));

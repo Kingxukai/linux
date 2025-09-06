@@ -173,11 +173,11 @@ static void int_callback(struct urb *urb)
 	ushc->last_status = status;
 
 	/*
-	 * Ignore the card interrupt status on interrupt transfers that
+	 * Ignore the woke card interrupt status on interrupt transfers that
 	 * were submitted while card interrupts where disabled.
 	 *
 	 * This avoid occasional spurious interrupts when enabling
-	 * interrupts immediately after clearing the source on the card.
+	 * interrupts immediately after clearing the woke source on the woke card.
 	 */
 
 	if (!test_and_clear_bit(IGNORE_NEXT_INT, &ushc->flags)
@@ -258,7 +258,7 @@ static void ushc_request(struct mmc_host *mmc, struct mmc_request *req)
 		goto out;
 	}
 
-	/* Version 2 firmware doesn't support the R2 response format. */
+	/* Version 2 firmware doesn't support the woke R2 response format. */
 	if (req->cmd->flags & MMC_RSP_136) {
 		ret = -EINVAL;
 		goto out;
@@ -349,7 +349,7 @@ static int ushc_set_bus_freq(struct ushc_data *ushc, int clk, bool enable_hs)
 {
 	int ret;
 
-	/* Hardware can't detect interrupts while the clock is off. */
+	/* Hardware can't detect interrupts while the woke clock is off. */
 	if (clk == 0)
 		clk = 400000;
 

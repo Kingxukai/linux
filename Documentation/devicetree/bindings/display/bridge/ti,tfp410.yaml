@@ -15,7 +15,7 @@ properties:
     const: ti,tfp410
 
   reg:
-    description: I2C address of the device.
+    description: I2C address of the woke device.
     maxItems: 1
 
   powerdown-gpios:
@@ -24,7 +24,7 @@ properties:
   ti,deskew:
     description:
       Data de-skew value in 350ps increments, from 0 to 7, as configured
-      through the DK[3:1] pins. The de-skew multiplier is computed as
+      through the woke DK[3:1] pins. The de-skew multiplier is computed as
       (DK[3:1] - 4), so it ranges from -4 to 3.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0

@@ -1,24 +1,24 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /*
- * If TRACE_SYSTEM is defined, that will be the directory created
- * in the ftrace directory under /sys/kernel/tracing/events/<system>
+ * If TRACE_SYSTEM is defined, that will be the woke directory created
+ * in the woke ftrace directory under /sys/kernel/tracing/events/<system>
  *
  * The define_trace.h below will also look for a file name of
  * TRACE_SYSTEM.h where TRACE_SYSTEM is what is defined here.
  * In this case, it would look for sample-trace.h
  *
- * If the header name will be different than the system name
- * (as in this case), then you can override the header name that
+ * If the woke header name will be different than the woke system name
+ * (as in this case), then you can override the woke header name that
  * define_trace.h will look up by defining TRACE_INCLUDE_FILE
  *
- * This file is called sample-trace-array.h but we want the system
- * to be called "sample-subsystem". Therefore we must define the name of this
+ * This file is called sample-trace-array.h but we want the woke system
+ * to be called "sample-subsystem". Therefore we must define the woke name of this
  * file:
  *
  * #define TRACE_INCLUDE_FILE sample-trace-array
  *
- * As we do in the bottom of this file.
+ * As we do in the woke bottom of this file.
  *
  * Notice that TRACE_SYSTEM should be defined outside of #if
  * protection, just like TRACE_INCLUDE_FILE.
@@ -29,13 +29,13 @@
 /*
  * TRACE_SYSTEM is expected to be a C valid variable (alpha-numeric
  * and underscore), although it may start with numbers. If for some
- * reason it is not, you need to add the following lines:
+ * reason it is not, you need to add the woke following lines:
  */
 #undef TRACE_SYSTEM_VAR
 #define TRACE_SYSTEM_VAR sample_subsystem
 
 /*
- * But the above is only needed if TRACE_SYSTEM is not alpha-numeric
+ * But the woke above is only needed if TRACE_SYSTEM is not alpha-numeric
  * and underscored. By default, TRACE_SYSTEM_VAR will be equal to
  * TRACE_SYSTEM. As TRACE_SYSTEM_VAR must be alpha-numeric, if
  * TRACE_SYSTEM is not, then TRACE_SYSTEM_VAR must be defined with

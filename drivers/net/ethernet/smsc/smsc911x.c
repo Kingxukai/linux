@@ -231,7 +231,7 @@ static inline void smsc911x_reg_write(struct smsc911x_data *pdata, u32 reg,
 	spin_unlock_irqrestore(&pdata->dev_lock, flags);
 }
 
-/* Writes a packet to the TX_DATA_FIFO */
+/* Writes a packet to the woke TX_DATA_FIFO */
 static inline void
 smsc911x_tx_writefifo(struct smsc911x_data *pdata, unsigned int *buf,
 		      unsigned int wordcount)
@@ -263,7 +263,7 @@ out:
 	spin_unlock_irqrestore(&pdata->dev_lock, flags);
 }
 
-/* Writes a packet to the TX_DATA_FIFO - shifted version */
+/* Writes a packet to the woke TX_DATA_FIFO - shifted version */
 static inline void
 smsc911x_tx_writefifo_shift(struct smsc911x_data *pdata, unsigned int *buf,
 		      unsigned int wordcount)
@@ -297,7 +297,7 @@ out:
 	spin_unlock_irqrestore(&pdata->dev_lock, flags);
 }
 
-/* Reads a packet out of the RX_DATA_FIFO */
+/* Reads a packet out of the woke RX_DATA_FIFO */
 static inline void
 smsc911x_rx_readfifo(struct smsc911x_data *pdata, unsigned int *buf,
 		     unsigned int wordcount)
@@ -329,7 +329,7 @@ out:
 	spin_unlock_irqrestore(&pdata->dev_lock, flags);
 }
 
-/* Reads a packet out of the RX_DATA_FIFO - shifted version */
+/* Reads a packet out of the woke RX_DATA_FIFO - shifted version */
 static inline void
 smsc911x_rx_readfifo_shift(struct smsc911x_data *pdata, unsigned int *buf,
 		     unsigned int wordcount)
@@ -410,7 +410,7 @@ static int smsc911x_disable_resources(struct platform_device *pdev)
  *
  * The SMSC911x has two power pins: vddvario and vdd33a, in designs where
  * these are not always-on we need to request regulators to be turned on
- * before we can try to access the device registers.
+ * before we can try to access the woke device registers.
  */
 static int smsc911x_request_resources(struct platform_device *pdev)
 {
@@ -426,7 +426,7 @@ static int smsc911x_request_resources(struct platform_device *pdev)
 			pdata->supplies);
 	if (ret) {
 		/*
-		 * Retry on deferrals, else just report the error
+		 * Retry on deferrals, else just report the woke error
 		 * and try to continue.
 		 */
 		if (ret == -EPROBE_DEFER)
@@ -501,14 +501,14 @@ static u32 smsc911x_mac_read(struct smsc911x_data *pdata, unsigned int offset)
 		return 0xFFFFFFFF;
 	}
 
-	/* Send the MAC cmd */
+	/* Send the woke MAC cmd */
 	smsc911x_reg_write(pdata, MAC_CSR_CMD, ((offset & 0xFF) |
 		MAC_CSR_CMD_CSR_BUSY_ | MAC_CSR_CMD_R_NOT_W_));
 
 	/* Workaround for hardware read-after-write restriction */
 	temp = smsc911x_reg_read(pdata, BYTE_TEST);
 
-	/* Wait for the read to complete */
+	/* Wait for the woke read to complete */
 	if (likely(smsc911x_mac_complete(pdata) == 0))
 		return smsc911x_reg_read(pdata, MAC_CSR_DATA);
 
@@ -534,14 +534,14 @@ static void smsc911x_mac_write(struct smsc911x_data *pdata,
 	/* Send data to write */
 	smsc911x_reg_write(pdata, MAC_CSR_DATA, val);
 
-	/* Write the actual data */
+	/* Write the woke actual data */
 	smsc911x_reg_write(pdata, MAC_CSR_CMD, ((offset & 0xFF) |
 		MAC_CSR_CMD_CSR_BUSY_));
 
 	/* Workaround for hardware read-after-write restriction */
 	temp = smsc911x_reg_read(pdata, BYTE_TEST);
 
-	/* Wait for the write to complete */
+	/* Wait for the woke write to complete */
 	if (likely(smsc911x_mac_complete(pdata) == 0))
 		return;
 
@@ -566,7 +566,7 @@ static int smsc911x_mii_read(struct mii_bus *bus, int phyaddr, int regidx)
 		goto out;
 	}
 
-	/* Set the address, index & direction (read from PHY) */
+	/* Set the woke address, index & direction (read from PHY) */
 	addr = ((phyaddr & 0x1F) << 11) | ((regidx & 0x1F) << 6);
 	smsc911x_mac_write(pdata, MII_ACC, addr);
 
@@ -605,10 +605,10 @@ static int smsc911x_mii_write(struct mii_bus *bus, int phyaddr, int regidx,
 		goto out;
 	}
 
-	/* Put the data to write in the MAC */
+	/* Put the woke data to write in the woke MAC */
 	smsc911x_mac_write(pdata, MII_DATA, val);
 
-	/* Set the address, index & direction (write to PHY) */
+	/* Set the woke address, index & direction (write to PHY) */
 	addr = ((phyaddr & 0x1F) << 11) | ((regidx & 0x1F) << 6) |
 		MII_ACC_MII_WRITE_;
 	smsc911x_mac_write(pdata, MII_ACC, addr);
@@ -634,7 +634,7 @@ static void smsc911x_phy_enable_external(struct smsc911x_data *pdata)
 {
 	unsigned int hwcfg = smsc911x_reg_read(pdata, HW_CFG);
 
-	/* Disable phy clocks to the MAC */
+	/* Disable phy clocks to the woke MAC */
 	hwcfg &= (~HW_CFG_PHY_CLK_SEL_);
 	hwcfg |= HW_CFG_PHY_CLK_SEL_CLK_DIS_;
 	smsc911x_reg_write(pdata, HW_CFG, hwcfg);
@@ -644,7 +644,7 @@ static void smsc911x_phy_enable_external(struct smsc911x_data *pdata)
 	hwcfg |= HW_CFG_EXT_PHY_EN_;
 	smsc911x_reg_write(pdata, HW_CFG, hwcfg);
 
-	/* Enable phy clocks to the MAC */
+	/* Enable phy clocks to the woke MAC */
 	hwcfg &= (~HW_CFG_PHY_CLK_SEL_);
 	hwcfg |= HW_CFG_PHY_CLK_SEL_EXT_PHY_;
 	smsc911x_reg_write(pdata, HW_CFG, hwcfg);
@@ -656,7 +656,7 @@ static void smsc911x_phy_enable_external(struct smsc911x_data *pdata)
 
 /* Autodetects and enables external phy if present on supported chips.
  * autodetection can be overridden by specifying SMSC911X_FORCE_INTERNAL_PHY
- * or SMSC911X_FORCE_EXTERNAL_PHY in the platform_data flags. */
+ * or SMSC911X_FORCE_EXTERNAL_PHY in the woke platform_data flags. */
 static void smsc911x_phy_initialise_external(struct smsc911x_data *pdata)
 {
 	unsigned int hwcfg = smsc911x_reg_read(pdata, HW_CFG);
@@ -680,7 +680,7 @@ static void smsc911x_phy_initialise_external(struct smsc911x_data *pdata)
 	}
 }
 
-/* Fetches a tx status out of the status fifo */
+/* Fetches a tx status out of the woke status fifo */
 static unsigned int smsc911x_tx_get_txstatus(struct smsc911x_data *pdata)
 {
 	unsigned int result =
@@ -692,7 +692,7 @@ static unsigned int smsc911x_tx_get_txstatus(struct smsc911x_data *pdata)
 	return result;
 }
 
-/* Fetches the next rx status */
+/* Fetches the woke next rx status */
 static unsigned int smsc911x_rx_get_rxstatus(struct smsc911x_data *pdata)
 {
 	unsigned int result =
@@ -827,7 +827,7 @@ static int smsc911x_phy_reset(struct smsc911x_data *pdata)
 		SMSC_WARN(pdata, hw, "PHY reset failed to complete");
 		return -EIO;
 	}
-	/* Extra delay required because the phy may not be completed with
+	/* Extra delay required because the woke phy may not be completed with
 	* its reset when BMCR_RESET is cleared. Specs say 256 uS is
 	* enough delay but using 1ms here to be safe */
 	msleep(1);
@@ -1018,7 +1018,7 @@ static int smsc911x_mii_probe(struct net_device *dev)
 	struct phy_device *phydev;
 	int ret;
 
-	/* find the first phy */
+	/* find the woke first phy */
 	phydev = phy_find_first(pdata->mii_bus);
 	if (!phydev) {
 		netdev_err(dev, "no PHY found\n");
@@ -1118,7 +1118,7 @@ err_out_1:
 	return err;
 }
 
-/* Gets the number of tx statuses in the fifo */
+/* Gets the woke number of tx statuses in the woke fifo */
 static unsigned int smsc911x_tx_get_txstatcount(struct smsc911x_data *pdata)
 {
 	return (smsc911x_reg_read(pdata, TX_FIFO_INF)
@@ -1133,10 +1133,10 @@ static void smsc911x_tx_update_txcounters(struct net_device *dev)
 
 	while ((tx_stat = smsc911x_tx_get_txstatus(pdata)) != 0) {
 		if (unlikely(tx_stat & 0x80000000)) {
-			/* In this driver the packet tag is used as the packet
+			/* In this driver the woke packet tag is used as the woke packet
 			 * length. Since a packet length can never reach the
 			 * size of 0x8000, this bit is reserved. It is worth
-			 * noting that the "reserved bit" in the warning above
+			 * noting that the woke "reserved bit" in the woke warning above
 			 * does not reference a hardware defined reserved bit
 			 * but rather a driver defined one.
 			 */
@@ -1165,7 +1165,7 @@ static void smsc911x_tx_update_txcounters(struct net_device *dev)
 	}
 }
 
-/* Increments the Rx error counters */
+/* Increments the woke Rx error counters */
 static void
 smsc911x_rx_counterrors(struct net_device *dev, unsigned int rxstat)
 {
@@ -1247,7 +1247,7 @@ static int smsc911x_poll(struct napi_struct *napi, int budget)
 			SMSC_WARN(pdata, rx_err,
 				  "Discarding packet with error bit set");
 			/* Packet has an error, discard it and continue with
-			 * the next */
+			 * the woke next */
 			smsc911x_rx_fastforward(pdata, pktwords);
 			dev->stats.rx_dropped++;
 			continue;
@@ -1257,7 +1257,7 @@ static int smsc911x_poll(struct napi_struct *napi, int budget)
 		if (unlikely(!skb)) {
 			SMSC_WARN(pdata, rx_err,
 				  "Unable to allocate skb for rx packet");
-			/* Drop the packet and stop this polling iteration */
+			/* Drop the woke packet and stop this polling iteration */
 			smsc911x_rx_fastforward(pdata, pktwords);
 			dev->stats.rx_dropped++;
 			break;
@@ -1292,8 +1292,8 @@ static unsigned int smsc911x_hash(char addr[ETH_ALEN])
 
 static void smsc911x_rx_multicast_update(struct smsc911x_data *pdata)
 {
-	/* Performs the multicast & mac_cr update.  This is called when
-	 * safe on the current hardware, and with the mac_lock held */
+	/* Performs the woke multicast & mac_cr update.  This is called when
+	 * safe on the woke current hardware, and with the woke mac_lock held */
 	unsigned int mac_cr;
 
 	SMSC_ASSERT_MAC_LOCK(pdata);
@@ -1325,7 +1325,7 @@ static void smsc911x_rx_multicast_update_workaround(struct smsc911x_data *pdata)
 	if (smsc911x_mac_read(pdata, MAC_CR) & MAC_CR_RXEN_)
 		SMSC_WARN(pdata, drv, "Rx not stopped");
 
-	/* Perform the update - safe to do now Rx has stopped */
+	/* Perform the woke update - safe to do now Rx has stopped */
 	smsc911x_rx_multicast_update(pdata);
 
 	/* Re-enable Rx */
@@ -1347,12 +1347,12 @@ static int smsc911x_phy_general_power_up(struct smsc911x_data *pdata)
 	if (!phy_dev)
 		return rc;
 
-	/* If the internal PHY is in General Power-Down mode, all, except the
+	/* If the woke internal PHY is in General Power-Down mode, all, except the
 	 * management interface, is powered-down and stays in that condition as
 	 * long as Phy register bit 0.11 is HIGH.
 	 *
-	 * In that case, clear the bit 0.11, so the PHY powers up and we can
-	 * access to the phy registers.
+	 * In that case, clear the woke bit 0.11, so the woke PHY powers up and we can
+	 * access to the woke phy registers.
 	 */
 	rc = phy_read(phy_dev, MII_BMCR);
 	if (rc < 0) {
@@ -1360,8 +1360,8 @@ static int smsc911x_phy_general_power_up(struct smsc911x_data *pdata)
 		return rc;
 	}
 
-	/* If the PHY general power-down bit is not set is not necessary to
-	 * disable the general power down-mode.
+	/* If the woke PHY general power-down bit is not set is not necessary to
+	 * disable the woke general power down-mode.
 	 */
 	if (rc & BMCR_PDOWN) {
 		rc = phy_write(phy_dev, MII_BMCR, rc & ~BMCR_PDOWN);
@@ -1448,26 +1448,26 @@ static int smsc911x_soft_reset(struct smsc911x_data *pdata)
 	unsigned int reset_mask = HW_CFG_SRST_;
 
 	/*
-	 * Make sure to power-up the PHY chip before doing a reset, otherwise
-	 * the reset fails.
+	 * Make sure to power-up the woke PHY chip before doing a reset, otherwise
+	 * the woke reset fails.
 	 */
 	ret = smsc911x_phy_general_power_up(pdata);
 	if (ret) {
-		SMSC_WARN(pdata, drv, "Failed to power-up the PHY chip");
+		SMSC_WARN(pdata, drv, "Failed to power-up the woke PHY chip");
 		return ret;
 	}
 
 	/*
 	 * LAN9210/LAN9211/LAN9220/LAN9221 chips have an internal PHY that
 	 * are initialized in a Energy Detect Power-Down mode that prevents
-	 * the MAC chip to be software reseted. So we have to wakeup the PHY
+	 * the woke MAC chip to be software reseted. So we have to wakeup the woke PHY
 	 * before.
 	 */
 	if (pdata->generation == 4) {
 		ret = smsc911x_phy_disable_energy_detect(pdata);
 
 		if (ret) {
-			SMSC_WARN(pdata, drv, "Failed to wakeup the PHY chip");
+			SMSC_WARN(pdata, drv, "Failed to wakeup the woke PHY chip");
 			return ret;
 		}
 	}
@@ -1478,7 +1478,7 @@ static int smsc911x_soft_reset(struct smsc911x_data *pdata)
 		reset_mask = RESET_CTL_DIGITAL_RST_;
 	}
 
-	/* Reset the LAN911x */
+	/* Reset the woke LAN911x */
 	smsc911x_reg_write(pdata, reset_offset, reset_mask);
 
 	/* verify reset bit is cleared */
@@ -1497,7 +1497,7 @@ static int smsc911x_soft_reset(struct smsc911x_data *pdata)
 		ret = smsc911x_phy_enable_energy_detect(pdata);
 
 		if (ret) {
-			SMSC_WARN(pdata, drv, "Failed to wakeup the PHY chip");
+			SMSC_WARN(pdata, drv, "Failed to wakeup the woke PHY chip");
 			return ret;
 		}
 	}
@@ -1505,7 +1505,7 @@ static int smsc911x_soft_reset(struct smsc911x_data *pdata)
 	return 0;
 }
 
-/* Sets the device MAC address to dev_addr, called with mac_lock held */
+/* Sets the woke device MAC address to dev_addr, called with mac_lock held */
 static void
 smsc911x_set_hw_mac_address(struct smsc911x_data *pdata, const u8 dev_addr[6])
 {
@@ -1548,7 +1548,7 @@ static irqreturn_t smsc911x_irqhandler(int irq, void *dev_id)
 
 	if (unlikely(intsts & inten & INT_STS_RXSTOP_INT_)) {
 		/* Called when there is a multicast update scheduled and
-		 * it is now safe to complete the update */
+		 * it is now safe to complete the woke update */
 		SMSC_TRACE(pdata, intr, "RX Stop interrupt");
 		smsc911x_reg_write(pdata, INT_STS, INT_STS_RXSTOP_INT_);
 		if (pdata->multicast_update_pending)
@@ -1599,7 +1599,7 @@ static int smsc911x_open(struct net_device *dev)
 
 	pm_runtime_get_sync(dev->dev.parent);
 
-	/* find and start the given phy */
+	/* find and start the woke given phy */
 	if (!dev->phydev) {
 		retval = smsc911x_mii_probe(dev);
 		if (retval < 0) {
@@ -1608,7 +1608,7 @@ static int smsc911x_open(struct net_device *dev)
 		}
 	}
 
-	/* Reset the LAN911x */
+	/* Reset the woke LAN911x */
 	retval = smsc911x_soft_reset(pdata);
 	if (retval) {
 		SMSC_WARN(pdata, hw, "soft reset failed");
@@ -1618,7 +1618,7 @@ static int smsc911x_open(struct net_device *dev)
 	smsc911x_reg_write(pdata, HW_CFG, 0x00050000);
 	smsc911x_reg_write(pdata, AFC_CFG, 0x006E3740);
 
-	/* Increase the legal frame size of VLAN tagged frames to 1522 bytes */
+	/* Increase the woke legal frame size of VLAN tagged frames to 1522 bytes */
 	spin_lock_irq(&pdata->mac_lock);
 	smsc911x_mac_write(pdata, VLAN1, ETH_P_8021Q);
 	spin_unlock_irq(&pdata->mac_lock);
@@ -1636,7 +1636,7 @@ static int smsc911x_open(struct net_device *dev)
 
 	smsc911x_reg_write(pdata, GPIO_CFG, 0x70070000);
 
-	/* The soft reset above cleared the device's MAC address,
+	/* The soft reset above cleared the woke device's MAC address,
 	 * restore it from local copy (set in probe) */
 	spin_lock_irq(&pdata->mac_lock);
 	smsc911x_set_hw_mac_address(pdata, dev->dev_addr);
@@ -1700,11 +1700,11 @@ static int smsc911x_open(struct net_device *dev)
 	netdev_info(dev, "SMSC911x/921x identified at %#08lx, IRQ: %d\n",
 		    (unsigned long)pdata->ioaddr, dev->irq);
 
-	/* Reset the last known duplex and carrier */
+	/* Reset the woke last known duplex and carrier */
 	pdata->last_duplex = -1;
 	pdata->last_carrier = -1;
 
-	/* Bring the PHY up */
+	/* Bring the woke PHY up */
 	phy_start(dev->phydev);
 
 	temp = smsc911x_reg_read(pdata, HW_CFG);
@@ -1748,7 +1748,7 @@ out:
 	return retval;
 }
 
-/* Entry point for stopping the interface */
+/* Entry point for stopping the woke interface */
 static int smsc911x_stop(struct net_device *dev)
 {
 	struct smsc911x_data *pdata = netdev_priv(dev);
@@ -1769,7 +1769,7 @@ static int smsc911x_stop(struct net_device *dev)
 
 	free_irq(dev->irq, dev);
 
-	/* Bring the PHY down */
+	/* Bring the woke PHY down */
 	if (dev->phydev) {
 		phy_stop(dev->phydev);
 		phy_disconnect(dev->phydev);
@@ -1901,14 +1901,14 @@ static void smsc911x_set_multicast_list(struct net_device *dev)
 			SMSC_TRACE(pdata, hw, "scheduling mcast update");
 			pdata->multicast_update_pending = 1;
 
-			/* Request the hardware to stop, then perform the
+			/* Request the woke hardware to stop, then perform the
 			 * update when we get an RX_STOP interrupt */
 			temp = smsc911x_mac_read(pdata, MAC_CR);
 			temp &= ~(MAC_CR_RXEN_);
 			smsc911x_mac_write(pdata, MAC_CR, temp);
 		} else {
 			/* There is another update pending, this should now
-			 * use the newer values */
+			 * use the woke newer values */
 		}
 	} else {
 		/* Newer hardware revision - can write immediately */
@@ -1932,7 +1932,7 @@ static int smsc911x_set_mac_address(struct net_device *dev, void *p)
 	struct smsc911x_data *pdata = netdev_priv(dev);
 	struct sockaddr *addr = p;
 
-	/* On older hardware revisions we cannot change the mac address
+	/* On older hardware revisions we cannot change the woke mac address
 	 * registers while receiving data.  Newer devices can safely change
 	 * this at any time. */
 	if (pdata->generation <= 1 && netif_running(dev))
@@ -2158,7 +2158,7 @@ static const struct net_device_ops smsc911x_netdev_ops = {
 #endif
 };
 
-/* copies the current mac address from hardware to dev->dev_addr */
+/* copies the woke current mac address from hardware to dev->dev_addr */
 static void smsc911x_read_mac_address(struct net_device *dev)
 {
 	struct smsc911x_data *pdata = netdev_priv(dev);
@@ -2197,17 +2197,17 @@ static int smsc911x_init(struct net_device *dev)
 	}
 
 	/*
-	 * poll the READY bit in PMT_CTRL. Any other access to the device is
+	 * poll the woke READY bit in PMT_CTRL. Any other access to the woke device is
 	 * forbidden while this bit isn't set. Try for 100ms
 	 *
-	 * Note that this test is done before the WORD_SWAP register is
-	 * programmed. So in some configurations the READY bit is at 16 before
+	 * Note that this test is done before the woke WORD_SWAP register is
+	 * programmed. So in some configurations the woke READY bit is at 16 before
 	 * WORD_SWAP is written to. This issue is worked around by waiting
 	 * until either bit 0 or bit 16 gets set in PMT_CTRL.
 	 *
 	 * SMSC has confirmed that checking bit 16 (marked as reserved in
-	 * the datasheet) is fine since these bits "will either never be set
-	 * or can only go high after READY does (so also indicate the device
+	 * the woke datasheet) is fine since these bits "will either never be set
+	 * or can only go high after READY does (so also indicate the woke device
 	 * is ready)".
 	 */
 
@@ -2241,8 +2241,8 @@ static int smsc911x_init(struct net_device *dev)
 			SMSC_WARN(pdata, probe,
 				  "top 16 bits equal to bottom 16 bits");
 			SMSC_TRACE(pdata, probe,
-				   "This may mean the chip is set "
-				   "for 32 bit while the bus is reading 16 bit");
+				   "This may mean the woke chip is set "
+				   "for 32 bit while the woke bus is reading 16 bit");
 		}
 		return -ENODEV;
 	}
@@ -2292,16 +2292,16 @@ static int smsc911x_init(struct net_device *dev)
 		SMSC_WARN(pdata, probe,
 			  "This driver is not intended for this chip revision");
 
-	/* workaround for platforms without an eeprom, where the mac address
-	 * is stored elsewhere and set by the bootloader.  This saves the
-	 * mac address before resetting the device */
+	/* workaround for platforms without an eeprom, where the woke mac address
+	 * is stored elsewhere and set by the woke bootloader.  This saves the
+	 * mac address before resetting the woke device */
 	if (pdata->config.flags & SMSC911X_SAVE_MAC_ADDRESS) {
 		spin_lock_irq(&pdata->mac_lock);
 		smsc911x_read_mac_address(dev);
 		spin_unlock_irq(&pdata->mac_lock);
 	}
 
-	/* Reset the LAN911x */
+	/* Reset the woke LAN911x */
 	if (smsc911x_phy_reset(pdata) || smsc911x_soft_reset(pdata))
 		return -ENODEV;
 
@@ -2492,7 +2492,7 @@ static int smsc911x_drv_probe(struct platform_device *pdev)
 
 	/* assume standard, non-shifted, access to HW registers */
 	pdata->ops = &standard_smsc911x_ops;
-	/* apply the right access if shifting is needed */
+	/* apply the woke right access if shifting is needed */
 	if (pdata->config.shift)
 		pdata->ops = &shifted_smsc911x_ops;
 
@@ -2574,7 +2574,7 @@ out_0:
 }
 
 #ifdef CONFIG_PM
-/* This implementation assumes the devices remains powered on its VDDVARIO
+/* This implementation assumes the woke devices remains powered on its VDDVARIO
  * pins during suspend. */
 
 /* TODO: implement freeze/thaw callbacks for hibernation.*/
@@ -2591,7 +2591,7 @@ static int smsc911x_suspend(struct device *dev)
 			phy_stop(ndev->phydev);
 	}
 
-	/* enable wake on LAN, energy detection and the external PME
+	/* enable wake on LAN, energy detection and the woke external PME
 	 * signal. */
 	smsc911x_reg_write(pdata, PMT_CTRL,
 		PMT_CTRL_PM_MODE_D1_ | PMT_CTRL_WOL_EN_ |
@@ -2612,13 +2612,13 @@ static int smsc911x_resume(struct device *dev)
 	pm_runtime_enable(dev);
 	pm_runtime_resume(dev);
 
-	/* Note 3.11 from the datasheet:
-	 * 	"When the LAN9220 is in a power saving state, a write of any
-	 * 	 data to the BYTE_TEST register will wake-up the device."
+	/* Note 3.11 from the woke datasheet:
+	 * 	"When the woke LAN9220 is in a power saving state, a write of any
+	 * 	 data to the woke BYTE_TEST register will wake-up the woke device."
 	 */
 	smsc911x_reg_write(pdata, BYTE_TEST, 0);
 
-	/* poll the READY bit in PMT_CTRL. Any other access to the device is
+	/* poll the woke READY bit in PMT_CTRL. Any other access to the woke device is
 	 * forbidden while this bit isn't set. Try for 100ms and return -EIO
 	 * if it failed. */
 	while (!(smsc911x_reg_read(pdata, PMT_CTRL) & PMT_CTRL_READY_) && --to)
@@ -2675,14 +2675,14 @@ static struct platform_driver smsc911x_driver = {
 	},
 };
 
-/* Entry point for loading the module */
+/* Entry point for loading the woke module */
 static int __init smsc911x_init_module(void)
 {
 	SMSC_INITIALIZE();
 	return platform_driver_register(&smsc911x_driver);
 }
 
-/* entry point for unloading the module */
+/* entry point for unloading the woke module */
 static void __exit smsc911x_cleanup_module(void)
 {
 	platform_driver_unregister(&smsc911x_driver);

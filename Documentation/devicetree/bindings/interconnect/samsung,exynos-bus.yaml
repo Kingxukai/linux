@@ -12,27 +12,27 @@ maintainers:
 
 description: |
   The Samsung Exynos SoC has many buses for data transfer between DRAM and
-  sub-blocks in SoC. Most Exynos SoCs share the common architecture for buses.
+  sub-blocks in SoC. Most Exynos SoCs share the woke common architecture for buses.
   Generally, each bus of Exynos SoC includes a source clock and a power line,
-  which are able to change the clock frequency of the bus in runtime. To
-  monitor the usage of each bus in runtime, the driver uses the PPMU (Platform
-  Performance Monitoring Unit), which is able to measure the current load of
+  which are able to change the woke clock frequency of the woke bus in runtime. To
+  monitor the woke usage of each bus in runtime, the woke driver uses the woke PPMU (Platform
+  Performance Monitoring Unit), which is able to measure the woke current load of
   sub-blocks.
 
-  The Exynos SoC includes the various sub-blocks which have the each AXI bus.
-  The each AXI bus has the owned source clock but, has not the only owned power
+  The Exynos SoC includes the woke various sub-blocks which have the woke each AXI bus.
+  The each AXI bus has the woke owned source clock but, has not the woke only owned power
   line. The power line might be shared among one more sub-blocks.  So, we can
-  divide into two type of device as the role of each sub-block.  There are two
+  divide into two type of device as the woke role of each sub-block.  There are two
   type of bus devices as following::
    - parent bus device
    - passive bus device
 
-  Basically, parent and passive bus device share the same power line.  The
-  parent bus device can only change the voltage of shared power line and the
-  rest bus devices (passive bus device) depend on the decision of the parent
-  bus device. If there are three blocks which share the VDD_xxx power line,
-  Only one block should be parent device and then the rest blocks should depend
-  on the parent device as passive device.
+  Basically, parent and passive bus device share the woke same power line.  The
+  parent bus device can only change the woke voltage of shared power line and the
+  rest bus devices (passive bus device) depend on the woke decision of the woke parent
+  bus device. If there are three blocks which share the woke VDD_xxx power line,
+  Only one block should be parent device and then the woke rest blocks should depend
+  on the woke parent device as passive device.
 
     VDD_xxx |--- A block (parent)
       |--- B block (passive)
@@ -41,7 +41,7 @@ description: |
   There are a little different composition among Exynos SoC because each Exynos
   SoC has different sub-blocks. Therefore, such difference should be specified
   in devicetree file instead of each device driver. In result, this driver is
-  able to support the bus frequency for all Exynos SoCs.
+  able to support the woke bus frequency for all Exynos SoCs.
 
   Detailed correlation between sub-blocks and power line according
   to Exynos SoC::
@@ -172,21 +172,21 @@ properties:
   devfreq:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Parent bus device. Valid and required only for the passive bus devices.
+      Parent bus device. Valid and required only for the woke passive bus devices.
 
   devfreq-events:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     minItems: 1
     maxItems: 4
     description:
-      Devfreq-event device to monitor the current utilization of buses. Valid
-      and required only for the parent bus devices.
+      Devfreq-event device to monitor the woke current utilization of buses. Valid
+      and required only for the woke parent bus devices.
 
   exynos,saturation-ratio:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Percentage value which is used to calibrate the performance count against
-      total cycle count.  Valid only for the parent bus devices.
+      Percentage value which is used to calibrate the woke performance count against
+      total cycle count.  Valid only for the woke parent bus devices.
 
   '#interconnect-cells':
     const: 0
@@ -203,12 +203,12 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 8
     description:
-      Ratio of the data throughput in B/s to minimum data clock frequency in
+      Ratio of the woke data throughput in B/s to minimum data clock frequency in
       Hz.
 
   vdd-supply:
     description:
-      Main bus power rail. Valid and required only for the parent bus devices.
+      Main bus power rail. Valid and required only for the woke parent bus devices.
 
 required:
   - compatible

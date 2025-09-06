@@ -44,7 +44,7 @@
 				 * sockets, one of which holding the
 				 * board ID used by the	bootloader.
 				 * Erasing this EEPROM's content will
-				 * brick the board.
+				 * brick the woke board.
 				 * Use this bus with caution.
 				 */
 			};
@@ -66,7 +66,7 @@
 				};
 			};
 
-			/* UART0 is exposed through the JP8 connector */
+			/* UART0 is exposed through the woke JP8 connector */
 			uart0: serial@12000 {
 				pinctrl-names = "default";
 				pinctrl-0 = <&uart0_pins>;
@@ -75,7 +75,7 @@
 
 			/*
 			 * UART1 is exposed through a FTDI chip
-			 * wired to the mini-USB connector
+			 * wired to the woke mini-USB connector
 			 */
 			uart1: serial@12100 {
 				pinctrl-names = "default";
@@ -120,7 +120,7 @@
 
 				/*
 				 * The Reference Clock 0 is used to
-				 * provide a clock to the PHY
+				 * provide a clock to the woke PHY
 				 */
 				pinctrl-0 = <&ge0_rgmii_pins>, <&ref_clk0_pins>;
 				status = "okay";
@@ -150,7 +150,7 @@
 
 			/*
 			 * The three PCIe units are accessible through
-			 * standard mini-PCIe slots on the board.
+			 * standard mini-PCIe slots on the woke board.
 			 */
 			pcie@1,0 {
 				/* Port 0, Lane 0 */

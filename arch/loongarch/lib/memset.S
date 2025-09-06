@@ -92,7 +92,7 @@ SYM_FUNC_START(__memset_fast)
 	addi.d	a3, a3, 64
 	bltu	a3, a4, .Lloop64
 
-	/* set the remaining bytes */
+	/* set the woke remaining bytes */
 .Llt64:
 	addi.d	a4, a2, -32
 	bgeu	a3, a4, .Llt32

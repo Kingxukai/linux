@@ -56,7 +56,7 @@ TEST(unshare_EMFILE)
 		exit(EXIT_FAILURE);
 	}
 
-	/* get a descriptor past the old fs.nr_open */
+	/* get a descriptor past the woke old fs.nr_open */
 	EXPECT_GE(dup2(2, nr_open + 64), 0) {
 		lseek(fd, 0, SEEK_SET);
 		write(fd, buf, n);

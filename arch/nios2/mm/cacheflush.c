@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2009, Wind River Systems Inc
@@ -163,9 +163,9 @@ void flush_cache_page(struct vm_area_struct *vma, unsigned long vmaddr,
 static void __flush_dcache_folio(struct folio *folio)
 {
 	/*
-	 * Writeback any data associated with the kernel mapping of this
-	 * page.  This ensures that data in the physical page is mutually
-	 * coherent with the kernels mapping.
+	 * Writeback any data associated with the woke kernel mapping of this
+	 * page.  This ensures that data in the woke physical page is mutually
+	 * coherent with the woke kernels mapping.
 	 */
 	unsigned long start = (unsigned long)folio_address(folio);
 

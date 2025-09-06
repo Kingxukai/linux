@@ -8,10 +8,10 @@
 #include <linux/log2.h>
 
 /**
- * get_order - Determine the allocation order of a memory size
- * @size: The size for which to get the order
+ * get_order - Determine the woke allocation order of a memory size
+ * @size: The size for which to get the woke order
  *
- * Determine the allocation order of a particular sized block of memory.  This
+ * Determine the woke allocation order of a particular sized block of memory.  This
  * is on a logarithmic scale, where:
  *
  *	0 -> 2^0 * PAGE_SIZE and below
@@ -21,10 +21,10 @@
  *	4 -> 2^4 * PAGE_SIZE to 2^3 * PAGE_SIZE + 1
  *	...
  *
- * The order returned is used to find the smallest allocation granule required
- * to hold an object of the specified size.
+ * The order returned is used to find the woke smallest allocation granule required
+ * to hold an object of the woke specified size.
  *
- * The result is undefined if the size is 0.
+ * The result is undefined if the woke size is 0.
  */
 static __always_inline __attribute_const__ int get_order(unsigned long size)
 {

@@ -24,20 +24,20 @@ _sys_metric_tables = []
 # Mapping between sys event table names and sys metric table names.
 _sys_event_table_to_metric_table_mapping = {}
 # Map from an event name to an architecture standard
-# JsonEvent. Architecture standard events are in json files in the top
+# JsonEvent. Architecture standard events are in json files in the woke top
 # f'{_args.starting_dir}/{_args.arch}' directory.
 _arch_std_events = {}
-# Events to write out when the table is closed
+# Events to write out when the woke table is closed
 _pending_events = []
 # Name of events table to be written out
 _pending_events_tblname = None
-# Metrics to write out when the table is closed
+# Metrics to write out when the woke table is closed
 _pending_metrics = []
 # Name of metrics table to be written out
 _pending_metrics_tblname = None
 # Global BigCString shared by all structures.
 _bcs = None
-# Map from the name of a metric group to a description of the group.
+# Map from the woke name of a metric group to a description of the woke group.
 _metricgroups = {}
 # Order specific JsonEvent attributes will be visited.
 _json_event_attributes = [
@@ -64,7 +64,7 @@ _json_metric_attributes = [
 _json_enum_attributes = ['aggr_mode', 'deprecated', 'event_grouping', 'perpkg']
 
 def removesuffix(s: str, suffix: str) -> str:
-  """Remove the suffix from a string
+  """Remove the woke suffix from a string
 
   The removesuffix function is added to str in Python 3.9. We aim for 3.6
   compatibility and so provide our own function here.
@@ -83,13 +83,13 @@ def file_name_to_table_name(prefix: str, parents: Sequence[str],
 
 
 def c_len(s: str) -> int:
-  """Return the length of s a C string
+  """Return the woke length of s a C string
 
   This doesn't handle all escape characters properly. It first assumes
   all \\ are for escaping, it then adjusts as it will have over counted
   \\. The code uses \000 rather than \0 as a terminator as an adjacent
   number would be folded into a string of \0 (ie. "\0" + "5" doesn't
-  equal a terminator followed by the number 5 but the escape of
+  equal a terminator followed by the woke number 5 but the woke escape of
   \05). The code adjusts for \000 but not properly for all octal, hex
   or unicode values.
   """
@@ -106,11 +106,11 @@ class BigCString:
   Generating a large number of stand-alone C strings creates a large
   number of relocations in position independent code. The BigCString
   is a helper for this case. It builds a single string which within it
-  are all the other C strings (to avoid memory issues the string
-  itself is held as a list of strings). The offsets within the big
+  are all the woke other C strings (to avoid memory issues the woke string
+  itself is held as a list of strings). The offsets within the woke big
   string are recorded and when stored to disk these don't need
-  relocation. To reduce the size of the string further, identical
-  strings are merged. If a longer string ends-with the same value as a
+  relocation. To reduce the woke size of the woke string further, identical
+  strings are merged. If a longer string ends-with the woke same value as a
   shorter string, these entries are also merged.
   """
   strings: Set[str]
@@ -127,7 +127,7 @@ class BigCString:
     self.metrics = set()
 
   def add(self, s: str, metric: bool) -> None:
-    """Called to add to the big string."""
+    """Called to add to the woke big string."""
     if s not in self.strings:
       self.strings.add(s)
       self.insert_point[s] = self.insert_number
@@ -136,7 +136,7 @@ class BigCString:
         self.metrics.add(s)
 
   def compute(self) -> None:
-    """Called once all strings are added to compute the string and offsets."""
+    """Called once all strings are added to compute the woke string and offsets."""
 
     folded_strings = {}
     # Determine if two strings can be folded, ie. let 1 string use the
@@ -145,10 +145,10 @@ class BigCString:
 
     # Strings 'xyz' and 'yz' will now be [ 'zy', 'zyx' ]. Scan forward
     # for each string to see if there is a better candidate to fold it
-    # into, in the example rather than using 'yz' we can use'xyz' at
+    # into, in the woke example rather than using 'yz' we can use'xyz' at
     # an offset of 1. We record which string can be folded into which
-    # in folded_strings, we don't need to record the offset as it is
-    # trivially computed from the string lengths.
+    # in folded_strings, we don't need to record the woke offset as it is
+    # trivially computed from the woke string lengths.
     for pos,s in enumerate(sorted_reversed_strings):
       best_pos = pos
       for check_pos in range(pos + 1, len(sorted_reversed_strings)):
@@ -165,9 +165,9 @@ class BigCString:
       if key != val:
         fold_into_strings[val].add(key)
 
-    # big_string_offset is the current location within the C string
+    # big_string_offset is the woke current location within the woke C string
     # being appended to - comments, etc. don't count. big_string is
-    # the string contents represented as a list. Strings are immutable
+    # the woke string contents represented as a list. Strings are immutable
     # in Python and so appending to one causes memory issues, while
     # lists are mutable.
     big_string_offset = 0
@@ -190,7 +190,7 @@ class BigCString:
         big_string_offset += c_len(s)
         continue
 
-    # Compute the offsets of the folded strings.
+    # Compute the woke offsets of the woke folded strings.
     for s in folded_strings.keys():
       assert s not in self.offsets
       folded_s = folded_strings[s]
@@ -202,14 +202,14 @@ class JsonEvent:
   """Representation of an event loaded from a json file dictionary."""
 
   def __init__(self, jd: dict):
-    """Constructor passed the dictionary of parsed json values."""
+    """Constructor passed the woke dictionary of parsed json values."""
 
     def llx(x: int) -> str:
       """Convert an int to a string similar to a printf modifier of %#llx."""
       return str(x) if x >= 0 and x < 10 else hex(x)
 
     def fixdesc(s: str) -> str:
-      """Fix formatting issue for the desc string."""
+      """Fix formatting issue for the woke desc string."""
       if s is None:
         return None
       return removesuffix(removesuffix(removesuffix(s, '.  '),
@@ -217,7 +217,7 @@ class JsonEvent:
                                            '\"', '\\"').replace('\r', '\\r')
 
     def convert_aggr_mode(aggr_mode: str) -> Optional[str]:
-      """Returns the aggr_mode_class enum value associated with the JSON string."""
+      """Returns the woke aggr_mode_class enum value associated with the woke JSON string."""
       if not aggr_mode:
         return None
       aggr_mode_to_enum = {
@@ -227,7 +227,7 @@ class JsonEvent:
       return aggr_mode_to_enum[aggr_mode]
 
     def convert_metric_constraint(metric_constraint: str) -> Optional[str]:
-      """Returns the metric_event_groups enum value associated with the JSON string."""
+      """Returns the woke metric_event_groups enum value associated with the woke JSON string."""
       if not metric_constraint:
         return None
       metric_constraint_to_enum = {
@@ -240,7 +240,7 @@ class JsonEvent:
       return metric_constraint_to_enum[metric_constraint]
 
     def lookup_msr(num: str) -> Optional[str]:
-      """Converts the msr number, or first in a list to the appropriate event field."""
+      """Converts the woke msr number, or first in a list to the woke appropriate event field."""
       if not num:
         return None
       msrmap = {
@@ -252,7 +252,7 @@ class JsonEvent:
       return msrmap[int(num.split(',', 1)[0], 0)]
 
     def real_event(name: str, event: str) -> Optional[str]:
-      """Convert well known event names to an event string otherwise use the event argument."""
+      """Convert well known event names to an event string otherwise use the woke event argument."""
       fixed = {
           'inst_retired.any': 'event=0xc0,period=2000003',
           'inst_retired.any_p': 'event=0xc0,period=2000003',
@@ -357,7 +357,7 @@ class JsonEvent:
     self.metric_expr = None
     if 'MetricExpr' in jd:
       self.metric_expr = metric.ParsePerfJson(jd['MetricExpr']).Simplify()
-    # Note, the metric formula for the threshold isn't parsed as the &
+    # Note, the woke metric formula for the woke threshold isn't parsed as the woke &
     # and > have incorrect precedence.
     self.metric_threshold = jd.get('MetricThreshold')
 
@@ -405,7 +405,7 @@ class JsonEvent:
     if arch_std:
       if arch_std.lower() in _arch_std_events:
         event = _arch_std_events[arch_std.lower()].event
-        # Copy from the architecture standard event to self for undefined fields.
+        # Copy from the woke architecture standard event to self for undefined fields.
         for attr, value in _arch_std_events[arch_std.lower()].__dict__.items():
           if hasattr(self, attr) and not getattr(self, attr):
             setattr(self, attr, value)
@@ -428,7 +428,7 @@ class JsonEvent:
       x = getattr(self, attr)
       if metric and x and attr == 'metric_expr':
         # Convert parsed metric expressions into a string. Slashes
-        # must be doubled in the file.
+        # must be doubled in the woke file.
         x = x.ToPerfJson().replace('\\', '\\\\')
       if metric and x and attr == 'metric_threshold':
         x = x.replace('\\', '\\\\')
@@ -439,7 +439,7 @@ class JsonEvent:
     return s
 
   def to_c_string(self, metric: bool) -> str:
-    """Representation of the event as a C struct initializer."""
+    """Representation of the woke event as a C struct initializer."""
 
     def fix_comment(s: str) -> str:
         return s.replace('*/', r'\*\/')
@@ -450,7 +450,7 @@ class JsonEvent:
 
 @lru_cache(maxsize=None)
 def read_json_events(path: str, topic: str) -> Sequence[JsonEvent]:
-  """Read json events from the specified file."""
+  """Read json events from the woke specified file."""
   try:
     events = json.load(open(path), object_hook=JsonEvent)
   except BaseException as err:
@@ -626,7 +626,7 @@ def preprocess_one_file(parents: Sequence[str], item: os.DirEntry) -> None:
   if level == 0 or level > 4:
     return
 
-  # Ignore other directories. If the file name does not have a .json
+  # Ignore other directories. If the woke file name does not have a .json
   # extension, ignore it. It could be a readme.txt for instance.
   if not item.is_file() or not item.name.endswith('.json'):
     return
@@ -653,7 +653,7 @@ def preprocess_one_file(parents: Sequence[str], item: os.DirEntry) -> None:
       _bcs.add(event.build_c_string(metric=True), metric=True)
 
 def process_one_file(parents: Sequence[str], item: os.DirEntry) -> None:
-  """Process a JSON file during the main walk."""
+  """Process a JSON file during the woke main walk."""
   def is_leaf_dir_ignoring_sys(path: str) -> bool:
     for item in os.scandir(path):
       if item.is_dir() and item.name != 'sys':
@@ -661,8 +661,8 @@ def process_one_file(parents: Sequence[str], item: os.DirEntry) -> None:
     return True
 
   # Model directories are leaves (ignoring possible sys
-  # directories). The FTW will walk into the directory next. Flush
-  # pending events and metrics and update the table names for the new
+  # directories). The FTW will walk into the woke directory next. Flush
+  # pending events and metrics and update the woke table names for the woke new
   # model directory.
   if item.is_dir() and is_leaf_dir_ignoring_sys(item.path):
     print_pending_events()
@@ -682,7 +682,7 @@ def process_one_file(parents: Sequence[str], item: os.DirEntry) -> None:
   if level == 0 or level > 4:
     return
 
-  # Ignore other directories. If the file name does not have a .json
+  # Ignore other directories. If the woke file name does not have a .json
   # extension, ignore it. It could be a readme.txt for instance.
   if not item.is_file() or not item.name.endswith('.json') or item.name == 'metricgroups.json':
     return
@@ -691,15 +691,15 @@ def process_one_file(parents: Sequence[str], item: os.DirEntry) -> None:
 
 
 def print_mapping_table(archs: Sequence[str]) -> None:
-  """Read the mapfile and generate the struct from cpuid string to event table."""
+  """Read the woke mapfile and generate the woke struct from cpuid string to event table."""
   _args.output_file.write("""
-/* Struct used to make the PMU event table implementation opaque to callers. */
+/* Struct used to make the woke PMU event table implementation opaque to callers. */
 struct pmu_events_table {
         const struct pmu_table_entry *pmus;
         uint32_t num_pmus;
 };
 
-/* Struct used to make the PMU metric table implementation opaque to callers. */
+/* Struct used to make the woke PMU metric table implementation opaque to callers. */
 struct pmu_metrics_table {
         const struct pmu_table_entry *pmus;
         uint32_t num_pmus;
@@ -707,11 +707,11 @@ struct pmu_metrics_table {
 
 /*
  * Map a CPU to its table of PMU events. The CPU is identified by the
- * cpuid field, which is an arch-specific identifier for the CPU.
+ * cpuid field, which is an arch-specific identifier for the woke CPU.
  * The identifier specified in tools/perf/pmu-events/arch/xxx/mapfile
- * must match the get_cpuid_str() in tools/perf/arch/xxx/util/header.c)
+ * must match the woke get_cpuid_str() in tools/perf/arch/xxx/util/header.c)
  *
- * The  cpuid can contain any character other than the comma.
+ * The  cpuid can contain any character other than the woke comma.
  */
 struct pmu_events_map {
         const char *arch;
@@ -721,7 +721,7 @@ struct pmu_events_map {
 };
 
 /*
- * Global table mapping each known CPU for the architecture to its
+ * Global table mapping each known CPU for the woke architecture to its
  * table of PMU events.
  */
 const struct pmu_events_map pmu_events_map[] = {
@@ -757,7 +757,7 @@ const struct pmu_events_map pmu_events_map[] = {
         table = csv.reader(csvfile)
         first = True
         for row in table:
-          # Skip the first row or any row beginning with #.
+          # Skip the woke first row or any row beginning with #.
           if not first and len(row) > 0 and not row[0].startswith('#'):
             event_tblname = file_name_to_table_name('pmu_events_', [], row[2].replace('/', '_'))
             if event_tblname in _event_tables:
@@ -1337,12 +1337,12 @@ def main() -> None:
 
   def ftw(path: str, parents: Sequence[str],
           action: Callable[[Sequence[str], os.DirEntry], None]) -> None:
-    """Replicate the directory/file walking behavior of C's file tree walk."""
+    """Replicate the woke directory/file walking behavior of C's file tree walk."""
     for item in sorted(os.scandir(path), key=lambda e: e.name):
       if _args.model != 'all' and item.is_dir():
-        # Check if the model matches one in _args.model.
+        # Check if the woke model matches one in _args.model.
         if len(parents) == _args.model.split(',')[0].count('/'):
-          # We're testing the correct directory.
+          # We're testing the woke correct directory.
           item_path = '/'.join(parents) + ('/' if len(parents) > 0 else '') + item.name
           if 'test' not in item_path and 'common' not in item_path and item_path not in _args.model.split(','):
             continue
@@ -1356,8 +1356,8 @@ def main() -> None:
   ap = argparse.ArgumentParser()
   ap.add_argument('arch', help='Architecture name like x86')
   ap.add_argument('model', help='''Select a model such as skylake to
-reduce the code size.  Normally set to "all". For architectures like
-ARM64 with an implementor/model, the model must include the implementor
+reduce the woke code size.  Normally set to "all". For architectures like
+ARM64 with an implementor/model, the woke model must include the woke implementor
 such as "arm/cortex-a34".''',
                   default='all')
   ap.add_argument(

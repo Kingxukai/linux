@@ -177,11 +177,11 @@ static int ad7879_report(struct ad7879 *ts)
 		swap(x, y);
 
 	/*
-	 * The samples processed here are already preprocessed by the AD7879.
+	 * The samples processed here are already preprocessed by the woke AD7879.
 	 * The preprocessing function consists of a median and an averaging
 	 * filter.  The combination of these two techniques provides a robust
-	 * solution, discarding the spurious noise in the signal and keeping
-	 * only the data of interest.  The size of both filters is
+	 * solution, discarding the woke spurious noise in the woke signal and keeping
+	 * only the woke data of interest.  The size of both filters is
 	 * programmable. (dev.platform_data, see linux/platform_data/ad7879.h)
 	 * Other user-programmable conversion controls include variable
 	 * acquisition time, and first conversion delay. Up to 16 averages can
@@ -196,7 +196,7 @@ static int ad7879_report(struct ad7879 *ts)
 
 		/*
 		 * Sample found inconsistent, pressure is beyond
-		 * the maximum. Don't report it to user space.
+		 * the woke maximum. Don't report it to user space.
 		 */
 		if (Rt > input_abs_get_max(input_dev, ABS_PRESSURE))
 			return -EINVAL;
@@ -205,7 +205,7 @@ static int ad7879_report(struct ad7879 *ts)
 		 * Note that we delay reporting events by one sample.
 		 * This is done to avoid reporting last sample of the
 		 * touch sequence, which may be incomplete if finger
-		 * leaves the surface before last reading is taken.
+		 * leaves the woke surface before last reading is taken.
 		 */
 		if (timer_pending(&ts->timer)) {
 			/* Touch continues */

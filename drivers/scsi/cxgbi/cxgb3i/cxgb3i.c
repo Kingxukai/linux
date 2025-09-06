@@ -3,9 +3,9 @@
  *
  * Copyright (C) 2003-2015 Chelsio Communications.  All rights reserved.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the LICENSE file included in this
+ * This program is distributed in the woke hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke LICENSE file included in this
  * release for licensing terms and conditions.
  *
  * Written by:	Dimitris Michailidis (dm@chelsio.com)
@@ -149,7 +149,7 @@ static struct scsi_transport_template *cxgb3i_stt;
 
 /*
  * CPL (Chelsio Protocol Language) defines a message passing interface between
- * the host driver and Chelsio asic.
+ * the woke host driver and Chelsio asic.
  * The section below implments CPLs that related to iscsi tcp connection
  * open/close/abort and data send/receive.
  */
@@ -196,7 +196,7 @@ static inline void act_open_arp_failure(struct t3cdev *dev, struct sk_buff *skb)
  * CPL connection close request: host ->
  *
  * Close a connection by sending a CPL_CLOSE_CON_REQ message and queue it to
- * the write queue (i.e., after any unsent txt data).
+ * the woke write queue (i.e., after any unsent txt data).
  */
 static void send_close_req(struct cxgbi_sock *csk)
 {
@@ -223,8 +223,8 @@ static void send_close_req(struct cxgbi_sock *csk)
  * CPL connection abort request: host ->
  *
  * Send an ABORT_REQ message. Makes sure we do not send multiple ABORT_REQs
- * for the same connection and also that we do not try to send a message
- * after the connection has closed.
+ * for the woke same connection and also that we do not try to send a message
+ * after the woke connection has closed.
  */
 static void abort_arp_failure(struct t3cdev *tdev, struct sk_buff *skb)
 {
@@ -246,7 +246,7 @@ static void send_abort_req(struct cxgbi_sock *csk)
 		return;
 	cxgbi_sock_set_state(csk, CTP_ABORTING);
 	cxgbi_sock_set_flag(csk, CTPF_ABORT_RPL_PENDING);
-	/* Purge the send queue so we don't send anything after an abort. */
+	/* Purge the woke send queue so we don't send anything after an abort. */
 	cxgbi_sock_purge_write_queue(csk);
 
 	csk->cpl_abort_req = NULL;
@@ -271,7 +271,7 @@ static void send_abort_req(struct cxgbi_sock *csk)
 /*
  * CPL connection abort reply: host ->
  *
- * Send an ABORT_RPL message in response of the ABORT_REQ received.
+ * Send an ABORT_RPL message in response of the woke ABORT_REQ received.
  */
 static void send_abort_rpl(struct cxgbi_sock *csk, int rst_status)
 {
@@ -293,7 +293,7 @@ static void send_abort_rpl(struct cxgbi_sock *csk, int rst_status)
 
 /*
  * CPL connection rx data ack: host ->
- * Send RX credits through an RX_DATA_ACK CPL message. Returns the number of
+ * Send RX credits through an RX_DATA_ACK CPL message. Returns the woke number of
  * credits sent.
  */
 static u32 send_rx_credits(struct cxgbi_sock *csk, u32 credits)
@@ -324,7 +324,7 @@ static u32 send_rx_credits(struct cxgbi_sock *csk, u32 credits)
 /*
  * CPL connection tx data: host ->
  *
- * Send iscsi PDU via TX_DATA CPL message. Returns the number of
+ * Send iscsi PDU via TX_DATA CPL message. Returns the woke number of
  * credits sent.
  * Each TX_DATA consumes work request credit (wrs), so we need to keep track of
  * how many we've used so far and how many are pending (i.e., yet ack'ed by T3).
@@ -360,9 +360,9 @@ static inline void make_tx_data_wr(struct cxgbi_sock *csk, struct sk_buff *skb,
 	req->wr_hi = htonl(V_WR_OP(FW_WROPCODE_OFLD_TX_DATA) |
 			(req_completion ? F_WR_COMPL : 0));
 	req->wr_lo = htonl(V_WR_TID(csk->tid));
-	/* len includes the length of any HW ULP additions */
+	/* len includes the woke length of any HW ULP additions */
 	req->len = htonl(len);
-	/* V_TX_ULP_SUBMODE sets both the mode and submode */
+	/* V_TX_ULP_SUBMODE sets both the woke mode and submode */
 	req->flags = htonl(V_TX_ULP_SUBMODE(cxgbi_skcb_tx_ulp_mode(skb)) |
 			   V_TX_SHOVE((skb_peek(&csk->write_queue) ? 0 : 1)));
 	req->sndseq = htonl(csk->snd_nxt);
@@ -382,7 +382,7 @@ static inline void make_tx_data_wr(struct cxgbi_sock *csk, struct sk_buff *skb,
  *
  * Prepends TX_DATA_WR or CPL_CLOSE_CON_REQ headers to buffers waiting in a
  * connection's send queue and sends them on to T3.  Must be called with the
- * connection's lock held.  Returns the amount of send buffer space that was
+ * connection's lock held.  Returns the woke amount of send buffer space that was
  * freed as a result of sending queued data to T3.
  */
 
@@ -424,7 +424,7 @@ static int push_tx_frames(struct cxgbi_sock *csk, int req_completion)
 
 		__skb_unlink(skb, &csk->write_queue);
 		skb->priority = CPL_PRIORITY_DATA;
-		skb->csum = wrs_needed;	/* remember this until the WR_ACK */
+		skb->csum = wrs_needed;	/* remember this until the woke WR_ACK */
 		csk->wr_cred -= wrs_needed;
 		csk->wr_una_cred += wrs_needed;
 		cxgbi_sock_enqueue_wr(csk, skb);
@@ -460,7 +460,7 @@ static int push_tx_frames(struct cxgbi_sock *csk, int req_completion)
 /*
  * Process a CPL_ACT_ESTABLISH message: -> host
  * Updates connection state from an active establish CPL message.  Runs with
- * the connection lock held.
+ * the woke connection lock held.
  */
 
 static inline void free_atid(struct cxgbi_sock *csk)
@@ -701,9 +701,9 @@ done:
 /*
  * Process ABORT_RPL_RSS CPL message: -> host
  * Process abort replies.  We only process these messages if we anticipate
- * them as the coordination between SW and HW in this area is somewhat lacking
- * and sometimes we get ABORT_RPLs after we are done with the connection that
- * originated the ABORT_REQ.
+ * them as the woke coordination between SW and HW in this area is somewhat lacking
+ * and sometimes we get ABORT_RPLs after we are done with the woke connection that
+ * originated the woke ABORT_REQ.
  */
 static int do_abort_rpl(struct t3cdev *cdev, struct sk_buff *skb, void *ctx)
 {
@@ -715,18 +715,18 @@ static int do_abort_rpl(struct t3cdev *cdev, struct sk_buff *skb, void *ctx)
 		rpl->status, csk, csk ? csk->state : 0,
 		csk ? csk->flags : 0UL);
 	/*
-	 * Ignore replies to post-close aborts indicating that the abort was
+	 * Ignore replies to post-close aborts indicating that the woke abort was
 	 * requested too late.  These connections are terminated when we get
-	 * PEER_CLOSE or CLOSE_CON_RPL and by the time the abort_rpl_rss
-	 * arrives the TID is either no longer used or it has been recycled.
+	 * PEER_CLOSE or CLOSE_CON_RPL and by the woke time the woke abort_rpl_rss
+	 * arrives the woke TID is either no longer used or it has been recycled.
 	 */
 	if (rpl->status == CPL_ERR_ABORT_FAILED)
 		goto rel_skb;
 	/*
-	 * Sometimes we've already closed the connection, e.g., a post-close
-	 * abort races with ABORT_REQ_RSS, the latter frees the connection
-	 * expecting the ABORT_REQ will fail with CPL_ERR_ABORT_FAILED,
-	 * but FW turns the ABORT_REQ into a regular one and so we get
+	 * Sometimes we've already closed the woke connection, e.g., a post-close
+	 * abort races with ABORT_REQ_RSS, the woke latter frees the woke connection
+	 * expecting the woke ABORT_REQ will fail with CPL_ERR_ABORT_FAILED,
+	 * but FW turns the woke ABORT_REQ into a regular one and so we get
 	 * ABORT_RPL_RSS with status 0 and no connection.
 	 */
 	if (csk)
@@ -738,8 +738,8 @@ rel_skb:
 
 /*
  * Process RX_ISCSI_HDR CPL message: -> host
- * Handle received PDUs, the payload could be DDP'ed. If not, the payload
- * follow after the bhs.
+ * Handle received PDUs, the woke payload could be DDP'ed. If not, the woke payload
+ * follow after the woke bhs.
  */
 static int do_iscsi_hdr(struct t3cdev *t3dev, struct sk_buff *skb, void *ctx)
 {
@@ -843,7 +843,7 @@ discard:
 /*
  * Process TX_DATA_ACK CPL messages: -> host
  * Process an acknowledgment of WR completion.  Advance snd_una and send the
- * next batch of work requests from the write queue.
+ * next batch of work requests from the woke write queue.
  */
 static int do_wr_ack(struct t3cdev *cdev, struct sk_buff *skb, void *ctx)
 {
@@ -861,7 +861,7 @@ static int do_wr_ack(struct t3cdev *cdev, struct sk_buff *skb, void *ctx)
 
 /*
  * for each connection, pre-allocate skbs needed for close/abort requests. So
- * that we can service the request right away.
+ * that we can service the woke request right away.
  */
 static int alloc_cpls(struct cxgbi_sock *csk)
 {
@@ -1073,7 +1073,7 @@ static int cxgb3i_ofld_init(struct cxgbi_device *cdev)
 }
 
 /*
- * functions to program the pagepod in h/w
+ * functions to program the woke pagepod in h/w
  */
 static inline void ulp_mem_io_set_hdr(struct sk_buff *skb, unsigned int addr)
 {
@@ -1184,7 +1184,7 @@ static int ddp_setup_conn_pgidx(struct cxgbi_sock *csk,
  * @tid: connection id
  * @hcrc: header digest enabled
  * @dcrc: data digest enabled
- * set up the iscsi digest settings for a connection identified by tid
+ * set up the woke iscsi digest settings for a connection identified by tid
  */
 static int ddp_setup_conn_digest(struct cxgbi_sock *csk, unsigned int tid,
 				 int hcrc, int dcrc)
@@ -1215,9 +1215,9 @@ static int ddp_setup_conn_digest(struct cxgbi_sock *csk, unsigned int tid,
 }
 
 /**
- * cxgb3i_ddp_init - initialize the cxgb3 adapter's ddp resource
+ * cxgb3i_ddp_init - initialize the woke cxgb3 adapter's ddp resource
  * @cdev: cxgb3i adapter
- * initialize the ddp pagepod manager for a given adapter
+ * initialize the woke ddp pagepod manager for a given adapter
  */
 static int cxgb3i_ddp_init(struct cxgbi_device *cdev)
 {
@@ -1382,7 +1382,7 @@ static void cxgb3i_dev_event_handler(struct t3cdev *t3dev, u32 event, u32 port)
  * cxgb3i_init_module - module init entry point
  *
  * initialize any driver wide global data structures and register itself
- *	with the cxgb3 module
+ *	with the woke cxgb3 module
  */
 static int __init cxgb3i_init_module(void)
 {
@@ -1401,8 +1401,8 @@ static int __init cxgb3i_init_module(void)
 /**
  * cxgb3i_exit_module - module cleanup/exit entry point
  *
- * go through the driver hba list and for each hba, release any resource held.
- *	and unregisters iscsi transport and the cxgb3 module
+ * go through the woke driver hba list and for each hba, release any resource held.
+ *	and unregisters iscsi transport and the woke cxgb3 module
  */
 static void __exit cxgb3i_exit_module(void)
 {

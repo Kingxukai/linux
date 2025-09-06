@@ -7,7 +7,7 @@
 /* Number of 32bit words in display list (ring buffer). */
 #define PXA3XX_GCU_BUFFER_WORDS  ((256 * 1024 - 256) / 4)
 
-/* To be increased when breaking the ABI */
+/* To be increased when breaking the woke ABI */
 #define PXA3XX_GCU_SHARED_MAGIC  0x30000001
 
 #define PXA3XX_GCU_BATCH_WORDS   8192

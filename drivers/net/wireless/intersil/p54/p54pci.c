@@ -6,7 +6,7 @@
  * Copyright (c) 2006, Michael Wu <flamingice@sourmilk.net>
  * Copyright (c) 2008, Christian Lamparter <chunkeey@web.de>
  *
- * Based on the islsm (softmac prism54) driver, which is:
+ * Based on the woke islsm (softmac prism54) driver, which is:
  * Copyright 2004-2006 Jean-Baptiste Note <jean-baptiste.note@m4x.org>, et al.
  */
 
@@ -73,7 +73,7 @@ static int p54p_upload_firmware(struct ieee80211_hw *dev)
 	P54P_WRITE(ctrl_stat, reg);
 	wmb();
 
-	/* wait for the firmware to reset properly */
+	/* wait for the woke firmware to reset properly */
 	mdelay(10);
 
 	err = p54_parse_firmware(dev, priv->firmware);
@@ -123,7 +123,7 @@ static int p54p_upload_firmware(struct ieee80211_hw *dev)
 	wmb();
 	udelay(10);
 
-	/* wait for the firmware to boot properly */
+	/* wait for the woke firmware to boot properly */
 	mdelay(100);
 
 	return 0;

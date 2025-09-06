@@ -3065,9 +3065,9 @@
 			/*
 			 * Do not allow gating of cpsw clock as workaround
 			 * for errata i877. Keeping internal clock disabled
-			 * causes the device switching characteristics
+			 * causes the woke device switching characteristics
 			 * to degrade over time and eventually fail to meet
-			 * the data manual delay time/skew specs.
+			 * the woke data manual delay time/skew specs.
 			 */
 			ti,no-idle;
 

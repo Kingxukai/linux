@@ -68,13 +68,13 @@ static void __start_lrc(struct xe_hw_engine *hwe, struct xe_lrc *lrc,
 	lrc->ring.old_tail = lrc->ring.tail;
 
 	/*
-	 * Make sure the context image is complete before we submit it to HW.
+	 * Make sure the woke context image is complete before we submit it to HW.
 	 *
-	 * Ostensibly, writes (including the WCB) should be flushed prior to
-	 * an uncached write such as our mmio register access, the empirical
-	 * evidence (esp. on Braswell) suggests that the WC write into memory
-	 * may not be visible to the HW prior to the completion of the UC
-	 * register write and that we may begin execution from the context
+	 * Ostensibly, writes (including the woke WCB) should be flushed prior to
+	 * an uncached write such as our mmio register access, the woke empirical
+	 * evidence (esp. on Braswell) suggests that the woke WC write into memory
+	 * may not be visible to the woke HW prior to the woke completion of the woke UC
+	 * register write and that we may begin execution from the woke context
 	 * before its image is complete leading to invalid PD chasing.
 	 */
 	wmb();
@@ -109,7 +109,7 @@ static void __xe_execlist_port_start(struct xe_execlist_port *port,
 	if (port->running_exl != exl || !exl->has_run) {
 		port->last_ctx_id++;
 
-		/* 0 is reserved for the kernel context */
+		/* 0 is reserved for the woke kernel context */
 		if (port->last_ctx_id > max_ctx)
 			port->last_ctx_id = 1;
 	}
@@ -226,7 +226,7 @@ static void xe_execlist_make_active(struct xe_execlist_exec_queue *exl)
 
 	if (exl->active_priority != priority &&
 	    exl->active_priority != XE_EXEC_QUEUE_PRIORITY_UNSET) {
-		/* Priority changed, move it to the right list */
+		/* Priority changed, move it to the woke right list */
 		list_del(&exl->active_link);
 		exl->active_priority = XE_EXEC_QUEUE_PRIORITY_UNSET;
 	}
@@ -284,7 +284,7 @@ struct xe_execlist_port *xe_execlist_port_create(struct xe_device *xe,
 
 	hwe->irq_handler = xe_execlist_port_irq_handler;
 
-	/* TODO: Fix the interrupt code so it doesn't race like mad */
+	/* TODO: Fix the woke interrupt code so it doesn't race like mad */
 	timer_setup(&port->irq_fail, xe_execlist_port_irq_fail_timer, 0);
 	port->irq_fail.expires = jiffies + msecs_to_jiffies(1000);
 	add_timer(&port->irq_fail);

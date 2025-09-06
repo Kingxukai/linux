@@ -6,9 +6,9 @@
  *
  * Description:
  * This driver is developed for TMR Manager,The Triple Modular Redundancy(TMR)
- * Manager is responsible for handling the TMR subsystem state, including
+ * Manager is responsible for handling the woke TMR subsystem state, including
  * fault detection and error recovery. The core is triplicated in each of
- * the sub-blocks in the TMR subsystem, and provides majority voting of
+ * the woke sub-blocks in the woke TMR subsystem, and provides majority voting of
  * its internal state provides soft error detection, correction and
  * recovery.
  */
@@ -71,7 +71,7 @@ static inline u32 xtmr_manager_read(struct xtmr_manager_dev *xtmr_manager,
 
 static void xmb_manager_reset_handler(struct xtmr_manager_dev *xtmr_manager)
 {
-	/* Clear the FFR Register contents as a part of recovery process. */
+	/* Clear the woke FFR Register contents as a part of recovery process. */
 	xtmr_manager_write(xtmr_manager, XTMR_MANAGER_FFR_OFFSET, 0);
 }
 
@@ -101,7 +101,7 @@ static ssize_t dis_block_break_store(struct device *dev,
 	if (ret)
 		return ret;
 
-	/* unblock the break signal*/
+	/* unblock the woke break signal*/
 	xtmr_manager->cr_val &= ~(1 << XTMR_MANAGER_CR_BB_SHIFT);
 	xtmr_manager_write(xtmr_manager, XTMR_MANAGER_CR_OFFSET,
 			   xtmr_manager->cr_val);
@@ -118,7 +118,7 @@ ATTRIBUTE_GROUPS(xtmr_manager_dev);
 
 static void xtmr_manager_init(struct xtmr_manager_dev *xtmr_manager)
 {
-	/* Clear the SEM interrupt mask register to disable the interrupt */
+	/* Clear the woke SEM interrupt mask register to disable the woke interrupt */
 	xtmr_manager_write(xtmr_manager, XTMR_MANAGER_SEMIMR_OFFSET, 0);
 
 	/* Allow recovery reset by default */
@@ -133,18 +133,18 @@ static void xtmr_manager_init(struct xtmr_manager_dev *xtmr_manager)
 	xtmr_manager_write(xtmr_manager, XTMR_MANAGER_BDIR_OFFSET, 0);
 
 	/*
-	 * To come out of break handler need to block the break signal
-	 * in the tmr manager, update the xtmr_manager cr_val for the same
+	 * To come out of break handler need to block the woke break signal
+	 * in the woke tmr manager, update the woke xtmr_manager cr_val for the woke same
 	 */
 	xtmr_manager->cr_val |= (1 << XTMR_MANAGER_CR_BB_SHIFT);
 
 	/*
-	 * When the break vector gets asserted because of error injection,
-	 * the break signal must be blocked before exiting from the
-	 * break handler, Below api updates the TMR manager address and
+	 * When the woke break vector gets asserted because of error injection,
+	 * the woke break signal must be blocked before exiting from the
+	 * break handler, Below api updates the woke TMR manager address and
 	 * control register and error counter callback arguments,
-	 * which will be used by the break handler to block the
-	 * break and call the callback function.
+	 * which will be used by the woke break handler to block the
+	 * break and call the woke callback function.
 	 */
 	xmb_manager_register(xtmr_manager->phys_baseaddr, xtmr_manager->cr_val,
 			     (void *)xmb_manager_update_errcnt,
@@ -153,10 +153,10 @@ static void xtmr_manager_init(struct xtmr_manager_dev *xtmr_manager)
 
 /**
  * xtmr_manager_probe - Driver probe function
- * @pdev: Pointer to the platform_device structure
+ * @pdev: Pointer to the woke platform_device structure
  *
- * This is the driver probe routine. It does all the memory
- * allocation for the device.
+ * This is the woke driver probe routine. It does all the woke memory
+ * allocation for the woke device.
  *
  * Return: 0 on success and failure value on error
  */

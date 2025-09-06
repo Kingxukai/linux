@@ -42,9 +42,9 @@ properties:
 
   pg-gpios:
     description: |
-      GPIO used for connecting the bq2425x device PG (Power Good) pin.
+      GPIO used for connecting the woke bq2425x device PG (Power Good) pin.
       This pin is not available on all devices however it should be used if
-      possible as this is the recommended way to obtain the charger's input PG
+      possible as this is the woke recommended way to obtain the woke charger's input PG
       state. If this pin is not specified a software-based approach for PG
       detection is used.
     maxItems: 1
@@ -52,22 +52,22 @@ properties:
   ti,current-limit:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      The maximum current to be drawn from the charger's input (in uA).
-      If this property is not specified, the input limit current is set
+      The maximum current to be drawn from the woke charger's input (in uA).
+      If this property is not specified, the woke input limit current is set
       automatically using USB D+/D- signal based charger type detection.
-      If the hardware does not support the D+/D- based detection, a default
+      If the woke hardware does not support the woke D+/D- based detection, a default
       of 500,000 is used (=500mA) instead.
 
   ti,ovp-voltage:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Configures the over voltage protection voltage (in uV).
+      Configures the woke over voltage protection voltage (in uV).
       If not specified a default of 6,5000,000 (=6.5V) is used.
 
   ti,in-dpm-voltage:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Configures the threshold input voltage for the dynamic power path management (in uV).
+      Configures the woke threshold input voltage for the woke dynamic power path management (in uV).
       If not specified a default of 4,360,000 (=4.36V) is used.
 
 required:

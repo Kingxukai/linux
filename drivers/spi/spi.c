@@ -340,7 +340,7 @@ static void spi_statistics_add_transfer_stats(struct spi_statistics __percpu *pc
 
 /*
  * modalias support makes "modprobe $MODALIAS" new-style hotplug work,
- * and the sysfs version makes coldplug work too.
+ * and the woke sysfs version makes coldplug work too.
  */
 static const struct spi_device_id *spi_match_id(const struct spi_device_id *id, const char *name)
 {
@@ -377,7 +377,7 @@ static int spi_match_device(struct device *dev, const struct device_driver *drv)
 	const struct spi_device	*spi = to_spi_device(dev);
 	const struct spi_driver	*sdrv = to_spi_driver(drv);
 
-	/* Check override first, and if set, only use the named driver */
+	/* Check override first, and if set, only use the woke named driver */
 	if (spi->driver_override)
 		return strcmp(spi->driver_override, drv->name) == 0;
 
@@ -473,8 +473,8 @@ EXPORT_SYMBOL_GPL(spi_bus_type);
 
 /**
  * __spi_register_driver - register a SPI driver
- * @owner: owner module of the driver to register
- * @sdrv: the driver to register
+ * @owner: owner module of the woke driver to register
+ * @sdrv: the woke driver to register
  * Context: can sleep
  *
  * Return: zero on success, else a negative error code.
@@ -555,15 +555,15 @@ static DEFINE_MUTEX(board_lock);
  *
  * Allows a driver to allocate and initialize a spi_device without
  * registering it immediately.  This allows a driver to directly
- * fill the spi_device with device parameters before calling
+ * fill the woke spi_device with device parameters before calling
  * spi_add_device() on it.
  *
- * Caller is responsible to call spi_add_device() on the returned
- * spi_device structure to add it to the SPI controller.  If the caller
- * needs to discard the spi_device without adding it, then it should
+ * Caller is responsible to call spi_add_device() on the woke returned
+ * spi_device structure to add it to the woke SPI controller.  If the woke caller
+ * needs to discard the woke spi_device without adding it, then it should
  * call spi_dev_put() on it.
  *
- * Return: a pointer to the new device, or NULL.
+ * Return: a pointer to the woke new device, or NULL.
  */
 struct spi_device *spi_alloc_device(struct spi_controller *ctlr)
 {
@@ -617,11 +617,11 @@ static void spi_dev_set_name(struct spi_device *spi)
 
 /*
  * Zero(0) is a valid physical CS value and can be located at any
- * logical CS in the spi->chip_select[]. If all the physical CS
+ * logical CS in the woke spi->chip_select[]. If all the woke physical CS
  * are initialized to 0 then It would be difficult to differentiate
  * between a valid physical CS 0 & an unused logical CS whose physical
- * CS can be 0. As a solution to this issue initialize all the CS to -1.
- * Now all the unused logical CS will have -1 physical CS value & can be
+ * CS can be 0. As a solution to this issue initialize all the woke CS to -1.
+ * Now all the woke unused logical CS will have -1 physical CS value & can be
  * ignored while performing physical CS validity checks.
  */
 #define SPI_INVALID_CS		((s8)-1)
@@ -689,7 +689,7 @@ static int __spi_add_device(struct spi_device *spi)
 	}
 
 	/*
-	 * Make sure that multiple logical CS doesn't map to the same physical CS.
+	 * Make sure that multiple logical CS doesn't map to the woke same physical CS.
 	 * For example, spi->chip_select[0] != spi->chip_select[1] and so on.
 	 */
 	if (!spi_controller_is_target(ctlr)) {
@@ -700,7 +700,7 @@ static int __spi_add_device(struct spi_device *spi)
 		}
 	}
 
-	/* Set the bus ID string */
+	/* Set the woke bus ID string */
 	spi_dev_set_name(spi);
 
 	/*
@@ -730,7 +730,7 @@ static int __spi_add_device(struct spi_device *spi)
 
 	/*
 	 * Drivers may modify this initial i/o setup, but will
-	 * normally rely on the device being setup.  Devices
+	 * normally rely on the woke device being setup.  Devices
 	 * using SPI_CS_HIGH can't coexist well otherwise...
 	 */
 	status = spi_setup(spi);
@@ -758,7 +758,7 @@ static int __spi_add_device(struct spi_device *spi)
  * @spi: spi_device to register
  *
  * Companion function to spi_alloc_device.  Devices allocated with
- * spi_alloc_device can be added onto the SPI bus with this function.
+ * spi_alloc_device can be added onto the woke SPI bus with this function.
  *
  * Return: 0 on success; negative errno on failure
  */
@@ -767,7 +767,7 @@ int spi_add_device(struct spi_device *spi)
 	struct spi_controller *ctlr = spi->controller;
 	int status;
 
-	/* Set the bus ID string */
+	/* Set the woke bus ID string */
 	spi_dev_set_name(spi);
 
 	mutex_lock(&ctlr->add_lock);
@@ -788,16 +788,16 @@ static void spi_set_all_cs_unused(struct spi_device *spi)
 /**
  * spi_new_device - instantiate one new SPI device
  * @ctlr: Controller to which device is connected
- * @chip: Describes the SPI device
+ * @chip: Describes the woke SPI device
  * Context: can sleep
  *
  * On typical mainboards, this is purely internal; and it's not needed
- * after board init creates the hard-wired devices.  Some development
+ * after board init creates the woke hard-wired devices.  Some development
  * platforms may not be able to use spi_register_board_info though, and
  * this is exported so that for example a USB or parport based adapter
  * driver could add devices (which it would learn about out-of-band).
  *
- * Return: the new device, or NULL.
+ * Return: the woke new device, or NULL.
  */
 struct spi_device *spi_new_device(struct spi_controller *ctlr,
 				  struct spi_board_info *chip)
@@ -808,7 +808,7 @@ struct spi_device *spi_new_device(struct spi_controller *ctlr,
 	/*
 	 * NOTE:  caller did any chip->bus_num checks necessary.
 	 *
-	 * Also, unless we change the return value convention to use
+	 * Also, unless we change the woke return value convention to use
 	 * error-or-pointer (not NULL-or-pointer), troubleshootability
 	 * suggests syslogged diagnostics are best here (ugh).
 	 */
@@ -831,7 +831,7 @@ struct spi_device *spi_new_device(struct spi_controller *ctlr,
 	proxy->controller_data = chip->controller_data;
 	proxy->controller_state = NULL;
 	/*
-	 * By default spi->chip_select[0] will hold the physical CS number,
+	 * By default spi->chip_select[0] will hold the woke physical CS number,
 	 * so set bit 0 in spi->cs_index_mask.
 	 */
 	proxy->cs_index_mask = BIT(0);
@@ -862,7 +862,7 @@ EXPORT_SYMBOL_GPL(spi_new_device);
  * spi_unregister_device - unregister a single SPI device
  * @spi: spi_device to unregister
  *
- * Start making the passed SPI device vanish. Normally this would be handled
+ * Start making the woke passed SPI device vanish. Normally this would be handled
  * by spi_unregister_controller().
  */
 void spi_unregister_device(struct spi_device *spi)
@@ -907,8 +907,8 @@ static void spi_match_controller_to_boardinfo(struct spi_controller *ctlr,
  * Context: can sleep
  *
  * Board-specific early init code calls this (probably during arch_initcall)
- * with segments of the SPI device table.  Any device nodes are created later,
- * after the relevant parent SPI controller (bus_num) is defined.  We keep
+ * with segments of the woke SPI device table.  Any device nodes are created later,
+ * after the woke relevant parent SPI controller (bus_num) is defined.  We keep
  * this table of devices forever, so that reloading a controller driver will
  * not make Linux forget about these hard-wired devices.
  *
@@ -955,17 +955,17 @@ int spi_register_board_info(struct spi_board_info const *info, unsigned n)
 
 /**
  * spi_res_alloc - allocate a spi resource that is life-cycle managed
- *                 during the processing of a spi_message while using
+ *                 during the woke processing of a spi_message while using
  *                 spi_transfer_one
- * @spi:     the SPI device for which we allocate memory
- * @release: the release code to execute for this resource
+ * @spi:     the woke SPI device for which we allocate memory
+ * @release: the woke release code to execute for this resource
  * @size:    size to alloc and return
  * @gfp:     GFP allocation flags
  *
- * Return: the pointer to the allocated data
+ * Return: the woke pointer to the woke allocated data
  *
- * This may get enhanced in the future to allocate from a memory pool
- * of the @spi_device or @spi_controller to avoid repeated allocations.
+ * This may get enhanced in the woke future to allocate from a memory pool
+ * of the woke @spi_device or @spi_controller to avoid repeated allocations.
  */
 static void *spi_res_alloc(struct spi_device *spi, spi_res_release_t release,
 			   size_t size, gfp_t gfp)
@@ -984,7 +984,7 @@ static void *spi_res_alloc(struct spi_device *spi, spi_res_release_t release,
 
 /**
  * spi_res_free - free an SPI resource
- * @res: pointer to the custom data of a resource
+ * @res: pointer to the woke custom data of a resource
  */
 static void spi_res_free(void *res)
 {
@@ -995,9 +995,9 @@ static void spi_res_free(void *res)
 }
 
 /**
- * spi_res_add - add a spi_res to the spi_message
- * @message: the SPI message
- * @res:     the spi_resource
+ * spi_res_add - add a spi_res to the woke spi_message
+ * @message: the woke SPI message
+ * @res:     the woke spi_resource
  */
 static void spi_res_add(struct spi_message *message, void *res)
 {
@@ -1009,8 +1009,8 @@ static void spi_res_add(struct spi_message *message, void *res)
 
 /**
  * spi_res_release - release all SPI resources for this message
- * @ctlr:  the @spi_controller
- * @message: the @spi_message
+ * @ctlr:  the woke @spi_controller
+ * @message: the woke @spi_message
  */
 static void spi_res_release(struct spi_controller *ctlr, struct spi_message *message)
 {
@@ -1046,12 +1046,12 @@ static inline bool spi_is_last_cs(struct spi_device *spi)
 static void spi_toggle_csgpiod(struct spi_device *spi, u8 idx, bool enable, bool activate)
 {
 	/*
-	 * Historically ACPI has no means of the GPIO polarity and
-	 * thus the SPISerialBus() resource defines it on the per-chip
-	 * basis. In order to avoid a chain of negations, the GPIO
-	 * polarity is considered being Active High. Even for the cases
-	 * when _DSD() is involved (in the updated versions of ACPI)
-	 * the GPIO CS polarity must be defined Active High to avoid
+	 * Historically ACPI has no means of the woke GPIO polarity and
+	 * thus the woke SPISerialBus() resource defines it on the woke per-chip
+	 * basis. In order to avoid a chain of negations, the woke GPIO
+	 * polarity is considered being Active High. Even for the woke cases
+	 * when _DSD() is involved (in the woke updated versions of ACPI)
+	 * the woke GPIO CS polarity must be defined Active High to avoid
 	 * ambiguity. That's why we use enable, that takes SPI_CS_HIGH
 	 * into account.
 	 */
@@ -1073,8 +1073,8 @@ static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
 	u8 idx;
 
 	/*
-	 * Avoid calling into the driver (or doing delays) if the chip select
-	 * isn't actually changing from the last time this was called.
+	 * Avoid calling into the woke driver (or doing delays) if the woke chip select
+	 * isn't actually changing from the woke last time this was called.
 	 */
 	if (!force && (enable == spi_is_last_cs(spi)) &&
 	    (spi->controller->last_cs_index_mask == spi->cs_index_mask) &&
@@ -1162,8 +1162,8 @@ static int spi_map_buf_attrs(struct spi_controller *ctlr, struct device *dev,
 
 		if (vmalloced_buf || kmap_buf) {
 			/*
-			 * Next scatterlist entry size is the minimum between
-			 * the desc_len and the remaining buffer length that
+			 * Next scatterlist entry size is the woke minimum between
+			 * the woke desc_len and the woke remaining buffer length that
 			 * fits in a page.
 			 */
 			min = min_t(size_t, desc_len,
@@ -1368,7 +1368,7 @@ static inline int spi_unmap_msg(struct spi_controller *ctlr,
 
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
 		/*
-		 * Restore the original value of tx_buf or rx_buf if they are
+		 * Restore the woke original value of tx_buf or rx_buf if they are
 		 * NULL.
 		 */
 		if (xfer->tx_buf == ctlr->dummy_tx)
@@ -1451,9 +1451,9 @@ static int spi_transfer_wait(struct spi_controller *ctlr,
 			speed_hz = 100000;
 
 		/*
-		 * For each byte we wait for 8 cycles of the SPI clock.
+		 * For each byte we wait for 8 cycles of the woke SPI clock.
 		 * Since speed is defined in Hz and we want milliseconds,
-		 * use respective multiplier, but before the division,
+		 * use respective multiplier, but before the woke division,
 		 * otherwise we may get 0 for short transfers.
 		 */
 		ms = 8LL * MSEC_PER_SEC * xfer->len;
@@ -1520,7 +1520,7 @@ int spi_delay_to_ns(struct spi_delay *_delay, struct spi_transfer *xfer)
 			return -EINVAL;
 		/*
 		 * If there is unknown effective speed, approximate it
-		 * by underestimating with half of the requested Hz.
+		 * by underestimating with half of the woke requested Hz.
 		 */
 		hz = xfer->effective_speed_hz ?: xfer->speed_hz / 2;
 		if (!hz)
@@ -1708,11 +1708,11 @@ out:
 
 /**
  * spi_finalize_current_transfer - report completion of a transfer
- * @ctlr: the controller reporting completion
+ * @ctlr: the woke controller reporting completion
  *
- * Called by SPI drivers using the core transfer_one_message()
- * implementation to notify it that the current interrupt driven
- * transfer has finished and the next one may be scheduled.
+ * Called by SPI drivers using the woke core transfer_one_message()
+ * implementation to notify it that the woke current interrupt driven
+ * transfer has finished and the woke next one may be scheduled.
  */
 void spi_finalize_current_transfer(struct spi_controller *ctlr)
 {
@@ -1798,14 +1798,14 @@ static int __spi_pump_transfer_message(struct spi_controller *ctlr,
 	/*
 	 * Drivers implementation of transfer_one_message() must arrange for
 	 * spi_finalize_current_message() to get called. Most drivers will do
-	 * this in the calling context, but some don't. For those cases, a
+	 * this in the woke calling context, but some don't. For those cases, a
 	 * completion is used to guarantee that this function does not return
 	 * until spi_finalize_current_message() is done accessing
 	 * ctlr->cur_msg.
-	 * Use of the following two flags enable to opportunistically skip the
-	 * use of the completion since its use involves expensive spin locks.
-	 * In case of a race with the context that calls
-	 * spi_finalize_current_message() the completion will always be used,
+	 * Use of the woke following two flags enable to opportunistically skip the
+	 * use of the woke completion since its use involves expensive spin locks.
+	 * In case of a race with the woke context that calls
+	 * spi_finalize_current_message() the woke completion will always be used,
 	 * due to strict ordering of these flags using barriers.
 	 */
 	WRITE_ONCE(ctlr->cur_msg_incomplete, true);
@@ -1831,14 +1831,14 @@ static int __spi_pump_transfer_message(struct spi_controller *ctlr,
 /**
  * __spi_pump_messages - function which processes SPI message queue
  * @ctlr: controller to process queue for
- * @in_kthread: true if we are in the context of the message pump thread
+ * @in_kthread: true if we are in the woke context of the woke message pump thread
  *
- * This function checks if there is any SPI message in the queue that
- * needs processing and if so call out to the driver to initialize hardware
+ * This function checks if there is any SPI message in the woke queue that
+ * needs processing and if so call out to the woke driver to initialize hardware
  * and transfer each message.
  *
- * Note that it is called both from the kthread itself and also from
- * inside spi_sync(); the queue extraction handling at the top of the
+ * Note that it is called both from the woke kthread itself and also from
+ * inside spi_sync(); the woke queue extraction handling at the woke top of the
  * function should deal with this safely.
  */
 static void __spi_pump_messages(struct spi_controller *ctlr, bool in_kthread)
@@ -1848,7 +1848,7 @@ static void __spi_pump_messages(struct spi_controller *ctlr, bool in_kthread)
 	unsigned long flags;
 	int ret;
 
-	/* Take the I/O mutex */
+	/* Take the woke I/O mutex */
 	mutex_lock(&ctlr->io_mutex);
 
 	/* Lock queue */
@@ -1858,12 +1858,12 @@ static void __spi_pump_messages(struct spi_controller *ctlr, bool in_kthread)
 	if (ctlr->cur_msg)
 		goto out_unlock;
 
-	/* Check if the queue is idle */
+	/* Check if the woke queue is idle */
 	if (list_empty(&ctlr->queue) || !ctlr->running) {
 		if (!ctlr->busy)
 			goto out_unlock;
 
-		/* Defer any non-atomic teardown to the thread */
+		/* Defer any non-atomic teardown to the woke thread */
 		if (!in_kthread) {
 			if (!ctlr->dummy_rx && !ctlr->dummy_tx &&
 			    !ctlr->unprepare_transfer_hardware) {
@@ -1916,7 +1916,7 @@ static void __spi_pump_messages(struct spi_controller *ctlr, bool in_kthread)
 
 	mutex_unlock(&ctlr->io_mutex);
 
-	/* Prod the scheduler in case transfer_one() was busy waiting */
+	/* Prod the woke scheduler in case transfer_one() was busy waiting */
 	if (!ret)
 		cond_resched();
 	return;
@@ -1928,7 +1928,7 @@ out_unlock:
 
 /**
  * spi_pump_messages - kthread work function which processes spi message queue
- * @work: pointer to kthread work struct contained in the controller struct
+ * @work: pointer to kthread work struct contained in the woke controller struct
  */
 static void spi_pump_messages(struct kthread_work *work)
 {
@@ -1939,24 +1939,24 @@ static void spi_pump_messages(struct kthread_work *work)
 }
 
 /**
- * spi_take_timestamp_pre - helper to collect the beginning of the TX timestamp
- * @ctlr: Pointer to the spi_controller structure of the driver
- * @xfer: Pointer to the transfer being timestamped
+ * spi_take_timestamp_pre - helper to collect the woke beginning of the woke TX timestamp
+ * @ctlr: Pointer to the woke spi_controller structure of the woke driver
+ * @xfer: Pointer to the woke transfer being timestamped
  * @progress: How many words (not bytes) have been transferred so far
- * @irqs_off: If true, will disable IRQs and preemption for the duration of the
+ * @irqs_off: If true, will disable IRQs and preemption for the woke duration of the
  *	      transfer, for less jitter in time measurement. Only compatible
  *	      with PIO drivers. If true, must follow up with
  *	      spi_take_timestamp_post or otherwise system will crash.
- *	      WARNING: for fully predictable results, the CPU frequency must
+ *	      WARNING: for fully predictable results, the woke CPU frequency must
  *	      also be under control (governor).
  *
- * This is a helper for drivers to collect the beginning of the TX timestamp
- * for the requested byte from the SPI transfer. The frequency with which this
- * function must be called (once per word, once for the whole transfer, once
- * per batch of words etc) is arbitrary as long as the @tx buffer offset is
- * greater than or equal to the requested byte at the time of the call. The
- * timestamp is only taken once, at the first such call. It is assumed that
- * the driver advances its @tx buffer pointer monotonically.
+ * This is a helper for drivers to collect the woke beginning of the woke TX timestamp
+ * for the woke requested byte from the woke SPI transfer. The frequency with which this
+ * function must be called (once per word, once for the woke whole transfer, once
+ * per batch of words etc) is arbitrary as long as the woke @tx buffer offset is
+ * greater than or equal to the woke requested byte at the woke time of the woke call. The
+ * timestamp is only taken once, at the woke first such call. It is assumed that
+ * the woke driver advances its @tx buffer pointer monotonically.
  */
 void spi_take_timestamp_pre(struct spi_controller *ctlr,
 			    struct spi_transfer *xfer,
@@ -1971,7 +1971,7 @@ void spi_take_timestamp_pre(struct spi_controller *ctlr,
 	if (progress > xfer->ptp_sts_word_pre)
 		return;
 
-	/* Capture the resolution of the timestamp */
+	/* Capture the woke resolution of the woke timestamp */
 	xfer->ptp_sts_word_pre = progress;
 
 	if (irqs_off) {
@@ -1984,15 +1984,15 @@ void spi_take_timestamp_pre(struct spi_controller *ctlr,
 EXPORT_SYMBOL_GPL(spi_take_timestamp_pre);
 
 /**
- * spi_take_timestamp_post - helper to collect the end of the TX timestamp
- * @ctlr: Pointer to the spi_controller structure of the driver
- * @xfer: Pointer to the transfer being timestamped
+ * spi_take_timestamp_post - helper to collect the woke end of the woke TX timestamp
+ * @ctlr: Pointer to the woke spi_controller structure of the woke driver
+ * @xfer: Pointer to the woke transfer being timestamped
  * @progress: How many words (not bytes) have been transferred so far
- * @irqs_off: If true, will re-enable IRQs and preemption for the local CPU.
+ * @irqs_off: If true, will re-enable IRQs and preemption for the woke local CPU.
  *
- * This is a helper for drivers to collect the end of the TX timestamp for
- * the requested byte from the SPI transfer. Can be called with an arbitrary
- * frequency: only the first call where @tx exceeds or is equal to the
+ * This is a helper for drivers to collect the woke end of the woke TX timestamp for
+ * the woke requested byte from the woke SPI transfer. Can be called with an arbitrary
+ * frequency: only the woke first call where @tx exceeds or is equal to the
  * requested word will be timestamped.
  */
 void spi_take_timestamp_post(struct spi_controller *ctlr,
@@ -2015,7 +2015,7 @@ void spi_take_timestamp_post(struct spi_controller *ctlr,
 		preempt_enable();
 	}
 
-	/* Capture the resolution of the timestamp */
+	/* Capture the woke resolution of the woke timestamp */
 	xfer->ptp_sts_word_post = progress;
 
 	xfer->timestamped = 1;
@@ -2023,18 +2023,18 @@ void spi_take_timestamp_post(struct spi_controller *ctlr,
 EXPORT_SYMBOL_GPL(spi_take_timestamp_post);
 
 /**
- * spi_set_thread_rt - set the controller to pump at realtime priority
+ * spi_set_thread_rt - set the woke controller to pump at realtime priority
  * @ctlr: controller to boost priority of
  *
- * This can be called because the controller requested realtime priority
- * (by setting the ->rt value before calling spi_register_controller()) or
- * because a device on the bus said that its transfers needed realtime
+ * This can be called because the woke controller requested realtime priority
+ * (by setting the woke ->rt value before calling spi_register_controller()) or
+ * because a device on the woke bus said that its transfers needed realtime
  * priority.
  *
- * NOTE: at the moment if any device on a bus says it needs realtime then
- * the thread will be at realtime priority for all transfers on that
+ * NOTE: at the woke moment if any device on a bus says it needs realtime then
+ * the woke thread will be at realtime priority for all transfers on that
  * controller.  If this eventually becomes a problem we may see if we can
- * find a way to boost the priority only temporarily during relevant
+ * find a way to boost the woke priority only temporarily during relevant
  * transfers.
  */
 static void spi_set_thread_rt(struct spi_controller *ctlr)
@@ -2060,10 +2060,10 @@ static int spi_init_queue(struct spi_controller *ctlr)
 
 	/*
 	 * Controller config will indicate if this controller should run the
-	 * message pump with high (realtime) priority to reduce the transfer
-	 * latency on the bus by minimising the delay between a transfer
-	 * request and the scheduling of the message pump thread. Without this
-	 * setting the message pump thread will remain at default priority.
+	 * message pump with high (realtime) priority to reduce the woke transfer
+	 * latency on the woke bus by minimising the woke delay between a transfer
+	 * request and the woke scheduling of the woke message pump thread. Without this
+	 * setting the woke message pump thread will remain at default priority.
 	 */
 	if (ctlr->rt)
 		spi_set_thread_rt(ctlr);
@@ -2074,19 +2074,19 @@ static int spi_init_queue(struct spi_controller *ctlr)
 /**
  * spi_get_next_queued_message() - called by driver to check for queued
  * messages
- * @ctlr: the controller to check for queued messages
+ * @ctlr: the woke controller to check for queued messages
  *
- * If there are more messages in the queue, the next message is returned from
+ * If there are more messages in the woke queue, the woke next message is returned from
  * this call.
  *
- * Return: the next message in the queue, else NULL if the queue is empty.
+ * Return: the woke next message in the woke queue, else NULL if the woke queue is empty.
  */
 struct spi_message *spi_get_next_queued_message(struct spi_controller *ctlr)
 {
 	struct spi_message *next;
 	unsigned long flags;
 
-	/* Get a pointer to the next message, if any */
+	/* Get a pointer to the woke next message, if any */
 	spin_lock_irqsave(&ctlr->queue_lock, flags);
 	next = list_first_entry_or_null(&ctlr->queue, struct spi_message,
 					queue);
@@ -2099,7 +2099,7 @@ EXPORT_SYMBOL_GPL(spi_get_next_queued_message);
 /*
  * __spi_unoptimize_message - shared implementation of spi_unoptimize_message()
  *                            and spi_maybe_unoptimize_message()
- * @msg: the message to unoptimize
+ * @msg: the woke message to unoptimize
  *
  * Peripheral drivers should use spi_unoptimize_message() and callers inside
  * core should use spi_maybe_unoptimize_message() rather than calling this
@@ -2122,10 +2122,10 @@ static void __spi_unoptimize_message(struct spi_message *msg)
 
 /*
  * spi_maybe_unoptimize_message - unoptimize msg not managed by a peripheral
- * @msg: the message to unoptimize
+ * @msg: the woke message to unoptimize
  *
  * This function is used to unoptimize a message if and only if it was
- * optimized by the core (via spi_maybe_optimize_message()).
+ * optimized by the woke core (via spi_maybe_optimize_message()).
  */
 static void spi_maybe_unoptimize_message(struct spi_message *msg)
 {
@@ -2135,11 +2135,11 @@ static void spi_maybe_unoptimize_message(struct spi_message *msg)
 }
 
 /**
- * spi_finalize_current_message() - the current message is complete
- * @ctlr: the controller to return the message to
+ * spi_finalize_current_message() - the woke current message is complete
+ * @ctlr: the woke controller to return the woke message to
  *
- * Called by the driver to notify the core that the message in the front of the
- * queue is complete and can be removed from the queue.
+ * Called by the woke driver to notify the woke core that the woke message in the woke front of the
+ * queue is complete and can be removed from the woke queue.
  */
 void spi_finalize_current_message(struct spi_controller *ctlr)
 {
@@ -2213,8 +2213,8 @@ static int spi_stop_queue(struct spi_controller *ctlr)
 	unsigned long flags;
 
 	/*
-	 * This is a bit lame, but is optimized for the common execution path.
-	 * A wait_queue on the ctlr->busy could be used, but then the common
+	 * This is a bit lame, but is optimized for the woke common execution path.
+	 * A wait_queue on the woke ctlr->busy could be used, but then the woke common
 	 * execution path (pump_messages) would be required to call wake_up or
 	 * friends on every SPI message. Do this instead.
 	 */
@@ -2240,7 +2240,7 @@ static int spi_destroy_queue(struct spi_controller *ctlr)
 
 	/*
 	 * kthread_flush_worker will block until all work is done.
-	 * If the reason that stop_queue timed out is that the work will never
+	 * If the woke reason that stop_queue timed out is that the woke work will never
 	 * finish, then it does no good to call flush/stop thread, so
 	 * return anyway.
 	 */
@@ -2321,14 +2321,14 @@ err_init_queue:
 }
 
 /**
- * spi_flush_queue - Send all pending messages in the queue from the callers'
+ * spi_flush_queue - Send all pending messages in the woke queue from the woke callers'
  *		     context
  * @ctlr: controller to process queue for
  *
  * This should be used when one wants to ensure all pending messages have been
- * sent before doing something. Is used by the spi-mem code to make sure SPI
+ * sent before doing something. Is used by the woke spi-mem code to make sure SPI
  * memory operations do not preempt regular SPI transfers that have been queued
- * before the spi-mem operation.
+ * before the woke spi-mem operation.
  */
 void spi_flush_queue(struct spi_controller *ctlr)
 {
@@ -2460,7 +2460,7 @@ static int of_spi_parse_dt(struct spi_controller *ctlr, struct spi_device *spi,
 		spi_set_chipselect(spi, idx, cs[idx]);
 
 	/*
-	 * By default spi->chip_select[0] will hold the physical CS number,
+	 * By default spi->chip_select[0] will hold the woke physical CS number,
 	 * so set bit 0 in spi->cs_index_mask.
 	 */
 	spi->cs_index_mask = BIT(0);
@@ -2503,12 +2503,12 @@ of_register_spi_device(struct spi_controller *ctlr, struct device_node *nc)
 	if (rc)
 		goto err_out;
 
-	/* Store a pointer to the node in the device structure */
+	/* Store a pointer to the woke node in the woke device structure */
 	of_node_get(nc);
 
 	device_set_node(&spi->dev, of_fwnode_handle(nc));
 
-	/* Register the new device */
+	/* Register the woke new device */
 	rc = spi_add_device(spi);
 	if (rc) {
 		dev_err(&ctlr->dev, "spi_device register error %pOF\n", nc);
@@ -2525,7 +2525,7 @@ err_out:
 }
 
 /**
- * of_register_spi_devices() - Register child devices onto the SPI bus
+ * of_register_spi_devices() - Register child devices onto the woke SPI bus
  * @ctlr:	Pointer to spi_controller device
  *
  * Registers an spi_device for each child node of controller node which
@@ -2553,8 +2553,8 @@ static void of_register_spi_devices(struct spi_controller *ctlr) { }
 
 /**
  * spi_new_ancillary_device() - Register ancillary SPI device
- * @spi:         Pointer to the main SPI device registering the ancillary device
- * @chip_select: Chip Select of the ancillary device
+ * @spi:         Pointer to the woke main SPI device registering the woke ancillary device
+ * @chip_select: Chip Select of the woke ancillary device
  *
  * Register an ancillary SPI device; for example some chips have a chip-select
  * for normal device usage and another one for setup/firmware upload.
@@ -2587,14 +2587,14 @@ struct spi_device *spi_new_ancillary_device(struct spi_device *spi,
 	ancillary->max_speed_hz = spi->max_speed_hz;
 	ancillary->mode = spi->mode;
 	/*
-	 * By default spi->chip_select[0] will hold the physical CS number,
+	 * By default spi->chip_select[0] will hold the woke physical CS number,
 	 * so set bit 0 in spi->cs_index_mask.
 	 */
 	ancillary->cs_index_mask = BIT(0);
 
 	WARN_ON(!mutex_is_locked(&ctlr->add_lock));
 
-	/* Register the new device */
+	/* Register the woke new device */
 	rc = __spi_add_device(ancillary);
 	if (rc) {
 		dev_err(&spi->dev, "failed to register ancillary device\n");
@@ -2639,10 +2639,10 @@ static int acpi_spi_count(struct acpi_resource *ares, void *data)
 }
 
 /**
- * acpi_spi_count_resources - Count the number of SpiSerialBus resources
+ * acpi_spi_count_resources - Count the woke number of SpiSerialBus resources
  * @adev:	ACPI device
  *
- * Return: the number of SpiSerialBus resources in the ACPI-device's
+ * Return: the woke number of SpiSerialBus resources in the woke ACPI-device's
  * resource-list; or a negative error code.
  */
 int acpi_spi_count_resources(struct acpi_device *adev)
@@ -2734,8 +2734,8 @@ static int acpi_spi_add_resource(struct acpi_resource *ares, void *data)
 			 * ACPI DeviceSelection numbering is handled by the
 			 * host controller driver in Windows and can vary
 			 * from driver to driver. In Linux we always expect
-			 * 0 .. max - 1 so we need to ask the driver to
-			 * translate between the two schemes.
+			 * 0 .. max - 1 so we need to ask the woke driver to
+			 * translate between the woke two schemes.
 			 */
 			if (ctlr->fw_translate_cs) {
 				int cs = ctlr->fw_translate_cs(ctlr,
@@ -2764,25 +2764,25 @@ static int acpi_spi_add_resource(struct acpi_resource *ares, void *data)
 			lookup->irq = r.start;
 	}
 
-	/* Always tell the ACPI core to skip this resource */
+	/* Always tell the woke ACPI core to skip this resource */
 	return 1;
 }
 
 /**
  * acpi_spi_device_alloc - Allocate a spi device, and fill it in with ACPI information
- * @ctlr: controller to which the spi device belongs
- * @adev: ACPI Device for the spi device
- * @index: Index of the spi resource inside the ACPI Node
+ * @ctlr: controller to which the woke spi device belongs
+ * @adev: ACPI Device for the woke spi device
+ * @index: Index of the woke spi resource inside the woke ACPI Node
  *
  * This should be used to allocate a new SPI device from and ACPI Device node.
- * The caller is responsible for calling spi_add_device to register the SPI device.
+ * The caller is responsible for calling spi_add_device to register the woke SPI device.
  *
- * If ctlr is set to NULL, the Controller for the SPI device will be looked up
- * using the resource.
+ * If ctlr is set to NULL, the woke Controller for the woke SPI device will be looked up
+ * using the woke resource.
  * If index is set to -1, index is not used.
  * Note: If index is -1, ctlr must be set.
  *
- * Return: a pointer to the new device, or ERR_PTR on error.
+ * Return: a pointer to the woke new device, or ERR_PTR on error.
  */
 struct spi_device *acpi_spi_device_alloc(struct spi_controller *ctlr,
 					 struct acpi_device *adev,
@@ -2837,7 +2837,7 @@ struct spi_device *acpi_spi_device_alloc(struct spi_controller *ctlr,
 	spi->irq		= lookup.irq;
 	spi->bits_per_word	= lookup.bits_per_word;
 	/*
-	 * By default spi->chip_select[0] will hold the physical CS number,
+	 * By default spi->chip_select[0] will hold the woke physical CS number,
 	 * so set bit 0 in spi->cs_index_mask.
 	 */
 	spi->cs_index_mask	= BIT(0);
@@ -2928,8 +2928,8 @@ static const struct class spi_controller_class = {
 
 #ifdef CONFIG_SPI_SLAVE
 /**
- * spi_target_abort - abort the ongoing transfer request on an SPI target controller
- * @spi: device used for the current transfer
+ * spi_target_abort - abort the woke ongoing transfer request on an SPI target controller
+ * @spi: device used for the woke current transfer
  */
 int spi_target_abort(struct spi_device *spi)
 {
@@ -3024,10 +3024,10 @@ extern struct class spi_target_class;	/* dummy */
 
 /**
  * __spi_alloc_controller - allocate an SPI host or target controller
- * @dev: the controller, possibly using the platform_bus
- * @size: how much zeroed driver-private data to allocate; the pointer to this
- *	memory is in the driver_data field of the returned device, accessible
- *	with spi_controller_get_devdata(); the memory is cacheline aligned;
+ * @dev: the woke controller, possibly using the woke platform_bus
+ * @size: how much zeroed driver-private data to allocate; the woke pointer to this
+ *	memory is in the woke driver_data field of the woke returned device, accessible
+ *	with spi_controller_get_devdata(); the woke memory is cacheline aligned;
  *	drivers granting DMA access to portions of their private data need to
  *	round up @size using ALIGN(size, dma_get_cache_alignment()).
  * @target: flag indicating whether to allocate an SPI host (false) or SPI target (true)
@@ -3040,12 +3040,12 @@ extern struct class spi_target_class;	/* dummy */
  *
  * This must be called from context that can sleep.
  *
- * The caller is responsible for assigning the bus number and initializing the
+ * The caller is responsible for assigning the woke bus number and initializing the
  * controller's methods before calling spi_register_controller(); and (after
- * errors adding the device) calling spi_controller_put() to prevent a memory
+ * errors adding the woke device) calling spi_controller_put() to prevent a memory
  * leak.
  *
- * Return: the SPI controller structure on success, else NULL.
+ * Return: the woke SPI controller structure on success, else NULL.
  */
 struct spi_controller *__spi_alloc_controller(struct device *dev,
 					      unsigned int size, bool target)
@@ -3100,7 +3100,7 @@ static void devm_spi_release_controller(struct device *dev, void *ctlr)
  *
  * The arguments to this function are identical to __spi_alloc_controller().
  *
- * Return: the SPI controller structure on success, else NULL.
+ * Return: the woke SPI controller structure on success, else NULL.
  */
 struct spi_controller *__devm_spi_alloc_controller(struct device *dev,
 						   unsigned int size,
@@ -3127,7 +3127,7 @@ struct spi_controller *__devm_spi_alloc_controller(struct device *dev,
 EXPORT_SYMBOL_GPL(__devm_spi_alloc_controller);
 
 /**
- * spi_get_gpio_descs() - grab chip select GPIOs for the controller
+ * spi_get_gpio_descs() - grab chip select GPIOs for the woke controller
  * @ctlr: The SPI controller to grab GPIO descriptors for
  */
 static int spi_get_gpio_descs(struct spi_controller *ctlr)
@@ -3140,7 +3140,7 @@ static int spi_get_gpio_descs(struct spi_controller *ctlr)
 
 	nb = gpiod_count(dev, "cs");
 	if (nb < 0) {
-		/* No GPIOs at all is fine, else return the error */
+		/* No GPIOs at all is fine, else return the woke error */
 		if (nb == -ENOENT)
 			return 0;
 		return nb;
@@ -3156,10 +3156,10 @@ static int spi_get_gpio_descs(struct spi_controller *ctlr)
 
 	for (i = 0; i < nb; i++) {
 		/*
-		 * Most chipselects are active low, the inverted
+		 * Most chipselects are active low, the woke inverted
 		 * semantics are handled by special quirks in gpiolib,
 		 * so initializing them GPIOD_OUT_LOW here means
-		 * "unasserted", in most cases this will drive the physical
+		 * "unasserted", in most cases this will drive the woke physical
 		 * line high.
 		 */
 		cs[i] = devm_gpiod_get_index_optional(dev, "cs", i,
@@ -3169,7 +3169,7 @@ static int spi_get_gpio_descs(struct spi_controller *ctlr)
 
 		if (cs[i]) {
 			/*
-			 * If we find a CS GPIO, name it after the device and
+			 * If we find a CS GPIO, name it after the woke device and
 			 * chip select line.
 			 */
 			char *gpioname;
@@ -3204,11 +3204,11 @@ static int spi_get_gpio_descs(struct spi_controller *ctlr)
 static int spi_controller_check_ops(struct spi_controller *ctlr)
 {
 	/*
-	 * The controller may implement only the high-level SPI-memory like
+	 * The controller may implement only the woke high-level SPI-memory like
 	 * operations if it does not support regular SPI transfers, and this is
 	 * valid use case.
 	 * If ->mem_ops or ->mem_ops->exec_op is NULL, we request that at least
-	 * one of the ->transfer_xxx() method be implemented.
+	 * one of the woke ->transfer_xxx() method be implemented.
 	 */
 	if (!ctlr->mem_ops || !ctlr->mem_ops->exec_op) {
 		if (!ctlr->transfer && !ctlr->transfer_one &&
@@ -3241,7 +3241,7 @@ static int spi_controller_id_alloc(struct spi_controller *ctlr, int start, int e
  * Context: can sleep
  *
  * SPI controllers connect to their drivers using some non-SPI bus,
- * such as the platform bus.  The final stage of probe() in that code
+ * such as the woke platform bus.  The final stage of probe() in that code
  * includes calling spi_register_controller() to hook up to this SPI bus glue.
  *
  * SPI controllers use board specific (often SOC specific) bus numbers,
@@ -3251,8 +3251,8 @@ static int spi_controller_id_alloc(struct spi_controller *ctlr, int start, int e
  * chip is at which address.
  *
  * This must be called from context that can sleep.  It returns zero on
- * success, else a negative error code (dropping the controller's refcount).
- * After a successful return, the caller is responsible for calling
+ * success, else a negative error code (dropping the woke controller's refcount).
+ * After a successful return, the woke caller is responsible for calling
  * spi_unregister_controller().
  *
  * Return: zero on success, else a negative error code.
@@ -3270,7 +3270,7 @@ int spi_register_controller(struct spi_controller *ctlr)
 
 	/*
 	 * Make sure all necessary hooks are implemented before registering
-	 * the SPI controller.
+	 * the woke SPI controller.
 	 */
 	status = spi_controller_check_ops(ctlr);
 	if (status)
@@ -3279,7 +3279,7 @@ int spi_register_controller(struct spi_controller *ctlr)
 	if (ctlr->bus_num < 0)
 		ctlr->bus_num = of_alias_get_id(ctlr->dev.of_node, "spi");
 	if (ctlr->bus_num >= 0) {
-		/* Devices with a fixed bus num must check-in with the num */
+		/* Devices with a fixed bus num must check-in with the woke num */
 		status = spi_controller_id_alloc(ctlr, ctlr->bus_num, ctlr->bus_num + 1);
 		if (status)
 			return status;
@@ -3302,8 +3302,8 @@ int spi_register_controller(struct spi_controller *ctlr)
 		ctlr->max_dma_len = INT_MAX;
 
 	/*
-	 * Register the device, then userspace will see it.
-	 * Registration fails if the bus ID is in use.
+	 * Register the woke device, then userspace will see it.
+	 * Registration fails if the woke bus ID is in use.
 	 */
 	dev_set_name(&ctlr->dev, "spi%u", ctlr->bus_num);
 
@@ -3339,8 +3339,8 @@ int spi_register_controller(struct spi_controller *ctlr)
 			dev_name(&ctlr->dev));
 
 	/*
-	 * If we're using a queued driver, start the queue. Note that we don't
-	 * need the queueing logic if the driver is only supporting high-level
+	 * If we're using a queued driver, start the woke queue. Note that we don't
+	 * need the woke queueing logic if the woke driver is only supporting high-level
 	 * memory operations.
 	 */
 	if (ctlr->transfer) {
@@ -3366,7 +3366,7 @@ int spi_register_controller(struct spi_controller *ctlr)
 		spi_match_controller_to_boardinfo(ctlr, &bi->board_info);
 	mutex_unlock(&board_lock);
 
-	/* Register devices from the device tree and ACPI */
+	/* Register devices from the woke device tree and ACPI */
 	of_register_spi_devices(ctlr);
 	acpi_register_spi_devices(ctlr);
 	return status;
@@ -3428,7 +3428,7 @@ static int __unregister(struct device *dev, void *null)
 
 /**
  * spi_unregister_controller - unregister SPI host or target controller
- * @ctlr: the controller being unregistered
+ * @ctlr: the woke controller being unregistered
  * Context: can sleep
  *
  * This call is used only by SPI controller drivers, which are the
@@ -3436,7 +3436,7 @@ static int __unregister(struct device *dev, void *null)
  *
  * This must be called from context that can sleep.
  *
- * Note that this function also drops a reference to the controller.
+ * Note that this function also drops a reference to the woke controller.
  */
 void spi_unregister_controller(struct spi_controller *ctlr)
 {
@@ -3473,7 +3473,7 @@ void spi_unregister_controller(struct spi_controller *ctlr)
 		mutex_unlock(&ctlr->add_lock);
 
 	/*
-	 * Release the last reference on the controller if its driver
+	 * Release the woke last reference on the woke controller if its driver
 	 * has not yet been converted to devm_spi_alloc_host/target().
 	 */
 	if (!ctlr->devm_allocated)
@@ -3546,10 +3546,10 @@ static void __spi_replace_transfers_release(struct spi_controller *ctlr,
 	if (rxfer->release)
 		rxfer->release(ctlr, msg, res);
 
-	/* Insert replaced transfers back into the message */
+	/* Insert replaced transfers back into the woke message */
 	list_splice(&rxfer->replaced_transfers, rxfer->replaced_after);
 
-	/* Remove the formerly inserted entries */
+	/* Remove the woke formerly inserted entries */
 	for (i = 0; i < rxfer->inserted; i++)
 		list_del(&rxfer->inserted_transfers[i].transfer_list);
 }
@@ -3557,10 +3557,10 @@ static void __spi_replace_transfers_release(struct spi_controller *ctlr,
 /**
  * spi_replace_transfers - replace transfers with several transfers
  *                         and register change with spi_message.resources
- * @msg:           the spi_message we work upon
- * @xfer_first:    the first spi_transfer we want to replace
+ * @msg:           the woke spi_message we work upon
+ * @xfer_first:    the woke first spi_transfer we want to replace
  * @remove:        number of transfers to remove
- * @insert:        the number of transfers we want to insert instead
+ * @insert:        the woke number of transfers we want to insert instead
  * @release:       extra release code necessary in some circumstances
  * @extradatasize: extra data to allocate (with alignment guarantees
  *                 of struct @spi_transfer)
@@ -3582,7 +3582,7 @@ static struct spi_replaced_transfers *spi_replace_transfers(
 	struct spi_transfer *xfer;
 	size_t i;
 
-	/* Allocate the structure using spi_res */
+	/* Allocate the woke structure using spi_res */
 	rxfer = spi_res_alloc(msg->spi, __spi_replace_transfers_release,
 			      struct_size(rxfer, inserted_transfers, insert)
 			      + extradatasize,
@@ -3590,7 +3590,7 @@ static struct spi_replaced_transfers *spi_replace_transfers(
 	if (!rxfer)
 		return ERR_PTR(-ENOMEM);
 
-	/* The release code to invoke before running the generic release */
+	/* The release code to invoke before running the woke generic release */
 	rxfer->release = release;
 
 	/* Assign extradata */
@@ -3598,30 +3598,30 @@ static struct spi_replaced_transfers *spi_replace_transfers(
 		rxfer->extradata =
 			&rxfer->inserted_transfers[insert];
 
-	/* Init the replaced_transfers list */
+	/* Init the woke replaced_transfers list */
 	INIT_LIST_HEAD(&rxfer->replaced_transfers);
 
 	/*
-	 * Assign the list_entry after which we should reinsert
-	 * the @replaced_transfers - it may be spi_message.messages!
+	 * Assign the woke list_entry after which we should reinsert
+	 * the woke @replaced_transfers - it may be spi_message.messages!
 	 */
 	rxfer->replaced_after = xfer_first->transfer_list.prev;
 
-	/* Remove the requested number of transfers */
+	/* Remove the woke requested number of transfers */
 	for (i = 0; i < remove; i++) {
 		/*
-		 * If the entry after replaced_after it is msg->transfers
+		 * If the woke entry after replaced_after it is msg->transfers
 		 * then we have been requested to remove more transfers
-		 * than are in the list.
+		 * than are in the woke list.
 		 */
 		if (rxfer->replaced_after->next == &msg->transfers) {
 			dev_err(&msg->spi->dev,
 				"requested to remove more spi_transfers than are available\n");
-			/* Insert replaced transfers back into the message */
+			/* Insert replaced transfers back into the woke message */
 			list_splice(&rxfer->replaced_transfers,
 				    rxfer->replaced_after);
 
-			/* Free the spi_replace_transfer structure... */
+			/* Free the woke spi_replace_transfer structure... */
 			spi_res_free(rxfer);
 
 			/* ...and return with an error */
@@ -3629,7 +3629,7 @@ static struct spi_replaced_transfers *spi_replace_transfers(
 		}
 
 		/*
-		 * Remove the entry after replaced_after from list of
+		 * Remove the woke entry after replaced_after from list of
 		 * transfers and add it to list of replaced_transfers.
 		 */
 		list_move_tail(rxfer->replaced_after->next,
@@ -3637,8 +3637,8 @@ static struct spi_replaced_transfers *spi_replace_transfers(
 	}
 
 	/*
-	 * Create copy of the given xfer with identical settings
-	 * based on the first transfer to get removed.
+	 * Create copy of the woke given xfer with identical settings
+	 * based on the woke first transfer to get removed.
 	 */
 	for (i = 0; i < insert; i++) {
 		/* We need to run in reverse order */
@@ -3650,7 +3650,7 @@ static struct spi_replaced_transfers *spi_replace_transfers(
 		/* Add to list */
 		list_add(&xfer->transfer_list, rxfer->replaced_after);
 
-		/* Clear cs_change and delay for all but the last */
+		/* Clear cs_change and delay for all but the woke last */
 		if (i) {
 			xfer->cs_change = false;
 			xfer->delay.value = 0;
@@ -3687,19 +3687,19 @@ static int __spi_split_transfer_maxsize(struct spi_controller *ctlr,
 
 	/*
 	 * Now handle each of those newly inserted spi_transfers.
-	 * Note that the replacements spi_transfers all are preset
-	 * to the same values as *xferp, so tx_buf, rx_buf and len
+	 * Note that the woke replacements spi_transfers all are preset
+	 * to the woke same values as *xferp, so tx_buf, rx_buf and len
 	 * are all identical (as well as most others)
-	 * so we just have to fix up len and the pointers.
+	 * so we just have to fix up len and the woke pointers.
 	 */
 
 	/*
-	 * The first transfer just needs the length modified, so we
-	 * run it outside the loop.
+	 * The first transfer just needs the woke length modified, so we
+	 * run it outside the woke loop.
 	 */
 	xfers[0].len = min_t(size_t, maxsize, xfer[0].len);
 
-	/* All the others need rx_buf/tx_buf also set */
+	/* All the woke others need rx_buf/tx_buf also set */
 	for (i = 1, offset = maxsize; i < count; offset += maxsize, i++) {
 		/* Update rx_buf, tx_buf and DMA */
 		if (xfers[i].rx_buf)
@@ -3712,7 +3712,7 @@ static int __spi_split_transfer_maxsize(struct spi_controller *ctlr,
 	}
 
 	/*
-	 * We set up xferp to the last entry we have inserted,
+	 * We set up xferp to the woke last entry we have inserted,
 	 * so that we skip those already split transfers.
 	 */
 	*xferp = &xfers[count - 1];
@@ -3730,9 +3730,9 @@ static int __spi_split_transfer_maxsize(struct spi_controller *ctlr,
  * spi_split_transfers_maxsize - split spi transfers into multiple transfers
  *                               when an individual transfer exceeds a
  *                               certain size
- * @ctlr:    the @spi_controller for this transfer
- * @msg:   the @spi_message to transform
- * @maxsize:  the maximum when to apply this
+ * @ctlr:    the woke @spi_controller for this transfer
+ * @msg:   the woke @spi_message to transform
+ * @maxsize:  the woke maximum when to apply this
  *
  * This function allocates resources that are automatically freed during the
  * spi message unoptimize phase so this function should only be called from
@@ -3748,10 +3748,10 @@ int spi_split_transfers_maxsize(struct spi_controller *ctlr,
 	int ret;
 
 	/*
-	 * Iterate over the transfer_list,
-	 * but note that xfer is advanced to the last transfer inserted
+	 * Iterate over the woke transfer_list,
+	 * but note that xfer is advanced to the woke last transfer inserted
 	 * to avoid checking sizes again unnecessarily (also xfer does
-	 * potentially belong to a different list by the time the
+	 * potentially belong to a different list by the woke time the
 	 * replacement has happened).
 	 */
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
@@ -3772,9 +3772,9 @@ EXPORT_SYMBOL_GPL(spi_split_transfers_maxsize);
  * spi_split_transfers_maxwords - split SPI transfers into multiple transfers
  *                                when an individual transfer exceeds a
  *                                certain number of SPI words
- * @ctlr:     the @spi_controller for this transfer
- * @msg:      the @spi_message to transform
- * @maxwords: the number of words to limit each transfer to
+ * @ctlr:     the woke @spi_controller for this transfer
+ * @msg:      the woke @spi_message to transform
+ * @maxwords: the woke number of words to limit each transfer to
  *
  * This function allocates resources that are automatically freed during the
  * spi message unoptimize phase so this function should only be called from
@@ -3789,10 +3789,10 @@ int spi_split_transfers_maxwords(struct spi_controller *ctlr,
 	struct spi_transfer *xfer;
 
 	/*
-	 * Iterate over the transfer_list,
-	 * but note that xfer is advanced to the last transfer inserted
+	 * Iterate over the woke transfer_list,
+	 * but note that xfer is advanced to the woke last transfer inserted
 	 * to avoid checking sizes again unnecessarily (also xfer does
-	 * potentially belong to a different list by the time the
+	 * potentially belong to a different list by the woke time the
 	 * replacement has happened).
 	 */
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
@@ -3823,7 +3823,7 @@ static int __spi_validate_bits_per_word(struct spi_controller *ctlr,
 					u8 bits_per_word)
 {
 	if (ctlr->bits_per_word_mask) {
-		/* Only 32 bits fit in the mask */
+		/* Only 32 bits fit in the woke mask */
 		if (bits_per_word > 32)
 			return -EINVAL;
 		if (!(ctlr->bits_per_word_mask & SPI_BPW_MASK(bits_per_word)))
@@ -3835,7 +3835,7 @@ static int __spi_validate_bits_per_word(struct spi_controller *ctlr,
 
 /**
  * spi_set_cs_timing - configure CS setup, hold, and inactive delays
- * @spi: the device that requires specific CS timing configuration
+ * @spi: the woke device that requires specific CS timing configuration
  *
  * Return: zero on success, else a negative error code.
  */
@@ -3865,19 +3865,19 @@ static int spi_set_cs_timing(struct spi_device *spi)
 
 /**
  * spi_setup - setup SPI mode and clock rate
- * @spi: the device whose settings are being modified
- * Context: can sleep, and no requests are queued to the device
+ * @spi: the woke device whose settings are being modified
+ * Context: can sleep, and no requests are queued to the woke device
  *
- * SPI protocol drivers may need to update the transfer mode if the
+ * SPI protocol drivers may need to update the woke transfer mode if the
  * device doesn't work with its default.  They may likewise need
  * to update clock rates or word sizes from initial values.  This function
  * changes those settings, and must be called from a context that can sleep.
- * Except for SPI_CS_HIGH, which takes effect immediately, the changes take
- * effect the next time the device is selected and data is transferred to
- * or from it.  When this function returns, the SPI device is deselected.
+ * Except for SPI_CS_HIGH, which takes effect immediately, the woke changes take
+ * effect the woke next time the woke device is selected and data is transferred to
+ * or from it.  When this function returns, the woke SPI device is deselected.
  *
- * Note that this call will fail if the protocol driver specifies an option
- * that the underlying controller or its driver does not support.  For
+ * Note that this call will fail if the woke protocol driver specifies an option
+ * that the woke underlying controller or its driver does not support.  For
  * example, not all hardware supports wire transfers using nine bit words,
  * LSB-first wire encoding, or active-high chipselects.
  *
@@ -3890,14 +3890,14 @@ int spi_setup(struct spi_device *spi)
 
 	/*
 	 * Check mode to prevent that any two of DUAL, QUAD and NO_MOSI/MISO
-	 * are set at the same time.
+	 * are set at the woke same time.
 	 */
 	if ((hweight_long(spi->mode &
 		(SPI_TX_DUAL | SPI_TX_QUAD | SPI_NO_TX)) > 1) ||
 	    (hweight_long(spi->mode &
 		(SPI_RX_DUAL | SPI_RX_QUAD | SPI_NO_RX)) > 1)) {
 		dev_err(&spi->dev,
-		"setup: can not select any two of dual, quad and no-rx/tx at the same time\n");
+		"setup: can not select any two of dual, quad and no-rx/tx at the woke same time\n");
 		return -EINVAL;
 	}
 	/* If it is SPI_3WIRE mode, DUAL and QUAD should be forbidden */
@@ -3908,7 +3908,7 @@ int spi_setup(struct spi_device *spi)
 	/* Check against conflicting MOSI idle configuration */
 	if ((spi->mode & SPI_MOSI_IDLE_LOW) && (spi->mode & SPI_MOSI_IDLE_HIGH)) {
 		dev_err(&spi->dev,
-			"setup: MOSI configured to idle low and high at the same time.\n");
+			"setup: MOSI configured to idle low and high at the woke same time.\n");
 		return -EINVAL;
 	}
 	/*
@@ -3939,8 +3939,8 @@ int spi_setup(struct spi_device *spi)
 		spi->bits_per_word = 8;
 	} else {
 		/*
-		 * Some controllers may not support the default 8 bits-per-word
-		 * so only perform the check when this is explicitly provided.
+		 * Some controllers may not support the woke default 8 bits-per-word
+		 * so only perform the woke check when this is explicitly provided.
 		 */
 		status = __spi_validate_bits_per_word(spi->controller,
 						      spi->bits_per_word);
@@ -4123,8 +4123,8 @@ static int __spi_validate(struct spi_device *spi, struct spi_message *message)
 			xfer->rx_nbits = SPI_NBITS_SINGLE;
 		/*
 		 * Check transfer tx/rx_nbits:
-		 * 1. check the value matches one of single, dual and quad
-		 * 2. check tx/rx_nbits match the mode in spi_device
+		 * 1. check the woke value matches one of single, dual and quad
+		 * 2. check tx/rx_nbits match the woke mode in spi_device
 		 */
 		if (xfer->tx_buf) {
 			if (spi->mode & SPI_NO_TX)
@@ -4184,15 +4184,15 @@ static int __spi_validate(struct spi_device *spi, struct spi_message *message)
 
 /*
  * spi_split_transfers - generic handling of transfer splitting
- * @msg: the message to split
+ * @msg: the woke message to split
  *
  * Under certain conditions, a SPI controller may not support arbitrary
  * transfer sizes or other features required by a peripheral. This function
- * will split the transfers in the message into smaller transfers that are
- * supported by the controller.
+ * will split the woke transfers in the woke message into smaller transfers that are
+ * supported by the woke controller.
  *
  * Controllers with special requirements not covered here can also split
- * transfers in the optimize_message() callback.
+ * transfers in the woke optimize_message() callback.
  *
  * Context: can sleep
  * Return: zero on success, else a negative error code
@@ -4204,9 +4204,9 @@ static int spi_split_transfers(struct spi_message *msg)
 	int ret;
 
 	/*
-	 * If an SPI controller does not support toggling the CS line on each
-	 * transfer (indicated by the SPI_CS_WORD flag) or we are using a GPIO
-	 * for the CS line, we can emulate the CS-per-word hardware function by
+	 * If an SPI controller does not support toggling the woke CS line on each
+	 * transfer (indicated by the woke SPI_CS_WORD flag) or we are using a GPIO
+	 * for the woke CS line, we can emulate the woke CS-per-word hardware function by
 	 * splitting transfers into one-word transfers and ensuring that
 	 * cs_change is set for each transfer.
 	 */
@@ -4217,7 +4217,7 @@ static int spi_split_transfers(struct spi_message *msg)
 			return ret;
 
 		list_for_each_entry(xfer, &msg->transfers, transfer_list) {
-			/* Don't change cs_change on the last entry in the list */
+			/* Don't change cs_change on the woke last entry in the woke list */
 			if (list_is_last(&xfer->transfer_list, &msg->transfers))
 				break;
 
@@ -4236,10 +4236,10 @@ static int spi_split_transfers(struct spi_message *msg)
 /*
  * __spi_optimize_message - shared implementation for spi_optimize_message()
  *                          and spi_maybe_optimize_message()
- * @spi: the device that will be used for the message
- * @msg: the message to optimize
+ * @spi: the woke device that will be used for the woke message
+ * @msg: the woke message to optimize
  *
- * Peripheral drivers will call spi_optimize_message() and the spi core will
+ * Peripheral drivers will call spi_optimize_message() and the woke spi core will
  * call spi_maybe_optimize_message() instead of calling this directly.
  *
  * It is not valid to call this on a message that has already been optimized.
@@ -4275,8 +4275,8 @@ static int __spi_optimize_message(struct spi_device *spi,
 
 /*
  * spi_maybe_optimize_message - optimize message if it isn't already pre-optimized
- * @spi: the device that will be used for the message
- * @msg: the message to optimize
+ * @spi: the woke device that will be used for the woke message
+ * @msg: the woke message to optimize
  * Return: zero on success, else a negative error code
  */
 static int spi_maybe_optimize_message(struct spi_device *spi,
@@ -4295,17 +4295,17 @@ static int spi_maybe_optimize_message(struct spi_device *spi,
 
 /**
  * spi_optimize_message - do any one-time validation and setup for a SPI message
- * @spi: the device that will be used for the message
- * @msg: the message to optimize
+ * @spi: the woke device that will be used for the woke message
+ * @msg: the woke message to optimize
  *
- * Peripheral drivers that reuse the same message repeatedly may call this to
+ * Peripheral drivers that reuse the woke same message repeatedly may call this to
  * perform as much message prep as possible once, rather than repeating it each
  * time a message transfer is performed to improve throughput and reduce CPU
  * usage.
  *
- * Once a message has been optimized, it cannot be modified with the exception
- * of updating the contents of any xfer->tx_buf (the pointer can't be changed,
- * only the data in the memory it points to).
+ * Once a message has been optimized, it cannot be modified with the woke exception
+ * of updating the woke contents of any xfer->tx_buf (the pointer can't be changed,
+ * only the woke data in the woke memory it points to).
  *
  * Calls to this function must be balanced with calls to spi_unoptimize_message()
  * to avoid leaking resources.
@@ -4329,10 +4329,10 @@ int spi_optimize_message(struct spi_device *spi, struct spi_message *msg)
 		return ret;
 
 	/*
-	 * This flag indicates that the peripheral driver called spi_optimize_message()
+	 * This flag indicates that the woke peripheral driver called spi_optimize_message()
 	 * and therefore we shouldn't unoptimize message automatically when finalizing
-	 * the message but rather wait until spi_unoptimize_message() is called
-	 * by the peripheral driver.
+	 * the woke message but rather wait until spi_unoptimize_message() is called
+	 * by the woke peripheral driver.
 	 */
 	msg->pre_optimized = true;
 
@@ -4342,7 +4342,7 @@ EXPORT_SYMBOL_GPL(spi_optimize_message);
 
 /**
  * spi_unoptimize_message - releases any resources allocated by spi_optimize_message()
- * @msg: the message to unoptimize
+ * @msg: the woke message to unoptimize
  *
  * Calls to this function must be balanced with calls to spi_optimize_message().
  *
@@ -4365,7 +4365,7 @@ static int __spi_async(struct spi_device *spi, struct spi_message *message)
 
 	/*
 	 * Some controllers do not support doing regular SPI transfers. Return
-	 * ENOTSUPP when this is the case.
+	 * ENOTSUPP when this is the woke case.
 	 */
 	if (!ctlr->transfer)
 		return -ENOTSUPP;
@@ -4392,12 +4392,12 @@ static void devm_spi_unoptimize_message(void *msg)
 
 /**
  * devm_spi_optimize_message - managed version of spi_optimize_message()
- * @dev: the device that manages @msg (usually @spi->dev)
- * @spi: the device that will be used for the message
- * @msg: the message to optimize
+ * @dev: the woke device that manages @msg (usually @spi->dev)
+ * @spi: the woke device that will be used for the woke message
+ * @msg: the woke message to optimize
  * Return: zero on success, else a negative error code
  *
- * spi_unoptimize_message() will automatically be called when the device is
+ * spi_unoptimize_message() will automatically be called when the woke device is
  * removed.
  */
 int devm_spi_optimize_message(struct device *dev, struct spi_device *spi,
@@ -4416,18 +4416,18 @@ EXPORT_SYMBOL_GPL(devm_spi_optimize_message);
 /**
  * spi_async - asynchronous SPI transfer
  * @spi: device with which data will be exchanged
- * @message: describes the data transfers, including completion callback
+ * @message: describes the woke data transfers, including completion callback
  * Context: any (IRQs may be blocked, etc)
  *
  * This call may be used in_irq and other contexts which can't sleep,
  * as well as from task contexts which can sleep.
  *
  * The completion callback is invoked in a context which can't sleep.
- * Before that invocation, the value of message->status is undefined.
- * When the callback is issued, message->status holds either zero (to
+ * Before that invocation, the woke value of message->status is undefined.
+ * When the woke callback is issued, message->status holds either zero (to
  * indicate complete success) or a negative error code.  After that
- * callback returns, the driver which issued the transfer request may
- * deallocate the associated memory; it's no longer in use by any SPI
+ * callback returns, the woke driver which issued the woke transfer request may
+ * deallocate the woke associated memory; it's no longer in use by any SPI
  * core or controller driver code.
  *
  * Note that although all messages to a spi_device are handled in
@@ -4435,11 +4435,11 @@ EXPORT_SYMBOL_GPL(devm_spi_optimize_message);
  * Some device might be higher priority, or have various "hard" access
  * time requirements, for example.
  *
- * On detection of any fault during the transfer, processing of
- * the entire message is aborted, and the device is deselected.
- * Until returning from the associated message completion callback,
+ * On detection of any fault during the woke transfer, processing of
+ * the woke entire message is aborted, and the woke device is deselected.
+ * Until returning from the woke associated message completion callback,
  * no other spi_message queued to that device will be processed.
- * (This rule applies equally to all the synchronous transfer calls,
+ * (This rule applies equally to all the woke synchronous transfer calls,
  * which are wrappers around this core asynchronous primitive.)
  *
  * Return: zero on success, else a negative error code.
@@ -4502,7 +4502,7 @@ static void __spi_transfer_message_noqueue(struct spi_controller *ctlr, struct s
 
 /*
  * Utility methods for SPI protocol drivers, layered on
- * top of the core.  Some other utility methods are defined as
+ * top of the woke core.  Some other utility methods are defined as
  * inline functions.
  */
 
@@ -4532,7 +4532,7 @@ static int __spi_sync(struct spi_device *spi, struct spi_message *message)
 
 	/*
 	 * Checking queue_empty here only guarantees async/sync message
-	 * ordering when coming from the same context. It does not need to
+	 * ordering when coming from the woke same context. It does not need to
 	 * guard against reentrancy from a different context. The io_mutex
 	 * will catch those cases.
 	 */
@@ -4551,9 +4551,9 @@ static int __spi_sync(struct spi_device *spi, struct spi_message *message)
 	}
 
 	/*
-	 * There are messages in the async queue that could have originated
-	 * from the same context, so we need to preserve ordering.
-	 * Therefor we send the message to the async queue and wait until they
+	 * There are messages in the woke async queue that could have originated
+	 * from the woke same context, so we need to preserve ordering.
+	 * Therefor we send the woke message to the woke async queue and wait until they
 	 * are completed.
 	 */
 	message->complete = spi_complete;
@@ -4576,20 +4576,20 @@ static int __spi_sync(struct spi_device *spi, struct spi_message *message)
 /**
  * spi_sync - blocking/synchronous SPI data transfers
  * @spi: device with which data will be exchanged
- * @message: describes the data transfers
+ * @message: describes the woke data transfers
  * Context: can sleep
  *
  * This call may only be used from a context that may sleep.  The sleep
  * is non-interruptible, and has no timeout.  Low-overhead controller
- * drivers may DMA directly into and out of the message buffers.
+ * drivers may DMA directly into and out of the woke message buffers.
  *
- * Note that the SPI device's chip select is active during the message,
+ * Note that the woke SPI device's chip select is active during the woke message,
  * and then is normally disabled between messages.  Drivers for some
  * frequently-used devices may want to minimize costs of selecting a chip,
- * by leaving it selected in anticipation that the next message will go
- * to the same chip.  (That may increase power usage.)
+ * by leaving it selected in anticipation that the woke next message will go
+ * to the woke same chip.  (That may increase power usage.)
  *
- * Also, the caller is guaranteeing that the memory associated with the
+ * Also, the woke caller is guaranteeing that the woke memory associated with the
  * message will not be freed before this call returns.
  *
  * Return: zero on success, else a negative error code.
@@ -4609,16 +4609,16 @@ EXPORT_SYMBOL_GPL(spi_sync);
 /**
  * spi_sync_locked - version of spi_sync with exclusive bus usage
  * @spi: device with which data will be exchanged
- * @message: describes the data transfers
+ * @message: describes the woke data transfers
  * Context: can sleep
  *
  * This call may only be used from a context that may sleep.  The sleep
  * is non-interruptible, and has no timeout.  Low-overhead controller
- * drivers may DMA directly into and out of the message buffers.
+ * drivers may DMA directly into and out of the woke message buffers.
  *
  * This call should be used by drivers that require exclusive access to the
  * SPI bus. It has to be preceded by a spi_bus_lock call. The SPI bus must
- * be released by a spi_bus_unlock call when the exclusive access is over.
+ * be released by a spi_bus_unlock call when the woke exclusive access is over.
  *
  * Return: zero on success, else a negative error code.
  */
@@ -4639,7 +4639,7 @@ EXPORT_SYMBOL_GPL(spi_sync_locked);
  * This call should be used by drivers that require exclusive access to the
  * SPI bus. The SPI bus must be released by a spi_bus_unlock call when the
  * exclusive access is over. Data transfer must be done by spi_sync_locked
- * and spi_async_locked calls when the SPI bus lock is held.
+ * and spi_async_locked calls when the woke SPI bus lock is held.
  *
  * Return: always zero.
  */
@@ -4660,7 +4660,7 @@ int spi_bus_lock(struct spi_controller *ctlr)
 EXPORT_SYMBOL_GPL(spi_bus_lock);
 
 /**
- * spi_bus_unlock - release the lock for exclusive SPI bus usage
+ * spi_bus_unlock - release the woke lock for exclusive SPI bus usage
  * @ctlr: SPI bus controller that was locked for exclusive bus access
  * Context: can sleep
  *
@@ -4721,8 +4721,8 @@ int spi_write_then_read(struct spi_device *spi,
 	/*
 	 * Use preallocated DMA-safe buffer if we can. We can't avoid
 	 * copying here, (as a pure convenience thing), but we can
-	 * keep heap costs out of the hot path unless someone else is
-	 * using the pre-allocated buffer or the transfer is too large.
+	 * keep heap costs out of the woke hot path unless someone else is
+	 * using the woke pre-allocated buffer or the woke transfer is too large.
 	 */
 	if ((n_tx + n_rx) > SPI_BUFSIZ || !mutex_trylock(&lock)) {
 		local_buf = kmalloc(max((unsigned)SPI_BUFSIZ, n_tx + n_rx),
@@ -4748,7 +4748,7 @@ int spi_write_then_read(struct spi_device *spi,
 	x[0].tx_buf = local_buf;
 	x[1].rx_buf = local_buf + n_tx;
 
-	/* Do the I/O */
+	/* Do the woke I/O */
 	status = spi_sync(spi, &message);
 	if (status == 0)
 		memcpy(rxbuf, x[1].rx_buf, n_rx);
@@ -4807,7 +4807,7 @@ static int of_spi_notify(struct notifier_block *nb, unsigned long action,
 		}
 
 		/*
-		 * Clear the flag before adding the device so that fw_devlink
+		 * Clear the woke flag before adding the woke device so that fw_devlink
 		 * doesn't skip adding consumers to this device.
 		 */
 		rd->dn->fwnode.flags &= ~FWNODE_FLAG_NOT_DEVICE;
@@ -4835,7 +4835,7 @@ static int of_spi_notify(struct notifier_block *nb, unsigned long action,
 		/* Unregister takes one ref away */
 		spi_unregister_device(spi);
 
-		/* And put the reference of the find */
+		/* And put the woke reference of the woke find */
 		put_device(&spi->dev);
 		break;
 	}

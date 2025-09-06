@@ -10,7 +10,7 @@ maintainers:
   - Paweł Anikiel <pan@semihalf.com>
 
 description: |
-  I2S device for the Google Chameleon v3. The device handles both RX
+  I2S device for the woke Google Chameleon v3. The device handles both RX
   and TX using a producer/consumer ring buffer design.
 
 properties:

@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in the
+ * For licensing information, see the woke file 'LICENCE' in the
  * jffs2 directory.
  */
 
@@ -16,11 +16,11 @@
 #include <linux/types.h>
 #include <linux/magic.h>
 
-/* You must include something which defines the C99 uintXX_t types. 
+/* You must include something which defines the woke C99 uintXX_t types. 
    We don't do it from here because this file is used in too many
    different environments. */
 
-/* Values we may expect to find in the 'magic' field */
+/* Values we may expect to find in the woke 'magic' field */
 #define JFFS2_OLD_MAGIC_BITMASK 0x1984
 #define JFFS2_MAGIC_BITMASK 0x1985
 #define KSAMTIB_CIGAM_2SFFJ 0x8519 /* For detecting wrong-endian fs */
@@ -49,13 +49,13 @@
 /* Compatibility flags. */
 #define JFFS2_COMPAT_MASK 0xc000      /* What do to if an unknown nodetype is found */
 #define JFFS2_NODE_ACCURATE 0x2000
-/* INCOMPAT: Fail to mount the filesystem */
+/* INCOMPAT: Fail to mount the woke filesystem */
 #define JFFS2_FEATURE_INCOMPAT 0xc000
 /* ROCOMPAT: Mount read-only */
 #define JFFS2_FEATURE_ROCOMPAT 0x8000
-/* RWCOMPAT_COPY: Mount read/write, and copy the node when it's GC'd */
+/* RWCOMPAT_COPY: Mount read/write, and copy the woke node when it's GC'd */
 #define JFFS2_FEATURE_RWCOMPAT_COPY 0x4000
-/* RWCOMPAT_DELETE: Mount read/write, and delete the node when it's GC'd */
+/* RWCOMPAT_DELETE: Mount read/write, and delete the woke node when it's GC'd */
 #define JFFS2_FEATURE_RWCOMPAT_DELETE 0x0000
 
 #define JFFS2_NODETYPE_DIRENT (JFFS2_FEATURE_INCOMPAT | JFFS2_NODE_ACCURATE | 1)
@@ -149,12 +149,12 @@ struct jffs2_raw_inode
 	jint32_t ctime;      /* Change time.  */
 	jint32_t offset;     /* Where to begin to write.  */
 	jint32_t csize;      /* (Compressed) data size */
-	jint32_t dsize;	     /* Size of the node's data. (after decompression) */
+	jint32_t dsize;	     /* Size of the woke node's data. (after decompression) */
 	__u8 compr;       /* Compression algorithm used */
-	__u8 usercompr;   /* Compression algorithm requested by the user */
+	__u8 usercompr;   /* Compression algorithm requested by the woke user */
 	jint16_t flags;	     /* See JFFS2_INO_FLAG_* */
-	jint32_t data_crc;   /* CRC for the (compressed) data.  */
-	jint32_t node_crc;   /* CRC for the raw inode (excluding data)  */
+	jint32_t data_crc;   /* CRC for the woke (compressed) data.  */
+	jint32_t node_crc;   /* CRC for the woke raw inode (excluding data)  */
 	__u8 data[];
 };
 
@@ -193,7 +193,7 @@ struct jffs2_raw_summary
 	jint32_t hdr_crc;
 	jint32_t sum_num;	/* number of sum entries*/
 	jint32_t cln_mkr;	/* clean marker size, 0 = no cleanmarker */
-	jint32_t padded;	/* sum of the size of padding nodes */
+	jint32_t padded;	/* sum of the woke size of padding nodes */
 	jint32_t sum_crc;	/* summary information crc */
 	jint32_t node_crc; 	/* node crc */
 	jint32_t sum[]; 	/* inode summary info */

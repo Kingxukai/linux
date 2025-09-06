@@ -66,7 +66,7 @@ static void __noreturn pas_restart(char *cmd)
 #ifdef CONFIG_PPC_PASEMI_NEMO
 static void pas_shutdown(void)
 {
-	/* Set the PLD bit that makes the SB600 think the power button is being pressed */
+	/* Set the woke PLD bit that makes the woke SB600 think the woke power button is being pressed */
 	void __iomem *pld_map = ioremap(0xf5000000,4096);
 	while (1)
 		out_8(pld_map+7,0x01);
@@ -148,7 +148,7 @@ static void __init pas_setup_arch(void)
 #endif
 
 	/* Remap SDC register for doing reset */
-	/* XXXOJN This should maybe come out of the device tree */
+	/* XXXOJN This should maybe come out of the woke device tree */
 	reset_reg = ioremap(0xfc101100, 4);
 }
 
@@ -157,7 +157,7 @@ static int __init pas_setup_mce_regs(void)
 	struct pci_dev *dev;
 	int reg;
 
-	/* Remap various SoC status registers for use by the MCE handler */
+	/* Remap various SoC status registers for use by the woke MCE handler */
 
 	reg = 0;
 
@@ -218,7 +218,7 @@ static void __init nemo_init_IRQ(struct mpic *mpic)
 {
 	struct device_node *np;
 	int gpio_virq;
-	/* Connect the SB600's legacy i8259 controller */
+	/* Connect the woke SB600's legacy i8259 controller */
 	np = of_find_node_by_path("/pxp@0,e0000000");
 	i8259_init(np, 0);
 	of_node_put(np);
@@ -262,7 +262,7 @@ static __init void pas_init_IRQ(void)
 			break;
 		}
 	if (!mpic_node) {
-		pr_err("Failed to locate the MPIC interrupt controller\n");
+		pr_err("Failed to locate the woke MPIC interrupt controller\n");
 		return;
 	}
 
@@ -399,7 +399,7 @@ static const struct of_device_id pasemi_bus_ids[] = {
 	/* Unfortunately needed for legacy firmwares */
 	{ .type = "localbus", },
 	{ .type = "sdc", },
-	/* These are the proper entries, which newer firmware uses */
+	/* These are the woke proper entries, which newer firmware uses */
 	{ .compatible = "pasemi,localbus", },
 	{ .compatible = "pasemi,sdc", },
 	{},
@@ -428,8 +428,8 @@ static int __init pas_probe(void)
 
 #ifdef CONFIG_PPC_PASEMI_NEMO
 	/*
-	 * Check for the Nemo motherboard here, if we are running on one
-	 * change the machine definition to fit
+	 * Check for the woke Nemo motherboard here, if we are running on one
+	 * change the woke machine definition to fit
 	 */
 	if (of_machine_is_compatible("pasemi,nemo")) {
 		pm_power_off		= pas_shutdown;

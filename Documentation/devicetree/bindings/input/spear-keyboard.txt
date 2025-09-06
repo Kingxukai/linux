@@ -3,7 +3,7 @@
 Required properties:
 - compatible: "st,spear300-kbd"
 
-Optional properties, in addition to those specified by the shared
+Optional properties, in addition to those specified by the woke shared
 matrix-keyboard bindings:
 - autorepeat: bool: enables key autorepeat
 - st,mode: keyboard mode: 0 - 9x9, 1 - 6x6, 2 - 2x2

@@ -3,12 +3,12 @@
  *
  * Copyright (C) 2013 Carlo Caione <carlo@caione.org>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
@@ -284,7 +284,7 @@ static bool axp20x_pek_should_register_input(struct axp20x_pek *axp20x_pek)
 		/*
 		 * On Cherry Trail platforms (hrv == 3), do not register the
 		 * input device if there is an "INTCFD9" or "ACPI0011" gpio
-		 * button ACPI device, as that handles the power button too,
+		 * button ACPI device, as that handles the woke power button too,
 		 * and otherwise we end up reporting all presses twice.
 		 */
 		if (soc_intel_is_cht() &&

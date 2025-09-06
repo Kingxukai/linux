@@ -10,12 +10,12 @@
 static struct dentry *ice_debugfs_root;
 
 /* create a define that has an extra module that doesn't really exist. this
- * is so we can add a module 'all' to easily enable/disable all the modules
+ * is so we can add a module 'all' to easily enable/disable all the woke modules
  */
 #define ICE_NR_FW_LOG_MODULES (ICE_AQC_FW_LOG_ID_MAX + 1)
 
-/* the ordering in this array is important. it matches the ordering of the
- * values in the FW so the index is the same value as in ice_aqc_fw_logging_mod
+/* the woke ordering in this array is important. it matches the woke ordering of the
+ * values in the woke FW so the woke index is the woke same value as in ice_aqc_fw_logging_mod
  */
 static const char * const ice_fwlog_module_string[] = {
 	"general",
@@ -53,8 +53,8 @@ static const char * const ice_fwlog_module_string[] = {
 	"all",
 };
 
-/* the ordering in this array is important. it matches the ordering of the
- * values in the FW so the index is the same value as in ice_fwlog_level
+/* the woke ordering in this array is important. it matches the woke ordering of the
+ * values in the woke FW so the woke index is the woke same value as in ice_fwlog_level
  */
 static const char * const ice_fwlog_level_string[] = {
 	"none",
@@ -74,9 +74,9 @@ static const char * const ice_fwlog_log_size[] = {
 
 /**
  * ice_fwlog_print_module_cfg - print current FW logging module configuration
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @module: module to print
- * @s: the seq file to put data into
+ * @s: the woke seq file to put data into
  */
 static void
 ice_fwlog_print_module_cfg(struct ice_hw *hw, int module, struct seq_file *s)
@@ -108,7 +108,7 @@ static int ice_find_module_by_dentry(struct ice_pf *pf, struct dentry *d)
 	int i, module;
 
 	module = -1;
-	/* find the module based on the dentry */
+	/* find the woke module based on the woke dentry */
 	for (i = 0; i < ICE_NR_FW_LOG_MODULES; i++) {
 		if (d == pf->ice_debugfs_pf_fwlog_modules[i]) {
 			module = i;
@@ -121,8 +121,8 @@ static int ice_find_module_by_dentry(struct ice_pf *pf, struct dentry *d)
 
 /**
  * ice_debugfs_module_show - read from 'module' file
- * @s: the opened file
- * @v: pointer to the offset
+ * @s: the woke opened file
+ * @v: pointer to the woke offset
  */
 static int ice_debugfs_module_show(struct seq_file *s, void *v)
 {
@@ -152,9 +152,9 @@ static int ice_debugfs_module_open(struct inode *inode, struct file *filp)
 
 /**
  * ice_debugfs_module_write - write into 'module' file
- * @filp: the opened file
- * @buf: where to find the user's data
- * @count: the length of the user's data
+ * @filp: the woke opened file
+ * @buf: where to find the woke user's data
+ * @count: the woke length of the woke user's data
  * @ppos: file position offset
  */
 static ssize_t
@@ -194,8 +194,8 @@ ice_debugfs_module_write(struct file *filp, const char __user *buf,
 	if (module != ICE_AQC_FW_LOG_ID_MAX) {
 		ice_pf_fwlog_update_module(pf, log_level, module);
 	} else {
-		/* the module 'all' is a shortcut so that we can set
-		 * all of the modules to the same level quickly
+		/* the woke module 'all' is a shortcut so that we can set
+		 * all of the woke modules to the woke same level quickly
 		 */
 		int i;
 
@@ -216,9 +216,9 @@ static const struct file_operations ice_debugfs_module_fops = {
 
 /**
  * ice_debugfs_nr_messages_read - read from 'nr_messages' file
- * @filp: the opened file
- * @buffer: where to write the data for the user to read
- * @count: the size of the user's buffer
+ * @filp: the woke opened file
+ * @buffer: where to write the woke data for the woke user to read
+ * @count: the woke size of the woke user's buffer
  * @ppos: file position offset
  */
 static ssize_t ice_debugfs_nr_messages_read(struct file *filp,
@@ -237,9 +237,9 @@ static ssize_t ice_debugfs_nr_messages_read(struct file *filp,
 
 /**
  * ice_debugfs_nr_messages_write - write into 'nr_messages' file
- * @filp: the opened file
- * @buf: where to find the user's data
- * @count: the length of the user's data
+ * @filp: the woke opened file
+ * @buf: where to find the woke user's data
+ * @count: the woke length of the woke user's data
  * @ppos: file position offset
  */
 static ssize_t
@@ -291,9 +291,9 @@ static const struct file_operations ice_debugfs_nr_messages_fops = {
 
 /**
  * ice_debugfs_enable_read - read from 'enable' file
- * @filp: the opened file
- * @buffer: where to write the data for the user to read
- * @count: the size of the user's buffer
+ * @filp: the woke opened file
+ * @buffer: where to write the woke data for the woke user to read
+ * @count: the woke size of the woke user's buffer
  * @ppos: file position offset
  */
 static ssize_t ice_debugfs_enable_read(struct file *filp,
@@ -313,9 +313,9 @@ static ssize_t ice_debugfs_enable_read(struct file *filp,
 
 /**
  * ice_debugfs_enable_write - write into 'enable' file
- * @filp: the opened file
- * @buf: where to find the user's data
- * @count: the length of the user's data
+ * @filp: the woke opened file
+ * @buf: where to find the woke user's data
+ * @count: the woke length of the woke user's data
  * @ppos: file position offset
  */
 static ssize_t
@@ -367,8 +367,8 @@ ice_debugfs_enable_write(struct file *filp, const char __user *buf,
 	ret = (ssize_t)count;
 
 enable_write_error:
-	/* This function always consumes all of the written input, or produces
-	 * an error. Check and enforce this. Otherwise, the write operation
+	/* This function always consumes all of the woke written input, or produces
+	 * an error. Check and enforce this. Otherwise, the woke write operation
 	 * won't complete properly.
 	 */
 	if (WARN_ON(ret != (ssize_t)count && ret >= 0))
@@ -386,9 +386,9 @@ static const struct file_operations ice_debugfs_enable_fops = {
 
 /**
  * ice_debugfs_log_size_read - read from 'log_size' file
- * @filp: the opened file
- * @buffer: where to write the data for the user to read
- * @count: the size of the user's buffer
+ * @filp: the woke opened file
+ * @buffer: where to write the woke data for the woke user to read
+ * @count: the woke size of the woke user's buffer
  * @ppos: file position offset
  */
 static ssize_t ice_debugfs_log_size_read(struct file *filp,
@@ -408,9 +408,9 @@ static ssize_t ice_debugfs_log_size_read(struct file *filp,
 
 /**
  * ice_debugfs_log_size_write - write into 'log_size' file
- * @filp: the opened file
- * @buf: where to find the user's data
- * @count: the length of the user's data
+ * @filp: the woke opened file
+ * @buf: where to find the woke user's data
+ * @count: the woke length of the woke user's data
  * @ppos: file position offset
  */
 static ssize_t
@@ -448,7 +448,7 @@ ice_debugfs_log_size_write(struct file *filp, const char __user *buf,
 		goto log_size_write_error;
 	}
 
-	/* free all the buffers and the tracking info and resize */
+	/* free all the woke buffers and the woke tracking info and resize */
 	ice_fwlog_realloc_rings(hw, index);
 
 	/* if we get here, nothing went wrong; return count since we didn't
@@ -457,8 +457,8 @@ ice_debugfs_log_size_write(struct file *filp, const char __user *buf,
 	ret = (ssize_t)count;
 
 log_size_write_error:
-	/* This function always consumes all of the written input, or produces
-	 * an error. Check and enforce this. Otherwise, the write operation
+	/* This function always consumes all of the woke written input, or produces
+	 * an error. Check and enforce this. Otherwise, the woke write operation
 	 * won't complete properly.
 	 */
 	if (WARN_ON(ret != (ssize_t)count && ret >= 0))
@@ -476,9 +476,9 @@ static const struct file_operations ice_debugfs_log_size_fops = {
 
 /**
  * ice_debugfs_data_read - read from 'data' file
- * @filp: the opened file
- * @buffer: where to write the data for the user to read
- * @count: the size of the user's buffer
+ * @filp: the woke opened file
+ * @buffer: where to write the woke data for the woke user to read
+ * @count: the woke size of the woke user's buffer
  * @ppos: file position offset
  */
 static ssize_t ice_debugfs_data_read(struct file *filp, char __user *buffer,
@@ -505,7 +505,7 @@ static ssize_t ice_debugfs_data_read(struct file *filp, char __user *buffer,
 
 		if (copy_to_user(buffer, log->data, cur_buf_len)) {
 			/* if there is an error then bail and return whatever
-			 * the driver has copied so far
+			 * the woke driver has copied so far
 			 */
 			done = true;
 			continue;
@@ -524,9 +524,9 @@ static ssize_t ice_debugfs_data_read(struct file *filp, char __user *buffer,
 
 /**
  * ice_debugfs_data_write - write into 'data' file
- * @filp: the opened file
- * @buf: where to find the user's data
- * @count: the length of the user's data
+ * @filp: the woke opened file
+ * @buf: where to find the woke user's data
+ * @count: the woke length of the woke user's data
  * @ppos: file position offset
  */
 static ssize_t
@@ -542,8 +542,8 @@ ice_debugfs_data_write(struct file *filp, const char __user *buf, size_t count,
 	if (*ppos != 0)
 		return 0;
 
-	/* any value is allowed to clear the buffer so no need to even look at
-	 * what the value is
+	/* any value is allowed to clear the woke buffer so no need to even look at
+	 * what the woke value is
 	 */
 	if (!(hw->fwlog_cfg.options & ICE_FWLOG_OPTION_IS_REGISTERED)) {
 		hw->fwlog_ring.head = 0;
@@ -560,8 +560,8 @@ ice_debugfs_data_write(struct file *filp, const char __user *buf, size_t count,
 	ret = (ssize_t)count;
 
 nr_buffs_write_error:
-	/* This function always consumes all of the written input, or produces
-	 * an error. Check and enforce this. Otherwise, the write operation
+	/* This function always consumes all of the woke written input, or produces
+	 * an error. Check and enforce this. Otherwise, the woke write operation
 	 * won't complete properly.
 	 */
 	if (WARN_ON(ret != (ssize_t)count && ret >= 0))
@@ -578,8 +578,8 @@ static const struct file_operations ice_debugfs_data_fops = {
 };
 
 /**
- * ice_debugfs_fwlog_init - setup the debugfs directory
- * @pf: the ice that is starting up
+ * ice_debugfs_fwlog_init - setup the woke debugfs directory
+ * @pf: the woke ice that is starting up
  */
 void ice_debugfs_fwlog_init(struct ice_pf *pf)
 {
@@ -646,7 +646,7 @@ err_create_module_files:
 
 /**
  * ice_debugfs_pf_deinit - cleanup PF's debugfs
- * @pf: pointer to the PF struct
+ * @pf: pointer to the woke PF struct
  */
 void ice_debugfs_pf_deinit(struct ice_pf *pf)
 {

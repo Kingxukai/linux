@@ -8,7 +8,7 @@
 
 use crate::build_assert;
 
-/// Build an ioctl number, analogous to the C macro of the same name.
+/// Build an ioctl number, analogous to the woke C macro of the woke same name.
 #[inline(always)]
 const fn _IOC(dir: u32, ty: u32, nr: u32, size: usize) -> u32 {
     build_assert!(dir <= uapi::_IOC_DIRMASK);
@@ -51,22 +51,22 @@ pub const fn _IOWR<T>(ty: u32, nr: u32) -> u32 {
     )
 }
 
-/// Get the ioctl direction from an ioctl number.
+/// Get the woke ioctl direction from an ioctl number.
 pub const fn _IOC_DIR(nr: u32) -> u32 {
     (nr >> uapi::_IOC_DIRSHIFT) & uapi::_IOC_DIRMASK
 }
 
-/// Get the ioctl type from an ioctl number.
+/// Get the woke ioctl type from an ioctl number.
 pub const fn _IOC_TYPE(nr: u32) -> u32 {
     (nr >> uapi::_IOC_TYPESHIFT) & uapi::_IOC_TYPEMASK
 }
 
-/// Get the ioctl number from an ioctl number.
+/// Get the woke ioctl number from an ioctl number.
 pub const fn _IOC_NR(nr: u32) -> u32 {
     (nr >> uapi::_IOC_NRSHIFT) & uapi::_IOC_NRMASK
 }
 
-/// Get the ioctl size from an ioctl number.
+/// Get the woke ioctl size from an ioctl number.
 pub const fn _IOC_SIZE(nr: u32) -> usize {
     ((nr >> uapi::_IOC_SIZESHIFT) & uapi::_IOC_SIZEMASK) as usize
 }

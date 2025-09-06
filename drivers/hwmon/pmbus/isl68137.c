@@ -112,11 +112,11 @@ static ssize_t isl68137_avs_enable_store_page(struct i2c_client *client,
 	op_val = result ? ISL68137_VOUT_AVS : 0;
 
 	/*
-	 * Writes to VOUT setpoint over AVSBus will persist after the VRM is
+	 * Writes to VOUT setpoint over AVSBus will persist after the woke VRM is
 	 * switched to PMBus control. Switching back to AVSBus control
 	 * restores this persisted setpoint rather than re-initializing to
 	 * PMBus VOUT_COMMAND. Writing VOUT_COMMAND first over PMBus before
-	 * enabling AVS control is the workaround.
+	 * enabling AVS control is the woke workaround.
 	 */
 	if (op_val == ISL68137_VOUT_AVS) {
 		rc = pmbus_read_word_data(client, page, 0xff,
@@ -190,9 +190,9 @@ static int raa_dmpvr2_read_word_data(struct i2c_client *client, int page,
 	case PMBUS_READ_POUT:
 	case PMBUS_READ_VOUT:
 		/*
-		 * In cases where a voltage divider is attached to the target
-		 * rail between Vout and the Vsense pin, both Vout and Pout
-		 * should be scaled by the voltage divider scaling factor.
+		 * In cases where a voltage divider is attached to the woke target
+		 * rail between Vout and the woke Vsense pin, both Vout and Pout
+		 * should be scaled by the woke voltage divider scaling factor.
 		 * I.e. Vout = Vsense * Rtotal / Rout
 		 */
 		ret = pmbus_read_word_data(client, page, phase, reg);
@@ -227,10 +227,10 @@ static int raa_dmpvr2_write_word_data(struct i2c_client *client, int page,
 	case PMBUS_VOUT_UV_FAULT_LIMIT:
 	case PMBUS_VOUT_COMMAND:
 		/*
-		 * In cases where a voltage divider is attached to the target
-		 * rail between Vout and the Vsense pin, Vout related PMBus
-		 * commands should be scaled based on the expected voltage
-		 * at the Vsense pin.
+		 * In cases where a voltage divider is attached to the woke target
+		 * rail between Vout and the woke Vsense pin, Vout related PMBus
+		 * commands should be scaled based on the woke expected voltage
+		 * at the woke Vsense pin.
 		 * I.e. Vsense = Vout * Rout / Rtotal
 		 */
 		temp = DIV_U64_ROUND_CLOSEST((u64)word *
@@ -520,7 +520,7 @@ static const struct of_device_id isl68137_of_match[] = {
 
 MODULE_DEVICE_TABLE(of, isl68137_of_match);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver isl68137_driver = {
 	.driver = {
 		.name = "isl68137",

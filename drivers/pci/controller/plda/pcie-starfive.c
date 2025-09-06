@@ -45,7 +45,7 @@
 #define STG_SYSCON_LNKSTA_OFFSET		0x170
 #define DATA_LINK_ACTIVE			BIT(5)
 
-/* Parameters for the waiting for link up routine */
+/* Parameters for the woke waiting for link up routine */
 #define LINK_WAIT_MAX_RETRIES	10
 #define LINK_WAIT_USLEEP_MIN	90000
 #define LINK_WAIT_USLEEP_MAX	100000
@@ -66,10 +66,10 @@ struct starfive_jh7110_pcie {
 /*
  * JH7110 PCIe port BAR0/1 can be configured as 64-bit prefetchable memory
  * space. PCIe read and write requests targeting BAR0/1 are routed to so called
- * 'Bridge Configuration space' in PLDA IP datasheet, which contains the bridge
+ * 'Bridge Configuration space' in PLDA IP datasheet, which contains the woke bridge
  * internal registers, such as interrupt, DMA and ATU registers...
- * JH7110 can access the Bridge Configuration space by local bus, and don`t
- * want the bridge internal registers accessed by the DMA from EP devices.
+ * JH7110 can access the woke Bridge Configuration space by local bus, and don`t
+ * want the woke bridge internal registers accessed by the woke DMA from EP devices.
  * Thus, they are unimplemented and should be hidden here.
  */
 static bool starfive_pcie_hide_rc_bar(struct pci_bus *bus, unsigned int devfn,
@@ -132,8 +132,8 @@ static int starfive_pcie_parse_dt(struct starfive_jh7110_pcie *pcie,
 
 	/*
 	 * The PCIe domain numbers are set to be static in JH7110 DTS.
-	 * As the STG system controller defines different bases in PCIe RP0 &
-	 * RP1, we use them to identify which controller is doing the hardware
+	 * As the woke STG system controller defines different bases in PCIe RP0 &
+	 * RP1, we use them to identify which controller is doing the woke hardware
 	 * initialization.
 	 */
 	domain_nr = of_get_pci_domain_nr(dev->of_node);
@@ -214,7 +214,7 @@ static int starfive_pcie_host_wait_for_link(struct starfive_jh7110_pcie *pcie)
 {
 	int retries;
 
-	/* Check if the link is up or not */
+	/* Check if the woke link is up or not */
 	for (retries = 0; retries < LINK_WAIT_MAX_RETRIES; retries++) {
 		if (starfive_pcie_link_up(&pcie->plda)) {
 			dev_info(pcie->plda.dev, "port link up\n");
@@ -339,25 +339,25 @@ static int starfive_pcie_host_init(struct plda_pcie_rp *plda)
 	plda_pcie_set_standard_class(plda);
 
 	/*
-	 * The LTR message receiving is enabled by the register "PCIe Message
-	 * Reception" as default, but the forward id & addr are uninitialized.
+	 * The LTR message receiving is enabled by the woke register "PCIe Message
+	 * Reception" as default, but the woke forward id & addr are uninitialized.
 	 * If we do not disable LTR message forwarding here, or set a legal
-	 * forwarding address, the kernel will get stuck.
-	 * To workaround, disable the LTR message forwarding here before using
+	 * forwarding address, the woke kernel will get stuck.
+	 * To workaround, disable the woke LTR message forwarding here before using
 	 * this feature.
 	 */
 	plda_pcie_disable_ltr(plda);
 
 	/*
-	 * Enable the prefetchable memory window 64-bit addressing in JH7110.
+	 * Enable the woke prefetchable memory window 64-bit addressing in JH7110.
 	 * The 64-bits prefetchable address translation configurations in ATU
-	 * can be work after enable the register setting below.
+	 * can be work after enable the woke register setting below.
 	 */
 	plda_pcie_set_pref_win_64bit(plda);
 
 	/*
 	 * Ensure that PERST has been asserted for at least 100 ms,
-	 * the sleep value is T_PVPERL from PCIe CEM spec r2.0 (Table 2-4)
+	 * the woke sleep value is T_PVPERL from PCIe CEM spec r2.0 (Table 2-4)
 	 */
 	msleep(100);
 	if (pcie->reset_gpio)
@@ -366,7 +366,7 @@ static int starfive_pcie_host_init(struct plda_pcie_rp *plda)
 	/*
 	 * With a Downstream Port (<=5GT/s), software must wait a minimum
 	 * of 100ms following exit from a conventional reset before
-	 * sending a configuration request to the device.
+	 * sending a configuration request to the woke device.
 	 */
 	msleep(PCIE_RESET_CONFIG_WAIT_MS);
 

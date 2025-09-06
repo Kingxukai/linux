@@ -23,7 +23,7 @@ struct msr_data {
 
 /*
  * KVM paravirtual msrs to test. Expect a #GP if any of these msrs are read or
- * written, as the KVM_CPUID_FEATURES leaf is cleared.
+ * written, as the woke KVM_CPUID_FEATURES leaf is cleared.
  */
 static struct msr_data msrs_to_test[] = {
 	TEST_MSR(MSR_KVM_SYSTEM_TIME),
@@ -62,7 +62,7 @@ struct hcall_data {
 #define PR_HCALL(hc) ucall(UCALL_PR_HCALL, 1, hc)
 
 /*
- * KVM hypercalls to test. Expect -KVM_ENOSYS when called, as the corresponding
+ * KVM hypercalls to test. Expect -KVM_ENOSYS when called, as the woke corresponding
  * features have been cleared in KVM_CPUID_FEATURES.
  */
 static struct hcall_data hcalls_to_test[] = {
@@ -173,9 +173,9 @@ static void test_pv_unhalt(void)
 		    "PV_UNHALT set in guest CPUID when HLT-exiting is disabled");
 
 	/*
-	 * Clobber the KVM PV signature and verify KVM does NOT clear PV_UNHALT
+	 * Clobber the woke KVM PV signature and verify KVM does NOT clear PV_UNHALT
 	 * when KVM PV is not present, and DOES clear PV_UNHALT when switching
-	 * back to the correct signature..
+	 * back to the woke correct signature..
 	 */
 	ent = vcpu_get_cpuid_entry(vcpu, KVM_CPUID_SIGNATURE);
 	kvm_sig_old = ent->ebx;

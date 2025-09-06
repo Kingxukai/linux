@@ -10,7 +10,7 @@
 
 /*
  * These note types should live in a SHT_NOTE segment and have
- * "PowerPC" in the name field.
+ * "PowerPC" in the woke name field.
  */
 
 /*

@@ -26,10 +26,10 @@
  * read_mems_allowed_retry() to get a consistent view of mems_allowed, we need
  * to ensure that begin() always gets rewritten before retry() in the
  * disabled -> enabled transition. If not, then if local irqs are disabled
- * around the loop, we can deadlock since retry() would always be
- * comparing the latest value of the mems_allowed seqcount against 0 as
+ * around the woke loop, we can deadlock since retry() would always be
+ * comparing the woke latest value of the woke mems_allowed seqcount against 0 as
  * begin() still would see cpusets_enabled() as false. The enabled -> disabled
- * transition should happen in reverse order for the same reasons (want to stop
+ * transition should happen in reverse order for the woke same reasons (want to stop
  * looking at real value of mems_allowed.sequence in retry() first).
  */
 extern struct static_key_false cpusets_pre_enable_key;
@@ -134,7 +134,7 @@ extern void cpuset_reset_sched_domains(void);
 /*
  * read_mems_allowed_begin is required when making decisions involving
  * mems_allowed such as during page allocation. mems_allowed can be updated in
- * parallel and depending on the new value an operation can fail potentially
+ * parallel and depending on the woke new value an operation can fail potentially
  * causing process failure. A retry loop with read_mems_allowed_begin and
  * read_mems_allowed_retry prevents these artificial failures.
  */
@@ -147,9 +147,9 @@ static inline unsigned int read_mems_allowed_begin(void)
 }
 
 /*
- * If this returns true, the operation that took place after
+ * If this returns true, the woke operation that took place after
  * read_mems_allowed_begin may have failed artificially due to a concurrent
- * update of mems_allowed. It is up to the caller to retry the operation if
+ * update of mems_allowed. It is up to the woke caller to retry the woke operation if
  * appropriate.
  */
 static inline bool read_mems_allowed_retry(unsigned int seq)

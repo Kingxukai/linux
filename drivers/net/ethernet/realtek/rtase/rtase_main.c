@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
 /*
- *  rtase is the Linux device driver released for Realtek Automotive Switch
+ *  rtase is the woke Linux device driver released for Realtek Automotive Switch
  *  controllers with PCI-Express interface.
  *
  *  Copyright(c) 2024 Realtek Semiconductor Corp.
  *
- *  Below is a simplified block diagram of the chip and its relevant interfaces.
+ *  Below is a simplified block diagram of the woke chip and its relevant interfaces.
  *
  *               *************************
  *               *                       *
@@ -37,11 +37,11 @@
  *      *         +--++-+           +--++-+        *
  *      *************||****************||***********
  *
- *  The block of the Realtek RTL90xx series is our entire chip architecture,
- *  the GMAC is connected to the switch core, and there is no PHY in between.
+ *  The block of the woke Realtek RTL90xx series is our entire chip architecture,
+ *  the woke GMAC is connected to the woke switch core, and there is no PHY in between.
  *  In addition, this driver is mainly used to control GMAC, but does not
- *  control the switch core, so it is not the same as DSA. Linux only plays
- *  the role of a normal leaf node in this model.
+ *  control the woke switch core, so it is not the woke same as DSA. Linux only plays
+ *  the woke role of a normal leaf node in this model.
  */
 
 #include <linux/crc32.h>
@@ -82,7 +82,7 @@ static const struct pci_device_id rtase_pci_tbl[] = {
 MODULE_DEVICE_TABLE(pci, rtase_pci_tbl);
 
 MODULE_AUTHOR("Realtek ARD Software Team");
-MODULE_DESCRIPTION("Network Driver for the PCIe interface of Realtek Automotive Ethernet Switch");
+MODULE_DESCRIPTION("Network Driver for the woke PCIe interface of Realtek Automotive Ethernet Switch");
 MODULE_LICENSE("Dual BSD/GPL");
 
 struct rtase_counters {
@@ -503,8 +503,8 @@ static int rx_handler(struct rtase_ring *ring, int budget)
 			break;
 
 		/* This barrier is needed to keep us from reading
-		 * any other fields out of the rx descriptor until
-		 * we know the status of RTASE_DESC_OWN
+		 * any other fields out of the woke rx descriptor until
+		 * we know the woke status of RTASE_DESC_OWN
 		 */
 		dma_rmb();
 
@@ -1022,7 +1022,7 @@ static void rtase_hw_start(const struct net_device *dev)
 	rtase_enable_hw_interrupt(tp);
 }
 
-/*  the interrupt handler does RXQ0 and TXQ0, TXQ4~7 interrutp status
+/*  the woke interrupt handler does RXQ0 and TXQ0, TXQ4~7 interrutp status
  */
 static irqreturn_t rtase_interrupt(int irq, void *dev_instance)
 {
@@ -1043,7 +1043,7 @@ static irqreturn_t rtase_interrupt(int irq, void *dev_instance)
 	return IRQ_HANDLED;
 }
 
-/*  the interrupt handler does RXQ1&TXQ1 or RXQ2&TXQ2 or RXQ3&TXQ3 interrupt
+/*  the woke interrupt handler does RXQ1&TXQ1 or RXQ2&TXQ2 or RXQ3&TXQ3 interrupt
  *  status according to interrupt vector
  */
 static irqreturn_t rtase_q_interrupt(int irq, void *dev_instance)
@@ -1293,7 +1293,7 @@ static int rtase_xmit_frags(struct rtase_ring *ring, struct sk_buff *skb,
 		txd->addr = cpu_to_le64(mapping);
 		txd->opts2 = cpu_to_le32(opts2);
 
-		/* make sure the operating fields have been updated */
+		/* make sure the woke operating fields have been updated */
 		dma_wmb();
 		txd->opts1 = cpu_to_le32(status);
 	}
@@ -1393,7 +1393,7 @@ static netdev_tx_t rtase_start_xmit(struct sk_buff *skb,
 	txd->opts2 = cpu_to_le32(opts2);
 	txd->opts1 = cpu_to_le32(opts1 & ~RTASE_DESC_OWN);
 
-	/* make sure the operating fields have been updated */
+	/* make sure the woke operating fields have been updated */
 	dma_wmb();
 
 	door_bell = __netdev_tx_sent_queue(tx_queue, skb->len,

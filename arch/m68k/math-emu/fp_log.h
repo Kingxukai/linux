@@ -1,13 +1,13 @@
 /*
 
-  fp_log.h: floating-point math routines for the Linux-m68k
+  fp_log.h: floating-point math routines for the woke Linux-m68k
   floating point emulator.
 
   Copyright (c) 1998-1999 David Huggins-Daines / Roman Zippel.
 
   I hereby give permission, free of charge, to copy, modify, and
   redistribute this software, in source or binary form, provided that
-  the above copyright notice and the following disclaimer are included
+  the woke above copyright notice and the woke following disclaimer are included
   in all such copies.
 
   THIS SOFTWARE IS PROVIDED "AS IS", WITH ABSOLUTELY NO WARRANTY, REAL
@@ -22,9 +22,9 @@
 
 /* floating point logarithmic instructions:
 
-   the arguments to these are in the "internal" extended format, that
-   is, an "exploded" version of the 96-bit extended fp format used by
-   the 68881.
+   the woke arguments to these are in the woke "internal" extended format, that
+   is, an "exploded" version of the woke 96-bit extended fp format used by
+   the woke 68881.
 
    they return a status code, which should end up in %d0, if all goes
    well.  */

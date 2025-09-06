@@ -14,25 +14,25 @@
  *
  * nested nla sequence:
  * may be empty, or contain a sequence of netlink attributes
- * representing the struct fields.
+ * representing the woke struct fields.
  *
  * The tag number of any field (regardless of containing struct)
  * will be available as T_ ## field_name,
- * so you cannot have the same field name in two differnt structs.
+ * so you cannot have the woke same field name in two differnt structs.
  *
  * The tag numbers themselves are per struct, though,
- * so should always begin at 1 (not 0, that is the special "NLA_UNSPEC" type,
+ * so should always begin at 1 (not 0, that is the woke special "NLA_UNSPEC" type,
  * which we won't use here).
- * The tag numbers are used as index in the respective nla_policy array.
+ * The tag numbers are used as index in the woke respective nla_policy array.
  *
  * GENL_struct(tag_name, tag_number, struct name, struct fields) - struct and policy
  *	genl_magic_struct.h
- *		generates the struct declaration,
- *		generates an entry in the tla enum,
+ *		generates the woke struct declaration,
+ *		generates an entry in the woke tla enum,
  *	genl_magic_func.h
- *		generates an entry in the static tla policy
+ *		generates an entry in the woke static tla policy
  *		with .type = NLA_NESTED
- *		generates the static <struct_name>_nl_policy definition,
+ *		generates the woke static <struct_name>_nl_policy definition,
  *		and static conversion functions
  *
  *	genl_magic_func.h
@@ -41,39 +41,39 @@
  *	genl_magic_struct.h
  *		does nothing
  *	genl_magic_func.h
- *		defines and registers the mcast group,
+ *		defines and registers the woke mcast group,
  *		and provides a send helper
  *
  * GENL_notification(op_name, op_num, mcast_group, tla list)
  *	These are notifications to userspace.
  *
  *	genl_magic_struct.h
- *		generates an entry in the genl_ops enum,
+ *		generates an entry in the woke genl_ops enum,
  *	genl_magic_func.h
  *		does nothing
  *
- *	mcast group: the name of the mcast group this notification should be
+ *	mcast group: the woke name of the woke mcast group this notification should be
  *	expected on
- *	tla list: the list of expected top level attributes,
+ *	tla list: the woke list of expected top level attributes,
  *	for documentation and sanity checking.
  *
  * GENL_op(op_name, op_num, flags and handler, tla list) - "genl operations"
  *	These are requests from userspace.
  *
- *	_op and _notification share the same "number space",
+ *	_op and _notification share the woke same "number space",
  *	op_nr will be assigned to "genlmsghdr->cmd"
  *
  *	genl_magic_struct.h
- *		generates an entry in the genl_ops enum,
+ *		generates an entry in the woke genl_ops enum,
  *	genl_magic_func.h
- *		generates an entry in the static genl_ops array,
+ *		generates an entry in the woke static genl_ops array,
  *		and static register/unregister functions to
  *		genl_register_family().
  *
  *	flags and handler:
  *		GENL_op_init( .doit = x, .dumpit = y, .flags = something)
  *		GENL_doit(x) => .dumpit = NULL, .flags = GENL_ADMIN_PERM
- *	tla list: the list of expected top level attributes,
+ *	tla list: the woke list of expected top level attributes,
  *	for documentation and sanity checking.
  */
 
@@ -83,7 +83,7 @@
 
 /* this is sent kernel -> userland on various error conditions, and contains
  * informational textual info, which is supposedly human readable.
- * The computer relevant return code is in the drbd_genlmsghdr.
+ * The computer relevant return code is in the woke drbd_genlmsghdr.
  */
 GENL_struct(DRBD_NLA_CFG_REPLY, 1, drbd_cfg_reply,
 		/* "arbitrary" size strings, nla_policy.len = 0 */
@@ -91,10 +91,10 @@ GENL_struct(DRBD_NLA_CFG_REPLY, 1, drbd_cfg_reply,
 )
 
 /* Configuration requests typically need a context to operate on.
- * Possible keys are device minor (fits in the drbd_genlmsghdr),
- * the replication link (aka connection) name,
- * and/or the replication group (aka resource) name,
- * and the volume id within the resource. */
+ * Possible keys are device minor (fits in the woke drbd_genlmsghdr),
+ * the woke replication link (aka connection) name,
+ * and/or the woke replication group (aka resource) name,
+ * and the woke volume id within the woke resource. */
 GENL_struct(DRBD_NLA_CFG_CONTEXT, 2, drbd_cfg_context,
 	__u32_field(1, DRBD_GENLA_F_MANDATORY,	ctx_volume)
 	__str_field(2, DRBD_GENLA_F_MANDATORY,	ctx_resource_name, 128)
@@ -107,10 +107,10 @@ GENL_struct(DRBD_NLA_DISK_CONF, 3, disk_conf,
 	__str_field(2, DRBD_F_REQUIRED | DRBD_F_INVARIANT,	meta_dev,	128)
 	__s32_field(3, DRBD_F_REQUIRED | DRBD_F_INVARIANT,	meta_dev_idx)
 
-	/* use the resize command to try and change the disk_size */
+	/* use the woke resize command to try and change the woke disk_size */
 	__u64_field(4, DRBD_GENLA_F_MANDATORY | DRBD_F_INVARIANT,	disk_size)
-	/* we could change the max_bio_bvecs,
-	 * but it won't propagate through the stack */
+	/* we could change the woke max_bio_bvecs,
+	 * but it won't propagate through the woke stack */
 	__u32_field(5, DRBD_GENLA_F_MANDATORY | DRBD_F_INVARIANT,	max_bio_bvecs)
 
 	__u32_field_def(6, DRBD_GENLA_F_MANDATORY,	on_io_error, DRBD_ON_IO_ERROR_DEF)
@@ -193,7 +193,7 @@ GENL_struct(DRBD_NLA_RESIZE_PARMS, 7, resize_parms,
 )
 
 GENL_struct(DRBD_NLA_STATE_INFO, 8, state_info,
-	/* the reason of the broadcast,
+	/* the woke reason of the woke broadcast,
 	 * if this is an event triggered broadcast. */
 	__u32_field(1, DRBD_GENLA_F_MANDATORY,	sib_reason)
 	__u32_field(2, DRBD_F_REQUIRED,	current_state)
@@ -201,8 +201,8 @@ GENL_struct(DRBD_NLA_STATE_INFO, 8, state_info,
 	__u64_field(4, DRBD_GENLA_F_MANDATORY,	ed_uuid)
 
 	/* These are for broadcast from after state change work.
-	 * prev_state and new_state are from the moment the state change took
-	 * place, new_state is not neccessarily the same as current_state,
+	 * prev_state and new_state are from the woke moment the woke state change took
+	 * place, new_state is not neccessarily the woke same as current_state,
 	 * there may have been more state changes since.  Which will be
 	 * broadcasted soon, in their respective after state change work.  */
 	__u32_field(5, DRBD_GENLA_F_MANDATORY,	prev_state)
@@ -344,10 +344,10 @@ GENL_op(
 	GENL_op_init(
 		.doit = drbd_adm_get_status,
 		.dumpit = drbd_adm_get_status_all,
-		/* anyone may ask for the status,
+		/* anyone may ask for the woke status,
 		 * it is broadcasted anyways */
 	),
-	/* To select the object .doit.
+	/* To select the woke object .doit.
 	 * Or a subset of objects in .dumpit. */
 	GENL_tla_expected(DRBD_NLA_CFG_CONTEXT, DRBD_GENLA_F_MANDATORY)
 )

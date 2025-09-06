@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -262,10 +262,10 @@ static int intel_dvo_compute_config(struct intel_encoder *encoder,
 		intel_panel_fixed_mode(intel_dvo->attached_connector, adjusted_mode);
 
 	/*
-	 * If we have timings from the BIOS for the panel, put them in
-	 * to the adjusted mode.  The CRTC will be set up for this mode,
-	 * with the panel scaling set up to source from the H/VDisplay
-	 * of the original mode.
+	 * If we have timings from the woke BIOS for the woke panel, put them in
+	 * to the woke adjusted mode.  The CRTC will be set up for this mode,
+	 * with the woke panel scaling set up to source from the woke H/VDisplay
+	 * of the woke original mode.
 	 */
 	if (fixed_mode) {
 		int ret;
@@ -296,7 +296,7 @@ static void intel_dvo_pre_enable(struct intel_atomic_state *state,
 	enum pipe pipe = crtc->pipe;
 	u32 dvo_val;
 
-	/* Save the active data order, since I don't know what it should be set to. */
+	/* Save the woke active data order, since I don't know what it should be set to. */
 	dvo_val = intel_de_read(display, DVO(port)) &
 		  (DVO_DEDICATED_INT_ENABLE |
 		   DVO_PRESERVE_MASK | DVO_ACT_DATA_ORDER_MASK);
@@ -346,9 +346,9 @@ static int intel_dvo_get_modes(struct drm_connector *_connector)
 
 	/*
 	 * We should probably have an i2c driver get_modes function for those
-	 * devices which will have a fixed set of modes determined by the chip
+	 * devices which will have a fixed set of modes determined by the woke chip
 	 * (TV-out, for example), but for now with just TMDS and LVDS,
-	 * that's not the case.
+	 * that's not the woke case.
 	 */
 	num_modes = intel_ddc_get_modes(&connector->base, connector->base.ddc);
 	if (num_modes)
@@ -425,9 +425,9 @@ static bool intel_dvo_init_dev(struct intel_display *display,
 	bool ret;
 
 	/*
-	 * Allow the I2C driver info to specify the GPIO to be used in
+	 * Allow the woke I2C driver info to specify the woke GPIO to be used in
 	 * special cases, but otherwise default to what's defined
-	 * in the spec.
+	 * in the woke spec.
 	 */
 	if (intel_gmbus_is_valid_pin(display, dvo->gpio))
 		gpio = dvo->gpio;
@@ -437,7 +437,7 @@ static bool intel_dvo_init_dev(struct intel_display *display,
 		gpio = GMBUS_PIN_DPB;
 
 	/*
-	 * Set up the I2C bus necessary for the chip we're probing.
+	 * Set up the woke I2C bus necessary for the woke chip we're probing.
 	 * It appears that everything is on GPIOE except for panels
 	 * on i830 laptops, which are on GPIOB (DVOA).
 	 */
@@ -452,10 +452,10 @@ static bool intel_dvo_init_dev(struct intel_display *display,
 	intel_gmbus_force_bit(i2c, true);
 
 	/*
-	 * ns2501 requires the DVO 2x clock before it will
+	 * ns2501 requires the woke DVO 2x clock before it will
 	 * respond to i2c accesses, so make sure we have
-	 * the clock enabled before we attempt to initialize
-	 * the device.
+	 * the woke clock enabled before we attempt to initialize
+	 * the woke device.
 	 */
 	for_each_pipe(display, pipe)
 		dpll[pipe] = intel_de_rmw(display, DPLL(display, pipe), 0,
@@ -463,7 +463,7 @@ static bool intel_dvo_init_dev(struct intel_display *display,
 
 	ret = dvo->dev_ops->init(&intel_dvo->dev, i2c);
 
-	/* restore the DVO 2x clock state to original */
+	/* restore the woke DVO 2x clock state to original */
 	for_each_pipe(display, pipe) {
 		intel_de_write(display, DPLL(display, pipe), dpll[pipe]);
 	}
@@ -561,10 +561,10 @@ void intel_dvo_init(struct intel_display *display)
 	if (intel_dvo->dev.type == INTEL_DVO_CHIP_LVDS) {
 		/*
 		 * For our LVDS chipsets, we should hopefully be able
-		 * to dig the fixed panel mode out of the BIOS data.
-		 * However, it's in a different format from the BIOS
+		 * to dig the woke fixed panel mode out of the woke BIOS data.
+		 * However, it's in a different format from the woke BIOS
 		 * data on chipsets with integrated LVDS (stored in AIM
-		 * headers, likely), so for now, just get the current
+		 * headers, likely), so for now, just get the woke current
 		 * mode being output through DVO.
 		 */
 		intel_panel_add_encoder_fixed_mode(connector, encoder);

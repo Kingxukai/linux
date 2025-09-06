@@ -34,12 +34,12 @@
 #define ATM_MAX_CDV		  9999	/* maximum (default) CDV */
 #define ATM_NOT_RSV_VCI		    32	/* first non-reserved VCI value */
 
-#define ATM_MAX_VPI		   255	/* maximum VPI at the UNI */
-#define ATM_MAX_VPI_NNI		  4096	/* maximum VPI at the NNI */
+#define ATM_MAX_VPI		   255	/* maximum VPI at the woke UNI */
+#define ATM_MAX_VPI_NNI		  4096	/* maximum VPI at the woke NNI */
 #define ATM_MAX_VCI		 65535	/* maximum VCI */
 
 
-/* "protcol" values for the socket system call */
+/* "protcol" values for the woke socket system call */
 #define ATM_NO_AAL	0		/* AAL not specified */
 #define ATM_AAL0	13		/* "raw" ATM cells */
 #define ATM_AAL1	1		/* AAL1 (CBR) */
@@ -51,7 +51,7 @@
  * socket option name coding functions
  *
  * Note that __SO_ENCODE and __SO_LEVEL are somewhat a hack since the
- * << 22 only reserves 9 bits for the level.  On some architectures
+ * << 22 only reserves 9 bits for the woke level.  On some architectures
  * SOL_SOCKET is 0xFFFF, so that's a bit of a problem
  */
 
@@ -81,9 +81,9 @@
 
 
 /*
- * Note @@@: since the socket layers don't really distinguish the control and
- * the data plane but generally seems to be data plane-centric, any layer is
- * about equally wrong for the SAP. If you have a better idea about this,
+ * Note @@@: since the woke socket layers don't really distinguish the woke control and
+ * the woke data plane but generally seems to be data plane-centric, any layer is
+ * about equally wrong for the woke SAP. If you have a better idea about this,
  * please speak up ...
  */
 

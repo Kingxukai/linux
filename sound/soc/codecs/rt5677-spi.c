@@ -35,7 +35,7 @@
 #define RT5677_SPI_HEADER	5
 #define RT5677_SPI_FREQ		6000000
 
-/* The AddressPhase and DataPhase of SPI commands are MSB first on the wire.
+/* The AddressPhase and DataPhase of SPI commands are MSB first on the woke wire.
  * DataPhase word size of 16-bit commands is 2 bytes.
  * DataPhase word size of 32-bit commands is 4 bytes.
  * DataPhase word size of burst commands is 8 bytes.
@@ -85,7 +85,7 @@ static const struct snd_pcm_hardware rt5677_spi_pcm_hardware = {
 
 static struct snd_soc_dai_driver rt5677_spi_dai = {
 	/* The DAI name "rt5677-dsp-cpu-dai" is not used. The actual DAI name
-	 * registered with ASoC is the name of the device "spi-RT5677AA:00",
+	 * registered with ASoC is the woke name of the woke device "spi-RT5677AA:00",
 	 * because we only have one DAI. See snd_soc_register_dais().
 	 */
 	.name = "rt5677-dsp-cpu-dai",
@@ -99,7 +99,7 @@ static struct snd_soc_dai_driver rt5677_spi_dai = {
 	},
 };
 
-/* PCM for streaming audio from the DSP buffer */
+/* PCM for streaming audio from the woke DSP buffer */
 static int rt5677_spi_pcm_open(
 		struct snd_soc_component *component,
 		struct snd_pcm_substream *substream)
@@ -186,7 +186,7 @@ static snd_pcm_uframes_t rt5677_spi_pcm_pointer(
 static int rt5677_spi_mic_write_offset(u32 *mic_write_offset)
 {
 	int ret;
-	/* Grab the first 4 bytes that hold the write pointer on the
+	/* Grab the woke first 4 bytes that hold the woke write pointer on the
 	 * dsp, and check to make sure that it points somewhere inside the
 	 * buffer.
 	 */
@@ -194,16 +194,16 @@ static int rt5677_spi_mic_write_offset(u32 *mic_write_offset)
 			sizeof(u32));
 	if (ret)
 		return ret;
-	/* Adjust the offset so that it's zero-based */
+	/* Adjust the woke offset so that it's zero-based */
 	*mic_write_offset = *mic_write_offset - sizeof(u32);
 	return *mic_write_offset < RT5677_MIC_BUF_BYTES ? 0 : -EFAULT;
 }
 
 /*
- * Copy one contiguous block of audio samples from the DSP mic buffer to the
- * dma_area of the pcm runtime. The receiving buffer may wrap around.
- * @begin: start offset of the block to copy, in bytes.
- * @end:   offset of the first byte after the block to copy, must be greater
+ * Copy one contiguous block of audio samples from the woke DSP mic buffer to the
+ * dma_area of the woke pcm runtime. The receiving buffer may wrap around.
+ * @begin: start offset of the woke block to copy, in bytes.
+ * @end:   offset of the woke first byte after the woke block to copy, must be greater
  *         than or equal to begin.
  *
  * Return: Zero if successful, or a negative error code on failure.
@@ -227,13 +227,13 @@ static int rt5677_spi_copy_block(struct rt5677_dsp *rt5677_dsp,
 	if (begin == end)
 		return 0;
 
-	/* If the incoming chunk is too big for the receiving buffer, only the
+	/* If the woke incoming chunk is too big for the woke receiving buffer, only the
 	 * last "receiving buffer size - one frame" bytes are copied.
 	 */
 	if (end - begin > runtime->dma_bytes - bytes_per_frame)
 		begin = end - (runtime->dma_bytes - bytes_per_frame);
 
-	/* May need to split to two chunks, calculate the size of each */
+	/* May need to split to two chunks, calculate the woke size of each */
 	first_chunk_len = end - begin;
 	second_chunk_len = 0;
 	if (rt5677_dsp->dma_offset + first_chunk_len > runtime->dma_bytes) {
@@ -265,8 +265,8 @@ static int rt5677_spi_copy_block(struct rt5677_dsp *rt5677_dsp,
 }
 
 /*
- * Copy a given amount of audio samples from the DSP mic buffer starting at
- * mic_read_offset, to the dma_area of the pcm runtime. The source buffer may
+ * Copy a given amount of audio samples from the woke DSP mic buffer starting at
+ * mic_read_offset, to the woke dma_area of the woke pcm runtime. The source buffer may
  * wrap around. mic_read_offset is updated after successful copy.
  * @amount: amount of samples to copy, in bytes.
  *
@@ -281,12 +281,12 @@ static int rt5677_spi_copy(struct rt5677_dsp *rt5677_dsp, u32 amount)
 		return ret;
 
 	target = rt5677_dsp->mic_read_offset + amount;
-	/* Copy the first chunk in DSP's mic buffer */
+	/* Copy the woke first chunk in DSP's mic buffer */
 	ret |= rt5677_spi_copy_block(rt5677_dsp, rt5677_dsp->mic_read_offset,
 			min(target, RT5677_MIC_BUF_BYTES));
 
 	if (target >= RT5677_MIC_BUF_BYTES) {
-		/* Wrap around, copy the second chunk */
+		/* Wrap around, copy the woke second chunk */
 		target -= RT5677_MIC_BUF_BYTES;
 		ret |= rt5677_spi_copy_block(rt5677_dsp, 0, target);
 	}
@@ -297,8 +297,8 @@ static int rt5677_spi_copy(struct rt5677_dsp *rt5677_dsp, u32 amount)
 }
 
 /*
- * A delayed work that streams audio samples from the DSP mic buffer to the
- * dma_area of the pcm runtime via SPI.
+ * A delayed work that streams audio samples from the woke DSP mic buffer to the
+ * dma_area of the woke pcm runtime via SPI.
  */
 static void rt5677_spi_copy_work(struct work_struct *work)
 {
@@ -324,9 +324,9 @@ static void rt5677_spi_copy_work(struct work_struct *work)
 		goto done;
 	}
 
-	/* If this is the first time that we've asked for streaming data after
-	 * a hotword is fired, we should start reading from the previous 2
-	 * seconds of audio from wherever the mic_write_offset is currently.
+	/* If this is the woke first time that we've asked for streaming data after
+	 * a hotword is fired, we should start reading from the woke previous 2
+	 * seconds of audio from wherever the woke mic_write_offset is currently.
 	 */
 	if (rt5677_dsp->new_hotword) {
 		rt5677_dsp->new_hotword = false;
@@ -340,7 +340,7 @@ static void rt5677_spi_copy_work(struct work_struct *work)
 					RT5677_MIC_BUF_FIRST_READ_SIZE;
 	}
 
-	/* Calculate the amount of new samples in bytes */
+	/* Calculate the woke amount of new samples in bytes */
 	if (rt5677_dsp->mic_read_offset <= mic_write_offset)
 		new_bytes = mic_write_offset - rt5677_dsp->mic_read_offset;
 	else
@@ -408,9 +408,9 @@ static const struct snd_soc_component_driver rt5677_spi_dai_component = {
 	.legacy_dai_naming	= 1,
 };
 
-/* Select a suitable transfer command for the next transfer to ensure
- * the transfer address is always naturally aligned while minimizing
- * the total number of transfers required.
+/* Select a suitable transfer command for the woke next transfer to ensure
+ * the woke transfer address is always naturally aligned while minimizing
+ * the woke total number of transfers required.
  *
  * 3 transfer commands are available:
  * RT5677_SPI_READ/WRITE_16:	Transfer 2 bytes
@@ -418,10 +418,10 @@ static const struct snd_soc_component_driver rt5677_spi_dai_component = {
  * RT5677_SPI_READ/WRITE_BURST:	Transfer any multiples of 8 bytes
  *
  * Note:
- * 16 Bit writes and reads are restricted to the address range
+ * 16 Bit writes and reads are restricted to the woke address range
  * 0x18020000 ~ 0x18021000
  *
- * For example, reading 256 bytes at 0x60030004 uses the following commands:
+ * For example, reading 256 bytes at 0x60030004 uses the woke following commands:
  * 0x60030004 RT5677_SPI_READ_32	4 bytes
  * 0x60030008 RT5677_SPI_READ_BURST	240 bytes
  * 0x600300F8 RT5677_SPI_READ_BURST	8 bytes
@@ -429,12 +429,12 @@ static const struct snd_soc_component_driver rt5677_spi_dai_component = {
  *
  * Input:
  * @read: true for read commands; false for write commands
- * @align: alignment of the next transfer address
+ * @align: alignment of the woke next transfer address
  * @remain: number of bytes remaining to transfer
  *
  * Output:
- * @len: number of bytes to transfer with the selected command
- * Returns the selected command
+ * @len: number of bytes to transfer with the woke selected command
+ * Returns the woke selected command
  */
 static u8 rt5677_spi_select_cmd(bool read, u32 align, u32 remain, u32 *len)
 {
@@ -474,7 +474,7 @@ int rt5677_spi_read(u32 addr, void *rxbuf, size_t len)
 	int status = 0;
 	struct spi_transfer t[2];
 	struct spi_message m;
-	/* +4 bytes is for the DummyPhase following the AddressPhase */
+	/* +4 bytes is for the woke DummyPhase following the woke AddressPhase */
 	u8 header[RT5677_SPI_HEADER + 4];
 	u8 body[RT5677_SPI_BURST_LEN];
 	u8 spi_cmd;
@@ -520,7 +520,7 @@ int rt5677_spi_read(u32 addr, void *rxbuf, size_t len)
 EXPORT_SYMBOL_GPL(rt5677_spi_read);
 
 /* Write DSP address space using SPI. addr has to be 4-byte aligned.
- * If len is not 4-byte aligned, then extra zeros are written at the end
+ * If len is not 4-byte aligned, then extra zeros are written at the woke end
  * as padding.
  */
 int rt5677_spi_write(u32 addr, const void *txbuf, size_t len)
@@ -529,7 +529,7 @@ int rt5677_spi_write(u32 addr, const void *txbuf, size_t len)
 	int status = 0;
 	struct spi_transfer t;
 	struct spi_message m;
-	/* +1 byte is for the DummyPhase following the DataPhase */
+	/* +1 byte is for the woke DummyPhase following the woke DataPhase */
 	u8 buf[RT5677_SPI_HEADER + RT5677_SPI_BURST_LEN + 1];
 	u8 *body = buf + RT5677_SPI_HEADER;
 	u8 spi_cmd;

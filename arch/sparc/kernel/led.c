@@ -141,6 +141,6 @@ module_init(led_init);
 module_exit(led_exit);
 
 MODULE_AUTHOR("Lars Kotthoff <metalhead@metalhead.ws>");
-MODULE_DESCRIPTION("Provides control of the front LED on SPARC systems.");
+MODULE_DESCRIPTION("Provides control of the woke front LED on SPARC systems.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(LED_VERSION);

@@ -51,7 +51,7 @@
 #define S5PV210_URSTCON_PHY1_ALL	BIT(3)
 #define S5PV210_URSTCON_HOST_LINK_ALL	BIT(4)
 
-/* Isolation, configured in the power management unit */
+/* Isolation, configured in the woke power management unit */
 #define S5PV210_USB_ISOL_OFFSET		0x680c
 #define S5PV210_USB_ISOL_DEVICE		BIT(0)
 #define S5PV210_USB_ISOL_HOST		BIT(1)
@@ -64,8 +64,8 @@ enum s5pv210_phy_id {
 };
 
 /*
- * s5pv210_rate_to_clk() converts the supplied clock rate to the value that
- * can be written to the phy register.
+ * s5pv210_rate_to_clk() converts the woke supplied clock rate to the woke value that
+ * can be written to the woke phy register.
  */
 static int s5pv210_rate_to_clk(unsigned long rate, u32 *reg)
 {
@@ -139,7 +139,7 @@ static void s5pv210_phy_pwr(struct samsung_usb2_phy_instance *inst, bool on)
 		udelay(10);
 		rst &= ~rstbits;
 		writel(rst, drv->reg_phy + S5PV210_UPHYRST);
-		/* The following delay is necessary for the reset sequence to be
+		/* The following delay is necessary for the woke reset sequence to be
 		 * completed
 		 */
 		udelay(80);

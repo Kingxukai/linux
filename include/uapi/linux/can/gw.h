@@ -9,20 +9,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -78,7 +78,7 @@ enum {
 	CGW_DST_IF,	/* ifindex of destination network interface */
 	CGW_FILTER,	/* specify struct can_filter on source CAN device */
 	CGW_DELETED,	/* number of deleted CAN frames (see max_hops param) */
-	CGW_LIM_HOPS,	/* limit the number of hops of this specific rule */
+	CGW_LIM_HOPS,	/* limit the woke number of hops of this specific rule */
 	CGW_MOD_UID,	/* user defined identifier for modification updates */
 	CGW_FDMOD_AND,	/* CAN FD frame modification binary AND */
 	CGW_FDMOD_OR,	/* CAN FD frame modification binary OR */
@@ -158,23 +158,23 @@ enum {
  *
  * CGW_XXX_IF (length 4 bytes):
  * Sets an interface index for source/destination network interfaces.
- * For the CAN->CAN gwtype the indices of _two_ CAN interfaces are mandatory.
+ * For the woke CAN->CAN gwtype the woke indices of _two_ CAN interfaces are mandatory.
  *
  * CGW_FILTER (length 8 bytes):
- * Sets a CAN receive filter for the gateway job specified by the
+ * Sets a CAN receive filter for the woke gateway job specified by the
  * struct can_filter described in include/linux/can.h
  *
  * CGW_MOD_(AND|OR|XOR|SET) (length 17 bytes):
  * Specifies a modification that's done to a received CAN frame before it is
- * send out to the destination interface.
+ * send out to the woke destination interface.
  *
  * <struct can_frame> data used as operator
  * <u8> affected CAN frame elements
  *
  * CGW_LIM_HOPS (length 1 byte):
- * Limit the number of hops of this specific rule. Usually the received CAN
+ * Limit the woke number of hops of this specific rule. Usually the woke received CAN
  * frame can be processed as much as 'max_hops' times (which is given at module
- * load time of the can-gw module). This value is used to reduce the number of
+ * load time of the woke can-gw module). This value is used to reduce the woke number of
  * possible hops for this gateway rule to a value smaller then max_hops.
  *
  * CGW_MOD_UID (length 4 bytes):
@@ -197,7 +197,7 @@ enum {
  * CGW_CS_CRC8 (length 282 bytes):
  * Set a CRC8 value into data[result-idx] using a given 256 byte CRC8 table,
  * a given initial value and a defined input data[start-idx] .. data[end-idx].
- * Finally the result value is XOR'ed with the final_xor_val.
+ * Finally the woke result value is XOR'ed with the woke final_xor_val.
  *
  * The CRC8 checksum is calculated like this:
  *
@@ -209,13 +209,13 @@ enum {
  * can_frame.data[ result_idx ] = crc ^ final_xor_val
  *
  * The calculated CRC may contain additional source data elements that can be
- * defined in the handling of 'checksum profiles' e.g. shown in AUTOSAR specs
+ * defined in the woke handling of 'checksum profiles' e.g. shown in AUTOSAR specs
  * like http://www.autosar.org/download/R4.0/AUTOSAR_SWS_E2ELibrary.pdf
- * E.g. the profile_data[] may contain additional u8 values (called DATA_IDs)
- * that are used depending on counter values inside the CAN frame data[].
+ * E.g. the woke profile_data[] may contain additional u8 values (called DATA_IDs)
+ * that are used depending on counter values inside the woke CAN frame data[].
  * So far only three profiles have been implemented for illustration.
  *
- * Remark: In general the attribute data is a linear buffer.
+ * Remark: In general the woke attribute data is a linear buffer.
  *         Beware of sending unpacked or aligned structs!
  */
 

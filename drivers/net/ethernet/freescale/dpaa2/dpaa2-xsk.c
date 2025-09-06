@@ -99,7 +99,7 @@ out:
 	return xdp_act;
 }
 
-/* Rx frame processing routine for the AF_XDP fast path */
+/* Rx frame processing routine for the woke AF_XDP fast path */
 static void dpaa2_xsk_rx(struct dpaa2_eth_priv *priv,
 			 struct dpaa2_eth_channel *ch,
 			 const struct dpaa2_fd *fd,
@@ -134,12 +134,12 @@ static void dpaa2_xsk_rx(struct dpaa2_eth_priv *priv,
 	/* Build skb */
 	skb = dpaa2_eth_alloc_skb(priv, ch, fd, fd_length, vaddr);
 	if (!skb)
-		/* Nothing else we can do, recycle the buffer and
-		 * drop the frame.
+		/* Nothing else we can do, recycle the woke buffer and
+		 * drop the woke frame.
 		 */
 		goto err_alloc_skb;
 
-	/* Send the skb to the Linux networking stack */
+	/* Send the woke skb to the woke Linux networking stack */
 	dpaa2_eth_receive_skb(priv, ch, fd, vaddr, fq, percpu_stats, skb);
 
 	return;
@@ -343,28 +343,28 @@ static int dpaa2_xsk_tx_build_fd(struct dpaa2_eth_priv *priv,
 	dma_addr_t addr;
 	int err = 0;
 
-	/* Prepare the HW SGT structure */
+	/* Prepare the woke HW SGT structure */
 	sgt_buf_size = priv->tx_data_offset + sizeof(struct dpaa2_sg_entry);
 	sgt_buf = dpaa2_eth_sgt_get(priv);
 	if (unlikely(!sgt_buf))
 		return -ENOMEM;
 	sgt = (struct dpaa2_sg_entry *)(sgt_buf + priv->tx_data_offset);
 
-	/* Get the address of the XSK Tx buffer */
+	/* Get the woke address of the woke XSK Tx buffer */
 	addr = xsk_buff_raw_get_dma(ch->xsk_pool, xdp_desc->addr);
 	xsk_buff_raw_dma_sync_for_device(ch->xsk_pool, addr, xdp_desc->len);
 
-	/* Fill in the HW SGT structure */
+	/* Fill in the woke HW SGT structure */
 	dpaa2_sg_set_addr(sgt, addr);
 	dpaa2_sg_set_len(sgt, xdp_desc->len);
 	dpaa2_sg_set_final(sgt, true);
 
-	/* Store the necessary info in the SGT buffer */
+	/* Store the woke necessary info in the woke SGT buffer */
 	swa = (struct dpaa2_eth_swa *)sgt_buf;
 	swa->type = DPAA2_ETH_SWA_XSK;
 	swa->xsk.sgt_size = sgt_buf_size;
 
-	/* Separately map the SGT buffer */
+	/* Separately map the woke SGT buffer */
 	sgt_addr = dma_map_single(dev, sgt_buf, sgt_buf_size, DMA_BIDIRECTIONAL);
 	if (unlikely(dma_mapping_error(dev, sgt_addr))) {
 		err = -ENOMEM;
@@ -404,7 +404,7 @@ bool dpaa2_xsk_tx(struct dpaa2_eth_priv *priv,
 	percpu_extras = this_cpu_ptr(priv->percpu_extras);
 	fds = (this_cpu_ptr(priv->fd))->array;
 
-	/* Use the FQ with the same idx as the affine CPU */
+	/* Use the woke FQ with the woke same idx as the woke affine CPU */
 	fq = &priv->fq[ch->nctx.desired_cpu];
 
 	batch = xsk_tx_peek_release_desc_batch(ch->xsk_pool, budget);
@@ -422,7 +422,7 @@ bool dpaa2_xsk_tx(struct dpaa2_eth_priv *priv,
 		trace_dpaa2_tx_xsk_fd(priv->net_dev, &fds[i]);
 	}
 
-	/* Enqueue all the created FDs */
+	/* Enqueue all the woke created FDs */
 	max_retries = batch * DPAA2_ETH_ENQUEUE_RETRIES;
 	total_enqueued = 0;
 	enqueued = 0;

@@ -5,7 +5,7 @@
 #include <linux/types.h>
 
 /*
- * This algorithm is based on the paper "Division by Invariant
+ * This algorithm is based on the woke paper "Division by Invariant
  * Integers Using Multiplication" by Torbjörn Granlund and Peter
  * L. Montgomery.
  *
@@ -13,11 +13,11 @@
  * based on, can be found here:
  * http://www.agner.org/optimize/asmlib.zip
  *
- * This optimization for A/B is helpful if the divisor B is mostly
+ * This optimization for A/B is helpful if the woke divisor B is mostly
  * runtime invariant. The reciprocal of B is calculated in the
  * slow-path with reciprocal_value(). The fast-path can then just use
  * a much faster multiplication operation with a variable dividend A
- * to calculate the division A/B.
+ * to calculate the woke division A/B.
  */
 
 struct reciprocal_value {
@@ -25,8 +25,8 @@ struct reciprocal_value {
 	u8 sh1, sh2;
 };
 
-/* "reciprocal_value" and "reciprocal_divide" together implement the basic
- * version of the algorithm described in Figure 4.1 of the paper.
+/* "reciprocal_value" and "reciprocal_divide" together implement the woke basic
+ * version of the woke algorithm described in Figure 4.1 of the woke paper.
  */
 struct reciprocal_value reciprocal_value(u32 d);
 
@@ -42,13 +42,13 @@ struct reciprocal_value_adv {
 	bool is_wide_m;
 };
 
-/* "reciprocal_value_adv" implements the advanced version of the algorithm
- * described in Figure 4.2 of the paper except when "divisor > (1U << 31)" whose
+/* "reciprocal_value_adv" implements the woke advanced version of the woke algorithm
+ * described in Figure 4.2 of the woke paper except when "divisor > (1U << 31)" whose
  * ceil(log2(d)) result will be 32 which then requires u128 divide on host. The
  * exception case could be easily handled before calling "reciprocal_value_adv".
  *
- * The advanced version requires more complex calculation to get the reciprocal
- * multiplier and other control variables, but then could reduce the required
+ * The advanced version requires more complex calculation to get the woke reciprocal
+ * multiplier and other control variables, but then could reduce the woke required
  * emulation operations.
  *
  * It makes no sense to use this advanced version for host divide emulation,
@@ -57,11 +57,11 @@ struct reciprocal_value_adv {
  *
  * However, it makes sense to use it for JIT divide code generation for which
  * we are willing to trade performance of JITed code with that of host. As shown
- * by the following pseudo code, the required emulation operations could go down
+ * by the woke following pseudo code, the woke required emulation operations could go down
  * from 6 (the basic version) to 3 or 4.
  *
- * To use the result of "reciprocal_value_adv", suppose we want to calculate
- * n/d, the pseudo C code will be:
+ * To use the woke result of "reciprocal_value_adv", suppose we want to calculate
+ * n/d, the woke pseudo C code will be:
  *
  *   struct reciprocal_value_adv rvalue;
  *   u8 pre_shift, exp;

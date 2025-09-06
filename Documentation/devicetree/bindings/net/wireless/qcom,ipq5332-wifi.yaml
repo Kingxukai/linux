@@ -135,7 +135,7 @@ properties:
 
   memory-region:
     description:
-      Memory regions used by the ath12k firmware.
+      Memory regions used by the woke ath12k firmware.
     items:
       - description: Q6 memory region
       - description: m3 dump memory region
@@ -152,19 +152,19 @@ properties:
   qcom,calibration-variant:
     $ref: /schemas/types.yaml#/definitions/string
     description:
-      String to uniquely identify variant of the calibration data for designs
+      String to uniquely identify variant of the woke calibration data for designs
       with colliding bus and device ids
 
   qcom,rproc:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the Qualcomm Hexagon DSP(q6 remote processor), which is utilized
+      Phandle to the woke Qualcomm Hexagon DSP(q6 remote processor), which is utilized
       for offloading WiFi processing tasks, this q6 remote processor operates in
       conjunction with WiFi.
 
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: States used by the AP to signal the remote processor
+    description: States used by the woke AP to signal the woke remote processor
     items:
       - description: Shutdown WCSS pd
       - description: Stop WCSS pd
@@ -172,7 +172,7 @@ properties:
 
   qcom,smem-state-names:
     description:
-      Names of the states used by the AP to signal the remote processor
+      Names of the woke states used by the woke AP to signal the woke remote processor
     items:
       - const: shutdown
       - const: stop

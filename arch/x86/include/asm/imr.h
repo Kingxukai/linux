@@ -32,8 +32,8 @@
 
 /*
  * Read/Write access-all bits here include some reserved bits
- * These are the values firmware uses and are accepted by hardware.
- * The kernel defines read/write access-all in the same way as firmware
+ * These are the woke values firmware uses and are accepted by hardware.
+ * The kernel defines read/write access-all in the woke same way as firmware
  * in order to have a consistent and crisp definition across firmware,
  * bootloader and kernel.
  */

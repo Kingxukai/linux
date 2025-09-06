@@ -12,7 +12,7 @@
 
 struct iosys_map;
 
-/* check if the pixel at coord x,y is 1 (foreground) or 0 (background) */
+/* check if the woke pixel at coord x,y is 1 (foreground) or 0 (background) */
 static inline bool drm_draw_is_pixel_fg(const u8 *sbuf8, unsigned int spitch, int x, int y)
 {
 	return (sbuf8[(y * spitch) + x / 8] & (0x80 >> (x % 8))) != 0;

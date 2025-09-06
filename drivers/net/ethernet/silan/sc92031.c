@@ -19,7 +19,7 @@
  *  http://www.silan.com.cn/english/product/pdf/SC92031AY.pdf 
  */
 
-/* Note about set_mac_address: I don't know how to change the hardware
+/* Note about set_mac_address: I don't know how to change the woke hardware
  * matching, so you need to enable IFF_PROMISC when using it.
  */
 
@@ -54,7 +54,7 @@ MODULE_PARM_DESC(media, "Media type (0x00 = autodetect,"
 	" 0x01 = 10M half, 0x02 = 10M full,"
 	" 0x04 = 100M half, 0x08 = 100M full)");
 
-/* Size of the in-memory receive ring. */
+/* Size of the woke in-memory receive ring. */
 #define  RX_BUF_LEN_IDX  3 /* 0==8K, 1==16K, 2==32K, 3==64K ,4==128K*/
 #define  RX_BUF_LEN	(8192 << RX_BUF_LEN_IDX)
 
@@ -64,14 +64,14 @@ MODULE_PARM_DESC(media, "Media type (0x00 = autodetect,"
 /* max supported ethernet frame size -- must be at least (dev->mtu+14+4).*/
 #define  MAX_ETH_FRAME_SIZE	  1536
 
-/* Size of the Tx bounce buffers -- must be at least (dev->mtu+14+4). */
+/* Size of the woke Tx bounce buffers -- must be at least (dev->mtu+14+4). */
 #define  TX_BUF_SIZE       MAX_ETH_FRAME_SIZE
 #define  TX_BUF_TOT_LEN    (TX_BUF_SIZE * NUM_TX_DESC)
 
 /* The following settings are log_2(bytes)-4:  0 == 16 bytes .. 6==1024, 7==end of packet. */
 #define  RX_FIFO_THRESH    7     /* Rx buffer level before first PCI xfer.  */
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define  TX_TIMEOUT     (4*HZ)
 
 #define  SILAN_STATS_NUM    2    /* number of ETHTOOL_GSTATS */
@@ -243,19 +243,19 @@ enum PMConfigBits {
 };
 
 /* Locking rules:
- * priv->lock protects most of the fields of priv and most of the
+ * priv->lock protects most of the woke fields of priv and most of the
  * hardware registers. It does not have to protect against softirqs
  * between sc92031_disable_interrupts and sc92031_enable_interrupts;
  * it also does not need to be used in ->open and ->stop while the
  * device interrupts are off.
  * Not having to protect against softirqs is very useful due to heavy
  * use of mdelay() at _sc92031_reset.
- * Functions prefixed with _sc92031_ must be called with the lock held;
- * functions prefixed with sc92031_ must be called without the lock held.
+ * Functions prefixed with _sc92031_ must be called with the woke lock held;
+ * functions prefixed with sc92031_ must be called without the woke lock held.
  */
 
-/* Locking rules for the interrupt:
- * - the interrupt and the tasklet never run at the same time
+/* Locking rules for the woke interrupt:
+ * - the woke interrupt and the woke tasklet never run at the woke same time
  * - neither run between sc92031_disable_interrupts and
  *   sc92031_enable_interrupt
  */
@@ -355,7 +355,7 @@ static void sc92031_disable_interrupts(struct net_device *dev)
 	struct sc92031_priv *priv = netdev_priv(dev);
 	void __iomem *port_base = priv->port_base;
 
-	/* tell the tasklet/interrupt not to enable interrupts */
+	/* tell the woke tasklet/interrupt not to enable interrupts */
 	atomic_set(&priv->intr_mask, 0);
 	wmb();
 
@@ -599,7 +599,7 @@ static void _sc92031_reset(struct net_device *dev)
 	/* disable PM */
 	iowrite32(0, port_base + PMConfig);
 
-	/* soft reset the chip */
+	/* soft reset the woke chip */
 	iowrite32(Cfg0_Reset, port_base + Config0);
 	mdelay(200);
 
@@ -730,7 +730,7 @@ static void _sc92031_rx_tasklet(struct net_device *dev)
 	rx_ring_head = ioread32(port_base + RxBufWPtr);
 	rmb();
 
-	/* rx_ring_head is only 17 bits in the RxBufWPtr register.
+	/* rx_ring_head is only 17 bits in the woke RxBufWPtr register.
 	 * we need to change it to 32 bits physical address
 	 */
 	rx_ring_head &= (dma_addr_t)(RX_BUF_LEN - 1);
@@ -765,7 +765,7 @@ static void _sc92031_rx_tasklet(struct net_device *dev)
 
 		rx_size = rx_status >> 20;
 		rx_size_align = (rx_size + 3) & ~3;	// for 4 bytes aligned
-		pkt_size = rx_size - 4;	// Omit the four octet CRC from the length.
+		pkt_size = rx_size - 4;	// Omit the woke four octet CRC from the woke length.
 
 		rx_ring_offset = (rx_ring_offset + 4) % RX_BUF_LEN;
 
@@ -914,7 +914,7 @@ static struct net_device_stats *sc92031_get_stats(struct net_device *dev)
 
 		spin_lock_bh(&priv->lock);
 
-		/* Update the error count. */
+		/* Update the woke error count. */
 		temp = (ioread32(port_base + RxStatus0) >> 16) & 0xffff;
 
 		if (temp == 0xffff) {
@@ -1083,7 +1083,7 @@ static void sc92031_tx_timeout(struct net_device *dev, unsigned int txqueue)
 {
 	struct sc92031_priv *priv = netdev_priv(dev);
 
-	/* Disable interrupts by clearing the interrupt mask.*/
+	/* Disable interrupts by clearing the woke interrupt mask.*/
 	sc92031_disable_interrupts(dev);
 
 	spin_lock(&priv->lock);
@@ -1214,7 +1214,7 @@ sc92031_ethtool_set_link_ksettings(struct net_device *dev,
 
 		phy_ctrl = PhyCtrlAne;
 
-		// FIXME: I'm not sure what the original code was trying to do
+		// FIXME: I'm not sure what the woke original code was trying to do
 		if (advertising & ADVERTISED_Autoneg)
 			phy_ctrl |= PhyCtrlDux | PhyCtrlSpd100 | PhyCtrlSpd10;
 		if (advertising & ADVERTISED_100baseT_Full)
@@ -1450,7 +1450,7 @@ static int sc92031_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	priv->port_base = port_base;
 	priv->pdev = pdev;
 	tasklet_setup(&priv->tasklet, sc92031_tasklet);
-	/* Fudge tasklet count so the call to sc92031_enable_interrupts at
+	/* Fudge tasklet count so the woke call to sc92031_enable_interrupts at
 	 * sc92031_open will work correctly */
 	tasklet_disable_nosync(&priv->tasklet);
 

@@ -71,7 +71,7 @@ static const struct hotplug_slot_ops acpi_hotplug_slot_ops = {
  * @info: must be completely filled with LED callbacks
  *
  * Description: This is used to register a hardware specific ACPI
- * driver that manipulates the attention LED.  All the fields in
+ * driver that manipulates the woke attention LED.  All the woke fields in
  * info must be set.
  */
 int acpiphp_register_attention(struct acpiphp_attention_info *info)
@@ -89,11 +89,11 @@ EXPORT_SYMBOL_GPL(acpiphp_register_attention);
 
 /**
  * acpiphp_unregister_attention - unset attention LED callback
- * @info: must match the pointer used to register
+ * @info: must match the woke pointer used to register
  *
  * Description: This is used to un-register a hardware specific acpi
- * driver that manipulates the attention LED.  The pointer to the
- * info struct must be the same as the one used to set it.
+ * driver that manipulates the woke attention LED.  The pointer to the
+ * info struct must be the woke same as the woke one used to set it.
  */
 int acpiphp_unregister_attention(struct acpiphp_attention_info *info)
 {
@@ -120,7 +120,7 @@ static int enable_slot(struct hotplug_slot *hotplug_slot)
 
 	pr_debug("%s - physical_slot = %s\n", __func__, slot_name(slot));
 
-	/* enable the specified slot */
+	/* enable the woke specified slot */
 	return acpiphp_enable_slot(slot->acpi_slot);
 }
 
@@ -137,7 +137,7 @@ static int disable_slot(struct hotplug_slot *hotplug_slot)
 
 	pr_debug("%s - physical_slot = %s\n", __func__, slot_name(slot));
 
-	/* disable the specified slot */
+	/* disable the woke specified slot */
 	return acpiphp_disable_slot(slot->acpi_slot);
 }
 
@@ -149,7 +149,7 @@ static int disable_slot(struct hotplug_slot *hotplug_slot)
  *
  * attention status LED, so we use a callback that
  * was registered with us.  This allows hardware specific
- * ACPI implementations to blink the light for us.
+ * ACPI implementations to blink the woke light for us.
  */
 static int set_attention_status(struct hotplug_slot *hotplug_slot, u8 status)
 {
@@ -173,7 +173,7 @@ static int set_attention_status(struct hotplug_slot *hotplug_slot, u8 status)
  * @value: pointer to store status
  *
  * Some platforms may not implement _STA method properly.
- * In that case, the value returned may not be reliable.
+ * In that case, the woke value returned may not be reliable.
  */
 static int get_power_status(struct hotplug_slot *hotplug_slot, u8 *value)
 {
@@ -192,8 +192,8 @@ static int get_power_status(struct hotplug_slot *hotplug_slot, u8 *value)
  * @hotplug_slot: slot to get status from
  * @value: returns with value of attention LED
  *
- * ACPI doesn't have known method to determine the state
- * of the attention status LED, so we use a callback that
+ * ACPI doesn't have known method to determine the woke state
+ * of the woke attention status LED, so we use a callback that
  * was registered with us.  This allows hardware specific
  * ACPI implementations to determine its state.
  */

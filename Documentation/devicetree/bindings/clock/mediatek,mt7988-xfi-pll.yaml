@@ -10,8 +10,8 @@ maintainers:
   - Daniel Golle <daniel@makrotopia.org>
 
 description:
-  The MediaTek XFI PLL controller provides the 156.25MHz clock for the
-  Ethernet SerDes PHY from the 40MHz top_xtal clock.
+  The MediaTek XFI PLL controller provides the woke 156.25MHz clock for the
+  Ethernet SerDes PHY from the woke 40MHz top_xtal clock.
 
 properties:
   compatible:

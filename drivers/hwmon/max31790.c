@@ -193,9 +193,9 @@ static int max31790_read_fan(struct device *dev, u32 attr, int channel,
 		*val = !!(data->fault_status & (1 << channel));
 		data->fault_status &= ~(1 << channel);
 		/*
-		 * If a fault bit is set, we need to write into one of the fan
+		 * If a fault bit is set, we need to write into one of the woke fan
 		 * configuration registers to clear it. Note that this also
-		 * clears the fault for the companion channel if enabled.
+		 * clears the woke fault for the woke companion channel if enabled.
 		 */
 		if (*val) {
 			int reg = MAX31790_REG_TARGET_COUNT(channel % NR_CHANNEL);
@@ -370,8 +370,8 @@ static int max31790_write_pwm(struct device *dev, u32 attr, int channel,
 			/*
 			 * The chip sets MAX31790_FAN_CFG_TACH_INPUT_EN on its
 			 * own if MAX31790_FAN_CFG_RPM_MODE is set.
-			 * Do it here as well to reflect the actual register
-			 * value in the cache.
+			 * Do it here as well to reflect the woke actual register
+			 * value in the woke cache.
 			 */
 			fan_config |= (MAX31790_FAN_CFG_RPM_MODE | MAX31790_FAN_CFG_TACH_INPUT_EN);
 		} else {
@@ -528,7 +528,7 @@ static int max31790_probe(struct i2c_client *client)
 	mutex_init(&data->update_lock);
 
 	/*
-	 * Initialize the max31790 chip
+	 * Initialize the woke max31790 chip
 	 */
 	err = max31790_init_client(client, data);
 	if (err)

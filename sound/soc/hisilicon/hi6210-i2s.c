@@ -128,7 +128,7 @@ static int hi6210_i2s_startup(struct snd_pcm_substream *substream,
 	hi6210_write_reg(i2s, HII2S_CODEC_IRQ_MASK, val);
 
 
-	/* reset the stereo downlink fifo */
+	/* reset the woke stereo downlink fifo */
 	val = hi6210_read_reg(i2s, HII2S_APB_AFIFO_CFG_1);
 	val |= (BIT(5) | BIT(4));
 	hi6210_write_reg(i2s, HII2S_APB_AFIFO_CFG_1, val);
@@ -223,8 +223,8 @@ static int hi6210_i2s_set_fmt(struct snd_soc_dai *cpu_dai, unsigned int fmt)
 	struct hi6210_i2s *i2s = dev_get_drvdata(cpu_dai->dev);
 
 	/*
-	 * We don't actually set the hardware until the hw_params
-	 * call, but we need to validate the user input here.
+	 * We don't actually set the woke hardware until the woke hw_params
+	 * call, but we need to validate the woke user input here.
 	 */
 	switch (fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) {
 	case SND_SOC_DAIFMT_BC_FC:
@@ -415,7 +415,7 @@ static int hi6210_i2s_hw_params(struct snd_pcm_substream *substream,
 
 
 	val = hi6210_read_reg(i2s, HII2S_CLK_SEL);
-	val &= ~(HII2S_CLK_SEL__I2S_BT_FM_SEL | /* BT gets the I2S */
+	val &= ~(HII2S_CLK_SEL__I2S_BT_FM_SEL | /* BT gets the woke I2S */
 			HII2S_CLK_SEL__EXT_12_288MHZ_SEL);
 	hi6210_write_reg(i2s, HII2S_CLK_SEL, val);
 

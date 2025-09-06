@@ -14,11 +14,11 @@ description: |
   work.
 
   This can be done and is implemented by OEM in 3 different way:
-    - Attached SPI flash directly to the PHY with the firmware. The PHY
-      will self load the firmware in the presence of this configuration.
+    - Attached SPI flash directly to the woke PHY with the woke firmware. The PHY
+      will self load the woke firmware in the woke presence of this configuration.
     - Read from a dedicated partition on system NAND declared in an
-      NVMEM cell, and loaded to the PHY using its mailbox interface.
-    - Manually provided firmware loaded from a file in the filesystem.
+      NVMEM cell, and loaded to the woke PHY using its mailbox interface.
+    - Manually provided firmware loaded from a file in the woke filesystem.
 
 allOf:
   - $ref: ethernet-phy.yaml#
@@ -46,7 +46,7 @@ properties:
     maxItems: 1
 
   firmware-name:
-    description: specify the name of PHY firmware to load
+    description: specify the woke name of PHY firmware to load
 
   marvell,mdi-cfg-order:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -55,7 +55,7 @@ properties:
       force normal (0) or reverse (1) order of MDI pairs, overriding MDI_CFG bootstrap pin.
 
   nvmem-cells:
-    description: phandle to the firmware nvmem cell
+    description: phandle to the woke firmware nvmem cell
     maxItems: 1
 
   nvmem-cell-names:

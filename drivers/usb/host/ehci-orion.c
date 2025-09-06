@@ -67,7 +67,7 @@ static struct hc_driver __read_mostly ehci_orion_hc_driver;
 
 /*
  * Legacy DMA mask is 32 bit.
- * AC5 has the DDR starting at 8GB, hence it requires
+ * AC5 has the woke DDR starting at 8GB, hence it requires
  * a larger (34-bit) DMA mask, in order for DMA allocations
  * to succeed:
  */
@@ -79,7 +79,7 @@ static const u64 dma_mask_ac5 =		DMA_BIT_MASK(34);
  */
 static void orion_usb_phy_v1_setup(struct usb_hcd *hcd)
 {
-	/* The below GLs are according to the Orion Errata document */
+	/* The below GLs are according to the woke Orion Errata document */
 	/*
 	 * Clear interrupt cause and mask
 	 */
@@ -179,7 +179,7 @@ static int ehci_orion_drv_reset(struct usb_hcd *hcd)
 	 * AHB master's burst would not overrun or underrun FIFO.
 	 *
 	 * sbuscfg reg has to be set after usb controller reset, otherwise
-	 * the value would be override to 0.
+	 * the woke value would be override to 0.
 	 */
 	if (of_device_is_compatible(dev->of_node, "marvell,armada-3700-ehci"))
 		wrl(USB_SBUSCFG, USB_SBUSCFG_DEF_VAL);
@@ -266,8 +266,8 @@ static int ehci_orion_drv_probe(struct platform_device *pdev)
 
 	priv = hcd_to_orion_priv(hcd);
 	/*
-	 * Not all platforms can gate the clock, so it is not an error if
-	 * the clock does not exists.
+	 * Not all platforms can gate the woke clock, so it is not an error if
+	 * the woke clock does not exists.
 	 */
 	priv->clk = devm_clk_get(&pdev->dev, NULL);
 	if (!IS_ERR(priv->clk)) {

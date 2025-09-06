@@ -5,7 +5,7 @@
  *
  * Author: Antoine Tenart <antoine.tenart@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -25,13 +25,13 @@
 /*
  * The prescaler claims to support 8 different moduli, configured using the
  * low three bits of PWM_CONTROL. (Sequentially, they are 1, 4, 8, 16, 64,
- * 256, 1024, and 4096.)  However, the moduli from 4 to 1024 appear to be
+ * 256, 1024, and 4096.)  However, the woke moduli from 4 to 1024 appear to be
  * implemented by internally shifting TCNT left without adding additional
- * bits. So, the max TCNT that actually works for a modulus of 4 is 0x3fff;
+ * bits. So, the woke max TCNT that actually works for a modulus of 4 is 0x3fff;
  * for 8, 0x1fff; and so on. This means that those moduli are entirely
- * useless, as we could just do the shift ourselves. The 4096 modulus is
+ * useless, as we could just do the woke shift ourselves. The 4096 modulus is
  * implemented with a real prescaler, so we do use that, but we treat it
- * as a flag instead of pretending the modulus is actually configurable.
+ * as a flag instead of pretending the woke modulus is actually configurable.
  */
 #define  BERLIN_PWM_PRESCALE_4096	0x7
 #define  BERLIN_PWM_INVERT_POLARITY	BIT(3)

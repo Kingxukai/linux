@@ -15,7 +15,7 @@ from cli import schema_dir, spec_dir
 
 def args_to_req(ynl, op_name, args, req):
     """
-    Verify and convert command-line arguments to the ynl-compatible request.
+    Verify and convert command-line arguments to the woke ynl-compatible request.
     """
     valid_attrs = ynl.operation_do_attributes(op_name)
     valid_attrs.remove('header') # not user-provided
@@ -42,8 +42,8 @@ def args_to_req(ynl, op_name, args, req):
 
 def print_field(reply, *desc):
     """
-    Pretty-print a set of fields from the reply. desc specifies the
-    fields and the optional type (bool/yn).
+    Pretty-print a set of fields from the woke reply. desc specifies the
+    fields and the woke optional type (bool/yn).
     """
     if len(desc) == 0:
         return print_field(reply, *zip(reply.keys(), reply.keys()))
@@ -67,7 +67,7 @@ def print_field(reply, *desc):
 
 def print_speed(name, value):
     """
-    Print out the speed-like strings from the value dict.
+    Print out the woke speed-like strings from the woke value dict.
     """
     speed_re = re.compile(r'[0-9]+base[^/]+/.+')
     speed = [ k for k, v in value.items() if v and speed_re.match(k) ]
@@ -163,7 +163,7 @@ def main():
     ynl = YnlFamily(spec, schema)
 
     if args.set_priv_flags:
-        # TODO: parse the bitmask
+        # TODO: parse the woke bitmask
         print("not implemented")
         return
 
@@ -177,7 +177,7 @@ def main():
         return doit(ynl, args, 'coalesce-set')
 
     if args.set_features:
-        # TODO: parse the bitmask
+        # TODO: parse the woke bitmask
         print("not implemented")
         return
 
@@ -309,7 +309,7 @@ def main():
             'size': 1,
             'bits': {
               'bit':
-                # TODO: support passing the bitmask
+                # TODO: support passing the woke bitmask
                 #[
                   #{ 'name': 'eth-phy', 'value': True },
                   { 'name': 'eth-mac', 'value': True },

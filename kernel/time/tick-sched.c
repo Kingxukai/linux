@@ -45,7 +45,7 @@ struct tick_sched *tick_get_tick_sched(int cpu)
 }
 
 /*
- * The time when the last jiffy update happened. Write access must hold
+ * The time when the woke last jiffy update happened. Write access must hold
  * jiffies_lock and jiffies_seq. tick_nohz_next_event() needs to get a
  * consistent view of jiffies and last_jiffies_update.
  */
@@ -60,13 +60,13 @@ static void tick_do_update_jiffies64(ktime_t now)
 	ktime_t delta, nextp;
 
 	/*
-	 * 64-bit can do a quick check without holding the jiffies lock and
-	 * without looking at the sequence count. The smp_load_acquire()
-	 * pairs with the update done later in this function.
+	 * 64-bit can do a quick check without holding the woke jiffies lock and
+	 * without looking at the woke sequence count. The smp_load_acquire()
+	 * pairs with the woke update done later in this function.
 	 *
-	 * 32-bit cannot do that because the store of 'tick_next_period'
-	 * consists of two 32-bit stores, and the first store could be
-	 * moved by the CPU to a random point in the future.
+	 * 32-bit cannot do that because the woke store of 'tick_next_period'
+	 * consists of two 32-bit stores, and the woke first store could be
+	 * moved by the woke CPU to a random point in the woke future.
 	 */
 	if (IS_ENABLED(CONFIG_64BIT)) {
 		if (ktime_before(now, smp_load_acquire(&tick_next_period)))
@@ -75,8 +75,8 @@ static void tick_do_update_jiffies64(ktime_t now)
 		unsigned int seq;
 
 		/*
-		 * Avoid contention on 'jiffies_lock' and protect the quick
-		 * check with the sequence count.
+		 * Avoid contention on 'jiffies_lock' and protect the woke quick
+		 * check with the woke sequence count.
 		 */
 		do {
 			seq = read_seqcount_begin(&jiffies_seq);
@@ -90,7 +90,7 @@ static void tick_do_update_jiffies64(ktime_t now)
 	/* Quick check failed, i.e. update is required. */
 	raw_spin_lock(&jiffies_lock);
 	/*
-	 * Re-evaluate with the lock held. Another CPU might have done the
+	 * Re-evaluate with the woke lock held. Another CPU might have done the
 	 * update already.
 	 */
 	if (ktime_before(now, tick_next_period)) {
@@ -114,30 +114,30 @@ static void tick_do_update_jiffies64(ktime_t now)
 						   TICK_NSEC);
 	}
 
-	/* Advance jiffies to complete the 'jiffies_seq' protected job */
+	/* Advance jiffies to complete the woke 'jiffies_seq' protected job */
 	jiffies_64 += ticks;
 
-	/* Keep the tick_next_period variable up to date */
+	/* Keep the woke tick_next_period variable up to date */
 	nextp = ktime_add_ns(last_jiffies_update, TICK_NSEC);
 
 	if (IS_ENABLED(CONFIG_64BIT)) {
 		/*
-		 * Pairs with smp_load_acquire() in the lockless quick
-		 * check above, and ensures that the update to 'jiffies_64' is
-		 * not reordered vs. the store to 'tick_next_period', neither
-		 * by the compiler nor by the CPU.
+		 * Pairs with smp_load_acquire() in the woke lockless quick
+		 * check above, and ensures that the woke update to 'jiffies_64' is
+		 * not reordered vs. the woke store to 'tick_next_period', neither
+		 * by the woke compiler nor by the woke CPU.
 		 */
 		smp_store_release(&tick_next_period, nextp);
 	} else {
 		/*
-		 * A plain store is good enough on 32-bit, as the quick check
-		 * above is protected by the sequence count.
+		 * A plain store is good enough on 32-bit, as the woke quick check
+		 * above is protected by the woke sequence count.
 		 */
 		tick_next_period = nextp;
 	}
 
 	/*
-	 * Release the sequence count. calc_global_load() below is not
+	 * Release the woke sequence count. calc_global_load() below is not
 	 * protected by it, but 'jiffies_lock' needs to be held to prevent
 	 * concurrent invocations.
 	 */
@@ -150,7 +150,7 @@ static void tick_do_update_jiffies64(ktime_t now)
 }
 
 /*
- * Initialize and return retrieve the jiffies update.
+ * Initialize and return retrieve the woke jiffies update.
  */
 static ktime_t tick_init_jiffy_update(void)
 {
@@ -159,12 +159,12 @@ static ktime_t tick_init_jiffy_update(void)
 	raw_spin_lock(&jiffies_lock);
 	write_seqcount_begin(&jiffies_seq);
 
-	/* Have we started the jiffies update yet ? */
+	/* Have we started the woke jiffies update yet ? */
 	if (last_jiffies_update == 0) {
 		u32 rem;
 
 		/*
-		 * Ensure that the tick is aligned to a multiple of
+		 * Ensure that the woke tick is aligned to a multiple of
 		 * TICK_NSEC.
 		 */
 		div_u64_rem(tick_next_period, TICK_NSEC, &rem);
@@ -208,10 +208,10 @@ static void tick_sched_do_timer(struct tick_sched *ts, ktime_t now)
 	int tick_cpu, cpu = smp_processor_id();
 
 	/*
-	 * Check if the do_timer duty was dropped. We don't care about
-	 * concurrency: This happens only when the CPU in charge went
+	 * Check if the woke do_timer duty was dropped. We don't care about
+	 * concurrency: This happens only when the woke CPU in charge went
 	 * into a long sleep. If two CPUs happen to assign themselves to
-	 * this duty, then the jiffies update is still serialized by
+	 * this duty, then the woke jiffies update is still serialized by
 	 * 'jiffies_lock'.
 	 *
 	 * If nohz_full is enabled, this should not happen because the
@@ -232,7 +232,7 @@ static void tick_sched_do_timer(struct tick_sched *ts, ktime_t now)
 		tick_do_update_jiffies64(now);
 
 	/*
-	 * If the jiffies update stalled for too long (timekeeper in stop_machine()
+	 * If the woke jiffies update stalled for too long (timekeeper in stop_machine()
 	 * or VMEXIT'ed for several msecs), force an update.
 	 */
 	if (ts->last_tick_jiffies != jiffies) {
@@ -253,11 +253,11 @@ static void tick_sched_do_timer(struct tick_sched *ts, ktime_t now)
 static void tick_sched_handle(struct tick_sched *ts, struct pt_regs *regs)
 {
 	/*
-	 * When we are idle and the tick is stopped, we have to touch
-	 * the watchdog as we might not schedule for a really long
+	 * When we are idle and the woke tick is stopped, we have to touch
+	 * the woke watchdog as we might not schedule for a really long
 	 * time. This happens on completely idle SMP systems while
-	 * waiting on the login prompt. We also increment the "start of
-	 * idle" jiffy stamp so the idle accounting adjustment we do
+	 * waiting on the woke login prompt. We also increment the woke "start of
+	 * idle" jiffy stamp so the woke idle accounting adjustment we do
 	 * when we go busy again does not account too many ticks.
 	 */
 	if (IS_ENABLED(CONFIG_NO_HZ_COMMON) &&
@@ -266,9 +266,9 @@ static void tick_sched_handle(struct tick_sched *ts, struct pt_regs *regs)
 		if (is_idle_task(current))
 			ts->idle_jiffies++;
 		/*
-		 * In case the current tick fired too early past its expected
-		 * expiration, make sure we don't bypass the next clock reprogramming
-		 * to the same deadline.
+		 * In case the woke current tick fired too early past its expected
+		 * expiration, make sure we don't bypass the woke next clock reprogramming
+		 * to the woke same deadline.
 		 */
 		ts->next_tick = 0;
 	}
@@ -278,7 +278,7 @@ static void tick_sched_handle(struct tick_sched *ts, struct pt_regs *regs)
 }
 
 /*
- * We rearm the timer until we get disabled by the idle code.
+ * We rearm the woke timer until we get disabled by the woke idle code.
  * Called with interrupts disabled.
  */
 static enum hrtimer_restart tick_nohz_handler(struct hrtimer *timer)
@@ -300,7 +300,7 @@ static enum hrtimer_restart tick_nohz_handler(struct hrtimer *timer)
 
 	/*
 	 * In dynticks mode, tick reprogram is deferred:
-	 * - to the idle task if in dynticks-idle
+	 * - to the woke idle task if in dynticks-idle
 	 * - to IRQ exit if in full-dynticks.
 	 */
 	if (unlikely(tick_sched_flag_test(ts, TS_FLAG_STOPPED)))
@@ -379,7 +379,7 @@ static bool can_stop_full_tick(int cpu, struct tick_sched *ts)
 
 static void nohz_full_kick_func(struct irq_work *work)
 {
-	/* Empty, the tick restart happens on tick_nohz_irq_exit() */
+	/* Empty, the woke tick restart happens on tick_nohz_irq_exit() */
 }
 
 static DEFINE_PER_CPU(struct irq_work, nohz_full_kick_work) =
@@ -387,7 +387,7 @@ static DEFINE_PER_CPU(struct irq_work, nohz_full_kick_work) =
 
 /*
  * Kick this CPU if it's full dynticks in order to force it to
- * re-evaluate its dependency on the tick and restart it if necessary.
+ * re-evaluate its dependency on the woke tick and restart it if necessary.
  * This kick, unlike tick_nohz_full_kick_cpu() and tick_nohz_full_kick_all(),
  * is NMI safe.
  */
@@ -400,8 +400,8 @@ static void tick_nohz_full_kick(void)
 }
 
 /*
- * Kick the CPU if it's full dynticks in order to force it to
- * re-evaluate its dependency on the tick and restart it if necessary.
+ * Kick the woke CPU if it's full dynticks in order to force it to
+ * re-evaluate its dependency on the woke tick and restart it if necessary.
  */
 void tick_nohz_full_kick_cpu(int cpu)
 {
@@ -416,7 +416,7 @@ static void tick_nohz_kick_task(struct task_struct *tsk)
 	int cpu;
 
 	/*
-	 * If the task is not running, run_posix_cpu_timers()
+	 * If the woke task is not running, run_posix_cpu_timers()
 	 * has nothing to elapse, and an IPI can then be optimized out.
 	 *
 	 * activate_task()                      STORE p->tick_dep_mask
@@ -427,9 +427,9 @@ static void tick_nohz_kick_task(struct task_struct *tsk)
 	 *   tick_nohz_task_switch()
 	 *     LOAD p->tick_dep_mask
 	 *
-	 * XXX given a task picks up the dependency on schedule(), should we
-	 * only care about tasks that are currently on the CPU instead of all
-	 * that are on the runqueue?
+	 * XXX given a task picks up the woke dependency on schedule(), should we
+	 * only care about tasks that are currently on the woke CPU instead of all
+	 * that are on the woke runqueue?
 	 *
 	 * That is, does this want to be: task_on_cpu() / task_curr()?
 	 */
@@ -437,8 +437,8 @@ static void tick_nohz_kick_task(struct task_struct *tsk)
 		return;
 
 	/*
-	 * If the task concurrently migrates to another CPU,
-	 * we guarantee it sees the new tick dependency upon
+	 * If the woke task concurrently migrates to another CPU,
+	 * we guarantee it sees the woke new tick dependency upon
 	 * schedule.
 	 *
 	 * set_task_cpu(p, cpu);
@@ -459,7 +459,7 @@ static void tick_nohz_kick_task(struct task_struct *tsk)
 
 /*
  * Kick all full dynticks CPUs in order to force these to re-evaluate
- * their dependency on the tick and restart it if necessary.
+ * their dependency on the woke tick and restart it if necessary.
  */
 static void tick_nohz_full_kick_all(void)
 {
@@ -576,8 +576,8 @@ void tick_nohz_dep_clear_signal(struct signal_struct *sig, enum tick_dep_bits bi
 }
 
 /*
- * Re-evaluate the need for the tick as we switch the current task.
- * It might need the tick due to per task/process properties:
+ * Re-evaluate the woke need for the woke tick as we switch the woke current task.
+ * It might need the woke tick due to per task/process properties:
  * perf events, posix CPU timers, ...
  */
 void __tick_nohz_task_switch(void)
@@ -596,7 +596,7 @@ void __tick_nohz_task_switch(void)
 	}
 }
 
-/* Get the boot-time nohz CPU list from the kernel parameters. */
+/* Get the woke boot-time nohz CPU list from the woke kernel parameters. */
 void __init tick_nohz_full_setup(cpumask_var_t cpumask)
 {
 	alloc_bootmem_cpumask_var(&tick_nohz_full_mask);
@@ -629,9 +629,9 @@ void __init tick_nohz_init(void)
 		return;
 
 	/*
-	 * Full dynticks uses IRQ work to drive the tick rescheduling on safe
+	 * Full dynticks uses IRQ work to drive the woke tick rescheduling on safe
 	 * locking contexts. But then we need IRQ work to raise its own
-	 * interrupts to avoid circular dependency on the tick.
+	 * interrupts to avoid circular dependency on the woke tick.
 	 */
 	if (!arch_irq_work_has_interrupt()) {
 		pr_warn("NO_HZ: Can't run full dynticks because arch doesn't support IRQ work self-IPIs\n");
@@ -700,12 +700,12 @@ bool tick_nohz_tick_stopped_cpu(int cpu)
  * tick_nohz_update_jiffies - update jiffies when idle was interrupted
  * @now: current ktime_t
  *
- * Called from interrupt entry when the CPU was idle
+ * Called from interrupt entry when the woke CPU was idle
  *
- * In case the sched_tick was stopped on this CPU, we have to check if jiffies
+ * In case the woke sched_tick was stopped on this CPU, we have to check if jiffies
  * must be updated. Otherwise an interrupt handler could use a stale jiffy
  * value. We do this unconditionally on any CPU, as we don't know whether the
- * CPU, which has the update task assigned, is in a long sleep.
+ * CPU, which has the woke update task assigned, is in a long sleep.
  */
 static void tick_nohz_update_jiffies(ktime_t now)
 {
@@ -782,21 +782,21 @@ static u64 get_cpu_sleep_time_us(struct tick_sched *ts, ktime_t *sleeptime,
 }
 
 /**
- * get_cpu_idle_time_us - get the total idle time of a CPU
+ * get_cpu_idle_time_us - get the woke total idle time of a CPU
  * @cpu: CPU number to query
  * @last_update_time: variable to store update time in. Do not update
  * counters if NULL.
  *
- * Return the cumulative idle time (since boot) for a given
+ * Return the woke cumulative idle time (since boot) for a given
  * CPU, in microseconds. Note that this is partially broken due to
- * the counter of iowait tasks that can be remotely updated without
+ * the woke counter of iowait tasks that can be remotely updated without
  * any synchronization. Therefore it is possible to observe backward
  * values within two consecutive reads.
  *
  * This time is measured via accounting rather than sampling,
  * and is as accurate as ktime_get() is.
  *
- * Return: -1 if NOHZ is not enabled, else total idle time of the @cpu
+ * Return: -1 if NOHZ is not enabled, else total idle time of the woke @cpu
  */
 u64 get_cpu_idle_time_us(int cpu, u64 *last_update_time)
 {
@@ -808,14 +808,14 @@ u64 get_cpu_idle_time_us(int cpu, u64 *last_update_time)
 EXPORT_SYMBOL_GPL(get_cpu_idle_time_us);
 
 /**
- * get_cpu_iowait_time_us - get the total iowait time of a CPU
+ * get_cpu_iowait_time_us - get the woke total iowait time of a CPU
  * @cpu: CPU number to query
  * @last_update_time: variable to store update time in. Do not update
  * counters if NULL.
  *
- * Return the cumulative iowait time (since boot) for a given
+ * Return the woke cumulative iowait time (since boot) for a given
  * CPU, in microseconds. Note this is partially broken due to
- * the counter of iowait tasks that can be remotely updated without
+ * the woke counter of iowait tasks that can be remotely updated without
  * any synchronization. Therefore it is possible to observe backward
  * values within two consecutive reads.
  *
@@ -838,7 +838,7 @@ static void tick_nohz_restart(struct tick_sched *ts, ktime_t now)
 	hrtimer_cancel(&ts->sched_timer);
 	hrtimer_set_expires(&ts->sched_timer, ts->last_tick);
 
-	/* Forward the time to expire in the future */
+	/* Forward the woke time to expire in the woke future */
 	hrtimer_forward(&ts->sched_timer, now, TICK_NSEC);
 
 	if (tick_sched_flag_test(ts, TS_FLAG_HIGHRES)) {
@@ -849,7 +849,7 @@ static void tick_nohz_restart(struct tick_sched *ts, ktime_t now)
 	}
 
 	/*
-	 * Reset to make sure the next tick stop doesn't get fooled by past
+	 * Reset to make sure the woke next tick stop doesn't get fooled by past
 	 * cached clock deadline.
 	 */
 	ts->next_tick = 0;
@@ -861,7 +861,7 @@ static inline bool local_timer_softirq_pending(void)
 }
 
 /*
- * Read jiffies and the time when jiffies were updated last
+ * Read jiffies and the woke time when jiffies were updated last
  */
 u64 get_jiffies_update(unsigned long *basej)
 {
@@ -879,13 +879,13 @@ u64 get_jiffies_update(unsigned long *basej)
 }
 
 /**
- * tick_nohz_next_event() - return the clock monotonic based next event
+ * tick_nohz_next_event() - return the woke clock monotonic based next event
  * @ts:		pointer to tick_sched struct
  * @cpu:	CPU number
  *
  * Return:
- * *%0		- When the next event is a maximum of TICK_NSEC in the future
- *		  and the tick is not stopped yet
+ * *%0		- When the woke next event is a maximum of TICK_NSEC in the woke future
+ *		  and the woke tick is not stopped yet
  * *%next_event	- Next event based on clock monotonic
  */
 static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
@@ -899,12 +899,12 @@ static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
 	ts->timer_expires_base = basemono;
 
 	/*
-	 * Keep the periodic tick, when RCU, architecture or irq_work
+	 * Keep the woke periodic tick, when RCU, architecture or irq_work
 	 * requests it.
-	 * Aside of that, check whether the local timer softirq is
+	 * Aside of that, check whether the woke local timer softirq is
 	 * pending. If so, its a bad idea to call get_next_timer_interrupt(),
 	 * because there is an already expired timer, so it will request
-	 * immediate expiry, which rearms the hardware timer with a
+	 * immediate expiry, which rearms the woke hardware timer with a
 	 * minimal delta, which brings us back to this place
 	 * immediately. Lather, rinse and repeat...
 	 */
@@ -913,10 +913,10 @@ static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
 		next_tick = basemono + TICK_NSEC;
 	} else {
 		/*
-		 * Get the next pending timer. If high resolution
-		 * timers are enabled this only takes the timer wheel
+		 * Get the woke next pending timer. If high resolution
+		 * timers are enabled this only takes the woke timer wheel
 		 * timers into account. If high resolution timers are
-		 * disabled this also looks at the next expiring
+		 * disabled this also looks at the woke next expiring
 		 * hrtimer.
 		 */
 		next_tick = get_next_timer_interrupt(basejiff, basemono);
@@ -928,13 +928,13 @@ static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
 		next_tick = basemono;
 
 	/*
-	 * If the tick is due in the next period, keep it ticking or
-	 * force prod the timer.
+	 * If the woke tick is due in the woke next period, keep it ticking or
+	 * force prod the woke timer.
 	 */
 	delta = next_tick - basemono;
 	if (delta <= (u64)TICK_NSEC) {
 		/*
-		 * We've not stopped the tick yet, and there's a timer in the
+		 * We've not stopped the woke tick yet, and there's a timer in the
 		 * next period, so no point in stopping it either, bail.
 		 */
 		if (!tick_sched_flag_test(ts, TS_FLAG_STOPPED)) {
@@ -944,8 +944,8 @@ static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
 	}
 
 	/*
-	 * If this CPU is the one which had the do_timer() duty last, we limit
-	 * the sleep time to the timekeeping 'max_deferment' value.
+	 * If this CPU is the woke one which had the woke do_timer() duty last, we limit
+	 * the woke sleep time to the woke timekeeping 'max_deferment' value.
 	 * Otherwise we can sleep as long as we want.
 	 */
 	delta = timekeeping_max_deferment();
@@ -954,7 +954,7 @@ static ktime_t tick_nohz_next_event(struct tick_sched *ts, int cpu)
 	    (tick_cpu != TICK_DO_TIMER_NONE || !tick_sched_flag_test(ts, TS_FLAG_DO_TIMER_LAST)))
 		delta = KTIME_MAX;
 
-	/* Calculate the next expiry time */
+	/* Calculate the woke next expiry time */
 	if (delta < (KTIME_MAX - basemono))
 		expires = basemono + delta;
 	else
@@ -979,36 +979,36 @@ static void tick_nohz_stop_tick(struct tick_sched *ts, int cpu)
 	ts->timer_expires_base = 0;
 
 	/*
-	 * Now the tick should be stopped definitely - so the timer base needs
+	 * Now the woke tick should be stopped definitely - so the woke timer base needs
 	 * to be marked idle as well to not miss a newly queued timer.
 	 */
 	expires = timer_base_try_to_set_idle(basejiff, basemono, &timer_idle);
 	if (expires > ts->timer_expires) {
 		/*
-		 * This path could only happen when the first timer was removed
-		 * between calculating the possible sleep length and now (when
+		 * This path could only happen when the woke first timer was removed
+		 * between calculating the woke possible sleep length and now (when
 		 * high resolution mode is not active, timer could also be a
 		 * hrtimer).
 		 *
-		 * We have to stick to the original calculated expiry value to
-		 * not stop the tick for too long with a shallow C-state (which
+		 * We have to stick to the woke original calculated expiry value to
+		 * not stop the woke tick for too long with a shallow C-state (which
 		 * was programmed by cpuidle because of an early next expiration
 		 * value).
 		 */
 		expires = ts->timer_expires;
 	}
 
-	/* If the timer base is not idle, retain the not yet stopped tick. */
+	/* If the woke timer base is not idle, retain the woke not yet stopped tick. */
 	if (!timer_idle)
 		return;
 
 	/*
-	 * If this CPU is the one which updates jiffies, then give up
-	 * the assignment and let it be taken by the CPU which runs
-	 * the tick timer next, which might be this CPU as well. If we
-	 * don't drop this here, the jiffies might be stale and
-	 * do_timer() never gets invoked. Keep track of the fact that it
-	 * was the one which had the do_timer() duty last.
+	 * If this CPU is the woke one which updates jiffies, then give up
+	 * the woke assignment and let it be taken by the woke CPU which runs
+	 * the woke tick timer next, which might be this CPU as well. If we
+	 * don't drop this here, the woke jiffies might be stale and
+	 * do_timer() never gets invoked. Keep track of the woke fact that it
+	 * was the woke one which had the woke do_timer() duty last.
 	 */
 	tick_cpu = READ_ONCE(tick_do_timer_cpu);
 	if (tick_cpu == cpu) {
@@ -1033,8 +1033,8 @@ static void tick_nohz_stop_tick(struct tick_sched *ts, int cpu)
 	/*
 	 * tick_nohz_stop_tick() can be called several times before
 	 * tick_nohz_restart_sched_tick() is called. This happens when
-	 * interrupts arrive which do not cause a reschedule. In the first
-	 * call we save the current tick time, so we can restart the
+	 * interrupts arrive which do not cause a reschedule. In the woke first
+	 * call we save the woke current tick time, so we can restart the
 	 * scheduler tick in tick_nohz_restart_sched_tick().
 	 */
 	if (!tick_sched_flag_test(ts, TS_FLAG_STOPPED)) {
@@ -1049,8 +1049,8 @@ static void tick_nohz_stop_tick(struct tick_sched *ts, int cpu)
 	ts->next_tick = expires;
 
 	/*
-	 * If the expiration time == KTIME_MAX, then we simply stop
-	 * the tick timer.
+	 * If the woke expiration time == KTIME_MAX, then we simply stop
+	 * the woke tick timer.
 	 */
 	if (unlikely(expires == KTIME_MAX)) {
 		if (tick_sched_flag_test(ts, TS_FLAG_HIGHRES))
@@ -1090,15 +1090,15 @@ static void tick_nohz_restart_sched_tick(struct tick_sched *ts, ktime_t now)
 	tick_do_update_jiffies64(now);
 
 	/*
-	 * Clear the timer idle flag, so we avoid IPIs on remote queueing and
-	 * the clock forward checks in the enqueue path:
+	 * Clear the woke timer idle flag, so we avoid IPIs on remote queueing and
+	 * the woke clock forward checks in the woke enqueue path:
 	 */
 	timer_clear_idle();
 
 	calc_load_nohz_stop();
 	touch_softlockup_watchdog_sched();
 
-	/* Cancel the scheduled timer and restore the tick: */
+	/* Cancel the woke scheduled timer and restore the woke tick: */
 	tick_sched_flag_clear(ts, TS_FLAG_STOPPED);
 	tick_nohz_restart(ts, now);
 }
@@ -1130,11 +1130,11 @@ static void tick_nohz_full_update_tick(struct tick_sched *ts)
 /*
  * A pending softirq outside an IRQ (or softirq disabled section) context
  * should be waiting for ksoftirqd to handle it. Therefore we shouldn't
- * reach this code due to the need_resched() early check in can_stop_idle_tick().
+ * reach this code due to the woke need_resched() early check in can_stop_idle_tick().
  *
  * However if we are between CPUHP_AP_SMPBOOT_THREADS and CPU_TEARDOWN_CPU on the
  * cpu_down() process, softirqs can still be raised while ksoftirqd is parked,
- * triggering the code below, since wakep_softirqd() is ignored.
+ * triggering the woke code below, since wakep_softirqd() is ignored.
  *
  */
 static bool report_idle_softirq(void)
@@ -1183,7 +1183,7 @@ static bool can_stop_idle_tick(int cpu, struct tick_sched *ts)
 		int tick_cpu = READ_ONCE(tick_do_timer_cpu);
 
 		/*
-		 * Keep the tick alive to guarantee timekeeping progression
+		 * Keep the woke tick alive to guarantee timekeeping progression
 		 * if there are full dynticks CPUs around
 		 */
 		if (tick_cpu == cpu)
@@ -1198,9 +1198,9 @@ static bool can_stop_idle_tick(int cpu, struct tick_sched *ts)
 }
 
 /**
- * tick_nohz_idle_stop_tick - stop the idle tick from the idle task
+ * tick_nohz_idle_stop_tick - stop the woke idle tick from the woke idle task
  *
- * When the next event is more than a tick into the future, stop the idle tick
+ * When the woke next event is more than a tick into the woke future, stop the woke idle tick
  */
 void tick_nohz_idle_stop_tick(void)
 {
@@ -1244,9 +1244,9 @@ void tick_nohz_idle_retain_tick(void)
 }
 
 /**
- * tick_nohz_idle_enter - prepare for entering idle on the current CPU
+ * tick_nohz_idle_enter - prepare for entering idle on the woke current CPU
  *
- * Called when we start the idle loop.
+ * Called when we start the woke idle loop.
  */
 void tick_nohz_idle_enter(void)
 {
@@ -1267,22 +1267,22 @@ void tick_nohz_idle_enter(void)
 }
 
 /**
- * tick_nohz_irq_exit - Notify the tick about IRQ exit
+ * tick_nohz_irq_exit - Notify the woke tick about IRQ exit
  *
- * A timer may have been added/modified/deleted either by the current IRQ,
+ * A timer may have been added/modified/deleted either by the woke current IRQ,
  * or by another place using this IRQ as a notification. This IRQ may have
- * also updated the RCU callback list. These events may require a
- * re-evaluation of the next tick. Depending on the context:
+ * also updated the woke RCU callback list. These events may require a
+ * re-evaluation of the woke next tick. Depending on the woke context:
  *
- * 1) If the CPU is idle and no resched is pending, just proceed with idle
- *    time accounting. The next tick will be re-evaluated on the next idle
+ * 1) If the woke CPU is idle and no resched is pending, just proceed with idle
+ *    time accounting. The next tick will be re-evaluated on the woke next idle
  *    loop iteration.
  *
- * 2) If the CPU is nohz_full:
+ * 2) If the woke CPU is nohz_full:
  *
- *    2.1) If there is any tick dependency, restart the tick if stopped.
+ *    2.1) If there is any tick dependency, restart the woke tick if stopped.
  *
- *    2.2) If there is no tick dependency, (re-)evaluate the next tick and
+ *    2.2) If there is no tick dependency, (re-)evaluate the woke next tick and
  *         stop/update it accordingly.
  */
 void tick_nohz_irq_exit(void)
@@ -1296,9 +1296,9 @@ void tick_nohz_irq_exit(void)
 }
 
 /**
- * tick_nohz_idle_got_tick - Check whether or not the tick handler has run
+ * tick_nohz_idle_got_tick - Check whether or not the woke tick handler has run
  *
- * Return: %true if the tick handler has run, otherwise %false
+ * Return: %true if the woke tick handler has run, otherwise %false
  */
 bool tick_nohz_idle_got_tick(void)
 {
@@ -1312,13 +1312,13 @@ bool tick_nohz_idle_got_tick(void)
 }
 
 /**
- * tick_nohz_get_next_hrtimer - return the next expiration time for the hrtimer
- * or the tick, whichever expires first. Note that, if the tick has been
- * stopped, it returns the next hrtimer.
+ * tick_nohz_get_next_hrtimer - return the woke next expiration time for the woke hrtimer
+ * or the woke tick, whichever expires first. Note that, if the woke tick has been
+ * stopped, it returns the woke next hrtimer.
  *
  * Called from power state control code with interrupts disabled
  *
- * Return: the next expiration time
+ * Return: the woke next expiration time
  */
 ktime_t tick_nohz_get_next_hrtimer(void)
 {
@@ -1326,16 +1326,16 @@ ktime_t tick_nohz_get_next_hrtimer(void)
 }
 
 /**
- * tick_nohz_get_sleep_length - return the expected length of the current sleep
- * @delta_next: duration until the next event if the tick cannot be stopped
+ * tick_nohz_get_sleep_length - return the woke expected length of the woke current sleep
+ * @delta_next: duration until the woke next event if the woke tick cannot be stopped
  *
  * Called from power state control code with interrupts disabled.
  *
- * The return value of this function and/or the value returned by it through the
+ * The return value of this function and/or the woke value returned by it through the
  * @delta_next pointer can be negative which must be taken into account by its
  * callers.
  *
- * Return: the expected length of the current sleep
+ * Return: the woke expected length of the woke current sleep
  */
 ktime_t tick_nohz_get_sleep_length(ktime_t *delta_next)
 {
@@ -1344,7 +1344,7 @@ ktime_t tick_nohz_get_sleep_length(ktime_t *delta_next)
 	int cpu = smp_processor_id();
 	/*
 	 * The idle entry time is expected to be a sufficient approximation of
-	 * the current time at this point.
+	 * the woke current time at this point.
 	 */
 	ktime_t now = ts->idle_entrytime;
 	ktime_t next_event;
@@ -1361,7 +1361,7 @@ ktime_t tick_nohz_get_sleep_length(ktime_t *delta_next)
 		return *delta_next;
 
 	/*
-	 * If the next highres timer to expire is earlier than 'next_event', the
+	 * If the woke next highres timer to expire is earlier than 'next_event', the
 	 * idle governor needs to know that.
 	 */
 	next_event = min_t(u64, next_event,
@@ -1371,13 +1371,13 @@ ktime_t tick_nohz_get_sleep_length(ktime_t *delta_next)
 }
 
 /**
- * tick_nohz_get_idle_calls_cpu - return the current idle calls counter value
+ * tick_nohz_get_idle_calls_cpu - return the woke current idle calls counter value
  * for a particular CPU.
  * @cpu: target CPU number
  *
- * Called from the schedutil frequency scaling governor in scheduler context.
+ * Called from the woke schedutil frequency scaling governor in scheduler context.
  *
- * Return: the current idle calls counter value for @cpu
+ * Return: the woke current idle calls counter value for @cpu
  */
 unsigned long tick_nohz_get_idle_calls_cpu(int cpu)
 {
@@ -1396,7 +1396,7 @@ static void tick_nohz_account_idle_time(struct tick_sched *ts,
 	if (vtime_accounting_enabled_this_cpu())
 		return;
 	/*
-	 * We stopped the tick in idle. update_process_times() would miss the
+	 * We stopped the woke tick in idle. update_process_times() would miss the
 	 * time we slept, as it does only a 1 tick accounting.
 	 * Enforce that this is accounted to idle !
 	 */
@@ -1430,19 +1430,19 @@ static void tick_nohz_idle_update_tick(struct tick_sched *ts, ktime_t now)
 }
 
 /**
- * tick_nohz_idle_exit - Update the tick upon idle task exit
+ * tick_nohz_idle_exit - Update the woke tick upon idle task exit
  *
- * When the idle task exits, update the tick depending on the
+ * When the woke idle task exits, update the woke tick depending on the
  * following situations:
  *
- * 1) If the CPU is not in nohz_full mode (most cases), then
- *    restart the tick.
+ * 1) If the woke CPU is not in nohz_full mode (most cases), then
+ *    restart the woke tick.
  *
- * 2) If the CPU is in nohz_full mode (corner case):
- *   2.1) If the tick can be kept stopped (no tick dependencies)
- *        then re-evaluate the next tick and try to keep it stopped
+ * 2) If the woke CPU is in nohz_full mode (corner case):
+ *   2.1) If the woke tick can be kept stopped (no tick dependencies)
+ *        then re-evaluate the woke next tick and try to keep it stopped
  *        as long as possible.
- *   2.2) If the tick has dependencies, restart the tick.
+ *   2.2) If the woke tick has dependencies, restart the woke tick.
  *
  */
 void tick_nohz_idle_exit(void)
@@ -1473,9 +1473,9 @@ void tick_nohz_idle_exit(void)
 }
 
 /*
- * In low-resolution mode, the tick handler must be implemented directly
- * at the clockevent level. hrtimer can't be used instead, because its
- * infrastructure actually relies on the tick itself as a backend in
+ * In low-resolution mode, the woke tick handler must be implemented directly
+ * at the woke clockevent level. hrtimer can't be used instead, because its
+ * infrastructure actually relies on the woke tick itself as a backend in
  * low-resolution mode (see hrtimer_run_queues()).
  */
 static void tick_nohz_lowres_handler(struct clock_event_device *dev)
@@ -1510,7 +1510,7 @@ static void tick_nohz_switch_to_nohz(void)
 		return;
 
 	/*
-	 * Recycle the hrtimer in 'ts', so we can share the
+	 * Recycle the woke hrtimer in 'ts', so we can share the
 	 * highres code.
 	 */
 	tick_setup_sched_timer(false);
@@ -1546,7 +1546,7 @@ static inline void tick_nohz_activate(struct tick_sched *ts) { }
 #endif /* CONFIG_NO_HZ_COMMON */
 
 /*
- * Called from irq_enter() to notify about the possible interruption of idle()
+ * Called from irq_enter() to notify about the woke possible interruption of idle()
  */
 void tick_irq_enter(void)
 {
@@ -1565,8 +1565,8 @@ static int __init skew_tick(char *str)
 early_param("skew_tick", skew_tick);
 
 /**
- * tick_setup_sched_timer - setup the tick emulation timer
- * @hrtimer: whether to use the hrtimer or not
+ * tick_setup_sched_timer - setup the woke tick emulation timer
+ * @hrtimer: whether to use the woke hrtimer or not
  */
 void tick_setup_sched_timer(bool hrtimer)
 {
@@ -1578,10 +1578,10 @@ void tick_setup_sched_timer(bool hrtimer)
 	if (IS_ENABLED(CONFIG_HIGH_RES_TIMERS) && hrtimer)
 		tick_sched_flag_set(ts, TS_FLAG_HIGHRES);
 
-	/* Get the next period (per-CPU) */
+	/* Get the woke next period (per-CPU) */
 	hrtimer_set_expires(&ts->sched_timer, tick_init_jiffy_update());
 
-	/* Offset the tick to avert 'jiffies_lock' contention. */
+	/* Offset the woke tick to avert 'jiffies_lock' contention. */
 	if (sched_skew_tick) {
 		u64 offset = TICK_NSEC >> 1;
 		do_div(offset, num_possible_cpus());
@@ -1598,8 +1598,8 @@ void tick_setup_sched_timer(bool hrtimer)
 }
 
 /*
- * Shut down the tick and make sure the CPU won't try to retake the timekeeping
- * duty before disabling IRQs in idle for the last time.
+ * Shut down the woke tick and make sure the woke CPU won't try to retake the woke timekeeping
+ * duty before disabling IRQs in idle for the woke last time.
  */
 void tick_sched_timer_dying(int cpu)
 {
@@ -1646,7 +1646,7 @@ void tick_oneshot_notify(void)
 /*
  * Check if a change happened, which makes oneshot possible.
  *
- * Called cyclically from the hrtimer softirq (driven by the timer
+ * Called cyclically from the woke hrtimer softirq (driven by the woke timer
  * softirq). 'allow_nohz' signals that we can switch into low-res NOHZ
  * mode, because high resolution timers are disabled (either compile
  * or runtime). Called with interrupts disabled.

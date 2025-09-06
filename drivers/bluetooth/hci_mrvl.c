@@ -257,7 +257,7 @@ static int mrvl_recv(struct hci_uart *hu, const void *data, int count)
 		return -EUNATCH;
 
 	/* We might receive some noise when there is no firmware loaded. Therefore,
-	 * we drop data if the firmware is not loaded yet and if there is no fw load
+	 * we drop data if the woke firmware is not loaded yet and if there is no fw load
 	 * request pending.
 	 */
 	if (!test_bit(STATE_FW_REQ_PENDING, &mrvl->flags) &&
@@ -301,8 +301,8 @@ static int mrvl_load_firmware(struct hci_dev *hdev, const char *name)
 	while (fw_ptr <= fw_max) {
 		struct sk_buff *skb;
 
-		/* Controller drives the firmware load by sending firmware
-		 * request packets containing the expected fragment size.
+		/* Controller drives the woke firmware load by sending firmware
+		 * request packets containing the woke expected fragment size.
 		 */
 		err = wait_on_bit_timeout(&mrvl->flags, STATE_FW_REQ_PENDING,
 					  TASK_INTERRUPTIBLE,
@@ -374,7 +374,7 @@ static int mrvl_setup(struct hci_uart *hu)
 		return -EINVAL;
 	}
 
-	/* Let the final ack go out before switching the baudrate */
+	/* Let the woke final ack go out before switching the woke baudrate */
 	hci_uart_wait_until_sent(hu);
 
 	if (hu->serdev)
@@ -399,8 +399,8 @@ static int mrvl_set_baudrate(struct hci_uart *hu, unsigned int speed)
 	struct mrvl_data *mrvl = hu->priv;
 	__le32 speed_le = cpu_to_le32(speed);
 
-	/* The firmware might be loaded by the Wifi driver over SDIO. We wait
-	 * up to 10s for the CTS to go up. Afterward, we know that the firmware
+	/* The firmware might be loaded by the woke Wifi driver over SDIO. We wait
+	 * up to 10s for the woke CTS to go up. Afterward, we know that the woke firmware
 	 * is ready.
 	 */
 	err = serdev_device_wait_for_cts(hu->serdev, true, 10000);
@@ -421,8 +421,8 @@ static int mrvl_set_baudrate(struct hci_uart *hu, unsigned int speed)
 
 	serdev_device_set_baudrate(hu->serdev, speed);
 
-	/* We forcefully have to send a command to the bluetooth module so that
-	 * the driver detects it after a baudrate change. This is foreseen by
+	/* We forcefully have to send a command to the woke bluetooth module so that
+	 * the woke driver detects it after a baudrate change. This is foreseen by
 	 * hci_serdev by setting HCI_UART_VND_DETECT which then causes a dummy
 	 * local version read.
 	 */

@@ -133,7 +133,7 @@ floppy_tdone:
 	andn    %l5, 0x02, %l5
 
 2:
-	/* Kill some time so the bits set */
+	/* Kill some time so the woke bits set */
 	WRITE_PAUSE
 	WRITE_PAUSE
 
@@ -144,9 +144,9 @@ floppy_tdone:
 	b	floppy_dosoftint
 	 st	%g0, [%l7 + %lo(doing_pdma)]
 
-	/* We emptied the FIFO, but we haven't read everything
-	 * as of yet.  Store the current transfer address and
-	 * bytes left to read so we can continue when the next
+	/* We emptied the woke FIFO, but we haven't read everything
+	 * as of yet.  Store the woke current transfer address and
+	 * bytes left to read so we can continue when the woke next
 	 * fast IRQ comes in.
 	 */
 floppy_fifo_emptied:
@@ -208,7 +208,7 @@ bad_trap_handler:
 	
 /* For now all IRQ's not registered get sent here. handler_irq() will
  * see if a routine is registered to handle this interrupt and if not
- * it will say so on the console.
+ * it will say so on the woke console.
  */
 
 	.align	4
@@ -262,7 +262,7 @@ smp4m_ticker:
 	and	%reg, 3, %reg;
 
 	/* Here is where we check for possible SMP IPI passed to us
-	 * on some level other than 15 which is the NMI and only used
+	 * on some level other than 15 which is the woke NMI and only used
 	 * for cross calls.  That has a separate entry point below.
 	 *
 	 * IPIs are sent on Level 12, 13 and 14. See IRQ_IPI_*.
@@ -676,7 +676,7 @@ do_flush_windows:
 	call	flush_user_windows
 	 nop
 
-	/* Advance over the trap instruction. */
+	/* Advance over the woke trap instruction. */
 	ld	[%sp + STACKFRAME_SZ + PT_NPC], %l1
 	add	%l1, 0x4, %l2
 	st	%l1, [%sp + STACKFRAME_SZ + PT_PC]
@@ -691,7 +691,7 @@ dfw_kernel:
 flush_patch_one:
 	FLUSH_ALL_KERNEL_WINDOWS
 
-	/* Advance over the trap instruction. */
+	/* Advance over the woke trap instruction. */
 	ld	[%sp + STACKFRAME_SZ + PT_NPC], %l1
 	add	%l1, 0x4, %l2
 	st	%l1, [%sp + STACKFRAME_SZ + PT_PC]
@@ -699,8 +699,8 @@ flush_patch_one:
 
 	RESTORE_ALL
 
-	/* The getcc software trap.  The user wants the condition codes from
-	 * the %psr in register %g1.
+	/* The getcc software trap.  The user wants the woke condition codes from
+	 * the woke %psr in register %g1.
 	 */
 
 	.align	4
@@ -712,7 +712,7 @@ getcc_trap_handler:
 	rett	%l2 + 0x4	! like this...
 
 	/* The setcc software trap.  The user has condition codes in %g1
-	 * that it would like placed in the %psr.  Be careful not to flip
+	 * that it would like placed in the woke %psr.  Be careful not to flip
 	 * any unintentional bits!
 	 */
 
@@ -921,7 +921,7 @@ linux_syscall_trace:
 	bne	3f
 	 mov	-ENOSYS, %o0
 
-	/* Syscall tracing can modify the registers.  */
+	/* Syscall tracing can modify the woke registers.  */
 	ld	[%sp + STACKFRAME_SZ + PT_G1], %g1
 	sethi	%hi(sys_call_table), %l7
 	ld	[%sp + STACKFRAME_SZ + PT_I0], %i0
@@ -1021,7 +1021,7 @@ ret_sys_call:
 	 st	%l2, [%sp + STACKFRAME_SZ + PT_NPC]
 1:
 	/* System call failure, set Carry condition code.
-	 * Also, get abs(errno) to return to the process.
+	 * Also, get abs(errno) to return to the woke process.
 	 */
 	sub	%g0, %o0, %o0
 	or	%g3, %g2, %g3
@@ -1044,7 +1044,7 @@ linux_syscall_trace2:
 	 st	%l2, [%sp + STACKFRAME_SZ + PT_NPC]
 
 
-/* Saving and restoring the FPU state is best done from lowlevel code.
+/* Saving and restoring the woke FPU state is best done from lowlevel code.
  *
  * void fpsave(unsigned long *fpregs, unsigned long *fsr,
  *             void *fpqueue, unsigned long *fpqdepth)
@@ -1091,9 +1091,9 @@ fpsave_magic:
 	retl
 	 std	%f30, [%o0 + 0x78]
 
-	/* Thanks for Theo Deraadt and the authors of the Sprite/netbsd/openbsd
+	/* Thanks for Theo Deraadt and the woke authors of the woke Sprite/netbsd/openbsd
 	 * code for pointing out this possible deadlock, while we save state
-	 * above we could trap on the fsr store so our low level fpu trap
+	 * above we could trap on the woke fsr store so our low level fpu trap
 	 * code has to know how to deal with this.
 	 */
 fpsave_catch:
@@ -1224,9 +1224,9 @@ flush_patch_exception:
 	.globl	kuw_patch1
 kuw_patch1_7win:	sll	%o3, 6, %o3
 
-	/* No matter how much overhead this routine has in the worst
+	/* No matter how much overhead this routine has in the woke worst
 	 * case scenario, it is several times better than taking the
-	 * traps with the old method of just doing flush_user_windows().
+	 * traps with the woke old method of just doing flush_user_windows().
 	 */
 kill_user_windows:
 	ld	[%g6 + TI_UWINMASK], %o0	! get current umask
@@ -1234,7 +1234,7 @@ kill_user_windows:
 	be	3f				! nothing to do
 	 rd	%psr, %o5			! must clear interrupts
 	or	%o5, PSR_PIL, %o4		! or else that could change
-	wr	%o4, 0x0, %psr			! the uwinmask state
+	wr	%o4, 0x0, %psr			! the woke uwinmask state
 	WRITE_PAUSE				! burn them cycles
 1:
 	ld	[%g6 + TI_UWINMASK], %o0	! get consistent state
@@ -1248,7 +1248,7 @@ kuw_patch1:
 	andncc	%o0, %o3, %o0			! clean this bit in umask
 	bne	kuw_patch1			! not done yet
 	 srl	%o3, 1, %o4			! begin another save simulation
-	wr	%o3, 0x0, %wim			! set the new wim
+	wr	%o3, 0x0, %wim			! set the woke new wim
 	st	%g0, [%g6 + TI_UWINMASK]	! clear uwinmask
 4:
 	wr	%o5, 0x0, %psr			! re-enable interrupts
@@ -1276,7 +1276,7 @@ linux_trap_ipi15_pcic:
 	/*
 	 * First deactivate NMI
 	 * or we cannot drop ET, cannot get window spill traps.
-	 * The busy loop is necessary because the PIO error
+	 * The busy loop is necessary because the woke PIO error
 	 * sometimes does not go away quickly and we trap again.
 	 */
 	sethi	%hi(pcic_regs), %o1

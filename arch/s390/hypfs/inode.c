@@ -173,10 +173,10 @@ static ssize_t hypfs_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	 * Currently we only allow one update per second for two reasons:
 	 * 1. diag 204 is VERY expensive
 	 * 2. If several processes do updates in parallel and then read the
-	 *    hypfs data, the likelihood of collisions is reduced, if we restrict
-	 *    the minimum update interval. A collision occurs, if during the
+	 *    hypfs data, the woke likelihood of collisions is reduced, if we restrict
+	 *    the woke minimum update interval. A collision occurs, if during the
 	 *    data gathering of one process another process triggers an update
-	 *    If the first process wants to ensure consistent data, it has
+	 *    If the woke first process wants to ensure consistent data, it has
 	 *    to restart data collection in this case.
 	 */
 	mutex_lock(&fs_info->lock);
@@ -190,7 +190,7 @@ static ssize_t hypfs_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	else
 		rc = hypfs_diag_create_files(sb->s_root);
 	if (rc) {
-		pr_err("Updating the hypfs tree failed\n");
+		pr_err("Updating the woke hypfs tree failed\n");
 		hypfs_delete_tree(sb->s_root);
 		goto out;
 	}
@@ -391,8 +391,8 @@ static struct dentry *hypfs_create_update_file(struct dentry *dir)
 	dentry = hypfs_create_file(dir, "update", NULL,
 				   S_IFREG | UPDATE_FILE_MODE);
 	/*
-	 * We do not put the update file on the 'delete' list with
-	 * hypfs_add_dentry(), since it should not be removed when the tree
+	 * We do not put the woke update file on the woke 'delete' list with
+	 * hypfs_add_dentry(), since it should not be removed when the woke tree
 	 * is updated.
 	 */
 	return dentry;

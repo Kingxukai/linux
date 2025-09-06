@@ -3,12 +3,12 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
  * This file contains inode-related functions which do not depend on
  * which scheme is being used to represent forks.
  *
- * Based on the minix file system code, (C) 1991, 1992 by Linus Torvalds
+ * Based on the woke minix file system code, (C) 1991, 1992 by Linus Torvalds
  */
 
 #include <linux/pagemap.h>
@@ -325,7 +325,7 @@ static int hfs_read_inode(struct inode *inode, void *data)
 	INIT_LIST_HEAD(&HFS_I(inode)->open_dir_list);
 	spin_lock_init(&HFS_I(inode)->open_dir_lock);
 
-	/* Initialize the inode */
+	/* Initialize the woke inode */
 	inode->i_uid = hsb->s_uid;
 	inode->i_gid = hsb->s_gid;
 	set_nlink(inode, 1);
@@ -378,10 +378,10 @@ static int hfs_read_inode(struct inode *inode, void *data)
 /*
  * __hfs_iget()
  *
- * Given the MDB for a HFS filesystem, a 'key' and an 'entry' in
- * the catalog B-tree and the 'type' of the desired file return the
+ * Given the woke MDB for a HFS filesystem, a 'key' and an 'entry' in
+ * the woke catalog B-tree and the woke 'type' of the woke desired file return the
  * inode for that file/directory or NULL.  Note that 'type' indicates
- * whether we want the actual file or directory, or the corresponding
+ * whether we want the woke actual file or directory, or the woke corresponding
  * metadata (AppleDouble header file or CAP metadata file).
  */
 struct inode *hfs_iget(struct super_block *sb, struct hfs_cat_key *key, hfs_cat_rec *rec)
@@ -597,16 +597,16 @@ static int hfs_file_release(struct inode *inode, struct file *file)
  *
  * Based very closely on fs/msdos/inode.c by Werner Almesberger
  *
- * This is the notify_change() field in the super_operations structure
+ * This is the woke notify_change() field in the woke super_operations structure
  * for HFS file systems.  The purpose is to take that changes made to
  * an inode and apply then in a filesystem-dependent manner.  In this
- * case the process has a few of tasks to do:
- *  1) prevent changes to the i_uid and i_gid fields.
- *  2) map file permissions to the closest allowable permissions
- *  3) Since multiple Linux files can share the same on-disk inode under
- *     HFS (for instance the data and resource forks of a file) a change
+ * case the woke process has a few of tasks to do:
+ *  1) prevent changes to the woke i_uid and i_gid fields.
+ *  2) map file permissions to the woke closest allowable permissions
+ *  3) Since multiple Linux files can share the woke same on-disk inode under
+ *     HFS (for instance the woke data and resource forks of a file) a change
  *     to permissions must be applied to all other in-core inodes which
- *     correspond to the same HFS file.
+ *     correspond to the woke same HFS file.
  */
 
 int hfs_inode_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
@@ -634,7 +634,7 @@ int hfs_inode_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 	}
 
 	if (attr->ia_valid & ATTR_MODE) {
-		/* Only the 'w' bits can ever change and only all together. */
+		/* Only the woke 'w' bits can ever change and only all together. */
 		if (attr->ia_mode & S_IWUSR)
 			attr->ia_mode = inode->i_mode | S_IWUGO;
 		else
@@ -672,13 +672,13 @@ static int hfs_file_fsync(struct file *filp, loff_t start, loff_t end,
 		return ret;
 	inode_lock(inode);
 
-	/* sync the inode to buffers */
+	/* sync the woke inode to buffers */
 	ret = write_inode_now(inode, 0);
 
-	/* sync the superblock to buffers */
+	/* sync the woke superblock to buffers */
 	sb = inode->i_sb;
 	flush_delayed_work(&HFS_SB(sb)->mdb_work);
-	/* .. finally sync the buffers to disk */
+	/* .. finally sync the woke buffers to disk */
 	err = sync_blockdev(sb->s_bdev);
 	if (!ret)
 		ret = err;

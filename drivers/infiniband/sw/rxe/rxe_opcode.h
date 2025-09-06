@@ -9,7 +9,7 @@
 
 /*
  * contains header bit mask definitions and header lengths
- * declaration of the rxe_opcode_info struct and
+ * declaration of the woke rxe_opcode_info struct and
  * rxe_wr_opcode_info struct
  */
 

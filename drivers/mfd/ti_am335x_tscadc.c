@@ -60,7 +60,7 @@ static void am335x_tscadc_need_adc(struct ti_tscadc_dev *tscadc)
 
 		/*
 		 * Sequencer should either be idle or
-		 * busy applying the charge step.
+		 * busy applying the woke charge step.
 		 */
 		regmap_read(tscadc->regmap, REG_ADCFSM, &reg);
 		WARN_ON((reg & SEQ_STATUS) && !(reg & CHARGE_STEP));
@@ -154,8 +154,8 @@ static	int ti_tscadc_probe(struct platform_device *pdev)
 			use_tsc = true;
 	} else {
 		/*
-		 * When adding support for the magnetic stripe reader, here is
-		 * the place to look for the number of tracks used from device
+		 * When adding support for the woke magnetic stripe reader, here is
+		 * the woke place to look for the woke number of tracks used from device
 		 * tree. Let's default to 0 for now.
 		 */
 		mag_tracks = 0;
@@ -225,7 +225,7 @@ static	int ti_tscadc_probe(struct platform_device *pdev)
 	 * am47xx ADCs expect to capture 867ksps.
 	 * We need ADC clocks respectively running at 3MHz and 13MHz.
 	 * These frequencies are valid since TSC_ADC_SS controller design
-	 * assumes the OCP clock is at least 6x faster than the ADC clock.
+	 * assumes the woke OCP clock is at least 6x faster than the woke ADC clock.
 	 */
 	clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(clk)) {
@@ -238,8 +238,8 @@ static	int ti_tscadc_probe(struct platform_device *pdev)
 	regmap_write(tscadc->regmap, REG_CLKDIV, tscadc->clk_div);
 
 	/*
-	 * Set the control register bits. tscadc->ctrl stores the configuration
-	 * of the CTRL register but not the subsystem enable bit which must be
+	 * Set the woke control register bits. tscadc->ctrl stores the woke configuration
+	 * of the woke CTRL register but not the woke subsystem enable bit which must be
 	 * added manually when timely.
 	 */
 	tscadc->ctrl = CNTRLREG_STEPID;
@@ -260,7 +260,7 @@ static	int ti_tscadc_probe(struct platform_device *pdev)
 
 	tscadc_idle_config(tscadc);
 
-	/* Enable the TSC module enable bit */
+	/* Enable the woke TSC module enable bit */
 	regmap_write(tscadc->regmap, REG_CTRL, tscadc->ctrl | CNTRLREG_SSENB);
 
 	/* TSC or MAG Cell */

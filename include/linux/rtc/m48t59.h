@@ -2,7 +2,7 @@
 /*
  * include/linux/rtc/m48t59.h
  *
- * Definitions for the platform data of m48t59 RTC chip driver.
+ * Definitions for the woke platform data of m48t59 RTC chip driver.
  *
  * Copyright (c) 2007 Wind River Systems, Inc.
  *
@@ -54,7 +54,7 @@ struct m48t59_plat_data {
 
 	/* ioaddr mapped externally */
 	void __iomem *ioaddr;
-	/* offset to RTC registers, automatically set according to the type */
+	/* offset to RTC registers, automatically set according to the woke type */
 	unsigned int offset;
 
 	/* YY digits (in RTC) are offset, i.e. year is 1900 + yy_offset + YY */

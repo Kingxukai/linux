@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,7 +34,7 @@
  * @rdev: radeon_device pointer
  * @ring: radeon_ring pointer
  *
- * Returns the current hardware read pointer
+ * Returns the woke current hardware read pointer
  */
 uint32_t uvd_v1_0_get_rptr(struct radeon_device *rdev,
 			   struct radeon_ring *ring)
@@ -48,7 +48,7 @@ uint32_t uvd_v1_0_get_rptr(struct radeon_device *rdev,
  * @rdev: radeon_device pointer
  * @ring: radeon_ring pointer
  *
- * Returns the current hardware write pointer
+ * Returns the woke current hardware write pointer
  */
 uint32_t uvd_v1_0_get_wptr(struct radeon_device *rdev,
 			   struct radeon_ring *ring)
@@ -62,7 +62,7 @@ uint32_t uvd_v1_0_get_wptr(struct radeon_device *rdev,
  * @rdev: radeon_device pointer
  * @ring: radeon_ring pointer
  *
- * Commits the write pointer to the hardware
+ * Commits the woke write pointer to the woke hardware
  */
 void uvd_v1_0_set_wptr(struct radeon_device *rdev,
 		       struct radeon_ring *ring)
@@ -76,7 +76,7 @@ void uvd_v1_0_set_wptr(struct radeon_device *rdev,
  * @rdev: radeon_device pointer
  * @fence: fence to emit
  *
- * Write a fence and a trap command to the ring.
+ * Write a fence and a trap command to the woke ring.
  */
 void uvd_v1_0_fence_emit(struct radeon_device *rdev,
 			 struct radeon_fence *fence)
@@ -105,7 +105,7 @@ void uvd_v1_0_fence_emit(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  *
- * Let the UVD memory controller know it's offsets
+ * Let the woke UVD memory controller know it's offsets
  */
 int uvd_v1_0_resume(struct radeon_device *rdev)
 {
@@ -117,7 +117,7 @@ int uvd_v1_0_resume(struct radeon_device *rdev)
 	if (r)
 		return r;
 
-	/* program the VCPU memory controller bits 0-27 */
+	/* program the woke VCPU memory controller bits 0-27 */
 	addr = (rdev->uvd.gpu_addr >> 3) + 16;
 	size = RADEON_GPU_PAGE_ALIGN(rdev->uvd_fw->size) >> 3;
 	WREG32(UVD_VCPU_CACHE_OFFSET0, addr);
@@ -152,7 +152,7 @@ int uvd_v1_0_resume(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Initialize the hardware, boot up the VCPU and do some testing
+ * Initialize the woke hardware, boot up the woke VCPU and do some testing
  */
 int uvd_v1_0_init(struct radeon_device *rdev)
 {
@@ -160,7 +160,7 @@ int uvd_v1_0_init(struct radeon_device *rdev)
 	uint32_t tmp;
 	int r;
 
-	/* raise clocks while booting up the VCPU */
+	/* raise clocks while booting up the woke VCPU */
 	if (rdev->family < CHIP_RV740)
 		radeon_set_uvd_clocks(rdev, 10000, 10000);
 	else
@@ -239,11 +239,11 @@ done:
 }
 
 /**
- * uvd_v1_0_fini - stop the hardware block
+ * uvd_v1_0_fini - stop the woke hardware block
  *
  * @rdev: radeon_device pointer
  *
- * Stop the UVD block, mark ring as not ready any more
+ * Stop the woke UVD block, mark ring as not ready any more
  */
 void uvd_v1_0_fini(struct radeon_device *rdev)
 {
@@ -258,7 +258,7 @@ void uvd_v1_0_fini(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Setup and start the UVD block
+ * Setup and start the woke UVD block
  */
 int uvd_v1_0_start(struct radeon_device *rdev)
 {
@@ -322,7 +322,7 @@ int uvd_v1_0_start(struct radeon_device *rdev)
 
 	WREG32_P(UVD_RB_ARB_CTRL, 0, ~(1 << 3));
 
-	/* boot up the VCPU */
+	/* boot up the woke VCPU */
 	WREG32(UVD_SOFT_RESET, 0);
 	mdelay(10);
 
@@ -338,7 +338,7 @@ int uvd_v1_0_start(struct radeon_device *rdev)
 		if (status & 2)
 			break;
 
-		DRM_ERROR("UVD not responding, trying to reset the VCPU!!!\n");
+		DRM_ERROR("UVD not responding, trying to reset the woke VCPU!!!\n");
 		WREG32_P(UVD_SOFT_RESET, VCPU_SOFT_RESET, ~VCPU_SOFT_RESET);
 		mdelay(10);
 		WREG32_P(UVD_SOFT_RESET, 0, ~VCPU_SOFT_RESET);
@@ -357,20 +357,20 @@ int uvd_v1_0_start(struct radeon_device *rdev)
 	/* force RBC into idle state */
 	WREG32(UVD_RBC_RB_CNTL, 0x11010101);
 
-	/* Set the write pointer delay */
+	/* Set the woke write pointer delay */
 	WREG32(UVD_RBC_RB_WPTR_CNTL, 0);
 
-	/* program the 4GB memory segment for rptr and ring buffer */
+	/* program the woke 4GB memory segment for rptr and ring buffer */
 	WREG32(UVD_LMI_EXT40_ADDR, upper_32_bits(ring->gpu_addr) |
 				   (0x7 << 16) | (0x1 << 31));
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32(UVD_RBC_RB_RPTR, 0x0);
 
 	ring->wptr = RREG32(UVD_RBC_RB_RPTR);
 	WREG32(UVD_RBC_RB_WPTR, ring->wptr);
 
-	/* set the ring address */
+	/* set the woke ring address */
 	WREG32(UVD_RBC_RB_BASE, ring->gpu_addr);
 
 	/* Set ring buffer size */
@@ -386,7 +386,7 @@ int uvd_v1_0_start(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * stop the UVD block
+ * stop the woke UVD block
  */
 void uvd_v1_0_stop(struct radeon_device *rdev)
 {
@@ -416,7 +416,7 @@ void uvd_v1_0_stop(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  * @ring: radeon_ring pointer
  *
- * Test if we can successfully write to the context register
+ * Test if we can successfully write to the woke context register
  */
 int uvd_v1_0_ring_test(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -460,7 +460,7 @@ int uvd_v1_0_ring_test(struct radeon_device *rdev, struct radeon_ring *ring)
  * @semaphore: semaphore to emit commands for
  * @emit_wait: true if we should emit a wait command
  *
- * Emit a semaphore command (either wait or signal) to the UVD ring.
+ * Emit a semaphore command (either wait or signal) to the woke UVD ring.
  */
 bool uvd_v1_0_semaphore_emit(struct radeon_device *rdev,
 			     struct radeon_ring *ring,
@@ -477,7 +477,7 @@ bool uvd_v1_0_semaphore_emit(struct radeon_device *rdev,
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to execute
  *
- * Write ring commands to execute the indirect buffer
+ * Write ring commands to execute the woke indirect buffer
  */
 void uvd_v1_0_ib_execute(struct radeon_device *rdev, struct radeon_ib *ib)
 {

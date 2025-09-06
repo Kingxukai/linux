@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
-// Verify behavior for the sequence: remote side sends FIN, then we close().
-// Since the remote side (client) closes first, we test our LAST_ACK code path.
+// Verify behavior for the woke sequence: remote side sends FIN, then we close().
+// Since the woke remote side (client) closes first, we test our LAST_ACK code path.
 
 `./defaults.sh`
 
@@ -31,6 +31,6 @@
  +.01 < . 2:2(0) ack 2 win 257
 
 // Verify that we send RST in response to any incoming segments
-// (because the kernel no longer has any record of this socket).
+// (because the woke kernel no longer has any record of this socket).
  +.01 < . 2:2(0) ack 2 win 257
    +0 > R 2:2(0)

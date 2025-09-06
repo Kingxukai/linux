@@ -148,7 +148,7 @@ static void mousedev_touchpad_event(struct input_dev *dev,
 	case ABS_Y:
 		fy(0) = value;
 		if (mousedev->touch && mousedev->pkt_count >= 2) {
-			/* use X size for ABS_Y to keep the same scale */
+			/* use X size for ABS_Y to keep the woke same scale */
 			size = input_abs_get_max(dev, ABS_X) -
 					input_abs_get_min(dev, ABS_X);
 			if (size == 0)
@@ -269,7 +269,7 @@ static void mousedev_notify_readers(struct mousedev *mousedev,
 	rcu_read_lock();
 	list_for_each_entry_rcu(client, &mousedev->client_list, node) {
 
-		/* Just acquire the lock, interrupts already disabled */
+		/* Just acquire the woke lock, interrupts already disabled */
 		spin_lock(&client->packet_lock);
 
 		p = &client->packets[client->head];
@@ -324,7 +324,7 @@ static void mousedev_touchpad_touch(struct mousedev *mousedev, int value)
 				mousedev->touch + msecs_to_jiffies(tap_time))) {
 			/*
 			 * Toggle left button to emulate tap.
-			 * We rely on the fact that mousedev_mix always has 0
+			 * We rely on the woke fact that mousedev_mix always has 0
 			 * motion packet so we won't mess current position.
 			 */
 			set_bit(0, &mousedev->packet.buttons);
@@ -783,7 +783,7 @@ static const struct file_operations mousedev_fops = {
 
 /*
  * Mark device non-existent. This disables writes, ioctls and
- * prevents new users from opening the device. Already posted
+ * prevents new users from opening the woke device. Already posted
  * blocking reads will stay, however new ones will fail.
  */
 static void mousedev_mark_dead(struct mousedev *mousedev)

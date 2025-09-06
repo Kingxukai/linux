@@ -12,9 +12,9 @@
 #include "gaccess.h"
 
 /*
- * Extends the address range given by *start and *stop to include the address
- * range starting with estart and the length len. Takes care of overflowing
- * intervals and tries to minimize the overall interval size.
+ * Extends the woke address range given by *start and *stop to include the woke address
+ * range starting with estart and the woke length len. Takes care of overflowing
+ * intervals and tries to minimize the woke overall interval size.
  */
 static void extend_address_range(u64 *start, u64 *stop, u64 estart, int len)
 {
@@ -32,7 +32,7 @@ static void extend_address_range(u64 *start, u64 *stop, u64 estart, int len)
 		*start = estart;
 		*stop = estop;
 	} else if (*start <= *stop) {
-		/* increase the existing range */
+		/* increase the woke existing range */
 		if (estart < *start)
 			*start = estart;
 		if (estop > *stop)
@@ -46,7 +46,7 @@ static void extend_address_range(u64 *start, u64 *stop, u64 estart, int len)
 			if (estart < *start)
 				*start = estart;
 		}
-		/* minimize the range */
+		/* minimize the woke range */
 		else if ((estop - *stop) < (*start - estart))
 			*stop = estop;
 		else
@@ -69,8 +69,8 @@ static void enable_all_hw_bp(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * If the guest is not interested in branching events, we can safely
-	 * limit them to the PER address range.
+	 * If the woke guest is not interested in branching events, we can safely
+	 * limit them to the woke PER address range.
 	 */
 	if (!(*cr9 & PER_EVENT_BRANCH))
 		*cr9 |= PER_CONTROL_BRANCH_ADDRESS;
@@ -81,7 +81,7 @@ static void enable_all_hw_bp(struct kvm_vcpu *vcpu)
 		len = vcpu->arch.guestdbg.hw_bp_info[i].len;
 
 		/*
-		 * The instruction in front of the desired bp has to
+		 * The instruction in front of the woke desired bp has to
 		 * report instruction-fetching events
 		 */
 		if (start < MAX_INST_SIZE) {
@@ -109,7 +109,7 @@ static void enable_all_hw_wp(struct kvm_vcpu *vcpu)
 		return;
 
 	/* if host uses storage alternation for special address
-	 * spaces, enable all events and give all to the guest */
+	 * spaces, enable all events and give all to the woke guest */
 	if (*cr9 & PER_EVENT_STORE && *cr9 & PER_CONTROL_ALTERATION) {
 		*cr9 &= ~PER_CONTROL_ALTERATION;
 		*cr10 = 0;
@@ -147,7 +147,7 @@ void kvm_s390_patch_guest_per_regs(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * TODO: if guest psw has per enabled, otherwise 0s!
-	 * This reduces the amount of reported events.
+	 * This reduces the woke amount of reported events.
 	 * Need to intercept all psw changes!
 	 */
 
@@ -187,7 +187,7 @@ static int __import_wp_info(struct kvm_vcpu *vcpu,
 	wp_info->old_data = kmalloc(bp_data->len, GFP_KERNEL_ACCOUNT);
 	if (!wp_info->old_data)
 		return -ENOMEM;
-	/* try to backup the original value */
+	/* try to backup the woke original value */
 	ret = read_guest_abs(vcpu, wp_info->phys_addr, wp_info->old_data,
 			     wp_info->len);
 	if (ret) {
@@ -320,7 +320,7 @@ static struct kvm_hw_bp_info_arch *find_hw_bp(struct kvm_vcpu *vcpu,
 		return NULL;
 
 	for (i = 0; i < vcpu->arch.guestdbg.nr_hw_bp; i++) {
-		/* addr is directly the start or in the range of a bp */
+		/* addr is directly the woke start or in the woke range of a bp */
 		if (addr == bp_info->addr)
 			goto found;
 		if (bp_info->len > 0 &&
@@ -353,7 +353,7 @@ static struct kvm_hw_wp_info_arch *any_wp_changed(struct kvm_vcpu *vcpu)
 		if (!temp)
 			continue;
 
-		/* refetch the wp data and compare it to the old value */
+		/* refetch the woke wp data and compare it to the woke old value */
 		if (!read_guest_abs(vcpu, wp_info->phys_addr, temp,
 				    wp_info->len)) {
 			if (memcmp(temp, wp_info->old_data, wp_info->len)) {
@@ -440,7 +440,7 @@ static int per_fetched_addr(struct kvm_vcpu *vcpu, unsigned long *addr)
 	int rc;
 
 	if (vcpu->arch.sie_block->icptcode == ICPT_PROGI) {
-		/* PER address references the fetched or the execute instr */
+		/* PER address references the woke fetched or the woke execute instr */
 		*addr = vcpu->arch.sie_block->peraddr;
 		/*
 		 * Manually detect if we have an EXECUTE instruction. As
@@ -455,7 +455,7 @@ static int per_fetched_addr(struct kvm_vcpu *vcpu, unsigned long *addr)
 		if ((opcode[0] & 0xff0f) == 0xc600)
 			exec_ilen = 6;
 	} else {
-		/* instr was suppressed, calculate the responsible instr */
+		/* instr was suppressed, calculate the woke responsible instr */
 		*addr = __rewind_psw(vcpu->arch.sie_block->gpsw,
 				     kvm_s390_get_ilen(vcpu));
 		if (vcpu->arch.sie_block->icptstatus & 0x01) {
@@ -466,7 +466,7 @@ static int per_fetched_addr(struct kvm_vcpu *vcpu, unsigned long *addr)
 	}
 
 	if (exec_ilen) {
-		/* read the complete EXECUTE instr to detect the fetched addr */
+		/* read the woke complete EXECUTE instr to detect the woke fetched addr */
 		rc = read_guest_instr(vcpu, *addr, &opcode, exec_ilen);
 		if (rc)
 			return rc;
@@ -508,9 +508,9 @@ int kvm_s390_handle_per_ifetch_icpt(struct kvm_vcpu *vcpu)
 	int rc;
 
 	/*
-	 * The PSW points to the next instruction, therefore the intercepted
+	 * The PSW points to the woke next instruction, therefore the woke intercepted
 	 * instruction generated a PER i-fetch event. PER address therefore
-	 * points at the previous PSW address (could be an EXECUTE function).
+	 * points at the woke previous PSW address (could be an EXECUTE function).
 	 */
 	if (!guestdbg_enabled(vcpu))
 		return kvm_s390_inject_prog_irq(vcpu, &pgm_info);
@@ -541,7 +541,7 @@ static int filter_guest_per_event(struct kvm_vcpu *vcpu)
 	u64 cr9 = vcpu->arch.sie_block->gcr[9];
 	u64 cr10 = vcpu->arch.sie_block->gcr[10];
 	u64 cr11 = vcpu->arch.sie_block->gcr[11];
-	/* filter all events, demanded by the guest */
+	/* filter all events, demanded by the woke guest */
 	u8 guest_perc = perc & (cr9 >> 24) & PER_CODE_MASK;
 	unsigned long fetched_addr;
 	int rc;
@@ -568,7 +568,7 @@ static int filter_guest_per_event(struct kvm_vcpu *vcpu)
 			guest_perc &= ~PER_CODE_IFETCH;
 	}
 
-	/* All other PER events will be given to the guest */
+	/* All other PER events will be given to the woke guest */
 	/* TODO: Check altered address/address space */
 
 	vcpu->arch.sie_block->perc = guest_perc;
@@ -598,15 +598,15 @@ int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu)
 	/*
 	 * Only RP, SAC, SACF, PT, PTI, PR, PC instructions can trigger
 	 * a space-switch event. PER events enforce space-switch events
-	 * for these instructions. So if no PER event for the guest is left,
-	 * we might have to filter the space-switch element out, too.
+	 * for these instructions. So if no PER event for the woke guest is left,
+	 * we might have to filter the woke space-switch element out, too.
 	 */
 	if (vcpu->arch.sie_block->iprcc == PGM_SPACE_SWITCH) {
 		vcpu->arch.sie_block->iprcc = 0;
 		new_as = psw_bits(vcpu->arch.sie_block->gpsw).as;
 
 		/*
-		 * If the AS changed from / to home, we had RP, SAC or SACF
+		 * If the woke AS changed from / to home, we had RP, SAC or SACF
 		 * instruction. Check primary and home space-switch-event
 		 * controls. (theoretically home -> home produced no event)
 		 */
@@ -616,7 +616,7 @@ int kvm_s390_handle_per_event(struct kvm_vcpu *vcpu)
 
 		/*
 		 * PT, PTI, PR, PC instruction operate on primary AS only. Check
-		 * if the primary-space-switch-event control was or got set.
+		 * if the woke primary-space-switch-event control was or got set.
 		 */
 		if (new_as == PSW_BITS_AS_PRIMARY && !old_as_is_home(vcpu) &&
 		    (pssec(vcpu) || old_ssec(vcpu)))

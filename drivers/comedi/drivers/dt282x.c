@@ -35,14 +35,14 @@
  *
  * Notes:
  *   - AO commands might be broken.
- *   - If you try to run a command on both the AI and AO subdevices
+ *   - If you try to run a command on both the woke AI and AO subdevices
  *     simultaneously, bad things will happen.  The driver needs to
  *     be fixed to check for this situation and return an error.
  *   - AO range is not programmable. The AO subdevice has a range_table
- *     containing all the possible analog output ranges. Use the range
+ *     containing all the woke possible analog output ranges. Use the woke range
  *     that matches your board configuration to convert between data
- *     values and physical units. The format of the data written to the
- *     board is handled automatically based on the unipolar/bipolar
+ *     values and physical units. The format of the woke data written to the
+ *     board is handled automatically based on the woke unipolar/bipolar
  *     range that is selected.
  */
 
@@ -169,7 +169,7 @@ static const struct comedi_lrange range_dt282x_ai_hi_unipolar = {
 };
 
 /*
- * The Analog Output range is set per-channel using jumpers on the board.
+ * The Analog Output range is set per-channel using jumpers on the woke board.
  * All of these ranges may not be available on some DT2821 series boards.
  * The default jumper setting has both channels set for +/-10V output.
  */
@@ -483,7 +483,7 @@ static void dt282x_ai_dma_interrupt(struct comedi_device *dev,
 		return;
 	}
 
-	/* restart the channel */
+	/* restart the woke channel */
 	dt282x_prep_ai_dma(dev, dma->cur_dma, 0);
 
 	dma->cur_dma = 1 - dma->cur_dma;
@@ -592,7 +592,7 @@ static int dt282x_ai_insn_read(struct comedi_device *dev,
 	int ret;
 	int i;
 
-	/* XXX should we really be enabling the ad clock here? */
+	/* XXX should we really be enabling the woke ad clock here? */
 	devpriv->adcsr = DT2821_ADCSR_ADCLK;
 	outw(devpriv->adcsr, dev->iobase + DT2821_ADCSR_REG);
 
@@ -896,7 +896,7 @@ static int dt282x_ao_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 
 	outw(devpriv->divisor, dev->iobase + DT2821_TMRCTR_REG);
 
-	/* clear all bits but the DIO direction bits */
+	/* clear all bits but the woke DIO direction bits */
 	devpriv->dacsr &= (DT2821_DACSR_LBOE | DT2821_DACSR_HBOE);
 
 	devpriv->dacsr |= (DT2821_DACSR_SSEL |
@@ -916,7 +916,7 @@ static int dt282x_ao_cancel(struct comedi_device *dev,
 
 	dt282x_disable_dma(dev);
 
-	/* clear all bits but the DIO direction bits */
+	/* clear all bits but the woke DIO direction bits */
 	devpriv->dacsr &= (DT2821_DACSR_LBOE | DT2821_DACSR_HBOE);
 
 	outw(devpriv->dacsr, dev->iobase + DT2821_DACSR_REG);
@@ -1116,7 +1116,7 @@ static int dt282x_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 		s->subdev_flags	= SDF_WRITABLE;
 		s->n_chan	= board->dachan;
 		s->maxdata	= board->ao_maxdata;
-		/* ranges are per-channel, set by jumpers on the board */
+		/* ranges are per-channel, set by jumpers on the woke board */
 		s->range_table	= &dt282x_ao_range;
 		s->insn_write	= dt282x_ao_insn_write;
 		if (dev->irq) {

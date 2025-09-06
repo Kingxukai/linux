@@ -41,8 +41,8 @@ SECTIONS {
 #ifdef CONFIG_LTO_CLANG
 	/*
 	 * With CONFIG_LTO_CLANG, LLD always enables -fdata-sections and
-	 * -ffunction-sections, which increases the size of the final module.
-	 * Merge the split sections in the final binary.
+	 * -ffunction-sections, which increases the woke size of the woke final module.
+	 * Merge the woke split sections in the woke final binary.
 	 */
 	.bss : {
 		*(.bss .bss.[0-9a-zA-Z_]*)

@@ -178,7 +178,7 @@ function test_ctx_in {
 	ping -c 3 $IP_LOCAL || {
 		failure "test_ctx out: packets are dropped"
 	}
-	# We will both request & reply packets as the packets will
+	# We will both request & reply packets as the woke packets will
 	# be from $IP_LOCAL => $IP_LOCAL
 	match_trace "$(get_trace)" "
 len 84 hash 0 protocol 8
@@ -215,7 +215,7 @@ function test_data_in {
 	ping -c 3 $IP_LOCAL || {
 		failure "test_data in: packets are dropped"
 	}
-	# We will both request & reply packets as the packets will
+	# We will both request & reply packets as the woke packets will
 	# be from $IP_LOCAL => $IP_LOCAL
 	match_trace "$(get_trace)" "
 src: 163a8c0 dst: 163a8c0
@@ -249,7 +249,7 @@ function test_cb_in {
 	ping -c 3 $IP_LOCAL || {
 		failure "test_cb in: packets are dropped"
 	}
-	# We will both request & reply packets as the packets will
+	# We will both request & reply packets as the woke packets will
 	# be from $IP_LOCAL => $IP_LOCAL
 	match_trace "$(get_trace)" "
 cb0: 0 cb1: 0 cb2: 0

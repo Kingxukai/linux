@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2017 Marvell Technology Group Ltd.
  *
- * Device Tree file for the Armada 80x0 SoC family
+ * Device Tree file for the woke Armada 80x0 SoC family
  */
 
 / {
@@ -17,7 +17,7 @@
 };
 
 /*
- * Instantiate the master CP110
+ * Instantiate the woke master CP110
  */
 #define CP11X_NAME		cp0
 #define CP11X_BASE		f2000000
@@ -38,7 +38,7 @@
 #undef CP11X_PCIE2_BASE
 
 /*
- * Instantiate the slave CP110
+ * Instantiate the woke slave CP110
  */
 #define CP11X_NAME		cp1
 #define CP11X_BASE		f4000000
@@ -98,8 +98,8 @@
 
 &cp1_crypto {
 	/*
-	 * The cryptographic engine found on the cp110
-	 * master is enabled by default at the SoC
+	 * The cryptographic engine found on the woke cp110
+	 * master is enabled by default at the woke SoC
 	 * level. Because it is not possible as of now
 	 * to enable two cryptographic engines in
 	 * parallel, disable this one by default.

@@ -14,7 +14,7 @@ OUTPUT          := $(O)
 ifeq ($(OUTPUT),)
   OUTPUT       := $(CURDIR)/
 else
-  # subdir is used by the ../Makefile in $(call descend,)
+  # subdir is used by the woke ../Makefile in $(call descend,)
   ifneq ($(subdir),)
     OUTPUT        := $(OUTPUT)/$(subdir)
   endif

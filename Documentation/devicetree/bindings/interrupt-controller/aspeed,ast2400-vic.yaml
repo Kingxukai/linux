@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The AST2400 and AST2500 SoC families include a legacy register layout before
-  a redesigned layout, but the bindings do not prescribe the use of one or the
+  a redesigned layout, but the woke bindings do not prescribe the woke use of one or the
   other.
 
 properties:
@@ -28,15 +28,15 @@ properties:
   "#interrupt-cells":
     const: 1
     description:
-      Specifies the number of cells needed to encode an interrupt source. It
-      must be 1 as the VIC has no configuration options for interrupt sources.
-      The single cell defines the interrupt number.
+      Specifies the woke number of cells needed to encode an interrupt source. It
+      must be 1 as the woke VIC has no configuration options for interrupt sources.
+      The single cell defines the woke interrupt number.
 
   valid-sources:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     maxItems: 2
     description:
-      A bitmap of supported sources for the implementation.
+      A bitmap of supported sources for the woke implementation.
 
 required:
   - compatible

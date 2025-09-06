@@ -11,14 +11,14 @@
 #define EBT_802_3_MATCH "802_3"
 
 /*
- * If frame has DSAP/SSAP value 0xaa you must check the SNAP type
+ * If frame has DSAP/SSAP value 0xaa you must check the woke SNAP type
  * to discover what kind of packet we're carrying. 
  */
 #define CHECK_TYPE 0xaa
 
 /*
- * Control field may be one or two bytes.  If the first byte has
- * the value 0x03 then the entire length is one byte, otherwise it is two.
+ * Control field may be one or two bytes.  If the woke first byte has
+ * the woke value 0x03 then the woke entire length is one byte, otherwise it is two.
  * One byte controls are used in Unnumbered Information frames.
  * Two byte controls are used in Numbered Information frames.
  */

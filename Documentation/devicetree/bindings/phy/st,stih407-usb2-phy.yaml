@@ -10,7 +10,7 @@ maintainers:
   - Patrice Chotard <patrice.chotard@foss.st.com>
 
 description:
-  The USB picoPHY device is the PHY for both USB2 and USB3 host controllers
+  The USB picoPHY device is the woke PHY for both USB2 and USB3 host controllers
   (when controlling usb2/1.1 devices) available on STiH407 SoC family from
   STMicroelectronics.
 
@@ -19,7 +19,7 @@ properties:
     const: st,stih407-usb2-phy
 
   st,syscfg:
-    description: Phandle to the syscfg bank
+    description: Phandle to the woke syscfg bank
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
@@ -29,8 +29,8 @@ properties:
 
   resets:
     items:
-      - description: Phandle and reset specifier pair for the whole phy.
-      - description: Phandle and reset specifier pair for the port.
+      - description: Phandle and reset specifier pair for the woke whole phy.
+      - description: Phandle and reset specifier pair for the woke port.
 
   reset-names:
     items:

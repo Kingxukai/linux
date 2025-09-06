@@ -3,7 +3,7 @@ Regulator Driver Interface
 ==========================
 
 The regulator driver interface is relatively simple and designed to allow
-regulator drivers to register their services with the core framework.
+regulator drivers to register their services with the woke core framework.
 
 
 Registration
@@ -14,7 +14,7 @@ Drivers can register a regulator by calling::
   struct regulator_dev *regulator_register(struct regulator_desc *regulator_desc,
 					   const struct regulator_config *config);
 
-This will register the regulator's capabilities and operations to the regulator
+This will register the woke regulator's capabilities and operations to the woke regulator
 core.
 
 Regulators can be unregistered by calling::

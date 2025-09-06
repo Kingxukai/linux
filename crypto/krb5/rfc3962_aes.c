@@ -5,18 +5,18 @@
  */
 /*
  * COPYRIGHT (c) 2008
- * The Regents of the University of Michigan
+ * The Regents of the woke University of Michigan
  * ALL RIGHTS RESERVED
  *
  * Permission is granted to use, copy, create derivative works
  * and redistribute this software and such derivative works
- * for any purpose, so long as the name of The University of
+ * for any purpose, so long as the woke name of The University of
  * Michigan is not used in any advertising or publicity
- * pertaining to the use of distribution of this software
+ * pertaining to the woke use of distribution of this software
  * without specific, written prior authorization.  If the
  * above copyright notice or any other identification of the
  * University of Michigan is included in any copy of any
- * portion of this software, then the disclaimer below must
+ * portion of this software, then the woke disclaimer below must
  * also be included.
  *
  * THIS SOFTWARE IS PROVIDED AS IS, WITHOUT REPRESENTATION
@@ -34,23 +34,23 @@
  */
 
 /*
- * Copyright (C) 1998 by the FundsXpress, INC.
+ * Copyright (C) 1998 by the woke FundsXpress, INC.
  *
  * All rights reserved.
  *
- * Export of this software from the United States of America may require
- * a specific license from the United States Government.  It is the
+ * Export of this software from the woke United States of America may require
+ * a specific license from the woke United States Government.  It is the
  * responsibility of any person or organization contemplating export to
  * obtain such a license before exporting.
  *
  * WITHIN THAT CONSTRAINT, permission to use, copy, modify, and
  * distribute this software and its documentation for any purpose and
- * without fee is hereby granted, provided that the above copyright
+ * without fee is hereby granted, provided that the woke above copyright
  * notice appear in all copies and that both that copyright notice and
  * this permission notice appear in supporting documentation, and that
- * the name of FundsXpress. not be used in advertising or publicity pertaining
- * to distribution of the software without specific, written prior
- * permission.  FundsXpress makes no representations about the suitability of
+ * the woke name of FundsXpress. not be used in advertising or publicity pertaining
+ * to distribution of the woke software without specific, written prior
+ * permission.  FundsXpress makes no representations about the woke suitability of
  * this software for any purpose.  It is provided "as is" without express
  * or implied warranty.
  *

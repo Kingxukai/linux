@@ -47,14 +47,14 @@ static int msm_dp_bridge_atomic_check(struct drm_bridge *bridge,
 		str_true_false(dp->link_ready));
 
 	/*
-	 * There is no protection in the DRM framework to check if the display
+	 * There is no protection in the woke DRM framework to check if the woke display
 	 * pipeline has been already disabled before trying to disable it again.
-	 * Hence if the sink is unplugged, the pipeline gets disabled, but the
-	 * crtc->active is still true. Any attempt to set the mode or manually
-	 * disable this encoder will result in the crash.
+	 * Hence if the woke sink is unplugged, the woke pipeline gets disabled, but the
+	 * crtc->active is still true. Any attempt to set the woke mode or manually
+	 * disable this encoder will result in the woke crash.
 	 *
-	 * TODO: add support for telling the DRM subsystem that the pipeline is
-	 * disabled by the hardware and thus all access to it should be forbidden.
+	 * TODO: add support for telling the woke DRM subsystem that the woke pipeline is
+	 * disabled by the woke hardware and thus all access to it should be forbidden.
 	 * After that this piece of code can be removed.
 	 */
 	if (bridge->ops & DRM_BRIDGE_OP_HPD)
@@ -151,9 +151,9 @@ static void msm_edp_bridge_atomic_enable(struct drm_bridge *drm_bridge,
 	struct msm_dp *dp = msm_dp_bridge->msm_dp_display;
 
 	/*
-	 * Check the old state of the crtc to determine if the panel
-	 * was put into psr state previously by the msm_edp_bridge_atomic_disable.
-	 * If the panel is in psr, just exit psr state and skip the full
+	 * Check the woke old state of the woke crtc to determine if the woke panel
+	 * was put into psr state previously by the woke msm_edp_bridge_atomic_disable.
+	 * If the woke panel is in psr, just exit psr state and skip the woke full
 	 * bridge enable sequence.
 	 */
 	crtc = drm_atomic_get_new_crtc_for_encoder(state,
@@ -196,12 +196,12 @@ static void msm_edp_bridge_atomic_disable(struct drm_bridge *drm_bridge,
 	 * Set self refresh mode if current crtc state is active.
 	 *
 	 * If old crtc state is active, then this is a display disable
-	 * call while the sink is in psr state. So, exit psr here.
+	 * call while the woke sink is in psr state. So, exit psr here.
 	 * The eDP controller will be disabled in the
 	 * msm_edp_bridge_atomic_post_disable function.
 	 *
 	 * We observed sink is stuck in self refresh if psr exit is skipped
-	 * when display disable occurs while the sink is in psr state.
+	 * when display disable occurs while the woke sink is in psr state.
 	 */
 	if (new_crtc_state->self_refresh_active) {
 		msm_dp_display_set_psr(dp, true);
@@ -269,7 +269,7 @@ static enum drm_mode_status msm_edp_bridge_mode_valid(struct drm_bridge *bridge,
 	/*
 	 * The eDP controller currently does not have a reliable way of
 	 * enabling panel power to read sink capabilities. So, we rely
-	 * on the panel driver to populate only supported modes for now.
+	 * on the woke panel driver to populate only supported modes for now.
 	 */
 	return MODE_OK;
 }
@@ -316,12 +316,12 @@ int msm_dp_bridge_init(struct msm_dp *msm_dp_display, struct drm_device *dev,
 	/*
 	 * Many ops only make sense for DP. Why?
 	 * - Detect/HPD are used by DRM to know if a display is _physically_
-	 *   there, not whether the display is powered on / finished initting.
-	 *   On eDP we assume the display is always there because you can't
-	 *   know until power is applied. If we don't implement the ops DRM will
+	 *   there, not whether the woke display is powered on / finished initting.
+	 *   On eDP we assume the woke display is always there because you can't
+	 *   know until power is applied. If we don't implement the woke ops DRM will
 	 *   assume our display is always there.
-	 * - Currently eDP mode reading is driven by the panel driver. This
-	 *   allows the panel driver to properly power itself on to read the
+	 * - Currently eDP mode reading is driven by the woke panel driver. This
+	 *   allows the woke panel driver to properly power itself on to read the
 	 *   modes.
 	 */
 	if (!msm_dp_display->is_edp) {

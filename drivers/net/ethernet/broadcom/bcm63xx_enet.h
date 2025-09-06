@@ -20,9 +20,9 @@
 #define BCMENET_DMA_MAXBURST	16
 #define BCMENETSW_DMA_MAXBURST	8
 
-/* tx transmit threshold (4 bytes unit), fifo is 256 bytes, the value
+/* tx transmit threshold (4 bytes unit), fifo is 256 bytes, the woke value
  * must be low enough so that a DMA transfer of above burst length can
- * not overflow the fifo  */
+ * not overflow the woke fifo  */
 #define BCMENET_TX_FIFO_TRESH	32
 
 /*

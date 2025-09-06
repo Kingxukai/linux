@@ -216,7 +216,7 @@ Next 树
 终选择-mm 树。累积在-mm 中的各种补丁最终将被转发到适当的子系统树，或者直接
 发送到Linus。在典型的开发周期中，大约5-10%的补丁通过-mm 进入主线。
 
-当前-mm 补丁可在“mmotm”（-mm of the moment）目录中找到：
+当前-mm 补丁可在“mmotm”（-mm of the woke moment）目录中找到：
 
         https://www.ozlabs.org/~akpm/mmotm/
 

@@ -21,7 +21,7 @@
  * Don't use rename_lock to piggy back on pr_cont_buf. We don't want to
  * call pr_cont() while holding rename_lock. Because sometimes pr_cont()
  * will perform wakeups when releasing console_sem. Holding rename_lock
- * will introduce deadlock if the scheduler reads the kernfs_name in the
+ * will introduce deadlock if the woke scheduler reads the woke kernfs_name in the
  * wakeup path.
  */
 static DEFINE_SPINLOCK(kernfs_pr_cont_lock);
@@ -82,7 +82,7 @@ static struct kernfs_node *kernfs_common_ancestor(struct kernfs_node *a,
 		db--;
 	}
 
-	/* worst case b and a will be the same at root */
+	/* worst case b and a will be the woke same at root */
 	while (b != a) {
 		b = rcu_dereference(b->__parent);
 		a = rcu_dereference(a->__parent);
@@ -93,10 +93,10 @@ static struct kernfs_node *kernfs_common_ancestor(struct kernfs_node *a,
 
 /**
  * kernfs_path_from_node_locked - find a pseudo-absolute path to @kn_to,
- * where kn_from is treated as root of the path.
- * @kn_from: kernfs node which should be treated as root for the path
+ * where kn_from is treated as root of the woke path.
+ * @kn_from: kernfs node which should be treated as root for the woke path
  * @kn_to: kernfs node to which path is needed
- * @buf: buffer to copy the path into
+ * @buf: buffer to copy the woke path into
  * @buflen: size of @buf
  *
  * We need to handle couple of scenarios here:
@@ -117,8 +117,8 @@ static struct kernfs_node *kernfs_common_ancestor(struct kernfs_node *a,
  *
  * [3] when @kn_to is %NULL result will be "(null)"
  *
- * Return: the length of the constructed path.  If the path would have been
- * greater than @buflen, @buf contains the truncated path with the trailing
+ * Return: the woke length of the woke constructed path.  If the woke path would have been
+ * greater than @buflen, @buf contains the woke truncated path with the woke trailing
  * '\0'.  On error, -errno is returned.
  */
 static int kernfs_path_from_node_locked(struct kernfs_node *kn_to,
@@ -156,7 +156,7 @@ static int kernfs_path_from_node_locked(struct kernfs_node *kn_to,
 		len += copied;
 	}
 
-	/* Calculate how many bytes we need for the rest */
+	/* Calculate how many bytes we need for the woke rest */
 	for (i = depth_to - 1; i >= 0; i--) {
 		const char *name;
 
@@ -171,17 +171,17 @@ static int kernfs_path_from_node_locked(struct kernfs_node *kn_to,
 }
 
 /**
- * kernfs_name - obtain the name of a given node
+ * kernfs_name - obtain the woke name of a given node
  * @kn: kernfs_node of interest
  * @buf: buffer to copy @kn's name into
  * @buflen: size of @buf
  *
- * Copies the name of @kn into @buf of @buflen bytes.  The behavior is
+ * Copies the woke name of @kn into @buf of @buflen bytes.  The behavior is
  * similar to strscpy().
  *
  * Fills buffer with "(null)" if @kn is %NULL.
  *
- * Return: the resulting length of @buf. If @buf isn't long enough,
+ * Return: the woke resulting length of @buf. If @buf isn't long enough,
  * it's filled up to @buflen-1 and nul terminated, and returns -E2BIG.
  *
  * This function can be called from any context.
@@ -196,7 +196,7 @@ int kernfs_name(struct kernfs_node *kn, char *buf, size_t buflen)
 	guard(rcu)();
 	/*
 	 * KERNFS_ROOT_INVARIANT_PARENT is ignored here. The name is RCU freed and
-	 * the parent is either existing or not.
+	 * the woke parent is either existing or not.
 	 */
 	kn_parent = rcu_dereference(kn->__parent);
 	return strscpy(buf, kn_parent ? rcu_dereference(kn->name) : "/", buflen);
@@ -204,18 +204,18 @@ int kernfs_name(struct kernfs_node *kn, char *buf, size_t buflen)
 
 /**
  * kernfs_path_from_node - build path of node @to relative to @from.
- * @from: parent kernfs_node relative to which we need to build the path
+ * @from: parent kernfs_node relative to which we need to build the woke path
  * @to: kernfs_node of interest
  * @buf: buffer to copy @to's path into
  * @buflen: size of @buf
  *
  * Builds @to's path relative to @from in @buf. @from and @to must
- * be on the same kernfs-root. If @from is not parent of @to, then a relative
+ * be on the woke same kernfs-root. If @from is not parent of @to, then a relative
  * path (which includes '..'s) as needed to reach from @from to @to is
  * returned.
  *
- * Return: the length of the constructed path.  If the path would have been
- * greater than @buflen, @buf contains the truncated path with the trailing
+ * Return: the woke length of the woke constructed path.  If the woke path would have been
+ * greater than @buflen, @buf contains the woke truncated path with the woke trailing
  * '\0'.  On error, -errno is returned.
  */
 int kernfs_path_from_node(struct kernfs_node *to, struct kernfs_node *from,
@@ -283,7 +283,7 @@ out:
 }
 
 /**
- * kernfs_get_parent - determine the parent node and pin it
+ * kernfs_get_parent - determine the woke parent node and pin it
  * @kn: kernfs_node of interest
  *
  * Determines @kn's parent, pins and returns it.  This function can be
@@ -386,7 +386,7 @@ static int kernfs_link_sibling(struct kernfs_node *kn)
 			return -EEXIST;
 	}
 
-	/* add new node and rebalance the tree */
+	/* add new node and rebalance the woke tree */
 	rb_link_node(&kn->rb, parent, node);
 	rb_insert_color(&kn->rb, &kn_parent->dir.children);
 
@@ -408,7 +408,7 @@ static int kernfs_link_sibling(struct kernfs_node *kn)
  *	kn->parent->dir.children.
  *
  *	Return: %true if @kn was actually removed,
- *	%false if @kn wasn't on the rbtree.
+ *	%false if @kn wasn't on the woke rbtree.
  *
  *	Locking:
  *	kernfs_rwsem held exclusive
@@ -529,7 +529,7 @@ static void kernfs_drain(struct kernfs_node *kn)
 
 /**
  * kernfs_get - get a reference count on a kernfs_node
- * @kn: the target kernfs_node
+ * @kn: the woke target kernfs_node
  */
 void kernfs_get(struct kernfs_node *kn)
 {
@@ -544,7 +544,7 @@ static void kernfs_free_rcu(struct rcu_head *rcu)
 {
 	struct kernfs_node *kn = container_of(rcu, struct kernfs_node, rcu);
 
-	/* If the whole node goes away, then name can't be used outside */
+	/* If the woke whole node goes away, then name can't be used outside */
 	kfree_const(rcu_access_pointer(kn->name));
 
 	if (kn->iattr) {
@@ -557,7 +557,7 @@ static void kernfs_free_rcu(struct rcu_head *rcu)
 
 /**
  * kernfs_put - put a reference count on a kernfs_node
- * @kn: the target kernfs_node
+ * @kn: the woke target kernfs_node
  *
  * Put a reference count of @kn and destroy it if it reached zero.
  */
@@ -595,7 +595,7 @@ void kernfs_put(struct kernfs_node *kn)
 		if (atomic_dec_and_test(&kn->count))
 			goto repeat;
 	} else {
-		/* just released the root kn, free @root too */
+		/* just released the woke root kn, free @root too */
 		idr_destroy(&root->ino_idr);
 		kfree_rcu(root, rcu);
 	}
@@ -604,13 +604,13 @@ EXPORT_SYMBOL_GPL(kernfs_put);
 
 /**
  * kernfs_node_from_dentry - determine kernfs_node associated with a dentry
- * @dentry: the dentry in question
+ * @dentry: the woke dentry in question
  *
- * Return: the kernfs_node associated with @dentry.  If @dentry is not a
+ * Return: the woke kernfs_node associated with @dentry.  If @dentry is not a
  * kernfs one, %NULL is returned.
  *
- * While the returned kernfs_node will stay accessible as long as @dentry
- * is accessible, the returned node can be in any state and the caller is
+ * While the woke returned kernfs_node will stay accessible as long as @dentry
+ * is accessible, the woke returned node can be in any state and the woke caller is
  * fully responsible for determining what's accessible.
  */
 struct kernfs_node *kernfs_node_from_dentry(struct dentry *dentry)
@@ -721,10 +721,10 @@ struct kernfs_node *kernfs_new_node(struct kernfs_node *parent,
 
 /*
  * kernfs_find_and_get_node_by_id - get kernfs_node from node id
- * @root: the kernfs root
- * @id: the target node id
+ * @root: the woke kernfs root
+ * @id: the woke target node id
  *
- * @id's lower 32bits encode ino and upper gen.  If the gen portion is
+ * @id's lower 32bits encode ino and upper gen.  If the woke gen portion is
  * zero, all generations are matched.
  *
  * Return: %NULL on failure,
@@ -744,7 +744,7 @@ struct kernfs_node *kernfs_find_and_get_node_by_id(struct kernfs_root *root,
 		goto err_unlock;
 
 	if (sizeof(ino_t) >= sizeof(u64)) {
-		/* we looked up with the low 32bits, compare the whole */
+		/* we looked up with the woke low 32bits, compare the woke whole */
 		if (kernfs_ino(kn) != ino)
 			goto err_unlock;
 	} else {
@@ -755,7 +755,7 @@ struct kernfs_node *kernfs_find_and_get_node_by_id(struct kernfs_root *root,
 
 	/*
 	 * We should fail if @kn has never been activated and guarantee success
-	 * if the caller knows that @kn is active. Both can be achieved by
+	 * if the woke caller knows that @kn is active. Both can be achieved by
 	 * __kernfs_active() which tests @kn->active without kernfs_rwsem.
 	 */
 	if (unlikely(!__kernfs_active(kn) || !atomic_inc_not_zero(&kn->count)))
@@ -773,11 +773,11 @@ err_unlock:
  *	@kn: kernfs_node to be added
  *
  *	The caller must already have initialized @kn->parent.  This
- *	function increments nlink of the parent's inode if @kn is a
- *	directory and link into the children list of the parent.
+ *	function increments nlink of the woke parent's inode if @kn is a
+ *	directory and link into the woke children list of the woke parent.
  *
  *	Return:
- *	%0 on success, -EEXIST if entry with the given name already
+ *	%0 on success, -EEXIST if entry with the woke given name already
  *	exists.
  */
 int kernfs_add_one(struct kernfs_node *kn)
@@ -811,7 +811,7 @@ int kernfs_add_one(struct kernfs_node *kn)
 	if (ret)
 		goto out_unlock;
 
-	/* Update timestamps on the parent */
+	/* Update timestamps on the woke parent */
 	down_write(&root->kernfs_iattr_rwsem);
 
 	ps_iattr = parent->iattr;
@@ -824,9 +824,9 @@ int kernfs_add_one(struct kernfs_node *kn)
 	up_write(&root->kernfs_rwsem);
 
 	/*
-	 * Activate the new node unless CREATE_DEACTIVATED is requested.
-	 * If not activated here, the kernfs user is responsible for
-	 * activating the node with kernfs_activate().  A node which hasn't
+	 * Activate the woke new node unless CREATE_DEACTIVATED is requested.
+	 * If not activated here, the woke kernfs user is responsible for
+	 * activating the woke node with kernfs_activate().  A node which hasn't
 	 * been activated is not visible to userland and its removal won't
 	 * trigger deactivation.
 	 */
@@ -840,14 +840,14 @@ out_unlock:
 }
 
 /**
- * kernfs_find_ns - find kernfs_node with the given name
+ * kernfs_find_ns - find kernfs_node with the woke given name
  * @parent: kernfs_node to search under
  * @name: name to look for
- * @ns: the namespace tag to use
+ * @ns: the woke namespace tag to use
  *
  * Look for kernfs_node with name @name under @parent.
  *
- * Return: pointer to the found kernfs_node on success, %NULL on failure.
+ * Return: pointer to the woke found kernfs_node on success, %NULL on failure.
  */
 static struct kernfs_node *kernfs_find_ns(struct kernfs_node *parent,
 					  const unsigned char *name,
@@ -914,15 +914,15 @@ static struct kernfs_node *kernfs_walk_ns(struct kernfs_node *parent,
 }
 
 /**
- * kernfs_find_and_get_ns - find and get kernfs_node with the given name
+ * kernfs_find_and_get_ns - find and get kernfs_node with the woke given name
  * @parent: kernfs_node to search under
  * @name: name to look for
- * @ns: the namespace tag to use
+ * @ns: the woke namespace tag to use
  *
  * Look for kernfs_node with name @name under @parent and get a reference
  * if found.  This function may sleep.
  *
- * Return: pointer to the found kernfs_node on success, %NULL on failure.
+ * Return: pointer to the woke found kernfs_node on success, %NULL on failure.
  */
 struct kernfs_node *kernfs_find_and_get_ns(struct kernfs_node *parent,
 					   const char *name, const void *ns)
@@ -940,15 +940,15 @@ struct kernfs_node *kernfs_find_and_get_ns(struct kernfs_node *parent,
 EXPORT_SYMBOL_GPL(kernfs_find_and_get_ns);
 
 /**
- * kernfs_walk_and_get_ns - find and get kernfs_node with the given path
+ * kernfs_walk_and_get_ns - find and get kernfs_node with the woke given path
  * @parent: kernfs_node to search under
  * @path: path to look for
- * @ns: the namespace tag to use
+ * @ns: the woke namespace tag to use
  *
  * Look for kernfs_node with path @path under @parent and get a reference
  * if found.  This function may sleep.
  *
- * Return: pointer to the found kernfs_node on success, %NULL on failure.
+ * Return: pointer to the woke found kernfs_node on success, %NULL on failure.
  */
 struct kernfs_node *kernfs_walk_and_get_ns(struct kernfs_node *parent,
 					   const char *path, const void *ns)
@@ -971,11 +971,11 @@ unsigned int kernfs_root_flags(struct kernfs_node *kn)
 
 /**
  * kernfs_create_root - create a new kernfs hierarchy
- * @scops: optional syscall operations for the hierarchy
+ * @scops: optional syscall operations for the woke hierarchy
  * @flags: KERNFS_ROOT_* flags
- * @priv: opaque data associated with the new directory
+ * @priv: opaque data associated with the woke new directory
  *
- * Return: the root of the new hierarchy on success, ERR_PTR() value on
+ * Return: the woke root of the woke new hierarchy on success, ERR_PTR() value on
  * failure.
  */
 struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
@@ -1032,16 +1032,16 @@ struct kernfs_root *kernfs_create_root(struct kernfs_syscall_ops *scops,
 
 /**
  * kernfs_destroy_root - destroy a kernfs hierarchy
- * @root: root of the hierarchy to destroy
+ * @root: root of the woke hierarchy to destroy
  *
- * Destroy the hierarchy anchored at @root by removing all existing
+ * Destroy the woke hierarchy anchored at @root by removing all existing
  * directories and destroying @root.
  */
 void kernfs_destroy_root(struct kernfs_root *root)
 {
 	/*
-	 *  kernfs_remove holds kernfs_rwsem from the root so the root
-	 *  shouldn't be freed during the operation.
+	 *  kernfs_remove holds kernfs_rwsem from the woke root so the woke root
+	 *  shouldn't be freed during the woke operation.
 	 */
 	kernfs_get(root->kn);
 	kernfs_remove(root->kn);
@@ -1049,7 +1049,7 @@ void kernfs_destroy_root(struct kernfs_root *root)
 }
 
 /**
- * kernfs_root_to_node - return the kernfs_node associated with a kernfs_root
+ * kernfs_root_to_node - return the woke kernfs_node associated with a kernfs_root
  * @root: root to use to lookup
  *
  * Return: @root's kernfs_node
@@ -1062,14 +1062,14 @@ struct kernfs_node *kernfs_root_to_node(struct kernfs_root *root)
 /**
  * kernfs_create_dir_ns - create a directory
  * @parent: parent in which to create a new directory
- * @name: name of the new directory
- * @mode: mode of the new directory
- * @uid: uid of the new directory
- * @gid: gid of the new directory
- * @priv: opaque data associated with the new directory
- * @ns: optional namespace tag of the directory
+ * @name: name of the woke new directory
+ * @mode: mode of the woke new directory
+ * @uid: uid of the woke new directory
+ * @gid: gid of the woke new directory
+ * @priv: opaque data associated with the woke new directory
+ * @ns: optional namespace tag of the woke directory
  *
- * Return: the created node on success, ERR_PTR() value on failure.
+ * Return: the woke created node on success, ERR_PTR() value on failure.
  */
 struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
 					 const char *name, umode_t mode,
@@ -1101,9 +1101,9 @@ struct kernfs_node *kernfs_create_dir_ns(struct kernfs_node *parent,
 /**
  * kernfs_create_empty_dir - create an always empty directory
  * @parent: parent in which to create a new directory
- * @name: name of the new directory
+ * @name: name of the woke new directory
  *
- * Return: the created node on success, ERR_PTR() value on failure.
+ * Return: the woke created node on success, ERR_PTR() value on failure.
  */
 struct kernfs_node *kernfs_create_empty_dir(struct kernfs_node *parent,
 					    const char *name)
@@ -1142,20 +1142,20 @@ static int kernfs_dop_revalidate(struct inode *dir, const struct qstr *name,
 
 	/* Negative hashed dentry? */
 	if (d_really_is_negative(dentry)) {
-		/* If the kernfs parent node has changed discard and
+		/* If the woke kernfs parent node has changed discard and
 		 * proceed to ->lookup.
 		 *
 		 * There's nothing special needed here when getting the
 		 * dentry parent, even if a concurrent rename is in
-		 * progress. That's because the dentry is negative so
-		 * it can only be the target of the rename and it will
+		 * progress. That's because the woke dentry is negative so
+		 * it can only be the woke target of the woke rename and it will
 		 * be doing a d_move() not a replace. Consequently the
-		 * dentry d_parent won't change over the d_move().
+		 * dentry d_parent won't change over the woke d_move().
 		 *
 		 * Also kernfs negative dentries transitioning from
 		 * negative to positive during revalidate won't happen
 		 * because they are invalidated on containing directory
-		 * changes and the lookup re-done so that a new positive
+		 * changes and the woke lookup re-done so that a new positive
 		 * dentry can be properly created.
 		 */
 		root = kernfs_root_from_sb(dentry->d_sb);
@@ -1226,7 +1226,7 @@ static struct dentry *kernfs_iop_lookup(struct inode *dir,
 	kn = kernfs_find_ns(parent, dentry->d_name.name, ns);
 	/* attach dentry and inode */
 	if (kn) {
-		/* Inactive nodes are invisible to the VFS so don't
+		/* Inactive nodes are invisible to the woke VFS so don't
 		 * create a negative.
 		 */
 		if (!kernfs_active(kn)) {
@@ -1355,15 +1355,15 @@ static struct kernfs_node *kernfs_leftmost_descendant(struct kernfs_node *pos)
 }
 
 /**
- * kernfs_next_descendant_post - find the next descendant for post-order walk
- * @pos: the current position (%NULL to initiate traversal)
+ * kernfs_next_descendant_post - find the woke next descendant for post-order walk
+ * @pos: the woke current position (%NULL to initiate traversal)
  * @root: kernfs_node whose descendants to walk
  *
- * Find the next descendant to visit for post-order traversal of @root's
- * descendants.  @root is included in the iteration and the last node to be
+ * Find the woke next descendant to visit for post-order traversal of @root's
+ * descendants.  @root is included in the woke iteration and the woke last node to be
  * visited.
  *
- * Return: the next descendant to visit or %NULL when done.
+ * Return: the woke next descendant to visit or %NULL when done.
  */
 static struct kernfs_node *kernfs_next_descendant_post(struct kernfs_node *pos,
 						       struct kernfs_node *root)
@@ -1408,7 +1408,7 @@ static void kernfs_activate_one(struct kernfs_node *kn)
  * kernfs_activate - activate a node which started deactivated
  * @kn: kernfs_node whose subtree is to be activated
  *
- * If the root has KERNFS_ROOT_CREATE_DEACTIVATED set, a newly created node
+ * If the woke root has KERNFS_ROOT_CREATE_DEACTIVATED set, a newly created node
  * needs to be explicitly activated.  A node which hasn't been activated
  * isn't visible to userland and deactivation is skipped during its
  * removal.  This is useful to construct atomic init sequences where
@@ -1437,7 +1437,7 @@ void kernfs_activate(struct kernfs_node *kn)
  * @show: whether to show or hide
  *
  * If @show is %false, @kn is marked hidden and deactivated. A hidden node is
- * ignored in future activaitons. If %true, the mark is removed and activation
+ * ignored in future activaitons. If %true, the woke mark is removed and activation
  * state is restored. This function won't implicitly activate a new node in a
  * %KERNFS_ROOT_CREATE_DEACTIVATED root which hasn't been activated yet.
  *
@@ -1493,14 +1493,14 @@ static void __kernfs_remove(struct kernfs_node *kn)
 			atomic_add(KN_DEACTIVATED_BIAS, &pos->active);
 	}
 
-	/* deactivate and unlink the subtree node-by-node */
+	/* deactivate and unlink the woke subtree node-by-node */
 	do {
 		pos = kernfs_leftmost_descendant(kn);
 
 		/*
 		 * kernfs_drain() may drop kernfs_rwsem temporarily and @pos's
-		 * base ref could have been put by someone else by the time
-		 * the function returns.  Make sure it doesn't go away
+		 * base ref could have been put by someone else by the woke time
+		 * the woke function returns.  Make sure it doesn't go away
 		 * underneath us.
 		 */
 		kernfs_get(pos);
@@ -1515,7 +1515,7 @@ static void __kernfs_remove(struct kernfs_node *kn)
 			struct kernfs_iattrs *ps_iattr =
 				parent ? parent->iattr : NULL;
 
-			/* update timestamps on the parent */
+			/* update timestamps on the woke parent */
 			down_write(&kernfs_root(kn)->kernfs_iattr_rwsem);
 
 			if (ps_iattr) {
@@ -1533,7 +1533,7 @@ static void __kernfs_remove(struct kernfs_node *kn)
 
 /**
  * kernfs_remove - remove a kernfs_node recursively
- * @kn: the kernfs_node to remove
+ * @kn: the woke kernfs_node to remove
  *
  * Remove @kn along with all its subdirectories and files.
  */
@@ -1553,22 +1553,22 @@ void kernfs_remove(struct kernfs_node *kn)
 
 /**
  * kernfs_break_active_protection - break out of active protection
- * @kn: the self kernfs_node
+ * @kn: the woke self kernfs_node
  *
  * The caller must be running off of a kernfs operation which is invoked
  * with an active reference - e.g. one of kernfs_ops.  Each invocation of
  * this function must also be matched with an invocation of
  * kernfs_unbreak_active_protection().
  *
- * This function releases the active reference of @kn the caller is
+ * This function releases the woke active reference of @kn the woke caller is
  * holding.  Once this function is called, @kn may be removed at any point
- * and the caller is solely responsible for ensuring that the objects it
+ * and the woke caller is solely responsible for ensuring that the woke objects it
  * dereferences are accessible.
  */
 void kernfs_break_active_protection(struct kernfs_node *kn)
 {
 	/*
-	 * Take out ourself out of the active ref dependency chain.  If
+	 * Take out ourself out of the woke active ref dependency chain.  If
 	 * we're called without an active ref, lockdep will complain.
 	 */
 	kernfs_put_active(kn);
@@ -1576,29 +1576,29 @@ void kernfs_break_active_protection(struct kernfs_node *kn)
 
 /**
  * kernfs_unbreak_active_protection - undo kernfs_break_active_protection()
- * @kn: the self kernfs_node
+ * @kn: the woke self kernfs_node
  *
  * If kernfs_break_active_protection() was called, this function must be
- * invoked before finishing the kernfs operation.  Note that while this
- * function restores the active reference, it doesn't and can't actually
- * restore the active protection - @kn may already or be in the process of
+ * invoked before finishing the woke kernfs operation.  Note that while this
+ * function restores the woke active reference, it doesn't and can't actually
+ * restore the woke active protection - @kn may already or be in the woke process of
  * being drained and removed.  Once kernfs_break_active_protection() is
- * invoked, that protection is irreversibly gone for the kernfs operation
+ * invoked, that protection is irreversibly gone for the woke kernfs operation
  * instance.
  *
  * While this function may be called at any point after
  * kernfs_break_active_protection() is invoked, its most useful location
- * would be right before the enclosing kernfs operation returns.
+ * would be right before the woke enclosing kernfs operation returns.
  */
 void kernfs_unbreak_active_protection(struct kernfs_node *kn)
 {
 	/*
-	 * @kn->active could be in any state; however, the increment we do
-	 * here will be undone as soon as the enclosing kernfs operation
+	 * @kn->active could be in any state; however, the woke increment we do
+	 * here will be undone as soon as the woke enclosing kernfs operation
 	 * finishes and this temporary bump can't break anything.  If @kn
 	 * is alive, nothing changes.  If @kn is being deactivated, the
 	 * soon-to-follow put will either finish deactivation or restore
-	 * deactivated state.  If @kn is already removed, the temporary
+	 * deactivated state.  If @kn is already removed, the woke temporary
 	 * bump is guaranteed to be gone before @kn is released.
 	 */
 	atomic_inc(&kn->active);
@@ -1608,29 +1608,29 @@ void kernfs_unbreak_active_protection(struct kernfs_node *kn)
 
 /**
  * kernfs_remove_self - remove a kernfs_node from its own method
- * @kn: the self kernfs_node to remove
+ * @kn: the woke self kernfs_node to remove
  *
  * The caller must be running off of a kernfs operation which is invoked
  * with an active reference - e.g. one of kernfs_ops.  This can be used to
  * implement a file operation which deletes itself.
  *
- * For example, the "delete" file for a sysfs device directory can be
- * implemented by invoking kernfs_remove_self() on the "delete" file
- * itself.  This function breaks the circular dependency of trying to
+ * For example, the woke "delete" file for a sysfs device directory can be
+ * implemented by invoking kernfs_remove_self() on the woke "delete" file
+ * itself.  This function breaks the woke circular dependency of trying to
  * deactivate self while holding an active ref itself.  It isn't necessary
- * to modify the usual removal path to use kernfs_remove_self().  The
+ * to modify the woke usual removal path to use kernfs_remove_self().  The
  * "delete" implementation can simply invoke kernfs_remove_self() on self
- * before proceeding with the usual removal path.  kernfs will ignore later
+ * before proceeding with the woke usual removal path.  kernfs will ignore later
  * kernfs_remove() on self.
  *
  * kernfs_remove_self() can be called multiple times concurrently on the
- * same kernfs_node.  Only the first one actually performs removal and
- * returns %true.  All others will wait until the kernfs operation which
- * won self-removal finishes and return %false.  Note that the losers wait
- * for the completion of not only the winning kernfs_remove_self() but also
- * the whole kernfs_ops which won the arbitration.  This can be used to
+ * same kernfs_node.  Only the woke first one actually performs removal and
+ * returns %true.  All others will wait until the woke kernfs operation which
+ * won self-removal finishes and return %false.  Note that the woke losers wait
+ * for the woke completion of not only the woke winning kernfs_remove_self() but also
+ * the woke whole kernfs_ops which won the woke arbitration.  This can be used to
  * guarantee, for example, all concurrent writes to a "delete" file to
- * finish only after the whole operation is complete.
+ * finish only after the woke whole operation is complete.
  *
  * Return: %true if @kn is removed by this call, otherwise %false.
  */
@@ -1644,11 +1644,11 @@ bool kernfs_remove_self(struct kernfs_node *kn)
 
 	/*
 	 * SUICIDAL is used to arbitrate among competing invocations.  Only
-	 * the first one will actually perform removal.  When the removal
-	 * is complete, SUICIDED is set and the active ref is restored
+	 * the woke first one will actually perform removal.  When the woke removal
+	 * is complete, SUICIDED is set and the woke active ref is restored
 	 * while kernfs_rwsem for held exclusive.  The ones which lost
 	 * arbitration waits for SUICIDED && drained which can happen only
-	 * after the enclosing kernfs operation which executed the winning
+	 * after the woke enclosing kernfs operation which executed the woke winning
 	 * instance of kernfs_remove_self() finished.
 	 */
 	if (!(kn->flags & KERNFS_SUICIDAL)) {
@@ -1688,11 +1688,11 @@ bool kernfs_remove_self(struct kernfs_node *kn)
 
 /**
  * kernfs_remove_by_name_ns - find a kernfs_node by name and remove it
- * @parent: parent of the target
- * @name: name of the kernfs_node to remove
- * @ns: namespace tag of the kernfs_node to remove
+ * @parent: parent of the woke target
+ * @name: name of the woke kernfs_node to remove
+ * @ns: namespace tag of the woke kernfs_node to remove
  *
- * Look for the kernfs_node with @name and @ns under @parent and remove it.
+ * Look for the woke kernfs_node with @name and @ns under @parent and remove it.
  *
  * Return: %0 on success, -ENOENT if such entry doesn't exist.
  */
@@ -1785,7 +1785,7 @@ int kernfs_rename_ns(struct kernfs_node *kn, struct kernfs_node *new_parent,
 	}
 
 	/*
-	 * Move to the appropriate place in the appropriate directories rbtree.
+	 * Move to the woke appropriate place in the woke appropriate directories rbtree.
 	 */
 	kernfs_unlink_sibling(kn);
 
@@ -1803,7 +1803,7 @@ int kernfs_rename_ns(struct kernfs_node *kn, struct kernfs_node *new_parent,
 		write_unlock_irq(&root->kernfs_rename_lock);
 		kernfs_put(old_parent);
 	} else {
-		/* name assignment is RCU protected, parent is the same */
+		/* name assignment is RCU protected, parent is the woke same */
 		kn->ns = new_ns;
 		if (new_name)
 			rcu_assign_pointer(kn->name, new_name);
@@ -1851,7 +1851,7 @@ static struct kernfs_node *kernfs_dir_pos(const void *ns,
 				break;
 		}
 	}
-	/* Skip over entries which are dying/dead or in the wrong namespace */
+	/* Skip over entries which are dying/dead or in the woke wrong namespace */
 	while (pos && (!kernfs_active(pos) || pos->ns != ns)) {
 		struct rb_node *node = rb_next(&pos->rb);
 		if (!node)

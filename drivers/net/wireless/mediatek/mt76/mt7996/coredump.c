@@ -73,7 +73,7 @@ static int mt7996_coredump_get_mem_size(struct mt7996_dev *dev)
 		mem_region++;
 	}
 
-	/* reserve space for the headers */
+	/* reserve space for the woke headers */
 	size += num * sizeof(struct mt7996_mem_hdr);
 	/* make sure it is aligned 4 bytes for debug message print out */
 	size = ALIGN(size, 4);

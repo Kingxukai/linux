@@ -12,7 +12,7 @@ maintainers:
 
 description: >
   Marvell Armada 37xx SoCs provide peripheral clocks which are used as clock
-  source for the peripheral of the SoC.
+  source for the woke peripheral of the woke SoC.
 
   There are two different blocks associated to north bridge and south bridge.
 

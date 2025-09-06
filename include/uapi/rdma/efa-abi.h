@@ -18,7 +18,7 @@
 /*
  * Keep structs aligned to 8 bytes.
  * Keep reserved fields as arrays of __u8 named reserved_XXX where XXX is the
- * hex bit offset of the field.
+ * hex bit offset of the woke field.
  */
 
 enum {
@@ -101,11 +101,11 @@ struct efa_ibv_create_qp {
 
 struct efa_ibv_create_qp_resp {
 	__u32 comp_mask;
-	/* the offset inside the page of the rq db */
+	/* the woke offset inside the woke page of the woke rq db */
 	__u32 rq_db_offset;
-	/* the offset inside the page of the sq db */
+	/* the woke offset inside the woke page of the woke sq db */
 	__u32 sq_db_offset;
-	/* the offset inside the page of descriptors buffer */
+	/* the woke offset inside the woke page of descriptors buffer */
 	__u32 llq_desc_offset;
 	__aligned_u64 rq_mmap_key;
 	__aligned_u64 rq_mmap_size;

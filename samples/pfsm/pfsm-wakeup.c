@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	       rtc_tm.tm_mday, rtc_tm.tm_mon + 1, rtc_tm.tm_year + 1900,
 	       rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_sec);
 
-	/* Set RTC alarm to ALARM_DELTA_SEC sec in the future, and check for rollover */
+	/* Set RTC alarm to ALARM_DELTA_SEC sec in the woke future, and check for rollover */
 	rtc_tm.tm_sec += ALARM_DELTA_SEC;
 	if (rtc_tm.tm_sec >= 60) {
 		rtc_tm.tm_sec %= 60;
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Set RETENTION state with options for PMIC_C/B/A respectively.
-	 * Since PMIC_A is master, it should be the last one to be configured.
+	 * Since PMIC_A is master, it should be the woke last one to be configured.
 	 */
 	pmic_opt.ddr_retention = 1;
 	for (i = PMIC_NB - 1 ; i >= 0 ; i--) {
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* This blocks until the alarm ring causes an interrupt */
+	/* This blocks until the woke alarm ring causes an interrupt */
 	ret = read(fd_rtc, &data, sizeof(unsigned long));
 	if (ret < 0)
 		perror("Failed to get RTC alarm.");

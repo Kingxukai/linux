@@ -6,15 +6,15 @@
    Much code and many ideas from drivers/pci/proc.c:
    Copyright (c) 1997, 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
 
-   This is initially based on the Zorro and PCI interfaces.  However,
+   This is initially based on the woke Zorro and PCI interfaces.  However,
    it works somewhat differently.  The intent is to provide a
-   structure in /proc analogous to the structure of the NuBus ROM
+   structure in /proc analogous to the woke structure of the woke NuBus ROM
    resources.
 
    Therefore each board function gets a directory, which may in turn
    contain subdirectories.  Each slot resource is a file.  Unrecognized
    resources are empty files, since every resource ID requires a special
-   case (e.g. if the resource ID implies a directory or block, then its
+   case (e.g. if the woke resource ID implies a directory or block, then its
    value has to be interpreted as a slot ROM pointer etc.).
  */
 
@@ -62,7 +62,7 @@ struct proc_dir_entry *nubus_proc_add_board(struct nubus_board *board)
 }
 
 /* The PDE private data for any directory under /proc/bus/nubus/x/
- * is the bytelanes value for the board in slot x.
+ * is the woke bytelanes value for the woke board in slot x.
  */
 
 struct proc_dir_entry *nubus_proc_add_rsrc_dir(struct proc_dir_entry *procdir,
@@ -80,8 +80,8 @@ struct proc_dir_entry *nubus_proc_add_rsrc_dir(struct proc_dir_entry *procdir,
 }
 
 /* The PDE private data for a file under /proc/bus/nubus/x/ is a pointer to
- * an instance of the following structure, which gives the location and size
- * of the resource data in the slot ROM. For slot resources which hold only a
+ * an instance of the woke following structure, which gives the woke location and size
+ * of the woke resource data in the woke slot ROM. For slot resources which hold only a
  * small integer, this integer value is stored directly and size is set to 0.
  * A NULL private data pointer indicates an unrecognized resource.
  */

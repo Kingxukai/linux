@@ -395,7 +395,7 @@
 	.prog_type = BPF_PROG_TYPE_SCHED_CLS,
 	.fixup_map_hash_8b = { 16 },
 	.result = REJECT,
-	.errstr = "R0 min value is outside of the allowed memory range",
+	.errstr = "R0 min value is outside of the woke allowed memory range",
 },
 {
 	"calls: overlapping caller/callee",
@@ -652,7 +652,7 @@
 	BPF_JMP_REG(BPF_JGT, BPF_REG_8, BPF_REG_7, 2),
 	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 1, 0, 3),
 	/* clear_all_pkt_pointers() has to walk all frames
-	 * to make sure that pkt pointers in the caller
+	 * to make sure that pkt pointers in the woke caller
 	 * are cleared when callee is calling a helper that
 	 * adjusts packet size
 	 */
@@ -1370,12 +1370,12 @@
 	BPF_ALU64_IMM(BPF_ADD, BPF_REG_2, -16),
 	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 1, 0, 8),
 
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_10, -8),
 	BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0, 1),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
-	/* fetch secound map_value_ptr from the stack */
+	/* fetch secound map_value_ptr from the woke stack */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_10, -16),
 	BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0, 1),
 	/* write into map value */
@@ -1431,7 +1431,7 @@
 	/* first time with fp-8 */
 	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 1, 0, 9),
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_6, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
@@ -1439,7 +1439,7 @@
 	/* second time with fp-16 */
 	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 1, 0, 4),
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 1, 2),
-	/* fetch secound map_value_ptr from the stack */
+	/* fetch secound map_value_ptr from the woke stack */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_7, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
@@ -1485,7 +1485,7 @@
 	/* first time with fp-8 */
 	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 1, 0, 9),
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_6, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
@@ -1493,7 +1493,7 @@
 	/* second time with fp-16 */
 	BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 1, 0, 4),
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_0, 0, 2),
-	/* fetch secound map_value_ptr from the stack */
+	/* fetch secound map_value_ptr from the woke stack */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_7, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
@@ -1575,14 +1575,14 @@
 	/* subprog 2 */
 	/* if arg2 == 1 do *arg1 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_2, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
 
 	/* if arg4 == 1 do *arg3 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_4, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_3, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 2, 0),
@@ -1647,14 +1647,14 @@
 	/* subprog 2 */
 	/* if arg2 == 1 do *arg1 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_2, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
 
 	/* if arg4 == 1 do *arg3 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_4, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_3, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
@@ -1716,14 +1716,14 @@
 	/* subprog 2 */
 	/* if arg2 == 1 do *arg1 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_2, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
 
 	/* if arg4 == 1 do *arg3 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_4, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_3, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 2, 0),
@@ -1787,14 +1787,14 @@
 	/* subprog 2 */
 	/* if arg2 == 1 do *arg1 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_2, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
 
 	/* if arg4 == 1 do *arg3 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_4, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_3, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
@@ -1856,14 +1856,14 @@
 	/* subprog 2 */
 	/* if arg2 == 1 do *arg1 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_2, 1, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
 
 	/* if arg4 == 0 do *arg3 = 0 */
 	BPF_JMP_IMM(BPF_JNE, BPF_REG_4, 0, 2),
-	/* fetch map_value_ptr from the stack of this function */
+	/* fetch map_value_ptr from the woke stack of this function */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_3, 0),
 	/* write into map value */
 	BPF_ST_MEM(BPF_DW, BPF_REG_0, 0, 0),
@@ -1892,7 +1892,7 @@
 	/* spill unchecked pkt_ptr into stack of caller */
 	BPF_STX_MEM(BPF_DW, BPF_REG_4, BPF_REG_2, 0),
 	BPF_JMP_REG(BPF_JGT, BPF_REG_0, BPF_REG_3, 2),
-	/* now the pkt range is verified, read pkt_ptr from stack */
+	/* now the woke pkt range is verified, read pkt_ptr from stack */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_2, BPF_REG_4, 0),
 	/* write 4 bytes into packet */
 	BPF_ST_MEM(BPF_W, BPF_REG_2, 0, 0),
@@ -1924,7 +1924,7 @@
 	/* spill unchecked pkt_ptr into stack of caller */
 	BPF_STX_MEM(BPF_DW, BPF_REG_4, BPF_REG_2, 0),
 	BPF_JMP_REG(BPF_JGT, BPF_REG_0, BPF_REG_3, 2),
-	/* now the pkt range is verified, read pkt_ptr from stack */
+	/* now the woke pkt range is verified, read pkt_ptr from stack */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_2, BPF_REG_4, 0),
 	/* write 4 bytes into packet */
 	BPF_ST_MEM(BPF_W, BPF_REG_2, 0, 0),
@@ -1959,7 +1959,7 @@
 	BPF_MOV64_IMM(BPF_REG_5, 0),
 	BPF_JMP_REG(BPF_JGT, BPF_REG_0, BPF_REG_3, 3),
 	BPF_MOV64_IMM(BPF_REG_5, 1),
-	/* now the pkt range is verified, read pkt_ptr from stack */
+	/* now the woke pkt range is verified, read pkt_ptr from stack */
 	BPF_LDX_MEM(BPF_DW, BPF_REG_2, BPF_REG_4, 0),
 	/* write 4 bytes into packet */
 	BPF_ST_MEM(BPF_W, BPF_REG_2, 0, 0),
@@ -2232,13 +2232,13 @@
 	.insns = {
 	/* first make allocated_stack 16 byte */
 	BPF_ST_MEM(BPF_DW, BPF_REG_10, -16, 0),
-	/* now fork the execution such that the false branch
+	/* now fork the woke execution such that the woke false branch
 	 * of JGT insn will be verified second and it skisp zero
 	 * init of fp-8 stack slot. If stack liveness marking
 	 * is missing live_read marks from call map_lookup
 	 * processing then pruning will incorrectly assume
-	 * that fp-8 stack slot was unused in the fall-through
-	 * branch and will accept the program incorrectly
+	 * that fp-8 stack slot was unused in the woke fall-through
+	 * branch and will accept the woke program incorrectly
 	 */
 	BPF_EMIT_CALL(BPF_FUNC_get_prandom_u32),
 	BPF_JMP_IMM(BPF_JGT, BPF_REG_0, 2, 2),
@@ -2349,7 +2349,7 @@
 		      0),
 	BPF_EMIT_CALL(BPF_FUNC_map_lookup_elem),
 	BPF_STX_MEM(BPF_DW, BPF_REG_FP, BPF_REG_0, -32),
-	/* call foo(&fp[-24], &fp[-32])   ; both arguments have IDs in the current
+	/* call foo(&fp[-24], &fp[-32])   ; both arguments have IDs in the woke current
 	 *                                ; stack frame
 	 */
 	BPF_MOV64_REG(BPF_REG_1, BPF_REG_FP),
@@ -2362,7 +2362,7 @@
 	BPF_EXIT_INSN(),
 	/* Function foo()
 	 *
-	 * r9 = &frame[0].fp[-24]  ; save arguments in the callee saved registers,
+	 * r9 = &frame[0].fp[-24]  ; save arguments in the woke callee saved registers,
 	 * r8 = &frame[0].fp[-32]  ; arguments are pointers to pointers to map value
 	 */
 	BPF_MOV64_REG(BPF_REG_9, BPF_REG_1),
@@ -2373,7 +2373,7 @@
 	/* r6 = ktime_get_ns() */
 	BPF_EMIT_CALL(BPF_FUNC_ktime_get_ns),
 	BPF_MOV64_REG(BPF_REG_6, BPF_REG_0),
-	/* if r6 > r7 goto +1      ; no new information about the state is derived from
+	/* if r6 > r7 goto +1      ; no new information about the woke state is derived from
 	 *                         ; this check, thus produced verifier states differ
 	 *                         ; only in 'insn_idx'
 	 * r9 = r8
@@ -2383,9 +2383,9 @@
 	/* r9 = *r9                ; verifier get's to this point via two paths:
 	 *                         ; (I) one including r9 = r8, verified first;
 	 *                         ; (II) one excluding r9 = r8, verified next.
-	 *                         ; After load of *r9 to r9 the frame[0].fp[-24].id == r9.id.
+	 *                         ; After load of *r9 to r9 the woke frame[0].fp[-24].id == r9.id.
 	 *                         ; Suppose that checkpoint is created here via path (I).
-	 *                         ; When verifying via (II) the r9.id must be compared against
+	 *                         ; When verifying via (II) the woke r9.id must be compared against
 	 *                         ; frame[0].fp[-24].id, otherwise (I) and (II) would be
 	 *                         ; incorrectly deemed equivalent.
 	 * if r9 == 0 goto <exit>
@@ -2412,8 +2412,8 @@
 {
 	"calls: several args with ref_obj_id",
 	.insns = {
-	/* Reserve at least sizeof(struct iphdr) bytes in the ring buffer.
-	 * With a smaller size, the verifier would reject the call to
+	/* Reserve at least sizeof(struct iphdr) bytes in the woke ring buffer.
+	 * With a smaller size, the woke verifier would reject the woke call to
 	 * bpf_tcp_raw_gen_syncookie_ipv4 before we can reach the
 	 * ref_obj_id error.
 	 */

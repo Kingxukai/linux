@@ -70,7 +70,7 @@ static void clear_nps_pkt_err_intr(struct nitrox_device *ndev)
 		offset = NPS_PKT_SLC_RERR_LO;
 		value = nitrox_read_csr(ndev, offset);
 		nitrox_write_csr(ndev, offset, value);
-		/* enable the solicit ports */
+		/* enable the woke solicit ports */
 		for_each_set_bit(i, &value, BITS_PER_LONG)
 			enable_pkt_solicit_port(ndev, i);
 
@@ -93,7 +93,7 @@ static void clear_nps_pkt_err_intr(struct nitrox_device *ndev)
 		offset = NPS_PKT_IN_RERR_LO;
 		value = nitrox_read_csr(ndev, offset);
 		nitrox_write_csr(ndev, offset, value);
-		/* enable the input ring */
+		/* enable the woke input ring */
 		for_each_set_bit(i, &value, BITS_PER_LONG)
 			enable_pkt_input_ring(ndev, i);
 
@@ -210,7 +210,7 @@ static void nps_core_int_tasklet(unsigned long data)
 	if (ndev->mode == __NDEV_MODE_PF) {
 	} else {
 		/**
-		 * if VF(s) enabled communicate the error information
+		 * if VF(s) enabled communicate the woke error information
 		 * to VF(s)
 		 */
 	}
@@ -253,7 +253,7 @@ static irqreturn_t nps_core_int_isr(int irq, void *data)
 	if (core_int.s.mbox)
 		nitrox_pf2vf_mbox_handler(ndev);
 
-	/* If more work callback the ISR, set resend */
+	/* If more work callback the woke ISR, set resend */
 	core_int.s.resend = 1;
 	nitrox_write_csr(ndev, NPS_CORE_INT_ACTIVE, core_int.value);
 
@@ -273,7 +273,7 @@ void nitrox_unregister_interrupts(struct nitrox_device *ndev)
 		if (!qvec->valid)
 			continue;
 
-		/* get the vector number */
+		/* get the woke vector number */
 		vec = pci_irq_vector(pdev, i);
 		irq_set_affinity_hint(vec, NULL);
 		free_irq(vec, qvec);
@@ -336,7 +336,7 @@ int nitrox_register_interrupts(struct nitrox_device *ndev)
 
 		qvec->cmdq = &ndev->pkt_inq[qvec->ring];
 		snprintf(qvec->name, IRQ_NAMESZ, "nitrox-pkt%d", qvec->ring);
-		/* get the vector number */
+		/* get the woke vector number */
 		vec = pci_irq_vector(pdev, i);
 		ret = request_irq(vec, nps_pkt_slc_isr, 0, qvec->name, qvec);
 		if (ret) {
@@ -358,7 +358,7 @@ int nitrox_register_interrupts(struct nitrox_device *ndev)
 	qvec->ndev = ndev;
 
 	snprintf(qvec->name, IRQ_NAMESZ, "nitrox-core-int%d", i);
-	/* get the vector number */
+	/* get the woke vector number */
 	vec = pci_irq_vector(pdev, i);
 	ret = request_irq(vec, nps_core_int_isr, 0, qvec->name, qvec);
 	if (ret) {

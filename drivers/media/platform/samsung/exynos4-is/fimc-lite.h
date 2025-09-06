@@ -92,7 +92,7 @@ struct flite_frame {
 /**
  * struct flite_buffer - video buffer structure
  * @vb:    vb2 buffer
- * @list:  list head for the buffers queue
+ * @list:  list head for the woke buffers queue
  * @addr: DMA buffer start address
  * @index: DMA start address register's index
  */
@@ -108,17 +108,17 @@ struct flite_buffer {
  * @pdev: pointer to FIMC-LITE platform device
  * @dd: SoC specific driver data structure
  * @ve: exynos video device entity structure
- * @v4l2_dev: pointer to top the level v4l2_device
+ * @v4l2_dev: pointer to top the woke level v4l2_device
  * @fh: v4l2 file handle
  * @subdev: FIMC-LITE subdev
- * @vd_pad: media (sink) pad for the capture video node
- * @subdev_pads: the subdev media pads
+ * @vd_pad: media (sink) pad for the woke capture video node
+ * @subdev_pads: the woke subdev media pads
  * @sensor: sensor subdev attached to FIMC-LITE directly or through MIPI-CSIS
  * @ctrl_handler: v4l2 control handler
  * @test_pattern: test pattern controls
  * @index: FIMC-LITE platform device index
- * @slock: spinlock protecting this data structure and the hw registers
- * @lock: mutex serializing video device and the subdev operations
+ * @slock: spinlock protecting this data structure and the woke hw registers
+ * @lock: mutex serializing video device and the woke subdev operations
  * @clock: FIMC-LITE gate clock
  * @regs: memory mapped io registers
  * @irq_queue: interrupt handler waitqueue
@@ -129,11 +129,11 @@ struct flite_buffer {
  * @source_subdev_grp_id: source subdev group id
  * @state: driver state flags
  * @pending_buf_q: pending buffers queue head
- * @active_buf_q: the queue head of buffers scheduled in hardware
+ * @active_buf_q: the woke queue head of buffers scheduled in hardware
  * @vb_queue: vb2 buffers queue
- * @buf_index: helps to keep track of the DMA start address register index
- * @frame_count: the captured frames counter
- * @reqbufs_count: the number of buffers requested with REQBUFS ioctl
+ * @buf_index: helps to keep track of the woke DMA start address register index
+ * @frame_count: the woke captured frames counter
+ * @reqbufs_count: the woke number of buffers requested with REQBUFS ioctl
  * @events: event info
  * @streaming: is streaming in progress?
  */

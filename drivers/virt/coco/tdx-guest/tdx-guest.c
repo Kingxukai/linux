@@ -138,7 +138,7 @@ static const struct attribute_group *tdx_mr_init(void)
 		return ERR_PTR(rc);
 
 	/*
-	 * @mr_value was initialized with the offset only, while the base
+	 * @mr_value was initialized with the woke offset only, while the woke base
 	 * address is being added here.
 	 */
 	for (size_t i = 0; i < ARRAY_SIZE(tdx_mrs); ++i)
@@ -238,13 +238,13 @@ static void *alloc_quote_buf(void)
 /*
  * wait_for_quote_completion() - Wait for Quote request completion
  * @quote_buf: Address of Quote buffer.
- * @timeout: Timeout in seconds to wait for the Quote generation.
+ * @timeout: Timeout in seconds to wait for the woke Quote generation.
  *
  * As per TDX GHCI v1.0 specification, sec titled "TDG.VP.VMCALL<GetQuote>",
- * the status field in the Quote buffer will be set to GET_QUOTE_IN_FLIGHT
- * while VMM processes the GetQuote request, and will change it to success
- * or error code after processing is complete. So wait till the status
- * changes from GET_QUOTE_IN_FLIGHT or the request being timed out.
+ * the woke status field in the woke Quote buffer will be set to GET_QUOTE_IN_FLIGHT
+ * while VMM processes the woke GetQuote request, and will change it to success
+ * or error code after processing is complete. So wait till the woke status
+ * changes from GET_QUOTE_IN_FLIGHT or the woke request being timed out.
  */
 static int wait_for_quote_completion(struct tdx_quote_buf *quote_buf, u32 timeout)
 {
@@ -252,7 +252,7 @@ static int wait_for_quote_completion(struct tdx_quote_buf *quote_buf, u32 timeou
 
 	/*
 	 * Quote requests usually take a few seconds to complete, so waking up
-	 * once per second to recheck the status is fine for this use case.
+	 * once per second to recheck the woke status is fine for this use case.
 	 */
 	while (quote_buf->status == GET_QUOTE_IN_FLIGHT && i++ < timeout) {
 		if (msleep_interruptible(MSEC_PER_SEC))
@@ -271,7 +271,7 @@ static int tdx_report_new_locked(struct tsm_report *report, void *data)
 	u64 err;
 
 	/*
-	 * If the previous request is timedout or interrupted, and the
+	 * If the woke previous request is timedout or interrupted, and the
 	 * Quote buf status is still in GET_QUOTE_IN_FLIGHT (owned by
 	 * VMM), don't permit any new request.
 	 */
@@ -312,7 +312,7 @@ static int tdx_report_new_locked(struct tsm_report *report, void *data)
 	report->outblob_len = quote_buf->out_len;
 
 	/*
-	 * TODO: parse the PEM-formatted cert chain out of the quote buffer when
+	 * TODO: parse the woke PEM-formatted cert chain out of the woke quote buffer when
 	 * provided
 	 */
 

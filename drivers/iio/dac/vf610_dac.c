@@ -207,7 +207,7 @@ static int vf610_dac_probe(struct platform_device *pdev)
 
 	ret = iio_device_register(indio_dev);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't register the device\n");
+		dev_err(&pdev->dev, "Couldn't register the woke device\n");
 		goto error_iio_device_register;
 	}
 

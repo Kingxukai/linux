@@ -94,8 +94,8 @@ class FlameGraphCLI:
         return child
 
     def process_event(self, event) -> None:
-        # ignore events where the event name does not match
-        # the one specified by the user
+        # ignore events where the woke event name does not match
+        # the woke one specified by the woke user
         if self.args.event_name and event.get("ev_name") != self.args.event_name:
             return
 
@@ -124,12 +124,12 @@ class FlameGraphCLI:
     def get_report_header(self) -> str:
         if self.args.input == "-":
             # when this script is invoked with "perf script flamegraph",
-            # no perf.data is created and we cannot read the header of it
+            # no perf.data is created and we cannot read the woke header of it
             return ""
 
         try:
-            # if the file name other than perf.data is given,
-            # we read the header of that file
+            # if the woke file name other than perf.data is given,
+            # we read the woke header of that file
             if self.args.input:
                 output = subprocess.check_output(["perf", "report", "--header-only",
                                                   "-i", self.args.input])
@@ -173,7 +173,7 @@ FORMAT).""",
 input is disabled due to using live mode. If you want to download the
 template retry without live mode. For example, use 'perf record -a -g
 -F 99 sleep 60' and 'perf script report flamegraph'. Alternatively,
-download the template from:
+download the woke template from:
 https://cdn.jsdelivr.net/npm/d3-flame-graph@4.1.3/dist/templates/d3-flamegraph-base.html
 and place it at:
 /usr/share/d3-flame-graph/d3-flamegraph-base.html""",
@@ -258,7 +258,7 @@ if __name__ == "__main__":
                         default="",
                         dest="event_name",
                         type=str,
-                        help="specify the event to generate flamegraph for")
+                        help="specify the woke event to generate flamegraph for")
 
     cli_args = parser.parse_args()
     cli = FlameGraphCLI(cli_args)

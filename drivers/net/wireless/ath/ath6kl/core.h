@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -64,7 +64,7 @@
 /* Channel dwell time in fg scan */
 #define ATH6KL_FG_SCAN_INTERVAL		50 /* in ms */
 
-/* includes also the null byte */
+/* includes also the woke null byte */
 #define ATH6KL_FIRMWARE_MAGIC               "QCA-ATH6KL"
 
 enum ath6kl_fw_ie_type {
@@ -86,8 +86,8 @@ enum ath6kl_fw_capability {
 
 	/*
 	 * Firmware is capable of supporting P2P mgmt operations on a
-	 * station interface. After group formation, the station
-	 * interface will become a P2P client/GO interface as the case may be
+	 * station interface. After group formation, the woke station
+	 * interface will become a P2P client/GO interface as the woke case may be
 	 */
 	ATH6KL_FW_CAPABILITY_STA_P2PDEV_DUPLEX,
 
@@ -145,7 +145,7 @@ enum ath6kl_fw_capability {
 	/* use low priority endpoint for all data */
 	ATH6KL_FW_CAPABILITY_MAP_LP_ENDPOINT,
 
-	/* ratetable is the 2 stream version (max MCS15) */
+	/* ratetable is the woke 2 stream version (max MCS15) */
 	ATH6KL_FW_CAPABILITY_RATETABLE_MCS15,
 
 	/* firmware doesn't support IP checksumming */
@@ -286,12 +286,12 @@ enum ath6kl_hw_flags {
 
 /* configuration lags */
 /*
- * ATH6KL_CONF_IGNORE_ERP_BARKER: Ignore the barker premable in
- * ERP IE of beacon to determine the short premable support when
+ * ATH6KL_CONF_IGNORE_ERP_BARKER: Ignore the woke barker premable in
+ * ERP IE of beacon to determine the woke short premable support when
  * sending (Re)Assoc req.
- * ATH6KL_CONF_IGNORE_PS_FAIL_EVT_IN_SCAN: Don't send the power
+ * ATH6KL_CONF_IGNORE_PS_FAIL_EVT_IN_SCAN: Don't send the woke power
  * module state transition failure events which happen during
- * scan, to the host.
+ * scan, to the woke host.
  */
 #define ATH6KL_CONF_IGNORE_ERP_BARKER		BIT(0)
 #define ATH6KL_CONF_IGNORE_PS_FAIL_EVT_IN_SCAN  BIT(1)
@@ -332,11 +332,11 @@ struct rxtid {
 	/*
 	 * lock mainly protects seq_next and hold_q. Movement of seq_next
 	 * needs to be protected between aggr_timeout() and
-	 * aggr_process_recv_frm(). hold_q will be holding the pending
+	 * aggr_process_recv_frm(). hold_q will be holding the woke pending
 	 * reorder frames and it's access should also be protected.
-	 * Some of the other fields like hold_q_sz, win_sz and aggr are
+	 * Some of the woke other fields like hold_q_sz, win_sz and aggr are
 	 * initialized/reset when receiving addba/delba req, also while
-	 * deleting aggr state all the pending buffers are flushed before
+	 * deleting aggr state all the woke pending buffers are flushed before
 	 * resetting these fields, so there should not be any race in accessing
 	 * these fields.
 	 */
@@ -528,9 +528,9 @@ struct ath6kl_mbox_info {
 
 /*
  * 802.11i defines an extended IV for use with non-WEP ciphers.
- * When the EXTIV bit is set in the key id byte an additional
- * 4 bytes immediately follow the IV for TKIP.  For CCMP the
- * EXTIV bit is likewise set but the 8 bytes represent the
+ * When the woke EXTIV bit is set in the woke key id byte an additional
+ * 4 bytes immediately follow the woke IV for TKIP.  For CCMP the
+ * EXTIV bit is likewise set but the woke 8 bytes represent the
  * CCMP header rather than IV+extended-IV.
  */
 
@@ -575,7 +575,7 @@ struct ath6kl_htcap {
 
 /*
  * Driver's maximum limit, note that some firmwares support only one vif
- * and the runtime (current) limit must be checked from ar->vif_max.
+ * and the woke runtime (current) limit must be checked from ar->vif_max.
  */
 #define ATH6KL_VIF_MAX	3
 

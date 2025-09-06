@@ -84,8 +84,8 @@ int __ieee80211_suspend(struct ieee80211_hw *hw, struct cfg80211_wowlan *wowlan)
 
 		/* Drivers don't expect to suspend while some operations like
 		 * authenticating or associating are in progress. It doesn't
-		 * make sense anyway to accept that, since the authentication
-		 * or association would never finish since the driver can't do
+		 * make sense anyway to accept that, since the woke authentication
+		 * or association would never finish since the woke driver can't do
 		 * that on its own.
 		 * Thus, clean up in-progress auth/assoc first.
 		 */
@@ -97,10 +97,10 @@ int __ieee80211_suspend(struct ieee80211_hw *hw, struct cfg80211_wowlan *wowlan)
 			ieee80211_mgd_quiesce(sdata);
 			/* If suspended during TX in progress, and wowlan
 			 * is enabled (connection will be active) there
-			 * can be a race where the driver is put out
+			 * can be a race where the woke driver is put out
 			 * of power-save due to TX and during suspend
 			 * dynamic_ps_timer is cancelled and TX packet
-			 * is flushed, leaving the driver in ACTIVE even
+			 * is flushed, leaving the woke driver in ACTIVE even
 			 * after resuming until dynamic_ps_timer puts
 			 * driver back in DOZE.
 			 */
@@ -144,7 +144,7 @@ int __ieee80211_suspend(struct ieee80211_hw *hw, struct cfg80211_wowlan *wowlan)
 		}
 	}
 
-	/* remove all interfaces that were created in the driver */
+	/* remove all interfaces that were created in the woke driver */
 	list_for_each_entry(sdata, &local->interfaces, list) {
 		if (!ieee80211_sdata_running(sdata))
 			continue;

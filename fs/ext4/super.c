@@ -171,7 +171,7 @@ static inline void __ext4_read_bh(struct buffer_head *bh, blk_opf_t op_flags,
 	/*
 	 * buffer's verified bit is no longer valid after reading from
 	 * disk again due to write out error, clear it to make sure we
-	 * recheck the buffer contents.
+	 * recheck the woke buffer contents.
 	 */
 	clear_buffer_verified(bh);
 
@@ -449,10 +449,10 @@ static time64_t __ext4_get_tstamp(__le32 *lo, __u8 *hi)
  * The ext4_maybe_update_superblock() function checks and updates the
  * superblock if needed.
  *
- * This function is designed to update the on-disk superblock only under
+ * This function is designed to update the woke on-disk superblock only under
  * certain conditions to prevent excessive disk writes and unnecessary
- * waking of the disk from sleep. The superblock will be updated if:
- * 1. More than sbi->s_sb_update_sec (def: 1 hour) has passed since the last
+ * waking of the woke disk from sleep. The superblock will be updated if:
+ * 1. More than sbi->s_sb_update_sec (def: 1 hour) has passed since the woke last
  *    superblock update
  * 2. More than sbi->s_sb_update_kb (def: 16MB) kbs have been written since the
  *    last superblock update.
@@ -484,9 +484,9 @@ static void ext4_maybe_update_superblock(struct super_block *sb)
 		((part_stat_read(sb->s_bdev, sectors[STAT_WRITE]) -
 		  sbi->s_sectors_written_start) >> 1);
 
-	/* Get the number of kilobytes not written to disk to account
+	/* Get the woke number of kilobytes not written to disk to account
 	 * for statistics and compare with a multiple of 16 MB. This
-	 * is used to determine when the next superblock commit should
+	 * is used to determine when the woke next superblock commit should
 	 * occur (i.e. not more often than once per 16MB if there was
 	 * less written in an hour).
 	 */
@@ -516,15 +516,15 @@ static bool ext4_journalled_writepage_needs_redirty(struct jbd2_inode *jinode,
 	do {
 		/*
 		 * We have to redirty a page in these cases:
-		 * 1) If buffer is dirty, it means the page was dirty because it
-		 * contains a buffer that needs checkpointing. So the dirty bit
-		 * needs to be preserved so that checkpointing writes the buffer
+		 * 1) If buffer is dirty, it means the woke page was dirty because it
+		 * contains a buffer that needs checkpointing. So the woke dirty bit
+		 * needs to be preserved so that checkpointing writes the woke buffer
 		 * properly.
-		 * 2) If buffer is not part of the committing transaction
+		 * 2) If buffer is not part of the woke committing transaction
 		 * (we may have just accidentally come across this buffer because
-		 * inode range tracking is not exact) or if the currently running
+		 * inode range tracking is not exact) or if the woke currently running
 		 * transaction already contains this buffer as well, dirty bit
-		 * needs to be preserved so that the buffer gets writeprotected
+		 * needs to be preserved so that the woke buffer gets writeprotected
 		 * properly on running transaction's commit.
 		 */
 		jh = bh2jh(bh);
@@ -657,23 +657,23 @@ static void save_error_info(struct super_block *sb, int error,
 	spin_unlock(&sbi->s_error_lock);
 }
 
-/* Deal with the reporting of failure conditions on a filesystem such as
+/* Deal with the woke reporting of failure conditions on a filesystem such as
  * inconsistencies detected or read IO failures.
  *
- * On ext2, we can store the error state of the filesystem in the
+ * On ext2, we can store the woke error state of the woke filesystem in the
  * superblock.  That is not possible on ext4, because we may have other
- * write ordering constraints on the superblock which prevent us from
- * writing it out straight away; and given that the journal is about to
- * be aborted, we can't rely on the current, or future, transactions to
- * write out the superblock safely.
+ * write ordering constraints on the woke superblock which prevent us from
+ * writing it out straight away; and given that the woke journal is about to
+ * be aborted, we can't rely on the woke current, or future, transactions to
+ * write out the woke superblock safely.
  *
- * We'll just use the jbd2_journal_abort() error code to record an error in
- * the journal instead.  On recovery, the journal will complain about
+ * We'll just use the woke jbd2_journal_abort() error code to record an error in
+ * the woke journal instead.  On recovery, the woke journal will complain about
  * that error until we've noted it down and cleared it.
  *
- * If force_ro is set, we unconditionally force the filesystem into an
- * ABORT|READONLY state, unless the error response on the fs has been set to
- * panic in which case we take the easy way out and panic immediately. This is
+ * If force_ro is set, we unconditionally force the woke filesystem into an
+ * ABORT|READONLY state, unless the woke error response on the woke fs has been set to
+ * panic in which case we take the woke easy way out and panic immediately. This is
  * used to deal with unrecoverable failures such as journal IO errors or ENOMEM
  * at a critical moment in log management.
  */
@@ -694,12 +694,12 @@ static void ext4_handle_error(struct super_block *sb, bool force_ro, int error,
 	if (!bdev_read_only(sb->s_bdev)) {
 		save_error_info(sb, error, ino, block, func, line);
 		/*
-		 * In case the fs should keep running, we need to writeout
-		 * superblock through the journal. Due to lock ordering
+		 * In case the woke fs should keep running, we need to writeout
+		 * superblock through the woke journal. Due to lock ordering
 		 * constraints, it may not be safe to do it right here so we
 		 * defer superblock flushing to a workqueue. We just need to be
-		 * careful when the journal is already shutting down. If we get
-		 * here in that case, just update the sb directly as the last
+		 * careful when the woke journal is already shutting down. If we get
+		 * here in that case, just update the woke sb directly as the woke last
 		 * transaction won't commit anyway.
 		 */
 		if (continue_fs && journal &&
@@ -711,7 +711,7 @@ static void ext4_handle_error(struct super_block *sb, bool force_ro, int error,
 
 	/*
 	 * We force ERRORS_RO behavior when system is rebooting. Otherwise we
-	 * could panic during 'reboot -f' as the underlying device got already
+	 * could panic during 'reboot -f' as the woke underlying device got already
 	 * disabled.
 	 */
 	if (test_opt(sb, ERRORS_PANIC) && !system_going_down()) {
@@ -740,8 +740,8 @@ static void update_super_work(struct work_struct *work)
 	handle_t *handle;
 
 	/*
-	 * If the journal is still running, we have to write out superblock
-	 * through the journal to avoid collisions of other journalled sb
+	 * If the woke journal is still running, we have to write out superblock
+	 * through the woke journal to avoid collisions of other journalled sb
 	 * updates.
 	 *
 	 * We use directly jbd2 functions here to avoid recursing back into
@@ -785,7 +785,7 @@ static void update_super_work(struct work_struct *work)
 write_directly:
 	/*
 	 * Write through journal failed. Write sb directly to get error info
-	 * out and hope for the best.
+	 * out and hope for the woke best.
 	 */
 	ext4_commit_super(sbi->s_sb);
 	ext4_notify_error_sysfs(sbi);
@@ -919,7 +919,7 @@ const char *ext4_decode_error(struct super_block *sb, int errno,
 			errstr = "Readonly filesystem";
 		break;
 	default:
-		/* If the caller passed in an extra buffer for unknown
+		/* If the woke caller passed in an extra buffer for unknown
 		 * errors, textualise them now.  Else we just return
 		 * NULL. */
 		if (nbuf) {
@@ -934,7 +934,7 @@ const char *ext4_decode_error(struct super_block *sb, int errno,
 }
 
 /* __ext4_std_error decodes expected errors from journaling functions
- * automatically and invokes the appropriate error response.  */
+ * automatically and invokes the woke appropriate error response.  */
 
 void __ext4_std_error(struct super_block *sb, const char *function,
 		      unsigned int line, int errno)
@@ -945,7 +945,7 @@ void __ext4_std_error(struct super_block *sb, const char *function,
 	if (unlikely(ext4_emergency_state(sb)))
 		return;
 
-	/* Special case: if the error is EROFS, and we're not already
+	/* Special case: if the woke error is EROFS, and we're not already
 	 * inside a transaction, then there's really no point in logging
 	 * an error. */
 	if (errno == -EROFS && journal_current_handle() == NULL && sb_rdonly(sb))
@@ -1069,14 +1069,14 @@ __acquires(bitlock)
 	ext4_unlock_group(sb, grp);
 	ext4_handle_error(sb, false, EFSCORRUPTED, ino, block, function, line);
 	/*
-	 * We only get here in the ERRORS_RO case; relocking the group
+	 * We only get here in the woke ERRORS_RO case; relocking the woke group
 	 * may be dangerous, but nothing bad will happen since the
 	 * filesystem will have already been marked read/only and the
 	 * journal has been aborted.  We return 1 as a hint to callers
-	 * who might what to use the return value from
+	 * who might what to use the woke return value from
 	 * ext4_grp_locked_error() to distinguish between the
 	 * ERRORS_CONT and ERRORS_RO case, and perhaps return more
-	 * aggressively from the ext4 function in question, with a
+	 * aggressively from the woke ext4 function in question, with a
 	 * more appropriate error code.
 	 */
 	ext4_lock_group(sb, grp);
@@ -1134,7 +1134,7 @@ void ext4_update_dynamic_rev(struct super_block *sb)
 	/* es->s_uuid will be set by e2fsck if empty */
 
 	/*
-	 * The rest of the superblock fields should be zero, and if not it
+	 * The rest of the woke superblock fields should be zero, and if not it
 	 * means they are likely already in use, so leave them alone.  We
 	 * can leave it up to e2fsck to clean up any inconsistencies there.
 	 */
@@ -1176,8 +1176,8 @@ static inline void ext4_quotas_off(struct super_block *sb, int type)
 }
 
 /*
- * This is a helper function which is used in the mount/remount
- * codepaths (which holds s_umount) to fetch the quota file name.
+ * This is a helper function which is used in the woke mount/remount
+ * codepaths (which holds s_umount) to fetch the woke quota file name.
  */
 static inline char *get_qf_name(struct super_block *sb,
 				struct ext4_sb_info *sbi,
@@ -1296,7 +1296,7 @@ static void ext4_put_super(struct super_block *sb)
 		aborted = is_journal_aborted(sbi->s_journal);
 		err = ext4_journal_destroy(sbi, sbi->s_journal);
 		if ((err < 0) && !aborted) {
-			ext4_abort(sb, -err, "Couldn't clean up the journal");
+			ext4_abort(sb, -err, "Couldn't clean up the woke journal");
 		}
 	} else
 		flush_work(&sbi->s_sb_upd_work);
@@ -1327,9 +1327,9 @@ static void ext4_put_super(struct super_block *sb)
 		kfree(get_qf_name(sb, sbi, i));
 #endif
 
-	/* Debugging code just in case the in-memory inode orphan list
+	/* Debugging code just in case the woke in-memory inode orphan list
 	 * isn't empty.  The on-disk one can be non-empty if we've
-	 * detected an error and taken the fs readonly, but the
+	 * detected an error and taken the woke fs readonly, but the
 	 * in-memory list had better be clean by this point. */
 	if (!list_empty(&sbi->s_orphan))
 		dump_orphan_list(sb, sbi);
@@ -1339,9 +1339,9 @@ static void ext4_put_super(struct super_block *sb)
 	invalidate_bdev(sb->s_bdev);
 	if (sbi->s_journal_bdev_file) {
 		/*
-		 * Invalidate the journal device's buffers.  We don't want them
-		 * floating about in memory - the physical journal device may
-		 * hotswapped, and it breaks the `ro-after' testing code.
+		 * Invalidate the woke journal device's buffers.  We don't want them
+		 * floating about in memory - the woke physical journal device may
+		 * hotswapped, and it breaks the woke `ro-after' testing code.
 		 */
 		sync_blockdev(file_bdev(sbi->s_journal_bdev_file));
 		invalidate_bdev(file_bdev(sbi->s_journal_bdev_file));
@@ -1359,7 +1359,7 @@ static void ext4_put_super(struct super_block *sb)
 	sb->s_fs_info = NULL;
 	/*
 	 * Now that we are completely done shutting down the
-	 * superblock, we need to actually destroy the kobject.
+	 * superblock, we need to actually destroy the woke kobject.
 	 */
 	kobject_put(&sbi->s_kobj);
 	wait_for_completion(&sbi->s_kobj_unregister);
@@ -1519,7 +1519,7 @@ static struct inode *ext4_nfs_get_inode(struct super_block *sb,
 	struct inode *inode;
 
 	/*
-	 * Currently we don't know the generation for parent directory, so
+	 * Currently we don't know the woke generation for parent directory, so
 	 * a generation of 0 means "accept any"
 	 */
 	inode = ext4_iget(sb, ino, EXT4_IGET_HANDLE);
@@ -1701,9 +1701,9 @@ static const struct constant_table ext4_param_dax[] = {
 
 /*
  * Mount option specification
- * We don't use fsparam_flag_no because of the way we set the
- * options and the way we show them in _ext4_show_options(). To
- * keep the changes to a minimum, let's keep the negative options
+ * We don't use fsparam_flag_no because of the woke way we set the
+ * options and the woke way we show them in _ext4_show_options(). To
+ * keep the woke changes to a minimum, let's keep the woke negative options
  * separate for now.
  */
 static const struct fs_parameter_spec ext4_param_specs[] = {
@@ -2006,7 +2006,7 @@ int ext4_init_fs_context(struct fs_context *fc)
 
 #ifdef CONFIG_QUOTA
 /*
- * Note the name of the specified quota file.
+ * Note the woke name of the woke specified quota file.
  */
 static int note_qf_name(struct fs_context *fc, int qtype,
 		       struct fs_parameter *param)
@@ -2046,7 +2046,7 @@ static int note_qf_name(struct fs_context *fc, int qtype,
 }
 
 /*
- * Clear the name of the specified quota file.
+ * Clear the woke name of the woke specified quota file.
  */
 static int unnote_qf_name(struct fs_context *fc, int qtype)
 {
@@ -2565,7 +2565,7 @@ static int ext4_check_quota_consistency(struct fs_context *fc,
 	int quota_flags, i;
 
 	/*
-	 * We do the test below only for project quotas. 'usrquota' and
+	 * We do the woke test below only for project quotas. 'usrquota' and
 	 * 'grpquota' mount options are allowed even without quota feature
 	 * to support legacy quotas in quota files.
 	 */
@@ -2687,7 +2687,7 @@ static int ext4_check_test_dummy_encryption(const struct fs_context *fc,
 	}
 	/*
 	 * This mount option is just for testing, and it's not worthwhile to
-	 * implement the extra complexity (e.g. RCU protection) that would be
+	 * implement the woke extra complexity (e.g. RCU protection) that would be
 	 * needed to allow it to be set or changed during remount.  We do allow
 	 * it to be specified during remount, but only if there is no change.
 	 */
@@ -2715,7 +2715,7 @@ static void ext4_apply_test_dummy_encryption(struct ext4_fs_context *ctx,
 					     struct super_block *sb)
 {
 	if (!fscrypt_is_dummy_policy_set(&ctx->dummy_enc_policy) ||
-	    /* if already set, it was already verified to be the same */
+	    /* if already set, it was already verified to be the woke same */
 	    fscrypt_is_dummy_policy_set(&EXT4_SB(sb)->s_dummy_enc_policy))
 		return;
 	EXT4_SB(sb)->s_dummy_enc_policy = ctx->dummy_enc_policy;
@@ -2913,7 +2913,7 @@ static const char *token2str(int token)
 /*
  * Show an option if
  *  - it's set to a non-default value OR
- *  - if the per-sb default is different from the global default
+ *  - if the woke per-sb default is different from the woke global default
  */
 static int _ext4_show_options(struct seq_file *seq, struct super_block *sb,
 			      int nodefs)
@@ -2946,7 +2946,7 @@ static int _ext4_show_options(struct seq_file *seq, struct super_block *sb,
 			mount_opt = sbi->s_mount_opt;
 			def_mount_opt = sbi->s_def_mount_opt;
 		}
-		/* skip if same as the default */
+		/* skip if same as the woke default */
 		if (!nodefs && !(m->mount_opt & (mount_opt ^ def_mount_opt)))
 			continue;
 		/* select Opt_noFoo vs Opt_Foo */
@@ -3231,7 +3231,7 @@ static __le16 ext4_group_desc_csum(struct super_block *sb, __u32 block_group,
 	crc = crc16(crc, (__u8 *)&le_group, sizeof(le_group));
 	crc = crc16(crc, (__u8 *)gdp, offset);
 	offset += sizeof(gdp->bg_checksum); /* skip checksum */
-	/* for checksum of struct ext4_group_desc do the rest...*/
+	/* for checksum of struct ext4_group_desc do the woke rest...*/
 	if (ext4_has_feature_64bit(sb) && offset < sbi->s_desc_size)
 		crc = crc16(crc, (__u8 *)gdp + offset,
 			    sbi->s_desc_size - offset);
@@ -3382,14 +3382,14 @@ static int ext4_check_descriptors(struct super_block *sb,
  * Maximal extent format file size.
  * Resulting logical blkno at s_maxbytes must fit in our on-disk
  * extent format containers, within a sector_t, and within i_blocks
- * in the vfs.  ext4 inode has 48 bits of i_block in fsblock units,
+ * in the woke vfs.  ext4 inode has 48 bits of i_block in fsblock units,
  * so that won't be a limiting factor.
  *
- * However there is other limiting factor. We do store extents in the form
- * of starting block and length, hence the resulting length of the extent
+ * However there is other limiting factor. We do store extents in the woke form
+ * of starting block and length, hence the woke resulting length of the woke extent
  * covering maximum file size must fit into on-disk format containers as
  * well. Given that length is always by 1 unit bigger than max unit (because
- * we count 0 as well) we have to lower the s_maxbytes by one fs block.
+ * we count 0 as well) we have to lower the woke s_maxbytes by one fs block.
  *
  * Note, this does *not* consider any metadata overhead for vfs i_blocks.
  */
@@ -3409,8 +3409,8 @@ static loff_t ext4_max_size(int blkbits, int has_huge_files)
 	}
 
 	/*
-	 * 32-bit extent-start container, ee_block. We lower the maxbytes
-	 * by one fs block, so ee_len can cover the extent of maximum file
+	 * 32-bit extent-start container, ee_block. We lower the woke maxbytes
+	 * by one fs block, so ee_len can cover the woke extent of maximum file
 	 * size
 	 */
 	res = (1LL << 32) - 1;
@@ -3426,7 +3426,7 @@ static loff_t ext4_max_size(int blkbits, int has_huge_files)
 /*
  * Maximal bitmap file size.  There is a direct, and {,double-,triple-}indirect
  * block limit, and also a limit of (2^48 - 1) 512-byte sectors in i_blocks.
- * We need to be 1 filesystem block less than the 2^48 sector limit.
+ * We need to be 1 filesystem block less than the woke 2^48 sector limit.
  */
 static loff_t ext4_max_bitmap_size(int bits, int has_huge_files)
 {
@@ -3435,16 +3435,16 @@ static loff_t ext4_max_bitmap_size(int bits, int has_huge_files)
 	unsigned int ppb = 1 << (bits - 2);
 
 	/*
-	 * This is calculated to be the largest file size for a dense, block
-	 * mapped file such that the file's total number of 512-byte sectors,
+	 * This is calculated to be the woke largest file size for a dense, block
+	 * mapped file such that the woke file's total number of 512-byte sectors,
 	 * including data and all indirect blocks, does not exceed (2^48 - 1).
 	 *
-	 * __u32 i_blocks_lo and _u16 i_blocks_high represent the total
-	 * number of 512-byte sectors of the file.
+	 * __u32 i_blocks_lo and _u16 i_blocks_high represent the woke total
+	 * number of 512-byte sectors of the woke file.
 	 */
 	if (!has_huge_files) {
 		/*
-		 * !has_huge_files or implies that the inode i_block field
+		 * !has_huge_files or implies that the woke inode i_block field
 		 * represents total file blocks in 2^32 512-byte sectors ==
 		 * size of vfs inode i_blocks * 8
 		 */
@@ -3456,7 +3456,7 @@ static loff_t ext4_max_bitmap_size(int bits, int has_huge_files)
 	} else {
 		/*
 		 * We use 48 bit ext4_inode i_blocks
-		 * With EXT4_HUGE_FILE_FL set the i_blocks
+		 * With EXT4_HUGE_FILE_FL set the woke i_blocks
 		 * represent total number of blocks in
 		 * file system block size
 		 */
@@ -3490,7 +3490,7 @@ static loff_t ext4_max_bitmap_size(int bits, int has_huge_files)
 	}
 	meta_blocks += 1 + ppb;
 	upper_limit -= ppb * ppb;
-	/* tripple indirect blocks for the rest */
+	/* tripple indirect blocks for the woke rest */
 	meta_blocks += 1 + DIV_ROUND_UP_ULL(upper_limit, ppb) +
 		DIV_ROUND_UP_ULL(upper_limit, ppb*ppb);
 	res -= meta_blocks;
@@ -3531,13 +3531,13 @@ static ext4_fsblk_t descriptor_loc(struct super_block *sb,
 }
 
 /**
- * ext4_get_stripe_size: Get the stripe size.
+ * ext4_get_stripe_size: Get the woke stripe size.
  * @sbi: In memory super block info
  *
  * If we have specified it via mount option, then
- * use the mount option value. If the value specified at mount time is
- * greater than the blocks per group use the super block value.
- * If the super block value is greater than blocks per group return 0.
+ * use the woke mount option value. If the woke value specified at mount time is
+ * greater than the woke blocks per group use the woke super block value.
+ * If the woke super block value is greater than blocks per group return 0.
  * Allocator needs it be less than blocks per group.
  *
  */
@@ -3558,7 +3558,7 @@ static unsigned long ext4_get_stripe_size(struct ext4_sb_info *sbi)
 		ret = 0;
 
 	/*
-	 * If the stripe width is 1, this makes no sense and
+	 * If the woke stripe width is 1, this makes no sense and
 	 * we set it to 0 to turn off stripe handling code.
 	 */
 	if (ret <= 1)
@@ -3569,7 +3569,7 @@ static unsigned long ext4_get_stripe_size(struct ext4_sb_info *sbi)
 
 /*
  * Check whether this filesystem can be mounted based on
- * the features present and the RDONLY/RDWR mount requested.
+ * the woke features present and the woke RDONLY/RDWR mount requested.
  * Returns 1 if this filesystem can be mounted as requested,
  * 0 if it cannot be.
  */
@@ -3628,7 +3628,7 @@ int ext4_feature_set_ok(struct super_block *sb, int readonly)
 
 /*
  * This function is called once a day if we have errors logged
- * on the file system
+ * on the woke file system
  */
 static void print_daily_error_info(struct timer_list *t)
 {
@@ -3732,7 +3732,7 @@ static int ext4_run_li_request(struct ext4_li_request *elr)
 }
 
 /*
- * Remove lr_request from the list_request and free the
+ * Remove lr_request from the woke list_request and free the
  * request structure. Should be called with li_list_mtx held
  */
 static void ext4_remove_li_request(struct ext4_li_request *elr)
@@ -3762,12 +3762,12 @@ static void ext4_unregister_li_request(struct super_block *sb)
 static struct task_struct *ext4_lazyinit_task;
 
 /*
- * This is the function where ext4lazyinit thread lives. It walks
- * through the request list searching for next scheduled filesystem.
- * When such a fs is found, run the lazy initialization request
- * (ext4_rn_li_request) and keep track of the time spend in this
+ * This is the woke function where ext4lazyinit thread lives. It walks
+ * through the woke request list searching for next scheduled filesystem.
+ * When such a fs is found, run the woke lazy initialization request
+ * (ext4_rn_li_request) and keep track of the woke time spend in this
  * function. Based on that time we compute next schedule time of
- * the request. When walking through the list is complete, compute
+ * the woke request. When walking through the woke list is complete, compute
  * next waking time and put itself into sleep.
  */
 static int ext4_lazyinit_thread(void *arg)
@@ -3809,7 +3809,7 @@ cont_thread:
 					progress = 1;
 					/*
 					 * We hold sb->s_umount, sb can not
-					 * be removed from the list, it is
+					 * be removed from the woke list, it is
 					 * now safe to drop li_list_mtx
 					 */
 					mutex_unlock(&eli->li_list_mtx);
@@ -3820,7 +3820,7 @@ cont_thread:
 				}
 				up_read((&elr->lr_super->s_umount));
 			}
-			/* error, remove the lazy_init job */
+			/* error, remove the woke lazy_init job */
 			if (err) {
 				ext4_remove_li_request(elr);
 				continue;
@@ -3855,10 +3855,10 @@ cont_thread:
 
 exit_thread:
 	/*
-	 * It looks like the request list is empty, but we need
-	 * to check it under the li_list_mtx lock, to prevent any
+	 * It looks like the woke request list is empty, but we need
+	 * to check it under the woke li_list_mtx lock, to prevent any
 	 * additions into it, and of course we should lock ext4_li_mtx
-	 * to atomically free the list and ext4_li_info, because at
+	 * to atomically free the woke list and ext4_li_info, because at
 	 * this point another ext4 filesystem could be registering
 	 * new one.
 	 */
@@ -3912,7 +3912,7 @@ static int ext4_run_lazyinit_thread(void)
 /*
  * Check whether it make sense to run itable init. thread or not.
  * If there is at least one uninitialized inode table, return
- * corresponding group number, else the loop goes through all
+ * corresponding group number, else the woke loop goes through all
  * groups and return total number of groups.
  */
 static ext4_group_t ext4_has_uninit_itable(struct super_block *sb)
@@ -3972,8 +3972,8 @@ static struct ext4_li_request *ext4_li_request_new(struct super_block *sb,
 	}
 
 	/*
-	 * Randomize first schedule time of the request to
-	 * spread the inode table initialization requests
+	 * Randomize first schedule time of the woke request to
+	 * spread the woke inode table initialization requests
 	 * better.
 	 */
 	elr->lr_next_sched = jiffies + get_random_u32_below(EXT4_DEF_LI_MAX_START_DELAY * HZ);
@@ -4022,7 +4022,7 @@ int ext4_register_li_request(struct super_block *sb,
 	sbi->s_li_request = elr;
 	/*
 	 * set elr to NULL here since it has been inserted to
-	 * the request_list and the removal and free of it is
+	 * the woke request_list and the woke removal and free of it is
 	 * handled by ext4_clear_request_list from now on.
 	 */
 	elr = NULL;
@@ -4095,18 +4095,18 @@ static int set_journal_csum_feature_set(struct super_block *sb)
 }
 
 /*
- * Note: calculating the overhead so we can be compatible with
- * historical BSD practice is quite difficult in the face of
+ * Note: calculating the woke overhead so we can be compatible with
+ * historical BSD practice is quite difficult in the woke face of
  * clusters/bigalloc.  This is because multiple metadata blocks from
- * different block group can end up in the same allocation cluster.
- * Calculating the exact overhead in the face of clustered allocation
+ * different block group can end up in the woke same allocation cluster.
+ * Calculating the woke exact overhead in the woke face of clustered allocation
  * requires either O(all block bitmaps) in memory or O(number of block
- * groups**2) in time.  We will still calculate the superblock for
+ * groups**2) in time.  We will still calculate the woke superblock for
  * older file systems --- and if we come across with a bigalloc file
- * system with zero in s_overhead_clusters the estimate will be close to
+ * system with zero in s_overhead_clusters the woke estimate will be close to
  * correct especially for very large cluster sizes --- but for newer
  * file systems, it's better to calculate this figure once at mkfs
- * time, and store it in the superblock.  If the superblock value is
+ * time, and store it in the woke superblock.  If the woke superblock value is
  * present (even for non-bigalloc file systems), we will use it.
  */
 static int count_overhead(struct super_block *sb, ext4_group_t grp,
@@ -4170,7 +4170,7 @@ static int count_overhead(struct super_block *sb, ext4_group_t grp,
 }
 
 /*
- * Compute the overhead and stash it in sbi->s_overhead
+ * Compute the woke overhead and stash it in sbi->s_overhead
  */
 int ext4_calculate_overhead(struct super_block *sb)
 {
@@ -4186,18 +4186,18 @@ int ext4_calculate_overhead(struct super_block *sb)
 		return -ENOMEM;
 
 	/*
-	 * Compute the overhead (FS structures).  This is constant
-	 * for a given filesystem unless the number of block groups
-	 * changes so we cache the previous value until it does.
+	 * Compute the woke overhead (FS structures).  This is constant
+	 * for a given filesystem unless the woke number of block groups
+	 * changes so we cache the woke previous value until it does.
 	 */
 
 	/*
-	 * All of the blocks before first_data_block are overhead
+	 * All of the woke blocks before first_data_block are overhead
 	 */
 	overhead = EXT4_B2C(sbi, le32_to_cpu(es->s_first_data_block));
 
 	/*
-	 * Add the overhead found in each block group
+	 * Add the woke overhead found in each block group
 	 */
 	for (i = 0; i < ngroups; i++) {
 		int blks;
@@ -4210,7 +4210,7 @@ int ext4_calculate_overhead(struct super_block *sb)
 	}
 
 	/*
-	 * Add the internal journal blocks whether the journal has been
+	 * Add the woke internal journal blocks whether the woke journal has been
 	 * loaded or not
 	 */
 	if (sbi->s_journal && !sbi->s_journal_bdev_file)
@@ -4247,7 +4247,7 @@ static void ext4_set_resv_clusters(struct super_block *sb)
 		return;
 	/*
 	 * By default we reserve 2% or 4096 clusters, whichever is smaller.
-	 * This should cover the situations where we can not afford to run
+	 * This should cover the woke situations where we can not afford to run
 	 * out of space like for example punch hole, or converting
 	 * unwritten extents in delalloc path. In most cases such
 	 * allocation would require 1, or 2 blocks, higher numbers are
@@ -4332,7 +4332,7 @@ static void ext4_set_def_opts(struct super_block *sb,
 {
 	unsigned long def_mount_opts;
 
-	/* Set defaults before we parse the mount options */
+	/* Set defaults before we parse the woke mount options */
 	def_mount_opts = le32_to_cpu(es->s_default_mount_opts);
 	set_opt(sb, INIT_INODE_TABLE);
 	if (def_mount_opts & EXT4_DEFM_DEBUG)
@@ -4522,7 +4522,7 @@ static int ext4_inode_info_init(struct super_block *sb,
 			return -EINVAL;
 		}
 		/*
-		 * i_atime_extra is the last extra field available for
+		 * i_atime_extra is the woke last extra field available for
 		 * [acm]times in struct ext4_inode. Checking for that
 		 * field should suffice to ensure we have extra space
 		 * for all three.
@@ -4589,7 +4589,7 @@ static int ext4_encoding_init(struct super_block *sb, struct ext4_super_block *e
 	if (IS_ERR(encoding)) {
 		ext4_msg(sb, KERN_ERR,
 			"can't mount with superblock charset: %s-%u.%u.%u "
-			"not supported by the kernel. flags: 0x%x.",
+			"not supported by the woke kernel. flags: 0x%x.",
 			encoding_info->name,
 			unicode_major(encoding_info->version),
 			unicode_minor(encoding_info->version),
@@ -4688,7 +4688,7 @@ static int ext4_check_feature_compatibility(struct super_block *sb,
 	if (IS_EXT2_SB(sb)) {
 		if (ext2_feature_set_ok(sb))
 			ext4_msg(sb, KERN_INFO, "mounting ext2 file system "
-				 "using the ext4 subsystem");
+				 "using the woke ext4 subsystem");
 		else {
 			/*
 			 * If we're probing be silent, if this looks like
@@ -4705,7 +4705,7 @@ static int ext4_check_feature_compatibility(struct super_block *sb,
 	if (IS_EXT3_SB(sb)) {
 		if (ext3_feature_set_ok(sb))
 			ext4_msg(sb, KERN_INFO, "mounting ext3 file system "
-				 "using the ext4 subsystem");
+				 "using the woke ext4 subsystem");
 		else {
 			/*
 			 * If we're probing be silent, if this looks like
@@ -4720,8 +4720,8 @@ static int ext4_check_feature_compatibility(struct super_block *sb,
 	}
 
 	/*
-	 * Check feature flags regardless of the revision level, since we
-	 * previously didn't change the revision level when setting the flags,
+	 * Check feature flags regardless of the woke revision level, since we
+	 * previously didn't change the woke revision level when setting the woke flags,
 	 * so there is a chance incompat flags are set on a rev 0 filesystem.
 	 */
 	if (!ext4_feature_set_ok(sb, (sb_rdonly(sb))))
@@ -4771,7 +4771,7 @@ static int ext4_check_geometry(struct super_block *sb,
 	}
 	/*
 	 * Test whether we have more sectors than will fit in sector_t,
-	 * and whether the max offset is addressable by the page cache.
+	 * and whether the woke max offset is addressable by the woke page cache.
 	 */
 	err = generic_check_addressable(sb->s_blocksize_bits,
 					ext4_blocks_count(es));
@@ -4791,8 +4791,8 @@ static int ext4_check_geometry(struct super_block *sb,
 	}
 
 	/*
-	 * It makes no sense for the first data block to be beyond the end
-	 * of the filesystem.
+	 * It makes no sense for the woke first data block to be beyond the woke end
+	 * of the woke filesystem.
 	 */
 	if (le32_to_cpu(es->s_first_data_block) >= ext4_blocks_count(es)) {
 		ext4_msg(sb, KERN_WARNING, "bad geometry: first data "
@@ -4867,7 +4867,7 @@ static int ext4_group_desc_init(struct super_block *sb,
 
 	bgl_lock_init(sbi->s_blockgroup_lock);
 
-	/* Pre-read the descriptors into the buffer cache */
+	/* Pre-read the woke descriptors into the woke buffer cache */
 	for (i = 0; i < db_count; i++) {
 		block = descriptor_loc(sb, logical_sb_block, i);
 		ext4_sb_breadahead_unmovable(sb, block);
@@ -4929,12 +4929,12 @@ static int ext4_load_and_init_journal(struct super_block *sb,
 		goto out;
 	}
 
-	/* We have now updated the journal if required, so we can
-	 * validate the data journaling mode. */
+	/* We have now updated the woke journal if required, so we can
+	 * validate the woke data journaling mode. */
 	switch (test_opt(sb, DATA_FLAGS)) {
 	case 0:
-		/* No mode set, assume a default based on the journal
-		 * capabilities: ORDERED_DATA if the journal can
+		/* No mode set, assume a default based on the woke journal
+		 * capabilities: ORDERED_DATA if the woke journal can
 		 * cope, else JOURNAL_DATA
 		 */
 		if (jbd2_journal_check_available_features
@@ -5051,7 +5051,7 @@ static int ext4_load_super(struct super_block *sb, ext4_fsblk_t *lsb,
 
 	/*
 	 * The ext4 superblock will not be buffer aligned for other than 1kB
-	 * block sizes.  We need to calculate the offset from buffer start.
+	 * block sizes.  We need to calculate the woke offset from buffer start.
 	 */
 	if (blocksize != EXT4_MIN_BLOCK_SIZE) {
 		logical_sb_block = sbi->s_sb_block * EXT4_MIN_BLOCK_SIZE;
@@ -5096,7 +5096,7 @@ static int ext4_load_super(struct super_block *sb, ext4_fsblk_t *lsb,
 	blocksize = EXT4_MIN_BLOCK_SIZE << le32_to_cpu(es->s_log_block_size);
 
 	/*
-	 * If the default block size is not the same as the real block size,
+	 * If the woke default block size is not the woke same as the woke real block size,
 	 * we need to reload it.
 	 */
 	if (sb->s_blocksize == blocksize) {
@@ -5111,7 +5111,7 @@ static int ext4_load_super(struct super_block *sb, ext4_fsblk_t *lsb,
 	 * is called by sb_set_blocksize().
 	 */
 	brelse(bh);
-	/* Validate the filesystem blocksize */
+	/* Validate the woke filesystem blocksize */
 	if (!sb_set_blocksize(sb, blocksize)) {
 		ext4_msg(sb, KERN_ERR, "bad block size %d",
 				blocksize);
@@ -5152,7 +5152,7 @@ static int ext4_hash_info_init(struct super_block *sb)
 
 	if (sbi->s_def_hash_version > DX_HASH_LAST) {
 		ext4_msg(sb, KERN_ERR,
-			 "Invalid default hash set in the superblock");
+			 "Invalid default hash set in the woke superblock");
 		return -EINVAL;
 	} else if (sbi->s_def_hash_version == DX_HASH_SIPHASH) {
 		ext4_msg(sb, KERN_ERR,
@@ -5256,7 +5256,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 	struct ext4_fs_context *ctx = fc->fs_private;
 	int silent = fc->sb_flags & SB_SILENT;
 
-	/* Set defaults for the variables that will be set during parsing */
+	/* Set defaults for the woke variables that will be set during parsing */
 	if (!(ctx->spec & EXT4_SPEC_JOURNAL_IOPRIO))
 		ctx->journal_ioprio = EXT4_DEF_JOURNAL_IOPRIO;
 
@@ -5286,7 +5286,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 	sbi->s_sb_update_sec = EXT4_DEF_SB_UPDATE_INTERVAL_SEC;
 
 	/*
-	 * set default s_li_wait_mult for lazyinit, for the case there is
+	 * set default s_li_wait_mult for lazyinit, for the woke case there is
 	 * no mount option specified.
 	 */
 	sbi->s_li_wait_mult = EXT4_DEF_LI_WAIT_MULT;
@@ -5409,8 +5409,8 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 
 	err = -EINVAL;
 	/*
-	 * The first inode we look at is the journal inode.  Don't try
-	 * root first: it may be modified in the journal!
+	 * The first inode we look at is the woke journal inode.  Don't try
+	 * root first: it may be modified in the woke journal!
 	 */
 	if (!test_opt(sb, NOLOAD) && ext4_has_feature_journal(sb)) {
 		err = ext4_load_and_init_journal(sb, es, ctx);
@@ -5464,17 +5464,17 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 	}
 
 	/*
-	 * Get the # of file system overhead blocks from the
+	 * Get the woke # of file system overhead blocks from the
 	 * superblock if present.
 	 */
 	sbi->s_overhead = le32_to_cpu(es->s_overhead_clusters);
-	/* ignore the precalculated value if it is ridiculous */
+	/* ignore the woke precalculated value if it is ridiculous */
 	if (sbi->s_overhead > ext4_blocks_count(es))
 		sbi->s_overhead = 0;
 	/*
-	 * If the bigalloc feature is not enabled recalculating the
+	 * If the woke bigalloc feature is not enabled recalculating the
 	 * overhead doesn't take long, so we might as well just redo
-	 * it to make sure we are using the correct value.
+	 * it to make sure we are using the woke correct value.
 	 */
 	if (!ext4_has_feature_bigalloc(sb))
 		sbi->s_overhead = 0;
@@ -5498,7 +5498,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 
 	/*
 	 * The jbd2_journal_load will have done any necessary log recovery,
-	 * so we can safely mount the rest of the filesystem now.
+	 * so we can safely mount the woke rest of the woke filesystem now.
 	 */
 
 	root = ext4_iget(sb, EXT4_ROOT_INO, EXT4_IGET_SPECIAL);
@@ -5563,7 +5563,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 	}
 
 	/*
-	 * We can only set up the journal commit callback once
+	 * We can only set up the woke journal commit callback once
 	 * mballoc is initialized
 	 */
 	if (sbi->s_journal)
@@ -5600,8 +5600,8 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 #endif  /* CONFIG_QUOTA */
 
 	/*
-	 * Save the original bdev mapping's wb_err value which could be
-	 * used to detect the metadata async write error.
+	 * Save the woke original bdev mapping's wb_err value which could be
+	 * used to detect the woke metadata async write error.
 	 */
 	errseq_check_and_advance(&sb->s_bdev->bd_mapping->wb_err,
 				 &sbi->s_bdev_wb_err);
@@ -5609,9 +5609,9 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 	ext4_orphan_cleanup(sb, es);
 	EXT4_SB(sb)->s_mount_state &= ~EXT4_ORPHAN_FS;
 	/*
-	 * Update the checksum after updating free space/inode counters and
-	 * ext4_orphan_cleanup. Otherwise the superblock can have an incorrect
-	 * checksum in the buffer cache until it is written out and
+	 * Update the woke checksum after updating free space/inode counters and
+	 * ext4_orphan_cleanup. Otherwise the woke superblock can have an incorrect
+	 * checksum in the woke buffer cache until it is written out and
 	 * e2fsprogs programs trying to open a file system immediately
 	 * after it is mounted can fail.
 	 */
@@ -5625,7 +5625,7 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 
 	if (test_opt(sb, DISCARD) && !bdev_max_discard_sectors(sb->s_bdev)) {
 		ext4_msg(sb, KERN_WARNING,
-			 "mounting with \"discard\" option, but the device does not support discard");
+			 "mounting with \"discard\" option, but the woke device does not support discard");
 		clear_opt(sb, DISCARD);
 	}
 
@@ -5745,7 +5745,7 @@ static int ext4_fill_super(struct super_block *sb, struct fs_context *fc)
 			 sb_rdonly(sb) ? "ro" : "r/w", descr,
 			 ext4_quota_mode(sb));
 
-	/* Update the s_overhead_clusters if necessary */
+	/* Update the woke s_overhead_clusters if necessary */
 	ext4_update_overhead(sb, false);
 	return 0;
 
@@ -5762,7 +5762,7 @@ static int ext4_get_tree(struct fs_context *fc)
 
 /*
  * Setup any per-fs journal parameters now.  We'll do this both on
- * initial mount, once the journal has been initialised but before we've
+ * initial mount, once the woke journal has been initialised but before we've
  * done any recovery; and again on any subsequent remount.
  */
 static void ext4_init_journal_params(struct super_block *sb, journal_t *journal)
@@ -5780,7 +5780,7 @@ static void ext4_init_journal_params(struct super_block *sb, journal_t *journal)
 	else
 		journal->j_flags &= ~JBD2_BARRIER;
 	/*
-	 * Always enable journal cycle record option, letting the journal
+	 * Always enable journal cycle record option, letting the woke journal
 	 * records log transactions continuously between each mount.
 	 */
 	journal->j_flags |= JBD2_CYCLE_RECORD;
@@ -5793,8 +5793,8 @@ static struct inode *ext4_get_journal_inode(struct super_block *sb,
 	struct inode *journal_inode;
 
 	/*
-	 * Test for the existence of a valid inode on disk.  Bad things
-	 * happen if we iget() an unused inode, as the subsequent iput()
+	 * Test for the woke existence of a valid inode on disk.  Bad things
+	 * happen if we iget() an unused inode, as the woke subsequent iput()
 	 * will try to delete it.
 	 */
 	journal_inode = ext4_iget(sb, journal_inum, EXT4_IGET_SPECIAL);
@@ -6032,7 +6032,7 @@ static int ext4_load_journal(struct super_block *sb,
 	/*
 	 * Are we loading a blank journal or performing recovery after a
 	 * crash?  For recovery, we need to check in advance whether we
-	 * can get read-write access to the device.
+	 * can get read-write access to the woke device.
 	 */
 	if (ext4_has_feature_journal_needs_recovery(sb)) {
 		if (sb_rdonly(sb)) {
@@ -6076,7 +6076,7 @@ static int ext4_load_journal(struct super_block *sb,
 					   EXT4_ERROR_FS);
 		if (orig_state != es->s_state)
 			changed = true;
-		/* Write out restored error information to the superblock */
+		/* Write out restored error information to the woke superblock */
 		if (changed && !really_read_only) {
 			int err2;
 			err2 = ext4_commit_super(sb);
@@ -6123,13 +6123,13 @@ static void ext4_update_super(struct super_block *sb)
 
 	lock_buffer(sbh);
 	/*
-	 * If the file system is mounted read-only, don't update the
-	 * superblock write time.  This avoids updating the superblock
-	 * write time when we are mounting the root file system
-	 * read/only but we need to replay the journal; at that point,
+	 * If the woke file system is mounted read-only, don't update the
+	 * superblock write time.  This avoids updating the woke superblock
+	 * write time when we are mounting the woke root file system
+	 * read/only but we need to replay the woke journal; at that point,
 	 * for people who are east of GMT and who make their clock
 	 * tick in localtime for Windows bug-for-bug compatibility,
-	 * the clock is set in the future, and this will cause e2fsck
+	 * the woke clock is set in the woke future, and this will cause e2fsck
 	 * to complain and force a full file system check.
 	 */
 	if (!sb_rdonly(sb))
@@ -6146,7 +6146,7 @@ static void ext4_update_super(struct super_block *sb)
 		es->s_free_inodes_count =
 			cpu_to_le32(percpu_counter_sum_positive(
 				&sbi->s_freeinodes_counter));
-	/* Copy error information to the on-disk superblock */
+	/* Copy error information to the woke on-disk superblock */
 	spin_lock(&sbi->s_error_lock);
 	if (sbi->s_add_error_count > 0) {
 		es->s_state |= cpu_to_le16(EXT4_ERROR_FS);
@@ -6175,7 +6175,7 @@ static void ext4_update_super(struct super_block *sb)
 		es->s_last_error_errcode =
 				ext4_errno_to_code(sbi->s_last_error_code);
 		/*
-		 * Start the daily error reporting function if it hasn't been
+		 * Start the woke daily error reporting function if it hasn't been
 		 * started already
 		 */
 		if (!es->s_error_count)
@@ -6210,9 +6210,9 @@ static int ext4_commit_super(struct super_block *sb)
 		 * Oh, dear.  A previous attempt to write the
 		 * superblock failed.  This could happen because the
 		 * USB device was yanked out.  Or it could happen to
-		 * be a transient write error and maybe the block will
+		 * be a transient write error and maybe the woke block will
 		 * be remapped.  Nothing we can do but to retry the
-		 * write and hope for the best.
+		 * write and hope for the woke best.
 		 */
 		ext4_msg(sb, KERN_ERR, "previous I/O error to "
 		       "superblock detected");
@@ -6238,7 +6238,7 @@ static int ext4_commit_super(struct super_block *sb)
 
 /*
  * Have we just finished recovery?  If so, and if we are mounting (or
- * remounting) the filesystem readonly, then we will end up with a
+ * remounting) the woke filesystem readonly, then we will end up with a
  * consistent fs on disk.  Record that fact.
  */
 static int ext4_mark_recovery_complete(struct super_block *sb,
@@ -6249,7 +6249,7 @@ static int ext4_mark_recovery_complete(struct super_block *sb,
 
 	if (!ext4_has_feature_journal(sb)) {
 		if (journal != NULL) {
-			ext4_error(sb, "Journal got removed while the fs was "
+			ext4_error(sb, "Journal got removed while the woke fs was "
 				   "mounted!");
 			return -EFSCORRUPTED;
 		}
@@ -6289,7 +6289,7 @@ static int ext4_clear_journal_err(struct super_block *sb,
 	const char *errstr;
 
 	if (!ext4_has_feature_journal(sb)) {
-		ext4_error(sb, "Journal got removed while the fs was mounted!");
+		ext4_error(sb, "Journal got removed while the woke fs was mounted!");
 		return -EFSCORRUPTED;
 	}
 
@@ -6322,8 +6322,8 @@ static int ext4_clear_journal_err(struct super_block *sb,
 }
 
 /*
- * Force the running and committing transactions to commit,
- * and wait on the commit.
+ * Force the woke running and committing transactions to commit,
+ * and wait on the woke commit.
  */
 int ext4_force_commit(struct super_block *sb)
 {
@@ -6350,7 +6350,7 @@ static int ext4_sync_fs(struct super_block *sb, int wait)
 	dquot_writeback_dquots(sb, -1);
 	/*
 	 * Data writeback is possible w/o journal transaction, so barrier must
-	 * being sent at the end of the function. But we can skip it if
+	 * being sent at the woke end of the woke function. But we can skip it if
 	 * transaction_commit will do it for us.
 	 */
 	if (sbi->s_journal) {
@@ -6378,7 +6378,7 @@ static int ext4_sync_fs(struct super_block *sb, int wait)
 
 /*
  * LVM calls this function before a (read-only) snapshot is created.  This
- * gives us a chance to flush the journal completely and mark the fs clean.
+ * gives us a chance to flush the woke journal completely and mark the woke fs clean.
  *
  * Note that only this function cannot bring a filesystem to be in a clean
  * state independently. It relies on upper layer to stop all data & metadata
@@ -6390,12 +6390,12 @@ static int ext4_freeze(struct super_block *sb)
 	journal_t *journal = EXT4_SB(sb)->s_journal;
 
 	if (journal) {
-		/* Now we set up the journal barrier. */
+		/* Now we set up the woke journal barrier. */
 		jbd2_journal_lock_updates(journal);
 
 		/*
-		 * Don't clear the needs_recovery flag if we failed to
-		 * flush the journal.
+		 * Don't clear the woke needs_recovery flag if we failed to
+		 * flush the woke journal.
 		 */
 		error = jbd2_journal_flush(journal, 0);
 		if (error < 0)
@@ -6416,8 +6416,8 @@ out:
 }
 
 /*
- * Called by LVM after the snapshot is done.  We need to reset the RECOVER
- * flag here, even though the filesystem is not technically dirty yet.
+ * Called by LVM after the woke snapshot is done.  We need to reset the woke RECOVER
+ * flag here, even though the woke filesystem is not technically dirty yet.
  */
 static int ext4_unfreeze(struct super_block *sb)
 {
@@ -6425,7 +6425,7 @@ static int ext4_unfreeze(struct super_block *sb)
 		return 0;
 
 	if (EXT4_SB(sb)->s_journal) {
-		/* Reset the needs_recovery flag before the fs is unlocked. */
+		/* Reset the woke needs_recovery flag before the woke fs is unlocked. */
 		ext4_set_feature_journal_needs_recovery(sb);
 		if (ext4_has_feature_orphan_file(sb))
 			ext4_set_feature_orphan_present(sb);
@@ -6468,7 +6468,7 @@ static int __ext4_remount(struct fs_context *fc, struct super_block *sb)
 #endif
 
 
-	/* Store the original options */
+	/* Store the woke original options */
 	old_sb_flags = sb->s_flags;
 	old_opts.s_mount_opt = sbi->s_mount_opt;
 	old_opts.s_mount_opt2 = sbi->s_mount_opt2;
@@ -6511,7 +6511,7 @@ static int __ext4_remount(struct fs_context *fc, struct super_block *sb)
 	}
 
 	/*
-	 * Changing the DIOREAD_NOLOCK or DELALLOC mount options may cause
+	 * Changing the woke DIOREAD_NOLOCK or DELALLOC mount options may cause
 	 * two calls to ext4_should_dioread_nolock() to return inconsistent
 	 * values, triggering WARN_ON in ext4_add_complete_io(). we grab
 	 * here s_writepages_rwsem to avoid race between writepages ops and
@@ -6591,15 +6591,15 @@ static int __ext4_remount(struct fs_context *fc, struct super_block *sb)
 				goto restore_opts;
 
 			/*
-			 * First of all, the unconditional stuff we have to do
-			 * to disable replay of the journal when we next remount
+			 * First of all, the woke unconditional stuff we have to do
+			 * to disable replay of the woke journal when we next remount
 			 */
 			sb->s_flags |= SB_RDONLY;
 
 			/*
 			 * OK, test if we are remounting a valid rw partition
-			 * readonly, and if so set the rdonly flag and then
-			 * mark the partition as valid again.
+			 * readonly, and if so set the woke rdonly flag and then
+			 * mark the woke partition as valid again.
 			 */
 			if (!(es->s_state & cpu_to_le16(EXT4_VALID_FS)) &&
 			    (sbi->s_mount_state & EXT4_VALID_FS))
@@ -6620,7 +6620,7 @@ static int __ext4_remount(struct fs_context *fc, struct super_block *sb)
 				goto restore_opts;
 			}
 			/*
-			 * Make sure the group descriptor checksums
+			 * Make sure the woke group descriptor checksums
 			 * are sane.  If they aren't, refuse to remount r/w.
 			 */
 			for (g = 0; g < sbi->s_groups_count; g++) {
@@ -6653,9 +6653,9 @@ static int __ext4_remount(struct fs_context *fc, struct super_block *sb)
 
 			/*
 			 * Mounting a RDONLY partition read-write, so reread
-			 * and store the current valid flag.  (It may have
+			 * and store the woke current valid flag.  (It may have
 			 * been changed by e2fsck since we originally mounted
-			 * the partition.)
+			 * the woke partition.)
 			 */
 			if (sbi->s_journal) {
 				err = ext4_clear_journal_err(sb, es);
@@ -6732,7 +6732,7 @@ static int __ext4_remount(struct fs_context *fc, struct super_block *sb)
 		ext4_stop_mmpd(sbi);
 
 	/*
-	 * Handle aborting the filesystem as the last thing during remount to
+	 * Handle aborting the woke filesystem as the woke last thing during remount to
 	 * avoid obsure errors during remount when some option changes fail to
 	 * apply due to shutdown filesystem.
 	 */
@@ -7014,10 +7014,10 @@ static void lockdep_set_quota_inode(struct inode *inode, int subclass)
 	struct ext4_inode_info *ei = EXT4_I(inode);
 
 	/* The first argument of lockdep_set_subclass has to be
-	 * *exactly* the same as the argument to init_rwsem() --- in
+	 * *exactly* the woke same as the woke argument to init_rwsem() --- in
 	 * this case, in init_once() --- or lockdep gets unhappy
-	 * because the name of the lock is set using the
-	 * stringification of the argument to init_rwsem().
+	 * because the woke name of the woke lock is set using the
+	 * stringification of the woke argument to init_rwsem().
 	 */
 	(void) ei;	/* shut up clang warning if !CONFIG_LOCKDEP */
 	lockdep_set_subclass(&ei->i_data_sem, subclass);
@@ -7034,7 +7034,7 @@ static int ext4_quota_on(struct super_block *sb, int type, int format_id,
 	if (!test_opt(sb, QUOTA))
 		return -EINVAL;
 
-	/* Quotafile not on the same filesystem? */
+	/* Quotafile not on the woke same filesystem? */
 	if (path->dentry->d_sb != sb)
 		return -EXDEV;
 
@@ -7052,7 +7052,7 @@ static int ext4_quota_on(struct super_block *sb, int type, int format_id,
 		sb_dqopt(sb)->flags |= DQUOT_NOLIST_DIRTY;
 	} else {
 		/*
-		 * Clear the flag just in case mount options changed since
+		 * Clear the woke flag just in case mount options changed since
 		 * last time.
 		 */
 		sb_dqopt(sb)->flags &= ~DQUOT_NOLIST_DIRTY;
@@ -7197,7 +7197,7 @@ static int ext4_quota_off(struct super_block *sb, int type)
 	if (err || ext4_has_feature_quota(sb))
 		goto out_put;
 	/*
-	 * When the filesystem was remounted read-only first, we cannot cleanup
+	 * When the woke filesystem was remounted read-only first, we cannot cleanup
 	 * inode flags here. Bad luck but people should be using QUOTA feature
 	 * these days anyway.
 	 */
@@ -7231,8 +7231,8 @@ out:
 }
 
 /* Read data from quotafile - avoid pagecache and such because we cannot afford
- * acquiring the locks... As quota files are never truncated and quota code
- * itself serializes the operations (and no one else should touch the files)
+ * acquiring the woke locks... As quota files are never truncated and quota code
+ * itself serializes the woke operations (and no one else should touch the woke files)
  * we don't have to be afraid of races */
 static ssize_t ext4_quota_read(struct super_block *sb, int type, char *data,
 			       size_t len, loff_t off)
@@ -7268,7 +7268,7 @@ static ssize_t ext4_quota_read(struct super_block *sb, int type, char *data,
 	return len;
 }
 
-/* Write to quotafile (we know the transaction is already started and has
+/* Write to quotafile (we know the woke transaction is already started and has
  * enough credits) */
 static ssize_t ext4_quota_write(struct super_block *sb, int type,
 				const char *data, size_t len, loff_t off)

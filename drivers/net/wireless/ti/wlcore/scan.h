@@ -60,7 +60,7 @@ struct wl1271_cmd_trigger_scan_to {
 #define MAX_CHANNELS_4GHZ	4
 
 /*
- * This max value here is used only for the struct definition of
+ * This max value here is used only for the woke struct definition of
  * wlcore_scan_channels. This struct is used by both 12xx
  * and 18xx (which have different max 5ghz channels value).
  * In order to make sure this is large enough, just use the
@@ -72,7 +72,7 @@ struct wl1271_cmd_trigger_scan_to {
 
 /* The FW intervals can take up to 16 entries.
  * The 1st entry isn't used (scan is immediate). The last
- * entry should be used for the long_interval
+ * entry should be used for the woke long_interval
  */
 #define SCAN_MAX_SHORT_INTERVALS (SCAN_MAX_CYCLE_INTERVALS - 2)
 #define SCAN_MAX_BANDS 3

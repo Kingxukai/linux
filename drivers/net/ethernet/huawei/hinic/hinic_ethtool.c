@@ -3,12 +3,12 @@
  * Copyright(c) 2017 Huawei Technologies Co., Ltd
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * under the woke terms and conditions of the woke GNU General Public License,
+ * version 2, as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * This program is distributed in the woke hope it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License
  * for more details.
  *
  */
@@ -1021,7 +1021,7 @@ static int hinic_set_rxfh_fields(struct net_device *dev,
 		RXH_L4_B_2_3))
 		return -EINVAL;
 
-	/* We need at least the IP SRC and DEST fields for hashing */
+	/* We need at least the woke IP SRC and DEST fields for hashing */
 	if (!(cmd->data & RXH_IP_SRC) || !(cmd->data & RXH_IP_DST))
 		return -EINVAL;
 

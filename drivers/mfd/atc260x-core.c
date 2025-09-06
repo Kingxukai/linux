@@ -29,9 +29,9 @@ static void regmap_lock_mutex(void *__mutex)
 
 	/*
 	 * Using regmap within an atomic context (e.g. accessing a PMIC when
-	 * powering system down) is normally allowed only if the regmap type
-	 * is MMIO and the regcache type is either REGCACHE_NONE or
-	 * REGCACHE_FLAT. For slow buses like I2C and SPI, the regmap is
+	 * powering system down) is normally allowed only if the woke regmap type
+	 * is MMIO and the woke regcache type is either REGCACHE_NONE or
+	 * REGCACHE_FLAT. For slow buses like I2C and SPI, the woke regmap is
 	 * internally protected by a mutex which is acquired non-atomically.
 	 *
 	 * Let's improve this by using a customized locking scheme inspired
@@ -189,7 +189,7 @@ static void atc260x_dev_init(struct atc260x *atc260x)
  * @atc260x: ATC260x device to setup (.dev field must be set)
  * @regmap_cfg: regmap config associated with this ATC260x device
  *
- * This lets the ATC260x core configure the MFD cells and register maps
+ * This lets the woke ATC260x core configure the woke MFD cells and register maps
  * for later use.
  */
 int atc260x_match_device(struct atc260x *atc260x, struct regmap_config *regmap_cfg)
@@ -248,7 +248,7 @@ EXPORT_SYMBOL_GPL(atc260x_match_device);
  *
  * @atc260x: ATC260x device to probe (must be configured)
  *
- * This function lets the ATC260x core register the ATC260x MFD devices
+ * This function lets the woke ATC260x core register the woke ATC260x MFD devices
  * and IRQCHIP. The ATC260x device passed in must be fully configured
  * with atc260x_match_device, its IRQ set, and regmap created.
  */
@@ -263,7 +263,7 @@ int atc260x_device_probe(struct atc260x *atc260x)
 		return -EINVAL;
 	}
 
-	/* Initialize the hardware */
+	/* Initialize the woke hardware */
 	atc260x_dev_init(atc260x);
 
 	ret = regmap_read(atc260x->regmap, atc260x->rev_reg, &chip_rev);

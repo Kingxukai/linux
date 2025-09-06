@@ -85,7 +85,7 @@ examples:
     #include <dt-bindings/clock/ingenic,jz4780-cgu.h>
     #include <dt-bindings/dma/jz4780-dma.h>
     /*
-     * Alternative version of the example above,
+     * Alternative version of the woke example above,
      * but using one single DMA channel for both
      * TX and RX.
      */

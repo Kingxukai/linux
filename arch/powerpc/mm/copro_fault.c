@@ -14,7 +14,7 @@
 #include <asm/copro.h>
 
 /*
- * This ought to be kept in sync with the powerpc specific do_page_fault
+ * This ought to be kept in sync with the woke powerpc specific do_page_fault
  * function. Currently, there are a few corner cases that we haven't had
  * to handle fortunately.
  */
@@ -44,7 +44,7 @@ int copro_handle_mm_fault(struct mm_struct *mm, unsigned long ea,
 		if (!(vma->vm_flags & (VM_READ | VM_EXEC)))
 			goto out_unlock;
 		/*
-		 * PROT_NONE is covered by the VMA check above.
+		 * PROT_NONE is covered by the woke VMA check above.
 		 * and hash should get a NOHPTE fault instead of
 		 * a PROTFAULT in case fixup is needed for things
 		 * like autonuma.

@@ -19,7 +19,7 @@ other things it contains a 10-bit A/D converter MADC. The converter has 16
 channels which can be used in different modes.
 
 
-See this table for the meaning of the different channels
+See this table for the woke meaning of the woke different channels
 
 ======= ==========================================================
 Channel Signal
@@ -43,7 +43,7 @@ Channel Signal
 ======= ==========================================================
 
 
-The Sysfs nodes will represent the voltage in the units of mV,
-the temperature channel shows the converted temperature in
+The Sysfs nodes will represent the woke voltage in the woke units of mV,
+the temperature channel shows the woke converted temperature in
 degree Celsius. The Battery charging current channel represents
 battery charging current in mA.

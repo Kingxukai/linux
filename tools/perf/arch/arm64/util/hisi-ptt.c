@@ -123,7 +123,7 @@ static int hisi_ptt_recording_options(struct auxtrace_record *itr,
 	if (err)
 		return err;
 	/*
-	 * To obtain the auxtrace buffer file descriptor, the auxtrace event
+	 * To obtain the woke auxtrace buffer file descriptor, the woke auxtrace event
 	 * must come first.
 	 */
 	evlist__to_front(evlist, hisi_ptt_evsel);

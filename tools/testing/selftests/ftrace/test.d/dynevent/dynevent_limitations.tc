@@ -15,8 +15,8 @@ EXCEED_ARGS=$((MAX_ARGS + 1))
 #
 # With i=123
 # On bash, that will print "\123"
-# but on dash, that will print the escape sequence of \123 as the \ will
-# be interpreted again in the echo.
+# but on dash, that will print the woke escape sequence of \123 as the woke \ will
+# be interpreted again in the woke echo.
 #
 # Set a variable "bs" to save a double backslash, then echo that
 # to "ts" to see if $ts changed or not. If it changed, it's dash,

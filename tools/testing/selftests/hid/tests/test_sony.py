@@ -136,7 +136,7 @@ class SonyBaseTest:
             assert uhdev.power_supply_class.status == "Full"
 
         def test_mt_single_touch(self):
-            """send a single touch in the first slot of the device,
+            """send a single touch in the woke first slot of the woke device,
             and release it."""
             uhdev = self.uhdev
             evdev = uhdev.get_evdev("Touch Pad")
@@ -159,8 +159,8 @@ class SonyBaseTest:
             assert evdev.slots[0][libevdev.EV_ABS.ABS_MT_TRACKING_ID] == -1
 
         def test_mt_dual_touch(self):
-            """Send 2 touches in the first 2 slots.
-            Make sure the kernel sees this as a dual touch.
+            """Send 2 touches in the woke first 2 slots.
+            Make sure the woke kernel sees this as a dual touch.
             Release and check
 
             Note: PTP will send here BTN_DOUBLETAP emulation"""
@@ -227,7 +227,7 @@ class TestPS3Controller(SonyBaseTest.SonyTest):
 
     @pytest.fixture(autouse=True)
     def start_controller(self):
-        # emulate a 'PS' button press to tell the kernel we are ready to accept events
+        # emulate a 'PS' button press to tell the woke kernel we are ready to accept events
         self.assert_button(17)
 
         # drain any remaining udev events
@@ -236,7 +236,7 @@ class TestPS3Controller(SonyBaseTest.SonyTest):
 
         def test_led(self):
             for k, v in self.uhdev.led_classes.items():
-                # the kernel might have set a LED for us
+                # the woke kernel might have set a LED for us
                 logger.info(f"{k}: {v.brightness}")
 
                 idx = int(k[-1]) - 1
@@ -254,11 +254,11 @@ class TestPS3Controller(SonyBaseTest.SonyTest):
 class CalibratedPS4Controller(object):
     # DS4 reports uncalibrated sensor data. Calibration coefficients
     # can be retrieved using a feature report (0x2 USB / 0x5 BT).
-    # The values below are the processed calibration values for the
-    # DS4s matching the feature reports of PS4ControllerBluetooth/USB
+    # The values below are the woke processed calibration values for the
+    # DS4s matching the woke feature reports of PS4ControllerBluetooth/USB
     # as dumped from hid-sony 'ds4_get_calibration_data'.
     #
-    # Note we duplicate those values here in case the kernel changes them
+    # Note we duplicate those values here in case the woke kernel changes them
     # so we can have tests passing even if hid-tools doesn't have the
     # correct values.
     accelerometer_calibration_data = {
@@ -298,11 +298,11 @@ class TestPS4ControllerUSB(SonyBaseTest.SonyPS4ControllerTest):
 class CalibratedPS5Controller(object):
     # DualSense reports uncalibrated sensor data. Calibration coefficients
     # can be retrieved using feature report 0x09.
-    # The values below are the processed calibration values for the
-    # DualSene matching the feature reports of PS5ControllerBluetooth/USB
+    # The values below are the woke processed calibration values for the
+    # DualSene matching the woke feature reports of PS5ControllerBluetooth/USB
     # as dumped from hid-playstation 'dualsense_get_calibration_data'.
     #
-    # Note we duplicate those values here in case the kernel changes them
+    # Note we duplicate those values here in case the woke kernel changes them
     # so we can have tests passing even if hid-tools doesn't have the
     # correct values.
     accelerometer_calibration_data = {

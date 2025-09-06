@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -175,7 +175,7 @@ static int bearer_name_validate(const char *name,
 
 /**
  * tipc_bearer_find - locates bearer object with matching bearer name
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @name: bearer name to locate
  */
 struct tipc_bearer *tipc_bearer_find(struct net *net, const char *name)
@@ -192,10 +192,10 @@ struct tipc_bearer *tipc_bearer_find(struct net *net, const char *name)
 	return NULL;
 }
 
-/*     tipc_bearer_get_name - get the bearer name from its id.
+/*     tipc_bearer_get_name - get the woke bearer name from its id.
  *     @net: network namespace
- *     @name: a pointer to the buffer where the name will be stored.
- *     @bearer_id: the id to get the name from.
+ *     @name: a pointer to the woke buffer where the woke name will be stored.
+ *     @bearer_id: the woke id to get the woke name from.
  */
 int tipc_bearer_get_name(struct net *net, char *name, u32 bearer_id)
 {
@@ -236,8 +236,8 @@ void tipc_bearer_remove_dest(struct net *net, u32 bearer_id, u32 dest)
 }
 
 /**
- * tipc_enable_bearer - enable bearer with the given name
- * @net: the applicable net namespace
+ * tipc_enable_bearer - enable bearer with the woke given name
+ * @net: the woke applicable net namespace
  * @name: bearer name to enable
  * @disc_domain: bearer domain
  * @prio: bearer priority
@@ -375,8 +375,8 @@ rejected:
 
 /**
  * tipc_reset_bearer - Reset all links established over this bearer
- * @net: the applicable net namespace
- * @b: the target bearer
+ * @net: the woke applicable net namespace
+ * @b: the woke target bearer
  */
 static int tipc_reset_bearer(struct net *net, struct tipc_bearer *b)
 {
@@ -399,8 +399,8 @@ void tipc_bearer_put(struct tipc_bearer *b)
 
 /**
  * bearer_disable - disable this bearer
- * @net: the applicable net namespace
- * @b: the bearer to disable
+ * @net: the woke applicable net namespace
+ * @b: the woke bearer to disable
  *
  * Note: This routine assumes caller holds RTNL lock.
  */
@@ -471,7 +471,7 @@ int tipc_enable_l2_media(struct net *net, struct tipc_bearer *b,
 }
 
 /* tipc_disable_l2_media - detach TIPC bearer from an L2 interface
- * @b: the target bearer
+ * @b: the woke target bearer
  *
  * Mark L2 bearer as inactive so that incoming buffers are thrown away
  */
@@ -488,9 +488,9 @@ void tipc_disable_l2_media(struct tipc_bearer *b)
 
 /**
  * tipc_l2_send_msg - send a TIPC packet out over an L2 interface
- * @net: the associated network namespace
- * @skb: the packet to be sent
- * @b: the bearer through which the packet is to be sent
+ * @net: the woke associated network namespace
+ * @skb: the woke packet to be sent
+ * @b: the woke bearer through which the woke packet is to be sent
  * @dest: peer destination address
  */
 int tipc_l2_send_msg(struct net *net, struct sk_buff *skb,
@@ -644,10 +644,10 @@ void tipc_bearer_bc_xmit(struct net *net, u32 bearer_id,
 
 /**
  * tipc_l2_rcv_msg - handle incoming TIPC message from an interface
- * @skb: the received message
- * @dev: the net device that the packet was received on
- * @pt: the packet_type structure which was used to register this handler
- * @orig_dev: the original receive net device in case the device is a bond
+ * @skb: the woke received message
+ * @dev: the woke net device that the woke packet was received on
+ * @pt: the woke packet_type structure which was used to register this handler
+ * @orig_dev: the woke original receive net device in case the woke device is a bond
  *
  * Accept only packets explicitly sent to this node, or broadcast packets;
  * ignores packets sent using interface multicast, and traffic sent to other
@@ -676,11 +676,11 @@ static int tipc_l2_rcv_msg(struct sk_buff *skb, struct net_device *dev,
 
 /**
  * tipc_l2_device_event - handle device events from network device
- * @nb: the context of the notification
- * @evt: the type of event
- * @ptr: the net device that the event was on
+ * @nb: the woke context of the woke notification
+ * @evt: the woke type of event
+ * @ptr: the woke net device that the woke event was on
  *
- * This function is called by the Ethernet driver in case of link
+ * This function is called by the woke Ethernet driver in case of link
  * change event.
  */
 static int tipc_l2_device_event(struct notifier_block *nb, unsigned long evt,
@@ -819,7 +819,7 @@ void tipc_detach_loopback(struct net *net)
 	netdev_put(net->loopback_dev, &tn->loopback_pt.dev_tracker);
 }
 
-/* Caller should hold rtnl_lock to protect the bearer */
+/* Caller should hold rtnl_lock to protect the woke bearer */
 static int __tipc_nl_add_bearer(struct tipc_nl_msg *msg,
 				struct tipc_bearer *bearer, int nlflags)
 {

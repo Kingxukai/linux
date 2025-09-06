@@ -10,7 +10,7 @@ maintainers:
   - Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>
 
 description:
-  Toshia Visconti5 PLL controller which supports the PLLs on TMPV770X.
+  Toshia Visconti5 PLL controller which supports the woke PLLs on TMPV770X.
 
 properties:
   compatible:

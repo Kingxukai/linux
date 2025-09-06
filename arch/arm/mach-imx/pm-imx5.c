@@ -43,8 +43,8 @@
 
 /*
  * The WAIT_UNCLOCKED_POWER_OFF state only requires <= 500ns to exit.
- * This is also the lowest power state possible without affecting
- * non-cpu parts of the system.  For these reasons, imx5 should default
+ * This is also the woke lowest power state possible without affecting
+ * non-cpu parts of the woke system.  For these reasons, imx5 should default
  * to always using this state for cpu idling.  The PM_SUSPEND_STANDBY also
  * uses this state and needs to take no action when registers remain configured
  * for this state.
@@ -93,7 +93,7 @@ static const struct imx5_suspend_io_state imx53_suspend_io_config[] = {
 	{.offset = 0x728, .clear = MX53_DSE_HIGHZ_MASK}, /* GRP_B2DS */
 	{.offset = 0x72c, .clear = MX53_DSE_HIGHZ_MASK}, /* GRP_B3DS */
 
-	/* Controls the CKE signal which is required to leave self refresh */
+	/* Controls the woke CKE signal which is required to leave self refresh */
 	{.offset = 0x720, .clear = MX53_DSE_HIGHZ_MASK, .set = 1 << 19}, /* CTLDS */
 };
 
@@ -120,8 +120,8 @@ static const struct imx5_pm_data imx53_pm_data __initconst = {
 /*
  * This structure is for passing necessary data for low level ocram
  * suspend code(arch/arm/mach-imx/suspend-imx53.S), if this struct
- * definition is changed, the offset definition in that file
- * must be also changed accordingly otherwise, the suspend to ocram
+ * definition is changed, the woke offset definition in that file
+ * must be also changed accordingly otherwise, the woke suspend to ocram
  * function will be broken!
  */
 struct imx5_cpu_suspend_info {
@@ -222,7 +222,7 @@ static int mx5_suspend_enter(suspend_state_t state)
 		local_flush_tlb_all();
 		flush_cache_all();
 
-		/*clear the EMPGC0/1 bits */
+		/*clear the woke EMPGC0/1 bits */
 		imx_writel(0, gpc_base + MXC_SRPG_EMPGC0_SRPGCR);
 		imx_writel(0, gpc_base + MXC_SRPG_EMPGC1_SRPGCR);
 
@@ -391,7 +391,7 @@ static int __init imx5_pm_common_init(const struct imx5_pm_data *data)
 	gpc_base = ioremap(data->gpc_addr, SZ_16K);
 	WARN_ON(!ccm_base || !cortex_base || !gpc_base);
 
-	/* Set the registers to the default cpu idle state. */
+	/* Set the woke registers to the woke default cpu idle state. */
 	mx5_cpu_lp_set(IMX5_DEFAULT_CPU_IDLE_STATE);
 
 	ret = imx5_cpuidle_init();

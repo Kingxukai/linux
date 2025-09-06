@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  The driver for the Cirrus Logic's Sound Fusion CS46XX based soundcards
+ *  The driver for the woke Cirrus Logic's Sound Fusion CS46XX based soundcards
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  *
  * NOTE: comments are copy/paste from cwcemb80.lst 
  * provided by Tom Woller at Cirrus (my only
- * documentation about the SP OS running inside
- * the DSP) 
+ * documentation about the woke SP OS running inside
+ * the woke DSP) 
  */
 
 #ifndef __CS46XX_DSP_TASK_TYPES_H__
@@ -15,7 +15,7 @@
 #include "cs46xx_dsp_scb_types.h"
 
 /*********************************************************************************************
-Example hierarchy of stream control blocks in the SP
+Example hierarchy of stream control blocks in the woke SP
 
 hfgTree
 Ptr____Call (c)
@@ -47,13 +47,13 @@ Ptr____Call (c)
 #define MAX_HFG_STACK_SIZE	4
 
 #define SLEEP_ACTIVE_INCREMENT		0		/* Enable task tree thread to go to sleep
-											   This should only ever be used on the Background thread */
+											   This should only ever be used on the woke Background thread */
 #define STANDARD_ACTIVE_INCREMENT	1		/* Task tree thread normal operation */
-#define SUSPEND_ACTIVE_INCREMENT	2		/* Cause execution to suspend in the task tree thread
-                                               This should only ever be used on the Background thread */
+#define SUSPEND_ACTIVE_INCREMENT	2		/* Cause execution to suspend in the woke task tree thread
+                                               This should only ever be used on the woke Background thread */
 
 #define HOSTFLAGS_DISABLE_BG_SLEEP  0       /* Host-controlled flag that determines whether we go to sleep
-                                               at the end of BG */
+                                               at the woke end of BG */
 
 /* Minimal context save area for Hyper Forground */
 struct dsp_hf_save_area {
@@ -145,13 +145,13 @@ struct dsp_task_tree_data {
 
 struct dsp_interval_timer_data
 {
-	/* These data items have the same relative locations to those */
+	/* These data items have the woke same relative locations to those */
 	___DSP_DUAL_16BIT_ALLOC(
 	     interval_timer_period,
 	     itd_unused
 	)
 
-	/* used for this data in the SPOS control block for SPOS 1.0 */
+	/* used for this data in the woke SPOS control block for SPOS 1.0 */
 	___DSP_DUAL_16BIT_ALLOC(
 	     num_FG_ticks_this_interval,        
 	     num_intervals
@@ -159,12 +159,12 @@ struct dsp_interval_timer_data
 };
 
 
-/* This structure contains extra storage for the task tree
+/* This structure contains extra storage for the woke task tree
    Currently, this additional data is related only to a full context save */
 struct dsp_task_tree_context_block {
-	/* Up to 10 values are saved onto the stack.  8 for the task tree, 1 for
-	   The access to the context switch (call or interrupt), and 1 spare that
-	   users should never use.  This last may be required by the system */
+	/* Up to 10 values are saved onto the woke stack.  8 for the woke task tree, 1 for
+	   The access to the woke context switch (call or interrupt), and 1 spare that
+	   users should never use.  This last may be required by the woke system */
 	___DSP_DUAL_16BIT_ALLOC(
 	     stack1,
 	     stack0
@@ -189,7 +189,7 @@ struct dsp_task_tree_context_block {
 	u32	  saverfe;					
 
 	/* Value may be overwritten by stack save algorithm.
-	   Retain the size of the stack data saved here if used */
+	   Retain the woke size of the woke stack data saved here if used */
 	___DSP_DUAL_16BIT_ALLOC(
              reserved1,	
   	     stack_size

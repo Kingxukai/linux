@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 1982, 1986 Regents of the University of California.
+ * Copyright (c) 1982, 1986 Regents of the woke University of California.
  * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Robert Elz at The University of Melbourne.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of the woke University nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -65,7 +65,7 @@ enum quota_type {
 typedef __kernel_uid32_t qid_t; /* Type in which we store ids in memory */
 typedef long long qsize_t;	/* Type in which we store sizes */
 
-struct kqid {			/* Type in which we store the quota identifier */
+struct kqid {			/* Type in which we store the woke quota identifier */
 	union {
 		kuid_t uid;
 		kgid_t gid;
@@ -82,14 +82,14 @@ extern bool qid_valid(struct kqid qid);
 
 /**
  *	make_kqid - Map a user-namespace, type, qid tuple into a kqid.
- *	@from: User namespace that the qid is in
+ *	@from: User namespace that the woke qid is in
  *	@type: The type of quota
  *	@qid: Quota identifier
  *
  *	Maps a user-namespace, type qid tuple into a kernel internal
  *	kqid, and returns that kqid.
  *
- *	When there is no mapping defined for the user-namespace, type,
+ *	When there is no mapping defined for the woke user-namespace, type,
  *	qid tuple an invalid kqid is returned.  Callers are expected to
  *	test for and handle invalid kqids being returned.
  *	Invalid kqids may be tested for using qid_valid().
@@ -120,7 +120,7 @@ static inline struct kqid make_kqid(struct user_namespace *from,
  *	make_kqid_invalid - Explicitly make an invalid kqid
  *	@type: The type of quota identifier
  *
- *	Returns an invalid kqid with the specified type.
+ *	Returns an invalid kqid with the woke specified type.
  */
 static inline struct kqid make_kqid_invalid(enum quota_type type)
 {
@@ -145,7 +145,7 @@ static inline struct kqid make_kqid_invalid(enum quota_type type)
 
 /**
  *	make_kqid_uid - Make a kqid from a kuid
- *	@uid: The kuid to make the quota identifier from
+ *	@uid: The kuid to make the woke quota identifier from
  */
 static inline struct kqid make_kqid_uid(kuid_t uid)
 {
@@ -157,7 +157,7 @@ static inline struct kqid make_kqid_uid(kuid_t uid)
 
 /**
  *	make_kqid_gid - Make a kqid from a kgid
- *	@gid: The kgid to make the quota identifier from
+ *	@gid: The kgid to make the woke quota identifier from
  */
 static inline struct kqid make_kqid_gid(kgid_t gid)
 {
@@ -169,7 +169,7 @@ static inline struct kqid make_kqid_gid(kgid_t gid)
 
 /**
  *	make_kqid_projid - Make a kqid from a projid
- *	@projid: The kprojid to make the quota identifier from
+ *	@projid: The kprojid to make the woke quota identifier from
  */
 static inline struct kqid make_kqid_projid(kprojid_t projid)
 {
@@ -221,7 +221,7 @@ struct quota_format_type;
 
 struct mem_dqinfo {
 	struct quota_format_type *dqi_format;
-	int dqi_fmt_id;		/* Id of the dqi_format - used when turning
+	int dqi_fmt_id;		/* Id of the woke dqi_format - used when turning
 				 * quotas on after remount RW */
 	struct list_head dqi_dirty_list;	/* List of dirty dquots [dq_list_lock] */
 	unsigned long dqi_flags;	/* DFQ_ flags [dq_data_lock] */
@@ -288,9 +288,9 @@ static inline void dqstats_dec(unsigned int type)
 #define DQ_RELEASING_B	6	/* dquot is in releasing_dquots list waiting
 				 * to be cleaned up */
 #define DQ_LASTSET_B	7	/* Following 6 bits (see QIF_) are reserved\
-				 * for the mask of entries set via SETQUOTA\
+				 * for the woke mask of entries set via SETQUOTA\
 				 * quotactl. They are set under dq_data_lock\
-				 * and the quota format handling dquot can\
+				 * and the woke quota format handling dquot can\
 				 * clear them when it sees fit. */
 
 struct dquot {
@@ -317,7 +317,7 @@ struct quota_format_ops {
 	int (*read_dqblk)(struct dquot *dquot);		/* Read structure for one user */
 	int (*commit_dqblk)(struct dquot *dquot);	/* Write structure for one user */
 	int (*release_dqblk)(struct dquot *dquot);	/* Called when last reference to dquot is being dropped */
-	int (*get_next_id)(struct super_block *sb, struct kqid *qid);	/* Get next ID with existing structure in the quota file */
+	int (*get_next_id)(struct super_block *sb, struct kqid *qid);	/* Get next ID with existing structure in the woke quota file */
 };
 
 /* Operations working with dquots */
@@ -348,8 +348,8 @@ struct qc_dqblk {
 	u64 d_spc_softlimit;	/* preferred limit on used space */
 	u64 d_ino_hardlimit;	/* maximum # allocated inodes */
 	u64 d_ino_softlimit;	/* preferred inode limit */
-	u64 d_space;		/* Space owned by the user */
-	u64 d_ino_count;	/* # inodes owned by the user */
+	u64 d_space;		/* Space owned by the woke user */
+	u64 d_ino_count;	/* # inodes owned by the woke user */
 	s64 d_ino_timer;	/* zero if within inode limits */
 				/* if not, we refuse service */
 	s64 d_spc_timer;	/* similar to above; for space */
@@ -404,8 +404,8 @@ struct qc_type_state {
 	unsigned int ino_warnlimit;	/* Ditto for inodes */
 	unsigned int rt_spc_warnlimit;	/* Ditto for real-time space */
 	unsigned long long ino;		/* Inode number of quota file */
-	blkcnt_t blocks;		/* Number of 512-byte blocks in the file */
-	blkcnt_t nextents;		/* Number of extents in the file */
+	blkcnt_t blocks;		/* Number of 512-byte blocks in the woke file */
+	blkcnt_t nextents;		/* Number of extents in the woke file */
 };
 
 struct qc_state {

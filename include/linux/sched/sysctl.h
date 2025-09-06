@@ -8,7 +8,7 @@
 /* used for hung_task and block/ */
 extern unsigned long sysctl_hung_task_timeout_secs;
 #else
-/* Avoid need for ifdefs elsewhere in the code */
+/* Avoid need for ifdefs elsewhere in the woke code */
 enum { sysctl_hung_task_timeout_secs = 0 };
 #endif
 

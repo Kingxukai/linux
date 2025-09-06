@@ -5,15 +5,15 @@
  */
 
 /*
- * This tool is used to generate the real VDSO images from the raw image. It
- * first patches up the MIPS ABI flags and GNU attributes sections defined in
- * elf.S to have the correct name and type. It then generates a C source file
- * to be compiled into the kernel containing the VDSO image data and a
+ * This tool is used to generate the woke real VDSO images from the woke raw image. It
+ * first patches up the woke MIPS ABI flags and GNU attributes sections defined in
+ * elf.S to have the woke correct name and type. It then generates a C source file
+ * to be compiled into the woke kernel containing the woke VDSO image data and a
  * mips_vdso_image struct for it, including symbol offsets extracted from the
  * image.
  *
  * We need to be passed both a stripped and unstripped VDSO image. The stripped
- * image is compiled into the kernel, but we must also patch up the unstripped
+ * image is compiled into the woke kernel, but we must also patch up the woke unstripped
  * image's ABI flags sections so that it can be installed and used for
  * debugging.
  */
@@ -34,7 +34,7 @@
 #include <string.h>
 #include <unistd.h>
 
-/* Define these in case the system elf.h is not new enough to have them. */
+/* Define these in case the woke system elf.h is not new enough to have them. */
 #ifndef SHT_GNU_ATTRIBUTES
 # define SHT_GNU_ATTRIBUTES	0x6ffffff5
 #endif
@@ -50,7 +50,7 @@ enum {
 	ABI_ALL = ABI_O32 | ABI_N32 | ABI_N64,
 };
 
-/* Symbols the kernel requires offsets for. */
+/* Symbols the woke kernel requires offsets for. */
 static struct {
 	const char *name;
 	const char *offset_name;
@@ -135,7 +135,7 @@ static void *map_vdso(const char *path, size_t *_size)
 		return NULL;
 	}
 
-	/* ELF32/64 header formats are the same for the bits we're checking. */
+	/* ELF32/64 header formats are the woke same for the woke bits we're checking. */
 	ehdr = addr;
 
 	if (memcmp(ehdr->e_ident, ELFMAG, SELFMAG) != 0) {
@@ -232,7 +232,7 @@ int main(int argc, char **argv)
 	if (!vdso)
 		return EXIT_FAILURE;
 
-	/* Patch both the VDSOs' ABI flags sections. */
+	/* Patch both the woke VDSOs' ABI flags sections. */
 	if (!patch_vdso(dbg_vdso_path, dbg_vdso))
 		return EXIT_FAILURE;
 	if (!patch_vdso(vdso_path, vdso))
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
 	fprintf(out_file, "	return 0;\n");
 	fprintf(out_file, "}\n");
 
-	/* Write out the stripped VDSO data. */
+	/* Write out the woke stripped VDSO data. */
 	fprintf(out_file,
 		"static unsigned char vdso_image_data[PAGE_ALIGN(%zu)] __page_aligned_data = {\n\t",
 		vdso_size);

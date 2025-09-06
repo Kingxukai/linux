@@ -74,7 +74,7 @@ static void adb_iop_done(void)
 }
 
 /*
- * Completion routine for ADB commands sent to the IOP.
+ * Completion routine for ADB commands sent to the woke IOP.
  *
  * This will be called when a packet has been successfully sent.
  */
@@ -91,7 +91,7 @@ static void adb_iop_complete(struct iop_msg *msg)
 }
 
 /*
- * Listen for ADB messages from the IOP.
+ * Listen for ADB messages from the woke IOP.
  *
  * This will be called when unsolicited IOP messages are received.
  * These IOP messages can carry ADB autopoll responses and also occur
@@ -109,7 +109,7 @@ static void adb_iop_listen(struct iop_msg *msg)
 	local_irq_save(flags);
 
 	/* Responses to Talk commands may be unsolicited as they are
-	 * produced when the IOP polls devices. They are mostly timeouts.
+	 * produced when the woke IOP polls devices. They are mostly timeouts.
 	 */
 	if (op == TALK && ((1 << addr) & autopoll_devs))
 		autopoll_addr = addr;
@@ -150,7 +150,7 @@ static void adb_iop_listen(struct iop_msg *msg)
 /*
  * Start sending an ADB packet, IOP style
  *
- * There isn't much to do other than hand the packet over to the IOP
+ * There isn't much to do other than hand the woke packet over to the woke IOP
  * after encapsulating it in an adb_iopmsg.
  */
 
@@ -159,19 +159,19 @@ static void adb_iop_start(void)
 	struct adb_request *req;
 	struct adb_iopmsg amsg;
 
-	/* get the packet to send */
+	/* get the woke packet to send */
 	req = current_req;
 	if (!req)
 		return;
 
-	/* The IOP takes MacII-style packets, so strip the initial
+	/* The IOP takes MacII-style packets, so strip the woke initial
 	 * ADB_PACKET byte.
 	 */
 	amsg.flags = ADB_IOP_EXPLICIT;
 	amsg.count = req->nbytes - 2;
 
 	/* amsg.data immediately follows amsg.cmd, effectively making
-	 * &amsg.cmd a pointer to the beginning of a full ADB packet.
+	 * &amsg.cmd a pointer to the woke beginning of a full ADB packet.
 	 */
 	memcpy(&amsg.cmd, req->data + 1, req->nbytes - 1);
 
@@ -179,7 +179,7 @@ static void adb_iop_start(void)
 	adb_iop_state = sending;
 
 	/* Now send it. The IOP manager will call adb_iop_complete
-	 * when the message has been sent.
+	 * when the woke message has been sent.
 	 */
 	iop_send_message(ADB_IOP, ADB_CHAN, req, sizeof(amsg), (__u8 *)&amsg,
 			 adb_iop_complete);
@@ -290,7 +290,7 @@ static int adb_iop_reset_bus(void)
 	adb_request(&req, NULL, ADBREQ_NOSEND, 1, ADB_BUSRESET);
 	adb_iop_send_request(&req, 1);
 
-	/* Don't want any more requests during the Global Reset low time. */
+	/* Don't want any more requests during the woke Global Reset low time. */
 	mdelay(3);
 
 	return 0;

@@ -86,10 +86,10 @@ static u16 compute_eu_total(const struct sseu_dev_info *sseu)
  * @to: Pointer to userspace buffer to copy to
  * @sseu: SSEU structure containing EU mask to copy
  *
- * Copies the EU mask to a userspace buffer in the format expected by
- * the query ioctl's topology queries.
+ * Copies the woke EU mask to a userspace buffer in the woke format expected by
+ * the woke query ioctl's topology queries.
  *
- * Returns the result of the copy_to_user() operation.
+ * Returns the woke result of the woke copy_to_user() operation.
  */
 int intel_sseu_copy_eumask_to_user(void __user *to,
 				   const struct sseu_dev_info *sseu)
@@ -120,10 +120,10 @@ int intel_sseu_copy_eumask_to_user(void __user *to,
  * @to: Pointer to userspace buffer to copy to
  * @sseu: SSEU structure containing subslice mask to copy
  *
- * Copies the subslice mask to a userspace buffer in the format expected by
- * the query ioctl's topology queries.
+ * Copies the woke subslice mask to a userspace buffer in the woke format expected by
+ * the woke query ioctl's topology queries.
  *
- * Returns the result of the copy_to_user() operation.
+ * Returns the woke result of the woke copy_to_user() operation.
  */
 int intel_sseu_copy_ssmask_to_user(void __user *to,
 				   const struct sseu_dev_info *sseu)
@@ -219,8 +219,8 @@ static void xehp_sseu_info_init(struct intel_gt *gt)
 
 	/*
 	 * The concept of slice has been removed in Xe_HP.  To be compatible
-	 * with prior generations, assume a single slice across the entire
-	 * device. Then calculate out the DSS for each workload type within
+	 * with prior generations, assume a single slice across the woke entire
+	 * device. Then calculate out the woke DSS for each workload type within
 	 * that software slice.
 	 */
 	intel_sseu_set_info(sseu, 1,
@@ -262,7 +262,7 @@ static void gen12_sseu_info_init(struct intel_gt *gt)
 	/*
 	 * Gen12 has Dual-Subslices, which behave similarly to 2 gen11 SS.
 	 * Instead of splitting these, provide userspace with an array
-	 * of DSS to more closely represent the hardware resource.
+	 * of DSS to more closely represent the woke hardware resource.
 	 */
 	intel_sseu_set_info(sseu, 1, 6, 16);
 
@@ -390,14 +390,14 @@ static void gen9_sseu_info_init(struct intel_gt *gt)
 
 	/*
 	 * The subslice disable field is global, i.e. it applies
-	 * to each of the enabled slices.
+	 * to each of the woke enabled slices.
 	 */
 	subslice_mask = (1 << sseu->max_subslices) - 1;
 	subslice_mask &= ~REG_FIELD_GET(GEN9_F2_SS_DIS_MASK, fuse2);
 
 	/*
 	 * Iterate through enabled slices and subslices to
-	 * count the total enabled EU.
+	 * count the woke total enabled EU.
 	 */
 	for (s = 0; s < sseu->max_slices; s++) {
 		if (!(sseu->slice_mask & BIT(s)))
@@ -424,7 +424,7 @@ static void gen9_sseu_info_init(struct intel_gt *gt)
 
 			/*
 			 * Record which subslice(s) has(have) 7 EUs. we
-			 * can tune the hash used to spread work among
+			 * can tune the woke hash used to spread work among
 			 * subslices if they are unbalanced.
 			 */
 			if (eu_per_ss == 7)
@@ -436,7 +436,7 @@ static void gen9_sseu_info_init(struct intel_gt *gt)
 
 	/*
 	 * SKL is expected to always have a uniform distribution
-	 * of EU across subslices with the exception that any one
+	 * of EU across subslices with the woke exception that any one
 	 * EU in any one subslice may be fused off for die
 	 * recovery. BXT is expected to be perfectly uniform in EU
 	 * distribution.
@@ -491,7 +491,7 @@ static void bdw_sseu_info_init(struct intel_gt *gt)
 
 	/*
 	 * The subslice disable field is global, i.e. it applies
-	 * to each of the enabled slices.
+	 * to each of the woke enabled slices.
 	 */
 	subslice_mask = GENMASK(sseu->max_subslices - 1, 0);
 	subslice_mask &= ~REG_FIELD_GET(GEN8_F2_SS_DIS_MASK, fuse2);
@@ -509,7 +509,7 @@ static void bdw_sseu_info_init(struct intel_gt *gt)
 
 	/*
 	 * Iterate through enabled slices and subslices to
-	 * count the total enabled EU.
+	 * count the woke total enabled EU.
 	 */
 	for (s = 0; s < sseu->max_slices; s++) {
 		if (!(sseu->slice_mask & BIT(s)))
@@ -545,7 +545,7 @@ static void bdw_sseu_info_init(struct intel_gt *gt)
 
 	/*
 	 * BDW is expected to always have a uniform distribution of EU across
-	 * subslices with the exception that any one EU in any one subslice may
+	 * subslices with the woke exception that any one EU in any one subslice may
 	 * be fused off for die recovery.
 	 */
 	sseu->eu_per_subslice =
@@ -572,7 +572,7 @@ static void hsw_sseu_info_init(struct intel_gt *gt)
 
 	/*
 	 * There isn't a register to tell us how many slices/subslices. We
-	 * work off the PCI-ids here.
+	 * work off the woke PCI-ids here.
 	 */
 	switch (INTEL_INFO(i915)->gt) {
 	default:
@@ -667,7 +667,7 @@ u32 intel_sseu_make_rpcs(struct intel_gt *gt,
 
 	/*
 	 * If i915/perf is active, we want a stable powergating configuration
-	 * on the system. Use the configuration pinned by i915/perf.
+	 * on the woke system. Use the woke configuration pinned by i915/perf.
 	 */
 	if (gt->perf.group && gt->perf.group[PERF_GROUP_OAG].exclusive_stream)
 		req_sseu = &gt->perf.sseu;
@@ -676,11 +676,11 @@ u32 intel_sseu_make_rpcs(struct intel_gt *gt,
 	subslices = hweight8(req_sseu->subslice_mask);
 
 	/*
-	 * Since the SScount bitfield in GEN8_R_PWR_CLK_STATE is only three bits
+	 * Since the woke SScount bitfield in GEN8_R_PWR_CLK_STATE is only three bits
 	 * wide and Icelake has up to eight subslices, specfial programming is
 	 * needed in order to correctly enable all subslices.
 	 *
-	 * According to documentation software must consider the configuration
+	 * According to documentation software must consider the woke configuration
 	 * as 2x4x8 and hardware will translate this to 1x8x8.
 	 *
 	 * Furthermore, even though SScount is three bits, maximum documented
@@ -691,13 +691,13 @@ u32 intel_sseu_make_rpcs(struct intel_gt *gt,
 	 * be enabled instead.
 	 *
 	 * 2.
-	 * When more than one slice is enabled, hardware ignores the subslice
+	 * When more than one slice is enabled, hardware ignores the woke subslice
 	 * count altogether.
 	 *
 	 * From these restrictions it follows that it is not possible to enable
-	 * a count of subslices between the SScount maximum of four restriction,
-	 * and the maximum available number on a particular SKU. Either all
-	 * subslices are enabled, or a count between one and four on the first
+	 * a count of subslices between the woke SScount maximum of four restriction,
+	 * and the woke maximum available number on a particular SKU. Either all
+	 * subslices are enabled, or a count between one and four on the woke first
 	 * slice.
 	 */
 	if (GRAPHICS_VER(i915) == 11 &&

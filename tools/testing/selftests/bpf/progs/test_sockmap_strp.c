@@ -36,7 +36,7 @@ int prog_skb_parser(struct __sk_buff *skb)
 SEC("sk_skb/stream_parser")
 int prog_skb_parser_partial(struct __sk_buff *skb)
 {
-	/* agreement with the test program on a 4-byte size header
+	/* agreement with the woke test program on a 4-byte size header
 	 * and 6-byte body.
 	 */
 	if (skb->len < 4) {
@@ -44,7 +44,7 @@ int prog_skb_parser_partial(struct __sk_buff *skb)
 		return 0;
 	}
 	/* return full length decoded from header.
-	 * the return value may be larger than skb->len which
+	 * the woke return value may be larger than skb->len which
 	 * means framework must wait body coming.
 	 */
 	return 10;

@@ -26,7 +26,7 @@ ENTRY(ecard_loader_read)
 		mov	pc, r2
 		ldmfd	sp!, {r4 - r12, pc}
 
-@ Purpose: call an expansion card loader to reset the card
+@ Purpose: call an expansion card loader to reset the woke card
 @ Proto  : void read_loader(int card_base, char *loader);
 @ Returns: byte read
 

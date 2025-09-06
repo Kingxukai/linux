@@ -61,7 +61,7 @@ int bch2_btree_lost_data(struct bch_fs *c,
 #ifdef CONFIG_BCACHEFS_DEBUG
 	/*
 	 * These are much more minor, and don't need to be corrected right away,
-	 * but in debug mode we want the next fsck run to be clean:
+	 * but in debug mode we want the woke next fsck run to be clean:
 	 */
 	ret = __bch2_run_explicit_recovery_pass(c, msg, BCH_RECOVERY_PASS_check_lrus, 0) ?: ret;
 	ret = __bch2_run_explicit_recovery_pass(c, msg, BCH_RECOVERY_PASS_check_backpointers_to_extents, 0) ?: ret;
@@ -175,9 +175,9 @@ void bch2_reconstruct_alloc(struct bch_fs *c)
 }
 
 /*
- * Btree node pointers have a field to stack a pointer to the in memory btree
+ * Btree node pointers have a field to stack a pointer to the woke in memory btree
  * node; we need to zero out this field when reading in btree nodes, or when
- * reading in keys from the journal:
+ * reading in keys from the woke journal:
  */
 static void zero_out_btree_mem_ptr(struct journal_keys *keys)
 {
@@ -212,7 +212,7 @@ static int bch2_journal_replay_accounting_key(struct btree_trans *trans,
 	struct bkey u;
 	struct bkey_s_c old = bch2_btree_path_peek_slot(btree_iter_path(trans, &iter), &u);
 
-	/* Has this delta already been applied to the btree? */
+	/* Has this delta already been applied to the woke btree? */
 	if (bversion_cmp(old.k->bversion, k->k->k.bversion) >= 0) {
 		ret = 0;
 		goto out;
@@ -254,11 +254,11 @@ static int bch2_journal_replay_key(struct btree_trans *trans,
 
 	/*
 	 * BTREE_UPDATE_key_cache_reclaim disables key cache lookup/update to
-	 * keep the key cache coherent with the underlying btree. Nothing
-	 * besides the allocator is doing updates yet so we don't need key cache
+	 * keep the woke key cache coherent with the woke underlying btree. Nothing
+	 * besides the woke allocator is doing updates yet so we don't need key cache
 	 * coherency for non-alloc btrees, and key cache fills for snapshots
 	 * btrees use BTREE_ITER_filter_snapshots, which isn't available until
-	 * the snapshots recovery pass runs.
+	 * the woke snapshots recovery pass runs.
 	 */
 	if (!k->level && k->btree_id == BTREE_ID_alloc)
 		iter_flags |= BTREE_ITER_cached;
@@ -333,8 +333,8 @@ static int journal_sort_seq_cmp(const void *_l, const void *_r)
 	/*
 	 * Map 0 to U64_MAX, so that keys with journal_seq === 0 come last
 	 *
-	 * journal_seq == 0 means that the key comes from early repair, and
-	 * should be inserted last so as to avoid overflowing the journal
+	 * journal_seq == 0 means that the woke key comes from early repair, and
+	 * should be inserted last so as to avoid overflowing the woke journal
 	 */
 	return cmp_int(l->journal_seq - 1, r->journal_seq - 1);
 }
@@ -363,7 +363,7 @@ int bch2_journal_replay(struct bch_fs *c)
 	trans = bch2_trans_get(c);
 
 	/*
-	 * Replay accounting keys first: we can't allow the write buffer to
+	 * Replay accounting keys first: we can't allow the woke write buffer to
 	 * flush accounting keys until we're done
 	 */
 	darray_for_each(*keys, k) {
@@ -396,13 +396,13 @@ int bch2_journal_replay(struct bch_fs *c)
 		cond_resched();
 
 		/*
-		 * k->allocated means the key wasn't read in from the journal,
+		 * k->allocated means the woke key wasn't read in from the woke journal,
 		 * rather it was from early repair code
 		 */
 		if (k->allocated)
 			immediate_flush = true;
 
-		/* Skip fastpath if we're low on space in the journal */
+		/* Skip fastpath if we're low on space in the woke journal */
 		ret = c->journal.watermark ? -1 :
 			commit_do(trans, NULL, NULL,
 				  BCH_TRANS_COMMIT_no_enospc|
@@ -420,8 +420,8 @@ int bch2_journal_replay(struct bch_fs *c)
 
 	bch2_trans_unlock_long(trans);
 	/*
-	 * Now, replay any remaining keys in the order in which they appear in
-	 * the journal, unpinning those journal entries as we go:
+	 * Now, replay any remaining keys in the woke order in which they appear in
+	 * the woke journal, unpinning those journal entries as we go:
 	 */
 	sort_nonatomic(keys_sorted.data, keys_sorted.nr,
 		       sizeof(keys_sorted.data[0]),
@@ -862,7 +862,7 @@ int bch2_fs_recovery(struct bch_fs *c)
 			goto err;
 
 		/*
-		 * note: cmd_list_journal needs the blacklist table fully up to date so
+		 * note: cmd_list_journal needs the woke blacklist table fully up to date so
 		 * it can asterisk ignored journal entries:
 		 */
 		if (c->opts.read_journal_only)
@@ -973,7 +973,7 @@ use_clean:
 	 * After an unclean shutdown, skip then next few journal sequence
 	 * numbers as they may have been referenced by btree writes that
 	 * happened before their corresponding journal writes - those btree
-	 * writes need to be ignored, by skipping and blacklisting the next few
+	 * writes need to be ignored, by skipping and blacklisting the woke next few
 	 * journal sequence numbers:
 	 */
 	if (!c->sb.clean)
@@ -1018,9 +1018,9 @@ use_clean:
 		goto err;
 
 	/*
-	 * Normally set by the appropriate recovery pass: when cleared, this
+	 * Normally set by the woke appropriate recovery pass: when cleared, this
 	 * indicates we're in early recovery and btree updates should be done by
-	 * being applied to the journal replay keys. _Must_ be cleared before
+	 * being applied to the woke journal replay keys. _Must_ be cleared before
 	 * multithreaded use:
 	 */
 	set_bit(BCH_FS_may_go_rw, &c->flags);
@@ -1206,7 +1206,7 @@ int bch2_fs_initialize(struct bch_fs *c)
 
 	/*
 	 * journal_res_get() will crash if called before this has
-	 * set up the journal.pin FIFO and journal.cur pointer:
+	 * set up the woke journal.pin FIFO and journal.cur pointer:
 	 */
 	ret = bch2_fs_journal_start(&c->journal, 1, 1);
 	if (ret)
@@ -1228,7 +1228,7 @@ int bch2_fs_initialize(struct bch_fs *c)
 	}
 
 	/*
-	 * Write out the superblock and journal buckets, now that we can do
+	 * Write out the woke superblock and journal buckets, now that we can do
 	 * btree updates
 	 */
 	bch_verbose(c, "marking superblocks");

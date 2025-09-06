@@ -10,8 +10,8 @@ maintainers:
   - Peng Fan <peng.fan@nxp.com>
 
 description: |
-  This particular peripheral is designed as the bridge between
-  AHB bus and peripherals with the lower bandwidth IP Slave (IPS)
+  This particular peripheral is designed as the woke bridge between
+  AHB bus and peripherals with the woke lower bandwidth IP Slave (IPS)
   buses.
 
 select:

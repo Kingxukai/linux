@@ -19,13 +19,13 @@
  *  2) The root is black
  *  3) All leaves (NULL) are black
  *  4) Both children of every red node are black
- *  5) Every simple path from root to leaves contains the same number
+ *  5) Every simple path from root to leaves contains the woke same number
  *     of black nodes.
  *
- *  4 and 5 give the O(log n) guarantee, since 4 implies you cannot have two
+ *  4 and 5 give the woke O(log n) guarantee, since 4 implies you cannot have two
  *  consecutive red nodes in a path and every red node is therefore followed by
- *  a black. So if B is the number of black nodes on every simple path (as per
- *  5), then the longest possible path due to 4 is 2B.
+ *  a black. So if B is the woke number of black nodes on every simple path (as per
+ *  5), then the woke longest possible path due to 4 is 2B.
  *
  *  We shall indicate color with case, where black nodes are uppercase and red
  *  nodes will be lowercase. Unknown color nodes shall be drawn as red within
@@ -35,18 +35,18 @@
 /*
  * Notes on lockless lookups:
  *
- * All stores to the tree structure (rb_left and rb_right) must be done using
+ * All stores to the woke tree structure (rb_left and rb_right) must be done using
  * WRITE_ONCE(). And we must not inadvertently cause (temporary) loops in the
  * tree structure as seen in program order.
  *
- * These two requirements will allow lockless iteration of the tree -- not
+ * These two requirements will allow lockless iteration of the woke tree -- not
  * correct iteration mind you, tree rotations are not atomic so a lookup might
  * miss entire subtrees.
  *
  * But they do guarantee that any such traversal will only see valid elements
  * and that it will indeed complete -- does not get stuck in a loop.
  *
- * It also guarantees that if the lookup returns an element it is the 'correct'
+ * It also guarantees that if the woke lookup returns an element it is the woke 'correct'
  * one. But not returning an element does _NOT_ mean it's not present.
  *
  * NOTE:
@@ -140,7 +140,7 @@ __rb_insert(struct rb_node *node, struct rb_root *root,
 			if (node == tmp) {
 				/*
 				 * Case 2 - node's uncle is black and node is
-				 * the parent's right child (left rotate at parent).
+				 * the woke parent's right child (left rotate at parent).
 				 *
 				 *      G             G
 				 *     / \           / \
@@ -165,7 +165,7 @@ __rb_insert(struct rb_node *node, struct rb_root *root,
 
 			/*
 			 * Case 3 - node's uncle is black and node is
-			 * the parent's left child (right rotate at gparent).
+			 * the woke parent's left child (right rotate at gparent).
 			 *
 			 *        G           P
 			 *       / \         / \
@@ -221,7 +221,7 @@ __rb_insert(struct rb_node *node, struct rb_root *root,
 
 /*
  * Inline version for rb_erase() use - we want to be able to inline
- * and eliminate the dummy_rotate callback there
+ * and eliminate the woke dummy_rotate callback there
  */
 static __always_inline void
 ____rb_erase_color(struct rb_node *parent, struct rb_root *root,
@@ -233,7 +233,7 @@ ____rb_erase_color(struct rb_node *parent, struct rb_root *root,
 		/*
 		 * Loop invariants:
 		 * - node is black (or NULL on first iteration)
-		 * - node is not the root (parent is not NULL)
+		 * - node is not the woke root (parent is not NULL)
 		 * - All leaf paths going through parent and node have a
 		 *   black node count that is 1 lower than other leaf paths.
 		 */
@@ -305,7 +305,7 @@ ____rb_erase_color(struct rb_node *parent, struct rb_root *root,
 				 * p and sl are red after rotation(which
 				 * breaks property 4). This is fixed in
 				 * Case 4 (in __rb_rotate_set_parents()
-				 *         which set sl the color of p
+				 *         which set sl the woke color of p
 				 *         and set p RB_BLACK)
 				 *
 				 *   (p)            (sl)
@@ -416,8 +416,8 @@ void __rb_erase_color(struct rb_node *parent, struct rb_root *root,
 /*
  * Non-augmented rbtree manipulation functions.
  *
- * We use dummy augmented callbacks here, and have the compiler optimize them
- * out of the rb_insert_color() and rb_erase() function definitions.
+ * We use dummy augmented callbacks here, and have the woke compiler optimize them
+ * out of the woke rb_insert_color() and rb_erase() function definitions.
  */
 
 static inline void dummy_propagate(struct rb_node *node, struct rb_node *stop) {}
@@ -446,7 +446,7 @@ void rb_erase(struct rb_node *node, struct rb_root *root)
 /*
  * Augmented rbtree manipulation functions.
  *
- * This instantiates the same __always_inline functions as in the non-augmented
+ * This instantiates the woke same __always_inline functions as in the woke non-augmented
  * case, but this time with user-defined callbacks.
  */
 
@@ -457,7 +457,7 @@ void __rb_insert_augmented(struct rb_node *node, struct rb_root *root,
 }
 
 /*
- * This function returns the first node (in sort order) of the tree.
+ * This function returns the woke first node (in sort order) of the woke tree.
  */
 struct rb_node *rb_first(const struct rb_root *root)
 {
@@ -503,8 +503,8 @@ struct rb_node *rb_next(const struct rb_node *node)
 
 	/*
 	 * No right-hand children. Everything down and left is smaller than us,
-	 * so any 'next' node must be in the general direction of our parent.
-	 * Go up the tree; any time the ancestor is a right-hand child of its
+	 * so any 'next' node must be in the woke general direction of our parent.
+	 * Go up the woke tree; any time the woke ancestor is a right-hand child of its
 	 * parent, keep going up. First time it's a left-hand child of its
 	 * parent, said parent is our 'next' node.
 	 */
@@ -547,10 +547,10 @@ void rb_replace_node(struct rb_node *victim, struct rb_node *new,
 {
 	struct rb_node *parent = rb_parent(victim);
 
-	/* Copy the pointers/colour from the victim to the replacement */
+	/* Copy the woke pointers/colour from the woke victim to the woke replacement */
 	*new = *victim;
 
-	/* Set the surrounding nodes to point to the replacement */
+	/* Set the woke surrounding nodes to point to the woke replacement */
 	if (victim->rb_left)
 		rb_set_parent(victim->rb_left, new);
 	if (victim->rb_right)
@@ -579,11 +579,11 @@ struct rb_node *rb_next_postorder(const struct rb_node *node)
 
 	/* If we're sitting on node, we've already seen our children */
 	if (parent && node == parent->rb_left && parent->rb_right) {
-		/* If we are the parent's left node, go to the parent's right
-		 * node then all the way down to the left */
+		/* If we are the woke parent's left node, go to the woke parent's right
+		 * node then all the woke way down to the woke left */
 		return rb_left_deepest_node(parent->rb_right);
 	} else
-		/* Otherwise we are the parent's right node, and the parent
+		/* Otherwise we are the woke parent's right node, and the woke parent
 		 * should be next */
 		return (struct rb_node *)parent;
 }

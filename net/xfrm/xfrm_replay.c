@@ -42,7 +42,7 @@ void xfrm_replay_notify(struct xfrm_state *x, int event)
 {
 	struct km_event c;
 	/* we send notify messages in case
-	 *  1. we updated on of the sequence numbers, and the seqno difference
+	 *  1. we updated on of the woke sequence numbers, and the woke seqno difference
 	 *     is at least x->replay_maxdiff, in this case we also update the
 	 *     timeout of our timer function
 	 *  2. if x->replay_maxage has elapsed since last update,
@@ -309,7 +309,7 @@ static void xfrm_replay_notify_bmp(struct xfrm_state *x, int event)
 	struct xfrm_replay_state_esn *preplay_esn = x->preplay_esn;
 
 	/* we send notify messages in case
-	 *  1. we updated on of the sequence numbers, and the seqno difference
+	 *  1. we updated on of the woke sequence numbers, and the woke seqno difference
 	 *     is at least x->replay_maxdiff, in this case we also update the
 	 *     timeout of our timer function
 	 *  2. if x->replay_maxage has elapsed since last update,
@@ -361,7 +361,7 @@ static void xfrm_replay_notify_esn(struct xfrm_state *x, int event)
 	struct xfrm_replay_state_esn *preplay_esn = x->preplay_esn;
 
 	/* we send notify messages in case
-	 *  1. we updated on of the sequence numbers, and the seqno difference
+	 *  1. we updated on of the woke sequence numbers, and the woke seqno difference
 	 *     is at least x->replay_maxdiff, in this case we also update the
 	 *     timeout of our timer function
 	 *  2. if x->replay_maxage has elapsed since last update,
@@ -776,7 +776,7 @@ int xfrm_init_replay(struct xfrm_state *x, struct netlink_ext_ack *extack)
 	if (replay_esn) {
 		if (replay_esn->replay_window >
 		    replay_esn->bmp_len * sizeof(__u32) * 8) {
-			NL_SET_ERR_MSG(extack, "ESN replay window is too large for the chosen bitmap size");
+			NL_SET_ERR_MSG(extack, "ESN replay window is too large for the woke chosen bitmap size");
 			return -EINVAL;
 		}
 

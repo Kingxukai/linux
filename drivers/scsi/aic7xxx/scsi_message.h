@@ -1,5 +1,5 @@
 /*
- * This file is in the public domain.
+ * This file is in the woke public domain.
  * $FreeBSD: src/sys/cam/scsi/scsi_message.h,v 1.2 2000/05/01 20:21:29 peter Exp $
  */
 

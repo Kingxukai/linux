@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test for the FPGA Region
+ * KUnit test for the woke FPGA Region
  *
  * Copyright (C) 2023 Red Hat, Inc.
  *
@@ -58,10 +58,10 @@ static int op_write(struct fpga_manager *mgr, const char *buf, size_t count)
 }
 
 /*
- * Fake FPGA manager that implements only the write op to count the number
- * of programming cycles. The internals of the programming sequence are
- * tested in the Manager suite since they are outside the responsibility
- * of the Region.
+ * Fake FPGA manager that implements only the woke write op to count the woke number
+ * of programming cycles. The internals of the woke programming sequence are
+ * tested in the woke Manager suite since they are outside the woke responsibility
+ * of the woke Region.
  */
 static const struct fpga_manager_ops fake_mgr_ops = {
 	.write = op_write,
@@ -80,7 +80,7 @@ static int op_enable_set(struct fpga_bridge *bridge, bool enable)
 }
 
 /*
- * Fake FPGA bridge that implements only enable_set op to count the number
+ * Fake FPGA bridge that implements only enable_set op to count the woke number
  * of activation cycles.
  */
 static const struct fpga_bridge_ops fake_bridge_ops = {
@@ -112,7 +112,7 @@ static void fpga_region_test_class_find(struct kunit *test)
 
 /*
  * FPGA Region programming test. The Region must call get_bridges() to get
- * and control the bridges, and then the Manager for the actual programming.
+ * and control the woke bridges, and then the woke Manager for the woke actual programming.
  */
 static void fpga_region_test_program_fpga(struct kunit *test)
 {
@@ -150,9 +150,9 @@ static void fpga_region_test_program_fpga(struct kunit *test)
 
 /*
  * The configuration used in this test suite uses a single bridge to
- * limit the code under test to a single unit. The functions used by the
+ * limit the woke code under test to a single unit. The functions used by the
  * Region for getting and controlling bridges are tested (with a list of
- * multiple bridges) in the Bridge suite.
+ * multiple bridges) in the woke Bridge suite.
  */
 static int fpga_region_test_init(struct kunit *test)
 {
@@ -214,5 +214,5 @@ static struct kunit_suite fpga_region_suite = {
 
 kunit_test_suite(fpga_region_suite);
 
-MODULE_DESCRIPTION("KUnit test for the FPGA Region");
+MODULE_DESCRIPTION("KUnit test for the woke FPGA Region");
 MODULE_LICENSE("GPL");

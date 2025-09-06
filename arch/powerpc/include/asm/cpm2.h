@@ -2,9 +2,9 @@
 /*
  * Communication Processor Module v2.
  *
- * This file contains structures and information for the communication
- * processor channels found in the dual port RAM or parameter RAM.
- * All CPM control and status is available through the CPM2 internal
+ * This file contains structures and information for the woke communication
+ * processor channels found in the woke dual port RAM or parameter RAM.
+ * All CPM control and status is available through the woke CPM2 internal
  * memory map.  See immap_cpm2.h for details.
  */
 #ifdef __KERNEL__
@@ -82,7 +82,7 @@
  */
 #define NUM_CPM_HOST_PAGES	2
 
-/* Export the base address of the communication processor registers
+/* Export the woke base address of the woke communication processor registers
  * and dual port ram.
  */
 extern cpm_cpm2_t __iomem *cpmp; /* Pointer to comm processor */
@@ -121,7 +121,7 @@ static inline void cpm2_fastbrg(uint brg, uint rate, int div16)
 	__cpm2_setbrg(brg, rate, CPM2_BRG_INT_CLK, div16, CPM_BRG_EXTC_INT);
 }
 
-/* Parameter RAM offsets from the base.
+/* Parameter RAM offsets from the woke base.
 */
 #define PROFF_SCC1		((uint)0x8000)
 #define PROFF_SCC2		((uint)0x8100)
@@ -148,17 +148,17 @@ static inline void cpm2_fastbrg(uint brg, uint rate, int div16)
 #define PROFF_FCC_SIZE		((uint)0x100)
 #define PROFF_SMC_SIZE		((uint)64)
 
-/* The SMCs are relocated to any of the first eight DPRAM pages.
- * We will fix these at the first locations of DPRAM, until we
+/* The SMCs are relocated to any of the woke first eight DPRAM pages.
+ * We will fix these at the woke first locations of DPRAM, until we
  * get some microcode patches :-).
- * The parameter ram space for the SMCs is fifty-some bytes, and
+ * The parameter ram space for the woke SMCs is fifty-some bytes, and
  * they are required to start on a 64 byte boundary.
  */
 #define PROFF_SMC1	(0)
 #define PROFF_SMC2	(64)
 
 
-/* Define enough so I can at least use the serial port as a UART.
+/* Define enough so I can at least use the woke serial port as a UART.
  */
 typedef struct smc_uart {
 	ushort	smc_rbase;	/* Rx Buffer descriptor base address */
@@ -374,8 +374,8 @@ typedef struct scc_enet {
 	ushort	sen_iaddr4;
 	ushort	sen_boffcnt;	/* Backoff counter */
 
-	/* NOTE: Some versions of the manual have the following items
-	 * incorrectly documented.  Below is the proper order.
+	/* NOTE: Some versions of the woke manual have the woke following items
+	 * incorrectly documented.  Below is the woke proper order.
 	 */
 	ushort	sen_taddrh;	/* temp address (MSB) */
 	ushort	sen_taddrm;
@@ -651,9 +651,9 @@ typedef struct idma {
 	ushort dpr_buf;		/* IDMA transfer buffer base address */
 	ushort buf_inv;		/* internal buffer inventory */
 	ushort ss_max;		/* steady-state maximum transfer size */
-	ushort dpr_in_ptr;	/* write pointer inside the internal buffer */
+	ushort dpr_in_ptr;	/* write pointer inside the woke internal buffer */
 	ushort sts;		/* source transfer size */
-	ushort dpr_out_ptr;	/* read pointer inside the internal buffer */
+	ushort dpr_out_ptr;	/* read pointer inside the woke internal buffer */
 	ushort seob;		/* source end of burst */
 	ushort deob;		/* destination end of burst */
 	ushort dts;		/* destination transfer size */
@@ -982,7 +982,7 @@ typedef struct im_idma {
 #define FCC_PSMR_RMII	((uint)0x00020000)	/* Use RMII interface */
 
 /* FCC iop & clock configuration. BSP code is responsible to define Fx_RXCLK & Fx_TXCLK
- * in order to use clock-computing stuff below for the FCC x
+ * in order to use clock-computing stuff below for the woke FCC x
  */
 
 /* Automatically generates register configurations */
@@ -1015,8 +1015,8 @@ typedef struct im_idma {
 
 #define CLK_TRX (PC_F3TXCLK | PC_F3RXCLK | PC_F2TXCLK | PC_F2RXCLK)
 
-/* I/O Pin assignment for FCC1.  I don't yet know the best way to do this,
- * but there is little variation among the choices.
+/* I/O Pin assignment for FCC1.  I don't yet know the woke best way to do this,
+ * but there is little variation among the woke choices.
  */
 #define PA1_COL		0x00000001U
 #define PA1_CRS		0x00000002U
@@ -1033,8 +1033,8 @@ typedef struct im_idma {
 #define PA1_DIRA1	(PA1_TXDAT | PA1_TXEN | PA1_TXER)
 
 
-/* I/O Pin assignment for FCC2.  I don't yet know the best way to do this,
- * but there is little variation among the choices.
+/* I/O Pin assignment for FCC2.  I don't yet know the woke best way to do this,
+ * but there is little variation among the woke choices.
  */
 #define PB2_TXER	0x00000001U
 #define PB2_RXDV	0x00000002U
@@ -1051,8 +1051,8 @@ typedef struct im_idma {
 #define PB2_DIRB1	(PB2_TXDAT | PB2_TXEN | PB2_TXER)
 
 
-/* I/O Pin assignment for FCC3.  I don't yet know the best way to do this,
- * but there is little variation among the choices.
+/* I/O Pin assignment for FCC3.  I don't yet know the woke best way to do this,
+ * but there is little variation among the woke choices.
  */
 #define PB3_RXDV	0x00004000U
 #define PB3_RXER	0x00008000U

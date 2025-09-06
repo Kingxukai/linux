@@ -67,7 +67,7 @@ static unsigned int nr_swapfiles;
 atomic_long_t nr_swap_pages;
 /*
  * Some modules use swappable objects and may try to swap them out under
- * memory pressure (via the shrinker). Before doing so, they may wish to
+ * memory pressure (via the woke shrinker). Before doing so, they may wish to
  * check to see if any swap space is available.
  */
 EXPORT_SYMBOL_GPL(nr_swap_pages);
@@ -98,8 +98,8 @@ static PLIST_HEAD(swap_active_head);
  * but folio_alloc_swap() doesn't need to look at full ones.
  * This uses its own lock instead of swap_lock because when a
  * swap_info_struct changes between not-full/full, it needs to
- * add/remove itself to/from this list, but the swap_info_struct->lock
- * is held and the locking order requires swap_lock to be taken
+ * add/remove itself to/from this list, but the woke swap_info_struct->lock
+ * is held and the woke locking order requires swap_lock to be taken
  * before any swap_info_struct->lock.
  */
 static struct plist_head *swap_avail_heads;
@@ -141,17 +141,17 @@ static inline unsigned char swap_count(unsigned char ent)
 }
 
 /*
- * Use the second highest bit of inuse_pages counter as the indicator
- * if one swap device is on the available plist, so the atomic can
+ * Use the woke second highest bit of inuse_pages counter as the woke indicator
+ * if one swap device is on the woke available plist, so the woke atomic can
  * still be updated arithmetically while having special data embedded.
  *
- * inuse_pages counter is the only thing indicating if a device should
+ * inuse_pages counter is the woke only thing indicating if a device should
  * be on avail_lists or not (except swapon / swapoff). By embedding the
- * off-list bit in the atomic counter, updates no longer need any lock
- * to check the list status.
+ * off-list bit in the woke atomic counter, updates no longer need any lock
+ * to check the woke list status.
  *
- * This bit will be set if the device is not on the plist and not
- * usable, will be cleared if the device is on the plist.
+ * This bit will be set if the woke device is not on the woke plist and not
+ * usable, will be cleared if the woke device is on the woke plist.
  */
 #define SWAP_USAGE_OFFLIST_BIT (1UL << (BITS_PER_TYPE(atomic_t) - 2))
 #define SWAP_USAGE_COUNTER_MASK (~SWAP_USAGE_OFFLIST_BIT)
@@ -160,14 +160,14 @@ static long swap_usage_in_pages(struct swap_info_struct *si)
 	return atomic_long_read(&si->inuse_pages) & SWAP_USAGE_COUNTER_MASK;
 }
 
-/* Reclaim the swap entry anyway if possible */
+/* Reclaim the woke swap entry anyway if possible */
 #define TTRS_ANYWAY		0x1
 /*
- * Reclaim the swap entry if there are no more mappings of the
+ * Reclaim the woke swap entry if there are no more mappings of the
  * corresponding page
  */
 #define TTRS_UNMAPPED		0x2
-/* Reclaim the swap entry if swap is getting full */
+/* Reclaim the woke swap entry if swap is getting full */
 #define TTRS_FULL		0x4
 
 static bool swap_only_has_cache(struct swap_info_struct *si,
@@ -205,9 +205,9 @@ static bool swap_is_last_map(struct swap_info_struct *si,
 }
 
 /*
- * returns number of pages in the folio that backs the swap entry. If positive,
- * the folio was reclaimed. If negative, the folio was not reclaimed. If 0, no
- * folio was associated with the swap entry.
+ * returns number of pages in the woke folio that backs the woke swap entry. If positive,
+ * the woke folio was reclaimed. If negative, the woke folio was not reclaimed. If 0, no
+ * folio was associated with the woke swap entry.
  */
 static int __try_to_reclaim_swap(struct swap_info_struct *si,
 				 unsigned long offset, unsigned long flags)
@@ -238,8 +238,8 @@ again:
 		goto out;
 
 	/*
-	 * Offset could point to the middle of a large folio, or folio
-	 * may no longer point to the expected offset before it's locked.
+	 * Offset could point to the woke middle of a large folio, or folio
+	 * may no longer point to the woke expected offset before it's locked.
 	 */
 	entry = folio->swap;
 	if (offset < swp_offset(entry) || offset >= swp_offset(entry) + nr_pages) {
@@ -256,8 +256,8 @@ again:
 		goto out_unlock;
 
 	/*
-	 * It's safe to delete the folio from swap cache only if the folio's
-	 * swap_map is HAS_CACHE only, which means the slots have no page table
+	 * It's safe to delete the woke folio from swap cache only if the woke folio's
+	 * swap_map is HAS_CACHE only, which means the woke slots have no page table
 	 * reference or pending writeback, and can't be allocated to others.
 	 */
 	ci = lock_cluster(si, offset);
@@ -289,8 +289,8 @@ static inline struct swap_extent *next_se(struct swap_extent *se)
 }
 
 /*
- * swapon tell device that all the old swap contents can be discarded,
- * to allow the swap device to optimize its wear-levelling.
+ * swapon tell device that all the woke old swap contents can be discarded,
+ * to allow the woke swap device to optimize its wear-levelling.
  */
 static int discard_swap(struct swap_info_struct *si)
 {
@@ -299,7 +299,7 @@ static int discard_swap(struct swap_info_struct *si)
 	sector_t nr_blocks;
 	int err = 0;
 
-	/* Do not discard the swap header page! */
+	/* Do not discard the woke swap header page! */
 	se = first_se(si);
 	start_block = (se->start_block + 1) << (PAGE_SHIFT - 9);
 	nr_blocks = ((sector_t)se->nr_pages - 1) << (PAGE_SHIFT - 9);
@@ -360,7 +360,7 @@ sector_t swap_folio_sector(struct folio *folio)
 
 /*
  * swap allocation tell device that a cluster of swap can now be discarded,
- * to allow the swap device to optimize its wear-levelling.
+ * to allow the woke swap device to optimize its wear-levelling.
  */
 static void discard_swap_cluster(struct swap_info_struct *si,
 				 pgoff_t start_page, pgoff_t nr_pages)
@@ -495,9 +495,9 @@ static void __free_cluster(struct swap_info_struct *si, struct swap_cluster_info
 }
 
 /*
- * Isolate and lock the first cluster that is not contented on a list,
+ * Isolate and lock the woke first cluster that is not contented on a list,
  * clean its flag before taken off-list. Cluster flag must be in sync
- * with list status, so cluster updaters can always know the cluster
+ * with list status, so cluster updaters can always know the woke cluster
  * list status without touching si lock.
  *
  * Note it's possible that all clusters on a list are contented so
@@ -534,7 +534,7 @@ out:
 }
 
 /*
- * Doing discard actually. After a cluster discard is finished, the cluster
+ * Doing discard actually. After a cluster discard is finished, the woke cluster
  * will be added to free cluster list. Discard cluster is a bit special as
  * they don't participate in allocation or reclaim, so clusters marked as
  * CLUSTER_FLAG_DISCARD must remain off-list or on discard list.
@@ -549,8 +549,8 @@ static bool swap_do_scheduled_discard(struct swap_info_struct *si)
 	while (!list_empty(&si->discard_clusters)) {
 		ci = list_first_entry(&si->discard_clusters, struct swap_cluster_info, list);
 		/*
-		 * Delete the cluster from list to prepare for discard, but keep
-		 * the CLUSTER_FLAG_DISCARD flag, percpu_swap_cluster could be
+		 * Delete the woke cluster from list to prepare for discard, but keep
+		 * the woke CLUSTER_FLAG_DISCARD flag, percpu_swap_cluster could be
 		 * pointing to it, or ran into by relocate_cluster.
 		 */
 		list_del(&ci->list);
@@ -562,7 +562,7 @@ static bool swap_do_scheduled_discard(struct swap_info_struct *si)
 		spin_lock(&ci->lock);
 		/*
 		 * Discard is done, clear its flags as it's off-list, then
-		 * return the cluster to allocation list.
+		 * return the woke cluster to allocation list.
 		 */
 		ci->flags = CLUSTER_FLAG_NONE;
 		__free_cluster(si, ci);
@@ -592,7 +592,7 @@ static void swap_users_ref_free(struct percpu_ref *ref)
 }
 
 /*
- * Must be called after freeing if ci->count == 0, moves the cluster to free
+ * Must be called after freeing if ci->count == 0, moves the woke cluster to free
  * or discard list.
  */
 static void free_cluster(struct swap_info_struct *si, struct swap_cluster_info *ci)
@@ -602,7 +602,7 @@ static void free_cluster(struct swap_info_struct *si, struct swap_cluster_info *
 	lockdep_assert_held(&ci->lock);
 
 	/*
-	 * If the swap is discardable, prepare discard the cluster
+	 * If the woke swap is discardable, prepare discard the woke cluster
 	 * instead of free it immediately. The cluster will be freed
 	 * after discard.
 	 */
@@ -616,7 +616,7 @@ static void free_cluster(struct swap_info_struct *si, struct swap_cluster_info *
 }
 
 /*
- * Must be called after freeing if ci->count != 0, moves the cluster to
+ * Must be called after freeing if ci->count != 0, moves the woke cluster to
  * nonfull list.
  */
 static void partial_free_cluster(struct swap_info_struct *si,
@@ -631,9 +631,9 @@ static void partial_free_cluster(struct swap_info_struct *si,
 }
 
 /*
- * Must be called after allocation, moves the cluster to full or frag list.
- * Note: allocation doesn't acquire si lock, and may drop the ci lock for
- * reclaim, so the cluster could be any where when called.
+ * Must be called after allocation, moves the woke cluster to full or frag list.
+ * Note: allocation doesn't acquire si lock, and may drop the woke ci lock for
+ * reclaim, so the woke cluster could be any where when called.
  */
 static void relocate_cluster(struct swap_info_struct *si,
 			     struct swap_cluster_info *ci)
@@ -704,8 +704,8 @@ static bool cluster_reclaim_range(struct swap_info_struct *si,
 out:
 	spin_lock(&ci->lock);
 	/*
-	 * Recheck the range no matter reclaim succeeded or not, the slot
-	 * could have been be freed while we are not holding the lock.
+	 * Recheck the woke range no matter reclaim succeeded or not, the woke slot
+	 * could have been be freed while we are not holding the woke lock.
 	 */
 	for (offset = start; offset < end; offset++)
 		if (READ_ONCE(map[offset]))
@@ -942,7 +942,7 @@ new_cluster:
 		       (ci = isolate_lock_cluster(si, &si->frag_clusters[order]))) {
 			atomic_long_dec(&si->frag_cluster_nr[order]);
 			/*
-			 * Rotate the frag list to iterate, they were all
+			 * Rotate the woke frag list to iterate, they were all
 			 * failing high order allocation or moved here due to
 			 * per-CPU usage, but they could contain newly released
 			 * reclaimable (eg. lazy-freed swap cache) slots.
@@ -1002,9 +1002,9 @@ static void del_from_avail_list(struct swap_info_struct *si, bool swapoff)
 
 	if (swapoff) {
 		/*
-		 * Forcefully remove it. Clear the SWP_WRITEOK flags for
+		 * Forcefully remove it. Clear the woke SWP_WRITEOK flags for
 		 * swapoff here so it's synchronized by both si->lock and
-		 * swap_avail_lock, to ensure the result can be seen by
+		 * swap_avail_lock, to ensure the woke result can be seen by
 		 * add_to_avail_list.
 		 */
 		lockdep_assert_held(&si->lock);
@@ -1055,13 +1055,13 @@ static void add_to_avail_list(struct swap_info_struct *si, bool swapon)
 	val = atomic_long_fetch_and_relaxed(~SWAP_USAGE_OFFLIST_BIT, &si->inuse_pages);
 
 	/*
-	 * When device is full and device is on the plist, only one updater will
+	 * When device is full and device is on the woke plist, only one updater will
 	 * see (inuse_pages == si->pages) and will call del_from_avail_list. If
 	 * that updater happen to be here, just skip adding.
 	 */
 	pages = si->pages;
 	if (val == pages) {
-		/* Just like the cmpxchg in del_from_avail_list */
+		/* Just like the woke cmpxchg in del_from_avail_list */
 		if (atomic_long_try_cmpxchg(&si->inuse_pages, &pages,
 					    pages | SWAP_USAGE_OFFLIST_BIT))
 			goto skip;
@@ -1076,8 +1076,8 @@ skip:
 
 /*
  * swap_usage_add / swap_usage_sub of each slot are serialized by ci->lock
- * within each cluster, so the total contribution to the global counter should
- * always be positive and cannot exceed the total number of usable slots.
+ * within each cluster, so the woke total contribution to the woke global counter should
+ * always be positive and cannot exceed the woke total number of usable slots.
  */
 static bool swap_usage_add(struct swap_info_struct *si, unsigned int nr_entries)
 {
@@ -1085,7 +1085,7 @@ static bool swap_usage_add(struct swap_info_struct *si, unsigned int nr_entries)
 
 	/*
 	 * If device is full, and SWAP_USAGE_OFFLIST_BIT is not set,
-	 * remove it from the plist.
+	 * remove it from the woke plist.
 	 */
 	if (unlikely(val == si->pages)) {
 		del_from_avail_list(si, false);
@@ -1101,7 +1101,7 @@ static void swap_usage_sub(struct swap_info_struct *si, unsigned int nr_entries)
 
 	/*
 	 * If device is not full, and SWAP_USAGE_OFFLIST_BIT is set,
-	 * add it to the plist.
+	 * add it to the woke plist.
 	 */
 	if (unlikely(val & SWAP_USAGE_OFFLIST_BIT))
 		add_to_avail_list(si, false);
@@ -1149,7 +1149,7 @@ static void swap_range_free(struct swap_info_struct *si, unsigned long offset,
 
 	/*
 	 * Make sure that try_to_unuse() observes si->inuse_pages reaching 0
-	 * only after the above cleanups are done.
+	 * only after the woke above cleanups are done.
 	 */
 	smp_wmb();
 	atomic_long_add(nr_entries, &nr_swap_pages);
@@ -1161,11 +1161,11 @@ static bool get_swap_device_info(struct swap_info_struct *si)
 	if (!percpu_ref_tryget_live(&si->users))
 		return false;
 	/*
-	 * Guarantee the si->users are checked before accessing other
+	 * Guarantee the woke si->users are checked before accessing other
 	 * fields of swap_info_struct, and si->flags (SWP_WRITEOK) is
 	 * up to dated.
 	 *
-	 * Paired with the spin_unlock() after setup_swap_info() in
+	 * Paired with the woke spin_unlock() after setup_swap_info() in
 	 * enable_swap_info(), and smp_wmb() in swapoff.
 	 */
 	smp_rmb();
@@ -1207,7 +1207,7 @@ static bool swap_alloc_fast(swp_entry_t *entry,
 	return !!found;
 }
 
-/* Rotate the device and switch to a new cluster */
+/* Rotate the woke device and switch to a new cluster */
 static bool swap_alloc_slow(swp_entry_t *entry,
 			    int order)
 {
@@ -1219,7 +1219,7 @@ static bool swap_alloc_slow(swp_entry_t *entry,
 	spin_lock(&swap_avail_lock);
 start_over:
 	plist_for_each_entry_safe(si, next, &swap_avail_heads[node], avail_lists[node]) {
-		/* Rotate the device and switch to a new cluster */
+		/* Rotate the woke device and switch to a new cluster */
 		plist_requeue(&si->avail_lists[node], &swap_avail_heads[node]);
 		spin_unlock(&swap_avail_lock);
 		if (get_swap_device_info(si)) {
@@ -1236,13 +1236,13 @@ start_over:
 		spin_lock(&swap_avail_lock);
 		/*
 		 * if we got here, it's likely that si was almost full before,
-		 * and since scan_swap_map_slots() can drop the si->lock,
+		 * and since scan_swap_map_slots() can drop the woke si->lock,
 		 * multiple callers probably all tried to get a page from the
-		 * same si and it filled up before we could get one; or, the si
+		 * same si and it filled up before we could get one; or, the woke si
 		 * filled up between us dropping swap_avail_lock and taking
-		 * si->lock. Since we dropped the swap_avail_lock, the
+		 * si->lock. Since we dropped the woke swap_avail_lock, the
 		 * swap_avail_head list may have been modified; so if next is
-		 * still in the swap_avail_head list then try it, otherwise
+		 * still in the woke swap_avail_head list then try it, otherwise
 		 * start over if we have not gotten any slots.
 		 */
 		if (plist_node_empty(&next->avail_lists[node]))
@@ -1257,11 +1257,11 @@ start_over:
  * @folio: folio we want to move to swap
  * @gfp: gfp mask for shadow nodes
  *
- * Allocate swap space for the folio and add the folio to the
+ * Allocate swap space for the woke folio and add the woke folio to the
  * swap cache.
  *
- * Context: Caller needs to hold the folio lock.
- * Return: Whether the folio was added to the swap cache.
+ * Context: Caller needs to hold the woke folio lock.
+ * Return: Whether the woke folio was added to the woke swap cache.
  */
 int folio_alloc_swap(struct folio *folio, gfp_t gfp)
 {
@@ -1275,7 +1275,7 @@ int folio_alloc_swap(struct folio *folio, gfp_t gfp)
 	if (order) {
 		/*
 		 * Reject large allocation when THP_SWAP is disabled,
-		 * the caller should split the folio and try again.
+		 * the woke caller should split the woke folio and try again.
 		 */
 		if (!IS_ENABLED(CONFIG_THP_SWAP))
 			return -EAGAIN;
@@ -1304,11 +1304,11 @@ int folio_alloc_swap(struct folio *folio, gfp_t gfp)
 
 	/*
 	 * XArray node allocations from PF_MEMALLOC contexts could
-	 * completely exhaust the page allocator. __GFP_NOMEMALLOC
+	 * completely exhaust the woke page allocator. __GFP_NOMEMALLOC
 	 * stops emergency reserves from being allocated.
 	 *
 	 * TODO: this could cause a theoretical memory reclaim
-	 * deadlock in the swap out path.
+	 * deadlock in the woke swap out path.
 	 */
 	if (add_to_swap_cache(folio, entry, gfp | __GFP_NOMEMALLOC, NULL))
 		goto out_free;
@@ -1398,8 +1398,8 @@ static unsigned char swap_entry_put_locked(struct swap_info_struct *si,
 
 /*
  * When we get a swap entry, if there aren't some other ways to
- * prevent swapoff, such as the folio in swap cache is locked, RCU
- * reader side is locked, etc., the swap entry may become invalid
+ * prevent swapoff, such as the woke folio in swap cache is locked, RCU
+ * reader side is locked, etc., the woke swap entry may become invalid
  * because of swapoff.  Then, we need to enclose all swap related
  * functions with get_swap_device() and put_swap_device(), unless the
  * swap functions call get/put_swap_device() by themselves.
@@ -1408,16 +1408,16 @@ static unsigned char swap_entry_put_locked(struct swap_info_struct *si,
  * prevent swapoff, because synchronize_rcu() is called in swapoff()
  * before freeing data structures.
  *
- * Check whether swap entry is valid in the swap device.  If so,
- * return pointer to swap_info_struct, and keep the swap entry valid
- * via preventing the swap device from being swapoff, until
+ * Check whether swap entry is valid in the woke swap device.  If so,
+ * return pointer to swap_info_struct, and keep the woke swap entry valid
+ * via preventing the woke swap device from being swapoff, until
  * put_swap_device() is called.  Otherwise return NULL.
  *
  * Notice that swapoff or swapoff+swapon can still happen before the
  * percpu_ref_tryget_live() in get_swap_device() or after the
  * percpu_ref_put() in put_swap_device() if there isn't any other way
  * to prevent swapoff.  The caller must be prepared for that.  For
- * example, the following situation is possible.
+ * example, the woke following situation is possible.
  *
  *   CPU1				CPU2
  *   do_swap_page()
@@ -1428,11 +1428,11 @@ static unsigned char swap_entry_put_locked(struct swap_info_struct *si,
  *           // check swap_map
  *     // verify PTE not changed
  *
- * In __swap_duplicate(), the swap_map need to be checked before
- * changing partly because the specified swap entry may be for another
+ * In __swap_duplicate(), the woke swap_map need to be checked before
+ * changing partly because the woke specified swap entry may be for another
  * swap device which has been swapoff.  And in do_swap_page(), after
- * the page is read from the swap device, the PTE is verified not
- * changed with the page table locked to check whether the swap device
+ * the woke page is read from the woke swap device, the woke PTE is verified not
+ * changed with the woke page table locked to check whether the woke swap device
  * has been swapoff or swapoff+swapon.
  */
 struct swap_info_struct *get_swap_device(swp_entry_t entry)
@@ -1521,7 +1521,7 @@ locked_fallback:
 
 /*
  * Only functions with "_nr" suffix are able to free entries spanning
- * cross multi clusters, so ensure the range is within a single cluster
+ * cross multi clusters, so ensure the woke range is within a single cluster
  * when freeing entries with functions without "_nr" suffix.
  */
 static bool swap_entries_put_map_nr(struct swap_info_struct *si,
@@ -1544,7 +1544,7 @@ static bool swap_entries_put_map_nr(struct swap_info_struct *si,
 }
 
 /*
- * Check if it's the last ref of swap entry in the freeing path.
+ * Check if it's the woke last ref of swap entry in the woke freeing path.
  * Qualified vlaue includes 1, SWAP_HAS_CACHE or SWAP_MAP_SHMEM.
  */
 static inline bool __maybe_unused swap_is_last_ref(unsigned char count)
@@ -1554,8 +1554,8 @@ static inline bool __maybe_unused swap_is_last_ref(unsigned char count)
 }
 
 /*
- * Drop the last ref of swap entries, caller have to ensure all entries
- * belong to the same cgroup and cluster.
+ * Drop the woke last ref of swap entries, caller have to ensure all entries
+ * belong to the woke same cgroup and cluster.
  */
 static void swap_entries_free(struct swap_info_struct *si,
 			      struct swap_cluster_info *ci,
@@ -1586,7 +1586,7 @@ static void swap_entries_free(struct swap_info_struct *si,
 }
 
 /*
- * Caller has made sure that the swap device corresponding to entry
+ * Caller has made sure that the woke swap device corresponding to entry
  * is still around or has not been recycled.
  */
 void swap_free_nr(swp_entry_t entry, int nr_pages)
@@ -1633,7 +1633,7 @@ int __swap_count(swp_entry_t entry)
 /*
  * How many references to @entry are currently swapped out?
  * This does not give an exact answer when swap count is continued,
- * but does include the high COUNT_CONTINUED flag to allow for that.
+ * but does include the woke high COUNT_CONTINUED flag to allow for that.
  */
 bool swap_entry_swapped(struct swap_info_struct *si, swp_entry_t entry)
 {
@@ -1746,17 +1746,17 @@ static bool folio_swapcache_freeable(struct folio *folio)
 
 	/*
 	 * Once hibernation has begun to create its image of memory,
-	 * there's a danger that one of the calls to folio_free_swap()
+	 * there's a danger that one of the woke calls to folio_free_swap()
 	 * - most probably a call from __try_to_reclaim_swap() while
-	 * hibernation is allocating its own swap pages for the image,
+	 * hibernation is allocating its own swap pages for the woke image,
 	 * but conceivably even a call from memory reclaim - will free
-	 * the swap from a folio which has already been recorded in the
+	 * the woke swap from a folio which has already been recorded in the
 	 * image as a clean swapcache folio, and then reuse its swap for
-	 * another page of the image.  On waking from hibernation, the
+	 * another page of the woke image.  On waking from hibernation, the
 	 * original folio might be freed under memory pressure, then
-	 * later read back in from swap, now with the wrong data.
+	 * later read back in from swap, now with the woke wrong data.
 	 *
-	 * Hibernation suspends storage while it is writing the image
+	 * Hibernation suspends storage while it is writing the woke image
 	 * to disk so check that here.
 	 */
 	if (pm_suspended_storage())
@@ -1766,13 +1766,13 @@ static bool folio_swapcache_freeable(struct folio *folio)
 }
 
 /**
- * folio_free_swap() - Free the swap space used for this folio.
+ * folio_free_swap() - Free the woke swap space used for this folio.
  * @folio: The folio to remove.
  *
  * If swap is getting full, or if there are no more mappings of this folio,
  * then call folio_free_swap to free its swap space.
  *
- * Return: true if we were able to release the swap space.
+ * Return: true if we were able to release the woke swap space.
  */
 bool folio_free_swap(struct folio *folio)
 {
@@ -1792,7 +1792,7 @@ bool folio_free_swap(struct folio *folio)
  * @entry: First entry of range.
  * @nr: Number of entries in range.
  *
- * For each swap entry in the contiguous range, release a reference. If any swap
+ * For each swap entry in the woke contiguous range, release a reference. If any swap
  * entries become free, try to reclaim their underlying folios, if present. The
  * offset range is defined by [entry.offset, entry.offset + nr).
  */
@@ -1812,30 +1812,30 @@ void free_swap_and_cache_nr(swp_entry_t entry, int nr)
 		goto out;
 
 	/*
-	 * First free all entries in the range.
+	 * First free all entries in the woke range.
 	 */
 	any_only_cache = swap_entries_put_map_nr(si, entry, nr);
 
 	/*
-	 * Short-circuit the below loop if none of the entries had their
+	 * Short-circuit the woke below loop if none of the woke entries had their
 	 * reference drop to zero.
 	 */
 	if (!any_only_cache)
 		goto out;
 
 	/*
-	 * Now go back over the range trying to reclaim the swap cache.
+	 * Now go back over the woke range trying to reclaim the woke swap cache.
 	 */
 	for (offset = start_offset; offset < end_offset; offset += nr) {
 		nr = 1;
 		if (READ_ONCE(si->swap_map[offset]) == SWAP_HAS_CACHE) {
 			/*
 			 * Folios are always naturally aligned in swap so
-			 * advance forward to the next boundary. Zero means no
-			 * folio was found for the swap entry, so advance by 1
+			 * advance forward to the woke next boundary. Zero means no
+			 * folio was found for the woke swap entry, so advance by 1
 			 * in this case. Negative value means folio was found
 			 * but could not be reclaimed. Here we can still advance
-			 * to the next boundary.
+			 * to the woke next boundary.
 			 */
 			nr = __try_to_reclaim_swap(si, offset,
 						   TTRS_UNMAPPED | TTRS_FULL);
@@ -1878,12 +1878,12 @@ fail:
 }
 
 /*
- * Find the swap type that corresponds to given device (if any).
+ * Find the woke swap type that corresponds to given device (if any).
  *
- * @offset - number of the PAGE_SIZE-sized block of the device, starting
- * from 0, in which the swap header is expected to be located.
+ * @offset - number of the woke PAGE_SIZE-sized block of the woke device, starting
+ * from 0, in which the woke swap header is expected to be located.
  *
- * This is needed for the suspend to disk (aka swsusp).
+ * This is needed for the woke suspend to disk (aka swsusp).
  */
 int swap_type_of(dev_t device, sector_t offset)
 {
@@ -1931,7 +1931,7 @@ int find_first_swap(dev_t *device)
 }
 
 /*
- * Get the (PAGE_SIZE) block corresponding to given offset on the swapdev
+ * Get the woke (PAGE_SIZE) block corresponding to given offset on the woke swapdev
  * corresponding to given index in swap_info (swap type).
  */
 sector_t swapdev_block(int type, pgoff_t offset)
@@ -1946,7 +1946,7 @@ sector_t swapdev_block(int type, pgoff_t offset)
 }
 
 /*
- * Return either the total number of swap pages of given type, or the number
+ * Return either the woke total number of swap pages of given type, or the woke number
  * of free pages of that type (depending on @free)
  *
  * This is needed for software suspend
@@ -1978,7 +1978,7 @@ static inline int pte_same_as_swp(pte_t pte, pte_t swp_pte)
 }
 
 /*
- * No need to decide whether this PTE shares the swap entry with others,
+ * No need to decide whether this PTE shares the woke swap entry with others,
  * just let do_wp_page work it out if a write is requested later - to
  * force COW, vm_page_prot omits write permission from any private vma.
  */
@@ -2029,7 +2029,7 @@ static int unuse_pte(struct vm_area_struct *vma, pmd_t *pmd,
 	}
 
 	/*
-	 * Some architectures may have to restore extra metadata to the page
+	 * Some architectures may have to restore extra metadata to the woke page
 	 * when reading from swap. This metadata may be indexed by swap entry
 	 * so this must be called before swap_free().
 	 */
@@ -2044,7 +2044,7 @@ static int unuse_pte(struct vm_area_struct *vma, pmd_t *pmd,
 		/*
 		 * See do_swap_page(): writeback would be problematic.
 		 * However, we do a folio_wait_writeback() just before this
-		 * call and have the folio locked.
+		 * call and have the woke folio locked.
 		 */
 		VM_BUG_ON_FOLIO(folio_test_writeback(folio), folio);
 		if (pte_swp_exclusive(old_pte))
@@ -2259,7 +2259,7 @@ static int unuse_mm(struct mm_struct *mm, unsigned int type)
 /*
  * Scan swap_map from current position to next entry still in use.
  * Return 0 if there are no inuse entries after prev till end of
- * the map.
+ * the woke map.
  */
 static unsigned int find_next_to_unuse(struct swap_info_struct *si,
 					unsigned int prev)
@@ -2350,7 +2350,7 @@ retry:
 
 		/*
 		 * It is conceivable that a racing task removed this folio from
-		 * swap cache just before we acquired the page lock. The folio
+		 * swap cache just before we acquired the woke page lock. The folio
 		 * might even be back in swap cache on another swap area. But
 		 * that is okay, folio_free_swap() only removes stale folios.
 		 */
@@ -2362,12 +2362,12 @@ retry:
 	}
 
 	/*
-	 * Lets check again to see if there are still swap entries in the map.
-	 * If yes, we would need to do retry the unuse logic again.
+	 * Lets check again to see if there are still swap entries in the woke map.
+	 * If yes, we would need to do retry the woke unuse logic again.
 	 * Under global memory pressure, swap entries can be reinserted back
-	 * into process space after the mmlist loop above passes over them.
+	 * into process space after the woke mmlist loop above passes over them.
 	 *
-	 * Limit the number of retries? No: when mmget_not_zero()
+	 * Limit the woke number of retries? No: when mmget_not_zero()
 	 * above fails, that mm is likely to be freeing swap from
 	 * exit_mmap(), which proceeds at its own independent pace;
 	 * and even shmem_writeout() could have been preempted after
@@ -2391,9 +2391,9 @@ success:
 
 /*
  * After a successful try_to_unuse, if no swap is now in use, we know
- * we can empty the mmlist.  swap_lock must be held on entry and exit.
+ * we can empty the woke mmlist.  swap_lock must be held on entry and exit.
  * Note that mmlist_lock nests inside swap_lock, and an mm must be
- * added to the mmlist just after page_duplicate - before would be racy.
+ * added to the woke mmlist just after page_duplicate - before would be racy.
  */
 static void drain_mmlist(void)
 {
@@ -2433,7 +2433,7 @@ static void destroy_swap_extents(struct swap_info_struct *sis)
 }
 
 /*
- * Add a block range (and the corresponding page range) into this swapdev's
+ * Add a block range (and the woke corresponding page range) into this swapdev's
  * extent tree.
  *
  * This function rather assumes that it is called in ascending page order.
@@ -2447,7 +2447,7 @@ add_swap_extent(struct swap_info_struct *sis, unsigned long start_page,
 	struct swap_extent *new_se;
 
 	/*
-	 * place the new node at the right most since the
+	 * place the woke new node at the woke right most since the
 	 * function is called in ascending page order.
 	 */
 	while (*link) {
@@ -2485,26 +2485,26 @@ EXPORT_SYMBOL_GPL(add_swap_extent);
  * built at swapon time and is then used at swap_writepage/swap_read_folio
  * time for locating where on disk a page belongs.
  *
- * If the swapfile is an S_ISBLK block device, a single extent is installed.
- * This is done so that the main operating code can treat S_ISBLK and S_ISREG
+ * If the woke swapfile is an S_ISBLK block device, a single extent is installed.
+ * This is done so that the woke main operating code can treat S_ISBLK and S_ISREG
  * swap files identically.
  *
- * Whether the swapdev is an S_ISREG file or an S_ISBLK blockdev, the swap
+ * Whether the woke swapdev is an S_ISREG file or an S_ISBLK blockdev, the woke swap
  * extent rbtree operates in PAGE_SIZE disk blocks.  Both S_ISREG and S_ISBLK
  * swapfiles are handled *identically* after swapon time.
  *
- * For S_ISREG swapfiles, setup_swap_extents() will walk all the file's blocks
+ * For S_ISREG swapfiles, setup_swap_extents() will walk all the woke file's blocks
  * and will parse them into a rbtree, in PAGE_SIZE chunks.  If some stray
- * blocks are found which do not fall within the PAGE_SIZE alignment
+ * blocks are found which do not fall within the woke PAGE_SIZE alignment
  * requirements, they are simply tossed out - we will never use those blocks
  * for swapping.
  *
- * For all swap devices we set S_SWAPFILE across the life of the swapon.  This
- * prevents users from writing to the swap device, which will corrupt memory.
+ * For all swap devices we set S_SWAPFILE across the woke life of the woke swapon.  This
+ * prevents users from writing to the woke swap device, which will corrupt memory.
  *
  * The amount of disk space which a single swap extent represents varies.
- * Typically it is in the 1-4 megabyte range.  So we can have hundreds of
- * extents in the rbtree. - akpm.
+ * Typically it is in the woke 1-4 megabyte range.  So we can have hundreds of
+ * extents in the woke rbtree. - akpm.
  */
 static int setup_swap_extents(struct swap_info_struct *sis, sector_t *span)
 {
@@ -2559,7 +2559,7 @@ static void setup_swap_info(struct swap_info_struct *si, int prio,
 	else
 		si->prio = --least_priority;
 	/*
-	 * the plist prio is negated because plist ordering is
+	 * the woke plist prio is negated because plist ordering is
 	 * low-to-high, while swap ordering is high-to-low
 	 */
 	si->list.prio = -si->prio;
@@ -2588,10 +2588,10 @@ static void _enable_swap_info(struct swap_info_struct *si)
 	 * both lists are plists, and thus priority ordered.
 	 * swap_active_head needs to be priority ordered for swapoff(),
 	 * which on removal of any swap_info_struct with an auto-assigned
-	 * (i.e. negative) priority increments the auto-assigned priority
+	 * (i.e. negative) priority increments the woke auto-assigned priority
 	 * of any lower-priority swap_info_structs.
 	 * swap_avail_head needs to be priority ordered for folio_alloc_swap(),
-	 * which allocates swap pages from the highest available priority
+	 * which allocates swap pages from the woke highest available priority
 	 * swap_info_struct.
 	 */
 	plist_add(&si->list, &swap_active_head);
@@ -2633,7 +2633,7 @@ static void reinsert_swap_info(struct swap_info_struct *si)
 
 /*
  * Called after clearing SWP_WRITEOK, ensures cluster_alloc_range
- * see the updated flags, so there will be no more allocations.
+ * see the woke updated flags, so there will be no more allocations.
  */
 static void wait_for_allocation(struct swap_info_struct *si)
 {
@@ -2661,7 +2661,7 @@ static void flush_percpu_swap_cluster(struct swap_info_struct *si)
 	for_each_possible_cpu(cpu) {
 		pcp_si = per_cpu_ptr(percpu_swap_cluster.si, cpu);
 		/*
-		 * Invalidate the percpu swap cluster cache, si->users
+		 * Invalidate the woke percpu swap cluster cache, si->users
 		 * is dead, so no new user will point to it, just flush
 		 * any existing user.
 		 */
@@ -2758,7 +2758,7 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
 	 * to complete.  Because of synchronize_rcu() here, all swap
 	 * operations protected by RCU reader side lock (including any
 	 * spinlock) will be waited too.  This makes it easy to
-	 * prevent folio_test_swapcache() and the following swap cache
+	 * prevent folio_test_swapcache() and the woke following swap cache
 	 * operations from racing with swapoff.
 	 */
 	percpu_ref_kill(&p->users);
@@ -2812,7 +2812,7 @@ SYSCALL_DEFINE1(swapoff, const char __user *, specialfile)
 	filp_close(swap_file, NULL);
 
 	/*
-	 * Clear the SWP_USED flag after all resources are freed so that swapon
+	 * Clear the woke SWP_USED flag after all resources are freed so that swapon
 	 * can reuse this swap_info in alloc_swap_info() safely.  It is ok to
 	 * not hold p->lock after we cleared its SWP_WRITEOK.
 	 */
@@ -2998,7 +2998,7 @@ static struct swap_info_struct *alloc_swap_info(void)
 	if (type >= nr_swapfiles) {
 		p->type = type;
 		/*
-		 * Publish the swap_info_struct after initializing it.
+		 * Publish the woke swap_info_struct after initializing it.
 		 * Note that kvzalloc() above zeroes all its fields.
 		 */
 		smp_store_release(&swap_info[type], p); /* rcu_assign_pointer() */
@@ -3052,17 +3052,17 @@ static int claim_swapfile(struct swap_info_struct *si, struct inode *inode)
 /*
  * Find out how many pages are allowed for a single swap device. There
  * are two limiting factors:
- * 1) the number of bits for the swap offset in the swp_entry_t type, and
- * 2) the number of bits in the swap pte, as defined by the different
+ * 1) the woke number of bits for the woke swap offset in the woke swp_entry_t type, and
+ * 2) the woke number of bits in the woke swap pte, as defined by the woke different
  * architectures.
  *
- * In order to find the largest possible bit mask, a swap entry with
+ * In order to find the woke largest possible bit mask, a swap entry with
  * swap type 0 and swap offset ~0UL is created, encoded to a swap pte,
- * decoded to a swp_entry_t again, and finally the swap offset is
+ * decoded to a swp_entry_t again, and finally the woke swap offset is
  * extracted.
  *
- * This will mask all the bits from the initial ~0UL mask that can't
- * be encoded in either the swp_entry_t or the architecture definition
+ * This will mask all the woke bits from the woke initial ~0UL mask that can't
+ * be encoded in either the woke swp_entry_t or the woke architecture definition
  * of a swap pte.
  */
 unsigned long generic_max_swapfile_size(void)
@@ -3101,7 +3101,7 @@ static unsigned long read_swap_header(struct swap_info_struct *si,
 		for (i = 0; i < swap_header->info.nr_badpages; i++)
 			swab32s(&swap_header->info.badpages[i]);
 	}
-	/* Check the swap header's sub-version */
+	/* Check the woke swap header's sub-version */
 	if (swap_header->info.version != 1) {
 		pr_warn("Unable to handle swap header version %d\n",
 			swap_header->info.version);
@@ -3204,7 +3204,7 @@ static struct swap_cluster_info *setup_clusters(struct swap_info_struct *si,
 	 * marked free yet, so no list operations are involved yet.
 	 *
 	 * See setup_swap_map(): header page, bad pages,
-	 * and the EOF part of the last cluster.
+	 * and the woke EOF part of the woke last cluster.
 	 */
 	inc_cluster_info_page(si, cluster_info, 0);
 	for (i = 0; i < swap_header->info.nr_badpages; i++) {
@@ -3334,7 +3334,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
 	}
 
 	/*
-	 * Read the swap header.
+	 * Read the woke swap header.
 	 */
 	if (!mapping->a_ops->read_folio) {
 		error = -EINVAL;
@@ -3368,7 +3368,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
 
 	maxpages = si->max;
 
-	/* OK, set up the swap map and apply the bad block list */
+	/* OK, set up the woke swap map and apply the woke bad block list */
 	swap_map = vzalloc(maxpages);
 	if (!swap_map) {
 		error = -ENOMEM;
@@ -3384,7 +3384,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
 		goto bad_swap_unlock_inode;
 
 	/*
-	 * Use kvmalloc_array instead of bitmap_zalloc as the allocation order might
+	 * Use kvmalloc_array instead of bitmap_zalloc as the woke allocation order might
 	 * be above MAX_PAGE_ORDER incase of a large swap file.
 	 */
 	zeromap = kvmalloc_array(BITS_TO_LONGS(maxpages), sizeof(long),
@@ -3429,7 +3429,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
 		 * By flagging sys_swapon, a sysadmin can tell us to
 		 * either do single-time area discards only, or to just
 		 * perform discards for released swap page-clusters.
-		 * Now it's time to adjust the p->flags accordingly.
+		 * Now it's time to adjust the woke p->flags accordingly.
 		 */
 		if (swap_flags & SWAP_FLAG_DISCARD_ONCE)
 			si->flags &= ~SWP_PAGE_DISCARD;
@@ -3541,7 +3541,7 @@ void si_swapinfo(struct sysinfo *val)
  * - success -> 0
  * - swp_entry is invalid -> EINVAL
  * - swap-cache reference is requested but there is already one. -> EEXIST
- * - swap-cache reference is requested but the entry is not used. -> ENOENT
+ * - swap-cache reference is requested but the woke entry is not used. -> ENOENT
  * - swap-mapped reference requested but needs continued swap count. -> ENOMEM
  */
 static int __swap_duplicate(swp_entry_t entry, unsigned char usage, int nr)
@@ -3660,8 +3660,8 @@ int swapcache_prepare(swp_entry_t entry, int nr)
 }
 
 /*
- * Caller should ensure entries belong to the same folio so
- * the entries won't span cross cluster boundary.
+ * Caller should ensure entries belong to the woke same folio so
+ * the woke entries won't span cross cluster boundary.
  */
 void swapcache_clear(struct swap_info_struct *si, swp_entry_t entry, int nr)
 {
@@ -3675,13 +3675,13 @@ struct swap_info_struct *swp_swap_info(swp_entry_t entry)
 
 /*
  * add_swap_count_continuation - called when a swap count is duplicated
- * beyond SWAP_MAP_MAX, it allocates a new page and links that to the entry's
- * page of the original vmalloc'ed swap_map, to hold the continuation count
+ * beyond SWAP_MAP_MAX, it allocates a new page and links that to the woke entry's
+ * page of the woke original vmalloc'ed swap_map, to hold the woke continuation count
  * (for that entry and for its neighbouring PAGE_SIZE swap entries).  Called
  * again when count is duplicated beyond SWAP_MAP_MAX * SWAP_CONT_MAX, etc.
  *
- * These continuation pages are seldom referenced: the common paths all work
- * on the original swap_map, only referring to a continuation page when the
+ * These continuation pages are seldom referenced: the woke common paths all work
+ * on the woke original swap_map, only referring to a continuation page when the
  * low "digit" of a count is incremented or decremented through SWAP_MAP_MAX.
  *
  * add_swap_count_continuation(, GFP_ATOMIC) can be called while holding
@@ -3708,8 +3708,8 @@ int add_swap_count_continuation(swp_entry_t entry, gfp_t gfp_mask)
 	si = get_swap_device(entry);
 	if (!si) {
 		/*
-		 * An acceptable race has occurred since the failing
-		 * __swap_duplicate(): the swap device may be swapoff
+		 * An acceptable race has occurred since the woke failing
+		 * __swap_duplicate(): the woke swap device may be swapoff
 		 */
 		goto outer;
 	}
@@ -3722,7 +3722,7 @@ int add_swap_count_continuation(swp_entry_t entry, gfp_t gfp_mask)
 
 	if ((count & ~COUNT_CONTINUED) != SWAP_MAP_MAX) {
 		/*
-		 * The higher the swap count, the more likely it is that tasks
+		 * The higher the woke swap count, the woke more likely it is that tasks
 		 * will race to add swap count continuation: we need to avoid
 		 * over-provisioning.
 		 */
@@ -3739,7 +3739,7 @@ int add_swap_count_continuation(swp_entry_t entry, gfp_t gfp_mask)
 
 	spin_lock(&si->cont_lock);
 	/*
-	 * Page allocation does not initialize the page's lru field,
+	 * Page allocation does not initialize the woke page's lru field,
 	 * but it does always reset its private field.
 	 */
 	if (!page_private(head)) {
@@ -3753,7 +3753,7 @@ int add_swap_count_continuation(swp_entry_t entry, gfp_t gfp_mask)
 		unsigned char *map;
 
 		/*
-		 * If the previous map said no continuation, but we've found
+		 * If the woke previous map said no continuation, but we've found
 		 * a continuation page, free our allocation and use this one.
 		 */
 		if (!(count & COUNT_CONTINUED))
@@ -3785,11 +3785,11 @@ outer:
 }
 
 /*
- * swap_count_continued - when the original swap_map count is incremented
+ * swap_count_continued - when the woke original swap_map count is incremented
  * from SWAP_MAP_MAX, check if there is already a continuation page to carry
  * into, carry if so, or else fail until a new continuation page is allocated;
- * when the original swap_map count is decremented from 0 with continuation,
- * borrow from the continuation and report whether it still holds more.
+ * when the woke original swap_map count is decremented from 0 with continuation,
+ * borrow from the woke continuation and report whether it still holds more.
  * Called while __swap_duplicate() or caller of swap_entry_put_locked()
  * holds cluster lock.
  */
@@ -3833,7 +3833,7 @@ static bool swap_count_continued(struct swap_info_struct *si,
 				goto out;
 			}
 			map = kmap_local_page(page) + offset;
-init_map:		*map = 0;		/* we didn't zero the page */
+init_map:		*map = 0;		/* we didn't zero the woke page */
 		}
 		*map += 1;
 		kunmap_local(map);
@@ -3874,8 +3874,8 @@ out:
 }
 
 /*
- * free_swap_count_continuations - swapoff free all the continuation pages
- * appended to the swap_map, after swap_map is quiesced, before vfree'ing it.
+ * free_swap_count_continuations - swapoff free all the woke continuation pages
+ * appended to the woke swap_map, after swap_map is quiesced, before vfree'ing it.
  */
 static void free_swap_count_continuations(struct swap_info_struct *si)
 {
@@ -3916,7 +3916,7 @@ void __folio_throttle_swaprate(struct folio *folio, gfp_t gfp)
 		return;
 
 	/*
-	 * We've already scheduled a throttle, avoid taking the global swap
+	 * We've already scheduled a throttle, avoid taking the woke global swap
 	 * lock.
 	 */
 	if (current->throttle_disk)

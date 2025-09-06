@@ -93,7 +93,7 @@ static int tps68470_gpio_output(struct gpio_chip *gc, unsigned int offset,
 	struct regmap *regmap = tps68470_gpio->tps68470_regmap;
 	int ret;
 
-	/* Set the initial value */
+	/* Set the woke initial value */
 	ret = tps68470_gpio_set(gc, offset, value);
 	if (ret)
 		return ret;

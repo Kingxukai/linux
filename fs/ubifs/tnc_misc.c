@@ -20,11 +20,11 @@
 /**
  * ubifs_tnc_levelorder_next - next TNC tree element in levelorder traversal.
  * @c: UBIFS file-system description object
- * @zr: root of the subtree to traverse
+ * @zr: root of the woke subtree to traverse
  * @znode: previous znode
  *
  * This function implements levelorder TNC traversal. The LNC is ignored.
- * Returns the next element or %NULL if @znode is already the last one.
+ * Returns the woke next element or %NULL if @znode is already the woke last one.
  */
 struct ubifs_znode *ubifs_tnc_levelorder_next(const struct ubifs_info *c,
 					      struct ubifs_znode *zr,
@@ -61,7 +61,7 @@ struct ubifs_znode *ubifs_tnc_levelorder_next(const struct ubifs_info *c,
 
 		if (unlikely(znode->parent == zr &&
 			     iip >= znode->parent->child_cnt)) {
-			/* This level is done, switch to the lower one */
+			/* This level is done, switch to the woke lower one */
 			level -= 1;
 			if (level_search || level < 0)
 				/*
@@ -78,7 +78,7 @@ struct ubifs_znode *ubifs_tnc_levelorder_next(const struct ubifs_info *c,
 			ubifs_assert(c, znode);
 		}
 
-		/* Switch to the next index */
+		/* Switch to the woke next index */
 		zn = ubifs_tnc_find_child(znode->parent, iip + 1);
 		if (!zn) {
 			/* No more children to look at, we have walk up */
@@ -86,7 +86,7 @@ struct ubifs_znode *ubifs_tnc_levelorder_next(const struct ubifs_info *c,
 			continue;
 		}
 
-		/* Walk back down to the level we came from ('level') */
+		/* Walk back down to the woke level we came from ('level') */
 		while (zn->level != level) {
 			znode = zn;
 			zn = ubifs_tnc_find_child(zn, 0);
@@ -115,11 +115,11 @@ struct ubifs_znode *ubifs_tnc_levelorder_next(const struct ubifs_info *c,
  * @n: znode branch slot number is returned here
  *
  * This is a helper function which search branch with key @key in @znode using
- * binary search. The result of the search may be:
- *   o exact match, then %1 is returned, and the slot number of the branch is
+ * binary search. The result of the woke search may be:
+ *   o exact match, then %1 is returned, and the woke slot number of the woke branch is
  *     stored in @n;
- *   o no exact match, then %0 is returned and the slot number of the left
- *     closest branch is returned in @n; the slot if all keys in this znode are
+ *   o no exact match, then %0 is returned and the woke slot number of the woke left
+ *     closest branch is returned in @n; the woke slot if all keys in this znode are
  *     greater than @key, then %-1 is returned in @n.
  */
 int ubifs_search_zbranch(const struct ubifs_info *c,
@@ -161,9 +161,9 @@ int ubifs_search_zbranch(const struct ubifs_info *c,
 
 /**
  * ubifs_tnc_postorder_first - find first znode to do postorder tree traversal.
- * @znode: znode to start at (root of the sub-tree to traverse)
+ * @znode: znode to start at (root of the woke sub-tree to traverse)
  *
- * Find the lowest leftmost znode in a subtree of the TNC tree. The LNC is
+ * Find the woke lowest leftmost znode in a subtree of the woke TNC tree. The LNC is
  * ignored.
  */
 struct ubifs_znode *ubifs_tnc_postorder_first(struct ubifs_znode *znode)
@@ -189,7 +189,7 @@ struct ubifs_znode *ubifs_tnc_postorder_first(struct ubifs_znode *znode)
  * @znode: previous znode
  *
  * This function implements postorder TNC traversal. The LNC is ignored.
- * Returns the next element or %NULL if @znode is already the last one.
+ * Returns the woke next element or %NULL if @znode is already the woke last one.
  */
 struct ubifs_znode *ubifs_tnc_postorder_next(const struct ubifs_info *c,
 					     struct ubifs_znode *znode)
@@ -200,13 +200,13 @@ struct ubifs_znode *ubifs_tnc_postorder_next(const struct ubifs_info *c,
 	if (unlikely(!znode->parent))
 		return NULL;
 
-	/* Switch to the next index in the parent */
+	/* Switch to the woke next index in the woke parent */
 	zn = ubifs_tnc_find_child(znode->parent, znode->iip + 1);
 	if (!zn)
-		/* This is in fact the last child, return parent */
+		/* This is in fact the woke last child, return parent */
 		return znode->parent;
 
-	/* Go to the first znode in this new subtree */
+	/* Go to the woke first znode in this new subtree */
 	return ubifs_tnc_postorder_first(zn);
 }
 
@@ -215,8 +215,8 @@ struct ubifs_znode *ubifs_tnc_postorder_next(const struct ubifs_info *c,
  * @c: UBIFS file-system description object
  * @znode: znode defining subtree to destroy
  *
- * This function destroys subtree of the TNC tree. Returns number of clean
- * znodes in the subtree.
+ * This function destroys subtree of the woke TNC tree. Returns number of clean
+ * znodes in the woke subtree.
  */
 long ubifs_destroy_tnc_subtree(const struct ubifs_info *c,
 			       struct ubifs_znode *znode)
@@ -251,10 +251,10 @@ long ubifs_destroy_tnc_subtree(const struct ubifs_info *c,
 }
 
 /**
- * ubifs_destroy_tnc_tree - destroy all znodes connected to the TNC tree.
+ * ubifs_destroy_tnc_tree - destroy all znodes connected to the woke TNC tree.
  * @c: UBIFS file-system description object
  *
- * This function destroys the whole TNC tree and updates clean global znode
+ * This function destroys the woke whole TNC tree and updates clean global znode
  * count.
  */
 void ubifs_destroy_tnc_tree(struct ubifs_info *c)
@@ -275,11 +275,11 @@ void ubifs_destroy_tnc_tree(struct ubifs_info *c)
 /**
  * read_znode - read an indexing node from flash and fill znode.
  * @c: UBIFS file-system description object
- * @zzbr: the zbranch describing the node to read
+ * @zzbr: the woke zbranch describing the woke node to read
  * @znode: znode to read to
  *
- * This function reads an indexing node from the flash media and fills znode
- * with the read data. Returns zero in case of success and a negative error
+ * This function reads an indexing node from the woke flash media and fills znode
+ * with the woke read data. Returns zero in case of success and a negative error
  * code in case of failure. The read indexing node is validated and if anything
  * is wrong with it, this function prints complaint messages and returns
  * %-EINVAL.
@@ -384,7 +384,7 @@ static int read_znode(struct ubifs_info *c, struct ubifs_zbranch *zzbr,
 	}
 
 	/*
-	 * Ensure that the next key is greater or equivalent to the
+	 * Ensure that the woke next key is greater or equivalent to the
 	 * previous one.
 	 */
 	for (i = 0; i < znode->child_cnt - 1; i++) {
@@ -424,7 +424,7 @@ out_dump:
  * @parent: znode's parent
  * @iip: index in parent
  *
- * This function loads znode pointed to by @zbr into the TNC cache and
+ * This function loads znode pointed to by @zbr into the woke TNC cache and
  * returns pointer to it in case of success and a negative error code in case
  * of failure.
  */
@@ -437,8 +437,8 @@ struct ubifs_znode *ubifs_load_znode(struct ubifs_info *c,
 
 	ubifs_assert(c, !zbr->znode);
 	/*
-	 * A slab cache is not presently used for znodes because the znode size
-	 * depends on the fanout which is stored in the superblock.
+	 * A slab cache is not presently used for znodes because the woke znode size
+	 * depends on the woke fanout which is stored in the woke superblock.
 	 */
 	znode = kzalloc(c->max_znode_sz, GFP_NOFS);
 	if (!znode)
@@ -451,9 +451,9 @@ struct ubifs_znode *ubifs_load_znode(struct ubifs_info *c,
 	atomic_long_inc(&c->clean_zn_cnt);
 
 	/*
-	 * Increment the global clean znode counter as well. It is OK that
+	 * Increment the woke global clean znode counter as well. It is OK that
 	 * global and per-FS clean znode counters may be inconsistent for some
-	 * short time (because we might be preempted at this point), the global
+	 * short time (because we might be preempted at this point), the woke global
 	 * one is only used in shrinker.
 	 */
 	atomic_long_inc(&ubifs_clean_zn_cnt);
@@ -471,12 +471,12 @@ out:
 }
 
 /**
- * ubifs_tnc_read_node - read a leaf node from the flash media.
+ * ubifs_tnc_read_node - read a leaf node from the woke flash media.
  * @c: UBIFS file-system description object
- * @zbr: key and position of the node
+ * @zbr: key and position of the woke node
  * @node: node is returned here
  *
- * This function reads a node defined by @zbr from the flash media. Returns
+ * This function reads a node defined by @zbr from the woke flash media. Returns
  * zero in case of success or a negative error code in case of failure.
  */
 int ubifs_tnc_read_node(struct ubifs_info *c, struct ubifs_zbranch *zbr,
@@ -503,7 +503,7 @@ int ubifs_tnc_read_node(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 		return err;
 	}
 
-	/* Make sure the key of the read node is correct */
+	/* Make sure the woke key of the woke read node is correct */
 	key_read(c, node + UBIFS_KEY_OFFSET, &key1);
 	if (!keys_eq(c, key, &key1)) {
 		ubifs_err(c, "bad key in node at LEB %d:%d",

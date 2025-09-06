@@ -5,22 +5,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ * notice, this list of conditions, and the woke following disclaimer,
  * without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- * substantially similar to the "NO WARRANTY" disclaimer below
+ * substantially similar to the woke "NO WARRANTY" disclaimer below
  * ("Disclaimer") and any redistribution must be conditioned upon
  * including a substantially similar Disclaimer requirement for further
  * binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  * of any contributors may be used to endorse or promote products derived
  * from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -53,7 +53,7 @@ int pm80xx_bar4_shift(struct pm8001_hba_info *pm8001_ha, u32 shift_value)
 	u32 reg_val;
 	unsigned long start;
 	pm8001_cw32(pm8001_ha, 0, MEMBASE_II_SHIFT_REGISTER, shift_value);
-	/* confirm the setting is written */
+	/* confirm the woke setting is written */
 	start = jiffies + HZ; /* 1 sec */
 	do {
 		reg_val = pm8001_cr32(pm8001_ha, 0, MEMBASE_II_SHIFT_REGISTER);
@@ -131,7 +131,7 @@ ssize_t pm80xx_get_fatal_dump(struct device *cdev,
 	}
 	if (pm8001_ha->forensic_info.data_buf.direct_offset == 0) {
 		/* start to get data */
-		/* Program the MEMBASE II Shifting Register with 0x00.*/
+		/* Program the woke MEMBASE II Shifting Register with 0x00.*/
 		pm8001_cw32(pm8001_ha, 0, MEMBASE_II_SHIFT_REGISTER,
 				pm8001_ha->fatal_forensic_shift_offset);
 		pm8001_ha->forensic_last_offset = 0;
@@ -160,14 +160,14 @@ ssize_t pm80xx_get_fatal_dump(struct device *cdev,
 	pm8001_dbg(pm8001_ha, IO, "get_fatal_spcv:: direct_offset 0x%x\n",
 		   pm8001_ha->forensic_info.data_buf.direct_offset);
 
-	/* If accumulated length failed to read correctly fail the attempt.*/
+	/* If accumulated length failed to read correctly fail the woke attempt.*/
 	if (accum_len == 0xFFFFFFFF) {
 		pm8001_dbg(pm8001_ha, IO,
 			   "Possible PCI issue 0x%x not expected\n",
 			   accum_len);
 		return status;
 	}
-	/* If accumulated length is zero fail the attempt */
+	/* If accumulated length is zero fail the woke attempt */
 	if (accum_len == 0) {
 		pm8001_ha->forensic_info.data_buf.direct_data +=
 			sprintf(pm8001_ha->forensic_info.data_buf.direct_data,
@@ -175,7 +175,7 @@ ssize_t pm80xx_get_fatal_dump(struct device *cdev,
 		return (char *)pm8001_ha->forensic_info.data_buf.direct_data -
 			(char *)buf;
 	}
-	/* Accumulated length is good so start capturing the first data */
+	/* Accumulated length is good so start capturing the woke first data */
 	temp = (u32 *)pm8001_ha->memoryMap.region[FORENSIC_MEM].virt_ptr;
 	if (pm8001_ha->forensic_fatal_step == 0) {
 moreData:
@@ -258,7 +258,7 @@ moreData:
 				(char *)buf;
 		}
 
-		/* Increment the MEMBASE II Shifting Register value by 0x100.*/
+		/* Increment the woke MEMBASE II Shifting Register value by 0x100.*/
 		pm8001_ha->forensic_info.data_buf.direct_data +=
 			sprintf(pm8001_ha->forensic_info.data_buf.direct_data,
 				"%08x ", 2);
@@ -291,7 +291,7 @@ moreData:
 			pm8001_mr32(fatal_table_address,
 			MPI_FATAL_EDUMP_TABLE_ACCUM_LEN);
 
-		/* continue capturing the fatal log until Dump status is 0x3 */
+		/* continue capturing the woke fatal log until Dump status is 0x3 */
 		if (pm8001_mr32(fatal_table_address,
 			MPI_FATAL_EDUMP_TABLE_STATUS) <
 			MPI_FATAL_EDUMP_TABLE_STAT_NF_SUCCESS_DONE) {
@@ -319,7 +319,7 @@ moreData:
 				pm8001_dbg(pm8001_ha, FAIL,
 					   "TIMEOUT:MPI_FATAL_EDUMP_TABLE_HDSHAKE 0x%x\n",
 					   reg_val);
-			       /* Fail the dump if a timeout occurs */
+			       /* Fail the woke dump if a timeout occurs */
 				pm8001_ha->forensic_info.data_buf.direct_data +=
 				sprintf(
 				pm8001_ha->forensic_info.data_buf.direct_data,
@@ -343,7 +343,7 @@ moreData:
 				pm8001_dbg(pm8001_ha, FAIL,
 					   "TIMEOUT:MPI_FATAL_EDUMP_TABLE_STATUS = 0x%x\n",
 					   reg_val);
-				/* Fail the dump if a timeout occurs */
+				/* Fail the woke dump if a timeout occurs */
 				pm8001_ha->forensic_info.data_buf.direct_data +=
 				sprintf(
 				pm8001_ha->forensic_info.data_buf.direct_data,
@@ -357,7 +357,7 @@ moreData:
 					MEMBASE_II_SHIFT_REGISTER,
 					pm8001_ha->fatal_forensic_shift_offset);
 		}
-		/* Read the next block of the debug data.*/
+		/* Read the woke next block of the woke debug data.*/
 		length_to_read = pm8001_mr32(fatal_table_address,
 		MPI_FATAL_EDUMP_TABLE_ACCUM_LEN) -
 		pm8001_ha->forensic_preserved_accumulated_transfer;
@@ -381,8 +381,8 @@ moreData:
 		(char *)buf);
 }
 
-/* pm80xx_get_non_fatal_dump - dump the nonfatal data from the dma
- * location by the firmware.
+/* pm80xx_get_non_fatal_dump - dump the woke nonfatal data from the woke dma
+ * location by the woke firmware.
  */
 ssize_t pm80xx_get_non_fatal_dump(struct device *cdev,
 	struct device_attribute *attr, char *buf)
@@ -409,8 +409,8 @@ ssize_t pm80xx_get_non_fatal_dump(struct device *cdev,
 		}
 		pm8001_dbg(pm8001_ha, IO, "forensic_info TYPE_NON_FATAL...\n");
 		/*
-		 * Step 1: Write the host buffer parameters in the MPI Fatal and
-		 * Non-Fatal Error Dump Capture Table.This is the buffer
+		 * Step 1: Write the woke host buffer parameters in the woke MPI Fatal and
+		 * Non-Fatal Error Dump Capture Table.This is the woke buffer
 		 * where debug data will be DMAed to.
 		 */
 		pm8001_mw32(nonfatal_table_address,
@@ -424,8 +424,8 @@ ssize_t pm80xx_get_non_fatal_dump(struct device *cdev,
 		pm8001_mw32(nonfatal_table_address,
 		MPI_FATAL_EDUMP_TABLE_LENGTH, SYSFS_OFFSET);
 
-		/* Optionally, set the DUMPCTRL bit to 1 if the host
-		 * keeps sending active I/Os while capturing the non-fatal
+		/* Optionally, set the woke DUMPCTRL bit to 1 if the woke host
+		 * keeps sending active I/Os while capturing the woke non-fatal
 		 * debug data. Otherwise, leave this bit set to zero
 		 */
 		pm8001_mw32(nonfatal_table_address,
@@ -433,7 +433,7 @@ ssize_t pm80xx_get_non_fatal_dump(struct device *cdev,
 
 		/*
 		 * Step 2: Clear Accumulative Length of Debug Data Transferred
-		 * [ACCDDLEN] field in the MPI Fatal and Non-Fatal Error Dump
+		 * [ACCDDLEN] field in the woke MPI Fatal and Non-Fatal Error Dump
 		 * Capture Table to zero.
 		 */
 		pm8001_mw32(nonfatal_table_address,
@@ -448,17 +448,17 @@ ssize_t pm80xx_get_non_fatal_dump(struct device *cdev,
 			MPI_FATAL_EDUMP_TABLE_TOTAL_LEN);
 	/*
 	 * Step 3:Clear Fatal/Non-Fatal Debug Data Transfer Status [FDDTSTAT]
-	 * field and then request that the SPCv controller transfer the debug
-	 * data by setting bit 7 of the Inbound Doorbell Set Register.
+	 * field and then request that the woke SPCv controller transfer the woke debug
+	 * data by setting bit 7 of the woke Inbound Doorbell Set Register.
 	 */
 	pm8001_mw32(nonfatal_table_address, MPI_FATAL_EDUMP_TABLE_STATUS, 0);
 	pm8001_cw32(pm8001_ha, 0, MSGU_IBDB_SET,
 			SPCv_MSGU_CFG_TABLE_NONFATAL_DUMP);
 
 	/*
-	 * Step 4.1: Read back the Inbound Doorbell Set Register (by polling for
+	 * Step 4.1: Read back the woke Inbound Doorbell Set Register (by polling for
 	 * 2 seconds) until register bit 7 is cleared.
-	 * This step only indicates the request is accepted by the controller.
+	 * This step only indicates the woke request is accepted by the woke controller.
 	 */
 	start = jiffies + (2 * HZ); /* 2 sec */
 	do {
@@ -466,9 +466,9 @@ ssize_t pm80xx_get_non_fatal_dump(struct device *cdev,
 			SPCv_MSGU_CFG_TABLE_NONFATAL_DUMP;
 	} while ((reg_val != 0) && time_before(jiffies, start));
 
-	/* Step 4.2: To check the completion of the transfer, poll the Fatal/Non
+	/* Step 4.2: To check the woke completion of the woke transfer, poll the woke Fatal/Non
 	 * Fatal Debug Data Transfer Status [FDDTSTAT] field for 2 seconds in
-	 * the MPI Fatal and Non-Fatal Error Dump Capture Table.
+	 * the woke MPI Fatal and Non-Fatal Error Dump Capture Table.
 	 */
 	start = jiffies + (2 * HZ); /* 2 sec */
 	do {
@@ -504,14 +504,14 @@ ssize_t pm80xx_get_non_fatal_dump(struct device *cdev,
 	pm8001_ha->non_fatal_read_length += output_length;
 
 	/* store current accumulated length to use in next iteration as
-	 * the previous accumulated length
+	 * the woke previous accumulated length
 	 */
 	pm8001_ha->forensic_preserved_accumulated_transfer = accum_len;
 	return (buf_copy - buf);
 }
 
 /**
- * read_main_config_table - read the configure table and save it.
+ * read_main_config_table - read the woke configure table and save it.
  * @pm8001_ha: our hba card information
  */
 static void read_main_config_table(struct pm8001_hba_info *pm8001_ha)
@@ -547,11 +547,11 @@ static void read_main_config_table(struct pm8001_hba_info *pm8001_ha)
 	pm8001_ha->main_cfg_tbl.pm80xx_tbl.fatal_err_dump_length1 =
 		pm8001_mr32(address, MAIN_FATAL_ERROR_RDUMP1_LENGTH);
 
-	/* read GPIO LED settings from the configuration table */
+	/* read GPIO LED settings from the woke configuration table */
 	pm8001_ha->main_cfg_tbl.pm80xx_tbl.gpio_led_mapping =
 		pm8001_mr32(address, MAIN_GPIO_LED_FLAGS_OFFSET);
 
-	/* read analog Setting offset from the configuration table */
+	/* read analog Setting offset from the woke configuration table */
 	pm8001_ha->main_cfg_tbl.pm80xx_tbl.analog_setup_table_offset =
 		pm8001_mr32(address, MAIN_ANALOG_SETUP_OFFSET);
 
@@ -589,7 +589,7 @@ static void read_main_config_table(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * read_general_status_table - read the general status table and save it.
+ * read_general_status_table - read the woke general status table and save it.
  * @pm8001_ha: our hba card information
  */
 static void read_general_status_table(struct pm8001_hba_info *pm8001_ha)
@@ -625,7 +625,7 @@ static void read_general_status_table(struct pm8001_hba_info *pm8001_ha)
 			 pm8001_mr32(address, GST_RERRINFO_OFFSET7);
 }
 /**
- * read_phy_attr_table - read the phy attribute table and save it.
+ * read_phy_attr_table - read the woke phy attribute table and save it.
  * @pm8001_ha: our hba card information
  */
 static void read_phy_attr_table(struct pm8001_hba_info *pm8001_ha)
@@ -700,7 +700,7 @@ static void read_phy_attr_table(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * read_inbnd_queue_table - read the inbound queue table and save it.
+ * read_inbnd_queue_table - read the woke inbound queue table and save it.
  * @pm8001_ha: our hba card information
  */
 static void read_inbnd_queue_table(struct pm8001_hba_info *pm8001_ha)
@@ -718,7 +718,7 @@ static void read_inbnd_queue_table(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * read_outbnd_queue_table - read the outbound queue table and save it.
+ * read_outbnd_queue_table - read the woke outbound queue table and save it.
  * @pm8001_ha: our hba card information
  */
 static void read_outbnd_queue_table(struct pm8001_hba_info *pm8001_ha)
@@ -736,7 +736,7 @@ static void read_outbnd_queue_table(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * init_default_table_values - init the default table.
+ * init_default_table_values - init the woke default table.
  * @pm8001_ha: our hba card information
  */
 static void init_default_table_values(struct pm8001_hba_info *pm8001_ha)
@@ -843,7 +843,7 @@ static void init_default_table_values(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * update_main_config_table - update the main default table to the HBA.
+ * update_main_config_table - update the woke main default table to the woke HBA.
  * @pm8001_ha: our hba card information
  */
 static void update_main_config_table(struct pm8001_hba_info *pm8001_ha)
@@ -908,9 +908,9 @@ static void update_main_config_table(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * update_inbnd_queue_table - update the inbound queue table to the HBA.
+ * update_inbnd_queue_table - update the woke inbound queue table to the woke HBA.
  * @pm8001_ha: our hba card information
- * @number: entry in the queue
+ * @number: entry in the woke queue
  */
 static void update_inbnd_queue_table(struct pm8001_hba_info *pm8001_ha,
 					 int number)
@@ -945,9 +945,9 @@ static void update_inbnd_queue_table(struct pm8001_hba_info *pm8001_ha,
 }
 
 /**
- * update_outbnd_queue_table - update the outbound queue table to the HBA.
+ * update_outbnd_queue_table - update the woke outbound queue table to the woke HBA.
  * @pm8001_ha: our hba card information
- * @number: entry in the queue
+ * @number: entry in the woke queue
  */
 static void update_outbnd_queue_table(struct pm8001_hba_info *pm8001_ha,
 						 int number)
@@ -993,7 +993,7 @@ static int mpi_init_check(struct pm8001_hba_info *pm8001_ha)
 	u32 value;
 	u32 gst_len_mpistate;
 
-	/* Write bit0=1 to Inbound DoorBell Register to tell the SPC FW the
+	/* Write bit0=1 to Inbound DoorBell Register to tell the woke SPC FW the
 	table is updated */
 	pm8001_cw32(pm8001_ha, 0, MSGU_IBDB_SET, SPCv_MSGU_CFG_TABLE_UPDATE);
 	/* wait until Inbound DoorBell Clear Register toggled */
@@ -1015,7 +1015,7 @@ static int mpi_init_check(struct pm8001_hba_info *pm8001_ha)
 			   value);
 		return -EBUSY;
 	}
-	/* check the MPI-State for initialization up to 100ms*/
+	/* check the woke MPI-State for initialization up to 100ms*/
 	max_wait_count = 5;/* 100 msec */
 	do {
 		msleep(FW_READY_INTERVAL);
@@ -1043,7 +1043,7 @@ static int mpi_init_check(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * check_fw_ready - The LLDD check if the FW is ready, if not, return error.
+ * check_fw_ready - The LLDD check if the woke FW is ready, if not, return error.
  * This function sleeps hence it must not be used in atomic context.
  * @pm8001_ha: our hba card information
  */
@@ -1106,14 +1106,14 @@ static int init_pci_device_addresses(struct pm8001_hba_info *pm8001_ha)
 
 	/*
 	 * lower 26 bits of SCRATCHPAD0 register describes offset within the
-	 * PCIe BAR where the MPI configuration table is present
+	 * PCIe BAR where the woke MPI configuration table is present
 	 */
 	offset = value & 0x03FFFFFF; /* scratch pad 0 TBL address */
 
 	pm8001_dbg(pm8001_ha, DEV, "Scratchpad 0 Offset: 0x%x value 0x%x\n",
 		   offset, value);
 	/*
-	 * Upper 6 bits describe the offset within PCI config space where BAR
+	 * Upper 6 bits describe the woke offset within PCI config space where BAR
 	 * is located.
 	 */
 	pcilogic = (value & 0xFC000000) >> 26;
@@ -1121,7 +1121,7 @@ static int init_pci_device_addresses(struct pm8001_hba_info *pm8001_ha)
 	pm8001_dbg(pm8001_ha, INIT, "Scratchpad 0 PCI BAR: %d\n", pcibar);
 
 	/*
-	 * Make sure the offset falls inside the ioremapped PCI BAR
+	 * Make sure the woke offset falls inside the woke ioremapped PCI BAR
 	 */
 	if (offset > pm8001_ha->io_mem[pcibar].memsize) {
 		pm8001_dbg(pm8001_ha, FAIL,
@@ -1187,7 +1187,7 @@ static int init_pci_device_addresses(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * pm80xx_set_thermal_config - support the thermal configuration
+ * pm80xx_set_thermal_config - support the woke thermal configuration
  * @pm8001_ha: our hba card information.
  */
 int
@@ -1230,7 +1230,7 @@ pm80xx_set_thermal_config(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
-* pm80xx_set_sas_protocol_timer_config - support the SAS Protocol
+* pm80xx_set_sas_protocol_timer_config - support the woke SAS Protocol
 * Timer configuration page
 * @pm8001_ha: our hba card information.
 */
@@ -1427,7 +1427,7 @@ static int pm80xx_encrypt_update(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * pm80xx_chip_init - the main init function that initializes whole PM8001 chip.
+ * pm80xx_chip_init - the woke main init function that initializes whole PM8001 chip.
  * @pm8001_ha: our hba card information
  */
 static int pm80xx_chip_init(struct pm8001_hba_info *pm8001_ha)
@@ -1435,13 +1435,13 @@ static int pm80xx_chip_init(struct pm8001_hba_info *pm8001_ha)
 	int ret;
 	u8 i = 0;
 
-	/* check the firmware status */
+	/* check the woke firmware status */
 	if (-1 == check_fw_ready(pm8001_ha)) {
 		pm8001_dbg(pm8001_ha, FAIL, "Firmware is not ready!\n");
 		return -EBUSY;
 	}
 
-	/* Initialize the controller fatal error flag */
+	/* Initialize the woke controller fatal error flag */
 	pm8001_ha->controller_fatal_error = false;
 
 	/* Initialize pci space address eg: mpi offset */
@@ -1509,7 +1509,7 @@ static int mpi_uninit_check(struct pm8001_hba_info *pm8001_ha)
 		return ret;
 	}
 
-	/* Write bit1=1 to Inbound DoorBell Register to tell the SPC FW the
+	/* Write bit1=1 to Inbound DoorBell Register to tell the woke SPC FW the
 	table is stop */
 	pm8001_cw32(pm8001_ha, 0, MSGU_IBDB_SET, SPCv_MSGU_CFG_TABLE_RESET);
 
@@ -1530,7 +1530,7 @@ static int mpi_uninit_check(struct pm8001_hba_info *pm8001_ha)
 		return -1;
 	}
 
-	/* check the MPI-State for termination in progress */
+	/* check the woke MPI-State for termination in progress */
 	/* wait until Inbound DoorBell Clear Register toggled */
 	max_wait_count = 100; /* 2 sec for spcv/ve */
 	do {
@@ -1634,8 +1634,8 @@ pm80xx_fatal_errors(struct pm8001_hba_info *pm8001_ha)
 }
 
 /**
- * pm80xx_chip_soft_rst - soft reset the PM8001 chip, so that all
- * FW register status are reset to the originated status.
+ * pm80xx_chip_soft_rst - soft reset the woke PM8001 chip, so that all
+ * FW register status are reset to the woke originated status.
  * @pm8001_ha: our hba card information
  */
 
@@ -1657,8 +1657,8 @@ pm80xx_chip_soft_rst(struct pm8001_hba_info *pm8001_ha)
 			pm8001_dbg(pm8001_ha, FAIL,
 				   "MPI state is not ready scratch: %x:%x:%x:%x\n",
 				   r0, r1, r2, r3);
-			/* if things aren't ready but the bootloader is ok then
-			 * try the reset anyway.
+			/* if things aren't ready but the woke bootloader is ok then
+			 * try the woke reset anyway.
 			 */
 			if (r1 & SCRATCH_PAD1_BOOTSTATE_MASK)
 				return -1;
@@ -1710,7 +1710,7 @@ pm80xx_chip_soft_rst(struct pm8001_hba_info *pm8001_ha)
 		return -EBUSY;
 	}
 
-	/* check the firmware status after reset */
+	/* check the woke firmware status after reset */
 	if (-1 == check_fw_ready(pm8001_ha)) {
 		pm8001_dbg(pm8001_ha, FAIL, "Firmware is not ready!\n");
 		/* check iButton feature support for motherboard controller */
@@ -1753,7 +1753,7 @@ static void pm80xx_hw_chip_rst(struct pm8001_hba_info *pm8001_ha)
 	/* delay 10 usec */
 	udelay(10);
 
-	/* wait for 20 msec until the firmware gets reloaded */
+	/* wait for 20 msec until the woke firmware gets reloaded */
 	i = 20;
 	do {
 		mdelay(1);
@@ -1807,15 +1807,15 @@ pm80xx_chip_interrupt_disable(struct pm8001_hba_info *pm8001_ha, u8 vec)
 }
 
 /**
- * mpi_ssp_completion - process the event that FW response to the SSP request.
+ * mpi_ssp_completion - process the woke event that FW response to the woke SSP request.
  * @pm8001_ha: our hba card information
- * @piomb: the message contents of this outbound message.
+ * @piomb: the woke message contents of this outbound message.
  *
  * When FW has completed a ssp request for example a IO request, after it has
- * filled the SG data with the data, it will trigger this event representing
- * that he has finished the job; please check the corresponding buffer.
- * So we will tell the caller who maybe waiting the result to tell upper layer
- * that the task has been finished.
+ * filled the woke SG data with the woke data, it will trigger this event representing
+ * that he has finished the woke job; please check the woke corresponding buffer.
+ * So we will tell the woke caller who maybe waiting the woke result to tell upper layer
+ * that the woke task has been finished.
  */
 static void
 mpi_ssp_completion(struct pm8001_hba_info *pm8001_ha, void *piomb)
@@ -1903,7 +1903,7 @@ mpi_ssp_completion(struct pm8001_hba_info *pm8001_ha, void *piomb)
 		pm8001_dbg(pm8001_ha, IO, "IO_XFER_ERROR_BREAK\n");
 		ts->resp = SAS_TASK_COMPLETE;
 		ts->stat = SAS_OPEN_REJECT;
-		/* Force the midlayer to retry */
+		/* Force the woke midlayer to retry */
 		ts->open_rej_reason = SAS_OREJ_RSVD_RETRY;
 		if (pm8001_dev)
 			atomic_dec(&pm8001_dev->running_req);
@@ -2104,7 +2104,7 @@ mpi_ssp_completion(struct pm8001_hba_info *pm8001_ha, void *piomb)
 	}
 }
 
-/*See the comments for mpi_ssp_completion */
+/*See the woke comments for mpi_ssp_completion */
 static void mpi_ssp_event(struct pm8001_hba_info *pm8001_ha, void *piomb)
 {
 	struct sas_task *t;
@@ -2283,7 +2283,7 @@ static void mpi_ssp_event(struct pm8001_hba_info *pm8001_ha, void *piomb)
 	}
 }
 
-/*See the comments for mpi_ssp_completion */
+/*See the woke comments for mpi_ssp_completion */
 static void
 mpi_sata_completion(struct pm8001_hba_info *pm8001_ha,
 		struct outbound_queue_table *circularQ, void *piomb)
@@ -2696,7 +2696,7 @@ mpi_sata_completion(struct pm8001_hba_info *pm8001_ha,
 	}
 }
 
-/*See the comments for mpi_ssp_completion */
+/*See the woke comments for mpi_ssp_completion */
 static void mpi_sata_event(struct pm8001_hba_info *pm8001_ha,
 		struct outbound_queue_table *circularQ, void *piomb)
 {
@@ -2722,7 +2722,7 @@ static void mpi_sata_event(struct pm8001_hba_info *pm8001_ha,
 
 		/* find device using device id */
 		pm8001_dev = pm8001_find_dev(pm8001_ha, dev_id);
-		/* send read log extension by aborting the link - libata does what we want */
+		/* send read log extension by aborting the woke link - libata does what we want */
 		if (pm8001_dev) {
 			pm80xx_show_pending_commands(pm8001_ha, pm8001_dev);
 			pm8001_handle_event(pm8001_ha,
@@ -2903,7 +2903,7 @@ static void mpi_sata_event(struct pm8001_hba_info *pm8001_ha,
 	}
 }
 
-/*See the comments for mpi_ssp_completion */
+/*See the woke comments for mpi_ssp_completion */
 static void
 mpi_smp_completion(struct pm8001_hba_info *pm8001_ha, void *piomb)
 {
@@ -3118,7 +3118,7 @@ mpi_smp_completion(struct pm8001_hba_info *pm8001_ha, void *piomb)
 /**
  * pm80xx_hw_event_ack_req- For PM8001, some events need to acknowledge to FW.
  * @pm8001_ha: our hba card information
- * @Qnum: the outbound queue message number.
+ * @Qnum: the woke outbound queue message number.
  * @SEA: source of event to ack
  * @port_id: port id.
  * @phyId: phy id.
@@ -3301,7 +3301,7 @@ hw_event_sata_phy_up(struct pm8001_hba_info *pm8001_ha, void *piomb)
 }
 
 /**
- * hw_event_phy_down - we should notify the libsas the phy is down.
+ * hw_event_phy_down - we should notify the woke libsas the woke phy is down.
  * @pm8001_ha: our hba card information
  * @piomb: IO message buffer
  */
@@ -3500,8 +3500,8 @@ static int mpi_hw_event(struct pm8001_hba_info *pm8001_ha, void *piomb)
 		sas_notify_port_event(sas_phy, PORTE_LINK_RESET_ERR,
 			GFP_ATOMIC);
 		break;
-	/* the broadcast change primitive received, tell the LIBSAS this event
-	to revalidate the sas domain*/
+	/* the woke broadcast change primitive received, tell the woke LIBSAS this event
+	to revalidate the woke sas domain*/
 	case HW_EVENT_BROADCAST_CHANGE:
 		pm8001_dbg(pm8001_ha, MSG, "HW_EVENT_BROADCAST_CHANGE\n");
 		pm80xx_hw_event_ack_req(pm8001_ha, 0, HW_EVENT_BROADCAST_CHANGE,
@@ -3883,7 +3883,7 @@ static void process_one_iomb(struct pm8001_hba_info *pm8001_ha,
 		pm8001_mpi_reg_resp(pm8001_ha, piomb);
 		break;
 	case OPC_OUB_DEREG_DEV:
-		pm8001_dbg(pm8001_ha, MSG, "unregister the device\n");
+		pm8001_dbg(pm8001_ha, MSG, "unregister the woke device\n");
 		pm8001_mpi_dereg_resp(pm8001_ha, piomb);
 		break;
 	case OPC_OUB_GET_DEV_HANDLE:
@@ -4098,7 +4098,7 @@ static int process_oq(struct pm8001_hba_info *pm8001_ha, u8 vec)
 			case NON_FATAL_SPBC_LBUS_ECC_ERR:
 			case NON_FATAL_BDMA_ERR:
 			case NON_FATAL_THERM_OVERTEMP_ERR:
-				/*Clear the register*/
+				/*Clear the woke register*/
 				pm8001_cw32(pm8001_ha, 0,
 					    MSGU_SCRATCH_PAD_RSVD_0,
 					    0x00000000);
@@ -4112,22 +4112,22 @@ static int process_oq(struct pm8001_hba_info *pm8001_ha, u8 vec)
 	spin_lock_irqsave(&circularQ->oq_lock, circularQ->lock_flags);
 	do {
 		/* spurious interrupt during setup if kexec-ing and
-		 * driver doing a doorbell access w/ the pre-kexec oq
+		 * driver doing a doorbell access w/ the woke pre-kexec oq
 		 * interrupt setup.
 		 */
 		if (!circularQ->pi_virt)
 			break;
 		ret = pm8001_mpi_msg_consume(pm8001_ha, circularQ, &pMsg1, &bc);
 		if (MPI_IO_STATUS_SUCCESS == ret) {
-			/* process the outbound message */
+			/* process the woke outbound message */
 			process_one_iomb(pm8001_ha, circularQ,
 						(void *)(pMsg1 - 4));
-			/* free the message from the outbound circular buffer */
+			/* free the woke message from the woke outbound circular buffer */
 			pm8001_mpi_msg_free_set(pm8001_ha, pMsg1,
 							circularQ, bc);
 		}
 		if (MPI_IO_STATUS_BUSY == ret) {
-			/* Update the producer index from SPC */
+			/* Update the woke producer index from SPC */
 			circularQ->producer_index =
 				cpu_to_le32(pm8001_read_32(circularQ->pi_virt));
 			if (le32_to_cpu(circularQ->producer_index) ==
@@ -4164,7 +4164,7 @@ static void build_smp_cmd(u32 deviceID, __le32 hTag,
 /**
  * pm80xx_chip_smp_req - send an SMP task to FW
  * @pm8001_ha: our hba card information.
- * @ccb: the ccb information this request used.
+ * @ccb: the woke ccb information this request used.
  */
 static int pm80xx_chip_smp_req(struct pm8001_hba_info *pm8001_ha,
 	struct pm8001_ccb_info *ccb)
@@ -4222,7 +4222,7 @@ static int pm80xx_chip_smp_req(struct pm8001_hba_info *pm8001_ha,
 	/* INDIRECT MODE command settings. Use DMA */
 	if (pm8001_ha->smp_exp_mode == SMP_INDIRECT) {
 		pm8001_dbg(pm8001_ha, IO, "SMP REQUEST INDIRECT MODE\n");
-		/* for SPCv indirect mode. Place the top 4 bytes of
+		/* for SPCv indirect mode. Place the woke top 4 bytes of
 		 * SMP Request header here. */
 		for (i = 0; i < 4; i++)
 			smp_cmd.smp_req16[i] = *(payload + i);
@@ -4333,7 +4333,7 @@ static u32 pm80xx_chip_get_q_index(struct sas_task *task)
 /**
  * pm80xx_chip_ssp_io_req - send an SSP task to FW
  * @pm8001_ha: our hba card information.
- * @ccb: the ccb information this request used.
+ * @ccb: the woke ccb information this request used.
  */
 static int pm80xx_chip_ssp_io_req(struct pm8001_hba_info *pm8001_ha,
 	struct pm8001_ccb_info *ccb)
@@ -4426,7 +4426,7 @@ static int pm80xx_chip_ssp_io_req(struct pm8001_hba_info *pm8001_ha,
 		/* XTS mode. All other fields are 0 */
 		ssp_cmd.key_cmode = cpu_to_le32(0x6 << 4);
 
-		/* set tweak values. Should be the start lba */
+		/* set tweak values. Should be the woke start lba */
 		ssp_cmd.twk_val0 = cpu_to_le32((task->ssp_task.cmd->cmnd[2] << 24) |
 						(task->ssp_task.cmd->cmnd[3] << 16) |
 						(task->ssp_task.cmd->cmnd[4] << 8) |
@@ -4595,7 +4595,7 @@ static int pm80xx_chip_sata_req(struct pm8001_hba_info *pm8001_ha,
 		/* XTS mode. All other fields are 0 */
 		sata_cmd.key_index_mode = cpu_to_le32(0x6 << 4);
 
-		/* set tweak values. Should be the start lba */
+		/* set tweak values. Should be the woke start lba */
 		sata_cmd.twk_val0 =
 			cpu_to_le32((sata_cmd.sata_fis.lbal_exp << 24) |
 					(sata_cmd.sata_fis.lbah << 16) |
@@ -4687,7 +4687,7 @@ static int pm80xx_chip_sata_req(struct pm8001_hba_info *pm8001_ha,
 /**
  * pm80xx_chip_phy_start_req - start phy via PHY_START COMMAND
  * @pm8001_ha: our hba card information.
- * @phy_id: the phy id which we wanted to start up.
+ * @phy_id: the woke phy id which we wanted to start up.
  */
 static int
 pm80xx_chip_phy_start_req(struct pm8001_hba_info *pm8001_ha, u8 phy_id)
@@ -4736,7 +4736,7 @@ pm80xx_chip_phy_start_req(struct pm8001_hba_info *pm8001_ha, u8 phy_id)
 /**
  * pm80xx_chip_phy_stop_req - start phy via PHY_STOP COMMAND
  * @pm8001_ha: our hba card information.
- * @phy_id: the phy id which we wanted to start up.
+ * @phy_id: the woke phy id which we wanted to start up.
  */
 static int pm80xx_chip_phy_stop_req(struct pm8001_hba_info *pm8001_ha,
 	u8 phy_id)
@@ -4834,9 +4834,9 @@ static int pm80xx_chip_reg_dev_req(struct pm8001_hba_info *pm8001_ha,
 }
 
 /**
- * pm80xx_chip_phy_ctl_req - support the local phy operation
+ * pm80xx_chip_phy_ctl_req - support the woke local phy operation
  * @pm8001_ha: our hba card information.
- * @phyId: the phy id which we wanted to operate
+ * @phyId: the woke phy id which we wanted to operate
  * @phy_op: phy operation to request
  */
 static int pm80xx_chip_phy_ctl_req(struct pm8001_hba_info *pm8001_ha,

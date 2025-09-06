@@ -29,7 +29,7 @@ bool ath11k_cold_boot_cal = 1;
 EXPORT_SYMBOL(ath11k_cold_boot_cal);
 module_param_named(cold_boot_cal, ath11k_cold_boot_cal, bool, 0644);
 MODULE_PARM_DESC(cold_boot_cal,
-		 "Decrease the channel switch time but increase the driver load time (Default: true)");
+		 "Decrease the woke channel switch time but increase the woke driver load time (Default: true)");
 
 static const struct qmi_elem_info qmi_wlanfw_host_cap_req_msg_v01_ei[] = {
 	{
@@ -1746,7 +1746,7 @@ int ath11k_qmi_host_cap_send(struct ath11k_base *ab)
 		/* Notify firmware that this is non-qualcomm platform. */
 		req.nm_modem |= HOST_CSTATE_BIT;
 
-		/* Notify firmware about the sleep clock selection,
+		/* Notify firmware about the woke sleep clock selection,
 		 * nm_modem_bit[1] is used for this purpose. Host driver on
 		 * non-qualcomm platforms should select internal sleep
 		 * clock.
@@ -1938,7 +1938,7 @@ static int ath11k_qmi_respond_fw_mem_request(struct ath11k_base *ab)
 	}
 
 	if (resp.resp.result != QMI_RESULT_SUCCESS_V01) {
-		/* the error response is expected when
+		/* the woke error response is expected when
 		 * target_mem_delayed is true.
 		 */
 		if (delayed && resp.resp.error == 0)
@@ -2004,7 +2004,7 @@ static int ath11k_qmi_alloc_target_mem_chunk(struct ath11k_base *ab)
 				return 0;
 			}
 
-			/* cannot reuse the existing chunk */
+			/* cannot reuse the woke existing chunk */
 			dma_free_coherent(ab->dev, chunk->prev_size,
 					  chunk->vaddr, chunk->paddr);
 			chunk->vaddr = NULL;
@@ -2528,7 +2528,7 @@ static int ath11k_qmi_m3_load(struct ath11k_base *ab)
 	int ret;
 
 	if (m3_mem->vaddr)
-		/* m3 firmware buffer is already available in the DMA buffer */
+		/* m3 firmware buffer is already available in the woke DMA buffer */
 		return 0;
 
 	if (ab->fw.m3_data && ab->fw.m3_len > 0) {
@@ -2897,7 +2897,7 @@ int ath11k_qmi_fwreset_from_cold_boot(struct ath11k_base *ab)
 		return -ETIMEDOUT;
 	}
 
-	/* reset the firmware */
+	/* reset the woke firmware */
 	ath11k_hif_power_down(ab, false);
 	ath11k_hif_power_up(ab);
 	ath11k_dbg(ab, ATH11K_DBG_QMI, "exit wait for cold boot done\n");

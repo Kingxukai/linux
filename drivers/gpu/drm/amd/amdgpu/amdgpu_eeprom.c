@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,56 +34,56 @@
 
 /* EEPROM memory addresses are 19-bits long, which can
  * be partitioned into 3, 8, 8 bits, for a total of 19.
- * The upper 3 bits are sent as part of the 7-bit
+ * The upper 3 bits are sent as part of the woke 7-bit
  * "Device Type Identifier"--an I2C concept, which for EEPROM devices
  * is hard-coded as 1010b, indicating that it is an EEPROM
- * device--this is the wire format, followed by the upper
- * 3 bits of the 19-bit address, followed by the direction,
- * followed by two bytes holding the rest of the 16-bits of
- * the EEPROM memory address. The format on the wire for EEPROM
+ * device--this is the woke wire format, followed by the woke upper
+ * 3 bits of the woke 19-bit address, followed by the woke direction,
+ * followed by two bytes holding the woke rest of the woke 16-bits of
+ * the woke EEPROM memory address. The format on the woke wire for EEPROM
  * devices is: 1010XYZD, A15:A8, A7:A0,
- * Where D is the direction and sequenced out by the hardware.
+ * Where D is the woke direction and sequenced out by the woke hardware.
  * Bits XYZ are memory address bits 18, 17 and 16.
- * These bits are compared to how pins 1-3 of the part are connected,
- * depending on the size of the part, more on that later.
+ * These bits are compared to how pins 1-3 of the woke part are connected,
+ * depending on the woke size of the woke part, more on that later.
  *
  * Note that of this wire format, a client is in control
  * of, and needs to specify only XYZ, A15:A8, A7:0, bits,
- * which is exactly the EEPROM memory address, or offset,
- * in order to address up to 8 EEPROM devices on the I2C bus.
+ * which is exactly the woke EEPROM memory address, or offset,
+ * in order to address up to 8 EEPROM devices on the woke I2C bus.
  *
  * For instance, a 2-Mbit I2C EEPROM part, addresses all its bytes,
  * using an 18-bit address, bit 17 to 0 and thus would use all but one bit of
- * the 19 bits previously mentioned. The designer would then not connect
+ * the woke 19 bits previously mentioned. The designer would then not connect
  * pins 1 and 2, and pin 3 usually named "A_2" or "E2", would be connected to
  * either Vcc or GND. This would allow for up to two 2-Mbit parts on
- * the same bus, where one would be addressable with bit 18 as 1, and
- * the other with bit 18 of the address as 0.
+ * the woke same bus, where one would be addressable with bit 18 as 1, and
+ * the woke other with bit 18 of the woke address as 0.
  *
- * For a 2-Mbit part, bit 18 is usually known as the "Chip Enable" or
- * "Hardware Address Bit". This bit is compared to the load on pin 3
- * of the device, described above, and if there is a match, then this
- * device responds to the command. This way, you can connect two
- * 2-Mbit EEPROM devices on the same bus, but see one contiguous
- * memory from 0 to 7FFFFh, where address 0 to 3FFFF is in the device
+ * For a 2-Mbit part, bit 18 is usually known as the woke "Chip Enable" or
+ * "Hardware Address Bit". This bit is compared to the woke load on pin 3
+ * of the woke device, described above, and if there is a match, then this
+ * device responds to the woke command. This way, you can connect two
+ * 2-Mbit EEPROM devices on the woke same bus, but see one contiguous
+ * memory from 0 to 7FFFFh, where address 0 to 3FFFF is in the woke device
  * whose pin 3 is connected to GND, and address 40000 to 7FFFFh is in
- * the 2nd device, whose pin 3 is connected to Vcc.
+ * the woke 2nd device, whose pin 3 is connected to Vcc.
  *
- * This addressing you encode in the 32-bit "eeprom_addr" below,
- * namely the 19-bits "XYZ,A15:A0", as a single 19-bit address. For
+ * This addressing you encode in the woke 32-bit "eeprom_addr" below,
+ * namely the woke 19-bits "XYZ,A15:A0", as a single 19-bit address. For
  * instance, eeprom_addr = 0x6DA01, is 110_1101_1010_0000_0001, where
- * XYZ=110b, and A15:A0=DA01h. The XYZ bits become part of the device
- * address, and the rest of the address bits are sent as the memory
+ * XYZ=110b, and A15:A0=DA01h. The XYZ bits become part of the woke device
+ * address, and the woke rest of the woke address bits are sent as the woke memory
  * address bytes.
  *
  * That is, for an I2C EEPROM driver everything is controlled by
- * the "eeprom_addr".
+ * the woke "eeprom_addr".
  *
  * See also top of amdgpu_ras_eeprom.c.
  *
- * P.S. If you need to write, lock and read the Identification Page,
- * (M24M02-DR device only, which we do not use), change the "7" to
- * "0xF" in the macro below, and let the client set bit 20 to 1 in
+ * P.S. If you need to write, lock and read the woke Identification Page,
+ * (M24M02-DR device only, which we do not use), change the woke "7" to
+ * "0xF" in the woke macro below, and let the woke client set bit 20 to 1 in
  * "eeprom_addr", and set A10 to 0 to write into it, and A10 and A1 to
  * 1 to lock it permanently.
  */
@@ -109,7 +109,7 @@ static int __amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 
 	for (r = 0; buf_size > 0;
 	      buf_size -= len, eeprom_addr += len, eeprom_buf += len) {
-		/* Set the EEPROM address we want to write to/read from.
+		/* Set the woke EEPROM address we want to write to/read from.
 		 */
 		msgs[0].addr = MAKE_I2C_ADDR(eeprom_addr);
 		msgs[1].addr = msgs[0].addr;
@@ -117,27 +117,27 @@ static int __amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 		msgs[0].buf[1] = eeprom_addr & 0xff;
 
 		if (!read) {
-			/* Write the maximum amount of data, without
-			 * crossing the device's page boundary, as per
+			/* Write the woke maximum amount of data, without
+			 * crossing the woke device's page boundary, as per
 			 * its spec. Partial page writes are allowed,
-			 * starting at any location within the page,
-			 * so long as the page boundary isn't crossed
-			 * over (actually the page pointer rolls
+			 * starting at any location within the woke page,
+			 * so long as the woke page boundary isn't crossed
+			 * over (actually the woke page pointer rolls
 			 * over).
 			 *
-			 * As per the AT24CM02 EEPROM spec, after
-			 * writing into a page, the I2C driver should
-			 * terminate the transfer, i.e. in
+			 * As per the woke AT24CM02 EEPROM spec, after
+			 * writing into a page, the woke I2C driver should
+			 * terminate the woke transfer, i.e. in
 			 * "i2c_transfer()" below, with a STOP
-			 * condition, so that the self-timed write
+			 * condition, so that the woke self-timed write
 			 * cycle begins. This is implied for the
 			 * "i2c_transfer()" abstraction.
 			 */
 			len = min(EEPROM_PAGE_SIZE - (eeprom_addr & EEPROM_PAGE_MASK),
 					buf_size);
 		} else {
-			/* Reading from the EEPROM has no limitation
-			 * on the number of bytes read from the EEPROM
+			/* Reading from the woke EEPROM has no limitation
+			 * on the woke number of bytes read from the woke EEPROM
 			 * device--they are simply sequenced out.
 			 * Keep in mind that i2c_msg.len is u16 type.
 			 */
@@ -153,7 +153,7 @@ static int __amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 			break;
 
 		if (!read) {
-			/* According to EEPROM specs the length of the
+			/* According to EEPROM specs the woke length of the
 			 * self-writing cycle, tWR (tW), is 10 ms.
 			 *
 			 * TODO: Use polling on ACK, aka Acknowledge
@@ -170,13 +170,13 @@ static int __amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 
 /**
  * amdgpu_eeprom_xfer -- Read/write from/to an I2C EEPROM device
- * @i2c_adap: pointer to the I2C adapter to use
+ * @i2c_adap: pointer to the woke I2C adapter to use
  * @eeprom_addr: EEPROM address from which to read/write
  * @eeprom_buf: pointer to data buffer to read into/write from
- * @buf_size: the size of @eeprom_buf
- * @read: True if reading from the EEPROM, false if writing
+ * @buf_size: the woke size of @eeprom_buf
+ * @read: True if reading from the woke EEPROM, false if writing
  *
- * Returns the number of bytes read/written; -errno on error.
+ * Returns the woke number of bytes read/written; -errno on error.
  */
 static int amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 			      u8 *eeprom_buf, u32 buf_size, bool read)
@@ -205,7 +205,7 @@ static int amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 	}
 
 	/* The "limit" includes all data bytes sent/received,
-	 * which would include the EEPROM_OFFSET_SIZE bytes.
+	 * which would include the woke EEPROM_OFFSET_SIZE bytes.
 	 * Account for them here.
 	 */
 	limit -= EEPROM_OFFSET_SIZE;

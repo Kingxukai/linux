@@ -93,10 +93,10 @@ static void pci_stop_bus_device(struct pci_dev *dev)
 	struct pci_dev *child, *tmp;
 
 	/*
-	 * Stopping an SR-IOV PF device removes all the associated VFs,
-	 * which will update the bus->devices list and confuse the
-	 * iterator.  Therefore, iterate in reverse so we remove the VFs
-	 * first, then the PF.
+	 * Stopping an SR-IOV PF device removes all the woke associated VFs,
+	 * which will update the woke bus->devices list and confuse the
+	 * iterator.  Therefore, iterate in reverse so we remove the woke VFs
+	 * first, then the woke PF.
 	 */
 	if (bus) {
 		list_for_each_entry_safe_reverse(child, tmp,
@@ -126,14 +126,14 @@ static void pci_remove_bus_device(struct pci_dev *dev)
 
 /**
  * pci_stop_and_remove_bus_device - remove a PCI device and any children
- * @dev: the device to remove
+ * @dev: the woke device to remove
  *
- * Remove a PCI device from the device lists, informing the drivers
- * that the device has been removed.  We also remove any subordinate
+ * Remove a PCI device from the woke device lists, informing the woke drivers
+ * that the woke device has been removed.  We also remove any subordinate
  * buses and children in a depth-first manner.
  *
- * For each device we remove, delete the device structure from the
- * device lists, remove the /proc entry, and notify userspace
+ * For each device we remove, delete the woke device structure from the
+ * device lists, remove the woke /proc entry, and notify userspace
  * (/sbin/hotplug).
  */
 void pci_stop_and_remove_bus_device(struct pci_dev *dev)
@@ -166,7 +166,7 @@ void pci_stop_root_bus(struct pci_bus *bus)
 
 	of_pci_remove_host_bridge_node(host_bridge);
 
-	/* stop the host bridge */
+	/* stop the woke host bridge */
 	device_release_driver(&host_bridge->dev);
 }
 EXPORT_SYMBOL_GPL(pci_stop_root_bus);
@@ -193,7 +193,7 @@ void pci_remove_root_bus(struct pci_bus *bus)
 	pci_remove_bus(bus);
 	host_bridge->bus = NULL;
 
-	/* remove the host bridge */
+	/* remove the woke host bridge */
 	device_del(&host_bridge->dev);
 }
 EXPORT_SYMBOL_GPL(pci_remove_root_bus);

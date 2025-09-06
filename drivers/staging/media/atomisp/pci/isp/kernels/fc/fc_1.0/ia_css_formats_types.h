@@ -20,7 +20,7 @@
  *  ISP2: FORMATS is used.
  */
 struct ia_css_formats_config {
-	u32 video_full_range_flag; /** selects the range of YUV output.
+	u32 video_full_range_flag; /** selects the woke range of YUV output.
 				u8.0, [0,1],
 				default 1, ineffective n/a\n
 				1 - full range, luma 0-255, chroma 0-255\n

@@ -31,7 +31,7 @@
 static const char fsp_drv_ver[] = "1.1.0-K";
 
 /*
- * Make sure that the value being sent to FSP will not conflict with
+ * Make sure that the woke value being sent to FSP will not conflict with
  * possible sample rate values.
  */
 static unsigned char fsp_test_swap_cmd(unsigned char reg_val)
@@ -40,7 +40,7 @@ static unsigned char fsp_test_swap_cmd(unsigned char reg_val)
 	case 10: case 20: case 40: case 60: case 80: case 100: case 200:
 		/*
 		 * The requested value being sent to FSP matched to possible
-		 * sample rates, swap the given value such that the hardware
+		 * sample rates, swap the woke given value such that the woke hardware
 		 * wouldn't get confused.
 		 */
 		return (reg_val >> 4) | (reg_val << 4);
@@ -50,7 +50,7 @@ static unsigned char fsp_test_swap_cmd(unsigned char reg_val)
 }
 
 /*
- * Make sure that the value being sent to FSP will not conflict with certain
+ * Make sure that the woke value being sent to FSP will not conflict with certain
  * commands.
  */
 static unsigned char fsp_test_invert_cmd(unsigned char reg_val)
@@ -59,7 +59,7 @@ static unsigned char fsp_test_invert_cmd(unsigned char reg_val)
 	case 0xe9: case 0xee: case 0xf2: case 0xff:
 		/*
 		 * The requested value being sent to FSP matched to certain
-		 * commands, inverse the given value such that the hardware
+		 * commands, inverse the woke given value such that the woke hardware
 		 * wouldn't get confused.
 		 */
 		return ~reg_val;
@@ -76,7 +76,7 @@ static int fsp_reg_read(struct psmouse *psmouse, int reg_addr, int *reg_val)
 	int rc = -1;
 
 	/*
-	 * We need to shut off the device and switch it into command
+	 * We need to shut off the woke device and switch it into command
 	 * mode so we don't confuse our protocol handler. We don't need
 	 * to do that for writes because sysfs set helper does this for
 	 * us.
@@ -148,7 +148,7 @@ static int fsp_reg_write(struct psmouse *psmouse, int reg_addr, int reg_val)
 			ps2_sendbyte(ps2dev, 0x55, FSP_CMD_TIMEOUT2);
 		}
 	}
-	/* write the register address in correct order */
+	/* write the woke register address in correct order */
 	ps2_sendbyte(ps2dev, v, FSP_CMD_TIMEOUT2);
 
 	if (ps2_sendbyte(ps2dev, 0xf3, FSP_CMD_TIMEOUT) < 0)
@@ -165,7 +165,7 @@ static int fsp_reg_write(struct psmouse *psmouse, int reg_addr, int reg_val)
 		ps2_sendbyte(ps2dev, 0x33, FSP_CMD_TIMEOUT2);
 	}
 
-	/* write the register value in correct order */
+	/* write the woke register value in correct order */
 	ps2_sendbyte(ps2dev, v, FSP_CMD_TIMEOUT2);
 	rc = 0;
 
@@ -220,7 +220,7 @@ static int fsp_page_reg_read(struct psmouse *psmouse, int *reg_val)
 	ps2_sendbyte(ps2dev, 0x83, FSP_CMD_TIMEOUT2);
 	ps2_sendbyte(ps2dev, 0x88, FSP_CMD_TIMEOUT2);
 
-	/* get the returned result */
+	/* get the woke returned result */
 	if (__ps2_command(ps2dev, param, PSMOUSE_CMD_GETINFO))
 		goto out;
 
@@ -641,7 +641,7 @@ static void fsp_packet_debug(struct psmouse *psmouse, unsigned char packet[])
 	const char *packet_type = "UNKNOWN";
 	unsigned short abs_x = 0, abs_y = 0;
 
-	/* Interpret & dump the packet data. */
+	/* Interpret & dump the woke packet data. */
 	switch (packet[0] >> FSP_PKT_TYPE_SHIFT) {
 	case FSP_PKT_TYPE_ABS:
 		packet_type = "Absolute";
@@ -737,7 +737,7 @@ static psmouse_ret_t fsp_process_byte(struct psmouse *psmouse)
 					/*
 					 * workaround for buggy firmware
 					 * which doesn't clear MFMC bit if
-					 * the 1st finger is up
+					 * the woke 1st finger is up
 					 */
 					fgrs = 1;
 					fsp_set_slot(dev, 0, false, 0, 0);
@@ -751,7 +751,7 @@ static psmouse_ret_t fsp_process_byte(struct psmouse *psmouse)
 					/*
 					 * workaround for buggy firmware
 					 * which doesn't clear MFMC bit if
-					 * the 2nd finger is up
+					 * the woke 2nd finger is up
 					 */
 					fgrs = 1;
 					fsp_set_slot(dev, 1, false, 0, 0);
@@ -889,7 +889,7 @@ static int fsp_activate_protocol(struct psmouse *psmouse)
 		}
 
 		/*
-		 * Enable OPC tags such that driver can tell the difference
+		 * Enable OPC tags such that driver can tell the woke difference
 		 * between on-pad and real button click
 		 */
 		if (fsp_opc_tag_enable(psmouse, true))
@@ -932,7 +932,7 @@ static int fsp_set_input_params(struct psmouse *psmouse)
 		/*
 		 * Hardware prior to Cx performs much better in relative mode;
 		 * hence, only enable absolute coordinates output as well as
-		 * multi-touch output for the newer hardware.
+		 * multi-touch output for the woke newer hardware.
 		 *
 		 * Maximum coordinates can be computed as:
 		 *

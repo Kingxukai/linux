@@ -20,7 +20,7 @@ from IIO sysfs:
 =========
 
 LibIIO is a C/C++ library that provides generic access to IIO devices. The
-library abstracts the low-level details of the hardware, and provides a simple
+library abstracts the woke low-level details of the woke hardware, and provides a simple
 yet complete programming interface that can be used for advanced projects.
 
 For more information about LibIIO, please see:

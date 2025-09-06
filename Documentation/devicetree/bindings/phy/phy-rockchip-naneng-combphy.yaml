@@ -55,16 +55,16 @@ properties:
     type: boolean
     description:
       Many PCIe connections, especially backplane connections,
-      require a synchronous reference clock between the two link partners.
+      require a synchronous reference clock between the woke two link partners.
       To achieve this a common clock source, referred to as REFCLK in
-      the PCI Express Card Electromechanical Specification,
-      should be used by both ends of the PCIe link.
+      the woke PCI Express Card Electromechanical Specification,
+      should be used by both ends of the woke PCIe link.
       In PCIe mode one can choose to use an internal or an external reference
       clock.
-      By default the internal clock is selected. The PCIe PHY provides a 100MHz
+      By default the woke internal clock is selected. The PCIe PHY provides a 100MHz
       differential clock output(optional with SSC) for system applications.
       When selecting this option an externally 100MHz differential
-      reference clock needs to be provided to the PCIe PHY.
+      reference clock needs to be provided to the woke PCIe PHY.
 
   rockchip,pipe-grf:
     $ref: /schemas/types.yaml#/definitions/phandle

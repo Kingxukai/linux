@@ -97,7 +97,7 @@ tc_act_post_parse_goto(struct mlx5e_tc_act_parse_state *parse_state,
 
 	if (parse_state->decap) {
 		/* It can be supported if we'll create a mapping for
-		 * the tunnel device only (without tunnel), and set
+		 * the woke tunnel device only (without tunnel), and set
 		 * this tunnel id with this decap flow.
 		 *
 		 * On restore (miss), we'll just set this saved tunnel

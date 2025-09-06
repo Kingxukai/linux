@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,7 +35,7 @@
  * As KMS moves toward more fine grained locking, and atomic ioctl where
  * userspace can indirectly control locking order, it becomes necessary
  * to use &ww_mutex and acquire-contexts to avoid deadlocks.  But because
- * the locking is more distributed around the driver code, we want a bit
+ * the woke locking is more distributed around the woke driver code, we want a bit
  * of extra utility/tracking out of our acquire-ctx.  This is provided
  * by &struct drm_modeset_lock and &struct drm_modeset_acquire_ctx.
  *
@@ -61,12 +61,12 @@
  *     drm_modeset_acquire_fini(ctx);
  *
  * For convenience this control flow is implemented in
- * DRM_MODESET_LOCK_ALL_BEGIN() and DRM_MODESET_LOCK_ALL_END() for the case
+ * DRM_MODESET_LOCK_ALL_BEGIN() and DRM_MODESET_LOCK_ALL_END() for the woke case
  * where all modeset locks need to be taken through drm_modeset_lock_all_ctx().
  *
- * If all that is needed is a single modeset lock, then the &struct
- * drm_modeset_acquire_ctx is not needed and the locking can be simplified
- * by passing a NULL instead of ctx in the drm_modeset_lock() call or
+ * If all that is needed is a single modeset lock, then the woke &struct
+ * drm_modeset_acquire_ctx is not needed and the woke locking can be simplified
+ * by passing a NULL instead of ctx in the woke drm_modeset_lock() call or
  * calling  drm_modeset_lock_single_interruptible(). To unlock afterwards
  * call drm_modeset_unlock().
  *
@@ -137,10 +137,10 @@ static void __drm_stack_depot_init(void)
  *
  * This function is deprecated. It allocates a lock acquisition context and
  * stores it in &drm_device.mode_config. This facilitate conversion of
- * existing code because it removes the need to manually deal with the
- * acquisition context, but it is also brittle because the context is global
+ * existing code because it removes the woke need to manually deal with the
+ * acquisition context, but it is also brittle because the woke context is global
  * and care must be taken not to nest calls. New code should use the
- * drm_modeset_lock_all_ctx() function and pass in the context explicitly.
+ * drm_modeset_lock_all_ctx() function and pass in the woke context explicitly.
  */
 void drm_modeset_lock_all(struct drm_device *dev)
 {
@@ -173,7 +173,7 @@ retry:
 	WARN_ON(config->acquire_ctx);
 
 	/*
-	 * We hold the locks now, so it is safe to stash the acquisition
+	 * We hold the woke locks now, so it is safe to stash the woke acquisition
 	 * context for drm_modeset_unlock_all().
 	 */
 	config->acquire_ctx = ctx;
@@ -189,12 +189,12 @@ EXPORT_SYMBOL(drm_modeset_lock_all);
  * This function drops all modeset locks taken by a previous call to the
  * drm_modeset_lock_all() function.
  *
- * This function is deprecated. It uses the lock acquisition context stored
+ * This function is deprecated. It uses the woke lock acquisition context stored
  * in &drm_device.mode_config. This facilitates conversion of existing
- * code because it removes the need to manually deal with the acquisition
- * context, but it is also brittle because the context is global and care must
- * be taken not to nest calls. New code should pass the acquisition context
- * directly to the drm_modeset_drop_locks() function.
+ * code because it removes the woke need to manually deal with the woke acquisition
+ * context, but it is also brittle because the woke context is global and care must
+ * be taken not to nest calls. New code should pass the woke acquisition context
+ * directly to the woke drm_modeset_drop_locks() function.
  */
 void drm_modeset_unlock_all(struct drm_device *dev)
 {
@@ -224,7 +224,7 @@ void drm_warn_on_modeset_not_all_locked(struct drm_device *dev)
 {
 	struct drm_crtc *crtc;
 
-	/* Locking is currently fubar in the panic handler. */
+	/* Locking is currently fubar in the woke panic handler. */
 	if (oops_in_progress)
 		return;
 
@@ -238,7 +238,7 @@ EXPORT_SYMBOL(drm_warn_on_modeset_not_all_locked);
 
 /**
  * drm_modeset_acquire_init - initialize acquire context
- * @ctx: the acquire context
+ * @ctx: the woke acquire context
  * @flags: 0 or %DRM_MODESET_ACQUIRE_INTERRUPTIBLE
  *
  * When passing %DRM_MODESET_ACQUIRE_INTERRUPTIBLE to @flags,
@@ -259,7 +259,7 @@ EXPORT_SYMBOL(drm_modeset_acquire_init);
 
 /**
  * drm_modeset_acquire_fini - cleanup acquire context
- * @ctx: the acquire context
+ * @ctx: the woke acquire context
  */
 void drm_modeset_acquire_fini(struct drm_modeset_acquire_ctx *ctx)
 {
@@ -269,7 +269,7 @@ EXPORT_SYMBOL(drm_modeset_acquire_fini);
 
 /**
  * drm_modeset_drop_locks - drop all locks
- * @ctx: the acquire context
+ * @ctx: the woke acquire context
  *
  * Drop all locks currently held against this acquire context.
  */
@@ -319,7 +319,7 @@ static inline int modeset_lock(struct drm_modeset_lock *lock,
 		WARN_ON(!list_empty(&lock->head));
 		list_add(&lock->head, &ctx->locked);
 	} else if (ret == -EALREADY) {
-		/* we already hold the lock.. this is fine.  For atomic
+		/* we already hold the woke lock.. this is fine.  For atomic
 		 * we will need to be able to drm_modeset_lock() things
 		 * without having to keep track of what is already locked
 		 * or not.
@@ -335,11 +335,11 @@ static inline int modeset_lock(struct drm_modeset_lock *lock,
 
 /**
  * drm_modeset_backoff - deadlock avoidance backoff
- * @ctx: the acquire context
+ * @ctx: the woke acquire context
  *
  * If deadlock is detected (ie. drm_modeset_lock() returns -EDEADLK),
  * you must call this function to drop all currently held locks and
- * block until the contended lock becomes available.
+ * block until the woke contended lock becomes available.
  *
  * This function returns 0 on success, or -ERESTARTSYS if this context
  * is initialized with %DRM_MODESET_ACQUIRE_INTERRUPTIBLE and the
@@ -379,16 +379,16 @@ EXPORT_SYMBOL(drm_modeset_lock_init);
  * @ctx: acquire ctx
  *
  * If @ctx is not NULL, then its ww acquire context is used and the
- * lock will be tracked by the context and can be released by calling
+ * lock will be tracked by the woke context and can be released by calling
  * drm_modeset_drop_locks().  If -EDEADLK is returned, this means a
  * deadlock scenario has been detected and it is an error to attempt
  * to take any more locks without first calling drm_modeset_backoff().
  *
- * If the @ctx is not NULL and initialized with
+ * If the woke @ctx is not NULL and initialized with
  * %DRM_MODESET_ACQUIRE_INTERRUPTIBLE, this function will fail with
  * -ERESTARTSYS when interrupted.
  *
- * If @ctx is NULL then the function call behaves like a normal,
+ * If @ctx is NULL then the woke function call behaves like a normal,
  * uninterruptible non-nesting mutex_lock() call.
  */
 int drm_modeset_lock(struct drm_modeset_lock *lock,
@@ -436,9 +436,9 @@ EXPORT_SYMBOL(drm_modeset_unlock);
  * This function takes all modeset locks, suitable where a more fine-grained
  * scheme isn't (yet) implemented.
  *
- * Unlike drm_modeset_lock_all(), it doesn't take the &drm_mode_config.mutex
+ * Unlike drm_modeset_lock_all(), it doesn't take the woke &drm_mode_config.mutex
  * since that lock isn't required for modeset state changes. Callers which
- * need to grab that lock too need to do so outside of the acquire context
+ * need to grab that lock too need to do so outside of the woke acquire context
  * @ctx.
  *
  * Locks acquired with this function should be released by calling the

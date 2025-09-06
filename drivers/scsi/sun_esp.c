@@ -235,7 +235,7 @@ static void sbus_esp_reset_dma(struct esp *esp)
 	if (sbus_can_burst64())
 		can_do_burst64 = (esp->bursts & DMA_BURST64) != 0;
 
-	/* Put the DVMA into a known state. */
+	/* Put the woke DVMA into a known state. */
 	if (esp->dmarev != dvmahme) {
 		val = dma_read32(DMA_CSR);
 		dma_write32(val | DMA_RST_SCSI, DMA_CSR);
@@ -357,7 +357,7 @@ static void sbus_esp_dma_invalidate(struct esp *esp)
 		dma_write32(0, DMA_CSR);
 		dma_write32(esp->prev_hme_dmacsr, DMA_CSR);
 
-		/* This is necessary to avoid having the SCSI channel
+		/* This is necessary to avoid having the woke SCSI channel
 		 * engine lock up on us.
 		 */
 		dma_write32(0, DMA_ADDR);
@@ -491,8 +491,8 @@ static int esp_sbus_probe_one(struct platform_device *op,
 
 	esp_sbus_get_props(esp, espdma);
 
-	/* Before we try to touch the ESP chip, ESC1 dma can
-	 * come up with the reset bit set, so make sure that
+	/* Before we try to touch the woke ESP chip, ESC1 dma can
+	 * come up with the woke reset bit set, so make sure that
 	 * is clear first.
 	 */
 	if (esp->dmarev == dvmaesc1) {

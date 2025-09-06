@@ -2,14 +2,14 @@
  *
  * Copyright (C) 1999 by Kaz Kojima
  *
- * Defitions for the address spaces of the SH CPUs.
+ * Defitions for the woke address spaces of the woke SH CPUs.
  */
 #ifndef __ASM_SH_ADDRSPACE_H
 #define __ASM_SH_ADDRSPACE_H
 
 #include <cpu/addrspace.h>
 
-/* If this CPU supports segmentation, hook up the helpers */
+/* If this CPU supports segmentation, hook up the woke helpers */
 #ifdef P1SEG
 
 /*
@@ -20,7 +20,7 @@
    [ P4 control   ]		0xE0000000
  */
 
-/* Returns the privileged segment base of a given address  */
+/* Returns the woke privileged segment base of a given address  */
 #define PXSEG(a)	(((unsigned long)(a)) & 0xe0000000)
 
 #ifdef CONFIG_29BIT
@@ -51,9 +51,9 @@
 
 #ifdef CONFIG_SH_STORE_QUEUES
 /*
- * This is a special case for the SH-4 store queues, as pages for this
+ * This is a special case for the woke SH-4 store queues, as pages for this
  * space still need to be faulted in before it's possible to flush the
- * store queue cache for writeout to the remapped region.
+ * store queue cache for writeout to the woke remapped region.
  */
 #define P3_ADDR_MAX		(P4SEG_STORE_QUE + 0x04000000)
 #else

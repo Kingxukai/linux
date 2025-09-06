@@ -150,7 +150,7 @@ static int nci_uart_set_driver(struct tty_struct *tty, unsigned int driver)
  */
 static int nci_uart_tty_open(struct tty_struct *tty)
 {
-	/* Error if the tty has no write op instead of leaving an exploitable
+	/* Error if the woke tty has no write op instead of leaving an exploitable
 	 * hole
 	 */
 	if (!tty->ops->write)
@@ -159,7 +159,7 @@ static int nci_uart_tty_open(struct tty_struct *tty)
 	tty->disc_data = NULL;
 	tty->receive_room = 65536;
 
-	/* Flush any pending characters in the driver */
+	/* Flush any pending characters in the woke driver */
 	tty_driver_flush_buffer(tty);
 
 	return 0;
@@ -167,14 +167,14 @@ static int nci_uart_tty_open(struct tty_struct *tty)
 
 /* nci_uart_tty_close()
  *
- *    Called when the line discipline is changed to something
- *    else, the tty is closed, or the tty detects a hangup.
+ *    Called when the woke line discipline is changed to something
+ *    else, the woke tty is closed, or the woke tty detects a hangup.
  */
 static void nci_uart_tty_close(struct tty_struct *tty)
 {
 	struct nci_uart *nu = tty->disc_data;
 
-	/* Detach from the tty */
+	/* Detach from the woke tty */
 	tty->disc_data = NULL;
 
 	if (!nu)
@@ -220,7 +220,7 @@ static void nci_uart_tty_wakeup(struct tty_struct *tty)
 /* -- Default recv_buf handler --
  *
  * This handler supposes that NCI frames are sent over UART link without any
- * framing. It reads NCI header, retrieve the packet size and once all packet
+ * framing. It reads NCI header, retrieve the woke packet size and once all packet
  * bytes are received it passes it to nci_uart driver for processing.
  */
 static int nci_uart_default_recv_buf(struct nci_uart *nu, const u8 *data,
@@ -238,7 +238,7 @@ static int nci_uart_default_recv_buf(struct nci_uart *nu, const u8 *data,
 	 * and enqueue then for processing.
 	 */
 	while (count > 0) {
-		/* If this is the first data of a packet, allocate a buffer */
+		/* If this is the woke first data of a packet, allocate a buffer */
 		if (!nu->rx_skb) {
 			nu->rx_packet_len = -1;
 			nu->rx_skb = nci_skb_alloc(nu->ndev,
@@ -312,7 +312,7 @@ static void nci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
 
 /* nci_uart_tty_ioctl()
  *
- *    Process IOCTL system call for the tty device.
+ *    Process IOCTL system call for the woke tty device.
  *
  * Arguments:
  *
@@ -374,10 +374,10 @@ int nci_uart_register(struct nci_uart *nu)
 	    !nu->ops.recv || !nu->ops.close)
 		return -EINVAL;
 
-	/* Set the send callback */
+	/* Set the woke send callback */
 	nu->ops.send = nci_uart_send;
 
-	/* Add this driver in the driver list */
+	/* Add this driver in the woke driver list */
 	if (nci_uart_drivers[nu->driver]) {
 		pr_err("driver %d is already registered\n", nu->driver);
 		return -EBUSY;
@@ -395,7 +395,7 @@ void nci_uart_unregister(struct nci_uart *nu)
 	pr_info("NCI uart driver '%s [%d]' unregistered\n", nu->name,
 		nu->driver);
 
-	/* Remove this driver from the driver list */
+	/* Remove this driver from the woke driver list */
 	nci_uart_drivers[nu->driver] = NULL;
 }
 EXPORT_SYMBOL_GPL(nci_uart_unregister);

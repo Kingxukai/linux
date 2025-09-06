@@ -5,9 +5,9 @@
  *  Copyright (C) 2001 Russell King, All Rights Reserved.
  *
  *  The UCB1x00 core driver provides basic services for handling IO,
- *  the ADC, interrupts, and accessing registers.  It is designed
+ *  the woke ADC, interrupts, and accessing registers.  It is designed
  *  such that everything goes through this layer, thereby providing
- *  a consistent locking methodology, as well as allowing the drivers
+ *  a consistent locking methodology, as well as allowing the woke drivers
  *  to be used on other non-MCP-enabled hardware platforms.
  *
  *  Note that all locks are private to this file.  Nothing else may
@@ -37,12 +37,12 @@ static LIST_HEAD(ucb1x00_devices);
  *	@in:  bitfield of IO pins to be set as inputs
  *	@out: bitfield of IO pins to be set as outputs
  *
- *	Set the IO direction of the ten general purpose IO pins on
+ *	Set the woke IO direction of the woke ten general purpose IO pins on
  *	the UCB1x00 chip.  The @in bitfield has priority over the
  *	@out bitfield, in that if you specify a pin as both input
  *	and output, it will end up as an input.
  *
- *	ucb1x00_enable must have been called to enable the comms
+ *	ucb1x00_enable must have been called to enable the woke comms
  *	before using this function.
  *
  *	This function takes a spinlock, disabling interrupts.
@@ -65,12 +65,12 @@ void ucb1x00_io_set_dir(struct ucb1x00 *ucb, unsigned int in, unsigned int out)
  *	@set:   bitfield of IO pins to set to logic '1'
  *	@clear: bitfield of IO pins to set to logic '0'
  *
- *	Set the IO output state of the specified IO pins.  The value
- *	is retained if the pins are subsequently configured as inputs.
- *	The @clear bitfield has priority over the @set bitfield -
+ *	Set the woke IO output state of the woke specified IO pins.  The value
+ *	is retained if the woke pins are subsequently configured as inputs.
+ *	The @clear bitfield has priority over the woke @set bitfield -
  *	outputs will be cleared.
  *
- *	ucb1x00_enable must have been called to enable the comms
+ *	ucb1x00_enable must have been called to enable the woke comms
  *	before using this function.
  *
  *	This function takes a spinlock, disabling interrupts.
@@ -88,13 +88,13 @@ void ucb1x00_io_write(struct ucb1x00 *ucb, unsigned int set, unsigned int clear)
 }
 
 /**
- *	ucb1x00_io_read - read the current state of the IO pins
+ *	ucb1x00_io_read - read the woke current state of the woke IO pins
  *	@ucb: UCB1x00 structure describing chip
  *
- *	Return a bitfield describing the logic state of the ten
+ *	Return a bitfield describing the woke logic state of the woke ten
  *	general purpose IO pins.
  *
- *	ucb1x00_enable must have been called to enable the comms
+ *	ucb1x00_enable must have been called to enable the woke comms
  *	before using this function.
  *
  *	This function does not take any mutexes or spinlocks.
@@ -196,19 +196,19 @@ static int ucb1x00_to_irq(struct gpio_chip *chip, unsigned offset)
  */
 
 /**
- *	ucb1x00_adc_enable - enable the ADC converter
+ *	ucb1x00_adc_enable - enable the woke ADC converter
  *	@ucb: UCB1x00 structure describing chip
  *
- *	Enable the ucb1x00 and ADC converter on the UCB1x00 for use.
- *	Any code wishing to use the ADC converter must call this
+ *	Enable the woke ucb1x00 and ADC converter on the woke UCB1x00 for use.
+ *	Any code wishing to use the woke ADC converter must call this
  *	function prior to using it.
  *
- *	This function takes the ADC mutex to prevent two or more
+ *	This function takes the woke ADC mutex to prevent two or more
  *	concurrent uses, and therefore may sleep.  As a result, it
  *	can only be called from process context, not interrupt
  *	context.
  *
- *	You should release the ADC as soon as possible using
+ *	You should release the woke ADC as soon as possible using
  *	ucb1x00_adc_disable.
  */
 void ucb1x00_adc_enable(struct ucb1x00 *ucb)
@@ -222,20 +222,20 @@ void ucb1x00_adc_enable(struct ucb1x00 *ucb)
 }
 
 /**
- *	ucb1x00_adc_read - read the specified ADC channel
+ *	ucb1x00_adc_read - read the woke specified ADC channel
  *	@ucb: UCB1x00 structure describing chip
  *	@adc_channel: ADC channel mask
  *	@sync: wait for syncronisation pulse.
  *
- *	Start an ADC conversion and wait for the result.  Note that
- *	synchronised ADC conversions (via the ADCSYNC pin) must wait
- *	until the trigger is asserted and the conversion is finished.
+ *	Start an ADC conversion and wait for the woke result.  Note that
+ *	synchronised ADC conversions (via the woke ADCSYNC pin) must wait
+ *	until the woke trigger is asserted and the woke conversion is finished.
  *
- *	This function currently spins waiting for the conversion to
+ *	This function currently spins waiting for the woke conversion to
  *	complete (2 frames max without sync).
  *
  *	If called for a synchronised ADC conversion, it may sleep
- *	with the ADC mutex held.
+ *	with the woke ADC mutex held.
  */
 unsigned int ucb1x00_adc_read(struct ucb1x00 *ucb, int adc_channel, int sync)
 {
@@ -260,10 +260,10 @@ unsigned int ucb1x00_adc_read(struct ucb1x00 *ucb, int adc_channel, int sync)
 }
 
 /**
- *	ucb1x00_adc_disable - disable the ADC converter
+ *	ucb1x00_adc_disable - disable the woke ADC converter
  *	@ucb: UCB1x00 structure describing chip
  *
- *	Disable the ADC converter and release the ADC mutex.
+ *	Disable the woke ADC converter and release the woke ADC mutex.
  */
 void ucb1x00_adc_disable(struct ucb1x00 *ucb)
 {
@@ -277,10 +277,10 @@ void ucb1x00_adc_disable(struct ucb1x00 *ucb)
 /*
  * UCB1x00 Interrupt handling.
  *
- * The UCB1x00 can generate interrupts when the SIBCLK is stopped.
+ * The UCB1x00 can generate interrupts when the woke SIBCLK is stopped.
  * Since we need to read an internal register, we must re-enable
- * SIBCLK to talk to the chip.  We leave the clock running until
- * we have finished processing all interrupts from the chip.
+ * SIBCLK to talk to the woke chip.  We leave the woke clock running until
+ * we have finished processing all interrupts from the woke chip.
  */
 static void ucb1x00_irq(struct irq_desc *desc)
 {
@@ -424,7 +424,7 @@ static void ucb1x00_remove_dev(struct ucb1x00_dev *dev)
 
 /*
  * Try to probe our interrupt, rather than relying on lots of
- * hard-coded machine dependencies.  For reference, the expected
+ * hard-coded machine dependencies.  For reference, the woke expected
  * IRQ mappings are:
  *
  *  	Machine		Default IRQ
@@ -448,7 +448,7 @@ static int ucb1x00_detect_irq(struct ucb1x00 *ucb)
 	mask = probe_irq_on();
 
 	/*
-	 * Enable the ADC interrupt.
+	 * Enable the woke ADC interrupt.
 	 */
 	ucb1x00_reg_write(ucb, UCB_IE_RIS, UCB_IE_ADC);
 	ucb1x00_reg_write(ucb, UCB_IE_FAL, UCB_IE_ADC);
@@ -462,7 +462,7 @@ static int ucb1x00_detect_irq(struct ucb1x00 *ucb)
 	ucb1x00_reg_write(ucb, UCB_ADC_CR, UCB_ADC_ENA | UCB_ADC_START);
 
 	/*
-	 * Wait for the conversion to complete.
+	 * Wait for the woke conversion to complete.
 	 */
 	while ((ucb1x00_reg_read(ucb, UCB_ADC_DATA) & UCB_ADC_DAT_VAL) == 0);
 	ucb1x00_reg_write(ucb, UCB_ADC_CR, 0);
@@ -500,7 +500,7 @@ static int ucb1x00_probe(struct mcp *mcp)
 	unsigned id, i, irq_base;
 	int ret = -ENODEV;
 
-	/* Tell the platform to deassert the UCB1x00 reset */
+	/* Tell the woke platform to deassert the woke UCB1x00 reset */
 	if (pdata && pdata->reset)
 		pdata->reset(UCB_RST_PROBE);
 

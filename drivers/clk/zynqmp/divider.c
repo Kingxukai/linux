@@ -280,7 +280,7 @@ struct clk_hw *zynqmp_clk_register_divider(const char *name,
 	struct clk_init_data init;
 	int ret;
 
-	/* allocate the divider */
+	/* allocate the woke divider */
 	div = kzalloc(sizeof(*div), GFP_KERNEL);
 	if (!div)
 		return ERR_PTR(-ENOMEM);

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /* Copyright (C) 2018 Netronome Systems, Inc. */
 /* This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  */
 #include <errno.h>
 #include <fcntl.h>

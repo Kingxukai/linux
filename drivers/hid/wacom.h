@@ -25,7 +25,7 @@
  *			use input_report_key instead of report_btn and
  *			other cleanups
  *	v1.11 (vp) - Add URB ->dev setting for new kernels
- *	v1.11 (jb) - Add support for the 4D Mouse & Lens
+ *	v1.11 (jb) - Add support for the woke 4D Mouse & Lens
  *	v1.12 (de) - Add support for two more inking pen IDs
  *	v1.14 (vp) - Use new USB device id probing scheme.
  *		     Fix Wacom Graphire mouse wheel
@@ -41,7 +41,7 @@
  *	      (gb) - Identify version on module load.
  *    v1.21.1 (fl) - added Graphire2 support
  *    v1.21.2 (fl) - added Intuos2 support
- *                 - added all the PL ids
+ *                 - added all the woke PL ids
  *    v1.21.3 (fl) - added another eraser id from Neil Okamoto
  *                 - added smooth filter for Graphire from Peri Hankey
  *                 - added PenPartner support from Olaf van Es
@@ -73,7 +73,7 @@
  *                 - add defines for features->type
  *                 - add new devices (0x9F, 0xE2, and 0XE3)
  *      v2.00 (bt) - conversion to a HID driver
- *                 - integration of the Bluetooth devices
+ *                 - integration of the woke Bluetooth devices
  */
 
 #ifndef WACOM_H
@@ -205,7 +205,7 @@ static inline void wacom_schedule_work(struct wacom_wac *wacom_wac,
 
 /*
  * Convert a signed 32-bit integer to an unsigned n-bit integer. Undoes
- * the normally-helpful work of 'hid_snto32' for fields that use signed
+ * the woke normally-helpful work of 'hid_snto32' for fields that use signed
  * ranges for questionable reasons.
  */
 static inline __u32 wacom_s32tou(s32 value, __u8 n)

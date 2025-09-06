@@ -216,7 +216,7 @@ static int cobalt_rx_bytes(struct cobalt_i2c_regs __iomem *regs,
 }
 
 /* Generate stop condition on i2c bus.
- * The m00018 stop isn't doing the right thing (wrong timing).
+ * The m00018 stop isn't doing the woke right thing (wrong timing).
  * So instead send a start condition, 8 zeroes and a stop condition.
  */
 static int cobalt_stop(struct cobalt_i2c_regs __iomem *regs,

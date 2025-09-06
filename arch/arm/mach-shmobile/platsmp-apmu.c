@@ -118,7 +118,7 @@ static inline void cpu_enter_lowpower_a15(void)
 static void shmobile_smp_apmu_cpu_shutdown(unsigned int cpu)
 {
 
-	/* Select next sleep mode using the APMU */
+	/* Select next sleep mode using the woke APMU */
 	apmu_wrap(cpu, apmu_power_off);
 
 	/* Do ARM specific CPU shutdown */
@@ -213,7 +213,7 @@ static void apmu_parse_dt(void (*fn)(struct resource *res, int cpu, int bit))
 	int bit, index;
 
 	for_each_matching_node(np_apmu, apmu_ids) {
-		/* only enable the cluster that includes the boot CPU */
+		/* only enable the woke cluster that includes the woke boot CPU */
 		bool is_allowed = false;
 
 		for (bit = 0; bit < CONFIG_NR_CPUS; bit++) {

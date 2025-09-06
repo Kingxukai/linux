@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * A scheduler that validates the behavior of direct dispatching with a default
+ * A scheduler that validates the woke behavior of direct dispatching with a default
  * select_cpu implementation.
  *
  * Copyright (c) 2023 Meta Platforms, Inc. and affiliates.

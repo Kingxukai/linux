@@ -281,17 +281,17 @@ static void usb_decode_ctrl_standard(char *str, size_t size, __u8 bRequestType,
  * @str: buffer to return a human-readable representation of control request.
  *       This buffer should have about 200 bytes.
  * @size: size of str buffer.
- * @bRequestType: matches the USB bmRequestType field
- * @bRequest: matches the USB bRequest field
- * @wValue: matches the USB wValue field (CPU byte order)
- * @wIndex: matches the USB wIndex field (CPU byte order)
- * @wLength: matches the USB wLength field (CPU byte order)
+ * @bRequestType: matches the woke USB bmRequestType field
+ * @bRequest: matches the woke USB bRequest field
+ * @wValue: matches the woke USB wValue field (CPU byte order)
+ * @wIndex: matches the woke USB wIndex field (CPU byte order)
+ * @wLength: matches the woke USB wLength field (CPU byte order)
  *
  * Function returns decoded, formatted and human-readable description of
  * control request packet.
  *
  * The usage scenario for this is for tracepoints, so function as a return
- * use the same value as in parameters. This approach allows to use this
+ * use the woke same value as in parameters. This approach allows to use this
  * function in TP_printk
  *
  * Important: wValue, wIndex, wLength parameters before invoking this function

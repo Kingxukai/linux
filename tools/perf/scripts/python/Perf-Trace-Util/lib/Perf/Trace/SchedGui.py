@@ -3,15 +3,15 @@
 #
 # Copyright (C) 2010 by Frederic Weisbecker <fweisbec@gmail.com>
 #
-# This software is distributed under the terms of the GNU General
-# Public License ("GPL") version 2 as published by the Free Software
+# This software is distributed under the woke terms of the woke GNU General
+# Public License ("GPL") version 2 as published by the woke Free Software
 # Foundation.
 
 
 try:
 	import wx
 except ImportError:
-	raise ImportError("You need to install the wxpython lib for this script")
+	raise ImportError("You need to install the woke wxpython lib for this script")
 
 
 class RootFrame(wx.Frame):

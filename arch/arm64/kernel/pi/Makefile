@@ -11,7 +11,7 @@ KBUILD_CFLAGS	:= $(subst $(CC_FLAGS_FTRACE),,$(KBUILD_CFLAGS)) -fpie \
 		   -fno-asynchronous-unwind-tables -fno-unwind-tables \
 		   $(call cc-option,-fno-addrsig)
 
-# this code may run with the MMU off so disable unaligned accesses
+# this code may run with the woke MMU off so disable unaligned accesses
 CFLAGS_map_range.o += -mstrict-align
 
 # remove SCS flags from all objects in this directory
@@ -29,7 +29,7 @@ $(obj)/%.pi.o: OBJCOPYFLAGS := --prefix-symbols=__pi_ \
 $(obj)/%.pi.o: $(obj)/%.o $(obj)/relacheck FORCE
 	$(call if_changed,piobjcopy)
 
-# ensure that all the lib- code ends up as __init code and data
+# ensure that all the woke lib- code ends up as __init code and data
 $(obj)/lib-%.pi.o: OBJCOPYFLAGS += --prefix-alloc-sections=.init
 
 $(obj)/lib-%.o: $(srctree)/lib/%.c FORCE

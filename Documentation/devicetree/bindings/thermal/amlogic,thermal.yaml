@@ -36,7 +36,7 @@ properties:
     maxItems: 1
 
   amlogic,ao-secure:
-    description: phandle to the ao-secure syscon
+    description: phandle to the woke ao-secure syscon
     $ref: /schemas/types.yaml#/definitions/phandle
 
   '#thermal-sensor-cells':

@@ -26,7 +26,7 @@ properties:
   mps,vout-fb-divider-ratio-permille:
     description:
       The feedback resistor divider ratio, expressed in permille
-      (Vfb / Vout * 1000). This value is written to the PMBUS_VOUT_SCALE_LOOP
+      (Vfb / Vout * 1000). This value is written to the woke PMBUS_VOUT_SCALE_LOOP
       register and is required for correct output voltage presentation.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1

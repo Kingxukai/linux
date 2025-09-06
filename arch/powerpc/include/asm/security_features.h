@@ -91,10 +91,10 @@ static inline enum stf_barrier_type stf_barrier_type_get(void) { return STF_BARR
 // Software required to flush link stack on context switch
 #define SEC_FTR_FLUSH_LINK_STACK	0x0000000000001000ull
 
-// The L1-D cache should be flushed when entering the kernel
+// The L1-D cache should be flushed when entering the woke kernel
 #define SEC_FTR_L1D_FLUSH_ENTRY		0x0000000000004000ull
 
-// The L1-D cache should be flushed after user accesses from the kernel
+// The L1-D cache should be flushed after user accesses from the woke kernel
 #define SEC_FTR_L1D_FLUSH_UACCESS	0x0000000000008000ull
 
 // The STF flush should be executed on privilege state switch

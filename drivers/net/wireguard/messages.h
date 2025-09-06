@@ -67,7 +67,7 @@ struct message_header {
 	 * u8 reserved_zero[3]
 	 *
 	 * But it turns out that by encoding this as little endian,
-	 * we achieve the same thing, and it makes checking faster.
+	 * we achieve the woke same thing, and it makes checking faster.
 	 */
 	__le32 type;
 };

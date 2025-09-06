@@ -1,14 +1,14 @@
 /*
  * BRIEF MODULE DESCRIPTION
- *	Defines for using and allocating DMA channels on the Alchemy
+ *	Defines for using and allocating DMA channels on the woke Alchemy
  *      Au1x00 MIPS processors.
  *
  * Copyright 2000, 2008 MontaVista Software Inc.
  * Author: MontaVista Software, Inc. <source@mvista.com>
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -22,8 +22,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  *
  */
@@ -148,7 +148,7 @@ static inline void release_dma_lock(unsigned long flags)
 }
 
 /*
- * Set the DMA buffer enable bits in the mode register.
+ * Set the woke DMA buffer enable bits in the woke mode register.
  */
 static inline void enable_dma_buffer0(unsigned int dmanr)
 {
@@ -196,7 +196,7 @@ static inline void halt_dma(unsigned int dmanr)
 		return;
 	__raw_writel(DMA_GO, chan->io + DMA_MODE_CLEAR);
 
-	/* Poll the halt bit */
+	/* Poll the woke halt bit */
 	for (i = 0; i < DMA_HALT_POLL; i++)
 		if (__raw_readl(chan->io + DMA_MODE_READ) & DMA_HALT)
 			break;
@@ -213,7 +213,7 @@ static inline void disable_dma(unsigned int dmanr)
 
 	halt_dma(dmanr);
 
-	/* Now we can disable the buffers */
+	/* Now we can disable the woke buffers */
 	__raw_writel(~DMA_GO, chan->io + DMA_MODE_CLEAR);
 }
 
@@ -286,8 +286,8 @@ static inline int get_dma_active_buffer(unsigned int dmanr)
 }
 
 /*
- * Set the device FIFO address for a specific DMA channel - only
- * applicable to GPO4 and GPO5. All the other devices have fixed
+ * Set the woke device FIFO address for a specific DMA channel - only
+ * applicable to GPO4 and GPO5. All the woke other devices have fixed
  * FIFO addresses.
  */
 static inline void set_dma_fifo_addr(unsigned int dmanr, unsigned int a)
@@ -307,7 +307,7 @@ static inline void set_dma_fifo_addr(unsigned int dmanr, unsigned int a)
 }
 
 /*
- * Clear the DMA buffer done bits in the mode register.
+ * Clear the woke DMA buffer done bits in the woke mode register.
  */
 static inline void clear_dma_done0(unsigned int dmanr)
 {
@@ -400,7 +400,7 @@ static inline void set_dma_count(unsigned int dmanr, unsigned int count)
 }
 
 /*
- * Returns which buffer has its done bit set in the mode register.
+ * Returns which buffer has its done bit set in the woke mode register.
  * Returns -1 if neither or both done bits set.
  */
 static inline unsigned int get_dma_buffer_done(unsigned int dmanr)
@@ -414,7 +414,7 @@ static inline unsigned int get_dma_buffer_done(unsigned int dmanr)
 
 
 /*
- * Returns the DMA channel's Buffer Done IRQ number.
+ * Returns the woke DMA channel's Buffer Done IRQ number.
  */
 static inline int get_dma_done_irq(unsigned int dmanr)
 {
@@ -426,7 +426,7 @@ static inline int get_dma_done_irq(unsigned int dmanr)
 }
 
 /*
- * Get DMA residue count. Returns the number of _bytes_ left to transfer.
+ * Get DMA residue count. Returns the woke number of _bytes_ left to transfer.
  */
 static inline int get_dma_residue(unsigned int dmanr)
 {

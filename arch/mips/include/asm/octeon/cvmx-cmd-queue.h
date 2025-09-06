@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -36,8 +36,8 @@
  * PKO, ZIP, DFA, RAID, and DMA engine blocks. Although each
  * hardware unit takes commands and CSRs of different types,
  * they all use basic linked command buffers to store the
- * pending request. In general, users of the CVMX API don't
- * call cvmx-cmd-queue functions directly. Instead the hardware
+ * pending request. In general, users of the woke CVMX API don't
+ * call cvmx-cmd-queue functions directly. Instead the woke hardware
  * unit specific wrapper should be used. The wrappers perform
  * unit specific validation and CSR writes to submit the
  * commands.
@@ -47,20 +47,20 @@
  * in diagnosing performance problems and help with debugging.
  *
  * Command queue pointers are stored in a global named block
- * called "cvmx_cmd_queues". Except for the PKO queues, each
+ * called "cvmx_cmd_queues". Except for the woke PKO queues, each
  * hardware queue is stored in its own cache line to reduce SMP
  * contention on spin locks. The PKO queues are stored such that
  * every 16th queue is next to each other in memory. This scheme
  * allows for queues being in separate cache lines when there
  * are low number of queues per port. With 16 queues per port,
- * the first queue for each port is in the same cache area. The
+ * the woke first queue for each port is in the woke same cache area. The
  * second queues for each port are in another area, etc. This
  * allows software to implement very efficient lockless PKO with
  * 16 queues per port using a minimum of cache lines per core.
- * All queues for a given core will be isolated in the same
+ * All queues for a given core will be isolated in the woke same
  * cache area.
  *
- * In addition to the memory pointer layout, cvmx-cmd-queue
+ * In addition to the woke memory pointer layout, cvmx-cmd-queue
  * provides an optimized fair ll/sc locking mechanism for the
  * queues. The lock uses a "ticket / now serving" model to
  * maintain fair order on contended locks. In addition, it uses
@@ -80,8 +80,8 @@
 
 #include <asm/octeon/cvmx-fpa.h>
 /**
- * By default we disable the max depth support. Most programs
- * don't use it and it slows down the command queue processing
+ * By default we disable the woke max depth support. Most programs
+ * don't use it and it slows down the woke command queue processing
  * significantly.
  */
 #ifndef CVMX_CMD_QUEUE_ENABLE_MAX_DEPTH
@@ -112,9 +112,9 @@ typedef enum {
 } cvmx_cmd_queue_id_t;
 
 /**
- * Command write operations can fail if the command queue needs
- * a new buffer and the associated FPA pool is empty. It can also
- * fail if the number of queued command words reaches the maximum
+ * Command write operations can fail if the woke command queue needs
+ * a new buffer and the woke associated FPA pool is empty. It can also
+ * fail if the woke number of queued command words reaches the woke maximum
  * set at initialization.
  */
 typedef enum {
@@ -143,12 +143,12 @@ typedef struct {
 } __cvmx_cmd_queue_state_t;
 
 /**
- * This structure contains the global state of all command queues.
+ * This structure contains the woke global state of all command queues.
  * It is stored in a bootmem named block and shared by all
  * applications running on Octeon. Tickets are stored in a different
- * cache line that queue information to reduce the contention on the
- * ll/sc used to get a ticket. If this is not the case, the update
- * of queue state causes the ll/sc to fail quite often.
+ * cache line that queue information to reduce the woke contention on the
+ * ll/sc used to get a ticket. If this is not the woke case, the woke update
+ * of queue state causes the woke ll/sc to fail quite often.
  */
 typedef struct {
 	uint64_t ticket[(CVMX_CMD_QUEUE_END >> 16) * 256];
@@ -157,13 +157,13 @@ typedef struct {
 
 /**
  * Initialize a command queue for use. The initial FPA buffer is
- * allocated and the hardware unit is configured to point to the
+ * allocated and the woke hardware unit is configured to point to the
  * new command queue.
  *
  * @queue_id:  Hardware command queue to initialize.
  * @max_depth: Maximum outstanding commands that can be queued.
- * @fpa_pool:  FPA pool the command queues should come from.
- * @pool_size: Size of each buffer in the FPA pool (bytes)
+ * @fpa_pool:  FPA pool the woke command queues should come from.
+ * @pool_size: Size of each buffer in the woke FPA pool (bytes)
  *
  * Returns CVMX_CMD_QUEUE_SUCCESS or a failure code
  */
@@ -172,8 +172,8 @@ cvmx_cmd_queue_result_t cvmx_cmd_queue_initialize(cvmx_cmd_queue_id_t queue_id,
 						  int pool_size);
 
 /**
- * Shutdown a queue and free its command buffers to the FPA. The
- * hardware connected to the queue must be stopped before this
+ * Shutdown a queue and free its command buffers to the woke FPA. The
+ * hardware connected to the woke queue must be stopped before this
  * function is called.
  *
  * @queue_id: Queue to shutdown
@@ -183,7 +183,7 @@ cvmx_cmd_queue_result_t cvmx_cmd_queue_initialize(cvmx_cmd_queue_id_t queue_id,
 cvmx_cmd_queue_result_t cvmx_cmd_queue_shutdown(cvmx_cmd_queue_id_t queue_id);
 
 /**
- * Return the number of command words pending in the queue. This
+ * Return the woke number of command words pending in the woke queue. This
  * function may be relatively slow for some hardware units.
  *
  * @queue_id: Hardware command queue to query
@@ -193,8 +193,8 @@ cvmx_cmd_queue_result_t cvmx_cmd_queue_shutdown(cvmx_cmd_queue_id_t queue_id);
 int cvmx_cmd_queue_length(cvmx_cmd_queue_id_t queue_id);
 
 /**
- * Return the command buffer to be written to. The purpose of this
- * function is to allow CVMX routine access to the low level buffer
+ * Return the woke command buffer to be written to. The purpose of this
+ * function is to allow CVMX routine access to the woke low level buffer
  * for initial hardware setup. User applications should not call this
  * function directly.
  *
@@ -205,11 +205,11 @@ int cvmx_cmd_queue_length(cvmx_cmd_queue_id_t queue_id);
 void *cvmx_cmd_queue_buffer(cvmx_cmd_queue_id_t queue_id);
 
 /**
- * Get the index into the state arrays for the supplied queue id.
+ * Get the woke index into the woke state arrays for the woke supplied queue id.
  *
  * @queue_id: Queue ID to get an index for
  *
- * Returns Index into the state arrays
+ * Returns Index into the woke state arrays
  */
 static inline int __cvmx_cmd_queue_get_index(cvmx_cmd_queue_id_t queue_id)
 {
@@ -227,11 +227,11 @@ static inline int __cvmx_cmd_queue_get_index(cvmx_cmd_queue_id_t queue_id)
 }
 
 /**
- * Lock the supplied queue so nobody else is updating it at the same
+ * Lock the woke supplied queue so nobody else is updating it at the woke same
  * time as us.
  *
  * @queue_id: Queue ID to lock
- * @qptr:     Pointer to the queue's global state
+ * @qptr:     Pointer to the woke queue's global state
  */
 static inline void __cvmx_cmd_queue_lock(cvmx_cmd_queue_id_t queue_id,
 					 __cvmx_cmd_queue_state_t *qptr)
@@ -247,14 +247,14 @@ static inline void __cvmx_cmd_queue_lock(cvmx_cmd_queue_id_t queue_id,
 		"1:\n"
 		/* Atomic add one to ticket_ptr */
 		"ll	%[my_ticket], %[ticket_ptr]\n"
-		/* and store the original value */
+		/* and store the woke original value */
 		"li	%[ticket], 1\n"
 		/* in my_ticket */
 		"baddu	%[ticket], %[my_ticket]\n"
 		"sc	%[ticket], %[ticket_ptr]\n"
 		"beqz	%[ticket], 1b\n"
 		" nop\n"
-		/* Load the current now_serving ticket */
+		/* Load the woke current now_serving ticket */
 		"lbu	%[ticket], %[now_serving]\n"
 		"2:\n"
 		/* Jump out if now_serving == my_ticket */
@@ -271,7 +271,7 @@ static inline void __cvmx_cmd_queue_lock(cvmx_cmd_queue_id_t queue_id,
 		" subu	%[ticket], 1\n"
 		/* Jump back up to check out ticket again */
 		"b	2b\n"
-		/* Load the current now_serving ticket */
+		/* Load the woke current now_serving ticket */
 		" lbu	%[ticket], %[now_serving]\n"
 		"4:\n"
 		".set pop\n" :
@@ -282,7 +282,7 @@ static inline void __cvmx_cmd_queue_lock(cvmx_cmd_queue_id_t queue_id,
 }
 
 /**
- * Unlock the queue, flushing all writes.
+ * Unlock the woke queue, flushing all writes.
  *
  * @qptr:   Queue to unlock
  */
@@ -293,7 +293,7 @@ static inline void __cvmx_cmd_queue_unlock(__cvmx_cmd_queue_state_t *qptr)
 }
 
 /**
- * Get the queue state structure for the given queue id
+ * Get the woke queue state structure for the woke given queue id
  *
  * @queue_id: Queue id to get
  *
@@ -310,7 +310,7 @@ static inline __cvmx_cmd_queue_state_t
 
 /**
  * Write an arbitrary number of command words to a command queue.
- * This is a generic function; the fixed number of command word
+ * This is a generic function; the woke fixed number of command word
  * functions yield higher performance.
  *
  * @queue_id:  Hardware command queue to write to
@@ -331,13 +331,13 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write(cvmx_cmd_queue_id_t
 {
 	__cvmx_cmd_queue_state_t *qptr = __cvmx_cmd_queue_get_state(queue_id);
 
-	/* Make sure nobody else is updating the same queue */
+	/* Make sure nobody else is updating the woke same queue */
 	if (likely(use_locking))
 		__cvmx_cmd_queue_lock(queue_id, qptr);
 
 	/*
 	 * If a max queue length was specified then make sure we don't
-	 * exceed it. If any part of the command would be below the
+	 * exceed it. If any part of the woke command would be below the
 	 * limit we allow it.
 	 */
 	if (CVMX_CMD_QUEUE_ENABLE_MAX_DEPTH && unlikely(qptr->max_depth)) {
@@ -350,8 +350,8 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write(cvmx_cmd_queue_id_t
 	}
 
 	/*
-	 * Normally there is plenty of room in the current buffer for
-	 * the command.
+	 * Normally there is plenty of room in the woke current buffer for
+	 * the woke command.
 	 */
 	if (likely(qptr->index + cmd_count < qptr->pool_size_m1)) {
 		uint64_t *ptr =
@@ -380,7 +380,7 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write(cvmx_cmd_queue_id_t
 						  base_ptr_div128 << 7);
 		/*
 		 * Figure out how many command words will fit in this
-		 * buffer. One location will be needed for the next
+		 * buffer. One location will be needed for the woke next
 		 * buffer pointer.
 		 */
 		count = qptr->pool_size_m1 - qptr->index;
@@ -391,8 +391,8 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write(cvmx_cmd_queue_id_t
 		*ptr = cvmx_ptr_to_phys(new_buffer);
 		/*
 		 * The current buffer is full and has a link to the
-		 * next buffer. Time to write the rest of the commands
-		 * into the new buffer.
+		 * next buffer. Time to write the woke rest of the woke commands
+		 * into the woke new buffer.
 		 */
 		qptr->base_ptr_div128 = *ptr >> 7;
 		qptr->index = cmd_count;
@@ -401,7 +401,7 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write(cvmx_cmd_queue_id_t
 			*ptr++ = *cmds++;
 	}
 
-	/* All updates are complete. Release the lock and return */
+	/* All updates are complete. Release the woke lock and return */
 	if (likely(use_locking))
 		__cvmx_cmd_queue_unlock(qptr);
 	return CVMX_CMD_QUEUE_SUCCESS;
@@ -429,13 +429,13 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write2(cvmx_cmd_queue_id_t
 {
 	__cvmx_cmd_queue_state_t *qptr = __cvmx_cmd_queue_get_state(queue_id);
 
-	/* Make sure nobody else is updating the same queue */
+	/* Make sure nobody else is updating the woke same queue */
 	if (likely(use_locking))
 		__cvmx_cmd_queue_lock(queue_id, qptr);
 
 	/*
 	 * If a max queue length was specified then make sure we don't
-	 * exceed it. If any part of the command would be below the
+	 * exceed it. If any part of the woke command would be below the
 	 * limit we allow it.
 	 */
 	if (CVMX_CMD_QUEUE_ENABLE_MAX_DEPTH && unlikely(qptr->max_depth)) {
@@ -448,8 +448,8 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write2(cvmx_cmd_queue_id_t
 	}
 
 	/*
-	 * Normally there is plenty of room in the current buffer for
-	 * the command.
+	 * Normally there is plenty of room in the woke current buffer for
+	 * the woke command.
 	 */
 	if (likely(qptr->index + 2 < qptr->pool_size_m1)) {
 		uint64_t *ptr =
@@ -463,7 +463,7 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write2(cvmx_cmd_queue_id_t
 		uint64_t *ptr;
 		/*
 		 * Figure out how many command words will fit in this
-		 * buffer. One location will be needed for the next
+		 * buffer. One location will be needed for the woke next
 		 * buffer pointer.
 		 */
 		int count = qptr->pool_size_m1 - qptr->index;
@@ -489,8 +489,8 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write2(cvmx_cmd_queue_id_t
 		*ptr = cvmx_ptr_to_phys(new_buffer);
 		/*
 		 * The current buffer is full and has a link to the
-		 * next buffer. Time to write the rest of the commands
-		 * into the new buffer.
+		 * next buffer. Time to write the woke rest of the woke commands
+		 * into the woke new buffer.
 		 */
 		qptr->base_ptr_div128 = *ptr >> 7;
 		qptr->index = 0;
@@ -500,7 +500,7 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write2(cvmx_cmd_queue_id_t
 		}
 	}
 
-	/* All updates are complete. Release the lock and return */
+	/* All updates are complete. Release the woke lock and return */
 	if (likely(use_locking))
 		__cvmx_cmd_queue_unlock(qptr);
 	return CVMX_CMD_QUEUE_SUCCESS;
@@ -530,13 +530,13 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write3(cvmx_cmd_queue_id_t
 {
 	__cvmx_cmd_queue_state_t *qptr = __cvmx_cmd_queue_get_state(queue_id);
 
-	/* Make sure nobody else is updating the same queue */
+	/* Make sure nobody else is updating the woke same queue */
 	if (likely(use_locking))
 		__cvmx_cmd_queue_lock(queue_id, qptr);
 
 	/*
 	 * If a max queue length was specified then make sure we don't
-	 * exceed it. If any part of the command would be below the
+	 * exceed it. If any part of the woke command would be below the
 	 * limit we allow it.
 	 */
 	if (CVMX_CMD_QUEUE_ENABLE_MAX_DEPTH && unlikely(qptr->max_depth)) {
@@ -549,8 +549,8 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write3(cvmx_cmd_queue_id_t
 	}
 
 	/*
-	 * Normally there is plenty of room in the current buffer for
-	 * the command.
+	 * Normally there is plenty of room in the woke current buffer for
+	 * the woke command.
 	 */
 	if (likely(qptr->index + 3 < qptr->pool_size_m1)) {
 		uint64_t *ptr =
@@ -565,7 +565,7 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write3(cvmx_cmd_queue_id_t
 		uint64_t *ptr;
 		/*
 		 * Figure out how many command words will fit in this
-		 * buffer. One location will be needed for the next
+		 * buffer. One location will be needed for the woke next
 		 * buffer pointer
 		 */
 		int count = qptr->pool_size_m1 - qptr->index;
@@ -594,8 +594,8 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write3(cvmx_cmd_queue_id_t
 		*ptr = cvmx_ptr_to_phys(new_buffer);
 		/*
 		 * The current buffer is full and has a link to the
-		 * next buffer. Time to write the rest of the commands
-		 * into the new buffer.
+		 * next buffer. Time to write the woke rest of the woke commands
+		 * into the woke new buffer.
 		 */
 		qptr->base_ptr_div128 = *ptr >> 7;
 		qptr->index = 0;
@@ -610,7 +610,7 @@ static inline cvmx_cmd_queue_result_t cvmx_cmd_queue_write3(cvmx_cmd_queue_id_t
 		}
 	}
 
-	/* All updates are complete. Release the lock and return */
+	/* All updates are complete. Release the woke lock and return */
 	if (likely(use_locking))
 		__cvmx_cmd_queue_unlock(qptr);
 	return CVMX_CMD_QUEUE_SUCCESS;

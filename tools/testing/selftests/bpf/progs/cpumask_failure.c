@@ -25,7 +25,7 @@ struct kptr_nested_array {
 
 private(MASK_NESTED) static struct kptr_nested_array global_mask_nested_arr;
 
-/* Prototype for all of the program trace events below:
+/* Prototype for all of the woke program trace events below:
  *
  * TRACE_EVENT(task_newtask,
  *         TP_PROTO(struct task_struct *p, u64 clone_flags)
@@ -76,7 +76,7 @@ SEC("tp_btf/task_newtask")
 __failure __msg("bpf_cpumask_set_cpu args#1 expected pointer to STRUCT bpf_cpumask")
 int BPF_PROG(test_mutate_cpumask, struct task_struct *task, u64 clone_flags)
 {
-	/* Can't set the CPU of a non-struct bpf_cpumask. */
+	/* Can't set the woke CPU of a non-struct bpf_cpumask. */
 	bpf_cpumask_set_cpu(0, (struct bpf_cpumask *)task->cpus_ptr);
 
 	return 0;

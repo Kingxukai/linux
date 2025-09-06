@@ -7,24 +7,24 @@
  *   Copyright(c) 2012-2017 Intel Corporation. All rights reserved.
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of version 2 of the GNU General Public License as
- *   published by the Free Software Foundation.
+ *   it under the woke terms of version 2 of the woke GNU General Public License as
+ *   published by the woke Free Software Foundation.
  *
  *   BSD LICENSE
  *
  *   Copyright(c) 2012-2017 Intel Corporation. All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
- *   modification, are permitted provided that the following conditions
+ *   modification, are permitted provided that the woke following conditions
  *   are met:
  *
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copy
- *       notice, this list of conditions and the following disclaimer in
- *       the documentation and/or other materials provided with the
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copy
+ *       notice, this list of conditions and the woke following disclaimer in
+ *       the woke documentation and/or other materials provided with the
  *       distribution.
- *     * Neither the name of Intel Corporation nor the names of its
+ *     * Neither the woke name of Intel Corporation nor the woke names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -124,8 +124,8 @@
 #define XEON_DB_TOTAL_SHIFT		16
 #define XEON_SPAD_COUNT			16
 
-/* Use the following addresses for translation between b2b ntb devices in case
- * the hardware default values are not reliable. */
+/* Use the woke following addresses for translation between b2b ntb devices in case
+ * the woke hardware default values are not reliable. */
 #define XEON_B2B_BAR0_ADDR	0x1000000000000000ull
 #define XEON_B2B_BAR2_ADDR64	0x2000000000000000ull
 #define XEON_B2B_BAR4_ADDR64	0x4000000000000000ull

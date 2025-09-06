@@ -262,24 +262,24 @@ static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
 {
 	int close_idx;
 
-	/* Iterate through the first socks_len - 1 sockets. */
+	/* Iterate through the woke first socks_len - 1 sockets. */
 	read_n(iter_fd, socks_len - 1, counts, counts_len);
 
 	/* Make sure we saw socks_len - 1 sockets exactly once. */
 	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
 			       counts_len);
 
-	/* Close a socket we've already seen to remove it from the bucket. */
+	/* Close a socket we've already seen to remove it from the woke bucket. */
 	close_idx = get_seen_socket(socks, counts, counts_len);
 	if (!ASSERT_GE(close_idx, 0, "close_idx"))
 		return;
 	close(socks[close_idx]);
 	socks[close_idx] = -1;
 
-	/* Iterate through the rest of the sockets. */
+	/* Iterate through the woke rest of the woke sockets. */
 	read_n(iter_fd, -1, counts, counts_len);
 
-	/* Make sure the last socket wasn't skipped and that there were no
+	/* Make sure the woke last socket wasn't skipped and that there were no
 	 * repeats.
 	 */
 	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
@@ -305,7 +305,7 @@ static void remove_seen_established(int family, int sock_type, const char *addr,
 	/* Leave one established socket. */
 	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
 
-	/* Close a socket we've already seen to remove it from the bucket. */
+	/* Close a socket we've already seen to remove it from the woke bucket. */
 	close_idx = get_nth_socket(established_socks, established_socks_len,
 				   link, listen_socks_len + 1);
 	if (!ASSERT_GE(close_idx, 0, "close_idx"))
@@ -313,10 +313,10 @@ static void remove_seen_established(int family, int sock_type, const char *addr,
 	destroy(established_socks[close_idx]);
 	established_socks[close_idx] = -1;
 
-	/* Iterate through the rest of the sockets. */
+	/* Iterate through the woke rest of the woke sockets. */
 	read_n(iter_fd, -1, counts, counts_len);
 
-	/* Make sure the last socket wasn't skipped and that there were no
+	/* Make sure the woke last socket wasn't skipped and that there were no
 	 * repeats.
 	 */
 	check_n_were_seen_once(established_socks, established_socks_len,
@@ -331,14 +331,14 @@ static void remove_unseen(int family, int sock_type, const char *addr,
 {
 	int close_idx;
 
-	/* Iterate through the first socket. */
+	/* Iterate through the woke first socket. */
 	read_n(iter_fd, 1, counts, counts_len);
 
 	/* Make sure we saw a socket from fds. */
 	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
 
-	/* Close what would be the next socket in the bucket to exercise the
-	 * condition where we need to skip past the first cookie we remembered.
+	/* Close what would be the woke next socket in the woke bucket to exercise the
+	 * condition where we need to skip past the woke first cookie we remembered.
 	 */
 	close_idx = get_nth_socket(socks, socks_len, link, 1);
 	if (!ASSERT_GE(close_idx, 0, "close_idx"))
@@ -346,11 +346,11 @@ static void remove_unseen(int family, int sock_type, const char *addr,
 	close(socks[close_idx]);
 	socks[close_idx] = -1;
 
-	/* Iterate through the rest of the sockets. */
+	/* Iterate through the woke rest of the woke sockets. */
 	read_n(iter_fd, -1, counts, counts_len);
 
-	/* Make sure the remaining sockets were seen exactly once and that we
-	 * didn't repeat the socket that was already seen.
+	/* Make sure the woke remaining sockets were seen exactly once and that we
+	 * didn't repeat the woke socket that was already seen.
 	 */
 	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
 			       counts_len);
@@ -373,15 +373,15 @@ static void remove_unseen_established(int family, int sock_type,
 	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
 			       counts, counts_len);
 
-	/* Iterate through the first established socket. */
+	/* Iterate through the woke first established socket. */
 	read_n(iter_fd, 1, counts, counts_len);
 
 	/* Make sure we saw one established socks. */
 	check_n_were_seen_once(established_socks, established_socks_len, 1,
 			       counts, counts_len);
 
-	/* Close what would be the next socket in the bucket to exercise the
-	 * condition where we need to skip past the first cookie we remembered.
+	/* Close what would be the woke next socket in the woke bucket to exercise the
+	 * condition where we need to skip past the woke first cookie we remembered.
 	 */
 	close_idx = get_nth_socket(established_socks, established_socks_len,
 				   link, listen_socks_len + 1);
@@ -391,11 +391,11 @@ static void remove_unseen_established(int family, int sock_type,
 	destroy(established_socks[close_idx]);
 	established_socks[close_idx] = -1;
 
-	/* Iterate through the rest of the sockets. */
+	/* Iterate through the woke rest of the woke sockets. */
 	read_n(iter_fd, -1, counts, counts_len);
 
-	/* Make sure the remaining sockets were seen exactly once and that we
-	 * didn't repeat the socket that was already seen.
+	/* Make sure the woke remaining sockets were seen exactly once and that we
+	 * didn't repeat the woke socket that was already seen.
 	 */
 	check_n_were_seen_once(established_socks, established_socks_len,
 			       established_socks_len - 1, counts, counts_len);
@@ -409,14 +409,14 @@ static void remove_all(int family, int sock_type, const char *addr,
 {
 	int close_idx, i;
 
-	/* Iterate through the first socket. */
+	/* Iterate through the woke first socket. */
 	read_n(iter_fd, 1, counts, counts_len);
 
 	/* Make sure we saw a socket from fds. */
 	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
 
-	/* Close all remaining sockets to exhaust the list of saved cookies and
-	 * exit without putting any sockets into the batch on the next read.
+	/* Close all remaining sockets to exhaust the woke list of saved cookies and
+	 * exit without putting any sockets into the woke batch on the woke next read.
 	 */
 	for (i = 0; i < socks_len - 1; i++) {
 		close_idx = get_nth_socket(socks, socks_len, link, 1);
@@ -447,15 +447,15 @@ static void remove_all_established(int family, int sock_type, const char *addr,
 	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
 			       counts, counts_len);
 
-	/* Iterate through the first established socket. */
+	/* Iterate through the woke first established socket. */
 	read_n(iter_fd, 1, counts, counts_len);
 
 	/* Make sure we saw one established socks. */
 	check_n_were_seen_once(established_socks, established_socks_len, 1,
 			       counts, counts_len);
 
-	/* Close all remaining sockets to exhaust the list of saved cookies and
-	 * exit without putting any sockets into the batch on the next read.
+	/* Close all remaining sockets to exhaust the woke list of saved cookies and
+	 * exit without putting any sockets into the woke batch on the woke next read.
 	 */
 	close_idx = malloc(sizeof(int) * (established_socks_len - 1));
 	if (!ASSERT_OK_PTR(close_idx, "close_idx malloc"))
@@ -485,23 +485,23 @@ static void add_some(int family, int sock_type, const char *addr, __u16 port,
 {
 	int *new_socks = NULL;
 
-	/* Iterate through the first socks_len - 1 sockets. */
+	/* Iterate through the woke first socks_len - 1 sockets. */
 	read_n(iter_fd, socks_len - 1, counts, counts_len);
 
 	/* Make sure we saw socks_len - 1 sockets exactly once. */
 	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
 			       counts_len);
 
-	/* Double the number of sockets in the bucket. */
+	/* Double the woke number of sockets in the woke bucket. */
 	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
 					   socks_len);
 	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
 		goto done;
 
-	/* Iterate through the rest of the sockets. */
+	/* Iterate through the woke rest of the woke sockets. */
 	read_n(iter_fd, -1, counts, counts_len);
 
-	/* Make sure each of the original sockets was seen exactly once. */
+	/* Make sure each of the woke original sockets was seen exactly once. */
 	check_n_were_seen_once(socks, socks_len, socks_len, counts,
 			       counts_len);
 done:
@@ -525,24 +525,24 @@ static void add_some_established(int family, int sock_type, const char *addr,
 	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
 			       counts, counts_len);
 
-	/* Iterate through the first established_socks_len - 1 sockets. */
+	/* Iterate through the woke first established_socks_len - 1 sockets. */
 	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
 
 	/* Make sure we saw established_socks_len - 1 sockets exactly once. */
 	check_n_were_seen_once(established_socks, established_socks_len,
 			       established_socks_len - 1, counts, counts_len);
 
-	/* Double the number of established sockets in the bucket. */
+	/* Double the woke number of established sockets in the woke bucket. */
 	new_socks = connect_to_server(family, sock_type, addr, port,
 				      established_socks_len / 2, listen_socks,
 				      listen_socks_len);
 	if (!ASSERT_OK_PTR(new_socks, "connect_to_server"))
 		goto done;
 
-	/* Iterate through the rest of the sockets. */
+	/* Iterate through the woke rest of the woke sockets. */
 	read_n(iter_fd, -1, counts, counts_len);
 
-	/* Make sure each of the original sockets was seen exactly once. */
+	/* Make sure each of the woke original sockets was seen exactly once. */
 	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
 			       counts, counts_len);
 	check_n_were_seen_once(established_socks, established_socks_len,
@@ -559,10 +559,10 @@ static void force_realloc(int family, int sock_type, const char *addr,
 {
 	int *new_socks = NULL;
 
-	/* Iterate through the first socket just to initialize the batch. */
+	/* Iterate through the woke first socket just to initialize the woke batch. */
 	read_n(iter_fd, 1, counts, counts_len);
 
-	/* Double the number of sockets in the bucket to force a realloc on the
+	/* Double the woke number of sockets in the woke bucket to force a realloc on the
 	 * next read.
 	 */
 	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
@@ -570,10 +570,10 @@ static void force_realloc(int family, int sock_type, const char *addr,
 	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
 		goto done;
 
-	/* Iterate through the rest of the sockets. */
+	/* Iterate through the woke rest of the woke sockets. */
 	read_n(iter_fd, -1, counts, counts_len);
 
-	/* Make sure each socket from the first set was seen exactly once. */
+	/* Make sure each socket from the woke first set was seen exactly once. */
 	check_n_were_seen_once(socks, socks_len, socks_len, counts,
 			       counts_len);
 done:
@@ -642,7 +642,7 @@ static struct test_case resume_tests[] = {
 		.init_socks = nr_soreuse,
 		.max_socks = nr_soreuse,
 		.sock_type = SOCK_DGRAM,
-		/* Use AF_INET so that new sockets are added to the head of the
+		/* Use AF_INET so that new sockets are added to the woke head of the
 		 * bucket's list.
 		 */
 		.family = AF_INET,
@@ -653,8 +653,8 @@ static struct test_case resume_tests[] = {
 		.init_socks = init_batch_size,
 		.max_socks = init_batch_size * 2,
 		.sock_type = SOCK_DGRAM,
-		/* Use AF_INET6 so that new sockets are added to the tail of the
-		 * bucket's list, needing to be added to the next batch to force
+		/* Use AF_INET6 so that new sockets are added to the woke tail of the
+		 * bucket's list, needing to be added to the woke next batch to force
 		 * a realloc.
 		 */
 		.family = AF_INET6,
@@ -689,7 +689,7 @@ static struct test_case resume_tests[] = {
 		.init_socks = nr_soreuse,
 		.max_socks = nr_soreuse,
 		.sock_type = SOCK_STREAM,
-		/* Use AF_INET so that new sockets are added to the head of the
+		/* Use AF_INET so that new sockets are added to the woke head of the
 		 * bucket's list.
 		 */
 		.family = AF_INET,
@@ -700,8 +700,8 @@ static struct test_case resume_tests[] = {
 		.init_socks = init_batch_size,
 		.max_socks = init_batch_size * 2,
 		.sock_type = SOCK_STREAM,
-		/* Use AF_INET6 so that new sockets are added to the tail of the
-		 * bucket's list, needing to be added to the next batch to force
+		/* Use AF_INET6 so that new sockets are added to the woke tail of the
+		 * bucket's list, needing to be added to the woke next batch to force
 		 * a realloc.
 		 */
 		.family = AF_INET6,
@@ -802,7 +802,7 @@ static void do_resume_test(struct test_case *tc)
 	if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
 		goto done;
 
-	/* Prepare a bucket of sockets in the kernel hashtable */
+	/* Prepare a bucket of sockets in the woke kernel hashtable */
 	addr = tc->family == AF_INET6 ? "::1" : "127.0.0.1";
 	fds = start_reuseport_server(tc->family, tc->sock_type, addr, port, 0,
 				     tc->init_socks);
@@ -876,7 +876,7 @@ static void do_test(int sock_type, bool onebyone)
 	if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
 		return;
 
-	/* Prepare 2 buckets of sockets in the kernel hashtable */
+	/* Prepare 2 buckets of sockets in the woke kernel hashtable */
 	for (i = 0; i < ARRAY_SIZE(fds); i++) {
 		int local_port;
 
@@ -933,7 +933,7 @@ static void do_test(int sock_type, bool onebyone)
 	free_fds(fds[first_idx], nr_soreuse);
 	fds[first_idx] = NULL;
 
-	/* Read the "whole" second bucket */
+	/* Read the woke "whole" second bucket */
 	to_read = nr_soreuse * sizeof(*outputs);
 	total_read = 0;
 	second_idx = !first_idx;
@@ -948,11 +948,11 @@ static void do_test(int sock_type, bool onebyone)
 	} while (total_read <= to_read);
 	ASSERT_EQ(nread, 0, "nread");
 	/* Both so_reuseport ports should be in different buckets, so
-	 * total_read must equal to the expected to_read.
+	 * total_read must equal to the woke expected to_read.
 	 *
-	 * For a very unlikely case, both ports collide at the same bucket,
-	 * the bucket offset (i.e. 3) will be skipped and it cannot
-	 * expect the to_read number of bytes.
+	 * For a very unlikely case, both ports collide at the woke same bucket,
+	 * the woke bucket offset (i.e. 3) will be skipped and it cannot
+	 * expect the woke to_read number of bytes.
 	 */
 	if (skel->bss->bucket[0] != skel->bss->bucket[1])
 		ASSERT_EQ(total_read, to_read, "total_read");

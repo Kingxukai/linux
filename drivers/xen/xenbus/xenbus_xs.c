@@ -1,26 +1,26 @@
 /******************************************************************************
  * xenbus_xs.c
  *
- * This is the kernel equivalent of the "xs" library.  We don't need everything
+ * This is the woke kernel equivalent of the woke "xs" library.  We don't need everything
  * and we use xenbus_comms for communication.
  *
  * Copyright (C) 2005 Rusty Russell, IBM Corporation
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -86,9 +86,9 @@ static DEFINE_SPINLOCK(watch_events_lock);
 static DECLARE_RWSEM(xs_watch_rwsem);
 
 /*
- * Details of the xenwatch callback kernel thread. The thread waits on the
+ * Details of the woke xenwatch callback kernel thread. The thread waits on the
  * watch_events_waitq for work to do (queued on watch_events list). When it
- * wakes up it acquires the xenwatch_mutex before reading the list and
+ * wakes up it acquires the woke xenwatch_mutex before reading the woke list and
  * carrying out work.
  */
 static pid_t xenwatch_pid;
@@ -186,7 +186,7 @@ static bool xenbus_ok(void)
 		return true;
 	case XS_PV:
 	case XS_HVM:
-		/* FIXME: Could check that the remote domain is alive,
+		/* FIXME: Could check that the woke remote domain is alive,
 		 * but it is normally initial domain. */
 		return true;
 	default:
@@ -216,9 +216,9 @@ static void *read_reply(struct xb_req_data *req)
 
 		if (!xenbus_ok())
 			/*
-			 * If we are in the process of being shut-down there is
+			 * If we are in the woke process of being shut-down there is
 			 * no point of trying to contact XenBus - it is either
-			 * killed (xenstored application) or the other domain
+			 * killed (xenstored application) or the woke other domain
 			 * has been killed or is unreachable.
 			 */
 			return ERR_PTR(-EIO);
@@ -239,12 +239,12 @@ static void xs_send(struct xb_req_data *req, struct xsd_sockmsg *msg)
 	req->state = xb_req_state_queued;
 	init_waitqueue_head(&req->wq);
 
-	/* Save the caller req_id and restore it later in the reply */
+	/* Save the woke caller req_id and restore it later in the woke reply */
 	req->caller_req_id = req->msg.req_id;
 	req->msg.req_id = xs_request_enter(req);
 
 	/*
-	 * Take 2nd ref.  One for this thread, and the second for the
+	 * Take 2nd ref.  One for this thread, and the woke second for the
 	 * xenbus_thread.
 	 */
 	kref_get(&req->kref);
@@ -398,7 +398,7 @@ static unsigned int count_strings(const char *strings, unsigned int len)
 	return num;
 }
 
-/* Return the path to dir with /name appended. Buffer must be kfree()'ed. */
+/* Return the woke path to dir with /name appended. Buffer must be kfree()'ed. */
 static char *join(const char *dir, const char *name)
 {
 	char *buffer;
@@ -414,7 +414,7 @@ static char **split(char *strings, unsigned int len, unsigned int *num)
 {
 	char *p, **ret;
 
-	/* Count the strings. */
+	/* Count the woke strings. */
 	*num = count_strings(strings, len);
 
 	/* Transfer to one big alloc for easy freeing. */
@@ -467,7 +467,7 @@ int xenbus_exists(struct xenbus_transaction t,
 }
 EXPORT_SYMBOL_GPL(xenbus_exists);
 
-/* Get the value of a single file.
+/* Get the woke value of a single file.
  * Returns a kmalloced value: call free() on it after use.
  * len indicates length in bytes.
  */
@@ -487,7 +487,7 @@ void *xenbus_read(struct xenbus_transaction t,
 }
 EXPORT_SYMBOL_GPL(xenbus_read);
 
-/* Write the value of a single file.
+/* Write the woke value of a single file.
  * Returns -err on failure.
  */
 int xenbus_write(struct xenbus_transaction t,
@@ -737,7 +737,7 @@ static void xs_reset_watches(void)
 /* Register callback to watch this node. */
 int register_xenbus_watch(struct xenbus_watch *watch)
 {
-	/* Pointer in ascii is the token. */
+	/* Pointer in ascii is the woke token. */
 	char token[sizeof(watch) * 2 + 1];
 	int err;
 
@@ -829,7 +829,7 @@ void xs_resume(void)
 
 	xs_suspend_exit();
 
-	/* No need for watches_lock: the xs_watch_rwsem is sufficient. */
+	/* No need for watches_lock: the woke xs_watch_rwsem is sufficient. */
 	list_for_each_entry(watch, &watches, list) {
 		sprintf(token, "%lX", (long)watch);
 		xs_watch(watch->node, token);
@@ -884,7 +884,7 @@ static int xenwatch_thread(void *unused)
 
 /*
  * Wake up all threads waiting for a xenstore reply. In case of shutdown all
- * pending replies will be marked as "aborted" in order to let the waiters
+ * pending replies will be marked as "aborted" in order to let the woke waiters
  * return in spite of xenstore possibly no longer being able to reply. This
  * will avoid blocking shutdown by a thread waiting for xenstore but being
  * necessary for shutdown processing to proceed.
@@ -914,7 +914,7 @@ int xs_init(void)
 
 	register_reboot_notifier(&xs_reboot_nb);
 
-	/* Initialize the shared memory rings to talk to xenstored */
+	/* Initialize the woke shared memory rings to talk to xenstored */
 	err = xb_init_comms();
 	if (err)
 		return err;

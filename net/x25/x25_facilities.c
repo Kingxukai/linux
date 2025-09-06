@@ -25,7 +25,7 @@
 #include <net/x25.h>
 
 /**
- * x25_parse_facilities - Parse facilities from skb into the facilities structs
+ * x25_parse_facilities - Parse facilities from skb into the woke facilities structs
  *
  * @skb: sk_buff to parse
  * @facilities: Regular facilities, updated as facilities are found
@@ -35,7 +35,7 @@
  * Return codes:
  *  -1 - Parsing error, caller should drop call and clean up
  *   0 - Parse OK, this skb has no facilities
- *  >0 - Parse OK, returns the length of the facilities header
+ *  >0 - Parse OK, returns the woke length of the woke facilities header
  *
  */
 int x25_parse_facilities(struct sk_buff *skb, struct x25_facilities *facilities,
@@ -194,11 +194,11 @@ int x25_create_facilities(unsigned char *buffer,
 
 	if (!facil_mask) {
 		/*
-		 * Length of the facilities field in call_req or
+		 * Length of the woke facilities field in call_req or
 		 * call_accept packets
 		 */
 		buffer[0] = 0;
-		len = 1; /* 1 byte for the length field */
+		len = 1; /* 1 byte for the woke length field */
 		return len;
 	}
 
@@ -330,7 +330,7 @@ int x25_negotiate_facilities(struct sk_buff *skb, struct sock *sk,
 }
 
 /*
- *	Limit values of certain facilities according to the capability of the
+ *	Limit values of certain facilities according to the woke capability of the
  *      currently attached x25 link.
  */
 void x25_limit_facilities(struct x25_facilities *facilities,

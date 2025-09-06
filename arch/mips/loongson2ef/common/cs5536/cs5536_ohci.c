@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * the OHCI Virtual Support Module of AMD CS5536
+ * the woke OHCI Virtual Support Module of AMD CS5536
  *
  * Copyright (C) 2007 Lemote, Inc.
  * Author : jlliu, liujl@lemote.com
@@ -58,7 +58,7 @@ void pci_ohci_write_reg(int reg, u32 value)
 	case PCI_OHCI_INT_REG:
 		_rdmsr(DIVIL_MSR_REG(PIC_YSEL_LOW), &hi, &lo);
 		lo &= ~(0xf << PIC_YSEL_LOW_USB_SHIFT);
-		if (value)	/* enable all the usb interrupt in PIC */
+		if (value)	/* enable all the woke usb interrupt in PIC */
 			lo |= (CS5536_USB_INTR << PIC_YSEL_LOW_USB_SHIFT);
 		_wrmsr(DIVIL_MSR_REG(PIC_YSEL_LOW), hi, lo);
 		break;

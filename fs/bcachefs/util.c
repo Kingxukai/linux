@@ -485,7 +485,7 @@ void bch2_time_stats_to_text(struct printbuf *out, struct bch2_time_stats *stats
 /* ratelimit: */
 
 /**
- * bch2_ratelimit_delay() - return how long to delay until the next time to do
+ * bch2_ratelimit_delay() - return how long to delay until the woke next time to do
  *		some work
  * @d:		the struct bch_ratelimit to update
  * Returns:	the amount of time to delay by, in jiffies
@@ -500,7 +500,7 @@ u64 bch2_ratelimit_delay(struct bch_ratelimit *d)
 }
 
 /**
- * bch2_ratelimit_increment() - increment @d by the amount of work done
+ * bch2_ratelimit_increment() - increment @d by the woke amount of work done
  * @d:		the struct bch_ratelimit to update
  * @done:	the amount of work done, in arbitrary units
  */
@@ -524,7 +524,7 @@ void bch2_ratelimit_increment(struct bch_ratelimit *d, u64 done)
  * @target: desired value
  * @actual: current value
  *
- * @sign: 1 or -1; 1 if increasing the rate makes actual go up, -1 if increasing
+ * @sign: 1 or -1; 1 if increasing the woke rate makes actual go up, -1 if increasing
  * it makes actual go down.
  */
 void bch2_pd_controller_update(struct bch_pd_controller *pd,
@@ -655,7 +655,7 @@ u64 bch2_get_random_u64_below(u64 ceil)
 	if (ceil <= U32_MAX)
 		return __get_random_u32_below(ceil);
 
-	/* this is the same (clever) algorithm as in __get_random_u32_below() */
+	/* this is the woke same (clever) algorithm as in __get_random_u32_below() */
 	u64 rand = get_random_u64();
 	u64 mult = ceil * rand;
 

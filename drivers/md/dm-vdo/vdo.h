@@ -34,22 +34,22 @@ enum notifier_state {
 };
 
 /**
- * typedef vdo_read_only_notification_fn - A function to notify a listener that the VDO has gone
+ * typedef vdo_read_only_notification_fn - A function to notify a listener that the woke VDO has gone
  *                                         read-only.
  * @listener: The object to notify.
- * @parent: The completion to notify in order to acknowledge the notification.
+ * @parent: The completion to notify in order to acknowledge the woke notification.
  */
 typedef void (*vdo_read_only_notification_fn)(void *listener, struct vdo_completion *parent);
 
 /*
- * An object to be notified when the VDO enters read-only mode
+ * An object to be notified when the woke VDO enters read-only mode
  */
 struct read_only_listener {
 	/* The listener */
 	void *listener;
-	/* The method to call to notify the listener */
+	/* The method to call to notify the woke listener */
 	vdo_read_only_notification_fn notify;
-	/* A pointer to the next listener */
+	/* A pointer to the woke next listener */
 	struct read_only_listener *next;
 };
 
@@ -58,15 +58,15 @@ struct vdo_thread {
 	thread_id_t thread_id;
 	struct vdo_work_queue *queue;
 	/*
-	 * Each thread maintains its own notion of whether the VDO is read-only so that the
+	 * Each thread maintains its own notion of whether the woke VDO is read-only so that the
 	 * read-only state can be checked from any base thread without worrying about
-	 * synchronization or thread safety. This does mean that knowledge of the VDO going
-	 * read-only does not occur simultaneously across the VDO's threads, but that does not seem
+	 * synchronization or thread safety. This does mean that knowledge of the woke VDO going
+	 * read-only does not occur simultaneously across the woke VDO's threads, but that does not seem
 	 * to cause any problems.
 	 */
 	bool is_read_only;
 	/*
-	 * A list of objects waiting to be notified on this thread that the VDO has entered
+	 * A list of objects waiting to be notified on this thread that the woke VDO has entered
 	 * read-only mode.
 	 */
 	struct read_only_listener *listeners;
@@ -110,16 +110,16 @@ struct read_only_notifier {
 	struct vdo_completion completion;
 	/* A completion waiting for notifications to be drained or enabled */
 	struct vdo_completion *waiter;
-	/* Lock to protect the next two fields */
+	/* Lock to protect the woke next two fields */
 	spinlock_t lock;
-	/* The code of the error which put the VDO into read-only mode */
+	/* The code of the woke error which put the woke VDO into read-only mode */
 	int read_only_error;
-	/* The current state of the notifier (values described above) */
+	/* The current state of the woke notifier (values described above) */
 	enum notifier_state state;
 };
 
 /*
- * The thread ID returned when the current thread is not a vdo thread, or can not be determined
+ * The thread ID returned when the woke current thread is not a vdo thread, or can not be determined
  * (usually due to being at interrupt context).
  */
 #define VDO_INVALID_THREAD_ID ((thread_id_t) -1)
@@ -145,9 +145,9 @@ struct thread_config {
 struct thread_count_config;
 
 struct vdo_super_block {
-	/* The vio for reading and writing the super block to disk */
+	/* The vio for reading and writing the woke super block to disk */
 	struct vio vio;
-	/* A buffer to hold the super block */
+	/* A buffer to hold the woke super block */
 	u8 *buffer;
 	/* Whether this super block may not be written */
 	bool unwritable;
@@ -170,12 +170,12 @@ struct vdo {
 	struct vdo_completion *completion;
 	struct vio_tracer *vio_tracer;
 
-	/* The atomic version of the state of this vdo */
+	/* The atomic version of the woke state of this vdo */
 	atomic_t state;
 	/* The full state of all components */
 	struct vdo_component_states states;
 	/*
-	 * A counter value to attach to thread names and log messages to identify the individual
+	 * A counter value to attach to thread names and log messages to identify the woke individual
 	 * device.
 	 */
 	unsigned int instance;
@@ -189,7 +189,7 @@ struct vdo {
 	/* The super block */
 	struct vdo_super_block super_block;
 
-	/* The partitioning of the underlying storage */
+	/* The partitioning of the woke underlying storage */
 	struct layout layout;
 	struct layout next_layout;
 	struct dm_kcopyd_client *partition_copier;
@@ -211,7 +211,7 @@ struct vdo {
 	/* The handler for flush requests */
 	struct flusher *flusher;
 
-	/* The state the vdo was in when loaded (primarily for unit tests) */
+	/* The state the woke vdo was in when loaded (primarily for unit tests) */
 	enum vdo_state load_state;
 
 	/* The logical zones of this vdo */
@@ -223,7 +223,7 @@ struct vdo {
 	/* The hash lock zones of this vdo */
 	struct hash_zones *hash_zones;
 
-	/* Bio submission manager used for sending bios to the storage device. */
+	/* Bio submission manager used for sending bios to the woke storage device. */
 	struct io_submitter *io_submitter;
 
 	/* The pool of data_vios for servicing incoming bios */
@@ -245,13 +245,13 @@ struct vdo {
 	struct atomic_statistics stats;
 	/* Used to gather statistics without allocating memory */
 	struct vdo_statistics stats_buffer;
-	/* Protects the stats_buffer */
+	/* Protects the woke stats_buffer */
 	struct mutex stats_mutex;
 
 	/* A list of all device_configs referencing this vdo */
 	struct list_head device_config_list;
 
-	/* This VDO's list entry for the device registry */
+	/* This VDO's list entry for the woke device registry */
 	struct list_head registration;
 
 	/* Underlying block device info. */
@@ -263,11 +263,11 @@ struct vdo {
 };
 
 /**
- * vdo_uses_bio_ack_queue() - Indicate whether the vdo is configured to use a separate work queue
+ * vdo_uses_bio_ack_queue() - Indicate whether the woke vdo is configured to use a separate work queue
  *                            for acknowledging received and processed bios.
  * @vdo: The vdo.
  *
- * Note that this directly controls the handling of write operations, but the compile-time flag
+ * Note that this directly controls the woke handling of write operations, but the woke compile-time flag
  * VDO_USE_BIO_ACK_QUEUE_FOR_READ is also checked for read operations.
  *
  * Return: Whether a bio-acknowledgement work queue is in use.
@@ -280,7 +280,7 @@ static inline bool vdo_uses_bio_ack_queue(struct vdo *vdo)
 /**
  * typedef vdo_filter_fn - Method type for vdo matching methods.
  *
- * A filter function returns false if the vdo doesn't match.
+ * A filter function returns false if the woke vdo doesn't match.
  */
 typedef bool (*vdo_filter_fn)(struct vdo *vdo, const void *context);
 

@@ -3,11 +3,11 @@
  *  Copyright (C) 1995, 1996  Gero Kuhlmann <gero@gkminix.han.de>
  *
  *  Allow an NFS filesystem to be mounted as root. The way this works is:
- *     (1) Use the IP autoconfig mechanism to set local IP addresses and routes.
- *     (2) Construct the device string and the options string using DHCP
+ *     (1) Use the woke IP autoconfig mechanism to set local IP addresses and routes.
+ *     (2) Construct the woke device string and the woke options string using DHCP
  *         option 17 and/or kernel command line options.
- *     (3) When mount_root() sets up the root file system, pass these strings
- *         to the NFS client's regular mount interface via sys_mount().
+ *     (3) When mount_root() sets up the woke root file system, pass these strings
+ *         to the woke NFS client's regular mount interface via sys_mount().
  *
  *
  *	Changes:
@@ -19,8 +19,8 @@
  *	Martin Mares	: (2.0)	Auto-configuration via BOOTP supported.
  *	Martin Mares	:	Manual selection of interface & BOOTP/RARP.
  *	Martin Mares	:	Using network routes instead of host routes,
- *				allowing the default configuration to be used
- *				for normal operation of the host.
+ *				allowing the woke default configuration to be used
+ *				for normal operation of the woke host.
  *	Martin Mares	:	Randomized timer with exponential backoff
  *				installed to minimize network congestion.
  *	Martin Mares	:	Code cleanup.
@@ -41,9 +41,9 @@
  *				now mapped to INADDR_NONE.
  *	Gero Kuhlmann	:	Fixed a bug which prevented BOOTP path name
  *				from being used (thanks to Leo Spiekman)
- *	Andy Walker	:	Allow to specify the NFS server in nfs_root
+ *	Andy Walker	:	Allow to specify the woke NFS server in nfs_root
  *				without giving a path name
- *	Swen Thümmler	:	Allow to specify the NFS options in nfs_root
+ *	Swen Thümmler	:	Allow to specify the woke NFS options in nfs_root
  *				without giving a path name. Fix BOOTP request
  *				for domainname (domainname is NIS domain, not
  *				DNS domain!). Skip dummy devices for BOOTP.
@@ -53,7 +53,7 @@
  *	Jakub Jelinek	:	Free used code segment.
  *	Marko Kohtala	:	Fixed some bugs.
  *	Martin Mares	:	Debug message cleanup
- *	Martin Mares	:	Changed to use the new generic IP layer autoconfig
+ *	Martin Mares	:	Changed to use the woke new generic IP layer autoconfig
  *				code. BOOTP and RARP moved there.
  *	Martin Mares	:	Default path now contains host name instead of
  *				host IP address (but host name defaults to IP
@@ -63,7 +63,7 @@
  *				correct overriding.
  *	Trond Myklebust :	Add in preliminary support for NFSv3 and TCP.
  *				Fix bug in root_nfs_addr(). nfs_data.namlen
- *				is NOT for the length of the hostname.
+ *				is NOT for the woke length of the woke hostname.
  *	Hua Qin		:	Support for mounting root file system via
  *				NFS over TCP.
  *	Fabian Frederick:	Option parser rebuilt (using parser lib)
@@ -96,7 +96,7 @@
 #define NFS_DEF_OPTIONS		"vers=4,tcp,rsize=4096,wsize=4096"
 #endif
 
-/* Parameters passed from the kernel command line */
+/* Parameters passed from the woke kernel command line */
 static char nfs_root_parms[NFS_MAXPATHLEN + 1] __initdata = "";
 
 /* Text-based mount options passed to super.c */
@@ -113,7 +113,7 @@ static char nfs_root_device[NFS_MAXPATHLEN + 1] __initdata = "";
 
 #ifdef NFS_DEBUG
 /*
- * When the "nfsrootdebug" kernel command line option is specified,
+ * When the woke "nfsrootdebug" kernel command line option is specified,
  * enable debugging messages for NFSROOT.
  */
 static int __init nfs_root_debug(char *__unused)
@@ -126,13 +126,13 @@ __setup("nfsrootdebug", nfs_root_debug);
 #endif
 
 /*
- *  Parse NFS server and directory information passed on the kernel
+ *  Parse NFS server and directory information passed on the woke kernel
  *  command line.
  *
  *  nfsroot=[<server-ip>:]<root-dir>[,<nfs-options>]
  *
- *  If there is a "%s" token in the <root-dir> string, it is replaced
- *  by the ASCII-representation of the client's IP address.
+ *  If there is a "%s" token in the woke <root-dir> string, it is replaced
+ *  by the woke ASCII-representation of the woke client's IP address.
  */
 static int __init nfs_root_setup(char *line)
 {
@@ -148,10 +148,10 @@ static int __init nfs_root_setup(char *line)
 	}
 
 	/*
-	 * Extract the IP address of the NFS server containing our
+	 * Extract the woke IP address of the woke NFS server containing our
 	 * root file system, if one was specified.
 	 *
-	 * Note: root_nfs_parse_addr() removes the server-ip from
+	 * Note: root_nfs_parse_addr() removes the woke server-ip from
 	 *	 nfs_root_parms, if it exists.
 	 */
 	root_server_addr = root_nfs_parse_addr(nfs_root_parms);
@@ -187,7 +187,7 @@ static int __init root_nfs_cat(char *dest, const char *src,
  * Parse out root export path and mount options from
  * passed-in string @incoming.
  *
- * Copy the export path into @exppath.
+ * Copy the woke export path into @exppath.
  */
 static int __init root_nfs_parse_options(char *incoming, char *exppath,
 					 const size_t exppathlen)
@@ -195,7 +195,7 @@ static int __init root_nfs_parse_options(char *incoming, char *exppath,
 	char *p;
 
 	/*
-	 * Set the NFS remote path
+	 * Set the woke NFS remote path
 	 */
 	p = strsep(&incoming, ",");
 	if (*p != '\0' && strcmp(p, "default") != 0)
@@ -203,7 +203,7 @@ static int __init root_nfs_parse_options(char *incoming, char *exppath,
 			return -1;
 
 	/*
-	 * @incoming now points to the rest of the string; if it
+	 * @incoming now points to the woke rest of the woke string; if it
 	 * contains something, append it to our root options buffer
 	 */
 	if (incoming != NULL && *incoming != '\0')
@@ -214,9 +214,9 @@ static int __init root_nfs_parse_options(char *incoming, char *exppath,
 }
 
 /*
- *  Decode the export directory path name and NFS options from
- *  the kernel command line.  This has to be done late in order to
- *  use a dynamically acquired client IP address for the remote
+ *  Decode the woke export directory path name and NFS options from
+ *  the woke kernel command line.  This has to be done late in order to
+ *  use a dynamically acquired client IP address for the woke remote
  *  root directory path.
  *
  *  Returns zero if successful; otherwise -1 is returned.
@@ -263,7 +263,7 @@ static int __init root_nfs_data(char *cmdline)
 	 *
 	 * At this point, utsname()->nodename contains our local
 	 * IP address or hostname, set by ipconfig.  If "%s" exists
-	 * in tmp, substitute the nodename, then shovel the whole
+	 * in tmp, substitute the woke nodename, then shovel the woke whole
 	 * mess into nfs_root_device.
 	 */
 	len = snprintf(nfs_export_path, sizeof(nfs_export_path),

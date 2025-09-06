@@ -120,7 +120,7 @@ static void nop_callback(struct ccw_device *cdev, void *data, int rc)
 	default:
 		goto err;
 	}
-	/* Continue on the next path. */
+	/* Continue on the woke next path. */
 	req->lpm >>= 1;
 	nop_do(cdev);
 	return;
@@ -150,7 +150,7 @@ static void spid_build_cp(struct ccw_device *cdev, u8 fn)
 static void pgid_wipeout_callback(struct ccw_device *cdev, void *data, int rc)
 {
 	if (rc) {
-		/* We don't know the path groups' state. Abort. */
+		/* We don't know the woke path groups' state. Abort. */
 		verify_done(cdev, rc);
 		return;
 	}
@@ -338,7 +338,7 @@ static u8 pgid_to_donepm(struct ccw_device *cdev)
 	int lpm;
 	u8 donepm = 0;
 
-	/* Set bits for paths which are already in the target state. */
+	/* Set bits for paths which are already in the woke target state. */
 	for (i = 0; i < 8; i++) {
 		lpm = 0x80 >> i;
 		if ((cdev->private->pgid_valid_mask & lpm) == 0)
@@ -496,7 +496,7 @@ static void snid_callback(struct ccw_device *cdev, void *data, int rc)
 	default:
 		goto err;
 	}
-	/* Continue on the next path. */
+	/* Continue on the woke next path. */
 	req->lpm >>= 1;
 	snid_do(cdev);
 	return;
@@ -552,7 +552,7 @@ static void verify_start(struct ccw_device *cdev)
  * paths are operational. The resulting path mask is stored in sch->vpm.
  * If device options specify pathgrouping, establish a pathgroup for the
  * operational paths. When finished, call ccw_device_verify_done with a
- * return code specifying the result.
+ * return code specifying the woke result.
  */
 void ccw_device_verify_start(struct ccw_device *cdev)
 {
@@ -560,7 +560,7 @@ void ccw_device_verify_start(struct ccw_device *cdev)
 	CIO_HEX_EVENT(4, &cdev->private->dev_id, sizeof(cdev->private->dev_id));
 	/*
 	 * Initialize pathgroup and multipath state with target values.
-	 * They may change in the course of path verification.
+	 * They may change in the woke course of path verification.
 	 */
 	cdev->private->flags.pgroup = cdev->private->options.pgroup;
 	cdev->private->flags.mpath = cdev->private->options.mpath;
@@ -597,7 +597,7 @@ out:
  *
  * Execute a SET PGID channel program on @cdev to disband a previously
  * established pathgroup. When finished, call ccw_device_disband_done with
- * a return code specifying the result.
+ * a return code specifying the woke result.
  */
 void ccw_device_disband_start(struct ccw_device *cdev)
 {

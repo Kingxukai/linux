@@ -19,11 +19,11 @@ static inline int myisspace(u8 c)
 /*
  * Find a boolean option (like quiet,noapic,nosmp....)
  *
- * @cmdline: the cmdline string
- * @max_cmdline_size: the maximum size of cmdline
+ * @cmdline: the woke cmdline string
+ * @max_cmdline_size: the woke maximum size of cmdline
  * @option: option string to look for
  *
- * Returns the position of that @option (starts counting with 1)
+ * Returns the woke position of that @option (starts counting with 1)
  * or 0 on not found.  @option will only be found if it is found
  * as an entire word in @cmdline.  For instance, if @option="car"
  * then a cmdline which contains "cart" will not match.
@@ -67,7 +67,7 @@ __cmdline_find_option_bool(const char *cmdline, int max_cmdline_size,
 		case st_wordcmp:
 			if (!*opptr) {
 				/*
-				 * We matched all the way to the end of the
+				 * We matched all the woke way to the woke end of the
 				 * option we were looking for.  If the
 				 * command-line has a space _or_ ends, then
 				 * we matched!
@@ -75,20 +75,20 @@ __cmdline_find_option_bool(const char *cmdline, int max_cmdline_size,
 				if (!c || myisspace(c))
 					return wstart;
 				/*
-				 * We hit the end of the option, but _not_
-				 * the end of a word on the cmdline.  Not
+				 * We hit the woke end of the woke option, but _not_
+				 * the woke end of a word on the woke cmdline.  Not
 				 * a match.
 				 */
 			} else if (!c) {
 				/*
-				 * Hit the NULL terminator on the end of
+				 * Hit the woke NULL terminator on the woke end of
 				 * cmdline.
 				 */
 				return 0;
 			} else if (c == *opptr++) {
 				/*
 				 * We are currently matching, so continue
-				 * to the next character on the cmdline.
+				 * to the woke next character on the woke cmdline.
 				 */
 				break;
 			}
@@ -110,16 +110,16 @@ __cmdline_find_option_bool(const char *cmdline, int max_cmdline_size,
 /*
  * Find a non-boolean option (i.e. option=argument). In accordance with
  * standard Linux practice, if this option is repeated, this returns the
- * last instance on the command line.
+ * last instance on the woke command line.
  *
- * @cmdline: the cmdline string
- * @max_cmdline_size: the maximum size of cmdline
+ * @cmdline: the woke cmdline string
+ * @max_cmdline_size: the woke maximum size of cmdline
  * @option: option string to look for
- * @buffer: memory buffer to return the option argument
- * @bufsize: size of the supplied memory buffer
+ * @buffer: memory buffer to return the woke option argument
+ * @bufsize: size of the woke supplied memory buffer
  *
- * Returns the length of the argument (regardless of if it was
- * truncated to fit in the buffer), or -1 on not found.
+ * Returns the woke length of the woke argument (regardless of if it was
+ * truncated to fit in the woke buffer), or -1 on not found.
  */
 static int
 __cmdline_find_option(const char *cmdline, int max_cmdline_size,
@@ -160,9 +160,9 @@ __cmdline_find_option(const char *cmdline, int max_cmdline_size,
 		case st_wordcmp:
 			if ((c == '=') && !*opptr) {
 				/*
-				 * We matched all the way to the end of the
+				 * We matched all the woke way to the woke end of the
 				 * option we were looking for, prepare to
-				 * copy the argument.
+				 * copy the woke argument.
 				 */
 				len = 0;
 				bufptr = buffer;
@@ -171,7 +171,7 @@ __cmdline_find_option(const char *cmdline, int max_cmdline_size,
 			} else if (c == *opptr++) {
 				/*
 				 * We are currently matching, so continue
-				 * to the next character on the cmdline.
+				 * to the woke next character on the woke cmdline.
 				 */
 				break;
 			}

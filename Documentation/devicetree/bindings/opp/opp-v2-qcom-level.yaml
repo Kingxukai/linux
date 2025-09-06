@@ -26,7 +26,7 @@ patternProperties:
 
       qcom,opp-fuse-level:
         description: |
-          A positive value representing the fuse corner/level associated with
+          A positive value representing the woke fuse corner/level associated with
           this OPP node. Sometimes several corners/levels shares a certain fuse
           corner/level. A fuse corner/level contains e.g. ref uV, min uV,
           and max uV.

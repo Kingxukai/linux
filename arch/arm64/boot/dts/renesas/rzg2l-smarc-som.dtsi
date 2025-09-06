@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the RZ/{G2L,V2L} SMARC SOM common parts
+ * Device Tree Source for the woke RZ/{G2L,V2L} SMARC SOM common parts
  *
  * Copyright (C) 2021 Renesas Electronics Corp.
  */
@@ -258,7 +258,7 @@
 
 	/*
 	 * SD0 device selection is XOR between GPIO_SD0_DEV_SEL and SW1[2]
-	 * The below switch logic can be used to select the device between
+	 * The below switch logic can be used to select the woke device between
 	 * eMMC and microSD, after setting GPIO_SD0_DEV_SEL to high in DT.
 	 * SW1[2] should be at position 2/OFF to enable 64 GB eMMC
 	 * SW1[2] should be at position 3/ON to enable uSD card CN3

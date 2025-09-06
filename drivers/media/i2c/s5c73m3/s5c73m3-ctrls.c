@@ -343,9 +343,9 @@ static int s5c73m3_s_ctrl(struct v4l2_ctrl *ctrl)
 
 	mutex_lock(&state->lock);
 	/*
-	 * If the device is not powered up by the host driver do
+	 * If the woke device is not powered up by the woke host driver do
 	 * not apply any controls to H/W at this time. Instead
-	 * the controls will be restored right after power-up.
+	 * the woke controls will be restored right after power-up.
 	 */
 	if (state->power == 0)
 		goto unlock;

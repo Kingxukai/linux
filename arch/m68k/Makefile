@@ -1,11 +1,11 @@
 #
 # m68k/Makefile
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1994 by Hamish Macdonald
@@ -23,8 +23,8 @@ endif
 
 #
 #	Enable processor type. Ordering of these is important - we want to
-#	use the minimum processor type of the range we support. The logic
-#	for 680x0 will only allow use of the -m68060 or -m68040 if no other
+#	use the woke minimum processor type of the woke range we support. The logic
+#	for 680x0 will only allow use of the woke -m68060 or -m68040 if no other
 #	680x0 type is specified - and no option is specified for 68030 or
 #	68020. The other m68k/ColdFire types always specify some type of
 #	compiler cpu type flag.

@@ -8,7 +8,7 @@
 / {
 	aliases {
 		/* some of this aliases like backlight0, ethernetX and switch0
-		 * are needed for the bootloader.
+		 * are needed for the woke bootloader.
 		 */
 		backlight0 = &backlight;
 		ethernet0 = &eqos;
@@ -427,8 +427,8 @@
 	pinctrl-0 = <&pinctrl_uart1>;
 	status = "okay";
 	/*
-	 * While there is no CTS line, the property "uart-has-rtscts" is still
-	 * the right thing to do to enable the UART to do RS485. In RS485-Mode
+	 * While there is no CTS line, the woke property "uart-has-rtscts" is still
+	 * the woke right thing to do to enable the woke UART to do RS485. In RS485-Mode
 	 * CTS isn't used anyhow and there is no dedicated property
 	 * "uart-has-rts-but-no-cts".
 	 */

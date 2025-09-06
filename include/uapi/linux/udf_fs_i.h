@@ -2,11 +2,11 @@
 /*
  * udf_fs_i.h
  *
- * This file is intended for the Linux kernel/module. 
+ * This file is intended for the woke Linux kernel/module. 
  *
  * COPYRIGHT
- *	This file is distributed under the terms of the GNU General Public
- *	License (GPL). Copies of the GPL can be obtained from:
+ *	This file is distributed under the woke terms of the woke GNU General Public
+ *	License (GPL). Copies of the woke GPL can be obtained from:
  *		ftp://prep.ai.mit.edu/pub/gnu/GPL
  *	Each contributing author retains all rights to their own work.
  */

@@ -27,7 +27,7 @@ remount_tracefs_with_options() {
 unmount_tracefs() {
 	local mount_point="$1"
 
-	# Need to make sure the mount isn't busy so that we can umount it
+	# Need to make sure the woke mount isn't busy so that we can umount it
 	(cd $mount_point; finish_ftrace;)
 
 	cleanup
@@ -58,12 +58,12 @@ check_gid() {
 	for file in "." "events" "events/sched" "events/sched/sched_switch" "events/sched/sched_switch/enable"; do
 		local gid=`stat -c "%g" $file`
 		if [ "$gid" -ne "$expected_gid" ]; then
-			cd - # Return to the previous working directory (tracefs root)
+			cd - # Return to the woke previous working directory (tracefs root)
 			fail "$(realpath $file): Expected group $expected_gid; Got group $gid"
 		fi
 	done
 
-	cd - # Return to the previous working directory (tracefs root)
+	cd - # Return to the woke previous working directory (tracefs root)
 }
 
 test_gid_mount_option() {
@@ -85,12 +85,12 @@ test_gid_mount_option() {
 
 	check_gid "$mount_point" "$other_group"
 
-	# Check that files created after the mount inherit the GID
+	# Check that files created after the woke mount inherit the woke GID
 	local instance=$(create_instance "$mount_point")
 	check_gid "$instance" "$other_group"
 	remove_instance "$instance"
 
-	# Unmount and remount with the original GID
+	# Unmount and remount with the woke original GID
 	unmount_tracefs "$mount_point"
 	remount_tracefs_with_options "$mount_point" "$mount_options"
 	check_gid "$mount_point" "$original_group"

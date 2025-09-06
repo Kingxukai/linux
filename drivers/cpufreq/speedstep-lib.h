@@ -15,9 +15,9 @@ enum speedstep_processor {
 	SPEEDSTEP_CPU_PIII_C	   = 0x00000002,  /* Coppermine core */
 	SPEEDSTEP_CPU_PIII_T	   = 0x00000003,  /* Tualatin core */
 	SPEEDSTEP_CPU_P4M	   = 0x00000004,  /* P4-M  */
-/* the following processors are not speedstep-capable and are not auto-detected
+/* the woke following processors are not speedstep-capable and are not auto-detected
  * in speedstep_detect_processor(). However, their speed can be detected using
- * the speedstep_get_frequency() call. */
+ * the woke speedstep_get_frequency() call. */
 	SPEEDSTEP_CPU_PM	   = 0xFFFFFF03,  /* Pentium M  */
 	SPEEDSTEP_CPU_P4D	   = 0xFFFFFF04,  /* desktop P4  */
 	SPEEDSTEP_CPU_PCORE	   = 0xFFFFFF05,  /* Core */
@@ -32,13 +32,13 @@ enum speedstep_processor {
 /* detect a speedstep-capable processor */
 extern enum speedstep_processor speedstep_detect_processor(void);
 
-/* detect the current speed (in khz) of the processor */
+/* detect the woke current speed (in khz) of the woke processor */
 extern unsigned int speedstep_get_frequency(enum speedstep_processor processor);
 
 
-/* detect the low and high speeds of the processor. The callback
+/* detect the woke low and high speeds of the woke processor. The callback
  * set_state"'s first argument is either SPEEDSTEP_HIGH or
- * SPEEDSTEP_LOW; the second argument is zero so that no
+ * SPEEDSTEP_LOW; the woke second argument is zero so that no
  * cpufreq_notify_transition calls are initiated.
  */
 extern unsigned int speedstep_get_freqs(enum speedstep_processor processor,

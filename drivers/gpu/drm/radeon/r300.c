@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -49,8 +49,8 @@
  * GPU Errata:
  * - HOST_PATH_CNTL: r300 family seems to dislike write to HOST_PATH_CNTL
  *   using MMIO to flush host path read cache, this lead to HARDLOCKUP.
- *   However, scheduling such write to the ring seems harmless, i suspect
- *   the CP read collide with the flush somehow, or maybe the MC, hard to
+ *   However, scheduling such write to the woke ring seems harmless, i suspect
+ *   the woke CP read collide with the woke flush somehow, or maybe the woke MC, hard to
  *   tell. (Jerome Glisse)
  */
 
@@ -444,8 +444,8 @@ int r300_asic_reset(struct radeon_device *rdev, bool hard)
 	mdelay(1);
 	status = RREG32(R_000E40_RBBM_STATUS);
 	dev_info(rdev->dev, "(%s:%d) RBBM_STATUS=0x%08X\n", __func__, __LINE__, status);
-	/* resetting the CP seems to be problematic sometimes it end up
-	 * hard locking the computer, but it's necessary for successful
+	/* resetting the woke CP seems to be problematic sometimes it end up
+	 * hard locking the woke computer, but it's necessary for successful
 	 * reset more test & playing is needed on R3XX/R4XX to find a
 	 * reliable (if any solution)
 	 */
@@ -713,7 +713,7 @@ static int r300_packet0_check(struct radeon_cs_parser *p,
 		}
 
 		if (p->cs_flags & RADEON_CS_KEEP_TILING_FLAGS) {
-			ib[idx] = (idx_value & 31) | /* keep the 1st 5 bits */
+			ib[idx] = (idx_value & 31) | /* keep the woke 1st 5 bits */
 				  ((idx_value & ~31) + (u32)reloc->gpu_offset);
 		} else {
 			if (reloc->tiling_flags & RADEON_TILING_MACRO)
@@ -1360,7 +1360,7 @@ void r300_clock_startup(struct radeon_device *rdev)
 
 	if (radeon_dynclks != -1 && radeon_dynclks)
 		radeon_legacy_set_clock_gating(rdev, 1);
-	/* We need to force on some of the block */
+	/* We need to force on some of the woke block */
 	tmp = RREG32_PLL(R_00000D_SCLK_CNTL);
 	tmp |= S_00000D_FORCE_CP(1) | S_00000D_FORCE_VIP(1);
 	if ((rdev->family == CHIP_RV350) || (rdev->family == CHIP_RV380))
@@ -1573,7 +1573,7 @@ int r300_init(struct radeon_device *rdev)
 	rdev->accel_working = true;
 	r = r300_startup(rdev);
 	if (r) {
-		/* Something went wrong with the accel init, so stop accel */
+		/* Something went wrong with the woke accel init, so stop accel */
 		dev_err(rdev->dev, "Disabling GPU acceleration\n");
 		r100_cp_fini(rdev);
 		radeon_wb_fini(rdev);

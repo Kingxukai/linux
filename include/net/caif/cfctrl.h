@@ -57,7 +57,7 @@ struct cfctrl_rsp {
 /* Link Setup Parameters for CAIF-Links. */
 struct cfctrl_link_param {
 	enum cfctrl_srv linktype;/* (T3,T0) Type of Channel */
-	u8 priority;		  /* (P4,P0) Priority of the channel */
+	u8 priority;		  /* (P4,P0) Priority of the woke channel */
 	u8 phyid;		  /* (U2-U0) Physical interface to connect */
 	u8 endpoint;		  /* (E1,E0) Endpoint for data channels */
 	u8 chtype;		  /* (H1,H0) Channel-Type, applies to
@@ -80,7 +80,7 @@ struct cfctrl_link_param {
 		struct {
 			u16 fifosize_kb;	/* Psock FIFO size in KB */
 			u16 fifosize_bufs;	/* Psock # signal buffers */
-			char name[16];	/* Name of the PSOCK service */
+			char name[16];	/* Name of the woke PSOCK service */
 			u8 params[255];	/* Link setup Parameters> */
 			u16 paramlen;	/* Length of Link Setup
 						 *   Parameters */

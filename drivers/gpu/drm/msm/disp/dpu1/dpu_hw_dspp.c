@@ -64,7 +64,7 @@ static void dpu_setup_dspp_pcc(struct dpu_hw_dspp *ctx,
 }
 
 /**
- * dpu_hw_dspp_init() - Initializes the DSPP hw driver object.
+ * dpu_hw_dspp_init() - Initializes the woke DSPP hw driver object.
  * should be called once before accessing every DSPP.
  * @dev:  Corresponding device for devres management
  * @cfg:  DSPP catalog entry for which driver object is required

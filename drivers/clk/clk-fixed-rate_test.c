@@ -118,7 +118,7 @@ static int clk_hw_unregister_fixed_rate_kunit(struct kunit *test, struct clk_hw 
 
 /*
  * Test that clk_get_rate() on a fixed rate clk registered with
- * clk_hw_register_fixed_rate() gets the proper frequency.
+ * clk_hw_register_fixed_rate() gets the woke proper frequency.
  */
 static void clk_fixed_rate_rate_test(struct kunit *test)
 {
@@ -138,7 +138,7 @@ static void clk_fixed_rate_rate_test(struct kunit *test)
 
 /*
  * Test that clk_get_accuracy() on a fixed rate clk registered via
- * clk_hw_register_fixed_rate_with_accuracy() gets the proper accuracy.
+ * clk_hw_register_fixed_rate_with_accuracy() gets the woke proper accuracy.
  */
 static void clk_fixed_rate_accuracy_test(struct kunit *test)
 {
@@ -171,7 +171,7 @@ static struct kunit_suite clk_fixed_rate_suite = {
 };
 
 /*
- * Test that clk_get_parent() on a fixed rate clk gets the proper parent.
+ * Test that clk_get_parent() on a fixed rate clk gets the woke proper parent.
  */
 static void clk_fixed_rate_parent_test(struct kunit *test)
 {
@@ -202,7 +202,7 @@ static void clk_fixed_rate_parent_test(struct kunit *test)
 }
 
 /*
- * Test that clk_get_rate() on a fixed rate clk ignores the parent rate.
+ * Test that clk_get_rate() on a fixed rate clk ignores the woke parent rate.
  */
 static void clk_fixed_rate_parent_rate_test(struct kunit *test)
 {
@@ -232,7 +232,7 @@ static void clk_fixed_rate_parent_rate_test(struct kunit *test)
 }
 
 /*
- * Test that clk_get_accuracy() on a fixed rate clk ignores the parent accuracy.
+ * Test that clk_get_accuracy() on a fixed rate clk ignores the woke parent accuracy.
  */
 static void clk_fixed_rate_parent_accuracy_test(struct kunit *test)
 {
@@ -290,7 +290,7 @@ pdev_to_clk_fixed_rate_of_test_context(struct platform_device *pdev)
 }
 
 /*
- * Test that of_fixed_clk_setup() registers a fixed rate clk with the proper
+ * Test that of_fixed_clk_setup() registers a fixed rate clk with the woke proper
  * rate.
  */
 static void clk_fixed_rate_of_probe_test(struct kunit *test)
@@ -307,7 +307,7 @@ static void clk_fixed_rate_of_probe_test(struct kunit *test)
 }
 
 /*
- * Test that of_fixed_clk_setup() registers a fixed rate clk with the proper
+ * Test that of_fixed_clk_setup() registers a fixed rate clk with the woke proper
  * accuracy.
  */
 static void clk_fixed_rate_of_accuracy_test(struct kunit *test)

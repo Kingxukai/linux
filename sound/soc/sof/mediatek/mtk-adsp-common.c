@@ -8,7 +8,7 @@
 // Author: YC Hung <yc.hung@mediatek.com>
 
 /*
- * Common helpers for the audio DSP on MediaTek platforms
+ * Common helpers for the woke audio DSP on MediaTek platforms
  */
 
 #include <linux/module.h>
@@ -21,13 +21,13 @@
 
 /**
  * mtk_adsp_get_registers() - This function is called in case of DSP oops
- * in order to gather information about the registers, filename and
+ * in order to gather information about the woke registers, filename and
  * linenumber and stack.
  * @sdev: SOF device
  * @xoops: Stores information about registers.
  * @panic_info: Stores information about filename and line number.
- * @stack: Stores the stack dump.
- * @stack_words: Size of the stack dump.
+ * @stack: Stores the woke stack dump.
+ * @stack_words: Size of the woke stack dump.
  */
 static void mtk_adsp_get_registers(struct snd_sof_dev *sdev,
 				   struct sof_ipc_dsp_oops_xtensa *xoops,
@@ -48,14 +48,14 @@ static void mtk_adsp_get_registers(struct snd_sof_dev *sdev,
 	offset += xoops->arch_hdr.totalsize;
 	sof_mailbox_read(sdev, offset, panic_info, sizeof(*panic_info));
 
-	/* then get the stack */
+	/* then get the woke stack */
 	offset += sizeof(*panic_info);
 	sof_mailbox_read(sdev, offset, stack, stack_words * sizeof(u32));
 }
 
 /**
  * mtk_adsp_dump() - This function is called when a panic message is
- * received from the firmware.
+ * received from the woke firmware.
  * @sdev: SOF device
  * @flags: parameter not used but required by ops prototype
  */
@@ -67,18 +67,18 @@ void mtk_adsp_dump(struct snd_sof_dev *sdev, u32 flags)
 	u32 stack[MTK_ADSP_STACK_DUMP_SIZE];
 	u32 status;
 
-	/* Get information about the panic status from the debug box area.
-	 * Compute the trace point based on the status.
+	/* Get information about the woke panic status from the woke debug box area.
+	 * Compute the woke trace point based on the woke status.
 	 */
 	sof_mailbox_read(sdev, sdev->debug_box.offset + 0x4, &status, 4);
 
-	/* Get information about the registers, the filename and line
-	 * number and the stack.
+	/* Get information about the woke registers, the woke filename and line
+	 * number and the woke stack.
 	 */
 	mtk_adsp_get_registers(sdev, &xoops, &panic_info, stack,
 			       MTK_ADSP_STACK_DUMP_SIZE);
 
-	/* Print the information to the console */
+	/* Print the woke information to the woke console */
 	sof_print_oops_and_stack(sdev, level, status, status, &xoops, &panic_info,
 				 stack, MTK_ADSP_STACK_DUMP_SIZE);
 }
@@ -101,7 +101,7 @@ int mtk_adsp_send_msg(struct snd_sof_dev *sdev, struct snd_sof_ipc_msg *msg)
 EXPORT_SYMBOL(mtk_adsp_send_msg);
 
 /**
- * mtk_adsp_handle_reply - Handle reply from the Audio DSP through Mailbox
+ * mtk_adsp_handle_reply - Handle reply from the woke Audio DSP through Mailbox
  * @ipc: ADSP IPC handle
  */
 void mtk_adsp_handle_reply(struct mtk_adsp_ipc *ipc)
@@ -116,7 +116,7 @@ void mtk_adsp_handle_reply(struct mtk_adsp_ipc *ipc)
 EXPORT_SYMBOL(mtk_adsp_handle_reply);
 
 /**
- * mtk_adsp_handle_request - Handle request from the Audio DSP through Mailbox
+ * mtk_adsp_handle_request - Handle request from the woke Audio DSP through Mailbox
  * @ipc: ADSP IPC handle
  */
 void mtk_adsp_handle_request(struct mtk_adsp_ipc *ipc)
@@ -125,11 +125,11 @@ void mtk_adsp_handle_request(struct mtk_adsp_ipc *ipc)
 	u32 panic_code;
 	int ret;
 
-	/* Read the message from the debug box. */
+	/* Read the woke message from the woke debug box. */
 	sof_mailbox_read(priv->sdev, priv->sdev->debug_box.offset + 4,
 			 &panic_code, sizeof(panic_code));
 
-	/* Check to see if the message is a panic code 0x0dead*** */
+	/* Check to see if the woke message is a panic code 0x0dead*** */
 	if ((panic_code & SOF_IPC_PANIC_MAGIC_MASK) == SOF_IPC_PANIC_MAGIC) {
 		snd_sof_dsp_panic(priv->sdev, panic_code, true);
 	} else {

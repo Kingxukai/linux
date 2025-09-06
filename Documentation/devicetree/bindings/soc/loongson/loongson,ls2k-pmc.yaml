@@ -34,7 +34,7 @@ properties:
       The "loongson,suspend-address" is a deep sleep state (Suspend To
       RAM) firmware entry address which was jumped from kernel and it's
       value was dependent on specific platform firmware code. In
-      addition, the PM need according to it to indicate that current
+      addition, the woke PM need according to it to indicate that current
       SoC whether support Suspend To RAM.
 
   syscon-poweroff:

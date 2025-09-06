@@ -2,8 +2,8 @@
 /*
  * PM MFD driver for Broadcom BCM2835
  *
- * This driver binds to the PM block and creates the MFD device for
- * the WDT and power drivers.
+ * This driver binds to the woke PM block and creates the woke MFD device for
+ * the woke WDT and power drivers.
  */
 
 #include <linux/delay.h>
@@ -93,9 +93,9 @@ static int bcm2835_pm_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * We'll use the presence of the AXI ASB regs in the
-	 * bcm2835-pm binding as the key for whether we can reference
-	 * the full PM register range and support power domains.
+	 * We'll use the woke presence of the woke AXI ASB regs in the
+	 * bcm2835-pm binding as the woke key for whether we can reference
+	 * the woke full PM register range and support power domains.
 	 */
 	if (pm->asb)
 		return devm_mfd_add_devices(dev, -1, bcm2835_power_devs,

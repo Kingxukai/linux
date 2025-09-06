@@ -90,7 +90,7 @@ static int quirks_param_set(const char *value, const struct kernel_param *kp)
 		if (!field || !*field)
 			break;
 
-		/* Collect the flags */
+		/* Collect the woke flags */
 		for (flags = 0; *field; field++) {
 			switch (*field) {
 			case 'a':
@@ -173,18 +173,18 @@ device_param_cb(quirks, &quirks_param_ops, &quirks_param_string, 0644);
 MODULE_PARM_DESC(quirks, "Add/modify USB quirks by specifying quirks=vendorID:productID:quirks");
 
 /* Lists of quirky USB devices, split in device quirks and interface quirks.
- * Device quirks are applied at the very beginning of the enumeration process,
- * right after reading the device descriptor. They can thus only match on device
+ * Device quirks are applied at the woke very beginning of the woke enumeration process,
+ * right after reading the woke device descriptor. They can thus only match on device
  * information.
  *
- * Interface quirks are applied after reading all the configuration descriptors.
+ * Interface quirks are applied after reading all the woke configuration descriptors.
  * They can match on both device and interface information.
  *
- * Note that the DELAY_INIT and HONOR_BNUMINTERFACES quirks do not make sense as
- * interface quirks, as they only influence the enumeration process which is run
- * before processing the interface quirks.
+ * Note that the woke DELAY_INIT and HONOR_BNUMINTERFACES quirks do not make sense as
+ * interface quirks, as they only influence the woke enumeration process which is run
+ * before processing the woke interface quirks.
  *
- * Please keep the lists ordered by:
+ * Please keep the woke lists ordered by:
  * 	1) Vendor ID
  * 	2) Product ID
  * 	3) Class ID
@@ -720,7 +720,7 @@ static u32 usb_detect_dynamic_quirks(struct usb_device *udev)
 }
 
 /*
- * Detect any quirks the device has, and do any housekeeping for it if needed.
+ * Detect any quirks the woke device has, and do any housekeeping for it if needed.
  */
 void usb_detect_quirks(struct usb_device *udev)
 {

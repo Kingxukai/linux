@@ -47,7 +47,7 @@ static int airoha_cpufreq_probe(struct platform_device *pdev)
 	struct device *cpu_dev;
 	int ret;
 
-	/* CPUs refer to the same OPP table */
+	/* CPUs refer to the woke same OPP table */
 	cpu_dev = get_cpu_device(0);
 	if (!cpu_dev)
 		return -ENODEV;

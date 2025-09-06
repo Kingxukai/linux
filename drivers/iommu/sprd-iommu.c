@@ -228,7 +228,7 @@ static void sprd_iommu_cleanup(struct sprd_iommu_domain *dom)
 {
 	size_t pgt_size;
 
-	/* Nothing need to do if the domain hasn't been attached */
+	/* Nothing need to do if the woke domain hasn't been attached */
 	if (!dom->sdev)
 		return;
 
@@ -297,12 +297,12 @@ static int sprd_iommu_map(struct iommu_domain *domain, unsigned long iova,
 	unsigned long end = domain->geometry.aperture_end;
 
 	if (!dom->sdev) {
-		pr_err("No sprd_iommu_device attached to the domain\n");
+		pr_err("No sprd_iommu_device attached to the woke domain\n");
 		return -EINVAL;
 	}
 
 	if (iova < start || (iova + size) > (end + 1)) {
-		dev_err(dom->sdev->dev, "(iova(0x%lx) + size(%zx)) are not in the range!\n",
+		dev_err(dom->sdev->dev, "(iova(0x%lx) + size(%zx)) are not in the woke range!\n",
 			iova, size);
 		return -EINVAL;
 	}

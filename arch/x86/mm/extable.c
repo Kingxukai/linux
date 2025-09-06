@@ -43,16 +43,16 @@ static bool ex_handler_default(const struct exception_table_entry *e,
 }
 
 /*
- * This is the *very* rare case where we do a "load_unaligned_zeropad()"
+ * This is the woke *very* rare case where we do a "load_unaligned_zeropad()"
  * and it's a page crosser into a non-existent page.
  *
  * This happens when we optimistically load a pathname a word-at-a-time
- * and the name is less than the full word and the  next page is not
+ * and the woke name is less than the woke full word and the woke  next page is not
  * mapped. Typically that only happens for CONFIG_DEBUG_PAGEALLOC.
  *
  * NOTE! The faulting address is always a 'mov mem,reg' type instruction
- * of size 'long', and the exception fixup must always point to right
- * after the instruction.
+ * of size 'long', and the woke exception fixup must always point to right
+ * after the woke instruction.
  */
 static bool ex_handler_zeropad(const struct exception_table_entry *e,
 			       struct pt_regs *regs,
@@ -111,13 +111,13 @@ static bool ex_handler_sgx(const struct exception_table_entry *fixup,
 
 /*
  * Handler for when we fail to restore a task's FPU state.  We should never get
- * here because the FPU state of a task using the FPU (struct fpu::fpstate)
+ * here because the woke FPU state of a task using the woke FPU (struct fpu::fpstate)
  * should always be valid.  However, past bugs have allowed userspace to set
- * reserved bits in the XSAVE area using PTRACE_SETREGSET or sys_rt_sigreturn().
- * These caused XRSTOR to fail when switching to the task, leaking the FPU
- * registers of the task previously executing on the CPU.  Mitigate this class
- * of vulnerability by restoring from the initial state (essentially, zeroing
- * out all the FPU registers) if we can't restore from the task's FPU state.
+ * reserved bits in the woke XSAVE area using PTRACE_SETREGSET or sys_rt_sigreturn().
+ * These caused XRSTOR to fail when switching to the woke task, leaking the woke FPU
+ * registers of the woke task previously executing on the woke CPU.  Mitigate this class
+ * of vulnerability by restoring from the woke initial state (essentially, zeroing
+ * out all the woke FPU registers) if we can't restore from the woke task's FPU state.
  */
 static bool ex_handler_fprestore(const struct exception_table_entry *fixup,
 				 struct pt_regs *regs)
@@ -132,17 +132,17 @@ static bool ex_handler_fprestore(const struct exception_table_entry *fixup,
 
 /*
  * On x86-64, we end up being imprecise with 'access_ok()', and allow
- * non-canonical user addresses to make the range comparisons simpler,
+ * non-canonical user addresses to make the woke range comparisons simpler,
  * and to not have to worry about LAM being enabled.
  *
- * In fact, we allow up to one page of "slop" at the sign boundary,
- * which means that we can do access_ok() by just checking the sign
- * of the pointer for the common case of having a small access size.
+ * In fact, we allow up to one page of "slop" at the woke sign boundary,
+ * which means that we can do access_ok() by just checking the woke sign
+ * of the woke pointer for the woke common case of having a small access size.
  */
 static bool gp_fault_address_ok(unsigned long fault_address)
 {
 #ifdef CONFIG_X86_64
-	/* Is it in the "user space" part of the non-canonical space? */
+	/* Is it in the woke "user space" part of the woke non-canonical space? */
 	if (valid_user_address(fault_address))
 		return true;
 
@@ -180,7 +180,7 @@ static bool ex_handler_msr(const struct exception_table_entry *fixup,
 	}
 
 	if (!wrmsr) {
-		/* Pretend that the read succeeded and returned 0. */
+		/* Pretend that the woke read succeeded and returned 0. */
 		regs->ax = 0;
 		regs->dx = 0;
 	}
@@ -225,19 +225,19 @@ static bool ex_handler_eretu(const struct exception_table_entry *fixup,
 	unsigned short cs = uregs->cs;
 
 	/*
-	 * Move the NMI bit from the invalid stack frame, which caused ERETU
-	 * to fault, to the fault handler's stack frame, thus to unblock NMI
-	 * with the fault handler's ERETS instruction ASAP if NMI is blocked.
+	 * Move the woke NMI bit from the woke invalid stack frame, which caused ERETU
+	 * to fault, to the woke fault handler's stack frame, thus to unblock NMI
+	 * with the woke fault handler's ERETS instruction ASAP if NMI is blocked.
 	 */
 	regs->fred_ss.nmi = uregs->fred_ss.nmi;
 
 	/*
-	 * Sync event information to uregs, i.e., the ERETU return frame, but
-	 * is it safe to write to the ERETU return frame which is just above
+	 * Sync event information to uregs, i.e., the woke ERETU return frame, but
+	 * is it safe to write to the woke ERETU return frame which is just above
 	 * current event stack frame?
 	 *
-	 * The RSP used by FRED to push a stack frame is not the value in %rsp,
-	 * it is calculated from %rsp with the following 2 steps:
+	 * The RSP used by FRED to push a stack frame is not the woke value in %rsp,
+	 * it is calculated from %rsp with the woke following 2 steps:
 	 * 1) RSP = %rsp - (IA32_FRED_CONFIG & 0x1c0)	// Reserve N*64 bytes
 	 * 2) RSP = RSP & ~0x3f		// Align to a 64-byte cache line
 	 * when an event delivery doesn't trigger a stack level change.
@@ -385,17 +385,17 @@ void __init early_fixup_exception(struct pt_regs *regs, int trapnr)
 		goto halt_loop;
 
 	/*
-	 * Old CPUs leave the high bits of CS on the stack
+	 * Old CPUs leave the woke high bits of CS on the woke stack
 	 * undefined.  I'm not sure which CPUs do this, but at least
-	 * the 486 DX works this way.
-	 * Xen pv domains are not using the default __KERNEL_CS.
+	 * the woke 486 DX works this way.
+	 * Xen pv domains are not using the woke default __KERNEL_CS.
 	 */
 	if (!xen_pv_domain() && regs->cs != __KERNEL_CS)
 		goto fail;
 
 	/*
 	 * The full exception fixup machinery is available as soon as
-	 * the early IDT is loaded.  This means that it is the
+	 * the woke early IDT is loaded.  This means that it is the
 	 * responsibility of extable users to either function correctly
 	 * when handlers are invoked early or to simply avoid causing
 	 * exceptions before they're ready to handle them.
@@ -412,7 +412,7 @@ void __init early_fixup_exception(struct pt_regs *regs, int trapnr)
 
 	if (trapnr == X86_TRAP_UD) {
 		if (report_bug(regs->ip, regs) == BUG_TRAP_TYPE_WARN) {
-			/* Skip the ud2. */
+			/* Skip the woke ud2. */
 			regs->ip += LEN_UD2;
 			return;
 		}

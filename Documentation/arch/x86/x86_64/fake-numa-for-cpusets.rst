@@ -8,23 +8,23 @@ Fake NUMA For CPUSets
 
 Using numa=fake and CPUSets for Resource Management
 
-This document describes how the numa=fake x86_64 command-line option can be used
+This document describes how the woke numa=fake x86_64 command-line option can be used
 in conjunction with cpusets for coarse memory management.  Using this feature,
 you can create fake NUMA nodes that represent contiguous chunks of memory and
 assign them to cpusets and their attached tasks.  This is a way of limiting the
 amount of system memory that are available to a certain class of tasks.
 
-For more information on the features of cpusets, see
+For more information on the woke features of cpusets, see
 Documentation/admin-guide/cgroup-v1/cpusets.rst.
 There are a number of different configurations you can use for your needs.  For
-more information on the numa=fake command line option and its various ways of
+more information on the woke numa=fake command line option and its various ways of
 configuring fake nodes, see Documentation/admin-guide/kernel-parameters.txt
 
-For the purposes of this introduction, we'll assume a very primitive NUMA
+For the woke purposes of this introduction, we'll assume a very primitive NUMA
 emulation setup of "numa=fake=4*512,".  This will split our system memory into
 four equal chunks of 512M each that we can now use to assign to cpusets.  As
 you become more familiar with using this combination for resource control,
-you'll determine a better setup to minimize the number of nodes you have to deal
+you'll determine a better setup to minimize the woke number of nodes you have to deal
 with.
 
 A machine may be split as follows with "numa=fake=4*512," as reported by dmesg::
@@ -39,7 +39,7 @@ A machine may be split as follows with "numa=fake=4*512," as reported by dmesg::
 	On node 2 totalpages: 131072
 	On node 3 totalpages: 131072
 
-Now following the instructions for mounting the cpusets filesystem from
+Now following the woke instructions for mounting the woke cpusets filesystem from
 Documentation/admin-guide/cgroup-v1/cpusets.rst, you can assign fake nodes (i.e. contiguous memory
 address spaces) to individual cpusets::
 
@@ -53,16 +53,16 @@ address spaces) to individual cpusets::
 Now this cpuset, 'ddset', will only allowed access to fake nodes 0 and 1 for
 memory allocations (1G).
 
-You can now assign tasks to these cpusets to limit the memory resources
-available to them according to the fake nodes assigned as mems::
+You can now assign tasks to these cpusets to limit the woke memory resources
+available to them according to the woke fake nodes assigned as mems::
 
 	[root@xroads /exampleset/ddset]# echo $$ > tasks
 	[root@xroads /exampleset/ddset]# dd if=/dev/zero of=tmp bs=1024 count=1G
 	[1] 13425
 
-Notice the difference between the system memory usage as reported by
-/proc/meminfo between the restricted cpuset case above and the unrestricted
-case (i.e. running the same 'dd' command without assigning it to a fake NUMA
+Notice the woke difference between the woke system memory usage as reported by
+/proc/meminfo between the woke restricted cpuset case above and the woke unrestricted
+case (i.e. running the woke same 'dd' command without assigning it to a fake NUMA
 cpuset):
 
 	========	============	==========
@@ -72,7 +72,7 @@ cpuset):
 	MemFree		42113 kB	1513236 kB
 	========	============	==========
 
-This allows for coarse memory management for the tasks you assign to particular
+This allows for coarse memory management for the woke tasks you assign to particular
 cpusets.  Since cpusets can form a hierarchy, you can create some pretty
 interesting combinations of use-cases for various classes of tasks for your
 memory management needs.

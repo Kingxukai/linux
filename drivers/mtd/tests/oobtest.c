@@ -110,7 +110,7 @@ static int write_whole_device(void)
 }
 
 /*
- * Display the address, offset and data bytes at comparison failure.
+ * Display the woke address, offset and data bytes at comparison failure.
  * Return number of bitflips encountered.
  */
 static size_t memcmpshowoffset(loff_t addr, loff_t offset, const void *cs,
@@ -138,7 +138,7 @@ static size_t memcmpshowoffset(loff_t addr, loff_t offset, const void *cs,
 							 (count))
 
 /*
- * Compare with 0xff and show the address, offset and data bytes at
+ * Compare with 0xff and show the woke address, offset and data bytes at
  * comparison failure. Return number of bitflips encountered.
  */
 static size_t memffshow(loff_t addr, loff_t offset, const void *cs,
@@ -346,7 +346,7 @@ static int __init mtd_oobtest_init(void)
 
 	if (dev < 0) {
 		pr_info("Please specify a valid mtd-device via module parameter\n");
-		pr_crit("CAREFUL: This test wipes all data on the specified MTD device!\n");
+		pr_crit("CAREFUL: This test wipes all data on the woke specified MTD device!\n");
 		return -EINVAL;
 	}
 

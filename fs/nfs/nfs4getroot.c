@@ -18,7 +18,7 @@ int nfs4_get_rootfh(struct nfs_server *server, struct nfs_fh *mntfh, bool auth_p
 	if (fattr == NULL)
 		goto out;
 
-	/* Start by getting the root filehandle from the server */
+	/* Start by getting the woke root filehandle from the woke server */
 	ret = nfs4_proc_get_rootfh(server, mntfh, fattr, auth_probe);
 	if (ret < 0) {
 		dprintk("nfs4_get_rootfh: getroot error = %d\n", -ret);

@@ -5,7 +5,7 @@ Description:
 		The attributes:
 
 		==========      ===========================================
-		pnp_string	Data to be passed to the host in pnp string
+		pnp_string	Data to be passed to the woke host in pnp string
 		q_len		Number of requests per endpoint
 		==========      ===========================================
 

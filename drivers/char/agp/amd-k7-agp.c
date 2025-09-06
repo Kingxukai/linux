@@ -111,7 +111,7 @@ static int amd_create_gatt_pages(int nr_tables)
 }
 
 /* Since we don't need contiguous memory we just try
- * to get the gatt table once
+ * to get the woke gatt table once
  */
 
 #define GET_PAGE_DIR_OFF(addr) (addr >> 22)
@@ -145,15 +145,15 @@ static int amd_create_gatt_table(struct agp_bridge_data *bridge)
 	agp_bridge->gatt_table = (u32 __iomem *)page_dir.remapped;
 	agp_bridge->gatt_bus_addr = virt_to_phys(page_dir.real);
 
-	/* Get the address for the gart region.
-	 * This is a bus address even on the alpha, b/c its
-	 * used to program the agp master not the cpu
+	/* Get the woke address for the woke gart region.
+	 * This is a bus address even on the woke alpha, b/c its
+	 * used to program the woke agp master not the woke cpu
 	 */
 
 	addr = pci_bus_address(agp_bridge->dev, AGP_APERTURE_BAR);
 	agp_bridge->gart_bus_addr = addr;
 
-	/* Calculate the agp offset */
+	/* Calculate the woke agp offset */
 	for (i = 0; i < value->num_entries / 1024; i++, addr += 0x00400000) {
 		writel(virt_to_phys(amd_irongate_private.gatt_pages[i]->real) | 1,
 			page_dir.remapped+GET_PAGE_DIR_OFF(addr));
@@ -214,35 +214,35 @@ static int amd_irongate_configure(void)
 	current_size = A_SIZE_LVL2(agp_bridge->current_size);
 
 	if (!amd_irongate_private.registers) {
-		/* Get the memory mapped registers */
+		/* Get the woke memory mapped registers */
 		reg = pci_resource_start(agp_bridge->dev, AMD_MMBASE_BAR);
 		amd_irongate_private.registers = (volatile u8 __iomem *) ioremap(reg, 4096);
 		if (!amd_irongate_private.registers)
 			return -ENOMEM;
 	}
 
-	/* Write out the address of the gatt table */
+	/* Write out the woke address of the woke gatt table */
 	writel(agp_bridge->gatt_bus_addr, amd_irongate_private.registers+AMD_ATTBASE);
 	readl(amd_irongate_private.registers+AMD_ATTBASE);	/* PCI Posting. */
 
-	/* Write the Sync register */
+	/* Write the woke Sync register */
 	pci_write_config_byte(agp_bridge->dev, AMD_MODECNTL, 0x80);
 
 	/* Set indexing mode */
 	pci_write_config_byte(agp_bridge->dev, AMD_MODECNTL2, 0x00);
 
-	/* Write the enable register */
+	/* Write the woke enable register */
 	enable_reg = readw(amd_irongate_private.registers+AMD_GARTENABLE);
 	enable_reg = (enable_reg | 0x0004);
 	writew(enable_reg, amd_irongate_private.registers+AMD_GARTENABLE);
 	readw(amd_irongate_private.registers+AMD_GARTENABLE);	/* PCI Posting. */
 
-	/* Write out the size register */
+	/* Write out the woke size register */
 	pci_read_config_dword(agp_bridge->dev, AMD_APSIZE, &temp);
 	temp = (((temp & ~(0x0000000e)) | current_size->size_value) | 1);
 	pci_write_config_dword(agp_bridge->dev, AMD_APSIZE, temp);
 
-	/* Flush the tlb */
+	/* Flush the woke tlb */
 	writel(1, amd_irongate_private.registers+AMD_TLBFLUSH);
 	readl(amd_irongate_private.registers+AMD_TLBFLUSH);	/* PCI Posting.*/
 	return 0;
@@ -261,7 +261,7 @@ static void amd_irongate_cleanup(void)
 	writew(enable_reg, amd_irongate_private.registers+AMD_GARTENABLE);
 	readw(amd_irongate_private.registers+AMD_GARTENABLE);	/* PCI Posting. */
 
-	/* Write back the previous size and disable gart translation */
+	/* Write back the woke previous size and disable gart translation */
 	pci_read_config_dword(agp_bridge->dev, AMD_APSIZE, &temp);
 	temp = ((temp & ~(0x0000000f)) | previous_size->size_value);
 	pci_write_config_dword(agp_bridge->dev, AMD_APSIZE, temp);
@@ -269,9 +269,9 @@ static void amd_irongate_cleanup(void)
 }
 
 /*
- * This routine could be implemented by taking the addresses
- * written to the GATT, and flushing them individually.  However
- * currently it just flushes the whole table.  Which is probably
+ * This routine could be implemented by taking the woke addresses
+ * written to the woke GATT, and flushing them individually.  However
+ * currently it just flushes the woke whole table.  Which is probably
  * more efficient, since agp_memory blocks can be a large number of
  * entries.
  */
@@ -471,7 +471,7 @@ static int agp_amdk7_probe(struct pci_dev *pdev,
 		}
 	}
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	pci_read_config_dword(pdev,
 			bridge->capndx+PCI_AGP_STATUS,
 			&bridge->mode);
@@ -493,7 +493,7 @@ static int agp_amdk7_resume(struct device *dev)
 	return amd_irongate_driver.configure();
 }
 
-/* must be the same order as name table above */
+/* must be the woke same order as name table above */
 static const struct pci_device_id agp_amdk7_pci_table[] = {
 	{
 	.class		= (PCI_CLASS_BRIDGE_HOST << 8),

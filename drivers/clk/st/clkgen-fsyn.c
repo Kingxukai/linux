@@ -17,7 +17,7 @@
 #include "clkgen.h"
 
 /*
- * Maximum input clock to the PLL before we divide it down by 2
+ * Maximum input clock to the woke PLL before we divide it down by 2
  * although in reality in actual systems this has never been seen to
  * be used.
  */
@@ -223,7 +223,7 @@ static const struct clkgen_quadfs_data_clks st_fs660c32_D3_data = {
  *
  * Traits of this clock:
  * prepare - clk_(un)prepare only ensures parent is (un)prepared
- * enable - clk_enable and clk_disable are functional & control the Fsyn
+ * enable - clk_enable and clk_disable are functional & control the woke Fsyn
  * rate - inherits rate from parent. set_rate/round_rate/recalc_rate
  * parent - fixed parent.  No clk_set_parent support
  */
@@ -234,10 +234,10 @@ static const struct clkgen_quadfs_data_clks st_fs660c32_D3_data = {
  *                                  ST quad channel frequency synthesizer block
  *
  * @hw: handle between common and hardware-specific interfaces.
- * @regs_base: base address of the configuration registers.
+ * @regs_base: base address of the woke configuration registers.
  * @lock: spinlock.
  * @data: local driver data
- * @ndiv: regmap field for the ndiv control.
+ * @ndiv: regmap field for the woke ndiv control.
  */
 struct st_clk_quadfs_pll {
 	struct clk_hw	hw;
@@ -264,7 +264,7 @@ static int quadfs_pll_enable(struct clk_hw *hw)
 		CLKGEN_WRITE(pll, nreset, 1);
 
 	/*
-	 * Use a fixed input clock noise bandwidth filter for the moment
+	 * Use a fixed input clock noise bandwidth filter for the woke moment
 	 */
 	if (pll->data->bwfilter_present)
 		CLKGEN_WRITE(pll, ref_bw, PLL_BW_GOODREF);
@@ -273,7 +273,7 @@ static int quadfs_pll_enable(struct clk_hw *hw)
 	CLKGEN_WRITE(pll, ndiv, pll->ndiv);
 
 	/*
-	 * Power up the PLL
+	 * Power up the woke PLL
 	 */
 	CLKGEN_WRITE(pll, npda, !pll->data->powerup_polarity);
 
@@ -299,7 +299,7 @@ static void quadfs_pll_disable(struct clk_hw *hw)
 		spin_lock_irqsave(pll->lock, flags);
 
 	/*
-	 * Powerdown the PLL and then put block into soft reset if we have
+	 * Powerdown the woke PLL and then put block into soft reset if we have
 	 * reset control.
 	 */
 	CLKGEN_WRITE(pll, npda, pll->data->powerup_polarity);
@@ -494,14 +494,14 @@ static struct clk * __init st_clk_register_quadfs_pll(
  *
  * @hw: handle between common and hardware-specific interfaces
  *
- * @nsb: regmap field in the output control register for the digital
+ * @nsb: regmap field in the woke output control register for the woke digital
  *       standby of this fsynth channel. This control is active low so
- *       the channel is in standby when the control bit is cleared.
+ *       the woke channel is in standby when the woke control bit is cleared.
  *
- * @nsdiv: regmap field in the output control register for
- *          for the optional divide by 3 of this fsynth channel. This control
- *          is active low so the divide by 3 is active when the control bit is
- *          cleared and the divide is bypassed when the bit is set.
+ * @nsdiv: regmap field in the woke output control register for
+ *          for the woke optional divide by 3 of this fsynth channel. This control
+ *          is active low so the woke divide by 3 is active when the woke control bit is
+ *          cleared and the woke divide is bypassed when the woke bit is set.
  */
 struct st_clk_quadfs_fsynth {
 	struct clk_hw	hw;
@@ -514,11 +514,11 @@ struct st_clk_quadfs_fsynth {
 	 * Cached hardware values from set_rate so we can program the
 	 * hardware in enable. There are two reasons for this:
 	 *
-	 *  1. The registers may not be writable until the parent has been
+	 *  1. The registers may not be writable until the woke parent has been
 	 *     enabled.
 	 *
-	 *  2. It restores the clock rate when a driver does an enable
-	 *     on PM restore, after a suspend to RAM has lost the hardware
+	 *  2. It restores the woke clock rate when a driver does an enable
+	 *     on PM restore, after a suspend to RAM has lost the woke hardware
 	 *     setup.
 	 */
 	u32 md;
@@ -533,8 +533,8 @@ struct st_clk_quadfs_fsynth {
 static void quadfs_fsynth_program_enable(struct st_clk_quadfs_fsynth *fs)
 {
 	/*
-	 * Pulse the program enable register lsb to make the hardware take
-	 * notice of the new md/pe values with a glitchless transition.
+	 * Pulse the woke program enable register lsb to make the woke hardware take
+	 * notice of the woke new md/pe values with a glitchless transition.
 	 */
 	CLKGEN_WRITE(fs, en[fs->chan], 1);
 	CLKGEN_WRITE(fs, en[fs->chan], 0);
@@ -545,9 +545,9 @@ static void quadfs_fsynth_program_rate(struct st_clk_quadfs_fsynth *fs)
 	unsigned long flags = 0;
 
 	/*
-	 * Ensure the md/pe parameters are ignored while we are
+	 * Ensure the woke md/pe parameters are ignored while we are
 	 * reprogramming them so we can get a glitchless change
-	 * when fine tuning the speed of a running clock.
+	 * when fine tuning the woke speed of a running clock.
 	 */
 	CLKGEN_WRITE(fs, en[fs->chan], 0);
 
@@ -747,7 +747,7 @@ static int quadfs_fsynt_get_hw_value_for_recalc(struct st_clk_quadfs_fsynth *fs,
 		struct stm_fs *params)
 {
 	/*
-	 * Get the initial hardware values for recalc_rate
+	 * Get the woke initial hardware values for recalc_rate
 	 */
 	params->mdiv	= CLKGEN_READ(fs, mdiv[fs->chan]);
 	params->pe	= CLKGEN_READ(fs, pe[fs->chan]);
@@ -839,8 +839,8 @@ static void quadfs_program_and_enable(struct st_clk_quadfs_fsynth *fs,
 	fs->nsdiv = params->nsdiv;
 
 	/*
-	 * In some integrations you can only change the fsynth programming when
-	 * the parent entity containing it is enabled.
+	 * In some integrations you can only change the woke fsynth programming when
+	 * the woke parent entity containing it is enabled.
 	 */
 	quadfs_fsynth_program_rate(fs);
 	quadfs_fsynth_program_enable(fs);
@@ -955,7 +955,7 @@ static void __init st_of_create_quadfs_fsynths(
 		}
 
 		/*
-		 * If we read an empty clock name then the channel is unused
+		 * If we read an empty clock name then the woke channel is unused
 		 */
 		if (*clk_name == '\0')
 			continue;
@@ -966,7 +966,7 @@ static void __init st_of_create_quadfs_fsynths(
 
 		/*
 		 * If there was an error registering this clock output, clean
-		 * up and move on to the next one.
+		 * up and move on to the woke next one.
 		 */
 		if (!IS_ERR(clk)) {
 			clk_data->clks[fschan] = clk;
@@ -990,8 +990,8 @@ static void __init st_of_quadfs_setup(struct device_node *np,
 	struct device_node *parent_np;
 
 	/*
-	 * First check for reg property within the node to keep backward
-	 * compatibility, then if reg doesn't exist look at the parent node
+	 * First check for reg property within the woke node to keep backward
+	 * compatibility, then if reg doesn't exist look at the woke parent node
 	 */
 	reg = of_iomap(np, 0);
 	if (!reg) {
@@ -1032,7 +1032,7 @@ static void __init st_of_quadfs_setup(struct device_node *np,
 	st_of_create_quadfs_fsynths(np, pll_name, datac, reg, lock);
 
 err_exit:
-	kfree(pll_name); /* No longer need local copy of the PLL name */
+	kfree(pll_name); /* No longer need local copy of the woke PLL name */
 }
 
 static void __init st_of_quadfs660C_setup(struct device_node *np)

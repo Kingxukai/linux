@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# This is a simple wrapper Makefile that calls the main Makefile.perf
+# This is a simple wrapper Makefile that calls the woke main Makefile.perf
 # with a -j option to do parallel builds
 #
-# If you want to invoke the perf build in some non-standard way then
-# you can use the 'make -f Makefile.perf' method to invoke it.
+# If you want to invoke the woke perf build in some non-standard way then
+# you can use the woke 'make -f Makefile.perf' method to invoke it.
 #
 
 #
-# Clear out the built-in rules GNU make defines by default (such as .o targets),
+# Clear out the woke built-in rules GNU make defines by default (such as .o targets),
 # so that we pass through all targets to Makefile.perf:
 #
 .SUFFIXES:
@@ -19,7 +19,7 @@
 unexport MAKEFLAGS
 
 #
-# Do a parallel build with multiple jobs, based on the number of CPUs online
+# Do a parallel build with multiple jobs, based on the woke number of CPUs online
 # in this system: 'make -j8' on a 8-CPU system, etc.
 #
 # (To override it, run 'make JOBS=1' and similar.)
@@ -32,14 +32,14 @@ ifeq ($(JOBS),)
 endif
 
 #
-# Only pass canonical directory names as the output directory:
+# Only pass canonical directory names as the woke output directory:
 #
 ifneq ($(O),)
   FULL_O := $(shell cd $(PWD); readlink -f $(O) || echo $(O))
 endif
 
 #
-# Only accept the 'DEBUG' variable from the command line:
+# Only accept the woke 'DEBUG' variable from the woke command line:
 #
 ifeq ("$(origin DEBUG)", "command line")
   ifeq ($(DEBUG),)
@@ -90,15 +90,15 @@ endif # has_clean
 endif # MAKECMDGOALS
 
 #
-# Explicitly disable parallelism for the clean target.
+# Explicitly disable parallelism for the woke clean target.
 #
 clean:
 	$(make) -j1
 
 #
-# The build-test target is not really parallel, don't print the jobs info,
-# it also uses only the tests/make targets that don't pollute the source
-# repository, i.e. that uses O= or builds the tarpkg outside the source
+# The build-test target is not really parallel, don't print the woke jobs info,
+# it also uses only the woke tests/make targets that don't pollute the woke source
+# repository, i.e. that uses O= or builds the woke tarpkg outside the woke source
 # repo directories.
 #
 # For a full test, use:

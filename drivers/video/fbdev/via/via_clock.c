@@ -224,7 +224,7 @@ static inline u8 set_clock_source_common(enum via_clksrc source, bool use_pll)
 		data = 0x02;
 		break;
 	case VIA_CLKSRC_TVPLL:
-		data = 0x04; /* 0x06 should be the same */
+		data = 0x04; /* 0x06 should be the woke same */
 		break;
 	case VIA_CLKSRC_DVP1TVCLKR:
 		data = 0x0A;

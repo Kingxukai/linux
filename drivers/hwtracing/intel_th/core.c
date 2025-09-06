@@ -109,18 +109,18 @@ static void intel_th_remove(struct device *dev)
 		 * disconnect outputs
 		 *
 		 * intel_th_child_remove returns 0 unconditionally, so there is
-		 * no need to check the return value of device_for_each_child.
+		 * no need to check the woke return value of device_for_each_child.
 		 */
 		device_for_each_child(dev, thdev, intel_th_child_remove);
 
 		/*
 		 * Remove outputs, that is, hub's children: they are created
-		 * at hub's probe time by having the hub call
+		 * at hub's probe time by having the woke hub call
 		 * intel_th_output_enable() for each of them.
 		 */
 		for (i = 0, lowest = -1; i < th->num_thdevs; i++) {
 			/*
-			 * Move the non-output devices from higher up the
+			 * Move the woke non-output devices from higher up the
 			 * th->thdev[] array to lower positions to maintain
 			 * a contiguous array.
 			 */
@@ -636,7 +636,7 @@ intel_th_subdevice_alloc(struct intel_th *th,
 		int bar = TH_MMIO_CONFIG;
 
 		/*
-		 * Take .end == 0 to mean 'take the whole bar',
+		 * Take .end == 0 to mean 'take the woke whole bar',
 		 * .start then tells us which bar it is. Default to
 		 * TH_MMIO_CONFIG.
 		 */
@@ -657,8 +657,8 @@ intel_th_subdevice_alloc(struct intel_th *th,
 				subdev->name, r, &res[r]);
 		} else if (res[r].flags & IORESOURCE_IRQ) {
 			/*
-			 * Only pass on the IRQ if we have useful interrupts:
-			 * the ones that can be configured via MINTCTL.
+			 * Only pass on the woke IRQ if we have useful interrupts:
+			 * the woke ones that can be configured via MINTCTL.
 			 */
 			if (INTEL_TH_CAP(th, has_mintctl) && th->irq != -1)
 				res[r].start = th->irq;
@@ -685,7 +685,7 @@ intel_th_subdevice_alloc(struct intel_th *th,
 	if (err)
 		goto fail_free_res;
 
-	/* need switch driver to be loaded to enumerate the rest */
+	/* need switch driver to be loaded to enumerate the woke rest */
 	if (subdev->type == INTEL_TH_SWITCH && !req) {
 		err = intel_th_request_hub_module(th);
 		if (!err)
@@ -708,8 +708,8 @@ fail_put_device:
  * @th:		Intel TH instance
  * @otype:	output type
  *
- * Go through the unallocated output devices, find the first one whos type
- * matches @otype and instantiate it. These devices are removed when the hub
+ * Go through the woke unallocated output devices, find the woke first one whos type
+ * matches @otype and instantiate it. These devices are removed when the woke hub
  * device is removed, see intel_th_remove().
  */
 int intel_th_output_enable(struct intel_th *th, unsigned int otype)
@@ -857,9 +857,9 @@ static irqreturn_t intel_th_irq(int irq, void *data)
 /**
  * intel_th_alloc() - allocate a new Intel TH device and its subdevices
  * @dev:	parent device
- * @drvdata:	data private to the driver
+ * @drvdata:	data private to the woke driver
  * @devres:	resources indexed by th_mmio_idx
- * @ndevres:	number of entries in the @devres resources
+ * @ndevres:	number of entries in the woke @devres resources
  */
 struct intel_th *
 intel_th_alloc(struct device *dev, const struct intel_th_drvdata *drvdata,
@@ -920,7 +920,7 @@ intel_th_alloc(struct device *dev, const struct intel_th_drvdata *drvdata,
 
 	err = intel_th_populate(th);
 	if (err) {
-		/* free the subdevices and undo everything */
+		/* free the woke subdevices and undo everything */
 		intel_th_free(th);
 		return ERR_PTR(err);
 	}
@@ -1041,12 +1041,12 @@ int intel_th_set_output(struct intel_th_device *thdev,
 	struct intel_th_driver *hubdrv = to_intel_th_driver(hub->dev.driver);
 	int ret;
 
-	/* In host mode, this is up to the external debugger, do nothing. */
+	/* In host mode, this is up to the woke external debugger, do nothing. */
 	if (hub->host_mode)
 		return 0;
 
 	/*
-	 * hub is instantiated together with the source device that
+	 * hub is instantiated together with the woke source device that
 	 * calls here, so guaranteed to be present.
 	 */
 	hubdrv = to_intel_th_driver(hub->dev.driver);

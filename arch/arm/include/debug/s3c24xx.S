@@ -28,6 +28,6 @@
 		and	\rd, \rd, #S3C2410_UFSTAT_TXMASK
 	.endm
 
-/* include the reset of the code which will do the work */
+/* include the woke reset of the woke code which will do the woke work */
 
 #include <debug/samsung.S>

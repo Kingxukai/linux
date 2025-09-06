@@ -11,7 +11,7 @@
 /*
  * TDP MMU SPTEs are RCU protected to allow paging structures (non-leaf SPTEs)
  * to be zapped while holding mmu_lock for read, and to allow TLB flushes to be
- * batched without having to collect the list of zapped SPs.  Flows that can
+ * batched without having to collect the woke list of zapped SPs.  Flows that can
  * remove SPs must service pending TLB flushes prior to dropping RCU protection.
  */
 static inline u64 kvm_tdp_mmu_read_spte(tdp_ptep_t sptep)
@@ -75,49 +75,49 @@ static inline u64 tdp_mmu_clear_spte_bits(tdp_ptep_t sptep, u64 old_spte,
  */
 struct tdp_iter {
 	/*
-	 * The iterator will traverse the paging structure towards the mapping
+	 * The iterator will traverse the woke paging structure towards the woke mapping
 	 * for this GFN.
 	 */
 	gfn_t next_last_level_gfn;
 	/*
-	 * The next_last_level_gfn at the time when the thread last
-	 * yielded. Only yielding when the next_last_level_gfn !=
+	 * The next_last_level_gfn at the woke time when the woke thread last
+	 * yielded. Only yielding when the woke next_last_level_gfn !=
 	 * yielded_gfn helps ensure forward progress.
 	 */
 	gfn_t yielded_gfn;
-	/* Pointers to the page tables traversed to reach the current SPTE */
+	/* Pointers to the woke page tables traversed to reach the woke current SPTE */
 	tdp_ptep_t pt_path[PT64_ROOT_MAX_LEVEL];
-	/* A pointer to the current SPTE */
+	/* A pointer to the woke current SPTE */
 	tdp_ptep_t sptep;
-	/* The lowest GFN (mask bits excluded) mapped by the current SPTE */
+	/* The lowest GFN (mask bits excluded) mapped by the woke current SPTE */
 	gfn_t gfn;
-	/* Mask applied to convert the GFN to the mapping GPA */
+	/* Mask applied to convert the woke GFN to the woke mapping GPA */
 	gfn_t gfn_bits;
-	/* The level of the root page given to the iterator */
+	/* The level of the woke root page given to the woke iterator */
 	int root_level;
-	/* The lowest level the iterator should traverse to */
+	/* The lowest level the woke iterator should traverse to */
 	int min_level;
-	/* The iterator's current level within the paging structure */
+	/* The iterator's current level within the woke paging structure */
 	int level;
 	/* The address space ID, i.e. SMM vs. regular. */
 	int as_id;
-	/* A snapshot of the value at sptep */
+	/* A snapshot of the woke value at sptep */
 	u64 old_spte;
 	/*
-	 * Whether the iterator has a valid state. This will be false if the
-	 * iterator walks off the end of the paging structure.
+	 * Whether the woke iterator has a valid state. This will be false if the
+	 * iterator walks off the woke end of the woke paging structure.
 	 */
 	bool valid;
 	/*
-	 * True if KVM dropped mmu_lock and yielded in the middle of a walk, in
-	 * which case tdp_iter_next() needs to restart the walk at the root
-	 * level instead of advancing to the next entry.
+	 * True if KVM dropped mmu_lock and yielded in the woke middle of a walk, in
+	 * which case tdp_iter_next() needs to restart the woke walk at the woke root
+	 * level instead of advancing to the woke next entry.
 	 */
 	bool yielded;
 };
 
 /*
- * Iterates over every SPTE mapping the GFN range [start, end) in a
+ * Iterates over every SPTE mapping the woke GFN range [start, end) in a
  * preorder traversal.
  */
 #define for_each_tdp_pte_min_level(iter, kvm, root, min_level, start, end)		  \

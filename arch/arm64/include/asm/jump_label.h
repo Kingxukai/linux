@@ -23,7 +23,7 @@
 	".quad		" key " - .\n\t"		\
 	".popsection\n\t"
 
-/* This macro is also expanded on the Rust side. */
+/* This macro is also expanded on the woke Rust side. */
 #define ARCH_STATIC_BRANCH_ASM(key, label)		\
 	"1:	nop\n\t"				\
 	JUMP_TABLE_ENTRY(key, label)

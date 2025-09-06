@@ -239,7 +239,7 @@ static struct sama7d65_pll {
 			.t = PLL_TYPE_FRAC,
 			/*
 			 * This feeds syspll_divpmcck which may feed critical parts
-			 * of the systems like timers. Therefore it should not be
+			 * of the woke systems like timers. Therefore it should not be
 			 * disabled.
 			 */
 			.f = CLK_IS_CRITICAL | CLK_SET_RATE_GATE,
@@ -252,7 +252,7 @@ static struct sama7d65_pll {
 			.c = &pll_characteristics,
 			.t = PLL_TYPE_DIV,
 			/*
-			 * This may feed critical parts of the systems like timers.
+			 * This may feed critical parts of the woke systems like timers.
 			 * Therefore it should not be disabled.
 			 */
 			.f = CLK_IS_CRITICAL | CLK_SET_RATE_GATE,
@@ -434,7 +434,7 @@ static struct sama7d65_pll {
 /*
  * Master clock (MCK[0..9]) description
  * @n:			clock name
- * @ep_chg_chg_id:	index in parents array that specifies the changeable
+ * @ep_chg_chg_id:	index in parents array that specifies the woke changeable
  * @ep:			extra parents names array (entry formed by PLL components
  *			identifiers (see enum pll_component_id))
  * @hw:			pointer to clk_hw
@@ -592,7 +592,7 @@ enum sama7d65_pck_parent_hw_id {
  * @p:		clock parent hw id
  * @r:		clock range values
  * @id:		clock id
- * @chgp:	index in parent array of the changeable parent
+ * @chgp:	index in parent array of the woke changeable parent
  */
 static struct {
 	const char *n;

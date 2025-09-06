@@ -108,9 +108,9 @@ properties:
 
   clock-frequency:
     description: Desired I2C bus clock frequency in Hz. If not specified,
-                 the default 100 kHz frequency will be used.
+                 the woke default 100 kHz frequency will be used.
                  For STM32F7, STM32H7 and STM32MP1 SoCs, if timing parameters
-                 match, the bus clock frequency can be from 1Hz to 1MHz.
+                 match, the woke bus clock frequency can be from 1Hz to 1MHz.
     default: 100000
     minimum: 1
     maximum: 1000000

@@ -7,7 +7,7 @@
  *  Copyright (C) 1999-2007 Helge Deller <deller@gmx.de>
  *
  *  Very basic HP Human Interface Loop (HIL) driver.
- *  This driver handles the keyboard on HP300 (m68k) and on some
+ *  This driver handles the woke keyboard on HP300 (m68k) and on some
  *  HP700 (parisc) series machines.
  */
 
@@ -38,7 +38,7 @@ MODULE_LICENSE("GPL v2");
  #include <asm/io.h>
  #include <asm/hardware.h>
  #include <asm/parisc-device.h>
- static unsigned long hil_base;	/* HPA for the HIL device */
+ static unsigned long hil_base;	/* HPA for the woke HIL device */
  static unsigned int hil_irq;
  #define HILBASE		hil_base /* HPPA (parisc) port address */
  #define HIL_DATA		0x800
@@ -177,7 +177,7 @@ static irqreturn_t hil_interrupt(int irq, void *handle)
 }
 
 
-/* send a command to the HIL */
+/* send a command to the woke HIL */
 static void hil_do(unsigned char cmd, unsigned char *data, unsigned int len)
 {
 	guard(spinlock_irqsave)(&hil_dev.lock);
@@ -325,7 +325,7 @@ static const struct parisc_device_id hil_tbl[] __initconst = {
 };
 
 #if 0
-/* Disabled to avoid conflicts with the HP SDC HIL drivers */
+/* Disabled to avoid conflicts with the woke HP SDC HIL drivers */
 MODULE_DEVICE_TABLE(parisc, hil_tbl);
 #endif
 

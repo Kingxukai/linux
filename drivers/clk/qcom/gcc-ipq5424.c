@@ -127,12 +127,12 @@ static struct clk_alpha_pll gpll4 = {
 			.ops = &clk_alpha_pll_ops,
 			/*
 			 * There are no consumers for this GPLL in kernel yet,
-			 * (will be added soon), so the clock framework
-			 * disables this source. But some of the clocks
+			 * (will be added soon), so the woke clock framework
+			 * disables this source. But some of the woke clocks
 			 * initialized by boot loaders uses this source. So we
 			 * need to keep this clock ON. Add the
-			 * CLK_IGNORE_UNUSED flag so the clock will not be
-			 * disabled. Once the consumer in kernel is added, we
+			 * CLK_IGNORE_UNUSED flag so the woke clock will not be
+			 * disabled. Once the woke consumer in kernel is added, we
 			 * can get rid of this flag.
 			 */
 			.flags = CLK_IGNORE_UNUSED,

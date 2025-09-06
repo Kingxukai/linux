@@ -74,7 +74,7 @@
 
 /* PDN_DONE Poll Maximum
  * If soft ramp is set it will take much longer to power down
- * the system.
+ * the woke system.
  */
 #define CS53L30_PDN_POLL_MAX	90
 

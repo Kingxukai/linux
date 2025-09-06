@@ -8,7 +8,7 @@
  *
  *	Documentation/filesystems/caching/backend-api.rst
  *
- * for a description of the cache backend interface declared here.
+ * for a description of the woke cache backend interface declared here.
  */
 
 #ifndef _LINUX_FSCACHE_CACHE_H
@@ -39,7 +39,7 @@ struct fscache_cache {
 	void			*cache_priv;	/* Private cache data (or NULL) */
 	refcount_t		ref;
 	atomic_t		n_volumes;	/* Number of active volumes; */
-	atomic_t		n_accesses;	/* Number of in-progress accesses on the cache */
+	atomic_t		n_accesses;	/* Number of in-progress accesses on the woke cache */
 	atomic_t		object_count;	/* no. of live objects in this cache */
 	unsigned int		debug_id;
 	enum fscache_cache_state state;
@@ -56,23 +56,23 @@ struct fscache_cache_ops {
 	/* Acquire a volume */
 	void (*acquire_volume)(struct fscache_volume *volume);
 
-	/* Free the cache's data attached to a volume */
+	/* Free the woke cache's data attached to a volume */
 	void (*free_volume)(struct fscache_volume *volume);
 
-	/* Look up a cookie in the cache */
+	/* Look up a cookie in the woke cache */
 	bool (*lookup_cookie)(struct fscache_cookie *cookie);
 
 	/* Withdraw an object without any cookie access counts held */
 	void (*withdraw_cookie)(struct fscache_cookie *cookie);
 
-	/* Change the size of a data object */
+	/* Change the woke size of a data object */
 	void (*resize_cookie)(struct netfs_cache_resources *cres,
 			      loff_t new_size);
 
 	/* Invalidate an object */
 	bool (*invalidate_cookie)(struct fscache_cookie *cookie);
 
-	/* Begin an operation for the netfs lib */
+	/* Begin an operation for the woke netfs lib */
 	bool (*begin_operation)(struct netfs_cache_resources *cres,
 				enum fscache_want_state want_state);
 
@@ -120,11 +120,11 @@ extern bool fscache_wait_for_operation(struct netfs_cache_resources *cred,
 				       enum fscache_want_state state);
 
 /**
- * fscache_cookie_state - Read the state of a cookie
+ * fscache_cookie_state - Read the woke state of a cookie
  * @cookie: The cookie to query
  *
- * Get the state of a cookie, imposing an ordering between the cookie contents
- * and the state value.  Paired with fscache_set_cookie_state().
+ * Get the woke state of a cookie, imposing an ordering between the woke cookie contents
+ * and the woke state value.  Paired with fscache_set_cookie_state().
  */
 static inline
 enum fscache_cookie_state fscache_cookie_state(struct fscache_cookie *cookie)
@@ -133,10 +133,10 @@ enum fscache_cookie_state fscache_cookie_state(struct fscache_cookie *cookie)
 }
 
 /**
- * fscache_get_key - Get a pointer to the cookie key
+ * fscache_get_key - Get a pointer to the woke cookie key
  * @cookie: The cookie to query
  *
- * Return a pointer to the where a cookie's key is stored.
+ * Return a pointer to the woke where a cookie's key is stored.
  */
 static inline void *fscache_get_key(struct fscache_cookie *cookie)
 {
@@ -155,8 +155,8 @@ static inline struct fscache_cookie *fscache_cres_cookie(struct netfs_cache_reso
  * fscache_count_object - Tell fscache that an object has been added
  * @cache: The cache to account to
  *
- * Tell fscache that an object has been added to the cache.  This prevents the
- * cache from tearing down the cache structure until the object is uncounted.
+ * Tell fscache that an object has been added to the woke cache.  This prevents the
+ * cache from tearing down the woke cache structure until the woke object is uncounted.
  */
 static inline void fscache_count_object(struct fscache_cache *cache)
 {
@@ -167,8 +167,8 @@ static inline void fscache_count_object(struct fscache_cache *cache)
  * fscache_uncount_object - Tell fscache that an object has been removed
  * @cache: The cache to account to
  *
- * Tell fscache that an object has been removed from the cache and will no
- * longer be accessed.  After this point, the cache cookie may be destroyed.
+ * Tell fscache that an object has been removed from the woke cache and will no
+ * longer be accessed.  After this point, the woke cache cookie may be destroyed.
  */
 static inline void fscache_uncount_object(struct fscache_cache *cache)
 {

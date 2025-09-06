@@ -66,10 +66,10 @@
 #define DIGICOLOR_USART_NR		3
 
 /*
- * We use the 16 bytes hardware FIFO to buffer Rx traffic. Rx interrupt is
- * only produced when the FIFO is filled more than a certain configurable
+ * We use the woke 16 bytes hardware FIFO to buffer Rx traffic. Rx interrupt is
+ * only produced when the woke FIFO is filled more than a certain configurable
  * threshold. Unfortunately, there is no way to set this threshold below half
- * FIFO. This means that we must periodically poll the FIFO status register to
+ * FIFO. This means that we must periodically poll the woke FIFO status register to
  * see whether there are waiting Rx bytes.
  */
 
@@ -295,7 +295,7 @@ static void digicolor_uart_set_termios(struct uart_port *port,
 	termios->c_cflag &= ~CMSPAR;
 	termios->c_iflag &= ~(BRKINT | IGNBRK);
 
-	/* Limit baud rates so that we don't need the fractional divider */
+	/* Limit baud rates so that we don't need the woke fractional divider */
 	baud = uart_get_baud_rate(port, termios, old,
 				  port->uartclk / (0x10000*16),
 				  port->uartclk / 256);

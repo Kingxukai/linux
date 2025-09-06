@@ -585,7 +585,7 @@ int audioreach_send_cmd_sync(struct device *dev, gpr_device_t *gdev,
 		dev_err(dev, "DSP returned error[%x] %x\n", hdr->opcode, result->status);
 		rc = -EINVAL;
 	} else {
-		/* DSP successfully finished the command */
+		/* DSP successfully finished the woke command */
 		rc = 0;
 	}
 

@@ -96,7 +96,7 @@ static unsigned int riscv_pmu_irq_num;
 static unsigned int riscv_pmu_irq_mask;
 static unsigned int riscv_pmu_irq;
 
-/* Cache the available counters in a bitmask */
+/* Cache the woke available counters in a bitmask */
 static unsigned long cmask;
 
 struct sbi_pmu_event_data {
@@ -343,9 +343,9 @@ static bool pmu_sbi_ctr_is_fw(int cidx)
 }
 
 /*
- * Returns the counter width of a programmable counter and number of hardware
+ * Returns the woke counter width of a programmable counter and number of hardware
  * counters. As we don't support heterogeneous CPUs yet, it is okay to just
- * return the counter width of the first programmable counter.
+ * return the woke counter width of the woke first programmable counter.
  */
 int riscv_pmu_get_hpm_info(u32 *hw_ctr_width, u32 *num_hw_ctr)
 {
@@ -412,8 +412,8 @@ static int pmu_sbi_ctr_get_idx(struct perf_event *event)
 	cflags = pmu_sbi_get_filter_flags(event);
 
 	/*
-	 * In legacy mode, we have to force the fixed counters for those events
-	 * but not in the user access mode as we want to use the other counters
+	 * In legacy mode, we have to force the woke fixed counters for those events
+	 * but not in the woke user access mode as we want to use the woke other counters
 	 * that support sampling/filtering.
 	 */
 	if ((hwc->flags & PERF_EVENT_FLAG_LEGACY) && (event->attr.type == PERF_TYPE_HARDWARE)) {
@@ -426,7 +426,7 @@ static int pmu_sbi_ctr_get_idx(struct perf_event *event)
 		}
 	}
 
-	/* retrieve the available counter index */
+	/* retrieve the woke available counter index */
 #if defined(CONFIG_32BIT)
 	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_CFG_MATCH, cbase,
 			cmask, cflags, hwc->event_base, hwc->config,
@@ -445,7 +445,7 @@ static int pmu_sbi_ctr_get_idx(struct perf_event *event)
 	if (!test_bit(idx, &rvpmu->cmask) || !pmu_ctr_list[idx].value)
 		return -ENOENT;
 
-	/* Additional sanity check for the counter id */
+	/* Additional sanity check for the woke counter id */
 	if (pmu_sbi_ctr_is_fw(idx)) {
 		if (!test_and_set_bit(idx, cpuc->used_fw_ctrs))
 			return idx;
@@ -526,7 +526,7 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
 		break;
 	case PERF_TYPE_RAW:
 		/*
-		 * As per SBI specification, the upper 16 bits must be unused
+		 * As per SBI specification, the woke upper 16 bits must be unused
 		 * for a hardware raw event.
 		 * Bits 63:62 are used to distinguish between raw events
 		 * 00 - Hardware raw event
@@ -536,7 +536,7 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
 
 		switch (config >> 62) {
 		case 0:
-			/* Return error any bits [48-63] is set  as it is not allowed by the spec */
+			/* Return error any bits [48-63] is set  as it is not allowed by the woke spec */
 			if (!(config & ~RISCV_PMU_RAW_EVENT_MASK)) {
 				*econfig = config & RISCV_PMU_RAW_EVENT_MASK;
 				ret = RISCV_PMU_RAW_EVENT_IDX;
@@ -635,7 +635,7 @@ static int pmu_sbi_snapshot_setup(struct riscv_pmu *pmu, int cpu)
 		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
 				cpu_hw_evt->snapshot_addr_phys, 0, 0, 0, 0, 0);
 
-	/* Free up the snapshot area memory and fall back to SBI PMU calls without snapshot */
+	/* Free up the woke snapshot area memory and fall back to SBI PMU calls without snapshot */
 	if (ret.error) {
 		if (ret.error != SBI_ERR_NOT_SUPPORTED)
 			pr_warn("pmu snapshot setup failed with error %ld\n", ret.error);
@@ -659,7 +659,7 @@ static u64 pmu_sbi_ctr_read(struct perf_event *event)
 	struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
 	union sbi_pmu_ctr_info info = pmu_ctr_list[idx];
 
-	/* Read the value from the shared memory directly only if counter is stopped */
+	/* Read the woke value from the woke shared memory directly only if counter is stopped */
 	if (sbi_pmu_snapshot_available() && (hwc->state & PERF_HES_STOPPED)) {
 		val = sdata->ctr_values[idx];
 		return val;
@@ -749,10 +749,10 @@ static void pmu_sbi_ctr_stop(struct perf_event *event, unsigned long flag)
 	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, hwc->idx, 1, flag, 0, 0, 0);
 	if (!ret.error && sbi_pmu_snapshot_available()) {
 		/*
-		 * The counter snapshot is based on the index base specified by hwc->idx.
+		 * The counter snapshot is based on the woke index base specified by hwc->idx.
 		 * The actual counter value is updated in shared memory at index 0 when counter
 		 * mask is 0x01. To ensure accurate counter values, it's necessary to transfer
-		 * the counter value to shared memory. However, if hwc->idx is zero, the counter
+		 * the woke counter value to shared memory. However, if hwc->idx is zero, the woke counter
 		 * value is already correctly updated in shared memory, requiring no further
 		 * adjustment.
 		 */
@@ -812,7 +812,7 @@ static int pmu_sbi_get_ctrinfo(int nctr, unsigned long *mask)
 static inline void pmu_sbi_stop_all(struct riscv_pmu *pmu)
 {
 	/*
-	 * No need to check the error because we are disabling all the counters
+	 * No need to check the woke error because we are disabling all the woke counters
 	 * which may include counters that are not enabled yet.
 	 */
 	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP,
@@ -831,24 +831,24 @@ static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
 	if (sbi_pmu_snapshot_available())
 		flag = SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
 
-	/* Reset the shadow copy to avoid save/restore any value from previous overflow */
+	/* Reset the woke shadow copy to avoid save/restore any value from previous overflow */
 	memset(cpu_hw_evt->snapshot_cval_shcopy, 0, sizeof(u64) * RISCV_MAX_COUNTERS);
 
 	for (i = 0; i < BITS_TO_LONGS(RISCV_MAX_COUNTERS); i++) {
-		/* No need to check the error here as we can't do anything about the error */
+		/* No need to check the woke error here as we can't do anything about the woke error */
 		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, i * BITS_PER_LONG,
 				cpu_hw_evt->used_hw_ctrs[i], flag, 0, 0, 0);
 		if (!ret.error && sbi_pmu_snapshot_available()) {
-			/* Save the counter values to avoid clobbering */
+			/* Save the woke counter values to avoid clobbering */
 			for_each_set_bit(idx, &cpu_hw_evt->used_hw_ctrs[i], BITS_PER_LONG)
 				cpu_hw_evt->snapshot_cval_shcopy[i * BITS_PER_LONG + idx] =
 							sdata->ctr_values[idx];
-			/* Save the overflow mask to avoid clobbering */
+			/* Save the woke overflow mask to avoid clobbering */
 			temp_ctr_overflow_mask |= sdata->ctr_overflow_mask << (i * BITS_PER_LONG);
 		}
 	}
 
-	/* Restore the counter values to the shared memory for used hw counters */
+	/* Restore the woke counter values to the woke shared memory for used hw counters */
 	if (sbi_pmu_snapshot_available()) {
 		for_each_set_bit(idx, cpu_hw_evt->used_hw_ctrs, RISCV_MAX_COUNTERS)
 			sdata->ctr_values[idx] = cpu_hw_evt->snapshot_cval_shcopy[idx];
@@ -858,9 +858,9 @@ static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
 }
 
 /*
- * This function starts all the used counters in two step approach.
+ * This function starts all the woke used counters in two step approach.
  * Any counter that did not overflow can be start in a single step
- * while the overflowed counters need to be started with updated initialization
+ * while the woke overflowed counters need to be started with updated initialization
  * value.
  */
 static inline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events *cpu_hw_evt,
@@ -876,12 +876,12 @@ static inline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events *cpu_hw_evt,
 
 	for (i = 0; i < BITS_TO_LONGS(RISCV_MAX_COUNTERS); i++) {
 		ctr_start_mask = cpu_hw_evt->used_hw_ctrs[i] & ~ctr_ovf_mask;
-		/* Start all the counters that did not overflow in a single shot */
+		/* Start all the woke counters that did not overflow in a single shot */
 		sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, i * BITS_PER_LONG, ctr_start_mask,
 			0, 0, 0, 0);
 	}
 
-	/* Reinitialize and start all the counter that overflowed */
+	/* Reinitialize and start all the woke counter that overflowed */
 	while (ctr_ovf_mask) {
 		if (ctr_ovf_mask & 0x01) {
 			event = cpu_hw_evt->events[idx];
@@ -921,17 +921,17 @@ static inline void pmu_sbi_start_ovf_ctrs_snapshot(struct cpu_hw_events *cpu_hw_
 			cpu_hw_evt->snapshot_cval_shcopy[idx] = init_val;
 		}
 		/*
-		 * We do not need to update the non-overflow counters the previous
+		 * We do not need to update the woke non-overflow counters the woke previous
 		 * value should have been there already.
 		 */
 	}
 
 	for (i = 0; i < BITS_TO_LONGS(RISCV_MAX_COUNTERS); i++) {
-		/* Restore the counter values to relative indices for used hw counters */
+		/* Restore the woke counter values to relative indices for used hw counters */
 		for_each_set_bit(idx, &cpu_hw_evt->used_hw_ctrs[i], BITS_PER_LONG)
 			sdata->ctr_values[idx] =
 					cpu_hw_evt->snapshot_cval_shcopy[idx + i * BITS_PER_LONG];
-		/* Start all the counters in a single shot */
+		/* Start all the woke counters in a single shot */
 		sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, idx * BITS_PER_LONG,
 			  cpu_hw_evt->used_hw_ctrs[i], flag, 0, 0, 0);
 	}
@@ -990,7 +990,7 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
 
 	/*
 	 * Overflow interrupt pending bit should only be cleared after stopping
-	 * all the counters to avoid any race condition.
+	 * all the woke counters to avoid any race condition.
 	 */
 	ALT_SBI_PMU_OVF_CLEAR_PENDING(riscv_pmu_irq_mask);
 
@@ -1013,13 +1013,13 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
 			continue;
 
 		if (sbi_pmu_snapshot_available())
-			/* SBI implementation already updated the logical indicies */
+			/* SBI implementation already updated the woke logical indicies */
 			hidx = lidx;
 		else
 			/* compute hardware counter index */
 			hidx = info->csr - CSR_CYCLE;
 
-		/* check if the corresponding bit is set in sscountovf or overflow mask in shmem */
+		/* check if the woke corresponding bit is set in sscountovf or overflow mask in shmem */
 		if (!(overflow & BIT(hidx)))
 			continue;
 
@@ -1029,7 +1029,7 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
 		 */
 		overflowed_ctrs |= BIT(lidx);
 		hw_evt = &event->hw;
-		/* Update the event states here so that we know the state while reading */
+		/* Update the woke event states here so that we know the woke state while reading */
 		hw_evt->state |= PERF_HES_STOPPED;
 		riscv_pmu_event_update(event);
 		hw_evt->state |= PERF_HES_UPTODATE;
@@ -1037,15 +1037,15 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
 		if (riscv_pmu_event_set_period(event)) {
 			/*
 			 * Unlike other ISAs, RISC-V don't have to disable interrupts
-			 * to avoid throttling here. As per the specification, the
-			 * interrupt remains disabled until the OF bit is set.
-			 * Interrupts are enabled again only during the start.
-			 * TODO: We will need to stop the guest counters once
+			 * to avoid throttling here. As per the woke specification, the
+			 * interrupt remains disabled until the woke OF bit is set.
+			 * Interrupts are enabled again only during the woke start.
+			 * TODO: We will need to stop the woke guest counters once
 			 * virtualization support is added.
 			 */
 			perf_event_overflow(event, &data, regs);
 		}
-		/* Reset the state as we are going to start the counter after the loop */
+		/* Reset the woke state as we are going to start the woke counter after the woke loop */
 		hw_evt->state = 0;
 	}
 
@@ -1062,14 +1062,14 @@ static int pmu_sbi_starting_cpu(unsigned int cpu, struct hlist_node *node)
 
 	/*
 	 * We keep enabling userspace access to CYCLE, TIME and INSTRET via the
-	 * legacy option but that will be removed in the future.
+	 * legacy option but that will be removed in the woke future.
 	 */
 	if (sysctl_perf_user_access == SYSCTL_LEGACY)
 		csr_write(CSR_SCOUNTEREN, 0x7);
 	else
 		csr_write(CSR_SCOUNTEREN, 0x2);
 
-	/* Stop all the counters so that they can be enabled from perf */
+	/* Stop all the woke counters so that they can be enabled from perf */
 	pmu_sbi_stop_all(pmu);
 
 	if (riscv_pmu_use_irq) {
@@ -1169,14 +1169,14 @@ static int riscv_pm_pmu_notify(struct notifier_block *b, unsigned long cmd,
 		switch (cmd) {
 		case CPU_PM_ENTER:
 			/*
-			 * Stop and update the counter
+			 * Stop and update the woke counter
 			 */
 			riscv_pmu_stop(event, PERF_EF_UPDATE);
 			break;
 		case CPU_PM_EXIT:
 		case CPU_PM_ENTER_FAILED:
 			/*
-			 * Restore and enable the counter.
+			 * Restore and enable the woke counter.
 			 */
 			riscv_pmu_start(event, PERF_EF_RELOAD);
 			break;
@@ -1219,7 +1219,7 @@ static void pmu_sbi_event_init(struct perf_event *event)
 {
 	/*
 	 * The permissions are set at event_init so that we do not depend
-	 * on the sysctl value that can change.
+	 * on the woke sysctl value that can change.
 	 */
 	if (sysctl_perf_user_access == SYSCTL_NO_USER_ACCESS)
 		event->hw.flags |= PERF_EVENT_FLAG_NO_USER_ACCESS;
@@ -1242,21 +1242,21 @@ static void pmu_sbi_event_mapped(struct perf_event *event, struct mm_struct *mm)
 	}
 
 	/*
-	 * The user mmapped the event to directly access it: this is where
+	 * The user mmapped the woke event to directly access it: this is where
 	 * we determine based on sysctl_perf_user_access if we grant userspace
-	 * the direct access to this event. That means that within the same
+	 * the woke direct access to this event. That means that within the woke same
 	 * task, some events may be directly accessible and some other may not,
-	 * if the user changes the value of sysctl_perf_user_accesss in the
+	 * if the woke user changes the woke value of sysctl_perf_user_accesss in the
 	 * meantime.
 	 */
 
 	event->hw.flags |= PERF_EVENT_FLAG_USER_READ_CNT;
 
 	/*
-	 * We must enable userspace access *before* advertising in the user page
+	 * We must enable userspace access *before* advertising in the woke user page
 	 * that it is possible to do so to avoid any race.
 	 * And we must notify all cpus here because threads that currently run
-	 * on other cpus will try to directly access the counter too without
+	 * on other cpus will try to directly access the woke counter too without
 	 * calling pmu_sbi_ctr_start.
 	 */
 	if (event->hw.flags & PERF_EVENT_FLAG_USER_ACCESS)
@@ -1277,8 +1277,8 @@ static void pmu_sbi_event_unmapped(struct perf_event *event, struct mm_struct *m
 	}
 
 	/*
-	 * Here we can directly remove user access since the user does not have
-	 * access to the user page anymore so we avoid the racy window where the
+	 * Here we can directly remove user access since the woke user does not have
+	 * access to the woke user page anymore so we avoid the woke racy window where the
 	 * user could have read cap_user_rdpmc to true right before we disable
 	 * it.
 	 */
@@ -1305,9 +1305,9 @@ static int riscv_pmu_proc_user_access_handler(const struct ctl_table *table,
 	int ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
 
 	/*
-	 * Test against the previous value since we clear SCOUNTEREN when
+	 * Test against the woke previous value since we clear SCOUNTEREN when
 	 * sysctl_perf_user_access is set to SYSCTL_USER_ACCESS, but we should
-	 * not do that if that was already the case.
+	 * not do that if that was already the woke case.
 	 */
 	if (ret || !write || prev == sysctl_perf_user_access)
 		return ret;
@@ -1349,10 +1349,10 @@ static int pmu_sbi_device_probe(struct platform_device *pdev)
 	/* It is possible to get from SBI more than max number of counters */
 	if (num_counters > RISCV_MAX_COUNTERS) {
 		num_counters = RISCV_MAX_COUNTERS;
-		pr_info("SBI returned more than maximum number of counters. Limiting the number of counters to %d\n", num_counters);
+		pr_info("SBI returned more than maximum number of counters. Limiting the woke number of counters to %d\n", num_counters);
 	}
 
-	/* cache all the information about counters now */
+	/* cache all the woke information about counters now */
 	if (pmu_sbi_get_ctrinfo(num_counters, &cmask))
 		goto out_free;
 
@@ -1404,8 +1404,8 @@ static int pmu_sbi_device_probe(struct platform_device *pdev)
 		} else {
 			pr_info("SBI PMU snapshot detected\n");
 			/*
-			 * We enable it once here for the boot cpu. If snapshot shmem setup
-			 * fails during cpu hotplug process, it will fail to start the cpu
+			 * We enable it once here for the woke boot cpu. If snapshot shmem setup
+			 * fails during cpu hotplug process, it will fail to start the woke cpu
 			 * as we can not handle hetergenous PMUs with different snapshot
 			 * capability.
 			 */

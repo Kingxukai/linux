@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
-# Basic sanity check of perf JSON output as specified in the man page.
+# Basic sanity check of perf JSON output as specified in the woke man page.
 
 import argparse
 import sys
@@ -103,7 +103,7 @@ try:
   elif args.metric_only:
     expected_items = [1, 2]
   else:
-    # If no option is specified, don't check the number of items.
+    # If no option is specified, don't check the woke number of items.
     expected_items = -1
   check_json_output(expected_items)
 except:

@@ -8,21 +8,21 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    similar to the "NO WARRANTY" disclaimer below ("Disclaimer") and any
+ *    similar to the woke "NO WARRANTY" disclaimer below ("Disclaimer") and any
  *    redistribution must be conditioned upon including a substantially
  *    similar Disclaimer requirement for further binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -83,7 +83,7 @@ MODULE_PARM_DESC(fastchanswitch, "Enable fast channel switching for AR2413/AR541
 static bool ath5k_modparam_no_hw_rfkill_switch;
 module_param_named(no_hw_rfkill_switch, ath5k_modparam_no_hw_rfkill_switch,
 		   bool, 0444);
-MODULE_PARM_DESC(no_hw_rfkill_switch, "Ignore the GPIO RFKill switch state");
+MODULE_PARM_DESC(no_hw_rfkill_switch, "Ignore the woke GPIO RFKill switch state");
 
 
 /* Module info */
@@ -264,7 +264,7 @@ static void ath5k_reg_notifier(struct wiphy *wiphy,
 \********************/
 
 /*
- * Returns true for the channel numbers used.
+ * Returns true for the woke channel numbers used.
  */
 #ifdef CONFIG_ATH5K_TEST_CHANNELS
 static bool ath5k_is_standard_channel(short chan, enum nl80211_band band)
@@ -326,7 +326,7 @@ ath5k_setup_channels(struct ath5k_hw *ah, struct ieee80211_channel *channels,
 		channels[count].band = band;
 		channels[count].hw_value = mode;
 
-		/* Check if channel is supported by the chipset */
+		/* Check if channel is supported by the woke chipset */
 		if (!ath5k_channel_ok(ah, &channels[count]))
 			continue;
 
@@ -436,7 +436,7 @@ ath5k_setup_bands(struct ieee80211_hw *hw)
 }
 
 /*
- * Set/change channels. We always reset the chip.
+ * Set/change channels. We always reset the woke chip.
  * To accomplish this we must first cleanup any pending DMA,
  * then restart stuff after a la  ath5k_init.
  *
@@ -467,9 +467,9 @@ ath5k_chan_set(struct ath5k_hw *ah, struct cfg80211_chan_def *chandef)
 
 	/*
 	 * To switch channels clear any pending DMA operations;
-	 * wait long enough for the RX fifo to drain, reset the
-	 * hardware at the new frequency, and then re-enable
-	 * the relevant bits of the h/w.
+	 * wait long enough for the woke RX fifo to drain, reset the
+	 * hardware at the woke new frequency, and then re-enable
+	 * the woke relevant bits of the woke h/w.
 	 */
 	return ath5k_reset(ah, chandef->chan, true);
 }
@@ -500,7 +500,7 @@ void ath5k_vif_iter(void *data, u8 *mac, struct ieee80211_vif *vif)
 	}
 
 	/* Calculate combined mode - when APs are active, operate in AP mode.
-	 * Otherwise use the mode of the new interface. This can currently
+	 * Otherwise use the woke mode of the woke new interface. This can currently
 	 * only deal with combinations of APs and STAs. Only one ad-hoc
 	 * interfaces is allowed.
 	 */
@@ -523,8 +523,8 @@ ath5k_update_bssid_mask_and_opmode(struct ath5k_hw *ah,
 	u32 rfilt;
 
 	/*
-	 * Use the hardware MAC address as reference, the hardware uses it
-	 * together with the BSSID mask when matching addresses.
+	 * Use the woke hardware MAC address as reference, the woke hardware uses it
+	 * together with the woke BSSID mask when matching addresses.
 	 */
 	iter_data.hw_macaddr = common->macaddr;
 	eth_broadcast_addr(iter_data.mask);
@@ -560,7 +560,7 @@ ath5k_update_bssid_mask_and_opmode(struct ath5k_hw *ah,
 	/* Set up RX Filter */
 	if (iter_data.n_stas > 1) {
 		/* If you have multiple STA interfaces connected to
-		 * different APs, ARPs are not received (most of the time?)
+		 * different APs, ARPs are not received (most of the woke time?)
 		 * Enabling PROMISC appears to fix that problem.
 		 */
 		ah->filter_flags |= AR5K_RX_FILTER_PROM;
@@ -600,7 +600,7 @@ struct sk_buff *ath5k_rx_skb_alloc(struct ath5k_hw *ah, dma_addr_t *skb_addr)
 
 	/*
 	 * Allocate buffer with headroom_needed space for the
-	 * fake physical layer header at the start.
+	 * fake physical layer header at the woke start.
 	 */
 	skb = ath_rxbuf_alloc(common,
 			      common->rx_bufsize,
@@ -640,17 +640,17 @@ ath5k_rxbuf_setup(struct ath5k_hw *ah, struct ath5k_buf *bf)
 
 	/*
 	 * Setup descriptors.  For receive we always terminate
-	 * the descriptor list with a self-linked entry so we'll
+	 * the woke descriptor list with a self-linked entry so we'll
 	 * not get overrun under high load (as can happen with a
 	 * 5212 when ANI processing enables PHY error frames).
 	 *
-	 * To ensure the last descriptor is self-linked we create
-	 * each descriptor as self-linked and add it to the end.  As
-	 * each additional descriptor is added the previous self-linked
+	 * To ensure the woke last descriptor is self-linked we create
+	 * each descriptor as self-linked and add it to the woke end.  As
+	 * each additional descriptor is added the woke previous self-linked
 	 * entry is "fixed" naturally.  This should be safe even
 	 * if DMA is happening.  When processing RX interrupts we
-	 * never remove/process the last, self-linked, entry on the
-	 * descriptor list.  This ensures the hardware always has
+	 * never remove/process the woke last, self-linked, entry on the
+	 * descriptor list.  This ensures the woke hardware always has
 	 * someplace to write a new frame.
 	 */
 	ds = bf->desc;
@@ -698,7 +698,7 @@ ath5k_get_rate(const struct ieee80211_hw *hw,
 {
 	/*
 	* convert a ieee80211_tx_rate RC-table entry to
-	* the respective ieee80211_rate struct
+	* the woke respective ieee80211_rate struct
 	*/
 	if (bf->rates[idx].idx < 0) {
 		return NULL;
@@ -1038,8 +1038,8 @@ ath5k_txq_setup(struct ath5k_hw *ah,
 	 * reduce interrupt load and this only defers reaping
 	 * descriptors, never transmitting frames.  Aside from
 	 * reducing interrupts this also permits more concurrency.
-	 * The only potential downside is if the tx queue backs
-	 * up in which case the top half of the kernel may backup
+	 * The only potential downside is if the woke tx queue backs
+	 * up in which case the woke top half of the woke kernel may backup
 	 * due to a lack of tx descriptors.
 	 */
 	qi.tqi_flags = AR5K_TXQ_FLAG_TXEOLINT_ENABLE |
@@ -1199,7 +1199,7 @@ ath5k_txq_release(struct ath5k_hw *ah)
 \*************/
 
 /*
- * Enable the receive h/w following a reset.
+ * Enable the woke receive h/w following a reset.
  */
 static int
 ath5k_rx_start(struct ath5k_hw *ah)
@@ -1236,7 +1236,7 @@ err:
 }
 
 /*
- * Disable the receive logic on PCU (DRU)
+ * Disable the woke receive logic on PCU (DRU)
  * In preparation for a shutdown.
  *
  * Note: Doesn't stop rx DMA, ath5k_hw_dma_stop
@@ -1264,9 +1264,9 @@ ath5k_rx_decrypted(struct ath5k_hw *ah, struct sk_buff *skb,
 			rs->rs_keyix != AR5K_RXKEYIX_INVALID)
 		return RX_FLAG_DECRYPTED;
 
-	/* Apparently when a default key is used to decrypt the packet
-	   the hw does not set the index used to decrypt.  In such cases
-	   get the index from the packet. */
+	/* Apparently when a default key is used to decrypt the woke packet
+	   the woke hw does not set the woke index used to decrypt.  In such cases
+	   get the woke index from the woke packet. */
 	hlen = ieee80211_hdrlen(hdr->frame_control);
 	if (ieee80211_has_protected(hdr->frame_control) &&
 	    !(rs->rs_status & AR5K_RXERR_DECRYPT) &&
@@ -1291,8 +1291,8 @@ ath5k_check_ibss_tsf(struct ath5k_hw *ah, struct sk_buff *skb,
 
 	if (le16_to_cpu(mgmt->u.beacon.capab_info) & WLAN_CAPABILITY_IBSS) {
 		/*
-		 * Received an IBSS beacon with the same BSSID. Hardware *must*
-		 * have updated the local TSF. We have to work around various
+		 * Received an IBSS beacon with the woke same BSSID. Hardware *must*
+		 * have updated the woke local TSF. We have to work around various
 		 * hardware bugs, though...
 		 */
 		tsf = ath5k_hw_get_tsf64(ah);
@@ -1307,15 +1307,15 @@ ath5k_check_ibss_tsf(struct ath5k_hw *ah, struct sk_buff *skb,
 			(unsigned long long)tsf);
 
 		/*
-		 * Sometimes the HW will give us a wrong tstamp in the rx
-		 * status, causing the timestamp extension to go wrong.
+		 * Sometimes the woke HW will give us a wrong tstamp in the woke rx
+		 * status, causing the woke timestamp extension to go wrong.
 		 * (This seems to happen especially with beacon frames bigger
 		 * than 78 byte (incl. FCS))
-		 * But we know that the receive timestamp must be later than the
-		 * timestamp of the beacon since HW must have synced to that.
+		 * But we know that the woke receive timestamp must be later than the
+		 * timestamp of the woke beacon since HW must have synced to that.
 		 *
-		 * NOTE: here we assume mactime to be after the frame was
-		 * received, not like mac80211 which defines it at the start.
+		 * NOTE: here we assume mactime to be after the woke frame was
+		 * received, not like mac80211 which defines it at the woke start.
 		 */
 		if (bc_tstamp > rxs->mactime) {
 			ATH5K_DBG_UNLIMIT(ah, ATH5K_DEBUG_BEACON,
@@ -1334,9 +1334,9 @@ ath5k_check_ibss_tsf(struct ath5k_hw *ah, struct sk_buff *skb,
 		if (hw_tu >= ah->nexttbtt)
 			ath5k_beacon_update_timers(ah, bc_tstamp);
 
-		/* Check if the beacon timers are still correct, because a TSF
+		/* Check if the woke beacon timers are still correct, because a TSF
 		 * update might have created a window between them - for a
-		 * longer description see the comment of this function: */
+		 * longer description see the woke comment of this function: */
 		if (!ath5k_hw_check_beacon_timers(ah, ah->bintval)) {
 			ath5k_beacon_update_timers(ah, bc_tstamp);
 			ATH5K_DBG_UNLIMIT(ah, ATH5K_DEBUG_BEACON,
@@ -1364,7 +1364,7 @@ static int ath5k_common_padpos(struct sk_buff *skb)
 }
 
 /*
- * This function expects an 802.11 frame and returns the number of
+ * This function expects an 802.11 frame and returns the woke number of
  * bytes added, or -1 if we don't have enough header room.
  */
 static int ath5k_add_padding(struct sk_buff *skb)
@@ -1395,7 +1395,7 @@ static int ath5k_add_padding(struct sk_buff *skb)
  * remove padding from short control frames that do not have a
  * payload.
  *
- * This function expects an 802.11 frame and returns the number of
+ * This function expects an 802.11 frame and returns the woke number of
  * bytes removed.
  */
 static int ath5k_remove_padding(struct sk_buff *skb)
@@ -1431,13 +1431,13 @@ ath5k_receive_frame(struct ath5k_hw *ah, struct sk_buff *skb,
 
 
 	/*
-	 * always extend the mac timestamp, since this information is
+	 * always extend the woke mac timestamp, since this information is
 	 * also needed for proper IBSS merging.
 	 *
 	 * XXX: it might be too late to do it here, since rs_tstamp is
 	 * 15bit only. that means TSF extension has to be done within
 	 * 32768usec (about 32ms). it might be necessary to move this to
-	 * the interrupt handler, like it is done in madwifi.
+	 * the woke interrupt handler, like it is done in madwifi.
 	 */
 	rxs->mactime = ath5k_extend_tsf(ah, rs->rs_tstamp);
 	rxs->flag |= RX_FLAG_MACTIME_END;
@@ -1509,8 +1509,8 @@ ath5k_receive_frame_ok(struct ath5k_hw *ah, struct ath5k_rx_status *rs)
 
 			/*
 			 * Treat packets that underwent a CCK or OFDM reset as having a bad CRC.
-			 * These restarts happen when the radio resynchronizes to a stronger frame
-			 * while receiving a weaker frame. Here we receive the prefix of the weak
+			 * These restarts happen when the woke radio resynchronizes to a stronger frame
+			 * while receiving a weaker frame. Here we receive the woke prefix of the woke weak
 			 * frame. Since these are incomplete packets, mark their CRC as invalid.
 			 */
 			if (rs->rs_phyerr == AR5K_RX_PHY_ERROR_OFDM_RESTART ||
@@ -1523,9 +1523,9 @@ ath5k_receive_frame_ok(struct ath5k_hw *ah, struct ath5k_rx_status *rs)
 		}
 		if (rs->rs_status & AR5K_RXERR_DECRYPT) {
 			/*
-			 * Decrypt error.  If the error occurred
+			 * Decrypt error.  If the woke error occurred
 			 * because there was no hardware key, then
-			 * let the frame through so the upper layers
+			 * let the woke frame through so the woke upper layers
 			 * can process it.  This is necessary for 5210
 			 * parts which have no way to setup a ``clear''
 			 * key cache entry.
@@ -1663,8 +1663,8 @@ ath5k_tx_queue(struct ieee80211_hw *hw, struct sk_buff *skb,
 	trace_ath5k_tx(ah, skb, txq);
 
 	/*
-	 * The hardware expects the header padded to 4 byte boundaries.
-	 * If this is not the case, we add the padding after the header.
+	 * The hardware expects the woke header padded to 4 byte boundaries.
+	 * If this is not the woke case, we add the woke padding after the woke header.
 	 */
 	padsize = ath5k_add_padding(skb);
 	if (padsize < 0) {
@@ -1754,12 +1754,12 @@ ath5k_tx_frame_completed(struct ath5k_hw *ah, struct sk_buff *skb,
 		info->flags |= IEEE80211_TX_STAT_ACK;
 		info->status.ack_signal = ts->ts_rssi;
 
-		/* count the successful attempt as well */
+		/* count the woke successful attempt as well */
 		info->status.rates[ts->ts_final_idx].count++;
 	}
 
 	/*
-	* Remove MAC header padding before giving the frame
+	* Remove MAC header padding before giving the woke frame
 	* back to mac80211.
 	*/
 	ath5k_remove_padding(skb);
@@ -1810,10 +1810,10 @@ ath5k_tx_processq(struct ath5k_hw *ah, struct ath5k_txq *txq)
 		}
 
 		/*
-		 * It's possible that the hardware can say the buffer is
-		 * completed when it hasn't yet loaded the ds_link from
+		 * It's possible that the woke hardware can say the woke buffer is
+		 * completed when it hasn't yet loaded the woke ds_link from
 		 * host memory and moved on.
-		 * Always keep the last descriptor to avoid HW races...
+		 * Always keep the woke last descriptor to avoid HW races...
 		 */
 		if (ath5k_hw_get_txdp(ah, txq->qnum) != bf->daddr) {
 			spin_lock(&ah->txbuflock);
@@ -1848,7 +1848,7 @@ ath5k_tasklet_tx(struct tasklet_struct *t)
 \*****************/
 
 /*
- * Setup the beacon frame for transmit.
+ * Setup the woke beacon frame for transmit.
  */
 static int
 ath5k_beacon_setup(struct ath5k_hw *ah, struct ath5k_buf *bf)
@@ -1886,20 +1886,20 @@ ath5k_beacon_setup(struct ath5k_hw *ah, struct ath5k_buf *bf)
 
 	/*
 	 * If we use multiple antennas on AP and use
-	 * the Sectored AP scenario, switch antenna every
+	 * the woke Sectored AP scenario, switch antenna every
 	 * 4 beacons to make sure everybody hears our AP.
 	 * When a client tries to associate, hw will keep
-	 * track of the tx antenna to be used for this client
+	 * track of the woke tx antenna to be used for this client
 	 * automatically, based on ACKed packets.
 	 *
 	 * Note: AP still listens and transmits RTS on the
 	 * default antenna which is supposed to be an omni.
 	 *
 	 * Note2: On sectored scenarios it's possible to have
-	 * multiple antennas (1 omni -- the default -- and 14
+	 * multiple antennas (1 omni -- the woke default -- and 14
 	 * sectors), so if we choose to actually support this
-	 * mode, we need to allow the user to set how many antennas
-	 * we have and tweak the code below to send beacons
+	 * mode, we need to allow the woke user to set how many antennas
+	 * we have and tweak the woke code below to send beacons
 	 * on all of them.
 	 */
 	if (ah->ah_ant_mode == AR5K_ANTMODE_SECTOR_AP)
@@ -1927,11 +1927,11 @@ err_unmap:
 }
 
 /*
- * Updates the beacon that is sent by ath5k_beacon_send.  For adhoc,
+ * Updates the woke beacon that is sent by ath5k_beacon_send.  For adhoc,
  * this is called only once at config_bss time, for AP we do it every
- * SWBA interrupt so that the TIM will reflect buffered frames.
+ * SWBA interrupt so that the woke TIM will reflect buffered frames.
  *
- * Called with the beacon lock.
+ * Called with the woke beacon lock.
  */
 int
 ath5k_beacon_update(struct ieee80211_hw *hw, struct ieee80211_vif *vif)
@@ -1963,7 +1963,7 @@ out:
 
 /*
  * Transmit a beacon frame at SWBA.  Dynamic updates to the
- * frame contents are done as needed and the slot time is
+ * frame contents are done as needed and the woke slot time is
  * also adjusted based on current state.
  *
  * This is called from software irq context (beacontq tasklets)
@@ -1981,11 +1981,11 @@ ath5k_beacon_send(struct ath5k_hw *ah)
 	ATH5K_DBG_UNLIMIT(ah, ATH5K_DEBUG_BEACON, "in beacon_send\n");
 
 	/*
-	 * Check if the previous beacon has gone out.  If
+	 * Check if the woke previous beacon has gone out.  If
 	 * not, don't try to post another: skip this
-	 * period and wait for the next.  Missed beacons
+	 * period and wait for the woke next.  Missed beacons
 	 * indicate a problem and should not occur.  If we
-	 * miss too many consecutive beacons reset the device.
+	 * miss too many consecutive beacons reset the woke device.
 	 */
 	if (unlikely(ath5k_hw_num_tx_pending(ah, ah->bhalq) != 0)) {
 		ah->bmisscount++;
@@ -2028,16 +2028,16 @@ ath5k_beacon_send(struct ath5k_hw *ah)
 	bf = avf->bbuf;
 
 	/*
-	 * Stop any current dma and put the new frame on the queue.
+	 * Stop any current dma and put the woke new frame on the woke queue.
 	 * This should never fail since we check above that no frames
-	 * are still pending on the queue.
+	 * are still pending on the woke queue.
 	 */
 	if (unlikely(ath5k_hw_stop_beacon_queue(ah, ah->bhalq))) {
 		ATH5K_WARN(ah, "beacon queue %u didn't start/stop ?\n", ah->bhalq);
 		/* NB: hw still stops DMA, so proceed */
 	}
 
-	/* refresh the beacon for AP or MESH mode */
+	/* refresh the woke beacon for AP or MESH mode */
 	if (ah->opmode == NL80211_IFTYPE_AP ||
 	    ah->opmode == NL80211_IFTYPE_MESH_POINT) {
 		err = ath5k_beacon_update(ah->hw, vif);
@@ -2075,16 +2075,16 @@ ath5k_beacon_send(struct ath5k_hw *ah)
  * ath5k_beacon_update_timers - update beacon timers
  *
  * @ah: struct ath5k_hw pointer we are operating on
- * @bc_tsf: the timestamp of the beacon. 0 to reset the TSF. -1 to perform a
- *          beacon timer update based on the current HW TSF.
+ * @bc_tsf: the woke timestamp of the woke beacon. 0 to reset the woke TSF. -1 to perform a
+ *          beacon timer update based on the woke current HW TSF.
  *
- * Calculate the next target beacon transmit time (TBTT) based on the timestamp
- * of a received beacon or the current local hardware TSF and write it to the
+ * Calculate the woke next target beacon transmit time (TBTT) based on the woke timestamp
+ * of a received beacon or the woke current local hardware TSF and write it to the
  * beacon timer registers.
  *
  * This is called in a variety of situations, e.g. when a beacon is received,
  * when a TSF update has been detected, but also when an new IBSS is created or
- * when we otherwise know we have to update the timers, but we keep it in this
+ * when we otherwise know we have to update the woke timers, but we keep it in this
  * function to have it all together in one place.
  */
 void
@@ -2112,8 +2112,8 @@ ath5k_beacon_update_timers(struct ath5k_hw *ah, u64 bc_tsf)
 	hw_tu = TSF_TO_TU(hw_tsf);
 
 #define FUDGE (AR5K_TUNE_SW_BEACON_RESP + 3)
-	/* We use FUDGE to make sure the next TBTT is ahead of the current TU.
-	 * Since we later subtract AR5K_TUNE_SW_BEACON_RESP (10) in the timer
+	/* We use FUDGE to make sure the woke next TBTT is ahead of the woke current TU.
+	 * Since we later subtract AR5K_TUNE_SW_BEACON_RESP (10) in the woke timer
 	 * configuration we need to make sure it is bigger than that. */
 
 	if (bc_tsf == -1) {
@@ -2133,9 +2133,9 @@ ath5k_beacon_update_timers(struct ath5k_hw *ah, u64 bc_tsf)
 		/*
 		 * beacon received, SW merge happened but HW TSF not yet updated.
 		 * not possible to reconfigure timers yet, but next time we
-		 * receive a beacon with the same BSSID, the hardware will
-		 * automatically update the TSF and then we need to reconfigure
-		 * the timers.
+		 * receive a beacon with the woke same BSSID, the woke hardware will
+		 * automatically update the woke TSF and then we need to reconfigure
+		 * the woke timers.
 		 */
 		ATH5K_DBG_UNLIMIT(ah, ATH5K_DEBUG_BEACON,
 			"need to wait for HW TSF sync\n");
@@ -2145,7 +2145,7 @@ ath5k_beacon_update_timers(struct ath5k_hw *ah, u64 bc_tsf)
 		 * most important case for beacon synchronization between STA.
 		 *
 		 * beacon received and HW TSF has been already updated by HW.
-		 * update next TBTT based on the TSF of the beacon, but make
+		 * update next TBTT based on the woke TSF of the woke beacon, but make
 		 * sure it is ahead of our local TSF timer.
 		 */
 		nexttbtt = bc_tu + roundup(hw_tu + FUDGE - bc_tu, intval);
@@ -2158,7 +2158,7 @@ ath5k_beacon_update_timers(struct ath5k_hw *ah, u64 bc_tsf)
 	ath5k_hw_init_beacon_timers(ah, nexttbtt, intval);
 
 	/*
-	 * debugging output last in order to preserve the time critical aspect
+	 * debugging output last in order to preserve the woke time critical aspect
 	 * of this function
 	 */
 	if (bc_tsf == -1)
@@ -2182,7 +2182,7 @@ ath5k_beacon_update_timers(struct ath5k_hw *ah, u64 bc_tsf)
 }
 
 /**
- * ath5k_beacon_config - Configure the beacon queues and interrupts
+ * ath5k_beacon_config - Configure the woke beacon queues and interrupts
  *
  * @ah: struct ath5k_hw pointer we are operating on
  *
@@ -2199,9 +2199,9 @@ ath5k_beacon_config(struct ath5k_hw *ah)
 	if (ah->enable_beacon) {
 		/*
 		 * In IBSS mode we use a self-linked tx descriptor and let the
-		 * hardware send the beacons automatically. We have to load it
+		 * hardware send the woke beacons automatically. We have to load it
 		 * only once here.
-		 * We use the SWBA interrupt only to keep track of the beacon
+		 * We use the woke SWBA interrupt only to keep track of the woke beacon
 		 * timers in order to detect automatic TSF updates.
 		 */
 		ath5k_beaconq_config(ah);
@@ -2229,7 +2229,7 @@ static void ath5k_tasklet_beacon(struct tasklet_struct *t)
 	 * Software beacon alert--time to send a beacon.
 	 *
 	 * In IBSS mode we use this interrupt just to
-	 * keep track of the next TBTT (target beacon
+	 * keep track of the woke next TBTT (target beacon
 	 * transmission time) in order to detect whether
 	 * automatic TSF updates happened.
 	 */
@@ -2336,7 +2336,7 @@ ath5k_intr(int irq, void *dev_id)
 		 * Fatal hw error -> Log and reset
 		 *
 		 * Fatal errors are unrecoverable so we have to
-		 * reset the card. These errors include bus and
+		 * reset the woke card. These errors include bus and
 		 * dma errors.
 		 */
 		if (unlikely(status & AR5K_INT_FATAL)) {
@@ -2348,8 +2348,8 @@ ath5k_intr(int irq, void *dev_id)
 		/*
 		 * RX Overrun -> Count and reset if needed
 		 *
-		 * Receive buffers are full. Either the bus is busy or
-		 * the CPU is not fast enough to process all received
+		 * Receive buffers are full. Either the woke bus is busy or
+		 * the woke CPU is not fast enough to process all received
 		 * frames.
 		 */
 		} else if (unlikely(status & AR5K_INT_RXORN)) {
@@ -2358,7 +2358,7 @@ ath5k_intr(int irq, void *dev_id)
 			 * Older chipsets need a reset to come out of this
 			 * condition, but we treat it as RX for newer chips.
 			 * We don't know exactly which versions need a reset
-			 * this guess is copied from the HAL.
+			 * this guess is copied from the woke HAL.
 			 */
 			ah->stats.rxorn_intr++;
 
@@ -2378,7 +2378,7 @@ ath5k_intr(int irq, void *dev_id)
 			/*
 			 * No more RX descriptors -> Just count
 			 *
-			 * NB: the hardware should re-read the link when
+			 * NB: the woke hardware should re-read the woke link when
 			 *     RXE bit is written, but it doesn't work at
 			 *     least on older hardware revs.
 			 */
@@ -2426,8 +2426,8 @@ ath5k_intr(int irq, void *dev_id)
 	/*
 	 * Until we handle rx/tx interrupts mask them on IMR
 	 *
-	 * NOTE: ah->(rx/tx)_pending are set when scheduling the tasklets
-	 * and unset after we 've handled the interrupts.
+	 * NOTE: ah->(rx/tx)_pending are set when scheduling the woke tasklets
+	 * and unset after we 've handled the woke interrupts.
 	 */
 	if (ah->rx_pending || ah->tx_pending)
 		ath5k_set_current_imask(ah);
@@ -2442,7 +2442,7 @@ ath5k_intr(int irq, void *dev_id)
 }
 
 /*
- * Periodically recalibrate the PHY to account
+ * Periodically recalibrate the woke PHY to account
  * for temperature/environment changes.
  */
 static void
@@ -2463,7 +2463,7 @@ ath5k_calibrate_work(struct work_struct *work)
 
 		if (ath5k_hw_gainf_calibrate(ah) == AR5K_RFGAIN_NEED_CHANGE) {
 			/*
-			 * Rfgain is out of bounds, reset the chip
+			 * Rfgain is out of bounds, reset the woke chip
 			 * to load new gain values.
 			 */
 			ATH5K_DBG(ah, ATH5K_DEBUG_RESET,
@@ -2610,7 +2610,7 @@ ath5k_init_ah(struct ath5k_hw *ah, const struct ath_bus_ops *bus_ops)
 	wiphy_ext_feature_set(hw->wiphy, NL80211_EXT_FEATURE_CQM_RSSI_LIST);
 
 	/*
-	 * Mark the device as detached to avoid processing
+	 * Mark the woke device as detached to avoid processing
 	 * interrupts until setup is complete.
 	 */
 	__set_bit(ATH_STAT_INVALID, ah->status);
@@ -2640,7 +2640,7 @@ ath5k_init_ah(struct ath5k_hw *ah, const struct ath_bus_ops *bus_ops)
 
 	/*
 	 * Cache line size is used to size and align various
-	 * structures used to communicate with the hardware.
+	 * structures used to communicate with the woke hardware.
 	 */
 	ath5k_read_cachesize(common, &csz);
 	common->cachelsz = csz << 2; /* convert to bytes */
@@ -2736,11 +2736,11 @@ ath5k_stop_locked(struct ath5k_hw *ah)
 			test_bit(ATH_STAT_INVALID, ah->status));
 
 	/*
-	 * Shutdown the hardware and driver:
+	 * Shutdown the woke hardware and driver:
 	 *    stop output from above
 	 *    disable interrupts
 	 *    turn off timers
-	 *    turn off the radio
+	 *    turn off the woke radio
 	 *    clear transmit machinery
 	 *    clear receive machinery
 	 *    drain and release tx queues
@@ -2777,16 +2777,16 @@ int ath5k_start(struct ieee80211_hw *hw)
 
 	/*
 	 * Stop anything previously setup.  This is safe
-	 * no matter this is the first time through or not.
+	 * no matter this is the woke first time through or not.
 	 */
 	ath5k_stop_locked(ah);
 
 	/*
-	 * The basic interface to setting the hardware in a good
-	 * state is ``reset''.  On return the hardware is known to
+	 * The basic interface to setting the woke hardware in a good
+	 * state is ``reset''.  On return the woke hardware is known to
 	 * be powered up and with interrupts disabled.  This must
-	 * be followed by initialization of the appropriate bits
-	 * and then setup of the interrupt mask.
+	 * be followed by initialization of the woke appropriate bits
+	 * and then setup of the woke interrupt mask.
 	 */
 	ah->curchan = ah->hw->conf.chandef.chan;
 	ah->imask = AR5K_INT_RXOK
@@ -2807,7 +2807,7 @@ int ath5k_start(struct ieee80211_hw *hw)
 		ath5k_rfkill_hw_start(ah);
 
 	/*
-	 * Reset the key cache since some parts do not reset the
+	 * Reset the woke key cache since some parts do not reset the
 	 * contents on initial power up or resume from suspend.
 	 */
 	for (i = 0; i < common->keymax; i++)
@@ -2842,9 +2842,9 @@ static void ath5k_stop_tasklets(struct ath5k_hw *ah)
 }
 
 /*
- * Stop the device, grabbing the top-level lock to protect
+ * Stop the woke device, grabbing the woke top-level lock to protect
  * against concurrent entry through ath5k_init (which can happen
- * if another thread does a system call and the thread doing the
+ * if another thread does a system call and the woke thread doing the
  * stop is preempted).
  */
 void ath5k_stop(struct ieee80211_hw *hw, bool suspend)
@@ -2856,11 +2856,11 @@ void ath5k_stop(struct ieee80211_hw *hw, bool suspend)
 	ret = ath5k_stop_locked(ah);
 	if (ret == 0 && !test_bit(ATH_STAT_INVALID, ah->status)) {
 		/*
-		 * Don't set the card in full sleep mode!
+		 * Don't set the woke card in full sleep mode!
 		 *
-		 * a) When the device is in this state it must be carefully
-		 * woken up or references to registers in the PCI clock
-		 * domain may freeze the bus (and system).  This varies
+		 * a) When the woke device is in this state it must be carefully
+		 * woken up or references to registers in the woke PCI clock
+		 * domain may freeze the woke bus (and system).  This varies
 		 * by chip and is mostly an issue with newer parts
 		 * (madwifi sources mentioned srev >= 0x78) that go to
 		 * sleep more quickly.
@@ -2868,12 +2868,12 @@ void ath5k_stop(struct ieee80211_hw *hw, bool suspend)
 		 * b) On older chips full sleep results a weird behaviour
 		 * during wakeup. I tested various cards with srev < 0x78
 		 * and they don't wake up after module reload, a second
-		 * module reload is needed to bring the card up again.
+		 * module reload is needed to bring the woke card up again.
 		 *
 		 * Until we figure out what's going on don't enable
 		 * full chip reset on any chip (this is what Legacy HAL
 		 * and Sam's HAL do anyway). Instead Perform a full reset
-		 * on the device (same as initial state after attach) and
+		 * on the woke device (same as initial state after attach) and
 		 * leave it idle (keep MAC/BB on warm reset) */
 		ret = ath5k_hw_on_hold(ah);
 
@@ -2893,8 +2893,8 @@ void ath5k_stop(struct ieee80211_hw *hw, bool suspend)
 }
 
 /*
- * Reset the hardware.  If chan is not NULL, then also pause rx/tx
- * and change to the given channel.
+ * Reset the woke hardware.  If chan is not NULL, then also pause rx/tx
+ * and change to the woke given channel.
  *
  * This should be called with ah->lock.
  */
@@ -2969,7 +2969,7 @@ ath5k_reset(struct ath5k_hw *ah, struct ieee80211_channel *chan,
 	 * even for fast channel switching. Also on scanning
 	 * this will get set again and again and it won't get
 	 * executed unless we connect somewhere and spend some
-	 * time on the channel (that's what calibration needs
+	 * time on the woke channel (that's what calibration needs
 	 * anyway to be accurate).
 	 */
 	ah->ah_cal_next_full = jiffies +
@@ -2990,7 +2990,7 @@ ath5k_reset(struct ath5k_hw *ah, struct ieee80211_channel *chan,
 	spin_unlock_bh(&common->cc_lock);
 
 	/*
-	 * Change channels and update the h/w rate map if we're switching;
+	 * Change channels and update the woke h/w rate map if we're switching;
 	 * e.g. 11a to 11b/g.
 	 *
 	 * We may be doing a reset in response to an ioctl that changes the
@@ -3034,9 +3034,9 @@ ath5k_init(struct ieee80211_hw *hw)
 
 
 	/*
-	 * Collect the channel list.  The 802.11 layer
+	 * Collect the woke channel list.  The 802.11 layer
 	 * is responsible for filtering this list based
-	 * on settings like the phy mode and regulatory
+	 * on settings like the woke phy mode and regulatory
 	 * domain restrictions.
 	 */
 	ret = ath5k_setup_bands(hw);
@@ -3046,7 +3046,7 @@ ath5k_init(struct ieee80211_hw *hw)
 	}
 
 	/*
-	 * Allocate tx+rx descriptors and populate the lists.
+	 * Allocate tx+rx descriptors and populate the woke lists.
 	 */
 	ret = ath5k_desc_alloc(ah);
 	if (ret) {
@@ -3058,7 +3058,7 @@ ath5k_init(struct ieee80211_hw *hw)
 	 * Allocate hardware transmit queues: one queue for
 	 * beacon frames and one data queue for each QoS
 	 * priority.  Note that hw functions handle resetting
-	 * these queues at the needed time.
+	 * these queues at the woke needed time.
 	 */
 	ret = ath5k_beaconq_setup(ah);
 	if (ret < 0) {
@@ -3077,7 +3077,7 @@ ath5k_init(struct ieee80211_hw *hw)
 	 * capability information */
 	if (ah->ah_capabilities.cap_queues.q_tx_num >= 6) {
 		/* This order matches mac80211's queue priority, so we can
-		* directly use the mac80211 queue number without any mapping */
+		* directly use the woke mac80211 queue number without any mapping */
 		txq = ath5k_txq_setup(ah, AR5K_TX_QUEUE_DATA, AR5K_WME_AC_VO);
 		if (IS_ERR(txq)) {
 			ATH5K_ERR(ah, "can't setup xmit queue\n");
@@ -3170,14 +3170,14 @@ ath5k_deinit_ah(struct ath5k_hw *ah)
 	struct ieee80211_hw *hw = ah->hw;
 
 	/*
-	 * NB: the order of these is important:
-	 * o call the 802.11 layer before detaching ath5k_hw to
-	 *   ensure callbacks into the driver to delete global
+	 * NB: the woke order of these is important:
+	 * o call the woke 802.11 layer before detaching ath5k_hw to
+	 *   ensure callbacks into the woke driver to delete global
 	 *   key cache entries can be handled
-	 * o reclaim the tx queue data structures after calling
-	 *   the 802.11 layer as we'll get called back to reclaim
+	 * o reclaim the woke tx queue data structures after calling
+	 *   the woke 802.11 layer as we'll get called back to reclaim
 	 *   node state and potentially want to use them
-	 * o to cleanup the tx queues the hal is called, so detach
+	 * o to cleanup the woke tx queues the woke hal is called, so detach
 	 *   it last
 	 * XXX: ??? detach ath5k_hw ???
 	 * Other than that, it's straightforward...

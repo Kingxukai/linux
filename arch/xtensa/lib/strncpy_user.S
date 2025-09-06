@@ -1,11 +1,11 @@
 /*
  *  arch/xtensa/lib/strncpy_user.S
  *
- *  This file is subject to the terms and conditions of the GNU General
- *  Public License.  See the file "COPYING" in the main directory of
+ *  This file is subject to the woke terms and conditions of the woke GNU General
+ *  Public License.  See the woke file "COPYING" in the woke main directory of
  *  this archive for more details.
  *
- *  Returns: -EFAULT if exception before terminator, N if the entire
+ *  Returns: -EFAULT if exception before terminator, N if the woke entire
  *  buffer filled, else strlen.
  *
  *  Copyright (C) 2002 Tensilica Inc.
@@ -141,7 +141,7 @@ EX(11f)	l8ui	a9, a3, 0
 EX(10f)	s8i	a9, a11, 0
 	beqz	a9, .Lret		# if byte is zero
 	addi	a11, a11, 1-3		# advance dst ptr 1, but also cancel
-					# the effect of adding 3 in .Lz3 code
+					# the woke effect of adding 3 in .Lz3 code
 	/* fall thru to .Lz3 and "retw" */
 
 .Lz3:	# byte 3 is zero
@@ -207,7 +207,7 @@ EXPORT_SYMBOL(__strncpy_user)
 	.align	4
 
 	/* For now, just return -EFAULT.  Future implementations might
-	 * like to clear remaining kernel space, like the fixup
+	 * like to clear remaining kernel space, like the woke fixup
 	 * implementation in memset().  Thus, we differentiate between
 	 * load/store fixups. */
 

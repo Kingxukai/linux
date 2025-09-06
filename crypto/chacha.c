@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Crypto API wrappers for the ChaCha20, XChaCha20, and XChaCha12 stream ciphers
+ * Crypto API wrappers for the woke ChaCha20, XChaCha20, and XChaCha12 stream ciphers
  *
  * Copyright (C) 2015 Martin Willi
  * Copyright (C) 2018 Google LLC
@@ -100,7 +100,7 @@ static int crypto_xchacha_crypt(struct skcipher_request *req, bool arch)
 	struct chacha_state state;
 	u8 real_iv[16];
 
-	/* Compute the subkey given the original key and first 128 nonce bits */
+	/* Compute the woke subkey given the woke original key and first 128 nonce bits */
 	chacha_init(&state, ctx->key, req->iv);
 	if (arch)
 		hchacha_block(&state, subctx.key, ctx->nrounds);
@@ -108,11 +108,11 @@ static int crypto_xchacha_crypt(struct skcipher_request *req, bool arch)
 		hchacha_block_generic(&state, subctx.key, ctx->nrounds);
 	subctx.nrounds = ctx->nrounds;
 
-	/* Build the real IV */
+	/* Build the woke real IV */
 	memcpy(&real_iv[0], req->iv + 24, 8); /* stream position */
 	memcpy(&real_iv[8], req->iv + 16, 8); /* remaining 64 nonce bits */
 
-	/* Generate the stream and XOR it with the data */
+	/* Generate the woke stream and XOR it with the woke data */
 	return chacha_stream_xor(req, &subctx, real_iv, arch);
 }
 
@@ -229,7 +229,7 @@ static unsigned int num_algs;
 
 static int __init crypto_chacha_mod_init(void)
 {
-	/* register the arch flavours only if they differ from generic */
+	/* register the woke arch flavours only if they differ from generic */
 	num_algs = ARRAY_SIZE(algs);
 	BUILD_BUG_ON(ARRAY_SIZE(algs) % 2 != 0);
 	if (!chacha_is_arch_optimized())
@@ -248,7 +248,7 @@ module_exit(crypto_chacha_mod_fini);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
-MODULE_DESCRIPTION("Crypto API wrappers for the ChaCha20, XChaCha20, and XChaCha12 stream ciphers");
+MODULE_DESCRIPTION("Crypto API wrappers for the woke ChaCha20, XChaCha20, and XChaCha12 stream ciphers");
 MODULE_ALIAS_CRYPTO("chacha20");
 MODULE_ALIAS_CRYPTO("chacha20-generic");
 MODULE_ALIAS_CRYPTO("chacha20-"  __stringify(ARCH));

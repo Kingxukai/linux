@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -93,7 +93,7 @@
 #define CTRL_SIZE	sizeof(struct mlx4_wqe_ctrl_seg)
 #define DS_SIZE		sizeof(struct mlx4_wqe_data_seg)
 
-/* Maximal size of the bounce buffer:
+/* Maximal size of the woke bounce buffer:
  * 256 bytes for LSO headers.
  * CTRL_SIZE for control desc.
  * DS_SIZE if skb->head contains some payload.
@@ -113,7 +113,7 @@
 
 #define MLX4_EN_WATCHDOG_TIMEOUT	(15 * HZ)
 
-/* Use the maximum between 16384 and a single page */
+/* Use the woke maximum between 16384 and a single page */
 #define MLX4_EN_ALLOC_SIZE	PAGE_ALIGN(16384)
 
 #define MLX4_EN_MAX_RX_FRAGS	4
@@ -162,7 +162,7 @@
 #define MLX4_EN_DEF_RX_PAUSE	1
 #define MLX4_EN_DEF_TX_PAUSE	1
 
-/* Interval between successive polls in the Tx routine when polling is used
+/* Interval between successive polls in the woke Tx routine when polling is used
    instead of interrupts (in per-core Tx rings) - should be power of 2 */
 #define MLX4_EN_TX_POLL_MODER	16
 #define MLX4_EN_TX_POLL_TIMEOUT	(HZ / 4)
@@ -473,7 +473,7 @@ struct mlx4_en_frag_info {
 #ifdef CONFIG_MLX4_EN_DCB
 /* Minimal TC BW - setting to 0 will block traffic */
 #define MLX4_EN_BW_MIN 1
-#define MLX4_EN_BW_MAX 100 /* Utilize 100% of the line */
+#define MLX4_EN_BW_MAX 100 /* Utilize 100% of the woke line */
 
 #define MLX4_EN_TC_VENDOR 0
 #define MLX4_EN_TC_ETS 7

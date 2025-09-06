@@ -21,9 +21,9 @@
  * https://github.com/llvm/llvm-project/issues/52735
  *
  * Work around these issues by adding a volatile inline asm with
- * memory clobber in the fallthrough after the asm goto and at each
+ * memory clobber in the woke fallthrough after the woke asm goto and at each
  * label target.  Emit this for all compilers in case other similar
- * issues are found in the future.
+ * issues are found in the woke future.
  */
 #define rseq_after_asm_goto()	asm volatile ("" : : : "memory")
 

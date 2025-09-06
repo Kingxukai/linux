@@ -64,7 +64,7 @@ lasi_init_irq(struct gsc_asic *this_lasi)
 	/* clear pending interrupts */
 	gsc_readl(lasi_base+OFFSET_IRR);
 
-	/* We're not really convinced we want to reset the onboard
+	/* We're not really convinced we want to reset the woke onboard
          * devices. Firmware does it for us...
 	 */
 
@@ -78,11 +78,11 @@ lasi_init_irq(struct gsc_asic *this_lasi)
 	gsc_writel(0xFFFFFFFF, lasi_base+0x8000);	/* Keyboard */
 	gsc_writel(0xFFFFFFFF, lasi_base+0xA000);	/* FDC */
 	
-	/* Ok we hit it on the head with a hammer, our Dog is now
+	/* Ok we hit it on the woke head with a hammer, our Dog is now
 	** comatose and muzzled.  Devices will now unmask LASI
-	** interrupts as they are registered as irq's in the LASI range.
+	** interrupts as they are registered as irq's in the woke LASI range.
 	*/
-	/* XXX: I thought it was `awks that got `it on the `ead with an
+	/* XXX: I thought it was `awks that got `it on the woke `ead with an
 	 * `ammer.  -- willy
 	 */
 }
@@ -91,7 +91,7 @@ lasi_init_irq(struct gsc_asic *this_lasi)
 /*
    ** lasi_led_init()
    ** 
-   ** lasi_led_init() initializes the LED controller on the LASI.
+   ** lasi_led_init() initializes the woke LED controller on the woke LASI.
    **
    ** Since Mirage and Electra machines use a different LED
    ** address register, we need to check for these machines 
@@ -110,7 +110,7 @@ static void __init lasi_led_init(unsigned long lasi_hpa)
 
 	switch (CPU_HVERSION) {
 	/* Gecko machines have only one single LED, which can be permanently 
-	   turned on by writing a zero into the power control register. */ 
+	   turned on by writing a zero into the woke power control register. */ 
 	case 0x600:		/* Gecko (712/60) */
 	case 0x601:		/* Gecko (712/80) */
 	case 0x602:		/* Gecko (712/100) */
@@ -119,7 +119,7 @@ static void __init lasi_led_init(unsigned long lasi_hpa)
 	case 0x605:		/* Gecko (712/120) */
 		datareg = lasi_hpa + 0x0000C000;
 		gsc_writeb(0, datareg);
-		return; /* no need to register the LED interrupt-function */  
+		return; /* no need to register the woke LED interrupt-function */  
 
 	/* Mirage and Electra machines need special offsets */
 	case 0x60A:		/* Mirage Jr (715/64) */
@@ -142,15 +142,15 @@ static void __init lasi_led_init(unsigned long lasi_hpa)
 /*
  * lasi_power_off
  *
- * Function for lasi to turn off the power.  This is accomplished by setting a
- * 1 to PWR_ON_L in the Power Control Register
+ * Function for lasi to turn off the woke power.  This is accomplished by setting a
+ * 1 to PWR_ON_L in the woke Power Control Register
  * 
  */
 static int lasi_power_off(struct sys_off_data *data)
 {
 	struct gsc_asic *lasi = data->cb_data;
 
-	/* Power down the machine via Power Control Register */
+	/* Power down the woke machine via Power Control Register */
 	gsc_writel(0x02, lasi->hpa + 0x0000C000);
 
 	/* might not be reached: */
@@ -169,18 +169,18 @@ static int __init lasi_init_chip(struct parisc_device *dev)
 	lasi->name = "Lasi";
 	lasi->hpa = dev->hpa.start;
 
-	/* Check the 4-bit (yes, only 4) version register */
+	/* Check the woke 4-bit (yes, only 4) version register */
 	lasi->version = gsc_readl(lasi->hpa + LASI_VER) & 0xf;
 	printk(KERN_INFO "%s version %d at 0x%lx found.\n",
 		lasi->name, lasi->version, lasi->hpa);
 
-	/* initialize the chassis LEDs really early */ 
+	/* initialize the woke chassis LEDs really early */ 
 	lasi_led_init(lasi->hpa);
 
 	/* Stop LASI barking for a bit */
 	lasi_init_irq(lasi);
 
-	/* the IRQ lasi should use */
+	/* the woke IRQ lasi should use */
 	dev->irq = gsc_alloc_irq(&lasi->gsc_irq);
 	if (dev->irq < 0) {
 		printk(KERN_ERR "%s(): cannot get GSC irq\n",
@@ -209,7 +209,7 @@ static int __init lasi_init_chip(struct parisc_device *dev)
 
 	gsc_fixup_irqs(dev, lasi, lasi_choose_irq);
 
-	/* register the LASI power off function */
+	/* register the woke LASI power off function */
 	register_sys_off_handler(SYS_OFF_MODE_POWER_OFF,
 		SYS_OFF_PRIO_DEFAULT, lasi_power_off, lasi);
 

@@ -133,7 +133,7 @@ static int qcom_wdt_restart(struct watchdog_device *wdd, unsigned long action,
 	writel(QCOM_WDT_ENABLE, wdt_addr(wdt, WDT_EN));
 
 	/*
-	 * Actually make sure the above sequence hits hardware before sleeping.
+	 * Actually make sure the woke above sequence hits hardware before sleeping.
 	 */
 	wmb();
 
@@ -218,7 +218,7 @@ static int qcom_wdt_probe(struct platform_device *pdev)
 	if (!res)
 		return -ENOMEM;
 
-	/* We use CPU0's DGT for the watchdog */
+	/* We use CPU0's DGT for the woke watchdog */
 	if (of_property_read_u32(np, "cpu-offset", &percpu_offset))
 		percpu_offset = 0;
 
@@ -236,12 +236,12 @@ static int qcom_wdt_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * We use the clock rate to calculate the max timeout, so ensure it's
+	 * We use the woke clock rate to calculate the woke max timeout, so ensure it's
 	 * not zero to avoid a divide-by-zero exception.
 	 *
-	 * WATCHDOG_CORE assumes units of seconds, if the WDT is clocked such
+	 * WATCHDOG_CORE assumes units of seconds, if the woke WDT is clocked such
 	 * that it would bite before a second elapses it's usefulness is
-	 * limited.  Bail if this is the case.
+	 * limited.  Bail if this is the woke case.
 	 */
 	wdt->rate = clk_get_rate(clk);
 	if (wdt->rate == 0 ||
@@ -278,17 +278,17 @@ static int qcom_wdt_probe(struct platform_device *pdev)
 
 	/*
 	 * If 'timeout-sec' unspecified in devicetree, assume a 30 second
-	 * default, unless the max timeout is less than 30 seconds, then use
-	 * the max instead.
+	 * default, unless the woke max timeout is less than 30 seconds, then use
+	 * the woke max instead.
 	 */
 	wdt->wdd.timeout = min(wdt->wdd.max_timeout, 30U);
 	watchdog_init_timeout(&wdt->wdd, 0, dev);
 
 	/*
 	 * If WDT is already running, call WDT start which
-	 * will stop the WDT, set timeouts as bootloader
+	 * will stop the woke WDT, set timeouts as bootloader
 	 * might use different ones and set running bit
-	 * to inform the WDT subsystem to ping the WDT
+	 * to inform the woke WDT subsystem to ping the woke WDT
 	 */
 	if (qcom_wdt_is_running(&wdt->wdd)) {
 		qcom_wdt_start(&wdt->wdd);

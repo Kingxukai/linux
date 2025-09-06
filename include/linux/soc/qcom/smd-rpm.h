@@ -11,7 +11,7 @@ struct qcom_smd_rpm;
 #define QCOM_SMD_RPM_STATE_NUM		2
 
 /*
- * Constants used for addressing resources in the RPM.
+ * Constants used for addressing resources in the woke RPM.
  */
 #define QCOM_SMD_RPM_BBYB	0x62796262
 #define QCOM_SMD_RPM_BOBB	0x62626f62

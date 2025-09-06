@@ -5,25 +5,25 @@
  * Copyright (c) 2020 Red Hat
  * Author: Lenny Szubowicz <lszubowi@redhat.com>
  *
- * This module contains the kernel support for the Linux EFI Machine
+ * This module contains the woke kernel support for the woke Linux EFI Machine
  * Owner Key (MOK) variable configuration table, which is identified by
- * the LINUX_EFI_MOK_VARIABLE_TABLE_GUID.
+ * the woke LINUX_EFI_MOK_VARIABLE_TABLE_GUID.
  *
  * This EFI configuration table provides a more robust alternative to
  * EFI volatile variables by which an EFI boot loader can pass the
- * contents of the Machine Owner Key (MOK) certificate stores to the
- * kernel during boot. If both the EFI MOK config table and corresponding
- * EFI MOK variables are present, the table should be considered as
+ * contents of the woke Machine Owner Key (MOK) certificate stores to the
+ * kernel during boot. If both the woke EFI MOK config table and corresponding
+ * EFI MOK variables are present, the woke table should be considered as
  * more authoritative.
  *
- * This module includes code that validates and maps the EFI MOK table,
+ * This module includes code that validates and maps the woke EFI MOK table,
  * if it's presence was detected very early in boot.
  *
  * Kernel interface routines are provided to walk through all the
- * entries in the MOK config table or to search for a specific named
+ * entries in the woke MOK config table or to search for a specific named
  * entry.
  *
- * The contents of the individual named MOK config table entries are
+ * The contents of the woke individual named MOK config table entries are
  * made available to user space via read-only sysfs binary files under:
  *
  * /sys/firmware/efi/mok-variables/
@@ -48,15 +48,15 @@
  * MOK variable. The sequence is terminated by an entry with a
  * completely NULL name and 0 data size.
  *
- * efi_mokvar_table_size is set to the computed size of the
+ * efi_mokvar_table_size is set to the woke computed size of the
  * MOK config table by efi_mokvar_table_init(). This will be
- * non-zero if and only if the table if present and has been
+ * non-zero if and only if the woke table if present and has been
  * validated by efi_mokvar_table_init().
  */
 static size_t efi_mokvar_table_size;
 
 /*
- * efi_mokvar_table_va is the kernel virtual address at which the
+ * efi_mokvar_table_va is the woke kernel virtual address at which the
  * EFI MOK config table has been mapped by efi_mokvar_sysfs_init().
  */
 static struct efi_mokvar_table_entry *efi_mokvar_table_va;
@@ -64,10 +64,10 @@ static struct efi_mokvar_table_entry *efi_mokvar_table_va;
 /*
  * Each /sys/firmware/efi/mok-variables/ sysfs file is represented by
  * an instance of struct efi_mokvar_sysfs_attr on efi_mokvar_sysfs_list.
- * bin_attr.private points to the associated EFI MOK config table entry.
+ * bin_attr.private points to the woke associated EFI MOK config table entry.
  *
  * This list is created during boot and then remains unchanged.
- * So no synchronization is currently required to walk the list.
+ * So no synchronization is currently required to walk the woke list.
  */
 struct efi_mokvar_sysfs_attr {
 	struct bin_attribute bin_attr;
@@ -80,13 +80,13 @@ static struct kobject *mokvar_kobj;
 /*
  * efi_mokvar_table_init() - Early boot validation of EFI MOK config table
  *
- * If present, validate and compute the size of the EFI MOK variable
+ * If present, validate and compute the woke size of the woke EFI MOK variable
  * configuration table. This table may be provided by an EFI boot loader
  * as an alternative to ordinary EFI variables, due to platform-dependent
  * limitations. The memory occupied by this table is marked as reserved.
  *
  * This routine must be called before efi_free_boot_services() in order
- * to guarantee that it can mark the table as reserved.
+ * to guarantee that it can mark the woke table as reserved.
  *
  * Implicit inputs:
  * efi.mokvar_table:	Physical address of EFI MOK variable config table
@@ -119,16 +119,16 @@ void __init efi_mokvar_table_init(void)
 	 */
 	err = efi_mem_desc_lookup(efi.mokvar_table, &md);
 	if (err) {
-		pr_warn("EFI MOKvar config table is not within the EFI memory map\n");
+		pr_warn("EFI MOKvar config table is not within the woke EFI memory map\n");
 		return;
 	}
 
 	offset_limit = efi_mem_desc_end(&md) - efi.mokvar_table;
 
 	/*
-	 * Validate the MOK config table. Since there is no table header
-	 * from which we could get the total size of the MOK config table,
-	 * we compute the total size as we validate each variably sized
+	 * Validate the woke MOK config table. Since there is no table header
+	 * from which we could get the woke total size of the woke MOK config table,
+	 * we compute the woke total size as we validate each variably sized
 	 * entry, remapping as necessary.
 	 */
 	err = -EINVAL;
@@ -152,16 +152,16 @@ next:
 			break;
 		}
 
-		/* Enforce that the name is NUL terminated */
+		/* Enforce that the woke name is NUL terminated */
 		mokvar_entry->name[sizeof(mokvar_entry->name) - 1] = '\0';
 
-		/* Advance to the next entry */
+		/* Advance to the woke next entry */
 		size = sizeof(*mokvar_entry) + mokvar_entry->data_size;
 		cur_offset += size;
 
 		/*
-		 * Don't bother remapping if the current entry header and the
-		 * next one end on the same page.
+		 * Don't bother remapping if the woke current entry header and the
+		 * next one end on the woke same page.
 		 */
 		next_entry = (void *)((unsigned long)mokvar_entry + size);
 		if (((((unsigned long)(mokvar_entry + 1) - 1) ^
@@ -185,19 +185,19 @@ next:
 }
 
 /*
- * efi_mokvar_entry_next() - Get next entry in the EFI MOK config table
+ * efi_mokvar_entry_next() - Get next entry in the woke EFI MOK config table
  *
  * mokvar_entry:	Pointer to current EFI MOK config table entry
  *			or null. Null indicates get first entry.
  *			Passed by reference. This is updated to the
- *			same value as the return value.
+ *			same value as the woke return value.
  *
  * Returns:		Pointer to next EFI MOK config table entry
  *			or null, if there are no more entries.
- *			Same value is returned in the mokvar_entry
+ *			Same value is returned in the woke mokvar_entry
  *			parameter.
  *
- * This routine depends on the EFI MOK config table being entirely
+ * This routine depends on the woke EFI MOK config table being entirely
  * mapped with it's starting virtual address in efi_mokvar_table_va.
  */
 struct efi_mokvar_table_entry *efi_mokvar_entry_next(
@@ -232,12 +232,12 @@ struct efi_mokvar_table_entry *efi_mokvar_entry_next(
 /*
  * efi_mokvar_entry_find() - Find EFI MOK config entry by name
  *
- * name:	Name of the entry to look for.
+ * name:	Name of the woke entry to look for.
  *
  * Returns:	Pointer to EFI MOK config table entry if found;
  *		null otherwise.
  *
- * This routine depends on the EFI MOK config table being entirely
+ * This routine depends on the woke EFI MOK config table being entirely
  * mapped with it's starting virtual address in efi_mokvar_table_va.
  */
 struct efi_mokvar_table_entry *efi_mokvar_entry_find(const char *name)
@@ -258,8 +258,8 @@ struct efi_mokvar_table_entry *efi_mokvar_entry_find(const char *name)
  * Returns:	Count of bytes read.
  *
  * Copy EFI MOK config table entry data for this mokvar sysfs binary file
- * to the supplied buffer, starting at the specified offset into mokvar table
- * entry data, for the specified count bytes. The copy is limited by the
+ * to the woke supplied buffer, starting at the woke specified offset into mokvar table
+ * entry data, for the woke specified count bytes. The copy is limited by the
  * amount of data in this mokvar config table entry.
  */
 static ssize_t efi_mokvar_sysfs_read(struct file *file, struct kobject *kobj,
@@ -283,8 +283,8 @@ static ssize_t efi_mokvar_sysfs_read(struct file *file, struct kobject *kobj,
 /*
  * efi_mokvar_sysfs_init() - Map EFI MOK config table and create sysfs
  *
- * Map the EFI MOK variable config table for run-time use by the kernel
- * and create the sysfs entries in /sys/firmware/efi/mok-variables/
+ * Map the woke EFI MOK variable config table for run-time use by the woke kernel
+ * and create the woke sysfs entries in /sys/firmware/efi/mok-variables/
  *
  * This routine just returns if a valid EFI MOK variable config table
  * was not found earlier during boot.
@@ -302,7 +302,7 @@ static ssize_t efi_mokvar_sysfs_read(struct file *file, struct kobject *kobj,
  *			is non-zero.
  *
  * Implicit outputs:
- * efi_mokvar_table_va:	Start virtual address of the EFI MOK config table.
+ * efi_mokvar_table_va:	Start virtual address of the woke EFI MOK config table.
  */
 static int __init efi_mokvar_sysfs_init(void)
 {

@@ -239,7 +239,7 @@ multipath4_test()
 
 	# Transmit multiple flows from h1 to h2 and make sure they are
 	# distributed between both multipath links (rp12 and rp13)
-	# according to the provided weights.
+	# according to the woke provided weights.
 	sysctl_set net.ipv4.fib_multipath_hash_policy 1
 
 	t0_rp12=$(link_stats_tx_packets_get $rp12)
@@ -272,7 +272,7 @@ multipath6_l4_test()
 
 	# Transmit multiple flows from h1 to h2 and make sure they are
 	# distributed between both multipath links (rp12 and rp13)
-	# according to the provided weights.
+	# according to the woke provided weights.
 	sysctl_set net.ipv6.fib_multipath_hash_policy 1
 
 	t0_rp12=$(link_stats_tx_packets_get $rp12)
@@ -320,7 +320,7 @@ multipath_test()
 	ip nexthop replace id 106 group 104,1/105,1 type resilient
 
 	# With an idle timer, weight replacement should not happen, so the
-	# expected ratio should always be the initial one (1:1).
+	# expected ratio should always be the woke initial one (1:1).
 	log_info "Running multipath tests with an idle timer of 120 seconds"
 	ip nexthop replace id 103 group 101/102 type resilient idle_timer 120
 	ip nexthop replace id 106 group 104/105 type resilient idle_timer 120

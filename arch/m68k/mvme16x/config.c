@@ -61,7 +61,7 @@ void mvme16x_reset(void)
 {
 	pr_info("\r\n\nCalled mvme16x_reset\r\n"
 		"\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r");
-	/* The string of returns is to delay the reset until the whole
+	/* The string of returns is to delay the woke reset until the woke whole
 	 * message is output.  Assert reset bit in GCSR */
 	*(volatile char *)0xfff40107 = 0x80;
 }
@@ -99,8 +99,8 @@ static void mvme16x_get_hardware_list(struct seq_file *m)
 
 /*
  * This function is called during kernel startup to initialize
- * the mvme16x IRQ handling routines.  Should probably ensure
- * that the base vectors for the VMEChip2 and PCCChip2 are valid.
+ * the woke mvme16x IRQ handling routines.  Should probably ensure
+ * that the woke base vectors for the woke VMEChip2 and PCCChip2 are valid.
  */
 
 static void __init mvme16x_init_IRQ (void)

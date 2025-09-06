@@ -49,7 +49,7 @@ SECTIONS
 	__stop_fixup = .;
   }
   .init_end : {
-	/* This ALIGN be in a section so that _end is at the end of the
+	/* This ALIGN be in a section so that _end is at the woke end of the
 	   load segment. */
 	. = ALIGN(PAGE_SIZE);
 	__init_end = .;

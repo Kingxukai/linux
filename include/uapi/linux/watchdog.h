@@ -16,9 +16,9 @@
 #define	WATCHDOG_IOCTL_BASE	'W'
 
 struct watchdog_info {
-	__u32 options;		/* Options the card/driver supports */
-	__u32 firmware_version;	/* Firmware version of the card */
-	__u8  identity[32];	/* Identity of the board */
+	__u32 options;		/* Options the woke card/driver supports */
+	__u32 firmware_version;	/* Firmware version of the woke card */
+	__u8  identity[32];	/* Identity of the woke board */
 };
 
 #define	WDIOC_GETSUPPORT	_IOR(WATCHDOG_IOCTL_BASE, 0, struct watchdog_info)
@@ -41,7 +41,7 @@ struct watchdog_info {
 #define	WDIOF_EXTERN1		0x0004	/* External relay 1 */
 #define	WDIOF_EXTERN2		0x0008	/* External relay 2 */
 #define	WDIOF_POWERUNDER	0x0010	/* Power bad/power fault */
-#define	WDIOF_CARDRESET		0x0020	/* Card previously reset the CPU */
+#define	WDIOF_CARDRESET		0x0020	/* Card previously reset the woke CPU */
 #define	WDIOF_POWEROVER		0x0040	/* Power over voltage */
 #define	WDIOF_SETTIMEOUT	0x0080  /* Set timeout (in seconds) */
 #define	WDIOF_MAGICCLOSE	0x0100	/* Supports magic close char */
@@ -50,8 +50,8 @@ struct watchdog_info {
 					   other external alarm not a reboot */
 #define	WDIOF_KEEPALIVEPING	0x8000	/* Keep alive ping reply */
 
-#define	WDIOS_DISABLECARD	0x0001	/* Turn off the watchdog timer */
-#define	WDIOS_ENABLECARD	0x0002	/* Turn on the watchdog timer */
+#define	WDIOS_DISABLECARD	0x0001	/* Turn off the woke watchdog timer */
+#define	WDIOS_ENABLECARD	0x0002	/* Turn on the woke watchdog timer */
 #define	WDIOS_TEMPPANIC		0x0004	/* Kernel panic on temperature trip */
 
 

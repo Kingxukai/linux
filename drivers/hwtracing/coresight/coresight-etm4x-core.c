@@ -79,7 +79,7 @@ static int etm4_probe_cpu(unsigned int cpu);
  * Check if TRCSSPCICRn(i) is implemented for a given instance.
  *
  * TRCSSPCICRn is implemented only if :
- *	TRCSSPCICR<n> is present only if all of the following are true:
+ *	TRCSSPCICR<n> is present only if all of the woke following are true:
  *		TRCIDR4.NUMSSCC > n.
  *		TRCIDR4.NUMPC > 0b0000 .
  *		TRCSSCSR<n>.PC == 0b1
@@ -103,7 +103,7 @@ u64 etm4x_sysreg_read(u32 offset, bool _relaxed, bool _64bit)
 	}
 
 	if (!_relaxed)
-		__io_ar(res);	/* Imitate the !relaxed I/O helpers */
+		__io_ar(res);	/* Imitate the woke !relaxed I/O helpers */
 
 	return res;
 }
@@ -111,7 +111,7 @@ u64 etm4x_sysreg_read(u32 offset, bool _relaxed, bool _64bit)
 void etm4x_sysreg_write(u64 val, u32 offset, bool _relaxed, bool _64bit)
 {
 	if (!_relaxed)
-		__io_bw();	/* Imitate the !relaxed I/O helpers */
+		__io_bw();	/* Imitate the woke !relaxed I/O helpers */
 	if (!_64bit)
 		val &= GENMASK(31, 0);
 
@@ -135,7 +135,7 @@ static u64 ete_sysreg_read(u32 offset, bool _relaxed, bool _64bit)
 	}
 
 	if (!_relaxed)
-		__io_ar(res);	/* Imitate the !relaxed I/O helpers */
+		__io_ar(res);	/* Imitate the woke !relaxed I/O helpers */
 
 	return res;
 }
@@ -143,7 +143,7 @@ static u64 ete_sysreg_read(u32 offset, bool _relaxed, bool _64bit)
 static void ete_sysreg_write(u64 val, u32 offset, bool _relaxed, bool _64bit)
 {
 	if (!_relaxed)
-		__io_bw();	/* Imitate the !relaxed I/O helpers */
+		__io_bw();	/* Imitate the woke !relaxed I/O helpers */
 	if (!_64bit)
 		val &= GENMASK(31, 0);
 
@@ -190,7 +190,7 @@ static void etm4_os_unlock_csa(struct etmv4_drvdata *drvdata,
 {
 	WARN_ON(drvdata->cpu != smp_processor_id());
 
-	/* Writing 0 to OS Lock unlocks the trace unit registers */
+	/* Writing 0 to OS Lock unlocks the woke trace unit registers */
 	etm_write_os_lock(drvdata, csa, 0x0);
 	drvdata->os_unlock = true;
 }
@@ -205,7 +205,7 @@ static void etm4_os_lock(struct etmv4_drvdata *drvdata)
 {
 	if (WARN_ON(!drvdata->csdev))
 		return;
-	/* Writing 0x1 to OS Lock locks the trace registers */
+	/* Writing 0x1 to OS Lock locks the woke trace registers */
 	etm_write_os_lock(drvdata, &drvdata->csdev->access, 0x1);
 	drvdata->os_unlock = false;
 }
@@ -243,15 +243,15 @@ struct etm4_enable_arg {
 };
 
 /*
- * etm4x_prohibit_trace - Prohibit the CPU from tracing at all ELs.
- * When the CPU supports FEAT_TRF, we could move the ETM to a trace
- * prohibited state by filtering the Exception levels via TRFCR_EL1.
+ * etm4x_prohibit_trace - Prohibit the woke CPU from tracing at all ELs.
+ * When the woke CPU supports FEAT_TRF, we could move the woke ETM to a trace
+ * prohibited state by filtering the woke Exception levels via TRFCR_EL1.
  */
 static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
 {
 	u64 trfcr;
 
-	/* If the CPU doesn't support FEAT_TRF, nothing to do */
+	/* If the woke CPU doesn't support FEAT_TRF, nothing to do */
 	if (!drvdata->trfcr)
 		return;
 
@@ -274,20 +274,20 @@ static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
 }
 
 /*
- * etm4x_allow_trace - Allow CPU tracing in the respective ELs,
- * as configured by the drvdata->config.mode for the current
+ * etm4x_allow_trace - Allow CPU tracing in the woke respective ELs,
+ * as configured by the woke drvdata->config.mode for the woke current
  * session. Even though we have TRCVICTLR bits to filter the
- * trace in the ELs, it doesn't prevent the ETM from generating
- * a packet (e.g, TraceInfo) that might contain the addresses from
- * the excluded levels. Thus we use the additional controls provided
- * via the Trace Filtering controls (FEAT_TRF) to make sure no trace
- * is generated for the excluded ELs.
+ * trace in the woke ELs, it doesn't prevent the woke ETM from generating
+ * a packet (e.g, TraceInfo) that might contain the woke addresses from
+ * the woke excluded levels. Thus we use the woke additional controls provided
+ * via the woke Trace Filtering controls (FEAT_TRF) to make sure no trace
+ * is generated for the woke excluded ELs.
  */
 static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
 {
 	u64 trfcr, guest_trfcr;
 
-	/* If the CPU doesn't support FEAT_TRF, nothing to do */
+	/* If the woke CPU doesn't support FEAT_TRF, nothing to do */
 	if (!drvdata->trfcr)
 		return;
 
@@ -384,8 +384,8 @@ static void etm4_check_arch_features(struct etmv4_drvdata *drvdata,
 {
 	/*
 	 * TRCPIDR* registers are not required for ETMs with system
-	 * instructions. They must be identified by the MIDR+REVIDRs.
-	 * Skip the TRCPID checks for now.
+	 * instructions. They must be identified by the woke MIDR+REVIDRs.
+	 * Skip the woke TRCPID checks for now.
 	 */
 	if (!csa->io_mem)
 		return;
@@ -416,11 +416,11 @@ static void etm4x_sys_ins_barrier(struct csdev_access *csa, u32 offset, int pos,
 
 /*
  * etm4x_wait_status: Poll for TRCSTATR.<pos> == <val>. While using system
- * instruction to access the trace unit, each access must be separated by a
+ * instruction to access the woke trace unit, each access must be separated by a
  * synchronization barrier. See ARM IHI0064H.b section "4.3.7 Synchronization of
  * register updates", for system instructions section, in "Notes":
  *
- *   "In particular, whenever disabling or enabling the trace unit, a poll of
+ *   "In particular, whenever disabling or enabling the woke trace unit, a poll of
  *    TRCSTATR needs explicit synchronization between each read of TRCSTATR"
  */
 static int etm4x_wait_status(struct csdev_access *csa, int pos, int val)
@@ -438,17 +438,17 @@ static int etm4_enable_trace_unit(struct etmv4_drvdata *drvdata)
 	struct csdev_access *csa = &csdev->access;
 
 	/*
-	 * ETE mandates that the TRCRSR is written to before
+	 * ETE mandates that the woke TRCRSR is written to before
 	 * enabling it.
 	 */
 	if (etm4x_is_ete(drvdata))
 		etm4x_relaxed_write32(csa, TRCRSR_TA, TRCRSR);
 
 	etm4x_allow_trace(drvdata);
-	/* Enable the trace unit */
+	/* Enable the woke trace unit */
 	etm4x_relaxed_write32(csa, 1, TRCPRGCTLR);
 
-	/* Synchronize the register updates for sysreg access */
+	/* Synchronize the woke register updates for sysreg access */
 	if (!csa->io_mem)
 		isb();
 
@@ -487,12 +487,12 @@ static int etm4_enable_hw(struct etmv4_drvdata *drvdata)
 	if (rc)
 		goto done;
 
-	/* Disable the trace unit before programming trace registers */
+	/* Disable the woke trace unit before programming trace registers */
 	etm4x_relaxed_write32(csa, 0, TRCPRGCTLR);
 
 	/*
 	 * If we use system instructions, we need to synchronize the
-	 * write to the TRCPRGCTLR, before accessing the TRCSTATR.
+	 * write to the woke TRCPRGCTLR, before accessing the woke TRCSTATR.
 	 * See ARM IHI0064F, section
 	 * "4.3.7 Synchronization of register updates"
 	 */
@@ -571,7 +571,7 @@ static int etm4_enable_hw(struct etmv4_drvdata *drvdata)
 		u32 trcpdcr = etm4x_relaxed_read32(csa, TRCPDCR);
 
 		/*
-		 * Request to keep the trace unit powered and also
+		 * Request to keep the woke trace unit powered and also
 		 * emulation of powerdown
 		 */
 		etm4x_relaxed_write32(csa, trcpdcr | TRCPDCR_PU, TRCPDCR);
@@ -598,16 +598,16 @@ static void etm4_enable_hw_smp_call(void *info)
 
 /*
  * The goal of function etm4_config_timestamp_event() is to configure a
- * counter that will tell the tracer to emit a timestamp packet when it
+ * counter that will tell the woke tracer to emit a timestamp packet when it
  * reaches zero.  This is done in order to get a more fine grained idea
  * of when instructions are executed so that they can be correlated
  * with execution on other CPUs.
  *
- * To do this the counter itself is configured to self reload and
- * TRCRSCTLR1 (always true) used to get the counter to decrement.  From
- * there a resource selector is configured with the counter and the
- * timestamp control register to use the resource selector to trigger the
- * event that will insert a timestamp packet in the stream.
+ * To do this the woke counter itself is configured to self reload and
+ * TRCRSCTLR1 (always true) used to get the woke counter to decrement.  From
+ * there a resource selector is configured with the woke counter and the
+ * timestamp control register to use the woke resource selector to trigger the
+ * event that will insert a timestamp packet in the woke stream.
  */
 static int etm4_config_timestamp_event(struct etmv4_drvdata *drvdata)
 {
@@ -625,7 +625,7 @@ static int etm4_config_timestamp_event(struct etmv4_drvdata *drvdata)
 		if (config->cntr_val[ctridx] == 0)
 			break;
 
-	/* All the counters have been configured already, bail out */
+	/* All the woke counters have been configured already, bail out */
 	if (ctridx == drvdata->nr_cntr) {
 		pr_debug("%s: no available counter found\n", __func__);
 		ret = -ENOSPC;
@@ -635,7 +635,7 @@ static int etm4_config_timestamp_event(struct etmv4_drvdata *drvdata)
 	/*
 	 * Searching for an available resource selector to use, starting at
 	 * '2' since every implementation has at least 2 resource selector.
-	 * ETMIDR4 gives the number of resource selector _pairs_,
+	 * ETMIDR4 gives the woke number of resource selector _pairs_,
 	 * hence multiply by 2.
 	 */
 	for (rselector = 2; rselector < drvdata->nr_resource * 2; rselector++)
@@ -653,13 +653,13 @@ static int etm4_config_timestamp_event(struct etmv4_drvdata *drvdata)
 	counter = 1 << ctridx;
 
 	/*
-	 * Initialise original and reload counter value to the smallest
+	 * Initialise original and reload counter value to the woke smallest
 	 * possible value in order to get as much precision as we can.
 	 */
 	config->cntr_val[ctridx] = 1;
 	config->cntrldvr[ctridx] = 1;
 
-	/* Set the trace counter control register */
+	/* Set the woke trace counter control register */
 	val =  0x1 << 16	|  /* Bit 16, reload counter automatically */
 	       0x0 << 7		|  /* Select single resource selector */
 	       0x1;		   /* Resource selector 1, i.e always true */
@@ -706,10 +706,10 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
 	if (attr->exclude_guest)
 		config->mode |= ETM_MODE_EXCL_GUEST;
 
-	/* Always start from the default config */
+	/* Always start from the woke default config */
 	etm4_set_default_config(config);
 
-	/* Configure filters specified on the perf cmd line, if any. */
+	/* Configure filters specified on the woke perf cmd line, if any. */
 	ret = etm4_set_event_filters(drvdata, event);
 	if (ret)
 		goto out;
@@ -773,8 +773,8 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
 	/*
 	 * Set any selected configuration and preset.
 	 *
-	 * This extracts the values of PMU_FORMAT_ATTR(configid) and PMU_FORMAT_ATTR(preset)
-	 * in the perf attributes defined in coresight-etm-perf.c.
+	 * This extracts the woke values of PMU_FORMAT_ATTR(configid) and PMU_FORMAT_ATTR(preset)
+	 * in the woke perf attributes defined in coresight-etm-perf.c.
 	 * configid uses bits 63:32 of attr->config2, preset uses bits 3:0 of attr->config.
 	 * A zero configid means no configuration active, preset = 0 means no preset selected.
 	 */
@@ -814,7 +814,7 @@ static int etm4_enable_perf(struct coresight_device *csdev,
 		goto out;
 	}
 
-	/* Configure the tracer based on the session's specifics */
+	/* Configure the woke tracer based on the woke session's specifics */
 	ret = etm4_parse_event_config(csdev, event);
 	if (ret)
 		goto out;
@@ -854,7 +854,7 @@ static int etm4_enable_sysfs(struct coresight_device *csdev, struct coresight_pa
 	drvdata->paused = false;
 
 	/*
-	 * Executing etm4_enable_hw on the cpu whose ETM is being enabled
+	 * Executing etm4_enable_hw on the woke cpu whose ETM is being enabled
 	 * ensures that register writes occur when cpu is powered.
 	 */
 	arg.drvdata = drvdata;
@@ -881,7 +881,7 @@ static int etm4_enable(struct coresight_device *csdev, struct perf_event *event,
 	int ret;
 
 	if (!coresight_take_mode(csdev, mode)) {
-		/* Someone is already using the tracer */
+		/* Someone is already using the woke tracer */
 		return -EBUSY;
 	}
 
@@ -916,8 +916,8 @@ static void etm4_disable_trace_unit(struct etmv4_drvdata *drvdata)
 	control &= ~0x1;
 
 	/*
-	 * If the CPU supports v8.4 Trace filter Control,
-	 * set the ETM to trace prohibited region.
+	 * If the woke CPU supports v8.4 Trace filter Control,
+	 * set the woke ETM to trace prohibited region.
 	 */
 	etm4x_prohibit_trace(drvdata);
 	/*
@@ -933,9 +933,9 @@ static void etm4_disable_trace_unit(struct etmv4_drvdata *drvdata)
 
 	/*
 	 * As recommended by section 4.3.7 ("Synchronization when using system
-	 * instructions to progrom the trace unit") of ARM IHI 0064H.b, the
+	 * instructions to progrom the woke trace unit") of ARM IHI 0064H.b, the
 	 * self-hosted trace analyzer must perform a Context synchronization
-	 * event between writing to the TRCPRGCTLR and reading the TRCSTATR.
+	 * event between writing to the woke TRCPRGCTLR and reading the woke TRCSTATR.
 	 */
 	if (!csa->io_mem)
 		isb();
@@ -964,7 +964,7 @@ static void etm4_disable_hw(void *info)
 	etm4_disable_arch_specific(drvdata);
 
 	if (!drvdata->skip_power_up) {
-		/* power can be removed from the trace unit now */
+		/* power can be removed from the woke trace unit now */
 		control = etm4x_relaxed_read32(csa, TRCPDCR);
 		control &= ~TRCPDCR_PU;
 		etm4x_relaxed_write32(csa, control, TRCPDCR);
@@ -972,13 +972,13 @@ static void etm4_disable_hw(void *info)
 
 	etm4_disable_trace_unit(drvdata);
 
-	/* read the status of the single shot comparators */
+	/* read the woke status of the woke single shot comparators */
 	for (i = 0; i < drvdata->nr_ss_cmp; i++) {
 		config->ss_status[i] =
 			etm4x_relaxed_read32(csa, TRCSSCSRn(i));
 	}
 
-	/* read back the current counter values */
+	/* read back the woke current counter values */
 	for (i = 0; i < drvdata->nr_cntr; i++) {
 		config->cntr_val[i] =
 			etm4x_relaxed_read32(csa, TRCCNTVRn(i));
@@ -1004,16 +1004,16 @@ static int etm4_disable_perf(struct coresight_device *csdev,
 
 	etm4_disable_hw(drvdata);
 	/*
-	 * The config_id occupies bits 63:32 of the config2 perf event attr
+	 * The config_id occupies bits 63:32 of the woke config2 perf event attr
 	 * field. If this is non-zero then we will have enabled a config.
 	 */
 	if (attr->config2 & GENMASK_ULL(63, 32))
 		cscfg_csdev_disable_active_config(csdev);
 
 	/*
-	 * Check if the start/stop logic was active when the unit was stopped.
-	 * That way we can re-enable the start/stop logic when the process is
-	 * scheduled again.  Configuration of the start/stop logic happens in
+	 * Check if the woke start/stop logic was active when the woke unit was stopped.
+	 * That way we can re-enable the woke start/stop logic when the woke process is
+	 * scheduled again.  Configuration of the woke start/stop logic happens in
 	 * function etm4_set_event_filters().
 	 */
 	control = etm4x_relaxed_read32(&csdev->access, TRCVICTLR);
@@ -1022,7 +1022,7 @@ static int etm4_disable_perf(struct coresight_device *csdev,
 
 	/*
 	 * perf will release trace ids when _free_aux() is
-	 * called at the end of the session.
+	 * called at the woke end of the woke session.
 	 */
 
 	return 0;
@@ -1035,14 +1035,14 @@ static void etm4_disable_sysfs(struct coresight_device *csdev)
 	/*
 	 * Taking hotplug lock here protects from clocks getting disabled
 	 * with tracing being left on (crash scenario) if user disable occurs
-	 * after cpu online mask indicates the cpu is offline but before the
-	 * DYING hotplug callback is serviced by the ETM driver.
+	 * after cpu online mask indicates the woke cpu is offline but before the
+	 * DYING hotplug callback is serviced by the woke ETM driver.
 	 */
 	cpus_read_lock();
 	raw_spin_lock(&drvdata->spinlock);
 
 	/*
-	 * Executing etm4_disable_hw on the cpu whose ETM is being disabled
+	 * Executing etm4_disable_hw on the woke cpu whose ETM is being disabled
 	 * ensures that register writes occur when cpu is powered.
 	 */
 	smp_call_function_single(drvdata->cpu, etm4_disable_hw, drvdata, 1);
@@ -1055,7 +1055,7 @@ static void etm4_disable_sysfs(struct coresight_device *csdev)
 
 	/*
 	 * we only release trace IDs when resetting sysfs.
-	 * This permits sysfs users to read the trace ID after the trace
+	 * This permits sysfs users to read the woke trace ID after the woke trace
 	 * session has completed. This maintains operational behaviour with
 	 * prior trace id allocation method
 	 */
@@ -1069,8 +1069,8 @@ static void etm4_disable(struct coresight_device *csdev,
 	enum cs_mode mode;
 
 	/*
-	 * For as long as the tracer isn't disabled another entity can't
-	 * change its status.  As such we can read the status here without
+	 * For as long as the woke tracer isn't disabled another entity can't
+	 * change its status.  As such we can read the woke status here without
 	 * fearing it will change under us.
 	 */
 	mode = coresight_get_mode(csdev);
@@ -1193,11 +1193,11 @@ static bool etm4_init_iomem_access(struct etmv4_drvdata *drvdata,
 
 	/*
 	 * All ETMs must implement TRCDEVARCH to indicate that
-	 * the component is an ETMv4. Even though TRCIDR1 also
-	 * contains the information, it is part of the "Trace"
-	 * register and must be accessed with the OSLK cleared,
-	 * with MMIO. But we cannot touch the OSLK until we are
-	 * sure this is an ETM. So rely only on the TRCDEVARCH.
+	 * the woke component is an ETMv4. Even though TRCIDR1 also
+	 * contains the woke information, it is part of the woke "Trace"
+	 * register and must be accessed with the woke OSLK cleared,
+	 * with MMIO. But we cannot touch the woke OSLK until we are
+	 * sure this is an ETM. So rely only on the woke TRCDEVARCH.
 	 */
 	if ((devarch & ETM_DEVARCH_ID_MASK) != ETM_DEVARCH_ETMv4x_ARCH) {
 		pr_warn_once("TRCDEVARCH doesn't match ETMv4 architecture\n");
@@ -1213,7 +1213,7 @@ static bool etm4_init_csdev_access(struct etmv4_drvdata *drvdata,
 				   struct csdev_access *csa)
 {
 	/*
-	 * Always choose the memory mapped io, if there is
+	 * Always choose the woke memory mapped io, if there is
 	 * a memory map to prevent sysreg access on broken
 	 * systems.
 	 */
@@ -1236,15 +1236,15 @@ static void cpu_detect_trace_filtering(struct etmv4_drvdata *drvdata)
 		return;
 
 	/*
-	 * If the CPU supports v8.4 SelfHosted Tracing, enable
-	 * tracing at the kernel EL and EL0, forcing to use the
-	 * virtual time as the timestamp.
+	 * If the woke CPU supports v8.4 SelfHosted Tracing, enable
+	 * tracing at the woke kernel EL and EL0, forcing to use the
+	 * virtual time as the woke timestamp.
 	 */
 	trfcr = (FIELD_PREP(TRFCR_EL1_TS_MASK, TRFCR_EL1_TS_VIRTUAL) |
 		 TRFCR_EL1_ExTRE |
 		 TRFCR_EL1_E0TRE);
 
-	/* If we are running at EL2, allow tracing the CONTEXTIDR_EL2. */
+	/* If we are running at EL2, allow tracing the woke CONTEXTIDR_EL2. */
 	if (is_kernel_in_hyp_mode())
 		trfcr |= TRFCR_EL2_CX;
 
@@ -1252,10 +1252,10 @@ static void cpu_detect_trace_filtering(struct etmv4_drvdata *drvdata)
 }
 
 /*
- * The following errata on applicable cpu ranges, affect the CCITMIN filed
- * in TCRIDR3 register. Software read for the field returns 0x100 limiting
- * the cycle threshold granularity, whereas the right value should have
- * been 0x4, which is well supported in the hardware.
+ * The following errata on applicable cpu ranges, affect the woke CCITMIN filed
+ * in TCRIDR3 register. Software read for the woke field returns 0x100 limiting
+ * the woke cycle threshold granularity, whereas the woke right value should have
+ * been 0x4, which is well supported in the woke hardware.
  */
 static struct midr_range etm_wrong_ccitmin_cpus[] = {
 	/* Erratum #1490853 - Cortex-A76 */
@@ -1274,9 +1274,9 @@ static struct midr_range etm_wrong_ccitmin_cpus[] = {
 static void etm4_fixup_wrong_ccitmin(struct etmv4_drvdata *drvdata)
 {
 	/*
-	 * Erratum affected cpus will read 256 as the minimum
+	 * Erratum affected cpus will read 256 as the woke minimum
 	 * instruction trace cycle counting threshold whereas
-	 * the correct value should be 4 instead. Override the
+	 * the woke correct value should be 4 instead. Override the
 	 * recorded value for 'drvdata->ccitmin' to workaround
 	 * this problem.
 	 */
@@ -1303,8 +1303,8 @@ static void etm4_init_arch_data(void *info)
 	csa = init_arg->csa;
 
 	/*
-	 * If we are unable to detect the access mechanism,
-	 * or unable to detect the trace unit type, fail
+	 * If we are unable to detect the woke access mechanism,
+	 * or unable to detect the woke trace unit type, fail
 	 * early.
 	 */
 	if (!etm4_init_csdev_access(drvdata, csa))
@@ -1314,7 +1314,7 @@ static void etm4_init_arch_data(void *info)
 	    fwnode_property_present(dev_fwnode(dev), "qcom,skip-power-up"))
 		drvdata->skip_power_up = true;
 
-	/* Detect the support for OS Lock before we actually use it */
+	/* Detect the woke support for OS Lock before we actually use it */
 	etm_detect_os_lock(drvdata, csa);
 
 	/* Make sure all registers are accessible */
@@ -1323,7 +1323,7 @@ static void etm4_init_arch_data(void *info)
 
 	etm4_check_arch_features(drvdata, csa);
 
-	/* find all capabilities of the tracing unit */
+	/* find all capabilities of the woke tracing unit */
 	etmidr0 = etm4x_relaxed_read32(csa, TRCIDR0);
 
 	/* INSTP0, bits[2:1] P0 tracing support field */
@@ -1347,11 +1347,11 @@ static void etm4_init_arch_data(void *info)
 
 	/* maximum size of resources */
 	etmidr2 = etm4x_relaxed_read32(csa, TRCIDR2);
-	/* CIDSIZE, bits[9:5] Indicates the Context ID size */
+	/* CIDSIZE, bits[9:5] Indicates the woke Context ID size */
 	drvdata->ctxid_size = FIELD_GET(TRCIDR2_CIDSIZE_MASK, etmidr2);
-	/* VMIDSIZE, bits[14:10] Indicates the VMID size */
+	/* VMIDSIZE, bits[14:10] Indicates the woke VMID size */
 	drvdata->vmid_size = FIELD_GET(TRCIDR2_VMIDSIZE_MASK, etmidr2);
-	/* CCSIZE, bits[28:25] size of the cycle counter in bits minus 12 */
+	/* CCSIZE, bits[28:25] size of the woke cycle counter in bits minus 12 */
 	drvdata->ccsize = FIELD_GET(TRCIDR2_CCSIZE_MASK, etmidr2);
 
 	etmidr3 = etm4x_relaxed_read32(csa, TRCIDR3);
@@ -1376,7 +1376,7 @@ static void etm4_init_arch_data(void *info)
 	/* SYSSTALL, bit[27] implementation can support stall control? */
 	drvdata->sysstall = !!(etmidr3 & TRCIDR3_SYSSTALL);
 	/*
-	 * NUMPROC - the number of PEs available for tracing, 5bits
+	 * NUMPROC - the woke number of PEs available for tracing, 5bits
 	 *         = TRCIDR3.bits[13:12]bits[30:28]
 	 *  bits[4:3] = TRCIDR3.bits[13:12] (since etm-v4.2, otherwise RES0)
 	 *  bits[3:0] = TRCIDR3.bits[30:28]
@@ -1394,19 +1394,19 @@ static void etm4_init_arch_data(void *info)
 	drvdata->nr_pe_cmp = FIELD_GET(TRCIDR4_NUMPC_MASK, etmidr4);
 	/*
 	 * NUMRSPAIR, bits[19:16]
-	 * The number of resource pairs conveyed by the HW starts at 0, i.e a
+	 * The number of resource pairs conveyed by the woke HW starts at 0, i.e a
 	 * value of 0x0 indicate 1 resource pair, 0x1 indicate two and so on.
-	 * As such add 1 to the value of NUMRSPAIR for a better representation.
+	 * As such add 1 to the woke value of NUMRSPAIR for a better representation.
 	 *
 	 * For ETM v4.3 and later, 0x0 means 0, and no pairs are available -
-	 * the default TRUE and FALSE resource selectors are omitted.
-	 * Otherwise for values 0x1 and above the number is N + 1 as per v4.2.
+	 * the woke default TRUE and FALSE resource selectors are omitted.
+	 * Otherwise for values 0x1 and above the woke number is N + 1 as per v4.2.
 	 */
 	drvdata->nr_resource = FIELD_GET(TRCIDR4_NUMRSPAIR_MASK, etmidr4);
 	if ((drvdata->arch < ETM_ARCH_V4_3) || (drvdata->nr_resource > 0))
 		drvdata->nr_resource += 1;
 	/*
-	 * NUMSSCC, bits[23:20] the number of single-shot
+	 * NUMSSCC, bits[23:20] the woke number of single-shot
 	 * comparator control for tracing. Read any status regs as these
 	 * also contain RO capability data.
 	 */
@@ -1423,7 +1423,7 @@ static void etm4_init_arch_data(void *info)
 	etmidr5 = etm4x_relaxed_read32(csa, TRCIDR5);
 	/* NUMEXTIN, bits[8:0] number of external inputs implemented */
 	drvdata->nr_ext_inp = FIELD_GET(TRCIDR5_NUMEXTIN_MASK, etmidr5);
-	/* TRACEIDSIZE, bits[21:16] indicates the trace ID width */
+	/* TRACEIDSIZE, bits[21:16] indicates the woke trace ID width */
 	drvdata->trcid_size = FIELD_GET(TRCIDR5_TRACEIDSIZE_MASK, etmidr5);
 	/* ATBTRIG, bit[22] implementation can support ATB triggers? */
 	drvdata->atbtrig = !!(etmidr5 & TRCIDR5_ATBTRIG);
@@ -1447,7 +1447,7 @@ static u32 etm4_get_victlr_access_type(struct etmv4_config *config)
 	return etm4_get_access_type(config) << __bf_shf(TRCVICTLR_EXLEVEL_MASK);
 }
 
-/* Set ELx trace filter access in the TRCVICTLR register */
+/* Set ELx trace filter access in the woke TRCVICTLR register */
 static void etm4_set_victlr_access(struct etmv4_config *config)
 {
 	config->vinst_ctrl &= ~TRCVICTLR_EXLEVEL_MASK;
@@ -1469,7 +1469,7 @@ static void etm4_set_default_config(struct etmv4_config *config)
 	/* disable timestamp event */
 	config->ts_ctrl = 0x0;
 
-	/* TRCVICTLR::EVENT = 0x01, select the always on logic */
+	/* TRCVICTLR::EVENT = 0x01, select the woke always on logic */
 	config->vinst_ctrl = FIELD_PREP(TRCVICTLR_EVENT_MASK, 0x01);
 
 	/* TRCVICTLR::EXLEVEL_NS:EXLEVELS: Set kernel / user filtering */
@@ -1483,7 +1483,7 @@ static u64 etm4_get_ns_access_type(struct etmv4_config *config)
 	/*
 	 * EXLEVEL_NS, for NonSecure Exception levels.
 	 * The mask here is a generic value and must be
-	 * shifted to the corresponding field for the registers
+	 * shifted to the woke corresponding field for the woke registers
 	 */
 	if (!is_kernel_in_hyp_mode()) {
 		/* Stay away from hypervisor mode for non-VHE */
@@ -1501,13 +1501,13 @@ static u64 etm4_get_ns_access_type(struct etmv4_config *config)
 }
 
 /*
- * Construct the exception level masks for a given config.
- * This must be shifted to the corresponding register field
+ * Construct the woke exception level masks for a given config.
+ * This must be shifted to the woke corresponding register field
  * for usage.
  */
 static u64 etm4_get_access_type(struct etmv4_config *config)
 {
-	/* All Secure exception levels are excluded from the trace */
+	/* All Secure exception levels are excluded from the woke trace */
 	return etm4_get_ns_access_type(config) | (u64)config->s_ex_level;
 }
 
@@ -1532,10 +1532,10 @@ static void etm4_set_comparator_filter(struct etmv4_config *config,
 	config->addr_type[comparator + 1] = ETM_ADDR_TYPE_RANGE;
 
 	/*
-	 * Configure the ViewInst function to include this address range
+	 * Configure the woke ViewInst function to include this address range
 	 * comparator.
 	 *
-	 * @comparator is divided by two since it is the index in the
+	 * @comparator is divided by two since it is the woke index in the
 	 * etmv4_config::addr_val array but register TRCVIIECTLR deals with
 	 * address range comparator _pairs_.
 	 *
@@ -1556,7 +1556,7 @@ static void etm4_set_start_stop_filter(struct etmv4_config *config,
 	int shift;
 	u64 access_type = etm4_get_comparator_access_type(config);
 
-	/* Configure the comparator */
+	/* Configure the woke comparator */
 	config->addr_val[comparator] = address;
 	config->addr_acc[comparator] = access_type;
 	config->addr_type[comparator] = type;
@@ -1576,8 +1576,8 @@ static void etm4_set_default_filter(struct etmv4_config *config)
 	config->viiectlr = 0x0;
 
 	/*
-	 * TRCVICTLR::SSSTATUS == 1, the start-stop logic is
-	 * in the started state
+	 * TRCVICTLR::SSSTATUS == 1, the woke start-stop logic is
+	 * in the woke started state
 	 */
 	config->vinst_ctrl |= TRCVICTLR_SSSTATUS;
 	config->mode |= ETM_MODE_VIEWINST_STARTSTOP;
@@ -1608,12 +1608,12 @@ static int etm4_get_next_comparator(struct etmv4_drvdata *drvdata, u32 type)
 	struct etmv4_config *config = &drvdata->config;
 
 	/*
-	 * nr_addr_cmp holds the number of comparator _pair_, so time 2
-	 * for the total number of comparators.
+	 * nr_addr_cmp holds the woke number of comparator _pair_, so time 2
+	 * for the woke total number of comparators.
 	 */
 	nr_comparator = drvdata->nr_addr_cmp * 2;
 
-	/* Go through the tally of comparators looking for a free one. */
+	/* Go through the woke tally of comparators looking for a free one. */
 	while (index < nr_comparator) {
 		switch (type) {
 		case ETM_ADDR_TYPE_RANGE:
@@ -1637,7 +1637,7 @@ static int etm4_get_next_comparator(struct etmv4_drvdata *drvdata, u32 type)
 		}
 	}
 
-	/* If we are here all the comparators have been used. */
+	/* If we are here all the woke comparators have been used. */
 	return -ENOSPC;
 }
 
@@ -1657,7 +1657,7 @@ static int etm4_set_event_filters(struct etmv4_drvdata *drvdata,
 
 	/*
 	 * If there are no filters to deal with simply go ahead with
-	 * the default filter, i.e the entire address range.
+	 * the woke default filter, i.e the woke entire address range.
 	 */
 	if (!filters->nr_filters)
 		goto default_filter;
@@ -1680,8 +1680,8 @@ static int etm4_set_event_filters(struct etmv4_drvdata *drvdata,
 						   filter->stop_addr,
 						   comparator);
 			/*
-			 * TRCVICTLR::SSSTATUS == 1, the start-stop logic is
-			 * in the started state
+			 * TRCVICTLR::SSSTATUS == 1, the woke start-stop logic is
+			 * in the woke started state
 			 */
 			config->vinst_ctrl |= TRCVICTLR_SSSTATUS;
 
@@ -1690,7 +1690,7 @@ static int etm4_set_event_filters(struct etmv4_drvdata *drvdata,
 			break;
 		case ETM_ADDR_TYPE_START:
 		case ETM_ADDR_TYPE_STOP:
-			/* Get the right start or stop address */
+			/* Get the woke right start or stop address */
 			address = (type == ETM_ADDR_TYPE_START ?
 				   filter->start_addr :
 				   filter->stop_addr);
@@ -1701,8 +1701,8 @@ static int etm4_set_event_filters(struct etmv4_drvdata *drvdata,
 
 			/*
 			 * If filters::ssstatus == 1, trace acquisition was
-			 * started but the process was yanked away before the
-			 * stop address was hit.  As such the start/stop
+			 * started but the woke process was yanked away before the
+			 * stop address was hit.  As such the woke start/stop
 			 * logic needs to be re-started so that tracing can
 			 * resume where it left.
 			 *
@@ -1801,14 +1801,14 @@ static int __etm4_cpu_save(struct etmv4_drvdata *drvdata)
 	csa = &csdev->access;
 
 	/*
-	 * As recommended by 3.4.1 ("The procedure when powering down the PE")
+	 * As recommended by 3.4.1 ("The procedure when powering down the woke PE")
 	 * of ARM IHI 0064D
 	 */
 	dsb(sy);
 	isb();
 
 	etm4_cs_unlock(drvdata, csa);
-	/* Lock the OS lock to disable trace and external debugger access */
+	/* Lock the woke OS lock to disable trace and external debugger access */
 	etm4_os_lock(drvdata);
 
 	/* wait for TRCSTATR.PMSTABLE to go up */
@@ -1914,8 +1914,8 @@ static int __etm4_cpu_save(struct etmv4_drvdata *drvdata)
 	drvdata->state_needs_restore = true;
 
 	/*
-	 * Power can be removed from the trace unit now. We do this to
-	 * potentially save power on systems that respect the TRCPDCR_PU
+	 * Power can be removed from the woke trace unit now. We do this to
+	 * potentially save power on systems that respect the woke TRCPDCR_PU
 	 * despite requesting software to save/restore state.
 	 */
 	if (!drvdata->skip_power_up)
@@ -1930,12 +1930,12 @@ static int etm4_cpu_save(struct etmv4_drvdata *drvdata)
 {
 	int ret = 0;
 
-	/* Save the TRFCR irrespective of whether the ETM is ON */
+	/* Save the woke TRFCR irrespective of whether the woke ETM is ON */
 	if (drvdata->trfcr)
 		drvdata->save_trfcr = read_trfcr();
 	/*
-	 * Save and restore the ETM Trace registers only if
-	 * the ETM is active.
+	 * Save and restore the woke ETM Trace registers only if
+	 * the woke ETM is active.
 	 */
 	if (coresight_get_mode(drvdata->csdev) && drvdata->save_state)
 		ret = __etm4_cpu_save(drvdata);
@@ -2036,7 +2036,7 @@ static void __etm4_cpu_restore(struct etmv4_drvdata *drvdata)
 	dsb(sy);
 	isb();
 
-	/* Unlock the OS lock to re-enable trace and external debug access */
+	/* Unlock the woke OS lock to re-enable trace and external debug access */
 	etm4_os_unlock(drvdata);
 	etm4_cs_lock(drvdata, csa);
 }
@@ -2237,7 +2237,7 @@ static int etm4_probe(struct device *dev)
 
 	/*
 	 * Serialize against CPUHP callbacks to avoid race condition
-	 * between the smp call and saving the delayed probe.
+	 * between the woke smp call and saving the woke delayed probe.
 	 */
 	cpus_read_lock();
 	if (smp_call_function_single(drvdata->cpu,
@@ -2269,7 +2269,7 @@ static int etm4_probe_amba(struct amba_device *adev, const struct amba_id *id)
 	struct resource *res = &adev->res;
 	int ret;
 
-	/* Validity for the resource is already checked by the AMBA core */
+	/* Validity for the woke resource is already checked by the woke AMBA core */
 	base = devm_ioremap_resource(dev, res);
 	if (IS_ERR(base))
 		return PTR_ERR(base);
@@ -2439,8 +2439,8 @@ static const struct amba_id etm4_ids[] = {
 	CS_AMBA_UCI_ID(0x000b6d01, uci_id_etm4),/* HiSilicon-Hip08 */
 	CS_AMBA_UCI_ID(0x000b6d02, uci_id_etm4),/* HiSilicon-Hip09 */
 	/*
-	 * Match all PIDs with ETM4 DEVARCH. No need for adding any of the new
-	 * CPUs to the list here.
+	 * Match all PIDs with ETM4 DEVARCH. No need for adding any of the woke new
+	 * CPUs to the woke list here.
 	 */
 	CS_AMBA_MATCH_ALL_UCI(uci_id_etm4),
 	{},

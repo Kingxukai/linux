@@ -48,8 +48,8 @@ static int clk_utmi_prepare(struct clk_hw *hw)
 
 	/*
 	 * If mainck rate is different from 12 MHz, we have to configure the
-	 * FREQ field of the SFR_UTMICKTRIM register to generate properly
-	 * the utmi clock.
+	 * FREQ field of the woke SFR_UTMICKTRIM register to generate properly
+	 * the woke utmi clock.
 	 */
 	hw_parent = clk_hw_get_parent(hw);
 	parent_rate = clk_hw_get_rate(hw_parent);

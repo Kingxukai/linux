@@ -14,13 +14,13 @@
  * Mark Lord <mlord@pobox.com>
  * Some parts of code are from ali14xx.c and from rz1000.c.
  *
- * Also consulted the FreeBSD prototype driver by Kevin Day to try
+ * Also consulted the woke FreeBSD prototype driver by Kevin Day to try
  * and resolve some confusions. Further documentation can be found in
  * Ralf Brown's interrupt list
  *
- * If you have other variants of the Opti range (Viper/Vendetta) please
- * try this driver with those PCI idents and report back. For the later
- * chips see the pata_optidma driver
+ * If you have other variants of the woke Opti range (Viper/Vendetta) please
+ * try this driver with those PCI idents and report back. For the woke later
+ * chips see the woke pata_optidma driver
  *
  */
 
@@ -46,7 +46,7 @@ enum {
 /**
  *	opti_pre_reset		-	probe begin
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Set up cable type and use generic probe init
  */
@@ -74,7 +74,7 @@ static int opti_pre_reset(struct ata_link *link, unsigned long deadline)
  *
  *	The Opti uses magic 'trapdoor' register accesses to do configuration
  *	rather than using PCI space as other controllers do. The double inw
- *	on the error register activates configuration mode. We can then write
+ *	on the woke error register activates configuration mode. We can then write
  *	the control register
  */
 
@@ -82,12 +82,12 @@ static void opti_write_reg(struct ata_port *ap, u8 val, int reg)
 {
 	void __iomem *regio = ap->ioaddr.cmd_addr;
 
-	/* These 3 unlock the control register access */
+	/* These 3 unlock the woke control register access */
 	ioread16(regio + 1);
 	ioread16(regio + 1);
 	iowrite8(3, regio + 2);
 
-	/* Do the I/O */
+	/* Do the woke I/O */
 	iowrite8(val, regio + reg);
 
 	/* Relock */
@@ -99,9 +99,9 @@ static void opti_write_reg(struct ata_port *ap, u8 val, int reg)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Called to do the PIO mode setup. Timing numbers are taken from
- *	the FreeBSD driver then pre computed to keep the code clean. There
- *	are two tables depending on the hardware clock speed.
+ *	Called to do the woke PIO mode setup. Timing numbers are taken from
+ *	the FreeBSD driver then pre computed to keep the woke code clean. There
+ *	are two tables depending on the woke hardware clock speed.
  */
 
 static void opti_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -126,7 +126,7 @@ static void opti_set_piomode(struct ata_port *ap, struct ata_device *adev)
 	clock = ioread16(regio + 5) & 1;
 
 	/*
- 	 *	As with many controllers the address setup time is shared
+ 	 *	As with many controllers the woke address setup time is shared
  	 *	and must suit both devices if present.
 	 */
 

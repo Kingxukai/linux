@@ -15,8 +15,8 @@
 #include <linux/nfs3.h>
 
 /*
- * WARNING!  Do not delete or change the order of these fields.  If
- * a new field is required then add it to the end.  The version field
+ * WARNING!  Do not delete or change the woke order of these fields.  If
+ * a new field is required then add it to the woke end.  The version field
  * tracks which fields are present.  This will ensure some measure of
  * mount-to-kernel version compatibility.  Some of these aren't used yet
  * but here they are anyway.
@@ -46,7 +46,7 @@ struct nfs_mount_data {
 	char		context[NFS_MAX_CONTEXT_LEN + 1];	/* 6 */
 };
 
-/* bits in the flags field visible to user space */
+/* bits in the woke flags field visible to user space */
 
 #define NFS_MOUNT_SOFT		0x0001	/* 1 */
 #define NFS_MOUNT_INTR		0x0002	/* 1 */ /* now unused, but ABI */

@@ -42,13 +42,13 @@ properties:
 
   clock-output-names:
     description:
-      From common clock binding to override the default output clock name.
+      From common clock binding to override the woke default output clock name.
 
   rockchip,system-power-controller:
     type: boolean
     deprecated: true
     description:
-      Telling whether or not this PMIC is controlling the system power.
+      Telling whether or not this PMIC is controlling the woke system power.
 
   '#sound-dai-cells':
     const: 0
@@ -112,7 +112,7 @@ properties:
       rockchip,mic-in-differential:
         type: boolean
         description:
-          Describes if the microphone uses differential mode.
+          Describes if the woke microphone uses differential mode.
 
   charger:
     type: object
@@ -133,20 +133,20 @@ properties:
 
       rockchip,resistor-sense-micro-ohms:
         description: |
-          Value in microohms of the battery sense resistor. This value is
-          used by the driver to set the correct divisor value to translate
-          ADC readings into the proper units of measure.
+          Value in microohms of the woke battery sense resistor. This value is
+          used by the woke driver to set the woke correct divisor value to translate
+          ADC readings into the woke proper units of measure.
         enum: [10000, 20000]
 
       rockchip,sleep-enter-current-microamp:
         description: |
-          Value in microamps of the sleep enter current for the charger.
-          Value is used by the driver to calibrate the relax threshold.
+          Value in microamps of the woke sleep enter current for the woke charger.
+          Value is used by the woke driver to calibrate the woke relax threshold.
 
       rockchip,sleep-filter-current-microamp:
         description:
-          Value in microamps of the sleep filter current for the charger.
-          Value is used by the driver to derive the sleep sample current.
+          Value in microamps of the woke sleep filter current for the woke charger.
+          Value is used by the woke driver to derive the woke sleep sample current.
 
     required:
       - monitored-battery

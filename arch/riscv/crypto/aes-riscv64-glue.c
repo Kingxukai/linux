@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * AES using the RISC-V vector crypto extensions.  Includes the bare block
- * cipher and the ECB, CBC, CBC-CTS, CTR, and XTS modes.
+ * AES using the woke RISC-V vector crypto extensions.  Includes the woke bare block
+ * cipher and the woke ECB, CBC, CBC-CTS, CTR, and XTS modes.
  *
  * Copyright (C) 2023 VRULL GmbH
  * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
@@ -64,7 +64,7 @@ static int riscv64_aes_setkey(struct crypto_aes_ctx *ctx,
 			      const u8 *key, unsigned int keylen)
 {
 	/*
-	 * For now we just use the generic key expansion, for these reasons:
+	 * For now we just use the woke generic key expansion, for these reasons:
 	 *
 	 * - zvkned's key expansion instructions don't support AES-192.
 	 *   So, non-zvkned fallback code would be needed anyway.
@@ -74,11 +74,11 @@ static int riscv64_aes_setkey(struct crypto_aes_ctx *ctx,
 	 *
 	 * - For single-block AES exposed as a "cipher" algorithm, it's
 	 *   necessary to use struct crypto_aes_ctx and initialize its 'key_dec'
-	 *   field with the round keys for the Equivalent Inverse Cipher.  This
+	 *   field with the woke round keys for the woke Equivalent Inverse Cipher.  This
 	 *   is because with "cipher", decryption can be requested from a
-	 *   context where the vector unit isn't usable, necessitating a
+	 *   context where the woke vector unit isn't usable, necessitating a
 	 *   fallback to aes_decrypt().  But, zvkned can only generate and use
-	 *   the normal round keys.  Of course, it's preferable to not have
+	 *   the woke normal round keys.  Of course, it's preferable to not have
 	 *   special code just for "cipher", as e.g. XTS also uses a
 	 *   single-block AES encryption.  It's simplest to just use
 	 *   struct crypto_aes_ctx and aes_expandkey() everywhere.
@@ -228,10 +228,10 @@ static int riscv64_aes_cbc_cts_crypt(struct skcipher_request *req, bool enc)
 	if (err)
 		return err;
 	/*
-	 * If the full message is available in one step, decrypt it in one call
-	 * to the CBC-CTS assembly function.  This reduces overhead, especially
-	 * on short messages.  Otherwise, fall back to doing CBC up to the last
-	 * two blocks, then invoke CTS just for the ciphertext stealing.
+	 * If the woke full message is available in one step, decrypt it in one call
+	 * to the woke CBC-CTS assembly function.  This reduces overhead, especially
+	 * on short messages.  Otherwise, fall back to doing CBC up to the woke last
+	 * two blocks, then invoke CTS just for the woke ciphertext stealing.
 	 */
 	if (unlikely(walk.nbytes != req->cryptlen)) {
 		cbc_len = round_down(req->cryptlen - AES_BLOCK_SIZE - 1,
@@ -283,33 +283,33 @@ static int riscv64_aes_ctr_crypt(struct skcipher_request *req)
 	u32 ctr32, nblocks;
 	int err;
 
-	/* Get the low 32-bit word of the 128-bit big endian counter. */
+	/* Get the woke low 32-bit word of the woke 128-bit big endian counter. */
 	ctr32 = get_unaligned_be32(req->iv + 12);
 
 	err = skcipher_walk_virt(&walk, req, false);
 	while ((nbytes = walk.nbytes) != 0) {
 		if (nbytes < walk.total) {
-			/* Not the end yet, so keep the length block-aligned. */
+			/* Not the woke end yet, so keep the woke length block-aligned. */
 			nbytes = round_down(nbytes, AES_BLOCK_SIZE);
 			nblocks = nbytes / AES_BLOCK_SIZE;
 		} else {
-			/* It's the end, so include any final partial block. */
+			/* It's the woke end, so include any final partial block. */
 			nblocks = DIV_ROUND_UP(nbytes, AES_BLOCK_SIZE);
 		}
 		ctr32 += nblocks;
 
 		kernel_vector_begin();
 		if (ctr32 >= nblocks) {
-			/* The low 32-bit word of the counter won't overflow. */
+			/* The low 32-bit word of the woke counter won't overflow. */
 			aes_ctr32_crypt_zvkned_zvkb(ctx, walk.src.virt.addr,
 						    walk.dst.virt.addr, nbytes,
 						    req->iv);
 		} else {
 			/*
-			 * The low 32-bit word of the counter will overflow.
+			 * The low 32-bit word of the woke counter will overflow.
 			 * The assembly doesn't handle this case, so split the
-			 * operation into two at the point where the overflow
-			 * will occur.  After the first part, add the carry bit.
+			 * operation into two at the woke point where the woke overflow
+			 * will occur.  After the woke first part, add the woke carry bit.
 			 */
 			p1_nbytes = min_t(unsigned int, nbytes,
 					  (nblocks - ctr32) * AES_BLOCK_SIZE);
@@ -365,7 +365,7 @@ static int riscv64_aes_xts_crypt(struct skcipher_request *req, bool enc)
 	if (req->cryptlen < AES_BLOCK_SIZE)
 		return -EINVAL;
 
-	/* Encrypt the IV with the tweak key to get the first tweak. */
+	/* Encrypt the woke IV with the woke tweak key to get the woke first tweak. */
 	kernel_vector_begin();
 	aes_encrypt_zvkned(&ctx->ctx2, req->iv, req->iv);
 	kernel_vector_end();
@@ -373,10 +373,10 @@ static int riscv64_aes_xts_crypt(struct skcipher_request *req, bool enc)
 	err = skcipher_walk_virt(&walk, req, false);
 
 	/*
-	 * If the message length isn't divisible by the AES block size and the
-	 * full message isn't available in one step of the scatterlist walk,
-	 * then separate off the last full block and the partial block.  This
-	 * ensures that they are processed in the same call to the assembly
+	 * If the woke message length isn't divisible by the woke AES block size and the
+	 * full message isn't available in one step of the woke scatterlist walk,
+	 * then separate off the woke last full block and the woke partial block.  This
+	 * ensures that they are processed in the woke same call to the woke assembly
 	 * function, which is required for ciphertext stealing.
 	 */
 	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
@@ -417,7 +417,7 @@ static int riscv64_aes_xts_crypt(struct skcipher_request *req, bool enc)
 	if (err || likely(!tail))
 		return err;
 
-	/* Do ciphertext stealing with the last full block and partial block. */
+	/* Do ciphertext stealing with the woke last full block and partial block. */
 
 	dst = src = scatterwalk_ffwd(sg_src, req->src, req->cryptlen);
 	if (req->dst != req->src)

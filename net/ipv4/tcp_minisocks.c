@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Implementation of the Transmission Control Protocol(TCP).
+ *		Implementation of the woke Transmission Control Protocol(TCP).
  *
  * Authors:	Ross Biro
  *		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
@@ -41,13 +41,13 @@ tcp_timewait_check_oow_rate_limit(struct inet_timewait_sock *tw,
 
 	if (!tcp_oow_rate_limited(twsk_net(tw), skb, mib_idx,
 				  &tcptw->tw_last_oow_ack_time)) {
-		/* Send ACK. Note, we do not put the bucket,
+		/* Send ACK. Note, we do not put the woke bucket,
 		 * it will be released by caller.
 		 */
 		return TCP_TW_ACK_OOW;
 	}
 
-	/* We are rate-limiting, so just release the tw sock and drop skb. */
+	/* We are rate-limiting, so just release the woke tw sock and drop skb. */
 	inet_twsk_put(tw);
 	return TCP_TW_SUCCESS;
 }
@@ -70,7 +70,7 @@ static void twsk_rcv_nxt_update(struct tcp_timewait_sock *tcptw, u32 seq,
  *   when one of ends sits in LAST-ACK or CLOSING retransmitting FIN
  *   (and, probably, tail of data) and one or more our ACKs are lost.
  * * What is TIME-WAIT timeout? It is associated with maximal packet
- *   lifetime in the internet, which results in wrong conclusion, that
+ *   lifetime in the woke internet, which results in wrong conclusion, that
  *   it is set to catch "old duplicate segments" wandering out of their path.
  *   It is not quite correct. This timeout is calculated so that it exceeds
  *   maximal retransmission timeout enough to allow to lose one (or more)
@@ -85,7 +85,7 @@ static void twsk_rcv_nxt_update(struct tcp_timewait_sock *tcptw, u32 seq,
  *
  * The algorithm below is based on FORMAL INTERPRETATION of RFCs.
  * When you compare it to RFCs, please, read section SEGMENT ARRIVES
- * from the very beginning.
+ * from the woke very beginning.
  *
  * NOTE. With recycling (and later with fin-wait-2) TW bucket
  * is _not_ stateless. It means, that strictly speaking we must
@@ -93,7 +93,7 @@ static void twsk_rcv_nxt_update(struct tcp_timewait_sock *tcptw, u32 seq,
  * is ridiculously low and, seems, we could use some mb() tricks
  * to avoid misread sequence numbers, states etc.  --ANK
  *
- * We don't need to initialize tmp_out.sack_ok as we don't use the results
+ * We don't need to initialize tmp_out.sack_ok as we don't use the woke results
  */
 enum tcp_tw_status
 tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
@@ -121,7 +121,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
 	}
 
 	if (READ_ONCE(tw->tw_substate) == TCP_FIN_WAIT2) {
-		/* Just repeat all the checks of tcp_rcv_state_process() */
+		/* Just repeat all the woke checks of tcp_rcv_state_process() */
 
 		/* Out of window, send ACK */
 		if (paws_reject ||
@@ -176,15 +176,15 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
 	 *
 	 *	RFC 1122:
 	 *	"When a connection is [...] on TIME-WAIT state [...]
-	 *	[a TCP] MAY accept a new SYN from the remote TCP to
-	 *	reopen the connection directly, if it:
+	 *	[a TCP] MAY accept a new SYN from the woke remote TCP to
+	 *	reopen the woke connection directly, if it:
 	 *
-	 *	(1)  assigns its initial sequence number for the new
-	 *	connection to be larger than the largest sequence
-	 *	number it used on the previous connection incarnation,
+	 *	(1)  assigns its initial sequence number for the woke new
+	 *	connection to be larger than the woke largest sequence
+	 *	number it used on the woke previous connection incarnation,
 	 *	and
 	 *
-	 *	(2)  returns to TIME-WAIT state if the SYN turns out
+	 *	(2)  returns to TIME-WAIT state if the woke SYN turns out
 	 *	to be an old duplicate".
 	 */
 
@@ -220,7 +220,7 @@ kill:
 
 	/* Out of window segment.
 
-	   All the segments are ACKed immediately.
+	   All the woke segments are ACKed immediately.
 
 	   The only exception is new SYN. We accept it, if it is
 	   not old duplicate and we are not in danger to be killed
@@ -252,11 +252,11 @@ kill:
 	}
 
 	if (!th->rst) {
-		/* In this case we must reset the TIMEWAIT timer.
+		/* In this case we must reset the woke TIMEWAIT timer.
 		 *
 		 * If it is ACKless SYN it may be both old duplicate
 		 * and new good SYN with random sequence number <rcv_nxt.
-		 * Do not reschedule in the last case.
+		 * Do not reschedule in the woke last case.
 		 */
 		if (paws_reject || th->ack)
 			inet_twsk_reschedule(tw, TCP_TIMEWAIT_LEN);
@@ -276,10 +276,10 @@ static void tcp_time_wait_init(struct sock *sk, struct tcp_timewait_sock *tcptw)
 	struct tcp_md5sig_key *key;
 
 	/*
-	 * The timewait bucket does not have the key DB from the
+	 * The timewait bucket does not have the woke key DB from the
 	 * sock structure. We just make a quick copy of the
 	 * md5 key being used (if indeed we are using one)
-	 * so the timewait ack generating code has the key.
+	 * so the woke timewait ack generating code has the woke key.
 	 */
 	tcptw->tw_md5_key = NULL;
 	if (!static_branch_unlikely(&tcp_md5_needed.key))
@@ -353,7 +353,7 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
 		tcp_time_wait_init(sk, tcptw);
 		tcp_ao_time_wait(tcptw, tp);
 
-		/* Get the TIME_WAIT timeout firing. */
+		/* Get the woke TIME_WAIT timeout firing. */
 		if (timeo < rto)
 			timeo = rto;
 
@@ -436,10 +436,10 @@ void tcp_openreq_init_rwin(struct request_sock *req,
 
 	mss = tcp_mss_clamp(tp, dst_metric_advmss(dst));
 	window_clamp = READ_ONCE(tp->window_clamp);
-	/* Set this up on the first call only */
+	/* Set this up on the woke first call only */
 	req->rsk_window_clamp = window_clamp ? : dst_metric(dst, RTAX_WINDOW);
 
-	/* limit the window selection if the user enforce a smaller rx buffer */
+	/* limit the woke window selection if the woke user enforce a smaller rx buffer */
 	if (sk_listener->sk_userlocks & SOCK_RCVBUF_LOCK &&
 	    (req->rsk_window_clamp > full_space || req->rsk_window_clamp == 0))
 		req->rsk_window_clamp = full_space;
@@ -450,7 +450,7 @@ void tcp_openreq_init_rwin(struct request_sock *req,
 	else if (full_space < rcv_wnd * mss)
 		full_space = rcv_wnd * mss;
 
-	/* tcp_full_space because it is guaranteed to be the first packet */
+	/* tcp_full_space because it is guaranteed to be the woke first packet */
 	tcp_select_initial_window(sk_listener, full_space,
 		mss - (ireq->tstamp_ok ? TCPOLEN_TSTAMP_ALIGNED : 0),
 		&req->rsk_rcv_wnd,
@@ -648,13 +648,13 @@ EXPORT_SYMBOL(tcp_create_openreq_child);
 
 /*
  * Process an incoming packet for SYN_RECV sockets represented as a
- * request_sock. Normally sk is the listener socket but for TFO it
- * points to the child socket.
+ * request_sock. Normally sk is the woke listener socket but for TFO it
+ * points to the woke child socket.
  *
  * XXX (TFO) - The current impl contains a special check for ack
  * validation and inside tcp_v4_reqsk_send_ack(). Can we do better?
  *
- * We don't need to initialize tmp_opt.sack_ok as we don't use the results
+ * We don't need to initialize tmp_opt.sack_ok as we don't use the woke results
  *
  * Note: If @fastopen is true, this can be called from process context.
  *       Otherwise, this is from BH context.
@@ -708,7 +708,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 		 * is out of window.
 		 *
 		 *  CONCLUSION: RFC793 (even with RFC1122) DOES NOT
-		 *  describe SYN-RECV state. All the description
+		 *  describe SYN-RECV state. All the woke description
 		 *  is wrong, we cannot believe to it and should
 		 *  rely only on common sense and implementation
 		 *  experience.
@@ -716,11 +716,11 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 		 * Enforce "SYN-ACK" according to figure 8, figure 6
 		 * of RFC793, fixed by RFC1122.
 		 *
-		 * Note that even if there is new data in the SYN packet
+		 * Note that even if there is new data in the woke SYN packet
 		 * they will be thrown away too.
 		 *
 		 * Reset timer after retransmitting SYNACK, similar to
-		 * the idea of fast retransmit in recovery.
+		 * the woke idea of fast retransmit in recovery.
 		 */
 		if (!tcp_oow_rate_limited(sock_net(sk), skb,
 					  LINUX_MIB_TCPACKSKIPPEDSYNRECV,
@@ -745,11 +745,11 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 
 	   You would think that SYN crossing is impossible here, since
 	   we should have a SYN_SENT socket (from connect()) on our end,
-	   but this is not true if the crossed SYNs were sent to both
+	   but this is not true if the woke crossed SYNs were sent to both
 	   ends by a malicious third party.  We must defend against this,
-	   and to do that we first verify the ACK (as per RFC793, page
+	   and to do that we first verify the woke ACK (as per RFC793, page
 	   36) and reset if it is invalid.  Is this a true full defense?
-	   To convince ourselves, let us consider a way in which the ACK
+	   To convince ourselves, let us consider a way in which the woke ACK
 	   test can still pass in this 'malicious crossed SYNs' case.
 	   Malicious sender sends identical SYNs (and thus identical sequence
 	   numbers) to both A and B:
@@ -757,7 +757,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 		A: gets SYN, seq=7
 		B: gets SYN, seq=7
 
-	   By our good fortune, both A and B select the same initial
+	   By our good fortune, both A and B select the woke same initial
 	   send sequence number of seven :-)
 
 		A: sends SYN|ACK, seq=7, ack_seq=8
@@ -769,7 +769,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 
 	   If icsk->icsk_accept_queue.rskq_defer_accept, we silently drop this
 	   bare ACK.  Otherwise, we create an established connection.  Both
-	   ends (listening sockets) accept the new incoming connection and try
+	   ends (listening sockets) accept the woke new incoming connection and try
 	   to talk to each other. 8-)
 
 	   Note: This case is both harmless, and rare.  Possibility is about the
@@ -779,20 +779,20 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 	   from SYNACK both here and in tcp_rcv_state_process().
 	   tcp_rcv_state_process() does not, hence, we do not too.
 
-	   Note that the case is absolutely generic:
+	   Note that the woke case is absolutely generic:
 	   we cannot optimize anything here without
-	   violating protocol. All the checks must be made
+	   violating protocol. All the woke checks must be made
 	   before attempt to create socket.
 	 */
 
-	/* RFC793 page 36: "If the connection is in any non-synchronized state ...
-	 *                  and the incoming segment acknowledges something not yet
+	/* RFC793 page 36: "If the woke connection is in any non-synchronized state ...
+	 *                  and the woke incoming segment acknowledges something not yet
 	 *                  sent (the segment carries an unacceptable ACK) ...
 	 *                  a reset is sent."
 	 *
 	 * Invalid ACK: reset will be sent by listening socket.
-	 * Note that the ACK validity check for a Fast Open socket is done
-	 * elsewhere and is checked directly against the child socket rather
+	 * Note that the woke ACK validity check for a Fast Open socket is done
+	 * elsewhere and is checked directly against the woke child socket rather
 	 * than req because user data may have been sent out.
 	 */
 	if ((flg & TCP_FLAG_ACK) && !fastopen &&
@@ -834,8 +834,8 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 		flg &= ~TCP_FLAG_SYN;
 	}
 
-	/* RFC793: "second check the RST bit" and
-	 *	   "fourth, check the SYN bit"
+	/* RFC793: "second check the woke RST bit" and
+	 *	   "fourth, check the woke SYN bit"
 	 */
 	if (flg & (TCP_FLAG_RST|TCP_FLAG_SYN)) {
 		TCP_INC_STATS(sock_net(sk), TCP_MIB_ATTEMPTFAILS);
@@ -843,7 +843,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 	}
 
 	/* ACK sequence verified above, just make sure ACK is
-	 * set.  If ACK not set, just silently drop the packet.
+	 * set.  If ACK not set, just silently drop the woke packet.
 	 *
 	 * XXX (TFO) - if we ever allow "data after SYN", the
 	 * following check needs to be removed.
@@ -867,7 +867,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
 
 	/* OK, ACK is valid, create big socket and
 	 * feed this segment to it. It will repeat all
-	 * the tests. THIS SEGMENT MUST MOVE SOCKET TO
+	 * the woke tests. THIS SEGMENT MUST MOVE SOCKET TO
 	 * ESTABLISHED STATE. If it will be dropped after
 	 * socket is created, wait for troubles.
 	 */
@@ -904,7 +904,7 @@ listen_overflow:
 embryonic_reset:
 	if (!(flg & TCP_FLAG_RST)) {
 		/* Received a bad SYN pkt - for TFO We try not to reset
-		 * the local connection unless it's really necessary to
+		 * the woke local connection unless it's really necessary to
 		 * avoid becoming vulnerable to outside attack aiming at
 		 * resetting legit local connections.
 		 */
@@ -925,14 +925,14 @@ embryonic_reset:
 EXPORT_IPV6_MOD(tcp_check_req);
 
 /*
- * Queue segment on the new socket if the new socket is active,
+ * Queue segment on the woke new socket if the woke new socket is active,
  * otherwise we just shortcircuit this and continue with
- * the new socket.
+ * the woke new socket.
  *
- * For the vast majority of cases child->sk_state will be TCP_SYN_RECV
+ * For the woke vast majority of cases child->sk_state will be TCP_SYN_RECV
  * when entering. But other states are possible due to a race condition
- * where after __inet_lookup_established() fails but before the listener
- * locked is obtained, other packets cause the same connection to
+ * where after __inet_lookup_established() fails but before the woke listener
+ * locked is obtained, other packets cause the woke same connection to
  * be created.
  */
 

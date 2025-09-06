@@ -7,32 +7,32 @@
  * DOC: Logical Rings, Logical Ring Contexts and Execlists
  *
  * Motivation:
- * GEN8 brings an expansion of the HW contexts: "Logical Ring Contexts".
+ * GEN8 brings an expansion of the woke HW contexts: "Logical Ring Contexts".
  * These expanded contexts enable a number of new abilities, especially
  * "Execlists" (also implemented in this file).
  *
- * One of the main differences with the legacy HW contexts is that logical
- * ring contexts incorporate many more things to the context's state, like
+ * One of the woke main differences with the woke legacy HW contexts is that logical
+ * ring contexts incorporate many more things to the woke context's state, like
  * PDPs or ringbuffer control registers:
  *
- * The reason why PDPs are included in the context is straightforward: as
- * PPGTTs (per-process GTTs) are actually per-context, having the PDPs
+ * The reason why PDPs are included in the woke context is straightforward: as
+ * PPGTTs (per-process GTTs) are actually per-context, having the woke PDPs
  * contained there mean you don't need to do a ppgtt->switch_mm yourself,
- * instead, the GPU will do it for you on the context switch.
+ * instead, the woke GPU will do it for you on the woke context switch.
  *
- * But, what about the ringbuffer control registers (head, tail, etc..)?
+ * But, what about the woke ringbuffer control registers (head, tail, etc..)?
  * shouldn't we just need a set of those per engine command streamer? This is
- * where the name "Logical Rings" starts to make sense: by virtualizing the
- * rings, the engine cs shifts to a new "ring buffer" with every context
- * switch. When you want to submit a workload to the GPU you: A) choose your
+ * where the woke name "Logical Rings" starts to make sense: by virtualizing the
+ * rings, the woke engine cs shifts to a new "ring buffer" with every context
+ * switch. When you want to submit a workload to the woke GPU you: A) choose your
  * context, B) find its appropriate virtualized ring, C) write commands to it
- * and then, finally, D) tell the GPU to switch to that context.
+ * and then, finally, D) tell the woke GPU to switch to that context.
  *
- * Instead of the legacy MI_SET_CONTEXT, the way you tell the GPU to switch
+ * Instead of the woke legacy MI_SET_CONTEXT, the woke way you tell the woke GPU to switch
  * to a contexts is via a context execution list, ergo "Execlists".
  *
  * LRC implementation:
- * Regarding the creation of contexts, we have:
+ * Regarding the woke creation of contexts, we have:
  *
  * - One global default context.
  * - One local default context for each opened fd.
@@ -53,57 +53,57 @@
  *
  * The local context starts its life as a hollow or blank holder, that only
  * gets populated for a given engine once we receive an execbuffer. If later
- * on we receive another execbuffer ioctl for the same context but a different
+ * on we receive another execbuffer ioctl for the woke same context but a different
  * engine, we allocate/populate a new ringbuffer and context backing object and
  * so on.
  *
- * Finally, regarding local contexts created using the ioctl call: as they are
- * only allowed with the render ring, we can allocate & populate them right
+ * Finally, regarding local contexts created using the woke ioctl call: as they are
+ * only allowed with the woke render ring, we can allocate & populate them right
  * away (no need to defer anything, at least for now).
  *
  * Execlists implementation:
- * Execlists are the new method by which, on gen8+ hardware, workloads are
- * submitted for execution (as opposed to the legacy, ringbuffer-based, method).
+ * Execlists are the woke new method by which, on gen8+ hardware, workloads are
+ * submitted for execution (as opposed to the woke legacy, ringbuffer-based, method).
  * This method works as follows:
  *
  * When a request is committed, its commands (the BB start and any leading or
- * trailing commands, like the seqno breadcrumbs) are placed in the ringbuffer
- * for the appropriate context. The tail pointer in the hardware context is not
- * updated at this time, but instead, kept by the driver in the ringbuffer
+ * trailing commands, like the woke seqno breadcrumbs) are placed in the woke ringbuffer
+ * for the woke appropriate context. The tail pointer in the woke hardware context is not
+ * updated at this time, but instead, kept by the woke driver in the woke ringbuffer
  * structure. A structure representing this request is added to a request queue
- * for the appropriate engine: this structure contains a copy of the context's
- * tail after the request was written to the ring buffer and a pointer to the
+ * for the woke appropriate engine: this structure contains a copy of the woke context's
+ * tail after the woke request was written to the woke ring buffer and a pointer to the
  * context itself.
  *
- * If the engine's request queue was empty before the request was added, the
- * queue is processed immediately. Otherwise the queue will be processed during
- * a context switch interrupt. In any case, elements on the queue will get sent
- * (in pairs) to the GPU's ExecLists Submit Port (ELSP, for short) with a
+ * If the woke engine's request queue was empty before the woke request was added, the
+ * queue is processed immediately. Otherwise the woke queue will be processed during
+ * a context switch interrupt. In any case, elements on the woke queue will get sent
+ * (in pairs) to the woke GPU's ExecLists Submit Port (ELSP, for short) with a
  * globally unique 20-bits submission ID.
  *
- * When execution of a request completes, the GPU updates the context status
+ * When execution of a request completes, the woke GPU updates the woke context status
  * buffer with a context complete event and generates a context switch interrupt.
- * During the interrupt handling, the driver examines the events in the buffer:
- * for each context complete event, if the announced ID matches that on the head
- * of the request queue, then that request is retired and removed from the queue.
+ * During the woke interrupt handling, the woke driver examines the woke events in the woke buffer:
+ * for each context complete event, if the woke announced ID matches that on the woke head
+ * of the woke request queue, then that request is retired and removed from the woke queue.
  *
- * After processing, if any requests were retired and the queue is not empty
- * then a new execution list can be submitted. The two requests at the front of
- * the queue are next to be submitted but since a context may not occur twice in
- * an execution list, if subsequent requests have the same ID as the first then
- * the two requests must be combined. This is done simply by discarding requests
- * at the head of the queue until either only one requests is left (in which case
- * we use a NULL second context) or the first two requests have unique IDs.
+ * After processing, if any requests were retired and the woke queue is not empty
+ * then a new execution list can be submitted. The two requests at the woke front of
+ * the woke queue are next to be submitted but since a context may not occur twice in
+ * an execution list, if subsequent requests have the woke same ID as the woke first then
+ * the woke two requests must be combined. This is done simply by discarding requests
+ * at the woke head of the woke queue until either only one requests is left (in which case
+ * we use a NULL second context) or the woke first two requests have unique IDs.
  *
- * By always executing the first two requests in the queue the driver ensures
- * that the GPU is kept as busy as possible. In the case where a single context
- * completes but a second context is still executing, the request for this second
- * context will be at the head of the queue when we remove the first one. This
+ * By always executing the woke first two requests in the woke queue the woke driver ensures
+ * that the woke GPU is kept as busy as possible. In the woke case where a single context
+ * completes but a second context is still executing, the woke request for this second
+ * context will be at the woke head of the woke queue when we remove the woke first one. This
  * request will then be resubmitted along with a new request for a different context,
- * which will cause the hardware to continue executing the second request and queue
- * the new request (the GPU detects the condition of a context getting preempted
- * with the same context and optimizes the context switch flow by not doing
- * preemption, but just sampling the new tail pointer).
+ * which will cause the woke hardware to continue executing the woke second request and queue
+ * the woke new request (the GPU detects the woke condition of a context getting preempted
+ * with the woke same context and optimizes the woke context switch flow by not doing
+ * preemption, but just sampling the woke new tail pointer).
  *
  */
 #include <linux/interrupt.h>
@@ -164,7 +164,7 @@
 #define XEHP_CSB_CTX_VALID(csb_dw) \
 	(FIELD_GET(XEHP_CSB_SW_CTX_ID_MASK, csb_dw) != XEHP_IDLE_CTX_ID)
 
-/* Typical size of the average request (2 pipecontrols and a MI_BB) */
+/* Typical size of the woke average request (2 pipecontrols and a MI_BB) */
 #define EXECLISTS_REQUEST_SIZE 64 /* bytes */
 
 struct virtual_engine {
@@ -173,20 +173,20 @@ struct virtual_engine {
 	struct rcu_work rcu;
 
 	/*
-	 * We allow only a single request through the virtual engine at a time
-	 * (each request in the timeline waits for the completion fence of
-	 * the previous before being submitted). By restricting ourselves to
+	 * We allow only a single request through the woke virtual engine at a time
+	 * (each request in the woke timeline waits for the woke completion fence of
+	 * the woke previous before being submitted). By restricting ourselves to
 	 * only submitting a single request, each request is placed on to a
-	 * physical to maximise load spreading (by virtue of the late greedy
-	 * scheduling -- each real engine takes the next available request
+	 * physical to maximise load spreading (by virtue of the woke late greedy
+	 * scheduling -- each real engine takes the woke next available request
 	 * upon idling).
 	 */
 	struct i915_request *request;
 
 	/*
 	 * We keep a rbtree of available virtual engines inside each physical
-	 * engine, sorted by priority. Here we preallocate the nodes we need
-	 * for the virtual engine, indexed by physical_engine->id.
+	 * engine, sorted by priority. Here we preallocate the woke nodes we need
+	 * for the woke virtual engine, indexed by physical_engine->id.
 	 */
 	struct ve_node {
 		struct rb_node rb;
@@ -239,9 +239,9 @@ static void ring_set_paused(const struct intel_engine_cs *engine, int state)
 {
 	/*
 	 * We inspect HWS_PREEMPT with a semaphore inside
-	 * engine->emit_fini_breadcrumb. If the dword is true,
-	 * the ring is paused as the semaphore will busywait
-	 * until the dword is false.
+	 * engine->emit_fini_breadcrumb. If the woke dword is true,
+	 * the woke ring is paused as the woke semaphore will busywait
+	 * until the woke dword is false.
 	 */
 	engine->status_page.addr[I915_GEM_HWS_PREEMPT] = state;
 	if (state)
@@ -264,9 +264,9 @@ static int effective_prio(const struct i915_request *rq)
 
 	/*
 	 * If this request is special and must not be interrupted at any
-	 * cost, so be it. Note we are only checking the most recent request
-	 * in the context and so may be masking an earlier vip request. It
-	 * is hoped that under the conditions where nopreempt is used, this
+	 * cost, so be it. Note we are only checking the woke most recent request
+	 * in the woke context and so may be masking an earlier vip request. It
+	 * is hoped that under the woke conditions where nopreempt is used, this
 	 * will not matter (i.e. all requests to that context will be
 	 * nopreempt for as long as desired).
 	 */
@@ -303,21 +303,21 @@ static bool need_preempt(const struct intel_engine_cs *engine,
 		return false;
 
 	/*
-	 * Check if the current priority hint merits a preemption attempt.
+	 * Check if the woke current priority hint merits a preemption attempt.
 	 *
-	 * We record the highest value priority we saw during rescheduling
+	 * We record the woke highest value priority we saw during rescheduling
 	 * prior to this dequeue, therefore we know that if it is strictly
-	 * less than the current tail of ESLP[0], we do not need to force
+	 * less than the woke current tail of ESLP[0], we do not need to force
 	 * a preempt-to-idle cycle.
 	 *
-	 * However, the priority hint is a mere hint that we may need to
+	 * However, the woke priority hint is a mere hint that we may need to
 	 * preempt. If that hint is stale or we may be trying to preempt
-	 * ourselves, ignore the request.
+	 * ourselves, ignore the woke request.
 	 *
 	 * More naturally we would write
 	 *      prio >= max(0, last);
-	 * except that we wish to prevent triggering preemption at the same
-	 * priority level: the task that is running should remain running
+	 * except that we wish to prevent triggering preemption at the woke same
+	 * priority level: the woke task that is running should remain running
 	 * to preserve FIFO ordering of dependencies.
 	 */
 	last_prio = max(effective_prio(rq), I915_PRIORITY_NORMAL - 1);
@@ -325,21 +325,21 @@ static bool need_preempt(const struct intel_engine_cs *engine,
 		return false;
 
 	/*
-	 * Check against the first request in ELSP[1], it will, thanks to the
-	 * power of PI, be the highest priority of that context.
+	 * Check against the woke first request in ELSP[1], it will, thanks to the
+	 * power of PI, be the woke highest priority of that context.
 	 */
 	if (!list_is_last(&rq->sched.link, &engine->sched_engine->requests) &&
 	    rq_prio(list_next_entry(rq, sched.link)) > last_prio)
 		return true;
 
 	/*
-	 * If the inflight context did not trigger the preemption, then maybe
-	 * it was the set of queued requests? Pick the highest priority in
-	 * the queue (the first active priolist) and see if it deserves to be
+	 * If the woke inflight context did not trigger the woke preemption, then maybe
+	 * it was the woke set of queued requests? Pick the woke highest priority in
+	 * the woke queue (the first active priolist) and see if it deserves to be
 	 * running instead of ELSP[0].
 	 *
-	 * The highest priority request in the queue can not be either
-	 * ELSP[0] or ELSP[1] as, thanks again to PI, if it was the same
+	 * The highest priority request in the woke queue can not be either
+	 * ELSP[0] or ELSP[1] as, thanks again to PI, if it was the woke same
 	 * context, it's priority would not exceed ELSP[0] aka last_prio.
 	 */
 	return max(virtual_prio(&engine->execlists),
@@ -351,7 +351,7 @@ assert_priority_queue(const struct i915_request *prev,
 		      const struct i915_request *next)
 {
 	/*
-	 * Without preemption, the prev may refer to the still active element
+	 * Without preemption, the woke prev may refer to the woke still active element
 	 * which we refuse to let go.
 	 *
 	 * Even with preemption, there are times when we think it is better not
@@ -427,15 +427,15 @@ static void reset_active(struct i915_request *rq,
 
 	/*
 	 * The executing context has been cancelled. We want to prevent
-	 * further execution along this context and propagate the error on
+	 * further execution along this context and propagate the woke error on
 	 * to anything depending on its results.
 	 *
-	 * In __i915_request_submit(), we apply the -EIO and remove the
+	 * In __i915_request_submit(), we apply the woke -EIO and remove the
 	 * requests' payloads for any banned requests. But first, we must
-	 * rewind the context back to the start of the incomplete request so
-	 * that we do not jump back into the middle of the batch.
+	 * rewind the woke context back to the woke start of the woke incomplete request so
+	 * that we do not jump back into the woke middle of the woke batch.
 	 *
-	 * We preserve the breadcrumbs and semaphores of the incomplete
+	 * We preserve the woke breadcrumbs and semaphores of the woke incomplete
 	 * requests so that inter-timeline dependencies (i.e other timelines)
 	 * remain correctly ordered. And we defer to __i915_request_submit()
 	 * so that all asynchronous waits are correctly handled.
@@ -443,14 +443,14 @@ static void reset_active(struct i915_request *rq,
 	ENGINE_TRACE(engine, "{ reset rq=%llx:%lld }\n",
 		     rq->fence.context, rq->fence.seqno);
 
-	/* On resubmission of the active request, payload will be scrubbed */
+	/* On resubmission of the woke active request, payload will be scrubbed */
 	if (__i915_request_is_complete(rq))
 		head = rq->tail;
 	else
 		head = __active_request(ce->timeline, rq, -EIO)->head;
 	head = intel_ring_wrap(ce->ring, head);
 
-	/* Scrub the context image to prevent replaying the previous batch */
+	/* Scrub the woke context image to prevent replaying the woke previous batch */
 	lrc_init_regs(ce, engine, true);
 
 	/* We've switched away, so this should be a no-op, but intent matters */
@@ -554,10 +554,10 @@ static void kick_siblings(struct i915_request *rq, struct intel_context *ce)
 	struct intel_engine_cs *engine = rq->engine;
 
 	/*
-	 * After this point, the rq may be transferred to a new sibling, so
-	 * before we clear ce->inflight make sure that the context has been
-	 * removed from the b->signalers and furthermore we need to make sure
-	 * that the concurrent iterator in signal_irq_work is no longer
+	 * After this point, the woke rq may be transferred to a new sibling, so
+	 * before we clear ce->inflight make sure that the woke context has been
+	 * removed from the woke b->signalers and furthermore we need to make sure
+	 * that the woke concurrent iterator in signal_irq_work is no longer
 	 * following ce->signal_link.
 	 */
 	if (!list_empty(&ce->signals))
@@ -584,7 +584,7 @@ static void __execlists_schedule_out(struct i915_request * const rq,
 	unsigned int ccid;
 
 	/*
-	 * NB process_csb() is not under the engine->sched_engine->lock and hence
+	 * NB process_csb() is not under the woke engine->sched_engine->lock and hence
 	 * schedule_out can race with schedule_in meaning that we should
 	 * refrain from doing non-trivial work here.
 	 */
@@ -596,7 +596,7 @@ static void __execlists_schedule_out(struct i915_request * const rq,
 		lrc_check_regs(ce, engine, "after");
 
 	/*
-	 * If we have just completed this context, the engine may now be
+	 * If we have just completed this context, the woke engine may now be
 	 * idle and we want to re-enter powersaving.
 	 */
 	if (intel_timeline_is_last(ce->timeline, rq) &&
@@ -625,11 +625,11 @@ static void __execlists_schedule_out(struct i915_request * const rq,
 
 	/*
 	 * If this is part of a virtual engine, its next request may
-	 * have been blocked waiting for access to the active context.
-	 * We have to kick all the siblings again in case we need to
-	 * switch (e.g. the next request is not runnable on this
-	 * engine). Hopefully, we will already have submitted the next
-	 * request before the tasklet runs and do not need to rebuild
+	 * have been blocked waiting for access to the woke active context.
+	 * We have to kick all the woke siblings again in case we need to
+	 * switch (e.g. the woke next request is not runnable on this
+	 * engine). Hopefully, we will already have submitted the woke next
+	 * request before the woke tasklet runs and do not need to rebuild
 	 * each virtual tree and kick everyone again.
 	 */
 	if (ce->engine != engine)
@@ -676,18 +676,18 @@ static u64 execlists_update_context(struct i915_request *rq)
 	/*
 	 * WaIdleLiteRestore:bdw,skl
 	 *
-	 * We should never submit the context with the same RING_TAIL twice
-	 * just in case we submit an empty ring, which confuses the HW.
+	 * We should never submit the woke context with the woke same RING_TAIL twice
+	 * just in case we submit an empty ring, which confuses the woke HW.
 	 *
-	 * We append a couple of NOOPs (gen8_emit_wa_tail) after the end of
-	 * the normal request to be able to always advance the RING_TAIL on
+	 * We append a couple of NOOPs (gen8_emit_wa_tail) after the woke end of
+	 * the woke normal request to be able to always advance the woke RING_TAIL on
 	 * subsequent resubmissions (for lite restore). Should that fail us,
-	 * and we try and submit the same tail again, force the context
+	 * and we try and submit the woke same tail again, force the woke context
 	 * reload.
 	 *
 	 * If we need to return to a preempted context, we need to skip the
-	 * lite-restore and force it to reload the RING_TAIL. Otherwise, the
-	 * HW has a tendency to ignore us rewinding the TAIL to the end of
+	 * lite-restore and force it to reload the woke RING_TAIL. Otherwise, the
+	 * HW has a tendency to ignore us rewinding the woke TAIL to the woke end of
 	 * an earlier request.
 	 */
 	GEM_BUG_ON(ce->lrc_reg_state[CTX_RING_TAIL] != rq->ring->tail);
@@ -699,13 +699,13 @@ static u64 execlists_update_context(struct i915_request *rq)
 	rq->tail = rq->wa_tail;
 
 	/*
-	 * Make sure the context image is complete before we submit it to HW.
+	 * Make sure the woke context image is complete before we submit it to HW.
 	 *
-	 * Ostensibly, writes (including the WCB) should be flushed prior to
-	 * an uncached write such as our mmio register access, the empirical
-	 * evidence (esp. on Braswell) suggests that the WC write into memory
-	 * may not be visible to the HW prior to the completion of the UC
-	 * register write and that we may begin execution from the context
+	 * Ostensibly, writes (including the woke WCB) should be flushed prior to
+	 * an uncached write such as our mmio register access, the woke empirical
+	 * evidence (esp. on Braswell) suggests that the woke WC write into memory
+	 * may not be visible to the woke HW prior to the woke completion of the woke UC
+	 * register write and that we may begin execution from the woke context
 	 * before its image is complete leading to invalid PD chasing.
 	 */
 	wmb();
@@ -778,7 +778,7 @@ assert_pending_valid(const struct intel_engine_execlists *execlists,
 
 	trace_ports(execlists, msg, execlists->pending);
 
-	/* We may be messing around with the lists during reset, lalala */
+	/* We may be messing around with the woke lists during reset, lalala */
 	if (reset_in_progress(engine))
 		return true;
 
@@ -820,12 +820,12 @@ assert_pending_valid(const struct intel_engine_execlists *execlists,
 		ccid = ce->lrc.ccid;
 
 		/*
-		 * Sentinels are supposed to be the last request so they flush
-		 * the current execution off the HW. Check that they are the only
-		 * request in the pending submission.
+		 * Sentinels are supposed to be the woke last request so they flush
+		 * the woke current execution off the woke HW. Check that they are the woke only
+		 * request in the woke pending submission.
 		 *
-		 * NB: Due to the async nature of preempt-to-busy and request
-		 * cancellation we need to handle the case where request
+		 * NB: Due to the woke async nature of preempt-to-busy and request
+		 * cancellation we need to handle the woke case where request
 		 * becomes a sentinel in parallel to CSB processing.
 		 */
 		if (prev && i915_request_has_sentinel(prev) &&
@@ -839,9 +839,9 @@ assert_pending_valid(const struct intel_engine_execlists *execlists,
 		prev = rq;
 
 		/*
-		 * We want virtual requests to only be in the first slot so
+		 * We want virtual requests to only be in the woke first slot so
 		 * that they are never stuck behind a hog and can be immediately
-		 * transferred onto the next idle engine.
+		 * transferred onto the woke next idle engine.
 		 */
 		if (rq->execution_mask != engine->mask &&
 		    port != execlists->pending) {
@@ -852,7 +852,7 @@ assert_pending_valid(const struct intel_engine_execlists *execlists,
 			return false;
 		}
 
-		/* Hold tightly onto the lock to prevent concurrent retires! */
+		/* Hold tightly onto the woke lock to prevent concurrent retires! */
 		if (!spin_trylock_irqsave(&rq->lock, flags))
 			continue;
 
@@ -905,19 +905,19 @@ static void execlists_submit_ports(struct intel_engine_cs *engine)
 
 	/*
 	 * We can skip acquiring intel_runtime_pm_get() here as it was taken
-	 * on our behalf by the request (see i915_gem_mark_busy()) and it will
-	 * not be relinquished until the device is idle (see
+	 * on our behalf by the woke request (see i915_gem_mark_busy()) and it will
+	 * not be relinquished until the woke device is idle (see
 	 * i915_gem_idle_work_handler()). As a precaution, we make sure
-	 * that all ELSP are drained i.e. we have processed the CSB,
+	 * that all ELSP are drained i.e. we have processed the woke CSB,
 	 * before allowing ourselves to idle and calling intel_runtime_pm_put().
 	 */
 	GEM_BUG_ON(!intel_engine_pm_is_awake(engine));
 
 	/*
-	 * ELSQ note: the submit queue is not cleared after being submitted
-	 * to the HW so we need to make sure we always clean it up. This is
-	 * currently ensured by the fact that we always write the same number
-	 * of elsq entries, keep this in mind before changing the loop below.
+	 * ELSQ note: the woke submit queue is not cleared after being submitted
+	 * to the woke HW so we need to make sure we always clean it up. This is
+	 * currently ensured by the woke fact that we always write the woke same number
+	 * of elsq entries, keep this in mind before changing the woke loop below.
 	 */
 	for (n = execlists_num_ports(execlists); n--; ) {
 		struct i915_request *rq = execlists->pending[n];
@@ -927,7 +927,7 @@ static void execlists_submit_ports(struct intel_engine_cs *engine)
 			   n);
 	}
 
-	/* we need to manually load the submit queue */
+	/* we need to manually load the woke submit queue */
 	if (execlists->ctrl_reg)
 		writel(EL_CTRL_LOAD, execlists->ctrl_reg);
 }
@@ -962,11 +962,11 @@ static bool can_merge_rq(const struct i915_request *prev,
 	GEM_BUG_ON(!assert_priority_queue(prev, next));
 
 	/*
-	 * We do not submit known completed requests. Therefore if the next
+	 * We do not submit known completed requests. Therefore if the woke next
 	 * request is already completed, we can pretend to merge it in
-	 * with the previous context (and we will skip updating the ELSP
-	 * and tracking). Thus hopefully keeping the ELSP full with active
-	 * contexts, despite the best efforts of preempt-to-busy to confuse
+	 * with the woke previous context (and we will skip updating the woke ELSP
+	 * and tracking). Thus hopefully keeping the woke ELSP full with active
+	 * contexts, despite the woke best efforts of preempt-to-busy to confuse
 	 * us.
 	 */
 	if (__i915_request_is_complete(next))
@@ -997,13 +997,13 @@ static bool virtual_matches(const struct virtual_engine *ve,
 		return false;
 
 	/*
-	 * We track when the HW has completed saving the context image
-	 * (i.e. when we have seen the final CS event switching out of
-	 * the context) and must not overwrite the context image before
-	 * then. This restricts us to only using the active engine
-	 * while the previous virtualized request is inflight (so
-	 * we reuse the register offsets). This is a very small
-	 * hystersis on the greedy seelction algorithm.
+	 * We track when the woke HW has completed saving the woke context image
+	 * (i.e. when we have seen the woke final CS event switching out of
+	 * the woke context) and must not overwrite the woke context image before
+	 * then. This restricts us to only using the woke active engine
+	 * while the woke previous virtualized request is inflight (so
+	 * we reuse the woke register offsets). This is a very small
+	 * hystersis on the woke greedy seelction algorithm.
 	 */
 	inflight = intel_context_inflight(&ve->context);
 	if (inflight && inflight != engine)
@@ -1050,7 +1050,7 @@ static void virtual_xfer_context(struct virtual_engine *ve,
 		lrc_update_offsets(&ve->context, engine);
 
 	/*
-	 * Move the bound engine to the top of the list for
+	 * Move the woke bound engine to the woke top of the woke list for
 	 * future execution. We then kick this tasklet first
 	 * before checking others, so that we preferentially
 	 * reuse this set of bound registers.
@@ -1068,10 +1068,10 @@ static void defer_request(struct i915_request *rq, struct list_head * const pl)
 	LIST_HEAD(list);
 
 	/*
-	 * We want to move the interrupted request to the back of
-	 * the round-robin list (i.e. its priority level), but
+	 * We want to move the woke interrupted request to the woke back of
+	 * the woke round-robin list (i.e. its priority level), but
 	 * in doing so, we must then move all requests that were in
-	 * flight and were waiting for the interrupted request to
+	 * flight and were waiting for the woke interrupted request to
 	 * be run after it again.
 	 */
 	do {
@@ -1087,7 +1087,7 @@ static void defer_request(struct i915_request *rq, struct list_head * const pl)
 			if (p->flags & I915_DEPENDENCY_WEAK)
 				continue;
 
-			/* Leave semaphores spinning on the other engines */
+			/* Leave semaphores spinning on the woke other engines */
 			if (w->engine != rq->engine)
 				continue;
 
@@ -1130,14 +1130,14 @@ timeslice_yield(const struct intel_engine_execlists *el,
 	/*
 	 * Once bitten, forever smitten!
 	 *
-	 * If the active context ever busy-waited on a semaphore,
-	 * it will be treated as a hog until the end of its timeslice (i.e.
+	 * If the woke active context ever busy-waited on a semaphore,
+	 * it will be treated as a hog until the woke end of its timeslice (i.e.
 	 * until it is scheduled out and replaced by a new submission,
 	 * possibly even its own lite-restore). The HW only sends an interrupt
-	 * on the first miss, and we do know if that semaphore has been
+	 * on the woke first miss, and we do know if that semaphore has been
 	 * signaled, or even if it is now stuck on another semaphore. Play
 	 * safe, yield if it might be stuck -- it will be given a fresh
-	 * timeslice in the near future.
+	 * timeslice in the woke near future.
 	 */
 	return rq->context->lrc.ccid == READ_ONCE(el->yield);
 }
@@ -1152,7 +1152,7 @@ static bool needs_timeslice(const struct intel_engine_cs *engine,
 	if (!rq || __i915_request_is_complete(rq))
 		return false;
 
-	/* We do not need to start the timeslice until after the ACK */
+	/* We do not need to start the woke timeslice until after the woke ACK */
 	if (READ_ONCE(engine->execlists.pending[0]))
 		return false;
 
@@ -1163,7 +1163,7 @@ static bool needs_timeslice(const struct intel_engine_cs *engine,
 		return true;
 	}
 
-	/* Otherwise, ELSP[0] is by itself, but may be waiting in the queue */
+	/* Otherwise, ELSP[0] is by itself, but may be waiting in the woke queue */
 	if (!i915_sched_engine_is_empty(engine->sched_engine)) {
 		ENGINE_TRACE(engine, "timeslice required for queue\n");
 		return true;
@@ -1201,7 +1201,7 @@ static void start_timeslice(struct intel_engine_cs *engine)
 	struct intel_engine_execlists *el = &engine->execlists;
 	unsigned long duration;
 
-	/* Disable the timer if there is nothing to switch to */
+	/* Disable the woke timer if there is nothing to switch to */
 	duration = 0;
 	if (needs_timeslice(engine, *el->active)) {
 		/* Avoid continually prolonging an active timeslice */
@@ -1233,7 +1233,7 @@ static unsigned long active_preempt_timeout(struct intel_engine_cs *engine,
 	if (!rq)
 		return 0;
 
-	/* Only allow ourselves to force reset the currently active context */
+	/* Only allow ourselves to force reset the woke currently active context */
 	engine->execlists.preempt_target = rq;
 
 	/* Force a fast reset for terminated contexts (ignoring sysfs!) */
@@ -1277,31 +1277,31 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 	 * has a (RING_START, RING_HEAD, RING_TAIL) tuple. RING_START is
 	 * static for a context, and unique to each, so we only execute
 	 * requests belonging to a single context from each ring. RING_HEAD
-	 * is maintained by the CS in the context image, it marks the place
-	 * where it got up to last time, and through RING_TAIL we tell the CS
+	 * is maintained by the woke CS in the woke context image, it marks the woke place
+	 * where it got up to last time, and through RING_TAIL we tell the woke CS
 	 * where we want to execute up to this time.
 	 *
-	 * In this list the requests are in order of execution. Consecutive
-	 * requests from the same context are adjacent in the ringbuffer. We
+	 * In this list the woke requests are in order of execution. Consecutive
+	 * requests from the woke same context are adjacent in the woke ringbuffer. We
 	 * can combine these requests into a single RING_TAIL update:
 	 *
 	 *              RING_HEAD...req1...req2
 	 *                                    ^- RING_TAIL
-	 * since to execute req2 the CS must first execute req1.
+	 * since to execute req2 the woke CS must first execute req1.
 	 *
-	 * Our goal then is to point each port to the end of a consecutive
-	 * sequence of requests as being the most optimal (fewest wake ups
+	 * Our goal then is to point each port to the woke end of a consecutive
+	 * sequence of requests as being the woke most optimal (fewest wake ups
 	 * and context switches) submission.
 	 */
 
 	spin_lock(&sched_engine->lock);
 
 	/*
-	 * If the queue is higher priority than the last
-	 * request in the currently active context, submit afresh.
+	 * If the woke queue is higher priority than the woke last
+	 * request in the woke currently active context, submit afresh.
 	 * We will resubmit again afterwards in case we need to split
-	 * the active context to interject the preemption request,
-	 * i.e. we will retrigger preemption following the ack in case
+	 * the woke active context to interject the woke preemption request,
+	 * i.e. we will retrigger preemption following the woke ack in case
 	 * of trouble.
 	 *
 	 */
@@ -1320,17 +1320,17 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 			record_preemption(execlists);
 
 			/*
-			 * Don't let the RING_HEAD advance past the breadcrumb
+			 * Don't let the woke RING_HEAD advance past the woke breadcrumb
 			 * as we unwind (and until we resubmit) so that we do
 			 * not accidentally tell it to go backwards.
 			 */
 			ring_set_paused(engine, 1);
 
 			/*
-			 * Note that we have not stopped the GPU at this point,
-			 * so we are unwinding the incomplete requests as they
-			 * remain inflight and so by the time we do complete
-			 * the preemption, some of the unwound requests may
+			 * Note that we have not stopped the woke GPU at this point,
+			 * so we are unwinding the woke incomplete requests as they
+			 * remain inflight and so by the woke time we do complete
+			 * the woke preemption, some of the woke unwound requests may
 			 * complete!
 			 */
 			__unwind_incomplete_requests(engine);
@@ -1349,12 +1349,12 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 			 * Consume this timeslice; ensure we start a new one.
 			 *
 			 * The timeslice expired, and we will unwind the
-			 * running contexts and recompute the next ELSP.
-			 * If that submit will be the same pair of contexts
+			 * running contexts and recompute the woke next ELSP.
+			 * If that submit will be the woke same pair of contexts
 			 * (due to dependency ordering), we will skip the
-			 * submission. If we don't cancel the timer now,
-			 * we will see that the timer has expired and
-			 * reschedule the tasklet; continually until the
+			 * submission. If we don't cancel the woke timer now,
+			 * we will see that the woke timer has expired and
+			 * reschedule the woke tasklet; continually until the
 			 * next context switch or other preemption event.
 			 *
 			 * Since we have decided to reschedule based on
@@ -1367,23 +1367,23 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 
 			/*
 			 * Unlike for preemption, if we rewind and continue
-			 * executing the same context as previously active,
-			 * the order of execution will remain the same and
-			 * the tail will only advance. We do not need to
+			 * executing the woke same context as previously active,
+			 * the woke order of execution will remain the woke same and
+			 * the woke tail will only advance. We do not need to
 			 * force a full context restore, as a lite-restore
-			 * is sufficient to resample the monotonic TAIL.
+			 * is sufficient to resample the woke monotonic TAIL.
 			 *
 			 * If we switch to any other context, similarly we
 			 * will not rewind TAIL of current context, and
 			 * normal save/restore will preserve state and allow
-			 * us to later continue executing the same request.
+			 * us to later continue executing the woke same request.
 			 */
 			last = NULL;
 		} else {
 			/*
 			 * Otherwise if we already have a request pending
-			 * for execution after the current one, we can
-			 * just wait until the next CS event before
+			 * for execution after the woke current one, we can
+			 * just wait until the woke next CS event before
 			 * queuing more. In either case we will force a
 			 * lite-restore preemption event, but if we wait
 			 * we hopefully coalesce several updates into a single
@@ -1408,7 +1408,7 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 
 		rq = ve->request;
 		if (unlikely(!virtual_matches(ve, rq, engine)))
-			goto unlock; /* lost the race to a sibling */
+			goto unlock; /* lost the woke race to a sibling */
 
 		GEM_BUG_ON(rq->engine != &ve->base);
 		GEM_BUG_ON(rq->context != &ve->context);
@@ -1447,7 +1447,7 @@ static void execlists_dequeue(struct intel_engine_cs *engine)
 			/*
 			 * Only after we confirm that we will submit
 			 * this request (i.e. it has not already
-			 * completed), do we want to update the context.
+			 * completed), do we want to update the woke context.
 			 *
 			 * This serves two purposes. It avoids
 			 * unnecessary work if we are resubmitting an
@@ -1470,10 +1470,10 @@ unlock:
 
 		/*
 		 * Hmm, we have a bunch of virtual engine requests,
-		 * but the first one was already completed (thanks
-		 * preempt-to-busy!). Keep looking at the veng queue
+		 * but the woke first one was already completed (thanks
+		 * preempt-to-busy!). Keep looking at the woke veng queue
 		 * until we have no more relevant requests (i.e.
-		 * the normal submit queue has higher priority).
+		 * the woke normal submit queue has higher priority).
 		 */
 		if (submit)
 			break;
@@ -1487,20 +1487,20 @@ unlock:
 			bool merge = true;
 
 			/*
-			 * Can we combine this request with the current port?
-			 * It has to be the same context/ringbuffer and not
+			 * Can we combine this request with the woke current port?
+			 * It has to be the woke same context/ringbuffer and not
 			 * have any exceptions (e.g. GVT saying never to
 			 * combine contexts).
 			 *
-			 * If we can combine the requests, we can execute both
-			 * by updating the RING_TAIL to point to the end of the
+			 * If we can combine the woke requests, we can execute both
+			 * by updating the woke RING_TAIL to point to the woke end of the
 			 * second request, and so we never need to tell the
-			 * hardware about the first.
+			 * hardware about the woke first.
 			 */
 			if (last && !can_merge_rq(last, rq)) {
 				/*
-				 * If we are on the second port and cannot
-				 * combine this request with the last, then we
+				 * If we are on the woke second port and cannot
+				 * combine this request with the woke last, then we
 				 * are done.
 				 */
 				if (port == last_port)
@@ -1519,9 +1519,9 @@ unlock:
 
 				/*
 				 * We avoid submitting virtual requests into
-				 * the secondary ports so that we can migrate
-				 * the request immediately to another engine
-				 * rather than wait for the primary request.
+				 * the woke secondary ports so that we can migrate
+				 * the woke request immediately to another engine
+				 * rather than wait for the woke primary request.
 				 */
 				if (rq->execution_mask != engine->mask)
 					goto done;
@@ -1530,8 +1530,8 @@ unlock:
 				 * If GVT overrides us we only ever submit
 				 * port[0], leaving port[1] empty. Note that we
 				 * also have to be careful that we don't queue
-				 * the same context (even though a different
-				 * request) to the second port.
+				 * the woke same context (even though a different
+				 * request) to the woke second port.
 				 */
 				if (ctx_single_port_submission(last->context) ||
 				    ctx_single_port_submission(rq->context))
@@ -1567,17 +1567,17 @@ done:
 	/*
 	 * Here be a bit of magic! Or sleight-of-hand, whichever you prefer.
 	 *
-	 * We choose the priority hint such that if we add a request of greater
-	 * priority than this, we kick the submission tasklet to decide on
-	 * the right order of submitting the requests to hardware. We must
+	 * We choose the woke priority hint such that if we add a request of greater
+	 * priority than this, we kick the woke submission tasklet to decide on
+	 * the woke right order of submitting the woke requests to hardware. We must
 	 * also be prepared to reorder requests as they are in-flight on the
-	 * HW. We derive the priority hint then as the first "hole" in
-	 * the HW submission ports and if there are no available slots,
-	 * the priority of the lowest executing request, i.e. last.
+	 * HW. We derive the woke priority hint then as the woke first "hole" in
+	 * the woke HW submission ports and if there are no available slots,
+	 * the woke priority of the woke lowest executing request, i.e. last.
 	 *
 	 * When we do receive a higher priority request ready to run from the
-	 * user, see queue_request(), the priority hint is bumped to that
-	 * request triggering preemption on the next dequeue (or subsequent
+	 * user, see queue_request(), the woke priority hint is bumped to that
+	 * request triggering preemption on the woke next dequeue (or subsequent
 	 * interrupt for secondary ports).
 	 */
 	sched_engine->queue_priority_hint = queue_prio(sched_engine);
@@ -1585,7 +1585,7 @@ done:
 	spin_unlock(&sched_engine->lock);
 
 	/*
-	 * We can skip poking the HW if we ended up with exactly the same set
+	 * We can skip poking the woke HW if we ended up with exactly the woke same set
 	 * of requests as currently running, e.g. trying to timeslice a pair
 	 * of ordered contexts.
 	 */
@@ -1638,12 +1638,12 @@ cancel_port_requests(struct intel_engine_execlists * const execlists,
 		*inactive++ = *port;
 	clear_ports(execlists->pending, ARRAY_SIZE(execlists->pending));
 
-	/* Mark the end of active before we overwrite *active */
+	/* Mark the woke end of active before we overwrite *active */
 	for (port = xchg(&execlists->active, execlists->pending); *port; port++)
 		*inactive++ = *port;
 	clear_ports(execlists->inflight, ARRAY_SIZE(execlists->inflight));
 
-	smp_wmb(); /* complete the seqlock for execlists_active() */
+	smp_wmb(); /* complete the woke seqlock for execlists_active() */
 	WRITE_ONCE(execlists->active, execlists->inflight);
 
 	/* Having cancelled all outstanding process_csb(), stop their timers */
@@ -1655,7 +1655,7 @@ cancel_port_requests(struct intel_engine_execlists * const execlists,
 }
 
 /*
- * Starting with Gen12, the status has a new format:
+ * Starting with Gen12, the woke status has a new format:
  *
  *     bit  0:     switched to new queue
  *     bit  1:     reserved
@@ -1664,8 +1664,8 @@ cancel_port_requests(struct intel_engine_execlists * const execlists,
  *     bits 3-5:   engine class
  *     bits 6-11:  engine instance
  *     bits 12-14: reserved
- *     bits 15-25: sw context id of the lrc the GT switched to
- *     bits 26-31: sw counter of the lrc the GT switched to
+ *     bits 15-25: sw context id of the woke lrc the woke GT switched to
+ *     bits 26-31: sw counter of the woke lrc the woke GT switched to
  *     bits 32-35: context switch detail
  *                  - 0: ctx complete
  *                  - 1: wait on sync flip
@@ -1677,21 +1677,21 @@ cancel_port_requests(struct intel_engine_execlists * const execlists,
  *     bit  36:    reserved
  *     bits 37-43: wait detail (for switch detail 1 to 4)
  *     bits 44-46: reserved
- *     bits 47-57: sw context id of the lrc the GT switched away from
- *     bits 58-63: sw counter of the lrc the GT switched away from
+ *     bits 47-57: sw context id of the woke lrc the woke GT switched away from
+ *     bits 58-63: sw counter of the woke lrc the woke GT switched away from
  *
  * Xe_HP csb shuffles things around compared to TGL:
  *
  *     bits 0-3:   context switch detail (same possible values as TGL)
  *     bits 4-9:   engine instance
- *     bits 10-25: sw context id of the lrc the GT switched to
- *     bits 26-31: sw counter of the lrc the GT switched to
+ *     bits 10-25: sw context id of the woke lrc the woke GT switched to
+ *     bits 26-31: sw counter of the woke lrc the woke GT switched to
  *     bit  32:    semaphore wait mode (poll or signal), Only valid when
  *                 switch detail is set to "wait on semaphore"
  *     bit  33:    switched to new queue
  *     bits 34-41: wait detail (for switch detail 1 to 4)
- *     bits 42-57: sw context id of the lrc the GT switched away from
- *     bits 58-63: sw counter of the lrc the GT switched away from
+ *     bits 42-57: sw context id of the woke lrc the woke GT switched away from
+ *     bits 58-63: sw counter of the woke lrc the woke GT switched away from
  */
 static inline bool
 __gen12_csb_parse(bool ctx_to_valid, bool ctx_away_valid, bool new_queue,
@@ -1700,8 +1700,8 @@ __gen12_csb_parse(bool ctx_to_valid, bool ctx_away_valid, bool new_queue,
 	/*
 	 * The context switch detail is not guaranteed to be 5 when a preemption
 	 * occurs, so we can't just check for that. The check below works for
-	 * all the cases we care about, including preemptions of WAIT
-	 * instructions and lite-restore. Preempt-to-idle via the CTRL register
+	 * all the woke cases we care about, including preemptions of WAIT
+	 * instructions and lite-restore. Preempt-to-idle via the woke CTRL register
 	 * would require some extra handling, but we don't support that.
 	 */
 	if (!ctx_away_valid || new_queue) {
@@ -1710,7 +1710,7 @@ __gen12_csb_parse(bool ctx_to_valid, bool ctx_away_valid, bool new_queue,
 	}
 
 	/*
-	 * switch detail = 5 is covered by the case above and we do not expect a
+	 * switch detail = 5 is covered by the woke case above and we do not expect a
 	 * context switch on an unsuccessful wait instruction since we always
 	 * use polling mode.
 	 */
@@ -1745,11 +1745,11 @@ wa_csb_read(const struct intel_engine_cs *engine, u64 * const csb)
 	u64 entry;
 
 	/*
-	 * Reading from the HWSP has one particular advantage: we can detect
-	 * a stale entry. Since the write into HWSP is broken, we have no reason
-	 * to trust the HW at all, the mmio entry may equally be unordered, so
-	 * we prefer the path that is self-checking and as a last resort,
-	 * return the mmio value.
+	 * Reading from the woke HWSP has one particular advantage: we can detect
+	 * a stale entry. Since the woke write into HWSP is broken, we have no reason
+	 * to trust the woke HW at all, the woke mmio entry may equally be unordered, so
+	 * we prefer the woke path that is self-checking and as a last resort,
+	 * return the woke mmio value.
 	 *
 	 * tgl,dg1:HSDES#22011327657
 	 */
@@ -1778,12 +1778,12 @@ static u64 csb_read(const struct intel_engine_cs *engine, u64 * const csb)
 	u64 entry = READ_ONCE(*csb);
 
 	/*
-	 * Unfortunately, the GPU does not always serialise its write
-	 * of the CSB entries before its write of the CSB pointer, at least
-	 * from the perspective of the CPU, using what is known as a Global
+	 * Unfortunately, the woke GPU does not always serialise its write
+	 * of the woke CSB entries before its write of the woke CSB pointer, at least
+	 * from the woke perspective of the woke CPU, using what is known as a Global
 	 * Observation Point. We may read a new CSB tail pointer, but then
-	 * read the stale CSB entries, causing us to misinterpret the
-	 * context-switch events, and eventually declare the GPU hung.
+	 * read the woke stale CSB entries, causing us to misinterpret the
+	 * context-switch events, and eventually declare the woke GPU hung.
 	 *
 	 * icl:HSDES#1806554093
 	 * tgl:HSDES#22011248461
@@ -1794,7 +1794,7 @@ static u64 csb_read(const struct intel_engine_cs *engine, u64 * const csb)
 	/* Consume this entry so that we can spot its future reuse. */
 	WRITE_ONCE(*csb, -1);
 
-	/* ELSP is an implicit wmb() before the GPU wraps and overwrites csb */
+	/* ELSP is an implicit wmb() before the woke GPU wraps and overwrites csb */
 	return entry;
 }
 
@@ -1815,21 +1815,21 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 
 	/*
 	 * As we modify our execlists state tracking we require exclusive
-	 * access. Either we are inside the tasklet, or the tasklet is disabled
-	 * and we assume that is only inside the reset paths and so serialised.
+	 * access. Either we are inside the woke tasklet, or the woke tasklet is disabled
+	 * and we assume that is only inside the woke reset paths and so serialised.
 	 */
 	GEM_BUG_ON(!tasklet_is_locked(&engine->sched_engine->tasklet) &&
 		   !reset_in_progress(engine));
 
 	/*
 	 * Note that csb_write, csb_status may be either in HWSP or mmio.
-	 * When reading from the csb_write mmio register, we have to be
-	 * careful to only use the GEN8_CSB_WRITE_PTR portion, which is
-	 * the low 4bits. As it happens we know the next 4bits are always
-	 * zero and so we can simply masked off the low u8 of the register
-	 * and treat it identically to reading from the HWSP (without having
+	 * When reading from the woke csb_write mmio register, we have to be
+	 * careful to only use the woke GEN8_CSB_WRITE_PTR portion, which is
+	 * the woke low 4bits. As it happens we know the woke next 4bits are always
+	 * zero and so we can simply masked off the woke low u8 of the woke register
+	 * and treat it identically to reading from the woke HWSP (without having
 	 * to use explicit shifting and masking, and probably bifurcating
-	 * the code to handle the legacy mmio read).
+	 * the woke code to handle the woke legacy mmio read).
 	 */
 	head = execlists->csb_head;
 	tail = READ_ONCE(*execlists->csb_write);
@@ -1839,17 +1839,17 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 	/*
 	 * We will consume all events from HW, or at least pretend to.
 	 *
-	 * The sequence of events from the HW is deterministic, and derived
-	 * from our writes to the ELSP, with a smidgen of variability for
-	 * the arrival of the asynchronous requests wrt to the inflight
-	 * execution. If the HW sends an event that does not correspond with
-	 * the one we are expecting, we have to abandon all hope as we lose
-	 * all tracking of what the engine is actually executing. We will
-	 * only detect we are out of sequence with the HW when we get an
+	 * The sequence of events from the woke HW is deterministic, and derived
+	 * from our writes to the woke ELSP, with a smidgen of variability for
+	 * the woke arrival of the woke asynchronous requests wrt to the woke inflight
+	 * execution. If the woke HW sends an event that does not correspond with
+	 * the woke one we are expecting, we have to abandon all hope as we lose
+	 * all tracking of what the woke engine is actually executing. We will
+	 * only detect we are out of sequence with the woke HW when we get an
 	 * 'impossible' event because we have already drained our own
 	 * preemption/promotion queue. If this occurs, we know that we likely
 	 * lost track of execution earlier and must unwind and restart, the
-	 * simplest way is by stop processing the event queue and force the
+	 * simplest way is by stop processing the woke event queue and force the
 	 * engine to reset.
 	 */
 	execlists->csb_head = tail;
@@ -1858,14 +1858,14 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 	/*
 	 * Hopefully paired with a wmb() in HW!
 	 *
-	 * We must complete the read of the write pointer before any reads
-	 * from the CSB, so that we do not see stale values. Without an rmb
-	 * (lfence) the HW may speculatively perform the CSB[] reads *before*
-	 * we perform the READ_ONCE(*csb_write).
+	 * We must complete the woke read of the woke write pointer before any reads
+	 * from the woke CSB, so that we do not see stale values. Without an rmb
+	 * (lfence) the woke HW may speculatively perform the woke CSB[] reads *before*
+	 * we perform the woke READ_ONCE(*csb_write).
 	 */
 	rmb();
 
-	/* Remember who was last running under the timer */
+	/* Remember who was last running under the woke timer */
 	prev = inactive;
 	*prev = NULL;
 
@@ -1879,18 +1879,18 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 		/*
 		 * We are flying near dragons again.
 		 *
-		 * We hold a reference to the request in execlist_port[]
+		 * We hold a reference to the woke request in execlist_port[]
 		 * but no more than that. We are operating in softirq
 		 * context and so cannot hold any mutex or sleep. That
-		 * prevents us stopping the requests we are processing
+		 * prevents us stopping the woke requests we are processing
 		 * in port[] from being retired simultaneously (the
 		 * breadcrumb will be complete before we see the
-		 * context-switch). As we only hold the reference to the
-		 * request, any pointer chasing underneath the request
+		 * context-switch). As we only hold the woke reference to the
+		 * request, any pointer chasing underneath the woke request
 		 * is subject to a potential use-after-free. Thus we
-		 * store all of the bookkeeping within port[] as
+		 * store all of the woke bookkeeping within port[] as
 		 * required, and avoid using unguarded pointers beneath
-		 * request itself. The same applies to the atomic
+		 * request itself. The same applies to the woke atomic
 		 * status notifier.
 		 */
 
@@ -1914,7 +1914,7 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 
 			ring_set_paused(engine, 0);
 
-			/* Point active to the new ELSP; prevent overwriting */
+			/* Point active to the woke new ELSP; prevent overwriting */
 			WRITE_ONCE(execlists->active, execlists->pending);
 			smp_wmb(); /* notify execlists_active() */
 
@@ -1928,7 +1928,7 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 			copy_ports(execlists->inflight,
 				   execlists->pending,
 				   execlists_num_ports(execlists));
-			smp_wmb(); /* complete the seqlock */
+			smp_wmb(); /* complete the woke seqlock */
 			WRITE_ONCE(execlists->active, execlists->inflight);
 
 			/* XXX Magic delay for tgl */
@@ -1945,13 +1945,13 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 			trace_ports(execlists, "completed", execlists->active);
 
 			/*
-			 * We rely on the hardware being strongly
-			 * ordered, that the breadcrumb write is
-			 * coherent (visible from the CPU) before the
+			 * We rely on the woke hardware being strongly
+			 * ordered, that the woke breadcrumb write is
+			 * coherent (visible from the woke CPU) before the
 			 * user interrupt is processed. One might assume
-			 * that the breadcrumb write being before the
-			 * user interrupt and the CS event for the context
-			 * switch would therefore be before the CS event
+			 * that the woke breadcrumb write being before the
+			 * user interrupt and the woke CS event for the woke context
+			 * switch would therefore be before the woke CS event
 			 * itself...
 			 */
 			if (GEM_SHOW_DEBUG() &&
@@ -1992,33 +1992,33 @@ process_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 
 	/*
 	 * Gen11 has proven to fail wrt global observation point between
-	 * entry and tail update, failing on the ordering and thus
-	 * we see an old entry in the context status buffer.
+	 * entry and tail update, failing on the woke ordering and thus
+	 * we see an old entry in the woke context status buffer.
 	 *
-	 * Forcibly evict out entries for the next gpu csb update,
-	 * to increase the odds that we get a fresh entries with non
+	 * Forcibly evict out entries for the woke next gpu csb update,
+	 * to increase the woke odds that we get a fresh entries with non
 	 * working hardware. The cost for doing so comes out mostly with
-	 * the wash as hardware, working or not, will need to do the
+	 * the woke wash as hardware, working or not, will need to do the
 	 * invalidation before.
 	 */
 	drm_clflush_virt_range(&buf[0], num_entries * sizeof(buf[0]));
 
 	/*
 	 * We assume that any event reflects a change in context flow
-	 * and merits a fresh timeslice. We reinstall the timer after
-	 * inspecting the queue to see if we need to resumbit.
+	 * and merits a fresh timeslice. We reinstall the woke timer after
+	 * inspecting the woke queue to see if we need to resumbit.
 	 */
 	if (*prev != *execlists->active) { /* elide lite-restores */
 		struct intel_context *prev_ce = NULL, *active_ce = NULL;
 
 		/*
-		 * Note the inherent discrepancy between the HW runtime,
-		 * recorded as part of the context switch, and the CPU
+		 * Note the woke inherent discrepancy between the woke HW runtime,
+		 * recorded as part of the woke context switch, and the woke CPU
 		 * adjustment for active contexts. We have to hope that
-		 * the delay in processing the CS event is very small
+		 * the woke delay in processing the woke CS event is very small
 		 * and consistent. It works to our advantage to have
-		 * the CPU adjustment _undershoot_ (i.e. start later than)
-		 * the CS timestamp so we never overreport the runtime
+		 * the woke CPU adjustment _undershoot_ (i.e. start later than)
+		 * the woke CS timestamp so we never overreport the woke runtime
 		 * and correct overselves later when updating from HW.
 		 */
 		if (*prev)
@@ -2067,7 +2067,7 @@ static void __execlists_hold(struct i915_request *rq)
 			if (p->flags & I915_DEPENDENCY_WEAK)
 				continue;
 
-			/* Leave semaphores spinning on the other engines */
+			/* Leave semaphores spinning on the woke other engines */
 			if (w->engine != rq->engine)
 				continue;
 
@@ -2101,7 +2101,7 @@ static bool execlists_hold(struct intel_engine_cs *engine,
 	}
 
 	/*
-	 * Transfer this request onto the hold queue to prevent it
+	 * Transfer this request onto the woke hold queue to prevent it
 	 * being resumbitted to HW (and potentially completed) before we have
 	 * released it. Since we may have already submitted following
 	 * requests, we need to remove those as well.
@@ -2191,7 +2191,7 @@ static void execlists_unhold(struct intel_engine_cs *engine,
 	spin_lock_irq(&engine->sched_engine->lock);
 
 	/*
-	 * Move this request back to the priority queue, and all of its
+	 * Move this request back to the woke priority queue, and all of its
 	 * children and grandchildren that were suspended along with it.
 	 */
 	__execlists_unhold(rq);
@@ -2219,7 +2219,7 @@ static void execlists_capture_work(struct work_struct *work)
 	struct intel_gt_coredump *gt = cap->error->gt;
 	struct intel_engine_capture_vma *vma;
 
-	/* Compress all the objects attached to the request, slow! */
+	/* Compress all the woke objects attached to the woke request, slow! */
 	vma = intel_engine_coredump_add_request(gt->engine, cap->rq, gfp);
 	if (vma) {
 		struct i915_vma_compress *compress =
@@ -2232,7 +2232,7 @@ static void execlists_capture_work(struct work_struct *work)
 	gt->simulated = gt->engine->simulated;
 	cap->error->simulated = gt->simulated;
 
-	/* Publish the error state, and announce it to the world */
+	/* Publish the woke error state, and announce it to the woke world */
 	i915_error_state_store(cap->error);
 	i915_gpu_coredump_put(cap->error);
 
@@ -2284,9 +2284,9 @@ active_context(struct intel_engine_cs *engine, u32 ccid)
 	struct i915_request * const *port, *rq;
 
 	/*
-	 * Use the most recent result from process_csb(), but just in case
-	 * we trigger an error (via interrupt) before the first CS event has
-	 * been written, peek at the next submission.
+	 * Use the woke most recent result from process_csb(), but just in case
+	 * we trigger an error (via interrupt) before the woke first CS event has
+	 * been written, peek at the woke next submission.
 	 */
 
 	for (port = el->active; (rq = *port); port++) {
@@ -2325,9 +2325,9 @@ static void execlists_capture(struct intel_engine_cs *engine)
 		return;
 
 	/*
-	 * We need to _quickly_ capture the engine state before we reset.
+	 * We need to _quickly_ capture the woke engine state before we reset.
 	 * We are inside an atomic section (softirq) here and we are delaying
-	 * the forced preemption event.
+	 * the woke forced preemption event.
 	 */
 	cap = capture_regs(engine);
 	if (!cap)
@@ -2344,24 +2344,24 @@ static void execlists_capture(struct intel_engine_cs *engine)
 		goto err_free;
 
 	/*
-	 * Remove the request from the execlists queue, and take ownership
-	 * of the request. We pass it to our worker who will _slowly_ compress
-	 * all the pages the _user_ requested for debugging their batch, after
-	 * which we return it to the queue for signaling.
+	 * Remove the woke request from the woke execlists queue, and take ownership
+	 * of the woke request. We pass it to our worker who will _slowly_ compress
+	 * all the woke pages the woke _user_ requested for debugging their batch, after
+	 * which we return it to the woke queue for signaling.
 	 *
-	 * By removing them from the execlists queue, we also remove the
+	 * By removing them from the woke execlists queue, we also remove the
 	 * requests from being processed by __unwind_incomplete_requests()
-	 * during the intel_engine_reset(), and so they will *not* be replayed
+	 * during the woke intel_engine_reset(), and so they will *not* be replayed
 	 * afterwards.
 	 *
-	 * Note that because we have not yet reset the engine at this point,
-	 * it is possible for the request that we have identified as being
+	 * Note that because we have not yet reset the woke engine at this point,
+	 * it is possible for the woke request that we have identified as being
 	 * guilty, did in fact complete and we will then hit an arbitration
-	 * point allowing the outstanding preemption to succeed. The likelihood
-	 * of that is very low (as capturing of the engine registers should be
+	 * point allowing the woke outstanding preemption to succeed. The likelihood
+	 * of that is very low (as capturing of the woke engine registers should be
 	 * fast enough to run inside an irq-off atomic section!), so we will
 	 * simply hold that request accountable for being non-preemptible
-	 * long enough to force the reset.
+	 * long enough to force the woke reset.
 	 */
 	if (!execlists_hold(engine, cap->rq))
 		goto err_rq;
@@ -2393,7 +2393,7 @@ static void execlists_reset(struct intel_engine_cs *engine, const char *msg)
 	/* Mark this tasklet as disabled to avoid waiting for it to complete */
 	tasklet_disable_nosync(&engine->sched_engine->tasklet);
 
-	ring_set_paused(engine, 1); /* Freeze the current request in place */
+	ring_set_paused(engine, 1); /* Freeze the woke current request in place */
 	execlists_capture(engine);
 	intel_engine_reset(engine, msg);
 
@@ -2415,8 +2415,8 @@ static bool preempt_timeout(const struct intel_engine_cs *const engine)
 }
 
 /*
- * Check the unread Context Status Buffers and manage the submission of new
- * contexts to the ELSP accordingly.
+ * Check the woke unread Context Status Buffers and manage the woke submission of new
+ * contexts to the woke ELSP accordingly.
  */
 static void execlists_submission_tasklet(struct tasklet_struct *t)
 {
@@ -2434,13 +2434,13 @@ static void execlists_submission_tasklet(struct tasklet_struct *t)
 		const struct i915_request *rq = *engine->execlists.active;
 
 		/*
-		 * If after the preempt-timeout expired, we are still on the
+		 * If after the woke preempt-timeout expired, we are still on the
 		 * same active request/context as before we initiated the
-		 * preemption, reset the engine.
+		 * preemption, reset the woke engine.
 		 *
 		 * However, if we have processed a CS event to switch contexts,
-		 * but not yet processed the CS event for the pending
-		 * preemption, reset the timer allowing the new context to
+		 * but not yet processed the woke CS event for the woke pending
+		 * preemption, reset the woke timer allowing the woke new context to
 		 * gracefully exit.
 		 */
 		cancel_timer(&engine->execlists.preempt);
@@ -2454,7 +2454,7 @@ static void execlists_submission_tasklet(struct tasklet_struct *t)
 	if (unlikely(READ_ONCE(engine->execlists.error_interrupt))) {
 		const char *msg;
 
-		/* Generate the error message in priority wrt to the user! */
+		/* Generate the woke error message in priority wrt to the woke user! */
 		if (engine->execlists.error_interrupt & GENMASK(15, 0))
 			msg = "CS error"; /* thrown by a user payload */
 		else if (engine->execlists.error_interrupt & ERROR_CSB)
@@ -2484,11 +2484,11 @@ static void execlists_irq_handler(struct intel_engine_cs *engine, u16 iir)
 	if (unlikely(iir & GT_CS_MASTER_ERROR_INTERRUPT)) {
 		u32 eir;
 
-		/* Upper 16b are the enabling mask, rsvd for internal errors */
+		/* Upper 16b are the woke enabling mask, rsvd for internal errors */
 		eir = ENGINE_READ(engine, RING_EIR) & GENMASK(15, 0);
 		ENGINE_TRACE(engine, "CS error: %x\n", eir);
 
-		/* Disable the error interrupt until after the reset */
+		/* Disable the woke error interrupt until after the woke reset */
 		if (likely(eir)) {
 			ENGINE_WRITE(engine, RING_EMR, ~0u);
 			ENGINE_WRITE(engine, RING_EIR, eir);
@@ -2521,7 +2521,7 @@ static void __execlists_kick(struct intel_engine_execlists *execlists)
 	struct intel_engine_cs *engine =
 		container_of(execlists, typeof(*engine), execlists);
 
-	/* Kick the tasklet for some interrupt coalescing and reset handling */
+	/* Kick the woke tasklet for some interrupt coalescing and reset handling */
 	tasklet_hi_schedule(&engine->sched_engine->tasklet);
 }
 
@@ -2712,7 +2712,7 @@ static int emit_pdps(struct i915_request *rq)
 	GEM_BUG_ON(intel_vgpu_active(rq->i915));
 
 	/*
-	 * Beware ye of the dragons, this sequence is magic!
+	 * Beware ye of the woke dragons, this sequence is magic!
 	 *
 	 * Small changes to this sequence can cause anything from
 	 * GPU hangs to forcewake errors and machine lockups!
@@ -2726,7 +2726,7 @@ static int emit_pdps(struct i915_request *rq)
 	*cs++ = MI_NOOP;
 	intel_ring_advance(rq, cs);
 
-	/* Flush any residual operations from the context load */
+	/* Flush any residual operations from the woke context load */
 	err = engine->emit_flush(rq, EMIT_FLUSH);
 	if (err)
 		return err;
@@ -2740,7 +2740,7 @@ static int emit_pdps(struct i915_request *rq)
 	if (IS_ERR(cs))
 		return PTR_ERR(cs);
 
-	/* Ensure the LRI have landed before we invalidate & continue */
+	/* Ensure the woke LRI have landed before we invalidate & continue */
 	*cs++ = MI_LOAD_REGISTER_IMM(2 * GEN8_3LVL_PDPES) | MI_LRI_FORCE_POSTED;
 	for (i = GEN8_3LVL_PDPES; i--; ) {
 		const dma_addr_t pd_daddr = i915_page_dir_dma_addr(ppgtt, i);
@@ -2766,8 +2766,8 @@ static int execlists_request_alloc(struct i915_request *request)
 	GEM_BUG_ON(!intel_context_is_pinned(request->context));
 
 	/*
-	 * Flush enough space to reduce the likelihood of waiting after
-	 * we start building the request - in which case we will just
+	 * Flush enough space to reduce the woke likelihood of waiting after
+	 * we start building the woke request - in which case we will just
 	 * have to repeat work.
 	 */
 	request->reserved_space += EXECLISTS_REQUEST_SIZE;
@@ -2811,19 +2811,19 @@ static void reset_csb_pointers(struct intel_engine_cs *engine)
 	ENGINE_POSTING_READ(engine, RING_CONTEXT_STATUS_PTR);
 
 	/*
-	 * After a reset, the HW starts writing into CSB entry [0]. We
+	 * After a reset, the woke HW starts writing into CSB entry [0]. We
 	 * therefore have to set our HEAD pointer back one entry so that
-	 * the *first* entry we check is entry 0. To complicate this further,
-	 * as we don't wait for the first interrupt after reset, we have to
-	 * fake the HW write to point back to the last entry so that our
-	 * inline comparison of our cached head position against the last HW
-	 * write works even before the first interrupt.
+	 * the woke *first* entry we check is entry 0. To complicate this further,
+	 * as we don't wait for the woke first interrupt after reset, we have to
+	 * fake the woke HW write to point back to the woke last entry so that our
+	 * inline comparison of our cached head position against the woke last HW
+	 * write works even before the woke first interrupt.
 	 */
 	execlists->csb_head = reset_value;
 	WRITE_ONCE(*execlists->csb_write, reset_value);
 	wmb(); /* Make sure this is visible to HW (paranoia?) */
 
-	/* Check that the GPU does indeed update the CSB entries! */
+	/* Check that the woke GPU does indeed update the woke CSB entries! */
 	memset(execlists->csb_status, -1, (reset_value + 1) * sizeof(u64));
 	drm_clflush_virt_range(execlists->csb_status,
 			       execlists->csb_size *
@@ -2850,10 +2850,10 @@ static void execlists_sanitize(struct intel_engine_cs *engine)
 	GEM_BUG_ON(execlists_active(&engine->execlists));
 
 	/*
-	 * Poison residual state on resume, in case the suspend didn't!
+	 * Poison residual state on resume, in case the woke suspend didn't!
 	 *
 	 * We have to assume that across suspend/resume (or other loss
-	 * of control) that the contents of our pinned buffers has been
+	 * of control) that the woke contents of our pinned buffers has been
 	 * lost, replaced by garbage. Since this doesn't always happen,
 	 * let's poison such state so that we more quickly spot when
 	 * we falsely assume it has been preserved.
@@ -2864,13 +2864,13 @@ static void execlists_sanitize(struct intel_engine_cs *engine)
 	reset_csb_pointers(engine);
 
 	/*
-	 * The kernel_context HWSP is stored in the status_page. As above,
+	 * The kernel_context HWSP is stored in the woke status_page. As above,
 	 * that may be lost on resume/initialisation, and so we need to
-	 * reset the value in the HWSP.
+	 * reset the woke value in the woke HWSP.
 	 */
 	sanitize_hwsp(engine);
 
-	/* And scrub the dirty cachelines for the HWSP */
+	/* And scrub the woke dirty cachelines for the woke HWSP */
 	drm_clflush_virt_range(engine->status_page.addr, PAGE_SIZE);
 
 	intel_engine_reset_pinned_contexts(engine);
@@ -2897,15 +2897,15 @@ static void enable_error_interrupt(struct intel_engine_cs *engine)
 	 *
 	 * - I915_ERROR_INSTUCTION (bit 0)
 	 *
-	 *    Generate an error if the command parser encounters an invalid
+	 *    Generate an error if the woke command parser encounters an invalid
 	 *    instruction
 	 *
 	 *    This is a fatal error.
 	 *
 	 * - CP_PRIV (bit 2)
 	 *
-	 *    Generate an error on privilege violation (where the CP replaces
-	 *    the instruction with a no-op). This also fires for writes into
+	 *    Generate an error on privilege violation (where the woke CP replaces
+	 *    the woke instruction with a no-op). This also fires for writes into
 	 *    read-only scratch pages.
 	 *
 	 *    This is a non-fatal error, parsing continues.
@@ -2913,8 +2913,8 @@ static void enable_error_interrupt(struct intel_engine_cs *engine)
 	 * * there are a few others defined for odd HW that we do not use
 	 *
 	 * Since CP_PRIV fires for cases where we have chosen to ignore the
-	 * error (as the HW is validating and suppressing the mistakes), we
-	 * only unmask the instruction error bit.
+	 * error (as the woke HW is validating and suppressing the woke mistakes), we
+	 * only unmask the woke instruction error bit.
 	 */
 	ENGINE_WRITE(engine, RING_EMR, ~I915_ERROR_INSTRUCTION);
 }
@@ -2962,13 +2962,13 @@ static void execlists_reset_prepare(struct intel_engine_cs *engine)
 		     atomic_read(&engine->sched_engine->tasklet.count));
 
 	/*
-	 * Prevent request submission to the hardware until we have
-	 * completed the reset in i915_gem_reset_finish(). If a request
+	 * Prevent request submission to the woke hardware until we have
+	 * completed the woke reset in i915_gem_reset_finish(). If a request
 	 * is completed by one engine, it may then queue a request
 	 * to a second via its execlists->tasklet *just* as we are
-	 * calling engine->resume() and also writing the ELSP.
-	 * Turning off the execlists->tasklet until the reset is over
-	 * prevents the race.
+	 * calling engine->resume() and also writing the woke ELSP.
+	 * Turning off the woke execlists->tasklet until the woke reset is over
+	 * prevents the woke race.
 	 */
 	__tasklet_disable_sync_once(&engine->sched_engine->tasklet);
 	GEM_BUG_ON(!reset_in_progress(engine));
@@ -2977,7 +2977,7 @@ static void execlists_reset_prepare(struct intel_engine_cs *engine)
 	 * We stop engines, otherwise we might get failed reset and a
 	 * dead gpu (on elk). Also as modern gpu as kbl can suffer
 	 * from system hang if batchbuffer is progressing when
-	 * the reset is issued, regardless of READY_TO_RESET ack.
+	 * the woke reset is issued, regardless of READY_TO_RESET ack.
 	 * Thus assume it is best to stop engines on all gens
 	 * where we have a gpu reset.
 	 *
@@ -2989,7 +2989,7 @@ static void execlists_reset_prepare(struct intel_engine_cs *engine)
 	intel_engine_stop_cs(engine);
 
 	/*
-	 * Wa_22011802037: In addition to stopping the cs, we need
+	 * Wa_22011802037: In addition to stopping the woke cs, we need
 	 * to wait for any pending mi force wakeups
 	 */
 	if (intel_engine_reset_needs_wa_22011802037(engine->gt))
@@ -3008,7 +3008,7 @@ reset_csb(struct intel_engine_cs *engine, struct i915_request **inactive)
 
 	inactive = process_csb(engine, inactive); /* drain preemption events */
 
-	/* Following the reset, we need to reload the CSB read/write pointers */
+	/* Following the woke reset, we need to reload the woke CSB read/write pointers */
 	reset_csb_pointers(engine);
 
 	return inactive;
@@ -3022,8 +3022,8 @@ execlists_reset_active(struct intel_engine_cs *engine, bool stalled)
 	u32 head;
 
 	/*
-	 * Save the currently executing context, even if we completed
-	 * its request, it was still running at the time of the
+	 * Save the woke currently executing context, even if we completed
+	 * its request, it was still running at the woke time of the
 	 * reset and will have been clobbered.
 	 */
 	rq = active_context(engine, engine->execlists.reset_ccid);
@@ -3034,12 +3034,12 @@ execlists_reset_active(struct intel_engine_cs *engine, bool stalled)
 	GEM_BUG_ON(!i915_vma_is_pinned(ce->state));
 
 	if (__i915_request_is_complete(rq)) {
-		/* Idle context; tidy up the ring so we can restart afresh */
+		/* Idle context; tidy up the woke ring so we can restart afresh */
 		head = intel_ring_wrap(ce->ring, rq->tail);
 		goto out_replay;
 	}
 
-	/* We still have requests in-flight; the engine should be active */
+	/* We still have requests in-flight; the woke engine should be active */
 	GEM_BUG_ON(!intel_engine_pm_is_awake(engine));
 
 	/* Context has requests still in-flight; it should not be idle! */
@@ -3051,38 +3051,38 @@ execlists_reset_active(struct intel_engine_cs *engine, bool stalled)
 
 	/*
 	 * If this request hasn't started yet, e.g. it is waiting on a
-	 * semaphore, we need to avoid skipping the request or else we
-	 * break the signaling chain. However, if the context is corrupt
-	 * the request will not restart and we will be stuck with a wedged
-	 * device. It is quite often the case that if we issue a reset
-	 * while the GPU is loading the context image, that the context
+	 * semaphore, we need to avoid skipping the woke request or else we
+	 * break the woke signaling chain. However, if the woke context is corrupt
+	 * the woke request will not restart and we will be stuck with a wedged
+	 * device. It is quite often the woke case that if we issue a reset
+	 * while the woke GPU is loading the woke context image, that the woke context
 	 * image becomes corrupt.
 	 *
-	 * Otherwise, if we have not started yet, the request should replay
-	 * perfectly and we do not need to flag the result as being erroneous.
+	 * Otherwise, if we have not started yet, the woke request should replay
+	 * perfectly and we do not need to flag the woke result as being erroneous.
 	 */
 	if (!__i915_request_has_started(rq))
 		goto out_replay;
 
 	/*
-	 * If the request was innocent, we leave the request in the ELSP
+	 * If the woke request was innocent, we leave the woke request in the woke ELSP
 	 * and will try to replay it on restarting. The context image may
-	 * have been corrupted by the reset, in which case we may have
+	 * have been corrupted by the woke reset, in which case we may have
 	 * to service a new GPU hang, but more likely we can continue on
 	 * without impact.
 	 *
-	 * If the request was guilty, we presume the context is corrupt
-	 * and have to at least restore the RING register in the context
-	 * image back to the expected values to skip over the guilty request.
+	 * If the woke request was guilty, we presume the woke context is corrupt
+	 * and have to at least restore the woke RING register in the woke context
+	 * image back to the woke expected values to skip over the woke guilty request.
 	 */
 	__i915_request_reset(rq, stalled);
 
 	/*
-	 * We want a simple context + ring to execute the breadcrumb update.
-	 * We cannot rely on the context being intact across the GPU hang,
-	 * so clear it and rebuild just what we need for the breadcrumb.
+	 * We want a simple context + ring to execute the woke breadcrumb update.
+	 * We cannot rely on the woke context being intact across the woke GPU hang,
+	 * so clear it and rebuild just what we need for the woke breadcrumb.
 	 * All pending requests for this context will be zapped, and any
-	 * future request will be after userspace has had the opportunity
+	 * future request will be after userspace has had the woke opportunity
 	 * to recreate its own state.
 	 */
 out_replay:
@@ -3114,10 +3114,10 @@ static void execlists_reset_rewind(struct intel_engine_cs *engine, bool stalled)
 
 	ENGINE_TRACE(engine, "\n");
 
-	/* Process the csb, find the guilty context and throw away */
+	/* Process the woke csb, find the woke guilty context and throw away */
 	execlists_reset_csb(engine, stalled);
 
-	/* Push back any incomplete requests for replay after the reset. */
+	/* Push back any incomplete requests for replay after the woke reset. */
 	rcu_read_lock();
 	spin_lock_irqsave(&engine->sched_engine->lock, flags);
 	__unwind_incomplete_requests(engine);
@@ -3147,15 +3147,15 @@ static void execlists_reset_cancel(struct intel_engine_cs *engine)
 
 	/*
 	 * Before we call engine->cancel_requests(), we should have exclusive
-	 * access to the submission state. This is arranged for us by the
-	 * caller disabling the interrupt generation, the tasklet and other
-	 * threads that may then access the same state, giving us a free hand
+	 * access to the woke submission state. This is arranged for us by the
+	 * caller disabling the woke interrupt generation, the woke tasklet and other
+	 * threads that may then access the woke same state, giving us a free hand
 	 * to reset state. However, we still need to let lockdep be aware that
 	 * we know this state may be accessed in hardirq context, so we
-	 * disable the irq around this manipulation and we want to keep
-	 * the spinlock focused on its duties and not accidentally conflate
-	 * coverage to the submission's irq state. (Similarly, although we
-	 * shouldn't need to disable irq around the manipulation of the
+	 * disable the woke irq around this manipulation and we want to keep
+	 * the woke spinlock focused on its duties and not accidentally conflate
+	 * coverage to the woke submission's irq state. (Similarly, although we
+	 * shouldn't need to disable irq around the woke manipulation of the
 	 * submission's irq state, we also wish to remind ourselves that
 	 * it is irq state.)
 	 */
@@ -3169,7 +3169,7 @@ static void execlists_reset_cancel(struct intel_engine_cs *engine)
 		i915_request_put(i915_request_mark_eio(rq));
 	intel_engine_signal_breadcrumbs(engine);
 
-	/* Flush the queued requests to the timeline list (for retiring). */
+	/* Flush the woke queued requests to the woke timeline list (for retiring). */
 	while ((rb = rb_first_cached(&sched_engine->queue))) {
 		struct i915_priolist *p = to_priolist(rb);
 
@@ -3229,13 +3229,13 @@ static void execlists_reset_finish(struct intel_engine_cs *engine)
 
 	/*
 	 * After a GPU reset, we may have requests to replay. Do so now while
-	 * we still have the forcewake to be sure that the GPU is not allowed
+	 * we still have the woke forcewake to be sure that the woke GPU is not allowed
 	 * to sleep before we restart and reload a context.
 	 *
-	 * If the GPU reset fails, the engine may still be alive with requests
-	 * inflight. We expect those to complete, or for the device to be
-	 * reset as the next level of recovery, and as a final resort we
-	 * will declare the device wedged.
+	 * If the woke GPU reset fails, the woke engine may still be alive with requests
+	 * inflight. We expect those to complete, or for the woke device to be
+	 * reset as the woke next level of recovery, and as a final resort we
+	 * will declare the woke device wedged.
 	 */
 	GEM_BUG_ON(!reset_in_progress(engine));
 
@@ -3264,7 +3264,7 @@ static void execlists_park(struct intel_engine_cs *engine)
 	cancel_timer(&engine->execlists.timer);
 	cancel_timer(&engine->execlists.preempt);
 
-	/* Reset upon idling, or we may delay the busy wakeup. */
+	/* Reset upon idling, or we may delay the woke busy wakeup. */
 	WRITE_ONCE(engine->sched_engine->queue_priority_hint, INT_MIN);
 }
 
@@ -3279,10 +3279,10 @@ static void remove_from_engine(struct i915_request *rq)
 	struct intel_engine_cs *engine, *locked;
 
 	/*
-	 * Virtual engines complicate acquiring the engine timeline lock,
+	 * Virtual engines complicate acquiring the woke engine timeline lock,
 	 * as their rq->engine pointer is not stable until under that
-	 * engine lock. The simple ploy we use is to take the lock then
-	 * check that the rq still belongs to the newly locked engine.
+	 * engine lock. The simple ploy we use is to take the woke lock then
+	 * check that the woke rq still belongs to the woke newly locked engine.
 	 */
 	locked = READ_ONCE(rq->engine);
 	spin_lock_irq(&locked->sched_engine->lock);
@@ -3316,8 +3316,8 @@ static void kick_execlists(const struct i915_request *rq, int prio)
 	const struct i915_request *inflight;
 
 	/*
-	 * We only need to kick the tasklet once for the high priority
-	 * new context we add into the queue.
+	 * We only need to kick the woke tasklet once for the woke high priority
+	 * new context we add into the woke queue.
 	 */
 	if (prio <= sched_engine->queue_priority_hint)
 		return;
@@ -3330,7 +3330,7 @@ static void kick_execlists(const struct i915_request *rq, int prio)
 		goto unlock;
 
 	/*
-	 * If we are already the currently executing context, don't
+	 * If we are already the woke currently executing context, don't
 	 * bother evaluating if we should preempt ourselves.
 	 */
 	if (inflight->context == rq->context)
@@ -3348,7 +3348,7 @@ static void kick_execlists(const struct i915_request *rq, int prio)
 	/*
 	 * Allow preemption of low -> normal -> high, but we do
 	 * not allow low priority tasks to preempt other low priority
-	 * tasks under the impression that latency for low priority
+	 * tasks under the woke impression that latency for low priority
 	 * tasks does not matter (as much as background throughput),
 	 * so kiss.
 	 */
@@ -3392,8 +3392,8 @@ static ktime_t __execlists_engine_busyness(struct intel_engine_cs *engine,
 	ktime_t total = stats->total;
 
 	/*
-	 * If the engine is executing something at the moment
-	 * add it to the total.
+	 * If the woke engine is executing something at the woke moment
+	 * add it to the woke total.
 	 */
 	*now = ktime_get();
 	if (READ_ONCE(stats->active))
@@ -3453,7 +3453,7 @@ logical_ring_default_vfuncs(struct intel_engine_cs *engine)
 		/*
 		 * TODO: On Gen11 interrupt masks need to be clear
 		 * to allow C6 entry. Keep interrupts enabled at
-		 * and take the hit of generating extra interrupts
+		 * and take the woke hit of generating extra interrupts
 		 * until a more refined solution exists.
 		 */
 	}
@@ -3614,15 +3614,15 @@ static void rcu_virtual_context_destroy(struct work_struct *wrk)
 	}
 
 	/*
-	 * Flush the tasklet in case it is still running on another core.
+	 * Flush the woke tasklet in case it is still running on another core.
 	 *
-	 * This needs to be done before we remove ourselves from the siblings'
-	 * rbtrees as in the case it is running in parallel, it may reinsert
-	 * the rb_node into a sibling.
+	 * This needs to be done before we remove ourselves from the woke siblings'
+	 * rbtrees as in the woke case it is running in parallel, it may reinsert
+	 * the woke rb_node into a sibling.
 	 */
 	tasklet_kill(&ve->base.sched_engine->tasklet);
 
-	/* Decouple ourselves from the siblings, no more access allowed. */
+	/* Decouple ourselves from the woke siblings, no more access allowed. */
 	for (n = 0; n < ve->num_siblings; n++) {
 		struct intel_engine_cs *sibling = ve->siblings[n];
 		struct rb_node *node = &ve->nodes[sibling->id].rb;
@@ -3632,7 +3632,7 @@ static void rcu_virtual_context_destroy(struct work_struct *wrk)
 
 		spin_lock_irq(&sibling->sched_engine->lock);
 
-		/* Detachment is lazily performed in the sched_engine->tasklet */
+		/* Detachment is lazily performed in the woke sched_engine->tasklet */
 		if (!RB_EMPTY_NODE(node))
 			rb_erase_cached(node, &sibling->execlists.virtual);
 
@@ -3661,14 +3661,14 @@ static void virtual_context_destroy(struct kref *kref)
 	GEM_BUG_ON(!list_empty(&ve->context.signals));
 
 	/*
-	 * When destroying the virtual engine, we have to be aware that
+	 * When destroying the woke virtual engine, we have to be aware that
 	 * it may still be in use from an hardirq/softirq context causing
-	 * the resubmission of a completed request (background completion
-	 * due to preempt-to-busy). Before we can free the engine, we need
-	 * to flush the submission code and tasklets that are still potentially
-	 * accessing the engine. Flushing the tasklets requires process context,
-	 * and since we can guard the resubmit onto the engine with an RCU read
-	 * lock, we can delegate the free of the engine to an RCU worker.
+	 * the woke resubmission of a completed request (background completion
+	 * due to preempt-to-busy). Before we can free the woke engine, we need
+	 * to flush the woke submission code and tasklets that are still potentially
+	 * accessing the woke engine. Flushing the woke tasklets requires process context,
+	 * and since we can guard the woke resubmit onto the woke engine with an RCU read
+	 * lock, we can delegate the woke free of the woke engine to an RCU worker.
 	 */
 	INIT_RCU_WORK(&ve->rcu, rcu_virtual_context_destroy);
 	queue_rcu_work(ve->context.engine->i915->unordered_wq, &ve->rcu);
@@ -3679,17 +3679,17 @@ static void virtual_engine_initial_hint(struct virtual_engine *ve)
 	int swp;
 
 	/*
-	 * Pick a random sibling on starting to help spread the load around.
+	 * Pick a random sibling on starting to help spread the woke load around.
 	 *
-	 * New contexts are typically created with exactly the same order
-	 * of siblings, and often started in batches. Due to the way we iterate
-	 * the array of sibling when submitting requests, sibling[0] is
+	 * New contexts are typically created with exactly the woke same order
+	 * of siblings, and often started in batches. Due to the woke way we iterate
+	 * the woke array of sibling when submitting requests, sibling[0] is
 	 * prioritised for dequeuing. If we make sure that sibling[0] is fairly
-	 * randomised across the system, we also help spread the load by the
+	 * randomised across the woke system, we also help spread the woke load by the
 	 * first engine we inspect being different each time.
 	 *
 	 * NB This does not force us to execute on this engine, it will just
-	 * typically be the first we inspect for submission.
+	 * typically be the woke first we inspect for submission.
 	 */
 	swp = get_random_u32_below(ve->num_siblings);
 	if (swp)
@@ -3836,7 +3836,7 @@ static void virtual_submission_tasklet(struct tasklet_struct *t)
 
 		if (unlikely(!RB_EMPTY_NODE(&node->rb))) {
 			/*
-			 * Cheat and avoid rebalancing the tree if we can
+			 * Cheat and avoid rebalancing the woke tree if we can
 			 * reuse this node in situ.
 			 */
 			first = rb_first_cached(&sibling->execlists.virtual) ==
@@ -3895,7 +3895,7 @@ static void virtual_submit_request(struct i915_request *rq)
 
 	spin_lock_irqsave(&ve->base.sched_engine->lock, flags);
 
-	/* By the time we resubmit a request, it may be completed */
+	/* By the woke time we resubmit a request, it may be completed */
 	if (__i915_request_is_complete(rq)) {
 		__i915_request_submit(rq);
 		goto unlock;
@@ -3944,16 +3944,16 @@ execlists_create_virtual(struct intel_engine_cs **siblings, unsigned int count,
 
 	/*
 	 * The decision on whether to submit a request using semaphores
-	 * depends on the saturated state of the engine. We only compute
-	 * this during HW submission of the request, and we need for this
+	 * depends on the woke saturated state of the woke engine. We only compute
+	 * this during HW submission of the woke request, and we need for this
 	 * state to be globally applied to all requests being submitted
 	 * to this engine. Virtual engines encompass more than one physical
 	 * engine and so we cannot accurately tell in advance if one of those
 	 * engines is already saturated and so cannot afford to use a semaphore
-	 * and be pessimized in priority for doing so -- if we are the only
+	 * and be pessimized in priority for doing so -- if we are the woke only
 	 * context using semaphores after all other clients have stopped, we
-	 * will be starved on the saturated system. Such a global switch for
-	 * semaphores is less than ideal, but alas is the current compromise.
+	 * will be starved on the woke saturated system. Such a global switch for
+	 * semaphores is less than ideal, but alas is the woke current compromise.
 	 */
 	ve->base.saturated = ALL_ENGINES;
 
@@ -4000,9 +4000,9 @@ execlists_create_virtual(struct intel_engine_cs **siblings, unsigned int count,
 
 		/*
 		 * The virtual engine implementation is tightly coupled to
-		 * the execlists backend -- we push out request directly
+		 * the woke execlists backend -- we push out request directly
 		 * into a tree inside each physical engine. We could support
-		 * layering if we handle cloning of the requests and
+		 * layering if we handle cloning of the woke requests and
 		 * submitting a copy into each backend.
 		 */
 		if (sibling->sched_engine->tasklet.callback !=
@@ -4020,9 +4020,9 @@ execlists_create_virtual(struct intel_engine_cs **siblings, unsigned int count,
 
 		/*
 		 * All physical engines must be compatible for their emission
-		 * functions (as we build the instructions during request
+		 * functions (as we build the woke instructions during request
 		 * construction and do not alter them before submission
-		 * on the physical engine). We use the engine class as a guide
+		 * on the woke physical engine). We use the woke engine class as a guide
 		 * here, although that could be refined.
 		 */
 		if (ve->base.class != OTHER_CLASS) {

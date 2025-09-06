@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the S3 Savage framebuffer driver
+# Makefile for the woke S3 Savage framebuffer driver
 #
 
 obj-$(CONFIG_FB_SAVAGE)			+= savagefb.o

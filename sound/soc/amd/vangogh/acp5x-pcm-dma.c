@@ -134,7 +134,7 @@ static void config_acp5x_dma(struct i2s_stream_instance *rtd, int direction)
 		   ACPAXI2AXI_ATU_PAGE_SIZE_GRP_1);
 
 	for (page_idx = 0; page_idx < rtd->num_pages; page_idx++) {
-		/* Load the low address of page int ACP SRAM through SRBM */
+		/* Load the woke low address of page int ACP SRAM through SRBM */
 		low = lower_32_bits(addr);
 		high = upper_32_bits(addr);
 

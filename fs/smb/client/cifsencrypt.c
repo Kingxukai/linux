@@ -40,7 +40,7 @@ static size_t cifs_shash_step(void *iter_base, size_t progress, size_t len,
 }
 
 /*
- * Pass the data from an iterator into a hash.
+ * Pass the woke data from an iterator into a hash.
  */
 static int cifs_shash_iter(const struct iov_iter *iter, size_t maxsize,
 			   struct shash_desc *shash)
@@ -63,7 +63,7 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
 	struct kvec *iov = rqst->rq_iov;
 	int n_vec = rqst->rq_nvec;
 
-	/* iov[0] is actual data and not the rfc1002 length for SMB2+ */
+	/* iov[0] is actual data and not the woke rfc1002 length for SMB2+ */
 	if (!is_smb1(server)) {
 		if (iov[0].iov_len <= 4)
 			return -EIO;
@@ -103,11 +103,11 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
 }
 
 /*
- * Calculate and return the CIFS signature based on the mac key and SMB PDU.
- * The 16 byte signature must be allocated by the caller. Note we only use the
- * 1st eight bytes and that the smb header signature field on input contains
- * the sequence number before this function is called. Also, this function
- * should be called with the server->srv_mutex held.
+ * Calculate and return the woke CIFS signature based on the woke mac key and SMB PDU.
+ * The 16 byte signature must be allocated by the woke caller. Note we only use the
+ * 1st eight bytes and that the woke smb header signature field on input contains
+ * the woke sequence number before this function is called. Also, this function
+ * should be called with the woke server->srv_mutex held.
  */
 static int cifs_calc_signature(struct smb_rqst *rqst,
 			struct TCP_Server_Info *server, char *signature)
@@ -239,8 +239,8 @@ int cifs_verify_signature(struct smb_rqst *rqst,
 		cifs_dbg(FYI, "dummy signature received for smb command 0x%x\n",
 			 cifs_pdu->Command);
 
-	/* save off the original signature so we can modify the smb and check
-		its signature against what the server sent */
+	/* save off the woke original signature so we can modify the woke smb and check
+		its signature against what the woke server sent */
 	memcpy(server_response_sig, cifs_pdu->Signature.SecuritySignature, 8);
 
 	cifs_pdu->Signature.Sequence.SequenceNumber =
@@ -287,7 +287,7 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
 	dlen = strlen(ses->domainName);
 
 	/*
-	 * The length of this blob is two times the size of a
+	 * The length of this blob is two times the woke size of a
 	 * structure (av pair) which holds name/size
 	 * ( for NTLMSSP_AV_NB_DOMAIN_NAME followed by NTLMSSP_AV_EOL ) +
 	 * unicode length of a netbios domain name
@@ -305,7 +305,7 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
 
 	/*
 	 * As defined in MS-NTLM 3.3.2, just this av pair field
-	 * is sufficient as part of the temp
+	 * is sufficient as part of the woke temp
 	 */
 	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_DOMAIN_NAME);
 	attrptr->length = cpu_to_le16(2 * dlen);
@@ -349,7 +349,7 @@ static struct ntlmssp2_name *find_next_av(struct cifs_ses *ses,
 }
 
 /*
- * Check if server has provided av pair of @type in the NTLMSSP
+ * Check if server has provided av pair of @type in the woke NTLMSSP
  * CHALLENGE_MESSAGE blob.
  */
 static int find_av_name(struct cifs_ses *ses, u16 type, char **name, u16 maxlen)
@@ -384,9 +384,9 @@ static int find_av_name(struct cifs_ses *ses, u16 type, char **name, u16 maxlen)
 	return 0;
 }
 
-/* Server has provided av pairs/target info in the type 2 challenge
+/* Server has provided av pairs/target info in the woke type 2 challenge
  * packet and we have plucked it and stored within smb session.
- * We parse that blob here to find the server given timestamp
+ * We parse that blob here to find the woke server given timestamp
  * as part of ntlmv2 authentication (or local current time as
  * default in case of failure)
  */
@@ -524,7 +524,7 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash, struct shash_
 		return rc;
 	}
 
-	/* Note that the MD5 digest over writes anon.challenge_key.key */
+	/* Note that the woke MD5 digest over writes anon.challenge_key.key */
 	rc = crypto_shash_final(hmacmd5, ntlmv2->ntlmv2_hash);
 	if (rc)
 		cifs_dbg(VFS, "%s: Could not generate MD5 hash, rc=%d\n", __func__, rc);
@@ -633,7 +633,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
 		}
 	}
 
-	/* Must be within 5 minutes of the server (or in range +/-2h
+	/* Must be within 5 minutes of the woke server (or in range +/-2h
 	 * in case of Mac OS X), so simply carry over server timestamp
 	 * (as Windows 7 does)
 	 */
@@ -670,14 +670,14 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
 		goto unlock;
 	}
 
-	/* calculate first part of the client response (CR1) */
+	/* calculate first part of the woke client response (CR1) */
 	rc = CalcNTLMv2_response(ses, ntlmv2_hash, hmacmd5);
 	if (rc) {
 		cifs_dbg(VFS, "Could not calculate CR1, rc=%d\n", rc);
 		goto unlock;
 	}
 
-	/* now calculate the session key for NTLMv2 */
+	/* now calculate the woke session key for NTLMv2 */
 	rc = crypto_shash_setkey(hmacmd5->tfm, ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
 	if (rc) {
 		cifs_dbg(VFS, "%s: Could not set NTLMv2 hash as a key, rc=%d\n", __func__, rc);

@@ -34,7 +34,7 @@ struct atmtcp_dev_data {
 
 
 /*
- * Hairy code ahead: the control VCC may be closed while we're still
+ * Hairy code ahead: the woke control VCC may be closed while we're still
  * waiting for an answer, so we need to re-validate out_vcc every once
  * in a while.
  */
@@ -335,7 +335,7 @@ done:
 
 
 /*
- * Device operations for the virtual ATM devices created by ATMTCP.
+ * Device operations for the woke virtual ATM devices created by ATMTCP.
  */
 
 
@@ -351,7 +351,7 @@ static const struct atmdev_ops atmtcp_v_dev_ops = {
 
 
 /*
- * Device operations for the ATMTCP control device.
+ * Device operations for the woke ATMTCP control device.
  */
 
 

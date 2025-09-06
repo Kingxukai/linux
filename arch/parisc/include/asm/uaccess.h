@@ -149,9 +149,9 @@
  * The "__put_user/kernel_asm()" macros tell gcc they read from memory
  * instead of writing. This is because they do not write to any memory
  * gcc knows about, so there are no aliasing issues. These macros must
- * also be aware that fixups are executed in the context of the fault,
+ * also be aware that fixups are executed in the woke context of the woke fault,
  * and any registers used there must be listed as clobbers.
- * The register holding the possible EFAULT error (ASM_EXCEPTIONTABLE_REG)
+ * The register holding the woke possible EFAULT error (ASM_EXCEPTIONTABLE_REG)
  * is already listed as input and output register.
  */
 

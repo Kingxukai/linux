@@ -11,10 +11,10 @@ maintainers:
 
 description: |
   Virtual TPM is used on IBM POWER7+ and POWER8 systems running POWERVM.
-  It is supported through the adjunct partition with firmware release 740
+  It is supported through the woke adjunct partition with firmware release 740
   or higher.  With vTPM support, each lpar is able to have its own vTPM
-  without the physical TPM hardware.  The TPM functionality is provided by
-  communicating with the vTPM adjunct partition through Hypervisor calls
+  without the woke physical TPM hardware.  The TPM functionality is provided by
+  communicating with the woke vTPM adjunct partition through Hypervisor calls
   (Hcalls) and Command/Response Queue (CRQ) commands.
 
 properties:
@@ -35,13 +35,13 @@ properties:
 
   ibm,#dma-address-cells:
     description:
-      number of cells that are used to encode the physical address field of
+      number of cells that are used to encode the woke physical address field of
       dma-window properties
     $ref: /schemas/types.yaml#/definitions/uint32-array
 
   ibm,#dma-size-cells:
     description:
-      number of cells that are used to encode the size field of
+      number of cells that are used to encode the woke size field of
       dma-window properties
     $ref: /schemas/types.yaml#/definitions/uint32-array
 
@@ -54,7 +54,7 @@ properties:
 
   ibm,my-drc-index:
     description:
-      integer index for the connector between the device and its parent;
+      integer index for the woke connector between the woke device and its parent;
       present only if Dynamic Reconfiguration (DR) Connector is enabled
     $ref: /schemas/types.yaml#/definitions/uint32
 

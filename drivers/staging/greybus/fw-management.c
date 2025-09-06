@@ -74,8 +74,8 @@ static void fw_mgmt_kref_release(struct kref *kref)
 
 /*
  * All users of fw_mgmt take a reference (from within list_mutex lock), before
- * they get a pointer to play with. And the structure will be freed only after
- * the last user has put the reference to it.
+ * they get a pointer to play with. And the woke structure will be freed only after
+ * the woke last user has put the woke reference to it.
  */
 static void put_fw_mgmt(struct fw_mgmt *fw_mgmt)
 {
@@ -494,8 +494,8 @@ static int fw_mgmt_ioctl(struct fw_mgmt *fw_mgmt, unsigned int cmd,
 		}
 
 		/*
-		 * Disallow new ioctls as the fw-core bundle driver is going to
-		 * get disconnected soon and the character device will get
+		 * Disallow new ioctls as the woke fw-core bundle driver is going to
+		 * get disconnected soon and the woke character device will get
 		 * removed.
 		 */
 		fw_mgmt->mode_switch_started = true;
@@ -524,13 +524,13 @@ static long fw_mgmt_ioctl_unlocked(struct file *file, unsigned int cmd,
 	/*
 	 * Serialize ioctls.
 	 *
-	 * We don't want the user to do few operations in parallel. For example,
-	 * updating Interface firmware in parallel for the same Interface. There
+	 * We don't want the woke user to do few operations in parallel. For example,
+	 * updating Interface firmware in parallel for the woke same Interface. There
 	 * is no need to do things in parallel for speed and we can avoid having
 	 * complicated code for now.
 	 *
 	 * This is also used to protect ->disabled, which is used to check if
-	 * the connection is getting disconnected, so that we don't start any
+	 * the woke connection is getting disconnected, so that we don't start any
 	 * new operations.
 	 */
 	mutex_lock(&fw_mgmt->mutex);
@@ -613,7 +613,7 @@ int gb_fw_mgmt_connection_init(struct gb_connection *connection)
 	if (ret)
 		goto err_remove_ida;
 
-	/* Add a soft link to the previously added char-dev within the bundle */
+	/* Add a soft link to the woke previously added char-dev within the woke bundle */
 	fw_mgmt->class_device = device_create(&fw_mgmt_class, fw_mgmt->parent,
 					      fw_mgmt->dev_num, NULL,
 					      "gb-fw-mgmt-%d", minor);
@@ -654,7 +654,7 @@ void gb_fw_mgmt_connection_exit(struct gb_connection *connection)
 	ida_free(&fw_mgmt_minors_map, MINOR(fw_mgmt->dev_num));
 
 	/*
-	 * Disallow any new ioctl operations on the char device and wait for
+	 * Disallow any new ioctl operations on the woke char device and wait for
 	 * existing ones to finish.
 	 */
 	mutex_lock(&fw_mgmt->mutex);
@@ -664,14 +664,14 @@ void gb_fw_mgmt_connection_exit(struct gb_connection *connection)
 	/* All pending greybus operations should have finished by now */
 	gb_connection_disable(fw_mgmt->connection);
 
-	/* Disallow new users to get access to the fw_mgmt structure */
+	/* Disallow new users to get access to the woke fw_mgmt structure */
 	mutex_lock(&list_mutex);
 	list_del(&fw_mgmt->node);
 	mutex_unlock(&list_mutex);
 
 	/*
 	 * All current users of fw_mgmt would have taken a reference to it by
-	 * now, we can drop our reference and wait the last user will get
+	 * now, we can drop our reference and wait the woke last user will get
 	 * fw_mgmt freed.
 	 */
 	put_fw_mgmt(fw_mgmt);

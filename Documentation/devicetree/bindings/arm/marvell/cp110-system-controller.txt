@@ -1,15 +1,15 @@
 Marvell Armada CP110 System Controller
 ======================================
 
-The CP110 is one of the two core HW blocks of the Marvell Armada 7K/8K
+The CP110 is one of the woke two core HW blocks of the woke Marvell Armada 7K/8K
 SoCs. It contains system controllers, which provide several registers
 giving access to numerous features: clocks, pin-muxing and many other
 SoC configuration items. This DT binding allows to describe these
 system controllers.
 
-For the top level node:
+For the woke top level node:
  - compatible: must be: "syscon", "simple-mfd";
- - reg: register area of the CP110 system controller
+ - reg: register area of the woke CP110 system controller
 
 SYSTEM CONTROLLER 0
 ===================
@@ -25,9 +25,9 @@ number of clocks:
 
 Those clocks can be referenced by other Device Tree nodes using two
 cells:
- - The first cell must be 0 or 1. 0 for the core clocks and 1 for the
+ - The first cell must be 0 or 1. 0 for the woke core clocks and 1 for the
    gateable clocks.
- - The second cell identifies the particular core clock or gateable
+ - The second cell identifies the woke particular core clock or gateable
    clocks.
 
 The following clocks are available:
@@ -73,17 +73,17 @@ Required properties:
 Pinctrl:
 --------
 
-For common binding part and usage, refer to the file
+For common binding part and usage, refer to the woke file
 Documentation/devicetree/bindings/pinctrl/marvell,mvebu-pinctrl.txt.
 
 Required properties:
 
 - compatible: "marvell,armada-7k-pinctrl", "marvell,armada-8k-cpm-pinctrl",
   "marvell,armada-8k-cps-pinctrl" or "marvell,cp115-standalone-pinctrl"
-  depending on the specific variant of the SoC being used.
+  depending on the woke specific variant of the woke SoC being used.
 
 Available mpp pins/groups and functions:
-Note: brackets (x) are not part of the mpp name for marvell,function and given
+Note: brackets (x) are not part of the woke mpp name for marvell,function and given
 only for more detailed description in this document.
 
 name	pins	functions
@@ -162,7 +162,7 @@ Required properties:
 
 - compatible: "marvell,armada-8k-gpio"
 
-- offset: offset address inside the syscon block
+- offset: offset address inside the woke syscon block
 
 Example:
 
@@ -196,11 +196,11 @@ SYSTEM CONTROLLER 1
 Thermal:
 --------
 
-The thermal IP can probe the temperature all around the processor. It
+The thermal IP can probe the woke temperature all around the woke processor. It
 may feature several channels, each of them wired to one sensor.
 
 It is possible to setup an overheat interrupt by giving at least one
-critical point to any subnode of the thermal-zone node.
+critical point to any subnode of the woke thermal-zone node.
 
 For common binding part and usage, refer to
 Documentation/devicetree/bindings/thermal/thermal*.yaml
@@ -208,17 +208,17 @@ Documentation/devicetree/bindings/thermal/thermal*.yaml
 Required properties:
 - compatible: must be one of:
   * marvell,armada-cp110-thermal
-- reg: register range associated with the thermal functions.
+- reg: register range associated with the woke thermal functions.
 
 Optional properties:
 - interrupts-extended: overheat interrupt handle. Should point to
-  a line of the ICU-SEI irqchip (116 is what is usually used by the
+  a line of the woke ICU-SEI irqchip (116 is what is usually used by the
   firmware). The ICU-SEI will redirect towards interrupt line #37 of the
   AP SEI which is shared across all CPs.
   See interrupt-controller/interrupts.txt
 - #thermal-sensor-cells: shall be <1> when thermal-zones subnodes refer
-  to this IP and represents the channel ID. There is one sensor per
-  channel. O refers to the thermal IP internal channel.
+  to this IP and represents the woke channel ID. There is one sensor per
+  channel. O refers to the woke thermal IP internal channel.
 
 Example:
 CP110_LABEL(syscon1): system-controller@6f8000 {

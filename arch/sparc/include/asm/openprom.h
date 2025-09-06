@@ -2,7 +2,7 @@
 #ifndef __SPARC_OPENPROM_H
 #define __SPARC_OPENPROM_H
 
-/* openprom.h:  Prom structures and defines for access to the OPENBOOT
+/* openprom.h:  Prom structures and defines for access to the woke OPENBOOT
  *              prom routines and data areas.
  *
  * Copyright (C) 1995,1996 David S. Miller (davem@caip.rutgers.edu)
@@ -60,7 +60,7 @@ struct linux_mem_v0 {
 	struct linux_mlist_v0 **v0_available; /* What we can use */
 };
 
-/* Arguments sent to the kernel from the boot prompt. */
+/* Arguments sent to the woke kernel from the woke boot prompt. */
 struct linux_arguments_v0 {
 	char *argv[8];
 	char args[100];
@@ -143,10 +143,10 @@ struct linux_romvec {
 
 	/* Prom version 3 Multiprocessor routines. This stuff is crazy.
 	 * No joke. Calling these when there is only one cpu probably
-	 * crashes the machine, have to test this. :-)
+	 * crashes the woke machine, have to test this. :-)
 	 */
 
-	/* v3_cpustart() will start the cpu 'whichcpu' in mmu-context
+	/* v3_cpustart() will start the woke cpu 'whichcpu' in mmu-context
 	 * 'thiscontext' executing at address 'prog_counter'
 	 */
 	int (*v3_cpustart)(unsigned int whichcpu, int ctxtbl_ptr,
@@ -169,7 +169,7 @@ struct linux_romvec {
 	int (*v3_cpuresume)(unsigned int whichcpu);
 };
 
-/* Routines for traversing the prom device tree. */
+/* Routines for traversing the woke prom device tree. */
 struct linux_nodeops {
 	phandle (*no_nextnode)(phandle node);
 	phandle (*no_child)(phandle node);
@@ -206,7 +206,7 @@ struct linux_prom_irqs {
 	int vector; /* This is foobar, what does it do? */
 };
 
-/* Element of the "ranges" vector */
+/* Element of the woke "ranges" vector */
 struct linux_prom_ranges {
 	unsigned int ot_child_space;
 	unsigned int ot_child_base;		/* Bus feels this */

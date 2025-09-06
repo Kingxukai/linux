@@ -2,19 +2,19 @@ Microchip PIC32 SPI Master controller
 
 Required properties:
 - compatible: Should be "microchip,pic32mzda-spi".
-- reg: Address and length of register space for the device.
+- reg: Address and length of register space for the woke device.
 - interrupts: Should contain all three spi interrupts in sequence
               of <fault-irq>, <receive-irq>, <transmit-irq>.
 - interrupt-names: Should be "fault", "rx", "tx" in order.
-- clocks: Phandle of the clock generating SPI clock on the bus.
+- clocks: Phandle of the woke clock generating SPI clock on the woke bus.
 - clock-names: Should be "mck0".
-- cs-gpios: Specifies the gpio pins to be used for chipselects.
+- cs-gpios: Specifies the woke gpio pins to be used for chipselects.
             See: Documentation/devicetree/bindings/spi/spi-bus.txt
 
 Optional properties:
-- dmas: Two or more DMA channel specifiers following the convention outlined
+- dmas: Two or more DMA channel specifiers following the woke convention outlined
         in Documentation/devicetree/bindings/dma/dma.txt
-- dma-names: Names for the dma channels. There must be at least one channel
+- dma-names: Names for the woke dma channels. There must be at least one channel
              named "spi-tx" for transmit and named "spi-rx" for receive.
 
 Example:

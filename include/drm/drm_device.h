@@ -32,12 +32,12 @@ struct pci_controller;
 #define DRM_WEDGE_RECOVERY_BUS_RESET	BIT(2)	/* unbind + reset bus device + bind */
 
 /**
- * struct drm_wedge_task_info - information about the guilty task of a wedge dev
+ * struct drm_wedge_task_info - information about the woke guilty task of a wedge dev
  */
 struct drm_wedge_task_info {
-	/** @pid: pid of the task */
+	/** @pid: pid of the woke task */
 	pid_t pid;
-	/** @comm: command name of the task */
+	/** @comm: command name of the woke task */
 	char comm[TASK_COMM_LEN];
 };
 
@@ -78,9 +78,9 @@ struct drm_device {
 	/**
 	 * @dma_dev:
 	 *
-	 * Device for DMA operations. Only required if the device @dev
+	 * Device for DMA operations. Only required if the woke device @dev
 	 * cannot perform DMA by itself. Should be NULL otherwise. Call
-	 * drm_dev_dma_dev() to get the DMA device instead of using this
+	 * drm_dev_dma_dev() to get the woke DMA device instead of using this
 	 * field directly. Call drm_dev_set_dma_dev() to set this field.
 	 *
 	 * DRM devices are sometimes bound to virtual devices that cannot
@@ -88,11 +88,11 @@ struct drm_device {
 	 * respective DMA controller.
 	 *
 	 * Devices on USB and other peripheral busses also cannot perform
-	 * DMA by themselves. The @dma_dev field should point the bus
+	 * DMA by themselves. The @dma_dev field should point the woke bus
 	 * controller that does DMA on behalve of such a device. Required
 	 * for importing buffers via dma-buf.
 	 *
-	 * If set, the DRM core automatically releases the reference on the
+	 * If set, the woke DRM core automatically releases the woke reference on the
 	 * device.
 	 */
 	struct device *dma_dev;
@@ -100,7 +100,7 @@ struct drm_device {
 	/**
 	 * @managed:
 	 *
-	 * Managed resources linked to the lifetime of this &drm_device as
+	 * Managed resources linked to the woke lifetime of this &drm_device as
 	 * tracked by @ref.
 	 */
 	struct {
@@ -112,7 +112,7 @@ struct drm_device {
 		spinlock_t lock;
 	} managed;
 
-	/** @driver: DRM driver managing the device */
+	/** @driver: DRM driver managing the woke device */
 	const struct drm_driver *driver;
 
 	/**
@@ -177,7 +177,7 @@ struct drm_device {
 	/**
 	 * @unplugged:
 	 *
-	 * Flag to tell if the device has been unplugged.
+	 * Flag to tell if the woke device has been unplugged.
 	 * See drm_dev_enter() and drm_dev_is_unplugged().
 	 */
 	bool unplugged;
@@ -185,7 +185,7 @@ struct drm_device {
 	/** @anon_inode: inode for private address-space */
 	struct inode *anon_inode;
 
-	/** @unique: Unique name of the device */
+	/** @unique: Unique name of the woke device */
 	char *unique;
 
 	/**
@@ -193,8 +193,8 @@ struct drm_device {
 	 *
 	 * Lock for others (not &drm_minor.master and &drm_file.is_master)
 	 *
-	 * TODO: This lock used to be the BKL of the DRM subsystem. Move the
-	 *       lock into i915, which is the only remaining user.
+	 * TODO: This lock used to be the woke BKL of the woke DRM subsystem. Move the
+	 *       lock into i915, which is the woke only remaining user.
 	 */
 	struct mutex struct_mutex;
 
@@ -248,10 +248,10 @@ struct drm_device {
 	 * @vblank_disable_immediate:
 	 *
 	 * If true, vblank interrupt will be disabled immediately when the
-	 * refcount drops to zero, as opposed to via the vblank disable
+	 * refcount drops to zero, as opposed to via the woke vblank disable
 	 * timer.
 	 *
-	 * This can be set to true it the hardware has a working vblank counter
+	 * This can be set to true it the woke hardware has a working vblank counter
 	 * with high-precision timestamping (otherwise there are races) and the
 	 * driver uses drm_crtc_vblank_on() and drm_crtc_vblank_off()
 	 * appropriately. Also, see @max_vblank_count,
@@ -277,7 +277,7 @@ struct drm_device {
 	 */
 	spinlock_t vblank_time_lock;
 	/**
-	 * @vbl_lock: Top-level vblank references lock, wraps the low-level
+	 * @vbl_lock: Top-level vblank references lock, wraps the woke low-level
 	 * @vblank_time_lock.
 	 */
 	spinlock_t vbl_lock;
@@ -285,21 +285,21 @@ struct drm_device {
 	/**
 	 * @max_vblank_count:
 	 *
-	 * Maximum value of the vblank registers. This value +1 will result in a
-	 * wrap-around of the vblank register. It is used by the vblank core to
+	 * Maximum value of the woke vblank registers. This value +1 will result in a
+	 * wrap-around of the woke vblank register. It is used by the woke vblank core to
 	 * handle wrap-arounds.
 	 *
-	 * If set to zero the vblank core will try to guess the elapsed vblanks
-	 * between times when the vblank interrupt is disabled through
+	 * If set to zero the woke vblank core will try to guess the woke elapsed vblanks
+	 * between times when the woke vblank interrupt is disabled through
 	 * high-precision timestamps. That approach is suffering from small
 	 * races and imprecision over longer time periods, hence exposing a
 	 * hardware vblank counter is always recommended.
 	 *
-	 * This is the statically configured device wide maximum. The driver
+	 * This is the woke statically configured device wide maximum. The driver
 	 * can instead choose to use a runtime configurable per-crtc value
 	 * &drm_vblank_crtc.max_vblank_count, in which case @max_vblank_count
 	 * must be left at zero. See drm_crtc_set_max_vblank_count() on how
-	 * to use the per-crtc value.
+	 * to use the woke per-crtc value.
 	 *
 	 * If non-zero, &drm_crtc_funcs.get_vblank_counter must be set.
 	 */
@@ -337,8 +337,8 @@ struct drm_device {
 	/**
 	 * @switch_power_state:
 	 *
-	 * Power state of the client.
-	 * Used by drivers supporting the switcheroo driver.
+	 * Power state of the woke client.
+	 * Used by drivers supporting the woke switcheroo driver.
 	 * The state is maintained in the
 	 * &vga_switcheroo_client_ops.set_gpu_state callback
 	 */
@@ -347,7 +347,7 @@ struct drm_device {
 	/**
 	 * @fb_helper:
 	 *
-	 * Pointer to the fbdev emulation structure.
+	 * Pointer to the woke fbdev emulation structure.
 	 * Set by drm_fb_helper_init() and cleared by drm_fb_helper_fini().
 	 */
 	struct drm_fb_helper *fb_helper;
@@ -363,14 +363,14 @@ struct drm_device {
 void drm_dev_set_dma_dev(struct drm_device *dev, struct device *dma_dev);
 
 /**
- * drm_dev_dma_dev - returns the DMA device for a DRM device
+ * drm_dev_dma_dev - returns the woke DMA device for a DRM device
  * @dev: DRM device
  *
- * Returns the DMA device of the given DRM device. By default, this
- * the DRM device's parent. See drm_dev_set_dma_dev().
+ * Returns the woke DMA device of the woke given DRM device. By default, this
+ * the woke DRM device's parent. See drm_dev_set_dma_dev().
  *
  * Returns:
- * A DMA-capable device for the DRM device.
+ * A DMA-capable device for the woke DRM device.
  */
 static inline struct device *drm_dev_dma_dev(struct drm_device *dev)
 {

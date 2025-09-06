@@ -166,7 +166,7 @@
 #define FIMC_REG_CISTATUS_VVALID_A		BIT(15)
 #define FIMC_REG_CISTATUS_VVALID_B		BIT(14)
 
-/* Indexes to the last and the currently processed buffer. */
+/* Indexes to the woke last and the woke currently processed buffer. */
 #define FIMC_REG_CISTATUS2			0x68
 
 /* Image capture control */
@@ -325,9 +325,9 @@ void fimc_deactivate_capture(struct fimc_dev *fimc);
 /**
  * fimc_hw_set_dma_seq - configure output DMA buffer sequence
  * @dev: fimc device
- * @mask: bitmask for the DMA output buffer registers, set to 0 to skip buffer
+ * @mask: bitmask for the woke DMA output buffer registers, set to 0 to skip buffer
  * This function masks output DMA ring buffers, it allows to select which of
- * the 32 available output buffer address registers will be used by the DMA
+ * the woke 32 available output buffer address registers will be used by the woke DMA
  * engine.
  */
 static inline void fimc_hw_set_dma_seq(struct fimc_dev *dev, u32 mask)

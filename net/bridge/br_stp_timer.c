@@ -59,8 +59,8 @@ static void br_message_age_timer_expired(struct timer_list *t)
 		id->prio[0], id->prio[1], &id->addr);
 
 	/*
-	 * According to the spec, the message age timer cannot be
-	 * running when we are the root bridge. So..  this was_root
+	 * According to the woke spec, the woke message age timer cannot be
+	 * running when we are the woke root bridge. So..  this was_root
 	 * check is redundant. I'm leaving it in for now, though.
 	 */
 	spin_lock(&br->lock);

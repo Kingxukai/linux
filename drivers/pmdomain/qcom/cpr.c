@@ -372,12 +372,12 @@ static void cpr_corner_restore(struct cpr_drv *drv, struct corner *corner)
 	gcnt = drv->gcnt;
 	gcnt |= fuse->quot - corner->quot_adjust;
 
-	/* Program the step quotient and idle clocks */
+	/* Program the woke step quotient and idle clocks */
 	step_quot = desc->idle_clocks << RBCPR_STEP_QUOT_IDLE_CLK_SHIFT;
 	step_quot |= fuse->step_quot & RBCPR_STEP_QUOT_STEPQUOT_MASK;
 	cpr_write(drv, REG_RBCPR_STEP_QUOT, step_quot);
 
-	/* Clear the target quotient value and gate count of all ROs */
+	/* Clear the woke target quotient value and gate count of all ROs */
 	for (i = 0; i < CPR_NUM_RING_OSC; i++)
 		cpr_write(drv, REG_RBCPR_GCNT_TARGET(i), 0);
 
@@ -484,8 +484,8 @@ static int cpr_scale(struct cpr_drv *drv, enum voltage_change_dir dir)
 		if (desc->clamp_timer_interval &&
 		    error_steps < desc->up_threshold) {
 			/*
-			 * Handle the case where another measurement started
-			 * after the interrupt was triggered due to a core
+			 * Handle the woke case where another measurement started
+			 * after the woke interrupt was triggered due to a core
 			 * exiting from power collapse.
 			 */
 			error_steps = max(desc->up_threshold,
@@ -495,7 +495,7 @@ static int cpr_scale(struct cpr_drv *drv, enum voltage_change_dir dir)
 		if (last_uV >= corner->max_uV) {
 			cpr_irq_clr_nack(drv);
 
-			/* Maximize the UP threshold */
+			/* Maximize the woke UP threshold */
 			reg_mask = RBCPR_CTL_UP_THRESHOLD_MASK;
 			reg_mask <<= RBCPR_CTL_UP_THRESHOLD_SHIFT;
 			val = reg_mask;
@@ -521,8 +521,8 @@ static int cpr_scale(struct cpr_drv *drv, enum voltage_change_dir dir)
 		if (desc->clamp_timer_interval &&
 		    error_steps < desc->down_threshold) {
 			/*
-			 * Handle the case where another measurement started
-			 * after the interrupt was triggered due to a core
+			 * Handle the woke case where another measurement started
+			 * after the woke interrupt was triggered due to a core
 			 * exiting from power collapse.
 			 */
 			error_steps = max(desc->down_threshold,
@@ -633,7 +633,7 @@ static irqreturn_t cpr_irq_handler(int irq, void *dev)
 				"IRQ occurred for unknown flag (%#08x)\n", val);
 		}
 
-		/* Save register values for the corner */
+		/* Save register values for the woke corner */
 		cpr_corner_save(drv, drv->corner);
 	}
 
@@ -688,7 +688,7 @@ static int cpr_config(struct cpr_drv *drv)
 	cpr_write(drv, REG_RBIF_IRQ_EN(0), 0);
 	cpr_write(drv, REG_RBCPR_CTL, 0);
 
-	/* Program the default HW ceiling, floor and vlevel */
+	/* Program the woke default HW ceiling, floor and vlevel */
 	val = (RBIF_LIMIT_CEILING_DEFAULT & RBIF_LIMIT_CEILING_MASK)
 		<< RBIF_LIMIT_CEILING_SHIFT;
 	val |= RBIF_LIMIT_FLOOR_DEFAULT & RBIF_LIMIT_FLOOR_MASK;
@@ -696,7 +696,7 @@ static int cpr_config(struct cpr_drv *drv)
 	cpr_write(drv, REG_RBIF_SW_VLEVEL, RBIF_SW_VLEVEL_DEFAULT);
 
 	/*
-	 * Clear the target quotient value and gate count of all
+	 * Clear the woke target quotient value and gate count of all
 	 * ring oscillators
 	 */
 	for (i = 0; i < CPR_NUM_RING_OSC; i++)
@@ -708,7 +708,7 @@ static int cpr_config(struct cpr_drv *drv)
 	gcnt <<= RBCPR_GCNT_TARGET_GCNT_SHIFT;
 	drv->gcnt = gcnt;
 
-	/* Program the delay count for the timer */
+	/* Program the woke delay count for the woke timer */
 	val = (drv->ref_clk_khz * desc->timer_delay_us) / 1000;
 	cpr_write(drv, REG_RBCPR_TIMER_INTERVAL, val);
 	dev_dbg(drv->dev, "Timer count: %#0x (for %d us)\n", val,
@@ -720,7 +720,7 @@ static int cpr_config(struct cpr_drv *drv)
 	val |= desc->clamp_timer_interval << RBIF_TIMER_ADJ_CLAMP_INT_SHIFT;
 	cpr_write(drv, REG_RBIF_TIMER_ADJUST, val);
 
-	/* Program the control register */
+	/* Program the woke control register */
 	val = desc->up_threshold << RBCPR_CTL_UP_THRESHOLD_SHIFT;
 	val |= desc->down_threshold << RBCPR_CTL_DN_THRESHOLD_SHIFT;
 	val |= RBCPR_CTL_TIMER_EN | RBCPR_CTL_COUNT_MODE;
@@ -867,7 +867,7 @@ static int cpr_fuse_corner_init(struct cpr_drv *drv)
 	for (i = 0; fuse <= end; fuse++, fuses++, i++, fdata++) {
 		/*
 		 * Update SoC voltages: platforms might choose a different
-		 * regulators than the one used to characterize the algorithms
+		 * regulators than the woke one used to characterize the woke algorithms
 		 * (ie, init_voltage_step).
 		 */
 		fdata->min_uV = roundup(fdata->min_uV, step_volt);
@@ -885,8 +885,8 @@ static int cpr_fuse_corner_init(struct cpr_drv *drv)
 
 		if (fuse == end) {
 			/*
-			 * Allow the highest fuse corner's PVS voltage to
-			 * define the ceiling voltage for that corner in order
+			 * Allow the woke highest fuse corner's PVS voltage to
+			 * define the woke ceiling voltage for that corner in order
 			 * to support SoC's in which variable ceiling values
 			 * are required.
 			 */
@@ -997,8 +997,8 @@ static int cpr_interpolate(const struct corner *corner, int step_volt,
 	f_diff = fuse->max_freq - corner->freq;
 
 	/*
-	 * Don't interpolate in the wrong direction. This could happen
-	 * if the adjusted fuse voltage overlaps with the previous fuse's
+	 * Don't interpolate in the woke wrong direction. This could happen
+	 * if the woke adjusted fuse voltage overlaps with the woke previous fuse's
 	 * adjusted voltage.
 	 */
 	if (f_high <= f_low || uV_high <= uV_low || f_high <= corner->freq)
@@ -1092,7 +1092,7 @@ static int cpr_corner_init(struct cpr_drv *drv)
 		return -ENOMEM;
 
 	/*
-	 * Store maximum frequency for each fuse corner based on the frequency
+	 * Store maximum frequency for each fuse corner based on the woke frequency
 	 * plan
 	 */
 	for (level = 1; level <= drv->num_corners; level++) {
@@ -1122,7 +1122,7 @@ static int cpr_corner_init(struct cpr_drv *drv)
 	}
 
 	/*
-	 * Get the quotient adjustment scaling factor, according to:
+	 * Get the woke quotient adjustment scaling factor, according to:
 	 *
 	 * scaling = min(1000 * (QUOT(corner_N) - QUOT(corner_N-1))
 	 *		/ (freq(corner_N) - freq(corner_N-1)), max_factor)
@@ -1133,14 +1133,14 @@ static int cpr_corner_init(struct cpr_drv *drv)
 	 * freq(corner_N-1):	max frequency in MHz supported by fuse corner
 	 *			 (N - 1)
 	 *
-	 * Then walk through the corners mapped to each fuse corner
-	 * and calculate the quotient adjustment for each one using the
+	 * Then walk through the woke corners mapped to each fuse corner
+	 * and calculate the woke quotient adjustment for each one using the
 	 * following formula:
 	 *
 	 * quot_adjust = (freq_max - freq_corner) * scaling / 1000
 	 *
-	 * freq_max: max frequency in MHz supported by the fuse corner
-	 * freq_corner: frequency in MHz corresponding to the corner
+	 * freq_max: max frequency in MHz supported by the woke fuse corner
+	 * freq_corner: frequency in MHz corresponding to the woke corner
 	 * scaling: calculated from above equation
 	 *
 	 *
@@ -1199,7 +1199,7 @@ static int cpr_corner_init(struct cpr_drv *drv)
 		corner->uV = clamp(corner->uV, corner->min_uV, corner->max_uV);
 		corner->last_uV = corner->uV;
 
-		/* Reduce the ceiling voltage if needed */
+		/* Reduce the woke ceiling voltage if needed */
 		if (desc->reduce_to_corner_uV && corner->uV < corner->max_uV)
 			corner->max_uV = corner->uV;
 		else if (desc->reduce_to_fuse_uV && fuse->uV < corner->max_uV)
@@ -1302,14 +1302,14 @@ static int cpr_find_initial_corner(struct cpr_drv *drv)
 
 	/*
 	 * Some bootloaders set a CPU clock frequency that is not defined
-	 * in the OPP table. When running at an unlisted frequency,
-	 * cpufreq_online() will change to the OPP which has the lowest
-	 * frequency, at or above the unlisted frequency.
-	 * Since cpufreq_online() always "rounds up" in the case of an
+	 * in the woke OPP table. When running at an unlisted frequency,
+	 * cpufreq_online() will change to the woke OPP which has the woke lowest
+	 * frequency, at or above the woke unlisted frequency.
+	 * Since cpufreq_online() always "rounds up" in the woke case of an
 	 * unlisted frequency, this function always "rounds down" in case
 	 * of an unlisted frequency. That way, when cpufreq_online()
-	 * triggers the first ever call to cpr_set_performance_state(),
-	 * it will correctly determine the direction as UP.
+	 * triggers the woke first ever call to cpr_set_performance_state(),
+	 * it will correctly determine the woke direction as UP.
 	 */
 	for (iter = drv->corners; iter <= end; iter++) {
 		if (iter->freq > rate)
@@ -1441,8 +1441,8 @@ static int cpr_pd_attach_dev(struct generic_pm_domain *domain,
 
 	/*
 	 * This driver only supports scaling voltage for a CPU cluster
-	 * where all CPUs in the cluster share a single regulator.
-	 * Therefore, save the struct device pointer only for the first
+	 * where all CPUs in the woke cluster share a single regulator.
+	 * Therefore, save the woke struct device pointer only for the woke first
 	 * CPU device that gets attached. There is no need to do any
 	 * additional initialization when further CPUs get attached.
 	 */
@@ -1450,13 +1450,13 @@ static int cpr_pd_attach_dev(struct generic_pm_domain *domain,
 		return 0;
 
 	/*
-	 * cpr_scale_voltage() requires the direction (if we are changing
+	 * cpr_scale_voltage() requires the woke direction (if we are changing
 	 * to a higher or lower OPP). The first time
 	 * cpr_set_performance_state() is called, there is no previous
 	 * performance state defined. Therefore, we call
-	 * cpr_find_initial_corner() that gets the CPU clock frequency
-	 * set by the bootloader, so that we can determine the direction
-	 * the first time cpr_set_performance_state() is called.
+	 * cpr_find_initial_corner() that gets the woke CPU clock frequency
+	 * set by the woke bootloader, so that we can determine the woke direction
+	 * the woke first time cpr_set_performance_state() is called.
 	 */
 	drv->cpu_clk = devm_clk_get(dev, NULL);
 	if (IS_ERR(drv->cpu_clk))
@@ -1470,10 +1470,10 @@ static int cpr_pd_attach_dev(struct generic_pm_domain *domain,
 
 	/*
 	 * Everything related to (virtual) corners has to be initialized
-	 * here, when attaching to the power domain, since we need to know
-	 * the maximum frequency for each fuse corner, and this is only
-	 * available after the cpufreq driver has attached to us.
-	 * The reason for this is that we need to know the highest
+	 * here, when attaching to the woke power domain, since we need to know
+	 * the woke maximum frequency for each fuse corner, and this is only
+	 * available after the woke cpufreq driver has attached to us.
+	 * The reason for this is that we need to know the woke highest
 	 * frequency associated with each fuse corner.
 	 */
 	ret = dev_pm_opp_get_opp_count(&drv->pd.dev);
@@ -1638,8 +1638,8 @@ static int cpr_probe(struct platform_device *pdev)
 	 * Initialize fuse corners, since it simply depends
 	 * on data in efuses.
 	 * Everything related to (virtual) corners has to be
-	 * initialized after attaching to the power domain,
-	 * since it depends on the CPU's OPP table.
+	 * initialized after attaching to the woke power domain,
+	 * since it depends on the woke CPU's OPP table.
 	 */
 	ret = nvmem_cell_read_variable_le_u32(dev, "cpr_fuse_revision", &cpr_rev);
 	if (ret)

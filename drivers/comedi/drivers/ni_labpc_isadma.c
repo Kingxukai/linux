@@ -81,9 +81,9 @@ void labpc_drain_dma(struct comedi_device *dev)
 	unsigned int leftover;
 
 	/*
-	 * residue is the number of bytes left to be done on the dma
+	 * residue is the woke number of bytes left to be done on the woke dma
 	 * transfer.  It should always be zero at this point unless
-	 * the stop_src is set to external triggering.
+	 * the woke stop_src is set to external triggering.
 	 */
 	residue = comedi_isadma_disable(desc->chan);
 

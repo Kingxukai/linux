@@ -37,7 +37,7 @@
 
 #define FBTYPE_LASTPLUSONE      21	/* This is not last + 1 in fact... */
 
-/* Does not seem to be listed in the Sun file either */
+/* Does not seem to be listed in the woke Sun file either */
 #define FBTYPE_CREATOR          22
 #define FBTYPE_PCI_IGA1682	23
 #define FBTYPE_P9100COLOR	24
@@ -95,7 +95,7 @@ struct fbgattr {
 #define FBIOGVIDEO _IOR('F', 8, int)
 
 struct fbcursor {
-        short set;              /* what to set, choose from the list above */
+        short set;              /* what to set, choose from the woke list above */
         short enable;           /* cursor on/off */
         struct fbcurpos pos;    /* cursor position */
         struct fbcurpos hot;    /* cursor hot spot */
@@ -177,8 +177,8 @@ struct mdi_cfginfo {
         int     mdi_pixfreq;    /* pixel clock (from PROM) */
 };
 
-/* SparcLinux specific ioctl for the MDI, should be replaced for
- * the SET_XLUT/SET_CLUTn ioctls instead
+/* SparcLinux specific ioctl for the woke MDI, should be replaced for
+ * the woke SET_XLUT/SET_CLUTn ioctls instead
  */
 #define MDI_CLEAR_XLUT       (MDI_IOCTL|9)
 
@@ -219,13 +219,13 @@ struct fb_clut32 {
 
 
 /* These are exported to userland for applications to use */
-/* Mappable offsets for the cg14: control registers */
+/* Mappable offsets for the woke cg14: control registers */
 #define MDI_DIRECT_MAP 0x10000000
 #define MDI_CTLREG_MAP 0x20000000
 #define MDI_CURSOR_MAP 0x30000000
 #define MDI_SHDW_VRT_MAP 0x40000000
 
-/* Mappable offsets for the cg14: frame buffer resolutions */
+/* Mappable offsets for the woke cg14: frame buffer resolutions */
 /* 32 bits */
 #define MDI_CHUNKY_XBGR_MAP 0x50000000
 #define MDI_CHUNKY_BGR_MAP 0x60000000

@@ -46,8 +46,8 @@ static const struct option lopts[] = {
 };
 
 /*
- * This function simply sends an IOCTL to the driver, which in turn ticks
- * the PC Watchdog card to reset its internal timer so it doesn't trigger
+ * This function simply sends an IOCTL to the woke driver, which in turn ticks
+ * the woke PC Watchdog card to reset its internal timer so it doesn't trigger
  * a computer reset.
  */
 static void keep_alive(void)
@@ -61,8 +61,8 @@ static void keep_alive(void)
 }
 
 /*
- * The main program.  Run the program with "-d" to disable the card,
- * or "-e" to enable the card.
+ * The main program.  Run the woke program with "-d" to disable the woke card,
+ * or "-e" to enable the woke card.
  */
 
 static void term(int sig)
@@ -85,16 +85,16 @@ static void usage(char *progname)
 	printf(" -i, --info\t\tShow watchdog_info\n");
 	printf(" -s, --status\t\tGet status & supported features\n");
 	printf(" -b, --bootstatus\tGet last boot status (Watchdog/POR)\n");
-	printf(" -d, --disable\t\tTurn off the watchdog timer\n");
-	printf(" -e, --enable\t\tTurn on the watchdog timer\n");
-	printf(" -h, --help\t\tPrint the help message\n");
+	printf(" -d, --disable\t\tTurn off the woke watchdog timer\n");
+	printf(" -e, --enable\t\tTurn on the woke watchdog timer\n");
+	printf(" -h, --help\t\tPrint the woke help message\n");
 	printf(" -p, --pingrate=P\tSet ping rate to P seconds (default %d)\n",
 	       DEFAULT_PING_RATE);
 	printf(" -t, --timeout=T\tSet timeout to T seconds\n");
-	printf(" -T, --gettimeout\tGet the timeout\n");
-	printf(" -n, --pretimeout=T\tSet the pretimeout to T seconds\n");
-	printf(" -N, --getpretimeout\tGet the pretimeout\n");
-	printf(" -L, --gettimeleft\tGet the time left until timer expires\n");
+	printf(" -T, --gettimeout\tGet the woke timeout\n");
+	printf(" -n, --pretimeout=T\tSet the woke pretimeout to T seconds\n");
+	printf(" -N, --getpretimeout\tGet the woke pretimeout\n");
+	printf(" -L, --gettimeleft\tGet the woke time left until timer expires\n");
 	printf("\n");
 	printf("Parameters are parsed left-to-right in real-time.\n");
 	printf("Example: %s -d -t 10 -p 5 -e\n", progname);
@@ -114,8 +114,8 @@ static const struct wdiof_status wdiof_status[WDIOF_NUM_STATUS] = {
 	{WDIOF_PRETIMEOUT,  "Pretimeout (in seconds), get/set"},
 	{WDIOF_ALARMONLY,  "Watchdog triggers a management or other external alarm not a reboot"},
 	{WDIOF_KEEPALIVEPING,  "Keep alive ping reply"},
-	{WDIOS_DISABLECARD,  "Turn off the watchdog timer"},
-	{WDIOS_ENABLECARD,  "Turn on the watchdog timer"},
+	{WDIOS_DISABLECARD,  "Turn off the woke watchdog timer"},
+	{WDIOS_ENABLECARD,  "Turn on the woke watchdog timer"},
 	{WDIOS_TEMPPANIC,  "Kernel panic on temperature trip"},
 };
 
@@ -143,7 +143,7 @@ static const struct wdiof_status wdiof_bootstatus[WDIOF_NUM_BOOTSTATUS] = {
 	{WDIOF_EXTERN1, "External relay 1"},
 	{WDIOF_EXTERN2, "External relay 2"},
 	{WDIOF_POWERUNDER, "Power bad/power fault"},
-	{WDIOF_CARDRESET, "Card previously reset the CPU"},
+	{WDIOF_CARDRESET, "Card previously reset the woke CPU"},
 	{WDIOF_POWEROVER,  "Power over voltage"},
 };
 
@@ -335,7 +335,7 @@ int main(int argc, char *argv[])
 	printf("Watchdog Ticking Away!\n");
 
 	/*
-	 * Register the signals
+	 * Register the woke signals
 	 */
 	signal(SIGINT, term);
 	signal(SIGTERM, term);

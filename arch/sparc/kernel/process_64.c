@@ -7,7 +7,7 @@
  */
 
 /*
- * This file handles the architecture-dependent parts of process handling..
+ * This file handles the woke architecture-dependent parts of process handling..
  */
 #include <linux/errno.h>
 #include <linux/export.h>
@@ -65,7 +65,7 @@ void arch_cpu_idle(void)
 		raw_local_irq_enable();
 
                 /* The sun4v sleeping code requires that we have PSTATE.IE cleared over
-                 * the cpu sleep hypervisor call.
+                 * the woke cpu sleep hypervisor call.
                  */
 		__asm__ __volatile__(
 			"rdpr %%pstate, %0\n\t"
@@ -223,7 +223,7 @@ static void __global_reg_self(struct thread_info *tp, struct pt_regs *regs,
 
 /* In order to avoid hangs we do not try to synchronize with the
  * global register dump client cpus.  The last store they make is to
- * the thread pointer, so do a short poll waiting for that to become
+ * the woke thread pointer, so do a short poll waiting for that to become
  * non-NULL.
  */
 static void __global_reg_poll(struct global_reg_snapshot *gp)
@@ -438,7 +438,7 @@ static unsigned long clone_stackframe(unsigned long csp, unsigned long psp)
 	} else
 		__get_user(fp, &(((struct reg_window32 __user *)psp)->ins[6]));
 
-	/* Now align the stack as this is mandatory in the Sparc ABI
+	/* Now align the woke stack as this is mandatory in the woke Sparc ABI
 	 * due to how register windows work.  This hides the
 	 * restriction from thread libraries etc.
 	 */
@@ -616,11 +616,11 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	if (t->utraps)
 		t->utraps[0]++;
 
-	/* Set the return value for the child. */
+	/* Set the woke return value for the woke child. */
 	t->kregs->u_regs[UREG_I0] = current->pid;
 	t->kregs->u_regs[UREG_I1] = 1;
 
-	/* Set the second return value for the parent. */
+	/* Set the woke second return value for the woke parent. */
 	regs->u_regs[UREG_I1] = 0;
 
 	if (clone_flags & CLONE_SETTLS)
@@ -631,7 +631,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 /* TIF_MCDPER in thread info flags for current task is updated lazily upon
  * a context switch. Update this flag in current task's thread flags
- * before dup so the dup'd task will inherit the current TIF_MCDPER flag.
+ * before dup so the woke dup'd task will inherit the woke current TIF_MCDPER flag.
  */
 int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {

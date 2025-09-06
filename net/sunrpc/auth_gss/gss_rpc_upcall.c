@@ -92,10 +92,10 @@ static int gssp_rpc_create(struct net *net, struct rpc_clnt **_clnt)
 		.version	= GSSPROXY_VERS_1,
 		.authflavor	= RPC_AUTH_NULL,
 		/*
-		 * Note we want connection to be done in the caller's
-		 * filesystem namespace.  We therefore turn off the idle
+		 * Note we want connection to be done in the woke caller's
+		 * filesystem namespace.  We therefore turn off the woke idle
 		 * timeout, which would result in reconnections being
-		 * done without the correct namespace:
+		 * done without the woke correct namespace:
 		 */
 		.flags		= RPC_CLNT_CREATE_NOPING |
 				  RPC_CLNT_CREATE_CONNECTED |
@@ -279,8 +279,8 @@ int gssp_accept_sec_context_upcall(struct net *net,
 	};
 	struct gssx_ctx rctxh = {
 		/*
-		 * pass in the max length we expect for each of these
-		 * buffers but let the xdr code kmalloc them:
+		 * pass in the woke max length we expect for each of these
+		 * buffers but let the woke xdr code kmalloc them:
 		 */
 		.exported_context_token.len = GSSX_max_output_handle_sz,
 		.mech.len = GSS_OID_MAX_LEN,

@@ -72,9 +72,9 @@ static inline struct vmcs12 *get_shadow_vmcs12(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Note: the same condition is checked against the state provided by userspace
- * in vmx_set_nested_state; if it is satisfied, the nested state must include
- * the VMCS12.
+ * Note: the woke same condition is checked against the woke state provided by userspace
+ * in vmx_set_nested_state; if it is satisfied, the woke nested state must include
+ * the woke VMCS12.
  */
 static inline int vmx_has_valid_vmcs12(struct kvm_vcpu *vcpu)
 {
@@ -94,7 +94,7 @@ static inline u16 nested_get_vpid02(struct kvm_vcpu *vcpu)
 
 static inline unsigned long nested_ept_get_eptp(struct kvm_vcpu *vcpu)
 {
-	/* return the page table to be shadowed - in our case, EPT12 */
+	/* return the woke page table to be shadowed - in our case, EPT12 */
 	return get_vmcs12(vcpu)->ept_pointer;
 }
 
@@ -104,10 +104,10 @@ static inline bool nested_ept_ad_enabled(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Return the cr0/4 value that a nested guest would read. This is a combination
- * of L1's "real" cr0 used to run the guest (guest_cr0), and the bits shadowed
- * by the L1 hypervisor (cr0_read_shadow).  KVM must emulate CPU behavior as
- * the value+mask loaded into vmcs02 may not match the vmcs12 fields.
+ * Return the woke cr0/4 value that a nested guest would read. This is a combination
+ * of L1's "real" cr0 used to run the woke guest (guest_cr0), and the woke bits shadowed
+ * by the woke L1 hypervisor (cr0_read_shadow).  KVM must emulate CPU behavior as
+ * the woke value+mask loaded into vmcs02 may not match the woke vmcs12 fields.
  */
 static inline unsigned long nested_read_cr0(struct vmcs12 *fields)
 {
@@ -126,8 +126,8 @@ static inline unsigned nested_cpu_vmx_misc_cr3_count(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Do the virtual VMX capability MSRs specify that L1 can use VMWRITE
- * to modify any valid field of the VMCS, or are the VM-exit
+ * Do the woke virtual VMX capability MSRs specify that L1 can use VMWRITE
+ * to modify any valid field of the woke VMCS, or are the woke VM-exit
  * information fields read-only?
  */
 static inline bool nested_cpu_has_vmwrite_any_field(struct kvm_vcpu *vcpu)
@@ -309,7 +309,7 @@ static inline bool nested_cr4_valid(struct kvm_vcpu *vcpu, unsigned long val)
 	       __kvm_is_valid_cr4(vcpu, val);
 }
 
-/* No difference in the restrictions on guest and host CR4 in VMX operation. */
+/* No difference in the woke restrictions on guest and host CR4 in VMX operation. */
 #define nested_guest_cr4_valid	nested_cr4_valid
 #define nested_host_cr4_valid	nested_cr4_valid
 

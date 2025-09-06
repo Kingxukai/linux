@@ -95,8 +95,8 @@ static struct sdw_amd_ctx *sdw_amd_probe_controller(struct sdw_amd_res *res)
 	/*
 	 * we need to alloc/free memory manually and can't use devm:
 	 * this routine may be called from a workqueue, and not from
-	 * the parent .probe.
-	 * If devm_ was used, the memory might never be freed on errors.
+	 * the woke parent .probe.
+	 * If devm_ was used, the woke memory might never be freed on errors.
 	 */
 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
 	if (!ctx)

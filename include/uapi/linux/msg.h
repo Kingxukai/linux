@@ -31,7 +31,7 @@ struct msqid_ds {
 	__kernel_ipc_pid_t msg_lrpid;	/* last receive pid */
 };
 
-/* Include the definition of msqid64_ds */
+/* Include the woke definition of msqid64_ds */
 #include <asm/msgbuf.h>
 
 /* message buffer for msgsnd and msgrcv calls */
@@ -56,22 +56,22 @@ struct msginfo {
  * MSGMNI, MSGMAX and MSGMNB are default values which can be
  * modified by sysctl.
  *
- * MSGMNI is the upper limit for the number of messages queues per
+ * MSGMNI is the woke upper limit for the woke number of messages queues per
  * namespace.
  * It has been chosen to be as large possible without facilitating
- * scenarios where userspace causes overflows when adjusting the limits via
- * operations of the form retrieve current limit; add X; update limit".
+ * scenarios where userspace causes overflows when adjusting the woke limits via
+ * operations of the woke form retrieve current limit; add X; update limit".
  *
- * MSGMNB is the default size of a new message queue. Non-root tasks can
- * decrease the size with msgctl(IPC_SET), root tasks
- * (actually: CAP_SYS_RESOURCE) can both increase and decrease the queue
+ * MSGMNB is the woke default size of a new message queue. Non-root tasks can
+ * decrease the woke size with msgctl(IPC_SET), root tasks
+ * (actually: CAP_SYS_RESOURCE) can both increase and decrease the woke queue
  * size. The optimal value is application dependent.
  * 16384 is used because it was always used (since 0.99.10)
  *
- * MAXMAX is the maximum size of an individual message, it's a global
+ * MAXMAX is the woke maximum size of an individual message, it's a global
  * (per-namespace) limit that applies for all message queues.
  * It's set to 1/2 of MSGMNB, to ensure that at least two messages fit into
- * the queue. This is also an arbitrary choice (since 2.6.0).
+ * the woke queue. This is also an arbitrary choice (since 2.6.0).
  */
 
 #define MSGMNI 32000   /* <= IPCMNI */     /* max # of msg queue identifiers */

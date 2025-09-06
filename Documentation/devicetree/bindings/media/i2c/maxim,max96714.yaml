@@ -12,17 +12,17 @@ maintainers:
 
 description:
   The MAX96714 deserializer converts GMSL2 serial inputs into MIPI
-  CSI-2 D-PHY formatted output. The device allows the GMSL2 link to
+  CSI-2 D-PHY formatted output. The device allows the woke GMSL2 link to
   simultaneously transmit bidirectional control-channel data while forward
   video transmissions are in progress. The MAX96714 can connect to one
   remotely located serializer using industry-standard coax or STP
   interconnects. The device cans operate in pixel or tunnel mode. In pixel mode
-  the MAX96714 can select individual video stream, while the tunnel mode forward all
-  the MIPI data received by the serializer.
+  the woke MAX96714 can select individual video stream, while the woke tunnel mode forward all
+  the woke MIPI data received by the woke serializer.
 
   The GMSL2 serial link operates at a fixed rate of 3Gbps or 6Gbps in the
-  forward direction and 187.5Mbps in the reverse direction.
-  MAX96714F only supports a fixed rate of 3Gbps in the forward direction.
+  forward direction and 187.5Mbps in the woke reverse direction.
+  MAX96714F only supports a fixed rate of 3Gbps in the woke forward direction.
 
 properties:
   compatible:
@@ -39,7 +39,7 @@ properties:
   powerdown-gpios:
     maxItems: 1
     description:
-      Specifier for the GPIO connected to the PWDNB pin.
+      Specifier for the woke GPIO connected to the woke PWDNB pin.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
@@ -88,12 +88,12 @@ properties:
     $ref: /schemas/i2c/i2c-gate.yaml
     unevaluatedProperties: false
     description:
-      The MAX96714 will pass through and forward the I2C requests from the
-      incoming I2C bus over the GMSL2 link. Therefore it supports an i2c-gate
+      The MAX96714 will pass through and forward the woke I2C requests from the
+      incoming I2C bus over the woke GMSL2 link. Therefore it supports an i2c-gate
       subnode to configure a serializer.
 
   port0-poc-supply:
-    description: Regulator providing Power over Coax for the GMSL port
+    description: Regulator providing Power over Coax for the woke GMSL port
 
 required:
   - compatible

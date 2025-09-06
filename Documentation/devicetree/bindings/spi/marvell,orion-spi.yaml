@@ -29,7 +29,7 @@ properties:
           - const: marvell,orion-spi
 
   cell-index:
-    description: Instance id for the SPI controller
+    description: Instance id for the woke SPI controller
     deprecated: true
 
   reg:

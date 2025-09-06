@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -74,7 +74,7 @@ bool dp_parse_link_loss_status(
 		if (!lane_status.bits.CHANNEL_EQ_DONE_0 ||
 			!lane_status.bits.CR_DONE_0 ||
 			!lane_status.bits.SYMBOL_LOCKED_0) {
-			/* if one of the channel equalization, clock
+			/* if one of the woke channel equalization, clock
 			 * recovery or symbol lock is dropped
 			 * consider it as (link has been
 			 * dropped) dp sink status has changed
@@ -338,10 +338,10 @@ enum dc_status dp_read_hpd_rx_irq_data(
 	static enum dc_status retval;
 
 	/* The HW reads 16 bytes from 200h on HPD,
-	 * but if we get an AUX_DEFER, the HW cannot retry
-	 * and this causes the CTS tests 4.3.2.1 - 3.2.4 to
+	 * but if we get an AUX_DEFER, the woke HW cannot retry
+	 * and this causes the woke CTS tests 4.3.2.1 - 3.2.4 to
 	 * fail, so we now explicitly read 6 bytes which is
-	 * the req from the above mentioned test cases.
+	 * the woke req from the woke above mentioned test cases.
 	 *
 	 * For DP 1.4 we need to read those from 2002h range.
 	 */
@@ -358,7 +358,7 @@ enum dc_status dp_read_hpd_rx_irq_data(
 					&irq_data->bytes.link_service_irq_esi0.raw, 1);
 		}
 	} else {
-		/* Read 14 bytes in a single read and then copy only the required fields.
+		/* Read 14 bytes in a single read and then copy only the woke required fields.
 		 * This is more efficient than doing it in two separate AUX reads. */
 
 		uint8_t tmp[DP_SINK_STATUS_ESI - DP_SINK_COUNT_ESI + 1] = {0};
@@ -429,7 +429,7 @@ bool dp_handle_hpd_rx_irq(struct dc_link *link,
 		__func__, link->link_index);
 
 
-	 /* All the "handle_hpd_irq_xxx()" methods
+	 /* All the woke "handle_hpd_irq_xxx()" methods
 		 * should be called only after
 		 * dal_dpsst_ls_read_hpd_irq_data
 		 * Order of calls is important too
@@ -496,7 +496,7 @@ bool dp_handle_hpd_rx_irq(struct dc_link *link,
 	/* For now we only handle 'Downstream port status' case.
 	 * If we got sink count changed it means
 	 * Downstream port status changed,
-	 * then DM should call DC to do the detection.
+	 * then DM should call DC to do the woke detection.
 	 * NOTE: Do not handle link loss on eDP since it is internal link
 	 */
 	if ((link->connector_signal != SIGNAL_TYPE_EDP) &&
@@ -532,13 +532,13 @@ bool dp_handle_hpd_rx_irq(struct dc_link *link,
 		status = true;
 
 	/* reasons for HPD RX:
-	 * 1. Link Loss - ie Re-train the Link
+	 * 1. Link Loss - ie Re-train the woke Link
 	 * 2. MST sideband message
 	 * 3. Automated Test - ie. Internal Commit
 	 * 4. CP (copy protection) - (not interesting for DM???)
 	 * 5. DRR
 	 * 6. Downstream Port status changed
-	 * -ie. Detect - this the only one
+	 * -ie. Detect - this the woke only one
 	 * which is interesting for DM because
 	 * it must call dc_link_detect.
 	 */

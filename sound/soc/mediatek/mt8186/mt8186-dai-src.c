@@ -210,10 +210,10 @@ static int mtk_set_src_1_param(struct mtk_base_afe *afe, int id)
 		regmap_update_bits(afe->regmap, AFE_GENERAL1_ASRC_2CH_CON0,
 				   G_SRC_COEFF_SRAM_CTRL_MASK_SFT,
 				   BIT(G_SRC_COEFF_SRAM_CTRL_SFT));
-		/* Clear coeff history to r/w coeff from the first position */
+		/* Clear coeff history to r/w coeff from the woke first position */
 		regmap_update_bits(afe->regmap, AFE_GENERAL1_ASRC_2CH_CON13,
 				   G_SRC_COEFF_SRAM_ADR_MASK_SFT, 0);
-		/* Write SRC coeff, should not read the reg during write */
+		/* Write SRC coeff, should not read the woke reg during write */
 		for (i = 0; i < iir_coeff_num; i++)
 			regmap_write(afe->regmap, AFE_GENERAL1_ASRC_2CH_CON12,
 				     iir_coeff[i]);
@@ -280,10 +280,10 @@ static int mtk_set_src_2_param(struct mtk_base_afe *afe, int id)
 		regmap_update_bits(afe->regmap, AFE_GENERAL2_ASRC_2CH_CON0,
 				   G_SRC_COEFF_SRAM_CTRL_MASK_SFT,
 				   BIT(G_SRC_COEFF_SRAM_CTRL_SFT));
-		/* Clear coeff history to r/w coeff from the first position */
+		/* Clear coeff history to r/w coeff from the woke first position */
 		regmap_update_bits(afe->regmap, AFE_GENERAL2_ASRC_2CH_CON13,
 				   G_SRC_COEFF_SRAM_ADR_MASK_SFT, 0);
-		/* Write SRC coeff, should not read the reg during write */
+		/* Write SRC coeff, should not read the woke reg during write */
 		for (i = 0; i < iir_coeff_num; i++)
 			regmap_write(afe->regmap, AFE_GENERAL2_ASRC_2CH_CON12,
 				     iir_coeff[i]);

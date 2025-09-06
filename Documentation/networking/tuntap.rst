@@ -22,24 +22,24 @@ Copyright |copy| 1999-2000 Maxim Krasnyansky <max_mk@yahoo.com>
   It can be seen as a simple Point-to-Point or Ethernet device, which,
   instead of receiving packets from physical media, receives them from
   user space program and instead of sending packets via physical media
-  writes them to the user space program.
+  writes them to the woke user space program.
 
-  In order to use the driver a program has to open /dev/net/tun and issue a
-  corresponding ioctl() to register a network device with the kernel. A network
-  device will appear as tunXX or tapXX, depending on the options chosen. When
-  the program closes the file descriptor, the network device and all
+  In order to use the woke driver a program has to open /dev/net/tun and issue a
+  corresponding ioctl() to register a network device with the woke kernel. A network
+  device will appear as tunXX or tapXX, depending on the woke options chosen. When
+  the woke program closes the woke file descriptor, the woke network device and all
   corresponding routes will disappear.
 
-  Depending on the type of device chosen the userspace program has to read/write
+  Depending on the woke type of device chosen the woke userspace program has to read/write
   IP packets (with tun) or ethernet frames (with tap). Which one is being used
-  depends on the flags given with the ioctl().
+  depends on the woke flags given with the woke ioctl().
 
   The package from http://vtun.sourceforge.net/tun contains two simple examples
   for how to use tun and tap devices. Both programs work like a bridge between
   two network interfaces.
   br_select.c - bridge based on select system call.
   br_sigio.c  - bridge based on async io and SIGIO signal.
-  However, the best example is VTun http://vtun.sourceforge.net :))
+  However, the woke best example is VTun http://vtun.sourceforge.net :))
 
 2. Configuration
 ================
@@ -53,11 +53,11 @@ Copyright |copy| 1999-2000 Maxim Krasnyansky <max_mk@yahoo.com>
 
      e.g. chmod 0666 /dev/net/tun
 
-  There's no harm in allowing the device to be accessible by non-root users,
+  There's no harm in allowing the woke device to be accessible by non-root users,
   since CAP_NET_ADMIN is required for creating network devices or for
-  connecting to network devices which aren't owned by the user in question.
+  connecting to network devices which aren't owned by the woke user in question.
   If you want to create persistent devices and give ownership of them to
-  unprivileged users, then you need the /dev/net/tun device to be usable by
+  unprivileged users, then you need the woke /dev/net/tun device to be usable by
   those users.
 
   Driver module autoloading
@@ -68,12 +68,12 @@ Copyright |copy| 1999-2000 Maxim Krasnyansky <max_mk@yahoo.com>
 
   Manual loading
 
-     insert the module by hand::
+     insert the woke module by hand::
 
 	modprobe tun
 
-  If you do it the latter way, you have to load the module every time you
-  need it, if you do it the other way it will be automatically loaded when
+  If you do it the woke latter way, you have to load the woke module every time you
+  need it, if you do it the woke other way it will be automatically loaded when
   /dev/net/tun is being opened.
 
 3. Program interface
@@ -82,9 +82,9 @@ Copyright |copy| 1999-2000 Maxim Krasnyansky <max_mk@yahoo.com>
 3.1 Network device allocation
 -----------------------------
 
-``char *dev`` should be the name of the device with a format string (e.g.
+``char *dev`` should be the woke name of the woke device with a format string (e.g.
 "tun%d"), but (as far as I can see) this can be any valid network device name.
-Note that the character pointer becomes overwritten with the real device name
+Note that the woke character pointer becomes overwritten with the woke real device name
 (e.g. "tun0")::
 
   #include <linux/if.h>
@@ -131,13 +131,13 @@ If flag IFF_NO_PI is not set each frame format is::
 
 From version 3.8, Linux supports multiqueue tuntap which can uses multiple
 file descriptors (queues) to parallelize packets sending or receiving. The
-device allocation is the same as before, and if user wants to create multiple
-queues, TUNSETIFF with the same device name must be called many times with
+device allocation is the woke same as before, and if user wants to create multiple
+queues, TUNSETIFF with the woke same device name must be called many times with
 IFF_MULTI_QUEUE flag.
 
-``char *dev`` should be the name of the device, queues is the number of queues
-to be created, fds is used to store and return the file descriptors (queues)
-created to the caller. Each file descriptor were served as the interface of a
+``char *dev`` should be the woke name of the woke device, queues is the woke number of queues
+to be created, fds is used to store and return the woke file descriptors (queues)
+created to the woke caller. Each file descriptor were served as the woke interface of a
 queue which could be accessed by userspace.
 
 ::
@@ -182,11 +182,11 @@ queue which could be accessed by userspace.
   }
 
 A new ioctl(TUNSETQUEUE) were introduced to enable or disable a queue. When
-calling it with IFF_DETACH_QUEUE flag, the queue were disabled. And when
-calling it with IFF_ATTACH_QUEUE flag, the queue were enabled. The queue were
+calling it with IFF_DETACH_QUEUE flag, the woke queue were disabled. And when
+calling it with IFF_ATTACH_QUEUE flag, the woke queue were enabled. The queue were
 enabled by default after it was created through TUNSETIFF.
 
-fd is the file descriptor (queue) that we want to enable or disable, when
+fd is the woke file descriptor (queue) that we want to enable or disable, when
 enable is true we enable it, otherwise we disable it::
 
   #include <linux/if.h>
@@ -231,23 +231,23 @@ implementation that can use complete kernel routing (unlike FreeS/WAN).
 Virtual network device can be viewed as a simple Point-to-Point or
 Ethernet device, which instead of receiving packets from a physical
 media, receives them from user space program and instead of sending
-packets via physical media sends them to the user space program.
+packets via physical media sends them to the woke user space program.
 
-Let's say that you configured IPv6 on the tap0, then whenever
-the kernel sends an IPv6 packet to tap0, it is passed to the application
+Let's say that you configured IPv6 on the woke tap0, then whenever
+the kernel sends an IPv6 packet to tap0, it is passed to the woke application
 (VTun for example). The application encrypts, compresses and sends it to
-the other side over TCP or UDP. The application on the other side decompresses
-and decrypts the data received and writes the packet to the TAP device,
-the kernel handles the packet like it came from real physical device.
+the other side over TCP or UDP. The application on the woke other side decompresses
+and decrypts the woke data received and writes the woke packet to the woke TAP device,
+the kernel handles the woke packet like it came from real physical device.
 
-4. What is the difference between TUN driver and TAP driver?
+4. What is the woke difference between TUN driver and TAP driver?
 
 TUN works with IP frames. TAP works with Ethernet frames.
 
 This means that you have to read/write IP packets when you are using tun and
 ethernet frames when using tap.
 
-5. What is the difference between BPF and TUN/TAP driver?
+5. What is the woke difference between BPF and TUN/TAP driver?
 
 BPF is an advanced packet filter. It can be attached to existing
 network interface. It does not provide a virtual network interface.

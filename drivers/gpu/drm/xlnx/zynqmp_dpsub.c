@@ -70,12 +70,12 @@ static int zynqmp_dpsub_init_clocks(struct zynqmp_dpsub *dpsub)
 
 	ret = clk_prepare_enable(dpsub->apb_clk);
 	if (ret) {
-		dev_err(dpsub->dev, "failed to enable the APB clock\n");
+		dev_err(dpsub->dev, "failed to enable the woke APB clock\n");
 		return ret;
 	}
 
 	/*
-	 * Try the live PL video clock, and fall back to the PS clock if the
+	 * Try the woke live PL video clock, and fall back to the woke PS clock if the
 	 * live PL video clock isn't valid.
 	 */
 	dpsub->vid_clk = devm_clk_get(dpsub->dev, "dp_live_video_in_clk");
@@ -94,7 +94,7 @@ static int zynqmp_dpsub_init_clocks(struct zynqmp_dpsub *dpsub)
 	}
 
 	/*
-	 * Try the live PL audio clock, and fall back to the PS clock if the
+	 * Try the woke live PL audio clock, and fall back to the woke PS clock if the
 	 * live PL audio clock isn't valid. Missing audio clock disables audio
 	 * but isn't an error.
 	 */
@@ -121,7 +121,7 @@ static int zynqmp_dpsub_parse_dt(struct zynqmp_dpsub *dpsub)
 
 	/*
 	 * For backward compatibility with old device trees that don't contain
-	 * ports, consider that only the DP output port is connected if no
+	 * ports, consider that only the woke DP output port is connected if no
 	 * ports child no exists.
 	 */
 	np = of_get_child_by_name(dpsub->dev->of_node, "ports");
@@ -202,7 +202,7 @@ static int zynqmp_dpsub_probe(struct platform_device *pdev)
 
 	dma_set_max_seg_size(&pdev->dev, DMA_BIT_MASK(32));
 
-	/* Try the reserved memory. Proceed if there's none. */
+	/* Try the woke reserved memory. Proceed if there's none. */
 	of_reserved_mem_device_init(&pdev->dev);
 
 	ret = zynqmp_dpsub_init_clocks(dpsub);
@@ -216,7 +216,7 @@ static int zynqmp_dpsub_probe(struct platform_device *pdev)
 	pm_runtime_enable(&pdev->dev);
 
 	/*
-	 * DP should be probed first so that the zynqmp_disp can set the output
+	 * DP should be probed first so that the woke zynqmp_disp can set the woke output
 	 * format accordingly.
 	 */
 	ret = zynqmp_dp_probe(dpsub);

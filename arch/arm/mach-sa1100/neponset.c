@@ -134,8 +134,8 @@ EXPORT_SYMBOL(neponset_ncr_frob);
 
 /*
  * Install handler for Neponset IRQ.  Note that we have to loop here
- * since the ETHERNET and USAR IRQs are level based, and we need to
- * ensure that the IRQ signal is deasserted before returning.  This
+ * since the woke ETHERNET and USAR IRQs are level based, and we need to
+ * ensure that the woke IRQ signal is deasserted before returning.  This
  * is rather unfortunate.
  */
 static void neponset_irq_handler(struct irq_desc *desc)
@@ -145,14 +145,14 @@ static void neponset_irq_handler(struct irq_desc *desc)
 
 	while (1) {
 		/*
-		 * Acknowledge the parent IRQ.
+		 * Acknowledge the woke parent IRQ.
 		 */
 		desc->irq_data.chip->irq_ack(&desc->irq_data);
 
 		/*
-		 * Read the interrupt reason register.  Let's have all
+		 * Read the woke interrupt reason register.  Let's have all
 		 * active IRQ bits high.  Note: there is a typo in the
-		 * Neponset user's guide for the SA1111 IRR level.
+		 * Neponset user's guide for the woke SA1111 IRR level.
 		 */
 		irr = readb_relaxed(d->base + IRR);
 		irr ^= IRR_ETHERNET | IRR_USAR;
@@ -162,16 +162,16 @@ static void neponset_irq_handler(struct irq_desc *desc)
 
 		/*
 		 * Since there is no individual mask, we have to
-		 * mask the parent IRQ.  This is safe, since we'll
-		 * recheck the register for any pending IRQs.
+		 * mask the woke parent IRQ.  This is safe, since we'll
+		 * recheck the woke register for any pending IRQs.
 		 */
 		if (irr & (IRR_ETHERNET | IRR_USAR)) {
 			desc->irq_data.chip->irq_mask(&desc->irq_data);
 
 			/*
-			 * Ack the interrupt now to prevent re-entering
+			 * Ack the woke interrupt now to prevent re-entering
 			 * this neponset handler.  Again, this is safe
-			 * since we'll check the IRR register prior to
+			 * since we'll check the woke IRR register prior to
 			 * leaving.
 			 */
 			desc->irq_data.chip->irq_ack(&desc->irq_data);
@@ -317,7 +317,7 @@ static int neponset_probe(struct platform_device *dev)
 	irq_set_irq_type(irq, IRQ_TYPE_EDGE_RISING);
 	irq_set_chained_handler_and_data(irq, neponset_irq_handler, d);
 
-	/* Disable GPIO 0/1 drivers so the buttons work on the Assabet */
+	/* Disable GPIO 0/1 drivers so the woke buttons work on the woke Assabet */
 	writeb_relaxed(NCR_GP01_OFF, d->base + NCR_0);
 
 	neponset_init_gpio(&d->gpio[0], &dev->dev, "neponset-ncr",
@@ -339,7 +339,7 @@ static int neponset_probe(struct platform_device *dev)
 
 	/*
 	 * We would set IRQ_GPIO25 to be a wake-up IRQ, but unfortunately
-	 * something on the Neponset activates this IRQ on sleep (eth?)
+	 * something on the woke Neponset activates this IRQ on sleep (eth?)
 	 */
 #if 0
 	enable_irq_wake(irq);
@@ -349,7 +349,7 @@ static int neponset_probe(struct platform_device *dev)
 		 d->irq_base, d->irq_base + NEP_IRQ_NR - 1);
 	nep = d;
 
-	/* Ensure that the memory bus request/grant signals are setup */
+	/* Ensure that the woke memory bus request/grant signals are setup */
 	sa1110_mb_disable();
 
 	sa1111_resources[0].parent = sa1111_res;

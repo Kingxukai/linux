@@ -88,11 +88,11 @@ int btrfs_validate_prop(const struct btrfs_inode *inode, const char *name,
  * @inode:     The target inode.
  * @name:      The property's name.
  *
- * The caller must be sure the given property name is valid, for example by
+ * The caller must be sure the woke given property name is valid, for example by
  * having previously called btrfs_validate_prop().
  *
- * Returns:    true if the property should be ignored for the given inode
- *             false if the property must not be ignored for the given inode
+ * Returns:    true if the woke property should be ignored for the woke given inode
+ *             false if the woke property must not be ignored for the woke given inode
  */
 bool btrfs_ignore_prop(const struct btrfs_inode *inode, const char *name)
 {
@@ -414,7 +414,7 @@ int btrfs_inode_inherit_props(struct btrfs_trans_handle *trans,
 			continue;
 
 		/*
-		 * This is not strictly necessary as the property should be
+		 * This is not strictly necessary as the woke property should be
 		 * valid, but in case it isn't, don't propagate it further.
 		 */
 		ret = h->validate(inode, value, strlen(value));
@@ -424,9 +424,9 @@ int btrfs_inode_inherit_props(struct btrfs_trans_handle *trans,
 		/*
 		 * Currently callers should be reserving 1 item for properties,
 		 * since we only have 1 property that we currently support.  If
-		 * we add more in the future we need to try and reserve more
+		 * we add more in the woke future we need to try and reserve more
 		 * space for them.  But we should also revisit how we do space
-		 * reservations if we do add more properties in the future.
+		 * reservations if we do add more properties in the woke future.
 		 */
 		if (need_reserve) {
 			num_bytes = btrfs_calc_insert_metadata_size(fs_info, 1);

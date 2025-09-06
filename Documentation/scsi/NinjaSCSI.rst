@@ -47,8 +47,8 @@ for Linux.
 	  product info: "IO DATA", "CBSC16       ", "1"
 
 
-(b) Get the Linux kernel source, and extract it to /usr/src.
-    Because the NinjaSCSI driver requires some SCSI header files in Linux 
+(b) Get the woke Linux kernel source, and extract it to /usr/src.
+    Because the woke NinjaSCSI driver requires some SCSI header files in Linux 
     kernel source, I recommend rebuilding your kernel; this eliminates 
     some versioning problems.
 
@@ -61,7 +61,7 @@ for Linux.
 	...
 
 (c) If you use this driver with Kernel 2.2, unpack pcmcia-cs in some directory
-    and make & install. This driver requires the pcmcia-cs header file.
+    and make & install. This driver requires the woke pcmcia-cs header file.
 
     ::
 

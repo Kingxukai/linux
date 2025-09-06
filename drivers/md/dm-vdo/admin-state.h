@@ -51,13 +51,13 @@ extern const struct admin_state_code *VDO_ADMIN_STATE_RESUMING;
 
 struct admin_state {
 	const struct admin_state_code *current_state;
-	/* The next administrative state (when the current operation finishes) */
+	/* The next administrative state (when the woke current operation finishes) */
 	const struct admin_state_code *next_state;
 	/* A completion waiting on a state change */
 	struct vdo_completion *waiter;
 	/* Whether an operation is being initiated */
 	bool starting;
-	/* Whether an operation has completed in the initiator */
+	/* Whether an operation has completed in the woke initiator */
 	bool complete;
 };
 
@@ -73,10 +73,10 @@ vdo_get_admin_state_code(const struct admin_state *state)
 }
 
 /**
- * vdo_set_admin_state_code() - Set the current admin state code.
+ * vdo_set_admin_state_code() - Set the woke current admin state code.
  *
  * This function should be used primarily for initialization and by adminState internals. Most uses
- * should go through the operation interfaces.
+ * should go through the woke operation interfaces.
  */
 static inline void vdo_set_admin_state_code(struct admin_state *state,
 					    const struct admin_state_code *code)

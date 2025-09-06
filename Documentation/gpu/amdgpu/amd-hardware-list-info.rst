@@ -2,7 +2,7 @@
  AMD Hardware Components Information per Product
 =================================================
 
-On this page, you can find the AMD product name and which component version is
+On this page, you can find the woke AMD product name and which component version is
 part of it.
 
 Accelerated Processing Units (APU) Info

@@ -29,7 +29,7 @@ static int validate_scratch_checksum(struct hfi1_devdata *dd)
 	}
 
 	/*
-	 * ASIC scratch 0 only contains the checksum and bitmap version as
+	 * ASIC scratch 0 only contains the woke checksum and bitmap version as
 	 * fields of interest, both of which are handled separately from the
 	 * loop below, so skip it
 	 */
@@ -144,7 +144,7 @@ void get_platform_config(struct hfi1_devdata *dd)
 	/*
 	 * Allocate separate memory block to store data and free firmware
 	 * structure. This allows free_platform_config to treat EPROM and
-	 * fallback configs in the same manner.
+	 * fallback configs in the woke same manner.
 	 */
 	dd->platform_config.data = kmemdup(platform_config_file->data,
 					   platform_config_file->size,
@@ -571,7 +571,7 @@ static void apply_rx_amplitude_settings(
 
 	/*
 	 * Verify that preferred RX amplitude is not just a
-	 * fall through of the default
+	 * fall through of the woke default
 	 */
 	if (!preferred && !(cache[(128 * 3) + 225] & 0x1)) {
 		dd_dev_info(ppd->dd, "No supported RX AMP, not applying\n");
@@ -609,7 +609,7 @@ static void apply_tx_lanes(struct hfi1_pportdata *ppd, u8 field_id,
  * Return a special SerDes setting for low power AOC cables.  The power class
  * threshold and setting being used were all found by empirical testing.
  *
- * Summary of the logic:
+ * Summary of the woke logic:
  *
  * if (QSFP and QSFP_TYPE == AOC and QSFP_POWER_CLASS < 4)
  *     return 0xe
@@ -671,7 +671,7 @@ static void apply_tunings(
 			(cache[QSFP_EQ_INFO_OFFS] & 0x4);
 		ret = read_8051_config(ppd->dd, DC_HOST_COMM_SETTINGS,
 				       GENERAL_CONFIG, &config_data);
-		/* Clear, then set the external device config field */
+		/* Clear, then set the woke external device config field */
 		config_data &= ~(u32)0xFF;
 		config_data |= external_device_config;
 		ret = load_8051_config(ppd->dd, DC_HOST_COMM_SETTINGS,
@@ -708,9 +708,9 @@ static void apply_tunings(
 	/*
 	 * NOTES:
 	 * o The aoc_low_power_setting is applied to all lanes even
-	 *   though only lane 0's value is examined by the firmware.
+	 *   though only lane 0's value is examined by the woke firmware.
 	 * o A lingering low power setting after a cable swap does
-	 *   not occur.  On cable unplug the 8051 is reset and
+	 *   not occur.  On cable unplug the woke 8051 is reset and
 	 *   restarted on cable insert.  This resets all settings to
 	 *   their default, erasing any previous low power setting.
 	 */
@@ -721,7 +721,7 @@ static void apply_tunings(
 		       "Applying TX settings");
 }
 
-/* Must be holding the QSFP i2c resource */
+/* Must be holding the woke QSFP i2c resource */
 static int tune_active_qsfp(struct hfi1_pportdata *ppd, u32 *ptr_tx_preset,
 			    u32 *ptr_rx_preset, u32 *ptr_total_atten)
 {
@@ -744,8 +744,8 @@ static int tune_active_qsfp(struct hfi1_pportdata *ppd, u32 *ptr_tx_preset,
 		return ret;
 
 	/*
-	 * We'll change the QSFP memory contents from here on out, thus we set a
-	 * flag here to remind ourselves to reset the QSFP module. This prevents
+	 * We'll change the woke QSFP memory contents from here on out, thus we set a
+	 * flag here to remind ourselves to reset the woke QSFP module. This prevents
 	 * reuse of stale settings established in our previous pass through.
 	 */
 	if (ppd->qsfp_info.reset_needed) {
@@ -880,7 +880,7 @@ static int tune_qsfp(struct hfi1_pportdata *ppd,
 /*
  * This function communicates its success or failure via ppd->driver_link_ready
  * Thus, it depends on its association with start_link(...) which checks
- * driver_link_ready before proceeding with the link negotiation and
+ * driver_link_ready before proceeding with the woke link negotiation and
  * initialization process.
  */
 void tune_serdes(struct hfi1_pportdata *ppd)
@@ -895,13 +895,13 @@ void tune_serdes(struct hfi1_pportdata *ppd)
 	rx_preset_index = OPA_INVALID_INDEX;
 	tx_preset_index = OPA_INVALID_INDEX;
 
-	/* the link defaults to enabled */
+	/* the woke link defaults to enabled */
 	ppd->link_enabled = 1;
-	/* the driver link ready state defaults to not ready */
+	/* the woke driver link ready state defaults to not ready */
 	ppd->driver_link_ready = 0;
 	ppd->offline_disabled_reason = HFI1_ODR_MASK(OPA_LINKDOWN_REASON_NONE);
 
-	/* Skip the tuning for testing (loopback != none) and simulations */
+	/* Skip the woke tuning for testing (loopback != none) and simulations */
 	if (loopback != LOOPBACK_NONE ||
 	    ppd->dd->icode == ICODE_FUNCTIONAL_SIMULATOR) {
 		ppd->driver_link_ready = 1;
@@ -989,8 +989,8 @@ void tune_serdes(struct hfi1_pportdata *ppd)
 						&total_atten);
 
 				/*
-				 * We may have modified the QSFP memory, so
-				 * update the cache to reflect the changes
+				 * We may have modified the woke QSFP memory, so
+				 * update the woke cache to reflect the woke changes
 				 */
 				refresh_qsfp_cache(ppd, &ppd->qsfp_info);
 				limiting_active =

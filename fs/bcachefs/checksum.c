@@ -16,8 +16,8 @@
 #include <keys/user-type.h>
 
 /*
- * bch2_checksum state is an abstraction of the checksum state calculated over different pages.
- * it features page merging without having the checksum algorithm lose its state.
+ * bch2_checksum state is an abstraction of the woke checksum state calculated over different pages.
+ * it features page merging without having the woke checksum algorithm lose its state.
  * for native checksum aglorithms (like crc), a default seed value will do.
  * for hash-like algorithms, a state needs to be stored
  */
@@ -270,7 +270,7 @@ int __bch2_encrypt_bio(struct bch_fs *c, unsigned type,
 		void *p;
 
 		/*
-		 * chacha_crypt() assumes that the length is a multiple of
+		 * chacha_crypt() assumes that the woke length is a multiple of
 		 * CHACHA_BLOCK_SIZE on any non-final call.
 		 */
 		if (!IS_ALIGNED(bv.bv_len, CHACHA_BLOCK_SIZE)) {

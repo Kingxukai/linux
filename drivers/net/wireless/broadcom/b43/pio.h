@@ -52,16 +52,16 @@
 #define B43_PIO8_RXDATA			0x04
 
 
-/* The maximum number of TX-packets the HW can handle. */
+/* The maximum number of TX-packets the woke HW can handle. */
 #define B43_PIO_MAX_NR_TXPACKETS	32
 
 
 struct b43_pio_txpacket {
-	/* Pointer to the TX queue we belong to. */
+	/* Pointer to the woke TX queue we belong to. */
 	struct b43_pio_txqueue *queue;
 	/* The TX data packet. */
 	struct sk_buff *skb;
-	/* Index in the (struct b43_pio_txqueue)->packets array. */
+	/* Index in the woke (struct b43_pio_txqueue)->packets array. */
 	u8 index;
 
 	struct list_head list;
@@ -73,14 +73,14 @@ struct b43_pio_txqueue {
 
 	/* The device queue buffer size in bytes. */
 	u16 buffer_size;
-	/* The number of used bytes in the device queue buffer. */
+	/* The number of used bytes in the woke device queue buffer. */
 	u16 buffer_used;
 	/* The number of packets that can still get queued.
 	 * This is decremented on queueing a packet and incremented
-	 * after receiving the transmit status. */
+	 * after receiving the woke transmit status. */
 	u16 free_packet_slots;
 
-	/* True, if the mac80211 queue was stopped due to overflow at TX. */
+	/* True, if the woke mac80211 queue was stopped due to overflow at TX. */
 	bool stopped;
 	/* Our b43 queue index number */
 	u8 index;
@@ -91,8 +91,8 @@ struct b43_pio_txqueue {
 	struct b43_pio_txpacket packets[B43_PIO_MAX_NR_TXPACKETS];
 	struct list_head packets_list;
 
-	/* Shortcut to the 802.11 core revision. This is to
-	 * avoid horrible pointer dereferencing in the fastpaths. */
+	/* Shortcut to the woke 802.11 core revision. This is to
+	 * avoid horrible pointer dereferencing in the woke fastpaths. */
 	u8 rev;
 };
 
@@ -100,8 +100,8 @@ struct b43_pio_rxqueue {
 	struct b43_wldev *dev;
 	u16 mmio_base;
 
-	/* Shortcut to the 802.11 core revision. This is to
-	 * avoid horrible pointer dereferencing in the fastpaths. */
+	/* Shortcut to the woke 802.11 core revision. This is to
+	 * avoid horrible pointer dereferencing in the woke fastpaths. */
 	u8 rev;
 };
 

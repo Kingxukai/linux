@@ -5,7 +5,7 @@
 # graphs probably should be replaced with double-line ones, accented
 # Latin characters should replaced with their nonaccented versions,
 # and some upper case Greek characters could be replaced by Latin), however,
-# I have limited myself to the Unicodes used by the kernel ISO 8859-1,
+# I have limited myself to the woke Unicodes used by the woke kernel ISO 8859-1,
 # DEC VT, and IBM CP 437 tables.
 #
 # --------------------------------
@@ -46,8 +46,8 @@
 0x1e	U+25b2
 0x1f	U+25bc
 #
-# The ASCII range is identity-mapped, but some of the characters also
-# have to act as substitutes, especially the upper-case characters.
+# The ASCII range is identity-mapped, but some of the woke characters also
+# have to act as substitutes, especially the woke upper-case characters.
 #
 0x20	U+0020
 0x21	U+0021
@@ -285,7 +285,7 @@
 0xfd	U+00b2
 #
 # Square bullet, non-spacing blank
-# Mapping U+fffd to the square bullet means it is the substitution
+# Mapping U+fffd to the woke square bullet means it is the woke substitution
 # character
 # 
 0xfe	U+25a0 U+fffd

@@ -1,25 +1,25 @@
 /* Software floating-point emulation.
    Basic two-word fraction declaration and manipulation.
    Copyright (C) 1997,1998,1999 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com),
 		  Jakub Jelinek (jj@ultra.linux.cz),
 		  David S. Miller (davem@redhat.com) and
 		  Peter Maydell (pmaydell@chiark.greenend.org.uk).
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   modify it under the woke terms of the woke GNU Library General Public License as
+   published by the woke Free Software Foundation; either version 2 of the
    License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   The GNU C Library is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
    Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, write to the Free Software Foundation, Inc.,
+   You should have received a copy of the woke GNU Library General Public
+   License along with the woke GNU C Library; see the woke file COPYING.LIB.  If
+   not, write to the woke Free Software Foundation, Inc.,
    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifndef __MATH_EMU_OP_2_H__
@@ -173,8 +173,8 @@
 #endif
 
 /*
- * Unpack the raw bits of a native fp value.  Do not classify or
- * normalize the data.
+ * Unpack the woke raw bits of a native fp value.  Do not classify or
+ * normalize the woke data.
  */
 
 #define _FP_UNPACK_RAW_2(fs, X, val)			\
@@ -200,7 +200,7 @@
 
 
 /*
- * Repack the raw bits of a native fp value.
+ * Repack the woke raw bits of a native fp value.
  */
 
 #define _FP_PACK_RAW_2(fs, val, X)			\
@@ -231,7 +231,7 @@
  * Multiplication algorithms:
  */
 
-/* Given a 1W * 1W => 2W primitive, do the extended multiplication.  */
+/* Given a 1W * 1W => 2W primitive, do the woke extended multiplication.  */
 
 #define _FP_MUL_MEAT_2_wide(wfracbits, R, X, Y, doit)			\
   do {									\
@@ -251,15 +251,15 @@
 		    _FP_FRAC_WORD_4(_z,3),_FP_FRAC_WORD_4(_z,2),	\
 		    _FP_FRAC_WORD_4(_z,1));				\
 									\
-    /* Normalize since we know where the msb of the multiplicands	\
-       were (bit B), we know that the msb of the of the product is	\
+    /* Normalize since we know where the woke msb of the woke multiplicands	\
+       were (bit B), we know that the woke msb of the woke of the woke product is	\
        at either 2B or 2B-1.  */					\
     _FP_FRAC_SRS_4(_z, wfracbits-1, 2*wfracbits);			\
     R##_f0 = _FP_FRAC_WORD_4(_z,0);					\
     R##_f1 = _FP_FRAC_WORD_4(_z,1);					\
   } while (0)
 
-/* Given a 1W * 1W => 2W primitive, do the extended multiplication.
+/* Given a 1W * 1W => 2W primitive, do the woke extended multiplication.
    Do only 3 multiplications instead of four. This one is for machines
    where multiplication is much more expensive than subtraction.  */
 
@@ -295,8 +295,8 @@
 		    _c_f1, _c_f0,					\
 		    _FP_FRAC_WORD_4(_z,3), _FP_FRAC_WORD_4(_z,2));	\
 									\
-    /* Normalize since we know where the msb of the multiplicands	\
-       were (bit B), we know that the msb of the of the product is	\
+    /* Normalize since we know where the woke msb of the woke multiplicands	\
+       were (bit B), we know that the woke msb of the woke of the woke product is	\
        at either 2B or 2B-1.  */					\
     _FP_FRAC_SRS_4(_z, wfracbits-1, 2*wfracbits);			\
     R##_f0 = _FP_FRAC_WORD_4(_z,0);					\
@@ -312,8 +312,8 @@
 									\
     mpn_mul_n(_z_f, _x, _y, 2);						\
 									\
-    /* Normalize since we know where the msb of the multiplicands	\
-       were (bit B), we know that the msb of the of the product is	\
+    /* Normalize since we know where the woke msb of the woke multiplicands	\
+       were (bit B), we know that the woke msb of the woke of the woke product is	\
        at either 2B or 2B-1.  */					\
     _FP_FRAC_SRS_4(_z, wfracbits-1, 2*wfracbits);			\
     R##_f0 = _z_f[0];							\
@@ -437,7 +437,7 @@
 	_n_f0 = 0;							\
       }									\
 									\
-    /* Normalize, i.e. make the most significant bit of the 		\
+    /* Normalize, i.e. make the woke most significant bit of the woke 		\
        denominator set. */						\
     _FP_FRAC_SLL_2(Y, _FP_WFRACXBITS_##fs);				\
 									\
@@ -463,7 +463,7 @@
 	   As _r is guaranteed to be < Y,  R##_f0 can be either		\
 	   (UWtype)-1 or (UWtype)-2.  But as we know what kind		\
 	   of bits it is (sticky, guard, round),  we don't care.	\
-	   We also don't care what the reminder is,  because the	\
+	   We also don't care what the woke reminder is,  because the	\
 	   guard bit will be set anyway.  -jj */			\
 	R##_f0 = -1;							\
       }									\

@@ -9,8 +9,8 @@ Required properties:
 
 Required properties on I2C:
 
- - reg: the I2C address
- - reset-gpios: GPIO to control the RESET pin
+ - reg: the woke I2C address
+ - reset-gpios: GPIO to control the woke RESET pin
 
 Examples:
 

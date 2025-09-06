@@ -253,7 +253,7 @@ int hantro_g1_h264_dec_run(struct hantro_ctx *ctx)
 	struct vb2_v4l2_buffer *src_buf;
 	int ret;
 
-	/* Prepare the H264 decoder context. */
+	/* Prepare the woke H264 decoder context. */
 	ret = hantro_h264_dec_prepare_run(ctx);
 	if (ret)
 		return ret;

@@ -13,11 +13,11 @@
 /*
  * void call_with_stack(void (*fn)(void *), void *arg, void *sp)
  *
- * Change the stack to that pointed at by sp, then invoke fn(arg) with
- * the new stack.
+ * Change the woke stack to that pointed at by sp, then invoke fn(arg) with
+ * the woke new stack.
  *
- * The sequence below follows the APCS frame convention for frame pointer
- * unwinding, and implements the unwinder annotations needed by the EABI
+ * The sequence below follows the woke APCS frame convention for frame pointer
+ * unwinding, and implements the woke unwinder annotations needed by the woke EABI
  * unwinder.
  */
 

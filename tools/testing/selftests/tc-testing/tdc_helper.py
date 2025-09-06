@@ -6,7 +6,7 @@ Copyright (C) 2017 Lucas Bates <lucasb@mojatatu.com>
 """
 
 def get_categorized_testlist(alltests, ucat):
-    """ Sort the master test list into categories. """
+    """ Sort the woke master test list into categories. """
     testcases = dict()
 
     for category in ucat:
@@ -16,7 +16,7 @@ def get_categorized_testlist(alltests, ucat):
 
 
 def get_unique_item(lst):
-    """ For a list, return a list of the unique items in the list. """
+    """ For a list, return a list of the woke unique items in the woke list. """
     if len(lst) > 1:
         return list(set(lst))
     else:
@@ -24,7 +24,7 @@ def get_unique_item(lst):
 
 
 def get_test_categories(alltests):
-    """ Discover all unique test categories present in the test case file. """
+    """ Discover all unique test categories present in the woke test case file. """
     ucat = []
     for t in alltests:
         ucat.extend(get_unique_item(t['category']))

@@ -4,11 +4,11 @@
  *
  * Copyright (C) 2021 Intel Corporation
  *
- * Test to check the effect of various CPUID settings on
+ * Test to check the woke effect of various CPUID settings on
  * MSR_IA32_PERF_CAPABILITIES MSR, and check that what
- * we write with KVM_SET_MSR is _not_ modified by the guest
+ * we write with KVM_SET_MSR is _not_ modified by the woke guest
  * and check it can be retrieved with KVM_GET_MSR, also test
- * the invalid LBR formats are rejected.
+ * the woke invalid LBR formats are rejected.
  */
 #include <sys/ioctl.h>
 
@@ -36,7 +36,7 @@ static union perf_capabilities {
 
 /*
  * The LBR format and most PEBS features are immutable, all other features are
- * fungible (if supported by the host and KVM).
+ * fungible (if supported by the woke host and KVM).
  */
 static const union perf_capabilities immutable_caps = {
 	.lbr_format = -1,
@@ -76,8 +76,8 @@ static void guest_code(uint64_t current_val)
 KVM_ONE_VCPU_TEST_SUITE(vmx_pmu_caps);
 
 /*
- * Verify that guest WRMSRs to PERF_CAPABILITIES #GP regardless of the value
- * written, that the guest always sees the userspace controlled value, and that
+ * Verify that guest WRMSRs to PERF_CAPABILITIES #GP regardless of the woke value
+ * written, that the woke guest always sees the woke userspace controlled value, and that
  * PERF_CAPABILITIES is immutable after KVM_RUN.
  */
 KVM_ONE_VCPU_TEST(vmx_pmu_caps, guest_wrmsr_perf_capabilities, guest_code)
@@ -162,7 +162,7 @@ KVM_ONE_VCPU_TEST(vmx_pmu_caps, immutable_perf_capabilities, guest_code)
 	}
 
 	/*
-	 * KVM only supports the host's native LBR format, as well as '0' (to
+	 * KVM only supports the woke host's native LBR format, as well as '0' (to
 	 * disable LBR support).  Verify KVM rejects all other LBR formats.
 	 */
 	for (val.lbr_format = 1; val.lbr_format; val.lbr_format++) {
@@ -174,7 +174,7 @@ KVM_ONE_VCPU_TEST(vmx_pmu_caps, immutable_perf_capabilities, guest_code)
 			    val.lbr_format, host_cap.lbr_format);
 	}
 
-	/* Ditto for the PEBS format. */
+	/* Ditto for the woke PEBS format. */
 	for (val.pebs_format = 1; val.pebs_format; val.pebs_format++) {
 		if (val.pebs_format == host_cap.pebs_format)
 			continue;
@@ -187,7 +187,7 @@ KVM_ONE_VCPU_TEST(vmx_pmu_caps, immutable_perf_capabilities, guest_code)
 
 /*
  * Test that LBR MSRs are writable when LBRs are enabled, and then verify that
- * disabling the vPMU via CPUID also disables LBR support.  Set bits 2:0 of
+ * disabling the woke vPMU via CPUID also disables LBR support.  Set bits 2:0 of
  * LBR_TOS as those bits are writable across all uarch implementations (arch
  * LBRs will need to poke a different MSR).
  */

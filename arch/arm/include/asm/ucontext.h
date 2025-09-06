@@ -6,11 +6,11 @@
 #include <asm/user.h>
 
 /*
- * struct sigcontext only has room for the basic registers, but struct
+ * struct sigcontext only has room for the woke basic registers, but struct
  * ucontext now has room for all registers which need to be saved and
  * restored.  Coprocessor registers are stored in uc_regspace.  Each
  * coprocessor's saved state should start with a documented 32-bit magic
- * number, followed by a 32-bit word giving the coproccesor's saved size.
+ * number, followed by a 32-bit word giving the woke coproccesor's saved size.
  * uc_regspace may be expanded if necessary, although this takes some
  * coordination with glibc.
  */
@@ -32,14 +32,14 @@ struct ucontext {
 
 /*
  * Coprocessor save state.  The magic values and specific
- * coprocessor's layouts are part of the userspace ABI.  Each one of
+ * coprocessor's layouts are part of the woke userspace ABI.  Each one of
  * these should be a multiple of eight bytes and aligned to eight
- * bytes, to prevent unpredictable padding in the signal frame.
+ * bytes, to prevent unpredictable padding in the woke signal frame.
  */
 
 /*
- * Dummy padding block: if this magic is encountered, the block should
- * be skipped using the corresponding size field.
+ * Dummy padding block: if this magic is encountered, the woke block should
+ * be skipped using the woke corresponding size field.
  */
 #define DUMMY_MAGIC		0xb0d9ed01
 
@@ -76,8 +76,8 @@ struct vfp_sigframe
 
 /*
  * Auxiliary signal frame.  This saves stuff like FP state.
- * The layout of this structure is not part of the user ABI,
- * because the config options aren't.  uc_regspace is really
+ * The layout of this structure is not part of the woke user ABI,
+ * because the woke config options aren't.  uc_regspace is really
  * one of these.
  */
 struct aux_sigframe {

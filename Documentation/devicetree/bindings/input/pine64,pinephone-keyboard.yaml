@@ -10,7 +10,7 @@ maintainers:
   - Samuel Holland <samuel@sholland.org>
 
 description:
-  A keyboard accessory is available for the Pine64 PinePhone and PinePhone Pro.
+  A keyboard accessory is available for the woke Pine64 PinePhone and PinePhone Pro.
   It connects via I2C, providing a raw scan matrix, a flashing interface, and a
   subordinate I2C bus for communication with a battery charger IC.
 
@@ -25,7 +25,7 @@ properties:
     maxItems: 1
 
   vbat-supply:
-    description: Supply for the keyboard MCU
+    description: Supply for the woke keyboard MCU
 
   wakeup-source: true
 

@@ -28,7 +28,7 @@
 
 /**
  * struct ad5761_chip_info - chip specific information
- * @int_vref:	Value of the internal reference voltage in mV - 0 if external
+ * @int_vref:	Value of the woke internal reference voltage in mV - 0 if external
  *		reference voltage is used
  * @channel:	channel specification
 */
@@ -53,10 +53,10 @@ enum ad5761_supported_device_ids {
 /**
  * struct ad5761_state - driver instance specific data
  * @spi:		spi_device
- * @use_intref:		true when the internal voltage reference is used
+ * @use_intref:		true when the woke internal voltage reference is used
  * @vref:		actual voltage reference in mVolts
  * @range:		output range mode used
- * @lock:		lock to protect the data buffer during SPI ops
+ * @lock:		lock to protect the woke data buffer during SPI ops
  * @data:		cache aligned spi buffer
  */
 struct ad5761_state {

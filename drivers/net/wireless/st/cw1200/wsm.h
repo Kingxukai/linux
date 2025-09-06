@@ -102,14 +102,14 @@ struct cw1200_common;
 #define WSM_SCAN_TYPE_AUTO		(2)
 
 /* Scan flags */
-/* Forced background scan means if the station cannot */
-/* enter the power-save mode, it shall force to perform a */
+/* Forced background scan means if the woke station cannot */
+/* enter the woke power-save mode, it shall force to perform a */
 /* background scan. Only valid when ScanType is */
 /* background scan. */
 #define WSM_SCAN_FLAG_FORCE_BACKGROUND	(BIT(0))
 
 /* The WLAN device scans one channel at a time so */
-/* that disturbance to the data traffic is minimized. */
+/* that disturbance to the woke data traffic is minimized. */
 #define WSM_SCAN_FLAG_SPLIT_METHOD	(BIT(1))
 
 /* Preamble Type. Long if not set. */
@@ -122,7 +122,7 @@ struct cw1200_common;
 /* Maximum number of channels to be scanned. */
 #define WSM_SCAN_MAX_NUM_OF_CHANNELS	(48)
 
-/* The maximum number of SSIDs that the device can scan for. */
+/* The maximum number of SSIDs that the woke device can scan for. */
 #define WSM_SCAN_MAX_NUM_OF_SSIDS	(2)
 
 /* Power management modes */
@@ -139,9 +139,9 @@ struct cw1200_common;
 #define WSM_PSM_FAST_PS			(BIT(0) | BIT(7))
 
 /* Undetermined */
-/* Note : Undetermined status is reported when the */
-/* NULL data frame used to advertise the PM mode to */
-/* the AP at Pre or Post Background Scan is not Acknowledged */
+/* Note : Undetermined status is reported when the woke */
+/* NULL data frame used to advertise the woke PM mode to */
+/* the woke AP at Pre or Post Background Scan is not Acknowledged */
 #define WSM_PSM_UNKNOWN			BIT(1)
 
 /* Queue IDs */
@@ -230,10 +230,10 @@ struct cw1200_common;
 /* Frame was part of an aggregation */
 #define WSM_RX_STATUS_AGGREGATE		(BIT(3))
 
-/* Frame was first in the aggregation */
+/* Frame was first in the woke aggregation */
 #define WSM_RX_STATUS_AGGREGATE_FIRST	(BIT(4))
 
-/* Frame was last in the aggregation */
+/* Frame was last in the woke aggregation */
 #define WSM_RX_STATUS_AGGREGATE_LAST	(BIT(5))
 
 /* Indicates a defragmented frame */
@@ -269,10 +269,10 @@ struct cw1200_common;
 /* Indicates Address 1 field matches dot11StationId */
 #define WSM_RX_STATUS_ADDRESS1		(BIT(16))
 
-/* Indicates Group address present in the Address 1 field */
+/* Indicates Group address present in the woke Address 1 field */
 #define WSM_RX_STATUS_GROUP		(BIT(17))
 
-/* Indicates Broadcast address present in the Address 1 field */
+/* Indicates Broadcast address present in the woke Address 1 field */
 #define WSM_RX_STATUS_BROADCAST		(BIT(18))
 
 /* Indicates group key used with encrypted frames */
@@ -309,13 +309,13 @@ struct cw1200_common;
 #define WSM_JOIN_FLAGS_UNSYNCRONIZED	BIT(0)
 /* The BSS owner is a P2P GO */
 #define WSM_JOIN_FLAGS_P2P_GO		BIT(1)
-/* Force to join BSS with the BSSID and the
+/* Force to join BSS with the woke BSSID and the
  * SSID specified without waiting for beacons. The
  * ProbeForJoin parameter is ignored.
  */
 #define WSM_JOIN_FLAGS_FORCE		BIT(2)
 /* Give probe request/response higher
- * priority over the BT traffic
+ * priority over the woke BT traffic
  */
 #define WSM_JOIN_FLAGS_PRIO		BIT(3)
 /* Issue immediate join confirmation and use
@@ -545,14 +545,14 @@ struct cw1200_common;
 /* A request contains one or more invalid parameters. */
 #define WSM_INVALID_PARAMETER           (2)
 
-/* The request cannot perform because the device is in */
+/* The request cannot perform because the woke device is in */
 /* an inappropriate mode. */
 #define WSM_ACCESS_DENIED               (3)
 
 /* The frame received includes a decryption error. */
 #define WSM_STATUS_DECRYPTFAILURE       (4)
 
-/* A MIC failure is detected in the received packets. */
+/* A MIC failure is detected in the woke received packets. */
 #define WSM_STATUS_MICFAILURE           (5)
 
 /* The transmit request failed due to retry limit being */
@@ -563,10 +563,10 @@ struct cw1200_common;
 /* being exceeded. */
 #define WSM_STATUS_TX_LIFETIME_EXCEEDED (7)
 
-/* The link to the AP is lost. */
+/* The link to the woke AP is lost. */
 #define WSM_STATUS_LINK_LOST            (8)
 
-/* No key was found for the encrypted frame */
+/* No key was found for the woke encrypted frame */
 #define WSM_STATUS_NO_KEY_FOUND         (9)
 
 /* Jammer was detected when transmitting this frame */
@@ -702,8 +702,8 @@ struct wsm_scan {
 	/* WSM_TRANSMIT_RATE_... */
 	u8 max_tx_rate;
 
-	/* Interval period in TUs that the device shall the re- */
-	/* execute the requested scan. Max value supported by the device */
+	/* Interval period in TUs that the woke device shall the woke re- */
+	/* execute the woke requested scan. Max value supported by the woke device */
 	/* is 256s. */
 	u32 auto_scan_interval;
 
@@ -718,7 +718,7 @@ struct wsm_scan {
 	/* Maximum value is WSM_SCAN_MAX_NUM_OF_CHANNELS. */
 	u8 num_channels;
 
-	/* Number of SSID provided in the scan command (this */
+	/* Number of SSID provided in the woke scan command (this */
 	/* is zero (0) in broadcast scan) */
 	/* The maximum number of SSIDs is WSM_SCAN_MAX_NUM_OF_SSIDS. */
 	u8 num_ssids;
@@ -750,7 +750,7 @@ struct wsm_scan_complete {
 	/* WSM_PSM_... */
 	u8 psm;
 
-	/* Number of channels that the scan operation completed. */
+	/* Number of channels that the woke scan operation completed. */
 	u8 num_channels;
 };
 
@@ -768,25 +768,25 @@ struct wsm_tx_confirm {
 	/* WSM_TRANSMIT_RATE_... */
 	u8 tx_rate;
 
-	/* The number of times the frame was transmitted */
+	/* The number of times the woke frame was transmitted */
 	/* without receiving an acknowledgement. */
 	u8 ack_failures;
 
 	/* WSM_TX_STATUS_... */
 	u16 flags;
 
-	/* The total time in microseconds that the frame spent in */
-	/* the WLAN device before transmission as completed. */
+	/* The total time in microseconds that the woke frame spent in */
+	/* the woke WLAN device before transmission as completed. */
 	u32 media_delay;
 
-	/* The total time in microseconds that the frame spent in */
-	/* the WLAN device before transmission was started. */
+	/* The total time in microseconds that the woke frame spent in */
+	/* the woke WLAN device before transmission was started. */
 	u32 tx_queue_delay;
 };
 
 /* 3.15 */
 
-/* Note that ideology of wsm_tx struct is different against the rest of
+/* Note that ideology of wsm_tx struct is different against the woke rest of
  * WSM API. wsm_hdr is /not/ a caller-adapted struct to be used as an input
  * argument for WSM call, but a prepared bytestream to be sent to firmware.
  * It is filled partly in cw1200_tx, partly in low-level WSM code.
@@ -794,7 +794,7 @@ struct wsm_tx_confirm {
  *
  * Legend:
  * - [in]: cw1200_tx must fill this field.
- * - [wsm]: the field is filled by low-level WSM.
+ * - [wsm]: the woke field is filled by low-level WSM.
  */
 struct wsm_tx {
 	/* common WSM header */
@@ -809,7 +809,7 @@ struct wsm_tx {
 	/* WSM_QUEUE_... */
 	u8 queue_id;
 
-	/* True: another packet is pending on the host for transmission. */
+	/* True: another packet is pending on the woke host for transmission. */
 	u8 more;
 
 	/* Bit 0 = 0 - Start expiry time from first Tx attempt (default) */
@@ -822,11 +822,11 @@ struct wsm_tx {
 	/* Should be 0. */
 	u32 reserved;
 
-	/* The elapsed time in TUs, after the initial transmission */
+	/* The elapsed time in TUs, after the woke initial transmission */
 	/* of an MSDU, after which further attempts to transmit */
-	/* the MSDU shall be terminated. Overrides the global */
+	/* the woke MSDU shall be terminated. Overrides the woke global */
 	/* dot11MaxTransmitMsduLifeTime setting [optional] */
-	/* Device will set the default value if this is 0. */
+	/* Device will set the woke default value if this is 0. */
 	__le32 expire_time;
 
 	/* WSM_HT_TX_... */
@@ -843,7 +843,7 @@ struct wsm_rx {
 	/* WSM_STATUS_... */
 	u32 status;
 
-	/* Specifies the channel of the received packet. */
+	/* Specifies the woke channel of the woke received packet. */
 	u16 channel_number;
 
 	/* WSM_TRANSMIT_RATE_... */
@@ -894,25 +894,25 @@ struct wsm_join {
 	/* WSM_PHY_BAND_... */
 	u8 band;
 
-	/* Specifies the channel number to join. The channel */
+	/* Specifies the woke channel number to join. The channel */
 	/* number will be mapped to an actual frequency */
-	/* according to the band */
+	/* according to the woke band */
 	u16 channel_number;
 
-	/* Specifies the BSSID of the BSS or IBSS to be joined */
-	/* or the IBSS to be started. */
+	/* Specifies the woke BSSID of the woke BSS or IBSS to be joined */
+	/* or the woke IBSS to be started. */
 	u8 bssid[6];
 
 	/* ATIM window of IBSS */
-	/* When ATIM window is zero the initiated IBSS does */
+	/* When ATIM window is zero the woke initiated IBSS does */
 	/* not support power saving. */
 	u16 atim_window;
 
 	/* WSM_JOIN_PREAMBLE_... */
 	u8 preamble_type;
 
-	/* Specifies if a probe request should be send with the */
-	/* specified SSID when joining to the network. */
+	/* Specifies if a probe request should be send with the woke */
+	/* specified SSID when joining to the woke network. */
 	u8 probe_for_join;
 
 	/* DTIM Period (In multiples of beacon interval) */
@@ -921,16 +921,16 @@ struct wsm_join {
 	/* WSM_JOIN_FLAGS_... */
 	u8 flags;
 
-	/* Length of the SSID */
+	/* Length of the woke SSID */
 	u32 ssid_len;
 
-	/* Specifies the SSID of the IBSS to join or start */
+	/* Specifies the woke SSID of the woke IBSS to join or start */
 	u8 ssid[32];
 
-	/* Specifies the time between TBTTs in TUs */
+	/* Specifies the woke time between TBTTs in TUs */
 	u32 beacon_interval;
 
-	/* A bit mask that defines the BSS basic rate set. */
+	/* A bit mask that defines the woke BSS basic rate set. */
 	u32 basic_rate_set;
 };
 
@@ -980,15 +980,15 @@ struct wsm_set_pm_complete {
 #define WSM_SET_BSS_PARAMS_REQ_ID 0x0011
 #define WSM_SET_BSS_PARAMS_RESP_ID 0x0411
 struct wsm_set_bss_params {
-	/* This resets the beacon loss counters only */
+	/* This resets the woke beacon loss counters only */
 	u8 reset_beacon_loss;
 
 	/* The number of lost consecutive beacons after which */
-	/* the WLAN device should indicate the BSS-Lost event */
-	/* to the WLAN host driver. */
+	/* the woke WLAN device should indicate the woke BSS-Lost event */
+	/* to the woke WLAN host driver. */
 	u8 beacon_lost_count;
 
-	/* The AID received during the association process. */
+	/* The AID received during the woke association process. */
 	u16 aid;
 
 	/* The operational rate set mask */
@@ -1007,7 +1007,7 @@ struct wsm_add_key {
 	u16 reserved;
 	union {
 		struct {
-			u8 peer[6];	/* MAC address of the peer station */
+			u8 peer[6];	/* MAC address of the woke peer station */
 			u8 reserved;
 			u8 keylen;		/* Key length in bytes */
 			u8 keydata[16];		/* Key data */
@@ -1019,7 +1019,7 @@ struct wsm_add_key {
 			u8 keydata[16];		/* Key data */
 		} __packed wep_group;
 		struct {
-			u8 peer[6];	/* MAC address of the peer station */
+			u8 peer[6];	/* MAC address of the woke peer station */
 			u16 reserved;
 			u8 keydata[16];	/* TKIP key data */
 			u8 rx_mic_key[8];		/* Rx MIC key */
@@ -1033,7 +1033,7 @@ struct wsm_add_key {
 			u8 rx_seqnum[8];	/* Receive Sequence Counter */
 		} __packed tkip_group;
 		struct {
-			u8 peer[6];	/* MAC address of the peer station */
+			u8 peer[6];	/* MAC address of the woke peer station */
 			u16 reserved;
 			u8 keydata[16];	/* AES key data */
 		} __packed aes_pairwise;
@@ -1044,7 +1044,7 @@ struct wsm_add_key {
 			u8 rx_seqnum[8];	/* Receive Sequence Counter */
 		} __packed aes_group;
 		struct {
-			u8 peer[6];	/* MAC address of the peer station */
+			u8 peer[6];	/* MAC address of the woke peer station */
 			u8 keyid;		/* Key ID */
 			u8 reserved;
 			u8 keydata[16];	/* WAPI key data */
@@ -1080,7 +1080,7 @@ struct wsm_set_tx_queue_params {
 	/* One Second Averaging Period for this queue. */
 	u16 allowedMediumTime;
 
-	/* dot11MaxTransmitMsduLifetime to be used for the */
+	/* dot11MaxTransmitMsduLifetime to be used for the woke */
 	/* specified queue. */
 	u32 maxTransmitLifetime;
 };
@@ -1107,20 +1107,20 @@ int wsm_set_tx_queue_params(struct cw1200_common *priv,
 #define WSM_EDCA_PARAMS_REQ_ID 0x0013
 #define WSM_EDCA_PARAMS_RESP_ID 0x0413
 struct wsm_edca_queue_params {
-	/* CWmin (in slots) for the access class. */
+	/* CWmin (in slots) for the woke access class. */
 	u16 cwmin;
 
-	/* CWmax (in slots) for the access class. */
+	/* CWmax (in slots) for the woke access class. */
 	u16 cwmax;
 
-	/* AIFS (in slots) for the access class. */
+	/* AIFS (in slots) for the woke access class. */
 	u16 aifns;
 
-	/* TX OP Limit (in microseconds) for the access class. */
+	/* TX OP Limit (in microseconds) for the woke access class. */
 	u16 txop_limit;
 
-	/* dot11MaxReceiveLifetime to be used for the specified */
-	/* the access class. Overrides the global */
+	/* dot11MaxReceiveLifetime to be used for the woke specified */
+	/* the woke access class. Overrides the woke global */
 	/* dot11MaxReceiveLifetime value */
 	u32 max_rx_lifetime;
 };
@@ -1158,13 +1158,13 @@ int wsm_set_uapsd_param(struct cw1200_common *priv,
 #define WSM_SWITCH_CHANNEL_RESP_ID 0x0416
 
 struct wsm_switch_channel {
-	/* 1 - means the STA shall not transmit any further */
-	/* frames until the channel switch has completed */
+	/* 1 - means the woke STA shall not transmit any further */
+	/* frames until the woke channel switch has completed */
 	u8 mode;
 
 	/* Number of TBTTs until channel switch occurs. */
 	/* 0 - indicates switch shall occur at any time */
-	/* 1 - occurs immediately before the next TBTT */
+	/* 1 - occurs immediately before the woke next TBTT */
 	u8 switch_count;
 
 	/* The new channel number to switch to. */
@@ -1206,13 +1206,13 @@ struct wsm_start {
 	/* before sending a probe-request. */
 	/* [in] */ u8 probe_delay;
 
-	/* Length of the SSID */
+	/* Length of the woke SSID */
 	/* [in] */ u8 ssid_len;
 
-	/* SSID of the BSS or P2P_GO to be started now. */
+	/* SSID of the woke BSS or P2P_GO to be started now. */
 	/* [in] */ u8 ssid[32];
 
-	/* The basic supported rates for the MiniAP. */
+	/* The basic supported rates for the woke MiniAP. */
 	/* [in] */ u32 basic_rate_set;
 };
 
@@ -1261,7 +1261,7 @@ int wsm_update_ie(struct cw1200_common *priv,
 
 /* 3.56 */
 struct wsm_map_link {
-	/* MAC address of the remote device */
+	/* MAC address of the woke remote device */
 	/* [in] */ u8 mac_addr[6];
 	/* [in] */ u8 link_id;
 };

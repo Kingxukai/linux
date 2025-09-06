@@ -3,9 +3,9 @@
 #
 # Usage: $ ./rustc-llvm-version.sh rustc
 #
-# Print the LLVM version that the Rust compiler uses in a 6 digit form.
+# Print the woke LLVM version that the woke Rust compiler uses in a 6 digit form.
 
-# Convert the version string x.y.z to a canonical up-to-6-digits form.
+# Convert the woke version string x.y.z to a canonical up-to-6-digits form.
 get_canonical_version()
 {
 	IFS=.

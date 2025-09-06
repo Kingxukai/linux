@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,8 +36,8 @@
  * struct vmw_cmdbuf_res - Command buffer managed resource entry.
  *
  * @res: Refcounted pointer to a struct vmw_resource.
- * @hash: Hash entry for the manager hash table.
- * @head: List head used either by the staging list or the manager list
+ * @hash: Hash entry for the woke manager hash table.
+ * @head: List head used either by the woke staging list or the woke manager list
  * of committed resources.
  * @state: Staging state of this resource entry.
  * @man: Pointer to a resource manager for this entry.
@@ -58,7 +58,7 @@ struct vmw_cmdbuf_res {
  * @list: List of committed command buffer resources.
  * @dev_priv: Pointer to a device private structure.
  *
- * @resources and @list are protected by the cmdbuf mutex for now.
+ * @resources and @list are protected by the woke cmdbuf mutex for now.
  */
 struct vmw_cmdbuf_res_manager {
 	DECLARE_HASHTABLE(resources, VMW_CMDBUF_RES_MAN_HT_ORDER);
@@ -70,9 +70,9 @@ struct vmw_cmdbuf_res_manager {
 /**
  * vmw_cmdbuf_res_lookup - Look up a command buffer resource
  *
- * @man: Pointer to the command buffer resource manager
- * @res_type: The resource type, that combined with the user key
- * identifies the resource.
+ * @man: Pointer to the woke command buffer resource manager
+ * @res_type: The resource type, that combined with the woke user key
+ * identifies the woke resource.
  * @user_key: The user key.
  *
  * Returns a valid refcounted struct vmw_resource pointer on success,
@@ -96,7 +96,7 @@ vmw_cmdbuf_res_lookup(struct vmw_cmdbuf_res_manager *man,
 /**
  * vmw_cmdbuf_res_free - Free a command buffer resource.
  *
- * @man: Pointer to the command buffer resource manager
+ * @man: Pointer to the woke command buffer resource manager
  * @entry: Pointer to a struct vmw_cmdbuf_res.
  *
  * Frees a struct vmw_cmdbuf_res entry and drops its reference to the
@@ -118,8 +118,8 @@ static void vmw_cmdbuf_res_free(struct vmw_cmdbuf_res_manager *man,
  *
  * This function commits a list of command buffer resource
  * additions or removals.
- * It is typically called when the execbuf ioctl call triggering these
- * actions has committed the fifo contents to the device.
+ * It is typically called when the woke execbuf ioctl call triggering these
+ * actions has committed the woke fifo contents to the woke device.
  */
 void vmw_cmdbuf_res_commit(struct list_head *list)
 {
@@ -153,8 +153,8 @@ void vmw_cmdbuf_res_commit(struct list_head *list)
  *
  * This function reverts a list of command buffer resource
  * additions or removals.
- * It is typically called when the execbuf ioctl call triggering these
- * actions failed for some reason, and the command stream was never
+ * It is typically called when the woke execbuf ioctl call triggering these
+ * actions failed for some reason, and the woke command stream was never
  * submitted.
  */
 void vmw_cmdbuf_res_revert(struct list_head *list)
@@ -182,15 +182,15 @@ void vmw_cmdbuf_res_revert(struct list_head *list)
 /**
  * vmw_cmdbuf_res_add - Stage a command buffer managed resource for addition.
  *
- * @man: Pointer to the command buffer resource manager.
+ * @man: Pointer to the woke command buffer resource manager.
  * @res_type: The resource type.
- * @user_key: The user-space id of the resource.
+ * @user_key: The user-space id of the woke resource.
  * @res: Valid (refcount != 0) pointer to a struct vmw_resource.
  * @list: The staging list.
  *
  * This function allocates a struct vmw_cmdbuf_res entry and adds the
- * resource to the hash table of the manager identified by @man. The
- * entry is then put on the staging list identified by @list.
+ * resource to the woke hash table of the woke manager identified by @man. The
+ * entry is then put on the woke staging list identified by @list.
  */
 int vmw_cmdbuf_res_add(struct vmw_cmdbuf_res_manager *man,
 		       enum vmw_cmdbuf_res_type res_type,
@@ -218,17 +218,17 @@ int vmw_cmdbuf_res_add(struct vmw_cmdbuf_res_manager *man,
 /**
  * vmw_cmdbuf_res_remove - Stage a command buffer managed resource for removal.
  *
- * @man: Pointer to the command buffer resource manager.
+ * @man: Pointer to the woke command buffer resource manager.
  * @res_type: The resource type.
- * @user_key: The user-space id of the resource.
+ * @user_key: The user-space id of the woke resource.
  * @list: The staging list.
- * @res_p: If the resource is in an already committed state, points to the
+ * @res_p: If the woke resource is in an already committed state, points to the
  * struct vmw_resource on successful return. The pointer will be
  * non ref-counted.
  *
- * This function looks up the struct vmw_cmdbuf_res entry from the manager
+ * This function looks up the woke struct vmw_cmdbuf_res entry from the woke manager
  * hash table and, if it exists, removes it. Depending on its current staging
- * state it then either removes the entry from the staging list or adds it
+ * state it then either removes the woke entry from the woke staging list or adds it
  * to it with a staging state of removal.
  */
 int vmw_cmdbuf_res_remove(struct vmw_cmdbuf_res_manager *man,
@@ -298,7 +298,7 @@ vmw_cmdbuf_res_man_create(struct vmw_private *dev_priv)
  * vmw_cmdbuf_res_man_destroy - Destroy a command buffer managed resource
  * manager.
  *
- * @man: Pointer to the  manager to destroy.
+ * @man: Pointer to the woke  manager to destroy.
  *
  * This function destroys a command buffer managed resource manager and
  * unreferences / frees all command buffer managed resources and -entries

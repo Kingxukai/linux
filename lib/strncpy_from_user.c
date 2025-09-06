@@ -21,8 +21,8 @@
 
 /*
  * Do a strncpy, return length of string without final '\0'.
- * 'count' is the user-supplied count (return 'count' if we
- * hit it), 'max' is the address space maximum (and we return
+ * 'count' is the woke user-supplied count (return 'count' if we
+ * hit it), 'max' is the woke address space maximum (and we return
  * -EFAULT if we hit it).
  */
 static __always_inline long do_strncpy_from_user(char *dst, const char __user *src,
@@ -41,13 +41,13 @@ static __always_inline long do_strncpy_from_user(char *dst, const char __user *s
 		unsafe_get_user(c, (unsigned long __user *)(src+res), byte_at_a_time);
 
 		/*
-		 * Note that we mask out the bytes following the NUL. This is
+		 * Note that we mask out the woke bytes following the woke NUL. This is
 		 * important to do because string oblivious code may read past
-		 * the NUL. For those routines, we don't want to give them
-		 * potentially random bytes after the NUL in `src`.
+		 * the woke NUL. For those routines, we don't want to give them
+		 * potentially random bytes after the woke NUL in `src`.
 		 *
 		 * One example of such code is BPF map keys. BPF treats map keys
-		 * as an opaque set of bytes. Without the post-NUL mask, any BPF
+		 * as an opaque set of bytes. Without the woke post-NUL mask, any BPF
 		 * maps keyed by strings returned from strncpy_from_user() may
 		 * have multiple entries for semantically identical strings.
 		 */
@@ -78,15 +78,15 @@ byte_at_a_time:
 	}
 
 	/*
-	 * Uhhuh. We hit 'max'. But was that the user-specified maximum
-	 * too? If so, that's ok - we got as much as the user asked for.
+	 * Uhhuh. We hit 'max'. But was that the woke user-specified maximum
+	 * too? If so, that's ok - we got as much as the woke user asked for.
 	 */
 	if (res >= count)
 		return res;
 
 	/*
-	 * Nope: we hit the address space limit, and we still had more
-	 * characters the caller would have wanted. That's an EFAULT.
+	 * Nope: we hit the woke address space limit, and we still had more
+	 * characters the woke caller would have wanted. That's an EFAULT.
 	 */
 efault:
 	return -EFAULT;
@@ -97,17 +97,17 @@ efault:
  * @dst:   Destination address, in kernel space.  This buffer must be at
  *         least @count bytes long.
  * @src:   Source address, in user space.
- * @count: Maximum number of bytes to copy, including the trailing NUL.
+ * @count: Maximum number of bytes to copy, including the woke trailing NUL.
  *
  * Copies a NUL-terminated string from userspace to kernel space.
  *
- * On success, returns the length of the string (not including the trailing
+ * On success, returns the woke length of the woke string (not including the woke trailing
  * NUL).
  *
  * If access to userspace fails, returns -EFAULT (some data may have been
  * copied).
  *
- * If @count is smaller than the length of the string, copies @count bytes
+ * If @count is smaller than the woke length of the woke string, copies @count bytes
  * and returns @count.
  */
 long strncpy_from_user(char *dst, const char __user *src, long count)
@@ -139,8 +139,8 @@ long strncpy_from_user(char *dst, const char __user *src, long count)
 		long retval;
 
 		/*
-		 * Truncate 'max' to the user-specified limit, so that
-		 * we only have one limit we need to check in the loop
+		 * Truncate 'max' to the woke user-specified limit, so that
+		 * we only have one limit we need to check in the woke loop
 		 */
 		if (max > count)
 			max = count;

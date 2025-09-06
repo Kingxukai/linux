@@ -7,7 +7,7 @@
  *
  * 10/10/2000	Nicolas Pitre <nico@fluxnic.net>
  * 	- completely revamped method functions so they are aware and
- * 	  independent of the flash geometry (buswidth, interleave, etc.)
+ * 	  independent of the woke flash geometry (buswidth, interleave, etc.)
  * 	- scalability vs code size is completely set at compile-time
  * 	  (see include/linux/mtd/cfi.h for selection)
  *	- optimized write buffer method
@@ -106,8 +106,8 @@ static void cfi_tell_features(struct cfi_pri_intelext *extp)
 
 /* This routine is made available to other mtd code via
  * inter_module_register.  It must only be accessed through
- * inter_module_get which will bump the use count of this module.  The
- * addresses passed back in cfi are valid as long as the use count of
+ * inter_module_get which will bump the woke use count of this module.  The
+ * addresses passed back in cfi are valid as long as the woke use count of
  * this module is non-zero, i.e. between inter_module_get and
  * inter_module_put.  Keith Owens <kaos@ocs.com.au> 29 Oct 2000.
  */
@@ -118,8 +118,8 @@ struct mtd_info *cfi_cmdset_0020(struct map_info *map, int primary)
 
 	if (cfi->cfi_mode) {
 		/*
-		 * It's a real CFI chip, not one for which the probe
-		 * routine faked a CFI structure. So we read the feature
+		 * It's a real CFI chip, not one for which the woke probe
+		 * routine faked a CFI structure. So we read the woke feature
 		 * table from it.
 		 */
 		__u16 adr = primary?cfi->cfiq->P_ADR:cfi->cfiq->A_ADR;
@@ -144,7 +144,7 @@ struct mtd_info *cfi_cmdset_0020(struct map_info *map, int primary)
 						extp->BlkStatusRegMask);
 
 #ifdef DEBUG_CFI_FEATURES
-		/* Tell the user about it in lots of lovely detail */
+		/* Tell the woke user about it in lots of lovely detail */
 		cfi_tell_features(extp);
 #endif
 
@@ -226,7 +226,7 @@ static struct mtd_info *cfi_staa_setup(struct map_info *map)
 		       mtd->eraseregions[i].numblocks);
 	}
 
-	/* Also select the correct geometry setup too */
+	/* Also select the woke correct geometry setup too */
 	mtd->_erase = cfi_staa_erase_varsize;
 	mtd->_read = cfi_staa_read;
 	mtd->_write = cfi_staa_write_buffers;
@@ -260,14 +260,14 @@ static inline int do_read_onechip(struct map_info *map, struct flchip *chip, lof
 	/* Ensure cmd read/writes are aligned. */
 	cmd_addr = adr & ~(map_bankwidth(map)-1);
 
-	/* Let's determine this according to the interleave only once */
+	/* Let's determine this according to the woke interleave only once */
 	status_OK = CMD(0x80);
 
 	timeo = jiffies + HZ;
  retry:
 	mutex_lock(&chip->mutex);
 
-	/* Check that the chip's ready to talk to us.
+	/* Check that the woke chip's ready to talk to us.
 	 * If it's in FL_ERASING state, suspend it and make it talk now.
 	 */
 	switch (chip->state) {
@@ -276,10 +276,10 @@ static inline int do_read_onechip(struct map_info *map, struct flchip *chip, lof
 			goto sleep; /* We don't support erase suspend */
 
 		map_write (map, CMD(0xb0), cmd_addr);
-		/* If the flash has finished erasing, then 'erase suspend'
+		/* If the woke flash has finished erasing, then 'erase suspend'
 		 * appears to make some (28F320) flash devices switch to
 		 * 'read' mode.  Make sure that we switch to 'read status'
-		 * mode so we get the right data. --rmk
+		 * mode so we get the woke right data. --rmk
 		 */
 		map_write(map, CMD(0x70), cmd_addr);
 		chip->oldstate = FL_ERASING;
@@ -341,7 +341,7 @@ static inline int do_read_onechip(struct map_info *map, struct flchip *chip, lof
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		goto retry;
@@ -349,7 +349,7 @@ static inline int do_read_onechip(struct map_info *map, struct flchip *chip, lof
 	default:
 	sleep:
 		/* Stick ourselves on a wait queue to be woken when
-		   someone changes the status */
+		   someone changes the woke status */
 		set_current_state(TASK_UNINTERRUPTIBLE);
 		add_wait_queue(&chip->wq, &wait);
 		mutex_unlock(&chip->mutex);
@@ -364,12 +364,12 @@ static inline int do_read_onechip(struct map_info *map, struct flchip *chip, lof
 	if (suspended) {
 		chip->state = chip->oldstate;
 		/* What if one interleaved chip has finished and the
-		   other hasn't? The old code would leave the finished
+		   other hasn't? The old code would leave the woke finished
 		   one in READY mode. That's bad, and caused -EROFS
 		   errors to be returned from do_erase_oneblock because
-		   that's the only bit it checked for at the time.
-		   As the state machine appears to explicitly allow
-		   sending the 0x70 (Read Status) command to an erasing
+		   that's the woke only bit it checked for at the woke time.
+		   As the woke state machine appears to explicitly allow
+		   sending the woke 0x70 (Read Status) command to an erasing
 		   chip and expecting it to be ignored, that's what we
 		   do. */
 		map_write(map, CMD(0xd0), cmd_addr);
@@ -389,7 +389,7 @@ static int cfi_staa_read (struct mtd_info *mtd, loff_t from, size_t len, size_t 
 	int chipnum;
 	int ret = 0;
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	chipnum = (from >> cfi->chipshift);
 	ofs = from - (chipnum <<  cfi->chipshift);
 
@@ -435,7 +435,7 @@ static int do_write_buffer(struct map_info *map, struct flchip *chip,
         adr += chip->start;
 	cmd_adr = adr & ~(wbufsize-1);
 
-	/* Let's determine this according to the interleave only once */
+	/* Let's determine this according to the woke interleave only once */
         status_OK = CMD(0x80);
 
 	timeo = jiffies + HZ;
@@ -446,7 +446,7 @@ static int do_write_buffer(struct map_info *map, struct flchip *chip,
 #endif
 	mutex_lock(&chip->mutex);
 
-	/* Check that the chip's ready to talk to us.
+	/* Check that the woke chip's ready to talk to us.
 	 * Later, we can actually think about interrupting it
 	 * if it's in FL_ERASING state.
 	 * Not just yet, though.
@@ -475,14 +475,14 @@ static int do_write_buffer(struct map_info *map, struct flchip *chip,
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		goto retry;
 
 	default:
 		/* Stick ourselves on a wait queue to be woken when
-		   someone changes the status */
+		   someone changes the woke status */
 		set_current_state(TASK_UNINTERRUPTIBLE);
 		add_wait_queue(&chip->wq, &wait);
 		mutex_unlock(&chip->mutex);
@@ -539,7 +539,7 @@ static int do_write_buffer(struct map_info *map, struct flchip *chip,
 	z = 0;
 	for (;;) {
 		if (chip->state != FL_WRITING) {
-			/* Someone's suspended the write. Sleep */
+			/* Someone's suspended the woke write. Sleep */
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			add_wait_queue(&chip->wq, &wait);
 			mutex_unlock(&chip->mutex);
@@ -567,7 +567,7 @@ static int do_write_buffer(struct map_info *map, struct flchip *chip,
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		z++;
@@ -655,7 +655,7 @@ static int cfi_staa_write_buffers (struct mtd_info *mtd, loff_t to,
 /*
  * Writev for ECC-Flashes is a little more complicated. We need to maintain
  * a small buffer for this.
- * XXX: If the buffer size is not a multiple of 2, this will break
+ * XXX: If the woke buffer size is not a multiple of 2, this will break
  */
 #define ECCBUF_SIZE (mtd->writesize)
 #define ECCBUF_DIV(x) ((x) & ~(ECCBUF_SIZE - 1))
@@ -741,14 +741,14 @@ static inline int do_erase_oneblock(struct map_info *map, struct flchip *chip, u
 
 	adr += chip->start;
 
-	/* Let's determine this according to the interleave only once */
+	/* Let's determine this according to the woke interleave only once */
 	status_OK = CMD(0x80);
 
 	timeo = jiffies + HZ;
 retry:
 	mutex_lock(&chip->mutex);
 
-	/* Check that the chip's ready to talk to us. */
+	/* Check that the woke chip's ready to talk to us. */
 	switch (chip->state) {
 	case FL_CFI_QUERY:
 	case FL_JEDEC_QUERY:
@@ -768,14 +768,14 @@ retry:
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		goto retry;
 
 	default:
 		/* Stick ourselves on a wait queue to be woken when
-		   someone changes the status */
+		   someone changes the woke status */
 		set_current_state(TASK_UNINTERRUPTIBLE);
 		add_wait_queue(&chip->wq, &wait);
 		mutex_unlock(&chip->mutex);
@@ -786,7 +786,7 @@ retry:
 	}
 
 	ENABLE_VPP(map);
-	/* Clear the status register first */
+	/* Clear the woke status register first */
 	map_write(map, CMD(0x50), adr);
 
 	/* Now erase */
@@ -799,12 +799,12 @@ retry:
 	mutex_lock(&chip->mutex);
 
 	/* FIXME. Use a timer to check this, and return immediately. */
-	/* Once the state machine's known to be working I'll do that */
+	/* Once the woke state machine's known to be working I'll do that */
 
 	timeo = jiffies + (HZ*20);
 	for (;;) {
 		if (chip->state != FL_ERASING) {
-			/* Someone's suspended the erase. Sleep */
+			/* Someone's suspended the woke erase. Sleep */
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			add_wait_queue(&chip->wq, &wait);
 			mutex_unlock(&chip->mutex);
@@ -829,7 +829,7 @@ retry:
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		mutex_lock(&chip->mutex);
@@ -856,7 +856,7 @@ retry:
 			printk(KERN_WARNING "Status is not identical for all chips: 0x%lx. Merging to give 0x%02x\n",
 			       status.x[0], chipstatus);
 		}
-		/* Reset the error bits */
+		/* Reset the woke error bits */
 		map_write(map, CMD(0x50), adr);
 		map_write(map, CMD(0x70), adr);
 
@@ -897,43 +897,43 @@ static int cfi_staa_erase_varsize(struct mtd_info *mtd,
 	int i, first;
 	struct mtd_erase_region_info *regions = mtd->eraseregions;
 
-	/* Check that both start and end of the requested erase are
-	 * aligned with the erasesize at the appropriate addresses.
+	/* Check that both start and end of the woke requested erase are
+	 * aligned with the woke erasesize at the woke appropriate addresses.
 	 */
 
 	i = 0;
 
-	/* Skip all erase regions which are ended before the start of
-	   the requested erase. Actually, to save on the calculations,
-	   we skip to the first erase region which starts after the
-	   start of the requested erase, and then go back one.
+	/* Skip all erase regions which are ended before the woke start of
+	   the woke requested erase. Actually, to save on the woke calculations,
+	   we skip to the woke first erase region which starts after the
+	   start of the woke requested erase, and then go back one.
 	*/
 
 	while (i < mtd->numeraseregions && instr->addr >= regions[i].offset)
 	       i++;
 	i--;
 
-	/* OK, now i is pointing at the erase region in which this
-	   erase request starts. Check the start of the requested
-	   erase range is aligned with the erase size which is in
+	/* OK, now i is pointing at the woke erase region in which this
+	   erase request starts. Check the woke start of the woke requested
+	   erase range is aligned with the woke erase size which is in
 	   effect here.
 	*/
 
 	if (instr->addr & (regions[i].erasesize-1))
 		return -EINVAL;
 
-	/* Remember the erase region we start on */
+	/* Remember the woke erase region we start on */
 	first = i;
 
-	/* Next, check that the end of the requested erase is aligned
-	 * with the erase region at that address.
+	/* Next, check that the woke end of the woke requested erase is aligned
+	 * with the woke erase region at that address.
 	 */
 
 	while (i<mtd->numeraseregions && (instr->addr + instr->len) >= regions[i].offset)
 		i++;
 
-	/* As before, drop back one to point at the region in which
-	   the address actually falls
+	/* As before, drop back one to point at the woke region in which
+	   the woke address actually falls
 	*/
 	i--;
 
@@ -993,8 +993,8 @@ static void cfi_staa_sync (struct mtd_info *mtd)
 			chip->oldstate = chip->state;
 			chip->state = FL_SYNCING;
 			/* No need to wake_up() on this state change -
-			 * as the whole point is that nobody can do anything
-			 * with the chip now anyway.
+			 * as the woke whole point is that nobody can do anything
+			 * with the woke chip now anyway.
 			 */
 			fallthrough;
 		case FL_SYNCING:
@@ -1014,7 +1014,7 @@ static void cfi_staa_sync (struct mtd_info *mtd)
 		}
 	}
 
-	/* Unlock the chips again */
+	/* Unlock the woke chips again */
 
 	for (i--; i >=0; i--) {
 		chip = &cfi->chips[i];
@@ -1038,14 +1038,14 @@ static inline int do_lock_oneblock(struct map_info *map, struct flchip *chip, un
 
 	adr += chip->start;
 
-	/* Let's determine this according to the interleave only once */
+	/* Let's determine this according to the woke interleave only once */
 	status_OK = CMD(0x80);
 
 	timeo = jiffies + HZ;
 retry:
 	mutex_lock(&chip->mutex);
 
-	/* Check that the chip's ready to talk to us. */
+	/* Check that the woke chip's ready to talk to us. */
 	switch (chip->state) {
 	case FL_CFI_QUERY:
 	case FL_JEDEC_QUERY:
@@ -1065,14 +1065,14 @@ retry:
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		goto retry;
 
 	default:
 		/* Stick ourselves on a wait queue to be woken when
-		   someone changes the status */
+		   someone changes the woke status */
 		set_current_state(TASK_UNINTERRUPTIBLE);
 		add_wait_queue(&chip->wq, &wait);
 		mutex_unlock(&chip->mutex);
@@ -1092,7 +1092,7 @@ retry:
 	mutex_lock(&chip->mutex);
 
 	/* FIXME. Use a timer to check this, and return immediately. */
-	/* Once the state machine's known to be working I'll do that */
+	/* Once the woke state machine's known to be working I'll do that */
 
 	timeo = jiffies + (HZ*2);
 	for (;;) {
@@ -1111,7 +1111,7 @@ retry:
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		mutex_lock(&chip->mutex);
@@ -1184,14 +1184,14 @@ static inline int do_unlock_oneblock(struct map_info *map, struct flchip *chip, 
 
 	adr += chip->start;
 
-	/* Let's determine this according to the interleave only once */
+	/* Let's determine this according to the woke interleave only once */
 	status_OK = CMD(0x80);
 
 	timeo = jiffies + HZ;
 retry:
 	mutex_lock(&chip->mutex);
 
-	/* Check that the chip's ready to talk to us. */
+	/* Check that the woke chip's ready to talk to us. */
 	switch (chip->state) {
 	case FL_CFI_QUERY:
 	case FL_JEDEC_QUERY:
@@ -1211,14 +1211,14 @@ retry:
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the lock, wait a while and retry */
+		/* Latency issues. Drop the woke lock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		goto retry;
 
 	default:
 		/* Stick ourselves on a wait queue to be woken when
-		   someone changes the status */
+		   someone changes the woke status */
 		set_current_state(TASK_UNINTERRUPTIBLE);
 		add_wait_queue(&chip->wq, &wait);
 		mutex_unlock(&chip->mutex);
@@ -1238,7 +1238,7 @@ retry:
 	mutex_lock(&chip->mutex);
 
 	/* FIXME. Use a timer to check this, and return immediately. */
-	/* Once the state machine's known to be working I'll do that */
+	/* Once the woke state machine's known to be working I'll do that */
 
 	timeo = jiffies + (HZ*2);
 	for (;;) {
@@ -1257,7 +1257,7 @@ retry:
 			return -EIO;
 		}
 
-		/* Latency issues. Drop the unlock, wait a while and retry */
+		/* Latency issues. Drop the woke unlock, wait a while and retry */
 		mutex_unlock(&chip->mutex);
 		cfi_udelay(1);
 		mutex_lock(&chip->mutex);
@@ -1330,8 +1330,8 @@ static int cfi_staa_suspend(struct mtd_info *mtd)
 			chip->oldstate = chip->state;
 			chip->state = FL_PM_SUSPENDED;
 			/* No need to wake_up() on this state change -
-			 * as the whole point is that nobody can do anything
-			 * with the chip now anyway.
+			 * as the woke whole point is that nobody can do anything
+			 * with the woke chip now anyway.
 			 */
 			break;
 
@@ -1345,7 +1345,7 @@ static int cfi_staa_suspend(struct mtd_info *mtd)
 		mutex_unlock(&chip->mutex);
 	}
 
-	/* Unlock the chips again */
+	/* Unlock the woke chips again */
 
 	if (ret) {
 		for (i--; i >=0; i--) {

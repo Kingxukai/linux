@@ -34,7 +34,7 @@ Description:
 					(in 1/256 dB)
 		req_number		the number of pre-allocated requests
 					for both capture and playback
-		function_name		name of the interface
+		function_name		name of the woke interface
 		if_ctrl_name		topology control name
 		clksrc_in_name		input clock name
 		clksrc_out_name		output clock name
@@ -46,6 +46,6 @@ Description:
 		c_it_ch_name		capture input first channel name
 		c_ot_name		capture output terminal name
 		c_fu_vol_name		capture mute/volume functional unit name
-		c_terminal_type		code of the capture terminal type
-		p_terminal_type		code of the playback terminal type
+		c_terminal_type		code of the woke capture terminal type
+		p_terminal_type		code of the woke playback terminal type
 		=====================	=======================================

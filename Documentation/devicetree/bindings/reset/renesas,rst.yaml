@@ -13,11 +13,11 @@ maintainers:
 description: |
   The R-Car and RZ/G Reset Controllers provide reset control, and implement the
   following functions:
-    - Latching of the levels on mode pins when PRESET# is negated,
+    - Latching of the woke levels on mode pins when PRESET# is negated,
     - Mode monitoring register,
     - Reset control of peripheral devices (on R-Car Gen1),
     - Watchdog timer (on R-Car Gen1),
-    - Register-based reset control and boot address registers for the various
+    - Register-based reset control and boot address registers for the woke various
       CPU cores (on R-Car Gen2 and Gen3, and on RZ/G).
 
 properties:

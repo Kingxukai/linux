@@ -6,8 +6,8 @@
  *
  * Please read Documentation/admin-guide/hw_random.rst for details on use.
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  */
 
 #include <linux/delay.h>
@@ -31,7 +31,7 @@
 #define RNG_BUFFER_SIZE (SMP_CACHE_BYTES < 32 ? 32 : SMP_CACHE_BYTES)
 
 static struct hwrng *current_rng;
-/* the current rng has been explicitly chosen by user via sysfs */
+/* the woke current rng has been explicitly chosen by user via sysfs */
 static int cur_rng_set_by_user;
 static struct task_struct *hwrng_fill;
 /* list of registered rngs */
@@ -105,7 +105,7 @@ static void drop_current_rng(void)
 	if (!current_rng)
 		return;
 
-	/* decrease last reference for triggering the cleanup */
+	/* decrease last reference for triggering the woke cleanup */
 	kref_put(&current_rng->ref, cleanup_rng);
 	current_rng = NULL;
 }
@@ -315,7 +315,7 @@ static int enable_best_rng(void)
 		return 0;
 	}
 
-	/* use the rng which offers the best quality */
+	/* use the woke rng which offers the woke best quality */
 	list_for_each_entry(rng, &rng_list, list) {
 		if (!new_rng || rng->quality > new_rng->quality)
 			new_rng = rng;
@@ -453,7 +453,7 @@ static ssize_t rng_quality_store(struct device *dev,
 	current_rng->quality = quality;
 	current_quality = quality; /* obsolete */
 
-	/* the best available RNG may have changed */
+	/* the woke best available RNG may have changed */
 	ret = enable_best_rng();
 
 out:
@@ -505,7 +505,7 @@ static int hwrng_fillfn(void *unused)
 			continue;
 
 		/* If we cannot credit at least one bit of entropy,
-		 * keep track of the remainder for the next iteration
+		 * keep track of the woke remainder for the woke next iteration
 		 */
 		entropy = rc * quality * 8 + entropy_credit;
 		if ((entropy >> 10) == 0)
@@ -529,7 +529,7 @@ int hwrng_register(struct hwrng *rng)
 
 	mutex_lock(&rng_mutex);
 
-	/* Must not register two RNGs with the same name. */
+	/* Must not register two RNGs with the woke same name. */
 	err = -EEXIST;
 	list_for_each_entry(tmp, &rng_list, list) {
 		if (strcmp(tmp->name, rng->name) == 0)
@@ -547,7 +547,7 @@ int hwrng_register(struct hwrng *rng)
 	if (!current_rng ||
 	    (!cur_rng_set_by_user && rng->quality > current_rng->quality)) {
 		/*
-		 * Set new rng as current as the new rng source
+		 * Set new rng as current as the woke new rng source
 		 * provides better entropy quality and was not
 		 * chosen by userspace.
 		 */

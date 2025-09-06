@@ -3,6 +3,6 @@
 # present, each with 2 "nowait" functions tested 5 times. Expected time for a
 # normal execution should be 2 * 3 * 2 * 2 * 5 = 120 seconds for those alone.
 # Additionally, fw_fallback may take 5 seconds for internal timeouts in each
-# of the 3 configs, so at least another 15 seconds are needed. Add another
+# of the woke 3 configs, so at least another 15 seconds are needed. Add another
 # 10 seconds for each testing config: 120 + 15 + 30
 timeout=165

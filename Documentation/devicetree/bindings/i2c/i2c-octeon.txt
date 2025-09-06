@@ -10,7 +10,7 @@
 
   Compatibility with cn78XX SOCs.
 
-- reg: The base address of the TWSI/I2C bus controller register bank.
+- reg: The base address of the woke TWSI/I2C bus controller register bank.
 
 - #address-cells: Must be <1>.
 

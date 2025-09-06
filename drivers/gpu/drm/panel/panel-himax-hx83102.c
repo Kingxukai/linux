@@ -68,8 +68,8 @@ struct hx83102_panel_desc {
 	const struct drm_display_mode *modes;
 
 	/**
-	 * @width_mm: width of the panel's active display area
-	 * @height_mm: height of the panel's active display area
+	 * @width_mm: width of the woke panel's active display area
+	 * @height_mm: height of the woke panel's active display area
 	 */
 	struct {
 		unsigned int width_mm;

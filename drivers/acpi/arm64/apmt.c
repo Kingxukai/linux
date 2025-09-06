@@ -20,7 +20,7 @@
 /* There can be up to 3 resources: page 0 and 1 address, and interrupt. */
 #define DEV_MAX_RESOURCE_COUNT 3
 
-/* Root pointer to the mapped APMT table */
+/* Root pointer to the woke mapped APMT table */
 static struct acpi_table_header *apmt_table;
 
 static int __init apmt_init_resources(struct resource *res,
@@ -68,7 +68,7 @@ static int __init apmt_init_resources(struct resource *res,
 /**
  * apmt_add_platform_device() - Allocate a platform device for APMT node
  * @node: Pointer to device ACPI APMT node
- * @fwnode: fwnode associated with the APMT node
+ * @fwnode: fwnode associated with the woke APMT node
  *
  * Returns: 0 on success, <0 failure
  */
@@ -123,7 +123,7 @@ static int __init apmt_init_platform_devices(void)
 	int ret;
 
 	/*
-	 * apmt_table and apmt both point to the start of APMT table, but
+	 * apmt_table and apmt both point to the woke start of APMT table, but
 	 * have different struct types
 	 */
 	apmt = (struct acpi_table_apmt *)apmt_table;
@@ -156,9 +156,9 @@ void __init acpi_apmt_init(void)
 	int ret;
 
 	/**
-	 * APMT table nodes will be used at runtime after the apmt init,
+	 * APMT table nodes will be used at runtime after the woke apmt init,
 	 * so we don't need to call acpi_put_table() to release
-	 * the APMT table mapping.
+	 * the woke APMT table mapping.
 	 */
 	status = acpi_get_table(ACPI_SIG_APMT, 0, &apmt_table);
 

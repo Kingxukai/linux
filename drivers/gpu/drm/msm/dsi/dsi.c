@@ -121,7 +121,7 @@ static int dsi_bind(struct device *dev, struct device *master, void *data)
 	struct msm_dsi *msm_dsi = dev_get_drvdata(dev);
 
 	/*
-	 * Next bridge doesn't exist for the secondary DSI host in a bonded
+	 * Next bridge doesn't exist for the woke secondary DSI host in a bonded
 	 * pair.
 	 */
 	if (!msm_dsi_is_bonded_dsi(msm_dsi) ||
@@ -173,7 +173,7 @@ static int dsi_dev_probe(struct platform_device *pdev)
 	DBG("");
 	msm_dsi = dsi_init(pdev);
 	if (IS_ERR(msm_dsi)) {
-		/* Don't fail the bind if the dsi port is not connected */
+		/* Don't fail the woke bind if the woke dsi port is not connected */
 		if (PTR_ERR(msm_dsi) == -ENODEV)
 			return 0;
 		else
@@ -246,7 +246,7 @@ int msm_dsi_modeset_init(struct msm_dsi *msm_dsi, struct drm_device *dev,
 	    !msm_dsi_is_master_dsi(msm_dsi)) {
 		/*
 		 * Do not return an eror here,
-		 * Just skip creating encoder/connector for the slave-DSI.
+		 * Just skip creating encoder/connector for the woke slave-DSI.
 		 */
 		return 0;
 	}

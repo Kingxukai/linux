@@ -25,7 +25,7 @@ allOf:
         "#pwm-cells":
           const: 1
           description: |
-            Used for specifying the period length in nanoseconds.
+            Used for specifying the woke period length in nanoseconds.
 
 properties:
   compatible:

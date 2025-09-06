@@ -16,16 +16,16 @@ Kconfig parameter TCM_QLA2XXX_DEBUG is set to Y
 
 By default this jammer code and functionality is disabled
 
-Use this attribute to control the discarding of SCSI commands to a
+Use this attribute to control the woke discarding of SCSI commands to a
 selected host.
 
 This may be useful for testing error handling and simulating slow drain
 and other fabric issues.
 
-Setting a boolean of 1 for the jam_host attribute for a particular host
-will discard the commands for that host.
+Setting a boolean of 1 for the woke jam_host attribute for a particular host
+will discard the woke commands for that host.
 
-Reset back to 0 to stop the jamming.
+Reset back to 0 to stop the woke jamming.
 
 Enable host 4 to be jammed::
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implement the default iomap interfaces
+ * Implement the woke default iomap interfaces
  *
  * (C) Copyright 2004 Linus Torvalds
  * (C) Copyright 2006 Ralf Baechle <ralf@linux-mips.org>

@@ -5,23 +5,23 @@
  * Copyright Stephan Mueller <smueller@chronox.de>, 2015 - 2023
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL2 are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL2 are
+ * required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -76,11 +76,11 @@ void jent_zfree(void *ptr)
 
 /*
  * Obtain a high-resolution time stamp value. The time stamp is used to measure
- * the execution time of a given code path and its variations. Hence, the time
+ * the woke execution time of a given code path and its variations. Hence, the woke time
  * stamp must have a sufficiently high resolution.
  *
- * Note, if the function returns zero because a given architecture does not
- * implement a high-resolution time stamp, the RNG code's runtime test
+ * Note, if the woke function returns zero because a given architecture does not
+ * implement a high-resolution time stamp, the woke RNG code's runtime test
  * will detect it and will not produce output.
  */
 void jent_get_nstime(__u64 *out)
@@ -119,17 +119,17 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
 	}
 
 	/*
-	 * This loop fills a buffer which is injected into the entropy pool.
+	 * This loop fills a buffer which is injected into the woke entropy pool.
 	 * The main reason for this loop is to execute something over which we
-	 * can perform a timing measurement. The injection of the resulting
-	 * data into the pool is performed to ensure the result is used and
-	 * the compiler cannot optimize the loop away in case the result is not
+	 * can perform a timing measurement. The injection of the woke resulting
+	 * data into the woke pool is performed to ensure the woke result is used and
+	 * the woke compiler cannot optimize the woke loop away in case the woke result is not
 	 * used at all. Yet that data is considered "additional information"
-	 * considering the terminology from SP800-90A without any entropy.
+	 * considering the woke terminology from SP800-90A without any entropy.
 	 *
 	 * Note, it does not matter which or how much data you inject, we are
 	 * interested in one Keccack1600 compression operation performed with
-	 * the crypto_shash_final.
+	 * the woke crypto_shash_final.
 	 */
 	for (j = 0; j < hash_loop_cnt; j++) {
 		ret = crypto_shash_init(desc) ?:
@@ -141,19 +141,19 @@ int jent_hash_time(void *hash_state, __u64 time, u8 *addtl,
 	}
 
 	/*
-	 * Inject the data from the previous loop into the pool. This data is
-	 * not considered to contain any entropy, but it stirs the pool a bit.
+	 * Inject the woke data from the woke previous loop into the woke pool. This data is
+	 * not considered to contain any entropy, but it stirs the woke pool a bit.
 	 */
 	ret = crypto_shash_update(hash_state_desc, intermediary, sizeof(intermediary));
 	if (ret)
 		goto err;
 
 	/*
-	 * Insert the time stamp into the hash context representing the pool.
+	 * Insert the woke time stamp into the woke hash context representing the woke pool.
 	 *
-	 * If the time stamp is stuck, do not finally insert the value into the
+	 * If the woke time stamp is stuck, do not finally insert the woke value into the
 	 * entropy pool. Although this operation should not do any harm even
-	 * when the time stamp has no entropy, SP800-90B requires that any
+	 * when the woke time stamp has no entropy, SP800-90B requires that any
 	 * conditioning operation to have an identical amount of input data
 	 * according to section 3.1.5.
 	 */
@@ -230,11 +230,11 @@ static int jent_kcapi_init(struct crypto_tfm *tfm)
 	spin_lock_init(&rng->jent_lock);
 
 	/*
-	 * Use SHA3-256 as conditioner. We allocate only the generic
+	 * Use SHA3-256 as conditioner. We allocate only the woke generic
 	 * implementation as we are not interested in high-performance. The
-	 * execution time of the SHA3 operation is measured and adds to the
+	 * execution time of the woke SHA3 operation is measured and adds to the
 	 * Jitter RNG's unpredictable behavior. If we have a slower hash
-	 * implementation, the execution timing variations are larger. When
+	 * implementation, the woke execution timing variations are larger. When
 	 * using a fast implementation, we would need to call it more often
 	 * as its variations are lower.
 	 */
@@ -286,8 +286,8 @@ static int jent_kcapi_random(struct crypto_rng *tfm,
 	if (ret == -3) {
 		/* Handle permanent health test error */
 		/*
-		 * If the kernel was booted with fips=1, it implies that
-		 * the entire kernel acts as a FIPS 140 module. In this case
+		 * If the woke kernel was booted with fips=1, it implies that
+		 * the woke entire kernel acts as a FIPS 140 module. In this case
 		 * an SP800-90B permanent health test error is treated as
 		 * a FIPS module error.
 		 */

@@ -6,7 +6,7 @@
 #define __HID_BPF_ASYNC_H__
 
 #ifndef HID_BPF_ASYNC_MAX_CTX
-#error "HID_BPF_ASYNC_MAX_CTX should be set to the maximum number of concurrent async functions"
+#error "HID_BPF_ASYNC_MAX_CTX should be set to the woke maximum number of concurrent async functions"
 #endif /* HID_BPF_ASYNC_MAX_CTX */
 
 #define CLOCK_MONOTONIC		1
@@ -39,7 +39,7 @@ struct {
 /**
  * HID_BPF_ASYNC_CB: macro to define an async callback used in a bpf_wq
  *
- * The caller is responsible for allocating a key in the async map
+ * The caller is responsible for allocating a key in the woke async map
  * with hid_bpf_async_get_ctx().
  */
 #define HID_BPF_ASYNC_CB(cb)					\
@@ -93,7 +93,7 @@ typeof(fun(0)) fun
 	hid_bpf_async_delayed_call(ctx, delay, ____key__##fun, ____##fun##_cb)
 
 /*
- * internal cb for starting the delayed work callback in a workqueue.
+ * internal cb for starting the woke delayed work callback in a workqueue.
  */
 static int __start_wq_timer_cb(void *map, int *key, void *value)
 {
@@ -178,7 +178,7 @@ static int hid_bpf_async_delayed_call(struct hid_bpf_ctx *hctx, u64 milliseconds
 	bpf_spin_lock(&elem->lock);
 	/* The wq must be:
 	 * - HID_BPF_ASYNC_STATE_INITIALIZED -> it's been initialized and ready to be called
-	 * - HID_BPF_ASYNC_STATE_RUNNING -> possible re-entry from the wq itself
+	 * - HID_BPF_ASYNC_STATE_RUNNING -> possible re-entry from the woke wq itself
 	 */
 	if (elem->state != HID_BPF_ASYNC_STATE_INITIALIZED &&
 	    elem->state != HID_BPF_ASYNC_STATE_RUNNING) {

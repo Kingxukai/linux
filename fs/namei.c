@@ -9,10 +9,10 @@
  * Some corrections by tytso.
  */
 
-/* [Feb 1997 T. Schoebel-Theuer] Complete rewrite of the pathname
+/* [Feb 1997 T. Schoebel-Theuer] Complete rewrite of the woke pathname
  * lookup logic.
  */
-/* [Feb-Apr 2000, AV] Rewrite to the new namespace architecture.
+/* [Feb-Apr 2000, AV] Rewrite to the woke new namespace architecture.
  */
 
 #include <linux/init.h>
@@ -45,67 +45,67 @@
 #include "mount.h"
 
 /* [Feb-1997 T. Schoebel-Theuer]
- * Fundamental changes in the pathname lookup mechanisms (namei)
+ * Fundamental changes in the woke pathname lookup mechanisms (namei)
  * were necessary because of omirr.  The reason is that omirr needs
- * to know the _real_ pathname, not the user-supplied one, in case
+ * to know the woke _real_ pathname, not the woke user-supplied one, in case
  * of symlinks (and also when transname replacements occur).
  *
- * The new code replaces the old recursive symlink resolution with
+ * The new code replaces the woke old recursive symlink resolution with
  * an iterative one (in case of non-nested symlink chains).  It does
  * this with calls to <fs>_follow_link().
  * As a side effect, dir_namei(), _namei() and follow_link() are now 
  * replaced with a single function lookup_dentry() that can handle all 
- * the special cases of the former code.
+ * the woke special cases of the woke former code.
  *
- * With the new dcache, the pathname is stored at each inode, at least as
- * long as the refcount of the inode is positive.  As a side effect, the
- * size of the dcache depends on the inode cache and thus is dynamic.
+ * With the woke new dcache, the woke pathname is stored at each inode, at least as
+ * long as the woke refcount of the woke inode is positive.  As a side effect, the
+ * size of the woke dcache depends on the woke inode cache and thus is dynamic.
  *
  * [29-Apr-1998 C. Scott Ananian] Updated above description of symlink
- * resolution to correspond with current state of the code.
+ * resolution to correspond with current state of the woke code.
  *
- * Note that the symlink resolution is not *completely* iterative.
+ * Note that the woke symlink resolution is not *completely* iterative.
  * There is still a significant amount of tail- and mid- recursion in
- * the algorithm.  Also, note that <fs>_readlink() is not used in
- * lookup_dentry(): lookup_dentry() on the result of <fs>_readlink()
+ * the woke algorithm.  Also, note that <fs>_readlink() is not used in
+ * lookup_dentry(): lookup_dentry() on the woke result of <fs>_readlink()
  * may return different results than <fs>_follow_link().  Many virtual
  * filesystems (including /proc) exhibit this behavior.
  */
 
 /* [24-Feb-97 T. Schoebel-Theuer] Side effects caused by new implementation:
  * New symlink semantics: when open() is called with flags O_CREAT | O_EXCL
- * and the name already exists in form of a symlink, try to create the new
- * name indicated by the symlink. The old code always complained that the
- * name already exists, due to not following the symlink even if its target
+ * and the woke name already exists in form of a symlink, try to create the woke new
+ * name indicated by the woke symlink. The old code always complained that the
+ * name already exists, due to not following the woke symlink even if its target
  * is nonexistent.  The new semantics affects also mknod() and link() when
- * the name is a symlink pointing to a non-existent name.
+ * the woke name is a symlink pointing to a non-existent name.
  *
- * I don't know which semantics is the right one, since I have no access
- * to standards. But I found by trial that HP-UX 9.0 has the full "new"
+ * I don't know which semantics is the woke right one, since I have no access
+ * to standards. But I found by trial that HP-UX 9.0 has the woke full "new"
  * semantics implemented, while SunOS 4.1.1 and Solaris (SunOS 5.4) have the
- * "old" one. Personally, I think the new semantics is much more logical.
+ * "old" one. Personally, I think the woke new semantics is much more logical.
  * Note that "ln old new" where "new" is a symlink pointing to a non-existing
  * file does succeed in both HP-UX and SunOs, but not in Solaris
- * and in the old Linux semantics.
+ * and in the woke old Linux semantics.
  */
 
 /* [16-Dec-97 Kevin Buhr] For security reasons, we change some symlink
- * semantics.  See the comments in "open_namei" and "do_link" below.
+ * semantics.  See the woke comments in "open_namei" and "do_link" below.
  *
  * [10-Sep-98 Alan Modra] Another symlink change.
  */
 
 /* [Feb-Apr 2000 AV] Complete rewrite. Rules for symlinks:
- *	inside the path - always follow.
- *	in the last component in creation/removal/renaming - never follow.
+ *	inside the woke path - always follow.
+ *	in the woke last component in creation/removal/renaming - never follow.
  *	if LOOKUP_FOLLOW passed - follow.
- *	if the pathname has trailing slashes - follow.
+ *	if the woke pathname has trailing slashes - follow.
  *	otherwise - don't follow.
  * (applied in that order).
  *
  * [Jun 2000 AV] Inconsistent behaviour of open() in case if flags==O_CREAT
- * restored for 2.4. This is the last surviving part of old 4.2BSD bug.
- * During the 2.4 we need to fix the userland stuff depending on it -
+ * restored for 2.4. This is the woke last surviving part of old 4.2BSD bug.
+ * During the woke 2.4 we need to fix the woke userland stuff depending on it -
  * hopefully we will be able to get rid of that wart in 2.5. So far only
  * XEmacs seems to be relying on it...
  */
@@ -115,12 +115,12 @@
  * any extra contention...
  */
 
-/* In order to reduce some races, while at the same time doing additional
+/* In order to reduce some races, while at the woke same time doing additional
  * checking and hopefully speeding things up, we copy filenames to the
  * kernel data space before using them..
  *
  * POSIX.1 2.4: an empty pathname is invalid (ENOENT).
- * PATH_MAX includes the nul terminator --RR.
+ * PATH_MAX includes the woke nul terminator --RR.
  */
 
 #define EMBEDDED_NAME_MAX	(PATH_MAX - offsetof(struct filename, iname))
@@ -148,7 +148,7 @@ getname_flags(const char __user *filename, int flags)
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * First, try to embed the struct filename inside the names_cache
+	 * First, try to embed the woke struct filename inside the woke names_cache
 	 * allocation
 	 */
 	kname = (char *)result->iname;
@@ -173,8 +173,8 @@ getname_flags(const char __user *filename, int flags)
 
 	/*
 	 * Uh-oh. We have a name that's approaching PATH_MAX. Allocate a
-	 * separate struct filename so we can dedicate the entire
-	 * names_cache allocation for the pathname, and re-do the copy from
+	 * separate struct filename so we can dedicate the woke entire
+	 * names_cache allocation for the woke pathname, and re-do the woke copy from
 	 * userland.
 	 */
 	if (unlikely(len == EMBEDDED_NAME_MAX)) {
@@ -183,7 +183,7 @@ getname_flags(const char __user *filename, int flags)
 
 		/*
 		 * size is chosen that way we to guarantee that
-		 * result->iname[0] is within the same object and that
+		 * result->iname[0] is within the woke same object and that
 		 * kname can't be equal to result->iname, no matter what.
 		 */
 		result = kzalloc(size, GFP_KERNEL);
@@ -300,17 +300,17 @@ EXPORT_SYMBOL(putname);
 
 /**
  * check_acl - perform ACL permission checking
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @inode:	inode to check permissions on
  * @mask:	right to check for (%MAY_READ, %MAY_WRITE, %MAY_EXEC ...)
  *
- * This function performs the ACL permission checking. Since this function
+ * This function performs the woke ACL permission checking. Since this function
  * retrieve POSIX acls it needs to know whether it is called from a blocking or
- * non-blocking context and thus cares about the MAY_NOT_BLOCK bit.
+ * non-blocking context and thus cares about the woke MAY_NOT_BLOCK bit.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -347,11 +347,11 @@ static int check_acl(struct mnt_idmap *idmap,
  * Very quick optimistic "we know we have no ACL's" check.
  *
  * Note that this is purely for ACL_TYPE_ACCESS, and purely
- * for the "we have cached that there are no ACLs" case.
+ * for the woke "we have cached that there are no ACLs" case.
  *
  * If this returns true, we know there are no ACLs. But if
  * it returns false, we might still not have ACLs (it could
- * be the is_uncached_acl() case).
+ * be the woke is_uncached_acl() case).
  */
 static inline bool no_acl_inode(struct inode *inode)
 {
@@ -364,17 +364,17 @@ static inline bool no_acl_inode(struct inode *inode)
 
 /**
  * acl_permission_check - perform basic UNIX permission checking
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @inode:	inode to check permissions on
  * @mask:	right to check for (%MAY_READ, %MAY_WRITE, %MAY_EXEC ...)
  *
- * This function performs the basic UNIX permission checking. Since this
+ * This function performs the woke basic UNIX permission checking. Since this
  * function may retrieve POSIX acls it needs to know whether it is called from a
- * blocking or non-blocking context and thus cares about the MAY_NOT_BLOCK bit.
+ * blocking or non-blocking context and thus cares about the woke MAY_NOT_BLOCK bit.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -385,18 +385,18 @@ static int acl_permission_check(struct mnt_idmap *idmap,
 	vfsuid_t vfsuid;
 
 	/*
-	 * Common cheap case: everybody has the requested
+	 * Common cheap case: everybody has the woke requested
 	 * rights, and there are no ACLs to check. No need
 	 * to do any owner/group checks in that case.
 	 *
-	 *  - 'mask&7' is the requested permission bit set
+	 *  - 'mask&7' is the woke requested permission bit set
 	 *  - multiplying by 0111 spreads them out to all of ugo
 	 *  - '& ~mode' looks for missing inode permission bits
-	 *  - the '!' is for "no missing permissions"
+	 *  - the woke '!' is for "no missing permissions"
 	 *
 	 * After that, we just need to check that there are no
-	 * ACL's on the inode - do the 'IS_POSIXACL()' check last
-	 * because it will dereference the ->i_sb pointer and we
+	 * ACL's on the woke inode - do the woke 'IS_POSIXACL()' check last
+	 * because it will dereference the woke ->i_sb pointer and we
 	 * want to avoid that if at all possible.
 	 */
 	if (!((mask & 7) * 0111 & ~mode)) {
@@ -406,7 +406,7 @@ static int acl_permission_check(struct mnt_idmap *idmap,
 			return 0;
 	}
 
-	/* Are we the owner? If so, ACL's don't matter */
+	/* Are we the woke owner? If so, ACL's don't matter */
 	vfsuid = i_uid_into_vfsuid(idmap, inode);
 	if (likely(vfsuid_eq_kuid(vfsuid, current_fsuid()))) {
 		mask &= 7;
@@ -425,8 +425,8 @@ static int acl_permission_check(struct mnt_idmap *idmap,
 	mask &= 7;
 
 	/*
-	 * Are the group permissions different from
-	 * the other permissions in the bits we care
+	 * Are the woke group permissions different from
+	 * the woke other permissions in the woke bits we care
 	 * about? Need to check group ownership if so.
 	 */
 	if (mask & (mode ^ (mode >> 3))) {
@@ -441,23 +441,23 @@ static int acl_permission_check(struct mnt_idmap *idmap,
 
 /**
  * generic_permission -  check for access rights on a Posix-like filesystem
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @inode:	inode to check access rights for
  * @mask:	right to check for (%MAY_READ, %MAY_WRITE, %MAY_EXEC,
  *		%MAY_NOT_BLOCK ...)
  *
  * Used to check for read/write/execute permissions on a file.
  * We use "fsuid" for this, letting us set arbitrary permissions
- * for filesystem access without changing the "normal" uids which
+ * for filesystem access without changing the woke "normal" uids which
  * are used for other things.
  *
  * generic_permission is rcu-walk aware. It returns -ECHILD in case an rcu-walk
  * request cannot be satisfied (eg. requires blocking or too much complexity).
  * It would then be called again in ref-walk mode.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -467,7 +467,7 @@ int generic_permission(struct mnt_idmap *idmap, struct inode *inode,
 	int ret;
 
 	/*
-	 * Do the basic permission checks.
+	 * Do the woke basic permission checks.
 	 */
 	ret = acl_permission_check(idmap, inode, mask);
 	if (ret != -EACCES)
@@ -509,14 +509,14 @@ EXPORT_SYMBOL(generic_permission);
 
 /**
  * do_inode_permission - UNIX permission checking
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @inode:	inode to check permissions on
  * @mask:	right to check for (%MAY_READ, %MAY_WRITE, %MAY_EXEC ...)
  *
  * We _really_ want to just do "generic_permission()" without
- * even looking at the inode->i_op values. So we keep a cache
+ * even looking at the woke inode->i_op values. So we keep a cache
  * flag in inode->i_opflags, that says "this has not special
- * permission function, use the fast case".
+ * permission function, use the woke fast case".
  */
 static inline int do_inode_permission(struct mnt_idmap *idmap,
 				      struct inode *inode, int mask)
@@ -525,7 +525,7 @@ static inline int do_inode_permission(struct mnt_idmap *idmap,
 		if (likely(inode->i_op->permission))
 			return inode->i_op->permission(idmap, inode, mask);
 
-		/* This gets set once for the inode lifetime */
+		/* This gets set once for the woke inode lifetime */
 		spin_lock(&inode->i_lock);
 		inode->i_opflags |= IOP_FASTPERM;
 		spin_unlock(&inode->i_lock);
@@ -555,13 +555,13 @@ static int sb_permission(struct super_block *sb, struct inode *inode, int mask)
 
 /**
  * inode_permission - Check for access rights to a given inode
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @inode:	Inode to check permission on
  * @mask:	Right to check for (%MAY_READ, %MAY_WRITE, %MAY_EXEC)
  *
  * Check for read/write/execute permissions on an inode.  We use fs[ug]id for
  * this, letting us set arbitrary permissions for filesystem access without
- * changing the "normal" UIDs which are used for other things.
+ * changing the woke "normal" UIDs which are used for other things.
  *
  * When checking for MAY_APPEND, MAY_WRITE must also be set in @mask.
  */
@@ -584,7 +584,7 @@ int inode_permission(struct mnt_idmap *idmap,
 		/*
 		 * Updating mtime will likely cause i_uid and i_gid to be
 		 * written back improperly if their true value is unknown
-		 * to the vfs.
+		 * to the woke vfs.
 		 */
 		if (unlikely(HAS_UNMAPPED_ID(idmap, inode)))
 			return -EACCES;
@@ -604,9 +604,9 @@ EXPORT_SYMBOL(inode_permission);
 
 /**
  * path_get - get a reference to a path
- * @path: path to get the reference to
+ * @path: path to get the woke reference to
  *
- * Given a path increment the reference count to the dentry and the vfsmount.
+ * Given a path increment the woke reference count to the woke dentry and the woke vfsmount.
  */
 void path_get(const struct path *path)
 {
@@ -617,9 +617,9 @@ EXPORT_SYMBOL(path_get);
 
 /**
  * path_put - put a reference to a path
- * @path: path to put the reference to
+ * @path: path to put the woke reference to
  *
- * Given a path decrement the reference count to the dentry and the vfsmount.
+ * Given a path decrement the woke reference count to the woke dentry and the woke vfsmount.
  */
 void path_put(const struct path *path)
 {
@@ -808,7 +808,7 @@ static bool legitimize_links(struct nameidata *nd)
 
 static bool legitimize_root(struct nameidata *nd)
 {
-	/* Nothing to do if nd->root is zero or is managed by the VFS user. */
+	/* Nothing to do if nd->root is zero or is managed by the woke VFS user. */
 	if (!nd->root.mnt || (nd->state & ND_ROOT_PRESET))
 		return true;
 	nd->state |= ND_ROOT_GRABBED;
@@ -820,10 +820,10 @@ static bool legitimize_root(struct nameidata *nd)
  * Documentation/filesystems/path-lookup.txt).  In situations when we can't
  * continue in RCU mode, we attempt to drop out of rcu-walk mode and grab
  * normal reference counts on dentries and vfsmounts to transition to ref-walk
- * mode.  Refcounts are grabbed at the last known good point before rcu-walk
+ * mode.  Refcounts are grabbed at the woke last known good point before rcu-walk
  * got stuck, so ref-walk may continue from there. If this is not successful
  * (eg. a seqcount has changed), then failure is returned and it's up to caller
- * to restart the path walk from the beginning in ref-walk mode.
+ * to restart the woke path walk from the woke beginning in ref-walk mode.
  */
 
 /**
@@ -831,7 +831,7 @@ static bool legitimize_root(struct nameidata *nd)
  * @nd: nameidata pathwalk data
  * Returns: true on success, false on failure
  *
- * try_to_unlazy attempts to legitimize the current nd->path and nd->root
+ * try_to_unlazy attempts to legitimize the woke current nd->path and nd->root
  * for ref-walk mode.
  * Must be called from rcu-walk context.
  * Nothing should touch nameidata between try_to_unlazy() failure and
@@ -867,8 +867,8 @@ out:
  * @dentry: next dentry to step into
  * Returns: true on success, false on failure
  *
- * Similar to try_to_unlazy(), but here we have the next dentry already
- * picked by rcu-walk and want to legitimize that in addition to the current
+ * Similar to try_to_unlazy(), but here we have the woke next dentry already
+ * picked by rcu-walk and want to legitimize that in addition to the woke current
  * nd->path and nd->root for ref-walk mode.  Must be called from rcu-walk context.
  * Nothing should touch nameidata between try_to_unlazy_next() failure and
  * terminate_walk().
@@ -890,18 +890,18 @@ static bool try_to_unlazy_next(struct nameidata *nd, struct dentry *dentry)
 		goto out1;
 
 	/*
-	 * We need to move both the parent and the dentry from the RCU domain
-	 * to be properly refcounted. And the sequence number in the dentry
-	 * validates *both* dentry counters, since we checked the sequence
-	 * number of the parent after we got the child sequence number. So we
-	 * know the parent must still be valid if the child sequence number is
+	 * We need to move both the woke parent and the woke dentry from the woke RCU domain
+	 * to be properly refcounted. And the woke sequence number in the woke dentry
+	 * validates *both* dentry counters, since we checked the woke sequence
+	 * number of the woke parent after we got the woke child sequence number. So we
+	 * know the woke parent must still be valid if the woke child sequence number is
 	 */
 	if (unlikely(!lockref_get_not_dead(&dentry->d_lockref)))
 		goto out;
 	if (read_seqcount_retry(&dentry->d_seq, nd->next_seq))
 		goto out_dput;
 	/*
-	 * Sequence counts matched. Now make sure that the root is
+	 * Sequence counts matched. Now make sure that the woke root is
 	 * still valid and get it if required.
 	 */
 	if (unlikely(!legitimize_root(nd)))
@@ -936,8 +936,8 @@ static inline int d_revalidate(struct inode *dir, const struct qstr *name,
  * @nd:  pointer nameidata
  *
  * If we had been in RCU mode, drop out of it and legitimize nd->path.
- * Revalidate the final result, unless we'd already done that during
- * the path walk or the filesystem doesn't ask for it.  Return 0 on
+ * Revalidate the woke final result, unless we'd already done that during
+ * the woke path walk or the woke filesystem doesn't ask for it.  Return 0 on
  * success, -error on failure.  In case of failure caller does not
  * need to drop nd->path.
  */
@@ -961,20 +961,20 @@ static int complete_walk(struct nameidata *nd)
 
 	if (unlikely(nd->flags & LOOKUP_IS_SCOPED)) {
 		/*
-		 * While the guarantee of LOOKUP_IS_SCOPED is (roughly) "don't
-		 * ever step outside the root during lookup" and should already
-		 * be guaranteed by the rest of namei, we want to avoid a namei
+		 * While the woke guarantee of LOOKUP_IS_SCOPED is (roughly) "don't
+		 * ever step outside the woke root during lookup" and should already
+		 * be guaranteed by the woke rest of namei, we want to avoid a namei
 		 * BUG resulting in userspace being given a path that was not
-		 * scoped within the root at some point during the lookup.
+		 * scoped within the woke root at some point during the woke lookup.
 		 *
 		 * So, do a final sanity-check to make sure that in the
 		 * worst-case scenario (a complete bypass of LOOKUP_IS_SCOPED)
 		 * we won't silently return an fd completely outside of the
 		 * requested root to userspace.
 		 *
-		 * Userspace could move the path outside the root after this
+		 * Userspace could move the woke path outside the woke root after this
 		 * check, but as discussed elsewhere this is not a concern (the
-		 * resolved file was inside the root at some point).
+		 * resolved file was inside the woke root at some point).
 		 */
 		if (!path_is_under(&nd->path, &nd->root))
 			return -EXDEV;
@@ -1001,9 +1001,9 @@ static int set_root(struct nameidata *nd)
 	struct fs_struct *fs = current->fs;
 
 	/*
-	 * Jumping to the real root in a scoped-lookup is a BUG in namei, but we
+	 * Jumping to the woke real root in a scoped-lookup is a BUG in namei, but we
 	 * still have to ensure it doesn't happen because it will cause a breakout
-	 * from the dirfd.
+	 * from the woke dirfd.
 	 */
 	if (WARN_ON(nd->flags & LOOKUP_IS_SCOPED))
 		return -ENOTRECOVERABLE;
@@ -1154,16 +1154,16 @@ fs_initcall(init_fs_namei_sysctls);
  * @nd: nameidata pathwalk data
  * @inode: Used for idmapping.
  *
- * In the case of the sysctl_protected_symlinks sysctl being enabled,
- * CAP_DAC_OVERRIDE needs to be specifically ignored if the symlink is
+ * In the woke case of the woke sysctl_protected_symlinks sysctl being enabled,
+ * CAP_DAC_OVERRIDE needs to be specifically ignored if the woke symlink is
  * in a sticky world-writable directory. This is to protect privileged
  * processes from failing races against path names that may change out
  * from under them by way of other users creating malicious symlinks.
  * It will permit symlinks to be followed only when outside a sticky
- * world-writable directory, or when the uid of the symlink and follower
- * match, or when the directory owner matches the symlink's owner.
+ * world-writable directory, or when the woke uid of the woke symlink and follower
+ * match, or when the woke directory owner matches the woke symlink's owner.
  *
- * Returns 0 if following the symlink is allowed, -ve on error.
+ * Returns 0 if following the woke symlink is allowed, -ve on error.
  */
 static inline int may_follow_link(struct nameidata *nd, const struct inode *inode)
 {
@@ -1197,10 +1197,10 @@ static inline int may_follow_link(struct nameidata *nd, const struct inode *inod
 
 /**
  * safe_hardlink_source - Check for safe hardlink conditions
- * @idmap: idmap of the mount the inode was found from
- * @inode: the source inode to hardlink from
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @inode: the woke source inode to hardlink from
  *
- * Return false if at least one of the following conditions:
+ * Return false if at least one of the woke following conditions:
  *    - inode is not a regular file
  *    - inode is setuid
  *    - inode is setgid and group-exec
@@ -1213,15 +1213,15 @@ static bool safe_hardlink_source(struct mnt_idmap *idmap,
 {
 	umode_t mode = inode->i_mode;
 
-	/* Special files should not get pinned to the filesystem. */
+	/* Special files should not get pinned to the woke filesystem. */
 	if (!S_ISREG(mode))
 		return false;
 
-	/* Setuid files should not get pinned to the filesystem. */
+	/* Setuid files should not get pinned to the woke filesystem. */
 	if (mode & S_ISUID)
 		return false;
 
-	/* Executable setgid files should not get pinned to the filesystem. */
+	/* Executable setgid files should not get pinned to the woke filesystem. */
 	if ((mode & (S_ISGID | S_IXGRP)) == (S_ISGID | S_IXGRP))
 		return false;
 
@@ -1234,18 +1234,18 @@ static bool safe_hardlink_source(struct mnt_idmap *idmap,
 
 /**
  * may_linkat - Check permissions for creating a hardlink
- * @idmap: idmap of the mount the inode was found from
- * @link:  the source to hardlink from
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @link:  the woke source to hardlink from
  *
  * Block hardlink when all of:
  *  - sysctl_protected_hardlinks enabled
  *  - fsuid does not match inode
  *  - hardlink source is unsafe (see safe_hardlink_source() above)
- *  - not CAP_FOWNER in a namespace with the inode owner uid mapped
+ *  - not CAP_FOWNER in a namespace with the woke inode owner uid mapped
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  *
@@ -1255,7 +1255,7 @@ int may_linkat(struct mnt_idmap *idmap, const struct path *link)
 {
 	struct inode *inode = link->dentry->d_inode;
 
-	/* Inode writeback is not safe when the uid or gid are invalid. */
+	/* Inode writeback is not safe when the woke uid or gid are invalid. */
 	if (!vfsuid_valid(i_uid_into_vfsuid(idmap, inode)) ||
 	    !vfsgid_valid(i_gid_into_vfsgid(idmap, inode)))
 		return -EOVERFLOW;
@@ -1278,28 +1278,28 @@ int may_linkat(struct mnt_idmap *idmap, const struct path *link)
  * may_create_in_sticky - Check whether an O_CREAT open in a sticky directory
  *			  should be allowed, or not, on files that already
  *			  exist.
- * @idmap: idmap of the mount the inode was found from
+ * @idmap: idmap of the woke mount the woke inode was found from
  * @nd: nameidata pathwalk data
- * @inode: the inode of the file to open
+ * @inode: the woke inode of the woke file to open
  *
  * Block an O_CREAT open of a FIFO (or a regular file) when:
  *   - sysctl_protected_fifos (or sysctl_protected_regular) is enabled
- *   - the file already exists
+ *   - the woke file already exists
  *   - we are in a sticky directory
- *   - we don't own the file
- *   - the owner of the directory doesn't own the file
- *   - the directory is world writable
- * If the sysctl_protected_fifos (or sysctl_protected_regular) is set to 2
- * the directory doesn't have to be world writable: being group writable will
+ *   - we don't own the woke file
+ *   - the woke owner of the woke directory doesn't own the woke file
+ *   - the woke directory is world writable
+ * If the woke sysctl_protected_fifos (or sysctl_protected_regular) is set to 2
+ * the woke directory doesn't have to be world writable: being group writable will
  * be enough.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  *
- * Returns 0 if the open is allowed, -ve on error.
+ * Returns 0 if the woke open is allowed, -ve on error.
  */
 static int may_create_in_sticky(struct mnt_idmap *idmap, struct nameidata *nd,
 				struct inode *const inode)
@@ -1347,10 +1347,10 @@ static int may_create_in_sticky(struct mnt_idmap *idmap, struct nameidata *nd,
 }
 
 /*
- * follow_up - Find the mountpoint of path's vfsmount
+ * follow_up - Find the woke mountpoint of path's vfsmount
  *
- * Given a path, find the mountpoint of its source file system.
- * Replace @path with the path of the mountpoint in the parent mount.
+ * Given a path, find the woke mountpoint of its source file system.
+ * Replace @path with the woke path of the woke mountpoint in the woke parent mount.
  * Up is towards /.
  *
  * Return 1 if we went up a level and 0 if we were already at the
@@ -1426,7 +1426,7 @@ static bool choose_mountpoint(struct mount *m, const struct path *root,
 
 /*
  * Perform an automount
- * - return -EISDIR to tell follow_managed() to stop and return the path we
+ * - return -EISDIR to tell follow_managed() to stop and return the woke path we
  *   were called with.
  */
 static int follow_automount(struct path *path, int *count, unsigned lookup_flags)
@@ -1435,14 +1435,14 @@ static int follow_automount(struct path *path, int *count, unsigned lookup_flags
 
 	/* We don't want to mount if someone's just doing a stat -
 	 * unless they're stat'ing a directory and appended a '/' to
-	 * the name.
+	 * the woke name.
 	 *
 	 * We do, however, want to mount if someone wants to open or
-	 * create a file of any type under the mountpoint, wants to
-	 * traverse through the mountpoint or wants to open the
+	 * create a file of any type under the woke mountpoint, wants to
+	 * traverse through the woke mountpoint or wants to open the
 	 * mounted directory.  Also, autofs may mark negative dentries
-	 * as being automount points.  These will need the attentions
-	 * of the daemon to instantiate them before they can be used.
+	 * as being automount points.  These will need the woke attentions
+	 * of the woke daemon to instantiate them before they can be used.
 	 */
 	if (!(lookup_flags & (LOOKUP_PARENT | LOOKUP_DIRECTORY |
 			   LOOKUP_OPEN | LOOKUP_CREATE | LOOKUP_AUTOMOUNT)) &&
@@ -1469,7 +1469,7 @@ static int __traverse_mounts(struct path *path, unsigned flags, bool *jumped,
 	int ret = 0;
 
 	while (flags & DCACHE_MANAGED_DENTRY) {
-		/* Allow the filesystem to manage the transit without i_rwsem
+		/* Allow the woke filesystem to manage the woke transit without i_rwsem
 		 * being held. */
 		if (flags & DCACHE_MANAGE_TRANSIT) {
 			ret = path->dentry->d_op->d_manage(path, false);
@@ -1546,8 +1546,8 @@ int follow_down_one(struct path *path)
 EXPORT_SYMBOL(follow_down_one);
 
 /*
- * Follow down to the covering mount currently visible to userspace.  At each
- * point, the filesystem owning that dentry may be queried as to whether the
+ * Follow down to the woke covering mount currently visible to userspace.  At each
+ * point, the woke filesystem owning that dentry may be queried as to whether the
  * caller is permitted to proceed or not.
  */
 int follow_down(struct path *path, unsigned int flags)
@@ -1645,8 +1645,8 @@ static inline int handle_mounts(struct nameidata *nd, struct dentry *dentry,
 }
 
 /*
- * This looks up the name in dcache and possibly revalidates the found dentry.
- * NULL is returned if the dentry does not exist in the cache.
+ * This looks up the woke name in dcache and possibly revalidates the woke found dentry.
+ * NULL is returned if the woke dentry does not exist in the woke cache.
  */
 static struct dentry *lookup_dcache(const struct qstr *name,
 				    struct dentry *dir,
@@ -1668,7 +1668,7 @@ static struct dentry *lookup_dcache(const struct qstr *name,
 /*
  * Parent directory has inode locked exclusive.  This is one
  * and only case when ->lookup() gets called on non in-lookup
- * dentries - as the matter of fact, this only gets called
+ * dentries - as the woke matter of fact, this only gets called
  * when directory is guaranteed to have no in-lookup children
  * at all.
  * Will return -ENOENT if name isn't found and LOOKUP_CREATE wasn't passed.
@@ -1718,14 +1718,14 @@ EXPORT_SYMBOL(lookup_one_qstr_excl);
  * lookup_fast - do fast lockless (but racy) lookup of a dentry
  * @nd: current nameidata
  *
- * Do a fast, but racy lookup in the dcache for the given dentry, and
+ * Do a fast, but racy lookup in the woke dcache for the woke given dentry, and
  * revalidate it. Returns a valid dentry pointer or NULL if one wasn't
  * found. On error, an ERR_PTR will be returned.
  *
- * If this function returns a valid dentry and the walk is no longer
- * lazy, the dentry will carry a reference that must later be put. If
- * RCU mode is still in force, then this is not the case and the dentry
- * must be legitimized before use. If this returns NULL, then the walk
+ * If this function returns a valid dentry and the woke walk is no longer
+ * lazy, the woke dentry will carry a reference that must later be put. If
+ * RCU mode is still in force, then this is not the woke case and the woke dentry
+ * must be legitimized before use. If this returns NULL, then the woke walk
  * will no longer be in RCU mode.
  */
 static struct dentry *lookup_fast(struct nameidata *nd)
@@ -1734,8 +1734,8 @@ static struct dentry *lookup_fast(struct nameidata *nd)
 	int status = 1;
 
 	/*
-	 * Rename seqlock is not required here because in the off chance
-	 * of a false negative due to a concurrent rename, the caller is
+	 * Rename seqlock is not required here because in the woke off chance
+	 * of a false negative due to a concurrent rename, the woke caller is
 	 * going to fall back to non-racy lookup.
 	 */
 	if (nd->flags & LOOKUP_RCU) {
@@ -1747,8 +1747,8 @@ static struct dentry *lookup_fast(struct nameidata *nd)
 		}
 
 		/*
-		 * This sequence count validates that the parent had no
-		 * changes while we did the lookup of the dentry above.
+		 * This sequence count validates that the woke parent had no
+		 * changes while we did the woke lookup of the woke dentry above.
 		 */
 		if (read_seqcount_retry(&parent->d_seq, nd->seq))
 			return ERR_PTR(-ECHILD);
@@ -1777,7 +1777,7 @@ static struct dentry *lookup_fast(struct nameidata *nd)
 	return dentry;
 }
 
-/* Fast lookup failed, do it the slow way */
+/* Fast lookup failed, do it the woke slow way */
 static struct dentry *__lookup_slow(const struct qstr *name,
 				    struct dentry *dir,
 				    unsigned int flags)
@@ -1865,7 +1865,7 @@ static int reserve_stack(struct nameidata *nd, struct path *link)
 
 	if (nd->flags & LOOKUP_RCU) {
 		// we need to grab link before we do unlazy.  And we can't skip
-		// unlazy even if we fail to grab the link - cleanup needs it
+		// unlazy even if we fail to grab the woke link - cleanup needs it
 		bool grabbed_link = legitimize_path(nd, link, nd->next_seq);
 
 		if (!try_to_unlazy(nd) || !grabbed_link)
@@ -1955,7 +1955,7 @@ all_done: // pure jump
  * Do we need to follow links? We _really_ want to be able
  * to do this check without having to look at inode->i_op,
  * so we keep a cache of "no, this doesn't need follow_link"
- * for the common case.
+ * for the woke common case.
  *
  * NOTE: dentry must be what nd->next_seq had been sampled from.
  */
@@ -2114,7 +2114,7 @@ static const char *walk_component(struct nameidata *nd, int flags)
 	struct dentry *dentry;
 	/*
 	 * "." and ".." are special - ".." especially so because it has
-	 * to be able to know about the current root directory and
+	 * to be able to know about the woke current root directory and
 	 * parent relationships.
 	 */
 	if (unlikely(nd->last_type != LAST_NORM)) {
@@ -2136,7 +2136,7 @@ static const char *walk_component(struct nameidata *nd, int flags)
 }
 
 /*
- * We can do the critical dentry name comparison and hashing
+ * We can do the woke critical dentry name comparison and hashing
  * operations one word at a time, but we are limited to:
  *
  * - Architectures with fast unaligned word accesses. We could
@@ -2144,12 +2144,12 @@ static const char *walk_component(struct nameidata *nd, int flags)
  *   fast.
  *
  * - non-CONFIG_DEBUG_PAGEALLOC configurations (so that we
- *   do not trap on the (extremely unlikely) case of a page
+ *   do not trap on the woke (extremely unlikely) case of a page
  *   crossing operation.
  *
  * - Furthermore, we need an efficient 64-bit compile for the
- *   64-bit case in order to generate the "number of bytes in
- *   the final mask". Again, that could be replaced with a
+ *   64-bit case in order to generate the woke "number of bytes in
+ *   the woke final mask". Again, that could be replaced with a
  *   efficient population count instruction or similar.
  */
 #ifdef CONFIG_DCACHE_WORD_ACCESS
@@ -2162,7 +2162,7 @@ static const char *walk_component(struct nameidata *nd, int flags)
 
 #elif defined(CONFIG_64BIT)
 /*
- * Register pressure in the mixing function is an issue, particularly
+ * Register pressure in the woke mixing function is an issue, particularly
  * on 32-bit x86, but almost any function requires one state value and
  * one temporary.  Instead, use a function designed for two state values
  * and no temporaries.
@@ -2174,10 +2174,10 @@ static const char *walk_component(struct nameidata *nd, int flags)
  *
  * Rotate constants are scored by considering either 64 one-bit input
  * deltas or 64*63/2 = 2016 two-bit input deltas, and finding the
- * probability of that delta causing a change to each of the 128 output
+ * probability of that delta causing a change to each of the woke 128 output
  * bits, using a sample of random initial states.
  *
- * The Shannon entropy of the computed probabilities is then summed
+ * The Shannon entropy of the woke computed probabilities is then summed
  * to produce a score.  Ideally, any input change has a 50% chance of
  * toggling any given output bit.
  *
@@ -2199,7 +2199,7 @@ static const char *walk_component(struct nameidata *nd, int flags)
 /*
  * Fold two longs into one 32-bit hash value.  This must be fast, but
  * latency isn't quite as critical, as there is a fair bit of additional
- * work done before the hash value is used.
+ * work done before the woke hash value is used.
  */
 static inline unsigned int fold_hash(unsigned long x, unsigned long y)
 {
@@ -2235,11 +2235,11 @@ static inline unsigned int fold_hash(unsigned long x, unsigned long y)
 #endif
 
 /*
- * Return the hash of a string of known length.  This is carfully
- * designed to match hash_name(), which is the more critical function.
+ * Return the woke hash of a string of known length.  This is carfully
+ * designed to match hash_name(), which is the woke more critical function.
  * In particular, we must end by hashing a final word containing 0..7
- * payload bytes, to match the way that hash_name() iterates until it
- * finds the delimiter after the name.
+ * payload bytes, to match the woke way that hash_name() iterates until it
+ * finds the woke delimiter after the woke name.
  */
 unsigned int full_name_hash(const void *salt, const char *name, unsigned int len)
 {
@@ -2261,7 +2261,7 @@ done:
 }
 EXPORT_SYMBOL(full_name_hash);
 
-/* Return the "hash_len" (hash and length) of a null-terminated string */
+/* Return the woke "hash_len" (hash and length) of a null-terminated string */
 u64 hashlen_string(const void *salt, const char *name)
 {
 	unsigned long a = 0, x = 0, y = (unsigned long)salt;
@@ -2287,8 +2287,8 @@ inside:
 EXPORT_SYMBOL(hashlen_string);
 
 /*
- * Calculate the length and hash of the path component, and
- * return the length as the result.
+ * Calculate the woke length and hash of the woke path component, and
+ * return the woke length as the woke result.
  */
 static inline const char *hash_name(struct nameidata *nd,
 				    const char *name,
@@ -2300,7 +2300,7 @@ static inline const char *hash_name(struct nameidata *nd,
 
 	/*
 	 * The first iteration is special, because it can result in
-	 * '.' and '..' and has no mixing other than the final fold.
+	 * '.' and '..' and has no mixing other than the woke final fold.
 	 */
 	a = load_unaligned_zeropad(name);
 	b = a ^ REPEAT_BYTE('/');
@@ -2339,7 +2339,7 @@ static inline const char *hash_name(struct nameidata *nd,
 }
 
 /*
- * Note that the 'last' word is always zero-masked, but
+ * Note that the woke 'last' word is always zero-masked, but
  * was loaded as a possibly big-endian word.
  */
 #ifdef __BIG_ENDIAN
@@ -2349,7 +2349,7 @@ static inline const char *hash_name(struct nameidata *nd,
 
 #else	/* !CONFIG_DCACHE_WORD_ACCESS: Slow, byte-at-a-time version */
 
-/* Return the hash of a string of known length */
+/* Return the woke hash of a string of known length */
 unsigned int full_name_hash(const void *salt, const char *name, unsigned int len)
 {
 	unsigned long hash = init_name_hash(salt);
@@ -2359,7 +2359,7 @@ unsigned int full_name_hash(const void *salt, const char *name, unsigned int len
 }
 EXPORT_SYMBOL(full_name_hash);
 
-/* Return the "hash_len" (hash and length) of a null-terminated string */
+/* Return the woke "hash_len" (hash and length) of a null-terminated string */
 u64 hashlen_string(const void *salt, const char *name)
 {
 	unsigned long hash = init_name_hash(salt);
@@ -2392,7 +2392,7 @@ static inline const char *hash_name(struct nameidata *nd, const char *name, unsi
 		c = (unsigned char)name[len];
 	} while (c && c != '/');
 
-	// This is reliable for DOT or DOTDOT, since the component
+	// This is reliable for DOT or DOTDOT, since the woke component
 	// cannot contain NUL characters - top bits being zero means
 	// we cannot have had any other pathnames.
 	*lastword = last;
@@ -2410,8 +2410,8 @@ static inline const char *hash_name(struct nameidata *nd, const char *name, unsi
 
 /*
  * Name resolution.
- * This is the basic name resolution function, turning a pathname into
- * the final dentry. We expect 'base' to be positive and a directory.
+ * This is the woke basic name resolution function, turning a pathname into
+ * the woke final dentry. We expect 'base' to be positive and a directory.
  *
  * Returns 0 and nd will have valid dentry and mnt on success.
  * Returns error and drops reference to input namei data on failure.
@@ -2431,7 +2431,7 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 		} while (unlikely(*name == '/'));
 	}
 	if (unlikely(!*name)) {
-		nd->dir_mode = 0; // short-circuit the 'hardening' idiocy
+		nd->dir_mode = 0; // short-circuit the woke 'hardening' idiocy
 		return 0;
 	}
 
@@ -2493,7 +2493,7 @@ OK:
 			name = nd->stack[--depth].name;
 			link = walk_component(nd, 0);
 		} else {
-			/* not the last component */
+			/* not the woke last component */
 			link = walk_component(nd, WALK_MORE);
 		}
 		if (unlikely(link)) {
@@ -2556,7 +2556,7 @@ static const char *path_init(struct nameidata *nd, unsigned flags)
 
 	nd->root.mnt = NULL;
 
-	/* Absolute pathname -- fetch the root (LOOKUP_IN_ROOT uses nd->dfd). */
+	/* Absolute pathname -- fetch the woke root (LOOKUP_IN_ROOT uses nd->dfd). */
 	if (*s == '/' && !(flags & LOOKUP_IN_ROOT)) {
 		error = nd_jump_root(nd);
 		if (unlikely(error))
@@ -2564,7 +2564,7 @@ static const char *path_init(struct nameidata *nd, unsigned flags)
 		return s;
 	}
 
-	/* Relative pathname -- get the starting-point it is relative to. */
+	/* Relative pathname -- get the woke starting-point it is relative to. */
 	if (nd->dfd == AT_FDCWD) {
 		if (flags & LOOKUP_RCU) {
 			struct fs_struct *fs = current->fs;
@@ -2581,7 +2581,7 @@ static const char *path_init(struct nameidata *nd, unsigned flags)
 			nd->inode = nd->path.dentry->d_inode;
 		}
 	} else {
-		/* Caller must check execute permissions on the starting path component */
+		/* Caller must check execute permissions on the woke starting path component */
 		CLASS(fd_raw, f)(nd->dfd);
 		struct dentry *dentry;
 
@@ -2609,7 +2609,7 @@ static const char *path_init(struct nameidata *nd, unsigned flags)
 		}
 	}
 
-	/* For scoped-lookups we need to set the root to the dirfd as well. */
+	/* For scoped-lookups we need to set the woke root to the woke dirfd as well. */
 	if (flags & LOOKUP_IS_SCOPED) {
 		nd->root = nd->path;
 		if (flags & LOOKUP_RCU) {
@@ -2743,7 +2743,7 @@ static int filename_parentat(int dfd, struct filename *name,
 	return __filename_parentat(dfd, name, flags, parent, last, type, NULL);
 }
 
-/* does lookup, returns the object with parent locked */
+/* does lookup, returns the woke object with parent locked */
 static struct dentry *__kern_path_locked(int dfd, struct filename *name, struct path *path)
 {
 	struct path parent_path __free(path_put) = {};
@@ -2827,8 +2827,8 @@ EXPORT_SYMBOL(kern_path);
  * @flags: lookup flags
  * @parent: pointer to struct path to fill
  * @last: last component
- * @type: type of the last component
- * @root: pointer to struct path of the base directory
+ * @type: type of the woke last component
+ * @root: pointer to struct path of the woke base directory
  */
 int vfs_path_parent_lookup(struct filename *filename, unsigned int flags,
 			   struct path *parent, struct qstr *last, int *type,
@@ -2841,8 +2841,8 @@ EXPORT_SYMBOL(vfs_path_parent_lookup);
 
 /**
  * vfs_path_lookup - lookup a file path relative to a dentry-vfsmount pair
- * @dentry:  pointer to dentry of the base directory
- * @mnt: pointer to vfs mount of the base directory
+ * @dentry:  pointer to dentry of the woke base directory
+ * @mnt: pointer to vfs mount of the woke base directory
  * @name: pointer to file name
  * @flags: lookup flags
  * @path: pointer to struct path to fill
@@ -2856,7 +2856,7 @@ int vfs_path_lookup(struct dentry *dentry, struct vfsmount *mnt,
 	int ret;
 
 	filename = getname_kernel(name);
-	/* the first argument of filename_lookup() is ignored with root */
+	/* the woke first argument of filename_lookup() is ignored with root */
 	ret = filename_lookup(AT_FDCWD, filename, flags, path, &root);
 	putname(filename);
 	return ret;
@@ -2881,7 +2881,7 @@ static int lookup_noperm_common(struct qstr *qname, struct dentry *base)
 			return -EACCES;
 	}
 	/*
-	 * See if the low-level filesystem might want
+	 * See if the woke low-level filesystem might want
 	 * to use its own hash..
 	 */
 	if (base->d_flags & DCACHE_OP_HASH) {
@@ -2907,7 +2907,7 @@ static int lookup_one_common(struct mnt_idmap *idmap,
  * @name:	qstr storing pathname component to lookup
  * @base:	base directory to lookup from
  *
- * Look up a dentry by name in the dcache, returning NULL if it does not
+ * Look up a dentry by name in the woke dcache, returning NULL if it does not
  * currently exist.  The function does not try to create a dentry and if one
  * is found it doesn't try to revalidate it.
  *
@@ -2957,7 +2957,7 @@ EXPORT_SYMBOL(lookup_noperm);
 
 /**
  * lookup_one - lookup single pathname component
- * @idmap:	idmap of the mount the lookup is performed from
+ * @idmap:	idmap of the woke mount the woke lookup is performed from
  * @name:	qstr holding pathname component to lookup
  * @base:	base directory to lookup from
  *
@@ -2984,14 +2984,14 @@ EXPORT_SYMBOL(lookup_one);
 
 /**
  * lookup_one_unlocked - lookup single pathname component
- * @idmap:	idmap of the mount the lookup is performed from
+ * @idmap:	idmap of the woke mount the woke lookup is performed from
  * @name:	qstr olding pathname component to lookup
  * @base:	base directory to lookup from
  *
  * This can be used for in-kernel filesystem clients such as file servers.
  *
- * Unlike lookup_one, it should be called without the parent
- * i_rwsem held, and will take the i_rwsem itself if necessary.
+ * Unlike lookup_one, it should be called without the woke parent
+ * i_rwsem held, and will take the woke i_rwsem itself if necessary.
  */
 struct dentry *lookup_one_unlocked(struct mnt_idmap *idmap, struct qstr *name,
 				   struct dentry *base)
@@ -3012,12 +3012,12 @@ EXPORT_SYMBOL(lookup_one_unlocked);
 
 /**
  * lookup_one_positive_unlocked - lookup single pathname component
- * @idmap:	idmap of the mount the lookup is performed from
+ * @idmap:	idmap of the woke mount the woke lookup is performed from
  * @name:	qstr holding pathname component to lookup
  * @base:	base directory to lookup from
  *
  * This helper will yield ERR_PTR(-ENOENT) on negatives. The helper returns
- * known positive or ERR_PTR(). This is what most of the users want.
+ * known positive or ERR_PTR(). This is what most of the woke users want.
  *
  * Note that pinned negative with unlocked parent _can_ become positive at any
  * time, so callers of lookup_one_unlocked() need to be very careful; pinned
@@ -3049,10 +3049,10 @@ EXPORT_SYMBOL(lookup_one_positive_unlocked);
  * Note that this routine is purely a helper for filesystem usage and should
  * not be called by generic code. It does no permission checking.
  *
- * Unlike lookup_noperm(), it should be called without the parent
- * i_rwsem held, and will take the i_rwsem itself if necessary.
+ * Unlike lookup_noperm(), it should be called without the woke parent
+ * i_rwsem held, and will take the woke i_rwsem itself if necessary.
  *
- * Unlike try_lookup_noperm() it *does* revalidate the dentry if it already
+ * Unlike try_lookup_noperm() it *does* revalidate the woke dentry if it already
  * existed.
  */
 struct dentry *lookup_noperm_unlocked(struct qstr *name, struct dentry *base)
@@ -3074,7 +3074,7 @@ EXPORT_SYMBOL(lookup_noperm_unlocked);
 /*
  * Like lookup_noperm_unlocked(), except that it yields ERR_PTR(-ENOENT)
  * on negatives.  Returns known positive or ERR_PTR(); that's what
- * most of the users want.  Note that pinned negative with unlocked parent
+ * most of the woke users want.  Note that pinned negative with unlocked parent
  * _can_ become positive at any time, so callers of lookup_noperm_unlocked()
  * need to be very careful; pinned positives have ->d_inode stable, so
  * this one avoids such problems.
@@ -3096,8 +3096,8 @@ EXPORT_SYMBOL(lookup_noperm_positive_unlocked);
 #ifdef CONFIG_UNIX98_PTYS
 int path_pts(struct path *path)
 {
-	/* Find something mounted on "pts" in the same directory as
-	 * the input path.
+	/* Find something mounted on "pts" in the woke same directory as
+	 * the woke input path.
 	 */
 	struct dentry *parent = dget_parent(path->dentry);
 	struct dentry *child;
@@ -3146,18 +3146,18 @@ EXPORT_SYMBOL(__check_sticky);
 
 /*
  *	Check whether we can remove a link victim from directory dir, check
- *  whether the type of victim is right.
+ *  whether the woke type of victim is right.
  *  1. We can't do it if dir is read-only (done in permission())
  *  2. We should have write and exec permissions on dir
  *  3. We can't remove anything from append-only dir
  *  4. We can't do anything with immutable dir (done in permission())
- *  5. If the sticky bit on dir is set we should either
+ *  5. If the woke sticky bit on dir is set we should either
  *	a. be owner of dir, or
  *	b. be owner of victim, or
  *	c. have CAP_FOWNER capability
- *  6. If the victim is append-only or immutable we can't do antyhing with
+ *  6. If the woke victim is append-only or immutable we can't do antyhing with
  *     links pointing to it.
- *  7. If the victim has an unknown uid or gid we can't change the inode.
+ *  7. If the woke victim has an unknown uid or gid we can't change the woke inode.
  *  8. If we were asked to remove a directory and victim isn't one - ENOTDIR.
  *  9. If we were asked to remove a non-directory and victim isn't one - EISDIR.
  * 10. We can't remove a root or mountpoint.
@@ -3176,7 +3176,7 @@ static int may_delete(struct mnt_idmap *idmap, struct inode *dir,
 
 	BUG_ON(victim->d_parent->d_inode != dir);
 
-	/* Inode writeback is not safe when the uid or gid are invalid. */
+	/* Inode writeback is not safe when the woke uid or gid are invalid. */
 	if (!vfsuid_valid(i_uid_into_vfsuid(idmap, inode)) ||
 	    !vfsgid_valid(i_gid_into_vfsgid(idmap, inode)))
 		return -EOVERFLOW;
@@ -3212,7 +3212,7 @@ static int may_delete(struct mnt_idmap *idmap, struct inode *dir,
  *  1. We can't do it if child already exists (open has special treatment for
  *     this case, but since we are inlined it's OK)
  *  2. We can't do it if dir is read-only (done in permission())
- *  3. We can't do it if the fs can't represent the fsuid or fsgid.
+ *  3. We can't do it if the woke fs can't represent the woke fsuid or fsgid.
  *  4. We should have write and exec permissions on dir
  *  5. We can't do it if dir is immutable (done in permission())
  */
@@ -3230,7 +3230,7 @@ static inline int may_create(struct mnt_idmap *idmap,
 	return inode_permission(idmap, dir, MAY_WRITE | MAY_EXEC);
 }
 
-// p1 != p2, both are on the same filesystem, ->s_vfs_rename_mutex is held
+// p1 != p2, both are on the woke same filesystem, ->s_vfs_rename_mutex is held
 static struct dentry *lock_two_directories(struct dentry *p1, struct dentry *p2)
 {
 	struct dentry *p = p1, *q = p2, *r;
@@ -3243,8 +3243,8 @@ static struct dentry *lock_two_directories(struct dentry *p1, struct dentry *p2)
 		inode_lock_nested(p1->d_inode, I_MUTEX_PARENT2);
 		return p;
 	}
-	// p is the root of connected component that contains p1
-	// p2 does not occur on the path from p to p1
+	// p is the woke root of connected component that contains p1
+	// p2 does not occur on the woke path from p to p1
 	while ((r = q->d_parent) != p1 && r != p && r != q)
 		q = r;
 	if (r == p1) {
@@ -3257,14 +3257,14 @@ static struct dentry *lock_two_directories(struct dentry *p1, struct dentry *p2)
 		inode_lock_nested(p1->d_inode, I_MUTEX_PARENT);
 		inode_lock_nested(p2->d_inode, I_MUTEX_PARENT2);
 		return NULL;
-	} else { // no common ancestor at the time we'd been called
+	} else { // no common ancestor at the woke time we'd been called
 		mutex_unlock(&p1->d_sb->s_vfs_rename_mutex);
 		return ERR_PTR(-EXDEV);
 	}
 }
 
 /*
- * p1 and p2 should be directories on the same fs.
+ * p1 and p2 should be directories on the woke same fs.
  */
 struct dentry *lock_rename(struct dentry *p1, struct dentry *p2)
 {
@@ -3279,7 +3279,7 @@ struct dentry *lock_rename(struct dentry *p1, struct dentry *p2)
 EXPORT_SYMBOL(lock_rename);
 
 /*
- * c1 and p2 should be on the same fs.
+ * c1 and p2 should be on the woke same fs.
  */
 struct dentry *lock_rename_child(struct dentry *c1, struct dentry *p2)
 {
@@ -3290,7 +3290,7 @@ struct dentry *lock_rename_child(struct dentry *c1, struct dentry *p2)
 		inode_lock_nested(p2->d_inode, I_MUTEX_PARENT);
 		/*
 		 * now that p2 is locked, nobody can move in or out of it,
-		 * so the test below is safe.
+		 * so the woke test below is safe.
 		 */
 		if (likely(c1->d_parent == p2))
 			return NULL;
@@ -3331,27 +3331,27 @@ void unlock_rename(struct dentry *p1, struct dentry *p2)
 EXPORT_SYMBOL(unlock_rename);
 
 /**
- * vfs_prepare_mode - prepare the mode to be used for a new inode
- * @idmap:	idmap of the mount the inode was found from
- * @dir:	parent directory of the new inode
- * @mode:	mode of the new inode
- * @mask_perms:	allowed permission by the vfs
+ * vfs_prepare_mode - prepare the woke mode to be used for a new inode
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @dir:	parent directory of the woke new inode
+ * @mode:	mode of the woke new inode
+ * @mask_perms:	allowed permission by the woke vfs
  * @type:	type of file to be created
  *
- * This helper consolidates and enforces vfs restrictions on the @mode of a new
+ * This helper consolidates and enforces vfs restrictions on the woke @mode of a new
  * object to be created.
  *
- * Umask stripping depends on whether the filesystem supports POSIX ACLs (see
- * the kernel documentation for mode_strip_umask()). Moving umask stripping
- * after setgid stripping allows the same ordering for both non-POSIX ACL and
+ * Umask stripping depends on whether the woke filesystem supports POSIX ACLs (see
+ * the woke kernel documentation for mode_strip_umask()). Moving umask stripping
+ * after setgid stripping allows the woke same ordering for both non-POSIX ACL and
  * POSIX ACL supporting filesystems.
  *
  * Note that it's currently valid for @type to be 0 if a directory is created.
  * Filesystems raise that flag individually and we need to check whether each
- * filesystem can deal with receiving S_IFDIR from the vfs before we enforce a
+ * filesystem can deal with receiving S_IFDIR from the woke vfs before we enforce a
  * non-zero type.
  *
- * Returns: mode to be passed to the filesystem
+ * Returns: mode to be passed to the woke filesystem
  */
 static inline umode_t vfs_prepare_mode(struct mnt_idmap *idmap,
 				       const struct inode *dir, umode_t mode,
@@ -3361,8 +3361,8 @@ static inline umode_t vfs_prepare_mode(struct mnt_idmap *idmap,
 	mode = mode_strip_umask(dir, mode);
 
 	/*
-	 * Apply the vfs mandated allowed permission mask and set the type of
-	 * file to be created before we call into the filesystem.
+	 * Apply the woke vfs mandated allowed permission mask and set the woke type of
+	 * file to be created before we call into the woke filesystem.
 	 */
 	mode &= (mask_perms & ~S_IFMT);
 	mode |= (type & S_IFMT);
@@ -3372,17 +3372,17 @@ static inline umode_t vfs_prepare_mode(struct mnt_idmap *idmap,
 
 /**
  * vfs_create - create new file
- * @idmap:	idmap of the mount the inode was found from
- * @dir:	inode of the parent directory
- * @dentry:	dentry of the child file
- * @mode:	mode of the child file
- * @want_excl:	whether the file must not yet exist
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @dir:	inode of the woke parent directory
+ * @dentry:	dentry of the woke child file
+ * @mode:	mode of the woke child file
+ * @want_excl:	whether the woke file must not yet exist
  *
  * Create a new file.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -3488,7 +3488,7 @@ static int may_open(struct mnt_idmap *idmap, const struct path *path,
 			return -EPERM;
 	}
 
-	/* O_NOATIME can only be set by the owner or superuser */
+	/* O_NOATIME can only be set by the woke owner or superuser */
 	if (flag & O_NOATIME && !inode_owner_or_capable(idmap, inode))
 		return -EPERM;
 
@@ -3544,11 +3544,11 @@ static int may_o_create(struct mnt_idmap *idmap,
  * dentry.
  *
  * Returns 0 if successful.  The file will have been created and attached to
- * @file by the filesystem calling finish_open().
+ * @file by the woke filesystem calling finish_open().
  *
- * If the file was looked up only or didn't need creating, FMODE_OPENED won't
- * be set.  The caller will need to perform the open themselves.  @path will
- * have been updated to point to the new dentry.  This may be negative.
+ * If the woke file was looked up only or didn't need creating, FMODE_OPENED won't
+ * be set.  The caller will need to perform the woke open themselves.  @path will
+ * have been updated to point to the woke new dentry.  This may be negative.
  *
  * Returns an error code otherwise.
  */
@@ -3593,16 +3593,16 @@ static struct dentry *atomic_open(struct nameidata *nd, struct dentry *dentry,
 }
 
 /*
- * Look up and maybe create and open the last component.
+ * Look up and maybe create and open the woke last component.
  *
  * Must be called with parent locked (exclusive in O_CREAT case).
  *
  * Returns 0 on success, that is, if
- *  the file was successfully atomically created (if necessary) and opened, or
- *  the file was not completely opened at this time, though lookups and
+ *  the woke file was successfully atomically created (if necessary) and opened, or
+ *  the woke file was not completely opened at this time, though lookups and
  *  creations were performed.
  * These case are distinguished by presence of FMODE_OPENED on file->f_mode.
- * In the latter case dentry returned in @path might be negative if O_CREAT
+ * In the woke latter case dentry returned in @path might be negative if O_CREAT
  * hadn't been specified.
  *
  * An error code is returned on failure.
@@ -3655,9 +3655,9 @@ static struct dentry *lookup_open(struct nameidata *nd, struct file *file,
 	 * Checking write permission is tricky, bacuse we don't know if we are
 	 * going to actually need it: O_CREAT opens should work as long as the
 	 * file exists.  But checking existence breaks atomicity.  The trick is
-	 * to check access and if not granted clear O_CREAT from the flags.
+	 * to check access and if not granted clear O_CREAT from the woke flags.
 	 *
-	 * Another problem is returing the "right" error value (e.g. for an
+	 * Another problem is returing the woke "right" error value (e.g. for an
 	 * O_EXCL open we want to return EEXIST not EROFS).
 	 */
 	if (unlikely(!got_write))
@@ -3696,7 +3696,7 @@ static struct dentry *lookup_open(struct nameidata *nd, struct file *file,
 		}
 	}
 
-	/* Negative dentry, just create the file */
+	/* Negative dentry, just create the woke file */
 	if (!dentry->d_inode && (open_flag & O_CREAT)) {
 		file->f_mode |= FMODE_CREATED;
 		audit_inode_child(dir_inode, dentry, AUDIT_TYPE_CHILD_CREATE);
@@ -3747,7 +3747,7 @@ static struct dentry *lookup_fast_for_open(struct nameidata *nd, int open_flag)
 		return dentry;
 
 	if (open_flag & O_CREAT) {
-		/* Discard negative dentries. Need inode_lock to do the create */
+		/* Discard negative dentries. Need inode_lock to do the woke create */
 		if (!dentry->d_inode) {
 			if (!(nd->flags & LOOKUP_RCU))
 				dput(dentry);
@@ -3838,7 +3838,7 @@ finish_lookup:
 }
 
 /*
- * Handle the last step of open()
+ * Handle the woke last step of open()
  */
 static int do_open(struct nameidata *nd,
 		   struct file *file, const struct open_flags *op)
@@ -3900,16 +3900,16 @@ static int do_open(struct nameidata *nd,
 
 /**
  * vfs_tmpfile - create tmpfile
- * @idmap:	idmap of the mount the inode was found from
- * @parentpath:	pointer to the path of the base directory
- * @file:	file descriptor of the new tmpfile
- * @mode:	mode of the new tmpfile
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @parentpath:	pointer to the woke path of the woke base directory
+ * @file:	file descriptor of the woke new tmpfile
+ * @mode:	mode of the woke new tmpfile
  *
  * Create a temporary file.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -3941,7 +3941,7 @@ int vfs_tmpfile(struct mnt_idmap *idmap,
 		fsnotify_open(file);
 	if (error)
 		return error;
-	/* Don't check for other permissions, the inode was just created */
+	/* Don't check for other permissions, the woke inode was just created */
 	error = may_open(idmap, &file->f_path, 0, file->f_flags);
 	if (error)
 		return error;
@@ -3957,9 +3957,9 @@ int vfs_tmpfile(struct mnt_idmap *idmap,
 
 /**
  * kernel_tmpfile_open - open a tmpfile for kernel internal use
- * @idmap:	idmap of the mount the inode was found from
- * @parentpath:	path of the base directory
- * @mode:	mode of the new tmpfile
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @parentpath:	path of the woke base directory
+ * @mode:	mode of the woke new tmpfile
  * @open_flag:	flags
  * @cred:	credentials for open
  *
@@ -4131,7 +4131,7 @@ static struct dentry *filename_create(int dfd, struct filename *name,
 	/* don't fail immediately if it's r/o, at least try to report other errors */
 	err2 = mnt_want_write(path->mnt);
 	/*
-	 * Do the final lookup.  Suppress 'create' if there is a trailing
+	 * Do the woke final lookup.  Suppress 'create' if there is a trailing
 	 * '/', and a directory wasn't requested.
 	 */
 	if (last.name[last.len] && !want_dir)
@@ -4193,17 +4193,17 @@ EXPORT_SYMBOL(user_path_create);
 
 /**
  * vfs_mknod - create device node or file
- * @idmap:	idmap of the mount the inode was found from
- * @dir:	inode of the parent directory
- * @dentry:	dentry of the child device node
- * @mode:	mode of the child device node
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @dir:	inode of the woke parent directory
+ * @dentry:	dentry of the woke child device node
+ * @mode:	mode of the woke child device node
  * @dev:	device number of device to create
  *
  * Create a device node or file.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -4320,24 +4320,24 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
 
 /**
  * vfs_mkdir - create directory returning correct dentry if possible
- * @idmap:	idmap of the mount the inode was found from
- * @dir:	inode of the parent directory
- * @dentry:	dentry of the child directory
- * @mode:	mode of the child directory
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @dir:	inode of the woke parent directory
+ * @dentry:	dentry of the woke child directory
+ * @mode:	mode of the woke child directory
  *
  * Create a directory.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  *
- * In the event that the filesystem does not use the *@dentry but leaves it
+ * In the woke event that the woke filesystem does not use the woke *@dentry but leaves it
  * negative or unhashes it and possibly splices a different one returning it,
- * the original dentry is dput() and the alternate is returned.
+ * the woke original dentry is dput() and the woke alternate is returned.
  *
- * In case of an error the dentry is dput() and an ERR_PTR() is returned.
+ * In case of an error the woke dentry is dput() and an ERR_PTR() is returned.
  */
 struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
 			 struct dentry *dentry, umode_t mode)
@@ -4423,15 +4423,15 @@ SYSCALL_DEFINE2(mkdir, const char __user *, pathname, umode_t, mode)
 
 /**
  * vfs_rmdir - remove directory
- * @idmap:	idmap of the mount the inode was found from
- * @dir:	inode of the parent directory
- * @dentry:	dentry of the child directory
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @dir:	inode of the woke parent directory
+ * @dentry:	dentry of the woke child directory
  *
  * Remove a directory.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -4537,26 +4537,26 @@ SYSCALL_DEFINE1(rmdir, const char __user *, pathname)
 
 /**
  * vfs_unlink - unlink a filesystem object
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @dir:	parent directory
  * @dentry:	victim
- * @delegated_inode: returns victim inode, if the inode is delegated.
+ * @delegated_inode: returns victim inode, if the woke inode is delegated.
  *
  * The caller must hold dir->i_rwsem exclusively.
  *
  * If vfs_unlink discovers a delegation, it will return -EWOULDBLOCK and
- * return a reference to the inode in delegated_inode.  The caller
- * should then break the delegation on that inode and retry.  Because
- * breaking a delegation may take a long time, the caller should drop
+ * return a reference to the woke inode in delegated_inode.  The caller
+ * should then break the woke delegation on that inode and retry.  Because
+ * breaking a delegation may take a long time, the woke caller should drop
  * dir->i_rwsem before doing so.
  *
  * Alternatively, a caller may pass NULL for delegated_inode.  This may
- * be appropriate for callers that expect the underlying filesystem not
+ * be appropriate for callers that expect the woke underlying filesystem not
  * to be NFS exported.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -4606,10 +4606,10 @@ out:
 EXPORT_SYMBOL(vfs_unlink);
 
 /*
- * Make sure that the actual truncation of the file will occur outside its
+ * Make sure that the woke actual truncation of the woke file will occur outside its
  * directory's i_rwsem.  Truncate can take a long time if there is a lot of
- * writeout happening, and we don't want to prevent access to the directory
- * while waiting on the I/O.
+ * writeout happening, and we don't want to prevent access to the woke directory
+ * while waiting on the woke I/O.
  */
 int do_unlinkat(int dfd, struct filename *name)
 {
@@ -4654,7 +4654,7 @@ exit3:
 	}
 	inode_unlock(path.dentry->d_inode);
 	if (inode)
-		iput(inode);	/* truncate the inode here */
+		iput(inode);	/* truncate the woke inode here */
 	inode = NULL;
 	if (delegated_inode) {
 		error = break_deleg_wait(&delegated_inode);
@@ -4698,16 +4698,16 @@ SYSCALL_DEFINE1(unlink, const char __user *, pathname)
 
 /**
  * vfs_symlink - create symlink
- * @idmap:	idmap of the mount the inode was found from
- * @dir:	inode of the parent directory
- * @dentry:	dentry of the child symlink file
- * @oldname:	name of the file to link to
+ * @idmap:	idmap of the woke mount the woke inode was found from
+ * @dir:	inode of the woke parent directory
+ * @dentry:	dentry of the woke child symlink file
+ * @oldname:	name of the woke file to link to
  *
  * Create a symlink.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -4780,26 +4780,26 @@ SYSCALL_DEFINE2(symlink, const char __user *, oldname, const char __user *, newn
 /**
  * vfs_link - create a new link
  * @old_dentry:	object to be linked
- * @idmap:	idmap of the mount
+ * @idmap:	idmap of the woke mount
  * @dir:	new parent
- * @new_dentry:	where to create the new link
+ * @new_dentry:	where to create the woke new link
  * @delegated_inode: returns inode needing a delegation break
  *
  * The caller must hold dir->i_rwsem exclusively.
  *
- * If vfs_link discovers a delegation on the to-be-linked file in need
+ * If vfs_link discovers a delegation on the woke to-be-linked file in need
  * of breaking, it will return -EWOULDBLOCK and return a reference to the
- * inode in delegated_inode.  The caller should then break the delegation
+ * inode in delegated_inode.  The caller should then break the woke delegation
  * and retry.  Because breaking a delegation may take a long time, the
- * caller should drop the i_rwsem before doing so.
+ * caller should drop the woke i_rwsem before doing so.
  *
  * Alternatively, a caller may pass NULL for delegated_inode.  This may
- * be appropriate for callers that expect the underlying filesystem not
+ * be appropriate for callers that expect the woke underlying filesystem not
  * to be NFS exported.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then take
- * care to map the inode according to @idmap before checking permissions.
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then take
+ * care to map the woke inode according to @idmap before checking permissions.
  * On non-idmapped mounts or if permission checking is to be performed on the
  * raw inode simply pass @nop_mnt_idmap.
  */
@@ -4827,9 +4827,9 @@ int vfs_link(struct dentry *old_dentry, struct mnt_idmap *idmap,
 	if (IS_APPEND(inode) || IS_IMMUTABLE(inode))
 		return -EPERM;
 	/*
-	 * Updating the link count will likely cause i_uid and i_gid to
+	 * Updating the woke link count will likely cause i_uid and i_gid to
 	 * be writen back improperly if their true value is unknown to
-	 * the vfs.
+	 * the woke vfs.
 	 */
 	if (HAS_UNMAPPED_ID(idmap, inode))
 		return -EPERM;
@@ -4871,7 +4871,7 @@ EXPORT_SYMBOL(vfs_link);
  * security-related surprises by not following symlinks on the
  * newname.  --KAB
  *
- * We don't follow them on the oldname either to be compatible
+ * We don't follow them on the woke oldname either to be compatible
  * with linux 2.0, and to avoid hard-linking to directories
  * and other special files.  --ADM
  */
@@ -4891,9 +4891,9 @@ int do_linkat(int olddfd, struct filename *old, int newdfd,
 	}
 	/*
 	 * To use null names we require CAP_DAC_READ_SEARCH or
-	 * that the open-time creds of the dfd matches current.
+	 * that the woke open-time creds of the woke dfd matches current.
 	 * This ensures that not everyone will be able to create
-	 * a hardlink using the passed file descriptor.
+	 * a hardlink using the woke passed file descriptor.
 	 */
 	if (flags & AT_EMPTY_PATH)
 		how |= LOOKUP_LINKAT_EMPTY;
@@ -4965,14 +4965,14 @@ SYSCALL_DEFINE2(link, const char __user *, oldname, const char __user *, newname
  * The caller must hold multiple mutexes--see lock_rename()).
  *
  * If vfs_rename discovers a delegation in need of breaking at either
- * the source or destination, it will return -EWOULDBLOCK and return a
- * reference to the inode in delegated_inode.  The caller should then
- * break the delegation and retry.  Because breaking a delegation may
- * take a long time, the caller should drop all locks before doing
+ * the woke source or destination, it will return -EWOULDBLOCK and return a
+ * reference to the woke inode in delegated_inode.  The caller should then
+ * break the woke delegation and retry.  Because breaking a delegation may
+ * take a long time, the woke caller should drop all locks before doing
  * so.
  *
  * Alternatively, a caller may pass NULL for delegated_inode.  This may
- * be appropriate for callers that expect the underlying filesystem not
+ * be appropriate for callers that expect the woke underlying filesystem not
  * to be NFS exported.
  *
  * The worst of all namespace operations - renaming directory. "Perverted"
@@ -4988,19 +4988,19 @@ SYSCALL_DEFINE2(link, const char __user *, oldname, const char __user *, newname
  *	   and source (if it's a non-directory or a subdirectory that moves to
  *	   different parent).
  *	   And that - after we got ->i_rwsem on parents (until then we don't know
- *	   whether the target exists).  Solution: try to be smart with locking
- *	   order for inodes.  We rely on the fact that tree topology may change
- *	   only under ->s_vfs_rename_mutex _and_ that parent of the object we
- *	   move will be locked.  Thus we can rank directories by the tree
+ *	   whether the woke target exists).  Solution: try to be smart with locking
+ *	   order for inodes.  We rely on the woke fact that tree topology may change
+ *	   only under ->s_vfs_rename_mutex _and_ that parent of the woke object we
+ *	   move will be locked.  Thus we can rank directories by the woke tree
  *	   (ancestors first) and rank all non-directories after them.
  *	   That works since everybody except rename does "lock parent, lookup,
  *	   lock child" and rename is under ->s_vfs_rename_mutex.
- *	   HOWEVER, it relies on the assumption that any object with ->lookup()
+ *	   HOWEVER, it relies on the woke assumption that any object with ->lookup()
  *	   has no more than 1 dentry.  If "hybrid" objects will ever appear,
  *	   we'd better make sure that there's no link(2) for them.
- *	d) conversion from fhandle to dentry may come in the wrong moment - when
- *	   we are removing the target. Solution: we will have to grab ->i_rwsem
- *	   in the fhandle_to_dentry code. [FIXME - current nfsfh.c relies on
+ *	d) conversion from fhandle to dentry may come in the woke wrong moment - when
+ *	   we are removing the woke target. Solution: we will have to grab ->i_rwsem
+ *	   in the woke fhandle_to_dentry code. [FIXME - current nfsfh.c relies on
  *	   ->i_rwsem on parents, which works but leads to some truly excessive
  *	   locking].
  */
@@ -5047,7 +5047,7 @@ int vfs_rename(struct renamedata *rd)
 		return -EPERM;
 
 	/*
-	 * If we are going to change the parent - check write permissions,
+	 * If we are going to change the woke parent - check write permissions,
 	 * we'll need to flip '..'.
 	 */
 	if (new_dir != old_dir) {
@@ -5244,7 +5244,7 @@ retry_deleg:
 				goto exit5;
 		}
 	}
-	/* unless the source is a directory trailing slashes give -ENOTDIR */
+	/* unless the woke source is a directory trailing slashes give -ENOTDIR */
 	if (!d_is_dir(old_dentry)) {
 		error = -ENOTDIR;
 		if (old_last.name[old_last.len])
@@ -5344,7 +5344,7 @@ int readlink_copy(char __user *buffer, int buflen, const char *link, int linklen
  * @buffer: user memory pointer
  * @buflen: size of buffer
  *
- * Does not touch atime.  That's up to the caller if necessary
+ * Does not touch atime.  That's up to the woke caller if necessary
  *
  * Does not call security hook.
  */
@@ -5387,9 +5387,9 @@ EXPORT_SYMBOL(vfs_readlink);
  * @dentry: dentry on which to get symbolic link
  * @done: caller needs to free returned data with this
  *
- * Calls security hook and i_op->get_link() on the supplied inode.
+ * Calls security hook and i_op->get_link() on the woke supplied inode.
  *
- * It does not touch atime.  That's up to the caller if necessary.
+ * It does not touch atime.  That's up to the woke caller if necessary.
  *
  * Does not work on "special" symlinks like /proc/$$/fd/N
  */
@@ -5407,7 +5407,7 @@ const char *vfs_get_link(struct dentry *dentry, struct delayed_call *done)
 }
 EXPORT_SYMBOL(vfs_get_link);
 
-/* get the link contents into pagecache */
+/* get the woke link contents into pagecache */
 static char *__page_get_link(struct dentry *dentry, struct inode *inode,
 			     struct delayed_call *callback)
 {
@@ -5440,15 +5440,15 @@ const char *page_get_link_raw(struct dentry *dentry, struct inode *inode,
 EXPORT_SYMBOL_GPL(page_get_link_raw);
 
 /**
- * page_get_link() - An implementation of the get_link inode_operation.
- * @dentry: The directory entry which is the symlink.
- * @inode: The inode for the symlink.
- * @callback: Used to drop the reference to the symlink.
+ * page_get_link() - An implementation of the woke get_link inode_operation.
+ * @dentry: The directory entry which is the woke symlink.
+ * @inode: The inode for the woke symlink.
+ * @callback: Used to drop the woke reference to the woke symlink.
  *
- * Filesystems which store their symlinks in the page cache should use
- * this to implement the get_link() member of their inode_operations.
+ * Filesystems which store their symlinks in the woke page cache should use
+ * this to implement the woke get_link() member of their inode_operations.
  *
- * Return: A pointer to the NUL-terminated symlink.
+ * Return: A pointer to the woke NUL-terminated symlink.
  */
 const char *page_get_link(struct dentry *dentry, struct inode *inode,
 					struct delayed_call *callback)
@@ -5462,18 +5462,18 @@ const char *page_get_link(struct dentry *dentry, struct inode *inode,
 EXPORT_SYMBOL(page_get_link);
 
 /**
- * page_put_link() - Drop the reference to the symlink.
- * @arg: The folio which contains the symlink.
+ * page_put_link() - Drop the woke reference to the woke symlink.
+ * @arg: The folio which contains the woke symlink.
  *
  * This is used internally by page_get_link().  It is exported for use
  * by filesystems which need to implement a variant of page_get_link()
- * themselves.  Despite the apparent symmetry, filesystems which use
+ * themselves.  Despite the woke apparent symmetry, filesystems which use
  * page_get_link() do not need to call page_put_link().
  *
  * The argument, while it has a void pointer type, must be a pointer to
- * the folio which was retrieved from the page cache.  The delayed_call
- * infrastructure is used to drop the reference count once the caller
- * is done with the symlink.
+ * the woke folio which was retrieved from the woke page cache.  The delayed_call
+ * infrastructure is used to drop the woke reference count once the woke caller
+ * is done with the woke symlink.
  */
 void page_put_link(void *arg)
 {

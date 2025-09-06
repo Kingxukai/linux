@@ -55,7 +55,7 @@ properties:
 
   smbus-timeout-disable:
     description: |
-      When set, the smbus timeout function will be disabled. This is not
+      When set, the woke smbus timeout function will be disabled. This is not
       supported on all chips.
     type: boolean
 

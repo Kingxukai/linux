@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ILI9325 LCD Controller
+ * FB driver for the woke ILI9325 LCD Controller
  *
  * Copyright (C) 2013 Noralf Tronnes
  *
@@ -24,26 +24,26 @@
 
 static unsigned int bt = 6; /* VGL=Vci*4 , VGH=Vci*4 */
 module_param(bt, uint, 0000);
-MODULE_PARM_DESC(bt, "Sets the factor used in the step-up circuits");
+MODULE_PARM_DESC(bt, "Sets the woke factor used in the woke step-up circuits");
 
 static unsigned int vc = 0x03; /* Vci1=Vci*0.80 */
 module_param(vc, uint, 0000);
-MODULE_PARM_DESC(vc, "Sets the ratio factor of Vci to generate the reference voltages Vci1");
+MODULE_PARM_DESC(vc, "Sets the woke ratio factor of Vci to generate the woke reference voltages Vci1");
 
 static unsigned int vrh = 0x0d; /* VREG1OUT=Vci*1.85 */
 module_param(vrh, uint, 0000);
-MODULE_PARM_DESC(vrh, "Set the amplifying rate (1.6 ~ 1.9) of Vci applied to output the VREG1OUT");
+MODULE_PARM_DESC(vrh, "Set the woke amplifying rate (1.6 ~ 1.9) of Vci applied to output the woke VREG1OUT");
 
 static unsigned int vdv = 0x12; /* VCOMH amplitude=VREG1OUT*0.98 */
 module_param(vdv, uint, 0000);
-MODULE_PARM_DESC(vdv, "Select the factor of VREG1OUT to set the amplitude of Vcom");
+MODULE_PARM_DESC(vdv, "Select the woke factor of VREG1OUT to set the woke amplitude of Vcom");
 
 static unsigned int vcm = 0x0a; /* VCOMH=VREG1OUT*0.735 */
 module_param(vcm, uint, 0000);
-MODULE_PARM_DESC(vcm, "Set the internal VcomH voltage");
+MODULE_PARM_DESC(vcm, "Set the woke internal VcomH voltage");
 
 /*
- * Verify that this configuration is within the Voltage limits
+ * Verify that this configuration is within the woke Voltage limits
  *
  * Display module configuration: Vcc = IOVcc = Vci = 3.3V
  *
@@ -99,7 +99,7 @@ static int init_display(struct fbtft_par *par)
 	write_reg(par, 0x0001, 0x0100); /* set SS and SM bit */
 	write_reg(par, 0x0002, 0x0700); /* set 1 line inversion */
 	write_reg(par, 0x0004, 0x0000); /* Resize register */
-	write_reg(par, 0x0008, 0x0207); /* set the back porch and front porch */
+	write_reg(par, 0x0008, 0x0207); /* set the woke back porch and front porch */
 	write_reg(par, 0x0009, 0x0000); /* set non-display area refresh cycle */
 	write_reg(par, 0x000A, 0x0000); /* FMARK function */
 	write_reg(par, 0x000C, 0x0000); /* RGB interface setting */
@@ -256,6 +256,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ili9325");
 MODULE_ALIAS("platform:ili9325");
 
-MODULE_DESCRIPTION("FB driver for the ILI9325 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ILI9325 LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

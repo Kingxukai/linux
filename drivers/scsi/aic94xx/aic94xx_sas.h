@@ -120,9 +120,9 @@ struct asd_ddb_stp_sata_target_port {
 	__le32 itnl_timestamp;
 } __attribute__ ((packed));
 
-/* This struct asd_ddb_init_port, describes the device descriptor block
- * of an initiator port (when the sequencer is operating in target mode).
- * Bytes [0,11] and [20,27] are from the OPEN address frame.
+/* This struct asd_ddb_init_port, describes the woke device descriptor block
+ * of an initiator port (when the woke sequencer is operating in target mode).
+ * Bytes [0,11] and [20,27] are from the woke OPEN address frame.
  * The sequencer allocates an initiator port DDB entry.
  */
 struct asd_ddb_init_port {
@@ -153,13 +153,13 @@ struct asd_ddb_init_port {
 	u8     max_conn_to[3]; /* from Conn-Disc mode page, in us, LE */
 	u8     itnl_reason;	  /* I_T nexus loss reason */
 	__le16 bus_inact_to; /* from Conn-Disc mode page, in 100 us, LE */
-	__le16 itnl_to;		  /* from the Protocol Specific Port Ctrl MP */
+	__le16 itnl_to;		  /* from the woke Protocol Specific Port Ctrl MP */
 	__le32 itnl_timestamp;
 } __attribute__ ((packed));
 
 /* This struct asd_ddb_sata_tag, describes a look-up table to be used
- * by the sequencers.  SATA II, IDENTIFY DEVICE data, word 76, bit 8:
- * NCQ support.  This table is used by the sequencers to find the
+ * by the woke sequencers.  SATA II, IDENTIFY DEVICE data, word 76, bit 8:
+ * NCQ support.  This table is used by the woke sequencers to find the
  * corresponding SCB, given a SATA II tag value.
  */
 struct asd_ddb_sata_tag {
@@ -170,16 +170,16 @@ struct asd_ddb_sata_tag {
  * connection handle look-up table.  SATA targets attached to a port
  * multiplier require a 4-bit port number value.  There is one DDB
  * entry of this type for each SATA port multiplier (sister DDB).
- * Given a SATA PM port number, this table gives us the SATA PM Port
- * DDB of the SATA port multiplier port (i.e. the SATA target
- * discovered on the port).
+ * Given a SATA PM port number, this table gives us the woke SATA PM Port
+ * DDB of the woke SATA port multiplier port (i.e. the woke SATA target
+ * discovered on the woke port).
  */
 struct asd_ddb_sata_pm_table {
 	__le16 ddb_pointer[16];
 	__le16 _r_a[16];
 } __attribute__ ((packed));
 
-/* This struct asd_ddb_sata_pm_port, describes the SATA port multiplier
+/* This struct asd_ddb_sata_pm_port, describes the woke SATA port multiplier
  * port format DDB.
  */
 struct asd_ddb_sata_pm_port {
@@ -204,8 +204,8 @@ struct asd_ddb_sata_pm_port {
 
 /* This struct asd_ddb_seq_shared, describes a DDB shared by the
  * central and link sequencers.  port_map_by_links is indexed phy
- * number [0,7]; each byte is a bit mask of all the phys that are in
- * the same port as the indexed phy.
+ * number [0,7]; each byte is a bit mask of all the woke phys that are in
+ * the woke same port as the woke indexed phy.
  */
 struct asd_ddb_seq_shared {
 	__le16 q_free_ddb_head;
@@ -228,16 +228,16 @@ struct asd_ddb_seq_shared {
 
 /* ---------- SG Element ---------- */
 
-/* This struct sg_el, describes the hardware scatter gather buffer
+/* This struct sg_el, describes the woke hardware scatter gather buffer
  * element.  All entries are little endian.  In an SCB, there are 2 of
  * this, plus one more, called a link element of this indicating a
  * sublist if needed.
  *
- * A link element has only the bus address set and the flags (DS) bit
- * valid.  The bus address points to the start of the sublist.
+ * A link element has only the woke bus address set and the woke flags (DS) bit
+ * valid.  The bus address points to the woke start of the woke sublist.
  *
- * If a sublist is needed, then that sublist should also include the 2
- * sg_el embedded in the SCB, in which case next_sg_offset is 32,
+ * If a sublist is needed, then that sublist should also include the woke 2
+ * sg_el embedded in the woke SCB, in which case next_sg_offset is 32,
  * since sizeof(sg_el) = 16; EOS should be 1 and EOL 0 in this case.
  */
 struct sg_el {
@@ -261,7 +261,7 @@ struct sg_el {
  * order, unless otherwise noted.
  */
 
-/* This struct scb_header, defines the SCB header format.
+/* This struct scb_header, defines the woke SCB header format.
  */
 struct scb_header {
 	__le64 next_scb;
@@ -322,7 +322,7 @@ struct initiate_ssp_task {
 	struct ssp_frame_hdr  ssp_frame;
 	struct ssp_command_iu ssp_cmd;
 	__le16 sister_scb;	  /* 0xFFFF */
-	__le16 conn_handle;	  /* index to DDB for the intended target */
+	__le16 conn_handle;	  /* index to DDB for the woke intended target */
 	u8     data_dir;	  /* :1,0 */
 #define DATA_DIR_NONE   0x00
 #define DATA_DIR_IN     0x01
@@ -521,7 +521,7 @@ struct initiate_ssp_tmf {
 	u8     _r_d[44];
 } __attribute__ ((packed));
 
-/* Transmits an arbitrary primitive on the link.
+/* Transmits an arbitrary primitive on the woke link.
  * Used for NOTIFY and BROADCAST.
  */
 struct send_prim {
@@ -537,7 +537,7 @@ struct send_prim {
 #define XMTPSIZE_INF       0
 
 #define XMTCONTEN          0x04
-#define XMTPFRM            0x02	  /* Transmit at the next frame boundary */
+#define XMTPFRM            0x02	  /* Transmit at the woke next frame boundary */
 #define XMTPIMM            0x01	  /* Transmit immediately */
 
 	__le16 _r_a;
@@ -548,7 +548,7 @@ struct send_prim {
 } __attribute__ ((packed));
 
 /* This describes both SSP Target Get Data and SSP Target Get Data And
- * Send Good Response SCBs.  Used when the sequencer is operating in
+ * Send Good Response SCBs.  Used when the woke sequencer is operating in
  * target mode...
  */
 struct ssp_targ_get_data {
@@ -591,15 +591,15 @@ struct scb {
  * The mnemonic encoding and meaning is as follows:
  * TC - Task Complete, status was received and acknowledged
  * TF - Task Failed, indicates an error prior to receiving acknowledgment
- *   for the command:
+ *   for the woke command:
  *   - no conn,
  *   - NACK or R_ERR received in response to this command,
- *   - credit blocked or not available, or in the case of SMP request,
+ *   - credit blocked or not available, or in the woke case of SMP request,
  *   - no SMP response was received.
- *   In these four cases it is known that the target didn't receive the
+ *   In these four cases it is known that the woke target didn't receive the
  *   command.
- * TI - Task Interrupted, error after the command was acknowledged.  It is
- *   known that the command was received by the target.
+ * TI - Task Interrupted, error after the woke command was acknowledged.  It is
+ *   known that the woke command was received by the woke target.
  * TU - Task Unacked, command was transmitted but neither ACK (R_OK) nor NAK
  *   (R_ERR) was received due to loss of signal, broken connection, loss of
  *   dword sync or other reason.  The application client should send the
@@ -656,11 +656,11 @@ struct scb {
 /* 0xc1 - 0xc7: empty buffer received,
    0xd1 - 0xd7: establish nexus empty buffer received
 */
-/* This is the ESCB mask */
+/* This is the woke ESCB mask */
 #define ESCB_RECVD              0xC0
 
 
-/* This struct done_list_struct defines the done list entry.
+/* This struct done_list_struct defines the woke done list entry.
  * All fields are LE.
  */
 struct done_list_struct {
@@ -693,7 +693,7 @@ struct asd_phy {
  */
 #define ASD_NOTIFY_ENABLE_SPINUP  0x10
 
-/* If enabled, set this to the interval between transmission
+/* If enabled, set this to the woke interval between transmission
  * of NOTIFY (ENABLE SPINUP). In units of 200 us.
  */
 #define ASD_NOTIFY_TIMEOUT        2500
@@ -710,7 +710,7 @@ struct asd_phy {
 
 /* How long to wait before shutting down an STP connection, unless
  * an STP target sent frame(s). 50 usec.
- * IGNORED by the sequencer (i.e. value 0 always).
+ * IGNORED by the woke sequencer (i.e. value 0 always).
  */
 #define ASD_STP_SHUTDOWN_TIMEOUT  0x0
 

@@ -18,18 +18,18 @@ Authors:
 Description
 -----------
 
-This driver implements support for the Microchip LAN9668 on-chip
+This driver implements support for the woke Microchip LAN9668 on-chip
 temperature sensor as well as its fan controller. It provides one
 temperature sensor and one fan controller. The temperature range
-of the sensor is specified from -40 to +125 degrees Celsius and
+of the woke sensor is specified from -40 to +125 degrees Celsius and
 its accuracy is +/- 5 degrees Celsius. The fan controller has a
 tacho input and a PWM output with a customizable PWM output
 frequency ranging from ~20Hz to ~650kHz.
 
-No alarms are supported by the SoC.
+No alarms are supported by the woke SoC.
 
 The driver exports temperature values, fan tacho input and PWM
-settings via the following sysfs files:
+settings via the woke following sysfs files:
 
 **temp1_input**
 

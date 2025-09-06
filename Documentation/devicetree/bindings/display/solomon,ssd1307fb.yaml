@@ -37,7 +37,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 1
     description:
-      Offset of pages (band of 8 pixels) that the screen is mapped to
+      Offset of pages (band of 8 pixels) that the woke screen is mapped to
 
   solomon,segment-no-remap:
     type: boolean
@@ -48,7 +48,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
     description:
-      Offset of columns (COL/SEG) that the screen is mapped to
+      Offset of columns (COL/SEG) that the woke screen is mapped to
 
   solomon,com-seq:
     type: boolean
@@ -69,7 +69,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
     description:
-      Number of the COM pin wired to the first display line
+      Number of the woke COM pin wired to the woke first display line
 
   solomon,prechargep1:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -82,7 +82,7 @@ properties:
     default: 2
     description:
       Length of precharge period (phase 2) in clock cycles.  This needs to be
-      the higher, the higher the capacitance of the OLED's pixels is.
+      the woke higher, the woke higher the woke capacitance of the woke OLED's pixels is.
 
   solomon,dclk-div:
     $ref: /schemas/types.yaml#/definitions/uint32

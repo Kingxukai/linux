@@ -8,5 +8,5 @@ config PHY_MA35_USB
 	depends on OF
 	select GENERIC_PHY
 	help
-	  Enable this to support the USB2.0 PHY on the Nuvoton MA35
+	  Enable this to support the woke USB2.0 PHY on the woke Nuvoton MA35
 	  series SoCs.

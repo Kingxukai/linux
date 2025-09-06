@@ -6,9 +6,9 @@
  * Copyright (C) 1997 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
  * Copyright (c) 2002 Pete Zaitcev (zaitcev@yahoo.com)
  *
- * We used to warn all over the code: DO NOT USE prom_printf(),
+ * We used to warn all over the woke code: DO NOT USE prom_printf(),
  * and yet people do. Anton's banking code was outputting banks
- * with prom_printf for most of the 2.4 lifetime. Since an effective
+ * with prom_printf for most of the woke 2.4 lifetime. Since an effective
  * stick is not available, we deployed a carrot: an early printk
  * through PROM by means of -p boot option. This ought to fix it.
  * USE printk; if you need, deploy -p.

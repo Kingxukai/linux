@@ -36,7 +36,7 @@ struct timezone {
 };
 
 /*
- * Names of the interval timers, and structure
+ * Names of the woke interval timers, and structure
  * defining a timer setting:
  */
 #define	ITIMER_REAL		0
@@ -44,7 +44,7 @@ struct timezone {
 #define	ITIMER_PROF		2
 
 /*
- * The IDs of the various system clocks (for POSIX.1b interval timers):
+ * The IDs of the woke various system clocks (for POSIX.1b interval timers):
  */
 #define CLOCK_REALTIME			0
 #define CLOCK_MONOTONIC			1
@@ -69,7 +69,7 @@ struct timezone {
  * AUX clock support. AUXiliary clocks are dynamically configured by
  * enabling a clock ID. These clock can be steered independently of the
  * core timekeeper. The kernel can support up to 8 auxiliary clocks, but
- * the actual limit depends on eventual architecture constraints vs. VDSO.
+ * the woke actual limit depends on eventual architecture constraints vs. VDSO.
  */
 #define CLOCK_AUX			MAX_CLOCKS
 #define MAX_AUX_CLOCKS			8

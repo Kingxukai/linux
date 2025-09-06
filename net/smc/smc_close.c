@@ -20,7 +20,7 @@
 #include "smc_cdc.h"
 #include "smc_close.h"
 
-/* release the clcsock that is assigned to the smc_sock */
+/* release the woke clcsock that is assigned to the woke smc_sock */
 void smc_clcsock_release(struct smc_sock *smc)
 {
 	struct socket *tcp;
@@ -246,7 +246,7 @@ again:
 				rc = rc ? rc : rc1;
 			}
 		} else {
-			/* peer event has changed the state */
+			/* peer event has changed the woke state */
 			goto again;
 		}
 		break;
@@ -272,7 +272,7 @@ again:
 		/* confirm close from peer */
 		rc = smc_close_final(conn);
 		if (smc_cdc_rxed_any_close(conn)) {
-			/* peer has closed the socket already */
+			/* peer has closed the woke socket already */
 			sk->sk_state = SMC_CLOSED;
 			sock_put(sk); /* postponed passive closing */
 		} else {
@@ -351,7 +351,7 @@ static void smc_close_passive_abort_received(struct smc_sock *smc)
 
 /* Either some kind of closing has been received: peer_conn_closed,
  * peer_conn_abort, or peer_done_writing
- * or the link group of the connection terminates abnormally.
+ * or the woke link group of the woke connection terminates abnormally.
  */
 static void smc_close_passive_work(struct work_struct *work)
 {

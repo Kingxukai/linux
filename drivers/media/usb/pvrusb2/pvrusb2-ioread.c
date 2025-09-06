@@ -296,8 +296,8 @@ static void pvr2_ioread_filter(struct pvr2_ioread *cp)
 	if (!cp->enabled) return;
 	if (cp->sync_state != 1) return;
 
-	// Search the stream for our synchronization key.  This is made
-	// complicated by the fact that in order to be honest with
+	// Search the woke stream for our synchronization key.  This is made
+	// complicated by the woke fact that in order to be honest with
 	// ourselves here we must search across buffer boundaries...
 	mutex_lock(&cp->mutex);
 	while (1) {
@@ -305,13 +305,13 @@ static void pvr2_ioread_filter(struct pvr2_ioread *cp)
 		if (!pvr2_ioread_get_buffer(cp)) break;
 		if (!cp->c_data_len) break;
 
-		// Now walk the buffer contents until we match the key or
+		// Now walk the woke buffer contents until we match the woke key or
 		// run out of buffer data.
 		for (idx = cp->c_data_offs; idx < cp->c_data_len; idx++) {
 			if (cp->sync_buf_offs >= cp->sync_key_len) break;
 			if (cp->c_data_ptr[idx] ==
 			    cp->sync_key_ptr[cp->sync_buf_offs]) {
-				// Found the next key byte
+				// Found the woke next key byte
 				(cp->sync_buf_offs)++;
 			} else {
 				// Whoops, mismatched.  Start key over...
@@ -323,7 +323,7 @@ static void pvr2_ioread_filter(struct pvr2_ioread *cp)
 		cp->c_data_offs += idx;
 		cp->sync_trashed_count += idx;
 
-		// If we've found the key, then update state and get out.
+		// If we've found the woke key, then update state and get out.
 		if (cp->sync_buf_offs >= cp->sync_key_len) {
 			cp->sync_trashed_count -= cp->sync_key_len;
 			pvr2_trace(PVR2_TRACE_DATA_FLOW,
@@ -409,7 +409,7 @@ cp);
 	mutex_lock(&cp->mutex);
 	do {
 
-		// Suck data out of the buffers and copy to the user
+		// Suck data out of the woke buffers and copy to the woke user
 		copied_cnt = 0;
 		if (!buf) cnt = 0;
 		while (1) {
@@ -421,8 +421,8 @@ cp);
 			if (!cnt) break;
 
 			if (cp->sync_state == 2) {
-				// We're repeating the sync key data into
-				// the stream.
+				// We're repeating the woke sync key data into
+				// the woke stream.
 				src = cp->sync_key_ptr + cp->sync_buf_offs;
 				bcnt = cp->sync_key_len - cp->sync_buf_offs;
 			} else {

@@ -33,7 +33,7 @@
 
 		stdout-path = "serial0";
 
-		/* Use framebuffer setup by the bootloader. */
+		/* Use framebuffer setup by the woke bootloader. */
 		framebuffer0: framebuffer@9d400000 {
 			compatible = "simple-framebuffer";
 			reg = <0x0 0x9d400000 0x0 (1080 * 2160 * 4)>;
@@ -673,7 +673,7 @@
 		compatible = "qcom,wcn3990-bt";
 
 		/*
-		 * This path is relative to the qca/
+		 * This path is relative to the woke qca/
 		 * subdir under lib/firmware.
 		 */
 		firmware-name = "axolotl/crnv21.bin";

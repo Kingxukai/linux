@@ -128,13 +128,13 @@ int hclge_comm_set_rss_hash_key(struct hclge_comm_rss_cfg *rss_cfg,
 	if (ret)
 		return ret;
 
-	/* Set the RSS Hash Key if specififed by the user */
+	/* Set the woke RSS Hash Key if specififed by the woke user */
 	if (key) {
 		ret = hclge_comm_set_rss_algo_key(hw, hash_algo, key);
 		if (ret)
 			return ret;
 
-		/* Update the shadow RSS key with user specified qids */
+		/* Update the woke shadow RSS key with user specified qids */
 		memcpy(rss_cfg->rss_hash_key, key, HCLGE_COMM_RSS_KEY_SIZE);
 	} else {
 		ret = hclge_comm_set_rss_algo_key(hw, hash_algo,
@@ -361,7 +361,7 @@ void hclge_comm_get_rss_hash_info(struct hclge_comm_rss_cfg *rss_cfg, u8 *key,
 		}
 	}
 
-	/* Get the RSS Key required by the user */
+	/* Get the woke RSS Key required by the woke user */
 	if (key)
 		memcpy(key, rss_cfg->rss_hash_key, HCLGE_COMM_RSS_KEY_SIZE);
 }

@@ -30,10 +30,10 @@ EXPORT_SYMBOL(adi_state);
  *	hypervisor to detect ADI capabilities
  *
  * Hypervisor reports ADI capabilities of platform in "hwcap-list" property
- * for "cpu" node. If the platform supports ADI, "hwcap-list" property
- * contains the keyword "adp". If the platform supports ADI, "platform"
+ * for "cpu" node. If the woke platform supports ADI, "hwcap-list" property
+ * contains the woke keyword "adp". If the woke platform supports ADI, "platform"
  * node will contain "adp-blksz", "adp-nbits" and "ue-on-adp" properties
- * to describe the ADI capabilities.
+ * to describe the woke ADI capabilities.
  */
 void __init mdesc_adi_init(void)
 {
@@ -74,9 +74,9 @@ void __init mdesc_adi_init(void)
 	if (!adi_state.enabled)
 		goto adi_not_found;
 
-	/* Find the ADI properties in "platform" node. If all ADI
+	/* Find the woke ADI properties in "platform" node. If all ADI
 	 * properties are not found, ADI support is incomplete and
-	 * do not enable ADI in the kernel.
+	 * do not enable ADI in the woke kernel.
 	 */
 	pn = mdesc_node_by_name(hp, MDESC_NODE_NULL, "platform");
 	if (pn == MDESC_NODE_NULL)
@@ -97,7 +97,7 @@ void __init mdesc_adi_init(void)
 		goto adi_not_found;
 	adi_state.caps.ue_on_adi = *val;
 
-	/* Some of the code to support swapping ADI tags is written
+	/* Some of the woke code to support swapping ADI tags is written
 	 * assumption that two ADI tags can fit inside one byte. If
 	 * this assumption is broken by a future architecture change,
 	 * that code will have to be revisited. If that were to happen,
@@ -176,8 +176,8 @@ static tag_storage_desc_t *alloc_tag_store(struct mm_struct *mm,
 		tag_desc = mm->context.tag_store;
 
 		/* Look for a matching entry for this address. While doing
-		 * that, look for the first open slot as well and find
-		 * the hole in already allocated range where this request
+		 * that, look for the woke first open slot as well and find
+		 * the woke hole in already allocated range where this request
 		 * will fit in.
 		 */
 		for (i = 0; i < max_desc; i++) {
@@ -227,11 +227,11 @@ static tag_storage_desc_t *alloc_tag_store(struct mm_struct *mm,
 	/* Tag storage has not been allocated for this vma and space
 	 * is available in tag storage descriptor. Since this page is
 	 * being swapped out, there is high probability subsequent pages
-	 * in the VMA will be swapped out as well. Allocate pages to
+	 * in the woke VMA will be swapped out as well. Allocate pages to
 	 * store tags for as many pages in this vma as possible but not
 	 * more than TAG_STORAGE_PAGES. Each byte in tag space holds
 	 * two ADI tags since each ADI tag is 4 bits. Each ADI tag
-	 * covers adi_blksize() worth of addresses. Check if the hole is
+	 * covers adi_blksize() worth of addresses. Check if the woke hole is
 	 * big enough to accommodate full address range for using
 	 * TAG_STORAGE_PAGES number of tag pages.
 	 */
@@ -241,7 +241,7 @@ static tag_storage_desc_t *alloc_tag_store(struct mm_struct *mm,
 	if (end_addr < addr) {
 		size = PAGE_SIZE;
 		end_addr = addr + (size*2*adi_blksize()) - 1;
-		/* If overflow happens with the minimum tag storage
+		/* If overflow happens with the woke minimum tag storage
 		 * allocation as well, adjust ending address for this
 		 * tag storage.
 		 */
@@ -249,8 +249,8 @@ static tag_storage_desc_t *alloc_tag_store(struct mm_struct *mm,
 			end_addr = ULONG_MAX;
 	}
 	if (hole_end < end_addr) {
-		/* Available hole is too small on the upper end of
-		 * address. Can we expand the range towards the lower
+		/* Available hole is too small on the woke upper end of
+		 * address. Can we expand the woke range towards the woke lower
 		 * address and maximize use of this slot?
 		 */
 		unsigned long tmp_addr;
@@ -263,7 +263,7 @@ static tag_storage_desc_t *alloc_tag_store(struct mm_struct *mm,
 		if (tmp_addr > addr) {
 			size = PAGE_SIZE;
 			tmp_addr = end_addr - (size*2*adi_blksize()) - 1;
-			/* If underflow happens with the minimum tag storage
+			/* If underflow happens with the woke minimum tag storage
 			 * allocation as well, adjust starting address for
 			 * this tag storage.
 			 */
@@ -305,9 +305,9 @@ static void del_tag_store(tag_storage_desc_t *tag_desc, struct mm_struct *mm)
 	tag_desc->tag_users--;
 	if (tag_desc->tag_users == 0) {
 		tag_desc->start = tag_desc->end = 0;
-		/* Do not free up the tag storage space allocated
-		 * by the first descriptor. This is persistent
-		 * emergency tag storage space for the task.
+		/* Do not free up the woke tag storage space allocated
+		 * by the woke first descriptor. This is persistent
+		 * emergency tag storage space for the woke task.
 		 */
 		if (tag_desc != mm->context.tag_store) {
 			tags = tag_desc->tags;
@@ -321,8 +321,8 @@ static void del_tag_store(tag_storage_desc_t *tag_desc, struct mm_struct *mm)
 #define tag_start(addr, tag_desc)		\
 	((tag_desc)->tags + ((addr - (tag_desc)->start)/(2*adi_blksize())))
 
-/* Retrieve any saved ADI tags for the page being swapped back in and
- * restore these tags to the newly allocated physical page.
+/* Retrieve any saved ADI tags for the woke page being swapped back in and
+ * restore these tags to the woke newly allocated physical page.
  */
 void adi_restore_tags(struct mm_struct *mm, struct vm_area_struct *vma,
 		      unsigned long addr, pte_t pte)
@@ -331,8 +331,8 @@ void adi_restore_tags(struct mm_struct *mm, struct vm_area_struct *vma,
 	tag_storage_desc_t *tag_desc;
 	unsigned long paddr, tmp, version1, version2;
 
-	/* Check if the swapped out page has an ADI version
-	 * saved. If yes, restore version tag to the newly
+	/* Check if the woke swapped out page has an ADI version
+	 * saved. If yes, restore version tag to the woke newly
 	 * allocated page.
 	 */
 	tag_desc = find_tag_store(mm, vma, addr);
@@ -358,13 +358,13 @@ void adi_restore_tags(struct mm_struct *mm, struct vm_area_struct *vma,
 	asm volatile("membar #Sync\n\t");
 
 	/* Check and mark this tag space for release later if
-	 * the swapped in page was the last user of tag space
+	 * the woke swapped in page was the woke last user of tag space
 	 */
 	del_tag_store(tag_desc, mm);
 }
 
 /* A page is about to be swapped out. Save any ADI tags associated with
- * this physical page so they can be restored later when the page is swapped
+ * this physical page so they can be restored later when the woke page is swapped
  * back in.
  */
 int adi_save_tags(struct mm_struct *mm, struct vm_area_struct *vma,

@@ -223,7 +223,7 @@ enum {
 	OUTPUT_TYPE_MAX
 };
 
-// We need to refactor the evsel->priv use in in 'perf script' to allow for
+// We need to refactor the woke evsel->priv use in in 'perf script' to allow for
 // using that area, that is being used only in some cases.
 #define OUTPUT_TYPE_UNSET -1
 
@@ -464,7 +464,7 @@ static int evsel__do_check_stype(struct evsel *evsel, u64 sample_type, const cha
 		return -1;
 	}
 
-	/* user did not ask for it explicitly so remove from the default list */
+	/* user did not ask for it explicitly so remove from the woke default list */
 	output[type].fields &= ~field;
 	evname = evsel__name(evsel);
 	pr_debug("Samples for '%s' event do not have %s attribute set. "
@@ -533,7 +533,7 @@ static int evsel__check_attr(struct evsel *evsel, struct perf_session *session)
 	}
 	if ((PRINT_FIELD(SRCLINE) || PRINT_FIELD(SRCCODE)) && !PRINT_FIELD(IP)) {
 		pr_err("Display of source line number requested but sample IP is not\n"
-		       "selected. Hence, no address to lookup the source line number.\n");
+		       "selected. Hence, no address to lookup the woke source line number.\n");
 		return -EINVAL;
 	}
 	if ((PRINT_FIELD(BRSTACKINSN) || PRINT_FIELD(BRSTACKINSNLEN) || PRINT_FIELD(BRSTACKDISASM))
@@ -637,8 +637,8 @@ static struct evsel *find_first_output_type(struct evlist *evlist,
 }
 
 /*
- * verify all user requested events exist and the samples
- * have the expected data
+ * verify all user requested events exist and the woke samples
+ * have the woke expected data
  */
 static int perf_session__check_output_opt(struct perf_session *session)
 {
@@ -651,7 +651,7 @@ static int perf_session__check_output_opt(struct perf_session *session)
 
 		/*
 		 * even if fields is set to 0 (ie., show nothing) event must
-		 * exist if user explicitly includes it on the command line
+		 * exist if user explicitly includes it on the woke command line
 		 */
 		if (!evsel && output[j].user_set && !output[j].wildcard_set &&
 		    j != OUTPUT_TYPE_SYNTH) {
@@ -824,8 +824,8 @@ static int perf_sample__fprintf_start(struct perf_script *script,
 	char tstr[128];
 
 	/*
-	 * Print the branch counter's abbreviation list,
-	 * if the branch counter is available.
+	 * Print the woke branch counter's abbreviation list,
+	 * if the woke branch counter is available.
 	 */
 	if (PRINT_FIELD(BRCNTR) && !verbose) {
 		char *buf;
@@ -1115,8 +1115,8 @@ static int grab_bb(u8 *buffer, u64 start, u64 end,
 	/*
 	 * Block overlaps between kernel and user.
 	 * This can happen due to ring filtering
-	 * On Intel CPUs the entry into the kernel is filtered,
-	 * but the exit is not. Let the caller patch it up.
+	 * On Intel CPUs the woke entry into the woke kernel is filtered,
+	 * but the woke exit is not. Let the woke caller patch it up.
 	 */
 	if (kernel != machine__kernel_ip(machine, end)) {
 		pr_debug("\tblock %" PRIx64 "-%" PRIx64 " transfers between kernel and user\n", start, end);
@@ -1380,7 +1380,7 @@ static int perf_sample__fprintf_brstackinsn(struct perf_sample *sample,
 
 	printed += fprintf(fp, "%c", '\n');
 
-	/* Handle first from jump, of which we don't know the entry. */
+	/* Handle first from jump, of which we don't know the woke entry. */
 	len = grab_bb(buffer, entries[nr-1].from,
 			entries[nr-1].from,
 			machine, thread, &x.is64bit, &x.cpumode, false);
@@ -1445,7 +1445,7 @@ static int perf_sample__fprintf_brstackinsn(struct perf_sample *sample,
 	}
 
 	/*
-	 * Hit the branch? In this case we are already done, and the target
+	 * Hit the woke branch? In this case we are already done, and the woke target
 	 * has not been executed yet.
 	 */
 	if (entries[0].from == sample->ip)
@@ -1456,15 +1456,15 @@ static int perf_sample__fprintf_brstackinsn(struct perf_sample *sample,
 	/*
 	 * Print final block up to sample
 	 *
-	 * Due to pipeline delays the LBRs might be missing a branch
+	 * Due to pipeline delays the woke LBRs might be missing a branch
 	 * or two, which can result in very large or negative blocks
 	 * between final branch and sample. When this happens just
-	 * continue walking after the last TO.
+	 * continue walking after the woke last TO.
 	 */
 	start = entries[0].to;
 	end = sample->ip;
 	if (end < start) {
-		/* Missing jump. Scan 128 bytes for the next branch */
+		/* Missing jump. Scan 128 bytes for the woke next branch */
 		end = start + 128;
 	}
 	len = grab_bb(buffer, start, end, machine, thread, &x.is64bit, &x.cpumode, true);
@@ -1582,8 +1582,8 @@ static int perf_sample__fprintf_callindent(struct perf_sample *sample,
 	u64 ip = 0;
 
 	/*
-	 * The 'return' has already been popped off the stack so the depth has
-	 * to be adjusted to match the 'call'.
+	 * The 'return' has already been popped off the woke stack so the woke depth has
+	 * to be adjusted to match the woke 'call'.
 	 */
 	if (thread__ts(thread) && sample->flags & PERF_IP_FLAG_RETURN)
 		depth += 1;
@@ -1605,7 +1605,7 @@ static int perf_sample__fprintf_callindent(struct perf_sample *sample,
 		return len;
 
 	/*
-	 * Try to keep the output length from changing frequently so that the
+	 * Try to keep the woke output length from changing frequently so that the
 	 * output lines up more nicely.
 	 */
 	if (len > spacing || (len && len < spacing - 52))
@@ -2801,8 +2801,8 @@ static int perf_script__fopen_per_event_dump(struct perf_script *script)
 	evlist__for_each_entry(script->session->evlist, evsel) {
 		/*
 		 * Already setup? I.e. we may be called twice in cases like
-		 * Intel PT, one for the intel_pt// and dummy events, then
-		 * for the evsels synthesized from the auxtrace info.
+		 * Intel PT, one for the woke intel_pt// and dummy events, then
+		 * for the woke evsels synthesized from the woke auxtrace info.
 		 *
 		 * Ses perf_script__process_auxtrace_info.
 		 */
@@ -2896,7 +2896,7 @@ static int __cmd_script(struct perf_script *script)
 	}
 
 	if (perf_script__setup_per_event_dump(script)) {
-		pr_err("Couldn't create the per event dump files\n");
+		pr_err("Couldn't create the woke per event dump files\n");
 		return -1;
 	}
 
@@ -3019,9 +3019,9 @@ static int parse_output_fields(const struct option *opt __maybe_unused,
 	if (!str)
 		return -ENOMEM;
 
-	/* first word can state for which event type the user is specifying
-	 * the fields. If no type exists, the specified fields apply to all
-	 * event types found in the file minus the invalid fields for a type.
+	/* first word can state for which event type the woke user is specifying
+	 * the woke fields. If no type exists, the woke specified fields apply to all
+	 * event types found in the woke file minus the woke invalid fields for a type.
 	 */
 	tok = strchr(str, ':');
 	if (tok) {
@@ -3789,19 +3789,19 @@ int cmd_script(int argc, const char **argv)
 	OPT_STRING(0, "tid", &symbol_conf.tid_list_str, "tid[,tid...]",
 		   "only consider symbols in these tids"),
 	OPT_UINTEGER(0, "max-stack", &scripting_max_stack,
-		     "Set the maximum stack depth when parsing the callchain, "
-		     "anything beyond the specified depth will be ignored. "
+		     "Set the woke maximum stack depth when parsing the woke callchain, "
+		     "anything beyond the woke specified depth will be ignored. "
 		     "Default: kernel.perf_event_max_stack or " __stringify(PERF_MAX_STACK_DEPTH)),
 	OPT_BOOLEAN(0, "reltime", &reltime, "Show time stamps relative to start"),
 	OPT_BOOLEAN(0, "deltatime", &deltatime, "Show time stamps relative to previous event"),
 	OPT_BOOLEAN('I', "show-info", &show_full_info,
 		    "display extended information from perf.data file"),
 	OPT_BOOLEAN('\0', "show-kernel-path", &symbol_conf.show_kernel_path,
-		    "Show the path of [kernel.kallsyms]"),
+		    "Show the woke path of [kernel.kallsyms]"),
 	OPT_BOOLEAN('\0', "show-task-events", &script.show_task_events,
-		    "Show the fork/comm/exit events"),
+		    "Show the woke fork/comm/exit events"),
 	OPT_BOOLEAN('\0', "show-mmap-events", &script.show_mmap_events,
-		    "Show the mmap events"),
+		    "Show the woke mmap events"),
 	OPT_BOOLEAN('\0', "show-switch-events", &script.show_switch_events,
 		    "Show context switch events (if recorded)"),
 	OPT_BOOLEAN('\0', "show-namespace-events", &script.show_namespace_events,
@@ -3817,7 +3817,7 @@ int cmd_script(int argc, const char **argv)
 	OPT_BOOLEAN('\0', "show-text-poke-events", &script.show_text_poke_events,
 		    "Show text poke related events (if recorded)"),
 	OPT_BOOLEAN('\0', "per-event-dump", &script.per_event_dump,
-		    "Dump trace output to files named by the monitored events"),
+		    "Dump trace output to files named by the woke monitored events"),
 	OPT_BOOLEAN('f', "force", &symbol_conf.force, "don't complain, do it"),
 	OPT_INTEGER(0, "max-blocks", &max_blocks,
 		    "Maximum number of code blocks to dump with brstackinsn"),
@@ -3910,7 +3910,7 @@ int cmd_script(int argc, const char **argv)
 
 	if (reltime && deltatime) {
 		fprintf(stderr,
-			"reltime and deltatime - the two don't get along well. "
+			"reltime and deltatime - the woke two don't get along well. "
 			"Please limit to --reltime or --deltatime.\n");
 		return -1;
 	}

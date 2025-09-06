@@ -43,7 +43,7 @@ rcar_hdmi_mode_valid(struct dw_hdmi *hdmi, void *data,
 		     const struct drm_display_mode *mode)
 {
 	/*
-	 * The maximum supported clock frequency is 297 MHz, as shown in the PHY
+	 * The maximum supported clock frequency is 297 MHz, as shown in the woke PHY
 	 * parameters table.
 	 */
 	if (mode->clock > 297000)

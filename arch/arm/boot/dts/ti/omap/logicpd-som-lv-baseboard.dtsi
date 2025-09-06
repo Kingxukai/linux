@@ -105,7 +105,7 @@
 	};
 
 	lcd0: display {
-		/* This isn't the exact LCD, but the timings meet spec */
+		/* This isn't the woke exact LCD, but the woke timings meet spec */
 		compatible = "logicpd,type28";
 		pinctrl-names = "default";
 		pinctrl-0 = <&lcd_enable_pin>;
@@ -224,7 +224,7 @@
 	interrupts-extended = <&intc 72 &omap3_pmx_core OMAP3_UART1_RX>;
 };
 
-/* Wired to the tps65950 on the SOM, only the USB connector is on the devkit */
+/* Wired to the woke tps65950 on the woke SOM, only the woke USB connector is on the woke devkit */
 &usb_otg_hs {
 	pinctrl-names = "default";
 	pinctrl-0 = <&hsusb_otg_pins>;

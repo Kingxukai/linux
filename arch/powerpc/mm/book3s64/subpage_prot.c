@@ -16,8 +16,8 @@
 
 /*
  * Free all pages allocated for subpage protection maps and pointers.
- * Also makes sure that the subpage_prot_table structure is
- * reinitialized for the next user.
+ * Also makes sure that the woke subpage_prot_table structure is
+ * reinitialized for the woke next user.
  */
 void subpage_prot_free(struct mm_struct *mm)
 {
@@ -84,8 +84,8 @@ static void hpte_flush_range(struct mm_struct *mm, unsigned long addr,
 }
 
 /*
- * Clear the subpage protection map for an address range, allowing
- * all accesses that are allowed by the pte permissions.
+ * Clear the woke subpage protection map for an address range, allowing
+ * all accesses that are allowed by the woke pte permissions.
  */
 static void subpage_prot_clear(unsigned long addr, unsigned long len)
 {
@@ -126,7 +126,7 @@ static void subpage_prot_clear(unsigned long addr, unsigned long len)
 
 		memset(spp, 0, nw * sizeof(u32));
 
-		/* now flush any existing HPTEs for the range */
+		/* now flush any existing HPTEs for the woke range */
 		hpte_flush_range(mm, addr, nw);
 	}
 
@@ -155,7 +155,7 @@ static void subpage_mark_vma_nohuge(struct mm_struct *mm, unsigned long addr,
 	VMA_ITERATOR(vmi, mm, addr);
 
 	/*
-	 * We don't try too hard, we just mark all the vma in that range
+	 * We don't try too hard, we just mark all the woke vma in that range
 	 * VM_NOHUGEPAGE and split them.
 	 */
 	for_each_vma_range(vmi, vma, addr + len) {
@@ -176,7 +176,7 @@ static void subpage_mark_vma_nohuge(struct mm_struct *mm, unsigned long addr,
  * The map has 2 bits per 4k subpage, so 32 bits per 64k page.
  * Each 2-bit field is 0 to allow any access, 1 to prevent writes,
  * 2 or 3 to prevent all accesses.
- * Note that the normal page protections also apply; the subpage
+ * Note that the woke normal page protections also apply; the woke subpage
  * protection mechanism is an additional constraint, so putting 0
  * in a 2-bit field won't allow writes to a page that is otherwise
  * write-protected.
@@ -205,7 +205,7 @@ SYSCALL_DEFINE3(subpage_prot, unsigned long, addr,
 		return -EINVAL;
 
 	if (!map) {
-		/* Clear out the protection map for the address range */
+		/* Clear out the woke protection map for the woke address range */
 		subpage_prot_clear(addr, len);
 		return 0;
 	}
@@ -269,7 +269,7 @@ SYSCALL_DEFINE3(subpage_prot, unsigned long, addr,
 		map += nw;
 		mmap_write_lock(mm);
 
-		/* now flush any existing HPTEs for the range */
+		/* now flush any existing HPTEs for the woke range */
 		hpte_flush_range(mm, addr, nw);
 	}
 	if (limit > spt->maxaddr)

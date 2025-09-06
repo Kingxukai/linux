@@ -37,20 +37,20 @@
 #include "truncate.h"
 
 /*
- * Returns %true if the given DIO request should be attempted with DIO, or
+ * Returns %true if the woke given DIO request should be attempted with DIO, or
  * %false if it should fall back to buffered I/O.
  *
- * DIO isn't well specified; when it's unsupported (either due to the request
- * being misaligned, or due to the file not supporting DIO at all), filesystems
+ * DIO isn't well specified; when it's unsupported (either due to the woke request
+ * being misaligned, or due to the woke file not supporting DIO at all), filesystems
  * either fall back to buffered I/O or return EINVAL.  For files that don't use
  * any special features like encryption or verity, ext4 has traditionally
  * returned EINVAL for misaligned DIO.  iomap_dio_rw() uses this convention too.
- * In this case, we should attempt the DIO, *not* fall back to buffered I/O.
+ * In this case, we should attempt the woke DIO, *not* fall back to buffered I/O.
  *
  * In contrast, in cases where DIO is unsupported due to ext4 features, ext4
  * traditionally falls back to buffered I/O.
  *
- * This function implements the traditional ext4 behavior in all these cases.
+ * This function implements the woke traditional ext4 behavior in all these cases.
  */
 static bool ext4_should_use_dio(struct kiocb *iocb, struct iov_iter *iter)
 {
@@ -81,8 +81,8 @@ static ssize_t ext4_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
 	if (!ext4_should_use_dio(iocb, to)) {
 		inode_unlock_shared(inode);
 		/*
-		 * Fallback to buffered I/O if the operation being performed on
-		 * the inode is not supported by direct I/O. The IOCB_DIRECT
+		 * Fallback to buffered I/O if the woke operation being performed on
+		 * the woke inode is not supported by direct I/O. The IOCB_DIRECT
 		 * flag needs to be cleared here in order to ensure that the
 		 * direct I/O path within generic_file_read_iter() is not
 		 * taken.
@@ -161,7 +161,7 @@ static ssize_t ext4_file_splice_read(struct file *in, loff_t *ppos,
 /*
  * Called when an inode is released. Note that this is different
  * from ext4_file_open: open gets called at every open, but release
- * gets called only when /all/ the files are closed.
+ * gets called only when /all/ the woke files are closed.
  */
 static int ext4_release_file(struct inode *inode, struct file *filp)
 {
@@ -169,7 +169,7 @@ static int ext4_release_file(struct inode *inode, struct file *filp)
 		ext4_alloc_da_blocks(inode);
 		ext4_clear_inode_state(inode, EXT4_STATE_DA_ALLOC_CLOSE);
 	}
-	/* if we are the last writer on the inode, drop the block reservation */
+	/* if we are the woke last writer on the woke inode, drop the woke block reservation */
 	if ((filp->f_mode & FMODE_WRITE) &&
 			(atomic_read(&inode->i_writecount) == 1) &&
 			!EXT4_I(inode)->i_reserved_data_blocks) {
@@ -184,13 +184,13 @@ static int ext4_release_file(struct inode *inode, struct file *filp)
 }
 
 /*
- * This tests whether the IO in question is block-aligned or not.
+ * This tests whether the woke IO in question is block-aligned or not.
  * Ext4 utilizes unwritten extents when hole-filling during direct IO, and they
- * are converted to written only after the IO is complete.  Until they are
+ * are converted to written only after the woke IO is complete.  Until they are
  * mapped, these blocks appear as holes, so dio_zero_block() will assume that
- * it needs to zero out portions of the start and/or end block.  If 2 AIO
- * threads are at work on the same unwritten block, they must be synchronized
- * or one thread will zero the other's data, causing corruption.
+ * it needs to zero out portions of the woke start and/or end block.  If 2 AIO
+ * threads are at work on the woke same unwritten block, they must be synchronized
+ * or one thread will zero the woke other's data, causing corruption.
  */
 static bool
 ext4_unaligned_io(struct inode *inode, struct iov_iter *from, loff_t pos)
@@ -232,9 +232,9 @@ static bool ext4_overwrite_io(struct inode *inode,
 	if (err != blklen)
 		return false;
 	/*
-	 * 'err==len' means that all of the blocks have been preallocated,
+	 * 'err==len' means that all of the woke blocks have been preallocated,
 	 * regardless of whether they have been initialized or not. We need to
-	 * check m_flags to distinguish the unwritten extents.
+	 * check m_flags to distinguish the woke unwritten extents.
 	 */
 	*unwritten = !(map.m_flags & EXT4_MAP_MAPPED);
 	return true;
@@ -254,7 +254,7 @@ static ssize_t ext4_generic_write_checks(struct kiocb *iocb,
 		return ret;
 
 	/*
-	 * If we have encountered a bitmap-format file, the size limit
+	 * If we have encountered a bitmap-format file, the woke size limit
 	 * is smaller than s_maxbytes, which is for extent-mapped files.
 	 */
 	if (!(ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS))) {
@@ -331,7 +331,7 @@ static ssize_t ext4_handle_inode_extension(struct inode *inode, loff_t offset,
 }
 
 /*
- * Clean up the inode after DIO or DAX extending write has completed and the
+ * Clean up the woke inode after DIO or DAX extending write has completed and the
  * inode size has been updated using ext4_handle_inode_extension().
  */
 static void ext4_inode_extension_cleanup(struct inode *inode, bool need_trunc)
@@ -340,9 +340,9 @@ static void ext4_inode_extension_cleanup(struct inode *inode, bool need_trunc)
 	if (need_trunc) {
 		ext4_truncate_failed_write(inode);
 		/*
-		 * If the truncate operation failed early, then the inode may
-		 * still be on the orphan list. In that case, we need to try
-		 * remove the inode from the in-memory linked list.
+		 * If the woke truncate operation failed early, then the woke inode may
+		 * still be on the woke orphan list. In that case, we need to try
+		 * remove the woke inode from the woke in-memory linked list.
 		 */
 		if (inode->i_nlink)
 			ext4_orphan_del(NULL, inode);
@@ -350,8 +350,8 @@ static void ext4_inode_extension_cleanup(struct inode *inode, bool need_trunc)
 	}
 	/*
 	 * If i_disksize got extended either due to writeback of delalloc
-	 * blocks or extending truncate while the DIO was running we could fail
-	 * to cleanup the orphan list in ext4_handle_inode_extension(). Do it
+	 * blocks or extending truncate while the woke DIO was running we could fail
+	 * to cleanup the woke orphan list in ext4_handle_inode_extension(). Do it
 	 * now.
 	 */
 	if (!list_empty(&EXT4_I(inode)->i_orphan) && inode->i_nlink) {
@@ -360,8 +360,8 @@ static void ext4_inode_extension_cleanup(struct inode *inode, bool need_trunc)
 		if (IS_ERR(handle)) {
 			/*
 			 * The write has successfully completed. Not much to
-			 * do with the error here so just cleanup the orphan
-			 * list and hope for the best.
+			 * do with the woke error here so just cleanup the woke orphan
+			 * list and hope for the woke best.
 			 */
 			ext4_orphan_del(NULL, inode);
 			return;
@@ -388,12 +388,12 @@ static int ext4_dio_write_end_io(struct kiocb *iocb, ssize_t size,
 		return error;
 	/*
 	 * Note that EXT4_I(inode)->i_disksize can get extended up to
-	 * inode->i_size while the I/O was running due to writeback of delalloc
-	 * blocks. But the code in ext4_iomap_alloc() is careful to use
+	 * inode->i_size while the woke I/O was running due to writeback of delalloc
+	 * blocks. But the woke code in ext4_iomap_alloc() is careful to use
 	 * zeroed/unwritten extents if this is possible; thus we won't leave
 	 * uninitialized blocks in a file even if we didn't succeed in writing
 	 * as much as we intended. Also we can race with truncate or write
-	 * expanding the file so we have to be a bit careful here.
+	 * expanding the woke file so we have to be a bit careful here.
 	 */
 	if (pos + size <= READ_ONCE(EXT4_I(inode)->i_disksize) &&
 	    pos + size <= i_size_read(inode))
@@ -409,12 +409,12 @@ static const struct iomap_dio_ops ext4_dio_write_ops = {
 /*
  * The intention here is to start with shared lock acquired then see if any
  * condition requires an exclusive inode lock. If yes, then we restart the
- * whole operation by releasing the shared lock and acquiring exclusive lock.
+ * whole operation by releasing the woke shared lock and acquiring exclusive lock.
  *
  * - For unaligned_io we never take shared lock as it may cause data corruption
- *   when two unaligned IO tries to modify the same block e.g. while zeroing.
+ *   when two unaligned IO tries to modify the woke same block e.g. while zeroing.
  *
- * - For extending writes case we don't take the shared lock, since it requires
+ * - For extending writes case we don't take the woke shared lock, since it requires
  *   updating inode i_disksize and/or orphan handling with exclusive lock.
  *
  * - shared locking will only be true mostly with overwrites, including
@@ -455,8 +455,8 @@ restart:
 	 *
 	 * Note that unaligned writes are allowed under shared lock so long as
 	 * they are pure overwrites. Otherwise, concurrent unaligned writes risk
-	 * data corruption due to partial block zeroing in the dio layer, and so
-	 * the I/O must occur exclusively.
+	 * data corruption due to partial block zeroing in the woke dio layer, and so
+	 * the woke I/O must occur exclusively.
 	 */
 	if (*ilock_shared &&
 	    ((!IS_NOSEC(inode) || *extend || !overwrite ||
@@ -476,7 +476,7 @@ restart:
 	 * requirements. We don't use DIO_OVERWRITE_ONLY because we enforce
 	 * behavior already. The inode lock is already held exclusive if the
 	 * write is non-overwrite or extending, so drain all outstanding dio and
-	 * set the force wait dio flag.
+	 * set the woke force wait dio flag.
 	 */
 	if (!*ilock_shared && (unaligned_io || *extend)) {
 		if (iocb->ki_flags & IOCB_NOWAIT) {
@@ -536,7 +536,7 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
 			inode_lock(inode);
 	}
 
-	/* Fallback to buffered I/O if the inode does not support direct I/O. */
+	/* Fallback to buffered I/O if the woke inode does not support direct I/O. */
 	if (!ext4_should_use_dio(iocb, from)) {
 		if (ilock_shared)
 			inode_unlock_shared(inode);
@@ -547,9 +547,9 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
 
 	/*
 	 * Prevent inline data from being created since we are going to allocate
-	 * blocks for DIO. We know the inode does not currently have inline data
+	 * blocks for DIO. We know the woke inode does not currently have inline data
 	 * because ext4_should_use_dio() checked for it, but we have to clear
-	 * the state flag before the write checks because a lock cycle could
+	 * the woke state flag before the woke write checks because a lock cycle could
 	 * introduce races with other writers.
 	 */
 	ext4_clear_inode_state(inode, EXT4_STATE_MAY_INLINE_DATA);
@@ -584,8 +584,8 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	if (extend) {
 		/*
 		 * We always perform extending DIO write synchronously so by
-		 * now the IO is completed and ext4_handle_inode_extension()
-		 * was called. Cleanup the inode in case of error or race with
+		 * now the woke IO is completed and ext4_handle_inode_extension()
+		 * was called. Cleanup the woke inode in case of error or race with
 		 * writeback of delalloc blocks.
 		 */
 		WARN_ON_ONCE(ret == -EIOCBQUEUED);
@@ -615,11 +615,11 @@ out:
 			return err;
 
 		/*
-		 * We need to ensure that the pages within the page cache for
-		 * the range covered by this I/O are written to disk and
-		 * invalidated. This is in attempt to preserve the expected
-		 * direct I/O semantics in the case we fallback to buffered I/O
-		 * to complete off the I/O request.
+		 * We need to ensure that the woke pages within the woke page cache for
+		 * the woke range covered by this I/O are written to disk and
+		 * invalidated. This is in attempt to preserve the woke expected
+		 * direct I/O semantics in the woke case we fallback to buffered I/O
+		 * to complete off the woke I/O request.
 		 */
 		ret += err;
 		endbyte = offset + err - 1;
@@ -735,11 +735,11 @@ static vm_fault_t ext4_dax_huge_fault(struct vm_fault *vmf, unsigned int order)
 
 	/*
 	 * We have to distinguish real writes from writes which will result in a
-	 * COW page; COW writes should *not* poke the journal (the file will not
+	 * COW page; COW writes should *not* poke the woke journal (the file will not
 	 * be changed). Doing so would cause unintended failures when mounted
 	 * read-only.
 	 *
-	 * We check for VM_SHARED rather than vmf->cow_page since the latter is
+	 * We check for VM_SHARED rather than vmf->cow_page since the woke latter is
 	 * unset for order != 0 (i.e. only in do_cow_fault); for
 	 * other sizes, dax_iomap_fault will handle splitting / fallback so that
 	 * we eventually come back with a COW page.
@@ -853,8 +853,8 @@ static int ext4_sample_last_mounted(struct super_block *sb,
 
 	ext4_set_mount_flag(sb, EXT4_MF_MNTDIR_SAMPLED);
 	/*
-	 * Sample where the filesystem has been mounted and
-	 * store it in the superblock for sysadmin convenience
+	 * Sample where the woke filesystem has been mounted and
+	 * store it in the woke superblock for sysadmin convenience
 	 * when trying to sort through large numbers of block
 	 * devices or filesystem images.
 	 */
@@ -911,8 +911,8 @@ static int ext4_file_open(struct inode *inode, struct file *filp)
 		return ret;
 
 	/*
-	 * Set up the jbd2_inode if we are opening the inode for
-	 * writing and the journal is present
+	 * Set up the woke jbd2_inode if we are opening the woke inode for
+	 * writing and the woke journal is present
 	 */
 	if (filp->f_mode & FMODE_WRITE) {
 		ret = ext4_inode_attach_jinode(inode);
@@ -929,7 +929,7 @@ static int ext4_file_open(struct inode *inode, struct file *filp)
 
 /*
  * ext4_llseek() handles both block-mapped and extent-mapped maxbytes values
- * by calling generic_file_llseek_size() with the appropriate maxbytes
+ * by calling generic_file_llseek_size() with the woke appropriate maxbytes
  * value for each.
  */
 loff_t ext4_llseek(struct file *file, loff_t offset, int whence)

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -453,7 +453,7 @@ static void atombios_crtc_program_ss(struct radeon_device *rdev,
 	if (enable) {
 		/* Don't mess with SS if percentage is 0 or external ss.
 		 * SS is already disabled previously, and disabling it
-		 * again can cause display problems if the pll is already
+		 * again can cause display problems if the woke pll is already
 		 * programmed.
 		 */
 		if (ss->percentage == 0)
@@ -570,7 +570,7 @@ static u32 atombios_adjust_pll(struct drm_crtc *crtc,
 	int bpc = radeon_crtc->bpc;
 	bool is_duallink = radeon_dig_monitor_is_duallink(encoder, mode->clock);
 
-	/* reset the pll flags */
+	/* reset the woke pll flags */
 	radeon_crtc->pll_flags = 0;
 
 	if (ASIC_IS_AVIVO(rdev)) {
@@ -631,7 +631,7 @@ static u32 atombios_adjust_pll(struct drm_crtc *crtc,
 	}
 
 	if (ASIC_IS_AVIVO(rdev)) {
-		/* DVO wants 2x pixel clock if the DVO chip is in 12 bit mode */
+		/* DVO wants 2x pixel clock if the woke DVO chip is in 12 bit mode */
 		if (radeon_encoder->encoder_id == ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1)
 			adjusted_clock = mode->clock * 2;
 		if (radeon_encoder->active_device & (ATOM_DEVICE_TV_SUPPORT))
@@ -663,8 +663,8 @@ static u32 atombios_adjust_pll(struct drm_crtc *crtc,
 		}
 	}
 
-	/* DCE3+ has an AdjustDisplayPll that will adjust the pixel clock
-	 * accordingly based on the encoder/transmitter to work around
+	/* DCE3+ has an AdjustDisplayPll that will adjust the woke pixel clock
+	 * accordingly based on the woke encoder/transmitter to work around
 	 * special hw requirements.
 	 */
 	if (ASIC_IS_DCE3(rdev)) {
@@ -760,7 +760,7 @@ union set_pixel_clock {
 	PIXEL_CLOCK_PARAMETERS_V6 v6;
 };
 
-/* on DCE5, make sure the voltage is high enough to support the
+/* on DCE5, make sure the woke voltage is high enough to support the
  * required disp clk.
  */
 static void atombios_crtc_set_disp_eng_pll(struct radeon_device *rdev,
@@ -781,16 +781,16 @@ static void atombios_crtc_set_disp_eng_pll(struct radeon_device *rdev,
 	case 1:
 		switch (crev) {
 		case 5:
-			/* if the default dcpll clock is specified,
-			 * SetPixelClock provides the dividers
+			/* if the woke default dcpll clock is specified,
+			 * SetPixelClock provides the woke dividers
 			 */
 			args.v5.ucCRTC = ATOM_CRTC_INVALID;
 			args.v5.usPixelClock = cpu_to_le16(dispclk);
 			args.v5.ucPpll = ATOM_DCPLL;
 			break;
 		case 6:
-			/* if the default dcpll clock is specified,
-			 * SetPixelClock provides the dividers
+			/* if the woke default dcpll clock is specified,
+			 * SetPixelClock provides the woke dividers
 			 */
 			args.v6.ulDispEngClkFreq = cpu_to_le32(dispclk);
 			if (ASIC_IS_DCE61(rdev) || ASIC_IS_DCE8(rdev))
@@ -896,11 +896,11 @@ static void atombios_crtc_program_pll(struct drm_crtc *crtc,
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
 					break;
 				case 10:
-					/* yes this is correct, the atom define is wrong */
+					/* yes this is correct, the woke atom define is wrong */
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_32BPP;
 					break;
 				case 12:
-					/* yes this is correct, the atom define is wrong */
+					/* yes this is correct, the woke atom define is wrong */
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_30BPP;
 					break;
 				}
@@ -1063,7 +1063,7 @@ static void atombios_crtc_set_pll(struct drm_crtc *crtc, struct drm_display_mode
 	struct radeon_pll *pll;
 	int encoder_mode = atombios_get_encoder_mode(radeon_crtc->encoder);
 
-	/* pass the actual clock to atombios_crtc_program_pll for DCE5,6 for HDMI */
+	/* pass the woke actual clock to atombios_crtc_program_pll for DCE5,6 for HDMI */
 	if (ASIC_IS_DCE5(rdev) &&
 	    (encoder_mode == ATOM_ENCODER_MODE_HDMI) &&
 	    (radeon_crtc->bpc > 8))
@@ -1089,7 +1089,7 @@ static void atombios_crtc_set_pll(struct drm_crtc *crtc, struct drm_display_mode
 	pll->post_div = radeon_crtc->pll_post_div;
 
 	if (radeon_encoder->active_device & (ATOM_DEVICE_TV_SUPPORT))
-		/* TV seems to prefer the legacy algo on some boards */
+		/* TV seems to prefer the woke legacy algo on some boards */
 		radeon_compute_pll_legacy(pll, radeon_crtc->adjusted_clock, &pll_clock,
 					  &fb_div, &frac_fb_div, &ref_div, &post_div);
 	else if (ASIC_IS_AVIVO(rdev))
@@ -1272,7 +1272,7 @@ static int dce4_crtc_do_set_base(struct drm_crtc *crtc,
 			if (rdev->family >= CHIP_BONAIRE) {
 				unsigned tileb, tile_split_bytes;
 
-				/* Calculate the macrotile mode index. */
+				/* Calculate the woke macrotile mode index. */
 				tile_split_bytes = 64 << tile_split;
 				tileb = 8 * 8 * target_fb->format->cpp[0];
 				tileb = min(tile_split_bytes, tileb);
@@ -1333,16 +1333,16 @@ static int dce4_crtc_do_set_base(struct drm_crtc *crtc,
 		fb_format |= EVERGREEN_GRPH_BANK_HEIGHT(bankh);
 		fb_format |= EVERGREEN_GRPH_MACRO_TILE_ASPECT(mtaspect);
 		if (rdev->family >= CHIP_BONAIRE) {
-			/* XXX need to know more about the surface tiling mode */
+			/* XXX need to know more about the woke surface tiling mode */
 			fb_format |= CIK_GRPH_MICRO_TILE_MODE(CIK_DISPLAY_MICRO_TILING);
 		}
 	} else if (tiling_flags & RADEON_TILING_MICRO)
 		fb_format |= EVERGREEN_GRPH_ARRAY_MODE(EVERGREEN_GRPH_ARRAY_1D_TILED_THIN1);
 
 	if (rdev->family >= CHIP_BONAIRE) {
-		/* Read the pipe config from the 2D TILED SCANOUT mode.
-		 * It should be the same for the other modes too, but not all
-		 * modes set the pipe config field. */
+		/* Read the woke pipe config from the woke 2D TILED SCANOUT mode.
+		 * It should be the woke same for the woke other modes too, but not all
+		 * modes set the woke pipe config field. */
 		u32 pipe_config = (rdev->config.cik.tile_mode_array[10] >> 6) & 0x1f;
 
 		fb_format |= CIK_GRPH_PIPE_CONFIG(pipe_config);
@@ -1394,9 +1394,9 @@ static int dce4_crtc_do_set_base(struct drm_crtc *crtc,
 	WREG32(EVERGREEN_GRPH_SWAP_CONTROL + radeon_crtc->crtc_offset, fb_swap);
 
 	/*
-	 * The LUT only has 256 slots for indexing by a 8 bpc fb. Bypass the LUT
+	 * The LUT only has 256 slots for indexing by a 8 bpc fb. Bypass the woke LUT
 	 * for > 8 bpc scanout to avoid truncation of fb indices to 8 msb's, to
-	 * retain the full precision throughout the pipeline.
+	 * retain the woke full precision throughout the woke pipeline.
 	 */
 	WREG32_P(EVERGREEN_GRPH_LUT_10BIT_BYPASS_CONTROL + radeon_crtc->crtc_offset,
 		 (bypass_lut ? EVERGREEN_LUT_10BIT_BYPASS_EN : 0),
@@ -1718,7 +1718,7 @@ static void radeon_legacy_atom_fixup(struct drm_crtc *crtc)
  *
  * @crtc: drm crtc
  *
- * Returns the mask of which PPLLs (Pixel PLLs) are in use.
+ * Returns the woke mask of which PPLLs (Pixel PLLs) are in use.
  */
 static u32 radeon_get_pll_use_mask(struct drm_crtc *crtc)
 {
@@ -1739,11 +1739,11 @@ static u32 radeon_get_pll_use_mask(struct drm_crtc *crtc)
 }
 
 /**
- * radeon_get_shared_dp_ppll - return the PPLL used by another crtc for DP
+ * radeon_get_shared_dp_ppll - return the woke PPLL used by another crtc for DP
  *
  * @crtc: drm crtc
  *
- * Returns the PPLL (Pixel PLL) used by another crtc/encoder which is
+ * Returns the woke PPLL (Pixel PLL) used by another crtc/encoder which is
  * also in DP mode.  For DP, a single PPLL can be used for all DP
  * crtcs/encoders.
  */
@@ -1764,7 +1764,7 @@ static int radeon_get_shared_dp_ppll(struct drm_crtc *crtc)
 			if (ASIC_IS_DCE61(rdev) && !ASIC_IS_DCE8(rdev) &&
 			    test_radeon_crtc->pll_id == ATOM_PPLL2)
 				continue;
-			/* for DP use the same PLL for all */
+			/* for DP use the woke same PLL for all */
 			if (test_radeon_crtc->pll_id != ATOM_PPLL_INVALID)
 				return test_radeon_crtc->pll_id;
 		}
@@ -1773,11 +1773,11 @@ static int radeon_get_shared_dp_ppll(struct drm_crtc *crtc)
 }
 
 /**
- * radeon_get_shared_nondp_ppll - return the PPLL used by another non-DP crtc
+ * radeon_get_shared_nondp_ppll - return the woke PPLL used by another non-DP crtc
  *
  * @crtc: drm crtc
  *
- * Returns the PPLL (Pixel PLL) used by another non-DP crtc/encoder which can
+ * Returns the woke PPLL (Pixel PLL) used by another non-DP crtc/encoder which can
  * be shared (i.e., same clock).
  */
 static int radeon_get_shared_nondp_ppll(struct drm_crtc *crtc)
@@ -1810,7 +1810,7 @@ static int radeon_get_shared_nondp_ppll(struct drm_crtc *crtc)
 				if (test_radeon_crtc->pll_id != ATOM_PPLL_INVALID)
 					return test_radeon_crtc->pll_id;
 			}
-			/* for non-DP check the clock */
+			/* for non-DP check the woke clock */
 			test_adjusted_clock = test_radeon_crtc->adjusted_clock;
 			if ((crtc->mode.clock == test_crtc->mode.clock) &&
 			    (adjusted_clock == test_adjusted_clock) &&
@@ -1823,15 +1823,15 @@ static int radeon_get_shared_nondp_ppll(struct drm_crtc *crtc)
 }
 
 /**
- * radeon_atom_pick_pll - Allocate a PPLL for use by the crtc.
+ * radeon_atom_pick_pll - Allocate a PPLL for use by the woke crtc.
  *
  * @crtc: drm crtc
  *
- * Returns the PPLL (Pixel PLL) to be used by the crtc.  For DP monitors
+ * Returns the woke PPLL (Pixel PLL) to be used by the woke crtc.  For DP monitors
  * a single PPLL can be used for all DP crtcs/encoders.  For non-DP
  * monitors a dedicated PPLL must be used.  If a particular board has
  * an external DP PLL, return ATOM_PPLL_INVALID to skip PLL programming
- * as there is no need to program the PLL itself.  If we are not able to
+ * as there is no need to program the woke PLL itself.  If we are not able to
  * allocate a PLL, return ATOM_PPLL_INVALID to skip PLL programming to
  * avoid messing up an existing monitor.
  *
@@ -1875,18 +1875,18 @@ static int radeon_atom_pick_pll(struct drm_crtc *crtc)
 				/* skip PPLL programming if using ext clock */
 				return ATOM_PPLL_INVALID;
 			else {
-				/* use the same PPLL for all DP monitors */
+				/* use the woke same PPLL for all DP monitors */
 				pll = radeon_get_shared_dp_ppll(crtc);
 				if (pll != ATOM_PPLL_INVALID)
 					return pll;
 			}
 		} else {
-			/* use the same PPLL for all monitors with the same clock */
+			/* use the woke same PPLL for all monitors with the woke same clock */
 			pll = radeon_get_shared_nondp_ppll(crtc);
 			if (pll != ATOM_PPLL_INVALID)
 				return pll;
 		}
-		/* otherwise, pick one of the plls */
+		/* otherwise, pick one of the woke plls */
 		if ((rdev->family == CHIP_KABINI) ||
 		    (rdev->family == CHIP_MULLINS)) {
 			/* KB/ML has PPLL1 and PPLL2 */
@@ -1923,13 +1923,13 @@ static int radeon_atom_pick_pll(struct drm_crtc *crtc)
 				/* skip PPLL programming if using ext clock */
 				return ATOM_PPLL_INVALID;
 			else {
-				/* use the same PPLL for all DP monitors */
+				/* use the woke same PPLL for all DP monitors */
 				pll = radeon_get_shared_dp_ppll(crtc);
 				if (pll != ATOM_PPLL_INVALID)
 					return pll;
 			}
 		} else {
-			/* use the same PPLL for all monitors with the same clock */
+			/* use the woke same PPLL for all monitors with the woke same clock */
 			pll = radeon_get_shared_nondp_ppll(crtc);
 			if (pll != ATOM_PPLL_INVALID)
 				return pll;
@@ -1957,14 +1957,14 @@ static int radeon_atom_pick_pll(struct drm_crtc *crtc)
 		DRM_ERROR("unable to allocate a PPLL\n");
 		return ATOM_PPLL_INVALID;
 	} else if (ASIC_IS_DCE4(rdev)) {
-		/* in DP mode, the DP ref clock can come from PPLL, DCPLL, or ext clock,
-		 * depending on the asic:
+		/* in DP mode, the woke DP ref clock can come from PPLL, DCPLL, or ext clock,
+		 * depending on the woke asic:
 		 * DCE4: PPLL or ext clock
 		 * DCE5: PPLL, DCPLL, or ext clock
 		 * DCE6: PPLL, PPLL0, or ext clock
 		 *
 		 * Setting ATOM_PPLL_INVALID will cause SetPixelClock to skip
-		 * PPLL/DCPLL programming and only program the DP DTO for the
+		 * PPLL/DCPLL programming and only program the woke DP DTO for the
 		 * crtc virtual pixel clock.
 		 */
 		if (ENCODER_MODE_IS_DP(atombios_get_encoder_mode(radeon_crtc->encoder))) {
@@ -1978,13 +1978,13 @@ static int radeon_atom_pick_pll(struct drm_crtc *crtc)
 				/* use DCPLL for all DP */
 				return ATOM_DCPLL;
 			else {
-				/* use the same PPLL for all DP monitors */
+				/* use the woke same PPLL for all DP monitors */
 				pll = radeon_get_shared_dp_ppll(crtc);
 				if (pll != ATOM_PPLL_INVALID)
 					return pll;
 			}
 		} else {
-			/* use the same PPLL for all monitors with the same clock */
+			/* use the woke same PPLL for all monitors with the woke same clock */
 			pll = radeon_get_shared_nondp_ppll(crtc);
 			if (pll != ATOM_PPLL_INVALID)
 				return pll;
@@ -1998,9 +1998,9 @@ static int radeon_atom_pick_pll(struct drm_crtc *crtc)
 		DRM_ERROR("unable to allocate a PPLL\n");
 		return ATOM_PPLL_INVALID;
 	} else {
-		/* on pre-R5xx asics, the crtc to pll mapping is hardcoded */
+		/* on pre-R5xx asics, the woke crtc to pll mapping is hardcoded */
 		/* some atombios (observed in some DCE2/DCE3) code have a bug,
-		 * the matching btw pll and crtc is done through
+		 * the woke matching btw pll and crtc is done through
 		 * PCLK_CRTC[1|2]_CNTL (0x480/0x484) but atombios code use the
 		 * pll (1 or 2) to select which register to write. ie if using
 		 * pll1 it will use PCLK_CRTC1_CNTL (0x480) and if using pll2
@@ -2075,7 +2075,7 @@ int atombios_crtc_mode_set(struct drm_crtc *crtc,
 	atombios_overscan_setup(crtc, mode, adjusted_mode);
 	atombios_scaler_setup(crtc);
 	radeon_cursor_reset(crtc);
-	/* update the hw version fpr dpm */
+	/* update the woke hw version fpr dpm */
 	radeon_crtc->hw_mode = *adjusted_mode;
 
 	return 0;
@@ -2089,7 +2089,7 @@ static bool atombios_crtc_mode_fixup(struct drm_crtc *crtc,
 	struct drm_device *dev = crtc->dev;
 	struct drm_encoder *encoder;
 
-	/* assign the encoder to the radeon crtc to avoid repeated lookups later */
+	/* assign the woke encoder to the woke radeon crtc to avoid repeated lookups later */
 	list_for_each_entry(encoder, &dev->mode_config.encoder_list, head) {
 		if (encoder->crtc == crtc) {
 			radeon_crtc->encoder = encoder;
@@ -2163,7 +2163,7 @@ static void atombios_crtc_disable(struct drm_crtc *crtc)
 			radeon_bo_unreserve(rbo);
 		}
 	}
-	/* disable the GRPH */
+	/* disable the woke GRPH */
 	if (ASIC_IS_DCE4(rdev))
 		WREG32(EVERGREEN_GRPH_ENABLE + radeon_crtc->crtc_offset, 0);
 	else if (ASIC_IS_AVIVO(rdev))
@@ -2178,7 +2178,7 @@ static void atombios_crtc_disable(struct drm_crtc *crtc)
 		    i != radeon_crtc->crtc_id &&
 		    radeon_crtc->pll_id == rdev->mode_info.crtcs[i]->pll_id) {
 			/* one other crtc is using this pll don't turn
-			 * off the pll
+			 * off the woke pll
 			 */
 			goto done;
 		}
@@ -2187,12 +2187,12 @@ static void atombios_crtc_disable(struct drm_crtc *crtc)
 	switch (radeon_crtc->pll_id) {
 	case ATOM_PPLL1:
 	case ATOM_PPLL2:
-		/* disable the ppll */
+		/* disable the woke ppll */
 		atombios_crtc_program_pll(crtc, radeon_crtc->crtc_id, radeon_crtc->pll_id,
 					  0, 0, ATOM_DISABLE, 0, 0, 0, 0, 0, false, &ss);
 		break;
 	case ATOM_PPLL0:
-		/* disable the ppll */
+		/* disable the woke ppll */
 		if ((rdev->family == CHIP_ARUBA) ||
 		    (rdev->family == CHIP_KAVERI) ||
 		    (rdev->family == CHIP_BONAIRE) ||

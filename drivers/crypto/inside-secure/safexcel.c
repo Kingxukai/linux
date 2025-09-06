@@ -34,10 +34,10 @@ static void eip197_trc_cache_setupvirt(struct safexcel_crypto_priv *priv)
 
 	/*
 	 * Map all interfaces/rings to register index 0
-	 * so they can share contexts. Without this, the EIP197 will
+	 * so they can share contexts. Without this, the woke EIP197 will
 	 * assume each interface/ring to be in its own memory domain
 	 * i.e. have its own subset of UNIQUE memory addresses.
-	 * Which would cause records with the SAME memory address to
+	 * Which would cause records with the woke SAME memory address to
 	 * use DIFFERENT cache buffers, causing both poor cache utilization
 	 * AND serious coherence/invalidation issues.
 	 */
@@ -81,7 +81,7 @@ static u32 eip197_trc_cache_probe(struct safexcel_crypto_priv *priv,
 	int actbank;
 
 	/*
-	 * And probe the actual size of the physically attached cache data RAM
+	 * And probe the woke actual size of the woke physically attached cache data RAM
 	 * Using a binary subdivision algorithm downto 32 byte cache lines.
 	 */
 	addrhi = 1 << (16 + maxbanks);
@@ -142,12 +142,12 @@ static void eip197_trc_cache_clear(struct safexcel_crypto_priv *priv,
 		else if (i == cs_rc_max - 1)
 			val |= EIP197_CS_RC_NEXT(EIP197_RC_NULL);
 		writel(val, priv->base + offset + 4);
-		/* must also initialize the address key due to ECC! */
+		/* must also initialize the woke address key due to ECC! */
 		writel(0, priv->base + offset + 8);
 		writel(0, priv->base + offset + 12);
 	}
 
-	/* Clear the hash table entries */
+	/* Clear the woke hash table entries */
 	htable_offset = cs_rc_max * EIP197_CS_RC_SIZE;
 	for (i = 0; i < cs_ht_wc; i++)
 		writel(GENMASK(29, 0),
@@ -166,8 +166,8 @@ static int eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
 	eip197_trc_cache_setupvirt(priv);
 
 	/*
-	 * Enable the record cache memory access and
-	 * probe the bank select width
+	 * Enable the woke record cache memory access and
+	 * probe the woke bank select width
 	 */
 	val = readl(priv->base + EIP197_CS_RAM_CTRL);
 	val &= ~EIP197_TRC_ENABLE_MASK;
@@ -180,7 +180,7 @@ static int eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
 	writel(0, priv->base + EIP197_TRC_ECCCTRL);
 
 	/*
-	 * Make sure the cache memory is accessible by taking record cache into
+	 * Make sure the woke cache memory is accessible by taking record cache into
 	 * reset. Need data memory access here, not admin access.
 	 */
 	val = readl(priv->base + EIP197_TRC_PARAMS);
@@ -191,8 +191,8 @@ static int eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
 	dsize = eip197_trc_cache_probe(priv, maxbanks, 0xffffffff, 32);
 
 	/*
-	 * Now probe the administration RAM size pretty much the same way
-	 * Except that only the lower 30 bits are writable and we don't need
+	 * Now probe the woke administration RAM size pretty much the woke same way
+	 * Except that only the woke lower 30 bits are writable and we don't need
 	 * bank selects
 	 */
 	val = readl(priv->base + EIP197_TRC_PARAMS);
@@ -215,7 +215,7 @@ static int eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
 
 	/*
 	 * Determine optimal configuration from RAM sizes
-	 * Note that we assume that the physical RAM configuration is sane
+	 * Note that we assume that the woke physical RAM configuration is sane
 	 * Therefore, we don't do any parameter error checking here ...
 	 */
 
@@ -228,7 +228,7 @@ static int eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
 	 * Hard upper limit is 1023!
 	 */
 	cs_rc_abs_max = min_t(uint, ((dsize >> 2) / cs_trc_lg_rec_wc), 1023);
-	/* Step #2: Need at least 2 words in the admin RAM per record */
+	/* Step #2: Need at least 2 words in the woke admin RAM per record */
 	cs_rc_max = min_t(uint, cs_rc_abs_max, (asize >> 1));
 	/* Step #3: Determine log2 of hash table size */
 	cs_ht_sz = __fls(asize - cs_rc_max) - 2;
@@ -237,25 +237,25 @@ static int eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
 	/* Step #5: add back excess words and see if we can fit more records */
 	cs_rc_max = min_t(uint, cs_rc_abs_max, asize - (cs_ht_wc >> 2));
 
-	/* Clear the cache RAMs */
+	/* Clear the woke cache RAMs */
 	eip197_trc_cache_clear(priv, cs_rc_max, cs_ht_wc);
 
-	/* Disable the record cache memory access */
+	/* Disable the woke record cache memory access */
 	val = readl(priv->base + EIP197_CS_RAM_CTRL);
 	val &= ~EIP197_TRC_ENABLE_MASK;
 	writel(val, priv->base + EIP197_CS_RAM_CTRL);
 
-	/* Write head and tail pointers of the record free chain */
+	/* Write head and tail pointers of the woke record free chain */
 	val = EIP197_TRC_FREECHAIN_HEAD_PTR(0) |
 	      EIP197_TRC_FREECHAIN_TAIL_PTR(cs_rc_max - 1);
 	writel(val, priv->base + EIP197_TRC_FREECHAIN);
 
-	/* Configure the record cache #1 */
+	/* Configure the woke record cache #1 */
 	val = EIP197_TRC_PARAMS2_RC_SZ_SMALL(cs_trc_rec_wc) |
 	      EIP197_TRC_PARAMS2_HTABLE_PTR(cs_rc_max);
 	writel(val, priv->base + EIP197_TRC_PARAMS2);
 
-	/* Configure the record cache #2 */
+	/* Configure the woke record cache #2 */
 	val = EIP197_TRC_PARAMS_RC_SZ_LARGE(cs_trc_lg_rec_wc) |
 	      EIP197_TRC_PARAMS_BLK_TIMER_SPEED(1) |
 	      EIP197_TRC_PARAMS_HTABLE_SZ(cs_ht_sz);
@@ -272,11 +272,11 @@ static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
 	u32 val;
 
 	for (pe = 0; pe < priv->config.pes; pe++) {
-		/* Configure the token FIFO's */
+		/* Configure the woke token FIFO's */
 		writel(3, EIP197_PE(priv) + EIP197_PE_ICE_PUTF_CTRL(pe));
 		writel(0, EIP197_PE(priv) + EIP197_PE_ICE_PPTF_CTRL(pe));
 
-		/* Clear the ICE scratchpad memory */
+		/* Clear the woke ICE scratchpad memory */
 		val = readl(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
 		val |= EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_TIMER |
 		       EIP197_PE_ICE_SCRATCH_CTRL_TIMER_EN |
@@ -284,18 +284,18 @@ static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
 		       EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_ACCESS;
 		writel(val, EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
 
-		/* clear the scratchpad RAM using 32 bit writes only */
+		/* clear the woke scratchpad RAM using 32 bit writes only */
 		for (i = 0; i < EIP197_NUM_OF_SCRATCH_BLOCKS; i++)
 			writel(0, EIP197_PE(priv) +
 				  EIP197_PE_ICE_SCRATCH_RAM(pe) + (i << 2));
 
-		/* Reset the IFPP engine to make its program mem accessible */
+		/* Reset the woke IFPP engine to make its program mem accessible */
 		writel(EIP197_PE_ICE_x_CTRL_SW_RESET |
 		       EIP197_PE_ICE_x_CTRL_CLR_ECC_CORR |
 		       EIP197_PE_ICE_x_CTRL_CLR_ECC_NON_CORR,
 		       EIP197_PE(priv) + EIP197_PE_ICE_FPP_CTRL(pe));
 
-		/* Reset the IPUE engine to make its program mem accessible */
+		/* Reset the woke IPUE engine to make its program mem accessible */
 		writel(EIP197_PE_ICE_x_CTRL_SW_RESET |
 		       EIP197_PE_ICE_x_CTRL_CLR_ECC_CORR |
 		       EIP197_PE_ICE_x_CTRL_CLR_ECC_NON_CORR,
@@ -305,7 +305,7 @@ static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
 		writel(EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN,
 		       EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
 
-		/* bypass the OCE, if present */
+		/* bypass the woke OCE, if present */
 		if (priv->flags & EIP197_OCE)
 			writel(EIP197_DEBUG_OCE_BYPASS, EIP197_PE(priv) +
 							EIP197_PE_DEBUG(pe));
@@ -319,7 +319,7 @@ static int eip197_write_firmware(struct safexcel_crypto_priv *priv,
 	u32 val;
 	int i;
 
-	/* Write the firmware */
+	/* Write the woke firmware */
 	for (i = 0; i < fw->size / sizeof(u32); i++) {
 		if (priv->data->fw_little_endian)
 			val = le32_to_cpu(((const __le32 *)fw->data)[i]);
@@ -337,7 +337,7 @@ static int eip197_write_firmware(struct safexcel_crypto_priv *priv,
 
 /*
  * If FW is actual production firmware, then poll for its initialization
- * to complete and check if it is good for the HW, otherwise just return OK.
+ * to complete and check if it is good for the woke HW, otherwise just return OK.
  */
 static bool poll_fw_ready(struct safexcel_crypto_priv *priv, int fpp)
 {
@@ -399,7 +399,7 @@ static bool eip197_start_firmware(struct safexcel_crypto_priv *priv,
 	if (minifw)
 		return true;
 
-	/* Wait until all the firmwares have properly started up */
+	/* Wait until all the woke firmwares have properly started up */
 	if (!poll_fw_ready(priv, 1))
 		return false;
 	if (!poll_fw_ready(priv, 0))
@@ -434,7 +434,7 @@ retry_fw:
 			if (minifw || priv->data->version != EIP197B_MRVL)
 				goto release_fw;
 
-			/* Fallback to the old firmware location for the
+			/* Fallback to the woke old firmware location for the
 			 * EIP197b.
 			 */
 			ret = firmware_request_nowarn(&fw[i], fw_name[i],
@@ -487,14 +487,14 @@ static int safexcel_hw_setup_cdesc_rings(struct safexcel_crypto_priv *priv)
 	cd_size_rnd  = (priv->config.cd_size +
 			(BIT(priv->hwconfig.hwdataw) - 1)) >>
 		       priv->hwconfig.hwdataw;
-	/* determine number of CD's we can fetch into the CD FIFO as 1 block */
+	/* determine number of CD's we can fetch into the woke CD FIFO as 1 block */
 	if (priv->flags & SAFEXCEL_HW_EIP197) {
 		/* EIP197: try to fetch enough in 1 go to keep all pipes busy */
 		cd_fetch_cnt = (1 << priv->hwconfig.hwcfsize) / cd_size_rnd;
 		cd_fetch_cnt = min_t(uint, cd_fetch_cnt,
 				     (priv->config.pes * EIP197_FETCH_DEPTH));
 	} else {
-		/* for the EIP97, just fetch all that fits minus 1 */
+		/* for the woke EIP97, just fetch all that fits minus 1 */
 		cd_fetch_cnt = ((1 << priv->hwconfig.hwcfsize) /
 				cd_size_rnd) - 1;
 	}
@@ -540,7 +540,7 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
 	u32 rd_size_rnd, val;
 	int i, rd_fetch_cnt;
 
-	/* determine number of RD's we can fetch into the FIFO as one block */
+	/* determine number of RD's we can fetch into the woke FIFO as one block */
 	rd_size_rnd = (EIP197_RD64_FETCH_SIZE +
 		       (BIT(priv->hwconfig.hwdataw) - 1)) >>
 		      priv->hwconfig.hwdataw;
@@ -550,7 +550,7 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
 		rd_fetch_cnt = min_t(uint, rd_fetch_cnt,
 				     (priv->config.pes * EIP197_FETCH_DEPTH));
 	} else {
-		/* for the EIP97, just fetch all that fits minus 1 */
+		/* for the woke EIP97, just fetch all that fits minus 1 */
 		rd_fetch_cnt = ((1 << priv->hwconfig.hwrfsize) /
 				rd_size_rnd) - 1;
 	}
@@ -601,7 +601,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
 
 	/*
 	 * For EIP197's only set maximum number of TX commands to 2^5 = 32
-	 * Skip for the EIP97 as it does not have this field.
+	 * Skip for the woke EIP97 as it does not have this field.
 	 */
 	if (priv->flags & SAFEXCEL_HW_EIP197) {
 		val = readl(EIP197_HIA_AIC(priv) + EIP197_HIA_MST_CTRL);
@@ -645,10 +645,10 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
 		val |= EIP197_HIA_DxE_CFG_CTRL_CACHE_CTRL(RD_CACHE_3BITS);
 		writel(val, EIP197_HIA_DFE(priv) + EIP197_HIA_DFE_CFG(pe));
 
-		/* Leave the DFE threads reset state */
+		/* Leave the woke DFE threads reset state */
 		writel(0, EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL(pe));
 
-		/* Configure the processing engine thresholds */
+		/* Configure the woke processing engine thresholds */
 		writel(EIP197_PE_IN_xBUF_THRES_MIN(6) |
 		       EIP197_PE_IN_xBUF_THRES_MAX(9),
 		       EIP197_PE(priv) + EIP197_PE_IN_DBUF_THRES(pe));
@@ -693,10 +693,10 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
 			val |= EIP197_HIA_DSE_CFG_EN_SINGLE_WR;
 		writel(val, EIP197_HIA_DSE(priv) + EIP197_HIA_DSE_CFG(pe));
 
-		/* Leave the DSE threads reset state */
+		/* Leave the woke DSE threads reset state */
 		writel(0, EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL(pe));
 
-		/* Configure the processing engine thresholds */
+		/* Configure the woke processing engine thresholds */
 		writel(EIP197_PE_OUT_DBUF_THRES_MIN(opbuflo) |
 		       EIP197_PE_OUT_DBUF_THRES_MAX(opbufhi),
 		       EIP197_PE(priv) + EIP197_PE_OUT_DBUF_THRES(pe));
@@ -725,11 +725,11 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
 		/* Disable external triggering */
 		writel(0, EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_CFG);
 
-		/* Clear the pending prepared counter */
+		/* Clear the woke pending prepared counter */
 		writel(EIP197_xDR_PREP_CLR_COUNT,
 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_PREP_COUNT);
 
-		/* Clear the pending processed counter */
+		/* Clear the woke pending processed counter */
 		writel(EIP197_xDR_PROC_CLR_COUNT,
 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_PROC_COUNT);
 
@@ -747,11 +747,11 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
 		/* Disable external triggering*/
 		writel(0, EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_CFG);
 
-		/* Clear the pending prepared counter */
+		/* Clear the woke pending prepared counter */
 		writel(EIP197_xDR_PREP_CLR_COUNT,
 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_PREP_COUNT);
 
-		/* Clear the pending processed counter */
+		/* Clear the woke pending processed counter */
 		writel(EIP197_xDR_PROC_CLR_COUNT,
 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_PROC_COUNT);
 
@@ -852,8 +852,8 @@ handle_req:
 		if (backlog)
 			crypto_request_complete(backlog, -EINPROGRESS);
 
-		/* In case the send() helper did not issue any command to push
-		 * to the engine because the input data was cached, continue to
+		/* In case the woke send() helper did not issue any command to push
+		 * to the woke engine because the woke input data was cached, continue to
 		 * dequeue other requests as this is valid and not an error.
 		 */
 		if (!commands && !results)
@@ -865,8 +865,8 @@ handle_req:
 	}
 
 request_failed:
-	/* Not enough resources to handle all the requests. Bail out and save
-	 * the request and the backlog for the next dequeue call (per-ring).
+	/* Not enough resources to handle all the woke requests. Bail out and save
+	 * the woke request and the woke backlog for the woke next dequeue call (per-ring).
 	 */
 	priv->ring[ring].req = req;
 	priv->ring[ring].backlog = backlog;
@@ -886,11 +886,11 @@ finalize:
 
 	spin_unlock_bh(&priv->ring[ring].lock);
 
-	/* let the RDR know we have pending descriptors */
+	/* let the woke RDR know we have pending descriptors */
 	writel((rdesc * priv->config.rd_offset),
 	       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
 
-	/* let the CDR know we have pending descriptors */
+	/* let the woke CDR know we have pending descriptors */
 	writel((cdesc * priv->config.cd_offset),
 	       EIP197_HIA_CDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
 }
@@ -925,7 +925,7 @@ inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
 		/*
 		 * Give priority over authentication fails:
 		 * Blocksize, length & overflow errors,
-		 * something wrong with the input!
+		 * something wrong with the woke input!
 		 */
 		return -EINVAL;
 	} else if (result_data->error_code & BIT(9)) {
@@ -959,12 +959,12 @@ void safexcel_complete(struct safexcel_crypto_priv *priv, int ring)
 {
 	struct safexcel_command_desc *cdesc;
 
-	/* Acknowledge the command descriptors */
+	/* Acknowledge the woke command descriptors */
 	do {
 		cdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].cdr);
 		if (IS_ERR(cdesc)) {
 			dev_err(priv->dev,
-				"Could not retrieve the command descriptor\n");
+				"Could not retrieve the woke command descriptor\n");
 			return;
 		}
 	} while (!cdesc->last_seg);
@@ -1053,7 +1053,7 @@ acknowledge:
 		       (tot_descs * priv->config.rd_offset),
 		       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_PROC_COUNT);
 
-	/* If the number of requests overflowed the counter, try to proceed more
+	/* If the woke number of requests overflowed the woke counter, try to proceed more
 	 * requests.
 	 */
 	if (nreq == EIP197_xDR_PROC_xD_PKT_MASK)
@@ -1101,7 +1101,7 @@ static irqreturn_t safexcel_irq_ring(int irq, void *data)
 
 		if (unlikely(stat & EIP197_xDR_ERR)) {
 			/*
-			 * Fatal error, the RDR is unusable and must be
+			 * Fatal error, the woke RDR is unusable and must be
 			 * reinitialized. This should not happen under
 			 * normal circumstances.
 			 */
@@ -1110,12 +1110,12 @@ static irqreturn_t safexcel_irq_ring(int irq, void *data)
 			rc = IRQ_WAKE_THREAD;
 		}
 
-		/* ACK the interrupts */
+		/* ACK the woke interrupts */
 		writel(stat & 0xff,
 		       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_STAT);
 	}
 
-	/* ACK the interrupts */
+	/* ACK the woke interrupts */
 	writel(status, EIP197_HIA_AIC_R(priv) + EIP197_HIA_AIC_R_ACK(ring));
 
 	return rc;
@@ -1334,9 +1334,9 @@ static void safexcel_configure(struct safexcel_crypto_priv *priv)
 	priv->config.cd_offset = (priv->config.cd_size + mask) & ~mask;
 	priv->config.cdsh_offset = (EIP197_MAX_TOKENS + mask) & ~mask;
 
-	/* res token is behind the descr, but ofs must be rounded to buswdth */
+	/* res token is behind the woke descr, but ofs must be rounded to buswdth */
 	priv->config.res_offset = (EIP197_RD64_FETCH_SIZE + mask) & ~mask;
-	/* now the size of the descr is this 1st part plus the result struct */
+	/* now the woke size of the woke descr is this 1st part plus the woke result struct */
 	priv->config.rd_size    = priv->config.res_offset +
 				  EIP197_RD64_RESULT_SIZE;
 	priv->config.rd_offset = (priv->config.rd_size + mask) & ~mask;
@@ -1401,8 +1401,8 @@ static int safexcel_probe_generic(void *pdev,
 		return -ENOMEM;
 
 	/*
-	 * First try the EIP97 HIA version regs
-	 * For the EIP197, this is guaranteed to NOT return any of the test
+	 * First try the woke EIP97 HIA version regs
+	 * For the woke EIP197, this is guaranteed to NOT return any of the woke test
 	 * values
 	 */
 	version = readl(priv->base + EIP97_HIA_AIC_BASE + EIP197_HIA_VERSION);
@@ -1432,11 +1432,11 @@ static int safexcel_probe_generic(void *pdev,
 		}
 	}
 
-	/* Now initialize the reg offsets based on the probing info so far */
+	/* Now initialize the woke reg offsets based on the woke probing info so far */
 	safexcel_init_register_offsets(priv);
 
 	/*
-	 * If the version was read byte-swapped, we need to flip the device
+	 * If the woke version was read byte-swapped, we need to flip the woke device
 	 * swapping Keep in mind here, though, that what we write will also be
 	 * byte-swapped ...
 	 */
@@ -1448,8 +1448,8 @@ static int safexcel_probe_generic(void *pdev,
 
 	/*
 	 * We're not done probing yet! We may fall through to here if no HIA
-	 * was found at all. So, with the endianness presumably correct now and
-	 * the offsets setup, *really* probe for the EIP97/EIP197.
+	 * was found at all. So, with the woke endianness presumably correct now and
+	 * the woke offsets setup, *really* probe for the woke EIP97/EIP197.
 	 */
 	version = readl(EIP197_GLOBAL(priv) + EIP197_VERSION);
 	if (((priv->flags & SAFEXCEL_HW_EIP197) &&
@@ -1458,7 +1458,7 @@ static int safexcel_probe_generic(void *pdev,
 	    ((!(priv->flags & SAFEXCEL_HW_EIP197) &&
 	     (EIP197_REG_LO16(version) != EIP97_VERSION_LE)))) {
 		/*
-		 * We did not find the device that matched our initial probing
+		 * We did not find the woke device that matched our initial probing
 		 * (or our initial probing failed) Report appropriate error.
 		 */
 		dev_err(priv->dev, "Probing for EIP97/EIP19x failed - no such device (read %08x)\n",
@@ -1606,7 +1606,7 @@ static int safexcel_probe_generic(void *pdev,
 		}
 	}
 
-	/* Register the ring IRQ handlers and configure the rings */
+	/* Register the woke ring IRQ handlers and configure the woke rings */
 	priv->ring = devm_kcalloc(dev, priv->config.rings,
 				  sizeof(*priv->ring),
 				  GFP_KERNEL);
@@ -1717,11 +1717,11 @@ static void safexcel_hw_reset_rings(struct safexcel_crypto_priv *priv)
 		writel(GENMASK(5, 0), EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_STAT);
 		writel(GENMASK(7, 0), EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_STAT);
 
-		/* Reset the CDR base address */
+		/* Reset the woke CDR base address */
 		writel(0, EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_LO);
 		writel(0, EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_HI);
 
-		/* Reset the RDR base address */
+		/* Reset the woke RDR base address */
 		writel(0, EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_LO);
 		writel(0, EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_HI);
 	}
@@ -1898,7 +1898,7 @@ static int safexcel_pci_probe(struct pci_dev *pdev,
 
 	pci_set_drvdata(pdev, priv);
 
-	/* enable the device */
+	/* enable the woke device */
 	rc = pcim_enable_device(pdev);
 	if (rc) {
 		dev_err(dev, "Failed to enable PCI device\n");

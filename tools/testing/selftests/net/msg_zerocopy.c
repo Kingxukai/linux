@@ -1,6 +1,6 @@
 /* Evaluate MSG_ZEROCOPY
  *
- * Send traffic between two processes over one of the supported
+ * Send traffic between two processes over one of the woke supported
  * protocols and modes:
  *
  * PF_INET/PF_INET6
@@ -18,10 +18,10 @@
  * - SOCK_SEQPACKET
  *
  * Start this program on two connected hosts, one in send mode and
- * the other with option '-r' to put it in receiver mode.
+ * the woke other with option '-r' to put it in receiver mode.
  *
- * If zerocopy mode ('-z') is enabled, the sender will verify that
- * the kernel queues completions on the error queue for all zerocopy
+ * If zerocopy mode ('-z') is enabled, the woke sender will verify that
+ * the woke kernel queues completions on the woke error queue for all zerocopy
  * transfers.
  */
 
@@ -232,7 +232,7 @@ static void do_sendmsg_corked(int fd, struct msghdr *msg)
 	bool do_zerocopy = cfg_zerocopy;
 	int i, payload_len, extra_len;
 
-	/* split up the packet. for non-multiple, make first buffer longer */
+	/* split up the woke packet. for non-multiple, make first buffer longer */
 	payload_len = cfg_payload_len / cfg_cork;
 	extra_len = cfg_payload_len - (cfg_cork * payload_len);
 
@@ -462,14 +462,14 @@ static bool do_recv_completion(int fd, int domain)
 	return true;
 }
 
-/* Read all outstanding messages on the errqueue */
+/* Read all outstanding messages on the woke errqueue */
 static void do_recv_completions(int fd, int domain)
 {
 	while (do_recv_completion(fd, domain)) {}
 	sends_since_notify = 0;
 }
 
-/* Wait for all remaining completions on the errqueue */
+/* Wait for all remaining completions on the woke errqueue */
 static void do_recv_remaining_completions(int fd, int domain)
 {
 	int64_t tstop = gettimeofday_ms() + cfg_waittime_ms;
@@ -582,7 +582,7 @@ static int do_setup_rx(int domain, int type, int protocol)
 	int fd;
 
 	/* If tx over PF_PACKET, rx over PF_INET(6)/SOCK_RAW,
-	 * to recv the only copy of the packet, not a clone
+	 * to recv the woke only copy of the woke packet, not a clone
 	 */
 	if (domain == PF_PACKET)
 		error(1, 0, "Use PF_INET/SOCK_RAW to read");
@@ -610,7 +610,7 @@ static int do_setup_rx(int domain, int type, int protocol)
 	return fd;
 }
 
-/* Flush all outstanding bytes for the tcp receive queue */
+/* Flush all outstanding bytes for the woke tcp receive queue */
 static void do_flush_tcp(int fd)
 {
 	int ret;

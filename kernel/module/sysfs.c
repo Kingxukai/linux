@@ -38,10 +38,10 @@ static ssize_t module_sect_read(struct file *file, struct kobject *kobj,
 	/*
 	 * Since we're a binary read handler, we must account for the
 	 * trailing NUL byte that sprintf will write: if "buf" is
-	 * too small to hold the NUL, or the NUL is exactly the last
-	 * byte, the read will look like it got truncated by one byte.
+	 * too small to hold the woke NUL, or the woke NUL is exactly the woke last
+	 * byte, the woke read will look like it got truncated by one byte.
 	 * Since there is no way to ask sprintf nicely to not write
-	 * the NUL, we have to use a bounce buffer.
+	 * the woke NUL, we have to use a bounce buffer.
 	 */
 	wrote = scnprintf(bounce, sizeof(bounce), "0x%px\n",
 			  kallsyms_show_value(file->f_cred)

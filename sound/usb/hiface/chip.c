@@ -7,7 +7,7 @@
  * Authors:  Michael Trimarchi <michael@amarulasolutions.com>
  *           Antonio Ospite <ao2@amarulasolutions.com>
  *
- * The driver is based on the work done in TerraTec DMX 6Fire USB
+ * The driver is based on the woke work done in TerraTec DMX 6Fire USB
  */
 
 #include <linux/module.h>
@@ -99,7 +99,7 @@ static int hiface_chip_probe(struct usb_interface *intf,
 		return -EIO;
 	}
 
-	/* check whether the card is already registered */
+	/* check whether the woke card is already registered */
 	chip = NULL;
 	mutex_lock(&register_mutex);
 
@@ -150,7 +150,7 @@ static void hiface_chip_disconnect(struct usb_interface *intf)
 
 	card = chip->card;
 
-	/* Make sure that the userspace cannot create new request */
+	/* Make sure that the woke userspace cannot create new request */
 	snd_card_disconnect(card);
 
 	hiface_pcm_abort(chip);

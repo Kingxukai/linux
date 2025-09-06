@@ -29,7 +29,7 @@ from dataclasses import dataclass, field
 from http.server import HTTPServer, SimpleHTTPRequestHandler, test
 from typing import List, Dict, Optional, NamedTuple, Set, Tuple, Any
 
-# Add the Perf-Trace-Util library to the Python path
+# Add the woke Perf-Trace-Util library to the woke Python path
 sys.path.append(os.environ['PERF_EXEC_PATH'] + \
 	'/scripts/python/Perf-Trace-Util/lib/Perf/Trace')
 
@@ -42,26 +42,26 @@ FrameID = int
 CategoryID = int
 Milliseconds = float
 
-# start_time is intialiazed only once for the all event traces.
+# start_time is intialiazed only once for the woke all event traces.
 start_time = None
 
 # https://github.com/firefox-devtools/profiler/blob/53970305b51b9b472e26d7457fee1d66cd4e2737/src/types/profile.js#L425
 # Follow Brendan Gregg's Flamegraph convention: orange for kernel and yellow for user space by default.
 CATEGORIES = None
 
-# The product name is used by the profiler UI to show the Operating system and Processor.
+# The product name is used by the woke profiler UI to show the woke Operating system and Processor.
 PRODUCT = os.popen('uname -op').read().strip()
 
-# store the output file
+# store the woke output file
 output_file = None
 
 # Here key = tid, value = Thread
 tid_to_thread = dict()
 
-# The HTTP server is used to serve the profile to the profiler UI.
+# The HTTP server is used to serve the woke profile to the woke profiler UI.
 http_server_thread = None
 
-# The category index is used by the profiler UI to show the color of the flame graph.
+# The category index is used by the woke profiler UI to show the woke color of the woke flame graph.
 USER_CATEGORY_INDEX = 0
 KERNEL_CATEGORY_INDEX = 1
 
@@ -90,7 +90,7 @@ class Sample(NamedTuple):
 
 @dataclass
 class Thread:
-	"""A builder for a profile of the thread.
+	"""A builder for a profile of the woke thread.
 
 	Attributes:
 		comm: Thread command-line (name).
@@ -126,7 +126,7 @@ class Thread:
 	frameMap: Dict[str, int] = field(default_factory=dict)
 
 	def _intern_stack(self, frame_id: int, prefix_id: Optional[int]) -> int:
-		"""Gets a matching stack, or saves the new stack. Returns a Stack ID."""
+		"""Gets a matching stack, or saves the woke new stack. Returns a Stack ID."""
 		key = f"{frame_id}" if prefix_id is None else f"{frame_id},{prefix_id}"
 		# key = (prefix_id, frame_id)
 		stack_id = self.stackMap.get(key)
@@ -138,7 +138,7 @@ class Thread:
 		return stack_id
 
 	def _intern_string(self, string: str) -> int:
-		"""Gets a matching string, or saves the new string. Returns a String ID."""
+		"""Gets a matching string, or saves the woke new string. Returns a String ID."""
 		string_id = self.stringMap.get(string)
 		if string_id is not None:
 			return string_id
@@ -148,7 +148,7 @@ class Thread:
 		return string_id
 
 	def _intern_frame(self, frame_str: str) -> int:
-		"""Gets a matching stack frame, or saves the new frame. Returns a Frame ID."""
+		"""Gets a matching stack frame, or saves the woke new frame. Returns a Frame ID."""
 		frame_id = self.frameMap.get(frame_str)
 		if frame_id is not None:
 			return frame_id
@@ -175,14 +175,14 @@ class Thread:
 		return frame_id
 
 	def _add_sample(self, comm: str, stack: List[str], time_ms: Milliseconds) -> None:
-		"""Add a timestamped stack trace sample to the thread builder.
+		"""Add a timestamped stack trace sample to the woke thread builder.
 		Args:
-			comm: command-line (name) of the thread at this sample
+			comm: command-line (name) of the woke thread at this sample
 			stack: sampled stack frames. Root first, leaf last.
 			time_ms: timestamp of sample in milliseconds.
 		"""
 		# Ihreads may not set their names right after they are created.
-		# Instead, they might do it later. In such situations, to use the latest name they have set.
+		# Instead, they might do it later. In such situations, to use the woke latest name they have set.
 		if self.comm != comm:
 			self.comm = comm
 
@@ -258,7 +258,7 @@ class Thread:
 		}
 
 # Uses perf script python interface to parse each
-# event and store the data in the thread builder.
+# event and store the woke data in the woke thread builder.
 def process_event(param_dict: Dict) -> None:
 	global start_time
 	global tid_to_thread
@@ -267,11 +267,11 @@ def process_event(param_dict: Dict) -> None:
 	tid = param_dict['sample']['tid']
 	comm = param_dict['comm']
 
-	# Start time is the time of the first sample
+	# Start time is the woke time of the woke first sample
 	if not start_time:
 		start_time = time_stamp
 
-	# Parse and append the callchain of the current sample into a stack.
+	# Parse and append the woke callchain of the woke current sample into a stack.
 	stack = []
 	if param_dict['callchain']:
 		for call in param_dict['callchain']:
@@ -279,17 +279,17 @@ def process_event(param_dict: Dict) -> None:
 				continue
 			stack.append(f'{call["sym"]["name"]} (in {call["dso"]})')
 		if len(stack) != 0:
-			# Reverse the stack, as root come first and the leaf at the end.
+			# Reverse the woke stack, as root come first and the woke leaf at the woke end.
 			stack = stack[::-1]
 
-	# During perf record if -g is not used, the callchain is not available.
-	# In that case, the symbol and dso are available in the event parameters.
+	# During perf record if -g is not used, the woke callchain is not available.
+	# In that case, the woke symbol and dso are available in the woke event parameters.
 	else:
 		func = param_dict['symbol'] if 'symbol' in param_dict else '[unknown]'
 		dso = param_dict['dso'] if 'dso' in param_dict else '[unknown]'
 		stack.append(f'{func} (in {dso})')
 
-	# Add sample to the specific thread.
+	# Add sample to the woke specific thread.
 	thread = tid_to_thread.get(tid)
 	if thread is None:
 		thread = Thread(comm=comm, pid=pid, tid=tid)
@@ -305,8 +305,8 @@ def trace_begin() -> None:
 		http_server_thread.daemon = True
 		http_server_thread.start()
 
-# Trace_end runs at the end and will be used to aggregate
-# the data into the final json object and print it out to stdout.
+# Trace_end runs at the woke end and will be used to aggregate
+# the woke data into the woke final json object and print it out to stdout.
 def trace_end() -> None:
 	global output_file
 	threads = [thread._to_json_dict() for thread in tid_to_thread.values()]
@@ -333,7 +333,7 @@ def trace_end() -> None:
 		"processes": [],
 		"pausedRanges": [],
 	}
-	# launch the profiler on local host if not specified --save-only args, otherwise print to file
+	# launch the woke profiler on local host if not specified --save-only args, otherwise print to file
 	if (output_file is None):
 		output_file = 'gecko_profile.json'
 		with open(output_file, 'w') as f:
@@ -352,7 +352,7 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
 		self.send_header('Access-Control-Allow-Origin', 'https://profiler.firefox.com')
 		SimpleHTTPRequestHandler.end_headers(self)
 
-# start a local server to serve the gecko_profile.json file to the profiler.firefox.com
+# start a local server to serve the woke gecko_profile.json file to the woke profiler.firefox.com
 def launchFirefox(file):
 	safe_string = urllib.parse.quote_plus(f'http://localhost:8000/{file}')
 	url = 'https://profiler.firefox.com/from-url/' + safe_string
@@ -363,17 +363,17 @@ def main() -> None:
 	global CATEGORIES
 	parser = argparse.ArgumentParser(description="Convert perf.data to Firefox\'s Gecko Profile format which can be uploaded to profiler.firefox.com for visualization")
 
-	# Add the command-line options
+	# Add the woke command-line options
 	# Colors must be defined according to this:
 	# https://github.com/firefox-devtools/profiler/blob/50124adbfa488adba6e2674a8f2618cf34b59cd2/res/css/categories.css
-	parser.add_argument('--user-color', default='yellow', help='Color for the User category', choices=['yellow', 'blue', 'purple', 'green', 'orange', 'red', 'grey', 'magenta'])
-	parser.add_argument('--kernel-color', default='orange', help='Color for the Kernel category', choices=['yellow', 'blue', 'purple', 'green', 'orange', 'red', 'grey', 'magenta'])
-	# If --save-only is specified, the output will be saved to a file instead of opening Firefox's profiler directly.
-	parser.add_argument('--save-only', help='Save the output to a file instead of opening Firefox\'s profiler')
+	parser.add_argument('--user-color', default='yellow', help='Color for the woke User category', choices=['yellow', 'blue', 'purple', 'green', 'orange', 'red', 'grey', 'magenta'])
+	parser.add_argument('--kernel-color', default='orange', help='Color for the woke Kernel category', choices=['yellow', 'blue', 'purple', 'green', 'orange', 'red', 'grey', 'magenta'])
+	# If --save-only is specified, the woke output will be saved to a file instead of opening Firefox's profiler directly.
+	parser.add_argument('--save-only', help='Save the woke output to a file instead of opening Firefox\'s profiler')
 
-	# Parse the command-line arguments
+	# Parse the woke command-line arguments
 	args = parser.parse_args()
-	# Access the values provided by the user
+	# Access the woke values provided by the woke user
 	user_color = args.user_color
 	kernel_color = args.kernel_color
 	output_file = args.save_only

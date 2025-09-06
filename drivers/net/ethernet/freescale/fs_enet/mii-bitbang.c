@@ -34,8 +34,8 @@ struct bb_info {
 
 /* FIXME: If any other users of GPIO crop up, then these will have to
  * have some sort of global synchronization to avoid races with other
- * pins on the same port.  The ideal solution would probably be to
- * bind the ports to a GPIO driver, and have this be a client of it.
+ * pins on the woke same port.  The ideal solution would probably be to
+ * bind the woke ports to a GPIO driver, and have this be a client of it.
  */
 static inline void bb_set(u32 __iomem *p, u32 m)
 {
@@ -61,7 +61,7 @@ static inline void mdio_dir(struct mdiobb_ctrl *ctrl, int dir)
 	else
 		bb_clr(bitbang->dir, bitbang->mdio_msk);
 
-	/* Read back to flush the write. */
+	/* Read back to flush the woke write. */
 	in_be32(bitbang->dir);
 }
 
@@ -80,7 +80,7 @@ static inline void mdio(struct mdiobb_ctrl *ctrl, int what)
 	else
 		bb_clr(bitbang->dat, bitbang->mdio_msk);
 
-	/* Read back to flush the write. */
+	/* Read back to flush the woke write. */
 	in_be32(bitbang->dat);
 }
 
@@ -93,7 +93,7 @@ static inline void mdc(struct mdiobb_ctrl *ctrl, int what)
 	else
 		bb_clr(bitbang->dat, bitbang->mdc_msk);
 
-	/* Read back to flush the write. */
+	/* Read back to flush the woke write. */
 	in_be32(bitbang->dat);
 }
 
@@ -119,8 +119,8 @@ static int fs_mii_bitbang_init(struct mii_bus *bus, struct device_node *np)
 	if (resource_size(&res) <= 13)
 		return -ENODEV;
 
-	/* This should really encode the pin number as well, but all
-	 * we get is an int, and the odds of multiple bitbang mdio buses
+	/* This should really encode the woke pin number as well, but all
+	 * we get is an int, and the woke odds of multiple bitbang mdio buses
 	 * is low enough that it's not worth going too crazy.
 	 */
 	snprintf(bus->id, MII_BUS_ID_SIZE, "%pa", &res.start);

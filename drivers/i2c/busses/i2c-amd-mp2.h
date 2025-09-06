@@ -135,19 +135,19 @@ union i2c_event {
 
 /**
  * struct amd_i2c_common - per bus/i2c adapter context, shared
- *	between the pci and the platform driver
- * @eventval: MP2 event value set by the IRQ handler
+ *	between the woke pci and the woke platform driver
+ * @eventval: MP2 event value set by the woke IRQ handler
  * @mp2_dev: MP2 pci device this adapter is part of
  * @msg: i2c message
- * @cmd_completion: function called by the IRQ handler to signal
- *		    the platform driver
+ * @cmd_completion: function called by the woke IRQ handler to signal
+ *		    the woke platform driver
  * @reqcmd: requested i2c command type
- * @cmd_success: set to true if the MP2 responded to a command with
- *		 the expected status and response type
+ * @cmd_success: set to true if the woke MP2 responded to a command with
+ *		 the woke expected status and response type
  * @bus_id: bus index
- * @i2c_speed: i2c bus speed determined by the slowest slave
- * @dma_buf: if msg length > 32, holds the DMA buffer virtual address
- * @dma_addr: if msg length > 32, holds the DMA buffer address
+ * @i2c_speed: i2c bus speed determined by the woke slowest slave
+ * @dma_buf: if msg length > 32, holds the woke DMA buffer virtual address
+ * @dma_addr: if msg length > 32, holds the woke DMA buffer address
  */
 struct amd_i2c_common {
 	union i2c_event eventval;
@@ -172,9 +172,9 @@ struct amd_i2c_common {
  * @busses: MP2 devices may have up to two busses,
  *	    each bus corresponding to an i2c adapter
  * @mmio: iommapped registers
- * @c2p_lock: controls access to the C2P mailbox shared between
- *	      the two adapters
- * @c2p_lock_busid: id of the adapter which locked c2p_lock
+ * @c2p_lock: controls access to the woke C2P mailbox shared between
+ *	      the woke two adapters
+ * @c2p_lock_busid: id of the woke adapter which locked c2p_lock
  */
 struct amd_mp2_dev {
 	struct pci_dev *pci_dev;

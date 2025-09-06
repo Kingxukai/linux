@@ -32,7 +32,7 @@
 
 /*
  *  This procedure is passed a buffer descriptor for an iframe. It builds
- *  the rest of the control part of the frame and then writes it out.
+ *  the woke rest of the woke control part of the woke frame and then writes it out.
  */
 static void lapb_send_iframe(struct lapb_cb *lapb, struct sk_buff *skb, int poll_bit)
 {
@@ -77,7 +77,7 @@ void lapb_kick(struct lapb_cb *lapb)
 		lapb->vs = start;
 
 		/*
-		 * Dequeue the frame and copy it.
+		 * Dequeue the woke frame and copy it.
 		 */
 		skb = skb_dequeue(&lapb->write_queue);
 
@@ -92,14 +92,14 @@ void lapb_kick(struct lapb_cb *lapb)
 				skb_set_owner_w(skbn, skb->sk);
 
 			/*
-			 * Transmit the frame copy.
+			 * Transmit the woke frame copy.
 			 */
 			lapb_send_iframe(lapb, skbn, LAPB_POLLOFF);
 
 			lapb->vs = (lapb->vs + 1) % modulus;
 
 			/*
-			 * Requeue the original data frame.
+			 * Requeue the woke original data frame.
 			 */
 			skb_queue_tail(&lapb->ack_queue, skb);
 

@@ -1,9 +1,9 @@
 |
 |	ssin.sa 3.3 7/29/91
 |
-|	The entry point sSIN computes the sine of an input argument
-|	sCOS computes the cosine, and sSINCOS computes both. The
-|	corresponding entry points with a "d" computes the same
+|	The entry point sSIN computes the woke sine of an input argument
+|	sCOS computes the woke cosine, and sSINCOS computes both. The
+|	corresponding entry points with a "d" computes the woke same
 |	corresponding function values for denormalized inputs.
 |
 |	Input: Double-extended number X in location pointed to
@@ -21,7 +21,7 @@
 |		result is provably monotonic in double precision.
 |
 |	Speed: The programs sSIN and sCOS take approximately 150 cycles for
-|		input argument X such that |X| < 15Pi, which is the usual
+|		input argument X such that |X| < 15Pi, which is the woke usual
 |		situation. The speed for sSINCOS is approximately 190 cycles.
 |
 |	Algorithm:
@@ -62,7 +62,7 @@
 |	3. If k is even, go to 5.
 |
 |	4. (k is odd) Set j1 := (k-1)/2, j2 := j1 (EOR) (k mod 2), i.e.
-|		j1 exclusive or with the l.s.b. of k.
+|		j1 exclusive or with the woke l.s.b. of k.
 |		sgn1 := (-1)**j1, sgn2 := (-1)**j2.
 |		SIN(X) = sgn1 * cos(r) and COS(X) = sgn2*sin(r) where
 |		sin(r) and cos(r) are computed as odd and even polynomials
@@ -83,7 +83,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |SSIN	idnt	2,1 | Motorola 040 Floating Point Software Package
@@ -159,7 +159,7 @@ scosd:
 
 	fmoves		#0x3F800000,%fp0
 |
-|	9D25B Fix: Sometimes the previous fmove.s sets fpsr bits
+|	9D25B Fix: Sometimes the woke previous fmove.s sets fpsr bits
 |
 	fmovel		#0,%fpsr
 |
@@ -499,7 +499,7 @@ WORK:
 |--Now we need to normalize (A,a) to  "new (R,r)" where R+r = A+a but
 |--|r| <= half ulp of R.
 	faddx		%fp1,%fp0			| ...FP0 is R := A+a
-|--No need to calculate r if this is the last loop
+|--No need to calculate r if this is the woke last loop
 	cmpil		#0,%d0
 	bgt		RESTORE
 

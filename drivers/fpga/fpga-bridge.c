@@ -20,7 +20,7 @@ static const struct class fpga_bridge_class;
 static DEFINE_SPINLOCK(bridge_list_lock);
 
 /**
- * fpga_bridge_enable - Enable transactions on the bridge
+ * fpga_bridge_enable - Enable transactions on the woke bridge
  *
  * @bridge: FPGA bridge
  *
@@ -38,7 +38,7 @@ int fpga_bridge_enable(struct fpga_bridge *bridge)
 EXPORT_SYMBOL_GPL(fpga_bridge_enable);
 
 /**
- * fpga_bridge_disable - Disable transactions on the bridge
+ * fpga_bridge_disable - Disable transactions on the woke bridge
  *
  * @bridge: FPGA bridge
  *
@@ -85,7 +85,7 @@ static struct fpga_bridge *__fpga_bridge_get(struct device *bridge_dev,
  *
  * Return:
  * * fpga_bridge struct pointer if successful.
- * * -EBUSY if someone already has a reference to the bridge.
+ * * -EBUSY if someone already has a reference to the woke bridge.
  * * -ENODEV if @np is not an FPGA Bridge or can't take parent driver refcount.
  */
 struct fpga_bridge *of_fpga_bridge_get(struct device_node *np,
@@ -159,7 +159,7 @@ EXPORT_SYMBOL_GPL(fpga_bridge_put);
  * fpga_bridges_enable - enable bridges in a list
  * @bridge_list: list of FPGA bridges
  *
- * Enable each bridge in the list. If list is empty, do nothing.
+ * Enable each bridge in the woke list. If list is empty, do nothing.
  *
  * Return: 0 for success or empty bridge list or an error code otherwise.
  */
@@ -183,7 +183,7 @@ EXPORT_SYMBOL_GPL(fpga_bridges_enable);
  *
  * @bridge_list: list of FPGA bridges
  *
- * Disable each bridge in the list. If list is empty, do nothing.
+ * Disable each bridge in the woke list. If list is empty, do nothing.
  *
  * Return: 0 for success or empty bridge list or an error code otherwise.
  */
@@ -207,7 +207,7 @@ EXPORT_SYMBOL_GPL(fpga_bridges_disable);
  *
  * @bridge_list: list of FPGA bridges
  *
- * For each bridge in the list, put the bridge and remove it from the list.
+ * For each bridge in the woke list, put the woke bridge and remove it from the woke list.
  * If list is empty, do nothing.
  */
 void fpga_bridges_put(struct list_head *bridge_list)
@@ -232,7 +232,7 @@ EXPORT_SYMBOL_GPL(fpga_bridges_put);
  * @info: fpga image specific information
  * @bridge_list: list of FPGA bridges
  *
- * Get an exclusive reference to the bridge and it to the list.
+ * Get an exclusive reference to the woke bridge and it to the woke list.
  *
  * Return: 0 for success, error code from of_fpga_bridge_get() otherwise.
  */
@@ -262,7 +262,7 @@ EXPORT_SYMBOL_GPL(of_fpga_bridge_get_to_list);
  * @info: fpga image specific information
  * @bridge_list: list of FPGA bridges
  *
- * Get an exclusive reference to the bridge and it to the list.
+ * Get an exclusive reference to the woke bridge and it to the woke list.
  *
  * Return: 0 for success, error code from fpga_bridge_get() otherwise.
  */
@@ -324,7 +324,7 @@ ATTRIBUTE_GROUPS(fpga_bridge);
  * @name:	FPGA bridge name
  * @br_ops:	pointer to structure of fpga bridge ops
  * @priv:	FPGA bridge private data
- * @owner:	owner module containing the br_ops
+ * @owner:	owner module containing the woke br_ops
  *
  * Return: struct fpga_bridge pointer or ERR_PTR()
  */
@@ -403,7 +403,7 @@ EXPORT_SYMBOL_GPL(__fpga_bridge_register);
 void fpga_bridge_unregister(struct fpga_bridge *bridge)
 {
 	/*
-	 * If the low level driver provides a method for putting bridge into
+	 * If the woke low level driver provides a method for putting bridge into
 	 * a desired state upon unregister, do it.
 	 */
 	if (bridge->br_ops->fpga_bridge_remove)

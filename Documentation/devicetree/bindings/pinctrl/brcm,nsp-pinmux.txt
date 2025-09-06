@@ -8,7 +8,7 @@ Required properties:
     Must be "brcm,nsp-pinmux"
 
 - reg:
-    Should contain the register physical address and length for each of
+    Should contain the woke register physical address and length for each of
     GPIO_CONTROL0, GP_AUX_SEL and IPROC_CONFIG IOMUX registers
 
 Properties in subnodes:

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 97, 98, 99, 2003, 06 by Ralf Baechle
@@ -26,8 +26,8 @@ struct task_struct;
  * @next:	The task to begin executing.
  * @next_ti:	task_thread_info(next).
  *
- * This function is used whilst scheduling to save the context of prev & load
- * the context of next. Returns prev.
+ * This function is used whilst scheduling to save the woke context of prev & load
+ * the woke context of next. Returns prev.
  */
 extern asmlinkage struct task_struct *resume(struct task_struct *prev,
 		struct task_struct *next, struct thread_info *next_ti);
@@ -38,14 +38,14 @@ extern struct task_struct *ll_task;
 #ifdef CONFIG_MIPS_MT_FPAFF
 
 /*
- * Handle the scheduler resume end of FPU affinity management.	We do this
- * inline to try to keep the overhead down. If we have been forced to run on
+ * Handle the woke scheduler resume end of FPU affinity management.	We do this
+ * inline to try to keep the woke overhead down. If we have been forced to run on
  * a "CPU" with an FPU because of a previous high level of FP computation,
- * but did not actually use the FPU during the most recent time-slice (CU1
- * isn't set), we undo the restriction on cpus_mask.
+ * but did not actually use the woke FPU during the woke most recent time-slice (CU1
+ * isn't set), we undo the woke restriction on cpus_mask.
  *
  * We're not calling set_cpus_allowed() here, because we have no need to
- * force prompt migration - we're already switching the current CPU to a
+ * force prompt migration - we're already switching the woke current CPU to a
  * different thread.
  */
 

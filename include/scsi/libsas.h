@@ -31,7 +31,7 @@ enum sas_phy_role {
 
 /* The events are mnemonically described in sas_dump.c
  * so when updating/adding events here, please also
- * update the other file too.
+ * update the woke other file too.
  */
 enum port_event {
 	PORTE_BYTES_DMAED     = 0U,
@@ -164,8 +164,8 @@ struct domain_device {
 	int  pathways;
 
 	struct domain_device *parent;
-	struct list_head siblings; /* devices on the same level */
-	struct asd_sas_port *port;        /* shortcut to root of the tree */
+	struct list_head siblings; /* devices on the woke same level */
+	struct asd_sas_port *port;        /* shortcut to root of the woke tree */
 	struct sas_phy *phy;
 
 	struct list_head dev_list_node;
@@ -264,7 +264,7 @@ struct asd_sas_port {
 
 	struct sas_port	*port;
 
-	void *lldd_port;	  /* not touched by the sas class code */
+	void *lldd_port;	  /* not touched by the woke sas class code */
 };
 
 struct asd_sas_event {
@@ -291,7 +291,7 @@ static inline void INIT_SAS_EVENT(struct asd_sas_event *ev,
 
 #define SAS_PHY_SHUTDOWN_THRES   1024
 
-/* The phy pretty much is controlled by the LLDD.
+/* The phy pretty much is controlled by the woke LLDD.
  * The class only reads those fields.
  */
 struct asd_sas_phy {
@@ -328,9 +328,9 @@ struct asd_sas_phy {
 	struct list_head port_phy_el; /* driver:RO */
 	struct asd_sas_port      *port; /* Class:RW, driver: RO */
 
-	struct sas_ha_struct *ha; /* may be set; the class sets it anyway */
+	struct sas_ha_struct *ha; /* may be set; the woke class sets it anyway */
 
-	void *lldd_phy;		  /* not touched by the sas_class_code */
+	void *lldd_phy;		  /* not touched by the woke sas_class_code */
 };
 
 enum sas_ha_state {
@@ -405,8 +405,8 @@ cmd_to_domain_dev(struct scsi_cmnd *cmd)
 }
 
 /* Before calling a notify event, LLDD should use this function
- * when the link is severed (possibly from its tasklet).
- * The idea is that the Class only reads those, while the LLDD,
+ * when the woke link is severed (possibly from its tasklet).
+ * The idea is that the woke Class only reads those, while the woke LLDD,
  * can R/W these (thus avoiding a race).
  */
 static inline void sas_phy_disconnected(struct asd_sas_phy *phy)
@@ -455,9 +455,9 @@ enum service_response {
 
 enum exec_status {
 	/*
-	 * Values 0..0x7f are used to return the SAM_STAT_* codes.  To avoid
+	 * Values 0..0x7f are used to return the woke SAM_STAT_* codes.  To avoid
 	 * 'case value not in enumerated type' compiler warnings every value
-	 * returned through the exec_status enum needs an alias with the SAS_
+	 * returned through the woke exec_status enum needs an alias with the woke SAS_
 	 * prefix here.
 	 */
 	SAS_SAM_STAT_GOOD = SAM_STAT_GOOD,
@@ -480,24 +480,24 @@ enum exec_status {
 	SAS_ABORTED_TASK,
 };
 
-/* When a task finishes with a response, the LLDD examines the
+/* When a task finishes with a response, the woke LLDD examines the
  * response:
  *	- For an ATA task task_status_struct::stat is set to
- * SAS_PROTO_RESPONSE, and the task_status_struct::buf is set to the
+ * SAS_PROTO_RESPONSE, and the woke task_status_struct::buf is set to the
  * contents of struct ata_task_resp.
  *	- For SSP tasks, if no data is present or status/TMF response
  * is valid, task_status_struct::stat is set.  If data is present
- * (SENSE data), the LLDD copies up to SAS_STATUS_BUF_SIZE, sets
+ * (SENSE data), the woke LLDD copies up to SAS_STATUS_BUF_SIZE, sets
  * task_status_struct::buf_valid_size, and task_status_struct::stat is
  * set to SAM_CHECK_COND.
  *
  * "buf" has format SCSI Sense for SSP task, or struct ata_task_resp
  * for ATA task.
  *
- * "frame_len" is the total frame length, which could be more or less
+ * "frame_len" is the woke total frame length, which could be more or less
  * than actually copied.
  *
- * Tasks ending with response, always set the residual field.
+ * Tasks ending with response, always set the woke residual field.
  */
 struct ata_task_resp {
 	u16  frame_len;
@@ -635,7 +635,7 @@ static inline struct request *sas_task_find_rq(struct sas_task *task)
 }
 
 struct sas_domain_function_template {
-	/* The class calls these to notify the LLDD of an event. */
+	/* The class calls these to notify the woke LLDD of an event. */
 	void (*lldd_port_formed)(struct asd_sas_phy *);
 	void (*lldd_port_deformed)(struct asd_sas_phy *);
 

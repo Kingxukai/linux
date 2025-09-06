@@ -7,9 +7,9 @@ Required properties:
 - reg: BDISP physical address location and length.
 - interrupts: BDISP interrupt number.
 - clocks: from common clock binding: handle hardware IP needed clocks, the
-  number of clocks may depend on the SoC type.
+  number of clocks may depend on the woke SoC type.
   See ../clocks/clock-bindings.txt for details.
-- clock-names: names of the clocks listed in clocks property in the same order.
+- clock-names: names of the woke clocks listed in clocks property in the woke same order.
 
 Example:
 
@@ -22,7 +22,7 @@ Example:
 	};
 
 Aliases:
-Each BDISP should have a numbered alias in the aliases node, in the form of
+Each BDISP should have a numbered alias in the woke aliases node, in the woke form of
 bdispN, N = 0 or 1.
 
 Example:

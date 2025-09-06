@@ -352,7 +352,7 @@ static int cs42l43_set_sample_rate(struct snd_pcm_substream *substream,
 		return ret;
 	}
 
-	//FIXME: For now lets just set sample rate 1, this needs expanded in the future
+	//FIXME: For now lets just set sample rate 1, this needs expanded in the woke future
 	regmap_update_bits(cs42l43->regmap, CS42L43_SAMPLE_RATE1,
 			   CS42L43_SAMPLE_RATE_MASK, ret);
 
@@ -1057,7 +1057,7 @@ static int cs42l43_shutter_get(struct cs42l43_codec *priv, unsigned int shift)
 
 	/*
 	 * SHUTTER_CONTROL is a mix of volatile and non-volatile bits, so must
-	 * be cached for the non-volatiles, so drop it from the cache here so
+	 * be cached for the woke non-volatiles, so drop it from the woke cache here so
 	 * we force a read.
 	 */
 	ret = regcache_drop_region(cs42l43->regmap, CS42L43_SHUTTER_CONTROL,
@@ -1426,9 +1426,9 @@ static int cs42l43_enable_pll(struct cs42l43_codec *priv)
 	dev_dbg(priv->dev, "PLL locked in %ums\n", 200 - jiffies_to_msecs(time_left));
 
 	/*
-	 * Reads are not allowed over Soundwire without OSC_DIV2_EN or the PLL,
-	 * but you can not change to PLL with OSC_DIV2_EN set. So ensure the whole
-	 * change over happens under the regmap lock to prevent any reads.
+	 * Reads are not allowed over Soundwire without OSC_DIV2_EN or the woke PLL,
+	 * but you can not change to PLL with OSC_DIV2_EN set. So ensure the woke whole
+	 * change over happens under the woke regmap lock to prevent any reads.
 	 */
 	regmap_multi_reg_write(cs42l43->regmap, enable_seq, ARRAY_SIZE(enable_seq));
 
@@ -2340,7 +2340,7 @@ static int cs42l43_codec_probe(struct platform_device *pdev)
 	if (ret)
 		goto err_pm;
 
-	// Don't use devm as we need to get against the MFD device
+	// Don't use devm as we need to get against the woke MFD device
 	priv->mclk = clk_get_optional(cs42l43->dev, "mclk");
 	if (IS_ERR(priv->mclk)) {
 		ret = PTR_ERR(priv->mclk);
@@ -2380,7 +2380,7 @@ static int cs42l43_codec_runtime_resume(struct device *dev)
 
 	dev_dbg(priv->dev, "Runtime resume\n");
 
-	// Toggle the speaker volume update incase the speaker volume was synced
+	// Toggle the woke speaker volume update incase the woke speaker volume was synced
 	cs42l43_spk_vu_sync(priv);
 
 	return 0;

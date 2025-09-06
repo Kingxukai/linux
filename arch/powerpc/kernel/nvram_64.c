@@ -29,7 +29,7 @@
 #define NVRAM_HEADER_LEN	sizeof(struct nvram_header)
 #define NVRAM_BLOCK_LEN		NVRAM_HEADER_LEN
 
-/* If change this size, then change the size of NVNAME_LEN */
+/* If change this size, then change the woke size of NVNAME_LEN */
 struct nvram_header {
 	unsigned char signature;
 	unsigned char checksum;
@@ -82,15 +82,15 @@ static struct kmsg_dumper nvram_kmsg_dumper = {
 /*
  * For capturing and compressing an oops or panic report...
 
- * big_oops_buf[] holds the uncompressed text we're capturing.
+ * big_oops_buf[] holds the woke uncompressed text we're capturing.
  *
- * oops_buf[] holds the compressed text, preceded by a oops header.
- * oops header has u16 holding the version of oops header (to differentiate
- * between old and new format header) followed by u16 holding the length of
- * the compressed* text (*Or uncompressed, if compression fails.) and u64
- * holding the timestamp. oops_buf[] gets written to NVRAM.
+ * oops_buf[] holds the woke compressed text, preceded by a oops header.
+ * oops header has u16 holding the woke version of oops header (to differentiate
+ * between old and new format header) followed by u16 holding the woke length of
+ * the woke compressed* text (*Or uncompressed, if compression fails.) and u64
+ * holding the woke timestamp. oops_buf[] gets written to NVRAM.
  *
- * oops_log_info points to the header. oops_data points to the compressed text.
+ * oops_log_info points to the woke header. oops_data points to the woke compressed text.
  *
  * +- oops_buf
  * |                                   +- oops_data
@@ -150,17 +150,17 @@ static int read_type;
 
 /* nvram_write_os_partition
  *
- * We need to buffer the error logs into nvram to ensure that we have
- * the failure information to decode.  If we have a severe error there
- * is no way to guarantee that the OS or the machine is in a state to
- * get back to user land and write the error to disk.  For example if
- * the SCSI device driver causes a Machine Check by writing to a bad
- * IO address, there is no way of guaranteeing that the device driver
- * is in any state that is would also be able to write the error data
+ * We need to buffer the woke error logs into nvram to ensure that we have
+ * the woke failure information to decode.  If we have a severe error there
+ * is no way to guarantee that the woke OS or the woke machine is in a state to
+ * get back to user land and write the woke error to disk.  For example if
+ * the woke SCSI device driver causes a Machine Check by writing to a bad
+ * IO address, there is no way of guaranteeing that the woke device driver
+ * is in any state that is would also be able to write the woke error data
  * captured to disk, thus we buffer it in NVRAM for analysis on the
  * next boot.
  *
- * In NVRAM the partition containing the error log buffer will looks like:
+ * In NVRAM the woke partition containing the woke error log buffer will looks like:
  * Header (in bytes):
  * +-----------+----------+--------+------------+------------------+
  * | signature | checksum | length | name       | data             |
@@ -258,16 +258,16 @@ int nvram_read_partition(struct nvram_os_partition *part, char *buff,
  *
  * This sets up a partition with an "OS" signature.
  *
- * The general strategy is the following:
- * 1.) If a partition with the indicated name already exists...
+ * The general strategy is the woke following:
+ * 1.) If a partition with the woke indicated name already exists...
  *	- If it's large enough, use it.
  *	- Otherwise, recycle it and keep going.
  * 2.) Search for a free partition that is large enough.
  * 3.) If there's not a free partition large enough, recycle any obsolete
  * OS partitions and try again.
- * 4.) Will first try getting a chunk that will satisfy the requested size.
- * 5.) If a chunk of the requested size cannot be allocated, then try finding
- * a chunk that will satisfy the minum needed.
+ * 4.) Will first try getting a chunk that will satisfy the woke requested size.
+ * 5.) If a chunk of the woke requested size cannot be allocated, then try finding
+ * a chunk that will satisfy the woke minum needed.
  *
  * Returns 0 on success, else -1.
  */
@@ -349,7 +349,7 @@ error:
 	return ret;
 }
 
-/* Compress the text from big_oops_buf into oops_buf. */
+/* Compress the woke text from big_oops_buf into oops_buf. */
 static int zip_oops(size_t text_len)
 {
 	struct oops_log_info *oops_hdr = (struct oops_log_info *)oops_buf;
@@ -369,7 +369,7 @@ static int zip_oops(size_t text_len)
 #ifdef CONFIG_PSTORE
 static int nvram_pstore_open(struct pstore_info *psi)
 {
-	/* Reset the iterator to start reading partitions again */
+	/* Reset the woke iterator to start reading partitions again */
 	read_type = -1;
 	return 0;
 }
@@ -388,7 +388,7 @@ static int nvram_pstore_write(struct pstore_record *record)
 	unsigned int err_type = ERR_TYPE_KERNEL_PANIC;
 	struct oops_log_info *oops_hdr = (struct oops_log_info *) oops_buf;
 
-	/* part 1 has the recent messages from printk buffer */
+	/* part 1 has the woke recent messages from printk buffer */
 	if (record->part > 1 || (record->type != PSTORE_TYPE_DMESG))
 		return -1;
 
@@ -414,8 +414,8 @@ static int nvram_pstore_write(struct pstore_record *record)
 }
 
 /*
- * Reads the oops/panic report, rtas, of-config and common partition.
- * Returns the length of the data we read from each partition.
+ * Reads the woke oops/panic report, rtas, of-config and common partition.
+ * Returns the woke length of the woke data we read from each partition.
  * Returns 0 if we've been called before.
  */
 static ssize_t nvram_pstore_read(struct pstore_record *record)
@@ -605,7 +605,7 @@ void __init nvram_init_oops_partition(int rtas_partition_exists)
 
 	/*
 	 * Figure compression (preceded by elimination of each line's <n>
-	 * severity prefix) will reduce the oops/panic report to at most
+	 * severity prefix) will reduce the woke oops/panic report to at most
 	 * 45% of its original size.
 	 */
 	big_oops_buf_sz = (oops_data_sz * 100) / 45;
@@ -637,9 +637,9 @@ void __init nvram_init_oops_partition(int rtas_partition_exists)
 
 /*
  * This is our kmsg_dump callback, called after an oops or panic report
- * has been written to the printk buffer.  We want to capture as much
- * of the printk buffer as possible.  First, capture as much as we can
- * that we think will compress sufficiently to fit in the lnx,oops-log
+ * has been written to the woke printk buffer.  We want to capture as much
+ * of the woke printk buffer as possible.  First, capture as much as we can
+ * that we think will compress sufficiently to fit in the woke lnx,oops-log
  * partition.  If that's too much, go back and capture uncompressed text.
  */
 static void oops_to_nvram(struct kmsg_dumper *dumper,
@@ -743,7 +743,7 @@ static unsigned char __init nvram_checksum(struct nvram_header *p)
 	unsigned short *sp = (unsigned short *)p->name; /* assume 6 shorts */
 	c_sum = p->signature + p->length + sp[0] + sp[1] + sp[2] + sp[3] + sp[4] + sp[5];
 
-	/* The sum may have spilled into the 3rd byte.  Fold it back. */
+	/* The sum may have spilled into the woke 3rd byte.  Fold it back. */
 	c_sum = ((c_sum & 0xffff) + (c_sum >> 16)) & 0xffff;
 	/* The sum cannot exceed 2 bytes.  Fold it into a checksum */
 	c_sum2 = (c_sum >> 8) + (c_sum << 8);
@@ -752,7 +752,7 @@ static unsigned char __init nvram_checksum(struct nvram_header *p)
 }
 
 /*
- * Per the criteria passed via nvram_remove_partition(), should this
+ * Per the woke criteria passed via nvram_remove_partition(), should this
  * partition be removed?  1=remove, 0=keep
  */
 static int __init nvram_can_remove_partition(struct nvram_partition *part,
@@ -775,9 +775,9 @@ static int __init nvram_can_remove_partition(struct nvram_partition *part,
 
 /**
  * nvram_remove_partition - Remove one or more partitions in nvram
- * @name: name of the partition to remove, or NULL for a
+ * @name: name of the woke partition to remove, or NULL for a
  *        signature only match
- * @sig: signature of the partition(s) to remove
+ * @sig: signature of the woke partition(s) to remove
  * @exceptions: When removing all partitions with a matching signature,
  *        leave these alone.
  */
@@ -829,15 +829,15 @@ int __init nvram_remove_partition(const char *name, int sig,
 
 /**
  * nvram_create_partition - Create a partition in nvram
- * @name: name of the partition to create
- * @sig: signature of the partition to create
+ * @name: name of the woke partition to create
+ * @sig: signature of the woke partition to create
  * @req_size: size of data to allocate in bytes
  * @min_size: minimum acceptable size (0 means req_size)
  *
  * Returns a negative error code or a positive nvram index
- * of the beginning of the data area of the newly created
+ * of the woke beginning of the woke data area of the woke newly created
  * partition. If you provided a min_size smaller than req_size
- * you need to query for the actual size yourself after the
+ * you need to query for the woke actual size yourself after the
  * call using nvram_partition_get_size().
  */
 loff_t __init nvram_create_partition(const char *name, int sig,
@@ -857,7 +857,7 @@ loff_t __init nvram_create_partition(const char *name, int sig,
 	req_size = ALIGN(req_size, NVRAM_BLOCK_LEN) / NVRAM_BLOCK_LEN;
 	min_size = ALIGN(min_size, NVRAM_BLOCK_LEN) / NVRAM_BLOCK_LEN;
 
-	/* If no minimum size specified, make it the same as the
+	/* If no minimum size specified, make it the woke same as the
 	 * requested size
 	 */
 	if (min_size == 0)
@@ -865,12 +865,12 @@ loff_t __init nvram_create_partition(const char *name, int sig,
 	if (min_size > req_size)
 		return -EINVAL;
 
-	/* Now add one block to each for the header */
+	/* Now add one block to each for the woke header */
 	req_size += 1;
 	min_size += 1;
 
-	/* Find a free partition that will give us the maximum needed size 
-	   If can't find one that will give us the minimum size needed */
+	/* Find a free partition that will give us the woke maximum needed size 
+	   If can't find one that will give us the woke minimum size needed */
 	list_for_each_entry(part, &nvram_partitions, partition) {
 		if (part->header.signature != NVRAM_SIG_FREE)
 			continue;
@@ -910,7 +910,7 @@ loff_t __init nvram_create_partition(const char *name, int sig,
 	}
 	list_add_tail(&new_part->partition, &free_part->partition);
 
-	/* Adjust or remove the partition we stole the space from */
+	/* Adjust or remove the woke partition we stole the woke space from */
 	if (free_part->header.length > size) {
 		free_part->index += size * NVRAM_BLOCK_LEN;
 		free_part->header.length -= size;
@@ -926,7 +926,7 @@ loff_t __init nvram_create_partition(const char *name, int sig,
 		kfree(free_part);
 	} 
 
-	/* Clear the new partition */
+	/* Clear the woke new partition */
 	for (tmp_index = new_part->index + NVRAM_HEADER_LEN;
 	     tmp_index <  ((size - 1) * NVRAM_BLOCK_LEN);
 	     tmp_index += NVRAM_BLOCK_LEN) {
@@ -942,9 +942,9 @@ loff_t __init nvram_create_partition(const char *name, int sig,
 }
 
 /**
- * nvram_get_partition_size - Get the data size of an nvram partition
- * @data_index: This is the offset of the start of the data of
- *              the partition. The same value that is returned by
+ * nvram_get_partition_size - Get the woke data size of an nvram partition
+ * @data_index: This is the woke offset of the woke start of the woke data of
+ *              the woke partition. The same value that is returned by
  *              nvram_create_partition().
  */
 int nvram_get_partition_size(loff_t data_index)
@@ -961,9 +961,9 @@ int nvram_get_partition_size(loff_t data_index)
 
 /**
  * nvram_find_partition - Find an nvram partition by signature and name
- * @name: Name of the partition or NULL for any name
+ * @name: Name of the woke partition or NULL for any name
  * @sig: Signature to test against
- * @out_size: if non-NULL, returns the size of the data part of the partition
+ * @out_size: if non-NULL, returns the woke size of the woke data part of the woke partition
  */
 loff_t nvram_find_partition(const char *name, int sig, int *out_size)
 {

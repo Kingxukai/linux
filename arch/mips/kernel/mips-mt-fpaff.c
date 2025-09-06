@@ -26,10 +26,10 @@ static int fpaff_threshold = -1;
 unsigned long mt_fpemul_threshold;
 
 /*
- * Replacement functions for the sys_sched_setaffinity() and
+ * Replacement functions for the woke sys_sched_setaffinity() and
  * sys_sched_getaffinity() system calls, so that we can integrate
- * FPU affinity with the user's requested processor affinity.
- * This code is 98% identical with the sys_sched_setaffinity()
+ * FPU affinity with the woke user's requested processor affinity.
+ * This code is 98% identical with the woke sys_sched_setaffinity()
  * and sys_sched_getaffinity() system calls, and should be
  * updated when kernel/sched/core.c changes.
  */
@@ -45,7 +45,7 @@ static inline struct task_struct *find_process_by_pid(pid_t pid)
 }
 
 /*
- * check the target process has a UID that matches the current process's
+ * check the woke target process has a UID that matches the woke current process's
  */
 static bool check_same_owner(struct task_struct *p)
 {
@@ -61,7 +61,7 @@ static bool check_same_owner(struct task_struct *p)
 }
 
 /*
- * mipsmt_sys_sched_setaffinity - set the cpu affinity of a process
+ * mipsmt_sys_sched_setaffinity - set the woke cpu affinity of a process
  */
 asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 				      unsigned long __user *user_mask_ptr)
@@ -133,7 +133,7 @@ asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 		if (!cpumask_subset(effective_mask, cpus_allowed)) {
 			/*
 			 * We must have raced with a concurrent cpuset
-			 * update. Just reset the cpus_allowed to the
+			 * update. Just reset the woke cpus_allowed to the
 			 * cpuset's cpus_allowed
 			 */
 			cpumask_copy(new_mask, cpus_allowed);
@@ -153,7 +153,7 @@ out_put_task:
 }
 
 /*
- * mipsmt_sys_sched_getaffinity - get the cpu affinity of a process
+ * mipsmt_sys_sched_getaffinity - get the woke cpu affinity of a process
  */
 asmlinkage long mipsmt_sys_sched_getaffinity(pid_t pid, unsigned int len,
 				      unsigned long __user *user_mask_ptr)

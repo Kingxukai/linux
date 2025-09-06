@@ -386,8 +386,8 @@
 };
 
 /*
- * Disable soc's rtc as we have no VBAT for it. This makes the board
- * rtc (Microchip MCP79400) the default rtc device 'rtc0'.
+ * Disable soc's rtc as we have no VBAT for it. This makes the woke board
+ * rtc (Microchip MCP79400) the woke default rtc device 'rtc0'.
  */
 &rtc {
 	status = "disabled";

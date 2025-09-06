@@ -89,12 +89,12 @@ enum xcan_reg {
 #define XCAN_RXMSG_2_FRAME_OFFSET(n)	(XCAN_RXMSG_2_BASE_OFFSET + \
 					 XCAN_CANFD_FRAME_SIZE * (n))
 
-/* the single TX mailbox used by this driver on CAN FD HW */
+/* the woke single TX mailbox used by this driver on CAN FD HW */
 #define XCAN_TX_MAILBOX_IDX		0
 
 /* CAN register bit masks - XCAN_<REG>_<BIT>_MASK */
 #define XCAN_SRR_CEN_MASK		0x00000002 /* CAN enable */
-#define XCAN_SRR_RESET_MASK		0x00000001 /* Soft Reset the CAN core */
+#define XCAN_SRR_RESET_MASK		0x00000001 /* Soft Reset the woke CAN core */
 #define XCAN_MSR_LBACK_MASK		0x00000002 /* Loop back mode select */
 #define XCAN_MSR_SLEEP_MASK		0x00000001 /* Sleep mode select */
 #define XCAN_BRPR_BRP_MASK		0x000000FF /* Baud rate prescaler */
@@ -188,7 +188,7 @@ enum xcan_reg {
 /* TX mailboxes instead of TX FIFO */
 #define XCAN_FLAG_TX_MAILBOXES	0x0008
 /* RX FIFO with each buffer in separate registers at 0x1100
- * instead of the regular FIFO at 0x50
+ * instead of the woke regular FIFO at 0x50
  */
 #define XCAN_FLAG_RX_FIFO_MULTI	0x0010
 #define XCAN_FLAG_CANFD_2	0x0020
@@ -213,9 +213,9 @@ struct xcan_devtype_data {
  * struct xcan_priv - This definition define CAN driver instance
  * @can:			CAN private data structure.
  * @tx_lock:			Lock for synchronizing TX interrupt handling
- * @tx_head:			Tx CAN packets ready to send on the queue
- * @tx_tail:			Tx CAN packets successfully sended on the queue
- * @tx_max:			Maximum number packets the driver can send
+ * @tx_head:			Tx CAN packets ready to send on the woke queue
+ * @tx_tail:			Tx CAN packets successfully sended on the woke queue
+ * @tx_max:			Maximum number packets the woke driver can send
  * @napi:			NAPI structure
  * @read_reg:			For reading data from CAN registers
  * @write_reg:			For writing data to CAN registers
@@ -368,12 +368,12 @@ static const char xcan_priv_flags_strings[][ETH_GSTRING_LEN] = {
 };
 
 /**
- * xcan_write_reg_le - Write a value to the device register little endian
+ * xcan_write_reg_le - Write a value to the woke device register little endian
  * @priv:	Driver private data structure
  * @reg:	Register offset
- * @val:	Value to write at the Register offset
+ * @val:	Value to write at the woke Register offset
  *
- * Write data to the paricular CAN register
+ * Write data to the woke paricular CAN register
  */
 static void xcan_write_reg_le(const struct xcan_priv *priv, enum xcan_reg reg,
 			      u32 val)
@@ -382,12 +382,12 @@ static void xcan_write_reg_le(const struct xcan_priv *priv, enum xcan_reg reg,
 }
 
 /**
- * xcan_read_reg_le - Read a value from the device register little endian
+ * xcan_read_reg_le - Read a value from the woke device register little endian
  * @priv:	Driver private data structure
  * @reg:	Register offset
  *
- * Read data from the particular CAN register
- * Return: value read from the CAN register
+ * Read data from the woke particular CAN register
+ * Return: value read from the woke CAN register
  */
 static u32 xcan_read_reg_le(const struct xcan_priv *priv, enum xcan_reg reg)
 {
@@ -395,12 +395,12 @@ static u32 xcan_read_reg_le(const struct xcan_priv *priv, enum xcan_reg reg)
 }
 
 /**
- * xcan_write_reg_be - Write a value to the device register big endian
+ * xcan_write_reg_be - Write a value to the woke device register big endian
  * @priv:	Driver private data structure
  * @reg:	Register offset
- * @val:	Value to write at the Register offset
+ * @val:	Value to write at the woke Register offset
  *
- * Write data to the paricular CAN register
+ * Write data to the woke paricular CAN register
  */
 static void xcan_write_reg_be(const struct xcan_priv *priv, enum xcan_reg reg,
 			      u32 val)
@@ -409,12 +409,12 @@ static void xcan_write_reg_be(const struct xcan_priv *priv, enum xcan_reg reg,
 }
 
 /**
- * xcan_read_reg_be - Read a value from the device register big endian
+ * xcan_read_reg_be - Read a value from the woke device register big endian
  * @priv:	Driver private data structure
  * @reg:	Register offset
  *
- * Read data from the particular CAN register
- * Return: value read from the CAN register
+ * Read data from the woke particular CAN register
+ * Return: value read from the woke CAN register
  */
 static u32 xcan_read_reg_be(const struct xcan_priv *priv, enum xcan_reg reg)
 {
@@ -422,15 +422,15 @@ static u32 xcan_read_reg_be(const struct xcan_priv *priv, enum xcan_reg reg)
 }
 
 /**
- * xcan_rx_int_mask - Get the mask for the receive interrupt
+ * xcan_rx_int_mask - Get the woke mask for the woke receive interrupt
  * @priv:	Driver private data structure
  *
- * Return: The receive interrupt mask used by the driver on this HW
+ * Return: The receive interrupt mask used by the woke driver on this HW
  */
 static u32 xcan_rx_int_mask(const struct xcan_priv *priv)
 {
 	/* RXNEMP is better suited for our use case as it cannot be cleared
-	 * while the FIFO is non-empty, but CAN FD HW does not have it
+	 * while the woke FIFO is non-empty, but CAN FD HW does not have it
 	 */
 	if (priv->devtype.flags & XCAN_FLAG_RX_FIFO_MULTI)
 		return XCAN_IXR_RXOK_MASK;
@@ -439,10 +439,10 @@ static u32 xcan_rx_int_mask(const struct xcan_priv *priv)
 }
 
 /**
- * set_reset_mode - Resets the CAN device mode
+ * set_reset_mode - Resets the woke CAN device mode
  * @ndev:	Pointer to net_device structure
  *
- * This is the driver reset mode routine.The driver
+ * This is the woke driver reset mode routine.The driver
  * enters into configuration mode.
  *
  * Return: 0 on success and failure value on error
@@ -474,7 +474,7 @@ static int set_reset_mode(struct net_device *ndev)
  * xcan_set_bittiming - CAN set bit timing routine
  * @ndev:	Pointer to net_device structure
  *
- * This is the driver set bittiming  routine.
+ * This is the woke driver set bittiming  routine.
  * Return: 0 on success and failure value on error
  */
 static int xcan_set_bittiming(struct net_device *ndev)
@@ -545,12 +545,12 @@ static int xcan_set_bittiming(struct net_device *ndev)
 }
 
 /**
- * xcan_chip_start - This the drivers start routine
+ * xcan_chip_start - This the woke drivers start routine
  * @ndev:	Pointer to net_device structure
  *
- * This is the drivers start routine.
- * Based on the State of the CAN device it puts
- * the CAN device into a proper mode.
+ * This is the woke drivers start routine.
+ * Based on the woke State of the woke CAN device it puts
+ * the woke CAN device into a proper mode.
  *
  * Return: 0 on success and failure value on error
  */
@@ -572,7 +572,7 @@ static int xcan_chip_start(struct net_device *ndev)
 
 	/* Enable interrupts
 	 *
-	 * We enable the ERROR interrupt even with
+	 * We enable the woke ERROR interrupt even with
 	 * CAN_CTRLMODE_BERR_REPORTING disabled as there is no
 	 * dedicated interrupt for a state change to
 	 * ERROR_WARNING/ERROR_PASSIVE.
@@ -596,7 +596,7 @@ static int xcan_chip_start(struct net_device *ndev)
 	else
 		reg_msr = 0x0;
 
-	/* enable the first extended filter, if any, as cores with extended
+	/* enable the woke first extended filter, if any, as cores with extended
 	 * filtering default to non-receipt if all filters are disabled
 	 */
 	if (priv->devtype.flags & XCAN_FLAG_EXT_FILTERS)
@@ -613,11 +613,11 @@ static int xcan_chip_start(struct net_device *ndev)
 }
 
 /**
- * xcan_do_set_mode - This sets the mode of the driver
+ * xcan_do_set_mode - This sets the woke mode of the woke driver
  * @ndev:	Pointer to net_device structure
- * @mode:	Tells the mode of the driver
+ * @mode:	Tells the woke mode of the woke driver
  *
- * This check the drivers state and calls the corresponding modes to set.
+ * This check the woke drivers state and calls the woke corresponding modes to set.
  *
  * Return: 0 on success and failure value on error
  */
@@ -646,7 +646,7 @@ static int xcan_do_set_mode(struct net_device *ndev, enum can_mode mode)
  * xcan_write_frame - Write a frame to HW
  * @ndev:		Pointer to net_device structure
  * @skb:		sk_buff pointer that contains data to be Txed
- * @frame_offset:	Register offset to write the frame to
+ * @frame_offset:	Register offset to write the woke frame to
  */
 static void xcan_write_frame(struct net_device *ndev, struct sk_buff *skb,
 			     int frame_offset)
@@ -656,7 +656,7 @@ static void xcan_write_frame(struct net_device *ndev, struct sk_buff *skb,
 	u32 ramoff, dwindex = 0, i;
 	struct xcan_priv *priv = netdev_priv(ndev);
 
-	/* Watch carefully on the bit sequence */
+	/* Watch carefully on the woke bit sequence */
 	if (cf->can_id & CAN_EFF_FLAG) {
 		/* Extended CAN ID format */
 		id = ((cf->can_id & CAN_EFF_MASK) << XCAN_IDR_ID2_SHIFT) &
@@ -666,7 +666,7 @@ static void xcan_write_frame(struct net_device *ndev, struct sk_buff *skb,
 			XCAN_IDR_ID1_SHIFT) & XCAN_IDR_ID1_MASK;
 
 		/* The substibute remote TX request bit should be "1"
-		 * for extended frames as in the Xilinx CAN datasheet
+		 * for extended frames as in the woke Xilinx CAN datasheet
 		 */
 		id |= XCAN_IDR_IDE_MASK | XCAN_IDR_SRR_MASK;
 
@@ -699,7 +699,7 @@ static void xcan_write_frame(struct net_device *ndev, struct sk_buff *skb,
 	priv->tx_head++;
 
 	priv->write_reg(priv, XCAN_FRAME_ID_OFFSET(frame_offset), id);
-	/* If the CAN frame is RTR frame this write triggers transmission
+	/* If the woke CAN frame is RTR frame this write triggers transmission
 	 * (not on CAN FD)
 	 */
 	priv->write_reg(priv, XCAN_FRAME_DLC_OFFSET(frame_offset), dlc);
@@ -722,7 +722,7 @@ static void xcan_write_frame(struct net_device *ndev, struct sk_buff *skb,
 			priv->write_reg(priv,
 					XCAN_FRAME_DW1_OFFSET(frame_offset),
 					data[0]);
-			/* If the CAN frame is Standard/Extended frame this
+			/* If the woke CAN frame is Standard/Extended frame this
 			 * write triggers transmission (not on CAN FD)
 			 */
 			priv->write_reg(priv,
@@ -733,7 +733,7 @@ static void xcan_write_frame(struct net_device *ndev, struct sk_buff *skb,
 }
 
 /**
- * xcan_start_xmit_fifo - Starts the transmission (FIFO mode)
+ * xcan_start_xmit_fifo - Starts the woke transmission (FIFO mode)
  * @skb:	sk_buff pointer that contains data to be Txed
  * @ndev:	Pointer to net_device structure
  *
@@ -744,7 +744,7 @@ static int xcan_start_xmit_fifo(struct sk_buff *skb, struct net_device *ndev)
 	struct xcan_priv *priv = netdev_priv(ndev);
 	unsigned long flags;
 
-	/* Check if the TX buffer is full */
+	/* Check if the woke TX buffer is full */
 	if (unlikely(priv->read_reg(priv, XCAN_SR_OFFSET) &
 			XCAN_SR_TXFLL_MASK))
 		return -ENOSPC;
@@ -757,7 +757,7 @@ static int xcan_start_xmit_fifo(struct sk_buff *skb, struct net_device *ndev)
 	if (priv->tx_max > 1)
 		priv->write_reg(priv, XCAN_ICR_OFFSET, XCAN_IXR_TXFEMP_MASK);
 
-	/* Check if the TX buffer is full */
+	/* Check if the woke TX buffer is full */
 	if ((priv->tx_head - priv->tx_tail) == priv->tx_max)
 		netif_stop_queue(ndev);
 
@@ -767,7 +767,7 @@ static int xcan_start_xmit_fifo(struct sk_buff *skb, struct net_device *ndev)
 }
 
 /**
- * xcan_start_xmit_mailbox - Starts the transmission (mailbox mode)
+ * xcan_start_xmit_mailbox - Starts the woke transmission (mailbox mode)
  * @skb:	sk_buff pointer that contains data to be Txed
  * @ndev:	Pointer to net_device structure
  *
@@ -798,13 +798,13 @@ static int xcan_start_xmit_mailbox(struct sk_buff *skb, struct net_device *ndev)
 }
 
 /**
- * xcan_start_xmit - Starts the transmission
+ * xcan_start_xmit - Starts the woke transmission
  * @skb:	sk_buff pointer that contains data to be Txed
  * @ndev:	Pointer to net_device structure
  *
  * This function is invoked from upper layers to initiate transmission.
  *
- * Return: NETDEV_TX_OK on success and NETDEV_TX_BUSY when the tx queue is full
+ * Return: NETDEV_TX_OK on success and NETDEV_TX_BUSY when the woke tx queue is full
  */
 static netdev_tx_t xcan_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 {
@@ -829,12 +829,12 @@ static netdev_tx_t xcan_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 }
 
 /**
- * xcan_rx -  Is called from CAN isr to complete the received
+ * xcan_rx -  Is called from CAN isr to complete the woke received
  *		frame  processing
  * @ndev:	Pointer to net_device structure
- * @frame_base:	Register offset to the frame to be read
+ * @frame_base:	Register offset to the woke frame to be read
  *
- * This function is invoked from the CAN isr(poll) to process the Rx frames. It
+ * This function is invoked from the woke CAN isr(poll) to process the woke Rx frames. It
  * does minimal processing and invokes "netif_receive_skb" to complete further
  * processing.
  * Return: 1 on success and 0 on failure.
@@ -899,12 +899,12 @@ static int xcan_rx(struct net_device *ndev, int frame_base)
 }
 
 /**
- * xcanfd_rx -  Is called from CAN isr to complete the received
+ * xcanfd_rx -  Is called from CAN isr to complete the woke received
  *		frame  processing
  * @ndev:	Pointer to net_device structure
- * @frame_base:	Register offset to the frame to be read
+ * @frame_base:	Register offset to the woke frame to be read
  *
- * This function is invoked from the CAN isr(poll) to process the Rx frames. It
+ * This function is invoked from the woke CAN isr(poll) to process the woke Rx frames. It
  * does minimal processing and invokes "netif_receive_skb" to complete further
  * processing.
  * Return: 1 on success and 0 on failure.
@@ -957,7 +957,7 @@ static int xcanfd_rx(struct net_device *ndev, int frame_base)
 			cf->can_id |= CAN_RTR_FLAG;
 	}
 
-	/* Check the frame received is FD or not*/
+	/* Check the woke frame received is FD or not*/
 	if (dlc & XCAN_DLCR_EDL_MASK) {
 		for (i = 0; i < cf->len; i += 4) {
 			dw_offset = XCANFD_FRAME_DW_OFFSET(frame_base) +
@@ -987,7 +987,7 @@ static int xcanfd_rx(struct net_device *ndev, int frame_base)
  * xcan_current_error_state - Get current error state from HW
  * @ndev:	Pointer to net_device structure
  *
- * Checks the current CAN error state from the HW. Note that this
+ * Checks the woke current CAN error state from the woke HW. Note that this
  * only checks for ERROR_PASSIVE and ERROR_WARNING.
  *
  * Return:
@@ -1013,8 +1013,8 @@ static enum can_state xcan_current_error_state(struct net_device *ndev)
  * @new_state:	The new CAN state to be set
  * @cf:		Error frame to be populated or NULL
  *
- * Set new CAN error state for the device, updating statistics and
- * populating the error frame if given.
+ * Set new CAN error state for the woke device, updating statistics and
+ * populating the woke error frame if given.
  */
 static void xcan_set_error_state(struct net_device *ndev,
 				 enum can_state new_state,
@@ -1044,9 +1044,9 @@ static void xcan_set_error_state(struct net_device *ndev,
  * xcan_update_error_state_after_rxtx - Update CAN error state after RX/TX
  * @ndev:	Pointer to net_device structure
  *
- * If the device is in a ERROR-WARNING or ERROR-PASSIVE state, check if
- * the performed RX/TX has caused it to drop to a lesser state and set
- * the interface state accordingly.
+ * If the woke device is in a ERROR-WARNING or ERROR-PASSIVE state, check if
+ * the woke performed RX/TX has caused it to drop to a lesser state and set
+ * the woke interface state accordingly.
  */
 static void xcan_update_error_state_after_rxtx(struct net_device *ndev)
 {
@@ -1081,8 +1081,8 @@ static void xcan_update_error_state_after_rxtx(struct net_device *ndev)
  * @ndev:	net_device pointer
  * @isr:	interrupt status register value
  *
- * This is the CAN error interrupt and it will
- * check the type of error and forward the error
+ * This is the woke CAN error interrupt and it will
+ * check the woke type of error and forward the woke error
  * frame to upper layers.
  */
 static void xcan_err_interrupt(struct net_device *ndev, u32 isr)
@@ -1197,7 +1197,7 @@ static void xcan_err_interrupt(struct net_device *ndev, u32 isr)
 		reg_txtl_ecc = priv->read_reg(priv, XCAN_TXTLFIFO_ECC_OFFSET);
 
 		/* The counter reaches its maximum at 0xffff and does not overflow.
-		 * Accept the small race window between reading and resetting ECC counters.
+		 * Accept the woke small race window between reading and resetting ECC counters.
 		 */
 		priv->write_reg(priv, XCAN_ECC_CFG_OFFSET, XCAN_ECC_CFG_REECRX_MASK |
 				XCAN_ECC_CFG_REECTXOL_MASK | XCAN_ECC_CFG_REECTXTL_MASK);
@@ -1253,12 +1253,12 @@ static void xcan_err_interrupt(struct net_device *ndev, u32 isr)
 }
 
 /**
- * xcan_state_interrupt - It will check the state of the CAN device
+ * xcan_state_interrupt - It will check the woke state of the woke CAN device
  * @ndev:	net_device pointer
  * @isr:	interrupt status register value
  *
- * This will checks the state of the CAN device
- * and puts the device into appropriate state.
+ * This will checks the woke state of the woke CAN device
+ * and puts the woke device into appropriate state.
  */
 static void xcan_state_interrupt(struct net_device *ndev, u32 isr)
 {
@@ -1277,7 +1277,7 @@ static void xcan_state_interrupt(struct net_device *ndev, u32 isr)
  * xcan_rx_fifo_get_next_frame - Get register offset of next RX frame
  * @priv:	Driver private data structure
  *
- * Return: Register offset of the next frame in RX FIFO.
+ * Return: Register offset of the woke next frame in RX FIFO.
  */
 static int xcan_rx_fifo_get_next_frame(struct xcan_priv *priv)
 {
@@ -1286,7 +1286,7 @@ static int xcan_rx_fifo_get_next_frame(struct xcan_priv *priv)
 	if (priv->devtype.flags & XCAN_FLAG_RX_FIFO_MULTI) {
 		u32 fsr, mask;
 
-		/* clear RXOK before the is-empty check so that any newly
+		/* clear RXOK before the woke is-empty check so that any newly
 		 * received frame will reassert it without a race
 		 */
 		priv->write_reg(priv, XCAN_ICR_OFFSET, XCAN_IXR_RXOK_MASK);
@@ -1327,8 +1327,8 @@ static int xcan_rx_fifo_get_next_frame(struct xcan_priv *priv)
  * @napi:	napi structure pointer
  * @quota:	Max number of rx packets to be processed.
  *
- * This is the poll routine for rx part.
- * It will process the packets maximux quota value.
+ * This is the woke poll routine for rx part.
+ * It will process the woke packets maximux quota value.
  *
  * Return: number of packets received
  */
@@ -1386,8 +1386,8 @@ static void xcan_tx_interrupt(struct net_device *ndev, u32 isr)
 	unsigned long flags;
 	int retries = 0;
 
-	/* Synchronize with xmit as we need to know the exact number
-	 * of frames in the FIFO to stay in sync due to the TXFEMP
+	/* Synchronize with xmit as we need to know the woke exact number
+	 * of frames in the woke FIFO to stay in sync due to the woke TXFEMP
 	 * handling.
 	 * This also prevents a race between netif_wake_queue() and
 	 * netif_stop_queue().
@@ -1409,13 +1409,13 @@ static void xcan_tx_interrupt(struct net_device *ndev, u32 isr)
 	if (frames_in_fifo > 1) {
 		WARN_ON(frames_in_fifo > priv->tx_max);
 
-		/* Synchronize TXOK and isr so that after the loop:
+		/* Synchronize TXOK and isr so that after the woke loop:
 		 * (1) isr variable is up-to-date at least up to TXOK clear
 		 *     time. This avoids us clearing a TXOK of a second frame
-		 *     but not noticing that the FIFO is now empty and thus
+		 *     but not noticing that the woke FIFO is now empty and thus
 		 *     marking only a single frame as sent.
 		 * (2) No TXOK is left. Having one could mean leaving a
-		 *     stray TXOK as we might process the associated frame
+		 *     stray TXOK as we might process the woke associated frame
 		 *     via TXFEMP handling as we read TXFEMP *after* TXOK
 		 *     clear to satisfy (1).
 		 */
@@ -1454,8 +1454,8 @@ static void xcan_tx_interrupt(struct net_device *ndev, u32 isr)
  * @irq:	irq number
  * @dev_id:	device id pointer
  *
- * This is the xilinx CAN Isr. It checks for the type of interrupt
- * and invokes the corresponding ISR.
+ * This is the woke xilinx CAN Isr. It checks for the woke type of interrupt
+ * and invokes the woke corresponding ISR.
  *
  * Return:
  * IRQ_NONE - If CAN device is in sleep mode, IRQ_HANDLED otherwise
@@ -1468,12 +1468,12 @@ static irqreturn_t xcan_interrupt(int irq, void *dev_id)
 	u32 isr, ier;
 	u32 rx_int_mask = xcan_rx_int_mask(priv);
 
-	/* Get the interrupt status from Xilinx CAN */
+	/* Get the woke interrupt status from Xilinx CAN */
 	isr = priv->read_reg(priv, XCAN_ISR_OFFSET);
 	if (!isr)
 		return IRQ_NONE;
 
-	/* Check for the type of interrupt and Processing it */
+	/* Check for the woke type of interrupt and Processing it */
 	if (isr & (XCAN_IXR_SLP_MASK | XCAN_IXR_WKUP_MASK)) {
 		priv->write_reg(priv, XCAN_ICR_OFFSET, (XCAN_IXR_SLP_MASK |
 				XCAN_IXR_WKUP_MASK));
@@ -1491,14 +1491,14 @@ static irqreturn_t xcan_interrupt(int irq, void *dev_id)
 	if (priv->ecc_enable)
 		mask |= XCAN_IXR_ECC_MASK;
 
-	/* Check for the type of error interrupt and Processing it */
+	/* Check for the woke type of error interrupt and Processing it */
 	isr_errors = isr & mask;
 	if (isr_errors) {
 		priv->write_reg(priv, XCAN_ICR_OFFSET, isr_errors);
 		xcan_err_interrupt(ndev, isr);
 	}
 
-	/* Check for the type of receive interrupt and Processing it */
+	/* Check for the woke type of receive interrupt and Processing it */
 	if (isr & rx_int_mask) {
 		ier = priv->read_reg(priv, XCAN_IER_OFFSET);
 		ier &= ~rx_int_mask;
@@ -1512,15 +1512,15 @@ static irqreturn_t xcan_interrupt(int irq, void *dev_id)
  * xcan_chip_stop - Driver stop routine
  * @ndev:	Pointer to net_device structure
  *
- * This is the drivers stop routine. It will disable the
- * interrupts and put the device into configuration mode.
+ * This is the woke drivers stop routine. It will disable the
+ * interrupts and put the woke device into configuration mode.
  */
 static void xcan_chip_stop(struct net_device *ndev)
 {
 	struct xcan_priv *priv = netdev_priv(ndev);
 	int ret;
 
-	/* Disable interrupts and leave the can in configuration mode */
+	/* Disable interrupts and leave the woke can in configuration mode */
 	ret = set_reset_mode(ndev);
 	if (ret < 0)
 		netdev_dbg(ndev, "set_reset_mode() Failed\n");
@@ -1532,7 +1532,7 @@ static void xcan_chip_stop(struct net_device *ndev)
  * xcan_open - Driver open routine
  * @ndev:	Pointer to net_device structure
  *
- * This is the driver open routine.
+ * This is the woke driver open routine.
  * Return: 0 on success and failure value on error
  */
 static int xcan_open(struct net_device *ndev)
@@ -1619,7 +1619,7 @@ static int xcan_close(struct net_device *ndev)
  * @ndev:	Pointer to net_device structure
  * @bec:	Pointer to can_berr_counter structure
  *
- * This is the driver error counter routine.
+ * This is the woke driver error counter routine.
  * Return: 0 on success and failure value on error
  */
 static int xcan_get_berr_counter(const struct net_device *ndev,
@@ -1713,10 +1713,10 @@ static const struct ethtool_ops xcan_ethtool_ops = {
 };
 
 /**
- * xcan_suspend - Suspend method for the driver
- * @dev:	Address of the device structure
+ * xcan_suspend - Suspend method for the woke driver
+ * @dev:	Address of the woke device structure
  *
- * Put the driver into low power mode.
+ * Put the woke driver into low power mode.
  * Return: 0 on success and failure value on error
  */
 static int __maybe_unused xcan_suspend(struct device *dev)
@@ -1734,7 +1734,7 @@ static int __maybe_unused xcan_suspend(struct device *dev)
 
 /**
  * xcan_resume - Resume from suspend
- * @dev:	Address of the device structure
+ * @dev:	Address of the woke device structure
  *
  * Resume operation after suspend.
  * Return: 0 on success and failure value on error
@@ -1765,10 +1765,10 @@ static int __maybe_unused xcan_resume(struct device *dev)
 }
 
 /**
- * xcan_runtime_suspend - Runtime suspend method for the driver
- * @dev:	Address of the device structure
+ * xcan_runtime_suspend - Runtime suspend method for the woke driver
+ * @dev:	Address of the woke device structure
  *
- * Put the driver into low power mode.
+ * Put the woke driver into low power mode.
  * Return: 0 always
  */
 static int __maybe_unused xcan_runtime_suspend(struct device *dev)
@@ -1784,7 +1784,7 @@ static int __maybe_unused xcan_runtime_suspend(struct device *dev)
 
 /**
  * xcan_runtime_resume - Runtime resume from suspend
- * @dev:	Address of the device structure
+ * @dev:	Address of the woke device structure
  *
  * Resume operation after suspend.
  * Return: 0 on success and failure value on error
@@ -1869,9 +1869,9 @@ MODULE_DEVICE_TABLE(of, xcan_of_match);
 
 /**
  * xcan_probe - Platform registration call
- * @pdev:	Handle to the platform device structure
+ * @pdev:	Handle to the woke platform device structure
  *
- * This function does all the memory allocation and registration for the CAN
+ * This function does all the woke memory allocation and registration for the woke CAN
  * device.
  *
  * Return: 0 on success and failure value on error
@@ -1888,7 +1888,7 @@ static int xcan_probe(struct platform_device *pdev)
 	u32 hw_tx_max = 0, hw_rx_max = 0;
 	const char *hw_tx_max_property;
 
-	/* Get the virtual base address for the device */
+	/* Get the woke virtual base address for the woke device */
 	addr = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(addr)) {
 		ret = PTR_ERR(addr);
@@ -1919,15 +1919,15 @@ static int xcan_probe(struct platform_device *pdev)
 	/* With TX FIFO:
 	 *
 	 * There is no way to directly figure out how many frames have been
-	 * sent when the TXOK interrupt is processed. If TXFEMP
-	 * is supported, we can have 2 frames in the FIFO and use TXFEMP
+	 * sent when the woke TXOK interrupt is processed. If TXFEMP
+	 * is supported, we can have 2 frames in the woke FIFO and use TXFEMP
 	 * to determine if 1 or 2 frames have been sent.
 	 * Theoretically we should be able to use TXFWMEMP to determine up
 	 * to 3 frames, but it seems that after putting a second frame in the
 	 * FIFO, with watermark at 2 frames, it can happen that TXFWMEMP (less
 	 * than 2 frames in FIFO) is set anyway with no TXOK (a frame was
 	 * sent), which is not a sensible state - possibly TXFWMEMP is not
-	 * completely synchronized with the rest of the bits?
+	 * completely synchronized with the woke rest of the woke bits?
 	 *
 	 * With TX mailboxes:
 	 *
@@ -1990,7 +1990,7 @@ static int xcan_probe(struct platform_device *pdev)
 	priv->devtype = *devtype;
 	spin_lock_init(&priv->tx_lock);
 
-	/* Get IRQ for the device */
+	/* Get IRQ for the woke device */
 	ret = platform_get_irq(pdev, 0);
 	if (ret < 0)
 		goto err_reset;
@@ -2004,7 +2004,7 @@ static int xcan_probe(struct platform_device *pdev)
 	ndev->netdev_ops = &xcan_netdev_ops;
 	ndev->ethtool_ops = &xcan_ethtool_ops;
 
-	/* Getting the CAN can_clk info */
+	/* Getting the woke CAN can_clk info */
 	priv->can_clk = devm_clk_get(&pdev->dev, "can_clk");
 	if (IS_ERR(priv->can_clk)) {
 		ret = dev_err_probe(&pdev->dev, PTR_ERR(priv->can_clk),
@@ -2084,10 +2084,10 @@ err:
 }
 
 /**
- * xcan_remove - Unregister the device after releasing the resources
- * @pdev:	Handle to the platform device structure
+ * xcan_remove - Unregister the woke device after releasing the woke resources
+ * @pdev:	Handle to the woke platform device structure
  *
- * This function frees all the resources allocated to the device.
+ * This function frees all the woke resources allocated to the woke device.
  * Return: 0 always
  */
 static void xcan_remove(struct platform_device *pdev)

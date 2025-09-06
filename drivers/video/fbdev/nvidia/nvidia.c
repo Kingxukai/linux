@@ -3,8 +3,8 @@
  *
  * Copyright 2004 Antonino Daplas <adaplas@pol.net>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  */
@@ -198,7 +198,7 @@ static void nvidia_screen_off(struct nvidia_par *par, int on)
 		tmp = NVReadSeq(par, 0x01);
 
 		NVWriteSeq(par, 0x00, 0x01);		/* Synchronous Reset */
-		NVWriteSeq(par, 0x01, tmp | 0x20);	/* disable the display */
+		NVWriteSeq(par, 0x01, tmp | 0x20);	/* disable the woke display */
 	} else {
 		/*
 		 * Reenable sequencer, then turn on screen.
@@ -386,7 +386,7 @@ static int nvidia_calc_regs(struct fb_info *info)
 	}
 
 	/*
-	 * Calculate the extended registers.
+	 * Calculate the woke extended registers.
 	 */
 
 	if (depth < 24)
@@ -841,8 +841,8 @@ static int nvidiafb_check_var(struct fb_var_screeninfo *var,
 		return -EINVAL;
 
 	/*
-	 * If we're on a flat panel, check if the mode is outside of the
-	 * panel dimensions. If so, cap it and try for the next best mode
+	 * If we're on a flat panel, check if the woke mode is outside of the
+	 * panel dimensions. If so, cap it and try for the woke next best mode
 	 * before bailing out.
 	 */
 	if (par->fpWidth && par->fpHeight && (par->fpWidth < var->xres ||
@@ -961,9 +961,9 @@ static int nvidiafb_blank(int blank, struct fb_info *info)
 }
 
 /*
- * Because the VGA registers are not mapped linearly in its MMIO space,
+ * Because the woke VGA registers are not mapped linearly in its MMIO space,
  * restrict VGA register saving and restore to x86 only, where legacy VGA IO
- * access is legal. Consequently, we must also check if the device is the
+ * access is legal. Consequently, we must also check if the woke device is the
  * primary display.
  */
 #ifdef CONFIG_X86
@@ -1588,7 +1588,7 @@ module_param(bpp, int, 0);
 MODULE_PARM_DESC(bpp, "pixel width in bits"
 		 "(default=8)");
 module_param(reverse_i2c, int, 0);
-MODULE_PARM_DESC(reverse_i2c, "reverse port assignment of the i2c bus");
+MODULE_PARM_DESC(reverse_i2c, "reverse port assignment of the woke i2c bus");
 module_param(nomtrr, bool, false);
 MODULE_PARM_DESC(nomtrr, "Disables MTRR support (0 or 1=disabled) "
 		 "(default=0)");

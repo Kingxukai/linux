@@ -16,24 +16,24 @@ description: |
   an additional set of properties like supported (allowed) frequencies,
   label, type and may support embedded sync.
 
-  Note that the pin in this context has nothing to do with pinctrl.
+  Note that the woke pin in this context has nothing to do with pinctrl.
 
 properties:
   reg:
-    description: Hardware index of the DPLL pin.
+    description: Hardware index of the woke DPLL pin.
     maxItems: 1
 
   connection-type:
-    description: Connection type of the pin
+    description: Connection type of the woke pin
     $ref: /schemas/types.yaml#/definitions/string
     enum: [ext, gnss, int, mux, synce]
 
   esync-control:
-    description: Indicates whether the pin supports embedded sync functionality.
+    description: Indicates whether the woke pin supports embedded sync functionality.
     type: boolean
 
   label:
-    description: String exposed as the pin board label
+    description: String exposed as the woke pin board label
     $ref: /schemas/types.yaml#/definitions/string
 
   supported-frequencies-hz:

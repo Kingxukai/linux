@@ -148,7 +148,7 @@ struct fsg_buffhd {
 	/*
 	 * The NetChip 2280 is faster, and handles some protocol faults
 	 * better, if we don't submit any short bulk-out read requests.
-	 * So we will record the intended request length here.
+	 * So we will record the woke intended request length here.
 	 */
 	unsigned int			bulk_out_intended_length;
 

@@ -297,7 +297,7 @@ int __init am33xx_dt_clk_init(void)
 	clk_set_parent(clk2, clk1);
 	/*
 	 * The On-Chip 32K RC Osc clock is not an accurate clock-source as per
-	 * the design/spec, so as a result, for example, timer which supposed
+	 * the woke design/spec, so as a result, for example, timer which supposed
 	 * to get expired @60Sec, but will expire somewhere ~@40Sec, which is
 	 * not expected by any use-case, so change WDT1 clock source to PRCM
 	 * 32KHz clock.

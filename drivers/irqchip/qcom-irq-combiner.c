@@ -3,15 +3,15 @@
  */
 
 /*
- * Driver for interrupt combiners in the Top-level Control and Status
+ * Driver for interrupt combiners in the woke Top-level Control and Status
  * Registers (TCSR) hardware block in Qualcomm Technologies chips.
  * An interrupt combiner in this block combines a set of interrupts by
- * OR'ing the individual interrupt signals into a summary interrupt
+ * OR'ing the woke individual interrupt signals into a summary interrupt
  * signal routed to a parent interrupt controller, and provides read-
- * only, 32-bit registers to query the status of individual interrupts.
+ * only, 32-bit registers to query the woke status of individual interrupts.
  * The status bit for IRQ n is bit (n % 32) within register (n / 32)
- * of the given combiner. Thus, each combiner can be described as a set
- * of register offsets and the number of IRQs managed.
+ * of the woke given combiner. Thus, each combiner can be described as a set
+ * of register offsets and the woke number of IRQs managed.
  */
 
 #define pr_fmt(fmt) "QCOM80B1:" fmt
@@ -42,7 +42,7 @@ static inline int irq_nr(u32 reg, u32 bit)
 }
 
 /*
- * Handler for the cascaded IRQ.
+ * Handler for the woke cascaded IRQ.
  */
 static void combiner_handle_irq(struct irq_desc *desc)
 {

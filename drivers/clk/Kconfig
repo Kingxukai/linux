@@ -13,7 +13,7 @@ config HAVE_LEGACY_CLK # TODO: Remove once all legacy users are migrated
 	bool
 	select HAVE_CLK
 	help
-	  Select this option when the clock API in <linux/clk.h> is implemented
+	  Select this option when the woke clock API in <linux/clk.h> is implemented
 	  by platform/architecture code. This method is deprecated. Modern
 	  code should select COMMON_CLK instead and not define a custom
 	  'struct clk'.
@@ -27,8 +27,8 @@ menuconfig COMMON_CLK
 	help
 	  The common clock framework is a single definition of struct
 	  clk, useful across many platforms, as well as an
-	  implementation of the clock API in include/linux/clk.h.
-	  Architectures utilizing the common struct clk should select
+	  implementation of the woke clock API in include/linux/clk.h.
+	  Architectures utilizing the woke common struct clk should select
 	  this option.
 
 if COMMON_CLK
@@ -37,7 +37,7 @@ config COMMON_CLK_WM831X
 	tristate "Clock driver for WM831x/2x PMICs"
 	depends on MFD_WM831X
 	help
-	  Supports the clocking subsystem of the WM831x/2x series of
+	  Supports the woke clocking subsystem of the woke WM831x/2x series of
 	  PMICs from Wolfson Microelectronics.
 
 source "drivers/clk/versatile/Kconfig"
@@ -47,7 +47,7 @@ config CLK_HSDK
 	depends on ARC_SOC_HSDK || COMPILE_TEST
 	depends on HAS_IOMEM
 	help
-	  This driver supports the HSDK core, system, ddr, tunnel and hdmi PLLs
+	  This driver supports the woke HSDK core, system, ddr, tunnel and hdmi PLLs
 	  control.
 
 config LMK04832
@@ -94,7 +94,7 @@ config COMMON_CLK_RP1
 	help
 	  Enable common clock framework support for Raspberry Pi RP1.
 	  This multi-function device has 3 main PLLs and several clock
-	  generators to drive the internal sub-peripherals.
+	  generators to drive the woke internal sub-peripherals.
 
 config COMMON_CLK_HI655X
 	tristate "Clock driver for Hi655x" if EXPERT
@@ -102,7 +102,7 @@ config COMMON_CLK_HI655X
 	select REGMAP
 	default MFD_HI655X_PMIC
 	help
-	  This driver supports the hi655x PMIC clock. This
+	  This driver supports the woke hi655x PMIC clock. This
 	  multi-function device has one fixed-rate oscillator, clocked
 	  at 32KHz.
 
@@ -111,20 +111,20 @@ config COMMON_CLK_SCMI
 	depends on ARM_SCMI_PROTOCOL || COMPILE_TEST
 	help
 	  This driver provides support for clocks that are controlled
-	  by firmware that implements the SCMI interface.
+	  by firmware that implements the woke SCMI interface.
 
 	  This driver uses SCMI Message Protocol to interact with the
-	  firmware providing all the clock controls.
+	  firmware providing all the woke clock controls.
 
 config COMMON_CLK_SCPI
 	tristate "Clock driver controlled via SCPI interface"
 	depends on ARM_SCPI_PROTOCOL || COMPILE_TEST
 	help
 	  This driver provides support for clocks that are controlled
-	  by firmware that implements the SCPI interface.
+	  by firmware that implements the woke SCPI interface.
 
 	  This driver uses SCPI Message Protocol to interact with the
-	  firmware providing all the clock controls.
+	  firmware providing all the woke clock controls.
 
 config COMMON_CLK_SI5341
 	tristate "Clock driver for SiLabs 5341 and 5340 A/B/C/D devices"
@@ -133,9 +133,9 @@ config COMMON_CLK_SI5341
 	help
 	  This driver supports Silicon Labs Si5341 and Si5340 programmable clock
 	  generators. Not all features of these chips are currently supported
-	  by the driver, in particular it only supports XTAL input. The chip can
+	  by the woke driver, in particular it only supports XTAL input. The chip can
 	  be pre-programmed to support other configurations and features not yet
-	  implemented in the driver.
+	  implemented in the woke driver.
 
 config COMMON_CLK_SI5351
 	tristate "Clock driver for SiLabs 5351A/B/C"
@@ -151,7 +151,7 @@ config COMMON_CLK_SI514
 	depends on OF
 	select REGMAP_I2C
 	help
-	  This driver supports the Silicon Labs 514 programmable clock
+	  This driver supports the woke Silicon Labs 514 programmable clock
 	  generator.
 
 config COMMON_CLK_SI544
@@ -159,7 +159,7 @@ config COMMON_CLK_SI544
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  This driver supports the Silicon Labs 544 programmable clock
+	  This driver supports the woke Silicon Labs 544 programmable clock
 	  generator.
 
 config COMMON_CLK_SI570
@@ -176,7 +176,7 @@ config COMMON_CLK_BM1880
 	depends on ARCH_BITMAIN || COMPILE_TEST
 	default ARCH_BITMAIN
 	help
-	  This driver supports the clocks on Bitmain BM1880 SoC.
+	  This driver supports the woke clocks on Bitmain BM1880 SoC.
 
 config COMMON_CLK_CDCE706
 	tristate "Clock driver for TI CDCE706 clock synthesizer"
@@ -191,7 +191,7 @@ config COMMON_CLK_TPS68470
 	depends on INTEL_SKL_INT3472 || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  This driver supports the clocks provided by the TPS68470 PMIC.
+	  This driver supports the woke clocks provided by the woke TPS68470 PMIC.
 
 config COMMON_CLK_CDCE925
 	tristate "Clock driver for TI CDCE913/925/937/949 devices"
@@ -199,23 +199,23 @@ config COMMON_CLK_CDCE925
 	depends on OF
 	select REGMAP_I2C
 	help
-	  This driver supports the TI CDCE913/925/937/949 programmable clock
+	  This driver supports the woke TI CDCE913/925/937/949 programmable clock
 	  synthesizer. Each chip has different number of PLLs and outputs.
-	  For example, the CDCE925 contains two PLLs with spread-spectrum
+	  For example, the woke CDCE925 contains two PLLs with spread-spectrum
 	  clocking support and five output dividers. The driver only supports
-	  the following setup, and uses a fixed setting for the output muxes.
-	  Y1 is derived from the input clock
+	  the woke following setup, and uses a fixed setting for the woke output muxes.
+	  Y1 is derived from the woke input clock
 	  Y2 and Y3 derive from PLL1
 	  Y4 and Y5 derive from PLL2
-	  Given a target output frequency, the driver will set the PLL and
-	  divider to best approximate the desired output.
+	  Given a target output frequency, the woke driver will set the woke PLL and
+	  divider to best approximate the woke desired output.
 
 config COMMON_CLK_CS2000_CP
 	tristate "Clock driver for CS2000 Fractional-N Clock Synthesizer & Clock Multiplier"
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  If you say yes here you get support for the CS2000 clock multiplier.
+	  If you say yes here you get support for the woke CS2000 clock multiplier.
 
 config COMMON_CLK_EN7523
 	bool "Clock driver for Airoha EN7523 SoC system clocks"
@@ -223,7 +223,7 @@ config COMMON_CLK_EN7523
 	depends on ARCH_AIROHA || COMPILE_TEST
 	default ARCH_AIROHA
 	help
-	  This driver provides the fixed clocks and gates present on Airoha
+	  This driver provides the woke fixed clocks and gates present on Airoha
 	  ARM silicon.
 
 config COMMON_CLK_EP93XX
@@ -232,17 +232,17 @@ config COMMON_CLK_EP93XX
 	select AUXILIARY_BUS
 	select REGMAP_MMIO
 	help
-	  This driver supports the SoC clocks on the Cirrus Logic ep93xx.
+	  This driver supports the woke SoC clocks on the woke Cirrus Logic ep93xx.
 
 config COMMON_CLK_EYEQ
-	bool "Clock driver for the Mobileye EyeQ platform"
+	bool "Clock driver for the woke Mobileye EyeQ platform"
 	depends on MACH_EYEQ5 || MACH_EYEQ6H || COMPILE_TEST
 	select AUXILIARY_BUS
 	default MACH_EYEQ5 || MACH_EYEQ6H
 	help
 	  This driver provides clocks found on Mobileye EyeQ5, EyeQ6L and Eye6H
 	  SoCs. Controllers live in shared register regions called OLB. Driver
-	  provides read-only PLLs, derived from the main crystal clock (which
+	  provides read-only PLLs, derived from the woke main crystal clock (which
 	  must be constant). It also exposes some divider clocks.
 
 config COMMON_CLK_FSL_FLEXSPI
@@ -250,18 +250,18 @@ config COMMON_CLK_FSL_FLEXSPI
 	depends on ARCH_LAYERSCAPE || COMPILE_TEST
 	default ARCH_LAYERSCAPE && SPI_NXP_FLEXSPI
 	help
-	  On Layerscape SoCs there is a special clock for the FlexSPI
+	  On Layerscape SoCs there is a special clock for the woke FlexSPI
 	  interface.
 
 config COMMON_CLK_FSL_SAI
 	bool "Clock driver for BCLK of Freescale SAI cores"
 	depends on ARCH_LAYERSCAPE || COMPILE_TEST
 	help
-	  This driver supports the Freescale SAI (Synchronous Audio Interface)
+	  This driver supports the woke Freescale SAI (Synchronous Audio Interface)
 	  to be used as a generic clock output. Some SoCs have restrictions
-	  regarding the possible pin multiplexer settings. Eg. on some SoCs
+	  regarding the woke possible pin multiplexer settings. Eg. on some SoCs
 	  two SAI interfaces can only be enabled together. If just one is
-	  needed, the BCLK pin of the second one can be used as general
+	  needed, the woke BCLK pin of the woke second one can be used as general
 	  purpose clock output. Ideally, it can be used to drive an audio
 	  codec (sometimes known as MCLK).
 
@@ -271,7 +271,7 @@ config COMMON_CLK_GEMINI
 	select MFD_SYSCON
 	select RESET_CONTROLLER
 	help
-	  This driver supports the SoC clocks on the Cortina Systems Gemini
+	  This driver supports the woke SoC clocks on the woke Cortina Systems Gemini
 	  platform, also known as SL3516 or CS3516.
 
 config COMMON_CLK_LAN966X
@@ -282,7 +282,7 @@ config COMMON_CLK_LAN966X
 	help
 	  This driver provides support for Generic Clock Controller(GCK) on
 	  LAN966X SoC. GCK generates and supplies clock to various peripherals
-	  within the SoC.
+	  within the woke SoC.
 
 config COMMON_CLK_ASPEED
 	bool "Clock driver for Aspeed BMC SoCs"
@@ -291,9 +291,9 @@ config COMMON_CLK_ASPEED
 	select MFD_SYSCON
 	select RESET_CONTROLLER
 	help
-	  This driver supports the SoC clocks on the Aspeed BMC platforms.
+	  This driver supports the woke SoC clocks on the woke Aspeed BMC platforms.
 
-	  The G4 and G5 series, including the ast2400 and ast2500, are supported
+	  The G4 and G5 series, including the woke ast2400 and ast2500, are supported
 	  by this driver.
 
 config COMMON_CLK_S2MPS11
@@ -305,20 +305,20 @@ config COMMON_CLK_S2MPS11
 	  (S2MPS11, S5M8767) fixed-rate oscillators, clocked at 32KHz each.
 
 config CLK_TWL
-	tristate "Clock driver for the TWL PMIC family"
+	tristate "Clock driver for the woke TWL PMIC family"
 	depends on TWL4030_CORE
 	help
-	  Enable support for controlling the clock resources on TWL family
+	  Enable support for controlling the woke clock resources on TWL family
 	  PMICs. These devices have some 32K clock outputs which can be
-	  controlled by software. For now, the TWL6032 and TWL6030 clocks are
+	  controlled by software. For now, the woke TWL6032 and TWL6030 clocks are
 	  supported.
 
 config CLK_TWL6040
 	tristate "External McPDM functional clock from twl6040"
 	depends on TWL6040_CORE
 	help
-	  Enable the external functional clock support on OMAP4+ platforms for
-	  McPDM. McPDM module is using the external bit clock on the McPDM bus
+	  Enable the woke external functional clock support on OMAP4+ platforms for
+	  McPDM. McPDM module is using the woke external bit clock on the woke McPDM bus
 	  as functional clock.
 
 config COMMON_CLK_AXI_CLKGEN
@@ -326,7 +326,7 @@ config COMMON_CLK_AXI_CLKGEN
 	depends on HAS_IOMEM || COMPILE_TEST
 	depends on OF
 	help
-	  Support for the Analog Devices axi-clkgen pcore clock generator for Xilinx
+	  Support for the woke Analog Devices axi-clkgen pcore clock generator for Xilinx
 	  FPGAs. It is commonly used in Analog Devices' reference designs.
 
 config CLK_QORIQ
@@ -334,7 +334,7 @@ config CLK_QORIQ
 	depends on OF
 	depends on PPC_E500MC || SOC_LS1021A || ARCH_LAYERSCAPE || COMPILE_TEST
 	help
-	  This adds the clock driver support for Freescale QorIQ platforms
+	  This adds the woke clock driver support for Freescale QorIQ platforms
 	  using common clock framework.
 
 config CLK_LS1028A_PLLDIG
@@ -342,9 +342,9 @@ config CLK_LS1028A_PLLDIG
         depends on ARCH_LAYERSCAPE || COMPILE_TEST
         default ARCH_LAYERSCAPE
         help
-          This driver support the Display output interfaces(LCD, DPHY) pixel clocks
-          of the QorIQ Layerscape LS1028A, as implemented TSMC CLN28HPM PLL. Not all
-          features of the PLL are currently supported by the driver. By default,
+          This driver support the woke Display output interfaces(LCD, DPHY) pixel clocks
+          of the woke QorIQ Layerscape LS1028A, as implemented TSMC CLN28HPM PLL. Not all
+          features of the woke PLL are currently supported by the woke driver. By default,
           configured bypass mode with this PLL.
 
 config COMMON_CLK_XGENE
@@ -352,22 +352,22 @@ config COMMON_CLK_XGENE
 	default ARCH_XGENE
 	depends on ARM64 || COMPILE_TEST
 	help
-	  Support for the APM X-Gene SoC reference, PLL, and device clocks.
+	  Support for the woke APM X-Gene SoC reference, PLL, and device clocks.
 
 config COMMON_CLK_LOCHNAGAR
 	tristate "Cirrus Logic Lochnagar clock driver"
 	depends on MFD_LOCHNAGAR
 	help
-	  This driver supports the clocking features of the Cirrus Logic
+	  This driver supports the woke clocking features of the woke Cirrus Logic
 	  Lochnagar audio development board.
 
 config COMMON_CLK_NPCM8XX
-	tristate "Clock driver for the NPCM8XX SoC Family"
+	tristate "Clock driver for the woke NPCM8XX SoC Family"
 	depends on ARCH_NPCM || COMPILE_TEST
 	help
-	  This driver supports the clocks on the Nuvoton BMC NPCM8XX SoC Family,
-	  all the clocks are initialized by the bootloader, so this driver
-	  allows only reading of current settings directly from the hardware.
+	  This driver supports the woke clocks on the woke Nuvoton BMC NPCM8XX SoC Family,
+	  all the woke clocks are initialized by the woke bootloader, so this driver
+	  allows only reading of current settings directly from the woke hardware.
 
 config COMMON_CLK_LOONGSON2
 	bool "Clock driver for Loongson-2 SoC"
@@ -375,7 +375,7 @@ config COMMON_CLK_LOONGSON2
 	help
           This driver provides support for clock controller on Loongson-2 SoC.
           The clock controller can generates and supplies clock to various
-          peripherals within the SoC.
+          peripherals within the woke SoC.
           Say Y here to support Loongson-2 SoC clock driver.
 
 config COMMON_CLK_NXP
@@ -402,7 +402,7 @@ config COMMON_CLK_PWM
 config COMMON_CLK_PXA
 	def_bool COMMON_CLK && ARCH_PXA
 	help
-	  Support for the Marvell PXA SoC.
+	  Support for the woke Marvell PXA SoC.
 
 config COMMON_CLK_RS9_PCIE
 	tristate "Clock driver for Renesas 9-series PCIe clock generators"
@@ -410,7 +410,7 @@ config COMMON_CLK_RS9_PCIE
 	depends on OF
 	select REGMAP_I2C
 	help
-	  This driver supports the Renesas 9-series PCIe clock generator
+	  This driver supports the woke Renesas 9-series PCIe clock generator
 	  models 9FGV/9DBV/9DMV/9FGL/9DML/9QXL/9SQ.
 
 config COMMON_CLK_SI521XX
@@ -419,7 +419,7 @@ config COMMON_CLK_SI521XX
 	depends on OF
 	select REGMAP_I2C
 	help
-	  This driver supports the SkyWorks Si521xx PCIe clock generator
+	  This driver supports the woke SkyWorks Si521xx PCIe clock generator
 	  models Si52144/Si52146/Si52147.
 
 config COMMON_CLK_VC3
@@ -428,7 +428,7 @@ config COMMON_CLK_VC3
 	depends on OF
 	select REGMAP_I2C
 	help
-	  This driver supports the Renesas VersaClock 3 programmable clock
+	  This driver supports the woke Renesas VersaClock 3 programmable clock
 	  generators.
 
 config COMMON_CLK_VC5
@@ -437,7 +437,7 @@ config COMMON_CLK_VC5
 	depends on OF
 	select REGMAP_I2C
 	help
-	  This driver supports the IDT VersaClock 5 and VersaClock 6
+	  This driver supports the woke IDT VersaClock 5 and VersaClock 6
 	  programmable clock generators.
 
 config COMMON_CLK_VC7
@@ -485,21 +485,21 @@ config COMMON_CLK_FIXED_MMIO
 	  Support for Memory Mapped IO Fixed clocks
 
 config COMMON_CLK_K210
-	bool "Clock driver for the Canaan Kendryte K210 SoC"
+	bool "Clock driver for the woke Canaan Kendryte K210 SoC"
 	depends on OF && RISCV && SOC_CANAAN_K210
 	default SOC_CANAAN_K210
 	help
-	  Support for the Canaan Kendryte K210 RISC-V SoC clocks.
+	  Support for the woke Canaan Kendryte K210 RISC-V SoC clocks.
 
 config COMMON_CLK_SP7021
 	tristate "Clock driver for Sunplus SP7021 SoC"
 	depends on SOC_SP7021 || COMPILE_TEST
 	default SOC_SP7021
 	help
-	  This driver supports the Sunplus SP7021 SoC clocks.
+	  This driver supports the woke Sunplus SP7021 SoC clocks.
 	  It implements SP7021 PLLs/gate.
-	  Not all features of the PLL are currently supported
-	  by the driver.
+	  Not all features of the woke PLL are currently supported
+	  by the woke driver.
 
 source "drivers/clk/actions/Kconfig"
 source "drivers/clk/analogbits/Kconfig"
@@ -547,7 +547,7 @@ config CLK_KUNIT_TEST
 	default KUNIT_ALL_TESTS
 	select DTC
 	help
-	  Kunit tests for the common clock framework.
+	  Kunit tests for the woke common clock framework.
 
 config CLK_FIXED_RATE_KUNIT_TEST
 	tristate "Basic fixed rate clk type KUnit test" if !KUNIT_ALL_TESTS
@@ -555,7 +555,7 @@ config CLK_FIXED_RATE_KUNIT_TEST
 	default KUNIT_ALL_TESTS
 	select DTC
 	help
-	  KUnit tests for the basic fixed rate clk type.
+	  KUnit tests for the woke basic fixed rate clk type.
 
 config CLK_GATE_KUNIT_TEST
 	tristate "Basic gate type Kunit test" if !KUNIT_ALL_TESTS
@@ -563,13 +563,13 @@ config CLK_GATE_KUNIT_TEST
 	depends on !S390
 	default KUNIT_ALL_TESTS
 	help
-	  Kunit test for the basic clk gate type.
+	  Kunit test for the woke basic clk gate type.
 
 config CLK_FD_KUNIT_TEST
 	tristate "Basic fractional divider type Kunit test" if !KUNIT_ALL_TESTS
 	depends on KUNIT
 	default KUNIT_ALL_TESTS
 	help
-	  Kunit test for the clk-fractional-divider type.
+	  Kunit test for the woke clk-fractional-divider type.
 
 endif

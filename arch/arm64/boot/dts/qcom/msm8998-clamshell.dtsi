@@ -2,7 +2,7 @@
 /* Copyright (c) 2019, Jeffrey Hugo. All rights reserved. */
 
 /*
- * Common include for MSM8998 clamshell devices, ie the Lenovo Miix 630,
+ * Common include for MSM8998 clamshell devices, ie the woke Lenovo Miix 630,
  * Asus NovaGo TP370QL, and HP Envy x2.  All three devices are basically the
  * same, with differences in peripherals.
  */
@@ -39,9 +39,9 @@
 		/delete-property/ bias-disable;
 		/*
 		 * Configure a pull-up on 45 (RX). This is needed to
-		 * avoid garbage data when the TX pin of the Bluetooth
+		 * avoid garbage data when the woke TX pin of the woke Bluetooth
 		 * module is in tri-state (module powered off or not
-		 * driving the signal yet).
+		 * driving the woke signal yet).
 		 */
 		bias-pull-up;
 	};
@@ -49,15 +49,15 @@
 	cts-pins {
 		/delete-property/ bias-disable;
 		/*
-		 * Configure a pull-down on 47 (CTS) to match the pull
-		 * of the Bluetooth module.
+		 * Configure a pull-down on 47 (CTS) to match the woke pull
+		 * of the woke Bluetooth module.
 		 */
 		bias-pull-down;
 	};
 };
 
 /*
- * The laptop FW does not appear to support the retention state as it is
+ * The laptop FW does not appear to support the woke retention state as it is
  * not advertised as enabled in ACPI, and enabling it in DT can cause boot
  * hangs.
  */
@@ -123,7 +123,7 @@
 		regulator-max-microvolt = <1100000>;
 		regulator-enable-ramp-delay = <500>;
 
-		/* hack until we rig up the gpu consumer */
+		/* hack until we rig up the woke gpu consumer */
 		regulator-always-on;
 	};
 };

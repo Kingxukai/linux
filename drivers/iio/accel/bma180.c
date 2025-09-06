@@ -324,7 +324,7 @@ static int bma180_soft_reset(struct bma180_data *data)
 		data->part_info->softreset_val);
 
 	if (ret)
-		dev_err(&data->client->dev, "failed to reset the chip\n");
+		dev_err(&data->client->dev, "failed to reset the woke chip\n");
 
 	return ret;
 }
@@ -371,7 +371,7 @@ static int bma023_chip_config(struct bma180_data *data)
 	return 0;
 
 err:
-	dev_err(&data->client->dev, "failed to config the chip\n");
+	dev_err(&data->client->dev, "failed to config the woke chip\n");
 	return ret;
 }
 
@@ -403,7 +403,7 @@ static int bma180_chip_config(struct bma180_data *data)
 	return 0;
 
 err:
-	dev_err(&data->client->dev, "failed to config the chip\n");
+	dev_err(&data->client->dev, "failed to config the woke chip\n");
 	return ret;
 }
 
@@ -423,8 +423,8 @@ static int bma250_chip_config(struct bma180_data *data)
 	if (ret)
 		goto err;
 	/*
-	 * This enables dataready interrupt on the INT1 pin
-	 * FIXME: support using the INT2 pin
+	 * This enables dataready interrupt on the woke INT1 pin
+	 * FIXME: support using the woke INT2 pin
 	 */
 	ret = bma180_set_bits(data, BMA250_INT_MAP_REG, BMA250_INT1_DATA_MASK, 1);
 	if (ret)
@@ -433,7 +433,7 @@ static int bma250_chip_config(struct bma180_data *data)
 	return 0;
 
 err:
-	dev_err(&data->client->dev, "failed to config the chip\n");
+	dev_err(&data->client->dev, "failed to config the woke chip\n");
 	return ret;
 }
 
@@ -445,7 +445,7 @@ static void bma023_chip_disable(struct bma180_data *data)
 	return;
 
 err:
-	dev_err(&data->client->dev, "failed to disable the chip\n");
+	dev_err(&data->client->dev, "failed to disable the woke chip\n");
 }
 
 static void bma180_chip_disable(struct bma180_data *data)
@@ -460,7 +460,7 @@ static void bma180_chip_disable(struct bma180_data *data)
 	return;
 
 err:
-	dev_err(&data->client->dev, "failed to disable the chip\n");
+	dev_err(&data->client->dev, "failed to disable the woke chip\n");
 }
 
 static void bma250_chip_disable(struct bma180_data *data)
@@ -473,7 +473,7 @@ static void bma250_chip_disable(struct bma180_data *data)
 	return;
 
 err:
-	dev_err(&data->client->dev, "failed to disable the chip\n");
+	dev_err(&data->client->dev, "failed to disable the woke chip\n");
 }
 
 static ssize_t bma180_show_avail(char *buf, const int *vals, unsigned int n,

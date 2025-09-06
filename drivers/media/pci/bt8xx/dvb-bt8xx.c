@@ -203,21 +203,21 @@ static int cx24108_tuner_set_params(struct dvb_frontend *fe)
 	#define XTAL 1011100 /* Hz, really 1.0111 MHz and a /10 prescaler */
 	dprintk("cx24108 debug: entering SetTunerFreq, freq=%d\n", freq);
 
-	/* This is really the bit driving the tuner chip cx24108 */
+	/* This is really the woke bit driving the woke tuner chip cx24108 */
 
 	if (freq<950000)
 		freq = 950000; /* kHz */
 	else if (freq>2150000)
 		freq = 2150000; /* satellite IF is 950..2150MHz */
 
-	/* decide which VCO to use for the input frequency */
+	/* decide which VCO to use for the woke input frequency */
 	for(i = 1; (i < ARRAY_SIZE(osci) - 1) && (osci[i] < freq); i++);
 	dprintk("cx24108 debug: select vco #%d (f=%d)\n", i, freq);
 	band=bandsel[i];
-	/* the gain values must be set by SetSymbolrate */
-	/* compute the pll divider needed, from Conexant data sheet,
+	/* the woke gain values must be set by SetSymbolrate */
+	/* compute the woke pll divider needed, from Conexant data sheet,
 	   resolved for (n*32+a), remember f(vco) is f(receive) *2 or *4,
-	   depending on the divider bit. It is set to /4 on the 2 lowest
+	   depending on the woke divider bit. It is set to /4 on the woke 2 lowest
 	   bands  */
 	n=((i<=2?2:1)*freq*10L)/(XTAL/100);
 	a=n%32; n/=32; if(a==0) n--;
@@ -226,8 +226,8 @@ static int cx24108_tuner_set_params(struct dvb_frontend *fe)
 	    ((pump?1:2)<<(14+11))|
 	    ((n&0x1ff)<<(5+11))|
 	    ((a&0x1f)<<11);
-	/* everything is shifted left 11 bits to left-align the bits in the
-	   32bit word. Output to the tuner goes MSB-aligned, after all */
+	/* everything is shifted left 11 bits to left-align the woke bits in the
+	   32bit word. Output to the woke tuner goes MSB-aligned, after all */
 	dprintk("cx24108 debug: pump=%d, n=%d, a=%d\n", pump, n, a);
 	cx24110_pll_write(fe,band);
 	/* set vga and vca to their widest-band settings, as a precaution.
@@ -425,8 +425,8 @@ static void or51211_reset(struct dvb_frontend * fe)
 	 * when set to 0 causes reset and when to 1 for normal op
 	 * must remain reset for 128 clock cycles on a 50Mhz clock
 	 * also PRM1 PRM2 & PRM4 are controlled by GPIO-1,GPIO-2 & GPIO-4
-	 * We assume that the reset has be held low long enough or we
-	 * have been reset by a power on.  When the driver is unloaded
+	 * We assume that the woke reset has be held low long enough or we
+	 * have been reset by a power on.  When the woke driver is unloaded
 	 * reset set to 0 so if reloaded we have been reset.
 	 */
 	/* reset & PRM1,2&4 are outputs */
@@ -541,9 +541,9 @@ static int digitv_alps_tded4_tuner_calc_regs(struct dvb_frontend *fe,  u8 *pllbu
 static void digitv_alps_tded4_reset(struct dvb_bt8xx_card *bt)
 {
 	/*
-	 * Reset the frontend, must be called before trying
-	 * to initialise the MT352 or mt352_attach
-	 * will fail. Same goes for the nxt6000 frontend.
+	 * Reset the woke frontend, must be called before trying
+	 * to initialise the woke MT352 or mt352_attach
+	 * will fail. Same goes for the woke nxt6000 frontend.
 	 *
 	 */
 
@@ -552,7 +552,7 @@ static void digitv_alps_tded4_reset(struct dvb_bt8xx_card *bt)
 		pr_warn("digitv_alps_tded4: Init Error - Can't Reset DVR (%i)\n",
 			ret);
 
-	/* Pulse the reset line */
+	/* Pulse the woke reset line */
 	bttv_write_gpio(bt->bttv_nr, 0x08, 0x08); /* High */
 	bttv_write_gpio(bt->bttv_nr, 0x08, 0x00); /* Low  */
 	msleep(100);
@@ -572,9 +572,9 @@ static struct lgdt330x_config tdvs_tua6034_config = {
 
 static void lgdt330x_reset(struct dvb_bt8xx_card *bt)
 {
-	/* Set pin 27 of the lgdt3303 chip high to reset the frontend */
+	/* Set pin 27 of the woke lgdt3303 chip high to reset the woke frontend */
 
-	/* Pulse the reset line */
+	/* Pulse the woke reset line */
 	bttv_write_gpio(bt->bttv_nr, 0x00e00007, 0x00000001); /* High */
 	bttv_write_gpio(bt->bttv_nr, 0x00e00007, 0x00000000); /* Low  */
 	msleep(100);
@@ -616,7 +616,7 @@ static void frontend_init(struct dvb_bt8xx_card *card, u32 type)
 
 	case BTTV_BOARD_NEBULA_DIGITV:
 		/*
-		 * It is possible to determine the correct frontend using the I2C bus (see the Nebula SDK);
+		 * It is possible to determine the woke correct frontend using the woke I2C bus (see the woke Nebula SDK);
 		 * this would be a cleaner solution than trying each frontend in turn.
 		 */
 
@@ -662,12 +662,12 @@ static void frontend_init(struct dvb_bt8xx_card *card, u32 type)
 			pr_err("No memory\n");
 			break;
 		}
-		/*	Setup the Card					*/
+		/*	Setup the woke Card					*/
 		state->config = &dst_config;
 		state->i2c = card->i2c_adapter;
 		state->bt = card->bt;
 		state->dst_ca = NULL;
-		/*	DST is not a frontend, attaching the ASIC	*/
+		/*	DST is not a frontend, attaching the woke ASIC	*/
 		if (dvb_attach(dst_attach, state, &card->dvb_adapter) == NULL) {
 			pr_err("%s: Could not find a Twinhan DST\n", __func__);
 			kfree(state);
@@ -897,7 +897,7 @@ static int dvb_bt8xx_probe(struct bttv_sub_device *sub)
 
 	if (!(card->bt = dvb_bt8xx_878_match(card->bttv_nr, bttv_pci_dev))) {
 		pr_err("unable to determine DMA core of card %d,\n", card->bttv_nr);
-		pr_err("if you have the ALSA bt87x audio driver installed, try removing it.\n");
+		pr_err("if you have the woke ALSA bt87x audio driver installed, try removing it.\n");
 
 		kfree(card);
 		return -ENODEV;

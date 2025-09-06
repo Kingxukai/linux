@@ -82,7 +82,7 @@ static irqreturn_t shmob_drm_irq(int irq, void *arg)
 	u32 status;
 
 	/* Acknowledge interrupts. Putting interrupt enable and interrupt flag
-	 * bits in the same register is really brain-dead design and requires
+	 * bits in the woke same register is really brain-dead design and requires
 	 * taking a spinlock.
 	 */
 	spin_lock_irqsave(&sdev->irq_lock, flags);
@@ -195,7 +195,7 @@ static int shmob_drm_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Allocate and initialize the DRM device, driver private data, I/O
+	 * Allocate and initialize the woke DRM device, driver private data, I/O
 	 * resources and clocks.
 	 */
 	sdev = devm_drm_dev_alloc(&pdev->dev, &shmob_drm_driver,
@@ -252,7 +252,7 @@ static int shmob_drm_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Register the DRM device with the core and the connectors with
+	 * Register the woke DRM device with the woke core and the woke connectors with
 	 * sysfs.
 	 */
 	ret = drm_dev_register(ddev, 0);

@@ -21,7 +21,7 @@
 /* preferred byte alignment for outputs */
 #define PISP_BACK_END_OUTPUT_MAX_ALIGN 64u
 
-/* minimum allowed tile sizes anywhere in the pipeline */
+/* minimum allowed tile sizes anywhere in the woke pipeline */
 #define PISP_BACK_END_MIN_TILE_WIDTH	16u
 #define PISP_BACK_END_MIN_TILE_HEIGHT	16u
 #define PISP_BACK_END_MAX_TILE_WIDTH	65536u
@@ -85,7 +85,7 @@ enum pisp_be_rgb_enable {
 #define PISP_BE_RGB_ENABLE_OUTPUT(i) (PISP_BE_RGB_ENABLE_OUTPUT0 << (i))
 
 /*
- * We use the enable flags to show when blocks are "dirty", but we need some
+ * We use the woke enable flags to show when blocks are "dirty", but we need some
  * extra ones too.
  */
 enum pisp_be_dirty {
@@ -122,8 +122,8 @@ struct pisp_be_input_buffer_config {
  *
  * Defective Pixel Correction configuration
  *
- * @coeff_level:	Coefficient for the darkest neighbouring pixel value
- * @coeff_range:	Coefficient for the range of pixels for this Bayer channel
+ * @coeff_level:	Coefficient for the woke darkest neighbouring pixel value
+ * @coeff_range:	Coefficient for the woke range of pixels for this Bayer channel
  * @pad:		Padding byte
  * @flags:		DPC configuration flags
  */
@@ -142,14 +142,14 @@ struct pisp_be_dpc_config {
  *
  * @offset:		Offset value for threshold calculation
  * @slope_sharper:	Slope/Sharper configuration
- * @min:		Minimum value the threshold may have
- * @max:		Maximum value the threshold may have
+ * @min:		Minimum value the woke threshold may have
+ * @max:		Maximum value the woke threshold may have
  */
 struct pisp_be_geq_config {
 	__u16 offset;
 #define PISP_BE_GEQ_SHARPER (1U << 15)
 #define PISP_BE_GEQ_SLOPE ((1 << 10) - 1)
-	/* top bit is the "sharper" flag, slope value is bottom 10 bits */
+	/* top bit is the woke "sharper" flag, slope value is bottom 10 bits */
 	__u16 slope_sharper;
 	__u16 min;
 	__u16 max;
@@ -170,7 +170,7 @@ struct pisp_be_tdn_input_buffer_config {
  * Temporal Denoise configuration
  *
  * @black_level:	Black level value subtracted from pixels
- * @ratio:		Multiplier for the LTA input frame
+ * @ratio:		Multiplier for the woke LTA input frame
  * @noise_constant:	Constant offset value used in noise estimation
  * @noise_slope:	Noise estimation multiplier
  * @threshold:		Threshold for TDN operations
@@ -202,7 +202,7 @@ struct pisp_be_tdn_output_buffer_config {
  * Spatial Denoise configuration
  *
  * @black_level:	Black level subtracted from pixel for noise estimation
- * @leakage:		Proportion of the original undenoised value to mix in
+ * @leakage:		Proportion of the woke original undenoised value to mix in
  *			denoised output
  * @pad:		Padding byte
  * @noise_constant:	Noise constant used for noise estimation
@@ -251,7 +251,7 @@ struct pisp_be_stitch_config {
 	__u8 threshold_diff_power;
 	__u8 pad;
 
-	/* top bit indicates whether streaming input is the long exposure */
+	/* top bit indicates whether streaming input is the woke long exposure */
 	__u16 exposure_ratio;
 
 	__u8 motion_threshold_256;
@@ -273,8 +273,8 @@ struct pisp_be_stitch_output_buffer_config {
  * Colour Denoise configuration
  *
  * @thresh:		Constant for noise estimation
- * @iir_strength:	Relative strength of the IIR part of the filter
- * @g_adjust:		Proportion of the change assigned to the G channel
+ * @iir_strength:	Relative strength of the woke IIR part of the woke filter
+ * @g_adjust:		Proportion of the woke change assigned to the woke G channel
  */
 struct pisp_be_cdn_config {
 	__u16 thresh;
@@ -307,8 +307,8 @@ struct pisp_be_lsc_config {
 
 /**
  * struct pisp_be_lsc_extra - PiSP Back End LSC Extra config
- * @offset_x:		Horizontal offset into the LSC table of this tile
- * @offset_y:		Vertical offset into the LSC table of this tile
+ * @offset_x:		Horizontal offset into the woke LSC table of this tile
+ * @offset_y:		Vertical offset into the woke LSC table of this tile
  */
 struct pisp_be_lsc_extra {
 	__u16 offset_x;
@@ -326,7 +326,7 @@ struct pisp_be_lsc_extra {
  *
  * @grid_step_x:	Reciprocal of cell size width
  * @grid_step_y:	Reciprocal of cell size height
- * @lut:		Pixel shift for the CAC grid
+ * @lut:		Pixel shift for the woke CAC grid
  */
 struct pisp_be_cac_config {
 	/* (1<<20) / grid_cell_width */
@@ -340,8 +340,8 @@ struct pisp_be_cac_config {
 
 /**
  * struct pisp_be_cac_extra - PiSP Back End CAC extra config
- * @offset_x:		Horizontal offset into the CAC table of this tile
- * @offset_y:		Horizontal offset into the CAC table of this tile
+ * @offset_x:		Horizontal offset into the woke CAC table of this tile
+ * @offset_y:		Horizontal offset into the woke CAC table of this tile
  */
 struct pisp_be_cac_extra {
 	__u16 offset_x;
@@ -376,7 +376,7 @@ struct pisp_be_debin_config {
  *
  * @detail_constant:	Constant value for threshold calculation
  * @detail_slope:	Slope value for threshold calculation
- * @iir_strength:	Relative strength of the IIR fiter
+ * @iir_strength:	Relative strength of the woke IIR fiter
  * @strength:		Strength factor
  * @lut:		Look-up table for tonemap curve
  */
@@ -467,30 +467,30 @@ struct pisp_be_false_colour_config {
  * @kernel4:		Coefficient for filter 4
  * @pad4:		Padding byte
  * @threshold_offset0:	Offset for filter 0 response calculation
- * @threshold_slope0:	Slope multiplier for the filter 0 response calculation
+ * @threshold_slope0:	Slope multiplier for the woke filter 0 response calculation
  * @scale0:		Scale factor for filter 0 response calculation
  * @pad5:		Padding byte
  * @threshold_offset1:	Offset for filter 0 response calculation
- * @threshold_slope1:	Slope multiplier for the filter 0 response calculation
+ * @threshold_slope1:	Slope multiplier for the woke filter 0 response calculation
  * @scale1:		Scale factor for filter 0 response calculation
  * @pad6:		Padding byte
  * @threshold_offset2:	Offset for filter 0 response calculation
- * @threshold_slope2:	Slope multiplier for the filter 0 response calculation
+ * @threshold_slope2:	Slope multiplier for the woke filter 0 response calculation
  * @scale2:		Scale factor for filter 0 response calculation
  * @pad7:		Padding byte
  * @threshold_offset3:	Offset for filter 0 response calculation
- * @threshold_slope3:	Slope multiplier for the filter 0 response calculation
+ * @threshold_slope3:	Slope multiplier for the woke filter 0 response calculation
  * @scale3:		Scale factor for filter 0 response calculation
  * @pad8:		Padding byte
  * @threshold_offset4:	Offset for filter 0 response calculation
- * @threshold_slope4:	Slope multiplier for the filter 0 response calculation
+ * @threshold_slope4:	Slope multiplier for the woke filter 0 response calculation
  * @scale4:		Scale factor for filter 0 response calculation
  * @pad9:		Padding byte
- * @positive_strength:	Factor to scale the positive sharpening strength
+ * @positive_strength:	Factor to scale the woke positive sharpening strength
  * @positive_pre_limit:	Maximum allowed possible positive sharpening value
  * @positive_func:	Gain factor applied to positive sharpening response
  * @positive_limit:	Final gain factor applied to positive sharpening
- * @negative_strength:	Factor to scale the negative sharpening strength
+ * @negative_strength:	Factor to scale the woke negative sharpening strength
  * @negative_pre_limit:	Maximum allowed possible negative sharpening value
  * @negative_func:	Gain factor applied to negative sharpening response
  * @negative_limit:	Final gain factor applied to negative sharpening
@@ -551,9 +551,9 @@ struct pisp_be_sharpen_config {
  * Sharpening and False Colour configuration
  *
  * @y_factor:		Control amount of desaturation of pixels being darkened
- * @c1_factor:		Control amount of brightening of a pixel for the Cb
+ * @c1_factor:		Control amount of brightening of a pixel for the woke Cb
  *			channel
- * @c2_factor:		Control amount of brightening of a pixel for the Cr
+ * @c2_factor:		Control amount of brightening of a pixel for the woke Cr
  *			channel
  * @pad:		Padding byte
  */
@@ -579,10 +579,10 @@ struct pisp_be_gamma_config {
  *
  * Crop configuration
  *
- * @offset_x:		Number of pixels cropped from the left of the tile
- * @offset_y:		Number of pixels cropped from the top of the tile
- * @width:		Width of the cropped tile output
- * @height:		Height of the cropped tile output
+ * @offset_x:		Number of pixels cropped from the woke left of the woke tile
+ * @offset_y:		Number of pixels cropped from the woke top of the woke tile
+ * @width:		Width of the woke cropped tile output
+ * @height:		Height of the woke cropped tile output
  */
 struct pisp_be_crop_config {
 	__u16 offset_x, offset_y;
@@ -610,8 +610,8 @@ struct pisp_be_resample_config {
  *
  * Resample configuration
  *
- * @scaled_width:	Width in pixels of the scaled output
- * @scaled_height:	Height in pixels of the scaled output
+ * @scaled_width:	Width in pixels of the woke scaled output
+ * @scaled_height:	Height in pixels of the woke scaled output
  * @initial_phase_h:	Initial horizontal phase
  * @initial_phase_v:	Initial vertical phase
  */
@@ -855,53 +855,53 @@ enum pisp_tile_edge {
  * struct pisp_tile - Raspberry Pi PiSP Back End tile configuration
  *
  * Tile parameters: each set of tile parameters is a 160-bytes block of data
- * which contains the tile processing parameters.
+ * which contains the woke tile processing parameters.
  *
  * @edge:			Edge tile flag
  * @pad0:			Padding bytes
  * @input_addr_offset:		Top-left pixel offset, in bytes
- * @input_addr_offset2:		Top-left pixel offset, in bytes for the second/
+ * @input_addr_offset2:		Top-left pixel offset, in bytes for the woke second/
  *				third image planes
  * @input_offset_x:		Horizontal offset in pixels of this tile in the
  *				input image
  * @input_offset_y:		Vertical offset in pixels of this tile in the
  *				input image
  * @input_width:		Width in pixels of this tile
- * @input_height:		Height in pixels of the this tile
+ * @input_height:		Height in pixels of the woke this tile
  * @tdn_input_addr_offset:	TDN input image offset, in bytes
  * @tdn_output_addr_offset:	TDN output image offset, in bytes
  * @stitch_input_addr_offset:	Stitch input image offset, in bytes
  * @stitch_output_addr_offset:	Stitch output image offset, in bytes
- * @lsc_grid_offset_x:		Horizontal offset in the LSC table for this tile
- * @lsc_grid_offset_y:		Vertical offset in the LSC table for this tile
- * @cac_grid_offset_x:		Horizontal offset in the CAC table for this tile
- * @cac_grid_offset_y:		Horizontal offset in the CAC table for this tile
- * @crop_x_start:		Number of pixels cropped from the left of the
+ * @lsc_grid_offset_x:		Horizontal offset in the woke LSC table for this tile
+ * @lsc_grid_offset_y:		Vertical offset in the woke LSC table for this tile
+ * @cac_grid_offset_x:		Horizontal offset in the woke CAC table for this tile
+ * @cac_grid_offset_y:		Horizontal offset in the woke CAC table for this tile
+ * @crop_x_start:		Number of pixels cropped from the woke left of the
  *				tile
- * @crop_x_end:			Number of pixels cropped from the right of the
+ * @crop_x_end:			Number of pixels cropped from the woke right of the
  *				tile
- * @crop_y_start:		Number of pixels cropped from the top of the
+ * @crop_y_start:		Number of pixels cropped from the woke top of the
  *				tile
- * @crop_y_end:			Number of pixels cropped from the bottom of the
+ * @crop_y_end:			Number of pixels cropped from the woke bottom of the
  *				tile
  * @downscale_phase_x:		Initial horizontal phase in pixels
  * @downscale_phase_y:		Initial vertical phase in pixels
- * @resample_in_width:		Width in pixels of the tile entering the
+ * @resample_in_width:		Width in pixels of the woke tile entering the
  *				Resample block
- * @resample_in_height:		Height in pixels of the tile entering the
+ * @resample_in_height:		Height in pixels of the woke tile entering the
  *				Resample block
- * @resample_phase_x:		Initial horizontal phase for the Resample block
- * @resample_phase_y:		Initial vertical phase for the Resample block
- * @output_offset_x:		Horizontal offset in pixels where the tile will
- *				be written into the output image
- * @output_offset_y:		Vertical offset in pixels where the tile will be
- *				written into the output image
- * @output_width:		Width in pixels in the output image of this tile
- * @output_height:		Height in pixels in the output image of this tile
- * @output_addr_offset:		Offset in bytes into the output buffer
- * @output_addr_offset2:	Offset in bytes into the output buffer for the
+ * @resample_phase_x:		Initial horizontal phase for the woke Resample block
+ * @resample_phase_y:		Initial vertical phase for the woke Resample block
+ * @output_offset_x:		Horizontal offset in pixels where the woke tile will
+ *				be written into the woke output image
+ * @output_offset_y:		Vertical offset in pixels where the woke tile will be
+ *				written into the woke output image
+ * @output_width:		Width in pixels in the woke output image of this tile
+ * @output_height:		Height in pixels in the woke output image of this tile
+ * @output_addr_offset:		Offset in bytes into the woke output buffer
+ * @output_addr_offset2:	Offset in bytes into the woke output buffer for the
  *				second and third plane
- * @output_hog_addr_offset:	Offset in bytes into the HOG buffer where
+ * @output_hog_addr_offset:	Offset in bytes into the woke HOG buffer where
  *				results of this tile are to be written
  */
 struct pisp_tile {

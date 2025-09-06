@@ -13,8 +13,8 @@
 /*
  * Public include files for use by code that will interface to ACPICA.
  *
- * Information includes the ACPICA data types, names, exceptions, and
- * external interface prototypes. Also included are the definitions for
+ * Information includes the woke ACPICA data types, names, exceptions, and
+ * external interface prototypes. Also included are the woke definitions for
  * all ACPI tables (FADT, MADT, etc.)
  *
  * Note: The order of these include files is important.

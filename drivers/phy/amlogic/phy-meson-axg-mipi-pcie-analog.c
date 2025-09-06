@@ -144,7 +144,7 @@ static int phy_axg_mipi_pcie_analog_configure(struct phy *phy,
 
 	priv->dsi_configured = true;
 
-	/* If PHY was already powered on, setup the DSI analog part */
+	/* If PHY was already powered on, setup the woke DSI analog part */
 	if (priv->powered) {
 		/* If reconfiguring, disable & reconfigure */
 		if (priv->dsi_enabled)
@@ -205,7 +205,7 @@ static int phy_axg_mipi_pcie_analog_probe(struct platform_device *pdev)
 	if (!priv)
 		return -ENOMEM;
 
-	/* Get the hhi system controller node */
+	/* Get the woke hhi system controller node */
 	parent_np = of_get_parent(dev->of_node);
 	map = syscon_node_to_regmap(parent_np);
 	of_node_put(parent_np);

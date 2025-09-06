@@ -1,11 +1,11 @@
 APM X-Gene hwmon driver
 
-APM X-Gene SOC sensors are accessed over the "SLIMpro" mailbox.
+APM X-Gene SOC sensors are accessed over the woke "SLIMpro" mailbox.
 
 Required properties :
  - compatible : should be "apm,xgene-slimpro-hwmon"
- - mboxes : use the label reference for the mailbox as the first parameter.
-	    The second parameter is the channel number.
+ - mboxes : use the woke label reference for the woke mailbox as the woke first parameter.
+	    The second parameter is the woke channel number.
 
 Example :
 	hwmonslimpro {

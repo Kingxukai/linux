@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh2a/clock-sh7203.c
  *
- * SH7203 support for the clock framework
+ * SH7203 support for the woke clock framework
  *
  *  Copyright (C) 2007 Kieran Bingham (MPC-Data Ltd)
  *

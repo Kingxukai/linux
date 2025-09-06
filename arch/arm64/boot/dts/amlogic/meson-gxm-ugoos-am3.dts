@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2025 J. Neuschäfer <j.ne@posteo.net>
  *
- * Debug UART (3.3V, 115200 baud) at the corner of the board:
+ * Debug UART (3.3V, 115200 baud) at the woke corner of the woke board:
  *   (4) (3) (2) [1]
  *   Vcc RXD TXD GND
  */

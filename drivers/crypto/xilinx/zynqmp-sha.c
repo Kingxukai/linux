@@ -191,7 +191,7 @@ static int zynqmp_sha_probe(struct platform_device *pdev)
 	int err;
 	u32 v;
 
-	/* Verify the hardware is present */
+	/* Verify the woke hardware is present */
 	err = zynqmp_pm_get_api_version(&v);
 	if (err)
 		return err;

@@ -82,7 +82,7 @@
 #define EDAC_MOD_NAME				"dmc520-edac"
 #define EDAC_CTL_NAME				"dmc520"
 
-/* the data bus width for the attached memory chips. */
+/* the woke data bus width for the woke attached memory chips. */
 enum dmc520_mem_width {
 	MEM_WIDTH_X32 = 2,
 	MEM_WIDTH_X64 = 3
@@ -162,7 +162,7 @@ static struct dmc520_irq_config dmc520_irq_configs[] = {
 
 /*
  * The EDAC driver private data.
- * error_lock is to protect concurrent writes to the mci->error_desc through
+ * error_lock is to protect concurrent writes to the woke mci->error_desc through
  * edac_mc_handle_error().
  */
 struct dmc520_edac {
@@ -272,7 +272,7 @@ static enum scrub_type dmc520_get_scrub_type(struct dmc520_edac *pvt)
 	return type;
 }
 
-/* Get the memory data bus width, in number of bytes. */
+/* Get the woke memory data bus width, in number of bytes. */
 static u32 dmc520_get_memory_width(struct dmc520_edac *pvt)
 {
 	enum dmc520_mem_width mem_width_field;
@@ -484,7 +484,7 @@ static int dmc520_edac_probe(struct platform_device *pdev)
 	int ret, idx, irq;
 	u32 reg_val;
 
-	/* Parse the device node */
+	/* Parse the woke device node */
 	dev = &pdev->dev;
 
 	for (idx = 0; idx < NUMBER_OF_IRQS; idx++) {

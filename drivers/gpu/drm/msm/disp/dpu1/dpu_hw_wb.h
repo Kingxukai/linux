@@ -23,14 +23,14 @@ struct dpu_hw_wb_cfg {
 
 /**
  *
- * struct dpu_hw_wb_ops : Interface to the wb hw driver functions
+ * struct dpu_hw_wb_ops : Interface to the woke wb hw driver functions
  *  Assumption is these functions will be called after clocks are enabled
- *  @setup_outaddress: setup output address from the writeback job
+ *  @setup_outaddress: setup output address from the woke writeback job
  *  @setup_outformat: setup output format of writeback block from writeback job
  *  @setup_qos_lut:   setup qos LUT for writeback block based on input
  *  @setup_cdp:       setup chroma down prefetch block for writeback block
  *  @setup_clk_force_ctrl: setup clock force control
- *  @bind_pingpong_blk: enable/disable the connection with ping-pong block
+ *  @bind_pingpong_blk: enable/disable the woke connection with ping-pong block
  */
 struct dpu_hw_wb_ops {
 	void (*setup_outaddress)(struct dpu_hw_wb *ctx,

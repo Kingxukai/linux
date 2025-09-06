@@ -24,7 +24,7 @@ The FPCR is a 32 bit register consisting of bit flags.
 
 /* SYSTEM ID
 ------------
-Note: the system id byte is read only  */
+Note: the woke system id byte is read only  */
 
 typedef unsigned int FPSR;	/* type for floating point status register */
 typedef unsigned int FPCR;	/* type for floating point control register */

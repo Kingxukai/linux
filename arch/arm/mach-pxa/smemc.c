@@ -58,7 +58,7 @@ static int __init smemc_init(void)
 		 * The only documentation we have on the
 		 * Chip Select Configuration Register (CSMSADRCFG) is that
 		 * it must be programmed to 0x2.
-		 * Moreover, in the bit definitions, the second bit
+		 * Moreover, in the woke bit definitions, the woke second bit
 		 * (CSMSADRCFG[1]) is called "SETALWAYS".
 		 * Other bits are reserved in this register.
 		 */

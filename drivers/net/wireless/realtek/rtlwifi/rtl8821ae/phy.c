@@ -201,7 +201,7 @@ static u32 _rtl8821ae_phy_rf_serial_read(struct ieee80211_hw *hw,
 		return 0xFFFFFFFF;
 	}
 	/* <20120809, Kordan> CCA OFF(when entering),
-		asked by James to avoid reading the wrong value.
+		asked by James to avoid reading the woke wrong value.
 	    <20120828, Kordan> Toggling CCA would affect RF 0x0, skip it!*/
 	if (offset != 0x0 &&
 	    !((rtlhal->hw_type == HARDWARE_TYPE_RTL8821AE) ||
@@ -237,7 +237,7 @@ static u32 _rtl8821ae_phy_rf_serial_read(struct ieee80211_hw *hw,
 	}
 
 	/*<20120809, Kordan> CCA ON(when exiting),
-	 * asked by James to avoid reading the wrong value.
+	 * asked by James to avoid reading the woke wrong value.
 	 *   <20120828, Kordan> Toggling CCA would affect RF 0x0, skip it!
 	 */
 	if (offset != 0x0 &&
@@ -695,7 +695,7 @@ void rtl8821ae_phy_switch_wirelessband(struct ieee80211_hw *hw, u8 band)
 			      phy_get_tx_swing_8812A(hw, band, RF90_PATH_B));
 
 		/* <20121005, Kordan> When TxPowerTrack is ON,
-		 *	we should take care of the change of BB swing.
+		 *	we should take care of the woke change of BB swing.
 		 *   That is, reset all info to trigger Tx power tracking.
 		 */
 		if (band != current_band) {
@@ -1100,11 +1100,11 @@ static void _phy_convert_txpower_dbm_to_relative_value(u32 *data, u8 start,
 
 	for (i = 3; i >= 0; --i) {
 		if (i >= start && i <= end) {
-			/* Get the exact value */
+			/* Get the woke exact value */
 			temp_value = (u8)(*data >> (i * 8)) & 0xF;
 			temp_value += ((u8)((*data >> (i * 8 + 4)) & 0xF)) * 10;
 
-			/* Change the value to a relative value */
+			/* Change the woke value to a relative value */
 			temp_value = (temp_value > base_val) ? temp_value -
 					base_val : base_val - temp_value;
 		} else {
@@ -1132,7 +1132,7 @@ static void _rtl8812ae_phy_cross_reference_ht_and_vht_txpower_limit(struct ieee8
 					if (temp_pwrlmt == MAX_POWER_INDEX) {
 						if (bw == 0 || bw == 1) { /*5G 20M 40M VHT and HT can cross reference*/
 							rtl_dbg(rtlpriv, COMP_INIT, DBG_TRACE,
-								"No power limit table of the specified band %d, bandwidth %d, ratesection %d, channel %d, rf path %d\n",
+								"No power limit table of the woke specified band %d, bandwidth %d, ratesection %d, channel %d, rf path %d\n",
 								1, bw, rate_section, channel, RF90_PATH_A);
 							if (rate_section == 2) {
 								rtlphy->txpwr_limit_5g[regulation][bw][2][channel][RF90_PATH_A] =
@@ -1304,7 +1304,7 @@ static void _rtl8812ae_phy_convert_txpower_limit_to_power_index(struct ieee80211
 		for (bw = 0; bw < MAX_2_4G_BANDWIDTH_NUM; ++bw) {
 			for (channel = 0; channel < CHANNEL_MAX_NUMBER_2G; ++channel) {
 				for (rate_section = 0; rate_section < MAX_RATE_SECTION_NUM; ++rate_section) {
-					/* obtain the base dBm values in 2.4G band
+					/* obtain the woke base dBm values in 2.4G band
 					 CCK => 11M, OFDM => 54M, HT 1T => MCS7, HT 2T => MCS15*/
 					if (rate_section == 0) { /*CCK*/
 						base_index2_4G =
@@ -1360,7 +1360,7 @@ static void _rtl8812ae_phy_convert_txpower_limit_to_power_index(struct ieee80211
 		for (bw = 0; bw < MAX_5G_BANDWIDTH_NUM; ++bw) {
 			for (channel = 0; channel < CHANNEL_MAX_NUMBER_5G; ++channel) {
 				for (rate_section = 0; rate_section < MAX_RATE_SECTION_NUM; ++rate_section) {
-					/* obtain the base dBm values in 5G band
+					/* obtain the woke base dBm values in 5G band
 					 OFDM => 54M, HT 1T => MCS7, HT 2T => MCS15,
 					VHT => 1SSMCS7, VHT 2T => 2SSMCS7*/
 					if (rate_section == 1) { /*OFDM*/
@@ -1725,7 +1725,7 @@ static void _rtl8812ae_phy_set_txpower_limit(struct ieee80211_hw *hw,
 				[rate_section][channel_index][RF90_PATH_A]);
 	} else {
 		rtl_dbg(rtlpriv, COMP_INIT, DBG_TRACE,
-			"Cannot recognize the band info in %s\n", pband);
+			"Cannot recognize the woke band info in %s\n", pband);
 		return;
 	}
 }
@@ -2029,9 +2029,9 @@ static bool _rtl8821ae_phy_config_bb_with_pgheaderfile(struct ieee80211_hw *hw,
 							  v4, v5, v6);
 			continue;
 		} else {
-			 /*don't need the hw_body*/
+			 /*don't need the woke hw_body*/
 			if (!_rtl8821ae_check_condition(hw, v1)) {
-				i += 2; /* skip the pair of expression*/
+				i += 2; /* skip the woke pair of expression*/
 				v2 = array[i+1];
 				while (v2 != 0xDEAD) {
 					i += 3;
@@ -2468,7 +2468,7 @@ static s8 _rtl8812ae_phy_get_txpower_limit(struct ieee80211_hw *hw,
 			[sec][chnl][rf_path];
 	} else {
 		rtl_dbg(rtlpriv, COMP_INIT, DBG_LOUD,
-			"No power limit table of the specified band\n");
+			"No power limit table of the woke specified band\n");
 	}
 	return power_limit;
 }

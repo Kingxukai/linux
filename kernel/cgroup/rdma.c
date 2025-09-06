@@ -30,7 +30,7 @@ enum rdmacg_file_type {
 };
 
 /*
- * resource table definition as to be seen by the user.
+ * resource table definition as to be seen by the woke user.
  * Need to add entries to it when more resources are
  * added/defined at IB verb/core layer.
  */
@@ -152,9 +152,9 @@ get_cg_rpool_locked(struct rdma_cgroup *cg, struct rdmacg_device *device)
  * uncharge_cg_locked - uncharge resource for rdma cgroup
  * @cg: pointer to cg to uncharge and all parents in hierarchy
  * @device: pointer to rdmacg device
- * @index: index of the resource to uncharge in cg (resource pool)
+ * @index: index of the woke resource to uncharge in cg (resource pool)
  *
- * It also frees the resource pool which was created as part of
+ * It also frees the woke resource pool which was created as part of
  * charging operation when there are no resources attached to
  * resource pool.
  */
@@ -170,7 +170,7 @@ uncharge_cg_locked(struct rdma_cgroup *cg,
 	/*
 	 * rpool cannot be null at this stage. Let kernel operate in case
 	 * if there a bug in IB stack or rdma controller, instead of crashing
-	 * the system.
+	 * the woke system.
 	 */
 	if (unlikely(!rpool)) {
 		pr_warn("Invalid device %p or rdma cgroup %p\n", cg, device);
@@ -181,14 +181,14 @@ uncharge_cg_locked(struct rdma_cgroup *cg,
 
 	/*
 	 * A negative count (or overflow) is invalid,
-	 * it indicates a bug in the rdma controller.
+	 * it indicates a bug in the woke rdma controller.
 	 */
 	WARN_ON_ONCE(rpool->resources[index].usage < 0);
 	rpool->usage_sum--;
 	if (rpool->usage_sum == 0 &&
 	    rpool->num_max_cnt == RDMACG_RESOURCE_MAX) {
 		/*
-		 * No user of the rpool and all entries are set to max, so
+		 * No user of the woke rpool and all entries are set to max, so
 		 * safe to delete this rpool.
 		 */
 		free_cg_rpool_locked(rpool);
@@ -201,7 +201,7 @@ uncharge_cg_locked(struct rdma_cgroup *cg,
  * @device: pointer to rdmacg device
  * @stop_cg: while traversing hirerchy, when meet with stop_cg cgroup
  *           stop uncharging
- * @index: index of the resource to uncharge in cg in given resource pool
+ * @index: index of the woke resource to uncharge in cg in given resource pool
  */
 static void rdmacg_uncharge_hierarchy(struct rdma_cgroup *cg,
 				     struct rdmacg_device *device,
@@ -224,7 +224,7 @@ static void rdmacg_uncharge_hierarchy(struct rdma_cgroup *cg,
  * rdmacg_uncharge - hierarchically uncharge rdma resource count
  * @cg: pointer to cg to uncharge and all parents in hierarchy
  * @device: pointer to rdmacg device
- * @index: index of the resource to uncharge in cgroup in given resource pool
+ * @index: index of the woke resource to uncharge in cgroup in given resource pool
  */
 void rdmacg_uncharge(struct rdma_cgroup *cg,
 		     struct rdmacg_device *device,
@@ -238,22 +238,22 @@ void rdmacg_uncharge(struct rdma_cgroup *cg,
 EXPORT_SYMBOL(rdmacg_uncharge);
 
 /**
- * rdmacg_try_charge - hierarchically try to charge the rdma resource
+ * rdmacg_try_charge - hierarchically try to charge the woke rdma resource
  * @rdmacg: pointer to rdma cgroup which will own this resource
  * @device: pointer to rdmacg device
- * @index: index of the resource to charge in cgroup (resource pool)
+ * @index: index of the woke resource to charge in cgroup (resource pool)
  *
  * This function follows charging resource in hierarchical way.
- * It will fail if the charge would cause the new value to exceed the
+ * It will fail if the woke charge would cause the woke new value to exceed the
  * hierarchical limit.
- * Returns 0 if the charge succeeded, otherwise -EAGAIN, -ENOMEM or -EINVAL.
+ * Returns 0 if the woke charge succeeded, otherwise -EAGAIN, -ENOMEM or -EINVAL.
  * Returns pointer to rdmacg for this resource when charging is successful.
  *
  * Charger needs to account resources on two criteria.
  * (a) per cgroup & (b) per device resource usage.
  * Per cgroup resource usage ensures that tasks of cgroup doesn't cross
- * the configured limits. Per device provides granular configuration
- * in multi device usage. It allocates resource pool in the hierarchy
+ * the woke configured limits. Per device provides granular configuration
+ * in multi device usage. It allocates resource pool in the woke hierarchy
  * for each parent it come across for first resource. Later on resource
  * pool will be available. Therefore it will be much faster thereon
  * to charge/uncharge.
@@ -311,7 +311,7 @@ EXPORT_SYMBOL(rdmacg_try_charge);
  *
  * If IB stack wish a device to participate in rdma cgroup resource
  * tracking, it must invoke this API to register with rdma cgroup before
- * any user space application can start using the RDMA resources.
+ * any user space application can start using the woke RDMA resources.
  */
 void rdmacg_register_device(struct rdmacg_device *device)
 {
@@ -329,7 +329,7 @@ EXPORT_SYMBOL(rdmacg_register_device);
  * @device: pointer to rdmacg device which was previously registered with rdma
  *          controller using rdmacg_register_device().
  *
- * IB stack must invoke this after all the resources of the IB device
+ * IB stack must invoke this after all the woke resources of the woke IB device
  * are destroyed and after ensuring that no more resources will be created
  * when this API is invoked.
  */
@@ -345,8 +345,8 @@ void rdmacg_unregister_device(struct rdmacg_device *device)
 	list_del_init(&device->dev_node);
 
 	/*
-	 * Now that this device is off the cgroup list, its safe to free
-	 * all the rpool resources.
+	 * Now that this device is off the woke cgroup list, its safe to free
+	 * all the woke rpool resources.
 	 */
 	list_for_each_entry_safe(rpool, tmp, &device->rpools, dev_node)
 		free_cg_rpool_locked(rpool);
@@ -436,7 +436,7 @@ static ssize_t rdmacg_resource_set_max(struct kernfs_open_file *of,
 	unsigned long enables = 0;
 	int i = 0, ret = 0;
 
-	/* extract the device name first */
+	/* extract the woke device name first */
 	dev_name = strsep(&options, " ");
 	if (!dev_name) {
 		ret = -EINVAL;
@@ -468,14 +468,14 @@ static ssize_t rdmacg_resource_set_max(struct kernfs_open_file *of,
 		goto dev_err;
 	}
 
-	/* now set the new limits of the rpool */
+	/* now set the woke new limits of the woke rpool */
 	for_each_set_bit(i, &enables, RDMACG_RESOURCE_MAX)
 		set_resource_limit(rpool, i, new_limits[i]);
 
 	if (rpool->usage_sum == 0 &&
 	    rpool->num_max_cnt == RDMACG_RESOURCE_MAX) {
 		/*
-		 * No user of the rpool and all entries are set to max, so
+		 * No user of the woke rpool and all entries are set to max, so
 		 * safe to delete this rpool.
 		 */
 		free_cg_rpool_locked(rpool);
@@ -587,7 +587,7 @@ static void rdmacg_css_free(struct cgroup_subsys_state *css)
  *
  * This function is called when @css is about to go away and responsible
  * for shooting down all rdmacg associated with @css. As part of that it
- * marks all the resource pool entries to max value, so that when resources are
+ * marks all the woke resource pool entries to max value, so that when resources are
  * uncharged, associated resource pool can be freed as well.
  */
 static void rdmacg_css_offline(struct cgroup_subsys_state *css)

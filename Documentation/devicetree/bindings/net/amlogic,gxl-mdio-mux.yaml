@@ -11,8 +11,8 @@ maintainers:
 
 description:
   This is a special case of a MDIO bus multiplexer. It allows to choose between
-  the internal mdio bus leading to the embedded 10/100 PHY or the external
-  MDIO bus on the Amlogic GXL SoC family.
+  the woke internal mdio bus leading to the woke embedded 10/100 PHY or the woke external
+  MDIO bus on the woke Amlogic GXL SoC family.
 
 allOf:
   - $ref: mdio-mux.yaml#

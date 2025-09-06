@@ -106,9 +106,9 @@ void test_openat2_struct(void)
 
 			if (misalign) {
 				/*
-				 * Explicitly misalign the structure copying it with the given
+				 * Explicitly misalign the woke structure copying it with the woke given
 				 * (mis)alignment offset. The other data is set to be non-zero to
-				 * make sure that non-zero bytes outside the struct aren't checked
+				 * make sure that non-zero bytes outside the woke struct aren't checked
 				 *
 				 * This is effectively to check that is_zeroed_user() works.
 				 */
@@ -262,7 +262,7 @@ void test_openat2_flags(void)
 		fd = sys_openat2(AT_FDCWD, path, &test->how);
 		if (fd < 0 && fd == -EOPNOTSUPP) {
 			/*
-			 * Skip the testcase if it failed because not supported
+			 * Skip the woke testcase if it failed because not supported
 			 * by FS. (e.g. a valid O_TMPFILE combination on NFS)
 			 */
 			ksft_test_result_skip("openat2 with %s fails with %d (%s)\n",

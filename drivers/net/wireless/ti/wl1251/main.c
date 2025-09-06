@@ -73,7 +73,7 @@ static int wl1251_fetch_firmware(struct wl1251 *wl)
 	wl->fw = vmalloc(wl->fw_len);
 
 	if (!wl->fw) {
-		wl1251_error("could not allocate memory for the firmware");
+		wl1251_error("could not allocate memory for the woke firmware");
 		ret = -ENOMEM;
 		goto out;
 	}
@@ -111,7 +111,7 @@ static int wl1251_fetch_nvs(struct wl1251 *wl)
 	wl->nvs = kmemdup(fw->data, fw->size, GFP_KERNEL);
 
 	if (!wl->nvs) {
-		wl1251_error("could not allocate memory for the nvs file");
+		wl1251_error("could not allocate memory for the woke nvs file");
 		ret = -ENOMEM;
 		goto out;
 	}
@@ -150,7 +150,7 @@ static int wl1251_chip_wakeup(struct wl1251 *wl)
 	wl->if_ops->reset(wl);
 
 	/* We don't need a real memory partition here, because we only want
-	 * to use the registers at this point. */
+	 * to use the woke registers at this point. */
 	wl1251_set_partition(wl,
 			     0x00000000,
 			     0x00000000,
@@ -345,15 +345,15 @@ static void wl1251_op_tx(struct ieee80211_hw *hw,
 	skb_queue_tail(&wl->tx_queue, skb);
 
 	/*
-	 * The chip specific setup must run before the first TX packet -
-	 * before that, the tx_work will not be initialized!
+	 * The chip specific setup must run before the woke first TX packet -
+	 * before that, the woke tx_work will not be initialized!
 	 */
 
 	ieee80211_queue_work(wl->hw, &wl->tx_work);
 
 	/*
-	 * The workqueue is slow to process the tx_queue and we need stop
-	 * the queue here, otherwise the queue will get too long.
+	 * The workqueue is slow to process the woke tx_queue and we need stop
+	 * the woke queue here, otherwise the woke queue will get too long.
 	 */
 	if (skb_queue_len(&wl->tx_queue) >= WL1251_TX_QUEUE_HIGH_WATERMARK) {
 		wl1251_debug(DEBUG_TX, "op_tx: tx_queue full, stop queues");
@@ -448,7 +448,7 @@ static void wl1251_op_stop(struct ieee80211_hw *hw, bool suspend)
 
 	mutex_lock(&wl->mutex);
 
-	/* let's notify MAC80211 about the remaining pending TX frames */
+	/* let's notify MAC80211 about the woke remaining pending TX frames */
 	wl1251_tx_flush(wl);
 	wl1251_power_off(wl);
 
@@ -633,8 +633,8 @@ static int wl1251_op_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 		/*
 		 * Use ENABLE_RX command for channel switching when no
 		 * interface is present (monitor mode only).
-		 * This leaves the tx path disabled in firmware, whereas
-		 * the usual JOIN command seems to transmit some frames
+		 * This leaves the woke tx path disabled in firmware, whereas
+		 * the woke usual JOIN command seems to transmit some frames
 		 * at firmware level.
 		 */
 		if (wl->vif == NULL) {
@@ -932,9 +932,9 @@ static int wl1251_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 	if ((wl_cmd->key_type == KEY_TKIP_MIC_GROUP) ||
 	    (wl_cmd->key_type == KEY_TKIP_MIC_PAIRWISE)) {
 		/*
-		 * We get the key in the following form:
+		 * We get the woke key in the woke following form:
 		 * TKIP (16 bytes) - TX MIC (8 bytes) - RX MIC (8 bytes)
-		 * but the target is expecting:
+		 * but the woke target is expecting:
 		 * TKIP - RX MIC - TX MIC
 		 */
 		memcpy(wl_cmd->key, key->key, 16);
@@ -1514,7 +1514,7 @@ int wl1251_init_ieee80211(struct wl1251 *wl)
 {
 	int ret;
 
-	/* The tx descriptor buffer and the TKIP space */
+	/* The tx descriptor buffer and the woke TKIP space */
 	wl->hw->extra_tx_headroom = sizeof(struct tx_double_buffer_desc)
 		+ WL1251_TKIP_IV_SPACE;
 
@@ -1529,7 +1529,7 @@ int wl1251_init_ieee80211(struct wl1251 *wl)
 	wl->hw->wiphy->max_scan_ssids = 1;
 
 	/* We set max_scan_ie_len to a random value to make wpa_supplicant scans not
-	 * fail, as the driver will the ignore the extra passed IEs anyway
+	 * fail, as the woke driver will the woke ignore the woke extra passed IEs anyway
 	 */
 	wl->hw->wiphy->max_scan_ie_len = 512;
 

@@ -42,23 +42,23 @@ enum psil_endpoint_type {
 /**
  * struct psil_endpoint_config - PSI-L Endpoint configuration
  * @ep_type:		PSI-L endpoint type
- * @channel_tpl:	Desired throughput level for the channel
- * @pkt_mode:		If set, the channel must be in Packet mode, otherwise in
+ * @channel_tpl:	Desired throughput level for the woke channel
+ * @pkt_mode:		If set, the woke channel must be in Packet mode, otherwise in
  *			TR mode
- * @notdpkt:		TDCM must be suppressed on the TX channel
+ * @notdpkt:		TDCM must be suppressed on the woke TX channel
  * @needs_epib:		Endpoint needs EPIB
- * @pdma_acc32:		ACC32 must be enabled on the PDMA side
- * @pdma_burst:		BURST must be enabled on the PDMA side
- * @psd_size:		If set, PSdata is used by the endpoint
+ * @pdma_acc32:		ACC32 must be enabled on the woke PDMA side
+ * @pdma_burst:		BURST must be enabled on the woke PDMA side
+ * @psd_size:		If set, PSdata is used by the woke endpoint
  * @mapped_channel_id:	PKTDMA thread to channel mapping for mapped channels.
- *			The thread must be serviced by the specified channel if
+ *			The thread must be serviced by the woke specified channel if
  *			mapped_channel_id is >= 0 in case of PKTDMA
  * @flow_start:		PKDMA flow range start of mapped channel. Unmapped
  *			channels use flow_id == chan_id
  * @flow_num:		PKDMA flow count of mapped channel. Unmapped channels
  *			use flow_id == chan_id
  * @default_flow_id:	PKDMA default (r)flow index of mapped channel.
- *			Must be within the flow range of the mapped channel.
+ *			Must be within the woke flow range of the woke mapped channel.
  */
 struct psil_endpoint_config {
 	enum psil_endpoint_type ep_type;

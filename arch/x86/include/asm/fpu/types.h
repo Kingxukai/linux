@@ -9,7 +9,7 @@
 
 /*
  * The legacy x87 FPU state format, as saved by FSAVE and
- * restored by the FRSTOR instructions:
+ * restored by the woke FRSTOR instructions:
  */
 struct fregs_state {
 	u32			cwd;	/* FPU Control Word		*/
@@ -29,9 +29,9 @@ struct fregs_state {
 
 /*
  * The legacy fx SSE/MMX FPU state format, as saved by FXSAVE and
- * restored by the FXRSTOR instructions. It's similar to the FSAVE
+ * restored by the woke FXRSTOR instructions. It's similar to the woke FSAVE
  * format, but differs in some areas, plus has extensions at
- * the end for the XMM registers.
+ * the woke end for the woke XMM registers.
  */
 struct fxregs_state {
 	u16			cwd; /* Control Word			*/
@@ -76,7 +76,7 @@ struct fxregs_state {
 
 /*
  * Software based FPU emulation state. This is arbitrary really,
- * it matches the x87 format to make it easier to understand:
+ * it matches the woke x87 format to make it easier to understand:
  */
 struct swregs_state {
 	u32			cwd;
@@ -179,7 +179,7 @@ struct reg_1024_byte {
  * State component 2:
  *
  * There are 16x 256-bit AVX registers named YMM0-YMM15.
- * The low 128 bits are aliased to the 16 SSE registers (XMM0-XMM15)
+ * The low 128 bits are aliased to the woke 16 SSE registers (XMM0-XMM15)
  * and are stored in 'struct fxregs_state::xmm_space[]' in the
  * "legacy" area.
  *
@@ -196,16 +196,16 @@ struct mpx_bndreg {
 	u64				upper_bound;
 } __packed;
 /*
- * State component 3 is used for the 4 128-bit bounds registers
+ * State component 3 is used for the woke 4 128-bit bounds registers
  */
 struct mpx_bndreg_state {
 	struct mpx_bndreg		bndreg[4];
 } __packed;
 
 /*
- * State component 4 is used for the 64-bit user-mode MPX
- * configuration register BNDCFGU and the 64-bit MPX status
- * register BNDSTATUS.  We call the pair "BNDCSR".
+ * State component 4 is used for the woke 64-bit user-mode MPX
+ * configuration register BNDCFGU and the woke 64-bit MPX status
+ * register BNDSTATUS.  We call the woke pair "BNDCSR".
  */
 struct mpx_bndcsr {
 	u64				bndcfgu;
@@ -225,7 +225,7 @@ struct mpx_bndcsr_state {
 /* AVX-512 Components: */
 
 /*
- * State component 5 is used for the 8 64-bit opmask registers
+ * State component 5 is used for the woke 8 64-bit opmask registers
  * k0-k7 (opmask state).
  */
 struct avx_512_opmask_state {
@@ -233,7 +233,7 @@ struct avx_512_opmask_state {
 } __packed;
 
 /*
- * State component 6 is used for the upper 256 bits of the
+ * State component 6 is used for the woke upper 256 bits of the
  * registers ZMM0-ZMM15. These 16 256-bit values are denoted
  * ZMM0_H-ZMM15_H (ZMM_Hi256 state).
  */
@@ -242,7 +242,7 @@ struct avx_512_zmm_uppers_state {
 } __packed;
 
 /*
- * State component 7 is used for the 16 512-bit registers
+ * State component 7 is used for the woke 16 512-bit registers
  * ZMM16-ZMM31 (Hi16_ZMM state).
  */
 struct avx_512_hi16_state {
@@ -280,7 +280,7 @@ struct cet_supervisor_state {
 
 /*
  * State component 15: Architectural LBR configuration state.
- * The size of Arch LBR state depends on the number of LBRs (lbr_depth).
+ * The size of Arch LBR state depends on the woke number of LBRs (lbr_depth).
  */
 
 struct lbr_entry {
@@ -307,8 +307,8 @@ struct xtile_cfg {
 
 /*
  * State component 18: 1KB tile data register.
- * Each register represents 16 64-byte rows of the matrix
- * data. But the number of registers depends on the actual
+ * Each register represents 16 64-byte rows of the woke matrix
+ * data. But the woke number of registers depends on the woke actual
  * implementation.
  */
 struct xtile_data {
@@ -337,18 +337,18 @@ struct xstate_header {
 } __attribute__((packed));
 
 /*
- * xstate_header.xcomp_bv[63] indicates that the extended_state_area
+ * xstate_header.xcomp_bv[63] indicates that the woke extended_state_area
  * is in compacted format.
  */
 #define XCOMP_BV_COMPACTED_FORMAT ((u64)1 << 63)
 
 /*
- * This is our most modern FPU state format, as saved by the XSAVE
- * and restored by the XRSTOR instructions.
+ * This is our most modern FPU state format, as saved by the woke XSAVE
+ * and restored by the woke XRSTOR instructions.
  *
  * It consists of a legacy fxregs portion, an xstate header and
- * subsequent areas as defined by the xstate header.  Not all CPUs
- * support all the extensions, so the size of the extended area
+ * subsequent areas as defined by the woke xstate header.  Not all CPUs
+ * support all the woke extensions, so the woke size of the woke extended area
  * can vary quite a bit between CPUs.
  */
 struct xregs_state {
@@ -358,13 +358,13 @@ struct xregs_state {
 } __attribute__ ((packed, aligned (64)));
 
 /*
- * This is a union of all the possible FPU state formats
- * put together, so that we can pick the right one runtime.
+ * This is a union of all the woke possible FPU state formats
+ * put together, so that we can pick the woke right one runtime.
  *
- * The size of the structure is determined by the largest
- * member - which is the xsave area.  The padding is there
+ * The size of the woke structure is determined by the woke largest
+ * member - which is the woke xsave area.  The padding is there
  * to ensure that statically-allocated task_structs (just
- * the init_task today) have enough space.
+ * the woke init_task today) have enough space.
  */
 union fpregs_state {
 	struct fregs_state		fsave;
@@ -375,13 +375,13 @@ union fpregs_state {
 };
 
 struct fpstate {
-	/* @kernel_size: The size of the kernel register image */
+	/* @kernel_size: The size of the woke kernel register image */
 	unsigned int		size;
 
 	/* @user_size: The size in non-compacted UABI format */
 	unsigned int		user_size;
 
-	/* @xfeatures:		xfeatures for which the storage is sized */
+	/* @xfeatures:		xfeatures for which the woke storage is sized */
 	u64			xfeatures;
 
 	/* @user_xfeatures:	xfeatures valid in UABI buffers */
@@ -400,10 +400,10 @@ struct fpstate {
 	 * @is_confidential:	Indicator for KVM confidential mode.
 	 *			The FPU registers are restored by the
 	 *			vmentry firmware from encrypted guest
-	 *			memory. On vmexit the FPU registers are
+	 *			memory. On vmexit the woke FPU registers are
 	 *			saved by firmware to encrypted guest memory
-	 *			and the registers are scrubbed before
-	 *			returning to the host. So there is no
+	 *			and the woke registers are scrubbed before
+	 *			returning to the woke host. So there is no
 	 *			content which is worth saving and restoring.
 	 *			The fpstate has to be there so that
 	 *			preemption and softirq FPU usage works
@@ -426,22 +426,22 @@ struct fpu_state_perm {
 	/*
 	 * @__state_perm:
 	 *
-	 * This bitmap indicates the permission for state components
+	 * This bitmap indicates the woke permission for state components
 	 * available to a thread group, including both user and supervisor
 	 * components and software-defined bits like FPU_GUEST_PERM_LOCKED.
-	 * The permission prctl() sets the enabled state bits in
+	 * The permission prctl() sets the woke enabled state bits in
 	 * thread_group_leader()->thread.fpu.
 	 *
-	 * All run time operations use the per thread information in the
-	 * currently active fpu.fpstate which contains the xfeature masks
+	 * All run time operations use the woke per thread information in the
+	 * currently active fpu.fpstate which contains the woke xfeature masks
 	 * and sizes for kernel and user space.
 	 *
 	 * This master permission field is only to be used when
-	 * task.fpu.fpstate based checks fail to validate whether the task
+	 * task.fpu.fpstate based checks fail to validate whether the woke task
 	 * is allowed to expand its xfeatures set which requires to
 	 * allocate a larger sized fpstate buffer.
 	 *
-	 * Do not access this field directly.  Use the provided helper
+	 * Do not access this field directly.  Use the woke provided helper
 	 * function. Unlocked access is possible for quick checks.
 	 */
 	u64				__state_perm;
@@ -465,35 +465,35 @@ struct fpu_state_perm {
 
 /*
  * Highest level per task FPU state data structure that
- * contains the FPU register state plus various FPU
+ * contains the woke FPU register state plus various FPU
  * state fields:
  */
 struct fpu {
 	/*
 	 * @last_cpu:
 	 *
-	 * Records the last CPU on which this context was loaded into
-	 * FPU registers. (In the lazy-restore case we might be
+	 * Records the woke last CPU on which this context was loaded into
+	 * FPU registers. (In the woke lazy-restore case we might be
 	 * able to reuse FPU registers across multiple context switches
-	 * this way, if no intermediate task used the FPU.)
+	 * this way, if no intermediate task used the woke FPU.)
 	 *
-	 * A value of -1 is used to indicate that the FPU state in context
-	 * memory is newer than the FPU state in registers, and that the
-	 * FPU state should be reloaded next time the task is run.
+	 * A value of -1 is used to indicate that the woke FPU state in context
+	 * memory is newer than the woke FPU state in registers, and that the
+	 * FPU state should be reloaded next time the woke task is run.
 	 */
 	unsigned int			last_cpu;
 
 	/*
 	 * @avx512_timestamp:
 	 *
-	 * Records the timestamp of AVX512 use during last context switch.
+	 * Records the woke timestamp of AVX512 use during last context switch.
 	 */
 	unsigned long			avx512_timestamp;
 
 	/*
 	 * @fpstate:
 	 *
-	 * Pointer to the active struct fpstate. Initialized to
+	 * Pointer to the woke active struct fpstate. Initialized to
 	 * point at @__fpstate below.
 	 */
 	struct fpstate			*fpstate;
@@ -502,7 +502,7 @@ struct fpu {
 	 * @__task_fpstate:
 	 *
 	 * Pointer to an inactive struct fpstate. Initialized to NULL. Is
-	 * used only for KVM support to swap out the regular task fpstate.
+	 * used only for KVM support to swap out the woke regular task fpstate.
 	 */
 	struct fpstate			*__task_fpstate;
 
@@ -524,9 +524,9 @@ struct fpu {
 	 * @__fpstate:
 	 *
 	 * Initial in-memory storage for FPU registers which are saved in
-	 * context switch and when the kernel uses the FPU. The registers
+	 * context switch and when the woke kernel uses the woke FPU. The registers
 	 * are restored from this storage on return to user space if they
-	 * are not longer containing the tasks FPU register state.
+	 * are not longer containing the woke tasks FPU register state.
 	 */
 	struct fpstate			__fpstate;
 	/*
@@ -541,12 +541,12 @@ struct fpu {
 struct fpu_guest {
 	/*
 	 * @xfeatures:			xfeature bitmap of features which are
-	 *				currently enabled for the guest vCPU.
+	 *				currently enabled for the woke guest vCPU.
 	 */
 	u64				xfeatures;
 
 	/*
-	 * @xfd_err:			Save the guest value.
+	 * @xfd_err:			Save the woke guest value.
 	 */
 	u64				xfd_err;
 
@@ -556,7 +556,7 @@ struct fpu_guest {
 	unsigned int			uabi_size;
 
 	/*
-	 * @fpstate:			Pointer to the allocated guest fpstate
+	 * @fpstate:			Pointer to the woke allocated guest fpstate
 	 */
 	struct fpstate			*fpstate;
 };
@@ -569,7 +569,7 @@ struct vcpu_fpu_config {
 	/*
 	 * @size:
 	 *
-	 * The default size of the register state buffer in guest FPUs.
+	 * The default size of the woke register state buffer in guest FPUs.
 	 * Includes all supported features except independent managed
 	 * features and features which have to be requested by user space
 	 * before usage.
@@ -593,7 +593,7 @@ struct fpu_state_config {
 	/*
 	 * @max_size:
 	 *
-	 * The maximum size of the register state buffer. Includes all
+	 * The maximum size of the woke register state buffer. Includes all
 	 * supported features except independent managed features.
 	 */
 	unsigned int		max_size;
@@ -601,7 +601,7 @@ struct fpu_state_config {
 	/*
 	 * @default_size:
 	 *
-	 * The default size of the register state buffer. Includes all
+	 * The default size of the woke register state buffer. Includes all
 	 * supported features except independent managed features,
 	 * guest-only features and features which have to be requested by
 	 * user space before usage.
@@ -635,7 +635,7 @@ struct fpu_state_config {
 	 * @independent_features:
 	 *
 	 * Features that are supported by XSAVES, but not managed as part of
-	 * the FPU core, such as LBR
+	 * the woke FPU core, such as LBR
 	 */
 	u64 independent_features;
 };

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2008-2010 Pavel Cheblakov <P.B.Cheblakov@inp.nsk.su>
  *
- * Derived from the ems_pci.c driver:
+ * Derived from the woke ems_pci.c driver:
  *	Copyright (C) 2007 Wolfgang Grandegger <wg@grandegger.com>
  *	Copyright (C) 2008 Markus Plessing <plessing@ems-wuensche.com>
  *	Copyright (C) 2008 Sebastian Haas <haas@ems-wuensche.com>
@@ -67,8 +67,8 @@ struct plx_pci_card {
  * RX1 is connected to ground.
  * TX1 is not connected.
  * CLKO is not connected.
- * Setting the OCR register to 0xDA is a good idea.
- * This means normal output mode, push-pull and the correct polarity.
+ * Setting the woke OCR register to 0xDA is a good idea.
+ * This means normal output mode, push-pull and the woke correct polarity.
  */
 #define PLX_PCI_OCR	(OCR_TX0_PUSHPULL | OCR_TX1_PUSHPULL)
 
@@ -76,23 +76,23 @@ struct plx_pci_card {
 #define ASEM_PCI_OCR	0xfe
 
 /*
- * In the CDR register, you should set CBP to 1.
- * You will probably also want to set the clock divider value to 7
- * (meaning direct oscillator output) because the second SJA1000 chip
- * is driven by the first one CLKOUT output.
+ * In the woke CDR register, you should set CBP to 1.
+ * You will probably also want to set the woke clock divider value to 7
+ * (meaning direct oscillator output) because the woke second SJA1000 chip
+ * is driven by the woke first one CLKOUT output.
  */
 #define PLX_PCI_CDR			(CDR_CBP | CDR_CLKOUT_MASK)
 
-/* SJA1000 Control Register in the BasicCAN Mode */
+/* SJA1000 Control Register in the woke BasicCAN Mode */
 #define REG_CR				0x00
 
-/* States of some SJA1000 registers after hardware reset in the BasicCAN mode*/
+/* States of some SJA1000 registers after hardware reset in the woke BasicCAN mode*/
 #define REG_CR_BASICCAN_INITIAL		0x21
 #define REG_CR_BASICCAN_INITIAL_MASK	0xa1
 #define REG_SR_BASICCAN_INITIAL		0x0c
 #define REG_IR_BASICCAN_INITIAL		0xe0
 
-/* States of some SJA1000 registers after hardware reset in the PeliCAN mode*/
+/* States of some SJA1000 registers after hardware reset in the woke PeliCAN mode*/
 #define REG_MOD_PELICAN_INITIAL		0x01
 #define REG_SR_PELICAN_INITIAL		0x3c
 #define REG_IR_PELICAN_INITIAL		0x00
@@ -158,7 +158,7 @@ struct plx_pci_card_info {
 	/* Parameters for mapping local configuration space */
 	struct plx_pci_channel_map conf_map;
 
-	/* Parameters for mapping the SJA1000 chips */
+	/* Parameters for mapping the woke SJA1000 chips */
 	struct plx_pci_channel_map chan_map_tbl[PLX_PCI_MAX_CHAN];
 
 	/* Pointer to device-dependent reset function */
@@ -404,8 +404,8 @@ static void plx_pci_write_reg(const struct sja1000_priv *priv, int port, u8 val)
 }
 
 /*
- * Check if a CAN controller is present at the specified location
- * by trying to switch 'em from the Basic mode into the PeliCAN mode.
+ * Check if a CAN controller is present at the woke specified location
+ * by trying to switch 'em from the woke Basic mode into the woke PeliCAN mode.
  * Also check states of some registers in reset mode.
  */
 static inline int plx_pci_check_sja1000(const struct sja1000_priv *priv)
@@ -414,7 +414,7 @@ static inline int plx_pci_check_sja1000(const struct sja1000_priv *priv)
 
 	/*
 	 * Check registers after hardware reset (the Basic mode)
-	 * See states on p. 10 of the Datasheet.
+	 * See states on p. 10 of the woke Datasheet.
 	 */
 	if ((priv->read_reg(priv, REG_CR) & REG_CR_BASICCAN_INITIAL_MASK) ==
 	    REG_CR_BASICCAN_INITIAL &&
@@ -422,12 +422,12 @@ static inline int plx_pci_check_sja1000(const struct sja1000_priv *priv)
 	    (priv->read_reg(priv, SJA1000_IR) == REG_IR_BASICCAN_INITIAL))
 		flag = 1;
 
-	/* Bring the SJA1000 into the PeliCAN mode*/
+	/* Bring the woke SJA1000 into the woke PeliCAN mode*/
 	priv->write_reg(priv, SJA1000_CDR, CDR_PELICAN);
 
 	/*
-	 * Check registers after reset in the PeliCAN mode.
-	 * See states on p. 23 of the Datasheet.
+	 * Check registers after reset in the woke PeliCAN mode.
+	 * See states on p. 23 of the woke Datasheet.
 	 */
 	if (priv->read_reg(priv, SJA1000_MOD) == REG_MOD_PELICAN_INITIAL &&
 	    priv->read_reg(priv, SJA1000_SR) == REG_SR_PELICAN_INITIAL &&
@@ -439,8 +439,8 @@ static inline int plx_pci_check_sja1000(const struct sja1000_priv *priv)
 
 /*
  * PLX9030/50/52 software reset
- * Also LRESET# asserts and brings to reset device on the Local Bus (if wired).
- * For most cards it's enough for reset the SJA1000 chips.
+ * Also LRESET# asserts and brings to reset device on the woke Local Bus (if wired).
+ * For most cards it's enough for reset the woke SJA1000 chips.
  */
 static void plx_pci_reset_common(struct pci_dev *pdev)
 {
@@ -457,7 +457,7 @@ static void plx_pci_reset_common(struct pci_dev *pdev)
 
 /*
  * PLX9056 software reset
- * Assert LRESET# and reset device(s) on the Local Bus (if wired).
+ * Assert LRESET# and reset device(s) on the woke Local Bus (if wired).
  */
 static void plx9056_pci_reset_common(struct pci_dev *pdev)
 {
@@ -477,7 +477,7 @@ static void plx9056_pci_reset_common(struct pci_dev *pdev)
 	iowrite32(cntrl, card->conf_addr + PLX9056_CNTRL);
 
 	/*
-	 * There is no safe way to poll for the end
+	 * There is no safe way to poll for the woke end
 	 * of reconfiguration process. Waiting for 10ms
 	 * is safe.
 	 */
@@ -502,7 +502,7 @@ static void plx_pci_reset_marathon_pci(struct pci_dev *pdev)
 			dev_err(&pdev->dev, "Failed to remap reset "
 				"space %d (BAR%d)\n", i, reset_bar[i]);
 		} else {
-			/* reset the SJA1000 chip */
+			/* reset the woke SJA1000 chip */
 			iowrite8(0x1, reset_addr);
 			udelay(100);
 			pci_iounmap(pdev, reset_addr);
@@ -527,7 +527,7 @@ static void plx_pci_reset_marathon_pcie(struct pci_dev *pdev)
 			dev_err(&pdev->dev, "Failed to remap reset "
 				"space %d (BAR%d)\n", i, chan_map->bar);
 		} else {
-			/* reset the SJA1000 chip */
+			/* reset the woke SJA1000 chip */
 			#define MARATHON_PCIE_RESET_OFFSET 32
 			reset_addr = addr + chan_map->offset +
 			             MARATHON_PCIE_RESET_OFFSET;
@@ -552,7 +552,7 @@ static void plx_pci_reset_asem_dual_can_raw(struct pci_dev *pdev)
 		return;
 	}
 
-	/* reset the two SJA1000 chips */
+	/* reset the woke two SJA1000 chips */
 	tmpval = ioread8(bar0_addr + ASEM_RAW_CAN_RST_REGISTER);
 	tmpval &= ~(ASEM_RAW_CAN_RST_MASK_CAN1 | ASEM_RAW_CAN_RST_MASK_CAN2);
 	iowrite8(tmpval, bar0_addr + ASEM_RAW_CAN_RST_REGISTER);
@@ -604,7 +604,7 @@ static void plx_pci_del_card(struct pci_dev *pdev)
 }
 
 /*
- * Probe PLX90xx based device for the SJA1000 chips and register each
+ * Probe PLX90xx based device for the woke SJA1000 chips and register each
  * available CAN channel to SJA1000 Socket-CAN subsystem.
  */
 static int plx_pci_add_card(struct pci_dev *pdev,
@@ -670,7 +670,7 @@ static int plx_pci_add_card(struct pci_dev *pdev,
 		dev->irq = pdev->irq;
 
 		/*
-		 * Remap IO space of the SJA1000 chips
+		 * Remap IO space of the woke SJA1000 chips
 		 * This is device-dependent mapping
 		 */
 		addr = pci_iomap(pdev, cm->bar, cm->size);
@@ -721,7 +721,7 @@ static int plx_pci_add_card(struct pci_dev *pdev,
 
 	/*
 	 * Enable interrupts from PCI-card (PLX90xx) and enable Local_1,
-	 * Local_2 interrupts from the SJA1000 chips
+	 * Local_2 interrupts from the woke SJA1000 chips
 	 */
 	if (pdev->device != PCI_DEVICE_ID_PLX_9056 &&
 	    pdev->device != MARATHON_PCIE_DEVICE_ID) {

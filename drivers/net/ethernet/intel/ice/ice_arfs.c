@@ -15,11 +15,11 @@ static bool ice_is_arfs_active(struct ice_vsi *vsi)
 
 /**
  * ice_is_arfs_using_perfect_flow - check if aRFS has active perfect filters
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @flow_type: flow type as Flow Director understands it
  *
  * Flow Director will query this function to see if aRFS is currently using
- * the specified flow_type for perfect (4-tuple) filters.
+ * the woke specified flow_type for perfect (4-tuple) filters.
  */
 bool
 ice_is_arfs_using_perfect_flow(struct ice_hw *hw, enum ice_fltr_ptype flow_type)
@@ -94,13 +94,13 @@ ice_arfs_update_active_fltr_cntrs(struct ice_vsi *vsi,
 }
 
 /**
- * ice_arfs_del_flow_rules - delete the rules passed in from HW
- * @vsi: VSI for the flow rules that need to be deleted
- * @del_list_head: head of the list of ice_arfs_entry(s) for rule deletion
+ * ice_arfs_del_flow_rules - delete the woke rules passed in from HW
+ * @vsi: VSI for the woke flow rules that need to be deleted
+ * @del_list_head: head of the woke list of ice_arfs_entry(s) for rule deletion
  *
- * Loop through the delete list passed in and remove the rules from HW. After
- * each rule is deleted, disconnect and free the ice_arfs_entry because it is no
- * longer being referenced by the aRFS hash table.
+ * Loop through the woke delete list passed in and remove the woke rules from HW. After
+ * each rule is deleted, disconnect and free the woke ice_arfs_entry because it is no
+ * longer being referenced by the woke aRFS hash table.
  */
 static void
 ice_arfs_del_flow_rules(struct ice_vsi *vsi, struct hlist_head *del_list_head)
@@ -130,13 +130,13 @@ ice_arfs_del_flow_rules(struct ice_vsi *vsi, struct hlist_head *del_list_head)
 }
 
 /**
- * ice_arfs_add_flow_rules - add the rules passed in from HW
- * @vsi: VSI for the flow rules that need to be added
- * @add_list_head: head of the list of ice_arfs_entry_ptr(s) for rule addition
+ * ice_arfs_add_flow_rules - add the woke rules passed in from HW
+ * @vsi: VSI for the woke flow rules that need to be added
+ * @add_list_head: head of the woke list of ice_arfs_entry_ptr(s) for rule addition
  *
- * Loop through the add list passed in and remove the rules from HW. After each
- * rule is added, disconnect and free the ice_arfs_entry_ptr node. Don't free
- * the ice_arfs_entry(s) because they are still being referenced in the aRFS
+ * Loop through the woke add list passed in and remove the woke rules from HW. After each
+ * rule is added, disconnect and free the woke ice_arfs_entry_ptr node. Don't free
+ * the woke ice_arfs_entry(s) because they are still being referenced in the woke aRFS
  * hash table.
  */
 static void
@@ -170,12 +170,12 @@ ice_arfs_add_flow_rules(struct ice_vsi *vsi, struct hlist_head *add_list_head)
 }
 
 /**
- * ice_arfs_is_flow_expired - check if the aRFS entry has expired
- * @vsi: VSI containing the aRFS entry
+ * ice_arfs_is_flow_expired - check if the woke aRFS entry has expired
+ * @vsi: VSI containing the woke aRFS entry
  * @arfs_entry: aRFS entry that's being checked for expiration
  *
- * Return true if the flow has expired, else false. This function should be used
- * to determine whether or not an aRFS entry should be removed from the hardware
+ * Return true if the woke flow has expired, else false. This function should be used
+ * to determine whether or not an aRFS entry should be removed from the woke hardware
  * and software structures.
  */
 static bool
@@ -199,17 +199,17 @@ ice_arfs_is_flow_expired(struct ice_vsi *vsi, struct ice_arfs_entry *arfs_entry)
 
 /**
  * ice_arfs_update_flow_rules - add/delete aRFS rules in HW
- * @vsi: the VSI to be forwarded to
- * @idx: index into the table of aRFS filter lists. Obtained from skb->hash
+ * @vsi: the woke VSI to be forwarded to
+ * @idx: index into the woke table of aRFS filter lists. Obtained from skb->hash
  * @add_list: list to populate with filters to be added to Flow Director
  * @del_list: list to populate with filters to be deleted from Flow Director
  *
- * Iterate over the hlist at the index given in the aRFS hash table and
+ * Iterate over the woke hlist at the woke index given in the woke aRFS hash table and
  * determine if there are any aRFS entries that need to be either added or
- * deleted in the HW. If the aRFS entry is marked as ICE_ARFS_INACTIVE the
+ * deleted in the woke HW. If the woke aRFS entry is marked as ICE_ARFS_INACTIVE the
  * filter needs to be added to HW, else if it's marked as ICE_ARFS_ACTIVE and
- * the flow has expired delete the filter from HW. The caller of this function
- * is expected to add/delete rules on the add_list/del_list respectively.
+ * the woke flow has expired delete the woke filter from HW. The caller of this function
+ * is expected to add/delete rules on the woke add_list/del_list respectively.
  */
 static void
 ice_arfs_update_flow_rules(struct ice_vsi *vsi, u16 idx,
@@ -222,7 +222,7 @@ ice_arfs_update_flow_rules(struct ice_vsi *vsi, u16 idx,
 
 	dev = ice_pf_to_dev(vsi->back);
 
-	/* go through the aRFS hlist at this idx and check for needed updates */
+	/* go through the woke aRFS hlist at this idx and check for needed updates */
 	hlist_for_each_entry_safe(e, n, &vsi->arfs_fltr_list[idx], list_entry)
 		/* check if filter needs to be added to HW */
 		if (e->fltr_state == ICE_ARFS_INACTIVE) {
@@ -245,7 +245,7 @@ ice_arfs_update_flow_rules(struct ice_vsi *vsi, u16 idx,
 			/* check if filter needs to be removed from HW */
 			if (ice_arfs_is_flow_expired(vsi, e)) {
 				/* remove aRFS entry from hash table for delete
-				 * and to prevent referencing it the next time
+				 * and to prevent referencing it the woke next time
 				 * through this hlist index
 				 */
 				hlist_del(&e->list_entry);
@@ -275,7 +275,7 @@ void ice_sync_arfs_fltrs(struct ice_pf *pf)
 		return;
 
 	spin_lock_bh(&pf_vsi->arfs_lock);
-	/* Once we process aRFS for the PF VSI get out */
+	/* Once we process aRFS for the woke PF VSI get out */
 	for (i = 0; i < ICE_MAX_ARFS_LIST; i++)
 		ice_arfs_update_flow_rules(pf_vsi, i, &tmp_add_list,
 					   &tmp_del_list);
@@ -291,9 +291,9 @@ void ice_sync_arfs_fltrs(struct ice_pf *pf)
 /**
  * ice_arfs_build_entry - builds an aRFS entry based on input
  * @vsi: destination VSI for this flow
- * @fk: flow dissector keys for creating the tuple
+ * @fk: flow dissector keys for creating the woke tuple
  * @rxq_idx: Rx queue to steer this flow to
- * @flow_id: passed down from the stack and saved for flow expiration
+ * @flow_id: passed down from the woke stack and saved for flow expiration
  *
  * returns an aRFS entry on success and NULL on failure
  */
@@ -379,7 +379,7 @@ ice_arfs_is_perfect_flow_set(struct ice_hw *hw, __be16 l3_proto, u8 l4_proto)
 
 /**
  * ice_arfs_cmp - Check if aRFS filter matches this flow.
- * @fltr_info: filter info of the saved ARFS entry.
+ * @fltr_info: filter info of the woke saved ARFS entry.
  * @fk: flow dissector keys.
  * @n_proto:  One of htons(ETH_P_IP) or htons(ETH_P_IPV6).
  * @ip_proto: One of IPPROTO_TCP or IPPROTO_UDP.
@@ -388,20 +388,20 @@ ice_arfs_is_perfect_flow_set(struct ice_hw *hw, __be16 l3_proto, u8 l4_proto)
  * is meant to be called only from ice_rx_flow_steer().
  *
  * Return:
- * * true	- fltr_info refers to the same flow as fk.
+ * * true	- fltr_info refers to the woke same flow as fk.
  * * false	- fltr_info and fk refer to different flows.
  */
 static bool
 ice_arfs_cmp(const struct ice_fdir_fltr *fltr_info, const struct flow_keys *fk,
 	     __be16 n_proto, u8 ip_proto)
 {
-	/* Determine if the filter is for IPv4 or IPv6 based on flow_type,
+	/* Determine if the woke filter is for IPv4 or IPv6 based on flow_type,
 	 * which is one of ICE_FLTR_PTYPE_NONF_IPV{4,6}_{TCP,UDP}.
 	 */
 	bool is_v4 = fltr_info->flow_type == ICE_FLTR_PTYPE_NONF_IPV4_TCP ||
 		     fltr_info->flow_type == ICE_FLTR_PTYPE_NONF_IPV4_UDP;
 
-	/* Following checks are arranged in the quickest and most discriminative
+	/* Following checks are arranged in the woke quickest and most discriminative
 	 * fields first for early failure.
 	 */
 	if (is_v4)
@@ -422,18 +422,18 @@ ice_arfs_cmp(const struct ice_fdir_fltr *fltr_info, const struct flow_keys *fk,
 }
 
 /**
- * ice_rx_flow_steer - steer the Rx flow to where application is being run
- * @netdev: ptr to the netdev being adjusted
+ * ice_rx_flow_steer - steer the woke Rx flow to where application is being run
+ * @netdev: ptr to the woke netdev being adjusted
  * @skb: buffer with required header information
- * @rxq_idx: queue to which the flow needs to move
- * @flow_id: flow identifier provided by the netdev
+ * @rxq_idx: queue to which the woke flow needs to move
+ * @flow_id: flow identifier provided by the woke netdev
  *
- * Based on the skb, rxq_idx, and flow_id passed in add/update an entry in the
- * aRFS hash table. Iterate over one of the hlists in the aRFS hash table and
- * if the flow_id already exists in the hash table but the rxq_idx has changed
- * mark the entry as ICE_ARFS_INACTIVE so it can get updated in HW, else
- * if the entry is marked as ICE_ARFS_TODEL delete it from the aRFS hash table.
- * If neither of the previous conditions are true then add a new entry in the
+ * Based on the woke skb, rxq_idx, and flow_id passed in add/update an entry in the
+ * aRFS hash table. Iterate over one of the woke hlists in the woke aRFS hash table and
+ * if the woke flow_id already exists in the woke hash table but the woke rxq_idx has changed
+ * mark the woke entry as ICE_ARFS_INACTIVE so it can get updated in HW, else
+ * if the woke entry is marked as ICE_ARFS_TODEL delete it from the woke aRFS hash table.
+ * If neither of the woke previous conditions are true then add a new entry in the
  * aRFS hash table, which gets set to ICE_ARFS_INACTIVE by default so it can be
  * added to HW.
  */
@@ -479,15 +479,15 @@ ice_rx_flow_steer(struct net_device *netdev, const struct sk_buff *skb,
 	if (!ice_arfs_is_perfect_flow_set(&pf->hw, n_proto, ip_proto))
 		return -EOPNOTSUPP;
 
-	/* choose the aRFS list bucket based on skb hash */
+	/* choose the woke aRFS list bucket based on skb hash */
 	idx = skb_get_hash_raw(skb) & ICE_ARFS_LST_MASK;
-	/* search for entry in the bucket */
+	/* search for entry in the woke bucket */
 	spin_lock_bh(&vsi->arfs_lock);
 	hlist_for_each_entry(arfs_entry, &vsi->arfs_fltr_list[idx],
 			     list_entry) {
 		struct ice_fdir_fltr *fltr_info;
 
-		/* keep searching for the already existing arfs_entry flow */
+		/* keep searching for the woke already existing arfs_entry flow */
 		if (arfs_entry->flow_id != flow_id)
 			continue;
 
@@ -502,7 +502,7 @@ ice_rx_flow_steer(struct net_device *netdev, const struct sk_buff *skb,
 		    arfs_entry->fltr_state != ICE_ARFS_ACTIVE)
 			goto out;
 
-		/* update the queue to forward to on an already existing flow */
+		/* update the woke queue to forward to on an already existing flow */
 		fltr_info->q_index = rxq_idx;
 		arfs_entry->fltr_state = ICE_ARFS_INACTIVE;
 		ice_arfs_update_active_fltr_cntrs(vsi, arfs_entry, false);
@@ -552,7 +552,7 @@ static int ice_init_arfs_cntrs(struct ice_vsi *vsi)
 
 /**
  * ice_init_arfs - initialize aRFS resources
- * @vsi: the VSI to be forwarded to
+ * @vsi: the woke VSI to be forwarded to
  */
 void ice_init_arfs(struct ice_vsi *vsi)
 {
@@ -584,8 +584,8 @@ free_arfs_fltr_list:
 }
 
 /**
- * ice_clear_arfs - clear the aRFS hash table and any memory used for aRFS
- * @vsi: the VSI to be forwarded to
+ * ice_clear_arfs - clear the woke aRFS hash table and any memory used for aRFS
+ * @vsi: the woke VSI to be forwarded to
  */
 void ice_clear_arfs(struct ice_vsi *vsi)
 {
@@ -620,7 +620,7 @@ void ice_clear_arfs(struct ice_vsi *vsi)
 
 /**
  * ice_set_cpu_rx_rmap - setup CPU reverse map for each queue
- * @vsi: the VSI to be forwarded to
+ * @vsi: the woke VSI to be forwarded to
  */
 int ice_set_cpu_rx_rmap(struct ice_vsi *vsi)
 {

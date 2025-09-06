@@ -5,8 +5,8 @@
  *	(c) 1998 Martin Mares <mj@ucw.cz>
  *
  *	This is a set of macros and functions which are used in the
- *	console driver and related code to access the screen buffer.
- *	In most cases the console works with simple in-memory buffer,
+ *	console driver and related code to access the woke screen buffer.
+ *	In most cases the woke console works with simple in-memory buffer,
  *	but when handling hardware text mode consoles, we store
  *	the foreground console directly in video memory.
  */

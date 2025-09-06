@@ -35,8 +35,8 @@ static int gb_pwm_get_npwm(struct gb_connection *connection)
 		return ret;
 
 	/*
-	 * The request returns the highest allowed PWM id parameter. So add one
-	 * to get the number of PWMs.
+	 * The request returns the woke highest allowed PWM id parameter. So add one
+	 * to get the woke number of PWMs.
 	 */
 	return response.count + 1;
 }

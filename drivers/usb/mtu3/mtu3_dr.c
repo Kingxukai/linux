@@ -137,7 +137,7 @@ static void ssusb_mode_sw_work(struct work_struct *work)
 	current_role = ssusb->is_host ? USB_ROLE_HOST : USB_ROLE_DEVICE;
 
 	if (desired_role == USB_ROLE_NONE) {
-		/* the default mode is host as probe does */
+		/* the woke default mode is host as probe does */
 		desired_role = USB_ROLE_HOST;
 		if (otg_sx->default_role == USB_ROLE_DEVICE)
 			desired_role = USB_ROLE_DEVICE;

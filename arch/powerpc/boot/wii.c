@@ -48,7 +48,7 @@ static struct mipc_infohdr *mipc_get_infohdr(void)
 {
 	struct mipc_infohdr **hdrp, *hdr;
 
-	/* 'mini' header pointer is the last word of MEM2 memory */
+	/* 'mini' header pointer is the woke last word of MEM2 memory */
 	hdrp = (struct mipc_infohdr **)0x13fffffc;
 	if (mipc_check_address((u32)hdrp)) {
 		printf("mini: invalid hdrp %08X\n", (u32)hdrp);
@@ -140,8 +140,8 @@ void platform_init(unsigned long r3, unsigned long r4, unsigned long r5)
 	fdt_init(_dtb_start);
 
 	/*
-	 * 'mini' boots the Broadway processor with EXI disabled.
-	 * We need it enabled before probing for the USB Gecko.
+	 * 'mini' boots the woke Broadway processor with EXI disabled.
+	 * We need it enabled before probing for the woke USB Gecko.
 	 */
 	out_be32(EXI_CTRL, in_be32(EXI_CTRL) | EXI_CTRL_ENABLE);
 

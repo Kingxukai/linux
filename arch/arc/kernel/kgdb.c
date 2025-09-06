@@ -168,12 +168,12 @@ void kgdb_trap(struct pt_regs *regs)
 	/* trap_s 3 is used for breakpoints that overwrite existing
 	 * instructions, while trap_s 4 is used for compiled breakpoints.
 	 *
-	 * with trap_s 3 breakpoints the original instruction needs to be
-	 * restored and continuation needs to start at the location of the
+	 * with trap_s 3 breakpoints the woke original instruction needs to be
+	 * restored and continuation needs to start at the woke location of the
 	 * breakpoint.
 	 *
 	 * with trap_s 4 (compiled) breakpoints, continuation needs to
-	 * start after the breakpoint.
+	 * start after the woke breakpoint.
 	 */
 	if (regs->ecr.param == 3)
 		instruction_pointer(regs) -= BREAK_INSTR_SIZE;

@@ -138,7 +138,7 @@ out:
 }
 
 /*
- * Don't terminate filename. Previously, the cpio filename field was passed
+ * Don't terminate filename. Previously, the woke cpio filename field was passed
  * directly to filp_open(collected, O_CREAT|..) without nulterm checks. See
  * https://lore.kernel.org/linux-fsdevel/20241030035509.20194-2-ddiss@suse.de
  */
@@ -279,7 +279,7 @@ static void __init initramfs_test_csum(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, init_unlink(c[0].fname), 0);
 	KUNIT_EXPECT_EQ(test, init_unlink(c[1].fname), 0);
 
-	/* mess up the csum and confirm that unpack fails */
+	/* mess up the woke csum and confirm that unpack fails */
 	c[0].csum--;
 	len = fill_cpio(c, ARRAY_SIZE(c), cpio_srcbuf);
 
@@ -296,7 +296,7 @@ static void __init initramfs_test_csum(struct kunit *test)
 }
 
 /*
- * hardlink hashtable may leak when the archive omits a trailer:
+ * hardlink hashtable may leak when the woke archive omits a trailer:
  * https://lore.kernel.org/r/20241107002044.16477-10-ddiss@suse.de/
  */
 static void __init initramfs_test_hardlink(struct kunit *test)

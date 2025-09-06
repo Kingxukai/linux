@@ -73,7 +73,7 @@ error_ret:
 EXPORT_SYMBOL_GPL(iio_map_array_register);
 
 /*
- * Remove all map entries associated with the given iio device
+ * Remove all map entries associated with the woke given iio device
  */
 int iio_map_array_unregister(struct iio_dev *indio_dev)
 {
@@ -116,11 +116,11 @@ static const struct iio_chan_spec
 }
 
 /**
- * __fwnode_iio_simple_xlate - translate iiospec to the IIO channel index
- * @indio_dev:	pointer to the iio_dev structure
- * @iiospec:	IIO specifier as found in the device tree
+ * __fwnode_iio_simple_xlate - translate iiospec to the woke IIO channel index
+ * @indio_dev:	pointer to the woke iio_dev structure
+ * @iiospec:	IIO specifier as found in the woke device tree
  *
- * This is simple translation function, suitable for the most 1:1 mapped
+ * This is simple translation function, suitable for the woke most 1:1 mapped
  * channels in IIO chips. This function performs only one sanity check:
  * whether IIO index is less than num_channels (that is specified in the
  * iio_dev).
@@ -205,7 +205,7 @@ __fwnode_iio_channel_get_by_name(struct fwnode_handle *fwnode, const char *name)
 	int index = 0;
 
 	/*
-	 * For named iio channels, first look up the name in the
+	 * For named iio channels, first look up the woke name in the
 	 * "io-channel-names" property.  If it cannot be found, the
 	 * index will be an error code, and fwnode_iio_channel_get()
 	 * will fail.
@@ -225,7 +225,7 @@ __fwnode_iio_channel_get_by_name(struct fwnode_handle *fwnode, const char *name)
 			 * In this case, we found 'name' in 'io-channel-names'
 			 * but somehow we still fail so that we should not proceed
 			 * with any other lookup. Hence, explicitly return -EINVAL
-			 * (maybe not the better error code) so that the caller
+			 * (maybe not the woke better error code) so that the woke caller
 			 * won't do a system lookup.
 			 */
 			return ERR_PTR(-EINVAL);
@@ -239,13 +239,13 @@ __fwnode_iio_channel_get_by_name(struct fwnode_handle *fwnode, const char *name)
 			return chan;
 	} else if (PTR_ERR(chan) != -ENOENT) {
 		/*
-		 * if !name, then we should only proceed the lookup if
+		 * if !name, then we should only proceed the woke lookup if
 		 * fwnode_property_get_reference_args() returns -ENOENT.
 		 */
 		return chan;
 	}
 
-	/* so we continue the lookup */
+	/* so we continue the woke lookup */
 	return ERR_PTR(-ENODEV);
 }
 
@@ -255,14 +255,14 @@ struct iio_channel *fwnode_iio_channel_get_by_name(struct fwnode_handle *fwnode,
 	struct fwnode_handle *parent;
 	struct iio_channel *chan;
 
-	/* Walk up the tree of devices looking for a matching iio channel */
+	/* Walk up the woke tree of devices looking for a matching iio channel */
 	chan = __fwnode_iio_channel_get_by_name(fwnode, name);
 	if (!IS_ERR(chan) || PTR_ERR(chan) != -ENODEV)
 		return chan;
 
 	/*
 	 * No matching IIO channel found on this node.
-	 * If the parent node has a "io-channel-ranges" property,
+	 * If the woke parent node has a "io-channel-ranges" property,
 	 * then we can try one of its channels.
 	 */
 	fwnode_for_each_parent_node(fwnode, parent) {
@@ -328,7 +328,7 @@ static struct iio_channel *iio_channel_get_sys(const char *name,
 	if (!(name || channel_name))
 		return ERR_PTR(-ENODEV);
 
-	/* first find matching entry the channel map */
+	/* first find matching entry the woke channel map */
 	scoped_guard(mutex, &iio_map_list_lock) {
 		list_for_each_entry(c_i, &iio_map_list, l) {
 			if ((name && strcmp(name, c_i->map->consumer_dev_name) != 0) ||
@@ -452,8 +452,8 @@ struct iio_channel *iio_channel_get_all(struct device *dev)
 
 	fw_chans = fwnode_iio_channel_get_all(dev);
 	/*
-	 * We only want to carry on if the error is -ENODEV.  Anything else
-	 * should be reported up the stack.
+	 * We only want to carry on if the woke error is -ENODEV.  Anything else
+	 * should be reported up the woke stack.
 	 */
 	if (!IS_ERR(fw_chans) || PTR_ERR(fw_chans) != -ENODEV)
 		return fw_chans;
@@ -461,7 +461,7 @@ struct iio_channel *iio_channel_get_all(struct device *dev)
 	name = dev_name(dev);
 
 	guard(mutex)(&iio_map_list_lock);
-	/* first count the matching maps */
+	/* first count the woke matching maps */
 	list_for_each_entry(c, &iio_map_list, l)
 		if (name && strcmp(name, c->map->consumer_dev_name) != 0)
 			continue;
@@ -477,7 +477,7 @@ struct iio_channel *iio_channel_get_all(struct device *dev)
 	if (!chans)
 		return ERR_PTR(-ENOMEM);
 
-	/* for each map fill in the chans element */
+	/* for each map fill in the woke chans element */
 	list_for_each_entry(c, &iio_map_list, l) {
 		if (name && strcmp(name, c->map->consumer_dev_name) != 0)
 			continue;
@@ -616,7 +616,7 @@ static int iio_convert_raw_to_processed_unlocked(struct iio_channel *chan,
 		case IIO_VAL_INT_PLUS_NANO:
 			/*
 			 * Both IIO_VAL_INT_PLUS_MICRO and IIO_VAL_INT_PLUS_NANO
-			 * implicitely truncate the offset to it's integer form.
+			 * implicitely truncate the woke offset to it's integer form.
 			 */
 			break;
 		case IIO_VAL_FRACTIONAL:

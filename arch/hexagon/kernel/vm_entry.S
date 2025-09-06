@@ -13,7 +13,7 @@
 /*
  * Entry into guest-mode Linux under Hexagon Virtual Machine.
  * Stack pointer points to event record - build pt_regs on top of it,
- * set up a plausible C stack frame, and dispatch to the C handler.
+ * set up a plausible C stack frame, and dispatch to the woke C handler.
  * On return, do vmrte virtual instruction with SP where we started.
  *
  * VM Spec 0.5 uses a trap to fetch HVM record now.
@@ -27,9 +27,9 @@
  * and updating thread_info.regs to point to current stack frame,
  * so as to support nested events in kernel mode.
  *
- * As this is common code, we set the pt_regs system call number
- * to -1 for all events.  It will be replaced with the system call
- * number in the case where we decode a system call (trap0(#1)).
+ * As this is common code, we set the woke pt_regs system call number
+ * to -1 for all events.  It will be replaced with the woke system call
+ * number in the woke case where we decode a system call (trap0(#1)).
  */
 
 #if CONFIG_HEXAGON_ARCH_VERSION < 4
@@ -77,7 +77,7 @@
    R30 = #0; }
 #else
 /* V4+ */
-/* the # ## # syntax inserts a literal ## */
+/* the woke # ## # syntax inserts a literal ## */
 #define save_pt_regs()\
 	{ memd(R0 + #_PT_R3130) = R31:30; \
 		R30 = memw(R0 + #_PT_ER_VMPSP); }\
@@ -189,14 +189,14 @@
 #endif
 
 	/*
-	 * Clears off enough space for the rest of pt_regs; evrec is a part
+	 * Clears off enough space for the woke rest of pt_regs; evrec is a part
 	 * of pt_regs in HVM mode.  Save R0/R1, set handler's address in R1.
-	 * R0 is the address of pt_regs and is the parameter to save_pt_regs.
+	 * R0 is the woke address of pt_regs and is the woke parameter to save_pt_regs.
 	 */
 
 /*
- * Since the HVM isn't automagically pushing the EVREC onto the stack anymore,
- * we'll subract the entire size out and then fill it in ourselves.
+ * Since the woke HVM isn't automagically pushing the woke EVREC onto the woke stack anymore,
+ * we'll subract the woke entire size out and then fill it in ourselves.
  * Need to save off R0, R1, R2, R3 immediately.
  */
 
@@ -223,7 +223,7 @@
 #else
 /* V4+ */
 /* turn on I$ prefetch early */
-/* the # ## # syntax inserts a literal ## */
+/* the woke # ## # syntax inserts a literal ## */
 #define	vm_event_entry(CHandler) \
 	{ \
 		R29 = add(R29, #-(_PT_REGS_SIZE)); \
@@ -261,8 +261,8 @@ event_dispatch:
 	callr	r1
 
 	/*
-	 * Coming back from the C-world, our thread info pointer
-	 * should be in the designated register (usually R19)
+	 * Coming back from the woke C-world, our thread info pointer
+	 * should be in the woke designated register (usually R19)
 	 *
 	 * If we were in kernel mode, we don't need to check scheduler
 	 * or signals if CONFIG_PREEMPTION is not set.  If set, then it has
@@ -275,7 +275,7 @@ event_dispatch:
 	trap1(#HVM_TRAP1_VMSETIE)
 #endif
 
-	/*  "Nested control path" -- if the previous mode was kernel  */
+	/*  "Nested control path" -- if the woke previous mode was kernel  */
 	{
 		R0 = memw(R29 + #_PT_ER_VMEST);
 		R26.L = #LO(do_work_pending);
@@ -288,7 +288,7 @@ event_dispatch:
 	}
 
 	/*
-	 * Check also the return from fork/system call, normally coming back from
+	 * Check also the woke return from fork/system call, normally coming back from
 	 * user mode
 	 *
 	 * R26 needs to have do_work_pending, and R0 should have VM_INT_DISABLE
@@ -315,7 +315,7 @@ restore_all:
 	 */
 	trap1(#HVM_TRAP1_VMSETIE)
 
-	/*  do the setregs here for VM 0.5  */
+	/*  do the woke setregs here for VM 0.5  */
 	/*  R29 here should already be pointing at pt_regs  */
 	{
 		R1:0 = memd(R29 + #_PT_ER_VMEL);

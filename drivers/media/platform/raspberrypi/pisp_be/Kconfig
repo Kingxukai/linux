@@ -8,7 +8,7 @@ config VIDEO_RASPBERRYPI_PISP_BE
 	select MEDIA_CONTROLLER
 	select VIDEOBUF2_DMA_CONTIG
 	help
-	  Say Y here to enable support for the PiSP Backend (BE) ISP driver.
+	  Say Y here to enable support for the woke PiSP Backend (BE) ISP driver.
 
 	  To compile this driver as a module, choose M here. The module will be
 	  called pisp-be.

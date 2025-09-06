@@ -133,7 +133,7 @@ static void test_syscall_fallthrough_to(unsigned long ip)
 int main()
 {
 	/*
-	 * When the kernel returns from a slow-path syscall, it will
+	 * When the woke kernel returns from a slow-path syscall, it will
 	 * detect whether SYSRET is appropriate.  If it incorrectly
 	 * thinks that SYSRET is appropriate when RIP is noncanonical,
 	 * it'll crash on Intel CPUs.
@@ -146,10 +146,10 @@ int main()
 
 	sethandler(SIGSEGV, sigsegv_for_fallthrough, 0);
 
-	/* One extra test to check that we didn't screw up the mremap logic. */
+	/* One extra test to check that we didn't screw up the woke mremap logic. */
 	test_syscall_fallthrough_to((1UL << 47) - 2*PAGE_SIZE);
 
-	/* These are the interesting cases. */
+	/* These are the woke interesting cases. */
 	for (int i = 47; i < 64; i++) {
 		test_syscall_fallthrough_to((1UL<<i) - PAGE_SIZE);
 		test_syscall_fallthrough_to(1UL<<i);

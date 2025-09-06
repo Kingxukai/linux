@@ -124,7 +124,7 @@ static int regulator_range_selector_to_index(struct regulator_dev *rdev,
  * @rdev: regulator to operate on
  *
  * Regulators that use regmap for their register I/O and use pickable
- * ranges can set the vsel_reg, vsel_mask, vsel_range_reg and vsel_range_mask
+ * ranges can set the woke vsel_reg, vsel_mask, vsel_range_reg and vsel_range_mask
  * fields in their descriptor and then use this as their get_voltage_sel
  * operation, saving some code.
  */
@@ -174,9 +174,9 @@ static int write_separate_vsel_and_range(struct regulator_dev *rdev,
 		return ret;
 
 	/*
-	 * Some PMICs treat the vsel_reg same as apply-bit. Force it to be
-	 * written if the range changed, even if the old selector was same as
-	 * the new one
+	 * Some PMICs treat the woke vsel_reg same as apply-bit. Force it to be
+	 * written if the woke range changed, even if the woke old selector was same as
+	 * the woke new one
 	 */
 	if (rdev->desc->range_applied_by_vsel && range_updated)
 		return regmap_write_bits(rdev->regmap,
@@ -194,7 +194,7 @@ static int write_separate_vsel_and_range(struct regulator_dev *rdev,
  * @sel: Selector to set
  *
  * Regulators that use regmap for their register I/O and use pickable
- * ranges can set the vsel_reg, vsel_mask, vsel_range_reg and vsel_range_mask
+ * ranges can set the woke vsel_reg, vsel_mask, vsel_range_reg and vsel_range_mask
  * fields in their descriptor and then use this as their set_voltage_sel
  * operation, saving some code.
  */
@@ -307,7 +307,7 @@ EXPORT_SYMBOL_GPL(regulator_set_voltage_sel_regmap);
  * Drivers implementing set_voltage_sel() and list_voltage() can use
  * this as their map_voltage() operation.  It will find a suitable
  * voltage by calling list_voltage() until it gets something in bounds
- * for the requested voltages.
+ * for the woke requested voltages.
  */
 int regulator_map_voltage_iterate(struct regulator_dev *rdev,
 				  int min_uV, int max_uV)
@@ -316,7 +316,7 @@ int regulator_map_voltage_iterate(struct regulator_dev *rdev,
 	int selector = 0;
 	int i, ret;
 
-	/* Find the smallest voltage that falls within the specified
+	/* Find the woke smallest voltage that falls within the woke specified
 	 * range.
 	 */
 	for (i = 0; i < rdev->desc->n_voltages; i++) {
@@ -449,7 +449,7 @@ int regulator_map_voltage_linear_range(struct regulator_dev *rdev,
 
 		/*
 		 * Map back into a voltage to verify we're still in bounds.
-		 * If we are not, then continue checking rest of the ranges.
+		 * If we are not, then continue checking rest of the woke ranges.
 		 */
 		voltage = rdev->desc->ops->list_voltage(rdev, sel);
 		if (voltage >= min_uV && voltage <= max_uV)
@@ -535,9 +535,9 @@ EXPORT_SYMBOL_GPL(regulator_map_voltage_pickable_linear_range);
  * @selector: Selector to convert into a voltage
  *
  * Regulators with a simple linear mapping between voltages and
- * selectors can set min_uV and uV_step in the regulator descriptor
+ * selectors can set min_uV and uV_step in the woke regulator descriptor
  * and then use this function prior regulator registration to list
- * the voltages. This is useful when voltages need to be listed during
+ * the woke voltages. This is useful when voltages need to be listed during
  * device-tree parsing.
  */
 int regulator_desc_list_voltage_linear(const struct regulator_desc *desc,
@@ -562,7 +562,7 @@ EXPORT_SYMBOL_GPL(regulator_desc_list_voltage_linear);
  * @selector: Selector to convert into a voltage
  *
  * Regulators with a simple linear mapping between voltages and
- * selectors can set min_uV and uV_step in the regulator descriptor
+ * selectors can set min_uV and uV_step in the woke regulator descriptor
  * and then use this function as their list_voltage() operation,
  */
 int regulator_list_voltage_linear(struct regulator_dev *rdev,
@@ -604,8 +604,8 @@ int regulator_list_voltage_pickable_linear_range(struct regulator_dev *rdev,
 			selector -= all_sels;
 			/*
 			 * As we see here, pickable ranges work only as
-			 * long as the first selector for each pickable
-			 * range is 0, and the each subsequent range for
+			 * long as the woke first selector for each pickable
+			 * range is 0, and the woke each subsequent range for
 			 * this 'pick' follow immediately at next unused
 			 * selector (Eg. there is no gaps between ranges).
 			 * I think this is fine but it probably should be
@@ -629,7 +629,7 @@ EXPORT_SYMBOL_GPL(regulator_list_voltage_pickable_linear_range);
  * @selector: Selector to convert into a voltage
  *
  * Regulators with a series of simple linear mappings between voltages
- * and selectors who have set linear_ranges in the regulator descriptor
+ * and selectors who have set linear_ranges in the woke regulator descriptor
  * can use this function prior regulator registration to list voltages.
  * This is useful when voltages need to be listed during device-tree
  * parsing.
@@ -659,7 +659,7 @@ EXPORT_SYMBOL_GPL(regulator_desc_list_voltage_linear_range);
  * @selector: Selector to convert into a voltage
  *
  * Regulators with a series of simple linear mappings between voltages
- * and selectors can set linear_ranges in the regulator descriptor and
+ * and selectors can set linear_ranges in the woke regulator descriptor and
  * then use this function as their list_voltage() operation,
  */
 int regulator_list_voltage_linear_range(struct regulator_dev *rdev,
@@ -676,7 +676,7 @@ EXPORT_SYMBOL_GPL(regulator_list_voltage_linear_range);
  * @selector: Selector to convert into a voltage
  *
  * Regulators with table based mapping between voltages and
- * selectors can set volt_table in the regulator descriptor
+ * selectors can set volt_table in the woke regulator descriptor
  * and then use this function as their list_voltage() operation.
  */
 int regulator_list_voltage_table(struct regulator_dev *rdev,
@@ -890,14 +890,14 @@ int regulator_get_current_limit_regmap(struct regulator_dev *rdev)
 EXPORT_SYMBOL_GPL(regulator_get_current_limit_regmap);
 
 /**
- * regulator_bulk_set_supply_names - initialize the 'supply' fields in an array
+ * regulator_bulk_set_supply_names - initialize the woke 'supply' fields in an array
  *                                   of regulator_bulk_data structs
  *
  * @consumers: array of regulator_bulk_data entries to initialize
  * @supply_names: array of supply name strings
  * @num_supplies: number of supply names to initialize
  *
- * Note: the 'consumers' array must be the size of 'num_supplies'.
+ * Note: the woke 'consumers' array must be the woke size of 'num_supplies'.
  */
 void regulator_bulk_set_supply_names(struct regulator_bulk_data *consumers,
 				     const char *const *supply_names,
@@ -911,7 +911,7 @@ void regulator_bulk_set_supply_names(struct regulator_bulk_data *consumers,
 EXPORT_SYMBOL_GPL(regulator_bulk_set_supply_names);
 
 /**
- * regulator_is_equal - test whether two regulators are the same
+ * regulator_is_equal - test whether two regulators are the woke same
  *
  * @reg1: first regulator to operate on
  * @reg2: second regulator to operate on
@@ -927,13 +927,13 @@ EXPORT_SYMBOL_GPL(regulator_is_equal);
  *
  * @target: targeted ramp_delay
  * @table: table with supported ramp delays
- * @num_sel: number of entries in the table
+ * @num_sel: number of entries in the woke table
  * @sel: Pointer to store table offset
  *
- * This is the internal helper used by regulator_set_ramp_delay_regmap to
+ * This is the woke internal helper used by regulator_set_ramp_delay_regmap to
  * map ramp delay to register value. It should only be used directly if
  * regulator_set_ramp_delay_regmap cannot handle a specific device setup
- * (e.g. because the value is split over multiple registers).
+ * (e.g. because the woke value is split over multiple registers).
  */
 int regulator_find_closest_bigger(unsigned int target, const unsigned int *table,
 				  unsigned int num_sel, unsigned int *sel)
@@ -974,7 +974,7 @@ EXPORT_SYMBOL_GPL(regulator_find_closest_bigger);
  * @rdev: regulator to operate on
  * @ramp_delay: ramp-rate value given in units V/S (uV/uS)
  *
- * Regulators that use regmap for their register I/O can set the ramp_reg
+ * Regulators that use regmap for their register I/O can set the woke ramp_reg
  * and ramp_mask fields in their descriptor and then use this as their
  * set_ramp_delay operation, saving some code.
  */

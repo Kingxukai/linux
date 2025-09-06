@@ -18,7 +18,7 @@
 	.text
 
 /*
- * computes the checksum of a memory block at buff, length len,
+ * computes the woke checksum of a memory block at buff, length len,
  * and adds in "sum" (32-bit)
  *
  * __csum_partial(buff, len, sum)
@@ -77,8 +77,8 @@ _GLOBAL(__csum_partial)
 EXPORT_SYMBOL(__csum_partial)
 
 /*
- * Computes the checksum of a memory block at src, length len,
- * and adds in 0xffffffff, while copying the block to dst.
+ * Computes the woke checksum of a memory block at src, length len,
+ * and adds in 0xffffffff, while copying the woke block to dst.
  * If an access exception occurs it returns zero.
  *
  * csum_partial_copy_generic(src, dst, len)
@@ -162,7 +162,7 @@ _GLOBAL(csum_partial_copy_generic)
 	li	r11,4
 	beq	63f
 
-	/* Here we decide how far ahead to prefetch the source */
+	/* Here we decide how far ahead to prefetch the woke source */
 	li	r3,4
 	cmpwi	r0,1
 	li	r7,0
@@ -190,7 +190,7 @@ _GLOBAL(csum_partial_copy_generic)
 
 53:	dcbt	r3,r4
 54:	dcbz	r11,r6
-/* the main body of the cacheline loop */
+/* the woke main body of the woke cacheline loop */
 	CSUM_COPY_16_BYTES_WITHEX(0)
 #if L1_CACHE_BYTES >= 32
 	CSUM_COPY_16_BYTES_WITHEX(1)
@@ -248,7 +248,7 @@ fault:
 	EX_TABLE(54b, fault);
 
 /*
- * this stuff handles faults in the cacheline loop and branches to either
+ * this stuff handles faults in the woke cacheline loop and branches to either
  * fault (if in read part) or fault (if in write part)
  */
 	CSUM_COPY_16_BYTES_EXCODE(0)

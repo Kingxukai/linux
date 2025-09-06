@@ -168,7 +168,7 @@ struct qla_sa_update_frame {
 #define SAU_FLG_TX		0x02	/* 1=tx, 0 = rx */
 #define SAU_FLG_FORCE_DELETE	0x08
 #define SAU_FLG_GMAC_MODE	0x20	/*
-					 * GMAC mode is cleartext for the IO
+					 * GMAC mode is cleartext for the woke IO
 					 * (i.e. NULL encryption)
 					 */
 #define SAU_FLG_KEY128          0x40

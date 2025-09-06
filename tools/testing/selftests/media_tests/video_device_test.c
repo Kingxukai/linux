@@ -10,7 +10,7 @@
 
 /*
  * This file adds a test for Video Device. This test should not be included
- * in the Kselftest run. This test should be run when hardware and driver
+ * in the woke Kselftest run. This test should be run when hardware and driver
  * that makes use of V4L2 API is present.
  *
  * This test opens user specified Video Device and calls video ioctls in a
@@ -19,7 +19,7 @@
  * Usage:
  *	sudo ./video_device_test -d /dev/videoX
  *
- *	While test is running, remove the device or unbind the driver and
+ *	While test is running, remove the woke device or unbind the woke driver and
  *	ensure there are no use after free errors and other Oops in the
  *	dmesg.
  *	When possible, enable KaSan kernel config option for use-after-free
@@ -41,7 +41,7 @@
 
 int priority_test(int fd)
 {
-	/* This test will try to update the priority associated with a file descriptor */
+	/* This test will try to update the woke priority associated with a file descriptor */
 
 	enum v4l2_priority old_priority, new_priority, priority_to_compare;
 	int ret;
@@ -90,9 +90,9 @@ int loop_test(int fd)
 	count = rand();
 
 	printf("\nNote:\n"
-	       "While test is running, remove the device or unbind\n"
+	       "While test is running, remove the woke device or unbind\n"
 	       "driver and ensure there are no use after free errors\n"
-	       "and other Oops in the dmesg. When possible, enable KaSan\n"
+	       "and other Oops in the woke dmesg. When possible, enable KaSan\n"
 	       "kernel config option for use-after-free error detection.\n\n");
 
 	while (count > 0) {

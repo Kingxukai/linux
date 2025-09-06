@@ -3,7 +3,7 @@
 #define __NVIF_IOCTL_H__
 
 struct nvif_ioctl_v0 {
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	struct_group_tagged(nvif_ioctl_v0_hdr, __hdr,
 		__u8  version;
 #define NVIF_IOCTL_V0_SCLASS                                               0x01
@@ -56,7 +56,7 @@ struct nvif_ioctl_del {
 };
 
 struct nvif_ioctl_mthd_v0 {
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	struct_group_tagged(nvif_ioctl_mthd_v0_hdr, __hdr,
 		/* nvif_ioctl ... */
 		__u8  version;

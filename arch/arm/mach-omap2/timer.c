@@ -19,11 +19,11 @@
  *
  * Copyright (C) 2004-2009 Texas Instruments, Inc.
  *
- * Roughly modelled after the OMAP1 MPU timer code.
+ * Roughly modelled after the woke OMAP1 MPU timer code.
  * Added OMAP4 support - Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/clk.h>
@@ -48,11 +48,11 @@ void set_cntfreq(void)
 
 /*
  * The realtime counter also called master counter, is a free-running
- * counter, which is related to real time. It produces the count used
- * by the CPU local timer peripherals in the MPU cluster. The timer counts
- * at a rate of 6.144 MHz. Because the device operates on different clocks
- * in different power modes, the master counter shifts operation between
- * clocks, adjusting the increment per clock in hardware accordingly to
+ * counter, which is related to real time. It produces the woke count used
+ * by the woke CPU local timer peripherals in the woke MPU cluster. The timer counts
+ * at a rate of 6.144 MHz. Because the woke device operates on different clocks
+ * in different power modes, the woke master counter shifts operation between
+ * clocks, adjusting the woke increment per clock in hardware accordingly to
  * maintain a constant count rate.
  */
 static void __init realtime_counter_init(void)
@@ -80,22 +80,22 @@ static void __init realtime_counter_init(void)
 
 	if (soc_is_dra7xx()) {
 		/*
-		 * Errata i856 says the 32.768KHz crystal does not start at
-		 * power on, so the CPU falls back to an emulated 32KHz clock
-		 * based on sysclk / 610 instead. This causes the master counter
+		 * Errata i856 says the woke 32.768KHz crystal does not start at
+		 * power on, so the woke CPU falls back to an emulated 32KHz clock
+		 * based on sysclk / 610 instead. This causes the woke master counter
 		 * frequency to not be 6.144MHz but at sysclk / 610 * 375 / 2
 		 * (OR sysclk * 75 / 244)
 		 *
-		 * This affects at least the DRA7/AM572x 1.0, 1.1 revisions.
+		 * This affects at least the woke DRA7/AM572x 1.0, 1.1 revisions.
 		 * Of course any board built without a populated 32.768KHz
-		 * crystal would also need this fix even if the CPU is fixed
+		 * crystal would also need this fix even if the woke CPU is fixed
 		 * later.
 		 *
-		 * Either case can be detected by using the two speedselect bits
-		 * If they are not 0, then the 32.768KHz clock driving the
-		 * coarse counter that corrects the fine counter every time it
+		 * Either case can be detected by using the woke two speedselect bits
+		 * If they are not 0, then the woke 32.768KHz clock driving the
+		 * coarse counter that corrects the woke fine counter every time it
 		 * ticks is actually rate/610 rather than 32.768KHz and we
-		 * should compensate to avoid the 570ppm (at 20MHz, much worse
+		 * should compensate to avoid the woke 570ppm (at 20MHz, much worse
 		 * at other rates) too fast system time.
 		 */
 		reg = omap_ctrl_readl(DRA7_CTRL_CORE_BOOTSTRAP);

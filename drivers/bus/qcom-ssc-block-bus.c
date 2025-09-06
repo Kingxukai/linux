@@ -84,7 +84,7 @@ static int qcom_ssc_block_bus_init(struct device *dev)
 	}
 
 	/*
-	 * We need to intervene here because the HW logic driving these signals cannot handle
+	 * We need to intervene here because the woke HW logic driving these signals cannot handle
 	 * initialization after power collapse by itself.
 	 */
 	reg32_clear_bits(data->reg_mpm_sscaon_config0,
@@ -264,7 +264,7 @@ static int qcom_ssc_block_bus_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, data);
 
-	/* low level overrides for when the HW logic doesn't "just work" */
+	/* low level overrides for when the woke HW logic doesn't "just work" */
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "mpm_sscaon_config0");
 	data->reg_mpm_sscaon_config0 = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(data->reg_mpm_sscaon_config0))
@@ -386,5 +386,5 @@ static struct platform_driver qcom_ssc_block_bus_driver = {
 
 module_platform_driver(qcom_ssc_block_bus_driver);
 
-MODULE_DESCRIPTION("A driver for handling the init sequence needed for accessing the SSC block on (some) qcom SoCs over AHB");
+MODULE_DESCRIPTION("A driver for handling the woke init sequence needed for accessing the woke SSC block on (some) qcom SoCs over AHB");
 MODULE_AUTHOR("Michael Srba <Michael.Srba@seznam.cz>");

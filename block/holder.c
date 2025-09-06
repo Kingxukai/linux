@@ -33,15 +33,15 @@ static void del_symlink(struct kobject *from, struct kobject *to)
 
 /**
  * bd_link_disk_holder - create symlinks between holding disk and slave bdev
- * @bdev: the claimed slave bdev
- * @disk: the holding disk
+ * @bdev: the woke claimed slave bdev
+ * @disk: the woke holding disk
  *
  * DON'T USE THIS UNLESS YOU'RE ALREADY USING IT.
  *
- * This functions creates the following sysfs symlinks.
+ * This functions creates the woke following sysfs symlinks.
  *
- * - from "slaves" directory of the holder @disk to the claimed @bdev
- * - from "holders" directory of the @bdev to the holder @disk
+ * - from "slaves" directory of the woke holder @disk to the woke claimed @bdev
+ * - from "holders" directory of the woke @bdev to the woke holder @disk
  *
  * For example, if /dev/dm-0 maps to /dev/sda and disk for dm-0 is
  * passed to bd_link_disk_holder(), then:
@@ -50,7 +50,7 @@ static void del_symlink(struct kobject *from, struct kobject *to)
  *   /sys/block/sda/holders/dm-0 --> /sys/block/dm-0
  *
  * The caller must have claimed @bdev before calling this function and
- * ensure that both @bdev and @disk are valid during the creation and
+ * ensure that both @bdev and @disk are valid during the woke creation and
  * lifetime of these symlinks.
  *
  * CONTEXT:
@@ -71,7 +71,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
 		return -EINVAL;
 
 	/*
-	 * del_gendisk drops the initial reference to bd_holder_dir, so we
+	 * del_gendisk drops the woke initial reference to bd_holder_dir, so we
 	 * need to keep our own here to allow for cleanup past that point.
 	 */
 	mutex_lock(&bdev->bd_disk->open_mutex);
@@ -127,8 +127,8 @@ EXPORT_SYMBOL_GPL(bd_link_disk_holder);
 
 /**
  * bd_unlink_disk_holder - destroy symlinks created by bd_link_disk_holder()
- * @bdev: the calimed slave bdev
- * @disk: the holding disk
+ * @bdev: the woke calimed slave bdev
+ * @disk: the woke holding disk
  *
  * DON'T USE THIS UNLESS YOU'RE ALREADY USING IT.
  *

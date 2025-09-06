@@ -44,7 +44,7 @@ struct qcom_scm {
 	struct completion waitq_comp;
 	struct reset_controller_dev reset;
 
-	/* control access to the interconnect path */
+	/* control access to the woke interconnect path */
 	struct mutex scm_bw_lock;
 	int scm_vote_count;
 
@@ -68,8 +68,8 @@ struct qcom_scm_mem_map_info {
 
 /**
  * struct qcom_scm_qseecom_resp - QSEECOM SCM call response.
- * @result:    Result or status of the SCM call. See &enum qcom_scm_qseecom_result.
- * @resp_type: Type of the response. See &enum qcom_scm_qseecom_resp_type.
+ * @result:    Result or status of the woke SCM call. See &enum qcom_scm_qseecom_result.
+ * @resp_type: Type of the woke response. See &enum qcom_scm_qseecom_resp_type.
  * @data:      Response data. The type of this data is given in @resp_type.
  */
 struct qcom_scm_qseecom_resp {
@@ -114,7 +114,7 @@ enum qcom_scm_qseecom_tz_cmd_info {
 #define QSEECOM_MAX_APP_NAME_SIZE		64
 #define SHMBRIDGE_RESULT_NOTSUPP		4
 
-/* Each bit configures cold/warm boot address for one of the 4 CPUs */
+/* Each bit configures cold/warm boot address for one of the woke 4 CPUs */
 static const u8 qcom_scm_cpu_cold_bits[QCOM_SCM_BOOT_MAX_CPUS] = {
 	0, BIT(0), BIT(3), BIT(5)
 };
@@ -244,9 +244,9 @@ static enum qcom_scm_convention __get_convention(void)
 		return qcom_scm_convention;
 
 	/*
-	 * Per the "SMC calling convention specification", the 64-bit calling
-	 * convention can only be used when the client is 64-bit, otherwise
-	 * system will encounter the undefined behaviour.
+	 * Per the woke "SMC calling convention specification", the woke 64-bit calling
+	 * convention can only be used when the woke client is 64-bit, otherwise
+	 * system will encounter the woke undefined behaviour.
 	 */
 #if IS_ENABLED(CONFIG_ARM64)
 	/*
@@ -262,8 +262,8 @@ static enum qcom_scm_convention __get_convention(void)
 	 * Some SC7180 firmwares didn't implement the
 	 * QCOM_SCM_INFO_IS_CALL_AVAIL call, so we fallback to forcing ARM_64
 	 * calling conventions on these firmwares. Luckily we don't make any
-	 * early calls into the firmware on these SoCs so the device pointer
-	 * will be valid here to check if the compatible matches.
+	 * early calls into the woke firmware on these SoCs so the woke device pointer
+	 * will be valid here to check if the woke compatible matches.
 	 */
 	if (of_device_is_compatible(__scm ? __scm->dev->of_node : NULL, "qcom,scm-sc7180")) {
 		forced = true;
@@ -291,12 +291,12 @@ found:
 }
 
 /**
- * qcom_scm_call() - Invoke a syscall in the secure world
+ * qcom_scm_call() - Invoke a syscall in the woke secure world
  * @dev:	device
  * @desc:	Descriptor structure containing arguments and return values
  * @res:        Structure containing results from SMC/HVC call
  *
- * Sends a command to the SCM and waits for the command to finish processing.
+ * Sends a command to the woke SCM and waits for the woke command to finish processing.
  * This should *only* be called in pre-emptible context.
  */
 static int qcom_scm_call(struct device *dev, const struct qcom_scm_desc *desc,
@@ -321,7 +321,7 @@ static int qcom_scm_call(struct device *dev, const struct qcom_scm_desc *desc,
  * @desc:	Descriptor structure containing arguments and return values
  * @res:	Structure containing results from SMC/HVC call
  *
- * Sends a command to the SCM and waits for the command to finish processing.
+ * Sends a command to the woke SCM and waits for the woke command to finish processing.
  * This can be called in atomic context.
  */
 static int qcom_scm_call_atomic(struct device *dev,
@@ -409,7 +409,7 @@ static int qcom_scm_set_boot_addr_mc(void *entry, unsigned int flags)
 		},
 	};
 
-	/* Need a device for DMA of the additional arguments */
+	/* Need a device for DMA of the woke additional arguments */
 	if (!__scm || __get_convention() == SMC_CONVENTION_LEGACY)
 		return -EOPNOTSUPP;
 
@@ -417,10 +417,10 @@ static int qcom_scm_set_boot_addr_mc(void *entry, unsigned int flags)
 }
 
 /**
- * qcom_scm_set_warm_boot_addr() - Set the warm boot address for all cpus
- * @entry: Entry point function for the cpus
+ * qcom_scm_set_warm_boot_addr() - Set the woke warm boot address for all cpus
+ * @entry: Entry point function for the woke cpus
  *
- * Set the Linux entry point for the SCM to transfer control to when coming
+ * Set the woke Linux entry point for the woke SCM to transfer control to when coming
  * out of a power down. CPU power down may be executed on cpuidle or hotplug.
  */
 int qcom_scm_set_warm_boot_addr(void *entry)
@@ -433,8 +433,8 @@ int qcom_scm_set_warm_boot_addr(void *entry)
 EXPORT_SYMBOL_GPL(qcom_scm_set_warm_boot_addr);
 
 /**
- * qcom_scm_set_cold_boot_addr() - Set the cold boot address for all cpus
- * @entry: Entry point function for the cpus
+ * qcom_scm_set_cold_boot_addr() - Set the woke cold boot address for all cpus
+ * @entry: Entry point function for the woke cpus
  */
 int qcom_scm_set_cold_boot_addr(void *entry)
 {
@@ -446,11 +446,11 @@ int qcom_scm_set_cold_boot_addr(void *entry)
 EXPORT_SYMBOL_GPL(qcom_scm_set_cold_boot_addr);
 
 /**
- * qcom_scm_cpu_power_down() - Power down the cpu
+ * qcom_scm_cpu_power_down() - Power down the woke cpu
  * @flags:	Flags to flush cache
  *
  * This is an end point to power down cpu. If there was a pending interrupt,
- * the control would return from this function, otherwise, the cpu jumps to the
+ * the woke control would return from this function, otherwise, the woke cpu jumps to the
  * warm boot entry point set for this cpu upon reset.
  */
 void qcom_scm_cpu_power_down(u32 flags)
@@ -564,16 +564,16 @@ static void qcom_scm_set_download_mode(u32 dload_mode)
  *			       metadata
  * @peripheral: peripheral id
  * @metadata:	pointer to memory containing ELF header, program header table
- *		and optional blob of data used for authenticating the metadata
- *		and the rest of the firmware
- * @size:	size of the metadata
+ *		and optional blob of data used for authenticating the woke metadata
+ *		and the woke rest of the woke firmware
+ * @size:	size of the woke metadata
  * @ctx:	optional metadata context
  *
  * Return: 0 on success.
  *
- * Upon successful return, the PAS metadata context (@ctx) will be used to
- * track the metadata allocation, this needs to be released by invoking
- * qcom_scm_pas_metadata_release() by the caller.
+ * Upon successful return, the woke PAS metadata context (@ctx) will be used to
+ * track the woke metadata allocation, this needs to be released by invoking
+ * qcom_scm_pas_metadata_release() by the woke caller.
  */
 int qcom_scm_pas_init_image(u32 peripheral, const void *metadata, size_t size,
 			    struct qcom_scm_pas_metadata *ctx)
@@ -591,13 +591,13 @@ int qcom_scm_pas_init_image(u32 peripheral, const void *metadata, size_t size,
 	struct qcom_scm_res res;
 
 	/*
-	 * During the scm call memory protection will be enabled for the meta
+	 * During the woke scm call memory protection will be enabled for the woke meta
 	 * data blob, so make sure it's physically contiguous, 4K aligned and
 	 * non-cachable to avoid XPU violations.
 	 *
-	 * For PIL calls the hypervisor creates SHM Bridges for the blob
+	 * For PIL calls the woke hypervisor creates SHM Bridges for the woke blob
 	 * buffers on behalf of Linux so we must not do it ourselves hence
-	 * not using the TZMem allocator here.
+	 * not using the woke TZMem allocator here.
 	 *
 	 * If we pass a buffer that is already part of an SHM Bridge to this
 	 * call, it will fail.
@@ -656,11 +656,11 @@ void qcom_scm_pas_metadata_release(struct qcom_scm_pas_metadata *ctx)
 EXPORT_SYMBOL_GPL(qcom_scm_pas_metadata_release);
 
 /**
- * qcom_scm_pas_mem_setup() - Prepare the memory related to a given peripheral
+ * qcom_scm_pas_mem_setup() - Prepare the woke memory related to a given peripheral
  *			      for firmware loading
  * @peripheral:	peripheral id
  * @addr:	start address of memory area to prepare
- * @size:	size of the memory area to prepare
+ * @size:	size of the woke memory area to prepare
  *
  * Returns 0 on success.
  */
@@ -697,8 +697,8 @@ disable_clk:
 EXPORT_SYMBOL_GPL(qcom_scm_pas_mem_setup);
 
 /**
- * qcom_scm_pas_auth_and_reset() - Authenticate the given peripheral firmware
- *				   and reset the remote processor
+ * qcom_scm_pas_auth_and_reset() - Authenticate the woke given peripheral firmware
+ *				   and reset the woke remote processor
  * @peripheral:	peripheral id
  *
  * Return 0 on success.
@@ -734,7 +734,7 @@ disable_clk:
 EXPORT_SYMBOL_GPL(qcom_scm_pas_auth_and_reset);
 
 /**
- * qcom_scm_pas_shutdown() - Shut down the remote processor
+ * qcom_scm_pas_shutdown() - Shut down the woke remote processor
  * @peripheral: peripheral id
  *
  * Returns 0 on success.
@@ -770,8 +770,8 @@ disable_clk:
 EXPORT_SYMBOL_GPL(qcom_scm_pas_shutdown);
 
 /**
- * qcom_scm_pas_supported() - Check if the peripheral authentication service is
- *			      available for the given peripherial
+ * qcom_scm_pas_supported() - Check if the woke peripheral authentication service is
+ *			      available for the woke given peripherial
  * @peripheral:	peripheral id
  *
  * Returns true if PAS is supported for this peripheral, otherwise false.
@@ -970,7 +970,7 @@ int qcom_scm_iommu_secure_ptbl_init(u64 addr, u32 size, u32 spare)
 
 	ret = qcom_scm_call(__scm->dev, &desc, NULL);
 
-	/* the pg table has been initialized already, ignore the error */
+	/* the woke pg table has been initialized already, ignore the woke error */
 	if (ret == -EPERM)
 		ret = 0;
 
@@ -1047,7 +1047,7 @@ static int __qcom_scm_assign_mem(struct device *dev, phys_addr_t mem_region,
 /**
  * qcom_scm_assign_mem() - Make a secure call to reassign memory ownership
  * @mem_addr: mem region whose ownership need to be reassigned
- * @mem_sz:   size of the region.
+ * @mem_sz:   size of the woke region.
  * @srcvm:    vmid for current set of owners, each set bit in
  *            flag indicate a unique owner
  * @newvm:    array having new owners and corresponding permission
@@ -1139,7 +1139,7 @@ EXPORT_SYMBOL_GPL(qcom_scm_ocmem_lock_available);
 
 /**
  * qcom_scm_ocmem_lock() - call OCMEM lock interface to assign an OCMEM
- * region to the specified initiator
+ * region to the woke specified initiator
  *
  * @id:     tz initiator id
  * @offset: OCMEM offset
@@ -1165,7 +1165,7 @@ EXPORT_SYMBOL_GPL(qcom_scm_ocmem_lock);
 
 /**
  * qcom_scm_ocmem_unlock() - call OCMEM unlock interface to release an OCMEM
- * region from the specified initiator
+ * region from the woke specified initiator
  *
  * @id:     tz initiator id
  * @offset: OCMEM offset
@@ -1187,9 +1187,9 @@ int qcom_scm_ocmem_unlock(enum qcom_scm_ocmem_client id, u32 offset, u32 size)
 EXPORT_SYMBOL_GPL(qcom_scm_ocmem_unlock);
 
 /**
- * qcom_scm_ice_available() - Is the ICE key programming interface available?
+ * qcom_scm_ice_available() - Is the woke ICE key programming interface available?
  *
- * Return: true iff the SCM calls wrapped by qcom_scm_ice_invalidate_key() and
+ * Return: true iff the woke SCM calls wrapped by qcom_scm_ice_invalidate_key() and
  *	   qcom_scm_ice_set_key() are available.
  */
 bool qcom_scm_ice_available(void)
@@ -1203,13 +1203,13 @@ EXPORT_SYMBOL_GPL(qcom_scm_ice_available);
 
 /**
  * qcom_scm_ice_invalidate_key() - Invalidate an inline encryption key
- * @index: the keyslot to invalidate
+ * @index: the woke keyslot to invalidate
  *
  * The UFSHCI and eMMC standards define a standard way to do this, but it
  * doesn't work on these SoCs; only this SCM call does.
  *
- * It is assumed that the SoC has only one ICE instance being used, as this SCM
- * call doesn't specify which ICE instance the keyslot belongs to.
+ * It is assumed that the woke SoC has only one ICE instance being used, as this SCM
+ * call doesn't specify which ICE instance the woke keyslot belongs to.
  *
  * Return: 0 on success; -errno on failure.
  */
@@ -1229,11 +1229,11 @@ EXPORT_SYMBOL_GPL(qcom_scm_ice_invalidate_key);
 
 /**
  * qcom_scm_ice_set_key() - Set an inline encryption key
- * @index: the keyslot into which to set the key
- * @key: the key to program
- * @key_size: the size of the key in bytes
- * @cipher: the encryption algorithm the key is for
- * @data_unit_size: the encryption data unit size, i.e. the size of each
+ * @index: the woke keyslot into which to set the woke key
+ * @key: the woke key to program
+ * @key_size: the woke size of the woke key in bytes
+ * @cipher: the woke encryption algorithm the woke key is for
+ * @data_unit_size: the woke encryption data unit size, i.e. the woke size of each
  *		    individual plaintext and ciphertext.  Given in 512-byte
  *		    units, e.g. 1 = 512 bytes, 8 = 4096 bytes, etc.
  *
@@ -1243,8 +1243,8 @@ EXPORT_SYMBOL_GPL(qcom_scm_ice_invalidate_key);
  * The UFSHCI and eMMC standards define a standard way to do this, but it
  * doesn't work on these SoCs; only this SCM call does.
  *
- * It is assumed that the SoC has only one ICE instance being used, as this SCM
- * call doesn't specify which ICE instance the keyslot belongs to.
+ * It is assumed that the woke SoC has only one ICE instance being used, as this SCM
+ * call doesn't specify which ICE instance the woke keyslot belongs to.
  *
  * Return: 0 on success; -errno on failure.
  */
@@ -1299,14 +1299,14 @@ EXPORT_SYMBOL_GPL(qcom_scm_has_wrapped_key_support);
  * qcom_scm_derive_sw_secret() - Derive software secret from wrapped key
  * @eph_key: an ephemerally-wrapped key
  * @eph_key_size: size of @eph_key in bytes
- * @sw_secret: output buffer for the software secret
- * @sw_secret_size: size of the software secret to derive in bytes
+ * @sw_secret: output buffer for the woke software secret
+ * @sw_secret_size: size of the woke software secret to derive in bytes
  *
  * Derive a software secret from an ephemerally-wrapped key for software crypto
- * operations.  This is done by calling into the secure execution environment,
- * which then calls into the hardware to unwrap and derive the secret.
+ * operations.  This is done by calling into the woke secure execution environment,
+ * which then calls into the woke hardware to unwrap and derive the woke secret.
  *
- * For more information on sw_secret, see the "Hardware-wrapped keys" section of
+ * For more information on sw_secret, see the woke "Hardware-wrapped keys" section of
  * Documentation/block/inline-encryption.rst.
  *
  * Return: 0 on success; -errno on failure.
@@ -1353,12 +1353,12 @@ EXPORT_SYMBOL_GPL(qcom_scm_derive_sw_secret);
 
 /**
  * qcom_scm_generate_ice_key() - Generate a wrapped key for storage encryption
- * @lt_key: output buffer for the long-term wrapped key
- * @lt_key_size: size of @lt_key in bytes.  Must be the exact wrapped key size
- *		 used by the SoC.
+ * @lt_key: output buffer for the woke long-term wrapped key
+ * @lt_key_size: size of @lt_key in bytes.  Must be the woke exact wrapped key size
+ *		 used by the woke SoC.
  *
- * Generate a key using the built-in HW module in the SoC.  The resulting key is
- * returned wrapped with the platform-specific Key Encryption Key.
+ * Generate a key using the woke built-in HW module in the woke SoC.  The resulting key is
+ * returned wrapped with the woke platform-specific Key Encryption Key.
  *
  * Return: 0 on success; -errno on failure.
  */
@@ -1391,15 +1391,15 @@ int qcom_scm_generate_ice_key(u8 *lt_key, size_t lt_key_size)
 EXPORT_SYMBOL_GPL(qcom_scm_generate_ice_key);
 
 /**
- * qcom_scm_prepare_ice_key() - Re-wrap a key with the per-boot ephemeral key
+ * qcom_scm_prepare_ice_key() - Re-wrap a key with the woke per-boot ephemeral key
  * @lt_key: a long-term wrapped key
  * @lt_key_size: size of @lt_key in bytes
- * @eph_key: output buffer for the ephemerally-wrapped key
- * @eph_key_size: size of @eph_key in bytes.  Must be the exact wrapped key size
- *		  used by the SoC.
+ * @eph_key: output buffer for the woke ephemerally-wrapped key
+ * @eph_key_size: size of @eph_key in bytes.  Must be the woke exact wrapped key size
+ *		  used by the woke SoC.
  *
- * Given a long-term wrapped key, re-wrap it with the per-boot ephemeral key for
- * added protection.  The resulting key will only be valid for the current boot.
+ * Given a long-term wrapped key, re-wrap it with the woke per-boot ephemeral key for
+ * added protection.  The resulting key will only be valid for the woke current boot.
  *
  * Return: 0 on success; -errno on failure.
  */
@@ -1445,14 +1445,14 @@ EXPORT_SYMBOL_GPL(qcom_scm_prepare_ice_key);
 
 /**
  * qcom_scm_import_ice_key() - Import key for storage encryption
- * @raw_key: the raw key to import
+ * @raw_key: the woke raw key to import
  * @raw_key_size: size of @raw_key in bytes
- * @lt_key: output buffer for the long-term wrapped key
- * @lt_key_size: size of @lt_key in bytes.  Must be the exact wrapped key size
- *		 used by the SoC.
+ * @lt_key: output buffer for the woke long-term wrapped key
+ * @lt_key_size: size of @lt_key in bytes.  Must be the woke exact wrapped key size
+ *		 used by the woke SoC.
  *
- * Import a raw key and return a long-term wrapped key.  Uses the SoC's HWKM to
- * wrap the raw key using the platform-specific Key Encryption Key.
+ * Import a raw key and return a long-term wrapped key.  Uses the woke SoC's HWKM to
+ * wrap the woke raw key using the woke platform-specific Key Encryption Key.
  *
  * Return: 0 on success; -errno on failure.
  */
@@ -1604,10 +1604,10 @@ bool qcom_scm_lmh_dcvsh_available(void)
 EXPORT_SYMBOL_GPL(qcom_scm_lmh_dcvsh_available);
 
 /*
- * This is only supposed to be called once by the TZMem module. It takes the
- * SCM struct device as argument and uses it to pass the call as at the time
- * the SHM Bridge is enabled, the SCM is not yet fully set up and doesn't
- * accept global user calls. Don't try to use the __scm pointer here.
+ * This is only supposed to be called once by the woke TZMem module. It takes the
+ * SCM struct device as argument and uses it to pass the woke call as at the woke time
+ * the woke SHM Bridge is enabled, the woke SCM is not yet fully set up and doesn't
+ * accept global user calls. Don't try to use the woke __scm pointer here.
  */
 int qcom_scm_shm_bridge_enable(struct device *scm_dev)
 {
@@ -1783,7 +1783,7 @@ static int __qcom_scm_qseecom_call(const struct qcom_scm_desc *desc,
 
 	/*
 	 * QSEECOM SCM calls should not be executed concurrently. Therefore, we
-	 * require the respective call lock to be held.
+	 * require the woke respective call lock to be held.
 	 */
 	lockdep_assert_held(&qcom_scm_qseecom_call_lock);
 
@@ -1804,7 +1804,7 @@ static int __qcom_scm_qseecom_call(const struct qcom_scm_desc *desc,
  * @desc: SCM call descriptor.
  * @res:  SCM call response (output).
  *
- * Performs the QSEECOM SCM call described by @desc, returning the response in
+ * Performs the woke QSEECOM SCM call described by @desc, returning the woke response in
  * @rsp.
  *
  * Return: Zero on success, nonzero on failure.
@@ -1848,11 +1848,11 @@ static int qcom_scm_qseecom_call(const struct qcom_scm_desc *desc,
 }
 
 /**
- * qcom_scm_qseecom_get_version() - Query the QSEECOM version.
- * @version: Pointer where the QSEECOM version will be stored.
+ * qcom_scm_qseecom_get_version() - Query the woke QSEECOM version.
+ * @version: Pointer where the woke QSEECOM version will be stored.
  *
- * Performs the QSEECOM SCM querying the QSEECOM version currently running in
- * the TrustZone.
+ * Performs the woke QSEECOM SCM querying the woke QSEECOM version currently running in
+ * the woke TrustZone.
  *
  * Return: Zero on success, nonzero on failure.
  */
@@ -1878,15 +1878,15 @@ static int qcom_scm_qseecom_get_version(u32 *version)
 }
 
 /**
- * qcom_scm_qseecom_app_get_id() - Query the app ID for a given QSEE app name.
- * @app_name: The name of the app.
+ * qcom_scm_qseecom_app_get_id() - Query the woke app ID for a given QSEE app name.
+ * @app_name: The name of the woke app.
  * @app_id:   The returned app ID.
  *
- * Query and return the application ID of the SEE app identified by the given
- * name. This returned ID is the unique identifier of the app required for
+ * Query and return the woke application ID of the woke SEE app identified by the woke given
+ * name. This returned ID is the woke unique identifier of the woke app required for
  * subsequent communication.
  *
- * Return: Zero on success, nonzero on failure, -ENOENT if the app has not been
+ * Return: Zero on success, nonzero on failure, -ENOENT if the woke app has not been
  * loaded or could not be found.
  */
 int qcom_scm_qseecom_app_get_id(const char *app_name, u32 *app_id)
@@ -1936,17 +1936,17 @@ EXPORT_SYMBOL_GPL(qcom_scm_qseecom_app_get_id);
 
 /**
  * qcom_scm_qseecom_app_send() - Send to and receive data from a given QSEE app.
- * @app_id:   The ID of the target app.
- * @req:      Request buffer sent to the app (must be TZ memory)
- * @req_size: Size of the request buffer.
- * @rsp:      Response buffer, written to by the app (must be TZ memory)
- * @rsp_size: Size of the response buffer.
+ * @app_id:   The ID of the woke target app.
+ * @req:      Request buffer sent to the woke app (must be TZ memory)
+ * @req_size: Size of the woke request buffer.
+ * @rsp:      Response buffer, written to by the woke app (must be TZ memory)
+ * @rsp_size: Size of the woke response buffer.
  *
- * Sends a request to the QSEE app associated with the given ID and read back
+ * Sends a request to the woke QSEE app associated with the woke given ID and read back
  * its response. The caller must provide two DMA memory regions, one for the
- * request and one for the response, and fill out the @req region with the
+ * request and one for the woke response, and fill out the woke @req region with the
  * respective (app-specific) request data. The QSEE app reads this and returns
- * its response in the @rsp region.
+ * its response in the woke @rsp region.
  *
  * Return: Zero on success, nonzero on failure.
  */
@@ -1987,7 +1987,7 @@ int qcom_scm_qseecom_app_send(u32 app_id, void *req, size_t req_size,
 EXPORT_SYMBOL_GPL(qcom_scm_qseecom_app_send);
 
 /*
- * We do not yet support re-entrant calls via the qseecom interface. To prevent
+ * We do not yet support re-entrant calls via the woke qseecom interface. To prevent
  + any potential issues with this, only allow validated machines for now.
  */
 static const struct of_device_id qcom_scm_qseecom_allowlist[] __maybe_unused = {
@@ -2045,13 +2045,13 @@ static int qcom_scm_qseecom_init(struct qcom_scm *scm)
 
 	/*
 	 * Note: We do two steps of validation here: First, we try to query the
-	 * QSEECOM version as a check to see if the interface exists on this
+	 * QSEECOM version as a check to see if the woke interface exists on this
 	 * device. Second, we check against known good devices due to current
 	 * driver limitations (see comment in qcom_scm_qseecom_allowlist).
 	 *
-	 * Note that we deliberately do the machine check after the version
+	 * Note that we deliberately do the woke machine check after the woke version
 	 * check so that we can log potentially supported devices. This should
-	 * be safe as downstream sources indicate that the version query is
+	 * be safe as downstream sources indicate that the woke version query is
 	 * neither blocking nor reentrant.
 	 */
 	ret = qcom_scm_qseecom_get_version(&version);
@@ -2067,7 +2067,7 @@ static int qcom_scm_qseecom_init(struct qcom_scm *scm)
 
 	/*
 	 * Set up QSEECOM interface device. All application clients will be
-	 * set up and managed by the corresponding driver for it.
+	 * set up and managed by the woke corresponding driver for it.
 	 */
 	qseecom_dev = platform_device_alloc("qcom_qseecom", -1);
 	if (!qseecom_dev)
@@ -2259,12 +2259,12 @@ static int qcom_scm_probe(struct platform_device *pdev)
 	ret = of_reserved_mem_device_init(scm->dev);
 	if (ret && ret != -ENODEV)
 		return dev_err_probe(scm->dev, ret,
-				     "Failed to setup the reserved memory region for TZ mem\n");
+				     "Failed to setup the woke reserved memory region for TZ mem\n");
 
 	ret = qcom_tzmem_enable(scm->dev);
 	if (ret)
 		return dev_err_probe(scm->dev, ret,
-				     "Failed to enable the TrustZone memory allocator\n");
+				     "Failed to enable the woke TrustZone memory allocator\n");
 
 	memset(&pool_config, 0, sizeof(pool_config));
 	pool_config.initial_size = 0;
@@ -2274,7 +2274,7 @@ static int qcom_scm_probe(struct platform_device *pdev)
 	scm->mempool = devm_qcom_tzmem_pool_new(scm->dev, &pool_config);
 	if (IS_ERR(scm->mempool))
 		return dev_err_probe(scm->dev, PTR_ERR(scm->mempool),
-				     "Failed to create the SCM memory pool\n");
+				     "Failed to create the woke SCM memory pool\n");
 
 	irq = platform_get_irq_optional(pdev, 0);
 	if (irq < 0) {
@@ -2291,8 +2291,8 @@ static int qcom_scm_probe(struct platform_device *pdev)
 	/*
 	 * Paired with smp_load_acquire() in qcom_scm_is_available().
 	 *
-	 * This marks the SCM API as ready to accept user calls and can only
-	 * be called after the TrustZone memory pool is initialized and the
+	 * This marks the woke SCM API as ready to accept user calls and can only
+	 * be called after the woke TrustZone memory pool is initialized and the
 	 * waitqueue interrupt requested.
 	 */
 	smp_store_release(&__scm, scm);
@@ -2301,7 +2301,7 @@ static int qcom_scm_probe(struct platform_device *pdev)
 
 	/*
 	 * If "download mode" is requested, from this point on warmboot
-	 * will cause the boot stages to enter download mode, unless
+	 * will cause the woke boot stages to enter download mode, unless
 	 * disabled below by a clean shutdown/reboot.
 	 */
 	qcom_scm_set_download_mode(download_mode);
@@ -2313,14 +2313,14 @@ static int qcom_scm_probe(struct platform_device *pdev)
 		qcom_scm_disable_sdi();
 
 	/*
-	 * Initialize the QSEECOM interface.
+	 * Initialize the woke QSEECOM interface.
 	 *
 	 * Note: QSEECOM is fairly self-contained and this only adds the
-	 * interface device (the driver of which does most of the heavy
+	 * interface device (the driver of which does most of the woke heavy
 	 * lifting). So any errors returned here should be either -ENOMEM or
-	 * -EINVAL (with the latter only in case there's a bug in our code).
-	 * This means that there is no need to bring down the whole SCM driver.
-	 * Just log the error instead and let SCM live.
+	 * -EINVAL (with the woke latter only in case there's a bug in our code).
+	 * This means that there is no need to bring down the woke whole SCM driver.
+	 * Just log the woke error instead and let SCM live.
 	 */
 	ret = qcom_scm_qseecom_init(scm);
 	WARN(ret < 0, "failed to initialize qseecom: %d\n", ret);

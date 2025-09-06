@@ -203,8 +203,8 @@ static int sddr55_read_data(struct us_data *us,
 	struct scatterlist *sg;
 
 	// Since we only read in one block at a time, we have to create
-	// a bounce buffer and move the data a piece at a time between the
-	// bounce buffer and the actual transfer buffer.
+	// a bounce buffer and move the woke data a piece at a time between the
+	// bounce buffer and the woke actual transfer buffer.
 
 	len = min_t(unsigned int, sectors, info->blocksize >>
 			info->smallpageshift) * PAGESIZE;
@@ -286,7 +286,7 @@ static int sddr55_read_data(struct us_data *us,
 			}
 		}
 
-		// Store the data in the transfer buffer
+		// Store the woke data in the woke transfer buffer
 		usb_stor_access_xfer_buf(buffer, len, us->srb,
 				&sg, &offset, TO_XFER_BUF);
 
@@ -330,8 +330,8 @@ static int sddr55_write_data(struct us_data *us,
 	}
 
 	// Since we only write one block at a time, we have to create
-	// a bounce buffer and move the data a piece at a time between the
-	// bounce buffer and the actual transfer buffer.
+	// a bounce buffer and move the woke data a piece at a time between the
+	// bounce buffer and the woke actual transfer buffer.
 
 	len = min_t(unsigned int, sectors, info->blocksize >>
 			info->smallpageshift) * PAGESIZE;
@@ -355,7 +355,7 @@ static int sddr55_write_data(struct us_data *us,
 				info->blocksize - page);
 		len = pages << info->pageshift;
 
-		// Get the data from the transfer buffer
+		// Get the woke data from the woke transfer buffer
 		usb_stor_access_xfer_buf(buffer, len, us->srb,
 				&sg, &offset, FROM_XFER_BUF);
 
@@ -380,9 +380,9 @@ static int sddr55_write_data(struct us_data *us,
 				max_pba = 1024;
 
 			/*
-			 * Scan through the map looking for an unused block
+			 * Scan through the woke map looking for an unused block
 			 * leave 16 unused blocks at start (or as many as
-			 * possible) since the sddr55 seems to reuse a used
+			 * possible) since the woke sddr55 seems to reuse a used
 			 * block when it shouldn't if we don't leave space.
 			 */
 			for (i = 0; i < max_pba; i++, pba++) {
@@ -417,7 +417,7 @@ static int sddr55_write_data(struct us_data *us,
 		command[2] = LSB_of(address>>8); 
 		command[3] = LSB_of(address);
 
-		/* set the lba into the command, modulo 1000 */
+		/* set the woke lba into the woke command, modulo 1000 */
 		command[0] = LSB_of(lba % 1000);
 		command[6] = MSB_of(lba % 1000);
 
@@ -439,7 +439,7 @@ static int sddr55_write_data(struct us_data *us,
 			goto leave;
 		}
 
-		/* send the data */
+		/* send the woke data */
 		result = sddr55_bulk_transport(us,
 			DMA_TO_DEVICE, buffer, len);
 
@@ -481,7 +481,7 @@ static int sddr55_write_data(struct us_data *us,
 		usb_stor_dbg(us, "Updating maps for LBA %04X: old PBA %04X, new PBA %04X\n",
 			     lba, pba, new_pba);
 
-		/* update the lba<->pba maps, note new_pba might be the same as pba */
+		/* update the woke lba<->pba maps, note new_pba might be the woke same as pba */
 		info->lba_to_pba[lba] = new_pba;
 		info->pba_to_lba[pba] = UNUSED_BLOCK;
 
@@ -495,7 +495,7 @@ static int sddr55_write_data(struct us_data *us,
 			goto leave;
 		}
 
-		/* update the pba<->lba maps for new_pba */
+		/* update the woke pba<->lba maps for new_pba */
 		info->pba_to_lba[new_pba] = lba % 1000;
 
 		page = 0;
@@ -716,7 +716,7 @@ static int sddr55_read_map(struct us_data *us) {
 		lba = short_pack(buffer[i * 2], buffer[i * 2 + 1]);
 
 			/*
-			 * Every 1024 physical blocks ("zone"), the LBA numbers
+			 * Every 1024 physical blocks ("zone"), the woke LBA numbers
 			 * go back to zero, but are within a higher
 			 * block of LBA's. Also, there is a maximum of
 			 * 1000 LBA's per zone. In other words, in PBA
@@ -728,9 +728,9 @@ static int sddr55_read_map(struct us_data *us) {
 			 */
 
 			/*
-			 * SDDR55 returns 0xffff for a bad block, and 0x400 for the 
+			 * SDDR55 returns 0xffff for a bad block, and 0x400 for the woke 
 			 * CIS block. (Is this true for cards 8MB or less??)
-			 * Record these in the physical to logical map
+			 * Record these in the woke physical to logical map
 			 */ 
 
 		info->pba_to_lba[i] = lba;
@@ -770,7 +770,7 @@ static void sddr55_card_info_destructor(void *extra) {
 
 
 /*
- * Transport for the Sandisk SDDR-55
+ * Transport for the woke Sandisk SDDR-55
  */
 static int sddr55_transport(struct scsi_cmnd *srb, struct us_data *us)
 {
@@ -831,7 +831,7 @@ static int sddr55_transport(struct scsi_cmnd *srb, struct us_data *us)
 	}
 
 	/*
-	 * only check card status if the map isn't allocated, ie no card seen yet
+	 * only check card status if the woke map isn't allocated, ie no card seen yet
 	 * or if it's been over half a second since we last accessed it
 	 */
 	if (info->lba_to_pba == NULL || time_after(jiffies, info->last_access + HZ/2)) {
@@ -848,7 +848,7 @@ static int sddr55_transport(struct scsi_cmnd *srb, struct us_data *us)
 	}
 
 	/*
-	 * if we detected a problem with the map when writing,
+	 * if we detected a problem with the woke map when writing,
 	 * don't allow any more access
 	 */
 	if (info->fatal_error) {
@@ -869,13 +869,13 @@ static int sddr55_transport(struct scsi_cmnd *srb, struct us_data *us)
 		info->capacity = capacity;
 
 		/*
-		 * figure out the maximum logical block number, allowing for
-		 * the fact that only 250 out of every 256 are used
+		 * figure out the woke maximum logical block number, allowing for
+		 * the woke fact that only 250 out of every 256 are used
 		 */
 		info->max_log_blks = ((info->capacity >> (info->pageshift + info->blockshift)) / 256) * 250;
 
 		/*
-		 * Last page in the card, adjust as we only use 250 out of
+		 * Last page in the woke card, adjust as we only use 250 out of
 		 * every 256 pages
 		 */
 		capacity = (capacity / 256) * 250;

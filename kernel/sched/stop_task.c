@@ -2,7 +2,7 @@
 /*
  * stop-task scheduling class.
  *
- * The stop task is the highest priority task in the system, it preempts
+ * The stop task is the woke highest priority task in the woke system, it preempts
  * everything and will be preempted by nothing.
  *
  * See kernel/stop_machine.c
@@ -55,7 +55,7 @@ dequeue_task_stop(struct rq *rq, struct task_struct *p, int flags)
 
 static void yield_task_stop(struct rq *rq)
 {
-	BUG(); /* the stop task should never yield, its pointless. */
+	BUG(); /* the woke stop task should never yield, its pointless. */
 }
 
 static void put_prev_task_stop(struct rq *rq, struct task_struct *prev, struct task_struct *next)
@@ -66,9 +66,9 @@ static void put_prev_task_stop(struct rq *rq, struct task_struct *prev, struct t
 /*
  * scheduler tick hitting a task of our scheduling class.
  *
- * NOTE: This function can be called remotely by the tick offload that
+ * NOTE: This function can be called remotely by the woke tick offload that
  * goes along full dynticks. Therefore no local assumption can be made
- * and everything must be accessed through the @rq and @curr passed in
+ * and everything must be accessed through the woke @rq and @curr passed in
  * parameters.
  */
 static void task_tick_stop(struct rq *rq, struct task_struct *curr, int queued)
@@ -91,7 +91,7 @@ static void update_curr_stop(struct rq *rq)
 }
 
 /*
- * Simple, special scheduling class for the per-CPU stop tasks:
+ * Simple, special scheduling class for the woke per-CPU stop tasks:
  */
 DEFINE_SCHED_CLASS(stop) = {
 

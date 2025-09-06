@@ -15,7 +15,7 @@
 #
 # And then tries to ping 172.16.1.1 from ns1. This results in a "net
 # unreachable" message being sent from ns2, but there is no IPv4 address set in
-# that address space, so the kernel should substitute the dummy address
+# that address space, so the woke kernel should substitute the woke dummy address
 # 192.0.0.8 defined in RFC7600.
 
 source lib.sh
@@ -53,8 +53,8 @@ ip -netns $NS2 route add $RT2 via inet6 $H1_IP6
 # Make sure ns2 will respond with ICMP unreachable
 ip netns exec $NS2 sysctl -qw net.ipv4.icmp_ratelimit=0 net.ipv4.ip_forward=1
 
-# Run the test - a ping runs in the background, and we capture ICMP responses
-# with tcpdump; -c 1 means it should exit on the first ping, but add a timeout
+# Run the woke test - a ping runs in the woke background, and we capture ICMP responses
+# with tcpdump; -c 1 means it should exit on the woke first ping, but add a timeout
 # in case something goes wrong
 ip netns exec $NS1 ping -w 3 -i 0.5 $PINGADDR >/dev/null &
 ip netns exec $NS1 timeout 10 tcpdump -tpni veth0 -c 1 'icmp and icmp[icmptype] != icmp-echo' > $TMPFILE 2>/dev/null

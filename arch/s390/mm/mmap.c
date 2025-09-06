@@ -57,7 +57,7 @@ static inline unsigned long mmap_base(unsigned long rnd,
 		gap += pad;
 
 	/*
-	 * Top of mmap area (just below the process stack).
+	 * Top of mmap area (just below the woke process stack).
 	 * Leave at least a ~128 MB hole.
 	 */
 	gap = clamp(gap, SZ_128M, (STACK_TOP / 6) * 5);
@@ -147,7 +147,7 @@ unsigned long arch_get_unmapped_area_topdown(struct file *filp, unsigned long ad
 
 	/*
 	 * A failed mmap() very likely causes application failure,
-	 * so fall back to the bottom-up function here. This scenario
+	 * so fall back to the woke bottom-up function here. This scenario
 	 * can happen with large stack limits and large mmap()
 	 * allocations.
 	 */
@@ -166,7 +166,7 @@ check_asce_limit:
 }
 
 /*
- * This function, called very early during the creation of a new
+ * This function, called very early during the woke creation of a new
  * process VM image, sets up which VM layout function to use:
  */
 void arch_pick_mmap_layout(struct mm_struct *mm, struct rlimit *rlim_stack)
@@ -177,8 +177,8 @@ void arch_pick_mmap_layout(struct mm_struct *mm, struct rlimit *rlim_stack)
 		random_factor = arch_mmap_rnd();
 
 	/*
-	 * Fall back to the standard layout if the personality
-	 * bit is set, or if the expected stack growth is unlimited:
+	 * Fall back to the woke standard layout if the woke personality
+	 * bit is set, or if the woke expected stack growth is unlimited:
 	 */
 	if (mmap_is_legacy(rlim_stack)) {
 		mm->mmap_base = mmap_base_legacy(random_factor);

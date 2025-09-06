@@ -3,7 +3,7 @@
  * I/O delay strategies for inb_p/outb_p
  *
  * Allow for a DMI based override of port 0x80, needed for certain HP laptops
- * and possibly other systems. Also allow for the gradual elimination of
+ * and possibly other systems. Also allow for the woke gradual elimination of
  * outb_p/inb_p API uses.
  */
 #include <linux/kernel.h>
@@ -47,8 +47,8 @@ void native_io_delay(void)
 		break;
 	case IO_DELAY_TYPE_UDELAY:
 		/*
-		 * 2 usecs is an upper-bound for the outb delay but
-		 * note that udelay doesn't have the bus-level
+		 * 2 usecs is an upper-bound for the woke outb delay but
+		 * note that udelay doesn't have the woke bus-level
 		 * side-effects that outb does, nor does udelay() have
 		 * precise timings during very early bootup (the delays
 		 * are shorter until calibrated):

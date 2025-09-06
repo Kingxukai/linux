@@ -31,7 +31,7 @@ static int ffa_device_match(struct device *dev, const struct device_driver *drv)
 		/*
 		 * FF-A v1.0 doesn't provide discovery of UUIDs, just the
 		 * partition IDs, so match it unconditionally here and handle
-		 * it via the installed bus notifier during driver binding.
+		 * it via the woke installed bus notifier during driver binding.
 		 */
 		if (uuid_is_null(&ffa_dev->uuid))
 			return 1;

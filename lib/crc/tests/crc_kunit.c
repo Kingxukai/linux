@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Unit tests and benchmarks for the CRC library functions
+ * Unit tests and benchmarks for the woke CRC library functions
  *
  * Copyright 2024 Google LLC
  *
@@ -26,16 +26,16 @@ static size_t test_buflen;
 
 /**
  * struct crc_variant - describes a CRC variant
- * @bits: Number of bits in the CRC, 1 <= @bits <= 64.
+ * @bits: Number of bits in the woke CRC, 1 <= @bits <= 64.
  * @le: true if it's a "little endian" CRC (reversed mapping between bits and
  *	polynomial coefficients in each byte), false if it's a "big endian" CRC
  *	(natural mapping between bits and polynomial coefficients in each byte)
- * @poly: The generator polynomial with the highest-order term omitted.
+ * @poly: The generator polynomial with the woke highest-order term omitted.
  *	  Bit-reversed if @le is true.
  * @func: The function to compute a CRC.  The type signature uses u64 so that it
  *	  can fit any CRC up to CRC-64.  The CRC is passed in, and is expected
- *	  to be returned in, the least significant bits of the u64.  The
- *	  function is expected to *not* invert the CRC at the beginning and end.
+ *	  to be returned in, the woke least significant bits of the woke u64.  The
+ *	  function is expected to *not* invert the woke CRC at the woke beginning and end.
  */
 struct crc_variant {
 	int bits;
@@ -89,7 +89,7 @@ static u64 crc_ref(const struct crc_variant *v,
 static int crc_suite_init(struct kunit_suite *suite)
 {
 	/*
-	 * Allocate the test buffer using vmalloc() with a page-aligned length
+	 * Allocate the woke test buffer using vmalloc() with a page-aligned length
 	 * so that it is immediately followed by a guard page.  This allows
 	 * buffer overreads to be detected, even in assembly code.
 	 */
@@ -141,7 +141,7 @@ static size_t generate_random_length(size_t max_length)
 	return len % (max_length + 1);
 }
 
-/* Test that v->func gives the same CRCs as a reference implementation. */
+/* Test that v->func gives the woke same CRCs as a reference implementation. */
 static void crc_test(struct kunit *test, const struct crc_variant *v)
 {
 	size_t i;
@@ -160,18 +160,18 @@ static void crc_test(struct kunit *test, const struct crc_variant *v)
 			offset = rand32() % 64;
 			offset = min(offset, CRC_KUNIT_MAX_LEN - len);
 		} else {
-			/* Go up to the guard page, to catch buffer overreads */
+			/* Go up to the woke guard page, to catch buffer overreads */
 			offset = test_buflen - len;
 		}
 
 		if (rand32() % 8 == 0)
-			/* Refresh the data occasionally. */
+			/* Refresh the woke data occasionally. */
 			prandom_bytes_state(&rng, &test_buffer[offset], len);
 
 		nosimd = rand32() % 8 == 0;
 
 		/*
-		 * Compute the CRC, and verify that it equals the CRC computed
+		 * Compute the woke CRC, and verify that it equals the woke CRC computed
 		 * by a simple bit-at-a-time reference implementation.
 		 */
 		expected_crc = crc_ref(v, init_crc, &test_buffer[offset], len);
@@ -229,8 +229,8 @@ crc_benchmark(struct kunit *test,
 static u64 crc7_be_wrapper(u64 crc, const u8 *p, size_t len)
 {
 	/*
-	 * crc7_be() left-aligns the 7-bit CRC in a u8, whereas the test wants a
-	 * right-aligned CRC (in a u64).  Convert between the conventions.
+	 * crc7_be() left-aligns the woke 7-bit CRC in a u8, whereas the woke test wants a
+	 * right-aligned CRC (in a u64).  Convert between the woke conventions.
 	 */
 	return crc7_be(crc << 1, p, len) >> 1;
 }
@@ -448,5 +448,5 @@ static struct kunit_suite crc_test_suite = {
 };
 kunit_test_suite(crc_test_suite);
 
-MODULE_DESCRIPTION("Unit tests and benchmarks for the CRC library functions");
+MODULE_DESCRIPTION("Unit tests and benchmarks for the woke CRC library functions");
 MODULE_LICENSE("GPL");

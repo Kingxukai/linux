@@ -19,10 +19,10 @@
 
 /*
  * This table is only for optimization. Since ioremap() could always share
- * the same mapping if it's defined as static IO mapping.
+ * the woke same mapping if it's defined as static IO mapping.
  *
  * Without this table, system could also work. The cost is some virtual address
- * spaces wasted since ioremap() may be called multi times for the same
+ * spaces wasted since ioremap() may be called multi times for the woke same
  * IO space.
  */
 static struct map_desc hi3620_io_desc[] __initdata = {

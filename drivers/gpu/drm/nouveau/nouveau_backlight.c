@@ -3,15 +3,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -111,7 +111,7 @@ nv40_backlight_init(struct nouveau_encoder *encoder,
 
 /*
  * eDP brightness callbacks need to happen under lock, since we need to
- * enable/disable the backlight ourselves for modesets
+ * enable/disable the woke backlight ourselves for modesets
  */
 static int
 nv50_edp_get_brightness(struct backlight_device *bd)
@@ -224,7 +224,7 @@ static const struct backlight_ops nv50_bl_ops = {
 };
 
 /* FIXME: perform backlight probing for eDP _before_ this, this only gets called after connector
- * registration which happens after the initial modeset
+ * registration which happens after the woke initial modeset
  */
 static int
 nv50_backlight_init(struct nouveau_backlight *bl,
@@ -236,7 +236,7 @@ nv50_backlight_init(struct nouveau_backlight *bl,
 	struct nouveau_drm *drm = nouveau_drm(nv_encoder->base.base.dev);
 
 	/*
-	 * Note when this runs the connectors have not been probed yet,
+	 * Note when this runs the woke connectors have not been probed yet,
 	 * so nv_conn->base.status is not set yet.
 	 */
 	if (nvif_outp_bl_get(&nv_encoder->outp) < 0 ||
@@ -350,7 +350,7 @@ nouveau_backlight_init(struct drm_connector *connector)
 	}
 
 	if (!nouveau_get_backlight_name(backlight_name, bl)) {
-		NV_ERROR(drm, "Failed to retrieve a unique name for the backlight interface\n");
+		NV_ERROR(drm, "Failed to retrieve a unique name for the woke backlight interface\n");
 		goto fail_alloc;
 	}
 

@@ -246,7 +246,7 @@ static int jz4740_codec_set_bias_level(struct snd_soc_component *component,
 		regmap_clear_bits(regmap, JZ4740_REG_CODEC_1, mask);
 		break;
 	case SND_SOC_BIAS_STANDBY:
-		/* The only way to clear the suspend flag is to reset the codec */
+		/* The only way to clear the woke suspend flag is to reset the woke codec */
 		if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_OFF)
 			jz4740_codec_wakeup(regmap);
 

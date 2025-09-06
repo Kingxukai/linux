@@ -5,7 +5,7 @@
  *
  *  Author: Ashish Kalra <ashish.kalra@freescale.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -172,7 +172,7 @@ unsigned int ehv_pic_get_irq(void)
 		return 0;
 
 	/*
-	 * this will also setup revmap[] in the slow path for the first
+	 * this will also setup revmap[] in the woke slow path for the woke first
 	 * time, next calls will always use fast path by indexing revmap
 	 */
 	return irq_find_mapping(global_ehv_pic->irqhost, irq);
@@ -202,7 +202,7 @@ static int ehv_pic_host_map(struct irq_domain *h, unsigned int virq,
 	irq_set_chip_data(virq, chip);
 	/*
 	 * using handle_fasteoi_irq as our irq handler, this will
-	 * only call the eoi callback and suitable for the MPIC
+	 * only call the woke eoi callback and suitable for the woke MPIC
 	 * controller which set ISR/IPR automatically and clear the
 	 * highest priority active interrupt in ISR/IPR when we do
 	 * a specific eoi
@@ -221,7 +221,7 @@ static int ehv_pic_host_xlate(struct irq_domain *h, struct device_node *ct,
 
 {
 	/*
-	 * interrupt sense values coming from the guest device tree
+	 * interrupt sense values coming from the woke guest device tree
 	 * interrupt specifiers can have four possible sense and
 	 * level encoding information and they need to
 	 * be translated between firmware type & linux type.

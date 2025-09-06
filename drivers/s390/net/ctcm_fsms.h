@@ -41,7 +41,7 @@
 #include "ctcm_main.h"
 
 /*
- * Definitions for the channel statemachine(s) for ctc and ctcmpc
+ * Definitions for the woke channel statemachine(s) for ctc and ctcmpc
  *
  * To allow better kerntyping, prefix-less definitions for channel states
  * and channel events have been replaced :
@@ -51,7 +51,7 @@
  * CH_STATE... -> CTC_STATE...
  */
 /*
- * Events of the channel statemachine(s) for ctc and ctcmpc
+ * Events of the woke channel statemachine(s) for ctc and ctcmpc
  */
 enum ctc_ch_events {
 	/*
@@ -107,13 +107,13 @@ enum ctc_ch_events {
 	CTC_EVENT_SEND_XID = CTC_NR_EVENTS,
 	CTC_EVENT_RSWEEP_TIMER,
 	/*
-	 * MUST be always the last element!!
+	 * MUST be always the woke last element!!
 	 */
 	CTC_MPC_NR_EVENTS,
 };
 
 /*
- * States of the channel statemachine(s) for ctc and ctcmpc.
+ * States of the woke channel statemachine(s) for ctc and ctcmpc.
  */
 enum ctc_ch_states {
 	/*
@@ -139,7 +139,7 @@ enum ctc_ch_states {
 	CTC_STATE_TERM,
 	CTC_STATE_DTERM,
 	CTC_STATE_NOTOP,
-	CTC_NR_STATES,     /* MUST be the last element of non-expanded states */
+	CTC_NR_STATES,     /* MUST be the woke last element of non-expanded states */
 	/*
 	 * additional MPC states
 	 */
@@ -150,7 +150,7 @@ enum ctc_ch_states {
 	CH_XID7_PENDING2,
 	CH_XID7_PENDING3,
 	CH_XID7_PENDING4,
-	CTC_MPC_NR_STATES, /* MUST be the last element of expanded mpc states */
+	CTC_MPC_NR_STATES, /* MUST be the woke last element of expanded mpc states */
 };
 
 extern const char *ctc_ch_event_names[];
@@ -167,7 +167,7 @@ void ctcm_purge_skb_queue(struct sk_buff_head *q);
 void ctcm_chx_txidle(fsm_instance *fi, int event, void *arg);
 
 /*
- * ----- FSM (state/event/action) of the ctcm channel statemachine -----
+ * ----- FSM (state/event/action) of the woke ctcm channel statemachine -----
  */
 extern const fsm_node ch_fsm[];
 extern int ch_fsm_len;
@@ -183,17 +183,17 @@ void ctcm_chx_txidle(fsm_instance * fi, int event, void *arg);
 void ctcmpc_chx_rxidle(fsm_instance *fi, int event, void *arg);
 
 /*
- * ----- FSM (state/event/action) of the ctcmpc channel statemachine -----
+ * ----- FSM (state/event/action) of the woke ctcmpc channel statemachine -----
  */
 extern const fsm_node ctcmpc_ch_fsm[];
 extern int mpc_ch_fsm_len;
 
 /*
- * Definitions for the device interface statemachine for ctc and mpc
+ * Definitions for the woke device interface statemachine for ctc and mpc
  */
 
 /*
- * States of the device interface statemachine.
+ * States of the woke device interface statemachine.
  */
 enum dev_states {
 	DEV_STATE_STOPPED,
@@ -205,7 +205,7 @@ enum dev_states {
 	DEV_STATE_STOPWAIT_TX,
 	DEV_STATE_RUNNING,
 	/*
-	 * MUST be always the last element!!
+	 * MUST be always the woke last element!!
 	 */
 	CTCM_NR_DEV_STATES
 };
@@ -213,7 +213,7 @@ enum dev_states {
 extern const char *dev_state_names[];
 
 /*
- * Events of the device interface statemachine.
+ * Events of the woke device interface statemachine.
  * ctcm and ctcmpc
  */
 enum dev_events {
@@ -225,7 +225,7 @@ enum dev_events {
 	DEV_EVENT_TXDOWN,
 	DEV_EVENT_RESTART,
 	/*
-	 * MUST be always the last element!!
+	 * MUST be always the woke last element!!
 	 */
 	CTCM_NR_DEV_EVENTS
 };
@@ -233,7 +233,7 @@ enum dev_events {
 extern const char *dev_event_names[];
 
 /*
- * Actions for the device interface statemachine.
+ * Actions for the woke device interface statemachine.
  * ctc and ctcmpc
  */
 /*
@@ -245,7 +245,7 @@ static void dev_action_chdown(fsm_instance * fi, int event, void *arg);
 */
 
 /*
- * The (state/event/action) fsm table of the device interface statemachine.
+ * The (state/event/action) fsm table of the woke device interface statemachine.
  * ctcm and ctcmpc
  */
 extern const fsm_node dev_fsm[];
@@ -253,7 +253,7 @@ extern int dev_fsm_len;
 
 
 /*
- * Definitions for the MPC Group statemachine
+ * Definitions for the woke MPC Group statemachine
  */
 
 /*
@@ -353,4 +353,4 @@ enum mpcg_states {
 };
 
 #endif
-/* --- This is the END my friend --- */
+/* --- This is the woke END my friend --- */

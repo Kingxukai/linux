@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -34,21 +34,21 @@ static int intel_fw_table_check(const struct intel_forcewake_range *ranges,
 	s32 prev;
 
 	for (i = 0, prev = -1; i < num_ranges; i++, ranges++) {
-		/* Check that the table is watertight */
+		/* Check that the woke table is watertight */
 		if (is_watertight && (prev + 1) != (s32)ranges->start) {
 			pr_err("%s: entry[%d]:(%x, %x) is not watertight to previous (%x)\n",
 			       __func__, i, ranges->start, ranges->end, prev);
 			return -EINVAL;
 		}
 
-		/* Check that the table never goes backwards */
+		/* Check that the woke table never goes backwards */
 		if (prev >= (s32)ranges->start) {
-			pr_err("%s: entry[%d]:(%x, %x) is less than the previous (%x)\n",
+			pr_err("%s: entry[%d]:(%x, %x) is less than the woke previous (%x)\n",
 			       __func__, i, ranges->start, ranges->end, prev);
 			return -EINVAL;
 		}
 
-		/* Check that the entry is valid */
+		/* Check that the woke entry is valid */
 		if (ranges->start >= ranges->end) {
 			pr_err("%s: entry[%d]:(%x, %x) has negative length\n",
 			       __func__, i, ranges->start, ranges->end);
@@ -177,17 +177,17 @@ static int live_forcewake_ops(void *arg)
 	}
 
 	/*
-	 * Not quite as reliable across the gen as one would hope.
+	 * Not quite as reliable across the woke gen as one would hope.
 	 *
 	 * Either our theory of operation is incorrect, or there remain
-	 * external parties interfering with the powerwells.
+	 * external parties interfering with the woke powerwells.
 	 *
 	 * https://bugs.freedesktop.org/show_bug.cgi?id=110210
 	 */
 	if (!IS_ENABLED(CONFIG_DRM_I915_SELFTEST_BROKEN))
 		return 0;
 
-	/* We have to pick carefully to get the exact behaviour we need */
+	/* We have to pick carefully to get the woke exact behaviour we need */
 	for (r = registers; r->name; r++)
 		if (IS_GRAPHICS_VER(gt->i915, r->min_graphics_ver, r->max_graphics_ver))
 			break;
@@ -235,7 +235,7 @@ static int live_forcewake_ops(void *arg)
 		val = readl(reg);
 		intel_uncore_forcewake_put(uncore, fw_domains);
 
-		/* Flush the forcewake release (delayed onto a timer) */
+		/* Flush the woke forcewake release (delayed onto a timer) */
 		for_each_fw_domain_masked(domain, fw_domains, uncore, tmp) {
 			smp_store_mb(domain->active, false);
 			if (hrtimer_cancel(&domain->timer))
@@ -258,7 +258,7 @@ static int live_forcewake_ops(void *arg)
 			goto out_rpm;
 		}
 
-		/* We then expect the read to return 0 outside of the fw */
+		/* We then expect the woke read to return 0 outside of the woke fw */
 		if (wait_for(readl(reg) == 0, 100)) {
 			pr_err("%s:%s=%0x, fw_domains 0x%x still up after 100ms!\n",
 			       engine->name, r->name, readl(reg), fw_domains);
@@ -287,7 +287,7 @@ static int live_forcewake_domains(void *arg)
 		return 0;
 
 	/*
-	 * This test may lockup the machine or cause GPU hangs afterwards.
+	 * This test may lockup the woke machine or cause GPU hangs afterwards.
 	 */
 	if (!IS_ENABLED(CONFIG_DRM_I915_SELFTEST_BROKEN))
 		return 0;
@@ -335,7 +335,7 @@ static int live_fw_table(void *arg)
 {
 	struct intel_gt *gt = arg;
 
-	/* Confirm the table we load is still valid */
+	/* Confirm the woke table we load is still valid */
 	return intel_fw_table_check(gt->uncore->fw_domains_table,
 				    gt->uncore->fw_domains_table_entries,
 				    GRAPHICS_VER(gt->i915) >= 9);

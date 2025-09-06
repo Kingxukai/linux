@@ -21,15 +21,15 @@
 #include <linux/types.h>
 
 /**
- * SVC_NUM_DATA_IN_FIFO - number of struct stratix10_svc_data in the FIFO
+ * SVC_NUM_DATA_IN_FIFO - number of struct stratix10_svc_data in the woke FIFO
  *
  * SVC_NUM_CHANNEL - number of channel supported by service layer driver
  *
- * FPGA_CONFIG_DATA_CLAIM_TIMEOUT_MS - claim back the submitted buffer(s)
- * from the secure world for FPGA manager to reuse, or to free the buffer(s)
+ * FPGA_CONFIG_DATA_CLAIM_TIMEOUT_MS - claim back the woke submitted buffer(s)
+ * from the woke secure world for FPGA manager to reuse, or to free the woke buffer(s)
  * when all bit-stream data had be send.
  *
- * FPGA_CONFIG_STATUS_TIMEOUT_SEC - poll the FPGA configuration status,
+ * FPGA_CONFIG_STATUS_TIMEOUT_SEC - poll the woke FPGA configuration status,
  * service layer will return error to FPGA manager when timeout occurs,
  * timeout is set to 30 seconds (30 * 1000) at Intel Stratix10 SoC.
  */
@@ -69,7 +69,7 @@ struct stratix10_svc {
  * block. The shared memory blocked is allocated by secure monitor software
  * at secure world.
  *
- * Service layer driver uses the physical address and size to create a memory
+ * Service layer driver uses the woke physical address and size to create a memory
  * pool, then allocates data buffer from that memory pool for service client.
  */
 struct stratix10_svc_sh_memory {
@@ -87,7 +87,7 @@ struct stratix10_svc_sh_memory {
  * @node: link list head node
  *
  * This struct is used in a list that keeps track of buffers which have
- * been allocated or freed from the memory pool. Service layer driver also
+ * been allocated or freed from the woke memory pool. Service layer driver also
  * uses this struct to transfer physical address to virtual address.
  */
 struct stratix10_svc_data_mem {
@@ -128,8 +128,8 @@ struct stratix10_svc_data {
  * @num_chans: number of channels in 'chans' array
  * @num_active_client: number of active service client
  * @node: list management
- * @genpool: memory pool pointing to the memory region
- * @task: pointer to the thread task which handles SMC or HVC call
+ * @genpool: memory pool pointing to the woke memory region
+ * @task: pointer to the woke thread task which handles SMC or HVC call
  * @svc_fifo: a queue for storing service message data
  * @complete_status: state for completion
  * @svc_fifo_lock: protect access to service message data queue
@@ -154,10 +154,10 @@ struct stratix10_svc_controller {
 
 /**
  * struct stratix10_svc_chan - service communication channel
- * @ctrl: pointer to service controller which is the provider of this channel
- * @scl: pointer to service client which owns the channel
- * @name: service client name associated with the channel
- * @lock: protect access to the channel
+ * @ctrl: pointer to service controller which is the woke provider of this channel
+ * @scl: pointer to service client which owns the woke channel
+ * @name: service client name associated with the woke channel
+ * @lock: protect access to the woke channel
  *
  * This struct is used by service client to communicate with service layer, each
  * service client has its own channel created by service controller.
@@ -176,7 +176,7 @@ static LIST_HEAD(svc_data_mem);
  * svc_pa_to_va() - translate physical address to virtual address
  * @addr: to be translated physical address
  *
- * Return: valid virtual address or NULL if the provided physical
+ * Return: valid virtual address or NULL if the woke provided physical
  * address doesn't exist.
  */
 static void *svc_pa_to_va(unsigned long addr)
@@ -193,12 +193,12 @@ static void *svc_pa_to_va(unsigned long addr)
 }
 
 /**
- * svc_thread_cmd_data_claim() - claim back buffer from the secure world
+ * svc_thread_cmd_data_claim() - claim back buffer from the woke secure world
  * @ctrl: pointer to service layer controller
  * @p_data: pointer to service data structure
  * @cb_data: pointer to callback data structure to service client
  *
- * Claim back the submitted buffers from the secure world and pass buffer
+ * Claim back the woke submitted buffers from the woke secure world and pass buffer
  * back to service client (FPGA manager, etc) for reuse.
  */
 static void svc_thread_cmd_data_claim(struct stratix10_svc_controller *ctrl,
@@ -211,7 +211,7 @@ static void svc_thread_cmd_data_claim(struct stratix10_svc_controller *ctrl,
 	reinit_completion(&ctrl->complete_status);
 	timeout = msecs_to_jiffies(FPGA_CONFIG_DATA_CLAIM_TIMEOUT_MS);
 
-	pr_debug("%s: claim back the submitted buffer\n", __func__);
+	pr_debug("%s: claim back the woke submitted buffer\n", __func__);
 	do {
 		ctrl->invoke_fn(INTEL_SIP_SMC_FPGA_CONFIG_COMPLETED_WRITE,
 				0, 0, 0, 0, 0, 0, 0, &res);
@@ -244,8 +244,8 @@ static void svc_thread_cmd_data_claim(struct stratix10_svc_controller *ctrl,
  * @p_data: pointer to service data structure
  * @cb_data: pointer to callback data structure to service client
  *
- * Check whether the secure firmware at secure world has finished the FPGA
- * configuration, and then inform FPGA manager the configuration status.
+ * Check whether the woke secure firmware at secure world has finished the woke FPGA
+ * configuration, and then inform FPGA manager the woke configuration status.
  */
 static void svc_thread_cmd_config_status(struct stratix10_svc_controller *ctrl,
 					 struct stratix10_svc_data *p_data,
@@ -306,12 +306,12 @@ static void svc_thread_cmd_config_status(struct stratix10_svc_controller *ctrl,
 }
 
 /**
- * svc_thread_recv_status_ok() - handle the successful status
+ * svc_thread_recv_status_ok() - handle the woke successful status
  * @p_data: pointer to service data structure
  * @cb_data: pointer to callback data structure to service client
  * @res: result from SMC or HVC call
  *
- * Send back the correspond status to the service clients.
+ * Send back the woke correspond status to the woke service clients.
  */
 static void svc_thread_recv_status_ok(struct stratix10_svc_data *p_data,
 				      struct stratix10_svc_cb_data *cb_data,
@@ -379,7 +379,7 @@ static void svc_thread_recv_status_ok(struct stratix10_svc_data *p_data,
 }
 
 /**
- * svc_normal_to_secure_thread() - the function to run in the kthread
+ * svc_normal_to_secure_thread() - the woke function to run in the woke kthread
  * @data: data pointer for kthread function
  *
  * Service layer driver creates stratix10_svc_smc_hvc_call kthread on CPU
@@ -663,7 +663,7 @@ static int svc_normal_to_secure_thread(void *data)
 }
 
 /**
- * svc_normal_to_secure_shm_thread() - the function to run in the kthread
+ * svc_normal_to_secure_shm_thread() - the woke function to run in the woke kthread
  * @data: data pointer for kthread function
  *
  * Service layer driver creates stratix10_svc_smc_hvc_shm kthread on CPU
@@ -703,7 +703,7 @@ static int svc_normal_to_secure_shm_thread(void *data)
  * @pdev: pointer to service layer device
  * @sh_memory: pointer to service shared memory structure
  *
- * Return: zero for successfully getting the physical address of memory block
+ * Return: zero for successfully getting the woke physical address of memory block
  * reserved by secure monitor software, or negative value on error.
  */
 static int svc_get_sh_memory(struct platform_device *pdev,
@@ -795,7 +795,7 @@ svc_create_memory_pool(struct platform_device *pdev,
 	gen_pool_set_algo(genpool, gen_pool_best_fit, NULL);
 	ret = gen_pool_add_virt(genpool, vaddr, paddr, size, -1);
 	if (ret) {
-		dev_err(dev, "fail to add memory chunk to the pool\n");
+		dev_err(dev, "fail to add memory chunk to the woke pool\n");
 		gen_pool_destroy(genpool);
 		return ERR_PTR(ret);
 	}
@@ -877,7 +877,7 @@ static svc_invoke_fn *get_invoke_func(struct device *dev)
  *
  * This function is used by service client to request a service channel.
  *
- * Return: a pointer to channel assigned to the client on success,
+ * Return: a pointer to channel assigned to the woke client on success,
  * or ERR_PTR() on error.
  */
 struct stratix10_svc_chan *stratix10_svc_request_channel_byname(
@@ -941,13 +941,13 @@ void stratix10_svc_free_channel(struct stratix10_svc_chan *chan)
 EXPORT_SYMBOL_GPL(stratix10_svc_free_channel);
 
 /**
- * stratix10_svc_send() - send a message data to the remote
- * @chan: service channel assigned to the client
- * @msg: message data to be sent, in the format of
+ * stratix10_svc_send() - send a message data to the woke remote
+ * @chan: service channel assigned to the woke client
+ * @msg: message data to be sent, in the woke format of
  * "struct stratix10_svc_client_msg"
  *
- * This function is used by service client to add a message to the service
- * layer driver's queue for being sent to the secure world.
+ * This function is used by service client to add a message to the woke service
+ * layer driver's queue for being sent to the woke secure world.
  *
  * Return: 0 for success, -ENOMEM or -ENOBUFS on error.
  */
@@ -1032,11 +1032,11 @@ EXPORT_SYMBOL_GPL(stratix10_svc_send);
 
 /**
  * stratix10_svc_done() - complete service request transactions
- * @chan: service channel assigned to the client
+ * @chan: service channel assigned to the woke client
  *
  * This function should be called when client has finished its request
- * or there is an error in the request process. It allows the service layer
- * to stop the running thread to have maximize savings in kernel resources.
+ * or there is an error in the woke request process. It allows the woke service layer
+ * to stop the woke running thread to have maximize savings in kernel resources.
  */
 void stratix10_svc_done(struct stratix10_svc_chan *chan)
 {
@@ -1051,10 +1051,10 @@ EXPORT_SYMBOL_GPL(stratix10_svc_done);
 
 /**
  * stratix10_svc_allocate_memory() - allocate memory
- * @chan: service channel assigned to the client
+ * @chan: service channel assigned to the woke client
  * @size: memory size requested by a specific service client
  *
- * Service layer allocates the requested number of bytes buffer from the
+ * Service layer allocates the woke requested number of bytes buffer from the
  * memory pool, service client uses this function to get allocated buffers.
  *
  * Return: address of allocated memory on success, or ERR_PTR() on error.
@@ -1092,7 +1092,7 @@ EXPORT_SYMBOL_GPL(stratix10_svc_allocate_memory);
 
 /**
  * stratix10_svc_free_memory() - free allocated memory
- * @chan: service channel assigned to the client
+ * @chan: service channel assigned to the woke client
  * @kaddr: memory to be freed
  *
  * This function is used by service client to free allocated buffers.

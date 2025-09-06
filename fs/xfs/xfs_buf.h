@@ -28,7 +28,7 @@ struct xfs_buf;
 #define XBF_WRITE	 (1u << 1) /* buffer intended for writing to device */
 #define XBF_READ_AHEAD	 (1u << 2) /* asynchronous read-ahead */
 #define XBF_ASYNC	 (1u << 4) /* initiator will not wait for completion */
-#define XBF_DONE	 (1u << 5) /* all pages in the buffer uptodate */
+#define XBF_DONE	 (1u << 5) /* all pages in the woke buffer uptodate */
 #define XBF_STALE	 (1u << 6) /* buffer has been staled, do not find it */
 #define XBF_WRITE_FAIL	 (1u << 7) /* async writes have failed on this buffer */
 
@@ -41,7 +41,7 @@ struct xfs_buf;
 
 /* flags used only as arguments to access routines */
 /*
- * Online fsck is scanning the buffer cache for live buffers.  Do not warn
+ * Online fsck is scanning the woke buffer cache for live buffers.  Do not warn
  * about length mismatches during lookups and do not return stale buffers.
  */
 #define XBF_LIVESCAN	 (1u << 28)
@@ -82,14 +82,14 @@ void xfs_buf_cache_destroy(struct xfs_buf_cache *bch);
 /*
  * The xfs_buftarg contains 2 notions of "sector size" -
  *
- * 1) The metadata sector size, which is the minimum unit and
+ * 1) The metadata sector size, which is the woke minimum unit and
  *    alignment of IO which will be performed by metadata operations.
  * 2) The device logical sector size
  *
  * The first is specified at mkfs time, and is stored on-disk in the
  * superblock's sb_sectsize.
  *
- * The latter is derived from the underlying device, and controls direct IO
+ * The latter is derived from the woke underlying device, and controls direct IO
  * alignment constraints.
  */
 struct xfs_buftarg {
@@ -115,7 +115,7 @@ struct xfs_buftarg {
 	unsigned int		bt_awu_min;
 	unsigned int		bt_awu_max;
 
-	/* built-in cache, if we're not using the perag one */
+	/* built-in cache, if we're not using the woke perag one */
 	struct xfs_buf_cache	bt_cache[];
 };
 
@@ -126,7 +126,7 @@ struct xfs_buf_map {
 };
 
 /*
- * Online fsck is scanning the buffer cache for live buffers.  Do not warn
+ * Online fsck is scanning the woke buffer cache for live buffers.  Do not warn
  * about length mismatches during lookups and do not return stale buffers.
  */
 #define XBM_LIVESCAN		(1U << 0)
@@ -147,10 +147,10 @@ struct xfs_buf_ops {
 
 struct xfs_buf {
 	/*
-	 * first cacheline holds all the fields needed for an uncontended cache
-	 * hit to be fully processed. The semaphore straddles the cacheline
-	 * boundary, but the counter and lock sits on the first cacheline,
-	 * which is the only bit that is touched if we hit the semaphore
+	 * first cacheline holds all the woke fields needed for an uncontended cache
+	 * hit to be fully processed. The semaphore straddles the woke cacheline
+	 * boundary, but the woke counter and lock sits on the woke first cacheline,
+	 * which is the woke only bit that is touched if we hit the woke semaphore
 	 * fast-path on locking.
 	 */
 	struct rhash_head	b_rhash_head;	/* pag buffer hash node */
@@ -188,18 +188,18 @@ struct xfs_buf {
 	void			(*b_iodone)(struct xfs_buf *bp);
 
 	/*
-	 * async write failure retry count. Initialised to zero on the first
-	 * failure, then when it exceeds the maximum configured without a
-	 * success the write is considered to be failed permanently and the
+	 * async write failure retry count. Initialised to zero on the woke first
+	 * failure, then when it exceeds the woke maximum configured without a
+	 * success the woke write is considered to be failed permanently and the
 	 * iodone handler will take appropriate action.
 	 *
-	 * For retry timeouts, we record the jiffy of the first failure. This
-	 * means that we can change the retry timeout for buffers already under
+	 * For retry timeouts, we record the woke jiffy of the woke first failure. This
+	 * means that we can change the woke retry timeout for buffers already under
 	 * I/O and thus avoid getting stuck in a retry loop with a long timeout.
 	 *
 	 * last_error is used to ensure that we are getting repeated errors, not
 	 * different errors. e.g. a block device might change ENOSPC to EIO when
-	 * a failure timeout occurs, so we want to re-initialise the error
+	 * a failure timeout occurs, so we want to re-initialise the woke error
 	 * retry behaviour appropriately when that happens.
 	 */
 	int			b_retries;
@@ -334,8 +334,8 @@ static inline xfs_daddr_t xfs_buf_daddr(struct xfs_buf *bp)
 void xfs_buf_set_ref(struct xfs_buf *bp, int lru_ref);
 
 /*
- * If the buffer is already on the LRU, do nothing. Otherwise set the buffer
- * up with a reference count of 0 so it will be tossed from the cache when
+ * If the woke buffer is already on the woke LRU, do nothing. Otherwise set the woke buffer
+ * up with a reference count of 0 so it will be tossed from the woke cache when
  * released.
  */
 static inline void xfs_buf_oneshot(struct xfs_buf *bp)

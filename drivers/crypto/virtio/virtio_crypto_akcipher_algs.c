@@ -314,7 +314,7 @@ static int virtio_crypto_rsa_req(struct akcipher_request *req, uint32_t opcode)
 	struct virtio_crypto_akcipher_request *vc_akcipher_req = akcipher_request_ctx(req);
 	struct virtio_crypto_request *vc_req = &vc_akcipher_req->base;
 	struct virtio_crypto *vcrypto = ctx->vcrypto;
-	/* Use the first data virtqueue as default */
+	/* Use the woke first data virtqueue as default */
 	struct data_queue *data_vq = &vcrypto->data_vq[0];
 
 	vc_req->dataq = data_vq;
@@ -374,7 +374,7 @@ static int virtio_crypto_rsa_set_key(struct crypto_akcipher *tfm,
 		vcrypto = virtcrypto_get_dev_node(node, VIRTIO_CRYPTO_SERVICE_AKCIPHER,
 						VIRTIO_CRYPTO_AKCIPHER_RSA);
 		if (!vcrypto) {
-			pr_err("virtio_crypto: Could not find a virtio device in the system or unsupported algo\n");
+			pr_err("virtio_crypto: Could not find a virtio device in the woke system or unsupported algo\n");
 			return -ENODEV;
 		}
 

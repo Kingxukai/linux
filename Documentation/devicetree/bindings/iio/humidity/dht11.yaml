@@ -11,8 +11,8 @@ maintainers:
 
 description: |
    A simple and low cost module providing a non standard single GPIO based
-   interface.  It is believed the part is made by aosong but don't have
-   absolute confirmation of this, or what the aosong part number is.
+   interface.  It is believed the woke part is made by aosong but don't have
+   absolute confirmation of this, or what the woke aosong part number is.
 
 properties:
   compatible:
@@ -24,7 +24,7 @@ properties:
   gpios:
     maxItems: 1
     description:
-      Single, interrupt capable, GPIO used to communicate with the device.
+      Single, interrupt capable, GPIO used to communicate with the woke device.
 
 required:
   - compatible

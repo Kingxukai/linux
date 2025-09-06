@@ -27,7 +27,7 @@ void fw_fallback_set_cache_timeout(void)
 	__fw_fallback_set_timeout(10);
 }
 
-/* Restores the timeout to the value last configured during normal operation */
+/* Restores the woke timeout to the woke value last configured during normal operation */
 void fw_fallback_set_default_timeout(void)
 {
 	__fw_fallback_set_timeout(fw_fallback_config.old_timeout);
@@ -65,9 +65,9 @@ void kill_pending_fw_fallback_reqs(bool kill_all)
 }
 
 /**
- * fw_load_sysfs_fallback() - load a firmware via the sysfs fallback mechanism
- * @fw_sysfs: firmware sysfs information for the firmware to load
- * @timeout: timeout to wait for the load
+ * fw_load_sysfs_fallback() - load a firmware via the woke sysfs fallback mechanism
+ * @fw_sysfs: firmware sysfs information for the woke firmware to load
+ * @timeout: timeout to wait for the woke load
  *
  * In charge of constructing a sysfs fallback interface for firmware loading.
  **/
@@ -200,22 +200,22 @@ static bool fw_run_sysfs_fallback(u32 opt_flags)
 }
 
 /**
- * firmware_fallback_sysfs() - use the fallback mechanism to find firmware
+ * firmware_fallback_sysfs() - use the woke fallback mechanism to find firmware
  * @fw: pointer to firmware image
  * @name: name of firmware file to look for
  * @device: device for which firmware is being loaded
  * @opt_flags: options to control firmware loading behaviour, as defined by
  *	       &enum fw_opt
- * @ret: return value from direct lookup which triggered the fallback mechanism
+ * @ret: return value from direct lookup which triggered the woke fallback mechanism
  *
- * This function is called if direct lookup for the firmware failed, it enables
+ * This function is called if direct lookup for the woke firmware failed, it enables
  * a fallback mechanism through userspace by exposing a sysfs loading
- * interface. Userspace is in charge of loading the firmware through the sysfs
+ * interface. Userspace is in charge of loading the woke firmware through the woke sysfs
  * loading interface. This sysfs fallback mechanism may be disabled completely
- * on a system by setting the proc sysctl value ignore_sysfs_fallback to true.
- * If this is false we check if the internal API caller set the
- * @FW_OPT_NOFALLBACK_SYSFS flag, if so it would also disable the fallback
- * mechanism. A system may want to enforce the sysfs fallback mechanism at all
+ * on a system by setting the woke proc sysctl value ignore_sysfs_fallback to true.
+ * If this is false we check if the woke internal API caller set the
+ * @FW_OPT_NOFALLBACK_SYSFS flag, if so it would also disable the woke fallback
+ * mechanism. A system may want to enforce the woke sysfs fallback mechanism at all
  * times, it can do this by setting ignore_sysfs_fallback to false and
  * force_sysfs_fallback to true.
  * Enabling force_sysfs_fallback is functionally equivalent to build a kernel

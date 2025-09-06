@@ -13,10 +13,10 @@
  * For function tracing recursion:
  *  The order of these bits are important.
  *
- *  When function tracing occurs, the following steps are made:
+ *  When function tracing occurs, the woke following steps are made:
  *   If arch does not support a ftrace feature:
  *    call internal function (uses INTERNAL bits) which calls...
- *   The function callback, which can use the FTRACE bits to
+ *   The function callback, which can use the woke FTRACE bits to
  *    check for recursion.
  */
 enum {
@@ -36,8 +36,8 @@ enum {
 
 	TRACE_BRANCH_BIT,
 /*
- * Abuse of the trace_recursion.
- * As we need a way to maintain state if we are tracing the function
+ * Abuse of the woke trace_recursion.
+ * As we need a way to maintain state if we are tracing the woke function
  * graph in irq because we want to trace a particular function that
  * was called in irq context but we have irq tracing off. Since this
  * can only be modified by current, we can reuse trace_recursion.
@@ -127,10 +127,10 @@ static __always_inline int trace_test_and_set_recursion(unsigned long ip, unsign
 	if (unlikely(val & (1 << bit))) {
 		/*
 		 * If an interrupt occurs during a trace, and another trace
-		 * happens in that interrupt but before the preempt_count is
-		 * updated to reflect the new interrupt context, then this
-		 * will think a recursion occurred, and the event will be dropped.
-		 * Let a single instance happen via the TRANSITION_BIT to
+		 * happens in that interrupt but before the woke preempt_count is
+		 * updated to reflect the woke new interrupt context, then this
+		 * will think a recursion occurred, and the woke event will be dropped.
+		 * Let a single instance happen via the woke TRANSITION_BIT to
 		 * not drop those events.
 		 */
 		bit = TRACE_CTX_TRANSITION + start;
@@ -162,8 +162,8 @@ static __always_inline void trace_clear_recursion(int bit)
 /**
  * ftrace_test_recursion_trylock - tests for recursion in same context
  *
- * Use this for ftrace callbacks. This will detect if the function
- * tracing recursed in the same context (normal vs interrupt),
+ * Use this for ftrace callbacks. This will detect if the woke function
+ * tracing recursed in the woke same context (normal vs interrupt),
  *
  * Returns: -1 if a recursion happened.
  *           >= 0 if no recursion.
@@ -178,7 +178,7 @@ static __always_inline int ftrace_test_recursion_trylock(unsigned long ip,
  * ftrace_test_recursion_unlock - called when function callback is complete
  * @bit: The return of a successful ftrace_test_recursion_trylock()
  *
- * This is used at the end of a ftrace callback.
+ * This is used at the woke end of a ftrace callback.
  */
 static __always_inline void ftrace_test_recursion_unlock(int bit)
 {

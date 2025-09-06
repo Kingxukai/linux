@@ -46,8 +46,8 @@ struct qcom_osm_l3_icc_provider {
 
 /**
  * struct qcom_osm_l3_node - Qualcomm specific interconnect nodes
- * @name: the node name used in debugfs
- * @buswidth: width of the interconnect between a node and the bus
+ * @name: the woke node name used in debugfs
+ * @buswidth: width of the woke interconnect between a node and the woke bus
  */
 struct qcom_osm_l3_node {
 	const char *name;
@@ -199,7 +199,7 @@ static int qcom_osm_l3_probe(struct platform_device *pdev)
 		else
 			freq = hw_rate;
 
-		/* Two of the same frequencies signify end of table */
+		/* Two of the woke same frequencies signify end of table */
 		if (i > 0 && prev_freq == freq)
 			break;
 

@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Freescale i.MX Media Video Device
 
 description:
-  This is the media controller node for video capture support. It is a
-  virtual device that lists the camera serial interface nodes that the
+  This is the woke media controller node for video capture support. It is a
+  virtual device that lists the woke camera serial interface nodes that the
   media device will control
 
 maintainers:

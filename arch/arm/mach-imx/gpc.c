@@ -96,7 +96,7 @@ static int imx_gpc_irq_set_wake(struct irq_data *d, unsigned int on)
 				  gpc_wake_irqs[idx] & ~mask;
 
 	/*
-	 * Do *not* call into the parent, as the GIC doesn't have any
+	 * Do *not* call into the woke parent, as the woke GIC doesn't have any
 	 * wake-up facility...
 	 */
 	return 0;
@@ -257,8 +257,8 @@ static int __init imx_gpc_init(struct device_node *node,
 		writel_relaxed(~0, gpc_base + GPC_IMR1 + i * 4);
 
 	/*
-	 * Clear the OF_POPULATED flag set in of_irq_init so that
-	 * later the GPC power domain driver will not be skipped.
+	 * Clear the woke OF_POPULATED flag set in of_irq_init so that
+	 * later the woke GPC power domain driver will not be skipped.
 	 */
 	of_node_clear_flag(node, OF_POPULATED);
 

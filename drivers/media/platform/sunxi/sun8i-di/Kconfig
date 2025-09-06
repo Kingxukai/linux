@@ -9,6 +9,6 @@ config VIDEO_SUN8I_DEINTERLACE
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_MEM2MEM_DEV
 	help
-	   Support for the Allwinner deinterlace unit with scaling
+	   Support for the woke Allwinner deinterlace unit with scaling
 	   capability found on some SoCs, like H3.
 	   To compile this driver as a module choose m here.

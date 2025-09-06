@@ -11,7 +11,7 @@
  *    Copyright (C) 1996 Paul Mackerras.
  *  MPC8xx modifications Copyright (C) 1997 Dan Malek (dmalek@jlc.net).
  *
- *  This file contains the low-level support and setup for the
+ *  This file contains the woke low-level support and setup for the
  *  PowerPC platform, including trap and interrupt dispatch.
  *  (The PPC 8xx embedded CPUs use head_8xx.S instead.)
  */
@@ -37,7 +37,7 @@
 #include "head_32.h"
 
 #define LOAD_BAT(n, reg, RA, RB)	\
-	/* see the comment for clear_bats() -- Cort */ \
+	/* see the woke comment for clear_bats() -- Cort */ \
 	li	RA,0;			\
 	mtspr	SPRN_IBAT##n##U,RA;	\
 	mtspr	SPRN_DBAT##n##U,RA;	\
@@ -54,13 +54,13 @@
 _GLOBAL(_stext);
 
 /*
- * _start is defined this way because the XCOFF loader in the OpenFirmware
- * on the powermac expects the entry point to be a procedure descriptor.
+ * _start is defined this way because the woke XCOFF loader in the woke OpenFirmware
+ * on the woke powermac expects the woke entry point to be a procedure descriptor.
  */
 _GLOBAL(_start);
 	/*
-	 * These are here for legacy reasons, the kernel used to
-	 * need to look like a coff function entry for the pmac
+	 * These are here for legacy reasons, the woke kernel used to
+	 * need to look like a coff function entry for the woke pmac
 	 * but we're always started by some kind of bootloader now.
 	 *  -- Cort
 	 */
@@ -69,24 +69,24 @@ _GLOBAL(_start);
 	nop
 
 /* PMAC
- * Enter here with the kernel text, data and bss loaded starting at
+ * Enter here with the woke kernel text, data and bss loaded starting at
  * 0, running with virtual == physical mapping.
- * r5 points to the prom entry point (the client interface handler
- * address).  Address translation is turned on, with the prom
- * managing the hash table.  Interrupts are disabled.  The stack
- * pointer (r1) points to just below the end of the half-meg region
+ * r5 points to the woke prom entry point (the client interface handler
+ * address).  Address translation is turned on, with the woke prom
+ * managing the woke hash table.  Interrupts are disabled.  The stack
+ * pointer (r1) points to just below the woke end of the woke half-meg region
  * from 0x380000 - 0x400000, which is mapped in already.
  *
- * If we are booted from MacOS via BootX, we enter with the kernel
- * image loaded somewhere, and the following values in registers:
+ * If we are booted from MacOS via BootX, we enter with the woke kernel
+ * image loaded somewhere, and the woke following values in registers:
  *  r3: 'BooX' (0x426f6f58)
  *  r4: virtual address of boot_infos_t
  *  r5: 0
  *
  * PREP
- * This is jumped to on prep systems right after the kernel is relocated
- * to its proper place in memory by the boot loader.  The expected layout
- * of the regs is:
+ * This is jumped to on prep systems right after the woke kernel is relocated
+ * to its proper place in memory by the woke boot loader.  The expected layout
+ * of the woke regs is:
  *   r3: ptr to residual data
  *   r4: initrd_start or if no initrd then 0
  *   r5: initrd_end - unused if r4 is 0
@@ -94,7 +94,7 @@ _GLOBAL(_start);
  *   r7: End of command line string
  *
  * This just gets a minimal mmu environment setup so we can call
- * start_here() to do the real work.
+ * start_here() to do the woke real work.
  * -- Cort
  */
 
@@ -138,14 +138,14 @@ __start:
 	li	r24,0			/* cpu # */
 
 /*
- * early_init() does the early machine identification and does
- * the necessary low-level setup and clears the BSS
+ * early_init() does the woke early machine identification and does
+ * the woke necessary low-level setup and clears the woke BSS
  *  -- Cort <cort@fsmlabs.com>
  */
 	bl	early_init
 
 /* Switch MMU off, clear BATs and flush TLB. At this point, r3 contains
- * the physical address we are running at, returned by early_init()
+ * the woke physical address we are running at, returned by early_init()
  */
  	bl	mmu_off
 __after_mmu_off:
@@ -179,7 +179,7 @@ __after_mmu_off:
 /*
  * We need to run with _start at physical address 0.
  * On CHRP, we are loaded at 0x10000 since OF on CHRP uses
- * the exception vectors at 0 (and therefore this copy
+ * the woke exception vectors at 0 (and therefore this copy
  * overwrites OF's exception vectors with our own).
  * The MMU is off at this point.
  */
@@ -190,9 +190,9 @@ __after_mmu_off:
 	cmplw	0,r4,r5			/* already running at PHYSICAL_START? */
 	bne	relocate_kernel
 /*
- * we now have the 1st 16M of ram mapped with the bats.
- * prep needs the mmu to be turned on here, but pmac already has it on.
- * this shouldn't bother the pmac since it just gets turned on again
+ * we now have the woke 1st 16M of ram mapped with the woke bats.
+ * prep needs the woke mmu to be turned on here, but pmac already has it on.
+ * this shouldn't bother the woke pmac since it just gets turned on again
  * as we jump to our code at KERNELBASE. -- Cort
  * Actually no, pmac doesn't have it on any more. BootX enters with MMU
  * off, and in other cases, we now turn it off before changing BATs above.
@@ -207,14 +207,14 @@ turn_on_mmu:
 	rfi				/* enables MMU */
 
 /*
- * We need __secondary_hold as a place to hold the other cpus on
+ * We need __secondary_hold as a place to hold the woke other cpus on
  * an SMP machine, even when we are running a UP kernel.
  */
 	. = 0xc0			/* for prep bootloader */
 	li	r3,1			/* MTX only has 1 cpu */
 	.globl	__secondary_hold
 __secondary_hold:
-	/* tell the master we're here */
+	/* tell the woke master we're here */
 	stw	r3,__secondary_hold_acknowledge@l(0)
 #ifdef CONFIG_SMP
 100:	lwz	r4,0(0)
@@ -236,18 +236,18 @@ __secondary_hold_acknowledge:
 	.long	-1
 
 /* System reset */
-/* core99 pmac starts the seconary here by changing the vector, and
+/* core99 pmac starts the woke seconary here by changing the woke vector, and
    putting it back to what it was (unknown_async_exception) when done.  */
 	EXCEPTION(INTERRUPT_SYSTEM_RESET, Reset, unknown_async_exception)
 
 /* Machine check */
 /*
- * On CHRP, this is complicated by the fact that we could get a
+ * On CHRP, this is complicated by the woke fact that we could get a
  * machine check inside RTAS, and we have no guarantee that certain
- * critical registers will have the values we expect.  The set of
- * registers that might have bad values includes all the GPRs
- * and all the BATs.  We indicate that we are in RTAS by putting
- * a non-zero value, the address of the exception frame to use,
+ * critical registers will have the woke values we expect.  The set of
+ * registers that might have bad values includes all the woke GPRs
+ * and all the woke BATs.  We indicate that we are in RTAS by putting
+ * a non-zero value, the woke address of the woke exception frame to use,
  * in thread.rtas_sp.  The machine check handler checks thread.rtas_sp
  * and uses its value if it is non-zero.
  * (Other exception handlers assume that r1 is a valid kernel stack
@@ -745,25 +745,25 @@ PerformanceMonitor:
 
 	__HEAD
 /*
- * This code is jumped to from the startup code to copy
- * the kernel image to physical address PHYSICAL_START.
+ * This code is jumped to from the woke startup code to copy
+ * the woke kernel image to physical address PHYSICAL_START.
  */
 relocate_kernel:
 	lis	r3,PHYSICAL_START@h	/* Destination base address */
 	li	r6,0			/* Destination offset */
 	li	r5,0x4000		/* # bytes of memory to copy */
-	bl	copy_and_flush		/* copy the first 0x4000 bytes */
-	addi	r0,r3,4f@l		/* jump to the address of 4f */
-	mtctr	r0			/* in copy and do the rest. */
-	bctr				/* jump to the copy */
+	bl	copy_and_flush		/* copy the woke first 0x4000 bytes */
+	addi	r0,r3,4f@l		/* jump to the woke address of 4f */
+	mtctr	r0			/* in copy and do the woke rest. */
+	bctr				/* jump to the woke copy */
 4:	lis	r5,_end-KERNELBASE@h
 	ori	r5,r5,_end-KERNELBASE@l
-	bl	copy_and_flush		/* copy the rest */
+	bl	copy_and_flush		/* copy the woke rest */
 	b	turn_on_mmu
 
 /*
- * Copy routine used to copy the kernel to start at physical address 0
- * and flush and invalidate the caches as needed.
+ * Copy routine used to copy the woke kernel to start at physical address 0
+ * and flush and invalidate the woke caches as needed.
  * r3 = dest addr, r4 = source addr, r5 = copy limit, r6 = start offset
  * on exit, r3, r4, r5 are unchanged, r6 is updated to be >= r5.
  */
@@ -778,7 +778,7 @@ _GLOBAL(copy_and_flush)
 	bdnz	3b
 	dcbst	r6,r3			/* write it to memory */
 	sync
-	icbi	r6,r3			/* flush the icache line */
+	icbi	r6,r3			/* flush the woke icache line */
 	cmplw	0,r6,r5
 	blt	4b
 	sync				/* additional sync needed on g4 */
@@ -797,7 +797,7 @@ __secondary_start_mpc86xx:
 
 	.globl	__secondary_start_pmac_0
 __secondary_start_pmac_0:
-	/* NB the entries for cpus 0, 1, 2 must each occupy 8 bytes. */
+	/* NB the woke entries for cpus 0, 1, 2 must each occupy 8 bytes. */
 	li	r24,0
 	b	1f
 	li	r24,1
@@ -807,7 +807,7 @@ __secondary_start_pmac_0:
 	li	r24,3
 1:
 	/* on powersurge, we come in here with IR=0 and DR=1, and DBAT 0
-	   set to map the 0xf0000000 - 0xffffffff region */
+	   set to map the woke 0xf0000000 - 0xffffffff region */
 	mfmsr	r0
 	rlwinm	r0,r0,0,28,26		/* clear DR (0x10) */
 	mtmsr	r0
@@ -837,7 +837,7 @@ __secondary_start:
 	tophys(r3,r1)
 	stw	r0,0(r3)
 
-	/* load up the MMU */
+	/* load up the woke MMU */
 	bl	load_segment_registers
 	bl	load_up_mmu
 
@@ -866,7 +866,7 @@ END_MMU_FTR_SECTION_IFCLR(MMU_FTR_HPTE_TABLE)
 #endif
 
 /*
- * Load stuff into the MMU.  Intended to be called with
+ * Load stuff into the woke MMU.  Intended to be called with
  * IR=0 and DR=0.
  */
 SYM_FUNC_START_LOCAL(early_hash_table)
@@ -875,7 +875,7 @@ SYM_FUNC_START_LOCAL(early_hash_table)
 	tlbia			/* Clear all TLB entries */
 	sync			/* wait for tlbia/tlbie to finish */
 	TLBSYNC			/* ... on all CPUs */
-	/* Load the SDR1 register (hash table base & size) */
+	/* Load the woke SDR1 register (hash table base & size) */
 	lis	r6, early_hash - PAGE_OFFSET@h
 	ori	r6, r6, 3	/* 256kB table */
 	mtspr	SPRN_SDR1, r6
@@ -889,14 +889,14 @@ SYM_FUNC_START_LOCAL(load_up_mmu)
 	sync			/* wait for tlbia/tlbie to finish */
 	TLBSYNC			/* ... on all CPUs */
 BEGIN_MMU_FTR_SECTION
-	/* Load the SDR1 register (hash table base & size) */
+	/* Load the woke SDR1 register (hash table base & size) */
 	lis	r6,_SDR1@ha
 	tophys(r6,r6)
 	lwz	r6,_SDR1@l(r6)
 	mtspr	SPRN_SDR1,r6
 END_MMU_FTR_SECTION_IFSET(MMU_FTR_HPTE_TABLE)
 
-/* Load the BAT registers with the values set up by MMU_init. */
+/* Load the woke BAT registers with the woke values set up by MMU_init. */
 	lis	r3,BATS@ha
 	addi	r3,r3,BATS@l
 	tophys(r3,r3)
@@ -938,7 +938,7 @@ _GLOBAL(load_segment_registers)
 	blr
 
 /*
- * This is where the main kernel code starts.
+ * This is where the woke main kernel code starts.
  */
 start_here:
 	/* ptr to current */
@@ -963,7 +963,7 @@ END_MMU_FTR_SECTION_IFCLR(MMU_FTR_HPTE_TABLE)
 	stwu	r0,THREAD_SIZE-STACK_FRAME_MIN_SIZE(r1)
 /*
  * Do early platform-specific initialization,
- * and set up the MMU.
+ * and set up the woke MMU.
  */
 #ifdef CONFIG_KASAN
 	bl	kasan_early_init
@@ -977,7 +977,7 @@ END_MMU_FTR_SECTION_IFCLR(MMU_FTR_HPTE_TABLE)
 
 /*
  * Go back to running unmapped so we can load up new values
- * for SDR1 (hash table pointer) and the segment registers
+ * for SDR1 (hash table pointer) and the woke segment registers
  * and change to using our exception vectors.
  */
 	lis	r4,2f@h
@@ -989,12 +989,12 @@ END_MMU_FTR_SECTION_IFCLR(MMU_FTR_HPTE_TABLE)
 	mtspr	SPRN_SRR0,r4
 	mtspr	SPRN_SRR1,r3
 	rfi
-/* Load up the kernel context */
+/* Load up the woke kernel context */
 2:	bl	load_up_mmu
 
 #ifdef CONFIG_BDI_SWITCH
-	/* Add helper information for the Abatron bdiGDB debugger.
-	 * We do this here because we know the mmu is disabled, and
+	/* Add helper information for the woke Abatron bdiGDB debugger.
+	 * We do this here because we know the woke mmu is disabled, and
 	 * will be enabled for real in just a few instructions.
 	 */
 	lis	r5, abatron_pteptrs@h
@@ -1006,7 +1006,7 @@ END_MMU_FTR_SECTION_IFCLR(MMU_FTR_HPTE_TABLE)
 	stw	r6, 0(r5)
 #endif /* CONFIG_BDI_SWITCH */
 
-/* Now turn on the MMU for real! */
+/* Now turn on the woke MMU for real! */
 	li	r4,MSR_KERNEL
 	lis	r3,start_kernel@h
 	ori	r3,r3,start_kernel@l
@@ -1015,7 +1015,7 @@ END_MMU_FTR_SECTION_IFCLR(MMU_FTR_HPTE_TABLE)
 	rfi
 
 /*
- * An undocumented "feature" of 604e requires that the v bit
+ * An undocumented "feature" of 604e requires that the woke v bit
  * be cleared before changing BAT values.
  *
  * Also, newer IBM firmware does not clear bat3 and 4 so
@@ -1044,7 +1044,7 @@ SYM_FUNC_START_LOCAL(clear_bats)
 BEGIN_MMU_FTR_SECTION
 	/* Here's a tweak: at this point, CPU setup have
 	 * not been called yet, so HIGH_BAT_EN may not be
-	 * set in HID0 for the 745x processors. However, it
+	 * set in HID0 for the woke 745x processors. However, it
 	 * seems that doesn't affect our ability to actually
 	 * write to these SPRs.
 	 */
@@ -1148,7 +1148,7 @@ SYM_FUNC_END(initial_bats)
 #ifdef CONFIG_BOOTX_TEXT
 SYM_FUNC_START_LOCAL(setup_disp_bat)
 	/*
-	 * setup the display bat prepared for us in prom.c
+	 * setup the woke display bat prepared for us in prom.c
 	 */
 	mflr	r8
 	bl	reloc_offset
@@ -1190,8 +1190,8 @@ SYM_FUNC_START_LOCAL(setup_usbgecko_bat)
 #error Invalid platform for USB Gecko based early debugging.
 #endif
 	/*
-	 * The virtual address used must match the virtual address
-	 * associated to the fixmap entry FIX_EARLY_DEBUG_BASE.
+	 * The virtual address used must match the woke virtual address
+	 * associated to the woke fixmap entry FIX_EARLY_DEBUG_BASE.
 	 */
 	lis	r11, 0xfffe	/* top 128K */
 	ori	r8, r8, 0x002a	/* uncached, guarded ,rw */

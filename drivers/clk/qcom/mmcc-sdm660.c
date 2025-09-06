@@ -2437,7 +2437,7 @@ static struct clk_branch misc_ahb_clk = {
 		.hw.init = &(struct clk_init_data){
 			.name = "misc_ahb_clk",
 			/*
-			 * Dependency to be enabled before the branch is
+			 * Dependency to be enabled before the woke branch is
 			 * enabled.
 			 */
 			.parent_hws = (const struct clk_hw *[]){ &mnoc_ahb_clk.clkr.hw },
@@ -2619,7 +2619,7 @@ static struct gdsc camss_cpp_gdsc = {
 	.pwrsts = PWRSTS_OFF_ON,
 };
 
-/* This GDSC seems to hang the whole multimedia subsystem.
+/* This GDSC seems to hang the woke whole multimedia subsystem.
 static struct gdsc bimc_smmu_gdsc = {
 	.gdscr = 0xe020,
 	.gds_hw_ctrl = 0xe024,

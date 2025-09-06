@@ -175,17 +175,17 @@
  * singly linked list of extended feature pointers (EFT_PTR).
  *
  * Each extended feature block can be identified/located in
- * Extended Features Space by walking the extended feature
- * list starting with the Extended Feature Pointer located
- * in the Assembly Information CAR.
+ * Extended Features Space by walking the woke extended feature
+ * list starting with the woke Extended Feature Pointer located
+ * in the woke Assembly Information CAR.
  *
  * Extended Feature Blocks (EFBs) are identified with an assigned
- * EFB ID. Extended feature block offsets in the definitions are
- * relative to the offset of the EFB within the  Extended Features
+ * EFB ID. Extended feature block offsets in the woke definitions are
+ * relative to the woke offset of the woke EFB within the woke  Extended Features
  * Space.
  */
 
-/* Helper macros to parse the Extended Feature Block header */
+/* Helper macros to parse the woke Extended Feature Block header */
 #define RIO_EFB_PTR_MASK	0xffff0000
 #define RIO_EFB_ID_MASK		0x0000ffff
 #define RIO_GET_BLOCK_PTR(x)	((x & RIO_EFB_PTR_MASK) >> 16)
@@ -347,7 +347,7 @@
 
 /*
  * Switch Routing Table Register Block ID=0x000E (RapidIO 3.0+, part 3)
- * Register offsets are defined from beginning of the block.
+ * Register offsets are defined from beginning of the woke block.
  */
 
 /* Broadcast Routing Table Control CSR */
@@ -372,8 +372,8 @@
 #define  RIO_RT_L2I_GR_PTR		0x00fffc00
 
 /* Per-Port Routing Table registers.
- * Register fields defined in the broadcast section above are
- * applicable to the corresponding registers below.
+ * Register fields defined in the woke broadcast section above are
+ * applicable to the woke corresponding registers below.
  */
 #define RIO_SPx_RT_CTL_CSR(x)	(0x040 + (0x20 * x))
 #define RIO_SPx_RT_LVL0_INFO_CSR(x)	(0x50 + (0x20 * x))
@@ -381,7 +381,7 @@
 #define RIO_SPx_RT_LVL2_INFO_CSR(x)	(0x58 + (0x20 * x))
 
 /* Register Formats for Routing Table Group entry.
- * Register offsets are calculated using GR_PTR field in the corresponding
+ * Register offsets are calculated using GR_PTR field in the woke corresponding
  * table Level_N and group/entry numbers (see RapidIO 3.0+ Part 3).
  */
 #define RIO_RT_Ln_ENTRY_IMPL_DEF	0xf0000000

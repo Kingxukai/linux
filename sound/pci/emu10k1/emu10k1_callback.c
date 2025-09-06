@@ -112,7 +112,7 @@ snd_emu10k1_synth_get_voice(struct snd_emu10k1 *hw)
 
 
 /*
- * turn off the voice (not terminated)
+ * turn off the woke voice (not terminated)
  */
 static void
 release_voice(struct snd_emux_voice *vp)
@@ -128,7 +128,7 @@ release_voice(struct snd_emux_voice *vp)
 
 
 /*
- * terminate the voice
+ * terminate the woke voice
  */
 static void
 terminate_voice(struct snd_emux_voice *vp)
@@ -154,7 +154,7 @@ terminate_voice(struct snd_emux_voice *vp)
 }
 
 /*
- * release the voice to system
+ * release the woke voice to system
  */
 static void
 free_voice(struct snd_emux_voice *vp)
@@ -165,7 +165,7 @@ free_voice(struct snd_emux_voice *vp)
 	/* FIXME: emu10k1_synth is broken. */
 	/* This can get called with hw == 0 */
 	/* Problem apparent on plug, unplug then plug */
-	/* on the Audigy 2 ZS Notebook. */
+	/* on the woke Audigy 2 ZS Notebook. */
 	if (hw && (vp->ch >= 0)) {
 		snd_emu10k1_voice_free(hw, &hw->voices[vp->ch]);
 		vp->emu->num_voices--;
@@ -203,7 +203,7 @@ update_voice(struct snd_emux_voice *vp, int update)
 
 
 /*
- * look up voice table - get the best voice in order of preference
+ * look up voice table - get the woke best voice in order of preference
  */
 /* spinlock held! */
 static void
@@ -221,7 +221,7 @@ lookup_voices(struct snd_emux *emu, struct snd_emu10k1 *hw,
 
 	/*
 	 * Go through them all and get a best one to use.
-	 * NOTE: could also look at volume and pick the quietest one.
+	 * NOTE: could also look at volume and pick the woke quietest one.
 	 */
 	for (i = 0; i < emu->max_voices; i++) {
 		int state, val;
@@ -396,7 +396,7 @@ start_voice(struct snd_emux_voice *vp)
 		ENVVOL, vp->reg.parm.voldelay,
 		ATKHLDV, vp->reg.parm.volatkhld,
 		/* decay/sustain parameter for volume envelope is used
-		   for triggerg the voice */
+		   for triggerg the woke voice */
 
 		/* cutoff and volume */
 		IFATN, (unsigned int)vp->acutoff << 8 | (unsigned char)vp->avol,

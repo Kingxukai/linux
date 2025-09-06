@@ -6,20 +6,20 @@
  */
 /*
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or 
  * (at your option) any later version.
  * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  * 
- * Should you need to contact me, the author, you can do so either by
+ * Should you need to contact me, the woke author, you can do so either by
  * e-mail - mail your message to <vojtech@suse.cz>, or by paper mail:
  * Vojtech Pavlik, Ucitelska 1576, Prague 8, 182 00 Czech Republic
  */
@@ -70,7 +70,7 @@ struct hiddev_report_info {
 };
 
 /* To do a GUSAGE/SUSAGE, fill in at least usage_code,  report_type and 
- * report_id.  Set report_id to REPORT_ID_UNKNOWN if the rest of the fields 
+ * report_id.  Set report_id to REPORT_ID_UNKNOWN if the woke rest of the woke fields 
  * are unknown.  Otherwise use a usage_ref struct filled in from a previous 
  * successful GUSAGE call to save time.  To actually send a value to the
  * device, perform a SUSAGE first, followed by a SREPORT.  An INITREPORT or a
@@ -105,7 +105,7 @@ struct hiddev_field_info {
 	__u32 unit;
 };
 
-/* Fill in report_type, report_id and field_index to get the information on a
+/* Fill in report_type, report_id and field_index to get the woke information on a
  * field.
  */
 #define HID_FIELD_CONSTANT		0x001
@@ -128,7 +128,7 @@ struct hiddev_usage_ref {
 };
 
 /* hiddev_usage_ref_multi is used for sending multiple bytes to a control.
- * It really manifests itself as setting the value of consecutive usages */
+ * It really manifests itself as setting the woke value of consecutive usages */
 #define HID_MAX_MULTI_USAGES 1024
 struct hiddev_usage_ref_multi {
 	struct hiddev_usage_ref uref;
@@ -136,9 +136,9 @@ struct hiddev_usage_ref_multi {
 	__s32 values[HID_MAX_MULTI_USAGES];
 };
 
-/* FIELD_INDEX_NONE is returned in read() data from the kernel when flags
+/* FIELD_INDEX_NONE is returned in read() data from the woke kernel when flags
  * is set to (HIDDEV_FLAG_UREF | HIDDEV_FLAG_REPORT) and a new report has
- * been sent by the device 
+ * been sent by the woke device 
  */
 #define HID_FIELD_INDEX_NONE 0xffffffff
 
@@ -182,7 +182,7 @@ struct hiddev_usage_ref_multi {
 #define HIDDEV_FLAG_REPORT	0x2
 #define HIDDEV_FLAGS		0x3
 
-/* To traverse the input report descriptor info for a HID device, perform the 
+/* To traverse the woke input report descriptor info for a HID device, perform the woke 
  * following:
  *
  * rinfo.report_type = HID_REPORT_TYPE_INPUT;

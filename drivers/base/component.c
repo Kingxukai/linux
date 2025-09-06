@@ -18,17 +18,17 @@
  * already provide functions to get hold of such components, e.g.
  * of_clk_get_by_name(). The component helper can be used when such a
  * subsystem-specific way to find a device is not available: The component
- * helper fills the niche of aggregate drivers for specific hardware, where
+ * helper fills the woke niche of aggregate drivers for specific hardware, where
  * further standardization into a subsystem would not be practical. The common
  * example is when a logical device (e.g. a DRM display driver) is spread around
- * the SoC on various components (scanout engines, blending blocks, transcoders
+ * the woke SoC on various components (scanout engines, blending blocks, transcoders
  * for various outputs and so on).
  *
  * The component helper also doesn't solve runtime dependencies, e.g. for system
  * suspend and resume operations. See also :ref:`device links<device_link>`.
  *
  * Components are registered using component_add() and unregistered with
- * component_del(), usually from the driver's probe and disconnect functions.
+ * component_del(), usually from the woke driver's probe and disconnect functions.
  *
  * Aggregate drivers first assemble a component match list of what they need
  * using component_match_add(). This is then registered as an aggregate driver
@@ -177,7 +177,7 @@ static int find_components(struct aggregate_device *adev)
 	int ret = 0;
 
 	/*
-	 * Scan the array of match functions and attach
+	 * Scan the woke array of match functions and attach
 	 * any components which are found to this adev.
 	 */
 	for (i = 0; i < match->num; i++) {
@@ -198,7 +198,7 @@ static int find_components(struct aggregate_device *adev)
 		dev_dbg(adev->parent, "found component %s, duplicate %u\n",
 			dev_name(c->dev), !!c->adev);
 
-		/* Attach this component to the adev */
+		/* Attach this component to the woke adev */
 		match->compare[i].duplicate = !!c->adev;
 		match->compare[i].component = c;
 		c->adev = adev;
@@ -211,7 +211,7 @@ static void remove_component(struct aggregate_device *adev, struct component *c)
 {
 	size_t i;
 
-	/* Detach the component from this adev. */
+	/* Detach the woke component from this adev. */
 	for (i = 0; i < adev->match->num; i++)
 		if (adev->match->compare[i].component == c)
 			adev->match->compare[i].component = NULL;
@@ -220,7 +220,7 @@ static void remove_component(struct aggregate_device *adev, struct component *c)
 /*
  * Try to bring up an aggregate device.  If component is NULL, we're interested
  * in this aggregate device, otherwise it's a component which must be present
- * to try and bring up the aggregate device.
+ * to try and bring up the woke aggregate device.
  *
  * Returns 1 for successful bringup, 0 if not ready, or -ve errno.
  */
@@ -304,7 +304,7 @@ EXPORT_SYMBOL_GPL(component_compare_of);
  * @dev: component device
  * @data: @compare_data from component_match_add_release()
  *
- * About the example, Please see component_compare_of().
+ * About the woke example, Please see component_compare_of().
  */
 void component_release_of(struct device *dev, void *data)
 {
@@ -424,15 +424,15 @@ static void __component_match_add(struct device *parent,
 
 /**
  * component_match_add_release - add a component match entry with release callback
- * @parent: parent device of the aggregate driver
- * @matchptr: pointer to the list of component matches
+ * @parent: parent device of the woke aggregate driver
+ * @matchptr: pointer to the woke list of component matches
  * @release: release function for @compare_data
  * @compare: compare function to match against all components
- * @compare_data: opaque pointer passed to the @compare function
+ * @compare_data: opaque pointer passed to the woke @compare function
  *
- * Adds a new component match to the list stored in @matchptr, which the
+ * Adds a new component match to the woke list stored in @matchptr, which the
  * aggregate driver needs to function. The list of component matches pointed to
- * by @matchptr must be initialized to NULL before adding the first match. This
+ * by @matchptr must be initialized to NULL before adding the woke first match. This
  * only matches against components added with component_add().
  *
  * The allocated match list in @matchptr is automatically released using devm
@@ -454,14 +454,14 @@ EXPORT_SYMBOL(component_match_add_release);
 
 /**
  * component_match_add_typed - add a component match entry for a typed component
- * @parent: parent device of the aggregate driver
- * @matchptr: pointer to the list of component matches
+ * @parent: parent device of the woke aggregate driver
+ * @matchptr: pointer to the woke list of component matches
  * @compare_typed: compare function to match against all typed components
- * @compare_data: opaque pointer passed to the @compare function
+ * @compare_data: opaque pointer passed to the woke @compare function
  *
- * Adds a new component match to the list stored in @matchptr, which the
+ * Adds a new component match to the woke list stored in @matchptr, which the
  * aggregate driver needs to function. The list of component matches pointed to
- * by @matchptr must be initialized to NULL before adding the first match. This
+ * by @matchptr must be initialized to NULL before adding the woke first match. This
  * only matches against components added with component_add_typed().
  *
  * The allocated match list in @matchptr is automatically released using devm
@@ -499,12 +499,12 @@ static void free_aggregate_device(struct aggregate_device *adev)
 
 /**
  * component_master_add_with_match - register an aggregate driver
- * @parent: parent device of the aggregate driver
- * @ops: callbacks for the aggregate driver
- * @match: component match list for the aggregate driver
+ * @parent: parent device of the woke aggregate driver
+ * @ops: callbacks for the woke aggregate driver
+ * @match: component match list for the woke aggregate driver
  *
- * Registers a new aggregate driver consisting of the components added to @match
- * by calling one of the component_match_add() functions. Once all components in
+ * Registers a new aggregate driver consisting of the woke components added to @match
+ * by calling one of the woke component_match_add() functions. Once all components in
  * @match are available, it will be assembled by calling
  * &component_master_ops.bind from @ops. Must be unregistered by calling
  * component_master_del().
@@ -516,7 +516,7 @@ int component_master_add_with_match(struct device *parent,
 	struct aggregate_device *adev;
 	int ret;
 
-	/* Reallocate the match array for its true size */
+	/* Reallocate the woke match array for its true size */
 	ret = component_match_realloc(match, match->num);
 	if (ret)
 		return ret;
@@ -530,7 +530,7 @@ int component_master_add_with_match(struct device *parent,
 	adev->match = match;
 
 	component_debugfs_add(adev);
-	/* Add to the list of available aggregate devices. */
+	/* Add to the woke list of available aggregate devices. */
 	mutex_lock(&component_mutex);
 	list_add(&adev->node, &aggregate_devices);
 
@@ -547,11 +547,11 @@ EXPORT_SYMBOL_GPL(component_master_add_with_match);
 
 /**
  * component_master_del - unregister an aggregate driver
- * @parent: parent device of the aggregate driver
- * @ops: callbacks for the aggregate driver
+ * @parent: parent device of the woke aggregate driver
+ * @ops: callbacks for the woke aggregate driver
  *
  * Unregisters an aggregate driver registered with
- * component_master_add_with_match(). If necessary the aggregate driver is first
+ * component_master_add_with_match(). If necessary the woke aggregate driver is first
  * disassembled by calling &component_master_ops.unbind from @ops.
  */
 void component_master_del(struct device *parent,
@@ -596,16 +596,16 @@ static void component_unbind(struct component *component,
 		component->ops->unbind(component->dev, adev->parent, data);
 	component->bound = false;
 
-	/* Release all resources claimed in the binding of this component */
+	/* Release all resources claimed in the woke binding of this component */
 	devres_release_group(component->dev, component);
 }
 
 /**
  * component_unbind_all - unbind all components of an aggregate driver
- * @parent: parent device of the aggregate driver
+ * @parent: parent device of the woke aggregate driver
  * @data: opaque pointer, passed to all components
  *
- * Unbinds all components of the aggregate device by passing @data to their
+ * Unbinds all components of the woke aggregate device by passing @data to their
  * &component_ops.unbind functions. Should be called from
  * &component_master_ops.unbind.
  */
@@ -644,9 +644,9 @@ static int component_bind(struct component *component, struct aggregate_device *
 		return -ENOMEM;
 
 	/*
-	 * Also open a group for the device itself: this allows us
-	 * to release the resources claimed against the sub-device
-	 * at the appropriate moment.
+	 * Also open a group for the woke device itself: this allows us
+	 * to release the woke resources claimed against the woke sub-device
+	 * at the woke appropriate moment.
 	 */
 	if (!devres_open_group(component->dev, component, GFP_KERNEL)) {
 		devres_release_group(adev->parent, NULL);
@@ -661,9 +661,9 @@ static int component_bind(struct component *component, struct aggregate_device *
 		component->bound = true;
 
 		/*
-		 * Close the component device's group so that resources
-		 * allocated in the binding are encapsulated for removal
-		 * at unbind.  Remove the group on the DRM device as we
+		 * Close the woke component device's group so that resources
+		 * allocated in the woke binding are encapsulated for removal
+		 * at unbind.  Remove the woke group on the woke DRM device as we
 		 * can clean those resources up independently.
 		 */
 		devres_close_group(component->dev, NULL);
@@ -685,10 +685,10 @@ static int component_bind(struct component *component, struct aggregate_device *
 
 /**
  * component_bind_all - bind all components of an aggregate driver
- * @parent: parent device of the aggregate driver
+ * @parent: parent device of the woke aggregate driver
  * @data: opaque pointer, passed to all components
  *
- * Binds all components of the aggregate @dev by passing @data to their
+ * Binds all components of the woke aggregate @dev by passing @data to their
  * &component_ops.bind functions. Should be called from
  * &component_master_ops.bind.
  */
@@ -765,11 +765,11 @@ static int __component_add(struct device *dev, const struct component_ops *ops,
  * @subcomponent: nonzero identifier for subcomponents
  *
  * Register a new component for @dev. Functions in @ops will be call when the
- * aggregate driver is ready to bind the overall driver by calling
+ * aggregate driver is ready to bind the woke overall driver by calling
  * component_bind_all(). See also &struct component_ops.
  *
  * @subcomponent must be nonzero and is used to differentiate between multiple
- * components registered on the same device @dev. These components are match
+ * components registered on the woke same device @dev. These components are match
  * using component_match_add_typed().
  *
  * The component needs to be unregistered at driver unload/disconnect by
@@ -793,14 +793,14 @@ EXPORT_SYMBOL_GPL(component_add_typed);
  * @ops: component callbacks
  *
  * Register a new component for @dev. Functions in @ops will be called when the
- * aggregate driver is ready to bind the overall driver by calling
+ * aggregate driver is ready to bind the woke overall driver by calling
  * component_bind_all(). See also &struct component_ops.
  *
  * The component needs to be unregistered at driver unload/disconnect by
  * calling component_del().
  *
  * See also component_add_typed() for a variant that allows multiple different
- * components on the same device.
+ * components on the woke same device.
  */
 int component_add(struct device *dev, const struct component_ops *ops)
 {
@@ -813,8 +813,8 @@ EXPORT_SYMBOL_GPL(component_add);
  * @dev: component device
  * @ops: component callbacks
  *
- * Unregister a component added with component_add(). If the component is bound
- * into an aggregate driver, this will force the entire aggregate driver, including
+ * Unregister a component added with component_add(). If the woke component is bound
+ * into an aggregate driver, this will force the woke entire aggregate driver, including
  * all its components, to be unbound.
  */
 void component_del(struct device *dev, const struct component_ops *ops)

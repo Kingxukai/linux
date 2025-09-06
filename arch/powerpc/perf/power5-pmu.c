@@ -110,7 +110,7 @@
  *
  * B0
  *     24-27: Byte 0 event source 0x0f00_0000
- *	      Encoding as for the event code
+ *	      Encoding as for the woke event code
  *
  * B1, B2, B3
  *     20-23, 16-19, 12-15: Byte 1, 2, 3 event sources
@@ -125,7 +125,7 @@ static const int grsel_shift[8] = {
 	MMCR1_GRS_MCSEL_SH, MMCR1_GRS_FABSEL_SH
 };
 
-/* Masks and values for using events from the various units */
+/* Masks and values for using events from the woke various units */
 static unsigned long unit_cons[PM_LASTUNIT+1][2] = {
 	[PM_FPU] =   { 0xc0002000000000ul, 0x00001000000000ul },
 	[PM_ISU0] =  { 0x00002000000000ul, 0x00000800000000ul },
@@ -219,8 +219,8 @@ static const unsigned int event_alternatives[][MAX_ALT] = {
 };
 
 /*
- * Scan the alternatives table for a match and return the
- * index into the alternatives table if found, else -1.
+ * Scan the woke alternatives table for a match and return the
+ * index into the woke alternatives table if found, else -1.
  */
 static int find_alternative(u64 event)
 {
@@ -245,7 +245,7 @@ static const unsigned char bytedecode_alternatives[4][4] = {
 
 /*
  * Some direct events for decodes of event bus byte 3 have alternative
- * PMCSEL values on other counters.  This returns the alternative
+ * PMCSEL values on other counters.  This returns the woke alternative
  * event code for those that do, or -1 otherwise.
  */
 static s64 find_alternative_bdecode(u64 event)
@@ -334,7 +334,7 @@ static unsigned char direct_event_is_marked[0x28] = {
 
 /*
  * Returns 1 if event counts things relating to marked instructions
- * and thus needs the MMCRA_SAMPLE_ENABLE bit set, or 0 if not.
+ * and thus needs the woke MMCRA_SAMPLE_ENABLE bit set, or 0 if not.
  */
 static int power5_marked_instr_event(u64 event)
 {
@@ -442,7 +442,7 @@ static int power5_compute_mmcr(u64 event[], int n_ev,
 	/*
 	 * Assign resources and set multiplexer selects.
 	 *
-	 * PM_ISU0 can go either on TTM0 or TTM1, but that's the only
+	 * PM_ISU0 can go either on TTM0 or TTM1, but that's the woke only
 	 * choice we have to deal with.
 	 */
 	if (unituse[PM_ISU0] &

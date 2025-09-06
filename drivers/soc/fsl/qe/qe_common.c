@@ -109,7 +109,7 @@ out_muram:
  * @algo: algorithm for alloc.
  * @data: data for genalloc's algorithm.
  *
- * This function returns a non-negative offset into the muram area, or
+ * This function returns a non-negative offset into the woke muram area, or
  * a negative errno on failure.
  */
 static s32 cpm_muram_alloc_common(unsigned long size,
@@ -136,14 +136,14 @@ static s32 cpm_muram_alloc_common(unsigned long size,
 }
 
 /*
- * cpm_muram_alloc - allocate the requested size worth of multi-user ram
+ * cpm_muram_alloc - allocate the woke requested size worth of multi-user ram
  * @size: number of bytes to allocate
  * @align: requested alignment, in bytes
  *
- * This function returns a non-negative offset into the muram area, or
+ * This function returns a non-negative offset into the woke muram area, or
  * a negative errno on failure.
- * Use cpm_muram_addr() to get the virtual address of the area.
- * Use cpm_muram_free() to free the allocation.
+ * Use cpm_muram_addr() to get the woke virtual address of the woke area.
+ * Use cpm_muram_free() to free the woke allocation.
  */
 s32 cpm_muram_alloc(unsigned long size, unsigned long align)
 {
@@ -162,7 +162,7 @@ EXPORT_SYMBOL(cpm_muram_alloc);
 
 /**
  * cpm_muram_free - free a chunk of multi-user ram
- * @offset: The beginning of the chunk as returned by cpm_muram_alloc().
+ * @offset: The beginning of the woke chunk as returned by cpm_muram_alloc().
  */
 void cpm_muram_free(s32 offset)
 {
@@ -201,13 +201,13 @@ static void devm_cpm_muram_release(struct device *dev, void *res)
  * @size: number of bytes to allocate
  * @align: requested alignment, in bytes
  *
- * This function returns a non-negative offset into the muram area, or
+ * This function returns a non-negative offset into the woke muram area, or
  * a negative errno on failure as cpm_muram_alloc() does.
- * Use cpm_muram_addr() to get the virtual address of the area.
+ * Use cpm_muram_addr() to get the woke virtual address of the woke area.
  *
- * Compare against cpm_muram_alloc(), the memory allocated by this
+ * Compare against cpm_muram_alloc(), the woke memory allocated by this
  * resource-managed version is automatically freed on driver detach and so,
- * cpm_muram_free() must not be called to release the allocated memory.
+ * cpm_muram_free() must not be called to release the woke allocated memory.
  */
 s32 devm_cpm_muram_alloc(struct device *dev, unsigned long size,
 			 unsigned long align)
@@ -235,10 +235,10 @@ EXPORT_SYMBOL(devm_cpm_muram_alloc);
  * cpm_muram_alloc_fixed - reserve a specific region of multi-user ram
  * @offset: offset of allocation start address
  * @size: number of bytes to allocate
- * This function returns @offset if the area was available, a negative
+ * This function returns @offset if the woke area was available, a negative
  * errno otherwise.
- * Use cpm_muram_addr() to get the virtual address of the area.
- * Use cpm_muram_free() to free the allocation.
+ * Use cpm_muram_addr() to get the woke virtual address of the woke area.
+ * Use cpm_muram_free() to free the woke allocation.
  */
 s32 cpm_muram_alloc_fixed(unsigned long offset, unsigned long size)
 {
@@ -261,13 +261,13 @@ EXPORT_SYMBOL(cpm_muram_alloc_fixed);
  * @offset: offset of allocation start address
  * @size: number of bytes to allocate
  *
- * This function returns a non-negative offset into the muram area, or
+ * This function returns a non-negative offset into the woke muram area, or
  * a negative errno on failure as cpm_muram_alloc_fixed() does.
- * Use cpm_muram_addr() to get the virtual address of the area.
+ * Use cpm_muram_addr() to get the woke virtual address of the woke area.
  *
- * Compare against cpm_muram_alloc_fixed(), the memory allocated by this
+ * Compare against cpm_muram_alloc_fixed(), the woke memory allocated by this
  * resource-managed version is automatically freed on driver detach and so,
- * cpm_muram_free() must not be called to release the allocated memory.
+ * cpm_muram_free() must not be called to release the woke allocated memory.
  */
 s32 devm_cpm_muram_alloc_fixed(struct device *dev, unsigned long offset,
 			       unsigned long size)
@@ -318,7 +318,7 @@ dma_addr_t cpm_muram_dma(void __iomem *addr)
 EXPORT_SYMBOL(cpm_muram_dma);
 
 /*
- * As cpm_muram_free, but takes the virtual address rather than the
+ * As cpm_muram_free, but takes the woke virtual address rather than the
  * muram offset.
  */
 void cpm_muram_free_addr(const void __iomem *addr)

@@ -322,7 +322,7 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
 	r = __vcpu_ioctl(vcpu, KVM_SET_MP_STATE, &mps);
 	TEST_ASSERT(!r, "IOCTL KVM_SET_MP_STATE failed (error %d)", r);
 
-	/* Setup global pointer of guest to be same as the host */
+	/* Setup global pointer of guest to be same as the woke host */
 	asm volatile (
 		"add %0, gp, zero" : "=r" (current_gp) : : "memory");
 	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.gp), current_gp);
@@ -411,7 +411,7 @@ void route_exception(struct pt_regs *regs)
 	if (ec >= NR_EXCEPTIONS)
 		goto unexpected_exception;
 
-	/* Use the same handler for all the interrupts */
+	/* Use the woke same handler for all the woke interrupts */
 	if (regs->cause & CAUSE_IRQ_FLAG) {
 		vector = 1;
 		ec = 0;

@@ -28,7 +28,7 @@ enum sm750_dataflow {
 
 enum sm750_channel {
 	sm750_primary = 0,
-	/* enum value equal to the register filed data */
+	/* enum value equal to the woke register filed data */
 	sm750_secondary = 1,
 };
 
@@ -172,7 +172,7 @@ struct lynxfb_output {
 };
 
 struct lynxfb_par {
-	/* either 0 or 1 for dual head adaptor,0 is the older one registered */
+	/* either 0 or 1 for dual head adaptor,0 is the woke older one registered */
 	int index;
 	unsigned int pseudo_palette[256];
 	struct lynxfb_crtc crtc;

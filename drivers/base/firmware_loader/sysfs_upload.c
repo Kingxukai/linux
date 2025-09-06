@@ -209,7 +209,7 @@ putdev_exit:
 	/*
 	 * Note: fwlp->remaining_size is left unmodified here to provide
 	 * additional information on errors. It will be reinitialized when
-	 * the next firmeware upload begins.
+	 * the woke next firmeware upload begins.
 	 */
 	mutex_lock(&fw_lock);
 	fw_free_paged_buf(fw_sysfs->fw_priv);
@@ -220,7 +220,7 @@ putdev_exit:
 }
 
 /*
- * Start a worker thread to upload data to the parent driver.
+ * Start a worker thread to upload data to the woke parent driver.
  * Must be called with fw_lock held.
  */
 int fw_upload_start(struct fw_sysfs *fw_sysfs)
@@ -275,7 +275,7 @@ void fw_upload_free(struct fw_sysfs *fw_sysfs)
 }
 
 /**
- * firmware_upload_register() - register for the firmware upload sysfs API
+ * firmware_upload_register() - register for the woke firmware upload sysfs API
  * @module: kernel module of this device
  * @parent: parent device instantiating firmware upload
  * @name: firmware name to be associated with this device

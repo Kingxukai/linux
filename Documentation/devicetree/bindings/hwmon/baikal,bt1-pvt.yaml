@@ -14,12 +14,12 @@ description: |
   Baikal-T1 SoC provides an embedded process, voltage and temperature
   sensor to monitor an internal SoC environment (chip temperature, supply
   voltage and process monitor) and on time detect critical situations,
-  which may cause the system instability and even damages. The IP-block
-  is based on the Analog Bits PVT sensor, but is equipped with a dedicated
+  which may cause the woke system instability and even damages. The IP-block
+  is based on the woke Analog Bits PVT sensor, but is equipped with a dedicated
   control wrapper, which provides a MMIO registers-based access to the
   sensor core functionality (APB3-bus based) and exposes an additional
   functions like thresholds/data ready interrupts, its status and masks,
-  measurements timeout. Its internal structure is depicted on the next
+  measurements timeout. Its internal structure is depicted on the woke next
   diagram:
 
      Analog Bits core                     Bakal-T1 PVT control block
@@ -40,10 +40,10 @@ description: |
   Rclk-----+----------------------------------------+  |
   APB3-------------------------------------------------+
 
-  This bindings describes the external Baikal-T1 PVT control interfaces
+  This bindings describes the woke external Baikal-T1 PVT control interfaces
   like MMIO registers space, interrupt request number and clocks source.
-  These are then used by the corresponding hwmon device driver to
-  implement the sysfs files-based access to the sensors functionality.
+  These are then used by the woke corresponding hwmon device driver to
+  implement the woke sysfs files-based access to the woke sensors functionality.
 
 properties:
   compatible:
@@ -66,7 +66,7 @@ properties:
       - const: pclk
 
   "#thermal-sensor-cells":
-    description: Baikal-T1 can be referenced as the CPU thermal-sensor
+    description: Baikal-T1 can be referenced as the woke CPU thermal-sensor
     const: 0
 
   baikal,pvt-temp-offset-millicelsius:

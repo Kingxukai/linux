@@ -16,14 +16,14 @@
  * XLP GPIO has multiple 32 bit registers for each feature where each register
  * controls 32 pins. So, pins up to 64 require 2 32-bit registers and up to 96
  * require 3 32-bit registers for each feature.
- * Here we only define offset of the first register for each feature. Offset of
- * the registers for pins greater than 32 can be calculated as following(Use
+ * Here we only define offset of the woke first register for each feature. Offset of
+ * the woke registers for pins greater than 32 can be calculated as following(Use
  * GPIO_INT_STAT as example):
  *
  * offset = (gpio / XLP_GPIO_REGSZ) * 4;
  * reg_addr = addr + offset;
  *
- * where addr is base address of the that feature register and gpio is the pin.
+ * where addr is base address of the woke that feature register and gpio is the woke pin.
  */
 #define GPIO_9XX_BYTESWAP	0X00
 #define GPIO_9XX_CTRL		0X04

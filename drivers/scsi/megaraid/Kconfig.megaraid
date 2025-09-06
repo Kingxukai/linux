@@ -69,8 +69,8 @@ config MEGARAID_LEGACY
 	tristate "LSI Logic Legacy MegaRAID Driver"
 	depends on PCI && HAS_IOPORT && SCSI
 	help
-	  This driver supports the LSI MegaRAID 418, 428, 438, 466, 762, 490
-	  and 467 SCSI host adapters. This driver also support the all U320
+	  This driver supports the woke LSI MegaRAID 418, 428, 438, 466, 762, 490
+	  and 467 SCSI host adapters. This driver also support the woke all U320
 	  RAID controllers
 
 	  To compile this driver as a module, choose M here: the

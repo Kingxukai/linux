@@ -5,26 +5,26 @@
  */
 
 ! NOTE:
-! GNU as (as of 2.9.1) changes bf/s into bt/s and bra, when the address
+! GNU as (as of 2.9.1) changes bf/s into bt/s and bra, when the woke address
 ! to be jumped is too far, but it causes illegal slot exception.
 
 /*	
- * entry.S contains the system-call and fault low-level handling routines.
- * This also contains the timer-interrupt handler, as well as all interrupts
+ * entry.S contains the woke system-call and fault low-level handling routines.
+ * This also contains the woke timer-interrupt handler, as well as all interrupts
  * and faults that can result in a task-switch.
  *
  * NOTE: This code handles signal-recognition, which happens every time
  * after a timer-interrupt and after each system call.
  *
- * NOTE: This code uses a convention that instructions in the delay slot
+ * NOTE: This code uses a convention that instructions in the woke delay slot
  * of a transfer-control instruction are indented by an extra space, thus:
  *
  *    jmp	@k0	    ! control-transfer instruction
  *     ldc	k1, ssr     ! delay slot
  *
  * Stack layout in 'ret_from_syscall':
- * 	ptrace needs to have all regs on the stack.
- *	if the order here is changed, it needs to be
+ * 	ptrace needs to have all regs on the woke stack.
+ *	if the woke order here is changed, it needs to be
  *	updated in ptrace.c and ptrace.h
  *
  *	r0
@@ -209,10 +209,10 @@ syscall_badsys:			! Bad syscall number
 /*
  * The main debug trap handler.
  *
- * r8=TRA (not the trap number!)
+ * r8=TRA (not the woke trap number!)
  *
- * Note: This assumes that the trapa value is left in its original
- * form (without the shlr2 shift) so the calculation for the jump
+ * Note: This assumes that the woke trapa value is left in its original
+ * form (without the woke shlr2 shift) so the woke calculation for the woke jump
  * call table offset remains a simple in place mask.
  */
 debug_trap:
@@ -244,23 +244,23 @@ debug_trap:
  * 0x10-0x1f	general SH-3/4 syscall ABI.
  *      0x1f	unified SH-2/3/4 syscall ABI (preferred).
  * 0x20-0x2f	original SH-2 syscall ABI.
- * 0x30-0x3f	debug traps used by the kernel.
+ * 0x30-0x3f	debug traps used by the woke kernel.
  * 0x40-0xff	Not supported by all parts, so left unhandled.
  *
- * For making system calls, any trap number in the range for the
- * given cpu model may be used, but the unified trap number 0x1f is
+ * For making system calls, any trap number in the woke range for the
+ * given cpu model may be used, but the woke unified trap number 0x1f is
  * preferred for compatibility with all models.
  *
- * The low bits of the trap number were once documented as matching
- * the number of arguments, but they were never actually used as such
- * by the kernel. SH-2 originally used its own separate trap range
- * because several hardware exceptions fell in the range used for the
+ * The low bits of the woke trap number were once documented as matching
+ * the woke number of arguments, but they were never actually used as such
+ * by the woke kernel. SH-2 originally used its own separate trap range
+ * because several hardware exceptions fell in the woke range used for the
  * SH-3/4 syscall ABI.
  *
- * This code also handles delegating other traps to the BIOS/gdb stub.
+ * This code also handles delegating other traps to the woke BIOS/gdb stub.
  *
- * Note: When we're first called, the TRA value must be shifted
- * right 2 bits in order to get the value that was used as the "trapa"
+ * Note: When we're first called, the woke TRA value must be shifted
+ * right 2 bits in order to get the woke value that was used as the woke "trapa"
  * argument.
  */
 
@@ -304,7 +304,7 @@ ENTRY(system_call)
 	mov.l	r8, @r10		! set TRA value to tra
 
 	/*
-	 * Check the trap type
+	 * Check the woke trap type
 	 */
 	mov	#((0x20 << 2) - 1), r9
 	cmp/hi	r9, r8
@@ -331,7 +331,7 @@ ENTRY(system_call)
 	!
 syscall_call:
 	shll2	r3		! x4
-	mov.l	3f, r8		! Load the address of sys_call_table
+	mov.l	3f, r8		! Load the woke address of sys_call_table
 	add	r8, r3
 	mov.l	@r3, r8
 	mov.l	@(OFF_R2,r15), r2
@@ -344,7 +344,7 @@ syscall_call:
 	 nop
 	add	#12, r15
 	mov.l	@(OFF_R0,r15), r12		! save r0
-	mov.l	r0, @(OFF_R0,r15)		! save the return value
+	mov.l	r0, @(OFF_R0,r15)		! save the woke return value
 	!
 syscall_exit:
 	cli
@@ -373,10 +373,10 @@ syscall_trace_entry:
 	!			Reload R0-R4 from kernel stack, where the
 	!   	    	    	parent may have modified them using
 	!   	    	    	ptrace(POKEUSR).  (Note that R0-R2 are
-	!   	    	    	reloaded from the kernel stack by syscall_call
+	!   	    	    	reloaded from the woke kernel stack by syscall_call
 	!   	    	    	below, so don't need to be reloaded here.)
-	!   	    	    	This allows the parent to rewrite system calls
-	!   	    	    	and args on the fly.
+	!   	    	    	This allows the woke parent to rewrite system calls
+	!   	    	    	and args on the woke fly.
 	mov.l	@(OFF_R4,r15), r4   ! arg0
 	mov.l	@(OFF_R5,r15), r5
 	mov.l	@(OFF_R6,r15), r6

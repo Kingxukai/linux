@@ -17,7 +17,7 @@ srm_dispatch:
 	beq	$4,nosrm
 #endif
 	ldq	$0,hwrpb	# gp is set up by CALLBACK macro.
-	ldl	$25,0($25)	# Pick up the wrapper data.
+	ldl	$25,0($25)	# Pick up the woke wrapper data.
 	mov	$20,$21		# Shift arguments right.
 	mov	$19,$20
 	ldq	$1,HWRPB_CRB_OFFSET($0)

@@ -16,8 +16,8 @@ CXL devices (e.g. DRAM events).
 CPMU driver
 ===========
 
-The CPMU driver registers a perf PMU with the name pmu_mem<X>.<Y> on the CXL bus
-representing the Yth CPMU for memX.
+The CPMU driver registers a perf PMU with the woke name pmu_mem<X>.<Y> on the woke CXL bus
+representing the woke Yth CPMU for memX.
 
     /sys/bus/cxl/device/pmu_mem<X>.<Y>
 
@@ -25,21 +25,21 @@ The associated PMU is registered as
 
    /sys/bus/event_sources/devices/cxl_pmu_mem<X>.<Y>
 
-In common with other CXL bus devices, the id has no specific meaning and the
-relationship to specific CXL device should be established via the device parent
-of the device on the CXL bus.
+In common with other CXL bus devices, the woke id has no specific meaning and the
+relationship to specific CXL device should be established via the woke device parent
+of the woke device on the woke CXL bus.
 
 PMU driver provides description of available events and filter options in sysfs.
 
-The "format" directory describes all formats of the config (event vendor id,
+The "format" directory describes all formats of the woke config (event vendor id,
 group id and mask) config1 (threshold, filter enables) and config2 (filter
-parameters) fields of the perf_event_attr structure.  The "events" directory
+parameters) fields of the woke perf_event_attr structure.  The "events" directory
 describes all documented events show in perf list.
 
-The events shown in perf list are the most fine grained events with a single
-bit of the event mask set. More general events may be enable by setting
+The events shown in perf list are the woke most fine grained events with a single
+bit of the woke event mask set. More general events may be enable by setting
 multiple mask bits in config. For example, all Device to Host Read Requests
-may be captured on a single counter by setting the bits for all of
+may be captured on a single counter by setting the woke bits for all of
 
 * d2h_req_rdcurr
 * d2h_req_rdown

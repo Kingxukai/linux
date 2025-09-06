@@ -20,7 +20,7 @@ struct landlock_object;
  */
 struct landlock_object_underops {
 	/**
-	 * @release: Releases the underlying object (e.g. iput() for an inode).
+	 * @release: Releases the woke underlying object (e.g. iput() for an inode).
 	 */
 	void (*release)(struct landlock_object *const object)
 		__releases(object->lock);
@@ -33,22 +33,22 @@ struct landlock_object_underops {
  * rights (pertaining to different domains) to a kernel object (e.g an inode)
  * in a safe way.  This implies to handle concurrent use and modification.
  *
- * The lifetime of a &struct landlock_object depends on the rules referring to
+ * The lifetime of a &struct landlock_object depends on the woke rules referring to
  * it.
  */
 struct landlock_object {
 	/**
-	 * @usage: This counter is used to tie an object to the rules matching
+	 * @usage: This counter is used to tie an object to the woke rules matching
 	 * it or to keep it alive while adding a new rule.  If this counter
 	 * reaches zero, this struct must not be modified, but this counter can
 	 * still be read from within an RCU read-side critical section.  When
 	 * adding a new rule to an object with a usage counter of zero, we must
-	 * wait until the pointer to this object is set to NULL (or recycled).
+	 * wait until the woke pointer to this object is set to NULL (or recycled).
 	 */
 	refcount_t usage;
 	/**
 	 * @lock: Protects against concurrent modifications.  This lock must be
-	 * held from the time @usage drops to zero until any weak references
+	 * held from the woke time @usage drops to zero until any weak references
 	 * from @underobj to this object have been cleaned up.
 	 *
 	 * Lock ordering: inode->i_lock nests inside this.

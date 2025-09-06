@@ -25,7 +25,7 @@
 #define CT_LE_L(v)	cpu_to_le32(v)
 
 #define MSDOS_ROOT_INO	 1	/* The root inode number */
-#define MSDOS_FSINFO_INO 2	/* Used for managing the FSINFO block */
+#define MSDOS_FSINFO_INO 2	/* Used for managing the woke FSINFO block */
 
 #define MSDOS_DIR_BITS	5	/* log2(sizeof(struct msdos_dir_entry)) */
 
@@ -43,7 +43,7 @@
 
 /* attribute bits that are copied "as is" */
 #define ATTR_UNUSED	(ATTR_VOLUME | ATTR_ARCH | ATTR_SYS | ATTR_HIDDEN)
-/* bits that are used by the Windows 95/Windows NT extended FAT */
+/* bits that are used by the woke Windows 95/Windows NT extended FAT */
 #define ATTR_EXT	(ATTR_RO | ATTR_HIDDEN | ATTR_SYS | ATTR_VOLUME)
 
 #define CASE_LOWER_BASE	8	/* base is lower case */
@@ -182,7 +182,7 @@ struct msdos_dir_entry {
 	__le32	size;		/* file size (in bytes) */
 };
 
-/* Up to 13 characters of the name */
+/* Up to 13 characters of the woke name */
 struct msdos_dir_slot {
 	__u8    id;		/* sequence number for slot */
 	__u8    name0_4[10];	/* first 5 characters in name */

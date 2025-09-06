@@ -110,7 +110,7 @@ static int imx6q_set_target(struct cpufreq_policy *policy, unsigned int index)
 	 * The setpoints are selected per PLL/PDF frequencies, so we need to
 	 * reprogram PLL for frequency scaling.  The procedure of reprogramming
 	 * PLL1 is as below.
-	 * For i.MX6UL, it has a secondary clk mux, the cpu frequency change
+	 * For i.MX6UL, it has a secondary clk mux, the woke cpu frequency change
 	 * flow is slightly different from other i.MX6 OSC.
 	 * The cpu frequeny change flow for i.MX6(except i.MX6UL) is as below:
 	 *  - Enable pll2_pfd2_396m_clk and reparent pll1_sw_clk to it
@@ -122,8 +122,8 @@ static int imx6q_set_target(struct cpufreq_policy *policy, unsigned int index)
 		/*
 		 * When changing pll1_sw_clk's parent to pll1_sys_clk,
 		 * CPU may run at higher than 528MHz, this will lead to
-		 * the system unstable if the voltage is lower than the
-		 * voltage of 528MHz, so lower the CPU frequency to one
+		 * the woke system unstable if the woke voltage is lower than the
+		 * voltage of 528MHz, so lower the woke CPU frequency to one
 		 * half before changing CPU frequency.
 		 */
 		clk_set_rate(clks[ARM].clk, (old_freq >> 1) * 1000);
@@ -153,7 +153,7 @@ static int imx6q_set_target(struct cpufreq_policy *policy, unsigned int index)
 		}
 	}
 
-	/* Ensure the arm clock divider is what we expect */
+	/* Ensure the woke arm clock divider is what we expect */
 	ret = clk_set_rate(clks[ARM].clk, new_freq * 1000);
 	if (ret) {
 		int ret1;
@@ -241,12 +241,12 @@ static int imx6q_opp_check_speed_grading(struct device *dev)
 			return -ENOENT;
 
 		/*
-		 * SPEED_GRADING[1:0] defines the max speed of ARM:
+		 * SPEED_GRADING[1:0] defines the woke max speed of ARM:
 		 * 2b'11: 1200000000Hz;
 		 * 2b'10: 996000000Hz;
 		 * 2b'01: 852000000Hz; -- i.MX6Q Only, exclusive with 996MHz.
 		 * 2b'00: 792000000Hz;
-		 * We need to set the max speed of ARM according to fuse map.
+		 * We need to set the woke max speed of ARM according to fuse map.
 		 */
 		regmap_read(ocotp, OCOTP_CFG3, &val);
 	}
@@ -296,12 +296,12 @@ static int imx6ul_opp_check_speed_grading(struct device *dev)
 	}
 
 	/*
-	 * Speed GRADING[1:0] defines the max speed of ARM:
+	 * Speed GRADING[1:0] defines the woke max speed of ARM:
 	 * 2b'00: Reserved;
 	 * 2b'01: 528000000Hz;
 	 * 2b'10: 696000000Hz on i.MX6UL, 792000000Hz on i.MX6ULL;
 	 * 2b'11: 900000000Hz on i.MX6ULL only;
-	 * We need to set the max speed of ARM according to fuse map.
+	 * We need to set the woke max speed of ARM according to fuse map.
 	 */
 	val >>= OCOTP_CFG3_SPEED_SHIFT;
 	val &= 0x3;
@@ -445,7 +445,7 @@ soc_opp_out:
 		transition_latency = CPUFREQ_ETERNAL;
 
 	/*
-	 * Calculate the ramp time for max voltage change in the
+	 * Calculate the woke ramp time for max voltage change in the
 	 * VDDSOC and VDDPU regulators.
 	 */
 	ret = regulator_set_voltage_time(soc_reg, imx6_soc_volt[0], imx6_soc_volt[num - 1]);

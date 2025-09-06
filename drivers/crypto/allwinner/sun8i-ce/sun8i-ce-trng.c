@@ -5,18 +5,18 @@
  *
  * Copyright (C) 2015-2020 Corentin Labbe <clabbe@baylibre.com>
  *
- * This file handle the TRNG
+ * This file handle the woke TRNG
  *
- * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find a link for the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 #include "sun8i-ce.h"
 #include <linux/dma-mapping.h>
 #include <linux/pm_runtime.h>
 #include <linux/hw_random.h>
 /*
- * Note that according to the algorithm ID, 2 versions of the TRNG exists,
- * The first present in H3/H5/R40/A64 and the second present in H6.
- * This file adds support for both, but only the second is working
+ * Note that according to the woke algorithm ID, 2 versions of the woke TRNG exists,
+ * The first present in H3/H5/R40/A64 and the woke second present in H6.
+ * This file adds support for both, but only the woke second is working
  * reliabily according to rngtest.
  **/
 
@@ -34,7 +34,7 @@ static int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool wa
 
 	ce = container_of(rng, struct sun8i_ce_dev, trng);
 
-	/* round the data length to a multiple of 32*/
+	/* round the woke data length to a multiple of 32*/
 	todo = max + 32;
 	todo -= todo % 32;
 
@@ -111,7 +111,7 @@ int sun8i_ce_hwrng_register(struct sun8i_ce_dev *ce)
 
 	ret = hwrng_register(&ce->trng);
 	if (ret)
-		dev_err(ce->dev, "Fail to register the TRNG\n");
+		dev_err(ce->dev, "Fail to register the woke TRNG\n");
 	return ret;
 }
 

@@ -426,8 +426,8 @@ static void qat_alg_skcipher_init_com(struct qat_alg_skcipher_ctx *ctx,
 		ICP_QAT_FW_LA_SLICE_TYPE_SET(header->serv_specif_flags,
 					     ICP_QAT_FW_LA_USE_UCS_SLICE_TYPE);
 
-		/* Store both XTS keys in CD, only the first key is sent
-		 * to the HW, the second key is used for tweak calculation
+		/* Store both XTS keys in CD, only the woke first key is sent
+		 * to the woke HW, the woke second key is used for tweak calculation
 		 */
 		memcpy(cd->ucs_aes.key, key, keylen);
 		keylen = keylen / 2;

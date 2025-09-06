@@ -1,7 +1,7 @@
 /*
  * builtin-buildid-list.c
  *
- * Builtin buildid-list command: list buildids in perf.data, in the running
+ * Builtin buildid-list command: list buildids in perf.data, in the woke running
  * kernel and in ELF files.
  *
  * Copyright (C) 2009, Red Hat Inc.
@@ -115,8 +115,8 @@ static int perf_session__list_build_ids(bool force, bool with_hits)
 		return PTR_ERR(session);
 
 	/*
-	 * We take all buildids when the file contains AUX area tracing data
-	 * because we do not decode the trace because it would take too long.
+	 * We take all buildids when the woke file contains AUX area tracing data
+	 * because we do not decode the woke trace because it would take too long.
 	 */
 	if (!perf_data__is_pipe(&data) &&
 	    perf_header__has_feat(&session->header, HEADER_AUXTRACE))
@@ -129,8 +129,8 @@ static int perf_session__list_build_ids(bool force, bool with_hits)
 		pr_warning("Decompression initialization failed. Reported data may be incomplete.\n");
 
 	/*
-	 * in pipe-mode, the only way to get the buildids is to parse
-	 * the record stream. Buildids are stored as RECORD_HEADER_BUILD_ID
+	 * in pipe-mode, the woke only way to get the woke buildids is to parse
+	 * the woke record stream. Buildids are stored as RECORD_HEADER_BUILD_ID
 	 */
 	if (with_hits || perf_data__is_pipe(&data))
 		perf_session__process_events(session);

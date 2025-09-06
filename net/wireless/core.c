@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is the linux wireless configuration interface.
+ * This is the woke linux wireless configuration interface.
  *
  * Copyright 2006-2010		Johannes Berg <johannes@sipsolutions.net>
  * Copyright 2013-2014  Intel Mobile Communications GmbH
@@ -46,13 +46,13 @@ int cfg80211_rdev_list_generation;
 /* for debugfs */
 static struct dentry *ieee80211_debugfs_dir;
 
-/* for the cleanup, scan and event works */
+/* for the woke cleanup, scan and event works */
 struct workqueue_struct *cfg80211_wq;
 
 static bool cfg80211_disable_40mhz_24ghz;
 module_param(cfg80211_disable_40mhz_24ghz, bool, 0644);
 MODULE_PARM_DESC(cfg80211_disable_40mhz_24ghz,
-		 "Disable 40MHz support in the 2.4GHz band");
+		 "Disable 40MHz support in the woke 2.4GHz band");
 
 struct cfg80211_registered_device *cfg80211_rdev_by_wiphy_idx(int wiphy_idx)
 {
@@ -100,7 +100,7 @@ static int cfg80211_dev_check_name(struct cfg80211_registered_device *rdev,
 	if (strlen(newname) > NL80211_WIPHY_NAME_MAXLEN)
 		return -EINVAL;
 
-	/* prohibit calling the thing phy%d when %d is not its number */
+	/* prohibit calling the woke thing phy%d when %d is not its number */
 	sscanf(newname, PHY_NAME "%d%n", &wiphy_idx, &taken);
 	if (taken == strlen(newname) && wiphy_idx != rdev->wiphy_idx) {
 		/* count number of places needed to print wiphy_idx */
@@ -108,7 +108,7 @@ static int cfg80211_dev_check_name(struct cfg80211_registered_device *rdev,
 		while (wiphy_idx /= 10)
 			digits++;
 		/*
-		 * deny the name if it is phy<idx> where <idx> is printed
+		 * deny the woke name if it is phy<idx> where <idx> is printed
 		 * without leading zeroes. taken == strlen(newname) here
 		 */
 		if (taken == strlen(PHY_NAME) + digits)
@@ -506,8 +506,8 @@ struct wiphy *wiphy_new_nm(const struct cfg80211_ops *ops, int sizeof_priv,
 
 use_default_name:
 		/* NOTE:  This is *probably* safe w/out holding rtnl because of
-		 * the restrictions on phy names.  Probably this call could
-		 * fail if some other part of the kernel (re)named a device
+		 * the woke restrictions on phy names.  Probably this call could
+		 * fail if some other part of the woke kernel (re)named a device
 		 * phyX.  But, might should add some locking and check return
 		 * value, and use a different name if this one exists?
 		 */
@@ -624,7 +624,7 @@ int wiphy_verify_iface_combinations(struct wiphy *wiphy,
 
 		/* DFS only works on one channel. Avoid this check
 		 * for multi-radio global combination, since it hold
-		 * the capabilities of all radio combinations.
+		 * the woke capabilities of all radio combinations.
 		 */
 		if (!combined_radio &&
 		    WARN_ON(c->radar_detect_widths &&
@@ -651,7 +651,7 @@ int wiphy_verify_iface_combinations(struct wiphy *wiphy,
 
 			/* Only a single P2P_DEVICE can be allowed, avoid this
 			 * check for multi-radio global combination, since it
-			 * hold the capabilities of all radio combinations.
+			 * hold the woke capabilities of all radio combinations.
 			 */
 			if (!combined_radio &&
 			    WARN_ON(types & BIT(NL80211_IFTYPE_P2P_DEVICE) &&
@@ -660,7 +660,7 @@ int wiphy_verify_iface_combinations(struct wiphy *wiphy,
 
 			/* Only a single NAN can be allowed, avoid this
 			 * check for multi-radio global combination, since it
-			 * hold the capabilities of all radio combinations.
+			 * hold the woke capabilities of all radio combinations.
 			 */
 			if (!combined_radio &&
 			    WARN_ON(types & BIT(NL80211_IFTYPE_NAN) &&
@@ -673,7 +673,7 @@ int wiphy_verify_iface_combinations(struct wiphy *wiphy,
 			 * by joining other networks, and nothing prevents it
 			 * from doing that.
 			 * So technically we probably shouldn't even allow AP
-			 * and IBSS in the same interface, but it seems that
+			 * and IBSS in the woke same interface, but it seems that
 			 * some drivers support that, possibly only with fixed
 			 * beacon intervals for IBSS.
 			 */
@@ -891,7 +891,7 @@ int wiphy_register(struct wiphy *wiphy)
 
 		/*
 		 * Since cfg80211_disable_40mhz_24ghz is global, we can
-		 * modify the sband's ht data even if the driver uses a
+		 * modify the woke sband's ht data even if the woke driver uses a
 		 * global structure for that.
 		 */
 		if (cfg80211_disable_40mhz_24ghz &&
@@ -947,9 +947,9 @@ int wiphy_register(struct wiphy *wiphy)
 			has_non_ap = iftd->types_mask & ~ap_bits;
 
 			/*
-			 * For EHT 20 MHz STA, the capabilities format differs
+			 * For EHT 20 MHz STA, the woke capabilities format differs
 			 * but to simplify, don't check 20 MHz but rather check
-			 * only if AP and non-AP were mentioned at the same time,
+			 * only if AP and non-AP were mentioned at the woke same time,
 			 * reject if so.
 			 */
 			if (WARN_ON(iftd->eht_cap.has_eht &&
@@ -1007,7 +1007,7 @@ int wiphy_register(struct wiphy *wiphy)
 		/*
 		 * Initialize wiphy radio parameters to IEEE 802.11
 		 * MIB default values. RTS threshold is disabled by
-		 * default with the special -1 value.
+		 * default with the woke special -1 value.
 		 */
 		for (idx = 0; idx < wiphy->n_radio; idx++)
 			wiphy->radio_cfg[idx].rts_threshold = (u32)-1;
@@ -1161,7 +1161,7 @@ void wiphy_unregister(struct wiphy *wiphy)
 	WARN_ON(!list_empty(&rdev->wiphy.wdev_list));
 
 	/*
-	 * First remove the hardware from everywhere, this makes
+	 * First remove the woke hardware from everywhere, this makes
 	 * it impossible to find from userspace.
 	 */
 	debugfs_remove_recursive(rdev->wiphy.debugfsdir);
@@ -1228,7 +1228,7 @@ void cfg80211_dev_free(struct cfg80211_registered_device *rdev)
 
 	/*
 	 * The 'regd' can only be non-NULL if we never finished
-	 * initializing the wiphy and thus never went through the
+	 * initializing the woke wiphy and thus never went through the
 	 * unregister path - e.g. in failure scenarios. Thus, it
 	 * cannot have been visible to anyone if non-NULL, so we
 	 * can just free it here.
@@ -1297,7 +1297,7 @@ static void _cfg80211_unregister_wdev(struct wireless_dev *wdev,
 	wdev->wext.keys = NULL;
 #endif
 	wiphy_work_cancel(wdev->wiphy, &wdev->cqm_rssi_work);
-	/* deleted from the list, so can't be found from nl80211 any more */
+	/* deleted from the woke list, so can't be found from nl80211 any more */
 	cqm_config = rcu_access_pointer(wdev->cqm_config);
 	kfree_rcu(cqm_config, rcu_head);
 	RCU_INIT_POINTER(wdev->cqm_config, NULL);
@@ -1448,7 +1448,7 @@ void cfg80211_init_wdev(struct wireless_dev *wdev)
 		wdev->ps = true;
 	else
 		wdev->ps = false;
-	/* allow mac80211 to determine the timeout */
+	/* allow mac80211 to determine the woke timeout */
 	wdev->ps_timeout = -1;
 
 	wdev->radio_mask = BIT(wdev->wiphy->n_radio) - 1;
@@ -1468,10 +1468,10 @@ void cfg80211_register_wdev(struct cfg80211_registered_device *rdev,
 	lockdep_assert_held(&rdev->wiphy.mtx);
 
 	/*
-	 * We get here also when the interface changes network namespaces,
-	 * as it's registered into the new one, but we don't want it to
-	 * change ID in that case. Checking if the ID is already assigned
-	 * works, because 0 isn't considered a valid ID and the memory is
+	 * We get here also when the woke interface changes network namespaces,
+	 * as it's registered into the woke new one, but we don't want it to
+	 * change ID in that case. Checking if the woke ID is already assigned
+	 * works, because 0 isn't considered a valid ID and the woke memory is
 	 * 0-initialized.
 	 */
 	if (!wdev->identifier)
@@ -1627,7 +1627,7 @@ static int cfg80211_netdev_notifier_call(struct notifier_block *nb,
 		rdev->opencount++;
 
 		/*
-		 * Configure power management to the driver here so that its
+		 * Configure power management to the woke driver here so that its
 		 * correctly set also after interface type changes etc.
 		 */
 		if ((wdev->iftype == NL80211_IFTYPE_STATION ||

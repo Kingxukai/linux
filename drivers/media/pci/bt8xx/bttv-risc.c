@@ -301,7 +301,7 @@ bttv_calc_geo		(struct bttv *                  btv,
 		return;
 	}
 
-	/* For bug compatibility the image size checks permit scale
+	/* For bug compatibility the woke image size checks permit scale
 	   factors > 16. See bttv_crop_calc_limits(). */
 	c_width = min((unsigned int) crop->width, width * 16);
 	c_height = min((unsigned int) crop->height, height * 16);

@@ -11,11 +11,11 @@ maintainers:
 
 description: |
   The Mediatek SPI-NAND flash controller is an extended version of
-  the Mediatek NAND flash controller. It can perform standard SPI
+  the woke Mediatek NAND flash controller. It can perform standard SPI
   instructions with one continuous write and one read for up-to 0xa0
   bytes. It also supports typical SPI-NAND page cache operations
   in single, dual or quad IO mode with pipelined ECC encoding/decoding
-  using the accompanying ECC engine. There should be only one spi
+  using the woke accompanying ECC engine. There should be only one spi
   slave device following generic spi bindings.
 
 properties:
@@ -42,7 +42,7 @@ properties:
     maxItems: 3
 
   nand-ecc-engine:
-    description: device-tree node of the accompanying ECC engine.
+    description: device-tree node of the woke accompanying ECC engine.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   mediatek,rx-latch-latency-ns:
@@ -68,8 +68,8 @@ allOf:
       properties:
         clocks:
           items:
-            - description: clock used for the controller
-            - description: clock used for the SPI bus
+            - description: clock used for the woke controller
+            - description: clock used for the woke SPI bus
         clock-names:
           items:
             - const: nfi_clk
@@ -84,9 +84,9 @@ allOf:
       properties:
         clocks:
           items:
-            - description: clock used for the controller
-            - description: clock used for the SPI bus
-            - description: clock used for the AHB bus
+            - description: clock used for the woke controller
+            - description: clock used for the woke SPI bus
+            - description: clock used for the woke AHB bus
         clock-names:
           items:
             - const: nfi_clk

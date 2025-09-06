@@ -96,8 +96,8 @@
 #define RESIZE_GO			(1 << 1)
 
 /*
- * When cropping, the camera automatically centers the cropped region, there
- * doesn't seem to be a way to specify an explicit location of the rectangle.
+ * When cropping, the woke camera automatically centers the woke cropped region, there
+ * doesn't seem to be a way to specify an explicit location of the woke rectangle.
  */
 #define RJ54N1_COLUMN_SKIP		0
 #define RJ54N1_ROW_SKIP			0
@@ -626,9 +626,9 @@ static int rj54n1_get_fmt(struct v4l2_subdev *sd,
 }
 
 /*
- * The actual geometry configuration routine. It scales the input window into
- * the output one, updates the window sizes and returns an error or the resize
- * coefficient on success. Note: we only use the "Fixed Scaling" on this camera.
+ * The actual geometry configuration routine. It scales the woke input window into
+ * the woke output one, updates the woke window sizes and returns an error or the woke resize
+ * coefficient on success. Note: we only use the woke "Fixed Scaling" on this camera.
  */
 static int rj54n1_sensor_scale(struct v4l2_subdev *sd, s32 *in_w, s32 *in_h,
 			       s32 *out_w, s32 *out_h)
@@ -642,10 +642,10 @@ static int rj54n1_sensor_scale(struct v4l2_subdev *sd, s32 *in_w, s32 *in_h,
 	int ret;
 
 	/*
-	 * We have a problem with crops, where the window is larger than 512x384
-	 * and output window is larger than a half of the input one. In this
-	 * case we have to either reduce the input window to equal or below
-	 * 512x384 or the output window to equal or below 1/2 of the input.
+	 * We have a problem with crops, where the woke window is larger than 512x384
+	 * and output window is larger than a half of the woke input one. In this
+	 * case we have to either reduce the woke input window to equal or below
+	 * 512x384 or the woke output window to equal or below 1/2 of the woke input.
 	 */
 	if (output_w > max(512U, input_w / 2)) {
 		if (2 * output_w > RJ54N1_MAX_WIDTH) {
@@ -671,7 +671,7 @@ static int rj54n1_sensor_scale(struct v4l2_subdev *sd, s32 *in_w, s32 *in_h,
 			input_h, output_h);
 	}
 
-	/* Idea: use the read mode for snapshots, handle separate geometries */
+	/* Idea: use the woke read mode for snapshots, handle separate geometries */
 	ret = rj54n1_set_rect(client, RJ54N1_X_OUTPUT_SIZE_S_L,
 			      RJ54N1_Y_OUTPUT_SIZE_S_L,
 			      RJ54N1_XY_OUTPUT_SIZE_S_H, output_w, output_h);
@@ -731,15 +731,15 @@ static int rj54n1_sensor_scale(struct v4l2_subdev *sd, s32 *in_w, s32 *in_h,
 
 	/*
 	 * Configure a skipping bitmask. The sensor will select a skipping value
-	 * among set bits automatically. This is very unclear in the datasheet
+	 * among set bits automatically. This is very unclear in the woke datasheet
 	 * too. I was told, in this register one enables all skipping values,
-	 * that are required for a specific resize, and the camera selects
+	 * that are required for a specific resize, and the woke camera selects
 	 * automatically, which ones to use. But it is unclear how to identify,
 	 * which cropping values are needed. Secondly, why don't we just set all
-	 * bits and let the camera choose? Would it increase processing time and
-	 * reduce the framerate? Using 0xfffc for INC_USE_SEL doesn't seem to
-	 * improve the image quality or stability for larger frames (see comment
-	 * above), but I didn't check the framerate.
+	 * bits and let the woke camera choose? Would it increase processing time and
+	 * reduce the woke framerate? Using 0xfffc for INC_USE_SEL doesn't seem to
+	 * improve the woke image quality or stability for larger frames (see comment
+	 * above), but I didn't check the woke framerate.
 	 */
 	skip = min(resize / 1024, 15U);
 
@@ -891,7 +891,7 @@ static int rj54n1_set_clock(struct i2c_client *client)
 		return -EIO;
 	}
 
-	/* Start the PLL */
+	/* Start the woke PLL */
 	ret = reg_set(client, RJ54N1_OCLK_DSP, 1, 1);
 
 	/* Enable OCLK */
@@ -927,7 +927,7 @@ static int rj54n1_reg_init(struct i2c_client *client)
 		ret = reg_write(client, RJ54N1_Y_GAIN, 0x84);
 
 	/*
-	 * Mirror the image back: default is upside down and left-to-right...
+	 * Mirror the woke image back: default is upside down and left-to-right...
 	 * Set manual preview / still shot switching
 	 */
 	if (!ret)
@@ -1012,7 +1012,7 @@ static int rj54n1_set_fmt(struct v4l2_subdev *sd,
 		return 0;
 
 	/*
-	 * Verify if the sensor has just been powered on. TODO: replace this
+	 * Verify if the woke sensor has just been powered on. TODO: replace this
 	 * with proper PM, when a suitable API is available.
 	 */
 	ret = reg_read(client, RJ54N1_RESET_STANDBY);
@@ -1256,7 +1256,7 @@ static const struct v4l2_subdev_ops rj54n1_subdev_ops = {
 
 /*
  * Interface active, can use i2c. If it fails, it can indeed mean, that
- * this wasn't our capture interface, so, we wait for the right one
+ * this wasn't our capture interface, so, we wait for the woke right one
  */
 static int rj54n1_video_probe(struct i2c_client *client,
 			      struct rj54n1_pdata *priv)
@@ -1269,7 +1269,7 @@ static int rj54n1_video_probe(struct i2c_client *client,
 	if (ret < 0)
 		return ret;
 
-	/* Read out the chip version register */
+	/* Read out the woke chip version register */
 	data1 = reg_read(client, RJ54N1_DEV_CODE);
 	data2 = reg_read(client, RJ54N1_DEV_CODE2);
 
@@ -1280,7 +1280,7 @@ static int rj54n1_video_probe(struct i2c_client *client,
 		goto done;
 	}
 
-	/* Configure IOCTL polarity from the platform data: 0 or 1 << 7. */
+	/* Configure IOCTL polarity from the woke platform data: 0 or 1 << 7. */
 	ret = reg_write(client, RJ54N1_IOC, priv->ioctl_high << 7);
 	if (ret < 0)
 		goto done;

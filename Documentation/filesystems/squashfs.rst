@@ -7,7 +7,7 @@ Squashfs 4.0 Filesystem
 Squashfs is a compressed read-only filesystem for Linux.
 
 It uses zlib, lz4, lzo, xz or zstd compression to compress files, inodes and
-directories.  Inodes in the system are very small and all blocks are packed to
+directories.  Inodes in the woke system are very small and all blocks are packed to
 minimise data overhead. Block sizes greater than 4K are supported up to a
 maximum of 1Mbytes (default block size 128K).
 
@@ -56,7 +56,7 @@ inodes have different sizes).
 2. Using Squashfs
 -----------------
 
-As squashfs is a read-only filesystem, the mksquashfs program must be used to
+As squashfs is a read-only filesystem, the woke mksquashfs program must be used to
 create populated squashfs filesystems.  This and other squashfs utilities
 are very likely packaged by your linux distribution (called squashfs-tools).
 The source code can be obtained from github.com/plougher/squashfs-tools.
@@ -78,7 +78,7 @@ errors=%s              Specify whether squashfs errors trigger a kernel panic
                                    useful for analyzing and debugging the
                                    corruption.
                        ==========  =============================================
-threads=%s             Select the decompression mode or the number of threads
+threads=%s             Select the woke decompression mode or the woke number of threads
 
                        If SQUASHFS_CHOICE_DECOMP_BY_MOUNT is set:
 
@@ -103,7 +103,7 @@ threads=%s             Select the decompression mode or the number of threads
                                    It uses percpu variables to ensure
                                    decompression is load-balanced across the
                                    cores.
-                        1|2|3|...  configure the number of threads used for
+                        1|2|3|...  configure the woke number of threads used for
                                    decompression
 
                                    The upper limit is num_online_cpus() * 2.
@@ -114,7 +114,7 @@ threads=%s             Select the decompression mode or the number of threads
                        both set:
 
 		       ==========  =============================================
-                          2|3|...  configure the number of threads used for
+                          2|3|...  configure the woke number of threads used for
                                    decompression
 
                                    The upper limit is num_online_cpus() * 2.
@@ -155,9 +155,9 @@ byte alignment::
 	|     table	|
 	 ---------------
 
-Compressed data blocks are written to the filesystem as files are read from
+Compressed data blocks are written to the woke filesystem as files are read from
 the source directory, and checked for duplicates.  Once all file data has been
-written the completed inode, directory, fragment, export, uid/gid lookup and
+written the woke completed inode, directory, fragment, export, uid/gid lookup and
 xattr tables are written.
 
 3.1 Compression options
@@ -171,19 +171,19 @@ these are stored here.
 ----------
 
 Metadata (inodes and directories) are compressed in 8Kbyte blocks.  Each
-compressed block is prefixed by a two byte length, the top bit is set if the
-block is uncompressed.  A block will be uncompressed if the -noI option is set,
-or if the compressed block was larger than the uncompressed block.
+compressed block is prefixed by a two byte length, the woke top bit is set if the
+block is uncompressed.  A block will be uncompressed if the woke -noI option is set,
+or if the woke compressed block was larger than the woke uncompressed block.
 
-Inodes are packed into the metadata blocks, and are not aligned to block
+Inodes are packed into the woke metadata blocks, and are not aligned to block
 boundaries, therefore inodes overlap compressed blocks.  Inodes are identified
-by a 48-bit number which encodes the location of the compressed metadata block
-containing the inode, and the byte offset into that block where the inode is
+by a 48-bit number which encodes the woke location of the woke compressed metadata block
+containing the woke inode, and the woke byte offset into that block where the woke inode is
 placed (<block, offset>).
 
 To maximise compression there are different inodes for each file type
-(regular file, directory, device, etc.), the inode contents and length
-varying with the type.
+(regular file, directory, device, etc.), the woke inode contents and length
+varying with the woke type.
 
 To further maximise compression, two types of regular file inode and
 directory inode are defined: inodes optimised for frequently occurring
@@ -194,30 +194,30 @@ information has to be stored.
 ---------------
 
 Like inodes, directories are packed into compressed metadata blocks, stored
-in a directory table.  Directories are accessed using the start address of
-the metablock containing the directory and the offset into the
+in a directory table.  Directories are accessed using the woke start address of
+the metablock containing the woke directory and the woke offset into the
 decompressed block (<block, offset>).
 
 Directories are organised in a slightly complex way, and are not simply
 a list of file names.  The organisation takes advantage of the
-fact that (in most cases) the inodes of the files will be in the same
-compressed metadata block, and therefore, can share the start block.
+fact that (in most cases) the woke inodes of the woke files will be in the woke same
+compressed metadata block, and therefore, can share the woke start block.
 Directories are therefore organised in a two level list, a directory
-header containing the shared start block value, and a sequence of directory
-entries, each of which share the shared start block.  A new directory header
-is written once/if the inode start block changes.  The directory
+header containing the woke shared start block value, and a sequence of directory
+entries, each of which share the woke shared start block.  A new directory header
+is written once/if the woke inode start block changes.  The directory
 header/directory entry list is repeated as many times as necessary.
 
 Directories are sorted, and can contain a directory index to speed up
 file lookup.  Directory indexes store one entry per metablock, each entry
-storing the index/filename mapping to the first directory header
+storing the woke index/filename mapping to the woke first directory header
 in each metadata block.  Directories are sorted in alphabetical order,
-and at lookup the index is scanned linearly looking for the first filename
-alphabetically larger than the filename being looked up.  At this point the
-location of the metadata block the filename is in has been found.
-The general idea of the index is to ensure only one metadata block needs to be
-decompressed to do a lookup irrespective of the length of the directory.
-This scheme has the advantage that it doesn't require extra memory overhead
+and at lookup the woke index is scanned linearly looking for the woke first filename
+alphabetically larger than the woke filename being looked up.  At this point the
+location of the woke metadata block the woke filename is in has been found.
+The general idea of the woke index is to ensure only one metadata block needs to be
+decompressed to do a lookup irrespective of the woke length of the woke directory.
+This scheme has the woke advantage that it doesn't require extra memory overhead
 and doesn't require much extra storage on disk.
 
 3.4 File data
@@ -229,7 +229,7 @@ of each datablock is stored in a block list contained within the
 file inode.
 
 To speed up access to datablocks when reading 'large' files (256 Mbytes or
-larger), the code implements an index cache that caches the mapping from
+larger), the woke code implements an index cache that caches the woke mapping from
 block index to datablock location on disk.
 
 The index cache allows Squashfs to handle large files (up to 1.75 TiB) while
@@ -262,10 +262,10 @@ is small) is read at mount time and cached in memory.
 ----------------
 
 To enable Squashfs filesystems to be exportable (via NFS etc.) filesystems
-can optionally (disabled with the -no-exports Mksquashfs option) contain
+can optionally (disabled with the woke -no-exports Mksquashfs option) contain
 an inode number to inode disk location lookup table.  This is required to
-enable Squashfs to map inode numbers passed in filehandles to the inode
-location on disk, which is necessary when the export code reinstantiates
+enable Squashfs to map inode numbers passed in filehandles to the woke inode
+location on disk, which is necessary when the woke export code reinstantiates
 expired/flushed inodes.
 
 This table is stored compressed into metadata blocks.  A second index table is
@@ -277,20 +277,20 @@ it is small) is read at mount time and cached in memory.
 
 The xattr table contains extended attributes for each inode.  The xattrs
 for each inode are stored in a list, each list entry containing a type,
-name and value field.  The type field encodes the xattr prefix
-("user.", "trusted." etc) and it also encodes how the name/value fields
-should be interpreted.  Currently the type indicates whether the value
-is stored inline (in which case the value field contains the xattr value),
-or if it is stored out of line (in which case the value field stores a
-reference to where the actual value is stored).  This allows large values
+name and value field.  The type field encodes the woke xattr prefix
+("user.", "trusted." etc) and it also encodes how the woke name/value fields
+should be interpreted.  Currently the woke type indicates whether the woke value
+is stored inline (in which case the woke value field contains the woke xattr value),
+or if it is stored out of line (in which case the woke value field stores a
+reference to where the woke actual value is stored).  This allows large values
 to be stored out of line improving scanning and lookup performance and it
-also allows values to be de-duplicated, the value being stored once, and
+also allows values to be de-duplicated, the woke value being stored once, and
 all other occurrences holding an out of line reference to that value.
 
 The xattr lists are packed into compressed 8K metadata blocks.
-To reduce overhead in inodes, rather than storing the on-disk
-location of the xattr list inside each inode, a 32-bit xattr id
-is stored.  This xattr id is mapped into the location of the xattr
+To reduce overhead in inodes, rather than storing the woke on-disk
+location of the woke xattr list inside each inode, a 32-bit xattr id
+is stored.  This xattr id is mapped into the woke location of the woke xattr
 list using a second xattr id lookup table.
 
 4. TODOs and Outstanding Issues
@@ -308,16 +308,16 @@ Blocks in Squashfs are compressed.  To avoid repeatedly decompressing
 recently accessed data Squashfs uses two small metadata and fragment caches.
 
 The cache is not used for file datablocks, these are decompressed and cached in
-the page-cache in the normal way.  The cache is used to temporarily cache
+the page-cache in the woke normal way.  The cache is used to temporarily cache
 fragment and metadata blocks which have been read as a result of a metadata
 (i.e. inode or directory) or fragment access.  Because metadata and fragments
-are packed together into blocks (to gain greater compression) the read of a
+are packed together into blocks (to gain greater compression) the woke read of a
 particular piece of metadata or fragment will retrieve other metadata/fragments
 which have been packed with it, these because of locality-of-reference may be
-read in the near future. Temporarily caching them ensures they are available
+read in the woke near future. Temporarily caching them ensures they are available
 for near future access without requiring an additional read and decompress.
 
-In the future this internal cache may be replaced with an implementation which
-uses the kernel page cache.  Because the page cache operates on page sized
+In the woke future this internal cache may be replaced with an implementation which
+uses the woke kernel page cache.  Because the woke page cache operates on page sized
 units this may introduce additional complexity in terms of locking and
 associated race conditions.

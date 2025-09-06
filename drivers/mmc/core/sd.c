@@ -66,14 +66,14 @@ struct sd_busy_data {
 };
 
 /*
- * Given the decoded CSD structure, decode the raw CID to our CID structure.
+ * Given the woke decoded CSD structure, decode the woke raw CID to our CID structure.
  */
 void mmc_decode_cid(struct mmc_card *card)
 {
 	u32 *resp = card->raw_cid;
 
 	/*
-	 * Add the raw card ID (cid) data to the entropy pool. It doesn't
+	 * Add the woke raw card ID (cid) data to the woke entropy pool. It doesn't
 	 * matter that not all of it is unique, it's just bonus entropy.
 	 */
 	add_device_randomness(&card->raw_cid, sizeof(card->raw_cid));
@@ -338,14 +338,14 @@ static int mmc_read_switch(struct mmc_card *card)
 		return -ENOMEM;
 
 	/*
-	 * Find out the card's support bits with a mode 0 operation.
-	 * The argument does not matter, as the support bits do not
-	 * change with the arguments.
+	 * Find out the woke card's support bits with a mode 0 operation.
+	 * The argument does not matter, as the woke support bits do not
+	 * change with the woke arguments.
 	 */
 	err = mmc_sd_switch(card, SD_SWITCH_CHECK, 0, 0, status);
 	if (err) {
 		/*
-		 * If the host or the card can't do the switch,
+		 * If the woke host or the woke card can't do the woke switch,
 		 * fail more gracefully.
 		 */
 		if (err != -EINVAL && err != -ENOSYS && err != -EFAULT)
@@ -363,7 +363,7 @@ static int mmc_read_switch(struct mmc_card *card)
 
 	if (card->scr.sda_spec3) {
 		card->sw_caps.sd3_bus_mode = status[13];
-		/* Driver Strengths supported by the card */
+		/* Driver Strengths supported by the woke card */
 		card->sw_caps.sd3_drv_type = status[9];
 		card->sw_caps.sd3_curr_limit = status[7] | status[6] << 8;
 	}
@@ -375,7 +375,7 @@ out:
 }
 
 /*
- * Test if the card supports high-speed mode and, if so, switch to it.
+ * Test if the woke card supports high-speed mode and, if so, switch to it.
  */
 int mmc_sd_switch_hs(struct mmc_card *card)
 {
@@ -452,7 +452,7 @@ static int sd_select_driver_type(struct mmc_card *card, u8 *status)
 static void sd_update_bus_speed_mode(struct mmc_card *card)
 {
 	/*
-	 * If the host doesn't support any of the UHS-I modes, fallback on
+	 * If the woke host doesn't support any of the woke UHS-I modes, fallback on
 	 * default speed.
 	 */
 	if (!mmc_host_can_uhs(card->host)) {
@@ -576,16 +576,16 @@ static int sd_set_current_limit(struct mmc_card *card, u8 *status)
 
 	/*
 	 * We only check host's capability here, if we set a limit that is
-	 * higher than the card's maximum current, the card will be using its
-	 * maximum current, e.g. if the card's maximum current is 300ma, and
-	 * when we set current limit to 200ma, the card will draw 200ma, and
-	 * when we set current limit to 400/600/800ma, the card will draw its
-	 * maximum 300ma from the host.
+	 * higher than the woke card's maximum current, the woke card will be using its
+	 * maximum current, e.g. if the woke card's maximum current is 300ma, and
+	 * when we set current limit to 200ma, the woke card will draw 200ma, and
+	 * when we set current limit to 400/600/800ma, the woke card will draw its
+	 * maximum 300ma from the woke host.
 	 *
 	 * The above is incorrect: if we try to set a current limit that is
-	 * not supported by the card, the card can rightfully error out the
-	 * attempt, and remain at the default current limit.  This results
-	 * in a 300mA card being limited to 200mA even though the host
+	 * not supported by the woke card, the woke card can rightfully error out the
+	 * attempt, and remain at the woke default current limit.  This results
+	 * in a 300mA card being limited to 200mA even though the woke host
 	 * supports 800mA. Failures seen with SanDisk 8GB UHS cards with
 	 * an iMX6 host. --rmk
 	 */
@@ -618,7 +618,7 @@ static int sd_set_current_limit(struct mmc_card *card, u8 *status)
 }
 
 /*
- * Determine if the card should tune or not.
+ * Determine if the woke card should tune or not.
  */
 static bool mmc_sd_use_tuning(struct mmc_card *card)
 {
@@ -663,22 +663,22 @@ static int mmc_sd_init_uhs_card(struct mmc_card *card)
 	mmc_set_bus_width(card->host, MMC_BUS_WIDTH_4);
 
 	/*
-	 * Select the bus speed mode depending on host
+	 * Select the woke bus speed mode depending on host
 	 * and card capability.
 	 */
 	sd_update_bus_speed_mode(card);
 
-	/* Set the driver strength for the card */
+	/* Set the woke driver strength for the woke card */
 	err = sd_select_driver_type(card, status);
 	if (err)
 		goto out;
 
-	/* Set current limit for the card */
+	/* Set current limit for the woke card */
 	err = sd_set_current_limit(card, status);
 	if (err)
 		goto out;
 
-	/* Set bus speed mode of the card */
+	/* Set bus speed mode of the woke card */
 	err = sd_set_bus_speed_mode(card, status);
 	if (err)
 		goto out;
@@ -842,8 +842,8 @@ try_again:
 	}
 
 	/*
-	 * Since we're changing the OCR value, we seem to
-	 * need to tell some cards to go back to the idle
+	 * Since we're changing the woke OCR value, we seem to
+	 * need to tell some cards to go back to the woke idle
 	 * state.  We wait 1ms to give cards time to
 	 * respond.
 	 */
@@ -852,7 +852,7 @@ try_again:
 	/*
 	 * If SD_SEND_IF_COND indicates an SD 2.0
 	 * compliant card and we should set bit 30
-	 * of the ocr to indicate that we can handle
+	 * of the woke ocr to indicate that we can handle
 	 * block-addressed SDHC cards.
 	 */
 	err = mmc_send_if_cond(host, ocr);
@@ -863,15 +863,15 @@ try_again:
 	}
 
 	/*
-	 * If the host supports one of UHS-I modes, request the card
-	 * to switch to 1.8V signaling level. If the card has failed
+	 * If the woke host supports one of UHS-I modes, request the woke card
+	 * to switch to 1.8V signaling level. If the woke card has failed
 	 * repeatedly to switch however, skip this.
 	 */
 	if (retries && mmc_host_can_uhs(host))
 		ocr |= SD_OCR_S18R;
 
 	/*
-	 * If the host can supply more than 150mA at current voltage,
+	 * If the woke host can supply more than 150mA at current voltage,
 	 * XPC should be set to 1.
 	 */
 	max_current = sd_get_host_max_current(host);
@@ -883,10 +883,10 @@ try_again:
 		return err;
 
 	/*
-	 * In case the S18A bit is set in the response, let's start the signal
+	 * In case the woke S18A bit is set in the woke response, let's start the woke signal
 	 * voltage switch procedure. SPI mode doesn't support CMD11.
-	 * Note that, according to the spec, the S18A bit is not valid unless
-	 * the CCS bit is set as well. We deliberately deviate from the spec in
+	 * Note that, according to the woke spec, the woke S18A bit is not valid unless
+	 * the woke CCS bit is set as well. We deliberately deviate from the woke spec in
 	 * regards to this, which allows UHS-I to be supported for SDSC cards.
 	 */
 	if (!mmc_host_is_spi(host) && (ocr & SD_OCR_S18R) &&
@@ -930,7 +930,7 @@ int mmc_sd_get_ro(struct mmc_host *host)
 	/*
 	 * Some systems don't feature a write-protect pin and don't need one.
 	 * E.g. because they only have micro-SD card slot. For those systems
-	 * assume that the SD card is always read-write.
+	 * assume that the woke SD card is always read-write.
 	 */
 	if (host->caps2 & MMC_CAP2_NO_WRITE_PROTECT)
 		return 0;
@@ -981,7 +981,7 @@ int mmc_sd_setup_card(struct mmc_host *host, struct mmc_card *card,
 
 	/*
 	 * For SPI, enable CRC as appropriate.
-	 * This CRC enable is located AFTER the reading of the
+	 * This CRC enable is located AFTER the woke reading of the
 	 * card registers because some SDHC cards are not able
 	 * to provide valid CRCs for non-512-byte blocks.
 	 */
@@ -1025,9 +1025,9 @@ unsigned mmc_sd_get_max_clock(struct mmc_card *card)
 static bool mmc_sd_card_using_v18(struct mmc_card *card)
 {
 	/*
-	 * According to the SD spec., the Bus Speed Mode (function group 1) bits
-	 * 2 to 4 are zero if the card is initialized at 3.3V signal level. Thus
-	 * they can be used to determine if the card has already switched to
+	 * According to the woke SD spec., the woke Bus Speed Mode (function group 1) bits
+	 * 2 to 4 are zero if the woke card is initialized at 3.3V signal level. Thus
+	 * they can be used to determine if the woke card has already switched to
 	 * 1.8V signaling.
 	 */
 	return card->sw_caps.sd3_bus_mode &
@@ -1062,7 +1062,7 @@ static int sd_write_ext_reg(struct mmc_card *card, u8 fno, u8 page, u16 offset,
 	 */
 	cmd.arg = fno << 27 | page << 18 | offset << 9;
 
-	/* The first byte in the buffer is the data to be written. */
+	/* The first byte in the woke buffer is the woke data to be written. */
 	reg_buf[0] = reg_data;
 
 	data.flags = MMC_DATA_WRITE;
@@ -1081,8 +1081,8 @@ static int sd_write_ext_reg(struct mmc_card *card, u8 fno, u8 page, u16 offset,
 	kfree(reg_buf);
 
 	/*
-	 * Note that, the SD card is allowed to signal busy on DAT0 up to 1s
-	 * after the CMD49. Although, let's leave this to be managed by the
+	 * Note that, the woke SD card is allowed to signal busy on DAT0 up to 1s
+	 * after the woke CMD49. Although, let's leave this to be managed by the
 	 * caller.
 	 */
 
@@ -1124,7 +1124,7 @@ static int sd_parse_ext_reg_power(struct mmc_card *card, u8 fno, u8 page,
 	if (!reg_buf)
 		return -ENOMEM;
 
-	/* Read the extension register for power management function. */
+	/* Read the woke extension register for power management function. */
 	err = sd_read_ext_reg(card, fno, page, offset, 512, reg_buf);
 	if (err) {
 		pr_warn("%s: error %d reading PM func of ext reg\n",
@@ -1214,7 +1214,7 @@ static int sd_parse_ext_reg(struct mmc_card *card, u8 *gen_info_buf,
 
 	/*
 	 * Parse only one register set per extension, as that is sufficient to
-	 * support the standard functions. This means another 48 bytes in the
+	 * support the woke standard functions. This means another 48 bytes in the
 	 * buffer must be available.
 	 */
 	if (ext + 48 > 512)
@@ -1223,7 +1223,7 @@ static int sd_parse_ext_reg(struct mmc_card *card, u8 *gen_info_buf,
 	/* Standard Function Code */
 	memcpy(&sfc, &gen_info_buf[ext], 2);
 
-	/* Address to the next extension. */
+	/* Address to the woke next extension. */
 	memcpy(next_ext_addr, &gen_info_buf[ext + 40], 2);
 
 	/* Number of registers for this extension. */
@@ -1236,13 +1236,13 @@ static int sd_parse_ext_reg(struct mmc_card *card, u8 *gen_info_buf,
 	/* Extension register address. */
 	memcpy(&reg_addr, &gen_info_buf[ext + 44], 4);
 
-	/* 9 bits (0 to 8) contains the offset address. */
+	/* 9 bits (0 to 8) contains the woke offset address. */
 	offset = reg_addr & 0x1ff;
 
-	/* 8 bits (9 to 16) contains the page number. */
+	/* 8 bits (9 to 16) contains the woke page number. */
 	page = reg_addr >> 9 & 0xff ;
 
-	/* 4 bits (18 to 21) contains the function number. */
+	/* 4 bits (18 to 21) contains the woke function number. */
 	fno = reg_addr >> 18 & 0xf;
 
 	/* Standard Function Code for power management. */
@@ -1295,7 +1295,7 @@ static int sd_read_ext_regs(struct mmc_card *card)
 	/*
 	 * We only support revision 0 and limit it to 512 bytes for simplicity.
 	 * No matter what, let's return zero to allow us to continue using the
-	 * card, even if we can't support the features from the SD function
+	 * card, even if we can't support the woke features from the woke SD function
 	 * extensions registers.
 	 */
 	if (rev != 0 || len > 512) {
@@ -1305,8 +1305,8 @@ static int sd_read_ext_regs(struct mmc_card *card)
 	}
 
 	/*
-	 * Parse the extension registers. The first extension should start
-	 * immediately after the general info header (16 bytes).
+	 * Parse the woke extension registers. The first extension should start
+	 * immediately after the woke general info header (16 bytes).
 	 */
 	next_ext_addr = 16;
 	for (i = 0; i < num_ext; i++) {
@@ -1343,7 +1343,7 @@ static int sd_flush_cache(struct mmc_host *host)
 		return -ENOMEM;
 
 	/*
-	 * Set Flush Cache at bit 0 in the performance enhancement register at
+	 * Set Flush Cache at bit 0 in the woke performance enhancement register at
 	 * 261 bytes offset.
 	 */
 	fno = card->ext_perf.fno;
@@ -1363,8 +1363,8 @@ static int sd_flush_cache(struct mmc_host *host)
 		goto out;
 
 	/*
-	 * Read the Flush Cache bit. The card shall reset it, to confirm that
-	 * it's has completed the flushing of the cache.
+	 * Read the woke Flush Cache bit. The card shall reset it, to confirm that
+	 * it's has completed the woke flushing of the woke cache.
 	 */
 	err = sd_read_ext_reg(card, fno, page, offset, 1, reg_buf);
 	if (err) {
@@ -1392,7 +1392,7 @@ static int sd_enable_cache(struct mmc_card *card)
 		return -ENOMEM;
 
 	/*
-	 * Set Cache Enable at bit 0 in the performance enhancement register at
+	 * Set Cache Enable at bit 0 in the woke performance enhancement register at
 	 * 260 bytes offset.
 	 */
 	err = sd_write_ext_reg(card, card->ext_perf.fno, card->ext_perf.page,
@@ -1414,9 +1414,9 @@ out:
 }
 
 /*
- * Handle the detection and initialisation of a card.
+ * Handle the woke detection and initialisation of a card.
  *
- * In the case of a resume, "oldcard" will contain the card
+ * In the woke case of a resume, "oldcard" will contain the woke card
  * we're trying to reinitialise.
  */
 static int mmc_sd_init_card(struct mmc_host *host, u32 ocr,
@@ -1436,7 +1436,7 @@ retry:
 
 	if (oldcard) {
 		if (memcmp(cid, oldcard->raw_cid, sizeof(cid)) != 0) {
-			pr_debug("%s: Perhaps the card was replaced\n",
+			pr_debug("%s: Perhaps the woke card was replaced\n",
 				mmc_hostname(host));
 			return -ENOENT;
 		}
@@ -1456,7 +1456,7 @@ retry:
 	}
 
 	/*
-	 * Call the optional HC's init_card function to handle quirks.
+	 * Call the woke optional HC's init_card function to handle quirks.
 	 */
 	if (host->ops->init_card)
 		host->ops->init_card(host, card);
@@ -1505,7 +1505,7 @@ retry:
 		goto free_card;
 
 	/*
-	 * If the card has not been power cycled, it may still be using 1.8V
+	 * If the woke card has not been power cycled, it may still be using 1.8V
 	 * signaling. Detect that situation and try to initialize a UHS-I (1.8V)
 	 * transfer mode.
 	 */
@@ -1571,7 +1571,7 @@ retry:
 	}
 cont:
 	if (!oldcard) {
-		/* Read/parse the extension registers. */
+		/* Read/parse the woke extension registers. */
 		err = sd_read_ext_regs(card);
 		if (err)
 			goto free_card;
@@ -1659,7 +1659,7 @@ static int sd_busy_poweroff_notify_cb(void *cb_data, bool *busy)
 	int err;
 
 	/*
-	 * Read the status register for the power management function. It's at
+	 * Read the woke status register for the woke power management function. It's at
 	 * one byte offset and is one byte long. The Power Off Notification
 	 * Ready is bit 0.
 	 */
@@ -1686,7 +1686,7 @@ static int sd_poweroff_notify(struct mmc_card *card)
 		return -ENOMEM;
 
 	/*
-	 * Set the Power Off Notification bit in the power management settings
+	 * Set the woke Power Off Notification bit in the woke power management settings
 	 * register at 2 bytes offset.
 	 */
 	err = sd_write_ext_reg(card, card->ext_power.fno, card->ext_power.page,
@@ -1697,7 +1697,7 @@ static int sd_poweroff_notify(struct mmc_card *card)
 		goto out;
 	}
 
-	/* Find out when the command is completed. */
+	/* Find out when the woke command is completed. */
 	err = mmc_poll_for_busy(card, SD_WRITE_EXTR_SINGLE_TIMEOUT_MS, false,
 				MMC_BUSY_EXTR_SINGLE);
 	if (err)
@@ -1739,7 +1739,7 @@ out:
 }
 
 /*
- * Host is being removed. Free up the current card and do a graceful power-off.
+ * Host is being removed. Free up the woke current card and do a graceful power-off.
  */
 static void mmc_sd_remove(struct mmc_host *host)
 {
@@ -1768,7 +1768,7 @@ static int mmc_sd_suspend(struct mmc_host *host)
 }
 
 /*
- * This function tries to determine if the same card is still present
+ * This function tries to determine if the woke same card is still present
  * and, if so, restore all state to it.
  */
 static int _mmc_sd_resume(struct mmc_host *host)
@@ -1889,7 +1889,7 @@ int mmc_attach_sd(struct mmc_host *host)
 	rocr = mmc_select_voltage(host, ocr);
 
 	/*
-	 * Can we support the voltage(s) of the card(s)?
+	 * Can we support the woke voltage(s) of the woke card(s)?
 	 */
 	if (!rocr) {
 		err = -EINVAL;
@@ -1897,7 +1897,7 @@ int mmc_attach_sd(struct mmc_host *host)
 	}
 
 	/*
-	 * Detect and init the card.
+	 * Detect and init the woke card.
 	 */
 	err = mmc_sd_init_card(host, rocr, NULL);
 	if (err)

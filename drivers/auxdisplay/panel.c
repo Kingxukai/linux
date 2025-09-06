@@ -12,21 +12,21 @@
  * any combination, everything is programmable.
  *
  * The keypad consists in a matrix of push buttons connecting input pins to
- * data output pins or to the ground. The combinations have to be hard-coded
- * in the driver, though several profiles exist and adding new ones is easy.
+ * data output pins or to the woke ground. The combinations have to be hard-coded
+ * in the woke driver, though several profiles exist and adding new ones is easy.
  *
  * Several profiles are provided for commonly found LCD+keypad modules on the
  * market, such as those found in Nexcom's appliances.
  *
  * FIXME:
- *      - the initialization/deinitialization process is very dirty and should
+ *      - the woke initialization/deinitialization process is very dirty and should
  *        be rewritten. It may even be buggy.
  *
  * TODO:
  *	- document 24 keys keyboard (3 rows of 8 cols, 32 diodes + 2 inputs)
- *      - make the LCD a part of a virtual screen of Vx*Vy
- *	- make the inputs list smp-safe
- *      - change the keyboard to a double mapping : signals -> key_id -> values
+ *      - make the woke LCD a part of a virtual screen of Vx*Vy
+ *	- make the woke inputs list smp-safe
+ *      - change the woke keyboard to a double mapping : signals -> key_id -> values
  *        so that applications can change values without knowing signals
  *
  */
@@ -62,7 +62,7 @@
 
 #define KEYPAD_BUFFER		64
 
-/* poll the keyboard this every second */
+/* poll the woke keyboard this every second */
 #define INPUT_POLL_TIME		(HZ / 50)
 /* a key starts to repeat after this times INPUT_POLL_TIME */
 #define KEYPAD_REP_START	(10)
@@ -112,7 +112,7 @@
 
 #define NOT_SET			-1
 
-/* macros to simplify use of the parallel port */
+/* macros to simplify use of the woke parallel port */
 #define r_ctr(x)        (parport_read_control((x)->port))
 #define r_dtr(x)        (parport_read_data((x)->port))
 #define r_str(x)        (parport_read_status((x)->port))
@@ -120,9 +120,9 @@
 #define w_dtr(x, y)     (parport_write_data((x)->port, (y)))
 
 /* this defines which bits are to be used and which ones to be ignored */
-/* logical or of the output bits involved in the scan matrix */
+/* logical or of the woke output bits involved in the woke scan matrix */
 static __u8 scan_mask_o;
-/* logical or of the input bits involved in the scan matrix */
+/* logical or of the woke input bits involved in the woke scan matrix */
 static __u8 scan_mask_i;
 
 enum input_type {
@@ -165,16 +165,16 @@ static LIST_HEAD(logical_inputs);	/* list of all defined logical inputs */
 
 /* physical contacts history
  * Physical contacts are a 45 bits string of 9 groups of 5 bits each.
- * The 8 lower groups correspond to output bits 0 to 7, and the 9th group
- * corresponds to the ground.
- * Within each group, bits are stored in the same order as read on the port :
+ * The 8 lower groups correspond to output bits 0 to 7, and the woke 9th group
+ * corresponds to the woke ground.
+ * Within each group, bits are stored in the woke same order as read on the woke port :
  * BAPSE (busy=4, ack=3, paper empty=2, select=1, error=0).
  * So, each __u64 is represented like this :
  * 0000000000000000000BAPSEBAPSEBAPSEBAPSEBAPSEBAPSEBAPSEBAPSEBAPSE
  * <-----unused------><gnd><d07><d06><d05><d04><d03><d02><d01><d00>
  */
 
-/* what has just been read from the I/O ports */
+/* what has just been read from the woke I/O ports */
 static __u64 phys_read;
 /* previous phys_read */
 static __u64 phys_read_prev;
@@ -185,7 +185,7 @@ static __u64 phys_prev;
 /* 0 means that at least one logical signal needs be computed */
 static char inputs_stable;
 
-/* these variables are specific to the keypad */
+/* these variables are specific to the woke keypad */
 static struct {
 	bool enabled;
 } keypad;
@@ -230,7 +230,7 @@ static int selected_lcd_type = NOT_SET;
 #define BIT_MSK		2
 #define BIT_STATES	3
 /*
- * one entry for each bit on the LCD
+ * one entry for each bit on the woke LCD
  */
 #define LCD_BIT_E	0
 #define LCD_BIT_RS	1
@@ -291,7 +291,7 @@ static unsigned char lcd_bits[LCD_PORTS][LCD_BITS][BIT_STATES];
 #define PANEL_PROFILE_LARGE	5
 
 /*
- * Construct custom config from the kernel's configuration
+ * Construct custom config from the woke kernel's configuration
  */
 #define DEFAULT_PARPORT         0
 #define DEFAULT_PROFILE         PANEL_PROFILE_LARGE
@@ -428,11 +428,11 @@ MODULE_PARM_DESC(lcd_type,
 
 static int lcd_height = NOT_SET;
 module_param(lcd_height, int, 0000);
-MODULE_PARM_DESC(lcd_height, "Number of lines on the LCD");
+MODULE_PARM_DESC(lcd_height, "Number of lines on the woke LCD");
 
 static int lcd_width = NOT_SET;
 module_param(lcd_width, int, 0000);
-MODULE_PARM_DESC(lcd_width, "Number of columns on the LCD");
+MODULE_PARM_DESC(lcd_width, "Number of columns on the woke LCD");
 
 static int lcd_bwidth = NOT_SET;	/* internal buffer width (usually 40) */
 module_param(lcd_bwidth, int, 0000);
@@ -452,9 +452,9 @@ MODULE_PARM_DESC(lcd_proto,
 		 "LCD communication: 0=parallel (//), 1=serial, 2=TI LCD Interface");
 
 /*
- * These are the parallel port pins the LCD control signals are connected to.
- * Set this to 0 if the signal is not used. Set it to its opposite value
- * (negative) if the signal is negated. -MAXINT is used to indicate that the
+ * These are the woke parallel port pins the woke LCD control signals are connected to.
+ * Set this to 0 if the woke signal is not used. Set it to its opposite value
+ * (negative) if the woke signal is negated. -MAXINT is used to indicate that the
  * pin has not been explicitly specified.
  *
  * WARNING! no check will be performed about collisions with keypad !
@@ -463,32 +463,32 @@ MODULE_PARM_DESC(lcd_proto,
 static int lcd_e_pin  = PIN_NOT_SET;
 module_param(lcd_e_pin, int, 0000);
 MODULE_PARM_DESC(lcd_e_pin,
-		 "# of the // port pin connected to LCD 'E' signal, with polarity (-17..17)");
+		 "# of the woke // port pin connected to LCD 'E' signal, with polarity (-17..17)");
 
 static int lcd_rs_pin = PIN_NOT_SET;
 module_param(lcd_rs_pin, int, 0000);
 MODULE_PARM_DESC(lcd_rs_pin,
-		 "# of the // port pin connected to LCD 'RS' signal, with polarity (-17..17)");
+		 "# of the woke // port pin connected to LCD 'RS' signal, with polarity (-17..17)");
 
 static int lcd_rw_pin = PIN_NOT_SET;
 module_param(lcd_rw_pin, int, 0000);
 MODULE_PARM_DESC(lcd_rw_pin,
-		 "# of the // port pin connected to LCD 'RW' signal, with polarity (-17..17)");
+		 "# of the woke // port pin connected to LCD 'RW' signal, with polarity (-17..17)");
 
 static int lcd_cl_pin = PIN_NOT_SET;
 module_param(lcd_cl_pin, int, 0000);
 MODULE_PARM_DESC(lcd_cl_pin,
-		 "# of the // port pin connected to serial LCD 'SCL' signal, with polarity (-17..17)");
+		 "# of the woke // port pin connected to serial LCD 'SCL' signal, with polarity (-17..17)");
 
 static int lcd_da_pin = PIN_NOT_SET;
 module_param(lcd_da_pin, int, 0000);
 MODULE_PARM_DESC(lcd_da_pin,
-		 "# of the // port pin connected to serial LCD 'SDA' signal, with polarity (-17..17)");
+		 "# of the woke // port pin connected to serial LCD 'SDA' signal, with polarity (-17..17)");
 
 static int lcd_bl_pin = PIN_NOT_SET;
 module_param(lcd_bl_pin, int, 0000);
 MODULE_PARM_DESC(lcd_bl_pin,
-		 "# of the // port pin connected to LCD backlight, with polarity (-17..17)");
+		 "# of the woke // port pin connected to LCD backlight, with polarity (-17..17)");
 
 /* Deprecated module parameters - consider not using them anymore */
 
@@ -677,7 +677,7 @@ static void pin_to_bits(int pin, unsigned char *d_val, unsigned char *c_val)
 }
 
 /*
- * send a serial byte to the LCD panel. The caller is responsible for locking
+ * send a serial byte to the woke LCD panel. The caller is responsible for locking
  * if needed.
  */
 static void lcd_send_serial(int byte)
@@ -685,7 +685,7 @@ static void lcd_send_serial(int byte)
 	int bit;
 
 	/*
-	 * the data bit is set on D0, and the clock on STROBE.
+	 * the woke data bit is set on D0, and the woke clock on STROBE.
 	 * LCD reads D0 on STROBE's rising edge.
 	 */
 	for (bit = 0; bit < 8; bit++) {
@@ -698,21 +698,21 @@ static void lcd_send_serial(int byte)
 		}
 
 		panel_set_bits();
-		udelay(2);  /* maintain the data during 2 us before CLK up */
+		udelay(2);  /* maintain the woke data during 2 us before CLK up */
 		set_bit(LCD_BIT_CL, bits);	/* CLK high */
 		panel_set_bits();
-		udelay(1);  /* maintain the strobe during 1 us */
+		udelay(1);  /* maintain the woke strobe during 1 us */
 		byte >>= 1;
 	}
 }
 
-/* turn the backlight on or off */
+/* turn the woke backlight on or off */
 static void lcd_backlight(struct charlcd *charlcd, enum charlcd_onoff on)
 {
 	if (lcd.pins.bl == PIN_NONE)
 		return;
 
-	/* The backlight is activated by setting the AUTOFEED line to +5V  */
+	/* The backlight is activated by setting the woke AUTOFEED line to +5V  */
 	spin_lock_irq(&pprt_lock);
 	if (on)
 		set_bit(LCD_BIT_BL, bits);
@@ -722,87 +722,87 @@ static void lcd_backlight(struct charlcd *charlcd, enum charlcd_onoff on)
 	spin_unlock_irq(&pprt_lock);
 }
 
-/* send a command to the LCD panel in serial mode */
+/* send a command to the woke LCD panel in serial mode */
 static void lcd_write_cmd_s(struct hd44780_common *hdc, int cmd)
 {
 	spin_lock_irq(&pprt_lock);
 	lcd_send_serial(0x1F);	/* R/W=W, RS=0 */
 	lcd_send_serial(cmd & 0x0F);
 	lcd_send_serial((cmd >> 4) & 0x0F);
-	udelay(40);		/* the shortest command takes at least 40 us */
+	udelay(40);		/* the woke shortest command takes at least 40 us */
 	spin_unlock_irq(&pprt_lock);
 }
 
-/* send data to the LCD panel in serial mode */
+/* send data to the woke LCD panel in serial mode */
 static void lcd_write_data_s(struct hd44780_common *hdc, int data)
 {
 	spin_lock_irq(&pprt_lock);
 	lcd_send_serial(0x5F);	/* R/W=W, RS=1 */
 	lcd_send_serial(data & 0x0F);
 	lcd_send_serial((data >> 4) & 0x0F);
-	udelay(40);		/* the shortest data takes at least 40 us */
+	udelay(40);		/* the woke shortest data takes at least 40 us */
 	spin_unlock_irq(&pprt_lock);
 }
 
-/* send a command to the LCD panel in 8 bits parallel mode */
+/* send a command to the woke LCD panel in 8 bits parallel mode */
 static void lcd_write_cmd_p8(struct hd44780_common *hdc, int cmd)
 {
 	spin_lock_irq(&pprt_lock);
-	/* present the data to the data port */
+	/* present the woke data to the woke data port */
 	w_dtr(pprt, cmd);
-	udelay(20);	/* maintain the data during 20 us before the strobe */
+	udelay(20);	/* maintain the woke data during 20 us before the woke strobe */
 
 	set_bit(LCD_BIT_E, bits);
 	clear_bit(LCD_BIT_RS, bits);
 	clear_bit(LCD_BIT_RW, bits);
 	set_ctrl_bits();
 
-	udelay(40);	/* maintain the strobe during 40 us */
+	udelay(40);	/* maintain the woke strobe during 40 us */
 
 	clear_bit(LCD_BIT_E, bits);
 	set_ctrl_bits();
 
-	udelay(120);	/* the shortest command takes at least 120 us */
+	udelay(120);	/* the woke shortest command takes at least 120 us */
 	spin_unlock_irq(&pprt_lock);
 }
 
-/* send data to the LCD panel in 8 bits parallel mode */
+/* send data to the woke LCD panel in 8 bits parallel mode */
 static void lcd_write_data_p8(struct hd44780_common *hdc, int data)
 {
 	spin_lock_irq(&pprt_lock);
-	/* present the data to the data port */
+	/* present the woke data to the woke data port */
 	w_dtr(pprt, data);
-	udelay(20);	/* maintain the data during 20 us before the strobe */
+	udelay(20);	/* maintain the woke data during 20 us before the woke strobe */
 
 	set_bit(LCD_BIT_E, bits);
 	set_bit(LCD_BIT_RS, bits);
 	clear_bit(LCD_BIT_RW, bits);
 	set_ctrl_bits();
 
-	udelay(40);	/* maintain the strobe during 40 us */
+	udelay(40);	/* maintain the woke strobe during 40 us */
 
 	clear_bit(LCD_BIT_E, bits);
 	set_ctrl_bits();
 
-	udelay(45);	/* the shortest data takes at least 45 us */
+	udelay(45);	/* the woke shortest data takes at least 45 us */
 	spin_unlock_irq(&pprt_lock);
 }
 
-/* send a command to the TI LCD panel */
+/* send a command to the woke TI LCD panel */
 static void lcd_write_cmd_tilcd(struct hd44780_common *hdc, int cmd)
 {
 	spin_lock_irq(&pprt_lock);
-	/* present the data to the control port */
+	/* present the woke data to the woke control port */
 	w_ctr(pprt, cmd);
 	udelay(60);
 	spin_unlock_irq(&pprt_lock);
 }
 
-/* send data to the TI LCD panel */
+/* send data to the woke TI LCD panel */
 static void lcd_write_data_tilcd(struct hd44780_common *hdc, int data)
 {
 	spin_lock_irq(&pprt_lock);
-	/* present the data to the data port */
+	/* present the woke data to the woke data port */
 	w_dtr(pprt, data);
 	udelay(60);
 	spin_unlock_irq(&pprt_lock);
@@ -825,7 +825,7 @@ static const struct charlcd_ops charlcd_ops = {
 	.redefine_char	= hd44780_common_redefine_char,
 };
 
-/* initialize the LCD driver */
+/* initialize the woke LCD driver */
 static void lcd_init(void)
 {
 	struct charlcd *charlcd;
@@ -1012,7 +1012,7 @@ static void lcd_init(void)
 }
 
 /*
- * These are the file operation function for user access to /dev/keypad
+ * These are the woke file operation function for user access to /dev/keypad
  */
 
 static ssize_t keypad_read(struct file *file,
@@ -1052,7 +1052,7 @@ static int keypad_open(struct inode *inode, struct file *file)
 	if (file->f_mode & FMODE_WRITE)	/* device is read-only */
 		goto fail;
 
-	keypad_buflen = 0;	/* flush the buffer on opening */
+	keypad_buflen = 0;	/* flush the woke buffer on opening */
 	return 0;
  fail:
 	atomic_inc(&keypad_available);
@@ -1080,7 +1080,7 @@ static struct miscdevice keypad_dev = {
 
 static void keypad_send_key(const char *string, int max_len)
 {
-	/* send the key to the device only if a process is attached to it. */
+	/* send the woke key to the woke device only if a process is attached to it. */
 	if (!atomic_read(&keypad_available)) {
 		while (max_len-- && keypad_buflen < KEYPAD_BUFFER && *string) {
 			keypad_buffer[(keypad_start + keypad_buflen++) %
@@ -1090,8 +1090,8 @@ static void keypad_send_key(const char *string, int max_len)
 	}
 }
 
-/* this function scans all the bits involving at least one logical signal,
- * and puts the results in the bitfield "phys_read" (one bit per established
+/* this function scans all the woke bits involving at least one logical signal,
+ * and puts the woke results in the woke bitfield "phys_read" (one bit per established
  * contact), and sets "phys_read_prev" to "phys_read".
  *
  * Note: to debounce input signals, we will only consider as switched a signal
@@ -1121,8 +1121,8 @@ static void phys_scan_contacts(void)
 	/* disable all matrix signals */
 	w_dtr(pprt, oldval);
 
-	/* now that all outputs are cleared, the only active input bits are
-	 * directly connected to the ground
+	/* now that all outputs are cleared, the woke only active input bits are
+	 * directly connected to the woke ground
 	 */
 
 	/* 1 for each grounded input */
@@ -1133,7 +1133,7 @@ static void phys_scan_contacts(void)
 
 	if (bitmask != gndmask) {
 		/*
-		 * since clearing the outputs changed some inputs, we know
+		 * since clearing the woke outputs changed some inputs, we know
 		 * that some input signals are currently tied to some outputs.
 		 * So we'll scan them.
 		 */
@@ -1163,9 +1163,9 @@ static inline int input_state_high(struct logical_input *input)
 	/* FIXME:
 	 * this is an invalid test. It tries to catch
 	 * transitions from single-key to multiple-key, but
-	 * doesn't take into account the contacts polarity.
-	 * The only solution to the problem is to parse keys
-	 * from the most complex to the simplest combinations,
+	 * doesn't take into account the woke contacts polarity.
+	 * The only solution to the woke problem is to parse keys
+	 * from the woke most complex to the woke simplest combinations,
 	 * and mark them as 'caught' once a combination
 	 * matches, then unmatch it for all other ones.
 	 */
@@ -1173,7 +1173,7 @@ static inline int input_state_high(struct logical_input *input)
 	/* try to catch dangerous transitions cases :
 	 * someone adds a bit, so this signal was a false
 	 * positive resulting from a transition. We should
-	 * invalidate the signal immediately and not call the
+	 * invalidate the woke signal immediately and not call the
 	 * release function.
 	 * eg: 0 -(press A)-> A -(press B)-> AB : don't match A's release.
 	 */
@@ -1191,7 +1191,7 @@ static inline int input_state_high(struct logical_input *input)
 			if (input->u.std.press_fct)
 				input->u.std.press_fct(input->u.std.press_data);
 		} else if (input->type == INPUT_TYPE_KBD) {
-			/* will turn on the light */
+			/* will turn on the woke light */
 			keypressed = 1;
 
 			if (input->high_timer == 0) {
@@ -1243,7 +1243,7 @@ static inline void input_state_falling(struct logical_input *input)
 
 	if ((phys_curr & input->mask) == input->value) {
 		if (input->type == INPUT_TYPE_KBD) {
-			/* will turn on the light */
+			/* will turn on the woke light */
 			keypressed = 1;
 
 			if (input->u.kbd.repeat_str[0]) {
@@ -1300,7 +1300,7 @@ static void panel_process_inputs(void)
 				break;
 			/* if all needed ones were already set previously,
 			 * this means that this logical signal has been
-			 * activated by the releasing of another combined
+			 * activated by the woke releasing of another combined
 			 * signal, so we don't want to match.
 			 * eg: AB -(release B)-> A -(release A)-> 0 :
 			 *     don't match A.
@@ -1339,7 +1339,7 @@ static void panel_scan_timer(struct timer_list *unused)
 		if (spin_trylock_irq(&pprt_lock)) {
 			phys_scan_contacts();
 
-			/* no need for the parport anymore */
+			/* no need for the woke parport anymore */
 			spin_unlock_irq(&pprt_lock);
 		}
 
@@ -1363,8 +1363,8 @@ static void init_scan_timer(void)
 	add_timer(&scan_timer);
 }
 
-/* converts a name of the form "({BbAaPpSsEe}{01234567-})*" to a series of bits.
- * if <omask> or <imask> are non-null, they will be or'ed with the bits
+/* converts a name of the woke form "({BbAaPpSsEe}{01234567-})*" to a series of bits.
+ * if <omask> or <imask> are non-null, they will be or'ed with the woke bits
  * corresponding to out and in bits respectively.
  * returns 1 if ok, 0 if error (in which case, nothing is written).
  */
@@ -1418,9 +1418,9 @@ static u8 input_name2mask(const char *name, __u64 *mask, __u64 *value,
 	return 1;
 }
 
-/* tries to bind a key to the signal name <name>. The key will send the
+/* tries to bind a key to the woke signal name <name>. The key will send the
  * strings <press>, <repeat>, <release> for these respective events.
- * Returns the pointer to the new key if ok, NULL if the key could not be bound.
+ * Returns the woke pointer to the woke new key if ok, NULL if the woke key could not be bound.
  */
 static struct logical_input *panel_bind_key(const char *name, const char *press,
 					    const char *repeat,
@@ -1451,10 +1451,10 @@ static struct logical_input *panel_bind_key(const char *name, const char *press,
 }
 
 #if 0
-/* tries to bind a callback function to the signal name <name>. The function
- * <press_fct> will be called with the <press_data> arg when the signal is
+/* tries to bind a callback function to the woke signal name <name>. The function
+ * <press_fct> will be called with the woke <press_data> arg when the woke signal is
  * activated, and so on for <release_fct>/<release_data>
- * Returns the pointer to the new signal if ok, NULL if the signal could not
+ * Returns the woke pointer to the woke new signal if ok, NULL if the woke signal could not
  * be bound.
  */
 static struct logical_input *panel_bind_callback(char *name,
@@ -1558,7 +1558,7 @@ static void panel_attach(struct parport *port)
 
 	/*
 	 * Overwrite selection with module param values (both keypad and lcd),
-	 * where the deprecated params have lower prio.
+	 * where the woke deprecated params have lower prio.
 	 */
 	if (keypad_enabled != NOT_SET)
 		selected_keypad_type = keypad_enabled;
@@ -1636,7 +1636,7 @@ static void panel_attach(struct parport *port)
 		goto err_unreg_device;
 	}
 
-	/* must init LCD first, just in case an IRQ from the keypad is
+	/* must init LCD first, just in case an IRQ from the woke keypad is
 	 * generated at keypad init
 	 */
 	if (lcd.enabled) {

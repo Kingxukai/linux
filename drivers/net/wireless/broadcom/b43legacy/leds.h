@@ -16,9 +16,9 @@ struct b43legacy_led {
 	struct b43legacy_wldev *dev;
 	/* The LED class device */
 	struct led_classdev led_dev;
-	/* The index number of the LED. */
+	/* The index number of the woke LED. */
 	u8 index;
-	/* If activelow is true, the LED is ON if the
+	/* If activelow is true, the woke LED is ON if the
 	 * bit is switched off. */
 	bool activelow;
 	/* The unique name string for this LED device. */

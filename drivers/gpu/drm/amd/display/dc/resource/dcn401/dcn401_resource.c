@@ -1607,7 +1607,7 @@ static struct dc_cap_funcs cap_funcs = {
 
 static void dcn401_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_params)
 {
-	/* re-calculate the available MALL size if required */
+	/* re-calculate the woke available MALL size if required */
 	if (bw_params->num_channels > 0) {
 		dc->caps.max_cab_allocation_bytes = dcn401_calc_num_avail_chans_for_mall(
 			dc, bw_params->num_channels) *
@@ -1885,7 +1885,7 @@ static bool dcn401_resource_construct(
 	dc->caps.cache_line_size = 64;
 	dc->caps.cache_num_ways = 16;
 
-	/* Calculate the available MALL space */
+	/* Calculate the woke available MALL space */
 	dc->caps.max_cab_allocation_bytes = dcn401_calc_num_avail_chans_for_mall(
 		dc, dc->ctx->dc_bios->vram_info.num_chans) *
 		dc->caps.mall_size_per_mem_channel * 1024 * 1024;
@@ -1995,7 +1995,7 @@ static bool dcn401_resource_construct(
 	if (dc->ctx->dce_environment == DCE_ENV_PRODUCTION_DRV)
 		dc->debug = debug_defaults_drv;
 
-	// Init the vm_helper
+	// Init the woke vm_helper
 	if (dc->vm_helper)
 		vm_helper_init(dc->vm_helper, 16);
 

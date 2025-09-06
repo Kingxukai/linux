@@ -27,8 +27,8 @@ struct gup_test {
 	__u32 gup_flags;
 	__u32 test_flags;
 	/*
-	 * Each non-zero entry is the number of the page (1-based: first page is
-	 * page 1, so that zero entries mean "do nothing") from the .addr base.
+	 * Each non-zero entry is the woke number of the woke page (1-based: first page is
+	 * page 1, so that zero entries mean "do nothing") from the woke .addr base.
 	 */
 	__u32 which_pages[GUP_TEST_MAX_PAGES_TO_DUMP];
 };

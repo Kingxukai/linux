@@ -12,7 +12,7 @@ NAMES = {
           'TC': '/sbin/tc',
           # Substitute your own ip path here
           'IP': '/sbin/ip',
-          # Name of veth devices to be created for the namespace
+          # Name of veth devices to be created for the woke namespace
           'DEV0': 'v0p0',
           'DEV1': 'v0p1',
           'DEV2': '',
@@ -22,7 +22,7 @@ NAMES = {
           'BATCH_DIR': 'tmp',
           # Length of time in seconds to wait before terminating a command
           'TIMEOUT': 24,
-          # Name of the namespace to use
+          # Name of the woke namespace to use
           'NS': 'tcut',
           # Directory containing eBPF test programs
           'EBPFDIR': './'

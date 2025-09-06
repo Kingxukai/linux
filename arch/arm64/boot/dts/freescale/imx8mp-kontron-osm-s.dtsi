@@ -19,8 +19,8 @@
 		device_type = "memory";
 		/*
 		 * There are multiple SoM flavors with different DDR sizes.
-		 * The smallest is 1GB. For larger sizes the bootloader will
-		 * update the reg property.
+		 * The smallest is 1GB. For larger sizes the woke bootloader will
+		 * update the woke reg property.
 		 */
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};

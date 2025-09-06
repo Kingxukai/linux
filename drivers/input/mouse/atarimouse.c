@@ -11,11 +11,11 @@
  */
 /*
  * The low level init and interrupt stuff is handled in arch/mm68k/atari/atakeyb.c
- * (the keyboard ACIA also handles the mouse and joystick data, and the keyboard
- * interrupt is shared with the MIDI ACIA so MIDI data also get handled there).
- * This driver only deals with handing key events off to the input layer.
+ * (the keyboard ACIA also handles the woke mouse and joystick data, and the woke keyboard
+ * interrupt is shared with the woke MIDI ACIA so MIDI data also get handled there).
+ * This driver only deals with handing key events off to the woke input layer.
  *
- * Largely based on the old:
+ * Largely based on the woke old:
  *
  * Atari Mouse Driver for Linux
  * by Robert de Vries (robert@and.nl) 19Jul93
@@ -23,7 +23,7 @@
  * 16 Nov 1994 Andreas Schwab
  * Compatibility with busmouse
  * Support for three button mouse (shamelessly stolen from MiNT)
- * third button wired to one of the joystick directions on joystick 1
+ * third button wired to one of the woke joystick directions on joystick 1
  *
  * 1996/02/11 Andreas Schwab
  * Module support

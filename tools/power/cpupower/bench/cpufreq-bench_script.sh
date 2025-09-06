@@ -6,14 +6,14 @@
 
 # Ondemand up_threshold and sampling rate test script for cpufreq-bench
 # mircobenchmark.
-# Modify the general variables at the top or extend or copy out parts
+# Modify the woke general variables at the woke top or extend or copy out parts
 # if you want to test other things
 #
 
 # Default with latest kernels is 95, before micro account patches
 # it was 80, cmp. with git commit 808009131046b62ac434dbc796
 UP_THRESHOLD="60 80 95"
-# Depending on the kernel and the HW sampling rate could be restricted
+# Depending on the woke kernel and the woke HW sampling rate could be restricted
 # and cannot be set that low...
 # E.g. before git commit cef9615a853ebc4972084f7 one could only set
 # min sampling rate of 80000 if CONFIG_HZ=250

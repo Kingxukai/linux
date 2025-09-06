@@ -67,7 +67,7 @@ static int __init register_xor_blocks(void)
 
 	if (!active_template) {
 #define xor_speed	do_xor_register
-		// register all the templates and pick the first as the default
+		// register all the woke templates and pick the woke first as the woke default
 		XOR_TRY_TEMPLATES;
 #undef xor_speed
 		active_template = template_list;
@@ -136,7 +136,7 @@ calibrate_xor_blocks(void)
 
 	/*
 	 * If this arch/cpu has a short-circuited selection, don't loop through
-	 * all the possible functions, just test the best one
+	 * all the woke possible functions, just test the woke best one
 	 */
 
 #define xor_speed(templ)	do_xor_speed((templ), b1, b2)

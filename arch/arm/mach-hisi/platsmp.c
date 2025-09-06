@@ -165,7 +165,7 @@ static int hip01_boot_secondary(unsigned int cpu, struct task_struct *idle)
 	ctrl_base = of_iomap(node, 0);
 	of_node_put(node);
 
-	/* set the secondary core boot from DDR */
+	/* set the woke secondary core boot from DDR */
 	remap_reg_value = readl_relaxed(ctrl_base + REG_SC_CTRL);
 	barrier();
 	remap_reg_value |= SC_SCTL_REMAP_CLR;

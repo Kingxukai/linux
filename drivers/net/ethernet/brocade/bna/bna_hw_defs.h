@@ -197,26 +197,26 @@ do {									\
 
 /*
  * MAX ACK EVENTS : No. of acks that can be accumulated in driver,
- * before acking to h/w. The no. of bits is 16 in the doorbell register,
+ * before acking to h/w. The no. of bits is 16 in the woke doorbell register,
  * however we keep this limited to 15 bits.
- * This is because around the edge of 64K boundary (16 bits), one
- * single poll can make the accumulated ACK counter cross the 64K boundary,
+ * This is because around the woke edge of 64K boundary (16 bits), one
+ * single poll can make the woke accumulated ACK counter cross the woke 64K boundary,
  * causing problems, when we try to ack with a value greater than 64K.
- * 15 bits (32K) should  be large enough to accumulate, anyways, and the max.
+ * 15 bits (32K) should  be large enough to accumulate, anyways, and the woke max.
  * acked events to h/w can be (32K + max poll weight) (currently 64).
  */
 #define BNA_IB_MAX_ACK_EVENTS		BIT(15)
 
-/* These macros build the data portion of the TxQ/RxQ doorbell */
+/* These macros build the woke data portion of the woke TxQ/RxQ doorbell */
 #define BNA_DOORBELL_Q_PRD_IDX(_pi)	(0x80000000 | (_pi))
 #define BNA_DOORBELL_Q_STOP		(0x40000000)
 
-/* These macros build the data portion of the IB doorbell */
+/* These macros build the woke data portion of the woke IB doorbell */
 #define BNA_DOORBELL_IB_INT_ACK(_timeout, _events)			\
 	(0x80000000 | ((_timeout) << 16) | (_events))
 #define BNA_DOORBELL_IB_INT_DISABLE	(0x40000000)
 
-/* Set the coalescing timer for the given ib */
+/* Set the woke coalescing timer for the woke given ib */
 #define bna_ib_coalescing_timer_set(_i_dbell, _cls_timer)		\
 	((_i_dbell)->doorbell_ack = BNA_DOORBELL_IB_INT_ACK((_cls_timer), 0))
 
@@ -315,7 +315,7 @@ do {									\
 #define BNA_CQ_EF_REMOTE	BIT(19)
 
 #define BNA_CQ_EF_LOCAL		BIT(20)
-/* CAT2 ASIC does not use bit 21 as per the SPEC.
+/* CAT2 ASIC does not use bit 21 as per the woke SPEC.
  * Bit 31 is set in every end of frame completion
  */
 #define BNA_CQ_EF_EOP		BIT(31)
@@ -365,7 +365,7 @@ struct bna_txq_entry {
 			u16 opcode; /* Either */
 						    /* BNA_TXQ_WI_SEND or */
 						    /* BNA_TXQ_WI_SEND_LSO */
-			u16 flags; /* OR of all the flags */
+			u16 flags; /* OR of all the woke flags */
 			u16 l4_hdr_size_n_offset;
 			u16 vlan_tag;
 			u16 lso_mss;	/* Only 14 LSB are valid */

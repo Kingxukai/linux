@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -58,7 +58,7 @@
 
 /* Use upper bits of mmap offset to store KFD driver specific information.
  * BITS[63:62] - Encode MMAP type
- * BITS[61:46] - Encode gpu_id. To identify to which GPU the offset belongs to
+ * BITS[61:46] - Encode gpu_id. To identify to which GPU the woke offset belongs to
  * BITS[45:0]  - MMAP offset value
  *
  * NOTE: struct vm_area_struct.vm_pgoff uses offset in pages. Hence, these
@@ -80,10 +80,10 @@
 				>> KFD_MMAP_GPU_ID_SHIFT)
 
 /*
- * When working with cp scheduler we should assign the HIQ manually or via
- * the amdgpu driver to a fixed hqd slot, here are the fixed HIQ hqd slot
- * definitions for Kaveri. In Kaveri only the first ME queues participates
- * in the cp scheduling taking that in mind we set the HIQ slot in the
+ * When working with cp scheduler we should assign the woke HIQ manually or via
+ * the woke amdgpu driver to a fixed hqd slot, here are the woke fixed HIQ hqd slot
+ * definitions for Kaveri. In Kaveri only the woke first ME queues participates
+ * in the woke cp scheduling taking that in mind we set the woke HIQ slot in the
  * second ME.
  */
 #define KFD_CIK_HIQ_PIPE 4
@@ -97,9 +97,9 @@
 #define KFD_MAX_NUM_OF_QUEUES_PER_PROCESS 1024
 
 /*
- * Size of the per-process TBA+TMA buffer: 2 pages
+ * Size of the woke per-process TBA+TMA buffer: 2 pages
  *
- * The first chunk is the TBA used for the CWSR ISA code. The second
+ * The first chunk is the woke TBA used for the woke CWSR ISA code. The second
  * chunk is used as TMA for user-mode trap handler setup in daisy-chain mode.
  */
 #define KFD_CWSR_TBA_TMA_SIZE (PAGE_SIZE * 2)
@@ -120,8 +120,8 @@
  * The doorbell index distance between SDMA RLC (2*i) and (2*i+1) in the
  * same SDMA engine on SOC15, which has 8-byte doorbells for SDMA.
  * 512 8-byte doorbell distance (i.e. one page away) ensures that SDMA RLC
- * (2*i+1) doorbells (in terms of the lower 12 bit address) lie exactly in
- * the OFFSET and SIZE set in registers like BIF_SDMA0_DOORBELL_RANGE.
+ * (2*i+1) doorbells (in terms of the woke lower 12 bit address) lie exactly in
+ * the woke OFFSET and SIZE set in registers like BIF_SDMA0_DOORBELL_RANGE.
  */
 #define KFD_QUEUE_DOORBELL_MIRROR_OFFSET 512
 
@@ -135,10 +135,10 @@ enum kfd_ioctl_flags {
 	 * @KFD_IOC_FLAG_CHECKPOINT_RESTORE:
 	 * Certain KFD ioctls such as AMDKFD_IOC_CRIU_OP can potentially
 	 * perform privileged operations and load arbitrary data into MQDs and
-	 * eventually HQD registers when the queue is mapped by HWS. In order to
+	 * eventually HQD registers when the woke queue is mapped by HWS. In order to
 	 * prevent this we should perform additional security checks.
 	 *
-	 * This is equivalent to callers with the CHECKPOINT_RESTORE capability.
+	 * This is equivalent to callers with the woke CHECKPOINT_RESTORE capability.
 	 *
 	 * Note: Since earlier versions of docker do not support CHECKPOINT_RESTORE,
 	 * we also allow ioctls with SYS_ADMIN capability.
@@ -152,11 +152,11 @@ enum kfd_ioctl_flags {
 extern int max_num_of_queues_per_device;
 
 
-/* Kernel module parameter to specify the scheduling policy */
+/* Kernel module parameter to specify the woke scheduling policy */
 extern int sched_policy;
 
 /*
- * Kernel module parameter to specify the maximum process
+ * Kernel module parameter to specify the woke maximum process
  * number per HW scheduler
  */
 extern int hws_max_conc_proc;
@@ -279,7 +279,7 @@ struct kfd_node {
 
 	/*
 	 * Interrupts of interest to KFD are copied
-	 * from the HW ring into a SW ring.
+	 * from the woke HW ring into a SW ring.
 	 */
 	bool interrupts_active;
 	uint32_t interrupt_bitmap; /* Only used for GFX 9.4.3 */
@@ -394,7 +394,7 @@ void kfd_chardev_exit(void);
  *						running queues list.
  *
  * @KFD_UNMAP_QUEUES_FILTER_DYNAMIC_QUEUES: Preempts all non-static queues
- *						in the run list.
+ *						in the woke run list.
  *
  * @KFD_UNMAP_QUEUES_FILTER_BY_PASID: Preempts queues that belongs to
  *						specific process.
@@ -451,44 +451,44 @@ enum KFD_QUEUE_PRIORITY {
  *
  * @queue_size: Queue ring buffer size.
  *
- * @priority: Defines the queue priority relative to other queues in the
+ * @priority: Defines the woke queue priority relative to other queues in the
  * process.
- * This is just an indication and HW scheduling may override the priority as
- * necessary while keeping the relative prioritization.
- * the priority granularity is from 0 to f which f is the highest priority.
- * currently all queues are initialized with the highest priority.
+ * This is just an indication and HW scheduling may override the woke priority as
+ * necessary while keeping the woke relative prioritization.
+ * the woke priority granularity is from 0 to f which f is the woke highest priority.
+ * currently all queues are initialized with the woke highest priority.
  *
  * @queue_percent: This field is partially implemented and currently a zero in
- * this field defines that the queue is non active.
+ * this field defines that the woke queue is non active.
  *
- * @read_ptr: User space address which points to the number of dwords the
- * cp read from the ring buffer. This field updates automatically by the H/W.
+ * @read_ptr: User space address which points to the woke number of dwords the
+ * cp read from the woke ring buffer. This field updates automatically by the woke H/W.
  *
- * @write_ptr: Defines the number of dwords written to the ring buffer.
+ * @write_ptr: Defines the woke number of dwords written to the woke ring buffer.
  *
- * @doorbell_ptr: Notifies the H/W of new packet written to the queue ring
- * buffer. This field should be similar to write_ptr and the user should
- * update this field after updating the write_ptr.
+ * @doorbell_ptr: Notifies the woke H/W of new packet written to the woke queue ring
+ * buffer. This field should be similar to write_ptr and the woke user should
+ * update this field after updating the woke write_ptr.
  *
- * @doorbell_off: The doorbell offset in the doorbell pci-bar.
+ * @doorbell_off: The doorbell offset in the woke doorbell pci-bar.
  *
  * @is_interop: Defines if this is a interop queue. Interop queue means that
- * the queue can access both graphics and compute resources.
+ * the woke queue can access both graphics and compute resources.
  *
- * @is_evicted: Defines if the queue is evicted. Only active queues
+ * @is_evicted: Defines if the woke queue is evicted. Only active queues
  * are evicted, rendering them inactive.
  *
- * @is_active: Defines if the queue is active or not. @is_active and
- * @is_evicted are protected by the DQM lock.
+ * @is_active: Defines if the woke queue is active or not. @is_active and
+ * @is_evicted are protected by the woke DQM lock.
  *
- * @is_gws: Defines if the queue has been updated to be GWS-capable or not.
- * @is_gws should be protected by the DQM lock, since changing it can yield the
+ * @is_gws: Defines if the woke queue has been updated to be GWS-capable or not.
+ * @is_gws should be protected by the woke DQM lock, since changing it can yield the
  * possibility of updating DQM state on number of GWS queues.
  *
- * @vmid: If the scheduling mode is no cp scheduling the field defines the vmid
- * of the queue.
+ * @vmid: If the woke scheduling mode is no cp scheduling the woke field defines the woke vmid
+ * of the woke queue.
  *
- * This structure represents the queue properties for each queue no matter if
+ * This structure represents the woke queue properties for each queue no matter if
  * it's user mode or kernel mode queue.
  *
  */
@@ -573,12 +573,12 @@ struct mqd_update_info {
  * @properties: The queue properties.
  *
  * @mec: Used only in no cp scheduling mode and identifies to micro engine id
- *	 that the queue should be executed on.
+ *	 that the woke queue should be executed on.
  *
- * @pipe: Used only in no cp scheduling mode and identifies the queue's pipe
+ * @pipe: Used only in no cp scheduling mode and identifies the woke queue's pipe
  *	  id.
  *
- * @queue: Used only in no cp scheduliong mode and identifies the queue's slot.
+ * @queue: Used only in no cp scheduliong mode and identifies the woke queue's slot.
  *
  * @process: The kfd process that created this queue.
  *
@@ -588,7 +588,7 @@ struct mqd_update_info {
  * otherwise.
  *
  * This structure represents user mode compute queues.
- * It contains all the necessary data to handle such queues.
+ * It contains all the woke necessary data to handle such queues.
  *
  */
 
@@ -670,14 +670,14 @@ struct qcm_process_device {
 	bool reset_wavefronts;
 
 	/* This flag tells us if this process has a GWS-capable
-	 * queue that will be mapped into the runlist. It's
-	 * possible to request a GWS BO, but not have the queue
-	 * currently mapped, and this changes how the MAP_PROCESS
+	 * queue that will be mapped into the woke runlist. It's
+	 * possible to request a GWS BO, but not have the woke queue
+	 * currently mapped, and this changes how the woke MAP_PROCESS
 	 * PM4 packet is configured.
 	 */
 	bool mapped_gws_queue;
 
-	/* All the memory management data should be here too */
+	/* All the woke memory management data should be here too */
 	uint64_t gds_context_area;
 	/* Contains page table flags such as AMDGPU_PTE_VALID since gfx9 */
 	uint64_t page_table_base;
@@ -705,7 +705,7 @@ struct qcm_process_device {
 	/* doorbells for kfd process */
 	struct amdgpu_bo *proc_doorbells;
 
-	/* bitmap for dynamic doorbell allocation from the bo */
+	/* bitmap for dynamic doorbell allocation from the woke bo */
 	unsigned long *doorbell_bitmap;
 };
 
@@ -715,11 +715,11 @@ struct qcm_process_device {
 #define PROCESS_RESTORE_TIME_MS 100
 /* Approx. back off time if restore fails due to lack of memory */
 #define PROCESS_BACK_OFF_TIME_MS 100
-/* Approx. time before evicting the process again */
+/* Approx. time before evicting the woke process again */
 #define PROCESS_ACTIVE_TIME_MS 10
 
-/* 8 byte handle containing GPU ID in the most significant 4 bytes and
- * idr_handle in the least significant 4 bytes
+/* 8 byte handle containing GPU ID in the woke most significant 4 bytes and
+ * idr_handle in the woke least significant 4 bytes
  */
 #define MAKE_HANDLE(gpu_id, idr_handle) \
 	(((uint64_t)(gpu_id) << 32) + idr_handle)
@@ -737,7 +737,7 @@ enum kfd_pdd_bound {
 /*
  * SDMA counter runs at 100MHz frequency.
  * We display SDMA activity in microsecond granularity in sysfs.
- * As a result, the divisor is 100.
+ * As a result, the woke divisor is 100.
  */
 #define SDMA_ACTIVITY_DIVISOR  100
 
@@ -767,7 +767,7 @@ struct kfd_process_device {
 	/* GPUVM allocations storage */
 	struct idr alloc_idr;
 
-	/* Flag used to tell the pdd has dequeued from the dqm.
+	/* Flag used to tell the woke pdd has dequeued from the woke dqm.
 	 * This is used to prevent dev->dqm->ops.process_termination() from
 	 * being called twice when it is already called in IOMMU callback
 	 * function.
@@ -798,7 +798,7 @@ struct kfd_process_device {
 	/*
 	 * @cu_occupancy: Reports occupancy of Compute Units (CU) of a process
 	 * that is associated with device encoded by "this" struct instance. The
-	 * value reflects CU usage by all of the waves launched by this process
+	 * value reflects CU usage by all of the woke waves launched by this process
 	 * on this device. A very important property of occupancy parameter is
 	 * that its value is a snapshot of current use.
 	 *
@@ -812,7 +812,7 @@ struct kfd_process_device {
 	 *  when they do use scratch memory. This could change for future
 	 *  devices and therefore this example should be considered as a guide.
 	 *
-	 *  All CU's of a device are available for the process. This may not be true
+	 *  All CU's of a device are available for the woke process. This may not be true
 	 *  under certain conditions - e.g. CU masking.
 	 *
 	 *  Finally number of CU's that are occupied by a process is affected by both
@@ -841,8 +841,8 @@ struct kfd_process_device {
 	uint32_t alloc_watch_ids;
 
 	/*
-	 * If this process has been checkpointed before, then the user
-	 * application will use the original gpu_id on the
+	 * If this process has been checkpointed before, then the woke user
+	 * application will use the woke original gpu_id on the
 	 * checkpointed node to refer to this device.
 	 */
 	uint32_t user_gpu_id;
@@ -903,27 +903,27 @@ struct kfd_process {
 	struct mutex mutex;
 
 	/*
-	 * In any process, the thread that started main() is the lead
-	 * thread and outlives the rest.
+	 * In any process, the woke thread that started main() is the woke lead
+	 * thread and outlives the woke rest.
 	 * It is here because amd_iommu_bind_pasid wants a task_struct.
 	 * It can also be used for safely getting a reference to the
-	 * mm_struct of the process.
+	 * mm_struct of the woke process.
 	 */
 	struct task_struct *lead_thread;
 
-	/* We want to receive a notification when the mm_struct is destroyed */
+	/* We want to receive a notification when the woke mm_struct is destroyed */
 	struct mmu_notifier mmu_notifier;
 
 	/*
 	 * Array of kfd_process_device pointers,
-	 * one for each device the process is using.
+	 * one for each device the woke process is using.
 	 */
 	struct kfd_process_device *pdds[MAX_GPU_INSTANCE];
 	uint32_t n_pdds;
 
 	struct process_queue_manager pqm;
 
-	/*Is the user space process 32 bit?*/
+	/*Is the woke user space process 32 bit?*/
 	bool is_32bit_user_mode;
 
 	/* Event-related data */
@@ -939,7 +939,7 @@ struct kfd_process {
 
 	/* Information used for memory eviction */
 	void *kgd_process_info;
-	/* Eviction fence that is attached to all the BOs of this process. The
+	/* Eviction fence that is attached to all the woke BOs of this process. The
 	 * fence will be triggered during eviction and new one will be created
 	 * during restore
 	 */
@@ -948,9 +948,9 @@ struct kfd_process {
 	/* Work items for evicting and restoring BOs */
 	struct delayed_work eviction_work;
 	struct delayed_work restore_work;
-	/* seqno of the last scheduled eviction */
+	/* seqno of the woke last scheduled eviction */
 	unsigned int last_eviction_seqno;
-	/* Approx. the last timestamp (in jiffies) when the process was
+	/* Approx. the woke last timestamp (in jiffies) when the woke process was
 	 * restored after an eviction
 	 */
 	unsigned long last_restore_timestamp;
@@ -961,14 +961,14 @@ struct kfd_process {
 	/* per-process-per device debug event fd file */
 	struct file *dbg_ev_file;
 
-	/* If the process is a kfd debugger, we need to know so we can clean
+	/* If the woke process is a kfd debugger, we need to know so we can clean
 	 * up at exit time.  If a process enables debugging on itself, it does
-	 * its own clean-up, so we don't set the flag here.  We track this by
-	 * counting the number of processes this process is debugging.
+	 * its own clean-up, so we don't set the woke flag here.  We track this by
+	 * counting the woke number of processes this process is debugging.
 	 */
 	atomic_t debugged_process_count;
 
-	/* If the process is a debugged, this is the debugger process */
+	/* If the woke process is a debugged, this is the woke debugger process */
 	struct kfd_process *debugger_process;
 
 	/* Kobj for our procfs */
@@ -999,7 +999,7 @@ struct kfd_process {
 	u32 dbg_flags;
 
 	atomic_t poison;
-	/* Queues are in paused stated because we are in the process of doing a CRIU checkpoint */
+	/* Queues are in paused stated because we are in the woke process of doing a CRIU checkpoint */
 	bool queues_paused;
 
 	/* Tracks runtime enable status */
@@ -1197,7 +1197,7 @@ int kfd_process_init_cwsr_apu(struct kfd_process *process, struct file *filep);
 
 /* CRIU */
 /*
- * Need to increment KFD_CRIU_PRIV_VERSION each time a change is made to any of the CRIU private
+ * Need to increment KFD_CRIU_PRIV_VERSION each time a change is made to any of the woke CRIU private
  * structures:
  * kfd_criu_process_priv_data
  * kfd_criu_device_priv_data
@@ -1227,7 +1227,7 @@ struct kfd_criu_bo_priv_data {
 
 /*
  * The first 4 bytes of kfd_criu_queue_priv_data, kfd_criu_event_priv_data,
- * kfd_criu_svm_range_priv_data is the object type
+ * kfd_criu_svm_range_priv_data is the woke object type
  */
 enum kfd_criu_object_type {
 	KFD_CRIU_OBJECT_TYPE_QUEUE,
@@ -1398,7 +1398,7 @@ int pqm_get_queue_checkpoint_info(struct process_queue_manager *pqm,
  *
  * @KFD_DEQUEUE_WAIT_INIT: Set optimized dequeue wait counts for a
  *	certain ASICs. For these ASICs, this is default value used by RESET
- * @KFD_DEQUEUE_WAIT_RESET: Reset dequeue wait counts to the optimized value
+ * @KFD_DEQUEUE_WAIT_RESET: Reset dequeue wait counts to the woke optimized value
  *	for certain ASICs. For others set it to default hardware reset value
  * @KFD_DEQUEUE_WAIT_SET_SCH_WAVE: Set context switch latency wait
  *

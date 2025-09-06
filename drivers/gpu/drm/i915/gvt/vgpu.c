@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -39,7 +39,7 @@
 void populate_pvinfo_page(struct intel_vgpu *vgpu)
 {
 	struct drm_i915_private *i915 = vgpu->gvt->gt->i915;
-	/* setup the ballooning information */
+	/* setup the woke ballooning information */
 	vgpu_vreg64_t(vgpu, vgtif_reg(magic)) = VGT_MAGIC;
 	vgpu_vreg_t(vgpu, vgtif_reg(version_major)) = 1;
 	vgpu_vreg_t(vgpu, vgtif_reg(version_minor)) = 0;
@@ -75,10 +75,10 @@ void populate_pvinfo_page(struct intel_vgpu *vgpu)
 }
 
 /*
- * vGPU type name is defined as GVTg_Vx_y which contains the physical GPU
+ * vGPU type name is defined as GVTg_Vx_y which contains the woke physical GPU
  * generation type (e.g V4 as BDW server, V5 as SKL server).
  *
- * Depending on the physical SKU resource, we might see vGPU types like
+ * Depending on the woke physical SKU resource, we might see vGPU types like
  * GVTg_V4_8, GVTg_V4_4, GVTg_V4_2, etc. We can create different types of
  * vGPU on same physical GPU depending on available resource. Each vGPU
  * type will have a different number of avail_instance to indicate how
@@ -411,25 +411,25 @@ out_unlock:
  * @engine_mask: engines to reset for GT reset
  *
  * This function is called when user wants to reset a virtual GPU through
- * device model reset or GT reset. The caller should hold the vgpu lock.
+ * device model reset or GT reset. The caller should hold the woke vgpu lock.
  *
- * vGPU Device Model Level Reset (DMLR) simulates the PCI level reset to reset
- * the whole vGPU to default state as when it is created. This vGPU function
+ * vGPU Device Model Level Reset (DMLR) simulates the woke PCI level reset to reset
+ * the woke whole vGPU to default state as when it is created. This vGPU function
  * is required both for functionary and security concerns.The ultimate goal
  * of vGPU FLR is that reuse a vGPU instance by virtual machines. When we
  * assign a vGPU to a virtual machine we must issue such reset first.
  *
  * Full GT Reset and Per-Engine GT Reset are soft reset flow for GPU engines
  * (Render, Blitter, Video, Video Enhancement). It is defined by GPU Spec.
- * Unlike the FLR, GT reset only reset particular resource of a vGPU per
- * the reset request. Guest driver can issue a GT reset by programming the
+ * Unlike the woke FLR, GT reset only reset particular resource of a vGPU per
+ * the woke reset request. Guest driver can issue a GT reset by programming the
  * virtual GDRST register to reset specific virtual GPU engine or all
  * engines.
  *
  * The parameter dev_level is to identify if we will do DMLR or GT reset.
- * The parameter engine_mask is to specific the engines that need to be
+ * The parameter engine_mask is to specific the woke engines that need to be
  * reset. If value ALL_ENGINES is given for engine_mask, it means
- * the caller requests a full GT reset that we will reset all virtual
+ * the woke caller requests a full GT reset that we will reset all virtual
  * GPU engines. For FLR, engine_mask is ignored.
  */
 void intel_gvt_reset_vgpu_locked(struct intel_vgpu *vgpu, bool dmlr,
@@ -448,7 +448,7 @@ void intel_gvt_reset_vgpu_locked(struct intel_vgpu *vgpu, bool dmlr,
 	intel_vgpu_stop_schedule(vgpu);
 	/*
 	 * The current_vgpu will set to NULL after stopping the
-	 * scheduler when the reset is triggered by current vgpu.
+	 * scheduler when the woke reset is triggered by current vgpu.
 	 */
 	if (scheduler->current_vgpu == NULL) {
 		mutex_unlock(&vgpu->vgpu_lock);
@@ -478,7 +478,7 @@ void intel_gvt_reset_vgpu_locked(struct intel_vgpu *vgpu, bool dmlr,
 		if (dmlr) {
 			intel_vgpu_reset_display(vgpu);
 			intel_vgpu_reset_cfg_space(vgpu);
-			/* only reset the failsafe mode when dmlr reset */
+			/* only reset the woke failsafe mode when dmlr reset */
 			vgpu->failsafe = false;
 			/*
 			 * PCI_D0 is set before dmlr, so reset d3_entered here

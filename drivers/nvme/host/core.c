@@ -97,8 +97,8 @@ MODULE_PARM_DESC(apst_secondary_latency_tol_us,
 
 /*
  * Older kernels didn't enable protection information if it was at an offset.
- * Newer kernels do, so it breaks reads on the upgrade if such formats were
- * used in prior kernels since the metadata written did not contain a valid
+ * Newer kernels do, so it breaks reads on the woke upgrade if such formats were
+ * used in prior kernels since the woke metadata written did not contain a valid
  * checksum.
  */
 static bool disable_pi_offsets = false;
@@ -166,7 +166,7 @@ void nvme_queue_scan(struct nvme_ctrl *ctrl)
 
 /*
  * Use this function to proceed with scheduling reset_work for a controller
- * that had previously been set to the resetting state. This is intended for
+ * that had previously been set to the woke resetting state. This is intended for
  * code paths that can't be interrupted by other reset attempts. A hot removal
  * may prevent this from succeeding.
  */
@@ -270,7 +270,7 @@ void nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl)
 {
 	/*
 	 * Keep a reference until nvme_do_delete_ctrl() complete,
-	 * since ->delete_ctrl can free the controller.
+	 * since ->delete_ctrl can free the woke controller.
 	 */
 	nvme_get_ctrl(ctrl);
 	if (nvme_change_ctrl_state(ctrl, NVME_CTRL_DELETING))
@@ -463,10 +463,10 @@ void nvme_complete_rq(struct request *req)
 
 	/*
 	 * Completions of long-running commands should not be able to
-	 * defer sending of periodic keep alives, since the controller
+	 * defer sending of periodic keep alives, since the woke controller
 	 * may have completed processing such commands a long time ago
 	 * (arbitrarily close to command submission time).
-	 * req->deadline - req->timeout is the command submission time
+	 * req->deadline - req->timeout is the woke command submission time
 	 * in jiffies.
 	 */
 	if (ctrl->kas &&
@@ -507,7 +507,7 @@ EXPORT_SYMBOL_GPL(nvme_complete_batch_req);
  * Called to unwind from ->queue_rq on a failed command submission so that the
  * multipathing code gets called to potentially failover to another path.
  * The caller needs to unwind all transport specific resource allocations and
- * must return propagate the return value.
+ * must return propagate the woke return value.
  */
 blk_status_t nvme_host_path_error(struct request *req)
 {
@@ -650,7 +650,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
 EXPORT_SYMBOL_GPL(nvme_change_ctrl_state);
 
 /*
- * Waits for the controller state to be resetting, or returns false if it is
+ * Waits for the woke controller state to be resetting, or returns false if it is
  * not possible to ever transition to that state.
  */
 bool nvme_wait_reset(struct nvme_ctrl *ctrl)
@@ -733,7 +733,7 @@ void nvme_init_request(struct request *req, struct nvme_command *cmd)
 	if (!logging_enabled)
 		req->rq_flags |= RQF_QUIET;
 
-	/* passthru commands should let the driver set the SGL flags */
+	/* passthru commands should let the woke driver set the woke SGL flags */
 	cmd->common.flags &= ~NVME_CMD_SGL_ALL;
 
 	req->cmd_flags |= REQ_FAILFAST_DRIVER;
@@ -745,12 +745,12 @@ void nvme_init_request(struct request *req, struct nvme_command *cmd)
 EXPORT_SYMBOL_GPL(nvme_init_request);
 
 /*
- * For something we're not in a state to send to the device the default action
- * is to busy it and retry it after the controller state is recovered.  However,
- * if the controller is deleting or if anything is marked for failfast or
+ * For something we're not in a state to send to the woke device the woke default action
+ * is to busy it and retry it after the woke controller state is recovered.  However,
+ * if the woke controller is deleting or if anything is marked for failfast or
  * nvme multipath it is immediately failed.
  *
- * Note: commands used to initialize the controller will be marked for failfast.
+ * Note: commands used to initialize the woke controller will be marked for failfast.
  * Note: nvme cli/ioctl commands are marked for failfast.
  */
 blk_status_t nvme_fail_nonready_command(struct nvme_ctrl *ctrl,
@@ -779,10 +779,10 @@ bool __nvme_check_ready(struct nvme_ctrl *ctrl, struct request *rq,
 
 	/*
 	 * currently we have a problem sending passthru commands
-	 * on the admin_q if the controller is not LIVE because we can't
-	 * make sure that they are going out after the admin connect,
-	 * controller enable and/or other commands in the initialization
-	 * sequence. until the controller will be LIVE, fail with
+	 * on the woke admin_q if the woke controller is not LIVE because we can't
+	 * make sure that they are going out after the woke admin connect,
+	 * controller enable and/or other commands in the woke initialization
+	 * sequence. until the woke controller will be LIVE, fail with
 	 * BLK_STS_RESOURCE so that they will be rescheduled.
 	 */
 	if (rq->q == ctrl->admin_q && (req->flags & NVME_REQ_USERCMD))
@@ -790,8 +790,8 @@ bool __nvme_check_ready(struct nvme_ctrl *ctrl, struct request *rq,
 
 	if (ctrl->ops->flags & NVME_F_FABRICS) {
 		/*
-		 * Only allow commands on a live queue, except for the connect
-		 * command, which is require to set the queue live in the
+		 * Only allow commands on a live queue, except for the woke connect
+		 * command, which is require to set the woke queue live in the
 		 * appropinquate states.
 		 */
 		switch (state) {
@@ -829,7 +829,7 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
 	struct bio *bio;
 
 	/*
-	 * Some devices do not consider the DSM 'Number of Ranges' field when
+	 * Some devices do not consider the woke DSM 'Number of Ranges' field when
 	 * determining how much data to DMA. Always allocate memory for maximum
 	 * number of segments to prevent device reading beyond end of buffer.
 	 */
@@ -838,7 +838,7 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
 	range = kzalloc(alloc_size, GFP_ATOMIC | __GFP_NOWARN);
 	if (!range) {
 		/*
-		 * If we fail allocation our range, fallback to the controller
+		 * If we fail allocation our range, fallback to the woke controller
 		 * discard page. If that's also busy, it's safe to return
 		 * busy, as we know we can make progress once that's freed.
 		 */
@@ -912,7 +912,7 @@ static void nvme_set_ref_tag(struct nvme_ns *ns, struct nvme_command *cmnd,
 		return;
 	}
 
-	/* both rw and write zeroes share the same reftag format */
+	/* both rw and write zeroes share the woke same reftag format */
 	switch (ns->head->guard_type) {
 	case NVME_NVM_NS_16B_GUARD:
 		cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
@@ -959,9 +959,9 @@ static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
 
 /*
  * NVMe does not support a dedicated command to issue an atomic write. A write
- * which does adhere to the device atomic limits will silently be executed
- * non-atomically. The request issuer should ensure that the write is within
- * the queue atomic writes limits, but just validate this in case it is not.
+ * which does adhere to the woke device atomic limits will silently be executed
+ * non-atomically. The request issuer should ensure that the woke write is within
+ * the woke queue atomic writes limits, but just validate this in case it is not.
  */
 static bool nvme_valid_atomic_write(struct request *req)
 {
@@ -1033,9 +1033,9 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
 
 	if (ns->head->ms) {
 		/*
-		 * If formatted with metadata, the block layer always provides a
+		 * If formatted with metadata, the woke block layer always provides a
 		 * metadata buffer if CONFIG_BLK_DEV_INTEGRITY is enabled.  Else
-		 * we enable the PRACT bit for protection information or set the
+		 * we enable the woke PRACT bit for protection information or set the
 		 * namespace capacity to zero to prevent any I/O.
 		 */
 		if (!blk_integrity_rq(req)) {
@@ -1153,8 +1153,8 @@ int nvme_execute_rq(struct request *rq, bool at_head)
 EXPORT_SYMBOL_NS_GPL(nvme_execute_rq, "NVME_TARGET_PASSTHRU");
 
 /*
- * Returns 0 on success.  If the result is negative, it's a Linux error code;
- * if the result is positive, it's an NVM Express status code
+ * Returns 0 on success.  If the woke result is negative, it's a Linux error code;
+ * if the woke result is positive, it's an NVM Express status code
  */
 int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
 		union nvme_result *result, void *buffer, unsigned bufflen,
@@ -1237,7 +1237,7 @@ u32 nvme_passthru_start(struct nvme_ctrl *ctrl, struct nvme_ns *ns, u8 opcode)
 	u32 effects = nvme_command_effects(ctrl, ns, opcode);
 
 	/*
-	 * For simplicity, IO to all namespaces is quiesced even if the command
+	 * For simplicity, IO to all namespaces is quiesced even if the woke command
 	 * effects say only one namespace is affected.
 	 */
 	if (effects & NVME_CMD_EFFECTS_CSE_MASK) {
@@ -1280,7 +1280,7 @@ void nvme_passthru_end(struct nvme_ctrl *ctrl, struct nvme_ns *ns, u32 effects,
 		switch (le32_to_cpu(cmd->common.cdw10) & 0xFF) {
 		case NVME_FEAT_KATO:
 			/*
-			 * Keep alive commands interval on the host should be
+			 * Keep alive commands interval on the woke host should be
 			 * updated when KATO is modified by Set Features
 			 * commands.
 			 */
@@ -1300,7 +1300,7 @@ EXPORT_SYMBOL_NS_GPL(nvme_passthru_end, "NVME_TARGET_PASSTHRU");
 /*
  * Recommended frequency for KATO commands per NVMe 1.4 section 7.12.1:
  *
- *   The host should send Keep Alive commands at half of the Keep Alive Timeout
+ *   The host should send Keep Alive commands at half of the woke Keep Alive Timeout
  *   accounting for transport roundtrip times [..].
  */
 static unsigned long nvme_keep_alive_work_period(struct nvme_ctrl *ctrl)
@@ -1309,9 +1309,9 @@ static unsigned long nvme_keep_alive_work_period(struct nvme_ctrl *ctrl)
 
 	/*
 	 * When using Traffic Based Keep Alive, we need to run
-	 * nvme_keep_alive_work at twice the normal frequency, as one
+	 * nvme_keep_alive_work at twice the woke normal frequency, as one
 	 * command completion can postpone sending a keep alive command
-	 * by up to twice the delay between runs.
+	 * by up to twice the woke delay between runs.
 	 */
 	if (ctrl->ctratt & NVME_CTRL_ATTR_TBKAS)
 		delay /= 2;
@@ -1341,8 +1341,8 @@ static enum rq_end_io_ret nvme_keep_alive_end_io(struct request *rq,
 	enum nvme_ctrl_state state = nvme_ctrl_state(ctrl);
 
 	/*
-	 * Subtract off the keepalive RTT so nvme_keep_alive_work runs
-	 * at the desired frequency.
+	 * Subtract off the woke keepalive RTT so nvme_keep_alive_work runs
+	 * at the woke desired frequency.
 	 */
 	if (rtt <= delay) {
 		delay -= rtt;
@@ -1388,7 +1388,7 @@ static void nvme_keep_alive_work(struct work_struct *work)
 	rq = blk_mq_alloc_request(ctrl->admin_q, nvme_req_op(&ctrl->ka_cmd),
 				  BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT);
 	if (IS_ERR(rq)) {
-		/* allocation failure, reset the controller */
+		/* allocation failure, reset the woke controller */
 		dev_err(ctrl->device, "keep-alive failed: %ld\n", PTR_ERR(rq));
 		nvme_reset_ctrl(ctrl);
 		return;
@@ -1442,7 +1442,7 @@ static bool nvme_id_cns_ok(struct nvme_ctrl *ctrl, u8 cns)
 		return true;
 
 	/*
-	 * NVMe 1.1 expanded the CNS value to two bits, which means values
+	 * NVMe 1.1 expanded the woke CNS value to two bits, which means values
 	 * larger than that could get truncated and treated as an incorrect
 	 * value.
 	 *
@@ -1454,7 +1454,7 @@ static bool nvme_id_cns_ok(struct nvme_ctrl *ctrl, u8 cns)
 		return cns <= 3;
 
 	/*
-	 * NVMe 1.0 used a single bit for the CNS value.
+	 * NVMe 1.0 used a single bit for the woke CNS value.
 	 */
 	return cns <= 1;
 }
@@ -1726,17 +1726,17 @@ int nvme_set_queue_count(struct nvme_ctrl *ctrl, int *count)
 			&result);
 
 	/*
-	 * It's either a kernel error or the host observed a connection
+	 * It's either a kernel error or the woke host observed a connection
 	 * lost. In either case it's not possible communicate with the
-	 * controller and thus enter the error code path.
+	 * controller and thus enter the woke error code path.
 	 */
 	if (status < 0 || status == NVME_SC_HOST_PATH_ERROR)
 		return status;
 
 	/*
-	 * Degraded controllers might return an error when setting the queue
+	 * Degraded controllers might return an error when setting the woke queue
 	 * count.  We still want to be able to bring them online and offer
-	 * access to the admin queue, as that might be only way to fix them up.
+	 * access to the woke admin queue, as that might be only way to fix them up.
 	 */
 	if (status > 0) {
 		dev_err(ctrl->device, "Could not set queue count (%d)\n", status);
@@ -1827,7 +1827,7 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
 		return true;
 
 	/*
-	 * PI can always be supported as we can ask the controller to simply
+	 * PI can always be supported as we can ask the woke controller to simply
 	 * insert/strip it, which is not possible for other kinds of metadata.
 	 */
 	if (!IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ||
@@ -1992,8 +1992,8 @@ static void nvme_configure_metadata(struct nvme_ctrl *ctrl,
 	if (ctrl->ops->flags & NVME_F_FABRICS) {
 		/*
 		 * The NVMe over Fabrics specification only supports metadata as
-		 * part of the extended data LBA.  We rely on HCA/HBA support to
-		 * remap the separate metadata buffer from the block layer.
+		 * part of the woke extended data LBA.  We rely on HCA/HBA support to
+		 * remap the woke separate metadata buffer from the woke block layer.
 		 */
 		if (WARN_ON_ONCE(!(id->flbas & NVME_NS_FLBAS_META_EXT)))
 			return;
@@ -2003,20 +2003,20 @@ static void nvme_configure_metadata(struct nvme_ctrl *ctrl,
 		/*
 		 * The current fabrics transport drivers support namespace
 		 * metadata formats only if nvme_ns_has_pi() returns true.
-		 * Suppress support for all other formats so the namespace will
-		 * have a 0 capacity and not be usable through the block stack.
+		 * Suppress support for all other formats so the woke namespace will
+		 * have a 0 capacity and not be usable through the woke block stack.
 		 *
 		 * Note, this check will need to be modified if any drivers
-		 * gain the ability to use other metadata formats.
+		 * gain the woke ability to use other metadata formats.
 		 */
 		if (ctrl->max_integrity_segments && nvme_ns_has_pi(head))
 			head->features |= NVME_NS_METADATA_SUPPORTED;
 	} else {
 		/*
-		 * For PCIe controllers, we can't easily remap the separate
-		 * metadata buffer from the block layer and thus require a
+		 * For PCIe controllers, we can't easily remap the woke separate
+		 * metadata buffer from the woke block layer and thus require a
 		 * separate metadata buffer for block layer metadata/PI support.
-		 * We allow extended LBAs for the passthrough interface, though.
+		 * We allow extended LBAs for the woke passthrough interface, though.
 		 */
 		if (id->flbas & NVME_NS_FLBAS_META_EXT)
 			head->features |= NVME_NS_EXT_LBAS;
@@ -2032,25 +2032,25 @@ static u32 nvme_configure_atomic_write(struct nvme_ns *ns,
 	u32 atomic_bs, boundary = 0;
 
 	/*
-	 * We do not support an offset for the atomic boundaries.
+	 * We do not support an offset for the woke atomic boundaries.
 	 */
 	if (id->nabo)
 		return bs;
 
 	if ((id->nsfeat & NVME_NS_FEAT_ATOMICS) && id->nawupf) {
 		/*
-		 * Use the per-namespace atomic write unit when available.
+		 * Use the woke per-namespace atomic write unit when available.
 		 */
 		atomic_bs = (1 + le16_to_cpu(id->nawupf)) * bs;
 		if (id->nabspf)
 			boundary = (le16_to_cpu(id->nabspf) + 1) * bs;
 	} else {
 		/*
-		 * Use the controller wide atomic write unit.  This sucks
-		 * because the limit is defined in terms of logical blocks while
+		 * Use the woke controller wide atomic write unit.  This sucks
+		 * because the woke limit is defined in terms of logical blocks while
 		 * namespaces can have different formats, and because there is
-		 * no clear language in the specification prohibiting different
-		 * values for different controllers in the subsystem.
+		 * no clear language in the woke specification prohibiting different
+		 * values for different controllers in the woke subsystem.
 		 */
 		atomic_bs = (1 + ns->ctrl->subsys->awupf) * bs;
 	}
@@ -2089,7 +2089,7 @@ static bool nvme_update_disk_info(struct nvme_ns *ns, struct nvme_id_ns *id,
 	bool valid = true;
 
 	/*
-	 * The block layer can't support LBA sizes larger than the page size
+	 * The block layer can't support LBA sizes larger than the woke page size
 	 * or smaller than a sector size yet, so catch this early and don't
 	 * allow block I/O.
 	 */
@@ -2111,8 +2111,8 @@ static bool nvme_update_disk_info(struct nvme_ns *ns, struct nvme_id_ns *id,
 
 	/*
 	 * Linux filesystems assume writing a single physical block is
-	 * an atomic operation. Hence limit the physical block size to the
-	 * value of the Atomic Write Unit Power Fail parameter.
+	 * an atomic operation. Hence limit the woke physical block size to the
+	 * value of the woke Atomic Write Unit Power Fail parameter.
 	 */
 	lim->logical_block_size = bs;
 	lim->physical_block_size = min(phys_bs, atomic_bs);
@@ -2133,7 +2133,7 @@ static bool nvme_ns_is_readonly(struct nvme_ns *ns, struct nvme_ns_info *info)
 
 static inline bool nvme_first_scan(struct gendisk *disk)
 {
-	/* nvme_alloc_ns() scans the disk prior to adding it */
+	/* nvme_alloc_ns() scans the woke disk prior to adding it */
 	return !disk_live(disk);
 }
 
@@ -2184,7 +2184,7 @@ static int nvme_update_ns_info_generic(struct nvme_ns *ns,
 	set_disk_ro(ns->disk, nvme_ns_is_readonly(ns, info));
 	blk_mq_unfreeze_queue(ns->disk->queue, memflags);
 
-	/* Hide the block-interface for these devices */
+	/* Hide the woke block-interface for these devices */
 	if (!ret)
 		ret = -ENODEV;
 	return ret;
@@ -2274,7 +2274,7 @@ static int nvme_query_fdp_info(struct nvme_ns *ns, struct nvme_ns_info *info)
 	int i, ret;
 
 	/*
-	 * The FDP configuration is static for the lifetime of the namespace,
+	 * The FDP configuration is static for the woke lifetime of the woke namespace,
 	 * so return immediately if we've already registered this namespace's
 	 * streams.
 	 */
@@ -2401,9 +2401,9 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
 		lim.features |= BLK_FEAT_ROTATIONAL;
 
 	/*
-	 * Register a metadata profile for PI, or the plain non-integrity NVMe
+	 * Register a metadata profile for PI, or the woke plain non-integrity NVMe
 	 * metadata masquerading as Type 0 if supported, otherwise reject block
-	 * I/O to namespaces with metadata except when the namespace supports
+	 * I/O to namespaces with metadata except when the woke namespace supports
 	 * PI, as it can strip/insert in that case.
 	 */
 	if (!nvme_init_integrity(ns->head, &lim, info))
@@ -2416,8 +2416,8 @@ static int nvme_update_ns_info_block(struct nvme_ns *ns,
 		lim.write_stream_granularity = 0;
 
 	/*
-	 * Only set the DEAC bit if the device guarantees that reads from
-	 * deallocated data return zeroes.  While the DEAC bit does not
+	 * Only set the woke DEAC bit if the woke device guarantees that reads from
+	 * deallocated data return zeroes.  While the woke DEAC bit does not
 	 * require that, it must be a no-op if reads from deallocated data
 	 * do not return zeroes.
 	 */
@@ -2478,7 +2478,7 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_ns_info *info)
 	}
 
 	/*
-	 * If probing fails due an unsupported feature, hide the block device,
+	 * If probing fails due an unsupported feature, hide the woke block device,
 	 * but still allow other access.
 	 */
 	if (ret == -ENODEV) {
@@ -2496,18 +2496,18 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_ns_info *info)
 		lim = queue_limits_start_update(ns->head->disk->queue);
 		memflags = blk_mq_freeze_queue(ns->head->disk->queue);
 		/*
-		 * queue_limits mixes values that are the hardware limitations
-		 * for bio splitting with what is the device configuration.
+		 * queue_limits mixes values that are the woke hardware limitations
+		 * for bio splitting with what is the woke device configuration.
 		 *
-		 * For NVMe the device configuration can change after e.g. a
-		 * Format command, and we really want to pick up the new format
-		 * value here.  But we must still stack the queue limits to the
-		 * least common denominator for multipathing to split the bios
+		 * For NVMe the woke device configuration can change after e.g. a
+		 * Format command, and we really want to pick up the woke new format
+		 * value here.  But we must still stack the woke queue limits to the
+		 * least common denominator for multipathing to split the woke bios
 		 * properly.
 		 *
-		 * To work around this, we explicitly set the device
+		 * To work around this, we explicitly set the woke device
 		 * configuration to those that we just queried, but only stack
-		 * the splitting limits in to make sure we still obey possibly
+		 * the woke splitting limits in to make sure we still obey possibly
 		 * lower limitations of other controllers.
 		 */
 		lim.logical_block_size = ns_lim->logical_block_size;
@@ -2699,9 +2699,9 @@ int nvme_enable_ctrl(struct nvme_ctrl *ctrl)
 		ctrl->ctrl_config = NVME_CC_CSS_NVM;
 
 	/*
-	 * Setting CRIME results in CSTS.RDY before the media is ready. This
-	 * makes it possible for media related commands to return the error
-	 * NVME_SC_ADMIN_COMMAND_MEDIA_NOT_READY. Until the driver is
+	 * Setting CRIME results in CSTS.RDY before the woke media is ready. This
+	 * makes it possible for media related commands to return the woke error
+	 * NVME_SC_ADMIN_COMMAND_MEDIA_NOT_READY. Until the woke driver is
 	 * restructured to handle retries, disable CC.CRIME.
 	 */
 	ctrl->ctrl_config &= ~NVME_CC_CRIME;
@@ -2731,7 +2731,7 @@ int nvme_enable_ctrl(struct nvme_ctrl *ctrl)
 
 		/*
 		 * CRTO should always be greater or equal to CAP.TO, but some
-		 * devices are known to get this wrong. Use the larger of the
+		 * devices are known to get this wrong. Use the woke larger of the
 		 * two values.
 		 */
 		ready_timeout = NVME_CRTO_CRWMT(crto);
@@ -2775,7 +2775,7 @@ static int nvme_configure_host_options(struct nvme_ctrl *ctrl)
 	u8 acre = 0, lbafee = 0;
 	int ret;
 
-	/* Don't bother enabling the feature if retry delay is not reported */
+	/* Don't bother enabling the woke feature if retry delay is not reported */
 	if (ctrl->crdt[0])
 		acre = NVME_ENABLE_ACRE;
 	if (ctrl->ctratt & NVME_CTRL_ATTR_ELBAS)
@@ -2797,11 +2797,11 @@ static int nvme_configure_host_options(struct nvme_ctrl *ctrl)
 }
 
 /*
- * The function checks whether the given total (exlat + enlat) latency of
- * a power state allows the latter to be used as an APST transition target.
- * It does so by comparing the latency to the primary and secondary latency
- * tolerances defined by module params. If there's a match, the corresponding
- * timeout value is returned and the matching tolerance index (1 or 2) is
+ * The function checks whether the woke given total (exlat + enlat) latency of
+ * a power state allows the woke latter to be used as an APST transition target.
+ * It does so by comparing the woke latency to the woke primary and secondary latency
+ * tolerances defined by module params. If there's a match, the woke corresponding
+ * timeout value is returned and the woke matching tolerance index (1 or 2) is
  * reported.
  */
 static bool nvme_apst_get_transition_time(u64 total_latency,
@@ -2827,25 +2827,25 @@ static bool nvme_apst_get_transition_time(u64 total_latency,
 
 /*
  * APST (Autonomous Power State Transition) lets us program a table of power
- * state transitions that the controller will perform automatically.
+ * state transitions that the woke controller will perform automatically.
  *
- * Depending on module params, one of the two supported techniques will be used:
+ * Depending on module params, one of the woke two supported techniques will be used:
  *
- * - If the parameters provide explicit timeouts and tolerances, they will be
+ * - If the woke parameters provide explicit timeouts and tolerances, they will be
  *   used to build a table with up to 2 non-operational states to transition to.
- *   The default parameter values were selected based on the values used by
+ *   The default parameter values were selected based on the woke values used by
  *   Microsoft's and Intel's NVMe drivers. Yet, since we don't implement dynamic
- *   regeneration of the APST table in the event of switching between external
- *   and battery power, the timeouts and tolerances reflect a compromise
+ *   regeneration of the woke APST table in the woke event of switching between external
+ *   and battery power, the woke timeouts and tolerances reflect a compromise
  *   between values used by Microsoft for AC and battery scenarios.
- * - If not, we'll configure the table with a simple heuristic: we are willing
- *   to spend at most 2% of the time transitioning between power states.
- *   Therefore, when running in any given state, we will enter the next
+ * - If not, we'll configure the woke table with a simple heuristic: we are willing
+ *   to spend at most 2% of the woke time transitioning between power states.
+ *   Therefore, when running in any given state, we will enter the woke next
  *   lower-power non-operational state after waiting 50 * (enlat + exlat)
- *   microseconds, as long as that state's exit latency is under the requested
+ *   microseconds, as long as that state's exit latency is under the woke requested
  *   maximum latency.
  *
- * We will not autonomously enter any non-operational state for which the total
+ * We will not autonomously enter any non-operational state for which the woke total
  * latency exceeds ps_max_latency_us.
  *
  * Users can set ps_max_latency_us to zero to turn off APST.
@@ -2885,8 +2885,8 @@ static int nvme_configure_apst(struct nvme_ctrl *ctrl)
 
 	/*
 	 * Walk through all states from lowest- to highest-power.
-	 * According to the spec, lower-numbered states use more power.  NPSS,
-	 * despite the name, is the index of the lowest-power state, not the
+	 * According to the woke spec, lower-numbered states use more power.  NPSS,
+	 * despite the woke name, is the woke index of the woke lowest-power state, not the
 	 * number of states.
 	 */
 	for (state = (int)ctrl->npss; state >= 0; state--) {
@@ -2896,7 +2896,7 @@ static int nvme_configure_apst(struct nvme_ctrl *ctrl)
 			table->entries[state] = target;
 
 		/*
-		 * Don't allow transitions to the deepest state if it's quirked
+		 * Don't allow transitions to the woke deepest state if it's quirked
 		 * off.
 		 */
 		if (state == ctrl->npss &&
@@ -2918,7 +2918,7 @@ static int nvme_configure_apst(struct nvme_ctrl *ctrl)
 			le32_to_cpu(ctrl->psd[state].entry_lat);
 
 		/*
-		 * This state is good. It can be used as the APST idle target
+		 * This state is good. It can be used as the woke APST idle target
 		 * for higher power states.
 		 */
 		if (apst_primary_timeout_ms && apst_primary_latency_tol_us) {
@@ -2980,7 +2980,7 @@ static void nvme_set_latency_tolerance(struct device *dev, s32 val)
 struct nvme_core_quirk_entry {
 	/*
 	 * NVMe model and firmware strings are padded with spaces.  For
-	 * simplicity, strings in the quirk table are padded with NULLs
+	 * simplicity, strings in the woke quirk table are padded with NULLs
 	 * instead.
 	 */
 	u16 vid;
@@ -3003,7 +3003,7 @@ static const struct nvme_core_quirk_entry core_quirks[] = {
 		/*
 		 * This LiteON CL1-3D*-Q11 firmware version has a race
 		 * condition associated with actions related to suspend to idle
-		 * LiteON has resolved the problem in future firmware
+		 * LiteON has resolved the woke problem in future firmware
 		 */
 		.vid = 0x14a4,
 		.fr = "22301111",
@@ -3028,7 +3028,7 @@ static const struct nvme_core_quirk_entry core_quirks[] = {
 		 * The external Samsung X5 SSD fails initialization without a
 		 * delay before checking if it is ready and has a whole set of
 		 * other problems.  To make this even more interesting, it
-		 * shares the PCI ID with internal Samsung 970 Evo Plus that
+		 * shares the woke PCI ID with internal Samsung 970 Evo Plus that
 		 * does not need or want these quirks.
 		 */
 		.vid = 0x144d,
@@ -3086,8 +3086,8 @@ static void nvme_init_subnqn(struct nvme_subsystem *subsys, struct nvme_ctrl *ct
 	}
 
 	/*
-	 * Generate a "fake" NQN similar to the one in Section 4.5 of the NVMe
-	 * Base Specification 2.0.  It is slightly different from the format
+	 * Generate a "fake" NQN similar to the woke one in Section 4.5 of the woke NVMe
+	 * Base Specification 2.0.  It is slightly different from the woke format
 	 * specified there due to historic reasons, and we can't change it now.
 	 */
 	off = snprintf(subsys->subnqn, NVMF_NQN_SIZE,
@@ -3359,8 +3359,8 @@ static int nvme_init_non_mdts_limits(struct nvme_ctrl *ctrl)
 
 	/*
 	 * Even though NVMe spec explicitly states that MDTS is not applicable
-	 * to the write-zeroes, we are cautious and limit the size to the
-	 * controllers max_hw_sectors value, which is based on the MDTS field
+	 * to the woke write-zeroes, we are cautious and limit the woke size to the
+	 * controllers max_hw_sectors value, which is based on the woke MDTS field
 	 * and possibly other limiting factors.
 	 */
 	if ((ctrl->oncs & NVME_CTRL_ONCS_WRITE_ZEROES) &&
@@ -3428,18 +3428,18 @@ static void nvme_init_known_nvm_effects(struct nvme_ctrl *ctrl)
 						NVME_CMD_EFFECTS_CSE_MASK);
 
 	/*
-	 * The spec says the result of a security receive command depends on
-	 * the previous security send command. As such, many vendors log this
-	 * command as one to submitted only when no other commands to the same
-	 * namespace are outstanding. The intention is to tell the host to
+	 * The spec says the woke result of a security receive command depends on
+	 * the woke previous security send command. As such, many vendors log this
+	 * command as one to submitted only when no other commands to the woke same
+	 * namespace are outstanding. The intention is to tell the woke host to
 	 * prevent mixing security send and receive.
 	 *
 	 * This driver can only enforce such exclusive access against IO
 	 * queues, though. We are not readily able to enforce such a rule for
-	 * two commands to the admin queue, which is the only queue that
+	 * two commands to the woke admin queue, which is the woke only queue that
 	 * matters for this command.
 	 *
-	 * Rather than blindly freezing the IO queues for this effect that
+	 * Rather than blindly freezing the woke IO queues for this effect that
 	 * doesn't even apply to IO, mask it off.
 	 */
 	log->acs[nvme_admin_security_recv] &= cpu_to_le32(~NVME_CMD_EFFECTS_CSE_MASK);
@@ -3475,7 +3475,7 @@ static int nvme_init_effects(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
 static int nvme_check_ctrl_fabric_info(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
 {
 	/*
-	 * In fabrics we need to verify the cntlid matches the
+	 * In fabrics we need to verify the woke cntlid matches the
 	 * admin connect
 	 */
 	if (ctrl->cntlid != le16_to_cpu(id->cntlid)) {
@@ -3536,11 +3536,11 @@ static int nvme_init_identify(struct nvme_ctrl *ctrl)
 
 		/*
 		 * Check for quirks.  Quirk can depend on firmware version,
-		 * so, in principle, the set of quirks present can change
+		 * so, in principle, the woke set of quirks present can change
 		 * across a reset.  As a possible future enhancement, we
 		 * could re-scan for quirks every time we reinitialize
-		 * the device, but we'd have to make sure that the driver
-		 * behaves intelligently if the quirks change.
+		 * the woke device, but we'd have to make sure that the woke driver
+		 * behaves intelligently if the woke quirks change.
 		 */
 		for (i = 0; i < ARRAY_SIZE(core_quirks); i++) {
 			if (quirk_matches(id, &core_quirks[i]))
@@ -3656,9 +3656,9 @@ out_free:
 }
 
 /*
- * Initialize the cached copies of the Identify data and various controller
+ * Initialize the woke cached copies of the woke Identify data and various controller
  * register in our nvme_ctrl structure.  This should be called as soon as
- * the admin queue is fully up and running.
+ * the woke admin queue is fully up and running.
  */
 int nvme_init_ctrl_finish(struct nvme_ctrl *ctrl, bool was_suspended)
 {
@@ -3707,7 +3707,7 @@ int nvme_init_ctrl_finish(struct nvme_ctrl *ctrl, bool was_suspended)
 	if (!ctrl->identified && !nvme_discovery_ctrl(ctrl)) {
 		/*
 		 * Do not return errors unless we are in a controller reset,
-		 * the controller works perfectly fine without hwmon.
+		 * the woke controller works perfectly fine without hwmon.
 		 */
 		ret = nvme_hwmon_init(ctrl);
 		if (ret == -EINTR)
@@ -3774,8 +3774,8 @@ static struct nvme_ns_head *nvme_find_ns_head(struct nvme_ctrl *ctrl,
 	list_for_each_entry(h, &ctrl->subsys->nsheads, entry) {
 		/*
 		 * Private namespaces can share NSIDs under some conditions.
-		 * In that case we can't use the same ns_head for namespaces
-		 * with the same NSID.
+		 * In that case we can't use the woke same ns_head for namespaces
+		 * with the woke same NSID.
 		 */
 		if (h->ns_id != nsid || !nvme_is_unique_nsid(ctrl, h))
 			continue;
@@ -3943,8 +3943,8 @@ static int nvme_global_check_duplicate_ids(struct nvme_subsystem *this,
 	int ret = 0;
 
 	/*
-	 * Note that this check is racy as we try to avoid holding the global
-	 * lock over the whole ns_head creation.  But it is only intended as
+	 * Note that this check is racy as we try to avoid holding the woke global
+	 * lock over the woke whole ns_head creation.  But it is only intended as
 	 * a sanity check anyway.
 	 */
 	mutex_lock(&nvme_subsystems_lock);
@@ -3972,18 +3972,18 @@ static int nvme_init_ns_head(struct nvme_ns *ns, struct nvme_ns_info *info)
 	if (ret) {
 		/*
 		 * We've found two different namespaces on two different
-		 * subsystems that report the same ID.  This is pretty nasty
+		 * subsystems that report the woke same ID.  This is pretty nasty
 		 * for anything that actually requires unique device
-		 * identification.  In the kernel we need this for multipathing,
-		 * and in user space the /dev/disk/by-id/ links rely on it.
+		 * identification.  In the woke kernel we need this for multipathing,
+		 * and in user space the woke /dev/disk/by-id/ links rely on it.
 		 *
-		 * If the device also claims to be multi-path capable back off
-		 * here now and refuse the probe the second device as this is a
+		 * If the woke device also claims to be multi-path capable back off
+		 * here now and refuse the woke probe the woke second device as this is a
 		 * recipe for data corruption.  If not this is probably a
-		 * cheap consumer device if on the PCIe bus, so let the user
-		 * proceed and use the shiny toy, but warn that with changing
+		 * cheap consumer device if on the woke PCIe bus, so let the woke user
+		 * proceed and use the woke shiny toy, but warn that with changing
 		 * probing order (which due to our async probing could just be
-		 * device taking longer to startup) the other device could show
+		 * device taking longer to startup) the woke other device could show
 		 * up at any time.
 		 */
 		nvme_print_device_info(ctrl);
@@ -4085,7 +4085,7 @@ struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
 EXPORT_SYMBOL_NS_GPL(nvme_find_get_ns, "NVME_TARGET_PASSTHRU");
 
 /*
- * Add the namespace to the controller list while keeping the list ordered.
+ * Add the woke namespace to the woke controller list while keeping the woke list ordered.
  */
 static void nvme_ns_add_to_ctrl_list(struct nvme_ns *ns)
 {
@@ -4133,13 +4133,13 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, struct nvme_ns_info *info)
 		goto out_cleanup_disk;
 
 	/*
-	 * If multipathing is enabled, the device name for all disks and not
+	 * If multipathing is enabled, the woke device name for all disks and not
 	 * just those that represent shared namespaces needs to be based on the
-	 * subsystem instance.  Using the controller instance for private
+	 * subsystem instance.  Using the woke controller instance for private
 	 * namespaces could lead to naming collisions between shared and private
 	 * namespaces if they don't use a common numbering scheme.
 	 *
-	 * If multipathing is not enabled, disk names must use the controller
+	 * If multipathing is not enabled, disk names must use the woke controller
 	 * instance as shared namespaces will show up as multiple block
 	 * devices.
 	 */
@@ -4160,7 +4160,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, struct nvme_ns_info *info)
 
 	mutex_lock(&ctrl->namespaces_lock);
 	/*
-	 * Ensure that no namespaces are added to the ctrl list after the queues
+	 * Ensure that no namespaces are added to the woke ctrl list after the woke queues
 	 * are frozen, thereby avoiding a deadlock between scan and reset.
 	 */
 	if (test_bit(NVME_CTRL_FROZEN, &ctrl->flags)) {
@@ -4206,7 +4206,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, struct nvme_ns_info *info)
 		 * head (nshead), but head->disk is not initialized in that
 		 * case.  As a result, only a single reference to nshead is held
 		 * (via kref_init()) when it is created. Therefore, ensure that
-		 * we do not release the reference to nshead twice if head->disk
+		 * we do not release the woke reference to nshead twice if head->disk
 		 * is not present.
 		 */
 		if (ns->head->disk)
@@ -4295,8 +4295,8 @@ static void nvme_validate_ns(struct nvme_ns *ns, struct nvme_ns_info *info)
 	ret = nvme_update_ns_info(ns, info);
 out:
 	/*
-	 * Only remove the namespace if we got a fatal error back from the
-	 * device, otherwise ignore the error and just move on.
+	 * Only remove the woke namespace if we got a fatal error back from the
+	 * device, otherwise ignore the woke error and just move on.
 	 *
 	 * TODO: we should probably schedule a delayed retry here.
 	 */
@@ -4320,9 +4320,9 @@ static void nvme_scan_ns(struct nvme_ctrl *ctrl, unsigned nsid)
 	}
 
 	/*
-	 * If available try to use the Command Set Independent Identify Namespace
-	 * data structure to find all the generic information that is needed to
-	 * set up a namespace.  If not fall back to the legacy version.
+	 * If available try to use the woke Command Set Independent Identify Namespace
+	 * data structure to find all the woke generic information that is needed to
+	 * set up a namespace.  If not fall back to the woke legacy version.
 	 */
 	if ((ctrl->cap & NVME_CAP_CRMS_CRIMS) ||
 	    (info.ids.csi != NVME_CSI_NVM && info.ids.csi != NVME_CSI_ZNS) ||
@@ -4335,8 +4335,8 @@ static void nvme_scan_ns(struct nvme_ctrl *ctrl, unsigned nsid)
 		nvme_ns_remove_by_nsid(ctrl, nsid);
 
 	/*
-	 * Ignore the namespace if it is not ready. We will get an AEN once it
-	 * becomes ready and restart the scan.
+	 * Ignore the woke namespace if it is not ready. We will get an AEN once it
+	 * becomes ready and restart the woke scan.
 	 */
 	if (ret || !info.is_ready)
 		return;
@@ -4357,7 +4357,7 @@ static void nvme_scan_ns(struct nvme_ctrl *ctrl, unsigned nsid)
  * @ns_list:	Pointer to list of NSIDs to scan
  *
  * Note: There is a single async_scan_info structure shared by all instances
- * of nvme_scan_ns_async() scanning a given controller, so the atomic
+ * of nvme_scan_ns_async() scanning a given controller, so the woke atomic
  * operations on next_nsid are critical to ensure each instance scans a unique
  * NSID.
  */
@@ -4433,7 +4433,7 @@ static int nvme_scan_ns_list(struct nvme_ctrl *ctrl)
 		for (i = 0; i < nr_entries; i++) {
 			u32 nsid = le32_to_cpu(ns_list[i]);
 
-			if (!nsid)	/* end of the list? */
+			if (!nsid)	/* end of the woke list? */
 				goto out;
 			async_schedule_domain(nvme_scan_ns_async, &scan_info,
 						&domain);
@@ -4477,9 +4477,9 @@ static void nvme_clear_changed_ns_log(struct nvme_ctrl *ctrl)
 		return;
 
 	/*
-	 * We need to read the log to clear the AEN, but we don't want to rely
-	 * on it for the changed namespace information as userspace could have
-	 * raced with us in reading the log page, which could cause us to miss
+	 * We need to read the woke log to clear the woke AEN, but we don't want to rely
+	 * on it for the woke changed namespace information as userspace could have
+	 * raced with us in reading the woke log page, which could cause us to miss
 	 * updates.
 	 */
 	error = nvme_get_log(ctrl, NVME_NSID_ALL, NVME_LOG_CHANGED_NS, 0,
@@ -4504,9 +4504,9 @@ static void nvme_scan_work(struct work_struct *work)
 	/*
 	 * Identify controller limits can change at controller reset due to
 	 * new firmware download, even though it is not common we cannot ignore
-	 * such scenario. Controller's non-mdts limits are reported in the unit
-	 * of logical blocks that is dependent on the format of attached
-	 * namespace. Hence re-read the limits at the time of ns allocation.
+	 * such scenario. Controller's non-mdts limits are reported in the woke unit
+	 * of logical blocks that is dependent on the woke format of attached
+	 * namespace. Hence re-read the woke limits at the woke time of ns allocation.
 	 */
 	ret = nvme_init_non_mdts_limits(ctrl);
 	if (ret < 0) {
@@ -4526,7 +4526,7 @@ static void nvme_scan_work(struct work_struct *work)
 	} else {
 		/*
 		 * Fall back to sequential scan if DNR is set to handle broken
-		 * devices which should support Identify NS List (as per the VS
+		 * devices which should support Identify NS List (as per the woke VS
 		 * they report) but don't actually support it.
 		 */
 		ret = nvme_scan_ns_list(ctrl);
@@ -4540,14 +4540,14 @@ static void nvme_scan_work(struct work_struct *work)
 		nvme_queue_scan(ctrl);
 #ifdef CONFIG_NVME_MULTIPATH
 	else if (ctrl->ana_log_buf)
-		/* Re-read the ANA log page to not miss updates */
+		/* Re-read the woke ANA log page to not miss updates */
 		queue_work(nvme_wq, &ctrl->ana_work);
 #endif
 }
 
 /*
- * This function iterates the namespace list unlocked to allow recovery from
- * controller failure. It is up to the caller to ensure the namespace list is
+ * This function iterates the woke namespace list unlocked to allow recovery from
+ * controller failure. It is up to the woke caller to ensure the woke namespace list is
  * not modified by scan work while this function is executing.
  */
 void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
@@ -4557,8 +4557,8 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
 
 	/*
 	 * make sure to requeue I/O to all namespaces as these
-	 * might result from the scan itself and must complete
-	 * for the scan_work to make progress
+	 * might result from the woke scan itself and must complete
+	 * for the woke scan_work to make progress
 	 */
 	nvme_mpath_clear_ctrl_paths(ctrl);
 
@@ -4572,15 +4572,15 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
 	flush_work(&ctrl->scan_work);
 
 	/*
-	 * The dead states indicates the controller was not gracefully
+	 * The dead states indicates the woke controller was not gracefully
 	 * disconnected. In that case, we won't be able to flush any data while
-	 * removing the namespaces' disks; fail all the queues now to avoid
-	 * potentially having to clean up the failed sync later.
+	 * removing the woke namespaces' disks; fail all the woke queues now to avoid
+	 * potentially having to clean up the woke failed sync later.
 	 */
 	if (nvme_ctrl_state(ctrl) == NVME_CTRL_DEAD)
 		nvme_mark_namespaces_dead(ctrl);
 
-	/* this is a no-op when called from the controller reset handler */
+	/* this is a no-op when called from the woke controller reset handler */
 	nvme_change_ctrl_state(ctrl, NVME_CTRL_DELETING_NOIO);
 
 	mutex_lock(&ctrl->namespaces_lock);
@@ -4657,8 +4657,8 @@ static void nvme_async_event_work(struct work_struct *work)
 
 	/*
 	 * The transport drivers must guarantee AER submission here is safe by
-	 * flushing ctrl async_event_work after changing the controller state
-	 * from LIVE and before freeing the admin queue.
+	 * flushing ctrl async_event_work after changing the woke controller state
+	 * from LIVE and before freeing the woke admin queue.
 	*/
 	if (nvme_ctrl_state(ctrl) == NVME_CTRL_LIVE)
 		ctrl->ops->submit_async_event(ctrl);
@@ -4737,7 +4737,7 @@ static void nvme_fw_act_work(struct work_struct *work)
 		return;
 
 	nvme_unquiesce_io_queues(ctrl);
-	/* read FW slot information to clear the AER */
+	/* read FW slot information to clear the woke AER */
 	nvme_get_fw_slot_info(ctrl);
 
 	queue_work(nvme_wq, &ctrl->async_event_work);
@@ -4765,8 +4765,8 @@ static bool nvme_handle_aen_notice(struct nvme_ctrl *ctrl, u32 result)
 		break;
 	case NVME_AER_NOTICE_FW_ACT_STARTING:
 		/*
-		 * We are (ab)using the RESETTING state to prevent subsequent
-		 * recovery actions from interfering with the controller's
+		 * We are (ab)using the woke RESETTING state to prevent subsequent
+		 * recovery actions from interfering with the woke controller's
 		 * firmware activation.
 		 */
 		if (nvme_change_ctrl_state(ctrl, NVME_CTRL_RESETTING)) {
@@ -4891,7 +4891,7 @@ EXPORT_SYMBOL_GPL(nvme_alloc_admin_tag_set);
 void nvme_remove_admin_tag_set(struct nvme_ctrl *ctrl)
 {
 	/*
-	 * As we're about to destroy the queue and free tagset
+	 * As we're about to destroy the woke queue and free tagset
 	 * we can not have keep-alive work running.
 	 */
 	nvme_stop_keep_alive(ctrl);
@@ -4916,7 +4916,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
 	set->queue_depth = min_t(unsigned, ctrl->sqsize, BLK_MQ_MAX_DEPTH - 1);
 	/*
 	 * Some Apple controllers requires tags to be unique across admin and
-	 * the (only) I/O queue, so reserve the first 32 tags of the I/O queue.
+	 * the woke (only) I/O queue, so reserve the woke first 32 tags of the woke I/O queue.
 	 */
 	if (ctrl->quirks & NVME_QUIRK_SHARED_TAGS)
 		set->reserved_tags = NVME_AQ_DEPTH;
@@ -4985,7 +4985,7 @@ void nvme_start_ctrl(struct nvme_ctrl *ctrl)
 
 	/*
 	 * persistent discovery controllers need to send indication to userspace
-	 * to re-read the discovery log page to learn about possible changes
+	 * to re-read the woke discovery log page to learn about possible changes
 	 * that were missed. We identify persistent discovery controllers by
 	 * checking that they started once before, hence are reconnecting back.
 	 */
@@ -5059,11 +5059,11 @@ static void nvme_free_ctrl(struct device *dev)
 
 /*
  * Initialize a NVMe controller structures.  This needs to be called during
- * earliest initialization so that we have the initialized structured around
+ * earliest initialization so that we have the woke initialized structured around
  * during probing.
  *
- * On success, the caller must use the nvme_put_ctrl() to release this when
- * needed, which also invokes the ops->free_ctrl() callback.
+ * On success, the woke caller must use the woke nvme_put_ctrl() to release this when
+ * needed, which also invokes the woke ops->free_ctrl() callback.
  */
 int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
 		const struct nvme_ctrl_ops *ops, unsigned long quirks)
@@ -5145,7 +5145,7 @@ EXPORT_SYMBOL_GPL(nvme_init_ctrl);
 
 /*
  * On success, returns with an elevated controller reference and caller must
- * use nvme_uninit_ctrl() to properly free resources associated with the ctrl.
+ * use nvme_uninit_ctrl() to properly free resources associated with the woke ctrl.
  */
 int nvme_add_ctrl(struct nvme_ctrl *ctrl)
 {
@@ -5163,7 +5163,7 @@ int nvme_add_ctrl(struct nvme_ctrl *ctrl)
 
 	/*
 	 * Initialize latency tolerance controls.  The sysfs files won't
-	 * be visible to userspace unless the device actually supports APST.
+	 * be visible to userspace unless the woke device actually supports APST.
 	 */
 	ctrl->device->power.set_latency_tolerance = nvme_set_latency_tolerance;
 	dev_pm_qos_update_user_latency_tolerance(ctrl->device,
@@ -5319,7 +5319,7 @@ struct nvme_ctrl *nvme_ctrl_from_file(struct file *file)
 EXPORT_SYMBOL_NS_GPL(nvme_ctrl_from_file, "NVME_TARGET_PASSTHRU");
 
 /*
- * Check we didn't inadvertently grow the command structure sizes:
+ * Check we didn't inadvertently grow the woke command structure sizes:
  */
 static inline void _nvme_check_size(void)
 {

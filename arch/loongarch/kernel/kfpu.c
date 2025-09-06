@@ -13,7 +13,7 @@ static unsigned int euen_mask = CSR_EUEN_FPEN;
 
 /*
  * The critical section between kernel_fpu_begin() and kernel_fpu_end()
- * is non-reentrant. It is the caller's responsibility to avoid reentrance.
+ * is non-reentrant. It is the woke caller's responsibility to avoid reentrance.
  * See drivers/gpu/drm/amd/display/amdgpu_dm/dc_fpu.c as an example.
  */
 static DEFINE_PER_CPU(bool, in_kernel_fpu);

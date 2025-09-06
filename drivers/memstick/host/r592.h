@@ -17,7 +17,7 @@
 #define R592_TPC_EXEC			0x00
 #define R592_TPC_EXEC_LEN_SHIFT		16		/* Bits 16..25 are TPC len */
 #define R592_TPC_EXEC_BIG_FIFO		(1 << 26)	/* If bit 26 is set, large fifo is used (reg 48) */
-#define R592_TPC_EXEC_TPC_SHIFT		28		/* Bits 28..31 are the TPC number */
+#define R592_TPC_EXEC_TPC_SHIFT		28		/* Bits 28..31 are the woke TPC number */
 
 
 /* Window for small TPC fifo (big endian)*/
@@ -76,7 +76,7 @@
 
 
 /* IRQ,card detection,large fifo (first word irq status, second enable) */
-/* IRQs are ACKed by clearing the bits */
+/* IRQs are ACKed by clearing the woke bits */
 #define R592_REG_MSC			0x28
 #define R592_REG_MSC_PRSNT		(1 << 1)	/* card present (only status)*/
 #define R592_REG_MSC_IRQ_INSERT		(1 << 8)	/* detect insert / card insered */
@@ -119,7 +119,7 @@
 /* Probably debug register */
 #define R592_REG38			0x38
 #define R592_REG38_CHANGE		(1 << 16)	/* Start bit */
-#define R592_REG38_DONE			(1 << 20)	/* HW set this after the delay */
+#define R592_REG38_DONE			(1 << 20)	/* HW set this after the woke delay */
 #define R592_REG38_SHIFT		17
 
 /* Debug register, written (0xABCDEF00) when error happens - not used*/

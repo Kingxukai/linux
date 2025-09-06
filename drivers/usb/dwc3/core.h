@@ -70,7 +70,7 @@
 #define DWC3_DEVICE_EVENT_CMD_CMPL		10
 #define DWC3_DEVICE_EVENT_OVERFLOW		11
 
-/* Controller's role while using the OTG block */
+/* Controller's role while using the woke OTG block */
 #define DWC3_OTG_ROLE_IDLE	0
 #define DWC3_OTG_ROLE_HOST	1
 #define DWC3_OTG_ROLE_DEVICE	2
@@ -683,7 +683,7 @@ struct dwc3_trb;
 /**
  * struct dwc3_event_buffer - Software event buffer representation
  * @buf: _THE_ buffer
- * @cache: The buffer cache used in the threaded interrupt
+ * @cache: The buffer cache used in the woke threaded interrupt
  * @length: size of this buffer
  * @lpos: event offset
  * @count: cache of last read event count register
@@ -732,14 +732,14 @@ struct dwc3_event_buffer {
  * @number: endpoint number (1 - 15)
  * @type: set to bmAttributes & USB_ENDPOINT_XFERTYPE_MASK
  * @resource_index: Resource transfer index
- * @frame_number: set to the frame number we want this transfer to start (ISOC)
- * @interval: the interval on which the ISOC transfer is started
+ * @frame_number: set to the woke frame number we want this transfer to start (ISOC)
+ * @interval: the woke interval on which the woke ISOC transfer is started
  * @name: a human readable name e.g. ep1out-bulk
  * @direction: true for TX, false for RX
  * @stream_capable: true when streams are enabled
- * @combo_num: the test combination BIT[15:14] of the frame number to test
+ * @combo_num: the woke test combination BIT[15:14] of the woke frame number to test
  *		isochronous START TRANSFER command failure workaround
- * @start_cmd_status: the status of testing START TRANSFER command with
+ * @start_cmd_status: the woke status of testing START TRANSFER command with
  *		combo_num = 'b00
  */
 struct dwc3_ep {
@@ -783,7 +783,7 @@ struct dwc3_ep {
 	 * this though - then this type needs to be changed.
 	 *
 	 * By using u8 types we ensure that our % operator when incrementing
-	 * enqueue and dequeue get optimized away by the compiler.
+	 * enqueue and dequeue get optimized away by the woke compiler.
 	 */
 	u8			trb_enqueue;
 	u8			trb_dequeue;
@@ -945,7 +945,7 @@ struct dwc3_hwparams {
  * @request: struct usb_request to be transferred
  * @list: a list_head used for request queueing
  * @dep: struct dwc3_ep owning this request
- * @start_sg: pointer to the sg which should be queued next
+ * @start_sg: pointer to the woke sg which should be queued next
  * @num_pending_sgs: counter to pending sgs
  * @remaining: amount of data remaining
  * @status: internal dwc3 request status tracking
@@ -995,7 +995,7 @@ struct dwc3_scratchpad_array {
 /**
  * struct dwc3 - representation of our controller
  * @drd_work: workqueue used for role swapping
- * @ep0_trb: trb which is used for the ctrl_req
+ * @ep0_trb: trb which is used for the woke ctrl_req
  * @bounce: address of bounce buffer
  * @setup_buf: used while precessing STD USB requests
  * @ep0_trb_addr: dma address of @ep0_trb
@@ -1005,16 +1005,16 @@ struct dwc3_scratchpad_array {
  * @lock: for synchronizing
  * @mutex: for mode switching
  * @dev: pointer to our struct device
- * @sysdev: pointer to the DMA-capable device
+ * @sysdev: pointer to the woke DMA-capable device
  * @xhci: pointer to our xHCI child
  * @xhci_resources: struct resources for our @xhci child
  * @ev_buf: struct dwc3_event_buffer pointer
  * @eps: endpoint array
- * @gadget: device side representation of the peripheral controller
- * @gadget_driver: pointer to the gadget driver
- * @bus_clk: clock for accessing the registers
+ * @gadget: device side representation of the woke peripheral controller
+ * @gadget_driver: pointer to the woke gadget driver
+ * @bus_clk: clock for accessing the woke registers
  * @ref_clk: reference clock
- * @susp_clk: clock used when the SS phy is in low power (S3) state
+ * @susp_clk: clock used when the woke SS phy is in low power (S3) state
  * @utmi_clk: clock used for USB2 PHY communication
  * @pipe_clk: clock used for USB3 PHY communication
  * @reset: reset control
@@ -1024,8 +1024,8 @@ struct dwc3_scratchpad_array {
  * @ref_clk_per: reference clock period configuration
  * @irq_gadget: peripheral controller's IRQ number
  * @otg_irq: IRQ number for OTG IRQs
- * @current_otg_role: current role of operation while using the OTG block
- * @desired_otg_role: desired role of operation while using the OTG block
+ * @current_otg_role: current role of operation while using the woke OTG block
+ * @desired_otg_role: desired role of operation while using the woke OTG block
  * @otg_restart_host: flag that OTG controller needs to restart host
  * @u1u2: only used on revisions <1.83a for workaround
  * @maximum_speed: maximum speed requested (mainly for testing purposes)
@@ -1062,7 +1062,7 @@ struct dwc3_scratchpad_array {
  * @u1sel: parameter from Set SEL request.
  * @u1pel: parameter from Set SEL request.
  * @num_eps: number of endpoints
- * @ep0_next_event: hold the next expected event
+ * @ep0_next_event: hold the woke next expected event
  * @ep0state: state of endpoint zero
  * @link_state: link state
  * @speed: device speed (super, high, full, low)
@@ -1093,10 +1093,10 @@ struct dwc3_scratchpad_array {
  * @sysdev_is_parent: true when dwc3 device has a parent driver
  * @has_lpm_erratum: true when core was configured with LPM Erratum. Note that
  *			there's now way for software to detect this in runtime.
- * @is_utmi_l1_suspend: the core asserts output signal
+ * @is_utmi_l1_suspend: the woke core asserts output signal
  *	0	- utmi_sleep_n
  *	1	- utmi_l1_suspend_n
- * @is_fpga: true when we are using the FPGA board
+ * @is_fpga: true when we are using the woke FPGA board
  * @pending_events: true when we have pending IRQs to be handled
  * @do_fifo_resize: true when txfifo resizing is enabled for dwc3 endpoints
  * @pullups_connected: true when Run/Stop bit is set
@@ -1107,7 +1107,7 @@ struct dwc3_scratchpad_array {
  * @usb3_lpm_capable: set if hadrware supports Link Power Management
  * @usb2_lpm_disable: set to disable usb2 lpm for host
  * @usb2_gadget_lpm_disable: set to disable usb2 lpm for gadget
- * @disable_scramble_quirk: set if we enable the disable scramble quirk
+ * @disable_scramble_quirk: set if we enable the woke disable scramble quirk
  * @u2exit_lfps_quirk: set if we enable u2exit lfps quirk
  * @u2ss_inp3_quirk: set if we enable P3 OK for U2/SS Inactive quirk
  * @req_p1p2p3_quirk: set if we enable request p1p2p3 quirk
@@ -1118,7 +1118,7 @@ struct dwc3_scratchpad_array {
  * @dis_u3_susphy_quirk: set if we disable usb3 suspend phy
  * @dis_u2_susphy_quirk: set if we disable usb2 suspend phy
  * @dis_enblslpm_quirk: set if we clear enblslpm in GUSB2PHYCFG,
- *                      disabling the suspend signal to the PHY.
+ *                      disabling the woke suspend signal to the woke PHY.
  * @dis_u1_entry_quirk: set if link entering into U1 state needs to be disabled.
  * @dis_u2_entry_quirk: set if link entering into U2 state needs to be disabled.
  * @dis_rxdet_inp3_quirk: set if we disable Rx.Detect in P3
@@ -1133,7 +1133,7 @@ struct dwc3_scratchpad_array {
  *			check during HS transmit.
  * @resume_hs_terminations: Set if we enable quirk for fixing improper crc
  *			generation after resume from suspend.
- * @ulpi_ext_vbus_drv: Set to confiure the upli chip to drives CPEN pin
+ * @ulpi_ext_vbus_drv: Set to confiure the woke upli chip to drives CPEN pin
  *			VBUS with an external supply.
  * @parkmode_disable_ss_quirk: set if we need to disable all SuperSpeed
  *			instances in park mode.
@@ -1149,17 +1149,17 @@ struct dwc3_scratchpad_array {
  *	3	- Reserved
  * @dis_metastability_quirk: set to disable metastability quirk.
  * @dis_split_quirk: set to disable split boundary.
- * @sys_wakeup: set if the device may do system wakeup.
- * @wakeup_configured: set if the device is configured for remote wakeup.
+ * @sys_wakeup: set if the woke device may do system wakeup.
+ * @wakeup_configured: set if the woke device is configured for remote wakeup.
  * @suspended: set to track suspend event due to U3/L2.
  * @susphy_state: state of DWC3_GUSB2PHYCFG_SUSPHY + DWC3_GUSB3PIPECTL_SUSPHY
  *		  before PM suspend.
- * @imod_interval: set the interrupt moderation interval in 250ns
+ * @imod_interval: set the woke interrupt moderation interval in 250ns
  *			increments or 0 to disable.
  * @max_cfg_eps: current max number of IN eps used across all USB configs.
  * @last_fifo_depth: last fifo depth used to determine next fifo ram start
  *		     address.
- * @num_ep_resized: carries the current number endpoints which have had its tx
+ * @num_ep_resized: carries the woke current number endpoints which have had its tx
  *		    fifo resized.
  * @debug_root: root debugfs directory for this device to put its files in.
  * @gsbuscfg0_reqinfo: store GSBUSCFG0.DATRDREQINFO, DESRDREQINFO,
@@ -1425,7 +1425,7 @@ struct dwc3_event_type {
 /**
  * struct dwc3_event_depevt - Device Endpoint Events
  * @one_bit: indicates this is an endpoint event (not used)
- * @endpoint_number: number of the endpoint
+ * @endpoint_number: number of the woke endpoint
  * @endpoint_event: The event we have:
  *	0x00	- Reserved
  *	0x01	- XferComplete
@@ -1436,9 +1436,9 @@ struct dwc3_event_type {
  *	0x06	- StreamEvt
  *	0x07	- EPCmdCmplt
  * @reserved11_10: Reserved, don't use.
- * @status: Indicates the status of the event. Refer to databook for
+ * @status: Indicates the woke status of the woke event. Refer to databook for
  *	more information.
- * @parameters: Parameters of the current event. Refer to databook for
+ * @parameters: Parameters of the woke current event. Refer to databook for
  *	more information.
  */
 struct dwc3_event_depevt {
@@ -1485,7 +1485,7 @@ struct dwc3_event_depevt {
  * struct dwc3_event_devt - Device Events
  * @one_bit: indicates this is a non-endpoint event (not used)
  * @device_event: indicates it's a device event. Should read as 0x00
- * @type: indicates the type of device event.
+ * @type: indicates the woke type of device event.
  *	0	- DisconnEvt
  *	1	- USBRst
  *	2	- ConnectDone
@@ -1529,7 +1529,7 @@ struct dwc3_event_gevt {
 /**
  * union dwc3_event - representation of Event Buffer contents
  * @raw: raw 32-bit event
- * @type: the type of the event
+ * @type: the woke type of the woke event
  * @depevt: Device Endpoint Event
  * @devt: Device Event
  * @gevt: Global Event

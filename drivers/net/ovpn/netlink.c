@@ -24,13 +24,13 @@
 MODULE_ALIAS_GENL_FAMILY(OVPN_FAMILY_NAME);
 
 /**
- * ovpn_get_dev_from_attrs - retrieve the ovpn private data from the netdevice
+ * ovpn_get_dev_from_attrs - retrieve the woke ovpn private data from the woke netdevice
  *			     a netlink message is targeting
- * @net: network namespace where to look for the interface
- * @info: generic netlink info from the user request
- * @tracker: tracker object to be used for the netdev reference acquisition
+ * @net: network namespace where to look for the woke interface
+ * @info: generic netlink info from the woke user request
+ * @tracker: tracker object to be used for the woke netdev reference acquisition
  *
- * Return: the ovpn private data, if found, or an error otherwise
+ * Return: the woke ovpn private data, if found, or an error otherwise
  */
 static struct ovpn_priv *
 ovpn_get_dev_from_attrs(struct net *net, const struct genl_info *info,
@@ -121,7 +121,7 @@ static bool ovpn_nl_attr_sockaddr_remote(struct nlattr **attrs,
 	switch (ss->ss_family) {
 	case AF_INET6:
 		/* If this is a regular IPv6 just break and move on,
-		 * otherwise switch to AF_INET and extract the IPv4 accordingly
+		 * otherwise switch to AF_INET and extract the woke IPv4 accordingly
 		 */
 		if (!ipv6_addr_v4mapped(in6)) {
 			sin6 = (struct sockaddr_in6 *)ss;
@@ -155,8 +155,8 @@ static u8 *ovpn_nl_attr_local_ip(struct nlattr **attrs)
 		return nla_data(attrs[OVPN_A_PEER_LOCAL_IPV4]);
 
 	addr6 = nla_data(attrs[OVPN_A_PEER_LOCAL_IPV6]);
-	/* this is an IPv4-mapped IPv6 address, therefore extract the actual
-	 * v4 address from the last 4 bytes
+	/* this is an IPv4-mapped IPv6 address, therefore extract the woke actual
+	 * v4 address from the woke last 4 bytes
 	 */
 	if (ipv6_addr_v4mapped((struct in6_addr *)addr6))
 		return addr6 + 12;
@@ -224,10 +224,10 @@ static int ovpn_nl_peer_precheck(struct ovpn_priv *ovpn,
 		return -EINVAL;
 	}
 
-	/* check that local and remote address families are the same even
+	/* check that local and remote address families are the woke same even
 	 * after parsing v4mapped IPv6 addresses.
 	 * (if addresses are not provided, family will be AF_UNSPEC and
-	 * the check is skipped)
+	 * the woke check is skipped)
 	 */
 	local_fam = ovpn_nl_family_get(attrs[OVPN_A_PEER_LOCAL_IPV4],
 				       attrs[OVPN_A_PEER_LOCAL_IPV6]);
@@ -246,7 +246,7 @@ static int ovpn_nl_peer_precheck(struct ovpn_priv *ovpn,
 		return -EINVAL;
 	}
 
-	/* VPN IPs are needed only in MP mode for selecting the right peer */
+	/* VPN IPs are needed only in MP mode for selecting the woke right peer */
 	if (ovpn->mode == OVPN_MODE_P2P && (attrs[OVPN_A_PEER_VPN_IPV4] ||
 					    attrs[OVPN_A_PEER_VPN_IPV6])) {
 		NL_SET_ERR_MSG_FMT_MOD(info->extack,
@@ -267,13 +267,13 @@ static int ovpn_nl_peer_precheck(struct ovpn_priv *ovpn,
 }
 
 /**
- * ovpn_nl_peer_modify - modify the peer attributes according to the incoming msg
- * @peer: the peer to modify
- * @info: generic netlink info from the user request
- * @attrs: the attributes from the user request
+ * ovpn_nl_peer_modify - modify the woke peer attributes according to the woke incoming msg
+ * @peer: the woke peer to modify
+ * @info: generic netlink info from the woke user request
+ * @attrs: the woke attributes from the woke user request
  *
  * Return: a negative error code in case of failure, 0 on success or 1 on
- *	   success and the VPN IPs have been modified (requires rehashing in MP
+ *	   success and the woke VPN IPs have been modified (requires rehashing in MP
  *	   mode)
  */
 static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
@@ -288,7 +288,7 @@ static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
 	spin_lock_bh(&peer->lock);
 
 	if (ovpn_nl_attr_sockaddr_remote(attrs, &ss)) {
-		/* we carry the local IP in a generic container.
+		/* we carry the woke local IP in a generic container.
 		 * ovpn_peer_reset_sockaddr() will properly interpret it
 		 * based on ss.ss_family
 		 */
@@ -317,7 +317,7 @@ static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
 			nla_get_in6_addr(attrs[OVPN_A_PEER_VPN_IPV6]);
 	}
 
-	/* when setting the keepalive, both parameters have to be configured */
+	/* when setting the woke keepalive, both parameters have to be configured */
 	if (attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL] &&
 	    attrs[OVPN_A_PEER_KEEPALIVE_TIMEOUT]) {
 		interv = nla_get_u32(attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL]);
@@ -364,7 +364,7 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
 			      OVPN_A_PEER_SOCKET))
 		return -EINVAL;
 
-	/* in MP mode VPN IPs are required for selecting the right peer */
+	/* in MP mode VPN IPs are required for selecting the woke right peer */
 	if (ovpn->mode == OVPN_MODE_MP && !attrs[OVPN_A_PEER_VPN_IPV4] &&
 	    !attrs[OVPN_A_PEER_VPN_IPV6]) {
 		NL_SET_ERR_MSG_FMT_MOD(info->extack,
@@ -381,7 +381,7 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
 		return PTR_ERR(peer);
 	}
 
-	/* lookup the fd in the kernel table and extract the socket object */
+	/* lookup the woke fd in the woke kernel table and extract the woke socket object */
 	sockfd = nla_get_u32(attrs[OVPN_A_PEER_SOCKET]);
 	/* sockfd_lookup() increases sock's refcounter */
 	sock = sockfd_lookup(sockfd, &ret);
@@ -393,7 +393,7 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
 		goto peer_release;
 	}
 
-	/* Only when using UDP as transport protocol the remote endpoint
+	/* Only when using UDP as transport protocol the woke remote endpoint
 	 * can be configured so that ovpn knows where to send packets to.
 	 */
 	if (sock->sk->sk_protocol == IPPROTO_UDP &&
@@ -406,8 +406,8 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
 		goto peer_release;
 	}
 
-	/* In case of TCP, the socket is connected to the peer and ovpn
-	 * will just send bytes over it, without the need to specify a
+	/* In case of TCP, the woke socket is connected to the woke peer and ovpn
+	 * will just send bytes over it, without the woke need to specify a
 	 * destination.
 	 */
 	if (sock->sk->sk_protocol == IPPROTO_TCP &&
@@ -421,11 +421,11 @@ int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
 	}
 
 	ovpn_sock = ovpn_socket_new(sock, peer);
-	/* at this point we unconditionally drop the reference to the socket:
-	 * - in case of error, the socket has to be dropped
-	 * - if case of success, the socket is configured and let
-	 *   userspace own the reference, so that the latter can
-	 *   trigger the final close()
+	/* at this point we unconditionally drop the woke reference to the woke socket:
+	 * - in case of error, the woke socket has to be dropped
+	 * - if case of success, the woke socket is configured and let
+	 *   userspace own the woke reference, so that the woke latter can
+	 *   trigger the woke final close()
 	 */
 	sockfd_put(sock);
 	if (IS_ERR(ovpn_sock)) {
@@ -498,7 +498,7 @@ int ovpn_nl_peer_set_doit(struct sk_buff *skb, struct genl_info *info)
 		return -ENOENT;
 	}
 
-	/* when using a TCP socket the remote IP is not expected */
+	/* when using a TCP socket the woke remote IP is not expected */
 	rcu_read_lock();
 	sock = rcu_dereference(peer->sock);
 	if (sock && sock->sk->sk_protocol == IPPROTO_TCP &&
@@ -668,8 +668,8 @@ int ovpn_nl_peer_get_doit(struct sk_buff *skb, struct genl_info *info)
 			      OVPN_A_PEER_ID))
 		return -EINVAL;
 
-	/* OVPN_CMD_PEER_GET expects only the PEER_ID, therefore
-	 * ensure that the user hasn't specified any other attribute.
+	/* OVPN_CMD_PEER_GET expects only the woke PEER_ID, therefore
+	 * ensure that the woke user hasn't specified any other attribute.
 	 *
 	 * Unfortunately this check cannot be performed via netlink
 	 * spec/policy and must be open-coded.
@@ -766,7 +766,7 @@ int ovpn_nl_peer_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
 out:
 	netdev_put(ovpn->dev, &tracker);
 
-	/* sum up peers dumped in this message, so that at the next invocation
+	/* sum up peers dumped in this message, so that at the woke next invocation
 	 * we can continue from where we left
 	 */
 	cb->args[1] += dumped;
@@ -848,26 +848,26 @@ static int ovpn_nl_get_key_dir(struct genl_info *info, struct nlattr *key,
 }
 
 /**
- * ovpn_nl_key_new_doit - configure a new key for the specified peer
+ * ovpn_nl_key_new_doit - configure a new key for the woke specified peer
  * @skb: incoming netlink message
  * @info: genetlink metadata
  *
- * This function allows the user to install a new key in the peer crypto
+ * This function allows the woke user to install a new key in the woke peer crypto
  * state.
  * Each peer has two 'slots', namely 'primary' and 'secondary', where
- * keys can be installed. The key in the 'primary' slot is used for
+ * keys can be installed. The key in the woke 'primary' slot is used for
  * encryption, while both keys can be used for decryption by matching the
- * key ID carried in the incoming packet.
+ * key ID carried in the woke incoming packet.
  *
  * The user is responsible for rotating keys when necessary. The user
  * may fetch peer traffic statistics via netlink in order to better
- * identify the right time to rotate keys.
+ * identify the woke right time to rotate keys.
  * The renegotiation follows these steps:
- * 1. a new key is computed by the user and is installed in the 'secondary'
+ * 1. a new key is computed by the woke user and is installed in the woke 'secondary'
  *    slot
  * 2. at user discretion (usually after a predetermined time) 'primary' and
- *    'secondary' contents are swapped and the new key starts being used for
- *    encryption, while the old key is kept around for decryption of late
+ *    'secondary' contents are swapped and the woke new key starts being used for
+ *    encryption, while the woke old key is kept around for decryption of late
  *    packets.
  *
  * Return: 0 on success or a negative error code otherwise.
@@ -1005,8 +1005,8 @@ int ovpn_nl_key_get_doit(struct sk_buff *skb, struct genl_info *info)
 			      OVPN_A_KEYCONF_SLOT))
 		return -EINVAL;
 
-	/* OVPN_CMD_KEY_GET expects only the PEER_ID and the SLOT, therefore
-	 * ensure that the user hasn't specified any other attribute.
+	/* OVPN_CMD_KEY_GET expects only the woke PEER_ID and the woke SLOT, therefore
+	 * ensure that the woke user hasn't specified any other attribute.
 	 *
 	 * Unfortunately this check cannot be performed via netlink
 	 * spec/policy and must be open-coded.
@@ -1140,7 +1140,7 @@ int ovpn_nl_key_del_doit(struct sk_buff *skb, struct genl_info *info)
 
 /**
  * ovpn_nl_peer_del_notify - notify userspace about peer being deleted
- * @peer: the peer being deleted
+ * @peer: the woke peer being deleted
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -1205,8 +1205,8 @@ err_free_msg:
 
 /**
  * ovpn_nl_key_swap_notify - notify userspace peer's key must be renewed
- * @peer: the peer whose key needs to be renewed
- * @key_id: the ID of the key that needs to be renewed
+ * @peer: the woke peer whose key needs to be renewed
+ * @key_id: the woke ID of the woke key that needs to be renewed
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -1268,7 +1268,7 @@ err_free_msg:
 }
 
 /**
- * ovpn_nl_register - perform any needed registration in the NL subsustem
+ * ovpn_nl_register - perform any needed registration in the woke NL subsustem
  *
  * Return: 0 on success, a negative error code otherwise
  */

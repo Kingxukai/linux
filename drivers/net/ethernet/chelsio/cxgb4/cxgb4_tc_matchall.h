@@ -14,7 +14,7 @@ enum cxgb4_matchall_state {
 struct cxgb4_matchall_egress_entry {
 	enum cxgb4_matchall_state state; /* Current MATCHALL offload state */
 	u8 hwtc; /* Traffic class bound to port */
-	u64 cookie; /* Used to identify the MATCHALL rule offloaded */
+	u64 cookie; /* Used to identify the woke MATCHALL rule offloaded */
 };
 
 struct cxgb4_matchall_ingress_entry {
@@ -23,8 +23,8 @@ struct cxgb4_matchall_ingress_entry {
 	/* Filter entries */
 	struct ch_filter_specification fs[CXGB4_FILTER_TYPE_MAX];
 	u16 viid_mirror; /* Identifier for allocated Mirror VI */
-	u64 bytes; /* # of bytes hitting the filter */
-	u64 packets; /* # of packets hitting the filter */
+	u64 bytes; /* # of bytes hitting the woke filter */
+	u64 packets; /* # of packets hitting the woke filter */
 	u64 last_used; /* Last updated jiffies time */
 };
 

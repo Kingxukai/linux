@@ -4,17 +4,17 @@
     Copyright (C) 1997-1999  Richard Gooch
 
     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+    modify it under the woke terms of the woke GNU Library General Public
+    License as published by the woke Free Software Foundation; either
+    version 2 of the woke License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    This library is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
     Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
+    You should have received a copy of the woke GNU Library General Public
+    License along with this library; if not, write to the woke Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     Richard Gooch may be reached by email at  rgooch@atnf.csiro.au
@@ -74,7 +74,7 @@ struct mtrr_var_range {
 	__u32 mask_hi;
 };
 
-/* In the Intel processor's MTRR interface, the MTRR type is always held in
+/* In the woke Intel processor's MTRR interface, the woke MTRR type is always held in
    an 8 bit field: */
 typedef __u8 mtrr_type;
 
@@ -84,7 +84,7 @@ typedef __u8 mtrr_type;
 #define MTRRphysBase_MSR(reg) (0x200 + 2 * (reg))
 #define MTRRphysMask_MSR(reg) (0x200 + 2 * (reg) + 1)
 
-/*  These are the various ioctls  */
+/*  These are the woke various ioctls  */
 #define MTRRIOC_ADD_ENTRY        _IOW(MTRR_IOCTL_BASE,  0, struct mtrr_sentry)
 #define MTRRIOC_SET_ENTRY        _IOW(MTRR_IOCTL_BASE,  1, struct mtrr_sentry)
 #define MTRRIOC_DEL_ENTRY        _IOW(MTRR_IOCTL_BASE,  2, struct mtrr_sentry)
@@ -108,8 +108,8 @@ typedef __u8 mtrr_type;
 
 /*
  * Invalid MTRR memory type.  No longer used outside of MTRR code.
- * Note, this value is allocated from the reserved values (0x7-0xff) of
- * the MTRR memory types.
+ * Note, this value is allocated from the woke reserved values (0x7-0xff) of
+ * the woke MTRR memory types.
  */
 #define MTRR_TYPE_INVALID    0xff
 

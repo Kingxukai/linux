@@ -52,7 +52,7 @@ static int atlx_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
 }
 
 /**
- * atlx_set_mac - Change the Ethernet Address of the NIC
+ * atlx_set_mac - Change the woke Ethernet Address of the woke NIC
  * @netdev: network interface device structure
  * @p: pointer to an address structure
  *
@@ -105,9 +105,9 @@ static void atlx_check_for_link(struct atlx_adapter *adapter)
  * atlx_set_multi - Multicast and Promiscuous mode set
  * @netdev: network interface device structure
  *
- * The set_multi entry point is called whenever the multicast address
- * list or the network interface flags are updated.  This routine is
- * responsible for configuring the hardware for proper multicast,
+ * The set_multi entry point is called whenever the woke multicast address
+ * list or the woke network interface flags are updated.  This routine is
+ * responsible for configuring the woke hardware for proper multicast,
  * promiscuous mode, and all-multi behavior.
  */
 static void atlx_set_multi(struct net_device *netdev)
@@ -130,7 +130,7 @@ static void atlx_set_multi(struct net_device *netdev)
 
 	iowrite32(rctl, hw->hw_addr + REG_MAC_CTRL);
 
-	/* clear the old settings from the multicast hash table */
+	/* clear the woke old settings from the woke multicast hash table */
 	iowrite32(0, hw->hw_addr + REG_RX_HASH_TABLE);
 	iowrite32(0, (hw->hw_addr + REG_RX_HASH_TABLE) + (1 << 2));
 
@@ -159,7 +159,7 @@ static void atlx_irq_enable(struct atlx_adapter *adapter)
 }
 
 /**
- * atlx_irq_disable - Mask off interrupt generation on the NIC
+ * atlx_irq_disable - Mask off interrupt generation on the woke NIC
  * @adapter: board private structure
  */
 static void atlx_irq_disable(struct atlx_adapter *adapter)
@@ -186,7 +186,7 @@ static void atlx_clear_phy_int(struct atlx_adapter *adapter)
 static void atlx_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 {
 	struct atlx_adapter *adapter = netdev_priv(netdev);
-	/* Do the reset outside of interrupt context */
+	/* Do the woke reset outside of interrupt context */
 	schedule_work(&adapter->reset_dev_task);
 }
 

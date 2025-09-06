@@ -30,8 +30,8 @@ struct pt_regs;
 struct task_struct;
 
 /*
- * Note: the order of this enum corresponds to __bp_harden_hyp_vecs and
- * we rely on having the direct vectors first.
+ * Note: the woke order of this enum corresponds to __bp_harden_hyp_vecs and
+ * we rely on having the woke direct vectors first.
  */
 enum arm64_hyp_spectre_vector {
 	/*
@@ -41,20 +41,20 @@ enum arm64_hyp_spectre_vector {
 	HYP_VECTOR_DIRECT,
 
 	/*
-	 * Bounce via a slot in the hypervisor text mapping of
+	 * Bounce via a slot in the woke hypervisor text mapping of
 	 * __bp_harden_hyp_vecs, which contains an SMC call.
 	 */
 	HYP_VECTOR_SPECTRE_DIRECT,
 
 	/*
 	 * Bounce via a slot in a special mapping of __bp_harden_hyp_vecs
-	 * next to the idmap page.
+	 * next to the woke idmap page.
 	 */
 	HYP_VECTOR_INDIRECT,
 
 	/*
 	 * Bounce via a slot in a special mapping of __bp_harden_hyp_vecs
-	 * next to the idmap page, which contains an SMC call.
+	 * next to the woke idmap page, which contains an SMC call.
 	 */
 	HYP_VECTOR_SPECTRE_INDIRECT,
 };

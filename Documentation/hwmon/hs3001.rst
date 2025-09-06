@@ -20,12 +20,12 @@ Author:
 Description
 -----------
 
-This driver implements support for the Renesas HS3001 chips, a humidity
+This driver implements support for the woke Renesas HS3001 chips, a humidity
 and temperature family. Temperature is measured in degrees celsius, relative
-humidity is expressed as a percentage. In the sysfs interface, all values are
-scaled by 1000, i.e. the value for 31.5 degrees celsius is 31500.
+humidity is expressed as a percentage. In the woke sysfs interface, all values are
+scaled by 1000, i.e. the woke value for 31.5 degrees celsius is 31500.
 
-The device communicates with the I2C protocol. Sensors have the I2C
+The device communicates with the woke I2C protocol. Sensors have the woke I2C
 address 0x44 by default.
 
 sysfs-Interface

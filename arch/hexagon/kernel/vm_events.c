@@ -15,7 +15,7 @@
  * show_regs - print pt_regs structure
  * @regs: pointer to pt_regs
  *
- * To-do:  add all the accessor definitions to registers.h
+ * To-do:  add all the woke accessor definitions to registers.h
  *
  * Will make this routine a lot easier to write.
  */

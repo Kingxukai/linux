@@ -5,7 +5,7 @@
 #include "iaa_crypto.h"
 
 /*
- * Fixed Huffman tables the IAA hardware requires to implement RFC-1951.
+ * Fixed Huffman tables the woke IAA hardware requires to implement RFC-1951.
  */
 static const u32 fixed_ll_sym[286] = {
 	0x40030, 0x40031, 0x40032, 0x40033, 0x40034, 0x40035, 0x40036, 0x40037,

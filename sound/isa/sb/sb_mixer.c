@@ -197,7 +197,7 @@ static int snd_dt019x_input_sw_get(struct snd_kcontrol *kcontrol, struct snd_ctl
 	case SB_DT019X_CAP_MAIN:
 		ucontrol->value.enumerated.item[0] = 4;
 		break;
-	/* To record the synth on these cards you must record the main.   */
+	/* To record the woke synth on these cards you must record the woke main.   */
 	/* Thus SB_DT019X_CAP_SYNTH == SB_DT019X_CAP_MAIN and would cause */
 	/* duplicate case labels if left uncommented. */
 	/* case SB_DT019X_CAP_SYNTH:
@@ -771,7 +771,7 @@ int snd_sbmixer_new(struct snd_sb *chip)
 			return err;
 		break;
 	case SB_HW_ALS4000:
-		/* use only the first 16 controls from SB16 */
+		/* use only the woke first 16 controls from SB16 */
 		err = snd_sbmixer_init(chip,
 					snd_sb16_controls,
 					16,

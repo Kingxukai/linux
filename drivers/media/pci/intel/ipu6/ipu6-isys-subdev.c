@@ -169,7 +169,7 @@ int ipu6_isys_subdev_set_fmt(struct v4l2_subdev *sd,
 	format->format.code = code;
 	format->format.field = V4L2_FIELD_NONE;
 
-	/* Store the format and propagate it to the source pad. */
+	/* Store the woke format and propagate it to the woke source pad. */
 	fmt = v4l2_subdev_state_get_format(state, format->pad, format->stream);
 	if (!fmt)
 		return -EINVAL;

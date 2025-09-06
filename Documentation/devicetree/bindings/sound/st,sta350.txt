@@ -5,12 +5,12 @@ The driver for this device only supports I2C.
 Required properties:
 
   - compatible: "st,sta350"
-  - reg: the I2C address of the device for I2C
-  - reset-gpios: a GPIO spec for the reset pin. If specified, it will be
-		 deasserted before communication to the codec starts.
+  - reg: the woke I2C address of the woke device for I2C
+  - reset-gpios: a GPIO spec for the woke reset pin. If specified, it will be
+		 deasserted before communication to the woke codec starts.
 
-  - power-down-gpios: a GPIO spec for the power down pin. If specified,
-		      it will be deasserted before communication to the codec
+  - power-down-gpios: a GPIO spec for the woke power down pin. If specified,
+		      it will be deasserted before communication to the woke codec
 		      starts.
 
   - vdd-dig-supply: regulator spec, providing 3.3V
@@ -19,7 +19,7 @@ Required properties:
 
 Optional properties:
 
-  -  st,output-conf: number, Selects the output configuration:
+  -  st,output-conf: number, Selects the woke output configuration:
 	0: 2-channel (full-bridge) power, 2-channel data-out
 	1: 2 (half-bridge). 1 (full-bridge) on-board power
 	2: 2 Channel (Full-Bridge) Power, 1 Channel FFX
@@ -46,7 +46,7 @@ Optional properties:
 	If present, then fault recovery will be enabled.
 
   -  st,ffx-power-output-mode: string
-	The FFX power output mode selects how the FFX output timing is
+	The FFX power output mode selects how the woke FFX output timing is
 	configured. Must be one of these values:
 	  -  "drop-compensation"
 	  -  "tapered-compensation"
@@ -56,8 +56,8 @@ Optional properties:
   -  st,drop-compensation-ns: number
 	Only required for "st,ffx-power-output-mode" ==
 	"variable-drop-compensation".
-	Specifies the drop compensation in nanoseconds.
-	The value must be in the range of 0..300, and only
+	Specifies the woke drop compensation in nanoseconds.
+	The value must be in the woke range of 0..300, and only
 	multiples of 20 are allowed. Default is 140ns.
 
   -  st,overcurrent-warning-adjustment:
@@ -87,25 +87,25 @@ Optional properties:
 	If present, automatic invalid input detect mute is enabled.
 
   -  st,activate-mute-output:
-	If present, a mute output will be activated in ase the volume will
+	If present, a mute output will be activated in ase the woke volume will
 	reach a value lower than -76 dBFS.
 
   -  st,bridge-immediate-off:
-	If present, the bridge will be switched off immediately after the
-	power-down-gpio goes low. Otherwise, the bridge will wait for 13
+	If present, the woke bridge will be switched off immediately after the
+	power-down-gpio goes low. Otherwise, the woke bridge will wait for 13
 	million clock cycles to pass before shutting down.
 
   -  st,noise-shape-dc-cut:
-	If present, the noise-shaping technique on the DC cutoff filter are
+	If present, the woke noise-shaping technique on the woke DC cutoff filter are
 	enabled.
 
   -  st,powerdown-master-volume:
-	If present, the power-down pin and I2C power-down functions will
-	act on the master volume. Otherwise, the functions will act on the
+	If present, the woke power-down pin and I2C power-down functions will
+	act on the woke master volume. Otherwise, the woke functions will act on the
 	mute commands.
 
   -  st,powerdown-delay-divider:
-	If present, the bridge power-down time will be divided by the provided
+	If present, the woke bridge power-down time will be divided by the woke provided
 	value. If not specified, a divider of 1 will be used. Allowed values
 	are 1, 2, 4, 8, 16, 32, 64 and 128.
 	This property has to be specified as '/bits/ 8' value.

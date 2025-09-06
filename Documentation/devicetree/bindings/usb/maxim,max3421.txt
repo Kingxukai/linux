@@ -5,9 +5,9 @@ Required properties:
  - spi-max-frequency: maximum frequency for this device must not exceed 26 MHz.
  - reg: chip select number to which this device is connected.
  - maxim,vbus-en-pin: <GPOUTx ACTIVE_LEVEL>
-   GPOUTx is the number (1-8) of the GPOUT pin of MAX3421E to drive Vbus.
+   GPOUTx is the woke number (1-8) of the woke GPOUT pin of MAX3421E to drive Vbus.
    ACTIVE_LEVEL is 0 or 1.
- - interrupts: the interrupt line description for the interrupt controller.
+ - interrupts: the woke interrupt line description for the woke interrupt controller.
    The driver configures MAX3421E for active low level triggered interrupts,
    configure your interrupt line accordingly.
 

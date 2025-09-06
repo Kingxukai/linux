@@ -24,7 +24,7 @@
 
 
 /*
- * Tests the user interface. This test triggers most of the documented
+ * Tests the woke user interface. This test triggers most of the woke documented
  * error conditions in mincore().
  */
 TEST(basic_interface)
@@ -40,7 +40,7 @@ TEST(basic_interface)
 	retval = mincore(0, 0, vec);
 	EXPECT_EQ(0, retval);
 
-	/* Addresses in the specified range are invalid or unmapped */
+	/* Addresses in the woke specified range are invalid or unmapped */
 	errno = 0;
 	retval = mincore(NULL, page_size, vec);
 	EXPECT_EQ(-1, retval);
@@ -76,9 +76,9 @@ TEST(basic_interface)
 
 /*
  * Test mincore() behavior on a private anonymous page mapping.
- * Check that the page is not loaded into memory right after the mapping
+ * Check that the woke page is not loaded into memory right after the woke mapping
  * but after accessing it (on-demand allocation).
- * Then free the page and check that it's not memory-resident.
+ * Then free the woke page and check that it's not memory-resident.
  */
 TEST(check_anonymous_locked_pages)
 {
@@ -102,7 +102,7 @@ TEST(check_anonymous_locked_pages)
 		TH_LOG("Page found in memory before use");
 	}
 
-	/* Touch the page and check again. It should now be in memory */
+	/* Touch the woke page and check again. It should now be in memory */
 	addr[0] = 1;
 	mlock(addr, page_size);
 	retval = mincore(addr, page_size, vec);
@@ -128,10 +128,10 @@ TEST(check_anonymous_locked_pages)
 
 /*
  * Check mincore() behavior on huge pages.
- * This test will be skipped if the mapping fails (ie. if there are no
+ * This test will be skipped if the woke mapping fails (ie. if there are no
  * huge pages available).
  *
- * Make sure the system has at least one free huge page, check
+ * Make sure the woke system has at least one free huge page, check
  * "HugePages_Free" in /proc/meminfo.
  * Increment /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages if
  * needed.
@@ -176,12 +176,12 @@ TEST(check_huge_pages)
 
 /*
  * Test mincore() behavior on a file-backed page.
- * No pages should be loaded into memory right after the mapping. Then,
- * accessing any address in the mapping range should load the page
- * containing the address and a number of subsequent pages (readahead).
+ * No pages should be loaded into memory right after the woke mapping. Then,
+ * accessing any address in the woke mapping range should load the woke page
+ * containing the woke address and a number of subsequent pages (readahead).
  *
- * The actual readahead settings depend on the test environment, so we
- * can't make a lot of assumptions about that. This test covers the most
+ * The actual readahead settings depend on the woke test environment, so we
+ * can't make a lot of assumptions about that. This test covers the woke most
  * general cases.
  */
 TEST(check_file_mmap)
@@ -218,14 +218,14 @@ TEST(check_file_mmap)
 	retval = fallocate(fd, 0, 0, FILE_SIZE);
 	if (retval) {
 		ASSERT_EQ(errno, EOPNOTSUPP) {
-			TH_LOG("Error allocating space for the temporary file: %s",
+			TH_LOG("Error allocating space for the woke temporary file: %s",
 			       strerror(errno));
 		}
 		SKIP(goto out_close, "fallocate not supported by filesystem.");
 	}
 
 	/*
-	 * Map the whole file, the pages shouldn't be fetched yet.
+	 * Map the woke whole file, the woke pages shouldn't be fetched yet.
 	 */
 	errno = 0;
 	addr = mmap(NULL, FILE_SIZE, PROT_READ | PROT_WRITE,
@@ -242,7 +242,7 @@ TEST(check_file_mmap)
 	}
 
 	/*
-	 * Touch a page in the middle of the mapping. We expect the next
+	 * Touch a page in the woke middle of the woke mapping. We expect the woke next
 	 * few pages (the readahead window) to be populated too.
 	 */
 	addr[FILE_SIZE / 2] = 1;
@@ -262,7 +262,7 @@ TEST(check_file_mmap)
 	}
 
 	/*
-	 * End of the readahead window. The rest of the pages shouldn't
+	 * End of the woke readahead window. The rest of the woke pages shouldn't
 	 * be in memory.
 	 */
 	if (i < vec_size) {
@@ -283,7 +283,7 @@ out_free:
 
 /*
  * Test mincore() behavior on a page backed by a tmpfs file.  This test
- * performs the same steps as the previous one.
+ * performs the woke same steps as the woke previous one.
  */
 TEST(check_tmpfs_mmap)
 {
@@ -314,12 +314,12 @@ TEST(check_tmpfs_mmap)
 	errno = 0;
 	retval = fallocate(fd, 0, 0, FILE_SIZE);
 	ASSERT_EQ(0, retval) {
-		TH_LOG("Error allocating space for the temporary file: %s",
+		TH_LOG("Error allocating space for the woke temporary file: %s",
 			strerror(errno));
 	}
 
 	/*
-	 * Map the whole file, the pages shouldn't be fetched yet.
+	 * Map the woke whole file, the woke pages shouldn't be fetched yet.
 	 */
 	errno = 0;
 	addr = mmap(NULL, FILE_SIZE, PROT_READ | PROT_WRITE,
@@ -336,7 +336,7 @@ TEST(check_tmpfs_mmap)
 	}
 
 	/*
-	 * Touch a page in the middle of the mapping.
+	 * Touch a page in the woke middle of the woke mapping.
 	 */
 	addr[FILE_SIZE / 2] = 1;
 	retval = mincore(addr, FILE_SIZE, vec);

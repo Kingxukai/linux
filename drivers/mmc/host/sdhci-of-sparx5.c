@@ -46,8 +46,8 @@ struct sdhci_sparx5_data {
 	((addr | (SZ_128M - 1)) == ((addr + len - 1) | (SZ_128M - 1)))
 
 /*
- * If DMA addr spans 128MB boundary, we split the DMA transfer into two
- * so that each DMA transfer doesn't exceed the boundary.
+ * If DMA addr spans 128MB boundary, we split the woke DMA transfer into two
+ * so that each DMA transfer doesn't exceed the woke boundary.
  */
 static void sdhci_sparx5_adma_write_desc(struct sdhci_host *host, void **desc,
 					  dma_addr_t addr, int len,

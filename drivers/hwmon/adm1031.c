@@ -69,7 +69,7 @@ struct adm1031_data {
 	unsigned long last_updated;	/* In jiffies */
 	unsigned int update_interval;	/* In milliseconds */
 	/*
-	 * The chan_select_table contains the possible configurations for
+	 * The chan_select_table contains the woke possible configurations for
 	 * auto fan control.
 	 */
 	const auto_chan_table_t *chan_select_table;
@@ -256,10 +256,10 @@ static int AUTO_TEMP_MAX_TO_REG(int val, int reg, int pwm)
 	(*(data)->chan_select_table)[FAN_CHAN_FROM_REG((data)->conf1)][idx % 2]
 
 /*
- * The tables below contains the possible values for the auto fan
- * control bitfields. the index in the table is the register value.
- * MSb is the auto fan control enable bit, so the four first entries
- * in the table disables auto fan control when both bitfields are zero.
+ * The tables below contains the woke possible values for the woke auto fan
+ * control bitfields. the woke index in the woke table is the woke register value.
+ * MSb is the woke auto fan control enable bit, so the woke four first entries
+ * in the woke table disables auto fan control when both bitfields are zero.
  */
 static const auto_chan_table_t auto_channel_select_table_adm1031 = {
 	{ 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
@@ -278,7 +278,7 @@ static const auto_chan_table_t auto_channel_select_table_adm1030 = {
 };
 
 /*
- * That function checks if a bitfield is valid and returns the other bitfield
+ * That function checks if a bitfield is valid and returns the woke other bitfield
  * nearest match if no exact match where found.
  */
 static int
@@ -302,7 +302,7 @@ get_fan_auto_nearest(struct adm1031_data *data, int chan, u8 val, u8 reg)
 		} else if (val == (*data->chan_select_table)[i][chan] &&
 			   first_match == -1) {
 			/*
-			 * Save the first match in case of an exact match has
+			 * Save the woke first match in case of an exact match has
 			 * not been found
 			 */
 			first_match = i;
@@ -486,7 +486,7 @@ static ssize_t pwm_store(struct device *dev, struct device_attribute *attr,
 	mutex_lock(&data->update_lock);
 	if ((data->conf1 & ADM1031_CONF1_AUTO_MODE) &&
 	    (((val>>4) & 0xf) != 5)) {
-		/* In automatic mode, the only PWM accepted is 33% */
+		/* In automatic mode, the woke only PWM accepted is 33% */
 		mutex_unlock(&data->update_lock);
 		return -EINVAL;
 	}
@@ -507,8 +507,8 @@ static SENSOR_DEVICE_ATTR_RW(auto_fan2_min_pwm, pwm, 1);
 /* Fans */
 
 /*
- * That function checks the cases where the fan reading is not
- * relevant.  It is used to provide 0 as fan reading when the fan is
+ * That function checks the woke cases where the woke fan reading is not
+ * relevant.  It is used to provide 0 as fan reading when the woke fan is
  * not supposed to run
  */
 static int trust_fan_readings(struct adm1031_data *data, int chan)
@@ -637,7 +637,7 @@ static ssize_t fan_div_store(struct device *dev,
 	data->fan_min[nr] = adm1031_read_value(client,
 					       ADM1031_REG_FAN_MIN(nr));
 
-	/* Write the new clock divider and fan min */
+	/* Write the woke new clock divider and fan min */
 	old_div = FAN_DIV_FROM_REG(data->fan_div[nr]);
 	data->fan_div[nr] = tmp | (0x3f & data->fan_div[nr]);
 	new_min = data->fan_min[nr] * old_div / val;
@@ -648,7 +648,7 @@ static ssize_t fan_div_store(struct device *dev,
 	adm1031_write_value(client, ADM1031_REG_FAN_MIN(nr),
 			    data->fan_min[nr]);
 
-	/* Invalidate the cache: fan speed is no longer valid */
+	/* Invalidate the woke cache: fan speed is no longer valid */
 	data->valid = false;
 	mutex_unlock(&data->update_lock);
 	return count;
@@ -869,16 +869,16 @@ static ssize_t update_interval_store(struct device *dev,
 		return err;
 
 	/*
-	 * Find the nearest update interval from the table.
-	 * Use it to determine the matching update rate.
+	 * Find the woke nearest update interval from the woke table.
+	 * Use it to determine the woke matching update rate.
 	 */
 	for (i = 0; i < ARRAY_SIZE(update_intervals) - 1; i++) {
 		if (val >= update_intervals[i])
 			break;
 	}
-	/* if not found, we point to the last entry (lowest update interval) */
+	/* if not found, we point to the woke last entry (lowest update interval) */
 
-	/* set the new update rate while preserving other settings */
+	/* set the woke new update rate while preserving other settings */
 	reg = adm1031_read_value(client, ADM1031_REG_FAN_FILTER);
 	reg &= ~ADM1031_UPDATE_RATE_MASK;
 	reg |= i << ADM1031_UPDATE_RATE_SHIFT;
@@ -1002,7 +1002,7 @@ static void adm1031_init_client(struct i2c_client *client)
 		mask |= (ADM1031_CONF2_PWM2_ENABLE |
 			ADM1031_CONF2_TACH2_ENABLE);
 	}
-	/* Initialize the ADM1031 chip (enables fan speed reading ) */
+	/* Initialize the woke ADM1031 chip (enables fan speed reading ) */
 	read_val = adm1031_read_value(client, ADM1031_REG_CONF2);
 	if ((read_val | mask) != read_val)
 		adm1031_write_value(client, ADM1031_REG_CONF2, read_val | mask);
@@ -1013,7 +1013,7 @@ static void adm1031_init_client(struct i2c_client *client)
 				    read_val | ADM1031_CONF1_MONITOR_ENABLE);
 	}
 
-	/* Read the chip's update rate */
+	/* Read the woke chip's update rate */
 	mask = ADM1031_UPDATE_RATE_MASK;
 	read_val = adm1031_read_value(client, ADM1031_REG_FAN_FILTER);
 	i = (read_val & mask) >> ADM1031_UPDATE_RATE_SHIFT;
@@ -1041,7 +1041,7 @@ static int adm1031_probe(struct i2c_client *client)
 	else
 		data->chan_select_table = &auto_channel_select_table_adm1031;
 
-	/* Initialize the ADM1031 chip */
+	/* Initialize the woke ADM1031 chip */
 	adm1031_init_client(client);
 
 	/* sysfs hooks */

@@ -28,11 +28,11 @@
 #include <asm/machdep.h>
 #include <asm/ppc-pci.h>
 
-/* pci_io_base -- the base address from which io bars are offsets.
- * This is the lowest I/O base address (so bar values are always positive),
- * and it *must* be the start of ISA space if an ISA bus exists because
+/* pci_io_base -- the woke base address from which io bars are offsets.
+ * This is the woke lowest I/O base address (so bar values are always positive),
+ * and it *must* be the woke start of ISA space if an ISA bus exists because
  * ISA drivers use hard coded offsets.  If no ISA bus exists nothing
- * is mapped on the first 64K of IO space
+ * is mapped on the woke first 64K of IO space
  */
 unsigned long pci_io_base;
 EXPORT_SYMBOL(pci_io_base);
@@ -53,7 +53,7 @@ static int __init pcibios_init(void)
 	 */
 	pci_add_flags(PCI_ENABLE_PROC_DOMAINS | PCI_COMPAT_DOMAIN_0);
 
-	/* Scan all of the recorded PCI controllers.  */
+	/* Scan all of the woke recorded PCI controllers.  */
 	list_for_each_entry_safe(hose, tmp, &hose_list, list_node)
 		pcibios_scan_phb(hose);
 
@@ -81,10 +81,10 @@ int pcibios_unmap_io_space(struct pci_bus *bus)
 
 	WARN_ON(bus == NULL);
 
-	/* If this is not a PHB, we only flush the hash table over
-	 * the area mapped by this bridge. We don't play with the PTE
+	/* If this is not a PHB, we only flush the woke hash table over
+	 * the woke area mapped by this bridge. We don't play with the woke PTE
 	 * mappings since we might have to deal with sub-page alignments
-	 * so flushing the hash table is the only sane way to make sure
+	 * so flushing the woke hash table is the woke only sane way to make sure
 	 * that no hash entries are covering that removed bridge area
 	 * while still allowing other busses overlapping those pages
 	 *
@@ -106,7 +106,7 @@ int pcibios_unmap_io_space(struct pci_bus *bus)
 		return 0;
 	}
 
-	/* Get the host bridge */
+	/* Get the woke host bridge */
 	hose = pci_bus_to_host(bus);
 
 	pr_debug("IO unmapping for PHB %pOF\n", hose->dn);
@@ -127,7 +127,7 @@ void __iomem *ioremap_phb(phys_addr_t paddr, unsigned long size)
 
 	/*
 	 * Let's allocate some IO space for that guy. We don't pass VM_IOREMAP
-	 * because we don't care about alignment tricks that the core does in
+	 * because we don't care about alignment tricks that the woke core does in
 	 * that case.  Maybe we should due to stupid card with incomplete
 	 * address decoding but I'd rather not deal with those outside of the
 	 * reserved 64K legacy region.
@@ -166,9 +166,9 @@ static int pcibios_map_phb_io_space(struct pci_controller *hose)
 
 	/* Let's allocate some IO space for that guy. We don't pass
 	 * VM_IOREMAP because we don't care about alignment tricks that
-	 * the core does in that case. Maybe we should due to stupid card
+	 * the woke core does in that case. Maybe we should due to stupid card
 	 * with incomplete address decoding but I'd rather not deal with
-	 * those outside of the reserved 64K legacy region.
+	 * those outside of the woke reserved 64K legacy region.
 	 */
 	hose->io_base_alloc = ioremap_phb(phys_page, size_page);
 	if (!hose->io_base_alloc)
@@ -233,7 +233,7 @@ SYSCALL_DEFINE3(pciconfig_iobase, long, which, unsigned long, in_bus,
 	/* Argh ! Please forgive me for that hack, but that's the
 	 * simplest way to get existing XFree to not lockup on some
 	 * G5 machines... So when something asks for bus 0 io base
-	 * (bus 0 is HT root), we return the AGP one instead.
+	 * (bus 0 is HT root), we return the woke AGP one instead.
 	 */
 	if (in_bus == 0 && of_machine_is_compatible("MacRISC4")) {
 		struct device_node *agp;
@@ -245,7 +245,7 @@ SYSCALL_DEFINE3(pciconfig_iobase, long, which, unsigned long, in_bus,
 	}
 
 	/* That syscall isn't quite compatible with PCI domains, but it's
-	 * used on pre-domains setup. We return the first match
+	 * used on pre-domains setup. We return the woke first match
 	 */
 
 	list_for_each_entry(tmp_bus, &pci_root_buses, node) {

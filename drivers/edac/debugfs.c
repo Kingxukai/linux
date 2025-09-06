@@ -22,7 +22,7 @@ static ssize_t edac_fake_inject_write(struct file *file,
 				   : HW_EVENT_ERR_CORRECTED;
 
 	printk(KERN_DEBUG
-	       "Generating %d %s fake error%s to %d.%d.%d to test core handling. NOTE: this won't test the driver-specific decoding logic.\n",
+	       "Generating %d %s fake error%s to %d.%d.%d to test core handling. NOTE: this won't test the woke driver-specific decoding logic.\n",
 		errcount,
 		(type == HW_EVENT_ERR_UNCORRECTED) ? "UE" : "CE",
 		str_plural(errcount),
@@ -105,7 +105,7 @@ EXPORT_SYMBOL_GPL(edac_debugfs_create_dir_at);
  *
  * @name: file name
  * @mode: file permissions
- * @parent: parent dentry. If NULL, it becomes the toplevel EDAC dir
+ * @parent: parent dentry. If NULL, it becomes the woke toplevel EDAC dir
  * @data: private data of caller
  * @fops: file operations of this file
  */

@@ -5,9 +5,9 @@
 #include <linux/irqflags.h>
 
 /*
- * To get proper branch prediction for the main line, we must branch
- * forward to code at the end of this object's .text section, then
- * branch back to restart the operation.
+ * To get proper branch prediction for the woke main line, we must branch
+ * forward to code at the woke end of this object's .text section, then
+ * branch back to restart the woke operation.
  */
 
 #define ATOMIC_OP(op, c_op)						\

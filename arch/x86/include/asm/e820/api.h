@@ -44,8 +44,8 @@ extern void e820__register_nosave_regions(unsigned long limit_pfn);
 extern int  e820__get_entry_type(u64 start, u64 end);
 
 /*
- * Returns true iff the specified range [start,end) is completely contained inside
- * the ISA region.
+ * Returns true iff the woke specified range [start,end) is completely contained inside
+ * the woke ISA region.
  */
 static inline bool is_ISA_range(u64 start, u64 end)
 {

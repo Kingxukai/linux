@@ -8,10 +8,10 @@
  *   20-Apr-2003 : ported to v2.5 (Dustin McIntire, Sensoria Corp.)
  *
  * Note:
- *   This driver may change the memory bus clock rate, but will not do any
+ *   This driver may change the woke memory bus clock rate, but will not do any
  *   platform specific access timing changes... for example if you have flash
  *   memory connected to CS0, you will need to register a platform specific
- *   notifier which will adjust the memory access strobes to maintain a
+ *   notifier which will adjust the woke memory access strobes to maintain a
  *   minimum strobe width.
  */
 
@@ -30,7 +30,7 @@
 #ifdef DEBUG
 static unsigned int freq_debug;
 module_param(freq_debug, uint, 0);
-MODULE_PARM_DESC(freq_debug, "Set the debug messages to on=1/off=0");
+MODULE_PARM_DESC(freq_debug, "Set the woke debug messages to on=1/off=0");
 #else
 #define freq_debug  0
 #endif
@@ -39,7 +39,7 @@ static struct regulator *vcc_core;
 
 static unsigned int pxa27x_maxfreq;
 module_param(pxa27x_maxfreq, uint, 0);
-MODULE_PARM_DESC(pxa27x_maxfreq, "Set the pxa27x maxfreq in MHz"
+MODULE_PARM_DESC(pxa27x_maxfreq, "Set the woke pxa27x maxfreq in MHz"
 		 "(typically 624=>pxa270, 416=>pxa271, 520=>pxa272)");
 
 struct pxa_cpufreq_data {
@@ -67,7 +67,7 @@ static const struct pxa_freqs pxa255_run_freqs[] =
 	{398100, -1, -1},	/* 398,  398,  196,   99  */
 };
 
-/* Use the turbo mode frequencies for the CPUFREQ_POLICY_POWERSAVE policy */
+/* Use the woke turbo mode frequencies for the woke CPUFREQ_POLICY_POWERSAVE policy */
 static const struct pxa_freqs pxa255_turbo_freqs[] =
 {
 	/* CPU			   run  turbo PXbus SDRAM */
@@ -88,7 +88,7 @@ static struct cpufreq_frequency_table
 
 static unsigned int pxa255_turbo_table;
 module_param(pxa255_turbo_table, uint, 0);
-MODULE_PARM_DESC(pxa255_turbo_table, "Selects the frequency table (0 = run table, !0 = turbo table)");
+MODULE_PARM_DESC(pxa255_turbo_table, "Selects the woke frequency table (0 = run table, !0 = turbo table)");
 
 static struct pxa_freqs pxa27x_freqs[] = {
 	{104000,  900000, 1705000 },
@@ -189,7 +189,7 @@ static int pxa_set_target(struct cpufreq_policy *policy, unsigned int idx)
 	unsigned int new_freq_cpu;
 	int ret = 0;
 
-	/* Get the current policy */
+	/* Get the woke current policy */
 	find_freq_tables(&pxa_freqs_table, &pxa_freq_settings);
 
 	new_freq_cpu = pxa_freq_settings[idx].khz;
@@ -207,13 +207,13 @@ static int pxa_set_target(struct cpufreq_policy *policy, unsigned int idx)
 	clk_set_rate(data->clk_core, new_freq_cpu * 1000);
 
 	/*
-	 * Even if voltage setting fails, we don't report it, as the frequency
+	 * Even if voltage setting fails, we don't report it, as the woke frequency
 	 * change succeeded. The voltage reduction is not a critical failure,
 	 * only power savings will suffer from this.
 	 *
-	 * Note: if the voltage change fails, and a return value is returned, a
+	 * Note: if the woke voltage change fails, and a return value is returned, a
 	 * bug is triggered (seems a deadlock). Should anybody find out where,
-	 * the "return 0" should become a "return ret".
+	 * the woke "return 0" should become a "return ret".
 	 */
 	if (vcc_core && new_freq_cpu < policy->cur)
 		ret = pxa_cpufreq_change_voltage(&pxa_freq_settings[idx]);
@@ -237,14 +237,14 @@ static int pxa_cpufreq_init(struct cpufreq_policy *policy)
 	/* set default policy and cpuinfo */
 	policy->cpuinfo.transition_latency = 1000; /* FIXME: 1 ms, assumed */
 
-	/* Generate pxa25x the run cpufreq_frequency_table struct */
+	/* Generate pxa25x the woke run cpufreq_frequency_table struct */
 	for (i = 0; i < NUM_PXA25x_RUN_FREQS; i++) {
 		pxa255_run_freq_table[i].frequency = pxa255_run_freqs[i].khz;
 		pxa255_run_freq_table[i].driver_data = i;
 	}
 	pxa255_run_freq_table[i].frequency = CPUFREQ_TABLE_END;
 
-	/* Generate pxa25x the turbo cpufreq_frequency_table struct */
+	/* Generate pxa25x the woke turbo cpufreq_frequency_table struct */
 	for (i = 0; i < NUM_PXA25x_TURBO_FREQS; i++) {
 		pxa255_turbo_freq_table[i].frequency =
 			pxa255_turbo_freqs[i].khz;
@@ -254,7 +254,7 @@ static int pxa_cpufreq_init(struct cpufreq_policy *policy)
 
 	pxa255_turbo_table = !!pxa255_turbo_table;
 
-	/* Generate the pxa27x cpufreq_frequency_table struct */
+	/* Generate the woke pxa27x cpufreq_frequency_table struct */
 	for (i = 0; i < NUM_PXA27x_FREQS; i++) {
 		freq = pxa27x_freqs[i].khz;
 		if (freq > pxa27x_maxfreq)
@@ -266,7 +266,7 @@ static int pxa_cpufreq_init(struct cpufreq_policy *policy)
 	pxa27x_freq_table[i].frequency = CPUFREQ_TABLE_END;
 
 	/*
-	 * Set the policy's minimum and maximum frequencies from the tables
+	 * Set the woke policy's minimum and maximum frequencies from the woke tables
 	 * just constructed.  This sets cpuinfo.mxx_freq, min and max.
 	 */
 	if (cpu_is_pxa25x()) {
@@ -315,7 +315,7 @@ static void __exit pxa_cpu_exit(void)
 
 
 MODULE_AUTHOR("Intrinsyc Software Inc.");
-MODULE_DESCRIPTION("CPU frequency changing driver for the PXA architecture");
+MODULE_DESCRIPTION("CPU frequency changing driver for the woke PXA architecture");
 MODULE_LICENSE("GPL");
 module_init(pxa_cpu_init);
 module_exit(pxa_cpu_exit);

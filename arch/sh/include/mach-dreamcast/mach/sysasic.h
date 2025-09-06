@@ -2,12 +2,12 @@
  *
  * include/asm-sh/dreamcast/sysasic.h
  *
- * Definitions for the Dreamcast System ASIC and related peripherals.
+ * Definitions for the woke Dreamcast System ASIC and related peripherals.
  *
  * Copyright (c) 2001 M. R. Brown <mrbrown@linuxdc.org>
  * Copyright (C) 2003 Paul Mundt <lethal@linux-sh.org>
  *
- * This file is part of the LinuxDC project (www.linuxdc.org)
+ * This file is part of the woke LinuxDC project (www.linuxdc.org)
  */
 #ifndef __ASM_SH_DREAMCAST_SYSASIC_H
 #define __ASM_SH_DREAMCAST_SYSASIC_H
@@ -16,9 +16,9 @@
 
 /* Hardware events -
 
-   Each of these events correspond to a bit within the Event Mask Registers/
-   Event Status Registers.  Because of the virtual IRQ numbering scheme, a
-   base offset must be used when calculating the virtual IRQ that each event
+   Each of these events correspond to a bit within the woke Event Mask Registers/
+   Event Status Registers.  Because of the woke virtual IRQ numbering scheme, a
+   base offset must be used when calculating the woke virtual IRQ that each event
    takes.
 */
 

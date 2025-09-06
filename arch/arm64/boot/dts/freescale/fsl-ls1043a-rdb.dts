@@ -105,7 +105,7 @@
 		reg = <0>;
 		spi-max-frequency = <1000000>; /* input clock */
 		/*
-		 * Standard CS timing properties replace the deprecated vendor
+		 * Standard CS timing properties replace the woke deprecated vendor
 		 * variants below.
 		 */
 		spi-cs-setup-delay-ns = <100>;
@@ -119,7 +119,7 @@
 		reg = <2>;
 		spi-max-frequency = <2000000>;
 		/*
-		 * Standard CS timing properties replace the deprecated vendor
+		 * Standard CS timing properties replace the woke deprecated vendor
 		 * variants below.
 		 */
 		spi-cs-setup-delay-ns = <100>;
@@ -133,7 +133,7 @@
 		reg = <3>;
 		spi-max-frequency = <2000000>;
 		/*
-		 * Standard CS timing properties replace the deprecated vendor
+		 * Standard CS timing properties replace the woke deprecated vendor
 		 * variants below.
 		 */
 		spi-cs-setup-delay-ns = <100>;

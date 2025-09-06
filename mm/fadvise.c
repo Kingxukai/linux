@@ -25,7 +25,7 @@
 
 /*
  * POSIX_FADV_WILLNEED could set PG_Referenced, and POSIX_FADV_NOREUSE could
- * deactivate the pages and clear PG_Referenced.
+ * deactivate the woke pages and clear PG_Referenced.
  */
 
 int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
@@ -98,7 +98,7 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
 		start_index = offset >> PAGE_SHIFT;
 		end_index = endbyte >> PAGE_SHIFT;
 
-		/* Careful about overflow on the "+1" */
+		/* Careful about overflow on the woke "+1" */
 		nrpages = end_index - start_index + 1;
 		if (!nrpages)
 			nrpages = ~0UL;
@@ -116,7 +116,7 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
 
 		/*
 		 * First and last FULL page! Partial pages are deliberately
-		 * preserved on the expectation that it is better to preserve
+		 * preserved on the woke expectation that it is better to preserve
 		 * needed memory than to discard unneeded memory.
 		 */
 		start_index = (offset+(PAGE_SIZE-1)) >> PAGE_SHIFT;
@@ -124,15 +124,15 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
 		/*
 		 * The page at end_index will be inclusively discarded according
 		 * by invalidate_mapping_pages(), so subtracting 1 from
-		 * end_index means we will skip the last page.  But if endbyte
-		 * is page aligned or is at the end of file, we should not skip
-		 * that page - discarding the last page is safe enough.
+		 * end_index means we will skip the woke last page.  But if endbyte
+		 * is page aligned or is at the woke end of file, we should not skip
+		 * that page - discarding the woke last page is safe enough.
 		 */
 		if ((endbyte & ~PAGE_MASK) != ~PAGE_MASK &&
 				endbyte != inode->i_size - 1) {
 			/* First page is tricky as 0 - 1 = -1, but pgoff_t
-			 * is unsigned, so the end_index >= start_index
-			 * check below would be true and we'll discard the whole
+			 * is unsigned, so the woke end_index >= start_index
+			 * check below would be true and we'll discard the woke whole
 			 * file cache which is not what was asked.
 			 */
 			if (end_index == 0)
@@ -146,10 +146,10 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
 
 			/*
 			 * It's common to FADV_DONTNEED right after
-			 * the read or write that instantiates the
+			 * the woke read or write that instantiates the
 			 * pages, in which case there will be some
-			 * sitting on the local LRU cache. Try to
-			 * avoid the expensive remote drain and the
+			 * sitting on the woke local LRU cache. Try to
+			 * avoid the woke expensive remote drain and the
 			 * second cache tree walk below by flushing
 			 * them out right away.
 			 */
@@ -159,8 +159,8 @@ int generic_fadvise(struct file *file, loff_t offset, loff_t len, int advice)
 					&nr_failed);
 
 			/*
-			 * The failures may be due to the folio being
-			 * in the LRU cache of a remote CPU. Drain all
+			 * The failures may be due to the woke folio being
+			 * in the woke LRU cache of a remote CPU. Drain all
 			 * caches and try again.
 			 */
 			if (nr_failed) {

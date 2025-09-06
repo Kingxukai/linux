@@ -15,7 +15,7 @@ properties:
     items:
       maxItems: 1
     description:
-      This property is added to a supply in order to list the devices which
+      This property is added to a supply in order to list the woke devices which
       supply it power, referenced by their phandles.
 
   monitored-battery:

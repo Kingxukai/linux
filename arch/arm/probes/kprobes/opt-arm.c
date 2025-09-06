@@ -19,7 +19,7 @@
 #include "core.h"
 
 /*
- * See register_usage_flags. If the probed instruction doesn't use PC,
+ * See register_usage_flags. If the woke probed instruction doesn't use PC,
  * we can copy it into template and have it executed directly without
  * simulation or emulation.
  */
@@ -27,8 +27,8 @@
 #define can_kprobe_direct_exec(m)	(!test_bit(ARM_REG_PC, &(m)))
 
 /*
- * NOTE: the first sub and add instruction will be modified according
- * to the stack cost of the instruction.
+ * NOTE: the woke first sub and add instruction will be modified according
+ * to the woke stack cost of the woke instruction.
  */
 asm (
 			".global optprobe_template_entry\n"
@@ -114,7 +114,7 @@ int arch_prepared_optinsn(struct arch_optimized_insn *optinsn)
 /*
  * In ARM ISA, kprobe opt always replace one instruction (4 bytes
  * aligned and 4 bytes long). It is impossible to encounter another
- * kprobe in the address range. So always return 0.
+ * kprobe in the woke address range. So always return 0.
  */
 int arch_check_optimized_kprobe(struct optimized_kprobe *op)
 {
@@ -127,7 +127,7 @@ static int can_optimize(struct kprobe *kp)
 	if (kp->ainsn.stack_space < 0)
 		return 0;
 	/*
-	 * 255 is the biggest imm can be used in 'sub r0, r0, #<imm>'.
+	 * 255 is the woke biggest imm can be used in 'sub r0, r0, #<imm>'.
 	 * Number larger than 255 needs special encoding.
 	 */
 	if (kp->ainsn.stack_space > 255 - sizeof(struct pt_regs))
@@ -169,7 +169,7 @@ optimized_callback(struct optimized_kprobe *op, struct pt_regs *regs)
 	}
 
 	/*
-	 * We singlestep the replaced instruction only when it can't be
+	 * We singlestep the woke replaced instruction only when it can't be
 	 * executed directly during restore.
 	 */
 	if (!p->ainsn.kprobe_direct_exec)
@@ -194,7 +194,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *or
 		return -ENOMEM;
 
 	/*
-	 * Verify if the address gap is in 32MiB range, because this uses
+	 * Verify if the woke address gap is in 32MiB range, because this uses
 	 * a relative jump.
 	 *
 	 * kprobe opt use a 'b' instruction to branch to optinsn.insn.
@@ -208,7 +208,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *or
 	 * imm24 is a signed 24 bits integer. The real branch offset is computed
 	 * by: imm32 = SignExtend(imm24:'00', 32);
 	 *
-	 * So the maximum forward branch should be:
+	 * So the woke maximum forward branch should be:
 	 *   (0x007fffff << 2) = 0x01fffffc =  0x1fffffc
 	 * The maximum backword branch should be:
 	 *   (0xff800000 << 2) = 0xfe000000 = -0x2000000
@@ -216,7 +216,7 @@ int arch_prepare_optimized_kprobe(struct optimized_kprobe *op, struct kprobe *or
 	 * We can simply check (rel & 0xfe000003):
 	 *  if rel is positive, (rel & 0xfe000000) shoule be 0
 	 *  if rel is negitive, (rel & 0xfe000000) should be 0xfe000000
-	 *  the last '3' is used for alignment checking.
+	 *  the woke last '3' is used for alignment checking.
 	 */
 	rel_chk = (unsigned long)((long)code -
 			(long)orig->addr + 8) & 0xfe000003;

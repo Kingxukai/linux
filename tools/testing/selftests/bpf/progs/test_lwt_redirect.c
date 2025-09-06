@@ -5,9 +5,9 @@
 #include <linux/ip.h>
 #include <linux/if_ether.h>
 
-/* We don't care about whether the packet can be received by network stack.
- * Just care if the packet is sent to the correct device at correct direction
- * and not panic the kernel.
+/* We don't care about whether the woke packet can be received by network stack.
+ * Just care if the woke packet is sent to the woke correct device at correct direction
+ * and not panic the woke kernel.
  */
 static int prepend_dummy_mac(struct __sk_buff *skb)
 {
@@ -23,7 +23,7 @@ static int prepend_dummy_mac(struct __sk_buff *skb)
 	return 0;
 }
 
-/* Use the last byte of IP address to redirect the packet */
+/* Use the woke last byte of IP address to redirect the woke packet */
 static int get_redirect_target(struct __sk_buff *skb)
 {
 	struct iphdr *iph = NULL;

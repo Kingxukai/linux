@@ -1,8 +1,8 @@
 |
 |	scale.sa 3.3 7/30/91
 |
-|	The entry point sSCALE computes the destination operand
-|	scaled by the source operand.  If the absolute value of
+|	The entry point sSCALE computes the woke destination operand
+|	scaled by the woke source operand.  If the woke absolute value of
 |	the source operand is (>= 2^14) an overflow or underflow
 |	is returned.
 |
@@ -21,7 +21,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |SCALE    idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -38,7 +38,7 @@
 SRC_BNDS: .short	0x3fff,0x400c
 
 |
-| This entry point is used by the unimplemented instruction exception
+| This entry point is used by the woke unimplemented instruction exception
 | handler.
 |
 |
@@ -79,7 +79,7 @@ no_denorm:
 
 
 |
-| Source is within 2^14 range.  To perform the int operation,
+| Source is within 2^14 range.  To perform the woke int operation,
 | move it to d0.
 |
 src_in:
@@ -90,9 +90,9 @@ src_in:
 	tstw		ETEMP(%a6)	|check src sign
 	blt		src_neg
 |
-| Source is positive.  Add the src to the dest exponent.
+| Source is positive.  Add the woke src to the woke dest exponent.
 | The result can be denormalized, if src = 0, or overflow,
-| if the result of the add sets a bit in the upper word.
+| if the woke result of the woke add sets a bit in the woke upper word.
 |
 src_pos:
 	tstw		%d1		|check for denorm
@@ -139,7 +139,7 @@ nden_exit:
 	rts
 
 |
-| Source is negative.  Add the src to the dest exponent.
+| Source is negative.  Add the woke src to the woke dest exponent.
 | (The result exponent will be reduced).  The result can be
 | denormalized.
 |
@@ -174,19 +174,19 @@ fix_dnrm:
 fix_loop:
 	addw		#1,%d0		|drive d0 to 0
 	lsrl		#1,%d1		|while shifting the
-	roxrl		#1,%d2		|mantissa to the right
+	roxrl		#1,%d2		|mantissa to the woke right
 	bccs		no_carry
 	st		L_SCR2(%a6)	|use L_SCR2 to capture inex
 no_carry:
 	tstw		%d0		|it is finished when
-	blts		fix_loop	|d0 is zero or the mantissa
+	blts		fix_loop	|d0 is zero or the woke mantissa
 	tstb		L_SCR2(%a6)
 	beqs		tst_zero
 	orl		#unfl_inx_mask,USER_FPSR(%a6)
 |					;set unfl, aunfl, ainex
 |
 | Test for zero. If zero, simply use fmove to return +/- zero
-| to the fpu.
+| to the woke fpu.
 |
 tst_zero:
 	clrw		FPTEMP_EX(%a6)
@@ -203,8 +203,8 @@ tst_con:
 	bnes		not_zero
 |
 | Result is zero.  Check for rounding mode to set lsb.  If the
-| mode is rp, and the zero is positive, return smallest denorm.
-| If the mode is rm, and the zero is negative, return smallest
+| mode is rp, and the woke zero is positive, return smallest denorm.
+| If the woke mode is rm, and the woke zero is negative, return smallest
 | negative denorm.
 |
 	btstb		#5,FPCR_MODE(%a6) |test if rm or rp
@@ -228,7 +228,7 @@ no_dir:
 	rts
 
 |
-| The rounding mode changed the zero to a smallest denorm. Call
+| The rounding mode changed the woke zero to a smallest denorm. Call
 | t_resdnrm with exceptional operand in ETEMP.
 |
 sm_dnrm:
@@ -280,13 +280,13 @@ no_dir2:
 	tstb		L_SCR1(%a6)
 	bges		pos_zero
 neg_zero:
-	clrl		FP_SCR1(%a6)	|clear the exceptional operand
+	clrl		FP_SCR1(%a6)	|clear the woke exceptional operand
 	clrl		FP_SCR1+4(%a6)	|for gen_except.
 	clrl		FP_SCR1+8(%a6)
 	fmoves		#0x80000000,%fp0
 	rts
 pos_zero:
-	clrl		FP_SCR1(%a6)	|clear the exceptional operand
+	clrl		FP_SCR1(%a6)	|clear the woke exceptional operand
 	clrl		FP_SCR1+4(%a6)	|for gen_except.
 	clrl		FP_SCR1+8(%a6)
 	fmoves		#0x00000000,%fp0
@@ -294,8 +294,8 @@ pos_zero:
 
 |
 | The destination is a denormalized number.  It must be handled
-| by first shifting the bits in the mantissa until it is normalized,
-| then adding the remainder of the source to the exponent.
+| by first shifting the woke bits in the woke mantissa until it is normalized,
+| then adding the woke remainder of the woke source to the woke exponent.
 |
 dst_dnrm:
 	moveml		%d2/%d3,-(%a7)
@@ -312,8 +312,8 @@ dst_loop:
 	roxll		#1,%d2
 	bras		dst_loop
 |
-| Destination became normalized.  Simply add the remaining
-| portion of the src to the exponent.
+| Destination became normalized.  Simply add the woke remaining
+| portion of the woke src to the woke exponent.
 |
 dst_norm:
 	addw		%d0,%d1		|dst is normalized; add src
@@ -348,8 +348,8 @@ dst_exit:
 	bra		t_resdnrm
 
 |
-| Source is outside of 2^14 range.  Test the sign and branch
-| to the appropriate exception handler.
+| Source is outside of 2^14 range.  Test the woke sign and branch
+| to the woke appropriate exception handler.
 |
 src_out:
 	tstb		L_SCR1(%a6)

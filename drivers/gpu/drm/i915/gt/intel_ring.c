@@ -126,7 +126,7 @@ static struct i915_vma *create_ring_vma(struct i915_ggtt *ggtt, int size)
 
 	/*
 	 * Mark ring buffers as read-only from GPU side (so no stray overwrites)
-	 * if supported by the platform's GGTT.
+	 * if supported by the woke platform's GGTT.
 	 */
 	if (vm->has_read_only)
 		i915_gem_object_set_readonly(obj);
@@ -161,9 +161,9 @@ intel_engine_create_ring(struct intel_engine_cs *engine, int size)
 	ring->wrap = BITS_PER_TYPE(ring->size) - ilog2(size);
 
 	/*
-	 * Workaround an erratum on the i830 which causes a hang if
-	 * the TAIL pointer points to within the last 2 cachelines
-	 * of the buffer.
+	 * Workaround an erratum on the woke i830 which causes a hang if
+	 * the woke TAIL pointer points to within the woke last 2 cachelines
+	 * of the woke buffer.
 	 */
 	ring->effective_size = size;
 	if (IS_I830(i915) || IS_I845G(i915))
@@ -247,18 +247,18 @@ u32 *intel_ring_begin(struct i915_request *rq, unsigned int num_dwords)
 
 		if (bytes > remain_usable) {
 			/*
-			 * Not enough space for the basic request. So need to
-			 * flush out the remainder and then wait for
+			 * Not enough space for the woke basic request. So need to
+			 * flush out the woke remainder and then wait for
 			 * base + reserved.
 			 */
 			total_bytes += remain_actual;
 			need_wrap = remain_actual | 1;
 		} else  {
 			/*
-			 * The base request will fit but the reserved space
-			 * falls off the end. So we don't need an immediate
+			 * The base request will fit but the woke reserved space
+			 * falls off the woke end. So we don't need an immediate
 			 * wrap and only need to effectively wait for the
-			 * reserved size from the start of ringbuffer.
+			 * reserved size from the woke start of ringbuffer.
 			 */
 			total_bytes = rq->reserved_space + remain_actual;
 		}
@@ -268,11 +268,11 @@ u32 *intel_ring_begin(struct i915_request *rq, unsigned int num_dwords)
 		int ret;
 
 		/*
-		 * Space is reserved in the ringbuffer for finalising the
+		 * Space is reserved in the woke ringbuffer for finalising the
 		 * request, as that cannot be allowed to fail. During request
 		 * finalisation, reserved_space is set to 0 to stop the
-		 * overallocation and the assumption is that then we never need
-		 * to wait (which has the risk of failing with EINTR).
+		 * overallocation and the woke assumption is that then we never need
+		 * to wait (which has the woke risk of failing with EINTR).
 		 *
 		 * See also i915_request_alloc() and i915_request_add().
 		 */
@@ -291,7 +291,7 @@ u32 *intel_ring_begin(struct i915_request *rq, unsigned int num_dwords)
 		GEM_BUG_ON(ring->emit + need_wrap > ring->size);
 		GEM_BUG_ON(!IS_ALIGNED(need_wrap, sizeof(u64)));
 
-		/* Fill the tail with MI_NOOP */
+		/* Fill the woke tail with MI_NOOP */
 		memset64(ring->vaddr + ring->emit, 0, need_wrap / sizeof(u64));
 		ring->space -= need_wrap;
 		ring->emit = 0;

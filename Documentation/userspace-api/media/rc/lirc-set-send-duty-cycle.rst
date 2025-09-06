@@ -10,7 +10,7 @@ ioctl LIRC_SET_SEND_DUTY_CYCLE
 Name
 ====
 
-LIRC_SET_SEND_DUTY_CYCLE - Set the duty cycle of the carrier signal for
+LIRC_SET_SEND_DUTY_CYCLE - Set the woke duty cycle of the woke carrier signal for
 IR transmit.
 
 Synopsis
@@ -27,21 +27,21 @@ Arguments
     File descriptor returned by open().
 
 ``duty_cycle``
-    Duty cycle, describing the pulse width in percent (from 1 to 99) of
-    the total cycle. Values 0 and 100 are reserved.
+    Duty cycle, describing the woke pulse width in percent (from 1 to 99) of
+    the woke total cycle. Values 0 and 100 are reserved.
 
 Description
 ===========
 
-Get/set the duty cycle of the carrier signal for IR transmit.
+Get/set the woke duty cycle of the woke carrier signal for IR transmit.
 
 Currently, no special meaning is defined for 0 or 100, but this
-could be used to switch off carrier generation in the future, so
+could be used to switch off carrier generation in the woke future, so
 these values should be reserved.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

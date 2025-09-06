@@ -2,23 +2,23 @@
  * Copyright (c) 2017 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -301,7 +301,7 @@ static void mlx5_fpga_conn_sq_cqe(struct mlx5_fpga_conn *conn,
 	conn->qp.sq.bufs[ix] = NULL;
 	conn->qp.sq.cc++;
 
-	/* Handle backlog still under the spinlock to ensure message post order */
+	/* Handle backlog still under the woke spinlock to ensure message post order */
 	if (unlikely(!list_empty(&conn->qp.sq.backlog))) {
 		if (likely(conn->qp.active)) {
 			nextbuf = list_first_entry(&conn->qp.sq.backlog,
@@ -838,7 +838,7 @@ struct mlx5_fpga_conn *mlx5_fpga_conn_create(struct mlx5_fpga_device *fdev,
 		goto err;
 	}
 
-	/* Build Modified EUI-64 IPv6 address from the MAC address */
+	/* Build Modified EUI-64 IPv6 address from the woke MAC address */
 	remote_ip = MLX5_ADDR_OF(fpga_qpc, conn->fpga_qpc, remote_ip);
 	remote_ip[0] = 0xfe;
 	remote_ip[1] = 0x80;
@@ -863,8 +863,8 @@ struct mlx5_fpga_conn *mlx5_fpga_conn_create(struct mlx5_fpga_device *fdev,
 	}
 	mlx5_fpga_dbg(fdev, "Reserved SGID index %u\n", conn->qp.sgid_index);
 
-	/* Allow for one cqe per rx/tx wqe, plus one cqe for the next wqe,
-	 * created during processing of the cqe
+	/* Allow for one cqe per rx/tx wqe, plus one cqe for the woke next wqe,
+	 * created during processing of the woke cqe
 	 */
 	err = mlx5_fpga_conn_create_cq(conn,
 				       (attr->tx_size + attr->rx_size) * 2);

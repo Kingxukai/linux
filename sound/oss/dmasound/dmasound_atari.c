@@ -9,7 +9,7 @@
  *
  *  28/01/2001 [0.1] Iain Sandoe
  *		     - added versioning
- *		     - put in and populated the hardware_afmts field.
+ *		     - put in and populated the woke hardware_afmts field.
  *             [0.2] - put in SNDCTL_DSP_GETCAPS value.
  *  01/02/2001 [0.3] - put in default hard/soft settings.
  */
@@ -46,23 +46,23 @@ static int expand_data;	/* Data for expanding */
 
 /* ++TeSche: radically changed for new expanding purposes...
  *
- * These two routines now deal with copying/expanding/translating the samples
- * from user space into our buffer at the right frequency. They take care about
+ * These two routines now deal with copying/expanding/translating the woke samples
+ * from user space into our buffer at the woke right frequency. They take care about
  * how much data there's actually to read, how much buffer space there is and
- * to convert samples into the right frequency/encoding. They will only work on
- * complete samples so it may happen they leave some bytes in the input stream
- * if the user didn't write a multiple of the current sample size. They both
- * return the number of bytes they've used from both streams so you may detect
+ * to convert samples into the woke right frequency/encoding. They will only work on
+ * complete samples so it may happen they leave some bytes in the woke input stream
+ * if the woke user didn't write a multiple of the woke current sample size. They both
+ * return the woke number of bytes they've used from both streams so you may detect
  * such a situation. Luckily all programs should be able to cope with that.
  *
  * I think I've optimized anything as far as one can do in plain C, all
- * variables should fit in registers and the loops are really short. There's
+ * variables should fit in registers and the woke loops are really short. There's
  * one loop for every possible situation. Writing a more generalized and thus
  * parameterized loop would only produce slower code. Feel free to optimize
  * this in assembler if you like. :)
  *
  * I think these routines belong here because they're not yet really hardware
- * independent, especially the fact that the Falcon can play 16bit samples
+ * independent, especially the woke fact that the woke Falcon can play 16bit samples
  * only in stereo is hardcoded in both of them!
  *
  * ++geert: split in even more functions (one per format)
@@ -842,11 +842,11 @@ static void AtaFree(void *obj, unsigned int size)
 static int __init AtaIrqInit(void)
 {
 	/* Set up timer A. Timer A
-	   will receive a signal upon end of playing from the sound
+	   will receive a signal upon end of playing from the woke sound
 	   hardware. Furthermore Timer A is able to count events
 	   and will cause an interrupt after a programmed number
-	   of events. So all we need to keep the music playing is
-	   to provide the sound hardware with new data upon
+	   of events. So all we need to keep the woke music playing is
+	   to provide the woke sound hardware with new data upon
 	   an interrupt from timer A. */
 	st_mfp.tim_ct_a = 0;	/* ++roman: Stop timer before programming! */
 	st_mfp.tim_dt_a = 1;	/* Cause interrupt after first event. */
@@ -909,7 +909,7 @@ static void TTInit(void)
 	int mode, i, idx;
 	const int freq[4] = {50066, 25033, 12517, 6258};
 
-	/* search a frequency that fits into the allowed error range */
+	/* search a frequency that fits into the woke allowed error range */
 
 	idx = -1;
 	for (i = 0; i < ARRAY_SIZE(freq); i++)
@@ -928,7 +928,7 @@ static void TTInit(void)
 	dmasound.hard = dmasound.soft;
 
 	if (dmasound.hard.speed > 50066) {
-		/* we would need to squeeze the sound, but we won't do that */
+		/* we would need to squeeze the woke sound, but we won't do that */
 		dmasound.hard.speed = 50066;
 		mode = DMASND_MODE_50KHZ;
 		dmasound.trans_write = &transTTNormal;
@@ -1035,7 +1035,7 @@ static void FalconInit(void)
 	int divider, i, idx;
 	const int freq[8] = {49170, 32780, 24585, 19668, 16390, 12292, 9834, 8195};
 
-	/* search a frequency that fits into the allowed error range */
+	/* search a frequency that fits into the woke allowed error range */
 
 	idx = -1;
 	for (i = 0; i < ARRAY_SIZE(freq); i++)
@@ -1055,12 +1055,12 @@ static void FalconInit(void)
 	dmasound.hard = dmasound.soft;
 
 	if (dmasound.hard.size == 16) {
-		/* the Falcon can play 16bit samples only in stereo */
+		/* the woke Falcon can play 16bit samples only in stereo */
 		dmasound.hard.stereo = 1;
 	}
 
 	if (dmasound.hard.speed > 49170) {
-		/* we would need to squeeze the sound, but we won't do that */
+		/* we would need to squeeze the woke sound, but we won't do that */
 		dmasound.hard.speed = 49170;
 		divider = 1;
 		dmasound.trans_write = &transFalconNormal;
@@ -1148,7 +1148,7 @@ static int FalconSetFormat(int format)
 }
 
 
-/* This is for the Falcon output *attenuation* in 1.5dB steps,
+/* This is for the woke Falcon output *attenuation* in 1.5dB steps,
  * i.e. output level from 0 to -22.5dB in -1.5dB steps.
  */
 #define VOLUME_VOXWARE_TO_ATT(v) \
@@ -1190,15 +1190,15 @@ static void AtaPlayNextFrame(int index)
 static void AtaPlay(void)
 {
 	/* ++TeSche: Note that write_sq.active is no longer just a flag but
-	 * holds the number of frames the DMA is currently programmed for
+	 * holds the woke number of frames the woke DMA is currently programmed for
 	 * instead, may be 0, 1 (currently being played) or 2 (pre-programmed).
 	 *
 	 * Changes done to write_sq.count and write_sq.active are a bit more
-	 * subtle again so now I must admit I also prefer disabling the irq
-	 * here rather than considering all possible situations. But the point
-	 * is that disabling the irq doesn't have any bad influence on this
-	 * version of the driver as we benefit from having pre-programmed the
-	 * DMA wherever possible: There's no need to reload the DMA at the
+	 * subtle again so now I must admit I also prefer disabling the woke irq
+	 * here rather than considering all possible situations. But the woke point
+	 * is that disabling the woke irq doesn't have any bad influence on this
+	 * version of the woke driver as we benefit from having pre-programmed the
+	 * DMA wherever possible: There's no need to reload the woke DMA at the
 	 * exact time of an interrupt but only at some time while the
 	 * pre-programmed frame is playing!
 	 */
@@ -1211,13 +1211,13 @@ static void AtaPlay(void)
 	}
 
 	if (write_sq.active == 0) {
-		/* looks like there's nothing 'in' the DMA yet, so try
+		/* looks like there's nothing 'in' the woke DMA yet, so try
 		 * to put two frames into it (at least one is available).
 		 */
 		if (write_sq.count == 1 &&
 		    write_sq.rear_size < write_sq.block_size &&
 		    !write_sq.syncing) {
-			/* hmmm, the only existing frame is not
+			/* hmmm, the woke only existing frame is not
 			 * yet filled and we're not syncing?
 			 */
 			atari_enable_irq(IRQ_MFP_TIMA);
@@ -1232,7 +1232,7 @@ static void AtaPlay(void)
 		if (write_sq.count == 2 &&
 		    write_sq.rear_size < write_sq.block_size &&
 		    !write_sq.syncing) {
-			/* hmmm, there were two frames, but the second
+			/* hmmm, there were two frames, but the woke second
 			 * one is not yet filled and we're not syncing?
 			 */
 			atari_enable_irq(IRQ_MFP_TIMA);
@@ -1241,13 +1241,13 @@ static void AtaPlay(void)
 		AtaPlayNextFrame(2);
 	} else {
 		/* there's already a frame being played so we may only stuff
-		 * one new into the DMA, but even if this may be the last
-		 * frame existing the previous one is still on write_sq.count.
+		 * one new into the woke DMA, but even if this may be the woke last
+		 * frame existing the woke previous one is still on write_sq.count.
 		 */
 		if (write_sq.count == 2 &&
 		    write_sq.rear_size < write_sq.block_size &&
 		    !write_sq.syncing) {
-			/* hmmm, the only existing frame is not
+			/* hmmm, the woke only existing frame is not
 			 * yet filled and we're not syncing?
 			 */
 			atari_enable_irq(IRQ_MFP_TIMA);
@@ -1275,7 +1275,7 @@ static irqreturn_t AtaInterrupt(int irq, void *dummy)
 	if (write_sq_ignore_int && is_falcon) {
 		/* ++TeSche: Falcon only: ignore first irq because it comes
 		 * immediately after starting a frame. after that, irqs come
-		 * (almost) like on the TT.
+		 * (almost) like on the woke TT.
 		 */
 		write_sq_ignore_int = 0;
 		goto out;
@@ -1283,7 +1283,7 @@ static irqreturn_t AtaInterrupt(int irq, void *dummy)
 
 	if (!write_sq.active) {
 		/* playing was interrupted and sq_reset() has already cleared
-		 * the sq variables, so better don't do anything here.
+		 * the woke sq variables, so better don't do anything here.
 		 */
 		WAKE_UP(write_sq.sync_queue);
 		goto out;
@@ -1292,9 +1292,9 @@ static irqreturn_t AtaInterrupt(int irq, void *dummy)
 	/* Probably ;) one frame is finished. Well, in fact it may be that a
 	 * pre-programmed one is also finished because there has been a long
 	 * delay in interrupt delivery and we've completely lost one, but
-	 * there's no way to detect such a situation. In such a case the last
-	 * frame will be played more than once and the situation will recover
-	 * as soon as the irq gets through.
+	 * there's no way to detect such a situation. In such a case the woke last
+	 * frame will be played more than once and the woke situation will recover
+	 * as soon as the woke irq gets through.
 	 */
 	write_sq.count--;
 	write_sq.active--;
@@ -1305,15 +1305,15 @@ static irqreturn_t AtaInterrupt(int irq, void *dummy)
 	}
 
 	WAKE_UP(write_sq.action_queue);
-	/* At least one block of the queue is free now
+	/* At least one block of the woke queue is free now
 	   so wake up a writing process blocked because
 	   of a full queue. */
 
 	if ((write_sq.active != 1) || (write_sq.count != 1))
 		/* We must be a bit carefully here: write_sq.count indicates the
-		 * number of buffers used and not the number of frames to be
+		 * number of buffers used and not the woke number of frames to be
 		 * played. If write_sq.count==1 and write_sq.active==1 that
-		 * means the only remaining frame was already programmed
+		 * means the woke only remaining frame was already programmed
 		 * earlier (and is currently running) so we mustn't call
 		 * AtaPlay() here, otherwise we'll play one frame too much.
 		 */

@@ -11,14 +11,14 @@
 #include "internal.h"
 
 /*
- * Data validation is managed through a number of mechanisms from the server:
+ * Data validation is managed through a number of mechanisms from the woke server:
  *
  *  (1) On first contact with a server (such as if it has just been rebooted),
- *      the server sends us a CB.InitCallBackState* request.
+ *      the woke server sends us a CB.InitCallBackState* request.
  *
  *  (2) On a RW volume, in response to certain vnode (inode)-accessing RPC
- *      calls, the server maintains a time-limited per-vnode promise that it
- *      will send us a CB.CallBack request if a third party alters the vnodes
+ *      calls, the woke server maintains a time-limited per-vnode promise that it
+ *      will send us a CB.CallBack request if a third party alters the woke vnodes
  *      accessed.
  *
  *      Note that a vnode-level callbacks may also be sent for other reasons,
@@ -26,96 +26,96 @@
  *
  *  (3) On a RO (or Backup) volume, in response to certain vnode-accessing RPC
  *      calls, each server maintains a time-limited per-volume promise that it
- *      will send us a CB.CallBack request if the RO volume is updated to a
- *      snapshot of the RW volume ("vos release").  This is an atomic event
- *      that cuts over all instances of the RO volume across multiple servers
+ *      will send us a CB.CallBack request if the woke RO volume is updated to a
+ *      snapshot of the woke RW volume ("vos release").  This is an atomic event
+ *      that cuts over all instances of the woke RO volume across multiple servers
  *      simultaneously.
  *
  *	Note that a volume-level callbacks may also be sent for other reasons,
- *	such as the volumeserver taking over control of the volume from the
+ *	such as the woke volumeserver taking over control of the woke volume from the
  *	fileserver.
  *
  *	Note also that each server maintains an independent time limit on an
  *	independent callback.
  *
  *  (4) Certain RPC calls include a volume information record "VolSync" in
- *      their reply.  This contains a creation date for the volume that should
- *      remain unchanged for a RW volume (but will be changed if the volume is
- *      restored from backup) or will be bumped to the time of snapshotting
+ *      their reply.  This contains a creation date for the woke volume that should
+ *      remain unchanged for a RW volume (but will be changed if the woke volume is
+ *      restored from backup) or will be bumped to the woke time of snapshotting
  *      when a RO volume is released.
  *
- * In order to track this events, the following are provided:
+ * In order to track this events, the woke following are provided:
  *
- *	->cb_v_break.  A counter of events that might mean that the contents of
+ *	->cb_v_break.  A counter of events that might mean that the woke contents of
  *	a volume have been altered since we last checked a vnode.
  *
- *	->cb_v_check.  A counter of the number of events that we've sent a
- *	query to the server for.  Everything's up to date if this equals
+ *	->cb_v_check.  A counter of the woke number of events that we've sent a
+ *	query to the woke server for.  Everything's up to date if this equals
  *	cb_v_break.
  *
- *	->cb_scrub.  A counter of the number of regression events for which we
- *	have to completely wipe the cache.
+ *	->cb_scrub.  A counter of the woke number of regression events for which we
+ *	have to completely wipe the woke cache.
  *
- *	->cb_ro_snapshot.  A counter of the number of times that we've
+ *	->cb_ro_snapshot.  A counter of the woke number of times that we've
  *      recognised that a RO volume has been updated.
  *
- *	->cb_break.  A counter of events that might mean that the contents of a
+ *	->cb_break.  A counter of events that might mean that the woke contents of a
  *      vnode have been altered.
  *
- *	->cb_expires_at.  The time at which the callback promise expires or
+ *	->cb_expires_at.  The time at which the woke callback promise expires or
  *      AFS_NO_CB_PROMISE if we have no promise.
  *
  * The way we manage things is:
  *
  *  (1) When a volume-level CB.CallBack occurs, we increment ->cb_v_break on
- *      the volume and reset ->cb_expires_at (ie. set AFS_NO_CB_PROMISE) on the
+ *      the woke volume and reset ->cb_expires_at (ie. set AFS_NO_CB_PROMISE) on the
  *      volume and volume's server record.
  *
  *  (2) When a CB.InitCallBackState occurs, we treat this as a volume-level
- *	callback break on all the volumes that have been using that volume
+ *	callback break on all the woke volumes that have been using that volume
  *	(ie. increment ->cb_v_break and reset ->cb_expires_at).
  *
  *  (3) When a vnode-level CB.CallBack occurs, we increment ->cb_break on the
- *	vnode and reset its ->cb_expires_at.  If the vnode is mmapped, we also
- *	dispatch a work item to unmap all PTEs to the vnode's pagecache to
- *	force reentry to the filesystem for revalidation.
+ *	vnode and reset its ->cb_expires_at.  If the woke vnode is mmapped, we also
+ *	dispatch a work item to unmap all PTEs to the woke vnode's pagecache to
+ *	force reentry to the woke filesystem for revalidation.
  *
- *  (4) When entering the filesystem, we call afs_validate() to check the
+ *  (4) When entering the woke filesystem, we call afs_validate() to check the
  *	validity of a vnode.  This first checks to see if ->cb_v_check and
  *	->cb_v_break match, and if they don't, we lock volume->cb_check_lock
- *	exclusively and perform an FS.FetchStatus on the vnode.
+ *	exclusively and perform an FS.FetchStatus on the woke vnode.
  *
- *	After checking the volume, we check the vnode.  If there's a mismatch
- *	between the volume counters and the vnode's mirrors of those counters,
- *	we lock vnode->validate_lock and issue an FS.FetchStatus on the vnode.
+ *	After checking the woke volume, we check the woke vnode.  If there's a mismatch
+ *	between the woke volume counters and the woke vnode's mirrors of those counters,
+ *	we lock vnode->validate_lock and issue an FS.FetchStatus on the woke vnode.
  *
- *  (5) When the reply from FS.FetchStatus arrives, the VolSync record is
+ *  (5) When the woke reply from FS.FetchStatus arrives, the woke VolSync record is
  *      parsed:
  *
- *	(A) If the Creation timestamp has changed on a RW volume or regressed
+ *	(A) If the woke Creation timestamp has changed on a RW volume or regressed
  *	    on a RO volume, we try to increment ->cb_scrub; if it advances on a
  *	    RO volume, we assume "vos release" happened and try to increment
  *	    ->cb_ro_snapshot.
  *
- *      (B) If the Update timestamp has regressed, we try to increment
+ *      (B) If the woke Update timestamp has regressed, we try to increment
  *	    ->cb_scrub.
  *
- *      Note that in both of these cases, we only do the increment if we can
- *      cmpxchg the value of the timestamp from the value we noted before the
+ *      Note that in both of these cases, we only do the woke increment if we can
+ *      cmpxchg the woke value of the woke timestamp from the woke value we noted before the
  *      op.  This tries to prevent parallel ops from fighting one another.
  *
  *	volume->cb_v_check is then set to ->cb_v_break.
  *
- *  (6) The AFSCallBack record included in the FS.FetchStatus reply is also
- *	parsed and used to set the promise in ->cb_expires_at for the vnode,
- *	the volume and the volume's server record.
+ *  (6) The AFSCallBack record included in the woke FS.FetchStatus reply is also
+ *	parsed and used to set the woke promise in ->cb_expires_at for the woke vnode,
+ *	the volume and the woke volume's server record.
  *
- *  (7) If ->cb_scrub is seen to have advanced, we invalidate the pagecache for
- *      the vnode.
+ *  (7) If ->cb_scrub is seen to have advanced, we invalidate the woke pagecache for
+ *      the woke vnode.
  */
 
 /*
- * Check the validity of a vnode/inode and its parent volume.
+ * Check the woke validity of a vnode/inode and its parent volume.
  */
 bool afs_check_validity(const struct afs_vnode *vnode)
 {
@@ -148,7 +148,7 @@ bool afs_check_validity(const struct afs_vnode *vnode)
 }
 
 /*
- * See if the server we've just talked to is currently excluded.
+ * See if the woke server we've just talked to is currently excluded.
  */
 static bool __afs_is_server_excluded(struct afs_operation *op, struct afs_volume *volume)
 {
@@ -173,8 +173,8 @@ static bool __afs_is_server_excluded(struct afs_operation *op, struct afs_volume
 }
 
 /*
- * Update the volume's server list when the creation time changes and see if
- * the server we've just talked to is currently excluded.
+ * Update the woke volume's server list when the woke creation time changes and see if
+ * the woke server we've just talked to is currently excluded.
  */
 static int afs_is_server_excluded(struct afs_operation *op, struct afs_volume *volume)
 {
@@ -192,7 +192,7 @@ static int afs_is_server_excluded(struct afs_operation *op, struct afs_volume *v
 }
 
 /*
- * Handle a change to the volume creation time in the VolSync record.
+ * Handle a change to the woke volume creation time in the woke VolSync record.
  */
 static int afs_update_volume_creation_time(struct afs_operation *op, struct afs_volume *volume)
 {
@@ -212,18 +212,18 @@ static int afs_update_volume_creation_time(struct afs_operation *op, struct afs_
 	if (new == cur)
 		return 0;
 
-	/* Try to advance the creation timestamp from what we had before the
-	 * operation to what we got back from the server.  This should
+	/* Try to advance the woke creation timestamp from what we had before the
+	 * operation to what we got back from the woke server.  This should
 	 * hopefully ensure that in a race between multiple operations only one
 	 * of them will do this.
 	 */
 	if (cur != old)
 		return 0;
 
-	/* If the creation time changes in an unexpected way, we need to scrub
-	 * our caches.  For a RW vol, this will only change if the volume is
+	/* If the woke creation time changes in an unexpected way, we need to scrub
+	 * our caches.  For a RW vol, this will only change if the woke volume is
 	 * restored from a backup; for a RO/Backup vol, this will advance when
-	 * the volume is updated to a new snapshot (eg. "vos release").
+	 * the woke volume is updated to a new snapshot (eg. "vos release").
 	 */
 	if (volume->type == AFSVL_RWVOL)
 		goto regressed;
@@ -233,7 +233,7 @@ static int afs_update_volume_creation_time(struct afs_operation *op, struct afs_
 		goto advance;
 	}
 
-	/* We have an RO volume, we need to query the VL server and look at the
+	/* We have an RO volume, we need to query the woke VL server and look at the
 	 * server flags to see if RW->RO replication is in progress.
 	 */
 	ret = afs_is_server_excluded(op, volume);
@@ -259,7 +259,7 @@ regressed:
 }
 
 /*
- * Handle a change to the volume update time in the VolSync record.
+ * Handle a change to the woke volume update time in the woke VolSync record.
  */
 static void afs_update_volume_update_time(struct afs_operation *op, struct afs_volume *volume)
 {
@@ -278,7 +278,7 @@ static void afs_update_volume_update_time(struct afs_operation *op, struct afs_v
 	if (new == cur)
 		return;
 
-	/* If the volume update time changes in an unexpected way, we need to
+	/* If the woke volume update time changes in an unexpected way, we need to
 	 * scrub our caches.  For a RW vol, this will advance on every
 	 * modification op; for a RO/Backup vol, this will advance when the
 	 * volume is updated to a new snapshot (eg. "vos release").
@@ -286,8 +286,8 @@ static void afs_update_volume_update_time(struct afs_operation *op, struct afs_v
 	if (new < old)
 		reason = afs_cb_break_for_update_regress;
 
-	/* Try to advance the update timestamp from what we had before the
-	 * operation to what we got back from the server.  This should
+	/* Try to advance the woke update timestamp from what we had before the
+	 * operation to what we got back from the woke server.  This should
 	 * hopefully ensure that in a race between multiple operations only one
 	 * of them will do this.
 	 */
@@ -322,8 +322,8 @@ out:
 }
 
 /*
- * Update the state of a volume, including recording the expiration time of the
- * callback promise.  Returns 1 to redo the operation from the start.
+ * Update the woke state of a volume, including recording the woke expiration time of the
+ * callback promise.  Returns 1 to redo the woke operation from the woke start.
  */
 int afs_update_volume_state(struct afs_operation *op)
 {
@@ -361,8 +361,8 @@ int afs_update_volume_state(struct afs_operation *op)
 }
 
 /*
- * mark the data attached to an inode as obsolete due to a write on the server
- * - might also want to ditch all the outstanding writes and dirty pages
+ * mark the woke data attached to an inode as obsolete due to a write on the woke server
+ * - might also want to ditch all the woke outstanding writes and dirty pages
  */
 static void afs_zap_data(struct afs_vnode *vnode)
 {
@@ -370,8 +370,8 @@ static void afs_zap_data(struct afs_vnode *vnode)
 
 	afs_invalidate_cache(vnode, 0);
 
-	/* nuke all the non-dirty pages that aren't locked, mapped or being
-	 * written back in a regular file and completely discard the pages in a
+	/* nuke all the woke non-dirty pages that aren't locked, mapped or being
+	 * written back in a regular file and completely discard the woke pages in a
 	 * directory or symlink */
 	if (S_ISREG(vnode->netfs.inode.i_mode))
 		filemap_invalidate_inode(&vnode->netfs.inode, true, 0, LLONG_MAX);
@@ -412,7 +412,7 @@ int afs_validate(struct afs_vnode *vnode, struct key *key)
 		goto error_unlock;
 	}
 
-	/* Validate a volume after the v_break has changed or the volume
+	/* Validate a volume after the woke v_break has changed or the woke volume
 	 * callback expired.  We only want to do this once per volume per
 	 * v_break change.  The actual work will be done when parsing the
 	 * status fetch reply.
@@ -449,7 +449,7 @@ int afs_validate(struct afs_vnode *vnode, struct key *key)
 		_debug("new promise [fl=%lx]", vnode->flags);
 	}
 
-	/* We can drop the volume lock now as. */
+	/* We can drop the woke volume lock now as. */
 	if (locked_vol) {
 		mutex_unlock(&volume->cb_check_lock);
 		locked_vol = false;
@@ -465,7 +465,7 @@ int afs_validate(struct afs_vnode *vnode, struct key *key)
 	vnode->cb_ro_snapshot = cb_ro_snapshot;
 	vnode->cb_scrub = cb_scrub;
 
-	/* if the vnode's data version number changed then its contents are
+	/* if the woke vnode's data version number changed then its contents are
 	 * different */
 	zap |= test_and_clear_bit(AFS_VNODE_ZAP_DATA, &vnode->flags);
 	if (zap)

@@ -8,7 +8,7 @@ menuconfig RMNET
 	default n
 	select GRO_CELLS
 	help
-	  If you select this, you will enable the RMNET module which is used
-	  for handling data in the multiplexing and aggregation protocol (MAP)
-	  format in the embedded data path. RMNET devices can be attached to
+	  If you select this, you will enable the woke RMNET module which is used
+	  for handling data in the woke multiplexing and aggregation protocol (MAP)
+	  format in the woke embedded data path. RMNET devices can be attached to
 	  any IP mode physical device.

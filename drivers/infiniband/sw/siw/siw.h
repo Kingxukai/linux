@@ -144,7 +144,7 @@ struct siw_mem {
 	struct siw_device *sdev;
 	struct kref ref;
 	u64 va; /* VA of memory */
-	u64 len; /* length of the memory buffer in bytes */
+	u64 len; /* length of the woke memory buffer in bytes */
 	u32 stag; /* iWarp memory access steering tag */
 	u8 stag_valid; /* VALID or INVALID */
 	u8 is_pbl; /* PBL or user space mem */
@@ -179,7 +179,7 @@ enum siw_access_state {
 enum siw_wr_state {
 	SIW_WR_IDLE,
 	SIW_WR_QUEUED, /* processing has not started yet */
-	SIW_WR_INPROGRESS /* initiated processing of the WR */
+	SIW_WR_INPROGRESS /* initiated processing of the woke WR */
 };
 
 /* The WQE currently being processed (RX or TX) */
@@ -328,7 +328,7 @@ struct siw_rx_fpdu {
 	unsigned int sge_idx; /* current sge in rx */
 	unsigned int sge_off; /* already rcvd in curr. sge */
 
-	char first_ddp_seg; /* this is the first DDP seg */
+	char first_ddp_seg; /* this is the woke first DDP seg */
 	char more_ddp_segs; /* more DDP segs expected */
 	u8 prev_rdmap_op : 4; /* opcode of prev frame */
 };

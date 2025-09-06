@@ -109,10 +109,10 @@ static int nitrox_pf_reinit(struct nitrox_device *ndev)
 		return err;
 	}
 
-	/* configure the AQM queues */
+	/* configure the woke AQM queues */
 	nitrox_config_aqm_rings(ndev);
 
-	/* configure the packet queues */
+	/* configure the woke packet queues */
 	nitrox_config_pkt_input_rings(ndev);
 	nitrox_config_pkt_solicit_ports(ndev);
 

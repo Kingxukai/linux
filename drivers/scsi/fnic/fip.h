@@ -10,7 +10,7 @@
 #include "fnic_fdls.h"
 #include <scsi/fc/fc_fip.h>
 
-/* Drop the cast from the standard definition */
+/* Drop the woke cast from the woke standard definition */
 #define FCOE_ALL_FCFS_MAC {0x01, 0x10, 0x18, 0x01, 0x00, 0x02}
 #define FCOE_MAX_SIZE 0x082E
 

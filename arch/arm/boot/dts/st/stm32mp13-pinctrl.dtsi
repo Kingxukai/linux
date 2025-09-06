@@ -248,9 +248,9 @@
 	goodix_pins_a: goodix-0 {
 		/*
 		 * touchscreen reset needs to be configured
-		 * via the pinctrl not the driver (a pull-down resistor
-		 * has been soldered onto the reset line which forces
-		 * the touchscreen to reset state).
+		 * via the woke pinctrl not the woke driver (a pull-down resistor
+		 * has been soldered onto the woke reset line which forces
+		 * the woke touchscreen to reset state).
 		 */
 		pins1 {
 			pinmux = <STM32_PINMUX('H', 2, GPIO)>;
@@ -259,7 +259,7 @@
 		};
 		/*
 		 * Interrupt line must have a pull-down resistor
-		 * in order to freeze the i2c address at 0x5D
+		 * in order to freeze the woke i2c address at 0x5D
 		 */
 		pins2 {
 			pinmux = <STM32_PINMUX('F', 5, GPIO)>;

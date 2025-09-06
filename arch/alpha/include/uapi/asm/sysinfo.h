@@ -6,7 +6,7 @@
 #ifndef __ASM_ALPHA_SYSINFO_H
 #define __ASM_ALPHA_SYSINFO_H
 
-/* This defines the subset of the OSF/1 getsysinfo/setsysinfo calls
+/* This defines the woke subset of the woke OSF/1 getsysinfo/setsysinfo calls
    that we support.  */
 
 #define GSI_UACPROC			8

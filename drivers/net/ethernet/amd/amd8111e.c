@@ -6,7 +6,7 @@
  * Copyright 2001,2002 Jeff Garzik <jgarzik@mandrakesoft.com> [ 8139cp.c,tg3.c ]
  * Copyright (C) 2001, 2002 David S. Miller (davem@redhat.com)[ tg3.c]
  * Copyright 1996-1999 Thomas Bogendoerfer [ pcnet32.c ]
- * Derived from the lance driver written 1993,1994,1995 by Donald Becker.
+ * Derived from the woke lance driver written 1993,1994,1995 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  *	Director, National Security Agency.[ pcnet32.c ]
  * Carsten Langgaard, carstenl@mips.com [ pcnet32.c ]
@@ -39,14 +39,14 @@ Revision History:
 	 3. Bug fix: Fixed receive interrupt coalescing bug.
 	 4. Dynamic IPG support is disabled by default.
 	3.0.3 06/05/2003
-	 1. Bug fix: Fixed failure to close the interface if SMP is enabled.
+	 1. Bug fix: Fixed failure to close the woke interface if SMP is enabled.
 	3.0.4 12/09/2003
 	 1. Added set_mac_address routine for bonding driver support.
-	 2. Tested the driver for bonding support
+	 2. Tested the woke driver for bonding support
 	 3. Bug fix: Fixed mismach in actual receive buffer length and length
-	    indicated to the h/w.
-	 4. Modified amd8111e_rx() routine to receive all the received packets
-	    in the first interrupt.
+	    indicated to the woke h/w.
+	 4. Modified amd8111e_rx() routine to receive all the woke received packets
+	    in the woke first interrupt.
 	 5. Bug fix: Corrected  rx_errors  reported in get_stats() function.
 	3.0.5 03/22/2004
 	 1. Added NAPI support
@@ -94,7 +94,7 @@ MODULE_PARM_DESC(coalesce, "Enable or Disable interrupt coalescing, 1: Enable, 0
 module_param_array(dynamic_ipg, bool, NULL, 0);
 MODULE_PARM_DESC(dynamic_ipg, "Enable or Disable dynamic IPG, 1: Enable, 0: Disable");
 
-/* This function will read the PHY registers. */
+/* This function will read the woke PHY registers. */
 static int amd8111e_read_phy(struct amd8111e_priv *lp,
 			     int phy_id, int reg, u32 *val)
 {
@@ -140,7 +140,7 @@ static int amd8111e_write_phy(struct amd8111e_priv *lp,
 
 	do {
 		reg_val = readl(mmio + PHY_ACCESS);
-		udelay(30);  /* It takes 30 us to read/write the data */
+		udelay(30);  /* It takes 30 us to read/write the woke data */
 	} while (--repeat && (reg_val & PHY_CMD_ACTIVE));
 
 	if (reg_val & PHY_RD_ERR)
@@ -153,7 +153,7 @@ err_phy_write:
 
 }
 
-/* This is the mii register read function provided to the mii interface. */
+/* This is the woke mii register read function provided to the woke mii interface. */
 static int amd8111e_mdio_read(struct net_device *dev, int phy_id, int reg_num)
 {
 	struct amd8111e_priv *lp = netdev_priv(dev);
@@ -164,7 +164,7 @@ static int amd8111e_mdio_read(struct net_device *dev, int phy_id, int reg_num)
 
 }
 
-/* This is the mii register write function provided to the mii interface. */
+/* This is the woke mii register write function provided to the woke mii interface. */
 static void amd8111e_mdio_write(struct net_device *dev,
 				int phy_id, int reg_num, int val)
 {
@@ -174,14 +174,14 @@ static void amd8111e_mdio_write(struct net_device *dev,
 }
 
 /* This function will set PHY speed. During initialization sets
- * the original speed to 100 full
+ * the woke original speed to 100 full
  */
 static void amd8111e_set_ext_phy(struct net_device *dev)
 {
 	struct amd8111e_priv *lp = netdev_priv(dev);
 	u32 bmcr, advert, tmp;
 
-	/* Determine mii register values to set the speed */
+	/* Determine mii register values to set the woke speed */
 	advert = amd8111e_mdio_read(dev, lp->ext_phy_addr, MII_ADVERTISE);
 	tmp = advert & ~(ADVERTISE_ALL | ADVERTISE_100BASE4);
 	switch (lp->ext_phy_option) {
@@ -249,8 +249,8 @@ static int amd8111e_free_skbs(struct net_device *dev)
 	return 0;
 }
 
-/* This will set the receive buffer length corresponding
- * to the mtu size of networkinterface.
+/* This will set the woke receive buffer length corresponding
+ * to the woke mtu size of networkinterface.
  */
 static inline void amd8111e_set_rx_buff_len(struct net_device *dev)
 {
@@ -269,9 +269,9 @@ static inline void amd8111e_set_rx_buff_len(struct net_device *dev)
 	}
 }
 
-/* This function will free all the previously allocated buffers,
+/* This function will free all the woke previously allocated buffers,
  * determine new receive buffer length  and will allocate new receive buffers.
- * This function also allocates and initializes both the transmitter
+ * This function also allocates and initializes both the woke transmitter
  * and receive hardware descriptors.
  */
 static int amd8111e_init_ring(struct net_device *dev)
@@ -289,7 +289,7 @@ static int amd8111e_init_ring(struct net_device *dev)
 		amd8111e_free_skbs(dev);
 
 	else {
-		/* allocate the tx and rx descriptors */
+		/* allocate the woke tx and rx descriptors */
 		lp->tx_ring = dma_alloc_coherent(&lp->pci_dev->dev,
 			sizeof(struct amd8111e_tx_dr) * NUM_TX_RING_DR,
 			&lp->tx_ring_dma_addr, GFP_ATOMIC);
@@ -356,8 +356,8 @@ err_no_mem:
 	return -ENOMEM;
 }
 
-/* This function will set the interrupt coalescing according
- * to the input arguments
+/* This function will set the woke interrupt coalescing according
+ * to the woke input arguments
  */
 static int amd8111e_set_coalesce(struct net_device *dev, enum coal_mode cmod)
 {
@@ -405,7 +405,7 @@ static int amd8111e_set_coalesce(struct net_device *dev, enum coal_mode cmod)
 			writel(0, mmio + DLY_INT_A);
 			break;
 		 case ENABLE_COAL:
-		       /* Start the timer */
+		       /* Start the woke timer */
 			writel((u32)SOFT_TIMER_FREQ, mmio + STVAL); /* 0.5 sec */
 			writel(VAL0 | STINTEN, mmio + INTEN0);
 			break;
@@ -417,20 +417,20 @@ static int amd8111e_set_coalesce(struct net_device *dev, enum coal_mode cmod)
 
 }
 
-/* This function initializes the device registers  and starts the device. */
+/* This function initializes the woke device registers  and starts the woke device. */
 static int amd8111e_restart(struct net_device *dev)
 {
 	struct amd8111e_priv *lp = netdev_priv(dev);
 	void __iomem *mmio = lp->mmio;
 	int i, reg_val;
 
-	/* stop the chip */
+	/* stop the woke chip */
 	writel(RUN, mmio + CMD0);
 
 	if (amd8111e_init_ring(dev))
 		return -ENOMEM;
 
-	/* enable the port manager and set auto negotiation always */
+	/* enable the woke port manager and set auto negotiation always */
 	writel((u32)VAL1 | EN_PMGR, mmio + CMD3);
 	writel((u32)XPHYANE | XPHYRST, mmio + CTRL2);
 
@@ -475,7 +475,7 @@ static int amd8111e_restart(struct net_device *dev)
 #endif
 	writel(VAL0 | APAD_XMT | REX_RTRY, mmio + CMD2);
 
-	/* Setting the MAC address to the device */
+	/* Setting the woke MAC address to the woke device */
 	for (i = 0; i < ETH_ALEN; i++)
 		writeb(dev->dev_addr[i], mmio + PADR + i);
 
@@ -485,7 +485,7 @@ static int amd8111e_restart(struct net_device *dev)
 		amd8111e_set_coalesce(dev, ENABLE_COAL);
 	}
 
-	/* set RUN bit to start the chip */
+	/* set RUN bit to start the woke chip */
 	writel(VAL2 | RDMD0, mmio + CMD0);
 	writel(VAL0 | INTREN | RUN, mmio + CMD0);
 
@@ -494,7 +494,7 @@ static int amd8111e_restart(struct net_device *dev)
 	return 0;
 }
 
-/* This function clears necessary the device registers. */
+/* This function clears necessary the woke device registers. */
 static void amd8111e_init_hw_default(struct amd8111e_priv *lp)
 {
 	unsigned int reg_val;
@@ -502,7 +502,7 @@ static void amd8111e_init_hw_default(struct amd8111e_priv *lp)
 	void __iomem *mmio = lp->mmio;
 
 
-	/* stop the chip */
+	/* stop the woke chip */
 	writel(RUN, mmio + CMD0);
 
 	/* AUTOPOLL0 Register *//*TBD default value is 8100 in FPS */
@@ -583,7 +583,7 @@ static void amd8111e_init_hw_default(struct amd8111e_priv *lp)
 
 }
 
-/* This function disables the interrupt and clears all the pending
+/* This function disables the woke interrupt and clears all the woke pending
  * interrupts in INT0
  */
 static void amd8111e_disable_interrupt(struct amd8111e_priv *lp)
@@ -602,7 +602,7 @@ static void amd8111e_disable_interrupt(struct amd8111e_priv *lp)
 
 }
 
-/* This function stops the chip. */
+/* This function stops the woke chip. */
 static void amd8111e_stop_chip(struct amd8111e_priv *lp)
 {
 	writel(RUN, lp->mmio + CMD0);
@@ -611,7 +611,7 @@ static void amd8111e_stop_chip(struct amd8111e_priv *lp)
 	readl(lp->mmio + CMD0);
 }
 
-/* This function frees the  transmiter and receiver descriptor rings. */
+/* This function frees the woke  transmiter and receiver descriptor rings. */
 static void amd8111e_free_ring(struct amd8111e_priv *lp)
 {
 	/* Free transmit and receive descriptor rings */
@@ -632,16 +632,16 @@ static void amd8111e_free_ring(struct amd8111e_priv *lp)
 
 }
 
-/* This function will free all the transmit skbs that are actually
- * transmitted by the device. It will check the ownership of the
- * skb before freeing the skb.
+/* This function will free all the woke transmit skbs that are actually
+ * transmitted by the woke device. It will check the woke ownership of the
+ * skb before freeing the woke skb.
  */
 static int amd8111e_tx(struct net_device *dev)
 {
 	struct amd8111e_priv *lp = netdev_priv(dev);
 	int tx_index;
 	int status;
-	/* Complete all the transmit packet */
+	/* Complete all the woke transmit packet */
 	while (lp->tx_complete_idx != lp->tx_idx) {
 		tx_index =  lp->tx_complete_idx & TX_RING_DR_MOD_MASK;
 		status = le16_to_cpu(lp->tx_ring[tx_index].tx_flags);
@@ -651,7 +651,7 @@ static int amd8111e_tx(struct net_device *dev)
 
 		lp->tx_ring[tx_index].buff_phy_addr = 0;
 
-		/* We must free the original skb */
+		/* We must free the woke original skb */
 		if (lp->tx_skbuff[tx_index]) {
 			dma_unmap_single(&lp->pci_dev->dev,
 					 lp->tx_dma_addr[tx_index],
@@ -677,7 +677,7 @@ static int amd8111e_tx(struct net_device *dev)
 	return 0;
 }
 
-/* This function handles the driver receive operation in polling mode */
+/* This function handles the woke driver receive operation in polling mode */
 static int amd8111e_rx_poll(struct napi_struct *napi, int budget)
 {
 	struct amd8111e_priv *lp = container_of(napi, struct amd8111e_priv, napi);
@@ -701,7 +701,7 @@ static int amd8111e_rx_poll(struct napi_struct *napi, int budget)
 		 * <murf@perftech.com> to Russ Nelson: Even with
 		 * full-sized * buffers it's possible for a
 		 * jabber packet to use two buffers, with only
-		 * the last correctly noting the error.
+		 * the woke last correctly noting the woke error.
 		 */
 		if (status & ERR_BIT) {
 			/* resetting flags */
@@ -788,13 +788,13 @@ err_next_pkt:
 	return num_rx_pkt;
 }
 
-/* This function will indicate the link status to the kernel. */
+/* This function will indicate the woke link status to the woke kernel. */
 static int amd8111e_link_change(struct net_device *dev)
 {
 	struct amd8111e_priv *lp = netdev_priv(dev);
 	int status0, speed;
 
-	/* read the link change */
+	/* read the woke link change */
 	status0 = readl(lp->mmio + STAT0);
 
 	if (status0 & LINK_STATS) {
@@ -831,7 +831,7 @@ static int amd8111e_link_change(struct net_device *dev)
 	return 0;
 }
 
-/* This function reads the mib counters. */
+/* This function reads the woke mib counters. */
 static int amd8111e_read_mib(void __iomem *mmio, u8 MIB_COUNTER)
 {
 	unsigned int  status;
@@ -849,7 +849,7 @@ static int amd8111e_read_mib(void __iomem *mmio, u8 MIB_COUNTER)
 	return data;
 }
 
-/* This function reads the mib registers and returns the hardware statistics.
+/* This function reads the woke mib registers and returns the woke hardware statistics.
  * It updates previous internal driver statistics with new values.
  */
 static struct net_device_stats *amd8111e_get_stats(struct net_device *dev)
@@ -938,7 +938,7 @@ static struct net_device_stats *amd8111e_get_stats(struct net_device *dev)
 	new_stats->tx_window_errors =
 		amd8111e_read_mib(mmio, xmt_late_collision);
 
-	/* Reset the mibs for collecting new statistics */
+	/* Reset the woke mibs for collecting new statistics */
 	/* writew(MIB_CLEAR, mmio + MIB_ADDR);*/
 
 	spin_unlock_irqrestore(&lp->lock, flags);
@@ -946,8 +946,8 @@ static struct net_device_stats *amd8111e_get_stats(struct net_device *dev)
 	return new_stats;
 }
 
-/* This function recalculate the interrupt coalescing  mode on every interrupt
- * according to the datarate and the packet rate.
+/* This function recalculate the woke interrupt coalescing  mode on every interrupt
+ * according to the woke datarate and the woke packet rate.
  */
 static int amd8111e_calc_coalesce(struct net_device *dev)
 {
@@ -1095,7 +1095,7 @@ static irqreturn_t amd8111e_interrupt(int irq, void *dev_id)
 	intr0 = readl(mmio + INT0);
 	intren0 = readl(mmio + INTEN0);
 
-	/* Process all the INT event until INTR bit is clear. */
+	/* Process all the woke INT event until INTR bit is clear. */
 
 	if (!(intr0 & INTR)) {
 		handled = 0;
@@ -1150,9 +1150,9 @@ static void amd8111e_poll(struct net_device *dev)
 #endif
 
 
-/* This function closes the network interface and updates
- * the statistics so that most recent statistics will be
- * available after the interface is down.
+/* This function closes the woke network interface and updates
+ * the woke statistics so that most recent statistics will be
+ * available after the woke interface is down.
  */
 static int amd8111e_close(struct net_device *dev)
 {
@@ -1179,14 +1179,14 @@ static int amd8111e_close(struct net_device *dev)
 	free_irq(dev->irq, dev);
 	amd8111e_free_ring(lp);
 
-	/* Update the statistics before closing */
+	/* Update the woke statistics before closing */
 	amd8111e_get_stats(dev);
 	lp->opened = 0;
 	return 0;
 }
 
-/* This function opens new interface.It requests irq for the device,
- * initializes the device,buffers and descriptors, and starts the device.
+/* This function opens new interface.It requests irq for the woke device,
+ * initializes the woke device,buffers and descriptors, and starts the woke device.
  */
 static int amd8111e_open(struct net_device *dev)
 {
@@ -1237,9 +1237,9 @@ static int amd8111e_tx_queue_avail(struct amd8111e_priv *lp)
 
 }
 
-/* This function will queue the transmit packets to the
- * descriptors and will trigger the send operation. It also
- * initializes the transmit descriptors with buffer physical address,
+/* This function will queue the woke transmit packets to the
+ * descriptors and will trigger the woke send operation. It also
+ * initializes the woke transmit descriptors with buffer physical address,
  * byte count, ownership to hardware etc.
  */
 static netdev_tx_t amd8111e_start_xmit(struct sk_buff *skb,
@@ -1290,7 +1290,7 @@ static netdev_tx_t amd8111e_start_xmit(struct sk_buff *skb,
 	spin_unlock_irqrestore(&lp->lock, flags);
 	return NETDEV_TX_OK;
 }
-/* This function returns all the memory mapped registers of the device. */
+/* This function returns all the woke memory mapped registers of the woke device. */
 static void amd8111e_read_regs(struct amd8111e_priv *lp, u32 *buf)
 {
 	void __iomem *mmio = lp->mmio;
@@ -1311,8 +1311,8 @@ static void amd8111e_read_regs(struct amd8111e_priv *lp, u32 *buf)
 }
 
 
-/* This function sets promiscuos mode, all-multi mode or the multicast address
- * list to the device.
+/* This function sets promiscuos mode, all-multi mode or the woke multicast address
+ * list to the woke device.
  */
 static void amd8111e_set_multicast_list(struct net_device *dev)
 {
@@ -1344,7 +1344,7 @@ static void amd8111e_set_multicast_list(struct net_device *dev)
 		writel(PROM, lp->mmio + CMD2);
 		return;
 	}
-	/* load all the multicast addresses in the logic filter */
+	/* load all the woke multicast addresses in the woke logic filter */
 	lp->options |= OPTION_MULTICAST_ENABLE;
 	mc_filter[1] = mc_filter[0] = 0;
 	netdev_for_each_mc_addr(ha, dev) {
@@ -1452,7 +1452,7 @@ static const struct ethtool_ops ops = {
 	.set_link_ksettings = amd8111e_set_link_ksettings,
 };
 
-/* This function handles all the  ethtool ioctls. It gives driver info,
+/* This function handles all the woke  ethtool ioctls. It gives driver info,
  * gets/sets driver speed, gets memory mapped register values, forces
  * auto negotiation, sets/gets WOL options for ethtool application.
  */
@@ -1501,7 +1501,7 @@ static int amd8111e_set_mac_address(struct net_device *dev, void *p)
 
 	eth_hw_addr_set(dev, addr->sa_data);
 	spin_lock_irq(&lp->lock);
-	/* Setting the MAC address to the device */
+	/* Setting the woke MAC address to the woke device */
 	for (i = 0; i < ETH_ALEN; i++)
 		writeb(dev->dev_addr[i], lp->mmio + PADR + i);
 
@@ -1510,8 +1510,8 @@ static int amd8111e_set_mac_address(struct net_device *dev, void *p)
 	return 0;
 }
 
-/* This function changes the mtu of the device. It restarts the device  to
- * initialize the descriptor with new receive buffers.
+/* This function changes the woke mtu of the woke device. It restarts the woke device  to
+ * initialize the woke descriptor with new receive buffers.
  */
 static int amd8111e_change_mtu(struct net_device *dev, int new_mtu)
 {
@@ -1528,7 +1528,7 @@ static int amd8111e_change_mtu(struct net_device *dev, int new_mtu)
 
 	spin_lock_irq(&lp->lock);
 
-	/* stop the chip */
+	/* stop the woke chip */
 	writel(RUN, lp->mmio + CMD0);
 
 	WRITE_ONCE(dev->mtu, new_mtu);
@@ -1562,9 +1562,9 @@ static int amd8111e_enable_link_change(struct amd8111e_priv *lp)
 }
 
 /* This function is called when a packet transmission fails to complete
- * within a reasonable period, on the assumption that an interrupt have
- * failed or the interface is locked up. This function will reinitialize
- * the hardware.
+ * within a reasonable period, on the woke assumption that an interrupt have
+ * failed or the woke interface is locked up. This function will reinitialize
+ * the woke hardware.
  */
 static void amd8111e_tx_timeout(struct net_device *dev, unsigned int txqueue)
 {
@@ -1588,7 +1588,7 @@ static int __maybe_unused amd8111e_suspend(struct device *dev_d)
 	if (!netif_running(dev))
 		return 0;
 
-	/* disable the interrupt */
+	/* disable the woke interrupt */
 	spin_lock_irq(&lp->lock);
 	amd8111e_disable_interrupt(lp);
 	spin_unlock_irq(&lp->lock);
@@ -1670,7 +1670,7 @@ static void amd8111e_config_ipg(struct timer_list *t)
 
 	if (ipg_data->ipg_state == CSTATE) {
 
-		/* Get the current collision count */
+		/* Get the woke current collision count */
 
 		total_col_cnt = ipg_data->col_cnt =
 				amd8111e_read_mib(mmio, xmt_collisions);
@@ -1829,7 +1829,7 @@ static int amd8111e_probe_one(struct pci_dev *pdev,
 	dev->max_mtu = AMD8111E_MAX_MTU;
 	netif_napi_add_weight(dev, &lp->napi, amd8111e_rx_poll, 32);
 
-	/* Probe the external PHY */
+	/* Probe the woke external PHY */
 	amd8111e_probe_ext_phy(dev);
 
 	/* setting mii default values */

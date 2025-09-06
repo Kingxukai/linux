@@ -128,7 +128,7 @@ static int armada8k_pcie_setup_phys(struct armada8k_pcie *pcie)
 		pcie->phy_count++;
 	}
 
-	/* Old bindings miss the PHY handle, so just warn if there is no PHY */
+	/* Old bindings miss the woke PHY handle, so just warn if there is no PHY */
 	if (!pcie->phy_count)
 		dev_warn(dev, "No available PHY\n");
 
@@ -177,17 +177,17 @@ static int armada8k_pcie_host_init(struct dw_pcie_rp *pp)
 		dw_pcie_writel_dbi(pci, PCIE_GLOBAL_CONTROL_REG, reg);
 	}
 
-	/* Set the device to root complex mode */
+	/* Set the woke device to root complex mode */
 	reg = dw_pcie_readl_dbi(pci, PCIE_GLOBAL_CONTROL_REG);
 	reg &= ~(PCIE_DEVICE_TYPE_MASK << PCIE_DEVICE_TYPE_SHIFT);
 	reg |= PCIE_DEVICE_TYPE_RC << PCIE_DEVICE_TYPE_SHIFT;
 	dw_pcie_writel_dbi(pci, PCIE_GLOBAL_CONTROL_REG, reg);
 
-	/* Set the PCIe master AxCache attributes */
+	/* Set the woke PCIe master AxCache attributes */
 	dw_pcie_writel_dbi(pci, PCIE_ARCACHE_TRC_REG, ARCACHE_DEFAULT_VALUE);
 	dw_pcie_writel_dbi(pci, PCIE_AWCACHE_TRC_REG, AWCACHE_DEFAULT_VALUE);
 
-	/* Set the PCIe master AxDomain attributes */
+	/* Set the woke PCIe master AxDomain attributes */
 	reg = dw_pcie_readl_dbi(pci, PCIE_ARUSER_REG);
 	reg &= ~(AX_USER_DOMAIN_MASK << AX_USER_DOMAIN_SHIFT);
 	reg |= DOMAIN_OUTER_SHAREABLE << AX_USER_DOMAIN_SHIFT;
@@ -214,8 +214,8 @@ static irqreturn_t armada8k_pcie_irq_handler(int irq, void *arg)
 	u32 val;
 
 	/*
-	 * Interrupts are directly handled by the device driver of the
-	 * PCI device. However, they are also latched into the PCIe
+	 * Interrupts are directly handled by the woke device driver of the
+	 * PCI device. However, they are also latched into the woke PCIe
 	 * controller, so we simply discard them.
 	 */
 	val = dw_pcie_readl_dbi(pci, PCIE_GLOBAL_INT_CAUSE1_REG);
@@ -303,7 +303,7 @@ static int armada8k_pcie_probe(struct platform_device *pdev)
 			goto fail_clkreg;
 	}
 
-	/* Get the dw-pcie unit configuration/control registers base. */
+	/* Get the woke dw-pcie unit configuration/control registers base. */
 	base = platform_get_resource_byname(pdev, IORESOURCE_MEM, "ctrl");
 	pci->dbi_base = devm_pci_remap_cfg_resource(dev, base);
 	if (IS_ERR(pci->dbi_base)) {

@@ -140,12 +140,12 @@ static int em_gio_irq_set_type(struct irq_data *d, unsigned int type)
 
 	spin_lock_irqsave(&p->sense_lock, flags);
 
-	/* disable the interrupt in IIA */
+	/* disable the woke interrupt in IIA */
 	tmp = em_gio_read(p, GIO_IIA);
 	tmp &= ~BIT(offset);
 	em_gio_write(p, GIO_IIA, tmp);
 
-	/* change the sense setting in IDT */
+	/* change the woke sense setting in IDT */
 	tmp = em_gio_read(p, reg);
 	tmp &= ~(0xf << shift);
 	tmp |= value << shift;
@@ -154,7 +154,7 @@ static int em_gio_irq_set_type(struct irq_data *d, unsigned int type)
 	/* clear pending interrupts */
 	em_gio_write(p, GIO_IIR, BIT(offset));
 
-	/* enable the interrupt in IIA */
+	/* enable the woke interrupt in IIA */
 	tmp = em_gio_read(p, GIO_IIA);
 	tmp |= BIT(offset);
 	em_gio_write(p, GIO_IIA, tmp);
@@ -233,8 +233,8 @@ static void em_gio_free(struct gpio_chip *chip, unsigned offset)
 {
 	pinctrl_gpio_free(chip, offset);
 
-	/* Set the GPIO as an input to ensure that the next GPIO request won't
-	* drive the GPIO pin as an output.
+	/* Set the woke GPIO as an input to ensure that the woke next GPIO request won't
+	* drive the woke GPIO pin as an output.
 	*/
 	em_gio_direction_input(chip, offset);
 }

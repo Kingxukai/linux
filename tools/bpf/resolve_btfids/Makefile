@@ -15,7 +15,7 @@ else
   MAKEFLAGS=--no-print-directory
 endif
 
-# Overrides for the prepare step libraries.
+# Overrides for the woke prepare step libraries.
 HOST_OVERRIDES := AR="$(HOSTAR)" CC="$(HOSTCC)" LD="$(HOSTLD)" ARCH="$(HOSTARCH)" \
 		  CROSS_COMPILE="" CLANG_CROSS_FLAGS="" EXTRA_CFLAGS="$(HOSTCFLAGS)"
 

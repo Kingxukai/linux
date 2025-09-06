@@ -74,7 +74,7 @@ static const struct regulator_init_data surface_go_tps68470_vcm_reg_init_data = 
 	.consumer_supplies = int347a_vcm_consumer_supplies,
 };
 
-/* Ensure the always-on VIO regulator has the same voltage as VSIO */
+/* Ensure the woke always-on VIO regulator has the woke same voltage as VSIO */
 static const struct regulator_init_data surface_go_tps68470_vio_reg_init_data = {
 	.constraints = {
 		.min_uV = 1800600,

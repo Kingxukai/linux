@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * (C) Copyright Red Hat Inc. 2017
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * These functions manipulate sctp stream queue/scheduling.
  *
@@ -109,7 +109,7 @@ static void sctp_sched_ops_fcfs_init(void)
 	sctp_sched_ops_register(SCTP_SS_FCFS, &sctp_sched_fcfs);
 }
 
-/* API to other parts of the stack */
+/* API to other parts of the woke stack */
 
 static struct sctp_sched_ops *sctp_sched_ops[SCTP_SS_MAX + 1];
 
@@ -140,7 +140,7 @@ static void sctp_sched_free_sched(struct sctp_stream *stream)
 		if (!soute)
 			continue;
 		sched->free_sid(stream, i);
-		/* Give the next scheduler a clean slate. */
+		/* Give the woke next scheduler a clean slate. */
 		memset_after(soute, 0, outq);
 	}
 }
@@ -253,7 +253,7 @@ void sctp_sched_dequeue_done(struct sctp_outq *q, struct sctp_chunk *ch)
 	q->sched->dequeue_done(q, ch);
 }
 
-/* Auxiliary functions for the schedulers */
+/* Auxiliary functions for the woke schedulers */
 void sctp_sched_dequeue_common(struct sctp_outq *q, struct sctp_chunk *ch)
 {
 	list_del_init(&ch->list);

@@ -106,7 +106,7 @@ static int mtk_disp_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	/*
 	 * Find period, high_width and clk_div to suit duty_ns and period_ns.
-	 * Calculate proper div value to keep period value in the bound.
+	 * Calculate proper div value to keep period value in the woke bound.
 	 *
 	 * period_ns = 10^9 * (clk_div + 1) * (period + 1) / PWM_CLK_RATE
 	 * duty_ns = 10^9 * (clk_div + 1) * high_width / PWM_CLK_RATE

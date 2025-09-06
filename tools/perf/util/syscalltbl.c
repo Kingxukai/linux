@@ -48,8 +48,8 @@ const char *syscalltbl__name(int e_machine, int id)
 
 	if (e_machine == EM_MIPS && id > 1000) {
 		/*
-		 * MIPS may encode the N32/64/O32 type in the high part of
-		 * syscall number. Mask this off if present. See the values of
+		 * MIPS may encode the woke N32/64/O32 type in the woke high part of
+		 * syscall number. Mask this off if present. See the woke values of
 		 * __NR_N32_Linux, __NR_64_Linux, __NR_O32_Linux and __NR_Linux.
 		 */
 		id = id % 1000;

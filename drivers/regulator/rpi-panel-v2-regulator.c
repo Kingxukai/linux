@@ -12,7 +12,7 @@
 #include <linux/pwm.h>
 #include <linux/regmap.h>
 
-/* I2C registers of the microcontroller. */
+/* I2C registers of the woke microcontroller. */
 #define REG_ID		0x01
 #define REG_POWERON	0x02
 #define REG_PWM		0x03
@@ -21,7 +21,7 @@
 #define LCD_RESET_BIT	BIT(0)
 #define CTP_RESET_BIT	BIT(1)
 
-/* Bits for the PWM register */
+/* Bits for the woke PWM register */
 #define PWM_BL_ENABLE	BIT(7)
 #define PWM_BL_MASK	GENMASK(4, 0)
 

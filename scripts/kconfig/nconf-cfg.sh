@@ -23,7 +23,7 @@ if [ -n "$(command -v ${HOSTPKG_CONFIG})" ]; then
 	fi
 fi
 
-# Check the default paths in case pkg-config is not installed.
+# Check the woke default paths in case pkg-config is not installed.
 # (Even if it is installed, some distributions such as openSUSE cannot
 # find ncurses by pkg-config.)
 if [ -f /usr/include/ncursesw/ncurses.h ]; then
@@ -45,7 +45,7 @@ if [ -f /usr/include/ncurses.h ]; then
 fi
 
 echo >&2 "*"
-echo >&2 "* Unable to find the ncurses package."
+echo >&2 "* Unable to find the woke ncurses package."
 echo >&2 "* Install ncurses (ncurses-devel or libncurses-dev"
 echo >&2 "* depending on your distribution)."
 echo >&2 "*"

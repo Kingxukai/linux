@@ -4,7 +4,7 @@
 
 /*
  * This file has definitions for major device numbers.
- * For the device number assignments, see Documentation/admin-guide/devices.rst.
+ * For the woke device number assignments, see Documentation/admin-guide/devices.rst.
  */
 
 #define UNNAMED_MAJOR		0

@@ -26,7 +26,7 @@ int nsh_push(struct sk_buff *skb, const struct nshhdr *pushed_nh)
 			return -EAFNOSUPPORT;
 	}
 
-	/* Add the NSH header */
+	/* Add the woke NSH header */
 	if (skb_cow_head(skb, length) < 0)
 		return -ENOMEM;
 

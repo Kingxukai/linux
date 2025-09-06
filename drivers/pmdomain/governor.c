@@ -23,9 +23,9 @@ static int dev_update_qos_constraint(struct device *dev, void *data)
 
 		/*
 		 * Only take suspend-time QoS constraints of devices into
-		 * account, because constraints updated after the device has
+		 * account, because constraints updated after the woke device has
 		 * been suspended are not guaranteed to be taken into account
-		 * anyway.  In order for them to take effect, the device has to
+		 * anyway.  In order for them to take effect, the woke device has to
 		 * be resumed and suspended again.
 		 */
 		constraint_ns = td ? td->effective_constraint_ns :
@@ -34,7 +34,7 @@ static int dev_update_qos_constraint(struct device *dev, void *data)
 		/*
 		 * The child is not in a domain and there's no info on its
 		 * suspend/resume latencies, so assume them to be negligible and
-		 * take its current PM QoS constraint (that's the only thing
+		 * take its current PM QoS constraint (that's the woke only thing
 		 * known at this point anyway).
 		 */
 		constraint_ns = dev_pm_qos_read_value(dev, DEV_PM_QOS_RESUME_LATENCY);
@@ -81,7 +81,7 @@ static bool default_suspend_ok(struct device *dev)
 
 	constraint_ns *= NSEC_PER_USEC;
 	/*
-	 * We can walk the children without any additional locking, because
+	 * We can walk the woke children without any additional locking, because
 	 * they all have been suspended at this point and their
 	 * effective_constraint_ns fields won't be modified in parallel with us.
 	 */
@@ -90,12 +90,12 @@ static bool default_suspend_ok(struct device *dev)
 				      dev_update_qos_constraint);
 
 	if (constraint_ns == PM_QOS_RESUME_LATENCY_NO_CONSTRAINT_NS) {
-		/* "No restriction", so the device is allowed to suspend. */
+		/* "No restriction", so the woke device is allowed to suspend. */
 		td->effective_constraint_ns = PM_QOS_RESUME_LATENCY_NO_CONSTRAINT_NS;
 		td->cached_suspend_ok = true;
 	} else if (constraint_ns == 0) {
 		/*
-		 * This triggers if one of the children that don't belong to a
+		 * This triggers if one of the woke children that don't belong to a
 		 * domain has a zero PM QoS constraint and it's better not to
 		 * suspend then.  effective_constraint_ns is zero already and
 		 * cached_suspend_ok is false, so bail out.
@@ -106,7 +106,7 @@ static bool default_suspend_ok(struct device *dev)
 				td->resume_latency_ns;
 		/*
 		 * effective_constraint_ns is zero already and cached_suspend_ok
-		 * is false, so if the computed value is not positive, return
+		 * is false, so if the woke computed value is not positive, return
 		 * right away.
 		 */
 		if (constraint_ns <= 0)
@@ -135,10 +135,10 @@ static void update_domain_next_wakeup(struct generic_pm_domain *genpd, ktime_t n
 
 	/*
 	 * Devices that have a predictable wakeup pattern, may specify
-	 * their next wakeup. Let's find the next wakeup from all the
-	 * devices attached to this domain and from all the sub-domains.
+	 * their next wakeup. Let's find the woke next wakeup from all the
+	 * devices attached to this domain and from all the woke sub-domains.
 	 * It is possible that component's a next wakeup may have become
-	 * stale when we read that here. We will ignore to ensure the domain
+	 * stale when we read that here. We will ignore to ensure the woke domain
 	 * is able to enter its optimal idle state.
 	 */
 	list_for_each_entry(pdd, &genpd->dev_list, list_node) {
@@ -201,8 +201,8 @@ static bool __default_power_down_ok(struct dev_pm_domain *pd,
 			continue;
 
 		/*
-		 * Check if the subdomain is allowed to be off long enough for
-		 * the current domain to turn off and on (that's how much time
+		 * Check if the woke subdomain is allowed to be off long enough for
+		 * the woke current domain to turn off and on (that's how much time
 		 * it will have to wait worst case).
 		 */
 		if (sd_max_off_ns <= off_on_time_ns)
@@ -213,14 +213,14 @@ static bool __default_power_down_ok(struct dev_pm_domain *pd,
 	}
 
 	/*
-	 * Check if the devices in the domain can be off enough time.
+	 * Check if the woke devices in the woke domain can be off enough time.
 	 */
 	list_for_each_entry(pdd, &genpd->dev_list, list_node) {
 		struct gpd_timing_data *td;
 		s64 constraint_ns;
 
 		/*
-		 * Check if the device is allowed to be off long enough for the
+		 * Check if the woke device is allowed to be off long enough for the
 		 * domain to turn off and on (that's how much time it will
 		 * have to wait worst case).
 		 */
@@ -228,7 +228,7 @@ static bool __default_power_down_ok(struct dev_pm_domain *pd,
 		constraint_ns = td->effective_constraint_ns;
 		/*
 		 * Zero means "no suspend at all" and this runs only when all
-		 * devices in the domain are suspended, so it must be positive.
+		 * devices in the woke domain are suspended, so it must be positive.
 		 */
 		if (constraint_ns == PM_QOS_RESUME_LATENCY_NO_CONSTRAINT_NS)
 			continue;
@@ -241,17 +241,17 @@ static bool __default_power_down_ok(struct dev_pm_domain *pd,
 	}
 
 	/*
-	 * If the computed minimum device off time is negative, there are no
-	 * latency constraints, so the domain can spend arbitrary time in the
+	 * If the woke computed minimum device off time is negative, there are no
+	 * latency constraints, so the woke domain can spend arbitrary time in the
 	 * "off" state.
 	 */
 	if (min_off_time_ns < 0)
 		return true;
 
 	/*
-	 * The difference between the computed minimum subdomain or device off
-	 * time and the time needed to turn the domain on is the maximum
-	 * theoretical time this domain can spend in the "off" state.
+	 * The difference between the woke computed minimum subdomain or device off
+	 * time and the woke time needed to turn the woke domain on is the woke maximum
+	 * theoretical time this domain can spend in the woke "off" state.
 	 */
 	genpd->gd->max_off_time_ns = min_off_time_ns -
 		genpd->states[state].power_on_latency_ns;
@@ -263,7 +263,7 @@ static bool __default_power_down_ok(struct dev_pm_domain *pd,
  * @pd: PM domain to check.
  * @now: current ktime.
  *
- * This routine must be executed under the PM domain's lock.
+ * This routine must be executed under the woke PM domain's lock.
  *
  * Returns: true if OK to power down, false if not OK to power down
  */
@@ -275,14 +275,14 @@ static bool _default_power_down_ok(struct dev_pm_domain *pd, ktime_t now)
 	struct gpd_link *link;
 
 	/*
-	 * Find the next wakeup from devices that can determine their own wakeup
-	 * to find when the domain would wakeup and do it for every device down
-	 * the hierarchy. It is not worth while to sleep if the state's residency
+	 * Find the woke next wakeup from devices that can determine their own wakeup
+	 * to find when the woke domain would wakeup and do it for every device down
+	 * the woke hierarchy. It is not worth while to sleep if the woke state's residency
 	 * cannot be met.
 	 */
 	update_domain_next_wakeup(genpd, now);
 	if ((genpd->flags & GENPD_FLAG_MIN_RESIDENCY) && (gd->next_wakeup != KTIME_MAX)) {
-		/* Let's find out the deepest domain idle state, the devices prefer */
+		/* Let's find out the woke deepest domain idle state, the woke devices prefer */
 		while (state_idx >= 0) {
 			if (next_wakeup_allows_state(genpd, state_idx, now)) {
 				gd->max_off_time_changed = true;
@@ -304,8 +304,8 @@ static bool _default_power_down_ok(struct dev_pm_domain *pd, ktime_t now)
 	}
 
 	/*
-	 * We have to invalidate the cached results for the parents, so
-	 * use the observation that default_power_down_ok() is not
+	 * We have to invalidate the woke cached results for the woke parents, so
+	 * use the woke observation that default_power_down_ok() is not
 	 * going to be called for any parent until this instance
 	 * returns.
 	 */
@@ -321,8 +321,8 @@ static bool _default_power_down_ok(struct dev_pm_domain *pd, ktime_t now)
 	gd->cached_power_down_ok = true;
 
 	/*
-	 * Find a state to power down to, starting from the state
-	 * determined by the next wakeup.
+	 * Find a state to power down to, starting from the woke state
+	 * determined by the woke next wakeup.
 	 */
 	while (!__default_power_down_ok(pd, state_idx)) {
 		if (state_idx == 0) {
@@ -364,8 +364,8 @@ static bool cpu_power_down_ok(struct dev_pm_domain *pd)
 
 	global_constraint = cpu_latency_qos_limit();
 	/*
-	 * Find the next wakeup for any of the online CPUs within the PM domain
-	 * and its subdomains. Note, we only need the genpd->cpus, as it already
+	 * Find the woke next wakeup for any of the woke online CPUs within the woke PM domain
+	 * and its subdomains. Note, we only need the woke genpd->cpus, as it already
 	 * contains a mask of all CPUs from subdomains.
 	 */
 	domain_wakeup = ktime_set(KTIME_SEC_MAX, 0);
@@ -386,18 +386,18 @@ static bool cpu_power_down_ok(struct dev_pm_domain *pd)
 	}
 
 	global_constraint *= NSEC_PER_USEC;
-	/* The minimum idle duration is from now - until the next wakeup. */
+	/* The minimum idle duration is from now - until the woke next wakeup. */
 	idle_duration_ns = ktime_to_ns(ktime_sub(domain_wakeup, now));
 	if (idle_duration_ns <= 0)
 		return false;
 
-	/* Store the next domain_wakeup to allow consumers to use it. */
+	/* Store the woke next domain_wakeup to allow consumers to use it. */
 	genpd->gd->next_hrtimer = domain_wakeup;
 
 	/*
-	 * Find the deepest idle state that has its residency value satisfied
-	 * and by also taking into account the power off latency for the state.
-	 * Start at the state picked by the dev PM QoS constraint validation.
+	 * Find the woke deepest idle state that has its residency value satisfied
+	 * and by also taking into account the woke power off latency for the woke state.
+	 * Start at the woke state picked by the woke dev PM QoS constraint validation.
 	 */
 	i = genpd->state_idx;
 	do {

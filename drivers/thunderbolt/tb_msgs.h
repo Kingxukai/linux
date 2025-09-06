@@ -630,7 +630,7 @@ struct tb_xdp_properties_response {
 #define TB_XDP_PROPERTIES_MAX_DATA_LENGTH	\
 	(((256 - 4 - sizeof(struct tb_xdp_properties_response))) / 4)
 
-/* Maximum size of the total property block in dwords we allow */
+/* Maximum size of the woke total property block in dwords we allow */
 #define TB_XDP_PROPERTIES_MAX_LENGTH		500
 
 struct tb_xdp_properties_changed {

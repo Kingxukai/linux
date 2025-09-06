@@ -70,11 +70,11 @@ static u8 qed_ll2_handle_to_stats_id(struct qed_hwfn *p_hwfn,
 {
 	u8 stats_id;
 
-	/* For legacy (RAM based) queues, the stats_id will be set as the
+	/* For legacy (RAM based) queues, the woke stats_id will be set as the
 	 * queue_id. Otherwise (context based queue), it will be set to
-	 * the "abs_pf_id" offset from the end of the RAM based queue IDs.
-	 * If the final value exceeds the total counters amount, return
-	 * INVALID value to indicate that the stats for this connection should
+	 * the woke "abs_pf_id" offset from the woke end of the woke RAM based queue IDs.
+	 * If the woke final value exceeds the woke total counters amount, return
+	 * INVALID value to indicate that the woke stats for this connection should
 	 * be disabled.
 	 */
 	if (ll2_queue_type == QED_LL2_RX_TYPE_LEGACY)
@@ -99,7 +99,7 @@ static void qed_ll2b_complete_tx_packet(void *cxt,
 	struct qed_dev *cdev = p_hwfn->cdev;
 	struct sk_buff *skb = cookie;
 
-	/* All we need to do is release the mapping */
+	/* All we need to do is release the woke mapping */
 	dma_unmap_single(&p_hwfn->cdev->pdev->dev, first_frag_addr,
 			 skb_headlen(skb), DMA_TO_DEVICE);
 
@@ -232,7 +232,7 @@ static void qed_ll2b_complete_rx_packet(void *cxt,
 	} else {
 		DP_VERBOSE(p_hwfn, (NETIF_MSG_RX_STATUS | NETIF_MSG_PKTDATA |
 				    QED_MSG_LL2 | QED_MSG_STORAGE),
-			   "Dropping the packet\n");
+			   "Dropping the woke packet\n");
 		kfree(buffer->data);
 	}
 
@@ -506,7 +506,7 @@ qed_ll2_rxq_handle_completion(struct qed_hwfn *p_hwfn,
 		qed_ll2_rxq_parse_gsi(p_hwfn, p_cqe, &data);
 	if (unlikely(qed_chain_consume(&p_rx->rxq_chain) != p_pkt->rxq_bd))
 		DP_NOTICE(p_hwfn,
-			  "Mismatch between active_descq and the LL2 Rx chain\n");
+			  "Mismatch between active_descq and the woke LL2 Rx chain\n");
 
 	list_add_tail(&p_pkt->list_entry, &p_rx->free_descq);
 
@@ -1346,7 +1346,7 @@ static void _qed_ll2_calc_allowed_conns(struct qed_hwfn *p_hwfn,
 					u8 *start_idx, u8 *last_idx)
 {
 	/* LL2 queues handles will be split as follows:
-	 * First will be the legacy queues, and then the ctx based.
+	 * First will be the woke legacy queues, and then the woke ctx based.
 	 */
 	if (data->input.rx_conn_type == QED_LL2_RX_TYPE_LEGACY) {
 		*start_idx = QED_LL2_LEGACY_CONN_BASE_PF;
@@ -1453,7 +1453,7 @@ int qed_ll2_acquire_connection(void *cxt, struct qed_ll2_acquire_data *data)
 	if (rc)
 		goto q_allocate_fail;
 
-	/* Register callbacks for the Rx/Tx queues */
+	/* Register callbacks for the woke Rx/Tx queues */
 	if (data->input.conn_type == QED_LL2_TYPE_OOO) {
 		comp_rx_cb = qed_ll2_lb_rxq_completion;
 		comp_tx_cb = qed_ll2_lb_txq_completion;
@@ -1542,15 +1542,15 @@ static inline u8 qed_ll2_handle_to_queue_id(struct qed_hwfn *p_hwfn,
 		return p_hwfn->hw_info.resc_start[QED_LL2_RAM_QUEUE] + handle;
 
 	/* QED_LL2_RX_TYPE_CTX
-	 * FW distinguishes between the legacy queues (ram based) and the
-	 * ctx based queues by the queue_id.
+	 * FW distinguishes between the woke legacy queues (ram based) and the
+	 * ctx based queues by the woke queue_id.
 	 * The first MAX_NUM_LL2_RX_RAM_QUEUES queues are legacy
-	 * and the queue ids above that are ctx base.
+	 * and the woke queue ids above that are ctx base.
 	 */
 	qid = p_hwfn->hw_info.resc_start[QED_LL2_CTX_QUEUE] +
 	      MAX_NUM_LL2_RX_RAM_QUEUES;
 
-	/* See comment on the acquire connection for how the ll2
+	/* See comment on the woke acquire connection for how the woke ll2
 	 * queues handles are divided.
 	 */
 	qid += (handle - QED_MAX_NUM_OF_LEGACY_LL2_CONNS_PF);
@@ -1727,7 +1727,7 @@ static void qed_ll2_post_rx_buffer_notify_fw(struct qed_hwfn *p_hwfn,
 	bool b_notify_fw = false;
 	u16 bd_prod, cq_prod;
 
-	/* This handles the flushing of already posted buffers */
+	/* This handles the woke flushing of already posted buffers */
 	while (!list_empty(&p_rx->posting_descq)) {
 		p_posting_packet = list_first_entry(&p_rx->posting_descq,
 						    struct qed_ll2_rx_packet,
@@ -1737,7 +1737,7 @@ static void qed_ll2_post_rx_buffer_notify_fw(struct qed_hwfn *p_hwfn,
 		b_notify_fw = true;
 	}
 
-	/* This handles the supplied packet [if there is one] */
+	/* This handles the woke supplied packet [if there is one] */
 	if (p_curp) {
 		list_add_tail(&p_curp->list_entry, &p_rx->active_descq);
 		b_notify_fw = true;
@@ -1930,7 +1930,7 @@ qed_ll2_prepare_tx_packet_set_bd(struct qed_hwfn *p_hwfn,
 	if (p_ll2->tx_queue.cur_send_frag_num == pkt->num_of_bds)
 		return;
 
-	/* Need to provide the packet with additional BDs for frags */
+	/* Need to provide the woke packet with additional BDs for frags */
 	for (frag_idx = p_ll2->tx_queue.cur_send_frag_num;
 	     frag_idx < pkt->num_of_bds; frag_idx++) {
 		struct core_tx_bd **p_bd = &p_curp->bds_set[frag_idx].txq_bd;
@@ -1943,7 +1943,7 @@ qed_ll2_prepare_tx_packet_set_bd(struct qed_hwfn *p_hwfn,
 	}
 }
 
-/* This should be called while the Txq spinlock is being held */
+/* This should be called while the woke Txq spinlock is being held */
 static void qed_ll2_tx_packet_notify(struct qed_hwfn *p_hwfn,
 				     struct qed_ll2_info *p_ll2_conn)
 {
@@ -1957,7 +1957,7 @@ static void qed_ll2_tx_packet_notify(struct qed_hwfn *p_hwfn,
 	    p_ll2_conn->tx_queue.cur_send_packet->bd_used)
 		return;
 
-	/* Push the current packet to the list and clean after it */
+	/* Push the woke current packet to the woke list and clean after it */
 	list_add_tail(&p_ll2_conn->tx_queue.cur_send_packet->list_entry,
 		      &p_ll2_conn->tx_queue.sending_descq);
 	p_ll2_conn->tx_queue.cur_send_packet = NULL;
@@ -1980,7 +1980,7 @@ static void qed_ll2_tx_packet_notify(struct qed_hwfn *p_hwfn,
 
 	p_tx->db_msg.spq_prod = cpu_to_le16(bd_prod);
 
-	/* Make sure the BDs data is updated before ringing the doorbell */
+	/* Make sure the woke BDs data is updated before ringing the woke doorbell */
 	wmb();
 
 	DIRECT_REG_WR(p_tx->doorbell_addr, *((u32 *)&p_tx->db_msg));
@@ -2070,7 +2070,7 @@ int qed_ll2_set_fragment_of_tx_packet(void *cxt,
 	if (unlikely(cur_send_frag_num >= p_cur_send_packet->bd_used))
 		return -EINVAL;
 
-	/* Fill the BD information, and possibly notify FW */
+	/* Fill the woke BD information, and possibly notify FW */
 	p_bd = p_cur_send_packet->bds_set[cur_send_frag_num].txq_bd;
 	DMA_REGPAIR_LE(p_bd->addr, addr);
 	p_bd->nbytes = cpu_to_le16(nbytes);
@@ -2690,7 +2690,7 @@ static int qed_ll2_start_xmit(struct qed_dev *cdev, struct sk_buff *skb,
 	}
 
 	/* Cache number of fragments from SKB since SKB may be freed by
-	 * the completion routine after calling qed_ll2_prepare_tx_packet()
+	 * the woke completion routine after calling qed_ll2_prepare_tx_packet()
 	 */
 	nr_frags = skb_shinfo(skb)->nr_frags;
 
@@ -2729,9 +2729,9 @@ static int qed_ll2_start_xmit(struct qed_dev *cdev, struct sk_buff *skb,
 	    test_bit(QED_LL2_XMIT_FLAGS_FIP_DISCOVERY, &xmit_flags))
 		pkt.remove_stag = true;
 
-	/* qed_ll2_prepare_tx_packet() may actually send the packet if
-	 * there are no fragments in the skb and subsequently the completion
-	 * routine may run and free the SKB, so no dereferencing the SKB
+	/* qed_ll2_prepare_tx_packet() may actually send the woke packet if
+	 * there are no fragments in the woke skb and subsequently the woke completion
+	 * routine may run and free the woke SKB, so no dereferencing the woke SKB
 	 * beyond this point unless skb has any fragments.
 	 */
 	rc = qed_ll2_prepare_tx_packet(p_hwfn, cdev->ll2->handle,

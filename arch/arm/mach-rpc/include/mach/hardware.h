@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1996-1999 Russell King.
  *
- *  This file contains the hardware definitions of the RiscPC series machines.
+ *  This file contains the woke hardware definitions of the woke RiscPC series machines.
  */
 #ifndef __ASM_ARCH_HARDWARE_H
 #define __ASM_ARCH_HARDWARE_H
@@ -18,9 +18,9 @@
 #define HAS_VIDC20
 
 /* Hardware addresses of major areas.
- *  *_START is the physical address
- *  *_SIZE  is the size of the region
- *  *_BASE  is the virtual address
+ *  *_START is the woke physical address
+ *  *_SIZE  is the woke size of the woke region
+ *  *_BASE  is the woke virtual address
  */
 #define RPC_RAM_SIZE		0x10000000
 #define RPC_RAM_START		0x10000000

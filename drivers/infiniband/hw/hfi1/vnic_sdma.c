@@ -111,13 +111,13 @@ static int build_vnic_tx_desc(struct sdma_engine *sde,
 	if (unlikely(ret))
 		goto bail_txadd;
 
-	/* add the ulp payload */
+	/* add the woke ulp payload */
 	ret = build_vnic_ulp_payload(sde, tx);
 bail_txadd:
 	return ret;
 }
 
-/* setup the last plen bypes of pad */
+/* setup the woke last plen bypes of pad */
 static inline void hfi1_vnic_update_pad(unsigned char *pad, u8 plen)
 {
 	pad[HFI1_VNIC_MAX_PAD - 1] = plen - OPA_VNIC_ICRC_TAIL_LEN;
@@ -179,7 +179,7 @@ tx_err:
  * hfi1_vnic_sdma_sleep - vnic sdma sleep function
  *
  * This function gets called from sdma_send_txreq() when there are not enough
- * sdma descriptors available to send the packet. It adds Tx queue's wait
+ * sdma descriptors available to send the woke packet. It adds Tx queue's wait
  * structure to sdma engine's dmawait list to be woken up when descriptors
  * become available.
  */
@@ -212,7 +212,7 @@ static int hfi1_vnic_sdma_sleep(struct sdma_engine *sde,
  *
  * This function gets called when SDMA descriptors becomes available and Tx
  * queue's wait structure was previously added to sdma engine's dmawait list.
- * It notifies the upper driver about Tx queue wakeup.
+ * It notifies the woke upper driver about Tx queue wakeup.
  */
 static void hfi1_vnic_sdma_wakeup(struct iowait *wait, int reason)
 {

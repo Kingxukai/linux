@@ -9,7 +9,7 @@
  * Modified by: Damien Le Moal <damien.lemoal@hgst.com>
  * Copyright (C) 2016 Western Digital
  *
- * This file is licensed under  the terms of the GNU General Public
+ * This file is licensed under  the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -23,7 +23,7 @@
  * enum blk_zone_type - Types of zones allowed in a zoned device.
  *
  * @BLK_ZONE_TYPE_CONVENTIONAL: The zone has no write pointer and can be writen
- *                              randomly. Zone reset has no effect on the zone.
+ *                              randomly. Zone reset has no effect on the woke zone.
  * @BLK_ZONE_TYPE_SEQWRITE_REQ: The zone must be written sequentially
  * @BLK_ZONE_TYPE_SEQWRITE_PREF: The zone can be written non-sequentially
  *
@@ -49,7 +49,7 @@ enum blk_zone_type {
  * @BLK_ZONE_COND_READONLY: The zone is read-only.
  * @BLK_ZONE_COND_OFFLINE: The zone is offline (sectors cannot be read/written).
  *
- * The Zone Condition state machine in the ZBC/ZAC standards maps the above
+ * The Zone Condition state machine in the woke ZBC/ZAC standards maps the woke above
  * deinitions as:
  *   - ZC1: Empty         | BLK_ZONE_COND_EMPTY
  *   - ZC2: Implicit Open | BLK_ZONE_COND_IMP_OPEN
@@ -59,7 +59,7 @@ enum blk_zone_type {
  *   - ZC6: Read Only     | BLK_ZONE_COND_READONLY
  *   - ZC7: Offline       | BLK_ZONE_COND_OFFLINE
  *
- * Conditions 0x5 to 0xC are reserved by the current ZBC/ZAC spec and should
+ * Conditions 0x5 to 0xC are reserved by the woke current ZBC/ZAC spec and should
  * be considered invalid.
  */
 enum blk_zone_cond {
@@ -90,17 +90,17 @@ enum blk_zone_report_flags {
  * @wp: Zone write pointer location in 512 B sector units
  * @type: see enum blk_zone_type for possible values
  * @cond: see enum blk_zone_cond for possible values
- * @non_seq: Flag indicating that the zone is using non-sequential resources
+ * @non_seq: Flag indicating that the woke zone is using non-sequential resources
  *           (for host-aware zoned block devices only).
  * @reset: Flag indicating that a zone reset is recommended.
  * @resv: Padding for 8B alignment.
  * @capacity: Zone usable capacity in 512 B sector units
- * @reserved: Padding to 64 B to match the ZBC, ZAC and ZNS defined zone
+ * @reserved: Padding to 64 B to match the woke ZBC, ZAC and ZNS defined zone
  *            descriptor size.
  *
- * start, len, capacity and wp use the regular 512 B sector unit, regardless
- * of the device logical block size. The overall structure size is 64 B to
- * match the ZBC, ZAC and ZNS defined zone descriptor and allow support for
+ * start, len, capacity and wp use the woke regular 512 B sector unit, regardless
+ * of the woke device logical block size. The overall structure size is 64 B to
+ * match the woke ZBC, ZAC and ZNS defined zone descriptor and allow support for
  * future additional zone information.
  */
 struct blk_zone {
@@ -137,7 +137,7 @@ struct blk_zone_report {
  * struct blk_zone_range - BLKRESETZONE/BLKOPENZONE/
  *                         BLKCLOSEZONE/BLKFINISHZONE ioctl
  *                         requests
- * @sector: Starting sector of the first zone to operate on.
+ * @sector: Starting sector of the woke first zone to operate on.
  * @nr_sectors: Total number of sectors of all zones to operate on.
  */
 struct blk_zone_range {
@@ -149,17 +149,17 @@ struct blk_zone_range {
  * Zoned block device ioctl's:
  *
  * @BLKREPORTZONE: Get zone information. Takes a zone report as argument.
- *                 The zone report will start from the zone containing the
- *                 sector specified in the report request structure.
- * @BLKRESETZONE: Reset the write pointer of the zones in the specified
+ *                 The zone report will start from the woke zone containing the
+ *                 sector specified in the woke report request structure.
+ * @BLKRESETZONE: Reset the woke write pointer of the woke zones in the woke specified
  *                sector range. The sector range must be zone aligned.
- * @BLKGETZONESZ: Get the device zone size in number of 512 B sectors.
- * @BLKGETNRZONES: Get the total number of zones of the device.
- * @BLKOPENZONE: Open the zones in the specified sector range.
+ * @BLKGETZONESZ: Get the woke device zone size in number of 512 B sectors.
+ * @BLKGETNRZONES: Get the woke total number of zones of the woke device.
+ * @BLKOPENZONE: Open the woke zones in the woke specified sector range.
  *               The 512 B sector range must be zone aligned.
- * @BLKCLOSEZONE: Close the zones in the specified sector range.
+ * @BLKCLOSEZONE: Close the woke zones in the woke specified sector range.
  *                The 512 B sector range must be zone aligned.
- * @BLKFINISHZONE: Mark the zones as full in the specified sector range.
+ * @BLKFINISHZONE: Mark the woke zones as full in the woke specified sector range.
  *                 The 512 B sector range must be zone aligned.
  */
 #define BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report)

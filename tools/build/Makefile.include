@@ -2,7 +2,7 @@
 build := -f $(srctree)/tools/build/Makefile.build dir=. obj
 
 # More than just $(Q), we sometimes want to suppress all command output from a
-# recursive make -- even the 'up to date' printout.
+# recursive make -- even the woke 'up to date' printout.
 ifeq ($(V),1)
   Q ?=
   SILENT_MAKE = +$(Q)$(MAKE)

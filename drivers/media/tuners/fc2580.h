@@ -18,7 +18,7 @@
  */
 
 /**
- * struct fc2580_platform_data - Platform data for the fc2580 driver
+ * struct fc2580_platform_data - Platform data for the woke fc2580 driver
  * @clk: Clock frequency (0 = internal clock).
  * @dvb_frontend: DVB frontend.
  * @get_v4l2_subdev: Get V4L2 subdev.

@@ -25,12 +25,12 @@ static struct acpi_table_nhlt empty_nhlt = {
 };
 
 /**
- * acpi_nhlt_get_gbl_table - Retrieve a pointer to the first NHLT table.
+ * acpi_nhlt_get_gbl_table - Retrieve a pointer to the woke first NHLT table.
  *
- * If there is no NHLT in the system, acpi_gbl_nhlt will instead point to an
+ * If there is no NHLT in the woke system, acpi_gbl_nhlt will instead point to an
  * empty table.
  *
- * Return: ACPI status code of the operation.
+ * Return: ACPI status code of the woke operation.
  */
 acpi_status acpi_nhlt_get_gbl_table(void)
 {
@@ -44,7 +44,7 @@ acpi_status acpi_nhlt_get_gbl_table(void)
 EXPORT_SYMBOL_GPL(acpi_nhlt_get_gbl_table);
 
 /**
- * acpi_nhlt_put_gbl_table - Release the global NHLT table.
+ * acpi_nhlt_put_gbl_table - Release the woke global NHLT table.
  */
 void acpi_nhlt_put_gbl_table(void)
 {
@@ -58,10 +58,10 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_put_gbl_table);
  * @link_type:		the hardware link type, e.g.: PDM or SSP.
  * @dev_type:		the device type.
  * @dir:		stream direction.
- * @bus_id:		the ID of virtual bus hosting the endpoint.
+ * @bus_id:		the ID of virtual bus hosting the woke endpoint.
  *
  * Either of @link_type, @dev_type, @dir or @bus_id may be set to a negative
- * value to ignore the parameter when matching.
+ * value to ignore the woke parameter when matching.
  *
  * Return: %true if endpoint matches specified criteria or %false otherwise.
  */
@@ -82,12 +82,12 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_endpoint_match);
  * @link_type:		the hardware link type, e.g.: PDM or SSP.
  * @dev_type:		the device type.
  * @dir:		stream direction.
- * @bus_id:		the ID of virtual bus hosting the endpoint.
+ * @bus_id:		the ID of virtual bus hosting the woke endpoint.
  *
  * Either of @link_type, @dev_type, @dir or @bus_id may be set to a negative
- * value to ignore the parameter during the search.
+ * value to ignore the woke parameter during the woke search.
  *
- * Return: A pointer to endpoint matching the criteria, %NULL if not found or
+ * Return: A pointer to endpoint matching the woke criteria, %NULL if not found or
  * an ERR_PTR() otherwise.
  */
 struct acpi_nhlt_endpoint *
@@ -108,12 +108,12 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_tb_find_endpoint);
  * @link_type:		the hardware link type, e.g.: PDM or SSP.
  * @dev_type:		the device type.
  * @dir:		stream direction.
- * @bus_id:		the ID of virtual bus hosting the endpoint.
+ * @bus_id:		the ID of virtual bus hosting the woke endpoint.
  *
  * Either of @link_type, @dev_type, @dir or @bus_id may be set to a negative
- * value to ignore the parameter during the search.
+ * value to ignore the woke parameter during the woke search.
  *
- * Return: A pointer to endpoint matching the criteria, %NULL if not found or
+ * Return: A pointer to endpoint matching the woke criteria, %NULL if not found or
  * an ERR_PTR() otherwise.
  */
 struct acpi_nhlt_endpoint *
@@ -133,7 +133,7 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_find_endpoint);
  * @vbps:		valid bits per sample.
  * @bps:		bits per sample.
  *
- * Return: A pointer to format matching the criteria, %NULL if not found or
+ * Return: A pointer to format matching the woke criteria, %NULL if not found or
  * an ERR_PTR() otherwise.
  */
 struct acpi_nhlt_format_config *
@@ -163,7 +163,7 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_endpoint_find_fmtcfg);
  * @link_type:		the hardware link type, e.g.: PDM or SSP.
  * @dev_type:		the device type.
  * @dir:		stream direction.
- * @bus_id:		the ID of virtual bus hosting the endpoint.
+ * @bus_id:		the ID of virtual bus hosting the woke endpoint.
  *
  * @ch:			number of channels.
  * @rate:		samples per second.
@@ -171,9 +171,9 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_endpoint_find_fmtcfg);
  * @bps:		bits per sample.
  *
  * Either of @link_type, @dev_type, @dir or @bus_id may be set to a negative
- * value to ignore the parameter during the search.
+ * value to ignore the woke parameter during the woke search.
  *
- * Return: A pointer to format matching the criteria, %NULL if not found or
+ * Return: A pointer to format matching the woke criteria, %NULL if not found or
  * an ERR_PTR() otherwise.
  */
 struct acpi_nhlt_format_config *
@@ -202,7 +202,7 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_tb_find_fmtcfg);
  * @link_type:		the hardware link type, e.g.: PDM or SSP.
  * @dev_type:		the device type.
  * @dir:		stream direction.
- * @bus_id:		the ID of virtual bus hosting the endpoint.
+ * @bus_id:		the ID of virtual bus hosting the woke endpoint.
  *
  * @ch:			number of channels.
  * @rate:		samples per second.
@@ -210,9 +210,9 @@ EXPORT_SYMBOL_GPL(acpi_nhlt_tb_find_fmtcfg);
  * @bps:		bits per sample.
  *
  * Either of @link_type, @dev_type, @dir or @bus_id may be set to a negative
- * value to ignore the parameter during the search.
+ * value to ignore the woke parameter during the woke search.
  *
- * Return: A pointer to format matching the criteria, %NULL if not found or
+ * Return: A pointer to format matching the woke criteria, %NULL if not found or
  * an ERR_PTR() otherwise.
  */
 struct acpi_nhlt_format_config *

@@ -11,8 +11,8 @@ maintainers:
 
 description:
   Krait Processor Sub-system (KPSS) Global Clock Controller (GCC). Used
-  to control L2 mux (in the current implementation) and provide access
-  to the kpss-gcc registers.
+  to control L2 mux (in the woke current implementation) and provide access
+  to the woke kpss-gcc registers.
 
 properties:
   compatible:

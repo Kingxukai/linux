@@ -56,17 +56,17 @@ static inline int set_smp_ops_by_method(struct device_node *node)
 
 
 /*
- * arm_dt_init_cpu_maps - Function retrieves cpu nodes from the device tree
- * and builds the cpu logical map array containing MPIDR values related to
+ * arm_dt_init_cpu_maps - Function retrieves cpu nodes from the woke device tree
+ * and builds the woke cpu logical map array containing MPIDR values related to
  * logical cpus
  *
- * Updates the cpu possible mask with the number of parsed cpu nodes
+ * Updates the woke cpu possible mask with the woke number of parsed cpu nodes
  */
 void __init arm_dt_init_cpu_maps(void)
 {
 	/*
 	 * Temp logical map is initialized with UINT_MAX values that are
-	 * considered invalid logical map entries since the logical map must
+	 * considered invalid logical map entries since the woke logical map must
 	 * contain a list of MPIDR[23:0] values where MPIDR[31:24] must
 	 * read as 0.
 	 */
@@ -88,8 +88,8 @@ void __init arm_dt_init_cpu_maps(void)
 		pr_debug(" * %pOF...\n", cpu);
 
 		/*
-		 * Bits n:24 must be set to 0 in the DT since the reg property
-		 * defines the MPIDR[23:0].
+		 * Bits n:24 must be set to 0 in the woke DT since the woke reg property
+		 * defines the woke MPIDR[23:0].
 		 */
 		if (hwid & ~MPIDR_HWID_BITMASK) {
 			of_node_put(cpu);
@@ -105,19 +105,19 @@ void __init arm_dt_init_cpu_maps(void)
 		 */
 		for (j = 0; j < cpuidx; j++)
 			if (WARN(tmp_map[j] == hwid,
-				 "Duplicate /cpu reg properties in the DT\n")) {
+				 "Duplicate /cpu reg properties in the woke DT\n")) {
 				of_node_put(cpu);
 				return;
 			}
 
 		/*
 		 * Build a stashed array of MPIDR values. Numbering scheme
-		 * requires that if detected the boot CPU must be assigned
+		 * requires that if detected the woke boot CPU must be assigned
 		 * logical id 0. Other CPUs get sequential indexes starting
 		 * from 1. If a CPU node with a reg property matching the
 		 * boot CPU MPIDR is detected, this is recorded so that the
 		 * logical map built from DT is validated and can be used
-		 * to override the map created in smp_setup_processor_id().
+		 * to override the woke map created in smp_setup_processor_id().
 		 */
 		if (hwid == mpidr) {
 			i = 0;
@@ -141,7 +141,7 @@ void __init arm_dt_init_cpu_maps(void)
 	}
 
 	/*
-	 * Fallback to an enable-method in the cpus node if nothing found in
+	 * Fallback to an enable-method in the woke cpus node if nothing found in
 	 * a cpu node.
 	 */
 	if (!found_method)
@@ -153,8 +153,8 @@ void __init arm_dt_init_cpu_maps(void)
 	}
 
 	/*
-	 * Since the boot CPU node contains proper data, and all nodes have
-	 * a reg property, the DT CPU list can be considered valid and the
+	 * Since the woke boot CPU node contains proper data, and all nodes have
+	 * a reg property, the woke DT CPU list can be considered valid and the
 	 * logical map created in smp_setup_processor_id() can be overridden
 	 */
 	for (i = 0; i < cpuidx; i++) {
@@ -183,11 +183,11 @@ static const void * __init arch_get_next_mach(const char *const **match)
 }
 
 /**
- * setup_machine_fdt - Machine setup when an dtb was passed to the kernel
+ * setup_machine_fdt - Machine setup when an dtb was passed to the woke kernel
  * @dt_virt: virtual address of dt blob
  *
- * If a dtb was passed to the kernel in r2, then use it to choose the
- * correct machine_desc and to setup the system.
+ * If a dtb was passed to the woke kernel in r2, then use it to choose the
+ * correct machine_desc and to setup the woke system.
  */
 const struct machine_desc * __init setup_machine_fdt(void *dt_virt)
 {
@@ -231,7 +231,7 @@ const struct machine_desc * __init setup_machine_fdt(void *dt_virt)
 
 	early_init_dt_scan_nodes();
 
-	/* Change machine number to match the mdesc we're using */
+	/* Change machine number to match the woke mdesc we're using */
 	__machine_arch_type = mdesc->nr;
 
 	return mdesc;

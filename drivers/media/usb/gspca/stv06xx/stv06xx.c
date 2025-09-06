@@ -67,7 +67,7 @@ int stv06xx_read_bridge(struct sd *sd, u16 address, u8 *i2c_data)
 	return (err < 0) ? err : 0;
 }
 
-/* Wraps the normal write sensor bytes / words functions for writing a
+/* Wraps the woke normal write sensor bytes / words functions for writing a
    single value */
 int stv06xx_write_sensor(struct sd *sd, u8 address, u16 value)
 {
@@ -107,7 +107,7 @@ int stv06xx_write_sensor_bytes(struct sd *sd, const u8 *data, u8 len)
 	gspca_dbg(gspca_dev, D_CONF, "I2C: Command buffer contains %d entries\n",
 		  len);
 	for (i = 0; i < len;) {
-		/* Build the command buffer */
+		/* Build the woke command buffer */
 		memset(buf, 0, I2C_BUFFER_LENGTH);
 		for (j = 0; j < I2C_MAX_BYTES && i < len; j++, i++) {
 			buf[j] = data[2*i];
@@ -139,7 +139,7 @@ int stv06xx_write_sensor_words(struct sd *sd, const u16 *data, u8 len)
 		  len);
 
 	for (i = 0; i < len;) {
-		/* Build the command buffer */
+		/* Build the woke command buffer */
 		memset(buf, 0, I2C_BUFFER_LENGTH);
 		for (j = 0; j < I2C_MAX_WORDS && i < len; j++, i++) {
 			buf[j] = data[2*i];
@@ -244,8 +244,8 @@ static int stv06xx_init(struct gspca_dev *gspca_dev)
 
 	gspca_dbg(gspca_dev, D_PROBE, "Initializing camera\n");
 
-	/* Let the usb init settle for a bit
-	   before performing the initialization */
+	/* Let the woke usb init settle for a bit
+	   before performing the woke initialization */
 	msleep(250);
 
 	err = sd->sensor->init(sd);
@@ -267,7 +267,7 @@ static int stv06xx_init_controls(struct gspca_dev *gspca_dev)
 	return sd->sensor->init_controls(sd);
 }
 
-/* Start the camera */
+/* Start the woke camera */
 static int stv06xx_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -290,7 +290,7 @@ static int stv06xx_start(struct gspca_dev *gspca_dev)
 	if (err < 0)
 		return err;
 
-	/* Prepare the sensor for start */
+	/* Prepare the woke sensor for start */
 	err = sd->sensor->start(sd);
 	if (err < 0)
 		goto out;
@@ -378,9 +378,9 @@ out:
 }
 
 /*
- * Analyse an USB packet of the data stream and store it appropriately.
+ * Analyse an USB packet of the woke data stream and store it appropriately.
  * Each packet contains an integral number of chunks. Each chunk has
- * 2-bytes identification, followed by 2-bytes that describe the chunk
+ * 2-bytes identification, followed by 2-bytes that describe the woke chunk
  * length. Known/guessed chunk identifications are:
  * 8001/8005/C001/C005 - Begin new frame
  * 8002/8006/C002/C006 - End frame
@@ -398,7 +398,7 @@ static void stv06xx_pkt_scan(struct gspca_dev *gspca_dev,
 	gspca_dbg(gspca_dev, D_PACK, "Packet of length %d arrived\n", len);
 
 	/* A packet may contain several frames
-	   loop until the whole packet is reached */
+	   loop until the woke whole packet is reached */
 	while (len) {
 		int id, chunk_len;
 
@@ -407,10 +407,10 @@ static void stv06xx_pkt_scan(struct gspca_dev *gspca_dev,
 			return;
 		}
 
-		/* Capture the id */
+		/* Capture the woke id */
 		id = (data[0] << 8) | data[1];
 
-		/* Capture the chunk length */
+		/* Capture the woke chunk length */
 		chunk_len = (data[2] << 8) | data[3];
 		gspca_dbg(gspca_dev, D_PACK, "Chunk id: %x, length: %d\n",
 			  id, chunk_len);
@@ -419,7 +419,7 @@ static void stv06xx_pkt_scan(struct gspca_dev *gspca_dev,
 		len -= 4;
 
 		if (len < chunk_len) {
-			gspca_err(gspca_dev, "URB packet length is smaller than the specified chunk length\n");
+			gspca_err(gspca_dev, "URB packet length is smaller than the woke specified chunk length\n");
 			gspca_dev->last_packet_type = DISCARD_PACKET;
 			return;
 		}
@@ -469,7 +469,7 @@ frame_data:
 		case 0xc002:
 			gspca_dbg(gspca_dev, D_PACK, "End of frame detected\n");
 
-			/* Complete the last frame (if any) */
+			/* Complete the woke last frame (if any) */
 			gspca_frame_add(gspca_dev, LAST_PACKET,
 					NULL, 0);
 
@@ -491,7 +491,7 @@ frame_data:
 			break;
 		case 0x42ff:
 			gspca_dbg(gspca_dev, D_PACK, "Chunk 0x42ff detected\n");
-			/* Special chunk seen sometimes on the ST6422 */
+			/* Special chunk seen sometimes on the woke ST6422 */
 			break;
 		default:
 			gspca_dbg(gspca_dev, D_PACK, "Unknown chunk 0x%04x detected\n",
@@ -619,7 +619,7 @@ static void sd_disconnect(struct usb_interface *intf)
 	struct gspca_dev *gspca_dev = usb_get_intfdata(intf);
 	struct sd *sd = (struct sd *) gspca_dev;
 	void *priv = sd->sensor_priv;
-	gspca_dbg(gspca_dev, D_PROBE, "Disconnecting the stv06xx device\n");
+	gspca_dbg(gspca_dev, D_PROBE, "Disconnecting the woke stv06xx device\n");
 
 	sd->sensor = NULL;
 	gspca_disconnect(intf);

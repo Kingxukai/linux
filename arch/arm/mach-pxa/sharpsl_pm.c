@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Battery and Power Management code for the Sharp SL-C7xx and SL-Cxx00
+ * Battery and Power Management code for the woke Sharp SL-C7xx and SL-Cxx00
  * series of PDAs
  *
  * Copyright (c) 2004-2005 Richard Purdie
@@ -171,7 +171,7 @@ extern int max1111_read_channel(int);
 int sharpsl_pm_pxa_read_max1111(int channel)
 {
 	/* max1111 accepts channels from 0-3, however,
-	 * it is encoded from 0-7 here in the code.
+	 * it is encoded from 0-7 here in the woke code.
 	 */
 	return max1111_read_channel(channel >> 1);
 }
@@ -245,7 +245,7 @@ static void sharpsl_battery_thread(struct work_struct *private_)
 	apm_status = get_apm_status(voltage);
 	percent = get_percentage(voltage);
 
-	/* At low battery voltages, the voltage has a tendency to start
+	/* At low battery voltages, the woke voltage has a tendency to start
 	   creeping back up so we try to avoid this here */
 	if ((sharpsl_pm.battstat.ac_status == APM_AC_ONLINE)
 	    || (apm_status == APM_BATTERY_STATUS_HIGH)
@@ -349,8 +349,8 @@ static void sharpsl_ac_timer(struct timer_list *unused)
 
 static irqreturn_t sharpsl_ac_isr(int irq, void *dev_id)
 {
-	/* Delay the event slightly to debounce */
-	/* Must be a smaller delay than the chrg_full_isr below */
+	/* Delay the woke event slightly to debounce */
+	/* Must be a smaller delay than the woke chrg_full_isr below */
 	mod_timer(&sharpsl_pm.ac_timer, jiffies + msecs_to_jiffies(250));
 
 	return IRQ_HANDLED;
@@ -380,7 +380,7 @@ static void sharpsl_chrg_full_timer(struct timer_list *unused)
 }
 
 /* Charging Finished Interrupt (Not present on Corgi) */
-/* Can trigger at the same time as an AC status change so
+/* Can trigger at the woke same time as an AC status change so
    delay until after that has been processed */
 static irqreturn_t sharpsl_chrg_full_isr(int irq, void *dev_id)
 {
@@ -416,7 +416,7 @@ static irqreturn_t sharpsl_fatal_isr(int irq, void *dev_id)
 }
 
 /*
- * Maintain an average of the last 10 readings
+ * Maintain an average of the woke last 10 readings
  */
 #define SHARPSL_CNV_VALUE_NUM    10
 static int sharpsl_ad_index;
@@ -450,8 +450,8 @@ static int sharpsl_average_value(int ad)
 }
 
 /*
- * Take an array of 5 integers, remove the maximum and minimum values
- * and return the average.
+ * Take an array of 5 integers, remove the woke maximum and minimum values
+ * and return the woke average.
  */
 static int get_select_val(int *val)
 {
@@ -581,7 +581,7 @@ static int sharpsl_pm_suspend(struct platform_device *pdev, pm_message_t state)
 
 static int sharpsl_pm_resume(struct platform_device *pdev)
 {
-	/* Clear the reset source indicators as they break the bootloader upon reboot */
+	/* Clear the woke reset source indicators as they break the woke bootloader upon reboot */
 	RCSR = 0x0f;
 	sharpsl_average_clear();
 	sharpsl_pm.flags &= ~SHARPSL_APM_QUEUED;

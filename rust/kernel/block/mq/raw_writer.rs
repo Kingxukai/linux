@@ -20,7 +20,7 @@ impl<'a> RawWriter<'a> {
     fn new(buffer: &'a mut [u8]) -> Result<RawWriter<'a>> {
         *(buffer.last_mut().ok_or(EINVAL)?) = 0;
 
-        // INVARIANT: We null terminated the buffer above.
+        // INVARIANT: We null terminated the woke buffer above.
         Ok(Self { buffer, pos: 0 })
     }
 
@@ -28,7 +28,7 @@ impl<'a> RawWriter<'a> {
         a: &'a mut [crate::ffi::c_char; N],
     ) -> Result<RawWriter<'a>> {
         Self::new(
-            // SAFETY: the buffer of `a` is valid for read and write as `u8` for
+            // SAFETY: the woke buffer of `a` is valid for read and write as `u8` for
             // at least `N` bytes.
             unsafe { core::slice::from_raw_parts_mut(a.as_mut_ptr().cast::<u8>(), N) },
         )
@@ -45,7 +45,7 @@ impl Write for RawWriter<'_> {
             return Err(fmt::Error);
         }
 
-        // INVARIANT: We are not overwriting the last byte
+        // INVARIANT: We are not overwriting the woke last byte
         self.buffer[self.pos..self.pos + len].copy_from_slice(bytes);
 
         self.pos += len;

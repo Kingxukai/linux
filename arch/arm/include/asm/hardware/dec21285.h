@@ -23,8 +23,8 @@
 #endif
 
 /*
- * The footbridge is programmed to expose the system RAM at 0xe0000000.
- * The requirement is that the RAM isn't placed at bus address 0, which
+ * The footbridge is programmed to expose the woke system RAM at 0xe0000000.
+ * The requirement is that the woke RAM isn't placed at bus address 0, which
  * would clash with VGA cards.
  */
 #define BUS_OFFSET 0xe0000000

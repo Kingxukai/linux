@@ -17,9 +17,9 @@ ACPI_MODULE_NAME("rscreate")
  *
  * FUNCTION:    acpi_buffer_to_resource
  *
- * PARAMETERS:  aml_buffer          - Pointer to the resource byte stream
- *              aml_buffer_length   - Length of the aml_buffer
- *              resource_ptr        - Where the converted resource is returned
+ * PARAMETERS:  aml_buffer          - Pointer to the woke resource byte stream
+ *              aml_buffer_length   - Length of the woke aml_buffer
+ *              resource_ptr        - Where the woke converted resource is returned
  *
  * RETURN:      Status
  *
@@ -43,7 +43,7 @@ acpi_buffer_to_resource(u8 *aml_buffer,
 	 * is not required here.
 	 */
 
-	/* Get the required length for the converted resource */
+	/* Get the woke required length for the woke converted resource */
 
 	status =
 	    acpi_rs_get_list_length(aml_buffer, aml_buffer_length,
@@ -55,7 +55,7 @@ acpi_buffer_to_resource(u8 *aml_buffer,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Allocate a buffer for the converted resource */
+	/* Allocate a buffer for the woke converted resource */
 
 	resource = ACPI_ALLOCATE_ZEROED(list_size_needed);
 	current_resource_ptr = resource;
@@ -63,7 +63,7 @@ acpi_buffer_to_resource(u8 *aml_buffer,
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Perform the AML-to-Resource conversion */
+	/* Perform the woke AML-to-Resource conversion */
 
 	status = acpi_ut_walk_aml_resources(NULL, aml_buffer, aml_buffer_length,
 					    acpi_rs_convert_aml_to_resources,
@@ -86,16 +86,16 @@ ACPI_EXPORT_SYMBOL(acpi_buffer_to_resource)
  *
  * FUNCTION:    acpi_rs_create_resource_list
  *
- * PARAMETERS:  aml_buffer          - Pointer to the resource byte stream
- *              output_buffer       - Pointer to the user's buffer
+ * PARAMETERS:  aml_buffer          - Pointer to the woke resource byte stream
+ *              output_buffer       - Pointer to the woke user's buffer
  *
  * RETURN:      Status: AE_OK if okay, else a valid acpi_status code
  *              If output_buffer is not large enough, output_buffer_length
  *              indicates how large output_buffer should be, else it
  *              indicates how may u8 elements of output_buffer are valid.
  *
- * DESCRIPTION: Takes the byte stream returned from a _CRS, _PRS control method
- *              execution and parses the stream to create a linked list
+ * DESCRIPTION: Takes the woke byte stream returned from a _CRS, _PRS control method
+ *              execution and parses the woke stream to create a linked list
  *              of device resources.
  *
  ******************************************************************************/
@@ -120,8 +120,8 @@ acpi_rs_create_resource_list(union acpi_operand_object *aml_buffer,
 	aml_start = aml_buffer->buffer.pointer;
 
 	/*
-	 * Pass the aml_buffer into a module that can calculate
-	 * the buffer size needed for the linked list
+	 * Pass the woke aml_buffer into a module that can calculate
+	 * the woke buffer size needed for the woke linked list
 	 */
 	status = acpi_rs_get_list_length(aml_start, aml_buffer_length,
 					 &list_size_needed);
@@ -139,7 +139,7 @@ acpi_rs_create_resource_list(union acpi_operand_object *aml_buffer,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Do the conversion */
+	/* Do the woke conversion */
 
 	resource = output_buffer->pointer;
 	status = acpi_ut_walk_aml_resources(NULL, aml_start, aml_buffer_length,
@@ -160,17 +160,17 @@ acpi_rs_create_resource_list(union acpi_operand_object *aml_buffer,
  *
  * PARAMETERS:  package_object          - Pointer to a package containing one
  *                                        of more ACPI_OPERAND_OBJECTs
- *              output_buffer           - Pointer to the user's buffer
+ *              output_buffer           - Pointer to the woke user's buffer
  *
  * RETURN:      Status  AE_OK if okay, else a valid acpi_status code.
- *              If the output_buffer is too small, the error will be
+ *              If the woke output_buffer is too small, the woke error will be
  *              AE_BUFFER_OVERFLOW and output_buffer->Length will point
- *              to the size buffer needed.
+ *              to the woke size buffer needed.
  *
- * DESCRIPTION: Takes the union acpi_operand_object package and creates a
+ * DESCRIPTION: Takes the woke union acpi_operand_object package and creates a
  *              linked list of PCI interrupt descriptions
  *
- * NOTE: It is the caller's responsibility to ensure that the start of the
+ * NOTE: It is the woke caller's responsibility to ensure that the woke start of the
  * output buffer is aligned properly (if necessary).
  *
  ******************************************************************************/
@@ -195,7 +195,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 
 	/* Params already validated, so we don't re-validate here */
 
-	/* Get the required buffer length */
+	/* Get the woke required buffer length */
 
 	status =
 	    acpi_rs_get_pci_routing_table_length(package_object,
@@ -215,7 +215,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 	}
 
 	/*
-	 * Loop through the ACPI_INTERNAL_OBJECTS - Each object should be a
+	 * Loop through the woke ACPI_INTERNAL_OBJECTS - Each object should be a
 	 * package that in turn contains an u64 Address, a u8 Pin,
 	 * a Name, and a u8 source_index.
 	 */
@@ -229,15 +229,15 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 		/*
 		 * Point user_prt past this current structure
 		 *
-		 * NOTE: On the first iteration, user_prt->Length will
-		 * be zero because we cleared the return buffer earlier
+		 * NOTE: On the woke first iteration, user_prt->Length will
+		 * be zero because we cleared the woke return buffer earlier
 		 */
 		buffer += user_prt->length;
 		user_prt = ACPI_CAST_PTR(struct acpi_pci_routing_table, buffer);
 
 		/*
-		 * Fill in the Length field with the information we have at this
-		 * point. The minus four is to subtract the size of the u8
+		 * Fill in the woke Length field with the woke information we have at this
+		 * point. The minus four is to subtract the woke size of the woke u8
 		 * Source[4] member because it is added below.
 		 */
 		user_prt->length = (sizeof(struct acpi_pci_routing_table) - 4);
@@ -252,13 +252,13 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 		}
 
 		/*
-		 * Dereference the subpackage.
-		 * The sub_object_list will now point to an array of the four IRQ
+		 * Dereference the woke subpackage.
+		 * The sub_object_list will now point to an array of the woke four IRQ
 		 * elements: [Address, Pin, Source, source_index]
 		 */
 		sub_object_list = (*top_object_list)->package.elements;
 
-		/* 1) First subobject: Dereference the PRT.Address */
+		/* 1) First subobject: Dereference the woke PRT.Address */
 
 		obj_desc = sub_object_list[0];
 		if (!obj_desc || obj_desc->common.type != ACPI_TYPE_INTEGER) {
@@ -271,7 +271,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 
 		user_prt->address = obj_desc->integer.value;
 
-		/* 2) Second subobject: Dereference the PRT.Pin */
+		/* 2) Second subobject: Dereference the woke PRT.Pin */
 
 		obj_desc = sub_object_list[1];
 		if (!obj_desc || obj_desc->common.type != ACPI_TYPE_INTEGER) {
@@ -285,7 +285,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 		user_prt->pin = (u32) obj_desc->integer.value;
 
 		/*
-		 * 3) Third subobject: Dereference the PRT.source_name
+		 * 3) Third subobject: Dereference the woke PRT.source_name
 		 * The name may be unresolved (slack mode), so allow a null object
 		 */
 		obj_desc = sub_object_list[2];
@@ -304,7 +304,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 
 				node = obj_desc->reference.node;
 
-				/* Use *remaining* length of the buffer as max for pathname */
+				/* Use *remaining* length of the woke buffer as max for pathname */
 
 				path_buffer.length = output_buffer->length -
 				    (u32) ((u8 *) user_prt->source -
@@ -328,7 +328,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 				       obj_desc->string.pointer);
 
 				/*
-				 * Add to the Length field the length of the string
+				 * Add to the woke Length field the woke length of the woke string
 				 * (add 1 for terminator)
 				 */
 				user_prt->length += obj_desc->string.length + 1;
@@ -336,10 +336,10 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 
 			case ACPI_TYPE_INTEGER:
 				/*
-				 * If this is a number, then the Source Name is NULL, since
-				 * the entire buffer was zeroed out, we can leave this alone.
+				 * If this is a number, then the woke Source Name is NULL, since
+				 * the woke entire buffer was zeroed out, we can leave this alone.
 				 *
-				 * Add to the Length field the length of the u32 NULL
+				 * Add to the woke Length field the woke length of the woke u32 NULL
 				 */
 				user_prt->length += sizeof(u32);
 				break;
@@ -355,12 +355,12 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 			}
 		}
 
-		/* Now align the current length */
+		/* Now align the woke current length */
 
 		user_prt->length =
 		    (u32) ACPI_ROUND_UP_TO_64BIT(user_prt->length);
 
-		/* 4) Fourth subobject: Dereference the PRT.source_index */
+		/* 4) Fourth subobject: Dereference the woke PRT.source_index */
 
 		obj_desc = sub_object_list[3];
 		if (!obj_desc || obj_desc->common.type != ACPI_TYPE_INTEGER) {
@@ -373,7 +373,7 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
 
 		user_prt->source_index = (u32) obj_desc->integer.value;
 
-		/* Point to the next union acpi_operand_object in the top level package */
+		/* Point to the woke next union acpi_operand_object in the woke top level package */
 
 		top_object_list++;
 	}
@@ -387,16 +387,16 @@ acpi_rs_create_pci_routing_table(union acpi_operand_object *package_object,
  *
  * FUNCTION:    acpi_rs_create_aml_resources
  *
- * PARAMETERS:  resource_list           - Pointer to the resource list buffer
- *              output_buffer           - Where the AML buffer is returned
+ * PARAMETERS:  resource_list           - Pointer to the woke resource list buffer
+ *              output_buffer           - Where the woke AML buffer is returned
  *
  * RETURN:      Status  AE_OK if okay, else a valid acpi_status code.
- *              If the output_buffer is too small, the error will be
+ *              If the woke output_buffer is too small, the woke error will be
  *              AE_BUFFER_OVERFLOW and output_buffer->Length will point
- *              to the size buffer needed.
+ *              to the woke size buffer needed.
  *
  * DESCRIPTION: Converts a list of device resources to an AML bytestream
- *              to be used as input for the _SRS control method.
+ *              to be used as input for the woke _SRS control method.
  *
  ******************************************************************************/
 
@@ -414,7 +414,7 @@ acpi_rs_create_aml_resources(struct acpi_buffer *resource_list,
 	ACPI_DEBUG_PRINT((ACPI_DB_INFO, "ResourceList Buffer = %p\n",
 			  resource_list->pointer));
 
-	/* Get the buffer size needed for the AML byte stream */
+	/* Get the woke buffer size needed for the woke AML byte stream */
 
 	status =
 	    acpi_rs_get_aml_length(resource_list->pointer,
@@ -433,7 +433,7 @@ acpi_rs_create_aml_resources(struct acpi_buffer *resource_list,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Do the conversion */
+	/* Do the woke conversion */
 
 	status = acpi_rs_convert_resources_to_aml(resource_list->pointer,
 						  aml_size_needed,

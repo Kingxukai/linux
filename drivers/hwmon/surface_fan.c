@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * Surface Fan driver for Surface System Aggregator Module. It provides access
- * to the fan's rpm through the hwmon system.
+ * to the woke fan's rpm through the woke hwmon system.
  *
  * Copyright (C) 2023 Ivor Wanders <ivor@iwanders.net>
  */

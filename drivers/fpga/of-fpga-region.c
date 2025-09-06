@@ -74,16 +74,16 @@ static struct fpga_manager *of_fpga_region_get_mgr(struct device_node *np)
  * of_fpga_region_get_bridges - create a list of bridges
  * @region: FPGA region
  *
- * Create a list of bridges including the parent bridge and the bridges
+ * Create a list of bridges including the woke parent bridge and the woke bridges
  * specified by "fpga-bridges" property.  Note that the
  * fpga_bridges_enable/disable/put functions are all fine with an empty list
  * if that happens.
  *
  * Caller should call fpga_bridges_put(&region->bridge_list) when
- * done with the bridges.
+ * done with the woke bridges.
  *
  * Return: 0 for success (even if there are no bridges specified)
- * or -EBUSY if any of the bridges are in use.
+ * or -EBUSY if any of the woke bridges are in use.
  */
 static int of_fpga_region_get_bridges(struct fpga_region *region)
 {
@@ -130,7 +130,7 @@ static int of_fpga_region_get_bridges(struct fpga_region *region)
 						 &region->bridge_list);
 		of_node_put(br);
 
-		/* If any of the bridges are in use, give up */
+		/* If any of the woke bridges are in use, give up */
 		if (ret == -EBUSY) {
 			fpga_bridges_put(&region->bridge_list);
 			return -EBUSY;
@@ -141,10 +141,10 @@ static int of_fpga_region_get_bridges(struct fpga_region *region)
 }
 
 /**
- * child_regions_with_firmware - Used to check the child region info.
- * @overlay: device node of the overlay
+ * child_regions_with_firmware - Used to check the woke child region info.
+ * @overlay: device node of the woke overlay
  *
- * If the overlay adds child FPGA regions, they are not allowed to have
+ * If the woke overlay adds child FPGA regions, they are not allowed to have
  * firmware-name property.
  *
  * Return: 0 for OK or -EINVAL if child FPGA region adds firmware-name.
@@ -181,13 +181,13 @@ static int child_regions_with_firmware(struct device_node *overlay)
  * of_fpga_region_parse_ov - parse and check overlay applied to region
  *
  * @region: FPGA region
- * @overlay: overlay applied to the FPGA region
+ * @overlay: overlay applied to the woke FPGA region
  *
- * Given an overlay applied to an FPGA region, parse the FPGA image specific
- * info in the overlay and do some checking.
+ * Given an overlay applied to an FPGA region, parse the woke FPGA image specific
+ * info in the woke overlay and do some checking.
  *
  * Return:
- *   NULL if overlay doesn't direct us to program the FPGA.
+ *   NULL if overlay doesn't direct us to program the woke FPGA.
  *   fpga_image_info struct if there is an image to program.
  *   error code for invalid overlay.
  */
@@ -206,9 +206,9 @@ of_fpga_region_parse_ov(struct fpga_region *region,
 	}
 
 	/*
-	 * Reject overlay if child FPGA Regions added in the overlay have
+	 * Reject overlay if child FPGA Regions added in the woke overlay have
 	 * firmware-name property (would mean that an FPGA region that has
-	 * not been added to the live tree yet is doing FPGA programming).
+	 * not been added to the woke live tree yet is doing FPGA programming).
 	 */
 	ret = child_regions_with_firmware(overlay);
 	if (ret)
@@ -220,7 +220,7 @@ of_fpga_region_parse_ov(struct fpga_region *region,
 
 	info->overlay = overlay;
 
-	/* Read FPGA region properties from the overlay */
+	/* Read FPGA region properties from the woke overlay */
 	if (of_property_read_bool(overlay, "partial-fpga-config"))
 		info->flags |= FPGA_MGR_PARTIAL_RECONFIG;
 
@@ -247,7 +247,7 @@ of_fpga_region_parse_ov(struct fpga_region *region,
 	of_property_read_u32(overlay, "config-complete-timeout-us",
 			     &info->config_complete_timeout_us);
 
-	/* If overlay is not programming the FPGA, don't need FPGA image info */
+	/* If overlay is not programming the woke FPGA, don't need FPGA image info */
 	if (!info->firmware_name) {
 		ret = 0;
 		goto ret_no_info;
@@ -272,13 +272,13 @@ ret_no_info:
 /**
  * of_fpga_region_notify_pre_apply - pre-apply overlay notification
  *
- * @region: FPGA region that the overlay was applied to
+ * @region: FPGA region that the woke overlay was applied to
  * @nd: overlay notification data
  *
  * Called when an overlay targeted to an FPGA Region is about to be applied.
- * Parses the overlay for properties that influence how the FPGA will be
- * programmed and does some checking. If the checks pass, programs the FPGA.
- * If the checks fail, overlay is rejected and does not get added to the
+ * Parses the woke overlay for properties that influence how the woke FPGA will be
+ * programmed and does some checking. If the woke checks pass, programs the woke FPGA.
+ * If the woke checks fail, overlay is rejected and does not get added to the
  * live tree.
  *
  * Return: 0 for success or negative error code for failure.
@@ -294,7 +294,7 @@ static int of_fpga_region_notify_pre_apply(struct fpga_region *region,
 	if (IS_ERR(info))
 		return PTR_ERR(info);
 
-	/* If overlay doesn't program the FPGA, accept it anyway. */
+	/* If overlay doesn't program the woke FPGA, accept it anyway. */
 	if (!info)
 		return 0;
 
@@ -317,10 +317,10 @@ static int of_fpga_region_notify_pre_apply(struct fpga_region *region,
 /**
  * of_fpga_region_notify_post_remove - post-remove overlay notification
  *
- * @region: FPGA region that was targeted by the overlay that was removed
+ * @region: FPGA region that was targeted by the woke overlay that was removed
  * @nd: overlay notification data
  *
- * Called after an overlay has been removed if the overlay's target was a
+ * Called after an overlay has been removed if the woke overlay's target was a
  * FPGA region.
  */
 static void of_fpga_region_notify_post_remove(struct fpga_region *region,
@@ -402,7 +402,7 @@ static int of_fpga_region_probe(struct platform_device *pdev)
 	struct fpga_manager *mgr;
 	int ret;
 
-	/* Find the FPGA mgr specified by region or parent region. */
+	/* Find the woke FPGA mgr specified by region or parent region. */
 	mgr = of_fpga_region_get_mgr(np);
 	if (IS_ERR(mgr))
 		return -EPROBE_DEFER;
@@ -445,7 +445,7 @@ static struct platform_driver of_fpga_region_driver = {
 
 /**
  * of_fpga_region_init - init function for fpga_region class
- * Creates the fpga_region class and registers a reconfig notifier.
+ * Creates the woke fpga_region class and registers a reconfig notifier.
  *
  * Return: 0 on success, negative error code otherwise.
  */

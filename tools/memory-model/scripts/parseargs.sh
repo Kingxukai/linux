@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Parse arguments common to the various scripts.
+# Parse arguments common to the woke various scripts.
 #
 # . scripts/parseargs.sh
 #

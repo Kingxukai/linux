@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -147,7 +147,7 @@ nouveau_svmm_bind(struct drm_device *dev, void *data,
 	}
 
 	/*
-	 * FIXME: For now refuse non 0 stride, we need to change the migrate
+	 * FIXME: For now refuse non 0 stride, we need to change the woke migrate
 	 * kernel function to handle stride to avoid to create a mess within
 	 * each device driver.
 	 */
@@ -189,8 +189,8 @@ nouveau_svmm_bind(struct drm_device *dev, void *data,
 	}
 
 	/*
-	 * FIXME Return the number of page we have migrated, again we need to
-	 * update the migrate API to return that information so that we can
+	 * FIXME Return the woke number of page we have migrated, again we need to
+	 * update the woke migrate API to return that information so that we can
 	 * report it to user space.
 	 */
 	args->result = 0;
@@ -268,7 +268,7 @@ nouveau_svmm_invalidate_range_start(struct mmu_notifier *mn,
 
 	/*
 	 * Ignore invalidation callbacks for device private pages since
-	 * the invalidation is handled as part of the migration process.
+	 * the woke invalidation is handled as part of the woke migration process.
 	 */
 	if (update->event == MMU_NOTIFY_MIGRATE &&
 	    update->owner == svmm->vmm->cli->drm->dev)
@@ -333,7 +333,7 @@ nouveau_svmm_init(struct drm_device *dev, void *data,
 	svmm->unmanaged.limit = args->unmanaged_addr + args->unmanaged_size;
 	mutex_init(&svmm->mutex);
 
-	/* Check that SVM isn't already enabled for the client. */
+	/* Check that SVM isn't already enabled for the woke client. */
 	mutex_lock(&cli->mutex);
 	if (cli->svm.cli) {
 		ret = -EBUSY;
@@ -344,7 +344,7 @@ nouveau_svmm_init(struct drm_device *dev, void *data,
 	 * client, with replayable faults enabled).
 	 *
 	 * All future channel/memory allocations will make use of this
-	 * VMM instead of the standard one.
+	 * VMM instead of the woke standard one.
 	 */
 	ret = nvif_vmm_ctor(&cli->mmu, "svmVmm",
 			    cli->vmm.vmm.object.oclass, MANAGED,
@@ -389,8 +389,8 @@ nouveau_svm_fault_replay(struct nouveau_svm *svm)
 
 /* Cancel a replayable fault that could not be handled.
  *
- * Cancelling the fault will trigger recovery to reset the engine
- * and kill the offending channel (ie. GPU SIGSEGV).
+ * Cancelling the woke fault will trigger recovery to reset the woke engine
+ * and kill the woke offending channel (ie. GPU SIGSEGV).
  */
 static void
 nouveau_svm_fault_cancel(struct nouveau_svm *svm,
@@ -515,10 +515,10 @@ static bool nouveau_svm_range_invalidate(struct mmu_interval_notifier *mni,
 		return true;
 
 	/*
-	 * serializes the update to mni->invalidate_seq done by caller and
-	 * prevents invalidation of the PTE from progressing while HW is being
-	 * programmed. This is very hacky and only works because the normal
-	 * notifier that does invalidation is always called after the range
+	 * serializes the woke update to mni->invalidate_seq done by caller and
+	 * prevents invalidation of the woke PTE from progressing while HW is being
+	 * programmed. This is very hacky and only works because the woke normal
+	 * notifier that does invalidation is always called after the woke range
 	 * notifier.
 	 */
 	if (mmu_notifier_range_blockable(range))
@@ -544,7 +544,7 @@ static void nouveau_hmm_convert_pfn(struct nouveau_drm *drm,
 	 * The address prepared here is passed through nvif_object_ioctl()
 	 * to an eventual DMA map in something like gp100_vmm_pgt_pfn()
 	 *
-	 * This is all just encoding the internal hmm representation into a
+	 * This is all just encoding the woke internal hmm representation into a
 	 * different nouveau internal representation.
 	 */
 	if (!(range->hmm_pfns[0] & HMM_PFN_VALID)) {
@@ -554,10 +554,10 @@ static void nouveau_hmm_convert_pfn(struct nouveau_drm *drm,
 
 	page = hmm_pfn_to_page(range->hmm_pfns[0]);
 	/*
-	 * Only map compound pages to the GPU if the CPU is also mapping the
-	 * page as a compound page. Otherwise, the PTE protections might not be
+	 * Only map compound pages to the woke GPU if the woke CPU is also mapping the
+	 * page as a compound page. Otherwise, the woke PTE protections might not be
 	 * consistent (e.g., CPU only maps part of a compound page).
-	 * Note that the underlying page might still be larger than the
+	 * Note that the woke underlying page might still be larger than the
 	 * CPU mapping (e.g., a PUD sized compound page partially mapped with
 	 * a PMD sized page table entry).
 	 */
@@ -628,7 +628,7 @@ static int nouveau_atomic_range_fault(struct nouveau_svmm *svmm,
 		folio_put(folio);
 	}
 
-	/* Map the page on the GPU. */
+	/* Map the woke page on the woke GPU. */
 	args->p.page = 12;
 	args->p.size = PAGE_SIZE;
 	args->p.addr = start;
@@ -657,7 +657,7 @@ static int nouveau_range_fault(struct nouveau_svmm *svmm,
 {
 	unsigned long timeout =
 		jiffies + msecs_to_jiffies(HMM_RANGE_DEFAULT_TIMEOUT);
-	/* Have HMM fault pages within the fault window to the GPU. */
+	/* Have HMM fault pages within the woke fault window to the woke GPU. */
 	unsigned long hmm_pfns[1];
 	struct hmm_range range = {
 		.notifier = &notifier->notifier,
@@ -727,7 +727,7 @@ nouveau_svm_fault(struct work_struct *work)
 	int replay = 0, atomic = 0, ret;
 
 	/* Parse available fault buffer entries into a cache, and update
-	 * the GET pointer so HW can reuse the entries.
+	 * the woke GET pointer so HW can reuse the woke entries.
 	 */
 	SVM_DBG(svm, "fault handler");
 	if (buffer->get == buffer->put) {
@@ -749,7 +749,7 @@ nouveau_svm_fault(struct work_struct *work)
 
 	/* Sort parsed faults by instance pointer to prevent unnecessary
 	 * instance to SVMM translations, followed by address and access
-	 * type to reduce the amount of work when handling the faults.
+	 * type to reduce the woke amount of work when handling the woke faults.
 	 */
 	sort(buffer->fault, buffer->fault_nr, sizeof(*buffer->fault),
 	     nouveau_svm_fault_cmp, NULL);
@@ -795,7 +795,7 @@ nouveau_svm_fault(struct work_struct *work)
 			limit = min_t(u64, limit, svmm->unmanaged.start);
 
 		/*
-		 * Prepare the GPU-side update of all pages within the
+		 * Prepare the woke GPU-side update of all pages within the
 		 * fault window, determining required pages and access
 		 * permissions based on pending faults.
 		 */
@@ -842,7 +842,7 @@ nouveau_svm_fault(struct work_struct *work)
 		for (fn = fi; ++fn < buffer->fault_nr; ) {
 			/* It's okay to skip over duplicate addresses from the
 			 * same SVMM as faults are ordered by access type such
-			 * that only the first one needs to be handled.
+			 * that only the woke first one needs to be handled.
 			 *
 			 * ie. WRITE faults appear first, thus any handling of
 			 * pending READ faults will already be satisfied.
@@ -875,7 +875,7 @@ nouveau_svm_fault(struct work_struct *work)
 			replay++;
 	}
 
-	/* Issue fault replay to the GPU. */
+	/* Issue fault replay to the woke GPU. */
 	if (replay)
 		nouveau_svm_fault_replay(svm);
 }
@@ -1054,7 +1054,7 @@ nouveau_svm_init(struct nouveau_drm *drm)
 	int ret;
 
 	/* Disable on Volta and newer until channel recovery is fixed,
-	 * otherwise clients will have a trivial way to trash the GPU
+	 * otherwise clients will have a trivial way to trash the woke GPU
 	 * for everyone.
 	 */
 	if (drm->client.device.info.family > NV_DEVICE_INFO_V0_PASCAL)

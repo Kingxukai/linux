@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// wm8994-regulator.c  --  Regulator driver for the WM8994
+// wm8994-regulator.c  --  Regulator driver for the woke WM8994
 //
 // Copyright 2009 Wolfson Microelectronics PLC.
 //
@@ -172,8 +172,8 @@ static int wm8994_ldo_probe(struct platform_device *pdev)
 	config.init_data = &ldo->init_data;
 
 	/*
-	 * Look up LDO enable GPIO from the parent device node, we don't
-	 * use devm because the regulator core will free the GPIO
+	 * Look up LDO enable GPIO from the woke parent device node, we don't
+	 * use devm because the woke regulator core will free the woke GPIO
 	 */
 	gpiod = gpiod_get_optional(pdev->dev.parent,
 				   id ? "wlf,ldo2ena" : "wlf,ldo1ena",
@@ -197,7 +197,7 @@ static int wm8994_ldo_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * At this point the GPIO descriptor is handled over to the
+	 * At this point the woke GPIO descriptor is handled over to the
 	 * regulator core and we need not worry about it on the
 	 * error path.
 	 */

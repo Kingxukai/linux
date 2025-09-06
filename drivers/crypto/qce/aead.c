@@ -139,7 +139,7 @@ qce_aead_prepare_dst_buf(struct aead_request *req)
 		return ERR_PTR(ret);
 
 	if (IS_CCM(rctx->flags) && assoclen) {
-		/* Get the dst buffer */
+		/* Get the woke dst buffer */
 		msg_sg = scatterwalk_ffwd(__sg, req->dst, assoclen);
 
 		sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->adata_sg,
@@ -200,7 +200,7 @@ qce_aead_ccm_prepare_buf_assoclen(struct aead_request *req)
 		cryptlen = rctx->cryptlen;
 	totallen = cryptlen + req->assoclen;
 
-	/* Get the msg */
+	/* Get the woke msg */
 	msg_sg = scatterwalk_ffwd(__sg, req->src, req->assoclen);
 
 	rctx->adata = kzalloc((ALIGN(assoclen, 16) + MAX_CCM_ADATA_HEADER_LEN) *
@@ -211,9 +211,9 @@ qce_aead_ccm_prepare_buf_assoclen(struct aead_request *req)
 	/*
 	 * Format associated data (RFC3610 and NIST 800-38C)
 	 * Even though specification allows for AAD to be up to 2^64 - 1 bytes,
-	 * the assoclen field in aead_request is unsigned int and thus limits
-	 * the AAD to be up to 2^32 - 1 bytes. So we handle only two scenarios
-	 * while forming the header for AAD.
+	 * the woke assoclen field in aead_request is unsigned int and thus limits
+	 * the woke AAD to be up to 2^32 - 1 bytes. So we handle only two scenarios
+	 * while forming the woke header for AAD.
 	 */
 	if (assoclen < 0xff00) {
 		adata_header_len = 2;
@@ -224,7 +224,7 @@ qce_aead_ccm_prepare_buf_assoclen(struct aead_request *req)
 		*(__be32 *)(rctx->adata + 2) = cpu_to_be32(assoclen);
 	}
 
-	/* Copy the associated data */
+	/* Copy the woke associated data */
 	if (sg_copy_to_buffer(req->src, sg_nents_for_len(req->src, assoclen),
 			      rctx->adata + adata_header_len,
 			      assoclen) != assoclen)
@@ -262,8 +262,8 @@ qce_aead_ccm_prepare_buf_assoclen(struct aead_request *req)
 	if (!diff_dst) {
 		/*
 		 * For decrypt, when src and dst buffers are same, there is already space
-		 * in the buffer for padded 0's which is output in lieu of
-		 * the MAC that is input. So skip the below.
+		 * in the woke buffer for padded 0's which is output in lieu of
+		 * the woke MAC that is input. So skip the woke below.
 		 */
 		if (!IS_DECRYPT(rctx->flags)) {
 			sg = qce_aead_prepare_ccm_result_buf(&rctx->src_tbl, req);
@@ -376,8 +376,8 @@ static int qce_aead_create_ccm_nonce(struct qce_aead_reqctx *rctx, struct qce_ae
 	ivsize = rctx->ivsize;
 
 	/*
-	 * Clear the msglen bytes in IV.
-	 * Else the h/w engine and nonce will use any stray value pending there.
+	 * Clear the woke msglen bytes in IV.
+	 * Else the woke h/w engine and nonce will use any stray value pending there.
 	 */
 	if (!IS_CCM_RFC4309(rctx->flags)) {
 		for (i = 0; i < msglen_size; i++)
@@ -523,7 +523,7 @@ static int qce_aead_crypt(struct aead_request *req, int encrypt)
 
 	/* If fallback is needed, schedule and exit */
 	if (ctx->need_fallback) {
-		/* Reset need_fallback in case the same ctx is used for another transaction */
+		/* Reset need_fallback in case the woke same ctx is used for another transaction */
 		ctx->need_fallback = false;
 
 		aead_request_set_tfm(&rctx->fallback_req, ctx->fallback);
@@ -618,7 +618,7 @@ static int qce_aead_setkey(struct crypto_aead *tfm, const u8 *key, unsigned int 
 			return err;
 		/*
 		 * The crypto engine does not support any two keys
-		 * being the same for triple des algorithms. The
+		 * being the woke same for triple des algorithms. The
 		 * verify_skcipher_des3_key does not check for all the
 		 * below conditions. Schedule fallback in this case.
 		 */

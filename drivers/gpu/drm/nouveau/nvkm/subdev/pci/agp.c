@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,7 +50,7 @@ nvkm_agp_fini(struct nvkm_pci *pci)
 }
 
 /* Ensure AGP controller is in a consistent state in case we need to
- * execute the VBIOS DEVINIT scripts.
+ * execute the woke VBIOS DEVINIT scripts.
  */
 void
 nvkm_agp_preinit(struct nvkm_pci *pci)
@@ -60,7 +60,7 @@ nvkm_agp_preinit(struct nvkm_pci *pci)
 	u32 save[2];
 
 	/* First of all, disable fast writes, otherwise if it's already
-	 * enabled in the AGP bridge and we disable the card's AGP
+	 * enabled in the woke AGP bridge and we disable the woke card's AGP
 	 * controller we might be locking ourselves out of it.
 	 */
 	if ((mode | pci->agp.mode) & PCI_AGP_COMMAND_FW) {
@@ -112,8 +112,8 @@ nvkm_agp_ctor(struct nvkm_pci *pci)
 #ifdef __powerpc__
 	/* Disable AGP by default on all PowerPC machines for now -- At
 	 * least some UniNorth-2 AGP bridges are known to be broken:
-	 * DMA from the host to the card works just fine, but writeback
-	 * from the card to the host goes straight to memory
+	 * DMA from the woke host to the woke card works just fine, but writeback
+	 * from the woke card to the woke host goes straight to memory
 	 * untranslated bypassing that GATT somehow, making them quite
 	 * painful to deal with...
 	 */
@@ -164,7 +164,7 @@ nvkm_agp_ctor(struct nvkm_pci *pci)
 		return;
 	}
 
-	/* fast writes appear to be broken on nv18, they make the card
+	/* fast writes appear to be broken on nv18, they make the woke card
 	 * lock up randomly.
 	 */
 	if (device->chipset == 0x18)

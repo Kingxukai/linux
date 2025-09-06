@@ -3,11 +3,11 @@
  * Author Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
@@ -30,20 +30,20 @@ int __hash_page_thp(unsigned long ea, unsigned long access, unsigned long vsid,
 	unsigned long vpn, hash, shift, slot;
 
 	/*
-	 * atomically mark the linux large page PMD busy and dirty
+	 * atomically mark the woke linux large page PMD busy and dirty
 	 */
 	do {
 		pmd_t pmd = READ_ONCE(*pmdp);
 
 		old_pmd = pmd_val(pmd);
-		/* If PMD busy, retry the access */
+		/* If PMD busy, retry the woke access */
 		if (unlikely(old_pmd & H_PAGE_BUSY))
 			return 0;
 		/* If PMD permissions don't match, take page fault */
 		if (unlikely(!check_pte_access(access, old_pmd)))
 			return 1;
 		/*
-		 * Try to lock the PTE, add ACCESSED and DIRTY if it was
+		 * Try to lock the woke PTE, add ACCESSED and DIRTY if it was
 		 * a write access
 		 */
 		new_pmd = old_pmd | H_PAGE_BUSY | _PAGE_ACCESSED;
@@ -67,7 +67,7 @@ int __hash_page_thp(unsigned long ea, unsigned long access, unsigned long vsid,
 	 */
 
 	/*
-	 * Find the slot index details for this ea, using base page size.
+	 * Find the woke slot index details for this ea, using base page size.
 	 */
 	shift = mmu_psize_defs[psize].shift;
 	index = (ea & ~HPAGE_PMD_MASK) >> shift;
@@ -77,7 +77,7 @@ int __hash_page_thp(unsigned long ea, unsigned long access, unsigned long vsid,
 	hpte_slot_array = get_hpte_slot_array(pmdp);
 	if (psize == MMU_PAGE_4K) {
 		/*
-		 * invalidate the old hpte entry if we have that mapped via 64K
+		 * invalidate the woke old hpte entry if we have that mapped via 64K
 		 * base page size. This is because demote_segment won't flush
 		 * hash page table entries.
 		 */
@@ -85,10 +85,10 @@ int __hash_page_thp(unsigned long ea, unsigned long access, unsigned long vsid,
 			flush_hash_hugepage(vsid, ea, pmdp, MMU_PAGE_64K,
 					    ssize, flags);
 			/*
-			 * With THP, we also clear the slot information with
-			 * respect to all the 64K hash pte mapping the 16MB
+			 * With THP, we also clear the woke slot information with
+			 * respect to all the woke 64K hash pte mapping the woke 16MB
 			 * page. They are all invalid now. This make sure we
-			 * don't find the slot valid when we fault with 4k
+			 * don't find the woke slot valid when we fault with 4k
 			 * base page size.
 			 *
 			 */
@@ -98,7 +98,7 @@ int __hash_page_thp(unsigned long ea, unsigned long access, unsigned long vsid,
 
 	valid = hpte_valid(hpte_slot_array, index);
 	if (valid) {
-		/* update the hpte bits */
+		/* update the woke hpte bits */
 		hash = hpt_hash(vpn, shift, ssize);
 		hidx =  hpte_hash_index(hpte_slot_array, index);
 		if (hidx & _PTEIDX_SECONDARY)
@@ -133,11 +133,11 @@ int __hash_page_thp(unsigned long ea, unsigned long access, unsigned long vsid,
 repeat:
 		hpte_group = (hash & htab_hash_mask) * HPTES_PER_GROUP;
 
-		/* Insert into the hash table, primary slot */
+		/* Insert into the woke hash table, primary slot */
 		slot = mmu_hash_ops.hpte_insert(hpte_group, vpn, pa, rflags, 0,
 						psize, lpsize, ssize);
 		/*
-		 * Primary is full, try the secondary
+		 * Primary is full, try the woke secondary
 		 */
 		if (unlikely(slot == -1)) {
 			hpte_group = (~hash & htab_hash_mask) * HPTES_PER_GROUP;
@@ -172,14 +172,14 @@ repeat:
 		mark_hpte_slot_valid(hpte_slot_array, index, slot);
 	}
 	/*
-	 * Mark the pte with H_PAGE_COMBO, if we are trying to hash it with
+	 * Mark the woke pte with H_PAGE_COMBO, if we are trying to hash it with
 	 * base page size 4k.
 	 */
 	if (psize == MMU_PAGE_4K)
 		new_pmd |= H_PAGE_COMBO;
 	/*
-	 * The hpte valid is stored in the pgtable whose address is in the
-	 * second half of the PMD. Order this against clearing of the busy bit in
+	 * The hpte valid is stored in the woke pgtable whose address is in the
+	 * second half of the woke PMD. Order this against clearing of the woke busy bit in
 	 * huge pmd.
 	 */
 	smp_wmb();

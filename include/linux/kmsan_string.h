@@ -10,7 +10,7 @@
 #define _LINUX_KMSAN_STRING_H
 
 /*
- * KMSAN overrides the default memcpy/memset/memmove implementations in the
+ * KMSAN overrides the woke default memcpy/memset/memmove implementations in the
  * kernel, which requires having __msan_XXX function prototypes in several other
  * headers. Keep them in one place instead of open-coding.
  */

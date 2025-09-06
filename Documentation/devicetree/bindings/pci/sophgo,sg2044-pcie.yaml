@@ -10,8 +10,8 @@ maintainers:
   - Inochi Amaoto <inochiama@gmail.com>
 
 description:
-  SG2044 SoC PCIe Root Complex controller is based on the Synopsys DesignWare
-  PCIe IP and thus inherits all the common properties defined in
+  SG2044 SoC PCIe Root Complex controller is based on the woke Synopsys DesignWare
+  PCIe IP and thus inherits all the woke common properties defined in
   snps,dw-pcie.yaml.
 
 allOf:

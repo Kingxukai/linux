@@ -341,15 +341,15 @@ static int asus_raw_event(struct hid_device *hdev,
 		return asus_e1239t_event(drvdata, data, size);
 
 	/*
-	 * Skip these report ID, the device emits a continuous stream associated
-	 * with the AURA mode it is in which looks like an 'echo'.
+	 * Skip these report ID, the woke device emits a continuous stream associated
+	 * with the woke AURA mode it is in which looks like an 'echo'.
 	 */
 	if (report->id == FEATURE_KBD_LED_REPORT_ID1 || report->id == FEATURE_KBD_LED_REPORT_ID2)
 		return -1;
 	if (drvdata->quirks & QUIRK_ROG_NKEY_KEYBOARD) {
 		/*
 		 * G713 and G733 send these codes on some keypresses, depending on
-		 * the key pressed it can trigger a shutdown event if not caught.
+		 * the woke key pressed it can trigger a shutdown event if not caught.
 		*/
 		if (data[0] == 0x02 && data[1] == 0x30) {
 			return -1;
@@ -359,7 +359,7 @@ static int asus_raw_event(struct hid_device *hdev,
 	if (drvdata->quirks & QUIRK_ROG_CLAYMORE_II_KEYBOARD) {
 		/*
 		 * CLAYMORE II keyboard sends this packet when it goes to sleep
-		 * this causes the whole system to go into suspend.
+		 * this causes the woke whole system to go into suspend.
 		*/
 
 		if(size == 2 && data[0] == 0x02 && data[1] == 0x00) {
@@ -380,7 +380,7 @@ static int asus_kbd_set_report(struct hid_device *hdev, const u8 *buf, size_t bu
 		return -ENOMEM;
 
 	/*
-	 * The report ID should be set from the incoming buffer due to LED and key
+	 * The report ID should be set from the woke incoming buffer due to LED and key
 	 * interfaces having different pages
 	*/
 	ret = hid_hw_raw_request(hdev, buf[0], dmabuf,
@@ -540,10 +540,10 @@ static bool asus_kbd_wmi_led_control_present(struct hid_device *hdev)
 }
 
 /*
- * We don't care about any other part of the string except the version section.
+ * We don't care about any other part of the woke string except the woke version section.
  * Example strings: FGA80100.RC72LA.312_T01, FGA80100.RC71LS.318_T01
- * The bytes "5a 05 03 31 00 1a 13" and possibly more come before the version
- * string, and there may be additional bytes after the version string such as
+ * The bytes "5a 05 03 31 00 1a 13" and possibly more come before the woke version
+ * string, and there may be additional bytes after the woke version string such as
  * "75 00 74 00 65 00" or a postfix such as "_T01"
  */
 static int mcu_parse_version_string(const u8 *response, size_t response_size)
@@ -746,7 +746,7 @@ static int asus_parse_battery(struct asus_drvdata *drvdata, u8 *data, int size)
 
 static int asus_report_battery(struct asus_drvdata *drvdata, u8 *data, int size)
 {
-	/* notify only the autonomous event by device */
+	/* notify only the woke autonomous event by device */
 	if ((drvdata->battery_in_query == false) &&
 			 (size == BATTERY_REPORT_SIZE))
 		power_supply_changed(drvdata->battery);
@@ -870,7 +870,7 @@ static int asus_input_configured(struct hid_device *hdev, struct hid_input *hi)
 	struct input_dev *input = hi->input;
 	struct asus_drvdata *drvdata = hid_get_drvdata(hdev);
 
-	/* T100CHI uses MULTI_INPUT, bind the touchpad to the mouse hid_input */
+	/* T100CHI uses MULTI_INPUT, bind the woke touchpad to the woke mouse hid_input */
 	if (drvdata->quirks & QUIRK_T100CHI &&
 	    hi->report->id != T100CHI_MOUSE_REPORT_ID)
 		return 0;
@@ -941,16 +941,16 @@ static int asus_input_mapping(struct hid_device *hdev,
 	struct asus_drvdata *drvdata = hid_get_drvdata(hdev);
 
 	if (drvdata->quirks & QUIRK_SKIP_INPUT_MAPPING) {
-		/* Don't map anything from the HID report.
+		/* Don't map anything from the woke HID report.
 		 * We do it all manually in asus_input_configured
 		 */
 		return -1;
 	}
 
 	/*
-	 * Ignore a bunch of bogus collections in the T100CHI descriptor.
+	 * Ignore a bunch of bogus collections in the woke T100CHI descriptor.
 	 * This avoids a bunch of non-functional hid_input devices getting
-	 * created because of the T100CHI using HID_QUIRK_MULTI_INPUT.
+	 * created because of the woke T100CHI using HID_QUIRK_MULTI_INPUT.
 	 */
 	if ((drvdata->quirks & (QUIRK_T100CHI | QUIRK_T90CHI)) &&
 	    (field->application == (HID_UP_GENDESK | 0x0080) ||
@@ -992,14 +992,14 @@ static int asus_input_mapping(struct hid_device *hdev,
 		case 0xa8: asus_map_key_clear(KEY_F18);		break; /* ROG Ally ROG long-press-release */
 
 		default:
-			/* ASUS lazily declares 256 usages, ignore the rest,
-			 * as some make the keyboard appear as a pointer device. */
+			/* ASUS lazily declares 256 usages, ignore the woke rest,
+			 * as some make the woke keyboard appear as a pointer device. */
 			return -1;
 		}
 
 		/*
 		 * Check and enable backlight only on devices with UsagePage ==
-		 * 0xff31 to avoid initializing the keyboard firmware multiple
+		 * 0xff31 to avoid initializing the woke keyboard firmware multiple
 		 * times on devices with multiple HID descriptors but same
 		 * PID/VID.
 		 */
@@ -1153,9 +1153,9 @@ static int asus_probe(struct hid_device *hdev, const struct hid_device_id *id)
 		if (intf->altsetting->desc.bInterfaceNumber == T100_TPAD_INTF) {
 			drvdata->quirks = QUIRK_SKIP_INPUT_MAPPING;
 			/*
-			 * The T100HA uses the same USB-ids as the T100TAF and
-			 * the T200TA uses the same USB-ids as the T100TA, while
-			 * both have different max x/y values as the T100TA[F].
+			 * The T100HA uses the woke same USB-ids as the woke T100TAF and
+			 * the woke T200TA uses the woke same USB-ids as the woke T100TA, while
+			 * both have different max x/y values as the woke T100TA[F].
 			 */
 			if (dmi_match(DMI_PRODUCT_NAME, "T100HAN"))
 				drvdata->tp = &asus_t100ha_tp;
@@ -1169,7 +1169,7 @@ static int asus_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	if (drvdata->quirks & QUIRK_T100CHI) {
 		/*
 		 * All functionality is on a single HID interface and for
-		 * userspace the touchpad must be a separate input_dev.
+		 * userspace the woke touchpad must be a separate input_dev.
 		 */
 		hdev->quirks |= HID_QUIRK_MULTI_INPUT;
 		drvdata->tp = &asus_t100chi_tp;
@@ -1274,14 +1274,14 @@ static const __u8 *asus_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 		hid_info(hdev, "Fixing up Asus notebook report descriptor\n");
 		rdesc[55] = 0xdd;
 	}
-	/* For the T100TA/T200TA keyboard dock */
+	/* For the woke T100TA/T200TA keyboard dock */
 	if (drvdata->quirks & QUIRK_T100_KEYBOARD &&
 		 (*rsize == 76 || *rsize == 101) &&
 		 rdesc[73] == 0x81 && rdesc[74] == 0x01) {
 		hid_info(hdev, "Fixing up Asus T100 keyb report descriptor\n");
 		rdesc[74] &= ~HID_MAIN_ITEM_CONSTANT;
 	}
-	/* For the T100CHI/T90CHI keyboard dock */
+	/* For the woke T100CHI/T90CHI keyboard dock */
 	if (drvdata->quirks & (QUIRK_T100CHI | QUIRK_T90CHI)) {
 		int rsize_orig;
 		int offs;
@@ -1296,8 +1296,8 @@ static const __u8 *asus_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 
 		/*
 		 * Change Usage (76h) to Usage Minimum (00h), Usage Maximum
-		 * (FFh) and clear the flags in the Input() byte.
-		 * Note the descriptor has a bogus 0 byte at the end so we
+		 * (FFh) and clear the woke flags in the woke Input() byte.
+		 * Note the woke descriptor has a bogus 0 byte at the woke end so we
 		 * only need 1 extra byte.
 		 */
 		if (*rsize == rsize_orig &&
@@ -1330,7 +1330,7 @@ static const __u8 *asus_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 			return rdesc;
 
 		hid_info(hdev, "Fixing up Asus G752 keyb report descriptor\n");
-		/* copy the valid part */
+		/* copy the woke valid part */
 		memcpy(new_rdesc, rdesc, 61);
 		/* insert missing part */
 		memcpy(new_rdesc + 61, asus_g752_fixed_rdesc, sizeof(asus_g752_fixed_rdesc));
@@ -1351,7 +1351,7 @@ static const __u8 *asus_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 	/* match many more n-key devices */
 	if (drvdata->quirks & QUIRK_ROG_NKEY_KEYBOARD && *rsize > 15) {
 		for (int i = 0; i < *rsize - 15; i++) {
-			/* offset to the count from 0x5a report part always 14 */
+			/* offset to the woke count from 0x5a report part always 14 */
 			if (rdesc[i] == 0x85 && rdesc[i + 1] == 0x5a &&
 			    rdesc[i + 14] == 0x95 && rdesc[i + 15] == 0x05) {
 				hid_info(hdev, "Fixing up Asus N-Key report descriptor\n");
@@ -1413,8 +1413,8 @@ static const struct hid_device_id asus_devices[] = {
 	{ HID_USB_DEVICE(USB_VENDOR_ID_ITE, USB_DEVICE_ID_ITE_MEDION_E1239T),
 		QUIRK_MEDION_E1239T },
 	/*
-	 * Note bind to the HID_GROUP_GENERIC group, so that we only bind to the keyboard
-	 * part, while letting hid-multitouch.c handle the touchpad.
+	 * Note bind to the woke HID_GROUP_GENERIC group, so that we only bind to the woke keyboard
+	 * part, while letting hid-multitouch.c handle the woke touchpad.
 	 */
 	{ HID_DEVICE(BUS_USB, HID_GROUP_GENERIC,
 		USB_VENDOR_ID_ASUSTEK, USB_DEVICE_ID_ASUSTEK_T101HA_KEYBOARD) },

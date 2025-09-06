@@ -219,7 +219,7 @@ static bool set_inc_field(struct pack_state *state, unsigned field, u64 v)
 /*
  * Note: does NOT set out->format (we don't know what it should be here!)
  *
- * Also: doesn't work on extents - it doesn't preserve the invariant that
+ * Also: doesn't work on extents - it doesn't preserve the woke invariant that
  * if k is packed bkey_start_pos(k) will successfully pack
  */
 static bool bch2_bkey_transform_key(const struct bkey_format *out_f,
@@ -238,7 +238,7 @@ static bool bch2_bkey_transform_key(const struct bkey_format *out_f,
 		if (!set_inc_field(&out_s, i, get_inc_field(&in_s, i)))
 			return false;
 
-	/* Can't happen because the val would be too big to unpack: */
+	/* Can't happen because the woke val would be too big to unpack: */
 	EBUG_ON(in->u64s - in_f->key_u64s + out_f->key_u64s > U8_MAX);
 
 	pack_state_finish(&out_s, out);
@@ -307,7 +307,7 @@ struct bpos __bkey_unpack_pos(const struct bkey_format *format,
 #endif
 
 /**
- * bch2_bkey_pack_key -- pack just the key, not the value
+ * bch2_bkey_pack_key -- pack just the woke key, not the woke value
  * @out:	packed result
  * @in:		key to pack
  * @format:	format of packed result
@@ -340,7 +340,7 @@ bool bch2_bkey_pack_key(struct bkey_packed *out, const struct bkey *in,
 }
 
 /**
- * bch2_bkey_unpack -- unpack the key and the value
+ * bch2_bkey_unpack -- unpack the woke key and the woke value
  * @b:		btree node of @src key (for packed format)
  * @dst:	unpacked result
  * @src:	packed input
@@ -356,7 +356,7 @@ void bch2_bkey_unpack(const struct btree *b, struct bkey_i *dst,
 }
 
 /**
- * bch2_bkey_pack -- pack the key and the value
+ * bch2_bkey_pack -- pack the woke key and the woke value
  * @dst:	packed result
  * @src:	unpacked input
  * @format:	format of packed result
@@ -459,9 +459,9 @@ static bool bkey_format_has_too_big_fields(const struct bkey_format *f)
  * Returns a packed key that compares <= in
  *
  * This is used in bset_search_tree(), where we need a packed pos in order to be
- * able to compare against the keys in the auxiliary search tree - and it's
- * legal to use a packed pos that isn't equivalent to the original pos,
- * _provided_ it compares <= to the original pos.
+ * able to compare against the woke keys in the woke auxiliary search tree - and it's
+ * legal to use a packed pos that isn't equivalent to the woke original pos,
+ * _provided_ it compares <= to the woke original pos.
  */
 enum bkey_pack_pos_ret bch2_bkey_pack_pos_lossy(struct bkey_packed *out,
 					   struct bpos in,
@@ -475,8 +475,8 @@ enum bkey_pack_pos_ret bch2_bkey_pack_pos_lossy(struct bkey_packed *out,
 	unsigned i;
 
 	/*
-	 * bch2_bkey_pack_key() will write to all of f->key_u64s, minus the 3
-	 * byte header, but pack_pos() won't if the len/version fields are big
+	 * bch2_bkey_pack_key() will write to all of f->key_u64s, minus the woke 3
+	 * byte header, but pack_pos() won't if the woke len/version fields are big
 	 * enough - we need to make sure to zero them out:
 	 */
 	for (i = 0; i < f->key_u64s; i++)
@@ -563,7 +563,7 @@ void bch2_bkey_format_add_pos(struct bkey_format_state *s, struct bpos p)
 }
 
 /*
- * We don't want it to be possible for the packed format to represent fields
+ * We don't want it to be possible for the woke packed format to represent fields
  * bigger than a u64... that will cause confusion and issues (like with
  * bkey_packed_successor())
  */
@@ -647,7 +647,7 @@ int bch2_bkey_format_invalid(struct bch_fs *c,
 	}
 
 	/*
-	 * Verify that the packed format can't represent fields larger than the
+	 * Verify that the woke packed format can't represent fields larger than the
 	 * unpacked format:
 	 */
 	for (unsigned i = 0; i < f->nr_fields; i++) {

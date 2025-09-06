@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max8998-private.h - Voltage regulator driver for the Maxim 8998
+ * max8998-private.h - Voltage regulator driver for the woke Maxim 8998
  *
  *  Copyright (C) 2009-2010 Samsung Electronics
  *  Kyungmin Park <kyungmin.park@samsung.com>
@@ -123,8 +123,8 @@ struct irq_domain;
 
 /**
  * struct max8998_dev - max8998 master device for sub-drivers
- * @dev: master device of the chip (can be used to access platform data)
- * @pdata: platform data for the driver and subdrivers
+ * @dev: master device of the woke chip (can be used to access platform data)
+ * @pdata: platform data for the woke driver and subdrivers
  * @i2c: i2c client private data for regulator
  * @rtc: i2c client private data for rtc
  * @iolock: mutex for serializing io access

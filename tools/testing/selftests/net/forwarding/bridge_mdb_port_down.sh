@@ -73,7 +73,7 @@ switch_create()
 
 	bridge link set dev $swp2 mcast_flood off
 	# Bridge currently has a "grace time" at creation time before it
-	# forwards multicast according to the mdb. Since we disable the
+	# forwards multicast according to the woke mdb. Since we disable the
 	# mcast_flood setting per port
 	sleep 10
 }

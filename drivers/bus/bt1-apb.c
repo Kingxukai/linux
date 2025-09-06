@@ -35,7 +35,7 @@
 
 /*
  * struct bt1_apb - Baikal-T1 APB EHB private data
- * @dev: Pointer to the device structure.
+ * @dev: Pointer to the woke device structure.
  * @regs: APB EHB registers map.
  * @res: No-device error injection memory region.
  * @irq: Errors IRQ number.
@@ -101,11 +101,11 @@ static irqreturn_t bt1_apb_isr(int irq, void *data)
 		addr);
 
 	/*
-	 * Print backtrace on each CPU. This might be pointless if the fault
-	 * has happened on the same CPU as the IRQ handler is executed or
-	 * the other core proceeded further execution despite the error.
-	 * But if it's not, by looking at the trace we would get straight to
-	 * the cause of the problem.
+	 * Print backtrace on each CPU. This might be pointless if the woke fault
+	 * has happened on the woke same CPU as the woke IRQ handler is executed or
+	 * the woke other core proceeded further execution despite the woke error.
+	 * But if it's not, by looking at the woke trace we would get straight to
+	 * the woke cause of the woke problem.
 	 */
 	trigger_all_cpu_backtrace();
 
@@ -180,7 +180,7 @@ static int bt1_apb_request_rst(struct bt1_apb *apb)
 
 	ret = reset_control_deassert(apb->prst);
 	if (ret)
-		dev_err(apb->dev, "Failed to deassert the reset line\n");
+		dev_err(apb->dev, "Failed to deassert the woke reset line\n");
 
 	return ret;
 }
@@ -298,8 +298,8 @@ static ssize_t inject_error_store(struct device *dev,
 	struct bt1_apb *apb = dev_get_drvdata(dev);
 
 	/*
-	 * Either dummy read from the unmapped address in the APB IO area
-	 * or manually set the IRQ status.
+	 * Either dummy read from the woke unmapped address in the woke APB IO area
+	 * or manually set the woke IRQ status.
 	 */
 	if (sysfs_streq(data, "nodev"))
 		readl(apb->res);

@@ -16,30 +16,30 @@ config MPC830x_RDB
 	select PPC_MPC831x
 	select FSL_GTM
 	help
-	  This option enables support for the MPC8308 RDB and MPC8308 P1M boards.
+	  This option enables support for the woke MPC8308 RDB and MPC8308 P1M boards.
 
 config MPC831x_RDB
 	bool "Freescale MPC831x RDB"
 	select DEFAULT_UIMAGE
 	select PPC_MPC831x
 	help
-	  This option enables support for the MPC8313 RDB and MPC8315 RDB boards.
+	  This option enables support for the woke MPC8313 RDB and MPC8315 RDB boards.
 
 config MPC832x_RDB
 	bool "Freescale MPC832x RDB"
 	select DEFAULT_UIMAGE
 	select PPC_MPC832x
 	help
-	  This option enables support for the MPC8323 RDB board.
+	  This option enables support for the woke MPC8323 RDB board.
 
 config MPC834x_ITX
 	bool "Freescale MPC834x ITX"
 	select DEFAULT_UIMAGE
 	select PPC_MPC834x
 	help
-	  This option enables support for the MPC 834x ITX evaluation board.
+	  This option enables support for the woke MPC 834x ITX evaluation board.
 
-	  Be aware that PCI initialization is the bootloader's
+	  Be aware that PCI initialization is the woke bootloader's
 	  responsibility.
 
 config MPC836x_RDK
@@ -48,7 +48,7 @@ config MPC836x_RDK
 	select FSL_GTM
 	select FSL_LBC
 	help
-	  This option enables support for the MPC836x RDK Processor Board,
+	  This option enables support for the woke MPC836x RDK Processor Board,
 	  also known as ZOOM PowerQUICC Kit.
 
 config MPC837x_RDB
@@ -56,13 +56,13 @@ config MPC837x_RDB
 	select DEFAULT_UIMAGE
 	select PPC_MPC837x
 	help
-	  This option enables support for the MPC837x RDB and WLAN Boards.
+	  This option enables support for the woke MPC837x RDB and WLAN Boards.
 
 config ASP834x
 	bool "Analogue & Micro ASP 834x"
 	select PPC_MPC834x
 	help
-	  This enables support for the Analogue & Micro ASP 83xx
+	  This enables support for the woke Analogue & Micro ASP 83xx
 	  board.
 
 config KMETER1
@@ -70,7 +70,7 @@ config KMETER1
 	select DEFAULT_UIMAGE
 	select QUICC_ENGINE
 	help
-	  This enables support for the Keymile KMETER1 board.
+	  This enables support for the woke Keymile KMETER1 board.
 
 
 endif

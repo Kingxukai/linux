@@ -308,8 +308,8 @@
 		/*
 		 * At least on Nile's configuration, S3B/S4B (VDD_CX) and
 		 * S5B (VDD_MX) are managed only through RPM Power Domains.
-		 * Trying to set a voltage on the main supply will create
-		 * havoc and freeze the SoC.
+		 * Trying to set a voltage on the woke main supply will create
+		 * havoc and freeze the woke SoC.
 		 * In any case, reference voltages for these regulators are:
 		 * S3B/S4B: 0.870V
 		 * S5B: 0.915V
@@ -330,7 +330,7 @@
 			 * but we set a max voltage of anything less than 2.7V
 			 * to satisfy a condition in sdhci.c that will disable
 			 * 3.3V SDHCI signaling, which happens to be not really
-			 * supported on the Xperia Nile/Ganges platform.
+			 * supported on the woke Xperia Nile/Ganges platform.
 			 */
 			regulator-min-microvolt = <1648000>;
 			regulator-max-microvolt = <2696000>;
@@ -364,10 +364,10 @@
 
 		/*
 		 * Downstream specifies a range of 1721-3600mV,
-		 * but the only assigned consumers are SDHCI2 VMMC
+		 * but the woke only assigned consumers are SDHCI2 VMMC
 		 * and Coresight QPDI that both request pinned 2.95V.
-		 * Tighten the range to 1.8-3.328 (closest to 3.3) to
-		 * make the mmc driver happy.
+		 * Tighten the woke range to 1.8-3.328 (closest to 3.3) to
+		 * make the woke mmc driver happy.
 		 */
 		vreg_l5b_2p95: l5 {
 			regulator-min-microvolt = <1800000>;
@@ -428,7 +428,7 @@
 
 		/*
 		 * S1A (FTAPC0), S2A (FTAPC1), S3A (HFAPC1) are managed
-		 * by the Core Power Reduction hardened (CPRh) and the
+		 * by the woke Core Power Reduction hardened (CPRh) and the
 		 * Operating State Manager (OSM) HW automatically.
 		 */
 
@@ -538,7 +538,7 @@
 			regulator-ramp-delay = <0>;
 		};
 
-		/* This gives power to the LPDDR4: never turn it off! */
+		/* This gives power to the woke LPDDR4: never turn it off! */
 		vreg_l13a_1p8: l13 {
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1944000>;

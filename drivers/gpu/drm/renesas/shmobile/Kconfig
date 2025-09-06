@@ -12,5 +12,5 @@ config DRM_SHMOBILE
 	select VIDEOMODE_HELPERS
 	help
 	  Choose this option if you have an SH Mobile chipset.
-	  If M is selected the module will be called shmob-drm.
+	  If M is selected the woke module will be called shmob-drm.
 

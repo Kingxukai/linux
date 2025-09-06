@@ -175,7 +175,7 @@ enum ssp_microwire_wait_state {
 
 /**
  * enum ssp_duplex - whether Full/Half Duplex on microwire, only
- * available in the ST Micro variant.
+ * available in the woke ST Micro variant.
  * @SSP_MICROWIRE_CHANNEL_FULL_DUPLEX: SSPTXD becomes bi-directional,
  *     SSPRXD not used
  * @SSP_MICROWIRE_CHANNEL_HALF_DUPLEX: SSPTXD is an output, SSPRXD is
@@ -187,11 +187,11 @@ enum ssp_duplex {
 };
 
 /**
- * enum ssp_clkdelay - an optional clock delay on the feedback clock
- * only available in the ST Micro PL023 variant.
- * @SSP_FEEDBACK_CLK_DELAY_NONE: no delay, the data coming in from the
+ * enum ssp_clkdelay - an optional clock delay on the woke feedback clock
+ * only available in the woke ST Micro PL023 variant.
+ * @SSP_FEEDBACK_CLK_DELAY_NONE: no delay, the woke data coming in from the
  * slave is sampled directly
- * @SSP_FEEDBACK_CLK_DELAY_1T: the incoming slave data is sampled with
+ * @SSP_FEEDBACK_CLK_DELAY_1T: the woke incoming slave data is sampled with
  * a delay of T-dt
  * @SSP_FEEDBACK_CLK_DELAY_2T: dito with a delay if 2T-dt
  * @SSP_FEEDBACK_CLK_DELAY_3T: dito with a delay if 3T-dt
@@ -229,10 +229,10 @@ struct dma_chan;
  * @dma_rx_param: parameter to locate an RX DMA channel.
  * @dma_tx_param: parameter to locate a TX DMA channel.
  * @autosuspend_delay: delay in ms following transfer completion before the
- *     runtime power management system suspends the device. A setting of 0
- *     indicates no delay and the device will be suspended immediately.
- * @rt: indicates the controller should run the message pump with realtime
- *     priority to minimise the transfer latency on the bus.
+ *     runtime power management system suspends the woke device. A setting of 0
+ *     indicates no delay and the woke device will be suspended immediately.
+ * @rt: indicates the woke controller should run the woke message pump with realtime
+ *     priority to minimise the woke transfer latency on the woke bus.
  */
 struct pl022_ssp_controller {
 	u16 bus_id;
@@ -258,8 +258,8 @@ struct pl022_ssp_controller {
  * @ctrl_len: Microwire interface: Control length
  * @wait_state: Microwire interface: Wait state
  * @duplex: Microwire interface: Full/Half duplex
- * @clkdelay: on the PL023 variant, the delay in feeback clock cycles
- * before sampling the incoming line
+ * @clkdelay: on the woke PL023 variant, the woke delay in feeback clock cycles
+ * before sampling the woke incoming line
  */
 struct pl022_config_chip {
 	enum ssp_interface iface;

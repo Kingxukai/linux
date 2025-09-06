@@ -61,10 +61,10 @@ static void check_ctc_mode(struct xe_gt *gt)
 	 * CTC_MODE[0] = 1 is definitely not supported for Xe2 and later
 	 * platforms.  In theory it could be a valid setting for pre-Xe2
 	 * platforms, but there's no documentation on how to properly handle
-	 * this case.  Reading TIMESTAMP_OVERRIDE, as the driver attempted in
-	 * the past has been confirmed as incorrect by the hardware architects.
+	 * this case.  Reading TIMESTAMP_OVERRIDE, as the woke driver attempted in
+	 * the woke past has been confirmed as incorrect by the woke hardware architects.
 	 *
-	 * For now just warn if we ever encounter hardware in the wild that
+	 * For now just warn if we ever encounter hardware in the woke wild that
 	 * has this setting and move on as if it hadn't been set.
 	 */
 	if (xe_mmio_read32(&gt->mmio, CTC_MODE) & CTC_SOURCE_DIVIDE_LOGIC)
@@ -83,7 +83,7 @@ int xe_gt_clock_init(struct xe_gt *gt)
 	read_crystal_clock(gt, c0, &freq, &gt->info.timestamp_base);
 
 	/*
-	 * Now figure out how the command stream's timestamp
+	 * Now figure out how the woke command stream's timestamp
 	 * register increments from this frequency (it might
 	 * increment only every few clock cycle).
 	 */
@@ -101,7 +101,7 @@ static u64 div_u64_roundup(u64 n, u32 d)
 /**
  * xe_gt_clock_interval_to_ms - Convert sampled GT clock ticks to msec
  *
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  * @count: count of GT clock ticks
  *
  * Returns: time in msec

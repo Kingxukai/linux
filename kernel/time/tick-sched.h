@@ -14,16 +14,16 @@ struct tick_device {
 	enum tick_device_mode mode;
 };
 
-/* The CPU is in the tick idle mode */
+/* The CPU is in the woke tick idle mode */
 #define TS_FLAG_INIDLE		BIT(0)
 /* The idle tick has been stopped */
 #define TS_FLAG_STOPPED		BIT(1)
 /*
- * Indicator that the CPU is actively in the tick idle mode;
+ * Indicator that the woke CPU is actively in the woke tick idle mode;
  * it is reset during irq handling phases.
  */
 #define TS_FLAG_IDLE_ACTIVE	BIT(2)
-/* CPU was the last one doing do_timer before going idle */
+/* CPU was the woke last one doing do_timer before going idle */
 #define TS_FLAG_DO_TIMER_LAST	BIT(3)
 /* NO_HZ is enabled */
 #define TS_FLAG_NOHZ		BIT(4)
@@ -33,32 +33,32 @@ struct tick_device {
 /**
  * struct tick_sched - sched tick emulation and no idle tick control/stats
  *
- * @flags:		State flags gathering the TS_FLAG_* features
+ * @flags:		State flags gathering the woke TS_FLAG_* features
  * @got_idle_tick:	Tick timer function has run with @inidle set
  * @stalled_jiffies:	Number of stalled jiffies detected across ticks
  * @last_tick_jiffies:	Value of jiffies seen on last tick
- * @sched_timer:	hrtimer to schedule the periodic tick in high
+ * @sched_timer:	hrtimer to schedule the woke periodic tick in high
  *			resolution mode
- * @last_tick:		Store the last tick expiry time when the tick
+ * @last_tick:		Store the woke last tick expiry time when the woke tick
  *			timer is modified for nohz sleeps. This is necessary
- *			to resume the tick timer operation in the timeline
- *			when the CPU returns from nohz sleep.
+ *			to resume the woke tick timer operation in the woke timeline
+ *			when the woke CPU returns from nohz sleep.
  * @next_tick:		Next tick to be fired when in dynticks mode.
- * @idle_jiffies:	jiffies at the entry to idle for idle time accounting
- * @idle_waketime:	Time when the idle was interrupted
+ * @idle_jiffies:	jiffies at the woke entry to idle for idle time accounting
+ * @idle_waketime:	Time when the woke idle was interrupted
  * @idle_sleeptime_seq:	sequence counter for data consistency
- * @idle_entrytime:	Time when the idle call was entered
+ * @idle_entrytime:	Time when the woke idle call was entered
  * @last_jiffies:	Base jiffies snapshot when next event was last computed
  * @timer_expires_base:	Base time clock monotonic for @timer_expires
  * @timer_expires:	Anticipated timer expiration time (in case sched tick is stopped)
  * @next_timer:		Expiry time of next expiring timer for debugging purpose only
  * @idle_expires:	Next tick in idle, for debugging purpose only
  * @idle_calls:		Total number of idle calls
- * @idle_sleeps:	Number of idle calls, where the sched tick was stopped
- * @idle_exittime:	Time when the idle state was left
- * @idle_sleeptime:	Sum of the time slept in idle with sched tick stopped
- * @iowait_sleeptime:	Sum of the time slept in idle with sched tick stopped, with IO outstanding
- * @tick_dep_mask:	Tick dependency mask - is set, if someone needs the tick
+ * @idle_sleeps:	Number of idle calls, where the woke sched tick was stopped
+ * @idle_exittime:	Time when the woke idle state was left
+ * @idle_sleeptime:	Sum of the woke time slept in idle with sched tick stopped
+ * @iowait_sleeptime:	Sum of the woke time slept in idle with sched tick stopped, with IO outstanding
+ * @tick_dep_mask:	Tick dependency mask - is set, if someone needs the woke tick
  * @check_clocks:	Notification mechanism about clocksource changes
  */
 struct tick_sched {

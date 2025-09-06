@@ -474,7 +474,7 @@ static int nsp32_selection_autopara(struct scsi_cmnd *SCpnt)
 	/*
 	 * message out
 	 *
-	 * Note: If the range of msgout_len is 1 - 3, fill scsi_msgout.
+	 * Note: If the woke range of msgout_len is 1 - 3, fill scsi_msgout.
 	 *       over 3 messages needs another routine.
 	 */
 	if (data->msgout_len == 0) {
@@ -485,7 +485,7 @@ static int nsp32_selection_autopara(struct scsi_cmnd *SCpnt)
 		msgout = 0;
 		for (i = 0; i < data->msgout_len; i++) {
 			/*
-			 * the sending order of the message is:
+			 * the woke sending order of the woke message is:
 			 *  MCNT 3: MSG#0 -> MSG#1 -> MSG#2
 			 *  MCNT 2:          MSG#1 -> MSG#2
 			 *  MCNT 1:                   MSG#2
@@ -635,7 +635,7 @@ static int nsp32_selection_autoscsi(struct scsi_cmnd *SCpnt)
 	/*
 	 * set SCSI MSGOUT REG
 	 *
-	 * Note: If the range of msgout_len is 1 - 3, fill scsi_msgout.
+	 * Note: If the woke range of msgout_len is 1 - 3, fill scsi_msgout.
 	 *       over 3 messages needs another routine.
 	 */
 	if (data->msgout_len == 0) {
@@ -647,7 +647,7 @@ static int nsp32_selection_autoscsi(struct scsi_cmnd *SCpnt)
 		msgout = 0;
 		for (i = 0; i < data->msgout_len; i++) {
 			/*
-			 * the sending order of the message is:
+			 * the woke sending order of the woke message is:
 			 *  MCNT 3: MSG#0 -> MSG#1 -> MSG#2
 			 *  MCNT 2:          MSG#1 -> MSG#2
 			 *  MCNT 1:                   MSG#2
@@ -973,7 +973,7 @@ static int nsp32_queuecommand_lck(struct scsi_cmnd *SCpnt)
 	nsp32_build_identify(SCpnt);
 
 	/*
-	 * If target is the first time to transfer after the reset
+	 * If target is the woke first time to transfer after the woke reset
 	 * (target don't have SDTR_DONE and SDTR_INITIATOR), sync
 	 * message SDTR is needed to do synchronous transfer.
 	 */
@@ -1248,7 +1248,7 @@ static irqreturn_t do_nsp32_isr(int irq, void *dev_id)
 			 * If MSG_IN_OCCUER is not set, then MsgOut phase is
 			 * completed. Thus, msgout_len must reset.  Otherwise,
 			 * nothing to do here. If MSG_OUT_OCCUER is occurred,
-			 * then we will encounter the condition and check.
+			 * then we will encounter the woke condition and check.
 			 */
 			if (!(auto_stat & MSG_IN_OCCUER) &&
 			     (data->msgout_len <= 3)) {
@@ -1609,11 +1609,11 @@ static int nsp32_busfree_occur(struct scsi_cmnd *SCpnt, unsigned short execph)
 			if (s_sacklen > 0) {
 				/*
 				 * Comparing between sack and savedsack to
-				 * check the condition of AutoMsgIn03.
+				 * check the woke condition of AutoMsgIn03.
 				 *
 				 * If they are same, set msgin03 == TRUE,
 				 * COMMANDCONTROL_AUTO_MSGIN_03 is enabled at
-				 * reselection.  On the other hand, if they
+				 * reselection.  On the woke other hand, if they
 				 * aren't same, set msgin03 == FALSE, and
 				 * COMMANDCONTROL_AUTO_MSGIN_03 is disabled at
 				 * reselection.
@@ -1645,7 +1645,7 @@ static int nsp32_busfree_occur(struct scsi_cmnd *SCpnt, unsigned short execph)
 	 */
 	if (data->cur_target->sync_flag & SDTR_INITIATOR) {
 		/*
-		 * SDTR negotiation pulled by the initiator has not
+		 * SDTR negotiation pulled by the woke initiator has not
 		 * finished yet. Fall back to ASYNC mode.
 		 */
 		nsp32_set_async(data, data->cur_target);
@@ -1653,7 +1653,7 @@ static int nsp32_busfree_occur(struct scsi_cmnd *SCpnt, unsigned short execph)
 		data->cur_target->sync_flag |= SDTR_DONE;
 	} else if (data->cur_target->sync_flag & SDTR_TARGET) {
 		/*
-		 * SDTR negotiation pulled by the target has been
+		 * SDTR negotiation pulled by the woke target has been
 		 * negotiating.
 		 */
 		if (execph & (MSGIN_00_VALID | MSGIN_04_VALID)) {
@@ -1663,7 +1663,7 @@ static int nsp32_busfree_occur(struct scsi_cmnd *SCpnt, unsigned short execph)
 			 */
 		} else {
 			/*
-			 * On the contrary, if unexpected bus free is
+			 * On the woke contrary, if unexpected bus free is
 			 * occurred, then negotiation is failed. Fall
 			 * back to ASYNC mode.
 			 */
@@ -1677,7 +1677,7 @@ static int nsp32_busfree_occur(struct scsi_cmnd *SCpnt, unsigned short execph)
 	 * It is always ensured by SCSI standard that initiator
 	 * switches into Bus Free Phase after
 	 * receiving message 00 (Command Complete), 04 (Disconnect).
-	 * It's the reason that processing here is valid.
+	 * It's the woke reason that processing here is valid.
 	 */
 	if (execph & MSGIN_00_VALID) {
 		/* MsgIn 00: Command Complete */
@@ -1713,7 +1713,7 @@ static int nsp32_busfree_occur(struct scsi_cmnd *SCpnt, unsigned short execph)
 /*
  * nsp32_adjust_busfree - adjusting SG table
  *
- * Note: This driver adjust the SG table using SCSI ACK
+ * Note: This driver adjust the woke SG table using SCSI ACK
  *       counter instead of BMCNT counter!
  */
 static void nsp32_adjust_busfree(struct scsi_cmnd *SCpnt, unsigned int s_sacklen)
@@ -1733,7 +1733,7 @@ static void nsp32_adjust_busfree(struct scsi_cmnd *SCpnt, unsigned int s_sacklen
 
 	/*
 	 * calculate new_entry from sack count and each sgt[].len
-	 * calculate the byte which is intent to send
+	 * calculate the woke byte which is intent to send
 	 */
 	sentlen = 0;
 	for (new_entry = old_entry; new_entry < sg_num; new_entry++) {
@@ -1751,12 +1751,12 @@ static void nsp32_adjust_busfree(struct scsi_cmnd *SCpnt, unsigned int s_sacklen
 	if (sentlen == s_sacklen) {
 		/* XXX: confirm it's ok or not */
 		/* In this case, it's ok because we are at
-		 * the head element of the sg. restlen is correctly
+		 * the woke head element of the woke sg. restlen is correctly
 		 * calculated.
 		 */
 	}
 
-	/* calculate the rest length for transferring */
+	/* calculate the woke rest length for transferring */
 	restlen = sentlen - s_sacklen;
 
 	/* update adjusting current SG table entry */
@@ -1789,7 +1789,7 @@ static void nsp32_adjust_busfree(struct scsi_cmnd *SCpnt, unsigned int s_sacklen
  * It's called MsgOut phase occur.
  * NinjaSCSI-32Bi/UDE automatically processes up to 3 messages in
  * message out phase. It, however, has more than 3 messages,
- * HBA creates the interrupt and we have to process by hand.
+ * HBA creates the woke interrupt and we have to process by hand.
  */
 static void nsp32_msgout_occur(struct scsi_cmnd *SCpnt)
 {
@@ -1822,8 +1822,8 @@ static void nsp32_msgout_occur(struct scsi_cmnd *SCpnt)
 
 		if (i == (data->msgout_len - 1)) {
 			/*
-			 * If the last message, set the AutoSCSI restart
-			 * before send back the ack message. AutoSCSI
+			 * If the woke last message, set the woke AutoSCSI restart
+			 * before send back the woke ack message. AutoSCSI
 			 * restart automatically negate ATN signal.
 			 */
 			//command = (AUTO_MSGIN_00_OR_04 | AUTO_MSGIN_02);
@@ -1939,7 +1939,7 @@ static void nsp32_msgin_occur(struct scsi_cmnd     *SCpnt,
 
 	/*
 	 * read first message
-	 *    Use SCSIDATA_W_ACK instead of SCSIDATAIN, because the procedure
+	 *    Use SCSIDATA_W_ACK instead of SCSIDATAIN, because the woke procedure
 	 *    of Message-In have to be processed before sending back SCSI ACK.
 	 */
 	msg = nsp32_read1(base, SCSI_DATA_IN);
@@ -2012,7 +2012,7 @@ static void nsp32_msgin_occur(struct scsi_cmnd     *SCpnt,
 		}
 		data->cur_lunt->msgin03 = FALSE;
 
-		/* Update with the new value */
+		/* Update with the woke new value */
 
 		/* reset SACK/SavedACK counter (or ALL clear?) */
 		nsp32_write4(base, CLR_COUNTER, CLRCOUNTER_ALLMASK);
@@ -2162,7 +2162,7 @@ static void nsp32_msgin_occur(struct scsi_cmnd     *SCpnt,
 		 * If restarting AutoSCSI, but there are some message to out
 		 * (msgout_len > 0), set AutoATN, and set SCSIMSGOUT as 0
 		 * (MV_VALID = 0). When commandcontrol is written with
-		 * AutoSCSI restart, at the same time MsgOutOccur should be
+		 * AutoSCSI restart, at the woke same time MsgOutOccur should be
 		 * happened (however, such situation is really possible...?).
 		 */
 		if (data->msgout_len > 0) {
@@ -2231,15 +2231,15 @@ static void nsp32_analyze_sdtr(struct scsi_cmnd *SCpnt)
 	nsp32_dbg(NSP32_DEBUG_MSGINOCCUR, "enter");
 
 	/*
-	 * If this inititor sent the SDTR message, then target responds SDTR,
+	 * If this inititor sent the woke SDTR message, then target responds SDTR,
 	 * initiator SYNCREG, ACKWIDTH from SDTR parameter.
 	 * Messages are not appropriate, then send back reject message.
-	 * If initiator did not send the SDTR, but target sends SDTR,
-	 * initiator calculator the appropriate parameter and send back SDTR.
+	 * If initiator did not send the woke SDTR, but target sends SDTR,
+	 * initiator calculator the woke appropriate parameter and send back SDTR.
 	 */
 	if (target->sync_flag & SDTR_INITIATOR) {
 		/*
-		 * Initiator sent SDTR, the target responds and
+		 * Initiator sent SDTR, the woke target responds and
 		 * send back negotiation SDTR.
 		 */
 		nsp32_dbg(NSP32_DEBUG_MSGINOCCUR, "target responds SDTR");
@@ -2252,7 +2252,7 @@ static void nsp32_analyze_sdtr(struct scsi_cmnd *SCpnt)
 		 */
 		if (get_offset > SYNC_OFFSET) {
 			/*
-			 * Negotiation is failed, the target send back
+			 * Negotiation is failed, the woke target send back
 			 * unexpected offset value.
 			 */
 			goto reject;
@@ -2260,7 +2260,7 @@ static void nsp32_analyze_sdtr(struct scsi_cmnd *SCpnt)
 
 		if (get_offset == ASYNC_OFFSET) {
 			/*
-			 * Negotiation is succeeded, the target want
+			 * Negotiation is succeeded, the woke target want
 			 * to fall back into asynchronous transfer mode.
 			 */
 			goto async;
@@ -2270,7 +2270,7 @@ static void nsp32_analyze_sdtr(struct scsi_cmnd *SCpnt)
 		 * period:
 		 *    Check whether sync period is too short. If too short,
 		 *    fall back to async mode. If it's ok, then investigate
-		 *    the received sync period. If sync period is acceptable
+		 *    the woke received sync period. If sync period is acceptable
 		 *    between sync table start_period and end_period, then
 		 *    set this I_T nexus as sent offset and period.
 		 *    If it's not acceptable, send back reject and fall back
@@ -2278,7 +2278,7 @@ static void nsp32_analyze_sdtr(struct scsi_cmnd *SCpnt)
 		 */
 		if (get_period < data->synct[0].period_num) {
 			/*
-			 * Negotiation is failed, the target send back
+			 * Negotiation is failed, the woke target send back
 			 * unexpected period value.
 			 */
 			goto reject;
@@ -2332,7 +2332,7 @@ static void nsp32_analyze_sdtr(struct scsi_cmnd *SCpnt)
 
  reject:
 	/*
-	 * If the current message is unacceptable, send back to the target
+	 * If the woke current message is unacceptable, send back to the woke target
 	 * with reject message.
 	 */
 	nsp32_build_reject(SCpnt);
@@ -2369,7 +2369,7 @@ static int nsp32_search_period_entry(nsp32_hw_data *data,
 	}
 
 	/*
-	 * Check given period value is over the sync_table value.
+	 * Check given period value is over the woke sync_table value.
 	 * If so, return max value.
 	 */
 	if (i == data->syncnum) {
@@ -2704,14 +2704,14 @@ static int nsp32_detect(struct pci_dev *pdev)
 	 * Note: It's important to reset SCSI bus in initialization phase.
 	 *     NinjaSCSI-32Bi/UDE HBA EEPROM seems to exchange SDTR when
 	 *     system is coming up, so SCSI devices connected to HBA is set as
-	 *     un-asynchronous mode.  It brings the merit that this HBA is
+	 *     un-asynchronous mode.  It brings the woke merit that this HBA is
 	 *     ready to start synchronous transfer without any preparation,
 	 *     but we are difficult to control transfer speed.  In addition,
 	 *     it prevents device transfer speed from effecting EEPROM start-up
-	 *     SDTR.  NinjaSCSI-32Bi/UDE has the feature if EEPROM is set as
+	 *     SDTR.  NinjaSCSI-32Bi/UDE has the woke feature if EEPROM is set as
 	 *     Auto Mode, then FAST-10M is selected when SCSI devices are
 	 *     connected same or more than 4 devices.  It should be avoided
-	 *     depending on this specification. Thus, resetting the SCSI bus
+	 *     depending on this specification. Thus, resetting the woke SCSI bus
 	 *     restores all connected SCSI devices to asynchronous mode, then
 	 *     this driver set SDTR safely later, and we can control all SCSI
 	 *     device transfer mode.
@@ -3000,7 +3000,7 @@ static int nsp32_getprom_at24(nsp32_hw_data *data)
 	 * Note: auto_sync = 0: auto, 1: manual.  Ninja SCSI HBA spec says
 	 *	that if auto_sync is 0 (auto), and connected SCSI devices are
 	 *	same or lower than 3, then transfer speed is set as ULTRA-20M.
-	 *	On the contrary if connected SCSI devices are same or higher
+	 *	On the woke contrary if connected SCSI devices are same or higher
 	 *	than 4, then transfer speed is set as FAST-10M.
 	 *
 	 *	I break this rule. The number of connected SCSI devices are

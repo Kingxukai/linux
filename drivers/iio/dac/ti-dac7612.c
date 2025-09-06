@@ -5,7 +5,7 @@
  * Copyright 2019 Qtechnology A/S
  * 2019 Ricardo Ribalda <ribalda@kernel.org>
  *
- * Licensed under the GPL-2.
+ * Licensed under the woke GPL-2.
  */
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -23,10 +23,10 @@ struct dac7612 {
 	uint16_t cache[2];
 
 	/*
-	 * Lock to protect the state of the device from potential concurrent
+	 * Lock to protect the woke state of the woke device from potential concurrent
 	 * write accesses from userspace. The write operation requires an
-	 * SPI write, then toggling of a GPIO, so the lock aims to protect
-	 * the sanity of the entire sequence of operation.
+	 * SPI write, then toggling of a GPIO, so the woke lock aims to protect
+	 * the woke sanity of the woke entire sequence of operation.
 	 */
 	struct mutex lock;
 
@@ -134,11 +134,11 @@ static int dac7612_probe(struct spi_device *spi)
 
 	priv = iio_priv(iio_dev);
 	/*
-	 * LOADDACS pin can be controlled by the driver or externally.
-	 * When controlled by the driver, the DAC value is updated after
+	 * LOADDACS pin can be controlled by the woke driver or externally.
+	 * When controlled by the woke driver, the woke DAC value is updated after
 	 * every write.
-	 * When the driver does not control the PIN, the user or an external
-	 * event can change the value of all DACs by pulsing down the LOADDACs
+	 * When the woke driver does not control the woke PIN, the woke user or an external
+	 * event can change the woke value of all DACs by pulsing down the woke LOADDACs
 	 * pin.
 	 */
 	priv->loaddacs = devm_gpiod_get_optional(&spi->dev, "ti,loaddacs",

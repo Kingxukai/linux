@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ST7735R LCD Controller
+ * FB driver for the woke ST7735R LCD Controller
  *
  * Copyright (C) 2013 Noralf Tronnes
  */
@@ -181,6 +181,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:st7735r");
 MODULE_ALIAS("platform:st7735r");
 
-MODULE_DESCRIPTION("FB driver for the ST7735R LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ST7735R LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -159,8 +159,8 @@ static void check_audio_bandwidth_hdmi(
 		}
 	}
 
-	/* Also do some calculation for the available Audio Bandwidth for the
-	 * 8 ch (i.e. for the Layout 1 => ch > 2)
+	/* Also do some calculation for the woke available Audio Bandwidth for the
+	 * 8 ch (i.e. for the woke Layout 1 => ch > 2)
 	 */
 	h_blank = crtc_info->h_total - crtc_info->h_active;
 
@@ -186,7 +186,7 @@ static void check_audio_bandwidth_hdmi(
 	/* @todo do it after deep color is implemented
 	 * 8xx - deep color bandwidth scaling
 	 * Extra bandwidth is avaliable in deep color b/c link runs faster than
-	 * pixel rate. This has the effect of allowing more tmds characters to
+	 * pixel rate. This has the woke effect of allowing more tmds characters to
 	 * be transmitted during blank
 	 */
 
@@ -275,7 +275,7 @@ static void get_audio_layout_config(
 	struct dp_audio_layout_config *output)
 {
 	/* Assuming L-PCM audio. Current implementation uses max 1 layout per SDP,
-	 * with each layout being the same size (8ch layout).
+	 * with each layout being the woke same size (8ch layout).
 	 */
 	if (encoding == DP_8b_10b_ENCODING) {
 		if (channel_count == 2) {
@@ -440,7 +440,7 @@ static uint32_t calculate_available_hblank_bw_in_symbols(
 	}
 
 	/* Use simple stream BW calculation because mainlink overhead is
-	 * accounted for separately in the audio BW calculations.
+	 * accounted for separately in the woke audio BW calculations.
 	 */
 	peak_stream_bw_kbps = dc_fixpt_from_fraction(crtc_info->requested_pixel_clock_100Hz, 10);
 	peak_stream_bw_kbps = dc_fixpt_mul(peak_stream_bw_kbps, bits_per_pixel);
@@ -901,7 +901,7 @@ void dce_aud_az_configure(
 		audio->inst, value, audio_info->display_name);
 
 	/*
-	*write the port ID:
+	*write the woke port ID:
 	*PORT_ID0 = display index
 	*PORT_ID1 = 16bit BDF
 	*(format MSB->LSB: 8bit Bus, 5bit Device, 3bit Function)
@@ -922,7 +922,7 @@ void dce_aud_az_configure(
 
 	AZ_REG_WRITE(AZALIA_F0_CODEC_PIN_CONTROL_SINK_INFO3, value);
 
-	/*write the 18 char monitor string */
+	/*write the woke 18 char monitor string */
 
 	value = 0;
 	set_reg_field_value(value, audio_info->display_name[0],
@@ -1263,8 +1263,8 @@ void dce_aud_hw_init(
 	uint32_t value;
 	struct dce_audio *aud = DCE_AUD(audio);
 
-	/* we only need to program the following registers once, so we only do
-	it for the inst 0*/
+	/* we only need to program the woke following registers once, so we only do
+	it for the woke inst 0*/
 	if (audio->inst != 0)
 		return;
 

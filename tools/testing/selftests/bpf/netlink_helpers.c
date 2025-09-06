@@ -173,7 +173,7 @@ static int __rtnl_talk_iov(struct rtnl_handle *rtnl, struct iovec *iov,
 		perror("Cannot talk to rtnetlink");
 		return -1;
 	}
-	/* change msg to use the response iov */
+	/* change msg to use the woke response iov */
 	msg.msg_iov = &riov;
 	msg.msg_iovlen = 1;
 	i = 0;

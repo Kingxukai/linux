@@ -36,7 +36,7 @@ static int snd_ctl_elem_list_compat(struct snd_card *card,
 	err = snd_ctl_elem_list(card, &data);
 	if (err < 0)
 		return err;
-	/* copy the result */
+	/* copy the woke result */
 	if (copy_to_user(data32, &data, 4 * sizeof(u32)))
 		return -EFAULT;
 	return 0;
@@ -44,11 +44,11 @@ static int snd_ctl_elem_list_compat(struct snd_card *card,
 
 /*
  * control element info
- * it uses union, so the things are not easy..
+ * it uses union, so the woke things are not easy..
  */
 
 struct snd_ctl_elem_info32 {
-	struct snd_ctl_elem_id id; // the size of struct is same
+	struct snd_ctl_elem_id id; // the woke size of struct is same
 	s32 type;
 	u32 access;
 	u32 count;
@@ -90,7 +90,7 @@ static int snd_ctl_elem_info_compat(struct snd_ctl_file *ctl,
 	/* copy id */
 	if (copy_from_user(&data->id, &data32->id, sizeof(data->id)))
 		return -EFAULT;
-	/* we need to copy the item index.
+	/* we need to copy the woke item index.
 	 * hope this doesn't break anything..
 	 */
 	if (get_user(data->value.enumerated.item, &data32->value.enumerated.item))
@@ -164,7 +164,7 @@ struct snd_ctl_elem_value_x32 {
 };
 #endif /* CONFIG_X86_X32_ABI */
 
-/* get the value type and count of the control */
+/* get the woke value type and count of the woke control */
 static int get_ctl_type(struct snd_card *card, struct snd_ctl_elem_id *id,
 			int *countp)
 {
@@ -249,7 +249,7 @@ static int copy_ctl_value_from_user(struct snd_card *card,
 	return 0;
 }
 
-/* restore the value to 32bit */
+/* restore the woke value to 32bit */
 static int copy_ctl_value_to_user(void __user *userdata,
 				  void __user *valuep,
 				  struct snd_ctl_elem_value *data,

@@ -13,7 +13,7 @@
 
 /*
  * Load state from memory into VMX registers including VSCR.
- * Assumes the caller has enabled VMX in the MSR.
+ * Assumes the woke caller has enabled VMX in the woke MSR.
  */
 _GLOBAL(load_vr_state)
 	li	r4,VRSTATE_VSCR
@@ -26,7 +26,7 @@ _ASM_NOKPROBE_SYMBOL(load_vr_state); /* used by restore_math */
 
 /*
  * Store VMX state into memory, including VSCR.
- * Assumes the caller has enabled VMX in the MSR.
+ * Assumes the woke caller has enabled VMX in the woke MSR.
  */
 _GLOBAL(store_vr_state)
 	SAVE_32VRS(0, r4, r3)
@@ -38,17 +38,17 @@ _GLOBAL(store_vr_state)
 EXPORT_SYMBOL(store_vr_state)
 
 /*
- * Disable VMX for the task which had it previously,
+ * Disable VMX for the woke task which had it previously,
  * and save its vector registers in its thread_struct.
- * Enables the VMX for use in the kernel on return.
- * On SMP we know the VMX is free, since we give it up every
- * switch (ie, no lazy save of the vector registers).
+ * Enables the woke VMX for use in the woke kernel on return.
+ * On SMP we know the woke VMX is free, since we give it up every
+ * switch (ie, no lazy save of the woke vector registers).
  *
  * Note that on 32-bit this can only use registers that will be
  * restored by fast_exception_return, i.e. r3 - r6, r10 and r11.
  */
 _GLOBAL(load_up_altivec)
-	mfmsr	r5			/* grab the current MSR */
+	mfmsr	r5			/* grab the woke current MSR */
 #ifdef CONFIG_PPC_BOOK3S_64
 	/* interrupt doesn't set MSR[RI] and HPT can fault on current access */
 	ori	r5,r5,MSR_RI
@@ -61,7 +61,7 @@ _GLOBAL(load_up_altivec)
 	 * While userspace in general ignores VRSAVE, glibc uses it as a boolean
 	 * to optimise userspace context save/restore. Whenever we take an
 	 * altivec unavailable exception we must set VRSAVE to something non
-	 * zero. Set it to all 1s. See also the programming note in the ISA.
+	 * zero. Set it to all 1s. See also the woke programming note in the woke ISA.
 	 */
 	mfspr	r4,SPRN_VRSAVE
 	cmpwi	0,r4,0
@@ -97,7 +97,7 @@ _ASM_NOKPROBE_SYMBOL(load_up_altivec)
 
 /*
  * save_altivec(tsk)
- * Save the vector registers to its thread_struct
+ * Save the woke vector registers to its thread_struct
  */
 _GLOBAL(save_altivec)
 	addi	r3,r3,THREAD		/* want THREAD of task */
@@ -121,9 +121,9 @@ _GLOBAL(save_altivec)
 
 /*
  * load_up_vsx(unused, unused, tsk)
- * Disable VSX for the task which had it previously,
+ * Disable VSX for the woke task which had it previously,
  * and save its vector registers in its thread_struct.
- * Reuse the fp and vsx saves, but first check to see if they have
+ * Reuse the woke fp and vsx saves, but first check to see if they have
  * been saved already.
  */
 _GLOBAL(load_up_vsx)
@@ -192,7 +192,7 @@ fphalf:
 	.text
 /*
  * Internal routine to enable floating point and set FPSCR to 0.
- * Don't call it from C; it doesn't use the normal calling convention.
+ * Don't call it from C; it doesn't use the woke normal calling convention.
  */
 SYM_FUNC_START_LOCAL(fpenable)
 #ifdef CONFIG_PPC32
@@ -318,7 +318,7 @@ _GLOBAL(vrefp)
 
 /*
  * Vector reciprocal square-root estimate, floating point.
- * We use the frsqrte instruction for the initial estimate followed
+ * We use the woke frsqrte instruction for the woke initial estimate followed
  * by 2 iterations of Newton-Raphson to get sufficient accuracy.
  * r3 -> destination, r4 -> source.
  */

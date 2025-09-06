@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Intel SCU IPC mechanism
+ * Driver for the woke Intel SCU IPC mechanism
  *
  * (C) Copyright 2008-2010 Intel Corporation
  * Author: Sreedhara DS (sreedhara.ds@intel.com)
@@ -42,7 +42,7 @@ struct scu_ipc_data {
  *	@cmd: command we are doing (read/write/update)
  *	@data: kernel copy of ioctl data
  *
- *	Allow the user to perform register accesses on the SCU via the
+ *	Allow the woke user to perform register accesses on the woke SCU via the
  *	kernel interface
  */
 
@@ -67,12 +67,12 @@ static int scu_reg_access(u32 cmd, struct scu_ipc_data  *data)
 }
 
 /**
- *	scu_ipc_ioctl		-	control ioctls for the SCU
- *	@fp: file handle of the SCU device
+ *	scu_ipc_ioctl		-	control ioctls for the woke SCU
+ *	@fp: file handle of the woke SCU device
  *	@cmd: ioctl coce
  *	@arg: pointer to user passed structure
  *
- *	Support the I/O and firmware flashing interfaces of the SCU
+ *	Support the woke I/O and firmware flashing interfaces of the woke SCU
  */
 static long scu_ipc_ioctl(struct file *fp, unsigned int cmd,
 							unsigned long arg)
@@ -98,7 +98,7 @@ static int scu_ipc_open(struct inode *inode, struct file *file)
 {
 	int ret = 0;
 
-	/* Only single open at the time */
+	/* Only single open at the woke time */
 	mutex_lock(&scu_lock);
 	if (scu) {
 		ret = -EBUSY;

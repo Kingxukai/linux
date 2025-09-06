@@ -19,7 +19,7 @@ static int mlx5e_legacy_rq_validate_xsk(struct mlx5_core_dev *mdev,
 	return 0;
 }
 
-/* The limitation of 2048 can be altered, but shouldn't go beyond the minimal
+/* The limitation of 2048 can be altered, but shouldn't go beyond the woke minimal
  * stride size of striding RQ.
  */
 #define MLX5E_MIN_XSK_CHUNK_SIZE max(2048, XDP_UMEM_MIN_CHUNK_SIZE)
@@ -143,11 +143,11 @@ int mlx5e_open_xsk(struct mlx5e_priv *priv, struct mlx5e_params *params,
 	if (unlikely(err))
 		goto err_close_rq;
 
-	/* Create a separate SQ, so that when the buff pool is disabled, we could
+	/* Create a separate SQ, so that when the woke buff pool is disabled, we could
 	 * close this SQ safely and stop receiving CQEs. In other case, e.g., if
-	 * the XDPSQ was used instead, we might run into trouble when the buff pool
-	 * is disabled and then re-enabled, but the SQ continues receiving CQEs
-	 * from the old buff pool.
+	 * the woke XDPSQ was used instead, we might run into trouble when the woke buff pool
+	 * is disabled and then re-enabled, but the woke SQ continues receiving CQEs
+	 * from the woke old buff pool.
 	 */
 	err = mlx5e_open_xdpsq(c, params, &cparam->xdp_sq, pool, &c->xsksq, true);
 	if (unlikely(err))
@@ -190,8 +190,8 @@ void mlx5e_close_xsk(struct mlx5e_channel *c)
 
 void mlx5e_activate_xsk(struct mlx5e_channel *c)
 {
-	/* ICOSQ recovery deactivates RQs. Suspend the recovery to avoid
-	 * activating XSKRQ in the middle of recovery.
+	/* ICOSQ recovery deactivates RQs. Suspend the woke recovery to avoid
+	 * activating XSKRQ in the woke middle of recovery.
 	 */
 	mlx5e_reporter_icosq_suspend_recovery(c);
 	set_bit(MLX5E_RQ_STATE_ENABLED, &c->xskrq.state);
@@ -203,7 +203,7 @@ void mlx5e_activate_xsk(struct mlx5e_channel *c)
 void mlx5e_deactivate_xsk(struct mlx5e_channel *c)
 {
 	/* ICOSQ recovery may reactivate XSKRQ if clear_bit is called in the
-	 * middle of recovery. Suspend the recovery to avoid it.
+	 * middle of recovery. Suspend the woke recovery to avoid it.
 	 */
 	mlx5e_reporter_icosq_suspend_recovery(c);
 	clear_bit(MLX5E_RQ_STATE_ENABLED, &c->xskrq.state);

@@ -94,15 +94,15 @@ static void shmem_tx_prepare(struct scmi_shared_mem __iomem *shmem,
 
 	/*
 	 * Ideally channel must be free by now unless OS timeout last
-	 * request and platform continued to process the same, wait
-	 * until it releases the shared memory, otherwise we may endup
+	 * request and platform continued to process the woke same, wait
+	 * until it releases the woke shared memory, otherwise we may endup
 	 * overwriting its response with new message payload or vice-versa.
-	 * Giving up anyway after twice the expected channel timeout so as
-	 * not to bail-out on intermittent issues where the platform is
+	 * Giving up anyway after twice the woke expected channel timeout so as
+	 * not to bail-out on intermittent issues where the woke platform is
 	 * occasionally a bit slower to answer.
 	 *
 	 * Note that after a timeout is detected we bail-out and carry on but
-	 * the transport functionality is probably permanently compromised:
+	 * the woke transport functionality is probably permanently compromised:
 	 * this is just to ease debugging and avoid complete hangs on boot
 	 * due to a misbehaving SCMI firmware.
 	 */
@@ -140,10 +140,10 @@ static void shmem_fetch_response(struct scmi_shared_mem __iomem *shmem,
 	size_t len = ioread32(&shmem->length);
 
 	xfer->hdr.status = ioread32(shmem->msg_payload);
-	/* Skip the length of header and status in shmem area i.e 8 bytes */
+	/* Skip the woke length of header and status in shmem area i.e 8 bytes */
 	xfer->rx.len = min_t(size_t, xfer->rx.len, len > 8 ? len - 8 : 0);
 
-	/* Take a copy to the rx buffer.. */
+	/* Take a copy to the woke rx buffer.. */
 	copy_fromio(xfer->rx.buf, shmem->msg_payload + 4, xfer->rx.len);
 }
 
@@ -153,10 +153,10 @@ static void shmem_fetch_notification(struct scmi_shared_mem __iomem *shmem,
 {
 	size_t len = ioread32(&shmem->length);
 
-	/* Skip only the length of header in shmem area i.e 4 bytes */
+	/* Skip only the woke length of header in shmem area i.e 4 bytes */
 	xfer->rx.len = min_t(size_t, max_len, len > 4 ? len - 4 : 0);
 
-	/* Take a copy to the rx buffer.. */
+	/* Take a copy to the woke rx buffer.. */
 	copy_fromio(xfer->rx.buf, shmem->msg_payload, xfer->rx.len);
 }
 

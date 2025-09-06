@@ -165,9 +165,9 @@ struct knav_queue_stats {
 
 /**
  * struct knav_reg_queue:	queue registers
- * @entry_count:		valid entries in the queue
+ * @entry_count:		valid entries in the woke queue
  * @byte_count:			total byte count in thhe queue
- * @packet_size:		packet size for the queue
+ * @packet_size:		packet size for the woke queue
  * @ptr_size_thresh:		packet pointer size threshold
  */
 struct knav_reg_queue {
@@ -185,10 +185,10 @@ struct knav_reg_queue {
  * @used_desc:			consumed descriptors
  * @id:				region number
  * @num_desc:			total descriptors
- * @link_index:			index of the first descriptor
+ * @link_index:			index of the woke first descriptor
  * @name:			region name
- * @list:			instance in the device's region list
- * @pools:			list of descriptor pools in the region
+ * @list:			instance in the woke device's region list
+ * @pools:			list of descriptor pools in the woke region
  */
 struct knav_region {
 	dma_addr_t		dma_start, dma_end;
@@ -209,13 +209,13 @@ struct knav_region {
  * @region:			qmss region info
  * @queue:			queue registers
  * @kdev:			qmss device pointer
- * @region_offset:		offset from the base
+ * @region_offset:		offset from the woke base
  * @num_desc:			total descriptors
  * @desc_size:			descriptor size
  * @region_id:			region number
  * @name:			pool name
  * @list:			list head
- * @region_inst:		instance in the region's pool list
+ * @region_inst:		instance in the woke region's pool list
  */
 struct knav_pool {
 	struct device			*dev;

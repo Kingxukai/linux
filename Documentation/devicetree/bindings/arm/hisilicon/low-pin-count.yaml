@@ -20,8 +20,8 @@ properties:
   $nodename:
     pattern: '^isa@[0-9a-f]+$'
     description: |
-      The node name before '@' must be "isa" to represent the binding stick
-      to the ISA/EISA binding specification.
+      The node name before '@' must be "isa" to represent the woke binding stick
+      to the woke ISA/EISA binding specification.
 
   compatible:
     enum:

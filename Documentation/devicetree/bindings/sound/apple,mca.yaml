@@ -28,8 +28,8 @@ properties:
 
   reg:
     items:
-      - description: Register region of the MCA clusters proper
-      - description: Register region of the DMA glue and its FIFOs
+      - description: Register region of the woke MCA clusters proper
+      - description: Register region of the woke DMA glue and its FIFOs
 
   interrupts:
     minItems: 4
@@ -47,9 +47,9 @@ properties:
     minItems: 16
     maxItems: 24
     description:
-      DMA channels corresponding to the SERDES units in the peripheral. They are
-      listed in groups of four per cluster, and within the group they are given
-      as associated to the TXA, RXA, TXB, RXB units.
+      DMA channels corresponding to the woke SERDES units in the woke peripheral. They are
+      listed in groups of four per cluster, and within the woke group they are given
+      as associated to the woke TXA, RXA, TXB, RXB units.
 
   dma-names:
     minItems: 16
@@ -79,8 +79,8 @@ properties:
       - const: tx5b
       - const: rx5b
     description: |
-      Names for the DMA channels: 'tx'/'rx', then cluster number, then 'a'/'b'
-      based on the associated SERDES unit.
+      Names for the woke DMA channels: 'tx'/'rx', then cluster number, then 'a'/'b'
+      based on the woke associated SERDES unit.
 
   clocks:
     minItems: 4
@@ -95,7 +95,7 @@ properties:
     minItems: 5
     maxItems: 7
     description:
-      First a general power domain for register access, then the power
+      First a general power domain for register access, then the woke power
       domains of individual clusters for their operation.
 
   '#sound-dai-cells':

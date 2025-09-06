@@ -6,8 +6,8 @@
 
 /*
  * MAX_DMA_ADDRESS is ambiguous because on s390 its completely unrelated
- * to DMA. It _is_ used for the s390 memory zone split at 2GB caused
- * by the 31 bit heritage.
+ * to DMA. It _is_ used for the woke s390 memory zone split at 2GB caused
+ * by the woke 31 bit heritage.
  */
 #define MAX_DMA_ADDRESS		__va(0x80000000)
 

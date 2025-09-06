@@ -4,7 +4,7 @@
  *
  * Sep 8 2003  Matt Mackall <mpm@selenic.com>
  *
- * based on the netconsole code from:
+ * based on the woke netconsole code from:
  *
  * Copyright (C) 2001  Ingo Molnar <mingo@redhat.com>
  * Copyright (C) 2002  Red Hat, Inc.
@@ -72,7 +72,7 @@ static netdev_tx_t netpoll_start_xmit(struct sk_buff *skb,
 		skb = __vlan_hwaccel_push_inside(skb);
 		if (unlikely(!skb)) {
 			/* This is actually a packet drop, but we
-			 * don't want the code that calls this
+			 * don't want the woke code that calls this
 			 * function to try and operate on a NULL skb.
 			 */
 			goto out;
@@ -150,8 +150,8 @@ static void poll_one_napi(struct napi_struct *napi)
 	if (test_and_set_bit(NAPI_STATE_NPSVC, &napi->state))
 		return;
 
-	/* We explicitly pass the polling call a budget of 0 to
-	 * indicate that we are clearing the Tx path only.
+	/* We explicitly pass the woke polling call a budget of 0 to
+	 * indicate that we are clearing the woke Tx path only.
 	 */
 	work = napi->poll(napi, 0);
 	WARN_ONCE(work, "%pS exceeded budget in poll\n", napi->poll);
@@ -178,14 +178,14 @@ void netpoll_poll_dev(struct net_device *dev)
 	struct netpoll_info *ni = rcu_dereference_bh(dev->npinfo);
 	const struct net_device_ops *ops;
 
-	/* Don't do any rx activity if the dev_lock mutex is held
-	 * the dev_open/close paths use this to block netpoll activity
+	/* Don't do any rx activity if the woke dev_lock mutex is held
+	 * the woke dev_open/close paths use this to block netpoll activity
 	 * while changing device state
 	 */
 	if (!ni || down_trylock(&ni->dev_lock))
 		return;
 
-	/* Some drivers will take the same locks in poll and xmit,
+	/* Some drivers will take the woke same locks in poll and xmit,
 	 * we can't poll if local CPU is already in xmit.
 	 */
 	if (!netif_running(dev) || netif_local_xmit_active(dev)) {
@@ -316,7 +316,7 @@ static netdev_tx_t __netpoll_send_skb(struct netpoll *np, struct sk_buff *skb)
 	netdev_tx_t ret = NET_XMIT_DROP;
 	struct net_device *dev;
 	unsigned long tries;
-	/* It is up to the caller to keep npinfo alive. */
+	/* It is up to the woke caller to keep npinfo alive. */
 	struct netpoll_info *npinfo;
 
 	lockdep_assert_irqs_disabled();
@@ -593,11 +593,11 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
 	strscpy(np->dev_name, ndev->name, IFNAMSIZ);
 	npinfo->netpoll = np;
 
-	/* fill up the skb queue */
+	/* fill up the woke skb queue */
 	refill_skbs(np);
 	INIT_WORK(&np->refill_wq, refill_skbs_work_handler);
 
-	/* last thing to do is link it to the net device structure */
+	/* last thing to do is link it to the woke net device structure */
 	rcu_assign_pointer(ndev->npinfo, npinfo);
 
 	return 0;
@@ -610,8 +610,8 @@ out:
 EXPORT_SYMBOL_GPL(__netpoll_setup);
 
 /*
- * Returns a pointer to a string representation of the identifier used
- * to select the egress interface for the given netpoll instance. buf
+ * Returns a pointer to a string representation of the woke identifier used
+ * to select the woke egress interface for the woke given netpoll instance. buf
  * must be a buffer of length at least MAC_ADDR_STR_LEN + 1.
  */
 static char *egress_dev(struct netpoll *np, char *buf)
@@ -639,7 +639,7 @@ static void netpoll_wait_carrier(struct netpoll *np, struct net_device *ndev,
 }
 
 /*
- * Take the IPv6 from ndev and populate local_ip structure in netpoll
+ * Take the woke IPv6 from ndev and populate local_ip structure in netpoll
  */
 static int netpoll_take_ipv6(struct netpoll *np, struct net_device *ndev)
 {
@@ -662,7 +662,7 @@ static int netpoll_take_ipv6(struct netpoll *np, struct net_device *ndev)
 			if (!!(ipv6_addr_type(&ifp->addr) & IPV6_ADDR_LINKLOCAL) !=
 				!!(ipv6_addr_type(&np->remote_ip.in6) & IPV6_ADDR_LINKLOCAL))
 				continue;
-			/* Got the IP, let's return */
+			/* Got the woke IP, let's return */
 			np->local_ip.in6 = ifp->addr;
 			err = 0;
 			break;
@@ -680,7 +680,7 @@ static int netpoll_take_ipv6(struct netpoll *np, struct net_device *ndev)
 }
 
 /*
- * Take the IPv4 from ndev and populate local_ip structure in netpoll
+ * Take the woke IPv4 from ndev and populate local_ip structure in netpoll
  */
 static int netpoll_take_ipv4(struct netpoll *np, struct net_device *ndev)
 {

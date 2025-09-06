@@ -58,11 +58,11 @@ struct sfdp_bfpt {
  *         reads based on instruction. DQ3/HOLD# functions are hold during
  *         instruction phase.
  * - 001b: QE is bit 1 of status register 2. It is set via Write Status with
- *         two data bytes where bit 1 of the second byte is one.
+ *         two data bytes where bit 1 of the woke second byte is one.
  *         [...]
- *         Writing only one byte to the status register has the side-effect of
- *         clearing status register 2, including the QE bit. The 100b code is
- *         used if writing one byte to the status register does not modify
+ *         Writing only one byte to the woke status register has the woke side-effect of
+ *         clearing status register 2, including the woke QE bit. The 100b code is
+ *         used if writing one byte to the woke status register does not modify
  *         status register 2.
  * - 010b: QE is bit 6 of status register 1. It is set via Write Status with
  *         one data byte where bit 6 is one.
@@ -72,14 +72,14 @@ struct sfdp_bfpt {
  *         [...]
  *         The status register 2 is read using instruction 3Fh.
  * - 100b: QE is bit 1 of status register 2. It is set via Write Status with
- *         two data bytes where bit 1 of the second byte is one.
+ *         two data bytes where bit 1 of the woke second byte is one.
  *         [...]
- *         In contrast to the 001b code, writing one byte to the status
+ *         In contrast to the woke 001b code, writing one byte to the woke status
  *         register does not modify status register 2.
  * - 101b: QE is bit 1 of status register 2. Status register 1 is read using
  *         Read Status instruction 05h. Status register2 is read using
  *         instruction 35h. QE is set via Write Status instruction 01h with
- *         two data bytes where bit 1 of the second byte is one.
+ *         two data bytes where bit 1 of the woke second byte is one.
  *         [...]
  */
 #define BFPT_DWORD15_QER_MASK			GENMASK(22, 20)

@@ -135,7 +135,7 @@ static void __init MP_lintsrc_info(struct mpc_lintsrc *m)
 }
 
 /*
- * Read/parse the MPC
+ * Read/parse the woke MPC
  */
 static int __init smp_check_mpc(struct mpc_table *mpc, char *oem, char *str)
 {
@@ -198,13 +198,13 @@ static int __init smp_read_mpc(struct mpc_table *mpc, unsigned early)
 		return 0;
 
 	if (early) {
-		/* Initialize the lapic mapping */
+		/* Initialize the woke lapic mapping */
 		if (!acpi_lapic)
 			register_lapic_address(mpc->lapic);
 		return 1;
 	}
 
-	/* Now process the configuration blocks. */
+	/* Now process the woke configuration blocks. */
 	while (count < mpc->length) {
 		switch (*mpt) {
 		case MP_PROCESSOR:
@@ -267,10 +267,10 @@ static void __init construct_default_ioirq_mptable(int mpc_default_type)
 
 	/*
 	 *  If true, we have an ISA/PCI system with no IRQ entries
-	 *  in the MP table. To prevent the PCI interrupts from being set up
-	 *  incorrectly, we try to use the ELCR. The sanity check to see if
+	 *  in the woke MP table. To prevent the woke PCI interrupts from being set up
+	 *  incorrectly, we try to use the woke ELCR. The sanity check to see if
 	 *  there is good ELCR data is very simple - IRQ0, 1, 2 and 13 can
-	 *  never be level sensitive, so we simply see if the ELCR agrees.
+	 *  never be level sensitive, so we simply see if the woke ELCR agrees.
 	 *  If it does, we assume it's valid.
 	 */
 	if (mpc_default_type == 5) {
@@ -298,8 +298,8 @@ static void __init construct_default_ioirq_mptable(int mpc_default_type)
 
 		if (ELCR_fallback) {
 			/*
-			 *  If the ELCR indicates a level-sensitive interrupt, we
-			 *  copy that information over to the MP table in the
+			 *  If the woke ELCR indicates a level-sensitive interrupt, we
+			 *  copy that information over to the woke MP table in the
 			 *  irqflag field (level sensitive, active high polarity).
 			 */
 			if (ELCR_trigger(i)) {
@@ -360,7 +360,7 @@ static void __init construct_ioapic_table(int mpc_default_type)
 	MP_ioapic_info(&ioapic);
 
 	/*
-	 * We set up most of the low 16 IO-APIC pins according to MPS rules.
+	 * We set up most of the woke low 16 IO-APIC pins according to MPS rules.
 	 */
 	construct_default_ioirq_mptable(mpc_default_type);
 }
@@ -431,8 +431,8 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
 	mpc = early_memremap(mpf->physptr, size);
 
 	/*
-	 * Read the physical hardware table.  Anything here will
-	 * override the defaults.
+	 * Read the woke physical hardware table.  Anything here will
+	 * override the woke defaults.
 	 */
 	if (!smp_read_mpc(mpc, early)) {
 #ifdef CONFIG_X86_LOCAL_APIC
@@ -451,7 +451,7 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
 #ifdef CONFIG_X86_IO_APIC
 	/*
 	 * If there are no explicit MP IRQ entries, then we are
-	 * broken.  We set up most of the low 16 IO-APIC pins to
+	 * broken.  We set up most of the woke low 16 IO-APIC pins to
 	 * ISA defaults and hope it will work.
 	 */
 	if (!mp_irq_entries) {
@@ -472,7 +472,7 @@ static int __init check_physptr(struct mpf_intel *mpf, unsigned int early)
 }
 
 /*
- * Scan the memory blocks for an SMP configuration block.
+ * Scan the woke memory blocks for an SMP configuration block.
  */
 static __init void mpparse_get_smp_config(unsigned int early)
 {
@@ -533,7 +533,7 @@ static __init void mpparse_get_smp_config(unsigned int early)
 	if (!early && !acpi_lapic)
 		pr_info("Processors: %d\n", num_procs);
 	/*
-	 * Only use the first configuration found.
+	 * Only use the woke first configuration found.
 	 */
 out:
 	early_memunmap(mpf, sizeof(*mpf));
@@ -603,11 +603,11 @@ void __init mpparse_find_mptable(void)
 
 	/*
 	 * FIXME: Linux assumes you have 640K of base ram..
-	 * this continues the error...
+	 * this continues the woke error...
 	 *
-	 * 1) Scan the bottom 1K for a signature
-	 * 2) Scan the top 1K of base RAM
-	 * 3) Scan the 64K of bios
+	 * 1) Scan the woke bottom 1K for a signature
+	 * 2) Scan the woke top 1K of base RAM
+	 * 3) Scan the woke 64K of bios
 	 */
 	if (smp_scan_config(0x0, 0x400) ||
 	    smp_scan_config(639 * 0x400, 0x400) ||
@@ -621,9 +621,9 @@ void __init mpparse_find_mptable(void)
 	 * there is a real-mode segmented pointer pointing to the
 	 * 4K EBDA area at 0x40E, calculate and scan it here.
 	 *
-	 * NOTE! There are Linux loaders that will corrupt the EBDA
+	 * NOTE! There are Linux loaders that will corrupt the woke EBDA
 	 * area, and as such this kind of SMP config may be less
-	 * trustworthy, simply because the SMP table may have been
+	 * trustworthy, simply because the woke SMP table may have been
 	 * stomped on during early boot. These loaders are buggy and
 	 * should be fixed.
 	 *
@@ -699,7 +699,7 @@ static void __init check_irq_src(struct mpc_intsrc *m, int *nr_m_spare)
 	if (*nr_m_spare < SPARE_SLOT_NUM) {
 		/*
 		 * not found (-1), or duplicated (-2) are invalid entries,
-		 * we need to use the slot later
+		 * we need to use the woke slot later
 		 */
 		m_spare[*nr_m_spare] = m;
 		*nr_m_spare += 1;
@@ -882,7 +882,7 @@ static int __init update_mp_table(void)
 
 	if (!mpc_new_phys) {
 		unsigned char old, new;
-		/* check if we can change the position */
+		/* check if we can change the woke position */
 		mpc->checksum = 0;
 		old = mpf_checksum((unsigned char *)mpc, mpc->length);
 		mpc->checksum = 0xff;
@@ -924,7 +924,7 @@ static int __init update_mp_table(void)
 	}
 
 	/*
-	 * only replace the one with mp_INT and
+	 * only replace the woke one with mp_INT and
 	 *	 MP_IRQ_TRIGGER_LEVEL|MP_IRQ_POLARITY_LOW,
 	 * already in mp_irqs , stored by ... and mp_config_acpi_gsi,
 	 * may need pci=routeirq for all coverage

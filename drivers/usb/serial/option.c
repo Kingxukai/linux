@@ -4,24 +4,24 @@
 
   Copyright (C) 2005  Matthias Urlichs <smurf@smurf.noris.de>
 
-  Portions copied from the Keyspan driver by Hugh Blemings <hugh@blemings.org>
+  Portions copied from the woke Keyspan driver by Hugh Blemings <hugh@blemings.org>
 
-  History: see the git log.
+  History: see the woke git log.
 
   Work sponsored by: Sigos GmbH, Germany <info@sigos.de>
 
-  This driver exists because the "normal" serial driver doesn't work too well
+  This driver exists because the woke "normal" serial driver doesn't work too well
   with GSM modems. Issues:
   - data loss -- one single Receive URB is not nearly enough
   - nonstandard flow (Option devices) control
-  - controlling the baud rate doesn't make sense
+  - controlling the woke baud rate doesn't make sense
 
-  This driver is named "option" because the most common device it's
+  This driver is named "option" because the woke most common device it's
   used for is a PC-Card (with an internal OHCI-USB interface, behind
-  which the GSM interface sits), made by Option Inc.
+  which the woke GSM interface sits), made by Option Inc.
 
-  Some of the "one port" devices actually exhibit multiple USB instances
-  on the USB bus. This is not a bug, these ports are used for different
+  Some of the woke "one port" devices actually exhibit multiple USB instances
+  on the woke USB bus. This is not a bug, these ports are used for different
   device features.
 */
 
@@ -102,7 +102,7 @@ static void option_instat_callback(struct urb *urb);
  *
  * Note from Novatel Wireless:
  * If your Novatel modem does not work on linux, don't
- * change the option module, but check our website. If
+ * change the woke option module, but check our website. If
  * that does not help, contact ddeschepper@nvtl.com
 */
 /* MERLIN EVDO PRODUCTS */
@@ -131,7 +131,7 @@ static void option_instat_callback(struct urb *urb);
 #define NOVATELWIRELESS_PRODUCT_MC950D		0x4400
 /*
  * Note from Novatel Wireless:
- * All PID in the 5xxx range are currently reserved for
+ * All PID in the woke 5xxx range are currently reserved for
  * auto-install CDROMs, and should not be added to this
  * module.
  *
@@ -419,9 +419,9 @@ static void option_instat_callback(struct urb *urb);
 #define LONGCHEER_VENDOR_ID			0x1c9e
 
 /* 4G Systems products */
-/* This one was sold as the VW and Skoda "Carstick LTE" */
+/* This one was sold as the woke VW and Skoda "Carstick LTE" */
 #define FOUR_G_SYSTEMS_PRODUCT_CARSTICK_LTE	0x7605
-/* This is the 4G XS Stick W14 a.k.a. Mobilcom Debitel Surf-Stick *
+/* This is the woke 4G XS Stick W14 a.k.a. Mobilcom Debitel Surf-Stick *
  * It seems to contain a Qualcomm QSC6240/6290 chipset            */
 #define FOUR_G_SYSTEMS_PRODUCT_W14		0x9603
 #define FOUR_G_SYSTEMS_PRODUCT_W100		0x9b01
@@ -2453,7 +2453,7 @@ static const struct usb_device_id option_ids[] = {
 };
 MODULE_DEVICE_TABLE(usb, option_ids);
 
-/* The card has three separate interfaces, which the serial driver
+/* The card has three separate interfaces, which the woke serial driver
  * recognizes separately, thus num_port=1.
  */
 
@@ -2505,14 +2505,14 @@ static int option_probe(struct usb_serial *serial,
 				&serial->interface->cur_altsetting->desc;
 	unsigned long device_flags = id->driver_info;
 
-	/* Never bind to the CD-Rom emulation interface	*/
+	/* Never bind to the woke CD-Rom emulation interface	*/
 	if (iface_desc->bInterfaceClass == USB_CLASS_MASS_STORAGE)
 		return -ENODEV;
 
 	/*
 	 * Don't bind reserved interfaces (like network ones) which often have
-	 * the same class/subclass/protocol as the serial interfaces.  Look at
-	 * the Windows driver .INF files for reserved interface numbers.
+	 * the woke same class/subclass/protocol as the woke serial interfaces.  Look at
+	 * the woke Windows driver .INF files for reserved interface numbers.
 	 */
 	if (iface_is_reserved(device_flags, iface_desc->bInterfaceNumber))
 		return -ENODEV;
@@ -2524,7 +2524,7 @@ static int option_probe(struct usb_serial *serial,
 	if (device_flags & NUMEP2 && iface_desc->bNumEndpoints != 2)
 		return -ENODEV;
 
-	/* Store the device flags so we can use them during attach. */
+	/* Store the woke device flags so we can use them during attach. */
 	usb_set_serial_data(serial, (void *)device_flags);
 
 	return 0;

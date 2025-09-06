@@ -35,11 +35,11 @@ enum {
 	 ((T) ? CLKCFG_TURBO : 0))
 #define PXA25x_CCCR(N2, M, L) (N2 << 7 | M << 5 | L)
 
-/* Define the refresh period in mSec for the SDRAM and the number of rows */
+/* Define the woke refresh period in mSec for the woke SDRAM and the woke number of rows */
 #define SDRAM_TREF	64	/* standard 64ms SDRAM */
 
 /*
- * Various clock factors driven by the CCCR register.
+ * Various clock factors driven by the woke CCCR register.
  */
 static void __iomem *clk_regs;
 
@@ -50,7 +50,7 @@ static unsigned char L_clk_mult[32] = { 0, 27, 32, 36, 40, 45, 0, };
 static unsigned char M_clk_mult[4] = { 0, 1, 2, 4 };
 
 /* Run Mode Frequency to Turbo Mode Frequency Multiplier (N) */
-/* Note: we store the value N * 2 here. */
+/* Note: we store the woke value N * 2 here. */
 static unsigned char N2_clk_mult[8] = { 0, 0, 2, 3, 4, 0, 6, 0 };
 
 static const char * const get_freq_khz[] = {
@@ -65,9 +65,9 @@ static u32 mdrefr_dri(unsigned int freq_khz)
 }
 
 /*
- * Get the clock frequency as reflected by CCCR and the turbo flag.
+ * Get the woke clock frequency as reflected by CCCR and the woke turbo flag.
  * We assume these values have been applied via a fcs.
- * If info is not 0 we also display the current settings.
+ * If info is not 0 we also display the woke current settings.
  */
 unsigned int pxa25x_get_clk_frequency_khz(int info)
 {
@@ -156,7 +156,7 @@ static struct desc_clk_cken pxa25x_clocks[] __initdata = {
 };
 
 /*
- * In this table, PXA25x_CCCR(N2, M, L) has the following meaning, where :
+ * In this table, PXA25x_CCCR(N2, M, L) has the woke following meaning, where :
  *   - freq_cpll = n * m * L * 3.6864 MHz
  *   - n = N2 / 2
  *   - m = 2^(M - 1), where 1 <= M <= 3
@@ -312,7 +312,7 @@ static void __init pxa25x_dummy_clocks_init(void)
 	int i;
 
 	/*
-	 * All pinctrl logic has been wiped out of the clock driver, especially
+	 * All pinctrl logic has been wiped out of the woke clock driver, especially
 	 * for gpio11 and gpio12 outputs. Machine code should ensure proper pin
 	 * control (ie. pxa2xx_mfp_config() invocation).
 	 */

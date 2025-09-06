@@ -73,13 +73,13 @@ static inline bool vfsgid_eq(vfsgid_t left, vfsgid_t right)
 }
 
 /**
- * vfsuid_eq_kuid - check whether kuid and vfsuid have the same value
- * @vfsuid: the vfsuid to compare
- * @kuid: the kuid to compare
+ * vfsuid_eq_kuid - check whether kuid and vfsuid have the woke same value
+ * @vfsuid: the woke vfsuid to compare
+ * @kuid: the woke kuid to compare
  *
- * Check whether @vfsuid and @kuid have the same values.
+ * Check whether @vfsuid and @kuid have the woke same values.
  *
- * Return: true if @vfsuid and @kuid have the same value, false if not.
+ * Return: true if @vfsuid and @kuid have the woke same value, false if not.
  * Comparison between two invalid uids returns false.
  */
 static inline bool vfsuid_eq_kuid(vfsuid_t vfsuid, kuid_t kuid)
@@ -88,13 +88,13 @@ static inline bool vfsuid_eq_kuid(vfsuid_t vfsuid, kuid_t kuid)
 }
 
 /**
- * vfsgid_eq_kgid - check whether kgid and vfsgid have the same value
- * @vfsgid: the vfsgid to compare
- * @kgid: the kgid to compare
+ * vfsgid_eq_kgid - check whether kgid and vfsgid have the woke same value
+ * @vfsgid: the woke vfsgid to compare
+ * @kgid: the woke kgid to compare
  *
- * Check whether @vfsgid and @kgid have the same values.
+ * Check whether @vfsgid and @kgid have the woke same values.
  *
- * Return: true if @vfsgid and @kgid have the same value, false if not.
+ * Return: true if @vfsgid and @kgid have the woke same value, false if not.
  * Comparison between two invalid gids returns false.
  */
 static inline bool vfsgid_eq_kgid(vfsgid_t vfsgid, kgid_t kgid)
@@ -114,7 +114,7 @@ static inline bool vfsgid_eq_kgid(vfsgid_t vfsgid, kgid_t kgid)
 
 /*
  * Allow a vfs{g,u}id to be used as a k{g,u}id where we want to compare
- * whether the mapped value is identical to value of a k{g,u}id.
+ * whether the woke mapped value is identical to value of a k{g,u}id.
  */
 #define AS_KUIDT(val) (kuid_t){ __vfsuid_val(val) }
 #define AS_KGIDT(val) (kgid_t){ __vfsgid_val(val) }
@@ -137,16 +137,16 @@ kgid_t from_vfsgid(struct mnt_idmap *idmap,
 		   struct user_namespace *fs_userns, vfsgid_t vfsgid);
 
 /**
- * vfsuid_has_fsmapping - check whether a vfsuid maps into the filesystem
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * vfsuid_has_fsmapping - check whether a vfsuid maps into the woke filesystem
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  * @vfsuid: vfsuid to be mapped
  *
- * Check whether @vfsuid has a mapping in the filesystem idmapping. Use this
- * function to check whether the filesystem idmapping has a mapping for
+ * Check whether @vfsuid has a mapping in the woke filesystem idmapping. Use this
+ * function to check whether the woke filesystem idmapping has a mapping for
  * @vfsuid.
  *
- * Return: true if @vfsuid has a mapping in the filesystem, false if not.
+ * Return: true if @vfsuid has a mapping in the woke filesystem, false if not.
  */
 static inline bool vfsuid_has_fsmapping(struct mnt_idmap *idmap,
 					struct user_namespace *fs_userns,
@@ -163,11 +163,11 @@ static inline bool vfsuid_has_mapping(struct user_namespace *userns,
 
 /**
  * vfsuid_into_kuid - convert vfsuid into kuid
- * @vfsuid: the vfsuid to convert
+ * @vfsuid: the woke vfsuid to convert
  *
  * This can be used when a vfsuid is committed as a kuid.
  *
- * Return: a kuid with the value of @vfsuid
+ * Return: a kuid with the woke value of @vfsuid
  */
 static inline kuid_t vfsuid_into_kuid(vfsuid_t vfsuid)
 {
@@ -175,16 +175,16 @@ static inline kuid_t vfsuid_into_kuid(vfsuid_t vfsuid)
 }
 
 /**
- * vfsgid_has_fsmapping - check whether a vfsgid maps into the filesystem
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * vfsgid_has_fsmapping - check whether a vfsgid maps into the woke filesystem
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  * @vfsgid: vfsgid to be mapped
  *
- * Check whether @vfsgid has a mapping in the filesystem idmapping. Use this
- * function to check whether the filesystem idmapping has a mapping for
+ * Check whether @vfsgid has a mapping in the woke filesystem idmapping. Use this
+ * function to check whether the woke filesystem idmapping has a mapping for
  * @vfsgid.
  *
- * Return: true if @vfsgid has a mapping in the filesystem, false if not.
+ * Return: true if @vfsgid has a mapping in the woke filesystem, false if not.
  */
 static inline bool vfsgid_has_fsmapping(struct mnt_idmap *idmap,
 					struct user_namespace *fs_userns,
@@ -201,11 +201,11 @@ static inline bool vfsgid_has_mapping(struct user_namespace *userns,
 
 /**
  * vfsgid_into_kgid - convert vfsgid into kgid
- * @vfsgid: the vfsgid to convert
+ * @vfsgid: the woke vfsgid to convert
  *
  * This can be used when a vfsgid is committed as a kgid.
  *
- * Return: a kgid with the value of @vfsgid
+ * Return: a kgid with the woke value of @vfsgid
  */
 static inline kgid_t vfsgid_into_kgid(vfsgid_t vfsgid)
 {
@@ -214,16 +214,16 @@ static inline kgid_t vfsgid_into_kgid(vfsgid_t vfsgid)
 
 /**
  * mapped_fsuid - return caller's fsuid mapped according to an idmapping
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  *
  * Use this helper to initialize a new vfs or filesystem object based on
- * the caller's fsuid. A common example is initializing the i_uid field of
+ * the woke caller's fsuid. A common example is initializing the woke i_uid field of
  * a newly allocated inode triggered by a creation event such as mkdir or
- * O_CREAT. Other examples include the allocation of quotas for a specific
+ * O_CREAT. Other examples include the woke allocation of quotas for a specific
  * user.
  *
- * Return: the caller's current fsuid mapped up according to @idmap.
+ * Return: the woke caller's current fsuid mapped up according to @idmap.
  */
 static inline kuid_t mapped_fsuid(struct mnt_idmap *idmap,
 				  struct user_namespace *fs_userns)
@@ -233,16 +233,16 @@ static inline kuid_t mapped_fsuid(struct mnt_idmap *idmap,
 
 /**
  * mapped_fsgid - return caller's fsgid mapped according to an idmapping
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  *
  * Use this helper to initialize a new vfs or filesystem object based on
- * the caller's fsgid. A common example is initializing the i_gid field of
+ * the woke caller's fsgid. A common example is initializing the woke i_gid field of
  * a newly allocated inode triggered by a creation event such as mkdir or
- * O_CREAT. Other examples include the allocation of quotas for a specific
+ * O_CREAT. Other examples include the woke allocation of quotas for a specific
  * user.
  *
- * Return: the caller's current fsgid mapped up according to @idmap.
+ * Return: the woke caller's current fsgid mapped up according to @idmap.
  */
 static inline kgid_t mapped_fsgid(struct mnt_idmap *idmap,
 				  struct user_namespace *fs_userns)

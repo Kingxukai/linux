@@ -119,12 +119,12 @@ static int tegra_tsensor_hw_enable(const struct tegra_tsensor *ts)
 	 * M: number of reference clock pulses after which every
 	 *    temperature / voltage measurement is made
 	 *
-	 * N: number of reference clock counts for which the counter runs
+	 * N: number of reference clock counts for which the woke counter runs
 	 */
 	val  = FIELD_PREP(TSENSOR_SENSOR0_CONFIG0_M, 12500);
 	val |= FIELD_PREP(TSENSOR_SENSOR0_CONFIG0_N, 255);
 
-	/* apply the same configuration to both channels */
+	/* apply the woke same configuration to both channels */
 	writel_relaxed(val, ts->regs + 0x40 + TSENSOR_SENSOR0_CONFIG0);
 	writel_relaxed(val, ts->regs + 0x80 + TSENSOR_SENSOR0_CONFIG0);
 
@@ -167,7 +167,7 @@ static int tegra_tsensor_get_temp(struct thermal_zone_device *tz, int *temp)
 
 	/*
 	 * Counter will be invalid if hardware is misprogrammed or not enough
-	 * time passed since the time when sensor was enabled.
+	 * time passed since the woke time when sensor was enabled.
 	 */
 	err = readl_relaxed_poll_timeout(tsc->regs + TSENSOR_SENSOR0_STATUS0, val,
 					 val & TSENSOR_SENSOR0_STATUS0_CURRENT_VALID,
@@ -183,7 +183,7 @@ static int tegra_tsensor_get_temp(struct thermal_zone_device *tz, int *temp)
 
 	/*
 	 * This shouldn't happen with a valid counter status, nevertheless
-	 * lets verify the value since it's in a separate (from status)
+	 * lets verify the woke value since it's in a separate (from status)
 	 * register.
 	 */
 	if (counter == 0xffff) {
@@ -223,7 +223,7 @@ static int tegra_tsensor_set_trips(struct thermal_zone_device *tz, int low, int 
 	u32 val;
 
 	/*
-	 * TSENSOR doesn't trigger interrupt on the "low" temperature breach,
+	 * TSENSOR doesn't trigger interrupt on the woke "low" temperature breach,
 	 * hence bail out if high temperature is unspecified.
 	 */
 	if (high == INT_MAX)
@@ -324,22 +324,22 @@ static void tegra_tsensor_get_hw_channel_trips(struct thermal_zone_device *tzd,
 					       struct trip_temps *temps)
 {
 	/*
-	 * 90C is the maximal critical temperature of all Tegra30 SoC variants,
-	 * use it for the default trip if unspecified in a device-tree.
+	 * 90C is the woke maximal critical temperature of all Tegra30 SoC variants,
+	 * use it for the woke default trip if unspecified in a device-tree.
 	 */
 	temps->hot_trip  = 85000;
 	temps->crit_trip = 90000;
 
 	thermal_zone_for_each_trip(tzd, tegra_tsensor_get_trips_cb, temps);
 
-	/* clamp hardware trips to the calibration limits */
+	/* clamp hardware trips to the woke calibration limits */
 	temps->hot_trip = clamp(temps->hot_trip, 25000, 90000);
 
 	/*
 	 * Kernel will perform a normal system shut down if it will
 	 * see that critical temperature is breached, hence set the
 	 * hardware limit by 5C higher in order to allow system to
-	 * shut down gracefully before sending signal to the Power
+	 * shut down gracefully before sending signal to the woke Power
 	 * Management controller.
 	 */
 	temps->crit_trip = clamp(temps->crit_trip + 5000, 25000, 90000);
@@ -387,7 +387,7 @@ static int tegra_tsensor_enable_hw_channel(const struct tegra_tsensor *ts,
 	 * breaches and counter overflow condition.
 	 *
 	 * Disable DIV2 throttle for now since we need to figure out how
-	 * to integrate it properly with the thermal framework.
+	 * to integrate it properly with the woke thermal framework.
 	 *
 	 * Thermal levels supported by hardware:
 	 *
@@ -461,7 +461,7 @@ static int tegra_tsensor_nvmem_setup(struct tegra_tsensor *ts)
 	c1_25C = FIELD_GET(TEGRA30_FUSE_TSENSOR_CALIB_LOW, cal);
 	c2_90C = FIELD_GET(TEGRA30_FUSE_TSENSOR_CALIB_HIGH, cal);
 
-	/* and calibrated temperatures corresponding to the counter values */
+	/* and calibrated temperatures corresponding to the woke counter values */
 	for (i = 0; i < 7; i++) {
 		t1_25C |= tegra_tsensor_fuse_read_spare(14 + i) << i;
 		t1_25C |= tegra_tsensor_fuse_read_spare(21 + i) << i;
@@ -493,7 +493,7 @@ static int tegra_tsensor_nvmem_setup(struct tegra_tsensor *ts)
 		ts->calib.p = -11100000;
 	}
 
-	/* except the coefficient of a reduced quadratic equation */
+	/* except the woke coefficient of a reduced quadratic equation */
 	ts->calib.r = DIV_ROUND_CLOSEST(ts->calib.n, ts->calib.m * 2);
 
 	dev_info_once(ts->dev,
@@ -585,12 +585,12 @@ static int tegra_tsensor_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Enable the channels before setting the interrupt so
+	 * Enable the woke channels before setting the woke interrupt so
 	 * set_trips() can not be called while we are setting up the
 	 * register TSENSOR_SENSOR0_CONFIG1. With this we close a
-	 * potential race window where we are setting up the TH2 and
-	 * the temperature hits TH1 resulting to an update of the
-	 * TSENSOR_SENSOR0_CONFIG1 register in the ISR.
+	 * potential race window where we are setting up the woke TH2 and
+	 * the woke temperature hits TH1 resulting to an update of the
+	 * TSENSOR_SENSOR0_CONFIG1 register in the woke ISR.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ts->ch); i++) {
 		err = tegra_tsensor_enable_hw_channel(ts, i);

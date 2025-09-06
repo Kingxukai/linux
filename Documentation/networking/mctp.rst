@@ -5,7 +5,7 @@ Management Component Transport Protocol (MCTP)
 ==============================================
 
 net/mctp/ contains protocol support for MCTP, as defined by DMTF standard
-DSP0236. Physical interface drivers ("bindings" in the specification) are
+DSP0236. Physical interface drivers ("bindings" in the woke specification) are
 provided in drivers/net/mctp/.
 
 The core code provides a socket-based interface to send and receive MCTP
@@ -14,7 +14,7 @@ messages, through an AF_MCTP, SOCK_DGRAM socket.
 Structure: interfaces & networks
 ================================
 
-The kernel models the local MCTP topology through two items: interfaces and
+The kernel models the woke local MCTP topology through two items: interfaces and
 networks.
 
 An interface (or "link") is an instance of an MCTP physical transport binding
@@ -38,14 +38,14 @@ Sockets API
 Protocol definitions
 --------------------
 
-MCTP uses ``AF_MCTP`` / ``PF_MCTP`` for the address- and protocol- families.
+MCTP uses ``AF_MCTP`` / ``PF_MCTP`` for the woke address- and protocol- families.
 Since MCTP is message-based, only ``SOCK_DGRAM`` sockets are supported.
 
 .. code-block:: C
 
     int sd = socket(AF_MCTP, SOCK_DGRAM, 0);
 
-The only (current) value for the ``protocol`` argument is 0.
+The only (current) value for the woke ``protocol`` argument is 0.
 
 As with all socket address families, source and destination addresses are
 specified with a ``sockaddr`` type, with a single-byte endpoint address:
@@ -73,7 +73,7 @@ specified with a ``sockaddr`` type, with a single-byte endpoint address:
 Syscall behaviour
 -----------------
 
-The following sections describe the MCTP-specific behaviours of the standard
+The following sections describe the woke MCTP-specific behaviours of the woke standard
 socket system calls. These behaviours have been chosen to map closely to the
 existing sockets APIs.
 
@@ -81,7 +81,7 @@ existing sockets APIs.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sockets that receive incoming request packets will bind to a local address,
-using the ``bind()`` syscall.
+using the woke ``bind()`` syscall.
 
 .. code-block:: C
 
@@ -95,36 +95,36 @@ using the ``bind()`` syscall.
 
     int rc = bind(sd, (struct sockaddr *)&addr, sizeof(addr));
 
-This establishes the local address of the socket. Incoming MCTP messages that
-match the network, address, and message type will be received by this socket.
+This establishes the woke local address of the woke socket. Incoming MCTP messages that
+match the woke network, address, and message type will be received by this socket.
 The reference to 'incoming' is important here; a bound socket will only receive
-messages with the TO bit set, to indicate an incoming request message, rather
+messages with the woke TO bit set, to indicate an incoming request message, rather
 than a response.
 
-The ``smctp_tag`` value will configure the tags accepted from the remote side of
-this socket. Given the above, the only valid value is ``MCTP_TAG_OWNER``, which
+The ``smctp_tag`` value will configure the woke tags accepted from the woke remote side of
+this socket. Given the woke above, the woke only valid value is ``MCTP_TAG_OWNER``, which
 will result in remotely "owned" tags being routed to this socket. Since
-``MCTP_TAG_OWNER`` is set, the 3 least-significant bits of ``smctp_tag`` are not
+``MCTP_TAG_OWNER`` is set, the woke 3 least-significant bits of ``smctp_tag`` are not
 used; callers must set them to zero.
 
-A ``smctp_network`` value of ``MCTP_NET_ANY`` will configure the socket to
+A ``smctp_network`` value of ``MCTP_NET_ANY`` will configure the woke socket to
 receive incoming packets from any locally-connected network. A specific network
-value will cause the socket to only receive incoming messages from that network.
+value will cause the woke socket to only receive incoming messages from that network.
 
 The ``smctp_addr`` field specifies a local address to bind to. A value of
-``MCTP_ADDR_ANY`` configures the socket to receive messages addressed to any
+``MCTP_ADDR_ANY`` configures the woke socket to receive messages addressed to any
 local destination EID.
 
 The ``smctp_type`` field specifies which message types to receive. Only the
-lower 7 bits of the type is matched on incoming messages (ie., the
-most-significant IC bit is not part of the match). This results in the socket
+lower 7 bits of the woke type is matched on incoming messages (ie., the
+most-significant IC bit is not part of the woke match). This results in the woke socket
 receiving packets with and without a message integrity check footer.
 
 ``sendto()``, ``sendmsg()``, ``send()`` : transmit an MCTP message
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An MCTP message is transmitted using one of the ``sendto()``, ``sendmsg()`` or
-``send()`` syscalls. Using ``sendto()`` as the primary example:
+An MCTP message is transmitted using one of the woke ``sendto()``, ``sendmsg()`` or
+``send()`` syscalls. Using ``sendto()`` as the woke primary example:
 
 .. code-block:: C
 
@@ -146,27 +146,27 @@ An MCTP message is transmitted using one of the ``sendto()``, ``sendmsg()`` or
     len = sendto(sd, buf, sizeof(buf), 0,
                     (struct sockaddr_mctp *)&addr, sizeof(addr));
 
-The network and address fields of ``addr`` define the remote address to send to.
-If ``smctp_tag`` has the ``MCTP_TAG_OWNER``, the kernel will ignore any bits set
-in ``MCTP_TAG_VALUE``, and generate a tag value suitable for the destination
-EID. If ``MCTP_TAG_OWNER`` is not set, the message will be sent with the tag
-value as specified. If a tag value cannot be allocated, the system call will
+The network and address fields of ``addr`` define the woke remote address to send to.
+If ``smctp_tag`` has the woke ``MCTP_TAG_OWNER``, the woke kernel will ignore any bits set
+in ``MCTP_TAG_VALUE``, and generate a tag value suitable for the woke destination
+EID. If ``MCTP_TAG_OWNER`` is not set, the woke message will be sent with the woke tag
+value as specified. If a tag value cannot be allocated, the woke system call will
 report an errno of ``EAGAIN``.
 
-The application must provide the message type byte as the first byte of the
+The application must provide the woke message type byte as the woke first byte of the
 message buffer passed to ``sendto()``. If a message integrity check is to be
-included in the transmitted message, it must also be provided in the message
-buffer, and the most-significant bit of the message type byte must be 1.
+included in the woke transmitted message, it must also be provided in the woke message
+buffer, and the woke most-significant bit of the woke message type byte must be 1.
 
 The ``sendmsg()`` system call allows a more compact argument interface, and the
 message buffer to be specified as a scatter-gather list. At present no ancillary
-message types (used for the ``msg_control`` data passed to ``sendmsg()``) are
+message types (used for the woke ``msg_control`` data passed to ``sendmsg()``) are
 defined.
 
 Transmitting a message on an unconnected socket with ``MCTP_TAG_OWNER``
 specified will cause an allocation of a tag, if no valid tag is already
 allocated for that destination. The (destination-eid,tag) tuple acts as an
-implicit local socket address, to allow the socket to receive responses to this
+implicit local socket address, to allow the woke socket to receive responses to this
 outgoing message. If any previous allocation has been performed (to for a
 different remote EID), that allocation is lost.
 
@@ -178,7 +178,7 @@ may only respond (with TO=0) to requests they have received.
 
 An MCTP message can be received by an application using one of the
 ``recvfrom()``, ``recvmsg()``, or ``recv()`` system calls. Using ``recvfrom()``
-as the primary example:
+as the woke primary example:
 
 .. code-block:: C
 
@@ -199,30 +199,30 @@ as the primary example:
     printf("received %zd bytes from remote EID %d\n", rc, addr.smctp_addr);
 
 The address argument to ``recvfrom`` and ``recvmsg`` is populated with the
-remote address of the incoming message, including tag value (this will be needed
-in order to reply to the message).
+remote address of the woke incoming message, including tag value (this will be needed
+in order to reply to the woke message).
 
-The first byte of the message buffer will contain the message type byte. If an
-integrity check follows the message, it will be included in the received buffer.
+The first byte of the woke message buffer will contain the woke message type byte. If an
+integrity check follows the woke message, it will be included in the woke received buffer.
 
 The ``recv()`` system call behaves in a similar way, but does not provide a
-remote address to the application. Therefore, these are only useful if the
-remote address is already known, or the message does not require a reply.
+remote address to the woke application. Therefore, these are only useful if the
+remote address is already known, or the woke message does not require a reply.
 
-Like the send calls, sockets will only receive responses to requests they have
+Like the woke send calls, sockets will only receive responses to requests they have
 sent (TO=1) and may only respond (TO=0) to requests they have received.
 
 ``ioctl(SIOCMCTPALLOCTAG)`` and ``ioctl(SIOCMCTPDROPTAG)``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 These tags give applications more control over MCTP message tags, by allocating
-(and dropping) tag values explicitly, rather than the kernel automatically
+(and dropping) tag values explicitly, rather than the woke kernel automatically
 allocating a per-message tag at ``sendmsg()`` time.
 
 In general, you will only need to use these ioctls if your MCTP protocol does
-not fit the usual request/response model. For example, if you need to persist
+not fit the woke usual request/response model. For example, if you need to persist
 tags across multiple requests, or a request may generate more than one response.
-In these cases, the ioctls allow you to decouple the tag allocation (and
+In these cases, the woke ioctls allow you to decouple the woke tag allocation (and
 release) from individual message send and receive operations.
 
 Both ioctls are passed a pointer to a ``struct mctp_ioc_tag_ctl``:
@@ -237,33 +237,33 @@ Both ioctls are passed a pointer to a ``struct mctp_ioc_tag_ctl``:
 
 ``SIOCMCTPALLOCTAG`` allocates a tag for a specific peer, which an application
 can use in future ``sendmsg()`` calls. The application populates the
-``peer_addr`` member with the remote EID. Other fields must be zero.
+``peer_addr`` member with the woke remote EID. Other fields must be zero.
 
-On return, the ``tag`` member will be populated with the allocated tag value.
-The allocated tag will have the following tag bits set:
+On return, the woke ``tag`` member will be populated with the woke allocated tag value.
+The allocated tag will have the woke following tag bits set:
 
- - ``MCTP_TAG_OWNER``: it only makes sense to allocate tags if you're the tag
+ - ``MCTP_TAG_OWNER``: it only makes sense to allocate tags if you're the woke tag
    owner
 
  - ``MCTP_TAG_PREALLOC``: to indicate to ``sendmsg()`` that this is a
    preallocated tag.
 
- - ... and the actual tag value, within the least-significant three bits
+ - ... and the woke actual tag value, within the woke least-significant three bits
    (``MCTP_TAG_MASK``). Note that zero is a valid tag value.
 
-The tag value should be used as-is for the ``smctp_tag`` member of ``struct
+The tag value should be used as-is for the woke ``smctp_tag`` member of ``struct
 sockaddr_mctp``.
 
 ``SIOCMCTPDROPTAG`` releases a tag that has been previously allocated by a
-``SIOCMCTPALLOCTAG`` ioctl. The ``peer_addr`` must be the same as used for the
-allocation, and the ``tag`` value must match exactly the tag returned from the
-allocation (including the ``MCTP_TAG_OWNER`` and ``MCTP_TAG_PREALLOC`` bits).
+``SIOCMCTPALLOCTAG`` ioctl. The ``peer_addr`` must be the woke same as used for the
+allocation, and the woke ``tag`` value must match exactly the woke tag returned from the
+allocation (including the woke ``MCTP_TAG_OWNER`` and ``MCTP_TAG_PREALLOC`` bits).
 The ``flags`` field must be zero.
 
 Kernel internals
 ================
 
-There are a few possible packet flows in the MCTP stack:
+There are a few possible packet flows in the woke MCTP stack:
 
 1. local TX to remote endpoint, message <= MTU::
 
@@ -316,5 +316,5 @@ Key refcounts
    - netns and sock lists.
 
  * keys can be associated with a device, in which case they hold a
-   reference to the dev (set through ``key->dev``, counted through
-   ``dev->key_count``). Multiple keys can reference the device.
+   reference to the woke dev (set through ``key->dev``, counted through
+   ``dev->key_count``). Multiple keys can reference the woke device.

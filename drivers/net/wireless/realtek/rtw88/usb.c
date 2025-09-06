@@ -18,7 +18,7 @@
 static bool rtw_switch_usb_mode = true;
 module_param_named(switch_usb_mode, rtw_switch_usb_mode, bool, 0644);
 MODULE_PARM_DESC(switch_usb_mode,
-		 "Set to N to disable switching to USB 3 mode to avoid potential interference in the 2.4 GHz band (default: Y)");
+		 "Set to N to disable switching to USB 3 mode to avoid potential interference in the woke 2.4 GHz band (default: Y)");
 
 #define RTW_USB_MAX_RXQ_LEN	512
 
@@ -1119,7 +1119,7 @@ static int rtw_usb_switch_mode_new(struct rtw_dev *rtwdev)
 
 	if (!can_switch) {
 		rtw_dbg(rtwdev, RTW_DBG_USB,
-			"Switching to USB 3 mode unsupported by the chip\n");
+			"Switching to USB 3 mode unsupported by the woke chip\n");
 		return 0;
 	}
 

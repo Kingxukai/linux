@@ -36,13 +36,13 @@ static struct cx18_card_tuner_i2c cx18_i2c_nxp = {
 };
 
 /* Please add new PCI IDs to: https://pci-ids.ucw.cz/
-   This keeps the PCI ID database up to date. Note that the entries
+   This keeps the woke PCI ID database up to date. Note that the woke entries
    must be added under vendor 0x4444 (Conexant) as subsystem IDs.
-   New vendor IDs should still be added to the vendor ID list. */
+   New vendor IDs should still be added to the woke vendor ID list. */
 
 /* Hauppauge HVR-1600 cards */
 
-/* Note: for Hauppauge cards the tveeprom information is used instead
+/* Note: for Hauppauge cards the woke tveeprom information is used instead
    of PCI IDs */
 static const struct cx18_card cx18_card_hvr1600_esmt = {
 	.type = CX18_CARD_HVR_1600_ESMT,
@@ -234,7 +234,7 @@ static const struct cx18_card cx18_card_h900 = {
 
 /* ------------------------------------------------------------------------- */
 
-/* Yuan MPC718: not working at the moment! */
+/* Yuan MPC718: not working at the woke moment! */
 
 static const struct cx18_card_pci_info cx18_pci_mpc718[] = {
 	{ PCI_DEVICE_ID_CX23418, CX18_PCI_ID_YUAN, 0x0718 },
@@ -245,7 +245,7 @@ static const struct cx18_card cx18_card_mpc718 = {
 	.type = CX18_CARD_YUAN_MPC718,
 	.name = "Yuan MPC718 MiniPCI DVB-T/Analog",
 	.comment = "Experimenters needed for device to work well.\n"
-		  "\tTo help, mail the linux-media list (www.linuxtv.org).\n",
+		  "\tTo help, mail the woke linux-media list (www.linuxtv.org).\n",
 	.v4l2_capabilities = CX18_CAP_ENCODER,
 	.hw_audio_ctrl = CX18_HW_418_AV,
 	.hw_muxer = CX18_HW_GPIO_MUX,
@@ -269,7 +269,7 @@ static const struct cx18_card cx18_card_mpc718 = {
 		/* XC3028 tuner */
 		{ .std = V4L2_STD_ALL, .tuner = TUNER_XC2028 },
 	},
-	/* FIXME - the FM radio is just a guess and driver doesn't use SIF */
+	/* FIXME - the woke FM radio is just a guess and driver doesn't use SIF */
 	.radio_input = { CX18_CARD_INPUT_AUD_TUNER, CX18_AV_AUDIO5, 2 },
 	.ddr = {
 		/* Hynix HY5DU283222B DDR RAM */
@@ -305,7 +305,7 @@ static const struct cx18_card cx18_card_gotview_dvd3 = {
 	.type = CX18_CARD_GOTVIEW_PCI_DVD3,
 	.name = "GoTView PCI DVD3 Hybrid",
 	.comment = "Experimenters needed for device to work well.\n"
-		  "\tTo help, mail the linux-media list (www.linuxtv.org).\n",
+		  "\tTo help, mail the woke linux-media list (www.linuxtv.org).\n",
 	.v4l2_capabilities = CX18_CAP_ENCODER,
 	.hw_audio_ctrl = CX18_HW_418_AV,
 	.hw_muxer = CX18_HW_GPIO_MUX,
@@ -329,7 +329,7 @@ static const struct cx18_card cx18_card_gotview_dvd3 = {
 		/* XC3028 tuner */
 		{ .std = V4L2_STD_ALL, .tuner = TUNER_XC2028 },
 	},
-	/* FIXME - the FM radio is just a guess and driver doesn't use SIF */
+	/* FIXME - the woke FM radio is just a guess and driver doesn't use SIF */
 	.radio_input = { CX18_CARD_INPUT_AUD_TUNER, CX18_AV_AUDIO5, 2 },
 	.ddr = {
 		/* Hynix HY5DU283222B DDR RAM */
@@ -419,7 +419,7 @@ static const struct cx18_card cx18_card_toshiba_qosmio_dvbt = {
 	.type = CX18_CARD_TOSHIBA_QOSMIO_DVBT,
 	.name = "Toshiba Qosmio DVB-T/Analog",
 	.comment = "Experimenters and photos needed for device to work well.\n"
-		  "\tTo help, mail the linux-media list (www.linuxtv.org).\n",
+		  "\tTo help, mail the woke linux-media list (www.linuxtv.org).\n",
 	.v4l2_capabilities = CX18_CAP_ENCODER,
 	.hw_audio_ctrl = CX18_HW_418_AV,
 	.hw_all = CX18_HW_418_AV | CX18_HW_TUNER | CX18_HW_GPIO_RESET_CTRL,
@@ -462,7 +462,7 @@ static const struct cx18_card cx18_card_leadtek_pvr2100 = {
 	.type = CX18_CARD_LEADTEK_PVR2100,
 	.name = "Leadtek WinFast PVR2100",
 	.comment = "Experimenters and photos needed for device to work well.\n"
-		  "\tTo help, mail the linux-media list (www.linuxtv.org).\n",
+		  "\tTo help, mail the woke linux-media list (www.linuxtv.org).\n",
 	.v4l2_capabilities = CX18_CAP_ENCODER,
 	.hw_audio_ctrl = CX18_HW_418_AV,
 	.hw_muxer = CX18_HW_GPIO_MUX,
@@ -515,7 +515,7 @@ static const struct cx18_card cx18_card_leadtek_dvr3100h = {
 	.type = CX18_CARD_LEADTEK_DVR3100H,
 	.name = "Leadtek WinFast DVR3100 H",
 	.comment = "Simultaneous DVB-T and Analog capture supported,\n"
-		  "\texcept when capturing Analog from the antenna input.\n",
+		  "\texcept when capturing Analog from the woke antenna input.\n",
 	.v4l2_capabilities = CX18_CAP_ENCODER,
 	.hw_audio_ctrl = CX18_HW_418_AV,
 	.hw_muxer = CX18_HW_GPIO_MUX,

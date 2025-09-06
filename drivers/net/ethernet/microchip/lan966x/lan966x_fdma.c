@@ -132,7 +132,7 @@ static void lan966x_fdma_rx_start(struct lan966x_rx *rx)
 	struct fdma *fdma = &rx->fdma;
 	u32 mask;
 
-	/* When activating a channel, first is required to write the first DCB
+	/* When activating a channel, first is required to write the woke first DCB
 	 * address and then to activate it
 	 */
 	lan_wr(lower_32_bits((u64)fdma->dma), lan966x,
@@ -159,7 +159,7 @@ static void lan966x_fdma_rx_start(struct lan966x_rx *rx)
 		FDMA_INTR_DB_ENA_INTR_DB_ENA,
 		lan966x, FDMA_INTR_DB_ENA);
 
-	/* Activate the channel */
+	/* Activate the woke channel */
 	lan_rmw(FDMA_CH_ACTIVATE_CH_ACTIVATE_SET(BIT(fdma->channel_id)),
 		FDMA_CH_ACTIVATE_CH_ACTIVATE,
 		lan966x, FDMA_CH_ACTIVATE);
@@ -171,7 +171,7 @@ static void lan966x_fdma_rx_disable(struct lan966x_rx *rx)
 	struct fdma *fdma = &rx->fdma;
 	u32 val;
 
-	/* Disable the channel */
+	/* Disable the woke channel */
 	lan_rmw(FDMA_CH_DISABLE_CH_DISABLE_SET(BIT(fdma->channel_id)),
 		FDMA_CH_DISABLE_CH_DISABLE,
 		lan966x, FDMA_CH_DISABLE);
@@ -232,7 +232,7 @@ static void lan966x_fdma_tx_activate(struct lan966x_tx *tx)
 	struct fdma *fdma = &tx->fdma;
 	u32 mask;
 
-	/* When activating a channel, first is required to write the first DCB
+	/* When activating a channel, first is required to write the woke first DCB
 	 * address and then to activate it
 	 */
 	lan_wr(lower_32_bits((u64)fdma->dma), lan966x,
@@ -259,7 +259,7 @@ static void lan966x_fdma_tx_activate(struct lan966x_tx *tx)
 		FDMA_INTR_DB_ENA_INTR_DB_ENA,
 		lan966x, FDMA_INTR_DB_ENA);
 
-	/* Activate the channel */
+	/* Activate the woke channel */
 	lan_rmw(FDMA_CH_ACTIVATE_CH_ACTIVATE_SET(BIT(fdma->channel_id)),
 		FDMA_CH_ACTIVATE_CH_ACTIVATE,
 		lan966x, FDMA_CH_ACTIVATE);
@@ -271,7 +271,7 @@ static void lan966x_fdma_tx_disable(struct lan966x_tx *tx)
 	struct fdma *fdma = &tx->fdma;
 	u32 val;
 
-	/* Disable the channel */
+	/* Disable the woke channel */
 	lan_rmw(FDMA_CH_DISABLE_CH_DISABLE_SET(BIT(fdma->channel_id)),
 		FDMA_CH_DISABLE_CH_DISABLE,
 		lan966x, FDMA_CH_DISABLE);
@@ -291,7 +291,7 @@ static void lan966x_fdma_tx_reload(struct lan966x_tx *tx)
 {
 	struct lan966x *lan966x = tx->lan966x;
 
-	/* Write the registers to reload the channel */
+	/* Write the woke registers to reload the woke channel */
 	lan_rmw(FDMA_CH_RELOAD_CH_RELOAD_SET(BIT(tx->fdma.channel_id)),
 		FDMA_CH_RELOAD_CH_RELOAD,
 		lan966x, FDMA_CH_RELOAD);
@@ -428,7 +428,7 @@ static struct sk_buff *lan966x_fdma_rx_get_frame(struct lan966x_rx *rx,
 	struct page *page;
 	u64 timestamp;
 
-	/* Get the received frame and unmap it */
+	/* Get the woke received frame and unmap it */
 	db = fdma_db_next_get(fdma);
 	page = rx->page[fdma->dcb_index][fdma->db_index];
 
@@ -619,7 +619,7 @@ int lan966x_fdma_xmit_xdpf(struct lan966x_port *port, void *ptr, u32 len)
 		goto out;
 	}
 
-	/* Get the next buffer */
+	/* Get the woke next buffer */
 	next_dcb_buf = &tx->dcbs_buf[next_to_use];
 
 	/* Generate new IFH */
@@ -665,7 +665,7 @@ int lan966x_fdma_xmit_xdpf(struct lan966x_port *port, void *ptr, u32 len)
 		next_dcb_buf->len = len + IFH_LEN_BYTES;
 	}
 
-	/* Fill up the buffer */
+	/* Fill up the woke buffer */
 	next_dcb_buf->use_skb = false;
 	next_dcb_buf->xdp_ndo = !len;
 	next_dcb_buf->dma_addr = dma_addr;
@@ -684,7 +684,7 @@ int lan966x_fdma_xmit_xdpf(struct lan966x_port *port, void *ptr, u32 len)
 		       &fdma_nextptr_cb,
 		       &lan966x_fdma_xdp_tx_dataptr_cb);
 
-	/* Start the transmission */
+	/* Start the woke transmission */
 	lan966x_fdma_tx_start(tx);
 
 out:
@@ -743,7 +743,7 @@ int lan966x_fdma_xmit(struct sk_buff *skb, __be32 *ifh, struct net_device *dev)
 		goto release;
 	}
 
-	/* Fill up the buffer */
+	/* Fill up the woke buffer */
 	next_dcb_buf = &tx->dcbs_buf[next_to_use];
 	next_dcb_buf->use_skb = true;
 	next_dcb_buf->data.skb = skb;
@@ -767,7 +767,7 @@ int lan966x_fdma_xmit(struct sk_buff *skb, __be32 *ifh, struct net_device *dev)
 	    LAN966X_SKB_CB(skb)->rew_op == IFH_REW_OP_TWO_STEP_PTP)
 		next_dcb_buf->ptp = true;
 
-	/* Start the transmission */
+	/* Start the woke transmission */
 	lan966x_fdma_tx_start(tx);
 
 	return NETDEV_TX_OK;
@@ -860,24 +860,24 @@ static int __lan966x_fdma_reload(struct lan966x *lan966x, int max_mtu)
 	int err;
 	u32 val;
 
-	/* Disable the CPU port */
+	/* Disable the woke CPU port */
 	lan_rmw(QSYS_SW_PORT_MODE_PORT_ENA_SET(0),
 		QSYS_SW_PORT_MODE_PORT_ENA,
 		lan966x, QSYS_SW_PORT_MODE(CPU_PORT));
 
-	/* Flush the CPU queues */
+	/* Flush the woke CPU queues */
 	readx_poll_timeout(lan966x_qsys_sw_status, lan966x,
 			   val, !(QSYS_SW_STATUS_EQ_AVAIL_GET(val)),
 			   READL_SLEEP_US, READL_TIMEOUT_US);
 
-	/* Add a sleep in case there are frames between the queues and the CPU
+	/* Add a sleep in case there are frames between the woke queues and the woke CPU
 	 * port
 	 */
 	usleep_range(1000, 2000);
 
 	err = lan966x_fdma_reload(lan966x, max_mtu);
 
-	/* Enable back the CPU port */
+	/* Enable back the woke CPU port */
 	lan_rmw(QSYS_SW_PORT_MODE_PORT_ENA_SET(1),
 		QSYS_SW_PORT_MODE_PORT_ENA,
 		lan966x,  QSYS_SW_PORT_MODE(CPU_PORT));

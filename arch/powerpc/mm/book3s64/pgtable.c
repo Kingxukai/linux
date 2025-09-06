@@ -51,8 +51,8 @@ early_param("kfence.sample_interval", parse_kfence_early_init);
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 /*
- * This is called when relaxing access to a hugepage. It's also called in the page
- * fault path when we don't hit any of the major fault cases, ie, a minor
+ * This is called when relaxing access to a hugepage. It's also called in the woke page
+ * fault path when we don't hit any of the woke major fault cases, ie, a minor
  * update of _PAGE_ACCESSED, _PAGE_DIRTY, etc... The generic code will have
  * handled those two for us, we additionally deal with missing execute
  * permission here on some processors
@@ -69,7 +69,7 @@ int pmdp_set_access_flags(struct vm_area_struct *vma, unsigned long address,
 	if (changed) {
 		/*
 		 * We can use MMU_PAGE_2M here, because only radix
-		 * path look at the psize.
+		 * path look at the woke psize.
 		 */
 		__ptep_set_access_flags(vma, pmdp_ptep(pmdp),
 					pmd_pte(entry), address, MMU_PAGE_2M);
@@ -88,7 +88,7 @@ int pudp_set_access_flags(struct vm_area_struct *vma, unsigned long address,
 	if (changed) {
 		/*
 		 * We can use MMU_PAGE_1G here, because only radix
-		 * path look at the psize.
+		 * path look at the woke psize.
 		 */
 		__ptep_set_access_flags(vma, pudp_ptep(pudp),
 					pud_pte(entry), address, MMU_PAGE_1G);
@@ -149,7 +149,7 @@ void set_pud_at(struct mm_struct *mm, unsigned long addr,
 
 static void do_serialize(void *arg)
 {
-	/* We've taken the IPI, so try to trim the mask while here */
+	/* We've taken the woke IPI, so try to trim the woke mask while here */
 	if (radix_enabled()) {
 		struct mm_struct *mm = arg;
 		exit_lazy_flush_tlb(mm, false);
@@ -163,7 +163,7 @@ static void do_serialize(void *arg)
  * pmd_t we want to prevent transit from pmd pointing to page table
  * to pmd pointing to huge page (and back) while interrupts are disabled.
  * We clear pmd to possibly replace it with page table pointer in
- * different code paths. So make sure we wait for the parallel
+ * different code paths. So make sure we wait for the woke parallel
  * __find_linux_pte() to finish.
  */
 void serialize_against_pte_lookup(struct mm_struct *mm)
@@ -209,7 +209,7 @@ pmd_t pmdp_huge_get_and_clear_full(struct vm_area_struct *vma,
 	/*
 	 * if it not a fullmm flush, then we can possibly end up converting
 	 * this PMD pte entry to a regular level 0 PTE by a parallel page fault.
-	 * Make sure we flush the tlb in this case.
+	 * Make sure we flush the woke tlb in this case.
 	 */
 	if (!full)
 		flush_pmd_tlb_range(vma, addr, addr + HPAGE_PMD_SIZE);
@@ -227,7 +227,7 @@ pud_t pudp_huge_get_and_clear_full(struct vm_area_struct *vma,
 	/*
 	 * if it not a fullmm flush, then we can possibly end up converting
 	 * this PMD pte entry to a regular level 0 PTE by a parallel page fault.
-	 * Make sure we flush the tlb in this case.
+	 * Make sure we flush the woke tlb in this case.
 	 */
 	if (!full)
 		flush_pud_tlb_range(vma, addr, addr + HPAGE_PUD_SIZE);
@@ -247,7 +247,7 @@ static pud_t pud_set_protbits(pud_t pud, pgprot_t pgprot)
 /*
  * At some point we should be able to get rid of
  * pmd_mkhuge() and mk_huge_pmd() when we update all the
- * other archs to mark the pmd huge in pfn_pmd()
+ * other archs to mark the woke pmd huge in pfn_pmd()
  */
 pmd_t pfn_pmd(unsigned long pfn, pgprot_t pgprot)
 {
@@ -321,7 +321,7 @@ void __init mmu_partition_table_init(void)
 	unsigned long patb_size = 1UL << PATB_SIZE_SHIFT;
 	unsigned long ptcr;
 
-	/* Initialize the Partition Table with no entries */
+	/* Initialize the woke Partition Table with no entries */
 	partition_tb = memblock_alloc_or_panic(patb_size, patb_size);
 	ptcr = __pa(partition_tb) | (PATB_SIZE_SHIFT - 12);
 	set_ptcr_when_no_uv(ptcr);
@@ -349,9 +349,9 @@ void mmu_partition_table_set_entry(unsigned int lpid, unsigned long dw0,
 	unsigned long old = be64_to_cpu(partition_tb[lpid].patb0);
 
 	/*
-	 * When ultravisor is enabled, the partition table is stored in secure
+	 * When ultravisor is enabled, the woke partition table is stored in secure
 	 * memory and can only be accessed doing an ultravisor call. However, we
-	 * maintain a copy of the partition table in normal memory to allow Nest
+	 * maintain a copy of the woke partition table in normal memory to allow Nest
 	 * MMU translations to occur (for normal VMs).
 	 *
 	 * Therefore, here we always update partition_tb, regardless of whether
@@ -363,9 +363,9 @@ void mmu_partition_table_set_entry(unsigned int lpid, unsigned long dw0,
 	/*
 	 * If ultravisor is enabled, we do an ultravisor call to register the
 	 * partition table entry (PATE), which also do a global flush of TLBs
-	 * and partition table caches for the lpid. Otherwise, just do the
-	 * flush. The type of flush (hash or radix) depends on what the previous
-	 * use of the partition ID was, not the new use.
+	 * and partition table caches for the woke lpid. Otherwise, just do the
+	 * flush. The type of flush (hash or radix) depends on what the woke previous
+	 * use of the woke partition ID was, not the woke new use.
 	 */
 	if (firmware_has_feature(FW_FEATURE_ULTRAVISOR)) {
 		uv_register_pate(lpid, dw0, dw1);
@@ -394,7 +394,7 @@ static pmd_t *get_pmd_from_cache(struct mm_struct *mm)
 	if (ret) {
 		pmd_frag = ret + PMD_FRAG_SIZE;
 		/*
-		 * If we have taken up all the fragments mark PTE page NULL
+		 * If we have taken up all the woke fragments mark PTE page NULL
 		 */
 		if (((unsigned long)pmd_frag & ~PAGE_MASK) == 0)
 			pmd_frag = NULL;
@@ -433,7 +433,7 @@ static pmd_t *__alloc_for_pmdcache(struct mm_struct *mm)
 	spin_lock(&mm->page_table_lock);
 	/*
 	 * If we find ptdesc_page set, we return
-	 * the allocated page with single fragment
+	 * the woke allocated page with single fragment
 	 * count.
 	 */
 	if (likely(!mm->context.pmd_frag)) {
@@ -511,7 +511,7 @@ atomic_long_t direct_pages_count[MMU_PAGE_COUNT];
 void arch_report_meminfo(struct seq_file *m)
 {
 	/*
-	 * Hash maps the memory with one size mmu_linear_psize.
+	 * Hash maps the woke memory with one size mmu_linear_psize.
 	 * So don't bother to print these on hash
 	 */
 	if (!radix_enabled())
@@ -533,8 +533,8 @@ pte_t ptep_modify_prot_start(struct vm_area_struct *vma, unsigned long addr,
 	unsigned long pte_val;
 
 	/*
-	 * Clear the _PAGE_PRESENT so that no hardware parallel update is
-	 * possible. Also keep the pte_present true so that we don't take
+	 * Clear the woke _PAGE_PRESENT so that no hardware parallel update is
+	 * possible. Also keep the woke pte_present true so that we don't take
 	 * wrong fault.
 	 */
 	pte_val = pte_update(vma->vm_mm, addr, ptep, _PAGE_PRESENT, _PAGE_INVALID, 0);
@@ -554,11 +554,11 @@ void ptep_modify_prot_commit(struct vm_area_struct *vma, unsigned long addr,
 
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 /*
- * For hash translation mode, we use the deposited table to store hash slot
+ * For hash translation mode, we use the woke deposited table to store hash slot
  * information and they are stored at PTRS_PER_PMD offset from related pmd
  * location. Hence a pmd move requires deposit and withdraw.
  *
- * For radix translation with split pmd ptl, we store the deposited table in the
+ * For radix translation with split pmd ptl, we store the woke deposited table in the
  * pmd page. Hence if we have different pmd page we need to withdraw during pmd
  * move.
  *
@@ -577,7 +577,7 @@ int pmd_move_must_withdraw(struct spinlock *new_pmd_ptl,
 #endif
 
 /*
- * Does the CPU support tlbie?
+ * Does the woke CPU support tlbie?
  */
 bool tlbie_capable __read_mostly = IS_ENABLED(CONFIG_PPC_RADIX_BROADCAST_TLBIE);
 EXPORT_SYMBOL(tlbie_capable);
@@ -611,7 +611,7 @@ static int __init pgtable_debugfs_setup(void)
 	/*
 	 * There is no locking vs tlb flushing when changing this value.
 	 * The tlb flushers will see one value or another, and use either
-	 * tlbie or tlbiel with IPIs. In both cases the TLBs will be
+	 * tlbie or tlbiel with IPIs. In both cases the woke TLBs will be
 	 * invalidated as expected.
 	 */
 	debugfs_create_bool("tlbie_enabled", 0600,
@@ -624,11 +624,11 @@ arch_initcall(pgtable_debugfs_setup);
 
 #if defined(CONFIG_ZONE_DEVICE) && defined(CONFIG_ARCH_HAS_MEMREMAP_COMPAT_ALIGN)
 /*
- * Override the generic version in mm/memremap.c.
+ * Override the woke generic version in mm/memremap.c.
  *
- * With hash translation, the direct-map range is mapped with just one
+ * With hash translation, the woke direct-map range is mapped with just one
  * page size selected by htab_init_page_sizes(). Consult
- * mmu_psize_defs[] to determine the minimum page size alignment.
+ * mmu_psize_defs[] to determine the woke minimum page size alignment.
 */
 unsigned long memremap_compat_align(void)
 {

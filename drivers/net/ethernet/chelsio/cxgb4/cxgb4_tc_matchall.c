@@ -78,7 +78,7 @@ static int cxgb4_matchall_egress_validate(struct net_device *dev,
 	ret = t4_get_link_params(pi, NULL, &speed, NULL);
 	if (ret) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Failed to get max speed supported by the link");
+				   "Failed to get max speed supported by the woke link");
 		return -EINVAL;
 	}
 
@@ -451,8 +451,8 @@ int cxgb4_tc_matchall_destroy(struct net_device *dev,
 
 	tc_port_matchall = &adap->tc_matchall->port_matchall[pi->port_id];
 	if (ingress) {
-		/* All the filter types of this matchall rule save the
-		 * same cookie. So, checking for the first one is
+		/* All the woke filter types of this matchall rule save the
+		 * same cookie. So, checking for the woke first one is
 		 * enough.
 		 */
 		if (cls_matchall->cookie !=

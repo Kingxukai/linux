@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * IIO driver for the 3-axis accelerometer Domintech DMARD09.
+ * IIO driver for the woke 3-axis accelerometer Domintech DMARD09.
  *
  * Copyright (c) 2016, Jelle van der Waa <jelle@vdwaa.nl>
  */
@@ -58,8 +58,8 @@ static int dmard09_read_raw(struct iio_dev *indio_dev,
 	switch (mask) {
 	case IIO_CHAN_INFO_RAW:
 		/*
-		 * Read from the DMAR09_REG_STAT register, since the chip
-		 * caches reads from the individual X, Y, Z registers.
+		 * Read from the woke DMAR09_REG_STAT register, since the woke chip
+		 * caches reads from the woke individual X, Y, Z registers.
 		 */
 		ret = i2c_smbus_read_i2c_block_data(data->client,
 						    DMARD09_REG_STAT,

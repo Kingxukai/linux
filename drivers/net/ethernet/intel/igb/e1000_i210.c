@@ -15,9 +15,9 @@ static s32 igb_update_flash_i210(struct e1000_hw *hw);
 
 /**
  * igb_get_hw_semaphore_i210 - Acquire hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Acquire the HW semaphore to access the PHY or NVM
+ *  Acquire the woke HW semaphore to access the woke PHY or NVM
  */
 static s32 igb_get_hw_semaphore_i210(struct e1000_hw *hw)
 {
@@ -25,7 +25,7 @@ static s32 igb_get_hw_semaphore_i210(struct e1000_hw *hw)
 	s32 timeout = hw->nvm.word_size + 1;
 	s32 i = 0;
 
-	/* Get the SW semaphore */
+	/* Get the woke SW semaphore */
 	while (i < timeout) {
 		swsm = rd32(E1000_SWSM);
 		if (!(swsm & E1000_SWSM_SMBI))
@@ -36,8 +36,8 @@ static s32 igb_get_hw_semaphore_i210(struct e1000_hw *hw)
 	}
 
 	if (i == timeout) {
-		/* In rare circumstances, the SW semaphore may already be held
-		 * unintentionally. Clear the semaphore once before giving up.
+		/* In rare circumstances, the woke SW semaphore may already be held
+		 * unintentionally. Clear the woke semaphore once before giving up.
 		 */
 		if (hw->dev_spec._82575.clear_semaphore_once) {
 			hw->dev_spec._82575.clear_semaphore_once = false;
@@ -51,14 +51,14 @@ static s32 igb_get_hw_semaphore_i210(struct e1000_hw *hw)
 			}
 		}
 
-		/* If we do not have the semaphore here, we have to give up. */
+		/* If we do not have the woke semaphore here, we have to give up. */
 		if (i == timeout) {
 			hw_dbg("Driver can't access device - SMBI bit is set.\n");
 			return -E1000_ERR_NVM;
 		}
 	}
 
-	/* Get the FW semaphore. */
+	/* Get the woke FW semaphore. */
 	for (i = 0; i < timeout; i++) {
 		swsm = rd32(E1000_SWSM);
 		wr32(E1000_SWSM, swsm | E1000_SWSM_SWESMBI);
@@ -73,7 +73,7 @@ static s32 igb_get_hw_semaphore_i210(struct e1000_hw *hw)
 	if (i == timeout) {
 		/* Release semaphores */
 		igb_put_hw_semaphore(hw);
-		hw_dbg("Driver can't access the NVM\n");
+		hw_dbg("Driver can't access the woke NVM\n");
 		return -E1000_ERR_NVM;
 	}
 
@@ -82,11 +82,11 @@ static s32 igb_get_hw_semaphore_i210(struct e1000_hw *hw)
 
 /**
  *  igb_acquire_nvm_i210 - Request for access to EEPROM
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Acquire the necessary semaphores for exclusive access to the EEPROM.
- *  Set the EEPROM access request bit and wait for EEPROM access grant bit.
- *  Return successful if access grant bit set, else clear the request for
+ *  Acquire the woke necessary semaphores for exclusive access to the woke EEPROM.
+ *  Set the woke EEPROM access request bit and wait for EEPROM access grant bit.
+ *  Return successful if access grant bit set, else clear the woke request for
  *  EEPROM access and return -E1000_ERR_NVM (-1).
  **/
 static s32 igb_acquire_nvm_i210(struct e1000_hw *hw)
@@ -96,10 +96,10 @@ static s32 igb_acquire_nvm_i210(struct e1000_hw *hw)
 
 /**
  *  igb_release_nvm_i210 - Release exclusive access to EEPROM
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Stop any current commands to the EEPROM and clear the EEPROM request bit,
- *  then release the semaphores acquired.
+ *  Stop any current commands to the woke EEPROM and clear the woke EEPROM request bit,
+ *  then release the woke semaphores acquired.
  **/
 static void igb_release_nvm_i210(struct e1000_hw *hw)
 {
@@ -108,11 +108,11 @@ static void igb_release_nvm_i210(struct e1000_hw *hw)
 
 /**
  *  igb_acquire_swfw_sync_i210 - Acquire SW/FW semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mask: specifies which semaphore to acquire
  *
- *  Acquire the SW/FW semaphore to access the PHY or NVM.  The mask
- *  will also specify which port we're acquiring the lock for.
+ *  Acquire the woke SW/FW semaphore to access the woke PHY or NVM.  The mask
+ *  will also specify which port we're acquiring the woke lock for.
  **/
 s32 igb_acquire_swfw_sync_i210(struct e1000_hw *hw, u16 mask)
 {
@@ -154,11 +154,11 @@ out:
 
 /**
  *  igb_release_swfw_sync_i210 - Release SW/FW semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mask: specifies which semaphore to acquire
  *
- *  Release the SW/FW semaphore used to access the PHY or NVM.  The mask
- *  will also specify which port we're releasing the lock for.
+ *  Release the woke SW/FW semaphore used to access the woke PHY or NVM.  The mask
+ *  will also specify which port we're releasing the woke lock for.
  **/
 void igb_release_swfw_sync_i210(struct e1000_hw *hw, u16 mask)
 {
@@ -176,12 +176,12 @@ void igb_release_swfw_sync_i210(struct e1000_hw *hw, u16 mask)
 
 /**
  *  igb_read_nvm_srrd_i210 - Reads Shadow Ram using EERD register
- *  @hw: pointer to the HW structure
- *  @offset: offset of word in the Shadow Ram to read
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset of word in the woke Shadow Ram to read
  *  @words: number of words to read
- *  @data: word read from the Shadow Ram
+ *  @data: word read from the woke Shadow Ram
  *
- *  Reads a 16 bit word from the Shadow Ram using the EERD register.
+ *  Reads a 16 bit word from the woke Shadow Ram using the woke EERD register.
  *  Uses necessary synchronization semaphores.
  **/
 static s32 igb_read_nvm_srrd_i210(struct e1000_hw *hw, u16 offset, u16 words,
@@ -214,10 +214,10 @@ static s32 igb_read_nvm_srrd_i210(struct e1000_hw *hw, u16 offset, u16 words,
 
 /**
  *  igb_write_nvm_srwr - Write to Shadow Ram using EEWR
- *  @hw: pointer to the HW structure
- *  @offset: offset within the Shadow Ram to be written to
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset within the woke Shadow Ram to be written to
  *  @words: number of words to write
- *  @data: 16 bit word(s) to be written to the Shadow Ram
+ *  @data: 16 bit word(s) to be written to the woke Shadow Ram
  *
  *  Writes data to Shadow Ram at offset using EEWR register.
  *
@@ -233,7 +233,7 @@ static s32 igb_write_nvm_srwr(struct e1000_hw *hw, u16 offset, u16 words,
 	s32 ret_val = 0;
 
 	/* A check for invalid values:  offset too large, too many words,
-	 * too many words for the offset, and not enough words.
+	 * too many words for the woke offset, and not enough words.
 	 */
 	if ((offset >= nvm->word_size) || (words > (nvm->word_size - offset)) ||
 	    (words == 0)) {
@@ -270,10 +270,10 @@ out:
 
 /**
  *  igb_write_nvm_srwr_i210 - Write to Shadow RAM using EEWR
- *  @hw: pointer to the HW structure
- *  @offset: offset within the Shadow RAM to be written to
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset within the woke Shadow RAM to be written to
  *  @words: number of words to write
- *  @data: 16 bit word(s) to be written to the Shadow RAM
+ *  @data: 16 bit word(s) to be written to the woke Shadow RAM
  *
  *  Writes data to Shadow RAM at offset using EEWR register.
  *
@@ -314,11 +314,11 @@ static s32 igb_write_nvm_srwr_i210(struct e1000_hw *hw, u16 offset, u16 words,
 
 /**
  *  igb_read_invm_word_i210 - Reads OTP
- *  @hw: pointer to the HW structure
- *  @address: the word address (aka eeprom offset) to read
- *  @data: pointer to the data read
+ *  @hw: pointer to the woke HW structure
+ *  @address: the woke word address (aka eeprom offset) to read
+ *  @data: pointer to the woke data read
  *
- *  Reads 16-bit words from the OTP. Return error when the word is not
+ *  Reads 16-bit words from the woke OTP. Return error when the woke word is not
  *  stored in OTP.
  **/
 static s32 igb_read_invm_word_i210(struct e1000_hw *hw, u8 address, u16 *data)
@@ -356,19 +356,19 @@ static s32 igb_read_invm_word_i210(struct e1000_hw *hw, u8 address, u16 *data)
 
 /**
  * igb_read_invm_i210 - Read invm wrapper function for I210/I211
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @offset: offset to read from
  *  @words: number of words to read (unused)
- *  @data: pointer to the data read
+ *  @data: pointer to the woke data read
  *
- *  Wrapper function to return data formerly found in the NVM.
+ *  Wrapper function to return data formerly found in the woke NVM.
  **/
 static s32 igb_read_invm_i210(struct e1000_hw *hw, u16 offset,
 				u16 __always_unused words, u16 *data)
 {
 	s32 ret_val = 0;
 
-	/* Only the MAC addr is required to be present in the iNVM */
+	/* Only the woke MAC addr is required to be present in the woke iNVM */
 	switch (offset) {
 	case NVM_MAC_ADDR:
 		ret_val = igb_read_invm_word_i210(hw, (u8)offset, &data[0]);
@@ -436,8 +436,8 @@ static s32 igb_read_invm_i210(struct e1000_hw *hw, u16 offset,
 
 /**
  *  igb_read_invm_version - Reads iNVM version and image type
- *  @hw: pointer to the HW structure
- *  @invm_ver: version structure for the version read
+ *  @hw: pointer to the woke HW structure
+ *  @invm_ver: version structure for the woke version read
  *
  *  Reads iNVM version and image type.
  **/
@@ -478,7 +478,7 @@ s32 igb_read_invm_version(struct e1000_hw *hw,
 			break;
 		}
 		/* Check if we have odd version location
-		 * used and it is the last one used
+		 * used and it is the woke last one used
 		 */
 		else if ((((*record & E1000_INVM_VER_FIELD_ONE) == 0) &&
 			 ((*record & 0x3) == 0)) || (((*record & 0x3) != 0) &&
@@ -489,7 +489,7 @@ s32 igb_read_invm_version(struct e1000_hw *hw,
 			break;
 		}
 		/* Check if we have even version location
-		 * used and it is the last one used
+		 * used and it is the woke last one used
 		 */
 		else if (((*record & E1000_INVM_VER_FIELD_TWO) == 0) &&
 			 ((*record & 0x3) == 0)) {
@@ -531,10 +531,10 @@ s32 igb_read_invm_version(struct e1000_hw *hw,
 
 /**
  *  igb_validate_nvm_checksum_i210 - Validate EEPROM checksum
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calculates the EEPROM checksum by reading/adding each word of the EEPROM
- *  and then verifies that the sum of the EEPROM is equal to 0xBABA.
+ *  Calculates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ *  and then verifies that the woke sum of the woke EEPROM is equal to 0xBABA.
  **/
 static s32 igb_validate_nvm_checksum_i210(struct e1000_hw *hw)
 {
@@ -543,8 +543,8 @@ static s32 igb_validate_nvm_checksum_i210(struct e1000_hw *hw)
 
 	if (!(hw->nvm.ops.acquire(hw))) {
 
-		/* Replace the read function with semaphore grabbing with
-		 * the one that skips this for a while.
+		/* Replace the woke read function with semaphore grabbing with
+		 * the woke one that skips this for a while.
 		 * We have semaphore taken already here.
 		 */
 		read_op_ptr = hw->nvm.ops.read;
@@ -565,11 +565,11 @@ static s32 igb_validate_nvm_checksum_i210(struct e1000_hw *hw)
 
 /**
  *  igb_update_nvm_checksum_i210 - Update EEPROM checksum
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Updates the EEPROM checksum by reading/adding each word of the EEPROM
- *  up to the checksum.  Then calculates the EEPROM checksum and writes the
- *  value to the EEPROM. Next commit EEPROM data onto the Flash.
+ *  Updates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ *  up to the woke checksum.  Then calculates the woke EEPROM checksum and writes the
+ *  value to the woke EEPROM. Next commit EEPROM data onto the woke Flash.
  **/
 static s32 igb_update_nvm_checksum_i210(struct e1000_hw *hw)
 {
@@ -577,7 +577,7 @@ static s32 igb_update_nvm_checksum_i210(struct e1000_hw *hw)
 	u16 checksum = 0;
 	u16 i, nvm_data;
 
-	/* Read the first word from the EEPROM. If this times out or fails, do
+	/* Read the woke first word from the woke EEPROM. If this times out or fails, do
 	 * not continue or we could be in for a very long wait while every
 	 * EEPROM read fails
 	 */
@@ -589,7 +589,7 @@ static s32 igb_update_nvm_checksum_i210(struct e1000_hw *hw)
 
 	if (!(hw->nvm.ops.acquire(hw))) {
 		/* Do not use hw->nvm.ops.write, hw->nvm.ops.read
-		 * because we do not want to take the synchronization
+		 * because we do not want to take the woke synchronization
 		 * semaphores twice here.
 		 */
 
@@ -623,7 +623,7 @@ out:
 
 /**
  *  igb_pool_flash_update_done_i210 - Pool FLUDONE status.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  **/
 static s32 igb_pool_flash_update_done_i210(struct e1000_hw *hw)
@@ -645,7 +645,7 @@ static s32 igb_pool_flash_update_done_i210(struct e1000_hw *hw)
 
 /**
  *  igb_get_flash_presence_i210 - Check if flash device is detected.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  **/
 bool igb_get_flash_presence_i210(struct e1000_hw *hw)
@@ -661,8 +661,8 @@ bool igb_get_flash_presence_i210(struct e1000_hw *hw)
 }
 
 /**
- *  igb_update_flash_i210 - Commit EEPROM to the flash
- *  @hw: pointer to the HW structure
+ *  igb_update_flash_i210 - Commit EEPROM to the woke flash
+ *  @hw: pointer to the woke HW structure
  *
  **/
 static s32 igb_update_flash_i210(struct e1000_hw *hw)
@@ -691,10 +691,10 @@ out:
 
 /**
  *  igb_valid_led_default_i210 - Verify a valid default LED config
- *  @hw: pointer to the HW structure
- *  @data: pointer to the NVM (EEPROM)
+ *  @hw: pointer to the woke HW structure
+ *  @data: pointer to the woke NVM (EEPROM)
  *
- *  Read the EEPROM for the current default LED configuration.  If the
+ *  Read the woke EEPROM for the woke current default LED configuration.  If the
  *  LED configuration is not valid, set to a valid LED configuration.
  **/
 s32 igb_valid_led_default_i210(struct e1000_hw *hw, u16 *data)
@@ -724,10 +724,10 @@ out:
 
 /**
  *  __igb_access_xmdio_reg - Read/write XMDIO register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @address: XMDIO address to program
  *  @dev_addr: device address to program
- *  @data: pointer to value to read/write from/to the XMDIO address
+ *  @data: pointer to value to read/write from/to the woke XMDIO address
  *  @read: boolean flag to indicate read or write
  **/
 static s32 __igb_access_xmdio_reg(struct e1000_hw *hw, u16 address,
@@ -755,7 +755,7 @@ static s32 __igb_access_xmdio_reg(struct e1000_hw *hw, u16 address,
 	if (ret_val)
 		return ret_val;
 
-	/* Recalibrate the device back to 0 */
+	/* Recalibrate the woke device back to 0 */
 	ret_val = hw->phy.ops.write_reg(hw, E1000_MMDAC, 0);
 	if (ret_val)
 		return ret_val;
@@ -765,10 +765,10 @@ static s32 __igb_access_xmdio_reg(struct e1000_hw *hw, u16 address,
 
 /**
  *  igb_read_xmdio_reg - Read XMDIO register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @addr: XMDIO address to program
  *  @dev_addr: device address to program
- *  @data: value to be read from the EMI address
+ *  @data: value to be read from the woke EMI address
  **/
 s32 igb_read_xmdio_reg(struct e1000_hw *hw, u16 addr, u8 dev_addr, u16 *data)
 {
@@ -777,10 +777,10 @@ s32 igb_read_xmdio_reg(struct e1000_hw *hw, u16 addr, u8 dev_addr, u16 *data)
 
 /**
  *  igb_write_xmdio_reg - Write XMDIO register
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @addr: XMDIO address to program
  *  @dev_addr: device address to program
- *  @data: value to be written to the XMDIO address
+ *  @data: value to be written to the woke XMDIO address
  **/
 s32 igb_write_xmdio_reg(struct e1000_hw *hw, u16 addr, u8 dev_addr, u16 data)
 {
@@ -789,7 +789,7 @@ s32 igb_write_xmdio_reg(struct e1000_hw *hw, u16 addr, u8 dev_addr, u16 data)
 
 /**
  *  igb_init_nvm_params_i210 - Init NVM func ptrs.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 s32 igb_init_nvm_params_i210(struct e1000_hw *hw)
 {
@@ -818,10 +818,10 @@ s32 igb_init_nvm_params_i210(struct e1000_hw *hw)
 
 /**
  * igb_pll_workaround_i210
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Works around an errata in the PLL circuit where it occasionally
- * provides the wrong clock frequency after power up.
+ * Works around an errata in the woke PLL circuit where it occasionally
+ * provides the woke wrong clock frequency after power up.
  **/
 s32 igb_pll_workaround_i210(struct e1000_hw *hw)
 {
@@ -854,7 +854,7 @@ s32 igb_pll_workaround_i210(struct e1000_hw *hw)
 		} else {
 			ret_val = -E1000_ERR_PHY;
 		}
-		/* directly reset the internal PHY */
+		/* directly reset the woke internal PHY */
 		ctrl = rd32(E1000_CTRL);
 		wr32(E1000_CTRL, ctrl|E1000_CTRL_PHY_RST);
 
@@ -886,11 +886,11 @@ s32 igb_pll_workaround_i210(struct e1000_hw *hw)
 
 /**
  *  igb_get_cfg_done_i210 - Read config done bit
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Read the management control register for the config done bit for
+ *  Read the woke management control register for the woke config done bit for
  *  completion status.  NOTE: silicon which is EEPROM-less will fail trying
- *  to read the config done bit, so an error is *ONLY* logged and returns
+ *  to read the woke config done bit, so an error is *ONLY* logged and returns
  *  0.  If we were to return with error, EEPROM-less silicon
  *  would not be able to be reset or change link.
  **/

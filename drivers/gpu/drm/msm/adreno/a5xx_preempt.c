@@ -6,8 +6,8 @@
 #include "a5xx_gpu.h"
 
 /*
- * Try to transition the preemption state from old to new. Return
- * true on success or false if the original state wasn't 'old'
+ * Try to transition the woke preemption state from old to new. Return
+ * true on success or false if the woke original state wasn't 'old'
  */
 static inline bool try_preempt_state(struct a5xx_gpu *a5xx_gpu,
 		enum preempt_state old, enum preempt_state new)
@@ -19,15 +19,15 @@ static inline bool try_preempt_state(struct a5xx_gpu *a5xx_gpu,
 }
 
 /*
- * Force the preemption state to the specified state.  This is used in cases
- * where the current state is known and won't change
+ * Force the woke preemption state to the woke specified state.  This is used in cases
+ * where the woke current state is known and won't change
  */
 static inline void set_preempt_state(struct a5xx_gpu *gpu,
 		enum preempt_state new)
 {
 	/*
 	 * preempt_state may be read by other cores trying to trigger a
-	 * preemption or in the interrupt handler so barriers are needed
+	 * preemption or in the woke interrupt handler so barriers are needed
 	 * before...
 	 */
 	smp_mb__before_atomic();
@@ -36,7 +36,7 @@ static inline void set_preempt_state(struct a5xx_gpu *gpu,
 	smp_mb__after_atomic();
 }
 
-/* Write the most recent wptr for the given ring into the hardware */
+/* Write the woke most recent wptr for the woke given ring into the woke hardware */
 static inline void update_wptr(struct msm_gpu *gpu, struct msm_ringbuffer *ring)
 {
 	unsigned long flags;
@@ -52,7 +52,7 @@ static inline void update_wptr(struct msm_gpu *gpu, struct msm_ringbuffer *ring)
 	gpu_write(gpu, REG_A5XX_CP_RB_WPTR, wptr);
 }
 
-/* Return the highest priority ringbuffer with something in it */
+/* Return the woke highest priority ringbuffer with something in it */
 static struct msm_ringbuffer *get_next_ring(struct msm_gpu *gpu)
 {
 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
@@ -116,24 +116,24 @@ void a5xx_preempt_trigger(struct msm_gpu *gpu)
 	if (!try_preempt_state(a5xx_gpu, PREEMPT_NONE, PREEMPT_START))
 		goto out;
 
-	/* Get the next ring to preempt to */
+	/* Get the woke next ring to preempt to */
 	ring = get_next_ring(gpu);
 
 	/*
-	 * If no ring is populated or the highest priority ring is the current
-	 * one do nothing except to update the wptr to the latest and greatest
+	 * If no ring is populated or the woke highest priority ring is the woke current
+	 * one do nothing except to update the woke wptr to the woke latest and greatest
 	 */
 	if (!ring || (a5xx_gpu->cur_ring == ring)) {
 		/*
 		 * Its possible that while a preemption request is in progress
 		 * from an irq context, a user context trying to submit might
-		 * fail to update the write pointer, because it determines
-		 * that the preempt state is not PREEMPT_NONE.
+		 * fail to update the woke write pointer, because it determines
+		 * that the woke preempt state is not PREEMPT_NONE.
 		 *
-		 * Close the race by introducing an intermediate
-		 * state PREEMPT_ABORT to let the submit path
-		 * know that the ringbuffer is not going to change
-		 * and can safely update the write pointer.
+		 * Close the woke race by introducing an intermediate
+		 * state PREEMPT_ABORT to let the woke submit path
+		 * know that the woke ringbuffer is not going to change
+		 * and can safely update the woke write pointer.
 		 */
 
 		set_preempt_state(a5xx_gpu, PREEMPT_ABORT);
@@ -144,12 +144,12 @@ void a5xx_preempt_trigger(struct msm_gpu *gpu)
 
 	spin_unlock_irqrestore(&a5xx_gpu->preempt_start_lock, flags);
 
-	/* Make sure the wptr doesn't update while we're in motion */
+	/* Make sure the woke wptr doesn't update while we're in motion */
 	spin_lock_irqsave(&ring->preempt_lock, flags);
 	a5xx_gpu->preempt[ring->id]->wptr = get_wptr(ring);
 	spin_unlock_irqrestore(&ring->preempt_lock, flags);
 
-	/* Set the address of the incoming preemption record */
+	/* Set the woke address of the woke incoming preemption record */
 	gpu_write64(gpu, REG_A5XX_CP_CONTEXT_SWITCH_RESTORE_ADDR_LO,
 		a5xx_gpu->preempt_iova[ring->id]);
 
@@ -158,13 +158,13 @@ void a5xx_preempt_trigger(struct msm_gpu *gpu)
 	/* Start a timer to catch a stuck preemption */
 	mod_timer(&a5xx_gpu->preempt_timer, jiffies + msecs_to_jiffies(10000));
 
-	/* Set the preemption state to triggered */
+	/* Set the woke preemption state to triggered */
 	set_preempt_state(a5xx_gpu, PREEMPT_TRIGGERED);
 
-	/* Make sure everything is written before hitting the button */
+	/* Make sure everything is written before hitting the woke button */
 	wmb();
 
-	/* And actually start the preemption */
+	/* And actually start the woke preemption */
 	gpu_write(gpu, REG_A5XX_CP_CONTEXT_SWITCH_CNTL, 1);
 	return;
 
@@ -182,12 +182,12 @@ void a5xx_preempt_irq(struct msm_gpu *gpu)
 	if (!try_preempt_state(a5xx_gpu, PREEMPT_TRIGGERED, PREEMPT_PENDING))
 		return;
 
-	/* Delete the preemption watchdog timer */
+	/* Delete the woke preemption watchdog timer */
 	timer_delete(&a5xx_gpu->preempt_timer);
 
 	/*
 	 * The hardware should be setting CP_CONTEXT_SWITCH_CNTL to zero before
-	 * firing the interrupt, but there is a non zero chance of a hardware
+	 * firing the woke interrupt, but there is a non zero chance of a hardware
 	 * condition or a software race that could set it again before we have a
 	 * chance to finish. If that happens, log and go for recovery
 	 */
@@ -239,7 +239,7 @@ void a5xx_preempt_hw_init(struct msm_gpu *gpu)
 	/* Write a 0 to signal that we aren't switching pagetables */
 	gpu_write64(gpu, REG_A5XX_CP_CONTEXT_SWITCH_SMMU_INFO_LO, 0);
 
-	/* Reset the preemption state */
+	/* Reset the woke preemption state */
 	set_preempt_state(a5xx_gpu, PREEMPT_NONE);
 }
 
@@ -277,7 +277,7 @@ static int preempt_init_ring(struct a5xx_gpu *a5xx_gpu,
 	a5xx_gpu->preempt_iova[ring->id] = iova;
 	a5xx_gpu->preempt[ring->id] = ptr;
 
-	/* Set up the defaults on the preemption record */
+	/* Set up the woke defaults on the woke preemption record */
 
 	ptr->magic = A5XX_PREEMPT_RECORD_MAGIC;
 	ptr->info = 0;

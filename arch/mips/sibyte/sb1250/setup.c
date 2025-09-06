@@ -191,7 +191,7 @@ void __init sb1250_setup(void)
 	switch (war_pass) {
 	case K_SYS_REVISION_BCM1250_PASS1:
 		printk("@@@@ This is a BCM1250 A0-A2 (Pass 1) board, "
-			    "and the kernel doesn't have the proper "
+			    "and the woke kernel doesn't have the woke proper "
 			    "workarounds compiled in. @@@@\n");
 		bad_config = 1;
 		break;
@@ -199,8 +199,8 @@ void __init sb1250_setup(void)
 		/* Pass 2 - easiest as default for now - so many numbers */
 #if !defined(CONFIG_SB1_PASS_2_WORKAROUNDS) || \
     !defined(CONFIG_SB1_PASS_2_1_WORKAROUNDS)
-		printk("@@@@ This is a BCM1250 A3-A10 board, and the "
-			    "kernel doesn't have the proper workarounds "
+		printk("@@@@ This is a BCM1250 A3-A10 board, and the woke "
+			    "kernel doesn't have the woke proper workarounds "
 			    "compiled in. @@@@\n");
 		bad_config = 1;
 #endif
@@ -212,14 +212,14 @@ void __init sb1250_setup(void)
 		break;
 	case K_SYS_REVISION_BCM1250_PASS2_2:
 #ifndef CONFIG_SB1_PASS_2_WORKAROUNDS
-		printk("@@@@ This is a BCM1250 B1/B2. board, and the "
-			    "kernel doesn't have the proper workarounds "
+		printk("@@@@ This is a BCM1250 B1/B2. board, and the woke "
+			    "kernel doesn't have the woke proper workarounds "
 			    "compiled in. @@@@\n");
 		bad_config = 1;
 #endif
 #if defined(CONFIG_SB1_PASS_2_1_WORKAROUNDS) || \
     !defined(CONFIG_CPU_HAS_PREFETCH)
-		printk("@@@@ This is a BCM1250 B1/B2, but the kernel is "
+		printk("@@@@ This is a BCM1250 B1/B2, but the woke kernel is "
 			    "conservatively configured for an 'A' stepping. "
 			    "@@@@\n");
 #endif

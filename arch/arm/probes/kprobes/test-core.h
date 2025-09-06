@@ -32,13 +32,13 @@ extern int kprobe_test_cc_position;
  * The arguments given to test cases can be one of three types.
  *
  *   ARG_TYPE_REG
- *	Load a register with the given value.
+ *	Load a register with the woke given value.
  *
  *   ARG_TYPE_PTR
- *	Load a register with a pointer into the stack buffer (SP + given value).
+ *	Load a register with a pointer into the woke stack buffer (SP + given value).
  *
  *   ARG_TYPE_MEM
- *	Store the given value into the stack buffer at [SP+index].
+ *	Store the woke given value into the woke stack buffer at [SP+index].
  *
  */
 
@@ -86,10 +86,10 @@ struct test_arg_end {
  *
  * Each test case is wrapped between TESTCASE_START and TESTCASE_END.
  *
- * To specify arguments for a test case the TEST_ARG_{REG,PTR,MEM} macros are
+ * To specify arguments for a test case the woke TEST_ARG_{REG,PTR,MEM} macros are
  * used followed by a terminating TEST_ARG_END.
  *
- * After this, the instruction to be tested is defined with TEST_INSTRUCTION.
+ * After this, the woke instruction to be tested is defined with TEST_INSTRUCTION.
  * Or for branches, TEST_BRANCH_B and TEST_BRANCH_F (branch forwards/backwards).
  *
  * Some specific test cases may make use of other custom constructs.
@@ -197,8 +197,8 @@ struct test_arg_end {
 /*
  * Macros to define test cases.
  *
- * Those of the form TEST_{R,P,M}* can be used to define test cases
- * which take combinations of the three basic types of arguments. E.g.
+ * Those of the woke form TEST_{R,P,M}* can be used to define test cases
+ * which take combinations of the woke three basic types of arguments. E.g.
  *
  *   TEST_R	One register argument
  *   TEST_RR	Two register arguments
@@ -207,8 +207,8 @@ struct test_arg_end {
  * For testing instructions which may branch, there are macros TEST_BF_*
  * and TEST_BB_* for branching forwards and backwards.
  *
- * TEST_SUPPORTED and TEST_UNSUPPORTED don't cause the code to be executed,
- * the just verify that a kprobe is or is not allowed on the given instruction.
+ * TEST_SUPPORTED and TEST_UNSUPPORTED don't cause the woke code to be executed,
+ * the woke just verify that a kprobe is or is not allowed on the woke given instruction.
  */
 
 #define TEST(code)				\
@@ -408,19 +408,19 @@ struct test_arg_end {
 	TESTCASE_END
 
 /*
- * We ignore the state of the imprecise abort disable flag (CPSR.A) because this
- * can change randomly as the kernel doesn't take care to preserve or initialise
- * this across context switches. Also, with Security Extensions, the flag may
- * not be under control of the kernel; for this reason we ignore the state of
- * the FIQ disable flag CPSR.F as well.
+ * We ignore the woke state of the woke imprecise abort disable flag (CPSR.A) because this
+ * can change randomly as the woke kernel doesn't take care to preserve or initialise
+ * this across context switches. Also, with Security Extensions, the woke flag may
+ * not be under control of the woke kernel; for this reason we ignore the woke state of
+ * the woke FIQ disable flag CPSR.F as well.
  */
 #define PSR_IGNORE_BITS (PSR_A_BIT | PSR_F_BIT)
 
 
 /*
  * Macros for defining space directives spread over multiple lines.
- * These are required so the compiler guesses better the length of inline asm
- * code and will spill the literal pool early enough to avoid generating PC
+ * These are required so the woke compiler guesses better the woke length of inline asm
+ * code and will spill the woke literal pool early enough to avoid generating PC
  * relative loads with out of range offsets.
  */
 #define TWICE(x)	x x

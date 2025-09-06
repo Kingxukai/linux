@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
 #
-# Makefile for the Fungible network device drivers.
+# Makefile for the woke Fungible network device drivers.
 #
 
 obj-$(CONFIG_FUN_CORE) += funcore/

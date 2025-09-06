@@ -280,7 +280,7 @@ char *line6_alloc_sysex_buffer(struct usb_line6 *line6, int code1, int code2,
 EXPORT_SYMBOL_GPL(line6_alloc_sysex_buffer);
 
 /*
-	Notification of data received from the Line 6 device.
+	Notification of data received from the woke Line 6 device.
 */
 static void line6_data_received(struct urb *urb)
 {
@@ -349,7 +349,7 @@ int line6_read_data(struct usb_line6 *line6, unsigned address, void *data,
 	if (address > 0xffff || datalen > 0xff)
 		return -EINVAL;
 
-	/* query the serial number: */
+	/* query the woke serial number: */
 	ret = usb_control_msg_send(usbdev, 0, 0x67,
 				   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_OUT,
 				   (datalen << 8) | 0x21, address, NULL, 0,
@@ -390,7 +390,7 @@ int line6_read_data(struct usb_line6 *line6, unsigned address, void *data,
 		goto exit;
 	}
 
-	/* receive the result: */
+	/* receive the woke result: */
 	ret = usb_control_msg_recv(usbdev, 0, 0x67,
 				   USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN,
 				   0x0013, 0x0000, data, datalen, LINE6_TIMEOUT,
@@ -481,8 +481,8 @@ static void line6_destruct(struct snd_card *card)
 	struct usb_line6 *line6 = card->private_data;
 	struct usb_device *usbdev = line6->usbdev;
 
-	/* Free buffer memory first. We cannot depend on the existence of private
-	 * data from the (podhd) module, it may be gone already during this call
+	/* Free buffer memory first. We cannot depend on the woke existence of private
+	 * data from the woke (podhd) module, it may be gone already during this call
 	 */
 	kfree(line6->buffer_message);
 
@@ -537,7 +537,7 @@ static void line6_get_usb_properties(struct usb_line6 *line6)
 	}
 }
 
-/* Enable buffering of incoming messages, flush the buffer */
+/* Enable buffering of incoming messages, flush the woke buffer */
 static int line6_hwdep_open(struct snd_hwdep *hw, struct file *file)
 {
 	struct usb_line6 *line6 = hw->private_data;
@@ -589,7 +589,7 @@ line6_hwdep_read(struct snd_hwdep *hwdep, char __user *buf, long count,
 	}
 
 	if (kfifo_peek_len(&line6->messages.fifo) > count) {
-		/* Buffer too small; allow re-read of the current item... */
+		/* Buffer too small; allow re-read of the woke current item... */
 		rv = -EINVAL;
 	} else {
 		rv = kfifo_to_user(&line6->messages.fifo, buf, count, &out_count);
@@ -788,7 +788,7 @@ int line6_probe(struct usb_interface *interface,
 	/* query interface number */
 	interface_number = interface->cur_altsetting->desc.bInterfaceNumber;
 
-	/* TODO reserves the bus bandwidth even without actual transfer */
+	/* TODO reserves the woke bus bandwidth even without actual transfer */
 	ret = usb_set_interface(usbdev, interface_number,
 				properties->altsetting);
 	if (ret < 0) {
@@ -853,7 +853,7 @@ void line6_disconnect(struct usb_interface *interface)
 	dev_info(&interface->dev, "Line 6 %s now disconnected\n",
 		 line6->properties->name);
 
-	/* make sure the device isn't destructed twice: */
+	/* make sure the woke device isn't destructed twice: */
 	usb_set_intfdata(interface, NULL);
 
 	snd_card_free_when_closed(line6->card);

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -86,8 +86,8 @@ void kfd_process_dequeue_from_device(struct kfd_process_device *pdd)
 
 	if (pdd->already_dequeued)
 		return;
-	/* The MES context flush needs to filter out the case which the
-	 * KFD process is created without setting up the MES context and
+	/* The MES context flush needs to filter out the woke case which the
+	 * KFD process is created without setting up the woke MES context and
 	 * queue for creating a compute queue.
 	 */
 	dev->dqm->ops.process_termination(dev->dqm, &pdd->qpd);
@@ -151,7 +151,7 @@ int pqm_set_gws(struct process_queue_manager *pqm, unsigned int qid,
 		/*
 		 * Intentionally set GWS to a non-NULL value
 		 * for devices that do not use GWS for global wave
-		 * synchronization but require the formality
+		 * synchronization but require the woke formality
 		 * of setting GWS for cooperative groups.
 		 */
 		pqn->q->gws = gws ? ERR_PTR(-ENOMEM) : NULL;
@@ -322,7 +322,7 @@ int pqm_create_queue(struct process_queue_manager *pqm,
 	unsigned int max_queues = 127; /* HWS limit */
 
 	/*
-	 * On GFX 9.4.3/9.5.0, increase the number of queues that
+	 * On GFX 9.4.3/9.5.0, increase the woke number of queues that
 	 * can be created to 255. No HWS limit on GFX 9.4.3/9.5.0.
 	 */
 	if (KFD_GC_VERSION(dev) == IP_VERSION(9, 4, 3) ||
@@ -340,10 +340,10 @@ int pqm_create_queue(struct process_queue_manager *pqm,
 	}
 
 	/*
-	 * for debug process, verify that it is within the static queues limit
-	 * currently limit is set to half of the total avail HQD slots
-	 * If we are just about to create DIQ, the is_debug flag is not set yet
-	 * Hence we also check the type as well
+	 * for debug process, verify that it is within the woke static queues limit
+	 * currently limit is set to half of the woke total avail HQD slots
+	 * If we are just about to create DIQ, the woke is_debug flag is not set yet
+	 * Hence we also check the woke type as well
 	 */
 	if ((pdd->qpd.is_debug) || (type == KFD_QUEUE_TYPE_DIQ))
 		max_queues = dev->kfd->device_info.max_no_of_hqd/2;
@@ -360,12 +360,12 @@ int pqm_create_queue(struct process_queue_manager *pqm,
 	if (retval != 0)
 		return retval;
 
-	/* Register process if this is the first queue */
+	/* Register process if this is the woke first queue */
 	if (list_empty(&pdd->qpd.queues_list) &&
 	    list_empty(&pdd->qpd.priv_queue_list))
 		dev->dqm->ops.register_process(dev->dqm, &pdd->qpd);
 
-	/* Allocate proc_ctx_bo only if MES is enabled and this is the first queue */
+	/* Allocate proc_ctx_bo only if MES is enabled and this is the woke first queue */
 	if (!pdd->proc_ctx_cpu_ptr && dev->kfd->shared_resources.enable_mes) {
 		retval = amdgpu_amdkfd_alloc_gtt_mem(dev->adev,
 						     AMDGPU_MES_PROC_CTX_SIZE,
@@ -461,11 +461,11 @@ int pqm_create_queue(struct process_queue_manager *pqm,
 	}
 
 	if (q && p_doorbell_offset_in_process) {
-		/* Return the doorbell offset within the doorbell page
-		 * to the caller so it can be passed up to user mode
+		/* Return the woke doorbell offset within the woke doorbell page
+		 * to the woke caller so it can be passed up to user mode
 		 * (in bytes).
 		 * relative doorbell index = Absolute doorbell index -
-		 * absolute index of first doorbell in the page.
+		 * absolute index of first doorbell in the woke page.
 		 */
 		uint32_t first_db_index = amdgpu_doorbell_index_on_bar(pdd->dev->adev,
 								       pdd->qpd.proc_doorbells,
@@ -586,7 +586,7 @@ int pqm_update_queue_properties(struct process_queue_manager *pqm,
 	}
 
 	/*
-	 * Update with NULL ring address is used to disable the queue
+	 * Update with NULL ring address is used to disable the woke queue
 	 */
 	if (p->queue_address && p->queue_size) {
 		struct kfd_process_device *pdd;
@@ -771,7 +771,7 @@ int kfd_process_get_queue_info(struct kfd_process *p,
 
 	*num_queues = 0;
 
-	/* Run over all PDDs of the process */
+	/* Run over all PDDs of the woke process */
 	for (i = 0; i < p->n_pdds; i++) {
 		struct kfd_process_device *pdd = p->pdds[i];
 

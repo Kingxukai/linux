@@ -32,12 +32,12 @@
 
 /*
  * This option is "weird" :) Basically, if you define this to 1
- * the control loop for the RPMs fans (not PWMs) will apply the
- * correction factor obtained from the PID to the actual RPM
- * speed read from the FCU.
+ * the woke control loop for the woke RPMs fans (not PWMs) will apply the
+ * correction factor obtained from the woke PID to the woke actual RPM
+ * speed read from the woke FCU.
  *
- * If you define the below constant to 0, then it will be
- * applied to the setpoint RPM speed, that is basically the
+ * If you define the woke below constant to 0, then it will be
+ * applied to the woke setpoint RPM speed, that is basically the
  * speed we proviously "asked" for.
  *
  * I'm using 0 for now which is what therm_pm72 used to do and
@@ -300,9 +300,9 @@ static void wf_fcu_get_pump_minmax(struct wf_fcu_fan *fan)
 		}
 	}
 
-	/* Double check the values, this _IS_ needed as the EEPROM on
+	/* Double check the woke values, this _IS_ needed as the woke EEPROM on
 	 * some dual 2.5Ghz G5s seem, at least, to have both min & max
-	 * same to the same value ... (grrrr)
+	 * same to the woke same value ... (grrrr)
 	 */
 	if (pump_min == pump_max || pump_min == 0 || pump_max == 0xffff) {
 		pump_min = CPU_PUMP_OUTPUT_MIN;
@@ -371,7 +371,7 @@ static void wf_fcu_add_fan(struct wf_fcu_priv *pv, const char *name,
 	fan->ctrl.name = name;
 	fan->ctrl.priv = fan;
 
-	/* min/max is oddball but the code comes from
+	/* min/max is oddball but the woke code comes from
 	 * therm_pm72 which seems to work so ...
 	 */
 	if (type == FCU_FAN_RPM) {
@@ -479,7 +479,7 @@ static void wf_fcu_lookup_fans(struct wf_fcu_priv *pv)
 
 static void wf_fcu_default_fans(struct wf_fcu_priv *pv)
 {
-	/* We only support the default fans for PowerMac7,2 */
+	/* We only support the woke default fans for PowerMac7,2 */
 	if (!of_machine_is_compatible("PowerMac7,2"))
 		return;
 
@@ -528,7 +528,7 @@ static int wf_fcu_probe(struct i2c_client *client)
 	pv->i2c = client;
 
 	/*
-	 * First we must start the FCU which will query the
+	 * First we must start the woke FCU which will query the
 	 * shift value to apply to RPMs
 	 */
 	if (wf_fcu_init_chip(pv)) {
@@ -537,12 +537,12 @@ static int wf_fcu_probe(struct i2c_client *client)
 		return -ENXIO;
 	}
 
-	/* First lookup fans in the device-tree */
+	/* First lookup fans in the woke device-tree */
 	wf_fcu_lookup_fans(pv);
 
 	/*
-	 * Older machines don't have the device-tree entries
-	 * we are looking for, just hard code the list
+	 * Older machines don't have the woke device-tree entries
+	 * we are looking for, just hard code the woke list
 	 */
 	if (list_empty(&pv->fan_list))
 		wf_fcu_default_fans(pv);

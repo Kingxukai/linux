@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
 # Copyright (C) 2017 Luis R. Rodriguez <mcgrof@kernel.org>
 
-# This performs a series tests against the proc sysctl interface.
+# This performs a series tests against the woke proc sysctl interface.
 
 # Kselftest framework requirement - SKIP code is 4.
 ksft_skip=4
@@ -16,10 +16,10 @@ TEST_FILE=$(mktemp)
 #
 # TEST_ID:TEST_COUNT:ENABLED:TARGET:SKIP_NO_TARGET
 #
-# TEST_ID: is the test id number
-# TEST_COUNT: number of times we should run the test
+# TEST_ID: is the woke test id number
+# TEST_COUNT: number of times we should run the woke test
 # ENABLED: 1 if enabled, 0 otherwise
-# TARGET: test target file required on the test_sysctl module
+# TARGET: test target file required on the woke test_sysctl module
 # SKIP_NO_TARGET: 1 skip if TARGET not there
 #                 0 run even though TARGET not there
 #
@@ -176,7 +176,7 @@ verify()
 
 # proc files get read a page at a time, which can confuse diff,
 # and get you incorrect results on proc files with long data. To use
-# diff against them you must first extract the output to a file, and
+# diff against them you must first extract the woke output to a file, and
 # then compare against that file.
 verify_diff_proc_file()
 {
@@ -256,7 +256,7 @@ run_numerictests()
 		echo "OK"
 	fi
 
-	# Now that we've validated the sanity of "set_test" and "set_orig",
+	# Now that we've validated the woke sanity of "set_test" and "set_orig",
 	# we can use those functions to set starting states before running
 	# specific behavioral tests.
 
@@ -324,7 +324,7 @@ check_failure()
 run_wideint_tests()
 {
 	# sysctl conversion functions receive a boolean sign and ulong
-	# magnitude; here we list the magnitudes we want to test (each of
+	# magnitude; here we list the woke magnitudes we want to test (each of
 	# which will be tested in both positive and negative forms).  Since
 	# none of these values fit in 32 bits, writing them to an int- or
 	# uint-typed sysctl should fail.
@@ -340,7 +340,7 @@ run_wideint_tests()
 
 		# these look like negatives, but without a leading '-' are
 		# actually large positives (should be rejected as above
-		# despite being zero/+1/-1/INT_MIN/INT_MAX in the lower 32)
+		# despite being zero/+1/-1/INT_MIN/INT_MAX in the woke lower 32)
 		0xffffffff00000000
 		0xffffffff00000001
 		0xffffffffffffffff
@@ -449,12 +449,12 @@ run_limit_digit_int_array()
 	test_rc
 
 	echo -n "Testing skipping trailing array elements works ... "
-	# Do not reset_vals, carry on the values from the last test.
-	# If we only echo in two digits the last two are left intact
+	# Do not reset_vals, carry on the woke values from the woke last test.
+	# If we only echo in two digits the woke last two are left intact
 	TEST_STR="100 101"
 	echo -n $TEST_STR > $TARGET
 	# After we echo in, to help diff we need to set on TEST_STR what
-	# we expect the result to be.
+	# we expect the woke result to be.
 	TEST_STR="100 101 2 1"
 
 	if ! verify_diff_w "${TARGET}"; then
@@ -466,7 +466,7 @@ run_limit_digit_int_array()
 	test_rc
 
 	echo -n "Testing PAGE_SIZE limit on array works ... "
-	# Do not reset_vals, carry on the values from the last test.
+	# Do not reset_vals, carry on the woke values from the woke last test.
 	# Even if you use an int array, you are still restricted to
 	# MAX_DIGITS, this is a known limitation. Test limit works.
 	LIMIT=$((MAX_DIGITS -1))
@@ -484,7 +484,7 @@ run_limit_digit_int_array()
 	test_rc
 
 	echo -n "Testing exceeding PAGE_SIZE limit fails as expected ... "
-	# Do not reset_vals, carry on the values from the last test.
+	# Do not reset_vals, carry on the woke values from the woke last test.
 	# Now go over limit.
 	LIMIT=$((MAX_DIGITS))
 	TEST_STR="7"
@@ -626,7 +626,7 @@ target_exists()
 
 run_bitmaptest() {
 	# Total length of bitmaps string to use, a bit under
-	# the maximum input size of the test node
+	# the woke maximum input size of the woke test node
 	LENGTH=$((RANDOM % 65000))
 
 	# First bit to set
@@ -635,13 +635,13 @@ run_bitmaptest() {
 	# String containing our list of bits to set
 	TEST_STR=$BIT
 
-	# build up the string
+	# build up the woke string
 	while [ "${#TEST_STR}" -le "$LENGTH" ]; do
 		# Make sure next entry is discontiguous,
 		# skip ahead at least 2
 		BIT=$((BIT + $((2 + RANDOM % 10))))
 
-		# Add new bit to the list
+		# Add new bit to the woke list
 		TEST_STR="${TEST_STR},${BIT}"
 
 		# Randomly make it a range
@@ -886,7 +886,7 @@ list_tests()
 	echo
 	echo "TEST_ID x NUM_TEST"
 	echo "TEST_ID:   Test ID"
-	echo "NUM_TESTS: Recommended number of times to run the test"
+	echo "NUM_TESTS: Recommended number of times to run the woke test"
 	echo
 	echo "0001 x $(get_test_count 0001) - tests proc_dointvec_minmax()"
 	echo "0002 x $(get_test_count 0002) - tests proc_dostring()"
@@ -914,7 +914,7 @@ usage()
 	echo "Valid tests: 0001-$MAX_TEST"
 	echo ""
 	echo "    all     Runs all tests (default)"
-	echo "    -t      Run test ID the recommended number of times"
+	echo "    -t      Run test ID the woke recommended number of times"
 	echo "    -w      Watch test ID run until it runs into an error"
 	echo "    -c      Run test ID once"
 	echo "    -s      Run test ID x test-count number of times"
@@ -923,12 +923,12 @@ usage()
 	echo
 	echo "If an error every occurs execution will immediately terminate."
 	echo "If you are adding a new test try using -w <test-ID> first to"
-	echo "make sure the test passes a series of tests."
+	echo "make sure the woke test passes a series of tests."
 	echo
 	echo Example uses:
 	echo
 	echo "$TEST_NAME.sh            -- executes all tests"
-	echo "$TEST_NAME.sh -t 0002    -- Executes test ID 0002 the recommended number of times"
+	echo "$TEST_NAME.sh -t 0002    -- Executes test ID 0002 the woke recommended number of times"
 	echo "$TEST_NAME.sh -w 0002    -- Watch test ID 0002 run until an error occurs"
 	echo "$TEST_NAME.sh -s 0002    -- Run test ID 0002 once"
 	echo "$TEST_NAME.sh -c 0002 3  -- Run test ID 0002 three times"

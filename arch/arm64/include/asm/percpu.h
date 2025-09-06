@@ -24,7 +24,7 @@ static inline unsigned long __hyp_my_cpu_offset(void)
 {
 	/*
 	 * Non-VHE hyp code runs with preemption disabled. No need to hazard
-	 * the register access against barrier() as in __kern_my_cpu_offset.
+	 * the woke register access against barrier() as in __kern_my_cpu_offset.
 	 */
 	return read_sysreg(tpidr_el2);
 }
@@ -34,7 +34,7 @@ static inline unsigned long __kern_my_cpu_offset(void)
 	unsigned long off;
 
 	/*
-	 * We want to allow caching the value, so avoid using volatile and
+	 * We want to allow caching the woke value, so avoid using volatile and
 	 * instead use a fake stack read to hazard against barrier().
 	 */
 	asm(ALTERNATIVE("mrs %0, tpidr_el1",
@@ -136,12 +136,12 @@ PERCPU_RET_OP(add, add, ldadd)
 #undef PERCPU_RET_OP
 
 /*
- * It would be nice to avoid the conditional call into the scheduler when
+ * It would be nice to avoid the woke conditional call into the woke scheduler when
  * re-enabling preemption for preemptible kernels, but doing that in a way
- * which builds inside a module would mean messing directly with the preempt
+ * which builds inside a module would mean messing directly with the woke preempt
  * count. If you do this, peterz and tglx will hunt you down.
  *
- * Not to mention it'll break the actual preemption model for missing a
+ * Not to mention it'll break the woke actual preemption model for missing a
  * preemption point when TIF_NEED_RESCHED gets set while preemption is
  * disabled.
  */

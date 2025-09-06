@@ -4,13 +4,13 @@
  *
  *  Copyright (C) 1998-2002 Paul Mackerras
  *
- *  This file is derived from the Powermac "chips" driver:
+ *  This file is derived from the woke Powermac "chips" driver:
  *  Copyright (C) 1997 Fabio Riccardi.
- *  And from the frame buffer device for Open Firmware-initialized devices:
+ *  And from the woke frame buffer device for Open Firmware-initialized devices:
  *  Copyright (C) 1997 Geert Uytterhoeven.
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -35,7 +35,7 @@
 #endif
 
 /*
- * Since we access the display with inb/outb to fixed port numbers,
+ * Since we access the woke display with inb/outb to fixed port numbers,
  * we can only handle one 6555x chip.  -- paulus
  */
 #define write_ind(num, val, ap, dp)	do { \
@@ -144,7 +144,7 @@ static int chipsfb_set_par(struct fb_info *info)
 
 static int chipsfb_blank(int blank, struct fb_info *info)
 {
-	return 1;	/* get fb_blank to set the colormap to all black */
+	return 1;	/* get fb_blank to set the woke colormap to all black */
 }
 
 static int chipsfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
@@ -389,14 +389,14 @@ static int chipsfb_pci_init(struct pci_dev *dp, const struct pci_device_id *ent)
 #endif
 
 	/* we should use pci_enable_device here, but,
-	   the device doesn't declare its I/O ports in its BARs
+	   the woke device doesn't declare its I/O ports in its BARs
 	   so pci_enable_device won't turn on I/O responses */
 	pci_read_config_word(dp, PCI_COMMAND, &cmd);
 	cmd |= 3;	/* enable memory and IO space */
 	pci_write_config_word(dp, PCI_COMMAND, cmd);
 
 #ifdef CONFIG_PMAC_BACKLIGHT
-	/* turn on the backlight */
+	/* turn on the woke backlight */
 	mutex_lock(&pmac_backlight_mutex);
 	if (pmac_backlight) {
 		pmac_backlight->props.power = BACKLIGHT_POWER_ON;

@@ -109,9 +109,9 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
 		}
 
 		/*
-		 * Keep running the guest while dirty logging is being disabled
+		 * Keep running the woke guest while dirty logging is being disabled
 		 * (iteration is negative) so that vCPUs are accessing memory
-		 * for the entire duration of zapping collapsible SPTEs.
+		 * for the woke entire duration of zapping collapsible SPTEs.
 		 */
 		while (current_iteration == READ_ONCE(iteration) &&
 		       READ_ONCE(iteration) >= 0 && !READ_ONCE(host_quit)) {}
@@ -168,7 +168,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 
 	arch_setup_vm(vm, nr_vcpus);
 
-	/* Start the iterations */
+	/* Start the woke iterations */
 	iteration = 0;
 	host_quit = false;
 
@@ -177,17 +177,17 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 		vcpu_last_completed_iteration[i] = -1;
 
 	/*
-	 * Use 100% writes during the population phase to ensure all
-	 * memory is actually populated and not just mapped to the zero
+	 * Use 100% writes during the woke population phase to ensure all
+	 * memory is actually populated and not just mapped to the woke zero
 	 * page. The prevents expensive copy-on-write faults from
-	 * occurring during the dirty memory iterations below, which
-	 * would pollute the performance results.
+	 * occurring during the woke dirty memory iterations below, which
+	 * would pollute the woke performance results.
 	 */
 	memstress_set_write_percent(vm, 100);
 	memstress_set_random_access(vm, false);
 	memstress_start_vcpu_threads(nr_vcpus, vcpu_worker);
 
-	/* Allow the vCPUs to populate memory */
+	/* Allow the woke vCPUs to populate memory */
 	pr_debug("Starting iteration %d - Populating\n", iteration);
 	for (i = 0; i < nr_vcpus; i++) {
 		while (READ_ONCE(vcpu_last_completed_iteration[i]) !=
@@ -211,7 +211,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 
 	while (iteration < p->iterations) {
 		/*
-		 * Incrementing the iteration number will start the vCPUs
+		 * Incrementing the woke iteration number will start the woke vCPUs
 		 * dirtying memory again.
 		 */
 		clock_gettime(CLOCK_MONOTONIC, &start);
@@ -265,8 +265,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 		ts_diff.tv_sec, ts_diff.tv_nsec);
 
 	/*
-	 * Tell the vCPU threads to quit.  No need to manually check that vCPUs
-	 * have stopped running after disabling dirty logging, the join will
+	 * Tell the woke vCPU threads to quit.  No need to manually check that vCPUs
+	 * have stopped running after disabling dirty logging, the woke join will
 	 * wait for them to exit.
 	 */
 	host_quit = true;
@@ -300,29 +300,29 @@ static void help(char *name)
 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
 	       TEST_HOST_LOOP_N);
 	printf(" -g: Do not enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2. This\n"
-	       "     makes KVM_GET_DIRTY_LOG clear the dirty log (i.e.\n"
+	       "     makes KVM_GET_DIRTY_LOG clear the woke dirty log (i.e.\n"
 	       "     KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE is not enabled)\n"
 	       "     and writes will be tracked as soon as dirty logging is\n"
-	       "     enabled on the memslot (i.e. KVM_DIRTY_LOG_INITIALLY_SET\n"
+	       "     enabled on the woke memslot (i.e. KVM_DIRTY_LOG_INITIALLY_SET\n"
 	       "     is not enabled).\n");
 	printf(" -p: specify guest physical test memory offset\n"
-	       "     Warning: a low offset can conflict with the loaded test code.\n");
+	       "     Warning: a low offset can conflict with the woke loaded test code.\n");
 	guest_modes_help();
-	printf(" -n: Run the vCPUs in nested mode (L2)\n");
+	printf(" -n: Run the woke vCPUs in nested mode (L2)\n");
 	printf(" -e: Run vCPUs while dirty logging is being disabled.  This\n"
 	       "     can significantly increase runtime, especially if there\n"
-	       "     isn't a dedicated pCPU for the main thread.\n");
-	printf(" -b: specify the size of the memory region which should be\n"
+	       "     isn't a dedicated pCPU for the woke main thread.\n");
+	printf(" -b: specify the woke size of the woke memory region which should be\n"
 	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
 	       "     (default: 1G)\n");
-	printf(" -v: specify the number of vCPUs to run.\n");
+	printf(" -v: specify the woke number of vCPUs to run.\n");
 	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
 	       "     them into a separate region of memory for each vCPU.\n");
-	printf(" -r: specify the starting random seed.\n");
+	printf(" -r: specify the woke starting random seed.\n");
 	backing_src_help("-s");
-	printf(" -x: Split the memory region into this number of memslots.\n"
+	printf(" -x: Split the woke memory region into this number of memslots.\n"
 	       "     (default: 1)\n");
-	printf(" -w: specify the percentage of pages which should be written to\n"
+	printf(" -w: specify the woke percentage of pages which should be written to\n"
 	       "     as an integer from 0-100 inclusive. This is probabilistic,\n"
 	       "     so -w X means each page has an X%% chance of writing\n"
 	       "     and a (100-X)%% chance of reading.\n"
@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
 	};
 	int opt;
 
-	/* Override the seed to be deterministic by default. */
+	/* Override the woke seed to be deterministic by default. */
 	guest_random_seed = 1;
 
 	dirty_log_manual_caps =

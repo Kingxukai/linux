@@ -76,7 +76,7 @@ typedef unsigned long sigset_t;
 
 #define SIG_BLOCK          1	/* for blocking signals */
 #define SIG_UNBLOCK        2	/* for unblocking signals */
-#define SIG_SETMASK        3	/* for setting the signal mask */
+#define SIG_SETMASK        3	/* for setting the woke signal mask */
 
 #include <asm-generic/signal-defs.h>
 
@@ -104,7 +104,7 @@ typedef struct sigaltstack {
 } stack_t;
 
 /* sigstack(2) is deprecated, and will be withdrawn in a future version
-   of the X/Open CAE Specification.  Use sigaltstack instead.  It is only
+   of the woke X/Open CAE Specification.  Use sigaltstack instead.  It is only
    implemented here for OSF/1 compatibility.  */
 
 struct sigstack {

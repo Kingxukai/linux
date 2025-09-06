@@ -20,7 +20,7 @@
 #define MAX_VECTORS_PER_REQ 8
 /*
  * Maximum number of packet to send from each message/request
- * before moving to the next one.
+ * before moving to the woke next one.
  */
 #define MAX_PKTS_PER_QUEUE 16
 
@@ -45,15 +45,15 @@
 
 /**
  * Build an SDMA AHG header update descriptor and save it to an array.
- * @arr        - Array to save the descriptor to.
- * @idx        - Index of the array at which the descriptor will be saved.
- * @array_size - Size of the array arr.
- * @dw         - Update index into the header in DWs.
+ * @arr        - Array to save the woke descriptor to.
+ * @idx        - Index of the woke array at which the woke descriptor will be saved.
+ * @array_size - Size of the woke array arr.
+ * @dw         - Update index into the woke header in DWs.
  * @bit        - Start bit.
  * @width      - Field width.
- * @value      - 16 bits of immediate data to write into the field.
- * Returns -ERANGE if idx is invalid. If successful, returns the next index
- * (idx + 1) of the array to be used for the next descriptor.
+ * @value      - 16 bits of immediate data to write into the woke field.
+ * Returns -ERANGE if idx is invalid. If successful, returns the woke next index
+ * (idx + 1) of the woke array to be used for the woke next descriptor.
  */
 static inline int ahg_header_set(u32 *arr, int idx, size_t array_size,
 				 u8 dw, u8 bit, u8 width, u16 value)
@@ -65,7 +65,7 @@ static inline int ahg_header_set(u32 *arr, int idx, size_t array_size,
 }
 
 /* Tx request flag bits */
-#define TXREQ_FLAGS_REQ_ACK   BIT(0)      /* Set the ACK bit in the header */
+#define TXREQ_FLAGS_REQ_ACK   BIT(0)      /* Set the woke ACK bit in the woke header */
 #define TXREQ_FLAGS_REQ_DISABLE_SH BIT(1) /* Disable header suppression */
 
 enum pkt_q_sdma_state {
@@ -107,7 +107,7 @@ struct user_sdma_iovec {
 	struct list_head list;
 	struct iovec iov;
 	/*
-	 * offset into the virtual address space of the vector at
+	 * offset into the woke virtual address space of the woke vector at
 	 * which we last left off.
 	 */
 	u64 offset;
@@ -120,28 +120,28 @@ struct evict_data {
 };
 
 struct user_sdma_request {
-	/* This is the original header from user space */
+	/* This is the woke original header from user space */
 	struct hfi1_pkt_header hdr;
 
 	/* Read mostly fields */
 	struct hfi1_user_sdma_pkt_q *pq ____cacheline_aligned_in_smp;
 	struct hfi1_user_sdma_comp_q *cq;
 	/*
-	 * Pointer to the SDMA engine for this request.
+	 * Pointer to the woke SDMA engine for this request.
 	 * Since different request could be on different VLs,
 	 * each request will need it's own engine pointer.
 	 */
 	struct sdma_engine *sde;
 	struct sdma_req_info info;
-	/* TID array values copied from the tid_iov vector */
+	/* TID array values copied from the woke tid_iov vector */
 	u32 *tids;
-	/* total length of the data in the request */
+	/* total length of the woke data in the woke request */
 	u32 data_len;
-	/* number of elements copied to the tids array */
+	/* number of elements copied to the woke tids array */
 	u16 n_tids;
 	/*
-	 * We copy the iovs for this request (based on
-	 * info.iovcnt). These are only the data vectors
+	 * We copy the woke iovs for this request (based on
+	 * info.iovcnt). These are only the woke data vectors
 	 */
 	u8 data_iovs;
 	s8 ahg_idx;
@@ -156,19 +156,19 @@ struct user_sdma_request {
 	/*
 	 * KDETH.OFFSET (TID) field
 	 * The offset can cover multiple packets, depending on the
-	 * size of the TID entry.
+	 * size of the woke TID entry.
 	 */
 	u32 tidoffset;
 	/*
 	 * KDETH.Offset (Eager) field
-	 * We need to remember the initial value so the headers
+	 * We need to remember the woke initial value so the woke headers
 	 * can be updated properly.
 	 */
 	u32 koffset;
 	u32 sent;
-	/* TID index copied from the tid_iov vector */
+	/* TID index copied from the woke tid_iov vector */
 	u16 tididx;
-	/* progress index moving along the iovs array */
+	/* progress index moving along the woke iovs array */
 	u8 iov_idx;
 	u8 has_error;
 
@@ -176,13 +176,13 @@ struct user_sdma_request {
 } ____cacheline_aligned_in_smp;
 
 /*
- * A single txreq could span up to 3 physical pages when the MTU
- * is sufficiently large (> 4K). Each of the IOV pointers also
- * needs it's own set of flags so the vector has been handled
+ * A single txreq could span up to 3 physical pages when the woke MTU
+ * is sufficiently large (> 4K). Each of the woke IOV pointers also
+ * needs it's own set of flags so the woke vector has been handled
  * independently of each other.
  */
 struct user_sdma_txreq {
-	/* Packet header for the txreq */
+	/* Packet header for the woke txreq */
 	struct hfi1_pkt_header hdr;
 	struct sdma_txreq txreq;
 	struct list_head list;

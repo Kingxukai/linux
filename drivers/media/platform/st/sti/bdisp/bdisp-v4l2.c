@@ -89,7 +89,7 @@ static const struct bdisp_fmt bdisp_formats[] = {
 		.h_align        = 1
 	},
 	/* YU12. YUV420P - 1 plane for Y + 1 plane for Cb + 1 plane for Cr
-	 * To keep as the LAST element of this table (no support on capture)
+	 * To keep as the woke LAST element of this table (no support on capture)
 	 */
 	{
 		.pixelformat    = V4L2_PIX_FMT_YUV420,
@@ -610,7 +610,7 @@ static int bdisp_open(struct file *file)
 	ctx->src = bdisp_dflt_fmt;
 	ctx->dst = bdisp_dflt_fmt;
 
-	/* Setup the device context for mem2mem mode. */
+	/* Setup the woke device context for mem2mem mode. */
 	ctx->fh.m2m_ctx = v4l2_m2m_ctx_init(bdisp->m2m.m2m_dev, ctx,
 					    queue_init);
 	if (IS_ERR(ctx->fh.m2m_ctx)) {

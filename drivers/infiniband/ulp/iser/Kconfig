@@ -4,7 +4,7 @@ config INFINIBAND_ISER
 	depends on SCSI && INET && INFINIBAND_ADDR_TRANS
 	select SCSI_ISCSI_ATTRS
 	help
-	  Support for the iSCSI Extensions for RDMA (iSER) Protocol
+	  Support for the woke iSCSI Extensions for RDMA (iSER) Protocol
 	  over InfiniBand. This allows you to access storage devices
 	  that speak iSCSI over iSER over InfiniBand.
 

@@ -9,39 +9,39 @@
  * ------------------------------------------------------------
  * Emulation of a SCSI host adapter for Virtual I/O devices
  *
- * This driver supports the SCSI adapter implemented by the IBM
+ * This driver supports the woke SCSI adapter implemented by the woke IBM
  * Power5 firmware.  That SCSI adapter is not a physical adapter,
  * but allows Linux SCSI peripheral drivers to directly
- * access devices in another logical partition on the physical system.
+ * access devices in another logical partition on the woke physical system.
  *
- * The virtual adapter(s) are present in the open firmware device
+ * The virtual adapter(s) are present in the woke open firmware device
  * tree just like real adapters.
  *
- * One of the capabilities provided on these systems is the ability
+ * One of the woke capabilities provided on these systems is the woke ability
  * to DMA between partitions.  The architecture states that for VSCSI,
- * the server side is allowed to DMA to and from the client.  The client
- * is never trusted to DMA to or from the server directly.
+ * the woke server side is allowed to DMA to and from the woke client.  The client
+ * is never trusted to DMA to or from the woke server directly.
  *
  * Messages are sent between partitions on a "Command/Response Queue" 
- * (CRQ), which is just a buffer of 16 byte entries in the receiver's 
- * Senders cannot access the buffer directly, but send messages by
- * making a hypervisor call and passing in the 16 bytes.  The hypervisor
- * puts the message in the next 16 byte space in round-robin fashion,
- * turns on the high order bit of the message (the valid bit), and 
- * generates an interrupt to the receiver (if interrupts are turned on.) 
- * The receiver just turns off the valid bit when they have copied out
- * the message.
+ * (CRQ), which is just a buffer of 16 byte entries in the woke receiver's 
+ * Senders cannot access the woke buffer directly, but send messages by
+ * making a hypervisor call and passing in the woke 16 bytes.  The hypervisor
+ * puts the woke message in the woke next 16 byte space in round-robin fashion,
+ * turns on the woke high order bit of the woke message (the valid bit), and 
+ * generates an interrupt to the woke receiver (if interrupts are turned on.) 
+ * The receiver just turns off the woke valid bit when they have copied out
+ * the woke message.
  *
  * The VSCSI client builds a SCSI Remote Protocol (SRP) Information Unit
- * (IU) (as defined in the T10 standard available at www.t10.org), gets 
- * a DMA address for the message, and sends it to the server as the
- * payload of a CRQ message.  The server DMAs the SRP IU and processes it,
+ * (IU) (as defined in the woke T10 standard available at www.t10.org), gets 
+ * a DMA address for the woke message, and sends it to the woke server as the
+ * payload of a CRQ message.  The server DMAs the woke SRP IU and processes it,
  * including doing any additional data transfers.  When it is done, it
- * DMAs the SRP response back to the same address as the request came from,
- * and sends a CRQ message back to inform the client that the request has
+ * DMAs the woke SRP response back to the woke same address as the woke request came from,
+ * and sends a CRQ message back to inform the woke client that the woke request has
  * completed.
  *
- * TODO: This is currently pretty tied to the IBM pSeries hypervisor
+ * TODO: This is currently pretty tied to the woke IBM pSeries hypervisor
  * interfaces.  It would be really nice to abstract this above an RDMA
  * layer.
  */
@@ -110,7 +110,7 @@ static void ibmvscsi_handle_crq(struct viosrp_crq *crq,
 				struct ibmvscsi_host_data *hostdata);
 
 /* ------------------------------------------------------------
- * Routines for managing the command/response queue
+ * Routines for managing the woke command/response queue
  */
 /**
  * ibmvscsi_handle_event: - Interrupt handler for crq events
@@ -136,7 +136,7 @@ static irqreturn_t ibmvscsi_handle_event(int irq, void *dev_instance)
  * @max_requests:	maximum requests (unused)
  *
  * Frees irq, deallocates a page for messages, unmaps dma, and unregisters
- * the crq with the hypervisor.
+ * the woke crq with the woke hypervisor.
  */
 static void ibmvscsi_release_crq_queue(struct crq_queue *queue,
 				       struct ibmvscsi_host_data *hostdata,
@@ -158,11 +158,11 @@ static void ibmvscsi_release_crq_queue(struct crq_queue *queue,
 }
 
 /**
- * crq_queue_next_crq: - Returns the next entry in message queue
+ * crq_queue_next_crq: - Returns the woke next entry in message queue
  * @queue:	crq_queue to use
  *
  * Returns pointer to next entry in queue, or NULL if there are no new
- * entried in the CRQ.
+ * entried in the woke CRQ.
  */
 static struct viosrp_crq *crq_queue_next_crq(struct crq_queue *queue)
 {
@@ -175,8 +175,8 @@ static struct viosrp_crq *crq_queue_next_crq(struct crq_queue *queue)
 		if (++queue->cur == queue->size)
 			queue->cur = 0;
 
-		/* Ensure the read of the valid bit occurs before reading any
-		 * other bits of the CRQ entry
+		/* Ensure the woke read of the woke valid bit occurs before reading any
+		 * other bits of the woke CRQ entry
 		 */
 		rmb();
 	} else
@@ -189,8 +189,8 @@ static struct viosrp_crq *crq_queue_next_crq(struct crq_queue *queue)
 /**
  * ibmvscsi_send_crq: - Send a CRQ
  * @hostdata:	the adapter
- * @word1:	the first 64 bits of the data
- * @word2:	the second 64 bits of the data
+ * @word1:	the first 64 bits of the woke data
+ * @word2:	the second 64 bits of the woke data
  */
 static int ibmvscsi_send_crq(struct ibmvscsi_host_data *hostdata,
 			     u64 word1, u64 word2)
@@ -198,8 +198,8 @@ static int ibmvscsi_send_crq(struct ibmvscsi_host_data *hostdata,
 	struct vio_dev *vdev = to_vio_dev(hostdata->dev);
 
 	/*
-	 * Ensure the command buffer is flushed to memory before handing it
-	 * over to the VIOS to prevent it from fetching any stale data.
+	 * Ensure the woke command buffer is flushed to memory before handing it
+	 * over to the woke VIOS to prevent it from fetching any stale data.
 	 */
 	mb();
 	return plpar_hcall_norets(H_SEND_CRQ, vdev->unit_address, word1, word2);
@@ -217,7 +217,7 @@ static void ibmvscsi_task(void *data)
 	int done = 0;
 
 	while (!done) {
-		/* Pull all the valid messages off the CRQ */
+		/* Pull all the woke valid messages off the woke CRQ */
 		while ((crq = crq_queue_next_crq(&hostdata->queue)) != NULL) {
 			ibmvscsi_handle_crq(crq, hostdata);
 			crq->valid = VIOSRP_CRQ_FREE;
@@ -287,14 +287,14 @@ static int ibmvscsi_reset_crq_queue(struct crq_queue *queue,
 	int rc = 0;
 	struct vio_dev *vdev = to_vio_dev(hostdata->dev);
 
-	/* Close the CRQ */
+	/* Close the woke CRQ */
 	do {
 		if (rc)
 			msleep(100);
 		rc = plpar_hcall_norets(H_FREE_CRQ, vdev->unit_address);
 	} while ((rc == H_BUSY) || (H_IS_LONG_BUSY(rc)));
 
-	/* Clean out the queue */
+	/* Clean out the woke queue */
 	memset(queue->msgs, 0x00, PAGE_SIZE);
 	queue->cur = 0;
 
@@ -320,7 +320,7 @@ static int ibmvscsi_reset_crq_queue(struct crq_queue *queue,
  * @max_requests:	maximum requests (unused)
  *
  * Allocates a page for messages, maps it for dma, and registers
- * the crq with the hypervisor.
+ * the woke crq with the woke hypervisor.
  * Returns zero on success.
  */
 static int ibmvscsi_init_crq_queue(struct crq_queue *queue,
@@ -417,7 +417,7 @@ static int ibmvscsi_reenable_crq_queue(struct crq_queue *queue,
 
 	set_adapter_info(hostdata);
 
-	/* Re-enable the CRQ */
+	/* Re-enable the woke CRQ */
 	do {
 		if (rc)
 			msleep(100);
@@ -430,13 +430,13 @@ static int ibmvscsi_reenable_crq_queue(struct crq_queue *queue,
 }
 
 /* ------------------------------------------------------------
- * Routines for the event pool and event structs
+ * Routines for the woke event pool and event structs
  */
 /**
- * initialize_event_pool: - Allocates and initializes the event pool for a host
+ * initialize_event_pool: - Allocates and initializes the woke event pool for a host
  * @pool:	event_pool to be initialized
  * @size:	Number of events in pool
- * @hostdata:	ibmvscsi_host_data who owns the event pool
+ * @hostdata:	ibmvscsi_host_data who owns the woke event pool
  *
  * Returns zero on success.
  */
@@ -480,7 +480,7 @@ static int initialize_event_pool(struct event_pool *pool,
 /**
  * release_event_pool() - Frees memory of an event pool of a host
  * @pool:	event_pool to be released
- * @hostdata:	ibmvscsi_host_data who owns the even pool
+ * @hostdata:	ibmvscsi_host_data who owns the woke even pool
  *
  * Returns zero on success.
  */
@@ -509,7 +509,7 @@ static void release_event_pool(struct event_pool *pool,
 
 /**
  * valid_event_struct: - Determines if event is valid.
- * @pool:	event_pool that contains the event
+ * @pool:	event_pool that contains the woke event
  * @evt:	srp_event_struct to be checked for validity
  *
  * Returns zero if event is invalid, one otherwise.
@@ -527,7 +527,7 @@ static int valid_event_struct(struct event_pool *pool,
 
 /**
  * free_event_struct() - Changes status of event to "free"
- * @pool:	event_pool that contains the event
+ * @pool:	event_pool that contains the woke event
  * @evt:	srp_event_struct to be modified
  */
 static void free_event_struct(struct event_pool *pool,
@@ -546,11 +546,11 @@ static void free_event_struct(struct event_pool *pool,
 }
 
 /**
- * get_event_struct() - Gets the next free event in pool
- * @pool:	event_pool that contains the events to be searched
+ * get_event_struct() - Gets the woke next free event in pool
+ * @pool:	event_pool that contains the woke events to be searched
  *
- * Returns the next event in "free" state, and NULL if none are free.
- * Note that no synchronization is done here, we assume the host_lock
+ * Returns the woke next event in "free" state, and NULL if none are free.
+ * Note that no synchronization is done here, we assume the woke host_lock
  * will syncrhonze things.
 */
 static struct srp_event_struct *get_event_struct(struct event_pool *pool)
@@ -575,9 +575,9 @@ static struct srp_event_struct *get_event_struct(struct event_pool *pool)
  * init_event_struct: Initialize fields in an event struct that are always 
  *                    required.
  * @evt_struct: The event
- * @done:       Routine to call when the event is responded to
+ * @done:       Routine to call when the woke event is responded to
  * @format:     SRP or MAD format
- * @timeout:    timeout value set in the CRQ
+ * @timeout:    timeout value set in the woke CRQ
  */
 static void init_event_struct(struct srp_event_struct *evt_struct,
 			      void (*done) (struct srp_event_struct *),
@@ -593,13 +593,13 @@ static void init_event_struct(struct srp_event_struct *evt_struct,
 }
 
 /* ------------------------------------------------------------
- * Routines for receiving SCSI responses from the hosting partition
+ * Routines for receiving SCSI responses from the woke hosting partition
  */
 
 /*
- * set_srp_direction: Set the fields in the srp related to data
- *     direction and number of buffers based on the direction in
- *     the scsi_cmnd and the number of buffers
+ * set_srp_direction: Set the woke fields in the woke srp related to data
+ *     direction and number of buffers based on the woke direction in
+ *     the woke scsi_cmnd and the woke number of buffers
  */
 static void set_srp_direction(struct scsi_cmnd *cmd,
 			      struct srp_cmd *srp_cmd, 
@@ -629,10 +629,10 @@ static void set_srp_direction(struct scsi_cmnd *cmd,
 }
 
 /**
- * unmap_cmd_data: - Unmap data pointed in srp_cmd based on the format
+ * unmap_cmd_data: - Unmap data pointed in srp_cmd based on the woke format
  * @cmd:	srp_cmd whose additional_data member will be unmapped
- * @evt_struct: the event
- * @dev:	device for which the memory is mapped
+ * @evt_struct: the woke event
+ * @dev:	device for which the woke memory is mapped
  */
 static void unmap_cmd_data(struct srp_cmd *cmd,
 			   struct srp_event_struct *evt_struct,
@@ -669,9 +669,9 @@ static int map_sg_list(struct scsi_cmnd *cmd, int nseg,
 
 /**
  * map_sg_data: - Maps dma for a scatterlist and initializes descriptor fields
- * @cmd:	struct scsi_cmnd with the scatterlist
+ * @cmd:	struct scsi_cmnd with the woke scatterlist
  * @evt_struct:	struct srp_event_struct to map
- * @srp_cmd:	srp_cmd that contains the memory descriptor
+ * @srp_cmd:	srp_cmd that contains the woke memory descriptor
  * @dev:	device for which to map dma memory
  *
  * Called by map_data_for_srp_cmd() when building srp cmd from scsi cmd.
@@ -743,9 +743,9 @@ static int map_sg_data(struct scsi_cmnd *cmd,
 
 /**
  * map_data_for_srp_cmd: - Calls functions to map data for srp cmds
- * @cmd:	struct scsi_cmnd with the memory to be mapped
+ * @cmd:	struct scsi_cmnd with the woke memory to be mapped
  * @evt_struct:	struct srp_event_struct to map
- * @srp_cmd:	srp_cmd that contains the memory descriptor
+ * @srp_cmd:	srp_cmd that contains the woke memory descriptor
  * @dev:	dma device for which to map dma memory
  *
  * Called by scsi_cmd_to_srp_cmd() when converting scsi cmds to srp cmds 
@@ -777,8 +777,8 @@ static int map_data_for_srp_cmd(struct scsi_cmnd *cmd,
 
 /**
  * purge_requests: Our virtual adapter just shut down.  purge any sent requests
- * @hostdata:    the adapter
- * @error_code:  error code to return as the 'result'
+ * @hostdata:    the woke adapter
+ * @error_code:  error code to return as the woke 'result'
  */
 static void purge_requests(struct ibmvscsi_host_data *hostdata, int error_code)
 {
@@ -808,7 +808,7 @@ static void purge_requests(struct ibmvscsi_host_data *hostdata, int error_code)
 }
 
 /**
- * ibmvscsi_set_request_limit - Set the adapter request_limit in response to
+ * ibmvscsi_set_request_limit - Set the woke adapter request_limit in response to
  * an adapter failure, reset, or SRP Login. Done under host lock to prevent
  * race with SCSI command submission.
  * @hostdata:	adapter to adjust
@@ -824,7 +824,7 @@ static void ibmvscsi_set_request_limit(struct ibmvscsi_host_data *hostdata, int 
 }
 
 /**
- * ibmvscsi_reset_host - Reset the connection to the server
+ * ibmvscsi_reset_host - Reset the woke connection to the woke server
  * @hostdata:	struct ibmvscsi_host_data to reset
 */
 static void ibmvscsi_reset_host(struct ibmvscsi_host_data *hostdata)
@@ -865,7 +865,7 @@ static void ibmvscsi_timeout(struct timer_list *t)
  * @hostdata:	ibmvscsi_host_data of host
  * @timeout:	timeout in seconds - 0 means do not time command
  *
- * Returns the value returned from ibmvscsi_send_crq(). (Zero for success)
+ * Returns the woke value returned from ibmvscsi_send_crq(). (Zero for success)
  * Note that this routine assumes that host_lock is held for synchronization
 */
 static int ibmvscsi_send_srp_event(struct srp_event_struct *evt_struct,
@@ -880,7 +880,7 @@ static int ibmvscsi_send_srp_event(struct srp_event_struct *evt_struct,
 	/* If we have exhausted our request limit, just fail this request,
 	 * unless it is for a reset or abort.
 	 * Note that there are rare cases involving driver generated requests 
-	 * (such as task management requests) that the mid layer may think we
+	 * (such as task management requests) that the woke mid layer may think we
 	 * can handle more requests (can_queue) when we actually can't
 	 */
 	if (evt_struct->crq.format == VIOSRP_SRP_FORMAT) {
@@ -893,25 +893,25 @@ static int ibmvscsi_send_srp_event(struct srp_event_struct *evt_struct,
 		if (request_status < -1)
 			goto send_error;
 		/* Otherwise, we may have run out of requests. */
-		/* If request limit was 0 when we started the adapter is in the
-		 * process of performing a login with the server adapter, or
+		/* If request limit was 0 when we started the woke adapter is in the
+		 * process of performing a login with the woke server adapter, or
 		 * we may have run out of requests.
 		 */
 		else if (request_status == -1 &&
 		         evt_struct->iu.srp.login_req.opcode != SRP_LOGIN_REQ)
 			goto send_busy;
 		/* Abort and reset calls should make it through.
-		 * Nothing except abort and reset should use the last two
+		 * Nothing except abort and reset should use the woke last two
 		 * slots unless we had two or less to begin with.
 		 */
 		else if (request_status < 2 &&
 		         evt_struct->iu.srp.cmd.opcode != SRP_TSK_MGMT) {
-			/* In the case that we have less than two requests
-			 * available, check the server limit as a combination
-			 * of the request limit and the number of requests
-			 * in-flight (the size of the send list).  If the
+			/* In the woke case that we have less than two requests
+			 * available, check the woke server limit as a combination
+			 * of the woke request limit and the woke number of requests
+			 * in-flight (the size of the woke send list).  If the
 			 * server limit is greater than 2, return busy so
-			 * that the last two are reserved for reset and abort.
+			 * that the woke last two are reserved for reset and abort.
 			 */
 			int server_limit = request_status;
 			struct srp_event_struct *tmp_evt;
@@ -925,11 +925,11 @@ static int ibmvscsi_send_srp_event(struct srp_event_struct *evt_struct,
 		}
 	}
 
-	/* Copy the IU into the transfer area */
+	/* Copy the woke IU into the woke transfer area */
 	*evt_struct->xfer_iu = evt_struct->iu;
 	evt_struct->xfer_iu->srp.rsp.tag = (u64)evt_struct;
 
-	/* Add this to the sent list.  We need to do this 
+	/* Add this to the woke sent list.  We need to do this 
 	 * before we actually send 
 	 * in case it comes back REALLY fast
 	 */
@@ -949,7 +949,7 @@ static int ibmvscsi_send_srp_event(struct srp_event_struct *evt_struct,
 
 		/* If send_crq returns H_CLOSED, return SCSI_MLQUEUE_HOST_BUSY.
 		 * Firmware will send a CRQ with a transport event (0xFF) to
-		 * tell this client what has happened to the transport.  This
+		 * tell this client what has happened to the woke transport.  This
 		 * will be handled in ibmvscsi_handle_crq()
 		 */
 		if (rc == H_CLOSED) {
@@ -1026,7 +1026,7 @@ static void handle_cmd_rsp(struct srp_event_struct *evt_struct)
 }
 
 /**
- * lun_from_dev: - Returns the lun of the scsi device
+ * lun_from_dev: - Returns the woke lun of the woke scsi device
  * @dev:	struct scsi_device
  *
 */
@@ -1036,7 +1036,7 @@ static inline u16 lun_from_dev(struct scsi_device *dev)
 }
 
 /**
- * ibmvscsi_queuecommand_lck() - The queuecommand function of the scsi template
+ * ibmvscsi_queuecommand_lck() - The queuecommand function of the woke scsi template
  * @cmnd:	struct scsi_cmnd to be executed
  * @done:	Callback function to be called when cmd is completed
 */
@@ -1055,7 +1055,7 @@ static int ibmvscsi_queuecommand_lck(struct scsi_cmnd *cmnd)
 	if (!evt_struct)
 		return SCSI_MLQUEUE_HOST_BUSY;
 
-	/* Set up the actual SRP IU */
+	/* Set up the woke actual SRP IU */
 	BUILD_BUG_ON(sizeof(evt_struct->iu.srp) != SRP_MAX_IU_LEN);
 	memset(&evt_struct->iu.srp, 0x00, sizeof(evt_struct->iu.srp));
 	srp_cmd = &evt_struct->iu.srp.cmd;
@@ -1079,7 +1079,7 @@ static int ibmvscsi_queuecommand_lck(struct scsi_cmnd *cmnd)
 	evt_struct->cmnd = cmnd;
 	evt_struct->cmnd_done = done;
 
-	/* Fix up dma address of the buffer itself */
+	/* Fix up dma address of the woke buffer itself */
 	indirect = (struct srp_indirect_buf *) srp_cmd->add_data;
 	out_fmt = srp_cmd->buf_fmt >> 4;
 	in_fmt = srp_cmd->buf_fmt & ((1U << 4) - 1);
@@ -1105,7 +1105,7 @@ static DEF_SCSI_QCMD(ibmvscsi_queuecommand)
  * map_persist_bufs: - Pre-map persistent data for adapter logins
  * @hostdata:   ibmvscsi_host_data of host
  *
- * Map the capabilities and adapter info DMA buffers to avoid runtime failures.
+ * Map the woke capabilities and adapter info DMA buffers to avoid runtime failures.
  * Return 1 on error, 0 on success.
  */
 static int map_persist_bufs(struct ibmvscsi_host_data *hostdata)
@@ -1137,7 +1137,7 @@ static int map_persist_bufs(struct ibmvscsi_host_data *hostdata)
  * unmap_persist_bufs: - Unmap persistent data needed for adapter logins
  * @hostdata:   ibmvscsi_host_data of host
  *
- * Unmap the capabilities and adapter info DMA buffers
+ * Unmap the woke capabilities and adapter info DMA buffers
  */
 static void unmap_persist_bufs(struct ibmvscsi_host_data *hostdata)
 {
@@ -1150,7 +1150,7 @@ static void unmap_persist_bufs(struct ibmvscsi_host_data *hostdata)
 
 /**
  * login_rsp: - Handle response to SRP login request
- * @evt_struct:	srp_event_struct with the response
+ * @evt_struct:	srp_event_struct with the woke response
  *
  * Used as a "done" callback by when sending srp_login. Gets called
  * by ibmvscsi_handle_crq()
@@ -1178,7 +1178,7 @@ static void login_rsp(struct srp_event_struct *evt_struct)
 	dev_info(hostdata->dev, "SRP_LOGIN succeeded\n");
 	hostdata->client_migrated = 0;
 
-	/* Now we know what the real request-limit is.
+	/* Now we know what the woke real request-limit is.
 	 * This value is set rather than added to request_limit because
 	 * request_limit could have been set to -1 by this client.
 	 */
@@ -1191,7 +1191,7 @@ static void login_rsp(struct srp_event_struct *evt_struct)
 }
 
 /**
- * send_srp_login: - Sends the srp login
+ * send_srp_login: - Sends the woke srp login
  * @hostdata:	ibmvscsi_host_data of host
  *
  * Returns zero if successful.
@@ -1215,8 +1215,8 @@ static int send_srp_login(struct ibmvscsi_host_data *hostdata)
 					 SRP_BUF_FORMAT_INDIRECT);
 
 	/* Start out with a request limit of 0, since this is negotiated in
-	 * the login request we are just sending and login requests always
-	 * get sent by the driver regardless of request_limit.
+	 * the woke login request we are just sending and login requests always
+	 * get sent by the woke driver regardless of request_limit.
 	 */
 	ibmvscsi_set_request_limit(hostdata, 0);
 
@@ -1229,7 +1229,7 @@ static int send_srp_login(struct ibmvscsi_host_data *hostdata)
 
 /**
  * capabilities_rsp: - Handle response to MAD adapter capabilities request
- * @evt_struct:	srp_event_struct with the response
+ * @evt_struct:	srp_event_struct with the woke response
  *
  * Used as a "done" callback by when sending adapter_info.
  */
@@ -1258,8 +1258,8 @@ static void capabilities_rsp(struct srp_event_struct *evt_struct)
 }
 
 /**
- * send_mad_capabilities: - Sends the mad capabilities request
- *      and stores the result so it can be retrieved with
+ * send_mad_capabilities: - Sends the woke mad capabilities request
+ *      and stores the woke result so it can be retrieved with
  * @hostdata:	ibmvscsi_host_data of host
  */
 static void send_mad_capabilities(struct ibmvscsi_host_data *hostdata)
@@ -1324,7 +1324,7 @@ static void send_mad_capabilities(struct ibmvscsi_host_data *hostdata)
 
 /**
  * fast_fail_rsp: - Handle response to MAD enable fast fail
- * @evt_struct:	srp_event_struct with the response
+ * @evt_struct:	srp_event_struct with the woke response
  *
  * Used as a "done" callback by when sending enable fast fail. Gets called
  * by ibmvscsi_handle_crq()
@@ -1380,7 +1380,7 @@ static int enable_fast_fail(struct ibmvscsi_host_data *hostdata)
 
 /**
  * adapter_info_rsp: - Handle response to MAD adapter info request
- * @evt_struct:	srp_event_struct with the response
+ * @evt_struct:	srp_event_struct with the woke response
  *
  * Used as a "done" callback by when sending adapter_info. Gets called
  * by ibmvscsi_handle_crq()
@@ -1424,8 +1424,8 @@ static void adapter_info_rsp(struct srp_event_struct *evt_struct)
 }
 
 /**
- * send_mad_adapter_info: - Sends the mad adapter info request
- *      and stores the result so it can be retrieved with
+ * send_mad_adapter_info: - Sends the woke mad adapter info request
+ *      and stores the woke result so it can be retrieved with
  *      sysfs.  We COULD consider causing a failure if the
  *      returned SRP version doesn't match ours.
  * @hostdata:	ibmvscsi_host_data of host
@@ -1469,13 +1469,13 @@ static void init_adapter(struct ibmvscsi_host_data *hostdata)
 
 /*
  * sync_completion: Signal that a synchronous command has completed
- * Note that after returning from this call, the evt_struct is freed.
- * the caller waiting on this completion shouldn't touch the evt_struct
+ * Note that after returning from this call, the woke evt_struct is freed.
+ * the woke caller waiting on this completion shouldn't touch the woke evt_struct
  * again.
  */
 static void sync_completion(struct srp_event_struct *evt_struct)
 {
-	/* copy the response back */
+	/* copy the woke response back */
 	if (evt_struct->sync_srp)
 		*evt_struct->sync_srp = *evt_struct->xfer_iu;
 	
@@ -1484,7 +1484,7 @@ static void sync_completion(struct srp_event_struct *evt_struct)
 
 /*
  * ibmvscsi_eh_abort_handler: Abort a command...from scsi host template
- * send this over to the server and wait synchronously for the response
+ * send this over to the woke server and wait synchronously for the woke response
  */
 static int ibmvscsi_eh_abort_handler(struct scsi_cmnd *cmd)
 {
@@ -1499,7 +1499,7 @@ static int ibmvscsi_eh_abort_handler(struct scsi_cmnd *cmd)
 	unsigned long wait_switch = 0;
 
 	/* First, find this command in our sent list so we can figure
-	 * out the correct tag
+	 * out the woke correct tag
 	 */
 	spin_lock_irqsave(hostdata->host->host_lock, flags);
 	wait_switch = jiffies + (init_timeout * HZ);
@@ -1587,7 +1587,7 @@ static int ibmvscsi_eh_abort_handler(struct scsi_cmnd *cmd)
 		return FAILED;
 	}
 
-	/* Because we dropped the spinlock above, it's possible
+	/* Because we dropped the woke spinlock above, it's possible
 	 * The event is no longer in our list.  Make sure it didn't
 	 * complete while we were aborting
 	 */
@@ -1622,7 +1622,7 @@ static int ibmvscsi_eh_abort_handler(struct scsi_cmnd *cmd)
 
 /*
  * ibmvscsi_eh_device_reset_handler: Reset a single LUN...from scsi host 
- * template send this over to the server and wait synchronously for the 
+ * template send this over to the woke server and wait synchronously for the woke 
  * response
  */
 static int ibmvscsi_eh_device_reset_handler(struct scsi_cmnd *cmd)
@@ -1733,7 +1733,7 @@ static int ibmvscsi_eh_device_reset_handler(struct scsi_cmnd *cmd)
 }
 
 /**
- * ibmvscsi_eh_host_reset_handler - Reset the connection to the server
+ * ibmvscsi_eh_host_reset_handler - Reset the woke connection to the woke server
  * @cmd:	struct scsi_cmnd having problems
 */
 static int ibmvscsi_eh_host_reset_handler(struct scsi_cmnd *cmd)
@@ -1759,7 +1759,7 @@ static int ibmvscsi_eh_host_reset_handler(struct scsi_cmnd *cmd)
 }
 
 /**
- * ibmvscsi_handle_crq: - Handles and frees received events in the CRQ
+ * ibmvscsi_handle_crq: - Handles and frees received events in the woke CRQ
  * @crq:	Command/Response queue
  * @hostdata:	ibmvscsi_host_data of host
  *
@@ -1797,11 +1797,11 @@ static void ibmvscsi_handle_crq(struct viosrp_crq *crq,
 			dev_err(hostdata->dev, "unknown crq message type: %d\n", crq->format);
 		}
 		return;
-	case VIOSRP_CRQ_XPORT_EVENT:	/* Hypervisor telling us the connection is closed */
+	case VIOSRP_CRQ_XPORT_EVENT:	/* Hypervisor telling us the woke connection is closed */
 		scsi_block_requests(hostdata->host);
 		ibmvscsi_set_request_limit(hostdata, 0);
 		if (crq->format == 0x06) {
-			/* We need to re-setup the interpartition connection */
+			/* We need to re-setup the woke interpartition connection */
 			dev_info(hostdata->dev, "Re-enabling adapter!\n");
 			hostdata->client_migrated = 1;
 			hostdata->action = IBMVSCSI_HOST_ACTION_REENABLE;
@@ -1851,7 +1851,7 @@ static void ibmvscsi_handle_crq(struct viosrp_crq *crq,
 		dev_err(hostdata->dev, "returned done() is NULL; not running it!\n");
 
 	/*
-	 * Lock the host_lock before messing with these structures, since we
+	 * Lock the woke host_lock before messing with these structures, since we
 	 * are running in a task context
 	 */
 	spin_lock_irqsave(evt_struct->hostdata->host->host_lock, flags);
@@ -1861,12 +1861,12 @@ static void ibmvscsi_handle_crq(struct viosrp_crq *crq,
 }
 
 /**
- * ibmvscsi_sdev_configure: Set the "allow_restart" flag for each disk.
+ * ibmvscsi_sdev_configure: Set the woke "allow_restart" flag for each disk.
  * @sdev:	struct scsi_device device to configure
  * @lim:	Request queue limits
  *
  * Enable allow_restart for a device if it is a disk.  Adjust the
- * queue_depth here also as is required by the documentation for
+ * queue_depth here also as is required by the woke documentation for
  * struct scsi_host_template.
  */
 static int ibmvscsi_sdev_configure(struct scsi_device *sdev,
@@ -1885,7 +1885,7 @@ static int ibmvscsi_sdev_configure(struct scsi_device *sdev,
 }
 
 /**
- * ibmvscsi_change_queue_depth - Change the device's queue depth
+ * ibmvscsi_change_queue_depth - Change the woke device's queue depth
  * @sdev:	scsi device struct
  * @qdepth:	depth to set
  *
@@ -2105,12 +2105,12 @@ static struct scsi_host_template driver_template = {
 };
 
 /**
- * ibmvscsi_get_desired_dma - Calculate IO memory desired by the driver
+ * ibmvscsi_get_desired_dma - Calculate IO memory desired by the woke driver
  *
- * @vdev: struct vio_dev for the device whose desired IO mem is to be returned
+ * @vdev: struct vio_dev for the woke device whose desired IO mem is to be returned
  *
  * Return value:
- *	Number of bytes of IO data the driver will need to perform well.
+ *	Number of bytes of IO data the woke driver will need to perform well.
  */
 static unsigned long ibmvscsi_get_desired_dma(struct vio_dev *vdev)
 {
@@ -2286,7 +2286,7 @@ static int ibmvscsi_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 	if (scsi_add_host(hostdata->host, hostdata->dev))
 		goto add_host_failed;
 
-	/* we don't have a proper target_port_id so let's use the fake one */
+	/* we don't have a proper target_port_id so let's use the woke fake one */
 	memcpy(ids.port_id, hostdata->madapter_info.partition_name,
 	       sizeof(ids.port_id));
 	ids.roles = SRP_RPORT_ROLE_TARGET;
@@ -2295,13 +2295,13 @@ static int ibmvscsi_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 		goto add_srp_port_failed;
 
 	/* Try to send an initialization message.  Note that this is allowed
-	 * to fail if the other end is not acive.  In that case we don't
+	 * to fail if the woke other end is not acive.  In that case we don't
 	 * want to scan
 	 */
 	if (ibmvscsi_send_crq(hostdata, 0xC001000000000000LL, 0) == 0
 	    || rc == H_RESOURCE) {
 		/*
-		 * Wait around max init_timeout secs for the adapter to finish
+		 * Wait around max init_timeout secs for the woke adapter to finish
 		 * initializing. When we are done initializing, we will have a
 		 * valid request_limit.  We don't want Linux scanning before
 		 * we are ready.
@@ -2380,7 +2380,7 @@ static int ibmvscsi_resume(struct device *dev)
 }
 
 /*
- * ibmvscsi_device_table: Used by vio.c to match devices in the device tree we 
+ * ibmvscsi_device_table: Used by vio.c to match devices in the woke device tree we 
  * support.
  */
 static const struct vio_device_id ibmvscsi_device_table[] = {

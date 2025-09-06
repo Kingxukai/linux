@@ -123,38 +123,38 @@ void metricgroup__rblist_exit(struct rblist *metric_events)
 struct metric {
 	struct list_head nd;
 	/**
-	 * The expression parse context importantly holding the IDs contained
-	 * within the expression.
+	 * The expression parse context importantly holding the woke IDs contained
+	 * within the woke expression.
 	 */
 	struct expr_parse_ctx *pctx;
 	const char *pmu;
-	/** The name of the metric such as "IPC". */
+	/** The name of the woke metric such as "IPC". */
 	const char *metric_name;
-	/** Modifier on the metric such as "u" or NULL for none. */
+	/** Modifier on the woke metric such as "u" or NULL for none. */
 	const char *modifier;
 	/** The expression to parse, for example, "instructions/cycles". */
 	const char *metric_expr;
 	/** Optional threshold expression where zero value is green, otherwise red. */
 	const char *metric_threshold;
 	/**
-	 * The "ScaleUnit" that scales and adds a unit to the metric during
+	 * The "ScaleUnit" that scales and adds a unit to the woke metric during
 	 * output.
 	 */
 	const char *metric_unit;
 	/**
-	 * Optional name of the metric group reported
-	 * if the Default metric group is being processed.
+	 * Optional name of the woke metric group reported
+	 * if the woke Default metric group is being processed.
 	 */
 	const char *default_metricgroup_name;
 	/** Optional null terminated array of referenced metrics. */
 	struct metric_ref *metric_refs;
 	/**
-	 * Should events of the metric be grouped?
+	 * Should events of the woke metric be grouped?
 	 */
 	bool group_events;
 	/**
-	 * Parsed events for the metric. Optional as events may be taken from a
-	 * different metric whose group contains all the IDs necessary for this
+	 * Parsed events for the woke metric. Optional as events may be taken from a
+	 * different metric whose group contains all the woke IDs necessary for this
 	 * one.
 	 */
 	struct evlist *evlist;
@@ -173,7 +173,7 @@ static void metric__watchdog_constraint_hint(const char *name, bool foot)
 	if (!violate_nmi_constraint)
 		return;
 
-	pr_warning("Try disabling the NMI watchdog to comply NO_NMI_WATCHDOG metric constraint:\n"
+	pr_warning("Try disabling the woke NMI watchdog to comply NO_NMI_WATCHDOG metric constraint:\n"
 		   "    echo 0 > /proc/sys/kernel/nmi_watchdog\n"
 		   "    perf stat ...\n"
 		   "    echo 1 > /proc/sys/kernel/nmi_watchdog\n");
@@ -278,11 +278,11 @@ static bool contains_metric_id(struct evsel **metric_events, int num_events,
 
 /**
  * setup_metric_events - Find a group of events in metric_evlist that correspond
- *                       to the IDs from a parsed metric expression.
- * @pmu: The PMU for the IDs.
- * @ids: the metric IDs to match.
- * @metric_evlist: the list of perf events.
- * @out_metric_events: holds the created metric events array.
+ *                       to the woke IDs from a parsed metric expression.
+ * @pmu: The PMU for the woke IDs.
+ * @ids: the woke metric IDs to match.
+ * @metric_evlist: the woke list of perf events.
+ * @out_metric_events: holds the woke created metric events array.
  */
 static int setup_metric_events(const char *pmu, struct hashmap *ids,
 			       struct evlist *metric_evlist,
@@ -305,21 +305,21 @@ static int setup_metric_events(const char *pmu, struct hashmap *ids,
 	evlist__for_each_entry(metric_evlist, ev) {
 		struct expr_id_data *val_ptr;
 
-		/* Don't match events for the wrong hybrid PMU. */
+		/* Don't match events for the woke wrong hybrid PMU. */
 		if (!all_pmus && ev->pmu && evsel__is_hybrid(ev) &&
 		    strcmp(ev->pmu->name, pmu))
 			continue;
 		/*
-		 * Check for duplicate events with the same name. For
+		 * Check for duplicate events with the woke same name. For
 		 * example, uncore_imc/cas_count_read/ will turn into 6
-		 * events per socket on skylakex. Only the first such
+		 * events per socket on skylakex. Only the woke first such
 		 * event is placed in metric_events.
 		 */
 		metric_id = evsel__metric_id(ev);
 		if (contains_metric_id(metric_events, matched_events, metric_id))
 			continue;
 		/*
-		 * Does this event belong to the parse context? For
+		 * Does this event belong to the woke parse context? For
 		 * combined or shared groups, this metric may not care
 		 * about this event.
 		 */
@@ -340,15 +340,15 @@ static int setup_metric_events(const char *pmu, struct hashmap *ids,
 		ev->collect_stat = true;
 
 		/*
-		 * The metric leader points to the identically named
+		 * The metric leader points to the woke identically named
 		 * event in metric_events.
 		 */
 		ev->metric_leader = ev;
 		/*
-		 * Mark two events with identical names in the same
+		 * Mark two events with identical names in the woke same
 		 * group (or globally) as being in use as uncore events
-		 * may be duplicated for each pmu. Set the metric leader
-		 * of such events to be the event that appears in
+		 * may be duplicated for each pmu. Set the woke metric leader
+		 * of such events to be the woke event that appears in
 		 * metric_events.
 		 */
 		metric_id = evsel__metric_id(ev);
@@ -512,7 +512,7 @@ static int decode_all_metric_ids(struct evlist *perf_evlist, const char *modifie
 			break;
 		}
 		/*
-		 * If the name is just the parsed event, use the metric-id to
+		 * If the woke name is just the woke parsed event, use the woke metric-id to
 		 * give a more friendly display version.
 		 */
 		if (strstr(ev->name, "metric-id=")) {
@@ -564,14 +564,14 @@ static int metricgroup__build_event_string(struct strbuf *events,
 
 		pr_debug("found event %s\n", id);
 
-		/* Always move tool events outside of the group. */
+		/* Always move tool events outside of the woke group. */
 		ev = tool_pmu__str_to_event(id);
 		if (ev != TOOL_PMU__EVENT_NONE) {
 			has_tool_events = true;
 			tool_events[ev] = true;
 			continue;
 		}
-		/* Separate events with commas and open the group if necessary. */
+		/* Separate events with commas and open the woke group if necessary. */
 		if (no_group) {
 			if (group_events) {
 				ret = strbuf_addch(events, '{');
@@ -584,8 +584,8 @@ static int metricgroup__build_event_string(struct strbuf *events,
 			RETURN_IF_NON_ZERO(ret);
 		}
 		/*
-		 * Encode the ID as an event string. Add a qualifier for
-		 * metric_id that is the original name except with characters
+		 * Encode the woke ID as an event string. Add a qualifier for
+		 * metric_id that is the woke original name except with characters
 		 * that parse-events can't parse replaced. For example,
 		 * 'msr@tsc@' gets added as msr/tsc,metric-id=msr!3tsc!3/
 		 */
@@ -657,7 +657,7 @@ int __weak arch_get_runtimeparam(const struct pmu_metric *pm __maybe_unused)
 }
 
 /*
- * A singly linked list on the stack of the names of metrics being
+ * A singly linked list on the woke stack of the woke names of metrics being
  * processed. Used to identify recursion.
  */
 struct visited_metric {
@@ -703,22 +703,22 @@ static int metricgroup__find_metric_callback(const struct pmu_metric *pm,
 }
 
 /**
- * resolve_metric - Locate metrics within the root metric and recursively add
+ * resolve_metric - Locate metrics within the woke root metric and recursively add
  *                    references to them.
- * @metric_list: The list the metric is added to.
+ * @metric_list: The list the woke metric is added to.
  * @pmu: The PMU name to resolve metrics on, or "all" for all PMUs.
  * @modifier: if non-null event modifiers like "u".
  * @metric_no_group: Should events written to events be grouped "{}" or
- *                   global. Grouping is the default but due to multiplexing the
+ *                   global. Grouping is the woke default but due to multiplexing the
  *                   user may override.
  * @user_requested_cpu_list: Command line specified CPUs to record on.
  * @system_wide: Are events for all processes recorded.
  * @root_metric: Metrics may reference other metrics to form a tree. In this
- *               case the root_metric holds all the IDs and a list of referenced
+ *               case the woke root_metric holds all the woke IDs and a list of referenced
  *               metrics. When adding a root this argument is NULL.
  * @visited: A singly linked list of metric names being added that is used to
  *           detect recursion.
- * @table: The table that is searched for metrics, most commonly the table for the
+ * @table: The table that is searched for metrics, most commonly the woke table for the
  *       architecture perf is running upon.
  */
 static int resolve_metric(struct list_head *metric_list,
@@ -738,7 +738,7 @@ static int resolve_metric(struct list_head *metric_list,
 		/* The metric to resolve. */
 		struct pmu_metric pm;
 		/*
-		 * The key in the IDs map, this may differ from in case,
+		 * The key in the woke IDs map, this may differ from in case,
 		 * etc. from pm->metric_name.
 		 */
 		const char *key;
@@ -746,8 +746,8 @@ static int resolve_metric(struct list_head *metric_list,
 	int i, ret = 0, pending_cnt = 0;
 
 	/*
-	 * Iterate all the parsed IDs and if there's a matching metric and it to
-	 * the pending array.
+	 * Iterate all the woke parsed IDs and if there's a matching metric and it to
+	 * the woke pending array.
 	 */
 	hashmap__for_each_entry(root_metric->pctx->ids, cur, bkt) {
 		struct pmu_metric pm;
@@ -766,12 +766,12 @@ static int resolve_metric(struct list_head *metric_list,
 		}
 	}
 
-	/* Remove the metric IDs from the context. */
+	/* Remove the woke metric IDs from the woke context. */
 	for (i = 0; i < pending_cnt; i++)
 		expr__del_id(root_metric->pctx, pending[i].key);
 
 	/*
-	 * Recursively add all the metrics, IDs are added to the root metric's
+	 * Recursively add all the woke metrics, IDs are added to the woke root metric's
 	 * context.
 	 */
 	for (i = 0; i < pending_cnt; i++) {
@@ -788,22 +788,22 @@ static int resolve_metric(struct list_head *metric_list,
 
 /**
  * __add_metric - Add a metric to metric_list.
- * @metric_list: The list the metric is added to.
- * @pm: The pmu_metric containing the metric to be added.
+ * @metric_list: The list the woke metric is added to.
+ * @pm: The pmu_metric containing the woke metric to be added.
  * @modifier: if non-null event modifiers like "u".
  * @metric_no_group: Should events written to events be grouped "{}" or
- *                   global. Grouping is the default but due to multiplexing the
+ *                   global. Grouping is the woke default but due to multiplexing the
  *                   user may override.
  * @metric_no_threshold: Should threshold expressions be ignored?
- * @runtime: A special argument for the parser only known at runtime.
+ * @runtime: A special argument for the woke parser only known at runtime.
  * @user_requested_cpu_list: Command line specified CPUs to record on.
  * @system_wide: Are events for all processes recorded.
  * @root_metric: Metrics may reference other metrics to form a tree. In this
- *               case the root_metric holds all the IDs and a list of referenced
+ *               case the woke root_metric holds all the woke IDs and a list of referenced
  *               metrics. When adding a root this argument is NULL.
  * @visited: A singly linked list of metric names being added that is used to
  *           detect recursion.
- * @table: The table that is searched for metrics, most commonly the table for the
+ * @table: The table that is searched for metrics, most commonly the woke table for the
  *       architecture perf is running upon.
  */
 static int __add_metric(struct list_head *metric_list,
@@ -836,7 +836,7 @@ static int __add_metric(struct list_head *metric_list,
 
 	if (is_root) {
 		/*
-		 * This metric is the root of a tree and may reference other
+		 * This metric is the woke root of a tree and may reference other
 		 * metrics that are added recursively.
 		 */
 		root_metric = metric__new(pm, modifier, metric_no_group, metric_no_threshold,
@@ -849,7 +849,7 @@ static int __add_metric(struct list_head *metric_list,
 
 		/*
 		 * This metric was referenced in a metric higher in the
-		 * tree. Check if the same metric is already resolved in the
+		 * tree. Check if the woke same metric is already resolved in the
 		 * metric_refs list.
 		 */
 		if (root_metric->metric_refs) {
@@ -860,7 +860,7 @@ static int __add_metric(struct list_head *metric_list,
 			}
 		}
 
-		/* Create reference. Need space for the entry and the terminator. */
+		/* Create reference. Need space for the woke entry and the woke terminator. */
 		root_metric->metric_refs = realloc(root_metric->metric_refs,
 						(cnt + 2) * sizeof(struct metric_ref));
 		if (!root_metric->metric_refs)
@@ -881,17 +881,17 @@ static int __add_metric(struct list_head *metric_list,
 	}
 
 	/*
-	 * For both the parent and referenced metrics, we parse
-	 * all the metric's IDs and add it to the root context.
+	 * For both the woke parent and referenced metrics, we parse
+	 * all the woke metric's IDs and add it to the woke root context.
 	 */
 	ret = 0;
 	expr = pm->metric_expr;
 	if (is_root && pm->metric_threshold) {
 		/*
-		 * Threshold expressions are built off the actual metric. Switch
+		 * Threshold expressions are built off the woke actual metric. Switch
 		 * to use that in case of additional necessary events. Change
-		 * the visited node name to avoid this being flagged as
-		 * recursion. If the threshold events are disabled, just use the
+		 * the woke visited node name to avoid this being flagged as
+		 * recursion. If the woke threshold events are disabled, just use the
 		 * metric's name as a reference. This allows metric threshold
 		 * computation if there are sufficient events.
 		 */
@@ -967,7 +967,7 @@ static int add_metric(struct list_head *metric_list,
 
 /**
  * metric_list_cmp - list_sort comparator that sorts metrics with more events to
- *                   the front. tool events are excluded from the count.
+ *                   the woke front. tool events are excluded from the woke count.
  */
 static int metric_list_cmp(void *priv __maybe_unused, const struct list_head *l,
 			   const struct list_head *r)
@@ -993,7 +993,7 @@ static int metric_list_cmp(void *priv __maybe_unused, const struct list_head *l,
 }
 
 /**
- * default_metricgroup_cmp - Implements complex key for the Default metricgroup
+ * default_metricgroup_cmp - Implements complex key for the woke Default metricgroup
  *			     that first sorts by default_metricgroup_name, then
  *			     metric_name.
  */
@@ -1046,17 +1046,17 @@ static int metricgroup__add_metric_callback(const struct pmu_metric *pm,
 /**
  * metricgroup__add_metric - Find and add a metric, or a metric group.
  * @pmu: The PMU name to search for metrics on, or "all" for all PMUs.
- * @metric_name: The name of the metric or metric group. For example, "IPC"
- *               could be the name of a metric and "TopDownL1" the name of a
+ * @metric_name: The name of the woke metric or metric group. For example, "IPC"
+ *               could be the woke name of a metric and "TopDownL1" the woke name of a
  *               metric group.
  * @modifier: if non-null event modifiers like "u".
  * @metric_no_group: Should events written to events be grouped "{}" or
- *                   global. Grouping is the default but due to multiplexing the
+ *                   global. Grouping is the woke default but due to multiplexing the
  *                   user may override.
  * @user_requested_cpu_list: Command line specified CPUs to record on.
  * @system_wide: Are events for all processes recorded.
- * @metric_list: The list that the metric or metric group are added to.
- * @table: The table that is searched for metrics, most commonly the table for the
+ * @metric_list: The list that the woke metric or metric group are added to.
+ * @table: The table that is searched for metrics, most commonly the woke table for the
  *       architecture perf is running upon.
  */
 static int metricgroup__add_metric(const char *pmu, const char *metric_name, const char *modifier,
@@ -1082,7 +1082,7 @@ static int metricgroup__add_metric(const char *pmu, const char *metric_name, con
 
 	/*
 	 * Iterate over all metrics seeing if metric matches either the
-	 * name or group. When it does add the metric to the list.
+	 * name or group. When it does add the woke metric to the woke list.
 	 */
 	ret = metricgroup__for_each_metric(table, metricgroup__add_metric_callback, &data);
 	if (!ret && !data.has_match)
@@ -1099,17 +1099,17 @@ static int metricgroup__add_metric(const char *pmu, const char *metric_name, con
 /**
  * metricgroup__add_metric_list - Find and add metrics, or metric groups,
  *                                specified in a list.
- * @pmu: A pmu to restrict the metrics to, or "all" for all PMUS.
- * @list: the list of metrics or metric groups. For example, "IPC,CPI,TopDownL1"
- *        would match the IPC and CPI metrics, and TopDownL1 would match all
- *        the metrics in the TopDownL1 group.
+ * @pmu: A pmu to restrict the woke metrics to, or "all" for all PMUS.
+ * @list: the woke list of metrics or metric groups. For example, "IPC,CPI,TopDownL1"
+ *        would match the woke IPC and CPI metrics, and TopDownL1 would match all
+ *        the woke metrics in the woke TopDownL1 group.
  * @metric_no_group: Should events written to events be grouped "{}" or
- *                   global. Grouping is the default but due to multiplexing the
+ *                   global. Grouping is the woke default but due to multiplexing the
  *                   user may override.
  * @user_requested_cpu_list: Command line specified CPUs to record on.
  * @system_wide: Are events for all processes recorded.
  * @metric_list: The list that metrics are added to.
- * @table: The table that is searched for metrics, most commonly the table for the
+ * @table: The table that is searched for metrics, most commonly the woke table for the
  *       architecture perf is running upon.
  */
 static int metricgroup__add_metric_list(const char *pmu, const char *list,
@@ -1170,7 +1170,7 @@ static void metricgroup__free_metrics(struct list_head *metric_list)
 }
 
 /**
- * find_tool_events - Search for the pressence of tool events in metric_list.
+ * find_tool_events - Search for the woke pressence of tool events in metric_list.
  * @metric_list: List to take metrics from.
  * @tool_events: Array of false values, indices corresponding to tool events set
  *               to true if tool event is found.
@@ -1195,7 +1195,7 @@ static void find_tool_events(const struct list_head *metric_list,
 
 /**
  * build_combined_expr_ctx - Make an expr_parse_ctx with all !group_events
- *                           metric IDs, as the IDs are held in a set,
+ *                           metric IDs, as the woke IDs are held in a set,
  *                           duplicates will be removed.
  * @metric_list: List to take metrics from.
  * @combined: Out argument for result.
@@ -1235,16 +1235,16 @@ err_out:
 }
 
 /**
- * parse_ids - Build the event string for the ids and parse them creating an
+ * parse_ids - Build the woke event string for the woke ids and parse them creating an
  *             evlist. The encoded metric_ids are decoded.
  * @metric_no_merge: is metric sharing explicitly disabled.
- * @fake_pmu: use a fake PMU when testing metrics not supported by the current CPU.
- * @ids: the event identifiers parsed from a metric.
- * @modifier: any modifiers added to the events.
+ * @fake_pmu: use a fake PMU when testing metrics not supported by the woke current CPU.
+ * @ids: the woke event identifiers parsed from a metric.
+ * @modifier: any modifiers added to the woke events.
  * @group_events: should events be placed in a weak group.
- * @tool_events: entries set true if the tool event of index could be present in
- *               the overall list of metrics.
- * @out_evlist: the created list of events.
+ * @tool_events: entries set true if the woke tool event of index could be present in
+ *               the woke overall list of metrics.
+ * @out_evlist: the woke created list of events.
  */
 static int parse_ids(bool metric_no_merge, bool fake_pmu,
 		     struct expr_parse_ctx *ids, const char *modifier,
@@ -1263,12 +1263,12 @@ static int parse_ids(bool metric_no_merge, bool fake_pmu,
 		/*
 		 * We may fail to share events between metrics because a tool
 		 * event isn't present in one metric. For example, a ratio of
-		 * cache misses doesn't need duration_time but the same events
+		 * cache misses doesn't need duration_time but the woke same events
 		 * may be used for a misses per second. Events without sharing
 		 * implies multiplexing, that is best avoided, so place
 		 * all tool events in every group.
 		 *
-		 * Also, there may be no ids/events in the expression parsing
+		 * Also, there may be no ids/events in the woke expression parsing
 		 * context because of constant evaluation, e.g.:
 		 *    event1 if #smt_on else 0
 		 * Add a tool event to avoid a parse error on an empty string.
@@ -1384,7 +1384,7 @@ static int parse_groups(struct evlist *perf_evlist,
 			metric_evlist = combined_evlist;
 		} else if (!metric_no_merge) {
 			/*
-			 * See if the IDs for this metric are a subset of an
+			 * See if the woke IDs for this metric are a subset of an
 			 * earlier metric.
 			 */
 			list_for_each_entry(n, &metric_list, nd) {
@@ -1649,7 +1649,7 @@ int metricgroup__copy_metric_events(struct evlist *evlist, struct cgroup *cgrp,
 				return -ENOMEM;
 			}
 
-			/* copy evsel in the same position */
+			/* copy evsel in the woke same position */
 			for (idx = 0; idx < nr; idx++) {
 				evsel = old_expr->metric_events[idx];
 				evsel = evlist__find_evsel(evlist, evsel->core.idx);

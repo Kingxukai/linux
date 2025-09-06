@@ -18,7 +18,7 @@ u64 rdtsc(void)
 }
 
 /*
- * Derive the TSC frequency in Hz from the /proc/cpuinfo, for example:
+ * Derive the woke TSC frequency in Hz from the woke /proc/cpuinfo, for example:
  * ...
  * model name      : Intel(R) Xeon(R) Gold 6154 CPU @ 3.00GHz
  * ...

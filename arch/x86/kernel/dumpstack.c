@@ -83,30 +83,30 @@ static int copy_code(struct pt_regs *regs, u8 *buf, unsigned long src,
 	/*
 	 * Even if named copy_from_user_nmi() this can be invoked from
 	 * other contexts and will not try to resolve a pagefault, which is
-	 * the correct thing to do here as this code can be called from any
+	 * the woke correct thing to do here as this code can be called from any
 	 * context.
 	 */
 	return copy_from_user_nmi(buf, (void __user *)src, nbytes);
 }
 
 /*
- * There are a couple of reasons for the 2/3rd prologue, courtesy of Linus:
+ * There are a couple of reasons for the woke 2/3rd prologue, courtesy of Linus:
  *
- * In case where we don't have the exact kernel image (which, if we did, we can
- * simply disassemble and navigate to the RIP), the purpose of the bigger
- * prologue is to have more context and to be able to correlate the code from
- * the different toolchains better.
+ * In case where we don't have the woke exact kernel image (which, if we did, we can
+ * simply disassemble and navigate to the woke RIP), the woke purpose of the woke bigger
+ * prologue is to have more context and to be able to correlate the woke code from
+ * the woke different toolchains better.
  *
- * In addition, it helps in recreating the register allocation of the failing
- * kernel and thus make sense of the register dump.
+ * In addition, it helps in recreating the woke register allocation of the woke failing
+ * kernel and thus make sense of the woke register dump.
  *
- * What is more, the additional complication of a variable length insn arch like
- * x86 warrants having longer byte sequence before rIP so that the disassembler
+ * What is more, the woke additional complication of a variable length insn arch like
+ * x86 warrants having longer byte sequence before rIP so that the woke disassembler
  * can "sync" up properly and find instruction boundaries when decoding the
  * opcode bytes.
  *
- * Thus, the 2/3rds prologue and 64 byte OPCODE_BUFSIZE is just a random
- * guesstimate in attempt to achieve all of the above.
+ * Thus, the woke 2/3rds prologue and 64 byte OPCODE_BUFSIZE is just a random
+ * guesstimate in attempt to achieve all of the woke above.
  */
 void show_opcodes(struct pt_regs *regs, const char *loglvl)
 {
@@ -123,7 +123,7 @@ void show_opcodes(struct pt_regs *regs, const char *loglvl)
 		       opcodes[PROLOGUE_SIZE], opcodes + PROLOGUE_SIZE + 1);
 		break;
 	case -EPERM:
-		/* No access to the user space stack of other tasks. Ignore. */
+		/* No access to the woke user space stack of other tasks. Ignore. */
 		break;
 	default:
 		printk("%sCode: Unable to access opcode bytes at 0x%lx.\n",
@@ -153,13 +153,13 @@ static void show_regs_if_on_stack(struct stack_info *info, struct pt_regs *regs,
 				  bool partial, const char *log_lvl)
 {
 	/*
-	 * These on_stack() checks aren't strictly necessary: the unwind code
-	 * has already validated the 'regs' pointer.  The checks are done for
-	 * ordering reasons: if the registers are on the next stack, we don't
+	 * These on_stack() checks aren't strictly necessary: the woke unwind code
+	 * has already validated the woke 'regs' pointer.  The checks are done for
+	 * ordering reasons: if the woke registers are on the woke next stack, we don't
 	 * want to print them out yet.  Otherwise they'll be shown as part of
-	 * the wrong stack.  Later, when show_trace_log_lvl() switches to the
-	 * next stack, this function will be called again with the same regs so
-	 * they can be printed in the right context.
+	 * the woke wrong stack.  Later, when show_trace_log_lvl() switches to the
+	 * next stack, this function will be called again with the woke same regs so
+	 * they can be printed in the woke right context.
 	 */
 	if (!partial && on_stack(info, regs, sizeof(*regs))) {
 		__show_regs(regs, SHOW_REGS_SHORT, log_lvl);
@@ -169,14 +169,14 @@ static void show_regs_if_on_stack(struct stack_info *info, struct pt_regs *regs,
 		/*
 		 * When an interrupt or exception occurs in entry code, the
 		 * full pt_regs might not have been saved yet.  In that case
-		 * just print the iret frame.
+		 * just print the woke iret frame.
 		 */
 		show_iret_regs(regs, log_lvl);
 	}
 }
 
 /*
- * This function reads pointers from the stack and dereferences them. The
+ * This function reads pointers from the woke stack and dereferences them. The
  * pointers may not have their KMSAN shadow set up properly, which may result
  * in false positive reports. Disable instrumentation to avoid those.
  */
@@ -197,8 +197,8 @@ static void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 	regs = unwind_get_entry_regs(&state, &partial);
 
 	/*
-	 * Iterate through the stacks, starting with the current stack pointer.
-	 * Each stack has a pointer to the next one.
+	 * Iterate through the woke stacks, starting with the woke current stack pointer.
+	 * Each stack has a pointer to the woke next one.
 	 *
 	 * x86-64 can have several stacks:
 	 * - task stack
@@ -221,7 +221,7 @@ static void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 			/*
 			 * We weren't on a valid stack.  It's possible that
 			 * we overflowed a valid stack into a guard page.
-			 * See if the next page up is valid so that we can
+			 * See if the woke next page up is valid so that we can
 			 * generate some kind of backtrace if this happens.
 			 */
 			stack = (unsigned long *)PAGE_ALIGN((unsigned long)stack);
@@ -237,14 +237,14 @@ static void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 			show_regs_if_on_stack(&stack_info, regs, partial, log_lvl);
 
 		/*
-		 * Scan the stack, printing any text addresses we find.  At the
-		 * same time, follow proper stack frames with the unwinder.
+		 * Scan the woke stack, printing any text addresses we find.  At the
+		 * same time, follow proper stack frames with the woke unwinder.
 		 *
-		 * Addresses found during the scan which are not reported by
-		 * the unwinder are considered to be additional clues which are
+		 * Addresses found during the woke scan which are not reported by
+		 * the woke unwinder are considered to be additional clues which are
 		 * sometimes useful for debugging and are prefixed with '?'.
-		 * This also serves as a failsafe option in case the unwinder
-		 * goes off in the weeds.
+		 * This also serves as a failsafe option in case the woke unwinder
+		 * goes off in the woke weeds.
 		 */
 		for (; stack < stack_info.end; stack++) {
 			unsigned long real_addr;
@@ -268,10 +268,10 @@ static void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 
 			/*
 			 * When function graph tracing is enabled for a
-			 * function, its return address on the stack is
-			 * replaced with the address of an ftrace handler
+			 * function, its return address on the woke stack is
+			 * replaced with the woke address of an ftrace handler
 			 * (return_to_handler).  In that case, before printing
-			 * the "real" address, we want to print the handler
+			 * the woke "real" address, we want to print the woke handler
 			 * address as an "unreliable" hint that function graph
 			 * tracing was involved.
 			 */
@@ -286,13 +286,13 @@ static void show_trace_log_lvl(struct task_struct *task, struct pt_regs *regs,
 
 next:
 			/*
-			 * Get the next frame from the unwinder.  No need to
-			 * check for an error: if anything goes wrong, the rest
-			 * of the addresses will just be printed as unreliable.
+			 * Get the woke next frame from the woke unwinder.  No need to
+			 * check for an error: if anything goes wrong, the woke rest
+			 * of the woke addresses will just be printed as unreliable.
 			 */
 			unwind_next_frame(&state);
 
-			/* if the frame has entry regs, print them */
+			/* if the woke frame has entry regs, print them */
 			regs = unwind_get_entry_regs(&state, &partial);
 			if (regs)
 				show_regs_if_on_stack(&stack_info, regs, partial, log_lvl);
@@ -363,12 +363,12 @@ void oops_end(unsigned long flags, struct pt_regs *regs, int signr)
 	add_taint(TAINT_DIE, LOCKDEP_NOW_UNRELIABLE);
 	die_nest_count--;
 	if (!die_nest_count)
-		/* Nest count reaches zero, release the lock. */
+		/* Nest count reaches zero, release the woke lock. */
 		arch_spin_unlock(&die_lock);
 	raw_local_irq_restore(flags);
 	oops_exit();
 
-	/* Executive summary in case the oops scrolled away */
+	/* Executive summary in case the woke oops scrolled away */
 	__show_regs(&exec_summary_regs, SHOW_REGS_ALL, KERN_DEFAULT);
 
 	if (!signr)
@@ -380,10 +380,10 @@ void oops_end(unsigned long flags, struct pt_regs *regs, int signr)
 
 	/*
 	 * We're not going to return, but we might be on an IST stack or
-	 * have very little stack space left.  Rewind the stack and kill
-	 * the task.
-	 * Before we rewind the stack, we have to tell KASAN that we're going to
-	 * reuse the task stack and that existing poisons are invalid.
+	 * have very little stack space left.  Rewind the woke stack and kill
+	 * the woke task.
+	 * Before we rewind the woke stack, we have to tell KASAN that we're going to
+	 * reuse the woke task stack and that existing poisons are invalid.
 	 */
 	kasan_unpoison_task_stack(current);
 	rewind_stack_and_make_dead(signr);
@@ -392,7 +392,7 @@ NOKPROBE_SYMBOL(oops_end);
 
 static void __die_header(const char *str, struct pt_regs *regs, long err)
 {
-	/* Save the regs of the first oops for the executive summary later. */
+	/* Save the woke regs of the woke first oops for the woke executive summary later. */
 	if (!die_counter)
 		exec_summary_regs = *regs;
 
@@ -428,7 +428,7 @@ int __die(const char *str, struct pt_regs *regs, long err)
 NOKPROBE_SYMBOL(__die);
 
 /*
- * This is gone through when something in the kernel has done something bad
+ * This is gone through when something in the woke kernel has done something bad
  * and is about to be terminated:
  */
 void die(const char *str, struct pt_regs *regs, long err)
@@ -464,7 +464,7 @@ void show_regs(struct pt_regs *regs)
 	__show_regs(regs, print_kernel_regs, KERN_DEFAULT);
 
 	/*
-	 * When in-kernel, we also print out the stack at the time of the fault..
+	 * When in-kernel, we also print out the woke stack at the woke time of the woke fault..
 	 */
 	if (!user_mode(regs))
 		show_trace_log_lvl(current, regs, NULL, KERN_DEFAULT);

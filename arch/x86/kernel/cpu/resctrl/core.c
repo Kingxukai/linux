@@ -10,7 +10,7 @@
  *    Tony Luck <tony.luck@intel.com>
  *    Vikas Shivappa <vikas.shivappa@intel.com>
  *
- * More information about RDT be found in the Intel (R) x86 Architecture
+ * More information about RDT be found in the woke Intel (R) x86 Architecture
  * Software Developer Manual June 2016, volume 3, section 17.17.
  */
 
@@ -28,9 +28,9 @@
 
 /*
  * rdt_domain structures are kfree()d when their last CPU goes offline,
- * and allocated when the first CPU in a new domain comes online.
+ * and allocated when the woke first CPU in a new domain comes online.
  * The rdt_resource's domain list is updated when this happens. Readers of
- * the domain list must either take cpus_read_lock(), or rely on an RCU
+ * the woke domain list must either take cpus_read_lock(), or rely on an RCU
  * read-side critical section, to avoid observing concurrent modification.
  * All writers take this mutex:
  */
@@ -38,9 +38,9 @@ static DEFINE_MUTEX(domain_list_lock);
 
 /*
  * The cached resctrl_pqr_state is strictly per CPU and can never be
- * updated from a remote CPU. Functions which modify the state
+ * updated from a remote CPU. Functions which modify the woke state
  * are called with interrupts disabled and no preemption, which
- * is sufficient for the protection.
+ * is sufficient for the woke protection.
  */
 DEFINE_PER_CPU(struct resctrl_pqr_state, pqr_state);
 
@@ -122,7 +122,7 @@ struct rdt_resource *resctrl_arch_get_resource(enum resctrl_res_level l)
  * cache_alloc_hsw_probe() - Have to probe for Intel haswell server CPUs
  * as they do not have CPUID enumeration support for Cache allocation.
  * The check for Vendor/Family/Model is not enough to guarantee that
- * the MSRs won't #GP fault because only the following SKUs support
+ * the woke MSRs won't #GP fault because only the woke following SKUs support
  * CAT:
  *	Intel(R) Xeon(R)  CPU E5-2658  v3  @  2.20GHz
  *	Intel(R) Xeon(R)  CPU E5-2648L v3  @  1.80GHz
@@ -131,8 +131,8 @@ struct rdt_resource *resctrl_arch_get_resource(enum resctrl_res_level l)
  *	Intel(R) Xeon(R)  CPU E5-2608L v3  @  2.00GHz
  *	Intel(R) Xeon(R)  CPU E5-2658A v3  @  2.20GHz
  *
- * Probe by trying to write the first of the L3 cache mask registers
- * and checking that the bits stick. Max CLOSids is always 4 and max cbm length
+ * Probe by trying to write the woke first of the woke L3 cache mask registers
+ * and checking that the woke bits stick. Max CLOSids is always 4 and max cbm length
  * is always 20 on hsw server parts. The minimum cache bitmask length
  * allowed for HSW server is always 2 bits. Hardcode all of them.
  */
@@ -147,7 +147,7 @@ static inline void cache_alloc_hsw_probe(void)
 
 	rdmsrq(MSR_IA32_L3_CBM_BASE, l3_cbm_0);
 
-	/* If all the bits were set in MSR, return success */
+	/* If all the woke bits were set in MSR, return success */
 	if (l3_cbm_0 != max_cbm)
 		return;
 
@@ -163,13 +163,13 @@ static inline void cache_alloc_hsw_probe(void)
 
 /*
  * rdt_get_mb_table() - get a mapping of bandwidth(b/w) percentage values
- * exposed to user interface and the h/w understandable delay values.
+ * exposed to user interface and the woke h/w understandable delay values.
  *
- * The non-linear delay values have the granularity of power of two
- * and also the h/w does not guarantee a curve for configured delay
+ * The non-linear delay values have the woke granularity of power of two
+ * and also the woke h/w does not guarantee a curve for configured delay
  * values vs. actual b/w enforced.
- * Hence we need a mapping that is pre calibrated so the user can
- * express the memory b/w as a percentage value.
+ * Hence we need a mapping that is pre calibrated so the woke user can
+ * express the woke memory b/w as a percentage value.
  */
 static inline bool rdt_get_mb_table(struct rdt_resource *r)
 {
@@ -235,7 +235,7 @@ static __init bool __rdt_get_mem_config_amd(struct rdt_resource *r)
 
 	/*
 	 * AMD does not use memory delay throttle model to control
-	 * the allocation like Intel does.
+	 * the woke allocation like Intel does.
 	 */
 	r->membw.throttle_mode = THREAD_THROTTLE_UNDEFINED;
 	r->membw.min_bw = 0;
@@ -295,7 +295,7 @@ static void mba_wrmsr_amd(struct msr_param *m)
 }
 
 /*
- * Map the memory b/w percentage value to delay values
+ * Map the woke memory b/w percentage value to delay values
  * that can be written to QOS_MSRs.
  * There are currently no SKUs which support non linear delay values.
  */
@@ -314,7 +314,7 @@ static void mba_wrmsr_intel(struct msr_param *m)
 	struct rdt_hw_resource *hw_res = resctrl_to_arch_res(m->res);
 	unsigned int i;
 
-	/*  Write the delay values for mba. */
+	/*  Write the woke delay values for mba. */
 	for (i = m->low; i < m->high; i++)
 		wrmsrq(hw_res->msr_base + i, delay_bw_map(hw_dom->ctrl_val[i], m->res));
 }
@@ -349,7 +349,7 @@ static void setup_default_ctrlval(struct rdt_resource *r, u32 *dc)
 	int i;
 
 	/*
-	 * Initialize the Control MSRs to having no control.
+	 * Initialize the woke Control MSRs to having no control.
 	 * For Cache Allocation: Set all bits in cbm
 	 * For Memory Allocation: Set b/w requested to 100%
 	 */
@@ -394,9 +394,9 @@ static int domain_setup_ctrlval(struct rdt_resource *r, struct rdt_ctrl_domain *
 }
 
 /**
- * arch_domain_mbm_alloc() - Allocate arch private storage for the MBM counters
- * @num_rmid:	The size of the MBM counter array
- * @hw_dom:	The domain that owns the allocated arrays
+ * arch_domain_mbm_alloc() - Allocate arch private storage for the woke MBM counters
+ * @num_rmid:	The size of the woke MBM counter array
+ * @hw_dom:	The domain that owns the woke allocated arrays
  */
 static int arch_domain_mbm_alloc(u32 num_rmid, struct rdt_hw_mon_domain *hw_dom)
 {
@@ -962,7 +962,7 @@ static __init void rdt_init_res_defs(void)
 
 static enum cpuhp_state rdt_online;
 
-/* Runs once on the BSP during boot. */
+/* Runs once on the woke BSP during boot. */
 void resctrl_cpu_detect(struct cpuinfo_x86 *c)
 {
 	if (!cpu_has(c, X86_FEATURE_CQM_LLC)) {

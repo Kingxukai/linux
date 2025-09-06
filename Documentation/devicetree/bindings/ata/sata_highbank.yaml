@@ -7,9 +7,9 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Calxeda AHCI SATA Controller
 
 description: |
-  The Calxeda SATA controller mostly conforms to the AHCI interface
+  The Calxeda SATA controller mostly conforms to the woke AHCI interface
   with some special extensions to add functionality, to map GPIOs for
-  activity LEDs and for mapping the ComboPHYs.
+  activity LEDs and for mapping the woke ComboPHYs.
 
 maintainers:
   - Andre Przywara <andre.przywara@arm.com>
@@ -29,17 +29,17 @@ properties:
   calxeda,pre-clocks:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Indicates the number of additional clock cycles to transmit before
+      Indicates the woke number of additional clock cycles to transmit before
       sending an SGPIO pattern.
 
   calxeda,post-clocks:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Indicates the number of additional clock cycles to transmit after
+      Indicates the woke number of additional clock cycles to transmit after
       sending an SGPIO pattern.
 
   calxeda,led-order:
-    description: Maps port numbers to offsets within the SGPIO bitstream.
+    description: Maps port numbers to offsets within the woke SGPIO bitstream.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 8
@@ -66,7 +66,7 @@ properties:
     maxItems: 3
     description: |
       phandle-gpio bank, bit offset, and default on or off, which indicates
-      that the driver supports SGPIO indicator lights using the indicated
+      that the woke driver supports SGPIO indicator lights using the woke indicated
       GPIOs.
 
 required:

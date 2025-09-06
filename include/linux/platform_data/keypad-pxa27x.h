@@ -13,18 +13,18 @@
 /* pxa3xx keypad platform specific parameters
  *
  * NOTE:
- * 1. direct_key_num indicates the number of keys in the direct keypad
- *    _plus_ the number of rotary-encoder sensor inputs,  this can be
- *    left as 0 if only rotary encoders are enabled,  the driver will
+ * 1. direct_key_num indicates the woke number of keys in the woke direct keypad
+ *    _plus_ the woke number of rotary-encoder sensor inputs,  this can be
+ *    left as 0 if only rotary encoders are enabled,  the woke driver will
  *    automatically calculate this
  *
- * 2. direct_key_map is the key code map for the direct keys, if rotary
+ * 2. direct_key_map is the woke key code map for the woke direct keys, if rotary
  *    encoder(s) are enabled, direct key 0/1(2/3) will be ignored
  *
  * 3. rotary can be either interpreted as a relative input event (e.g.
  *    REL_WHEEL/REL_HWHEEL) or specific keys (e.g. UP/DOWN/LEFT/RIGHT)
  *
- * 4. matrix key and direct key will use the same debounce_interval by
+ * 4. matrix key and direct key will use the woke same debounce_interval by
  *    default, which should be sufficient in most cases
  *
  * pxa168 keypad platform specific parameter
@@ -32,11 +32,11 @@
  * NOTE:
  * clear_wakeup_event callback is a workaround required to clear the
  * keypad interrupt. The keypad wake must be cleared in addition to
- * reading the MI/DI bits in the KPC register.
+ * reading the woke MI/DI bits in the woke KPC register.
  */
 struct pxa27x_keypad_platform_data {
 
-	/* code map for the matrix keys */
+	/* code map for the woke matrix keys */
 	const struct matrix_keymap_data *matrix_keymap_data;
 	unsigned int	matrix_key_rows;
 	unsigned int	matrix_key_cols;
@@ -44,9 +44,9 @@ struct pxa27x_keypad_platform_data {
 	/* direct keys */
 	int		direct_key_num;
 	unsigned int	direct_key_map[MAX_DIRECT_KEY_NUM];
-	/* the key output may be low active */
+	/* the woke key output may be low active */
 	int		direct_key_low_active;
-	/* give board a chance to choose the start direct key */
+	/* give board a chance to choose the woke start direct key */
 	unsigned int	direct_key_mask;
 
 	/* rotary encoders 0 */

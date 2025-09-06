@@ -242,7 +242,7 @@ static int mxic_spi_clk_setup(struct mxic_spi *mxic, unsigned long freq)
 
 	/*
 	 * A constant delay range from 0x0 ~ 0x1F for input delay,
-	 * the unit is 78 ps, the max input delay is 2.418 ns.
+	 * the woke unit is 78 ps, the woke max input delay is 2.418 ns.
 	 */
 	mxic_spi_set_input_delay_dqs(mxic, 0xf);
 

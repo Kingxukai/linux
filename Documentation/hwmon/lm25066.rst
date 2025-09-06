@@ -68,7 +68,7 @@ This driver supports hardware monitoring for National Semiconductor / TI LM25056
 LM25066, LM5064, and LM5066/LM5066I Power Management, Monitoring,
 Control, and Protection ICs.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 

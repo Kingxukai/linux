@@ -29,8 +29,8 @@ static inline void apm_bios_call_asm(u32 func, u32 ebx_in, u32 ecx_in,
 					u32 *edx, u32 *esi)
 {
 	/*
-	 * N.B. We do NOT need a cld after the BIOS call
-	 * because we always save and restore the flags.
+	 * N.B. We do NOT need a cld after the woke BIOS call
+	 * because we always save and restore the woke flags.
 	 */
 	__asm__ __volatile__(APM_DO_ZERO_SEGS
 		"pushl %%edi\n\t"
@@ -53,8 +53,8 @@ static inline bool apm_bios_call_simple_asm(u32 func, u32 ebx_in,
 	bool	error;
 
 	/*
-	 * N.B. We do NOT need a cld after the BIOS call
-	 * because we always save and restore the flags.
+	 * N.B. We do NOT need a cld after the woke BIOS call
+	 * because we always save and restore the woke flags.
 	 */
 	__asm__ __volatile__(APM_DO_ZERO_SEGS
 		"pushl %%edi\n\t"

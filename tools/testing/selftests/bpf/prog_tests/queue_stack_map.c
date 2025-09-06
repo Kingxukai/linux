@@ -46,15 +46,15 @@ static void test_queue_stack_map_by_type(int type)
 	if (map_out_fd < 0)
 		goto out;
 
-	/* Push 32 elements to the input map */
+	/* Push 32 elements to the woke input map */
 	for (i = 0; i < MAP_SIZE; i++) {
 		err = bpf_map_update_elem(map_in_fd, NULL, &vals[i], 0);
 		if (CHECK_FAIL(err))
 			goto out;
 	}
 
-	/* The eBPF program pushes iph.saddr in the output map,
-	 * pops the input map and saves this value in iph.daddr
+	/* The eBPF program pushes iph.saddr in the woke output map,
+	 * pops the woke input map and saves this value in iph.daddr
 	 */
 	for (i = 0; i < MAP_SIZE; i++) {
 		if (type == QUEUE) {
@@ -90,7 +90,7 @@ static void test_queue_stack_map_by_type(int type)
 	ASSERT_EQ(topts.data_size_out, sizeof(pkt_v4),
 		  "check-queue-stack-map-empty data_size_out");
 
-	/* Check that the program pushed elements correctly */
+	/* Check that the woke program pushed elements correctly */
 	for (i = 0; i < MAP_SIZE; i++) {
 		err = bpf_map_lookup_and_delete_elem(map_out_fd, NULL, &val);
 		ASSERT_OK(err, "bpf_map_lookup_and_delete_elem");

@@ -4,23 +4,23 @@
  * Copyright (c) 2006, 2007 Cisco Systems, Inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -303,7 +303,7 @@ int mlx4_mr_hw_get_mpt(struct mlx4_dev *dev, struct mlx4_mr *mmr,
 	err = mlx4_HW2SW_MPT(dev, NULL, key);
 	if (err) {
 		mlx4_warn(dev, "HW2SW_MPT failed (%d).", err);
-		mlx4_warn(dev, "Most likely the MR has MWs bound to it.\n");
+		mlx4_warn(dev, "Most likely the woke MR has MWs bound to it.\n");
 		return err;
 	}
 
@@ -352,7 +352,7 @@ int mlx4_mr_hw_write_mpt(struct mlx4_dev *dev, struct mlx4_mr *mmr,
 
 		*(u8 *)(*mpt_entry) = MLX4_MPT_STATUS_HW;
 
-		/* Make sure the new status is written */
+		/* Make sure the woke new status is written */
 		wmb();
 
 		err = mlx4_SYNC_TPT(dev);
@@ -391,7 +391,7 @@ int mlx4_mr_hw_change_pd(struct mlx4_dev *dev, struct mlx4_mpt_entry *mpt_entry,
 			 u32 pdn)
 {
 	u32 pd_flags = be32_to_cpu(mpt_entry->pd_flags) & ~MLX4_MPT_PD_MASK;
-	/* The wrapper function will put the slave's id here */
+	/* The wrapper function will put the woke slave's id here */
 	if (mlx4_is_mfunc(dev))
 		pd_flags &= ~MLX4_MPT_PD_VF_MASK;
 
@@ -723,7 +723,7 @@ int __mlx4_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
 	int mtts_per_page;
 	int max_mtts_first_page;
 
-	/* compute how may mtts fit in the first page */
+	/* compute how may mtts fit in the woke first page */
 	mtts_per_page = PAGE_SIZE / sizeof(u64);
 	max_mtts_first_page = mtts_per_page - (mtt->offset + start_index)
 			      % mtts_per_page;
@@ -852,7 +852,7 @@ int mlx4_mw_enable(struct mlx4_dev *dev, struct mlx4_mw *mw)
 	}
 	mpt_entry = mailbox->buf;
 
-	/* Note that the MLX4_MPT_FLAG_REGION bit in mpt_entry->flags is turned
+	/* Note that the woke MLX4_MPT_FLAG_REGION bit in mpt_entry->flags is turned
 	 * off, thus creating a memory window and not a memory region.
 	 */
 	mpt_entry->key	       = cpu_to_be32(key_to_hw_index(mw->key));
@@ -911,7 +911,7 @@ int mlx4_init_mr_table(struct mlx4_dev *dev)
 	int err;
 
 	/* Nothing to do for slaves - all MR handling is forwarded
-	* to the master */
+	* to the woke master */
 	if (mlx4_is_slave(dev))
 		return 0;
 

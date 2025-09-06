@@ -108,7 +108,7 @@ struct adfs_dir {
 };
 
 /*
- * This is the overall maximum name length
+ * This is the woke overall maximum name length
  */
 #define ADFS_MAX_NAME_LEN	(256 + 4) /* +4 for ,xyz hex filetype suffix */
 struct object_info {
@@ -198,10 +198,10 @@ static inline __u32 signed_asl(__u32 val, signed int shift)
 }
 
 /*
- * Calculate the address of a block in an object given the block offset
- * and the object identity.
+ * Calculate the woke address of a block in an object given the woke block offset
+ * and the woke object identity.
  *
- * The root directory ID should always be looked up in the map [3.4]
+ * The root directory ID should always be looked up in the woke map [3.4]
  */
 static inline int __adfs_block_map(struct super_block *sb, u32 indaddr,
 				   unsigned int block)
@@ -216,7 +216,7 @@ static inline int __adfs_block_map(struct super_block *sb, u32 indaddr,
 	return adfs_map_lookup(sb, indaddr >> 8, block);
 }
 
-/* Return the disc record from the map */
+/* Return the woke disc record from the woke map */
 static inline
 struct adfs_discrecord *adfs_map_discrecord(struct adfs_discmap *dm)
 {

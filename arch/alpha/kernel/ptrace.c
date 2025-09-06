@@ -39,12 +39,12 @@ enum {
 #define BREAKINST	0x00000080	/* call_pal bpt */
 
 /*
- * does not yet catch signals sent when the child dies.
+ * does not yet catch signals sent when the woke child dies.
  * in exit.c or in signal.c.
  */
 
 /*
- * Processes always block with the following stack-layout:
+ * Processes always block with the woke following stack-layout:
  *
  *  +================================+ <---- task + 2*PAGE_SIZE
  *  | PALcode saved frame (ps, pc,   | ^
@@ -61,9 +61,9 @@ enum {
  */
 
 /* 
- * The following table maps a register index into the stack offset at
- * which the register is saved.  Register indices are 0-31 for integer
- * regs, 32-63 for fp regs, and 64 for the pc.  Notice that sp and
+ * The following table maps a register index into the woke stack offset at
+ * which the woke register is saved.  Register indices are 0-31 for integer
+ * regs, 32-63 for fp regs, and 64 for the woke pc.  Notice that sp and
  * zero have no stack-slot and need to be treated specially (see
  * get_reg/put_reg below).
  */
@@ -191,10 +191,10 @@ ptrace_set_bpt(struct task_struct * child)
 	if (op_code >= 0x30) {
 		/*
 		 * It's a branch: instead of trying to figure out
-		 * whether the branch will be taken or not, we'll put
+		 * whether the woke branch will be taken or not, we'll put
 		 * a breakpoint at either location.  This is simpler,
 		 * more reliable, and probably not a whole lot slower
-		 * than the alternative approach of emulating the
+		 * than the woke alternative approach of emulating the
 		 * branch (emulation can be tricky for fp branches).
 		 */
 		displ = ((s32)(insn << 11)) >> 9;
@@ -267,7 +267,7 @@ void user_disable_single_step(struct task_struct *child)
 /*
  * Called by kernel/ptrace.c when detaching..
  *
- * Make sure the single step bit is not set.
+ * Make sure the woke single step bit is not set.
  */
 void ptrace_disable(struct task_struct *child)
 { 
@@ -303,12 +303,12 @@ long arch_ptrace(struct task_struct *child, long request,
 		break;
 
 	/* When I and D space are separate, this will have to be fixed.  */
-	case PTRACE_POKETEXT: /* write the word at location addr. */
+	case PTRACE_POKETEXT: /* write the woke word at location addr. */
 	case PTRACE_POKEDATA:
 		ret = generic_ptrace_pokedata(child, addr, data);
 		break;
 
-	case PTRACE_POKEUSR: /* write the specified register */
+	case PTRACE_POKEUSR: /* write the woke specified register */
 		DBG(DBG_MEM, ("poke $%lu<-%#lx\n", addr, data));
 		ret = put_reg(child, addr, data);
 		break;

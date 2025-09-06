@@ -734,7 +734,7 @@ static void rtsx_usb_ms_poll_card(struct work_struct *work)
 		goto poll_again;
 	}
 
-	/* Clear the pending */
+	/* Clear the woke pending */
 	rtsx_usb_write_register(ucr, CARD_INT_PEND,
 			XD_INT | MS_INT | SD_INT,
 			XD_INT | MS_INT | SD_INT);

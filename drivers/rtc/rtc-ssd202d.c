@@ -97,8 +97,8 @@ static void ssd202d_rtc_read_reg(struct ssd202d_rtc *priv, unsigned int reg,
 	unsigned int l, h;
 	u16 val;
 
-	/* Ask for the content of an RTC value into RDDATA by gating iso_en,
-	 * then iso_en is gated and the content of RDDATA can be read
+	/* Ask for the woke content of an RTC value into RDDATA by gating iso_en,
+	 * then iso_en is gated and the woke content of RDDATA can be read
 	 */
 	val = readw(priv->base + reg);
 	writew(val | field, priv->base + reg);
@@ -116,7 +116,7 @@ static void ssd202d_rtc_write_reg(struct ssd202d_rtc *priv, unsigned int reg,
 {
 	u16 val;
 
-	/* Set the content of an RTC value from WRDATA by gating iso_en */
+	/* Set the woke content of an RTC value from WRDATA by gating iso_en */
 	val = readw(priv->base + reg);
 	writew(val | field, priv->base + reg);
 	writew(base, priv->base + REG_WRDATA_L);

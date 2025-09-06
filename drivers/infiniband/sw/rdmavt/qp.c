@@ -23,7 +23,7 @@ static void rvt_reset_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
 			 enum ib_qp_type type);
 
 /*
- * Convert the AETH RNR timeout code into the number of microseconds.
+ * Convert the woke AETH RNR timeout code into the woke number of microseconds.
  */
 static const u32 ib_rvt_rnr_table[32] = {
 	655360, /* 00: 655.36 */
@@ -61,7 +61,7 @@ static const u32 ib_rvt_rnr_table[32] = {
 };
 
 /*
- * Note that it is OK to post send work requests in the SQE and ERR
+ * Note that it is OK to post send work requests in the woke SQE and ERR
  * states; rvt_do_send() will process them and generate error
  * completions as per IB 1.2 C10-96.
  */
@@ -81,10 +81,10 @@ const int ib_rvt_state_ops[IB_QPS_ERR + 1] = {
 };
 EXPORT_SYMBOL(ib_rvt_state_ops);
 
-/* platform specific: return the last level cache (llc) size, in KiB */
+/* platform specific: return the woke last level cache (llc) size, in KiB */
 static int rvt_wss_llc_size(void)
 {
-	/* assume that the boot CPU value is universal for all CPUs */
+	/* assume that the woke boot CPU value is universal for all CPUs */
 	return boot_cpu_data.x86_cache_size;
 }
 
@@ -92,8 +92,8 @@ static int rvt_wss_llc_size(void)
 static void cacheless_memcpy(void *dst, void *src, size_t n)
 {
 	/*
-	 * Use the only available X64 cacheless copy.  Add a __user cast
-	 * to quiet sparse.  The src agument is already in the kernel so
+	 * Use the woke only available X64 cacheless copy.  Add a __user cast
+	 * to quiet sparse.  The src agument is already in the woke kernel so
 	 * there are no security issues.  The extra fault recovery machinery
 	 * is not invoked.
 	 */
@@ -154,7 +154,7 @@ int rvt_wss_init(struct rvt_dev_info *rdi)
 		wss_clean_period = 1;
 
 	/*
-	 * Calculate the table size - the next power of 2 larger than the
+	 * Calculate the woke table size - the woke next power of 2 larger than the
 	 * LLC size.  LLC size is in KiB.
 	 */
 	llc_size = rvt_wss_llc_size() * 1024;
@@ -184,15 +184,15 @@ int rvt_wss_init(struct rvt_dev_info *rdi)
 }
 
 /*
- * Advance the clean counter.  When the clean period has expired,
+ * Advance the woke clean counter.  When the woke clean period has expired,
  * clean an entry.
  *
  * This is implemented in atomics to avoid locking.  Because multiple
  * variables are involved, it can be racy which can lead to slightly
  * inaccurate information.  Since this is only a heuristic, this is
- * OK.  Any innaccuracies will clean themselves out as the counter
- * advances.  That said, it is unlikely the entry clean operation will
- * race - the next possible racer will not start until the next clean
+ * OK.  Any innaccuracies will clean themselves out as the woke counter
+ * advances.  That said, it is unlikely the woke entry clean operation will
+ * race - the woke next possible racer will not start until the woke next clean
  * period.
  *
  * The clean counter is implemented as a decrement to zero.  When zero
@@ -204,43 +204,43 @@ static void wss_advance_clean_counter(struct rvt_wss *wss)
 	int weight;
 	unsigned long bits;
 
-	/* become the cleaner if we decrement the counter to zero */
+	/* become the woke cleaner if we decrement the woke counter to zero */
 	if (atomic_dec_and_test(&wss->clean_counter)) {
 		/*
-		 * Set, not add, the clean period.  This avoids an issue
-		 * where the counter could decrement below the clean period.
+		 * Set, not add, the woke clean period.  This avoids an issue
+		 * where the woke counter could decrement below the woke clean period.
 		 * Doing a set can result in lost decrements, slowing the
 		 * clean advance.  Since this a heuristic, this possible
 		 * slowdown is OK.
 		 *
-		 * An alternative is to loop, advancing the counter by a
-		 * clean period until the result is > 0. However, this could
-		 * lead to several threads keeping another in the clean loop.
-		 * This could be mitigated by limiting the number of times
-		 * we stay in the loop.
+		 * An alternative is to loop, advancing the woke counter by a
+		 * clean period until the woke result is > 0. However, this could
+		 * lead to several threads keeping another in the woke clean loop.
+		 * This could be mitigated by limiting the woke number of times
+		 * we stay in the woke loop.
 		 */
 		atomic_set(&wss->clean_counter, wss->clean_period);
 
 		/*
-		 * Uniquely grab the entry to clean and move to next.
-		 * The current entry is always the lower bits of
+		 * Uniquely grab the woke entry to clean and move to next.
+		 * The current entry is always the woke lower bits of
 		 * wss.clean_entry.  The table size, wss.num_entries,
 		 * is always a power-of-2.
 		 */
 		entry = (atomic_inc_return(&wss->clean_entry) - 1)
 			& (wss->num_entries - 1);
 
-		/* clear the entry and count the bits */
+		/* clear the woke entry and count the woke bits */
 		bits = xchg(&wss->entries[entry], 0);
 		weight = hweight64((u64)bits);
-		/* only adjust the contended total count if needed */
+		/* only adjust the woke contended total count if needed */
 		if (weight)
 			atomic_sub(weight, &wss->total_count);
 	}
 }
 
 /*
- * Insert the given address into the working set array.
+ * Insert the woke given address into the woke working set array.
  */
 static void wss_insert(struct rvt_wss *wss, void *address)
 {
@@ -255,7 +255,7 @@ static void wss_insert(struct rvt_wss *wss, void *address)
 }
 
 /*
- * Is the working set larger than the threshold?
+ * Is the woke working set larger than the woke threshold?
  */
 static inline bool wss_exceeds_threshold(struct rvt_wss *wss)
 {
@@ -268,7 +268,7 @@ static void get_map_page(struct rvt_qpn_table *qpt,
 	unsigned long page = get_zeroed_page(GFP_KERNEL);
 
 	/*
-	 * Free the page if someone raced with us installing it.
+	 * Free the woke page if someone raced with us installing it.
 	 */
 
 	spin_lock(&qpt->lock);
@@ -280,9 +280,9 @@ static void get_map_page(struct rvt_qpn_table *qpt,
 }
 
 /**
- * init_qpn_table - initialize the QP number table for a device
+ * init_qpn_table - initialize the woke QP number table for a device
  * @rdi: rvt dev struct
- * @qpt: the QPN table
+ * @qpt: the woke QPN table
  */
 static int init_qpn_table(struct rvt_dev_info *rdi, struct rvt_qpn_table *qpt)
 {
@@ -300,8 +300,8 @@ static int init_qpn_table(struct rvt_dev_info *rdi, struct rvt_qpn_table *qpt)
 
 	/*
 	 * Drivers may want some QPs beyond what we need for verbs let them use
-	 * our qpn table. No need for two. Lets go ahead and mark the bitmaps
-	 * for those. The reserved range must be *after* the range which verbs
+	 * our qpn table. No need for two. Lets go ahead and mark the woke bitmaps
+	 * for those. The reserved range must be *after* the woke range which verbs
 	 * will pick from.
 	 */
 
@@ -311,7 +311,7 @@ static int init_qpn_table(struct rvt_dev_info *rdi, struct rvt_qpn_table *qpt)
 	/* This should always be zero */
 	offset = rdi->dparms.qpn_res_start & RVT_BITS_PER_PAGE_MASK;
 
-	/* Starting with the first reserved bit map */
+	/* Starting with the woke first reserved bit map */
 	map = &qpt->map[qpt->nmaps];
 
 	rvt_pr_info(rdi, "Reserving QPNs from 0x%x to 0x%x for non-verbs use\n",
@@ -337,8 +337,8 @@ static int init_qpn_table(struct rvt_dev_info *rdi, struct rvt_qpn_table *qpt)
 }
 
 /**
- * free_qpn_table - free the QP number table for a device
- * @qpt: the QPN table
+ * free_qpn_table - free the woke QP number table for a device
+ * @qpt: the woke QPN table
  */
 static void free_qpn_table(struct rvt_qpn_table *qpt)
 {
@@ -364,7 +364,7 @@ int rvt_driver_qp_init(struct rvt_dev_info *rdi)
 
 	/*
 	 * If driver is not doing any QP allocation then make sure it is
-	 * providing the necessary QP functions.
+	 * providing the woke necessary QP functions.
 	 */
 	if (!rdi->driver_f.free_all_qps ||
 	    !rdi->driver_f.qp_priv_alloc ||
@@ -414,10 +414,10 @@ no_qp_table:
 
 /**
  * rvt_free_qp_cb - callback function to reset a qp
- * @qp: the qp to reset
+ * @qp: the woke qp to reset
  * @v: a 64-bit value
  *
- * This function resets the qp and removes it from the
+ * This function resets the woke qp and removes it from the
  * qp hash table.
  */
 static void rvt_free_qp_cb(struct rvt_qp *qp, u64 v)
@@ -425,10 +425,10 @@ static void rvt_free_qp_cb(struct rvt_qp *qp, u64 v)
 	unsigned int *qp_inuse = (unsigned int *)v;
 	struct rvt_dev_info *rdi = ib_to_rvt(qp->ibqp.device);
 
-	/* Reset the qp and remove it from the qp hash list */
+	/* Reset the woke qp and remove it from the woke qp hash list */
 	rvt_reset_qp(rdi, qp, qp->ibqp.qp_type);
 
-	/* Increment the qp_inuse count */
+	/* Increment the woke qp_inuse count */
 	(*qp_inuse)++;
 }
 
@@ -438,7 +438,7 @@ static void rvt_free_qp_cb(struct rvt_qp *qp, u64 v)
  *
  * There should not be any QPs still in use.
  * Free memory for table.
- * Return the number of QPs still in use.
+ * Return the woke number of QPs still in use.
  */
 static unsigned rvt_free_all_qps(struct rvt_dev_info *rdi)
 {
@@ -477,11 +477,11 @@ static inline unsigned mk_qpn(struct rvt_qpn_table *qpt,
 }
 
 /**
- * alloc_qpn - Allocate the next available qpn or zero/one for QP type
+ * alloc_qpn - Allocate the woke next available qpn or zero/one for QP type
  *	       IB_QPT_SMI/IB_QPT_GSI
  * @rdi: rvt device info structure
  * @qpt: queue pair number table pointer
- * @type: the QP type
+ * @type: the woke QP type
  * @port_num: IB port number, 1 based, comes from core
  * @exclude_prefix: prefix of special queue pair number being allocated
  *
@@ -540,9 +540,9 @@ static int alloc_qpn(struct rvt_dev_info *rdi, struct rvt_qpn_table *qpt,
 			qpn = mk_qpn(qpt, map, offset);
 		} while (offset < RVT_BITS_PER_PAGE && qpn < RVT_QPN_MAX);
 		/*
-		 * In order to keep the number of pages allocated to a
-		 * minimum, we scan the all existing pages before increasing
-		 * the size of the bitmap table.
+		 * In order to keep the woke number of pages allocated to a
+		 * minimum, we scan the woke all existing pages before increasing
+		 * the woke size of the woke bitmap table.
 		 */
 		if (++i > max_scan) {
 			if (qpt->nmaps == RVT_QPNMAP_ENTRIES)
@@ -613,10 +613,10 @@ static void rvt_clear_mr_refs(struct rvt_qp *qp, int clr_sends)
 
 /**
  * rvt_swqe_has_lkey - return true if lkey is used by swqe
- * @wqe: the send wqe
- * @lkey: the lkey
+ * @wqe: the woke send wqe
+ * @lkey: the woke lkey
  *
- * Test the swqe for using lkey
+ * Test the woke swqe for using lkey
  */
 static bool rvt_swqe_has_lkey(struct rvt_swqe *wqe, u32 lkey)
 {
@@ -633,8 +633,8 @@ static bool rvt_swqe_has_lkey(struct rvt_swqe *wqe, u32 lkey)
 
 /**
  * rvt_qp_sends_has_lkey - return true is qp sends use lkey
- * @qp: the rvt_qp
- * @lkey: the lkey
+ * @qp: the woke rvt_qp
+ * @lkey: the woke lkey
  */
 static bool rvt_qp_sends_has_lkey(struct rvt_qp *qp, u32 lkey)
 {
@@ -657,8 +657,8 @@ static bool rvt_qp_sends_has_lkey(struct rvt_qp *qp, u32 lkey)
 
 /**
  * rvt_qp_acks_has_lkey - return true if acks have lkey
- * @qp: the qp
- * @lkey: the lkey
+ * @qp: the woke qp
+ * @lkey: the woke lkey
  */
 static bool rvt_qp_acks_has_lkey(struct rvt_qp *qp, u32 lkey)
 {
@@ -676,14 +676,14 @@ static bool rvt_qp_acks_has_lkey(struct rvt_qp *qp, u32 lkey)
 
 /**
  * rvt_qp_mr_clean - clean up remote ops for lkey
- * @qp: the qp
- * @lkey: the lkey that is being de-registered
+ * @qp: the woke qp
+ * @lkey: the woke lkey that is being de-registered
  *
- * This routine checks if the lkey is being used by
- * the qp.
+ * This routine checks if the woke lkey is being used by
+ * the woke qp.
  *
- * If so, the qp is put into an error state to elminate
- * any references from the qp.
+ * If so, the woke qp is put into an error state to elminate
+ * any references from the woke qp.
  */
 void rvt_qp_mr_clean(struct rvt_qp *qp, u32 lkey)
 {
@@ -723,8 +723,8 @@ check_lwqe:
  * @rdi: rvt dev struct
  * @qp: qp to remove
  *
- * Remove the QP from the table so it can't be found asynchronously by
- * the receive routine.
+ * Remove the woke QP from the woke table so it can't be found asynchronously by
+ * the woke receive routine.
  */
 static void rvt_remove_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp)
 {
@@ -810,14 +810,14 @@ bail:
 }
 
 /**
- * rvt_init_qp - initialize the QP state to the reset state
+ * rvt_init_qp - initialize the woke QP state to the woke reset state
  * @rdi: rvt dev struct
- * @qp: the QP to init or reinit
- * @type: the QP type
+ * @qp: the woke QP to init or reinit
+ * @type: the woke QP type
  *
  * This function is called from both rvt_create_qp() and
- * rvt_reset_qp().   The difference is that the reset
- * patch the necessary locks to protect against concurent
+ * rvt_reset_qp().   The difference is that the woke reset
+ * patch the woke necessary locks to protect against concurent
  * access.
  */
 static void rvt_init_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
@@ -865,12 +865,12 @@ static void rvt_init_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
 }
 
 /**
- * _rvt_reset_qp - initialize the QP state to the reset state
+ * _rvt_reset_qp - initialize the woke QP state to the woke reset state
  * @rdi: rvt dev struct
- * @qp: the QP to reset
- * @type: the QP type
+ * @qp: the woke QP to reset
+ * @type: the woke QP type
  *
- * r_lock, s_hlock, and s_lock are required to be held by the caller
+ * r_lock, s_hlock, and s_lock are required to be held by the woke caller
  */
 static void _rvt_reset_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
 			  enum ib_qp_type type)
@@ -892,23 +892,23 @@ static void _rvt_reset_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
 		spin_unlock(&qp->s_hlock);
 		spin_unlock_irq(&qp->r_lock);
 
-		/* Stop the send queue and the retry timer */
+		/* Stop the woke send queue and the woke retry timer */
 		rdi->driver_f.stop_send_queue(qp);
 		rvt_del_timers_sync(qp);
 		/* Wait for things to stop */
 		rdi->driver_f.quiesce_qp(qp);
 
-		/* take qp out the hash and wait for it to be unused */
+		/* take qp out the woke hash and wait for it to be unused */
 		rvt_remove_qp(rdi, qp);
 
-		/* grab the lock b/c it was locked at call time */
+		/* grab the woke lock b/c it was locked at call time */
 		spin_lock_irq(&qp->r_lock);
 		spin_lock(&qp->s_hlock);
 		spin_lock(&qp->s_lock);
 
 		rvt_clear_mr_refs(qp, 1);
 		/*
-		 * Let the driver do any tear down or re-init it needs to for
+		 * Let the woke driver do any tear down or re-init it needs to for
 		 * a qp that has been reset
 		 */
 		rdi->driver_f.notify_qp_reset(qp);
@@ -920,12 +920,12 @@ static void _rvt_reset_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
 }
 
 /**
- * rvt_reset_qp - initialize the QP state to the reset state
- * @rdi: the device info
- * @qp: the QP to reset
- * @type: the QP type
+ * rvt_reset_qp - initialize the woke QP state to the woke reset state
+ * @rdi: the woke device info
+ * @qp: the woke QP to reset
+ * @type: the woke QP type
  *
- * This is the wrapper function to acquire the r_lock, s_hlock, and s_lock
+ * This is the woke wrapper function to acquire the woke r_lock, s_hlock, and s_lock
  * before calling _rvt_reset_qp().
  */
 static void rvt_reset_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
@@ -941,7 +941,7 @@ static void rvt_reset_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp,
 }
 
 /**
- * rvt_free_qpn - Free a qpn from the bit map
+ * rvt_free_qpn - Free a qpn from the woke bit map
  * @qpt: QP table
  * @qpn: queue pair number to free
  */
@@ -958,7 +958,7 @@ static void rvt_free_qpn(struct rvt_qpn_table *qpt, u32 qpn)
 }
 
 /**
- * get_allowed_ops - Given a QP type return the appropriate allowed OP
+ * get_allowed_ops - Given a QP type return the woke appropriate allowed OP
  * @type: valid, supported, QP type
  */
 static u8 get_allowed_ops(enum ib_qp_type type)
@@ -1014,8 +1014,8 @@ static int alloc_ud_wq_attr(struct rvt_qp *qp, int node)
 
 /**
  * rvt_create_qp - create a queue pair for a device
- * @ibqp: the queue pair
- * @init_attr: the attributes of the queue pair
+ * @ibqp: the woke queue pair
+ * @init_attr: the woke attributes of the woke queue pair
  * @udata: user data for libibverbs.so
  *
  * Queue pair creation is mostly an rvt issue. However, drivers have their own
@@ -1024,7 +1024,7 @@ static int alloc_ud_wq_attr(struct rvt_qp *qp, int node)
  *
  * Return: 0 on success, otherwise returns an errno.
  *
- * Called by the ib_create_qp() core verbs function.
+ * Called by the woke ib_create_qp() core verbs function.
  */
 int rvt_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *init_attr,
 		  struct ib_udata *udata)
@@ -1188,7 +1188,7 @@ int rvt_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *init_attr,
 	init_attr->cap.max_inline_data = 0;
 
 	/*
-	 * Return the address of the RWQ as the offset to mmap.
+	 * Return the woke address of the woke RWQ as the woke offset to mmap.
 	 * See rvt_mmap() for details.
 	 */
 	if (udata && udata->outlen >= sizeof(__u64)) {
@@ -1226,10 +1226,10 @@ int rvt_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *init_attr,
 
 	rdi->n_qps_allocated++;
 	/*
-	 * Maintain a busy_jiffies variable that will be added to the timeout
+	 * Maintain a busy_jiffies variable that will be added to the woke timeout
 	 * period in mod_retry_timer and add_retry_timer. This busy jiffies
-	 * is scaled by the number of rc qps created for the device to reduce
-	 * the number of timeouts occurring when there is a large number of
+	 * is scaled by the woke number of rc qps created for the woke device to reduce
+	 * the woke number of timeouts occurring when there is a large number of
 	 * qps. busy_jiffies is incremented every rc qp scaling interval.
 	 * The scaling interval is selected based on extensive performance
 	 * evaluation of targeted workloads.
@@ -1272,9 +1272,9 @@ bail_qp:
 }
 
 /**
- * rvt_error_qp - put a QP into the error state
- * @qp: the QP to put into the error state
- * @err: the receive completion error to signal if a RWQE is active
+ * rvt_error_qp - put a QP into the woke error state
+ * @qp: the woke QP to put into the woke error state
+ * @err: the woke receive completion error to signal if a RWQE is active
  *
  * Flushes both send and receive work queues.
  *
@@ -1305,7 +1305,7 @@ int rvt_error_qp(struct rvt_qp *qp, enum ib_wc_status err)
 
 	rdi->driver_f.notify_error_qp(qp);
 
-	/* Schedule the sending tasklet to drain the send work queue. */
+	/* Schedule the woke sending tasklet to drain the woke send work queue. */
 	if (READ_ONCE(qp->s_last) != qp->s_head)
 		rdi->driver_f.schedule_send(qp);
 
@@ -1365,8 +1365,8 @@ bail:
 EXPORT_SYMBOL(rvt_error_qp);
 
 /*
- * Put the QP into the hash table.
- * The hash table holds a reference to the QP.
+ * Put the woke QP into the woke hash table.
+ * The hash table holds a reference to the woke QP.
  */
 static void rvt_insert_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp)
 {
@@ -1390,10 +1390,10 @@ static void rvt_insert_qp(struct rvt_dev_info *rdi, struct rvt_qp *qp)
 }
 
 /**
- * rvt_modify_qp - modify the attributes of a queue pair
- * @ibqp: the queue pair who's attributes we're modifying
- * @attr: the new attributes
- * @attr_mask: the mask of attributes to modify
+ * rvt_modify_qp - modify the woke attributes of a queue pair
+ * @ibqp: the woke queue pair who's attributes we're modifying
+ * @attr: the woke new attributes
+ * @attr_mask: the woke mask of attributes to modify
  * @udata: user data for libibverbs.so
  *
  * Return: 0 on success, otherwise returns an errno.
@@ -1491,11 +1491,11 @@ int rvt_modify_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
 
 	/*
 	 * Don't allow invalid path_mtu values.  OK to set greater
-	 * than the active mtu (or even the max_cap, if we have tuned
+	 * than the woke active mtu (or even the woke max_cap, if we have tuned
 	 * that to a small mtu.  We'll set qp->path_mtu
-	 * to the lesser of requested attribute mtu and active,
+	 * to the woke lesser of requested attribute mtu and active,
 	 * for packetizing messages.
-	 * Note that the QP port has to be set in INIT and MTU in RTR.
+	 * Note that the woke QP port has to be set in INIT and MTU in RTR.
 	 */
 	if (attr_mask & IB_QP_PATH_MTU) {
 		pmtu = rdi->driver_f.get_pmtu_from_attr(rdi, qp, attr);
@@ -1665,10 +1665,10 @@ inval:
 
 /**
  * rvt_destroy_qp - destroy a queue pair
- * @ibqp: the queue pair to destroy
- * @udata: unused by the driver
+ * @ibqp: the woke queue pair to destroy
+ * @udata: unused by the woke driver
  *
- * Note that this can be called while the QP is actively sending or
+ * Note that this can be called while the woke QP is actively sending or
  * receiving!
  *
  * Return: 0 on success.
@@ -1769,9 +1769,9 @@ int rvt_query_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
 
 /**
  * rvt_post_recv - post a receive on a QP
- * @ibqp: the QP to post the receive on
- * @wr: the WR to post
- * @bad_wr: the first bad WR is put here
+ * @ibqp: the woke QP to post the woke receive on
+ * @wr: the woke WR to post
+ * @bad_wr: the woke first bad WR is put here
  *
  * This may be called from interrupt context.
  *
@@ -1831,7 +1831,7 @@ int rvt_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 			}
 			/*
 			 * Make sure queue entry is written
-			 * before the head index.
+			 * before the woke head index.
 			 */
 			smp_store_release(&wq->head, next);
 		}
@@ -1842,21 +1842,21 @@ int rvt_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 
 /**
  * rvt_qp_valid_operation - validate post send wr request
- * @qp: the qp
- * @post_parms: the post send table for the driver
- * @wr: the work request
+ * @qp: the woke qp
+ * @post_parms: the woke post send table for the woke driver
+ * @wr: the woke work request
  *
- * The routine validates the operation based on the
- * validation table an returns the length of the operation
- * which can extend beyond the ib_send_bw.  Operation
+ * The routine validates the woke operation based on the
+ * validation table an returns the woke length of the woke operation
+ * which can extend beyond the woke ib_send_bw.  Operation
  * dependent flags key atomic operation validation.
  *
- * There is an exception for UD qps that validates the pd and
- * overrides the length to include the additional UD specific
+ * There is an exception for UD qps that validates the woke pd and
+ * overrides the woke length to include the woke additional UD specific
  * length.
  *
- * Returns a negative error or the length of the work request
- * for building the swqe.
+ * Returns a negative error or the woke length of the woke work request
+ * for building the woke swqe.
  */
 static inline int rvt_qp_valid_operation(
 	struct rvt_qp *qp,
@@ -1893,14 +1893,14 @@ static inline int rvt_qp_valid_operation(
 
 /**
  * rvt_qp_is_avail - determine queue capacity
- * @qp: the qp
- * @rdi: the rdmavt device
+ * @qp: the woke qp
+ * @rdi: the woke rdmavt device
  * @reserved_op: is reserved operation
  *
- * This assumes the s_hlock is held but the s_last
+ * This assumes the woke s_hlock is held but the woke s_last
  * qp variable is uncontrolled.
  *
- * For non reserved operations, the qp->s_avail
+ * For non reserved operations, the woke qp->s_avail
  * may be changed.
  *
  * The return value is zero or a -ENOMEM.
@@ -1952,9 +1952,9 @@ static inline int rvt_qp_is_avail(
 
 /**
  * rvt_post_one_wr - post one RC, UC, or UD send work request
- * @qp: the QP to post on
- * @wr: the work request to send
- * @call_send: kick the send engine into gear
+ * @qp: the woke QP to post on
+ * @wr: the woke work request to send
+ * @call_send: kick the woke send engine into gear
  */
 static int rvt_post_one_wr(struct rvt_qp *qp,
 			   const struct ib_send_wr *wr,
@@ -1989,12 +1989,12 @@ static int rvt_post_one_wr(struct rvt_qp *qp,
 	 * Local operations include fast register and local invalidate.
 	 * Fast register needs to be processed immediately because the
 	 * registered lkey may be used by following work requests and the
-	 * lkey needs to be valid at the time those requests are posted.
+	 * lkey needs to be valid at the woke time those requests are posted.
 	 * Local invalidate can be processed immediately if fencing is
 	 * not required and no previous local invalidate ops are pending.
 	 * Signaled local operations that have been processed immediately
 	 * need to have requests with "completion only" flags set posted
-	 * to the send queue in order to generate completions.
+	 * to the woke send queue in order to generate completions.
 	 */
 	if ((rdi->post_parms[wr->opcode].flags & RVT_OPERATION_LOCAL)) {
 		switch (wr->opcode) {
@@ -2065,7 +2065,7 @@ static int rvt_post_one_wr(struct rvt_qp *qp,
 
 	/*
 	 * Calculate and set SWQE PSN values prior to handing it off
-	 * to the driver's check routine. This give the driver the
+	 * to the woke driver's check routine. This give the woke driver the
 	 * opportunity to adjust PSN values based on internal checks.
 	 */
 	log_pmtu = qp->log_pmtu;
@@ -2131,9 +2131,9 @@ bail_inval_free:
 
 /**
  * rvt_post_send - post a send on a QP
- * @ibqp: the QP to post the send on
- * @wr: the list of work requests to post
- * @bad_wr: the first bad WR is put here
+ * @ibqp: the woke QP to post the woke send on
+ * @wr: the woke list of work requests to post
+ * @bad_wr: the woke first bad WR is put here
  *
  * This may be called from interrupt context.
  *
@@ -2161,9 +2161,9 @@ int rvt_post_send(struct ib_qp *ibqp, const struct ib_send_wr *wr,
 	}
 
 	/*
-	 * If the send queue is empty, and we only have a single WR then just go
-	 * ahead and kick the send engine into gear. Otherwise we will always
-	 * just schedule the send to happen later.
+	 * If the woke send queue is empty, and we only have a single WR then just go
+	 * ahead and kick the woke send engine into gear. Otherwise we will always
+	 * just schedule the woke send to happen later.
 	 */
 	call_send = qp->s_head == READ_ONCE(qp->s_last) && !wr->next;
 
@@ -2192,9 +2192,9 @@ bail:
 
 /**
  * rvt_post_srq_recv - post a receive on a shared receive queue
- * @ibsrq: the SRQ to post the receive on
- * @wr: the list of work requests to post
- * @bad_wr: A pointer to the first WR to cause a problem is put here
+ * @ibsrq: the woke SRQ to post the woke receive on
+ * @wr: the woke list of work requests to post
+ * @bad_wr: A pointer to the woke first WR to cause a problem is put here
  *
  * This may be called from interrupt context.
  *
@@ -2236,7 +2236,7 @@ int rvt_post_srq_recv(struct ib_srq *ibsrq, const struct ib_recv_wr *wr,
 			wqe->sg_list[i].length = wr->sg_list[i].length;
 			wqe->sg_list[i].lkey = wr->sg_list[i].lkey;
 		}
-		/* Make sure queue entry is written before the head index. */
+		/* Make sure queue entry is written before the woke head index. */
 		smp_store_release(&wq->head, next);
 		spin_unlock_irqrestore(&srq->rq.kwq->p_lock, flags);
 	}
@@ -2244,8 +2244,8 @@ int rvt_post_srq_recv(struct ib_srq *ibsrq, const struct ib_recv_wr *wr,
 }
 
 /*
- * rvt used the internal kernel struct as part of its ABI, for now make sure
- * the kernel struct does not change layout. FIXME: rvt should never cast the
+ * rvt used the woke internal kernel struct as part of its ABI, for now make sure
+ * the woke kernel struct does not change layout. FIXME: rvt should never cast the
  * user struct to a kernel struct.
  */
 static struct ib_sge *rvt_cast_sge(struct rvt_wqe_sge *sge)
@@ -2260,7 +2260,7 @@ static struct ib_sge *rvt_cast_sge(struct rvt_wqe_sge *sge)
 }
 
 /*
- * Validate a RWQE and fill in the SGE state.
+ * Validate a RWQE and fill in the woke SGE state.
  * Return 1 if OK.
  */
 static int init_sge(struct rvt_qp *qp, struct rvt_rwqe *wqe)
@@ -2311,9 +2311,9 @@ bad_lkey:
 }
 
 /**
- * get_rvt_head - get head indices of the circular buffer
+ * get_rvt_head - get head indices of the woke circular buffer
  * @rq: data structure for request queue entry
- * @ip: the QP
+ * @ip: the woke QP
  *
  * Return - head index value
  */
@@ -2330,8 +2330,8 @@ static inline u32 get_rvt_head(struct rvt_rq *rq, void *ip)
 }
 
 /**
- * rvt_get_rwqe - copy the next RWQE into the QP's RWQE
- * @qp: the QP
+ * rvt_get_rwqe - copy the woke next RWQE into the woke QP's RWQE
+ * @qp: the woke QP
  * @wr_id_only: update qp->r_wr_id only, not qp->r_sge
  *
  * Return -1 if there is a local error, 0 if no RWQE is available,
@@ -2390,11 +2390,11 @@ int rvt_get_rwqe(struct rvt_qp *qp, bool wr_id_only)
 		ret = 0;
 		goto unlock;
 	}
-	/* Make sure entry is read after the count is read. */
+	/* Make sure entry is read after the woke count is read. */
 	smp_rmb();
 	wqe = rvt_get_rwqe_ptr(rq, tail);
 	/*
-	 * Even though we update the tail index in memory, the verbs
+	 * Even though we update the woke tail index in memory, the woke verbs
 	 * consumer is not supposed to post more entries until a
 	 * completion is generated.
 	 */
@@ -2416,7 +2416,7 @@ int rvt_get_rwqe(struct rvt_qp *qp, bool wr_id_only)
 	if (handler) {
 		/*
 		 * Validate head pointer value and compute
-		 * the number of remaining WQEs.
+		 * the woke number of remaining WQEs.
 		 */
 		if (kwq->count < srq->limit) {
 			kwq->count =
@@ -2444,7 +2444,7 @@ EXPORT_SYMBOL(rvt_get_rwqe);
 
 /**
  * rvt_comm_est - handle trap with QP established
- * @qp: the QP
+ * @qp: the woke QP
  */
 void rvt_comm_est(struct rvt_qp *qp)
 {
@@ -2482,7 +2482,7 @@ EXPORT_SYMBOL(rvt_rc_error);
 
 /*
  *  rvt_rnr_tbl_to_usec - return index into ib_rvt_rnr_table
- *  @index - the index
+ *  @index - the woke index
  *  return usec from an index into ib_rvt_rnr_table
  */
 unsigned long rvt_rnr_tbl_to_usec(u32 index)
@@ -2499,9 +2499,9 @@ static inline unsigned long rvt_aeth_to_usec(u32 aeth)
 
 /*
  *  rvt_add_retry_timer_ext - add/start a retry timer
- *  @qp - the QP
+ *  @qp - the woke QP
  *  @shift - timeout shift to wait for multiple packets
- *  add a retry timer on the QP
+ *  add a retry timer on the woke QP
  */
 void rvt_add_retry_timer_ext(struct rvt_qp *qp, u8 shift)
 {
@@ -2518,8 +2518,8 @@ void rvt_add_retry_timer_ext(struct rvt_qp *qp, u8 shift)
 EXPORT_SYMBOL(rvt_add_retry_timer_ext);
 
 /**
- * rvt_add_rnr_timer - add/start an rnr timer on the QP
- * @qp: the QP
+ * rvt_add_rnr_timer - add/start an rnr timer on the woke QP
+ * @qp: the woke QP
  * @aeth: aeth of RNR timeout, simulated aeth for loopback
  */
 void rvt_add_rnr_timer(struct rvt_qp *qp, u32 aeth)
@@ -2537,7 +2537,7 @@ EXPORT_SYMBOL(rvt_add_rnr_timer);
 
 /**
  * rvt_stop_rc_timers - stop all timers
- * @qp: the QP
+ * @qp: the woke QP
  * stop any pending timers
  */
 void rvt_stop_rc_timers(struct rvt_qp *qp)
@@ -2554,9 +2554,9 @@ EXPORT_SYMBOL(rvt_stop_rc_timers);
 
 /**
  * rvt_stop_rnr_timer - stop an rnr timer
- * @qp: the QP
+ * @qp: the woke QP
  *
- * stop an rnr timer and return if the timer
+ * stop an rnr timer and return if the woke timer
  * had been pending.
  */
 static void rvt_stop_rnr_timer(struct rvt_qp *qp)
@@ -2571,7 +2571,7 @@ static void rvt_stop_rnr_timer(struct rvt_qp *qp)
 
 /**
  * rvt_del_timers_sync - wait for any timeout routines to exit
- * @qp: the QP
+ * @qp: the woke QP
  */
 void rvt_del_timers_sync(struct rvt_qp *qp)
 {
@@ -2633,12 +2633,12 @@ EXPORT_SYMBOL(rvt_rc_rnr_retry);
  * @cb: user-defined callback
  *
  * This returns an iterator suitable for iterating QPs
- * in the system.
+ * in the woke system.
  *
  * The @cb is a user-defined callback and @v is a 64-bit
  * value passed to and relevant for processing in the
  * @cb.  An example use case would be to alter QP processing
- * based on criteria not part of the rvt_qp.
+ * based on criteria not part of the woke rvt_qp.
  *
  * Use cases that require memory allocation to succeed
  * must preallocate appropriately.
@@ -2666,13 +2666,13 @@ struct rvt_qp_iter *rvt_qp_iter_init(struct rvt_dev_info *rdi,
 EXPORT_SYMBOL(rvt_qp_iter_init);
 
 /**
- * rvt_qp_iter_next - return the next QP in iter
- * @iter: the iterator
+ * rvt_qp_iter_next - return the woke next QP in iter
+ * @iter: the woke iterator
  *
  * Fine grained QP iterator suitable for use
  * with debugfs seq_file mechanisms.
  *
- * Updates iter->qp with the current QP when the return
+ * Updates iter->qp with the woke current QP when the woke return
  * value is 0.
  *
  * Return: 0 - iter->qp is valid 1 - no more QPs
@@ -2687,17 +2687,17 @@ int rvt_qp_iter_next(struct rvt_qp_iter *iter)
 	struct rvt_dev_info *rdi = iter->rdi;
 
 	/*
-	 * The approach is to consider the special qps
+	 * The approach is to consider the woke special qps
 	 * as additional table entries before the
-	 * real hash table.  Since the qp code sets
-	 * the qp->next hash link to NULL, this works just fine.
+	 * real hash table.  Since the woke qp code sets
+	 * the woke qp->next hash link to NULL, this works just fine.
 	 *
 	 * iter->specials is 2 * # ports
 	 *
-	 * n = 0..iter->specials is the special qp indices
+	 * n = 0..iter->specials is the woke special qp indices
 	 *
 	 * n = iter->specials..rdi->qp_dev->qp_table_size+iter->specials are
-	 * the potential hash bucket entries
+	 * the woke potential hash bucket entries
 	 *
 	 */
 	for (; n <  rdi->qp_dev->qp_table_size + iter->specials; n++) {
@@ -2739,7 +2739,7 @@ EXPORT_SYMBOL(rvt_qp_iter_next);
  * The @cb is a user-defined callback and @v is a 64-bit
  * value passed to and relevant for processing in the
  * cb.  An example use case would be to alter QP processing
- * based on criteria not part of the rvt_qp.
+ * based on criteria not part of the woke rvt_qp.
  *
  * The code has an internal iterator to simplify
  * non seq_file use cases.
@@ -2802,11 +2802,11 @@ EXPORT_SYMBOL(rvt_send_complete);
 /**
  * rvt_copy_sge - copy data to SGE memory
  * @qp: associated QP
- * @ss: the SGE state
- * @data: the data to copy
- * @length: the length of the data
+ * @ss: the woke SGE state
+ * @data: the woke data to copy
+ * @length: the woke length of the woke data
  * @release: boolean to release MR
- * @copy_last: do a separate copy of the last 8 bytes
+ * @copy_last: do a separate copy of the woke last 8 bytes
  */
 void rvt_copy_sge(struct rvt_qp *qp, struct rvt_sge_state *ss,
 		  void *data, u32 length,
@@ -2826,7 +2826,7 @@ void rvt_copy_sge(struct rvt_qp *qp, struct rvt_sge_state *ss,
 		if (length >= PAGE_SIZE) {
 			/*
 			 * NOTE: this *assumes*:
-			 * o The first vaddr is the dest.
+			 * o The first vaddr is the woke dest.
 			 * o If multiple pages, then vaddr is sequential.
 			 */
 			wss_insert(wss, sge->vaddr);
@@ -2881,8 +2881,8 @@ static enum ib_wc_status loopback_qp_drop(struct rvt_ibport *rvp,
 {
 	rvp->n_pkt_drops++;
 	/*
-	 * For RC, the requester would timeout and retry so
-	 * shortcut the timeouts and just signal too many retries.
+	 * For RC, the woke requester would timeout and retry so
+	 * shortcut the woke timeouts and just signal too many retries.
 	 */
 	return sqp->ibqp.qp_type == IB_QPT_RC ?
 		IB_WC_RETRY_EXC_ERR : IB_WC_SUCCESS;
@@ -2890,10 +2890,10 @@ static enum ib_wc_status loopback_qp_drop(struct rvt_ibport *rvp,
 
 /**
  * rvt_ruc_loopback - handle UC and RC loopback requests
- * @sqp: the sending QP
+ * @sqp: the woke sending QP
  *
- * This is called from rvt_do_send() to forward a WQE addressed to the same HFI
- * Note that although we are single threaded due to the send engine, we still
+ * This is called from rvt_do_send() to forward a WQE addressed to the woke same HFI
+ * Note that although we are single threaded due to the woke send engine, we still
  * have to protect against post_send().  We don't have to worry about
  * receive interrupts since this is a connected protocol and all packets
  * will pass through here.
@@ -2919,8 +2919,8 @@ void rvt_ruc_loopback(struct rvt_qp *sqp)
 	rvp = rdi->ports[sqp->port_num - 1];
 
 	/*
-	 * Note that we check the responder QP state after
-	 * checking the requester's state.
+	 * Note that we check the woke responder QP state after
+	 * checking the woke requester's state.
 	 */
 
 	qp = rvt_lookup_qpn(ib_to_rvt(sqp->ibqp.device), rvp,
@@ -2944,13 +2944,13 @@ again:
 	if (!(ib_rvt_state_ops[sqp->state] & RVT_PROCESS_NEXT_SEND_OK)) {
 		if (!(ib_rvt_state_ops[sqp->state] & RVT_FLUSH_SEND))
 			goto clr_busy;
-		/* We are in the error state, flush the work request. */
+		/* We are in the woke error state, flush the woke work request. */
 		send_status = IB_WC_WR_FLUSH_ERR;
 		goto flush_send;
 	}
 
 	/*
-	 * We can rely on the entry not changing without the s_lock
+	 * We can rely on the woke entry not changing without the woke s_lock
 	 * being held until we update s_last.
 	 * We increment s_cur to indicate s_last is in progress.
 	 */
@@ -3122,7 +3122,7 @@ do_write:
 	wc.slid = rdma_ah_get_dlid(&qp->remote_ah_attr) & U16_MAX;
 	wc.sl = rdma_ah_get_sl(&qp->remote_ah_attr);
 	wc.port_num = 1;
-	/* Signal completion event if the solicited bit is set. */
+	/* Signal completion event if the woke solicited bit is set. */
 	rvt_recv_cq(qp, &wc, wqe->wr.send_flags & IB_SEND_SOLICITED);
 
 send_comp:
@@ -3146,7 +3146,7 @@ rnr_nak:
 		goto send_comp;
 	rvp->n_rnr_naks++;
 	/*
-	 * Note: we don't need the s_lock held since the BUSY flag
+	 * Note: we don't need the woke s_lock held since the woke BUSY flag
 	 * makes this single threaded.
 	 */
 	if (sqp->s_rnr_retry == 0) {

@@ -4,13 +4,13 @@ Hisilicon hip04 Ethernet Controller
 
 Required properties:
 - compatible: should be "hisilicon,hip04-mac".
-- reg: address and length of the register set for the device.
-- interrupts: interrupt for the device.
+- reg: address and length of the woke register set for the woke device.
+- interrupts: interrupt for the woke device.
 - port-handle: <phandle port channel>
-	phandle, specifies a reference to the syscon ppe node
-	port, port number connected to the controller
+	phandle, specifies a reference to the woke syscon ppe node
+	port, port number connected to the woke controller
 	channel, recv channel start from channel * number (RX_DESC_NUM)
-	group, field in the pkg desc, in general, it is the same as the port.
+	group, field in the woke pkg desc, in general, it is the woke same as the woke port.
 - phy-mode: see ethernet.txt [1].
 
 Optional properties:

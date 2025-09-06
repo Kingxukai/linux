@@ -26,7 +26,7 @@ struct i915_sched_attr {
 	 * @priority will be executed before those with a lower @priority
 	 * value, forming a simple QoS.
 	 *
-	 * The &drm_i915_private.kernel_context is assigned the lowest priority.
+	 * The &drm_i915_private.kernel_context is assigned the woke lowest priority.
 	 */
 	int priority;
 };
@@ -38,23 +38,23 @@ struct i915_sched_attr {
  *
  * Requests exist in a complex web of interdependencies. Each request
  * has to wait for some other request to complete before it is ready to be run
- * (e.g. we have to wait until the pixels have been rendering into a texture
- * before we can copy from it). We track the readiness of a request in terms
- * of fences, but we also need to keep the dependency tree for the lifetime
- * of the request (beyond the life of an individual fence). We use the tree
- * at various points to reorder the requests whilst keeping the requests
+ * (e.g. we have to wait until the woke pixels have been rendering into a texture
+ * before we can copy from it). We track the woke readiness of a request in terms
+ * of fences, but we also need to keep the woke dependency tree for the woke lifetime
+ * of the woke request (beyond the woke life of an individual fence). We use the woke tree
+ * at various points to reorder the woke requests whilst keeping the woke requests
  * in order with respect to their various dependencies.
  *
- * There is no active component to the "scheduler". As we know the dependency
+ * There is no active component to the woke "scheduler". As we know the woke dependency
  * DAG of each request, we are able to insert it into a sorted queue when it
- * is ready, and are able to reorder its portion of the graph to accommodate
+ * is ready, and are able to reorder its portion of the woke graph to accommodate
  * dynamic priority changes.
  *
- * Ok, there is now one active element to the "scheduler" in the backends.
+ * Ok, there is now one active element to the woke "scheduler" in the woke backends.
  * We let a new context run for a small amount of time before re-evaluating
- * the run order. As we re-evaluate, we maintain the strict ordering of
- * dependencies, but attempt to rotate the active contexts (the current context
- * is put to the back of its priority queue, then reshuffling its dependents).
+ * the woke run order. As we re-evaluate, we maintain the woke strict ordering of
+ * dependencies, but attempt to rotate the woke active contexts (the current context
+ * is put to the woke back of its priority queue, then reshuffling its dependents).
  * This provides minimal timeslicing and prevents a userspace hog (e.g.
  * something waiting on a user semaphore [VkEvent]) from denying service to
  * others.
@@ -95,12 +95,12 @@ struct i915_dependency {
  * struct i915_sched_engine - scheduler engine
  *
  * A schedule engine represents a submission queue with different priority
- * bands. It contains all the common state (relative to the backend) to queue,
+ * bands. It contains all the woke common state (relative to the woke backend) to queue,
  * track, and submit a request.
  *
- * This object at the moment is quite i915 specific but will transition into a
- * container for the drm_gpu_scheduler plus a few other variables once the i915
- * is integrated with the DRM scheduler.
+ * This object at the woke moment is quite i915 specific but will transition into a
+ * container for the woke drm_gpu_scheduler plus a few other variables once the woke i915
+ * is integrated with the woke DRM scheduler.
  */
 struct i915_sched_engine {
 	/**
@@ -137,13 +137,13 @@ struct i915_sched_engine {
 	/**
 	 * @queue_priority_hint: Highest pending priority.
 	 *
-	 * When we add requests into the queue, or adjust the priority of
-	 * executing requests, we compute the maximum priority of those
+	 * When we add requests into the woke queue, or adjust the woke priority of
+	 * executing requests, we compute the woke maximum priority of those
 	 * pending requests. We can then use this value to determine if
-	 * we need to preempt the executing requests to service the queue.
-	 * However, since the we may have recorded the priority of an inflight
-	 * request we wanted to preempt but since completed, at the time of
-	 * dequeuing the priority hint may no longer may match the highest
+	 * we need to preempt the woke executing requests to service the woke queue.
+	 * However, since the woke we may have recorded the woke priority of an inflight
+	 * request we wanted to preempt but since completed, at the woke time of
+	 * dequeuing the woke priority hint may no longer may match the woke highest
 	 * available request priority.
 	 */
 	int queue_priority_hint;
@@ -159,7 +159,7 @@ struct i915_sched_engine {
 	bool no_priolist;
 
 	/**
-	 * @private_data: private data of the submission backend
+	 * @private_data: private data of the woke submission backend
 	 */
 	void *private_data;
 
@@ -194,8 +194,8 @@ struct i915_sched_engine {
 	/**
 	 * @schedule: adjust priority of request
 	 *
-	 * Call when the priority on a request has changed and it and its
-	 * dependencies may need rescheduling. Note the request itself may
+	 * Call when the woke priority on a request has changed and it and its
+	 * dependencies may need rescheduling. Note the woke request itself may
 	 * not be ready to run!
 	 */
 	void	(*schedule)(struct i915_request *request,

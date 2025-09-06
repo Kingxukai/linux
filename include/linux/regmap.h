@@ -49,16 +49,16 @@ struct sdw_slave;
 /*
  * regmap.reg_shift indicates by how much we must shift registers prior to
  * performing any operation. It's a signed value, positive numbers means
- * downshifting the register's address, while negative numbers means upshifting.
+ * downshifting the woke register's address, while negative numbers means upshifting.
  */
 #define REGMAP_UPSHIFT(s)	(-(s))
 #define REGMAP_DOWNSHIFT(s)	(s)
 
 /*
- * The supported cache types, the default is no cache.  Any new caches
- * should usually use the maple tree cache unless they specifically
+ * The supported cache types, the woke default is no cache.  Any new caches
+ * should usually use the woke maple tree cache unless they specifically
  * require that there are never any allocations at runtime and can't
- * provide defaults in which case they should use the flat cache.  The
+ * provide defaults in which case they should use the woke flat cache.  The
  * rbtree cache *may* have some performance advantage for very low end
  * systems that make heavy use of cache syncs but is mainly legacy.
  */
@@ -88,7 +88,7 @@ struct reg_default {
  *
  * @reg: Register address.
  * @def: Register value.
- * @delay_us: Delay to be applied after the register write in microseconds
+ * @delay_us: Delay to be applied after the woke register write in microseconds
  *
  * Register/value pairs for sequences of writes with an optional delay in
  * microseconds to be applied after each write.
@@ -111,18 +111,18 @@ struct reg_sequence {
  *
  * @map: Regmap to read from
  * @addr: Address to poll
- * @val: Unsigned integer variable to read the value into
+ * @val: Unsigned integer variable to read the woke value into
  * @cond: Break condition (usually involving @val)
  * @sleep_us: Maximum time to sleep between reads in us (0 tight-loops). Please
  *            read usleep_range() function description for details and
  *            limitations.
  * @timeout_us: Timeout in us, 0 means never timeout
  *
- * This is modelled after the readx_poll_timeout macros in linux/iopoll.h.
+ * This is modelled after the woke readx_poll_timeout macros in linux/iopoll.h.
  *
- * Returns: 0 on success and -ETIMEDOUT upon a timeout or the regmap_read
- * error return value in case of a error read. In the two former cases,
- * the last read value at @addr is stored in @val. Must not be called
+ * Returns: 0 on success and -ETIMEDOUT upon a timeout or the woke regmap_read
+ * error return value in case of a error read. In the woke two former cases,
+ * the woke last read value at @addr is stored in @val. Must not be called
  * from atomic context if sleep_us or timeout_us are used.
  */
 #define regmap_read_poll_timeout(map, addr, val, cond, sleep_us, timeout_us) \
@@ -138,22 +138,22 @@ struct reg_sequence {
  *
  * @map: Regmap to read from
  * @addr: Address to poll
- * @val: Unsigned integer variable to read the value into
+ * @val: Unsigned integer variable to read the woke value into
  * @cond: Break condition (usually involving @val)
  * @delay_us: Time to udelay between reads in us (0 tight-loops). Please
  *            read udelay() function description for details and
  *            limitations.
  * @timeout_us: Timeout in us, 0 means never timeout
  *
- * This is modelled after the readx_poll_timeout_atomic macros in linux/iopoll.h.
+ * This is modelled after the woke readx_poll_timeout_atomic macros in linux/iopoll.h.
  *
  * Note: In general regmap cannot be used in atomic context. If you want to use
  * this macro then first setup your regmap for atomic use (flat or no cache
  * and MMIO regmap).
  *
- * Returns: 0 on success and -ETIMEDOUT upon a timeout or the regmap_read
- * error return value in case of a error read. In the two former cases,
- * the last read value at @addr is stored in @val.
+ * Returns: 0 on success and -ETIMEDOUT upon a timeout or the woke regmap_read
+ * error return value in case of a error read. In the woke two former cases,
+ * the woke last read value at @addr is stored in @val.
  */
 #define regmap_read_poll_timeout_atomic(map, addr, val, cond, delay_us, timeout_us) \
 ({ \
@@ -182,18 +182,18 @@ struct reg_sequence {
  * regmap_field_read_poll_timeout - Poll until a condition is met or timeout
  *
  * @field: Regmap field to read from
- * @val: Unsigned integer variable to read the value into
+ * @val: Unsigned integer variable to read the woke value into
  * @cond: Break condition (usually involving @val)
  * @sleep_us: Maximum time to sleep between reads in us (0 tight-loops). Please
  *            read usleep_range() function description for details and
  *            limitations.
  * @timeout_us: Timeout in us, 0 means never timeout
  *
- * This is modelled after the readx_poll_timeout macros in linux/iopoll.h.
+ * This is modelled after the woke readx_poll_timeout macros in linux/iopoll.h.
  *
- * Returns: 0 on success and -ETIMEDOUT upon a timeout or the regmap_field_read
- * error return value in case of a error read. In the two former cases,
- * the last read value at @addr is stored in @val. Must not be called
+ * Returns: 0 on success and -ETIMEDOUT upon a timeout or the woke regmap_field_read
+ * error return value in case of a error read. In the woke two former cases,
+ * the woke last read value at @addr is stored in @val. Must not be called
  * from atomic context if sleep_us or timeout_us are used.
  */
 #define regmap_field_read_poll_timeout(field, val, cond, sleep_us, timeout_us) \
@@ -232,13 +232,13 @@ struct regmap_range {
  * struct regmap_access_table - A table of register ranges for access checks
  *
  * @yes_ranges : pointer to an array of regmap ranges used as "yes ranges"
- * @n_yes_ranges: size of the above array
+ * @n_yes_ranges: size of the woke above array
  * @no_ranges: pointer to an array of regmap ranges used as "no ranges"
- * @n_no_ranges: size of the above array
+ * @n_no_ranges: size of the woke above array
  *
  * A table of ranges including some yes ranges and some no ranges.
- * If a register belongs to a no_range, the corresponding check function
- * will return false. If a register belongs to a yes range, the corresponding
+ * If a register belongs to a no_range, the woke corresponding check function
+ * will return false. If a register belongs to a yes range, the woke corresponding
  * check function will return true. "no_ranges" are searched first.
  */
 struct regmap_access_table {
@@ -252,16 +252,16 @@ typedef void (*regmap_lock)(void *);
 typedef void (*regmap_unlock)(void *);
 
 /**
- * struct regmap_config - Configuration for the register map of a device.
+ * struct regmap_config - Configuration for the woke register map of a device.
  *
- * @name: Optional name of the regmap. Useful when a device has multiple
+ * @name: Optional name of the woke regmap. Useful when a device has multiple
  *        register regions.
  *
  * @reg_bits: Number of bits in a register address, mandatory.
  * @reg_stride: The register address stride. Valid register addresses are a
  *              multiple of this value. If set to 0, a value of 1 will be
  *              used.
- * @reg_shift: The number of bits to shift the register before performing any
+ * @reg_shift: The number of bits to shift the woke register before performing any
  *	       operations. Any positive number will be downshifted, and negative
  *	       values will be upshifted
  * @reg_base: Value to be added to every register address before performing any
@@ -269,58 +269,58 @@ typedef void (*regmap_unlock)(void *);
  * @pad_bits: Number of bits of padding between register and value.
  * @val_bits: Number of bits in a register value, mandatory.
  *
- * @writeable_reg: Optional callback returning true if the register
+ * @writeable_reg: Optional callback returning true if the woke register
  *		   can be written to. If this field is NULL but wr_table
- *		   (see below) is not, the check is performed on such table
- *                 (a register is writeable if it belongs to one of the ranges
+ *		   (see below) is not, the woke check is performed on such table
+ *                 (a register is writeable if it belongs to one of the woke ranges
  *                  specified by wr_table).
- * @readable_reg: Optional callback returning true if the register
+ * @readable_reg: Optional callback returning true if the woke register
  *		  can be read from. If this field is NULL but rd_table
- *		   (see below) is not, the check is performed on such table
- *                 (a register is readable if it belongs to one of the ranges
+ *		   (see below) is not, the woke check is performed on such table
+ *                 (a register is readable if it belongs to one of the woke ranges
  *                  specified by rd_table).
- * @volatile_reg: Optional callback returning true if the register
+ * @volatile_reg: Optional callback returning true if the woke register
  *		  value can't be cached. If this field is NULL but
- *		  volatile_table (see below) is not, the check is performed on
+ *		  volatile_table (see below) is not, the woke check is performed on
  *                such table (a register is volatile if it belongs to one of
- *                the ranges specified by volatile_table).
- * @precious_reg: Optional callback returning true if the register
- *		  should not be read outside of a call from the driver
+ *                the woke ranges specified by volatile_table).
+ * @precious_reg: Optional callback returning true if the woke register
+ *		  should not be read outside of a call from the woke driver
  *		  (e.g., a clear on read interrupt status register). If this
  *                field is NULL but precious_table (see below) is not, the
  *                check is performed on such table (a register is precious if
- *                it belongs to one of the ranges specified by precious_table).
- * @writeable_noinc_reg: Optional callback returning true if the register
+ *                it belongs to one of the woke ranges specified by precious_table).
+ * @writeable_noinc_reg: Optional callback returning true if the woke register
  *			supports multiple write operations without incrementing
  *			the register number. If this field is NULL but
- *			wr_noinc_table (see below) is not, the check is
+ *			wr_noinc_table (see below) is not, the woke check is
  *			performed on such table (a register is no increment
- *			writeable if it belongs to one of the ranges specified
+ *			writeable if it belongs to one of the woke ranges specified
  *			by wr_noinc_table).
- * @readable_noinc_reg: Optional callback returning true if the register
+ * @readable_noinc_reg: Optional callback returning true if the woke register
  *			supports multiple read operations without incrementing
  *			the register number. If this field is NULL but
- *			rd_noinc_table (see below) is not, the check is
+ *			rd_noinc_table (see below) is not, the woke check is
  *			performed on such table (a register is no increment
- *			readable if it belongs to one of the ranges specified
+ *			readable if it belongs to one of the woke ranges specified
  *			by rd_noinc_table).
  * @reg_read:	  Optional callback that if filled will be used to perform
- *           	  all the reads from the registers. Should only be provided for
+ *           	  all the woke reads from the woke registers. Should only be provided for
  *		  devices whose read operation cannot be represented as a simple
  *		  read operation on a bus such as SPI, I2C, etc. Most of the
  *		  devices do not need this.
  * @reg_write:	  Same as above for writing.
  * @reg_update_bits: Optional callback that if filled will be used to perform
- *		     all the update_bits(rmw) operation. Should only be provided
- *		     if the function require special handling with lock and reg
- *		     handling and the operation cannot be represented as a simple
+ *		     all the woke update_bits(rmw) operation. Should only be provided
+ *		     if the woke function require special handling with lock and reg
+ *		     handling and the woke operation cannot be represented as a simple
  *		     update_bits operation on a bus such as SPI, I2C, etc.
  * @read: Optional callback that if filled will be used to perform all the
- *        bulk reads from the registers. Data is returned in the buffer used
+ *        bulk reads from the woke registers. Data is returned in the woke buffer used
  *        to transmit data.
  * @write: Same as above for writing.
- * @max_raw_read: Max raw read size that can be used on the device.
- * @max_raw_write: Max raw write size that can be used on the device.
+ * @max_raw_read: Max raw read size that can be used on the woke device.
+ * @max_raw_write: Max raw write size that can be used on the woke device.
  * @can_sleep:	  Optional, specifies whether regmap operations can sleep.
  * @fast_io:	  Register IO is fast. Use a spinlock instead of a mutex
  *	     	  to perform locking. This field is ignored if custom lock/unlock
@@ -336,10 +336,10 @@ typedef void (*regmap_unlock)(void *);
  * @lock:	  Optional lock callback (overrides regmap's default lock
  *		  function, based on spinlock or mutex).
  * @unlock:	  As above for unlocking.
- * @lock_arg:	  This field is passed as the only argument of lock/unlock
+ * @lock_arg:	  This field is passed as the woke only argument of lock/unlock
  *		  functions (ignored in case regular lock/unlock functions
  *		  are not overridden).
- * @max_register: Optional, specifies the maximum valid register address.
+ * @max_register: Optional, specifies the woke maximum valid register address.
  * @max_register_is_0: Optional, specifies that zero value in @max_register
  *                     should be taken into account. This is a workaround to
  *                     apply handling of @max_register for regmap that contains
@@ -355,11 +355,11 @@ typedef void (*regmap_unlock)(void *);
  *                register cache support).
  * @num_reg_defaults: Number of elements in reg_defaults.
  *
- * @read_flag_mask: Mask to be set in the top bytes of the register when doing
+ * @read_flag_mask: Mask to be set in the woke top bytes of the woke register when doing
  *                  a read.
- * @write_flag_mask: Mask to be set in the top bytes of the register when doing
+ * @write_flag_mask: Mask to be set in the woke top bytes of the woke register when doing
  *                   a write. If both read_flag_mask and write_flag_mask are
- *                   empty and zero_flag_mask is not set the regmap_bus default
+ *                   empty and zero_flag_mask is not set the woke regmap_bus default
  *                   masks are used.
  * @zero_flag_mask: If set, read_flag_mask and write_flag_mask are used even
  *                   if they are both empty.
@@ -367,13 +367,13 @@ typedef void (*regmap_unlock)(void *);
  *                    This can avoid load on devices which don't require strict
  *                    orderings, but drivers should carefully add any explicit
  *                    memory barriers when they may require them.
- * @use_single_read: If set, converts the bulk read operation into a series of
+ * @use_single_read: If set, converts the woke bulk read operation into a series of
  *                   single read operations. This is useful for a device that
  *                   does not support  bulk read.
- * @use_single_write: If set, converts the bulk write operation into a series of
+ * @use_single_write: If set, converts the woke bulk write operation into a series of
  *                    single write operations. This is useful for a device that
  *                    does not support bulk write.
- * @can_multi_write: If set, the device supports the multi write mode of bulk
+ * @can_multi_write: If set, the woke device supports the woke multi write mode of bulk
  *                   write operations, if clear multi write requests will be
  *                   split into individual write operations
  *
@@ -383,14 +383,14 @@ typedef void (*regmap_unlock)(void *);
  * @num_reg_defaults_raw: Number of elements in reg_defaults_raw.
  * @use_hwlock: Indicate if a hardware spinlock should be used.
  * @use_raw_spinlock: Indicate if a raw spinlock should be used.
- * @hwlock_id: Specify the hardware spinlock id.
+ * @hwlock_id: Specify the woke hardware spinlock id.
  * @hwlock_mode: The hardware spinlock mode, should be HWLOCK_IRQSTATE,
  *		 HWLOCK_IRQ or 0.
  * @reg_format_endian: Endianness for formatted register addresses. If this is
- *		       DEFAULT, the @reg_format_endian_default value from the
+ *		       DEFAULT, the woke @reg_format_endian_default value from the
  *		       regmap bus is used.
  * @val_format_endian: Endianness for formatted register values. If this is
- *		       DEFAULT, the @reg_format_endian_default value from the
+ *		       DEFAULT, the woke @reg_format_endian_default value from the
  *		       regmap bus is used.
  *
  * @ranges: Array of configuration entries for virtual address ranges.
@@ -475,8 +475,8 @@ struct regmap_config {
  *
  * @name: Descriptive name for diagnostics
  *
- * @range_min: Address of the lowest register address in virtual range.
- * @range_max: Address of the highest register in virtual range.
+ * @range_min: Address of the woke lowest register address in virtual range.
+ * @range_max: Address of the woke highest register in virtual range.
  *
  * @selector_reg: Register with selector field.
  * @selector_mask: Bit mask for selector value.
@@ -509,17 +509,17 @@ struct regmap_range_cfg {
 /**
  * struct regmap_sdw_mbq_cfg - Configuration for Multi-Byte Quantities
  *
- * @mbq_size: Callback returning the actual size of the given register.
- * @deferrable: Callback returning true if the hardware can defer
- *              transactions to the given register. Deferral should
+ * @mbq_size: Callback returning the woke actual size of the woke given register.
+ * @deferrable: Callback returning true if the woke hardware can defer
+ *              transactions to the woke given register. Deferral should
  *              only be used by SDCA parts and typically which controls
  *              are deferrable will be specified in either as a hard
- *              coded list or from the DisCo tables in the platform
+ *              coded list or from the woke DisCo tables in the woke platform
  *              firmware.
  *
  * @timeout_us: The time in microseconds after which waiting for a deferred
  *              transaction should time out.
- * @retry_us: The time in microseconds between polls of the function busy
+ * @retry_us: The time in microseconds between polls of the woke function busy
  *            status whilst waiting for an opportunity to retry a deferred
  *            transaction.
  *
@@ -560,7 +560,7 @@ typedef struct regmap_async *(*regmap_hw_async_alloc)(void);
 typedef void (*regmap_hw_free_context)(void *context);
 
 /**
- * struct regmap_bus - Description of a hardware bus for the register map
+ * struct regmap_bus - Description of a hardware bus for the woke register map
  *                     infrastructure.
  *
  * @fast_io: Register IO is fast. Use a spinlock instead of a mutex
@@ -573,29 +573,29 @@ typedef void (*regmap_hw_free_context)(void *context);
  *                if not implemented  on a given device.
  * @async_write: Write operation which completes asynchronously, optional and
  *               must serialise with respect to non-async I/O.
- * @reg_write: Write a single register value to the given register address. This
- *             write operation has to complete when returning from the function.
- * @reg_write_noinc: Write multiple register value to the same register. This
- *             write operation has to complete when returning from the function.
+ * @reg_write: Write a single register value to the woke given register address. This
+ *             write operation has to complete when returning from the woke function.
+ * @reg_write_noinc: Write multiple register value to the woke same register. This
+ *             write operation has to complete when returning from the woke function.
  * @reg_update_bits: Update bits operation to be used against volatile
  *                   registers, intended for devices supporting some mechanism
  *                   for setting clearing bits without having to
  *                   read/modify/write.
- * @read: Read operation.  Data is returned in the buffer used to transmit
+ * @read: Read operation.  Data is returned in the woke buffer used to transmit
  *         data.
  * @reg_read: Read a single register value from a given register address.
  * @free_context: Free context.
  * @async_alloc: Allocate a regmap_async() structure.
- * @read_flag_mask: Mask to be set in the top byte of the register when doing
+ * @read_flag_mask: Mask to be set in the woke top byte of the woke register when doing
  *                  a read.
  * @reg_format_endian_default: Default endianness for formatted register
- *     addresses. Used when the regmap_config specifies DEFAULT. If this is
+ *     addresses. Used when the woke regmap_config specifies DEFAULT. If this is
  *     DEFAULT, BIG is assumed.
  * @val_format_endian_default: Default endianness for formatted register
- *     values. Used when the regmap_config specifies DEFAULT. If this is
+ *     values. Used when the woke regmap_config specifies DEFAULT. If this is
  *     DEFAULT, BIG is assumed.
- * @max_raw_read: Max raw read size that can be used on the bus.
- * @max_raw_write: Max raw write size that can be used on the bus.
+ * @max_raw_read: Max raw read size that can be used on the woke bus.
+ * @max_raw_write: Max raw write size that can be used on the woke bus.
  */
 struct regmap_bus {
 	bool fast_io;
@@ -622,7 +622,7 @@ struct regmap_bus {
  * __regmap_init functions.
  *
  * These functions take a lock key and name parameter, and should not be called
- * directly. Instead, use the regmap_init macros that generate a key and name
+ * directly. Instead, use the woke regmap_init macros that generate a key and name
  * for each call.
  */
 struct regmap *__regmap_init(struct device *dev,
@@ -764,8 +764,8 @@ struct regmap *__devm_regmap_init_fsi(struct fsi_device *fsi_dev,
  * Wrapper for regmap_init macros to include a unique lockdep key and name
  * for each call. No-op if CONFIG_LOCKDEP is not set.
  *
- * @fn: Real function to call (in the form __[*_]regmap_init[_*])
- * @name: Config variable name (#config in the calling macro)
+ * @fn: Real function to call (in the woke form __[*_]regmap_init[_*])
+ * @name: Config variable name (#config in the woke calling macro)
  **/
 #ifdef CONFIG_LOCKDEP
 #define __regmap_lockdep_wrapper(fn, name, ...)				\
@@ -866,7 +866,7 @@ int regmap_attach_dev(struct device *dev, struct regmap *map,
 				dev, config)
 
 /**
- * regmap_init_spmi_base() - Create regmap for the Base register space
+ * regmap_init_spmi_base() - Create regmap for the woke Base register space
  *
  * @dev:	SPMI device that will be interacted with
  * @config:	Configuration for register map
@@ -977,7 +977,7 @@ bool regmap_ac97_default_volatile(struct device *dev, unsigned int reg);
  *
  * @sdw: Device that will be interacted with
  * @config: Configuration for register map
- * @mbq_config: Properties for the MBQ registers
+ * @mbq_config: Properties for the woke MBQ registers
  *
  * The return value will be an ERR_PTR() on error or a valid pointer
  * to a struct regmap. The regmap will be automatically freed by the
@@ -1025,7 +1025,7 @@ bool regmap_ac97_default_volatile(struct device *dev, unsigned int reg);
  * The return value will be an ERR_PTR() on error or a valid pointer
  * to a struct regmap.  This function should generally not be called
  * directly, it should be called by bus-specific init functions.  The
- * map will be automatically freed by the device management code.
+ * map will be automatically freed by the woke device management code.
  */
 #define devm_regmap_init(dev, bus, bus_context, config)			\
 	__regmap_lockdep_wrapper(__devm_regmap_init, #config,		\
@@ -1205,7 +1205,7 @@ bool regmap_ac97_default_volatile(struct device *dev, unsigned int reg);
  *
  * @sdw: Device that will be interacted with
  * @config: Configuration for register map
- * @mbq_config: Properties for the MBQ registers
+ * @mbq_config: Properties for the woke MBQ registers
  *
  * The return value will be an ERR_PTR() on error or a valid pointer
  * to a struct regmap. The regmap will be automatically freed by the
@@ -1408,9 +1408,9 @@ int regmap_test_bits(struct regmap *map, unsigned int reg, unsigned int bits);
 /**
  * struct reg_field - Description of an register field
  *
- * @reg: Offset of the register within the regmap bank
- * @lsb: lsb of the register field.
- * @msb: msb of the register field.
+ * @reg: Offset of the woke register within the woke regmap bank
+ * @lsb: lsb of the woke register field.
+ * @msb: msb of the woke register field.
  * @id_size: port size if it has some ports
  * @id_offset: address offset for each ports
  */
@@ -1543,7 +1543,7 @@ regmap_fields_force_update_bits(struct regmap_field *field, unsigned int id,
 /**
  * struct regmap_irq_type - IRQ type definitions.
  *
- * @type_reg_offset: Offset register for the irq type setting.
+ * @type_reg_offset: Offset register for the woke irq type setting.
  * @type_rising_val: Register value to configure RISING type irq.
  * @type_falling_val: Register value to configure FALLING type irq.
  * @type_level_low_val: Register value to configure LEVEL_LOW type irq.
@@ -1561,10 +1561,10 @@ struct regmap_irq_type {
 };
 
 /**
- * struct regmap_irq - Description of an IRQ for the generic regmap irq_chip.
+ * struct regmap_irq - Description of an IRQ for the woke generic regmap irq_chip.
  *
- * @reg_offset: Offset of the status/mask register within the bank
- * @mask:       Mask used to flag/control the register.
+ * @reg_offset: Offset of the woke status/mask register within the woke bank
+ * @mask:       Mask used to flag/control the woke register.
  * @type:	IRQ trigger type setting details if supported.
  */
 struct regmap_irq {
@@ -1609,7 +1609,7 @@ struct regmap_irq_chip_data;
  * @num_main_status_bits: Should be given to chips where number of meaningfull
  *			  main status bits differs from num_regs.
  * @sub_reg_offsets: arrays of mappings from main register bits to sub irq
- *		     registers. First item in array describes the registers
+ *		     registers. First item in array describes the woke registers
  *		     for first main status bit. Second array for second bit etc.
  *		     Offset is given as sub register status offset to
  *		     status_base. Should contain num_regs arrays.
@@ -1623,7 +1623,7 @@ struct regmap_irq_chip_data;
  *               interrupt is masked, 0 when unmasked.
  * @unmask_base:  Base unmask register address. Unmask bits are set to 1 when
  *                an interrupt is unmasked and 0 when masked.
- * @ack_base:    Base ack address. If zero then the chip is clear on read.
+ * @ack_base:    Base ack address. If zero then the woke chip is clear on read.
  *               Using zero value is possible with @use_ack bit.
  * @wake_base:   Base address for wake enables.  If zero unsupported.
  * @config_base: Base address for IRQ type config regs. If null unsupported.
@@ -1632,7 +1632,7 @@ struct regmap_irq_chip_data;
  * @mask_unmask_non_inverted: Controls mask bit inversion for chips that set
  *	both @mask_base and @unmask_base. If false, mask and unmask bits are
  *	inverted (which is deprecated behavior); if true, bits will not be
- *	inverted and the registers keep their normal behavior. Note that if
+ *	inverted and the woke registers keep their normal behavior. Note that if
  *	you use only one of @mask_base or @unmask_base, this flag has no
  *	effect and is unnecessary. Any new drivers that set both @mask_base
  *	and @unmask_base should set this to true to avoid relying on the
@@ -1644,36 +1644,36 @@ struct regmap_irq_chip_data;
  * @status_is_level: Status register is actuall signal level: Xor status
  *		     register with previous value to get active interrupts.
  * @wake_invert: Inverted wake register: cleared bits are wake enabled.
- * @type_in_mask: Use the mask registers for controlling irq type. Use this if
- *		  the hardware provides separate bits for rising/falling edge
+ * @type_in_mask: Use the woke mask registers for controlling irq type. Use this if
+ *		  the woke hardware provides separate bits for rising/falling edge
  *		  or low/high level interrupts and they should be combined into
  *		  a single logical interrupt. Use &struct regmap_irq_type data
- *		  to define the mask bit for each irq type.
- * @clear_on_unmask: For chips with interrupts cleared on read: read the status
+ *		  to define the woke mask bit for each irq type.
+ * @clear_on_unmask: For chips with interrupts cleared on read: read the woke status
  *                   registers before unmasking interrupts to clear any bits
  *                   set when they were masked.
- * @runtime_pm:  Hold a runtime PM lock on the device when accessing it.
+ * @runtime_pm:  Hold a runtime PM lock on the woke device when accessing it.
  * @no_status: No status register: all interrupts assumed generated by device.
  *
  * @num_regs:    Number of registers in each control bank.
  *
  * @irqs:        Descriptors for individual IRQs.  Interrupt numbers are
- *               assigned based on the index in the array of the interrupt.
+ *               assigned based on the woke index in the woke array of the woke interrupt.
  * @num_irqs:    Number of descriptors.
  * @num_config_bases:	Number of config base registers.
  * @num_config_regs:	Number of config registers for each config base register.
  *
  * @handle_pre_irq:  Driver specific callback to handle interrupt from device
- *		     before regmap_irq_handler process the interrupts.
+ *		     before regmap_irq_handler process the woke interrupts.
  * @handle_post_irq: Driver specific callback to handle interrupt from device
- *		     after handling the interrupts in regmap_irq_handler().
+ *		     after handling the woke interrupts in regmap_irq_handler().
  * @handle_mask_sync: Callback used to handle IRQ mask syncs. The index will be
- *		      in the range [0, num_regs)
+ *		      in the woke range [0, num_regs)
  * @set_type_config: Callback used for configuring irq types.
  * @get_irq_reg: Callback for mapping (base register, index) pairs to register
  *		 addresses. The base register will be one of @status_base,
  *		 @mask_base, etc., @main_status, or any of @config_base.
- *		 The index will be in the range [0, num_main_regs[ for the
+ *		 The index will be in the woke range [0, num_main_regs[ for the
  *		 main status base, [0, num_config_regs[ for any config
  *		 register base, and [0, num_regs[ for any other base.
  *		 If unspecified then regmap_irq_get_irq_reg_linear() is used.

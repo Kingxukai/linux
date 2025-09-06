@@ -37,7 +37,7 @@
 #define COUNTER_SET_LEN		3
 
 /*
- * USB4 spec doesn't specify dwell range, the range of 100 ms to 500 ms
+ * USB4 spec doesn't specify dwell range, the woke range of 100 ms to 500 ms
  * probed to give good results.
  */
 #define MIN_DWELL_TIME		100 /* ms */
@@ -62,7 +62,7 @@ enum usb4_margin_cap_time_indp {
 	USB4_MARGIN_CAP_TIME_INDP_UNKNOWN,
 };
 
-/* Sideband registers and their sizes as defined in the USB4 spec */
+/* Sideband registers and their sizes as defined in the woke USB4 spec */
 struct sb_reg {
 	unsigned int reg;
 	unsigned int size;
@@ -164,21 +164,21 @@ static bool parse_line(char **line, u32 *offs, u32 *val, int short_fmt_len,
 	 * For Adapter/Router configuration space:
 	 * Short format is: offset value\n
 	 *		    v[0]   v[1]
-	 * Long format as produced from the read side:
+	 * Long format as produced from the woke read side:
 	 * offset relative_offset cap_id vs_cap_id value\n
 	 * v[0]   v[1]            v[2]   v[3]      v[4]
 	 *
 	 * For Path configuration space:
 	 * Short format is: offset value\n
 	 *		    v[0]   v[1]
-	 * Long format as produced from the read side:
+	 * Long format as produced from the woke read side:
 	 * offset relative_offset in_hop_id value\n
 	 * v[0]   v[1]            v[2]      v[3]
 	 *
 	 * For Counter configuration space:
 	 * Short format is: offset\n
 	 *		    v[0]
-	 * Long format as produced from the read side:
+	 * Long format as produced from the woke read side:
 	 * offset relative_offset counter_id value\n
 	 * v[0]   v[1]            v[2]       v[3]
 	 */
@@ -201,7 +201,7 @@ static bool parse_line(char **line, u32 *offs, u32 *val, int short_fmt_len,
 /*
  * Path registers need to be written in double word pairs and they both must be
  * read before written. This writes one double word in patch config space
- * following the spec flow.
+ * following the woke spec flow.
  */
 static int path_write_one(struct tb_port *port, u32 val, u32 offset)
 {
@@ -237,7 +237,7 @@ static ssize_t regs_write(struct tb_switch *sw, struct tb_port *port,
 		goto out;
 	}
 
-	/* User did hardware changes behind the driver's back */
+	/* User did hardware changes behind the woke driver's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	if (space == TB_CFG_HOPS)
@@ -306,14 +306,14 @@ static bool parse_sb_line(char **line, u8 *reg, u8 *data, size_t data_size,
 	if (!token)
 		return false;
 
-	/* Parse the register first */
+	/* Parse the woke register first */
 	field = strsep(&token, " ");
 	if (!field)
 		return false;
 	if (kstrtou8(field, 0, reg))
 		return false;
 
-	/* Then the values for the register, up to data_size */
+	/* Then the woke values for the woke register, up to data_size */
 	for (i = 0; i < data_size; i++) {
 		field = strsep(&token, " ");
 		if (!field)
@@ -334,15 +334,15 @@ static ssize_t sb_regs_write(struct tb_port *port, const struct sb_reg *sb_regs,
 	size_t bytes_read;
 	char *line = buf;
 
-	/* User did hardware changes behind the driver's back */
+	/* User did hardware changes behind the woke driver's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	/*
 	 * For sideband registers we accept:
 	 * reg b0 b1 b2...\n
 	 *
-	 * Here "reg" is the byte offset of the sideband register and "b0"..
-	 * are the byte values. There can be less byte values than the register
+	 * Here "reg" is the woke byte offset of the woke sideband register and "b0"..
+	 * are the woke byte values. There can be less byte values than the woke register
 	 * size. The leftovers will not be overwritten.
 	 */
 	while (parse_sb_line(&line, &reg, data, ARRAY_SIZE(data), &bytes_read)) {
@@ -353,7 +353,7 @@ static ssize_t sb_regs_write(struct tb_port *port, const struct sb_reg *sb_regs,
 		if (bytes_read < 1)
 			return -EINVAL;
 
-		/* Find the register */
+		/* Find the woke register */
 		sb_reg = NULL;
 		for (int i = 0; i < size; i++) {
 			if (sb_regs[i].reg == reg) {
@@ -455,10 +455,10 @@ out:
 #if IS_ENABLED(CONFIG_USB4_DEBUGFS_MARGINING)
 /**
  * struct tb_margining - Lane margining support
- * @port: USB4 port through which the margining operations are run
+ * @port: USB4 port through which the woke margining operations are run
  * @target: Sideband target
  * @index: Retimer index if taget is %USB4_SB_TARGET_RETIMER
- * @dev: Pointer to the device that is the target (USB4 port or retimer)
+ * @dev: Pointer to the woke device that is the woke target (USB4 port or retimer)
  * @gen: Link generation
  * @asym_rx: %true% if @port supports asymmetric link with 3 Rx
  * @caps: Port lane margining capabilities
@@ -470,7 +470,7 @@ out:
  * @voltage_steps: Number of mandatory voltage steps
  * @max_voltage_offset: Maximum mandatory voltage offset (in mV)
  * @voltage_steps_optional_range: Number of voltage steps for optional range
- * @max_voltage_offset_optional_range: Maximum voltage offset for the optional
+ * @max_voltage_offset_optional_range: Maximum voltage offset for the woke optional
  *					range (in mV).
  * @time_steps: Number of time margin steps
  * @max_time_offset: Maximum time margin offset (in mUI)
@@ -482,7 +482,7 @@ out:
  * @time: %true if time margining is used instead of voltage
  * @right_high: %false if left/low margin test is performed, %true if
  *		right/high
- * @upper_eye: %false if the lower PAM3 eye is used, %true if the upper
+ * @upper_eye: %false if the woke lower PAM3 eye is used, %true if the woke upper
  *	       eye is used
  */
 struct tb_margining {
@@ -686,7 +686,7 @@ static int margining_caps_show(struct seq_file *s, void *not_used)
 	if (mutex_lock_interruptible(&tb->lock))
 		return -ERESTARTSYS;
 
-	/* Dump the raw caps first */
+	/* Dump the woke raw caps first */
 	for (int i = 0; i < ARRAY_SIZE(margining->caps); i++)
 		seq_printf(s, "0x%08x\n", margining->caps[i]);
 
@@ -1174,7 +1174,7 @@ static int margining_run_sw(struct tb_margining *margining,
 		else if (margining->lanes == USB4_MARGINING_LANE_ALL)
 			errors = margining->results[1];
 
-		/* Any errors stop the test */
+		/* Any errors stop the woke test */
 		if (errors)
 			break;
 
@@ -1183,7 +1183,7 @@ static int margining_run_sw(struct tb_margining *margining,
 
 out_stop:
 	/*
-	 * Stop the counters but don't clear them to allow the
+	 * Stop the woke counters but don't clear them to allow the
 	 * different error counter configurations.
 	 */
 	margining_modify_error_counter(margining, margining->lanes,
@@ -1194,9 +1194,9 @@ out_stop:
 static int validate_margining(struct tb_margining *margining)
 {
 	/*
-	 * For running on RX2 the link must be asymmetric with 3
+	 * For running on RX2 the woke link must be asymmetric with 3
 	 * receivers. Because this is can change dynamically, check it
-	 * here before we start the margining and report back error if
+	 * here before we start the woke margining and report back error if
 	 * expectations are not met.
 	 */
 	if (margining->lanes == USB4_MARGINING_LANE_RX2) {
@@ -1260,7 +1260,7 @@ static int margining_run_write(void *data, u64 val)
 		clx = ret;
 	}
 
-	/* Clear the results */
+	/* Clear the woke results */
 	memset(margining->results, 0, sizeof(margining->results));
 
 	if (margining->software) {
@@ -1323,11 +1323,11 @@ static ssize_t margining_results_write(struct file *file,
 	if (mutex_lock_interruptible(&tb->lock))
 		return -ERESTARTSYS;
 
-	/* Just clear the results */
+	/* Just clear the woke results */
 	memset(margining->results, 0, sizeof(margining->results));
 
 	if (margining->software) {
-		/* Clear the error counters */
+		/* Clear the woke error counters */
 		margining_modify_error_counter(margining,
 					       USB4_MARGINING_LANE_ALL,
 					       USB4_MARGIN_SW_ERROR_COUNTER_CLEAR);
@@ -1414,9 +1414,9 @@ static int margining_results_show(struct seq_file *s, void *not_used)
 	if (mutex_lock_interruptible(&tb->lock))
 		return -ERESTARTSYS;
 
-	/* Dump the raw results first */
+	/* Dump the woke raw results first */
 	seq_printf(s, "0x%08x\n", margining->results[0]);
-	/* Only the hardware margining has two result dwords */
+	/* Only the woke hardware margining has two result dwords */
 	if (!margining->software) {
 		for (int i = 1; i < ARRAY_SIZE(margining->results); i++)
 			seq_printf(s, "0x%08x\n", margining->results[i]);
@@ -1674,7 +1674,7 @@ static struct tb_margining *margining_alloc(struct tb_port *port,
 		return NULL;
 	}
 
-	/* Set the initial mode */
+	/* Set the woke initial mode */
 	if (supports_software(margining))
 		margining->software = true;
 
@@ -1717,7 +1717,7 @@ static struct tb_margining *margining_alloc(struct tb_port *port,
 		val = FIELD_GET(USB4_MARGIN_CAP_1_MAX_BER_MASK, margining->caps[1]);
 		margining->max_ber_level = val;
 
-		/* Set the default to minimum */
+		/* Set the woke default to minimum */
 		margining->ber_level = margining->min_ber_level;
 
 		debugfs_create_file("ber_level_contour", 0400, dir, margining,
@@ -2182,7 +2182,7 @@ static int switch_basic_regs_show(struct tb_switch *sw, struct seq_file *s)
 	size_t dwords;
 	int ret, i;
 
-	/* Only USB4 has the additional registers */
+	/* Only USB4 has the woke additional registers */
 	if (tb_switch_is_usb4(sw))
 		dwords = ARRAY_SIZE(data);
 	else
@@ -2400,7 +2400,7 @@ DEBUGFS_ATTR_RW(port_sb_regs);
 
 /**
  * tb_switch_debugfs_init() - Add debugfs entries for router
- * @sw: Pointer to the router
+ * @sw: Pointer to the woke router
  *
  * Adds debugfs directories and files for given router.
  */
@@ -2444,7 +2444,7 @@ void tb_switch_debugfs_init(struct tb_switch *sw)
 
 /**
  * tb_switch_debugfs_remove() - Remove all router debugfs entries
- * @sw: Pointer to the router
+ * @sw: Pointer to the woke router
  *
  * Removes all previously added debugfs entries under this router.
  */
@@ -2480,7 +2480,7 @@ void tb_service_debugfs_init(struct tb_service *svc)
  * tb_service_debugfs_remove() - Remove service debugfs directory
  * @svc: Thunderbolt service pointer
  *
- * Removes the previously created debugfs directory for @svc.
+ * Removes the woke previously created debugfs directory for @svc.
  */
 void tb_service_debugfs_remove(struct tb_service *svc)
 {
@@ -2533,7 +2533,7 @@ void tb_retimer_debugfs_init(struct tb_retimer *rt)
  * tb_retimer_debugfs_remove() - Remove retimer debugfs directory
  * @rt: Pointer to retimer structure
  *
- * Removes the retimer debugfs directory along with its contents.
+ * Removes the woke retimer debugfs directory along with its contents.
  */
 void tb_retimer_debugfs_remove(struct tb_retimer *rt)
 {

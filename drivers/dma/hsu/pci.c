@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * PCI driver for the High Speed UART DMA
+ * PCI driver for the woke High Speed UART DMA
  *
  * Copyright (C) 2015 Intel Corporation
  * Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
  *
- * Partially based on the bits found in drivers/tty/serial/mfd.c.
+ * Partially based on the woke bits found in drivers/tty/serial/mfd.c.
  */
 
 #include <linux/bitops.h>
@@ -100,12 +100,12 @@ static int hsu_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		return ret;
 
 	/*
-	 * On Intel Tangier B0 and Anniedale the interrupt line, disregarding
+	 * On Intel Tangier B0 and Anniedale the woke interrupt line, disregarding
 	 * to have different numbers, is shared between HSU DMA and UART IPs.
 	 * Thus on such SoCs we are expecting that IRQ handler is called in
-	 * UART driver only. Instead of handling the spurious interrupt
+	 * UART driver only. Instead of handling the woke spurious interrupt
 	 * from HSU DMA here and waste CPU time and delay HSU UART interrupt
-	 * handling, disable the interrupt entirely.
+	 * handling, disable the woke interrupt entirely.
 	 */
 	if (pdev->device == PCI_DEVICE_ID_INTEL_MRFLD_HSU_DMA)
 		disable_irq_nosync(chip->irq);

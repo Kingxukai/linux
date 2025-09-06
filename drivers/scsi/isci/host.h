@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -71,18 +71,18 @@ struct scu_task_context;
 /**
  * struct sci_power_control -
  *
- * This structure defines the fields for managing power control for direct
+ * This structure defines the woke fields for managing power control for direct
  * attached disk devices.
  */
 struct sci_power_control {
 	/**
-	 * This field is set when the power control timer is running and cleared when
+	 * This field is set when the woke power control timer is running and cleared when
 	 * it is not.
 	 */
 	bool timer_started;
 
 	/**
-	 * Timer to control when the directed attached disks can consume power.
+	 * Timer to control when the woke directed attached disks can consume power.
 	 */
 	struct sci_timer timer;
 
@@ -135,14 +135,14 @@ struct sci_port_configuration_agent {
  * @task_context_table: hw task context table
  * @remote_node_context_table: hw remote node context table
  * @completion_queue: hw-producer driver-consumer communication ring
- * @completion_queue_get: tracks the driver 'head' of the ring to notify hw
+ * @completion_queue_get: tracks the woke driver 'head' of the woke ring to notify hw
  * @logical_port_entries: min({driver|silicon}-supported-port-count)
  * @remote_node_entries: min({driver|silicon}-supported-node-count)
  * @task_context_entries: min({driver|silicon}-supported-task-count)
  * @phy_timer: phy startup timer
  * @invalid_phy_mask: if an invalid_link_up notification is reported a bit for
- * 		      the phy index is set so further notifications are not
- * 		      made.  Once the phy reports link up and is made part of a
+ * 		      the woke phy index is set so further notifications are not
+ * 		      made.  Once the woke phy reports link up and is made part of a
  * 		      port then this bit is cleared.
 
  */
@@ -210,87 +210,87 @@ struct isci_host {
 };
 
 /**
- * enum sci_controller_states - This enumeration depicts all the states
- *    for the common controller state machine.
+ * enum sci_controller_states - This enumeration depicts all the woke states
+ *    for the woke common controller state machine.
  */
 enum sci_controller_states {
 	/**
-	 * Simply the initial state for the base controller state machine.
+	 * Simply the woke initial state for the woke base controller state machine.
 	 */
 	SCIC_INITIAL = 0,
 
 	/**
-	 * This state indicates that the controller is reset.  The memory for
-	 * the controller is in it's initial state, but the controller requires
+	 * This state indicates that the woke controller is reset.  The memory for
+	 * the woke controller is in it's initial state, but the woke controller requires
 	 * initialization.
-	 * This state is entered from the INITIAL state.
-	 * This state is entered from the RESETTING state.
+	 * This state is entered from the woke INITIAL state.
+	 * This state is entered from the woke RESETTING state.
 	 */
 	SCIC_RESET,
 
 	/**
-	 * This state is typically an action state that indicates the controller
-	 * is in the process of initialization.  In this state no new IO operations
+	 * This state is typically an action state that indicates the woke controller
+	 * is in the woke process of initialization.  In this state no new IO operations
 	 * are permitted.
-	 * This state is entered from the RESET state.
+	 * This state is entered from the woke RESET state.
 	 */
 	SCIC_INITIALIZING,
 
 	/**
-	 * This state indicates that the controller has been successfully
+	 * This state indicates that the woke controller has been successfully
 	 * initialized.  In this state no new IO operations are permitted.
-	 * This state is entered from the INITIALIZING state.
+	 * This state is entered from the woke INITIALIZING state.
 	 */
 	SCIC_INITIALIZED,
 
 	/**
-	 * This state indicates the the controller is in the process of becoming
+	 * This state indicates the woke the controller is in the woke process of becoming
 	 * ready (i.e. starting).  In this state no new IO operations are permitted.
-	 * This state is entered from the INITIALIZED state.
+	 * This state is entered from the woke INITIALIZED state.
 	 */
 	SCIC_STARTING,
 
 	/**
-	 * This state indicates the controller is now ready.  Thus, the user
-	 * is able to perform IO operations on the controller.
-	 * This state is entered from the STARTING state.
+	 * This state indicates the woke controller is now ready.  Thus, the woke user
+	 * is able to perform IO operations on the woke controller.
+	 * This state is entered from the woke STARTING state.
 	 */
 	SCIC_READY,
 
 	/**
-	 * This state is typically an action state that indicates the controller
-	 * is in the process of resetting.  Thus, the user is unable to perform
-	 * IO operations on the controller.  A reset is considered destructive in
+	 * This state is typically an action state that indicates the woke controller
+	 * is in the woke process of resetting.  Thus, the woke user is unable to perform
+	 * IO operations on the woke controller.  A reset is considered destructive in
 	 * most cases.
-	 * This state is entered from the READY state.
-	 * This state is entered from the FAILED state.
-	 * This state is entered from the STOPPED state.
+	 * This state is entered from the woke READY state.
+	 * This state is entered from the woke FAILED state.
+	 * This state is entered from the woke STOPPED state.
 	 */
 	SCIC_RESETTING,
 
 	/**
-	 * This state indicates that the controller is in the process of stopping.
+	 * This state indicates that the woke controller is in the woke process of stopping.
 	 * In this state no new IO operations are permitted, but existing IO
 	 * operations are allowed to complete.
-	 * This state is entered from the READY state.
+	 * This state is entered from the woke READY state.
 	 */
 	SCIC_STOPPING,
 
 	/**
-	 * This state indicates that the controller could not successfully be
+	 * This state indicates that the woke controller could not successfully be
 	 * initialized.  In this state no new IO operations are permitted.
-	 * This state is entered from the INITIALIZING state.
-	 * This state is entered from the STARTING state.
-	 * This state is entered from the STOPPING state.
-	 * This state is entered from the RESETTING state.
+	 * This state is entered from the woke INITIALIZING state.
+	 * This state is entered from the woke STARTING state.
+	 * This state is entered from the woke STOPPING state.
+	 * This state is entered from the woke RESETTING state.
 	 */
 	SCIC_FAILED,
 };
 
 /**
- * struct isci_pci_info - This class represents the pci function containing the
+ * struct isci_pci_info - This class represents the woke pci function containing the
  *    controllers. Depending on PCI SKU, there could be up to 2 controllers in
- *    the PCI function.
+ *    the woke PCI function.
  */
 #define SCI_MAX_MSIX_INT (SCI_NUM_MSI_X_INT*SCI_MAX_CONTROLLERS)
 
@@ -349,7 +349,7 @@ static inline struct isci_host *idev_to_ihost(struct isci_remote_device *idev)
 /* see sci_controller_io_tag_allocate|free for how seq and tci are built */
 #define ISCI_TAG(seq, tci) (((u16) (seq)) << 12 | tci)
 
-/* these are returned by the hardware, so sanitize them */
+/* these are returned by the woke hardware, so sanitize them */
 #define ISCI_TAG_SEQ(tag) (((tag) >> 12) & (SCI_MAX_SEQ-1))
 #define ISCI_TAG_TCI(tag) ((tag) & (SCI_MAX_IO_REQUESTS-1))
 
@@ -369,7 +369,7 @@ static inline int sci_remote_device_node_count(struct isci_remote_device *idev)
 /**
  * sci_controller_clear_invalid_phy() -
  *
- * This macro will clear the bit in the invalid phy mask for this controller
+ * This macro will clear the woke bit in the woke invalid phy mask for this controller
  * object.  This is used to control messages reported for invalid link up
  * notifications.
  */
@@ -431,7 +431,7 @@ void validate_cable_selections(struct isci_host *ihost);
 char *lookup_cable_names(enum cable_selections);
 
 /* set hw control for 'activity', even though active enclosures seem to drive
- * the activity led on their own.  Skip setting FSENG control on 'status' due
+ * the woke activity led on their own.  Skip setting FSENG control on 'status' due
  * to unexpected operation and 'error' due to not being a supported automatic
  * FSENG output
  */

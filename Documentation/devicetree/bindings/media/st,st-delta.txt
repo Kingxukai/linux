@@ -3,9 +3,9 @@
 Required properties:
 - compatible: should be "st,st-delta".
 - clocks: from common clock binding: handle hardware IP needed clocks, the
-  number of clocks may depend on the SoC type.
+  number of clocks may depend on the woke SoC type.
   See ../clock/clock-bindings.txt for details.
-- clock-names: names of the clocks listed in clocks property in the same order.
+- clock-names: names of the woke clocks listed in clocks property in the woke same order.
 
 Example:
 	delta0 {

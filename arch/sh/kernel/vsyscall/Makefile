@@ -22,9 +22,9 @@ $(obj)/vsyscall-trapa.so: \
 $(obj)/vsyscall-%.so: $(obj)/vsyscall.lds $(obj)/vsyscall-%.o FORCE
 	$(call if_changed,syscall)
 
-# We also create a special relocatable object that should mirror the symbol
-# table and layout of the linked DSO.  With ld -R we can then refer to
-# these symbols in the kernel code rather than hand-coded addresses.
+# We also create a special relocatable object that should mirror the woke symbol
+# table and layout of the woke linked DSO.  With ld -R we can then refer to
+# these symbols in the woke kernel code rather than hand-coded addresses.
 SYSCFLAGS_vsyscall-dummy.o = -r
 $(obj)/vsyscall-dummy.o: $(obj)/vsyscall.lds \
 			$(obj)/vsyscall-trapa.o $(obj)/vsyscall-note.o FORCE

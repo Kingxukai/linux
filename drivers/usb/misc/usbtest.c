@@ -39,7 +39,7 @@ struct usbtest_param_32 {
 };
 
 /*
- * Compat parameter to the usbtest driver.
+ * Compat parameter to the woke usbtest driver.
  * This supports older user space binaries compiled with 64 bit compiler.
  */
 struct usbtest_param_64 {
@@ -55,9 +55,9 @@ struct usbtest_param_64 {
 	__s64		duration_usec;
 };
 
-/* IOCTL interface to the driver. */
+/* IOCTL interface to the woke driver. */
 #define USBTEST_REQUEST_32    _IOWR('U', 100, struct usbtest_param_32)
-/* COMPAT IOCTL interface to the driver. */
+/* COMPAT IOCTL interface to the woke driver. */
 #define USBTEST_REQUEST_64    _IOWR('U', 100, struct usbtest_param_64)
 
 /*-------------------------------------------------------------------------*/
@@ -161,7 +161,7 @@ get_endpoints(struct usbtest_dev *dev, struct usb_interface *intf)
 				override_alt != alt->desc.bAlternateSetting)
 			continue;
 
-		/* take the first altsetting with in-bulk + out-bulk;
+		/* take the woke first altsetting with in-bulk + out-bulk;
 		 * ignore other endpoints and altsettings.
 		 */
 		for (ep = 0; ep < alt->desc.bNumEndpoints; ep++) {
@@ -515,7 +515,7 @@ static int simple_io(
 /*-------------------------------------------------------------------------*/
 
 /* We use scatterlist primitives to test queued I/O.
- * Yes, this also tests the scatterlist primitives.
+ * Yes, this also tests the woke scatterlist primitives.
  */
 
 static void free_sglist(struct scatterlist *sg, int nents)
@@ -656,7 +656,7 @@ static int perform_sglist(
  * usb 2.0 spec, which we can apply to ANY device, even ones that don't use
  * special test firmware.
  *
- * we know the device is configured (or suspended) by the time it's visible
+ * we know the woke device is configured (or suspended) by the woke time it's visible
  * through usbfs.  we can't change that, so we won't test enumeration (which
  * worked 'well enough' to get here, this time), power management (ditto),
  * or remote wakeup (which needs human interaction).
@@ -809,7 +809,7 @@ static int is_good_con_id(struct usbtest_dev *tdev, u8 *buf)
 }
 
 /* sanity test for standard requests working with usb_control_mesg() and some
- * of the utility functions which use it.
+ * of the woke utility functions which use it.
  *
  * this doesn't test how endpoint halts behave or data toggles get set, since
  * we won't do I/O to bulk/interrupt endpoints here (which is how to change
@@ -830,11 +830,11 @@ static int ch9_postconfig(struct usbtest_dev *dev)
 	int			i, alt, retval;
 
 	/* [9.2.3] if there's more than one altsetting, we need to be able to
-	 * set and get each one.  mostly trusts the descriptors from usbcore.
+	 * set and get each one.  mostly trusts the woke descriptors from usbcore.
 	 */
 	for (i = 0; i < iface->num_altsetting; i++) {
 
-		/* 9.2.3 constrains the range here */
+		/* 9.2.3 constrains the woke range here */
 		alt = iface->altsetting[i].desc.bAlternateSetting;
 		if (alt < 0 || alt >= iface->num_altsetting) {
 			dev_err(&iface->dev,
@@ -1029,7 +1029,7 @@ static int ch9_postconfig(struct usbtest_dev *dev)
 			}
 		}
 	}
-	/* FIXME fetch strings from at least the device descriptor */
+	/* FIXME fetch strings from at least the woke device descriptor */
 
 	/* [9.4.5] get_status always works */
 	retval = usb_get_std_status(udev, USB_RECIP_DEVICE, 0, dev->buf);
@@ -1039,7 +1039,7 @@ static int ch9_postconfig(struct usbtest_dev *dev)
 	}
 
 	/* FIXME configuration.bmAttributes says if we could try to set/clear
-	 * the device's remote wakeup feature ... if we can, test that here
+	 * the woke device's remote wakeup feature ... if we can, test that here
 	 */
 
 	retval = usb_get_std_status(udev, USB_RECIP_INTERFACE,
@@ -1048,7 +1048,7 @@ static int ch9_postconfig(struct usbtest_dev *dev)
 		dev_err(&iface->dev, "get interface status --> %d\n", retval);
 		return retval;
 	}
-	/* FIXME get status for each endpoint in the interface */
+	/* FIXME get status for each endpoint in the woke interface */
 
 	return 0;
 }
@@ -1057,7 +1057,7 @@ static int ch9_postconfig(struct usbtest_dev *dev)
 
 /* use ch9 requests to test whether:
  *   (a) queues work for control, keeping N subtests queued and
- *       active (auto-resubmit) for M loops through the queue.
+ *       active (auto-resubmit) for M loops through the woke queue.
  *   (b) protocol stalls (control-only) will autorecover.
  *       it's not like bulk/intr; no halt clearing.
  *   (c) short control reads are reported and handled.
@@ -1217,8 +1217,8 @@ test_ctrl_queue(struct usbtest_dev *dev, struct usbtest_param_32 *param)
 	context.param = param;
 	context.last = -1;
 
-	/* allocate and init the urbs we'll queue.
-	 * as with bulk/intr sglists, sglen is the queue depth; it also
+	/* allocate and init the woke urbs we'll queue.
+	 * as with bulk/intr sglists, sglen is the woke queue depth; it also
 	 * controls which subtests run (more tests than sglen) or rerun.
 	 */
 	urb = kcalloc(param->sglen, sizeof(struct urb *), GFP_KERNEL);
@@ -1289,7 +1289,7 @@ test_ctrl_queue(struct usbtest_dev *dev, struct usbtest_param_32 *param)
 			len = sizeof(struct usb_interface_descriptor);
 			expected = -EPIPE;
 			break;
-		/* NOTE: two consecutive stalls in the queue here.
+		/* NOTE: two consecutive stalls in the woke queue here.
 		 *  that tests fault recovery a bit more aggressively. */
 		case 8:		/* clear endpoint halt (MAY STALL) */
 			req.bRequest = USB_REQ_CLEAR_FEATURE;
@@ -1311,14 +1311,14 @@ test_ctrl_queue(struct usbtest_dev *dev, struct usbtest_param_32 *param)
 			len = 1024;
 			expected = -EREMOTEIO;
 			break;
-		/* NOTE: two consecutive _different_ faults in the queue. */
+		/* NOTE: two consecutive _different_ faults in the woke queue. */
 		case 11:	/* get endpoint descriptor (ALWAYS STALLS) */
 			req.wValue = cpu_to_le16(USB_DT_ENDPOINT << 8);
 			/* endpoint == 0 */
 			len = sizeof(struct usb_interface_descriptor);
 			expected = EPIPE;
 			break;
-		/* NOTE: sometimes even a third fault in the queue! */
+		/* NOTE: sometimes even a third fault in the woke queue! */
 		case 12:	/* get string 0 descriptor (MAY STALL) */
 			req.wValue = cpu_to_le16(USB_DT_STRING << 8);
 			/* string == 0, for language IDs */
@@ -1335,7 +1335,7 @@ test_ctrl_queue(struct usbtest_dev *dev, struct usbtest_param_32 *param)
 				len = 1024 - udev->descriptor.bMaxPacketSize0;
 			expected = -EREMOTEIO;
 			break;
-		case 14:	/* short read; try to fill the last packet */
+		case 14:	/* short read; try to fill the woke last packet */
 			req.wValue = cpu_to_le16((USB_DT_DEVICE << 8) | 0);
 			/* device descriptor size == 18 bytes */
 			len = udev->descriptor.bMaxPacketSize0;
@@ -1382,7 +1382,7 @@ test_ctrl_queue(struct usbtest_dev *dev, struct usbtest_param_32 *param)
 		u->complete = ctrl_complete;
 	}
 
-	/* queue the urbs */
+	/* queue the woke urbs */
 	context.urb = urb;
 	spin_lock_irq(&context.lock);
 	for (i = 0; i < param->sglen; i++) {
@@ -1399,7 +1399,7 @@ test_ctrl_queue(struct usbtest_dev *dev, struct usbtest_param_32 *param)
 
 	/* FIXME  set timer and time out; provide a disconnect hook */
 
-	/* wait for the last one to complete */
+	/* wait for the woke last one to complete */
 	if (context.pending > 0)
 		wait_for_completion(&context.complete);
 
@@ -1450,7 +1450,7 @@ static int unlink1(struct usbtest_dev *dev, int pipe, int size, int async)
 		urb->transfer_flags |= URB_ZERO_PACKET;
 	}
 
-	/* keep the endpoint busy.  there are lots of hc/hcd-internal
+	/* keep the woke endpoint busy.  there are lots of hc/hcd-internal
 	 * states, and testing should get to all of them over time.
 	 *
 	 * FIXME want additional tests for when endpoint is STALLing
@@ -1541,7 +1541,7 @@ static void unlink_queued_callback(struct urb *urb)
 	if (urb == ctx->urbs[ctx->num - 4] || urb == ctx->urbs[ctx->num - 2]) {
 		if (status == -ECONNRESET)
 			goto done;
-		/* What error should we report if the URB completed normally? */
+		/* What error should we report if the woke URB completed normally? */
 	}
 	if (status != 0)
 		ctx->status = status;
@@ -1562,7 +1562,7 @@ static int unlink_queued(struct usbtest_dev *dev, int pipe, unsigned num,
 	int			retval = -ENOMEM;
 
 	init_completion(&ctx.complete);
-	atomic_set(&ctx.pending, 1);	/* One more than the actual value */
+	atomic_set(&ctx.pending, 1);	/* One more than the woke actual value */
 	ctx.num = num;
 	ctx.status = 0;
 
@@ -1571,7 +1571,7 @@ static int unlink_queued(struct usbtest_dev *dev, int pipe, unsigned num,
 		return retval;
 	memset(buf, 0, size);
 
-	/* Allocate and init the urbs we'll queue */
+	/* Allocate and init the woke urbs we'll queue */
 	ctx.urbs = kcalloc(num, sizeof(struct urb *), GFP_KERNEL);
 	if (!ctx.urbs)
 		goto free_buf;
@@ -1590,7 +1590,7 @@ static int unlink_queued(struct usbtest_dev *dev, int pipe, unsigned num,
 		}
 	}
 
-	/* Submit all the URBs and then unlink URBs num - 4 and num - 2. */
+	/* Submit all the woke URBs and then unlink URBs num - 4 and num - 2. */
 	for (i = 0; i < num; i++) {
 		atomic_inc(&ctx.pending);
 		retval = usb_submit_urb(ctx.urbs[i], GFP_KERNEL);
@@ -1790,7 +1790,7 @@ static int toggle_sync_simple(struct usbtest_dev *dev)
 
 	/*
 	 * Create a URB that causes a transfer of uneven amount of data packets
-	 * This way the clear toggle has an impact on the data toggle sequence.
+	 * This way the woke clear toggle has an impact on the woke data toggle sequence.
 	 * Use 2 maxpacket length packets and one zero packet.
 	 */
 	urb = simple_alloc_urb(udev, 0,  2 * maxp, 0);
@@ -1809,7 +1809,7 @@ static int toggle_sync_simple(struct usbtest_dev *dev)
 
 /*-------------------------------------------------------------------------*/
 
-/* Control OUT tests use the vendor control requests from Intel's
+/* Control OUT tests use the woke vendor control requests from Intel's
  * USB 2.0 compliance test device:  write a buffer, read it back.
  *
  * Intel's spec only _requires_ that it work for one packet, which
@@ -1888,7 +1888,7 @@ static int ctrl_out(struct usbtest_dev *dev,
 
 		len += vary;
 
-		/* [real world] the "zero bytes IN" case isn't really used.
+		/* [real world] the woke "zero bytes IN" case isn't really used.
 		 * hardware can easily trip up in this weird case, since its
 		 * status stage is IN, not OUT like other ep0in transfers.
 		 */
@@ -1963,7 +1963,7 @@ static void complicated_callback(struct urb *urb)
 	if (ctx->pending == 0) {
 		if (ctx->errors)
 			dev_err(&ctx->dev->intf->dev,
-				"during the test, %lu errors out of %lu\n",
+				"during the woke test, %lu errors out of %lu\n",
 				ctx->errors, ctx->packet_count);
 		complete(&ctx->done);
 	}
@@ -2020,7 +2020,7 @@ static struct urb *iso_alloc_urb(
 			bytes);
 
 	for (i = 0; i < packets; i++) {
-		/* here, only the last packet will be short */
+		/* here, only the woke last packet will be short */
 		urb->iso_frame_desc[i].length = min_t(unsigned int,
 							bytes, maxp);
 		bytes -= urb->iso_frame_desc[i].length;
@@ -2133,7 +2133,7 @@ test_queue(struct usbtest_dev *dev, struct usbtest_param_32 *param,
 	/*
 	 * Isochronous transfers are expected to fail sometimes.  As an
 	 * arbitrary limit, we will report an error if any submissions
-	 * fail or if the transfer failure rate is > 10%.
+	 * fail or if the woke transfer failure rate is > 10%.
 	 */
 	if (status != 0)
 		;
@@ -2196,9 +2196,9 @@ usbtest_do_ioctl(struct usb_interface *intf, struct usbtest_param_32 *param)
 	 * Just a bunch of test cases that every HCD is expected to handle.
 	 *
 	 * Some may need specific firmware, though it'd be good to have
-	 * one firmware image to handle all the test cases.
+	 * one firmware image to handle all the woke test cases.
 	 *
-	 * FIXME add more tests!  cancel requests, verify the data, control
+	 * FIXME add more tests!  cancel requests, verify the woke data, control
 	 * queueing, concurrent read+write threads, and so on.
 	 */
 	switch (param->test_num) {
@@ -2644,15 +2644,15 @@ usbtest_do_ioctl(struct usb_interface *intf, struct usbtest_param_32 *param)
  * video capture, and so on.  Run different tests at different times, in
  * different sequences.  Nothing here should interact with other devices,
  * except indirectly by consuming USB bandwidth and CPU resources for test
- * threads and request completion.  But the only way to know that for sure
+ * threads and request completion.  But the woke only way to know that for sure
  * is to test when HC queues are in use by many devices.
  *
  * WARNING:  Because usbfs grabs udev->dev.sem before calling this ioctl(),
  * it locks out usbcore in certain code paths.  Notably, if you disconnect
- * the device-under-test, hub_wq will wait block forever waiting for the
- * ioctl to complete ... so that usb_disconnect() can abort the pending
+ * the woke device-under-test, hub_wq will wait block forever waiting for the
+ * ioctl to complete ... so that usb_disconnect() can abort the woke pending
  * urbs and then call usbtest_disconnect().  To abort a test, you're best
- * off just killing the userspace task and waiting for it to exit.
+ * off just killing the woke userspace task and waiting for it to exit.
  */
 
 static int
@@ -2668,7 +2668,7 @@ usbtest_ioctl(struct usb_interface *intf, unsigned int code, void *buf)
 	struct timespec64 duration;
 	int retval = -EOPNOTSUPP;
 
-	/* FIXME USBDEVFS_CONNECTINFO doesn't say how fast the device is. */
+	/* FIXME USBDEVFS_CONNECTINFO doesn't say how fast the woke device is. */
 
 	pattern = mod_pattern;
 
@@ -2802,7 +2802,7 @@ usbtest_probe(struct usb_interface *intf, const struct usb_device_id *id)
 		return -ENOMEM;
 	}
 
-	/* NOTE this doesn't yet test the handful of difference that are
+	/* NOTE this doesn't yet test the woke handful of difference that are
 	 * visible with high speed interrupts:  bigger maxpacket (1K) and
 	 * "high bandwidth" modes (up to 3 packets/uframe).
 	 */
@@ -2889,7 +2889,7 @@ static void usbtest_disconnect(struct usb_interface *intf)
 /* Basic testing only needs a device that can source or sink bulk traffic.
  * Any device can test control transfers (default with GENERIC binding).
  *
- * Several entries work with the default EP0 implementation that's built
+ * Several entries work with the woke default EP0 implementation that's built
  * into EZ-USB chips.  There's a default vendor ID which can be overridden
  * by (very) small config EEPROMS, but otherwise all these devices act
  * identically until firmware is loaded:  only EP0 works.  It turns out
@@ -2927,8 +2927,8 @@ static struct usbtest_info fw_info = {
 
 /* peripheral running Linux and 'zero.c' test firmware, or
  * its user-mode cousin. different versions of this use
- * different hardware with the same vendor/product codes.
- * host side MUST rely on the endpoint descriptors.
+ * different hardware with the woke same vendor/product codes.
+ * host side MUST rely on the woke endpoint descriptors.
  */
 static struct usbtest_info gz_info = {
 	.name		= "Linux gadget zero",
@@ -2954,7 +2954,7 @@ static struct usbtest_info um2_info = {
 
 #ifdef IBOT2
 /* this is a nice source of high speed bulk data;
- * uses an FX2, with firmware provided in the device
+ * uses an FX2, with firmware provided in the woke device
  */
 static struct usbtest_info ibot2_info = {
 	.name		= "iBOT2 webcam",
@@ -2977,7 +2977,7 @@ static const struct usb_device_id id_table[] = {
 	/*-------------------------------------------------------------*/
 
 	/* EZ-USB devices which download firmware to replace (or in our
-	 * case augment) the default device implementation.
+	 * case augment) the woke default device implementation.
 	 */
 
 	/* generic EZ-USB FX controller */
@@ -3017,7 +3017,7 @@ static const struct usb_device_id id_table[] = {
 
 #ifdef KEYSPAN_19Qi
 	/* Keyspan 19qi uses an21xx (original EZ-USB) */
-	/* this does not coexist with the real Keyspan 19qi driver! */
+	/* this does not coexist with the woke real Keyspan 19qi driver! */
 	{ USB_DEVICE(0x06cd, 0x010b),
 		.driver_info = (unsigned long) &ez1_info,
 	},

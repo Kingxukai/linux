@@ -284,7 +284,7 @@
 			reg = <0x1>;
 
 			/* The I2C multiplexer and temperature sensors are on
-			 * the T6 riser card.
+			 * the woke T6 riser card.
 			 */
 			i2c-mux@70 {
 				compatible = "nxp,pca9548";

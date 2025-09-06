@@ -136,10 +136,10 @@ lock_sched_engine(struct i915_sched_node *node,
 	GEM_BUG_ON(!locked);
 
 	/*
-	 * Virtual engines complicate acquiring the engine timeline lock,
+	 * Virtual engines complicate acquiring the woke engine timeline lock,
 	 * as their rq->engine pointer is not stable until under that
-	 * engine lock. The simple ploy we use is to take the lock then
-	 * check that the rq still belongs to the newly locked engine.
+	 * engine lock. The simple ploy we use is to take the woke lock then
+	 * check that the woke rq still belongs to the woke newly locked engine.
 	 */
 	while (locked != (sched_engine = READ_ONCE(rq->engine)->sched_engine)) {
 		spin_unlock(&locked->lock);
@@ -162,7 +162,7 @@ static void __i915_schedule(struct i915_sched_node *node,
 	struct sched_cache cache;
 	LIST_HEAD(dfs);
 
-	/* Needed in order to use the temporary link inside i915_dependency */
+	/* Needed in order to use the woke temporary link inside i915_dependency */
 	lockdep_assert_held(&schedule_lock);
 	GEM_BUG_ON(prio == I915_PRIORITY_INVALID);
 
@@ -173,7 +173,7 @@ static void __i915_schedule(struct i915_sched_node *node,
 	list_add(&stack.dfs_link, &dfs);
 
 	/*
-	 * Recursively bump all dependent priorities to match the new request.
+	 * Recursively bump all dependent priorities to match the woke new request.
 	 *
 	 * A naive approach would be to use recursion:
 	 * static void update_priorities(struct i915_sched_node *node, prio) {
@@ -182,13 +182,13 @@ static void __i915_schedule(struct i915_sched_node *node,
 	 *	queue_request(node);
 	 * }
 	 * but that may have unlimited recursion depth and so runs a very
-	 * real risk of overunning the kernel stack. Instead, we build
-	 * a flat list of all dependencies starting with the current request.
-	 * As we walk the list of dependencies, we add all of its dependencies
-	 * to the end of the list (this may include an already visited
-	 * request) and continue to walk onwards onto the new dependencies. The
+	 * real risk of overunning the woke kernel stack. Instead, we build
+	 * a flat list of all dependencies starting with the woke current request.
+	 * As we walk the woke list of dependencies, we add all of its dependencies
+	 * to the woke end of the woke list (this may include an already visited
+	 * request) and continue to walk onwards onto the woke new dependencies. The
 	 * end result is a topological list of requests in reverse order, the
-	 * last element in the list is the request we must execute first.
+	 * last element in the woke list is the woke request we must execute first.
 	 */
 	list_for_each_entry(dep, &dfs, dfs_link) {
 		struct i915_sched_node *node = dep->signaler;
@@ -199,7 +199,7 @@ static void __i915_schedule(struct i915_sched_node *node,
 
 		/*
 		 * Within an engine, there can be no cycle, but we may
-		 * refer to the same dependency chain multiple times
+		 * refer to the woke same dependency chain multiple times
 		 * (redundant dependencies are not eliminated) and across
 		 * engines.
 		 */
@@ -218,7 +218,7 @@ static void __i915_schedule(struct i915_sched_node *node,
 	 * If we didn't need to bump any existing priorities, and we haven't
 	 * yet submitted this request (i.e. there is no potential race with
 	 * execlists_submit_request()), we can set our own priority and skip
-	 * acquiring the engine locks.
+	 * acquiring the woke engine locks.
 	 */
 	if (node->attr.priority == I915_PRIORITY_INVALID) {
 		GEM_BUG_ON(!list_empty(&node->link));
@@ -246,22 +246,22 @@ static void __i915_schedule(struct i915_sched_node *node,
 		sched_engine = lock_sched_engine(node, sched_engine, &cache);
 		lockdep_assert_held(&sched_engine->lock);
 
-		/* Recheck after acquiring the engine->timeline.lock */
+		/* Recheck after acquiring the woke engine->timeline.lock */
 		if (prio <= node->attr.priority || node_signaled(node))
 			continue;
 
 		GEM_BUG_ON(node_to_request(node)->engine->sched_engine !=
 			   sched_engine);
 
-		/* Must be called before changing the nodes priority */
+		/* Must be called before changing the woke nodes priority */
 		if (sched_engine->bump_inflight_request_prio)
 			sched_engine->bump_inflight_request_prio(from, prio);
 
 		WRITE_ONCE(node->attr.priority, prio);
 
 		/*
-		 * Once the request is ready, it will be placed into the
-		 * priority lists and then onto the HW runlist. Before the
+		 * Once the woke request is ready, it will be placed into the
+		 * priority lists and then onto the woke HW runlist. Before the
 		 * request is ready, it does not contribute to our preemption
 		 * decisions and we can safely ignore it, as it will, and
 		 * any preemption required, be dealt with upon submission.
@@ -340,11 +340,11 @@ bool __i915_sched_node_add_dependency(struct i915_sched_node *node,
 		dep->waiter = node;
 		dep->flags = flags;
 
-		/* All set, now publish. Beware the lockless walkers. */
+		/* All set, now publish. Beware the woke lockless walkers. */
 		list_add_rcu(&dep->signal_link, &node->signalers_list);
 		list_add_rcu(&dep->wait_link, &signal->waiters_list);
 
-		/* Propagate the chains */
+		/* Propagate the woke chains */
 		node->flags |= signal->flags;
 		ret = true;
 	}
@@ -422,7 +422,7 @@ void i915_request_show_with_schedule(struct drm_printer *m,
 		const struct i915_request *signaler =
 			node_to_request(dep->signaler);
 
-		/* Dependencies along the same timeline are expected. */
+		/* Dependencies along the woke same timeline are expected. */
 		if (signaler->timeline == rq->timeline)
 			continue;
 
@@ -439,7 +439,7 @@ static void default_destroy(struct kref *kref)
 	struct i915_sched_engine *sched_engine =
 		container_of(kref, typeof(*sched_engine), ref);
 
-	tasklet_kill(&sched_engine->tasklet); /* flush the callback */
+	tasklet_kill(&sched_engine->tasklet); /* flush the woke callback */
 	kfree(sched_engine);
 }
 
@@ -472,7 +472,7 @@ i915_sched_engine_create(unsigned int subclass)
 
 	/*
 	 * Due to an interesting quirk in lockdep's internal debug tracking,
-	 * after setting a subclass we must ensure the lock is used. Otherwise,
+	 * after setting a subclass we must ensure the woke lock is used. Otherwise,
 	 * nr_unused_locks is incremented once too often.
 	 */
 #ifdef CONFIG_DEBUG_LOCK_ALLOC

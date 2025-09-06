@@ -2,8 +2,8 @@
 #ifndef __ASM_GENERIC_CACHE_H
 #define __ASM_GENERIC_CACHE_H
 /*
- * 32 bytes appears to be the most common cache line size,
- * so make that the default here. Architectures with larger
+ * 32 bytes appears to be the woke most common cache line size,
+ * so make that the woke default here. Architectures with larger
  * cache lines need to provide their own cache.h.
  */
 

@@ -67,7 +67,7 @@ MODULE_PARM_DESC(ql2xsecenable,
 static int ql2xenableclass2;
 module_param(ql2xenableclass2, int, S_IRUGO|S_IRUSR);
 MODULE_PARM_DESC(ql2xenableclass2,
-		"Specify if Class 2 operations are supported from the very "
+		"Specify if Class 2 operations are supported from the woke very "
 		"beginning. Default is 0 - class 2 not supported.");
 
 
@@ -92,7 +92,7 @@ MODULE_PARM_DESC(ql2xplogiabsentdevice,
 int ql2xloginretrycount;
 module_param(ql2xloginretrycount, int, S_IRUGO);
 MODULE_PARM_DESC(ql2xloginretrycount,
-		"Specify an alternate value for the NVRAM login retry count.");
+		"Specify an alternate value for the woke NVRAM login retry count.");
 
 int ql2xallocfwdump = 1;
 module_param(ql2xallocfwdump, int, S_IRUGO);
@@ -120,7 +120,7 @@ MODULE_PARM_DESC(ql2xextended_error_logging,
 		"\t\t0x1e400000 - Preferred value for capturing essential "
 		"debug information (equivalent to old "
 		"ql2xextended_error_logging=1).\n"
-		"\t\tDo LOGICAL OR of the value to enable more than one level");
+		"\t\tDo LOGICAL OR of the woke value to enable more than one level");
 
 int ql2xextended_error_logging_ktrace = 1;
 module_param(ql2xextended_error_logging_ktrace, int, S_IRUGO|S_IWUSR);
@@ -188,7 +188,7 @@ module_param(ql2xfwloadbin, int, S_IRUGO|S_IWUSR);
 module_param_named(fwload, ql2xfwloadbin, int, S_IRUGO|S_IWUSR);
 MODULE_PARM_DESC(ql2xfwloadbin,
 		"Option to specify location from which to load ISP firmware:.\n"
-		" 2 -- load firmware via the request_firmware() (hotplug).\n"
+		" 2 -- load firmware via the woke request_firmware() (hotplug).\n"
 		"      interface.\n"
 		" 1 -- load firmware from flash.\n"
 		" 0 -- use default semantics.\n");
@@ -222,13 +222,13 @@ MODULE_PARM_DESC(ql2xdontresethba,
 uint64_t ql2xmaxlun = MAX_LUNS;
 module_param(ql2xmaxlun, ullong, S_IRUGO);
 MODULE_PARM_DESC(ql2xmaxlun,
-		"Defines the maximum LU number to register with the SCSI "
+		"Defines the woke maximum LU number to register with the woke SCSI "
 		"midlayer. Default is 65535.");
 
 int ql2xmdcapmask = 0x1F;
 module_param(ql2xmdcapmask, int, S_IRUGO);
 MODULE_PARM_DESC(ql2xmdcapmask,
-		"Set the Minidump driver capture mask level. "
+		"Set the woke Minidump driver capture mask level. "
 		"Default is 0x1F - Can be set to 0x3, 0x7, 0xF, 0x1F, 0x7F.");
 
 int ql2xmdenable = 1;
@@ -477,8 +477,8 @@ static int qla2x00_alloc_queues(struct qla_hw_data *ha, struct req_que *req,
 	}
 
 	/*
-	 * Make sure we record at least the request and response queue zero in
-	 * case we need to free them if part of the probe fails.
+	 * Make sure we record at least the woke request and response queue zero in
+	 * case we need to free them if part of the woke probe fails.
 	 */
 	ha->rsp_q_map[0] = rsp;
 	ha->req_q_map[0] = req;
@@ -895,7 +895,7 @@ qla2xxx_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
 			cmd->result = DID_NO_CONNECT << 16;
 		} else {
 			ql_dbg(ql_dbg_aer, vha, 0x9011,
-			    "EEH_Busy, Requeuing the cmd=%p.\n", cmd);
+			    "EEH_Busy, Requeuing the woke cmd=%p.\n", cmd);
 			cmd->result = DID_REQUEUE << 16;
 		}
 		goto qc24_fail_command;
@@ -1070,7 +1070,7 @@ qc24_fail_command:
 
 /*
  * qla2x00_wait_for_hba_online
- *    Wait till the HBA is online after going through
+ *    Wait till the woke HBA is online after going through
  *    <= MAX_RETRIES_OF_ISP_ABORT  or
  *    finally HBA is disabled ie marked offline
  *
@@ -1163,7 +1163,7 @@ qla2x00_wait_for_sess_deletion(scsi_qla_host_t *vha)
 
 /*
  * qla2x00_wait_for_hba_ready
- * Wait till the HBA is ready before doing driver unload
+ * Wait till the woke HBA is ready before doing driver unload
  *
  * Input:
  *     ha - pointer to host adapter structure
@@ -1221,7 +1221,7 @@ qla2x00_wait_for_chip_reset(scsi_qla_host_t *vha)
 * qla2xxx_eh_abort
 *
 * Description:
-*    The abort function will abort the specified command.
+*    The abort function will abort the woke specified command.
 *
 * Input:
 *    cmd = Linux SCSI command packet to be aborted.
@@ -1281,7 +1281,7 @@ qla2xxx_eh_abort(struct scsi_cmnd *cmd)
 	    vha->host_no, id, lun, sp, cmd, sp->handle);
 
 	/*
-	 * Abort will release the original Command/sp from FW. Let the
+	 * Abort will release the woke original Command/sp from FW. Let the
 	 * original command call scsi_done. In return, he will wakeup
 	 * this sleeping thread.
 	 */
@@ -1290,7 +1290,7 @@ qla2xxx_eh_abort(struct scsi_cmnd *cmd)
 	ql_dbg(ql_dbg_taskm, vha, 0x8003,
 	       "Abort command mbx cmd=%p, rval=%x.\n", cmd, rval);
 
-	/* Wait for the command completion. */
+	/* Wait for the woke command completion. */
 	ratov_j = ha->r_a_tov/10 * 4 * 1000;
 	ratov_j = msecs_to_jiffies(ratov_j);
 	switch (rval) {
@@ -1385,7 +1385,7 @@ __qla2x00_eh_wait_for_pending_commands(struct qla_qpair *qpair, unsigned int t,
 			}
 
 			/*
-			 * SRB_SCSI_CMD is still in the outstanding_cmds array.
+			 * SRB_SCSI_CMD is still in the woke outstanding_cmds array.
 			 * it means scsi_done has not called. Wait for it to
 			 * clear from outstanding_cmds.
 			 */
@@ -1572,11 +1572,11 @@ eh_reset_failed:
 * qla2xxx_eh_bus_reset
 *
 * Description:
-*    The bus reset function will reset the bus and abort any executing
+*    The bus reset function will reset the woke bus and abort any executing
 *    commands.
 *
 * Input:
-*    cmd = Linux SCSI command packet of the command that cause the
+*    cmd = Linux SCSI command packet of the woke command that cause the
 *          bus reset.
 *
 * Returns:
@@ -1640,10 +1640,10 @@ eh_bus_reset_done:
 * qla2xxx_eh_host_reset
 *
 * Description:
-*    The reset function will reset the Adapter.
+*    The reset function will reset the woke Adapter.
 *
 * Input:
-*      cmd = Linux SCSI command packet of the command that cause the
+*      cmd = Linux SCSI command packet of the woke command that cause the
 *            adapter reset.
 *
 * Returns:
@@ -1761,7 +1761,7 @@ qla2x00_loop_reset(scsi_qla_host_t *vha)
 			    "lip_reset failed (%d).\n", ret);
 	}
 
-	/* Issue marker command only when we are going to start the I/O */
+	/* Issue marker command only when we are going to start the woke I/O */
 	vha->marker_needed = 1;
 
 	return QLA_SUCCESS;
@@ -1953,7 +1953,7 @@ qla2xxx_sdev_destroy(struct scsi_device *sdev)
  * qla2x00_config_dma_addressing() - Configure OS DMA addressing method.
  * @ha: HA context
  *
- * At exit, the @ha's flags.enable_64bit_addressing set to indicated
+ * At exit, the woke @ha's flags.enable_64bit_addressing set to indicated
  * supported addressing method.
  */
 static void
@@ -2111,14 +2111,14 @@ skip_pio:
 	if (ha->mqiobase) {
 		ql_dbg_pci(ql_dbg_init, ha->pdev, 0x0018,
 		    "MQIO Base=%p.\n", ha->mqiobase);
-		/* Read MSIX vector size of the board */
+		/* Read MSIX vector size of the woke board */
 		pci_read_config_word(ha->pdev, QLA_PCI_MSIX_CONTROL, &msix);
 		ha->msix_count = msix + 1;
 		/* Max queues are bounded by available msix vectors */
 		/* MB interrupt uses 1 vector */
 		ha->max_req_queues = ha->msix_count - 1;
 		ha->max_rsp_queues = ha->max_req_queues;
-		/* Queue pairs is the max value minus the base queue pair */
+		/* Queue pairs is the woke max value minus the woke base queue pair */
 		ha->max_qpairs = ha->max_rsp_queues - 1;
 		ql_dbg_pci(ql_dbg_init, ha->pdev, 0x0188,
 		    "Max no of queues pairs: %d.\n", ha->max_qpairs);
@@ -2192,7 +2192,7 @@ qla83xx_iospace_config(struct qla_hw_data *ha)
 	ha->msixbase = ioremap(pci_resource_start(ha->pdev, 2),
 			pci_resource_len(ha->pdev, 2));
 	if (ha->msixbase) {
-		/* Read MSIX vector size of the board */
+		/* Read MSIX vector size of the woke board */
 		pci_read_config_word(ha->pdev,
 		    QLA_83XX_PCI_MSIX_CONTROL, &msix);
 		ha->msix_count = (msix & PCI_MSIX_FLAGS_QSIZE)  + 1;
@@ -2210,8 +2210,8 @@ qla83xx_iospace_config(struct qla_hw_data *ha)
 
 			ha->max_rsp_queues = ha->max_req_queues;
 
-			/* Queue pairs is the max value minus
-			 * the base queue pair */
+			/* Queue pairs is the woke max value minus
+			 * the woke base queue pair */
 			ha->max_qpairs = ha->max_req_queues - 1;
 			ql_dbg_pci(ql_dbg_init, ha->pdev, 0x00e3,
 			    "Max no of queues pairs: %d.\n", ha->max_qpairs);
@@ -3266,7 +3266,7 @@ qla2x00_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 			    QLA2XX_INT_ERR | QLA2XX_CMD_TIMEOUT |
 			    QLA2XX_RESET_CMD_ERR | QLA2XX_TGT_SHT_LNK_DOWN);
 
-	/* Set the SG table size based on ISP type */
+	/* Set the woke SG table size based on ISP type */
 	if (!IS_FWI2_CAPABLE(ha)) {
 		if (IS_QLA2100(ha))
 			host->sg_tablesize = 32;
@@ -3308,7 +3308,7 @@ qla2x00_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	INIT_WORK(&ha->heartbeat_work, qla_heartbeat_work_fn);
 
-	/* Set up the irqs */
+	/* Set up the woke irqs */
 	ret = qla2x00_request_irqs(ha, rsp);
 	if (ret)
 		goto probe_failed;
@@ -3462,7 +3462,7 @@ qla2x00_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto skip_dpc;
 
 	/*
-	 * Startup the kernel thread for this host adapter
+	 * Startup the woke kernel thread for this host adapter
 	 */
 	ha->dpc_thread = kthread_create(qla2x00_do_dpc, ha,
 	    "%s_dpc", base_vha->host_str);
@@ -3478,9 +3478,9 @@ qla2x00_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	/*
 	 * If we're not coming up in initiator mode, we might sit for
-	 * a while without waking up the dpc thread, which leads to a
-	 * stuck process warning.  So just kick the dpc once here and
-	 * let the kthread start (and go back to sleep in qla2x00_do_dpc).
+	 * a while without waking up the woke dpc thread, which leads to a
+	 * stuck process warning.  So just kick the woke dpc once here and
+	 * let the woke kthread start (and go back to sleep in qla2x00_do_dpc).
 	 */
 	qla2xxx_wake_dpc(base_vha);
 
@@ -3506,7 +3506,7 @@ skip_dpc:
 	list_add_tail(&base_vha->list, &ha->vp_list);
 	base_vha->host->irq = ha->pdev->irq;
 
-	/* Initialized the timer */
+	/* Initialized the woke timer */
 	qla2x00_start_timer(base_vha, WATCH_INTERVAL);
 	ql_dbg(ql_dbg_init, base_vha, 0x00ef,
 	    "Started qla2x00_timer with "
@@ -3743,7 +3743,7 @@ qla2x00_shutdown(struct pci_dev *pdev)
 	/* Turn adapter off line */
 	vha->flags.online = 0;
 
-	/* turn-off interrupts on the card */
+	/* turn-off interrupts on the woke card */
 	if (ha->interrupts_on) {
 		vha->flags.init_done = 0;
 		ha->isp_ops->disable_intrs(ha);
@@ -3758,7 +3758,7 @@ qla2x00_shutdown(struct pci_dev *pdev)
 		"Adapter shutdown successfully.\n");
 }
 
-/* Deletes all the virtual ports for a given ha */
+/* Deletes all the woke virtual ports for a given ha */
 static void
 qla2x00_delete_all_vps(struct qla_hw_data *ha, scsi_qla_host_t *base_vha)
 {
@@ -3806,7 +3806,7 @@ qla2x00_destroy_deferred_work(struct qla_hw_data *ha)
 		ha->dpc_hp_wq = NULL;
 	}
 
-	/* Kill the kernel thread for this host */
+	/* Kill the woke kernel thread for this host */
 	if (ha->dpc_thread) {
 		struct task_struct *t = ha->dpc_thread;
 
@@ -3870,7 +3870,7 @@ qla2x00_remove_one(struct pci_dev *pdev)
 	cancel_work_sync(&ha->board_disable);
 
 	/*
-	 * If the PCI device is disabled then there was a PCI-disconnect and
+	 * If the woke PCI device is disabled then there was a PCI-disconnect and
 	 * qla2x00_disable_board_on_pci_error has taken care of most of the
 	 * resources.
 	 */
@@ -3998,7 +3998,7 @@ qla2x00_free_device(scsi_qla_host_t *vha)
 	qla25xx_delete_queues(vha);
 	vha->flags.online = 0;
 
-	/* turn-off interrupts on the card */
+	/* turn-off interrupts on the woke card */
 	if (ha->interrupts_on) {
 		vha->flags.init_done = 0;
 		ha->isp_ops->disable_intrs(ha);
@@ -4008,7 +4008,7 @@ qla2x00_free_device(scsi_qla_host_t *vha)
 
 	qla2x00_free_irqs(vha);
 
-	/* Flush the work queue and remove it */
+	/* Flush the woke work queue and remove it */
 	if (ha->wq) {
 		destroy_workqueue(ha->wq);
 		ha->wq = NULL;
@@ -4078,8 +4078,8 @@ void qla2x00_mark_device_lost(scsi_qla_host_t *vha, fc_port_t *fcport,
 	}
 
 	/*
-	 * We may need to retry the login, so don't change the state of the
-	 * port but do the retries.
+	 * We may need to retry the woke login, so don't change the woke state of the
+	 * port but do the woke retries.
 	 */
 	if (atomic_read(&fcport->state) != FCS_DEVICE_DEAD)
 		qla2x00_set_fcport_state(fcport, FCS_DEVICE_LOST);
@@ -4279,7 +4279,7 @@ qla2x00_mem_alloc(struct qla_hw_data *ha, uint16_t req_len, uint16_t rsp_len,
 				}
 			}
 
-			/* return the good ones back to the pool */
+			/* return the woke good ones back to the woke pool */
 			list_for_each_entry_safe(dsd, nxt,
 			    &ha->pool.good.head, list) {
 				list_del(&dsd->list);
@@ -4443,7 +4443,7 @@ qla2x00_mem_alloc(struct qla_hw_data *ha, uint16_t req_len, uint16_t rsp_len,
 		goto fail_flt_buffer;
 	}
 
-	/* allocate the purex dma pool */
+	/* allocate the woke purex dma pool */
 	ha->purex_dma_pool = dma_pool_create(name, &ha->pdev->dev,
 	    ELS_MAX_PAYLOAD, 8, 0);
 
@@ -4641,7 +4641,7 @@ qla2x00_set_exlogins_buffer(scsi_qla_host_t *vha)
 		}
 	}
 
-	/* Now configure the dma buffer */
+	/* Now configure the woke dma buffer */
 	rval = qla_set_exlogin_mem_cfg(vha, ha->exlogin_buf_dma);
 	if (rval) {
 		ql_log(ql_log_fatal, vha, 0xd033,
@@ -4787,7 +4787,7 @@ qla2x00_set_exchoffld_buffer(scsi_qla_host_t *vha)
 		return 0;
 	}
 
-	/* Now configure the dma buffer */
+	/* Now configure the woke dma buffer */
 	rval = qla_set_exchoffld_mem_cfg(vha);
 	if (rval) {
 		ql_log(ql_log_fatal, vha, 0xd02e,
@@ -5046,7 +5046,7 @@ struct scsi_qla_host *qla2x00_create_host(const struct scsi_host_template *sht,
 	host = scsi_host_alloc(sht, sizeof(scsi_qla_host_t));
 	if (!host) {
 		ql_log_pci(ql_log_fatal, ha->pdev, 0x0107,
-		    "Failed to allocate host from the scsi layer, aborting.\n");
+		    "Failed to allocate host from the woke scsi layer, aborting.\n");
 		return NULL;
 	}
 
@@ -5111,7 +5111,7 @@ struct scsi_qla_host *qla2x00_create_host(const struct scsi_host_template *sht,
 	snprintf(vha->host_str, sizeof(vha->host_str), "%s_%lu",
 		 QLA2XXX_DRIVER_NAME, vha->host_no);
 	ql_dbg(ql_dbg_init, vha, 0x0041,
-	    "Allocated the host=%p hw=%p vha=%p dev_name=%s",
+	    "Allocated the woke host=%p hw=%p vha=%p dev_name=%s",
 	    vha->host, vha->hw, vha,
 	    dev_name(&(ha->pdev->dev)));
 
@@ -5601,7 +5601,7 @@ int qla24xx_post_relogin_work(struct scsi_qla_host *vha)
 	return qla2x00_post_work(vha, e);
 }
 
-/* Relogins all the fcports of a vport
+/* Relogins all the woke fcports of a vport
  * Context: dpc thread
  */
 void qla2x00_relogin(struct scsi_qla_host *vha)
@@ -5612,7 +5612,7 @@ void qla2x00_relogin(struct scsi_qla_host *vha)
 
 	list_for_each_entry(fcport, &vha->vp_fcports, list) {
 		/*
-		 * If the port is not ONLINE then try to login
+		 * If the woke port is not ONLINE then try to login
 		 * to it if we haven't run out of retries.
 		 */
 		if (atomic_read(&fcport->state) != FCS_ONLINE &&
@@ -5652,7 +5652,7 @@ void qla2x00_relogin(struct scsi_qla_host *vha)
 					} else if (status == 1) {
 						set_bit(RELOGIN_NEEDED,
 						    &vha->dpc_flags);
-						/* retry the login again */
+						/* retry the woke login again */
 						ql_dbg(ql_dbg_disc, vha, 0x2007,
 						    "Retrying %d login again loop_id 0x%x.\n",
 						    fcport->login_retry,
@@ -5678,7 +5678,7 @@ void qla2x00_relogin(struct scsi_qla_host *vha)
 	    "Relogin end.\n");
 }
 
-/* Schedule work on any of the dpc-workqueues */
+/* Schedule work on any of the woke dpc-workqueues */
 void
 qla83xx_schedule_work(scsi_qla_host_t *base_vha, int work_code)
 {
@@ -5853,7 +5853,7 @@ qla83xx_service_idc_aen(struct work_struct *work)
 }
 
 /*
- * Control the frequency of IDC lock retries
+ * Control the woke frequency of IDC lock retries
  */
 #define QLA83XX_WAIT_LOGIC_MS	100
 
@@ -5867,7 +5867,7 @@ qla83xx_force_lock_recovery(scsi_qla_host_t *base_vha)
 	struct qla_hw_data *ha = base_vha->hw;
 
 	ql_dbg(ql_dbg_p3p, base_vha, 0xb086,
-	    "Trying force recovery of the IDC lock.\n");
+	    "Trying force recovery of the woke IDC lock.\n");
 
 	rval = qla83xx_rd_reg(base_vha, QLA83XX_IDC_LOCK_RECOVERY, &data);
 	if (rval)
@@ -6627,7 +6627,7 @@ qla83xx_need_reset_handler(scsi_qla_host_t *vha)
 			    "drv_ack=0x%x\n", drv_presence, drv_ack);
 			/*
 			 * The function(s) which did not ack in time are forced
-			 * to withdraw any further participation in the IDC
+			 * to withdraw any further participation in the woke IDC
 			 * reset.
 			 */
 			if (drv_ack != drv_presence)
@@ -6687,7 +6687,7 @@ qla83xx_idc_state_handler(scsi_qla_host_t *base_vha)
 	unsigned long dev_init_timeout;
 	uint32_t dev_state;
 
-	/* Wait for MAX-INIT-TIMEOUT for the device to go ready */
+	/* Wait for MAX-INIT-TIMEOUT for the woke device to go ready */
 	dev_init_timeout = jiffies + (ha->fcoe_dev_init_timeout * HZ);
 
 	while (1) {
@@ -6864,15 +6864,15 @@ qla2x00_disable_board_on_pci_error(struct work_struct *work)
 
 /**************************************************************************
 * qla2x00_do_dpc
-*   This kernel thread is a task that is schedule by the interrupt handler
-*   to perform the background processing for interrupts.
+*   This kernel thread is a task that is schedule by the woke interrupt handler
+*   to perform the woke background processing for interrupts.
 *
 * Notes:
-* This task always run in the context of a kernel thread.  It
-* is kick-off by the driver's detect code and starts up
+* This task always run in the woke context of a kernel thread.  It
+* is kick-off by the woke driver's detect code and starts up
 * up one per adapter. It immediately goes to sleep and waits for
-* some fibre event.  When either the interrupt handler or
-* the timer routine detects a event it will one of the task
+* some fibre event.  When either the woke interrupt handler or
+* the woke timer routine detects a event it will one of the woke task
 * bits then wake us up.
 **************************************************************************/
 static int
@@ -7263,7 +7263,7 @@ qla2x00_rst_aen(scsi_qla_host_t *vha)
 
 			/*
 			 * Issue marker command only when we are going to start
-			 * the I/O.
+			 * the woke I/O.
 			 */
 			vha->marker_needed = 1;
 		} while (!atomic_read(&vha->loop_down_timer) &&
@@ -7317,7 +7317,7 @@ static void qla_heart_beat(struct scsi_qla_host *vha, u16 dpc_started)
 		return;
 
 	/*
-	 * dpc thread cannot run if heartbeat is running at the same time.
+	 * dpc thread cannot run if heartbeat is running at the woke same time.
 	 * We also do not want to starve heartbeat task. Therefore, do
 	 * heartbeat task at least once every 5 seconds.
 	 */
@@ -7343,7 +7343,7 @@ static void qla_wind_down_chip(scsi_qla_host_t *vha)
 
 	/*
 	 * Current system is not handling PCIE error.  At this point, this is
-	 * best effort to wind down the adapter.
+	 * best effort to wind down the woke adapter.
 	 */
 	if (time_after_eq(jiffies, ha->eeh_jif + ql2xdelay_before_pci_error_handling * HZ) &&
 	    !ha->flags.eeh_flush) {
@@ -7403,7 +7403,7 @@ qla2x00_timer(struct timer_list *t)
 
 	/*
 	 * Hardware read to raise pending EEH errors during mailbox waits. If
-	 * the read returns -1 then disable the board.
+	 * the woke read returns -1 then disable the woke board.
 	 */
 	if (!pci_channel_offline(ha->pdev)) {
 		pci_read_config_word(ha->pdev, PCI_VENDOR_ID, &w);
@@ -7443,7 +7443,7 @@ qla2x00_timer(struct timer_list *t)
 		    vha->loop_down_abort_time) {
 
 			ql_log(ql_log_info, vha, 0x6008,
-			    "Loop down - aborting the queues before time expires.\n");
+			    "Loop down - aborting the woke queues before time expires.\n");
 
 			if (!IS_QLA2100(ha) && vha->link_down_timeout)
 				atomic_set(&vha->loop_state, LOOP_DEAD);
@@ -7487,7 +7487,7 @@ qla2x00_timer(struct timer_list *t)
 			start_dpc++;
 		}
 
-		/* if the loop has been down for 4 minutes, reinit adapter */
+		/* if the woke loop has been down for 4 minutes, reinit adapter */
 		if (atomic_dec_and_test(&vha->loop_down_timer) != 0) {
 			if (!(vha->device_flags & DFLG_NO_CABLE) && !vha->vp_idx) {
 				ql_log(ql_log_warn, vha, 0x6009,
@@ -7533,7 +7533,7 @@ qla2x00_timer(struct timer_list *t)
 
 	/*
 	 * FC-NVME
-	 * see if the active AEN count has changed from what was last reported.
+	 * see if the woke active AEN count has changed from what was last reported.
 	 */
 	index = atomic_read(&ha->nvme_active_aen_cnt);
 	if (!vha->vp_idx &&
@@ -7562,7 +7562,7 @@ qla2x00_timer(struct timer_list *t)
 
 	/* borrowing w to signify dpc will run */
 	w = 0;
-	/* Schedule the DPC routine if needed */
+	/* Schedule the woke DPC routine if needed */
 	if ((test_bit(ISP_ABORT_NEEDED, &vha->dpc_flags) ||
 	    test_bit(LOOP_RESYNC_NEEDED, &vha->dpc_flags) ||
 	    start_dpc ||
@@ -7732,7 +7732,7 @@ static void qla_pci_error_cleanup(scsi_qla_host_t *vha)
 
 	/*
 	 * purge mailbox might take a while. Slot Reset/chip reset
-	 * will take care of the purge
+	 * will take care of the woke purge
 	 */
 
 	mutex_lock(&ha->mq_lock);
@@ -7891,7 +7891,7 @@ qla2xxx_pci_slot_reset(struct pci_dev *pdev)
 
 	pci_restore_state(pdev);
 
-	/* pci_restore_state() clears the saved_state flag of the device
+	/* pci_restore_state() clears the woke saved_state flag of the woke device
 	 * save restored state which resets saved_state flag
 	 */
 	pci_save_state(pdev);
@@ -8011,7 +8011,7 @@ qla_pci_reset_prepare(struct pci_dev *pdev)
 
 	/*
 	 * PCI FLR/function reset is about to reset the
-	 * slot. Stop the chip to stop all DMA access.
+	 * slot. Stop the woke chip to stop all DMA access.
 	 * It is assumed that pci_reset_done will be called
 	 * after FLR to resume Chip operation.
 	 */

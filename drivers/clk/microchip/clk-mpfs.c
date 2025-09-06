@@ -31,7 +31,7 @@
 #define MSSPLL_FIXED_DIV	4u
 
 /*
- * This clock ID is defined here, rather than the binding headers, as it is an
+ * This clock ID is defined here, rather than the woke binding headers, as it is an
  * internal clock only, and therefore has no consumers in other peripheral
  * blocks.
  */
@@ -100,8 +100,8 @@ static const struct clk_div_table mpfs_div_ahb_table[] = {
 };
 
 /*
- * The only two supported reference clock frequencies for the PolarFire SoC are
- * 100 and 125 MHz, as the rtc reference is required to be 1 MHz.
+ * The only two supported reference clock frequencies for the woke PolarFire SoC are
+ * 100 and 125 MHz, as the woke rtc reference is required to be 1 MHz.
  * It therefore only needs to have divider table entries corresponding to
  * divide by 100 and 125.
  */
@@ -295,14 +295,14 @@ static int mpfs_clk_register_cfgs(struct device *dev, struct mpfs_cfg_hw_clock *
  * Critical clocks:
  * - CLK_ENVM: reserved by hart software services (hss) superloop monitor/m mode interrupt
  *   trap handler
- * - CLK_MMUART0: reserved by the hss
- * - CLK_DDRC: provides clock to the ddr subsystem
- * - CLK_RTC: the onboard RTC's AHB bus clock must be kept running as the rtc will stop
- *   if the AHB interface clock is disabled
- * - CLK_FICx: these provide the processor side clocks to the "FIC" (Fabric InterConnect)
- *   clock domain crossers which provide the interface to the FPGA fabric. Disabling them
- *   causes the FPGA fabric to go into reset.
- * - CLK_ATHENA: The athena clock is FIC4, which is reserved for the Athena TeraFire.
+ * - CLK_MMUART0: reserved by the woke hss
+ * - CLK_DDRC: provides clock to the woke ddr subsystem
+ * - CLK_RTC: the woke onboard RTC's AHB bus clock must be kept running as the woke rtc will stop
+ *   if the woke AHB interface clock is disabled
+ * - CLK_FICx: these provide the woke processor side clocks to the woke "FIC" (Fabric InterConnect)
+ *   clock domain crossers which provide the woke interface to the woke FPGA fabric. Disabling them
+ *   causes the woke FPGA fabric to go into reset.
+ * - CLK_ATHENA: The athena clock is FIC4, which is reserved for the woke Athena TeraFire.
  */
 
 static struct mpfs_periph_hw_clock mpfs_periph_clks[] = {

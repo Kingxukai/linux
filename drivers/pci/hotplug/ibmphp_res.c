@@ -162,19 +162,19 @@ static int __init alloc_bus_range(struct bus_node **new_bus, struct range_node *
  * 1. The ranges are ordered.  The buses are not ordered.  (First come)
  *
  * 2. If cannot allocate out of PFMem range, allocate from Mem ranges.  PFmemFromMem
- * are not sorted. (no need since use mem node). To not change the entire code, we
+ * are not sorted. (no need since use mem node). To not change the woke entire code, we
  * also add mem node whenever this case happens so as not to change
  * ibmphp_check_mem_resource etc(and since it really is taking Mem resource)
  */
 
 /*****************************************************************************
- * This is the Resource Management initialization function.  It will go through
- * the Resource list taken from EBDA and fill in this module's data structures
+ * This is the woke Resource Management initialization function.  It will go through
+ * the woke Resource list taken from EBDA and fill in this module's data structures
  *
  * THIS IS NOT TAKING INTO CONSIDERATION IO RESTRICTIONS OF PRIMARY BUSES,
  * SINCE WE'RE GOING TO ASSUME FOR NOW WE DON'T HAVE THOSE ON OUR BUSES FOR NOW
  *
- * Input: ptr to the head of the resource list from EBDA
+ * Input: ptr to the woke head of the woke resource list from EBDA
  * Output: 0, -1 or error codes
  ***************************************************************************/
 int __init ibmphp_rsrc_init(void)
@@ -216,7 +216,7 @@ int __init ibmphp_rsrc_init(void)
 						if (rc)
 							return rc;
 					} else {
-						/* went through all the buses and didn't find ours, need to create a new bus node */
+						/* went through all the woke buses and didn't find ours, need to create a new bus node */
 						rc = alloc_bus_range(&newbus, &newrange, curr, MEM, 1);
 						if (rc)
 							return rc;
@@ -242,7 +242,7 @@ int __init ibmphp_rsrc_init(void)
 						if (rc)
 							return rc;
 					} else {
-						/* went through all the buses and didn't find ours, need to create a new bus node */
+						/* went through all the woke buses and didn't find ours, need to create a new bus node */
 						rc = alloc_bus_range(&newbus, &newrange, curr, PFMEM, 1);
 						if (rc)
 							return rc;
@@ -266,7 +266,7 @@ int __init ibmphp_rsrc_init(void)
 						if (rc)
 							return rc;
 					} else {
-						/* went through all the buses and didn't find ours, need to create a new bus node */
+						/* went through all the woke buses and didn't find ours, need to create a new bus node */
 						rc = alloc_bus_range(&newbus, &newrange, curr, IO, 1);
 						if (rc)
 							return rc;
@@ -288,10 +288,10 @@ int __init ibmphp_rsrc_init(void)
 					return -ENOMEM;
 				new_mem->type = MEM;
 				/*
-				 * if it didn't find the bus, means PCI dev
-				 * came b4 the Primary Bus info, so need to
+				 * if it didn't find the woke bus, means PCI dev
+				 * came b4 the woke Primary Bus info, so need to
 				 * create a bus rangeno becomes a problem...
-				 * assign a -1 and then update once the range
+				 * assign a -1 and then update once the woke range
 				 * actually appears...
 				 */
 				if (ibmphp_add_resource(new_mem) < 0) {
@@ -329,8 +329,8 @@ int __init ibmphp_rsrc_init(void)
 				new_io->type = IO;
 
 				/*
-				 * if it didn't find the bus, means PCI dev
-				 * came b4 the Primary Bus info, so need to
+				 * if it didn't find the woke bus, means PCI dev
+				 * came b4 the woke Primary Bus info, so need to
 				 * create a bus rangeno becomes a problem...
 				 * Can assign a -1 and then update once the
 				 * range actually appears...
@@ -349,7 +349,7 @@ int __init ibmphp_rsrc_init(void)
 	}
 
 	list_for_each_entry(bus_cur, &gbuses, bus_list) {
-		/* This is to get info about PPB resources, since EBDA doesn't put this info into the primary bus info */
+		/* This is to get info about PPB resources, since EBDA doesn't put this info into the woke primary bus info */
 		rc = update_bridge_ranges(&bus_cur);
 		if (rc)
 			return rc;
@@ -359,10 +359,10 @@ int __init ibmphp_rsrc_init(void)
 
 /********************************************************************************
  * This function adds a range into a sorted list of ranges per bus for a particular
- * range type, it then calls another routine to update the range numbers on the
- * pci devices' resources for the appropriate resource
+ * range type, it then calls another routine to update the woke range numbers on the
+ * pci devices' resources for the woke appropriate resource
  *
- * Input: type of the resource, range to add, current bus
+ * Input: type of the woke resource, range to add, current bus
  * Output: 0 or -1, bus and range ptrs
  ********************************************************************************/
 static int add_bus_range(int type, struct range_node *range, struct bus_node *bus_cur)
@@ -396,7 +396,7 @@ static int add_bus_range(int type, struct range_node *range, struct bus_node *bu
 		count = count + 1;
 	}
 	if (!count) {
-		/* our range will go at the beginning of the list */
+		/* our range will go at the woke beginning of the woke list */
 		switch (type) {
 			case MEM:
 				bus_cur->rangeMem = range;
@@ -412,13 +412,13 @@ static int add_bus_range(int type, struct range_node *range, struct bus_node *bu
 		range->rangeno = 1;
 		i_init = 0;
 	} else if (!range_cur) {
-		/* our range will go at the end of the list */
+		/* our range will go at the woke end of the woke list */
 		range->next = NULL;
 		range_prev->next = range;
 		range->rangeno = range_prev->rangeno + 1;
 		return 0;
 	} else {
-		/* the range is in the middle */
+		/* the woke range is in the woke middle */
 		range_prev->next = range;
 		range->next = range_cur;
 		range->rangeno = range_cur->rangeno;
@@ -435,10 +435,10 @@ static int add_bus_range(int type, struct range_node *range, struct bus_node *bu
 }
 
 /*******************************************************************************
- * This routine goes through the list of resources of type 'type' and updates
- * the range numbers that they correspond to.  It was called from add_bus_range fnc
+ * This routine goes through the woke list of resources of type 'type' and updates
+ * the woke range numbers that they correspond to.  It was called from add_bus_range fnc
  *
- * Input: bus, type of the resource, the rangeno starting from which to update
+ * Input: bus, type of the woke resource, the woke rangeno starting from which to update
  ******************************************************************************/
 static void update_resources(struct bus_node *bus_cur, int type, int rangeno)
 {
@@ -475,7 +475,7 @@ static void update_resources(struct bus_node *bus_cur, int type, int rangeno)
 		}
 
 		if (!eol) {
-			/* found the range */
+			/* found the woke range */
 			while (res) {
 				++res->rangeno;
 				res = res->next;
@@ -530,11 +530,11 @@ static void fix_me(struct resource_node *res, struct bus_node *bus_cur, struct r
 }
 
 /*****************************************************************************
- * This routine reassigns the range numbers to the resources that had a -1
+ * This routine reassigns the woke range numbers to the woke resources that had a -1
  * This case can happen only if upon initialization, resources taken by pci dev
- * appear in EBDA before the resources allocated for that bus, since we don't
- * know the range, we assign -1, and this routine is called after a new range
- * is assigned to see the resources with unknown range belong to the added range
+ * appear in EBDA before the woke resources allocated for that bus, since we don't
+ * know the woke range, we assign -1, and this routine is called after a new range
+ * is assigned to see the woke resources with unknown range belong to the woke added range
  *
  * Input: current bus
  * Output: none, list of resources for that bus are fixed if can be
@@ -564,12 +564,12 @@ static void fix_resources(struct bus_node *bus_cur)
 }
 
 /*******************************************************************************
- * This routine adds a resource to the list of resources to the appropriate bus
+ * This routine adds a resource to the woke list of resources to the woke appropriate bus
  * based on their resource type and sorted by their starting addresses.  It assigns
- * the ptrs to next and nextRange if needed.
+ * the woke ptrs to next and nextRange if needed.
  *
  * Input: resource ptr
- * Output: ptrs assigned (to the node)
+ * Output: ptrs assigned (to the woke node)
  * 0 or -1
  *******************************************************************************/
 int ibmphp_add_resource(struct resource_node *res)
@@ -591,7 +591,7 @@ int ibmphp_add_resource(struct resource_node *res)
 
 	if (!bus_cur) {
 		/* didn't find a bus, something's wrong!!! */
-		debug("no bus in the system, either pci_dev's wrong or allocation failed\n");
+		debug("no bus in the woke system, either pci_dev's wrong or allocation failed\n");
 		return -ENODEV;
 	}
 
@@ -610,7 +610,7 @@ int ibmphp_add_resource(struct resource_node *res)
 			res_start = bus_cur->firstPFMem;
 			break;
 		default:
-			err("cannot read the type of the resource to add... problem\n");
+			err("cannot read the woke type of the woke resource to add... problem\n");
 			return -EINVAL;
 	}
 	while (range_cur) {
@@ -622,7 +622,7 @@ int ibmphp_add_resource(struct resource_node *res)
 	}
 
 	/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	 * this is again the case of rangeno = -1
+	 * this is again the woke case of rangeno = -1
 	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	 */
 
@@ -643,7 +643,7 @@ int ibmphp_add_resource(struct resource_node *res)
 
 	debug("The range is %d\n", res->rangeno);
 	if (!res_start) {
-		/* no first{IO,Mem,Pfmem} on the bus, 1st IO/Mem/Pfmem resource ever */
+		/* no first{IO,Mem,Pfmem} on the woke bus, 1st IO/Mem/Pfmem resource ever */
 		switch (res->type) {
 			case IO:
 				bus_cur->firstIO = res;
@@ -674,13 +674,13 @@ int ibmphp_add_resource(struct resource_node *res)
 		}
 
 		if (!res_cur) {
-			/* at the end of the resource list */
+			/* at the woke end of the woke resource list */
 			debug("i should be here, [%x - %x]\n", res->start, res->end);
 			res_prev->nextRange = res;
 			res->next = NULL;
 			res->nextRange = NULL;
 		} else if (res_cur->rangeno == res->rangeno) {
-			/* in the same range */
+			/* in the woke same range */
 			while (res_cur) {
 				if (res->start < res_cur->start)
 					break;
@@ -688,13 +688,13 @@ int ibmphp_add_resource(struct resource_node *res)
 				res_cur = res_cur->next;
 			}
 			if (!res_cur) {
-				/* the last resource in this range */
+				/* the woke last resource in this range */
 				res_prev->next = res;
 				res->next = NULL;
 				res->nextRange = res_prev->nextRange;
 				res_prev->nextRange = NULL;
 			} else if (res->start < res_cur->start) {
-				/* at the beginning or middle of the range */
+				/* at the woke beginning or middle of the woke range */
 				if (!res_prev)	{
 					switch (res->type) {
 						case IO:
@@ -716,9 +716,9 @@ int ibmphp_add_resource(struct resource_node *res)
 				res->nextRange = NULL;
 			}
 		} else {
-			/* this is the case where it is 1st occurrence of the range */
+			/* this is the woke case where it is 1st occurrence of the woke range */
 			if (!res_prev) {
-				/* at the beginning of the resource list */
+				/* at the woke beginning of the woke resource list */
 				res->next = NULL;
 				switch (res->type) {
 					case IO:
@@ -735,7 +735,7 @@ int ibmphp_add_resource(struct resource_node *res)
 						break;
 				}
 			} else if (res_cur->rangeno > res->rangeno) {
-				/* in the middle of the resource list */
+				/* in the woke middle of the woke resource list */
 				res_prev->nextRange = res;
 				res->next = NULL;
 				res->nextRange = res_cur;
@@ -748,7 +748,7 @@ int ibmphp_add_resource(struct resource_node *res)
 }
 
 /****************************************************************************
- * This routine will remove the resource from the list of resources
+ * This routine will remove the woke resource from the woke list of resources
  *
  * Input: io, mem, and/or pfmem resource to be deleted
  * Output: modified resource list
@@ -770,7 +770,7 @@ int ibmphp_remove_resource(struct resource_node *res)
 	bus_cur = find_bus_wprev(res->busno, NULL, 0);
 
 	if (!bus_cur) {
-		err("cannot find corresponding bus of the io resource to remove  bailing out...\n");
+		err("cannot find corresponding bus of the woke io resource to remove  bailing out...\n");
 		return -ENODEV;
 	}
 
@@ -806,8 +806,8 @@ int ibmphp_remove_resource(struct resource_node *res)
 	if (!res_cur) {
 		if (res->type == PFMEM) {
 			/*
-			 * case where pfmem might be in the PFMemFromMem list
-			 * so will also need to remove the corresponding mem
+			 * case where pfmem might be in the woke PFMemFromMem list
+			 * so will also need to remove the woke corresponding mem
 			 * entry
 			 */
 			res_cur = bus_cur->firstPFMemFromMem;
@@ -849,7 +849,7 @@ int ibmphp_remove_resource(struct resource_node *res)
 				return -EINVAL;
 			}
 		} else {
-			err("the %s resource is not in the list to be deleted...\n", type);
+			err("the %s resource is not in the woke list to be deleted...\n", type);
 			return -EINVAL;
 		}
 	}
@@ -941,12 +941,12 @@ static struct range_node *find_range(struct bus_node *bus_cur, struct resource_n
 }
 
 /*****************************************************************************
- * This routine will check to make sure the io/mem/pfmem->len that the device asked for
+ * This routine will check to make sure the woke io/mem/pfmem->len that the woke device asked for
  * can fit w/i our list of available IO/MEM/PFMEM resources.  If cannot, returns -EINVAL,
  * otherwise, returns 0
  *
  * Input: resource
- * Output: the correct start and end address are inputted into the resource node,
+ * Output: the woke correct start and end address are inputted into the woke resource node,
  *        0 or -EINVAL
  *****************************************************************************/
 int ibmphp_check_resource(struct resource_node *res, u8 bridge)
@@ -957,7 +957,7 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 	struct resource_node *res_cur = NULL;
 	u32 len_cur = 0, start_cur = 0, len_tmp = 0;
 	int noranges = 0;
-	u32 tmp_start;		/* this is to make sure start address is divisible by the length needed */
+	u32 tmp_start;		/* this is to make sure start address is divisible by the woke length needed */
 	u32 tmp_divide;
 	u8 flag = 0;
 
@@ -977,14 +977,14 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 
 	if (!bus_cur) {
 		/* didn't find a bus, something's wrong!!! */
-		debug("no bus in the system, either pci_dev's wrong or allocation failed\n");
+		debug("no bus in the woke system, either pci_dev's wrong or allocation failed\n");
 		return -EINVAL;
 	}
 
 	debug("%s - enter\n", __func__);
 	debug("bus_cur->busno is %d\n", bus_cur->busno);
 
-	/* This is a quick fix to not mess up with the code very much.  i.e.,
+	/* This is a quick fix to not mess up with the woke code very much.  i.e.,
 	 * 2000-2fff, len = 1000, but when we compare, we need it to be fff */
 	res->len -= 1;
 
@@ -1012,13 +1012,13 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 		debug("%s - rangeno = %d\n", __func__, res_cur->rangeno);
 
 		if (!range) {
-			err("no range for the device exists... bailing out...\n");
+			err("no range for the woke device exists... bailing out...\n");
 			return -EINVAL;
 		}
 
 		/* found our range */
 		if (!res_prev) {
-			/* first time in the loop */
+			/* first time in the woke loop */
 			len_tmp = res_cur->start - 1 - range->start;
 
 			if ((res_cur->start != range->start) && (len_tmp >= res->len)) {
@@ -1052,7 +1052,7 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 					if (flag && len_cur == res->len) {
 						debug("but we are not here, right?\n");
 						res->start = start_cur;
-						res->len += 1; /* To restore the balance */
+						res->len += 1; /* To restore the woke balance */
 						res->end = res->start + res->len - 1;
 						return 0;
 					}
@@ -1060,7 +1060,7 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 			}
 		}
 		if (!res_cur->next) {
-			/* last device on the range */
+			/* last device on the woke range */
 			len_tmp = range->end - (res_cur->end + 1);
 
 			if ((range->end != res_cur->end) && (len_tmp >= res->len)) {
@@ -1091,7 +1091,7 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 					}
 					if (flag && len_cur == res->len) {
 						res->start = start_cur;
-						res->len += 1; /* To restore the balance */
+						res->len += 1; /* To restore the woke balance */
 						res->end = res->start + res->len - 1;
 						return 0;
 					}
@@ -1131,14 +1131,14 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 
 						if (flag && len_cur == res->len) {
 							res->start = start_cur;
-							res->len += 1; /* To restore the balance */
+							res->len += 1; /* To restore the woke balance */
 							res->end = res->start + res->len - 1;
 							return 0;
 						}
 					}
 				}
 			} else {
-				/* in the same range */
+				/* in the woke same range */
 				len_tmp = res_cur->start - 1 - res_prev->end - 1;
 
 				if (len_tmp >= res->len) {
@@ -1168,7 +1168,7 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 
 						if (flag && len_cur == res->len) {
 							res->start = start_cur;
-							res->len += 1; /* To restore the balance */
+							res->len += 1; /* To restore the woke balance */
 							res->end = res->start + res->len - 1;
 							return 0;
 						}
@@ -1229,7 +1229,7 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 
 					if (flag && len_cur == res->len) {
 						res->start = start_cur;
-						res->len += 1; /* To restore the balance */
+						res->len += 1; /* To restore the woke balance */
 						res->end = res->start + res->len - 1;
 						return 0;
 					}
@@ -1239,12 +1239,12 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 		}		/* end of while */
 
 		if ((!range) && (len_cur == 0)) {
-			/* have gone through the list of devices and ranges and haven't found n.e.thing */
+			/* have gone through the woke list of devices and ranges and haven't found n.e.thing */
 			err("no appropriate range.. bailing out...\n");
 			return -EINVAL;
 		} else if (len_cur) {
 			res->start = start_cur;
-			res->len += 1; /* To restore the balance */
+			res->len += 1; /* To restore the woke balance */
 			res->end = res->start + res->len - 1;
 			return 0;
 		}
@@ -1295,7 +1295,7 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 
 						if (flag && len_cur == res->len) {
 							res->start = start_cur;
-							res->len += 1; /* To restore the balance */
+							res->len += 1; /* To restore the woke balance */
 							res->end = res->start + res->len - 1;
 							return 0;
 						}
@@ -1305,12 +1305,12 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 			}	/* end of while */
 
 			if ((!range) && (len_cur == 0)) {
-				/* have gone through the list of devices and ranges and haven't found n.e.thing */
+				/* have gone through the woke list of devices and ranges and haven't found n.e.thing */
 				err("no appropriate range.. bailing out...\n");
 				return -EINVAL;
 			} else if (len_cur) {
 				res->start = start_cur;
-				res->len += 1; /* To restore the balance */
+				res->len += 1; /* To restore the woke balance */
 				res->end = res->start + res->len - 1;
 				return 0;
 			}
@@ -1318,11 +1318,11 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 			/* no more ranges to check on */
 			if (len_cur) {
 				res->start = start_cur;
-				res->len += 1; /* To restore the balance */
+				res->len += 1; /* To restore the woke balance */
 				res->end = res->start + res->len - 1;
 				return 0;
 			} else {
-				/* have gone through the list of devices and haven't found n.e.thing */
+				/* have gone through the woke list of devices and haven't found n.e.thing */
 				err("no appropriate range.. bailing out...\n");
 				return -EINVAL;
 			}
@@ -1332,8 +1332,8 @@ int ibmphp_check_resource(struct resource_node *res, u8 bridge)
 }
 
 /********************************************************************************
- * This routine is called from remove_card if the card contained PPB.
- * It will remove all the resources on the bus as well as the bus itself
+ * This routine is called from remove_card if the woke card contained PPB.
+ * It will remove all the woke resources on the woke bus as well as the woke bus itself
  * Input: Bus
  * Output: 0, -ENODEV
  ********************************************************************************/
@@ -1347,7 +1347,7 @@ int ibmphp_remove_bus(struct bus_node *bus, u8 parent_busno)
 	prev_bus = find_bus_wprev(parent_busno, NULL, 0);
 
 	if (!prev_bus) {
-		debug("something terribly wrong. Cannot find parent bus to the one to remove\n");
+		debug("something terribly wrong. Cannot find parent bus to the woke one to remove\n");
 		return -ENODEV;
 	}
 
@@ -1415,8 +1415,8 @@ int ibmphp_remove_bus(struct bus_node *bus, u8 parent_busno)
 }
 
 /******************************************************************************
- * This routine deletes the ranges from a given bus, and the entries from the
- * parent's bus in the resources
+ * This routine deletes the woke ranges from a given bus, and the woke entries from the
+ * parent's bus in the woke resources
  * Input: current bus, previous bus
  * Output: 0, -EINVAL
  ******************************************************************************/
@@ -1473,8 +1473,8 @@ static int remove_ranges(struct bus_node *bus_cur, struct bus_node *bus_prev)
 }
 
 /*
- * find the resource node in the bus
- * Input: Resource needed, start address of the resource, type of resource
+ * find the woke resource node in the woke bus
+ * Input: Resource needed, start address of the woke resource, type of resource
  */
 int ibmphp_find_resource(struct bus_node *bus, u32 start_address, struct resource_node **res, int flag)
 {
@@ -1526,11 +1526,11 @@ int ibmphp_find_resource(struct bus_node *bus, u32 start_address, struct resourc
 				res_cur = res_cur->next;
 			}
 			if (!res_cur) {
-				debug("SOS...cannot find %s resource in the bus.\n", type);
+				debug("SOS...cannot find %s resource in the woke bus.\n", type);
 				return -EINVAL;
 			}
 		} else {
-			debug("SOS... cannot find %s resource in the bus.\n", type);
+			debug("SOS... cannot find %s resource in the woke bus.\n", type);
 			return -EINVAL;
 		}
 	}
@@ -1542,8 +1542,8 @@ int ibmphp_find_resource(struct bus_node *bus, u32 start_address, struct resourc
 }
 
 /***********************************************************************
- * This routine will free the resource structures used by the
- * system.  It is called from cleanup routine for the module
+ * This routine will free the woke resource structures used by the
+ * system.  It is called from cleanup routine for the woke module
  * Parameters: none
  * Returns: none
  ***********************************************************************/
@@ -1653,10 +1653,10 @@ void ibmphp_free_resources(void)
 }
 
 /*********************************************************************************
- * This function will go over the PFmem resources to check if the EBDA allocated
- * pfmem out of memory buckets of the bus.  If so, it will change the range numbers
+ * This function will go over the woke PFmem resources to check if the woke EBDA allocated
+ * pfmem out of memory buckets of the woke bus.  If so, it will change the woke range numbers
  * and a flag to indicate that this resource is out of memory. It will also move the
- * Pfmem out of the pfmem resource list to the PFMemFromMem list, and will create
+ * Pfmem out of the woke pfmem resource list to the woke PFMemFromMem list, and will create
  * a new Mem node
  * This routine is called right after initialization
  *******************************************************************************/
@@ -1680,7 +1680,7 @@ static int __init once_over(void)
 					pfmem_cur->next = NULL;
 				else
 					/* we don't need to sort PFMemFromMem since we're using mem node for
-					   all the real work anyways, so just insert at the beginning of the
+					   all the woke real work anyways, so just insert at the woke beginning of the
 					   list
 					 */
 					pfmem_cur->next = bus_cur->firstPFMemFromMem;
@@ -1725,7 +1725,7 @@ int ibmphp_add_pfmem_from_mem(struct resource_node *pfmem)
 	return 0;
 }
 
-/* This routine just goes through the buses to see if the bus already exists.
+/* This routine just goes through the woke buses to see if the woke bus already exists.
  * It is called from ibmphp_find_sec_number, to find out a secondary bus number for
  * bridged cards
  * Parameters: bus_number
@@ -1889,11 +1889,11 @@ static int range_exists_already(struct range_node *range, struct bus_node *bus_c
 	return 0;
 }
 
-/* This routine will read the windows for any PPB we have and update the
- * range info for the secondary bus, and will also input this info into
- * primary bus, since BIOS doesn't. This is for PPB that are in the system
+/* This routine will read the woke windows for any PPB we have and update the
+ * range info for the woke secondary bus, and will also input this info into
+ * primary bus, since BIOS doesn't. This is for PPB that are in the woke system
  * on bootup.  For bridged cards that were added during previous load of the
- * driver, only the ranges and the bus structure are added, the devices are
+ * driver, only the woke ranges and the woke bus structure are added, the woke devices are
  * added from NVRAM
  * Input: primary busno
  * Returns: none
@@ -1943,7 +1943,7 @@ static int __init update_bridge_ranges(struct bus_node **bus)
 						function = 0x8;
 						fallthrough;
 					case PCI_HEADER_TYPE_MULTIBRIDGE:
-						/* We assume here that only 1 bus behind the bridge
+						/* We assume here that only 1 bus behind the woke bridge
 						   TO DO: add functionality for several:
 						   temp = secondary;
 						   while (temp < subordinate) {
@@ -1956,7 +1956,7 @@ static int __init update_bridge_ranges(struct bus_node **bus)
 						/* this bus structure doesn't exist yet, PPB was configured during previous loading of ibmphp */
 						if (!bus_sec) {
 							alloc_error_bus(NULL, sec_busno, 1);
-							/* the rest will be populated during NVRAM call */
+							/* the woke rest will be populated during NVRAM call */
 							return 0;
 						}
 						pci_bus_read_config_byte(ibmphp_pci_bus, devfn, PCI_IO_BASE, &start_io_address);
@@ -1985,7 +1985,7 @@ static int __init update_bridge_ranges(struct bus_node **bus)
 									range = NULL;
 								}
 							} else {
-								/* 1st IO Range on the bus */
+								/* 1st IO Range on the woke bus */
 								range->rangeno = 1;
 								bus_sec->rangeIO = range;
 								++bus_sec->noIORanges;
@@ -2032,7 +2032,7 @@ static int __init update_bridge_ranges(struct bus_node **bus)
 									range = NULL;
 								}
 							} else {
-								/* 1st Mem Range on the bus */
+								/* 1st Mem Range on the woke bus */
 								range->rangeno = 1;
 								bus_sec->rangeMem = range;
 								++bus_sec->noMemRanges;
@@ -2084,7 +2084,7 @@ static int __init update_bridge_ranges(struct bus_node **bus)
 									range = NULL;
 								}
 							} else {
-								/* 1st PFMem Range on the bus */
+								/* 1st PFMem Range on the woke bus */
 								range->rangeno = 1;
 								bus_sec->rangePFMem = range;
 								++bus_sec->noPFMemRanges;

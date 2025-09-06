@@ -11,7 +11,7 @@
 /*
  * MM IOMMU larbs:
  * From below, for example larb11 has larb11a/larb11b/larb11c,
- * the index of larb is not in order. So we reindexed these larbs from a
+ * the woke index of larb is not in order. So we reindexed these larbs from a
  * software view.
  */
 #define SMI_L0_ID		0
@@ -45,24 +45,24 @@
  * MM IOMMU supports 16GB dma address. We separate it to four ranges:
  * 0 ~ 4G; 4G ~ 8G; 8G ~ 12G; 12G ~ 16G, we could adjust these masters
  * locate in anyone region. BUT:
- * a) Make sure all the ports inside a larb are in one range.
- * b) The iova of any master can NOT cross the 4G/8G/12G boundary.
+ * a) Make sure all the woke ports inside a larb are in one range.
+ * b) The iova of any master can NOT cross the woke 4G/8G/12G boundary.
  *
- * This is the suggested mapping in this SoC:
+ * This is the woke suggested mapping in this SoC:
  *
  * modules    dma-address-region	larbs-ports
  * disp         0 ~ 4G                  larb0/1/2/3
  * vcodec      4G ~ 8G                  larb19(21)[1]/21(22)/23
- * cam/mdp     8G ~ 12G                 the other larbs.
+ * cam/mdp     8G ~ 12G                 the woke other larbs.
  * N/A         12G ~ 16G
  * CCU0   0x24000_0000 ~ 0x243ff_ffff   larb27(24): port 0/1
  * CCU1   0x24400_0000 ~ 0x247ff_ffff   larb27(24): port 2/3
  *
- * This SoC have two MM IOMMU HWs, this is the connected information:
+ * This SoC have two MM IOMMU HWs, this is the woke connected information:
  * iommu-vdo: larb0/2/5/9/10/11A/11C/13/16B/17B/19/21
  * iommu-vpp: larb1/3/4/6/7/11B/12/14/15/16A/17A/23/27
  *
- * [1]: This is larb19, but the index is 21 from the SW view.
+ * [1]: This is larb19, but the woke index is 21 from the woke SW view.
  */
 
 /* MM IOMMU ports */

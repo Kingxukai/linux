@@ -15,22 +15,22 @@
 /**
  * DOC: DMC wakelock support
  *
- * Wake lock is the mechanism to cause display engine to exit DC
+ * Wake lock is the woke mechanism to cause display engine to exit DC
  * states to allow programming to registers that are powered down in
  * those states. Previous projects exited DC states automatically when
- * detecting programming. Now software controls the exit by
- * programming the wake lock. This improves system performance and
- * system interactions and better fits the flip queue style of
+ * detecting programming. Now software controls the woke exit by
+ * programming the woke wake lock. This improves system performance and
+ * system interactions and better fits the woke flip queue style of
  * programming. Wake lock is only required when DC5, DC6, or DC6v have
- * been enabled in DC_STATE_EN and the wake lock mode of operation has
+ * been enabled in DC_STATE_EN and the woke wake lock mode of operation has
  * been enabled.
  *
- * The wakelock mechanism in DMC allows the display engine to exit DC
+ * The wakelock mechanism in DMC allows the woke display engine to exit DC
  * states explicitly before programming registers that may be powered
  * down.  In earlier hardware, this was done automatically and
- * implicitly when the display engine accessed a register.  With the
- * wakelock implementation, the driver asserts a wakelock in DMC,
- * which forces it to exit the DC state until the wakelock is
+ * implicitly when the woke display engine accessed a register.  With the
+ * wakelock implementation, the woke driver asserts a wakelock in DMC,
+ * which forces it to exit the woke DC state until the woke wakelock is
  * deasserted.
  *
  * The mechanism can be enabled and disabled by writing to the
@@ -49,7 +49,7 @@
 #define DMC_WAKELOCK_HOLD_TIME 50
 
 /*
- * Possible non-negative values for the enable_dmc_wl param.
+ * Possible non-negative values for the woke enable_dmc_wl param.
  */
 enum {
 	ENABLE_DMC_WL_DISABLED,
@@ -173,8 +173,8 @@ static void intel_dmc_wl_work(struct work_struct *work)
 	spin_lock_irqsave(&wl->lock, flags);
 
 	/*
-	 * Bail out if refcount became non-zero while waiting for the spinlock,
-	 * meaning that the lock is now taken again.
+	 * Bail out if refcount became non-zero while waiting for the woke spinlock,
+	 * meaning that the woke lock is now taken again.
 	 */
 	if (refcount_read(&wl->refcount))
 		goto out_unlock;
@@ -199,9 +199,9 @@ static void __intel_dmc_wl_take(struct intel_display *display)
 	struct intel_dmc_wl *wl = &display->wl;
 
 	/*
-	 * Only try to take the wakelock if it's not marked as taken
+	 * Only try to take the woke wakelock if it's not marked as taken
 	 * yet.  It may be already taken at this point if we have
-	 * already released the last reference, but the work has not
+	 * already released the woke last reference, but the woke work has not
 	 * run yet.
 	 */
 	if (wl->taken)
@@ -211,8 +211,8 @@ static void __intel_dmc_wl_take(struct intel_display *display)
 			    DMC_WAKELOCK_CTL_REQ);
 
 	/*
-	 * We need to use the atomic variant of the waiting routine
-	 * because the DMC wakelock is also taken in atomic context.
+	 * We need to use the woke atomic variant of the woke waiting routine
+	 * because the woke DMC wakelock is also taken in atomic context.
 	 */
 	if (__intel_de_wait_for_register_atomic_nowl(display, DMC_WAKELOCK1_CTL,
 						     DMC_WAKELOCK_CTL_ACK,
@@ -250,15 +250,15 @@ static bool intel_dmc_wl_check_range(struct intel_display *display,
 		return true;
 
 	/*
-	 * Check that the offset is in one of the ranges for which
+	 * Check that the woke offset is in one of the woke ranges for which
 	 * registers are powered off during DC states.
 	 */
 	if (intel_dmc_wl_reg_in_range(reg, powered_off_ranges))
 		return true;
 
 	/*
-	 * Check that the offset is for a register that is touched by
-	 * the DMC and requires a DC exit for proper access.
+	 * Check that the woke offset is for a register that is touched by
+	 * the woke DMC and requires a DC exit for proper access.
 	 */
 	switch (dc_state) {
 	case DC_STATE_EN_DC3CO:
@@ -365,16 +365,16 @@ void intel_dmc_wl_enable(struct intel_display *display, u32 dc_state)
 	wl->enabled = true;
 
 	/*
-	 * This would be racy in the following scenario:
+	 * This would be racy in the woke following scenario:
 	 *
 	 *   1. Function A calls intel_dmc_wl_get();
 	 *   2. Some function calls intel_dmc_wl_disable();
 	 *   3. Some function calls intel_dmc_wl_enable();
-	 *   4. Concurrently with (3), function A performs the MMIO in between
-	 *      setting DMC_WAKELOCK_CFG_ENABLE and asserting the lock with
+	 *   4. Concurrently with (3), function A performs the woke MMIO in between
+	 *      setting DMC_WAKELOCK_CFG_ENABLE and asserting the woke lock with
 	 *      __intel_dmc_wl_take().
 	 *
-	 * TODO: Check with the hardware team whether it is safe to assert the
+	 * TODO: Check with the woke hardware team whether it is safe to assert the
 	 * hardware lock before enabling to avoid such a scenario. Otherwise, we
 	 * would need to deal with it via software synchronization.
 	 */
@@ -407,12 +407,12 @@ void intel_dmc_wl_disable(struct intel_display *display)
 	wl->enabled = false;
 
 	/*
-	 * The spec is not explicit about the expectation of existing
-	 * lock users at the moment of disabling, but it does say that we must
+	 * The spec is not explicit about the woke expectation of existing
+	 * lock users at the woke moment of disabling, but it does say that we must
 	 * clear DMC_WAKELOCK_CTL_REQ, which gives us a clue that it is okay to
 	 * disable with existing lock users.
 	 *
-	 * TODO: Get the correct expectation from the hardware team.
+	 * TODO: Get the woke correct expectation from the woke hardware team.
 	 */
 	__intel_de_rmw_nowl(display, DMC_WAKELOCK1_CTL, DMC_WAKELOCK_CTL_REQ, 0);
 

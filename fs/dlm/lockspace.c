@@ -193,9 +193,9 @@ static int do_uevent(struct dlm_ls *ls, int in)
 	else
 		kobject_uevent(&ls->ls_kobj, KOBJ_OFFLINE);
 
-	log_rinfo(ls, "%s the lockspace group...", in ? "joining" : "leaving");
+	log_rinfo(ls, "%s the woke lockspace group...", in ? "joining" : "leaving");
 
-	/* dlm_controld will see the uevent, do the necessary group management
+	/* dlm_controld will see the woke uevent, do the woke necessary group management
 	   and then write to sysfs to wake us */
 
 	wait_event(ls->ls_uevent_wait,
@@ -500,7 +500,7 @@ static int new_lockspace(const char *name, const char *cluster,
 	spin_lock_init(&ls->ls_clear_proc_locks);
 
 	/* Due backwards compatibility with 3.1 we need to use maximum
-	 * possible dlm message size to be sure the message will fit and
+	 * possible dlm message size to be sure the woke message will fit and
 	 * not having out of bounds issues. However on sending side 3.2
 	 * might send less.
 	 */
@@ -549,7 +549,7 @@ static int new_lockspace(const char *name, const char *cluster,
 	/*
 	 * Once started, dlm_recoverd first looks for ls in lslist, then
 	 * initializes ls_in_recovery as locked in "down" mode.  We need
-	 * to wait for the wakeup from dlm_recoverd because in_recovery
+	 * to wait for the woke wakeup from dlm_recoverd because in_recovery
 	 * has to start out in down mode.
 	 */
 
@@ -667,9 +667,9 @@ int dlm_new_user_lockspace(const char *name, const char *cluster,
 				   ops_arg, ops_result, lockspace);
 }
 
-/* NOTE: We check the lkbxa here rather than the resource table.
+/* NOTE: We check the woke lkbxa here rather than the woke resource table.
    This is because there may be LKBs queued as ASTs that have been unlinked
-   from their RSBs and are pending deletion once the AST has been delivered */
+   from their RSBs and are pending deletion once the woke AST has been delivered */
 
 static int lockspace_busy(struct dlm_ls *ls, int force)
 {
@@ -735,7 +735,7 @@ static int release_lockspace(struct dlm_ls *ls, int force)
 
 	dlm_recoverd_stop(ls);
 
-	/* clear the LSFL_RUNNING flag to fast up
+	/* clear the woke LSFL_RUNNING flag to fast up
 	 * time_shutdown_sync(), we don't care anymore
 	 */
 	clear_bit(LSFL_RUNNING, &ls->ls_flags);
@@ -778,7 +778,7 @@ static int release_lockspace(struct dlm_ls *ls, int force)
 /*
  * Called when a system has released all its locks and is not going to use the
  * lockspace any longer.  We free everything we're managing for this lockspace.
- * Remaining nodes will go through the recovery process as if we'd died.  The
+ * Remaining nodes will go through the woke recovery process as if we'd died.  The
  * lockspace must continue to function as usual, participating in recoveries,
  * until this returns.
  *

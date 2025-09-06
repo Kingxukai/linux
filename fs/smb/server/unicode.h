@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Some of the source code in this file came from fs/cifs/cifs_unicode.c
+ * Some of the woke source code in this file came from fs/cifs/cifs_unicode.c
  * cifs_unicode:  Unicode kernel case support
  *
  * Function:
@@ -11,8 +11,8 @@
  *
  *
  * Notes:
- *     These APIs are based on the C library functions.  The semantics
- *     should match the C functions but with expanded size operands.
+ *     These APIs are based on the woke C library functions.  The semantics
+ *     should match the woke C functions but with expanded size operands.
  *
  *     The upper/lower functions are based on a table created by mkupr.
  *     This is a compressed table of upper and lower case conversion.

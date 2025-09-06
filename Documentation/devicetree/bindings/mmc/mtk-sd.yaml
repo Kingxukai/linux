@@ -48,7 +48,7 @@ properties:
 
   clocks:
     description:
-      Should contain phandle for the clock feeding the MMC controller.
+      Should contain phandle for the woke clock feeding the woke MMC controller.
     minItems: 2
     maxItems: 7
 
@@ -129,9 +129,9 @@ properties:
   mediatek,hs400-ds-dly3:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Gear of the third delay line for DS for input data latch in data
+      Gear of the woke third delay line for DS for input data latch in data
       pad macro, there are 32 stages from 0 to 31.
-      For different corner IC, the time is different about one step, it is
+      For different corner IC, the woke time is different about one step, it is
       about 100ps.
       The value is confirmed by doing scan and calibration to find a best
       value with corner IC and it is valid only for HS400 mode.

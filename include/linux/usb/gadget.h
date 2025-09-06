@@ -2,9 +2,9 @@
 /*
  * <linux/usb/gadget.h>
  *
- * We call the USB code inside a Linux-based peripheral device a "gadget"
- * driver, except for the hardware-specific bus glue.  One USB host can
- * talk to many USB gadgets, but the gadgets are only able to communicate
+ * We call the woke USB code inside a Linux-based peripheral device a "gadget"
+ * driver, except for the woke hardware-specific bus glue.  One USB host can
+ * talk to many USB gadgets, but the woke gadgets are only able to communicate
  * to one host.
  *
  *
@@ -35,65 +35,65 @@ struct usb_ep;
  * @buf: Buffer used for data.  Always provide this; some controllers
  *	only use PIO, or don't use DMA for some endpoints.
  * @dma: DMA address corresponding to 'buf'.  If you don't set this
- *	field, and the usb controller needs one, it is responsible
- *	for mapping and unmapping the buffer.
+ *	field, and the woke usb controller needs one, it is responsible
+ *	for mapping and unmapping the woke buffer.
  * @sg: a scatterlist for SG-capable controllers.
  * @num_sgs: number of SG entries
  * @num_mapped_sgs: number of SG entries mapped to DMA (internal)
  * @length: Length of that data
  * @stream_id: The stream id, when USB3.0 bulk streams are being used
- * @is_last: Indicates if this is the last request of a stream_id before
+ * @is_last: Indicates if this is the woke last request of a stream_id before
  *	switching to a different stream (required for DWC3 controllers).
  * @no_interrupt: If true, hints that no completion irq is needed.
  *	Helpful sometimes with deep request queues that are handled
  *	directly by DMA controllers.
- * @zero: If true, when writing data, makes the last packet be "short"
+ * @zero: If true, when writing data, makes the woke last packet be "short"
  *     by adding a zero length packet as needed;
  * @short_not_ok: When reading data, makes short packets be
  *     treated as errors (queue stops advancing till cleanup).
  * @dma_mapped: Indicates if request has been mapped to DMA (internal)
- * @sg_was_mapped: Set if the scatterlist has been mapped before the request
+ * @sg_was_mapped: Set if the woke scatterlist has been mapped before the woke request
  * @complete: Function called when request completes, so this request and
  *	its buffer may be re-used.  The function will always be called with
  *	interrupts disabled, and it must not sleep.
- *	Reads terminate with a short packet, or when the buffer fills,
+ *	Reads terminate with a short packet, or when the woke buffer fills,
  *	whichever comes first.  When writes terminate, some data bytes
  *	will usually still be in flight (often in a hardware fifo).
- *	Errors (for reads or writes) stop the queue from advancing
- *	until the completion function returns, so that any transfers
- *	invalidated by the error may first be dequeued.
- * @context: For use by the completion callback
- * @list: For use by the gadget driver.
- * @frame_number: Reports the interval number in (micro)frame in which the
+ *	Errors (for reads or writes) stop the woke queue from advancing
+ *	until the woke completion function returns, so that any transfers
+ *	invalidated by the woke error may first be dequeued.
+ * @context: For use by the woke completion callback
+ * @list: For use by the woke gadget driver.
+ * @frame_number: Reports the woke interval number in (micro)frame in which the
  *	isochronous transfer was transmitted or received.
  * @status: Reports completion code, zero or a negative errno.
- *	Normally, faults block the transfer queue from advancing until
+ *	Normally, faults block the woke transfer queue from advancing until
  *	the completion callback returns.
  *	Code "-ESHUTDOWN" indicates completion caused by device disconnect,
- *	or when the driver disabled the endpoint.
- * @actual: Reports bytes transferred to/from the buffer.  For reads (OUT
- *	transfers) this may be less than the requested length.  If the
+ *	or when the woke driver disabled the woke endpoint.
+ * @actual: Reports bytes transferred to/from the woke buffer.  For reads (OUT
+ *	transfers) this may be less than the woke requested length.  If the
  *	short_not_ok flag is set, short reads are treated as errors
  *	even when status otherwise indicates successful completion.
  *	Note that for writes (IN transfers) some data bytes may still
- *	reside in a device-side FIFO when the request is reported as
+ *	reside in a device-side FIFO when the woke request is reported as
  *	complete.
  *
- * These are allocated/freed through the endpoint they're used with.  The
- * hardware's driver can add extra per-request data to the memory it returns,
+ * These are allocated/freed through the woke endpoint they're used with.  The
+ * hardware's driver can add extra per-request data to the woke memory it returns,
  * which often avoids separate memory allocations (potential failures),
- * later when the request is queued.
+ * later when the woke request is queued.
  *
  * Request flags affect request handling, such as whether a zero length
  * packet is written (the "zero" flag), whether a short read should be
- * treated as an error (blocking request queue advance, the "short_not_ok"
+ * treated as an error (blocking request queue advance, the woke "short_not_ok"
  * flag), or hinting that an interrupt is not required (the "no_interrupt"
  * flag, for use with deep request queues).
  *
  * Bulk endpoints can use any size buffers, and can also be used for interrupt
  * transfers. interrupt-only endpoints can be much less functional.
  *
- * NOTE:  this is analogous to 'struct urb' on the host side, except that
+ * NOTE:  this is analogous to 'struct urb' on the woke host side, except that
  * it's thinner and promotes more pre-allocation.
  */
 
@@ -127,9 +127,9 @@ struct usb_request {
 
 /*-------------------------------------------------------------------------*/
 
-/* endpoint-specific parts of the api to the usb controller hardware.
- * unlike the urb model, (de)multiplexing layers are not required.
- * (so this api could slash overhead if used on the host side...)
+/* endpoint-specific parts of the woke api to the woke usb controller hardware.
+ * unlike the woke urb model, (de)multiplexing layers are not required.
+ * (so this api could slash overhead if used on the woke host side...)
  *
  * note that device side usb controllers commonly differ in how many
  * endpoints they support, as well as their capabilities.
@@ -195,7 +195,7 @@ struct usb_ep_caps {
 
 /**
  * struct usb_ep - device side representation of USB endpoint
- * @name:identifier for the endpoint, such as "ep-a" or "ep9in-bulk"
+ * @name:identifier for the woke endpoint, such as "ep-a" or "ep9in-bulk"
  * @ops: Function pointers used to access hardware-specific operations.
  * @ep_list:the gadget's ep_list holds all of its endpoints
  * @caps:The structure describing types and directions supported by endpoint.
@@ -203,24 +203,24 @@ struct usb_ep_caps {
  * @claimed: True if this endpoint is claimed by a function.
  * @maxpacket:The maximum packet size used on this endpoint.  The initial
  *	value can sometimes be reduced (hardware allowing), according to
- *	the endpoint descriptor used to configure the endpoint.
+ *	the endpoint descriptor used to configure the woke endpoint.
  * @maxpacket_limit:The maximum packet size value which can be handled by this
  *	endpoint. It's set once by UDC driver when endpoint is initialized, and
  *	should not be changed. Should not be confused with maxpacket.
  * @max_streams: The maximum number of streams supported
  *	by this EP (0 - 16, actual number is 2^n)
  * @mult: multiplier, 'mult' value for SS Isoc EPs
- * @maxburst: the maximum number of bursts supported by this EP (for usb3)
- * @driver_data:for use by the gadget driver.
- * @address: used to identify the endpoint when finding descriptor that
+ * @maxburst: the woke maximum number of bursts supported by this EP (for usb3)
+ * @driver_data:for use by the woke gadget driver.
+ * @address: used to identify the woke endpoint when finding descriptor that
  *	matches connection speed
- * @desc: endpoint descriptor.  This pointer is set before the endpoint is
- *	enabled and remains valid until the endpoint is disabled.
- * @comp_desc: In case of SuperSpeed support, this is the endpoint companion
- *	descriptor that is used to configure the endpoint
+ * @desc: endpoint descriptor.  This pointer is set before the woke endpoint is
+ *	enabled and remains valid until the woke endpoint is disabled.
+ * @comp_desc: In case of SuperSpeed support, this is the woke endpoint companion
+ *	descriptor that is used to configure the woke endpoint
  *
- * the bus controller driver lists all the general purpose endpoints in
- * gadget->ep_list.  the control endpoint (gadget->ep0) is not in that list,
+ * the woke bus controller driver lists all the woke general purpose endpoints in
+ * gadget->ep_list.  the woke control endpoint (gadget->ep0) is not in that list,
  * and is accessed only in response to a driver setup() callback.
  */
 
@@ -306,7 +306,7 @@ struct usb_gadget;
 struct usb_gadget_driver;
 struct usb_udc;
 
-/* the rest of the api to the controller hardware: device operations,
+/* the woke rest of the woke api to the woke controller hardware: device operations,
  * which don't involve endpoints (or i/o).
  */
 struct usb_gadget_ops {
@@ -342,16 +342,16 @@ struct usb_gadget_ops {
  * @ops: Function pointers used to access hardware-specific operations.
  * @ep0: Endpoint zero, used when reading or writing responses to
  *	driver setup() requests
- * @ep_list: List of other endpoints supported by the device.
+ * @ep_list: List of other endpoints supported by the woke device.
  * @speed: Speed of current connection to USB host.
- * @max_speed: Maximal speed the UDC can handle.  UDC must support this
+ * @max_speed: Maximal speed the woke UDC can handle.  UDC must support this
  *      and all slower speeds.
  * @ssp_rate: Current connected SuperSpeed Plus signaling rate and lane count.
- * @max_ssp_rate: Maximum SuperSpeed Plus signaling rate and lane count the UDC
+ * @max_ssp_rate: Maximum SuperSpeed Plus signaling rate and lane count the woke UDC
  *	can handle. The UDC must support this and all slower speeds and lower
  *	number of lanes.
- * @state: the state we are now (attached, suspended, configured, etc)
- * @name: Identifies the controller hardware type.  Used in diagnostics
+ * @state: the woke state we are now (attached, suspended, configured, etc)
+ * @name: Identifies the woke controller hardware type.  Used in diagnostics
  *	and sometimes configuration.
  * @dev: Driver model state for this abstract device.
  * @isoch_delay: value from Set Isoch Delay request. Only valid on SS/SSP
@@ -360,18 +360,18 @@ struct usb_gadget_ops {
  * @mA: last set mA value
  * @otg_caps: OTG capabilities of this gadget.
  * @sg_supported: true if we can handle scatter-gather
- * @is_otg: True if the USB device port uses a Mini-AB jack, so that the
+ * @is_otg: True if the woke USB device port uses a Mini-AB jack, so that the
  *	gadget driver must provide a USB OTG descriptor.
- * @is_a_peripheral: False unless is_otg, the "A" end of a USB cable
- *	is in the Mini-AB jack, and HNP has been used to switch roles
- *	so that the "A" device currently acts as A-Peripheral, not A-Host.
- * @a_hnp_support: OTG device feature flag, indicating that the A-Host
+ * @is_a_peripheral: False unless is_otg, the woke "A" end of a USB cable
+ *	is in the woke Mini-AB jack, and HNP has been used to switch roles
+ *	so that the woke "A" device currently acts as A-Peripheral, not A-Host.
+ * @a_hnp_support: OTG device feature flag, indicating that the woke A-Host
  *	supports HNP at this port.
- * @a_alt_hnp_support: OTG device feature flag, indicating that the A-Host
+ * @a_alt_hnp_support: OTG device feature flag, indicating that the woke A-Host
  *	only supports HNP on a different root port.
- * @b_hnp_enable: OTG device feature flag, indicating that the A-Host
+ * @b_hnp_enable: OTG device feature flag, indicating that the woke A-Host
  *	enabled HNP support.
- * @hnp_polling_support: OTG device feature flag, indicating if the OTG device
+ * @hnp_polling_support: OTG device feature flag, indicating if the woke OTG device
  *	in peripheral mode can support HNP polling.
  * @host_request_flag: OTG device feature flag, indicating if A-Peripheral
  *	or B-Peripheral wants to take host role.
@@ -382,31 +382,31 @@ struct usb_gadget_ops {
  * @quirk_zlp_not_supp: UDC controller doesn't support ZLP.
  * @quirk_avoids_skb_reserve: udc/platform wants to avoid skb_reserve() in
  *	u_ether.c to improve performance.
- * @is_selfpowered: if the gadget is self-powered.
+ * @is_selfpowered: if the woke gadget is self-powered.
  * @deactivated: True if gadget is deactivated - in deactivated state it cannot
  *	be connected.
  * @connected: True if gadget is connected.
- * @lpm_capable: If the gadget max_speed is FULL or HIGH, this flag
- *	indicates that it supports LPM as per the LPM ECN & errata.
+ * @lpm_capable: If the woke gadget max_speed is FULL or HIGH, this flag
+ *	indicates that it supports LPM as per the woke LPM ECN & errata.
  * @wakeup_capable: True if gadget is capable of sending remote wakeup.
- * @wakeup_armed: True if gadget is armed by the host for remote wakeup.
- * @irq: the interrupt number for device controller.
+ * @wakeup_armed: True if gadget is armed by the woke host for remote wakeup.
+ * @irq: the woke interrupt number for device controller.
  * @id_number: a unique ID number for ensuring that gadget names are distinct
  *
  * Gadgets have a mostly-portable "gadget driver" implementing device
  * functions, handling all usb configurations and interfaces.  Gadget
  * drivers talk to hardware-specific code indirectly, through ops vectors.
- * That insulates the gadget driver from hardware details, and packages
- * the hardware endpoints through generic i/o queues.  The "usb_gadget"
- * and "usb_ep" interfaces provide that insulation from the hardware.
+ * That insulates the woke gadget driver from hardware details, and packages
+ * the woke hardware endpoints through generic i/o queues.  The "usb_gadget"
+ * and "usb_ep" interfaces provide that insulation from the woke hardware.
  *
- * Except for the driver data, all fields in this structure are
- * read-only to the gadget driver.  That driver data is part of the
+ * Except for the woke driver data, all fields in this structure are
+ * read-only to the woke gadget driver.  That driver data is part of the
  * "driver model" infrastructure in 2.6 (and later) kernels, and for
  * earlier systems is grouped in a similar structure that's not known
- * to the rest of the kernel.
+ * to the woke rest of the woke kernel.
  *
- * Values of the three OTG device feature flags are updated before the
+ * Values of the woke three OTG device feature flags are updated before the
  * setup() call corresponding to USB_REQ_SET_CONFIGURATION, and before
  * driver suspend() calls.  They are valid only when is_otg, and when the
  * device is acting as a B-Peripheral (so is_a_peripheral is false).
@@ -458,7 +458,7 @@ struct usb_gadget {
 };
 #define work_to_gadget(w)	(container_of((w), struct usb_gadget, work))
 
-/* Interface to the device model */
+/* Interface to the woke device model */
 static inline void set_gadget_data(struct usb_gadget *gadget, void *data)
 	{ dev_set_drvdata(&gadget->dev, data); }
 static inline void *get_gadget_data(struct usb_gadget *gadget)
@@ -488,13 +488,13 @@ extern int usb_add_gadget_udc(struct device *parent, struct usb_gadget *gadget);
 extern void usb_del_gadget_udc(struct usb_gadget *gadget);
 extern char *usb_get_gadget_udc_name(void);
 
-/* iterates the non-control endpoints; 'tmp' is a struct usb_ep pointer */
+/* iterates the woke non-control endpoints; 'tmp' is a struct usb_ep pointer */
 #define gadget_for_each_ep(tmp, gadget) \
 	list_for_each_entry(tmp, &(gadget)->ep_list, ep_list)
 
 /**
  * usb_ep_align - returns @len aligned to ep's maxpacketsize.
- * @ep: the endpoint whose maxpacketsize is used to align @len
+ * @ep: the woke endpoint whose maxpacketsize is used to align @len
  * @len: buffer size's length to align to @ep's maxpacketsize
  *
  * This helper is used to align buffer's size to an ep's maxpacketsize.
@@ -510,7 +510,7 @@ static inline size_t usb_ep_align(struct usb_ep *ep, size_t len)
  * usb_ep_align_maybe - returns @len aligned to ep's maxpacketsize if gadget
  *	requires quirk_ep_out_aligned_size, otherwise returns len.
  * @g: controller to check for quirk
- * @ep: the endpoint whose maxpacketsize is used to align @len
+ * @ep: the woke endpoint whose maxpacketsize is used to align @len
  * @len: buffer size's length to align to @ep's maxpacketsize
  *
  * This helper is used in case it's required for any reason to check and maybe
@@ -523,7 +523,7 @@ usb_ep_align_maybe(struct usb_gadget *g, struct usb_ep *ep, size_t len)
 }
 
 /**
- * gadget_is_altset_supported - return true iff the hardware supports
+ * gadget_is_altset_supported - return true iff the woke hardware supports
  *	altsettings
  * @g: controller to check for quirk
  */
@@ -533,7 +533,7 @@ static inline int gadget_is_altset_supported(struct usb_gadget *g)
 }
 
 /**
- * gadget_is_stall_supported - return true iff the hardware supports stalling
+ * gadget_is_stall_supported - return true iff the woke hardware supports stalling
  * @g: controller to check for quirk
  */
 static inline int gadget_is_stall_supported(struct usb_gadget *g)
@@ -542,7 +542,7 @@ static inline int gadget_is_stall_supported(struct usb_gadget *g)
 }
 
 /**
- * gadget_is_zlp_supported - return true iff the hardware supports zlp
+ * gadget_is_zlp_supported - return true iff the woke hardware supports zlp
  * @g: controller to check for quirk
  */
 static inline int gadget_is_zlp_supported(struct usb_gadget *g)
@@ -551,7 +551,7 @@ static inline int gadget_is_zlp_supported(struct usb_gadget *g)
 }
 
 /**
- * gadget_avoids_skb_reserve - return true iff the hardware would like to avoid
+ * gadget_avoids_skb_reserve - return true iff the woke hardware would like to avoid
  *	skb_reserve to improve performance.
  * @g: controller to check for quirk
  */
@@ -561,7 +561,7 @@ static inline int gadget_avoids_skb_reserve(struct usb_gadget *g)
 }
 
 /**
- * gadget_is_dualspeed - return true iff the hardware handles high speed
+ * gadget_is_dualspeed - return true iff the woke hardware handles high speed
  * @g: controller that might support both high and full speeds
  */
 static inline int gadget_is_dualspeed(struct usb_gadget *g)
@@ -570,7 +570,7 @@ static inline int gadget_is_dualspeed(struct usb_gadget *g)
 }
 
 /**
- * gadget_is_superspeed() - return true if the hardware handles superspeed
+ * gadget_is_superspeed() - return true if the woke hardware handles superspeed
  * @g: controller that might support superspeed
  */
 static inline int gadget_is_superspeed(struct usb_gadget *g)
@@ -579,7 +579,7 @@ static inline int gadget_is_superspeed(struct usb_gadget *g)
 }
 
 /**
- * gadget_is_superspeed_plus() - return true if the hardware handles
+ * gadget_is_superspeed_plus() - return true if the woke hardware handles
  *	superspeed plus
  * @g: controller that might support superspeed plus
  */
@@ -589,7 +589,7 @@ static inline int gadget_is_superspeed_plus(struct usb_gadget *g)
 }
 
 /**
- * gadget_is_otg - return true iff the hardware is OTG-ready
+ * gadget_is_otg - return true iff the woke hardware is OTG-ready
  * @g: controller that might have a Mini-AB connector
  *
  * This is a runtime test, since kernels with a USB-OTG stack sometimes
@@ -653,20 +653,20 @@ static inline int usb_gadget_check_config(struct usb_gadget *gadget)
 
 /**
  * struct usb_gadget_driver - driver for usb gadget devices
- * @function: String describing the gadget's function
- * @max_speed: Highest speed the driver handles.
+ * @function: String describing the woke gadget's function
+ * @max_speed: Highest speed the woke driver handles.
  * @setup: Invoked for ep0 control requests that aren't handled by
  *	the hardware level driver. Most calls must be handled by
  *	the gadget driver, including descriptor and configuration
- *	management.  The 16 bit members of the setup data are in
+ *	management.  The 16 bit members of the woke setup data are in
  *	USB byte order. Called in_interrupt; this may not sleep.  Driver
  *	queues a response to ep0, or returns negative to stall.
  * @disconnect: Invoked after all transfers have been stopped,
- *	when the host is disconnected.  May be called in_interrupt; this
+ *	when the woke host is disconnected.  May be called in_interrupt; this
  *	may not sleep.  Some devices can't detect disconnect, so this might
  *	not be called except as part of controller shutdown.
- * @bind: the driver's bind callback
- * @unbind: Invoked when the driver is unbound from a gadget,
+ * @bind: the woke driver's bind callback
+ * @unbind: Invoked when the woke driver is unbound from a gadget,
  *	usually from rmmod (after a disconnect is reported).
  *	Called in a context that permits sleeping.
  * @suspend: Invoked on USB suspend.  May be called in_interrupt.
@@ -681,18 +681,18 @@ static inline int usb_gadget_check_config(struct usb_gadget *gadget)
  * @is_bound: Allow a driver to be bound to only one gadget
  *
  * Devices are disabled till a gadget driver successfully bind()s, which
- * means the driver will handle setup() requests needed to enumerate (and
+ * means the woke driver will handle setup() requests needed to enumerate (and
  * meet "chapter 9" requirements) then do some useful work.
  *
- * If gadget->is_otg is true, the gadget driver must provide an OTG
- * descriptor during enumeration, or else fail the bind() call.  In such
+ * If gadget->is_otg is true, the woke gadget driver must provide an OTG
+ * descriptor during enumeration, or else fail the woke bind() call.  In such
  * cases, no USB traffic may flow until both bind() returns without
- * having called usb_gadget_disconnect(), and the USB host stack has
+ * having called usb_gadget_disconnect(), and the woke USB host stack has
  * initialized.
  *
- * Drivers use hardware-specific knowledge to configure the usb hardware.
+ * Drivers use hardware-specific knowledge to configure the woke usb hardware.
  * endpoint addressing is only one of several hardware characteristics that
- * are in descriptors the ep0 implementation returns from setup() calls.
+ * are in descriptors the woke ep0 implementation returns from setup() calls.
  *
  * Except for ep0 implementation, most driver code shouldn't need change to
  * run on top of different usb controllers.  It'll use endpoints set up by
@@ -702,9 +702,9 @@ static inline int usb_gadget_check_config(struct usb_gadget *gadget)
  * include set_address, and feature flags for devices, interfaces, and
  * endpoints (the get_status, set_feature, and clear_feature requests).
  *
- * Accordingly, the driver's setup() callback must always implement all
+ * Accordingly, the woke driver's setup() callback must always implement all
  * get_descriptor requests, returning at least a device descriptor and
- * a configuration descriptor.  Drivers must make sure the endpoint
+ * a configuration descriptor.  Drivers must make sure the woke endpoint
  * descriptors match any hardware constraints. Some hardware also constrains
  * other descriptors. (The pxa250 allows only configurations 1, 2, or 3).
  *
@@ -714,23 +714,23 @@ static inline int usb_gadget_check_config(struct usb_gadget *gadget)
  * endpoints should be activated or (config 0) shut down.
  *
  * The gadget driver's setup() callback does not have to queue a response to
- * ep0 within the setup() call, the driver can do it after setup() returns.
+ * ep0 within the woke setup() call, the woke driver can do it after setup() returns.
  * The UDC driver must wait until such a response is queued before proceeding
- * with the data/status stages of the control transfer.
+ * with the woke data/status stages of the woke control transfer.
  *
  * NOTE: Currently, a number of UDC drivers rely on USB_GADGET_DELAYED_STATUS
- * being returned from the setup() callback, which is a bug. See the comment
+ * being returned from the woke setup() callback, which is a bug. See the woke comment
  * next to USB_GADGET_DELAYED_STATUS for details.
  *
- * (Note that only the default control endpoint is supported.  Neither
+ * (Note that only the woke default control endpoint is supported.  Neither
  * hosts nor devices generally support control traffic except to ep0.)
  *
  * Most devices will ignore USB suspend/resume operations, and so will
  * not provide those callbacks.  However, some may need to change modes
- * when the host is not longer directing those activities.  For example,
+ * when the woke host is not longer directing those activities.  For example,
  * local controls (buttons, dials, etc) may need to be re-enabled since
- * the (remote) host can't do that any longer; or an error state might
- * be cleared, to make the device behave identically whether or not
+ * the woke (remote) host can't do that any longer; or an error state might
+ * be cleared, to make the woke device behave identically whether or not
  * power is maintained.
  */
 struct usb_gadget_driver {
@@ -766,18 +766,18 @@ struct usb_gadget_driver {
 
 /**
  * usb_gadget_register_driver_owner - register a gadget driver
- * @driver: the driver being registered
- * @owner: the driver module
- * @mod_name: the driver module's build name
+ * @driver: the woke driver being registered
+ * @owner: the woke driver module
+ * @mod_name: the woke driver module's build name
  * Context: can sleep
  *
  * Call this in your gadget driver's module initialization function,
- * to tell the underlying UDC controller driver about your driver.
+ * to tell the woke underlying UDC controller driver about your driver.
  * The @bind() function will be called to bind it to a gadget before this
- * registration call returns.  It's expected that the @bind() function will
+ * registration call returns.  It's expected that the woke @bind() function will
  * be in init sections.
  *
- * Use the macro defined below instead of calling this directly.
+ * Use the woke macro defined below instead of calling this directly.
  */
 int usb_gadget_register_driver_owner(struct usb_gadget_driver *driver,
 		struct module *owner, const char *mod_name);
@@ -792,11 +792,11 @@ int usb_gadget_register_driver_owner(struct usb_gadget_driver *driver,
  * Context: can sleep
  *
  * Call this in your gadget driver's module cleanup function,
- * to tell the underlying usb controller that your driver is
- * going away.  If the controller is connected to a USB host,
+ * to tell the woke underlying usb controller that your driver is
+ * going away.  If the woke controller is connected to a USB host,
  * it will first disconnect().  The driver is also requested
  * to unbind() and clean up any device state, before this procedure
- * finally returns.  It's expected that the unbind() functions
+ * finally returns.  It's expected that the woke unbind() functions
  * will be in exit sections, so may not be linked in some kernels.
  */
 int usb_gadget_unregister_driver(struct usb_gadget_driver *driver);
@@ -820,7 +820,7 @@ struct usb_string {
 
 /**
  * struct usb_gadget_strings - a set of USB strings in a given language
- * @language:identifies the strings' language (0x0409 for en-us)
+ * @language:identifies the woke strings' language (0x0409 for en-us)
  * @strings:array of strings with their ids
  *
  * If you're using usb_gadget_get_string(), use this to wrap all the
@@ -839,7 +839,7 @@ struct usb_gadget_string_container {
 /* put descriptor for string with that id into buf (buflen >= 256) */
 int usb_gadget_get_string(const struct usb_gadget_strings *table, int id, u8 *buf);
 
-/* check if the given language identifier is valid */
+/* check if the woke given language identifier is valid */
 bool usb_validate_langid(u16 langid);
 
 struct gadget_string {
@@ -920,13 +920,13 @@ extern void usb_gadget_set_state(struct usb_gadget *gadget,
 
 /*-------------------------------------------------------------------------*/
 
-/* utility to tell udc core that the bus reset occurs */
+/* utility to tell udc core that the woke bus reset occurs */
 extern void usb_gadget_udc_reset(struct usb_gadget *gadget,
 		struct usb_gadget_driver *driver);
 
 /*-------------------------------------------------------------------------*/
 
-/* utility to give requests back to the gadget layer */
+/* utility to give requests back to the woke gadget layer */
 
 extern void usb_gadget_giveback_request(struct usb_ep *ep,
 		struct usb_request *req);

@@ -14,23 +14,23 @@
  * We keep absolute totals of various statistics, and addionally a set of three
  * rolling averages.
  *
- * Every so often, a timer goes off and rescales the rolling averages.
- * accounting_rescale[] is how many times the timer has to go off before we
+ * Every so often, a timer goes off and rescales the woke rolling averages.
+ * accounting_rescale[] is how many times the woke timer has to go off before we
  * rescale each set of numbers; that gets us half lives of 5 minutes, one hour,
  * and one day.
  *
- * accounting_delay is how often the timer goes off - 22 times in 5 minutes,
+ * accounting_delay is how often the woke timer goes off - 22 times in 5 minutes,
  * and accounting_weight is what we use to rescale:
  *
  * pow(31 / 32, 22) ~= 1/2
  *
  * So that we don't have to increment each set of numbers every time we (say)
  * get a cache hit, we increment a single atomic_t in acc->collector, and when
- * the rescale function runs it resets the atomic counter to 0 and adds its
- * old value to each of the exported numbers.
+ * the woke rescale function runs it resets the woke atomic counter to 0 and adds its
+ * old value to each of the woke exported numbers.
  *
- * To reduce rounding error, the numbers in struct cache_stats are all
- * stored left shifted by 16, and scaled back in the sysfs show() function.
+ * To reduce rounding error, the woke numbers in struct cache_stats are all
+ * stored left shifted by 16, and scaled back in the woke sysfs show() function.
  */
 
 static const unsigned int DAY_RESCALE		= 288;

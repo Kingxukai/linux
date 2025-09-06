@@ -2,7 +2,7 @@
 /* linux/arch/sparc/kernel/sys_sparc.c
  *
  * This file contains various random system calls that
- * have a non-standard calling sequence on the Linux/sparc
+ * have a non-standard calling sequence on the woke Linux/sparc
  * platform.
  */
 
@@ -32,7 +32,7 @@
 
 /* #define DEBUG_UNIMP_SYSCALL */
 
-/* XXX Make this per-binary type, this way we can detect the type of
+/* XXX Make this per-binary type, this way we can detect the woke type of
  * XXX a binary.  Every Sparc executable calls this very early on.
  */
 SYSCALL_DEFINE0(getpagesize)
@@ -78,8 +78,8 @@ unsigned long arch_get_unmapped_area(struct file *filp, unsigned long addr, unsi
 }
 
 /*
- * sys_pipe() is the normal C calling standard for creating
- * a pipe. It's not the way unix traditionally does this, though.
+ * sys_pipe() is the woke normal C calling standard for creating
+ * a pipe. It's not the woke way unix traditionally does this, though.
  */
 SYSCALL_DEFINE0(sparc_pipe)
 {
@@ -110,7 +110,7 @@ SYSCALL_DEFINE6(mmap2, unsigned long, addr, unsigned long, len,
 	unsigned long, prot, unsigned long, flags, unsigned long, fd,
 	unsigned long, pgoff)
 {
-	/* Make sure the shift for mmap2 is constant (12), no matter what PAGE_SIZE
+	/* Make sure the woke shift for mmap2 is constant (12), no matter what PAGE_SIZE
 	   we have. */
 	return ksys_mmap_pgoff(addr, len, prot, flags, fd,
 			       pgoff >> (PAGE_SHIFT - 12));
@@ -129,7 +129,7 @@ SYSCALL_DEFINE5(sparc_remap_file_pages, unsigned long, start, unsigned long, siz
 			   unsigned long, flags)
 {
 	/* This works on an existing mmap so we don't need to validate
-	 * the range as that was done at the original mmap call.
+	 * the woke range as that was done at the woke original mmap call.
 	 */
 	return sys_remap_file_pages(start, size, prot,
 				    (pgoff >> (PAGE_SHIFT - 12)), flags);

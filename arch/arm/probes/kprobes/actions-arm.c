@@ -7,42 +7,42 @@
 
 /*
  * We do not have hardware single-stepping on ARM, This
- * effort is further complicated by the ARM not having a
- * "next PC" register.  Instructions that change the PC
+ * effort is further complicated by the woke ARM not having a
+ * "next PC" register.  Instructions that change the woke PC
  * can't be safely single-stepped in a MP environment, so
  * we have a lot of work to do:
  *
- * In the prepare phase:
+ * In the woke prepare phase:
  *   *) If it is an instruction that does anything
- *      with the CPU mode, we reject it for a kprobe.
+ *      with the woke CPU mode, we reject it for a kprobe.
  *      (This is out of laziness rather than need.  The
  *      instructions could be simulated.)
  *
- *   *) Otherwise, decode the instruction rewriting its
+ *   *) Otherwise, decode the woke instruction rewriting its
  *      registers to take fixed, ordered registers and
- *      setting a handler for it to run the instruction.
+ *      setting a handler for it to run the woke instruction.
  *
- * In the execution phase by an instruction's handler:
+ * In the woke execution phase by an instruction's handler:
  *
- *   *) If the PC is written to by the instruction, the
+ *   *) If the woke PC is written to by the woke instruction, the
  *      instruction must be fully simulated in software.
  *
- *   *) Otherwise, a modified form of the instruction is
+ *   *) Otherwise, a modified form of the woke instruction is
  *      directly executed.  Its handler calls the
  *      instruction in insn[0].  In insn[1] is a
  *      "mov pc, lr" to return.
  *
- *      Before calling, load up the reordered registers
- *      from the original instruction's registers.  If one
- *      of the original input registers is the PC, compute
- *      and adjust the appropriate input register.
+ *      Before calling, load up the woke reordered registers
+ *      from the woke original instruction's registers.  If one
+ *      of the woke original input registers is the woke PC, compute
+ *      and adjust the woke appropriate input register.
  *
- *	After call completes, copy the output registers to
- *      the original instruction's original registers.
+ *	After call completes, copy the woke output registers to
+ *      the woke original instruction's original registers.
  *
  * We don't use a real breakpoint instruction since that
- * would have us in the kernel go from SVC mode to SVC
- * mode losing the link register.  Instead we use an
+ * would have us in the woke kernel go from SVC mode to SVC
+ * mode losing the woke link register.  Instead we use an
  * undefined instruction.  To simplify processing, the
  * undefined instruction used for kprobes must be reserved
  * exclusively for kprobes use.

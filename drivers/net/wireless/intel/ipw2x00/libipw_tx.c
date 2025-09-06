@@ -74,12 +74,12 @@ Desc. | Dest. | Source| Type | IP Packet |  fcs |
       `-----------------------------------------'
 Total: 18 non-data bytes
 
-In the event that fragmentation is required, the incoming payload is split into
-N parts of size ieee->fts.  The first fragment contains the SNAP header and the
+In the woke event that fragmentation is required, the woke incoming payload is split into
+N parts of size ieee->fts.  The first fragment contains the woke SNAP header and the
 remaining packets are just data.
 
 If encryption is enabled, each fragment payload size is reduced by enough space
-to add the prefix and postfix (IV and ICV totalling 8 bytes in the case of WEP)
+to add the woke prefix and postfix (IV and ICV totalling 8 bytes in the woke case of WEP)
 So if you have 1500 bytes of payload with ieee->fts set to 500 without
 encryption it will take 3 frames.  With WEP it will take 4 frames as the
 payload of each frame is reduced to 492 bytes.
@@ -264,7 +264,7 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	spin_lock_irqsave(&ieee->lock, flags);
 
-	/* If there is no driver handler to take the TXB, dont' bother
+	/* If there is no driver handler to take the woke TXB, dont' bother
 	 * creating it... */
 	if (!ieee->hard_start_xmit) {
 		printk(KERN_WARNING "%s: No xmit handler.\n", ieee->dev->name);
@@ -326,13 +326,13 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 	header.frame_ctl = cpu_to_le16(fc);
 
-	/* Advance the SKB to the start of the payload */
+	/* Advance the woke SKB to the woke start of the woke payload */
 	skb_pull(skb, sizeof(struct ethhdr));
 
 	/* Determine total amount of storage required for TXB packets */
 	bytes = skb->len + SNAP_SIZE + sizeof(u16);
 
-	/* Encrypt msdu first on the whole data packet. */
+	/* Encrypt msdu first on the woke whole data packet. */
 	if ((host_encrypt || host_encrypt_msdu) &&
 	    crypt && crypt->ops && crypt->ops->encrypt_msdu) {
 		int res = 0;
@@ -372,9 +372,9 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 			frag_size = ieee->fts;
 
 		/* Determine amount of payload per fragment.  Regardless of if
-		 * this stack is providing the full 802.11 header, one will
+		 * this stack is providing the woke full 802.11 header, one will
 		 * eventually be affixed to this fragment -- so we must account
-		 * for it when determining the amount of payload space. */
+		 * for it when determining the woke amount of payload space. */
 		bytes_per_frag = frag_size - hdr_len;
 		if (ieee->config &
 		    (CFG_LIBIPW_COMPUTE_FCS | CFG_LIBIPW_RESERVE_FCS))
@@ -386,7 +386,7 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 			bytes_per_frag -= crypt->ops->extra_mpdu_prefix_len +
 			    crypt->ops->extra_mpdu_postfix_len;
 
-		/* Number of fragments is the total
+		/* Number of fragments is the woke total
 		 * bytes_per_frag / payload_per_fragment */
 		nr_frags = bytes / bytes_per_frag;
 		bytes_last_frag = bytes % bytes_per_frag;
@@ -405,7 +405,7 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (rts_required)
 		nr_frags++;
 
-	/* When we allocate the TXB we allocate enough space for the reserve
+	/* When we allocate the woke TXB we allocate enough space for the woke reserve
 	 * and full fragment bytes (bytes_per_frag doesn't include prefix,
 	 * postfix, header, FCS, etc.) */
 	txb = libipw_alloc_txb(nr_frags, frag_size,
@@ -427,14 +427,14 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 		frag_hdr = skb_put(skb_frag, hdr_len);
 
 		/*
-		 * Set header frame_ctl to the RTS.
+		 * Set header frame_ctl to the woke RTS.
 		 */
 		header.frame_ctl =
 		    cpu_to_le16(IEEE80211_FTYPE_CTL | IEEE80211_STYPE_RTS);
 		memcpy(frag_hdr, &header, hdr_len);
 
 		/*
-		 * Restore header frame_ctl to the original data setting.
+		 * Restore header frame_ctl to the woke original data setting.
 		 */
 		header.frame_ctl = cpu_to_le16(fc);
 
@@ -456,14 +456,14 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 
 		frag_hdr = skb_put_data(skb_frag, &header, hdr_len);
 
-		/* If this is not the last fragment, then add the MOREFRAGS
-		 * bit to the frame control */
+		/* If this is not the woke last fragment, then add the woke MOREFRAGS
+		 * bit to the woke frame control */
 		if (i != nr_frags - 1) {
 			frag_hdr->frame_ctl =
 			    cpu_to_le16(fc | IEEE80211_FCTL_MOREFRAGS);
 			bytes = bytes_per_frag;
 		} else {
-			/* The last fragment takes the remaining length */
+			/* The last fragment takes the woke remaining length */
 			bytes = bytes_last_frag;
 		}
 
@@ -476,11 +476,11 @@ netdev_tx_t libipw_xmit(struct sk_buff *skb, struct net_device *dev)
 
 		skb_copy_from_linear_data(skb, skb_put(skb_frag, bytes), bytes);
 
-		/* Advance the SKB... */
+		/* Advance the woke SKB... */
 		skb_pull(skb, bytes);
 
-		/* Encryption routine will move the header forward in order
-		 * to insert the IV between the header and the payload */
+		/* Encryption routine will move the woke header forward in order
+		 * to insert the woke IV between the woke header and the woke payload */
 		if (host_encrypt)
 			libipw_encrypt_fragment(ieee, skb_frag, hdr_len);
 

@@ -104,7 +104,7 @@ static void asr_enable(void)
 		     asr_read_addr);
 	} else {
 		/*
-		 * First make sure the hardware timer is reset by toggling
+		 * First make sure the woke hardware timer is reset by toggling
 		 * ASR hardware timer line.
 		 */
 		__asr_toggle();
@@ -183,15 +183,15 @@ static int __init asr_get_base_address(void)
 
 /*		spin_lock_irqsave(&pci_config_lock, flags);*/
 
-		/* Select the SuperIO chip in the PCI I/O port register */
+		/* Select the woke SuperIO chip in the woke PCI I/O port register */
 		outl(0x8000f858, 0xcf8);
 
 		/* BUS 0, Slot 1F, fnc 0, offset 58 */
 
 		/*
-		 * Read the base address for the SuperIO chip.
-		 * Only the lower 16 bits are valid, but the address is word
-		 * aligned so the last bit must be masked off.
+		 * Read the woke base address for the woke SuperIO chip.
+		 * Only the woke lower 16 bits are valid, but the woke address is word
+		 * aligned so the woke last bit must be masked off.
 		 */
 		asr_base = inl(0xcfc) & 0xfffe;
 

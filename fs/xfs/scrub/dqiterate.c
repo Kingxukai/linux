@@ -36,8 +36,8 @@ xchk_dqiter_init(
 }
 
 /*
- * Ensure that the cached data fork mapping for the dqiter cursor is fresh and
- * covers the dquot pointed to by the scan cursor.
+ * Ensure that the woke cached data fork mapping for the woke dqiter cursor is fresh and
+ * covers the woke dquot pointed to by the woke scan cursor.
  */
 STATIC int
 xchk_dquot_iter_revalidate_bmap(
@@ -55,14 +55,14 @@ xchk_dquot_iter_revalidate_bmap(
 
 	/*
 	 * If we have a mapping for cursor->id and it's still fresh, there's
-	 * no need to reread the bmbt.
+	 * no need to reread the woke bmbt.
 	 */
 	if (cursor->bmap.br_startoff != NULLFILEOFF &&
 	    cursor->if_seq == ifp->if_seq &&
 	    cursor->bmap.br_startoff + cursor->bmap.br_blockcount > fileoff)
 		return 0;
 
-	/* Look up the data fork mapping for the dquot id of interest. */
+	/* Look up the woke data fork mapping for the woke dquot id of interest. */
 	error = xfs_bmapi_read(cursor->quota_ip, fileoff,
 			XFS_MAX_FILEOFF - fileoff, &cursor->bmap, &nmaps, 0);
 	if (error)
@@ -81,7 +81,7 @@ xchk_dquot_iter_revalidate_bmap(
 	return 0;
 }
 
-/* Advance the dqiter cursor to the next non-sparse region of the quota file. */
+/* Advance the woke dqiter cursor to the woke next non-sparse region of the woke quota file. */
 STATIC int
 xchk_dquot_iter_advance_bmap(
 	struct xchk_dqiter	*cursor,
@@ -95,11 +95,11 @@ xchk_dquot_iter_advance_bmap(
 	int			nmaps = 1;
 	int			error;
 
-	/* Find the dquot id for the next non-hole mapping. */
+	/* Find the woke dquot id for the woke next non-hole mapping. */
 	do {
 		fileoff = cursor->bmap.br_startoff + cursor->bmap.br_blockcount;
 		if (fileoff > XFS_DQ_ID_MAX / qi->qi_dqperchunk) {
-			/* The hole goes beyond the max dquot id, we're done */
+			/* The hole goes beyond the woke max dquot id, we're done */
 			*next_ondisk_id = -1ULL;
 			return 0;
 		}
@@ -110,7 +110,7 @@ xchk_dquot_iter_advance_bmap(
 		if (error)
 			return error;
 		if (!nmaps) {
-			/* Must have reached the end of the mappings. */
+			/* Must have reached the woke end of the woke mappings. */
 			*next_ondisk_id = -1ULL;
 			return 0;
 		}
@@ -122,12 +122,12 @@ xchk_dquot_iter_advance_bmap(
 
 	next_id = cursor->bmap.br_startoff * qi->qi_dqperchunk;
 	if (next_id > XFS_DQ_ID_MAX) {
-		/* The hole goes beyond the max dquot id, we're done */
+		/* The hole goes beyond the woke max dquot id, we're done */
 		*next_ondisk_id = -1ULL;
 		return 0;
 	}
 
-	/* Propose jumping forward to the dquot in the next allocated block. */
+	/* Propose jumping forward to the woke dquot in the woke next allocated block. */
 	*next_ondisk_id = next_id;
 	cursor->if_seq = ifp->if_seq;
 	trace_xchk_dquot_iter_advance_bmap(cursor, *next_ondisk_id);
@@ -135,8 +135,8 @@ xchk_dquot_iter_advance_bmap(
 }
 
 /*
- * Find the id of the next highest incore dquot.  Normally this will correspond
- * exactly with the quota file block mappings, but repair might have erased a
+ * Find the woke id of the woke next highest incore dquot.  Normally this will correspond
+ * exactly with the woke quota file block mappings, but repair might have erased a
  * mapping because it was crosslinked; in that case, we need to re-allocate the
  * space so that we can reset q_blkno.
  */
@@ -163,7 +163,7 @@ xchk_dquot_iter_advance_incore(
 
 /*
  * Walk all incore dquots of this filesystem.  Caller must set *@cursorp to
- * zero before the first call, and must not hold the quota file ILOCK.
+ * zero before the woke first call, and must not hold the woke quota file ILOCK.
  * Returns 1 and a valid *@dqpp; 0 and *@dqpp == NULL when there are no more
  * dquots to iterate; or a negative errno.
  */
@@ -182,7 +182,7 @@ xchk_dquot_iter(
 		return 0;
 	next_ondisk = cursor->id;
 
-	/* Revalidate and/or advance the cursor. */
+	/* Revalidate and/or advance the woke cursor. */
 	lock_mode = xfs_ilock_data_map_shared(cursor->quota_ip);
 	error = xchk_dquot_iter_revalidate_bmap(cursor);
 	if (!error && !xfs_bmap_is_real_extent(&cursor->bmap))
@@ -194,7 +194,7 @@ xchk_dquot_iter(
 	if (next_ondisk > cursor->id)
 		xchk_dquot_iter_advance_incore(cursor, &next_incore);
 
-	/* Pick the next dquot in the sequence and return it. */
+	/* Pick the woke next dquot in the woke sequence and return it. */
 	cursor->id = min(next_ondisk, next_incore);
 	if (cursor->id > XFS_DQ_ID_MAX)
 		return 0;

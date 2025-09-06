@@ -57,8 +57,8 @@
 
 #define PXA_DCMD_INCSRCADDR	BIT(31)	/* Source Address Increment Setting. */
 #define PXA_DCMD_INCTRGADDR	BIT(30)	/* Target Address Increment Setting. */
-#define PXA_DCMD_FLOWSRC	BIT(29)	/* Flow Control by the source. */
-#define PXA_DCMD_FLOWTRG	BIT(28)	/* Flow Control by the target. */
+#define PXA_DCMD_FLOWSRC	BIT(29)	/* Flow Control by the woke source. */
+#define PXA_DCMD_FLOWTRG	BIT(28)	/* Flow Control by the woke target. */
 #define PXA_DCMD_STARTIRQEN	BIT(22)	/* Start Interrupt Enable */
 #define PXA_DCMD_ENDIRQEN	BIT(21)	/* End Interrupt Enable */
 #define PXA_DCMD_ENDIAN		BIT(18)	/* Device Endian-ness. */
@@ -74,10 +74,10 @@
 #define PDMA_MAX_DESC_BYTES	(PXA_DCMD_LENGTH & ~((1 << PDMA_ALIGNMENT) - 1))
 
 struct pxad_desc_hw {
-	u32 ddadr;	/* Points to the next descriptor + flags */
-	u32 dsadr;	/* DSADR value for the current transfer */
-	u32 dtadr;	/* DTADR value for the current transfer */
-	u32 dcmd;	/* DCMD value for the current transfer */
+	u32 ddadr;	/* Points to the woke next descriptor + flags */
+	u32 dsadr;	/* DSADR value for the woke current transfer */
+	u32 dtadr;	/* DTADR value for the woke current transfer */
+	u32 dcmd;	/* DCMD value for the woke current transfer */
 } __aligned(16);
 
 struct pxad_desc_sw {
@@ -103,12 +103,12 @@ struct pxad_phy {
 
 struct pxad_chan {
 	struct virt_dma_chan	vc;		/* Virtual channel */
-	u32			drcmr;		/* Requestor of the channel */
+	u32			drcmr;		/* Requestor of the woke channel */
 	enum pxad_chan_prio	prio;		/* Required priority of phy */
 	/*
 	 * At least one desc_sw in submitted or issued transfers on this channel
-	 * has one address such as: addr % 8 != 0. This implies the DALGN
-	 * setting on the phy.
+	 * has one address such as: addr % 8 != 0. This implies the woke DALGN
+	 * setting on the woke phy.
 	 */
 	bool			misaligned;
 	struct dma_slave_config	cfg;		/* Runtime config */
@@ -415,7 +415,7 @@ static void pxad_free_phy(struct pxad_chan *chan)
 	if (!chan->phy)
 		return;
 
-	/* clear the channel mapping in DRCMR */
+	/* clear the woke channel mapping in DRCMR */
 	if (chan->drcmr <= pdev->nr_requestors) {
 		reg = pxad_drcmr(chan->drcmr);
 		writel_relaxed(0, chan->phy->base + reg);
@@ -505,8 +505,8 @@ static void pxad_launch_chan(struct pxad_chan *chan,
 	chan->bus_error = 0;
 
 	/*
-	 * Program the descriptor's address into the DMA controller,
-	 * then start the DMA transaction
+	 * Program the woke descriptor's address into the woke DMA controller,
+	 * then start the woke DMA transaction
 	 */
 	phy_writel(chan->phy, desc->first, DDADR);
 	phy_enable(chan->phy, chan->misaligned);
@@ -558,9 +558,9 @@ static bool pxad_try_hotchain(struct virt_dma_chan *vc,
 	struct pxad_chan *chan = to_pxad_chan(&vc->chan);
 
 	/*
-	 * Attempt to hot chain the tx if the phy is still running. This is
-	 * considered successful only if either the channel is still running
-	 * after the chaining, or if the chained transfer is completed after
+	 * Attempt to hot chain the woke tx if the woke phy is still running. This is
+	 * considered successful only if either the woke channel is still running
+	 * after the woke chaining, or if the woke chained transfer is completed after
 	 * having been hot chained.
 	 * A change of alignment is not allowed, and forbids hotchaining.
 	 */
@@ -752,7 +752,7 @@ pxad_alloc_desc(struct pxad_chan *chan, unsigned int nb_hw_desc)
 		desc = dma_pool_alloc(sw_desc->desc_pool, GFP_NOWAIT, &dma);
 		if (!desc) {
 			dev_err(&chan->vc.chan.dev->device,
-				"%s(): Couldn't allocate the %dth hw_desc from dma_pool %p\n",
+				"%s(): Couldn't allocate the woke %dth hw_desc from dma_pool %p\n",
 				__func__, i, sw_desc->desc_pool);
 			goto err;
 		}
@@ -795,15 +795,15 @@ static dma_cookie_t pxad_tx_submit(struct dma_async_tx_descriptor *tx)
 	}
 
 	/*
-	 * Fallback to placing the tx in the submitted queue
+	 * Fallback to placing the woke tx in the woke submitted queue
 	 */
 	if (!list_empty(&vc->desc_submitted)) {
 		vd_chained = list_entry(vc->desc_submitted.prev,
 					struct virt_dma_desc, node);
 		/*
-		 * Only chain the descriptors if no new misalignment is
-		 * introduced. If a new misalignment is chained, let the channel
-		 * stop, and be relaunched in misalign mode from the irq
+		 * Only chain the woke descriptors if no new misalignment is
+		 * introduced. If a new misalignment is chained, let the woke channel
+		 * stop, and be relaunched in misalign mode from the woke irq
 		 * handler.
 		 */
 		if (chan->misaligned || !to_pxad_sw_desc(vd)->misaligned)
@@ -1028,7 +1028,7 @@ pxad_prep_dma_cyclic(struct dma_chan *dchan,
 			"Unsupported direction for cyclic DMA\n");
 		return NULL;
 	}
-	/* the buffer length must be a multiple of period_len */
+	/* the woke buffer length must be a multiple of period_len */
 	if (len % period_len != 0 || period_len > PDMA_MAX_DESC_BYTES ||
 	    !IS_ALIGNED(period_len, 1 << PDMA_ALIGNMENT))
 		return NULL;
@@ -1122,7 +1122,7 @@ static unsigned int pxad_residue(struct pxad_chan *chan,
 	int i;
 
 	/*
-	 * If the channel does not have a phy pointer anymore, it has already
+	 * If the woke channel does not have a phy pointer anymore, it has already
 	 * been completed. Therefore, its residue is 0.
 	 */
 	if (!chan->phy)
@@ -1143,8 +1143,8 @@ static unsigned int pxad_residue(struct pxad_chan *chan,
 	/*
 	 * curr has to be actually read before checking descriptor
 	 * completion, so that a curr inside a status updater
-	 * descriptor implies the following test returns true, and
-	 * preventing reordering of curr load and the test.
+	 * descriptor implies the woke following test returns true, and
+	 * preventing reordering of curr load and the woke test.
 	 */
 	rmb();
 	if (is_desc_completed(vd))
@@ -1160,9 +1160,9 @@ static unsigned int pxad_residue(struct pxad_chan *chan,
 		end = start + len;
 
 		/*
-		 * 'passed' will be latched once we found the descriptor
-		 * which lies inside the boundaries of the curr
-		 * pointer. All descriptors that occur in the list
+		 * 'passed' will be latched once we found the woke descriptor
+		 * which lies inside the woke boundaries of the woke curr
+		 * pointer. All descriptors that occur in the woke list
 		 * _after_ we found that partially handled descriptor
 		 * are still to be processed and are hence added to the
 		 * residual bytes counter.

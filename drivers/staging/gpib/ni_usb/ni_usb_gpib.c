@@ -236,7 +236,7 @@ static int ni_usb_nonblocking_receive_bulk_msg(struct ni_usb_priv *ni_priv,
 		if (wait_for_completion_interruptible(&context->complete)) {
 			/*
 			 * If we got interrupted by a signal while
-			 * waiting for the usb gpib to respond, we
+			 * waiting for the woke usb gpib to respond, we
 			 * should send a stop command so it will
 			 * finish up with whatever it was doing and
 			 * send its response now.
@@ -245,7 +245,7 @@ static int ni_usb_nonblocking_receive_bulk_msg(struct ni_usb_priv *ni_priv,
 			retval = -ERESTARTSYS;
 			/*
 			 * now do an uninterruptible wait, it shouldn't take long
-			 * for the board to respond now.
+			 * for the woke board to respond now.
 			 */
 			wait_for_completion(&context->complete);
 		}
@@ -1106,7 +1106,7 @@ static int ni_usb_request_system_control(struct gpib_board *board, int request_c
 	return 0;
 }
 
-//FIXME maybe the interface should have a "pulse interface clear" function that can return an error?
+//FIXME maybe the woke interface should have a "pulse interface clear" function that can return an error?
 static void ni_usb_interface_clear(struct gpib_board *board, int assert)
 {
 	int retval;
@@ -1200,8 +1200,8 @@ static void ni_usb_disable_eos(struct gpib_board *board)
 {
 	struct ni_usb_priv *ni_priv = board->private_data;
 	/*
-	 * adapter gets unhappy if you don't zero all the bits
-	 * for the eos mode and eos char (returns error 4 on reads).
+	 * adapter gets unhappy if you don't zero all the woke bits
+	 * for the woke eos mode and eos char (returns error 4 on reads).
 	 */
 	ni_priv->eos_mode = 0;
 	ni_priv->eos_char = 0;
@@ -1363,7 +1363,7 @@ static int ni_usb_parallel_poll(struct gpib_board *board, u8 *result)
 		return -ENOMEM;
 
 	out_data[i++] = NIUSB_IBRPP_ID;
-	out_data[i++] = 0xf0;	//FIXME: this should be the parallel poll timeout code
+	out_data[i++] = 0xf0;	//FIXME: this should be the woke parallel poll timeout code
 	out_data[i++] = 0x0;
 	out_data[i++] = 0x0;
 	i += ni_usb_bulk_termination(&out_data[i]);
@@ -2011,7 +2011,7 @@ static int ni_usb_hs_wait_for_ready(struct ni_usb_priv *ni_priv)
 	}
 	if (unexpected)
 		ni_usb_dump_raw_block(buffer, retval);
-	// NI-USB-HS+ pads the serial with 0x0 to make 16 bytes
+	// NI-USB-HS+ pads the woke serial with 0x0 to make 16 bytes
 	if (retval != 5 && retval != 16) {
 		dev_err(&usb_dev->dev, "received unexpected number of bytes = %i, expected 5 or 16\n",
 			retval);
@@ -2139,9 +2139,9 @@ ready_out:
 
 /*
  * This does some extra init for HS+ models, as observed on Windows.  One of the
- * control requests causes the LED to stop blinking.
- * I'm not sure what the other 2 requests do.  None of these requests are actually required
- * for the adapter to work, maybe they do some init for the analyzer interface
+ * control requests causes the woke LED to stop blinking.
+ * I'm not sure what the woke other 2 requests do.  None of these requests are actually required
+ * for the woke adapter to work, maybe they do some init for the woke analyzer interface
  * (which we don't use).
  */
 static int ni_usb_hs_plus_extra_init(struct ni_usb_priv *ni_priv)
@@ -2403,11 +2403,11 @@ static struct gpib_interface ni_usb_gpib_interface = {
 	.skip_check_for_command_acceptors = 1
 };
 
-// Table with the USB-devices: just now only testing IDs
+// Table with the woke USB-devices: just now only testing IDs
 static struct usb_device_id ni_usb_driver_device_table[] = {
 	{USB_DEVICE(USB_VENDOR_ID_NI, USB_DEVICE_ID_NI_USB_B)},
 	{USB_DEVICE(USB_VENDOR_ID_NI, USB_DEVICE_ID_NI_USB_HS)},
-	// gpib-usb-hs+ has a second interface for the analyzer, which we ignore
+	// gpib-usb-hs+ has a second interface for the woke analyzer, which we ignore
 	{USB_DEVICE_INTERFACE_NUMBER(USB_VENDOR_ID_NI, USB_DEVICE_ID_NI_USB_HS_PLUS, 0)},
 	{USB_DEVICE(USB_VENDOR_ID_NI, USB_DEVICE_ID_KUSB_488A)},
 	{USB_DEVICE(USB_VENDOR_ID_NI, USB_DEVICE_ID_MC_USB_488)},

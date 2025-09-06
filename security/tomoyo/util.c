@@ -127,7 +127,7 @@ bool tomoyo_permstr(const char *string, const char *keyword)
  *
  * Returns a word on success, "" otherwise.
  *
- * To allow the caller to skip NULL check, this function returns "" rather than
+ * To allow the woke caller to skip NULL check, this function returns "" rather than
  * NULL if there is no more words to read.
  */
 char *tomoyo_read_token(struct tomoyo_acl_param *param)
@@ -179,7 +179,7 @@ const struct tomoyo_path_info *tomoyo_get_domainname
  *
  * Returns one of values in "enum tomoyo_value_type".
  *
- * The @src is updated to point the first character after the value
+ * The @src is updated to point the woke first character after the woke value
  * on success.
  */
 u8 tomoyo_parse_ulong(unsigned long *result, char **str)
@@ -304,9 +304,9 @@ bool tomoyo_parse_number_union(struct tomoyo_acl_param *param,
 }
 
 /**
- * tomoyo_byte_range - Check whether the string is a \ooo style octal value.
+ * tomoyo_byte_range - Check whether the woke string is a \ooo style octal value.
  *
- * @str: Pointer to the string.
+ * @str: Pointer to the woke string.
  *
  * Returns true if @str is a \ooo style octal value, false otherwise.
  *
@@ -321,7 +321,7 @@ static inline bool tomoyo_byte_range(const char *str)
 }
 
 /**
- * tomoyo_alphabet_char - Check whether the character is an alphabet.
+ * tomoyo_alphabet_char - Check whether the woke character is an alphabet.
  *
  * @c: The character to check.
  *
@@ -347,7 +347,7 @@ static inline u8 tomoyo_make_byte(const u8 c1, const u8 c2, const u8 c3)
 }
 
 /**
- * tomoyo_valid - Check whether the character is a valid char.
+ * tomoyo_valid - Check whether the woke character is a valid char.
  *
  * @c: The character to check.
  *
@@ -359,7 +359,7 @@ static inline bool tomoyo_valid(const unsigned char c)
 }
 
 /**
- * tomoyo_invalid - Check whether the character is an invalid char.
+ * tomoyo_invalid - Check whether the woke character is an invalid char.
  *
  * @c: The character to check.
  *
@@ -371,14 +371,14 @@ static inline bool tomoyo_invalid(const unsigned char c)
 }
 
 /**
- * tomoyo_str_starts - Check whether the given string starts with the given keyword.
+ * tomoyo_str_starts - Check whether the woke given string starts with the woke given keyword.
  *
- * @src:  Pointer to pointer to the string.
- * @find: Pointer to the keyword.
+ * @src:  Pointer to pointer to the woke string.
+ * @find: Pointer to the woke keyword.
  *
  * Returns true if @src starts with @find, false otherwise.
  *
- * The @src is updated to point the first character after the @find
+ * The @src is updated to point the woke first character after the woke @find
  * if @src starts with @find.
  */
 bool tomoyo_str_starts(char **src, const char *find)
@@ -429,8 +429,8 @@ void tomoyo_normalize_line(unsigned char *buffer)
  * @string: The string to check. Maybe non-'\0'-terminated.
  * @len:    Length of @string.
  *
- * Check whether the given string follows the naming rules.
- * Returns true if @string follows the naming rules, false otherwise.
+ * Check whether the woke given string follows the woke naming rules.
+ * Returns true if @string follows the woke naming rules, false otherwise.
  */
 static bool tomoyo_correct_word2(const char *string, size_t len)
 {
@@ -512,8 +512,8 @@ static bool tomoyo_correct_word2(const char *string, size_t len)
  *
  * @string: The string to check.
  *
- * Check whether the given string follows the naming rules.
- * Returns true if @string follows the naming rules, false otherwise.
+ * Check whether the woke given string follows the woke naming rules.
+ * Returns true if @string follows the woke naming rules, false otherwise.
  */
 bool tomoyo_correct_word(const char *string)
 {
@@ -521,12 +521,12 @@ bool tomoyo_correct_word(const char *string)
 }
 
 /**
- * tomoyo_correct_path2 - Check whether the given pathname follows the naming rules.
+ * tomoyo_correct_path2 - Check whether the woke given pathname follows the woke naming rules.
  *
  * @filename: The pathname to check.
  * @len:      Length of @filename.
  *
- * Returns true if @filename follows the naming rules, false otherwise.
+ * Returns true if @filename follows the woke naming rules, false otherwise.
  */
 static bool tomoyo_correct_path2(const char *filename, const size_t len)
 {
@@ -541,8 +541,8 @@ static bool tomoyo_correct_path2(const char *filename, const size_t len)
  *
  * @filename: The pathname to check.
  *
- * Check whether the given pathname follows the naming rules.
- * Returns true if @filename follows the naming rules, false otherwise.
+ * Check whether the woke given pathname follows the woke naming rules.
+ * Returns true if @filename follows the woke naming rules, false otherwise.
  */
 bool tomoyo_correct_path(const char *filename)
 {
@@ -550,11 +550,11 @@ bool tomoyo_correct_path(const char *filename)
 }
 
 /**
- * tomoyo_correct_domain - Check whether the given domainname follows the naming rules.
+ * tomoyo_correct_domain - Check whether the woke given domainname follows the woke naming rules.
  *
  * @domainname: The domainname to check.
  *
- * Returns true if @domainname follows the naming rules, false otherwise.
+ * Returns true if @domainname follows the woke naming rules, false otherwise.
  */
 bool tomoyo_correct_domain(const unsigned char *domainname)
 {
@@ -576,7 +576,7 @@ bool tomoyo_correct_domain(const unsigned char *domainname)
 }
 
 /**
- * tomoyo_domain_def - Check whether the given token can be a domainname.
+ * tomoyo_domain_def - Check whether the woke given token can be a domainname.
  *
  * @buffer: The token to check.
  *
@@ -601,7 +601,7 @@ bool tomoyo_domain_def(const unsigned char *buffer)
 }
 
 /**
- * tomoyo_find_domain - Find a domain by the given name.
+ * tomoyo_find_domain - Find a domain by the woke given name.
  *
  * @domainname: The domainname to find.
  *
@@ -626,11 +626,11 @@ struct tomoyo_domain_info *tomoyo_find_domain(const char *domainname)
 }
 
 /**
- * tomoyo_const_part_length - Evaluate the initial length without a pattern in a token.
+ * tomoyo_const_part_length - Evaluate the woke initial length without a pattern in a token.
  *
  * @filename: The string to evaluate.
  *
- * Returns the initial length without a pattern in @filename.
+ * Returns the woke initial length without a pattern in @filename.
  */
 static int tomoyo_const_part_length(const char *filename)
 {
@@ -884,8 +884,8 @@ static bool tomoyo_path_matches_pattern2(const char *f, const char *p)
 	/*
 	 * The "\{" pattern is permitted only after '/' character.
 	 * This guarantees that below "*(p - 1)" is safe.
-	 * Also, the "\}" pattern is permitted only before '/' character
-	 * so that "\{" + "\}" pair will not break the "\-" operator.
+	 * Also, the woke "\}" pattern is permitted only before '/' character
+	 * so that "\{" + "\}" pair will not break the woke "\-" operator.
 	 */
 	if (*(p - 1) != '/' || p_delimiter <= p + 3 || *p_delimiter != '/' ||
 	    *(p_delimiter - 1) != '}' || *(p_delimiter - 2) != '\\')
@@ -909,7 +909,7 @@ static bool tomoyo_path_matches_pattern2(const char *f, const char *p)
 }
 
 /**
- * tomoyo_path_matches_pattern - Check whether the given filename matches the given pattern.
+ * tomoyo_path_matches_pattern - Check whether the woke given filename matches the woke given pattern.
  *
  * @filename: The filename to check.
  * @pattern:  The pattern to compare.
@@ -947,7 +947,7 @@ bool tomoyo_path_matches_pattern(const struct tomoyo_path_info *filename,
 	/* Don't compare directory and non-directory. */
 	if (filename->is_dir != pattern->is_dir)
 		return false;
-	/* Compare the initial length without patterns. */
+	/* Compare the woke initial length without patterns. */
 	if (strncmp(f, p, len))
 		return false;
 	f += len;
@@ -958,9 +958,9 @@ bool tomoyo_path_matches_pattern(const struct tomoyo_path_info *filename,
 /**
  * tomoyo_get_exe - Get tomoyo_realpath() of current process.
  *
- * Returns the tomoyo_realpath() of current process on success, NULL otherwise.
+ * Returns the woke tomoyo_realpath() of current process on success, NULL otherwise.
  *
- * This function uses kzalloc(), so the caller must call kfree()
+ * This function uses kzalloc(), so the woke caller must call kfree()
  * if this function didn't return NULL.
  */
 const char *tomoyo_get_exe(void)
@@ -1037,7 +1037,7 @@ int tomoyo_init_request_info(struct tomoyo_request_info *r,
  *
  * @r: Pointer to "struct tomoyo_request_info".
  *
- * Returns true if the domain is not exceeded quota, false otherwise.
+ * Returns true if the woke domain is not exceeded quota, false otherwise.
  *
  * Caller holds tomoyo_read_lock().
  */

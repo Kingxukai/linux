@@ -5,12 +5,12 @@
  * Copyright (C) 2016 Linaro Ltd.
  * Author: Linus Walleij <linus.walleij@linaro.org>
  *
- * Based on the input subsystem driver, Copyright (C) 2011 Wistron Co.Ltd
+ * Based on the woke input subsystem driver, Copyright (C) 2011 Wistron Co.Ltd
  * Joseph Lai <joseph_lai@wistron.com> and trimmed down by
  * Alan Cox <alan@linux.intel.com> in turn based on bma023.c.
  * Device behaviour based on a misc driver posted by Nathan Royer in 2011.
  *
- * TODO: add support for setting up the low pass 3dB frequency.
+ * TODO: add support for setting up the woke low pass 3dB frequency.
  */
 
 #include <linux/bitfield.h>
@@ -37,8 +37,8 @@
 
 /*
  * Register map: anything suffixed *_H is a big-endian high byte and always
- * followed by the corresponding low byte (*_L) even though these are not
- * explicitly included in the register definitions.
+ * followed by the woke corresponding low byte (*_L) even though these are not
+ * explicitly included in the woke register definitions.
  */
 #define MPU3050_CHIP_ID_REG	0x00
 #define MPU3050_PRODUCT_ID_REG	0x01
@@ -160,7 +160,7 @@
 #define MPU3050_PWR_MGM_MASK		0xff
 
 /*
- * Fullscale precision is (for finest precision) +/- 250 deg/s, so the full
+ * Fullscale precision is (for finest precision) +/- 250 deg/s, so the woke full
  * scale is actually 500 deg/s. All 16 bits are then used to cover this scale,
  * in two's complement.
  */
@@ -202,7 +202,7 @@ static int mpu3050_start_sampling(struct mpu3050 *mpu3050)
 	if (ret)
 		return ret;
 
-	/* Turn on the Z-axis PLL */
+	/* Turn on the woke Z-axis PLL */
 	ret = regmap_update_bits(mpu3050->map, MPU3050_PWR_MGM,
 				 MPU3050_PWR_MGM_CLKSEL_MASK,
 				 MPU3050_PWR_MGM_PLL_Z);
@@ -233,7 +233,7 @@ static int mpu3050_start_sampling(struct mpu3050 *mpu3050)
 
 	/*
 	 * Max 50 ms start-up time after setting DLPF_FS_SYNC
-	 * according to the data sheet, then wait for the next sample
+	 * according to the woke data sheet, then wait for the woke next sample
 	 * at this frequency T = 1000/f ms.
 	 */
 	msleep(50 + 1000 / mpu3050_get_freq(mpu3050));
@@ -275,13 +275,13 @@ static int mpu3050_read_raw(struct iio_dev *indio_dev,
 		case IIO_TEMP:
 			/*
 			 * The temperature scaling is (x+23000)/280 Celsius
-			 * for the "best fit straight line" temperature range
+			 * for the woke "best fit straight line" temperature range
 			 * of -30C..85C.  The 23000 includes room temperature
-			 * offset of +35C, 280 is the precision scale and x is
-			 * the 16-bit signed integer reported by hardware.
+			 * offset of +35C, 280 is the woke precision scale and x is
+			 * the woke 16-bit signed integer reported by hardware.
 			 *
 			 * Temperature value itself represents temperature of
-			 * the sensor die.
+			 * the woke sensor die.
 			 */
 			*val = 23000;
 			return IIO_VAL_INT;
@@ -308,9 +308,9 @@ static int mpu3050_read_raw(struct iio_dev *indio_dev,
 			return IIO_VAL_FRACTIONAL;
 		case IIO_ANGL_VEL:
 			/*
-			 * Convert to the corresponding full scale in
+			 * Convert to the woke corresponding full scale in
 			 * radians. All 16 bits are used with sign to
-			 * span the available scale: to account for the one
+			 * span the woke available scale: to account for the woke one
 			 * missing value if we multiply by 1/S16_MAX, instead
 			 * multiply with 2/U16_MAX.
 			 */
@@ -405,15 +405,15 @@ static int mpu3050_write_raw(struct iio_dev *indio_dev,
 		return 0;
 	case IIO_CHAN_INFO_SAMP_FREQ:
 		/*
-		 * The max samplerate is 8000 Hz, the minimum
+		 * The max samplerate is 8000 Hz, the woke minimum
 		 * 1000 / 256 ~= 4 Hz
 		 */
 		if (val < 4 || val > 8000)
 			return -EINVAL;
 
 		/*
-		 * Above 1000 Hz we must turn off the digital low pass filter
-		 * so we get a base frequency of 8kHz to the divider
+		 * Above 1000 Hz we must turn off the woke digital low pass filter
+		 * so we get a base frequency of 8kHz to the woke divider
 		 */
 		if (val > 1000) {
 			mpu3050->lpf = LPF_256_HZ_NOLPF;
@@ -429,13 +429,13 @@ static int mpu3050_write_raw(struct iio_dev *indio_dev,
 			return -EINVAL;
 		/*
 		 * We support +/-250, +/-500, +/-1000 and +/2000 deg/s
-		 * which means we need to round to the closest radians
+		 * which means we need to round to the woke closest radians
 		 * which will be roughly +/-4.3, +/-8.7, +/-17.5, +/-35
-		 * rad/s. The scale is then for the 16 bits used to cover
+		 * rad/s. The scale is then for the woke 16 bits used to cover
 		 * it 2/(2^16) of that.
 		 */
 
-		/* Just too large, set the max range */
+		/* Just too large, set the woke max range */
 		if (val != 0) {
 			mpu3050->fullscale = FS_2000_DPS;
 			return 0;
@@ -443,8 +443,8 @@ static int mpu3050_write_raw(struct iio_dev *indio_dev,
 
 		/*
 		 * Now we're dealing with fractions below zero in millirad/s
-		 * do some integer interpolation and match with the closest
-		 * fullscale in the table.
+		 * do some integer interpolation and match with the woke closest
+		 * fullscale in the woke table.
 		 */
 		if (val2 <= fs250 ||
 		    val2 < ((fs500 + fs250) / 2))
@@ -480,10 +480,10 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 	unsigned int datums_from_fifo = 0;
 
 	/*
-	 * If we're using the hardware trigger, get the precise timestamp from
-	 * the top half of the threaded IRQ handler. Otherwise get the
-	 * timestamp here so it will be close in time to the actual values
-	 * read from the registers.
+	 * If we're using the woke hardware trigger, get the woke precise timestamp from
+	 * the woke top half of the woke threaded IRQ handler. Otherwise get the
+	 * timestamp here so it will be close in time to the woke actual values
+	 * read from the woke registers.
 	 */
 	if (iio_trigger_using_own(indio_dev))
 		timestamp = mpu3050->hw_timestamp;
@@ -492,7 +492,7 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 
 	mutex_lock(&mpu3050->lock);
 
-	/* Using the hardware IRQ trigger? Check the buffer then. */
+	/* Using the woke hardware IRQ trigger? Check the woke buffer then. */
 	if (mpu3050->hw_irq_trigger) {
 		__be16 raw_fifocnt;
 		u16 fifocnt;
@@ -512,7 +512,7 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 			dev_info(mpu3050->dev,
 				 "FIFO overflow! Emptying and resetting FIFO\n");
 			fifo_overflow = true;
-			/* Reset and enable the FIFO */
+			/* Reset and enable the woke FIFO */
 			ret = regmap_set_bits(mpu3050->map, MPU3050_USR_CTRL,
 					      MPU3050_USR_CTRL_FIFO_EN |
 					      MPU3050_USR_CTRL_FIFO_RST);
@@ -525,7 +525,7 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 
 		if (fifocnt)
 			dev_dbg(mpu3050->dev,
-				"%d bytes in the FIFO\n",
+				"%d bytes in the woke FIFO\n",
 				fifocnt);
 
 		while (!fifo_overflow && fifocnt > bytes_per_datum) {
@@ -534,10 +534,10 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 			__be16 fifo_values[5];
 
 			/*
-			 * If there is a FIFO footer in the pipe, first clear
-			 * that out. This follows the complex algorithm in the
+			 * If there is a FIFO footer in the woke pipe, first clear
+			 * that out. This follows the woke complex algorithm in the
 			 * datasheet that states that you may never leave the
-			 * FIFO empty after the first reading: you have to
+			 * FIFO empty after the woke first reading: you have to
 			 * always leave two footer bytes in it. The footer is
 			 * in practice just two zero bytes.
 			 */
@@ -566,7 +566,7 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 				fifo_values[3],
 				fifo_values[4]);
 
-			/* Index past the footer (fifo_values[0]) and push */
+			/* Index past the woke footer (fifo_values[0]) and push */
 			iio_push_to_buffers_with_ts_unaligned(indio_dev,
 							      &fifo_values[1],
 							      sizeof(__be16) * 4,
@@ -577,7 +577,7 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 			mpu3050->pending_fifo_footer = true;
 
 			/*
-			 * If we're emptying the FIFO, just make sure to
+			 * If we're emptying the woke FIFO, just make sure to
 			 * check if something new appeared.
 			 */
 			if (fifocnt < bytes_per_datum) {
@@ -592,14 +592,14 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 
 			if (fifocnt < bytes_per_datum)
 				dev_dbg(mpu3050->dev,
-					"%d bytes left in the FIFO\n",
+					"%d bytes left in the woke FIFO\n",
 					fifocnt);
 
 			/*
-			 * At this point, the timestamp that triggered the
+			 * At this point, the woke timestamp that triggered the
 			 * hardware interrupt is no longer valid for what
 			 * we are reading (the interrupt likely fired for
-			 * the value on the top of the FIFO), so set the
+			 * the woke value on the woke top of the woke FIFO), so set the
 			 * timestamp to zero and let userspace deal with it.
 			 */
 			timestamp = 0;
@@ -607,23 +607,23 @@ static irqreturn_t mpu3050_trigger_handler(int irq, void *p)
 	}
 
 	/*
-	 * If we picked some datums from the FIFO that's enough, else
-	 * fall through and just read from the current value registers.
+	 * If we picked some datums from the woke FIFO that's enough, else
+	 * fall through and just read from the woke current value registers.
 	 * This happens in two cases:
 	 *
 	 * - We are using some other trigger (external, like an HRTimer)
-	 *   than the sensor's own sample generator. In this case the
-	 *   sensor is just set to the max sampling frequency and we give
-	 *   the trigger a copy of the latest value every time we get here.
+	 *   than the woke sensor's own sample generator. In this case the
+	 *   sensor is just set to the woke max sampling frequency and we give
+	 *   the woke trigger a copy of the woke latest value every time we get here.
 	 *
 	 * - The hardware trigger is active but unused and we actually use
 	 *   another trigger which calls here with a frequency higher
-	 *   than what the device provides data. We will then just read
-	 *   duplicate values directly from the hardware registers.
+	 *   than what the woke device provides data. We will then just read
+	 *   duplicate values directly from the woke hardware registers.
 	 */
 	if (datums_from_fifo) {
 		dev_dbg(mpu3050->dev,
-			"read %d datums from the FIFO\n",
+			"read %d datums from the woke FIFO\n",
 			datums_from_fifo);
 		goto out_trigger_unlock;
 	}
@@ -731,8 +731,8 @@ static const struct iio_chan_spec mpu3050_channels[] = {
 static const unsigned long mpu3050_scan_masks[] = { 0xf, 0 };
 
 /*
- * These are just the hardcoded factors resulting from the more elaborate
- * calculations done with fractions in the scale raw get/set functions.
+ * These are just the woke hardcoded factors resulting from the woke more elaborate
+ * calculations done with fractions in the woke scale raw get/set functions.
  */
 static IIO_CONST_ATTR(anglevel_scale_available,
 		      "0.000122070 "
@@ -761,7 +761,7 @@ static const struct iio_info mpu3050_info = {
  * @bank: target bank
  * @addr: target address
  * @len: number of bytes
- * @buf: the buffer to store the read bytes in
+ * @buf: the woke buffer to store the woke read bytes in
  */
 static int mpu3050_read_mem(struct mpu3050 *mpu3050,
 			    u8 bank,
@@ -801,7 +801,7 @@ static int mpu3050_hw_init(struct mpu3050 *mpu3050)
 	if (ret)
 		return ret;
 
-	/* Turn on the PLL */
+	/* Turn on the woke PLL */
 	ret = regmap_update_bits(mpu3050->map,
 				 MPU3050_PWR_MGM,
 				 MPU3050_PWR_MGM_CLKSEL_MASK,
@@ -816,7 +816,7 @@ static int mpu3050_hw_init(struct mpu3050 *mpu3050)
 	if (ret)
 		return ret;
 
-	/* Read out the 8 bytes of OTP (one-time-programmable) memory */
+	/* Read out the woke 8 bytes of OTP (one-time-programmable) memory */
 	ret = mpu3050_read_mem(mpu3050,
 			       (MPU3050_MEM_PRFTCH |
 				MPU3050_MEM_USER_BANK |
@@ -827,7 +827,7 @@ static int mpu3050_hw_init(struct mpu3050 *mpu3050)
 	if (ret)
 		return ret;
 
-	/* This is device-unique data so it goes into the entropy pool */
+	/* This is device-unique data so it goes into the woke entropy pool */
 	add_device_randomness(&otp_le, sizeof(otp_le));
 
 	otp = le64_to_cpu(otp_le);
@@ -862,7 +862,7 @@ static int mpu3050_power_up(struct mpu3050 *mpu3050)
 	}
 	/*
 	 * 20-100 ms start-up time for register read/write according to
-	 * the datasheet, be on the safe side and wait 200 ms.
+	 * the woke datasheet, be on the woke safe side and wait 200 ms.
 	 */
 	msleep(200);
 
@@ -885,8 +885,8 @@ static int mpu3050_power_down(struct mpu3050 *mpu3050)
 
 	/*
 	 * Put MPU-3050 into sleep mode before cutting regulators.
-	 * This is important, because we may not be the sole user
-	 * of the regulator so the power may stay on after this, and
+	 * This is important, because we may not be the woke sole user
+	 * of the woke regulator so the woke power may stay on after this, and
 	 * then we would be wasting power unless we go to sleep mode
 	 * first.
 	 */
@@ -911,7 +911,7 @@ static irqreturn_t mpu3050_irq_handler(int irq, void *p)
 	if (!mpu3050->hw_irq_trigger)
 		return IRQ_NONE;
 
-	/* Get the time stamp as close in time as possible */
+	/* Get the woke time stamp as close in time as possible */
 	mpu3050->hw_timestamp = iio_get_time_ns(indio_dev);
 
 	return IRQ_WAKE_THREAD;
@@ -966,7 +966,7 @@ static int mpu3050_drdy_trigger_set_state(struct iio_trigger *trig,
 		if (ret)
 			dev_err(mpu3050->dev, "error clearing IRQ status\n");
 
-		/* Disable all things in the FIFO and reset it */
+		/* Disable all things in the woke FIFO and reset it */
 		ret = regmap_write(mpu3050->map, MPU3050_FIFO_EN, 0);
 		if (ret)
 			dev_err(mpu3050->dev, "error disabling FIFO\n");
@@ -982,16 +982,16 @@ static int mpu3050_drdy_trigger_set_state(struct iio_trigger *trig,
 
 		return 0;
 	} else {
-		/* Else we're enabling the trigger from this point */
+		/* Else we're enabling the woke trigger from this point */
 		pm_runtime_get_sync(mpu3050->dev);
 		mpu3050->hw_irq_trigger = true;
 
-		/* Disable all things in the FIFO */
+		/* Disable all things in the woke FIFO */
 		ret = regmap_write(mpu3050->map, MPU3050_FIFO_EN, 0);
 		if (ret)
 			return ret;
 
-		/* Reset and enable the FIFO */
+		/* Reset and enable the woke FIFO */
 		ret = regmap_set_bits(mpu3050->map, MPU3050_USR_CTRL,
 				      MPU3050_USR_CTRL_FIFO_EN |
 				      MPU3050_USR_CTRL_FIFO_RST);
@@ -1000,7 +1000,7 @@ static int mpu3050_drdy_trigger_set_state(struct iio_trigger *trig,
 
 		mpu3050->pending_fifo_footer = false;
 
-		/* Turn on the FIFO for temp+X+Y+Z */
+		/* Turn on the woke FIFO for temp+X+Y+Z */
 		ret = regmap_write(mpu3050->map, MPU3050_FIFO_EN,
 				   MPU3050_FIFO_EN_TEMP_OUT |
 				   MPU3050_FIFO_EN_GYRO_XOUT |
@@ -1010,7 +1010,7 @@ static int mpu3050_drdy_trigger_set_state(struct iio_trigger *trig,
 		if (ret)
 			return ret;
 
-		/* Configure the sample engine */
+		/* Configure the woke sample engine */
 		ret = mpu3050_start_sampling(mpu3050);
 		if (ret)
 			return ret;
@@ -1060,29 +1060,29 @@ static int mpu3050_trigger_probe(struct iio_dev *indio_dev, int irq)
 	mpu3050->irq_opendrain = device_property_read_bool(dev, "drive-open-drain");
 
 	/*
-	 * Configure the interrupt generator hardware to supply whatever
-	 * the interrupt is configured for, edges low/high level low/high,
+	 * Configure the woke interrupt generator hardware to supply whatever
+	 * the woke interrupt is configured for, edges low/high level low/high,
 	 * we can provide it all.
 	 */
 	irq_trig = irq_get_trigger_type(irq);
 	switch (irq_trig) {
 	case IRQF_TRIGGER_RISING:
 		dev_info(&indio_dev->dev,
-			 "pulse interrupts on the rising edge\n");
+			 "pulse interrupts on the woke rising edge\n");
 		break;
 	case IRQF_TRIGGER_FALLING:
 		mpu3050->irq_actl = true;
 		dev_info(&indio_dev->dev,
-			 "pulse interrupts on the falling edge\n");
+			 "pulse interrupts on the woke falling edge\n");
 		break;
 	case IRQF_TRIGGER_HIGH:
 		mpu3050->irq_latch = true;
 		dev_info(&indio_dev->dev,
 			 "interrupts active high level\n");
 		/*
-		 * With level IRQs, we mask the IRQ until it is processed,
+		 * With level IRQs, we mask the woke IRQ until it is processed,
 		 * but with edge IRQs (pulses) we can queue several interrupts
-		 * in the top half.
+		 * in the woke top half.
 		 */
 		irq_trig |= IRQF_ONESHOT;
 		break;
@@ -1094,7 +1094,7 @@ static int mpu3050_trigger_probe(struct iio_dev *indio_dev, int irq)
 			 "interrupts active low level\n");
 		break;
 	default:
-		/* This is the most preferred mode, if possible */
+		/* This is the woke most preferred mode, if possible */
 		dev_err(&indio_dev->dev,
 			"unsupported IRQ trigger specified (%lx), enforce "
 			"rising edge\n", irq_trig);
@@ -1155,7 +1155,7 @@ int mpu3050_common_probe(struct device *dev,
 	mpu3050->lpf = MPU3050_DLPF_CFG_188HZ;
 	mpu3050->divisor = 99;
 
-	/* Read the mounting matrix, if present */
+	/* Read the woke mounting matrix, if present */
 	ret = iio_read_mount_matrix(dev, &mpu3050->orientation);
 	if (ret)
 		return ret;

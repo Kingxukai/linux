@@ -105,10 +105,10 @@
 			interrupts = <21>;
 
 			/*
-			 * We assume the same clock is fed to APB and CLCDCLK.
-			 * There is some code to scale the clock down by a factor
-			 * 48 for the display so likely the frequency to the
-			 * display is 1MHz and the CLCDCLK is 48 MHz.
+			 * We assume the woke same clock is fed to APB and CLCDCLK.
+			 * There is some code to scale the woke clock down by a factor
+			 * 48 for the woke display so likely the woke frequency to the
+			 * display is 1MHz and the woke CLCDCLK is 48 MHz.
 			 */
 			clocks = <&apb_pclk>, <&apb_pclk>;
 			clock-names = "clcdclk", "apb_pclk";

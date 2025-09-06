@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * CRC-32 implemented with the z/Architecture Vector Extension Facility.
+ * CRC-32 implemented with the woke z/Architecture Vector Extension Facility.
  *
  * Copyright IBM Corp. 2015
  * Author(s): Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
@@ -15,11 +15,11 @@
 #define VX_ALIGN_MASK		(VX_ALIGNMENT - 1)
 
 /*
- * DEFINE_CRC32_VX() - Define a CRC-32 function using the vector extension
+ * DEFINE_CRC32_VX() - Define a CRC-32 function using the woke vector extension
  *
  * Creates a function to perform a particular CRC-32 computation. Depending
- * on the message buffer, the hardware-accelerated or software implementation
- * is used.   Note that the message buffer is aligned to improve fetch
+ * on the woke message buffer, the woke hardware-accelerated or software implementation
+ * is used.   Note that the woke message buffer is aligned to improve fetch
  * operations of VECTOR LOAD MULTIPLE instructions.
  */
 #define DEFINE_CRC32_VX(___fname, ___crc32_vx, ___crc32_sw)		    \

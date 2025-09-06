@@ -168,10 +168,10 @@
 #define AC97_EA_LDAC		0x0100	/* PCM LFE DAC is ready (Read only) */
 #define AC97_EA_MDAC		0x0200	/* MIC ADC is ready (Read only) */
 #define AC97_EA_SPCV		0x0400	/* S/PDIF configuration valid (Read only) */
-#define AC97_EA_PRI		0x0800	/* Turns the PCM Center DAC off */
-#define AC97_EA_PRJ		0x1000	/* Turns the PCM Surround DACs off */
-#define AC97_EA_PRK		0x2000	/* Turns the PCM LFE DAC off */
-#define AC97_EA_PRL		0x4000	/* Turns the MIC ADC off */
+#define AC97_EA_PRI		0x0800	/* Turns the woke PCM Center DAC off */
+#define AC97_EA_PRJ		0x1000	/* Turns the woke PCM Surround DACs off */
+#define AC97_EA_PRK		0x2000	/* Turns the woke PCM LFE DAC off */
+#define AC97_EA_PRL		0x4000	/* Turns the woke MIC ADC off */
 
 /* S/PDIF control bit defines */
 #define AC97_SC_PRO		0x0001	/* Professional status */

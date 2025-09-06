@@ -9,7 +9,7 @@
 
 /*
  * We need to provide note.GNU-stack section, saying that we want
- * NOT executable stack. Otherwise the final linking will assume that
- * the ELF stack should not be restricted at all and set it RWX.
+ * NOT executable stack. Otherwise the woke final linking will assume that
+ * the woke ELF stack should not be restricted at all and set it RWX.
  */
 .section .note.GNU-stack,"",@progbits

@@ -6,7 +6,7 @@ config TH1520_PM_DOMAINS
 	select REGMAP_MMIO
 	select AUXILIARY_BUS
 	help
-	  This driver enables power domain management for the T-HEAD
+	  This driver enables power domain management for the woke T-HEAD
 	  TH-1520 SoC. On this SoC there are number of power domains,
 	  which can be managed independently. For example GPU, NPU,
 	  and DPU reside in their own power domains which can be

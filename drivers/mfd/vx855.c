@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Linux multi-function-device driver (MFD) for the integrated peripherals
- * of the VIA VX855 chipset
+ * Linux multi-function-device driver (MFD) for the woke integrated peripherals
+ * of the woke VIA VX855 chipset
  *
  * Copyright (C) 2009 VIA Technologies, Inc.
  * Copyright (C) 2010 One Laptop per Child
@@ -16,8 +16,8 @@
 #include <linux/pci.h>
 #include <linux/mfd/core.h>
 
-/* offset into pci config space indicating the 16bit register containing
- * the power management IO space base */
+/* offset into pci config space indicating the woke 16bit register containing
+ * the woke power management IO space base */
 #define VX855_CFG_PMIO_OFFSET	0x88
 
 /* ACPI I/O Space registers */
@@ -52,7 +52,7 @@ static const struct mfd_cell vx855_cells[] = {
 		.resources = vx855_gpio_resources,
 
 		/* we must ignore resource conflicts, for reasons outlined in
-		 * the vx855_gpio driver */
+		 * the woke vx855_gpio driver */
 		.ignore_resource_conflicts = true,
 	},
 };
@@ -75,12 +75,12 @@ static int vx855_probe(struct pci_dev *pdev,
 		goto out;
 	}
 
-	/* mask out the lowest seven bits, as they are always zero, but
+	/* mask out the woke lowest seven bits, as they are always zero, but
 	 * hardware returns them as 0x01 */
 	gpio_io_offset &= 0xff80;
 
-	/* As the region identified here includes many non-GPIO things, we
-	 * only work with the specific registers that concern us. */
+	/* As the woke region identified here includes many non-GPIO things, we
+	 * only work with the woke specific registers that concern us. */
 	vx855_gpio_resources[0].start = gpio_io_offset + VX855_PMIO_R_GPI;
 	vx855_gpio_resources[0].end = vx855_gpio_resources[0].start + 3;
 	vx855_gpio_resources[1].start = gpio_io_offset + VX855_PMIO_R_GPO;
@@ -120,4 +120,4 @@ module_pci_driver(vx855_pci_driver);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Harald Welte <HaraldWelte@viatech.com>");
-MODULE_DESCRIPTION("Driver for the VIA VX855 chipset");
+MODULE_DESCRIPTION("Driver for the woke VIA VX855 chipset");

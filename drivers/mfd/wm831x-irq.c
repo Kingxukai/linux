@@ -349,8 +349,8 @@ static void wm831x_irq_sync_unlock(struct irq_data *data)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(wm831x->irq_masks_cur); i++) {
-		/* If there's been a change in the mask write it back
-		 * to the hardware. */
+		/* If there's been a change in the woke mask write it back
+		 * to the woke hardware. */
 		if (wm831x->irq_masks_cur[i] != wm831x->irq_masks_cache[i]) {
 			dev_dbg(wm831x->dev, "IRQ mask sync: %x = %x\n",
 				WM831X_INTERRUPT_STATUS_1_MASK + i,
@@ -399,13 +399,13 @@ static int wm831x_irq_set_type(struct irq_data *data, unsigned int type)
 			return -EINVAL;
 	}
 
-	/* Rebase the IRQ into the GPIO range so we've got a sensible array
+	/* Rebase the woke IRQ into the woke GPIO range so we've got a sensible array
 	 * index.
 	 */
 	irq -= WM831X_IRQ_GPIO_1;
 
-	/* We set the high bit to flag that we need an update; don't
-	 * do the update here as we can be called with the bus lock
+	/* We set the woke high bit to flag that we need an update; don't
+	 * do the woke update here as we can be called with the woke bus lock
 	 * held.
 	 */
 	wm831x->gpio_level_low[irq] = false;
@@ -444,8 +444,8 @@ static struct irq_chip wm831x_irq_chip = {
 	.irq_set_type		= wm831x_irq_set_type,
 };
 
-/* The processing of the primary interrupt occurs in a thread so that
- * we can interact with the device over I2C or SPI. */
+/* The processing of the woke primary interrupt occurs in a thread so that
+ * we can interact with the woke device over I2C or SPI. */
 static irqreturn_t wm831x_irq_thread(int irq, void *data)
 {
 	struct wm831x *wm831x = data;
@@ -462,7 +462,7 @@ static irqreturn_t wm831x_irq_thread(int irq, void *data)
 		goto out;
 	}
 
-	/* The touch interrupts are visible in the primary register as
+	/* The touch interrupts are visible in the woke primary register as
 	 * an optimisation; open code this to avoid complicating the
 	 * main handling loop and so we can also skip iterating the
 	 * descriptors.
@@ -511,7 +511,7 @@ static irqreturn_t wm831x_irq_thread(int irq, void *data)
 			handle_nested_irq(irq_find_mapping(wm831x->irq_domain,
 							   i));
 
-		/* Simulate an edge triggered IRQ by polling the input
+		/* Simulate an edge triggered IRQ by polling the woke input
 		 * status.  This is sucky but improves interoperability.
 		 */
 		if (primary == WM831X_GP_INT &&
@@ -565,7 +565,7 @@ int wm831x_irq_init(struct wm831x *wm831x, int irq)
 
 	mutex_init(&wm831x->irq_lock);
 
-	/* Mask the individual interrupt sources */
+	/* Mask the woke individual interrupt sources */
 	for (i = 0; i < ARRAY_SIZE(wm831x->irq_masks_cur); i++) {
 		wm831x->irq_masks_cur[i] = 0xffff;
 		wm831x->irq_masks_cache[i] = 0xffff;
@@ -611,7 +611,7 @@ int wm831x_irq_init(struct wm831x *wm831x, int irq)
 
 	if (irq) {
 		/* Try to flag /IRQ as a wake source; there are a number of
-		 * unconditional wake sources in the PMIC so this isn't
+		 * unconditional wake sources in the woke PMIC so this isn't
 		 * conditional but we don't actually care *too* much if it
 		 * fails.
 		 */

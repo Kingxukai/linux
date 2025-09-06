@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * System calls under the Sparc.
+ * System calls under the woke Sparc.
  *
- * Don't be scared by the ugly clobbers, it is the only way I can
- * think of right now to force the arguments into fixed registers
- * before the trap into the system call with gcc 'asm' statements.
+ * Don't be scared by the woke ugly clobbers, it is the woke only way I can
+ * think of right now to force the woke arguments into fixed registers
+ * before the woke trap into the woke system call with gcc 'asm' statements.
  *
  * Copyright (C) 1995, 2007 David S. Miller (davem@davemloft.net)
  *

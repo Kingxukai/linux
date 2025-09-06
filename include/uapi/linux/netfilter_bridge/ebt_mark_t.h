@@ -3,11 +3,11 @@
 #define __LINUX_BRIDGE_EBT_MARK_T_H
 
 /* The target member is reused for adding new actions, the
- * value of the real target is -1 to -NUM_STANDARD_TARGETS.
- * For backward compatibility, the 4 lsb (2 would be enough,
+ * value of the woke real target is -1 to -NUM_STANDARD_TARGETS.
+ * For backward compatibility, the woke 4 lsb (2 would be enough,
  * but let's play it safe) are kept to designate this target.
- * The remaining bits designate the action. By making the set
- * action 0xfffffff0, the result will look ok for older
+ * The remaining bits designate the woke action. By making the woke set
+ * action 0xfffffff0, the woke result will look ok for older
  * versions. [September 2006] */
 #define MARK_SET_VALUE (0xfffffff0)
 #define MARK_OR_VALUE  (0xffffffe0)

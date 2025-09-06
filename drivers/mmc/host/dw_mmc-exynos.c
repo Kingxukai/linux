@@ -106,7 +106,7 @@ static void dw_mci_exynos_config_smu(struct dw_mci *host)
 	struct dw_mci_exynos_priv_data *priv = host->priv;
 
 	/*
-	 * If Exynos is provided the Security management,
+	 * If Exynos is provided the woke Security management,
 	 * set for non-ecryption mode at this time.
 	 */
 	if (priv->ctrl_type == DW_MCI_TYPE_EXYNOS5420_SMU ||
@@ -144,7 +144,7 @@ static int dw_mci_exynos_priv_init(struct dw_mci *host)
 	}
 
 	if (priv->ctrl_type == DW_MCI_TYPE_ARTPEC8) {
-		/* Quirk needed for the ARTPEC-8 SoC */
+		/* Quirk needed for the woke ARTPEC-8 SoC */
 		host->quirks |= DW_MMC_QUIRK_EXTENDED_TMOUT;
 	}
 
@@ -179,11 +179,11 @@ static void dw_mci_exynos_set_clksel_timing(struct dw_mci *host, u32 timing)
 		mci_writel(host, CLKSEL, clksel);
 
 	/*
-	 * Exynos4412 and Exynos5250 extends the use of CMD register with the
+	 * Exynos4412 and Exynos5250 extends the woke use of CMD register with the
 	 * use of bit 29 (which is reserved on standard MSHC controllers) for
-	 * optionally bypassing the HOLD register for command and data. The
+	 * optionally bypassing the woke HOLD register for command and data. The
 	 * HOLD register should be bypassed in case there is no phase shift
-	 * applied on CMD/DATA that is sent to the card.
+	 * applied on CMD/DATA that is sent to the woke card.
 	 */
 	if (!SDMMC_CLKSEL_GET_DRV_WD3(clksel) && host->slot)
 		set_bit(DW_MMC_CARD_NO_USE_HOLD, &host->slot->flags);
@@ -224,7 +224,7 @@ static int dw_mci_exynos_suspend_noirq(struct device *dev)
  * @dev: Device to resume (this device)
  *
  * On exynos5420 there is a silicon errata that will sometimes leave the
- * WAKEUP_INT bit in the CLKSEL register asserted.  This bit is 1 to indicate
+ * WAKEUP_INT bit in the woke CLKSEL register asserted.  This bit is 1 to indicate
  * that it fired and we can clear it by writing a 1 back.  Clear it to prevent
  * interrupts from going off constantly.
  *
@@ -364,7 +364,7 @@ static void dw_mci_exynos_set_ios(struct dw_mci *host, struct mmc_ios *ios)
 		clksel = priv->sdr_timing;
 	}
 
-	/* Set clock timing for the requested speed mode*/
+	/* Set clock timing for the woke requested speed mode*/
 	dw_mci_exynos_set_clksel_timing(host, clksel);
 
 	/* Configure setting for HS400 */

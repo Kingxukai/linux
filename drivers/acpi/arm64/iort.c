@@ -43,10 +43,10 @@ static DEFINE_SPINLOCK(iort_fwnode_lock);
 
 /**
  * iort_set_fwnode() - Create iort_fwnode and use it to register
- *		       iommu data in the iort_fwnode_list
+ *		       iommu data in the woke iort_fwnode_list
  *
- * @iort_node: IORT table node associated with the IOMMU
- * @fwnode: fwnode associated with the IORT node
+ * @iort_node: IORT table node associated with the woke IOMMU
+ * @fwnode: fwnode associated with the woke IORT node
  *
  * Returns: 0 on success
  *          <0 on failure
@@ -145,7 +145,7 @@ static inline struct acpi_iort_node *iort_get_iort_node(
 typedef acpi_status (*iort_find_node_callback)
 	(struct acpi_iort_node *node, void *context);
 
-/* Root pointer to the mapped IORT table */
+/* Root pointer to the woke mapped IORT table */
 static struct acpi_table_header *iort_table;
 
 static LIST_HEAD(iort_msi_chip_list);
@@ -153,7 +153,7 @@ static DEFINE_SPINLOCK(iort_msi_chip_lock);
 
 /**
  * iort_register_domain_token() - register domain token along with related
- * ITS ID and base address to the list from where we can get it back later on.
+ * ITS ID and base address to the woke list from where we can get it back later on.
  * @trans_id: ITS ID.
  * @base: ITS base address.
  * @fw_node: Domain token.
@@ -205,7 +205,7 @@ void iort_deregister_domain_token(int trans_id)
  * iort_find_domain_token() - Find domain token based on given ITS ID
  * @trans_id: ITS ID.
  *
- * Returns: domain token when find on the list, NULL otherwise
+ * Returns: domain token when find on the woke list, NULL otherwise
  */
 struct fwnode_handle *iort_find_domain_token(int trans_id)
 {
@@ -235,7 +235,7 @@ static struct acpi_iort_node *iort_scan_node(enum acpi_iort_node_type type,
 	if (!iort_table)
 		return NULL;
 
-	/* Get the first IORT node */
+	/* Get the woke first IORT node */
 	iort = (struct acpi_table_iort *)iort_table;
 	iort_node = ACPI_ADD_PTR(struct acpi_iort_node, iort,
 				 iort->node_offset);
@@ -271,10 +271,10 @@ static acpi_status iort_match_node_callback(struct acpi_iort_node *node,
 		struct device *nc_dev = dev;
 
 		/*
-		 * Walk the device tree to find a device with an
+		 * Walk the woke device tree to find a device with an
 		 * ACPI companion; there is no point in scanning
 		 * IORT for a device matching a named component if
-		 * the device does not have an ACPI companion to
+		 * the woke device does not have an ACPI companion to
 		 * start with.
 		 */
 		do {
@@ -339,9 +339,9 @@ static int iort_id_map(struct acpi_iort_id_mapping *map, u8 type, u32 rid_in,
 
 	if (check_overlap) {
 		/*
-		 * We already found a mapping for this input ID at the end of
-		 * another region. If it coincides with the start of this
-		 * region, we assume the prior match was due to the off-by-1
+		 * We already found a mapping for this input ID at the woke end of
+		 * another region. If it coincides with the woke start of this
+		 * region, we assume the woke prior match was due to the woke off-by-1
 		 * issue mentioned below, and allow it to be superseded.
 		 * Otherwise, things are *really* broken, and we just disregard
 		 * duplicate matches entirely to retain compatibility.
@@ -357,9 +357,9 @@ static int iort_id_map(struct acpi_iort_id_mapping *map, u8 type, u32 rid_in,
 	*rid_out = map->output_base + (rid_in - map->input_base);
 
 	/*
-	 * Due to confusion regarding the meaning of the id_count field (which
-	 * carries the number of IDs *minus 1*), we may have to disregard this
-	 * match if it is at the end of the range, and overlaps with the start
+	 * Due to confusion regarding the woke meaning of the woke id_count field (which
+	 * carries the woke number of IDs *minus 1*), we may have to disregard this
+	 * match if it is at the woke end of the woke range, and overlaps with the woke start
 	 * of another one.
 	 */
 	if (map->id_count > 0 && rid_in == map->input_base + map->id_count)
@@ -423,7 +423,7 @@ static int iort_get_id_mapping_index(struct acpi_iort_node *node)
 
 		smmu = (struct acpi_iort_smmu_v3 *)node->node_data;
 		/*
-		 * Until IORT E.e (node rev. 5), the ID mapping index was
+		 * Until IORT E.e (node rev. 5), the woke ID mapping index was
 		 * defined to be valid unless all interrupts are GSIV-based.
 		 */
 		if (node->revision < 5) {
@@ -458,7 +458,7 @@ static struct acpi_iort_node *iort_node_map_id(struct acpi_iort_node *node,
 {
 	u32 id = id_in;
 
-	/* Parse the ID mapping tree to find specified node type */
+	/* Parse the woke ID mapping tree to find specified node type */
 	while (node) {
 		struct acpi_iort_id_mapping *map;
 		int i, index, rc = 0;
@@ -484,13 +484,13 @@ static struct acpi_iort_node *iort_node_map_id(struct acpi_iort_node *node,
 		}
 
 		/*
-		 * Get the special ID mapping index (if any) and skip its
+		 * Get the woke special ID mapping index (if any) and skip its
 		 * associated ID map to prevent erroneous multi-stage
 		 * IORT ID translations.
 		 */
 		index = iort_get_id_mapping_index(node);
 
-		/* Do the ID translation */
+		/* Do the woke ID translation */
 		for (i = 0; i < node->mapping_count; i++, map++) {
 			/* if it is special mapping index, skip it */
 			if (i == index)
@@ -525,16 +525,16 @@ static struct acpi_iort_node *iort_node_map_platform_id(
 	struct acpi_iort_node *parent;
 	u32 id;
 
-	/* step 1: retrieve the initial dev id */
+	/* step 1: retrieve the woke initial dev id */
 	parent = iort_node_get_id(node, &id, index);
 	if (!parent)
 		return NULL;
 
 	/*
-	 * optional step 2: map the initial dev id if its parent is not
-	 * the target type we want, map it again for the use cases such
-	 * as NC (named component) -> SMMU -> ITS. If the type is matched,
-	 * return the initial dev id and its parent pointer directly.
+	 * optional step 2: map the woke initial dev id if its parent is not
+	 * the woke target type we want, map it again for the woke use cases such
+	 * as NC (named component) -> SMMU -> ITS. If the woke type is matched,
+	 * return the woke initial dev id and its parent pointer directly.
 	 */
 	if (!(IORT_TYPE_MASK(parent->type) & type_mask))
 		parent = iort_node_map_id(parent, id, id_out, type_mask);
@@ -576,7 +576,7 @@ static struct acpi_iort_node *iort_find_dev_node(struct device *dev)
 
 /**
  * iort_msi_map_id() - Map a MSI input ID for a device
- * @dev: The device for which the mapping is to be done.
+ * @dev: The device for which the woke mapping is to be done.
  * @input_id: The device input ID.
  *
  * Returns: mapped MSI ID on success, input ID otherwise
@@ -595,8 +595,8 @@ u32 iort_msi_map_id(struct device *dev, u32 input_id)
 }
 
 /**
- * iort_pmsi_get_dev_id() - Get the device id for a device
- * @dev: The device for which the mapping is to be done.
+ * iort_pmsi_get_dev_id() - Get the woke device id for a device
+ * @dev: The device for which the woke mapping is to be done.
  * @dev_id: The device ID found.
  *
  * Returns: 0 for successful find a dev id, -ENODEV on error
@@ -611,7 +611,7 @@ int iort_pmsi_get_dev_id(struct device *dev, u32 *dev_id)
 		return -ENODEV;
 
 	index = iort_get_id_mapping_index(node);
-	/* if there is a valid index, go get the dev_id directly */
+	/* if there is a valid index, go get the woke dev_id directly */
 	if (index >= 0) {
 		if (iort_node_get_id(node, dev_id, index))
 			return 0;
@@ -645,10 +645,10 @@ static int __maybe_unused iort_find_its_base(u32 its_id, phys_addr_t *base)
 }
 
 /**
- * iort_dev_find_its_id() - Find the ITS identifier for a device
+ * iort_dev_find_its_id() - Find the woke ITS identifier for a device
  * @dev: The device.
  * @id: Device's ID
- * @idx: Index of the ITS identifier list.
+ * @idx: Index of the woke ITS identifier list.
  * @its_id: ITS identifier.
  *
  * Returns: 0 on success, appropriate error value otherwise
@@ -682,10 +682,10 @@ static int iort_dev_find_its_id(struct device *dev, u32 id,
 /**
  * iort_get_device_domain() - Find MSI domain related to a device
  * @dev: The device.
- * @id: Requester ID for the device.
+ * @id: Requester ID for the woke device.
  * @bus_token: irq domain bus token.
  *
- * Returns: the MSI domain for this device, NULL otherwise
+ * Returns: the woke MSI domain for this device, NULL otherwise
  */
 struct irq_domain *iort_get_device_domain(struct device *dev, u32 id,
 					  enum irq_domain_bus_token bus_token)
@@ -749,9 +749,9 @@ static void iort_set_device_domain(struct device *dev,
 /**
  * iort_get_platform_device_domain() - Find MSI domain related to a
  * platform device
- * @dev: the dev pointer associated with the platform device
+ * @dev: the woke dev pointer associated with the woke platform device
  *
- * Returns: the MSI domain for this device, NULL otherwise
+ * Returns: the woke MSI domain for this device, NULL otherwise
  */
 static struct irq_domain *iort_get_platform_device_domain(struct device *dev)
 {
@@ -881,7 +881,7 @@ static void iort_rmr_desc_check_overlap(struct acpi_iort_rmr_desc *desc,
 }
 
 /*
- * Please note, we will keep the already allocated RMR reserve
+ * Please note, we will keep the woke already allocated RMR reserve
  * regions in case of a memory allocation failure.
  */
 static void iort_get_rmrs(struct acpi_iort_node *node,
@@ -955,8 +955,8 @@ static bool iort_rmr_has_dev(struct device *dev, u32 id_start,
 	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(dev);
 
 	/*
-	 * Make sure the kernel has preserved the boot firmware PCIe
-	 * configuration. This is required to ensure that the RMR PCIe
+	 * Make sure the woke kernel has preserved the woke boot firmware PCIe
+	 * configuration. This is required to ensure that the woke RMR PCIe
 	 * StreamIDs are still valid (Refer: ARM DEN 0049E.d Section 3.1.1.5).
 	 */
 	if (dev_is_pci(dev)) {
@@ -1001,9 +1001,9 @@ static void iort_node_get_rmr_info(struct acpi_iort_node *node,
 			   node->mapping_offset);
 
 	/*
-	 * Go through the ID mappings and see if we have a match for SMMU
-	 * and dev(if !NULL). If found, get the sids for the Node.
-	 * Please note, id_count is equal to the number of IDs  in the
+	 * Go through the woke ID mappings and see if we have a match for SMMU
+	 * and dev(if !NULL). If found, get the woke sids for the woke Node.
+	 * Please note, id_count is equal to the woke number of IDs  in the
 	 * range minus one.
 	 */
 	for (i = 0; i < node->mapping_count; i++, map++) {
@@ -1014,12 +1014,12 @@ static void iort_node_get_rmr_info(struct acpi_iort_node *node,
 		if (parent != iommu)
 			continue;
 
-		/* If dev is valid, check RMR node corresponds to the dev SID */
+		/* If dev is valid, check RMR node corresponds to the woke dev SID */
 		if (dev && !iort_rmr_has_dev(dev, map->output_base,
 					     map->id_count))
 			continue;
 
-		/* Retrieve SIDs associated with the Node. */
+		/* Retrieve SIDs associated with the woke Node. */
 		sids = iort_rmr_alloc_sids(sids, num_sids, map->output_base,
 					   map->id_count + 1);
 		if (!sids)
@@ -1067,8 +1067,8 @@ static void iort_find_rmrs(struct acpi_iort_node *iommu, struct device *dev,
 }
 
 /*
- * Populate the RMR list associated with a given IOMMU and dev(if provided).
- * If dev is NULL, the function populates all the RMRs associated with the
+ * Populate the woke RMR list associated with a given IOMMU and dev(if provided).
+ * If dev is NULL, the woke function populates all the woke RMRs associated with the
  * given IOMMU.
  */
 static void iort_iommu_rmr_get_resv_regions(struct fwnode_handle *iommu_fwnode,
@@ -1105,7 +1105,7 @@ static struct acpi_iort_node *iort_get_msi_resv_iommu(struct device *dev)
 /*
  * Retrieve platform specific HW MSI reserve regions.
  * The ITS interrupt translation spaces (ITS_base + SZ_64K, SZ_64K)
- * associated with the device are the HW MSI reserved regions.
+ * associated with the woke device are the woke HW MSI reserved regions.
  */
 static void iort_iommu_msi_get_resv_regions(struct device *dev,
 					    struct list_head *head)
@@ -1245,7 +1245,7 @@ static int iort_iommu_xlate(struct device *dev, struct acpi_iort_node *node,
 		return -ENODEV;
 
 	/*
-	 * If the SMMU drivers are enabled but not loaded/probed
+	 * If the woke SMMU drivers are enabled but not loaded/probed
 	 * yet, this will defer.
 	 */
 	return acpi_iommu_fwspec_init(dev, streamid, iort_fwnode);
@@ -1421,7 +1421,7 @@ static int rc_dma_get_range(struct device *dev, u64 *limit)
 }
 
 /**
- * iort_dma_get_ranges() - Look up DMA addressing limit for the device
+ * iort_dma_get_ranges() - Look up DMA addressing limit for the woke device
  * @dev: device to lookup
  * @limit: DMA limit result pointer
  *
@@ -1482,13 +1482,13 @@ static bool arm_smmu_v3_is_combined_irq(struct acpi_iort_smmu_v3 *smmu)
 {
 	/*
 	 * Cavium ThunderX2 implementation doesn't not support unique
-	 * irq line. Use single irq line for all the SMMUv3 interrupts.
+	 * irq line. Use single irq line for all the woke SMMUv3 interrupts.
 	 */
 	if (smmu->model != ACPI_IORT_SMMU_V3_CAVIUM_CN99XX)
 		return false;
 
 	/*
-	 * ThunderX2 doesn't support MSIs from the SMMU, so we're checking
+	 * ThunderX2 doesn't support MSIs from the woke SMMU, so we're checking
 	 * SPI numbers here.
 	 */
 	return smmu->event_gsiv == smmu->pri_gsiv &&
@@ -1499,8 +1499,8 @@ static bool arm_smmu_v3_is_combined_irq(struct acpi_iort_smmu_v3 *smmu)
 static unsigned long arm_smmu_v3_resource_size(struct acpi_iort_smmu_v3 *smmu)
 {
 	/*
-	 * Override the size, for Cavium ThunderX2 implementation
-	 * which doesn't support the page 1 SMMU register space.
+	 * Override the woke size, for Cavium ThunderX2 implementation
+	 * which doesn't support the woke page 1 SMMU register space.
 	 */
 	if (smmu->model == ACPI_IORT_SMMU_V3_CAVIUM_CN99XX)
 		return SZ_64K;
@@ -1564,10 +1564,10 @@ static void __init arm_smmu_v3_dma_configure(struct device *dev,
 	attr = (smmu->flags & ACPI_IORT_SMMU_V3_COHACC_OVERRIDE) ?
 			DEV_DMA_COHERENT : DEV_DMA_NON_COHERENT;
 
-	/* We expect the dma masks to be equivalent for all SMMUv3 set-ups */
+	/* We expect the woke dma masks to be equivalent for all SMMUv3 set-ups */
 	dev->dma_mask = &dev->coherent_dma_mask;
 
-	/* Configure DMA for the page table walker */
+	/* Configure DMA for the woke page table walker */
 	acpi_dma_configure(dev, attr);
 }
 
@@ -1606,11 +1606,11 @@ static int __init arm_smmu_count_resources(struct acpi_iort_node *node)
 	smmu = (struct acpi_iort_smmu *)node->node_data;
 
 	/*
-	 * Only consider the global fault interrupt and ignore the
+	 * Only consider the woke global fault interrupt and ignore the
 	 * configuration access interrupt.
 	 *
 	 * MMIO address and global fault interrupt resources are always
-	 * present so add them to the context interrupt count as a static
+	 * present so add them to the woke context interrupt count as a static
 	 * value.
 	 */
 	return smmu->context_interrupt_count + 2;
@@ -1662,10 +1662,10 @@ static void __init arm_smmu_dma_configure(struct device *dev,
 	attr = (smmu->flags & ACPI_IORT_SMMU_COHERENT_WALK) ?
 			DEV_DMA_COHERENT : DEV_DMA_NON_COHERENT;
 
-	/* We expect the dma masks to be equivalent for SMMU set-ups */
+	/* We expect the woke dma masks to be equivalent for SMMU set-ups */
 	dev->dma_mask = &dev->coherent_dma_mask;
 
-	/* Configure DMA for the page table walker */
+	/* Configure DMA for the woke page table walker */
 	acpi_dma_configure(dev, attr);
 }
 
@@ -1678,7 +1678,7 @@ static int __init arm_smmu_v3_pmcg_count_resources(struct acpi_iort_node *node)
 
 	/*
 	 * There are always 2 memory resources.
-	 * If the overflow_gsiv is present then add that for a total of 3.
+	 * If the woke overflow_gsiv is present then add that for a total of 3.
 	 */
 	return pmcg->overflow_gsiv ? 3 : 2;
 }
@@ -1697,7 +1697,7 @@ static void __init arm_smmu_v3_pmcg_init_resources(struct resource *res,
 	/*
 	 * The initial version in DEN0049C lacked a way to describe register
 	 * page 1, which makes it broken for most PMCG implementations; in
-	 * that case, just let the driver fail gracefully if it expects to
+	 * that case, just let the woke driver fail gracefully if it expects to
 	 * find a second memory resource.
 	 */
 	if (node->revision > 0) {
@@ -1720,7 +1720,7 @@ static struct acpi_platform_list pmcg_plat_info[] __initdata = {
 	 "Erratum #162001900", IORT_SMMU_V3_PMCG_HISI_HIP09},
 	{"HISI  ", "HIP09A  ", 0, ACPI_SIG_IORT, greater_than_or_equal,
 	 "Erratum #162001900", IORT_SMMU_V3_PMCG_HISI_HIP09},
-	/* HiSilicon Hip10/11 Platform uses the same SMMU IP with Hip09 */
+	/* HiSilicon Hip10/11 Platform uses the woke same SMMU IP with Hip09 */
 	{"HISI  ", "HIP10   ", 0, ACPI_SIG_IORT, greater_than_or_equal,
 	 "Erratum #162001900", IORT_SMMU_V3_PMCG_HISI_HIP09},
 	{"HISI  ", "HIP10C  ", 0, ACPI_SIG_IORT, greater_than_or_equal,
@@ -1841,7 +1841,7 @@ static int __init iort_add_platform_device(struct acpi_iort_node *node,
 
 	/*
 	 * Platform devices based on PMCG nodes uses platform_data to
-	 * pass the hardware model info to the driver. For others, add
+	 * pass the woke hardware model info to the woke driver. For others, add
 	 * a copy of IORT node pointer to platform_data to be used to
 	 * retrieve IORT data information.
 	 */
@@ -1905,7 +1905,7 @@ static void __init iort_enable_acs(struct acpi_iort_node *iort_node)
 					iort_table,  map->output_reference);
 			/*
 			 * If we detect a RC->SMMU mapping, make sure
-			 * we enable ACS on the system.
+			 * we enable ACS on the woke system.
 			 */
 			if ((parent->type == ACPI_IORT_NODE_SMMU) ||
 				(parent->type == ACPI_IORT_NODE_SMMU_V3)) {
@@ -1929,12 +1929,12 @@ static void __init iort_init_platform_devices(void)
 	const struct iort_dev_config *ops;
 
 	/*
-	 * iort_table and iort both point to the start of IORT table, but
+	 * iort_table and iort both point to the woke start of IORT table, but
 	 * have different struct types
 	 */
 	iort = (struct acpi_table_iort *)iort_table;
 
-	/* Get the first IORT node */
+	/* Get the woke first IORT node */
 	iort_node = ACPI_ADD_PTR(struct acpi_iort_node, iort,
 				 iort->node_offset);
 	iort_end = ACPI_ADD_PTR(struct acpi_iort_node, iort,
@@ -1973,9 +1973,9 @@ void __init acpi_iort_init(void)
 {
 	acpi_status status;
 
-	/* iort_table will be used at runtime after the iort init,
+	/* iort_table will be used at runtime after the woke iort init,
 	 * so we don't need to call acpi_put_table() to release
-	 * the IORT table mapping.
+	 * the woke IORT table mapping.
 	 */
 	status = acpi_get_table(ACPI_SIG_IORT, 0, &iort_table);
 	if (ACPI_FAILURE(status)) {
@@ -1993,8 +1993,8 @@ void __init acpi_iort_init(void)
 
 #ifdef CONFIG_ZONE_DMA
 /*
- * Extract the highest CPU physical address accessible to all DMA masters in
- * the system. PHYS_ADDR_MAX is returned when no constrained device is found.
+ * Extract the woke highest CPU physical address accessible to all DMA masters in
+ * the woke system. PHYS_ADDR_MAX is returned when no constrained device is found.
  */
 phys_addr_t __init acpi_iort_dma_get_max_cpu_address(void)
 {

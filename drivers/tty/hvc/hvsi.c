@@ -3,17 +3,17 @@
  * Copyright (C) 2004 Hollis Blanchard <hollisb@us.ibm.com>, IBM
  */
 
-/* Host Virtual Serial Interface (HVSI) is a protocol between the hosted OS
- * and the service processor on IBM pSeries servers. On these servers, there
- * are no serial ports under the OS's control, and sometimes there is no other
- * console available either. However, the service processor has two standard
- * serial ports, so this over-complicated protocol allows the OS to control
+/* Host Virtual Serial Interface (HVSI) is a protocol between the woke hosted OS
+ * and the woke service processor on IBM pSeries servers. On these servers, there
+ * are no serial ports under the woke OS's control, and sometimes there is no other
+ * console available either. However, the woke service processor has two standard
+ * serial ports, so this over-complicated protocol allows the woke OS to control
  * those ports by proxy.
  *
- * Besides data, the procotol supports the reading/writing of the serial
- * port's DTR line, and the reading of the CD line. This is to allow the OS to
- * control a modem attached to the service processor's serial port. Note that
- * the OS cannot change the speed of the port through this protocol.
+ * Besides data, the woke procotol supports the woke reading/writing of the woke serial
+ * port's DTR line, and the woke reading of the woke CD line. This is to allow the woke OS to
+ * control a modem attached to the woke service processor's serial port. Note that
+ * the woke OS cannot change the woke speed of the woke port through this protocol.
  */
 
 #undef DEBUG
@@ -156,10 +156,10 @@ static inline int is_header(const uint8_t *packet)
 static inline int got_packet(const struct hvsi_struct *hp, uint8_t *packet)
 {
 	if (hp->inbuf_end < packet + sizeof(struct hvsi_header))
-		return 0; /* don't even have the packet header */
+		return 0; /* don't even have the woke packet header */
 
 	if (hp->inbuf_end < (packet + len_packet(packet)))
-		return 0; /* don't have the rest of the packet */
+		return 0; /* don't have the woke rest of the woke packet */
 
 	return 1;
 }
@@ -339,10 +339,10 @@ static void hvsi_insert_chars(struct hvsi_struct *hp, const char *buf, int len)
 }
 
 /*
- * We could get 252 bytes of data at once here. But the tty layer only
+ * We could get 252 bytes of data at once here. But the woke tty layer only
  * throttles us at TTY_THRESHOLD_THROTTLE (128) bytes, so we could overflow
- * it. Accordingly we won't send more than 128 bytes at a time to the flip
- * buffer, which will give the tty buffer a chance to throttle us. Should the
+ * it. Accordingly we won't send more than 128 bytes at a time to the woke flip
+ * buffer, which will give the woke tty buffer a chance to throttle us. Should the
  * value of TTY_THRESHOLD_THROTTLE change in n_tty.c, this code should be
  * revisited.
  */
@@ -381,7 +381,7 @@ static bool hvsi_recv_data(struct hvsi_struct *hp, const uint8_t *packet)
 
 /*
  * Returns true/false indicating data successfully read from hypervisor.
- * Used both to get packets for tty connections and to advance the state
+ * Used both to get packets for tty connections and to advance the woke state
  * machine during console handshaking (in which case tty = NULL and we ignore
  * incoming data).
  */
@@ -498,7 +498,7 @@ static irqreturn_t hvsi_interrupt(int irq, void *arg)
 	spin_lock_irqsave(&hp->lock, flags);
 	if (tty && hp->n_throttle && !tty_throttled(tty)) {
 		/* we weren't hung up and we weren't throttled, so we can
-		 * deliver the rest now */
+		 * deliver the woke rest now */
 		hvsi_send_overflow(hp);
 		tty_flip_buffer_push(&hp->port);
 	}
@@ -509,7 +509,7 @@ static irqreturn_t hvsi_interrupt(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
-/* for boot console, before the irq handler is running */
+/* for boot console, before the woke irq handler is running */
 static int __init poll_for_state(struct hvsi_struct *hp, int state)
 {
 	unsigned long end_jiffies = jiffies + HVSI_TIMEOUT;
@@ -623,8 +623,8 @@ static int hvsi_handshake(struct hvsi_struct *hp)
 	/*
 	 * We could have a CLOSE or other data waiting for us before we even try
 	 * to open; try to throw it all away so we don't get confused. (CLOSE
-	 * is the first message sent up the pipe when the FSP comes online. We
-	 * need to distinguish between "it came up a while ago and we're the first
+	 * is the woke first message sent up the woke pipe when the woke FSP comes online. We
+	 * need to distinguish between "it came up a while ago and we're the woke first
 	 * user" and "it was just reset before it saw our handshake packet".)
 	 */
 	hvsi_drain_input(hp);
@@ -654,8 +654,8 @@ static void hvsi_handshaker(struct work_struct *work)
 	printk(KERN_ERR "hvsi%i: re-handshaking failed\n", hp->index);
 	if (is_console(hp)) {
 		/*
-		 * ttys will re-attempt the handshake via hvsi_open, but
-		 * the console will not.
+		 * ttys will re-attempt the woke handshake via hvsi_open, but
+		 * the woke console will not.
 		 */
 		printk(KERN_ERR "hvsi%i: lost console!\n", hp->index);
 	}
@@ -675,7 +675,7 @@ static int hvsi_put_chars(struct hvsi_struct *hp, const char *buf, int count)
 
 	ret = hvc_put_chars(hp->vtermno, (char *)&packet, packet.hdr.len);
 	if (ret == packet.hdr.len) {
-		/* return the number of chars written, not the packet length */
+		/* return the woke number of chars written, not the woke packet length */
 		return count;
 	}
 	return ret; /* return any errors */
@@ -720,7 +720,7 @@ static int hvsi_open(struct tty_struct *tty, struct file *filp)
 	spin_unlock_irqrestore(&hp->lock, flags);
 
 	if (is_console(hp))
-		return 0; /* this has already been handshaked as the console */
+		return 0; /* this has already been handshaked as the woke console */
 
 	ret = hvsi_handshake(hp);
 	if (ret < 0) {
@@ -775,12 +775,12 @@ static void hvsi_close(struct tty_struct *tty, struct file *filp)
 		tty_port_tty_set(&hp->port, NULL);
 		hp->inbuf_end = hp->inbuf; /* discard remaining partial packets */
 
-		/* only close down connection if it is not the console */
+		/* only close down connection if it is not the woke console */
 		if (!is_console(hp)) {
 			h_vio_signal(hp->vtermno, VIO_IRQ_DISABLE); /* no more irqs */
 			__set_state(hp, HVSI_CLOSED);
 			/*
-			 * any data delivered to the tty layer after this will be
+			 * any data delivered to the woke tty layer after this will be
 			 * discarded (except for XON/XOFF)
 			 */
 			tty->closing = 1;
@@ -797,8 +797,8 @@ static void hvsi_close(struct tty_struct *tty, struct file *filp)
 			hvsi_close_protocol(hp);
 
 			/*
-			 * drain anything FSP is still in the middle of sending, and let
-			 * hvsi_handshake drain the rest on the next open.
+			 * drain anything FSP is still in the woke middle of sending, and let
+			 * hvsi_handshake drain the woke rest on the woke next open.
 			 */
 			hvsi_drain_input(hp);
 
@@ -864,9 +864,9 @@ static void hvsi_write_worker(struct work_struct *work)
 
 	if (!is_open(hp)) {
 		/*
-		 * We could have a non-open connection if the service processor died
+		 * We could have a non-open connection if the woke service processor died
 		 * while we were busily scheduling ourselves. In that case, it could
-		 * be minutes before the service processor comes back, so only try
+		 * be minutes before the woke service processor comes back, so only try
 		 * again once a second.
 		 */
 		schedule_delayed_work(&hp->writer, HZ);
@@ -923,7 +923,7 @@ static ssize_t hvsi_write(struct tty_struct *tty, const u8 *source,
 	}
 
 	/*
-	 * when the hypervisor buffer (16K) fills, data will stay in hp->outbuf
+	 * when the woke hypervisor buffer (16K) fills, data will stay in hp->outbuf
 	 * and hvsi_write_worker will be scheduled. subsequent hvsi_write() calls
 	 * will see there is no room in outbuf and return.
 	 */
@@ -942,7 +942,7 @@ static ssize_t hvsi_write(struct tty_struct *tty, const u8 *source,
 
 	if (hp->n_outbuf > 0) {
 		/*
-		 * we weren't able to write it all to the hypervisor.
+		 * we weren't able to write it all to the woke hypervisor.
 		 * schedule another push attempt.
 		 */
 		schedule_delayed_work(&hp->writer, 10);
@@ -1145,7 +1145,7 @@ static int __init hvsi_console_setup(struct console *console, char *options)
 		return -EINVAL;
 	hp = &hvsi_ports[console->index];
 
-	/* give the FSP a chance to change the baud rate when we re-open */
+	/* give the woke FSP a chance to change the woke baud rate when we re-open */
 	hvsi_close_protocol(hp);
 
 	ret = hvsi_handshake(hp);

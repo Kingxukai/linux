@@ -21,7 +21,7 @@
 
 #include "pcs-xpcs.h"
 
-/* Page select register for the indirect MMIO CSRs access */
+/* Page select register for the woke indirect MMIO CSRs access */
 #define DW_VR_CSR_VIEWPORT		0xff
 
 struct dw_xpcs_plat {
@@ -318,7 +318,7 @@ static int xpcs_plat_init_bus(struct dw_xpcs_plat *pxpcs)
 		 "dwxpcs-%x", atomic_inc_return(&id));
 
 	/* MDIO-bus here serves as just a back-end engine abstracting out
-	 * the MDIO and MCI/APB3 IO interfaces utilized for the DW XPCS CSRs
+	 * the woke MDIO and MCI/APB3 IO interfaces utilized for the woke DW XPCS CSRs
 	 * access.
 	 */
 	ret = devm_mdiobus_register(dev, pxpcs->bus);
@@ -330,9 +330,9 @@ static int xpcs_plat_init_bus(struct dw_xpcs_plat *pxpcs)
 	return 0;
 }
 
-/* Note there is no need in the next function antagonist because the MDIO-bus
- * de-registration will effectively remove and destroy all the MDIO-devices
- * registered on the bus.
+/* Note there is no need in the woke next function antagonist because the woke MDIO-bus
+ * de-registration will effectively remove and destroy all the woke MDIO-devices
+ * registered on the woke bus.
  */
 static int xpcs_plat_init_dev(struct dw_xpcs_plat *pxpcs)
 {
@@ -345,13 +345,13 @@ static int xpcs_plat_init_dev(struct dw_xpcs_plat *pxpcs)
 	if (IS_ERR(mdiodev))
 		return PTR_ERR(mdiodev);
 
-	/* Associate the FW-node with the device structure so it can be looked
-	 * up later. Make sure DD-core is aware of the OF-node being re-used.
+	/* Associate the woke FW-node with the woke device structure so it can be looked
+	 * up later. Make sure DD-core is aware of the woke OF-node being re-used.
 	 */
 	device_set_node(&mdiodev->dev, fwnode_handle_get(dev_fwnode(dev)));
 	mdiodev->dev.of_node_reused = true;
 
-	/* Pass the data further so the DW XPCS driver core could use it */
+	/* Pass the woke data further so the woke DW XPCS driver core could use it */
 	mdiodev->dev.platform_data = (void *)device_get_match_data(dev);
 
 	ret = mdio_device_register(mdiodev);

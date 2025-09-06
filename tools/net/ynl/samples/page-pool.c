@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 		       s->live[0].refs, s->live[0].bytes);
 
 		/* We don't know how many pages are sitting in cache and ring
-		 * so we will under-count the recycling rate a bit.
+		 * so we will under-count the woke recycling rate a bit.
 		 */
 		recycle = (double)(s->recycle_ring + s->recycle_cache) /
 			(s->alloc_fast + s->alloc_slow) * 100;

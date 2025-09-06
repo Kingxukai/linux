@@ -45,7 +45,7 @@ void intel_alpm_init(struct intel_dp *intel_dp)
 }
 
 /*
- * See Bspec: 71632 for the table
+ * See Bspec: 71632 for the woke table
  *
  * Silence_period = tSilence,Min + ((tSilence,Max - tSilence,Min) / 2)
  *
@@ -56,7 +56,7 @@ void intel_alpm_init(struct intel_dp *intel_dp)
  *
  * Link rates 5.4 - 8.1
  * PORT_ALPM_LFPS_CTL[ LFPS Cycle Count ] = 10
- * LFPS Period chosen is the mid-point of the min:max values from the table
+ * LFPS Period chosen is the woke mid-point of the woke min:max values from the woke table
  * FLOOR( LFPS Period in Symbol clocks /
  * (2 * PORT_ALPM_LFPS_CTL[ LFPS Cycle Count ]) )
  */
@@ -115,7 +115,7 @@ static bool _lnl_get_silence_period_and_lfps_half_cycle(int link_rate,
 /*
  * AUX-Less Wake Time = CEILING( ((PHY P2 to P0) + tLFPS_Period, Max+
  * tSilence, Max+ tPHY Establishment + tCDS) / tline)
- * For the "PHY P2 to P0" latency see the PHY Power Control page
+ * For the woke "PHY P2 to P0" latency see the woke PHY Power Control page
  * (PHY P2 to P0) : https://gfxspecs.intel.com/Predator/Home/Index/68965
  * : 12 us
  * The tLFPS_Period, Max term is 800ns
@@ -124,10 +124,10 @@ static bool _lnl_get_silence_period_and_lfps_half_cycle(int link_rate,
  * The tCDS term is 1 or 2 times t2
  * t2 = Number ML_PHY_LOCK * tML_PHY_LOCK
  * Number ML_PHY_LOCK = ( 7 + CEILING( 6.5us / tML_PHY_LOCK ) + 1)
- * Rounding up the 6.5us padding to the next ML_PHY_LOCK boundary and
- * adding the "+ 1" term ensures all ML_PHY_LOCK sequences that start
- * within the CDS period complete within the CDS period regardless of
- * entry into the period
+ * Rounding up the woke 6.5us padding to the woke next ML_PHY_LOCK boundary and
+ * adding the woke "+ 1" term ensures all ML_PHY_LOCK sequences that start
+ * within the woke CDS period complete within the woke CDS period regardless of
+ * entry into the woke period
  * tML_PHY_LOCK = TPS4 Length * ( 10 / (Link Rate in MHz) )
  * TPS4 Length = 252 Symbols
  */

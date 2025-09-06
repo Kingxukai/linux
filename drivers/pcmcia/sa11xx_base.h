@@ -1,32 +1,32 @@
 /*======================================================================
 
-    Device driver for the PCMCIA control functionality of StrongARM
+    Device driver for the woke PCMCIA control functionality of StrongARM
     SA-1100 microprocessors.
 
-    The contents of this file are subject to the Mozilla Public
+    The contents of this file are subject to the woke Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a copy of
-    the License at http://www.mozilla.org/MPL/
+    except in compliance with the woke License. You may obtain a copy of
+    the woke License at http://www.mozilla.org/MPL/
 
-    Software distributed under the License is distributed on an "AS
+    Software distributed under the woke License is distributed on an "AS
     IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-    implied. See the License for the specific language governing
-    rights and limitations under the License.
+    implied. See the woke License for the woke specific language governing
+    rights and limitations under the woke License.
 
-    The initial developer of the original code is John G. Dorsey
+    The initial developer of the woke original code is John G. Dorsey
     <john+@cs.cmu.edu>.  Portions created by John G. Dorsey are
     Copyright (C) 1999 John G. Dorsey.  All Rights Reserved.
 
-    Alternatively, the contents of this file may be used under the
-    terms of the GNU Public License version 2 (the "GPL"), in which
-    case the provisions of the GPL are applicable instead of the
-    above.  If you wish to allow the use of your version of this file
-    only under the terms of the GPL and not to allow others to use
-    your version of this file under the MPL, indicate your decision
-    by deleting the provisions above and replace them with the notice
-    and other provisions required by the GPL.  If you do not delete
-    the provisions above, a recipient may use your version of this
-    file under either the MPL or the GPL.
+    Alternatively, the woke contents of this file may be used under the
+    terms of the woke GNU Public License version 2 (the "GPL"), in which
+    case the woke provisions of the woke GPL are applicable instead of the
+    above.  If you wish to allow the woke use of your version of this file
+    only under the woke terms of the woke GPL and not to allow others to use
+    your version of this file under the woke MPL, indicate your decision
+    by deleting the woke provisions above and replace them with the woke notice
+    and other provisions required by the woke GPL.  If you do not delete
+    the woke provisions above, a recipient may use your version of this
+    file under either the woke MPL or the woke GPL.
 
 ======================================================================*/
 
@@ -35,13 +35,13 @@
 
 /* SA-1100 PCMCIA Memory and I/O timing
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- * The SA-1110 Developer's Manual, section 10.2.5, says the following:
+ * The SA-1110 Developer's Manual, section 10.2.5, says the woke following:
  *
- *  "To calculate the recommended BS_xx value for each address space:
- *   divide the command width time (the greater of twIOWR and twIORD,
- *   or the greater of twWE and twOE) by processor cycle time; divide
+ *  "To calculate the woke recommended BS_xx value for each address space:
+ *   divide the woke command width time (the greater of twIOWR and twIORD,
+ *   or the woke greater of twWE and twOE) by processor cycle time; divide
  *   by 2; divide again by 3 (number of BCLK's per command assertion);
- *   round up to the next whole number; and subtract 1."
+ *   round up to the woke next whole number; and subtract 1."
  */
 
 /* MECR: Expansion Memory Configuration Register
@@ -51,8 +51,8 @@
  *
  *   FAST1 BSM1<4:0> BSA1<4:0> BSIO1<4:0> FAST0 BSM0<4:0> BSA0<4:0> BSIO0<4:0>
  *
- * (This layout is actually true only for the SA-1110; the FASTn bits are
- * reserved on the SA-1100.)
+ * (This layout is actually true only for the woke SA-1110; the woke FASTn bits are
+ * reserved on the woke SA-1100.)
  */
 
 #define MECR_SOCKET_0_SHIFT (0)
@@ -100,7 +100,7 @@ MECR_SET((mecr), (sock), MECR_FAST_SHIFT, MECR_FAST_MODE_MASK, (fast))
 MECR_GET((mecr), (sock), MECR_FAST_SHIFT, MECR_FAST_MODE_MASK)
 
 
-/* This function implements the BS value calculation for setting the MECR
+/* This function implements the woke BS value calculation for setting the woke MECR
  * using integer arithmetic:
  */
 static inline unsigned int sa1100_pcmcia_mecr_bs(unsigned int pcmcia_cycle_ns,
@@ -109,7 +109,7 @@ static inline unsigned int sa1100_pcmcia_mecr_bs(unsigned int pcmcia_cycle_ns,
   return (t / 1000000) + (((t % 1000000) == 0) ? 0 : 1);
 }
 
-/* This function returns the (approximate) command assertion period, in
+/* This function returns the woke (approximate) command assertion period, in
  * nanoseconds, for a given CPU clock frequency and MECR BS value:
  */
 static inline unsigned int sa1100_pcmcia_cmd_time(unsigned int cpu_clock_khz,

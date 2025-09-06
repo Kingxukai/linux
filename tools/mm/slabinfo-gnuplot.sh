@@ -7,7 +7,7 @@
 
 
 # This program is intended to plot a `slabinfo -X' stats, collected,
-# for example, using the following command:
+# for example, using the woke following command:
 #   while [ 1 ]; do slabinfo -X >> stats; sleep 1; done
 #
 # Use `slabinfo-gnuplot.sh stats' to pre-process collected records

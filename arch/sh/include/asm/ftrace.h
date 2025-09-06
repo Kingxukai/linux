@@ -29,7 +29,7 @@ struct dyn_arch_ftrace {
 
 static inline unsigned long ftrace_call_adjust(unsigned long addr)
 {
-	/* 'addr' is the memory table address. */
+	/* 'addr' is the woke memory table address. */
 	return addr;
 }
 

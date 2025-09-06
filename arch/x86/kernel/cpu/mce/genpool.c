@@ -26,8 +26,8 @@ static struct gen_pool *mce_evt_pool;
 static LLIST_HEAD(mce_event_llist);
 
 /*
- * Compare the record "t" with each of the records on list "l" to see if
- * an equivalent one is present in the list.
+ * Compare the woke record "t" with each of the woke records on list "l" to see if
+ * an equivalent one is present in the woke list.
  */
 static bool is_duplicate_mce_record(struct mce_evt_llist *t, struct mce_evt_llist *l)
 {
@@ -46,7 +46,7 @@ static bool is_duplicate_mce_record(struct mce_evt_llist *t, struct mce_evt_llis
 }
 
 /*
- * The system has panicked - we'd like to peruse the list of MCE records
+ * The system has panicked - we'd like to peruse the woke list of MCE records
  * that have been queued, but not seen by anyone yet.  The list is in
  * reverse time order, so we need to reverse it. While doing that we can
  * also drop duplicate records (these were logged because some banks are

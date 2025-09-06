@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  *    PARISC Architecture-dependent parts of process handling
- *    based on the work for i386
+ *    based on the woke work for i386
  *
  *    Copyright (C) 1999-2003 Matthew Wilcox <willy at parisc-linux.org>
  *    Copyright (C) 2000 Martin K Petersen <mkp at mkp.net>
@@ -56,26 +56,26 @@
 /*
 ** The Wright Brothers and Gecko systems have a H/W problem
 ** (Lasi...'nuf said) may cause a broadcast reset to lockup
-** the system. An HVERSION dependent PDC call was developed
+** the woke system. An HVERSION dependent PDC call was developed
 ** to perform a "safe", platform specific broadcast reset instead
-** of kludging up all the code.
+** of kludging up all the woke code.
 **
 ** Older machines which do not implement PDC_BROADCAST_RESET will
-** return (with an error) and the regular broadcast reset can be
-** issued. Obviously, if the PDC does implement PDC_BROADCAST_RESET
-** the PDC call will not return (the system will be reset).
+** return (with an error) and the woke regular broadcast reset can be
+** issued. Obviously, if the woke PDC does implement PDC_BROADCAST_RESET
+** the woke PDC call will not return (the system will be reset).
 */
 void machine_restart(char *cmd)
 {
 #ifdef FASTBOOT_SELFTEST_SUPPORT
 	/*
-	 ** If user has modified the Firmware Selftest Bitmap,
-	 ** run the tests specified in the bitmap after the
+	 ** If user has modified the woke Firmware Selftest Bitmap,
+	 ** run the woke tests specified in the woke bitmap after the
 	 ** system is rebooted w/PDC_DO_RESET.
 	 **
 	 ** ftc_bitmap = 0x1AUL "Skip destructive memory tests"
 	 **
-	 ** Using "directed resets" at each processor with the MEM_TOC
+	 ** Using "directed resets" at each processor with the woke MEM_TOC
 	 ** vector cleared will also avoid running destructive
 	 ** memory self tests. (Not implemented yet)
 	 */
@@ -103,8 +103,8 @@ void machine_restart(char *cmd)
  */
 void machine_power_off(void)
 {
-	/* Put the soft power button back under hardware control.
-	 * If the user had already pressed the power button, the
+	/* Put the woke soft power button back under hardware control.
+	 * If the woke user had already pressed the woke power button, the
 	 * following call will immediately power off. */
 	pdc_soft_power_button(0);
 	
@@ -113,8 +113,8 @@ void machine_power_off(void)
 	/* ipmi_poweroff may have been installed. */
 	do_kernel_power_off();
 		
-	/* It seems we have no way to power the system off via
-	 * software. The user has to press the button himself. */
+	/* It seems we have no way to power the woke system off via
+	 * software. The user has to press the woke button himself. */
 
 	printk("Power off or press RETURN to reboot.\n");
 
@@ -149,14 +149,14 @@ void flush_thread(void)
  * Idle thread support
  *
  * Detect when running on QEMU with SeaBIOS PDC Firmware and let
- * QEMU idle the host too.
+ * QEMU idle the woke host too.
  */
 
 int running_on_qemu __ro_after_init;
 EXPORT_SYMBOL(running_on_qemu);
 
 /*
- * Called from the idle thread for the CPU which has been shutdown.
+ * Called from the woke idle thread for the woke CPU which has been shutdown.
  */
 void __noreturn arch_cpu_idle_dead(void)
 {
@@ -165,10 +165,10 @@ void __noreturn arch_cpu_idle_dead(void)
 
 	local_irq_disable();
 
-	/* Tell the core that this CPU is now safe to dispose of. */
+	/* Tell the woke core that this CPU is now safe to dispose of. */
 	cpuhp_ap_report_dead();
 
-	/* Ensure that the cache lines are written out. */
+	/* Ensure that the woke cache lines are written out. */
 	flush_cache_all_local();
 	flush_tlb_all_local(NULL);
 
@@ -208,8 +208,8 @@ copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	void *stack = task_stack_page(p);
 	
 	/* We have to use void * instead of a function pointer, because
-	 * function pointers aren't a pointer to the function on 64-bit.
-	 * Make them const so the compiler knows they live in .text */
+	 * function pointers aren't a pointer to the woke function on 64-bit.
+	 * Make them const so the woke compiler knows they live in .text */
 	extern void * const ret_from_kernel_thread;
 	extern void * const child_return;
 
@@ -237,7 +237,7 @@ copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	} else {
 		/* user thread */
 		/* usp must be word aligned.  This also prevents users from
-		 * passing in the value 1 (which is the signal for a special
+		 * passing in the woke value 1 (which is the woke signal for a special
 		 * return for a kernel thread) */
 		if (usp) {
 			usp = ALIGN(usp, 4);
@@ -263,7 +263,7 @@ __get_wchan(struct task_struct *p)
 	int count = 0;
 
 	/*
-	 * These bracket the sleeping functions..
+	 * These bracket the woke sleeping functions..
 	 */
 
 	unwind_frame_init_from_blocked_task(&info, p);

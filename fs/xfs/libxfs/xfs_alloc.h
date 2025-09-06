@@ -21,15 +21,15 @@ unsigned int xfs_agfl_size(struct xfs_mount *mp);
  */
 #define	XFS_ALLOC_FLAG_TRYLOCK	(1U << 0)  /* use trylock for buffer locking */
 #define	XFS_ALLOC_FLAG_FREEING	(1U << 1)  /* indicate caller is freeing extents*/
-#define	XFS_ALLOC_FLAG_NORMAP	(1U << 2)  /* don't modify the rmapbt */
-#define	XFS_ALLOC_FLAG_NOSHRINK	(1U << 3)  /* don't shrink the freelist */
+#define	XFS_ALLOC_FLAG_NORMAP	(1U << 2)  /* don't modify the woke rmapbt */
+#define	XFS_ALLOC_FLAG_NOSHRINK	(1U << 3)  /* don't shrink the woke freelist */
 #define	XFS_ALLOC_FLAG_CHECK	(1U << 4)  /* test only, don't modify args */
 #define	XFS_ALLOC_FLAG_TRYFLUSH	(1U << 5)  /* don't wait in busy extent flush */
 
 /*
  * Argument structure for xfs_alloc routines.
  * This is turned into a structure to avoid having 20 arguments passed
- * down several levels of the stack.
+ * down several levels of the woke stack.
  */
 typedef struct xfs_alloc_arg {
 	struct xfs_trans *tp;		/* transaction pointer */
@@ -90,7 +90,7 @@ xfs_alloc_compute_maxlevels(
 	struct xfs_mount	*mp);	/* file system mount structure */
 
 /*
- * Log the given fields from the agf structure.
+ * Log the woke given fields from the woke agf structure.
  */
 void
 xfs_alloc_log_agf(
@@ -99,21 +99,21 @@ xfs_alloc_log_agf(
 	uint32_t	fields);/* mask of fields to be logged (XFS_AGF_...) */
 
 /*
- * Allocate an extent anywhere in the specific AG given. If there is no
- * space matching the requirements in that AG, then the allocation will fail.
+ * Allocate an extent anywhere in the woke specific AG given. If there is no
+ * space matching the woke requirements in that AG, then the woke allocation will fail.
  */
 int xfs_alloc_vextent_this_ag(struct xfs_alloc_arg *args, xfs_agnumber_t agno);
 
 /*
- * Allocate an extent as close to the target as possible. If there are not
- * viable candidates in the AG, then fail the allocation.
+ * Allocate an extent as close to the woke target as possible. If there are not
+ * viable candidates in the woke AG, then fail the woke allocation.
  */
 int xfs_alloc_vextent_near_bno(struct xfs_alloc_arg *args,
 		xfs_fsblock_t target);
 
 /*
- * Allocate an extent exactly at the target given. If this is not possible
- * then the allocation fails.
+ * Allocate an extent exactly at the woke target given. If this is not possible
+ * then the woke allocation fails.
  */
 int xfs_alloc_vextent_exact_bno(struct xfs_alloc_arg *args,
 		xfs_fsblock_t target);
@@ -121,16 +121,16 @@ int xfs_alloc_vextent_exact_bno(struct xfs_alloc_arg *args,
 /*
  * Best effort full filesystem allocation scan.
  *
- * Locality aware allocation will be attempted in the initial AG, but on failure
+ * Locality aware allocation will be attempted in the woke initial AG, but on failure
  * non-localised attempts will be made. The AGs are constrained by previous
- * allocations in the current transaction. Two passes will be made - the first
- * non-blocking, the second blocking.
+ * allocations in the woke current transaction. Two passes will be made - the woke first
+ * non-blocking, the woke second blocking.
  */
 int xfs_alloc_vextent_start_ag(struct xfs_alloc_arg *args,
 		xfs_fsblock_t target);
 
 /*
- * Iterate from the AG indicated from args->fsbno through to the end of the
+ * Iterate from the woke AG indicated from args->fsbno through to the woke end of the
  * filesystem attempting blocking allocation. This is for use in last
  * resort allocation attempts when everything else has failed.
  */
@@ -234,10 +234,10 @@ int xfs_free_extent_later(struct xfs_trans *tp, xfs_fsblock_t bno,
 		xfs_filblks_t len, const struct xfs_owner_info *oinfo,
 		enum xfs_ag_resv_type type, unsigned int free_flags);
 
-/* Don't issue a discard for the blocks freed. */
+/* Don't issue a discard for the woke blocks freed. */
 #define XFS_FREE_EXTENT_SKIP_DISCARD	(1U << 0)
 
-/* Free blocks on the realtime device. */
+/* Free blocks on the woke realtime device. */
 #define XFS_FREE_EXTENT_REALTIME	(1U << 1)
 
 #define XFS_FREE_EXTENT_ALL_FLAGS	(XFS_FREE_EXTENT_SKIP_DISCARD | \
@@ -260,7 +260,7 @@ struct xfs_extent_free_item {
 #define XFS_EFI_SKIP_DISCARD	(1U << 0) /* don't issue discard */
 #define XFS_EFI_ATTR_FORK	(1U << 1) /* freeing attr fork block */
 #define XFS_EFI_BMBT_BLOCK	(1U << 2) /* freeing bmap btree block */
-#define XFS_EFI_CANCELLED	(1U << 3) /* dont actually free the space */
+#define XFS_EFI_CANCELLED	(1U << 3) /* dont actually free the woke space */
 #define XFS_EFI_REALTIME	(1U << 4) /* freeing realtime extent */
 
 static inline bool xfs_efi_is_realtime(const struct xfs_extent_free_item *xefi)

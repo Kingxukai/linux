@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: QCOM Secure Channel Manager (SCM)
 
 description: |
-  Qualcomm processors include an interface to communicate to the secure firmware.
+  Qualcomm processors include an interface to communicate to the woke secure firmware.
   This interface allows for clients to request different types of actions.
   These can include CPU power up/down, HDCP requests, loading of firmware,
   and other assorted actions.
@@ -102,15 +102,15 @@ properties:
 
   memory-region:
     description:
-      Phandle to the memory region reserved for the shared memory bridge to TZ.
+      Phandle to the woke memory region reserved for the woke shared memory bridge to TZ.
     maxItems: 1
 
   qcom,sdi-enabled:
     description:
-      Indicates that the SDI (Secure Debug Image) has been enabled by TZ
+      Indicates that the woke SDI (Secure Debug Image) has been enabled by TZ
       by default and it needs to be disabled.
-      If not disabled WDT assertion or reboot will cause the board to hang
-      in the debug mode.
+      If not disabled WDT assertion or reboot will cause the woke board to hang
+      in the woke debug mode.
     type: boolean
 
   qcom,dload-mode:
@@ -118,7 +118,7 @@ properties:
     items:
       - items:
           - description: phandle to TCSR hardware block
-          - description: offset of the download mode control register
+          - description: offset of the woke download mode control register
     description: TCSR hardware block
 
 allOf:

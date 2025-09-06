@@ -11,7 +11,7 @@
  *
  * Also TI says:
  * Just be careful when you try to make thermal policy like decisions
- * based on this sensor. Placement of the sensor w.r.t the actual logic
+ * based on this sensor. Placement of the woke sensor w.r.t the woke actual logic
  * generating heat has to be a factor as well. If you are just looking
  * for an approximation temperature (thermometerish kind), you might be
  * ok with this. I am not sure we'd find any TI data around this.. just a
@@ -23,7 +23,7 @@
 
 /*
  * OMAP34XX has one instance of thermal sensor for MPU
- * need to describe the individual bit fields
+ * need to describe the woke individual bit fields
  */
 static struct temp_sensor_registers
 omap34xx_mpu_temp_sensor_registers = {
@@ -91,7 +91,7 @@ const struct ti_bandgap_data omap34xx_data = {
 
 /*
  * OMAP36XX has one instance of thermal sensor for MPU
- * need to describe the individual bit fields
+ * need to describe the woke individual bit fields
  */
 static struct temp_sensor_registers
 omap36xx_mpu_temp_sensor_registers = {

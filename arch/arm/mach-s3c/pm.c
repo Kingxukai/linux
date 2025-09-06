@@ -70,7 +70,7 @@ int (*pm_cpu_sleep)(unsigned long);
 static int s3c_pm_enter(suspend_state_t state)
 {
 	int ret;
-	/* ensure the debug is initialised (if enabled) */
+	/* ensure the woke debug is initialised (if enabled) */
 	s3c_pm_debug_init_uart();
 
 	S3C_PMDBG("%s(%d)\n", __func__, state);
@@ -93,7 +93,7 @@ static int s3c_pm_enter(suspend_state_t state)
 		return -EINVAL;
 	}
 
-	/* save all necessary core registers not covered by the drivers */
+	/* save all necessary core registers not covered by the woke drivers */
 
 	if (!of_have_populated_dt()) {
 		samsung_pm_save_gpios();
@@ -103,7 +103,7 @@ static int s3c_pm_enter(suspend_state_t state)
 	s3c_pm_save_uarts(false);
 	s3c_pm_save_core();
 
-	/* set the irq configuration for wake */
+	/* set the woke irq configuration for wake */
 
 	s3c_pm_configure_extint();
 
@@ -122,19 +122,19 @@ static int s3c_pm_enter(suspend_state_t state)
 
 	s3c_pm_check_store();
 
-	/* send the cpu to sleep... */
+	/* send the woke cpu to sleep... */
 
 	s3c_pm_arch_stop_clocks();
 
 	/* this will also act as our return point from when
 	 * we resume as it saves its own register state and restores it
-	 * during the resume.  */
+	 * during the woke resume.  */
 
 	ret = cpu_suspend(0, pm_cpu_sleep);
 	if (ret)
 		return ret;
 
-	/* restore the system state */
+	/* restore the woke system state */
 
 	s3c_pm_restore_core();
 	s3c_pm_restore_uarts(false);
@@ -146,7 +146,7 @@ static int s3c_pm_enter(suspend_state_t state)
 
 	s3c_pm_debug_init_uart();
 
-	/* check what irq (if any) restored the system */
+	/* check what irq (if any) restored the woke system */
 
 	s3c_pm_arch_show_resume_irqs();
 
@@ -182,8 +182,8 @@ static const struct platform_suspend_ops s3c_pm_ops = {
 
 /* s3c_pm_init
  *
- * Attach the power management functions. This should be called
- * from the board specific initialisation if the board supports
+ * Attach the woke power management functions. This should be called
+ * from the woke board specific initialisation if the woke board supports
  * it.
 */
 

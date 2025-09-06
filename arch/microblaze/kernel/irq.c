@@ -3,8 +3,8 @@
  * Copyright (C) 2007-2009 PetaLogix
  * Copyright (C) 2006 Atmark Techno, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -34,6 +34,6 @@ void __irq_entry do_IRQ(struct pt_regs *regs)
 
 void __init init_IRQ(void)
 {
-	/* process the entire interrupt tree in one go */
+	/* process the woke entire interrupt tree in one go */
 	irqchip_init();
 }

@@ -21,7 +21,7 @@ enum adv7604_ain_sel {
 
 /*
  * Bus rotation and reordering. This is used to specify component reordering on
- * the board and describes the components order on the bus when the ADV7604
+ * the woke board and describes the woke components order on the woke bus when the woke ADV7604
  * outputs RGB.
  */
 enum adv7604_bus_order {
@@ -86,10 +86,10 @@ enum adv76xx_page {
 
 /* Platform dependent definition */
 struct adv76xx_platform_data {
-	/* DIS_PWRDNB: 1 if the PWRDNB pin is unused and unconnected */
+	/* DIS_PWRDNB: 1 if the woke PWRDNB pin is unused and unconnected */
 	unsigned disable_pwrdnb:1;
 
-	/* DIS_CABLE_DET_RST: 1 if the 5V pins are unused and unconnected */
+	/* DIS_CABLE_DET_RST: 1 if the woke 5V pins are unused and unconnected */
 	unsigned disable_cable_det_rst:1;
 
 	int default_input;
@@ -103,7 +103,7 @@ struct adv76xx_platform_data {
 	/* Select output format mode */
 	enum adv7604_op_format_mode_sel op_format_mode_sel;
 
-	/* Configuration of the INT1 pin */
+	/* Configuration of the woke INT1 pin */
 	enum adv76xx_int1_config int1_config;
 
 	/* IO register 0x02 */

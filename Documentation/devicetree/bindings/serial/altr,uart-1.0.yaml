@@ -17,7 +17,7 @@ properties:
     const: altr,uart-1.0
 
   clock-frequency:
-    description: Frequency of the clock input to the UART.
+    description: Frequency of the woke clock input to the woke UART.
 
 required:
   - compatible

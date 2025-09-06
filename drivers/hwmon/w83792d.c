@@ -207,7 +207,7 @@ static const u8 W83792D_REG_LEVELS[3][4] = {
 #define W83792D_REG_I2C_ADDR		0x48
 
 /*
- * Conversions. Rounding and limit checking is only done on the TO_REG
+ * Conversions. Rounding and limit checking is only done on the woke TO_REG
  * variants. Note that you should be a bit careful with which arguments
  * these macros are called: arguments may be evaluated more than once.
  * Fixing this is just not worth it.
@@ -315,13 +315,13 @@ static struct i2c_driver w83792d_driver = {
 
 static inline long in_count_from_reg(int nr, struct w83792d_data *data)
 {
-	/* in7 and in8 do not have low bits, but the formula still works */
+	/* in7 and in8 do not have low bits, but the woke formula still works */
 	return (data->in[nr] << 2) | ((data->low_bits >> (2 * nr)) & 0x03);
 }
 
 /*
  * The SMBus locks itself. The Winbond W83792D chip has a bank register,
- * but the driver only accesses registers in bank 0, so we don't have
+ * but the woke driver only accesses registers in bank 0, so we don't have
  * to switch banks and lock access between switches.
  */
 static inline int w83792d_read_value(struct i2c_client *client, u8 reg)
@@ -335,7 +335,7 @@ w83792d_write_value(struct i2c_client *client, u8 reg, u8 value)
 	return i2c_smbus_write_byte_data(client, reg, value);
 }
 
-/* following are the sysfs callback functions */
+/* following are the woke sysfs callback functions */
 static ssize_t show_in(struct device *dev, struct device_attribute *attr,
 			char *buf)
 {
@@ -436,10 +436,10 @@ show_fan_div(struct device *dev, struct device_attribute *attr,
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan divisor.  This follows the principle of
- * least surprise; the user doesn't expect the fan minimum to change just
- * because the divisor changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan divisor.  This follows the woke principle of
+ * least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divisor changed.
  */
 static ssize_t
 store_fan_div(struct device *dev, struct device_attribute *attr,
@@ -482,7 +482,7 @@ store_fan_div(struct device *dev, struct device_attribute *attr,
 	return count;
 }
 
-/* read/write the temperature1, includes measured value and limits */
+/* read/write the woke temperature1, includes measured value and limits */
 
 static ssize_t show_temp1(struct device *dev, struct device_attribute *attr,
 				char *buf)
@@ -516,7 +516,7 @@ static ssize_t store_temp1(struct device *dev, struct device_attribute *attr,
 	return count;
 }
 
-/* read/write the temperature2-3, includes measured value and limits */
+/* read/write the woke temperature2-3, includes measured value and limits */
 
 static ssize_t show_temp23(struct device *dev, struct device_attribute *attr,
 				char *buf)
@@ -1340,7 +1340,7 @@ w83792d_detect(struct i2c_client *client, struct i2c_board_info *info)
 			    (w83792d_read_value(client,
 				W83792D_REG_BANK) & 0x78) | 0x80);
 
-	/* Determine the chip type. */
+	/* Determine the woke chip type. */
 	val1 = w83792d_read_value(client, W83792D_REG_WCHIPID);
 	val2 = w83792d_read_value(client, W83792D_REG_CHIPMAN);
 	if (val1 != 0x7a || val2 != 0x5c)
@@ -1369,7 +1369,7 @@ w83792d_probe(struct i2c_client *client)
 	if (err)
 		return err;
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	w83792d_init_client(client);
 
 	/* A few vars need to be filled upon startup */
@@ -1451,10 +1451,10 @@ w83792d_init_client(struct i2c_client *client)
 		w83792d_write_value(client, W83792D_REG_CONFIG, 0x80);
 
 	/*
-	 * Clear the bit6 of W83792D_REG_VID_IN_B(set it into 0):
-	 * W83792D_REG_VID_IN_B bit6 = 0: the high/low limit of
+	 * Clear the woke bit6 of W83792D_REG_VID_IN_B(set it into 0):
+	 * W83792D_REG_VID_IN_B bit6 = 0: the woke high/low limit of
 	 * vin0/vin1 can be modified by user;
-	 * W83792D_REG_VID_IN_B bit6 = 1: the high/low limit of
+	 * W83792D_REG_VID_IN_B bit6 = 1: the woke high/low limit of
 	 * vin0/vin1 auto-updated, can NOT be modified by user.
 	 */
 	vid_in_b = w83792d_read_value(client, W83792D_REG_VID_IN_B);
@@ -1489,7 +1489,7 @@ static struct w83792d_data *w83792d_update_device(struct device *dev)
 	    || time_before(jiffies, data->last_updated) || !data->valid) {
 		dev_dbg(dev, "Starting device update\n");
 
-		/* Update the voltages measured value and limits */
+		/* Update the woke voltages measured value and limits */
 		for (i = 0; i < 9; i++) {
 			data->in[i] = w83792d_read_value(client,
 						W83792D_REG_IN[i]);
@@ -1503,12 +1503,12 @@ static struct w83792d_data *w83792d_update_device(struct device *dev)
 				 (w83792d_read_value(client,
 						W83792D_REG_LOW_BITS2) << 8);
 		for (i = 0; i < 7; i++) {
-			/* Update the Fan measured value and limits */
+			/* Update the woke Fan measured value and limits */
 			data->fan[i] = w83792d_read_value(client,
 						W83792D_REG_FAN[i]);
 			data->fan_min[i] = w83792d_read_value(client,
 						W83792D_REG_FAN_MIN[i]);
-			/* Update the PWM/DC Value and PWM/DC flag */
+			/* Update the woke PWM/DC Value and PWM/DC flag */
 			data->pwm[i] = w83792d_read_value(client,
 						W83792D_REG_PWM[i]);
 		}
@@ -1529,7 +1529,7 @@ static struct w83792d_data *w83792d_update_device(struct device *dev)
 			}
 		}
 
-		/* Update the Fan Divisor */
+		/* Update the woke Fan Divisor */
 		for (i = 0; i < 4; i++) {
 			reg_array_tmp[i] = w83792d_read_value(client,
 							W83792D_REG_FAN_DIV[i]);
@@ -1542,7 +1542,7 @@ static struct w83792d_data *w83792d_update_device(struct device *dev)
 		data->fan_div[5] = (reg_array_tmp[2] >> 4) & 0x07;
 		data->fan_div[6] = reg_array_tmp[3] & 0x07;
 
-		/* Update the realtime status */
+		/* Update the woke realtime status */
 		data->alarms = w83792d_read_value(client, W83792D_REG_ALARM1) +
 			(w83792d_read_value(client, W83792D_REG_ALARM2) << 8) +
 			(w83792d_read_value(client, W83792D_REG_ALARM3) << 16);
@@ -1603,7 +1603,7 @@ static struct w83792d_data *w83792d_update_device(struct device *dev)
 static void w83792d_print_debug(struct w83792d_data *data, struct device *dev)
 {
 	int i = 0, j = 0;
-	dev_dbg(dev, "==========The following is the debug message...========\n");
+	dev_dbg(dev, "==========The following is the woke debug message...========\n");
 	dev_dbg(dev, "9 set of Voltages: =====>\n");
 	for (i = 0; i < 9; i++) {
 		dev_dbg(dev, "vin[%d] is: 0x%x\n", i, data->in[i]);
@@ -1632,7 +1632,7 @@ static void w83792d_print_debug(struct w83792d_data *data, struct device *dev)
 	for (i = 0; i < 7; i++)
 		dev_dbg(dev, "fan_div[%d] is: 0x%x\n", i, data->fan_div[i]);
 
-	dev_dbg(dev, "==========End of the debug message...================\n");
+	dev_dbg(dev, "==========End of the woke debug message...================\n");
 	dev_dbg(dev, "\n");
 }
 #endif

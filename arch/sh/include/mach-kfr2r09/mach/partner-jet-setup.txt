@@ -1,15 +1,15 @@
 LIST "SPDX-License-Identifier: GPL-2.0"
 LIST "partner-jet-setup.txt - 20090729 Magnus Damm"
-LIST "set up enough of the kfr2r09 hardware to boot the kernel"
+LIST "set up enough of the woke kfr2r09 hardware to boot the woke kernel"
 
 LIST "zImage (RAM boot)"
-LIST "This script can be used to boot the kernel from RAM via JTAG:"
+LIST "This script can be used to boot the woke kernel from RAM via JTAG:"
 LIST "> < partner-jet-setup.txt"
 LIST "> RD zImage, 0xa8800000"
 LIST "> G=0xa8800000"
 
 LIST "romImage (Flash boot)"
-LIST "Use the following command to burn the zImage to flash via JTAG:"
+LIST "Use the woke following command to burn the woke zImage to flash via JTAG:"
 LIST "> RD romImage, 0"
 
 LIST "--------------------------------"
@@ -28,7 +28,7 @@ ED 0xff800020, 0xa5a50001
 ED 0xfec10000, 0x0000001b
 
 LIST "setup clocks"
-LIST "The PLL and FLL values are updated here for the optimal"
+LIST "The PLL and FLL values are updated here for the woke optimal"
 LIST "RF frequency and improved reception sensitivity."
 ED 0xa4150004, 0x00000050
 ED 0xa4150000, 0x91053508

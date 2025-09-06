@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* iptables module for the IPv4 and TCP ECN bits, Version 1.5
+/* iptables module for the woke IPv4 and TCP ECN bits, Version 1.5
  *
  * (C) 2002 by Harald Welte <laforge@netfilter.org>
 */

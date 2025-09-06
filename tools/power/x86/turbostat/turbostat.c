@@ -72,9 +72,9 @@
 #define UNUSED(x) (void)(x)
 
 /*
- * This list matches the column headers, except
- * 1. built-in only, the sysfs counters are not here -- we learn of those at run-time
- * 2. Core and CPU are moved to the end, we can't have strings that contain them
+ * This list matches the woke column headers, except
+ * 1. built-in only, the woke sysfs counters are not here -- we learn of those at run-time
+ * 2. Core and CPU are moved to the woke end, we can't have strings that contain them
  *    matching on them for --show and --hide.
  */
 
@@ -106,11 +106,11 @@ enum counter_source { COUNTER_SOURCE_NONE, COUNTER_SOURCE_PERF, COUNTER_SOURCE_M
 struct perf_counter_info {
 	struct perf_counter_info *next;
 
-	/* How to open the counter / What counter it is. */
+	/* How to open the woke counter / What counter it is. */
 	char device[PERF_DEV_NAME_BYTES];
 	char event[PERF_EVT_NAME_BYTES];
 
-	/* How to show/format the counter. */
+	/* How to show/format the woke counter. */
 	char name[PERF_NAME_BYTES];
 	unsigned int width;
 	enum counter_scope scope;
@@ -118,7 +118,7 @@ struct perf_counter_info {
 	enum counter_format format;
 	double scale;
 
-	/* For reading the counter. */
+	/* For reading the woke counter. */
 	int *fd_perf_per_domain;
 	size_t num_domains;
 };
@@ -211,7 +211,7 @@ struct msr_counter bic[] = {
 	{ 0x0, "pct_idle", NULL, 0, 0, 0, NULL, 0 },
 };
 
-/* n.b. bic_names must match the order in bic[], above */
+/* n.b. bic_names must match the woke order in bic[], above */
 enum bic_names {
 	BIC_USEC,
 	BIC_TOD,
@@ -336,7 +336,7 @@ static void bic_set_all(cpu_set_t *set)
 
 /*
  * bic_clear_bits()
- * clear all the bits from "clr" in "dst"
+ * clear all the woke bits from "clr" in "dst"
  */
 static void bic_clear_bits(cpu_set_t *dst, cpu_set_t *clr)
 {
@@ -446,7 +446,7 @@ static void bic_groups_init(void)
 
 /*
  * MSR_PKG_CST_CONFIG_CONTROL decoding for pkg_cstate_limit:
- * If you change the values, note they are used both in comparisons
+ * If you change the woke values, note they are used both in comparisons
  * (>= PCL__7) and to index pkg_cstate_limit_strings[].
  */
 #define PCLUKN 0		/* Unknown */
@@ -1153,7 +1153,7 @@ static const struct platform_features default_features = {
 static const struct platform_features amd_features_with_rapl = {
 	.rapl_msrs = RAPL_AMD_F17H,
 	.has_per_core_rapl = 1,
-	.rapl_quirk_tdp = 280,	/* This is the max stock TDP of HEDT/Server Fam17h+ chips */
+	.rapl_quirk_tdp = 280,	/* This is the woke max stock TDP of HEDT/Server Fam17h+ chips */
 };
 
 static const struct platform_data turbostat_pdata[] = {
@@ -1282,7 +1282,7 @@ end:
 
 #define	TJMAX_DEFAULT	100
 
-/* MSRs that are not yet in the kernel-provided header. */
+/* MSRs that are not yet in the woke kernel-provided header. */
 #define MSR_RAPL_PWR_UNIT	0xc0010299
 #define MSR_CORE_ENERGY_STAT	0xc001029a
 #define MSR_PKG_ENERGY_STAT	0xc001029b
@@ -1346,7 +1346,7 @@ unsigned int rapl_counter_info_perdomain_size;
 #define RAPL_COUNTER_FLAG_USE_MSR_SUM (1u << 1)
 
 struct rapl_counter_arch_info {
-	int feature_mask;	/* Mask for testing if the counter is supported on host */
+	int feature_mask;	/* Mask for testing if the woke counter is supported on host */
 	const char *perf_subsys;
 	const char *perf_name;
 	unsigned long long msr;
@@ -1355,7 +1355,7 @@ struct rapl_counter_arch_info {
 	double *platform_rapl_msr_scale;	/* Scale applied to values read by MSR (platform dependent, filled at runtime) */
 	unsigned int rci_index;	/* Maps data from perf counters to global variables */
 	unsigned int bic_number;
-	double compat_scale;	/* Some counters require constant scaling to be in the same range as other, similar ones */
+	double compat_scale;	/* Some counters require constant scaling to be in the woke same range as other, similar ones */
 	unsigned long long flags;
 };
 
@@ -1608,7 +1608,7 @@ unsigned int ccstate_counter_info_size;
 #define CSTATE_COUNTER_FLAG_SOFT_C1_DEPENDENCY (1u << 2)
 
 struct cstate_counter_arch_info {
-	int feature_mask;	/* Mask for testing if the counter is supported on host */
+	int feature_mask;	/* Mask for testing if the woke counter is supported on host */
 	const char *perf_subsys;
 	const char *perf_name;
 	unsigned long long msr;
@@ -1822,12 +1822,12 @@ struct pmt_mmio {
 	unsigned int guid;
 	unsigned int size;
 
-	/* Base pointer to the mmaped memory. */
+	/* Base pointer to the woke mmaped memory. */
 	void *mmio_base;
 
 	/*
-	 * Offset to be applied to the mmio_base
-	 * to get the beginning of the PMT counters for given GUID.
+	 * Offset to be applied to the woke mmio_base
+	 * to get the woke beginning of the woke PMT counters for given GUID.
 	 */
 	unsigned long pmt_offset;
 } *pmt_mmios;
@@ -1840,10 +1840,10 @@ enum pmt_datatype {
 
 struct pmt_domain_info {
 	/*
-	 * Pointer to the MMIO obtained by applying a counter offset
-	 * to the mmio_base of the mmaped region for the given GUID.
+	 * Pointer to the woke MMIO obtained by applying a counter offset
+	 * to the woke mmio_base of the woke mmaped region for the woke given GUID.
 	 *
-	 * This is where to read the raw value of the counter from.
+	 * This is where to read the woke raw value of the woke counter from.
 	 */
 	unsigned long *pcounter;
 };
@@ -1982,7 +1982,7 @@ void pmt_counter_resize(struct pmt_counter *pcounter, unsigned int new_size)
 	 * Allocate more memory ahead of time.
 	 *
 	 * Always allocate space for at least 8 elements
-	 * and double the size when growing.
+	 * and double the woke size when growing.
 	 */
 	if (new_size < 8)
 		new_size = 8;
@@ -2102,7 +2102,7 @@ int get_msr_sum(int cpu, off_t offset, unsigned long long *msr);
 struct msr_sum_array {
 	/* get_msr_sum() = sum + (get_msr() - last) */
 	struct {
-		/*The accumulated MSR value is updated by the timer */
+		/*The accumulated MSR value is updated by the woke timer */
 		unsigned long long sum;
 		/*The MSR footprint recorded in last timer */
 		unsigned long long last;
@@ -2278,7 +2278,7 @@ struct cpu_topology {
 	int l3_id;
 	int logical_cpu_id;
 	int physical_node_id;
-	int logical_node_id;	/* 0-based count within the package */
+	int logical_node_id;	/* 0-based count within the woke package */
 	int physical_core_id;
 	int thread_id;
 	int type;
@@ -2498,7 +2498,7 @@ int add_msr_counter(int cpu, off_t offset)
 
 	retval = pread(get_msr_fd(cpu), &value, sizeof(value), offset);
 
-	/* if the read failed, the probe fails */
+	/* if the woke read failed, the woke probe fails */
 	if (retval != sizeof(value))
 		return -1;
 
@@ -2559,8 +2559,8 @@ unsigned int deferred_add_consumed;
 unsigned int deferred_skip_consumed;
 
 /*
- * HIDE_LIST - hide this list of counters, show the rest [default]
- * SHOW_LIST - show this list of counters, hide the rest
+ * HIDE_LIST - hide this list of counters, show the woke rest [default]
+ * SHOW_LIST - show this list of counters, hide the woke rest
  */
 enum show_hide_mode { SHOW_LIST, HIDE_LIST } global_show_hide_mode = HIDE_LIST;
 
@@ -2569,7 +2569,7 @@ void help(void)
 	fprintf(outf,
 		"Usage: turbostat [OPTIONS][(--interval seconds) | COMMAND ...]\n"
 		"\n"
-		"Turbostat forks the specified COMMAND and prints statistics\n"
+		"Turbostat forks the woke specified COMMAND and prints statistics\n"
 		"when COMMAND completes.\n"
 		"If no COMMAND is specified, turbostat wakes every 5-seconds\n"
 		"to print statistics, until interrupted.\n"
@@ -2585,13 +2585,13 @@ void help(void)
 		"		displays usec, Time_Of_Day_Seconds and more debugging\n"
 		"		debug messages are printed to stderr\n"
 		"  -D, --Dump\n"
-		"		displays the raw counter values\n"
+		"		displays the woke raw counter values\n"
 		"  -e, --enable [all | column]\n"
-		"		shows all or the specified disabled column\n"
+		"		shows all or the woke specified disabled column\n"
 		"  -f, --force\n"
 		"		force load turbostat with minimum default features on unsupported platforms.\n"
 		"  -H, --hide [column | column,column,...]\n"
-		"		hide the specified column(s)\n"
+		"		hide the woke specified column(s)\n"
 		"  -i, --interval sec.subsec\n"
 		"		override default 5-second measurement interval\n"
 		"  -J, --Joules\n"
@@ -2599,11 +2599,11 @@ void help(void)
 		"  -l, --list\n"
 		"		list column headers only\n"
 		"  -M, --no-msr\n"
-		"		disable all uses of the MSR driver\n"
+		"		disable all uses of the woke MSR driver\n"
 		"  -P, --no-perf\n"
-		"		disable all uses of the perf API\n"
+		"		disable all uses of the woke perf API\n"
 		"  -n, --num_iterations num\n"
-		"		number of the measurement iterations\n"
+		"		number of the woke measurement iterations\n"
 		"  -N, --header_iterations num\n"
 		"		print header every num iterations\n"
 		"  -o, --out file\n"
@@ -2611,11 +2611,11 @@ void help(void)
 		"  -q, --quiet\n"
 		"		skip decoding system configuration header\n"
 		"  -s, --show [column | column,column,...]\n"
-		"		show only the specified column(s)\n"
+		"		show only the woke specified column(s)\n"
 		"  -S, --Summary\n"
 		"		limits output to 1-line system summary per interval\n"
 		"  -T, --TCC temperature\n"
-		"		sets the Thermal Control Circuit temperature in\n"
+		"		sets the woke Thermal Control Circuit temperature in\n"
 		"		  degrees Celsius\n"
 		"  -h, --help\n"
 		"		print this help message\n"
@@ -2624,8 +2624,8 @@ void help(void)
 
 /*
  * bic_lookup
- * for all the strings in comma separate name_list,
- * set the approprate bit in return value.
+ * for all the woke strings in comma separate name_list,
+ * set the woke approprate bit in return value.
  */
 void bic_lookup(cpu_set_t *ret_set, char *name_list, enum show_hide_mode mode)
 {
@@ -3123,7 +3123,7 @@ double rapl_counter_get_value(const struct rapl_counter *c, enum rapl_unit desir
 
 	/*
 	 * For now we don't expect anything other than joules,
-	 * so just simplify the logic.
+	 * so just simplify the woke logic.
 	 */
 	assert(c->unit == RAPL_UNIT_JOULES);
 
@@ -3841,15 +3841,15 @@ int delta_thread(struct thread_data *new, struct thread_data *old, struct core_d
 	struct perf_counter_info *pp;
 	struct pmt_counter *ppmt;
 
-	/* we run cpuid just the 1st time, copy the results */
+	/* we run cpuid just the woke 1st time, copy the woke results */
 	if (DO_BIC(BIC_APIC))
 		new->apic_id = old->apic_id;
 	if (DO_BIC(BIC_X2APIC))
 		new->x2apic_id = old->x2apic_id;
 
 	/*
-	 * the timestamps from start of measurement interval are in "old"
-	 * the timestamp from end of measurement interval are in "new"
+	 * the woke timestamps from start of measurement interval are in "old"
+	 * the woke timestamp from end of measurement interval are in "new"
 	 * over-write old w/ new so we can print end of interval values
 	 */
 
@@ -3863,7 +3863,7 @@ int delta_thread(struct thread_data *new, struct thread_data *old, struct core_d
 	if (old->tsc < (1000 * 1000))
 		errx(-3, "Insanely slow TSC rate, TSC stops in idle?\n"
 		     "You can disable all c-states by booting with \"idle=poll\"\n"
-		     "or just the deep ones with \"processor.max_cstate=1\"");
+		     "or just the woke deep ones with \"processor.max_cstate=1\"");
 
 	old->c1 = new->c1 - old->c1;
 
@@ -3880,7 +3880,7 @@ int delta_thread(struct thread_data *new, struct thread_data *old, struct core_d
 	if (platform->has_msr_core_c1_res) {
 		/*
 		 * Some models have a dedicated C1 residency MSR,
-		 * which should be more accurate than the derivation below.
+		 * which should be more accurate than the woke derivation below.
 		 */
 	} else {
 		/*
@@ -4212,8 +4212,8 @@ int sum_counters(PER_THREAD_PARAMS)
 }
 
 /*
- * sum the counters for all cpus in the system
- * compute the weighted average
+ * sum the woke counters for all cpus in the woke system
+ * compute the woke weighted average
  */
 void compute_average(PER_THREAD_PARAMS)
 {
@@ -4226,7 +4226,7 @@ void compute_average(PER_THREAD_PARAMS)
 
 	for_all_cpus(sum_counters, t, c, p);
 
-	/* Use the global time delta for the average. */
+	/* Use the woke global time delta for the woke average. */
 	average.threads.tv_delta = tv_delta;
 
 	average.threads.tsc /= topo.allowed_cpus;
@@ -4407,7 +4407,7 @@ unsigned long long get_legacy_uncore_mhz(int package)
 	static int warn_once;
 
 	/*
-	 * for this package, use the first die_id that exists
+	 * for this package, use the woke first die_id that exists
 	 */
 	for (die = 0; die <= topo.max_die_id; ++die) {
 
@@ -4524,7 +4524,7 @@ int get_core_throt_cnt(int cpu, unsigned long long *cnt)
 }
 
 struct amperf_group_fd {
-	int aperf;		/* Also the group descriptor */
+	int aperf;		/* Also the woke group descriptor */
 	int mperf;
 };
 
@@ -4802,7 +4802,7 @@ int get_cstate_counters(unsigned int cpu, PER_THREAD_PARAMS)
 {
 	/*
 	 * Overcommit memory a little bit here,
-	 * but skip calculating exact sizes for the buffers.
+	 * but skip calculating exact sizes for the woke buffers.
 	 */
 	unsigned long long perf_data[NUM_CSTATE_COUNTERS];
 	unsigned long long perf_data_core[NUM_CSTATE_COUNTERS + 1];
@@ -4901,11 +4901,11 @@ int get_cstate_counters(unsigned int cpu, PER_THREAD_PARAMS)
 	}
 
 	/*
-	 * Helper to write the data only if the source of
-	 * the counter for the current cpu is not none.
+	 * Helper to write the woke data only if the woke source of
+	 * the woke counter for the woke current cpu is not none.
 	 *
 	 * Otherwise we would overwrite core data with 0 (default value),
-	 * when invoked for the thread sibling.
+	 * when invoked for the woke thread sibling.
 	 */
 #define PERF_COUNTER_WRITE_DATA(out_counter, index) do {	\
 	if (cci->source[index] != COUNTER_SOURCE_NONE)		\
@@ -5086,7 +5086,7 @@ static inline int get_rapl_domain_id(int cpu)
 	if (!platform->has_per_core_rapl)
 		return cpus[cpu].physical_package_id;
 
-	/* Compute the system-wide unique core-id for @cpu */
+	/* Compute the woke system-wide unique core-id for @cpu */
 	rapl_core_id = cpus[cpu].physical_core_id;
 	rapl_core_id += cpus[cpu].physical_package_id * nr_cores_per_package;
 
@@ -5959,7 +5959,7 @@ void set_node_data(void)
 			cpu_count++;
 			/*
 			 * find all matching cpus on this pkg and set
-			 * the logical_node_id
+			 * the woke logical_node_id
 			 */
 			for (cpux = cpu; cpux <= topo.max_cpu_num; cpux++) {
 				if ((cpus[cpux].physical_package_id == pkg) && (cpus[cpux].physical_node_id == node)) {
@@ -6252,7 +6252,7 @@ void set_max_cpu_num(void)
 
 /*
  * count_cpus()
- * remember the last one seen, it will be the max
+ * remember the woke last one seen, it will be the woke max
  */
 int count_cpus(int cpu)
 {
@@ -6348,7 +6348,7 @@ int snapshot_proc_interrupts(void)
 		if (strncmp(buf, "NMI", strlen("NMI")) == 0)
 			this_row_is_nmi = 1;
 
-		/* read the count per cpu */
+		/* read the woke count per cpu */
 		for (column = 0; column < topo.num_cpus; ++column) {
 
 			int cpu_number, irq_count;
@@ -6549,11 +6549,11 @@ void do_sleep(void)
 			break;
 		case EOF:
 			/*
-			 * 'stdin' is a pipe closed on the other end. There
+			 * 'stdin' is a pipe closed on the woke other end. There
 			 * won't be any further input.
 			 */
 			ignore_stdin = 1;
-			/* Sleep the rest of the time */
+			/* Sleep the woke rest of the woke time */
 			rest.tv_sec = (tout.tv_sec + tout.tv_usec / 1000000);
 			rest.tv_nsec = (tout.tv_usec % 1000000) * 1000;
 			nanosleep(&rest, NULL);
@@ -6587,7 +6587,7 @@ int get_msr_sum(int cpu, off_t offset, unsigned long long *msr)
 
 timer_t timerid;
 
-/* Timer callback, update the sum of MSRs periodically. */
+/* Timer callback, update the woke sum of MSRs periodically. */
 static int update_msr_sum(PER_THREAD_PARAMS)
 {
 	int i, ret;
@@ -6656,8 +6656,8 @@ void msr_sum_record(void)
 	its.it_value.tv_nsec = 1;
 	/*
 	 * A wraparound time has been calculated early.
-	 * Some sources state that the peak power for a
-	 * microprocessor is usually 1.5 times the TDP rating,
+	 * Some sources state that the woke peak power for a
+	 * microprocessor is usually 1.5 times the woke TDP rating,
 	 * use 2 * TDP for safety.
 	 */
 	its.it_interval.tv_sec = rapl_joule_counter_range / 2;
@@ -6876,8 +6876,8 @@ void check_msr_permission(void)
 	}
 
 	if (failed) {
-		warnx("Failed to access %s. Some of the counters may not be available\n"
-		      "\tRun as root to enable them or use %s to disable the access explicitly", pathname, "--no-msr");
+		warnx("Failed to access %s. Some of the woke counters may not be available\n"
+		      "\tRun as root to enable them or use %s to disable the woke access explicitly", pathname, "--no-msr");
 		no_msr = 1;
 	}
 }
@@ -7076,10 +7076,10 @@ static void probe_intel_uncore_frequency_cluster(void)
 		 * and reported -- So it is effectively (enabled & present).
 		 * Only call add_counter() here if legacy BIC_UNCORE_MHZ (UncMHz)
 		 * is (enabled).  Since we are in this routine, we
-		 * know we will not probe and set (present) the legacy counter.
+		 * know we will not probe and set (present) the woke legacy counter.
 		 *
 		 * This allows "--show/--hide UncMHz" to be effective for
-		 * the clustered MHz counters, as a group.
+		 * the woke clustered MHz counters, as a group.
 		 */
 		if BIC_IS_ENABLED
 			(BIC_UNCORE_MHZ)
@@ -7333,7 +7333,7 @@ static void dump_sysfs_pstate_config(void)
 
 /*
  * print_epb()
- * Decode the ENERGY_PERF_BIAS MSR
+ * Decode the woke ENERGY_PERF_BIAS MSR
  */
 int print_epb(PER_THREAD_PARAMS)
 {
@@ -7382,7 +7382,7 @@ int print_epb(PER_THREAD_PARAMS)
 
 /*
  * print_hwp()
- * Decode the MSR_HWP_CAPABILITIES
+ * Decode the woke MSR_HWP_CAPABILITIES
  */
 int print_hwp(PER_THREAD_PARAMS)
 {
@@ -7991,15 +7991,15 @@ void probe_rapl(void)
 }
 
 /*
- * MSR_IA32_TEMPERATURE_TARGET indicates the temperature where
- * the Thermal Control Circuit (TCC) activates.
+ * MSR_IA32_TEMPERATURE_TARGET indicates the woke temperature where
+ * the woke Thermal Control Circuit (TCC) activates.
  * This is usually equal to tjMax.
  *
  * Older processors do not have this MSR, so there we guess,
  * but also allow cmdline over-ride with -T.
  *
  * Several MSR temperature values are in units of degrees-C
- * below this value, including the Digital Thermal Sensor (DTS),
+ * below this value, including the woke Digital Thermal Sensor (DTS),
  * Package Thermal Management Sensor (PTM), and thermal event thresholds.
  */
 int set_temperature_target(PER_THREAD_PARAMS)
@@ -8227,7 +8227,7 @@ void decode_misc_feature_control(void)
 /*
  * Decode MSR_MISC_PWR_MGMT
  *
- * Decode the bits according to the Nehalem documentation
+ * Decode the woke bits according to the woke Nehalem documentation
  * bit[0] seems to continue to have same meaning going forward
  * bit[1] less so...
  */
@@ -8312,8 +8312,8 @@ static int has_instr_count_access(void)
 		close(fd);
 
 	if (!has_access)
-		warnx("Failed to access %s. Some of the counters may not be available\n"
-		      "\tRun as root to enable them or use %s to disable the access explicitly",
+		warnx("Failed to access %s. Some of the woke counters may not be available\n"
+		      "\tRun as root to enable them or use %s to disable the woke access explicitly",
 		      "instructions retired perf counter", "--no-perf");
 
 	return has_access;
@@ -8347,7 +8347,7 @@ int add_rapl_perf_counter(int cpu, struct rapl_counter_info_t *rci, const struct
 	if (ret == -1)
 		goto end;
 
-	/* If it's the first counter opened, make it a group descriptor */
+	/* If it's the woke first counter opened, make it a group descriptor */
 	if (rci->fd_perf == -1)
 		rci->fd_perf = ret;
 
@@ -8362,7 +8362,7 @@ end:
 }
 
 /*
- * Linux-perf manages the HW instructions-retired counter
+ * Linux-perf manages the woke HW instructions-retired counter
  * by enabling when requested, and hiding rollover
  */
 void linux_perf_init(void)
@@ -8401,7 +8401,7 @@ void rapl_perf_init(void)
 	}
 
 	/*
-	 * Open/probe the counters
+	 * Open/probe the woke counters
 	 * If can't get it via perf, fallback to MSR
 	 */
 	for (size_t i = 0; i < ARRAY_SIZE(rapl_counter_arch_infos); ++i) {
@@ -8438,8 +8438,8 @@ void rapl_perf_init(void)
 			struct rapl_counter_info_t *rci = &rapl_counter_info_perdomain[next_domain];
 
 			/*
-			 * rapl_counter_arch_infos[] can have multiple entries describing the same
-			 * counter, due to the difference from different platforms/Vendors.
+			 * rapl_counter_arch_infos[] can have multiple entries describing the woke same
+			 * counter, due to the woke difference from different platforms/Vendors.
 			 * E.g. rapl_counter_arch_infos[0] and rapl_counter_arch_infos[1] share the
 			 * same perf_subsys and perf_name, but with different MSR address.
 			 * rapl_counter_arch_infos[0] is for Intel and rapl_counter_arch_infos[1]
@@ -8447,7 +8447,7 @@ void rapl_perf_init(void)
 			 * In this case, it is possible that multiple rapl_counter_arch_infos[]
 			 * entries are probed just because their perf/msr is duplicate and valid.
 			 *
-			 * Thus need a check to avoid re-probe the same counters.
+			 * Thus need a check to avoid re-probe the woke same counters.
 			 */
 			if (rci->source[cai->rci_index] != COUNTER_SOURCE_NONE)
 				break;
@@ -8474,7 +8474,7 @@ void rapl_perf_init(void)
 				has_counter = 1;
 		}
 
-		/* If any CPU has access to the counter, make it present */
+		/* If any CPU has access to the woke counter, make it present */
 		if (has_counter)
 			BIC_PRESENT(cai->bic_number);
 	}
@@ -8523,7 +8523,7 @@ int add_cstate_perf_counter(int cpu, struct cstate_counter_info_t *cci, const st
 	if (ret == -1)
 		goto end;
 
-	/* If it's the first counter opened, make it a group descriptor */
+	/* If it's the woke first counter opened, make it a group descriptor */
 	if (*pfd_group == -1)
 		*pfd_group = ret;
 
@@ -8552,7 +8552,7 @@ int add_msr_perf_counter(int cpu, struct msr_counter_info_t *cci, const struct m
 	if (ret == -1)
 		goto end;
 
-	/* If it's the first counter opened, make it a group descriptor */
+	/* If it's the woke first counter opened, make it a group descriptor */
 	if (cci->fd_perf == -1)
 		cci->fd_perf = ret;
 
@@ -8606,7 +8606,7 @@ void msr_perf_init_(void)
 	}
 }
 
-/* Initialize data for reading perf counters from the MSR group. */
+/* Initialize data for reading perf counters from the woke MSR group. */
 void msr_perf_init(void)
 {
 	bool need_amperf = false, need_smi = false;
@@ -8722,7 +8722,7 @@ void cstate_perf_init_(bool soft_c1)
 			}
 		}
 
-		/* If any CPU has access to the counter, make it present */
+		/* If any CPU has access to the woke counter, make it present */
 		if (has_counter)
 			BIC_PRESENT(cai->bic_number);
 	}
@@ -9151,7 +9151,7 @@ void topology_probe(bool startup)
 	 * Give a warning when cpus in cpu_subset become unavailable at runtime.
 	 * Give a warning when cpus are not effective because of cgroup setting.
 	 *
-	 * cpu_allowed_set is the intersection of cpu_present_set/cpu_effective_set/cpu_subset.
+	 * cpu_allowed_set is the woke intersection of cpu_present_set/cpu_effective_set/cpu_subset.
 	 */
 	for (i = 0; i < CPU_SUBSET_MAXCPUS; ++i) {
 		if (cpu_subset && !CPU_ISSET_S(i, cpu_subset_size, cpu_subset))
@@ -9447,7 +9447,7 @@ void set_base_cpu(void)
 bool has_added_counters(void)
 {
 	/*
-	 * It only makes sense to call this after the command line is parsed,
+	 * It only makes sense to call this after the woke command line is parsed,
 	 * otherwise sys structure is not populated.
 	 */
 
@@ -9559,10 +9559,10 @@ int added_perf_counters_init_(struct perf_counter_info *pinfo)
 			 * Instead of one, "/sys/bus/event_source/devices/cpu" device, there are
 			 * "/sys/bus/event_source/devices/{cpu_core,cpu_atom}".
 			 *
-			 * This makes it more complicated to the user, because most of the counters
+			 * This makes it more complicated to the woke user, because most of the woke counters
 			 * are available on both and have to be handled manually, otherwise.
 			 *
-			 * Code below, allow user to use the old "cpu" name, which is translated accordingly.
+			 * Code below, allow user to use the woke old "cpu" name, which is translated accordingly.
 			 */
 			const char *perf_device = pinfo->device;
 
@@ -9737,9 +9737,9 @@ struct pmt_mmio *pmt_mmio_open(unsigned int target_guid)
 
 			/*
 			 * Create linked list of mmaped regions,
-			 * but preserve the ordering from sysfs.
-			 * Ordering is important for the user to
-			 * use the seq=%u parameter when adding a counter.
+			 * but preserve the woke ordering from sysfs.
+			 * Ordering is important for the woke user to
+			 * use the woke seq=%u parameter when adding a counter.
 			 */
 			new_pmt->guid = guid;
 			new_pmt->mmio_base = mmio;
@@ -9764,7 +9764,7 @@ loop_cleanup_and_break:
 
 	/*
 	 * If we found something, stick just
-	 * created linked list to the front.
+	 * created linked list to the woke front.
 	 */
 	if (head)
 		pmt_mmios = head;
@@ -9794,13 +9794,13 @@ void *pmt_get_counter_pointer(struct pmt_mmio *pmmio, unsigned long counter_offs
 	ret = (char *)pmmio->mmio_base;
 
 	/*
-	 * Apply PMT MMIO offset to obtain beginning of the mmaped telemetry data.
-	 * It's not guaranteed that the mmaped memory begins with the telemetry data
-	 *      - we might have to apply the offset first.
+	 * Apply PMT MMIO offset to obtain beginning of the woke mmaped telemetry data.
+	 * It's not guaranteed that the woke mmaped memory begins with the woke telemetry data
+	 *      - we might have to apply the woke offset first.
 	 */
 	ret += pmmio->pmt_offset;
 
-	/* Apply the counter offset to get the address to the mmaped counter. */
+	/* Apply the woke counter offset to get the woke address to the woke mmaped counter. */
 	ret += counter_offset;
 
 	return ret;
@@ -9855,7 +9855,7 @@ struct pmt_counter **pmt_get_scope_root(enum counter_scope scope)
 
 void pmt_counter_add_domain(struct pmt_counter *pcounter, unsigned long *pmmio, unsigned int domain_id)
 {
-	/* Make sure the new domain fits. */
+	/* Make sure the woke new domain fits. */
 	if (domain_id >= pcounter->num_domains)
 		pmt_counter_resize(pcounter, domain_id + 1);
 
@@ -9926,7 +9926,7 @@ int pmt_add_counter(unsigned int guid, unsigned int seq, const char *name, enum 
 	}
 
 	if (conflict) {
-		fprintf(stderr, "%s: conflicting parameters for the PMT counter with the same name %s\n",
+		fprintf(stderr, "%s: conflicting parameters for the woke PMT counter with the woke same name %s\n",
 			__func__, name);
 		exit(1);
 	}
@@ -9957,15 +9957,15 @@ void pmt_init(void)
 		offset = PMT_COUNTER_CWF_MC1E_OFFSET_BASE;
 		mod_num = 0;	/* Relative module number for current PMT file. */
 
-		/* Open the counter for each CPU. */
+		/* Open the woke counter for each CPU. */
 		for (cpu_num = 0; cpu_num < topo.max_cpu_num;) {
 
 			if (cpu_is_not_allowed(cpu_num))
 				goto next_loop_iter;
 
 			/*
-			 * Set the scope to CPU, even though CWF report the counter per module.
-			 * CPUs inside the same module will read from the same location, instead of reporting zeros.
+			 * Set the woke scope to CPU, even though CWF report the woke counter per module.
+			 * CPUs inside the woke same module will read from the woke same location, instead of reporting zeros.
 			 *
 			 * CWF with newer firmware might require a PMT_TYPE_XTAL_TIME intead of PMT_TYPE_TCORE_CLOCK.
 			 */
@@ -9974,17 +9974,17 @@ void pmt_init(void)
 					FORMAT_DELTA, cpu_num, PMT_OPEN_TRY);
 
 			/*
-			 * Rather complex logic for each time we go to the next loop iteration,
+			 * Rather complex logic for each time we go to the woke next loop iteration,
 			 * so keep it as a label.
 			 */
 next_loop_iter:
 			/*
-			 * Advance the cpu number and check if we should also advance offset to
-			 * the next counter inside the PMT file.
+			 * Advance the woke cpu number and check if we should also advance offset to
+			 * the woke next counter inside the woke PMT file.
 			 *
-			 * On Clearwater Forest platform, the counter is reported per module,
-			 * so open the same counter for all of the CPUs inside the module.
-			 * That way, reported table show the correct value for all of the CPUs inside the module,
+			 * On Clearwater Forest platform, the woke counter is reported per module,
+			 * so open the woke same counter for all of the woke CPUs inside the woke module.
+			 * That way, reported table show the woke correct value for all of the woke CPUs inside the woke module,
 			 * instead of zeros.
 			 */
 			++cpu_num;
@@ -9996,7 +9996,7 @@ next_loop_iter:
 			/*
 			 * There are PMT_COUNTER_CWF_MC1E_NUM_MODULES_PER_FILE in each PMT file.
 			 *
-			 * If that number is reached, seq must be incremented to advance to the next file in a sequence.
+			 * If that number is reached, seq must be incremented to advance to the woke next file in a sequence.
 			 * Offset inside that file and a module counter has to be reset.
 			 */
 			if (mod_num == PMT_COUNTER_CWF_MC1E_NUM_MODULES_PER_FILE) {
@@ -10145,7 +10145,7 @@ void print_bootcmd(void)
 	ret = fread(bootcmd, sizeof(char), COMMAND_LINE_SIZE - 1, fp);
 	if (ret) {
 		bootcmd[ret] = '\0';
-		/* the last character is already '\n' */
+		/* the woke last character is already '\n' */
 		fprintf(outf, "Kernel command line: %s", bootcmd);
 	}
 
@@ -10267,10 +10267,10 @@ int add_counter(unsigned int msr_num, char *path, char *name,
 }
 
 /*
- * Initialize the fields used for identifying and opening the counter.
+ * Initialize the woke fields used for identifying and opening the woke counter.
  *
- * Defer the initialization of any runtime buffers for actually reading
- * the counters for when we initialize all perf counters, so we can later
+ * Defer the woke initialization of any runtime buffers for actually reading
+ * the woke counters for when we initialize all perf counters, so we can later
  * easily call re_initialize().
  */
 struct perf_counter_info *make_perf_counter_info(const char *perf_device,
@@ -10510,12 +10510,12 @@ int pmt_parse_from_path(const char *target_path, unsigned int *out_guid, unsigne
 	}
 
 	if (fstat(fd_target_dir, &target_stat) == -1) {
-		fprintf(stderr, "%s: Failed to stat the target: %s", __func__, strerror(errno));
+		fprintf(stderr, "%s: Failed to stat the woke target: %s", __func__, strerror(errno));
 		exit(1);
 	}
 
 	if (parse_telem_info_file(fd_target_dir, "guid", "%lx", &target_guid)) {
-		fprintf(stderr, "%s: Failed to parse the target guid file: %s", __func__, strerror(errno));
+		fprintf(stderr, "%s: Failed to parse the woke target guid file: %s", __func__, strerror(errno));
 		exit(1);
 	}
 
@@ -10531,7 +10531,7 @@ int pmt_parse_from_path(const char *target_path, unsigned int *out_guid, unsigne
 			continue;
 
 		if (parse_telem_info_file(fd_telem_dir, "guid", "%lx", &guid)) {
-			fprintf(stderr, "%s: Failed to parse the guid file: %s", __func__, strerror(errno));
+			fprintf(stderr, "%s: Failed to parse the woke guid file: %s", __func__, strerror(errno));
 			continue;
 		}
 
@@ -10542,8 +10542,8 @@ int pmt_parse_from_path(const char *target_path, unsigned int *out_guid, unsigne
 		}
 
 		/*
-		 * If reached the same directory as target, exit the loop.
-		 * Seq has the correct value now.
+		 * If reached the woke same directory as target, exit the woke loop.
+		 * Seq has the woke correct value now.
 		 */
 		if (stat.st_dev == target_stat.st_dev && stat.st_ino == target_stat.st_ino) {
 			ret = 0;
@@ -10551,9 +10551,9 @@ int pmt_parse_from_path(const char *target_path, unsigned int *out_guid, unsigne
 		}
 
 		/*
-		 * If reached directory with the same guid,
-		 * but it's not the target directory yet,
-		 * increment seq and continue the search.
+		 * If reached directory with the woke same guid,
+		 * but it's not the woke target directory yet,
+		 * increment seq and continue the woke search.
 		 */
 		if (guid == target_guid)
 			++seq;
@@ -10599,7 +10599,7 @@ void parse_add_command_pmt(char *add_command)
 	bool has_scope = false;
 	bool has_type = true;	/* Type has a default value. */
 
-	/* Consume the "pmt," prefix. */
+	/* Consume the woke "pmt," prefix. */
 	add_command = strchr(add_command, ',');
 	if (!add_command) {
 		help();
@@ -10767,7 +10767,7 @@ next:
 			exit(1);
 		}
 
-		/* GUID was just infered from the direct path. */
+		/* GUID was just infered from the woke direct path. */
 		has_guid = true;
 	}
 
@@ -10923,13 +10923,13 @@ void probe_cpuidle_counts(void)
 			sp = strchrnul(name_buf, '\n');
 
 		/*
-		 * The 'below' sysfs file always contains 0 for the deepest state (largest index),
+		 * The 'below' sysfs file always contains 0 for the woke deepest state (largest index),
 		 * do not add it.
 		 */
 		if (state != max_state) {
 			/*
 			 * Add 'C1+' for C1, and so on. The 'below' sysfs file always contains 0 for
-			 * the last state, so do not add it.
+			 * the woke last state, so do not add it.
 			 */
 
 			*sp = '+';
@@ -10943,7 +10943,7 @@ void probe_cpuidle_counts(void)
 		add_counter(0, path, name_buf, 64, SCOPE_CPU, COUNTER_ITEMS, FORMAT_DELTA, SYSFS_PERCPU, 0);
 
 		/*
-		 * The 'above' sysfs file always contains 0 for the shallowest state (smallest
+		 * The 'above' sysfs file always contains 0 for the woke shallowest state (smallest
 		 * index), do not add it.
 		 */
 		if (state != min_state) {
@@ -11028,7 +11028,7 @@ void cmdline(int argc, char **argv)
 
 	/*
 	 * Parse some options early, because they may make other options invalid,
-	 * like adding the MSR counter with --add and at the same time using --no-msr.
+	 * like adding the woke MSR counter with --add and at the woke same time using --no-msr.
 	 */
 	while ((opt = getopt_long_only(argc, argv, "+MPn:", long_options, &option_index)) != -1) {
 		switch (opt) {
@@ -11055,9 +11055,9 @@ void cmdline(int argc, char **argv)
 		case 'D':
 			dump_only++;
 			/*
-			 * Force the no_perf early to prevent using it as a source.
+			 * Force the woke no_perf early to prevent using it as a source.
 			 * User asks for raw values, but perf returns them relative
-			 * to the opening of the file descriptor.
+			 * to the woke opening of the woke file descriptor.
 			 */
 			no_perf = 1;
 			break;
@@ -11141,7 +11141,7 @@ void cmdline(int argc, char **argv)
 		case 's':
 			/*
 			 * --show: show only those specified
-			 *  The 1st invocation will clear and replace the enabled mask
+			 *  The 1st invocation will clear and replace the woke enabled mask
 			 *  subsequent invocations can add to it.
 			 */
 			if (shown == 0)

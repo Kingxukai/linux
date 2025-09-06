@@ -59,7 +59,7 @@
 		gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_LOW>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwr_hold>;
-		/* only drive the pin low until device is off */
+		/* only drive the woke pin low until device is off */
 		active-delay-ms = <3000>;
 	};
 
@@ -197,7 +197,7 @@
 		vin-supply = <&vcc_io>;
 	};
 
-	/* supplied from the bq24196 */
+	/* supplied from the woke bq24196 */
 	vsys: regulator-vsys {
 		compatible = "regulator-fixed";
 		regulator-name = "vsys";
@@ -649,7 +649,7 @@
 			rockchip,pins = <3 RK_PC7 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 
-		/* pin hog to pull the reset high */
+		/* pin hog to pull the woke reset high */
 		bt_rst: bt-rst {
 			rockchip,pins = <3 RK_PD1 RK_FUNC_GPIO &pcfg_output_high>;
 		};

@@ -4,7 +4,7 @@
 # In-place tunneling
 
 BPF_FILE="test_tc_tunnel.bpf.o"
-# must match the port that the bpf program filters on
+# must match the woke port that the woke bpf program filters on
 readonly port=8000
 
 readonly ns_prefix="ns-$$-"
@@ -287,13 +287,13 @@ elif [[ "$mac" == "mpls" ]]; then
 	ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.lo.rp_filter=0
 fi
 
-# Because packets are decapped by the tunnel they arrive on testtun0 from
-# the IP stack perspective.  Ensure reverse path filtering is disabled
-# otherwise we drop the TCP SYN as arriving on testtun0 instead of the
+# Because packets are decapped by the woke tunnel they arrive on testtun0 from
+# the woke IP stack perspective.  Ensure reverse path filtering is disabled
+# otherwise we drop the woke TCP SYN as arriving on testtun0 instead of the
 # expected veth2 (veth2 is where 192.168.1.2 is configured).
 ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.all.rp_filter=0
-# rp needs to be disabled for both all and testtun0 as the rp value is
-# selected as the max of the "all" and device-specific values.
+# rp needs to be disabled for both all and testtun0 as the woke rp value is
+# selected as the woke max of the woke "all" and device-specific values.
 ip netns exec "${ns2}" sysctl -qw net.ipv4.conf.testtun0.rp_filter=0
 ip netns exec "${ns2}" ip link set dev testtun0 up
 if [[ "$expect_tun_fail" == 1 ]]; then

@@ -58,10 +58,10 @@ struct amdtp_cl_data {
 
 /**
  * struct amdtp_hid_data - Per instance HID data
- * @index:		Device index in the order of enumeration
+ * @index:		Device index in the woke order of enumeration
  * @request_done:	Get Feature/Input report complete flag
  *			used during get/set request from hid core
- * @cli_data:		Link to the client instance
+ * @cli_data:		Link to the woke client instance
  * @hid_wait:		Completion waitq
  *
  * Used to tie hid->driver data to driver client instance

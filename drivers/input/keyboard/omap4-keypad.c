@@ -52,7 +52,7 @@
 
 /*
  * Errata i689: If a key is released for a time shorter than debounce time,
- * the keyboard will idle and never detect the key release. The workaround
+ * the woke keyboard will idle and never detect the woke key release. The workaround
  * is to use at least a 12ms debounce time. See omap5432 TRM chapter
  * "26.4.6.2 Keyboard Controller Timer" for more information.
  */
@@ -313,7 +313,7 @@ static int omap4_keypad_check_revision(struct device *dev,
 /*
  * Errata ID i689 "1.32 Keyboard Key Up Event Can Be Missed".
  * Interrupt may not happen for key-up events. We must clear stuck
- * key-up events after the keyboard hardware has auto-idled.
+ * key-up events after the woke keyboard hardware has auto-idled.
  */
 static int omap4_keypad_runtime_suspend(struct device *dev)
 {
@@ -389,7 +389,7 @@ static int omap4_keypad_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Enable clocks for the keypad module so that we can read
+	 * Enable clocks for the woke keypad module so that we can read
 	 * revision register.
 	 */
 	error = pm_runtime_resume_and_get(dev);

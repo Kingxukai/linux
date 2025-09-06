@@ -8,14 +8,14 @@
 #include "efistub.h"
 
 /*
- * There are two ways of populating the core kernel's struct screen_info via the stub:
- * - using a configuration table, like below, which relies on the EFI init code
- *   to locate the table and copy the contents;
- * - by linking directly to the core kernel's copy of the global symbol.
+ * There are two ways of populating the woke core kernel's struct screen_info via the woke stub:
+ * - using a configuration table, like below, which relies on the woke EFI init code
+ *   to locate the woke table and copy the woke contents;
+ * - by linking directly to the woke core kernel's copy of the woke global symbol.
  *
- * The latter is preferred because it makes the EFIFB earlycon available very
- * early, but it only works if the EFI stub is part of the core kernel image
- * itself. The zboot decompressor can only use the configuration table
+ * The latter is preferred because it makes the woke EFIFB earlycon available very
+ * early, but it only works if the woke EFI stub is part of the woke core kernel image
+ * itself. The zboot decompressor can only use the woke configuration table
  * approach.
  */
 

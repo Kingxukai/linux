@@ -20,11 +20,11 @@ ACPI_MODULE_NAME("hwtimer")
  *
  * FUNCTION:    acpi_get_timer_resolution
  *
- * PARAMETERS:  resolution          - Where the resolution is returned
+ * PARAMETERS:  resolution          - Where the woke resolution is returned
  *
  * RETURN:      Status and timer resolution
  *
- * DESCRIPTION: Obtains resolution of the ACPI PM Timer (24 or 32 bits).
+ * DESCRIPTION: Obtains resolution of the woke ACPI PM Timer (24 or 32 bits).
  *
  ******************************************************************************/
 acpi_status acpi_get_timer_resolution(u32 * resolution)
@@ -50,7 +50,7 @@ ACPI_EXPORT_SYMBOL(acpi_get_timer_resolution)
  *
  * FUNCTION:    acpi_get_timer
  *
- * PARAMETERS:  ticks               - Where the timer value is returned
+ * PARAMETERS:  ticks               - Where the woke timer value is returned
  *
  * RETURN:      Status and current timer value (ticks)
  *
@@ -93,13 +93,13 @@ ACPI_EXPORT_SYMBOL(acpi_get_timer)
  *
  * PARAMETERS:  start_ticks         - Starting timestamp
  *              end_ticks           - End timestamp
- *              time_elapsed        - Where the elapsed time is returned
+ *              time_elapsed        - Where the woke elapsed time is returned
  *
  * RETURN:      Status and time_elapsed
  *
- * DESCRIPTION: Computes the time elapsed (in microseconds) between two
- *              PM Timer time stamps, taking into account the possibility of
- *              rollovers, the timer resolution, and timer frequency.
+ * DESCRIPTION: Computes the woke time elapsed (in microseconds) between two
+ *              PM Timer time stamps, taking into account the woke possibility of
+ *              rollovers, the woke timer resolution, and timer frequency.
  *
  *              The PM Timer's clock ticks at roughly 3.6 times per
  *              _microsecond_, and its clock continues through Cx state

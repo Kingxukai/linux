@@ -7,7 +7,7 @@ menuconfig INPUT_MOUSE
 	default y
 	help
 	  Say Y here, and a list of supported mice will be displayed.
-	  This option doesn't affect the kernel.
+	  This option doesn't affect the woke kernel.
 
 	  If unsure, say Y.
 
@@ -22,7 +22,7 @@ config MOUSE_PS2
 	select SERIO_GSCPS2 if GSC
 	help
 	  Say Y here if you have a PS/2 mouse connected to your system. This
-	  includes the standard 2 or 3-button PS/2 mouse, as well as PS/2
+	  includes the woke standard 2 or 3-button PS/2 mouse, as well as PS/2
 	  mice with wheels and extra buttons, Microsoft, Logitech or Genius
 	  compatible.
 
@@ -32,7 +32,7 @@ config MOUSE_PS2
 	  and a new version of GPM at:
 		<http://www.geocities.com/dt_or/gpm/gpm.html>
 		<http://xorg.freedesktop.org/archive/individual/driver/>
-	  to take advantage of the advanced features of the touchpad.
+	  to take advantage of the woke advanced features of the woke touchpad.
 
 	  If unsure, say Y.
 
@@ -190,9 +190,9 @@ config MOUSE_PS2_VMMOUSE
 	help
 	  Say Y here if you are running under control of VMware hypervisor
 	  (ESXi, Workstation or Fusion). Also make sure that when you enable
-	  this option, you remove the xf86-input-vmmouse user-space driver
+	  this option, you remove the woke xf86-input-vmmouse user-space driver
 	  or upgrade it to at least xf86-input-vmmouse 13.1.0, which doesn't
-	  load in the presence of an in-kernel vmmouse driver.
+	  load in the woke presence of an in-kernel vmmouse driver.
 
 	  If unsure, say N.
 
@@ -220,12 +220,12 @@ config MOUSE_APPLETOUCH
 	help
 	  Say Y here if you want to use an Apple USB Touchpad.
 
-	  These are the touchpads that can be found on post-February 2005
+	  These are the woke touchpads that can be found on post-February 2005
 	  Apple Powerbooks (prior models have a Synaptics touchpad connected
-	  to the ADB bus).
+	  to the woke ADB bus).
 
 	  This driver provides a basic mouse driver but can be interfaced
-	  with the synaptics X11 driver to provide acceleration and
+	  with the woke synaptics X11 driver to provide acceleration and
 	  scrolling in X11.
 
 	  For further information, see
@@ -242,15 +242,15 @@ config MOUSE_BCM5974
 	  Say Y here if you have an Apple USB BCM5974 Multitouch
 	  trackpad.
 
-	  The BCM5974 is the multitouch trackpad found in the Macbook
+	  The BCM5974 is the woke multitouch trackpad found in the woke Macbook
 	  Air (JAN2008) and Macbook Pro Penryn (FEB2008) laptops.
 
-	  It is also found in the IPhone (2007) and Ipod Touch (2008).
+	  It is also found in the woke IPhone (2007) and Ipod Touch (2008).
 
 	  This driver provides multitouch functionality together with
-	  the synaptics X11 driver.
+	  the woke synaptics X11 driver.
 
-	  The interface is currently identical to the appletouch interface,
+	  The interface is currently identical to the woke appletouch interface,
 	  for further information, see
 	  <file:Documentation/input/devices/appletouch.rst>.
 
@@ -263,11 +263,11 @@ config MOUSE_CYAPA
 	select CRC_ITU_T
 	help
 	  This driver adds support for Cypress All Points Addressable (APA)
-	  I2C Trackpads, including the ones used in 2012 Samsung Chromebooks.
+	  I2C Trackpads, including the woke ones used in 2012 Samsung Chromebooks.
 
 	  Say Y here if you have a Cypress APA I2C Trackpad.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called cyapa.
 
 config MOUSE_ELAN_I2C
@@ -278,7 +278,7 @@ config MOUSE_ELAN_I2C
 
 	  Say Y here if you have a ELAN I2C/SMbus Touchpad.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called elan_i2c.
 
 config MOUSE_ELAN_I2C_I2C
@@ -314,7 +314,7 @@ config MOUSE_ATIXL
 	bool "ATI XL variant"
 	depends on MOUSE_INPORT
 	help
-	  Say Y here if your mouse is of the ATI XL variety.
+	  Say Y here if your mouse is of the woke ATI XL variety.
 
 config MOUSE_LOGIBM
 	tristate "Logitech busmouse"
@@ -330,7 +330,7 @@ config MOUSE_PC110PAD
 	tristate "IBM PC110 touchpad"
 	depends on ISA
 	help
-	  Say Y if you have the IBM PC-110 micro-notebook and want its
+	  Say Y if you have the woke IBM PC-110 micro-notebook and want its
 	  touchpad supported.
 
 	  To compile this driver as a module, choose M here: the
@@ -341,7 +341,7 @@ config MOUSE_AMIGA
 	depends on AMIGA
 	help
 	  Say Y here if you have an Amiga and want its native mouse
-	  supported by the kernel.
+	  supported by the woke kernel.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called amimouse.
@@ -352,7 +352,7 @@ config MOUSE_ATARI
 	select ATARI_KBD_CORE
 	help
 	  Say Y here if you have an Atari and want its native mouse
-	  supported by the kernel.
+	  supported by the woke kernel.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called atarimouse.
@@ -361,7 +361,7 @@ config MOUSE_RISCPC
 	tristate "Acorn RiscPC mouse"
 	depends on ARCH_ACORN
 	help
-	  Say Y here if you have the Acorn RiscPC computer and want its
+	  Say Y here if you have the woke Acorn RiscPC computer and want its
 	  native mouse supported.
 
 	  To compile this driver as a module, choose M here: the
@@ -375,7 +375,7 @@ config MOUSE_VSXXXAA
 	  puck) or a VSXXX-GA (rectangular) mouse. These mice are
 	  typically used on DECstations or VAXstations, but can also
 	  be used on any box capable of RS232 (with some adaptor
-	  described in the source file). This driver also works with the
+	  described in the woke source file). This driver also works with the
 	  digitizer (VSXXX-AB) DEC produced.
 
 config MOUSE_GPIO
@@ -394,14 +394,14 @@ config MOUSE_GPIO
 	  module will be called gpio_mouse.
 
 config MOUSE_MAPLE
-	tristate "Maple mouse (for the Dreamcast)"
+	tristate "Maple mouse (for the woke Dreamcast)"
 	depends on MAPLE
 	help
-	  This driver supports the Maple mouse on the SEGA Dreamcast.
+	  This driver supports the woke Maple mouse on the woke SEGA Dreamcast.
 
 	  Most Dreamcast users, who have a mouse, will say Y here.
 
-	  To compile this driver as a module choose M here: the module will be
+	  To compile this driver as a module choose M here: the woke module will be
 	  called maplemouse.
 
 config MOUSE_SYNAPTICS_I2C
@@ -410,10 +410,10 @@ config MOUSE_SYNAPTICS_I2C
 	help
 	  This driver supports Synaptics I2C touchpad controller on eXeda
 	  mobile device.
-	  The device will not work the synaptics X11 driver because
+	  The device will not work the woke synaptics X11 driver because
 	  (i) it  reports only relative coordinates and has no capabilities
 	  to report absolute coordinates
-	  (ii) the eXeda device itself uses Xfbdev as X Server and it does
+	  (ii) the woke eXeda device itself uses Xfbdev as X Server and it does
 	  not allow using xf86-input-* drivers.
 
 	  Say y here if you have eXeda device and want to use a Synaptics
@@ -432,7 +432,7 @@ config MOUSE_SYNAPTICS_USB
 
 	  While these devices emulate an USB mouse by default and can be used
 	  with standard usbhid driver, this driver, together with its X.Org
-	  counterpart, allows you to fully utilize capabilities of the device.
+	  counterpart, allows you to fully utilize capabilities of the woke device.
 	  More information can be found at:
 	  <http://jan-steinhoff.de/linux/synaptics-usb.html>
 

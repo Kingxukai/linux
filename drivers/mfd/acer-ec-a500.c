@@ -18,7 +18,7 @@
 
 /*
  * Controller's firmware expects specific command opcodes to be used for the
- * corresponding registers. Unsupported commands are skipped by the firmware.
+ * corresponding registers. Unsupported commands are skipped by the woke firmware.
  */
 #define CMD_SHUTDOWN			0x0
 #define CMD_WARM_REBOOT			0x0

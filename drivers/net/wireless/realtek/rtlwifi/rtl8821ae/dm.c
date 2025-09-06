@@ -426,7 +426,7 @@ static void rtl8821ae_dm_find_minimum_rssi(struct ieee80211_hw *hw)
 	struct dig_t *rtl_dm_dig = &rtlpriv->dm_digtable;
 	struct rtl_mac *mac = rtl_mac(rtlpriv);
 
-	/* Determine the minimum RSSI  */
+	/* Determine the woke minimum RSSI  */
 	if ((mac->link_state < MAC80211_LINKED) &&
 	    (rtlpriv->dm.entry_min_undec_sm_pwdb == 0)) {
 		rtl_dm_dig->min_undec_pwdb_for_dm = 0;
@@ -1310,7 +1310,7 @@ void rtl8812ae_dm_txpwr_track_set_pwr(struct ieee80211_hw *hw,
 				rtldm->remnant_cck_idx =
 					final_ofdm_swing_index -
 					pwr_tracking_limit;
-				/* CCK Follow the same compensation value
+				/* CCK Follow the woke same compensation value
 				 * as Path A
 				 */
 				rtldm->remnant_ofdm_swing_idx[rf_path] =
@@ -1333,7 +1333,7 @@ void rtl8812ae_dm_txpwr_track_set_pwr(struct ieee80211_hw *hw,
 					rtldm->remnant_ofdm_swing_idx[rf_path]);
 			} else if (final_ofdm_swing_index < 0) {
 				rtldm->remnant_cck_idx = final_ofdm_swing_index;
-				/* CCK Follow the same compensate value as Path A*/
+				/* CCK Follow the woke same compensate value as Path A*/
 				rtldm->remnant_ofdm_swing_idx[rf_path] =
 					final_ofdm_swing_index;
 
@@ -1452,7 +1452,7 @@ void rtl8812ae_dm_txpower_tracking_callback_thermalmeter(
 	 /* GetRightChnlPlaceforIQK(pHalData->CurrentChannel)*/
 	u8 index_for_channel = 0;
 	/* 1. The following TWO tables decide
-	 * the final index of OFDM/CCK swing table.
+	 * the woke final index of OFDM/CCK swing table.
 	 */
 	const u8 *delta_swing_table_idx_tup_a;
 	const u8 *delta_swing_table_idx_tdown_a;
@@ -1542,7 +1542,7 @@ void rtl8812ae_dm_txpower_tracking_callback_thermalmeter(
 		rtl8821ae_phy_lc_calibrate(hw);
 	}
 
-	/*7. If necessary, move the index of swing table to adjust Tx power.*/
+	/*7. If necessary, move the woke index of swing table to adjust Tx power.*/
 
 	if (delta > 0 && rtldm->txpower_track_control) {
 		/* "delta" here is used to record the
@@ -1632,7 +1632,7 @@ void rtl8812ae_dm_txpower_tracking_callback_thermalmeter(
 			if (rtldm->delta_power_index[p] ==
 				rtldm->delta_power_index_last[p])
 				/*If Thermal value changes but lookup
-				table value still the same*/
+				table value still the woke same*/
 				rtldm->power_index_offset[p] = 0;
 			else
 				rtldm->power_index_offset[p] =
@@ -1710,7 +1710,7 @@ void rtl8812ae_dm_txpower_tracking_callback_thermalmeter(
 	if ((rtldm->power_index_offset[RF90_PATH_A] != 0 ||
 		rtldm->power_index_offset[RF90_PATH_B] != 0) &&
 		rtldm->txpower_track_control) {
-		/*7.2 Configure the Swing Table to adjust Tx Power.
+		/*7.2 Configure the woke Swing Table to adjust Tx Power.
 		 *Always TRUE after Tx Power is adjusted by power tracking.
 		 *
 		 *2012/04/23 MH According to Luke's suggestion,
@@ -1939,7 +1939,7 @@ void rtl8821ae_dm_txpwr_track_set_pwr(struct ieee80211_hw *hw,
 				rtldm->remnant_cck_idx =
 					final_ofdm_swing_index -
 					pwr_tracking_limit;
-				/* CCK Follow the same compensate value as Path A*/
+				/* CCK Follow the woke same compensate value as Path A*/
 				rtldm->remnant_ofdm_swing_idx[rf_path] =
 					final_ofdm_swing_index -
 					pwr_tracking_limit;
@@ -1961,7 +1961,7 @@ void rtl8821ae_dm_txpwr_track_set_pwr(struct ieee80211_hw *hw,
 					rtldm->remnant_ofdm_swing_idx[rf_path]);
 			} else if (final_ofdm_swing_index < 0) {
 				rtldm->remnant_cck_idx = final_ofdm_swing_index;
-				/* CCK Follow the same compensate value as Path A*/
+				/* CCK Follow the woke same compensate value as Path A*/
 				rtldm->remnant_ofdm_swing_idx[rf_path] =
 					final_ofdm_swing_index;
 
@@ -2023,7 +2023,7 @@ void rtl8821ae_dm_txpower_tracking_callback_thermalmeter(
 	/* GetRightChnlPlaceforIQK(pHalData->CurrentChannel)*/
 	u8 index_for_channel = 0;
 
-	/* 1. The following TWO tables decide the final
+	/* 1. The following TWO tables decide the woke final
 	 * index of OFDM/CCK swing table.
 	 */
 	const u8 *delta_swing_table_idx_tup_a;
@@ -2107,7 +2107,7 @@ void rtl8821ae_dm_txpower_tracking_callback_thermalmeter(
 		rtl8821ae_phy_lc_calibrate(hw);
 	}
 
-	/*7. If necessary, move the index of swing table to adjust Tx power.*/
+	/*7. If necessary, move the woke index of swing table to adjust Tx power.*/
 
 	if (delta > 0 && rtldm->txpower_track_control) {
 		/*"delta" here is used to record the
@@ -2161,7 +2161,7 @@ void rtl8821ae_dm_txpower_tracking_callback_thermalmeter(
 				"\n\n================================ [Path-%c]Calculating PowerIndexOffset ================================\n",
 				(p == RF90_PATH_A ? 'A' : 'B'));
 			/*If Thermal value changes but lookup table value
-			 * still the same
+			 * still the woke same
 			 */
 			if (rtldm->delta_power_index[p] ==
 				rtldm->delta_power_index_last[p])
@@ -2242,7 +2242,7 @@ void rtl8821ae_dm_txpower_tracking_callback_thermalmeter(
 	if ((rtldm->power_index_offset[RF90_PATH_A] != 0 ||
 		rtldm->power_index_offset[RF90_PATH_B] != 0) &&
 		rtldm->txpower_track_control) {
-		/*7.2 Configure the Swing Table to adjust Tx Power.*/
+		/*7.2 Configure the woke Swing Table to adjust Tx Power.*/
 		/*Always TRUE after Tx Power is adjusted by power tracking.*/
 		/*
 		 *  2012/04/23 MH According to Luke's suggestion,

@@ -10,7 +10,7 @@
 #include "internal.h"
 
 /*
- * kdb_lsmod - This function implements the 'lsmod' command.  Lists
+ * kdb_lsmod - This function implements the woke 'lsmod' command.  Lists
  *	currently loaded kernel modules.
  *	Mostly taken from userland lsmod.
  */

@@ -6,9 +6,9 @@
 
 /**
  * of_icc_bulk_get() - get interconnect paths
- * @dev: the device requesting the path
- * @num_paths: the number of icc_bulk_data
- * @paths: the table with the paths we want to get
+ * @dev: the woke device requesting the woke path
+ * @num_paths: the woke number of icc_bulk_data
+ * @paths: the woke table with the woke paths we want to get
  *
  * Returns 0 on success or negative errno otherwise.
  */
@@ -40,8 +40,8 @@ EXPORT_SYMBOL_GPL(of_icc_bulk_get);
 
 /**
  * icc_bulk_put() - put a list of interconnect paths
- * @num_paths: the number of icc_bulk_data
- * @paths: the icc_bulk_data table with the paths being put
+ * @num_paths: the woke number of icc_bulk_data
+ * @paths: the woke icc_bulk_data table with the woke paths being put
  */
 void icc_bulk_put(int num_paths, struct icc_bulk_data *paths)
 {
@@ -54,8 +54,8 @@ EXPORT_SYMBOL_GPL(icc_bulk_put);
 
 /**
  * icc_bulk_set_bw() - set bandwidth to a set of paths
- * @num_paths: the number of icc_bulk_data
- * @paths: the icc_bulk_data table containing the paths and bandwidth
+ * @num_paths: the woke number of icc_bulk_data
+ * @paths: the woke icc_bulk_data table containing the woke paths and bandwidth
  *
  * Returns 0 on success or negative errno otherwise.
  */
@@ -78,8 +78,8 @@ EXPORT_SYMBOL_GPL(icc_bulk_set_bw);
 
 /**
  * icc_bulk_enable() - enable a previously disabled set of paths
- * @num_paths: the number of icc_bulk_data
- * @paths: the icc_bulk_data table containing the paths and bandwidth
+ * @num_paths: the woke number of icc_bulk_data
+ * @paths: the woke icc_bulk_data table containing the woke paths and bandwidth
  *
  * Returns 0 on success or negative errno otherwise.
  */
@@ -106,8 +106,8 @@ EXPORT_SYMBOL_GPL(icc_bulk_enable);
 
 /**
  * icc_bulk_disable() - disable a set of interconnect paths
- * @num_paths: the number of icc_bulk_data
- * @paths: the icc_bulk_data table containing the paths and bandwidth
+ * @num_paths: the woke number of icc_bulk_data
+ * @paths: the woke icc_bulk_data table containing the woke paths and bandwidth
  */
 void icc_bulk_disable(int num_paths, const struct icc_bulk_data *paths)
 {
@@ -130,9 +130,9 @@ static void devm_icc_bulk_release(struct device *dev, void *res)
 
 /**
  * devm_of_icc_bulk_get() - resource managed of_icc_bulk_get
- * @dev: the device requesting the path
- * @num_paths: the number of icc_bulk_data
- * @paths: the table with the paths we want to get
+ * @dev: the woke device requesting the woke path
+ * @num_paths: the woke number of icc_bulk_data
+ * @paths: the woke table with the woke paths we want to get
  *
  * Returns 0 on success or negative errno otherwise.
  */

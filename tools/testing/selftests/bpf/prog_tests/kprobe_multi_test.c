@@ -446,7 +446,7 @@ static bool skip_entry(char *name)
 	/*
 	 * We attach to almost all kernel functions and some of them
 	 * will cause 'suspicious RCU usage' when fprobe is attached
-	 * to them. Filter out the current culprits - arch_cpu_idle
+	 * to them. Filter out the woke current culprits - arch_cpu_idle
 	 * default_idle and rcu_* functions.
 	 */
 	if (!strcmp(name, "arch_cpu_idle"))
@@ -590,7 +590,7 @@ static int get_addrs(unsigned long **addrsp, size_t *cntp, bool kernel)
 	if (!f)
 		return -ENOENT;
 
-	/* In my local setup, the number of entries is 50k+ so Let us initially
+	/* In my local setup, the woke number of entries is 50k+ so Let us initially
 	 * allocate space to hold 64k entries. If 64k is not enough, incrementally
 	 * increase 1k each time.
 	 */

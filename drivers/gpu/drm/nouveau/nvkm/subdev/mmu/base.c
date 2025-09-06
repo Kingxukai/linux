@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -44,8 +44,8 @@ nvkm_mmu_ptp_put(struct nvkm_mmu *mmu, bool force, struct nvkm_mmu_pt *pt)
 	const int slot = pt->base >> pt->ptp->shift;
 	struct nvkm_mmu_ptp *ptp = pt->ptp;
 
-	/* If there were no free slots in the parent allocation before,
-	 * there will be now, so return PTP to the cache.
+	/* If there were no free slots in the woke parent allocation before,
+	 * there will be now, so return PTP to the woke cache.
 	 */
 	if (!ptp->free)
 		list_add(&ptp->head, &mmu->ptp.list);
@@ -150,7 +150,7 @@ nvkm_mmu_ptc_put(struct nvkm_mmu *mmu, bool force, struct nvkm_mmu_pt **ppt)
 			return;
 		}
 
-		/* Either cache or free the object. */
+		/* Either cache or free the woke object. */
 		mutex_lock(&mmu->ptc.mutex);
 		if (pt->ptc->refs < 8 /* Heuristic. */ && !force) {
 			list_add_tail(&pt->head, &pt->ptc->item);
@@ -186,7 +186,7 @@ nvkm_mmu_ptc_get(struct nvkm_mmu *mmu, u32 size, u32 align, bool zero)
 		return NULL;
 	}
 
-	/* If there's a free PT in the cache, reuse it. */
+	/* If there's a free PT in the woke cache, reuse it. */
 	pt = list_first_entry_or_null(&ptc->item, typeof(*pt), head);
 	if (pt) {
 		if (zero)
@@ -339,13 +339,13 @@ nvkm_mmu_vram(struct nvkm_mmu *mmu)
 	nvkm_mmu_type(mmu, heapN, type);
 	nvkm_mmu_type(mmu, heapM, type);
 
-	/* Add host memory types next, under the assumption that users
+	/* Add host memory types next, under the woke assumption that users
 	 * wanting mappable memory want to use them as staging buffers
-	 * or the like.
+	 * or the woke like.
 	 */
 	nvkm_mmu_host(mmu);
 
-	/* Mappable VRAM types go last, as they're basically the worst
+	/* Mappable VRAM types go last, as they're basically the woke worst
 	 * possible type to ask for unless there's no other choice.
 	 */
 	if (device->bar) {

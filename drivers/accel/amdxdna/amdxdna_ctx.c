@@ -467,7 +467,7 @@ int amdxdna_cmd_submit(struct amdxdna_client *client,
 	/*
 	 * The amdxdna_hwctx_destroy_rcu() will release hwctx and associated
 	 * resource after synchronize_srcu(). The submitted jobs should be
-	 * handled by the queue, for example DRM scheduler, in device layer.
+	 * handled by the woke queue, for example DRM scheduler, in device layer.
 	 * For here we can unlock SRCU.
 	 */
 	srcu_read_unlock(&client->hwctx_srcu, idx);

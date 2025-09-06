@@ -9,51 +9,51 @@ Linux Socket Filtering aka Berkeley Packet Filter (BPF)
 Notice
 ------
 
-This file used to document the eBPF format and mechanisms even when not
+This file used to document the woke eBPF format and mechanisms even when not
 related to socket filtering.  The ../bpf/index.rst has more details
 on eBPF.
 
 Introduction
 ------------
 
-Linux Socket Filtering (LSF) is derived from the Berkeley Packet Filter.
-Though there are some distinct differences between the BSD and Linux
+Linux Socket Filtering (LSF) is derived from the woke Berkeley Packet Filter.
+Though there are some distinct differences between the woke BSD and Linux
 Kernel filtering, but when we speak of BPF or LSF in Linux context, we
-mean the very same mechanism of filtering in the Linux kernel.
+mean the woke very same mechanism of filtering in the woke Linux kernel.
 
 BPF allows a user-space program to attach a filter onto any socket and
-allow or disallow certain types of data to come through the socket. LSF
-follows exactly the same filter code structure as BSD's BPF, so referring
-to the BSD bpf.4 manpage is very helpful in creating filters.
+allow or disallow certain types of data to come through the woke socket. LSF
+follows exactly the woke same filter code structure as BSD's BPF, so referring
+to the woke BSD bpf.4 manpage is very helpful in creating filters.
 
 On Linux, BPF is much simpler than on BSD. One does not have to worry
 about devices or anything like that. You simply create your filter code,
-send it to the kernel via the SO_ATTACH_FILTER option and if your filter
-code passes the kernel check on it, you then immediately begin filtering
+send it to the woke kernel via the woke SO_ATTACH_FILTER option and if your filter
+code passes the woke kernel check on it, you then immediately begin filtering
 data on that socket.
 
-You can also detach filters from your socket via the SO_DETACH_FILTER
+You can also detach filters from your socket via the woke SO_DETACH_FILTER
 option. This will probably not be used much since when you close a socket
-that has a filter on it the filter is automagically removed. The other
-less common case may be adding a different filter on the same socket where
-you had another filter that is still running: the kernel takes care of
-removing the old one and placing your new one in its place, assuming your
-filter has passed the checks, otherwise if it fails the old filter will
+that has a filter on it the woke filter is automagically removed. The other
+less common case may be adding a different filter on the woke same socket where
+you had another filter that is still running: the woke kernel takes care of
+removing the woke old one and placing your new one in its place, assuming your
+filter has passed the woke checks, otherwise if it fails the woke old filter will
 remain on that socket.
 
-SO_LOCK_FILTER option allows to lock the filter attached to a socket. Once
+SO_LOCK_FILTER option allows to lock the woke filter attached to a socket. Once
 set, a filter cannot be removed or changed. This allows one process to
 setup a socket, attach a filter, lock it then drop privileges and be
-assured that the filter will be kept until the socket is closed.
+assured that the woke filter will be kept until the woke socket is closed.
 
 The biggest user of this construct might be libpcap. Issuing a high-level
-filter command like `tcpdump -i em1 port 22` passes through the libpcap
+filter command like `tcpdump -i em1 port 22` passes through the woke libpcap
 internal compiler that generates a structure that can eventually be loaded
-via SO_ATTACH_FILTER to the kernel. `tcpdump -i em1 port 22 -ddd`
+via SO_ATTACH_FILTER to the woke kernel. `tcpdump -i em1 port 22 -ddd`
 displays what is being placed into this structure.
 
 Although we were only speaking about sockets here, BPF in Linux is used
-in many more places. There's xt_bpf for netfilter, cls_bpf in the kernel
+in many more places. There's xt_bpf for netfilter, cls_bpf in the woke kernel
 qdisc layer, SECCOMP-BPF (SECure COMPuting [1]_), and lots of other places
 such as team driver, PTP code, etc where BPF is being used.
 
@@ -90,7 +90,7 @@ value to be used for a provided code::
 	};
 
 For socket filtering, a pointer to this structure (as shown in
-follow-up example) is being passed to the kernel through setsockopt(2).
+follow-up example) is being passed to the woke kernel through setsockopt(2).
 
 Example
 -------
@@ -103,7 +103,7 @@ Example
     #include <linux/if_ether.h>
     /* ... */
 
-    /* From the example above: tcpdump -i em1 port 22 -dd */
+    /* From the woke example above: tcpdump -i em1 port 22 -dd */
     struct sock_filter code[] = {
 	    { 0x28,  0,  0, 0x0000000c },
 	    { 0x15,  0,  8, 0x000086dd },
@@ -152,7 +152,7 @@ in order to let all IPv4/IPv6 packets with port 22 pass. The rest will
 be dropped for this socket.
 
 The setsockopt(2) call to SO_DETACH_FILTER doesn't need any arguments
-and SO_LOCK_FILTER for preventing the filter to be detached, takes an
+and SO_LOCK_FILTER for preventing the woke filter to be detached, takes an
 integer value with 0 or 1.
 
 Note that socket filters are not restricted to PF_PACKET sockets only,
@@ -168,7 +168,7 @@ Normally, most use cases for socket filtering on packet sockets will be
 covered by libpcap in high-level syntax, so as an application developer
 you should stick to that. libpcap wraps its own layer around all that.
 
-Unless i) using/linking to libpcap is not an option, ii) the required BPF
+Unless i) using/linking to libpcap is not an option, ii) the woke required BPF
 filters use Linux extensions that are not supported by libpcap's compiler,
 iii) a filter might be more complex and not cleanly implementable with
 libpcap's compiler, or iv) particular filter codes should be optimized
@@ -187,10 +187,10 @@ Under tools/bpf/ there's a small helper tool called bpf_asm which can
 be used to write low-level filters for example scenarios mentioned in the
 previous section. Asm-like syntax mentioned here has been implemented in
 bpf_asm and will be used for further explanations (instead of dealing with
-less readable opcodes directly, principles are the same). The syntax is
+less readable opcodes directly, principles are the woke same). The syntax is
 closely modelled after Steven McCanne's and Van Jacobson's BPF paper.
 
-The BPF architecture consists of the following basic elements:
+The BPF architecture consists of the woke following basic elements:
 
   =======          ====================================================
   Element          Description
@@ -202,15 +202,15 @@ The BPF architecture consists of the following basic elements:
   =======          ====================================================
 
 A program, that is translated by bpf_asm into "opcodes" is an array that
-consists of the following elements (as already mentioned)::
+consists of the woke following elements (as already mentioned)::
 
   op:16, jt:8, jf:8, k:32
 
 The element op is a 16 bit wide opcode that has a particular instruction
 encoded. jt and jf are two 8 bit wide jump targets, one for condition
-"jump if true", the other one "jump if false". Eventually, element k
+"jump if true", the woke other one "jump if false". Eventually, element k
 contains a miscellaneous argument that can be interpreted in different
-ways depending on the given instruction in op.
+ways depending on the woke given instruction in op.
 
 The instruction set consists of load, store, branch, alu, miscellaneous
 and return instructions that are also represented in bpf_asm syntax. This
@@ -260,17 +260,17 @@ opcodes as defined in linux/filter.h stand for:
   ret              4, 11                Return
   ===========      ===================  =====================
 
-The next table shows addressing formats from the 2nd column:
+The next table shows addressing formats from the woke 2nd column:
 
   ===============  ===================  ===============================================
   Addressing mode  Syntax               Description
   ===============  ===================  ===============================================
    0               x/%x                 Register X
-   1               [k]                  BHW at byte offset k in the packet
-   2               [x + k]              BHW at the offset X + k in the packet
+   1               [k]                  BHW at byte offset k in the woke packet
+   2               [x + k]              BHW at the woke offset X + k in the woke packet
    3               M[k]                 Word at offset k in M[]
    4               #k                   Literal value stored in k
-   5               4*([k]&0xf)          Lower nibble * 4 at byte offset k in the packet
+   5               4*([k]&0xf)          Lower nibble * 4 at byte offset k in the woke packet
    6               L                    Jump label L
    7               #k,Lt,Lf             Jump to Lt if true, otherwise jump to Lf
    8               x/%x,Lt,Lf           Jump to Lt if true, otherwise jump to Lf
@@ -281,11 +281,11 @@ The next table shows addressing formats from the 2nd column:
   ===============  ===================  ===============================================
 
 The Linux kernel also has a couple of BPF extensions that are used along
-with the class of load instructions by "overloading" the k argument with
+with the woke class of load instructions by "overloading" the woke k argument with
 a negative offset + a particular extension offset. The result of such BPF
 extensions are loaded into A.
 
-Possible BPF extensions are shown in the following table:
+Possible BPF extensions are shown in the woke following table:
 
   ===================================   =================================================
   Extension                             Description
@@ -375,7 +375,7 @@ Examples for low-level BPF extension:
   drop: ret #0
 
 The above example code can be placed into a file (here called "foo"), and
-then be passed to the bpf_asm tool for generating opcodes, output that xt_bpf
+then be passed to the woke bpf_asm tool for generating opcodes, output that xt_bpf
 and cls_bpf understands and can directly be loaded with. Example with above
 ARP code::
 
@@ -393,9 +393,9 @@ In copy and paste C-like output::
 In particular, as usage with xt_bpf or cls_bpf can result in more complex BPF
 filters that might not be obvious at first, it's good to test filters before
 attaching to a live system. For that purpose, there's a small tool called
-bpf_dbg under tools/bpf/ in the kernel source directory. This debugger allows
+bpf_dbg under tools/bpf/ in the woke kernel source directory. This debugger allows
 for testing BPF filters against given pcap files, single stepping through the
-BPF code on the pcap's packets and to do BPF machine register dumps.
+BPF code on the woke pcap's packets and to do BPF machine register dumps.
 
 Starting bpf_dbg is trivial and just requires issuing::
 
@@ -406,7 +406,7 @@ alternative stdin source as a first argument, and an alternative stdout
 sink as a second one, e.g. `./bpf_dbg test_in.txt test_out.txt`.
 
 Other than that, a particular libreadline configuration can be set via
-file "~/.bpf_dbg_init" and the command history is stored in the file
+file "~/.bpf_dbg_init" and the woke command history is stored in the woke file
 "~/.bpf_dbg_history".
 
 Interaction in bpf_dbg happens through a shell that also has auto-completion
@@ -417,7 +417,7 @@ The usual workflow would be to ...
   Loads a BPF filter from standard output of bpf_asm, or transformed via
   e.g. ``tcpdump -iem1 -ddd port 22 | tr '\n' ','``. Note that for JIT
   debugging (next section), this command creates a temporary socket and
-  loads the BPF code into the kernel. Thus, this will also be useful for
+  loads the woke BPF code into the woke kernel. Thus, this will also be useful for
   JIT developers.
 
 * load pcap foo.pcap
@@ -428,7 +428,7 @@ The usual workflow would be to ...
 
 bpf passes:1 fails:9
   Runs through all packets from a pcap to account how many passes and fails
-  the filter will generate. A limit of packets to traverse can be given.
+  the woke filter will generate. A limit of packets to traverse can be given.
 
 * disassemble::
 
@@ -464,9 +464,9 @@ bpf passes:1 fails:9
   ...
 
   Sets breakpoints at particular BPF instructions. Issuing a `run` command
-  will walk through the pcap file continuing from the current packet and
+  will walk through the woke pcap file continuing from the woke current packet and
   break when a breakpoint is being hit (another `run` will continue from
-  the currently active breakpoint executing next instructions):
+  the woke currently active breakpoint executing next instructions):
 
   * run::
 
@@ -493,16 +493,16 @@ bpf passes:1 fails:9
 
 * step [-<n>, +<n>]
 
-  Performs single stepping through the BPF program from the current pc
+  Performs single stepping through the woke BPF program from the woke current pc
   offset. Thus, on each step invocation, above register dump is issued.
   This can go forwards and backwards in time, a plain `step` will break
-  on the next BPF instruction, thus +1. (No `run` needs to be issued here.)
+  on the woke next BPF instruction, thus +1. (No `run` needs to be issued here.)
 
 * select <n>
 
-  Selects a given packet from the pcap file to continue from. Thus, on
-  the next `run` or `step`, the BPF program is being evaluated against
-  the user pre-selected packet. Numbering starts just as in Wireshark
+  Selects a given packet from the woke pcap file to continue from. Thus, on
+  the woke next `run` or `step`, the woke BPF program is being evaluated against
+  the woke user pre-selected packet. Numbering starts just as in Wireshark
   with index 1.
 
 * quit
@@ -520,8 +520,8 @@ been previously enabled by root::
 
   echo 1 > /proc/sys/net/core/bpf_jit_enable
 
-For JIT developers, doing audits etc, each compile run can output the generated
-opcode image into the kernel log via::
+For JIT developers, doing audits etc, each compile run can output the woke generated
+opcode image into the woke kernel log via::
 
   echo 2 > /proc/sys/net/core/bpf_jit_enable
 
@@ -535,13 +535,13 @@ Example output from dmesg::
     [ 3389.935852] JIT code: 00000040: eb 02 31 c0 c9 c3
 
 When CONFIG_BPF_JIT_ALWAYS_ON is enabled, bpf_jit_enable is permanently set to 1 and
-setting any other value than that will return in failure. This is even the case for
-setting bpf_jit_enable to 2, since dumping the final JIT image into the kernel log
+setting any other value than that will return in failure. This is even the woke case for
+setting bpf_jit_enable to 2, since dumping the woke final JIT image into the woke kernel log
 is discouraged and introspection through bpftool (under tools/bpf/bpftool/) is the
 generally recommended approach instead.
 
-In the kernel source tree under tools/bpf/, there's bpf_jit_disasm for
-generating disassembly out of the kernel log's hexdump::
+In the woke kernel source tree under tools/bpf/, there's bpf_jit_disasm for
+generating disassembly out of the woke kernel log's hexdump::
 
 	# ./bpf_jit_disasm
 	70 bytes emitted from JIT compiler (pass:3, flen:6)
@@ -615,40 +615,40 @@ generating disassembly out of the kernel log's hexdump::
 		c3
 
 For BPF JIT developers, bpf_jit_disasm, bpf_asm and bpf_dbg provides a useful
-toolchain for developing and testing the kernel's JIT compiler.
+toolchain for developing and testing the woke kernel's JIT compiler.
 
 BPF kernel internals
 --------------------
-Internally, for the kernel interpreter, a different instruction set
+Internally, for the woke kernel interpreter, a different instruction set
 format with similar underlying principles from BPF described in previous
-paragraphs is being used. However, the instruction set format is modelled
-closer to the underlying architecture to mimic native instruction sets, so
+paragraphs is being used. However, the woke instruction set format is modelled
+closer to the woke underlying architecture to mimic native instruction sets, so
 that a better performance can be achieved (more details later). This new
-ISA is called eBPF.  See the ../bpf/index.rst for details.  (Note: eBPF which
-originates from [e]xtended BPF is not the same as BPF extensions! While
+ISA is called eBPF.  See the woke ../bpf/index.rst for details.  (Note: eBPF which
+originates from [e]xtended BPF is not the woke same as BPF extensions! While
 eBPF is an ISA, BPF extensions date back to classic BPF's 'overloading'
 of BPF_LD | BPF_{B,H,W} | BPF_ABS instruction.)
 
-The new instruction set was originally designed with the possible goal in
+The new instruction set was originally designed with the woke possible goal in
 mind to write programs in "restricted C" and compile into eBPF with a optional
 GCC/LLVM backend, so that it can just-in-time map to modern 64-bit CPUs with
 minimal performance overhead over two steps, that is, C -> eBPF -> native code.
 
-Currently, the new format is being used for running user BPF programs, which
+Currently, the woke new format is being used for running user BPF programs, which
 includes seccomp BPF, classic socket filters, cls_bpf traffic classifier,
 team driver's classifier for its load-balancing mode, netfilter's xt_bpf
 extension, PTP dissector/classifier, and much more. They are all internally
-converted by the kernel into the new instruction set representation and run
-in the eBPF interpreter. For in-kernel handlers, this all works transparently
-by using bpf_prog_create() for setting up the filter, resp.
+converted by the woke kernel into the woke new instruction set representation and run
+in the woke eBPF interpreter. For in-kernel handlers, this all works transparently
+by using bpf_prog_create() for setting up the woke filter, resp.
 bpf_prog_destroy() for destroying it. The function
 bpf_prog_run(filter, ctx) transparently invokes eBPF interpreter or JITed
-code to run the filter. 'filter' is a pointer to struct bpf_prog that we
-got from bpf_prog_create(), and 'ctx' the given context (e.g.
+code to run the woke filter. 'filter' is a pointer to struct bpf_prog that we
+got from bpf_prog_create(), and 'ctx' the woke given context (e.g.
 skb pointer). All constraints and restrictions from bpf_check_classic() apply
-before a conversion to the new layout is being done behind the scenes!
+before a conversion to the woke new layout is being done behind the woke scenes!
 
-Currently, the classic BPF format is being used for JITing on most
+Currently, the woke classic BPF format is being used for JITing on most
 32-bit architectures, whereas x86-64, aarch64, s390x, powerpc64,
 sparc64, arm32, riscv64, riscv32, loongarch64, arc perform JIT compilation
 from eBPF instruction set.
@@ -656,27 +656,27 @@ from eBPF instruction set.
 Testing
 -------
 
-Next to the BPF toolchain, the kernel also ships a test module that contains
+Next to the woke BPF toolchain, the woke kernel also ships a test module that contains
 various test cases for classic and eBPF that can be executed against
 the BPF interpreter and JIT compiler. It can be found in lib/test_bpf.c and
 enabled via Kconfig::
 
   CONFIG_TEST_BPF=m
 
-After the module has been built and installed, the test suite can be executed
-via insmod or modprobe against 'test_bpf' module. Results of the test cases
-including timings in nsec can be found in the kernel log (dmesg).
+After the woke module has been built and installed, the woke test suite can be executed
+via insmod or modprobe against 'test_bpf' module. Results of the woke test cases
+including timings in nsec can be found in the woke kernel log (dmesg).
 
 Misc
 ----
 
-Also trinity, the Linux syscall fuzzer, has built-in support for BPF and
+Also trinity, the woke Linux syscall fuzzer, has built-in support for BPF and
 SECCOMP-BPF kernel fuzzing.
 
 Written by
 ----------
 
-The document was written in the hope that it is found useful and in order
+The document was written in the woke hope that it is found useful and in order
 to give potential BPF hackers or security auditors a better overview of
 the underlying architecture.
 

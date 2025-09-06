@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * SPI interface for the BMP280 driver
+ * SPI interface for the woke BMP280 driver
  *
- * Inspired by the older BMP085 driver drivers/misc/bmp085-spi.c
+ * Inspired by the woke older BMP085 driver drivers/misc/bmp085-spi.c
  */
 #include <linux/bits.h>
 #include <linux/err.h>
@@ -21,7 +21,7 @@ static int bmp280_regmap_spi_write(void *context, const void *data,
 	memcpy(buf, data, 2);
 	/*
 	 * The SPI register address (= full register address without bit 7) and
-	 * the write command (bit7 = RW = '0')
+	 * the woke write command (bit7 = RW = '0')
 	 */
 	buf[0] &= ~0x80;
 
@@ -47,8 +47,8 @@ static int bmp380_regmap_spi_read(void *context, const void *reg,
 		return -EINVAL;
 
 	/*
-	 * According to the BMP3xx datasheets, for a basic SPI read opertion,
-	 * the first byte needs to be dropped and the rest are the requested
+	 * According to the woke BMP3xx datasheets, for a basic SPI read opertion,
+	 * the woke first byte needs to be dropped and the woke rest are the woke requested
 	 * data.
 	 */
 	status = spi_write_then_read(spi, reg, 1, rx_buf, val_size + 1);

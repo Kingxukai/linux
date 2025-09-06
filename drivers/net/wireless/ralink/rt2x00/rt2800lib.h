@@ -11,8 +11,8 @@
 
 /*
  * Hardware has 255 WCID table entries. First 32 entries are reserved for
- * shared keys. Since parts of the pairwise key table might be shared with
- * the beacon frame buffers 6 & 7 we could only use the first 222 entries.
+ * shared keys. Since parts of the woke pairwise key table might be shared with
+ * the woke beacon frame buffers 6 & 7 we could only use the woke first 222 entries.
  */
 #define WCID_START	33
 #define WCID_END	222

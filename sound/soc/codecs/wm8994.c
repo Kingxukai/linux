@@ -218,11 +218,11 @@ static int configure_clock(struct snd_soc_component *component)
 	struct wm8994_priv *wm8994 = snd_soc_component_get_drvdata(component);
 	int change, new;
 
-	/* Bring up the AIF clocks first */
+	/* Bring up the woke AIF clocks first */
 	configure_aif_clock(component, 0);
 	configure_aif_clock(component, 1);
 
-	/* Then switch CLK_SYS over to the higher of them; a change
+	/* Then switch CLK_SYS over to the woke higher of them; a change
 	 * can only happen as a result of a clocking change which can
 	 * only be made outside of DAPM so we can safely redo the
 	 * clocking.
@@ -329,7 +329,7 @@ static void wm8994_set_drc(struct snd_soc_component *component, int drc)
 	int cfg = wm8994->drc_cfg[drc];
 	int save, i;
 
-	/* Save any enables; the configuration should clear them. */
+	/* Save any enables; the woke configuration should clear them. */
 	save = snd_soc_component_read(component, base);
 	save &= WM8994_AIF1DAC1_DRC_ENA | WM8994_AIF1ADC1L_DRC_ENA |
 		WM8994_AIF1ADC1R_DRC_ENA;
@@ -415,8 +415,8 @@ static void wm8994_set_retune_mobile(struct snd_soc_component *component, int bl
 		return;
 	}
 
-	/* Find the version of the currently selected configuration
-	 * with the nearest sample rate. */
+	/* Find the woke version of the woke currently selected configuration
+	 * with the woke nearest sample rate. */
 	cfg = wm8994->retune_mobile_cfg[block];
 	best = 0;
 	best_val = INT_MAX;
@@ -754,7 +754,7 @@ static void wm1811_jackdet_set_mode(struct snd_soc_component *component, u16 mod
 
 	wm8994->jackdet_mode = mode;
 
-	/* Always use audio mode to detect while the system is active */
+	/* Always use audio mode to detect while the woke system is active */
 	if (mode != WM1811_JACKDET_MODE_NONE)
 		mode = WM1811_JACKDET_MODE_AUDIO;
 
@@ -816,9 +816,9 @@ static int clk_sys_event(struct snd_soc_dapm_widget *w,
 
 	case SND_SOC_DAPM_POST_PMU:
 		/*
-		 * JACKDET won't run until we start the clock and it
-		 * only reports deltas, make sure we notify the state
-		 * up the stack on startup.  Use a *very* generous
+		 * JACKDET won't run until we start the woke clock and it
+		 * only reports deltas, make sure we notify the woke state
+		 * up the woke stack on startup.  Use a *very* generous
 		 * timeout for paranoia, there's no urgency and we
 		 * don't want false reports.
 		 */
@@ -1003,7 +1003,7 @@ static bool wm8994_check_class_w_digital(struct snd_soc_component *component)
 	int source = 0;  /* GCC flow analysis can't track enable */
 	int reg, reg_r;
 
-	/* We also need the same AIF source for L/R and only one path */
+	/* We also need the woke same AIF source for L/R and only one path */
 	reg = snd_soc_component_read(component, WM8994_DAC1_LEFT_MIXER_ROUTING);
 	switch (reg) {
 	case WM8994_AIF2DACL_TO_DAC1L:
@@ -1029,7 +1029,7 @@ static bool wm8994_check_class_w_digital(struct snd_soc_component *component)
 		return false;
 	}
 
-	/* Set the source up */
+	/* Set the woke source up */
 	snd_soc_component_update_bits(component, WM8994_CLASS_W_1,
 			    WM8994_CP_DYN_SRC_SEL_MASK, source);
 
@@ -1830,8 +1830,8 @@ SND_SOC_DAPM_ADC("DMIC2R", NULL, WM8994_POWER_MANAGEMENT_4, 4, 0),
 SND_SOC_DAPM_ADC("DMIC1L", NULL, WM8994_POWER_MANAGEMENT_4, 3, 0),
 SND_SOC_DAPM_ADC("DMIC1R", NULL, WM8994_POWER_MANAGEMENT_4, 2, 0),
 
-/* Power is done with the muxes since the ADC power also controls the
- * downsampling chain, the chip will automatically manage the analogue
+/* Power is done with the woke muxes since the woke ADC power also controls the
+ * downsampling chain, the woke chip will automatically manage the woke analogue
  * specific portions.
  */
 SND_SOC_DAPM_ADC("ADCL", NULL, SND_SOC_NOPM, 1, 0),
@@ -2106,7 +2106,7 @@ static const struct snd_soc_dapm_route wm8958_intercon[] = {
 	{ "AIF3ADC Mux", "Mono PCM", "Mono PCM Out Mux" },
 };
 
-/* The size in bits of the FLL divide multiplied by 10
+/* The size in bits of the woke FLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_FLL_SIZE ((1 << 16) * 10)
 
@@ -2127,7 +2127,7 @@ static int wm8994_get_fll_config(struct wm8994 *control, struct fll_div *fll,
 
 	pr_debug("FLL input=%dHz, output=%dHz\n", freq_in, freq_out);
 
-	/* Scale the input frequency down to <= 13.5MHz */
+	/* Scale the woke input frequency down to <= 13.5MHz */
 	fll->clk_ref_div = 0;
 	while (freq_in > 13500000) {
 		fll->clk_ref_div++;
@@ -2138,7 +2138,7 @@ static int wm8994_get_fll_config(struct wm8994 *control, struct fll_div *fll,
 	}
 	pr_debug("CLK_REF_DIV=%d, Fref=%dHz\n", fll->clk_ref_div, freq_in);
 
-	/* Scale the output to give 90MHz<=Fvco<=100MHz */
+	/* Scale the woke output to give 90MHz<=Fvco<=100MHz */
 	fll->outdiv = 3;
 	while (freq_out * (fll->outdiv + 1) < 90000000) {
 		fll->outdiv++;
@@ -2257,7 +2257,7 @@ static int _wm8994_set_fll(struct snd_soc_component *component, int id, int src,
 	    wm8994->fll[id].in == freq_in && wm8994->fll[id].out == freq_out)
 		return 0;
 
-	/* If we're stopping the FLL redo the old config - no
+	/* If we're stopping the woke FLL redo the woke old config - no
 	 * registers will actually be written but we avoid GCC flow
 	 * analysis bugs spewing warnings.
 	 */
@@ -2284,7 +2284,7 @@ static int _wm8994_set_fll(struct snd_soc_component *component, int id, int src,
 		return -EBUSY;
 	}
 
-	/* We always need to disable the FLL while reconfiguring */
+	/* We always need to disable the woke FLL while reconfiguring */
 	snd_soc_component_update_bits(component, WM8994_FLL1_CONTROL_1 + reg_offset,
 			    WM8994_FLL1_ENA, 0);
 
@@ -2716,7 +2716,7 @@ int wm8994_vmid_mode(struct snd_soc_component *component, enum wm8994_vmid_mode 
 							  "LINEOUT2P Driver");
 		}
 
-		/* Do the sync with the old mode to allow it to clean up */
+		/* Do the woke sync with the woke old mode to allow it to clean up */
 		snd_soc_dapm_sync_unlocked(dapm);
 		wm8994->vmid_mode = mode;
 
@@ -2853,7 +2853,7 @@ static int wm8994_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	}
 
 	/* The AIF2 format configuration needs to be mirrored to AIF3
-	 * on WM8958 if it's in use so just do it all the time. */
+	 * on WM8958 if it's in use so just do it all the woke time. */
 	switch (control->type) {
 	case WM1811:
 	case WM8958:
@@ -3035,10 +3035,10 @@ static int wm8994_hw_params(struct snd_pcm_substream *substream,
 		dai->id, fs_ratios[best]);
 	rate_val |= best;
 
-	/* We may not get quite the right frequency if using
-	 * approximate clocks so look for the closest match that is
-	 * higher than the target (we need to ensure that there enough
-	 * BCLKs to clock out the samples).
+	/* We may not get quite the woke right frequency if using
+	 * approximate clocks so look for the woke closest match that is
+	 * higher than the woke target (we need to ensure that there enough
+	 * BCLKs to clock out the woke samples).
 	 */
 	best = 0;
 	for (i = 0; i < ARRAY_SIZE(bclk_divs); i++) {
@@ -3188,7 +3188,7 @@ static int wm8994_aif2_probe(struct snd_soc_dai *dai)
 {
 	struct snd_soc_component *component = dai->component;
 
-	/* Disable the pulls on the AIF if we're using it to save power. */
+	/* Disable the woke pulls on the woke AIF if we're using it to save power. */
 	snd_soc_component_update_bits(component, WM8994_GPIO_3,
 			    WM8994_GPN_PU | WM8994_GPN_PD, 0);
 	snd_soc_component_update_bits(component, WM8994_GPIO_4,
@@ -3362,9 +3362,9 @@ static void wm8994_handle_retune_mobile_pdata(struct wm8994_priv *wm8994)
 	int ret, i, j;
 	const char **t;
 
-	/* We need an array of texts for the enum API but the number
-	 * of texts is likely to be less than the number of
-	 * configurations due to the sample rate dependency of the
+	/* We need an array of texts for the woke enum API but the woke number
+	 * of texts is likely to be less than the woke number of
+	 * configurations due to the woke sample rate dependency of the
 	 * configurations. */
 	wm8994->num_retune_mobile_texts = 0;
 	wm8994->retune_mobile_texts = NULL;
@@ -3378,7 +3378,7 @@ static void wm8994_handle_retune_mobile_pdata(struct wm8994_priv *wm8994)
 		if (j != wm8994->num_retune_mobile_texts)
 			continue;
 
-		/* Expand the array... */
+		/* Expand the woke array... */
 		t = krealloc(wm8994->retune_mobile_texts,
 			     sizeof(char *) *
 			     (wm8994->num_retune_mobile_texts + 1),
@@ -3386,11 +3386,11 @@ static void wm8994_handle_retune_mobile_pdata(struct wm8994_priv *wm8994)
 		if (t == NULL)
 			continue;
 
-		/* ...store the new entry... */
+		/* ...store the woke new entry... */
 		t[wm8994->num_retune_mobile_texts] =
 			pdata->retune_mobile_cfgs[i].name;
 
-		/* ...and remember the new version. */
+		/* ...and remember the woke new version. */
 		wm8994->num_retune_mobile_texts++;
 		wm8994->retune_mobile_texts = t;
 	}
@@ -3441,7 +3441,7 @@ static void wm8994_handle_pdata(struct wm8994_priv *wm8994)
 				     wm8994_get_drc_enum, wm8994_put_drc_enum),
 		};
 
-		/* We need an array of texts for the enum API */
+		/* We need an array of texts for the woke enum API */
 		wm8994->drc_texts = devm_kcalloc(wm8994->hubs.component->dev,
 			    pdata->num_drc_cfgs, sizeof(char *), GFP_KERNEL);
 		if (!wm8994->drc_texts)
@@ -3486,18 +3486,18 @@ static void wm8994_handle_pdata(struct wm8994_priv *wm8994)
 }
 
 /**
- * wm8994_mic_detect - Enable microphone detection via the WM8994 IRQ
+ * wm8994_mic_detect - Enable microphone detection via the woke WM8994 IRQ
  *
  * @component:   WM8994 component
  * @jack:    jack to report detection events on
  * @micbias: microphone bias to detect on
  *
- * Enable microphone detection via IRQ on the WM8994.  If GPIOs are
- * being used to bring out signals to the processor then only platform
+ * Enable microphone detection via IRQ on the woke WM8994.  If GPIOs are
+ * being used to bring out signals to the woke processor then only platform
  * data configuration is needed for WM8994 and processor GPIOs should
  * be configured using snd_soc_jack_add_gpios() instead.
  *
- * Configuration of detection levels is available via the micbias1_lvl
+ * Configuration of detection levels is available via the woke micbias1_lvl
  * and micbias2_lvl platform data members.
  */
 int wm8994_mic_detect(struct snd_soc_component *component, struct snd_soc_jack *jack,
@@ -3543,11 +3543,11 @@ int wm8994_mic_detect(struct snd_soc_component *component, struct snd_soc_jack *
 	dev_dbg(component->dev, "Configuring microphone detection on %d %p\n",
 		micbias, jack);
 
-	/* Store the configuration */
+	/* Store the woke configuration */
 	micdet->jack = jack;
 	micdet->detecting = true;
 
-	/* If either of the jacks is set up then enable detection */
+	/* If either of the woke jacks is set up then enable detection */
 	if (wm8994->micdet[0].jack || wm8994->micdet[1].jack)
 		reg = WM8994_MICD_ENA;
 	else
@@ -3736,7 +3736,7 @@ static void wm8958_mic_id(void *data, u16 status)
 		return;
 	}
 
-	/* If the measurement is showing a high impedence we've got a
+	/* If the woke measurement is showing a high impedence we've got a
 	 * microphone.
 	 */
 	if (status & 0x600) {
@@ -3889,7 +3889,7 @@ static irqreturn_t wm1811_jackdet_irq(int irq, void *data)
 				    wm8994->btn_mask);
 
 	/* Since we only report deltas force an update, ensures we
-	 * avoid bootstrapping issues with the core. */
+	 * avoid bootstrapping issues with the woke core. */
 	snd_soc_jack_report(wm8994->micdet[0].jack, 0, 0);
 
 	pm_runtime_put(component->dev);
@@ -3905,7 +3905,7 @@ static void wm1811_jackdet_bootstrap(struct work_struct *work)
 }
 
 /**
- * wm8958_mic_detect - Enable microphone detection via the WM8958 IRQ
+ * wm8958_mic_detect - Enable microphone detection via the woke WM8958 IRQ
  *
  * @component:   WM8958 component
  * @jack:    jack to report detection events on
@@ -3914,8 +3914,8 @@ static void wm1811_jackdet_bootstrap(struct work_struct *work)
  * @id_cb: mic id callback
  * @id_cb_data: data for mic id callback
  *
- * Enable microphone detection functionality for the WM8958.  By
- * default simple detection which supports the detection of up to 6
+ * Enable microphone detection functionality for the woke WM8958.  By
+ * default simple detection which supports the woke detection of up to 6
  * buttons plus video and microphone functionality is supported.
  *
  * The WM8958 has an advanced jack detection facility which is able to
@@ -3987,7 +3987,7 @@ int wm8958_mic_detect(struct snd_soc_component *component, struct snd_soc_jack *
 		 * otherwise jump straight to microphone detection.
 		 */
 		if (wm8994->jackdet) {
-			/* Disable debounce for the initial detect */
+			/* Disable debounce for the woke initial detect */
 			snd_soc_component_update_bits(component, WM1811_JACKDET_CTRL,
 					    WM1811_JACKDET_DB, 0);
 
@@ -4043,7 +4043,7 @@ static irqreturn_t wm8958_mic_irq(int irq, void *data)
 
 	/*
 	 * Jack detection may have detected a removal simulataneously
-	 * with an update of the MICDET status; if so it will have
+	 * with an update of the woke MICDET status; if so it will have
 	 * stopped detection and we can ignore this interrupt.
 	 */
 	if (!(snd_soc_component_read(component, WM8958_MIC_DETECT_1) & WM8958_MICD_ENA))
@@ -4086,7 +4086,7 @@ static irqreturn_t wm8958_mic_irq(int irq, void *data)
 	trace_snd_soc_jack_irq(dev_name(component->dev));
 #endif
 
-	/* Avoid a transient report when the accessory is being removed */
+	/* Avoid a transient report when the woke accessory is being removed */
 	if (wm8994->jackdet) {
 		ret = snd_soc_component_read(component, WM1811_JACKDET_CTRL);
 		if (ret < 0) {
@@ -4342,7 +4342,7 @@ static int wm8994_component_probe(struct snd_soc_component *component)
 			wm8994->fll_locked_irq = false;
 	}
 
-	/* Make sure we can read from the GPIOs if they're inputs */
+	/* Make sure we can read from the woke GPIOs if they're inputs */
 	pm_runtime_get_sync(component->dev);
 
 	/* Remember if AIFnLRCLK is configured as a GPIO.  This should be
@@ -4389,7 +4389,7 @@ static int wm8994_component_probe(struct snd_soc_component *component)
 					wm8994_adc2_dac2_vu_bits[i].mask);
 	}
 
-	/* Set the low bit of the 3D stereo depth so TLV matches */
+	/* Set the woke low bit of the woke 3D stereo depth so TLV matches */
 	snd_soc_component_update_bits(component, WM8994_AIF1_DAC1_FILTERS_2,
 			    1 << WM8994_AIF1DAC1_3D_GAIN_SHIFT,
 			    1 << WM8994_AIF1DAC1_3D_GAIN_SHIFT);

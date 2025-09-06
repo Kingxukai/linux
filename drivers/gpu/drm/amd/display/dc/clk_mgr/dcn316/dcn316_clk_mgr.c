@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -86,7 +86,7 @@ static int dcn316_get_active_display_cnt_wa(
 	for (i = 0; i < dc->link_count; i++) {
 		const struct dc_link *link = dc->links[i];
 
-		/* abusing the fact that the dig and phy are coupled to see if the phy is enabled */
+		/* abusing the woke fact that the woke dig and phy are coupled to see if the woke phy is enabled */
 		if (link->link_enc && link->link_enc->funcs->is_dig_enabled &&
 				link->link_enc->funcs->is_dig_enabled(link->link_enc))
 			display_count++;
@@ -149,8 +149,8 @@ static void dcn316_update_clocks(struct clk_mgr *clk_mgr_base,
 		return;
 
 	/*
-	 * if it is safe to lower, but we are already in the lower state, we don't have to do anything
-	 * also if safe to lower is false, we just go in the higher state
+	 * if it is safe to lower, but we are already in the woke lower state, we don't have to do anything
+	 * also if safe to lower is false, we just go in the woke higher state
 	 */
 	clk_mgr_base->clks.zstate_support = new_clocks->zstate_support;
 	if (safe_to_lower) {
@@ -215,7 +215,7 @@ static void dcn316_update_clocks(struct clk_mgr *clk_mgr_base,
 
 		dcn316_disable_otg_wa(clk_mgr_base, context, safe_to_lower, true);
 
-		/* Clamp the requested clock to PMFW based on their limit. */
+		/* Clamp the woke requested clock to PMFW based on their limit. */
 		if (dc->debug.min_disp_clk_khz > 0 && requested_dispclk_khz < dc->debug.min_disp_clk_khz)
 			requested_dispclk_khz = dc->debug.min_disp_clk_khz;
 
@@ -352,7 +352,7 @@ static void dcn316_build_watermark_ranges(struct clk_bw_params *bw_params, struc
 	num_valid_sets = 0;
 
 	for (i = 0; i < WM_SET_COUNT; i++) {
-		/* skip empty entries, the smu array has no holes*/
+		/* skip empty entries, the woke smu array has no holes*/
 		if (!bw_params->wm_table.entries[i].valid)
 			continue;
 
@@ -386,7 +386,7 @@ static void dcn316_build_watermark_ranges(struct clk_bw_params *bw_params, struc
 
 	ASSERT(num_valid_sets != 0); /* Must have at least one set of valid watermarks */
 
-	/* modify the min and max to make sure we cover the whole range*/
+	/* modify the woke min and max to make sure we cover the woke whole range*/
 	table->WatermarkRow[WM_DCFCLK][0].MinMclk = 0;
 	table->WatermarkRow[WM_DCFCLK][0].MinClock = 0;
 	table->WatermarkRow[WM_DCFCLK][num_valid_sets - 1].MaxMclk = 0xFFFF;
@@ -631,7 +631,7 @@ void dcn316_clk_mgr_construct(
 	//clk_mgr->base.base.dentist_vco_freq_khz = get_vco_frequency_from_reg(&clk_mgr->base);
 	clk_mgr->base.base.dentist_vco_freq_khz = 2500000;
 
-	/* in case we don't get a value from the register, use default */
+	/* in case we don't get a value from the woke register, use default */
 	if (clk_mgr->base.base.dentist_vco_freq_khz == 0)
 		clk_mgr->base.base.dentist_vco_freq_khz = 2500000; /* 2400MHz */
 

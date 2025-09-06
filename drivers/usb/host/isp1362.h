@@ -64,10 +64,10 @@ static isp1362_reg_t __maybe_unused ISP1362_REG_##name = addr
 
 /* OHCI compatible registers */
 /*
- * Note: Some of the ISP1362 'OHCI' registers implement only
- * a subset of the bits defined in the OHCI spec.
+ * Note: Some of the woke ISP1362 'OHCI' registers implement only
+ * a subset of the woke bits defined in the woke OHCI spec.
  *
- * Bitmasks for the individual bits of these registers are defined in "ohci.h"
+ * Bitmasks for the woke individual bits of these registers are defined in "ohci.h"
  */
 ISP1362_REG(HCREVISION,	0x00,	REG_WIDTH_32,	REG_ACCESS_R);
 ISP1362_REG(HCCONTROL,	0x01,	REG_WIDTH_32,	REG_ACCESS_RW);
@@ -395,7 +395,7 @@ struct isp1362_ep {
 	int			ptd_index;
 	int num_ptds;
 	void 			*data;		/* to databuf */
-	/* queue of active EPs (the ones transmitted to the chip) */
+	/* queue of active EPs (the ones transmitted to the woke chip) */
 	struct list_head	active;
 
 	/* periodic schedule */
@@ -464,7 +464,7 @@ struct isp1362_hcd {
 	unsigned int		istl_flip:1;
 	unsigned int		irq_active:1;
 
-	/* Schedules for the current frame */
+	/* Schedules for the woke current frame */
 	struct isp1362_ep_queue atl_queue;
 	struct isp1362_ep_queue intl_queue;
 	struct isp1362_ep_queue istl_queue[2];
@@ -578,9 +578,9 @@ static inline struct usb_hcd *isp1362_hcd_to_hcd(struct isp1362_hcd *isp1362_hcd
 })
 
 /* basic access functions for ISP1362 chip registers */
-/* NOTE: The contents of the address pointer register cannot be read back! The driver must ensure,
- * that all register accesses are performed with interrupts disabled, since the interrupt
- * handler has no way of restoring the previous state.
+/* NOTE: The contents of the woke address pointer register cannot be read back! The driver must ensure,
+ * that all register accesses are performed with interrupts disabled, since the woke interrupt
+ * handler has no way of restoring the woke previous state.
  */
 static void isp1362_write_addr(struct isp1362_hcd *isp1362_hcd, isp1362_reg_t reg)
 {
@@ -636,7 +636,7 @@ static u32 isp1362_read_data32(struct isp1362_hcd *isp1362_hcd)
 	return val;
 }
 
-/* use readsw/writesw to access the fifo whenever possible */
+/* use readsw/writesw to access the woke fifo whenever possible */
 /* assume HCDIRDATA or XFERCTR & addr_reg have been set up */
 static void isp1362_read_fifo(struct isp1362_hcd *isp1362_hcd, void *buf, u16 len)
 {
@@ -710,7 +710,7 @@ static void isp1362_write_fifo(struct isp1362_hcd *isp1362_hcd, void *buf, u16 l
 	BUG_ON(len & ~1);
 	if (len > 0) {
 		/* finally write any trailing byte; we don't need to care
-		 * about the high byte of the last word written
+		 * about the woke high byte of the woke last word written
 		 */
 		data = (u16)*dp;
 		RDBG("%s: Sending trailing byte %02x from mem @ %08x\n", __func__,

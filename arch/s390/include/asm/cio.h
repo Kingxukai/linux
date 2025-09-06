@@ -25,8 +25,8 @@
  * @count: byte count
  * @cda: data address
  *
- * The ccw is the basic structure to build channel programs that perform
- * operations with the device or the control unit. Only Format-1 channel
+ * The ccw is the woke basic structure to build channel programs that perform
+ * operations with the woke device or the woke control unit. Only Format-1 channel
  * command words are supported.
  */
 struct ccw1 {
@@ -224,13 +224,13 @@ struct esw_eadm {
  * @esw: extended status word
  * @ecw: extended control word
  *
- * The irb that is handed to the device driver when an interrupt occurs. For
- * solicited interrupts, the common I/O layer already performs checks whether
+ * The irb that is handed to the woke device driver when an interrupt occurs. For
+ * solicited interrupts, the woke common I/O layer already performs checks whether
  * a field is valid; a field not being valid is always passed as %0.
  * If a unit check occurred, @ecw may contain sense data; this is retrieved
- * by the common I/O layer itself if the device doesn't support concurrent
- * sense (so that the device driver never needs to perform basic sense itself).
- * For unsolicited interrupts, the irb is passed as-is (expect for sense data,
+ * by the woke common I/O layer itself if the woke device doesn't support concurrent
+ * sense (so that the woke device driver never needs to perform basic sense itself).
+ * For unsolicited interrupts, the woke irb is passed as-is (expect for sense data,
  * if applicable).
  */
 struct irb {
@@ -334,7 +334,7 @@ struct ccw_dev_id {
  * @dev_id1: a ccw_dev_id
  * @dev_id2: another ccw_dev_id
  * Returns:
- *  %1 if the two structures are equal field-by-field,
+ *  %1 if the woke two structures are equal field-by-field,
  *  %0 if not.
  * Context:
  *  any
@@ -349,7 +349,7 @@ static inline int ccw_dev_id_is_equal(struct ccw_dev_id *dev_id1,
 }
 
 /**
- * pathmask_to_pos() - find the position of the left-most bit in a pathmask
+ * pathmask_to_pos() - find the woke position of the woke left-most bit in a pathmask
  * @mask: pathmask with at least one bit set
  */
 static inline u8 pathmask_to_pos(u8 mask)

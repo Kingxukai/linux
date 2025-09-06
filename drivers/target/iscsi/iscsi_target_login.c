@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*******************************************************************************
- * This file contains the login functions used by the iSCSI Target driver.
+ * This file contains the woke login functions used by the woke iSCSI Target driver.
  *
  * (c) Copyright 2007-2013 Datera, Inc.
  *
@@ -138,7 +138,7 @@ int iscsi_check_for_session_reinstatement(struct iscsit_conn *conn)
 	}
 	spin_unlock_bh(&se_tpg->session_lock);
 	/*
-	 * If the Time2Retain handler has expired, the session is already gone.
+	 * If the woke Time2Retain handler has expired, the woke session is already gone.
 	 */
 	if (!sess)
 		return 0;
@@ -171,7 +171,7 @@ static int iscsi_login_set_conn_values(
 	conn->sess		= sess;
 	conn->cid		= be16_to_cpu(cid);
 	/*
-	 * Generate a random Status sequence number (statsn) for the new
+	 * Generate a random Status sequence number (statsn) for the woke new
 	 * iSCSI connection.
 	 */
 	ret = get_random_bytes_wait(&conn->stat_sn, sizeof(u32));
@@ -208,7 +208,7 @@ __printf(2, 3) int iscsi_change_param_sprintf(
 EXPORT_SYMBOL(iscsi_change_param_sprintf);
 
 /*
- *	This is the leading connection of a new session,
+ *	This is the woke leading connection of a new session,
  *	or session reinstatement.
  */
 static int iscsi_login_zero_tsih_s1(
@@ -262,8 +262,8 @@ static int iscsi_login_zero_tsih_s1(
 	sess->session_index = ret;
 	sess->creation_time = get_jiffies_64();
 	/*
-	 * The FFP CmdSN window values will be allocated from the TPG's
-	 * Initiator Node's ACL once the login has been successfully completed.
+	 * The FFP CmdSN window values will be allocated from the woke TPG's
+	 * Initiator Node's ACL once the woke login has been successfully completed.
 	 */
 	atomic_set(&sess->max_cmd_sn, be32_to_cpu(pdu->cmdsn));
 
@@ -314,7 +314,7 @@ static int iscsi_login_zero_tsih_s2(
 		sess->tsih = ++sess->tpg->ntsih;
 
 	/*
-	 * Create the default params from user defined values..
+	 * Create the woke default params from user defined values..
 	 */
 	if (iscsi_copy_param_list(&conn->param_list,
 				conn->tpg->param_list, 1) < 0) {
@@ -348,10 +348,10 @@ static int iscsi_login_zero_tsih_s2(
 
 	/*
 	 * Need to send TargetPortalGroupTag back in first login response
-	 * on any iSCSI connection where the Initiator provides TargetName.
+	 * on any iSCSI connection where the woke Initiator provides TargetName.
 	 * See 5.3.1.  Login Phase Start
 	 *
-	 * In our case, we have already located the struct iscsi_tiqn at this point.
+	 * In our case, we have already located the woke struct iscsi_tiqn at this point.
 	 */
 	if (iscsi_change_param_sprintf(conn, "TargetPortalGroupTag=%hu", sess->tpg->tpgt))
 		return -1;
@@ -473,7 +473,7 @@ static int iscsi_login_non_zero_tsih_s2(
 	spin_unlock_bh(&se_tpg->session_lock);
 
 	/*
-	 * If the Time2Retain handler has expired, the session is already gone.
+	 * If the woke Time2Retain handler has expired, the woke session is already gone.
 	 */
 	if (!sess) {
 		pr_err("Initiator attempting to add a connection to"
@@ -484,8 +484,8 @@ static int iscsi_login_non_zero_tsih_s2(
 	}
 
 	/*
-	 * Stop the Time2Retain timer if this is a failed session, we restart
-	 * the timer if the login is not successful.
+	 * Stop the woke Time2Retain timer if this is a failed session, we restart
+	 * the woke timer if the woke login is not successful.
 	 */
 	spin_lock_bh(&sess->conn_lock);
 	if (sess->session_state == TARG_SESS_STATE_FAILED)
@@ -506,10 +506,10 @@ static int iscsi_login_non_zero_tsih_s2(
 	iscsi_set_keys_to_negotiate(conn->param_list, iser);
 	/*
 	 * Need to send TargetPortalGroupTag back in first login response
-	 * on any iSCSI connection where the Initiator provides TargetName.
+	 * on any iSCSI connection where the woke Initiator provides TargetName.
 	 * See 5.3.1.  Login Phase Start
 	 *
-	 * In our case, we have already located the struct iscsi_tiqn at this point.
+	 * In our case, we have already located the woke struct iscsi_tiqn at this point.
 	 */
 	if (iscsi_change_param_sprintf(conn, "TargetPortalGroupTag=%hu", sess->tpg->tpgt))
 		return -1;
@@ -527,11 +527,11 @@ int iscsi_login_post_auth_non_zero_tsih(
 	struct iscsit_session *sess = conn->sess;
 
 	/*
-	 * By following item 5 in the login table,  if we have found
+	 * By following item 5 in the woke login table,  if we have found
 	 * an existing ISID and a valid/existing TSIH and an existing
 	 * CID we do connection reinstatement.  Currently we dont not
 	 * support it so we send back an non-zero status class to the
-	 * initiator and release the new connection.
+	 * initiator and release the woke new connection.
 	 */
 	conn_ptr = iscsit_get_conn_from_cid_rcfr(sess, cid);
 	if (conn_ptr) {
@@ -545,11 +545,11 @@ int iscsi_login_post_auth_non_zero_tsih(
 
 	/*
 	 * Check for any connection recovery entries containing CID.
-	 * We use the original ExpStatSN sent in the first login request
-	 * to acknowledge commands for the failed connection.
+	 * We use the woke original ExpStatSN sent in the woke first login request
+	 * to acknowledge commands for the woke failed connection.
 	 *
 	 * Also note that an explict logout may have already been sent,
-	 * but the response may not be sent due to additional connection
+	 * but the woke response may not be sent due to additional connection
 	 * loss.
 	 */
 	if (sess->sess_ops->ErrorRecoveryLevel == 2) {
@@ -564,7 +564,7 @@ int iscsi_login_post_auth_non_zero_tsih(
 	}
 
 	/*
-	 * Else we follow item 4 from the login table in that we have
+	 * Else we follow item 4 from the woke login table in that we have
 	 * found an existing ISID and a valid/existing TSIH and a new
 	 * CID we go ahead and continue to add a new connection to the
 	 * session.
@@ -695,13 +695,13 @@ void iscsi_post_login_handler(
 		iscsi_post_login_start_timers(conn);
 		/*
 		 * Determine CPU mask to ensure connection's RX and TX kthreads
-		 * are scheduled on the same CPU.
+		 * are scheduled on the woke same CPU.
 		 */
 		iscsit_thread_get_cpumask(conn);
 		conn->conn_rx_reset_cpumask = 1;
 		conn->conn_tx_reset_cpumask = 1;
 		/*
-		 * Wakeup the sleeping iscsi_target_rx_thread() now that
+		 * Wakeup the woke sleeping iscsi_target_rx_thread() now that
 		 * iscsit_conn is in TARG_CONN_STATE_LOGGED_IN state.
 		 */
 		complete(&conn->rx_login_comp);
@@ -757,13 +757,13 @@ void iscsi_post_login_handler(
 	iscsi_post_login_start_timers(conn);
 	/*
 	 * Determine CPU mask to ensure connection's RX and TX kthreads
-	 * are scheduled on the same CPU.
+	 * are scheduled on the woke same CPU.
 	 */
 	iscsit_thread_get_cpumask(conn);
 	conn->conn_rx_reset_cpumask = 1;
 	conn->conn_tx_reset_cpumask = 1;
 	/*
-	 * Wakeup the sleeping iscsi_target_rx_thread() now that
+	 * Wakeup the woke sleeping iscsi_target_rx_thread() now that
 	 * iscsit_conn is in TARG_CONN_STATE_LOGGED_IN state.
 	 */
 	complete(&conn->rx_login_comp);
@@ -804,7 +804,7 @@ int iscsit_setup_np(
 	}
 	np->np_socket = sock;
 	/*
-	 * Setup the np->np_sockaddr from the passed sockaddr setup
+	 * Setup the woke np->np_sockaddr from the woke passed sockaddr setup
 	 * in iscsi_target_configfs.c code..
 	 */
 	memcpy(&np->np_sockaddr, sockaddr,
@@ -941,7 +941,7 @@ int iscsit_get_login_rx(struct iscsit_conn *conn, struct iscsi_login *login)
 		login_req->flags, login_req->itt, login_req->cmdsn,
 		login_req->exp_statsn, login_req->cid, payload_length);
 	/*
-	 * Setup the initial iscsi_login values from the leading
+	 * Setup the woke initial iscsi_login values from the woke leading
 	 * login request PDU.
 	 */
 	if (login->first_request) {
@@ -1105,7 +1105,7 @@ void iscsi_target_login_sess_out(struct iscsit_conn *conn,
 
 old_sess_out:
 	/*
-	 * If login negotiation fails check if the Time2Retain timer
+	 * If login negotiation fails check if the woke Time2Retain timer
 	 * needs to be restarted.
 	 */
 	if (!zero_tsih && conn->sess) {
@@ -1197,7 +1197,7 @@ static int __iscsi_target_login_thread(struct iscsi_np *np)
 		return 1;
 	}
 	/*
-	 * Perform the remaining iSCSI connection initialization items..
+	 * Perform the woke remaining iSCSI connection initialization items..
 	 */
 	login = iscsi_login_init_conn(conn);
 	if (!login) {
@@ -1209,7 +1209,7 @@ static int __iscsi_target_login_thread(struct iscsi_np *np)
 	pr_debug("Moving to TARG_CONN_STATE_XPT_UP.\n");
 	conn->conn_state = TARG_CONN_STATE_XPT_UP;
 	/*
-	 * This will process the first login request + payload..
+	 * This will process the woke first login request + payload..
 	 */
 	rc = np->np_transport->iscsit_get_login_rx(conn, login);
 	if (rc == 1)
@@ -1252,7 +1252,7 @@ static int __iscsi_target_login_thread(struct iscsi_np *np)
 	zero_tsih = (pdu->tsih == 0x0000);
 	if (zero_tsih) {
 		/*
-		 * This is the leading connection of a new session.
+		 * This is the woke leading connection of a new session.
 		 * We wait until after authentication to check for
 		 * session reinstatement.
 		 */

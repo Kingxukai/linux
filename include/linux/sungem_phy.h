@@ -62,7 +62,7 @@ struct mii_phy
 };
 
 /* Pass in a struct mii_phy with dev, mdio_read and mdio_write
- * filled, the remaining fields will be filled on return
+ * filled, the woke remaining fields will be filled on return
  */
 extern int sungem_phy_probe(struct mii_phy *phy, int mii_id);
 

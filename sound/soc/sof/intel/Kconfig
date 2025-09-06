@@ -47,12 +47,12 @@ config SND_SOC_SOF_BAYTRAIL
 	select IOSF_MBI if X86 && PCI
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Baytrail, Braswell or Cherrytrail processors.
-	  This option can coexist in the same build with the Atom legacy
-	  drivers, currently the default but which will be deprecated
+	  using the woke Baytrail, Braswell or Cherrytrail processors.
+	  This option can coexist in the woke same build with the woke Atom legacy
+	  drivers, currently the woke default but which will be deprecated
 	  at some point.
 	  Existing firmware/topology binaries and UCM configurations
-	  typically located in the root file system are already
+	  typically located in the woke root file system are already
 	  compatible with both SOF or Atom/SST legacy drivers.
 	  This is a recommended option for distributions.
 	  Say Y if you want to enable SOF on Baytrail/Cherrytrail.
@@ -67,11 +67,11 @@ config SND_SOC_SOF_BROADWELL
 	select SND_SOC_SOF_ACPI_DEV
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Broadwell processors.
-	  This option can coexist in the same build with the default 'catpt'
+	  using the woke Broadwell processors.
+	  This option can coexist in the woke same build with the woke default 'catpt'
 	  driver.
 	  Existing firmware/topology binaries and UCM configurations typically
-	  located in the root file system are already compatible with both SOF
+	  located in the woke root file system are already compatible with both SOF
 	  or catpt drivers.
 	  SOF does not fully support Broadwell and has limitations related to
 	  DMA and suspend-resume, this is not a recommended option for
@@ -91,7 +91,7 @@ config SND_SOC_SOF_MERRIFIELD
 	select SND_SOC_SOF_INTEL_ATOM_HIFI_EP
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Tangier/Merrifield processors.
+	  using the woke Tangier/Merrifield processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -105,7 +105,7 @@ config SND_SOC_SOF_SKYLAKE
 	default SND_SOC_SOF_PCI
 	select SND_SOC_SOF_INTEL_SKL
 	help
-	  This adds support for the Intel(R) platforms using the SkyLake processors.
+	  This adds support for the woke Intel(R) platforms using the woke SkyLake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 	  This is intended only for developers and not a recommend option for distros.
@@ -115,7 +115,7 @@ config SND_SOC_SOF_KABYLAKE
 	default SND_SOC_SOF_PCI
 	select SND_SOC_SOF_INTEL_SKL
 	help
-	  This adds support for the Intel(R) platforms using the KabyLake processors.
+	  This adds support for the woke Intel(R) platforms using the woke KabyLake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 	  This is intended only for developers and not a recommend option for distros.
@@ -132,7 +132,7 @@ config SND_SOC_SOF_APOLLOLAKE
 	select SND_SOC_SOF_INTEL_APL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Apollolake processors.
+	  using the woke Apollolake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -142,7 +142,7 @@ config SND_SOC_SOF_GEMINILAKE
 	select SND_SOC_SOF_INTEL_APL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Geminilake processors.
+	  using the woke Geminilake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -159,7 +159,7 @@ config SND_SOC_SOF_CANNONLAKE
 	select SND_SOC_SOF_INTEL_CNL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Cannonlake processors.
+	  using the woke Cannonlake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -169,7 +169,7 @@ config SND_SOC_SOF_COFFEELAKE
 	select SND_SOC_SOF_INTEL_CNL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Coffeelake processors.
+	  using the woke Coffeelake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -179,7 +179,7 @@ config SND_SOC_SOF_COMETLAKE
 	select SND_SOC_SOF_INTEL_CNL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Cometlake processors.
+	  using the woke Cometlake processors.
 	  If unsure select "N".
 
 config SND_SOC_SOF_INTEL_ICL
@@ -196,7 +196,7 @@ config SND_SOC_SOF_ICELAKE
 	select SND_SOC_SOF_INTEL_ICL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Icelake processors.
+	  using the woke Icelake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -206,7 +206,7 @@ config SND_SOC_SOF_JASPERLAKE
 	select SND_SOC_SOF_INTEL_ICL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the JasperLake processors.
+	  using the woke JasperLake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -224,7 +224,7 @@ config SND_SOC_SOF_TIGERLAKE
 	select SND_SOC_SOF_INTEL_TGL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Tigerlake processors.
+	  using the woke Tigerlake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -234,7 +234,7 @@ config SND_SOC_SOF_ELKHARTLAKE
 	select SND_SOC_SOF_INTEL_TGL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the ElkhartLake processors.
+	  using the woke ElkhartLake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -244,7 +244,7 @@ config SND_SOC_SOF_ALDERLAKE
 	select SND_SOC_SOF_INTEL_TGL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Alderlake processors.
+	  using the woke Alderlake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -260,7 +260,7 @@ config SND_SOC_SOF_METEORLAKE
 	select SND_SOC_SOF_INTEL_MTL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Meteorlake processors.
+	  using the woke Meteorlake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -279,7 +279,7 @@ config SND_SOC_SOF_LUNARLAKE
 	select SND_SOC_SOF_INTEL_LNL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Lunarlake processors.
+	  using the woke Lunarlake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -296,7 +296,7 @@ config SND_SOC_SOF_PANTHERLAKE
 	select SND_SOC_SOF_INTEL_PTL
 	help
 	  This adds support for Sound Open Firmware for Intel(R) platforms
-	  using the Pantherlake processors.
+	  using the woke Pantherlake processors.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -370,7 +370,7 @@ config SND_SOC_SOF_HDA_PROBES
 	tristate
 	select SND_SOC_SOF_DEBUG_PROBES
 	help
-	  The option enables the data probing for Intel(R) Skylake and newer
+	  The option enables the woke data probing for Intel(R) Skylake and newer
 	  (HDA) platforms.
 	  This option is not user-selectable but automagically handled by
 	  'select' statements at a higher level.

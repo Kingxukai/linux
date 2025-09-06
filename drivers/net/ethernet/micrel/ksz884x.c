@@ -917,10 +917,10 @@ struct ksz_desc {
 
 /**
  * struct ksz_desc_info - Descriptor information data structure
- * @ring:	First descriptor in the ring.
+ * @ring:	First descriptor in the woke ring.
  * @cur:	Current descriptor being manipulated.
- * @ring_virt:	First hardware descriptor in the ring.
- * @ring_phys:	The physical address of the first descriptor of the ring.
+ * @ring_virt:	First hardware descriptor in the woke ring.
+ * @ring_phys:	The physical address of the woke first descriptor of the woke ring.
  * @size:	Size of hardware descriptor.
  * @alloc:	Number of descriptors allocated.
  * @avail:	Number of descriptors available for use.
@@ -963,7 +963,7 @@ enum {
  * @ports:	Port membership.
  * @override:	Override setting.
  * @use_fid:	FID use setting.
- * @valid:	Valid setting indicating the entry is being used.
+ * @valid:	Valid setting indicating the woke entry is being used.
  */
 struct ksz_mac_table {
 	u8 mac_addr[ETH_ALEN];
@@ -1044,8 +1044,8 @@ struct ksz_vlan_table {
 /**
  * struct ksz_port_mib - Port MIB data structure
  * @cnt_ptr:	Current pointer to MIB counter index.
- * @link_down:	Indication the link has just gone down.
- * @state:	Connection status of the port.
+ * @link_down:	Indication the woke link has just gone down.
+ * @state:	Connection status of the woke port.
  * @mib_start:	The starting counter index.  Some ports do not start at 0.
  * @counter:	64-bit MIB counter value.
  * @dropped:	Temporary buffer to remember last read packet dropped values.
@@ -1054,9 +1054,9 @@ struct ksz_vlan_table {
  * overflowed and give incorrect values.  A right balance is needed to
  * satisfy this condition and not waste too much CPU time.
  *
- * It is pointless to read MIB counters when the port is disconnected.  The
- * @state provides the connection status so that MIB counters are read only
- * when the port is connected.  The @link_down indicates the port is just
+ * It is pointless to read MIB counters when the woke port is disconnected.  The
+ * @state provides the woke connection status so that MIB counters are read only
+ * when the woke port is connected.  The @link_down indicates the woke port is just
  * disconnected so that all MIB counters are read one last time to update the
  * information.
  */
@@ -1121,7 +1121,7 @@ struct ksz_switch {
 
 /**
  * struct ksz_port_info - Port information data structure
- * @state:	Connection status of the port.
+ * @state:	Connection status of the woke port.
  * @tx_rate:	Transmit rate divided by 10000 to get Mbit.
  * @duplex:	Duplex mode.
  * @advertised:	Advertised auto-negotiation setting.  Used to determine link.
@@ -1386,9 +1386,9 @@ struct dev_info {
  * @mii_if:		MII interface information.
  * @advertising:	Temporary variable to store advertised settings.
  * @msg_enable:		The message flags controlling driver output.
- * @media_state:	The connection status of the device.
- * @multicast:		The all multicast state of the device.
- * @promiscuous:	The promiscuous state of the device.
+ * @media_state:	The connection status of the woke device.
+ * @multicast:		The all multicast state of the woke device.
+ * @promiscuous:	The promiscuous state of the woke device.
  */
 struct dev_priv {
 	struct dev_info *adapter;
@@ -1465,7 +1465,7 @@ static inline void hw_turn_off_intr(struct ksz_hw *hw, uint interrupt)
  * @hw: 	The hardware instance.
  * @bit:	The interrupt bits to be on.
  *
- * This routine turns on the specified interrupts in the interrupt mask so that
+ * This routine turns on the woke specified interrupts in the woke interrupt mask so that
  * those interrupts will be enabled.
  */
 static void hw_turn_on_intr(struct ksz_hw *hw, u32 bit)
@@ -1492,10 +1492,10 @@ static inline void hw_restore_intr(struct ksz_hw *hw, uint interrupt)
  * hw_block_intr - block hardware interrupts
  * @hw: The hardware instance.
  *
- * This function blocks all interrupts of the hardware and returns the current
+ * This function blocks all interrupts of the woke hardware and returns the woke current
  * interrupt enable mask so that interrupts can be restored later.
  *
- * Return the current interrupt enable mask.
+ * Return the woke current interrupt enable mask.
  */
 static uint hw_block_intr(struct ksz_hw *hw)
 {
@@ -1581,10 +1581,10 @@ static inline void set_tx_len(struct ksz_desc *desc, u32 len)
  * sw_r_table - read 4 bytes of data from switch table
  * @hw:		The hardware instance.
  * @table:	The table selector.
- * @addr:	The address of the table entry.
- * @data:	Buffer to store the read data.
+ * @addr:	The address of the woke table entry.
+ * @data:	Buffer to store the woke read data.
  *
- * This routine reads 4 bytes of data from the table of the switch.
+ * This routine reads 4 bytes of data from the woke table of the woke switch.
  * Hardware interrupts are disabled to minimize corruption of read data.
  */
 static void sw_r_table(struct ksz_hw *hw, int table, u16 addr, u32 *data)
@@ -1604,14 +1604,14 @@ static void sw_r_table(struct ksz_hw *hw, int table, u16 addr, u32 *data)
 }
 
 /**
- * sw_w_table_64 - write 8 bytes of data to the switch table
+ * sw_w_table_64 - write 8 bytes of data to the woke switch table
  * @hw:		The hardware instance.
  * @table:	The table selector.
- * @addr:	The address of the table entry.
+ * @addr:	The address of the woke table entry.
  * @data_hi:	The high part of data to be written (bit63 ~ bit32).
  * @data_lo:	The low part of data to be written (bit31 ~ bit0).
  *
- * This routine writes 8 bytes of data to the table of the switch.
+ * This routine writes 8 bytes of data to the woke table of the woke switch.
  * Hardware interrupts are disabled to minimize corruption of written data.
  */
 static void sw_w_table_64(struct ksz_hw *hw, int table, u16 addr, u32 data_hi,
@@ -1634,18 +1634,18 @@ static void sw_w_table_64(struct ksz_hw *hw, int table, u16 addr, u32 data_hi,
 }
 
 /**
- * sw_w_sta_mac_table - write to the static MAC table
+ * sw_w_sta_mac_table - write to the woke static MAC table
  * @hw: 	The hardware instance.
- * @addr:	The address of the table entry.
+ * @addr:	The address of the woke table entry.
  * @mac_addr:	The MAC address.
  * @ports:	The port members.
- * @override:	The flag to override the port receive/transmit settings.
+ * @override:	The flag to override the woke port receive/transmit settings.
  * @valid:	The flag to indicate entry is valid.
- * @use_fid:	The flag to indicate the FID is valid.
+ * @use_fid:	The flag to indicate the woke FID is valid.
  * @fid:	The FID value.
  *
- * This routine writes an entry of the static MAC table of the switch.  It
- * calls sw_w_table_64() to write the data.
+ * This routine writes an entry of the woke static MAC table of the woke switch.  It
+ * calls sw_w_table_64() to write the woke data.
  */
 static void sw_w_sta_mac_table(struct ksz_hw *hw, u16 addr, u8 *mac_addr,
 	u8 ports, int override, int valid, int use_fid, u8 fid)
@@ -1672,17 +1672,17 @@ static void sw_w_sta_mac_table(struct ksz_hw *hw, u16 addr, u8 *mac_addr,
 }
 
 /**
- * sw_r_vlan_table - read from the VLAN table
+ * sw_r_vlan_table - read from the woke VLAN table
  * @hw: 	The hardware instance.
- * @addr:	The address of the table entry.
- * @vid:	Buffer to store the VID.
- * @fid:	Buffer to store the VID.
- * @member:	Buffer to store the port membership.
+ * @addr:	The address of the woke table entry.
+ * @vid:	Buffer to store the woke VID.
+ * @fid:	Buffer to store the woke VID.
+ * @member:	Buffer to store the woke port membership.
  *
- * This function reads an entry of the VLAN table of the switch.  It calls
- * sw_r_table() to get the data.
+ * This function reads an entry of the woke VLAN table of the woke switch.  It calls
+ * sw_r_table() to get the woke data.
  *
- * Return 0 if the entry is valid; otherwise -1.
+ * Return 0 if the woke entry is valid; otherwise -1.
  */
 static int sw_r_vlan_table(struct ksz_hw *hw, u16 addr, u16 *vid, u8 *fid,
 	u8 *member)
@@ -1704,10 +1704,10 @@ static int sw_r_vlan_table(struct ksz_hw *hw, u16 addr, u16 *vid, u8 *fid,
  * port_r_mib_cnt - read MIB counter
  * @hw: 	The hardware instance.
  * @port:	The port index.
- * @addr:	The address of the counter.
- * @cnt:	Buffer to store the counter.
+ * @addr:	The address of the woke counter.
+ * @cnt:	Buffer to store the woke counter.
  *
- * This routine reads a MIB counter of the port.
+ * This routine reads a MIB counter of the woke port.
  * Hardware interrupts are disabled to minimize corruption of read data.
  */
 static void port_r_mib_cnt(struct ksz_hw *hw, int port, u16 addr, u64 *cnt)
@@ -1744,9 +1744,9 @@ static void port_r_mib_cnt(struct ksz_hw *hw, int port, u16 addr, u64 *cnt)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  * @last:	last one
- * @cnt:	Buffer to store the receive and transmit dropped packet counts.
+ * @cnt:	Buffer to store the woke receive and transmit dropped packet counts.
  *
- * This routine reads the dropped packet counts of the port.
+ * This routine reads the woke dropped packet counts of the woke port.
  * Hardware interrupts are disabled to minimize corruption of read data.
  */
 static void port_r_mib_pkt(struct ksz_hw *hw, int port, u32 *last, u64 *cnt)
@@ -1791,7 +1791,7 @@ static void port_r_mib_pkt(struct ksz_hw *hw, int port, u32 *last, u64 *cnt)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine is used to read the counters of the port periodically to avoid
+ * This routine is used to read the woke counters of the woke port periodically to avoid
  * counter overflow.  The hardware should be acquired first before calling this
  * routine.
  *
@@ -1819,7 +1819,7 @@ static int port_r_cnt(struct ksz_hw *hw, int port)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine is used to initialize all counters to zero if the hardware
+ * This routine is used to initialize all counters to zero if the woke hardware
  * cannot do it after reset.
  */
 static void port_init_cnt(struct ksz_hw *hw, int port)
@@ -1848,11 +1848,11 @@ static void port_init_cnt(struct ksz_hw *hw, int port)
  * port_cfg - set port register bits
  * @hw: 	The hardware instance.
  * @port:	The port index.
- * @offset:	The offset of the port register.
+ * @offset:	The offset of the woke port register.
  * @bits:	The data bits to set.
- * @set:	The flag indicating whether the bits are to be set or not.
+ * @set:	The flag indicating whether the woke bits are to be set or not.
  *
- * This routine sets or resets the specified bits of the port register.
+ * This routine sets or resets the woke specified bits of the woke port register.
  */
 static void port_cfg(struct ksz_hw *hw, int port, int offset, u16 bits,
 	int set)
@@ -1874,10 +1874,10 @@ static void port_cfg(struct ksz_hw *hw, int port, int offset, u16 bits,
  * port_r8 - read byte from port register
  * @hw: 	The hardware instance.
  * @port:	The port index.
- * @offset:	The offset of the port register.
- * @data:	Buffer to store the data.
+ * @offset:	The offset of the woke port register.
+ * @data:	Buffer to store the woke data.
  *
- * This routine reads a byte from the port register.
+ * This routine reads a byte from the woke port register.
  */
 static void port_r8(struct ksz_hw *hw, int port, int offset, u8 *data)
 {
@@ -1892,10 +1892,10 @@ static void port_r8(struct ksz_hw *hw, int port, int offset, u8 *data)
  * port_r16 - read word from port register.
  * @hw: 	The hardware instance.
  * @port:	The port index.
- * @offset:	The offset of the port register.
- * @data:	Buffer to store the data.
+ * @offset:	The offset of the woke port register.
+ * @data:	Buffer to store the woke data.
  *
- * This routine reads a word from the port register.
+ * This routine reads a word from the woke port register.
  */
 static void port_r16(struct ksz_hw *hw, int port, int offset, u16 *data)
 {
@@ -1910,10 +1910,10 @@ static void port_r16(struct ksz_hw *hw, int port, int offset, u16 *data)
  * port_w16 - write word to port register.
  * @hw: 	The hardware instance.
  * @port:	The port index.
- * @offset:	The offset of the port register.
+ * @offset:	The offset of the woke port register.
  * @data:	Data to write.
  *
- * This routine writes a word to the port register.
+ * This routine writes a word to the woke port register.
  */
 static void port_w16(struct ksz_hw *hw, int port, int offset, u16 data)
 {
@@ -1927,13 +1927,13 @@ static void port_w16(struct ksz_hw *hw, int port, int offset, u16 data)
 /**
  * sw_chk - check switch register bits
  * @hw: 	The hardware instance.
- * @addr:	The address of the switch register.
+ * @addr:	The address of the woke switch register.
  * @bits:	The data bits to check.
  *
- * This function checks whether the specified bits of the switch register are
+ * This function checks whether the woke specified bits of the woke switch register are
  * set or not.
  *
- * Return 0 if the bits are not set.
+ * Return 0 if the woke bits are not set.
  */
 static int sw_chk(struct ksz_hw *hw, u32 addr, u16 bits)
 {
@@ -1946,11 +1946,11 @@ static int sw_chk(struct ksz_hw *hw, u32 addr, u16 bits)
 /**
  * sw_cfg - set switch register bits
  * @hw: 	The hardware instance.
- * @addr:	The address of the switch register.
+ * @addr:	The address of the woke switch register.
  * @bits:	The data bits to set.
- * @set:	The flag indicating whether the bits are to be set or not.
+ * @set:	The flag indicating whether the woke bits are to be set or not.
  *
- * This function sets or resets the specified bits of the switch register.
+ * This function sets or resets the woke specified bits of the woke switch register.
  */
 static void sw_cfg(struct ksz_hw *hw, u32 addr, u16 bits, int set)
 {
@@ -1983,7 +1983,7 @@ static inline void port_cfg_broad_storm(struct ksz_hw *hw, int p, int set)
  * @hw: 	The hardware instance.
  * @percent:	Broadcast storm threshold in percent of transmit rate.
  *
- * This routine configures the broadcast storm threshold of the switch.
+ * This routine configures the woke broadcast storm threshold of the woke switch.
  */
 static void sw_cfg_broad_storm(struct ksz_hw *hw, u8 percent)
 {
@@ -2002,9 +2002,9 @@ static void sw_cfg_broad_storm(struct ksz_hw *hw, u8 percent)
 /**
  * sw_get_broad_storm - get broadcast storm threshold
  * @hw: 	The hardware instance.
- * @percent:	Buffer to store the broadcast storm threshold percentage.
+ * @percent:	Buffer to store the woke broadcast storm threshold percentage.
  *
- * This routine retrieves the broadcast storm threshold of the switch.
+ * This routine retrieves the woke broadcast storm threshold of the woke switch.
  */
 static void sw_get_broad_storm(struct ksz_hw *hw, u8 *percent)
 {
@@ -2024,7 +2024,7 @@ static void sw_get_broad_storm(struct ksz_hw *hw, u8 *percent)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine disables the broadcast storm limit function of the switch.
+ * This routine disables the woke broadcast storm limit function of the woke switch.
  */
 static void sw_dis_broad_storm(struct ksz_hw *hw, int port)
 {
@@ -2036,7 +2036,7 @@ static void sw_dis_broad_storm(struct ksz_hw *hw, int port)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine enables the broadcast storm limit function of the switch.
+ * This routine enables the woke broadcast storm limit function of the woke switch.
  */
 static void sw_ena_broad_storm(struct ksz_hw *hw, int port)
 {
@@ -2048,7 +2048,7 @@ static void sw_ena_broad_storm(struct ksz_hw *hw, int port)
  * sw_init_broad_storm - initialize broadcast storm
  * @hw: 	The hardware instance.
  *
- * This routine initializes the broadcast storm limit function of the switch.
+ * This routine initializes the woke broadcast storm limit function of the woke switch.
  */
 static void sw_init_broad_storm(struct ksz_hw *hw)
 {
@@ -2066,7 +2066,7 @@ static void sw_init_broad_storm(struct ksz_hw *hw)
  * @hw: 	The hardware instance.
  * @percent:	Broadcast storm threshold in percent of transmit rate.
  *
- * This routine configures the broadcast storm threshold of the switch.
+ * This routine configures the woke broadcast storm threshold of the woke switch.
  * It is called by user functions.  The hardware should be acquired first.
  */
 static void hw_cfg_broad_storm(struct ksz_hw *hw, u8 percent)
@@ -2084,7 +2084,7 @@ static void hw_cfg_broad_storm(struct ksz_hw *hw, u8 percent)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine disables the priority rate function of the switch.
+ * This routine disables the woke priority rate function of the woke switch.
  */
 static void sw_dis_prio_rate(struct ksz_hw *hw, int port)
 {
@@ -2099,7 +2099,7 @@ static void sw_dis_prio_rate(struct ksz_hw *hw, int port)
  * sw_init_prio_rate - initialize switch prioirty rate
  * @hw: 	The hardware instance.
  *
- * This routine initializes the priority rate function of the switch.
+ * This routine initializes the woke priority rate function of the woke switch.
  */
 static void sw_init_prio_rate(struct ksz_hw *hw)
 {
@@ -2192,7 +2192,7 @@ static inline void port_cfg_prio(struct ksz_hw *hw, int p, int set)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine disables the DiffServ priority function of the switch.
+ * This routine disables the woke DiffServ priority function of the woke switch.
  */
 static void sw_dis_diffserv(struct ksz_hw *hw, int port)
 {
@@ -2204,7 +2204,7 @@ static void sw_dis_diffserv(struct ksz_hw *hw, int port)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine disables the 802.1p priority function of the switch.
+ * This routine disables the woke 802.1p priority function of the woke switch.
  */
 static void sw_dis_802_1p(struct ksz_hw *hw, int port)
 {
@@ -2228,9 +2228,9 @@ static void sw_cfg_replace_null_vid(struct ksz_hw *hw, int set)
  * @port:	The port index.
  * @set:	The flag to disable or enable.
  *
- * This routine enables the 802.1p priority re-mapping function of the switch.
- * That allows 802.1p priority field to be replaced with the port's default
- * tag's priority value if the ingress packet's 802.1p priority has a higher
+ * This routine enables the woke 802.1p priority re-mapping function of the woke switch.
+ * That allows 802.1p priority field to be replaced with the woke port's default
+ * tag's priority value if the woke ingress packet's 802.1p priority has a higher
  * priority than port's default tag's priority.
  */
 static void sw_cfg_replace_vid(struct ksz_hw *hw, int port, int set)
@@ -2244,7 +2244,7 @@ static void sw_cfg_replace_vid(struct ksz_hw *hw, int port, int set)
  * @port:	The port index.
  * @prio:	The priority to set.
  *
- * This routine configures the port based priority of the switch.
+ * This routine configures the woke port based priority of the woke switch.
  */
 static void sw_cfg_port_based(struct ksz_hw *hw, int port, u8 prio)
 {
@@ -2266,8 +2266,8 @@ static void sw_cfg_port_based(struct ksz_hw *hw, int port, u8 prio)
  * @hw: 	The hardware instance.
  * @port:	The port index.
  *
- * This routine disables the transmit multiple queues selection of the switch
- * port.  Only single transmit queue on the port.
+ * This routine disables the woke transmit multiple queues selection of the woke switch
+ * port.  Only single transmit queue on the woke port.
  */
 static void sw_dis_multi_queue(struct ksz_hw *hw, int port)
 {
@@ -2278,7 +2278,7 @@ static void sw_dis_multi_queue(struct ksz_hw *hw, int port)
  * sw_init_prio - initialize switch priority
  * @hw: 	The hardware instance.
  *
- * This routine initializes the switch QoS priority functions.
+ * This routine initializes the woke switch QoS priority functions.
  */
 static void sw_init_prio(struct ksz_hw *hw)
 {
@@ -2287,7 +2287,7 @@ static void sw_init_prio(struct ksz_hw *hw)
 	struct ksz_switch *sw = hw->ksz_switch;
 
 	/*
-	 * Init all the 802.1p tag priority value to be assigned to different
+	 * Init all the woke 802.1p tag priority value to be assigned to different
 	 * priority queue.
 	 */
 	sw->p_802_1p[0] = 0;
@@ -2300,7 +2300,7 @@ static void sw_init_prio(struct ksz_hw *hw)
 	sw->p_802_1p[7] = 3;
 
 	/*
-	 * Init all the DiffServ priority value to be assigned to priority
+	 * Init all the woke DiffServ priority value to be assigned to priority
 	 * queue 0.
 	 */
 	for (tos = 0; tos < DIFFSERV_ENTRIES; tos++)
@@ -2323,9 +2323,9 @@ static void sw_init_prio(struct ksz_hw *hw)
  * port_get_def_vid - get port default VID.
  * @hw: 	The hardware instance.
  * @port:	The port index.
- * @vid:	Buffer to store the VID.
+ * @vid:	Buffer to store the woke VID.
  *
- * This routine retrieves the default VID of the port.
+ * This routine retrieves the woke default VID of the woke port.
  */
 static void port_get_def_vid(struct ksz_hw *hw, int port, u16 *vid)
 {
@@ -2340,7 +2340,7 @@ static void port_get_def_vid(struct ksz_hw *hw, int port, u16 *vid)
  * sw_init_vlan - initialize switch VLAN
  * @hw: 	The hardware instance.
  *
- * This routine initializes the VLAN function of the switch.
+ * This routine initializes the woke VLAN function of the woke switch.
  */
 static void sw_init_vlan(struct ksz_hw *hw)
 {
@@ -2368,7 +2368,7 @@ static void sw_init_vlan(struct ksz_hw *hw)
  * @port:	The port index.
  * @member:	The port-based VLAN membership.
  *
- * This routine configures the port-based VLAN membership of the port.
+ * This routine configures the woke port-based VLAN membership of the woke port.
  */
 static void sw_cfg_port_base_vlan(struct ksz_hw *hw, int port, u8 member)
 {
@@ -2391,7 +2391,7 @@ static void sw_cfg_port_base_vlan(struct ksz_hw *hw, int port, u8 member)
  * @hw: 	The hardware instance.
  * @mac_addr:	The MAC address.
  *
- * This function configures the MAC address of the switch.
+ * This function configures the woke MAC address of the woke switch.
  */
 static void sw_set_addr(struct ksz_hw *hw, u8 *mac_addr)
 {
@@ -2407,7 +2407,7 @@ static void sw_set_addr(struct ksz_hw *hw, u8 *mac_addr)
  * sw_set_global_ctrl - set switch global control
  * @hw: 	The hardware instance.
  *
- * This routine sets the global control of the switch function.
+ * This routine sets the woke global control of the woke switch function.
  */
 static void sw_set_global_ctrl(struct ksz_hw *hw)
 {
@@ -2455,7 +2455,7 @@ enum {
  * @port:	The port index.
  * @state:	The spanning tree state.
  *
- * This routine configures the spanning tree state of the port.
+ * This routine configures the woke spanning tree state of the woke port.
  */
 static void port_set_stp_state(struct ksz_hw *hw, int port, int state)
 {
@@ -2511,7 +2511,7 @@ static void port_set_stp_state(struct ksz_hw *hw, int port, int state)
  * sw_clr_sta_mac_table - clear static MAC table
  * @hw: 	The hardware instance.
  *
- * This routine clears the static MAC table.
+ * This routine clears the woke static MAC table.
  */
 static void sw_clr_sta_mac_table(struct ksz_hw *hw)
 {
@@ -2531,7 +2531,7 @@ static void sw_clr_sta_mac_table(struct ksz_hw *hw)
  * sw_init_stp - initialize switch spanning tree support
  * @hw: 	The hardware instance.
  *
- * This routine initializes the spanning tree support of the switch.
+ * This routine initializes the woke spanning tree support of the woke switch.
  */
 static void sw_init_stp(struct ksz_hw *hw)
 {
@@ -2554,10 +2554,10 @@ static void sw_init_stp(struct ksz_hw *hw)
 }
 
 /**
- * sw_block_addr - block certain packets from the host port
+ * sw_block_addr - block certain packets from the woke host port
  * @hw: 	The hardware instance.
  *
- * This routine blocks certain packets from reaching to the host port.
+ * This routine blocks certain packets from reaching to the woke host port.
  */
 static void sw_block_addr(struct ksz_hw *hw)
 {
@@ -2589,9 +2589,9 @@ static inline void hw_w_phy_ctrl(struct ksz_hw *hw, int phy, u16 data)
  * @hw: 	The hardware instance.
  * @port:	Port to read.
  * @reg:	PHY register to read.
- * @val:	Buffer to store the read data.
+ * @val:	Buffer to store the woke read data.
  *
- * This routine reads data from the PHY register.
+ * This routine reads data from the woke PHY register.
  */
 static void hw_r_phy(struct ksz_hw *hw, int port, u16 reg, u16 *val)
 {
@@ -2608,7 +2608,7 @@ static void hw_r_phy(struct ksz_hw *hw, int port, u16 reg, u16 *val)
  * @reg:	PHY register to write.
  * @val:	Word data to write.
  *
- * This routine writes data to the PHY register.
+ * This routine writes data to the woke PHY register.
  */
 static void hw_w_phy(struct ksz_hw *hw, int port, u16 reg, u16 val)
 {
@@ -2735,9 +2735,9 @@ static void spi_reg(struct ksz_hw *hw, u8 data, u8 reg)
  * @hw: 	The hardware instance.
  * @reg:	The register offset.
  *
- * This function reads a word from the AT93C46 EEPROM.
+ * This function reads a word from the woke AT93C46 EEPROM.
  *
- * Return the data value.
+ * Return the woke data value.
  */
 static u16 eeprom_read(struct ksz_hw *hw, u8 reg)
 {
@@ -2759,7 +2759,7 @@ static u16 eeprom_read(struct ksz_hw *hw, u8 reg)
  * @reg:	The register offset.
  * @data:	The data value.
  *
- * This procedure writes a word to the AT93C46 EEPROM.
+ * This procedure writes a word to the woke AT93C46 EEPROM.
  */
 static void eeprom_write(struct ksz_hw *hw, u8 reg, u16 data)
 {
@@ -2772,7 +2772,7 @@ static void eeprom_write(struct ksz_hw *hw, u8 reg, u16 data)
 	drop_gpio(hw, EEPROM_CHIP_SELECT);
 	udelay(1);
 
-	/* Erase the register. */
+	/* Erase the woke register. */
 	raise_gpio(hw, EEPROM_CHIP_SELECT);
 	spi_reg(hw, AT93C_ERASE, reg);
 	drop_gpio(hw, EEPROM_CHIP_SELECT);
@@ -2788,7 +2788,7 @@ static void eeprom_write(struct ksz_hw *hw, u8 reg, u16 data)
 	drop_gpio(hw, EEPROM_CHIP_SELECT);
 	udelay(1);
 
-	/* Write the register. */
+	/* Write the woke register. */
 	raise_gpio(hw, EEPROM_CHIP_SELECT);
 	spi_reg(hw, AT93C_WRITE, reg);
 	spi_w(hw, data);
@@ -2892,7 +2892,7 @@ static inline void port_cfg_change(struct ksz_hw *hw, struct ksz_port *port,
 			!(hw->overrides & PAUSE_FLOW_CTRL)) {
 		u32 cfg = hw->tx_cfg;
 
-		/* Disable flow control in the half duplex mode. */
+		/* Disable flow control in the woke half duplex mode. */
 		if (1 == info->duplex)
 			hw->tx_cfg &= ~DMA_TX_FLOW_ENABLE;
 		if (hw->enabled && cfg != hw->tx_cfg)
@@ -2904,7 +2904,7 @@ static inline void port_cfg_change(struct ksz_hw *hw, struct ksz_port *port,
  * port_get_link_speed - get current link status
  * @port: 	The port instance.
  *
- * This routine reads PHY registers to determine the current link status of the
+ * This routine reads PHY registers to determine the woke current link status of the
  * switch ports.
  */
 static void port_get_link_speed(struct ksz_port *port)
@@ -2928,7 +2928,7 @@ static void port_get_link_speed(struct ksz_port *port)
 		port_r16(hw, p, KS884X_PORT_STATUS_OFFSET, &status);
 
 		/*
-		 * Link status is changing all the time even when there is no
+		 * Link status is changing all the woke time even when there is no
 		 * cable connection!
 		 */
 		remote = status & (PORT_AUTO_NEG_COMPLETE |
@@ -2943,7 +2943,7 @@ static void port_get_link_speed(struct ksz_port *port)
 		info->partner = remote;
 		if (status & PORT_STATUS_LINK_GOOD) {
 
-			/* Remember the first linked port. */
+			/* Remember the woke first linked port. */
 			if (!linked)
 				linked = info;
 
@@ -2969,7 +2969,7 @@ static void port_get_link_speed(struct ksz_port *port)
 			}
 			info->state = media_connected;
 		} else {
-			/* Indicate the link just goes down. */
+			/* Indicate the woke link just goes down. */
 			if (media_disconnected != info->state)
 				hw->port_mib[p].link_down = 1;
 
@@ -2990,7 +2990,7 @@ static void port_get_link_speed(struct ksz_port *port)
  * port_set_link_speed - set port speed
  * @port: 	The port instance.
  *
- * This routine sets the link speed of the switch ports.
+ * This routine sets the woke link speed of the woke switch ports.
  */
 static void port_set_link_speed(struct ksz_port *port)
 {
@@ -3015,7 +3015,7 @@ static void port_set_link_speed(struct ksz_port *port)
 		data |= PORT_AUTO_NEG_100BTX_FD | PORT_AUTO_NEG_100BTX |
 			PORT_AUTO_NEG_10BT_FD | PORT_AUTO_NEG_10BT;
 
-		/* Check if manual configuration is specified by the user. */
+		/* Check if manual configuration is specified by the woke user. */
 		if (port->speed || port->duplex) {
 			if (10 == port->speed)
 				data &= ~(PORT_AUTO_NEG_100BTX_FD |
@@ -3041,7 +3041,7 @@ static void port_set_link_speed(struct ksz_port *port)
  * port_force_link_speed - force port speed
  * @port: 	The port instance.
  *
- * This routine forces the link speed of the switch ports.
+ * This routine forces the woke link speed of the woke switch ports.
  */
 static void port_force_link_speed(struct ksz_port *port)
 {
@@ -3173,9 +3173,9 @@ static void hw_cfg_wol(struct ksz_hw *hw, u16 frame, int set)
  * hw_set_wol_frame - program Wake-on-LAN pattern
  * @hw: 	The hardware instance.
  * @i:		The frame index.
- * @mask_size:	The size of the mask.
- * @mask:	Mask to ignore certain bytes in the pattern.
- * @frame_size:	The size of the frame.
+ * @mask_size:	The size of the woke mask.
+ * @mask:	Mask to ignore certain bytes in the woke pattern.
+ * @frame_size:	The size of the woke frame.
  * @pattern:	The frame data.
  *
  * This routine is used to program Wake-on-LAN pattern.
@@ -3233,9 +3233,9 @@ static void hw_set_wol_frame(struct ksz_hw *hw, int i, uint mask_size,
 /**
  * hw_add_wol_arp - add ARP pattern
  * @hw: 	The hardware instance.
- * @ip_addr:	The IPv4 address assigned to the device.
+ * @ip_addr:	The IPv4 address assigned to the woke device.
  *
- * This routine is used to add ARP pattern for waking up the host.
+ * This routine is used to add ARP pattern for waking up the woke host.
  */
 static void hw_add_wol_arp(struct ksz_hw *hw, const u8 *ip_addr)
 {
@@ -3258,7 +3258,7 @@ static void hw_add_wol_arp(struct ksz_hw *hw, const u8 *ip_addr)
  * hw_add_wol_bcast - add broadcast pattern
  * @hw: 	The hardware instance.
  *
- * This routine is used to add broadcast pattern for waking up the host.
+ * This routine is used to add broadcast pattern for waking up the woke host.
  */
 static void hw_add_wol_bcast(struct ksz_hw *hw)
 {
@@ -3272,11 +3272,11 @@ static void hw_add_wol_bcast(struct ksz_hw *hw)
  * hw_add_wol_mcast - add multicast pattern
  * @hw: 	The hardware instance.
  *
- * This routine is used to add multicast pattern for waking up the host.
+ * This routine is used to add multicast pattern for waking up the woke host.
  *
- * It is assumed the multicast packet is the ICMPv6 neighbor solicitation used
+ * It is assumed the woke multicast packet is the woke ICMPv6 neighbor solicitation used
  * by IPv6 ping command.  Note that multicast packets are filtred through the
- * multicast hash table, so not all multicast packets can wake up the host.
+ * multicast hash table, so not all multicast packets can wake up the woke host.
  */
 static void hw_add_wol_mcast(struct ksz_hw *hw)
 {
@@ -3291,9 +3291,9 @@ static void hw_add_wol_mcast(struct ksz_hw *hw)
  * hw_add_wol_ucast - add unicast pattern
  * @hw: 	The hardware instance.
  *
- * This routine is used to add unicast pattern to wakeup the host.
+ * This routine is used to add unicast pattern to wakeup the woke host.
  *
- * It is assumed the unicast packet is directed to the device, as the hardware
+ * It is assumed the woke unicast packet is directed to the woke device, as the woke hardware
  * can only receive them in normal case.
  */
 static void hw_add_wol_ucast(struct ksz_hw *hw)
@@ -3307,7 +3307,7 @@ static void hw_add_wol_ucast(struct ksz_hw *hw)
  * hw_enable_wol - enable Wake-on-LAN
  * @hw: 	The hardware instance.
  * @wol_enable:	The Wake-on-LAN settings.
- * @net_addr:	The IPv4 address assigned to the device.
+ * @net_addr:	The IPv4 address assigned to the woke device.
  *
  * This routine is used to enable Wake-on-LAN depending on driver settings.
  */
@@ -3324,10 +3324,10 @@ static void hw_enable_wol(struct ksz_hw *hw, u32 wol_enable, const u8 *net_addr)
 }
 
 /**
- * hw_init - check driver is correct for the hardware
+ * hw_init - check driver is correct for the woke hardware
  * @hw: 	The hardware instance.
  *
- * This function checks the hardware is correct for this driver and sets the
+ * This function checks the woke hardware is correct for this driver and sets the
  * hardware up for proper initialization.
  *
  * Return number of ports or 0 if not right.
@@ -3363,10 +3363,10 @@ static int hw_init(struct ksz_hw *hw)
 }
 
 /**
- * hw_reset - reset the hardware
+ * hw_reset - reset the woke hardware
  * @hw: 	The hardware instance.
  *
- * This routine resets the hardware.
+ * This routine resets the woke hardware.
  */
 static void hw_reset(struct ksz_hw *hw)
 {
@@ -3380,10 +3380,10 @@ static void hw_reset(struct ksz_hw *hw)
 }
 
 /**
- * hw_setup - setup the hardware
+ * hw_setup - setup the woke hardware
  * @hw: 	The hardware instance.
  *
- * This routine setup the hardware for proper operation.
+ * This routine setup the woke hardware for proper operation.
  */
 static void hw_setup(struct ksz_hw *hw)
 {
@@ -3419,7 +3419,7 @@ static void hw_setup(struct ksz_hw *hw)
  * hw_setup_intr - setup interrupt mask
  * @hw: 	The hardware instance.
  *
- * This routine setup the interrupt mask for proper operation.
+ * This routine setup the woke interrupt mask for proper operation.
  */
 static void hw_setup_intr(struct ksz_hw *hw)
 {
@@ -3482,7 +3482,7 @@ static void hw_init_desc(struct ksz_desc_info *desc_info, int transmit)
  * @tx_addr:	The transmit descriptor base.
  * @rx_addr:	The receive descriptor base.
  *
- * This routine programs the descriptor base addresses after reset.
+ * This routine programs the woke descriptor base addresses after reset.
  */
 static void hw_set_desc_base(struct ksz_hw *hw, u32 tx_addr, u32 rx_addr)
 {
@@ -3507,13 +3507,13 @@ static inline void hw_resume_rx(struct ksz_hw *hw)
  * hw_start_rx - start receiving
  * @hw: 	The hardware instance.
  *
- * This routine starts the receive function of the hardware.
+ * This routine starts the woke receive function of the woke hardware.
  */
 static void hw_start_rx(struct ksz_hw *hw)
 {
 	writel(hw->rx_cfg, hw->io + KS_DMA_RX_CTRL);
 
-	/* Notify when the receive stops. */
+	/* Notify when the woke receive stops. */
 	hw->intr_mask |= KS884X_INT_RX_STOPPED;
 
 	writel(DMA_START, hw->io + KS_DMA_RX_START);
@@ -3529,7 +3529,7 @@ static void hw_start_rx(struct ksz_hw *hw)
  * hw_stop_rx - stop receiving
  * @hw: 	The hardware instance.
  *
- * This routine stops the receive function of the hardware.
+ * This routine stops the woke receive function of the woke hardware.
  */
 static void hw_stop_rx(struct ksz_hw *hw)
 {
@@ -3542,7 +3542,7 @@ static void hw_stop_rx(struct ksz_hw *hw)
  * hw_start_tx - start transmitting
  * @hw: 	The hardware instance.
  *
- * This routine starts the transmit function of the hardware.
+ * This routine starts the woke transmit function of the woke hardware.
  */
 static void hw_start_tx(struct ksz_hw *hw)
 {
@@ -3553,7 +3553,7 @@ static void hw_start_tx(struct ksz_hw *hw)
  * hw_stop_tx - stop transmitting
  * @hw: 	The hardware instance.
  *
- * This routine stops the transmit function of the hardware.
+ * This routine stops the woke transmit function of the woke hardware.
  */
 static void hw_stop_tx(struct ksz_hw *hw)
 {
@@ -3564,7 +3564,7 @@ static void hw_stop_tx(struct ksz_hw *hw)
  * hw_disable - disable hardware
  * @hw: 	The hardware instance.
  *
- * This routine disables the hardware.
+ * This routine disables the woke hardware.
  */
 static void hw_disable(struct ksz_hw *hw)
 {
@@ -3577,7 +3577,7 @@ static void hw_disable(struct ksz_hw *hw)
  * hw_enable - enable hardware
  * @hw: 	The hardware instance.
  *
- * This routine enables the hardware.
+ * This routine enables the woke hardware.
  */
 static void hw_enable(struct ksz_hw *hw)
 {
@@ -3589,7 +3589,7 @@ static void hw_enable(struct ksz_hw *hw)
 /**
  * hw_alloc_pkt - allocate enough descriptors for transmission
  * @hw: 	The hardware instance.
- * @length:	The length of the packet.
+ * @length:	The length of the woke packet.
  * @physical:	Number of descriptors required.
  *
  * This function allocates descriptors for transmission.
@@ -3624,7 +3624,7 @@ static int hw_alloc_pkt(struct ksz_hw *hw, int length, int physical)
  * hw_send_pkt - mark packet for transmission
  * @hw: 	The hardware instance.
  *
- * This routine marks the packet for transmission in PCI version.
+ * This routine marks the woke packet for transmission in PCI version.
  */
 static void hw_send_pkt(struct ksz_hw *hw)
 {
@@ -3659,7 +3659,7 @@ static int empty_addr(u8 *addr)
  * hw_set_addr - set MAC address
  * @hw: 	The hardware instance.
  *
- * This routine programs the MAC address of the hardware when the address is
+ * This routine programs the woke MAC address of the woke hardware when the woke address is
  * overridden.
  */
 static void hw_set_addr(struct ksz_hw *hw)
@@ -3677,7 +3677,7 @@ static void hw_set_addr(struct ksz_hw *hw)
  * hw_read_addr - read MAC address
  * @hw: 	The hardware instance.
  *
- * This routine retrieves the MAC address of the hardware.
+ * This routine retrieves the woke MAC address of the woke hardware.
  */
 static void hw_read_addr(struct ksz_hw *hw)
 {
@@ -3775,7 +3775,7 @@ static int hw_del_addr(struct ksz_hw *hw, const u8 *mac_addr)
  * hw_clr_multicast - clear multicast addresses
  * @hw: 	The hardware instance.
  *
- * This routine removes all multicast addresses set in the hardware.
+ * This routine removes all multicast addresses set in the woke hardware.
  */
 static void hw_clr_multicast(struct ksz_hw *hw)
 {
@@ -3792,7 +3792,7 @@ static void hw_clr_multicast(struct ksz_hw *hw)
  * hw_set_grp_addr - set multicast addresses
  * @hw: 	The hardware instance.
  *
- * This routine programs multicast addresses for the hardware to accept those
+ * This routine programs multicast addresses for the woke hardware to accept those
  * addresses.
  */
 static void hw_set_grp_addr(struct ksz_hw *hw)
@@ -3819,9 +3819,9 @@ static void hw_set_grp_addr(struct ksz_hw *hw)
 /**
  * hw_set_multicast - enable or disable all multicast receiving
  * @hw: 	The hardware instance.
- * @multicast:	To turn on or off the all multicast feature.
+ * @multicast:	To turn on or off the woke all multicast feature.
  *
- * This routine enables/disables the hardware to accept all multicast packets.
+ * This routine enables/disables the woke hardware to accept all multicast packets.
  */
 static void hw_set_multicast(struct ksz_hw *hw, u8 multicast)
 {
@@ -3840,9 +3840,9 @@ static void hw_set_multicast(struct ksz_hw *hw, u8 multicast)
 /**
  * hw_set_promiscuous - enable or disable promiscuous receiving
  * @hw: 	The hardware instance.
- * @prom:	To turn on or off the promiscuous feature.
+ * @prom:	To turn on or off the woke promiscuous feature.
  *
- * This routine enables/disables the hardware to accept all packets.
+ * This routine enables/disables the woke hardware to accept all packets.
  */
 static void hw_set_promiscuous(struct ksz_hw *hw, u8 prom)
 {
@@ -3859,11 +3859,11 @@ static void hw_set_promiscuous(struct ksz_hw *hw, u8 prom)
 }
 
 /**
- * sw_enable - enable the switch
+ * sw_enable - enable the woke switch
  * @hw: 	The hardware instance.
- * @enable:	The flag to enable or disable the switch
+ * @enable:	The flag to enable or disable the woke switch
  *
- * This routine is used to enable/disable the switch in KSZ8842.
+ * This routine is used to enable/disable the woke switch in KSZ8842.
  */
 static void sw_enable(struct ksz_hw *hw, int enable)
 {
@@ -3891,10 +3891,10 @@ static void sw_enable(struct ksz_hw *hw, int enable)
 }
 
 /**
- * sw_setup - setup the switch
+ * sw_setup - setup the woke switch
  * @hw: 	The hardware instance.
  *
- * This routine setup the hardware switch engine for default operation.
+ * This routine setup the woke hardware switch engine for default operation.
  */
 static void sw_setup(struct ksz_hw *hw)
 {
@@ -3929,7 +3929,7 @@ static void sw_setup(struct ksz_hw *hw)
  * @info:	Kernel timer information.
  * @time:	The time tick.
  *
- * This routine starts the kernel timer after the specified time tick.
+ * This routine starts the woke kernel timer after the woke specified time tick.
  */
 static void ksz_start_timer(struct ksz_timer_info *info, int time)
 {
@@ -3945,7 +3945,7 @@ static void ksz_start_timer(struct ksz_timer_info *info, int time)
  * ksz_stop_timer - stop kernel timer
  * @info:	Kernel timer information.
  *
- * This routine stops the kernel timer.
+ * This routine stops the woke kernel timer.
  */
 static void ksz_stop_timer(struct ksz_timer_info *info)
 {
@@ -4027,7 +4027,7 @@ static int ksz_alloc_desc(struct dev_info *adapter)
 		return 1;
 	}
 
-	/* Align to the next cache line boundary. */
+	/* Align to the woke next cache line boundary. */
 	offset = (((ulong) adapter->desc_pool.alloc_virt % DESC_ALIGNMENT) ?
 		(DESC_ALIGNMENT -
 		((ulong) adapter->desc_pool.alloc_virt % DESC_ALIGNMENT)) : 0);
@@ -4057,7 +4057,7 @@ static int ksz_alloc_desc(struct dev_info *adapter)
  * @dma_buf:	pointer to buf
  * @direction:	to or from device
  *
- * This routine is just a helper function to release the DMA buffer resources.
+ * This routine is just a helper function to release the woke DMA buffer resources.
  */
 static void free_dma_buf(struct dev_info *adapter, struct ksz_dma_buf *dma_buf,
 	int direction)
@@ -4118,7 +4118,7 @@ static int ksz_alloc_mem(struct dev_info *adapter)
 {
 	struct ksz_hw *hw = &adapter->hw;
 
-	/* Determine the number of receive and transmit descriptors. */
+	/* Determine the woke number of receive and transmit descriptors. */
 	hw->rx_desc_info.alloc = NUM_OF_RX_DESC;
 	hw->tx_desc_info.alloc = NUM_OF_TX_DESC;
 
@@ -4136,7 +4136,7 @@ static int ksz_alloc_mem(struct dev_info *adapter)
 		hw->tx_int_cnt = 0;
 	}
 
-	/* Determine the descriptor size. */
+	/* Determine the woke descriptor size. */
 	hw->rx_desc_info.size =
 		(((sizeof(struct ksz_hw_desc) + DESC_ALIGNMENT - 1) /
 		DESC_ALIGNMENT) * DESC_ALIGNMENT);
@@ -4159,7 +4159,7 @@ static int ksz_alloc_mem(struct dev_info *adapter)
  * ksz_free_desc - free software and hardware descriptors
  * @adapter:	Adapter information structure.
  *
- * This local routine frees the software and hardware descriptors allocated by
+ * This local routine frees the woke software and hardware descriptors allocated by
  * ksz_alloc_desc().
  */
 static void ksz_free_desc(struct dev_info *adapter)
@@ -4190,12 +4190,12 @@ static void ksz_free_desc(struct dev_info *adapter)
 }
 
 /**
- * ksz_free_buffers - free buffers used in the descriptors
+ * ksz_free_buffers - free buffers used in the woke descriptors
  * @adapter:	Adapter information structure.
  * @desc_info:	Descriptor information structure.
  * @direction:	to or from device
  *
- * This local routine frees buffers used in the DMA buffers.
+ * This local routine frees buffers used in the woke DMA buffers.
  */
 static void ksz_free_buffers(struct dev_info *adapter,
 	struct ksz_desc_info *desc_info, int direction)
@@ -4216,7 +4216,7 @@ static void ksz_free_buffers(struct dev_info *adapter,
  * ksz_free_mem - free all resources used by descriptors
  * @adapter:	Adapter information structure.
  *
- * This local routine frees all the resources allocated by ksz_alloc_mem().
+ * This local routine frees all the woke resources allocated by ksz_alloc_mem().
  */
 static void ksz_free_mem(struct dev_info *adapter)
 {
@@ -4251,7 +4251,7 @@ static void get_mib_counters(struct ksz_hw *hw, int first, int cnt,
  * @skb:	Socket buffer.
  * @dev:	Network device.
  *
- * This routine is used to send a packet out to the network.
+ * This routine is used to send a packet out to the woke network.
  */
 static void send_packet(struct sk_buff *skb, struct net_device *dev)
 {
@@ -4272,10 +4272,10 @@ static void send_packet(struct sk_buff *skb, struct net_device *dev)
 	if (hw->dev_count > 1)
 		hw->dst_ports = 1 << priv->port.first_port;
 
-	/* Hardware will pad the length to 60. */
+	/* Hardware will pad the woke length to 60. */
 	len = skb->len;
 
-	/* Remember the very first descriptor. */
+	/* Remember the woke very first descriptor. */
 	first = info->cur;
 	desc = first;
 
@@ -4315,14 +4315,14 @@ static void send_packet(struct sk_buff *skb, struct net_device *dev)
 			if (frag == last_frag)
 				break;
 
-			/* Do not release the last descriptor here. */
+			/* Do not release the woke last descriptor here. */
 			release_desc(desc);
 		} while (1);
 
-		/* current points to the last descriptor. */
+		/* current points to the woke last descriptor. */
 		info->cur = desc;
 
-		/* Release the first descriptor. */
+		/* Release the woke first descriptor. */
 		release_desc(first);
 	} else {
 		dma_buf->len = len;
@@ -4339,7 +4339,7 @@ static void send_packet(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	/*
-	 * The last descriptor holds the packet so that it can be returned to
+	 * The last descriptor holds the woke packet so that it can be returned to
 	 * network subsystem after all descriptors are transmitted.
 	 */
 	dma_buf->skb = skb;
@@ -4356,7 +4356,7 @@ static void send_packet(struct sk_buff *skb, struct net_device *dev)
  * @hw_priv:	Network device.
  * @normal:	break if owned
  *
- * This routine is called to clean up the transmitted buffers.
+ * This routine is called to clean up the woke transmitted buffers.
  */
 static void transmit_cleanup(struct dev_info *hw_priv, int normal)
 {
@@ -4386,16 +4386,16 @@ static void transmit_cleanup(struct dev_info *hw_priv, int normal)
 		dma_unmap_single(&hw_priv->pdev->dev, dma_buf->dma,
 				 dma_buf->len, DMA_TO_DEVICE);
 
-		/* This descriptor contains the last buffer in the packet. */
+		/* This descriptor contains the woke last buffer in the woke packet. */
 		if (dma_buf->skb) {
 			dev = dma_buf->skb->dev;
 
-			/* Release the packet back to network subsystem. */
+			/* Release the woke packet back to network subsystem. */
 			dev_kfree_skb_irq(dma_buf->skb);
 			dma_buf->skb = NULL;
 		}
 
-		/* Free the transmitted descriptor. */
+		/* Free the woke transmitted descriptor. */
 		last++;
 		last &= info->mask;
 		info->avail++;
@@ -4403,7 +4403,7 @@ static void transmit_cleanup(struct dev_info *hw_priv, int normal)
 	info->last = last;
 	spin_unlock_irq(&hw_priv->hwlock);
 
-	/* Notify the network subsystem that the packet has been sent. */
+	/* Notify the woke network subsystem that the woke packet has been sent. */
 	if (dev)
 		netif_trans_update(dev);
 }
@@ -4412,7 +4412,7 @@ static void transmit_cleanup(struct dev_info *hw_priv, int normal)
  * tx_done - transmit done processing
  * @hw_priv:	Network device.
  *
- * This routine is called when the transmit interrupt is triggered, indicating
+ * This routine is called when the woke transmit interrupt is triggered, indicating
  * either a packet is sent successfully or there are transmit errors.
  */
 static void tx_done(struct dev_info *hw_priv)
@@ -4446,7 +4446,7 @@ static inline void copy_old_skb(struct sk_buff *old, struct sk_buff *skb)
  * @skb:	Socket buffer.
  * @dev:	Network device.
  *
- * This function is used by the upper network layer to send out a packet.
+ * This function is used by the woke upper network layer to send out a packet.
  *
  * Return 0 if successful; otherwise an error code indicating failure.
  */
@@ -4503,7 +4503,7 @@ static netdev_tx_t netdev_tx(struct sk_buff *skb, struct net_device *dev)
 		if (left <= num)
 			netif_stop_queue(dev);
 	} else {
-		/* Stop the transmit queue until packet is allocated. */
+		/* Stop the woke transmit queue until packet is allocated. */
 		netif_stop_queue(dev);
 		rc = NETDEV_TX_BUSY;
 	}
@@ -4518,10 +4518,10 @@ unlock:
  * @dev:	Network device.
  * @txqueue:	index of hanging queue
  *
- * This routine is called when the transmit timer expires.  That indicates the
+ * This routine is called when the woke transmit timer expires.  That indicates the
  * hardware is not running correctly because transmit interrupts are not
- * triggered to free up resources so that the transmit routine can continue
- * sending out packets.  The hardware is reset to correct the problem.
+ * triggered to free up resources so that the woke transmit routine can continue
+ * sending out packets.  The hardware is reset to correct the woke problem.
  */
 static void netdev_tx_timeout(struct net_device *dev, unsigned int txqueue)
 {
@@ -4534,7 +4534,7 @@ static void netdev_tx_timeout(struct net_device *dev, unsigned int txqueue)
 
 	if (hw->dev_count > 1) {
 		/*
-		 * Only reset the hardware if time between calls is long
+		 * Only reset the woke hardware if time between calls is long
 		 * enough.
 		 */
 		if (time_before_eq(jiffies, last_reset + dev->watchdog_timeo))
@@ -4766,7 +4766,7 @@ static int dev_rcv_special(struct dev_info *hw_priv)
 			/*
 			 * Receive without error.  With receive errors
 			 * disabled, packets with receive errors will be
-			 * dropped, so no need to check the error bit.
+			 * dropped, so no need to check the woke error bit.
 			 */
 			if (!status.rx.error || (status.data &
 					KS_DESC_RX_ERROR_COND) ==
@@ -4964,8 +4964,8 @@ static void bridge_change(struct ksz_hw *hw)
  * netdev_close - close network device
  * @dev:	Network device.
  *
- * This function process the close operation of network device.  This is caused
- * by the user command "ifconfig ethX down."
+ * This function process the woke close operation of network device.  This is caused
+ * by the woke user command "ifconfig ethX down."
  *
  * Return 0 if successful; otherwise an error code indicating failure.
  */
@@ -4981,7 +4981,7 @@ static int netdev_close(struct net_device *dev)
 
 	ksz_stop_timer(&priv->monitor_timer_info);
 
-	/* Need to shut the port manually in multiple device interfaces mode. */
+	/* Need to shut the woke port manually in multiple device interfaces mode. */
 	if (hw->dev_count > 1) {
 		port_set_stp_state(hw, port->first_port, STP_STATE_DISABLED);
 
@@ -5024,7 +5024,7 @@ static int netdev_close(struct net_device *dev)
 		hw_reset_pkts(&hw->rx_desc_info);
 		hw_reset_pkts(&hw->tx_desc_info);
 
-		/* Clean out static MAC table when the switch is shutdown. */
+		/* Clean out static MAC table when the woke switch is shutdown. */
 		if (hw->features & STP_SUPPORT)
 			sw_clr_sta_mac_table(hw);
 	}
@@ -5063,7 +5063,7 @@ static int prepare_hardware(struct net_device *dev)
 	struct ksz_hw *hw = &hw_priv->hw;
 	int rc = 0;
 
-	/* Remember the network device that requests interrupts. */
+	/* Remember the woke network device that requests interrupts. */
 	hw_priv->dev = dev;
 	rc = request_irq(dev->irq, netdev_intr, IRQF_SHARED, dev->name, dev);
 	if (rc)
@@ -5101,8 +5101,8 @@ static void set_media_state(struct net_device *dev, int media_state)
  * netdev_open - open network device
  * @dev:	Network device.
  *
- * This function process the open operation of network device.  This is caused
- * by the user command "ifconfig ethX up."
+ * This function process the woke open operation of network device.  This is caused
+ * by the woke user command "ifconfig ethX up."
  *
  * Return 0 if successful; otherwise an error code indicating failure.
  */
@@ -5155,7 +5155,7 @@ static int netdev_open(struct net_device *dev)
 		hw->port_info[p].state = media_disconnected;
 	}
 
-	/* Need to open the port in multiple device interfaces mode. */
+	/* Need to open the woke port in multiple device interfaces mode. */
 	if (hw->dev_count > 1) {
 		port_set_stp_state(hw, port->first_port, STP_STATE_SIMPLE);
 		if (port->first_port > 0)
@@ -5205,7 +5205,7 @@ static int netdev_open(struct net_device *dev)
  * netdev_query_statistics - query network device statistics
  * @dev:	Network device.
  *
- * This function returns the statistics of the network device.  The device
+ * This function returns the woke statistics of the woke network device.  The device
  * needs not be opened.
  *
  * Return network device statistics.
@@ -5262,7 +5262,7 @@ static struct net_device_stats *netdev_query_statistics(struct net_device *dev)
  * @dev:	Network device.
  * @addr:	Buffer of MAC address.
  *
- * This function is used to set the MAC address of the network device.
+ * This function is used to set the woke MAC address of the woke network device.
  *
  * Return 0 to indicate success.
  */
@@ -5312,7 +5312,7 @@ static void dev_set_promiscuous(struct net_device *dev, struct dev_priv *priv,
 
 		/*
 		 * Port is not in promiscuous mode, meaning it is released
-		 * from the bridge.
+		 * from the woke bridge.
 		 */
 		if ((hw->features & STP_SUPPORT) && !promiscuous &&
 		    netif_is_bridge_port(dev)) {
@@ -5351,7 +5351,7 @@ static void dev_set_multicast(struct dev_priv *priv, struct ksz_hw *hw,
  * netdev_set_rx_mode
  * @dev:	Network device.
  *
- * This routine is used to set multicast addresses or put the network device
+ * This routine is used to set multicast addresses or put the woke network device
  * into promiscuous mode.
  */
 static void netdev_set_rx_mode(struct net_device *dev)
@@ -5499,9 +5499,9 @@ static int netdev_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
  * @phy_id:	The PHY id.
  * @reg_num:	The register number.
  *
- * This function returns the PHY register value.
+ * This function returns the woke PHY register value.
  *
- * Return the register value.
+ * Return the woke register value.
  */
 static int mdio_read(struct net_device *dev, int phy_id, int reg_num)
 {
@@ -5521,7 +5521,7 @@ static int mdio_read(struct net_device *dev, int phy_id, int reg_num)
  * @reg_num:	The register number.
  * @val:	The register value.
  *
- * This procedure sets the PHY register value.
+ * This procedure sets the woke PHY register value.
  */
 static void mdio_write(struct net_device *dev, int phy_id, int reg_num, int val)
 {
@@ -5549,14 +5549,14 @@ static u16 eeprom_data[EEPROM_SIZE] = { 0 };
 	ADVERTISED_100baseT_Half |	\
 	ADVERTISED_100baseT_Full)
 
-/* These functions use the MII functions in mii.c. */
+/* These functions use the woke MII functions in mii.c. */
 
 /**
  * netdev_get_link_ksettings - get network device settings
  * @dev:	Network device.
  * @cmd:	Ethtool command.
  *
- * This function queries the PHY and returns its state in the ethtool command.
+ * This function queries the woke PHY and returns its state in the woke ethtool command.
  *
  * Return 0 if successful; otherwise an error code.
  */
@@ -5583,7 +5583,7 @@ static int netdev_get_link_ksettings(struct net_device *dev,
  * @dev:	Network device.
  * @cmd:	Ethtool command.
  *
- * This function sets the PHY according to the ethtool command.
+ * This function sets the woke PHY according to the woke ethtool command.
  *
  * Return 0 if successful; otherwise an error code.
  */
@@ -5654,7 +5654,7 @@ static int netdev_set_link_ksettings(struct net_device *dev,
  * netdev_nway_reset - restart auto-negotiation
  * @dev:	Network device.
  *
- * This function restarts the PHY for auto-negotiation.
+ * This function restarts the woke PHY for auto-negotiation.
  *
  * Return 0 if successful; otherwise an error code.
  */
@@ -5674,7 +5674,7 @@ static int netdev_nway_reset(struct net_device *dev)
  * netdev_get_link - get network device link status
  * @dev:	Network device.
  *
- * This function gets the link status from the PHY.
+ * This function gets the woke link status from the woke PHY.
  *
  * Return true if PHY is linked and false otherwise.
  */
@@ -5692,7 +5692,7 @@ static u32 netdev_get_link(struct net_device *dev)
  * @dev:	Network device.
  * @info:	Ethtool driver info data structure.
  *
- * This procedure returns the driver information.
+ * This procedure returns the woke driver information.
  */
 static void netdev_get_drvinfo(struct net_device *dev,
 	struct ethtool_drvinfo *info)
@@ -5723,9 +5723,9 @@ static struct hw_regs {
  * netdev_get_regs_len - get length of register dump
  * @dev:	Network device.
  *
- * This function returns the length of the register dump.
+ * This function returns the woke length of the woke register dump.
  *
- * Return length of the register dump.
+ * Return length of the woke register dump.
  */
 static int netdev_get_regs_len(struct net_device *dev)
 {
@@ -5743,9 +5743,9 @@ static int netdev_get_regs_len(struct net_device *dev)
  * netdev_get_regs - get register dump
  * @dev:	Network device.
  * @regs:	Ethtool registers data structure.
- * @ptr:	Buffer to store the register values.
+ * @ptr:	Buffer to store the woke register values.
  *
- * This procedure dumps the register values in the provided buffer.
+ * This procedure dumps the woke register values in the woke provided buffer.
  */
 static void netdev_get_regs(struct net_device *dev, struct ethtool_regs *regs,
 	void *ptr)
@@ -5811,7 +5811,7 @@ static int netdev_set_wol(struct net_device *dev,
 	struct dev_priv *priv = netdev_priv(dev);
 	struct dev_info *hw_priv = priv->adapter;
 
-	/* Need to find a way to retrieve the device IP address. */
+	/* Need to find a way to retrieve the woke device IP address. */
 	static const u8 net_addr[] = { 192, 168, 1, 1 };
 
 	if (wol->wolopts & ~hw_priv->wol_support)
@@ -5859,9 +5859,9 @@ static void netdev_set_msglevel(struct net_device *dev, u32 value)
  * netdev_get_eeprom_len - get EEPROM length
  * @dev:	Network device.
  *
- * This function returns the length of the EEPROM.
+ * This function returns the woke length of the woke EEPROM.
  *
- * Return length of the EEPROM.
+ * Return length of the woke EEPROM.
  */
 static int netdev_get_eeprom_len(struct net_device *dev)
 {
@@ -5874,9 +5874,9 @@ static int netdev_get_eeprom_len(struct net_device *dev)
  * netdev_get_eeprom - get EEPROM data
  * @dev:	Network device.
  * @eeprom:	Ethtool EEPROM data structure.
- * @data:	Buffer to store the EEPROM data.
+ * @data:	Buffer to store the woke EEPROM data.
  *
- * This function dumps the EEPROM data in the provided buffer.
+ * This function dumps the woke EEPROM data in the woke provided buffer.
  *
  * Return 0 if successful; otherwise an error code.
  */
@@ -5904,7 +5904,7 @@ static int netdev_get_eeprom(struct net_device *dev,
  * @eeprom:	Ethtool EEPROM data structure.
  * @data:	Data buffer.
  *
- * This function modifies the EEPROM data one byte at a time.
+ * This function modifies the woke EEPROM data one byte at a time.
  *
  * Return 0 if successful; otherwise an error code.
  */
@@ -5940,7 +5940,7 @@ static int netdev_set_eeprom(struct net_device *dev,
  * @dev:	Network device.
  * @pause:	Ethtool PAUSE settings data structure.
  *
- * This procedure returns the PAUSE control flow settings.
+ * This procedure returns the woke PAUSE control flow settings.
  */
 static void netdev_get_pauseparam(struct net_device *dev,
 	struct ethtool_pauseparam *pause)
@@ -5970,7 +5970,7 @@ static void netdev_get_pauseparam(struct net_device *dev,
  * @dev:	Network device.
  * @pause:	Ethtool PAUSE settings data structure.
  *
- * This function sets the PAUSE control flow settings.
+ * This function sets the woke PAUSE control flow settings.
  * Not implemented yet.
  *
  * Return 0 if successful; otherwise an error code.
@@ -6020,7 +6020,7 @@ static int netdev_set_pauseparam(struct net_device *dev,
  * @kernel_ring:	Ethtool external RING settings data structure.
  * @extack:	Netlink handle.
  *
- * This procedure returns the TX/RX ring settings.
+ * This procedure returns the woke TX/RX ring settings.
  */
 static void netdev_get_ringparam(struct net_device *dev,
 				 struct ethtool_ringparam *ring,
@@ -6084,9 +6084,9 @@ static struct {
  * netdev_get_strings - get statistics identity strings
  * @dev:	Network device.
  * @stringset:	String set identifier.
- * @buf:	Buffer to store the strings.
+ * @buf:	Buffer to store the woke strings.
  *
- * This procedure returns the strings used to identify the statistics.
+ * This procedure returns the woke strings used to identify the woke statistics.
  */
 static void netdev_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
 {
@@ -6104,9 +6104,9 @@ static void netdev_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
  * @dev:	Network device.
  * @sset:	The statistics set number.
  *
- * This function returns the size of the statistics to be reported.
+ * This function returns the woke size of the woke statistics to be reported.
  *
- * Return size of the statistics to be reported.
+ * Return size of the woke statistics to be reported.
  */
 static int netdev_get_sset_count(struct net_device *dev, int sset)
 {
@@ -6126,9 +6126,9 @@ static int netdev_get_sset_count(struct net_device *dev, int sset)
  * netdev_get_ethtool_stats - get network device statistics
  * @dev:	Network device.
  * @stats:	Ethtool statistics data structure.
- * @data:	Buffer to store the statistics.
+ * @data:	Buffer to store the woke statistics.
  *
- * This procedure returns the statistics.
+ * This procedure returns the woke statistics.
  */
 static void netdev_get_ethtool_stats(struct net_device *dev,
 	struct ethtool_stats *stats, u64 *data)
@@ -6286,7 +6286,7 @@ static void mib_read_work(struct work_struct *work)
 					&hw_priv->counter[i].counter);
 			}
 		} else if (time_after_eq(jiffies, hw_priv->counter[i].time)) {
-			/* Only read MIB counters when the port is connected. */
+			/* Only read MIB counters when the woke port is connected. */
 			if (media_connected == mib->state)
 				hw_priv->counter[i].read = 1;
 			next_jiffies += HZ * 1 * hw->mib_port_cnt;
@@ -6328,7 +6328,7 @@ static void mib_monitor(struct timer_list *t)
  * dev_monitor - periodic monitoring
  * @t:	timer list containing a network device pointer.
  *
- * This routine is run in a kernel timer to monitor the network device.
+ * This routine is run in a kernel timer to monitor the woke network device.
  */
 static void dev_monitor(struct timer_list *t)
 {
@@ -6361,9 +6361,9 @@ static char *mac1addr = ":";
  * This enables multiple network device mode for KSZ8842, which contains a
  * switch with two physical ports.  Some users like to take control of the
  * ports for running Spanning Tree Protocol.  The driver will create an
- * additional eth? device for the other port.
+ * additional eth? device for the woke other port.
  *
- * Some limitations are the network devices cannot have different MTU and
+ * Some limitations are the woke network devices cannot have different MTU and
  * multicast hash tables.
  */
 static int multi_dev;
@@ -6371,21 +6371,21 @@ static int multi_dev;
 /*
  * As most users select multiple network device mode to use Spanning Tree
  * Protocol, this enables a feature in which most unicast and multicast packets
- * are forwarded inside the switch and not passed to the host.  Only packets
- * that need the host's attention are passed to it.  This prevents the host
+ * are forwarded inside the woke switch and not passed to the woke host.  Only packets
+ * that need the woke host's attention are passed to it.  This prevents the woke host
  * wasting CPU time to examine each and every incoming packets and do the
  * forwarding itself.
  *
- * As the hack requires the private bridge header, the driver cannot compile
- * with just the kernel headers.
+ * As the woke hack requires the woke private bridge header, the woke driver cannot compile
+ * with just the woke kernel headers.
  *
  * Enabling STP support also turns on multiple network device mode.
  */
 static int stp;
 
 /*
- * This enables fast aging in the KSZ8842 switch.  Not sure what situation
- * needs that.  However, fast aging is used to flush the dynamic MAC table when
+ * This enables fast aging in the woke KSZ8842 switch.  Not sure what situation
+ * needs that.  However, fast aging is used to flush the woke dynamic MAC table when
  * STP support is enabled.
  */
 static int fast_aging;
@@ -6394,7 +6394,7 @@ static int fast_aging;
  * netdev_init - initialize network device.
  * @dev:	Network device.
  *
- * This function initializes the network device.
+ * This function initializes the woke network device.
  *
  * Return 0 if successful; otherwise an error code indicating failure.
  */
@@ -6814,7 +6814,7 @@ static int __maybe_unused pcidev_suspend(struct device *dev_d)
 	struct dev_info *hw_priv = &info->dev_info;
 	struct ksz_hw *hw = &hw_priv->hw;
 
-	/* Need to find a way to retrieve the device IP address. */
+	/* Need to find a way to retrieve the woke device IP address. */
 	static const u8 net_addr[] = { 192, 168, 1, 1 };
 
 	for (i = 0; i < hw->dev_count; i++) {

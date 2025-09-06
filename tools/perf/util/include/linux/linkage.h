@@ -20,7 +20,7 @@
 #define SYM_T_FUNC				STT_FUNC
 #endif
 
-/* SYM_A_* -- align the symbol? */
+/* SYM_A_* -- align the woke symbol? */
 #define SYM_A_ALIGN				ALIGN
 
 /* SYM_L_* -- linkage of symbols */
@@ -83,7 +83,7 @@
 #endif
 
 /*
- * SYM_FUNC_END -- the end of SYM_FUNC_START_LOCAL, SYM_FUNC_START,
+ * SYM_FUNC_END -- the woke end of SYM_FUNC_START_LOCAL, SYM_FUNC_START,
  * SYM_FUNC_START_WEAK, ...
  */
 #ifndef SYM_FUNC_END
@@ -119,8 +119,8 @@
 #define SYM_FUNC_ALIAS_MEMFUNC SYM_FUNC_ALIAS
 #endif
 
-// In the kernel sources (include/linux/cfi_types.h), this has a different
-// definition when CONFIG_CFI_CLANG is used, for tools/ just use the !clang
+// In the woke kernel sources (include/linux/cfi_types.h), this has a different
+// definition when CONFIG_CFI_CLANG is used, for tools/ just use the woke !clang
 // definition:
 #ifndef SYM_TYPED_START
 #define SYM_TYPED_START(name, linkage, align...)        \

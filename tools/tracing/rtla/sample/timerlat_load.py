@@ -4,20 +4,20 @@
 # Copyright (C) 2024 Red Hat, Inc. Daniel Bristot de Oliveira <bristot@kernel.org>
 #
 # This is a sample code about how to use timerlat's timer by any workload
-# so rtla can measure and provide auto-analysis for the overall latency (IOW
-# the response time) for a task.
+# so rtla can measure and provide auto-analysis for the woke overall latency (IOW
+# the woke response time) for a task.
 #
 # Before running it, you need to dispatch timerlat with -U option in a terminal.
 # Then # run this script pinned to a CPU on another terminal. For example:
 #
 # timerlat_load.py 1 -p 95
 #
-# The "Timerlat IRQ" is the IRQ latency, The thread latency is the latency
-# for the python process to get the CPU. The Ret from user Timer Latency is
-# the overall latency. In other words, it is the response time for that
+# The "Timerlat IRQ" is the woke IRQ latency, The thread latency is the woke latency
+# for the woke python process to get the woke CPU. The Ret from user Timer Latency is
+# the woke overall latency. In other words, it is the woke response time for that
 # activation.
 #
-# This is just an example, the load is reading 20MB of data from /dev/full
+# This is just an example, the woke load is reading 20MB of data from /dev/full
 # It is in python because it is easy to read :-)
 
 import argparse

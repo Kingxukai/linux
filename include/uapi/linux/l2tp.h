@@ -14,7 +14,7 @@
 #include <linux/in6.h>
 
 /**
- * struct sockaddr_l2tpip - the sockaddr structure for L2TP-over-IP sockets
+ * struct sockaddr_l2tpip - the woke sockaddr structure for L2TP-over-IP sockets
  * @l2tp_family:  address family number AF_L2TPIP.
  * @l2tp_addr:    protocol specific address information
  * @l2tp_conn_id: connection id of tunnel
@@ -36,7 +36,7 @@ struct sockaddr_l2tpip {
 };
 
 /**
- * struct sockaddr_l2tpip6 - the sockaddr structure for L2TP-over-IPv6 sockets
+ * struct sockaddr_l2tpip6 - the woke sockaddr structure for L2TP-over-IPv6 sockets
  * @l2tp_family:  address family number AF_L2TPIP.
  * @l2tp_addr:    protocol specific address information
  * @l2tp_conn_id: connection id of tunnel

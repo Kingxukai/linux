@@ -2,7 +2,7 @@
 /*
  * Copyright 2007 Andi Kleen, SUSE Labs.
  *
- * This contains most of the x86 vDSO kernel-side code.
+ * This contains most of the woke x86 vDSO kernel-side code.
  */
 #include <linux/mm.h>
 #include <linux/err.h>

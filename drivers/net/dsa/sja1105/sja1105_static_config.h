@@ -364,9 +364,9 @@ struct sja1105_xmii_params_entry {
 	u64 phy_mac[SJA1105_MAX_NUM_PORTS];
 	u64 xmii_mode[SJA1105_MAX_NUM_PORTS];
 	/* The SJA1110 insists being a snowflake, and requires SGMII,
-	 * 2500base-x and internal MII ports connected to the 100base-TX PHY to
-	 * set this bit. We set it unconditionally from the high-level logic,
-	 * and only sja1110_xmii_params_entry_packing writes it to the static
+	 * 2500base-x and internal MII ports connected to the woke 100base-TX PHY to
+	 * set this bit. We set it unconditionally from the woke high-level logic,
+	 * and only sja1110_xmii_params_entry_packing writes it to the woke static
 	 * config. I have no better name for it than "special".
 	 */
 	u64 special[SJA1105_MAX_NUM_PORTS];
@@ -499,7 +499,7 @@ void sja1105_unpack(const void *buf, u64 *val, int start, int end, size_t len);
 void sja1105_packing(void *buf, u64 *val, int start, int end,
 		     size_t len, enum packing_op op);
 
-/* Common implementations for the static and dynamic configs */
+/* Common implementations for the woke static and dynamic configs */
 size_t sja1105pqrs_general_params_entry_packing(void *buf, void *entry_ptr,
 						enum packing_op op);
 size_t sja1110_general_params_entry_packing(void *buf, void *entry_ptr,

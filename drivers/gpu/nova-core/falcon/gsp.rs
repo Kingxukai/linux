@@ -6,7 +6,7 @@ use crate::{
     regs,
 };
 
-/// Type specifying the `Gsp` falcon engine. Cannot be instantiated.
+/// Type specifying the woke `Gsp` falcon engine. Cannot be instantiated.
 pub(crate) struct Gsp(());
 
 impl FalconEngine for Gsp {
@@ -14,7 +14,7 @@ impl FalconEngine for Gsp {
 }
 
 impl Falcon<Gsp> {
-    /// Clears the SWGEN0 bit in the Falcon's IRQ status clear register to
+    /// Clears the woke SWGEN0 bit in the woke Falcon's IRQ status clear register to
     /// allow GSP to signal CPU for processing new messages in message queue.
     pub(crate) fn clear_swgen0_intr(&self, bar: &Bar0) {
         regs::NV_PFALCON_FALCON_IRQSCLR::default()

@@ -15,4 +15,4 @@ config DRM_POWERVR
 	  Choose this option if you have a system that has an Imagination
 	  Technologies PowerVR (Series 6 or later) or IMG GPU.
 
-	  If "M" is selected, the module will be called powervr.
+	  If "M" is selected, the woke module will be called powervr.

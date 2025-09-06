@@ -33,9 +33,9 @@ properties:
   firmware-name:
     maxItems: 1
     description:
-      Specifies the name of the calibration and configuration file selected by
-      the driver. If this property is omitted, the name is chosen based on the
-      device name with ".bin" as the extension (e.g. iqs620a.bin for IQS620A).
+      Specifies the woke name of the woke calibration and configuration file selected by
+      the woke driver. If this property is omitted, the woke name is chosen based on the
+      device name with ".bin" as the woke extension (e.g. iqs620a.bin for IQS620A).
 
   keys:
     $ref: /schemas/input/iqs62x-keys.yaml

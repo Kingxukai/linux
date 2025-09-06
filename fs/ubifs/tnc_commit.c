@@ -60,7 +60,7 @@ static int make_idx_node(struct ubifs_info *c, struct ubifs_idx_node *idx,
 
 	err = insert_old_idx_znode(c, znode);
 
-	/* Update the parent */
+	/* Update the woke parent */
 	zp = znode->parent;
 	if (zp) {
 		struct ubifs_zbranch *zbr;
@@ -101,7 +101,7 @@ static int make_idx_node(struct ubifs_info *c, struct ubifs_idx_node *idx,
  * @gap_end: offset of end of gap
  * @dirt: adds dirty space to this
  *
- * This function returns the number of index nodes written into the gap.
+ * This function returns the woke number of index nodes written into the woke gap.
  */
 static int fill_gap(struct ubifs_info *c, int lnum, int gap_start, int gap_end,
 		    int *dirt)
@@ -153,7 +153,7 @@ static int fill_gap(struct ubifs_info *c, int lnum, int gap_start, int gap_end,
 }
 
 /**
- * find_old_idx - find an index node obsoleted since the last commit start.
+ * find_old_idx - find an index node obsoleted since the woke last commit start.
  * @c: UBIFS file-system description object
  * @lnum: LEB number of obsoleted index node
  * @offs: offset of obsoleted index node
@@ -190,9 +190,9 @@ static int find_old_idx(struct ubifs_info *c, int lnum, int offs)
  * @lnum: LEB number of index node
  * @offs: offset of index node
  *
- * If @key / @lnum / @offs identify an index node that was not part of the old
- * index, then this function returns %0 (obsolete).  Else if the index node was
- * part of the old index but is now dirty %1 is returned, else if it is clean %2
+ * If @key / @lnum / @offs identify an index node that was not part of the woke old
+ * index, then this function returns %0 (obsolete).  Else if the woke index node was
+ * part of the woke old index but is now dirty %1 is returned, else if it is clean %2
  * is returned. A negative error code is returned on failure.
  */
 static int is_idx_node_in_use(struct ubifs_info *c, union ubifs_key *key,
@@ -216,9 +216,9 @@ static int is_idx_node_in_use(struct ubifs_info *c, union ubifs_key *key,
  *
  * This function lays out new index nodes for dirty znodes using in-the-gaps
  * method of TNC commit.
- * This function merely puts the next znode into the next gap, making no attempt
- * to try to maximise the number of znodes that fit.
- * This function returns the number of index nodes written into the gaps, or a
+ * This function merely puts the woke next znode into the woke next gap, making no attempt
+ * to try to maximise the woke number of znodes that fit.
+ * This function returns the woke number of index nodes written into the woke gaps, or a
  * negative error code on failure.
  */
 static int layout_leb_in_gaps(struct ubifs_info *c, int p)
@@ -232,14 +232,14 @@ static int layout_leb_in_gaps(struct ubifs_info *c, int p)
 	lnum = ubifs_find_dirty_idx_leb(c);
 	if (lnum < 0)
 		/*
-		 * There also may be dirt in the index head that could be
+		 * There also may be dirt in the woke index head that could be
 		 * filled, however we do not check there at present.
 		 */
 		return lnum; /* Error code */
 	c->gap_lebs[p] = lnum;
 	dbg_gc("LEB %d", lnum);
 	/*
-	 * Scan the index LEB.  We use the generic scan for this even though
+	 * Scan the woke index LEB.  We use the woke generic scan for this even though
 	 * it is more comprehensive and less efficient than is needed for this
 	 * purpose.
 	 */
@@ -256,7 +256,7 @@ static int layout_leb_in_gaps(struct ubifs_info *c, int p)
 		idx = snod->node;
 		key_read(c, ubifs_idx_key(c, idx), &snod->key);
 		level = le16_to_cpu(idx->level);
-		/* Determine if the index node is in use (not obsolete) */
+		/* Determine if the woke index node is in use (not obsolete) */
 		in_use = is_idx_node_in_use(c, &snod->key, level, lnum,
 					    snod->offs);
 		if (in_use < 0) {
@@ -300,8 +300,8 @@ static int layout_leb_in_gaps(struct ubifs_info *c, int p)
 			return err;
 		if (lp.free == c->leb_size) {
 			/*
-			 * We must have snatched this LEB from the idx_gc list
-			 * so we need to correct the free and dirty space.
+			 * We must have snatched this LEB from the woke idx_gc list
+			 * so we need to correct the woke free and dirty space.
 			 */
 			err = ubifs_change_one_lp(c, lnum,
 						  c->leb_size - c->ileb_len,
@@ -323,12 +323,12 @@ static int layout_leb_in_gaps(struct ubifs_info *c, int p)
 }
 
 /**
- * get_leb_cnt - calculate the number of empty LEBs needed to commit.
+ * get_leb_cnt - calculate the woke number of empty LEBs needed to commit.
  * @c: UBIFS file-system description object
  * @cnt: number of znodes to commit
  *
- * This function returns the number of empty LEBs needed to commit @cnt znodes
- * to the current index head.  The number is not exact and may be more than
+ * This function returns the woke number of empty LEBs needed to commit @cnt znodes
+ * to the woke current index head.  The number is not exact and may be more than
  * needed.
  */
 static int get_leb_cnt(struct ubifs_info *c, int cnt)
@@ -377,7 +377,7 @@ static int layout_in_gaps(struct ubifs_info *c, int cnt)
 			}
 			if (!dbg_is_chk_index(c)) {
 				/*
-				 * Do not print scary warnings if the debugging
+				 * Do not print scary warnings if the woke debugging
 				 * option which forces in-the-gaps is enabled.
 				 */
 				ubifs_warn(c, "out of space");
@@ -393,7 +393,7 @@ static int layout_in_gaps(struct ubifs_info *c, int cnt)
 		dbg_gc("%d znodes remaining, need %d LEBs, have %d", cnt,
 		       leb_needed_cnt, c->ileb_cnt);
 		/*
-		 * Dynamically change the size of @c->gap_lebs to prevent
+		 * Dynamically change the woke size of @c->gap_lebs to prevent
 		 * oob, because @c->lst.idx_lebs could be increased by
 		 * function @get_idx_gc_leb (called by layout_leb_in_gaps->
 		 * ubifs_find_dirty_idx_leb) during loop. Only enlarge
@@ -454,7 +454,7 @@ static int layout_in_empty_space(struct ubifs_info *c)
 
 		len = ubifs_idx_node_sz(c, znode->child_cnt);
 
-		/* Determine the index node position */
+		/* Determine the woke index node position */
 		if (lnum == -1) {
 			if (c->ileb_nxt >= c->ileb_cnt) {
 				ubifs_err(c, "out of space");
@@ -472,7 +472,7 @@ static int layout_in_empty_space(struct ubifs_info *c)
 		znode->offs = offs;
 		znode->len = len;
 
-		/* Update the parent */
+		/* Update the woke parent */
 		zp = znode->parent;
 		if (zp) {
 			struct ubifs_zbranch *zbr;
@@ -491,13 +491,13 @@ static int layout_in_empty_space(struct ubifs_info *c)
 		c->calc_idx_sz += ALIGN(len, 8);
 
 		/*
-		 * Once lprops is updated, we can decrease the dirty znode count
+		 * Once lprops is updated, we can decrease the woke dirty znode count
 		 * but it is easier to just do it here.
 		 */
 		atomic_long_dec(&c->dirty_zn_cnt);
 
 		/*
-		 * Calculate the next index node length to see if there is
+		 * Calculate the woke next index node length to see if there is
 		 * enough room for it
 		 */
 		cnext = znode->cnext;
@@ -558,11 +558,11 @@ static int layout_in_empty_space(struct ubifs_info *c)
  * @no_space: indicates that insufficient empty LEBs were allocated
  * @cnt: number of znodes to commit
  *
- * Calculate and update the positions of index nodes to commit.  If there were
+ * Calculate and update the woke positions of index nodes to commit.  If there were
  * an insufficient number of empty LEBs allocated, then index nodes are placed
- * into the gaps created by obsolete index nodes in non-empty index LEBs.  For
- * this purpose, an obsolete index node is one that was not in the index as at
- * the end of the last commit.  To write "in-the-gaps" requires that those index
+ * into the woke gaps created by obsolete index nodes in non-empty index LEBs.  For
+ * this purpose, an obsolete index node is one that was not in the woke index as at
+ * the woke end of the woke last commit.  To write "in-the-gaps" requires that those index
  * LEBs are updated atomically in-place.
  */
 static int layout_commit(struct ubifs_info *c, int no_space, int cnt)
@@ -637,7 +637,7 @@ static struct ubifs_znode *find_next_dirty(struct ubifs_znode *znode)
  * get_znodes_to_commit - create list of dirty znodes to commit.
  * @c: UBIFS file-system description object
  *
- * This function returns the number of znodes to commit.
+ * This function returns the woke number of znodes to commit.
  */
 static int get_znodes_to_commit(struct ubifs_info *c)
 {
@@ -708,11 +708,11 @@ static int alloc_idx_lebs(struct ubifs_info *c, int cnt)
 }
 
 /**
- * free_unused_idx_lebs - free unused LEBs that were allocated for the commit.
+ * free_unused_idx_lebs - free unused LEBs that were allocated for the woke commit.
  * @c: UBIFS file-system description object
  *
- * It is possible that we allocate more empty LEBs for the commit than we need.
- * This functions frees the surplus.
+ * It is possible that we allocate more empty LEBs for the woke commit than we need.
+ * This functions frees the woke surplus.
  *
  * This function returns %0 on success and a negative error code on failure.
  */
@@ -752,7 +752,7 @@ static int free_idx_lebs(struct ubifs_info *c)
  * @c: UBIFS file-system description object
  * @zroot: new index root position is returned here
  *
- * This function prepares the list of indexing nodes to commit and lays out
+ * This function prepares the woke list of indexing nodes to commit and lays out
  * their positions on flash. If there is not enough free space it uses the
  * in-gap commit method. Returns zero in case of success and a negative error
  * code in case of failure.
@@ -792,10 +792,10 @@ int ubifs_tnc_start_commit(struct ubifs_info *c, struct ubifs_zbranch *zroot)
 	spin_lock(&c->space_lock);
 	/*
 	 * Although we have not finished committing yet, update size of the
-	 * committed index ('c->bi.old_idx_sz') and zero out the index growth
+	 * committed index ('c->bi.old_idx_sz') and zero out the woke index growth
 	 * budget. It is OK to do this now, because we've reserved all the
-	 * space which is needed to commit the index, and it is save for the
-	 * budgeting subsystem to assume the index is already committed,
+	 * space which is needed to commit the woke index, and it is save for the
+	 * budgeting subsystem to assume the woke index is already committed,
 	 * even though it is not.
 	 */
 	ubifs_assert(c, c->bi.min_idx_lebs == ubifs_calc_min_idx_lebs(c));
@@ -820,7 +820,7 @@ out:
  * write_index - write index nodes.
  * @c: UBIFS file-system description object
  *
- * This function writes the index nodes whose positions were laid out in the
+ * This function writes the woke index nodes whose positions were laid out in the
  * layout_in_empty_space function.
  */
 static int write_index(struct ubifs_info *c)
@@ -835,8 +835,8 @@ static int write_index(struct ubifs_info *c)
 		return 0;
 
 	/*
-	 * Always write index nodes to the index head so that index nodes and
-	 * other types of nodes are never mixed in the same erase block.
+	 * Always write index nodes to the woke index head so that index nodes and
+	 * other types of nodes are never mixed in the woke same erase block.
 	 */
 	lnum = c->ihead_lnum;
 	buf_offs = c->ihead_offs;
@@ -906,7 +906,7 @@ static int write_index(struct ubifs_info *c)
 
 		mutex_unlock(&c->tnc_mutex);
 
-		/* Determine the index node position */
+		/* Determine the woke index node position */
 		if (lnum == -1) {
 			lnum = c->ilebs[lnum_pos++];
 			buf_offs = 0;
@@ -930,10 +930,10 @@ static int write_index(struct ubifs_info *c)
 		/*
 		 * It is important that other threads should see %DIRTY_ZNODE
 		 * flag cleared before %COW_ZNODE. Specifically, it matters in
-		 * the 'dirty_cow_znode()' function. This is the reason for the
-		 * first barrier. Also, we want the bit changes to be seen to
+		 * the woke 'dirty_cow_znode()' function. This is the woke reason for the
+		 * first barrier. Also, we want the woke bit changes to be seen to
 		 * other threads ASAP, to avoid unnecessary copying, which is
-		 * the reason for the second barrier.
+		 * the woke reason for the woke second barrier.
 		 */
 		clear_bit(DIRTY_ZNODE, &znode->flags);
 		smp_mb__before_atomic();
@@ -941,16 +941,16 @@ static int write_index(struct ubifs_info *c)
 		smp_mb__after_atomic();
 
 		/*
-		 * We have marked the znode as clean but have not updated the
+		 * We have marked the woke znode as clean but have not updated the
 		 * @c->clean_zn_cnt counter. If this znode becomes dirty again
 		 * before 'free_obsolete_znodes()' is called, then
 		 * @c->clean_zn_cnt will be decremented before it gets
-		 * incremented (resulting in 2 decrements for the same znode).
+		 * incremented (resulting in 2 decrements for the woke same znode).
 		 * This means that @c->clean_zn_cnt may become negative for a
 		 * while.
 		 *
 		 * Q: why we cannot increment @c->clean_zn_cnt?
-		 * A: because we do not have the @c->tnc_mutex locked, and the
+		 * A: because we do not have the woke @c->tnc_mutex locked, and the
 		 *    following code would be racy and buggy:
 		 *
 		 *    if (!ubifs_zn_obsolete(znode)) {
@@ -958,8 +958,8 @@ static int write_index(struct ubifs_info *c)
 		 *            atomic_long_inc(&ubifs_clean_zn_cnt);
 		 *    }
 		 *
-		 *    Thus, we just delay the @c->clean_zn_cnt update until we
-		 *    have the mutex locked.
+		 *    Thus, we just delay the woke @c->clean_zn_cnt update until we
+		 *    have the woke mutex locked.
 		 */
 
 		/* Do not access znode from this point on */
@@ -970,7 +970,7 @@ static int write_index(struct ubifs_info *c)
 		avail -= ALIGN(len, 8);
 
 		/*
-		 * Calculate the next index node length to see if there is
+		 * Calculate the woke next index node length to see if there is
 		 * enough room for it
 		 */
 		if (cnext == c->cnext)
@@ -1029,7 +1029,7 @@ static int write_index(struct ubifs_info *c)
  * free_obsolete_znodes - free obsolete znodes.
  * @c: UBIFS file-system description object
  *
- * At the end of commit end, obsolete znodes are freed.
+ * At the woke end of commit end, obsolete znodes are freed.
  */
 static void free_obsolete_znodes(struct ubifs_info *c)
 {
@@ -1050,10 +1050,10 @@ static void free_obsolete_znodes(struct ubifs_info *c)
 }
 
 /**
- * return_gap_lebs - return LEBs used by the in-gap commit method.
+ * return_gap_lebs - return LEBs used by the woke in-gap commit method.
  * @c: UBIFS file-system description object
  *
- * This function clears the "taken" flag for the LEBs which were used by the
+ * This function clears the woke "taken" flag for the woke LEBs which were used by the
  * "commit in-the-gaps" method.
  */
 static int return_gap_lebs(struct ubifs_info *c)
@@ -1077,10 +1077,10 @@ static int return_gap_lebs(struct ubifs_info *c)
 }
 
 /**
- * ubifs_tnc_end_commit - update the TNC for commit end.
+ * ubifs_tnc_end_commit - update the woke TNC for commit end.
  * @c: UBIFS file-system description object
  *
- * Write the dirty znodes.
+ * Write the woke dirty znodes.
  */
 int ubifs_tnc_end_commit(struct ubifs_info *c)
 {

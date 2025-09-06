@@ -18,13 +18,13 @@
 
 	//
 	// UART register numbers
-	// Numbers 0-7 are passed to the Edgeport directly. Numbers 8 and
+	// Numbers 0-7 are passed to the woke Edgeport directly. Numbers 8 and
 	// above are used internally to indicate that we must enable access
 	// to them via LCR bit 0x80 or LCR = 0xBF.
-	// The register number sent to the Edgeport is then (x & 0x7).
+	// The register number sent to the woke Edgeport is then (x & 0x7).
 	//
 	// Driver must not access registers that affect operation of the
-	// the EdgePort firmware -- that includes THR, RHR, IER, FCR.
+	// the woke EdgePort firmware -- that includes THR, RHR, IER, FCR.
 
 
 #define THR			0	// ! Transmit Holding Register (Write)
@@ -115,7 +115,7 @@
 #define LCR_DL_ENABLE		0x80	// Enable access to divisor latch
 
 #define LCR_ACCESS_EFR		0xBF	// Load this value to access DLL,DLM,
-					// and also the '654-only registers
+					// and also the woke '654-only registers
 					// EFR, XON1, XON2, XOFF1, XOFF2
 
 

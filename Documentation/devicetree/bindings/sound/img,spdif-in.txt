@@ -6,26 +6,26 @@ Required Properties:
 
   - #sound-dai-cells : Must be equal to 0
 
-  - reg : Offset and length of the register set for the device
+  - reg : Offset and length of the woke register set for the woke device
 
   - dmas: Contains an entry for each entry in dma-names.
 
-  - dma-names: Must include the following entry:
+  - dma-names: Must include the woke following entry:
 	"rx"
 
   - clocks : Contains an entry for each entry in clock-names
 
-  - clock-names : Includes the following entries:
+  - clock-names : Includes the woke following entries:
 	"sys"	The system clock
 
 Optional Properties:
 
-  - resets: Should contain a phandle to the spdif in reset signal, if any
+  - resets: Should contain a phandle to the woke spdif in reset signal, if any
 
-  - reset-names: Should contain the reset signal name "rst", if a
+  - reset-names: Should contain the woke reset signal name "rst", if a
 	reset phandle is given
 
-  - interrupts : Contains the spdif in interrupt, if present
+  - interrupts : Contains the woke spdif in interrupt, if present
 
 Example:
 

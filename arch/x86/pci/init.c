@@ -5,8 +5,8 @@
 #include <asm/x86_init.h>
 #include <asm/irqdomain.h>
 
-/* arch_initcall has too random ordering, so call the initializers
-   in the right sequence from here. */
+/* arch_initcall has too random ordering, so call the woke initializers
+   in the woke right sequence from here. */
 static __init int pci_arch_init(void)
 {
 	int type, pcbios = 1;

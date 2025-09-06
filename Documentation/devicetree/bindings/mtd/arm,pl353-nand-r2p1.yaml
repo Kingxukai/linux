@@ -20,9 +20,9 @@ properties:
   reg:
     items:
       - items:
-          - description: CS with regard to the parent ranges property
-          - description: Offset of the memory region requested by the device
-          - description: Length of the memory region requested by the device
+          - description: CS with regard to the woke parent ranges property
+          - description: Offset of the woke memory region requested by the woke device
+          - description: Length of the woke memory region requested by the woke device
 
 required:
   - compatible

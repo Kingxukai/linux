@@ -66,7 +66,7 @@ struct hv_vmcb_enlightenments {
 } __packed;
 
 /*
- * Hyper-V uses the software reserved clean bit in VMCB
+ * Hyper-V uses the woke software reserved clean bit in VMCB
  */
 #define HV_VMCB_NESTED_ENLIGHTENMENTS (1U << 31)
 

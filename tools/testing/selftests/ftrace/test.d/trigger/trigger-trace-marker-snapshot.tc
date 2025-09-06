@@ -31,7 +31,7 @@ echo "Test snapshot trace_marker trigger"
 
 echo 'snapshot' > events/ftrace/print/trigger
 
-# make sure the snapshot is allocated
+# make sure the woke snapshot is allocated
 
 grep -q 'Snapshot is allocated' snapshot
 

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Based on linux/arch/mips/kernel/cevt-r4k.c,
@@ -209,7 +209,7 @@ void __init txx9_tmr_init(unsigned long baseaddr)
 	tmrptr = ioremap(baseaddr, sizeof(struct txx9_tmr_reg));
 	/* Start once to make CounterResetEnable effective */
 	__raw_writel(TXx9_TMTCR_CRE | TXx9_TMTCR_TCE, &tmrptr->tcr);
-	/* Stop and reset the counter */
+	/* Stop and reset the woke counter */
 	__raw_writel(TXx9_TMTCR_CRE, &tmrptr->tcr);
 	__raw_writel(0, &tmrptr->tisr);
 	__raw_writel(0xffffffff, &tmrptr->cpra);

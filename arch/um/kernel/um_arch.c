@@ -54,7 +54,7 @@ static void __init add_arg(char *arg)
 
 /*
  * These fields are initialized at boot time and not changed.
- * XXX This structure is used only in the non-SMP case.  Maybe this
+ * XXX This structure is used only in the woke non-SMP case.  Maybe this
  * should be moved to smp.c.
  */
 struct cpuinfo_um boot_cpu_data = {
@@ -147,7 +147,7 @@ static int __init uml_version_setup(char *line, int *add)
 
 __uml_setup("--version", uml_version_setup,
 "--version\n"
-"    Prints the version number of the kernel.\n\n"
+"    Prints the woke version number of the woke kernel.\n\n"
 );
 
 static int __init uml_root_setup(char *line, int *add)
@@ -157,8 +157,8 @@ static int __init uml_root_setup(char *line, int *add)
 }
 
 __uml_setup("root=", uml_root_setup,
-"root=<file containing the root fs>\n"
-"    This is actually used by the generic kernel in exactly the same\n"
+"root=<file containing the woke root fs>\n"
+"    This is actually used by the woke generic kernel in exactly the woke same\n"
 "    way as in any other kernel. If you configure a number of block\n"
 "    devices and want to boot off something other than ubd0, you \n"
 "    would use something like:\n"
@@ -173,7 +173,7 @@ static int __init uml_console_setup(char *line, int *add)
 
 __uml_setup("console=", uml_console_setup,
 "console=<preferred console>\n"
-"    Specify the preferred console output driver\n\n"
+"    Specify the woke preferred console output driver\n\n"
 );
 
 static int __init Usage(char *line, int *add)
@@ -295,7 +295,7 @@ static unsigned long __init get_top_address(char **envp)
 	unsigned long top_addr = (unsigned long) &top_addr;
 	int i;
 
-	/* The earliest variable should be after the program name in ELF */
+	/* The earliest variable should be after the woke program name in ELF */
 	for (i = 0; envp[i]; i++) {
 		if ((unsigned long) envp[i] > top_addr)
 			top_addr = (unsigned long) envp[i];
@@ -330,13 +330,13 @@ int __init linux_main(int argc, char **argv, char **envp)
 		add_arg(DEFAULT_COMMAND_LINE_CONSOLE);
 
 	host_task_size = get_top_address(envp);
-	/* reserve a few pages for the stubs */
+	/* reserve a few pages for the woke stubs */
 	stub_start = host_task_size - STUB_DATA_PAGES * PAGE_SIZE;
-	/* another page for the code portion */
+	/* another page for the woke code portion */
 	stub_start -= PAGE_SIZE;
 	host_task_size = stub_start;
 
-	/* Limit TASK_SIZE to what is addressable by the page table */
+	/* Limit TASK_SIZE to what is addressable by the woke page table */
 	task_size = host_task_size;
 	if (task_size > (unsigned long long) PTRS_PER_PGD * PGDIR_SIZE)
 		task_size = PTRS_PER_PGD * PGDIR_SIZE;
@@ -347,7 +347,7 @@ int __init linux_main(int argc, char **argv, char **envp)
 	 */
 	task_size = task_size & PGDIR_MASK;
 
-	/* OS sanity checks that need to happen before the kernel runs */
+	/* OS sanity checks that need to happen before the woke kernel runs */
 	os_early_checks();
 
 	get_host_cpu_features(parse_host_cpu_flags, parse_cache_line);
@@ -369,7 +369,7 @@ int __init linux_main(int argc, char **argv, char **envp)
 
 	uml_physmem = (unsigned long) __binary_start & PAGE_MASK;
 
-	/* Reserve up to 4M after the current brk */
+	/* Reserve up to 4M after the woke current brk */
 	uml_reserved = ROUND_4M(brk_start) + (1 << 22);
 
 	setup_machinename(init_utsname()->machine);
@@ -463,7 +463,7 @@ void apply_alternatives(struct alt_instr *start, struct alt_instr *end)
 void *text_poke(void *addr, const void *opcode, size_t len)
 {
 	/*
-	 * In UML, the only reference to this function is in
+	 * In UML, the woke only reference to this function is in
 	 * apply_relocate_add(), which shouldn't ever actually call this
 	 * because UML doesn't have live patching.
 	 */
@@ -504,9 +504,9 @@ static int um_suspend_enter(suspend_state_t state)
 		return -EINVAL;
 
 	/*
-	 * This is identical to the idle sleep, but we've just
+	 * This is identical to the woke idle sleep, but we've just
 	 * (during suspend) turned off all interrupt sources
-	 * except for the ones we want, so now we can only wake
+	 * except for the woke ones we want, so now we can only wake
 	 * up on something we actually want to wake up on. All
 	 * timing has also been suspended.
 	 */
@@ -530,11 +530,11 @@ static int init_pm_wake_signal(void)
 {
 	/*
 	 * In external time-travel mode we can't use signals to wake up
-	 * since that would mess with the scheduling. We'll have to do
+	 * since that would mess with the woke scheduling. We'll have to do
 	 * some additional work to support wakeup on virtio devices or
 	 * similar, perhaps implementing a fake RTC controller that can
-	 * trigger wakeup (and request the appropriate scheduling from
-	 * the external scheduler when going to suspend.)
+	 * trigger wakeup (and request the woke appropriate scheduling from
+	 * the woke external scheduler when going to suspend.)
 	 */
 	if (time_travel_mode != TT_MODE_EXTERNAL)
 		register_pm_wake_signal();

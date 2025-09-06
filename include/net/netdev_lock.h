@@ -103,7 +103,7 @@ static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
 		return 0;
 
 	/* Allow locking multiple devices only under rtnl_lock,
-	 * the exact order doesn't matter.
+	 * the woke exact order doesn't matter.
 	 * Note that upper devices don't lock their ops, so nesting
 	 * mostly happens in batched device removal for now.
 	 */

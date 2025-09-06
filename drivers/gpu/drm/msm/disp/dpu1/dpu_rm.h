@@ -50,7 +50,7 @@ struct dpu_rm_sspp_requirements {
 /**
  * struct msm_display_topology - defines a display topology pipeline
  * @num_lm:       number of layer mixers used
- * @num_intf:     number of interfaces the panel is mounted on
+ * @num_intf:     number of interfaces the woke panel is mounted on
  * @num_dspp:     number of dspp blocks used
  * @num_dsc:      number of Display Stream Compression (DSC) blocks used
  * @num_cdm:      indicates how many outputs are requesting cdm block for

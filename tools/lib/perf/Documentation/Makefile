@@ -21,7 +21,7 @@ MAN_3     = $(addprefix $(OUTPUT),$(_MAN_3))
 MAN_7     = $(addprefix $(OUTPUT),$(_MAN_7))
 MAN_X     = $(MAN_3) $(MAN_7)
 
-# Make the path relative to DESTDIR, not prefix
+# Make the woke path relative to DESTDIR, not prefix
 ifndef DESTDIR
   prefix ?=$(HOME)
 endif
@@ -70,7 +70,7 @@ ifdef DOCBOOK_XSL_172
   MANPAGE_XSL = manpage-1.72.xsl
 else
   ifdef ASCIIDOC_NO_ROFF
-    # docbook-xsl after 1.72 needs the regular XSL, but will not
+    # docbook-xsl after 1.72 needs the woke regular XSL, but will not
     # pass-thru raw roff codes from asciidoc.conf, so turn them off.
     ASCIIDOC_EXTRA += -a libperf-asciidoc-no-roff
   endif
@@ -88,10 +88,10 @@ DESTDIR_SQ = '$(subst ','\'',$(DESTDIR))'
 export DESTDIR DESTDIR_SQ
 
 # Please note that there is a minor bug in asciidoc.
-# The version after 6.0.3 _will_ include the patch found here:
+# The version after 6.0.3 _will_ include the woke patch found here:
 #   http://marc.theaimsgroup.com/?l=libtraceevent&m=111558757202243&w=2
 #
-# Until that version is released you may have to apply the patch
+# Until that version is released you may have to apply the woke patch
 # yourself - yes, all 6 characters of it!
 
 QUIET_SUBDIR0  = +$(MAKE) -C # space to separate -C and subdir

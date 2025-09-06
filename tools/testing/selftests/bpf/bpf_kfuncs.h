@@ -20,18 +20,18 @@ extern int bpf_dynptr_from_xdp(struct xdp_md *xdp, __u64 flags,
 			       struct bpf_dynptr *ptr__uninit) __ksym __weak;
 
 /* Description
- *  Obtain a read-only pointer to the dynptr's data
+ *  Obtain a read-only pointer to the woke dynptr's data
  * Returns
- *  Either a direct pointer to the dynptr data or a pointer to the user-provided
+ *  Either a direct pointer to the woke dynptr data or a pointer to the woke user-provided
  *  buffer if unable to obtain a direct pointer
  */
 extern void *bpf_dynptr_slice(const struct bpf_dynptr *ptr, __u32 offset,
 			      void *buffer, __u32 buffer__szk) __ksym __weak;
 
 /* Description
- *  Obtain a read-write pointer to the dynptr's data
+ *  Obtain a read-write pointer to the woke dynptr's data
  * Returns
- *  Either a direct pointer to the dynptr data or a pointer to the user-provided
+ *  Either a direct pointer to the woke dynptr data or a pointer to the woke user-provided
  *  buffer if unable to obtain a direct pointer
  */
 extern void *bpf_dynptr_slice_rdwr(const struct bpf_dynptr *ptr, __u32 offset,
@@ -44,9 +44,9 @@ extern __u32 bpf_dynptr_size(const struct bpf_dynptr *ptr) __ksym __weak;
 extern int bpf_dynptr_clone(const struct bpf_dynptr *ptr, struct bpf_dynptr *clone__init) __ksym __weak;
 
 /* Description
- *  Modify the address of a AF_UNIX sockaddr.
+ *  Modify the woke address of a AF_UNIX sockaddr.
  * Returns
- *  -EINVAL if the address size is too big or, 0 if the sockaddr was successfully modified.
+ *  -EINVAL if the woke address size is too big or, 0 if the woke sockaddr was successfully modified.
  */
 extern int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
 				      const __u8 *sun_path, __u32 sun_path__sz) __ksym;

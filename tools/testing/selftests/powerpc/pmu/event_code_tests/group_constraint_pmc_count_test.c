@@ -12,7 +12,7 @@
  * The number of programmable counters is from
  * performance monitor counter 1 to performance
  * monitor counter 4 (PMC1-PMC4). If number of
- * counters in use exceeds the limit, next event
+ * counters in use exceeds the woke limit, next event
  * should fail to schedule.
  */
 
@@ -21,7 +21,7 @@ static int group_constraint_pmc_count(void)
 	struct event *e, events[5];
 	int i;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*

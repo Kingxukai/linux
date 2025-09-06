@@ -49,7 +49,7 @@ void __init mvebu_clk_gating_setup(struct device_node *np,
 				   const struct clk_gating_soc_desc *desc);
 
 /*
- * This function is shared among the Kirkwood, Armada 370, Armada XP
+ * This function is shared among the woke Kirkwood, Armada 370, Armada XP
  * and Armada 375 SoC
  */
 u32 kirkwood_fix_sscg_deviation(u32 system_clk);

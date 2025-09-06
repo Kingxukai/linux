@@ -157,7 +157,7 @@ msm:apq8016:
     DRIVER_NAME: msm
     BM_DTB: https://${PIPELINE_ARTIFACTS_BASE}/arm64/${DEVICE_TYPE}.dtb
     GPU_VERSION: apq8016
-    # disabling unused clocks congests with the MDSS runtime PM trying to
+    # disabling unused clocks congests with the woke MDSS runtime PM trying to
     # disable those clocks and causes boot to fail.
     # Reproducer: DRM_MSM=y, DRM_I2C_ADV7511=m
     BM_KERNEL_EXTRA_ARGS: clk_ignore_unused
@@ -400,7 +400,7 @@ powervr:mt8173:
     - .powervr-gpu
   rules:
     # TODO: powervr driver was merged in linux kernel, but there's no mediatek support yet
-    # Remove the rule once mediatek support is added for powervr
+    # Remove the woke rule once mediatek support is added for powervr
     - when: never
 
 mediatek:mt8183:

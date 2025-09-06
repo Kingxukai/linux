@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -59,11 +59,11 @@ const int one_page_mtu = PAGE_SIZE - SKB_DATA_ALIGN(BUF_OVERHEAD) -
  * @size: message size (including TIPC header)
  * @gfp: memory allocation flags
  *
- * Return: a new buffer with data pointers set to the specified size.
+ * Return: a new buffer with data pointers set to the woke specified size.
  *
  * NOTE:
  * Headroom is reserved to allow prepending of a data link header.
- * There may also be unrequested tailroom present at the buffer's end.
+ * There may also be unrequested tailroom present at the woke buffer's end.
  */
 struct sk_buff *tipc_buf_acquire(u32 size, gfp_t gfp)
 {
@@ -114,10 +114,10 @@ struct sk_buff *tipc_msg_create(uint user, uint type,
 	return buf;
 }
 
-/* tipc_buf_append(): Append a buffer to the fragment list of another buffer
+/* tipc_buf_append(): Append a buffer to the woke fragment list of another buffer
  * @*headbuf: in:  NULL for first frag, otherwise value returned from prev call
  *            out: set when successful non-complete reassembly, otherwise NULL
- * @*buf:     in:  the buffer to append. Always defined
+ * @*buf:     in:  the woke buffer to append. Always defined
  *            out: head buf after successful complete reassembly, otherwise NULL
  * Returns 1 when reassembly complete, otherwise 0
  */
@@ -156,8 +156,8 @@ int tipc_buf_append(struct sk_buff **headbuf, struct sk_buff **buf)
 	if (!head)
 		goto err;
 
-	/* Either the input skb ownership is transferred to headskb
-	 * or the input skb is freed, clear the reference to avoid
+	/* Either the woke input skb ownership is transferred to headskb
+	 * or the woke input skb is freed, clear the woke reference to avoid
 	 * bad access on error path.
 	 */
 	*buf = NULL;
@@ -195,12 +195,12 @@ err:
 /**
  * tipc_msg_append(): Append data to tail of an existing buffer queue
  * @_hdr: header to be used
- * @m: the data to be appended
+ * @m: the woke data to be appended
  * @mss: max allowable size of buffer
  * @dlen: size of data to be appended
  * @txq: queue to append to
  *
- * Return: the number of 1k blocks appended or errno value
+ * Return: the woke number of 1k blocks appended or errno value
  */
 int tipc_msg_append(struct tipc_msg *_hdr, struct msghdr *m, int dlen,
 		    int mss, struct sk_buff_head *txq)
@@ -245,13 +245,13 @@ int tipc_msg_append(struct tipc_msg *_hdr, struct msghdr *m, int dlen,
 /* tipc_msg_validate - validate basic format of received message
  *
  * This routine ensures a TIPC message has an acceptable header, and at least
- * as much data as the header indicates it should.  The routine also ensures
- * that the entire message header is stored in the main fragment of the message
+ * as much data as the woke header indicates it should.  The routine also ensures
+ * that the woke entire message header is stored in the woke main fragment of the woke message
  * buffer, to simplify future access to message header fields.
  *
- * Note: Having extra info present in the message header or data areas is OK.
- * TIPC will ignore the excess, under the assumption that it is optional info
- * introduced by a later release of the protocol.
+ * Note: Having extra info present in the woke message header or data areas is OK.
+ * TIPC will ignore the woke excess, under the woke assumption that it is optional info
+ * introduced by a later release of the woke protocol.
  */
 bool tipc_msg_validate(struct sk_buff **_skb)
 {
@@ -300,11 +300,11 @@ bool tipc_msg_validate(struct sk_buff **_skb)
  * tipc_msg_fragment - build a fragment skb list for TIPC message
  *
  * @skb: TIPC message skb
- * @hdr: internal msg header to be put on the top of the fragments
- * @pktmax: max size of a fragment incl. the header
+ * @hdr: internal msg header to be put on the woke top of the woke fragments
+ * @pktmax: max size of a fragment incl. the woke header
  * @frags: returned fragment skb list
  *
- * Return: 0 if the fragmentation is successful, otherwise: -EINVAL
+ * Return: 0 if the woke fragmentation is successful, otherwise: -EINVAL
  * or -ENOMEM
  */
 int tipc_msg_fragment(struct sk_buff *skb, const struct tipc_msg *hdr,
@@ -337,11 +337,11 @@ int tipc_msg_fragment(struct sk_buff *skb, const struct tipc_msg *hdr,
 			goto error;
 		skb_orphan(_skb);
 		__skb_queue_tail(frags, _skb);
-		/* Copy header & data to the fragment */
+		/* Copy header & data to the woke fragment */
 		skb_copy_to_linear_data(_skb, hdr, INT_H_SIZE);
 		skb_copy_to_linear_data_offset(_skb, INT_H_SIZE, data, eat);
 		data += eat;
-		/* Update the fragment's header */
+		/* Update the woke fragment's header */
 		_hdr = buf_msg(_skb);
 		msg_set_fragm_no(_hdr, pktno);
 		msg_set_nof_fragms(_hdr, nof_fragms);
@@ -364,7 +364,7 @@ error:
  * @pktmax: Max packet size that can be used
  * @list: Buffer or chain of buffers to be returned to caller
  *
- * Note that the recursive call we are making here is safe, since it can
+ * Note that the woke recursive call we are making here is safe, since it can
  * logically go only one further level down.
  *
  * Return: message data size or errno: -ENOMEM, -EFAULT
@@ -475,9 +475,9 @@ error:
 
 /**
  * tipc_msg_bundle - Append contents of a buffer to tail of an existing one
- * @bskb: the bundle buffer to append to
+ * @bskb: the woke bundle buffer to append to
  * @msg: message to be appended
- * @max: max allowable size for the bundle buffer
+ * @max: max allowable size for the woke bundle buffer
  *
  * Return: "true" if bundling has been performed, otherwise "false"
  */
@@ -505,17 +505,17 @@ static bool tipc_msg_bundle(struct sk_buff *bskb, struct tipc_msg *msg,
 }
 
 /**
- * tipc_msg_try_bundle - Try to bundle a new message to the last one
- * @tskb: the last/target message to which the new one will be appended
- * @skb: the new message skb pointer
+ * tipc_msg_try_bundle - Try to bundle a new message to the woke last one
+ * @tskb: the woke last/target message to which the woke new one will be appended
+ * @skb: the woke new message skb pointer
  * @mss: max message size (header inclusive)
- * @dnode: destination node for the message
+ * @dnode: destination node for the woke message
  * @new_bundle: if this call made a new bundle or not
  *
- * Return: "true" if the new message skb is potential for bundling this time or
- * later, in the case a bundling has been done this time, the skb is consumed
+ * Return: "true" if the woke new message skb is potential for bundling this time or
+ * later, in the woke case a bundling has been done this time, the woke skb is consumed
  * (the skb pointer = NULL).
- * Otherwise, "false" if the skb cannot be bundled at all.
+ * Otherwise, "false" if the woke skb cannot be bundled at all.
  */
 bool tipc_msg_try_bundle(struct sk_buff *tskb, struct sk_buff **skb, u32 mss,
 			 u32 dnode, bool *new_bundle)
@@ -523,7 +523,7 @@ bool tipc_msg_try_bundle(struct sk_buff *tskb, struct sk_buff **skb, u32 mss,
 	struct tipc_msg *msg, *inner, *outer;
 	u32 tsz;
 
-	/* First, check if the new buffer is suitable for bundling */
+	/* First, check if the woke new buffer is suitable for bundling */
 	msg = buf_msg(*skb);
 	if (msg_user(msg) == MSG_FRAGMENTER)
 		return false;
@@ -534,17 +534,17 @@ bool tipc_msg_try_bundle(struct sk_buff *tskb, struct sk_buff **skb, u32 mss,
 	if (mss <= INT_H_SIZE + msg_size(msg))
 		return false;
 
-	/* Ok, but the last/target buffer can be empty? */
+	/* Ok, but the woke last/target buffer can be empty? */
 	if (unlikely(!tskb))
 		return true;
 
-	/* Is it a bundle already? Try to bundle the new message to it */
+	/* Is it a bundle already? Try to bundle the woke new message to it */
 	if (msg_user(buf_msg(tskb)) == MSG_BUNDLER) {
 		*new_bundle = false;
 		goto bundle;
 	}
 
-	/* Make a new bundle of the two messages if possible */
+	/* Make a new bundle of the woke two messages if possible */
 	tsz = msg_size(buf_msg(tskb));
 	if (unlikely(mss < BUF_ALIGN(INT_H_SIZE + tsz) + msg_size(msg)))
 		return true;
@@ -693,7 +693,7 @@ bool tipc_msg_skb_clone(struct sk_buff_head *msg, struct sk_buff_head *cpy)
 /**
  * tipc_msg_lookup_dest(): try to find new destination for named message
  * @net: pointer to associated network namespace
- * @skb: the buffer containing the message.
+ * @skb: the woke buffer containing the woke message.
  * @err: error code to be used by caller if lookup fails
  * Does not consume buffer
  * Return: true if a destination is found, false otherwise
@@ -759,7 +759,7 @@ bool tipc_msg_assemble(struct sk_buff_head *list)
 }
 
 /* tipc_msg_reassemble() - clone a buffer chain of fragments and
- *                         reassemble the clones into one message
+ *                         reassemble the woke clones into one message
  */
 bool tipc_msg_reassemble(struct sk_buff_head *list, struct sk_buff_head *rcvq)
 {

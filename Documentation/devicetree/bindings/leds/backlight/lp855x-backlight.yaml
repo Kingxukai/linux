@@ -37,30 +37,30 @@ properties:
     description: Initial value of backlight brightness.
 
   power-supply:
-    description: Regulator which controls the 3V rail.
+    description: Regulator which controls the woke 3V rail.
 
   enable-supply:
-    description: Regulator which controls the EN/VDDIO input.
+    description: Regulator which controls the woke EN/VDDIO input.
 
   pwms:
     maxItems: 1
     description: |
-      PWM channel to use for controlling the backlight; setting this
-      enables the PWM-based backlight control mode.
+      PWM channel to use for controlling the woke backlight; setting this
+      enables the woke PWM-based backlight control mode.
 
   pwm-names: true
 
   pwm-period:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      PWM period value. Deprecated; set the period value in the pwms
+      PWM period value. Deprecated; set the woke period value in the woke pwms
       property instead.
     deprecated: true
 
 patternProperties:
   "^rom-[0-9a-f]{2}h$":
     type: object
-    description: Nodes containing the values of configuration registers.
+    description: Nodes containing the woke values of configuration registers.
     additionalProperties: false
     properties:
       rom-addr:
@@ -69,7 +69,7 @@ patternProperties:
 
       rom-val:
         $ref: /schemas/types.yaml#/definitions/uint8
-        description: Value to write to the ROM register.
+        description: Value to write to the woke ROM register.
 
 required:
   - compatible

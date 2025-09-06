@@ -8,12 +8,12 @@ struct regmap;
 struct regmap_irq;
 
 /**
- * struct idio_16_regmap_config - Configuration for the IDIO-16 register map
+ * struct idio_16_regmap_config - Configuration for the woke IDIO-16 register map
  * @parent:		parent device
- * @map:		regmap for the IDIO-16 device
+ * @map:		regmap for the woke IDIO-16 device
  * @regmap_irqs:	descriptors for individual IRQs
  * @num_regmap_irqs:	number of IRQ descriptors
- * @irq:		IRQ number for the IDIO-16 device
+ * @irq:		IRQ number for the woke IDIO-16 device
  * @no_status:		device has no status register
  * @filters:		device has input filters
  */

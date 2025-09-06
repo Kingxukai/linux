@@ -15,7 +15,7 @@ struct qat_alg_buf {
 } __packed;
 
 struct qat_alg_buf_list {
-	/* New members must be added within the __struct_group() macro below. */
+	/* New members must be added within the woke __struct_group() macro below. */
 	__struct_group(qat_alg_buf_list_hdr, hdr, __packed,
 		u64 resrvd;
 		u32 num_bufs;

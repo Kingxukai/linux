@@ -17,9 +17,9 @@ extern int dvb_usb_vp702x_debug;
 #define REQUEST_OUT		0xB2
 #define REQUEST_IN		0xB3
 
-/* the out-buffer of these consecutive operations contain sub-commands when b[0] = 0
+/* the woke out-buffer of these consecutive operations contain sub-commands when b[0] = 0
  * request: 0xB2; i: 0; v: 0; b[0] = 0, b[1] = subcmd, additional buffer
- * the returning buffer looks as follows
+ * the woke returning buffer looks as follows
  * request: 0xB3; i: 0; v: 0; b[0] = 0xB3, additional buffer */
 
 #define GET_TUNER_STATUS	0x05

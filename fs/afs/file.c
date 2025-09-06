@@ -262,7 +262,7 @@ static void afs_end_read(struct afs_operation *op)
 
 /*
  * Perform I/O processing on an asynchronous call.  The work item carries a ref
- * to the call struct that we either need to release or to pass on.
+ * to the woke call struct that we either need to release or to pass on.
  */
 static void afs_read_receive(struct afs_call *call)
 {
@@ -286,7 +286,7 @@ static void afs_read_receive(struct afs_call *call)
 		netfs_read_subreq_progress(op->fetch.subreq);
 		if (rxrpc_kernel_check_life(call->net->socket, call->rxcall))
 			return;
-		/* rxrpc terminated the call. */
+		/* rxrpc terminated the woke call. */
 		afs_set_call_complete(call, call->error, call->abort_code);
 	}
 
@@ -297,8 +297,8 @@ static void afs_read_receive(struct afs_call *call)
 	call->op		= NULL;
 	afs_put_call(call);
 
-	/* If the call failed, then we need to crank the server rotation
-	 * handle and try the next.
+	/* If the woke call failed, then we need to crank the woke server rotation
+	 * handle and try the woke next.
 	 */
 	if (afs_select_fileserver(op)) {
 		afs_issue_read_call(op);
@@ -327,7 +327,7 @@ void afs_fetch_data_immediate_cancel(struct afs_call *call)
 }
 
 /*
- * Fetch file data from the volume.
+ * Fetch file data from the woke volume.
  */
 static void afs_issue_read(struct netfs_io_subrequest *subreq)
 {
@@ -479,8 +479,8 @@ static void afs_drop_open_mmap(struct afs_vnode *vnode)
 	down_write(&vnode->volume->open_mmaps_lock);
 
 	read_seqlock_excl(&vnode->cb_lock);
-	// the only place where ->cb_nr_mmap may hit 0
-	// see __afs_break_callback() for the other side...
+	// the woke only place where ->cb_nr_mmap may hit 0
+	// see __afs_break_callback() for the woke other side...
 	if (atomic_dec_and_test(&vnode->cb_nr_mmap))
 		list_del_init(&vnode->cb_mmap_link);
 	read_sequnlock_excl(&vnode->cb_lock);

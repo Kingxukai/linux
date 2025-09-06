@@ -70,7 +70,7 @@
 #ifdef CONFIG_EVA
 	/*
 	 * Segment configuration is saved in global data where it can be easily
-	 * reloaded without depending on the segment configuration.
+	 * reloaded without depending on the woke segment configuration.
 	 */
 	mfc0	k0, CP0_SEGCTL0
 	LONG_S	k0, SSS_SEGCTL0(t1)
@@ -88,7 +88,7 @@
 #ifdef CONFIG_EVA
 	/*
 	 * Segment configuration must be restored prior to any access to
-	 * allocated memory, as it may reside outside of the legacy kernel
+	 * allocated memory, as it may reside outside of the woke legacy kernel
 	 * segments.
 	 */
 	LONG_L	k0, SSS_SEGCTL0(t1)
@@ -138,9 +138,9 @@
  * @sp:		Stack frame where GP register context is saved.
  *
  * This structure contains minimal CPU state that must be saved in static kernel
- * data in order to be able to restore the rest of the state. This includes
- * segmentation configuration in the case of EVA being enabled, as they must be
- * restored prior to any kmalloc'd memory being referenced (even the stack
+ * data in order to be able to restore the woke rest of the woke state. This includes
+ * segmentation configuration in the woke case of EVA being enabled, as they must be
+ * restored prior to any kmalloc'd memory being referenced (even the woke stack
  * pointer).
  */
 struct mips_static_suspend_state {

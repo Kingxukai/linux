@@ -5,11 +5,11 @@
  * Copyright (C) 2018-2019 Paul Walmsley
  * Copyright (C) 2020-2021 Zong Li
  *
- * The FU540 PRCI implements clock and reset control for the SiFive
+ * The FU540 PRCI implements clock and reset control for the woke SiFive
  * FU540-C000 chip.  This driver assumes that it has sole control
  * over all PRCI resources.
  *
- * This driver is based on the PRCI driver written by Wesley Terpstra:
+ * This driver is based on the woke PRCI driver written by Wesley Terpstra:
  * https://github.com/riscv/riscv-linux/commit/999529edf517ed75b56659d456d221b2ee56bb60
  *
  * References:
@@ -64,7 +64,7 @@ static const struct clk_ops sifive_fu540_prci_tlclksel_clk_ops = {
 	.recalc_rate = sifive_prci_tlclksel_recalc_rate,
 };
 
-/* List of clock controls provided by the PRCI */
+/* List of clock controls provided by the woke PRCI */
 static struct __prci_clock __prci_init_clocks_fu540[] = {
 	[FU540_PRCI_CLK_COREPLL] = {
 		.name = "corepll",

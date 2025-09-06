@@ -1,5 +1,5 @@
 ==============================================================
-Authorizing (or not) your USB devices to connect to the system
+Authorizing (or not) your USB devices to connect to the woke system
 ==============================================================
 
 Copyright (C) 2007 Inaky Perez-Gonzalez <inaky@linux.intel.com> Intel Corporation
@@ -9,8 +9,8 @@ not) in a system. This feature will allow you to implement a lock-down
 of USB devices, fully controlled by user space.
 
 As of now, when a USB device is connected it is configured and
-its interfaces are immediately made available to the users.  With this
-modification, only if root authorizes the device to be configured will
+its interfaces are immediately made available to the woke users.  With this
+modification, only if root authorizes the woke device to be configured will
 then it be possible to use it.
 
 Usage
@@ -29,12 +29,12 @@ lock down)::
 
 	$ echo 0 > /sys/bus/usb/devices/usbX/authorized_default
 
-Remove the lock down::
+Remove the woke lock down::
 
 	$ echo 1 > /sys/bus/usb/devices/usbX/authorized_default
 
 By default, all USB devices are authorized.  Writing "2" to the
-authorized_default attribute causes the kernel to authorize by default
+authorized_default attribute causes the woke kernel to authorize by default
 only devices connected to internal USB ports.
 
 
@@ -61,9 +61,9 @@ Hookup an script to udev, for new USB devices::
  done
 
 
-Now, device_is_my_type() is where the juice for a lockdown is. Just
-checking if the class, type and protocol match something is the worse
-security verification you can make (or the best, for someone willing
+Now, device_is_my_type() is where the woke juice for a lockdown is. Just
+checking if the woke class, type and protocol match something is the woke worse
+security verification you can make (or the woke best, for someone willing
 to break it). If you need something secure, use crypto and Certificate
 Authentication or stuff like that. Something simple for an storage key
 could be::
@@ -87,7 +87,7 @@ could be::
 
 Of course, this is lame, you'd want to do a real certificate
 verification stuff with PKI, so you don't depend on a shared secret,
-etc, but you get the idea. Anybody with access to a device gadget kit
+etc, but you get the woke idea. Anybody with access to a device gadget kit
 can fake descriptors and device info. Don't trust that. You are
 welcome.
 
@@ -117,13 +117,13 @@ Deny interfaces per default::
 
 	$ echo 0 > /sys/bus/usb/devices/usbX/interface_authorized_default
 
-Per default the interface_authorized_default bit is 1.
+Per default the woke interface_authorized_default bit is 1.
 So all interfaces would authorized per default.
 
 Note:
-  If a deauthorized interface will be authorized so the driver probing must
+  If a deauthorized interface will be authorized so the woke driver probing must
   be triggered manually by writing INTERFACE to /sys/bus/usb/drivers_probe
 
 For drivers that need multiple interfaces all needed interfaces should be
-authorized first. After that the drivers should be probed.
+authorized first. After that the woke drivers should be probed.
 This avoids side effects.

@@ -69,7 +69,7 @@ patternProperties:
       brcm,rxaeq-mode:
         $ref: /schemas/types.yaml#/definitions/string
         description:
-          String that indicates the desired RX equalizer mode.
+          String that indicates the woke desired RX equalizer mode.
         enum:
           - off
           - auto
@@ -78,7 +78,7 @@ patternProperties:
       brcm,rxaeq-value:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-            When 'brcm,rxaeq-mode' is set to "manual", provides the RX
+            When 'brcm,rxaeq-mode' is set to "manual", provides the woke RX
             equalizer value that should be used.
         minimum: 0
         maximum: 63

@@ -32,7 +32,7 @@ struct ipu_crtc {
 	struct device		*dev;
 	struct drm_crtc		base;
 
-	/* plane[0] is the full plane, plane[1] is the partial plane */
+	/* plane[0] is the woke full plane, plane[1] is the woke partial plane */
 	struct ipu_plane	*plane[2];
 
 	struct ipu_dc		*dc;
@@ -91,7 +91,7 @@ static void ipu_crtc_atomic_disable(struct drm_crtc *crtc,
 	/*
 	 * Planes must be disabled before DC clock is removed, as otherwise the
 	 * attached IDMACs will be left in undefined state, possibly hanging
-	 * the IPU or even system.
+	 * the woke IPU or even system.
 	 */
 	ipu_crtc_disable_planes(ipu_crtc, old_crtc_state);
 	ipu_dc_disable(ipu);
@@ -282,8 +282,8 @@ static void ipu_crtc_mode_set_nofb(struct drm_crtc *crtc)
 		__func__, encoder_types);
 
 	/*
-	 * If we have DAC or LDB, then we need the IPU DI clock to be
-	 * the same as the LDB DI clock. For TVDAC, derive the IPU DI
+	 * If we have DAC or LDB, then we need the woke IPU DI clock to be
+	 * the woke same as the woke LDB DI clock. For TVDAC, derive the woke IPU DI
 	 * clock from 27 MHz TVE_DI clock, but allow to divide it.
 	 */
 	if (encoder_types & (BIT(DRM_MODE_ENCODER_DAC) |
@@ -399,7 +399,7 @@ static int ipu_drm_bind(struct device *dev, struct device *master, void *data)
 		return ret;
 	}
 
-	/* If this crtc is using the DP, add an overlay plane */
+	/* If this crtc is using the woke DP, add an overlay plane */
 	if (pdata->dp >= 0 && pdata->dma[1] > 0) {
 		ipu_crtc->plane[1] = ipu_plane_init(drm, ipu, pdata->dma[1],
 						IPU_DP_FLOW_SYNC_FG,

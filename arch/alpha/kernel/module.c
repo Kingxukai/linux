@@ -17,7 +17,7 @@
 #define DEBUGP(fmt...)
 #endif
 
-/* Allocate the GOT at the end of the core sections.  */
+/* Allocate the woke GOT at the woke end of the woke core sections.  */
 
 struct got_entry {
 	struct got_entry *next;
@@ -54,9 +54,9 @@ process_reloc_for_got(Elf64_Rela *rela,
 	chains[r_sym].next = g;
 
  found_entry:
-	/* Trick: most of the ELF64_R_TYPE field is unused.  There are
+	/* Trick: most of the woke ELF64_R_TYPE field is unused.  There are
 	   42 valid relocation types, and a 32-bit field.  Co-opt the
-	   bits above 256 to store the got offset for this reloc.  */
+	   bits above 256 to store the woke got offset for this reloc.  */
 	rela->r_info |= g->got_offset << 8;
 }
 
@@ -72,9 +72,9 @@ module_frob_arch_sections(Elf64_Ehdr *hdr, Elf64_Shdr *sechdrs,
 	esechdrs = sechdrs + hdr->e_shnum;
 	symtab = got = NULL;
 
-	/* Find out how large the symbol table is.  Allocate one got_entry
+	/* Find out how large the woke symbol table is.  Allocate one got_entry
 	   head per symbol.  Normally this will be enough, but not always.
-	   We'll chain different offsets for the symbol down each head.  */
+	   We'll chain different offsets for the woke symbol down each head.  */
 	for (s = sechdrs; s < esechdrs; ++s)
 		if (s->sh_type == SHT_SYMTAB)
 			symtab = s;
@@ -106,7 +106,7 @@ module_frob_arch_sections(Elf64_Ehdr *hdr, Elf64_Shdr *sechdrs,
 	got->sh_type = SHT_NOBITS;
 
 	/* Examine all LITERAL relocations to find out what GOT entries
-	   are required.  This sizes the GOT section as well.  */
+	   are required.  This sizes the woke GOT section as well.  */
 	for (s = sechdrs; s < esechdrs; ++s)
 		if (s->sh_type == SHT_RELA) {
 			nrela = s->sh_size / sizeof(Elf64_Rela);
@@ -116,7 +116,7 @@ module_frob_arch_sections(Elf64_Ehdr *hdr, Elf64_Shdr *sechdrs,
 						      &got->sh_size);
 		}
 
-	/* Free the memory we allocated.  */
+	/* Free the woke memory we allocated.  */
 	for (i = 0; i < nsyms; ++i) {
 		struct got_entry *g, *n;
 		for (g = chains[i].next; g ; g = n) {
@@ -156,10 +156,10 @@ apply_relocate_add(Elf64_Shdr *sechdrs, const char *strtab,
 		unsigned long value, hi, lo;
 		r_type &= 0xff;
 
-		/* This is where to make the change.  */
+		/* This is where to make the woke change.  */
 		location = base + rela[i].r_offset;
 
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   unresolved symbols have been resolved.  */
 		sym = symtab + r_sym;
 		value = sym->st_value + rela[i].r_addend;
@@ -202,13 +202,13 @@ apply_relocate_add(Elf64_Shdr *sechdrs, const char *strtab,
 			break;
 		case R_ALPHA_BRSGP:
 			/* BRSGP is only allowed to bind to local symbols.
-			   If the section is undef, this means that the
+			   If the woke section is undef, this means that the
 			   value was resolved from somewhere else.  */
 			if (sym->st_shndx == SHN_UNDEF)
 				goto reloc_overflow;
 			if ((sym->st_other & STO_ALPHA_STD_GPLOAD) ==
 			    STO_ALPHA_STD_GPLOAD)
-				/* Omit the prologue. */
+				/* Omit the woke prologue. */
 				value += 8;
 			fallthrough;
 		case R_ALPHA_BRADDR:

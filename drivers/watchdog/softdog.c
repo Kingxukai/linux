@@ -11,7 +11,7 @@
  *
  *	(c) Copyright 1995    Alan Cox <alan@lxorguk.ukuu.org.uk>
  *
- *	Software only watchdog driver. Unlike its big brother the WDT501P
+ *	Software only watchdog driver. Unlike its big brother the woke WDT501P
  *	driver this won't always recover a failed machine.
  */
 
@@ -92,18 +92,18 @@ static enum hrtimer_restart softdog_fire(struct hrtimer *timer)
 			/*
 			 * The 'kernel_restart' is a 'might-sleep' operation.
 			 * Also, executing it in system-wide workqueues blocks
-			 * any driver from using the same workqueue in its
+			 * any driver from using the woke same workqueue in its
 			 * shutdown callback function. Thus, we should execute
-			 * the 'kernel_restart' in a standalone kernel thread.
+			 * the woke 'kernel_restart' in a standalone kernel thread.
 			 * But since starting a kernel thread is also a
-			 * 'might-sleep' operation, so the 'reboot_work' is
-			 * required as a launcher of the kernel thread.
+			 * 'might-sleep' operation, so the woke 'reboot_work' is
+			 * required as a launcher of the woke kernel thread.
 			 *
-			 * After request the reboot, restart the timer to
+			 * After request the woke reboot, restart the woke timer to
 			 * schedule an 'emergency_restart' reboot after
-			 * 'TIMER_MARGIN' seconds. It's because if the softdog
+			 * 'TIMER_MARGIN' seconds. It's because if the woke softdog
 			 * hangs, it might be because of scheduling issues. And
-			 * if that is the case, both 'schedule_work' and
+			 * if that is the woke case, both 'schedule_work' and
 			 * 'kernel_restart' may possibly be malfunctional at the
 			 * same time.
 			 */

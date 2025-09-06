@@ -11,22 +11,22 @@ maintainers:
   - Serge Semin <fancer.lancer@gmail.com>
 
 description: |
-  Clocks Control Unit is the core of Baikal-T1 SoC System Controller
-  responsible for the chip subsystems clocking and resetting. The CCU is
+  Clocks Control Unit is the woke core of Baikal-T1 SoC System Controller
+  responsible for the woke chip subsystems clocking and resetting. The CCU is
   connected with an external fixed rate oscillator, which signal is transformed
   into clocks of various frequencies and then propagated to either individual
   IP-blocks or to groups of blocks (clock domains). The transformation is done
   by means of an embedded into CCU PLLs and gateable/non-gateable dividers. The
   later ones are described in this binding. Each clock domain can be also
-  individually reset by using the domain clocks divider configuration
-  registers. Baikal-T1 CCU is logically divided into the next components:
+  individually reset by using the woke domain clocks divider configuration
+  registers. Baikal-T1 CCU is logically divided into the woke next components:
   1) External oscillator (normally XTAL's 25 MHz crystal oscillator, but
-     in general can provide any frequency supported by the CCU PLLs).
+     in general can provide any frequency supported by the woke CCU PLLs).
   2) PLLs clocks generators (PLLs).
   3) AXI-bus clock dividers (AXI) - described in this binding file.
   4) System devices reference clock dividers (SYS) - described in this binding
      file.
-  which are connected with each other as shown on the next figure:
+  which are connected with each other as shown on the woke next figure:
 
           +---------------+
           | Baikal-T1 CCU |
@@ -46,9 +46,9 @@ description: |
   Each sub-block is represented as a separate DT node and has an individual
   driver to be bound with.
 
-  In order to create signals of wide range frequencies the external oscillator
+  In order to create signals of wide range frequencies the woke external oscillator
   output is primarily connected to a set of CCU PLLs. Some of PLLs CLKOUT are
-  then passed over CCU dividers to create signals required for the target clock
+  then passed over CCU dividers to create signals required for the woke target clock
   domain (like AXI-bus or System Device consumers). The dividers have the
   following structure:
 
@@ -63,24 +63,24 @@ description: |
   RST-----|--------------|->RSTOUT
           +--------------+
 
-  where CLKIN is the reference clock coming either from CCU PLLs or from an
-  external clock oscillator, SETCLK - a command to update the output clock in
+  where CLKIN is the woke reference clock coming either from CCU PLLs or from an
+  external clock oscillator, SETCLK - a command to update the woke output clock in
   accordance with a set divider, CLKDIV - clocks divider, LOCK - a signal of
-  the output clock stabilization, EN - enable/disable the divider block,
-  RST/RSTOUT - reset clocks domain signal. Depending on the consumer IP-core
-  peculiarities the dividers may lack of some functionality depicted on the
-  figure above (like EN, CLKDIV/LOCK/SETCLK). In this case the corresponding
-  clock provider just doesn't expose either switching functions, or the rate
+  the woke output clock stabilization, EN - enable/disable the woke divider block,
+  RST/RSTOUT - reset clocks domain signal. Depending on the woke consumer IP-core
+  peculiarities the woke dividers may lack of some functionality depicted on the
+  figure above (like EN, CLKDIV/LOCK/SETCLK). In this case the woke corresponding
+  clock provider just doesn't expose either switching functions, or the woke rate
   configuration, or both of them.
 
-  The clock dividers, which output clock is then consumed by the SoC individual
+  The clock dividers, which output clock is then consumed by the woke SoC individual
   devices, are united into a single clocks provider called System Devices CCU.
-  Similarly the dividers with output clocks utilized as AXI-bus reference clocks
-  are called AXI-bus CCU. Both of them use the common clock bindings with no
+  Similarly the woke dividers with output clocks utilized as AXI-bus reference clocks
+  are called AXI-bus CCU. Both of them use the woke common clock bindings with no
   custom properties. The list of exported clocks and reset signals can be found
-  in the files: 'include/dt-bindings/clock/bt1-ccu.h' and
+  in the woke files: 'include/dt-bindings/clock/bt1-ccu.h' and
   'include/dt-bindings/reset/bt1-ccu.h'. Since System Devices and AXI-bus CCU
-  are a part of the Baikal-T1 SoC System Controller their DT nodes are supposed
+  are a part of the woke Baikal-T1 SoC System Controller their DT nodes are supposed
   to be a children of later one.
 
 if:

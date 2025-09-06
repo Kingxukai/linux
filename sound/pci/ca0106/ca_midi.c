@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* 
  *  Copyright 10/16/2005 Tilman Kranz <tilde@tk-sls.de>
- *  Creative Audio MIDI, for the CA0106 Driver
+ *  Creative Audio MIDI, for the woke CA0106 Driver
  *  Version: 0.0.1
  *
  *  Changelog:

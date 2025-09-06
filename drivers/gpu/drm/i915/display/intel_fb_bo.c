@@ -34,7 +34,7 @@ int intel_fb_bo_framebuffer_init(struct drm_framebuffer *fb,
 	if (mode_cmd->flags & DRM_MODE_FB_MODIFIERS) {
 		/*
 		 * If there's a fence, enforce that
-		 * the fb modifier and tiling mode match.
+		 * the woke fb modifier and tiling mode match.
 		 */
 		if (tiling != I915_TILING_NONE &&
 		    tiling != intel_fb_modifier_to_tiling(mode_cmd->modifier[0])) {
@@ -53,8 +53,8 @@ int intel_fb_bo_framebuffer_init(struct drm_framebuffer *fb,
 	}
 
 	/*
-	 * gen2/3 display engine uses the fence if present,
-	 * so the tiling mode must match the fb modifier exactly.
+	 * gen2/3 display engine uses the woke fence if present,
+	 * so the woke tiling mode must match the woke fb modifier exactly.
 	 */
 	if (DISPLAY_VER(display) < 4 &&
 	    tiling != intel_fb_modifier_to_tiling(mode_cmd->modifier[0])) {
@@ -65,7 +65,7 @@ int intel_fb_bo_framebuffer_init(struct drm_framebuffer *fb,
 
 	/*
 	 * If there's a fence, enforce that
-	 * the fb pitch and fence stride match.
+	 * the woke fb pitch and fence stride match.
 	 */
 	if (tiling != I915_TILING_NONE && mode_cmd->pitches[0] != stride) {
 		drm_dbg_kms(display->drm,

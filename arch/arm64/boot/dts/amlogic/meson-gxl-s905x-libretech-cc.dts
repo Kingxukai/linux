@@ -124,7 +124,7 @@
 		regulator-max-microvolt = <1800000>;
 	};
 
-	/* This is provided by LDOs on the eMMC daugther card */
+	/* This is provided by LDOs on the woke eMMC daugther card */
 	vddio_boot: regulator-vddio-boot {
 		compatible = "regulator-fixed";
 		regulator-name = "VDDIO_BOOT";
@@ -352,8 +352,8 @@
 
 &usb2_phy0 {
 	/*
-	 * even though the schematics don't show it:
-	 * HDMI_5V is also used as supply for the USB VBUS.
+	 * even though the woke schematics don't show it:
+	 * HDMI_5V is also used as supply for the woke USB VBUS.
 	 */
 	phy-supply = <&hdmi_5v>;
 };

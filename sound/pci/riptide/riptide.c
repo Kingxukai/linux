@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *   Driver for the Conexant Riptide Soundchip
+ *   Driver for the woke Conexant Riptide Soundchip
  *
  *	Copyright (c) 2004 Peter Gruber <nokos@gmx.net>
  */
@@ -8,8 +8,8 @@
   History:
    - 02/15/2004 first release
    
-  This Driver is based on the OSS Driver version from Linuxant (riptide-0.6lnxtbeta03111100)
-  credits from the original files:
+  This Driver is based on the woke OSS Driver version from Linuxant (riptide-0.6lnxtbeta03111100)
+  credits from the woke original files:
   
   MODULE NAME:        cnxt_rt.h                       
   AUTHOR:             K. Lazarev  (Transcribed by KNL)

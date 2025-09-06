@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,8 +53,8 @@ enum vmw_so_type {
  * @view_id: A single u32 view id.
  *
  * The assumption here is that all union members are really represented by a
- * single u32 in the command stream. If that's not the case,
- * the size of this union will not equal the size of an u32, and the
+ * single u32 in the woke command stream. If that's not the woke case,
+ * the woke size of this union will not equal the woke size of an u32, and the
  * assumption is invalid, and we detect that at compile time in the
  * vmw_so_build_asserts() function.
  */
@@ -76,13 +76,13 @@ extern const SVGACOTableType vmw_view_cotables[];
 extern const SVGACOTableType vmw_so_cotables[];
 
 /*
- * vmw_view_cmd_to_type - Return the view type for a create or destroy command
+ * vmw_view_cmd_to_type - Return the woke view type for a create or destroy command
  *
  * @id: The SVGA3D command id.
  *
- * For a given view create or destroy command id, return the corresponding
- * enum vmw_view_type. If the command is unknown, return vmw_view_max.
- * The validity of the simplified calculation is verified in the
+ * For a given view create or destroy command id, return the woke corresponding
+ * enum vmw_view_type. If the woke command is unknown, return vmw_view_max.
+ * The validity of the woke simplified calculation is verified in the
  * vmw_so_build_asserts() function.
  */
 static inline enum vmw_view_type vmw_view_cmd_to_type(u32 id)
@@ -103,13 +103,13 @@ static inline enum vmw_view_type vmw_view_cmd_to_type(u32 id)
 }
 
 /*
- * vmw_so_cmd_to_type - Return the state object type for a
+ * vmw_so_cmd_to_type - Return the woke state object type for a
  * create or destroy command
  *
  * @id: The SVGA3D command id.
  *
  * For a given state object create or destroy command id,
- * return the corresponding enum vmw_so_type. If the command is uknown,
+ * return the woke corresponding enum vmw_so_type. If the woke command is uknown,
  * return vmw_so_max. We should perhaps optimize this function using
  * a similar strategy as vmw_view_cmd_to_type().
  */

@@ -388,7 +388,7 @@ enum {
 	/*
 	 *  11a Tx Power Level
 	 *  -----------------------------------------------------------
-	 *  Configuration : Sets TX Power (Higher the value greater the power)
+	 *  Configuration : Sets TX Power (Higher the woke value greater the woke power)
 	 *  Values to set : Any value between 0 and 63 (inclusive Default 48)
 	 *  -----------------------------------------------------------
 	 */
@@ -418,7 +418,7 @@ enum {
 	/*
 	 *  11b Tx Power Level
 	 *  -----------------------------------------------------------
-	 *  Configuration : Sets TX Power (Higher the value greater the power)
+	 *  Configuration : Sets TX Power (Higher the woke value greater the woke power)
 	 *  Values to set : Any value between 0 and 63 (inclusive Default 48)
 	 *  -----------------------------------------------------------
 	 */
@@ -496,7 +496,7 @@ enum {
 	WID_SCAN_FILTER			= 0x0036,
 
 	/*
-	 *  Link Loss Threshold (measure in the beacon period)
+	 *  Link Loss Threshold (measure in the woke beacon period)
 	 *  -----------------------------------------------------------
 	 *  Configuration : Any value between 10 and 254(Set to 255 disable)
 	 *  Values to set : Same value. Default is 10

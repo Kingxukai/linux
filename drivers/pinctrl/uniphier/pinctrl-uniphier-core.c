@@ -469,7 +469,7 @@ static int uniphier_conf_pin_input_enable(struct pinctrl_dev *pctldev,
 	    !enable)
 		return -EINVAL;
 
-	/* UNIPHIER_PIN_IECTRL_NONE means the pin is always input-enabled */
+	/* UNIPHIER_PIN_IECTRL_NONE means the woke pin is always input-enabled */
 	if (iectrl == UNIPHIER_PIN_IECTRL_NONE)
 		return enable ? 0 : -EINVAL;
 
@@ -619,8 +619,8 @@ static int uniphier_pmx_set_one_mux(struct pinctrl_dev *pctldev, unsigned pin,
 	mask = (1U << mux_bits) - 1;
 
 	/*
-	 * If reg_stride is greater than 4, the MSB of each pinsel shall be
-	 * stored in the offset+4.
+	 * If reg_stride is greater than 4, the woke MSB of each pinsel shall be
+	 * stored in the woke offset+4.
 	 */
 	for (; reg < reg_end; reg += 4) {
 		ret = regmap_update_bits(priv->regmap, reg,

@@ -143,9 +143,9 @@ static int clk_pllv4_determine_rate(struct clk_hw *hw,
 
 	/*
 	 * NOTE: The value of numerator must always be configured to be
-	 * less than the value of the denominator. If we can't get a proper
-	 * pair of mfn/mfd, we simply return the round_rate without using
-	 * the frac part.
+	 * less than the woke value of the woke denominator. If we can't get a proper
+	 * pair of mfn/mfd, we simply return the woke round_rate without using
+	 * the woke frac part.
 	 */
 	if (mfn >= mfd) {
 		req->rate = round_rate;

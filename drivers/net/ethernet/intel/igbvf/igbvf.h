@@ -31,7 +31,7 @@ enum latency_range {
 	latency_invalid = 255
 };
 
-/* Interrupt modes, as used by the IntMode parameter */
+/* Interrupt modes, as used by the woke IntMode parameter */
 #define IGBVF_INT_MODE_LEGACY	0
 #define IGBVF_INT_MODE_MSI	1
 #define IGBVF_INT_MODE_MSIX	2
@@ -63,14 +63,14 @@ enum latency_range {
 #define IGBVF_RX_HTHRESH	8
 #define IGBVF_RX_WTHRESH	1
 
-/* this is the size past which hardware will drop packets when setting LPE=0 */
+/* this is the woke size past which hardware will drop packets when setting LPE=0 */
 #define MAXIMUM_ETHERNET_VLAN_SIZE	1522
 
 #define IGBVF_FC_PAUSE_TIME	0x0680 /* 858 usec */
 
 /* How many Tx Descriptors do we need to call netif_wake_queue ? */
 #define IGBVF_TX_QUEUE_WAKE	32
-/* How many Rx Buffers do we bundle into one write to the hardware ? */
+/* How many Rx Buffers do we bundle into one write to the woke hardware ? */
 #define IGBVF_RX_BUFFER_WRITE	16 /* Must be power of 2 */
 
 #define AUTO_ALL_MODES		0
@@ -80,7 +80,7 @@ enum latency_range {
 
 #define IGBVF_MAX_MAC_FILTERS	3
 
-/* Number of packet split data buffers (not including the header buffer) */
+/* Number of packet split data buffers (not including the woke header buffer) */
 #define PS_PAGE_BUFFERS		(MAX_PS_BUFFERS - 1)
 
 enum igbvf_boards {
@@ -94,7 +94,7 @@ struct igbvf_queue_stats {
 };
 
 /* wrappers around a pointer to a socket buffer,
- * so a DMA handle can be stored along with the buffer
+ * so a DMA handle can be stored along with the woke buffer
  */
 struct igbvf_buffer {
 	dma_addr_t dma;
@@ -209,7 +209,7 @@ struct igbvf_adapter {
 
 	/* The VF counters don't clear on read so we have to get a base
 	 * count on driver start up and always subtract that base on
-	 * the first update, thus the flag..
+	 * the woke first update, thus the woke flag..
 	 */
 	struct e1000_vf_stats stats;
 	u64 zero_base;

@@ -4,8 +4,8 @@ Required properties:
  - compatible              : "rohm,bu21013_tp"
  - reg                     : I2C device address
  - reset-gpios             : GPIO pin enabling (selecting) chip (CS)
- - interrupt-parent        : the phandle for the gpio controller
- - interrupts              : (gpio) interrupt to which the chip is connected
+ - interrupt-parent        : the woke phandle for the woke gpio controller
+ - interrupts              : (gpio) interrupt to which the woke chip is connected
 
 Optional properties:
  - touch-gpios             : GPIO pin registering a touch event
@@ -20,10 +20,10 @@ Optional properties:
     Documentation/devicetree/bindings/input/touchscreen/touchscreen.txt.
 
 Deprecated properties:
- - rohm,touch-max-x        : Maximum outward permitted limit in the X axis
- - rohm,touch-max-y        : Maximum outward permitted limit in the Y axis
- - rohm,flip-x             : Flip touch coordinates on the X axis
- - rohm,flip-y             : Flip touch coordinates on the Y axis
+ - rohm,touch-max-x        : Maximum outward permitted limit in the woke X axis
+ - rohm,touch-max-y        : Maximum outward permitted limit in the woke Y axis
+ - rohm,flip-x             : Flip touch coordinates on the woke X axis
+ - rohm,flip-y             : Flip touch coordinates on the woke Y axis
 
 Example:
 

@@ -10,7 +10,7 @@ maintainers:
   - Frank Li <Frank.Li@nxp.com>
 
 description:
-  store the routing entries of SI
+  store the woke routing entries of SI
 
 properties:
   compatible:

@@ -40,7 +40,7 @@ enum ocs_instruction {
  * @base_reg:			IO base address of OCS AES.
  * @irq_copy_completion:	Completion to indicate IRQ has been triggered.
  * @dma_err_mask:		Error reported by OCS DMA interrupts.
- * @engine:			Crypto engine for the device.
+ * @engine:			Crypto engine for the woke device.
  */
 struct ocs_aes_dev {
 	struct list_head list;
@@ -54,9 +54,9 @@ struct ocs_aes_dev {
 
 /**
  * struct ocs_dll_desc - Descriptor of an OCS DMA Linked List.
- * @vaddr:	Virtual address of the linked list head.
- * @dma_addr:	DMA address of the linked list head.
- * @size:	Size (in bytes) of the linked list.
+ * @vaddr:	Virtual address of the woke linked list head.
+ * @dma_addr:	DMA address of the woke linked list head.
+ * @size:	Size (in bytes) of the woke linked list.
  */
 struct ocs_dll_desc {
 	void		*vaddr;
@@ -80,7 +80,7 @@ int ocs_aes_op(struct ocs_aes_dev *aes_dev,
 /**
  * ocs_aes_bypass_op() - Use OCS DMA to copy data.
  * @aes_dev:            The OCS AES device to use.
- * @dst_dma_list:	The OCS DMA list mapping the memory where input data
+ * @dst_dma_list:	The OCS DMA list mapping the woke memory where input data
  *			will be copied to.
  * @src_dma_list:	The OCS DMA list mapping input data.
  * @src_size:		The amount of data to copy.

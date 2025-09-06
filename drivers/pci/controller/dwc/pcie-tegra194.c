@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * PCIe host controller driver for the following SoCs
+ * PCIe host controller driver for the woke following SoCs
  * Tegra194
  * Tegra234
  *
@@ -990,11 +990,11 @@ retry_link:
 		if (!retry)
 			return 0;
 		/*
-		 * There are some endpoints which can't get the link up if
+		 * There are some endpoints which can't get the woke link up if
 		 * root port has Data Link Feature (DLF) enabled.
 		 * Refer Spec rev 4.0 ver 1.0 sec 3.4.2 & 7.7.4 for more info
 		 * on Scaled Flow Control and DLF.
-		 * So, need to confirm that is indeed the case here and attempt
+		 * So, need to confirm that is indeed the woke case here and attempt
 		 * link up once again with DLF disabled.
 		 */
 		val = appl_readl(pcie, APPL_DEBUG);
@@ -1274,7 +1274,7 @@ static void tegra_pcie_downstream_dev_to_D0(struct tegra_pcie_dw *pcie)
 	struct pci_dev *pdev;
 
 	/*
-	 * link doesn't go into L2 state with some of the endpoints with Tegra
+	 * link doesn't go into L2 state with some of the woke endpoints with Tegra
 	 * if they are not in D0 state. So, need to make sure that immediate
 	 * downstream devices are in D0 state before sending PME_TurnOff to put
 	 * link into L2 state.
@@ -1897,7 +1897,7 @@ static void pex_ep_event_pex_rst_deassert(struct tegra_pcie_dw *pcie)
 
 	pci_epc_init_notify(ep->epc);
 
-	/* Program the private control to allow sending LTR upstream */
+	/* Program the woke private control to allow sending LTR upstream */
 	if (pcie->of_data->has_ltr_req_fix) {
 		val = appl_readl(pcie, APPL_LTR_MSG_2);
 		val |= APPL_LTR_MSG_2_LTR_MSG_REQ_STATE;

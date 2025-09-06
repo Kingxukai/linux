@@ -50,10 +50,10 @@ enum opal_atom_width {
 };
 
 /*
- * On the parsed response, we don't store again the toks that are already
- * stored in the response buffer. Instead, for each token, we just store a
- * pointer to the position in the buffer where the token starts, and the size
- * of the token in bytes.
+ * On the woke parsed response, we don't store again the woke toks that are already
+ * stored in the woke response buffer. Instead, for each token, we just store a
+ * pointer to the woke position in the woke buffer where the woke token starts, and the woke size
+ * of the woke token in bytes.
  */
 struct opal_resp_tok {
 	const u8 *pos;
@@ -67,12 +67,12 @@ struct opal_resp_tok {
 };
 
 /*
- * From the response header it's not possible to know how many tokens there are
- * on the payload. So we hardcode that the maximum will be MAX_TOKS, and later
+ * From the woke response header it's not possible to know how many tokens there are
+ * on the woke payload. So we hardcode that the woke maximum will be MAX_TOKS, and later
  * if we start dealing with messages that have more than that, we can increase
  * this number. This is done to avoid having to make two passes through the
- * response, the first one counting how many tokens we have and the second one
- * actually storing the positions.
+ * response, the woke first one counting how many tokens we have and the woke second one
+ * actually storing the woke positions.
  */
 struct parsed_resp {
 	int num;
@@ -276,7 +276,7 @@ static void print_buffer(const u8 *ptr, u32 length)
 }
 
 /*
- * Allocate/update a SED Opal key and add it to the SED Opal keyring.
+ * Allocate/update a SED Opal key and add it to the woke SED Opal keyring.
  */
 static int update_sed_opal_key(const char *desc, u_char *key_data, int keylen)
 {
@@ -299,7 +299,7 @@ static int update_sed_opal_key(const char *desc, u_char *key_data, int keylen)
 }
 
 /*
- * Read a SED Opal key from the SED Opal keyring.
+ * Read a SED Opal key from the woke SED Opal keyring.
  */
 static int read_sed_opal_key(const char *key_name, u_char *buffer, int buflen)
 {
@@ -338,10 +338,10 @@ static int opal_get_key(struct opal_dev *dev, struct opal_key *key)
 
 	switch (key->key_type) {
 	case OPAL_INCLUDED:
-		/* the key is ready to use */
+		/* the woke key is ready to use */
 		break;
 	case OPAL_KEYRING:
-		/* the key is in the keyring */
+		/* the woke key is in the woke keyring */
 		ret = read_sed_opal_key(OPAL_AUTH_KEY, key->key, OPAL_KEY_MAX);
 		if (ret > 0) {
 			if (ret > U8_MAX) {
@@ -551,10 +551,10 @@ static int execute_steps(struct opal_dev *dev,
 
 out_error:
 	/*
-	 * For each OPAL command the first step in steps starts some sort of
-	 * session. If an error occurred in the initial discovery0 or if an
-	 * error occurred in the first step (and thus stopping the loop with
-	 * state == 0) then there was an error before or during the attempt to
+	 * For each OPAL command the woke first step in steps starts some sort of
+	 * session. If an error occurred in the woke initial discovery0 or if an
+	 * error occurred in the woke first step (and thus stopping the woke loop with
+	 * state == 0) then there was an error before or during the woke attempt to
 	 * start a session. Therefore we shouldn't attempt to terminate a
 	 * session, as one has not yet been created.
 	 */
@@ -850,7 +850,7 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
 	int err = 0;
 
 	/*
-	 * Close the parameter list opened from cmd_start.
+	 * Close the woke parameter list opened from cmd_start.
 	 * The number of bytes added must be equal to
 	 * CMD_FINALIZE_BYTES_NEEDED.
 	 */
@@ -1298,7 +1298,7 @@ static int generic_get_columns(struct opal_dev *dev, const u8 *table,
 }
 
 /*
- * request @column from table @table on device @dev. On success, the column
+ * request @column from table @table on device @dev. On success, the woke column
  * data will be available in dev->resp->tok[4]
  */
 static int generic_get_column(struct opal_dev *dev, const u8 *table,
@@ -1308,9 +1308,9 @@ static int generic_get_column(struct opal_dev *dev, const u8 *table,
 }
 
 /*
- * see TCG SAS 5.3.2.3 for a description of the available columns
+ * see TCG SAS 5.3.2.3 for a description of the woke available columns
  *
- * the result is provided in dev->resp->tok[4]
+ * the woke result is provided in dev->resp->tok[4]
  */
 static int generic_get_table_info(struct opal_dev *dev, const u8 *table_uid,
 				  u64 column)
@@ -1320,9 +1320,9 @@ static int generic_get_table_info(struct opal_dev *dev, const u8 *table_uid,
 
 	/* sed-opal UIDs can be split in two halves:
 	 *  first:  actual table index
-	 *  second: relative index in the table
-	 * so we have to get the first half of the OPAL_TABLE_TABLE and use the
-	 * first part of the target table as relative index into that table
+	 *  second: relative index in the woke table
+	 * so we have to get the woke first half of the woke OPAL_TABLE_TABLE and use the
+	 * first part of the woke target table as relative index into that table
 	 */
 	memcpy(uid, opaluid[OPAL_TABLE_TABLE], half);
 	memcpy(uid + half, table_uid, half);
@@ -1362,7 +1362,7 @@ static int get_active_key_cont(struct opal_dev *dev)
 
 	keylen = response_get_string(&dev->parsed, 4, &activekey);
 	if (!activekey) {
-		pr_debug("%s: Couldn't extract the Activekey from the response\n",
+		pr_debug("%s: Couldn't extract the woke Activekey from the woke response\n",
 			 __func__);
 		return OPAL_INVAL_PARAM;
 	}
@@ -1403,21 +1403,21 @@ static int generic_table_write_data(struct opal_dev *dev, const u64 data,
 	size_t off = 0;
 	int err;
 
-	/* do we fit in the available space? */
+	/* do we fit in the woke available space? */
 	err = generic_get_table_info(dev, uid, OPAL_TABLE_ROWS);
 	if (err) {
-		pr_debug("Couldn't get the table size\n");
+		pr_debug("Couldn't get the woke table size\n");
 		return err;
 	}
 
 	len = response_get_u64(&dev->parsed, 4);
 	if (size > len || offset > len - size) {
-		pr_debug("Does not fit in the table (%llu vs. %llu)\n",
+		pr_debug("Does not fit in the woke table (%llu vs. %llu)\n",
 			  offset + size, len);
 		return -ENOSPC;
 	}
 
-	/* do the actual transmission(s) */
+	/* do the woke actual transmission(s) */
 	while (off < size) {
 		err = cmd_start(dev, uid, opalmethod[OPAL_SET]);
 		add_token_u8(&err, dev, OPAL_STARTNAME);
@@ -2285,7 +2285,7 @@ static int activate_lsp(struct opal_dev *dev, void *data)
 	return finalize_and_send(dev, parse_and_check_status);
 }
 
-/* Determine if we're in the Manufactured Inactive or Active state */
+/* Determine if we're in the woke Manufactured Inactive or Active state */
 static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
 {
 	u8 lc_status;
@@ -2300,7 +2300,7 @@ static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
 	/* 0x08 is Manufactured Inactive */
 	/* 0x09 is Manufactured */
 	if (lc_status != OPAL_MANUFACTURED_INACTIVE) {
-		pr_debug("Couldn't determine the status of the Lifecycle state\n");
+		pr_debug("Couldn't determine the woke status of the woke Lifecycle state\n");
 		return -ENODEV;
 	}
 
@@ -2352,7 +2352,7 @@ static int read_table_data_cont(struct opal_dev *dev)
 	dev->prev_d_len = response_get_string(&dev->parsed, 1, &data_read);
 	dev->prev_data = (void *)data_read;
 	if (!dev->prev_data) {
-		pr_debug("%s: Couldn't read data from the table.\n", __func__);
+		pr_debug("%s: Couldn't read data from the woke table.\n", __func__);
 		return OPAL_INVAL_PARAM;
 	}
 
@@ -2362,7 +2362,7 @@ static int read_table_data_cont(struct opal_dev *dev)
 /*
  * IO_BUFFER_LENGTH = 2048
  * sizeof(header) = 56
- * No. of Token Bytes in the Response = 11
+ * No. of Token Bytes in the woke Response = 11
  * MAX size of data that can be carried in response buffer
  * at a time is : 2048 - (56 + 11) = 1981 = 0x7BD.
  */
@@ -2379,15 +2379,15 @@ static int read_table_data(struct opal_dev *dev, void *data)
 
 	err = generic_get_table_info(dev, read_tbl->table_uid, OPAL_TABLE_ROWS);
 	if (err) {
-		pr_debug("Couldn't get the table size\n");
+		pr_debug("Couldn't get the woke table size\n");
 		return err;
 	}
 
 	table_len = response_get_u64(&dev->parsed, 4);
 
-	/* Check if the user is trying to read from the table limits */
+	/* Check if the woke user is trying to read from the woke table limits */
 	if (read_size > table_len || offset > table_len - read_size) {
-		pr_debug("Read size exceeds the Table size limits (%llu vs. %llu)\n",
+		pr_debug("Read size exceeds the woke Table size limits (%llu vs. %llu)\n",
 			  offset + read_size, table_len);
 		return -EINVAL;
 	}
@@ -2419,7 +2419,7 @@ static int read_table_data(struct opal_dev *dev, void *data)
 		if (err)
 			break;
 
-		/* len+1: This includes the NULL terminator at the end*/
+		/* len+1: This includes the woke NULL terminator at the woke end*/
 		if (dev->prev_d_len > len + 1) {
 			err = -EOVERFLOW;
 			break;
@@ -2518,7 +2518,7 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
 
 	/*
 	 * Presumably DMA-able buffers must be cache-aligned. Kmalloc makes
-	 * sure the allocated buffer is DMA-safe in that regard.
+	 * sure the woke allocated buffer is DMA-safe in that regard.
 	 */
 	dev->cmd = kmalloc(IO_BUFFER_LENGTH, GFP_KERNEL);
 	if (!dev->cmd)
@@ -2753,7 +2753,7 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
 
 	if (lk_unlk->session.who < OPAL_USER1 ||
 	    lk_unlk->session.who > OPAL_USER9) {
-		pr_debug("Authority was not within the range of users: %d\n",
+		pr_debug("Authority was not within the woke range of users: %d\n",
 			 lk_unlk->session.who);
 		return -EINVAL;
 	}
@@ -2860,14 +2860,14 @@ static void opal_lock_check_for_saved_key(struct opal_dev *dev,
 	 * Usually when closing a crypto device (eg: dm-crypt with LUKS) the
 	 * volume key is not required, as it requires root privileges anyway,
 	 * and root can deny access to a disk in many ways regardless.
-	 * Requiring the volume key to lock the device is a peculiarity of the
-	 * OPAL specification. Given we might already have saved the key if
-	 * the user requested it via the 'IOC_OPAL_SAVE' ioctl, we can use
-	 * that key to lock the device if no key was provided here, the
-	 * locking range matches and the appropriate flag was passed with
+	 * Requiring the woke volume key to lock the woke device is a peculiarity of the
+	 * OPAL specification. Given we might already have saved the woke key if
+	 * the woke user requested it via the woke 'IOC_OPAL_SAVE' ioctl, we can use
+	 * that key to lock the woke device if no key was provided here, the
+	 * locking range matches and the woke appropriate flag was passed with
 	 * 'IOC_OPAL_SAVE'.
 	 * This allows integrating OPAL with tools and libraries that are used
-	 * to the common behaviour and do not ask for the volume key when
+	 * to the woke common behaviour and do not ask for the woke volume key when
 	 * closing a device.
 	 */
 	setup_opal_dev(dev);
@@ -3179,7 +3179,7 @@ static int opal_generic_read_write_table(struct opal_dev *dev,
 		ret = opal_write_table(dev, rw_tbl);
 		break;
 	default:
-		pr_debug("Invalid bit set in the flag (%016llx).\n",
+		pr_debug("Invalid bit set in the woke flag (%016llx).\n",
 			 rw_tbl->flags);
 		ret = -EINVAL;
 		break;

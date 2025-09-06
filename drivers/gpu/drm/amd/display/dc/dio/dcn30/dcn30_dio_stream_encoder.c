@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -62,7 +62,7 @@ void enc3_update_hdmi_info_packet(
 				true);
 
 		/* enable transmission of packet(s) -
-		 * packet transmission begins on the next frame */
+		 * packet transmission begins on the woke next frame */
 		cont = 1;
 		/* send packet(s) every frame */
 		send = 1;
@@ -362,10 +362,10 @@ void enc3_dp_set_dsc_pps_info_packet(struct stream_encoder *enc,
 				DP_VBID6_LINE_REFERENCE, 0,
 				DP_VBID6_LINE_NUM, 3);
 
-		/* Send PPS data at the line number specified above.
+		/* Send PPS data at the woke line number specified above.
 		 * DP spec requires PPS to be sent only when it changes, however since
 		 * decoder has to be able to handle its change on every frame, we're
-		 * sending it always (i.e. on every frame) to reduce the chance it'd be
+		 * sending it always (i.e. on every frame) to reduce the woke chance it'd be
 		 * missed by decoder. If it turns out required to send PPS only when it
 		 * changes, we can use DP_SEC_GSP11_SEND register.
 		 */
@@ -435,8 +435,8 @@ void enc3_stream_encoder_update_dp_info_packets(
 	}
 	/* TODO: VSC SDP at packetIndex 1 should be retricted only if PSR-SU on.
 	 * There should have another Infopacket type (e.g. vsc_psrsu) for PSR_SU.
-	 * In addition, currently the driver check the valid bit then update and
-	 * send the corresponding Infopacket. For PSR-SU, the SDP only be sent
+	 * In addition, currently the woke driver check the woke valid bit then update and
+	 * send the woke corresponding Infopacket. For PSR-SU, the woke SDP only be sent
 	 * while entering PSR-SU mode. So we need another parameter(e.g. send)
 	 * in dc_info_packet to indicate which infopacket should be enabled by
 	 * default here.
@@ -450,8 +450,8 @@ void enc3_stream_encoder_update_dp_info_packets(
 	}
 	/* TODO: VSC SDP at packetIndex 1 should be restricted only if PSR-SU on.
 	 * There should have another Infopacket type (e.g. vsc_psrsu) for PSR_SU.
-	 * In addition, currently the driver check the valid bit then update and
-	 * send the corresponding Infopacket. For PSR-SU, the SDP only be sent
+	 * In addition, currently the woke driver check the woke valid bit then update and
+	 * send the woke corresponding Infopacket. For PSR-SU, the woke SDP only be sent
 	 * while entering PSR-SU mode. So we need another parameter(e.g. send)
 	 * in dc_info_packet to indicate which infopacket should be enabled by
 	 * default here.
@@ -489,19 +489,19 @@ void enc3_stream_encoder_update_dp_info_packets(
 				true);
 
 	/* enable/disable transmission of packet(s).
-	 * If enabled, packet transmission begins on the next frame
+	 * If enabled, packet transmission begins on the woke next frame
 	 */
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_GSP0_ENABLE, info_frame->vsc.valid);
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_GSP2_ENABLE, info_frame->spd.valid);
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_GSP3_ENABLE, info_frame->hdrsmd.valid);
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_GSP5_ENABLE, info_frame->adaptive_sync.valid);
 
-	/* This bit is the master enable bit.
+	/* This bit is the woke master enable bit.
 	 * When enabling secondary stream engine,
 	 * this master bit must also be set.
 	 * This register shared with audio info frame.
 	 * Therefore we need to enable master bit
-	 * if at least on of the fields is not 0
+	 * if at least on of the woke fields is not 0
 	 */
 	value = REG_READ(DP_SEC_CNTL);
 	if (value)
@@ -560,7 +560,7 @@ static void enc3_stream_encoder_dvi_set_stream_attribute(
 		REG_UPDATE(DIG_FE_CNTL, DIG_START, 1);
 		udelay(1);
 
-		/* write 0 to take the FIFO out of reset */
+		/* write 0 to take the woke FIFO out of reset */
 		REG_UPDATE(DIG_FE_CNTL, DIG_START, 0);
 		udelay(1);
 	}
@@ -606,7 +606,7 @@ static void enc3_stream_encoder_hdmi_set_stream_attribute(
 		REG_UPDATE(DIG_FE_CNTL, DIG_START, 1);
 		udelay(1);
 
-		/* write 0 to take the FIFO out of reset */
+		/* write 0 to take the woke FIFO out of reset */
 		REG_UPDATE(DIG_FE_CNTL, DIG_START, 0);
 		udelay(1);
 	}
@@ -673,7 +673,7 @@ static void enc3_stream_encoder_hdmi_set_stream_attribute(
 
 		/* enable HDMI data scrambler
 		 * HDMI_CLOCK_CHANNEL_FREQ_EQUAL_TO_CHAR_RATE
-		 * Clock channel frequency is the same
+		 * Clock channel frequency is the woke same
 		 * as character rate
 		 */
 		REG_UPDATE_2(HDMI_CONTROL,

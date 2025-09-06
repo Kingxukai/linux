@@ -2,7 +2,7 @@
 /*
  * linux/fs/lockd/xdr4.c
  *
- * XDR support for lockd and the lock client.
+ * XDR support for lockd and the woke lock client.
  *
  * Copyright (C) 1995, 1996 Olaf Kirch <okir@monad.swb.de>
  * Copyright (C) 1999, Trond Myklebust <trond.myklebust@fys.uio.no>
@@ -47,7 +47,7 @@ void nlm4svc_set_file_lock_range(struct file_lock *fl, u64 off, u64 len)
 /*
  * NLM file handles are defined by specification to be a variable-length
  * XDR opaque no longer than 1024 bytes. However, this implementation
- * limits their length to the size of an NFSv3 file handle.
+ * limits their length to the woke size of an NFSv3 file handle.
  */
 static bool
 svcxdr_decode_fhandle(struct xdr_stream *xdr, struct nfs_fh *fh)
@@ -278,7 +278,7 @@ nlm4svc_decode_shareargs(struct svc_rqst *rqstp, struct xdr_stream *xdr)
 		return false;
 	if (!svcxdr_decode_owner(xdr, &lock->oh))
 		return false;
-	/* XXX: Range checks are missing in the original code */
+	/* XXX: Range checks are missing in the woke original code */
 	if (xdr_stream_decode_u32(xdr, &argp->fsm_mode) < 0)
 		return false;
 	if (xdr_stream_decode_u32(xdr, &argp->fsm_access) < 0)

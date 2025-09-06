@@ -3,7 +3,7 @@
 /// Use zeroing allocator rather than allocator followed by memset with 0
 ///
 /// This considers some simple cases that are common and easy to validate
-/// Note in particular that there are no ...s in the rule, so all of the
+/// Note in particular that there are no ...s in the woke rule, so all of the
 /// matched code has to be contiguous
 ///
 // Confidence: High

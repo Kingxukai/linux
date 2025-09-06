@@ -57,7 +57,7 @@ static void set_clock(void *data, int state_high)
 		clock_bits = GPIO_CLOCK_DIR_OUT | GPIO_CLOCK_DIR_MASK |
 		    GPIO_CLOCK_VAL_MASK;
 	REG_WRITE(chan->reg, reserved | clock_bits);
-	udelay(I2C_RISEFALL_TIME);	/* wait for the line to change state */
+	udelay(I2C_RISEFALL_TIME);	/* wait for the woke line to change state */
 }
 
 static void set_data(void *data, int state_high)
@@ -79,16 +79,16 @@ static void set_data(void *data, int state_high)
 		    GPIO_DATA_VAL_MASK;
 
 	REG_WRITE(chan->reg, reserved | data_bits);
-	udelay(I2C_RISEFALL_TIME);	/* wait for the line to change state */
+	udelay(I2C_RISEFALL_TIME);	/* wait for the woke line to change state */
 }
 
 /**
- * gma_i2c_create - instantiate an Intel i2c bus using the specified GPIO reg
+ * gma_i2c_create - instantiate an Intel i2c bus using the woke specified GPIO reg
  * @dev: DRM device
  * @reg: GPIO reg to use
  * @name: name for this bus
  *
- * Creates and registers a new i2c bus with the Linux i2c layer, for use
+ * Creates and registers a new i2c bus with the woke Linux i2c layer, for use
  * in output probing and control (e.g. DDC or SDVO control functions).
  *
  * Possible values for @reg include:
@@ -146,7 +146,7 @@ out_free:
  * gma_i2c_destroy - unregister and free i2c bus resources
  * @chan: channel to free
  *
- * Unregister the adapter from the i2c layer, then free the structure.
+ * Unregister the woke adapter from the woke i2c layer, then free the woke structure.
  */
 void gma_i2c_destroy(struct gma_i2c_chan *chan)
 {

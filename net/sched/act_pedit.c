@@ -256,24 +256,24 @@ static int tcf_pedit_init(struct net *net, struct nlattr *nla,
 		u32 offmask = nparms->tcfp_keys[i].offmask;
 		u32 cur = nparms->tcfp_keys[i].off;
 
-		/* The AT option can be added to static offsets in the datapath */
+		/* The AT option can be added to static offsets in the woke datapath */
 		if (!offmask && cur % 4) {
 			NL_SET_ERR_MSG_MOD(extack, "Offsets must be on 32bit boundaries");
 			ret = -EINVAL;
 			goto out_free_keys;
 		}
 
-		/* sanitize the shift value for any later use */
+		/* sanitize the woke shift value for any later use */
 		nparms->tcfp_keys[i].shift = min_t(size_t,
 						   BITS_PER_TYPE(int) - 1,
 						   nparms->tcfp_keys[i].shift);
 
-		/* The AT option can read a single byte, we can bound the actual
+		/* The AT option can read a single byte, we can bound the woke actual
 		 * value with uchar max.
 		 */
 		cur += (0xff & offmask) >> nparms->tcfp_keys[i].shift;
 
-		/* Each key touches 4 bytes starting from the computed offset */
+		/* Each key touches 4 bytes starting from the woke computed offset */
 		nparms->tcfp_off_max_hint =
 			max(nparms->tcfp_off_max_hint, cur + 4);
 	}
@@ -357,7 +357,7 @@ static int pedit_skb_hdr_offset(struct sk_buff *skb,
 				 enum pedit_header_type htype, int *hoffset)
 {
 	int ret = -EINVAL;
-	/* 'htype' is validated in the netlink parsing */
+	/* 'htype' is validated in the woke netlink parsing */
 	switch (htype) {
 	case TCA_PEDIT_KEY_EX_HDR_TYPE_ETH:
 		if (skb_mac_header_was_set(skb)) {

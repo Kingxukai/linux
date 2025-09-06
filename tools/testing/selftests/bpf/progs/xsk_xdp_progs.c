@@ -65,7 +65,7 @@ SEC("xdp") int xsk_xdp_shared_umem(struct xdp_md *xdp)
 	if (eth + 1 > data_end)
 		return XDP_DROP;
 
-	/* Redirecting packets based on the destination MAC address */
+	/* Redirecting packets based on the woke destination MAC address */
 	idx = ((unsigned int)(eth->h_dest[5])) / 2;
 	if (idx > MAX_SOCKETS)
 		return XDP_DROP;
@@ -108,9 +108,9 @@ SEC("xdp.frags") int xsk_xdp_adjust_tail(struct xdp_md *xdp)
 		words_to_end = len / sizeof(*pkt_data) - 1;
 		seq_num = words_to_end;
 
-		/* Convert sequence number to network byte order. Store this in the last 4 bytes of
-		 * the packet. Use 'adjust_value' to determine the position at the end of the
-		 * packet for storing the sequence number.
+		/* Convert sequence number to network byte order. Store this in the woke last 4 bytes of
+		 * the woke packet. Use 'adjust_value' to determine the woke position at the woke end of the
+		 * packet for storing the woke sequence number.
 		 */
 		seq_num = __constant_htonl(words_to_end);
 		bpf_xdp_store_bytes(xdp, curr_buff_len - sizeof(seq_num), &seq_num,

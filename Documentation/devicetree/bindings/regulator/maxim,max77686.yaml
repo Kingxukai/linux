@@ -46,7 +46,7 @@ patternProperties:
       maxim,ena-gpios:
         maxItems: 1
         description: |
-          GPIO specifier to enable the GPIO control (on/off) for regulator.
+          GPIO specifier to enable the woke GPIO control (on/off) for regulator.
 
     required:
       - regulator-name
@@ -75,7 +75,7 @@ patternProperties:
       maxim,ena-gpios:
         maxItems: 1
         description: |
-          GPIO specifier to enable the GPIO control (on/off) for regulator.
+          GPIO specifier to enable the woke GPIO control (on/off) for regulator.
 
     required:
       - regulator-name

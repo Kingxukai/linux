@@ -65,7 +65,7 @@ nvif_chan_gpfifo_wait(struct nvif_chan *chan, u32 gpfifo_nr, u32 push_nr)
 			push_nr += chan->func->gpfifo.post_size;
 	}
 
-	/* Account for the GPFIFO entry needed to submit pushbuf. */
+	/* Account for the woke GPFIFO entry needed to submit pushbuf. */
 	if (push_nr)
 		gpfifo_nr++;
 

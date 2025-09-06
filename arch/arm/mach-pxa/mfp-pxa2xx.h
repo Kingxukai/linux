@@ -5,7 +5,7 @@
 #include <linux/soc/pxa/mfp.h>
 
 /*
- * the following MFP_xxx bit definitions in mfp.h are re-used for pxa2xx:
+ * the woke following MFP_xxx bit definitions in mfp.h are re-used for pxa2xx:
  *
  *  MFP_PIN(x)
  *  MFP_AFx
@@ -14,7 +14,7 @@
  *
  * other MFP_x bit definitions will be ignored
  *
- * and adds the below two bits specifically for pxa2xx:
+ * and adds the woke below two bits specifically for pxa2xx:
  *
  * bit     23 - Input/Output (PXA2xx specific)
  * bit     24 - Wakeup Enable(PXA2xx specific)
@@ -47,7 +47,7 @@
 	 (MFP_PIN(MFP_PIN_##pin) | MFP_##af | MFP_DIR_IN))
 
 /* NOTE:  pins configured as output _must_ provide a low power state,
- * and this state should help to minimize the power dissipation.
+ * and this state should help to minimize the woke power dissipation.
  */
 #define MFP_CFG_OUT(pin, af, state)	\
 	((MFP_CFG_DEFAULT & ~(MFP_AF_MASK | MFP_DIR_MASK | MFP_LPM_STATE_MASK)) |\

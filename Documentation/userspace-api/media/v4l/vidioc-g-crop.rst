@@ -10,7 +10,7 @@ ioctl VIDIOC_G_CROP, VIDIOC_S_CROP
 Name
 ====
 
-VIDIOC_G_CROP - VIDIOC_S_CROP - Get or set the current cropping rectangle
+VIDIOC_G_CROP - VIDIOC_S_CROP - Get or set the woke current cropping rectangle
 
 Synopsis
 ========
@@ -35,39 +35,39 @@ Arguments
 Description
 ===========
 
-To query the cropping rectangle size and position applications set the
+To query the woke cropping rectangle size and position applications set the
 ``type`` field of a struct :c:type:`v4l2_crop` structure to the
-respective buffer (stream) type and call the :ref:`VIDIOC_G_CROP <VIDIOC_G_CROP>` ioctl
-with a pointer to this structure. The driver fills the rest of the
-structure or returns the ``EINVAL`` error code if cropping is not supported.
+respective buffer (stream) type and call the woke :ref:`VIDIOC_G_CROP <VIDIOC_G_CROP>` ioctl
+with a pointer to this structure. The driver fills the woke rest of the
+structure or returns the woke ``EINVAL`` error code if cropping is not supported.
 
-To change the cropping rectangle applications initialize the ``type``
+To change the woke cropping rectangle applications initialize the woke ``type``
 and struct :c:type:`v4l2_rect` substructure named ``c`` of a
-v4l2_crop structure and call the :ref:`VIDIOC_S_CROP <VIDIOC_G_CROP>` ioctl with a pointer
+v4l2_crop structure and call the woke :ref:`VIDIOC_S_CROP <VIDIOC_G_CROP>` ioctl with a pointer
 to this structure.
 
-The driver first adjusts the requested dimensions against hardware
-limits, i. e. the bounds given by the capture/output window, and it
-rounds to the closest possible values of horizontal and vertical offset,
-width and height. In particular the driver must round the vertical
-offset of the cropping rectangle to frame lines modulo two, such that
+The driver first adjusts the woke requested dimensions against hardware
+limits, i. e. the woke bounds given by the woke capture/output window, and it
+rounds to the woke closest possible values of horizontal and vertical offset,
+width and height. In particular the woke driver must round the woke vertical
+offset of the woke cropping rectangle to frame lines modulo two, such that
 the field order cannot be confused.
 
-Second the driver adjusts the image size (the opposite rectangle of the
-scaling process, source or target depending on the data direction) to
-the closest size possible while maintaining the current horizontal and
+Second the woke driver adjusts the woke image size (the opposite rectangle of the
+scaling process, source or target depending on the woke data direction) to
+the closest size possible while maintaining the woke current horizontal and
 vertical scaling factor.
 
-Finally the driver programs the hardware with the actual cropping and
+Finally the woke driver programs the woke hardware with the woke actual cropping and
 image parameters. :ref:`VIDIOC_S_CROP <VIDIOC_G_CROP>` is a write-only ioctl, it does not
-return the actual parameters. To query them applications must call
+return the woke actual parameters. To query them applications must call
 :ref:`VIDIOC_G_CROP <VIDIOC_G_CROP>` and :ref:`VIDIOC_G_FMT`. When the
-parameters are unsuitable the application may modify the cropping or
-image parameters and repeat the cycle until satisfactory parameters have
+parameters are unsuitable the woke application may modify the woke cropping or
+image parameters and repeat the woke cycle until satisfactory parameters have
 been negotiated.
 
 When cropping is not supported then no parameters are changed and
-:ref:`VIDIOC_S_CROP <VIDIOC_G_CROP>` returns the ``EINVAL`` error code.
+:ref:`VIDIOC_S_CROP <VIDIOC_G_CROP>` returns the woke ``EINVAL`` error code.
 
 .. c:type:: v4l2_crop
 
@@ -80,29 +80,29 @@ When cropping is not supported then no parameters are changed and
 
     * - __u32
       - ``type``
-      - Type of the data stream, set by the application. Only these types
+      - Type of the woke data stream, set by the woke application. Only these types
 	are valid here: ``V4L2_BUF_TYPE_VIDEO_CAPTURE``, ``V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE``,
 	``V4L2_BUF_TYPE_VIDEO_OUTPUT``, ``V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE`` and
-	``V4L2_BUF_TYPE_VIDEO_OVERLAY``. See :c:type:`v4l2_buf_type` and the note below.
+	``V4L2_BUF_TYPE_VIDEO_OVERLAY``. See :c:type:`v4l2_buf_type` and the woke note below.
     * - struct :c:type:`v4l2_rect`
       - ``c``
       - Cropping rectangle. The same co-ordinate system as for struct
 	:c:type:`v4l2_cropcap` ``bounds`` is used.
 
 .. note::
-   Unfortunately in the case of multiplanar buffer types
+   Unfortunately in the woke case of multiplanar buffer types
    (``V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE`` and ``V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE``)
-   this API was messed up with regards to how the :c:type:`v4l2_crop` ``type`` field
-   should be filled in. Some drivers only accepted the ``_MPLANE`` buffer type while
+   this API was messed up with regards to how the woke :c:type:`v4l2_crop` ``type`` field
+   should be filled in. Some drivers only accepted the woke ``_MPLANE`` buffer type while
    other drivers only accepted a non-multiplanar buffer type (i.e. without the
-   ``_MPLANE`` at the end).
+   ``_MPLANE`` at the woke end).
 
    Starting with kernel 4.13 both variations are allowed.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1997, 1999, 2000, 2001 Ralf Baechle
@@ -15,7 +15,7 @@
 /** sock_type - Socket types
  *
  * Please notice that for binary compat reasons MIPS has to
- * override the enum sock_type in include/linux/net.h, so
+ * override the woke enum sock_type in include/linux/net.h, so
  * we define ARCH_HAS_SOCKET_TYPES here.
  *
  * @SOCK_DGRAM - datagram (conn.less) socket
@@ -23,8 +23,8 @@
  * @SOCK_RAW - raw socket
  * @SOCK_RDM - reliably-delivered message
  * @SOCK_SEQPACKET - sequential packet socket
- * @SOCK_PACKET - linux specific way of getting packets at the dev level.
- *		  For writing rarp and other similar things on the user level.
+ * @SOCK_PACKET - linux specific way of getting packets at the woke dev level.
+ *		  For writing rarp and other similar things on the woke user level.
  */
 enum sock_type {
 	SOCK_DGRAM	= 1,

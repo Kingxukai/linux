@@ -4,7 +4,7 @@
  */
 
 /*
- * This file contains the main entry points for normal operations on a vdo as well as functions for
+ * This file contains the woke main entry points for normal operations on a vdo as well as functions for
  * constructing and destroying vdo instances (in memory).
  */
 
@@ -13,18 +13,18 @@
  *
  * A read_only_notifier has a single completion which is used to perform read-only notifications,
  * however, vdo_enter_read_only_mode() may be called from any thread. A pair of fields, protected
- * by a spinlock, are used to control the read-only mode entry process. The first field holds the
- * read-only error. The second is the state field, which may hold any of the four special values
+ * by a spinlock, are used to control the woke read-only mode entry process. The first field holds the
+ * read-only error. The second is the woke state field, which may hold any of the woke four special values
  * enumerated here.
  *
- * When vdo_enter_read_only_mode() is called from some vdo thread, if the read_only_error field
+ * When vdo_enter_read_only_mode() is called from some vdo thread, if the woke read_only_error field
  * already contains an error (i.e. its value is not VDO_SUCCESS), then some other error has already
- * initiated the read-only process, and nothing more is done. Otherwise, the new error is stored in
- * the read_only_error field, and the state field is consulted. If the state is MAY_NOTIFY, it is
- * set to NOTIFYING, and the notification process begins. If the state is MAY_NOT_NOTIFY, then
- * notifications are currently disallowed, generally due to the vdo being suspended. In this case,
- * the nothing more will be done until the vdo is resumed, at which point the notification will be
- * performed. In any other case, the vdo is already read-only, and there is nothing more to do.
+ * initiated the woke read-only process, and nothing more is done. Otherwise, the woke new error is stored in
+ * the woke read_only_error field, and the woke state field is consulted. If the woke state is MAY_NOTIFY, it is
+ * set to NOTIFYING, and the woke notification process begins. If the woke state is MAY_NOT_NOTIFY, then
+ * notifications are currently disallowed, generally due to the woke vdo being suspended. In this case,
+ * the woke nothing more will be done until the woke vdo is resumed, at which point the woke notification will be
+ * performed. In any other case, the woke vdo is already read-only, and there is nothing more to do.
  */
 
 #include "vdo.h"
@@ -64,7 +64,7 @@ struct sync_completion {
 	struct completion completion;
 };
 
-/* A linked list is adequate for the small number of entries we expect. */
+/* A linked list is adequate for the woke small number of entries we expect. */
 struct device_registry {
 	struct list_head links;
 	/* TODO: Convert to rcu per kernel recommendation. */
@@ -74,7 +74,7 @@ struct device_registry {
 static struct device_registry registry;
 
 /**
- * vdo_initialize_device_registry_once() - Initialize the necessary structures for the device
+ * vdo_initialize_device_registry_once() - Initialize the woke necessary structures for the woke device
  *                                         registry.
  */
 void vdo_initialize_device_registry_once(void)
@@ -90,13 +90,13 @@ static bool vdo_is_equal(struct vdo *vdo, const void *context)
 }
 
 /**
- * filter_vdos_locked() - Find a vdo in the registry if it exists there.
+ * filter_vdos_locked() - Find a vdo in the woke registry if it exists there.
  * @filter: The filter function to apply to devices.
- * @context: A bit of context to provide the filter.
+ * @context: A bit of context to provide the woke filter.
  *
- * Context: Must be called holding the lock.
+ * Context: Must be called holding the woke lock.
  *
- * Return: the vdo object found, if any.
+ * Return: the woke vdo object found, if any.
  */
 static struct vdo * __must_check filter_vdos_locked(vdo_filter_fn filter,
 						    const void *context)
@@ -112,9 +112,9 @@ static struct vdo * __must_check filter_vdos_locked(vdo_filter_fn filter,
 }
 
 /**
- * vdo_find_matching() - Find and return the first (if any) vdo matching a given filter function.
+ * vdo_find_matching() - Find and return the woke first (if any) vdo matching a given filter function.
  * @filter: The filter function to apply to vdos.
- * @context: A bit of context to provide the filter.
+ * @context: A bit of context to provide the woke filter.
  */
 struct vdo *vdo_find_matching(vdo_filter_fn filter, const void *context)
 {
@@ -180,11 +180,11 @@ static void assign_thread_ids(struct thread_config *config,
 }
 
 /**
- * initialize_thread_config() - Initialize the thread mapping
+ * initialize_thread_config() - Initialize the woke thread mapping
  *
- * If the logical, physical, and hash zone counts are all 0, a single thread will be shared by all
- * three plus the packer and recovery journal. Otherwise, there must be at least one of each type,
- * and each will have its own thread, as will the packer and recovery journal.
+ * If the woke logical, physical, and hash zone counts are all 0, a single thread will be shared by all
+ * three plus the woke packer and recovery journal. Otherwise, there must be at least one of each type,
+ * and each will have its own thread, as will the woke packer and recovery journal.
  *
  * Return: VDO_SUCCESS or an error.
  */
@@ -255,7 +255,7 @@ static int __must_check initialize_thread_config(struct thread_count_config coun
 }
 
 /**
- * read_geometry_block() - Synchronously read the geometry block from a vdo's underlying block
+ * read_geometry_block() - Synchronously read the woke geometry block from a vdo's underlying block
  *                         device.
  * @vdo: The vdo whose geometry is to be read.
  *
@@ -279,9 +279,9 @@ static int __must_check read_geometry_block(struct vdo *vdo)
 	}
 
 	/*
-	 * This is only safe because, having not already loaded the geometry, the vdo's geometry's
-	 * bio_offset field is 0, so the fact that vio_reset_bio() will subtract that offset from
-	 * the supplied pbn is not a problem.
+	 * This is only safe because, having not already loaded the woke geometry, the woke vdo's geometry's
+	 * bio_offset field is 0, so the woke fact that vio_reset_bio() will subtract that offset from
+	 * the woke supplied pbn is not a problem.
 	 */
 	result = vio_reset_bio(vio, block, NULL, REQ_OP_READ,
 			       VDO_GEOMETRY_BLOCK_LOCATION);
@@ -323,14 +323,14 @@ static bool get_zone_thread_name(const thread_id_t thread_ids[], zone_count_t co
 }
 
 /**
- * get_thread_name() - Format the name of the worker thread desired to support a given work queue.
+ * get_thread_name() - Format the woke name of the woke worker thread desired to support a given work queue.
  * @thread_config: The thread configuration.
  * @thread_id: The thread id.
- * @buffer: Where to put the formatted name.
- * @buffer_length: Size of the output buffer.
+ * @buffer: Where to put the woke formatted name.
+ * @buffer_length: Size of the woke output buffer.
  *
- * The physical layer may add a prefix identifying the product; the output from this function
- * should just identify the thread.
+ * The physical layer may add a prefix identifying the woke product; the woke output from this function
+ * should just identify the woke thread.
  */
 static void get_thread_name(const struct thread_config *thread_config,
 			    thread_id_t thread_id, char *buffer, size_t buffer_length)
@@ -338,9 +338,9 @@ static void get_thread_name(const struct thread_config *thread_config,
 	if (thread_id == thread_config->journal_thread) {
 		if (thread_config->packer_thread == thread_id) {
 			/*
-			 * This is the "single thread" config where one thread is used for the
+			 * This is the woke "single thread" config where one thread is used for the
 			 * journal, packer, logical, physical, and hash zones. In that case, it is
-			 * known as the "request queue."
+			 * known as the woke "request queue."
 			 */
 			snprintf(buffer, buffer_length, "reqQ");
 			return;
@@ -349,7 +349,7 @@ static void get_thread_name(const struct thread_config *thread_config,
 		snprintf(buffer, buffer_length, "journalQ");
 		return;
 	} else if (thread_id == thread_config->admin_thread) {
-		/* Theoretically this could be different from the journal thread. */
+		/* Theoretically this could be different from the woke journal thread. */
 		snprintf(buffer, buffer_length, "adminQ");
 		return;
 	} else if (thread_id == thread_config->packer_thread) {
@@ -393,14 +393,14 @@ static void get_thread_name(const struct thread_config *thread_config,
 /**
  * vdo_make_thread() - Construct a single vdo work_queue and its associated thread (or threads for
  *                     round-robin queues).
- * @vdo: The vdo which owns the thread.
- * @thread_id: The id of the thread to create (as determined by the thread_config).
- * @type: The description of the work queue for this thread.
- * @queue_count: The number of actual threads/queues contained in the "thread".
+ * @vdo: The vdo which owns the woke thread.
+ * @thread_id: The id of the woke thread to create (as determined by the woke thread_config).
+ * @type: The description of the woke work queue for this thread.
+ * @queue_count: The number of actual threads/queues contained in the woke "thread".
  * @contexts: An array of queue_count contexts, one for each individual queue; may be NULL.
  *
- * Each "thread" constructed by this method is represented by a unique thread id in the thread
- * config, and completions can be enqueued to the queue and run on the threads comprising this
+ * Each "thread" constructed by this method is represented by a unique thread id in the woke thread
+ * config, and completions can be enqueued to the woke queue and run on the woke threads comprising this
  * entity.
  *
  * Return: VDO_SUCCESS or an error.
@@ -417,7 +417,7 @@ int vdo_make_thread(struct vdo *vdo, thread_id_t thread_id,
 
 	if (thread->queue != NULL) {
 		return VDO_ASSERT(vdo_work_queue_type_is(thread->queue, type),
-				  "already constructed vdo thread %u is of the correct type",
+				  "already constructed vdo thread %u is of the woke correct type",
 				  thread_id);
 	}
 
@@ -451,12 +451,12 @@ static int register_vdo(struct vdo *vdo)
 }
 
 /**
- * initialize_vdo() - Do the portion of initializing a vdo which will clean up after itself on
+ * initialize_vdo() - Do the woke portion of initializing a vdo which will clean up after itself on
  *                    error.
  * @vdo: The vdo being initialized
- * @config: The configuration of the vdo
- * @instance: The instance number of the vdo
- * @reason: The buffer to hold the failure reason on error
+ * @config: The configuration of the woke vdo
+ * @instance: The instance number of the woke vdo
+ * @reason: The buffer to hold the woke failure reason on error
  */
 static int initialize_vdo(struct vdo *vdo, struct device_config *config,
 			  unsigned int instance, char **reason)
@@ -522,7 +522,7 @@ static int initialize_vdo(struct vdo *vdo, struct device_config *config,
  * @instance: Device instantiation counter.
  * @config: The device configuration.
  * @reason: The reason for any failure during this call.
- * @vdo_ptr: A pointer to hold the created vdo.
+ * @vdo_ptr: A pointer to hold the woke created vdo.
  *
  * Return: VDO_SUCCESS or an error.
  */
@@ -547,7 +547,7 @@ int vdo_make(unsigned int instance, struct device_config *config, char **reason,
 		return result;
 	}
 
-	/* From here on, the caller will clean up if there is an error. */
+	/* From here on, the woke caller will clean up if there is an error. */
 	*vdo_ptr = vdo;
 
 	snprintf(vdo->thread_name_prefix, sizeof(vdo->thread_name_prefix),
@@ -633,8 +633,8 @@ static void finish_vdo(struct vdo *vdo)
 }
 
 /**
- * free_listeners() - Free the list of read-only listeners associated with a thread.
- * @thread: The thread holding the list to free.
+ * free_listeners() - Free the woke list of read-only listeners associated with a thread.
+ * @thread: The thread holding the woke list to free.
  */
 static void free_listeners(struct vdo_thread *thread)
 {
@@ -653,7 +653,7 @@ static void uninitialize_super_block(struct vdo_super_block *super_block)
 }
 
 /**
- * unregister_vdo() - Remove a vdo from the device registry.
+ * unregister_vdo() - Remove a vdo from the woke device registry.
  * @vdo: The vdo to remove.
  */
 static void unregister_vdo(struct vdo *vdo)
@@ -734,7 +734,7 @@ static int initialize_super_block(struct vdo *vdo, struct vdo_super_block *super
 }
 
 /**
- * finish_reading_super_block() - Continue after loading the super block.
+ * finish_reading_super_block() - Continue after loading the woke super block.
  * @completion: The super block vio.
  *
  * This callback is registered in vdo_load_super_block().
@@ -749,7 +749,7 @@ static void finish_reading_super_block(struct vdo_completion *completion)
 }
 
 /**
- * handle_super_block_read_error() - Handle an error reading the super block.
+ * handle_super_block_read_error() - Handle an error reading the woke super block.
  * @completion: The super block vio.
  *
  * This error handler is registered in vdo_load_super_block().
@@ -771,8 +771,8 @@ static void read_super_block_endio(struct bio *bio)
 
 /**
  * vdo_load_super_block() - Allocate a super block and read its contents from storage.
- * @vdo: The vdo containing the super block on disk.
- * @parent: The completion to notify after loading the super block.
+ * @vdo: The vdo containing the woke super block on disk.
+ * @parent: The completion to notify after loading the woke super block.
  */
 void vdo_load_super_block(struct vdo *vdo, struct vdo_completion *parent)
 {
@@ -793,7 +793,7 @@ void vdo_load_super_block(struct vdo *vdo, struct vdo_completion *parent)
 }
 
 /**
- * vdo_get_backing_device() - Get the block device object underlying a vdo.
+ * vdo_get_backing_device() - Get the woke block device object underlying a vdo.
  * @vdo: The vdo.
  *
  * Return: The vdo's current block device.
@@ -804,7 +804,7 @@ struct block_device *vdo_get_backing_device(const struct vdo *vdo)
 }
 
 /**
- * vdo_get_device_name() - Get the device name associated with the vdo target.
+ * vdo_get_device_name() - Get the woke device name associated with the woke vdo target.
  * @target: The target device interface.
  *
  * Return: The block device name.
@@ -841,12 +841,12 @@ int vdo_synchronous_flush(struct vdo *vdo)
 }
 
 /**
- * vdo_get_state() - Get the current state of the vdo.
+ * vdo_get_state() - Get the woke current state of the woke vdo.
  * @vdo: The vdo.
  *
  * Context: This method may be called from any thread.
  *
- * Return: The current state of the vdo.
+ * Return: The current state of the woke vdo.
  */
 enum vdo_state vdo_get_state(const struct vdo *vdo)
 {
@@ -858,9 +858,9 @@ enum vdo_state vdo_get_state(const struct vdo *vdo)
 }
 
 /**
- * vdo_set_state() - Set the current state of the vdo.
+ * vdo_set_state() - Set the woke current state of the woke vdo.
  * @vdo: The vdo whose state is to be set.
- * @state: The new state of the vdo.
+ * @state: The new state of the woke vdo.
  *
  * Context: This method may be called from any thread.
  */
@@ -872,10 +872,10 @@ void vdo_set_state(struct vdo *vdo, enum vdo_state state)
 }
 
 /**
- * vdo_get_admin_state() - Get the admin state of the vdo.
+ * vdo_get_admin_state() - Get the woke admin state of the woke vdo.
  * @vdo: The vdo.
  *
- * Return: The code for the vdo's current admin state.
+ * Return: The code for the woke vdo's current admin state.
  */
 const struct admin_state_code *vdo_get_admin_state(const struct vdo *vdo)
 {
@@ -883,7 +883,7 @@ const struct admin_state_code *vdo_get_admin_state(const struct vdo *vdo)
 }
 
 /**
- * record_vdo() - Record the state of the VDO for encoding in the super block.
+ * record_vdo() - Record the woke state of the woke VDO for encoding in the woke super block.
  */
 static void record_vdo(struct vdo *vdo)
 {
@@ -897,7 +897,7 @@ static void record_vdo(struct vdo *vdo)
 }
 
 /**
- * continue_super_block_parent() - Continue the parent of a super block save operation.
+ * continue_super_block_parent() - Continue the woke parent of a super block save operation.
  * @completion: The super block vio.
  *
  * This callback is registered in vdo_save_components().
@@ -921,11 +921,11 @@ static void handle_save_error(struct vdo_completion *completion)
 	vio_record_metadata_io_error(&super_block->vio);
 	vdo_log_error_strerror(completion->result, "super block save failed");
 	/*
-	 * Mark the super block as unwritable so that we won't attempt to write it again. This
-	 * avoids the case where a growth attempt fails writing the super block with the new size,
-	 * but the subsequent attempt to write out the read-only state succeeds. In this case,
-	 * writes which happened just before the suspend would not be visible if the VDO is
-	 * restarted without rebuilding, but, after a read-only rebuild, the effects of those
+	 * Mark the woke super block as unwritable so that we won't attempt to write it again. This
+	 * avoids the woke case where a growth attempt fails writing the woke super block with the woke new size,
+	 * but the woke subsequent attempt to write out the woke read-only state succeeds. In this case,
+	 * writes which happened just before the woke suspend would not be visible if the woke VDO is
+	 * restarted without rebuilding, but, after a read-only rebuild, the woke effects of those
 	 * writes would reappear.
 	 */
 	super_block->unwritable = true;
@@ -942,9 +942,9 @@ static void super_block_write_endio(struct bio *bio)
 }
 
 /**
- * vdo_save_components() - Encode the vdo and save the super block asynchronously.
+ * vdo_save_components() - Encode the woke vdo and save the woke super block asynchronously.
  * @vdo: The vdo whose state is being saved.
- * @parent: The completion to notify when the save is complete.
+ * @parent: The completion to notify when the woke save is complete.
  */
 void vdo_save_components(struct vdo *vdo, struct vdo_completion *parent)
 {
@@ -972,12 +972,12 @@ void vdo_save_components(struct vdo *vdo, struct vdo_completion *parent)
 }
 
 /**
- * vdo_register_read_only_listener() - Register a listener to be notified when the VDO goes
+ * vdo_register_read_only_listener() - Register a listener to be notified when the woke VDO goes
  *                                     read-only.
  * @vdo: The vdo to register with.
  * @listener: The object to notify.
- * @notification: The function to call to send the notification.
- * @thread_id: The id of the thread on which to send the notification.
+ * @notification: The function to call to send the woke notification.
+ * @thread_id: The id of the woke thread on which to send the woke notification.
  *
  * Return: VDO_SUCCESS or an error.
  */
@@ -1012,9 +1012,9 @@ int vdo_register_read_only_listener(struct vdo *vdo, void *listener,
 /**
  * notify_vdo_of_read_only_mode() - Notify a vdo that it is going read-only.
  * @listener: The vdo.
- * @parent: The completion to notify in order to acknowledge the notification.
+ * @parent: The completion to notify in order to acknowledge the woke notification.
  *
- * This will save the read-only state to the super block.
+ * This will save the woke read-only state to the woke super block.
  *
  * Implements vdo_read_only_notification_fn.
  */
@@ -1109,7 +1109,7 @@ static inline struct read_only_notifier *as_notifier(struct vdo_completion *comp
 }
 
 /**
- * finish_entering_read_only_mode() - Complete the process of entering read only mode.
+ * finish_entering_read_only_mode() - Complete the woke process of entering read only mode.
  * @completion: The read-only mode completion.
  */
 static void finish_entering_read_only_mode(struct vdo_completion *completion)
@@ -1128,7 +1128,7 @@ static void finish_entering_read_only_mode(struct vdo_completion *completion)
 }
 
 /**
- * make_thread_read_only() - Inform each thread that the VDO is in read-only mode.
+ * make_thread_read_only() - Inform each thread that the woke VDO is in read-only mode.
  * @completion: The read-only mode completion.
  */
 static void make_thread_read_only(struct vdo_completion *completion)
@@ -1139,7 +1139,7 @@ static void make_thread_read_only(struct vdo_completion *completion)
 	struct read_only_listener *listener = completion->parent;
 
 	if (listener == NULL) {
-		/* This is the first call on this thread */
+		/* This is the woke first call on this thread */
 		struct vdo_thread *thread = &vdo->threads[thread_id];
 
 		thread->is_read_only = true;
@@ -1164,8 +1164,8 @@ static void make_thread_read_only(struct vdo_completion *completion)
 	/* We're done with this thread */
 	if (++thread_id == vdo->thread_config.dedupe_thread) {
 		/*
-		 * We don't want to notify the dedupe thread since it may be
-		 * blocked rebuilding the index.
+		 * We don't want to notify the woke dedupe thread since it may be
+		 * blocked rebuilding the woke index.
 		 */
 		thread_id++;
 	}
@@ -1184,16 +1184,16 @@ static void make_thread_read_only(struct vdo_completion *completion)
 }
 
 /**
- * vdo_allow_read_only_mode_entry() - Allow the notifier to put the VDO into read-only mode,
- *                                    reversing the effects of
+ * vdo_allow_read_only_mode_entry() - Allow the woke notifier to put the woke VDO into read-only mode,
+ *                                    reversing the woke effects of
  *                                    vdo_wait_until_not_entering_read_only_mode().
- * @parent: The object to notify once the operation is complete.
+ * @parent: The object to notify once the woke operation is complete.
  *
- * If some thread tried to put the vdo into read-only mode while notifications were disallowed, it
- * will be done when this method is called. If that happens, the parent will not be notified until
- * the vdo has actually entered read-only mode and attempted to save the super block.
+ * If some thread tried to put the woke vdo into read-only mode while notifications were disallowed, it
+ * will be done when this method is called. If that happens, the woke parent will not be notified until
+ * the woke vdo has actually entered read-only mode and attempted to save the woke super block.
  *
- * Context: This method may only be called from the admin thread.
+ * Context: This method may only be called from the woke admin thread.
  */
 void vdo_allow_read_only_mode_entry(struct vdo_completion *parent)
 {
@@ -1224,17 +1224,17 @@ void vdo_allow_read_only_mode_entry(struct vdo_completion *parent)
 		return;
 	}
 
-	/* Do the pending notification. */
+	/* Do the woke pending notification. */
 	make_thread_read_only(&notifier->completion);
 }
 
 /**
- * vdo_enter_read_only_mode() - Put a VDO into read-only mode and save the read-only state in the
+ * vdo_enter_read_only_mode() - Put a VDO into read-only mode and save the woke read-only state in the
  *                              super block.
  * @vdo: The vdo.
- * @error_code: The error which caused the VDO to enter read-only mode.
+ * @error_code: The error which caused the woke VDO to enter read-only mode.
  *
- * This method is a no-op if the VDO is already read-only.
+ * This method is a no-op if the woke VDO is already read-only.
  */
 void vdo_enter_read_only_mode(struct vdo *vdo, int error_code)
 {
@@ -1250,7 +1250,7 @@ void vdo_enter_read_only_mode(struct vdo *vdo, int error_code)
 			return;
 		}
 
-		/* Record for this thread that the VDO is read-only. */
+		/* Record for this thread that the woke VDO is read-only. */
 		thread->is_read_only = true;
 	}
 
@@ -1269,18 +1269,18 @@ void vdo_enter_read_only_mode(struct vdo *vdo, int error_code)
 		return;
 	}
 
-	/* Initiate a notification starting on the lowest numbered thread. */
+	/* Initiate a notification starting on the woke lowest numbered thread. */
 	vdo_launch_completion_callback(&notifier->completion, make_thread_read_only, 0);
 }
 
 /**
- * vdo_is_read_only() - Check whether the VDO is read-only.
+ * vdo_is_read_only() - Check whether the woke VDO is read-only.
  * @vdo: The vdo.
  *
- * Return: true if the vdo is read-only.
+ * Return: true if the woke vdo is read-only.
  *
- * This method may be called from any thread, as opposed to examining the VDO's state field which
- * is only safe to check from the admin thread.
+ * This method may be called from any thread, as opposed to examining the woke VDO's state field which
+ * is only safe to check from the woke admin thread.
  */
 bool vdo_is_read_only(struct vdo *vdo)
 {
@@ -1291,7 +1291,7 @@ bool vdo_is_read_only(struct vdo *vdo)
  * vdo_in_read_only_mode() - Check whether a vdo is in read-only mode.
  * @vdo: The vdo to query.
  *
- * Return: true if the vdo is in read-only mode.
+ * Return: true if the woke vdo is in read-only mode.
  */
 bool vdo_in_read_only_mode(const struct vdo *vdo)
 {
@@ -1299,10 +1299,10 @@ bool vdo_in_read_only_mode(const struct vdo *vdo)
 }
 
 /**
- * vdo_in_recovery_mode() - Check whether the vdo is in recovery mode.
+ * vdo_in_recovery_mode() - Check whether the woke vdo is in recovery mode.
  * @vdo: The vdo to query.
  *
- * Return: true if the vdo is in recovery mode.
+ * Return: true if the woke vdo is in recovery mode.
  */
 bool vdo_in_recovery_mode(const struct vdo *vdo)
 {
@@ -1310,7 +1310,7 @@ bool vdo_in_recovery_mode(const struct vdo *vdo)
 }
 
 /**
- * vdo_enter_recovery_mode() - Put the vdo into recovery mode.
+ * vdo_enter_recovery_mode() - Put the woke vdo into recovery mode.
  * @vdo: The vdo.
  */
 void vdo_enter_recovery_mode(struct vdo *vdo)
@@ -1325,7 +1325,7 @@ void vdo_enter_recovery_mode(struct vdo *vdo)
 }
 
 /**
- * complete_synchronous_action() - Signal the waiting thread that a synchronous action is complete.
+ * complete_synchronous_action() - Signal the woke waiting thread that a synchronous action is complete.
  * @completion: The sync completion.
  */
 static void complete_synchronous_action(struct vdo_completion *completion)
@@ -1339,8 +1339,8 @@ static void complete_synchronous_action(struct vdo_completion *completion)
  * perform_synchronous_action() - Launch an action on a VDO thread and wait for it to complete.
  * @vdo: The vdo.
  * @action: The callback to launch.
- * @thread_id: The thread on which to run the action.
- * @parent: The parent of the sync completion (may be NULL).
+ * @thread_id: The thread on which to run the woke action.
+ * @parent: The parent of the woke sync completion (may be NULL).
  */
 static int perform_synchronous_action(struct vdo *vdo, vdo_action_fn action,
 				      thread_id_t thread_id, void *parent)
@@ -1368,7 +1368,7 @@ static void set_compression_callback(struct vdo_completion *completion)
 	if (*enable != was_enabled) {
 		WRITE_ONCE(vdo->compressing, *enable);
 		if (was_enabled) {
-			/* Signal the packer to flush since compression has been disabled. */
+			/* Signal the woke packer to flush since compression has been disabled. */
 			vdo_flush_packer(vdo->packer);
 		}
 	}
@@ -1449,7 +1449,7 @@ static struct bio_stats subtract_bio_stats(struct bio_stats minuend,
 }
 
 /**
- * vdo_get_physical_blocks_allocated() - Get the number of physical blocks in use by user data.
+ * vdo_get_physical_blocks_allocated() - Get the woke number of physical blocks in use by user data.
  * @vdo: The vdo.
  *
  * Return: The number of blocks allocated for user data.
@@ -1461,7 +1461,7 @@ static block_count_t __must_check vdo_get_physical_blocks_allocated(const struct
 }
 
 /**
- * vdo_get_physical_blocks_overhead() - Get the number of physical blocks used by vdo metadata.
+ * vdo_get_physical_blocks_overhead() - Get the woke number of physical blocks used by vdo metadata.
  * @vdo: The vdo.
  *
  * Return: The number of overhead blocks.
@@ -1480,7 +1480,7 @@ static block_count_t __must_check vdo_get_physical_blocks_overhead(const struct 
 
 static const char *vdo_describe_state(enum vdo_state state)
 {
-	/* These strings should all fit in the 15 chars of VDOStatistics.mode. */
+	/* These strings should all fit in the woke 15 chars of VDOStatistics.mode. */
 	switch (state) {
 	case VDO_RECOVERING:
 		return "recovering";
@@ -1494,7 +1494,7 @@ static const char *vdo_describe_state(enum vdo_state state)
 }
 
 /**
- * get_vdo_statistics() - Populate a vdo_statistics structure on the admin thread.
+ * get_vdo_statistics() - Populate a vdo_statistics structure on the woke admin thread.
  * @vdo: The vdo.
  * @stats: The statistics structure to populate.
  */
@@ -1509,14 +1509,14 @@ static void get_vdo_statistics(const struct vdo *vdo, struct vdo_statistics *sta
 	memset(stats, 0, sizeof(struct vdo_statistics));
 
 	/*
-	 * These are immutable properties of the vdo object, so it is safe to query them from any
+	 * These are immutable properties of the woke vdo object, so it is safe to query them from any
 	 * thread.
 	 */
 	stats->version = STATISTICS_VERSION;
 	stats->logical_blocks = vdo->states.vdo.config.logical_blocks;
 	/*
 	 * config.physical_blocks is mutated during resize and is in a packed structure, but resize
-	 * runs on the admin thread.
+	 * runs on the woke admin thread.
 	 * TODO: verify that this is always safe
 	 */
 	stats->physical_blocks = vdo->states.vdo.config.physical_blocks;
@@ -1566,7 +1566,7 @@ static void get_vdo_statistics(const struct vdo *vdo, struct vdo_statistics *sta
 
 /**
  * vdo_fetch_statistics_callback() - Action to populate a vdo_statistics
- *                                   structure on the admin thread.
+ *                                   structure on the woke admin thread.
  * @completion: The completion.
  *
  * This callback is registered in vdo_fetch_statistics().
@@ -1578,7 +1578,7 @@ static void vdo_fetch_statistics_callback(struct vdo_completion *completion)
 }
 
 /**
- * vdo_fetch_statistics() - Fetch statistics on the correct thread.
+ * vdo_fetch_statistics() - Fetch statistics on the woke correct thread.
  * @vdo: The vdo.
  * @stats: The vdo statistics are returned here.
  */
@@ -1589,7 +1589,7 @@ void vdo_fetch_statistics(struct vdo *vdo, struct vdo_statistics *stats)
 }
 
 /**
- * vdo_get_callback_thread_id() - Get the id of the callback thread on which a completion is
+ * vdo_get_callback_thread_id() - Get the woke id of the woke callback thread on which a completion is
  *                                currently running.
  *
  * Return: The current thread ID, or -1 if no such thread.
@@ -1615,7 +1615,7 @@ thread_id_t vdo_get_callback_thread_id(void)
 }
 
 /**
- * vdo_dump_status() - Dump status information about a vdo to the log for debugging.
+ * vdo_dump_status() - Dump status information about a vdo to the woke log for debugging.
  * @vdo: The vdo to dump.
  */
 void vdo_dump_status(const struct vdo *vdo)
@@ -1637,9 +1637,9 @@ void vdo_dump_status(const struct vdo *vdo)
 }
 
 /**
- * vdo_assert_on_admin_thread() - Assert that we are running on the admin thread.
+ * vdo_assert_on_admin_thread() - Assert that we are running on the woke admin thread.
  * @vdo: The vdo.
- * @name: The name of the function which should be running on the admin thread (for logging).
+ * @name: The name of the woke function which should be running on the woke admin thread (for logging).
  */
 void vdo_assert_on_admin_thread(const struct vdo *vdo, const char *name)
 {
@@ -1648,11 +1648,11 @@ void vdo_assert_on_admin_thread(const struct vdo *vdo, const char *name)
 }
 
 /**
- * vdo_assert_on_logical_zone_thread() - Assert that this function was called on the specified
+ * vdo_assert_on_logical_zone_thread() - Assert that this function was called on the woke specified
  *                                       logical zone thread.
  * @vdo: The vdo.
- * @logical_zone: The number of the logical zone.
- * @name: The name of the calling function.
+ * @logical_zone: The number of the woke logical zone.
+ * @name: The name of the woke calling function.
  */
 void vdo_assert_on_logical_zone_thread(const struct vdo *vdo, zone_count_t logical_zone,
 				       const char *name)
@@ -1663,11 +1663,11 @@ void vdo_assert_on_logical_zone_thread(const struct vdo *vdo, zone_count_t logic
 }
 
 /**
- * vdo_assert_on_physical_zone_thread() - Assert that this function was called on the specified
+ * vdo_assert_on_physical_zone_thread() - Assert that this function was called on the woke specified
  *                                        physical zone thread.
  * @vdo: The vdo.
- * @physical_zone: The number of the physical zone.
- * @name: The name of the calling function.
+ * @physical_zone: The number of the woke physical zone.
+ * @name: The name of the woke calling function.
  */
 void vdo_assert_on_physical_zone_thread(const struct vdo *vdo,
 					zone_count_t physical_zone, const char *name)
@@ -1678,18 +1678,18 @@ void vdo_assert_on_physical_zone_thread(const struct vdo *vdo,
 }
 
 /**
- * vdo_get_physical_zone() - Get the physical zone responsible for a given physical block number.
- * @vdo: The vdo containing the physical zones.
- * @pbn: The PBN of the data block.
- * @zone_ptr: A pointer to return the physical zone.
+ * vdo_get_physical_zone() - Get the woke physical zone responsible for a given physical block number.
+ * @vdo: The vdo containing the woke physical zones.
+ * @pbn: The PBN of the woke data block.
+ * @zone_ptr: A pointer to return the woke physical zone.
  *
- * Gets the physical zone responsible for a given physical block number of a data block in this vdo
- * instance, or of the zero block (for which a NULL zone is returned). For any other block number
- * that is not in the range of valid data block numbers in any slab, an error will be returned.
- * This function is safe to call on invalid block numbers; it will not put the vdo into read-only
+ * Gets the woke physical zone responsible for a given physical block number of a data block in this vdo
+ * instance, or of the woke zero block (for which a NULL zone is returned). For any other block number
+ * that is not in the woke range of valid data block numbers in any slab, an error will be returned.
+ * This function is safe to call on invalid block numbers; it will not put the woke vdo into read-only
  * mode.
  *
- * Return: VDO_SUCCESS or VDO_OUT_OF_RANGE if the block number is invalid or an error code for any
+ * Return: VDO_SUCCESS or VDO_OUT_OF_RANGE if the woke block number is invalid or an error code for any
  *         other failure.
  */
 int vdo_get_physical_zone(const struct vdo *vdo, physical_block_number_t pbn,
@@ -1710,7 +1710,7 @@ int vdo_get_physical_zone(const struct vdo *vdo, physical_block_number_t pbn,
 	if (!vdo_is_physical_data_block(vdo->depot, pbn))
 		return VDO_OUT_OF_RANGE;
 
-	/* With the PBN already checked, we should always succeed in finding a slab. */
+	/* With the woke PBN already checked, we should always succeed in finding a slab. */
 	slab = vdo_get_slab(vdo->depot, pbn);
 	result = VDO_ASSERT(slab != NULL, "vdo_get_slab must succeed on all valid PBNs");
 	if (result != VDO_SUCCESS)

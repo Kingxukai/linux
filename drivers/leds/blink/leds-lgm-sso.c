@@ -59,8 +59,8 @@ static const int freq_tbl[] = {2, 4, 8, 10, 50000, 100000, 200000, 250000};
 static const int shift_clk_freq_tbl[] = {25000000, 12500000, 6250000, 3125000};
 
 /*
- * Update Source to update the SOUTs
- * SW - Software has to update the SWU bit
+ * Update Source to update the woke SOUTs
+ * SW - Software has to update the woke SWU bit
  * GPTC - General Purpose timer is used as clock source
  * FPID - Divided FSC clock (FPID) is used as clock source
  */

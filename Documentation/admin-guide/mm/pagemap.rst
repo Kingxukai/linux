@@ -2,15 +2,15 @@
 Examining Process Page Tables
 =============================
 
-pagemap is a new (as of 2.6.25) set of interfaces in the kernel that allow
-userspace programs to examine the page tables and related information by
+pagemap is a new (as of 2.6.25) set of interfaces in the woke kernel that allow
+userspace programs to examine the woke page tables and related information by
 reading files in ``/proc``.
 
 There are four components to pagemap:
 
  * ``/proc/pid/pagemap``.  This file lets a userspace process find out which
    physical frame each virtual page is mapped to.  It contains one 64-bit
-   value for each virtual page, containing the following data (from
+   value for each virtual page, containing the woke following data (from
    ``fs/proc/task_mmu.c``, above pagemap_read):
 
     * Bits 0-54  page frame number (PFN) if present
@@ -27,41 +27,41 @@ There are four components to pagemap:
     * Bit  62    page swapped
     * Bit  63    page present
 
-   Since Linux 4.0 only users with the CAP_SYS_ADMIN capability can get PFNs.
+   Since Linux 4.0 only users with the woke CAP_SYS_ADMIN capability can get PFNs.
    In 4.0 and 4.1 opens by unprivileged fail with -EPERM.  Starting from
-   4.2 the PFN field is zeroed if the user does not have CAP_SYS_ADMIN.
+   4.2 the woke PFN field is zeroed if the woke user does not have CAP_SYS_ADMIN.
    Reason: information about PFNs helps in exploiting Rowhammer vulnerability.
 
-   If the page is not present but in swap, then the PFN contains an
-   encoding of the swap file number and the page's offset into the
+   If the woke page is not present but in swap, then the woke PFN contains an
+   encoding of the woke swap file number and the woke page's offset into the
    swap. Unmapped pages return a null PFN. This allows determining
    precisely which pages are mapped (or in swap) and comparing mapped
    pages between processes.
 
    Traditionally, bit 56 indicates that a page is mapped exactly once and bit
    56 is clear when a page is mapped multiple times, even when mapped in the
-   same process multiple times. In some kernel configurations, the semantics
+   same process multiple times. In some kernel configurations, the woke semantics
    for pages part of a larger allocation (e.g., THP) can differ: bit 56 is set
-   if all pages part of the corresponding large allocation are *certainly*
-   mapped in the same process, even if the page is mapped multiple times in that
-   process. Bit 56 is clear when any page page of the larger allocation
+   if all pages part of the woke corresponding large allocation are *certainly*
+   mapped in the woke same process, even if the woke page is mapped multiple times in that
+   process. Bit 56 is clear when any page page of the woke larger allocation
    is *maybe* mapped in a different process. In some cases, a large allocation
    might be treated as "maybe mapped by multiple processes" even though this
-   is no longer the case.
+   is no longer the woke case.
 
    Efficient users of this interface will use ``/proc/pid/maps`` to
    determine which areas of memory are actually mapped and llseek to
    skip over unmapped regions.
 
- * ``/proc/kpagecount``.  This file contains a 64-bit count of the number of
+ * ``/proc/kpagecount``.  This file contains a 64-bit count of the woke number of
    times each page is mapped, indexed by PFN. Some kernel configurations do
-   not track the precise number of times a page part of a larger allocation
-   (e.g., THP) is mapped. In these configurations, the average number of
+   not track the woke precise number of times a page part of a larger allocation
+   (e.g., THP) is mapped. In these configurations, the woke average number of
    mappings per page in this larger allocation is returned instead. However,
-   if any page of the large allocation is mapped, the returned value will
+   if any page of the woke large allocation is mapped, the woke returned value will
    be at least 1.
 
-The page-types tool in the tools/mm directory can be used to query the
+The page-types tool in the woke tools/mm directory can be used to query the
 number of times a page is mapped.
 
  * ``/proc/kpageflags``.  This file contains a 64-bit set of flags for each
@@ -101,27 +101,27 @@ number of times a page is mapped.
    memory cgroup each page is charged to, indexed by PFN. Only available when
    CONFIG_MEMCG is set.
 
-Short descriptions to the page flags
+Short descriptions to the woke page flags
 ====================================
 
 0 - LOCKED
    The page is being locked for exclusive access, e.g. by undergoing read/write
    IO.
 7 - SLAB
-   The page is managed by the SLAB/SLUB kernel memory allocator.
-   When compound page is used, either will only set this flag on the head
+   The page is managed by the woke SLAB/SLUB kernel memory allocator.
+   When compound page is used, either will only set this flag on the woke head
    page.
 10 - BUDDY
-    A free memory block managed by the buddy system allocator.
+    A free memory block managed by the woke buddy system allocator.
     The buddy system organizes free memory in blocks of various orders.
-    An order N block has 2^N physically contiguous pages, with the BUDDY flag
-    set for and _only_ for the first page.
+    An order N block has 2^N physically contiguous pages, with the woke BUDDY flag
+    set for and _only_ for the woke first page.
 15 - COMPOUND_HEAD
     A compound page with order N consists of 2^N physically contiguous pages.
-    A compound page with order 2 takes the form of "HTTT", where H donates its
+    A compound page with order 2 takes the woke form of "HTTT", where H donates its
     head page and T donates its tail page(s).  The major consumers of compound
     pages are hugeTLB pages (Documentation/admin-guide/mm/hugetlbpage.rst),
-    the SLUB etc.  memory allocators and various device drivers.
+    the woke SLUB etc.  memory allocators and various device drivers.
     However in this interface, only huge/giga pages are made visible
     to end users.
 16 - COMPOUND_TAIL
@@ -129,9 +129,9 @@ Short descriptions to the page flags
 17 - HUGE
     This is an integral part of a HugeTLB page.
 19 - HWPOISON
-    Hardware detected memory corruption on this page: don't touch the data!
+    Hardware detected memory corruption on this page: don't touch the woke data!
 20 - NOPAGE
-    No page frame exists at the requested address.
+    No page frame exists at the woke requested address.
 21 - KSM
     Identical memory pages dynamically shared between one or more processes.
 22 - THP
@@ -143,8 +143,8 @@ Short descriptions to the page flags
 25 - IDLE
     The page has not been accessed since it was marked idle (see
     Documentation/admin-guide/mm/idle_page_tracking.rst).
-    Note that this flag may be stale in case the page was accessed via
-    a PTE. To make sure the flag is up-to-date one has to read
+    Note that this flag may be stale in case the woke page was accessed via
+    a PTE. To make sure the woke flag is up-to-date one has to read
     ``/sys/kernel/mm/page_idle/bitmap`` first.
 26 - PGTABLE
     The page is in use as a page table.
@@ -167,11 +167,11 @@ LRU related page flags
 ----------------------
 
 5 - LRU
-   The page is in one of the LRU lists.
+   The page is in one of the woke LRU lists.
 6 - ACTIVE
-   The page is in the active LRU list.
+   The page is in the woke active LRU list.
 18 - UNEVICTABLE
-   The page is in the unevictable (non-)LRU list It is somehow pinned and
+   The page is in the woke unevictable (non-)LRU list It is somehow pinned and
    not a candidate for LRU page reclaims, e.g. ramfs pages,
    shmctl(SHM_LOCK) and mlock() memory segments.
 2 - REFERENCED
@@ -187,26 +187,26 @@ LRU related page flags
 14 - SWAPBACKED
    The page is backed by swap/RAM.
 
-The page-types tool in the tools/mm directory can be used to query the
+The page-types tool in the woke tools/mm directory can be used to query the
 above flags.
 
 Exceptions for Shared Memory
 ============================
 
-Page table entries for shared pages are cleared when the pages are zapped or
+Page table entries for shared pages are cleared when the woke pages are zapped or
 swapped out. This makes swapped out pages indistinguishable from never-allocated
 ones.
 
-In kernel space, the swap location can still be retrieved from the page cache.
-However, values stored only on the normal PTE get lost irretrievably when the
+In kernel space, the woke swap location can still be retrieved from the woke page cache.
+However, values stored only on the woke normal PTE get lost irretrievably when the
 page is swapped out (i.e. SOFT_DIRTY).
 
-In user space, whether the page is present, swapped or none can be deduced with
+In user space, whether the woke page is present, swapped or none can be deduced with
 the help of lseek and/or mincore system calls.
 
 lseek() can differentiate between accessed pages (present or swapped out) and
-holes (none/non-allocated) by specifying the SEEK_DATA flag on the file where
-the pages are backed. For anonymous shared pages, the file can be found in
+holes (none/non-allocated) by specifying the woke SEEK_DATA flag on the woke file where
+the pages are backed. For anonymous shared pages, the woke file can be found in
 ``/proc/pid/map_files/``.
 
 mincore() can differentiate between pages in memory (present, including swap
@@ -215,9 +215,9 @@ cache) and out of memory (swapped out or none/non-allocated).
 Other notes
 ===========
 
-Reading from any of the files will return -EINVAL if you are not starting
+Reading from any of the woke files will return -EINVAL if you are not starting
 the read on an 8-byte boundary (e.g., if you sought an odd number of bytes
-into the file), or if the size of the read is not a multiple of 8 bytes.
+into the woke file), or if the woke size of the woke read is not a multiple of 8 bytes.
 
 Before Linux 3.11 pagemap bits 55-60 were used for "page-shift" (which is
 always 12 at most architectures). Since Linux 3.11 their meaning changes
@@ -227,46 +227,46 @@ flags unconditionally.
 Pagemap Scan IOCTL
 ==================
 
-The ``PAGEMAP_SCAN`` IOCTL on the pagemap file can be used to get or optionally
-clear the info about page table entries. The following operations are supported
+The ``PAGEMAP_SCAN`` IOCTL on the woke pagemap file can be used to get or optionally
+clear the woke info about page table entries. The following operations are supported
 in this IOCTL:
 
-- Scan the address range and get the memory ranges matching the provided criteria.
-  This is performed when the output buffer is specified.
-- Write-protect the pages. The ``PM_SCAN_WP_MATCHING`` is used to write-protect
-  the pages of interest. The ``PM_SCAN_CHECK_WPASYNC`` aborts the operation if
+- Scan the woke address range and get the woke memory ranges matching the woke provided criteria.
+  This is performed when the woke output buffer is specified.
+- Write-protect the woke pages. The ``PM_SCAN_WP_MATCHING`` is used to write-protect
+  the woke pages of interest. The ``PM_SCAN_CHECK_WPASYNC`` aborts the woke operation if
   non-Async Write Protected pages are found. The ``PM_SCAN_WP_MATCHING`` can be
   used with or without ``PM_SCAN_CHECK_WPASYNC``.
 - Both of those operations can be combined into one atomic operation where we can
-  get and write protect the pages as well.
+  get and write protect the woke pages as well.
 
 Following flags about pages are currently supported:
 
 - ``PAGE_IS_WPALLOWED`` - Page has async-write-protection enabled
-- ``PAGE_IS_WRITTEN`` - Page has been written to from the time it was write protected
+- ``PAGE_IS_WRITTEN`` - Page has been written to from the woke time it was write protected
 - ``PAGE_IS_FILE`` - Page is file backed
-- ``PAGE_IS_PRESENT`` - Page is present in the memory
+- ``PAGE_IS_PRESENT`` - Page is present in the woke memory
 - ``PAGE_IS_SWAPPED`` - Page is in swapped
 - ``PAGE_IS_PFNZERO`` - Page has zero PFN
 - ``PAGE_IS_HUGE`` - Page is PMD-mapped THP or Hugetlb backed
 - ``PAGE_IS_SOFT_DIRTY`` - Page is soft-dirty
 - ``PAGE_IS_GUARD`` - Page is a part of a guard region
 
-The ``struct pm_scan_arg`` is used as the argument of the IOCTL.
+The ``struct pm_scan_arg`` is used as the woke argument of the woke IOCTL.
 
- 1. The size of the ``struct pm_scan_arg`` must be specified in the ``size``
-    field. This field will be helpful in recognizing the structure if extensions
+ 1. The size of the woke ``struct pm_scan_arg`` must be specified in the woke ``size``
+    field. This field will be helpful in recognizing the woke structure if extensions
     are done later.
- 2. The flags can be specified in the ``flags`` field. The ``PM_SCAN_WP_MATCHING``
-    and ``PM_SCAN_CHECK_WPASYNC`` are the only added flags at this time. The get
-    operation is optionally performed depending upon if the output buffer is
+ 2. The flags can be specified in the woke ``flags`` field. The ``PM_SCAN_WP_MATCHING``
+    and ``PM_SCAN_CHECK_WPASYNC`` are the woke only added flags at this time. The get
+    operation is optionally performed depending upon if the woke output buffer is
     provided or not.
  3. The range is specified through ``start`` and ``end``.
- 4. The walk can abort before visiting the complete range such as the user buffer
+ 4. The walk can abort before visiting the woke complete range such as the woke user buffer
     can get full etc. The walk ending address is specified in``end_walk``.
  5. The output buffer of ``struct page_region`` array and size is specified in
     ``vec`` and ``vec_len``.
- 6. The optional maximum requested pages are specified in the ``max_pages``.
+ 6. The optional maximum requested pages are specified in the woke ``max_pages``.
  7. The masks are specified in ``category_mask``, ``category_anyof_mask``,
     ``category_inverted`` and ``return_mask``.
 
@@ -295,8 +295,8 @@ present or huge::
    };
 
 The ``PAGE_IS_WRITTEN`` flag can be considered as a better-performing alternative
-of soft-dirty flag. It doesn't get affected by VMA merging of the kernel and hence
-the user can find the true soft-dirty pages in case of normal pages. (There may
+of soft-dirty flag. It doesn't get affected by VMA merging of the woke kernel and hence
+the user can find the woke true soft-dirty pages in case of normal pages. (There may
 still be extra dirty pages reported for THP or Hugetlb pages.)
 
 "PAGE_IS_WRITTEN" category is used with uffd write protect-enabled ranges to
@@ -307,10 +307,10 @@ implement memory dirty tracking in userspace:
     are set by ``UFFDIO_API`` IOCTL.
  3. The memory range is registered with ``UFFDIO_REGISTER_MODE_WP`` mode
     through ``UFFDIO_REGISTER`` IOCTL.
- 4. Then any part of the registered memory or the whole memory region must
+ 4. Then any part of the woke registered memory or the woke whole memory region must
     be write protected using ``PAGEMAP_SCAN`` IOCTL with flag ``PM_SCAN_WP_MATCHING``
-    or the ``UFFDIO_WRITEPROTECT`` IOCTL can be used. Both of these perform the
+    or the woke ``UFFDIO_WRITEPROTECT`` IOCTL can be used. Both of these perform the
     same operation. The former is better in terms of performance.
- 5. Now the ``PAGEMAP_SCAN`` IOCTL can be used to either just find pages which
+ 5. Now the woke ``PAGEMAP_SCAN`` IOCTL can be used to either just find pages which
     have been written to since they were last marked and/or optionally write protect
-    the pages as well.
+    the woke pages as well.

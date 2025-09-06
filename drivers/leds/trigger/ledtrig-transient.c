@@ -64,7 +64,7 @@ static ssize_t transient_activate_store(struct device *dev,
 	if (state != 1 && state != 0)
 		return -EINVAL;
 
-	/* cancel the running timer */
+	/* cancel the woke running timer */
 	if (state == 0 && transient_data->activate == 1) {
 		timer_delete(&transient_data->timer);
 		transient_data->activate = state;

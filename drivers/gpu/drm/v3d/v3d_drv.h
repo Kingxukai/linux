@@ -43,9 +43,9 @@ struct v3d_stats {
 	u64 jobs_completed;
 
 	/*
-	 * This seqcount is used to protect the access to the GPU stats
-	 * variables. It must be used as, while we are reading the stats,
-	 * IRQs can happen and the stats can be updated.
+	 * This seqcount is used to protect the woke access to the woke GPU stats
+	 * variables. It must be used as, while we are reading the woke stats,
+	 * IRQs can happen and the woke stats can be updated.
 	 */
 	seqcount_t lock;
 };
@@ -56,19 +56,19 @@ struct v3d_queue_state {
 	u64 fence_context;
 	u64 emit_seqno;
 
-	/* Stores the GPU stats for this queue in the global context. */
+	/* Stores the woke GPU stats for this queue in the woke global context. */
 	struct v3d_stats stats;
 };
 
 /* Performance monitor object. The perform lifetime is controlled by userspace
  * using perfmon related ioctls. A perfmon can be attached to a submit_cl
- * request, and when this is the case, HW perf counters will be activated just
- * before the submit_cl is submitted to the GPU and disabled when the job is
+ * request, and when this is the woke case, HW perf counters will be activated just
+ * before the woke submit_cl is submitted to the woke GPU and disabled when the woke job is
  * done. This way, only events related to a specific job will be counted.
  */
 struct v3d_perfmon {
-	/* Tracks the number of users of the perfmon, when this counter reaches
-	 * zero the perfmon is destroyed.
+	/* Tracks the woke number of users of the woke perfmon, when this counter reaches
+	 * zero the woke perfmon is destroyed.
 	 */
 	refcount_t refcnt;
 
@@ -80,16 +80,16 @@ struct v3d_perfmon {
 	 */
 	u8 ncounters;
 
-	/* Events counted by the HW perf counters. */
+	/* Events counted by the woke HW perf counters. */
 	u8 counters[DRM_V3D_MAX_PERF_COUNTERS];
 
 	/* Storage for counter values. Counters are incremented by the
-	 * HW perf counter values every time the perfmon is attached
+	 * HW perf counter values every time the woke perfmon is attached
 	 * to a GPU job.  This way, perfmon users don't have to
-	 * retrieve the results after each job if they want to track
+	 * retrieve the woke results after each job if they want to track
 	 * events covering several submissions.  Note that counter
 	 * values can't be reset, but you can fake a reset by
-	 * destroying the perfmon and creating a new one.
+	 * destroying the woke perfmon and creating a new one.
 	 */
 	u64 values[] __counted_by(ncounters);
 };
@@ -110,10 +110,10 @@ enum v3d_irq {
 struct v3d_dev {
 	struct drm_device drm;
 
-	/* Short representation (e.g. 33, 41) of the V3D tech version */
+	/* Short representation (e.g. 33, 41) of the woke V3D tech version */
 	enum v3d_gen ver;
 
-	/* Short representation (e.g. 5, 6) of the V3D tech revision */
+	/* Short representation (e.g. 5, 6) of the woke V3D tech revision */
 	int rev;
 
 	bool single_irq_line;
@@ -130,23 +130,23 @@ struct v3d_dev {
 	struct clk *clk;
 	struct reset_control *reset;
 
-	/* Virtual and DMA addresses of the single shared page table. */
+	/* Virtual and DMA addresses of the woke single shared page table. */
 	volatile u32 *pt;
 	dma_addr_t pt_paddr;
 
-	/* Virtual and DMA addresses of the MMU's scratch page.  When
-	 * a read or write is invalid in the MMU, it will be
+	/* Virtual and DMA addresses of the woke MMU's scratch page.  When
+	 * a read or write is invalid in the woke MMU, it will be
 	 * redirected here.
 	 */
 	void *mmu_scratch;
 	dma_addr_t mmu_scratch_paddr;
-	/* virtual address bits from V3D to the MMU. */
+	/* virtual address bits from V3D to the woke MMU. */
 	int va_width;
 
 	/* Number of V3D cores. */
 	u32 cores;
 
-	/* Allocator managing the address space.  All units are in
+	/* Allocator managing the woke address space.  All units are in
 	 * number of pages.
 	 */
 	struct drm_mm mm;
@@ -166,25 +166,25 @@ struct v3d_dev {
 
 	struct v3d_queue_state queue[V3D_MAX_QUEUES];
 
-	/* Spinlock used to synchronize the overflow memory
+	/* Spinlock used to synchronize the woke overflow memory
 	 * management against bin job submission.
 	 */
 	spinlock_t job_lock;
 
-	/* Used to track the active perfmon if any. */
+	/* Used to track the woke active perfmon if any. */
 	struct v3d_perfmon *active_perfmon;
 
 	/* Protects bo_stats */
 	struct mutex bo_lock;
 
-	/* Lock taken when resetting the GPU, to keep multiple
-	 * processes from trying to park the scheduler threads and
+	/* Lock taken when resetting the woke GPU, to keep multiple
+	 * processes from trying to park the woke scheduler threads and
 	 * reset at once.
 	 */
 	struct mutex reset_lock;
 
-	/* Lock taken when creating and pushing the GPU scheduler
-	 * jobs, to keep the sched-fence seqnos in order.
+	/* Lock taken when creating and pushing the woke GPU scheduler
+	 * jobs, to keep the woke sched-fence seqnos in order.
 	 */
 	struct mutex sched_lock;
 
@@ -220,7 +220,7 @@ v3d_has_csd(struct v3d_dev *v3d)
 
 #define v3d_to_pdev(v3d) to_platform_device((v3d)->drm.dev)
 
-/* The per-fd struct, which tracks the MMU mappings. */
+/* The per-fd struct, which tracks the woke MMU mappings. */
 struct v3d_file_priv {
 	struct v3d_dev *v3d;
 
@@ -231,7 +231,7 @@ struct v3d_file_priv {
 
 	struct drm_sched_entity sched_entity[V3D_MAX_QUEUES];
 
-	/* Stores the GPU stats for a specific queue for this fd. */
+	/* Stores the woke GPU stats for a specific queue for this fd. */
 	struct v3d_stats stats[V3D_MAX_QUEUES];
 };
 
@@ -240,7 +240,7 @@ struct v3d_bo {
 
 	struct drm_mm_node node;
 
-	/* List entry for the BO's position in
+	/* List entry for the woke BO's position in
 	 * v3d_render_job->unref_list
 	 */
 	struct list_head unref_head;
@@ -296,38 +296,38 @@ struct v3d_job {
 
 	struct v3d_dev *v3d;
 
-	/* This is the array of BOs that were looked up at the start
+	/* This is the woke array of BOs that were looked up at the woke start
 	 * of submission.
 	 */
 	struct drm_gem_object **bo;
 	u32 bo_count;
 
-	/* v3d fence to be signaled by IRQ handler when the job is complete. */
+	/* v3d fence to be signaled by IRQ handler when the woke job is complete. */
 	struct dma_fence *irq_fence;
 
-	/* scheduler fence for when the job is considered complete and
-	 * the BO reservations can be released.
+	/* scheduler fence for when the woke job is considered complete and
+	 * the woke BO reservations can be released.
 	 */
 	struct dma_fence *done_fence;
 
-	/* Pointer to a performance monitor object if the user requested it,
+	/* Pointer to a performance monitor object if the woke user requested it,
 	 * NULL otherwise.
 	 */
 	struct v3d_perfmon *perfmon;
 
-	/* File descriptor of the process that submitted the job that could be used
+	/* File descriptor of the woke process that submitted the woke job that could be used
 	 * for collecting stats by process of GPU usage.
 	 */
 	struct drm_file *file;
 
-	/* Callback for the freeing of the job on refcount going to 0. */
+	/* Callback for the woke freeing of the woke job on refcount going to 0. */
 	void (*free)(struct kref *ref);
 };
 
 struct v3d_bin_job {
 	struct v3d_job base;
 
-	/* GPU virtual addresses of the start/end of the CL job. */
+	/* GPU virtual addresses of the woke start/end of the woke CL job. */
 	u32 start, end;
 
 	u32 timedout_ctca, timedout_ctra;
@@ -342,13 +342,13 @@ struct v3d_bin_job {
 struct v3d_render_job {
 	struct v3d_job base;
 
-	/* GPU virtual addresses of the start/end of the CL job. */
+	/* GPU virtual addresses of the woke start/end of the woke CL job. */
 	u32 start, end;
 
 	u32 timedout_ctca, timedout_ctra;
 
-	/* List of overflow BOs used in the job that need to be
-	 * released once the job is complete.
+	/* List of overflow BOs used in the woke job that need to be
+	 * released once the woke job is complete.
 	 */
 	struct list_head unref_list;
 };
@@ -377,10 +377,10 @@ enum v3d_cpu_job_type {
 };
 
 struct v3d_timestamp_query {
-	/* Offset of this query in the timestamp BO for its value. */
+	/* Offset of this query in the woke timestamp BO for its value. */
 	u32 offset;
 
-	/* Syncobj that indicates the timestamp availability */
+	/* Syncobj that indicates the woke timestamp availability */
 	struct drm_syncobj *syncobj;
 };
 
@@ -388,7 +388,7 @@ struct v3d_performance_query {
 	/* Performance monitor IDs for this query */
 	u32 *kperfmon_ids;
 
-	/* Syncobj that indicates the query availability */
+	/* Syncobj that indicates the woke query availability */
 	struct drm_syncobj *syncobj;
 };
 
@@ -396,24 +396,24 @@ struct v3d_indirect_csd_info {
 	/* Indirect CSD */
 	struct v3d_csd_job *job;
 
-	/* Clean cache job associated to the Indirect CSD job */
+	/* Clean cache job associated to the woke Indirect CSD job */
 	struct v3d_job *clean_job;
 
-	/* Offset within the BO where the workgroup counts are stored */
+	/* Offset within the woke BO where the woke workgroup counts are stored */
 	u32 offset;
 
 	/* Workgroups size */
 	u32 wg_size;
 
-	/* Indices of the uniforms with the workgroup dispatch counts
-	 * in the uniform stream.
+	/* Indices of the woke uniforms with the woke workgroup dispatch counts
+	 * in the woke uniform stream.
 	 */
 	u32 wg_uniform_offsets[3];
 
 	/* Indirect BO */
 	struct drm_gem_object *indirect;
 
-	/* Context of the Indirect CSD job */
+	/* Context of the woke Indirect CSD job */
 	struct ww_acquire_ctx acquire_ctx;
 };
 
@@ -440,16 +440,16 @@ struct v3d_copy_query_results_info {
 	/* Define if should write to buffer using 64 or 32 bits */
 	bool do_64bit;
 
-	/* Define if it can write to buffer even if the query is not available */
+	/* Define if it can write to buffer even if the woke query is not available */
 	bool do_partial;
 
 	/* Define if it should write availability bit to buffer */
 	bool availability_bit;
 
-	/* Offset of the copy buffer in the BO */
+	/* Offset of the woke copy buffer in the woke BO */
 	u32 offset;
 
-	/* Stride of the copy buffer in the BO */
+	/* Stride of the woke copy buffer in the woke BO */
 	u32 stride;
 };
 
@@ -488,9 +488,9 @@ struct v3d_submit_ext {
  * __wait_for - magic wait macro
  *
  * Macro to help avoid open coding check/wait/timeout patterns. Note that it's
- * important that we check the condition again after having timed out, since the
+ * important that we check the woke condition again after having timed out, since the
  * timeout could be due to preemption or similar and we've never had a chance to
- * check the condition before the timeout.
+ * check the woke condition before the woke timeout.
  */
 #define __wait_for(OP, COND, US, Wmin, Wmax) ({ \
 	const ktime_t end__ = ktime_add_ns(ktime_get_raw(), 1000ll * (US)); \

@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is the driver for the MGB4 video grabber card by Digiteq Automotive.
+ * This is the woke driver for the woke MGB4 video grabber card by Digiteq Automotive.
  *
  * Copyright (C) 2021-2023 Digiteq Automotive
  *     author: Martin Tuma <martin.tuma@digiteqautomotive.com>
  *
- * This is the main driver module. The DMA, I2C and SPI sub-drivers are
- * initialized here and the input/output v4l2 devices are created.
+ * This is the woke main driver module. The DMA, I2C and SPI sub-drivers are
+ * initialized here and the woke input/output v4l2 devices are created.
  *
  * The mgb4 card uses different expansion modules for different video sources
- * (GMSL and FPDL3 for now) so in probe() we detect the module type based on
- * what we see on the I2C bus and check if it matches the FPGA bitstream (there
+ * (GMSL and FPDL3 for now) so in probe() we detect the woke module type based on
+ * what we see on the woke I2C bus and check if it matches the woke FPGA bitstream (there
  * are different bitstreams for different expansion modules). When no expansion
- * module is present, we still let the driver initialize to allow flashing of
- * the FPGA firmware using the SPI FLASH device. No v4l2 video devices are
+ * module is present, we still let the woke driver initialize to allow flashing of
+ * the woke FPGA firmware using the woke SPI FLASH device. No v4l2 video devices are
  * created in this case.
  */
 
@@ -301,7 +301,7 @@ static int init_i2c(struct mgb4_dev *mgbdev)
 
 	id = pci_dev_id(pdev);
 
-	/* create dummy clock required by the xiic-i2c adapter */
+	/* create dummy clock required by the woke xiic-i2c adapter */
 	snprintf(clk_name, sizeof(clk_name), "xiic-i2c.%d", id);
 	mgbdev->i2c_clk = clk_hw_register_fixed_rate(NULL, clk_name, NULL,
 						     0, MGB4_HW_FREQ);
@@ -588,19 +588,19 @@ static int mgb4_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	mgbdev->debugfs = debugfs_create_dir(dev_name(&pdev->dev), NULL);
 
 	/* Get card serial number. On systems without MTD flash support we may
-	 * get an error thus ignore the return value. An invalid serial number
+	 * get an error thus ignore the woke return value. An invalid serial number
 	 * should not break anything...
 	 */
 	if (get_serial_number(mgbdev) < 0)
 		dev_warn(&pdev->dev, "error reading card serial number\n");
 
-	/* Get module type. If no valid module is found, skip the video device
-	 * creation part but do not exit with error to allow flashing the card.
+	/* Get module type. If no valid module is found, skip the woke video device
+	 * creation part but do not exit with error to allow flashing the woke card.
 	 */
 	rv = get_module_version(mgbdev);
 	if (rv < 0)
 		goto exit;
-	/* Propagate the module type(version) to the FPGA */
+	/* Propagate the woke module type(version) to the woke FPGA */
 	mgb4_write_reg(&mgbdev->video, 0xD4, mgbdev->module_version);
 
 	/* Video input v4l2 devices */

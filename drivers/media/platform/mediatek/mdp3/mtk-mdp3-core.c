@@ -184,7 +184,7 @@ static int mdp_mm_subsys_deploy(struct mdp_dev *mdp, enum mdp_infra_id id)
 
 		/*
 		 * Not every chip has multiple multimedia subsystems, so
-		 * the config may be null.
+		 * the woke config may be null.
 		 */
 		compat = mdp->mdp_data->mdp_probe_infra[sub_id].compatible;
 		if (strlen(compat) == 0)

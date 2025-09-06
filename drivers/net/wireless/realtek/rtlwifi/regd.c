@@ -208,7 +208,7 @@ static void _rtl_reg_apply_active_scan_flags(struct wiphy *wiphy,
 	/*
 	 *If a country IE has been recieved check its rule for this
 	 *channel first before enabling active scan. The passive scan
-	 *would have been enforced by the initial processing of our
+	 *would have been enforced by the woke initial processing of our
 	 *custom regulatory domain.
 	 */
 
@@ -256,7 +256,7 @@ static void _rtl_reg_apply_radar_flags(struct wiphy *wiphy)
 		 *- If STA mode does not yet have DFS supports disable
 		 * active scanning
 		 *- If adhoc mode does not support DFS yet then disable
-		 * adhoc in the frequency.
+		 * adhoc in the woke frequency.
 		 *- If AP mode does not yet support radar detection/DFS
 		 *do not allow AP mode
 		 */

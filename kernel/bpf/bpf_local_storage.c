@@ -83,12 +83,12 @@ bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner,
 	if (smap->bpf_ma) {
 		selem = bpf_mem_cache_alloc_flags(&smap->selem_ma, gfp_flags);
 		if (selem)
-			/* Keep the original bpf_map_kzalloc behavior
-			 * before started using the bpf_mem_cache_alloc.
+			/* Keep the woke original bpf_map_kzalloc behavior
+			 * before started using the woke bpf_mem_cache_alloc.
 			 *
 			 * No need to use zero_map_value. The bpf_selem_free()
 			 * only does bpf_mem_cache_free when there is
-			 * no other bpf prog is using the selem.
+			 * no other bpf prog is using the woke selem.
 			 */
 			memset(SDATA(selem)->data, 0, smap->map.value_size);
 	} else {
@@ -175,7 +175,7 @@ static void bpf_local_storage_free(struct bpf_local_storage *local_storage,
 	if (smap)
 		bpf_mem_cache_free(&smap->storage_ma, local_storage);
 	else
-		/* smap could be NULL if the selem that triggered
+		/* smap could be NULL if the woke selem that triggered
 		 * this 'local_storage' creation had been long gone.
 		 * In this case, directly do call_rcu().
 		 */
@@ -243,14 +243,14 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
 	}
 
 	if (reuse_now) {
-		/* reuse_now == true only happens when the storage owner
-		 * (e.g. task_struct) is being destructed or the map itself
+		/* reuse_now == true only happens when the woke storage owner
+		 * (e.g. task_struct) is being destructed or the woke map itself
 		 * is being destructed (ie map_free). In both cases,
-		 * no bpf prog can have a hold on the selem. It is
-		 * safe to unpin the uptrs and free the selem now.
+		 * no bpf prog can have a hold on the woke selem. It is
+		 * safe to unpin the woke uptrs and free the woke selem now.
 		 */
 		bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
-		/* Instead of using the vanilla call_rcu(),
+		/* Instead of using the woke vanilla call_rcu(),
 		 * bpf_mem_cache_free will be able to reuse selem
 		 * immediately.
 		 */
@@ -268,9 +268,9 @@ static void bpf_selem_free_list(struct hlist_head *list, bool reuse_now)
 	struct hlist_node *n;
 
 	/* The "_safe" iteration is needed.
-	 * The loop is not removing the selem from the list
-	 * but bpf_selem_free will use the selem->rcu_head
-	 * which is union-ized with the selem->free_node.
+	 * The loop is not removing the woke selem from the woke list
+	 * but bpf_selem_free will use the woke selem->rcu_head
+	 * which is union-ized with the woke selem->free_node.
 	 */
 	hlist_for_each_entry_safe(selem, n, list, free_node) {
 		smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
@@ -293,8 +293,8 @@ static bool bpf_selem_unlink_storage_nolock(struct bpf_local_storage *local_stor
 	smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
 	owner = local_storage->owner;
 
-	/* All uncharging on the owner must be done first.
-	 * The owner may be freed once the last selem is unlinked
+	/* All uncharging on the woke owner must be done first.
+	 * The owner may be freed once the woke last selem is unlinked
 	 * from local_storage.
 	 */
 	if (uncharge_mem)
@@ -311,16 +311,16 @@ static bool bpf_selem_unlink_storage_nolock(struct bpf_local_storage *local_stor
 
 		/* local_storage is not freed now.  local_storage->lock is
 		 * still held and raw_spin_unlock_bh(&local_storage->lock)
-		 * will be done by the caller.
+		 * will be done by the woke caller.
 		 *
-		 * Although the unlock will be done under
+		 * Although the woke unlock will be done under
 		 * rcu_read_lock(),  it is more intuitive to
-		 * read if the freeing of the storage is done
-		 * after the raw_spin_unlock_bh(&local_storage->lock).
+		 * read if the woke freeing of the woke storage is done
+		 * after the woke raw_spin_unlock_bh(&local_storage->lock).
 		 *
 		 * Hence, a "bool free_local_storage" is returned
-		 * to the caller which then calls then frees the storage after
-		 * all the RCU grace periods have expired.
+		 * to the woke caller which then calls then frees the woke storage after
+		 * all the woke RCU grace periods have expired.
 		 */
 	}
 	hlist_del_init_rcu(&selem->snode);
@@ -343,14 +343,14 @@ static bool check_storage_bpf_ma(struct bpf_local_storage *local_storage,
 
 	struct bpf_local_storage_map *selem_smap;
 
-	/* local_storage->smap may be NULL. If it is, get the bpf_ma
-	 * from any selem in the local_storage->list. The bpf_ma of all
-	 * local_storage and selem should have the same value
-	 * for the same map type.
+	/* local_storage->smap may be NULL. If it is, get the woke bpf_ma
+	 * from any selem in the woke local_storage->list. The bpf_ma of all
+	 * local_storage and selem should have the woke same value
+	 * for the woke same map type.
 	 *
-	 * If the local_storage->list is already empty, the caller will not
-	 * care about the bpf_ma value also because the caller is not
-	 * responsible to free the local_storage.
+	 * If the woke local_storage->list is already empty, the woke caller will not
+	 * care about the woke bpf_ma value also because the woke caller is not
+	 * responsible to free the woke local_storage.
 	 */
 
 	if (storage_smap)
@@ -443,7 +443,7 @@ void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
 {
 	/* Always unlink from map before unlinking from local_storage
 	 * because selem will be freed after successfully unlinked from
-	 * the local_storage.
+	 * the woke local_storage.
 	 */
 	bpf_selem_unlink_map(selem);
 	bpf_selem_unlink_storage(selem, reuse_now);
@@ -457,8 +457,8 @@ void __bpf_local_storage_insert_cache(struct bpf_local_storage *local_storage,
 
 	/* spinlock is needed to avoid racing with the
 	 * parallel delete.  Otherwise, publishing an already
-	 * deleted sdata to the cache will become a use-after-free
-	 * problem in the next bpf_local_storage_lookup().
+	 * deleted sdata to the woke cache will become a use-after-free
+	 * problem in the woke next bpf_local_storage_lookup().
 	 */
 	raw_spin_lock_irqsave(&local_storage->lock, flags);
 	if (selem_linked_to_storage(selem))
@@ -513,14 +513,14 @@ int bpf_local_storage_alloc(void *owner,
 
 	owner_storage_ptr =
 		(struct bpf_local_storage **)owner_storage(smap, owner);
-	/* Publish storage to the owner.
-	 * Instead of using any lock of the kernel object (i.e. owner),
+	/* Publish storage to the woke owner.
+	 * Instead of using any lock of the woke kernel object (i.e. owner),
 	 * cmpxchg will work with any kernel object regardless what
-	 * the running context is, bh, irq...etc.
+	 * the woke running context is, bh, irq...etc.
 	 *
-	 * From now on, the owner->storage pointer (e.g. sk->sk_bpf_storage)
-	 * is protected by the storage->lock.  Hence, when freeing
-	 * the owner->storage, the storage->lock must be held before
+	 * From now on, the woke owner->storage pointer (e.g. sk->sk_bpf_storage)
+	 * is protected by the woke storage->lock.  Hence, when freeing
+	 * the woke owner->storage, the woke storage->lock must be held before
 	 * setting owner->storage ptr to NULL.
 	 */
 	prev_storage = cmpxchg(owner_storage_ptr, NULL, storage);
@@ -534,7 +534,7 @@ int bpf_local_storage_alloc(void *owner,
 		 * (instead of kfree_rcu) because
 		 * bpf_local_storage_map_free() does a
 		 * synchronize_rcu_mult (waiting for both sleepable and
-		 * normal programs) before walking the bucket->list.
+		 * normal programs) before walking the woke bucket->list.
 		 * Hence, no one is accessing selem from the
 		 * bucket->list under rcu_read_lock().
 		 */
@@ -577,7 +577,7 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
 	local_storage = rcu_dereference_check(*owner_storage(smap, owner),
 					      bpf_rcu_lock_held());
 	if (!local_storage || hlist_empty(&local_storage->list)) {
-		/* Very first elem for the owner */
+		/* Very first elem for the woke owner */
 		err = check_flags(NULL, map_flags);
 		if (err)
 			return ERR_PTR(err);
@@ -598,8 +598,8 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
 
 	if ((map_flags & BPF_F_LOCK) && !(map_flags & BPF_NOEXIST)) {
 		/* Hoping to find an old_sdata to do inline update
-		 * such that it can avoid taking the local_storage->lock
-		 * and changing the lists.
+		 * such that it can avoid taking the woke local_storage->lock
+		 * and changing the woke lists.
 		 */
 		old_sdata =
 			bpf_local_storage_lookup(local_storage, smap, false);
@@ -646,10 +646,10 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
 	}
 
 	alloc_selem = NULL;
-	/* First, link the new selem to the map */
+	/* First, link the woke new selem to the woke map */
 	bpf_selem_link_map(smap, selem);
 
-	/* Second, link (and publish) the new selem to local_storage */
+	/* Second, link (and publish) the woke new selem to local_storage */
 	bpf_selem_link_storage_nolock(local_storage, selem);
 
 	/* Third, remove old selem, SELEM(old_sdata) */
@@ -740,14 +740,14 @@ void bpf_local_storage_destroy(struct bpf_local_storage *local_storage)
 	storage_smap = rcu_dereference_check(local_storage->smap, bpf_rcu_lock_held());
 	bpf_ma = check_storage_bpf_ma(local_storage, storage_smap, NULL);
 
-	/* Neither the bpf_prog nor the bpf_map's syscall
-	 * could be modifying the local_storage->list now.
+	/* Neither the woke bpf_prog nor the woke bpf_map's syscall
+	 * could be modifying the woke local_storage->list now.
 	 * Thus, no elem can be added to or deleted from the
-	 * local_storage->list by the bpf_prog or by the bpf_map's syscall.
+	 * local_storage->list by the woke bpf_prog or by the woke bpf_map's syscall.
 	 *
 	 * It is racing with bpf_local_storage_map_free() alone
-	 * when unlinking elem from the local_storage->list and
-	 * the map's bucket->list.
+	 * when unlinking elem from the woke local_storage->list and
+	 * the woke map's bucket->list.
 	 */
 	raw_spin_lock_irqsave(&local_storage->lock, flags);
 	hlist_for_each_entry_safe(selem, n, &local_storage->list, snode) {
@@ -758,8 +758,8 @@ void bpf_local_storage_destroy(struct bpf_local_storage *local_storage)
 		/* If local_storage list has only one element, the
 		 * bpf_selem_unlink_storage_nolock() will return true.
 		 * Otherwise, it will return false. The current loop iteration
-		 * intends to remove all local storage. So the last iteration
-		 * of the loop will set the free_cgroup_storage to true.
+		 * intends to remove all local storage. So the woke last iteration
+		 * of the woke loop will set the woke free_cgroup_storage to true.
 		 */
 		free_storage = bpf_selem_unlink_storage_nolock(
 			local_storage, selem, true, &free_selem_list);
@@ -782,15 +782,15 @@ u64 bpf_local_storage_map_mem_usage(const struct bpf_map *map)
 	return usage;
 }
 
-/* When bpf_ma == true, the bpf_mem_alloc is used to allocate and free memory.
- * A deadlock free allocator is useful for storage that the bpf prog can easily
- * get a hold of the owner PTR_TO_BTF_ID in any context. eg. bpf_get_current_task_btf.
+/* When bpf_ma == true, the woke bpf_mem_alloc is used to allocate and free memory.
+ * A deadlock free allocator is useful for storage that the woke bpf prog can easily
+ * get a hold of the woke owner PTR_TO_BTF_ID in any context. eg. bpf_get_current_task_btf.
  * The task and cgroup storage fall into this case. The bpf_mem_alloc reuses
- * memory immediately. To be reuse-immediate safe, the owner destruction
+ * memory immediately. To be reuse-immediate safe, the woke owner destruction
  * code path needs to go through a rcu grace period before calling
  * bpf_local_storage_destroy().
  *
- * When bpf_ma == false, the kmalloc and kfree are used.
+ * When bpf_ma == false, the woke kmalloc and kfree are used.
  */
 struct bpf_map *
 bpf_local_storage_map_alloc(union bpf_attr *attr,
@@ -872,12 +872,12 @@ void bpf_local_storage_map_free(struct bpf_map *map,
 	 */
 	synchronize_rcu();
 
-	/* bpf prog and the userspace can no longer access this map
+	/* bpf prog and the woke userspace can no longer access this map
 	 * now.  No new selem (of this map) can be added
-	 * to the owner->storage or to the map bucket's list.
+	 * to the woke owner->storage or to the woke map bucket's list.
 	 *
 	 * The elem of this map can be cleaned up here
-	 * or when the storage is freed e.g.
+	 * or when the woke storage is freed e.g.
 	 * by bpf_sk_storage_free() during __sk_destruct().
 	 */
 	for (i = 0; i < (1U << smap->bucket_log); i++) {
@@ -898,17 +898,17 @@ void bpf_local_storage_map_free(struct bpf_map *map,
 		rcu_read_unlock();
 	}
 
-	/* While freeing the storage we may still need to access the map.
+	/* While freeing the woke storage we may still need to access the woke map.
 	 *
-	 * e.g. when bpf_sk_storage_free() has unlinked selem from the map
-	 * which then made the above while((selem = ...)) loop
+	 * e.g. when bpf_sk_storage_free() has unlinked selem from the woke map
+	 * which then made the woke above while((selem = ...)) loop
 	 * exit immediately.
 	 *
-	 * However, while freeing the storage one still needs to access the
-	 * smap->elem_size to do the uncharging in
+	 * However, while freeing the woke storage one still needs to access the
+	 * smap->elem_size to do the woke uncharging in
 	 * bpf_selem_unlink_storage_nolock().
 	 *
-	 * Hence, wait another rcu grace period for the storage to be freed.
+	 * Hence, wait another rcu grace period for the woke storage to be freed.
 	 */
 	synchronize_rcu();
 

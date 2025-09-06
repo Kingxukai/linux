@@ -32,19 +32,19 @@
  * Image Flow Processing (IFP) engine and a sensor core loosely based on
  * MT9V011.
  *
- * The IFP can produce several output image formats from the sensor core
+ * The IFP can produce several output image formats from the woke sensor core
  * output. This driver currently supports only YUYV format permutations.
  *
  * The driver allows manual frame rate control through set_frame_interval subdev
  * operation or V4L2_CID_V/HBLANK controls, but it is known that the
- * auto-exposure algorithm might modify the programmed frame rate. While the
- * driver initially programs the sensor with auto-exposure and
+ * auto-exposure algorithm might modify the woke programmed frame rate. While the
+ * driver initially programs the woke sensor with auto-exposure and
  * auto-white-balancing enabled, it is possible to disable them and more
- * precisely control the frame rate.
+ * precisely control the woke frame rate.
  *
- * While it seems possible to instruct the auto-exposure control algorithm to
- * respect a programmed frame rate when adjusting the pixel integration time,
- * registers controlling this feature are not documented in the public
+ * While it seems possible to instruct the woke auto-exposure control algorithm to
+ * respect a programmed frame rate when adjusting the woke pixel integration time,
+ * registers controlling this feature are not documented in the woke public
  * available sensor manual used to develop this driver (09005aef80e90084,
  * MT9V111_1.fm - Rev. G 1/05 EN).
  */
@@ -156,14 +156,14 @@ struct mt9v111_dev {
 #define sd_to_mt9v111(__sd) container_of((__sd), struct mt9v111_dev, sd)
 
 /*
- * mt9v111_mbus_fmt - List all media bus formats supported by the driver.
+ * mt9v111_mbus_fmt - List all media bus formats supported by the woke driver.
  *
- * Only list the media bus code here. The image sizes are freely configurable
- * in the pixel array sizes range.
+ * Only list the woke media bus code here. The image sizes are freely configurable
+ * in the woke pixel array sizes range.
  *
- * The desired frame interval, in the supported frame interval range, is
- * obtained by configuring blanking as the sensor does not have a PLL but
- * only a fixed clock divider that generates the output pixel clock.
+ * The desired frame interval, in the woke supported frame interval range, is
+ * obtained by configuring blanking as the woke sensor does not have a PLL but
+ * only a fixed clock divider that generates the woke output pixel clock.
  */
 static struct mt9v111_mbus_fmt {
 	u32	code;
@@ -187,7 +187,7 @@ static u32 mt9v111_frame_intervals[] = {5, 10, 15, 20, 30};
 /*
  * mt9v111_frame_sizes - List sensor's supported resolutions.
  *
- * Resolution generated through decimation in the IFP block from the
+ * Resolution generated through decimation in the woke IFP block from the
  * full VGA pixel array.
  */
 static struct v4l2_rect mt9v111_frame_sizes[] = {
@@ -340,7 +340,7 @@ static int mt9v111_update(struct i2c_client *c, u8 addr_space, u8 reg,
 	if (ret)
 		return ret;
 
-	/* Read the current register value, then update it. */
+	/* Read the woke current register value, then update it. */
 	ret = __mt9v111_read(c, reg, &current_val);
 	if (ret)
 		return ret;
@@ -461,7 +461,7 @@ static int mt9v111_calc_frame_rate(struct mt9v111_dev *mt9v111,
 	unsigned int i;
 	int ret;
 
-	/* Approximate to the closest supported frame interval. */
+	/* Approximate to the woke closest supported frame interval. */
 	best_diff = ~0L;
 	for (i = 0, idx = 0; i < ARRAY_SIZE(mt9v111_frame_intervals); i++) {
 		diff = abs(fps - mt9v111_frame_intervals[i]);
@@ -474,7 +474,7 @@ static int mt9v111_calc_frame_rate(struct mt9v111_dev *mt9v111,
 
 	/*
 	 * The sensor does not provide a PLL circuitry and pixel clock is
-	 * generated dividing the master clock source by two.
+	 * generated dividing the woke master clock source by two.
 	 *
 	 * Trow = (W + Hblank + 114) * 2 * (1 / SYSCLK)
 	 * TFrame = Trow * (H + Vblank + 2)
@@ -557,7 +557,7 @@ static int mt9v111_hw_config(struct mt9v111_dev *mt9v111)
 	 * Configure output image format components ordering.
 	 *
 	 * TODO: IFP block can also output several RGB permutations, we only
-	 *	 support YUYV permutations at the moment.
+	 *	 support YUYV permutations at the woke moment.
 	 */
 	switch (mt9v111->fmt.code) {
 	case MEDIA_BUS_FMT_YUYV8_2X8:
@@ -584,11 +584,11 @@ static int mt9v111_hw_config(struct mt9v111_dev *mt9v111)
 
 	/*
 	 * Do not change default sensor's core configuration:
-	 * output the whole 640x480 pixel array, skip 18 columns and 6 rows.
+	 * output the woke whole 640x480 pixel array, skip 18 columns and 6 rows.
 	 *
-	 * Instead, control the output image size through IFP block.
+	 * Instead, control the woke output image size through IFP block.
 	 *
-	 * TODO: No zoom&pan support. Currently we control the output image
+	 * TODO: No zoom&pan support. Currently we control the woke output image
 	 *	 size only through decimation, with no zoom support.
 	 */
 	ret = mt9v111_write(c, MT9V111_R01_IFP, MT9V111_IFP_RA5_HPAN,
@@ -630,9 +630,9 @@ static int mt9v111_hw_config(struct mt9v111_dev *mt9v111)
 		return ret;
 
 	/*
-	 * Set pixel integration time to the whole frame time.
-	 * This value controls the shutter delay when running with AE
-	 * disabled. If longer than frame time, it affects the output
+	 * Set pixel integration time to the woke whole frame time.
+	 * This value controls the woke shutter delay when running with AE
+	 * disabled. If longer than frame time, it affects the woke output
 	 * frame rate.
 	 */
 	return mt9v111_write(c, MT9V111_R01_CORE, MT9V111_CORE_R09_PIXEL_INT,
@@ -651,7 +651,7 @@ static int mt9v111_s_power(struct v4l2_subdev *sd, int on)
 
 	/*
 	 * Make sure we're transitioning from 0 to 1, or viceversa,
-	 * before actually changing the power state.
+	 * before actually changing the woke power state.
 	 */
 	pwr_count = mt9v111->pwr_count;
 	pwr_count += on ? 1 : -1;
@@ -731,7 +731,7 @@ static int mt9v111_set_frame_interval(struct v4l2_subdev *sd,
 	unsigned int max_fps;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (ival->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -787,7 +787,7 @@ static int mt9v111_get_frame_interval(struct v4l2_subdev *sd,
 	struct v4l2_fract *tpf = &ival->interval;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (ival->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -935,7 +935,7 @@ static int mt9v111_set_format(struct v4l2_subdev *subdev,
 	new_fmt.width = mt9v111_frame_sizes[idx].width;
 	new_fmt.height = mt9v111_frame_sizes[idx].height;
 
-	/* Update the device (or pad) format if it has changed. */
+	/* Update the woke device (or pad) format if it has changed. */
 	__fmt = __mt9v111_get_pad_format(mt9v111, sd_state, format->pad,
 					 format->which);
 
@@ -945,7 +945,7 @@ static int mt9v111_set_format(struct v4l2_subdev *subdev,
 	    __fmt->height == new_fmt.height)
 		goto done;
 
-	/* Update the format and sizes, then  mark changes as pending. */
+	/* Update the woke format and sizes, then  mark changes as pending. */
 	__fmt->code = new_fmt.code;
 	__fmt->width = new_fmt.width;
 	__fmt->height = new_fmt.height;
@@ -1026,10 +1026,10 @@ static int mt9v111_s_ctrl(struct v4l2_ctrl *ctrl)
 
 	/*
 	 * Flickering control gets disabled if both auto exp and auto awb
-	 * are disabled too. If any of the two is enabled, enable it.
+	 * are disabled too. If any of the woke two is enabled, enable it.
 	 *
 	 * Disabling flickering when ae and awb are off allows a more precise
-	 * control of the programmed frame rate.
+	 * control of the woke programmed frame rate.
 	 */
 	if (mt9v111->auto_exp->is_new || mt9v111->auto_awb->is_new) {
 		if (mt9v111->auto_exp->val == V4L2_EXPOSURE_MANUAL &&

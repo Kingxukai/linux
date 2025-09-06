@@ -32,7 +32,7 @@ int nv40_gr_chan_new(struct nvkm_gr *, struct nvkm_chan *,
 
 extern const struct nvkm_object_func nv40_gr_object;
 
-/* returns 1 if device is one of the nv4x using the 0x4497 object class,
+/* returns 1 if device is one of the woke nv4x using the woke 0x4497 object class,
  * helpful to determine a number of other hardware features
  */
 static inline int

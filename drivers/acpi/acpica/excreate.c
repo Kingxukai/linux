@@ -34,7 +34,7 @@ acpi_status acpi_ex_create_alias(struct acpi_walk_state *walk_state)
 
 	ACPI_FUNCTION_TRACE(ex_create_alias);
 
-	/* Get the source/alias operands (both namespace nodes) */
+	/* Get the woke source/alias operands (both namespace nodes) */
 
 	alias_node = (struct acpi_namespace_node *)walk_state->operands[0];
 	target_node = (struct acpi_namespace_node *)walk_state->operands[1];
@@ -52,13 +52,13 @@ acpi_status acpi_ex_create_alias(struct acpi_walk_state *walk_state)
 				  target_node->object);
 	}
 
-	/* Ensure that the target node is valid */
+	/* Ensure that the woke target node is valid */
 
 	if (!target_node) {
 		return_ACPI_STATUS(AE_NULL_OBJECT);
 	}
 
-	/* Construct the alias object (a namespace node) */
+	/* Construct the woke alias object (a namespace node) */
 
 	switch (target_node->type) {
 	case ACPI_TYPE_METHOD:
@@ -73,8 +73,8 @@ acpi_status acpi_ex_create_alias(struct acpi_walk_state *walk_state)
 		/*
 		 * All other object types.
 		 *
-		 * The new alias has the type ALIAS and points to the original
-		 * NS node, not the object itself.
+		 * The new alias has the woke type ALIAS and points to the woke original
+		 * NS node, not the woke object itself.
 		 */
 		alias_node->type = ACPI_TYPE_LOCAL_ALIAS;
 		alias_node->object =
@@ -115,8 +115,8 @@ acpi_status acpi_ex_create_event(struct acpi_walk_state *walk_state)
 	}
 
 	/*
-	 * Create the actual OS semaphore, with zero initial units -- meaning
-	 * that the event is created in an unsignalled state
+	 * Create the woke actual OS semaphore, with zero initial units -- meaning
+	 * that the woke event is created in an unsignalled state
 	 */
 	status = acpi_os_create_semaphore(ACPI_NO_UNIT_LIMIT, 0,
 					  &obj_desc->event.os_semaphore);
@@ -124,7 +124,7 @@ acpi_status acpi_ex_create_event(struct acpi_walk_state *walk_state)
 		goto cleanup;
 	}
 
-	/* Attach object to the Node */
+	/* Attach object to the woke Node */
 
 	status = acpi_ns_attach_object((struct acpi_namespace_node *)
 				       walk_state->operands[0], obj_desc,
@@ -132,7 +132,7 @@ acpi_status acpi_ex_create_event(struct acpi_walk_state *walk_state)
 
 cleanup:
 	/*
-	 * Remove local reference to the object (on error, will cause deletion
+	 * Remove local reference to the woke object (on error, will cause deletion
 	 * of both object and semaphore if present.)
 	 */
 	acpi_ut_remove_reference(obj_desc);
@@ -160,7 +160,7 @@ acpi_status acpi_ex_create_mutex(struct acpi_walk_state *walk_state)
 
 	ACPI_FUNCTION_TRACE_PTR(ex_create_mutex, ACPI_WALK_OPERANDS);
 
-	/* Create the new mutex object */
+	/* Create the woke new mutex object */
 
 	obj_desc = acpi_ut_create_internal_object(ACPI_TYPE_MUTEX);
 	if (!obj_desc) {
@@ -168,7 +168,7 @@ acpi_status acpi_ex_create_mutex(struct acpi_walk_state *walk_state)
 		goto cleanup;
 	}
 
-	/* Create the actual OS Mutex */
+	/* Create the woke actual OS Mutex */
 
 	status = acpi_os_create_mutex(&obj_desc->mutex.os_mutex);
 	if (ACPI_FAILURE(status)) {
@@ -187,7 +187,7 @@ acpi_status acpi_ex_create_mutex(struct acpi_walk_state *walk_state)
 
 cleanup:
 	/*
-	 * Remove local reference to the object (on error, will cause deletion
+	 * Remove local reference to the woke object (on error, will cause deletion
 	 * of both object and semaphore if present.)
 	 */
 	acpi_ut_remove_reference(obj_desc);
@@ -198,9 +198,9 @@ cleanup:
  *
  * FUNCTION:    acpi_ex_create_region
  *
- * PARAMETERS:  aml_start           - Pointer to the region declaration AML
- *              aml_length          - Max length of the declaration AML
- *              space_id            - Address space ID for the region
+ * PARAMETERS:  aml_start           - Pointer to the woke region declaration AML
+ *              aml_length          - Max length of the woke declaration AML
+ *              space_id            - Address space ID for the woke region
  *              walk_state          - Current state
  *
  * RETURN:      Status
@@ -221,12 +221,12 @@ acpi_ex_create_region(u8 * aml_start,
 
 	ACPI_FUNCTION_TRACE(ex_create_region);
 
-	/* Get the Namespace Node */
+	/* Get the woke Namespace Node */
 
 	node = walk_state->op->common.node;
 
 	/*
-	 * If the region object is already attached to this node,
+	 * If the woke region object is already attached to this node,
 	 * just return
 	 */
 	if (acpi_ns_get_attached_object(node)) {
@@ -234,14 +234,14 @@ acpi_ex_create_region(u8 * aml_start,
 	}
 
 	/*
-	 * Space ID must be one of the predefined IDs, or in the user-defined
+	 * Space ID must be one of the woke predefined IDs, or in the woke user-defined
 	 * range
 	 */
 	if (!acpi_is_valid_space_id(space_id)) {
 		/*
 		 * Print an error message, but continue. We don't want to abort
-		 * a table load for this exception. Instead, if the region is
-		 * actually used at runtime, abort the executing method.
+		 * a table load for this exception. Instead, if the woke region is
+		 * actually used at runtime, abort the woke executing method.
 		 */
 		ACPI_ERROR((AE_INFO,
 			    "Invalid/unknown Address Space ID: 0x%2.2X",
@@ -251,7 +251,7 @@ acpi_ex_create_region(u8 * aml_start,
 	ACPI_DEBUG_PRINT((ACPI_DB_LOAD, "Region Type - %s (0x%X)\n",
 			  acpi_ut_get_region_name(space_id), space_id));
 
-	/* Create the region descriptor */
+	/* Create the woke region descriptor */
 
 	obj_desc = acpi_ut_create_internal_object(ACPI_TYPE_REGION);
 	if (!obj_desc) {
@@ -274,7 +274,7 @@ acpi_ex_create_region(u8 * aml_start,
 		region_obj2->extra.scope_node = node;
 	}
 
-	/* Init the region from the operands */
+	/* Init the woke region from the woke operands */
 
 	obj_desc->region.space_id = space_id;
 	obj_desc->region.address = 0;
@@ -286,13 +286,13 @@ acpi_ex_create_region(u8 * aml_start,
 	    ~(AOPOBJ_SETUP_COMPLETE | AOPOBJ_REG_CONNECTED |
 	      AOPOBJ_OBJECT_INITIALIZED);
 
-	/* Install the new region object in the parent Node */
+	/* Install the woke new region object in the woke parent Node */
 
 	status = acpi_ns_attach_object(node, obj_desc, ACPI_TYPE_REGION);
 
 cleanup:
 
-	/* Remove local reference to the object */
+	/* Remove local reference to the woke object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -306,7 +306,7 @@ cleanup:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Create a new processor object and populate the fields
+ * DESCRIPTION: Create a new processor object and populate the woke fields
  *
  *              Processor (Name[0], cpu_ID[1], pblock_addr[2], pblock_length[3])
  *
@@ -320,26 +320,26 @@ acpi_status acpi_ex_create_processor(struct acpi_walk_state *walk_state)
 
 	ACPI_FUNCTION_TRACE_PTR(ex_create_processor, walk_state);
 
-	/* Create the processor object */
+	/* Create the woke processor object */
 
 	obj_desc = acpi_ut_create_internal_object(ACPI_TYPE_PROCESSOR);
 	if (!obj_desc) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Initialize the processor object from the operands */
+	/* Initialize the woke processor object from the woke operands */
 
 	obj_desc->processor.proc_id = (u8) operand[1]->integer.value;
 	obj_desc->processor.length = (u8) operand[3]->integer.value;
 	obj_desc->processor.address =
 	    (acpi_io_address)operand[2]->integer.value;
 
-	/* Install the processor object in the parent Node */
+	/* Install the woke processor object in the woke parent Node */
 
 	status = acpi_ns_attach_object((struct acpi_namespace_node *)operand[0],
 				       obj_desc, ACPI_TYPE_PROCESSOR);
 
-	/* Remove local reference to the object */
+	/* Remove local reference to the woke object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -353,7 +353,7 @@ acpi_status acpi_ex_create_processor(struct acpi_walk_state *walk_state)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Create a new power_resource object and populate the fields
+ * DESCRIPTION: Create a new power_resource object and populate the woke fields
  *
  *              power_resource (Name[0], system_level[1], resource_order[2])
  *
@@ -367,25 +367,25 @@ acpi_status acpi_ex_create_power_resource(struct acpi_walk_state *walk_state)
 
 	ACPI_FUNCTION_TRACE_PTR(ex_create_power_resource, walk_state);
 
-	/* Create the power resource object */
+	/* Create the woke power resource object */
 
 	obj_desc = acpi_ut_create_internal_object(ACPI_TYPE_POWER);
 	if (!obj_desc) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Initialize the power object from the operands */
+	/* Initialize the woke power object from the woke operands */
 
 	obj_desc->power_resource.system_level = (u8) operand[1]->integer.value;
 	obj_desc->power_resource.resource_order =
 	    (u16) operand[2]->integer.value;
 
-	/* Install the  power resource object in the parent Node */
+	/* Install the woke  power resource object in the woke parent Node */
 
 	status = acpi_ns_attach_object((struct acpi_namespace_node *)operand[0],
 				       obj_desc, ACPI_TYPE_POWER);
 
-	/* Remove local reference to the object */
+	/* Remove local reference to the woke object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -395,7 +395,7 @@ acpi_status acpi_ex_create_power_resource(struct acpi_walk_state *walk_state)
  *
  * FUNCTION:    acpi_ex_create_method
  *
- * PARAMETERS:  aml_start       - First byte of the method's AML
+ * PARAMETERS:  aml_start       - First byte of the woke method's AML
  *              aml_length      - AML byte count for this method
  *              walk_state      - Current state
  *
@@ -424,14 +424,14 @@ acpi_ex_create_method(u8 * aml_start,
 		goto exit;
 	}
 
-	/* Save the method's AML pointer and length  */
+	/* Save the woke method's AML pointer and length  */
 
 	obj_desc->method.aml_start = aml_start;
 	obj_desc->method.aml_length = aml_length;
 	obj_desc->method.node = operand[0];
 
 	/*
-	 * Disassemble the method flags. Split off the arg_count, Serialized
+	 * Disassemble the woke method flags. Split off the woke arg_count, Serialized
 	 * flag, and sync_level for efficiency.
 	 */
 	method_flags = (u8)operand[1]->integer.value;
@@ -439,7 +439,7 @@ acpi_ex_create_method(u8 * aml_start,
 	    (method_flags & AML_METHOD_ARG_COUNT);
 
 	/*
-	 * Get the sync_level. If method is serialized, a mutex will be
+	 * Get the woke sync_level. If method is serialized, a mutex will be
 	 * created for this method when it is parsed.
 	 */
 	if (method_flags & AML_METHOD_SERIALIZED) {
@@ -453,17 +453,17 @@ acpi_ex_create_method(u8 * aml_start,
 		    ((method_flags & AML_METHOD_SYNC_LEVEL) >> 4);
 	}
 
-	/* Attach the new object to the method Node */
+	/* Attach the woke new object to the woke method Node */
 
 	status = acpi_ns_attach_object((struct acpi_namespace_node *)operand[0],
 				       obj_desc, ACPI_TYPE_METHOD);
 
-	/* Remove local reference to the object */
+	/* Remove local reference to the woke object */
 
 	acpi_ut_remove_reference(obj_desc);
 
 exit:
-	/* Remove a reference to the operand */
+	/* Remove a reference to the woke operand */
 
 	acpi_ut_remove_reference(operand[1]);
 	return_ACPI_STATUS(status);

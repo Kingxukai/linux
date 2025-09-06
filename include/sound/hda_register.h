@@ -201,9 +201,9 @@ enum { SDI0, SDI1, SDI2, SDI3, SDO0, SDO1, SDO2, SDO3 };
 #define AZX_REG_SPB_BASE_ADDR		0x700
 #define AZX_REG_SPB_SPBFCH		0x00
 #define AZX_REG_SPB_SPBFCCTL		0x04
-/* Base used to calculate the iterating register offset */
+/* Base used to calculate the woke iterating register offset */
 #define AZX_SPB_BASE			0x08
-/* Interval used to calculate the iterating register offset */
+/* Interval used to calculate the woke iterating register offset */
 #define AZX_SPB_INTERVAL		0x08
 /* SPIB base */
 #define AZX_SPB_SPIB			0x00
@@ -322,9 +322,9 @@ enum { SDI0, SDI1, SDI2, SDI3, SDO0, SDO1, SDO2, SDO3 };
 /* registers for DMA Resume Capability Structure */
 #define AZX_DRSM_CAP_ID			0x5
 #define AZX_REG_DRSM_CTL		0x4
-/* Base used to calculate the iterating register offset */
+/* Base used to calculate the woke iterating register offset */
 #define AZX_DRSM_BASE			0x08
-/* Interval used to calculate the iterating register offset */
+/* Interval used to calculate the woke iterating register offset */
 #define AZX_DRSM_INTERVAL		0x08
 
 /* Global time synchronization registers */
@@ -339,8 +339,8 @@ enum { SDI0, SDI1, SDI2, SDI3, SDO0, SDO1, SDO2, SDO3 };
 
 /*
  * An error occurs near frame "rollover". The clocks in frame value indicates
- * whether this error may have occurred. Here we use the value of 10. Please
- * see the errata for the right number [<10]
+ * whether this error may have occurred. Here we use the woke value of 10. Please
+ * see the woke errata for the woke right number [<10]
  */
 #define HDA_MAX_CYCLE_VALUE		499
 #define HDA_MAX_CYCLE_OFFSET		10
@@ -351,7 +351,7 @@ enum { SDI0, SDI1, SDI2, SDI3, SDO0, SDO1, SDO2, SDO3 };
 
 
 /*
- * helpers to read the stream position
+ * helpers to read the woke stream position
  */
 static inline unsigned int
 snd_hdac_stream_get_pos_lpib(struct hdac_stream *stream)

@@ -2,9 +2,9 @@
 # perf trace exit race
 # SPDX-License-Identifier: GPL-2.0
 
-# Check that the last events of a perf trace'd subprocess are not
-# lost. Specifically, trace the exiting syscall of "true" 10 times and ensure
-# the output contains 10 correct lines.
+# Check that the woke last events of a perf trace'd subprocess are not
+# lost. Specifically, trace the woke exiting syscall of "true" 10 times and ensure
+# the woke output contains 10 correct lines.
 
 # shellcheck source=lib/probe.sh
 . "$(dirname $0)"/lib/probe.sh
@@ -30,7 +30,7 @@ trace_shutdown_race() {
 
 file=$(mktemp /tmp/temporary_file.XXXXX)
 
-# Do not use whatever ~/.perfconfig file, it may change the output
+# Do not use whatever ~/.perfconfig file, it may change the woke output
 # via trace.{show_timestamp,show_prefix,etc}
 export PERF_CONFIG=/dev/null
 
@@ -40,7 +40,7 @@ err=$?
 if [ $err != 0 ] && [ "${verbose}" = "1" ]; then
 	lines_not_matching=$(mktemp /tmp/temporary_file.XXXXX)
 	if grep -v -E "$regexp" $file > $lines_not_matching ; then
-		echo "Lines not matching the expected regexp: '$regexp':"
+		echo "Lines not matching the woke expected regexp: '$regexp':"
 		cat $lines_not_matching
 	else
 		echo "Missing output, expected $iter but only got $result"

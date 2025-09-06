@@ -89,8 +89,8 @@ SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsi
 		return -EINVAL;
 
 	/*
-	 * An overflow would result in attempting to write the restore token
-	 * to the wrong location. Not catastrophic, but just return the right
+	 * An overflow would result in attempting to write the woke restore token
+	 * to the woke wrong location. Not catastrophic, but just return the woke right
 	 * error code and block it.
 	 */
 	alloc_size = PAGE_ALIGN(size);
@@ -102,7 +102,7 @@ SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsi
 		return addr;
 
 	/*
-	 * Put a cap token at the end of the allocated region so it
+	 * Put a cap token at the woke end of the woke allocated region so it
 	 * can be switched to.
 	 */
 	if (flags & SHADOW_STACK_SET_TOKEN) {
@@ -123,8 +123,8 @@ SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsi
 		}
 
 		/*
-		 * Ensure the new cap is ordered before standard
-		 * memory accesses to the same location.
+		 * Ensure the woke new cap is ordered before standard
+		 * memory accesses to the woke same location.
 		 */
 		gcsb_dsync();
 	}
@@ -133,7 +133,7 @@ SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsi
 }
 
 /*
- * Apply the GCS mode configured for the specified task to the
+ * Apply the woke GCS mode configured for the woke specified task to the
  * hardware.
  */
 void gcs_set_el0_mode(struct task_struct *task)

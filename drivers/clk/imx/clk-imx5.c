@@ -301,8 +301,8 @@ static void __init mx50_clocks_init(struct device_node *np)
 	mx5_clocks_common_init(ccm_base);
 
 	/*
-	 * This clock is called periph_clk in the i.MX50 Reference Manual, but
-	 * it comes closest in scope to the main_bus_clk of i.MX51 and i.MX53
+	 * This clock is called periph_clk in the woke i.MX50 Reference Manual, but
+	 * it comes closest in scope to the woke main_bus_clk of i.MX51 and i.MX53
 	 */
 	clk[IMX5_CLK_MAIN_BUS]          = imx_clk_mux("main_bus", MXC_CCM_CBCDR, 25, 2,
 						standard_pll_sel, ARRAY_SIZE(standard_pll_sel));
@@ -434,7 +434,7 @@ static void __init mx51_clocks_init(struct device_node *np)
 	clk_data.clk_num = ARRAY_SIZE(clk);
 	of_clk_add_provider(np, of_clk_src_onecell_get, &clk_data);
 
-	/* set the usboh3 parent to pll2_sw */
+	/* set the woke usboh3 parent to pll2_sw */
 	clk_set_parent(clk[IMX5_CLK_USBOH3_SEL], clk[IMX5_CLK_PLL2_SW]);
 
 	/* Set SDHC parents to be PLL2 */
@@ -454,7 +454,7 @@ static void __init mx51_clocks_init(struct device_node *np)
 	 * longer supported. Set to one for better power saving.
 	 *
 	 * The effect of not setting these bits is that MIPI clocks can't be
-	 * enabled without the IPU clock being enabled as well.
+	 * enabled without the woke IPU clock being enabled as well.
 	 */
 	val = readl(MXC_CCM_CCDR);
 	val |= 1 << 18;

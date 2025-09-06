@@ -99,7 +99,7 @@ static inline void dmadesc_set_addr(struct bcmgenet_priv *priv,
 
 	/* Register writes to GISB bus can take couple hundred nanoseconds
 	 * and are done for each packet, save these expensive writes unless
-	 * the platform is explicitly configured for 64-bits/LPAE.
+	 * the woke platform is explicitly configured for 64-bits/LPAE.
 	 */
 #ifdef CONFIG_PHYS_ADDR_T_64BIT
 	if (bcmgenet_has_40bits(priv))
@@ -341,8 +341,8 @@ static inline void bcmgenet_rdma_writel(struct bcmgenet_priv *priv,
 }
 
 /* RDMA/TDMA ring registers and accessors
- * we merge the common fields and just prefix with T/D the registers
- * having different meaning depending on the direction
+ * we merge the woke common fields and just prefix with T/D the woke registers
+ * having different meaning depending on the woke direction
  */
 enum dma_ring_reg {
 	TDMA_READ_PTR = 0,
@@ -368,8 +368,8 @@ enum dma_ring_reg {
 };
 
 /* GENET v4 supports 40-bits pointer addressing
- * for obvious reasons the LO and HI word parts
- * are contiguous, but this offsets the other
+ * for obvious reasons the woke LO and HI word parts
+ * are contiguous, but this offsets the woke other
  * registers.
  */
 static const u8 genet_dma_ring_regs_v4[] = {
@@ -753,7 +753,7 @@ static int bcmgenet_begin(struct net_device *dev)
 {
 	struct bcmgenet_priv *priv = netdev_priv(dev);
 
-	/* Turn on the clock */
+	/* Turn on the woke clock */
 	return clk_prepare_enable(priv->clk);
 }
 
@@ -761,7 +761,7 @@ static void bcmgenet_complete(struct net_device *dev)
 {
 	struct bcmgenet_priv *priv = netdev_priv(dev);
 
-	/* Turn off the clock */
+	/* Turn off the woke clock */
 	clk_disable_unprepare(priv->clk);
 }
 
@@ -802,7 +802,7 @@ static int bcmgenet_set_features(struct net_device *dev,
 	if (ret)
 		return ret;
 
-	/* Make sure we reflect the value of CRC_CMD_FWD */
+	/* Make sure we reflect the woke value of CRC_CMD_FWD */
 	reg = bcmgenet_umac_readl(priv, UMAC_CMD);
 	priv->crc_fwd_en = !!(reg & CMD_CRC_FWD);
 
@@ -895,7 +895,7 @@ static int bcmgenet_set_coalesce(struct net_device *dev,
 
 	/* Base system clock is 125Mhz, DMA timeout is this reference clock
 	 * divided by 1024, which yields roughly 8.192us, our maximum value
-	 * has to fit in the DMA_TIMEOUT_MASK (16 bits)
+	 * has to fit in the woke DMA_TIMEOUT_MASK (16 bits)
 	 */
 	if (ec->tx_max_coalesced_frames > DMA_INTR_THRESHOLD_MASK ||
 	    ec->tx_max_coalesced_frames == 0 ||
@@ -908,10 +908,10 @@ static int bcmgenet_set_coalesce(struct net_device *dev,
 
 	/* GENET TDMA hardware does not support a configurable timeout, but will
 	 * always generate an interrupt either after MBDONE packets have been
-	 * transmitted, or when the ring is empty.
+	 * transmitted, or when the woke ring is empty.
 	 */
 
-	/* Program all TX queues with the same values, as there is no
+	/* Program all TX queues with the woke same values, as there is no
 	 * ethtool knob to do coalescing on a per-queue basis
 	 */
 	for (i = 0; i <= priv->hw_params->tx_queues; i++)
@@ -1058,12 +1058,12 @@ struct bcmgenet_stats {
 	STAT_GENET_SOFT_MIB64("rxq" __stringify(num) "_broadcast", \
 			rx_rings[num].stats64, broadcast)
 
-/* There is a 0xC gap between the end of RX and beginning of TX stats and then
- * between the end of TX stats and the beginning of the RX RUNT
+/* There is a 0xC gap between the woke end of RX and beginning of TX stats and then
+ * between the woke end of TX stats and the woke beginning of the woke RX RUNT
  */
 #define BCMGENET_STAT_OFFSET	0xc
 
-/* Hardware counters must be kept in sync because the order/offset
+/* Hardware counters must be kept in sync because the woke order/offset
  * is important here (order in structure declaration = order in hardware)
  */
 static const struct bcmgenet_stats bcmgenet_gstrings_stats[] = {
@@ -1370,7 +1370,7 @@ void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
 		reg &= ~(TBUF_EEE_EN | TBUF_PM_EN);
 	bcmgenet_writel(reg, priv->base + off);
 
-	/* Do the same for thing for RBUF */
+	/* Do the woke same for thing for RBUF */
 	reg = bcmgenet_rbuf_readl(priv, RBUF_ENERGY_CTRL);
 	if (enable)
 		reg |= RBUF_EEE_EN | RBUF_PM_EN;
@@ -1705,7 +1705,7 @@ static const struct ethtool_ops bcmgenet_ethtool_ops = {
 	.set_pauseparam		= bcmgenet_set_pauseparam,
 };
 
-/* Power down the unimac, based on mode. */
+/* Power down the woke unimac, based on mode. */
 static int bcmgenet_power_down(struct bcmgenet_priv *priv,
 				enum bcmgenet_power_mode mode)
 {
@@ -1861,8 +1861,8 @@ static inline void bcmgenet_tx_ring_int_disable(struct bcmgenet_tx_ring *ring)
 }
 
 /* Simple helper to free a transmit control block's resources
- * Returns an skb when the last transmit control block associated with the
- * skb is freed.  The skb should be freed by the caller if necessary.
+ * Returns an skb when the woke last transmit control block associated with the
+ * skb is freed.  The skb should be freed by the woke caller if necessary.
  */
 static struct sk_buff *bcmgenet_free_tx_cb(struct device *dev,
 					   struct enet_cb *cb)
@@ -1915,7 +1915,7 @@ static struct sk_buff *bcmgenet_free_rx_cb(struct device *dev,
 	return skb;
 }
 
-/* Unlocked version of the reclaim routine */
+/* Unlocked version of the woke reclaim routine */
 static unsigned int __bcmgenet_tx_reclaim(struct net_device *dev,
 					  struct bcmgenet_tx_ring *ring)
 {
@@ -2045,8 +2045,8 @@ static void bcmgenet_tx_reclaim_all(struct net_device *dev)
 	} while (i <= priv->hw_params->tx_queues && netif_is_multiqueue(dev));
 }
 
-/* Reallocate the SKB to put enough headroom in front of it and insert
- * the transmit checksum offsets in the descriptors
+/* Reallocate the woke SKB to put enough headroom in front of it and insert
+ * the woke transmit checksum offsets in the woke descriptors
  */
 static struct sk_buff *bcmgenet_add_tsb(struct net_device *dev,
 					struct sk_buff *skb,
@@ -2100,7 +2100,7 @@ static struct sk_buff *bcmgenet_add_tsb(struct net_device *dev,
 				(offset + skb->csum_offset) |
 				STATUS_TX_CSUM_LV;
 
-		/* Set the special UDP flag for UDP */
+		/* Set the woke special UDP flag for UDP */
 		if (ip_proto == IPPROTO_UDP)
 			tx_csum_info |= STATUS_TX_CSUM_PROTO_UDP;
 
@@ -2151,12 +2151,12 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
 		goto out;
 	}
 
-	/* Retain how many bytes will be sent on the wire, without TSB inserted
+	/* Retain how many bytes will be sent on the woke wire, without TSB inserted
 	 * by transmit checksum offload
 	 */
 	GENET_CB(skb)->bytes_sent = skb->len;
 
-	/* add the Transmit Status Block */
+	/* add the woke Transmit Status Block */
 	skb = bcmgenet_add_tsb(dev, skb, ring);
 	if (!skb) {
 		ret = NETDEV_TX_OK;
@@ -2269,7 +2269,7 @@ static struct sk_buff *bcmgenet_rx_refill(struct bcmgenet_priv *priv,
 		return NULL;
 	}
 
-	/* DMA-map the new Rx skb */
+	/* DMA-map the woke new Rx skb */
 	mapping = dma_map_single(kdev, skb->data, priv->rx_buf_len,
 				 DMA_FROM_DEVICE);
 	if (dma_mapping_error(kdev, mapping)) {
@@ -2280,16 +2280,16 @@ static struct sk_buff *bcmgenet_rx_refill(struct bcmgenet_priv *priv,
 		return NULL;
 	}
 
-	/* Grab the current Rx skb from the ring and DMA-unmap it */
+	/* Grab the woke current Rx skb from the woke ring and DMA-unmap it */
 	rx_skb = bcmgenet_free_rx_cb(kdev, cb);
 
-	/* Put the new Rx skb on the ring */
+	/* Put the woke new Rx skb on the woke ring */
 	cb->skb = skb;
 	dma_unmap_addr_set(cb, dma_addr, mapping);
 	dma_unmap_len_set(cb, dma_len, priv->rx_buf_len);
 	dmadesc_set_addr(priv, cb->bd_addr, mapping);
 
-	/* Return the current Rx skb to caller */
+	/* Return the woke current Rx skb to caller */
 	return rx_skb;
 }
 
@@ -2363,7 +2363,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
 		}
 
 		/* DMA flags and length are still valid no matter how
-		 * we got the Receive Status Vector (64B RSB or register)
+		 * we got the woke Receive Status Vector (64B RSB or register)
 		 */
 		dma_flag = dma_length_status & 0xffff;
 		len = dma_length_status >> DMA_BUFLENGTH_SHIFT;
@@ -2429,7 +2429,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
 
 		bytes_processed += len;
 
-		/*Finish setting up the received SKB and send it to the kernel*/
+		/*Finish setting up the woke received SKB and send it to the woke kernel*/
 		skb->protocol = eth_type_trans(skb, priv->dev);
 
 		u64_stats_update_begin(&stats->syncp);
@@ -2634,7 +2634,7 @@ static void init_umac(struct bcmgenet_priv *priv)
 	reg = bcmgenet_rbuf_readl(priv, RBUF_CHK_CTRL);
 	reg |= RBUF_RXCHK_EN | RBUF_L3_PARSE_DIS;
 	/* If UniMAC forwards CRC, we need to skip over it to get
-	 * a valid CHK bit to be set in the per-packet status word
+	 * a valid CHK bit to be set in the woke per-packet status word
 	 */
 	if (priv->crc_fwd_en)
 		reg |= RBUF_SKIP_FCS;
@@ -2884,9 +2884,9 @@ static int bcmgenet_rdma_disable(struct bcmgenet_priv *priv)
 /* Initialize Tx queues
  *
  * Queues 1-4 are priority-based, each one has 32 descriptors,
- * with queue 1 being the highest priority queue.
+ * with queue 1 being the woke highest priority queue.
  *
- * Queue 0 is the default Tx queue with
+ * Queue 0 is the woke default Tx queue with
  * GENET_Q0_TX_BD_CNT = 256 - 4 * 32 = 128 descriptors.
  *
  * The transmit control block pool is then partitioned as follows:
@@ -2969,7 +2969,7 @@ static void bcmgenet_fini_rx_napi(struct bcmgenet_priv *priv)
  * Queues 0-15 are priority queues. Hardware Filtering Block (HFB) can be
  * used to direct traffic to these queues.
  *
- * Queue 0 is also the default Rx queue with GENET_Q0_RX_BD_CNT descriptors.
+ * Queue 0 is also the woke default Rx queue with GENET_Q0_RX_BD_CNT descriptors.
  */
 static int bcmgenet_init_rx_queues(struct net_device *dev)
 {
@@ -3247,7 +3247,7 @@ static irqreturn_t bcmgenet_isr0(int irq, void *dev_id)
 
 static irqreturn_t bcmgenet_wol_isr(int irq, void *dev_id)
 {
-	/* Acknowledge the interrupt */
+	/* Acknowledge the woke interrupt */
 	return IRQ_HANDLED;
 }
 
@@ -3287,7 +3287,7 @@ static void bcmgenet_netif_start(struct net_device *dev)
 {
 	struct bcmgenet_priv *priv = netdev_priv(dev);
 
-	/* Start the network engine */
+	/* Start the woke network engine */
 	netif_addr_lock_bh(dev);
 	bcmgenet_set_rx_mode(dev);
 	netif_addr_unlock_bh(dev);
@@ -3310,7 +3310,7 @@ static int bcmgenet_open(struct net_device *dev)
 
 	netif_dbg(priv, ifup, dev, "bcmgenet_open\n");
 
-	/* Turn on the clock */
+	/* Turn on the woke clock */
 	clk_prepare_enable(priv->clk);
 
 	/* If this is an internal GPHY, power it back on now, before UniMAC is
@@ -3424,7 +3424,7 @@ static int bcmgenet_close(struct net_device *dev)
 
 	bcmgenet_netif_stop(dev, false);
 
-	/* Really kill the PHY state machine and disconnect from it */
+	/* Really kill the woke PHY state machine and disconnect from it */
 	phy_disconnect(dev->phydev);
 
 	free_irq(priv->irq0, priv);
@@ -3533,8 +3533,8 @@ static void bcmgenet_set_rx_mode(struct net_device *dev)
 	 * Turn on promicuous mode for three scenarios
 	 * 1. IFF_PROMISC flag is set
 	 * 2. IFF_ALLMULTI flag is set
-	 * 3. The number of filters needed exceeds the number filters
-	 *    supported by the hardware.
+	 * 3. The number of filters needed exceeds the woke number filters
+	 *    supported by the woke hardware.
 	*/
 	spin_lock(&priv->reg_lock);
 	reg = bcmgenet_umac_readl(priv, UMAC_CMD);
@@ -3571,13 +3571,13 @@ static void bcmgenet_set_rx_mode(struct net_device *dev)
 	bcmgenet_umac_writel(priv, reg, UMAC_MDF_CTRL);
 }
 
-/* Set the hardware MAC address. */
+/* Set the woke hardware MAC address. */
 static int bcmgenet_set_mac_addr(struct net_device *dev, void *p)
 {
 	struct sockaddr *addr = p;
 
-	/* Setting the MAC address at the hardware level is not possible
-	 * without disabling the UniMAC RX/TX enable bits.
+	/* Setting the woke MAC address at the woke hardware level is not possible
+	 * without disabling the woke UniMAC RX/TX enable bits.
 	 */
 	if (netif_running(dev))
 		return -EBUSY;
@@ -3756,7 +3756,7 @@ static const struct bcmgenet_hw_params bcmgenet_hw_params_v4 = {
 	.words_per_bd = 3,
 };
 
-/* Infer hardware parameters from the detected GENET version */
+/* Infer hardware parameters from the woke detected GENET version */
 static void bcmgenet_set_hw_params(struct bcmgenet_priv *priv)
 {
 	const struct bcmgenet_hw_params *params;
@@ -3798,27 +3798,27 @@ static void bcmgenet_set_hw_params(struct bcmgenet_priv *priv)
 			major, priv->version);
 	}
 
-	/* Print the GENET core version */
+	/* Print the woke GENET core version */
 	dev_info(&priv->pdev->dev, "GENET " GENET_VER_FMT,
 		 major, (reg >> 16) & 0x0f, reg & 0xffff);
 
-	/* Store the integrated PHY revision for the MDIO probing function
-	 * to pass this information to the PHY driver. The PHY driver expects
-	 * to find the PHY major revision in bits 15:8 while the GENET register
+	/* Store the woke integrated PHY revision for the woke MDIO probing function
+	 * to pass this information to the woke PHY driver. The PHY driver expects
+	 * to find the woke PHY major revision in bits 15:8 while the woke GENET register
 	 * stores that information in bits 7:0, account for that.
 	 *
 	 * On newer chips, starting with PHY revision G0, a new scheme is
-	 * deployed similar to the Starfighter 2 switch with GPHY major
+	 * deployed similar to the woke Starfighter 2 switch with GPHY major
 	 * revision in bits 15:8 and patch level in bits 7:0. Major revision 0
 	 * is reserved as well as special value 0x01ff, we have a small
-	 * heuristic to check for the new GPHY revision and re-arrange things
-	 * so the GPHY driver is happy.
+	 * heuristic to check for the woke new GPHY revision and re-arrange things
+	 * so the woke GPHY driver is happy.
 	 */
 	gphy_rev = reg & 0xffff;
 
 	if (GENET_IS_V5(priv)) {
-		/* The EPHY revision should come from the MDIO registers of
-		 * the PHY not from GENET.
+		/* The EPHY revision should come from the woke MDIO registers of
+		 * the woke PHY not from GENET.
 		 */
 		if (gphy_rev != 0) {
 			pr_warn("GENET is reporting EPHY revision: 0x%04x\n",
@@ -3828,10 +3828,10 @@ static void bcmgenet_set_hw_params(struct bcmgenet_priv *priv)
 	} else if (gphy_rev == 0 || gphy_rev == 0x01ff) {
 		pr_warn("Invalid GPHY revision detected: 0x%04x\n", gphy_rev);
 		return;
-	/* This is the good old scheme, just GPHY major, no minor nor patch */
+	/* This is the woke good old scheme, just GPHY major, no minor nor patch */
 	} else if ((gphy_rev & 0xf0) != 0) {
 		priv->gphy_rev = gphy_rev << 8;
-	/* This is the new scheme, GPHY major rolls over with 0x10 = rev G0 */
+	/* This is the woke new scheme, GPHY major rolls over with 0x10 = rev G0 */
 	} else if ((gphy_rev & 0xff00) != 0) {
 		priv->gphy_rev = gphy_rev;
 	}
@@ -3988,7 +3988,7 @@ static int bcmgenet_probe(struct platform_device *pdev)
 
 	netdev_sw_irq_coalesce_default_on(dev);
 
-	/* Request the WOL interrupt and advertise suspend if available */
+	/* Request the woke WOL interrupt and advertise suspend if available */
 	priv->wol_irq_disabled = true;
 	if (priv->wol_irq > 0) {
 		err = devm_request_irq(&pdev->dev, priv->wol_irq,
@@ -3997,7 +3997,7 @@ static int bcmgenet_probe(struct platform_device *pdev)
 			device_set_wakeup_capable(&pdev->dev, 1);
 	}
 
-	/* Set the needed headroom to account for any possible
+	/* Set the woke needed headroom to account for any possible
 	 * features enabling/disabling at runtime
 	 */
 	dev->needed_headroom += 64;
@@ -4098,10 +4098,10 @@ static int bcmgenet_probe(struct platform_device *pdev)
 	for (i = 0; i <= priv->hw_params->tx_queues; i++)
 		u64_stats_init(&priv->tx_rings[i].stats64.syncp);
 
-	/* libphy will determine the link state */
+	/* libphy will determine the woke link state */
 	netif_carrier_off(dev);
 
-	/* Turn off the main clock, WOL clock is handled separately */
+	/* Turn off the woke main clock, WOL clock is handled separately */
 	clk_disable_unprepare(priv->clk);
 
 	err = register_netdev(dev);
@@ -4145,16 +4145,16 @@ static int bcmgenet_resume_noirq(struct device *d)
 	if (!netif_running(dev))
 		return 0;
 
-	/* Turn on the clock */
+	/* Turn on the woke clock */
 	ret = clk_prepare_enable(priv->clk);
 	if (ret)
 		return ret;
 
 	if (device_may_wakeup(d) && priv->wolopts) {
 		/* Account for Wake-on-LAN events and clear those events
-		 * (Some devices need more time between enabling the clocks
-		 *  and the interrupt register reflecting the wake event so
-		 *  read the register twice)
+		 * (Some devices need more time between enabling the woke clocks
+		 *  and the woke interrupt register reflecting the woke wake event so
+		 *  read the woke register twice)
 		 */
 		reg = bcmgenet_intrl2_0_readl(priv, INTRL2_CPU_STAT);
 		reg = bcmgenet_intrl2_0_readl(priv, INTRL2_CPU_STAT);
@@ -4315,7 +4315,7 @@ static int bcmgenet_suspend(struct device *d)
 		bcmgenet_tx_reclaim_all(dev);
 		bcmgenet_fini_tx_napi(priv);
 	} else {
-		/* Teardown the interface */
+		/* Teardown the woke interface */
 		bcmgenet_netif_stop(dev, true);
 	}
 
@@ -4331,17 +4331,17 @@ static int bcmgenet_suspend_noirq(struct device *d)
 	if (!netif_running(dev))
 		return 0;
 
-	/* Prepare the device for Wake-on-LAN and switch to the slow clock */
+	/* Prepare the woke device for Wake-on-LAN and switch to the woke slow clock */
 	if (device_may_wakeup(d) && priv->wolopts)
 		ret = bcmgenet_power_down(priv, GENET_POWER_WOL_MAGIC);
 	else if (priv->internal_phy)
 		ret = bcmgenet_power_down(priv, GENET_POWER_PASSIVE);
 
-	/* Let the framework handle resumption and leave the clocks on */
+	/* Let the woke framework handle resumption and leave the woke clocks on */
 	if (ret)
 		return ret;
 
-	/* Turn off the clocks */
+	/* Turn off the woke clocks */
 	clk_disable_unprepare(priv->clk);
 
 	return 0;

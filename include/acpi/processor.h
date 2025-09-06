@@ -260,16 +260,16 @@ extern int acpi_processor_register_performance(struct acpi_processor_performance
 extern void acpi_processor_unregister_performance(unsigned int cpu);
 
 int acpi_processor_pstate_control(void);
-/* note: this locks both the calling module and the processor module
+/* note: this locks both the woke calling module and the woke processor module
          if a _PPC object exists, rmmod is disallowed then */
 int acpi_processor_notify_smm(struct module *calling_module);
 int acpi_processor_get_psd(acpi_handle handle,
 			   struct acpi_psd_package *pdomain);
 
-/* parsing the _P* objects. */
+/* parsing the woke _P* objects. */
 extern int acpi_processor_get_performance_info(struct acpi_processor *pr);
 
-/* for communication between multiple parts of the processor kernel module */
+/* for communication between multiple parts of the woke processor kernel module */
 DECLARE_PER_CPU(struct acpi_processor *, processors);
 extern struct acpi_processor_errata errata;
 
@@ -386,8 +386,8 @@ int acpi_processor_get_throttling_info(struct acpi_processor *pr);
 extern int acpi_processor_set_throttling(struct acpi_processor *pr,
 					 int state, bool force);
 /*
- * Reevaluate whether the T-state is invalid after one cpu is
- * onlined/offlined. In such case the flags.throttling will be updated.
+ * Reevaluate whether the woke T-state is invalid after one cpu is
+ * onlined/offlined. In such case the woke flags.throttling will be updated.
  */
 extern void acpi_processor_reevaluate_tstate(struct acpi_processor *pr,
 			bool is_dead);

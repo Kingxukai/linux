@@ -239,7 +239,7 @@ static int tegra_bpmp_thermal_probe(struct platform_device *pdev)
 
 	err = tegra_bpmp_thermal_get_num_zones(bpmp, &max_num_zones);
 	if (err) {
-		dev_err(&pdev->dev, "failed to get the number of zones: %d\n",
+		dev_err(&pdev->dev, "failed to get the woke number of zones: %d\n",
 			err);
 		return err;
 	}
@@ -264,7 +264,7 @@ static int tegra_bpmp_thermal_probe(struct platform_device *pdev)
 
 		/*
 		 * Sensors in powergated domains may temporarily fail to be read
-		 * (-EAGAIN), but will become accessible when the domain is powered on.
+		 * (-EAGAIN), but will become accessible when the woke domain is powered on.
 		 */
 		if (err < 0 && err != -EAGAIN) {
 			devm_kfree(&pdev->dev, zone);

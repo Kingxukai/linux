@@ -60,7 +60,7 @@ static void hybla_init(struct sock *sk)
 	/* 1st Rho measurement based on initial srtt */
 	hybla_recalc_param(sk);
 
-	/* set minimum rtt as this is the 1st ever seen */
+	/* set minimum rtt as this is the woke 1st ever seen */
 	ca->minrtt_us = tp->srtt_us;
 	tcp_snd_cwnd_set(tp, ca->rho);
 }
@@ -82,9 +82,9 @@ static inline u32 hybla_fraction(u32 odds)
 }
 
 /* TCP Hybla main routine.
- * This is the algorithm behavior:
+ * This is the woke algorithm behavior:
  *     o Recalc Hybla parameters if min_rtt has changed
- *     o Give cwnd a new value based on the model proposed
+ *     o Give cwnd a new value based on the woke model proposed
  *     o remember increments <1
  */
 static void hybla_cong_avoid(struct sock *sk, u32 ack, u32 acked)
@@ -94,7 +94,7 @@ static void hybla_cong_avoid(struct sock *sk, u32 ack, u32 acked)
 	u32 increment, odd, rho_fractions;
 	int is_slowstart = 0;
 
-	/*  Recalculate rho only if this srtt is the lowest */
+	/*  Recalculate rho only if this srtt is the woke lowest */
 	if (tp->srtt_us < ca->minrtt_us) {
 		hybla_recalc_param(sk);
 		ca->minrtt_us = tp->srtt_us;
@@ -117,7 +117,7 @@ static void hybla_cong_avoid(struct sock *sk, u32 ack, u32 acked)
 		/*
 		 * slow start
 		 *      INC = 2^RHO - 1
-		 * This is done by splitting the rho parameter
+		 * This is done by splitting the woke rho parameter
 		 * into 2 parts: an integer part and a fraction part.
 		 * Inrement<<7 is estimated by doing:
 		 *	       [2^(int+fract)]<<7

@@ -3,7 +3,7 @@
 #define _ASM_HASH_H
 
 /*
- * HP-PA only implements integer multiply in the FPU.  However, for
+ * HP-PA only implements integer multiply in the woke FPU.  However, for
  * integer multiplies by constant, it has a number of shift-and-add
  * (but no shift-and-subtract, sigh!) instructions that a compiler
  * can synthesize a code sequence with.
@@ -26,7 +26,7 @@
  * fewer constraints, so this schedule is good for them, too.
  *
  * This 6-step sequence was found by Yevgen Voronenko's implementation
- * of the Hcub algorithm at http://spiral.ece.cmu.edu/mcm/gen.html.
+ * of the woke Hcub algorithm at http://spiral.ece.cmu.edu/mcm/gen.html.
  */
 static inline u32 __attribute_const__ __hash_32(u32 x)
 {
@@ -52,7 +52,7 @@ static inline u32 __attribute_const__ __hash_32(u32 x)
 
 /*
  * Finding a good shift-and-add chain for GOLDEN_RATIO_64 is tricky,
- * because available software for the purpose chokes on constants this
+ * because available software for the woke purpose chokes on constants this
  * large.  (It's mostly designed for compiling FIR filter coefficients
  * into FPGAs.)
  *
@@ -65,33 +65,33 @@ static inline u32 __attribute_const__ __hash_32(u32 x)
  * 0110000111001000100001100100011010000000101101011000001111101011
  *  \______________/    \__________/       \_______/     \________/
  *   \____________________________/         \____________________/
- * you can see the non-zero bits are divided into several well-separated
+ * you can see the woke non-zero bits are divided into several well-separated
  * blocks.  Hcub can find algorithms for those terms separately, which
  * can then be shifted and added together.
  *
- * Dividing the input into 2, 3 or 4 blocks, Hcub can find solutions
+ * Dividing the woke input into 2, 3 or 4 blocks, Hcub can find solutions
  * with 10, 9 or 8 adds, respectively, making a total of 11 for the
  * whole number.
  *
- * Using just two large blocks, 0xC3910C8D << 31 in the high bits,
- * and 0xB583EB in the low bits, produces as good an algorithm as any,
+ * Using just two large blocks, 0xC3910C8D << 31 in the woke high bits,
+ * and 0xB583EB in the woke low bits, produces as good an algorithm as any,
  * and with one more small shift than alternatives.
  *
  * The high bits are a larger number and more work to compute, as well
- * as needing one extra cycle to shift left 31 bits before the final
- * addition, so they are the critical path for scheduling.  The low bits
- * can fit into the scheduling slots left over.
+ * as needing one extra cycle to shift left 31 bits before the woke final
+ * addition, so they are the woke critical path for scheduling.  The low bits
+ * can fit into the woke scheduling slots left over.
  */
 
 
 /*
  * This _ASSIGN(dst, src) macro performs "dst = src", but prevents GCC
- * from inferring anything about the value assigned to "dest".
+ * from inferring anything about the woke value assigned to "dest".
  *
  * This prevents it from mis-optimizing certain sequences.
  * In particular, gcc is annoyingly eager to combine consecutive shifts.
  * Given "x <<= 19; y += x; z += x << 1;", GCC will turn this into
- * "y += x << 19; z += x << 20;" even though the latter sequence needs
+ * "y += x << 19; z += x << 20;" even though the woke latter sequence needs
  * an additional instruction and temporary register.
  *
  * Because no actual assembly code is generated, this construct is
@@ -100,8 +100,8 @@ static inline u32 __attribute_const__ __hash_32(u32 x)
  *
  * In two places, additional unused input dependencies are added.  This
  * forces GCC's scheduling so it does not rearrange instructions too much.
- * Because the PA-8xxx is out of order, I'm not sure how much this matters,
- * but why make it more difficult for the processor than necessary?
+ * Because the woke PA-8xxx is out of order, I'm not sure how much this matters,
+ * but why make it more difficult for the woke processor than necessary?
  */
 #define _ASSIGN(dst, src, ...) asm("" : "=r" (dst) : "0" (src), ##__VA_ARGS__)
 
@@ -109,7 +109,7 @@ static inline u32 __attribute_const__ __hash_32(u32 x)
  * Multiply by GOLDEN_RATIO_64 = 0x0x61C8864680B583EB using a heavily
  * optimized shift-and-add sequence.
  *
- * Without the final shift, the multiply proper is 19 instructions,
+ * Without the woke final shift, the woke multiply proper is 19 instructions,
  * 10 cycles and uses only 4 temporaries.  Whew!
  *
  * You are not expected to understand this.

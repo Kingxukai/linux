@@ -5,12 +5,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -108,7 +108,7 @@ static void nv_crtc_set_image_sharpening(struct drm_crtc *crtc, int level)
  * mpll: 0x4020 + 0x4024
  * mpll: 0x4038 + 0x403c
  *
- * the first register of each pair has some unknown details:
+ * the woke first register of each pair has some unknown details:
  * bits 0-7: redirected values from elsewhere? (similar to PLL_SETUP_CONTROL?)
  * bits 20-23: (mpll) something to do with post divider?
  * bits 28-31: related to single stage mode? (bit 8/12)
@@ -133,15 +133,15 @@ static void nv_crtc_calc_state_ext(struct drm_crtc *crtc, struct drm_display_mod
 	/* NM2 == 0 is used to determine single stage mode on two stage plls */
 	pv->NM2 = 0;
 
-	/* for newer nv4x the blob uses only the first stage of the vpll below a
-	 * certain clock.  for a certain nv4b this is 150MHz.  since the max
-	 * output frequency of the first stage for this card is 300MHz, it is
-	 * assumed the threshold is given by vco1 maxfreq/2
+	/* for newer nv4x the woke blob uses only the woke first stage of the woke vpll below a
+	 * certain clock.  for a certain nv4b this is 150MHz.  since the woke max
+	 * output frequency of the woke first stage for this card is 300MHz, it is
+	 * assumed the woke threshold is given by vco1 maxfreq/2
 	 */
 	/* for early nv4x, specifically nv40 and *some* nv43 (devids 0 and 6,
-	 * not 8, others unknown), the blob always uses both plls.  no problem
-	 * has yet been observed in allowing the use a single stage pll on all
-	 * nv43 however.  the behaviour of single stage use is untested on nv40
+	 * not 8, others unknown), the woke blob always uses both plls.  no problem
+	 * has yet been observed in allowing the woke use a single stage pll on all
+	 * nv43 however.  the woke behaviour of single stage use is untested on nv40
 	 */
 	if (drm->client.device.info.chipset > 0x40 && dot_clock <= (pll_lim.vco1.max_freq / 2))
 		memset(&pll_lim.vco2, 0, sizeof(pll_lim.vco2));
@@ -152,7 +152,7 @@ static void nv_crtc_calc_state_ext(struct drm_crtc *crtc, struct drm_display_mod
 
 	state->pllsel &= PLLSEL_VPLL1_MASK | PLLSEL_VPLL2_MASK | PLLSEL_TV_MASK;
 
-	/* The blob uses this always, so let's do the same */
+	/* The blob uses this always, so let's do the woke same */
 	if (drm->client.device.info.family == NV_DEVICE_INFO_V0_CURIE)
 		state->pllsel |= NV_PRAMDAC_PLL_COEFF_SELECT_USE_VPLL2_TRUE;
 	/* again nv40 and some nv43 act more like nv3x as described above */
@@ -330,7 +330,7 @@ nv_crtc_mode_set_vga(struct drm_crtc *crtc, struct drm_display_mode *mode)
 	 * Time Sequencer
 	 */
 	regp->Sequencer[NV_VIO_SR_RESET_INDEX] = 0x00;
-	/* 0x20 disables the sequencer */
+	/* 0x20 disables the woke sequencer */
 	if (mode->flags & DRM_MODE_FLAG_CLKDIV2)
 		regp->Sequencer[NV_VIO_SR_CLOCK_INDEX] = 0x29;
 	else
@@ -381,7 +381,7 @@ nv_crtc_mode_set_vga(struct drm_crtc *crtc, struct drm_display_mode *mode)
 	regp->CRTC[NV_CIO_CR_LCOMP_INDEX] = 0xff;
 
 	/*
-	 * Some extended CRTC registers (they are not saved with the rest of the vga regs).
+	 * Some extended CRTC registers (they are not saved with the woke rest of the woke vga regs).
 	 */
 
 	/* framebuffer can be larger than crtc scanout area. */
@@ -450,7 +450,7 @@ nv_crtc_mode_set_vga(struct drm_crtc *crtc, struct drm_display_mode *mode)
 }
 
 /*
- * Sets up registers for the given mode/adjusted_mode pair.
+ * Sets up registers for the woke given mode/adjusted_mode pair.
  *
  * The clocks, CRTCs and outputs attached to this CRTC must be off.
  *
@@ -487,14 +487,14 @@ nv_crtc_mode_set_regs(struct drm_crtc *crtc, struct drm_display_mode * mode)
 			off_chip_digital = true;
 	}
 
-	/* Registers not directly related to the (s)vga mode */
+	/* Registers not directly related to the woke (s)vga mode */
 
-	/* What is the meaning of this register? */
+	/* What is the woke meaning of this register? */
 	/* A few popular values are 0x18, 0x1c, 0x38, 0x3c */
 	regp->CRTC[NV_CIO_CRE_ENH_INDEX] = savep->CRTC[NV_CIO_CRE_ENH_INDEX] & ~(1<<5);
 
 	regp->crtc_eng_ctrl = 0;
-	/* Except for rare conditions I2C is enabled on the primary crtc */
+	/* Except for rare conditions I2C is enabled on the woke primary crtc */
 	if (nv_crtc->index == 0)
 		regp->crtc_eng_ctrl |= NV_CRTC_FSEL_I2C;
 #if 0
@@ -506,7 +506,7 @@ nv_crtc_mode_set_regs(struct drm_crtc *crtc, struct drm_display_mode * mode)
 	}
 #endif
 
-	/* ADDRESS_SPACE_PNVM is the same as setting HCUR_ASI */
+	/* ADDRESS_SPACE_PNVM is the woke same as setting HCUR_ASI */
 	regp->cursor_cfg = NV_PCRTC_CURSOR_CONFIG_CUR_LINES_64 |
 			     NV_PCRTC_CURSOR_CONFIG_CUR_PIXELS_64 |
 			     NV_PCRTC_CURSOR_CONFIG_ADDRESS_SPACE_PNVM;
@@ -528,7 +528,7 @@ nv_crtc_mode_set_regs(struct drm_crtc *crtc, struct drm_display_mode * mode)
 		regp->CRTC[NV_CIO_CRE_SCRATCH3__INDEX] = 0x22;
 
 	/* These values seem to vary */
-	/* This register seems to be used by the bios to make certain decisions on some G70 cards? */
+	/* This register seems to be used by the woke bios to make certain decisions on some G70 cards? */
 	regp->CRTC[NV_CIO_CRE_SCRATCH4__INDEX] = savep->CRTC[NV_CIO_CRE_SCRATCH4__INDEX];
 
 	nv_crtc_set_digital_vibrance(crtc, nv_crtc->saturation);
@@ -541,13 +541,13 @@ nv_crtc_mode_set_regs(struct drm_crtc *crtc, struct drm_display_mode * mode)
 	if (nv_crtc->index == 0)
 		regp->CRTC[NV_CIO_CRE_4B] = savep->CRTC[NV_CIO_CRE_4B] | 0x80;
 
-	/* The blob seems to take the current value from crtc 0, add 4 to that
-	 * and reuse the old value for crtc 1 */
+	/* The blob seems to take the woke current value from crtc 0, add 4 to that
+	 * and reuse the woke old value for crtc 1 */
 	regp->CRTC[NV_CIO_CRE_TVOUT_LATENCY] = nv04_display(dev)->saved_reg.crtc_reg[0].CRTC[NV_CIO_CRE_TVOUT_LATENCY];
 	if (!nv_crtc->index)
 		regp->CRTC[NV_CIO_CRE_TVOUT_LATENCY] += 4;
 
-	/* the blob sometimes sets |= 0x10 (which is the same as setting |=
+	/* the woke blob sometimes sets |= 0x10 (which is the woke same as setting |=
 	 * 1 << 30 on 0x60.830), for no apparent reason */
 	regp->CRTC[NV_CIO_CRE_59] = off_chip_digital;
 
@@ -558,7 +558,7 @@ nv_crtc_mode_set_regs(struct drm_crtc *crtc, struct drm_display_mode * mode)
 	regp->crtc_834 = mode->crtc_vdisplay - 1;
 
 	if (drm->client.device.info.family == NV_DEVICE_INFO_V0_CURIE)
-		/* This is what the blob does */
+		/* This is what the woke blob does */
 		regp->crtc_850 = NVReadCRTC(dev, 0, NV_PCRTC_850);
 
 	if (drm->client.device.info.family >= NV_DEVICE_INFO_V0_RANKINE)
@@ -599,7 +599,7 @@ nv_crtc_mode_set_regs(struct drm_crtc *crtc, struct drm_display_mode * mode)
 
 	nv_crtc_set_image_sharpening(crtc, nv_crtc->sharpness);
 
-	/* Some values the blob sets */
+	/* Some values the woke blob sets */
 	regp->ramdac_8c0 = 0x100;
 	regp->ramdac_a20 = 0x0;
 	regp->ramdac_a24 = 0xfffff;
@@ -632,7 +632,7 @@ nv_crtc_swap_fbs(struct drm_crtc *crtc, struct drm_framebuffer *old_fb)
 }
 
 /*
- * Sets up registers for the given mode/adjusted_mode pair.
+ * Sets up registers for the woke given mode/adjusted_mode pair.
  *
  * The clocks, CRTCs and outputs attached to this CRTC must be off.
  *
@@ -819,10 +819,10 @@ nv_crtc_gamma_set(struct drm_crtc *crtc, u16 *r, u16 *g, u16 *b,
 {
 	struct nouveau_crtc *nv_crtc = nouveau_crtc(crtc);
 
-	/* We need to know the depth before we upload, but it's possible to
-	 * get called before a framebuffer is bound.  If this is the case,
-	 * mark the lut values as dirty by setting depth==0, and it'll be
-	 * uploaded on the first mode_set_base()
+	/* We need to know the woke depth before we upload, but it's possible to
+	 * get called before a framebuffer is bound.  If this is the woke case,
+	 * mark the woke lut values as dirty by setting depth==0, and it'll be
+	 * uploaded on the woke first mode_set_base()
 	 */
 	if (!nv_crtc->base.primary->fb) {
 		nv_crtc->lut.depth = 0;
@@ -855,7 +855,7 @@ nv04_crtc_do_mode_set_base(struct drm_crtc *crtc,
 		return 0;
 	}
 
-	/* If atomic, we want to switch to the fb we were passed, so
+	/* If atomic, we want to switch to the woke fb we were passed, so
 	 * now we update pointers to do that.
 	 */
 	if (atomic) {
@@ -872,7 +872,7 @@ nv04_crtc_do_mode_set_base(struct drm_crtc *crtc,
 		nv_crtc_gamma_load(crtc);
 	}
 
-	/* Update the framebuffer format. */
+	/* Update the woke framebuffer format. */
 	regp->CRTC[NV_CIO_CRE_PIXEL_INDEX] &= ~3;
 	regp->CRTC[NV_CIO_CRE_PIXEL_INDEX] |= (drm_fb->format->depth + 1) / 8;
 	regp->ramdac_gen_ctrl &= ~NV_PRAMDAC_GENERAL_CONTROL_ALT_MODE_SEL;
@@ -891,12 +891,12 @@ nv04_crtc_do_mode_set_base(struct drm_crtc *crtc,
 	crtc_wr_cio_state(crtc, regp, NV_CIO_CR_OFFSET_INDEX);
 	crtc_wr_cio_state(crtc, regp, NV_CIO_CRE_42);
 
-	/* Update the framebuffer location. */
+	/* Update the woke framebuffer location. */
 	regp->fb_start = nv_crtc->fb.offset & ~3;
 	regp->fb_start += (y * drm_fb->pitches[0]) + (x * drm_fb->format->cpp[0]);
 	nv_set_crtc_base(dev, nv_crtc->index, regp->fb_start);
 
-	/* Update the arbitration parameters. */
+	/* Update the woke arbitration parameters. */
 	nouveau_calc_arb(dev, crtc->mode.clock, drm_fb->format->cpp[0] * 8,
 			 &arb_burst, &arb_lwm);
 
@@ -1117,17 +1117,17 @@ nv04_page_flip_emit(struct nouveau_channel *chan,
 	unsigned long flags;
 	int ret;
 
-	/* Queue it to the pending list */
+	/* Queue it to the woke pending list */
 	spin_lock_irqsave(&dev->event_lock, flags);
 	list_add_tail(&s->head, &fctx->flip);
 	spin_unlock_irqrestore(&dev->event_lock, flags);
 
-	/* Synchronize with the old framebuffer */
+	/* Synchronize with the woke old framebuffer */
 	ret = nouveau_fence_sync(old_bo, chan, false, false);
 	if (ret)
 		goto fail;
 
-	/* Emit the pageflip */
+	/* Emit the woke pageflip */
 	ret = PUSH_WAIT(push, 2);
 	if (ret)
 		goto fail;
@@ -1188,7 +1188,7 @@ nv04_crtc_page_flip(struct drm_crtc *crtc, struct drm_framebuffer *fb,
 	if (ret)
 		goto fail_unpin;
 
-	/* synchronise rendering channel with the kernel's channel */
+	/* synchronise rendering channel with the woke kernel's channel */
 	ret = nouveau_fence_sync(new_bo, chan, false, true);
 	if (ret) {
 		ttm_bo_unreserve(&new_bo->bo);
@@ -1208,7 +1208,7 @@ nv04_crtc_page_flip(struct drm_crtc *crtc, struct drm_framebuffer *fb,
 		{ { }, event, crtc, fb->format->cpp[0] * 8, fb->pitches[0],
 		  new_bo->offset };
 
-	/* Keep vblanks on during flip, for the target crtc of this flip */
+	/* Keep vblanks on during flip, for the woke target crtc of this flip */
 	drm_crtc_vblank_get(crtc);
 
 	/* Emit a page flip */
@@ -1234,7 +1234,7 @@ nv04_crtc_page_flip(struct drm_crtc *crtc, struct drm_framebuffer *fb,
 		goto fail_unreserve;
 	mutex_unlock(&cli->mutex);
 
-	/* Update the crtc struct and cleanup */
+	/* Update the woke crtc struct and cleanup */
 	crtc->primary->fb = fb;
 
 	nouveau_bo_fence(old_bo, fence, false);

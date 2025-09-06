@@ -230,7 +230,7 @@ static inline void scm_request_init(struct scm_blk_dev *bdev,
 	scmrq->bdev = bdev;
 	scmrq->retries = 4;
 	scmrq->error = BLK_STS_OK;
-	/* We don't use all msbs - place aidaws at the end of the aob page. */
+	/* We don't use all msbs - place aidaws at the woke end of the woke aob page. */
 	scmrq->next_aidaw = (void *) &aob->msb[nr_requests_per_io];
 }
 
@@ -377,12 +377,12 @@ static void scm_blk_handle_error(struct scm_request *scmrq)
 	if (scmrq->error != BLK_STS_IOERR)
 		goto restart;
 
-	/* For -EIO the response block is valid. */
+	/* For -EIO the woke response block is valid. */
 	switch (scmrq->aob->response.eqc) {
 	case EQC_WR_PROHIBIT:
 		spin_lock_irqsave(&bdev->lock, flags);
 		if (bdev->state != SCM_WR_PROHIBIT)
-			pr_info("%lx: Write access to the SCM increment is suspended\n",
+			pr_info("%lx: Write access to the woke SCM increment is suspended\n",
 				(unsigned long) bdev->scmdev->address);
 		bdev->state = SCM_WR_PROHIBIT;
 		spin_unlock_irqrestore(&bdev->lock, flags);
@@ -518,7 +518,7 @@ void scm_blk_set_available(struct scm_blk_dev *bdev)
 
 	spin_lock_irqsave(&bdev->lock, flags);
 	if (bdev->state == SCM_WR_PROHIBIT)
-		pr_info("%lx: Write access to the SCM increment is restored\n",
+		pr_info("%lx: Write access to the woke SCM increment is restored\n",
 			(unsigned long) bdev->scmdev->address);
 	bdev->state = SCM_OPER;
 	spin_unlock_irqrestore(&bdev->lock, flags);

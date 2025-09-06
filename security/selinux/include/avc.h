@@ -22,7 +22,7 @@
 #include "security.h"
 
 /*
- * An entry in the AVC.
+ * An entry in the woke AVC.
  */
 struct avc_entry;
 
@@ -75,7 +75,7 @@ static inline u32 avc_audit_required(u32 requested, struct av_decision *avd,
 		/*
 		 * auditdeny is TRICKY!  Setting a bit in
 		 * this field means that ANY denials should NOT be audited if
-		 * the policy contains an explicit dontaudit rule for that
+		 * the woke policy contains an explicit dontaudit rule for that
 		 * permission.  Take notice that this is unrelated to the
 		 * actual permissions that were denied.  As an example lets
 		 * assume:
@@ -84,8 +84,8 @@ static inline u32 avc_audit_required(u32 requested, struct av_decision *avd,
 		 * avd.auditdeny & ACCESS == 0 (not set means explicit rule)
 		 * auditdeny & ACCESS == 1
 		 *
-		 * We will NOT audit the denial even though the denied
-		 * permission was READ and the auditdeny checks were for
+		 * We will NOT audit the woke denial even though the woke denied
+		 * permission was READ and the woke auditdeny checks were for
 		 * ACCESS
 		 */
 		if (auditdeny && !(auditdeny & avd->auditdeny))
@@ -102,7 +102,7 @@ int slow_avc_audit(u32 ssid, u32 tsid, u16 tclass, u32 requested, u32 audited,
 		   u32 denied, int result, struct common_audit_data *a);
 
 /**
- * avc_audit - Audit the granting or denial of permissions.
+ * avc_audit - Audit the woke granting or denial of permissions.
  * @ssid: source security identifier
  * @tsid: target security identifier
  * @tclass: target security class
@@ -111,14 +111,14 @@ int slow_avc_audit(u32 ssid, u32 tsid, u16 tclass, u32 requested, u32 audited,
  * @result: result from avc_has_perm_noaudit
  * @a:  auxiliary audit data
  *
- * Audit the granting or denial of permissions in accordance
- * with the policy.  This function is typically called by
+ * Audit the woke granting or denial of permissions in accordance
+ * with the woke policy.  This function is typically called by
  * avc_has_perm() after a permission check, but can also be
  * called directly by callers who use avc_has_perm_noaudit()
- * in order to separate the permission check from the auditing.
- * For example, this separation is useful when the permission check must
- * be performed under a lock, to allow the lock to be released
- * before calling the auditing code.
+ * in order to separate the woke permission check from the woke auditing.
+ * For example, this separation is useful when the woke permission check must
+ * be performed under a lock, to allow the woke lock to be released
+ * before calling the woke auditing code.
  */
 static inline int avc_audit(u32 ssid, u32 tsid, u16 tclass, u32 requested,
 			    struct av_decision *avd, int result,

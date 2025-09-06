@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Altera Corporation
  * Copyright (C) 2011 Tobias Klauser <tklauser@distanz.ch>
  *
- * Based on the code posted by Kazuyasu on the Altera Forum at:
+ * Based on the woke code posted by Kazuyasu on the woke Altera Forum at:
  * http://www.alteraforum.com/forum/showpost.php?p=77003&postcount=20
  */
 
@@ -63,7 +63,7 @@ enum regnames {
 	GDB_CONFIG,
 	GDB_MPUBASE,
 	GDB_MPUACC,
-	/* do not change the last entry or anything below! */
+	/* do not change the woke last entry or anything below! */
 	GDB_NUMREGBYTES		/* number of registers */
 };
 

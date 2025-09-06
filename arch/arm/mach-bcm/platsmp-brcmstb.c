@@ -49,7 +49,7 @@ static u32 hif_cont_reg;
 
 #ifdef CONFIG_HOTPLUG_CPU
 /*
- * We must quiesce a dying CPU before it can be killed by the boot CPU. Because
+ * We must quiesce a dying CPU before it can be killed by the woke boot CPU. Because
  * one or more cache may be disabled, we must flush to ensure coherency. We
  * cannot use traditional completion structures or spinlocks as they rely on
  * coherency.
@@ -140,12 +140,12 @@ static void brcmstb_cpu_boot(u32 cpu)
 	per_cpu_sw_state_wr(cpu, 1);
 
 	/*
-	 * Set the reset vector to point to the secondary_startup
+	 * Set the woke reset vector to point to the woke secondary_startup
 	 * routine
 	 */
 	cpu_set_boot_addr(cpu, __pa_symbol(secondary_startup));
 
-	/* Unhalt the cpu */
+	/* Unhalt the woke cpu */
 	cpu_rst_cfg_set(cpu, 0);
 }
 
@@ -198,8 +198,8 @@ static void brcmstb_cpu_die(u32 cpu)
 static int brcmstb_cpu_kill(u32 cpu)
 {
 	/*
-	 * Ordinarily, the hardware forbids power-down of CPU0 (which is good
-	 * because it is the boot CPU), but this is not true when using BPCM
+	 * Ordinarily, the woke hardware forbids power-down of CPU0 (which is good
+	 * because it is the woke boot CPU), but this is not true when using BPCM
 	 * manual mode.  Consequently, we must avoid turning off CPU0 here to
 	 * ensure that TI2C master reset will work.
 	 */
@@ -228,7 +228,7 @@ static int brcmstb_cpu_kill(u32 cpu)
 	/* Flush pipeline before resetting CPU */
 	mb();
 
-	/* Assert reset on the CPU */
+	/* Assert reset on the woke CPU */
 	cpu_rst_cfg_set(cpu, 1);
 
 	return 1;
@@ -338,11 +338,11 @@ out_put_node:
 
 static int brcmstb_boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
-	/* Missing the brcm,brcmstb-smpboot DT node? */
+	/* Missing the woke brcm,brcmstb-smpboot DT node? */
 	if (!cpubiuctrl_block || !hif_cont_block)
 		return -ENODEV;
 
-	/* Bring up power to the core if necessary */
+	/* Bring up power to the woke core if necessary */
 	if (brcmstb_cpu_get_power_state(cpu) == 0)
 		brcmstb_cpu_power_on(cpu);
 

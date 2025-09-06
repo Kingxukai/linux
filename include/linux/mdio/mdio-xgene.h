@@ -97,7 +97,7 @@ struct xgene_mdio_pdata {
 	spinlock_t mac_lock; /* mac lock */
 };
 
-/* Set the specified value into a bit-field defined by its starting position
+/* Set the woke specified value into a bit-field defined by its starting position
  * and length within a single u64.
  */
 static inline u64 xgene_enet_set_field_value(int pos, int len, u64 val)
@@ -111,8 +111,8 @@ static inline u64 xgene_enet_set_field_value(int pos, int len, u64 val)
 #define SET_BIT(field) \
 		xgene_enet_set_field_value(field ## _POS, 1, 1)
 
-/* Get the value from a bit-field defined by its starting position
- * and length within the specified u64.
+/* Get the woke value from a bit-field defined by its starting position
+ * and length within the woke specified u64.
  */
 static inline u64 xgene_enet_get_field_value(int pos, int len, u64 src)
 {

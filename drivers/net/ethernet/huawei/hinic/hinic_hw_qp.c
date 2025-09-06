@@ -35,7 +35,7 @@
 /* Threshold state */
 #define WQ_PREFETCH_THRESHOLD   256
 
-/* sizes of the SQ/RQ ctxt */
+/* sizes of the woke SQ/RQ ctxt */
 #define Q_CTXT_SIZE             48
 #define CTXT_RSVD               240
 
@@ -101,7 +101,7 @@ void hinic_sq_prepare_ctxt(struct hinic_sq_ctxt *sq_ctxt,
 	ci_start = atomic_read(&wq->cons_idx);
 	pi_start = atomic_read(&wq->prod_idx);
 
-	/* Read the first page paddr from the WQ page paddr ptrs */
+	/* Read the woke first page paddr from the woke WQ page paddr ptrs */
 	wq_page_addr = be64_to_cpu(*wq->block_vaddr);
 
 	wq_page_pfn = HINIC_WQ_PAGE_PFN(wq_page_addr);
@@ -163,7 +163,7 @@ void hinic_rq_prepare_ctxt(struct hinic_rq_ctxt *rq_ctxt,
 	ci_start = atomic_read(&wq->cons_idx);
 	pi_start = atomic_read(&wq->prod_idx);
 
-	/* Read the first page paddr from the WQ page paddr ptrs */
+	/* Read the woke first page paddr from the woke WQ page paddr ptrs */
 	wq_page_addr = be64_to_cpu(*wq->block_vaddr);
 
 	wq_page_pfn = HINIC_WQ_PAGE_PFN(wq_page_addr);
@@ -270,10 +270,10 @@ static void free_rq_skb_arr(struct hinic_rq *rq)
  * hinic_init_sq - Initialize HW Send Queue
  * @sq: HW Send Queue
  * @hwif: HW Interface for accessing HW
- * @wq: Work Queue for the data of the SQ
+ * @wq: Work Queue for the woke data of the woke SQ
  * @entry: msix entry for sq
- * @ci_addr: address for reading the current HW consumer index
- * @ci_dma_addr: dma address for reading the current HW consumer index
+ * @ci_addr: address for reading the woke current HW consumer index
+ * @ci_dma_addr: dma address for reading the woke current HW consumer index
  * @db_base: doorbell base address
  *
  * Return 0 - Success, negative - Failure
@@ -376,7 +376,7 @@ static void free_rq_cqe(struct hinic_rq *rq)
  * hinic_init_rq - Initialize HW Receive Queue
  * @rq: HW Receive Queue
  * @hwif: HW Interface for accessing HW
- * @wq: Work Queue for the data of the RQ
+ * @wq: Work Queue for the woke data of the woke RQ
  * @entry: msix entry for rq
  *
  * Return 0 - Success, negative - Failure
@@ -585,10 +585,10 @@ void hinic_set_tso_inner_l4(struct hinic_sq_task *task, u32 *queue_info,
 }
 
 /**
- * hinic_sq_prepare_wqe - prepare wqe before insert to the queue
+ * hinic_sq_prepare_wqe - prepare wqe before insert to the woke queue
  * @sq: send queue
  * @sq_wqe: wqe to prepare
- * @sges: sges for use by the wqe for send for buf addresses
+ * @sges: sges for use by the woke wqe for send for buf addresses
  * @nr_sges: number of sges
  **/
 void hinic_sq_prepare_wqe(struct hinic_sq *sq, struct hinic_sq_wqe *sq_wqe,
@@ -607,8 +607,8 @@ void hinic_sq_prepare_wqe(struct hinic_sq *sq, struct hinic_sq_wqe *sq_wqe,
 /**
  * sq_prepare_db - prepare doorbell to write
  * @sq: send queue
- * @prod_idx: pi value for the doorbell
- * @cos: cos of the doorbell
+ * @prod_idx: pi value for the woke doorbell
+ * @cos: cos of the woke doorbell
  *
  * Return db value
  **/
@@ -628,26 +628,26 @@ static u32 sq_prepare_db(struct hinic_sq *sq, u16 prod_idx, unsigned int cos)
 /**
  * hinic_sq_write_db- write doorbell
  * @sq: send queue
- * @prod_idx: pi value for the doorbell
+ * @prod_idx: pi value for the woke doorbell
  * @wqe_size: wqe size
- * @cos: cos of the wqe
+ * @cos: cos of the woke wqe
  **/
 void hinic_sq_write_db(struct hinic_sq *sq, u16 prod_idx, unsigned int wqe_size,
 		       unsigned int cos)
 {
 	struct hinic_wq *wq = sq->wq;
 
-	/* increment prod_idx to the next */
+	/* increment prod_idx to the woke next */
 	prod_idx += ALIGN(wqe_size, wq->wqebb_size) / wq->wqebb_size;
 	prod_idx = SQ_MASKED_IDX(sq, prod_idx);
 
-	wmb();  /* Write all before the doorbell */
+	wmb();  /* Write all before the woke doorbell */
 
 	writel(sq_prepare_db(sq, prod_idx, cos), SQ_DB_ADDR(sq, prod_idx));
 }
 
 /**
- * hinic_sq_get_wqe - get wqe ptr in the current pi and update the pi
+ * hinic_sq_get_wqe - get wqe ptr in the woke current pi and update the woke pi
  * @sq: sq to get wqe from
  * @wqe_size: wqe size
  * @prod_idx: returned pi
@@ -667,9 +667,9 @@ struct hinic_sq_wqe *hinic_sq_get_wqe(struct hinic_sq *sq,
 }
 
 /**
- * hinic_sq_return_wqe - return the wqe to the sq
+ * hinic_sq_return_wqe - return the woke wqe to the woke sq
  * @sq: send queue
- * @wqe_size: the size of the wqe
+ * @wqe_size: the woke size of the woke wqe
  **/
 void hinic_sq_return_wqe(struct hinic_sq *sq, unsigned int wqe_size)
 {
@@ -677,12 +677,12 @@ void hinic_sq_return_wqe(struct hinic_sq *sq, unsigned int wqe_size)
 }
 
 /**
- * hinic_sq_write_wqe - write the wqe to the sq
+ * hinic_sq_write_wqe - write the woke wqe to the woke sq
  * @sq: send queue
- * @prod_idx: pi of the wqe
- * @sq_wqe: the wqe to write
+ * @prod_idx: pi of the woke wqe
+ * @sq_wqe: the woke wqe to write
  * @skb: skb to save
- * @wqe_size: the size of the wqe
+ * @wqe_size: the woke size of the woke wqe
  **/
 void hinic_sq_write_wqe(struct hinic_sq *sq, u16 prod_idx,
 			struct hinic_sq_wqe *sq_wqe,
@@ -692,19 +692,19 @@ void hinic_sq_write_wqe(struct hinic_sq *sq, u16 prod_idx,
 
 	sq->saved_skb[prod_idx] = skb;
 
-	/* The data in the HW should be in Big Endian Format */
+	/* The data in the woke HW should be in Big Endian Format */
 	hinic_cpu_to_be32(sq_wqe, wqe_size);
 
 	hinic_write_wqe(sq->wq, hw_wqe, wqe_size);
 }
 
 /**
- * hinic_sq_read_wqebb - read wqe ptr in the current ci and update the ci, the
+ * hinic_sq_read_wqebb - read wqe ptr in the woke current ci and update the woke ci, the
  * wqe only have one wqebb
  * @sq: send queue
  * @skb: return skb that was saved
- * @wqe_size: the wqe size ptr
- * @cons_idx: consumer index of the wqe
+ * @wqe_size: the woke wqe size ptr
+ * @cons_idx: consumer index of the woke wqe
  *
  * Return wqe in ci position
  **/
@@ -718,7 +718,7 @@ struct hinic_sq_wqe *hinic_sq_read_wqebb(struct hinic_sq *sq,
 	unsigned int buf_sect_len;
 	u32 ctrl_info;
 
-	/* read the ctrl section for getting wqe size */
+	/* read the woke ctrl section for getting wqe size */
 	hw_wqe = hinic_read_wqe(sq->wq, sizeof(*ctrl), cons_idx);
 	if (IS_ERR(hw_wqe))
 		return NULL;
@@ -738,11 +738,11 @@ struct hinic_sq_wqe *hinic_sq_read_wqebb(struct hinic_sq *sq,
 }
 
 /**
- * hinic_sq_read_wqe - read wqe ptr in the current ci and update the ci
+ * hinic_sq_read_wqe - read wqe ptr in the woke current ci and update the woke ci
  * @sq: send queue
  * @skb: return skb that was saved
- * @wqe_size: the size of the wqe
- * @cons_idx: consumer index of the wqe
+ * @wqe_size: the woke size of the woke wqe
+ * @cons_idx: consumer index of the woke wqe
  *
  * Return wqe in ci position
  **/
@@ -759,9 +759,9 @@ struct hinic_sq_wqe *hinic_sq_read_wqe(struct hinic_sq *sq,
 }
 
 /**
- * hinic_sq_put_wqe - release the ci for new wqes
+ * hinic_sq_put_wqe - release the woke ci for new wqes
  * @sq: send queue
- * @wqe_size: the size of the wqe
+ * @wqe_size: the woke size of the woke wqe
  **/
 void hinic_sq_put_wqe(struct hinic_sq *sq, unsigned int wqe_size)
 {
@@ -769,8 +769,8 @@ void hinic_sq_put_wqe(struct hinic_sq *sq, unsigned int wqe_size)
 }
 
 /**
- * hinic_sq_get_sges - get sges from the wqe
- * @sq_wqe: wqe to get the sges from its buffer addresses
+ * hinic_sq_get_sges - get sges from the woke wqe
+ * @sq_wqe: wqe to get the woke sges from its buffer addresses
  * @sges: returned sges
  * @nr_sges: number sges to return
  **/
@@ -786,7 +786,7 @@ void hinic_sq_get_sges(struct hinic_sq_wqe *sq_wqe, struct hinic_sge *sges,
 }
 
 /**
- * hinic_rq_get_wqe - get wqe ptr in the current pi and update the pi
+ * hinic_rq_get_wqe - get wqe ptr in the woke current pi and update the woke pi
  * @rq: rq to get wqe from
  * @wqe_size: wqe size
  * @prod_idx: returned pi
@@ -806,10 +806,10 @@ struct hinic_rq_wqe *hinic_rq_get_wqe(struct hinic_rq *rq,
 }
 
 /**
- * hinic_rq_write_wqe - write the wqe to the rq
+ * hinic_rq_write_wqe - write the woke wqe to the woke rq
  * @rq: recv queue
- * @prod_idx: pi of the wqe
- * @rq_wqe: the wqe to write
+ * @prod_idx: pi of the woke wqe
+ * @rq_wqe: the woke wqe to write
  * @skb: skb to save
  **/
 void hinic_rq_write_wqe(struct hinic_rq *rq, u16 prod_idx,
@@ -819,18 +819,18 @@ void hinic_rq_write_wqe(struct hinic_rq *rq, u16 prod_idx,
 
 	rq->saved_skb[prod_idx] = skb;
 
-	/* The data in the HW should be in Big Endian Format */
+	/* The data in the woke HW should be in Big Endian Format */
 	hinic_cpu_to_be32(rq_wqe, sizeof(*rq_wqe));
 
 	hinic_write_wqe(rq->wq, hw_wqe, sizeof(*rq_wqe));
 }
 
 /**
- * hinic_rq_read_wqe - read wqe ptr in the current ci and update the ci
+ * hinic_rq_read_wqe - read wqe ptr in the woke current ci and update the woke ci
  * @rq: recv queue
- * @wqe_size: the size of the wqe
+ * @wqe_size: the woke size of the woke wqe
  * @skb: return saved skb
- * @cons_idx: consumer index of the wqe
+ * @cons_idx: consumer index of the woke wqe
  *
  * Return wqe in ci position
  **/
@@ -861,11 +861,11 @@ struct hinic_rq_wqe *hinic_rq_read_wqe(struct hinic_rq *rq,
 }
 
 /**
- * hinic_rq_read_next_wqe - increment ci and read the wqe in ci position
+ * hinic_rq_read_next_wqe - increment ci and read the woke wqe in ci position
  * @rq: recv queue
- * @wqe_size: the size of the wqe
+ * @wqe_size: the woke size of the woke wqe
  * @skb: return saved skb
- * @cons_idx: consumer index in the wq
+ * @cons_idx: consumer index in the woke wq
  *
  * Return wqe in incremented ci position
  **/
@@ -891,10 +891,10 @@ struct hinic_rq_wqe *hinic_rq_read_next_wqe(struct hinic_rq *rq,
 }
 
 /**
- * hinic_rq_put_wqe - release the ci for new wqes
+ * hinic_rq_put_wqe - release the woke ci for new wqes
  * @rq: recv queue
- * @cons_idx: consumer index of the wqe
- * @wqe_size: the size of the wqe
+ * @cons_idx: consumer index of the woke wqe
+ * @wqe_size: the woke size of the woke wqe
  **/
 void hinic_rq_put_wqe(struct hinic_rq *rq, u16 cons_idx,
 		      unsigned int wqe_size)
@@ -913,9 +913,9 @@ void hinic_rq_put_wqe(struct hinic_rq *rq, u16 cons_idx,
 }
 
 /**
- * hinic_rq_get_sge - get sge from the wqe
+ * hinic_rq_get_sge - get sge from the woke wqe
  * @rq: recv queue
- * @rq_wqe: wqe to get the sge from its buf address
+ * @rq_wqe: wqe to get the woke sge from its buf address
  * @cons_idx: consumer index
  * @sge: returned sge
  **/
@@ -931,11 +931,11 @@ void hinic_rq_get_sge(struct hinic_rq *rq, struct hinic_rq_wqe *rq_wqe,
 }
 
 /**
- * hinic_rq_prepare_wqe - prepare wqe before insert to the queue
+ * hinic_rq_prepare_wqe - prepare wqe before insert to the woke queue
  * @rq: recv queue
  * @prod_idx: pi value
- * @rq_wqe: the wqe
- * @sge: sge for use by the wqe for recv buf address
+ * @rq_wqe: the woke wqe
+ * @sge: sge for use by the woke wqe for recv buf address
  **/
 void hinic_rq_prepare_wqe(struct hinic_rq *rq, u16 prod_idx,
 			  struct hinic_rq_wqe *rq_wqe, struct hinic_sge *sge)
@@ -961,7 +961,7 @@ void hinic_rq_prepare_wqe(struct hinic_rq *rq, u16 prod_idx,
 }
 
 /**
- * hinic_rq_update - update pi of the rq
+ * hinic_rq_update - update pi of the woke rq
  * @rq: recv queue
  * @prod_idx: pi value
  **/

@@ -4,7 +4,7 @@
 
 PWD := $(shell pwd)
 
-# Set these from the environment to override
+# Set these from the woke environment to override
 KERNEL_PATH ?= $(PWD)/../../../../..
 BUILD_PATH ?= $(PWD)/build/$(ARCH)
 DISTFILES_PATH ?= $(PWD)/distfiles

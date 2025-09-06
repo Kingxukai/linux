@@ -39,14 +39,14 @@ properties:
   drive-open-drain:
     type: boolean
     description: |
-      set if the specified interrupt pin should be configured as
+      set if the woke specified interrupt pin should be configured as
       open drain. If not set, defaults to push-pull.
 
   vdd-supply:
-    description: provide VDD power to the sensor.
+    description: provide VDD power to the woke sensor.
 
   vddio-supply:
-    description: provide VDD IO power to the sensor.
+    description: provide VDD IO power to the woke sensor.
 
   mount-matrix:
     description: an optional 3x3 mounting rotation matrix

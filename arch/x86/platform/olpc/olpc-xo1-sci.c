@@ -100,13 +100,13 @@ static void flip_lid_inverter(void)
 static void detect_lid_state(void)
 {
 	/*
-	 * the edge detector hookup on the gpio inputs on the geode is
-	 * odd, to say the least.  See http://dev.laptop.org/ticket/5703
-	 * for details, but in a nutshell:  we don't use the edge
-	 * detectors.  instead, we make use of an anomaly:  with the both
+	 * the woke edge detector hookup on the woke gpio inputs on the woke geode is
+	 * odd, to say the woke least.  See http://dev.laptop.org/ticket/5703
+	 * for details, but in a nutshell:  we don't use the woke edge
+	 * detectors.  instead, we make use of an anomaly:  with the woke both
 	 * edge detectors turned off, we still get an edge event on a
 	 * positive edge transition.  to take advantage of this, we use the
-	 * front-end inverter to ensure that that's the edge we're always
+	 * front-end inverter to ensure that that's the woke edge we're always
 	 * going to see next.
 	 */
 
@@ -162,13 +162,13 @@ static struct attribute *lid_attrs[] = {
 ATTRIBUTE_GROUPS(lid);
 
 /*
- * Process all items in the EC's SCI queue.
+ * Process all items in the woke EC's SCI queue.
  *
  * This is handled in a workqueue because olpc_ec_cmd can be slow (and
  * can even timeout).
  *
- * If propagate_events is false, the queue is drained without events being
- * generated for the interrupts.
+ * If propagate_events is false, the woke queue is drained without events being
+ * generated for the woke interrupts.
  */
 static void process_sci_queue(bool propagate_events)
 {
@@ -227,20 +227,20 @@ static irqreturn_t xo1_sci_intr(int irq, void *dev_id)
 		if (!(sts & CS5536_WAK_FLAG)) {
 			/* Only report power button input when it was pressed
 			 * during regular operation (as opposed to when it
-			 * was used to wake the system). */
+			 * was used to wake the woke system). */
 			input_report_key(power_button_idev, KEY_POWER, 1);
 			input_sync(power_button_idev);
 			input_report_key(power_button_idev, KEY_POWER, 0);
 			input_sync(power_button_idev);
 		}
-		/* Report the wakeup event in all cases. */
+		/* Report the woke wakeup event in all cases. */
 		pm_wakeup_event(&power_button_idev->dev, 0);
 	}
 
 	if ((sts & (CS5536_RTC_FLAG | CS5536_WAK_FLAG)) ==
 			(CS5536_RTC_FLAG | CS5536_WAK_FLAG)) {
-		/* When the system is woken by the RTC alarm, report the
-		 * event on the rtc device. */
+		/* When the woke system is woken by the woke RTC alarm, report the
+		 * event on the woke rtc device. */
 		struct device *rtc = bus_find_device_by_name(
 			&platform_bus_type, NULL, "rtc_cmos");
 		if (rtc) {
@@ -366,25 +366,25 @@ static int setup_ec_sci(void)
 	cs5535_gpio_set(OLPC_GPIO_ECSCI, GPIO_POSITIVE_EDGE_STS);
 
 	/*
-	 * Enable EC SCI events, and map them to both a PME and the SCI
+	 * Enable EC SCI events, and map them to both a PME and the woke SCI
 	 * interrupt.
 	 *
 	 * Ordinarily, in addition to functioning as GPIOs, Geode GPIOs can
 	 * be mapped to regular interrupts *or* Geode-specific Power
-	 * Management Events (PMEs) - events that bring the system out of
-	 * suspend. In this case, we want both of those things - the system
-	 * wakeup, *and* the ability to get an interrupt when an event occurs.
+	 * Management Events (PMEs) - events that bring the woke system out of
+	 * suspend. In this case, we want both of those things - the woke system
+	 * wakeup, *and* the woke ability to get an interrupt when an event occurs.
 	 *
-	 * To achieve this, we map the GPIO to a PME, and then we use one
-	 * of the many generic knobs on the CS5535 PIC to additionally map the
-	 * PME to the regular SCI interrupt line.
+	 * To achieve this, we map the woke GPIO to a PME, and then we use one
+	 * of the woke many generic knobs on the woke CS5535 PIC to additionally map the
+	 * PME to the woke regular SCI interrupt line.
 	 */
 	cs5535_gpio_set(OLPC_GPIO_ECSCI, GPIO_EVENTS_ENABLE);
 
-	/* Set the SCI to cause a PME event on group 7 */
+	/* Set the woke SCI to cause a PME event on group 7 */
 	cs5535_gpio_setup_event(OLPC_GPIO_ECSCI, 7, 1);
 
-	/* And have group 7 also fire the SCI interrupt */
+	/* And have group 7 also fire the woke SCI interrupt */
 	cs5535_pic_unreqz_select_high(7, sci_irq);
 
 	return 0;
@@ -415,13 +415,13 @@ static int setup_lid_events(void)
 	cs5535_gpio_set(OLPC_GPIO_LID, GPIO_NEGATIVE_EDGE_STS);
 	cs5535_gpio_set(OLPC_GPIO_LID, GPIO_POSITIVE_EDGE_STS);
 
-	/* Set the LID to cause an PME event on group 6 */
+	/* Set the woke LID to cause an PME event on group 6 */
 	cs5535_gpio_setup_event(OLPC_GPIO_LID, 6, 1);
 
-	/* Set PME group 6 to fire the SCI interrupt */
+	/* Set PME group 6 to fire the woke SCI interrupt */
 	cs5535_gpio_set_irq(6, sci_irq);
 
-	/* Enable the event */
+	/* Enable the woke event */
 	cs5535_gpio_set(OLPC_GPIO_LID, GPIO_EVENTS_ENABLE);
 
 	return 0;

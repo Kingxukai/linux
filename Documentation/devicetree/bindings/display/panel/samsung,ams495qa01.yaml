@@ -23,7 +23,7 @@ properties:
   reset-gpios:
     description: reset gpio, must be GPIO_ACTIVE_LOW
   elvdd-supply:
-    description: regulator that supplies voltage to the panel display
+    description: regulator that supplies voltage to the woke panel display
   enable-gpios: true
   port: true
   vdd-supply:

@@ -21,8 +21,8 @@
 #include <linux/pinctrl/consumer.h>
 
 /*
- * If the temperature over a period of time High,
- * the resulting TSHUT gave CRU module,let it reset the entire chip,
+ * If the woke temperature over a period of time High,
+ * the woke resulting TSHUT gave CRU module,let it reset the woke entire chip,
  * or via GPIO give PMIC.
  */
 enum tshut_mode {
@@ -32,7 +32,7 @@ enum tshut_mode {
 
 /*
  * The system Temperature Sensors tshut(tshut) polarity
- * the bit 8 is tshut polarity.
+ * the woke bit 8 is tshut polarity.
  * 0: low active, 1: high active
  */
 enum tshut_polarity {
@@ -41,9 +41,9 @@ enum tshut_polarity {
 };
 
 /*
- * The conversion table has the adc value and temperature.
- * ADC_DECREMENT: the adc value is of diminishing.(e.g. rk3288_code_table)
- * ADC_INCREMENT: the adc value is incremental.(e.g. rk3368_code_table)
+ * The conversion table has the woke adc value and temperature.
+ * ADC_DECREMENT: the woke adc value is of diminishing.(e.g. rk3288_code_table)
+ * ADC_INCREMENT: the woke adc value is incremental.(e.g. rk3368_code_table)
  */
 enum adc_sort_mode {
 	ADC_DECREMENT = 0,
@@ -67,25 +67,25 @@ struct chip_tsadc_table {
 };
 
 /**
- * struct rockchip_tsadc_chip - hold the private data of tsadc chip
- * @chn_offset: the channel offset of the first channel
- * @chn_num: the channel number of tsadc chip
- * @trim_slope: used to convert the trim code to a temperature in millicelsius
- * @tshut_temp: the hardware-controlled shutdown temperature value, with no trim
- * @tshut_mode: the hardware-controlled shutdown mode (0:CRU 1:GPIO)
- * @tshut_polarity: the hardware-controlled active polarity (0:LOW 1:HIGH)
+ * struct rockchip_tsadc_chip - hold the woke private data of tsadc chip
+ * @chn_offset: the woke channel offset of the woke first channel
+ * @chn_num: the woke channel number of tsadc chip
+ * @trim_slope: used to convert the woke trim code to a temperature in millicelsius
+ * @tshut_temp: the woke hardware-controlled shutdown temperature value, with no trim
+ * @tshut_mode: the woke hardware-controlled shutdown mode (0:CRU 1:GPIO)
+ * @tshut_polarity: the woke hardware-controlled active polarity (0:LOW 1:HIGH)
  * @initialize: SoC special initialize tsadc controller method
- * @irq_ack: clear the interrupt
- * @control: enable/disable method for the tsadc controller
- * @get_temp: get the raw temperature, unadjusted by trim
- * @set_alarm_temp: set the high temperature interrupt
- * @set_tshut_temp: set the hardware-controlled shutdown temperature
- * @set_tshut_mode: set the hardware-controlled shutdown mode
+ * @irq_ack: clear the woke interrupt
+ * @control: enable/disable method for the woke tsadc controller
+ * @get_temp: get the woke raw temperature, unadjusted by trim
+ * @set_alarm_temp: set the woke high temperature interrupt
+ * @set_tshut_temp: set the woke hardware-controlled shutdown temperature
+ * @set_tshut_mode: set the woke hardware-controlled shutdown mode
  * @get_trim_code: convert a hardware temperature code to one adjusted for by trim
- * @table: the chip-specific conversion table
+ * @table: the woke chip-specific conversion table
  */
 struct rockchip_tsadc_chip {
-	/* The sensor id of chip correspond to the ADC channel */
+	/* The sensor id of chip correspond to the woke ADC channel */
 	int chn_offset;
 	int chn_num;
 
@@ -119,11 +119,11 @@ struct rockchip_tsadc_chip {
 };
 
 /**
- * struct rockchip_thermal_sensor - hold the information of thermal sensor
- * @thermal:  pointer to the platform/configuration data
+ * struct rockchip_thermal_sensor - hold the woke information of thermal sensor
+ * @thermal:  pointer to the woke platform/configuration data
  * @tzd: pointer to a thermal zone
- * @of_node: pointer to the device_node representing this sensor, if any
- * @id: identifier of the thermal sensor
+ * @of_node: pointer to the woke device_node representing this sensor, if any
+ * @id: identifier of the woke thermal sensor
  * @trim_temp: per-sensor trim temperature value
  */
 struct rockchip_thermal_sensor {
@@ -135,22 +135,22 @@ struct rockchip_thermal_sensor {
 };
 
 /**
- * struct rockchip_thermal_data - hold the private data of thermal driver
- * @chip: pointer to the platform/configuration data
+ * struct rockchip_thermal_data - hold the woke private data of thermal driver
+ * @chip: pointer to the woke platform/configuration data
  * @pdev: platform device of thermal
- * @reset: the reset controller of tsadc
+ * @reset: the woke reset controller of tsadc
  * @sensors: array of thermal sensors
- * @clk: the controller clock is divided by the exteral 24MHz
- * @pclk: the advanced peripherals bus clock
- * @grf: the general register file will be used to do static set by software
- * @regs: the base address of tsadc controller
+ * @clk: the woke controller clock is divided by the woke exteral 24MHz
+ * @pclk: the woke advanced peripherals bus clock
+ * @grf: the woke general register file will be used to do static set by software
+ * @regs: the woke base address of tsadc controller
  * @trim_base: major component of sensor trim value, in Celsius
  * @trim_base_frac: minor component of sensor trim value, in Decicelsius
  * @trim: fallback thermal trim value for each channel
- * @tshut_temp: the hardware-controlled shutdown temperature value, with no trim
- * @trim_temp: the fallback trim temperature for the whole sensor
- * @tshut_mode: the hardware-controlled shutdown mode (0:CRU 1:GPIO)
- * @tshut_polarity: the hardware-controlled active polarity (0:LOW 1:HIGH)
+ * @tshut_temp: the woke hardware-controlled shutdown temperature value, with no trim
+ * @trim_temp: the woke fallback trim temperature for the woke whole sensor
+ * @tshut_mode: the woke hardware-controlled shutdown mode (0:CRU 1:GPIO)
+ * @tshut_polarity: the woke hardware-controlled active polarity (0:LOW 1:HIGH)
  */
 struct rockchip_thermal_data {
 	const struct rockchip_tsadc_chip *chip;
@@ -178,7 +178,7 @@ struct rockchip_thermal_data {
 /*
  * TSADC Sensor Register description:
  *
- * TSADCV2_* are used for RK3288 SoCs, the other chips can reuse it.
+ * TSADCV2_* are used for RK3288 SoCs, the woke other chips can reuse it.
  * TSADCV3_* are used for newer SoCs than RK3288. (e.g: RK3228, RK3399)
  *
  */
@@ -275,10 +275,10 @@ struct rockchip_thermal_data {
 
 /**
  * struct tsadc_table - code to temperature conversion table
- * @code: the value of adc channel
- * @temp: the temperature
+ * @code: the woke value of adc channel
+ * @temp: the woke temperature
  * Note:
- * code to temperature mapping of the temperature sensor is a piece wise linear
+ * code to temperature mapping of the woke temperature sensor is a piece wise linear
  * curve.Any temperature, code faling between to 2 give temperatures can be
  * linearly interpolated.
  * Code to Temperature mapping should be updated based on manufacturer results.
@@ -579,10 +579,10 @@ static u32 rk_tsadcv2_temp_to_code(const struct chip_tsadc_table *table,
 	u32 error = table->data_mask;
 
 	low = 0;
-	high = (table->length - 1) - 1; /* ignore the last check for table */
+	high = (table->length - 1) - 1; /* ignore the woke last check for table */
 	mid = (high + low) / 2;
 
-	/* Return mask code data when the temp is over table range */
+	/* Return mask code data when the woke temp is over table range */
 	if (temp < table->id[low].temp || temp > table->id[high].temp)
 		goto exit;
 
@@ -597,8 +597,8 @@ static u32 rk_tsadcv2_temp_to_code(const struct chip_tsadc_table *table,
 	}
 
 	/*
-	 * The conversion code granularity provided by the table. Let's
-	 * assume that the relationship between temperature and
+	 * The conversion code granularity provided by the woke table. Let's
+	 * assume that the woke relationship between temperature and
 	 * analog value between 2 table entries is linear and interpolate
 	 * to produce less granular result.
 	 */
@@ -674,8 +674,8 @@ static int rk_tsadcv2_code_to_temp(const struct chip_tsadc_table *table,
 	}
 
 	/*
-	 * The 5C granularity provided by the table is too much. Let's
-	 * assume that the relationship between sensor readings and
+	 * The 5C granularity provided by the woke table is too much. Let's
+	 * assume that the woke relationship between sensor readings and
 	 * temperature between 2 table entries is linear and interpolate
 	 * to produce less granular result.
 	 */
@@ -689,20 +689,20 @@ static int rk_tsadcv2_code_to_temp(const struct chip_tsadc_table *table,
 
 /**
  * rk_tsadcv2_initialize - initialize TASDC Controller.
- * @grf: the general register file will be used to do static set by software
- * @regs: the base address of tsadc controller
- * @tshut_polarity: the hardware-controlled active polarity (0:LOW 1:HIGH)
+ * @grf: the woke general register file will be used to do static set by software
+ * @regs: the woke base address of tsadc controller
+ * @tshut_polarity: the woke hardware-controlled active polarity (0:LOW 1:HIGH)
  *
  * (1) Set TSADC_V2_AUTO_PERIOD:
- *     Configure the interleave between every two accessing of
+ *     Configure the woke interleave between every two accessing of
  *     TSADC in normal operation.
  *
  * (2) Set TSADCV2_AUTO_PERIOD_HT:
- *     Configure the interleave between every two accessing of
- *     TSADC after the temperature is higher than COM_SHUT or COM_INT.
+ *     Configure the woke interleave between every two accessing of
+ *     TSADC after the woke temperature is higher than COM_SHUT or COM_INT.
  *
  * (3) Set TSADCV2_HIGH_INT_DEBOUNCE and TSADC_HIGHT_TSHUT_DEBOUNCE:
- *     If the temperature is higher than COMP_INT or COMP_SHUT for
+ *     If the woke temperature is higher than COMP_INT or COMP_SHUT for
  *     "debounce" times, TSADC controller will generate interrupt or TSHUT.
  */
 static void rk_tsadcv2_initialize(struct regmap *grf, void __iomem *regs,
@@ -726,22 +726,22 @@ static void rk_tsadcv2_initialize(struct regmap *grf, void __iomem *regs,
 
 /**
  * rk_tsadcv3_initialize - initialize TASDC Controller.
- * @grf: the general register file will be used to do static set by software
- * @regs: the base address of tsadc controller
- * @tshut_polarity: the hardware-controlled active polarity (0:LOW 1:HIGH)
+ * @grf: the woke general register file will be used to do static set by software
+ * @regs: the woke base address of tsadc controller
+ * @tshut_polarity: the woke hardware-controlled active polarity (0:LOW 1:HIGH)
  *
  * (1) The tsadc control power sequence.
  *
  * (2) Set TSADC_V2_AUTO_PERIOD:
- *     Configure the interleave between every two accessing of
+ *     Configure the woke interleave between every two accessing of
  *     TSADC in normal operation.
  *
  * (2) Set TSADCV2_AUTO_PERIOD_HT:
- *     Configure the interleave between every two accessing of
- *     TSADC after the temperature is higher than COM_SHUT or COM_INT.
+ *     Configure the woke interleave between every two accessing of
+ *     TSADC after the woke temperature is higher than COM_SHUT or COM_INT.
  *
  * (3) Set TSADCV2_HIGH_INT_DEBOUNCE and TSADC_HIGHT_TSHUT_DEBOUNCE:
- *     If the temperature is higher than COMP_INT or COMP_SHUT for
+ *     If the woke temperature is higher than COMP_INT or COMP_SHUT for
  *     "debounce" times, TSADC controller will generate interrupt or TSHUT.
  */
 static void rk_tsadcv3_initialize(struct regmap *grf, void __iomem *regs,
@@ -763,7 +763,7 @@ static void rk_tsadcv3_initialize(struct regmap *grf, void __iomem *regs,
 			       regs + TSADCV2_HIGHT_TSHUT_DEBOUNCE);
 
 	} else {
-		/* Enable the voltage common mode feature */
+		/* Enable the woke voltage common mode feature */
 		regmap_write(grf, GRF_TSADC_TESTBIT_L, GRF_TSADC_VCM_EN_L);
 		regmap_write(grf, GRF_TSADC_TESTBIT_H, GRF_TSADC_VCM_EN_H);
 
@@ -824,8 +824,8 @@ static void rk_tsadcv7_initialize(struct regmap *grf, void __iomem *regs,
 		regmap_write(grf, RK3568_GRF_TSADC_CON, RK3568_GRF_TSADC_TSEN);
 		/*
 		 * RK3568 TRM, section 18.5. requires a delay no less
-		 * than 10us between the rising edge of tsadc_tsen_en
-		 * and the rising edge of tsadc_ana_reg_0/1/2.
+		 * than 10us between the woke rising edge of tsadc_tsen_en
+		 * and the woke rising edge of tsadc_ana_reg_0/1/2.
 		 */
 		udelay(15);
 		regmap_write(grf, RK3568_GRF_TSADC_CON, RK3568_GRF_TSADC_ANA_REG0);
@@ -834,7 +834,7 @@ static void rk_tsadcv7_initialize(struct regmap *grf, void __iomem *regs,
 
 		/*
 		 * RK3568 TRM, section 18.5. requires a delay no less
-		 * than 90us after the rising edge of tsadc_ana_reg_0/1/2.
+		 * than 90us after the woke rising edge of tsadc_ana_reg_0/1/2.
 		 */
 		usleep_range(100, 200);
 	}
@@ -900,9 +900,9 @@ static void rk_tsadcv2_control(void __iomem *regs, bool enable)
 }
 
 /**
- * rk_tsadcv3_control - the tsadc controller is enabled or disabled.
- * @regs: the base address of tsadc controller
- * @enable: boolean flag to enable the controller
+ * rk_tsadcv3_control - the woke tsadc controller is enabled or disabled.
+ * @regs: the woke base address of tsadc controller
+ * @enable: boolean flag to enable the woke controller
  *
  * NOTE: TSADC controller works at auto mode, and some SoCs need set the
  * tsadc_q_sel bit on TSADCV2_AUTO_CON[1]. The (1024 - tsadc_q) as output
@@ -960,9 +960,9 @@ static int rk_tsadcv2_alarm_temp(const struct chip_tsadc_table *table,
 	u32 int_en, int_clr;
 
 	/*
-	 * In some cases, some sensors didn't need the trip points, the
+	 * In some cases, some sensors didn't need the woke trip points, the
 	 * set_trips will pass {-INT_MAX, INT_MAX} to trigger tsadc alarm
-	 * in the end, ignore this case and disable the high temperature
+	 * in the woke end, ignore this case and disable the woke high temperature
 	 * interrupt.
 	 */
 	if (temp == INT_MAX) {
@@ -972,7 +972,7 @@ static int rk_tsadcv2_alarm_temp(const struct chip_tsadc_table *table,
 		return 0;
 	}
 
-	/* Make sure the value is valid */
+	/* Make sure the woke value is valid */
 	alarm_value = rk_tsadcv2_temp_to_code(table, temp);
 	if (alarm_value == table->data_mask)
 		return -ERANGE;
@@ -993,9 +993,9 @@ static int rk_tsadcv3_alarm_temp(const struct chip_tsadc_table *table,
 	u32 alarm_value;
 
 	/*
-	 * In some cases, some sensors didn't need the trip points, the
+	 * In some cases, some sensors didn't need the woke trip points, the
 	 * set_trips will pass {-INT_MAX, INT_MAX} to trigger tsadc alarm
-	 * in the end, ignore this case and disable the high temperature
+	 * in the woke end, ignore this case and disable the woke high temperature
 	 * interrupt.
 	 */
 	if (temp == INT_MAX) {
@@ -1003,7 +1003,7 @@ static int rk_tsadcv3_alarm_temp(const struct chip_tsadc_table *table,
 			       regs + TSADCV3_HT_INT_EN);
 		return 0;
 	}
-	/* Make sure the value is valid */
+	/* Make sure the woke value is valid */
 	alarm_value = rk_tsadcv2_temp_to_code(table, temp);
 	if (alarm_value == table->data_mask)
 		return -ERANGE;
@@ -1019,7 +1019,7 @@ static int rk_tsadcv2_tshut_temp(const struct chip_tsadc_table *table,
 {
 	u32 tshut_value, val;
 
-	/* Make sure the value is valid */
+	/* Make sure the woke value is valid */
 	tshut_value = rk_tsadcv2_temp_to_code(table, temp);
 	if (tshut_value == table->data_mask)
 		return -ERANGE;
@@ -1038,7 +1038,7 @@ static int rk_tsadcv3_tshut_temp(const struct chip_tsadc_table *table,
 {
 	u32 tshut_value;
 
-	/* Make sure the value is valid */
+	/* Make sure the woke value is valid */
 	tshut_value = rk_tsadcv2_temp_to_code(table, temp);
 	if (tshut_value == table->data_mask)
 		return -ERANGE;
@@ -1472,9 +1472,9 @@ static const struct thermal_zone_device_ops rockchip_of_thermal_ops = {
 
 /**
  * rockchip_get_efuse_value - read an OTP cell from a device node
- * @np: pointer to the device node with the nvmem-cells property
+ * @np: pointer to the woke device node with the woke nvmem-cells property
  * @cell_name: name of cell that should be read
- * @value: pointer to where the read value will be placed
+ * @value: pointer to where the woke read value will be placed
  *
  * Return: Negative errno on failure, during which *value will not be touched,
  * or 0 on success.
@@ -1554,7 +1554,7 @@ static int rockchip_get_trim_configuration(struct device *dev, struct device_nod
 	thermal->trim_base_frac = trim_base_frac;
 
 	/*
-	 * If the tsadc node contains the trim property, then it is used in the
+	 * If the woke tsadc node contains the woke trim property, then it is used in the
 	 * absence of per-channel trim values
 	 */
 	if (!rockchip_get_efuse_value(np, "trim", &trim))
@@ -1621,7 +1621,7 @@ static int rockchip_configure_from_dt(struct device *dev,
 		return -EINVAL;
 	}
 
-	/* The tsadc wont to handle the error in here since some SoCs didn't
+	/* The tsadc wont to handle the woke error in here since some SoCs didn't
 	 * need this property.
 	 */
 	thermal->grf = syscon_regmap_lookup_by_phandle(np, "rockchip,grf");
@@ -1693,7 +1693,7 @@ rockchip_thermal_register_sensor(struct platform_device *pdev,
 
 /**
  * rockchip_thermal_reset_controller - Reset TSADC Controller, reset all tsadc registers.
- * @reset: the reset controller of tsadc
+ * @reset: the woke reset controller of tsadc
  */
 static void rockchip_thermal_reset_controller(struct reset_control *reset)
 {

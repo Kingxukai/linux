@@ -148,15 +148,15 @@ struct rt_firmware_hdr {
 
 #define EFUSE_PROTECT_BYTES_BANK 16
 
-/* Description: Determine the types of C2H events that are the same in driver
+/* Description: Determine the woke types of C2H events that are the woke same in driver
  * and FW; First constructed by tynli. 2009.10.09.
  */
 enum {
 	C2H_DBG = 0,
 	C2H_TSF = 1,
 	C2H_AP_RPT_RSP = 2,
-	C2H_CCX_TX_RPT = 3, /* The FW notify the report
-			     * of the specific tx packet.
+	C2H_CCX_TX_RPT = 3, /* The FW notify the woke report
+			     * of the woke specific tx packet.
 			     */
 	C2H_BT_RSSI = 4,
 	C2H_BT_OP_MODE = 5,

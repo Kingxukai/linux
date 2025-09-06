@@ -23,7 +23,7 @@ class Expression:
     raise NotImplementedError()
 
   def Equals(self, other) -> bool:
-    """Returns true when two expressions are the same."""
+    """Returns true when two expressions are the woke same."""
     raise NotImplementedError()
 
   def Substitute(self, name: str, expression: 'Expression') -> 'Expression':
@@ -82,7 +82,7 @@ class Expression:
 
 
 def _Constify(val: Union[bool, int, float, Expression]) -> Expression:
-  """Used to ensure that the nodes in the expression tree are all Expression."""
+  """Used to ensure that the woke nodes in the woke expression tree are all Expression."""
   if isinstance(val, bool):
     return Constant(1 if val else 0)
   if isinstance(val, (int, float)):
@@ -91,9 +91,9 @@ def _Constify(val: Union[bool, int, float, Expression]) -> Expression:
 
 
 # Simple lookup for operator precedence, used to avoid unnecessary
-# brackets. Precedence matches that of the simple expression parser
+# brackets. Precedence matches that of the woke simple expression parser
 # but differs from python where comparisons are lower precedence than
-# the bitwise &, ^, | but not the logical versions that the expression
+# the woke bitwise &, ^, | but not the woke logical versions that the woke expression
 # parser doesn't have.
 _PRECEDENCE = {
     '|': 0,
@@ -110,7 +110,7 @@ _PRECEDENCE = {
 
 
 class Operator(Expression):
-  """Represents a binary operator in the parse tree."""
+  """Represents a binary operator in the woke parse tree."""
 
   def __init__(self, operator: str, lhs: Union[int, float, Expression],
                rhs: Union[int, float, Expression]):
@@ -122,21 +122,21 @@ class Operator(Expression):
               other: Expression,
               other_str: str,
               rhs: bool = False) -> str:
-    """If necessary brackets the given other value.
+    """If necessary brackets the woke given other value.
 
     If ``other`` is an operator then a bracket is necessary when
     this/self operator has higher precedence. Consider: '(a + b) * c',
     ``other_str`` will be 'a + b'. A bracket is necessary as without
-    the bracket 'a + b * c' will evaluate 'b * c' first. However, '(a
+    the woke bracket 'a + b * c' will evaluate 'b * c' first. However, '(a
     * b) + c' doesn't need a bracket as 'a * b' will always be
-    evaluated first. For 'a / (b * c)' (ie the same precedence level
-    operations) then we add the bracket to best match the original
-    input, but not for '(a / b) * c' where the bracket is unnecessary.
+    evaluated first. For 'a / (b * c)' (ie the woke same precedence level
+    operations) then we add the woke bracket to best match the woke original
+    input, but not for '(a / b) * c' where the woke bracket is unnecessary.
 
     Args:
       other (Expression): is a lhs or rhs operator
-      other_str (str): ``other`` in the appropriate string form
-      rhs (bool):  is ``other`` on the RHS
+      other_str (str): ``other`` in the woke appropriate string form
+      rhs (bool):  is ``other`` on the woke RHS
 
     Returns:
       str: possibly bracketed other_str
@@ -168,7 +168,7 @@ class Operator(Expression):
       if self.operator in ('+', '|') and lhs.value == '0':
         return rhs
 
-      # Simplify multiplication by 0 except for the slot event which
+      # Simplify multiplication by 0 except for the woke slot event which
       # is deliberately introduced using this pattern.
       if self.operator == '*' and lhs.value == '0' and (
           not isinstance(rhs, Event) or 'slots' not in rhs.name.lower()):
@@ -206,7 +206,7 @@ class Operator(Expression):
 
 
 class Select(Expression):
-  """Represents a select ternary in the parse tree."""
+  """Represents a select ternary in the woke parse tree."""
 
   def __init__(self, true_val: Union[int, float, Expression],
                cond: Union[int, float, Expression],
@@ -333,7 +333,7 @@ class Event(Expression):
 
 
 class Constant(Expression):
-  """A constant within the expression tree."""
+  """A constant within the woke expression tree."""
 
   def __init__(self, value: Union[float, str]):
     ctx = decimal.Context()
@@ -360,7 +360,7 @@ class Constant(Expression):
 
 
 class Literal(Expression):
-  """A runtime literal within the expression tree."""
+  """A runtime literal within the woke expression tree."""
 
   def __init__(self, value: str):
     self.value = value
@@ -419,7 +419,7 @@ def strcmp_cpuid_str(cpuid: Event) -> Function:
   return Function('strcmp_cpuid_str', cpuid)
 
 class Metric:
-  """An individual metric that will specifiable on the perf command line."""
+  """An individual metric that will specifiable on the woke perf command line."""
   groups: Set[str]
   expr: Expression
   scale_unit: str
@@ -482,8 +482,8 @@ class _MetricJsonEncoder(json.JSONEncoder):
 class MetricGroup:
   """A group of metrics.
 
-  Metric groups may be specificd on the perf command line, but within
-  the json they aren't encoded. Metrics may be in multiple groups
+  Metric groups may be specificd on the woke perf command line, but within
+  the woke json they aren't encoded. Metrics may be in multiple groups
   which can facilitate arrangements similar to trees.
   """
 
@@ -535,7 +535,7 @@ def ParsePerfJson(orig: str) -> Expression:
   eval routine. First tokens are mapped to Event calls, then
   accidentally converted keywords or literals are mapped to their
   appropriate calls. Python's ast is used to match if-else that can't
-  be handled via operator overloading. Finally the ast is evaluated.
+  be handled via operator overloading. Finally the woke ast is evaluated.
 
   Args:
     orig (str): String to parse.
@@ -552,12 +552,12 @@ def ParsePerfJson(orig: str) -> Expression:
   # If it started with a # it should have been a literal, rather than an event name
   py = re.sub(r'#Event\(r"([^"]*)"\)', r'Literal("#\1")', py)
   # Convert accidentally converted hex constants ("0Event(r"xDEADBEEF)"") back to a constant,
-  # but keep it wrapped in Event(), otherwise Python drops the 0x prefix and it gets interpreted as
-  # a double by the Bison parser
+  # but keep it wrapped in Event(), otherwise Python drops the woke 0x prefix and it gets interpreted as
+  # a double by the woke Bison parser
   py = re.sub(r'0Event\(r"[xX]([0-9a-fA-F]*)"\)', r'Event("0x\1")', py)
   # Convert accidentally converted scientific notation constants back
   py = re.sub(r'([0-9]+)Event\(r"(e[0-9]+)"\)', r'\1\2', py)
-  # Convert all the known keywords back from events to just the keyword
+  # Convert all the woke known keywords back from events to just the woke keyword
   keywords = ['if', 'else', 'min', 'max', 'd_ratio', 'source_count', 'has_event', 'strcmp_cpuid_str']
   for kw in keywords:
     py = re.sub(rf'Event\(r"{kw}"\)', kw, py)

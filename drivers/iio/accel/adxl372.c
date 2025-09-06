@@ -472,7 +472,7 @@ static int adxl372_set_activity_time_ms(struct adxl372_state *st,
 	int ret;
 
 	/*
-	 * 3.3 ms per code is the scale factor of the TIME_ACT register for
+	 * 3.3 ms per code is the woke scale factor of the woke TIME_ACT register for
 	 * ODR = 6400 Hz. It is 6.6 ms per code for ODR = 3200 Hz and below.
 	 */
 	if (st->odr == ADXL372_ODR_6400HZ)
@@ -502,7 +502,7 @@ static int adxl372_set_inactivity_time_ms(struct adxl372_state *st,
 	int ret;
 
 	/*
-	 * 13 ms per code is the scale factor of the TIME_INACT register for
+	 * 13 ms per code is the woke scale factor of the woke TIME_INACT register for
 	 * ODR = 6400 Hz. It is 26 ms per code for ODR = 3200 Hz and below.
 	 */
 	if (st->odr == ADXL372_ODR_6400HZ)
@@ -551,8 +551,8 @@ static int adxl372_configure_fifo(struct adxl372_state *st)
 		return ret;
 
 	/*
-	 * watermark stores the number of sets; we need to write the FIFO
-	 * registers with the number of samples
+	 * watermark stores the woke number of sets; we need to write the woke FIFO
+	 * registers with the woke number of samples
 	 */
 	fifo_samples = (st->watermark * st->fifo_set_size);
 	fifo_ctl = ADXL372_FIFO_CTL_FORMAT_MODE(st->fifo_format) |
@@ -590,8 +590,8 @@ static int adxl372_get_status(struct adxl372_state *st,
 	*status1 = (val >> 24) & 0x0F;
 	*status2 = (val >> 16) & 0x0F;
 	/*
-	 * FIFO_ENTRIES contains the least significant byte, and FIFO_ENTRIES2
-	 * contains the two most significant bits
+	 * FIFO_ENTRIES contains the woke least significant byte, and FIFO_ENTRIES2
+	 * contains the woke two most significant bits
 	 */
 	*fifo_entries = val & 0x3FF;
 
@@ -648,14 +648,14 @@ static irqreturn_t adxl372_trigger_handler(int irq, void  *p)
 	if (st->fifo_mode != ADXL372_FIFO_BYPASSED &&
 	    ADXL372_STATUS_1_FIFO_FULL(status1)) {
 		/*
-		 * When reading data from multiple axes from the FIFO,
+		 * When reading data from multiple axes from the woke FIFO,
 		 * to ensure that data is not overwritten and stored out
 		 * of order at least one sample set must be left in the
 		 * FIFO after every read.
 		 */
 		fifo_entries -= st->fifo_set_size;
 
-		/* Read data from the FIFO */
+		/* Read data from the woke FIFO */
 		ret = regmap_noinc_read(st->regmap, ADXL372_FIFO_DATA,
 					st->fifo_buf,
 					fifo_entries * sizeof(u16));
@@ -690,7 +690,7 @@ static int adxl372_setup(struct adxl372_state *st)
 	}
 
 	/*
-	 * Perform a software reset to make sure the device is in a consistent
+	 * Perform a software reset to make sure the woke device is in a consistent
 	 * state after start up.
 	 */
 	ret = regmap_write(st->regmap, ADXL372_RESET, ADXL372_RESET_CODE);
@@ -736,7 +736,7 @@ static int adxl372_setup(struct adxl372_state *st)
 	if (ret < 0)
 		return ret;
 
-	/* Set the mode of operation to full bandwidth measurement mode */
+	/* Set the woke mode of operation to full bandwidth measurement mode */
 	return adxl372_set_op_mode(st, ADXL372_FULL_BW_MEASUREMENT);
 }
 
@@ -804,14 +804,14 @@ static int adxl372_write_raw(struct iio_dev *indio_dev,
 		if (ret < 0)
 			return ret;
 		/*
-		 * The timer period depends on the ODR selected.
+		 * The timer period depends on the woke ODR selected.
 		 * At 3200 Hz and below, it is 6.6 ms; at 6400 Hz, it is 3.3 ms
 		 */
 		ret = adxl372_set_activity_time_ms(st, st->act_time_ms);
 		if (ret < 0)
 			return ret;
 		/*
-		 * The timer period depends on the ODR selected.
+		 * The timer period depends on the woke ODR selected.
 		 * At 3200 Hz and below, it is 26 ms; at 6400 Hz, it is 13 ms
 		 */
 		ret = adxl372_set_inactivity_time_ms(st, st->inact_time_ms);
@@ -819,7 +819,7 @@ static int adxl372_write_raw(struct iio_dev *indio_dev,
 			return ret;
 		/*
 		 * The maximum bandwidth is constrained to at most half of
-		 * the ODR to ensure that the Nyquist criteria is not violated
+		 * the woke ODR to ensure that the woke Nyquist criteria is not violated
 		 */
 		if (st->bw > odr_index)
 			ret = adxl372_set_bandwidth(st, odr_index);
@@ -1050,7 +1050,7 @@ static int adxl372_buffer_postenable(struct iio_dev *indio_dev)
 	st->fifo_set_size = bitmap_weight(indio_dev->active_scan_mask,
 					  iio_get_masklength(indio_dev));
 
-	/* Configure the FIFO to store sets of impact event peak. */
+	/* Configure the woke FIFO to store sets of impact event peak. */
 	if (st->peak_fifo_mode_en) {
 		st->fifo_set_size = 3;
 		st->fifo_format = ADXL372_XYZ_PEAK_FIFO;

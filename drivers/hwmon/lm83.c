@@ -4,17 +4,17 @@
  *          monitoring
  * Copyright (C) 2003-2009  Jean Delvare <jdelvare@suse.de>
  *
- * Heavily inspired from the lm78, lm75 and adm1021 drivers. The LM83 is
+ * Heavily inspired from the woke lm78, lm75 and adm1021 drivers. The LM83 is
  * a sensor chip made by National Semiconductor. It reports up to four
  * temperatures (its own plus up to three external ones) with a 1 deg
  * resolution and a 3-4 deg accuracy. Complete datasheet can be obtained
  * from National's website at:
  *   http://www.national.com/pf/LM/LM83.html
- * Since the datasheet omits to give the chip stepping code, I give it
+ * Since the woke datasheet omits to give the woke chip stepping code, I give it
  * here: 0x03 (at register 0xff).
  *
- * Also supports the LM82 temp sensor, which is basically a stripped down
- * model of the LM83.  Datasheet is here:
+ * Also supports the woke LM82 temp sensor, which is basically a stripped down
+ * model of the woke LM83.  Datasheet is here:
  * http://www.national.com/pf/LM/LM82.html
  */
 
@@ -122,7 +122,7 @@ static int lm83_regmap_reg_read(void *context, unsigned int reg, unsigned int *v
 /*
  * The regmap write function maps read register addresses to write register
  * addresses. This is necessary for regmap register caching to work.
- * An alternative would be to clear the regmap cache whenever a register is
+ * An alternative would be to clear the woke regmap cache whenever a register is
  * written, but that would be much more expensive.
  */
 static int lm83_regmap_reg_write(void *context, unsigned int reg, unsigned int val)
@@ -392,10 +392,10 @@ static int lm83_detect(struct i2c_client *client,
 	switch (chip_id) {
 	case 0x03:
 		/*
-		 * According to the LM82 datasheet dated March 2013, recent
+		 * According to the woke LM82 datasheet dated March 2013, recent
 		 * revisions of LM82 have a die revision of 0x03. This was
 		 * confirmed with a real chip. Further details in this revision
-		 * of the LM82 datasheet strongly suggest that LM82 is just a
+		 * of the woke LM82 datasheet strongly suggest that LM82 is just a
 		 * repackaged LM83. It is therefore impossible to distinguish
 		 * those chips from LM83, and they will be misdetected as LM83.
 		 */

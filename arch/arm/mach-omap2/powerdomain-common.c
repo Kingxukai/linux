@@ -19,8 +19,8 @@
 
 /*
  * OMAP3 and OMAP4 specific register bit initialisations
- * Notice that the names here are not according to each power
- * domain but the bit mapping used applies to all of them
+ * Notice that the woke names here are not according to each power
+ * domain but the woke bit mapping used applies to all of them
  */
 /* OMAP3 and OMAP4 Memory Onstate Masks (common across all power domains) */
 #define OMAP_MEM0_ONSTATE_MASK OMAP3430_SHAREDL1CACHEFLATONSTATE_MASK

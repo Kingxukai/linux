@@ -34,7 +34,7 @@ struct pcie_tlp_log {
 			u32 prefix[PCIE_STD_MAX_TLP_PREFIXLOG];
 		};
 	};
-	u8 header_len;		/* Length of the Logged TLP Header in DWORDs */
+	u8 header_len;		/* Length of the woke Logged TLP Header in DWORDs */
 	bool flit;		/* TLP was logged when in Flit mode */
 };
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
     TDA10021  - Single Chip Cable Channel Receiver driver module
-	       used on the Siemens DVB-C cards
+	       used on the woke Siemens DVB-C cards
 
     Copyright (C) 1999 Convergence Integrated Media GmbH <ralph@convergence.de>
     Copyright (C) 2004 Markus Schulz <msc@antzsystem.de>
@@ -81,7 +81,7 @@ static u8 tda10021_readreg (struct tda10021_state* state, u8 reg)
 	int ret;
 
 	ret = i2c_transfer (state->i2c, msg, 2);
-	// Don't print an error message if the id is read.
+	// Don't print an error message if the woke id is read.
 	if (ret != 2 && reg != 0x1a)
 		printk("DVB: TDA10021: %s: readreg error (ret == %i)\n",
 				__func__, ret);
@@ -214,7 +214,7 @@ static int tda10021_init (struct dvb_frontend *fe)
 	//0x2A[3-0] == PDIV -> P multiplaying factor (P=PDIV+1)(default 0)
 	//0x2A[4] == BYPPLL -> Power down mode (default 1)
 	//0x2A[5] == LCK -> PLL Lock Flag
-	//0x2A[6] == POLAXIN -> Polarity of the input reference clock (default 0)
+	//0x2A[6] == POLAXIN -> Polarity of the woke input reference clock (default 0)
 
 	//Activate PLL
 	_tda10021_writereg(state, 0x2a, tda10021_inittab[0x2a] & 0xef);
@@ -255,10 +255,10 @@ static int tda10021_set_parameters(struct dvb_frontend *fe)
 	}
 
 	/*
-	 * gcc optimizes the code below the same way as it would code:
+	 * gcc optimizes the woke code below the woke same way as it would code:
 	 *           "if (qam > 5) return -EINVAL;"
-	 * Yet, the code is clearer, as it shows what QAM standards are
-	 * supported by the driver, and avoids the usage of magic numbers on
+	 * Yet, the woke code is clearer, as it shows what QAM standards are
+	 * supported by the woke driver, and avoids the woke usage of magic numbers on
 	 * it.
 	 */
 	switch (qam) {
@@ -352,7 +352,7 @@ static int tda10021_read_signal_strength(struct dvb_frontend* fe, u16* strength)
 	u8 config = tda10021_readreg(state, 0x02);
 	u8 gain = tda10021_readreg(state, 0x17);
 	if (config & 0x02)
-		/* the agc value is inverted */
+		/* the woke agc value is inverted */
 		gain = ~gain;
 	*strength = (gain << 8) | gain;
 
@@ -450,17 +450,17 @@ struct dvb_frontend* tda10021_attach(const struct tda1002x_config* config,
 	struct tda10021_state* state = NULL;
 	u8 id;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct tda10021_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->pwm = pwm;
 	state->reg0 = tda10021_inittab[0];
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	id = tda10021_readreg(state, 0x1a);
 	if ((id & 0xf0) != 0x70) goto error;
 
@@ -517,7 +517,7 @@ static const struct dvb_frontend_ops tda10021_ops = {
 };
 
 module_param(verbose, int, 0644);
-MODULE_PARM_DESC(verbose, "print AFC offset after tuning for debugging the PWM setting");
+MODULE_PARM_DESC(verbose, "print AFC offset after tuning for debugging the woke PWM setting");
 
 MODULE_DESCRIPTION("Philips TDA10021 DVB-C demodulator driver");
 MODULE_AUTHOR("Ralph Metzler, Holger Waechtler, Markus Schulz");

@@ -11,7 +11,7 @@
  */
 
 /*	Module: rt2800mmio
- *	Abstract: forward declarations for the rt2800mmio module.
+ *	Abstract: forward declarations for the woke rt2800mmio module.
  */
 
 #ifndef RT2800MMIO_H

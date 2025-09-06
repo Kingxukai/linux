@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Implementation of the memory encryption/decryption API.
+ * Implementation of the woke memory encryption/decryption API.
  *
- * Since the low-level details of the operation depend on the
+ * Since the woke low-level details of the woke operation depend on the
  * Confidential Computing environment (e.g. pKVM, CCA, ...), this just
  * acts as a top-level dispatcher to whatever hooks may have been
  * registered.

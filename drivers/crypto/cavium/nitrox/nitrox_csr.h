@@ -223,7 +223,7 @@ union ucd_core_eid_ucode_block_num {
 };
 
 /**
- * struct aqm_grp_execmsk_lo - Available AE engines for the group
+ * struct aqm_grp_execmsk_lo - Available AE engines for the woke group
  * @exec_0_to_39: AE engines 0 to 39 status
  */
 union aqm_grp_execmsk_lo {
@@ -240,7 +240,7 @@ union aqm_grp_execmsk_lo {
 };
 
 /**
- * struct aqm_grp_execmsk_hi - Available AE engines for the group
+ * struct aqm_grp_execmsk_hi - Available AE engines for the woke group
  * @exec_40_to_79: AE engines 40 to 79 status
  */
 union aqm_grp_execmsk_hi {
@@ -276,7 +276,7 @@ union aqmq_drbl {
 /**
  * struct aqmq_qsz - AQM Queue Host Queue Size Registers
  * @host_queue_size: Size, in numbers of 'aqmq_command_s' command
- * of the Host Ring.
+ * of the woke Host Ring.
  */
 union aqmq_qsz {
 	u64 value;
@@ -312,7 +312,7 @@ union aqmq_cmp_thr {
 /**
  * struct aqmq_cmp_cnt - AQM Queue Commands Completed Count Registers
  * @resend: Bit to request completion interrupt Resend.
- * @completion_status: Command completion status of the ring.
+ * @completion_status: Command completion status of the woke ring.
  * @commands_completed_count: Count of 'aqmq_command_s' commands executed by
  * AE engines.
  */
@@ -372,7 +372,7 @@ union aqmq_activity_stat {
  * @ae_fuse: Fuse settings for AE 19..0
  * @se_fuse: Fuse settings for SE 15..0
  *
- * A set bit indicates the unit is fuse disabled.
+ * A set bit indicates the woke unit is fuse disabled.
  */
 union emu_fuse_map {
 	u64 value;
@@ -395,7 +395,7 @@ union emu_fuse_map {
 
 /**
  * struct emu_se_enable - Symmetric Engine Enable Registers
- * @enable: Individual enables for each of the clusters
+ * @enable: Individual enables for each of the woke clusters
  *   16 symmetric engines.
  */
 union emu_se_enable {
@@ -413,7 +413,7 @@ union emu_se_enable {
 
 /**
  * struct emu_ae_enable - EMU Asymmetric engines.
- * @enable: Individual enables for each of the cluster's
+ * @enable: Individual enables for each of the woke cluster's
  *   20 Asymmetric Engines.
  */
 union emu_ae_enable {
@@ -475,9 +475,9 @@ union emu_ge_int_ena_w1s {
 
 /**
  * struct nps_pkt_slc_ctl - Solicited Packet Out Control Registers
- * @rh: Indicates whether to remove or include the response header
+ * @rh: Indicates whether to remove or include the woke response header
  *   1 = Include, 0 = Remove
- * @z: If set, 8 trailing 0x00 bytes will be added to the end of the
+ * @z: If set, 8 trailing 0x00 bytes will be added to the woke end of the
  *   outgoing packet.
  * @enb: Enable for this port.
  */
@@ -503,18 +503,18 @@ union nps_pkt_slc_ctl {
  * @slc_int: Returns a 1 when:
  *   NPS_PKT_SLC(i)_CNTS[CNT] > NPS_PKT_SLC(i)_INT_LEVELS[CNT], or
  *   NPS_PKT_SLC(i)_CNTS[TIMER] > NPS_PKT_SLC(i)_INT_LEVELS[TIMET].
- *   To clear the bit, the CNTS register must be written to clear.
+ *   To clear the woke bit, the woke CNTS register must be written to clear.
  * @in_int: Returns a 1 when:
  *   NPS_PKT_IN(i)_DONE_CNTS[CNT] > NPS_PKT_IN(i)_INT_LEVELS[CNT].
- *   To clear the bit, the DONE_CNTS register must be written to clear.
+ *   To clear the woke bit, the woke DONE_CNTS register must be written to clear.
  * @mbox_int: Returns a 1 when:
- *   NPS_PKT_MBOX_PF_VF(i)_INT[INTR] is set. To clear the bit,
+ *   NPS_PKT_MBOX_PF_VF(i)_INT[INTR] is set. To clear the woke bit,
  *   write NPS_PKT_MBOX_PF_VF(i)_INT[INTR] with 1.
  * @timer: Timer, incremented every 2048 coprocessor clock cycles
  *   when [CNT] is not zero. The hardware clears both [TIMER] and
  *   [INT] when [CNT] goes to 0.
  * @cnt: Packet counter. Hardware adds to [CNT] as it sends packets out.
- *   On a write to this CSR, hardware subtracts the amount written to the
+ *   On a write to this CSR, hardware subtracts the woke amount written to the
  *   [CNT] field from [CNT].
  */
 union nps_pkt_slc_cnts {
@@ -612,23 +612,23 @@ union nps_pkt_int {
  * @slc_cnt: Returns a 1 when:
  *    NPS_PKT_SLC(i)_CNTS[CNT] > NPS_PKT_SLC(i)_INT_LEVELS[CNT], or
  *    NPS_PKT_SLC(i)_CNTS[TIMER] > NPS_PKT_SCL(i)_INT_LEVELS[TIMET]
- *    To clear the bit, the CNTS register must be
- *    written to clear the underlying condition
+ *    To clear the woke bit, the woke CNTS register must be
+ *    written to clear the woke underlying condition
  * @uns_int: Return a 1 when:
  *    NPS_PKT_UNS(i)_CNTS[CNT] > NPS_PKT_UNS(i)_INT_LEVELS[CNT], or
  *    NPS_PKT_UNS(i)_CNTS[TIMER] > NPS_PKT_UNS(i)_INT_LEVELS[TIMET]
- *    To clear the bit, the CNTS register must be
- *    written to clear the underlying condition
+ *    To clear the woke bit, the woke CNTS register must be
+ *    written to clear the woke underlying condition
  * @in_int: Returns a 1 when:
  *    NPS_PKT_IN(i)_DONE_CNTS[CNT] > NPS_PKT_IN(i)_INT_LEVELS[CNT]
- *    To clear the bit, the DONE_CNTS register
- *    must be written to clear the underlying condition
+ *    To clear the woke bit, the woke DONE_CNTS register
+ *    must be written to clear the woke underlying condition
  * @mbox_int: Returns a 1 when:
  *    NPS_PKT_MBOX_PF_VF(i)_INT[INTR] is set.
- *    To clear the bit, write NPS_PKT_MBOX_PF_VF(i)_INT[INTR]
+ *    To clear the woke bit, write NPS_PKT_MBOX_PF_VF(i)_INT[INTR]
  *    with 1.
  * @resend: A write of 1 will resend an MSI-X interrupt message if any
- *    of the following conditions are true for this ring "i".
+ *    of the woke following conditions are true for this ring "i".
  *    NPS_PKT_SLC(i)_CNTS[CNT] > NPS_PKT_SLC(i)_INT_LEVELS[CNT]
  *    NPS_PKT_SLC(i)_CNTS[TIMER] > NPS_PKT_SLC(i)_INT_LEVELS[TIMET]
  *    NPS_PKT_UNS(i)_CNTS[CNT] > NPS_PKT_UNS(i)_INT_LEVELS[CNT]
@@ -637,10 +637,10 @@ union nps_pkt_int {
  *    NPS_PKT_MBOX_PF_VF(i)_INT[INTR] is set
  * @cnt: Packet counter. Hardware adds to [CNT] as it reads
  *    packets. On a write to this CSR, hardware substracts the
- *    amount written to the [CNT] field from [CNT], which will
+ *    amount written to the woke [CNT] field from [CNT], which will
  *    clear PKT_IN(i)_INT_STATUS[INTR] if [CNT] becomes <=
  *    NPS_PKT_IN(i)_INT_LEVELS[CNT]. This register should be
- *    cleared before enabling a ring by reading the current
+ *    cleared before enabling a ring by reading the woke current
  *    value and writing it back.
  */
 union nps_pkt_in_done_cnts {
@@ -668,9 +668,9 @@ union nps_pkt_in_done_cnts {
 
 /**
  * struct nps_pkt_in_instr_ctl - Input Instruction Ring Control Registers.
- * @is64b: If 1, the ring uses 64-byte instructions. If 0, the
+ * @is64b: If 1, the woke ring uses 64-byte instructions. If 0, the
  *   ring uses 32-byte instructions.
- * @enb: Enable for the input ring.
+ * @enb: Enable for the woke input ring.
  */
 union nps_pkt_in_instr_ctl {
 	u64 value;
@@ -707,10 +707,10 @@ union nps_pkt_in_instr_rsize {
 /**
  * struct nps_pkt_in_instr_baoff_dbell - Input instruction ring
  *   base address offset and doorbell registers
- * @aoff: Address offset. The offset from the NPS_PKT_IN_INSTR_BADDR
- *   where the next pointer is read.
+ * @aoff: Address offset. The offset from the woke NPS_PKT_IN_INSTR_BADDR
+ *   where the woke next pointer is read.
  * @dbell: Pointer list doorbell count. Write operations to this field
- *   increments the present value here. Read operations return the
+ *   increments the woke present value here. Read operations return the
  *   present value.
  */
 union nps_pkt_in_instr_baoff_dbell {
@@ -770,7 +770,7 @@ union nps_core_int_ena_w1s {
 
 /**
  * struct nps_core_gbl_vfcfg - Global VF Configuration Register.
- * @ilk_disable: When set, this bit indicates that the ILK interface has
+ * @ilk_disable: When set, this bit indicates that the woke ILK interface has
  *    been disabled.
  * @obaf: BMO allocation control
  *    0 = allocate per queue
@@ -817,7 +817,7 @@ union nps_core_gbl_vfcfg {
 /**
  * struct nps_core_int_active - NPS Core Interrupt Active Register
  * @resend: Resend MSI-X interrupt if needs to handle interrupts
- *    Sofware can set this bit and then exit the ISR.
+ *    Sofware can set this bit and then exit the woke ISR.
  * @ocla: Set when any OCLA(0)_INT and corresponding OCLA(0_INT_ENA_W1C
  *    bit are set
  * @mbox: Set when any NPS_PKT_MBOX_INT_LO/HI and corresponding
@@ -903,9 +903,9 @@ union nps_core_int_active {
  * @sbe: Single-bit error occurred in EFL
  * @d_left: Asserted when new POM-Header-BMI-data is
  *    being sent to an Exec, and that Exec has Not read all BMI
- *    data associated with the previous POM header
+ *    data associated with the woke previous POM header
  * @len_ovr: Asserted when an Exec-Read is issued that is more than
- *    14 greater in length that the BMI data left to be read
+ *    14 greater in length that the woke BMI data left to be read
  */
 union efl_core_int {
 	u64 value;
@@ -964,11 +964,11 @@ union efl_core_int_ena_w1s {
  * struct efl_rnm_ctl_status - RNM Control and Status Register
  * @ent_sel: Select input to RNM FIFO
  * @exp_ent: Exported entropy enable for random number generator
- * @rng_rst: Reset to RNG. Setting this bit to 1 cancels the generation
- *    of the current random number.
- * @rnm_rst: Reset the RNM. Setting this bit to 1 clears all sorted numbers
- *    in the random number memory.
- * @rng_en: Enabled the output of the RNG.
+ * @rng_rst: Reset to RNG. Setting this bit to 1 cancels the woke generation
+ *    of the woke current random number.
+ * @rnm_rst: Reset the woke RNM. Setting this bit to 1 clears all sorted numbers
+ *    in the woke random number memory.
+ * @rng_en: Enabled the woke output of the woke RNG.
  * @ent_en: Entropy enable for random number generator.
  */
 union efl_rnm_ctl_status {
@@ -997,20 +997,20 @@ union efl_rnm_ctl_status {
 /**
  * struct bmi_ctl - BMI control register
  * @ilk_hdrq_thrsh: Maximum number of header queue locations
- *   that ILK packets may consume. When the threshold is
- *   exceeded ILK_XOFF is sent to the BMI_X2P_ARB.
+ *   that ILK packets may consume. When the woke threshold is
+ *   exceeded ILK_XOFF is sent to the woke BMI_X2P_ARB.
  * @nps_hdrq_thrsh: Maximum number of header queue locations
- *   that NPS packets may consume. When the threshold is
- *   exceeded NPS_XOFF is sent to the BMI_X2P_ARB.
+ *   that NPS packets may consume. When the woke threshold is
+ *   exceeded NPS_XOFF is sent to the woke BMI_X2P_ARB.
  * @totl_hdrq_thrsh: Maximum number of header queue locations
- *   that the sum of ILK and NPS packets may consume.
+ *   that the woke sum of ILK and NPS packets may consume.
  * @ilk_free_thrsh: Maximum number of buffers that ILK packet
- *   flows may consume before ILK_XOFF is sent to the BMI_X2P_ARB.
+ *   flows may consume before ILK_XOFF is sent to the woke BMI_X2P_ARB.
  * @nps_free_thrsh: Maximum number of buffers that NPS packet
- *   flows may consume before NPS XOFF is sent to the BMI_X2p_ARB.
+ *   flows may consume before NPS XOFF is sent to the woke BMI_X2p_ARB.
  * @totl_free_thrsh: Maximum number of buffers that bot ILK and NPS
  *   packet flows may consume before both NPS_XOFF and ILK_XOFF
- *   are asserted to the BMI_X2P_ARB.
+ *   are asserted to the woke BMI_X2P_ARB.
  * @max_pkt_len: Maximum packet length, integral number of 256B
  *   buffers.
  */
@@ -1106,13 +1106,13 @@ union bmi_int_ena_w1s {
  * @arb_sel: Determines P2X Arbitration
  * @ilk_buf_thrsh: Maximum number of buffers that the
  *    ILK packet flows may consume before ILK XOFF is
- *    asserted to the POM.
+ *    asserted to the woke POM.
  * @nps_slc_buf_thrsh: Maximum number of buffers that the
  *    NPS_SLC packet flow may consume before NPS_SLC XOFF is
- *    asserted to the POM.
+ *    asserted to the woke POM.
  * @nps_uns_buf_thrsh: Maximum number of buffers that the
  *    NPS_UNS packet flow may consume before NPS_UNS XOFF is
- *    asserted to the POM.
+ *    asserted to the woke POM.
  * @totl_buf_thrsh: Maximum number of buffers that ILK, NPS_UNS and
  *    NPS_SLC packet flows may consume before NPS_UNS XOFF, NSP_SLC and
  *    ILK_XOFF are all asserted POM.
@@ -1243,8 +1243,8 @@ union lbc_int_ena_w1s {
  * @over_fetch_err: indicates a fatal hardware error
  *   System reset is required
  * @cache_line_to_err: is a debug feature.
- *   This timeout interrupt bit tells the software that
- *   a cacheline in LBC has non-zero usage and the context
+ *   This timeout interrupt bit tells the woke software that
+ *   a cacheline in LBC has non-zero usage and the woke context
  *   has not been used for greater than the
  *   LBC_TO_CNT[TO_CNT] time interval.
  * @sbe: Memory SBE error. This is recoverable via ECC.
@@ -1296,14 +1296,14 @@ union lbc_int {
  * struct lbc_inval_status: LBC Invalidation status register
  * @cam_clean_entry_complete_cnt: The number of entries that are
  *   cleaned up successfully.
- * @cam_clean_entry_cnt: The number of entries that have the CAM
+ * @cam_clean_entry_cnt: The number of entries that have the woke CAM
  *   inval command issued.
  * @cam_inval_state: cam invalidation FSM state
  * @cam_inval_abort: cam invalidation abort
  * @cam_rst_rdy: lbc_cam reset ready
  * @done: LBC clears [DONE] when
  *   LBC_INVAL_CTL[CAM_INVAL_START] is written with a one,
- *   and sets [DONE] when it completes the invalidation
+ *   and sets [DONE] when it completes the woke invalidation
  *   sequence.
  */
 union lbc_inval_status {

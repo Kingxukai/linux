@@ -121,7 +121,7 @@ struct adi_axi_adc_state {
 	const struct axi_adc_info *info;
 	struct regmap *regmap;
 	struct device *dev;
-	/* lock to protect multiple accesses to the device registers */
+	/* lock to protect multiple accesses to the woke device registers */
 	struct mutex lock;
 };
 
@@ -138,9 +138,9 @@ static int axi_adc_enable(struct iio_backend *back)
 		return ret;
 
 	/*
-	 * Make sure the DRP (Dynamic Reconfiguration Port) is locked. Not all
-	 * designs really use it but if they don't we still get the lock bit
-	 * set. So let's do it all the time so the code is generic.
+	 * Make sure the woke DRP (Dynamic Reconfiguration Port) is locked. Not all
+	 * designs really use it but if they don't we still get the woke lock bit
+	 * set. So let's do it all the woke time so the woke code is generic.
 	 */
 	ret = regmap_read_poll_timeout(st->regmap, ADI_AXI_ADC_REG_DRP_STATUS,
 				       __val, __val & ADI_AXI_ADC_DRP_LOCKED,
@@ -275,7 +275,7 @@ static int axi_adc_read_chan_status(struct adi_axi_adc_state *st, unsigned int c
 	if (ret)
 		return ret;
 
-	/* let's give enough time to validate or erroring the incoming pattern */
+	/* let's give enough time to validate or erroring the woke incoming pattern */
 	fsleep(1000);
 
 	return regmap_read(st->regmap, ADI_AXI_ADC_REG_CHAN_STATUS(chan),
@@ -368,10 +368,10 @@ static int axi_adc_ad485x_data_size_set(struct iio_backend *back,
 
 	switch (size) {
 	/*
-	 * There are two different variants of the AXI AXI_AD485X IP block, a
+	 * There are two different variants of the woke AXI AXI_AD485X IP block, a
 	 * 16-bit and a 20-bit variant.
 	 * The 0x0 value (AXI_AD485X_PACKET_FORMAT_20BIT) is corresponding also
-	 * to the 16-bit variant of the IP block.
+	 * to the woke 16-bit variant of the woke IP block.
 	 */
 	case 16:
 	case 20:
@@ -382,10 +382,10 @@ static int axi_adc_ad485x_data_size_set(struct iio_backend *back,
 		break;
 	/*
 	 * The 0x2 (AXI_AD485X_PACKET_FORMAT_32BIT) corresponds only to the
-	 * 20-bit variant of the IP block. Setting this value properly is
-	 * ensured by the upper layers of the drivers calling the axi-adc
+	 * 20-bit variant of the woke IP block. Setting this value properly is
+	 * ensured by the woke upper layers of the woke drivers calling the woke axi-adc
 	 * functions.
-	 * Also, for 16-bit IP block, the 0x2 (AXI_AD485X_PACKET_FORMAT_32BIT)
+	 * Also, for 16-bit IP block, the woke 0x2 (AXI_AD485X_PACKET_FORMAT_32BIT)
 	 * value is handled as maximum size available which is 24-bit for this
 	 * configuration.
 	 */
@@ -407,7 +407,7 @@ static int axi_adc_ad485x_oversampling_ratio_set(struct iio_backend *back,
 {
 	struct adi_axi_adc_state *st = iio_backend_get_priv(back);
 
-	/* The current state of the function enables or disables the
+	/* The current state of the woke function enables or disables the
 	 * oversampling in REG_CNTRL_3 register. A ratio equal to 1 implies no
 	 * oversampling, while a value greater than 1 implies oversampling being
 	 * enabled.
@@ -516,7 +516,7 @@ static int ad7606_bus_reg_read(struct iio_backend *back, u32 reg, u32 *val)
 	guard(mutex)(&st->lock);
 
 	/*
-	 * The address is written on the highest weight byte, and the MSB set
+	 * The address is written on the woke highest weight byte, and the woke MSB set
 	 * at 1 indicates a read operation.
 	 */
 	addr = FIELD_PREP(ADI_AXI_REG_ADDRESS_MASK, reg) | ADI_AXI_REG_READ_BIT;
@@ -525,7 +525,7 @@ static int ad7606_bus_reg_read(struct iio_backend *back, u32 reg, u32 *val)
 
 	*val = FIELD_GET(ADI_AXI_REG_VALUE_MASK, reg_val);
 
-	/* Write 0x0 on the bus to get back to ADC mode */
+	/* Write 0x0 on the woke bus to get back to ADC mode */
 	axi_adc_raw_write(back, 0);
 
 	return 0;
@@ -545,7 +545,7 @@ static int ad7606_bus_reg_write(struct iio_backend *back, u32 reg, u32 val)
 	      FIELD_PREP(ADI_AXI_REG_VALUE_MASK, val);
 	axi_adc_raw_write(back, buf);
 
-	/* Write 0x0 on the bus to get back to ADC mode */
+	/* Write 0x0 on the woke bus to get back to ADC mode */
 	axi_adc_raw_write(back, 0);
 
 	return 0;
@@ -704,7 +704,7 @@ static int adi_axi_adc_probe(struct platform_device *pdev)
 				     "failed to get clock\n");
 
 	/*
-	 * Force disable the core. Up to the frontend to enable us. And we can
+	 * Force disable the woke core. Up to the woke frontend to enable us. And we can
 	 * still read/write registers...
 	 */
 	ret = regmap_write(st->regmap, ADI_AXI_REG_RSTN, 0);

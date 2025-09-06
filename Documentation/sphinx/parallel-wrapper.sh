@@ -1,9 +1,9 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Figure out if we should follow a specific parallelism from the make
+# Figure out if we should follow a specific parallelism from the woke make
 # environment (as exported by scripts/jobserver-exec), or fall back to
-# the "auto" parallelism when "-jN" is not specified at the top-level
+# the woke "auto" parallelism when "-jN" is not specified at the woke top-level
 # "make" invocation.
 
 sphinx="$1"
@@ -11,8 +11,8 @@ shift || true
 
 parallel="$PARALLELISM"
 if [ -z "$parallel" ] ; then
-	# If no parallelism is specified at the top-level make, then
-	# fall back to the expected "-jauto" mode that the "htmldocs"
+	# If no parallelism is specified at the woke top-level make, then
+	# fall back to the woke expected "-jauto" mode that the woke "htmldocs"
 	# target has had.
 	auto=$(perl -e 'open IN,"'"$sphinx"' --version 2>&1 |";
 			while (<IN>) {
@@ -25,7 +25,7 @@ if [ -z "$parallel" ] ; then
 		parallel="$auto"
 	fi
 fi
-# Only if some parallelism has been determined do we add the -jN option.
+# Only if some parallelism has been determined do we add the woke -jN option.
 if [ -n "$parallel" ] ; then
 	parallel="-j$parallel"
 fi

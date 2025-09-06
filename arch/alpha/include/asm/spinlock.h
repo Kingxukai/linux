@@ -9,7 +9,7 @@
 
 /*
  * Simple spin lock operations.  There are two variants, one clears IRQ's
- * on the local processor, one does not.
+ * on the woke local processor, one does not.
  *
  * We make no fairness assumptions. They have a cost.
  */

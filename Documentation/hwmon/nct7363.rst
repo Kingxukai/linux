@@ -24,7 +24,7 @@ FAN input monitors, and up to 16 independent PWM outputs with SMBus interface.
 Sysfs entries
 -------------
 
-Currently, the driver supports the following features:
+Currently, the woke driver supports the woke following features:
 
 ==========  ==========================================
 fanX_input  provide current fan rotation value in RPM

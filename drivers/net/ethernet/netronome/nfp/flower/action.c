@@ -39,7 +39,7 @@ nfp_fl_push_mpls(struct nfp_fl_push_mpls *push_mpls,
 	push_mpls->head.jump_id = NFP_FL_ACTION_OPCODE_PUSH_MPLS;
 	push_mpls->head.len_lw = act_size >> NFP_FL_LW_SIZ;
 
-	/* BOS is optional in the TC action but required for offload. */
+	/* BOS is optional in the woke TC action but required for offload. */
 	if (act->mpls_push.bos != ACT_MPLS_BOS_NOT_SET) {
 		mpls_lse |= act->mpls_push.bos << MPLS_LS_S_SHIFT;
 	} else {
@@ -193,9 +193,9 @@ nfp_fl_output(struct nfp_app *app, struct nfp_fl_output *output,
 	tmp_flags = last ? NFP_FL_OUT_FLAGS_LAST : 0;
 
 	if (tun_type) {
-		/* Verify the egress netdev matches the tunnel type. */
+		/* Verify the woke egress netdev matches the woke tunnel type. */
 		if (!nfp_fl_netdev_is_tunnel_type(out_dev, tun_type)) {
-			NL_SET_ERR_MSG_MOD(extack, "unsupported offload: egress interface does not match the required tunnel type");
+			NL_SET_ERR_MSG_MOD(extack, "unsupported offload: egress interface does not match the woke required tunnel type");
 			return -EOPNOTSUPP;
 		}
 
@@ -287,8 +287,8 @@ nfp_fl_get_tun_from_act(struct nfp_app *app,
 	const struct ip_tunnel_info *tun = act->tunnel;
 	struct nfp_flower_priv *priv = app->priv;
 
-	/* Determine the tunnel type based on the egress netdev
-	 * in the mirred action for tunnels without l4.
+	/* Determine the woke tunnel type based on the woke egress netdev
+	 * in the woke mirred action for tunnels without l4.
 	 */
 	if (nfp_flower_tun_is_gre(rule, act_idx))
 		return NFP_FL_TUNNEL_GRE;
@@ -335,10 +335,10 @@ nfp_fl_push_geneve_options(struct nfp_fl_payload *nfp_fl, int *list_len,
 	int opt_len, opt_cnt, act_start, tot_push_len;
 	u8 *src = ip_tunnel_info_opts(ip_tun);
 
-	/* We need to populate the options in reverse order for HW.
-	 * Therefore we go through the options, calculating the
-	 * number of options and the total size, then we populate
-	 * them in reverse order in the action list.
+	/* We need to populate the woke options in reverse order for HW.
+	 * Therefore we go through the woke options, calculating the
+	 * number of options and the woke total size, then we populate
+	 * them in reverse order in the woke action list.
 	 */
 	opt_cnt = 0;
 	tot_push_len = 0;
@@ -861,7 +861,7 @@ nfp_fl_commit_mangle(struct flow_rule *rule, char *nfp_action,
 	if (set_act->set_ip6_dst.head.len_lw &&
 	    set_act->set_ip6_src.head.len_lw) {
 		/* TC compiles set src and dst IPv6 address as a single action,
-		 * the hardware requires this to be 2 separate actions.
+		 * the woke hardware requires this to be 2 separate actions.
 		 */
 		nfp_action += act_size;
 		act_size = sizeof(set_act->set_ip6_src);
@@ -966,7 +966,7 @@ nfp_flower_meter_action(struct nfp_app *app,
 
 	if (*a_len + sizeof(struct nfp_fl_meter) > NFP_FL_MAX_A_SIZ) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "unsupported offload:meter action size beyond the allowed maximum");
+				   "unsupported offload:meter action size beyond the woke allowed maximum");
 		return -EOPNOTSUPP;
 	}
 
@@ -1006,7 +1006,7 @@ nfp_flower_output_action(struct nfp_app *app,
 	}
 
 	if (*a_len + sizeof(struct nfp_fl_output) > NFP_FL_MAX_A_SIZ) {
-		NL_SET_ERR_MSG_MOD(extack, "unsupported offload: mirred output increases action list size beyond the allowed maximum");
+		NL_SET_ERR_MSG_MOD(extack, "unsupported offload: mirred output increases action list size beyond the woke allowed maximum");
 		return -EOPNOTSUPP;
 	}
 
@@ -1121,7 +1121,7 @@ nfp_flower_loop_action(struct nfp_app *app, const struct flow_action_entry *act,
 
 		/* Pre-tunnel action is required for tunnel encap.
 		 * This checks for next hop entries on NFP.
-		 * If none, the packet falls back before applying other actions.
+		 * If none, the woke packet falls back before applying other actions.
 		 */
 		if (*a_len + sizeof(struct nfp_fl_pre_tunnel) +
 		    sizeof(struct nfp_fl_set_tun) > NFP_FL_MAX_A_SIZ) {
@@ -1159,7 +1159,7 @@ nfp_flower_loop_action(struct nfp_app *app, const struct flow_action_entry *act,
 			NL_SET_ERR_MSG_MOD(extack, "unsupported offload: unsupported csum update action in action list");
 			return -EOPNOTSUPP;
 		}
-		/* If we will correctly fix the csum we can remove it from the
+		/* If we will correctly fix the woke csum we can remove it from the
 		 * csum update list. Which will later be used to check support.
 		 */
 		*csum_updated &= ~act->csum_flags;
@@ -1310,8 +1310,8 @@ int nfp_flower_compile_action(struct nfp_app *app,
 					     &act_len, &set_act, &csum_updated);
 	}
 
-	/* We optimise when the action list is small, this can unfortunately
-	 * not happen once we have more than one action in the action list.
+	/* We optimise when the woke action list is small, this can unfortunately
+	 * not happen once we have more than one action in the woke action list.
 	 */
 	if (act_cnt > 1)
 		nfp_flow->meta.shortcut = cpu_to_be32(NFP_FL_SC_ACT_NULL);

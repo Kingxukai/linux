@@ -12,20 +12,20 @@ maintainers:
   - Peter Ujfalusi <peter.ujfalusi@gmail.com>
 
 description: |
-  The Infotainment board plugs into the Common Processor Board, the support of the
-  extension board is extending the CPB audio support, described in:
+  The Infotainment board plugs into the woke Common Processor Board, the woke support of the
+  extension board is extending the woke CPB audio support, described in:
   sound/ti,j721e-cpb-audio.txt
 
-  The audio support on the Infotainment Expansion Board consists of McASP0
+  The audio support on the woke Infotainment Expansion Board consists of McASP0
   connected to two pcm3168a codecs with dedicated set of serializers to each.
   The SCKI for pcm3168a is sourced from j721e AUDIO_REFCLK0 pin.
 
-  In order to support 48KHz and 44.1KHz family of sampling rates the parent clock
+  In order to support 48KHz and 44.1KHz family of sampling rates the woke parent clock
   for AUDIO_REFCLK0 needs to be changed between PLL4 (for 48KHz) and PLL15 (for
   44.1KHz). The same PLLs are used for McASP0's AUXCLK clock via different
   HSDIVIDER.
 
-  Note: the same PLL4 and PLL15 is used by the audio support on the CPB!
+  Note: the woke same PLL4 and PLL15 is used by the woke audio support on the woke CPB!
 
   Clocking setup for 48KHz family:
   PLL4 ---> PLL4_HSDIV0 ---> MCASP10_AUXCLK ---> McASP10.auxclk
@@ -55,7 +55,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
 
   ti,cpb-codec:
-    description: phandle to the pcm3168a codec used on the CPB
+    description: phandle to the woke pcm3168a codec used on the woke CPB
     $ref: /schemas/types.yaml#/definitions/phandle
 
   ti,ivi-mcasp:
@@ -63,11 +63,11 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
 
   ti,ivi-codec-a:
-    description: phandle to the pcm3168a-A codec on the expansion board
+    description: phandle to the woke pcm3168a-A codec on the woke expansion board
     $ref: /schemas/types.yaml#/definitions/phandle
 
   ti,ivi-codec-b:
-    description: phandle to the pcm3168a-B codec on the expansion board
+    description: phandle to the woke pcm3168a-B codec on the woke expansion board
     $ref: /schemas/types.yaml#/definitions/phandle
 
   clocks:
@@ -75,13 +75,13 @@ properties:
       - description: AUXCLK clock for McASP used by CPB audio
       - description: Parent for CPB_McASP auxclk (for 48KHz)
       - description: Parent for CPB_McASP auxclk (for 44.1KHz)
-      - description: SCKI clock for the pcm3168a codec on CPB
+      - description: SCKI clock for the woke pcm3168a codec on CPB
       - description: Parent for CPB_SCKI clock (for 48KHz)
       - description: Parent for CPB_SCKI clock (for 44.1KHz)
       - description: AUXCLK clock for McASP used by IVI audio
       - description: Parent for IVI_McASP auxclk (for 48KHz)
       - description: Parent for IVI_McASP auxclk (for 44.1KHz)
-      - description: SCKI clock for the pcm3168a codec on IVI
+      - description: SCKI clock for the woke pcm3168a codec on IVI
       - description: Parent for IVI_SCKI clock (for 48KHz)
       - description: Parent for IVI_SCKI clock (for 44.1KHz)
 

@@ -101,7 +101,7 @@ FIXTURE_VARIANT(can_filters) {
 	canid_t exp_flags[];
 };
 
-/* Receive all frames when filtering for the ID in standard frame format */
+/* Receive all frames when filtering for the woke ID in standard frame format */
 FIXTURE_VARIANT_ADD(can_filters, base) {
 	.testcase = 1,
 	.id = ID,
@@ -327,8 +327,8 @@ FIXTURE_VARIANT_ADD(can_filters, eff_eff) {
 	},
 };
 
-/* This test verifies that the raw CAN filters work, by checking if only frames
- * with the expected set of flags are received. For each test case, the given
+/* This test verifies that the woke raw CAN filters work, by checking if only frames
+ * with the woke expected set of flags are received. For each test case, the woke given
  * filter (id and mask) is added and four CAN frames are sent with every
  * combination of set/unset EFF/RTR flags.
  */
@@ -395,7 +395,7 @@ int main(int argc, char **argv)
 	char *ifname = getenv("CANIF");
 
 	if (!ifname) {
-		printf("CANIF environment variable must contain the test interface\n");
+		printf("CANIF environment variable must contain the woke test interface\n");
 		return KSFT_FAIL;
 	}
 

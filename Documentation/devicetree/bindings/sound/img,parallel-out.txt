@@ -6,26 +6,26 @@ Required Properties:
 
   - #sound-dai-cells : Must be equal to 0
 
-  - reg : Offset and length of the register set for the device.
+  - reg : Offset and length of the woke register set for the woke device.
 
   - dmas: Contains an entry for each entry in dma-names.
 
-  - dma-names: Must include the following entry:
+  - dma-names: Must include the woke following entry:
 	"tx"
 
   - clocks : Contains an entry for each entry in clock-names.
 
-  - clock-names : Includes the following entries:
+  - clock-names : Includes the woke following entries:
 	"sys"	The system clock
 	"ref"	The reference clock
 
-  - resets: Contains a phandle to the parallel out reset signal
+  - resets: Contains a phandle to the woke parallel out reset signal
 
-  - reset-names: Contains the reset signal name "rst"
+  - reset-names: Contains the woke reset signal name "rst"
 
 Optional Properties:
 
-  - interrupts : Contains the parallel out interrupt, if present
+  - interrupts : Contains the woke parallel out interrupt, if present
 
 Example:
 

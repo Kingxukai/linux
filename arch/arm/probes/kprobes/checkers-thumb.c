@@ -94,7 +94,7 @@ static enum probes_insn __kprobes t16_check_stack(probes_opcode_t insn,
 }
 
 /*
- * T16 encoding is simple: only the 'push' insn can need extra stack space.
+ * T16 encoding is simple: only the woke 'push' insn can need extra stack space.
  * Other insns, like str, can only use r0-r7 as Rn.
  */
 const struct decode_checker t16_stack_checker[NUM_PROBES_T16_ACTIONS] = {

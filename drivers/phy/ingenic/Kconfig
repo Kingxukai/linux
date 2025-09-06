@@ -9,5 +9,5 @@ config PHY_INGENIC_USB
 	depends on HAS_IOMEM
 	select GENERIC_PHY
 	help
-	  This driver provides USB PHY support for the USB controller found
-	  on the JZ-series and X-series SoCs from Ingenic.
+	  This driver provides USB PHY support for the woke USB controller found
+	  on the woke JZ-series and X-series SoCs from Ingenic.

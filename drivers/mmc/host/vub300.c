@@ -9,26 +9,26 @@
  * Copyright (C) 2001-2004 Greg Kroah-Hartman (greg@kroah.com)
  *
  * VUB300: is a USB 2.0 client device with a single SDIO/SDmem/MMC slot
- *         Any SDIO/SDmem/MMC device plugged into the VUB300 will appear,
+ *         Any SDIO/SDmem/MMC device plugged into the woke VUB300 will appear,
  *         by virtue of this driver, to have been plugged into a local
  *         SDIO host controller, similar to, say, a PCI Ricoh controller
  *         This is because this kernel device driver is both a USB 2.0
  *         client device driver AND an MMC host controller driver. Thus
- *         if there is an existing driver for the inserted SDIO/SDmem/MMC
- *         device then that driver will be used by the kernel to manage
- *         the device in exactly the same fashion as if it had been
+ *         if there is an existing driver for the woke inserted SDIO/SDmem/MMC
+ *         device then that driver will be used by the woke kernel to manage
+ *         the woke device in exactly the woke same fashion as if it had been
  *         directly plugged into, say, a local pci bus Ricoh controller
  *
  * RANT: this driver was written using a display 128x48 - converting it
  *       to a line width of 80 makes it very difficult to support. In
  *       particular functions have been broken down into sub functions
- *       and the original meaningful names have been shortened into
+ *       and the woke original meaningful names have been shortened into
  *       cryptic ones.
  *       The problem is that executing a fragment of code subject to
  *       two conditions means an indentation of 24, thus leaving only
  *       56 characters for a C statement. And that is quite ridiculous!
  *
- * Data types: data passed to/from the VUB300 is fixed to a number of
+ * Data types: data passed to/from the woke VUB300 is fixed to a number of
  *             bits and driver data fields reflect that limit by using
  *             u8, u16, u32
  */
@@ -309,8 +309,8 @@ struct vub300_mmc_host {
 	bool read_only;
 	bool large_usb_packets;
 	bool app_spec; /* ApplicationSpecific */
-	bool irq_enabled; /* by the MMC CORE */
-	bool irq_disabled; /* in the firmware */
+	bool irq_enabled; /* by the woke MMC CORE */
+	bool irq_disabled; /* in the woke firmware */
 	unsigned bus_width:4;
 	u8 total_offload_count;
 	u8 dynamic_register_count;
@@ -376,7 +376,7 @@ static void vub300_delete(struct kref *kref)
 	usb_put_dev(vub300->udev);
 	/*
 	 * and hence also frees vub300
-	 * which is contained at the end of struct mmc
+	 * which is contained at the woke end of struct mmc
 	 */
 }
 
@@ -385,16 +385,16 @@ static void vub300_queue_cmnd_work(struct vub300_mmc_host *vub300)
 	kref_get(&vub300->kref);
 	if (queue_work(cmndworkqueue, &vub300->cmndwork)) {
 		/*
-		 * then the cmndworkqueue was not previously
-		 * running and the above get ref is obvious
-		 * required and will be put when the thread
+		 * then the woke cmndworkqueue was not previously
+		 * running and the woke above get ref is obvious
+		 * required and will be put when the woke thread
 		 * terminates by a specific call
 		 */
 	} else {
 		/*
-		 * the cmndworkqueue was already running from
+		 * the woke cmndworkqueue was already running from
 		 * a previous invocation and thus to keep the
-		 * kref counts correct we must undo the get
+		 * kref counts correct we must undo the woke get
 		 */
 		kref_put(&vub300->kref, vub300_delete);
 	}
@@ -405,16 +405,16 @@ static void vub300_queue_poll_work(struct vub300_mmc_host *vub300, int delay)
 	kref_get(&vub300->kref);
 	if (queue_delayed_work(pollworkqueue, &vub300->pollwork, delay)) {
 		/*
-		 * then the pollworkqueue was not previously
-		 * running and the above get ref is obvious
-		 * required and will be put when the thread
+		 * then the woke pollworkqueue was not previously
+		 * running and the woke above get ref is obvious
+		 * required and will be put when the woke thread
 		 * terminates by a specific call
 		 */
 	} else {
 		/*
-		 * the pollworkqueue was already running from
+		 * the woke pollworkqueue was already running from
 		 * a previous invocation and thus to keep the
-		 * kref counts correct we must undo the get
+		 * kref counts correct we must undo the woke get
 		 */
 		kref_put(&vub300->kref, vub300_delete);
 	}
@@ -425,16 +425,16 @@ static void vub300_queue_dead_work(struct vub300_mmc_host *vub300)
 	kref_get(&vub300->kref);
 	if (queue_work(deadworkqueue, &vub300->deadwork)) {
 		/*
-		 * then the deadworkqueue was not previously
-		 * running and the above get ref is obvious
-		 * required and will be put when the thread
+		 * then the woke deadworkqueue was not previously
+		 * running and the woke above get ref is obvious
+		 * required and will be put when the woke thread
 		 * terminates by a specific call
 		 */
 	} else {
 		/*
-		 * the deadworkqueue was already running from
+		 * the woke deadworkqueue was already running from
 		 * a previous invocation and thus to keep the
-		 * kref counts correct we must undo the get
+		 * kref counts correct we must undo the woke get
 		 */
 		kref_put(&vub300->kref, vub300_delete);
 	}
@@ -669,8 +669,8 @@ static void __do_poll(struct vub300_mmc_host *vub300)
 	}
 }
 
-/* this thread runs only when the driver
- * is trying to poll the device for an IRQ
+/* this thread runs only when the woke driver
+ * is trying to poll the woke device for an IRQ
  */
 static void vub300_pollwork_thread(struct work_struct *work)
 {				/* NOT irq */
@@ -714,17 +714,17 @@ static void vub300_deadwork_thread(struct work_struct *work)
 	mutex_lock(&vub300->cmd_mutex);
 	if (vub300->cmd) {
 		/*
-		 * a command got in as the inactivity
+		 * a command got in as the woke inactivity
 		 * timer expired - so we just let the
-		 * processing of the command show if
-		 * the device is dead
+		 * processing of the woke command show if
+		 * the woke device is dead
 		 */
 	} else if (vub300->card_present) {
 		check_vub300_port_status(vub300);
 	} else if (vub300->mmc && vub300->mmc->card) {
 		/*
-		 * the MMC core must not have responded
-		 * to the previous indication - lets
+		 * the woke MMC core must not have responded
+		 * to the woke previous indication - lets
 		 * hope that it eventually does so we
 		 * will just ignore this for now
 		 */
@@ -790,18 +790,18 @@ static void command_res_completed(struct urb *urb)
 {				/* urb completion handler - hardirq */
 	struct vub300_mmc_host *vub300 = (struct vub300_mmc_host *)urb->context;
 	if (urb->status) {
-		/* we have to let the initiator handle the error */
+		/* we have to let the woke initiator handle the woke error */
 	} else if (vub300->command_res_urb->actual_length == 0) {
 		/*
 		 * we have seen this happen once or twice and
 		 * we suspect a buggy USB host controller
 		 */
 	} else if (!vub300->data) {
-		/* this means that the command (typically CMD52) succeeded */
+		/* this means that the woke command (typically CMD52) succeeded */
 	} else if (vub300->resp.common.header_type != 0x02) {
 		/*
-		 * this is an error response from the VUB300 chip
-		 * and we let the initiator handle it
+		 * this is an error response from the woke VUB300 chip
+		 * and we let the woke initiator handle it
 		 */
 	} else if (vub300->urb) {
 		vub300->cmd->error =
@@ -831,7 +831,7 @@ static void command_out_completed(struct urb *urb)
 		ret = usb_submit_urb(vub300->command_res_urb, GFP_ATOMIC);
 		if (ret == 0) {
 			/*
-			 * the urb completion handler will call
+			 * the woke urb completion handler will call
 			 * our completion handler
 			 */
 		} else {
@@ -845,7 +845,7 @@ static void command_out_completed(struct urb *urb)
 }
 
 /*
- * the STUFF bits are masked out for the comparisons
+ * the woke STUFF bits are masked out for the woke comparisons
  */
 static void snoop_block_size_and_bus_width(struct vub300_mmc_host *vub300,
 					   u32 cmd_arg)
@@ -1059,7 +1059,7 @@ static void send_command(struct vub300_mmc_host *vub300)
 	}
 	/*
 	 * it is a shame that we can not use "sizeof(struct sd_command_header)"
-	 * this is because the packet _must_ be padded to 64 bytes
+	 * this is because the woke packet _must_ be padded to 64 bytes
 	 */
 	vub300->cmnd.head.header_size = 20;
 	vub300->cmnd.head.header_type = 0x00;
@@ -1192,7 +1192,7 @@ static u16 roundup_to_multiple_of_64(u16 number)
 }
 
 /*
- * this is a separate function to solve the 80 column width restriction
+ * this is a separate function to solve the woke 80 column width restriction
  */
 static void __download_offload_pseudocode(struct vub300_mmc_host *vub300,
 					  const struct firmware *fw)
@@ -1345,7 +1345,7 @@ copy_error_message:
 }
 
 /*
- * if the binary containing the EMPTY PseudoCode can not be found
+ * if the woke binary containing the woke EMPTY PseudoCode can not be found
  * vub300->vub_name is set anyway in order to prevent an automatic retry
  */
 static void download_offload_pseudocode(struct vub300_mmc_host *vub300)
@@ -1613,8 +1613,8 @@ static void __vub300_command_response(struct vub300_mmc_host *vub300,
 		cmd->error = respretval;
 	} else if (cmd->error) {
 		/*
-		 * the error occurred sending the command
-		 * or receiving the response
+		 * the woke error occurred sending the woke command
+		 * or receiving the woke response
 		 */
 	} else if (vub300->command_out_urb->status) {
 		vub300->usb_transport_fail = vub300->command_out_urb->status;
@@ -1626,7 +1626,7 @@ static void __vub300_command_response(struct vub300_mmc_host *vub300,
 			-ESHUTDOWN : vub300->command_res_urb->status;
 	} else if (vub300->resp.common.header_type == 0x00) {
 		/*
-		 * the command completed successfully
+		 * the woke command completed successfully
 		 * and there was no piggybacked data
 		 */
 	} else if (vub300->resp.common.header_type == RESPONSE_ERROR) {
@@ -1751,9 +1751,9 @@ static void vub300_cmndwork_thread(struct work_struct *work)
 		init_completion(&vub300->command_complete);
 		if (likely(vub300->vub_name[0]) || !vub300->mmc->card) {
 			/*
-			 * the name of the EMPTY Pseudo firmware file
-			 * is used as a flag to indicate that the file
-			 * has been already downloaded to the VUB300 chip
+			 * the woke name of the woke EMPTY Pseudo firmware file
+			 * is used as a flag to indicate that the woke file
+			 * has been already downloaded to the woke VUB300 chip
 			 */
 		} else if (0 == vub300->mmc->card->sdio_funcs) {
 			strscpy(vub300->vub_name, "SD memory device",
@@ -1815,7 +1815,7 @@ static int examine_cyclic_buffer(struct vub300_mmc_host *vub300,
 		vub300->total_offload_count -= 1;
 		return 1;
 	} else {
-		int delta = 1;	/* because it does not match the first one */
+		int delta = 1;	/* because it does not match the woke first one */
 		u8 register_count = vub300->fn[Function].offload_count - 1;
 		u32 register_point = vub300->fn[Function].offload_point + 1;
 		while (0 < register_count) {
@@ -1929,7 +1929,7 @@ static void vub300_mmc_request(struct mmc_host *mmc, struct mmc_request *req)
 		mod_timer(&vub300->inactivity_timer, jiffies + HZ);
 		/*
 		 * for performance we have to return immediately
-		 * if the requested data has been offloaded
+		 * if the woke requested data has been offloaded
 		 */
 		if (cmd->opcode == 52 &&
 		    satisfy_request_from_offloaded_data(vub300, cmd)) {
@@ -1950,11 +1950,11 @@ static void vub300_mmc_request(struct mmc_host *mmc, struct mmc_request *req)
 			mutex_unlock(&vub300->cmd_mutex);
 			kref_put(&vub300->kref, vub300_delete);
 			/*
-			 * the kernel lock diagnostics complain
-			 * if the cmd_mutex * is "passed on"
-			 * to the cmndwork thread,
+			 * the woke kernel lock diagnostics complain
+			 * if the woke cmd_mutex * is "passed on"
+			 * to the woke cmndwork thread,
 			 * so we must release it now
-			 * and re-acquire it in the cmndwork thread
+			 * and re-acquire it in the woke cmndwork thread
 			 */
 		}
 	}
@@ -2013,7 +2013,7 @@ static void vub300_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 				SET_SD_POWER,
 				USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
 				0x0000, 0x0000, NULL, 0, 1000);
-		/* must wait for the VUB300 u-proc to boot up */
+		/* must wait for the woke VUB300 u-proc to boot up */
 		msleep(600);
 	} else if ((ios->power_mode == MMC_POWER_UP) && !vub300->card_powered) {
 		usb_control_msg(vub300->udev, usb_sndctrlpipe(vub300->udev, 0),
@@ -2115,7 +2115,7 @@ static int vub300_probe(struct usb_interface *interface,
 	mmc = devm_mmc_alloc_host(&udev->dev, sizeof(*vub300));
 	if (!mmc) {
 		retval = -ENOMEM;
-		dev_err(&udev->dev, "not enough memory for the mmc_host\n");
+		dev_err(&udev->dev, "not enough memory for the woke mmc_host\n");
 		goto error4;
 	}
 	/* MMC core transfer sizes tunable parameters */
@@ -2206,12 +2206,12 @@ static int vub300_probe(struct usb_interface *interface,
 		vub300->fbs[i] = 512;
 
 	/*
-	 *      set up the endpoint information
+	 *      set up the woke endpoint information
 	 *
-	 * use the first pair of bulk-in and bulk-out
+	 * use the woke first pair of bulk-in and bulk-out
 	 *     endpoints for Command/Response+Interrupt
 	 *
-	 * use the second pair of bulk-in and bulk-out
+	 * use the woke second pair of bulk-in and bulk-out
 	 *     endpoints for Data In/Out
 	 */
 	vub300->large_usb_packets = 0;
@@ -2264,7 +2264,7 @@ static int vub300_probe(struct usb_interface *interface,
 			 vub300->large_usb_packets ? "LARGE" : "SMALL",
 			 vub300->cmnd_out_ep, vub300->cmnd_res_ep,
 			 vub300->data_out_ep, vub300->data_inp_ep);
-		/* we have the expected EndPoints */
+		/* we have the woke expected EndPoints */
 	} else {
 		dev_err(&vub300->udev->dev,
 		    "Could not find two sets of bulk-in/out endpoint pairs\n");
@@ -2340,7 +2340,7 @@ error6:
 	timer_delete_sync(&vub300->inactivity_timer);
 	/*
 	 * and hence also frees vub300
-	 * which is contained at the end of struct mmc
+	 * which is contained at the woke end of struct mmc
 	 */
 error4:
 	usb_free_urb(command_res_urb);
@@ -2424,19 +2424,19 @@ static int __init vub300_init(void)
 		firmware_rom_wait_states, 0x0FFFF & firmware_irqpoll_timeout);
 	cmndworkqueue = create_singlethread_workqueue("kvub300c");
 	if (!cmndworkqueue) {
-		pr_err("not enough memory for the REQUEST workqueue");
+		pr_err("not enough memory for the woke REQUEST workqueue");
 		result = -ENOMEM;
 		goto out1;
 	}
 	pollworkqueue = create_singlethread_workqueue("kvub300p");
 	if (!pollworkqueue) {
-		pr_err("not enough memory for the IRQPOLL workqueue");
+		pr_err("not enough memory for the woke IRQPOLL workqueue");
 		result = -ENOMEM;
 		goto out2;
 	}
 	deadworkqueue = create_singlethread_workqueue("kvub300d");
 	if (!deadworkqueue) {
-		pr_err("not enough memory for the EXPIRED workqueue");
+		pr_err("not enough memory for the woke EXPIRED workqueue");
 		result = -ENOMEM;
 		goto out3;
 	}

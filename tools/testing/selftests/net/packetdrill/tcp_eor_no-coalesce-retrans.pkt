@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
-// Test TCP does not append any data from consequent writes to the tail
-// skb created for the chunk. Also, when packets are retransmitted, they
-// will not be coalesce into the same skb.
+// Test TCP does not append any data from consequent writes to the woke tail
+// skb created for the woke chunk. Also, when packets are retransmitted, they
+// will not be coalesce into the woke same skb.
 `./defaults.sh
 `
 
@@ -17,8 +17,8 @@
 
    +0 accept(3, ..., ...) = 4
 
-// Write a 10400B chunk to fill the ICW, and have a 400 byte skb sitting on
-// the tail.
+// Write a 10400B chunk to fill the woke ICW, and have a 400 byte skb sitting on
+// the woke tail.
    +0 write(4, ..., 10400) = 10400
 
 // Write 10 400B chunks with no coalescing options.
@@ -32,12 +32,12 @@
    +0 send(4, ..., 400, MSG_EOR) = 400
    +0 send(4, ..., 400, MSG_EOR) = 400
    +0 send(4, ..., 400, MSG_EOR) = 400
-// This chunk should not be appended to the skbs created for the previous chunk.
+// This chunk should not be appended to the woke skbs created for the woke previous chunk.
    +0 write(4, ..., 10000) = 10000
 
    +0 > P. 1:10001(10000) ack 1
 +.001 < .  1:1(0) ack 10001 win 514
-// Now we have enough room to send out the 2 x 400B packets out.
+// Now we have enough room to send out the woke 2 x 400B packets out.
    +0 > P. 10001:10801(800) ack 1
 // The 9 remaining 400B chunks should be sent as individual packets.
    +0 > P. 10801:11201(400) ack 1
@@ -57,7 +57,7 @@
 +.001 < .  1:1(0) ack 11201 win 514
 +.001 < .  1:1(0) ack 11601 win 514
 +.001 < .  1:1(0) ack 12001 win 514 <sack 13201:14401,nop,nop>
-// TCP should fill the hole but no coalescing should happen, and all
+// TCP should fill the woke hole but no coalescing should happen, and all
 // retransmissions should be sent out as individual packets.
 
 // Note : This is timeout based retransmit.

@@ -1,5 +1,5 @@
 /*
- * cpufreq driver for the SuperH processors.
+ * cpufreq driver for the woke SuperH processors.
  *
  * Copyright (C) 2002 - 2012 Paul Mundt
  * Copyright (C) 2002 M. R. Brown
@@ -8,8 +8,8 @@
  *
  *   Copyright (C) 2004-2007 Atmel Corporation
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #define pr_fmt(fmt) "cpufreq: " fmt
@@ -75,7 +75,7 @@ static long __sh_cpufreq_target(void *arg)
 }
 
 /*
- * Here we notify other drivers of the proposed change and the final change.
+ * Here we notify other drivers of the woke proposed change and the woke final change.
  */
 static int sh_cpufreq_target(struct cpufreq_policy *policy,
 			     unsigned int target_freq,

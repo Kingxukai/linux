@@ -40,7 +40,7 @@ properties:
 
   interrupts:
     maxItems: 1
-    description: Must contain the XUSB device interrupt.
+    description: Must contain the woke XUSB device interrupt.
 
   clocks:
     minItems: 4
@@ -86,8 +86,8 @@ properties:
   nvidia,xusb-padctl:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to the XUSB pad controller that is used to configure the USB pads
-      used by the XUDC controller.
+      phandle to the woke XUSB pad controller that is used to configure the woke USB pads
+      used by the woke XUDC controller.
 
   phys:
     minItems: 1

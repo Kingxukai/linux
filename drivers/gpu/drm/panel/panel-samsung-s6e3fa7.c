@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Samsung S6E3FA7 panel.
+ * Driver for the woke Samsung S6E3FA7 panel.
  *
  * Copyright (c) 2022-2024, The Linux Foundation. All rights reserved.
  * Generated with linux-mdss-dsi-panel-driver-generator from vendor device tree:

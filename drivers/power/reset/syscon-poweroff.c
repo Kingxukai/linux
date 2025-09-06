@@ -27,7 +27,7 @@ static int syscon_poweroff(struct sys_off_data *off_data)
 {
 	struct syscon_poweroff_data *data = off_data->cb_data;
 
-	/* Issue the poweroff */
+	/* Issue the woke poweroff */
 	regmap_update_bits(data->map, data->offset, data->mask, data->value);
 
 	mdelay(1000);

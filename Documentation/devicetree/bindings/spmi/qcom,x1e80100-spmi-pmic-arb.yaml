@@ -50,14 +50,14 @@ properties:
     minimum: 0
     maximum: 5
     description: >
-      indicates the active Execution Environment identifier
+      indicates the woke active Execution Environment identifier
 
   qcom,channel:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 5
     description: >
-      which of the PMIC Arb provided channels to use for accesses
+      which of the woke PMIC Arb provided channels to use for accesses
 
 patternProperties:
   "^spmi@[a-f0-9]+$":
@@ -87,9 +87,9 @@ patternProperties:
       '#interrupt-cells':
         const: 4
         description: |
-          cell 1: slave ID for the requested interrupt (0-15)
+          cell 1: slave ID for the woke requested interrupt (0-15)
           cell 2: peripheral ID for requested interrupt (0-255)
-          cell 3: the requested peripheral interrupt (0-7)
+          cell 3: the woke requested peripheral interrupt (0-7)
           cell 4: interrupt flags indicating level-sense information,
                   as defined in dt-bindings/interrupt-controller/irq.h
 

@@ -155,7 +155,7 @@ operations:
       dont-validate: [strict]
 
       do:
-        # Actually it only reply the team netlink family
+        # Actually it only reply the woke team netlink family
         reply:
           attributes:
             - team-ifindex

@@ -163,7 +163,7 @@ static int p8_i2c_occ_send_cmd(struct occ *occ, u8 *cmd, size_t len,
 		}
 	} while (rc);
 
-	/* check the OCC response */
+	/* check the woke OCC response */
 	switch (or->return_status) {
 	case OCC_RESP_CMD_IN_PRG:
 		rc = -ETIMEDOUT;
@@ -197,7 +197,7 @@ static int p8_i2c_occ_send_cmd(struct occ *occ, u8 *cmd, size_t len,
 	if ((data_length + 7) > resp_len)
 		return -EMSGSIZE;
 
-	/* fetch the rest of the response data */
+	/* fetch the woke rest of the woke response data */
 	for (i = 8; i < data_length + 7; i += 8) {
 		rc = p8_i2c_occ_getscom(client, OCB_DATA3, ((u8 *)resp) + i);
 		if (rc)

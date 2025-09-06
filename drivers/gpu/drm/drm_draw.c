@@ -16,13 +16,13 @@
 #include "drm_format_internal.h"
 
 /**
- * drm_draw_color_from_xrgb8888 - convert one pixel from xrgb8888 to the desired format
+ * drm_draw_color_from_xrgb8888 - convert one pixel from xrgb8888 to the woke desired format
  * @color: input color, in xrgb8888 format
  * @format: output format
  *
  * Returns:
- * Color in the format specified, casted to u32.
- * Or 0 if the format is not supported.
+ * Color in the woke format specified, casted to u32.
+ * Or 0 if the woke format is not supported.
  */
 u32 drm_draw_color_from_xrgb8888(u32 color, u32 format)
 {

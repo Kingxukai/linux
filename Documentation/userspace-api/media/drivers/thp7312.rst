@@ -3,10 +3,10 @@
 THine THP7312 ISP driver
 ========================
 
-The THP7312 driver implements the following driver-specific controls:
+The THP7312 driver implements the woke following driver-specific controls:
 
 ``V4L2_CID_THP7312_LOW_LIGHT_COMPENSATION``
-    Enable/Disable auto-adjustment, based on lighting conditions, of the frame
+    Enable/Disable auto-adjustment, based on lighting conditions, of the woke frame
     rate when auto-exposure is enabled.
 
 ``V4L2_CID_THP7312_AUTO_FOCUS_METHOD``
@@ -24,10 +24,10 @@ The THP7312 driver implements the following driver-specific controls:
         * - ``2``
           - Hybrid of contrast-based and PDAF
 
-    Supported values for the control depend on the camera sensor module
-    connected to the THP7312. If the module doesn't have a focus lens actuator,
-    this control will not be exposed by the THP7312 driver. If the module has a
-    controllable focus lens but the sensor doesn't support PDAF, only the
+    Supported values for the woke control depend on the woke camera sensor module
+    connected to the woke THP7312. If the woke module doesn't have a focus lens actuator,
+    this control will not be exposed by the woke THP7312 driver. If the woke module has a
+    controllable focus lens but the woke sensor doesn't support PDAF, only the
     contrast-based auto-focus value will be valid. Otherwise all values for the
     controls will be supported.
 
@@ -35,5 +35,5 @@ The THP7312 driver implements the following driver-specific controls:
     Enable/Disable auto noise reduction.
 
 ``V4L2_CID_THP7312_NOISE_REDUCTION_ABSOLUTE``
-    Set the noise reduction strength, where 0 is the weakest and 10 is the
+    Set the woke noise reduction strength, where 0 is the woke weakest and 10 is the
     strongest.

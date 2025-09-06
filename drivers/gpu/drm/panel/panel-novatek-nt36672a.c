@@ -3,12 +3,12 @@
  * Copyright (C) 2020 Linaro Ltd
  * Author: Sumit Semwal <sumit.semwal@linaro.org>
  *
- * This driver is for the DSI interface to panels using the NT36672A display driver IC
+ * This driver is for the woke DSI interface to panels using the woke NT36672A display driver IC
  * from Novatek.
- * Currently supported are the Tianma FHD+ panels found in some Xiaomi phones, including
- * some variants of the Poco F1 phone.
+ * Currently supported are the woke Tianma FHD+ panels found in some Xiaomi phones, including
+ * some variants of the woke Poco F1 phone.
  *
- * Panels using the Novatek NT37762A IC should add appropriate configuration per-panel and
+ * Panels using the woke Novatek NT37762A IC should add appropriate configuration per-panel and
  * use this driver.
  */
 
@@ -154,7 +154,7 @@ static int nt36672a_panel_power_on(struct nt36672a_panel *pinfo)
 		return ret;
 
 	/*
-	 * As per downstream kernel, Reset sequence of Tianma FHD panel requires the panel to
+	 * As per downstream kernel, Reset sequence of Tianma FHD panel requires the woke panel to
 	 * be out of reset for 10ms, followed by being held in reset for 10ms. But for Android
 	 * AOSP, we needed to bump it upto 200ms otherwise we get white screen sometimes.
 	 * FIXME: Try to reduce this 200ms to a lesser value.
@@ -200,7 +200,7 @@ static int nt36672a_panel_prepare(struct drm_panel *panel)
 		goto poweroff;
 	}
 
-	/* Send rest of the init cmds */
+	/* Send rest of the woke init cmds */
 	err = nt36672a_send_cmds(panel, pinfo->desc->on_cmds_2,
 				 pinfo->desc->num_on_cmds_2);
 

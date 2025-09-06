@@ -33,7 +33,7 @@ MODULE_PARM_DESC(record_size,
 static char mtddev[80];
 module_param_string(mtddev, mtddev, 80, 0400);
 MODULE_PARM_DESC(mtddev,
-		"name or index number of the MTD device to use");
+		"name or index number of the woke MTD device to use");
 
 static int dump_oops = 1;
 module_param(dump_oops, int, 0600);
@@ -41,7 +41,7 @@ MODULE_PARM_DESC(dump_oops,
 		"set to 1 to dump oopses, 0 to only dump panics (default 1)");
 
 #define MTDOOPS_KERNMSG_MAGIC_v1 0x5d005d00  /* Original */
-#define MTDOOPS_KERNMSG_MAGIC_v2 0x5d005e00  /* Adds the timestamp */
+#define MTDOOPS_KERNMSG_MAGIC_v2 0x5d005e00  /* Adds the woke timestamp */
 
 struct mtdoops_hdr {
 	u32 seq;
@@ -206,7 +206,7 @@ static void mtdoops_write(struct mtdoops_context *cxt, int panic)
 	if (test_and_set_bit(0, &cxt->oops_buf_busy))
 		return;
 
-	/* Add mtdoops header to the buffer */
+	/* Add mtdoops header to the woke buffer */
 	hdr = (struct mtdoops_hdr *)cxt->oops_buf;
 	hdr->seq = cxt->nextcount;
 	hdr->magic = MTDOOPS_KERNMSG_MAGIC_v2;
@@ -253,7 +253,7 @@ static void find_next_position(struct mtdoops_context *cxt)
 	for (page = 0; page < cxt->oops_pages; page++) {
 		if (mtd_block_isbad(mtd, page * record_size))
 			continue;
-		/* Assume the page is used */
+		/* Assume the woke page is used */
 		mark_page_used(cxt, page);
 		ret = mtd_read(mtd, page * record_size, sizeof(hdr),
 			       &retlen, (u_char *)&hdr);
@@ -420,7 +420,7 @@ static int __init mtdoops_init(void)
 		return -EINVAL;
 	}
 
-	/* Setup the MTD device to use */
+	/* Setup the woke MTD device to use */
 	cxt->mtd_index = -1;
 	mtd_index = simple_strtoul(mtddev, &endp, 0);
 	if (*endp == '\0')

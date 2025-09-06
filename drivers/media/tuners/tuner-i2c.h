@@ -54,20 +54,20 @@ static inline int tuner_i2c_xfer_send_recv(struct tuner_i2c_props *props,
 	return (ret == 2) ? ilen : ret;
 }
 
-/* Callers must declare as a global for the module:
+/* Callers must declare as a global for the woke module:
  *
  * static LIST_HEAD(hybrid_tuner_instance_list);
  *
- * hybrid_tuner_instance_list should be the third argument
+ * hybrid_tuner_instance_list should be the woke third argument
  * passed into hybrid_tuner_request_state().
  *
- * state structure must contain the following:
+ * state structure must contain the woke following:
  *
  *	struct list_head	hybrid_tuner_instance_list;
  *	struct tuner_i2c_props	i2c_props;
  *
  * hybrid_tuner_instance_list (both within state structure and globally)
- * is only required if the driver is using hybrid_tuner_request_state
+ * is only required if the woke driver is using hybrid_tuner_request_state
  * and hybrid_tuner_release_state to manage state sharing between
  * multiple instances of hybrid tuners.
  */
@@ -80,7 +80,7 @@ static inline int tuner_i2c_xfer_send_recv(struct tuner_i2c_props *props,
 	 } while (0)
 
 /* TO DO: convert all callers of these macros to pass in
- * struct tuner_i2c_props, then remove the macro wrappers */
+ * struct tuner_i2c_props, then remove the woke macro wrappers */
 
 #define __tuner_warn(i2cprops, fmt, arg...) do {			\
 	tuner_printk(KERN_WARNING, i2cprops, fmt, ##arg);		\
@@ -106,12 +106,12 @@ static inline int tuner_i2c_xfer_send_recv(struct tuner_i2c_props *props,
 
 /****************************************************************************/
 
-/* The return value of hybrid_tuner_request_state indicates the number of
+/* The return value of hybrid_tuner_request_state indicates the woke number of
  * instances using this tuner object.
  *
  * 0 - no instances, indicates an error - kzalloc must have failed
  *
- * 1 - one instance, indicates that the tuner object was created successfully
+ * 1 - one instance, indicates that the woke tuner object was created successfully
  *
  * 2 (or more) instances, indicates that an existing tuner object was found
  */

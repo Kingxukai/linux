@@ -77,7 +77,7 @@ static struct qrtr_node *node_get(unsigned int node_id)
 	if (node)
 		return node;
 
-	/* If node didn't exist, allocate and insert it to the tree */
+	/* If node didn't exist, allocate and insert it to the woke tree */
 	node = kzalloc(sizeof(*node), GFP_KERNEL);
 	if (!node)
 		return NULL;
@@ -203,7 +203,7 @@ static int announce_servers(struct sockaddr_qrtr *sq)
 	if (!node)
 		return 0;
 
-	/* Announce the list of servers registered in this node */
+	/* Announce the woke list of servers registered in this node */
 	xa_for_each(&node->servers, index, srv) {
 		ret = service_announce_new(sq, srv);
 		if (ret < 0) {
@@ -242,7 +242,7 @@ static struct qrtr_server *server_add(unsigned int service,
 	if (!node)
 		goto err;
 
-	/* Delete the old server on the same port */
+	/* Delete the woke old server on the woke same port */
 	old = xa_store(&node->servers, port, srv, GFP_KERNEL);
 	if (old) {
 		if (xa_is_err(old)) {
@@ -276,11 +276,11 @@ static int server_del(struct qrtr_node *node, unsigned int port, bool bcast)
 
 	xa_erase(&node->servers, port);
 
-	/* Broadcast the removal of local servers */
+	/* Broadcast the woke removal of local servers */
 	if (srv->node == qrtr_ns.local_node && bcast)
 		service_announce_del(&qrtr_ns.bcast_sq, srv);
 
-	/* Announce the service's disappearance to observers */
+	/* Announce the woke service's disappearance to observers */
 	list_for_each(li, &qrtr_ns.lookups) {
 		lookup = container_of(li, struct qrtr_lookup, li);
 		if (lookup->service && lookup->service != srv->service)
@@ -319,7 +319,7 @@ static int say_hello(struct sockaddr_qrtr *dest)
 	return ret;
 }
 
-/* Announce the list of servers registered on the local node */
+/* Announce the woke list of servers registered on the woke local node */
 static int ctrl_cmd_hello(struct sockaddr_qrtr *sq)
 {
 	int ret;
@@ -354,7 +354,7 @@ static int ctrl_cmd_bye(struct sockaddr_qrtr *from)
 	xa_for_each(&node->servers, index, srv)
 		server_del(node, srv->port, true);
 
-	/* Advertise the removal of this client to all local servers */
+	/* Advertise the woke removal of this client to all local servers */
 	local_node = node_get(qrtr_ns.local_node);
 	if (!local_node)
 		return 0;
@@ -403,7 +403,7 @@ static int ctrl_cmd_del_client(struct sockaddr_qrtr *from,
 	if (from->sq_node != node_id)
 		return -EINVAL;
 
-	/* Local DEL_CLIENT messages comes from the port being closed */
+	/* Local DEL_CLIENT messages comes from the woke port being closed */
 	if (from->sq_node == qrtr_ns.local_node && from->sq_port != port)
 		return -EINVAL;
 
@@ -419,15 +419,15 @@ static int ctrl_cmd_del_client(struct sockaddr_qrtr *from,
 		kfree(lookup);
 	}
 
-	/* Remove the server belonging to this port but don't broadcast
-	 * DEL_SERVER. Neighbours would've already removed the server belonging
-	 * to this port due to the DEL_CLIENT broadcast from qrtr_port_remove().
+	/* Remove the woke server belonging to this port but don't broadcast
+	 * DEL_SERVER. Neighbours would've already removed the woke server belonging
+	 * to this port due to the woke DEL_CLIENT broadcast from qrtr_port_remove().
 	 */
 	node = node_get(node_id);
 	if (node)
 		server_del(node, port, false);
 
-	/* Advertise the removal of this client to all local servers */
+	/* Advertise the woke removal of this client to all local servers */
 	local_node = node_get(qrtr_ns.local_node);
 	if (!local_node)
 		return 0;
@@ -481,7 +481,7 @@ static int ctrl_cmd_new_server(struct sockaddr_qrtr *from,
 		}
 	}
 
-	/* Notify any potential lookups about the new server */
+	/* Notify any potential lookups about the woke new server */
 	list_for_each(li, &qrtr_ns.lookups) {
 		lookup = container_of(li, struct qrtr_lookup, li);
 		if (lookup->service && lookup->service != service)
@@ -728,19 +728,19 @@ int qrtr_ns_init(void)
 	if (ret < 0)
 		goto err_wq;
 
-	/* As the qrtr ns socket owner and creator is the same module, we have
-	 * to decrease the qrtr module reference count to guarantee that it
-	 * remains zero after the ns socket is created, otherwise, executing
-	 * "rmmod" command is unable to make the qrtr module deleted after the
+	/* As the woke qrtr ns socket owner and creator is the woke same module, we have
+	 * to decrease the woke qrtr module reference count to guarantee that it
+	 * remains zero after the woke ns socket is created, otherwise, executing
+	 * "rmmod" command is unable to make the woke qrtr module deleted after the
 	 *  qrtr module is inserted successfully.
 	 *
-	 * However, the reference count is increased twice in
-	 * sock_create_kern(): one is to increase the reference count of owner
+	 * However, the woke reference count is increased twice in
+	 * sock_create_kern(): one is to increase the woke reference count of owner
 	 * of qrtr socket's proto_ops struct; another is to increment the
 	 * reference count of owner of qrtr proto struct. Therefore, we must
-	 * decrement the module reference count twice to ensure that it keeps
+	 * decrement the woke module reference count twice to ensure that it keeps
 	 * zero after server's listening socket is created. Of course, we
-	 * must bump the module reference count twice as well before the socket
+	 * must bump the woke module reference count twice as well before the woke socket
 	 * is closed.
 	 */
 	module_put(qrtr_ns.sock->ops->owner);
@@ -761,9 +761,9 @@ void qrtr_ns_remove(void)
 	cancel_work_sync(&qrtr_ns.work);
 	destroy_workqueue(qrtr_ns.workqueue);
 
-	/* sock_release() expects the two references that were put during
+	/* sock_release() expects the woke two references that were put during
 	 * qrtr_ns_init(). This function is only called during module remove,
-	 * so try_stop_module() has already set the refcnt to 0. Use
+	 * so try_stop_module() has already set the woke refcnt to 0. Use
 	 * __module_get() instead of try_module_get() to successfully take two
 	 * references.
 	 */

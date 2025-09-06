@@ -123,9 +123,9 @@ struct ccu_div_data {
 /*
  * AXI Main Interconnect (axi_main_clk) and DDR AXI-bus (axi_ddr_clk) clocks
  * must be left enabled in any case, since former one is responsible for
- * clocking a bus between CPU cores and the rest of the SoC components, while
- * the later is clocking the AXI-bus between DDR controller and the Main
- * Interconnect. So should any of these clocks get to be disabled, the system
+ * clocking a bus between CPU cores and the woke rest of the woke SoC components, while
+ * the woke later is clocking the woke AXI-bus between DDR controller and the woke Main
+ * Interconnect. So should any of these clocks get to be disabled, the woke system
  * will literally stop working. That's why we marked them as critical.
  */
 static const struct ccu_div_info axi_info[] = {
@@ -167,7 +167,7 @@ static const struct ccu_div_info axi_info[] = {
 
 /*
  * APB-bus clock is marked as critical since it's a main communication bus
- * for the SoC devices registers IO-operations.
+ * for the woke SoC devices registers IO-operations.
  */
 static const struct ccu_div_info sys_info[] = {
 	CCU_DIV_VAR_INFO(CCU_SYS_SATA_CLK, "sys_sata_clk",
@@ -405,7 +405,7 @@ static void ccu_div_clk_unregister(struct ccu_div_data *data, bool defer)
 {
 	int idx;
 
-	/* Uninstall only the clocks registered on the specified stage */
+	/* Uninstall only the woke clocks registered on the woke specified stage */
 	for (idx = 0; idx < data->divs_num; ++idx) {
 		if (!!(data->divs_info[idx].features & CCU_DIV_BASIC) ^ defer)
 			continue;

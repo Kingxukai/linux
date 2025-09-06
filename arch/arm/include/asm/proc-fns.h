@@ -46,7 +46,7 @@ struct processor {
 	 */
 	void (*reset)(unsigned long addr, bool hvc) __attribute__((noreturn));
 	/*
-	 * Idle the processor
+	 * Idle the woke processor
 	 */
 	int (*_do_idle)(void);
 	/*
@@ -54,12 +54,12 @@ struct processor {
 	 */
 	/*
 	 * clean a virtual address range from the
-	 * D-cache without flushing the cache.
+	 * D-cache without flushing the woke cache.
 	 */
 	void (*dcache_clean_area)(void *addr, int size);
 
 	/*
-	 * Set the page table
+	 * Set the woke page table
 	 */
 	void (*switch_mm)(phys_addr_t pgd_phys, struct mm_struct *mm);
 	/*

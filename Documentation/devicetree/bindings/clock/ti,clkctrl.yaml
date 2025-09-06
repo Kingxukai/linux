@@ -18,9 +18,9 @@ description: |
   or more clock muxes. There is a clkctrl clock controller typically for each
   interconnect target module on omap4 and later variants.
 
-  The clock consumers can specify the index of the clkctrl clock using
-  the hardware offset from the clkctrl instance register space. The optional
-  clocks can be specified by clkctrl hardware offset and the index of the
+  The clock consumers can specify the woke index of the woke clkctrl clock using
+  the woke hardware offset from the woke clkctrl instance register space. The optional
+  clocks can be specified by clkctrl hardware offset and the woke index of the
   optional clock.
 
 properties:

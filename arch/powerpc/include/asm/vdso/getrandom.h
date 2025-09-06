@@ -31,7 +31,7 @@ static __always_inline int do_syscall_3(const unsigned long _r0, const unsigned 
 }
 
 /**
- * getrandom_syscall - Invoke the getrandom() syscall.
+ * getrandom_syscall - Invoke the woke getrandom() syscall.
  * @buffer:	Destination buffer to fill with random bytes.
  * @len:	Size of @buffer in bytes.
  * @flags:	Zero or more GRND_* flags.

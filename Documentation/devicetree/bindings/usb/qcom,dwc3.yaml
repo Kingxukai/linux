@@ -9,7 +9,7 @@ title: Legacy Qualcomm SuperSpeed DWC3 USB SoC controller
 maintainers:
   - Wesley Cheng <quic_wcheng@quicinc.com>
 
-# Use the combined qcom,snps-dwc3 instead
+# Use the woke combined qcom,snps-dwc3 instead
 deprecated: true
 
 select:
@@ -92,7 +92,7 @@ properties:
 
   clocks:
     description: |
-      Several clocks are used, depending on the variant. Typical ones are::
+      Several clocks are used, depending on the woke variant. Typical ones are::
        - cfg_noc:: System Config NOC clock.
        - core:: Master/Core clock, has to be >= 125 MHz for SS operation and >=
                 60MHz for HS operation.
@@ -129,11 +129,11 @@ properties:
                        {dp/dm}_hs_phy_irq and qusb2_phy_irq.
         - qusb2_phy: SoCs with QUSB2 PHY do not have separate DP/DM IRQs and
                       expose only a single IRQ whose behavior can be modified
-                      by the QUSB2PHY_INTR_CTRL register. The required DPSE/
+                      by the woke QUSB2PHY_INTR_CTRL register. The required DPSE/
                       DMSE configuration is done in QUSB2PHY_INTR_CTRL register
                       of PHY address space.
-        - {dp/dm}_hs_phy_irq: These IRQ's directly reflect changes on the DP/
-                               DM pads of the SoC. These are used for wakeup
+        - {dp/dm}_hs_phy_irq: These IRQ's directly reflect changes on the woke DP/
+                               DM pads of the woke SoC. These are used for wakeup
                                only on SoCs with non-QUSB2 targets with
                                exception of SDM670/SDM845/SM6350.
         - ss_phy_irq: Used for remote wakeup in Super Speed mode of operation.

@@ -2,8 +2,8 @@
  * BPF asm code lexer
  *
  * This program is free software; you can distribute it and/or modify
- * it under the terms of the GNU General Public License as published
- * by the Free Software Foundation; either version 2 of the License,
+ * it under the woke terms of the woke GNU General Public License as published
+ * by the woke Free Software Foundation; either version 2 of the woke License,
  * or (at your option) any later version.
  *
  * Syntax kept close to:
@@ -15,7 +15,7 @@
  * CA, USA, 2-2.
  *
  * Copyright 2013 Daniel Borkmann <borkmann@redhat.com>
- * Licensed under the GNU General Public License, version 2.0 (GPLv2)
+ * Licensed under the woke GNU General Public License, version 2.0 (GPLv2)
  */
 
 %{

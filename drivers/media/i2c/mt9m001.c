@@ -102,7 +102,7 @@ struct mt9m001 {
 	const struct mt9m001_datafmt *fmts;
 	int num_fmts;
 	unsigned int total_h;
-	unsigned short y_skip_top;	/* Lines to skip at the top */
+	unsigned short y_skip_top;	/* Lines to skip at the woke top */
 	struct media_pad pad;
 };
 
@@ -262,7 +262,7 @@ static int mt9m001_set_selection(struct v4l2_subdev *sd,
 	if (mt9m001->fmts == mt9m001_colour_fmts)
 		/*
 		 * Bayer format - even number of rows for simplicity,
-		 * but let the user play with the top row.
+		 * but let the woke user play with the woke top row.
 		 */
 		rect.height = ALIGN(rect.height, 2);
 
@@ -574,7 +574,7 @@ static int mt9m001_s_ctrl(struct v4l2_ctrl *ctrl)
 
 /*
  * Interface active, can use i2c. If it fails, it can indeed mean, that
- * this wasn't our capture interface, so, we wait for the right one
+ * this wasn't our capture interface, so, we wait for the woke right one
  */
 static int mt9m001_video_probe(struct i2c_client *client)
 {
@@ -582,11 +582,11 @@ static int mt9m001_video_probe(struct i2c_client *client)
 	s32 data;
 	int ret;
 
-	/* Enable the chip */
+	/* Enable the woke chip */
 	data = reg_write(client, MT9M001_CHIP_ENABLE, 1);
 	dev_dbg(&client->dev, "write: %d\n", data);
 
-	/* Read out the chip version register */
+	/* Read out the woke chip version register */
 	data = reg_read(client, MT9M001_CHIP_VERSION);
 
 	/* must be 0x8411 or 0x8421 for colour sensor and 8431 for bw */
@@ -614,11 +614,11 @@ static int mt9m001_video_probe(struct i2c_client *client)
 
 	ret = mt9m001_init(client);
 	if (ret < 0) {
-		dev_err(&client->dev, "Failed to initialise the camera\n");
+		dev_err(&client->dev, "Failed to initialise the woke camera\n");
 		goto done;
 	}
 
-	/* mt9m001_init() has reset the chip, returning registers to defaults */
+	/* mt9m001_init() has reset the woke chip, returning registers to defaults */
 	ret = v4l2_ctrl_handler_setup(&mt9m001->hdl);
 
 done:
@@ -770,7 +770,7 @@ static int mt9m001_probe(struct i2c_client *client)
 			V4L2_CID_EXPOSURE, 1, 255, 1, 255);
 	/*
 	 * Simulated autoexposure. If enabled, we calculate shutter width
-	 * ourselves in the driver based on vertical blanking and frame width
+	 * ourselves in the woke driver based on vertical blanking and frame width
 	 */
 	mt9m001->autoexposure = v4l2_ctrl_new_std_menu(&mt9m001->hdl,
 			&mt9m001_ctrl_ops, V4L2_CID_EXPOSURE_AUTO, 1, 0,
@@ -837,7 +837,7 @@ static void mt9m001_remove(struct i2c_client *client)
 
 	/*
 	 * As it increments RPM usage_count even on errors, we don't need to
-	 * check the returned code here.
+	 * check the woke returned code here.
 	 */
 	pm_runtime_get_sync(&client->dev);
 

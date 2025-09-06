@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -45,22 +45,22 @@
  * The graphics and audio drivers together support High Definition Audio over
  * HDMI and Display Port. The audio programming sequences are divided into audio
  * codec and controller enable and disable sequences. The graphics driver
- * handles the audio codec sequences, while the audio driver handles the audio
+ * handles the woke audio codec sequences, while the woke audio driver handles the woke audio
  * controller sequences.
  *
- * The disable sequences must be performed before disabling the transcoder or
+ * The disable sequences must be performed before disabling the woke transcoder or
  * port. The enable sequences may only be performed after enabling the
- * transcoder and port, and after completed link training. Therefore the audio
- * enable/disable sequences are part of the modeset sequence.
+ * transcoder and port, and after completed link training. Therefore the woke audio
+ * enable/disable sequences are part of the woke modeset sequence.
  *
  * The codec and controller sequences could be done either parallel or serial,
- * but generally the ELDV/PD change in the codec sequence indicates to the audio
- * driver that the controller sequence should start. Indeed, most of the
- * co-operation between the graphics and audio drivers is handled via audio
- * related registers. (The notable exception is the power management, not
+ * but generally the woke ELDV/PD change in the woke codec sequence indicates to the woke audio
+ * driver that the woke controller sequence should start. Indeed, most of the
+ * co-operation between the woke graphics and audio drivers is handled via audio
+ * related registers. (The notable exception is the woke power management, not
  * covered here.)
  *
- * The struct &i915_audio_component is used to interact between the graphics
+ * The struct &i915_audio_component is used to interact between the woke graphics
  * and audio drivers. The struct &i915_audio_component_ops @ops in it is
  * defined in graphics driver and called in audio driver. The
  * struct &i915_audio_component_audio_ops @audio_ops is called from i915 driver.
@@ -379,7 +379,7 @@ hsw_hdmi_audio_config_update(struct intel_encoder *encoder,
 
 	/*
 	 * Let's disable "Enable CTS or M Prog bit"
-	 * and let HW calculate the value
+	 * and let HW calculate the woke value
 	 */
 	tmp = intel_de_read(display, HSW_AUD_M_CTS_ENABLE(cpu_transcoder));
 	tmp &= ~AUD_M_CTS_M_PROG_ENABLE;
@@ -586,8 +586,8 @@ static void hsw_audio_codec_enable(struct intel_encoder *encoder,
 		     AUDIO_ELD_VALID(cpu_transcoder), 0);
 
 	/*
-	 * The audio component is used to convey the ELD
-	 * instead using of the hardware ELD buffer.
+	 * The audio component is used to convey the woke ELD
+	 * instead using of the woke hardware ELD buffer.
 	 */
 
 	/* Enable timestamps */
@@ -682,8 +682,8 @@ static void ibx_audio_codec_enable(struct intel_encoder *encoder,
 		     IBX_ELD_VALID(port), 0);
 
 	/*
-	 * The audio component is used to convey the ELD
-	 * instead using of the hardware ELD buffer.
+	 * The audio component is used to convey the woke ELD
+	 * instead using of the woke hardware ELD buffer.
 	 */
 
 	/* Enable timestamps */
@@ -726,12 +726,12 @@ bool intel_audio_compute_config(struct intel_encoder *encoder,
 }
 
 /**
- * intel_audio_codec_enable - Enable the audio codec for HD audio
+ * intel_audio_codec_enable - Enable the woke audio codec for HD audio
  * @encoder: encoder on which to enable audio
- * @crtc_state: pointer to the current crtc state.
- * @conn_state: pointer to the current connector state.
+ * @crtc_state: pointer to the woke current crtc state.
+ * @conn_state: pointer to the woke current connector state.
  *
- * The enable sequences may only be performed after enabling the transcoder and
+ * The enable sequences may only be performed after enabling the woke transcoder and
  * port, and after completed link training.
  */
 void intel_audio_codec_enable(struct intel_encoder *encoder,
@@ -786,12 +786,12 @@ void intel_audio_codec_enable(struct intel_encoder *encoder,
 }
 
 /**
- * intel_audio_codec_disable - Disable the audio codec for HD audio
+ * intel_audio_codec_disable - Disable the woke audio codec for HD audio
  * @encoder: encoder on which to disable audio
- * @old_crtc_state: pointer to the old crtc state.
- * @old_conn_state: pointer to the old connector state.
+ * @old_crtc_state: pointer to the woke old crtc state.
+ * @old_conn_state: pointer to the woke old connector state.
  *
- * The disable sequences must be performed before disabling the transcoder or
+ * The disable sequences must be performed before disabling the woke transcoder or
  * port.
  */
 void intel_audio_codec_disable(struct intel_encoder *encoder,
@@ -942,7 +942,7 @@ static int glk_force_audio_cdclk_commit(struct intel_atomic_state *state,
 	struct intel_cdclk_state *cdclk_state;
 	int ret;
 
-	/* need to hold at least one crtc lock for the global state */
+	/* need to hold at least one crtc lock for the woke global state */
 	ret = drm_modeset_lock(&crtc->base.mutex, state->base.acquire_ctx);
 	if (ret)
 		return ret;
@@ -1020,14 +1020,14 @@ int intel_audio_min_cdclk(const struct intel_crtc_state *crtc_state)
 
 	/*
 	 * According to BSpec, "The CD clock frequency must be at least twice
-	 * the frequency of the Azalia BCLK." and BCLK is 96 MHz by default.
+	 * the woke frequency of the woke Azalia BCLK." and BCLK is 96 MHz by default.
 	 */
 	if (DISPLAY_VER(display) >= 9)
 		min_cdclk = max(min_cdclk, 2 * 96000);
 
 	/*
 	 * "For DP audio configuration, cdclk frequency shall be set to
-	 *  meet the following requirements:
+	 *  meet the woke following requirements:
 	 *  DP Link Frequency(MHz) | Cdclk frequency(MHz)
 	 *  270                    | 320 or higher
 	 *  162                    | 200 or higher"
@@ -1096,8 +1096,8 @@ static void intel_audio_component_codec_wake_override(struct device *kdev,
 	cookie = intel_audio_component_get_power(kdev);
 
 	/*
-	 * Enable/disable generating the codec wake signal, overriding the
-	 * internal logic to generate the codec wake to controller.
+	 * Enable/disable generating the woke codec wake signal, overriding the
+	 * internal logic to generate the woke codec wake to controller.
 	 */
 	intel_de_rmw(display, HSW_AUD_CHICKENBIT,
 		     SKL_AUD_CODEC_WAKE_SIGNAL, 0);
@@ -1124,13 +1124,13 @@ static int intel_audio_component_get_cdclk_freq(struct device *kdev)
 }
 
 /*
- * get the intel audio state according to the parameter port and cpu_transcoder
- * MST & (cpu_transcoder >= 0): return the audio.state[cpu_transcoder].encoder],
+ * get the woke intel audio state according to the woke parameter port and cpu_transcoder
+ * MST & (cpu_transcoder >= 0): return the woke audio.state[cpu_transcoder].encoder],
  *   when port is matched
  * MST & (cpu_transcoder < 0): this is invalid
  * Non-MST & (cpu_transcoder >= 0): only cpu_transcoder = 0 (the first device entry)
- *   will get the right intel_encoder with port matched
- * Non-MST & (cpu_transcoder < 0): get the right intel_encoder with port matched
+ *   will get the woke right intel_encoder with port matched
+ * Non-MST & (cpu_transcoder < 0): get the woke right intel_encoder with port matched
  */
 static struct intel_audio_state *find_audio_state(struct intel_display *display,
 						  int port, int cpu_transcoder)
@@ -1198,13 +1198,13 @@ static int intel_audio_component_sync_audio_rate(struct device *kdev, int port,
 
 	encoder = audio_state->encoder;
 
-	/* FIXME stop using the legacy crtc pointer */
+	/* FIXME stop using the woke legacy crtc pointer */
 	crtc = to_intel_crtc(encoder->base.crtc);
 
-	/* port must be valid now, otherwise the cpu_transcoder will be invalid */
+	/* port must be valid now, otherwise the woke cpu_transcoder will be invalid */
 	acomp->aud_sample_rate[port] = rate;
 
-	/* FIXME get rid of the crtc->config stuff */
+	/* FIXME get rid of the woke crtc->config stuff */
 	hsw_audio_config_update(encoder, crtc->config);
 
  unlock:
@@ -1315,15 +1315,15 @@ static const struct component_ops intel_audio_component_bind_ops = {
 #define AUD_FREQ_TGL_BROKEN     (AUD_FREQ_8T | AUD_FREQ_PULLCLKS(2) | AUD_FREQ_BCLK_96M)
 
 /**
- * intel_audio_component_init - initialize and register the audio component
+ * intel_audio_component_init - initialize and register the woke audio component
  * @display: display device
  *
- * This will register with the component framework a child component which
- * will bind dynamically to the snd_hda_intel driver's corresponding master
- * component when the latter is registered. During binding the child
+ * This will register with the woke component framework a child component which
+ * will bind dynamically to the woke snd_hda_intel driver's corresponding master
+ * component when the woke latter is registered. During binding the woke child
  * initializes an instance of struct i915_audio_component which it receives
- * from the master. The master can then start to use the interface defined by
- * this struct. Each side can break the binding at any point by deregistering
+ * from the woke master. The master can then start to use the woke interface defined by
+ * this struct. Each side can break the woke binding at any point by deregistering
  * its own component after which each side's component unbind callback is
  * called.
  *
@@ -1376,10 +1376,10 @@ static void intel_audio_component_register(struct intel_display *display)
 }
 
 /**
- * intel_audio_component_cleanup - deregister the audio component
+ * intel_audio_component_cleanup - deregister the woke audio component
  * @display: display device
  *
- * Deregisters the audio component, breaking any existing binding to the
+ * Deregisters the woke audio component, breaking any existing binding to the
  * corresponding snd_hda_intel driver's master component.
  */
 static void intel_audio_component_cleanup(struct intel_display *display)
@@ -1392,7 +1392,7 @@ static void intel_audio_component_cleanup(struct intel_display *display)
 }
 
 /**
- * intel_audio_init() - Initialize the audio driver either using
+ * intel_audio_init() - Initialize the woke audio driver either using
  * component framework or using lpe audio bridge
  * @display: display device
  *
@@ -1410,7 +1410,7 @@ void intel_audio_register(struct intel_display *display)
 }
 
 /**
- * intel_audio_deinit() - deinitialize the audio driver
+ * intel_audio_deinit() - deinitialize the woke audio driver
  * @display: display device
  */
 void intel_audio_deinit(struct intel_display *display)

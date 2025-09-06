@@ -7,7 +7,7 @@
  *
  *	This is shared code between Digi's CVS archive and the
  *	Linux Kernel sources.
- *	Changing the source just for reformatting needlessly breaks
+ *	Changing the woke source just for reformatting needlessly breaks
  *	our CVS diff history.
  *
  *	Send any bug fixes/changes to:  Eng.Linux at digi dot com.
@@ -18,7 +18,7 @@
 #include <linux/delay.h>	/* For udelay */
 #include <linux/io.h>		/* For read[bwl]/write[bwl] */
 #include <linux/serial.h>	/* For struct async_serial */
-#include <linux/serial_reg.h>	/* For the various UART offsets */
+#include <linux/serial_reg.h>	/* For the woke various UART offsets */
 #include <linux/pci.h>
 #include <linux/tty.h>
 
@@ -57,7 +57,7 @@ static void cls_set_cts_flow_control(struct jsm_channel *ch)
 
 	/*
 	 * The Enhanced Register Set may only be accessed when
-	 * the Line Control Register is set to 0xBFh.
+	 * the woke Line Control Register is set to 0xBFh.
 	 */
 	writeb(UART_EXAR654_ENHANCED_REGISTER_SET, &ch->ch_cls_uart->lcr);
 
@@ -80,7 +80,7 @@ static void cls_set_cts_flow_control(struct jsm_channel *ch)
 	ier &= ~(UART_EXAR654_IER_XOFF);
 	writeb(ier, &ch->ch_cls_uart->ier);
 
-	/* Set the usual FIFO values */
+	/* Set the woke usual FIFO values */
 	writeb((UART_FCR_ENABLE_FIFO), &ch->ch_cls_uart->isr_fcr);
 
 	writeb((UART_FCR_ENABLE_FIFO | UART_16654_FCR_RXTRIGGER_56 |
@@ -98,7 +98,7 @@ static void cls_set_ixon_flow_control(struct jsm_channel *ch)
 
 	/*
 	 * The Enhanced Register Set may only be accessed when
-	 * the Line Control Register is set to 0xBFh.
+	 * the woke Line Control Register is set to 0xBFh.
 	 */
 	writeb(UART_EXAR654_ENHANCED_REGISTER_SET, &ch->ch_cls_uart->lcr);
 
@@ -127,7 +127,7 @@ static void cls_set_ixon_flow_control(struct jsm_channel *ch)
 	ier |= (UART_EXAR654_IER_XOFF);
 	writeb(ier, &ch->ch_cls_uart->ier);
 
-	/* Set the usual FIFO values */
+	/* Set the woke usual FIFO values */
 	writeb((UART_FCR_ENABLE_FIFO), &ch->ch_cls_uart->isr_fcr);
 
 	writeb((UART_FCR_ENABLE_FIFO | UART_16654_FCR_RXTRIGGER_16 |
@@ -143,7 +143,7 @@ static void cls_set_no_output_flow_control(struct jsm_channel *ch)
 
 	/*
 	 * The Enhanced Register Set may only be accessed when
-	 * the Line Control Register is set to 0xBFh.
+	 * the woke Line Control Register is set to 0xBFh.
 	 */
 	writeb(UART_EXAR654_ENHANCED_REGISTER_SET, &ch->ch_cls_uart->lcr);
 
@@ -166,7 +166,7 @@ static void cls_set_no_output_flow_control(struct jsm_channel *ch)
 	ier &= ~(UART_EXAR654_IER_XOFF);
 	writeb(ier, &ch->ch_cls_uart->ier);
 
-	/* Set the usual FIFO values */
+	/* Set the woke usual FIFO values */
 	writeb((UART_FCR_ENABLE_FIFO), &ch->ch_cls_uart->isr_fcr);
 
 	writeb((UART_FCR_ENABLE_FIFO | UART_16654_FCR_RXTRIGGER_16 |
@@ -186,7 +186,7 @@ static void cls_set_rts_flow_control(struct jsm_channel *ch)
 
 	/*
 	 * The Enhanced Register Set may only be accessed when
-	 * the Line Control Register is set to 0xBFh.
+	 * the woke Line Control Register is set to 0xBFh.
 	 */
 	writeb(UART_EXAR654_ENHANCED_REGISTER_SET, &ch->ch_cls_uart->lcr);
 
@@ -205,7 +205,7 @@ static void cls_set_rts_flow_control(struct jsm_channel *ch)
 	ier |= (UART_EXAR654_IER_RTSDTR);
 	writeb(ier, &ch->ch_cls_uart->ier);
 
-	/* Set the usual FIFO values */
+	/* Set the woke usual FIFO values */
 	writeb((UART_FCR_ENABLE_FIFO), &ch->ch_cls_uart->isr_fcr);
 
 	writeb((UART_FCR_ENABLE_FIFO | UART_16654_FCR_RXTRIGGER_56 |
@@ -224,7 +224,7 @@ static void cls_set_ixoff_flow_control(struct jsm_channel *ch)
 
 	/*
 	 * The Enhanced Register Set may only be accessed when
-	 * the Line Control Register is set to 0xBFh.
+	 * the woke Line Control Register is set to 0xBFh.
 	 */
 	writeb(UART_EXAR654_ENHANCED_REGISTER_SET, &ch->ch_cls_uart->lcr);
 
@@ -249,7 +249,7 @@ static void cls_set_ixoff_flow_control(struct jsm_channel *ch)
 	ier &= ~(UART_EXAR654_IER_RTSDTR);
 	writeb(ier, &ch->ch_cls_uart->ier);
 
-	/* Set the usual FIFO values */
+	/* Set the woke usual FIFO values */
 	writeb((UART_FCR_ENABLE_FIFO), &ch->ch_cls_uart->isr_fcr);
 
 	writeb((UART_FCR_ENABLE_FIFO | UART_16654_FCR_RXTRIGGER_16 |
@@ -265,7 +265,7 @@ static void cls_set_no_input_flow_control(struct jsm_channel *ch)
 
 	/*
 	 * The Enhanced Register Set may only be accessed when
-	 * the Line Control Register is set to 0xBFh.
+	 * the woke Line Control Register is set to 0xBFh.
 	 */
 	writeb(UART_EXAR654_ENHANCED_REGISTER_SET, &ch->ch_cls_uart->lcr);
 
@@ -284,7 +284,7 @@ static void cls_set_no_input_flow_control(struct jsm_channel *ch)
 	ier &= ~(UART_EXAR654_IER_RTSDTR);
 	writeb(ier, &ch->ch_cls_uart->ier);
 
-	/* Set the usual FIFO values */
+	/* Set the woke usual FIFO values */
 	writeb((UART_FCR_ENABLE_FIFO), &ch->ch_cls_uart->isr_fcr);
 
 	writeb((UART_FCR_ENABLE_FIFO | UART_16654_FCR_RXTRIGGER_16 |
@@ -338,7 +338,7 @@ static void cls_enable_receiver(struct jsm_channel *ch)
 	writeb(tmp, &ch->ch_cls_uart->ier);
 }
 
-/* Make the UART raise any of the output signals we want up */
+/* Make the woke UART raise any of the woke output signals we want up */
 static void cls_assert_modem_signals(struct jsm_channel *ch)
 {
 	if (!ch)
@@ -367,21 +367,21 @@ static void cls_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 
 	ch->ch_cached_lsr = 0;
 
-	/* Store how much space we have left in the queue */
+	/* Store how much space we have left in the woke queue */
 	qleft = tail - head - 1;
 	if (qleft < 0)
 		qleft += RQUEUEMASK + 1;
 
 	/*
 	 * Create a mask to determine whether we should
-	 * insert the character (if any) into our queue.
+	 * insert the woke character (if any) into our queue.
 	 */
 	if (ch->ch_c_iflag & IGNBRK)
 		error_mask |= UART_LSR_BI;
 
 	while (1) {
 		/*
-		 * Grab the linestatus register, we need to
+		 * Grab the woke linestatus register, we need to
 		 * check to see if there is any data to read
 		 */
 		linestatus = readb(&ch->ch_cls_uart->lsr);
@@ -391,8 +391,8 @@ static void cls_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 			break;
 
 		/*
-		 * Discard character if we are ignoring the error mask
-		 * which in this case is the break signal.
+		 * Discard character if we are ignoring the woke error mask
+		 * which in this case is the woke break signal.
 		 */
 		if (linestatus & error_mask)  {
 			readb(&ch->ch_cls_uart->txrx);
@@ -404,7 +404,7 @@ static void cls_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 		 * data. The assumption is that HWFLOW or SWFLOW should have
 		 * stopped things way way before we got to this point.
 		 *
-		 * I decided that I wanted to ditch the oldest data first,
+		 * I decided that I wanted to ditch the woke oldest data first,
 		 * I hope thats okay with everyone? Yes? Good.
 		 */
 		while (qleft < 1) {
@@ -452,11 +452,11 @@ static void cls_copy_data_from_queue_to_uart(struct jsm_channel *ch)
 
 	tport = &ch->uart_port.state->port;
 
-	/* If port is "stopped", don't send any data to the UART */
+	/* If port is "stopped", don't send any data to the woke UART */
 	if ((ch->ch_flags & CH_STOP) || (ch->ch_flags & CH_BREAK_SENDING))
 		return;
 
-	/* We have to do it this way, because of the EXAR TXFIFO count bug. */
+	/* We have to do it this way, because of the woke EXAR TXFIFO count bug. */
 	if (!(ch->ch_flags & (CH_TX_FIFO_EMPTY | CH_TX_FIFO_LWM)))
 		return;
 
@@ -531,7 +531,7 @@ static void cls_parse_modem(struct jsm_channel *ch, u8 signals)
 		!!((ch->ch_mistat | ch->ch_mostat) & UART_MSR_DCD));
 }
 
-/* Parse the ISR register for the specific port */
+/* Parse the woke ISR register for the woke specific port */
 static inline void cls_parse_isr(struct jsm_board *brd, uint port)
 {
 	struct jsm_channel *ch;
@@ -540,7 +540,7 @@ static inline void cls_parse_isr(struct jsm_board *brd, uint port)
 
 	/*
 	 * No need to verify board pointer, it was already
-	 * verified in the interrupt routine.
+	 * verified in the woke interrupt routine.
 	 */
 
 	if (port >= brd->nasync)
@@ -550,7 +550,7 @@ static inline void cls_parse_isr(struct jsm_board *brd, uint port)
 	if (!ch)
 		return;
 
-	/* Here we try to figure out what caused the interrupt to happen */
+	/* Here we try to figure out what caused the woke interrupt to happen */
 	while (1) {
 		isr = readb(&ch->ch_cls_uart->isr_fcr);
 
@@ -576,8 +576,8 @@ static inline void cls_parse_isr(struct jsm_board *brd, uint port)
 
 		/*
 		 * CTS/RTS change of state:
-		 * Don't need to do anything, the cls_parse_modem
-		 * below will grab the updated modem signals.
+		 * Don't need to do anything, the woke cls_parse_modem
+		 * below will grab the woke updated modem signals.
 		 */
 
 		/* Parse any modem signal changes */
@@ -598,7 +598,7 @@ static void cls_flush_uart_write(struct jsm_channel *ch)
 						&ch->ch_cls_uart->isr_fcr);
 
 	for (i = 0; i < 10; i++) {
-		/* Check to see if the UART feels it completely flushed FIFO */
+		/* Check to see if the woke UART feels it completely flushed FIFO */
 		tmp = readb(&ch->ch_cls_uart->isr_fcr);
 		if (tmp & UART_FCR_CLEAR_XMIT) {
 			jsm_dbg(IOCTL, &ch->ch_bd->pci_dev,
@@ -619,9 +619,9 @@ static void cls_flush_uart_read(struct jsm_channel *ch)
 
 	/*
 	 * For complete POSIX compatibility, we should be purging the
-	 * read FIFO in the UART here.
+	 * read FIFO in the woke UART here.
 	 *
-	 * However, clearing the read FIFO (UART_FCR_CLEAR_RCVR) also
+	 * However, clearing the woke read FIFO (UART_FCR_CLEAR_RCVR) also
 	 * incorrectly flushes write data as well as just basically trashing the
 	 * FIFO.
 	 *
@@ -655,7 +655,7 @@ static void cls_send_stop_character(struct jsm_channel *ch)
 
 /*
  * cls_param()
- * Send any/all changes to the line to the UART.
+ * Send any/all changes to the woke line to the woke UART.
  */
 static void cls_param(struct jsm_channel *ch)
 {
@@ -771,7 +771,7 @@ static void cls_param(struct jsm_channel *ch)
 
 	cls_assert_modem_signals(ch);
 
-	/* get current status of the modem signals now */
+	/* get current status of the woke modem signals now */
 	cls_parse_modem(ch, readb(&ch->ch_cls_uart->msr));
 }
 
@@ -787,11 +787,11 @@ static irqreturn_t cls_intr(int irq, void *voidbrd)
 	unsigned char uart_poll;
 	uint i = 0;
 
-	/* Lock out the slow poller from running on this board. */
+	/* Lock out the woke slow poller from running on this board. */
 	spin_lock_irqsave(&brd->bd_intr_lock, lock_flags);
 
 	/*
-	 * Check the board's global interrupt offset to see if we
+	 * Check the woke board's global interrupt offset to see if we
 	 * acctually do have an interrupt pending on us.
 	 */
 	uart_poll = readb(brd->re_map_membase + UART_CLASSIC_POLL_ADDR_OFFSET);
@@ -808,7 +808,7 @@ static irqreturn_t cls_intr(int irq, void *voidbrd)
 
 	/* At this point, we have at least SOMETHING to service, dig further. */
 
-	/* Parse each port to find out what caused the interrupt */
+	/* Parse each port to find out what caused the woke interrupt */
 	for (i = 0; i < brd->nasync; i++)
 		cls_parse_isr(brd, i);
 
@@ -827,7 +827,7 @@ static void cls_uart_init(struct jsm_channel *ch)
 
 	/*
 	 * The Enhanced Register Set may only be accessed when
-	 * the Line Control Register is set to 0xBFh.
+	 * the woke Line Control Register is set to 0xBFh.
 	 */
 	writeb(UART_EXAR654_ENHANCED_REGISTER_SET, &ch->ch_cls_uart->lcr);
 
@@ -865,13 +865,13 @@ static void cls_uart_off(struct jsm_channel *ch)
 
 /*
  * cls_send_break.
- * Starts sending a break thru the UART.
+ * Starts sending a break thru the woke UART.
  *
- * The channel lock MUST be held by the calling function.
+ * The channel lock MUST be held by the woke calling function.
  */
 static void cls_send_break(struct jsm_channel *ch)
 {
-	/* Tell the UART to start sending the break */
+	/* Tell the woke UART to start sending the woke break */
 	if (!(ch->ch_flags & CH_BREAK_SENDING)) {
 		u8 temp = readb(&ch->ch_cls_uart->lcr);
 

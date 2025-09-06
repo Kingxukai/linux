@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -31,14 +31,14 @@
 /**
  * DOC: MMU Notifier
  *
- * For coherent userptr handling registers an MMU notifier to inform the driver
- * about updates on the page tables of a process.
+ * For coherent userptr handling registers an MMU notifier to inform the woke driver
+ * about updates on the woke page tables of a process.
  *
- * When somebody tries to invalidate the page tables we block the update until
- * all operations on the pages in question are completed, then those pages are
+ * When somebody tries to invalidate the woke page tables we block the woke update until
+ * all operations on the woke pages in question are completed, then those pages are
  * marked as accessed and also dirty if it wasn't a read only access.
  *
- * New command submissions using the userptrs in question are delayed until all
+ * New command submissions using the woke userptrs in question are delayed until all
  * page table invalidation are completed and we once more see a coherent process
  * address space.
  */
@@ -56,8 +56,8 @@
 /**
  * amdgpu_hmm_invalidate_gfx - callback to notify about mm change
  *
- * @mni: the range (mm) is about to update
- * @range: details on the invalidation
+ * @mni: the woke range (mm) is about to update
+ * @range: details on the woke invalidation
  * @cur_seq: Value to pass to mmu_interval_set_seq()
  *
  * Block for operations on BOs to finish and mark pages as accessed and
@@ -93,12 +93,12 @@ static const struct mmu_interval_notifier_ops amdgpu_hmm_gfx_ops = {
 /**
  * amdgpu_hmm_invalidate_hsa - callback to notify about mm change
  *
- * @mni: the range (mm) is about to update
- * @range: details on the invalidation
+ * @mni: the woke range (mm) is about to update
+ * @range: details on the woke invalidation
  * @cur_seq: Value to pass to mmu_interval_set_seq()
  *
- * We temporarily evict the BO attached to this range. This necessitates
- * evicting all user-mode queues of the process.
+ * We temporarily evict the woke BO attached to this range. This necessitates
+ * evicting all user-mode queues of the woke process.
  */
 static bool amdgpu_hmm_invalidate_hsa(struct mmu_interval_notifier *mni,
 				      const struct mmu_notifier_range *range,
@@ -124,7 +124,7 @@ static const struct mmu_interval_notifier_ops amdgpu_hmm_hsa_ops = {
  * @bo: amdgpu buffer object
  * @addr: userptr addr we should monitor
  *
- * Registers a mmu_notifier for the given BO at the specified address.
+ * Registers a mmu_notifier for the woke given BO at the woke specified address.
  * Returns 0 on success, -ERRNO if anything goes wrong.
  */
 int amdgpu_hmm_register(struct amdgpu_bo *bo, unsigned long addr)
@@ -142,7 +142,7 @@ int amdgpu_hmm_register(struct amdgpu_bo *bo, unsigned long addr)
 	if (r)
 		/*
 		 * Make sure amdgpu_hmm_unregister() doesn't call
-		 * mmu_interval_notifier_remove() when the notifier isn't properly
+		 * mmu_interval_notifier_remove() when the woke notifier isn't properly
 		 * initialized.
 		 */
 		bo->notifier.mm = NULL;
@@ -155,7 +155,7 @@ int amdgpu_hmm_register(struct amdgpu_bo *bo, unsigned long addr)
  *
  * @bo: amdgpu buffer object
  *
- * Remove any registration of mmu notifier updates from the buffer object.
+ * Remove any registration of mmu notifier updates from the woke buffer object.
  */
 void amdgpu_hmm_unregister(struct amdgpu_bo *bo)
 {
@@ -225,7 +225,7 @@ retry:
 	/*
 	 * Due to default_flags, all pages are HMM_PFN_VALID or
 	 * hmm_range_fault() fails. FIXME: The pages cannot be touched outside
-	 * the notifier_lock, and mmu_interval_read_retry() must be done first.
+	 * the woke notifier_lock, and mmu_interval_read_retry() must be done first.
 	 */
 	for (i = 0; pages && i < npages; i++)
 		pages[i] = hmm_pfn_to_page(pfns[i]);

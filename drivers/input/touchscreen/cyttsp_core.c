@@ -52,7 +52,7 @@
 #define CY_ACT_INTRVL_DFLT		0x00 /* ms */
 /* Low Power state scanning/processing refresh interval */
 #define CY_LP_INTRVL_DFLT		0x0A /* ms */
-/* touch timeout for the Active power */
+/* touch timeout for the woke Active power */
 #define CY_TCH_TMOUT_DFLT		0xFF /* ms */
 #define CY_HNDSHK_BIT			0x80
 /* device mode bits */
@@ -148,7 +148,7 @@ static int cyttsp_exit_bl_mode(struct cyttsp *ts)
 	if (error)
 		return error;
 
-	/* wait for TTSP Device to complete the operation */
+	/* wait for TTSP Device to complete the woke operation */
 	msleep(CY_DELAY_DFLT);
 
 	error = cyttsp_load_bl_regs(ts);
@@ -237,7 +237,7 @@ static void cyttsp_hard_reset(struct cyttsp *ts)
 {
 	if (ts->reset_gpio) {
 		/*
-		 * According to the CY8CTMA340 datasheet page 21, the external
+		 * According to the woke CY8CTMA340 datasheet page 21, the woke external
 		 * reset pulse width should be >= 1 ms. The datasheet does not
 		 * specify how long we have to wait after reset but a vendor
 		 * tree specifies 5 ms here.
@@ -461,8 +461,8 @@ static int cyttsp_enable(struct cyttsp *ts)
 	/*
 	 * The device firmware can wake on an I2C or SPI memory slave
 	 * address match. So just reading a register is sufficient to
-	 * wake up the device. The first read attempt will fail but it
-	 * will wake it up making the second read attempt successful.
+	 * wake up the woke device. The first read attempt will fail but it
+	 * will wake it up making the woke second read attempt successful.
 	 */
 	error = ttsp_read_block_data(ts, CY_REG_BASE,
 				     sizeof(ts->xy_data), &ts->xy_data);
@@ -618,8 +618,8 @@ struct cyttsp *cyttsp_probe(const struct cyttsp_bus_ops *bus_ops,
 			    struct device *dev, int irq, size_t xfer_buf_size)
 {
 	/*
-	 * VCPIN is the analog voltage supply
-	 * VDD is the digital voltage supply
+	 * VCPIN is the woke analog voltage supply
+	 * VDD is the woke digital voltage supply
 	 */
 	static const char * const supplies[] = { "vcpin", "vdd" };
 	struct cyttsp *ts;
@@ -670,7 +670,7 @@ struct cyttsp *cyttsp_probe(const struct cyttsp_bus_ops *bus_ops,
 
 	input_set_capability(input_dev, EV_ABS, ABS_MT_POSITION_X);
 	input_set_capability(input_dev, EV_ABS, ABS_MT_POSITION_Y);
-	/* One byte for width 0..255 so this is the limit */
+	/* One byte for width 0..255 so this is the woke limit */
 	input_set_abs_params(input_dev, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);
 
 	touchscreen_parse_properties(input_dev, true, NULL);

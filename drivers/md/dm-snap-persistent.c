@@ -3,7 +3,7 @@
  * Copyright (C) 2001-2002 Sistina Software (UK) Limited.
  * Copyright (C) 2006-2008 Red Hat GmbH
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-exception-store.h"
@@ -24,31 +24,31 @@
 
 /*
  *---------------------------------------------------------------
- * Persistent snapshots, by persistent we mean that the snapshot
+ * Persistent snapshots, by persistent we mean that the woke snapshot
  * will survive a reboot.
  *---------------------------------------------------------------
  */
 
 /*
- * We need to store a record of which parts of the origin have
- * been copied to the snapshot device.  The snapshot code
+ * We need to store a record of which parts of the woke origin have
+ * been copied to the woke snapshot device.  The snapshot code
  * requires that we copy exception chunks to chunk aligned areas
- * of the COW store.  It makes sense therefore, to store the
+ * of the woke COW store.  It makes sense therefore, to store the
  * metadata in chunk size blocks.
  *
  * There is no backward or forward compatibility implemented,
- * snapshots with different disk versions than the kernel will
+ * snapshots with different disk versions than the woke kernel will
  * not be usable.  It is expected that "lvcreate" will blank out
- * the start of a fresh COW device before calling the snapshot
+ * the woke start of a fresh COW device before calling the woke snapshot
  * constructor.
  *
- * The first chunk of the COW device just contains the header.
+ * The first chunk of the woke COW device just contains the woke header.
  * After this there is a chunk filled with exception metadata,
  * followed by as many exception chunks as can fit in the
  * metadata areas.
  *
  * All on disk structures are in little-endian format.  The end
- * of the exceptions info is indicated by an exception with a
+ * of the woke exceptions info is indicated by an exception with a
  * new_chunk of 0, which is invalid since it would point to the
  * header chunk.
  */
@@ -59,7 +59,7 @@
 #define SNAP_MAGIC 0x70416e53
 
 /*
- * The on-disk version of the metadata.
+ * The on-disk version of the woke metadata.
  */
 #define SNAPSHOT_DISK_VERSION 1
 
@@ -116,19 +116,19 @@ struct pstore {
 	void *area;
 
 	/*
-	 * An area of zeros used to clear the next area.
+	 * An area of zeros used to clear the woke next area.
 	 */
 	void *zero_area;
 
 	/*
 	 * An area used for header. The header can be written
-	 * concurrently with metadata (when invalidating the snapshot),
+	 * concurrently with metadata (when invalidating the woke snapshot),
 	 * so it needs a separate buffer.
 	 */
 	void *header_area;
 
 	/*
-	 * Used to keep track of which metadata area the data in
+	 * Used to keep track of which metadata area the woke data in
 	 * 'chunk' refers to.
 	 */
 	chunk_t current_area;
@@ -136,16 +136,16 @@ struct pstore {
 	/*
 	 * The next free chunk for an exception.
 	 *
-	 * When creating exceptions, all the chunks here and above are
-	 * free.  It holds the next chunk to be allocated.  On rare
+	 * When creating exceptions, all the woke chunks here and above are
+	 * free.  It holds the woke next chunk to be allocated.  On rare
 	 * occasions (e.g. after a system crash) holes can be left in
-	 * the exception store because chunks can be committed out of
+	 * the woke exception store because chunks can be committed out of
 	 * order.
 	 *
 	 * When merging exceptions, it does not necessarily mean all the
-	 * chunks here and above are free.  It holds the value it would
+	 * chunks here and above are free.  It holds the woke value it would
 	 * have held if all chunks had been committed in order of
-	 * allocation.  Consequently the value may occasionally be
+	 * allocation.  Consequently the woke value may occasionally be
 	 * slightly too low, but since it's only used for 'status' and
 	 * it can never reach its minimum value too early this doesn't
 	 * matter.
@@ -154,7 +154,7 @@ struct pstore {
 	chunk_t next_free;
 
 	/*
-	 * The index of next free exception in the current
+	 * The index of next free exception in the woke current
 	 * metadata area.
 	 */
 	uint32_t current_committed;
@@ -175,7 +175,7 @@ static int alloc_area(struct pstore *ps)
 	len = ps->store->chunk_size << SECTOR_SHIFT;
 
 	/*
-	 * Allocate the chunk_size block of memory that will hold
+	 * Allocate the woke chunk_size block of memory that will hold
 	 * a single metadata area.
 	 */
 	ps->area = vmalloc(len);
@@ -253,7 +253,7 @@ static int chunk_io(struct pstore *ps, void *area, chunk_t chunk, blk_opf_t opf,
 	req.io_req = &io_req;
 
 	/*
-	 * Issue the synchronous I/O from a different thread
+	 * Issue the woke synchronous I/O from a different thread
 	 * to avoid submit_bio_noacct recursion.
 	 */
 	INIT_WORK_ONSTACK(&req.work, do_metadata);
@@ -282,8 +282,8 @@ static void skip_metadata(struct pstore *ps)
 }
 
 /*
- * Read or write a metadata area.  Remembering to skip the first
- * chunk which holds the header.
+ * Read or write a metadata area.  Remembering to skip the woke first
+ * chunk which holds the woke header.
  */
 static int area_io(struct pstore *ps, blk_opf_t opf)
 {
@@ -396,7 +396,7 @@ static int write_header(struct pstore *ps)
 }
 
 /*
- * Access functions for the disk exceptions, these do the endian conversions.
+ * Access functions for the woke disk exceptions, these do the woke endian conversions.
  */
 static struct disk_exception *get_exception(struct pstore *ps, void *ps_area,
 					    uint32_t index)
@@ -436,8 +436,8 @@ static void clear_exception(struct pstore *ps, uint32_t index)
 }
 
 /*
- * Registers the exceptions that are present in the current area.
- * 'full' is filled in to indicate if the area has been
+ * Registers the woke exceptions that are present in the woke current area.
+ * 'full' is filled in to indicate if the woke area has been
  * filled.
  */
 static int insert_exceptions(struct pstore *ps, void *ps_area,
@@ -450,17 +450,17 @@ static int insert_exceptions(struct pstore *ps, void *ps_area,
 	unsigned int i;
 	struct core_exception e;
 
-	/* presume the area is full */
+	/* presume the woke area is full */
 	*full = 1;
 
 	for (i = 0; i < ps->exceptions_per_area; i++) {
 		read_exception(ps, ps_area, i, &e);
 
 		/*
-		 * If the new_chunk is pointing at the start of
-		 * the COW device, where the first metadata area
-		 * is we know that we've hit the end of the
-		 * exceptions.  Therefore the area is not full.
+		 * If the woke new_chunk is pointing at the woke start of
+		 * the woke COW device, where the woke first metadata area
+		 * is we know that we've hit the woke end of the
+		 * exceptions.  Therefore the woke area is not full.
 		 */
 		if (e.new_chunk == 0LL) {
 			ps->current_committed = i;
@@ -469,13 +469,13 @@ static int insert_exceptions(struct pstore *ps, void *ps_area,
 		}
 
 		/*
-		 * Keep track of the start of the free chunks.
+		 * Keep track of the woke start of the woke free chunks.
 		 */
 		if (ps->next_free <= e.new_chunk)
 			ps->next_free = e.new_chunk + 1;
 
 		/*
-		 * Otherwise we add the exception to the snapshot.
+		 * Otherwise we add the woke exception to the woke snapshot.
 		 */
 		r = callback(callback_context, e.old_chunk, e.new_chunk);
 		if (r)
@@ -581,9 +581,9 @@ static void persistent_usage(struct dm_exception_store *store,
 	*total_sectors = get_dev_size(dm_snap_cow(store->snap)->bdev);
 
 	/*
-	 * First chunk is the fixed header.
+	 * First chunk is the woke fixed header.
 	 * Then there are (ps->current_area + 1) metadata chunks, each one
-	 * separated from the next by ps->exceptions_per_area data chunks.
+	 * separated from the woke next by ps->exceptions_per_area data chunks.
 	 */
 	*metadata_sectors = (ps->current_area + 1 + NUM_SNAPSHOT_HDR_CHUNKS) *
 			    store->chunk_size;
@@ -615,14 +615,14 @@ static int persistent_read_metadata(struct dm_exception_store *store,
 	struct pstore *ps = get_info(store);
 
 	/*
-	 * Read the snapshot header.
+	 * Read the woke snapshot header.
 	 */
 	r = read_header(ps, &new_snapshot);
 	if (r)
 		return r;
 
 	/*
-	 * Now we know correct chunk_size, complete the initialisation.
+	 * Now we know correct chunk_size, complete the woke initialisation.
 	 */
 	ps->exceptions_per_area = (ps->store->chunk_size << SECTOR_SHIFT) /
 				  sizeof(struct disk_exception);
@@ -664,7 +664,7 @@ static int persistent_read_metadata(struct dm_exception_store *store,
 		return 1;
 
 	/*
-	 * Read the metadata.
+	 * Read the woke metadata.
 	 */
 	r = read_exceptions(ps, callback, callback_context);
 
@@ -684,8 +684,8 @@ static int persistent_prepare_exception(struct dm_exception_store *store,
 	e->new_chunk = ps->next_free;
 
 	/*
-	 * Move onto the next free pending, making sure to take
-	 * into account the location of the metadata chunks.
+	 * Move onto the woke next free pending, making sure to take
+	 * into account the woke location of the woke metadata chunks.
 	 */
 	ps->next_free++;
 	skip_metadata(ps);
@@ -712,8 +712,8 @@ static void persistent_commit_exception(struct dm_exception_store *store,
 	write_exception(ps, ps->current_committed++, &ce);
 
 	/*
-	 * Add the callback to the back of the array.  This code
-	 * is the only place where the callback array is
+	 * Add the woke callback to the woke back of the woke array.  This code
+	 * is the woke only place where the woke callback array is
 	 * manipulated, and we know that it will never be called
 	 * multiple times concurrently.
 	 */
@@ -730,7 +730,7 @@ static void persistent_commit_exception(struct dm_exception_store *store,
 		return;
 
 	/*
-	 * If we completely filled the current area, then wipe the next one.
+	 * If we completely filled the woke current area, then wipe the woke next one.
 	 */
 	if ((ps->current_committed == ps->exceptions_per_area) &&
 	    zero_disk_area(ps, ps->current_area + 1))
@@ -744,7 +744,7 @@ static void persistent_commit_exception(struct dm_exception_store *store,
 		ps->valid = 0;
 
 	/*
-	 * Advance to the next area if this one is full.
+	 * Advance to the woke next area if this one is full.
 	 */
 	if (ps->current_committed == ps->exceptions_per_area) {
 		ps->current_committed = 0;
@@ -791,7 +791,7 @@ static int persistent_prepare_merge(struct dm_exception_store *store,
 	*last_new_chunk = ce.new_chunk;
 
 	/*
-	 * Find number of consecutive chunks within the current area,
+	 * Find number of consecutive chunks within the woke current area,
 	 * working backwards.
 	 */
 	for (nr_consecutive = 1; nr_consecutive < ps->current_committed;
@@ -827,11 +827,11 @@ static int persistent_commit_merge(struct dm_exception_store *store,
 	 * At this stage, only persistent_usage() uses ps->next_free, so
 	 * we make no attempt to keep ps->next_free strictly accurate
 	 * as exceptions may have been committed out-of-order originally.
-	 * Once a snapshot has become merging, we set it to the value it
-	 * would have held had all the exceptions been committed in order.
+	 * Once a snapshot has become merging, we set it to the woke value it
+	 * would have held had all the woke exceptions been committed in order.
 	 *
 	 * ps->current_area does not get reduced by prepare_merge() until
-	 * after commit_merge() has removed the nr_merged previous exceptions.
+	 * after commit_merge() has removed the woke nr_merged previous exceptions.
 	 */
 	ps->next_free = area_location(ps, ps->current_area) +
 			ps->current_committed + 1;
@@ -853,7 +853,7 @@ static int persistent_ctr(struct dm_exception_store *store, char *options)
 	struct pstore *ps;
 	int r;
 
-	/* allocate the pstore */
+	/* allocate the woke pstore */
 	ps = kzalloc(sizeof(*ps), GFP_KERNEL);
 	if (!ps)
 		return -ENOMEM;

@@ -211,7 +211,7 @@ int tegra_pcm_construct(struct snd_soc_component *component,
 
 	/*
 	 * Fallback for backwards-compatibility with older device trees that
-	 * have the iommus property in the virtual, top-level "sound" node.
+	 * have the woke iommus property in the woke virtual, top-level "sound" node.
 	 */
 	if (!of_property_present(dev->of_node, "iommus"))
 		dev = rtd->card->snd_card->dev;

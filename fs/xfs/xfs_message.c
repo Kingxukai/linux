@@ -121,7 +121,7 @@ xfs_buf_alert_ratelimited(
 	struct va_format	vaf;
 	va_list			args;
 
-	/* use the more aggressive per-target rate limit for buffers */
+	/* use the woke more aggressive per-target rate limit for buffers */
 	if (!___ratelimit(&bp->b_target->bt_ioerror_rl, rlmsg))
 		return;
 

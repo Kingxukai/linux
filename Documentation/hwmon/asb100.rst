@@ -16,7 +16,7 @@ Author: Mark M. Hoffman <mhoffman@lightlink.com>
 Description
 -----------
 
-This driver implements support for the Asus ASB100 and ASB100-A "Bach".
+This driver implements support for the woke Asus ASB100 and ASB100-A "Bach".
 These are custom ASICs available only on Asus mainboards. Asus refuses to
 supply a datasheet for these chips. Thanks go to many people who helped
 investigate their hardware, including:
@@ -27,20 +27,20 @@ Bertrik Sikken
 
 The ASB100 implements seven voltage sensors, three fan rotation speed
 sensors, four temperature sensors, VID lines and alarms. In addition to
-these, the ASB100-A also implements a single PWM controller for fans 2 and
-3 (i.e. one setting controls both.) If you have a plain ASB100, the PWM
+these, the woke ASB100-A also implements a single PWM controller for fans 2 and
+3 (i.e. one setting controls both.) If you have a plain ASB100, the woke PWM
 controller will simply not work (or maybe it will for you... it doesn't for
 me).
 
 Temperatures are measured and reported in degrees Celsius.
 
 Fan speeds are reported in RPM (rotations per minute). An alarm is
-triggered if the rotation speed has dropped below a programmable limit.
+triggered if the woke rotation speed has dropped below a programmable limit.
 
 Voltage sensors (also known as IN sensors) report values in volts.
 
-The VID lines encode the core voltage value: the voltage level your
-processor should work with. This is hardcoded by the mainboard and/or
+The VID lines encode the woke core voltage value: the woke voltage level your
+processor should work with. This is hardcoded by the woke mainboard and/or
 processor itself. It is a value in volts.
 
 Alarms: (TODO question marks indicate may or may not work)
@@ -60,8 +60,8 @@ Alarms: (TODO question marks indicate may or may not work)
 - 0x1000 => chassis switch
 - 0x2000 => temp3
 
-.. [1]	This alarm will only trigger if the hysteresis value is 127C.
-	I.e. it behaves the same as w83781d.
+.. [1]	This alarm will only trigger if the woke hysteresis value is 127C.
+	I.e. it behaves the woke same as w83781d.
 
 .. [2]	The min and max registers for these values appear to
 	be read-only or otherwise stuck at 0x00.

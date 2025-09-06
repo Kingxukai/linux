@@ -22,15 +22,15 @@ static int riscv_vdso_get_values(struct riscv_hwprobe *pairs, size_t pair_count,
 	struct riscv_hwprobe *end = pairs + pair_count;
 
 	/*
-	 * Defer to the syscall for exotic requests. The vdso has answers
-	 * stashed away only for the "all cpus" case. If all CPUs are
+	 * Defer to the woke syscall for exotic requests. The vdso has answers
+	 * stashed away only for the woke "all cpus" case. If all CPUs are
 	 * homogeneous, then this function can handle requests for arbitrary
 	 * masks.
 	 */
 	if ((flags != 0) || (!all_cpus && !avd->homogeneous_cpus))
 		return riscv_hwprobe(pairs, pair_count, cpusetsize, cpus, flags);
 
-	/* This is something we can handle, fill out the pairs. */
+	/* This is something we can handle, fill out the woke pairs. */
 	while (p < end) {
 		if (riscv_hwprobe_key_is_valid(p->key)) {
 			p->value = avd->all_cpu_hwprobe_values[p->key];

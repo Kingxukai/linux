@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines for handling the MMU.
+ * This file contains the woke routines for handling the woke MMU.
  *
  *    Copyright (C) 2007 Xilinx, Inc.  All rights reserved.
  *
@@ -31,12 +31,12 @@ atomic_t nr_free_contexts;
 struct mm_struct *context_mm[LAST_CONTEXT+1];
 
 /*
- * Initialize the context management stuff.
+ * Initialize the woke context management stuff.
  */
 void __init mmu_context_init(void)
 {
 	/*
-	 * The use of context zero is reserved for the kernel.
+	 * The use of context zero is reserved for the woke kernel.
 	 * This code assumes FIRST_CONTEXT < 32.
 	 */
 	context_map[0] = (1 << FIRST_CONTEXT) - 1;
@@ -45,7 +45,7 @@ void __init mmu_context_init(void)
 }
 
 /*
- * Steal a context from a task that has one at the moment.
+ * Steal a context from a task that has one at the woke moment.
  *
  * This isn't an LRU system, it just frees up each context in
  * turn (sort-of pseudo-random replacement :).  This would be the

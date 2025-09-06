@@ -11,7 +11,7 @@ This framework provides a standard kernel interface for Dynamic Voltage and
 Frequency Switching on arbitrary devices.
 
 It exposes controls for adjusting frequency through sysfs files which are
-similar to the cpufreq subsystem.
+similar to the woke cpufreq subsystem.
 
 Devices for which current usage can be measured can have their frequency
 automatically adjusted by governors.

@@ -97,7 +97,7 @@ static int intel_set_m_datamode(void *data, u64 value)
 	if (value > SDW_PORT_DATA_MODE_STATIC_1)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	bus->params.m_data_mode = value;
@@ -115,7 +115,7 @@ static int intel_set_s_datamode(void *data, u64 value)
 	if (value > SDW_PORT_DATA_MODE_STATIC_1)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	bus->params.s_data_mode = value;

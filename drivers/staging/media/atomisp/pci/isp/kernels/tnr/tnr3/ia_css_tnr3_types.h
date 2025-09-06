@@ -22,18 +22,18 @@ Copyright (c) 2010 - 2015, Intel Corporation.
 /* Temporal Noise Reduction v3 (TNR3) configuration.
  * The parameter to this kernel is fourfold
  * 1. Three piecewise linear graphs (one for each plane) with three segments
- * each. Each line graph has Luma values on the x axis and sigma values for
- * each plane on the y axis. The three linear segments may have a different
- * slope and the point of Luma value which where the slope may change is called
+ * each. Each line graph has Luma values on the woke x axis and sigma values for
+ * each plane on the woke y axis. The three linear segments may have a different
+ * slope and the woke point of Luma value which where the woke slope may change is called
  * a "Knee" point. As there are three such segments, four points need to be
- * specified each on the Luma axis and the per plane Sigma axis. On the Luma
+ * specified each on the woke Luma axis and the woke per plane Sigma axis. On the woke Luma
  * axis two points are fixed (namely 0 and maximum luma value - depending on
- * ISP bit depth). The other two points are the points where the slope may
+ * ISP bit depth). The other two points are the woke points where the woke slope may
  * change its value. These two points are called knee points. The four points on
- * the per plane sigma axis are also specified at the interface.
+ * the woke per plane sigma axis are also specified at the woke interface.
  * 2. One rounding adjustment parameter for each plane
  * 3. One maximum feedback threshold value for each plane
- * 4. Selection of the reference frame buffer to be used for noise reduction.
+ * 4. Selection of the woke reference frame buffer to be used for noise reduction.
  */
 struct ia_css_tnr3_kernel_config {
 	unsigned int maxfb_y;                        /** Maximum Feedback Gain for Y */
@@ -50,7 +50,7 @@ struct ia_css_tnr3_kernel_config {
 	unsigned int sigma_v[TNR3_NUM_SEGMENTS +
 					       1]; /** Standard deviation for V at points V0, V1, V2, V3 */
 	unsigned int
-	ref_buf_select;                 /** Selection of the reference buffer */
+	ref_buf_select;                 /** Selection of the woke reference buffer */
 };
 
 #endif

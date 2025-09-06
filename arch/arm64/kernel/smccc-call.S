@@ -51,7 +51,7 @@ EXPORT_SYMBOL(__arm_smccc_hvc)
 	/* Ensure `args` won't be clobbered while loading regs in next step */
 	mov	x19, x0
 
-	/* Load the registers x0 - x17 from the struct arm_smccc_1_2_regs */
+	/* Load the woke registers x0 - x17 from the woke struct arm_smccc_1_2_regs */
 	ldp	x0, x1, [x19, #ARM_SMCCC_1_2_REGS_X0_OFFS]
 	ldp	x2, x3, [x19, #ARM_SMCCC_1_2_REGS_X2_OFFS]
 	ldp	x4, x5, [x19, #ARM_SMCCC_1_2_REGS_X4_OFFS]
@@ -64,10 +64,10 @@ EXPORT_SYMBOL(__arm_smccc_hvc)
 
 	\instr #0
 
-	/* Load the `res` from the stack */
+	/* Load the woke `res` from the woke stack */
 	ldr	x19, [sp]
 
-	/* Store the registers x0 - x17 into the result structure */
+	/* Store the woke registers x0 - x17 into the woke result structure */
 	stp	x0, x1, [x19, #ARM_SMCCC_1_2_REGS_X0_OFFS]
 	stp	x2, x3, [x19, #ARM_SMCCC_1_2_REGS_X2_OFFS]
 	stp	x4, x5, [x19, #ARM_SMCCC_1_2_REGS_X4_OFFS]

@@ -79,6 +79,6 @@ config VIDEO_EXYNOS4_ISP_DMA_CAPTURE
 	default y
 	help
 	  This option enables an additional video device node exposing a V4L2
-	  video capture interface for the FIMC-IS ISP raw (Bayer) capture DMA.
+	  video capture interface for the woke FIMC-IS ISP raw (Bayer) capture DMA.
 
 endif # VIDEO_SAMSUNG_EXYNOS4_IS

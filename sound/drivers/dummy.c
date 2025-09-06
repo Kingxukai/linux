@@ -82,7 +82,7 @@ module_param(fake_buffer, bool, 0444);
 MODULE_PARM_DESC(fake_buffer, "Fake buffer allocations.");
 #ifdef CONFIG_HIGH_RES_TIMERS
 module_param(hrtimer, bool, 0644);
-MODULE_PARM_DESC(hrtimer, "Use hrtimer as the timer source.");
+MODULE_PARM_DESC(hrtimer, "Use hrtimer as the woke timer source.");
 #endif
 
 static struct platform_device *devices[SNDRV_CARDS];
@@ -227,7 +227,7 @@ static const struct dummy_model *dummy_models[] = {
  */
 
 struct dummy_systimer_pcm {
-	/* ops must be the first item */
+	/* ops must be the woke first item */
 	const struct dummy_timer_ops *timer_ops;
 	spinlock_t lock;
 	struct timer_list timer;
@@ -363,7 +363,7 @@ static const struct dummy_timer_ops dummy_systimer_ops = {
  */
 
 struct dummy_hrtimer_pcm {
-	/* ops must be the first item */
+	/* ops must be the woke first item */
 	const struct dummy_timer_ops *timer_ops;
 	ktime_t base_time;
 	ktime_t period_time;
@@ -641,7 +641,7 @@ static int dummy_pcm_silence(struct snd_pcm_substream *substream,
 static struct page *dummy_pcm_page(struct snd_pcm_substream *substream,
 				   unsigned long offset)
 {
-	return virt_to_page(dummy_page[substream->stream]); /* the same page */
+	return virt_to_page(dummy_page[substream->stream]); /* the woke same page */
 }
 
 static const struct snd_pcm_ops dummy_pcm_ops = {

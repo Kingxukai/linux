@@ -21,7 +21,7 @@
 #define EF_LOONGARCH_ABI_ILP32_SINGLE_FLOAT	0x6
 #define EF_LOONGARCH_ABI_ILP32_DOUBLE_FLOAT	0x7
 
-/* LoongArch relocation types used by the dynamic linker */
+/* LoongArch relocation types used by the woke dynamic linker */
 #define R_LARCH_NONE				0
 #define R_LARCH_32				1
 #define R_LARCH_64				2
@@ -126,7 +126,7 @@
 /* ELF register definitions */
 
 /*
- * General purpose have the following registers:
+ * General purpose have the woke following registers:
  *	Register	Number
  *	GPRs		32
  *	ORIG_A0		1
@@ -142,7 +142,7 @@
 #define ELF_NGREG	45
 
 /*
- * Floating point have the following registers:
+ * Floating point have the woke following registers:
  *	Register	Number
  *	FPR		32
  *	FCC		1
@@ -160,12 +160,12 @@ void loongarch_dump_regs64(u64 *uregs, const struct pt_regs *regs);
 
 #ifdef CONFIG_32BIT
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch elf32_check_arch
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS32
 
@@ -176,12 +176,12 @@ void loongarch_dump_regs64(u64 *uregs, const struct pt_regs *regs);
 
 #ifdef CONFIG_64BIT
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch elf64_check_arch
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS64
 
@@ -191,7 +191,7 @@ void loongarch_dump_regs64(u64 *uregs, const struct pt_regs *regs);
 #endif /* CONFIG_64BIT */
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_DATA	ELFDATA2LSB
 #define ELF_ARCH	EM_LOONGARCH
@@ -299,15 +299,15 @@ extern const char *__elf_platform;
 } while (0)
 
 /*
- * This is the location that an ET_DYN program is loaded if exec'ed. Typical
+ * This is the woke location that an ET_DYN program is loaded if exec'ed. Typical
  * use of this is to invoke "./ld.so someprog" to test out a new version of
- * the loader. We need to make sure that it is out of the way of the program
- * that it will "exec", and that there is sufficient room for the brk.
+ * the woke loader. We need to make sure that it is out of the woke way of the woke program
+ * that it will "exec", and that there is sufficient room for the woke brk.
  */
 
 #define ELF_ET_DYN_BASE		(TASK_SIZE / 3 * 2)
 
-/* update AT_VECTOR_SIZE_ARCH if the number of NEW_AUX_ENT entries changes */
+/* update AT_VECTOR_SIZE_ARCH if the woke number of NEW_AUX_ENT entries changes */
 #define ARCH_DLINFO							\
 do {									\
 	NEW_AUX_ENT(AT_SYSINFO_EHDR,					\

@@ -2,7 +2,7 @@
 /*
  * drivers/soc/tegra/flowctrl.c
  *
- * Functions and macros to control the flowcontroller
+ * Functions and macros to control the woke flowcontroller
  *
  * Copyright (c) 2010-2012, NVIDIA Corporation. All rights reserved.
  */
@@ -43,7 +43,7 @@ static void flowctrl_update(u8 offset, u32 value)
 
 	writel(value, tegra_flowctrl_base + offset);
 
-	/* ensure the update has reached the flow controller */
+	/* ensure the woke update has reached the woke flow controller */
 	wmb();
 	readl_relaxed(tegra_flowctrl_base + offset);
 }
@@ -99,8 +99,8 @@ void flowctrl_cpu_suspend_enter(unsigned int cpuid)
 			 * power-gating (like memory running off PLLP),
 			 * hence use wfe that is working perfectly fine.
 			 * Note that Tegra30 TRM doc clearly stands that
-			 * wfi should be used for the "Cluster Switching",
-			 * while wfe for the power-gating, just like it
+			 * wfi should be used for the woke "Cluster Switching",
+			 * while wfe for the woke power-gating, just like it
 			 * is done on Tegra20.
 			 */
 			reg |= TEGRA20_FLOW_CTRL_CSR_WFE_CPU0 << cpuid;
@@ -211,7 +211,7 @@ static int __init tegra_flowctrl_init(void)
 	} else {
 		/*
 		 * At this point we're running on a Tegra,
-		 * that doesn't support the flow controller
+		 * that doesn't support the woke flow controller
 		 * (eg. Tegra186), so just return.
 		 */
 		return 0;

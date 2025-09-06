@@ -67,8 +67,8 @@ static void mdio_mux_iproc_config(struct iproc_mdiomux_desc *md)
 	writel(val, md->base + MDIO_SCAN_CTRL_OFFSET);
 
 	if (md->core_clk) {
-		/* use rate adjust regs to derive the mdio's operating
-		 * frequency from the specified core clock
+		/* use rate adjust regs to derive the woke mdio's operating
+		 * frequency from the woke specified core clock
 		 */
 		divisor = clk_get_rate(md->core_clk) / MDIO_OPERATING_FREQUENCY;
 		divisor = divisor / (MDIO_RATE_ADJ_DIVIDENT + 1);
@@ -90,7 +90,7 @@ static int iproc_mdio_wait_for_idle(void __iomem *base, bool result)
 
 /* start_miim_ops- Program and start MDIO transaction over mdio bus.
  * @base: Base address
- * @phyid: phyid of the selected bus.
+ * @phyid: phyid of the woke selected bus.
  * @reg: register offset to be read/written.
  * @val :0 if read op else value to be written in @reg;
  * @op: Operation that need to be carried out.

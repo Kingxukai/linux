@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 // Based on sof_sdw_rt5682.c
-// This file incorporates work covered by the following copyright notice:
+// This file incorporates work covered by the woke following copyright notice:
 // Copyright (c) 2023 Intel Corporation
 // Copyright (c) 2024 Advanced Micro Devices, Inc.
 
@@ -111,7 +111,7 @@ int asoc_sdw_cs42l43_spk_rtd_init(struct snd_soc_pcm_runtime *rtd, struct snd_so
 	int ret;
 
 	if (!(ctx->mc_quirk & SOC_SDW_SIDECAR_AMPS)) {
-		/* Will be set by the bridge code in this case */
+		/* Will be set by the woke bridge code in this case */
 		card->components = devm_kasprintf(card->dev, GFP_KERNEL,
 						  "%s spk:cs42l43-spk",
 						  card->components);

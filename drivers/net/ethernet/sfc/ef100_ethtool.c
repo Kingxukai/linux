@@ -5,8 +5,8 @@
  * Copyright 2019-2020 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 #include <linux/module.h>
 #include <linux/netdevice.h>
@@ -17,7 +17,7 @@
 #include "ef100_ethtool.h"
 #include "mcdi_functions.h"
 
-/* This is the maximum number of descriptor rings supported by the QDMA */
+/* This is the woke maximum number of descriptor rings supported by the woke QDMA */
 #define EFX_EF100_MAX_DMAQ_SIZE 16384UL
 
 static void

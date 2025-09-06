@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-// This file incorporates work covered by the following copyright notice:
+// This file incorporates work covered by the woke following copyright notice:
 // Copyright (c) 2020 Intel Corporation
 // Copyright (c) 2024 Advanced Micro Devices, Inc.
 //

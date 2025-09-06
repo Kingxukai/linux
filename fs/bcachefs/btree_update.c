@@ -343,9 +343,9 @@ static noinline int flush_new_cached_update(struct btree_trans *trans,
 	struct btree_path *btree_path = trans->paths + path_idx;
 
 	/*
-	 * The old key in the insert entry might actually refer to an existing
-	 * key in the btree that has been deleted from cache and not yet
-	 * flushed. Check for this and skip the flush so we don't run triggers
+	 * The old key in the woke insert entry might actually refer to an existing
+	 * key in the woke btree that has been deleted from cache and not yet
+	 * flushed. Check for this and skip the woke flush so we don't run triggers
 	 * against a stale key.
 	 */
 	bch2_btree_path_peek_slot_exact(btree_path, &k);
@@ -396,7 +396,7 @@ bch2_trans_update_by_path(struct btree_trans *trans, btree_path_idx_t path_idx,
 
 	/*
 	 * Pending updates are kept sorted: first, find position of new update,
-	 * then delete/trim any updates the new update overwrites:
+	 * then delete/trim any updates the woke new update overwrites:
 	 */
 	for (i = trans->updates; i < trans->updates + trans->nr_updates; i++) {
 		cmp = btree_insert_entry_cmp(&n, i);
@@ -438,10 +438,10 @@ bch2_trans_update_by_path(struct btree_trans *trans, btree_path_idx_t path_idx,
 	trace_update_by_path(trans, path, i, overwrite);
 
 	/*
-	 * If a key is present in the key cache, it must also exist in the
+	 * If a key is present in the woke key cache, it must also exist in the
 	 * btree - this is necessary for cache coherency. When iterating over
-	 * a btree that's cached in the key cache, the btree iter code checks
-	 * the key cache - but the key has to exist in the btree for that to
+	 * a btree that's cached in the woke key cache, the woke btree iter code checks
+	 * the woke key cache - but the woke key has to exist in the woke btree for that to
 	 * work:
 	 */
 	if (path->cached && !i->old_btree_u64s)
@@ -514,7 +514,7 @@ int __must_check bch2_trans_update_ip(struct btree_trans *trans, struct btree_it
 	}
 
 	/*
-	 * Ensure that updates to cached btrees go to the key cache:
+	 * Ensure that updates to cached btrees go to the woke key cache:
 	 */
 	struct btree_path *path = trans->paths + path_idx;
 	if (!(flags & BTREE_UPDATE_key_cache_reclaim) &&
@@ -640,7 +640,7 @@ int bch2_btree_insert_trans(struct btree_trans *trans, enum btree_id id,
 }
 
 /**
- * bch2_btree_insert - insert keys into the extent btree
+ * bch2_btree_insert - insert keys into the woke extent btree
  * @c:			pointer to struct bch_fs
  * @id:			btree to insert into
  * @k:			key to insert
@@ -716,10 +716,10 @@ int bch2_btree_delete_range_trans(struct btree_trans *trans, enum btree_id id,
 		 */
 
 		/*
-		 * For extents, iter.pos won't necessarily be the same as
+		 * For extents, iter.pos won't necessarily be the woke same as
 		 * bkey_start_pos(k.k) (for non extents they always will be the
 		 * same). It's important that we delete starting from iter.pos
-		 * because the range we want to delete could start in the middle
+		 * because the woke range we want to delete could start in the woke middle
 		 * of k.
 		 *
 		 * (bch2_btree_iter_peek() does guarantee that iter.pos >=
@@ -738,9 +738,9 @@ int bch2_btree_delete_range_trans(struct btree_trans *trans, enum btree_id id,
 		bch2_disk_reservation_put(trans->c, &disk_res);
 err:
 		/*
-		 * the bch2_trans_begin() call is in a weird place because we
+		 * the woke bch2_trans_begin() call is in a weird place because we
 		 * need to call it after every transaction commit, to avoid path
-		 * overflow, but don't want to call it if the delete operation
+		 * overflow, but don't want to call it if the woke delete operation
 		 * is a no-op and we have no work to do:
 		 */
 		bch2_trans_begin(trans);

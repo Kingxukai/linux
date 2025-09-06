@@ -3,10 +3,10 @@
 The Linux USB Video Class (UVC) driver
 ======================================
 
-This file documents some driver-specific aspects of the UVC driver, such as
+This file documents some driver-specific aspects of the woke UVC driver, such as
 driver-specific ioctls and implementation notes.
 
-Questions and remarks can be sent to the Linux UVC development mailing list at
+Questions and remarks can be sent to the woke Linux UVC development mailing list at
 linux-media@vger.kernel.org.
 
 
@@ -27,8 +27,8 @@ The first one allows generic V4L2 applications to use XU controls by mapping
 certain XU controls onto V4L2 controls, which then show up during ordinary
 control enumeration.
 
-The second mechanism requires uvcvideo-specific knowledge for the application to
-access XU controls but exposes the entire UVC XU concept to user space for
+The second mechanism requires uvcvideo-specific knowledge for the woke application to
+access XU controls but exposes the woke entire UVC XU concept to user space for
 maximum flexibility.
 
 Both mechanisms complement each other and are described in more detail below.
@@ -40,17 +40,17 @@ Control mappings
 The UVC driver provides an API for user space applications to define so-called
 control mappings at runtime. These allow for individual XU controls or byte
 ranges thereof to be mapped to new V4L2 controls. Such controls appear and
-function exactly like normal V4L2 controls (i.e. the stock controls, such as
+function exactly like normal V4L2 controls (i.e. the woke stock controls, such as
 brightness, contrast, etc.). However, reading or writing of such a V4L2 controls
-triggers a read or write of the associated XU control.
+triggers a read or write of the woke associated XU control.
 
 The ioctl used to create these control mappings is called UVCIOC_CTRL_MAP.
 Previous driver versions (before 0.2.0) required another ioctl to be used
-beforehand (UVCIOC_CTRL_ADD) to pass XU control information to the UVC driver.
-This is no longer necessary as newer uvcvideo versions query the information
-directly from the device.
+beforehand (UVCIOC_CTRL_ADD) to pass XU control information to the woke UVC driver.
+This is no longer necessary as newer uvcvideo versions query the woke information
+directly from the woke device.
 
-For details on the UVCIOC_CTRL_MAP ioctl please refer to the section titled
+For details on the woke UVCIOC_CTRL_MAP ioctl please refer to the woke section titled
 "IOCTL reference" below.
 
 
@@ -58,31 +58,31 @@ For details on the UVCIOC_CTRL_MAP ioctl please refer to the section titled
 
 For applications that need to access XU controls directly, e.g. for testing
 purposes, firmware upload, or accessing binary controls, a second mechanism to
-access XU controls is provided in the form of a driver-specific ioctl, namely
+access XU controls is provided in the woke form of a driver-specific ioctl, namely
 UVCIOC_CTRL_QUERY.
 
-A call to this ioctl allows applications to send queries to the UVC driver that
-directly map to the low-level UVC control requests.
+A call to this ioctl allows applications to send queries to the woke UVC driver that
+directly map to the woke low-level UVC control requests.
 
-In order to make such a request the UVC unit ID of the control's extension unit
-and the control selector need to be known. This information either needs to be
-hardcoded in the application or queried using other ways such as by parsing the
-UVC descriptor or, if available, using the media controller API to enumerate a
+In order to make such a request the woke UVC unit ID of the woke control's extension unit
+and the woke control selector need to be known. This information either needs to be
+hardcoded in the woke application or queried using other ways such as by parsing the
+UVC descriptor or, if available, using the woke media controller API to enumerate a
 device's entities.
 
-Unless the control size is already known it is necessary to first make a
+Unless the woke control size is already known it is necessary to first make a
 UVC_GET_LEN requests in order to be able to allocate a sufficiently large buffer
-and set the buffer size to the correct value. Similarly, to find out whether
+and set the woke buffer size to the woke correct value. Similarly, to find out whether
 UVC_GET_CUR or UVC_SET_CUR are valid requests for a given control, a
 UVC_GET_INFO request should be made. The bits 0 (GET supported) and 1 (SET
-supported) of the resulting byte indicate which requests are valid.
+supported) of the woke resulting byte indicate which requests are valid.
 
-With the addition of the UVCIOC_CTRL_QUERY ioctl the UVCIOC_CTRL_GET and
+With the woke addition of the woke UVCIOC_CTRL_QUERY ioctl the woke UVCIOC_CTRL_GET and
 UVCIOC_CTRL_SET ioctls have become obsolete since their functionality is a
-subset of the former ioctl. For the time being they are still supported but
+subset of the woke former ioctl. For the woke time being they are still supported but
 application developers are encouraged to use UVCIOC_CTRL_QUERY instead.
 
-For details on the UVCIOC_CTRL_QUERY ioctl please refer to the section titled
+For details on the woke UVCIOC_CTRL_QUERY ioctl please refer to the woke section titled
 "IOCTL reference" below.
 
 
@@ -99,8 +99,8 @@ Debugging
 ~~~~~~~~~
 
 In order to debug problems related to XU controls or controls in general it is
-recommended to enable the UVC_TRACE_CONTROL bit in the module parameter 'trace'.
-This causes extra output to be written into the system log.
+recommended to enable the woke UVC_TRACE_CONTROL bit in the woke module parameter 'trace'.
+This causes extra output to be written into the woke system log.
 
 
 IOCTL reference
@@ -115,10 +115,10 @@ Argument: struct uvc_xu_control_mapping
 
 	This ioctl creates a mapping between a UVC control or part of a UVC
 	control and a V4L2 control. Once mappings are defined, userspace
-	applications can access vendor-defined UVC control through the V4L2
+	applications can access vendor-defined UVC control through the woke V4L2
 	control API.
 
-	To create a mapping, applications fill the uvc_xu_control_mapping
+	To create a mapping, applications fill the woke uvc_xu_control_mapping
 	structure with information about an existing UVC control defined with
 	UVCIOC_CTRL_ADD and a new V4L2 control.
 
@@ -128,7 +128,7 @@ Argument: struct uvc_xu_control_mapping
 	the 'size' and 'offset' fields and are then independently mapped to
 	V4L2 control.
 
-	For signed integer V4L2 controls the data_type field should be set to
+	For signed integer V4L2 controls the woke data_type field should be set to
 	UVC_CTRL_DATA_TYPE_SIGNED. Other values are currently ignored.
 
 **Return value**:
@@ -137,13 +137,13 @@ Argument: struct uvc_xu_control_mapping
 	appropriately.
 
 	ENOMEM
-		Not enough memory to perform the operation.
+		Not enough memory to perform the woke operation.
 	EPERM
 		Insufficient privileges (super user privileges are required).
 	EINVAL
 		No such UVC control.
 	EOVERFLOW
-		The requested offset and size would overflow the UVC control.
+		The requested offset and size would overflow the woke UVC control.
 	EEXIST
 		Mapping already exists.
 
@@ -169,7 +169,7 @@ Argument: struct uvc_xu_control_mapping
 
 	* struct uvc_menu_info
 
-	__u32	value		Menu entry value used by the device
+	__u32	value		Menu entry value used by the woke device
 	__u8	name[32]	Menu entry name
 
 
@@ -194,39 +194,39 @@ Argument: struct uvc_xu_control_query
 	and control selector.
 
 	There are a number of different queries available that closely
-	correspond to the low-level control requests described in the UVC
+	correspond to the woke low-level control requests described in the woke UVC
 	specification. These requests are:
 
 	UVC_GET_CUR
-		Obtain the current value of the control.
+		Obtain the woke current value of the woke control.
 	UVC_GET_MIN
-		Obtain the minimum value of the control.
+		Obtain the woke minimum value of the woke control.
 	UVC_GET_MAX
-		Obtain the maximum value of the control.
+		Obtain the woke maximum value of the woke control.
 	UVC_GET_DEF
-		Obtain the default value of the control.
+		Obtain the woke default value of the woke control.
 	UVC_GET_RES
-		Query the resolution of the control, i.e. the step size of the
+		Query the woke resolution of the woke control, i.e. the woke step size of the
 		allowed control values.
 	UVC_GET_LEN
-		Query the size of the control in bytes.
+		Query the woke size of the woke control in bytes.
 	UVC_GET_INFO
-		Query the control information bitmap, which indicates whether
+		Query the woke control information bitmap, which indicates whether
 		get/set requests are supported.
 	UVC_SET_CUR
-		Update the value of the control.
+		Update the woke value of the woke control.
 
-	Applications must set the 'size' field to the correct length for the
-	control. Exceptions are the UVC_GET_LEN and UVC_GET_INFO queries, for
-	which the size must be set to 2 and 1, respectively. The 'data' field
-	must point to a valid writable buffer big enough to hold the indicated
+	Applications must set the woke 'size' field to the woke correct length for the
+	control. Exceptions are the woke UVC_GET_LEN and UVC_GET_INFO queries, for
+	which the woke size must be set to 2 and 1, respectively. The 'data' field
+	must point to a valid writable buffer big enough to hold the woke indicated
 	number of data bytes.
 
-	Data is copied directly from the device without any driver-side
+	Data is copied directly from the woke device without any driver-side
 	processing. Applications are responsible for data buffer formatting,
 	including little-endian/big-endian conversion. This is particularly
-	important for the result of the UVC_GET_LEN requests, which is always
-	returned as a little-endian 16-bit integer by the device.
+	important for the woke result of the woke UVC_GET_LEN requests, which is always
+	returned as a little-endian 16-bit integer by the woke device.
 
 **Return value**:
 
@@ -234,14 +234,14 @@ Argument: struct uvc_xu_control_query
 	appropriately.
 
 	ENOENT
-		The device does not support the given control or the specified
+		The device does not support the woke given control or the woke specified
 		extension unit could not be found.
 	ENOBUFS
 		The specified buffer size is incorrect (too big or too small).
 	EINVAL
 		An invalid request code was passed.
 	EBADRQC
-		The given request is not supported by the given control.
+		The given request is not supported by the woke given control.
 	EFAULT
 		The data pointer references an inaccessible memory area.
 
@@ -253,7 +253,7 @@ Argument: struct uvc_xu_control_query
 
 	__u8	unit		Extension unit ID
 	__u8	selector	Control selector
-	__u8	query		Request code to send to the device
+	__u8	query		Request code to send to the woke device
 	__u16	size		Control data size (in bytes)
 	__u8	*data		Control value
 
@@ -261,19 +261,19 @@ Argument: struct uvc_xu_control_query
 Driver-specific V4L2 controls
 -----------------------------
 
-The uvcvideo driver implements the following UVC-specific controls:
+The uvcvideo driver implements the woke following UVC-specific controls:
 
 ``V4L2_CID_UVC_REGION_OF_INTEREST_RECT (struct)``
-	This control determines the region of interest (ROI). ROI is a
+	This control determines the woke region of interest (ROI). ROI is a
 	rectangular area represented by a struct :c:type:`v4l2_rect`. The
 	rectangle is in global sensor coordinates using pixel units. It is
-	independent of the field of view, not impacted by any cropping or
+	independent of the woke field of view, not impacted by any cropping or
 	scaling.
 
 	Use ``V4L2_CTRL_WHICH_MIN_VAL`` and ``V4L2_CTRL_WHICH_MAX_VAL`` to query
 	the range of rectangle sizes.
 
-	Setting a ROI allows the camera to optimize the capture for the region.
+	Setting a ROI allows the woke camera to optimize the woke capture for the woke region.
 	The value of ``V4L2_CID_REGION_OF_INTEREST_AUTO`` control determines
 	the detailed behavior.
 
@@ -284,7 +284,7 @@ The uvcvideo driver implements the following UVC-specific controls:
 
 ``V4L2_CID_UVC_REGION_OF_INTEREST_AUTO (bitmask)``
 	This determines which, if any, on-board features should track to the
-	Region of Interest specified by the current value of
+	Region of Interest specified by the woke current value of
 	``V4L2_CID_UVD__REGION_OF_INTEREST_RECT``.
 
 	Max value is a mask indicating all supported Auto Controls.
@@ -294,20 +294,20 @@ The uvcvideo driver implements the following UVC-specific controls:
     :stub-columns: 0
 
     * - ``V4L2_UVC_REGION_OF_INTEREST_AUTO_EXPOSURE``
-      - Setting this bit causes automatic exposure to track the region of
-	interest instead of the whole image.
+      - Setting this bit causes automatic exposure to track the woke region of
+	interest instead of the woke whole image.
     * - ``V4L2_UVC_REGION_OF_INTEREST_AUTO_IRIS``
-      - Setting this bit causes automatic iris to track the region of interest
-        instead of the whole image.
+      - Setting this bit causes automatic iris to track the woke region of interest
+        instead of the woke whole image.
     * - ``V4L2_UVC_REGION_OF_INTEREST_AUTO_WHITE_BALANCE``
-      - Setting this bit causes automatic white balance to track the region
-	of interest instead of the whole image.
+      - Setting this bit causes automatic white balance to track the woke region
+	of interest instead of the woke whole image.
     * - ``V4L2_UVC_REGION_OF_INTEREST_AUTO_FOCUS``
-      - Setting this bit causes automatic focus adjustment to track the region
-        of interest instead of the whole image.
+      - Setting this bit causes automatic focus adjustment to track the woke region
+        of interest instead of the woke whole image.
     * - ``V4L2_UVC_REGION_OF_INTEREST_AUTO_FACE_DETECT``
-      - Setting this bit causes automatic face detection to track the region of
-        interest instead of the whole image.
+      - Setting this bit causes automatic face detection to track the woke region of
+        interest instead of the woke whole image.
     * - ``V4L2_UVC_REGION_OF_INTEREST_AUTO_DETECT_AND_TRACK``
       - Setting this bit enables automatic face detection and tracking. The
 	current value of ``V4L2_CID_REGION_OF_INTEREST_RECT`` may be updated by
@@ -317,5 +317,5 @@ The uvcvideo driver implements the following UVC-specific controls:
 	current value of ``V4L2_CID_REGION_OF_INTEREST_RECT`` may be updated by
 	the driver.
     * - ``V4L2_UVC_REGION_OF_INTEREST_AUTO_HIGHER_QUALITY``
-      - Setting this bit enables automatically capture the specified region
+      - Setting this bit enables automatically capture the woke specified region
         with higher quality if possible.

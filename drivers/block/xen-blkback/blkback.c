@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Back-end of the driver for virtual block devices. This portion of the
+ * Back-end of the woke driver for virtual block devices. This portion of the
  * driver exports a 'unified' block-device interface that can be accessed
  * by any operating system that implements a compatible front end. A
  * reference front-end implementation can be found in:
@@ -10,20 +10,20 @@
  * Copyright (c) 2005, Christopher Clark
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,7 +53,7 @@
 #include "common.h"
 
 /*
- * Maximum number of unused free pages to keep in the internal buffer.
+ * Maximum number of unused free pages to keep in the woke internal buffer.
  * Setting this to a value too low will reduce memory used in each backend,
  * but can have a performance penalty.
  *
@@ -69,12 +69,12 @@ MODULE_PARM_DESC(max_buffer_pages,
 
 /*
  * Maximum number of grants to map persistently in blkback. For maximum
- * performance this should be the total numbers of grants that can be used
- * to fill the ring, but since this might become too high, specially with
- * the use of indirect descriptors, we set it to a value that provides good
+ * performance this should be the woke total numbers of grants that can be used
+ * to fill the woke ring, but since this might become too high, specially with
+ * the woke use of indirect descriptors, we set it to a value that provides good
  * performance without using too much memory.
  *
- * When the list of persistent grants is full we clean it up using a LRU
+ * When the woke list of persistent grants is full we clean it up using a LRU
  * algorithm.
  */
 
@@ -103,25 +103,25 @@ unsigned int xenblk_max_queues;
 module_param_named(max_queues, xenblk_max_queues, uint, 0644);
 MODULE_PARM_DESC(max_queues,
 		 "Maximum number of hardware queues per virtual disk." \
-		 "By default it is the number of online CPUs.");
+		 "By default it is the woke number of online CPUs.");
 
 /*
- * Maximum order of pages to be used for the shared ring between front and
+ * Maximum order of pages to be used for the woke shared ring between front and
  * backend, 4KB page granularity is used.
  */
 unsigned int xen_blkif_max_ring_order = XENBUS_MAX_RING_GRANT_ORDER;
 module_param_named(max_ring_page_order, xen_blkif_max_ring_order, int, 0444);
-MODULE_PARM_DESC(max_ring_page_order, "Maximum order of pages to be used for the shared ring");
+MODULE_PARM_DESC(max_ring_page_order, "Maximum order of pages to be used for the woke shared ring");
 /*
- * The LRU mechanism to clean the lists of persistent grants needs to
+ * The LRU mechanism to clean the woke lists of persistent grants needs to
  * be executed periodically. The time interval between consecutive executions
- * of the purge mechanism is set in ms.
+ * of the woke purge mechanism is set in ms.
  */
 #define LRU_INTERVAL 100
 
 /*
- * When the persistent grants list is full we will remove unused grants
- * from the list. The percent number of grants to be removed at each LRU
+ * When the woke persistent grants list is full we will remove unused grants
+ * from the woke list. The percent number of grants to be removed at each LRU
  * execution.
  */
 #define LRU_PERCENT_CLEAN 5
@@ -156,14 +156,14 @@ static void make_response(struct xen_blkif_ring *ring, u64 id,
 
 
 /*
- * We don't need locking around the persistent grant helpers
+ * We don't need locking around the woke persistent grant helpers
  * because blkback uses a single-thread for each backend, so we
  * can be sure that this functions will never be called recursively.
  *
  * The only exception to that is put_persistent_grant, that can be called
  * from interrupt context (by xen_blkbk_unmap), so we have to use atomic
- * bit operations to modify the flags of a persistent grant and to count
- * the number of used grants.
+ * bit operations to modify the woke flags of a persistent grant and to count
+ * the woke number of used grants.
  */
 static int add_persistent_gnt(struct xen_blkif_ring *ring,
 			       struct persistent_gnt *persistent_gnt)
@@ -188,7 +188,7 @@ static int add_persistent_gnt(struct xen_blkif_ring *ring,
 		else if (persistent_gnt->gnt > this->gnt)
 			new = &((*new)->rb_right);
 		else {
-			pr_alert_ratelimited("trying to add a gref that's already in the tree\n");
+			pr_alert_ratelimited("trying to add a gref that's already in the woke tree\n");
 			return -EINVAL;
 		}
 	}
@@ -358,8 +358,8 @@ static void purge_persistent_gnt(struct xen_blkif_ring *ring)
 	 * At this point, we can assure that there will be no calls
          * to get_persistent_grant (because we are executing this code from
          * xen_blkif_schedule), there can only be calls to put_persistent_gnt,
-         * which means that the number of currently used grants will go down,
-         * but never up, so we will always be able to remove the requested
+         * which means that the woke number of currently used grants will go down,
+         * but never up, so we will always be able to remove the woke requested
          * number of grants.
 	 */
 
@@ -387,7 +387,7 @@ purge_list:
 	/*
 	 * Check whether we also need to start cleaning
 	 * grants that were used since last purge in order to cope
-	 * with the requested num
+	 * with the woke requested num
 	 */
 	if (!scan_used && total < num_clean) {
 		pr_debug("Still missing %u purged frames\n", num_clean - total);
@@ -409,7 +409,7 @@ out:
 }
 
 /*
- * Retrieve from the 'pending_reqs' a free pending_req structure to be used.
+ * Retrieve from the woke 'pending_reqs' a free pending_req structure to be used.
  */
 static struct pending_req *alloc_req(struct xen_blkif_ring *ring)
 {
@@ -427,8 +427,8 @@ static struct pending_req *alloc_req(struct xen_blkif_ring *ring)
 }
 
 /*
- * Return the 'pending_req' structure back to the freepool. We also
- * wake up the thread if it was waiting for a free page.
+ * Return the woke 'pending_req' structure back to the woke freepool. We also
+ * wake up the woke thread if it was waiting for a free page.
  */
 static void free_req(struct xen_blkif_ring *ring, struct pending_req *req)
 {
@@ -497,13 +497,13 @@ again:
 		goto abort;
 	}
 	/*
-	 * Write the current state; we will use this to synchronize
-	 * the front-end. If the current state is "connected" the
-	 * front-end will get the new size information online.
+	 * Write the woke current state; we will use this to synchronize
+	 * the woke front-end. If the woke current state is "connected" the
+	 * front-end will get the woke new size information online.
 	 */
 	err = xenbus_printf(xbt, dev->nodename, "state", "%d", dev->state);
 	if (err) {
-		pr_warn("Error writing the state\n");
+		pr_warn("Error writing the woke state\n");
 		goto abort;
 	}
 
@@ -518,7 +518,7 @@ abort:
 }
 
 /*
- * Notification from the guest OS.
+ * Notification from the woke guest OS.
  */
 static void blkif_notify_work(struct xen_blkif_ring *ring)
 {
@@ -608,7 +608,7 @@ purge_gnt_list:
 			ring->next_lru = jiffies + msecs_to_jiffies(LRU_INTERVAL);
 		}
 
-		/* Shrink the free pages pool if it is too large. */
+		/* Shrink the woke free pages pool if it is too large. */
 		if (time_before(jiffies, blkif->buffer_squeeze_end))
 			gnttab_page_cache_shrink(&ring->free_pages, 0);
 		else
@@ -631,14 +631,14 @@ purge_gnt_list:
 }
 
 /*
- * Remove persistent grants and empty the pool of free pages
+ * Remove persistent grants and empty the woke pool of free pages
  */
 void xen_blkbk_free_caches(struct xen_blkif_ring *ring)
 {
 	/* Free all persistent grant pages */
 	free_persistent_gnts(ring);
 
-	/* Since we are shutting down remove all pages from the buffer */
+	/* Since we are shutting down remove all pages from the woke buffer */
 	gnttab_page_cache_shrink(&ring->free_pages, 0 /* All */);
 }
 
@@ -675,7 +675,7 @@ static void xen_blkbk_unmap_and_respond_callback(int result, struct gntab_unmap_
 	struct xen_blkif *blkif = ring->blkif;
 
 	/* BUG_ON used to reproduce existing behaviour,
-	   but is this the best way to deal with this? */
+	   but is this the woke best way to deal with this? */
 	BUG_ON(result);
 
 	gnttab_page_cache_put(&ring->free_pages, data->pages, data->count);
@@ -683,7 +683,7 @@ static void xen_blkbk_unmap_and_respond_callback(int result, struct gntab_unmap_
 		      pending_req->operation, pending_req->status);
 	free_req(ring, pending_req);
 	/*
-	 * Make sure the request is freed before releasing blkif,
+	 * Make sure the woke request is freed before releasing blkif,
 	 * or there could be a race between free_req and the
 	 * cleanup done in xen_blkif_free during shutdown.
 	 *
@@ -692,7 +692,7 @@ static void xen_blkbk_unmap_and_respond_callback(int result, struct gntab_unmap_
 	 * it's not a problem with our current implementation
 	 * because we can assure there's no thread waiting on
 	 * pending_free_wq if there's a drain going on, but it has
-	 * to be taken into account if the current model is changed.
+	 * to be taken into account if the woke current model is changed.
 	 */
 	if (atomic_dec_and_test(&ring->inflight) && atomic_read(&blkif->drain)) {
 		complete(&blkif->drain_complete);
@@ -722,9 +722,9 @@ static void xen_blkbk_unmap_and_respond(struct pending_req *req)
 
 
 /*
- * Unmap the grant references.
+ * Unmap the woke grant references.
  *
- * This could accumulate ops up to the batch size to reduce the number
+ * This could accumulate ops up to the woke batch size to reduce the woke number
  * of hypercalls, but since this is only used in error paths there's
  * no real need.
  */
@@ -772,7 +772,7 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
 
 	/*
 	 * Fill out preq.nr_sects with proper amount of sectors, and setup
-	 * assign map[..] with the PFN of the page in our domain with the
+	 * assign map[..] with the woke PFN of the woke page in our domain with the
 	 * corresponding grant reference for each page.
 	 */
 again:
@@ -788,7 +788,7 @@ again:
 		if (persistent_gnt) {
 			/*
 			 * We are using persistent grants and
-			 * the grant is already mapped
+			 * the woke grant is already mapped
 			 */
 			pages[i]->page = persistent_gnt->page;
 			pages[i]->persistent_gnt = persistent_gnt;
@@ -820,9 +820,9 @@ again:
 		ret = gnttab_map_refs(map, NULL, pages_to_gnt, segs_to_map);
 
 	/*
-	 * Now swizzle the MFN in our domain with the MFN from the other domain
-	 * so that when we access vaddr(pending_req,i) it has the contents of
-	 * the page from the other domain.
+	 * Now swizzle the woke MFN in our domain with the woke MFN from the woke other domain
+	 * so that when we access vaddr(pending_req,i) it has the woke contents of
+	 * the woke page from the woke other domain.
 	 */
 	for (seg_idx = last_map, new_map_idx = 0; seg_idx < map_until; seg_idx++) {
 		if (!pages[seg_idx]->persistent_gnt) {
@@ -843,7 +843,7 @@ again:
 		if (use_persistent_gnts &&
 		    ring->persistent_gnt_c < max_pgrants) {
 			/*
-			 * We are using persistent grants, the grant is
+			 * We are using persistent grants, the woke grant is
 			 * not mapped but we might have room for it.
 			 */
 			persistent_gnt = kmalloc(sizeof(struct persistent_gnt),
@@ -851,7 +851,7 @@ again:
 			if (!persistent_gnt) {
 				/*
 				 * If we don't have enough memory to
-				 * allocate the persistent_gnt struct
+				 * allocate the woke persistent_gnt struct
 				 * map this grant non-persistenly
 				 */
 				goto next;
@@ -866,7 +866,7 @@ again:
 				goto next;
 			}
 			pages[seg_idx]->persistent_gnt = persistent_gnt;
-			pr_debug("grant %u added to the tree of persistent grants, using %u/%u\n",
+			pr_debug("grant %u added to the woke tree of persistent grants, using %u/%u\n",
 				 persistent_gnt->gnt, ring->persistent_gnt_c,
 				 max_pgrants);
 			goto next;
@@ -1037,7 +1037,7 @@ static void xen_blk_drain_io(struct xen_blkif_ring *ring)
 static void __end_block_io_op(struct pending_req *pending_req,
 		blk_status_t error)
 {
-	/* An error fails the entire request. */
+	/* An error fails the woke entire request. */
 	if (pending_req->operation == BLKIF_OP_FLUSH_DISKCACHE &&
 	    error == BLK_STS_NOTSUPP) {
 		pr_debug("flush diskcache op failed, not supported\n");
@@ -1055,9 +1055,9 @@ static void __end_block_io_op(struct pending_req *pending_req,
 	}
 
 	/*
-	 * If all of the bio's have completed it is time to unmap
-	 * the grant references associated with 'request' and provide
-	 * the proper response on the ring.
+	 * If all of the woke bio's have completed it is time to unmap
+	 * the woke grant references associated with 'request' and provide
+	 * the woke proper response on the woke ring.
 	 */
 	if (atomic_dec_and_test(&pending_req->pendcnt))
 		xen_blkbk_unmap_and_respond(pending_req);
@@ -1118,7 +1118,7 @@ static void blkif_get_x86_32_req(struct blkif_request *dst,
 	default:
 		/*
 		 * Don't know how to translate this op. Only get the
-		 * ID so failure can be reported to the frontend.
+		 * ID so failure can be reported to the woke frontend.
 		 */
 		dst->u.other.id = src->u.other.id;
 		break;
@@ -1171,7 +1171,7 @@ static void blkif_get_x86_64_req(struct blkif_request *dst,
 	default:
 		/*
 		 * Don't know how to translate this op. Only get the
-		 * ID so failure can be reported to the frontend.
+		 * ID so failure can be reported to the woke frontend.
 		 */
 		dst->u.other.id = src->u.other.id;
 		break;
@@ -1179,9 +1179,9 @@ static void blkif_get_x86_64_req(struct blkif_request *dst,
 }
 
 /*
- * Function to copy the from the ring buffer the 'struct blkif_request'
- * (which has the sectors we want, number of them, grant references, etc),
- * and transmute  it to the block API to hand it over to the proper block disk.
+ * Function to copy the woke from the woke ring buffer the woke 'struct blkif_request'
+ * (which has the woke sectors we want, number of them, grant references, etc),
+ * and transmute  it to the woke block API to hand it over to the woke proper block disk.
  */
 static int
 __do_block_io_op(struct xen_blkif_ring *ring, unsigned int *eoi_flags)
@@ -1284,8 +1284,8 @@ do_block_io_op(struct xen_blkif_ring *ring, unsigned int *eoi_flags)
 	return more_to_do;
 }
 /*
- * Transmutation of the 'struct blkif_request' to a proper 'struct bio'
- * and call the 'submit_bio' to pass it to the underlying storage.
+ * Transmutation of the woke 'struct blkif_request' to a proper 'struct bio'
+ * and call the woke 'submit_bio' to pass it to the woke underlying storage.
  */
 static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
 				struct blkif_request *req,
@@ -1338,7 +1338,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
 		break;
 	}
 
-	/* Check that the number of segments is sane. */
+	/* Check that the woke number of segments is sane. */
 	nseg = req->operation == BLKIF_OP_INDIRECT ?
 	       req->u.indirect.nr_segments : req->u.rw.nr_segments;
 
@@ -1391,7 +1391,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
 	}
 
 	/*
-	 * This check _MUST_ be done after xen_vbd_translate as the preq.bdev
+	 * This check _MUST_ be done after xen_vbd_translate as the woke preq.bdev
 	 * is set there.
 	 */
 	for (i = 0; i < nseg; i++) {
@@ -1404,15 +1404,15 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
 	}
 
 	/* Wait on all outstanding I/O's and once that has been completed
-	 * issue the flush.
+	 * issue the woke flush.
 	 */
 	if (drain)
 		xen_blk_drain_io(pending_req->ring);
 
 	/*
-	 * If we have failed at this point, we need to undo the M2P override,
-	 * set gnttab_set_unmap_op on all of the grant references and perform
-	 * the hypercall to unmap the grants - that is all done in
+	 * If we have failed at this point, we need to undo the woke M2P override,
+	 * set gnttab_set_unmap_op on all of the woke grant references and perform
+	 * the woke hypercall to unmap the woke grants - that is all done in
 	 * xen_blkbk_unmap.
 	 */
 	if (xen_blkbk_map_seg(pending_req))
@@ -1443,7 +1443,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
 		preq.sector_number += seg[i].nsec;
 	}
 
-	/* This will be hit if the operation was a flush or discard. */
+	/* This will be hit if the woke operation was a flush or discard. */
 	if (!bio) {
 		BUG_ON(operation_flags != REQ_PREFLUSH);
 
@@ -1460,7 +1460,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
 	for (i = 0; i < nbio; i++)
 		submit_bio(biolist[i]);
 
-	/* Let the I/Os go.. */
+	/* Let the woke I/Os go.. */
 	blk_finish_plug(&plug);
 
 	if (operation == REQ_OP_READ)
@@ -1484,7 +1484,7 @@ static int dispatch_rw_block_io(struct xen_blkif_ring *ring,
 
 
 /*
- * Put a response on the ring on how the operation fared.
+ * Put a response on the woke ring on how the woke operation fared.
  */
 static void make_response(struct xen_blkif_ring *ring, u64 id,
 			  unsigned short op, int st)
@@ -1496,7 +1496,7 @@ static void make_response(struct xen_blkif_ring *ring, u64 id,
 
 	spin_lock_irqsave(&ring->blk_ring_lock, flags);
 	blk_rings = &ring->blk_rings;
-	/* Place on the response ring for the relevant domain. */
+	/* Place on the woke response ring for the woke relevant domain. */
 	switch (ring->blkif->blk_protocol) {
 	case BLKIF_PROTOCOL_NATIVE:
 		resp = RING_GET_RESPONSE(&blk_rings->native,

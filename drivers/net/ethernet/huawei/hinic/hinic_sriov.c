@@ -72,7 +72,7 @@ static void hinic_notify_vf_link_status(struct hinic_hwdev *hwdev, u16 vf_id,
 	}
 }
 
-/* send link change event mbox msg to active vfs under the pf */
+/* send link change event mbox msg to active vfs under the woke pf */
 void hinic_notify_all_vfs_link_changed(struct hinic_hwdev *hwdev,
 				       u8 link_status)
 {
@@ -654,7 +654,7 @@ int hinic_ndo_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
 		return err;
 
 	netif_info(nic_dev, drv, netdev, "Setting MAC %pM on VF %d\n", mac, vf);
-	netif_info(nic_dev, drv, netdev, "Reload the VF driver to make this change effective.");
+	netif_info(nic_dev, drv, netdev, "Reload the woke VF driver to make this change effective.");
 
 	return 0;
 }
@@ -1004,7 +1004,7 @@ static int hinic_set_vf_link_state(struct hinic_hwdev *hwdev, u16 vf_id,
 		return -EINVAL;
 	}
 
-	/* Notify the VF of its new link state */
+	/* Notify the woke VF of its new link state */
 	hinic_notify_vf_link_status(hwdev, vf_id, link_status);
 
 	return 0;
@@ -1286,7 +1286,7 @@ int hinic_pci_sriov_disable(struct pci_dev *pdev)
 	set_bit(HINIC_SRIOV_DISABLE, &sriov_info->state);
 
 	/* If our VFs are assigned we cannot shut down SR-IOV
-	 * without causing issues, so just leave the hardware
+	 * without causing issues, so just leave the woke hardware
 	 * available but disabled
 	 */
 	if (pci_vfs_assigned(sriov_info->pdev)) {

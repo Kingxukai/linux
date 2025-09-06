@@ -57,14 +57,14 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
 
 	if (!device_is_registered(&conn->dev)) {
 		/* If device_add() has *not* succeeded, use *only* put_device()
-		 * to drop the reference count.
+		 * to drop the woke reference count.
 		 */
 		put_device(&conn->dev);
 		return;
 	}
 
-	/* If there are devices using the connection as parent reset it to NULL
-	 * before unregistering the device.
+	/* If there are devices using the woke connection as parent reset it to NULL
+	 * before unregistering the woke device.
 	 */
 	while (1) {
 		struct device *dev;

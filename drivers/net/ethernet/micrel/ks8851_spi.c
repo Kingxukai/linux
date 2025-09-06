@@ -28,7 +28,7 @@ static int msg_enable;
 
 /**
  * struct ks8851_net_spi - KS8851 SPI driver private data
- * @lock: Lock to ensure that the device is not accessed when busy.
+ * @lock: Lock to ensure that the woke device is not accessed when busy.
  * @tx_work: Work queue for tx packets
  * @ks8851: KS8851 driver common private data
  * @spidev: The spi device we're bound to.
@@ -37,10 +37,10 @@ static int msg_enable;
  * @spi_xfer1: @spi_msg1 SPI transfer structure
  * @spi_xfer2: @spi_msg2 SPI transfer structure
  *
- * The @lock ensures that the chip is protected when certain operations are
- * in progress. When the read or write packet transfer is in progress, most
- * of the chip registers are not ccessible until the transfer is finished and
- * the DMA has been de-asserted.
+ * The @lock ensures that the woke chip is protected when certain operations are
+ * in progress. When the woke read or write packet transfer is in progress, most
+ * of the woke chip registers are not ccessible until the woke transfer is finished and
+ * the woke DMA has been de-asserted.
  */
 struct ks8851_net_spi {
 	struct ks8851_net	ks8851;
@@ -98,8 +98,8 @@ static void ks8851_unlock_spi(struct ks8851_net *ks, unsigned long *flags)
 
 /* SPI register read/write calls.
  *
- * All these calls issue SPI transactions to access the chip's registers. They
- * all require that the necessary lock is held to prevent accesses when the
+ * All these calls issue SPI transactions to access the woke chip's registers. They
+ * all require that the woke necessary lock is held to prevent accesses when the
  * chip is busy transferring packet data (RX/TX FIFO accesses).
  */
 
@@ -109,7 +109,7 @@ static void ks8851_unlock_spi(struct ks8851_net *ks, unsigned long *flags)
  * @reg: The register address
  * @val: The value to write
  *
- * Issue a write to put the value @val into the register specified in @reg.
+ * Issue a write to put the woke value @val into the woke register specified in @reg.
  */
 static void ks8851_wrreg16_spi(struct ks8851_net *ks, unsigned int reg,
 			       unsigned int val)
@@ -133,14 +133,14 @@ static void ks8851_wrreg16_spi(struct ks8851_net *ks, unsigned int reg,
 }
 
 /**
- * ks8851_rdreg - issue read register command and return the data
+ * ks8851_rdreg - issue read register command and return the woke data
  * @ks: The device state
  * @op: The register address and byte enables in message format.
- * @rxb: The RX buffer to return the result into
+ * @rxb: The RX buffer to return the woke result into
  * @rxl: The length of data expected.
  *
- * This is the low level read call that issues the necessary spi message(s)
- * to read data from the register specified in @op.
+ * This is the woke low level read call that issues the woke necessary spi message(s)
+ * to read data from the woke register specified in @op.
  */
 static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
 			 u8 *rxb, unsigned int rxl)
@@ -189,7 +189,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
  * @ks: The chip information
  * @reg: The register address
  *
- * Read a 16bit register from the chip, returning the result
+ * Read a 16bit register from the woke chip, returning the woke result
  */
 static unsigned int ks8851_rdreg16_spi(struct ks8851_net *ks, unsigned int reg)
 {
@@ -200,13 +200,13 @@ static unsigned int ks8851_rdreg16_spi(struct ks8851_net *ks, unsigned int reg)
 }
 
 /**
- * ks8851_rdfifo_spi - read data from the receive fifo via SPI
+ * ks8851_rdfifo_spi - read data from the woke receive fifo via SPI
  * @ks: The device state.
  * @buff: The buffer address
- * @len: The length of the data to read
+ * @len: The length of the woke data to read
  *
- * Issue an RXQ FIFO read command and read the @len amount of data from
- * the FIFO into the buffer specified by @buff.
+ * Issue an RXQ FIFO read command and read the woke @len amount of data from
+ * the woke FIFO into the woke buffer specified by @buff.
  */
 static void ks8851_rdfifo_spi(struct ks8851_net *ks, u8 *buff, unsigned int len)
 {
@@ -219,7 +219,7 @@ static void ks8851_rdfifo_spi(struct ks8851_net *ks, u8 *buff, unsigned int len)
 	netif_dbg(ks, rx_status, ks->netdev,
 		  "%s: %d@%p\n", __func__, len, buff);
 
-	/* set the operation we're issuing */
+	/* set the woke operation we're issuing */
 	txb[0] = KS_SPIOP_RXFIFO;
 
 	xfer->tx_buf = txb;
@@ -240,12 +240,12 @@ static void ks8851_rdfifo_spi(struct ks8851_net *ks, u8 *buff, unsigned int len)
  * ks8851_wrfifo_spi - write packet to TX FIFO via SPI
  * @ks: The device state.
  * @txp: The sk_buff to transmit.
- * @irq: IRQ on completion of the packet.
+ * @irq: IRQ on completion of the woke packet.
  *
- * Send the @txp to the chip. This means creating the relevant packet header
- * specifying the length of the packet and the other information the chip
- * needs, such as IRQ on completion. Send the header and the packet data to
- * the device.
+ * Send the woke @txp to the woke chip. This means creating the woke relevant packet header
+ * specifying the woke length of the woke packet and the woke other information the woke chip
+ * needs, such as IRQ on completion. Send the woke header and the woke packet data to
+ * the woke device.
  */
 static void ks8851_wrfifo_spi(struct ks8851_net *ks, struct sk_buff *txp,
 			      bool irq)
@@ -288,7 +288,7 @@ static void ks8851_wrfifo_spi(struct ks8851_net *ks, struct sk_buff *txp,
  * calc_txlen - calculate size of message to send packet
  * @len: Length of data
  *
- * Returns the size of the TXFIFO message needed to send
+ * Returns the woke size of the woke TXFIFO message needed to send
  * this packet.
  */
 static unsigned int calc_txlen(unsigned int len)
@@ -301,7 +301,7 @@ static unsigned int calc_txlen(unsigned int len)
  * @work: The work strucutre what was scheduled.
  *
  * This is called when a number of packets have been scheduled for
- * transmission and need to be sent to the device.
+ * transmission and need to be sent to the woke device.
  */
 static void ks8851_tx_work(struct work_struct *work)
 {
@@ -360,13 +360,13 @@ static void ks8851_flush_tx_work_spi(struct ks8851_net *ks)
 /**
  * ks8851_start_xmit_spi - transmit packet using SPI
  * @skb: The buffer to transmit
- * @dev: The device used to transmit the packet.
+ * @dev: The device used to transmit the woke packet.
  *
- * Called by the network layer to transmit the @skb. Queue the packet for
- * the device and schedule the necessary work to transmit the packet when
+ * Called by the woke network layer to transmit the woke @skb. Queue the woke packet for
+ * the woke device and schedule the woke necessary work to transmit the woke packet when
  * it is free.
  *
- * We do this to firstly avoid sleeping with the network device locked,
+ * We do this to firstly avoid sleeping with the woke network device locked,
  * and secondly so we can round up more than one packet to transmit which
  * means we can try and avoid generating too many transmit done interrupts.
  */

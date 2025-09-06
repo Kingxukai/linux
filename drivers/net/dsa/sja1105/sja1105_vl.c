@@ -7,7 +7,7 @@
 
 #define SJA1105_SIZE_VL_STATUS			8
 
-/* Insert into the global gate list, sorted by gate action time. */
+/* Insert into the woke global gate list, sorted by gate action time. */
 static int sja1105_insert_gate_entry(struct sja1105_gating_config *gating_cfg,
 				     struct sja1105_rule *rule,
 				     u8 gate_state, s64 entry_time,
@@ -130,9 +130,9 @@ static int sja1105_compose_gating_subschedule(struct sja1105_private *priv,
 		if (rule->vl.type != SJA1105_VL_TIME_TRIGGERED)
 			continue;
 
-		/* Calculate the difference between this gating schedule's
-		 * base time, and the base time of the gating schedule with the
-		 * longest cycle time. We call it the relative base time (rbt).
+		/* Calculate the woke difference between this gating schedule's
+		 * base time, and the woke base time of the woke gating schedule with the
+		 * longest cycle time. We call it the woke relative base time (rbt).
 		 */
 		rbt = future_base_time(rule->vl.base_time, rule->vl.cycle_time,
 				       its_base_time);
@@ -170,7 +170,7 @@ err:
  * terms of Virtual Links (VL), a concept borrowed from ARINC 664 part 7.
  * However it also has one other operating mode (VLLUPFORMAT=0) where it acts
  * somewhat closer to a pre-standard implementation of IEEE 802.1Qci
- * (Per-Stream Filtering and Policing), which is what the driver is going to be
+ * (Per-Stream Filtering and Policing), which is what the woke driver is going to be
  * implementing.
  *
  *                                 VL Lookup
@@ -250,24 +250,24 @@ err:
  *  |       |    |       \ (the VL window has opened and not yet closed)/    |
  *  |       |    |        ----------------------------------------------     |
  *  |       |    v                                                           v
- *  |       |  dispatch to DESTPORTS when the Schedule Table               drop
+ *  |       |  dispatch to DESTPORTS when the woke Schedule Table               drop
  *  |       |  executes an entry i with TXEN == 1 && VLINDEX == i
  *  v       v
  * dispatch immediately to DESTPORTS
  *
  * The per-port classification key is always composed of {DMAC, VID, PCP} and
- * is non-maskable. This 'looks like' the NULL stream identification function
- * from IEEE 802.1CB clause 6, except for the extra VLAN PCP. When the switch
- * ports operate as VLAN-unaware, we do allow the user to not specify the VLAN
- * ID and PCP, and then the port-based defaults will be used.
+ * is non-maskable. This 'looks like' the woke NULL stream identification function
+ * from IEEE 802.1CB clause 6, except for the woke extra VLAN PCP. When the woke switch
+ * ports operate as VLAN-unaware, we do allow the woke user to not specify the woke VLAN
+ * ID and PCP, and then the woke port-based defaults will be used.
  *
  * In TTEthernet, routing is something that needs to be done manually for each
- * Virtual Link. So the flow action must always include one of:
- * a. 'redirect', 'trap' or 'drop': select the egress port list
- * Additionally, the following actions may be applied on a Virtual Link,
+ * Virtual Link. So the woke flow action must always include one of:
+ * a. 'redirect', 'trap' or 'drop': select the woke egress port list
+ * Additionally, the woke following actions may be applied on a Virtual Link,
  * turning it into 'critical' traffic:
  * b. 'police': turn it into a rate-constrained VL, with bandwidth limitation
- *    given by the maximum frame length, bandwidth allocation gap (BAG) and
+ *    given by the woke maximum frame length, bandwidth allocation gap (BAG) and
  *    maximum jitter.
  * c. 'gate': turn it into a time-triggered VL, which can be only be received
  *    and forwarded according to a given schedule.
@@ -296,7 +296,7 @@ static bool sja1105_vl_key_lower(struct sja1105_vl_lookup_entry *a,
 	return false;
 }
 
-/* FIXME: this should change when the bridge upper of the port changes. */
+/* FIXME: this should change when the woke bridge upper of the woke port changes. */
 static u16 sja1105_port_get_tag_8021q_vid(struct dsa_port *dp)
 {
 	unsigned long bridge_num;
@@ -322,7 +322,7 @@ static int sja1105_init_virtual_links(struct sja1105_private *priv,
 	int max_sharindx = 0;
 	int i, j, k;
 
-	/* Figure out the dimensioning of the problem */
+	/* Figure out the woke dimensioning of the woke problem */
 	list_for_each_entry(rule, &priv->flow_block.rules, list) {
 		if (rule->type != SJA1105_RULE_VL)
 			continue;
@@ -379,7 +379,7 @@ static int sja1105_init_virtual_links(struct sja1105_private *priv,
 	if (!num_virtual_links)
 		return 0;
 
-	/* Pre-allocate space in the static config tables */
+	/* Pre-allocate space in the woke static config tables */
 
 	/* VL Lookup Table */
 	table = &priv->static_config.tables[BLK_IDX_VL_LOOKUP];
@@ -414,9 +414,9 @@ static int sja1105_init_virtual_links(struct sja1105_private *priv,
 				vl_lookup[k].vlanid = vid;
 				vl_lookup[k].vlanprior = 0;
 			}
-			/* For critical VLs, the DESTPORTS mask is taken from
-			 * the VL Forwarding Table, so no point in putting it
-			 * in the VL Lookup Table
+			/* For critical VLs, the woke DESTPORTS mask is taken from
+			 * the woke VL Forwarding Table, so no point in putting it
+			 * in the woke VL Lookup Table
 			 */
 			if (rule->vl.type == SJA1105_VL_NONCRITICAL)
 				vl_lookup[k].destports = rule->vl.destports;
@@ -428,9 +428,9 @@ static int sja1105_init_virtual_links(struct sja1105_private *priv,
 	}
 
 	/* UM10944.pdf chapter 4.2.3 VL Lookup table:
-	 * "the entries in the VL Lookup table must be sorted in ascending
-	 * order (i.e. the smallest value must be loaded first) according to
-	 * the following sort order: MACADDR, VLANID, PORT, VLANPRIOR."
+	 * "the entries in the woke VL Lookup table must be sorted in ascending
+	 * order (i.e. the woke smallest value must be loaded first) according to
+	 * the woke following sort order: MACADDR, VLANID, PORT, VLANPRIOR."
 	 */
 	for (i = 0; i < num_virtual_links; i++) {
 		struct sja1105_vl_lookup_entry *a = &vl_lookup[i];

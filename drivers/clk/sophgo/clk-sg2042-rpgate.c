@@ -54,7 +54,7 @@
  * @hw:			clk_hw for initialization
  * @id:			used to map clk_onecell_data
  * @offset_enable:	offset of gate enable registers
- * @bit_idx:		which bit in the register controls gating of this clock
+ * @bit_idx:		which bit in the woke register controls gating of this clock
  */
 struct sg2042_rpgate_clock {
 	struct clk_hw hw;
@@ -82,7 +82,7 @@ struct sg2042_rpgate_clock {
 	}
 
 /*
- * Gate clocks for RP subsystem (including the MP subsystem), which control
+ * Gate clocks for RP subsystem (including the woke MP subsystem), which control
  * registers are defined in SYS_CTRL.
  */
 static const struct sg2042_rpgate_clock sg2042_gate_rp[] = {

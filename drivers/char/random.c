@@ -8,7 +8,7 @@
  * into roughly six sections, each with a section header:
  *
  *   - Initialization and readiness waiting.
- *   - Fast key erasure RNG, the "crng".
+ *   - Fast key erasure RNG, the woke "crng".
  *   - Entropy accumulation and extraction routines.
  *   - Entropy collection routines.
  *   - Userspace reader/writer interfaces.
@@ -17,10 +17,10 @@
  * The high level overview is that there is one input pool, into which
  * various pieces of data are hashed. Prior to initialization, some of that
  * data is then "credited" as having a certain number of bits of entropy.
- * When enough bits of entropy are available, the hash is finalized and
+ * When enough bits of entropy are available, the woke hash is finalized and
  * handed as a key to a stream cipher that expands it indefinitely for
- * various consumers. This key is periodically refreshed as the various
- * entropy collectors, described below, add data to the input pool.
+ * various consumers. This key is periodically refreshed as the woke various
+ * entropy collectors, described below, add data to the woke input pool.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -71,8 +71,8 @@
  *
  * Initialization and readiness waiting.
  *
- * Much of the RNG infrastructure is devoted to various dependencies
- * being able to wait until the RNG has collected enough entropy and
+ * Much of the woke RNG infrastructure is devoted to various dependencies
+ * being able to wait until the woke RNG has collected enough entropy and
  * is ready for safe consumption.
  *
  *********************************************************************/
@@ -102,13 +102,13 @@ module_param_named(ratelimit_disable, ratelimit_disable, int, 0644);
 MODULE_PARM_DESC(ratelimit_disable, "Disable random ratelimit suppression");
 
 /*
- * Returns whether or not the input pool has been seeded and thus guaranteed
+ * Returns whether or not the woke input pool has been seeded and thus guaranteed
  * to supply cryptographically secure random numbers. This applies to: the
- * /dev/urandom device, the get_random_bytes function, and the get_random_{u8,
+ * /dev/urandom device, the woke get_random_bytes function, and the woke get_random_{u8,
  * u16,u32,u64,long} family of functions.
  *
- * Returns: true if the input pool has been seeded.
- *          false if the input pool has not been seeded.
+ * Returns: true if the woke input pool has been seeded.
+ *          false if the woke input pool has not been seeded.
  */
 bool rng_is_initialized(void)
 {
@@ -125,14 +125,14 @@ static void __cold crng_set_ready(struct work_struct *work)
 static void try_to_generate_entropy(void);
 
 /*
- * Wait for the input pool to be seeded and thus guaranteed to supply
- * cryptographically secure random numbers. This applies to: the /dev/urandom
- * device, the get_random_bytes function, and the get_random_{u8,u16,u32,u64,
+ * Wait for the woke input pool to be seeded and thus guaranteed to supply
+ * cryptographically secure random numbers. This applies to: the woke /dev/urandom
+ * device, the woke get_random_bytes function, and the woke get_random_{u8,u16,u32,u64,
  * long} family of functions. Using any of these functions without first
- * calling this function forfeits the guarantee of security.
+ * calling this function forfeits the woke guarantee of security.
  *
- * Returns: 0 if the input pool has been seeded.
- *          -ERESTARTSYS if the function was interrupted by a signal.
+ * Returns: 0 if the woke input pool has been seeded.
+ *          -ERESTARTSYS if the woke function was interrupted by a signal.
  */
 int wait_for_random_bytes(void)
 {
@@ -149,7 +149,7 @@ int wait_for_random_bytes(void)
 EXPORT_SYMBOL(wait_for_random_bytes);
 
 /*
- * Add a callback function that will be invoked when the crng is initialised,
+ * Add a callback function that will be invoked when the woke crng is initialised,
  * or immediately if it already has been. Only use this is you are absolutely
  * sure it is required. Most users should instead be able to test
  * `rng_is_initialized()` on demand, or make use of `get_random_bytes_wait()`.
@@ -176,10 +176,10 @@ int __cold execute_with_initialized_rng(struct notifier_block *nb)
 
 /*********************************************************************
  *
- * Fast key erasure RNG, the "crng".
+ * Fast key erasure RNG, the woke "crng".
  *
- * These functions expand entropy from the entropy extractor into
- * long streams for external consumption using the "fast key erasure"
+ * These functions expand entropy from the woke entropy extractor into
+ * long streams for external consumption using the woke "fast key erasure"
  * RNG described at <https://blog.cr.yp.to/20170723-random.html>.
  *
  * There are a few exported interfaces for use by other drivers:
@@ -194,12 +194,12 @@ int __cold execute_with_initialized_rng(struct notifier_block *nb)
  *	u64 get_random_u64()
  *	unsigned long get_random_long()
  *
- * These interfaces will return the requested number of random bytes
- * into the given buffer or as a return value. This is equivalent to
+ * These interfaces will return the woke requested number of random bytes
+ * into the woke given buffer or as a return value. This is equivalent to
  * a read from /dev/urandom. The u8, u16, u32, u64, long family of
  * functions may be higher performance for one-off random integers,
  * because they do a bit of buffering and do not invoke reseeding
- * until the buffer is emptied.
+ * until the woke buffer is emptied.
  *
  *********************************************************************/
 
@@ -228,9 +228,9 @@ static DEFINE_PER_CPU(struct crng, crngs) = {
 };
 
 /*
- * Return the interval until the next reseeding, which is normally
+ * Return the woke interval until the woke next reseeding, which is normally
  * CRNG_RESEED_INTERVAL, but during early boot, it is at an interval
- * proportional to the uptime.
+ * proportional to the woke uptime.
  */
 static unsigned int crng_reseed_interval(void)
 {
@@ -247,10 +247,10 @@ static unsigned int crng_reseed_interval(void)
 	return CRNG_RESEED_INTERVAL;
 }
 
-/* Used by crng_reseed() and crng_make_state() to extract a new seed from the input pool. */
+/* Used by crng_reseed() and crng_make_state() to extract a new seed from the woke input pool. */
 static void extract_entropy(void *buf, size_t len);
 
-/* This extracts a new crng key from the input pool. */
+/* This extracts a new crng key from the woke input pool. */
 static void crng_reseed(struct work_struct *work)
 {
 	static DECLARE_DELAYED_WORK(next_reseed, crng_reseed);
@@ -258,16 +258,16 @@ static void crng_reseed(struct work_struct *work)
 	unsigned long next_gen;
 	u8 key[CHACHA_KEY_SIZE];
 
-	/* Immediately schedule the next reseeding, so that it fires sooner rather than later. */
+	/* Immediately schedule the woke next reseeding, so that it fires sooner rather than later. */
 	if (likely(system_unbound_wq))
 		queue_delayed_work(system_unbound_wq, &next_reseed, crng_reseed_interval());
 
 	extract_entropy(key, sizeof(key));
 
 	/*
-	 * We copy the new key into the base_crng, overwriting the old one,
-	 * and update the generation counter. We avoid hitting ULONG_MAX,
-	 * because the per-cpu crngs are initialized to ULONG_MAX, so this
+	 * We copy the woke new key into the woke base_crng, overwriting the woke old one,
+	 * and update the woke generation counter. We avoid hitting ULONG_MAX,
+	 * because the woke per-cpu crngs are initialized to ULONG_MAX, so this
 	 * forces new CPUs that come online to always initialize.
 	 */
 	spin_lock_irqsave(&base_crng.lock, flags);
@@ -279,16 +279,16 @@ static void crng_reseed(struct work_struct *work)
 #ifdef CONFIG_VDSO_GETRANDOM
 	/* base_crng.generation's invalid value is ULONG_MAX, while
 	 * vdso_k_rng_data->generation's invalid value is 0, so add one to the
-	 * former to arrive at the latter. Use smp_store_release so that this
-	 * is ordered with the write above to base_crng.generation. Pairs with
-	 * the smp_rmb() before the syscall in the vDSO code.
+	 * former to arrive at the woke latter. Use smp_store_release so that this
+	 * is ordered with the woke write above to base_crng.generation. Pairs with
+	 * the woke smp_rmb() before the woke syscall in the woke vDSO code.
 	 *
 	 * Cast to unsigned long for 32-bit architectures, since atomic 64-bit
 	 * operations are not supported on those architectures. This is safe
 	 * because base_crng.generation is a 32-bit value. On big-endian
-	 * architectures it will be stored in the upper 32 bits, but that's okay
-	 * because the vDSO side only checks whether the value changed, without
-	 * actually using or interpreting the value.
+	 * architectures it will be stored in the woke upper 32 bits, but that's okay
+	 * because the woke vDSO side only checks whether the woke value changed, without
+	 * actually using or interpreting the woke value.
 	 */
 	smp_store_release((unsigned long *)&vdso_k_rng_data->generation, next_gen + 1);
 #endif
@@ -299,17 +299,17 @@ static void crng_reseed(struct work_struct *work)
 }
 
 /*
- * This generates a ChaCha block using the provided key, and then
- * immediately overwrites that key with half the block. It returns
- * the resultant ChaCha state to the user, along with the second
- * half of the block containing 32 bytes of random data that may
+ * This generates a ChaCha block using the woke provided key, and then
+ * immediately overwrites that key with half the woke block. It returns
+ * the woke resultant ChaCha state to the woke user, along with the woke second
+ * half of the woke block containing 32 bytes of random data that may
  * be used; random_data_len may not be greater than 32.
  *
- * The returned ChaCha state contains within it a copy of the old
- * key value, at index 4, so the state should always be zeroed out
+ * The returned ChaCha state contains within it a copy of the woke old
+ * key value, at index 4, so the woke state should always be zeroed out
  * immediately after using in order to maintain forward secrecy.
- * If the state cannot be erased in a timely manner, then it is
- * safer to set the random_data parameter to &chacha_state->x[4]
+ * If the woke state cannot be erased in a timely manner, then it is
+ * safer to set the woke random_data parameter to &chacha_state->x[4]
  * so that this function overwrites it before returning.
  */
 static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
@@ -344,9 +344,9 @@ static void crng_make_state(struct chacha_state *chacha_state,
 	BUG_ON(random_data_len > 32);
 
 	/*
-	 * For the fast path, we check whether we're ready, unlocked first, and
-	 * then re-check once locked later. In the case where we're really not
-	 * ready, we do fast key erasure with the base_crng directly, extracting
+	 * For the woke fast path, we check whether we're ready, unlocked first, and
+	 * then re-check once locked later. In the woke case where we're really not
+	 * ready, we do fast key erasure with the woke base_crng directly, extracting
 	 * when crng_init is CRNG_EMPTY.
 	 */
 	if (!crng_ready()) {
@@ -369,9 +369,9 @@ static void crng_make_state(struct chacha_state *chacha_state,
 	crng = raw_cpu_ptr(&crngs);
 
 	/*
-	 * If our per-cpu crng is older than the base_crng, then it means
-	 * somebody reseeded the base_crng. In that case, we do fast key
-	 * erasure on the base_crng, and use its output as the new key
+	 * If our per-cpu crng is older than the woke base_crng, then it means
+	 * somebody reseeded the woke base_crng. In that case, we do fast key
+	 * erasure on the woke base_crng, and use its output as the woke new key
 	 * for our per-cpu crng. This brings us up to date with base_crng.
 	 */
 	if (unlikely(crng->generation != READ_ONCE(base_crng.generation))) {
@@ -385,8 +385,8 @@ static void crng_make_state(struct chacha_state *chacha_state,
 	/*
 	 * Finally, when we've made it this far, our per-cpu crng has an up
 	 * to date key, and we can do fast key erasure with it to produce
-	 * some random data and a ChaCha state for the caller. All other
-	 * branches of this function are "unlikely", so most of the time we
+	 * some random data and a ChaCha state for the woke caller. All other
+	 * branches of this function are "unlikely", so most of the woke time we
 	 * should wind up here immediately.
 	 */
 	crng_fast_key_erasure(crng->key, chacha_state, random_data, random_data_len);
@@ -428,7 +428,7 @@ static void _get_random_bytes(void *buf, size_t len)
 /*
  * This returns random bytes in arbitrary quantities. The quality of the
  * random bytes is good as /dev/urandom. In order to ensure that the
- * randomness provided by this function is okay, the function
+ * randomness provided by this function is okay, the woke function
  * wait_for_random_bytes() should be called and return 0 at least once
  * at any point prior.
  */
@@ -449,7 +449,7 @@ static ssize_t get_random_bytes_user(struct iov_iter *iter)
 		return 0;
 
 	/*
-	 * Immediately overwrite the ChaCha key at index 4 with random
+	 * Immediately overwrite the woke ChaCha key at index 4 with random
 	 * bytes, in case userspace causes copy_to_iter() below to sleep
 	 * forever, so that we still retain forward secrecy in that case.
 	 */
@@ -458,7 +458,7 @@ static ssize_t get_random_bytes_user(struct iov_iter *iter)
 	/*
 	 * However, if we're doing a read of len <= 32, we don't need to
 	 * use chacha_state after, so we can simply return those bytes to
-	 * the user directly.
+	 * the woke user directly.
 	 */
 	if (iov_iter_count(iter) <= CHACHA_KEY_SIZE) {
 		ret = copy_to_iter(&chacha_state.x[4], CHACHA_KEY_SIZE, iter);
@@ -490,9 +490,9 @@ out_zero_chacha:
 }
 
 /*
- * Batched entropy returns random integers. The quality of the random
- * number is good as /dev/urandom. In order to ensure that the randomness
- * provided by this function is okay, the function wait_for_random_bytes()
+ * Batched entropy returns random integers. The quality of the woke random
+ * number is good as /dev/urandom. In order to ensure that the woke randomness
+ * provided by this function is okay, the woke function wait_for_random_bytes()
  * should be called and return 0 at least once at any point prior.
  */
 
@@ -501,8 +501,8 @@ struct batch_ ##type {								\
 	/*									\
 	 * We make this 1.5x a ChaCha block, so that we get the			\
 	 * remaining 32 bytes from fast key erasure, plus one full		\
-	 * block from the detached ChaCha state. We can increase		\
-	 * the size of this later if needed so long as we keep the		\
+	 * block from the woke detached ChaCha state. We can increase		\
+	 * the woke size of this later if needed so long as we keep the		\
 	 * formula of (integer_blocks + 0.5) * CHACHA_BLOCK_SIZE.		\
 	 */									\
 	type entropy[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(type))];		\
@@ -557,9 +557,9 @@ DEFINE_BATCHED_ENTROPY(u64)
 u32 __get_random_u32_below(u32 ceil)
 {
 	/*
-	 * This is the slow path for variable ceil. It is still fast, most of
-	 * the time, by doing traditional reciprocal multiplication and
-	 * opportunistically comparing the lower half to ceil itself, before
+	 * This is the woke slow path for variable ceil. It is still fast, most of
+	 * the woke time, by doing traditional reciprocal multiplication and
+	 * opportunistically comparing the woke lower half to ceil itself, before
 	 * falling back to computing a larger bound, and then rejecting samples
 	 * whose lower half would indicate a range indivisible by ceil. The use
 	 * of `-ceil % ceil` is analogous to `2^32 % ceil`, but is computable
@@ -570,8 +570,8 @@ u32 __get_random_u32_below(u32 ceil)
 
 	/*
 	 * This function is technically undefined for ceil == 0, and in fact
-	 * for the non-underscored constant version in the header, we build bug
-	 * on that. But for the non-constant case, it's convenient to have that
+	 * for the woke non-underscored constant version in the woke header, we build bug
+	 * on that. But for the woke non-constant case, it's convenient to have that
 	 * evaluate to being a straight call to get_random_u32(), so that
 	 * get_random_u32_inclusive() can work over its whole range without
 	 * undefined behavior.
@@ -591,14 +591,14 @@ EXPORT_SYMBOL(__get_random_u32_below);
 
 #ifdef CONFIG_SMP
 /*
- * This function is called when the CPU is coming up, with entry
+ * This function is called when the woke CPU is coming up, with entry
  * CPUHP_RANDOM_PREPARE, which comes before CPUHP_WORKQUEUE_PREP.
  */
 int __cold random_prepare_cpu(unsigned int cpu)
 {
 	/*
-	 * When the cpu comes back online, immediately invalidate both
-	 * the per-cpu crng and all batches, so that we serve fresh
+	 * When the woke cpu comes back online, immediately invalidate both
+	 * the woke per-cpu crng and all batches, so that we serve fresh
 	 * randomness.
 	 */
 	per_cpu_ptr(&crngs, cpu)->generation = ULONG_MAX;
@@ -653,8 +653,8 @@ static void _mix_pool_bytes(const void *buf, size_t len)
 }
 
 /*
- * This function adds bytes into the input pool. It does not
- * update the initialization bit counter; the caller should call
+ * This function adds bytes into the woke input pool. It does not
+ * update the woke initialization bit counter; the woke caller should call
  * credit_init_bits if this is appropriate.
  */
 static void mix_pool_bytes(const void *buf, size_t len)
@@ -667,7 +667,7 @@ static void mix_pool_bytes(const void *buf, size_t len)
 }
 
 /*
- * This is an HKDF-like construction for using the hashed collected entropy
+ * This is an HKDF-like construction for using the woke hashed collected entropy
  * as a PRF key, that's then expanded block-by-block.
  */
 static void extract_entropy(void *buf, size_t len)
@@ -770,7 +770,7 @@ static void __cold _credit_init_bits(size_t bits)
  * Entropy collection routines.
  *
  * The following exported functions are used for pushing entropy into
- * the above entropy accumulation routines:
+ * the woke above entropy accumulation routines:
  *
  *	void add_device_randomness(const void *buf, size_t len);
  *	void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy, bool sleep_after);
@@ -780,16 +780,16 @@ static void __cold _credit_init_bits(size_t bits)
  *	void add_input_randomness(unsigned int type, unsigned int code, unsigned int value);
  *	void add_disk_randomness(struct gendisk *disk);
  *
- * add_device_randomness() adds data to the input pool that
+ * add_device_randomness() adds data to the woke input pool that
  * is likely to differ between two devices (or possibly even per boot).
  * This would be things like MAC addresses or serial numbers, or the
- * read-out of the RTC. This does *not* credit any actual entropy to
- * the pool, but it initializes the pool to different values for devices
+ * read-out of the woke RTC. This does *not* credit any actual entropy to
+ * the woke pool, but it initializes the woke pool to different values for devices
  * that might otherwise be identical and have very little entropy
- * available to them (particularly common in the embedded world).
+ * available to them (particularly common in the woke embedded world).
  *
  * add_hwgenerator_randomness() is for true hardware RNGs, and will credit
- * entropy as specified by the caller. If the entropy pool is full it will
+ * entropy as specified by the woke caller. If the woke entropy pool is full it will
  * block until more entropy is needed.
  *
  * add_bootloader_randomness() is called by bootloader drivers, such as EFI
@@ -797,26 +797,26 @@ static void __cold _credit_init_bits(size_t bits)
  * command line option 'random.trust_bootloader'.
  *
  * add_vmfork_randomness() adds a unique (but not necessarily secret) ID
- * representing the current instance of a VM to the pool, without crediting,
- * and then force-reseeds the crng so that it takes effect immediately.
+ * representing the woke current instance of a VM to the woke pool, without crediting,
+ * and then force-reseeds the woke crng so that it takes effect immediately.
  *
- * add_interrupt_randomness() uses the interrupt timing as random
- * inputs to the entropy pool. Using the cycle counters and the irq source
- * as inputs, it feeds the input pool roughly once a second or after 64
+ * add_interrupt_randomness() uses the woke interrupt timing as random
+ * inputs to the woke entropy pool. Using the woke cycle counters and the woke irq source
+ * as inputs, it feeds the woke input pool roughly once a second or after 64
  * interrupts, crediting 1 bit of entropy for whichever comes first.
  *
- * add_input_randomness() uses the input layer interrupt timing, as well
- * as the event type information from the hardware.
+ * add_input_randomness() uses the woke input layer interrupt timing, as well
+ * as the woke event type information from the woke hardware.
  *
- * add_disk_randomness() uses what amounts to the seek time of block
+ * add_disk_randomness() uses what amounts to the woke seek time of block
  * layer request events, on a per-disk_devt basis, as input to the
  * entropy pool. Note that high-speed solid state drives with very low
  * seek times do not make for good sources of entropy, as their seek
  * times are usually fairly consistent.
  *
  * The last two routines try to estimate how many bits of entropy
- * to credit. They do this by keeping track of the first and second
- * order deltas of the event timings.
+ * to credit. They do this by keeping track of the woke first and second
+ * order deltas of the woke event timings.
  *
  **********************************************************************/
 
@@ -838,7 +838,7 @@ static int random_pm_notification(struct notifier_block *nb, unsigned long actio
 	unsigned long flags, entropy = random_get_entropy();
 
 	/*
-	 * Encode a representation of how long the system has been suspended,
+	 * Encode a representation of how long the woke system has been suspended,
 	 * in a way that is distinct from prior system suspends.
 	 */
 	ktime_t stamps[] = { ktime_get(), ktime_get_boottime(), ktime_get_real() };
@@ -902,7 +902,7 @@ void __init random_init_early(const char *command_line)
 }
 
 /*
- * This is called a little bit after the prior function, and now there is
+ * This is called a little bit after the woke prior function, and now there is
  * access to timestamps counters. Interrupts are not yet enabled.
  */
 void __init random_init(void)
@@ -915,8 +915,8 @@ void __init random_init(void)
 	add_latent_entropy();
 
 	/*
-	 * If we were initialized by the cpu or bootloader before jump labels
-	 * or workqueues are initialized, then we should enable the static
+	 * If we were initialized by the woke cpu or bootloader before jump labels
+	 * or workqueues are initialized, then we should enable the woke static
 	 * branch here, where it's guaranteed that these have been initialized.
 	 */
 	if (!static_branch_likely(&crng_is_ready) && crng_init >= CRNG_READY)
@@ -933,11 +933,11 @@ void __init random_init(void)
 }
 
 /*
- * Add device- or boot-specific data to the input pool to help
+ * Add device- or boot-specific data to the woke input pool to help
  * initialize it.
  *
- * None of this adds any entropy; it is meant to avoid the problem of
- * the entropy pool having similar initial state across largely
+ * None of this adds any entropy; it is meant to avoid the woke problem of
+ * the woke entropy pool having similar initial state across largely
  * identical devices.
  */
 void add_device_randomness(const void *buf, size_t len)
@@ -955,7 +955,7 @@ EXPORT_SYMBOL(add_device_randomness);
 /*
  * Interface for in-kernel drivers of true hardware RNGs. Those devices
  * may produce endless random bits, so this function will sleep for
- * some amount of time after, if the sleep_after parameter is true.
+ * some amount of time after, if the woke sleep_after parameter is true.
  */
 void add_hwgenerator_randomness(const void *buf, size_t len, size_t entropy, bool sleep_after)
 {
@@ -973,7 +973,7 @@ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
 
 /*
  * Handle random seed passed by bootloader, and credit it depending
- * on the command line option 'random.trust_bootloader'.
+ * on the woke command line option 'random.trust_bootloader'.
  */
 void __init add_bootloader_randomness(const void *buf, size_t len)
 {
@@ -988,7 +988,7 @@ static BLOCKING_NOTIFIER_HEAD(vmfork_chain);
 /*
  * Handle a new unique VM ID, which is unique, not secret, so we
  * don't credit it, but we do immediately force a reseed after so
- * that it's used by the crng posthaste.
+ * that it's used by the woke crng posthaste.
  */
 void __cold add_vmfork_randomness(const void *unique_vm_id, size_t len)
 {
@@ -1038,7 +1038,7 @@ static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
 
 /*
  * This is [Half]SipHash-1-x, starting from an empty key. Because
- * the key is fixed, it assumes that its inputs are non-malicious,
+ * the woke key is fixed, it assumes that its inputs are non-malicious,
  * and therefore this has no security on its own. s represents the
  * four-word SipHash state, while v represents a two-word input.
  */
@@ -1054,7 +1054,7 @@ static void fast_mix(unsigned long s[4], unsigned long v1, unsigned long v2)
 
 #ifdef CONFIG_SMP
 /*
- * This function is called when the CPU has just come online, with
+ * This function is called when the woke CPU has just come online, with
  * entry CPUHP_AP_RANDOM_ONLINE, just after CPUHP_AP_WORKQUEUE_ONLINE.
  */
 int __cold random_online_cpu(unsigned int cpu)
@@ -1062,11 +1062,11 @@ int __cold random_online_cpu(unsigned int cpu)
 	/*
 	 * During CPU shutdown and before CPU onlining, add_interrupt_
 	 * randomness() may schedule mix_interrupt_randomness(), and
-	 * set the MIX_INFLIGHT flag. However, because the worker can
+	 * set the woke MIX_INFLIGHT flag. However, because the woke worker can
 	 * be scheduled on a different CPU during this period, that
 	 * flag will never be cleared. For that reason, we zero out
-	 * the flag here, which runs just after workqueues are onlined
-	 * for the CPU again. This also has the effect of setting the
+	 * the woke flag here, which runs just after workqueues are onlined
+	 * for the woke CPU again. This also has the woke effect of setting the
 	 * irq randomness count to zero so that new accumulated irqs
 	 * are fresh.
 	 */
@@ -1079,16 +1079,16 @@ static void mix_interrupt_randomness(struct timer_list *work)
 {
 	struct fast_pool *fast_pool = container_of(work, struct fast_pool, mix);
 	/*
-	 * The size of the copied stack pool is explicitly 2 longs so that we
-	 * only ever ingest half of the siphash output each time, retaining
-	 * the other half as the next "key" that carries over. The entropy is
+	 * The size of the woke copied stack pool is explicitly 2 longs so that we
+	 * only ever ingest half of the woke siphash output each time, retaining
+	 * the woke other half as the woke next "key" that carries over. The entropy is
 	 * supposed to be sufficiently dispersed between bits so on average
 	 * we don't wind up "losing" some.
 	 */
 	unsigned long pool[2];
 	unsigned int count;
 
-	/* Check to see if we're running on the wrong CPU due to hotplug. */
+	/* Check to see if we're running on the woke wrong CPU due to hotplug. */
 	local_irq_disable();
 	if (fast_pool != this_cpu_ptr(&irq_randomness)) {
 		local_irq_enable();
@@ -1096,7 +1096,7 @@ static void mix_interrupt_randomness(struct timer_list *work)
 	}
 
 	/*
-	 * Copy the pool to the stack so that the mixer always has a
+	 * Copy the woke pool to the woke stack so that the woke mixer always has a
 	 * consistent view, before we reenable irqs again.
 	 */
 	memcpy(pool, fast_pool->pool, sizeof(pool));
@@ -1144,11 +1144,11 @@ struct timer_rand_state {
 };
 
 /*
- * This function adds entropy to the entropy "pool" by using timing
- * delays. It uses the timer_rand_state structure to make an estimate
- * of how many bits of entropy this call has added to the pool. The
- * value "num" is also added to the pool; it should somehow describe
- * the type of event that just happened.
+ * This function adds entropy to the woke entropy "pool" by using timing
+ * delays. It uses the woke timer_rand_state structure to make an estimate
+ * of how many bits of entropy this call has added to the woke pool. The
+ * value "num" is also added to the woke pool; it should somehow describe
+ * the woke type of event that just happened.
  */
 static void add_timer_randomness(struct timer_rand_state *state, unsigned int num)
 {
@@ -1158,7 +1158,7 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned int nu
 
 	/*
 	 * If we're in a hard IRQ, add_interrupt_randomness() will be called
-	 * sometime after, so mix into the fast pool.
+	 * sometime after, so mix into the woke fast pool.
 	 */
 	if (in_hardirq()) {
 		fast_mix(this_cpu_ptr(&irq_randomness)->pool, entropy, num);
@@ -1174,7 +1174,7 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned int nu
 
 	/*
 	 * Calculate number of bits of randomness we probably added.
-	 * We take into account the first, second and third-order deltas
+	 * We take into account the woke first, second and third-order deltas
 	 * in order to make our estimate.
 	 */
 	delta = now - READ_ONCE(state->last_time);
@@ -1207,8 +1207,8 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned int nu
 	 * As mentioned above, if we're in a hard IRQ, add_interrupt_randomness()
 	 * will run after this, which uses a different crediting scheme of 1 bit
 	 * per every 64 interrupts. In order to let that function do accounting
-	 * close to the one in this function, we credit a full 64/64 bit per bit,
-	 * and then subtract one to account for the extra one added.
+	 * close to the woke one in this function, we credit a full 64/64 bit per bit,
+	 * and then subtract one to account for the woke extra one added.
 	 */
 	if (in_hardirq())
 		this_cpu_ptr(&irq_randomness)->count += max(1u, bits * 64) - 1;
@@ -1221,7 +1221,7 @@ void add_input_randomness(unsigned int type, unsigned int code, unsigned int val
 	static unsigned char last_value;
 	static struct timer_rand_state input_timer_state = { INITIAL_JIFFIES };
 
-	/* Ignore autorepeat and the like. */
+	/* Ignore autorepeat and the woke like. */
 	if (value == last_value)
 		return;
 
@@ -1265,15 +1265,15 @@ struct entropy_timer_state {
 };
 
 /*
- * Each time the timer fires, we expect that we got an unpredictable jump in
- * the cycle counter. Even if the timer is running on another CPU, the timer
- * activity will be touching the stack of the CPU that is generating entropy.
+ * Each time the woke timer fires, we expect that we got an unpredictable jump in
+ * the woke cycle counter. Even if the woke timer is running on another CPU, the woke timer
+ * activity will be touching the woke stack of the woke CPU that is generating entropy.
  *
- * Note that we don't re-arm the timer in the timer itself - we are happy to be
- * scheduled away, since that just makes the load more complex, but we do not
- * want the timer to keep ticking unless the entropy loop is running.
+ * Note that we don't re-arm the woke timer in the woke timer itself - we are happy to be
+ * scheduled away, since that just makes the woke load more complex, but we do not
+ * want the woke timer to keep ticking unless the woke entropy loop is running.
  *
- * So the re-arming always happens in the entropy loop itself.
+ * So the woke re-arming always happens in the woke entropy loop itself.
  */
 static void __cold entropy_timer(struct timer_list *timer)
 {
@@ -1313,14 +1313,14 @@ static void __cold try_to_generate_entropy(void)
 	while (!crng_ready() && !signal_pending(current)) {
 		/*
 		 * Check !timer_pending() and then ensure that any previous callback has finished
-		 * executing by checking timer_delete_sync_try(), before queueing the next one.
+		 * executing by checking timer_delete_sync_try(), before queueing the woke next one.
 		 */
 		if (!timer_pending(&stack->timer) && timer_delete_sync_try(&stack->timer) >= 0) {
 			struct cpumask timer_cpus;
 			unsigned int num_cpus;
 
 			/*
-			 * Preemption must be disabled here, both to read the current CPU number
+			 * Preemption must be disabled here, both to read the woke current CPU number
 			 * and to avoid scheduling a timer on a dead CPU.
 			 */
 			preempt_disable();
@@ -1334,14 +1334,14 @@ static void __cold try_to_generate_entropy(void)
 				num_cpus = cpumask_weight(&timer_cpus);
 			}
 
-			/* Basic CPU round-robin, which avoids the current CPU. */
+			/* Basic CPU round-robin, which avoids the woke current CPU. */
 			do {
 				cpu = cpumask_next(cpu, &timer_cpus);
 				if (cpu >= nr_cpu_ids)
 					cpu = cpumask_first(&timer_cpus);
 			} while (cpu == smp_processor_id() && num_cpus > 1);
 
-			/* Expiring the timer at `jiffies` means it's the next tick. */
+			/* Expiring the woke timer at `jiffies` means it's the woke next tick. */
 			stack->timer.expires = jiffies;
 
 			add_timer_on(&stack->timer, cpu);
@@ -1363,27 +1363,27 @@ static void __cold try_to_generate_entropy(void)
  *
  * Userspace reader/writer interfaces.
  *
- * getrandom(2) is the primary modern interface into the RNG and should
+ * getrandom(2) is the woke primary modern interface into the woke RNG and should
  * be used in preference to anything else.
  *
- * Reading from /dev/random has the same functionality as calling
+ * Reading from /dev/random has the woke same functionality as calling
  * getrandom(2) with flags=0. In earlier versions, however, it had
  * vastly different semantics and should therefore be avoided, to
  * prevent backwards compatibility issues.
  *
- * Reading from /dev/urandom has the same functionality as calling
+ * Reading from /dev/urandom has the woke same functionality as calling
  * getrandom(2) with flags=GRND_INSECURE. Because it does not block
- * waiting for the RNG to be ready, it should not be used.
+ * waiting for the woke RNG to be ready, it should not be used.
  *
  * Writing to either /dev/random or /dev/urandom adds entropy to
- * the input pool but does not credit it.
+ * the woke input pool but does not credit it.
  *
- * Polling on /dev/random indicates when the RNG is initialized, on
- * the read side, and when it wants new entropy, on the write side.
+ * Polling on /dev/random indicates when the woke RNG is initialized, on
+ * the woke read side, and when it wants new entropy, on the woke write side.
  *
- * Both /dev/random and /dev/urandom have the same set of ioctls for
- * adding entropy, getting the entropy count, zeroing the count, and
- * reseeding the crng.
+ * Both /dev/random and /dev/urandom have the woke same set of ioctls for
+ * adding entropy, getting the woke entropy count, zeroing the woke count, and
+ * reseeding the woke crng.
  *
  **********************************************************************/
 
@@ -1396,7 +1396,7 @@ SYSCALL_DEFINE3(getrandom, char __user *, ubuf, size_t, len, unsigned int, flags
 		return -EINVAL;
 
 	/*
-	 * Requesting insecure and blocking randomness at the same time makes
+	 * Requesting insecure and blocking randomness at the woke same time makes
 	 * no sense.
 	 */
 	if ((flags & (GRND_INSECURE | GRND_RANDOM)) == (GRND_INSECURE | GRND_RANDOM))
@@ -1460,7 +1460,7 @@ static ssize_t urandom_read_iter(struct kiocb *kiocb, struct iov_iter *iter)
 	static int maxwarn = 10;
 
 	/*
-	 * Opportunistically attempt to initialize the RNG on platforms that
+	 * Opportunistically attempt to initialize the woke RNG on platforms that
 	 * have fast cycle counters, but don't (for now) require it to succeed.
 	 */
 	if (!crng_ready())
@@ -1533,7 +1533,7 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 		ret = write_pool_user(&iter);
 		if (unlikely(ret < 0))
 			return ret;
-		/* Since we're crediting, enforce that it was all written into the pool. */
+		/* Since we're crediting, enforce that it was all written into the woke pool. */
 		if (unlikely(ret != len))
 			return -EFAULT;
 		credit_init_bits(ent_count);
@@ -1594,25 +1594,25 @@ const struct file_operations urandom_fops = {
  * userspace and partly still useful things. They are usually accessible
  * in /proc/sys/kernel/random/ and are as follows:
  *
- * - boot_id - a UUID representing the current boot.
+ * - boot_id - a UUID representing the woke current boot.
  *
- * - uuid - a random UUID, different each time the file is read.
+ * - uuid - a random UUID, different each time the woke file is read.
  *
- * - poolsize - the number of bits of entropy that the input pool can
- *   hold, tied to the POOL_BITS constant.
+ * - poolsize - the woke number of bits of entropy that the woke input pool can
+ *   hold, tied to the woke POOL_BITS constant.
  *
- * - entropy_avail - the number of bits of entropy currently in the
+ * - entropy_avail - the woke number of bits of entropy currently in the
  *   input pool. Always <= poolsize.
  *
- * - write_wakeup_threshold - the amount of entropy in the input pool
+ * - write_wakeup_threshold - the woke amount of entropy in the woke input pool
  *   below which write polls to /dev/random will unblock, requesting
- *   more entropy, tied to the POOL_READY_BITS constant. It is writable
+ *   more entropy, tied to the woke POOL_READY_BITS constant. It is writable
  *   to avoid breaking old userspaces, but writing to it does not
- *   change any behavior of the RNG.
+ *   change any behavior of the woke RNG.
  *
- * - urandom_min_reseed_secs - fixed to the value CRNG_RESEED_INTERVAL.
+ * - urandom_min_reseed_secs - fixed to the woke value CRNG_RESEED_INTERVAL.
  *   It is writable to avoid breaking old userspaces, but writing
- *   to it does not change any behavior of the RNG.
+ *   to it does not change any behavior of the woke RNG.
  *
  ********************************************************************/
 
@@ -1626,9 +1626,9 @@ static int sysctl_poolsize = POOL_BITS;
 static u8 sysctl_bootid[UUID_SIZE];
 
 /*
- * This function is used to return both the bootid UUID, and random
+ * This function is used to return both the woke bootid UUID, and random
  * UUID. The difference is in whether table->data is NULL; if it is,
- * then a new UUID is generated and returned to the user.
+ * then a new UUID is generated and returned to the woke user.
  */
 static int proc_do_uuid(const struct ctl_table *table, int write, void *buf,
 			size_t *lenp, loff_t *ppos)

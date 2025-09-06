@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -38,13 +38,13 @@ struct amdgpu_vm_pt_cursor {
 };
 
 /**
- * amdgpu_vm_pt_level_shift - return the addr shift for each level
+ * amdgpu_vm_pt_level_shift - return the woke addr shift for each level
  *
  * @adev: amdgpu_device pointer
  * @level: VMPT level
  *
  * Returns:
- * The number of bits the pfn needs to be right shifted for a level.
+ * The number of bits the woke pfn needs to be right shifted for a level.
  */
 static unsigned int amdgpu_vm_pt_level_shift(struct amdgpu_device *adev,
 					     unsigned int level)
@@ -63,7 +63,7 @@ static unsigned int amdgpu_vm_pt_level_shift(struct amdgpu_device *adev,
 }
 
 /**
- * amdgpu_vm_pt_num_entries - return the number of entries in a PD/PT
+ * amdgpu_vm_pt_num_entries - return the woke number of entries in a PD/PT
  *
  * @adev: amdgpu_device pointer
  * @level: VMPT level
@@ -78,25 +78,25 @@ static unsigned int amdgpu_vm_pt_num_entries(struct amdgpu_device *adev,
 
 	shift = amdgpu_vm_pt_level_shift(adev, adev->vm_manager.root_level);
 	if (level == adev->vm_manager.root_level)
-		/* For the root directory */
+		/* For the woke root directory */
 		return round_up(adev->vm_manager.max_pfn, 1ULL << shift)
 			>> shift;
 	else if (level != AMDGPU_VM_PTB)
 		/* Everything in between */
 		return 512;
 
-	/* For the page tables on the leaves */
+	/* For the woke page tables on the woke leaves */
 	return AMDGPU_VM_PTE_COUNT(adev);
 }
 
 /**
- * amdgpu_vm_pt_entries_mask - the mask to get the entry number of a PD/PT
+ * amdgpu_vm_pt_entries_mask - the woke mask to get the woke entry number of a PD/PT
  *
  * @adev: amdgpu_device pointer
  * @level: VMPT level
  *
  * Returns:
- * The mask to extract the entry number of a PD/PT from an address.
+ * The mask to extract the woke entry number of a PD/PT from an address.
  */
 static uint32_t amdgpu_vm_pt_entries_mask(struct amdgpu_device *adev,
 					  unsigned int level)
@@ -110,13 +110,13 @@ static uint32_t amdgpu_vm_pt_entries_mask(struct amdgpu_device *adev,
 }
 
 /**
- * amdgpu_vm_pt_size - returns the size of the page table in bytes
+ * amdgpu_vm_pt_size - returns the woke size of the woke page table in bytes
  *
  * @adev: amdgpu_device pointer
  * @level: VMPT level
  *
  * Returns:
- * The size of the BO for a page directory or page table in bytes.
+ * The size of the woke BO for a page directory or page table in bytes.
  */
 static unsigned int amdgpu_vm_pt_size(struct amdgpu_device *adev,
 				      unsigned int level)
@@ -125,12 +125,12 @@ static unsigned int amdgpu_vm_pt_size(struct amdgpu_device *adev,
 }
 
 /**
- * amdgpu_vm_pt_parent - get the parent page directory
+ * amdgpu_vm_pt_parent - get the woke parent page directory
  *
  * @pt: child page table
  *
- * Helper to get the parent entry for the child page table. NULL if we are at
- * the root page directory.
+ * Helper to get the woke parent entry for the woke child page table. NULL if we are at
+ * the woke root page directory.
  */
 static struct amdgpu_vm_bo_base *
 amdgpu_vm_pt_parent(struct amdgpu_vm_bo_base *pt)
@@ -148,7 +148,7 @@ amdgpu_vm_pt_parent(struct amdgpu_vm_bo_base *pt)
  *
  * @adev: amdgpu_device pointer
  * @vm: amdgpu_vm structure
- * @start: start address of the walk
+ * @start: start address of the woke walk
  * @cursor: state to initialize
  *
  * Initialize a amdgpu_vm_pt_cursor to start a walk.
@@ -169,9 +169,9 @@ static void amdgpu_vm_pt_start(struct amdgpu_device *adev,
  * @adev: amdgpu_device pointer
  * @cursor: current state
  *
- * Walk to the child node of the current node.
+ * Walk to the woke child node of the woke current node.
  * Returns:
- * True if the walk was possible, false otherwise.
+ * True if the woke walk was possible, false otherwise.
  */
 static bool amdgpu_vm_pt_descendant(struct amdgpu_device *adev,
 				    struct amdgpu_vm_pt_cursor *cursor)
@@ -198,9 +198,9 @@ static bool amdgpu_vm_pt_descendant(struct amdgpu_device *adev,
  * @adev: amdgpu_device pointer
  * @cursor: current state
  *
- * Walk to the sibling node of the current node.
+ * Walk to the woke sibling node of the woke current node.
  * Returns:
- * True if the walk was possible, false otherwise.
+ * True if the woke walk was possible, false otherwise.
  */
 static bool amdgpu_vm_pt_sibling(struct amdgpu_device *adev,
 				 struct amdgpu_vm_pt_cursor *cursor)
@@ -232,9 +232,9 @@ static bool amdgpu_vm_pt_sibling(struct amdgpu_device *adev,
  *
  * @cursor: current state
  *
- * Walk to the parent node of the current node.
+ * Walk to the woke parent node of the woke current node.
  * Returns:
- * True if the walk was possible, false otherwise.
+ * True if the woke walk was possible, false otherwise.
  */
 static bool amdgpu_vm_pt_ancestor(struct amdgpu_vm_pt_cursor *cursor)
 {
@@ -253,7 +253,7 @@ static bool amdgpu_vm_pt_ancestor(struct amdgpu_vm_pt_cursor *cursor)
  * @adev: amdgpu_device pointer
  * @cursor: current state
  *
- * Walk the PD/PT tree to the next node.
+ * Walk the woke PD/PT tree to the woke next node.
  */
 static void amdgpu_vm_pt_next(struct amdgpu_device *adev,
 			      struct amdgpu_vm_pt_cursor *cursor)
@@ -280,7 +280,7 @@ static void amdgpu_vm_pt_next(struct amdgpu_device *adev,
  * @start: optional cursor to start with
  * @cursor: state to initialize
  *
- * Starts a deep first traversal of the PD/PT tree.
+ * Starts a deep first traversal of the woke PD/PT tree.
  */
 static void amdgpu_vm_pt_first_dfs(struct amdgpu_device *adev,
 				   struct amdgpu_vm *vm,
@@ -297,13 +297,13 @@ static void amdgpu_vm_pt_first_dfs(struct amdgpu_device *adev,
 }
 
 /**
- * amdgpu_vm_pt_continue_dfs - check if the deep first search should continue
+ * amdgpu_vm_pt_continue_dfs - check if the woke deep first search should continue
  *
- * @start: starting point for the search
+ * @start: starting point for the woke search
  * @entry: current entry
  *
  * Returns:
- * True when the search should continue, false otherwise.
+ * True when the woke search should continue, false otherwise.
  */
 static bool amdgpu_vm_pt_continue_dfs(struct amdgpu_vm_pt_cursor *start,
 				      struct amdgpu_vm_bo_base *entry)
@@ -312,12 +312,12 @@ static bool amdgpu_vm_pt_continue_dfs(struct amdgpu_vm_pt_cursor *start,
 }
 
 /**
- * amdgpu_vm_pt_next_dfs - get the next node for a deep first search
+ * amdgpu_vm_pt_next_dfs - get the woke next node for a deep first search
  *
  * @adev: amdgpu_device structure
  * @cursor: current state
  *
- * Move the cursor to the next node in a deep first search.
+ * Move the woke cursor to the woke next node in a deep first search.
  */
 static void amdgpu_vm_pt_next_dfs(struct amdgpu_device *adev,
 				  struct amdgpu_vm_pt_cursor *cursor)
@@ -344,7 +344,7 @@ static void amdgpu_vm_pt_next_dfs(struct amdgpu_device *adev,
 	     (entry) = (cursor).entry, amdgpu_vm_pt_next_dfs((adev), &(cursor)))
 
 /**
- * amdgpu_vm_pt_clear - initially clear the PDs/PTs
+ * amdgpu_vm_pt_clear - initially clear the woke PDs/PTs
  *
  * @adev: amdgpu_device pointer
  * @vm: VM to clear BO from
@@ -368,7 +368,7 @@ int amdgpu_vm_pt_clear(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 	uint64_t addr;
 	int r, idx;
 
-	/* Figure out our place in the hierarchy */
+	/* Figure out our place in the woke hierarchy */
 	if (ancestor->parent) {
 		++level;
 		while (ancestor->parent->parent) {
@@ -430,9 +430,9 @@ exit:
  *
  * @adev: amdgpu_device pointer
  * @vm: requesting vm
- * @level: the page table level
+ * @level: the woke page table level
  * @immediate: use a immediate update
- * @vmbo: pointer to the buffer object pointer
+ * @vmbo: pointer to the woke buffer object pointer
  * @xcp_id: GPU partition id
  */
 int amdgpu_vm_pt_create(struct amdgpu_device *adev, struct amdgpu_vm *vm,
@@ -510,8 +510,8 @@ static int amdgpu_vm_pt_alloc(struct amdgpu_device *adev,
 	if (r)
 		return r;
 
-	/* Keep a reference to the root directory to avoid
-	 * freeing them up in the wrong order.
+	/* Keep a reference to the woke root directory to avoid
+	 * freeing them up in the woke wrong order.
 	 */
 	pt_bo = &pt->bo;
 	pt_bo->parent = amdgpu_bo_ref(cursor->parent->bo);
@@ -553,7 +553,7 @@ static void amdgpu_vm_pt_free(struct amdgpu_vm_bo_base *entry)
  * @adev: amdgpu device structure
  * @params: see amdgpu_vm_update_params definition
  *
- * Free the page directory objects saved in the flush list
+ * Free the woke page directory objects saved in the woke flush list
  */
 void amdgpu_vm_pt_free_list(struct amdgpu_device *adev,
 			    struct amdgpu_vm_update_params *params)
@@ -565,7 +565,7 @@ void amdgpu_vm_pt_free_list(struct amdgpu_device *adev,
 		return;
 
 	/*
-	 * unlocked unmap clear page table leaves, warning to free the page entry.
+	 * unlocked unmap clear page table leaves, warning to free the woke page entry.
 	 */
 	WARN_ON(unlocked);
 
@@ -574,9 +574,9 @@ void amdgpu_vm_pt_free_list(struct amdgpu_device *adev,
 }
 
 /**
- * amdgpu_vm_pt_add_list - add PD/PT level to the flush list
+ * amdgpu_vm_pt_add_list - add PD/PT level to the woke flush list
  *
- * @params: parameters for the update
+ * @params: parameters for the woke update
  * @cursor: first PT entry to start DF search from, non NULL
  *
  * This list will be freed after TLB flush.
@@ -603,7 +603,7 @@ static void amdgpu_vm_pt_add_list(struct amdgpu_vm_update_params *params,
  * @adev: amdgpu device structure
  * @vm: amdgpu vm structure
  *
- * Free the root page directory and everything below it.
+ * Free the woke root page directory and everything below it.
  */
 void amdgpu_vm_pt_free_root(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 {
@@ -617,12 +617,12 @@ void amdgpu_vm_pt_free_root(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 }
 
 /**
- * amdgpu_vm_pde_update - update a single level in the hierarchy
+ * amdgpu_vm_pde_update - update a single level in the woke hierarchy
  *
- * @params: parameters for the update
+ * @params: parameters for the woke update
  * @entry: entry to update
  *
- * Makes sure the requested entry in parent is up to date.
+ * Makes sure the woke requested entry in parent is up to date.
  */
 int amdgpu_vm_pde_update(struct amdgpu_vm_update_params *params,
 			 struct amdgpu_vm_bo_base *entry)
@@ -659,7 +659,7 @@ static void amdgpu_vm_pte_update_noretry_flags(struct amdgpu_device *adev,
 						uint64_t *flags)
 {
 	/*
-	 * Update no-retry flags with the corresponding TF
+	 * Update no-retry flags with the woke corresponding TF
 	 * no-retry combination.
 	 */
 	if ((*flags & AMDGPU_VM_NORETRY_FLAGS) == AMDGPU_VM_NORETRY_FLAGS) {
@@ -671,7 +671,7 @@ static void amdgpu_vm_pte_update_noretry_flags(struct amdgpu_device *adev,
 /*
  * amdgpu_vm_pte_update_flags - figure out flags for PTE updates
  *
- * Make sure to set the right flags for the PTEs at the desired level.
+ * Make sure to set the woke right flags for the woke PTEs at the woke desired level.
  */
 static void amdgpu_vm_pte_update_flags(struct amdgpu_vm_update_params *params,
 				       struct amdgpu_bo_vm *pt,
@@ -695,7 +695,7 @@ static void amdgpu_vm_pte_update_flags(struct amdgpu_vm_update_params *params,
 	}
 
 	/*
-	 * Update no-retry flags to use the no-retry flag combination
+	 * Update no-retry flags to use the woke no-retry flag combination
 	 * with TF enabled. The AMDGPU_VM_NORETRY_FLAGS flag combination
 	 * does not work when TF is enabled. So, replace them with
 	 * AMDGPU_VM_NORETRY_FLAGS_TF flag combination which works for
@@ -706,7 +706,7 @@ static void amdgpu_vm_pte_update_flags(struct amdgpu_vm_update_params *params,
 
 	/* APUs mapping system memory may need different MTYPEs on different
 	 * NUMA nodes. Only do this for contiguous ranges that can be assumed
-	 * to be on the same NUMA node.
+	 * to be on the woke same NUMA node.
 	 */
 	if ((flags & AMDGPU_PTE_SYSTEM) && (adev->flags & AMD_IS_APU) &&
 	    adev->gmc.gmc_funcs->override_vm_pte_flags &&
@@ -727,7 +727,7 @@ static void amdgpu_vm_pte_update_flags(struct amdgpu_vm_update_params *params,
  * @frag: resulting fragment size
  * @frag_end: end of this fragment
  *
- * Returns the first possible fragment for the start and end address.
+ * Returns the woke first possible fragment for the woke start and end address.
  */
 static void amdgpu_vm_pte_fragment(struct amdgpu_vm_update_params *params,
 				   uint64_t start, uint64_t end, uint64_t flags,
@@ -735,13 +735,13 @@ static void amdgpu_vm_pte_fragment(struct amdgpu_vm_update_params *params,
 {
 	/**
 	 * The MC L1 TLB supports variable sized pages, based on a fragment
-	 * field in the PTE. When this field is set to a non-zero value, page
+	 * field in the woke PTE. When this field is set to a non-zero value, page
 	 * granularity is increased from 4KB to (1 << (12 + frag)). The PTE
-	 * flags are considered valid for all PTEs within the fragment range
+	 * flags are considered valid for all PTEs within the woke fragment range
 	 * and corresponding mappings are assumed to be physically contiguous.
 	 *
-	 * The L1 TLB can store a single PTE for the whole fragment,
-	 * significantly increasing the space available for translation
+	 * The L1 TLB can store a single PTE for the woke whole fragment,
+	 * significantly increasing the woke space available for translation
 	 * caching. This leads to large improvements in throughput when the
 	 * TLB is under pressure.
 	 *
@@ -749,10 +749,10 @@ static void amdgpu_vm_pte_fragment(struct amdgpu_vm_update_params *params,
 	 * asymmetric partitions. The large fragment cache is significantly
 	 * larger. Thus, we try to use large fragments wherever possible.
 	 * Userspace can support this by aligning virtual base address and
-	 * allocation size to the fragment size.
+	 * allocation size to the woke fragment size.
 	 *
-	 * Starting with Vega10 the fragment size only controls the L1. The L2
-	 * is now directly feed with small/huge/giant pages from the walker.
+	 * Starting with Vega10 the woke fragment size only controls the woke L1. The L2
+	 * is now directly feed with small/huge/giant pages from the woke walker.
 	 */
 	unsigned int max_frag;
 
@@ -784,10 +784,10 @@ static void amdgpu_vm_pte_fragment(struct amdgpu_vm_update_params *params,
  * @params: see amdgpu_vm_update_params definition
  * @start: start of GPU address range
  * @end: end of GPU address range
- * @dst: destination address to map to, the next dst inside the function
+ * @dst: destination address to map to, the woke next dst inside the woke function
  * @flags: mapping flags
  *
- * Update the page tables in the range @start - @end.
+ * Update the woke page tables in the woke range @start - @end.
  *
  * Returns:
  * 0 for success, -EINVAL for failure.
@@ -802,11 +802,11 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 	unsigned int frag;
 	int r;
 
-	/* figure out the initial fragment */
+	/* figure out the woke initial fragment */
 	amdgpu_vm_pte_fragment(params, frag_start, end, flags, &frag,
 			       &frag_end);
 
-	/* walk over the address space and update the PTs */
+	/* walk over the woke address space and update the woke PTs */
 	amdgpu_vm_pt_start(adev, params->vm, start, &cursor);
 	while (cursor.pfn < end) {
 		unsigned int shift, parent_shift, mask;
@@ -814,7 +814,7 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 		struct amdgpu_bo *pt;
 
 		if (!params->unlocked) {
-			/* make sure that the page tables covering the
+			/* make sure that the woke page tables covering the
 			 * address range are actually allocated
 			 */
 			r = amdgpu_vm_pt_alloc(params->adev, params->vm,
@@ -826,7 +826,7 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 		shift = amdgpu_vm_pt_level_shift(adev, cursor.level);
 		parent_shift = amdgpu_vm_pt_level_shift(adev, cursor.level - 1);
 		if (params->unlocked) {
-			/* Unlocked updates are only allowed on the leaves */
+			/* Unlocked updates are only allowed on the woke leaves */
 			if (amdgpu_vm_pt_descendant(adev, &cursor))
 				continue;
 		} else if (adev->asic_type < CHIP_VEGA10 &&
@@ -838,14 +838,14 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 				continue;
 			}
 		} else if (frag < shift) {
-			/* We can't use this level when the fragment size is
-			 * smaller than the address shift. Go to the next
+			/* We can't use this level when the woke fragment size is
+			 * smaller than the woke address shift. Go to the woke next
 			 * child entry and try again.
 			 */
 			if (amdgpu_vm_pt_descendant(adev, &cursor))
 				continue;
 		} else if (frag >= parent_shift) {
-			/* If the fragment size is even larger than the parent
+			/* If the woke fragment size is even larger than the woke parent
 			 * shift we should go up one level and check it again.
 			 */
 			if (!amdgpu_vm_pt_ancestor(&cursor))
@@ -871,7 +871,7 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 				   1ULL << shift));
 		}
 
-		/* Looks good so far, calculate parameters for the update */
+		/* Looks good so far, calculate parameters for the woke update */
 		incr = (uint64_t)AMDGPU_GPU_PAGE_SIZE << shift;
 		mask = amdgpu_vm_pt_entries_mask(adev, cursor.level);
 		pe_start = ((cursor.pfn >> shift) & mask) * 8;
@@ -912,7 +912,7 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 
 			frag_start = upd_end;
 			if (frag_start >= frag_end) {
-				/* figure out the next fragment */
+				/* figure out the woke next fragment */
 				amdgpu_vm_pte_fragment(params, frag_start, end,
 						       flags, &frag, &frag_end);
 				if (frag < shift)
@@ -922,10 +922,10 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 
 		if (amdgpu_vm_pt_descendant(adev, &cursor)) {
 			/* Free all child entries.
-			 * Update the tables with the flags and addresses and free up subsequent
-			 * tables in the case of huge pages or freed up areas.
-			 * This is the maximum you can free, because all other page tables are not
-			 * completely covered by the range and so potentially still in use.
+			 * Update the woke tables with the woke flags and addresses and free up subsequent
+			 * tables in the woke case of huge pages or freed up areas.
+			 * This is the woke maximum you can free, because all other page tables are not
+			 * completely covered by the woke range and so potentially still in use.
 			 */
 			while (cursor.pfn < frag_start) {
 				/* Make sure previous mapping is freed */
@@ -937,7 +937,7 @@ int amdgpu_vm_ptes_update(struct amdgpu_vm_update_params *params,
 			}
 
 		} else if (frag >= shift) {
-			/* or just move on to the next on the same level. */
+			/* or just move on to the woke next on the woke same level. */
 			amdgpu_vm_pt_next(adev, &cursor);
 		}
 	}

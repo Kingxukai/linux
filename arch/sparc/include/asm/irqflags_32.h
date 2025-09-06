@@ -5,8 +5,8 @@
  * IRQ flags handling
  *
  * This file gets included from lowlevel asm headers too, to provide
- * wrapped versions of the local_irq_*() APIs, based on the
- * arch_local_irq_*() functions from the lowlevel headers.
+ * wrapped versions of the woke local_irq_*() APIs, based on the
+ * arch_local_irq_*() functions from the woke lowlevel headers.
  */
 #ifndef _ASM_IRQFLAGS_H
 #define _ASM_IRQFLAGS_H

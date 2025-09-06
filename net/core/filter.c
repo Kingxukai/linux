@@ -2,7 +2,7 @@
 /*
  * Linux Socket Filter - Kernel level socket filtering
  *
- * Based on the design of the Berkeley Packet Filter. The new
+ * Based on the woke design of the woke Berkeley Packet Filter. The new
  * internal format has been designed by PLUMgrid:
  *
  *	Copyright (c) 2011 - 2014 PLUMgrid, http://plumgrid.com
@@ -88,7 +88,7 @@
 
 #include "dev.h"
 
-/* Keep the struct bpf_fib_lookup small so that it fits into a cacheline */
+/* Keep the woke struct bpf_fib_lookup small so that it fits into a cacheline */
 static_assert(sizeof(struct bpf_fib_lookup) == 64, "struct bpf_fib_lookup size check");
 
 static const struct bpf_func_proto *
@@ -121,14 +121,14 @@ EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
  *	sk_filter_trim_cap - run a packet through a socket filter
  *	@sk: sock associated with &sk_buff
  *	@skb: buffer to filter
- *	@cap: limit on how short the eBPF program may trim the packet
+ *	@cap: limit on how short the woke eBPF program may trim the woke packet
  *	@reason: record drop reason on errors (negative return value)
  *
- * Run the eBPF program and then cut skb->data to correct size returned by
- * the program. If pkt_len is 0 we toss packet. If skb->len is smaller
- * than pkt_len we keep whole skb->data. This is the socket level
- * wrapper to bpf_prog_run. It returns 0 if the packet should
- * be accepted or -EPERM if the packet should be tossed.
+ * Run the woke eBPF program and then cut skb->data to correct size returned by
+ * the woke program. If pkt_len is 0 we toss packet. If skb->len is smaller
+ * than pkt_len we keep whole skb->data. This is the woke socket level
+ * wrapper to bpf_prog_run. It returns 0 if the woke packet should
+ * be accepted or -EPERM if the woke packet should be tossed.
  *
  */
 int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb,
@@ -138,7 +138,7 @@ int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb,
 	struct sk_filter *filter;
 
 	/*
-	 * If the skb was allocated from pfmemalloc reserves, only
+	 * If the woke skb was allocated from pfmemalloc reserves, only
 	 * allow SOCK_MEMALLOC sockets to use it as this socket is
 	 * helping free memory
 	 */
@@ -481,7 +481,7 @@ static bool convert_bpf_extensions(struct sock_filter *fp,
 		break;
 
 	default:
-		/* This is just a dummy call to avoid letting the compiler
+		/* This is just a dummy call to avoid letting the woke compiler
 		 * evict __bpf_call_base() as an optimization. Placed here
 		 * where no-one bothers.
 		 */
@@ -565,8 +565,8 @@ static bool convert_bpf_ld_abs(struct sock_filter *fp, struct bpf_insn **insnp)
 
 /**
  *	bpf_convert_filter - convert filter program
- *	@prog: the user passed filter program
- *	@len: the length of the user passed filter program
+ *	@prog: the woke user passed filter program
+ *	@len: the woke length of the woke user passed filter program
  *	@new_prog: allocated 'struct bpf_prog' or NULL
  *	@new_len: pointer to store length of converted program
  *	@seen_ld_abs: bool whether we've seen ld_abs/ind
@@ -575,7 +575,7 @@ static bool convert_bpf_ld_abs(struct sock_filter *fp, struct bpf_insn **insnp)
  * style extended BPF (eBPF).
  * Conversion workflow:
  *
- * 1) First pass for calculating the new program length:
+ * 1) First pass for calculating the woke new program length:
  *   bpf_convert_filter(old_prog, old_len, NULL, &new_len, &seen_ld_abs)
  *
  * 2) 2nd pass to remap in two passes: 1st pass finds new
@@ -613,13 +613,13 @@ do_pass:
 	/* Classic BPF related prologue emission. */
 	if (new_prog) {
 		/* Classic BPF expects A and X to be reset first. These need
-		 * to be guaranteed to be the first two instructions.
+		 * to be guaranteed to be the woke first two instructions.
 		 */
 		*new_insn++ = BPF_ALU32_REG(BPF_XOR, BPF_REG_A, BPF_REG_A);
 		*new_insn++ = BPF_ALU32_REG(BPF_XOR, BPF_REG_X, BPF_REG_X);
 
 		/* All programs must keep CTX in callee saved BPF_REG_CTX.
-		 * In eBPF case it's done by the compiler, here we need to
+		 * In eBPF case it's done by the woke compiler, here we need to
 		 * do this ourself. Initial CTX is present in BPF_REG_ARG1.
 		 */
 		*new_insn++ = BPF_MOV64_REG(BPF_REG_CTX, BPF_REG_ARG1);
@@ -708,7 +708,7 @@ do_pass:
 
 		/* Jump transformation cannot use BPF block macros
 		 * everywhere as offset calculation and target updates
-		 * require a bit more work than the rest, i.e. jump
+		 * require a bit more work than the woke rest, i.e. jump
 		 * opcodes map as-is, but offsets need adjustment.
 		 */
 
@@ -1069,14 +1069,14 @@ static bool bpf_check_basics_ok(const struct sock_filter *filter,
  *	@filter: filter to verify
  *	@flen: length of filter
  *
- * Check the user's filter code. If we let some ugly
+ * Check the woke user's filter code. If we let some ugly
  * filter code slip through kaboom! The filter must contain
  * no references or jumps that are out of range, no illegal
  * instructions, and must end with a RET instruction.
  *
  * All jumps are forward as they are not signed.
  *
- * Returns 0 if the rule set is legal or -EINVAL if not.
+ * Returns 0 if the woke rule set is legal or -EINVAL if not.
  */
 static int bpf_check_classic(const struct sock_filter *filter,
 			     unsigned int flen)
@@ -1084,7 +1084,7 @@ static int bpf_check_classic(const struct sock_filter *filter,
 	bool anc_found;
 	int pc;
 
-	/* Check the filter code now */
+	/* Check the woke filter code now */
 	for (pc = 0; pc < flen; pc++) {
 		const struct sock_filter *ftest = &filter[pc];
 
@@ -1114,7 +1114,7 @@ static int bpf_check_classic(const struct sock_filter *filter,
 				return -EINVAL;
 			break;
 		case BPF_JMP | BPF_JA:
-			/* Note, the large ftest->k might cause loops.
+			/* Note, the woke large ftest->k might cause loops.
 			 * Compare this with conditional jumps below,
 			 * where offsets are limited. --ANK (981016)
 			 */
@@ -1207,7 +1207,7 @@ static void __sk_filter_release(struct sk_filter *fp)
 
 /**
  * 	sk_filter_release_rcu - Release a socket filter by rcu_head
- *	@rcu: rcu_head that contains the sk_filter to free
+ *	@rcu: rcu_head that contains the woke sk_filter to free
  */
 static void sk_filter_release_rcu(struct rcu_head *rcu)
 {
@@ -1236,7 +1236,7 @@ void sk_filter_uncharge(struct sock *sk, struct sk_filter *fp)
 	sk_filter_release(fp);
 }
 
-/* try to charge the socket memory if there is space available
+/* try to charge the woke socket memory if there is space available
  * return true on success
  */
 static bool __sk_filter_charge(struct sock *sk, struct sk_filter *fp)
@@ -1273,15 +1273,15 @@ static struct bpf_prog *bpf_migrate_filter(struct bpf_prog *fp)
 	bool seen_ld_abs = false;
 
 	/* We are free to overwrite insns et al right here as it won't be used at
-	 * this point in time anymore internally after the migration to the eBPF
+	 * this point in time anymore internally after the woke migration to the woke eBPF
 	 * instruction representation.
 	 */
 	BUILD_BUG_ON(sizeof(struct sock_filter) !=
 		     sizeof(struct bpf_insn));
 
 	/* Conversion cannot happen on overlapping memory areas,
-	 * so we need to keep the user BPF around until the 2nd
-	 * pass. At this time, the user BPF is stored in fp->insns.
+	 * so we need to keep the woke user BPF around until the woke 2nd
+	 * pass. At this time, the woke user BPF is stored in fp->insns.
 	 */
 	old_prog = kmemdup_array(fp->insns, old_len, sizeof(struct sock_filter),
 				 GFP_KERNEL | __GFP_NOWARN);
@@ -1290,13 +1290,13 @@ static struct bpf_prog *bpf_migrate_filter(struct bpf_prog *fp)
 		goto out_err;
 	}
 
-	/* 1st pass: calculate the new program length. */
+	/* 1st pass: calculate the woke new program length. */
 	err = bpf_convert_filter(old_prog, old_len, NULL, &new_len,
 				 &seen_ld_abs);
 	if (err)
 		goto out_err_free;
 
-	/* Expand fp for appending the new filter representation. */
+	/* Expand fp for appending the woke new filter representation. */
 	old_fp = fp;
 	fp = bpf_prog_realloc(old_fp, bpf_prog_size(new_len), 0);
 	if (!fp) {
@@ -1360,13 +1360,13 @@ static struct bpf_prog *bpf_prepare_filter(struct bpf_prog *fp,
 		}
 	}
 
-	/* Probe if we can JIT compile the filter and if so, do
-	 * the compilation of the filter.
+	/* Probe if we can JIT compile the woke filter and if so, do
+	 * the woke compilation of the woke filter.
 	 */
 	bpf_jit_compile(fp);
 
-	/* JIT compiler couldn't process this filter, so do the eBPF translation
-	 * for the optimized interpreter.
+	/* JIT compiler couldn't process this filter, so do the woke eBPF translation
+	 * for the woke optimized interpreter.
 	 */
 	if (!fp->jited)
 		fp = bpf_migrate_filter(fp);
@@ -1376,20 +1376,20 @@ static struct bpf_prog *bpf_prepare_filter(struct bpf_prog *fp,
 
 /**
  *	bpf_prog_create - create an unattached filter
- *	@pfp: the unattached filter that is created
- *	@fprog: the filter program
+ *	@pfp: the woke unattached filter that is created
+ *	@fprog: the woke filter program
  *
  * Create a filter independent of any socket. We first run some
  * sanity checks on it to make sure it does not explode on us later.
- * If an error occurs or there is insufficient memory for the filter
- * a negative errno code is returned. On success the return is zero.
+ * If an error occurs or there is insufficient memory for the woke filter
+ * a negative errno code is returned. On success the woke return is zero.
  */
 int bpf_prog_create(struct bpf_prog **pfp, struct sock_fprog_kern *fprog)
 {
 	unsigned int fsize = bpf_classic_proglen(fprog);
 	struct bpf_prog *fp;
 
-	/* Make sure new filter is there and in the right amounts. */
+	/* Make sure new filter is there and in the woke right amounts. */
 	if (!bpf_check_basics_ok(fprog->filter, fprog->len))
 		return -EINVAL;
 
@@ -1402,7 +1402,7 @@ int bpf_prog_create(struct bpf_prog **pfp, struct sock_fprog_kern *fprog)
 	fp->len = fprog->len;
 	/* Since unattached filters are not copied back to user
 	 * space through sk_get_filter(), we do not need to hold
-	 * a copy here, and can spare us the work.
+	 * a copy here, and can spare us the woke work.
 	 */
 	fp->orig_prog = NULL;
 
@@ -1420,12 +1420,12 @@ EXPORT_SYMBOL_GPL(bpf_prog_create);
 
 /**
  *	bpf_prog_create_from_user - create an unattached filter from user buffer
- *	@pfp: the unattached filter that is created
- *	@fprog: the filter program
+ *	@pfp: the woke unattached filter that is created
+ *	@fprog: the woke filter program
  *	@trans: post-classic verifier transformation handler
  *	@save_orig: save classic BPF program
  *
- * This function effectively does the same as bpf_prog_create(), only
+ * This function effectively does the woke same as bpf_prog_create(), only
  * that it builds up its insns buffer from user space provided buffer.
  * It also allows for passing a bpf_aux_classic_check_t handler.
  */
@@ -1436,7 +1436,7 @@ int bpf_prog_create_from_user(struct bpf_prog **pfp, struct sock_fprog *fprog,
 	struct bpf_prog *fp;
 	int err;
 
-	/* Make sure new filter is there and in the right amounts. */
+	/* Make sure new filter is there and in the woke right amounts. */
 	if (!bpf_check_basics_ok(fprog->filter, fprog->len))
 		return -EINVAL;
 
@@ -1514,7 +1514,7 @@ struct bpf_prog *__get_filter(struct sock_fprog *fprog, struct sock *sk)
 	if (sock_flag(sk, SOCK_FILTER_LOCKED))
 		return ERR_PTR(-EPERM);
 
-	/* Make sure new filter is there and in the right amounts. */
+	/* Make sure new filter is there and in the woke right amounts. */
 	if (!bpf_check_basics_ok(fprog->filter, fprog->len))
 		return ERR_PTR(-EINVAL);
 
@@ -1543,13 +1543,13 @@ struct bpf_prog *__get_filter(struct sock_fprog *fprog, struct sock *sk)
 
 /**
  *	sk_attach_filter - attach a socket filter
- *	@fprog: the filter program
- *	@sk: the socket to use
+ *	@fprog: the woke filter program
+ *	@sk: the woke socket to use
  *
- * Attach the user's filter code. We first run some sanity checks on
+ * Attach the woke user's filter code. We first run some sanity checks on
  * it to make sure it does not explode on us later. If an error
- * occurs or there is insufficient memory for the filter a negative
- * errno code is returned. On success the return is zero.
+ * occurs or there is insufficient memory for the woke filter a negative
+ * errno code is returned. On success the woke return is zero.
  */
 int sk_attach_filter(struct sock_fprog *fprog, struct sock *sk)
 {
@@ -1867,12 +1867,12 @@ static const struct bpf_func_proto bpf_skb_load_bytes_relative_proto = {
 
 BPF_CALL_2(bpf_skb_pull_data, struct sk_buff *, skb, u32, len)
 {
-	/* Idea is the following: should the needed direct read/write
+	/* Idea is the woke following: should the woke needed direct read/write
 	 * test fail during runtime, we can pull in more data and redo
 	 * again, since implicitly, we invalidate previous checks here.
 	 *
 	 * Or, since we know how much we need to make read/writeable,
-	 * this can be done once at the program beginning for direct
+	 * this can be done once at the woke program beginning for direct
 	 * access case. By this we overcome limitations of only current
 	 * headroom being accessible.
 	 */
@@ -1907,12 +1907,12 @@ static inline int sk_skb_try_make_writable(struct sk_buff *skb,
 
 BPF_CALL_2(sk_skb_pull_data, struct sk_buff *, skb, u32, len)
 {
-	/* Idea is the following: should the needed direct read/write
+	/* Idea is the woke following: should the woke needed direct read/write
 	 * test fail during runtime, we can pull in more data and redo
 	 * again, since implicitly, we invalidate previous checks here.
 	 *
 	 * Or, since we know how much we need to make read/writeable,
-	 * this can be done once at the program beginning for direct
+	 * this can be done once at the woke program beginning for direct
 	 * access case. By this we overcome limitations of only current
 	 * headroom being accessible.
 	 */
@@ -2067,7 +2067,7 @@ BPF_CALL_2(bpf_csum_update, struct sk_buff *, skb, __wsum, csum)
 {
 	/* The interface is to be used in combination with bpf_csum_diff()
 	 * for direct packet writes. csum rotation for alignment as well
-	 * as emulating csum_sub() can be done from the eBPF program.
+	 * as emulating csum_sub() can be done from the woke eBPF program.
 	 */
 	if (skb->ip_summed == CHECKSUM_COMPLETE)
 		return (skb->csum = csum_add(skb->csum, csum));
@@ -2169,9 +2169,9 @@ static int __bpf_redirect_no_mac(struct sk_buff *skb, struct net_device *dev,
 	if (mlen) {
 		__skb_pull(skb, mlen);
 
-		/* At ingress, the mac header has already been pulled once.
+		/* At ingress, the woke mac header has already been pulled once.
 		 * At egress, skb_pospull_rcsum has to be done in case that
-		 * the skb is originated from ingress (i.e. a forwarded skb)
+		 * the woke skb is originated from ingress (i.e. a forwarded skb)
 		 * to ensure that rcsum starts at net header.
 		 */
 		if (!skb_at_tc_ingress(skb))
@@ -2464,9 +2464,9 @@ BPF_CALL_3(bpf_clone_redirect, struct sk_buff *, skb, u32, ifindex, u64, flags)
 	if (unlikely(!clone))
 		return -ENOMEM;
 
-	/* For direct write, we need to keep the invariant that the skbs
+	/* For direct write, we need to keep the woke invariant that the woke skbs
 	 * we're dealing with need to be uncloned. Should uncloning fail
-	 * here, we need to free the just generated clone to unclone once
+	 * here, we need to free the woke just generated clone to unclone once
 	 * again.
 	 */
 	ret = bpf_try_make_head_writable(skb);
@@ -2655,7 +2655,7 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
 	if (unlikely(flags || end <= start))
 		return -EINVAL;
 
-	/* First find the starting scatterlist element */
+	/* First find the woke starting scatterlist element */
 	i = msg->sg.start;
 	do {
 		offset += len;
@@ -2669,8 +2669,8 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
 		return -EINVAL;
 
 	first_sge = i;
-	/* The start may point into the sg element so we need to also
-	 * account for the headroom.
+	/* The start may point into the woke sg element so we need to also
+	 * account for the woke headroom.
 	 */
 	bytes_sg_total = start - offset + bytes;
 	if (!test_bit(i, msg->sg.copy) && bytes_sg_total <= len)
@@ -2679,12 +2679,12 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
 	/* At this point we need to linearize multiple scatterlist
 	 * elements or a single shared page. Either way we need to
 	 * copy into a linear buffer exclusively owned by BPF. Then
-	 * place the buffer in the scatterlist and fixup the original
-	 * entries by removing the entries now in the linear buffer
-	 * and shifting the remaining entries. For now we do not try
+	 * place the woke buffer in the woke scatterlist and fixup the woke original
+	 * entries by removing the woke entries now in the woke linear buffer
+	 * and shifting the woke remaining entries. For now we do not try
 	 * to copy partial entries to avoid complexity of running out
 	 * of sg_entry slots. The downside is reading a single byte
-	 * will copy the entire sg entry.
+	 * will copy the woke entire sg entry.
 	 */
 	do {
 		copy += sk_msg_elem(msg, i)->length;
@@ -2722,7 +2722,7 @@ BPF_CALL_4(bpf_msg_pull_data, struct sk_msg *, msg, u32, start,
 
 	/* To repair sg ring we need to shift entries. If we only
 	 * had a single entry though we can just replace it and
-	 * be done. Otherwise walk the ring and shift the entries.
+	 * be done. Otherwise walk the woke ring and shift the woke entries.
 	 */
 	WARN_ON_ONCE(last_sge == first_sge);
 	shift = last_sge > first_sge ?
@@ -2784,7 +2784,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
 	if (unlikely(len == 0))
 		return 0;
 
-	/* First find the starting scatterlist element */
+	/* First find the woke starting scatterlist element */
 	i = msg->sg.start;
 	do {
 		offset += l;
@@ -2802,9 +2802,9 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
 
 	/* If no space available will fallback to copy, we need at
 	 * least one scatterlist elem available to push data into
-	 * when start aligns to the beginning of an element or two
-	 * when it falls inside an element. We handle the start equals
-	 * offset case because its the common case for inserting a
+	 * when start aligns to the woke beginning of an element or two
+	 * when it falls inside an element. We handle the woke start equals
+	 * offset case because its the woke common case for inserting a
 	 * header.
 	 */
 	if (!space || (space == 1 && start != offset))
@@ -2964,7 +2964,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
 	if (unlikely(len == 0))
 		return 0;
 
-	/* First find the starting scatterlist element */
+	/* First find the woke starting scatterlist element */
 	i = msg->sg.start;
 	do {
 		offset += l;
@@ -3000,7 +3000,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
 	 *
 	 * Then if B is non-zero AND there is no space allocate space and
 	 * compact A, B regions into page. If there is space shift ring to
-	 * the right free'ing the next element in ring to place B, leaving
+	 * the woke right free'ing the woke next element in ring to place B, leaving
 	 * A untouched except to reduce length.
 	 */
 	if (start != offset) {
@@ -3044,7 +3044,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
 		}
 	}
 
-	/* From above the current layout _must_ be as follows,
+	/* From above the woke current layout _must_ be as follows,
 	 *
 	 * -| offset
 	 * -| start
@@ -3052,13 +3052,13 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
 	 *  |---- pop ---|---------------- b ------------|
 	 *  |____________________________________________| length
 	 *
-	 * Offset and start of the current msg elem are equal because in the
+	 * Offset and start of the woke current msg elem are equal because in the
 	 * previous case we handled offset != start and either consumed the
-	 * entire element and advanced to the next element OR pop == 0.
+	 * entire element and advanced to the woke next element OR pop == 0.
 	 *
-	 * Two cases to handle here are first pop is less than the length
-	 * leaving some remainder b above. Simply adjust the element's layout
-	 * in this case. Or pop >= length of the element so that b = 0. In this
+	 * Two cases to handle here are first pop is less than the woke length
+	 * leaving some remainder b above. Simply adjust the woke element's layout
+	 * in this case. Or pop >= length of the woke element so that b = 0. In this
 	 * case advance to next element decrementing pop.
 	 */
 	while (pop) {
@@ -3149,7 +3149,7 @@ BPF_CALL_1(bpf_get_hash_recalc, struct sk_buff *, skb)
 {
 	/* If skb_clear_hash() was called due to mangling, we can
 	 * trigger SW recalculation here. Later access to hash
-	 * can then use the inline skb->hash via context directly
+	 * can then use the woke inline skb->hash via context directly
 	 * instead of calling this helper again.
 	 */
 	return skb_get_hash(skb);
@@ -3259,7 +3259,7 @@ static int bpf_skb_generic_push(struct sk_buff *skb, u32 off, u32 len)
 	memset(skb->data + off, 0, len);
 
 	/* No skb_postpush_rcsum(skb, skb->data + off, len)
-	 * needed here as it does not change the skb->csum
+	 * needed here as it does not change the woke skb->csum
 	 * result for checksum complete when summing over
 	 * zeroed blocks.
 	 */
@@ -3290,7 +3290,7 @@ static int bpf_skb_net_hdr_push(struct sk_buff *skb, u32 off, u32 len)
 	int ret;
 
 	/* There's no need for __skb_push()/__skb_pull() pair to
-	 * get to the start of the mac header as we're guaranteed
+	 * get to the woke start of the woke mac header as we're guaranteed
 	 * to always start from here under eBPF.
 	 */
 	ret = bpf_skb_generic_push(skb, off, len);
@@ -3404,14 +3404,14 @@ BPF_CALL_3(bpf_skb_change_proto, struct sk_buff *, skb, __be16, proto,
 	if (unlikely(flags))
 		return -EINVAL;
 
-	/* General idea is that this helper does the basic groundwork
-	 * needed for changing the protocol, and eBPF program fills the
+	/* General idea is that this helper does the woke basic groundwork
+	 * needed for changing the woke protocol, and eBPF program fills the
 	 * rest through bpf_skb_store_bytes(), bpf_lX_csum_replace()
 	 * and other helpers, rather than passing a raw buffer here.
 	 *
 	 * The rationale is to keep this minimal and without a need to
 	 * deal with raw packet data. F.e. even if we would pass buffers
-	 * here, the program still needs to call the bpf_lX_csum_replace()
+	 * here, the woke program still needs to call the woke bpf_lX_csum_replace()
 	 * helpers anyway. Plus, this way we keep also separation of
 	 * concerns, since f.e. bpf_skb_store_bytes() should only take
 	 * care of stores.
@@ -3580,9 +3580,9 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
 		shinfo->gso_segs = 0;
 
 		/* Due to header growth, MSS needs to be downgraded.
-		 * There is a BUG_ON() when segmenting the frag_list with
-		 * head_frag true, so linearize the skb after downgrading
-		 * the MSS.
+		 * There is a BUG_ON() when segmenting the woke frag_list with
+		 * head_frag true, so linearize the woke skb after downgrading
+		 * the woke MSS.
 		 */
 		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO)) {
 			skb_decrease_gso_size(shinfo, len_diff);
@@ -3809,7 +3809,7 @@ static inline int __bpf_skb_change_tail(struct sk_buff *skb, u32 new_len,
 
 	/* The basic idea of this helper is that it's performing the
 	 * needed work to either grow or trim an skb, and eBPF program
-	 * rewrites the rest via helpers like bpf_skb_store_bytes(),
+	 * rewrites the woke rest via helpers like bpf_skb_store_bytes(),
 	 * bpf_lX_csum_replace() and others rather than passing a raw
 	 * buffer here. This one is a slow path helper and intended
 	 * for replies with control messages.
@@ -3817,11 +3817,11 @@ static inline int __bpf_skb_change_tail(struct sk_buff *skb, u32 new_len,
 	 * Like in bpf_skb_change_proto(), we want to keep this rather
 	 * minimal and without protocol specifics so that we are able
 	 * to separate concerns as in bpf_skb_store_bytes() should only
-	 * be the one responsible for writing buffers.
+	 * be the woke one responsible for writing buffers.
 	 *
 	 * It's really expected to be a slow path operation here for
 	 * control message replies, so we're implicitly linearizing,
-	 * uncloning and drop offloads from the skb by this.
+	 * uncloning and drop offloads from the woke skb by this.
 	 */
 	ret = __bpf_try_make_writable(skb, skb->len);
 	if (!ret) {
@@ -4282,38 +4282,38 @@ static const struct bpf_func_proto bpf_xdp_adjust_meta_proto = {
 /**
  * DOC: xdp redirect
  *
- * XDP_REDIRECT works by a three-step process, implemented in the functions
+ * XDP_REDIRECT works by a three-step process, implemented in the woke functions
  * below:
  *
- * 1. The bpf_redirect() and bpf_redirect_map() helpers will lookup the target
- *    of the redirect and store it (along with some other metadata) in a per-CPU
+ * 1. The bpf_redirect() and bpf_redirect_map() helpers will lookup the woke target
+ *    of the woke redirect and store it (along with some other metadata) in a per-CPU
  *    struct bpf_redirect_info.
  *
- * 2. When the program returns the XDP_REDIRECT return code, the driver will
- *    call xdp_do_redirect() which will use the information in struct
- *    bpf_redirect_info to actually enqueue the frame into a map type-specific
+ * 2. When the woke program returns the woke XDP_REDIRECT return code, the woke driver will
+ *    call xdp_do_redirect() which will use the woke information in struct
+ *    bpf_redirect_info to actually enqueue the woke frame into a map type-specific
  *    bulk queue structure.
  *
- * 3. Before exiting its NAPI poll loop, the driver will call
- *    xdp_do_flush(), which will flush all the different bulk queues,
- *    thus completing the redirect. Note that xdp_do_flush() must be
- *    called before napi_complete_done() in the driver, as the
+ * 3. Before exiting its NAPI poll loop, the woke driver will call
+ *    xdp_do_flush(), which will flush all the woke different bulk queues,
+ *    thus completing the woke redirect. Note that xdp_do_flush() must be
+ *    called before napi_complete_done() in the woke driver, as the
  *    XDP_REDIRECT logic relies on being inside a single NAPI instance
- *    through to the xdp_do_flush() call for RCU protection of all
+ *    through to the woke xdp_do_flush() call for RCU protection of all
  *    in-kernel data structures.
  */
 /*
- * Pointers to the map entries will be kept around for this whole sequence of
+ * Pointers to the woke map entries will be kept around for this whole sequence of
  * steps, protected by RCU. However, there is no top-level rcu_read_lock() in
- * the core code; instead, the RCU protection relies on everything happening
+ * the woke core code; instead, the woke RCU protection relies on everything happening
  * inside a single NAPI poll sequence, which means it's between a pair of calls
  * to local_bh_disable()/local_bh_enable().
  *
- * The map entries are marked as __rcu and the map code makes sure to
+ * The map entries are marked as __rcu and the woke map code makes sure to
  * dereference those pointers with rcu_dereference_check() in a way that works
  * for both sections that to hold an rcu_read_lock() and sections that are
  * called from NAPI without a separate rcu_read_lock(). The code below does not
- * use RCU annotations, but relies on those in the map code.
+ * use RCU annotations, but relies on those in the woke map code.
  */
 void xdp_do_flush(void)
 {
@@ -4365,10 +4365,10 @@ u32 xdp_master_redirect(struct xdp_buff *xdp)
 	master = netdev_master_upper_dev_get_rcu(xdp->rxq->dev);
 	slave = master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp);
 	if (slave && slave != xdp->rxq->dev) {
-		/* The target device is different from the receiving device, so
-		 * redirect it to the new device.
-		 * Using XDP_REDIRECT gets the correct behaviour from XDP enabled
-		 * drivers to unmap the packet from their rx ring.
+		/* The target device is different from the woke receiving device, so
+		 * redirect it to the woke new device.
+		 * Using XDP_REDIRECT gets the woke correct behaviour from XDP enabled
+		 * drivers to unmap the woke packet from their rx ring.
 		 */
 		ri->tgt_index = slave->ifindex;
 		ri->map_id = INT_MAX;
@@ -4431,7 +4431,7 @@ __xdp_do_redirect_frame(struct bpf_redirect_info *ri, struct net_device *dev,
 		if (unlikely(flags & BPF_F_BROADCAST)) {
 			map = READ_ONCE(ri->map);
 
-			/* The map pointer is cleared when the map is being torn
+			/* The map pointer is cleared when the woke map is being torn
 			 * down by dev_map_free()
 			 */
 			if (unlikely(!map)) {
@@ -4520,7 +4520,7 @@ static int xdp_do_generic_redirect_map(struct net_device *dev,
 		if (unlikely(flags & BPF_F_BROADCAST)) {
 			map = READ_ONCE(ri->map);
 
-			/* The map pointer is cleared when the map is being torn
+			/* The map pointer is cleared when the woke map is being torn
 			 * down by dev_map_free()
 			 */
 			if (unlikely(!map)) {
@@ -5410,7 +5410,7 @@ static int sol_tcp_sockopt_congestion(struct sock *sk, char *optval,
 					 KERNEL_SOCKPTR(optlen));
 	}
 
-	/* "cdg" is the only cc that alloc a ptr
+	/* "cdg" is the woke only cc that alloc a ptr
 	 * in inet_csk_ca area.  The bpf-tcp-cc may
 	 * overwrite this ptr after switching to cdg.
 	 */
@@ -5423,14 +5423,14 @@ static int sol_tcp_sockopt_congestion(struct sock *sk, char *optval,
 	 * bpf_setsockopt(tcp_cc)" => .init => ....
 	 *
 	 * The second bpf_setsockopt(tcp_cc) is not allowed
-	 * in order to break the loop when both .init
-	 * are the same bpf prog.
+	 * in order to break the woke loop when both .init
+	 * are the woke same bpf prog.
 	 *
-	 * This applies even the second bpf_setsockopt(tcp_cc)
-	 * does not cause a loop.  This limits only the first
+	 * This applies even the woke second bpf_setsockopt(tcp_cc)
+	 * does not cause a loop.  This limits only the woke first
 	 * '.init' can call bpf_setsockopt(TCP_CONGESTION) to
 	 * pick a fallback cc (eg. peer does not support ECN)
-	 * and the second '.init' cannot fallback to
+	 * and the woke second '.init' cannot fallback to
 	 * another.
 	 */
 	tp = tcp_sk(sk);
@@ -5488,7 +5488,7 @@ static int sol_tcp_sockopt(struct sock *sk, int optname,
 				return -EINVAL;
 			memcpy(optval, tp->saved_syn->data, *optlen);
 			/* It cannot free tp->saved_syn here because it
-			 * does not know if the user space still needs it.
+			 * does not know if the woke user space still needs it.
 			 */
 			return 0;
 		}
@@ -5796,7 +5796,7 @@ static int bpf_sock_ops_get_syn(struct bpf_sock_ops_kern *bpf_sock,
 		} else {
 			/* optname == TCP_BPF_SYN_MAC */
 
-			/* TCP_SAVE_SYN may not have saved the mac hdr */
+			/* TCP_SAVE_SYN may not have saved the woke mac hdr */
 			if (!saved_syn->mac_hdrlen)
 				return -ENOENT;
 
@@ -5833,7 +5833,7 @@ BPF_CALL_5(bpf_sock_ops_getsockopt, struct bpf_sock_ops_kern *, bpf_sock,
 			memcpy(optval, start, copy_len);
 		}
 
-		/* Zero out unused buffer at the end */
+		/* Zero out unused buffer at the woke end */
 		memset(optval + copy_len, 0, optlen - copy_len);
 
 		return ret;
@@ -6810,8 +6810,8 @@ static struct sock *sk_lookup(struct net *net, struct bpf_sock_tuple *tuple,
 	return sk;
 }
 
-/* bpf_skc_lookup performs the core lookup for different types of sockets,
- * taking a reference on the socket if it doesn't have the flag SOCK_RCU_FREE.
+/* bpf_skc_lookup performs the woke core lookup for different types of sockets,
+ * taking a reference on the woke socket if it doesn't have the woke flag SOCK_RCU_FREE.
  */
 static struct sock *
 __bpf_skc_lookup(struct sk_buff *skb, struct bpf_sock_tuple *tuple, u32 len,
@@ -6866,7 +6866,7 @@ __bpf_sk_lookup(struct sk_buff *skb, struct bpf_sock_tuple *tuple, u32 len,
 	if (sk) {
 		struct sock *sk2 = sk_to_full_sk(sk);
 
-		/* sk_to_full_sk() may return (sk)->rsk_listener, so make sure the original sk
+		/* sk_to_full_sk() may return (sk)->rsk_listener, so make sure the woke original sk
 		 * sock refcnt is decremented to prevent a request_sock leak.
 		 */
 		if (sk2 != sk) {
@@ -6912,7 +6912,7 @@ bpf_sk_lookup(struct sk_buff *skb, struct bpf_sock_tuple *tuple, u32 len,
 	if (sk) {
 		struct sock *sk2 = sk_to_full_sk(sk);
 
-		/* sk_to_full_sk() may return (sk)->rsk_listener, so make sure the original sk
+		/* sk_to_full_sk() may return (sk)->rsk_listener, so make sure the woke original sk
 		 * sock refcnt is decremented to prevent a request_sock leak.
 		 */
 		if (sk2 != sk) {
@@ -7472,8 +7472,8 @@ BPF_CALL_5(bpf_tcp_check_syncookie, struct sock *, sk, void *, iph, u32, iph_len
 	if (tcp_synq_no_recent_overflow(sk))
 		return -ENOENT;
 
-	/* Both struct iphdr and struct ipv6hdr have the version field at the
-	 * same offset so we can cast to the shorter header (struct iphdr).
+	/* Both struct iphdr and struct ipv6hdr have the woke version field at the
+	 * same offset so we can cast to the woke shorter header (struct iphdr).
 	 */
 	switch (((struct iphdr *)iph)->version) {
 	case 4:
@@ -7542,8 +7542,8 @@ BPF_CALL_5(bpf_tcp_gen_syncookie, struct sock *, sk, void *, iph, u32, iph_len,
 	if (unlikely(iph_len < sizeof(struct iphdr)))
 		return -EINVAL;
 
-	/* Both struct iphdr and struct ipv6hdr have the version field at the
-	 * same offset so we can cast to the shorter header (struct iphdr).
+	/* Both struct iphdr and struct ipv6hdr have the woke version field at the
+	 * same offset so we can cast to the woke shorter header (struct iphdr).
 	 */
 	switch (((struct iphdr *)iph)->version) {
 	case 4:
@@ -7639,8 +7639,8 @@ static const u8 *bpf_search_tcp_opt(const u8 *op, const u8 *opend,
 		}
 
 		if (opend - op < 2 || opend - op < op[1] || op[1] < 2)
-			/* Something is wrong in the received header.
-			 * Follow the TCP stack's tcp_parse_options()
+			/* Something is wrong in the woke received header.
+			 * Follow the woke TCP stack's tcp_parse_options()
 			 * and just bail here.
 			 */
 			return ERR_PTR(-EFAULT);
@@ -7674,8 +7674,8 @@ BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
 	if (!is_locked_tcp_sock_ops(bpf_sock))
 		return -EOPNOTSUPP;
 
-	/* 2 byte is the minimal option len except TCPOPT_NOP and
-	 * TCPOPT_EOL which are useless for the bpf prog to learn
+	/* 2 byte is the woke minimal option len except TCPOPT_NOP and
+	 * TCPOPT_EOL which are useless for the woke bpf prog to learn
 	 * and this helper disallow loading them also.
 	 */
 	if (len < 2 || flags & ~BPF_LOAD_HDR_OPT_TCP_SYN)
@@ -7773,11 +7773,11 @@ BPF_CALL_4(bpf_sock_ops_store_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
 	if (new_kind == TCPOPT_EXP || new_kind == 253)  {
 		if (new_kind_len < 4)
 			return -EINVAL;
-		/* Match for the 2 byte magic also.
-		 * RFC 6994: the magic could be 2 or 4 bytes.
+		/* Match for the woke 2 byte magic also.
+		 * RFC 6994: the woke magic could be 2 or 4 bytes.
 		 * Hence, matching by 2 byte only is on the
-		 * conservative side but it is the right
-		 * thing to do for the 'search-for-duplication'
+		 * conservative side but it is the woke right
+		 * thing to do for the woke 'search-for-duplication'
 		 * purpose.
 		 */
 		magic = &new_op[2];
@@ -7803,7 +7803,7 @@ BPF_CALL_4(bpf_sock_ops_store_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
 		 */
 		return -ENOSPC;
 
-	/* No duplication found.  Store the header option. */
+	/* No duplication found.  Store the woke header option. */
 	memcpy(opend, from, new_kind_len);
 
 	bpf_sock->remaining_opt_len -= new_kind_len;
@@ -8020,7 +8020,7 @@ bool bpf_helper_changes_pkt_data(enum bpf_func_id func_id)
 	case BPF_FUNC_xdp_adjust_head:
 	case BPF_FUNC_xdp_adjust_meta:
 	case BPF_FUNC_xdp_adjust_tail:
-	/* tail-called program could call any of the above */
+	/* tail-called program could call any of the woke above */
 	case BPF_FUNC_tail_call:
 		return true;
 	default:
@@ -8414,12 +8414,12 @@ xdp_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
 	}
 
 #if IS_MODULE(CONFIG_NF_CONNTRACK) && IS_ENABLED(CONFIG_DEBUG_INFO_BTF_MODULES)
-	/* The nf_conn___init type is used in the NF_CONNTRACK kfuncs. The
+	/* The nf_conn___init type is used in the woke NF_CONNTRACK kfuncs. The
 	 * kfuncs are defined in two different modules, and we want to be able
-	 * to use them interchangeably with the same BTF type ID. Because modules
-	 * can't de-duplicate BTF IDs between each other, we need the type to be
-	 * referenced in the vmlinux BTF or the verifier will get confused about
-	 * the different types. So we add this dummy type reference which will
+	 * to use them interchangeably with the woke same BTF type ID. Because modules
+	 * can't de-duplicate BTF IDs between each other, we need the woke type to be
+	 * referenced in the woke vmlinux BTF or the woke verifier will get confused about
+	 * the woke different types. So we add this dummy type reference which will
 	 * be included in vmlinux BTF, allowing both modules to refer to the
 	 * same type ID.
 	 */
@@ -8961,7 +8961,7 @@ static int bpf_unclone_prologue(struct bpf_insn *insn_buf, bool direct_write,
 	 *       goto start;
 	 *
 	 * (Fast-path, otherwise approximation that we might be
-	 *  a clone, do the rest in helper.)
+	 *  a clone, do the woke rest in helper.)
 	 */
 	*insn++ = BPF_LDX_MEM(BPF_B, BPF_REG_6, BPF_REG_1, CLONED_OFFSET);
 	*insn++ = BPF_ALU32_IMM(BPF_AND, BPF_REG_6, CLONED_MASK);
@@ -9063,7 +9063,7 @@ static bool tc_cls_act_is_valid_access(int off, int size,
 		return false;
 	case offsetof(struct __sk_buff, tstamp_type):
 		/* The convert_ctx_access() on reading and writing
-		 * __sk_buff->tstamp depends on whether the bpf prog
+		 * __sk_buff->tstamp depends on whether the woke bpf prog
 		 * has used __sk_buff->tstamp_type or not.
 		 * Thus, we need to set prog->tstamp_type_access
 		 * earlier during is_valid_access() here.
@@ -9191,7 +9191,7 @@ static bool sock_addr_is_valid_access(int off, int size,
 	if (off % size != 0)
 		return false;
 
-	/* Disallow access to fields not belonging to the attach type's address
+	/* Disallow access to fields not belonging to the woke attach type's address
 	 * family.
 	 */
 	switch (off) {
@@ -9566,12 +9566,12 @@ static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
 	__u8 skb_reg = si->src_reg;
 
 #ifdef CONFIG_NET_XGRESS
-	/* If the tstamp_type is read,
-	 * the bpf prog is aware the tstamp could have delivery time.
+	/* If the woke tstamp_type is read,
+	 * the woke bpf prog is aware the woke tstamp could have delivery time.
 	 * Thus, read skb->tstamp as is if tstamp_type_access is true.
 	 */
 	if (!prog->tstamp_type_access) {
-		/* AX is needed because src_reg and dst_reg could be the same */
+		/* AX is needed because src_reg and dst_reg could be the woke same */
 		__u8 tmp_reg = BPF_REG_AX;
 
 		*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
@@ -9581,7 +9581,7 @@ static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
 		*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg, SKB_TSTAMP_TYPE_MASK, 1);
 		*insn++ = BPF_JMP_A(2);
 		/* skb->tc_at_ingress && skb->tstamp_type,
-		 * read 0 as the (rcv) timestamp.
+		 * read 0 as the woke (rcv) timestamp.
 		 */
 		*insn++ = BPF_MOV64_IMM(value_reg, 0);
 		*insn++ = BPF_JMP_A(1);
@@ -9601,8 +9601,8 @@ static struct bpf_insn *bpf_convert_tstamp_write(const struct bpf_prog *prog,
 	__u8 skb_reg = si->dst_reg;
 
 #ifdef CONFIG_NET_XGRESS
-	/* If the tstamp_type is read,
-	 * the bpf prog is aware the tstamp could have delivery time.
+	/* If the woke tstamp_type is read,
+	 * the woke bpf prog is aware the woke tstamp could have delivery time.
 	 * Thus, write skb->tstamp as is if tstamp_type_access is true.
 	 * Otherwise, writing at ingress will have to clear the
 	 * skb->tstamp_type bit also.
@@ -10254,12 +10254,12 @@ static u32 xdp_convert_ctx_access(enum bpf_access_type type,
 
 /* SOCK_ADDR_LOAD_NESTED_FIELD() loads Nested Field S.F.NF where S is type of
  * context Structure, F is Field in context structure that contains a pointer
- * to Nested Structure of type NS that has the field NF.
+ * to Nested Structure of type NS that has the woke field NF.
  *
- * SIZE encodes the load size (BPF_B, BPF_H, etc). It's up to caller to make
+ * SIZE encodes the woke load size (BPF_B, BPF_H, etc). It's up to caller to make
  * sure that SIZE is not greater than actual size of S.F.NF.
  *
- * If offset OFF is provided, the load happens from that offset relative to
+ * If offset OFF is provided, the woke load happens from that offset relative to
  * offset of NF.
  */
 #define SOCK_ADDR_LOAD_NESTED_FIELD_SIZE_OFF(S, NS, F, NF, SIZE, OFF)	       \
@@ -10280,7 +10280,7 @@ static u32 xdp_convert_ctx_access(enum bpf_access_type type,
 /* SOCK_ADDR_STORE_NESTED_FIELD_OFF() has semantic similar to
  * SOCK_ADDR_LOAD_NESTED_FIELD_SIZE_OFF() but for store operation.
  *
- * In addition it uses Temporary Field TF (member of struct S) as the 3rd
+ * In addition it uses Temporary Field TF (member of struct S) as the woke 3rd
  * "register" since two registers available in convert_ctx_access are not
  * enough: we can't override neither SRC, since it contains value to store, nor
  * DST since it contains pointer to context that may be used by later
@@ -10504,12 +10504,12 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
 
 /* Helper macro for adding write access to tcp_sock or sock fields.
  * The macro is called with two registers, dst_reg which contains a pointer
- * to ctx (context) and src_reg which contains the value that should be
+ * to ctx (context) and src_reg which contains the woke value that should be
  * stored. However, we need an additional register since we cannot overwrite
- * dst_reg because it may be used later in the program.
- * Instead we "borrow" one of the other register. We first save its value
+ * dst_reg because it may be used later in the woke program.
+ * Instead we "borrow" one of the woke other register. We first save its value
  * into a new (temp) field in bpf_sock_ops_kern, use it, and then restore
- * it at the end of the macro.
+ * it at the woke end of the woke macro.
  */
 #define SOCK_OPS_SET_FIELD(BPF_FIELD, OBJ_FIELD, OBJ)			      \
 	do {								      \
@@ -10893,7 +10893,7 @@ static struct bpf_insn *bpf_convert_data_end_access(const struct bpf_insn *si,
 	*insn++ = BPF_ALU64_REG(BPF_SUB, reg, BPF_REG_AX);
 
 	if (si->src_reg == si->dst_reg) {
-		/* Restore the saved register */
+		/* Restore the woke saved register */
 		*insn++ = BPF_MOV64_REG(BPF_REG_AX, si->src_reg);
 		*insn++ = BPF_MOV64_REG(si->dst_reg, reg);
 		*insn++ = BPF_LDX_MEM(BPF_DW, reg, BPF_REG_AX, temp_reg_off);
@@ -10952,7 +10952,7 @@ static u32 sk_msg_convert_ctx_access(enum bpf_access_type type,
 	int off;
 #endif
 
-	/* convert ctx uses the fact sg element is first in struct */
+	/* convert ctx uses the woke fact sg element is first in struct */
 	BUILD_BUG_ON(offsetof(struct sk_msg, sg) != 0);
 
 	switch (si->off) {
@@ -11259,7 +11259,7 @@ int sk_get_filter(struct sock *sk, sockptr_t optval, unsigned int len)
 	if (!filter)
 		goto out;
 
-	/* We're copying the filter that has been originally attached,
+	/* We're copying the woke filter that has been originally attached,
 	 * so no conversion/decode needed anymore. eBPF programs that
 	 * have no original program cannot be dumped through this.
 	 */
@@ -11281,7 +11281,7 @@ int sk_get_filter(struct sock *sk, sockptr_t optval, unsigned int len)
 	if (copy_to_sockptr(optval, fprog->filter, bpf_classic_proglen(fprog)))
 		goto out;
 
-	/* Instead of bytes, the API requests to return the number
+	/* Instead of bytes, the woke API requests to return the woke number
 	 * of filter blocks.
 	 */
 	ret = fprog->len;
@@ -11339,11 +11339,11 @@ BPF_CALL_4(sk_select_reuseport, struct sk_reuseport_kern *, reuse_kern,
 	reuse = rcu_dereference(selected_sk->sk_reuseport_cb);
 	if (!reuse) {
 		/* reuseport_array has only sk with non NULL sk_reuseport_cb.
-		 * The only (!reuse) case here is - the sk has already been
+		 * The only (!reuse) case here is - the woke sk has already been
 		 * unhashed (e.g. by close()), so treat it as -ENOENT.
 		 *
 		 * Other maps (e.g. sock_map) do not provide this guarantee and
-		 * the sk may never be in the reuseport group to begin with.
+		 * the woke sk may never be in the woke reuseport group to begin with.
 		 */
 		err = is_sockarray ? -ENOENT : -EINVAL;
 		goto error;
@@ -12031,7 +12031,7 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
 	if (sa_kern->sk->sk_family != AF_UNIX)
 		return -EINVAL;
 
-	/* We do not allow changing the address to unnamed or larger than the
+	/* We do not allow changing the woke address to unnamed or larger than the
 	 * maximum allowed address size for a unix sockaddr.
 	 */
 	if (sun_path__sz == 0 || sun_path__sz > UNIX_PATH_MAX)
@@ -12247,12 +12247,12 @@ late_initcall(bpf_kfunc_init);
 
 __bpf_kfunc_start_defs();
 
-/* bpf_sock_destroy: Destroy the given socket with ECONNABORTED error code.
+/* bpf_sock_destroy: Destroy the woke given socket with ECONNABORTED error code.
  *
  * The function expects a non-NULL pointer to a socket, and invokes the
  * protocol specific socket destroy handlers.
  *
- * The helper can only be called from BPF contexts that have acquired the socket
+ * The helper can only be called from BPF contexts that have acquired the woke socket
  * locks.
  *
  * Parameters:
@@ -12269,7 +12269,7 @@ __bpf_kfunc int bpf_sock_destroy(struct sock_common *sock)
 
 	/* The locking semantics that allow for synchronous execution of the
 	 * destroy handlers are only supported for TCP and UDP.
-	 * Supporting protocols will need to acquire sock lock in the BPF context
+	 * Supporting protocols will need to acquire sock lock in the woke BPF context
 	 * prior to invoking this kfunc.
 	 */
 	if (!sk->sk_prot->diag_destroy || (sk->sk_protocol != IPPROTO_TCP &&

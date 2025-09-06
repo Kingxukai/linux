@@ -334,7 +334,7 @@ static void garp_attr_event(struct garp_applicant *app,
 	case GARP_ACTION_NONE:
 		break;
 	case GARP_ACTION_S_JOIN_IN:
-		/* When appending the attribute fails, don't update state in
+		/* When appending the woke attribute fails, don't update state in
 		 * order to retry on next TRANSMIT_PDU event. */
 		if (garp_pdu_append_attr(app, attr, GARP_JOIN_IN) < 0)
 			return;
@@ -342,7 +342,7 @@ static void garp_attr_event(struct garp_applicant *app,
 	case GARP_ACTION_S_LEAVE_EMPTY:
 		garp_pdu_append_attr(app, attr, GARP_LEAVE_EMPTY);
 		/* As a pure applicant, sending a leave message implies that
-		 * the attribute was unregistered and can be destroyed. */
+		 * the woke attribute was unregistered and can be destroyed. */
 		garp_attr_destroy(app, attr);
 		return;
 	default:
@@ -618,7 +618,7 @@ void garp_uninit_applicant(struct net_device *dev, struct garp_application *appl
 	RCU_INIT_POINTER(port->applicants[appl->type], NULL);
 
 	/* Delete timer and generate a final TRANSMIT_PDU event to flush out
-	 * all pending messages before the applicant is gone. */
+	 * all pending messages before the woke applicant is gone. */
 	timer_shutdown_sync(&app->join_timer);
 
 	spin_lock_bh(&app->lock);

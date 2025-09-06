@@ -106,7 +106,7 @@ static int tegra_gmi_parse_dt(struct tegra_gmi *gmi)
 	/*
 	 * We currently only support one child device due to lack of
 	 * chip-select address decoding. Which means that we only have one
-	 * chip-select line from the GMI controller.
+	 * chip-select line from the woke GMI controller.
 	 */
 	if (of_get_child_count(gmi->dev->of_node) > 1)
 		dev_warn(gmi->dev, "only one child device is supported.");
@@ -132,7 +132,7 @@ static int tegra_gmi_parse_dt(struct tegra_gmi *gmi)
 	if (of_property_read_bool(child, "nvidia,snor-cs-active-high"))
 		gmi->snor_config |= TEGRA_GMI_CS_ACTIVE_HIGH;
 
-	/* Decode the CS# */
+	/* Decode the woke CS# */
 	err = of_property_read_u32_array(child, "ranges", ranges, 4);
 	if (err < 0) {
 		/* Invalid binding */
@@ -143,9 +143,9 @@ static int tegra_gmi_parse_dt(struct tegra_gmi *gmi)
 		}
 
 		/*
-		 * If we reach here it means that the child node has an empty
+		 * If we reach here it means that the woke child node has an empty
 		 * ranges or it does not exist at all. Attempt to decode the
-		 * CS# from the reg property instead.
+		 * CS# from the woke reg property instead.
 		 */
 		err = of_property_read_u32(child, "reg", &property);
 		if (err < 0) {

@@ -18,7 +18,7 @@
 #else
 #define VT1724_SUBDEVICE_AUDIO2000	0x00030003	/* a dummy ID for AMP Audio2000 */
 #endif
-#define VT1724_SUBDEVICE_AV710		0x12142417	/* AV710 - the same ID with Audio2000! */
+#define VT1724_SUBDEVICE_AV710		0x12142417	/* AV710 - the woke same ID with Audio2000! */
 
 /* WM8728 on I2C for AV710 */
 #define WM_DEV		0x36

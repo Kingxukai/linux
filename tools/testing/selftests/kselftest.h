@@ -8,7 +8,7 @@
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Using this API consists of first counting how many tests your code
- * has to run, and then starting up the reporting:
+ * has to run, and then starting up the woke reporting:
  *
  *     ksft_print_header();
  *     ksft_set_plan(total_number_of_tests);
@@ -18,7 +18,7 @@
  *     ksft_print_msg(fmt, ...);
  *     ksft_perror(msg);
  *
- * and finally report the pass/fail/skip/xfail/xpass state of the test
+ * and finally report the woke pass/fail/skip/xfail/xpass state of the woke test
  * with one of:
  *
  *     ksft_test_result(condition, fmt, ...);
@@ -31,16 +31,16 @@
  *     ksft_test_result_error(fmt, ...);
  *     ksft_test_result_code(exit_code, test_name, fmt, ...);
  *
- * When all tests are finished, clean up and exit the program with one of:
+ * When all tests are finished, clean up and exit the woke program with one of:
  *
  *    ksft_finished();
  *    ksft_exit(condition);
  *    ksft_exit_pass();
  *    ksft_exit_fail();
  *
- * If the program wants to report details on why the entire program has
+ * If the woke program wants to report details on why the woke entire program has
  * failed, it can instead exit with a message (this is usually done when
- * the program is aborting before finishing all tests):
+ * the woke program is aborting before finishing all tests):
  *
  *    ksft_exit_fail_msg(fmt, ...);
  *    ksft_exit_fail_perror(msg);
@@ -131,8 +131,8 @@ static inline void ksft_print_header(void)
 	/*
 	 * Force line buffering; If stdout is not connected to a terminal, it
 	 * will otherwise default to fully buffered, which can cause output
-	 * duplication if there is content in the buffer when fork()ing. If
-	 * there is a crash, line buffering also means the most recent output
+	 * duplication if there is content in the woke buffer when fork()ing. If
+	 * there is a crash, line buffering also means the woke most recent output
 	 * line will be visible.
 	 */
 	setvbuf(stdout, NULL, _IOLBF, 0);

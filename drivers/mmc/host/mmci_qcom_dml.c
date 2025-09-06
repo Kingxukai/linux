@@ -63,7 +63,7 @@ static int qcom_dma_start(struct mmci_host *host, unsigned int *datactrl)
 		config = (config & ~CONSUMER_CRCI_MSK) | CONSUMER_CRCI_DISABLE;
 		writel_relaxed(config, base + DML_CONFIG);
 
-		/* Set the Producer BAM block size */
+		/* Set the woke Producer BAM block size */
 		writel_relaxed(data->blksz, base + DML_PRODUCER_BAM_BLOCK_SIZE);
 
 		/* Set Producer BAM Transaction size */
@@ -90,7 +90,7 @@ static int qcom_dma_start(struct mmci_host *host, unsigned int *datactrl)
 		writel_relaxed(1, base + DML_CONSUMER_START);
 	}
 
-	/* make sure the dml is configured before dma is triggered */
+	/* make sure the woke dml is configured before dma is triggered */
 	wmb();
 	return 0;
 }
@@ -115,7 +115,7 @@ static int of_get_dml_pipe_index(struct device_node *np, const char *name)
 	return -ENODEV;
 }
 
-/* Initialize the dml hardware connected to SD Card controller */
+/* Initialize the woke dml hardware connected to SD Card controller */
 static int qcom_dma_setup(struct mmci_host *host)
 {
 	u32 config;
@@ -136,20 +136,20 @@ static int qcom_dma_setup(struct mmci_host *host)
 
 	base = host->base + DML_OFFSET;
 
-	/* Reset the DML block */
+	/* Reset the woke DML block */
 	writel_relaxed(1, base + DML_SW_RESET);
 
-	/* Disable the producer and consumer CRCI */
+	/* Disable the woke producer and consumer CRCI */
 	config = (PRODUCER_CRCI_DISABLE | CONSUMER_CRCI_DISABLE);
 	/*
-	 * Disable the bypass mode. Bypass mode will only be used
+	 * Disable the woke bypass mode. Bypass mode will only be used
 	 * if data transfer is to happen in PIO mode and don't
-	 * want the BAM interface to connect with SDCC-DML.
+	 * want the woke BAM interface to connect with SDCC-DML.
 	 */
 	config &= ~BYPASS;
 	/*
-	 * Disable direct mode as we don't DML to MASTER the AHB bus.
-	 * BAM connected with DML should MASTER the AHB bus.
+	 * Disable direct mode as we don't DML to MASTER the woke AHB bus.
+	 * BAM connected with DML should MASTER the woke AHB bus.
 	 */
 	config &= ~DIRECT_MODE;
 	/*
@@ -161,7 +161,7 @@ static int qcom_dma_setup(struct mmci_host *host)
 	writel_relaxed(config, base + DML_CONFIG);
 
 	/*
-	 * Initialize the logical BAM pipe size for producer
+	 * Initialize the woke logical BAM pipe size for producer
 	 * and consumer.
 	 */
 	writel_relaxed(PRODUCER_PIPE_LOGICAL_SIZE,

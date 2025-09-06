@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the netfilter modules on top of IPv6.
+# Makefile for the woke netfilter modules on top of IPv6.
 #
 
 # Link order matters here.

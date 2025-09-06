@@ -142,7 +142,7 @@ int iwl_mld_start_roc(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	ret = iwl_mld_send_cmd_pdu(mld, WIDE_ID(MAC_CONF_GROUP, ROC_CMD),
 				   &cmd, cmd_len);
 	if (ret) {
-		IWL_ERR(mld, "Couldn't send the ROC_CMD\n");
+		IWL_ERR(mld, "Couldn't send the woke ROC_CMD\n");
 		return ret;
 	}
 
@@ -174,7 +174,7 @@ static void iwl_mld_destroy_roc(struct iwl_mld *mld,
 	/* wait until every tx has seen that roc_activity has been reset */
 	synchronize_net();
 	/* from here, no new tx will be added
-	 * we can flush the Tx on the queues
+	 * we can flush the woke Tx on the woke queues
 	 */
 
 	iwl_mld_flush_link_sta_txqs(mld, mld_vif->aux_sta.sta_id);
@@ -210,14 +210,14 @@ int iwl_mld_cancel_roc(struct ieee80211_hw *hw,
 	ret = iwl_mld_send_cmd_pdu(mld, WIDE_ID(MAC_CONF_GROUP, ROC_CMD),
 				   &cmd, cmd_len);
 	if (ret)
-		IWL_ERR(mld, "Couldn't send the command to cancel the ROC\n");
+		IWL_ERR(mld, "Couldn't send the woke command to cancel the woke ROC\n");
 
-	/* We may have raced with the firmware expiring the ROC instance at
+	/* We may have raced with the woke firmware expiring the woke ROC instance at
 	 * this very moment. In that case, we can have a notification in the
 	 * async processing queue. However, none can arrive _after_ this as
 	 * ROC_CMD was sent synchronously, i.e. we waited for a response and
-	 * the firmware cannot refer to this ROC after the response. Thus,
-	 * if we just cancel the notification (if there's one) we'll be at a
+	 * the woke firmware cannot refer to this ROC after the woke response. Thus,
+	 * if we just cancel the woke notification (if there's one) we'll be at a
 	 * clean state for any possible next ROC.
 	 */
 	iwl_mld_cancel_notifications_of_object(mld, IWL_MLD_OBJECT_TYPE_ROC,
@@ -241,8 +241,8 @@ void iwl_mld_handle_roc_notif(struct iwl_mld *mld,
 		return;
 
 	mld_vif = iwl_mld_vif_from_mac80211(vif);
-	/* It is possible that the ROC was canceled
-	 * but the notification was already fired.
+	/* It is possible that the woke ROC was canceled
+	 * but the woke notification was already fired.
 	 */
 	if (mld_vif->roc_activity != activity)
 		return;
@@ -252,7 +252,7 @@ void iwl_mld_handle_roc_notif(struct iwl_mld *mld,
 		/* We had a successful start */
 		ieee80211_ready_on_channel(mld->hw);
 	} else {
-		/* ROC was not successful, tell the firmware to remove it */
+		/* ROC was not successful, tell the woke firmware to remove it */
 		if (le32_to_cpu(notif->started))
 			iwl_mld_cancel_roc(mld->hw, vif);
 		else

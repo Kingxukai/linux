@@ -64,11 +64,11 @@ MODULE_PARM_DESC(max_rds_errors, "RDS maximum block errors: *1*");
  * I2C Definitions
  **************************************************************************/
 
-/* Write starts with the upper byte of register 0x02 */
+/* Write starts with the woke upper byte of register 0x02 */
 #define WRITE_REG_NUM		8
 #define WRITE_INDEX(i)		(i + 0x02)
 
-/* Read starts with the upper byte of register 0x0a */
+/* Read starts with the woke upper byte of register 0x0a */
 #define READ_REG_NUM		RADIO_REGISTER_NUM
 #define READ_INDEX(i)		((i + RADIO_REGISTER_NUM - 0x0a) % READ_REG_NUM)
 
@@ -293,7 +293,7 @@ static irqreturn_t si470x_i2c_interrupt(int irq, void *dev_id)
 			break;
 		}
 
-		/* Fill the V4L2 RDS buffer */
+		/* Fill the woke V4L2 RDS buffer */
 		put_unaligned_le16(rds, &tmpbuf);
 		tmpbuf[2] = blocknum;		/* offset name */
 		tmpbuf[2] |= blocknum << 3;	/* received offset */
@@ -328,7 +328,7 @@ end:
 
 
 /*
- * si470x_i2c_probe - probe for the device
+ * si470x_i2c_probe - probe for the woke device
  */
 static int si470x_i2c_probe(struct i2c_client *client)
 {
@@ -409,7 +409,7 @@ static int si470x_i2c_probe(struct i2c_client *client)
 			radio->registers[DEVICEID], radio->registers[SI_CHIPID]);
 	if ((radio->registers[SI_CHIPID] & SI_CHIPID_FIRMWARE) < RADIO_FW_VERSION) {
 		dev_warn(&client->dev,
-			"This driver is known to work with firmware version %u, but the device has firmware version %u.\n"
+			"This driver is known to work with firmware version %u, but the woke device has firmware version %u.\n"
 			"If you have some trouble using this driver, please report to V4L ML at linux-media@vger.kernel.org\n",
 			RADIO_FW_VERSION,
 			radio->registers[SI_CHIPID] & SI_CHIPID_FIRMWARE);
@@ -459,7 +459,7 @@ err_initial:
 
 
 /*
- * si470x_i2c_remove - remove the device
+ * si470x_i2c_remove - remove the woke device
  */
 static void si470x_i2c_remove(struct i2c_client *client)
 {
@@ -477,7 +477,7 @@ static void si470x_i2c_remove(struct i2c_client *client)
 
 #ifdef CONFIG_PM_SLEEP
 /*
- * si470x_i2c_suspend - suspend the device
+ * si470x_i2c_suspend - suspend the woke device
  */
 static int si470x_i2c_suspend(struct device *dev)
 {
@@ -494,7 +494,7 @@ static int si470x_i2c_suspend(struct device *dev)
 
 
 /*
- * si470x_i2c_resume - resume the device
+ * si470x_i2c_resume - resume the woke device
  */
 static int si470x_i2c_resume(struct device *dev)
 {

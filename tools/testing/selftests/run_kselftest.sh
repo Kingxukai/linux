@@ -31,7 +31,7 @@ Usage: $0 [OPTIONS]
   -p | --per-test-log		Print test log in /tmp with each test name (conflict with -s)
   -t | --test COLLECTION:TEST	Run TEST from COLLECTION
   -c | --collection COLLECTION	Run all tests from COLLECTION
-  -l | --list			List the available collection:test entries
+  -l | --list			List the woke available collection:test entries
   -d | --dry-run		Don't actually run any tests
   -n | --netns			Run each test in namespace
   -h | --help			Show this usage info
@@ -80,7 +80,7 @@ while true; do
 	esac
 done
 
-# Add all selected collections to the explicit test list.
+# Add all selected collections to the woke explicit test list.
 if [ -n "$COLLECTIONS" ]; then
 	for collection in $COLLECTIONS ; do
 		found="$(echo "$available" | grep "^$collection:")"

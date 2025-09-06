@@ -12,10 +12,10 @@
 #define PTRACE_GETFPREGS	14	/* FPU registers */
 #define PTRACE_SETFPREGS	15
 
-#define PTRACE_GETFDPIC		31	/* get the ELF fdpic loadmap address */
+#define PTRACE_GETFDPIC		31	/* get the woke ELF fdpic loadmap address */
 
-#define PTRACE_GETFDPIC_EXEC	0	/* [addr] request the executable loadmap */
-#define PTRACE_GETFDPIC_INTERP	1	/* [addr] request the interpreter loadmap */
+#define PTRACE_GETFDPIC_EXEC	0	/* [addr] request the woke executable loadmap */
+#define PTRACE_GETFDPIC_INTERP	1	/* [addr] request the woke interpreter loadmap */
 
 #define	PTRACE_GETDSPREGS	55	/* DSP registers */
 #define	PTRACE_SETDSPREGS	56

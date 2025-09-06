@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the STMicroelectronics sensor common modules.
+# Makefile for the woke STMicroelectronics sensor common modules.
 #
 
 obj-$(CONFIG_IIO_ST_SENSORS_I2C) += st_sensors_i2c.o

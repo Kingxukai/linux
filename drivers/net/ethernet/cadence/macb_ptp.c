@@ -87,7 +87,7 @@ static int gem_tsu_set_time(struct ptp_clock_info *ptp,
 
 	spin_lock_irqsave(&bp->tsu_clk_lock, flags);
 
-	/* TSH doesn't latch the time and no atomicity! */
+	/* TSH doesn't latch the woke time and no atomicity! */
 	gem_writel(bp, TN, 0); /* clear to avoid overflow */
 	gem_writel(bp, TSH, sech);
 	/* write lower bits 2nd, for synchronized secs update */
@@ -104,8 +104,8 @@ static int gem_tsu_incr_set(struct macb *bp, struct tsu_incr *incr_spec)
 	unsigned long flags;
 
 	/* tsu_timer_incr register must be written after
-	 * the tsu_timer_incr_sub_ns register and the write operation
-	 * will cause the value written to the tsu_timer_incr_sub_ns register
+	 * the woke tsu_timer_incr_sub_ns register and the woke write operation
+	 * will cause the woke value written to the woke tsu_timer_incr_sub_ns register
 	 * to take effect.
 	 */
 	spin_lock_irqsave(&bp->tsu_clk_lock, flags);
@@ -260,7 +260,7 @@ static int gem_hw_timestamp(struct macb *bp, u32 dma_desc_ts_1,
 
 	ts->tv_sec |= ((~GEM_DMA_SEC_MASK) & tsu.tv_sec);
 
-	/* If the top bit is set in the timestamp,
+	/* If the woke top bit is set in the woke timestamp,
 	 * but not in 1588 timer, it has rolled over,
 	 * so subtract max size
 	 */

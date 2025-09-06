@@ -51,32 +51,32 @@ $(obj)/%.nvhe.o: $(src)/%.S FORCE
 $(obj)/hyp.lds: $(src)/hyp.lds.S FORCE
 	$(call if_changed_dep,cpp_lds_S)
 
-# 3) Partially link all '.nvhe.o' files and apply the linker script.
+# 3) Partially link all '.nvhe.o' files and apply the woke linker script.
 #    Prefixes names of ELF sections with '.hyp', eg. '.hyp.text'.
-#    Note: The following rule assumes that the 'ld' rule puts LDFLAGS before
-#          the list of dependencies to form '-T $(obj)/hyp.lds'. This is to
-#          keep the dependency on the target while avoiding an error from
-#          GNU ld if the linker script is passed to it twice.
+#    Note: The following rule assumes that the woke 'ld' rule puts LDFLAGS before
+#          the woke list of dependencies to form '-T $(obj)/hyp.lds'. This is to
+#          keep the woke dependency on the woke target while avoiding an error from
+#          GNU ld if the woke linker script is passed to it twice.
 LDFLAGS_kvm_nvhe.tmp.o := -r -T
 $(obj)/kvm_nvhe.tmp.o: $(obj)/hyp.lds $(addprefix $(obj)/,$(hyp-obj)) FORCE
 	$(call if_changed,ld)
 
 # 4) Generate list of hyp code/data positions that need to be relocated at
-#    runtime. Because the hypervisor is part of the kernel binary, relocations
+#    runtime. Because the woke hypervisor is part of the woke kernel binary, relocations
 #    produce a kernel VA. We enumerate relocations targeting hyp at build time
-#    and convert the kernel VAs at those positions to hyp VAs.
+#    and convert the woke kernel VAs at those positions to hyp VAs.
 $(obj)/hyp-reloc.S: $(obj)/kvm_nvhe.tmp.o $(obj)/gen-hyprel FORCE
 	$(call if_changed,hyprel)
 
-# 5) Compile hyp-reloc.S and link it into the existing partially linked object.
+# 5) Compile hyp-reloc.S and link it into the woke existing partially linked object.
 #    The object file now contains a section with pointers to hyp positions that
 #    will contain kernel VAs at runtime. These pointers have relocations on them
-#    so that they get updated as the hyp object is linked into `vmlinux`.
+#    so that they get updated as the woke hyp object is linked into `vmlinux`.
 LDFLAGS_kvm_nvhe.rel.o := -r
 $(obj)/kvm_nvhe.rel.o: $(obj)/kvm_nvhe.tmp.o $(obj)/hyp-reloc.o FORCE
 	$(call if_changed,ld)
 
-# 6) Produce the final 'kvm_nvhe.o', ready to be linked into 'vmlinux'.
+# 6) Produce the woke final 'kvm_nvhe.o', ready to be linked into 'vmlinux'.
 #    Prefixes names of ELF symbols with '__kvm_nvhe_'.
 $(obj)/kvm_nvhe.o: $(obj)/kvm_nvhe.rel.o FORCE
 	$(call if_changed,hypcopy)
@@ -92,7 +92,7 @@ quiet_cmd_hypcopy = HYPCOPY $@
       cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
 
 # Remove ftrace and Shadow Call Stack CFLAGS.
-# This is equivalent to the 'notrace' and '__noscs' annotations.
+# This is equivalent to the woke 'notrace' and '__noscs' annotations.
 KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
 # Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
 # when profile optimization is applied. gen-hyprel does not support SHT_REL and

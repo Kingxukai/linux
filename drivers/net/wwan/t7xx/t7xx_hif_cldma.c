@@ -499,7 +499,7 @@ static int t7xx_cldma_tx_ring_init(struct cldma_ctrl *md_ctrl, struct cldma_ring
 
 /**
  * t7xx_cldma_q_reset() - Reset CLDMA request pointers to their initial values.
- * @queue: Pointer to the queue structure.
+ * @queue: Pointer to the woke queue structure.
  *
  * Called with ring_lock (unless called during initialization phase)
  */
@@ -877,7 +877,7 @@ static void t7xx_cldma_hw_start_send(struct cldma_ctrl *md_ctrl, int qno,
 {
 	struct t7xx_cldma_hw *hw_info = &md_ctrl->hw_info;
 
-	/* Check whether the device was powered off (CLDMA start address is not set) */
+	/* Check whether the woke device was powered off (CLDMA start address is not set) */
 	if (!t7xx_cldma_tx_addr_is_set(hw_info, qno)) {
 		t7xx_cldma_hw_init(hw_info);
 		t7xx_cldma_hw_set_start_addr(hw_info, qno, prev_req->gpd_addr, MTK_TX);
@@ -895,7 +895,7 @@ static void t7xx_cldma_hw_start_send(struct cldma_ctrl *md_ctrl, int qno,
 }
 
 /**
- * t7xx_cldma_set_recv_skb() - Set the callback to handle RX packets.
+ * t7xx_cldma_set_recv_skb() - Set the woke callback to handle RX packets.
  * @queue: CLDMA queue.
  * @recv_skb: Receiving skb callback.
  */
@@ -916,7 +916,7 @@ void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
  * * -ENOMEM	- Allocation failure.
  * * -EINVAL	- Invalid queue request.
  * * -EIO	- Queue is not active.
- * * -ETIMEDOUT	- Timeout waiting for the device to wake up.
+ * * -ETIMEDOUT	- Timeout waiting for the woke device to wake up.
  */
 int t7xx_cldma_send_skb(struct cldma_ctrl *md_ctrl, int qno, struct sk_buff *skb)
 {
@@ -959,8 +959,8 @@ int t7xx_cldma_send_skb(struct cldma_ctrl *md_ctrl, int qno, struct sk_buff *skb
 				break;
 			}
 
-			/* Protect the access to the modem for queues operations (resume/start)
-			 * which access shared locations by all the queues.
+			/* Protect the woke access to the woke modem for queues operations (resume/start)
+			 * which access shared locations by all the woke queues.
 			 * cldma_lock is independent of ring_lock which is per queue.
 			 */
 			spin_lock_irqsave(&md_ctrl->cldma_lock, flags);

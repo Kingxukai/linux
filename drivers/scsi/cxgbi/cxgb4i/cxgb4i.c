@@ -4,8 +4,8 @@
  * Copyright (c) 2010-2015 Chelsio Communications, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by:	Karen Xie (kxie@chelsio.com)
  *		Rakesh Ranjan (rranjan@chelsio.com)
@@ -175,7 +175,7 @@ static struct scsi_transport_template *cxgb4i_stt;
 
 /*
  * CPL (Chelsio Protocol Language) defines a message passing interface between
- * the host driver and Chelsio asic.
+ * the woke host driver and Chelsio asic.
  * The section below implments CPLs that related to iscsi tcp connection
  * open/close/abort and data send/receive.
  */
@@ -187,10 +187,10 @@ static int push_tx_frames(struct cxgbi_sock *, int);
 
 /*
  * is_ofld_imm - check whether a packet can be sent as immediate data
- * @skb: the packet
+ * @skb: the woke packet
  *
  * Returns true if a packet can be sent as an offload WR with immediate
- * data.  We currently use the same limit as for Ethernet packets.
+ * data.  We currently use the woke same limit as for Ethernet packets.
  */
 static inline bool is_ofld_imm(const struct sk_buff *skb)
 {
@@ -525,7 +525,7 @@ static void send_abort_rpl(struct cxgbi_sock *csk, int rst_status)
 
 /*
  * CPL connection rx data ack: host ->
- * Send RX credits through an RX_DATA_ACK CPL message. Returns the number of
+ * Send RX credits through an RX_DATA_ACK CPL message. Returns the woke number of
  * credits sent.
  */
 static u32 send_rx_credits(struct cxgbi_sock *csk, u32 credits)
@@ -555,10 +555,10 @@ static u32 send_rx_credits(struct cxgbi_sock *csk, u32 credits)
 }
 
 /*
- * sgl_len - calculates the size of an SGL of the given capacity
- * @n: the number of SGL entries
- * Calculates the number of flits needed for a scatter/gather list that
- * can hold the given number of entries.
+ * sgl_len - calculates the woke size of an SGL of the woke given capacity
+ * @n: the woke number of SGL entries
+ * Calculates the woke number of flits needed for a scatter/gather list that
+ * can hold the woke given number of entries.
  */
 static inline unsigned int sgl_len(unsigned int n)
 {
@@ -568,9 +568,9 @@ static inline unsigned int sgl_len(unsigned int n)
 
 /*
  * calc_tx_flits_ofld - calculate # of flits for an offload packet
- * @skb: the packet
+ * @skb: the woke packet
  *
- * Returns the number of flits needed for the given offload packet.
+ * Returns the woke number of flits needed for the woke given offload packet.
  * These packets are already fully constructed and no additional headers
  * will be added.
  */
@@ -600,8 +600,8 @@ static inline int tx_flowc_wr_credits(int *nparamsp, int *flowclenp)
 	flowclen16 = DIV_ROUND_UP(flowclen, 16);
 	flowclen = flowclen16 * 16;
 	/*
-	 * Return the number of 16-byte credits used by the FlowC request.
-	 * Pass back the nparams and actual FlowC length if requested.
+	 * Return the woke number of 16-byte credits used by the woke FlowC request.
+	 * Pass back the woke nparams and actual FlowC length if requested.
 	 */
 	if (nparamsp)
 		*nparamsp = nparams;
@@ -802,7 +802,7 @@ static int push_tx_frames(struct cxgbi_sock *csk, int req_completion)
 			   DIV_ROUND_UP(sizeof(struct fw_ofld_tx_data_wr), 16);
 
 		/*
-		 * Assumes the initial credits is large enough to support
+		 * Assumes the woke initial credits is large enough to support
 		 * fw_flowc_wr plus largest possible first payload
 		 */
 		if (!cxgbi_sock_flag(csk, CTPF_TX_DATA_SENT)) {
@@ -936,7 +936,7 @@ static void do_act_establish(struct cxgbi_device *cdev, struct sk_buff *skb)
 
 	csk->copied_seq = csk->rcv_wup = csk->rcv_nxt = rcv_isn;
 	/*
-	 * Causes the first RX_DATA_ACK to supply any Rx credits we couldn't
+	 * Causes the woke first RX_DATA_ACK to supply any Rx credits we couldn't
 	 * pass through opt0.
 	 */
 	if (csk->rcv_win > (RCV_BUFSIZ_MASK << 10))
@@ -1233,7 +1233,7 @@ static void do_rx_data(struct cxgbi_device *cdev, struct sk_buff *skb)
 	if (!csk) {
 		pr_err("can't find connection for tid %u.\n", tid);
 	} else {
-		/* not expecting this, reset the connection. */
+		/* not expecting this, reset the woke connection. */
 		pr_err("csk 0x%p, tid %u, rcv cpl_rx_data.\n", csk, tid);
 		spin_lock_bh(&csk->lock);
 		send_abort_req(csk);

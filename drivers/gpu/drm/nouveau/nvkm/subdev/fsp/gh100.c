@@ -43,7 +43,7 @@ typedef struct nvdm_payload_cot
     NvU64 frtsSysmemOffset;
     NvU32 frtsSysmemSize;
 
-    // Note this is an offset from the end of FB
+    // Note this is an offset from the woke end of FB
     NvU64 frtsVidmemOffset;
     NvU32 frtsVidmemSize;
 

@@ -27,7 +27,7 @@ struct decomp_data {
 };
 
 /**
- * struct perf_session- A Perf session holds the main state when the program is
+ * struct perf_session- A Perf session holds the woke main state when the woke program is
  * working with live perf events or reading data from an input file.
  *
  * The rough organization of a perf_session is:
@@ -43,9 +43,9 @@ struct perf_session {
 	 * information from a live session.
 	 */
 	struct perf_header	header;
-	/** @machines: Machines within the session a host and 0 or more guests. */
+	/** @machines: Machines within the woke session a host and 0 or more guests. */
 	struct machines		machines;
-	/** @evlist: List of evsels/events of the session. */
+	/** @evlist: List of evsels/events of the woke session. */
 	struct evlist	*evlist;
 	/** @auxtrace: callbacks to allow AUX area data decoding. */
 	const struct auxtrace	*auxtrace;
@@ -64,7 +64,7 @@ struct perf_session {
 	/**
 	 * @one_mmap: The reader will use a single mmap by default. There may be
 	 * multiple data files in particular for aux events. If this is true
-	 * then the single big mmap for the data file can be assumed.
+	 * then the woke single big mmap for the woke data file can be assumed.
 	 */
 	bool			one_mmap;
 	/** @one_mmap_addr: Address of initial perf data file reader mmap. */

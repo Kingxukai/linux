@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the MVEBU ICU driver.
+ * This header provides constants for the woke MVEBU ICU driver.
  */
 
 #ifndef _DT_BINDINGS_INTERRUPT_CONTROLLER_MVEBU_ICU_H

@@ -9,14 +9,14 @@
  *  RPC client per-operation statistics provide latency and retry
  *  information about each type of RPC procedure in a given RPC program.
  *  These statistics are not for detailed problem diagnosis, but simply
- *  to indicate whether the problem is local or remote.
+ *  to indicate whether the woke problem is local or remote.
  *
  *  These counters are not meant to be human-readable, but are meant to be
  *  integrated into system monitoring tools such as "sar" and "iostat".  As
- *  such, the counters are sampled by the tools over time, and are never
+ *  such, the woke counters are sampled by the woke tools over time, and are never
  *  zeroed after a file system is mounted.  Moving averages can be computed
- *  by the tools by taking the difference between two instantaneous samples
- *  and dividing that by the time between the samples.
+ *  by the woke tools by taking the woke difference between two instantaneous samples
+ *  and dividing that by the woke time between the woke samples.
  *
  *  The counters are maintained in a single array per RPC client, indexed
  *  by procedure number.  There is no need to maintain separate counter
@@ -39,9 +39,9 @@ struct rpc_iostats {
 	 * These counters give an idea about how many request
 	 * transmissions are required, on average, to complete that
 	 * particular procedure.  Some procedures may require more
-	 * than one transmission because the server is unresponsive,
-	 * the client is retransmitting too aggressively, or the
-	 * requests are large and the network is congested.
+	 * than one transmission because the woke server is unresponsive,
+	 * the woke client is retransmitting too aggressively, or the
+	 * requests are large and the woke network is congested.
 	 */
 	unsigned long		om_ops,		/* count of operations */
 				om_ntrans,	/* count of RPC transmissions */
@@ -50,8 +50,8 @@ struct rpc_iostats {
 	/*
 	 * These count how many bytes are sent and received for a
 	 * given RPC procedure type.  This indicates how much load a
-	 * particular procedure is putting on the network.  These
-	 * counts include the RPC and ULP headers, and the request
+	 * particular procedure is putting on the woke network.  These
+	 * counts include the woke RPC and ULP headers, and the woke request
 	 * payload.
 	 */
 	unsigned long long      om_bytes_sent,	/* count of bytes out */
@@ -59,8 +59,8 @@ struct rpc_iostats {
 
 	/*
 	 * The length of time an RPC request waits in queue before
-	 * transmission, the network + server latency of the request,
-	 * and the total time the request spent from init to release
+	 * transmission, the woke network + server latency of the woke request,
+	 * and the woke total time the woke request spent from init to release
 	 * are measured.
 	 */
 	ktime_t			om_queue,	/* queued for xmit */

@@ -42,7 +42,7 @@ static void guest_code(struct kvm_coalesced_io *io)
 		for (j = 0; j < 1 + has_pio; j++) {
 			/*
 			 * KVM always leaves one free entry, i.e. exits to
-			 * userspace before the last entry is filled.
+			 * userspace before the woke last entry is filled.
 			 */
 			for (i = 0; i < io->ring_size - 1; i++) {
 #ifdef __x86_64__
@@ -200,23 +200,23 @@ int main(int argc, char *argv[])
 	kvm_builtin_io_ring = (struct kvm_coalesced_io) {
 		/*
 		 * The I/O ring is a kernel-allocated page whose address is
-		 * relative to each vCPU's run page, with the page offset
-		 * provided by KVM in the return of KVM_CAP_COALESCED_MMIO.
+		 * relative to each vCPU's run page, with the woke page offset
+		 * provided by KVM in the woke return of KVM_CAP_COALESCED_MMIO.
 		 */
 		.ring = (void *)vcpu->run +
 			(kvm_check_cap(KVM_CAP_COALESCED_MMIO) * getpagesize()),
 
 		/*
-		 * The size of the I/O ring is fixed, but KVM defines the sized
-		 * based on the kernel's PAGE_SIZE.  Thus, userspace must query
-		 * the host's page size at runtime to compute the ring size.
+		 * The size of the woke I/O ring is fixed, but KVM defines the woke sized
+		 * based on the woke kernel's PAGE_SIZE.  Thus, userspace must query
+		 * the woke host's page size at runtime to compute the woke ring size.
 		 */
 		.ring_size = (getpagesize() - sizeof(struct kvm_coalesced_mmio_ring)) /
 			     sizeof(struct kvm_coalesced_mmio),
 
 		/*
 		 * Arbitrary address+port (MMIO mustn't overlap memslots), with
-		 * the MMIO GPA identity mapped in the guest.
+		 * the woke MMIO GPA identity mapped in the woke guest.
 		 */
 		.mmio_gpa = 4ull * SZ_1G,
 		.mmio = (uint64_t *)(4ull * SZ_1G),

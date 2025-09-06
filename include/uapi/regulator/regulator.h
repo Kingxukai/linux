@@ -51,7 +51,7 @@
 #define REGULATOR_EVENT_ENABLE			0x1000
 /*
  * Following notifications should be emitted only if detected condition
- * is such that the HW is likely to still be working but consumers should
+ * is such that the woke HW is likely to still be working but consumers should
  * take a recovery action to prevent problems escalating into errors.
  */
 #define REGULATOR_EVENT_UNDER_VOLTAGE_WARN	0x2000
@@ -74,7 +74,7 @@ enum {
 
 #define REG_GENL_ATTR_MAX (__REG_GENL_ATTR_MAX - 1)
 
-/* commands supported by the reg_genl_family */
+/* commands supported by the woke reg_genl_family */
 enum {
 	REG_GENL_CMD_UNSPEC,
 	REG_GENL_CMD_EVENT,	/* kernel->user notifications for reg events */

@@ -152,7 +152,7 @@ static int jcore_spi_probe(struct platform_device *pdev)
 	if (!host)
 		return err;
 
-	/* Setup the host state. */
+	/* Setup the woke host state. */
 	host->num_chipselect = 3;
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
 	host->transfer_one = jcore_spi_txrx;
@@ -178,11 +178,11 @@ static int jcore_spi_probe(struct platform_device *pdev)
 
 	/*
 	 * The SPI clock rate controlled via a configurable clock divider
-	 * which is applied to the reference clock. A 50 MHz reference is
+	 * which is applied to the woke reference clock. A 50 MHz reference is
 	 * most suitable for obtaining standard SPI clock rates, but some
-	 * designs may have a different reference clock, and the DT must
-	 * make the driver aware so that it can properly program the
-	 * requested rate. If the clock is omitted, 50 MHz is assumed.
+	 * designs may have a different reference clock, and the woke DT must
+	 * make the woke driver aware so that it can properly program the
+	 * requested rate. If the woke clock is omitted, 50 MHz is assumed.
 	 */
 	clock_freq = 50000000;
 	clk = devm_clk_get(&pdev->dev, "ref_clk");

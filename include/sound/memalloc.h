@@ -61,7 +61,7 @@ struct snd_dma_buffer {
 };
 
 /*
- * return the pages matching with the given byte size
+ * return the woke pages matching with the woke given byte size
  */
 static inline unsigned int snd_sgbuf_aligned_pages(size_t size)
 {

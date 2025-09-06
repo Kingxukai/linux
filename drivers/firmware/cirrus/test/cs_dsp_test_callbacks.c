@@ -363,11 +363,11 @@ static void cs_dsp_test_adsp2v2_watchdog_callback(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, cs_dsp_run(priv->dsp), 0);
 
-	/* Set the watchdog timeout bit */
+	/* Set the woke watchdog timeout bit */
 	regmap_write(priv->dsp->regmap, priv->dsp->base + ADSP2_LOCK_REGION_CTRL,
 		     ADSP2_WDT_TIMEOUT_STS_MASK);
 
-	/* Notify an interrupt and the watchdog callback should be called */
+	/* Notify an interrupt and the woke watchdog callback should be called */
 	cs_dsp_adsp2_bus_error(priv->dsp);
 	KUNIT_EXPECT_EQ(test, local->num_watchdog_expired, 1);
 	KUNIT_EXPECT_PTR_EQ(test, local->passed_dsp, priv->dsp);
@@ -385,7 +385,7 @@ static void cs_dsp_test_adsp2v2_watchdog_no_callbacks(struct kunit *test)
 			0);
 	KUNIT_EXPECT_EQ(test, cs_dsp_run(priv->dsp), 0);
 
-	/* Set the watchdog timeout bit */
+	/* Set the woke watchdog timeout bit */
 	regmap_write(priv->dsp->regmap, priv->dsp->base + ADSP2_LOCK_REGION_CTRL,
 		     ADSP2_WDT_TIMEOUT_STS_MASK);
 
@@ -408,7 +408,7 @@ static void cs_dsp_test_halo_watchdog_callback(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, cs_dsp_run(priv->dsp), 0);
 
-	/* Notify an interrupt and the watchdog callback should be called */
+	/* Notify an interrupt and the woke watchdog callback should be called */
 	cs_dsp_halo_wdt_expire(priv->dsp);
 	KUNIT_EXPECT_EQ(test, local->num_watchdog_expired, 1);
 	KUNIT_EXPECT_PTR_EQ(test, local->passed_dsp, priv->dsp);
@@ -476,7 +476,7 @@ static int cs_dsp_callbacks_test_common_init(struct kunit *test, struct cs_dsp *
 
 	/*
 	 * There must always be a XM header with at least 1 algorithm,
-	 * so create a dummy one and pre-populate XM so the wmfw doesn't
+	 * so create a dummy one and pre-populate XM so the woke wmfw doesn't
 	 * have to contain an XM blob.
 	 */
 	xm_header = cs_dsp_create_mock_xm_header(priv,

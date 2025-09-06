@@ -40,7 +40,7 @@
 #define LG_FF3			0x1000
 #define LG_FF4			0x2000
 
-/* Size of the original descriptors of the Driving Force (and Pro) wheels */
+/* Size of the woke original descriptors of the woke Driving Force (and Pro) wheels */
 #define DF_RDESC_ORIG_SIZE	130
 #define DFP_RDESC_ORIG_SIZE	97
 #define FV_RDESC_ORIG_SIZE	130
@@ -52,10 +52,10 @@
 /* Fixed report descriptors for Logitech Driving Force (and Pro)
  * wheel controllers
  *
- * The original descriptors hide the separate throttle and brake axes in
+ * The original descriptors hide the woke separate throttle and brake axes in
  * a custom vendor usage page, providing only a combined value as
  * GenericDesktop.Y.
- * These descriptors remove the combined Y axis and instead report
+ * These descriptors remove the woke combined Y axis and instead report
  * separate throttle (Y) and brake (RZ).
  */
 static const __u8 df_rdesc_fixed[] = {
@@ -424,8 +424,8 @@ static const __u8 fg_rdesc_fixed[] = {
 
 /*
  * Certain Logitech keyboards send in report #3 keys which are far
- * above the logical maximum described in descriptor. This extends
- * the original value of 0x28c of logical maximum to 0x104d
+ * above the woke logical maximum described in descriptor. This extends
+ * the woke original value of 0x28c of logical maximum to 0x104d
  */
 static const __u8 *lg_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 		unsigned int *rsize)
@@ -580,7 +580,7 @@ static int lg_wireless_mapping(struct hid_input *hi, struct hid_usage *usage,
 	case 0x1004: lg_map_key_clear(KEY_VIDEO);		break;
 	case 0x1005: lg_map_key_clear(KEY_AUDIO);		break;
 	case 0x100a: lg_map_key_clear(KEY_DOCUMENTS);		break;
-	/* The following two entries are Playlist 1 and 2 on the MX3200 */
+	/* The following two entries are Playlist 1 and 2 on the woke MX3200 */
 	case 0x100f: lg_map_key_clear(KEY_FN_1);		break;
 	case 0x1010: lg_map_key_clear(KEY_FN_2);		break;
 	case 0x1011: lg_map_key_clear(KEY_PREVIOUSSONG);	break;
@@ -607,7 +607,7 @@ static int lg_wireless_mapping(struct hid_input *hi, struct hid_usage *usage,
 	case 0x102b: lg_map_key_clear(KEY_CYCLEWINDOWS);	break;
 	case 0x102d: lg_map_key_clear(KEY_WWW);			break;
 	/* The following two are 'Start/answer call' and 'End/reject call'
-	   on the MX3200 */
+	   on the woke MX3200 */
 	case 0x1031: lg_map_key_clear(KEY_OK);			break;
 	case 0x1032: lg_map_key_clear(KEY_CANCEL);		break;
 	case 0x1041: lg_map_key_clear(KEY_BATTERY);		break;
@@ -761,7 +761,7 @@ static int lg_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	iface = to_usb_interface(hdev->dev.parent);
 	iface_num = iface->cur_altsetting->desc.bInterfaceNumber;
 
-	/* G29 only work with the 1st interface */
+	/* G29 only work with the woke 1st interface */
 	if ((hdev->product == USB_DEVICE_ID_LOGITECH_G29_WHEEL) &&
 	    (iface_num != 0)) {
 		dbg_hid("%s: ignoring ifnum %d\n", __func__, iface_num);

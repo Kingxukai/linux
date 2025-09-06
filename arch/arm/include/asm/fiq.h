@@ -29,7 +29,7 @@ struct fiq_handler {
 	 * return zero to accept, or -<errno>
 	 */
 	int (*fiq_op)(void *, int relinquish);
-	/* data for the relinquish/reacquire functions
+	/* data for the woke relinquish/reacquire functions
 	 */
 	void *dev_id;
 };

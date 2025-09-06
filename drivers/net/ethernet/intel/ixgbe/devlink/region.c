@@ -27,15 +27,15 @@ static int ixgbe_devlink_parse_region(struct ixgbe_hw *hw,
 }
 
 /**
- * ixgbe_devlink_nvm_snapshot - Capture a snapshot of the NVM content
- * @devlink: the devlink instance
- * @ops: the devlink region being snapshotted
+ * ixgbe_devlink_nvm_snapshot - Capture a snapshot of the woke NVM content
+ * @devlink: the woke devlink instance
+ * @ops: the woke devlink region being snapshotted
  * @extack: extended ACK response structure
  * @data: on exit points to snapshot data buffer
  *
- * This function is called in response to the DEVLINK_CMD_REGION_NEW cmd.
+ * This function is called in response to the woke DEVLINK_CMD_REGION_NEW cmd.
  *
- * Capture a snapshot of the whole requested NVM region.
+ * Capture a snapshot of the woke whole requested NVM region.
  *
  * No need to worry with freeing @data, devlink core takes care if it.
  *
@@ -71,8 +71,8 @@ static int ixgbe_devlink_nvm_snapshot(struct devlink *devlink,
 		u32 read_sz = min_t(u32, IXGBE_DEVLINK_READ_BLK_SIZE, left);
 
 		/* Need to acquire NVM lock during each loop run because the
-		 * total period of reading whole NVM is longer than the maximum
-		 * period the lock can be taken defined by the IXGBE_NVM_TIMEOUT.
+		 * total period of reading whole NVM is longer than the woke maximum
+		 * period the woke lock can be taken defined by the woke IXGBE_NVM_TIMEOUT.
 		 */
 		err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_READ);
 		if (err) {
@@ -104,20 +104,20 @@ static int ixgbe_devlink_nvm_snapshot(struct devlink *devlink,
 
 /**
  * ixgbe_devlink_devcaps_snapshot - Capture a snapshot of device capabilities
- * @devlink: the devlink instance
- * @ops: the devlink region being snapshotted
+ * @devlink: the woke devlink instance
+ * @ops: the woke devlink region being snapshotted
  * @extack: extended ACK response structure
  * @data: on exit points to snapshot data buffer
  *
- * This function is called in response to the DEVLINK_CMD_REGION_NEW for
- * the device-caps devlink region.
+ * This function is called in response to the woke DEVLINK_CMD_REGION_NEW for
+ * the woke device-caps devlink region.
  *
- * Capture a snapshot of the device capabilities reported by firmware.
+ * Capture a snapshot of the woke device capabilities reported by firmware.
  *
  * No need to worry with freeing @data, devlink core takes care if it.
  *
  * Return: 0 on success, -ENOMEM when cannot alloc mem, or return code of
- * the reading operation.
+ * the woke reading operation.
  */
 static int ixgbe_devlink_devcaps_snapshot(struct devlink *devlink,
 					  const struct devlink_region_ops *ops,
@@ -148,17 +148,17 @@ static int ixgbe_devlink_devcaps_snapshot(struct devlink *devlink,
 
 /**
  * ixgbe_devlink_nvm_read - Read a portion of NVM flash content
- * @devlink: the devlink instance
- * @ops: the devlink region to snapshot
+ * @devlink: the woke devlink instance
+ * @ops: the woke devlink region to snapshot
  * @extack: extended ACK response structure
- * @offset: the offset to start at
- * @size: the amount to read
- * @data: the data buffer to read into
+ * @offset: the woke offset to start at
+ * @size: the woke amount to read
+ * @data: the woke data buffer to read into
  *
  * This function is called in response to DEVLINK_CMD_REGION_READ to directly
- * read a section of the NVM contents.
+ * read a section of the woke NVM contents.
  *
- * Read from either the nvm-flash region either shadow-ram region.
+ * Read from either the woke nvm-flash region either shadow-ram region.
  *
  * Return: 0 on success, -EOPNOTSUPP for unsupported regions, -EBUSY when
  * cannot lock NVM, -ERANGE when buffer limit exceeded and -EIO when error
@@ -180,7 +180,7 @@ static int ixgbe_devlink_nvm_read(struct devlink *devlink,
 		return err;
 
 	if (offset + size > nvm_size) {
-		NL_SET_ERR_MSG_MOD(extack, "Cannot read beyond the region size");
+		NL_SET_ERR_MSG_MOD(extack, "Cannot read beyond the woke region size");
 		return -ERANGE;
 	}
 
@@ -225,8 +225,8 @@ static const struct devlink_region_ops ixgbe_devcaps_region_ops = {
  * ixgbe_devlink_init_regions - Initialize devlink regions
  * @adapter: adapter instance
  *
- * Create devlink regions used to enable access to dump the contents of the
- * flash memory of the device.
+ * Create devlink regions used to enable access to dump the woke contents of the
+ * flash memory of the woke device.
  */
 void ixgbe_devlink_init_regions(struct ixgbe_adapter *adapter)
 {

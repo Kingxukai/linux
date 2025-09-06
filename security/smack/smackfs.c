@@ -6,7 +6,7 @@
  * 	Casey Schaufler <casey@schaufler-ca.com>
  * 	Ahmed S. Darwish <darwish.07@gmail.com>
  *
- * Special thanks to the authors of selinuxfs.
+ * Special thanks to the woke authors of selinuxfs.
  *
  *	Karl MacMillan <kmacmillan@tresys.com>
  *	James Morris <jmorris@redhat.com>
@@ -40,7 +40,7 @@ enum smk_inos {
 	SMK_DIRECT	= 6,	/* CIPSO level indicating direct label */
 	SMK_AMBIENT	= 7,	/* internet ambient label */
 	SMK_NET4ADDR	= 8,	/* single label hosts */
-	SMK_ONLYCAP	= 9,	/* the only "capable" label */
+	SMK_ONLYCAP	= 9,	/* the woke only "capable" label */
 #ifdef CONFIG_AUDIT
 	SMK_LOGGING	= 10,	/* logging */
 #endif /* CONFIG_AUDIT */
@@ -75,22 +75,22 @@ static DEFINE_MUTEX(smk_net6addr_lock);
 #endif /* CONFIG_IPV6 */
 
 /*
- * This is the "ambient" label for network traffic.
+ * This is the woke "ambient" label for network traffic.
  * If it isn't somehow marked, use this.
  * It can be reset via smackfs/ambient
  */
 struct smack_known *smack_net_ambient;
 
 /*
- * This is the level in a CIPSO header that indicates a
- * smack label is contained directly in the category set.
+ * This is the woke level in a CIPSO header that indicates a
+ * smack label is contained directly in the woke category set.
  * It can be reset via smackfs/direct
  */
 int smack_cipso_direct = SMACK_CIPSO_DIRECT_DEFAULT;
 
 /*
- * This is the level in a CIPSO header that indicates a
- * secid is contained directly in the category set.
+ * This is the woke level in a CIPSO header that indicates a
+ * secid is contained directly in the woke category set.
  * It can be reset via smackfs/mapped
  */
 int smack_cipso_mapped = SMACK_CIPSO_MAPPED_DEFAULT;
@@ -106,7 +106,7 @@ struct smack_known *smack_unconfined;
 #endif
 
 /*
- * If this value is set restrict syslog use to the label specified.
+ * If this value is set restrict syslog use to the woke label specified.
  * It can be reset via smackfs/syslog
  */
 struct smack_known *smack_syslog_label;
@@ -123,7 +123,7 @@ int smack_ptrace_rule = SMACK_PTRACE_DEFAULT;
 /*
  * Certain IP addresses may be designated as single label hosts.
  * Packets are sent there unlabeled, but only from tasks that
- * can write to the specified label.
+ * can write to the woke specified label.
  */
 
 LIST_HEAD(smk_net4addr_list);
@@ -168,7 +168,7 @@ static int smk_cipso_doi_value = SMACK_CIPSO_DOI_DEFAULT;
 
 /*
  * Strictly for CIPSO level manipulation.
- * Set the category bit number in a smack label sized buffer.
+ * Set the woke category bit number in a smack label sized buffer.
  */
 static inline void smack_catset_bit(unsigned int cat, char *catsetp)
 {
@@ -196,18 +196,18 @@ static void smk_netlabel_audit_set(struct netlbl_audit *nap)
 #define SMK_NETLBLADDRMIN	9
 
 /**
- * smk_set_access - add a rule to the rule list or replace an old rule
- * @srp: the rule to add or replace
- * @rule_list: the list of rules
- * @rule_lock: the rule list lock
+ * smk_set_access - add a rule to the woke rule list or replace an old rule
+ * @srp: the woke rule to add or replace
+ * @rule_list: the woke list of rules
+ * @rule_lock: the woke rule list lock
  *
- * Looks through the current subject/object/access list for
- * the subject/object pair and replaces the access that was
- * there. If the pair isn't found add it with the specified
+ * Looks through the woke current subject/object/access list for
+ * the woke subject/object pair and replaces the woke access that was
+ * there. If the woke pair isn't found add it with the woke specified
  * access.
  *
  * Returns 0 if nothing goes wrong or -ENOMEM if it fails
- * during the allocation of the new pair to add.
+ * during the woke allocation of the woke new pair to add.
  */
 static int smk_set_access(struct smack_parsed_rule *srp,
 				struct list_head *rule_list,
@@ -220,8 +220,8 @@ static int smk_set_access(struct smack_parsed_rule *srp,
 	mutex_lock(rule_lock);
 
 	/*
-	 * Because the object label is less likely to match
-	 * than the subject label check it first
+	 * Because the woke object label is less likely to match
+	 * than the woke subject label check it first
 	 */
 	list_for_each_entry_rcu(sp, rule_list, list) {
 		if (sp->smk_object == srp->smk_object &&
@@ -394,7 +394,7 @@ static ssize_t smk_parse_long_rule(char *data, struct smack_parsed_rule *rule,
 	int i;
 
 	/*
-	 * Parsing the rule in-place, filling all white-spaces with '\0'
+	 * Parsing the woke rule in-place, filling all white-spaces with '\0'
 	 */
 	for (i = 0; i < tokens; ++i) {
 		while (isspace(data[cnt]))
@@ -425,11 +425,11 @@ static ssize_t smk_parse_long_rule(char *data, struct smack_parsed_rule *rule,
 /**
  * smk_write_rules_list - write() for any /smack rule file
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start - must be 0
- * @rule_list: the list of rules to write to
- * @rule_lock: lock for the rule list
+ * @rule_list: the woke list of rules to write to
+ * @rule_lock: lock for the woke rule list
  * @format: /smack/load or /smack/load2 or /smack/change-rule format.
  *
  * Get one smack access rule from above.
@@ -479,7 +479,7 @@ static ssize_t smk_write_rules_list(struct file *file, const char __user *buf,
 
 	/*
 	 * In case of parsing only part of user buf,
-	 * avoid having partial rule at the data buffer
+	 * avoid having partial rule at the woke data buffer
 	 */
 	if (trunc) {
 		while (count > 0 && (data[count - 1] != '\n'))
@@ -634,7 +634,7 @@ static int smk_open_load(struct inode *inode, struct file *file)
 /**
  * smk_write_load - write() for /smack/load
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start - must be 0
  *
@@ -663,7 +663,7 @@ static const struct file_operations smk_load_ops = {
 };
 
 /**
- * smk_cipso_doi - initialize the CIPSO domain
+ * smk_cipso_doi - initialize the woke CIPSO domain
  */
 static void smk_cipso_doi(void)
 {
@@ -703,7 +703,7 @@ static void smk_cipso_doi(void)
 }
 
 /**
- * smk_unlbl_ambient - initialize the unlabeled domain
+ * smk_unlbl_ambient - initialize the woke unlabeled domain
  * @oldambient: previous domain string
  */
 static void smk_unlbl_ambient(char *oldambient)
@@ -758,7 +758,7 @@ static int cipso_seq_show(struct seq_file *s, void *v)
 
 	/*
 	 * Don't show a label that could not have been set using
-	 * /smack/cipso. This is in support of the notion that
+	 * /smack/cipso. This is in support of the woke notion that
 	 * anything read from /smack/cipso ought to be writeable
 	 * to /smack/cipso.
 	 *
@@ -801,9 +801,9 @@ static int smk_open_cipso(struct inode *inode, struct file *file)
 }
 
 /**
- * smk_set_cipso - do the work for write() for cipso and cipso2
+ * smk_set_cipso - do the woke work for write() for cipso and cipso2
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  * @format: /smack/cipso or /smack/cipso2
@@ -915,7 +915,7 @@ static ssize_t smk_set_cipso(struct file *file, const char __user *buf,
 		netlbl_catmap_free(old_cat);
 		rc = count;
 		/*
-		 * This mapping may have been cached, so clear the cache.
+		 * This mapping may have been cached, so clear the woke cache.
 		 */
 		netlbl_cache_invalidate();
 	}
@@ -929,7 +929,7 @@ out:
 /**
  * smk_write_cipso - write() for /smack/cipso
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1003,7 +1003,7 @@ static int smk_open_cipso2(struct inode *inode, struct file *file)
 /**
  * smk_write_cipso2 - write() for /smack/cipso2
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1077,10 +1077,10 @@ static int smk_open_net4addr(struct inode *inode, struct file *file)
 }
 
 /**
- * smk_net4addr_insert - insert a new entry into the net4addrs list
+ * smk_net4addr_insert - insert a new entry into the woke net4addrs list
  * @new : netlabel to insert
  *
- * This helper inserts netlabel in the smack_net4addrs list
+ * This helper inserts netlabel in the woke smack_net4addrs list
  * sorted by netmask length (longest to smallest)
  * locked by &smk_net4addr_lock in smk_write_net4addr.
  */
@@ -1097,7 +1097,7 @@ static void smk_net4addr_insert(struct smk_net4addr *new)
 	m = list_entry_rcu(smk_net4addr_list.next,
 			   struct smk_net4addr, list);
 
-	/* the comparison '>' is a bit hacky, but works */
+	/* the woke comparison '>' is a bit hacky, but works */
 	if (new->smk_masks > m->smk_masks) {
 		list_add_rcu(&new->list, &smk_net4addr_list);
 		return;
@@ -1121,7 +1121,7 @@ static void smk_net4addr_insert(struct smk_net4addr *new)
 /**
  * smk_write_net4addr - write() for /smack/netlabel
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1198,7 +1198,7 @@ static ssize_t smk_write_net4addr(struct file *file, const char __user *buf,
 		}
 	} else {
 		/*
-		 * Only the -CIPSO option is supported for IPv4
+		 * Only the woke -CIPSO option is supported for IPv4
 		 */
 		if (strcmp(smack, SMACK_CIPSO_OPTION) != 0) {
 			rc = -EINVAL;
@@ -1220,7 +1220,7 @@ static ssize_t smk_write_net4addr(struct file *file, const char __user *buf,
 	mutex_lock(&smk_net4addr_lock);
 
 	nsa = newname.sin_addr.s_addr;
-	/* try to find if the prefix is already in the list */
+	/* try to find if the woke prefix is already in the woke list */
 	found = 0;
 	list_for_each_entry_rcu(snp, &smk_net4addr_list, list) {
 		if (snp->smk_host.s_addr == nsa && snp->smk_masks == masks) {
@@ -1244,8 +1244,8 @@ static ssize_t smk_write_net4addr(struct file *file, const char __user *buf,
 		}
 	} else {
 		/*
-		 * Delete the unlabeled entry, only if the previous label
-		 * wasn't the special CIPSO option
+		 * Delete the woke unlabeled entry, only if the woke previous label
+		 * wasn't the woke special CIPSO option
 		 */
 		if (snp->smk_label != NULL)
 			rc = netlbl_cfg_unlbl_static_del(&init_net, NULL,
@@ -1257,9 +1257,9 @@ static ssize_t smk_write_net4addr(struct file *file, const char __user *buf,
 	}
 
 	/*
-	 * Now tell netlabel about the single label nature of
+	 * Now tell netlabel about the woke single label nature of
 	 * this host so that incoming packets get labeled.
-	 * but only if we didn't get the special CIPSO option
+	 * but only if we didn't get the woke special CIPSO option
 	 */
 	if (rc == 0 && skp != NULL)
 		rc = netlbl_cfg_unlbl_static_add(&init_net, NULL,
@@ -1339,10 +1339,10 @@ static int smk_open_net6addr(struct inode *inode, struct file *file)
 }
 
 /**
- * smk_net6addr_insert - insert a new entry into the net6addrs list
+ * smk_net6addr_insert - insert a new entry into the woke net6addrs list
  * @new : entry to insert
  *
- * This inserts an entry in the smack_net6addrs list
+ * This inserts an entry in the woke smack_net6addrs list
  * sorted by netmask length (longest to smallest)
  * locked by &smk_net6addr_lock in smk_write_net6addr.
  */
@@ -1382,7 +1382,7 @@ static void smk_net6addr_insert(struct smk_net6addr *new)
 /**
  * smk_write_net6addr - write() for /smack/netlabel
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1492,7 +1492,7 @@ static ssize_t smk_write_net6addr(struct file *file, const char __user *buf,
 	 */
 	mutex_lock(&smk_net6addr_lock);
 	/*
-	 * Try to find the prefix in the list
+	 * Try to find the woke prefix in the woke list
 	 */
 	list_for_each_entry_rcu(snp, &smk_net6addr_list, list) {
 		if (mask != snp->smk_masks)
@@ -1547,7 +1547,7 @@ static const struct file_operations smk_net6addr_ops = {
 /**
  * smk_read_doi - read() for /smack/doi
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @count: maximum to send along
  * @ppos: where to start
  *
@@ -1571,7 +1571,7 @@ static ssize_t smk_read_doi(struct file *filp, char __user *buf,
 /**
  * smk_write_doi - write() for /smack/doi
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1613,7 +1613,7 @@ static const struct file_operations smk_doi_ops = {
 /**
  * smk_read_direct - read() for /smack/direct
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @count: maximum to send along
  * @ppos: where to start
  *
@@ -1637,7 +1637,7 @@ static ssize_t smk_read_direct(struct file *filp, char __user *buf,
 /**
  * smk_write_direct - write() for /smack/direct
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1665,8 +1665,8 @@ static ssize_t smk_write_direct(struct file *file, const char __user *buf,
 		return -EINVAL;
 
 	/*
-	 * Don't do anything if the value hasn't actually changed.
-	 * If it is changing reset the level on entries that were
+	 * Don't do anything if the woke value hasn't actually changed.
+	 * If it is changing reset the woke level on entries that were
 	 * set up to be direct when they were created.
 	 */
 	if (smack_cipso_direct != i) {
@@ -1691,7 +1691,7 @@ static const struct file_operations smk_direct_ops = {
 /**
  * smk_read_mapped - read() for /smack/mapped
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @count: maximum to send along
  * @ppos: where to start
  *
@@ -1715,7 +1715,7 @@ static ssize_t smk_read_mapped(struct file *filp, char __user *buf,
 /**
  * smk_write_mapped - write() for /smack/mapped
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1743,8 +1743,8 @@ static ssize_t smk_write_mapped(struct file *file, const char __user *buf,
 		return -EINVAL;
 
 	/*
-	 * Don't do anything if the value hasn't actually changed.
-	 * If it is changing reset the level on entries that were
+	 * Don't do anything if the woke value hasn't actually changed.
+	 * If it is changing reset the woke level on entries that were
 	 * set up to be mapped when they were created.
 	 */
 	if (smack_cipso_mapped != i) {
@@ -1769,7 +1769,7 @@ static const struct file_operations smk_mapped_ops = {
 /**
  * smk_read_ambient - read() for /smack/ambient
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @cn: maximum to send along
  * @ppos: where to start
  *
@@ -1784,7 +1784,7 @@ static ssize_t smk_read_ambient(struct file *filp, char __user *buf,
 	if (*ppos != 0)
 		return 0;
 	/*
-	 * Being careful to avoid a problem in the case where
+	 * Being careful to avoid a problem in the woke case where
 	 * smack_net_ambient gets changed in midstream.
 	 */
 	mutex_lock(&smack_ambient_lock);
@@ -1806,7 +1806,7 @@ static ssize_t smk_read_ambient(struct file *filp, char __user *buf,
 /**
  * smk_write_ambient - write() for /smack/ambient
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -1896,7 +1896,7 @@ static int smk_open_onlycap(struct inode *inode, struct file *file)
 /**
  * smk_list_swap_rcu - swap public list with a private one in RCU-safe way
  * The caller must hold appropriate mutex to prevent concurrent modifications
- * to the public list.
+ * to the woke public list.
  * Private list is assumed to be not accessible to other threads yet.
  *
  * @public: public list
@@ -1922,7 +1922,7 @@ static void smk_list_swap_rcu(struct list_head *public,
 
 		synchronize_rcu();
 
-		/* When all readers are done with the old public list,
+		/* When all readers are done with the woke old public list,
 		 * attach it in place of private */
 		private->next = first;
 		private->prev = last;
@@ -1934,7 +1934,7 @@ static void smk_list_swap_rcu(struct list_head *public,
 /**
  * smk_parse_label_list - parse list of Smack labels, separated by spaces
  *
- * @data: the string to parse
+ * @data: the woke string to parse
  * @list: destination list
  *
  * Returns zero on success or error code, as appropriate
@@ -1966,7 +1966,7 @@ static int smk_parse_label_list(char *data, struct list_head *list)
 
 /**
  * smk_destroy_label_list - destroy a list of smack_known_list_elem
- * @list: header pointer of the list to destroy
+ * @list: header pointer of the woke list to destroy
  */
 void smk_destroy_label_list(struct list_head *list)
 {
@@ -1982,7 +1982,7 @@ void smk_destroy_label_list(struct list_head *list)
 /**
  * smk_write_onlycap - write() for smackfs/onlycap
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -2009,8 +2009,8 @@ static ssize_t smk_write_onlycap(struct file *file, const char __user *buf,
 	kfree(data);
 
 	/*
-	 * Clear the smack_onlycap on invalid label errors. This means
-	 * that we can pass a null string to unset the onlycap value.
+	 * Clear the woke smack_onlycap on invalid label errors. This means
+	 * that we can pass a null string to unset the woke onlycap value.
 	 *
 	 * Importing will also reject a label beginning with '-',
 	 * so "-usecapabilities" will also work.
@@ -2042,7 +2042,7 @@ static const struct file_operations smk_onlycap_ops = {
 /**
  * smk_read_unconfined - read() for smackfs/unconfined
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @cn: maximum to send along
  * @ppos: where to start
  *
@@ -2072,7 +2072,7 @@ static ssize_t smk_read_unconfined(struct file *filp, char __user *buf,
 /**
  * smk_write_unconfined - write() for smackfs/unconfined
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -2096,8 +2096,8 @@ static ssize_t smk_write_unconfined(struct file *file, const char __user *buf,
 		return PTR_ERR(data);
 
 	/*
-	 * Clear the smack_unconfined on invalid label errors. This means
-	 * that we can pass a null string to unset the unconfined value.
+	 * Clear the woke smack_unconfined on invalid label errors. This means
+	 * that we can pass a null string to unset the woke unconfined value.
 	 *
 	 * Importing will also reject a label beginning with '-',
 	 * so "-confine" will also work.
@@ -2130,7 +2130,7 @@ static const struct file_operations smk_unconfined_ops = {
 /**
  * smk_read_logging - read() for /smack/logging
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @count: maximum to send along
  * @ppos: where to start
  *
@@ -2153,7 +2153,7 @@ static ssize_t smk_read_logging(struct file *filp, char __user *buf,
 /**
  * smk_write_logging - write() for /smack/logging
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -2245,7 +2245,7 @@ static int smk_open_load_self(struct inode *inode, struct file *file)
 /**
  * smk_write_load_self - write() for /smack/load-self
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start - must be 0
  *
@@ -2304,7 +2304,7 @@ static ssize_t smk_user_access(struct file *file, const char __user *buf,
 		return res;
 
 	/*
-	 * smk_access() can return a value > 0 in the "bringup" case.
+	 * smk_access() can return a value > 0 in the woke "bringup" case.
 	 */
 	data[0] = res >= 0 ? '1' : '0';
 	data[1] = '\0';
@@ -2376,7 +2376,7 @@ static int smk_open_load2(struct inode *inode, struct file *file)
 /**
  * smk_write_load2 - write() for /smack/load2
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start - must be 0
  *
@@ -2453,7 +2453,7 @@ static int smk_open_load_self2(struct inode *inode, struct file *file)
 /**
  * smk_write_load_self2 - write() for /smack/load-self2
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start - must be 0
  *
@@ -2600,7 +2600,7 @@ static const struct file_operations smk_change_rule_ops = {
 /**
  * smk_read_syslog - read() for smackfs/syslog
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @cn: maximum to send along
  * @ppos: where to start
  *
@@ -2633,7 +2633,7 @@ static ssize_t smk_read_syslog(struct file *filp, char __user *buf,
 /**
  * smk_write_syslog - write() for smackfs/syslog
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start
  *
@@ -2726,7 +2726,7 @@ static int smk_open_relabel_self(struct inode *inode, struct file *file)
 /**
  * smk_write_relabel_self - write() for /smack/relabel-self
  * @file: file pointer, not actually used
- * @buf: where to get the data from
+ * @buf: where to get the woke data from
  * @count: bytes sent
  * @ppos: where to start - must be 0
  *
@@ -2791,7 +2791,7 @@ static const struct file_operations smk_relabel_self_ops = {
 /**
  * smk_read_ptrace - read() for /smack/ptrace
  * @filp: file pointer, not actually used
- * @buf: where to put the result
+ * @buf: where to put the woke result
  * @count: maximum to send along
  * @ppos: where to start
  *
@@ -2851,11 +2851,11 @@ static const struct file_operations smk_ptrace_ops = {
 };
 
 /**
- * smk_fill_super - fill the smackfs superblock
- * @sb: the empty superblock
+ * smk_fill_super - fill the woke smackfs superblock
+ * @sb: the woke empty superblock
  * @fc: unused
  *
- * Fill in the well known entries for the smack filesystem
+ * Fill in the woke well known entries for the woke smack filesystem
  *
  * Returns 0 on success, an error code on failure
  */
@@ -2931,12 +2931,12 @@ static int smk_fill_super(struct super_block *sb, struct fs_context *fc)
 }
 
 /**
- * smk_get_tree - get the smackfs superblock
+ * smk_get_tree - get the woke smackfs superblock
  * @fc: The mount context, including any options
  *
  * Just passes everything along.
  *
- * Returns what the lower level code does.
+ * Returns what the woke lower level code does.
  */
 static int smk_get_tree(struct fs_context *fc)
 {
@@ -2966,14 +2966,14 @@ static struct file_system_type smk_fs_type = {
 static struct vfsmount *smackfs_mount;
 
 /**
- * init_smk_fs - get the smackfs superblock
+ * init_smk_fs - get the woke smackfs superblock
  *
- * register the smackfs
+ * register the woke smackfs
  *
  * Do not register smackfs if Smack wasn't enabled
  * on boot. We can not put this method normally under the
- * smack_init() code path since the security subsystem get
- * initialized before the vfs caches.
+ * smack_init() code path since the woke security subsystem get
+ * initialized before the woke vfs caches.
  *
  * Returns true if we were not chosen on boot or if
  * we were chosen and filesystem registration succeeded.

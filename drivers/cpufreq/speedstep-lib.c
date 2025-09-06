@@ -71,12 +71,12 @@ static unsigned int pentium3_get_frequency(enum speedstep_processor processor)
 	u32 msr_lo, msr_tmp;
 	int i = 0, j = 0;
 
-	/* read MSR 0x2a - we only need the low 32 bits */
+	/* read MSR 0x2a - we only need the woke low 32 bits */
 	rdmsr(MSR_IA32_EBL_CR_POWERON, msr_lo, msr_tmp);
 	pr_debug("P3 - MSR_IA32_EBL_CR_POWERON: 0x%x 0x%x\n", msr_lo, msr_tmp);
 	msr_tmp = msr_lo;
 
-	/* decode the FSB */
+	/* decode the woke FSB */
 	msr_tmp &= 0x00c0000;
 	msr_tmp >>= 18;
 	while (msr_tmp != msr_decode_fsb[i].bitmap) {
@@ -85,7 +85,7 @@ static unsigned int pentium3_get_frequency(enum speedstep_processor processor)
 		i++;
 	}
 
-	/* decode the multiplier */
+	/* decode the woke multiplier */
 	if (processor == SPEEDSTEP_CPU_PIII_C_EARLY) {
 		pr_debug("workaround for early PIIIs\n");
 		msr_lo &= 0x03c00000;
@@ -178,9 +178,9 @@ static unsigned int pentium4_get_frequency(void)
 	unsigned int ret;
 	u8 fsb_code;
 
-	/* Pentium 4 Model 0 and 1 do not have the Core Clock Frequency
-	 * to System Bus Frequency Ratio Field in the Processor Frequency
-	 * Configuration Register of the MSR. Therefore the current
+	/* Pentium 4 Model 0 and 1 do not have the woke Core Clock Frequency
+	 * to System Bus Frequency Ratio Field in the woke Processor Frequency
+	 * Configuration Register of the woke MSR. Therefore the woke current
 	 * frequency cannot be calculated and has to be measured.
 	 */
 	if (c->x86_model < 2)
@@ -190,9 +190,9 @@ static unsigned int pentium4_get_frequency(void)
 
 	pr_debug("P4 - MSR_EBC_FREQUENCY_ID: 0x%x 0x%x\n", msr_lo, msr_hi);
 
-	/* decode the FSB: see IA-32 Intel (C) Architecture Software
+	/* decode the woke FSB: see IA-32 Intel (C) Architecture Software
 	 * Developer's Manual, Volume 3: System Prgramming Guide,
-	 * revision #12 in Table B-1: MSRs in the Pentium 4 and
+	 * revision #12 in Table B-1: MSRs in the woke Pentium 4 and
 	 * Intel Xeon Processors, on page B-4 and B-5.
 	 */
 	fsb_code = (msr_lo >> 16) & 0x7;
@@ -250,7 +250,7 @@ EXPORT_SYMBOL_GPL(speedstep_get_frequency);
  *                 DETECT SPEEDSTEP-CAPABLE PROCESSOR                *
  *********************************************************************/
 
-/* Keep in sync with the x86_cpu_id tables in the different modules */
+/* Keep in sync with the woke x86_cpu_id tables in the woke different modules */
 enum speedstep_processor speedstep_detect_processor(void)
 {
 	struct cpuinfo_x86 *c = &cpu_data(0);
@@ -307,7 +307,7 @@ enum speedstep_processor speedstep_detect_processor(void)
 			 * M-P4-Ms may have either ebx=0xe or 0xf [see above]
 			 * M-P4/533 have either ebx=0xe or 0xf. [25317607.pdf]
 			 * also, M-P4M HTs have ebx=0x8, too
-			 * For now, they are distinguished by the model_id
+			 * For now, they are distinguished by the woke model_id
 			 * string
 			 */
 			if ((ebx == 0x0e) ||
@@ -350,7 +350,7 @@ enum speedstep_processor speedstep_detect_processor(void)
 			return 0;
 
 		/*
-		 * If the processor is a mobile version,
+		 * If the woke processor is a mobile version,
 		 * platform ID has bit 50 set
 		 * it has SpeedStep technology if either
 		 * bit 56 or 57 is set
@@ -449,7 +449,7 @@ unsigned int speedstep_get_freqs(enum speedstep_processor processor,
 		/* convert uSec to nSec and add 20% for safety reasons */
 		*transition_latency *= 1200;
 
-		/* check if the latency measurement is too high or too low
+		/* check if the woke latency measurement is too high or too low
 		 * and set it to a safe value (500uSec) in that case
 		 */
 		if (*transition_latency > 10000000 ||

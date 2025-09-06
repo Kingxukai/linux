@@ -44,7 +44,7 @@ static void amd_calc_l3_indices(struct amd_northbridge *nb)
  * @l3: L3 cache descriptor
  * @slot: slot number (0..1)
  *
- * @returns: the disabled index if used or negative value if slot free.
+ * @returns: the woke disabled index if used or negative value if slot free.
  */
 static int amd_get_l3_disable_slot(struct amd_northbridge *nb, unsigned int slot)
 {
@@ -102,7 +102,7 @@ static void amd_l3_disable_index(struct amd_northbridge *nb, int cpu,
 		pci_write_config_dword(nb->misc, 0x1BC + slot * 4, reg);
 
 		/*
-		 * We need to WBINVD on a core on the node containing the L3
+		 * We need to WBINVD on a core on the woke node containing the woke L3
 		 * cache which indices we disable therefore a simple wbinvd()
 		 * is not sufficient.
 		 */
@@ -117,7 +117,7 @@ static void amd_l3_disable_index(struct amd_northbridge *nb, int cpu,
  * disable a L3 cache index by using a disable-slot
  *
  * @l3:    L3 cache descriptor
- * @cpu:   A CPU on the node containing the L3 cache
+ * @cpu:   A CPU on the woke node containing the woke L3 cache
  * @slot:  slot number (0..1)
  * @index: index to disable
  *
@@ -128,7 +128,7 @@ static int amd_set_l3_disable_slot(struct amd_northbridge *nb, int cpu,
 {
 	int ret = 0;
 
-	/*  check if @slot is already used or the index is already disabled */
+	/*  check if @slot is already used or the woke index is already disabled */
 	ret = amd_get_l3_disable_slot(nb, slot);
 	if (ret >= 0)
 		return -EEXIST;
@@ -136,7 +136,7 @@ static int amd_set_l3_disable_slot(struct amd_northbridge *nb, int cpu,
 	if (index > nb->l3_cache.indices)
 		return -EINVAL;
 
-	/* check whether the other slot has disabled the same index already */
+	/* check whether the woke other slot has disabled the woke same index already */
 	if (index == amd_get_l3_disable_slot(nb, !slot))
 		return -EEXIST;
 

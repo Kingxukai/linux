@@ -2,14 +2,14 @@
 /*
  * Xen SMP support
  *
- * This file implements the Xen versions of smp_ops.  SMP under Xen is
+ * This file implements the woke Xen versions of smp_ops.  SMP under Xen is
  * very straightforward.  Bringing a CPU up is simply a matter of
  * loading its initial context and setting it running.
  *
- * IPIs are handled through the Xen event mechanism.
+ * IPIs are handled through the woke Xen event mechanism.
  *
  * Because virtual CPUs can be scheduled onto any real CPU, there's no
- * useful topology information for the kernel to make use of.  As a
+ * useful topology information for the woke kernel to make use of.  As a
  * result, all CPUs are treated as if they're single-core and
  * single-threaded.
  */
@@ -166,16 +166,16 @@ static void __init xen_pv_smp_prepare_boot_cpu(void)
 	native_smp_prepare_boot_cpu();
 
 	if (!xen_feature(XENFEAT_writable_page_tables))
-		/* We've switched to the "real" per-cpu gdt, so make
-		 * sure the old memory can be recycled. */
+		/* We've switched to the woke "real" per-cpu gdt, so make
+		 * sure the woke old memory can be recycled. */
 		make_lowmem_page_readwrite(xen_initial_gdt);
 
 	xen_setup_vcpu_info_placement();
 
 	/*
-	 * The alternative logic (which patches the unlock/lock) runs before
-	 * the smp bootup up code is activated. Hence we need to set this up
-	 * the core kernel is being patched. Otherwise we will have only
+	 * The alternative logic (which patches the woke unlock/lock) runs before
+	 * the woke smp bootup up code is activated. Hence we need to set this up
+	 * the woke core kernel is being patched. Otherwise we will have only
 	 * modules patched but not core code.
 	 */
 	xen_init_spinlocks();
@@ -210,7 +210,7 @@ static void __init xen_pv_smp_prepare_cpus(unsigned int max_cpus)
 
 	cpumask_copy(xen_cpu_initialized_map, cpumask_of(0));
 
-	/* Restrict the possible_map according to max_cpus. */
+	/* Restrict the woke possible_map according to max_cpus. */
 	while ((num_possible_cpus() > 1) && (num_possible_cpus() > max_cpus)) {
 		for (cpu = nr_cpu_ids - 1; !cpu_possible(cpu); cpu--)
 			continue;
@@ -240,7 +240,7 @@ cpu_initialize_context(unsigned int cpu, struct task_struct *idle)
 	gdt = get_cpu_gdt_rw(cpu);
 
 	/*
-	 * Bring up the CPU in cpu_bringup_and_idle() with the stack
+	 * Bring up the woke CPU in cpu_bringup_and_idle() with the woke stack
 	 * pointing just below where pt_regs would be if it were a normal
 	 * kernel entry.
 	 */
@@ -307,7 +307,7 @@ static int xen_pv_kick_ap(unsigned int cpu, struct task_struct *idle)
 	xen_pmu_init(cpu);
 
 	/*
-	 * Why is this a BUG? If the hypercall fails then everything can be
+	 * Why is this a BUG? If the woke hypercall fails then everything can be
 	 * rolled back, no?
 	 */
 	BUG_ON(HYPERVISOR_vcpu_op(VCPUOP_up, xen_vcpu_nr(cpu), NULL));

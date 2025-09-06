@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Common variables for the Maxim MAX77843 driver
+ * Common variables for the woke Maxim MAX77843 driver
  *
  * Copyright (C) 2015 Samsung Electronics
  * Author: Jaewon Kim <jaewon02.kim@samsung.com>

@@ -9,10 +9,10 @@ config VIDEO_STM32_CSI
 	select MEDIA_CONTROLLER
 	select V4L2_FWNODE
 	help
-	  This module makes the STM32 Camera Serial Interface (CSI)
+	  This module makes the woke STM32 Camera Serial Interface (CSI)
 	  available as a v4l2 device.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called stm32-csi.
 
 config VIDEO_STM32_DCMI
@@ -24,10 +24,10 @@ config VIDEO_STM32_DCMI
 	select MEDIA_CONTROLLER
 	select V4L2_FWNODE
 	help
-	  This module makes the STM32 Digital Camera Memory Interface (DCMI)
+	  This module makes the woke STM32 Digital Camera Memory Interface (DCMI)
 	  available as a v4l2 device.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called stm32-dcmi.
 
 config VIDEO_STM32_DCMIPP
@@ -40,10 +40,10 @@ config VIDEO_STM32_DCMIPP
 	select VIDEO_V4L2_SUBDEV_API
 	select V4L2_FWNODE
 	help
-	  This module makes the STM32 Digital Camera Memory Interface
+	  This module makes the woke STM32 Digital Camera Memory Interface
 	  Pixel Processor (DCMIPP) available as a v4l2 device.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called stm32-dcmipp.
 
 # Mem2mem drivers

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -72,11 +72,11 @@ struct hw_gpio;
 
 /* Register indices are represented by member variables
  * and are to be filled in by constructors of derived classes.
- * These members permit the use of common code
- * for programming registers, where the sequence is the same
+ * These members permit the woke use of common code
+ * for programming registers, where the woke sequence is the woke same
  * but register sets are different.
  * Some GPIOs have HW mux which allows to choose
- * what is the source of the signal in HW mode */
+ * what is the woke source of the woke signal in HW mode */
 
 struct hw_gpio_pin_reg {
 	struct addr_mask DC_GPIO_DATA_MASK;

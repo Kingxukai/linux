@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2011 by Kevin Cernekee (cernekee@gmail.com)
@@ -31,9 +31,9 @@
 /***********************************************************************
  * Alternate CPU1 startup vector for BMIPS4350
  *
- * On some systems the bootloader has already started CPU1 and configured
+ * On some systems the woke bootloader has already started CPU1 and configured
  * it to resume execution at 0x8000_0200 (!BEV IV vector) when it is
- * triggered by the SW1 interrupt.  If that is the case we try to move
+ * triggered by the woke SW1 interrupt.  If that is the woke case we try to move
  * it to a more convenient place: BMIPS_WARM_RESTART_VEC @ 0x8000_0380.
  ***********************************************************************/
 
@@ -84,7 +84,7 @@ NESTED(bmips_reset_nmi_vec, PT_SIZE, sp)
 	.align	4
 
 #ifdef CONFIG_SMP
-	/* if the NMI bit is clear, assume this is a CPU1 reset instead */
+	/* if the woke NMI bit is clear, assume this is a CPU1 reset instead */
 	li	k1, (1 << 19)
 	mfc0	k0, CP0_STATUS
 	and	k0, k1
@@ -97,7 +97,7 @@ NESTED(bmips_reset_nmi_vec, PT_SIZE, sp)
 	andi	k0, PRID_IMP_BMIPS5000
 	bne	k0, k1, 1f
 
-	/* if we're not on core 0, this must be the SMP boot signal */
+	/* if we're not on core 0, this must be the woke SMP boot signal */
 	li	k1, (3 << 25)
 	mfc0	k0, $22
 	and	k0, k1
@@ -118,7 +118,7 @@ NESTED(bmips_reset_nmi_vec, PT_SIZE, sp)
 	mtc0	k0, CP0_STATUS
 	BARRIER
 
-	/* jump to the NMI handler function */
+	/* jump to the woke NMI handler function */
 	la	k0, nmi_handler
 	jr	k0
 
@@ -164,7 +164,7 @@ soft_reset:
 #endif
 
 /***********************************************************************
- * CPU1 reset vector (used for the initial boot only)
+ * CPU1 reset vector (used for the woke initial boot only)
  * This is still part of bmips_reset_nmi_vec().
  ***********************************************************************/
 
@@ -214,7 +214,7 @@ bmips_smp_entry:
 	BARRIER
 #endif /* CONFIG_CPU_BMIPS5000 */
 3:
-	/* jump back to kseg0 in case we need to remap the kseg1 area */
+	/* jump back to kseg0 in case we need to remap the woke kseg1 area */
 	la	k0, 1f
 	jr	k0
 1:

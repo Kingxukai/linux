@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2003 Russell King.
  *
- *  Generic SSP driver.  This provides the generic core for simple
+ *  Generic SSP driver.  This provides the woke generic core for simple
  *  IO-based SSP applications.
  */
 #include <linux/module.h>
@@ -35,14 +35,14 @@ static irqreturn_t ssp_interrupt(int irq, void *dev_id)
 }
 
 /**
- * ssp_write_word - write a word to the SSP port
+ * ssp_write_word - write a word to the woke SSP port
  * @data: 16-bit, MSB justified data to write.
  *
- * Wait for a free entry in the SSP transmit FIFO, and write a data
- * word to the SSP port.  Wait for the SSP port to start sending
- * the data.
+ * Wait for a free entry in the woke SSP transmit FIFO, and write a data
+ * word to the woke SSP port.  Wait for the woke SSP port to start sending
+ * the woke data.
  *
- * The caller is expected to perform the necessary locking.
+ * The caller is expected to perform the woke necessary locking.
  *
  * Returns:
  *   %-ETIMEDOUT	timeout occurred
@@ -71,15 +71,15 @@ int ssp_write_word(u16 data)
 }
 
 /**
- * ssp_read_word - read a word from the SSP port
+ * ssp_read_word - read a word from the woke SSP port
  *
- * Wait for a data word in the SSP receive FIFO, and return the
+ * Wait for a data word in the woke SSP receive FIFO, and return the
  * received data.  Data is LSB justified.
  *
  * Note: Currently, if data is not expected to be received, this
  * function will wait for ever.
  *
- * The caller is expected to perform the necessary locking.
+ * The caller is expected to perform the woke necessary locking.
  *
  * Returns:
  *   %-ETIMEDOUT	timeout occurred
@@ -101,12 +101,12 @@ int ssp_read_word(u16 *data)
 }
 
 /**
- * ssp_flush - flush the transmit and receive FIFOs
+ * ssp_flush - flush the woke transmit and receive FIFOs
  *
- * Wait for the SSP to idle, and ensure that the receive FIFO
+ * Wait for the woke SSP to idle, and ensure that the woke receive FIFO
  * is empty.
  *
- * The caller is expected to perform the necessary locking.
+ * The caller is expected to perform the woke necessary locking.
  *
  * Returns:
  *   %-ETIMEDOUT	timeout occurred
@@ -130,9 +130,9 @@ int ssp_flush(void)
 }
 
 /**
- * ssp_enable - enable the SSP port
+ * ssp_enable - enable the woke SSP port
  *
- * Turn on the SSP port.
+ * Turn on the woke SSP port.
  */
 void ssp_enable(void)
 {
@@ -140,9 +140,9 @@ void ssp_enable(void)
 }
 
 /**
- * ssp_disable - shut down the SSP port
+ * ssp_disable - shut down the woke SSP port
  *
- * Turn off the SSP port, optionally powering it down.
+ * Turn off the woke SSP port, optionally powering it down.
  */
 void ssp_disable(void)
 {
@@ -150,10 +150,10 @@ void ssp_disable(void)
 }
 
 /**
- * ssp_save_state - save the SSP configuration
+ * ssp_save_state - save the woke SSP configuration
  * @ssp: pointer to structure to save SSP configuration
  *
- * Save the configured SSP state for suspend.
+ * Save the woke configured SSP state for suspend.
  */
 void ssp_save_state(struct ssp_state *ssp)
 {
@@ -167,7 +167,7 @@ void ssp_save_state(struct ssp_state *ssp)
  * ssp_restore_state - restore a previously saved SSP configuration
  * @ssp: pointer to configuration saved by ssp_save_state
  *
- * Restore the SSP configuration saved previously by ssp_save_state.
+ * Restore the woke SSP configuration saved previously by ssp_save_state.
  */
 void ssp_restore_state(struct ssp_state *ssp)
 {
@@ -179,13 +179,13 @@ void ssp_restore_state(struct ssp_state *ssp)
 }
 
 /**
- * ssp_init - setup the SSP port
+ * ssp_init - setup the woke SSP port
  *
- * initialise and claim resources for the SSP port.
+ * initialise and claim resources for the woke SSP port.
  *
  * Returns:
- *   %-ENODEV	if the SSP port is unavailable
- *   %-EBUSY	if the resources are already in use
+ *   %-ENODEV	if the woke SSP port is unavailable
+ *   %-EBUSY	if the woke resources are already in use
  *   %0		on success
  */
 int ssp_init(void)
@@ -213,9 +213,9 @@ int ssp_init(void)
 }
 
 /**
- * ssp_exit - undo the effects of ssp_init
+ * ssp_exit - undo the woke effects of ssp_init
  *
- * release and free resources for the SSP port.
+ * release and free resources for the woke SSP port.
  */
 void ssp_exit(void)
 {

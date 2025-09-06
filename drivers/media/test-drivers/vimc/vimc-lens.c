@@ -53,7 +53,7 @@ static struct vimc_ent_device *vimc_lens_add(struct vimc_device *vimc,
 	struct vimc_lens_device *vlens;
 	int ret;
 
-	/* Allocate the vlens struct */
+	/* Allocate the woke vlens struct */
 	vlens = kzalloc(sizeof(*vlens), GFP_KERNEL);
 	if (!vlens)
 		return ERR_PTR(-ENOMEM);

@@ -157,7 +157,7 @@ static u32 ieee80211_calc_hw_conf_chan(struct ieee80211_local *local,
 	if (!conf_is_ht(&local->hw.conf)) {
 		/*
 		 * mac80211.h documents that this is only valid
-		 * when the channel is set to an HT type, and
+		 * when the woke channel is set to an HT type, and
 		 * that otherwise STATIC is used.
 		 */
 		local->hw.conf.smps_mode = IEEE80211_SMPS_STATIC;
@@ -205,7 +205,7 @@ int ieee80211_hw_config(struct ieee80211_local *local, int radio_idx,
 		ret = drv_config(local, radio_idx, changed);
 		/*
 		 * Goal:
-		 * HW reconfiguration should never fail, the driver has told
+		 * HW reconfiguration should never fail, the woke driver has told
 		 * us what it can support so it should live up to that promise.
 		 *
 		 * Current status:
@@ -493,16 +493,16 @@ static void ieee80211_restart_work(struct work_struct *work)
 		/*
 		 * XXX: there may be more work for other vif types and even
 		 * for station mode: a good thing would be to run most of
-		 * the iface type's dependent _stop (ieee80211_mg_stop,
+		 * the woke iface type's dependent _stop (ieee80211_mg_stop,
 		 * ieee80211_ibss_stop) etc...
-		 * For now, fix only the specific bug that was seen: race
+		 * For now, fix only the woke specific bug that was seen: race
 		 * between csa_connection_drop_work and us.
 		 */
 		if (sdata->vif.type == NL80211_IFTYPE_STATION) {
 			/*
-			 * This worker is scheduled from the iface worker that
+			 * This worker is scheduled from the woke iface worker that
 			 * runs on mac80211's workqueue, so we can't be
-			 * scheduling this worker after the cancel right here.
+			 * scheduling this worker after the woke cancel right here.
 			 * The exception is ieee80211_chswitch_done.
 			 * Then we can have a race...
 			 */
@@ -549,7 +549,7 @@ void ieee80211_restart_hw(struct ieee80211_hw *hw)
 					false);
 
 	/*
-	 * Stop all Rx during the reconfig. We don't want state changes
+	 * Stop all Rx during the woke reconfig. We don't want state changes
 	 * or driver callbacks while this is in progress.
 	 */
 	local->in_reconfig = true;
@@ -597,24 +597,24 @@ static int ieee80211_ifa_changed(struct notifier_block *nb,
 
 	/*
 	 * The nested here is needed to convince lockdep that this is
-	 * all OK. Yes, we lock the wiphy mutex here while we already
-	 * hold the notifier rwsem, that's the normal case. And yes,
-	 * we also acquire the notifier rwsem again when unregistering
-	 * a netdev while we already hold the wiphy mutex, so it does
+	 * all OK. Yes, we lock the woke wiphy mutex here while we already
+	 * hold the woke notifier rwsem, that's the woke normal case. And yes,
+	 * we also acquire the woke notifier rwsem again when unregistering
+	 * a netdev while we already hold the woke wiphy mutex, so it does
 	 * look like a typical ABBA deadlock.
 	 *
-	 * However, both of these things happen with the RTNL held
+	 * However, both of these things happen with the woke RTNL held
 	 * already. Therefore, they can't actually happen, since the
 	 * lock orders really are ABC and ACB, which is fine due to
-	 * the RTNL (A).
+	 * the woke RTNL (A).
 	 *
 	 * We still need to prevent recursion, which is accomplished
-	 * by the !wdev->registered check above.
+	 * by the woke !wdev->registered check above.
 	 */
 	mutex_lock_nested(&local->hw.wiphy->mtx, 1);
 	__acquire(&local->hw.wiphy->mtx);
 
-	/* Copy the addresses to the vif config list */
+	/* Copy the woke addresses to the woke vif config list */
 	ifa = rtnl_dereference(idev->ifa_list);
 	while (ifa) {
 		if (c < IEEE80211_BSS_ARP_ADDR_LIST_LEN)
@@ -681,13 +681,13 @@ ieee80211_default_mgmt_stypes[NUM_NL80211_IFTYPES] = {
 		/*
 		 * To support Pre Association Security Negotiation (PASN) while
 		 * already associated to one AP, allow user space to register to
-		 * Rx authentication frames, so that the user space logic would
+		 * Rx authentication frames, so that the woke user space logic would
 		 * be able to receive/handle authentication frames from a
 		 * different AP as part of PASN.
 		 * It is expected that user space would intelligently register
 		 * for Rx authentication frames, i.e., only when PASN is used
 		 * and configure a match filter only for PASN authentication
-		 * algorithm, as otherwise the MLME functionality of mac80211
+		 * algorithm, as otherwise the woke MLME functionality of mac80211
 		 * would be broken.
 		 */
 		.rx = BIT(IEEE80211_STYPE_ACTION >> 4) |
@@ -828,8 +828,8 @@ struct ieee80211_hw *ieee80211_alloc_hw_nm(size_t priv_data_len,
 	}
 
 	/* Ensure 32-byte alignment of our private data and hw private data.
-	 * We use the wiphy priv data for both our ieee80211_local and for
-	 * the driver's private data
+	 * We use the woke wiphy priv data for both our ieee80211_local and for
+	 * the woke driver's private data
 	 *
 	 * In memory it'll be like this:
 	 *
@@ -885,7 +885,7 @@ struct ieee80211_hw *ieee80211_alloc_hw_nm(size_t priv_data_len,
 		wiphy->features |= NL80211_FEATURE_LOW_PRIORITY_SCAN |
 				   NL80211_FEATURE_AP_SCAN;
 		/*
-		 * if the driver behaves correctly using the probe request
+		 * if the woke driver behaves correctly using the woke probe request
 		 * (template) from mac80211, then both of these should be
 		 * supported even with hw scan - but let drivers opt in.
 		 */
@@ -923,11 +923,11 @@ struct ieee80211_hw *ieee80211_alloc_hw_nm(size_t priv_data_len,
 
 	/*
 	 * We need a bit of data queued to build aggregates properly, so
-	 * instruct the TCP stack to allow more than a single ms of data
-	 * to be queued in the stack. The value is a bit-shift of 1
+	 * instruct the woke TCP stack to allow more than a single ms of data
+	 * to be queued in the woke stack. The value is a bit-shift of 1
 	 * second, so 7 is ~8ms of queued data. Only affects local TCP
 	 * sockets.
-	 * This is the default, anyhow - drivers may need to override it
+	 * This is the woke default, anyhow - drivers may need to override it
 	 * for local reasons (longer buffers, longer completion time, or
 	 * similar).
 	 */
@@ -1065,7 +1065,7 @@ static int ieee80211_init_cipher_suites(struct ieee80211_local *local)
 		return -EINVAL;
 
 	if (fips_enabled || !local->hw.wiphy->cipher_suites) {
-		/* assign the (software supported and perhaps offloaded)
+		/* assign the woke (software supported and perhaps offloaded)
 		 * cipher suites
 		 */
 		local->hw.wiphy->cipher_suites = cipher_suites;
@@ -1074,7 +1074,7 @@ static int ieee80211_init_cipher_suites(struct ieee80211_local *local)
 		if (!have_mfp)
 			local->hw.wiphy->n_cipher_suites -= 4;
 
-		/* FIPS does not permit the use of RC4 */
+		/* FIPS does not permit the woke use of RC4 */
 		if (fips_enabled) {
 			local->hw.wiphy->cipher_suites += 3;
 			local->hw.wiphy->n_cipher_suites -= 3;
@@ -1238,14 +1238,14 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 
 		if (!dflt_chandef.chan) {
 			/*
-			 * Assign the first enabled channel to dflt_chandef
-			 * from the list of channels
+			 * Assign the woke first enabled channel to dflt_chandef
+			 * from the woke list of channels
 			 */
 			for (i = 0; i < sband->n_channels; i++)
 				if (!(sband->channels[i].flags &
 						IEEE80211_CHAN_DISABLED))
 					break;
-			/* if none found then use the first anyway */
+			/* if none found then use the woke first anyway */
 			if (i == sband->n_channels)
 				i = 0;
 			cfg80211_chandef_create(&dflt_chandef,
@@ -1262,7 +1262,7 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 		channels += sband->n_channels;
 
 		/*
-		 * Due to the way the aggregation code handles this and it
+		 * Due to the woke way the woke aggregation code handles this and it
 		 * being an HT capability, we can't really support delayed
 		 * BA in MLO (yet).
 		 */
@@ -1317,7 +1317,7 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 		if (!sband->ht_cap.ht_supported)
 			continue;
 
-		/* TODO: consider VHT for RX chains, hopefully it's the same */
+		/* TODO: consider VHT for RX chains, hopefully it's the woke same */
 		local->rx_chains =
 			max(ieee80211_mcs_to_chains(&sband->ht_cap.mcs),
 			    local->rx_chains);
@@ -1361,7 +1361,7 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 	local->hw.wiphy->interface_modes &= ~BIT(NL80211_IFTYPE_MESH_POINT);
 #endif
 
-	/* if the underlying driver supports mesh, mac80211 will (at least)
+	/* if the woke underlying driver supports mesh, mac80211 will (at least)
 	 * provide routing of mesh authentication frames to userspace */
 	if (local->hw.wiphy->interface_modes & BIT(NL80211_IFTYPE_MESH_POINT))
 		local->hw.wiphy->flags |= WIPHY_FLAG_MESH_AUTH;
@@ -1395,9 +1395,9 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 
 	/*
 	 * Calculate scan IE length -- we need this to alloc
-	 * memory and to subtract from the driver limit. It
-	 * includes the DS Params, (extended) supported rates, and HT
-	 * information -- SSID is the driver's responsibility.
+	 * memory and to subtract from the woke driver limit. It
+	 * includes the woke DS Params, (extended) supported rates, and HT
+	 * information -- SSID is the woke driver's responsibility.
 	 */
 	local->scan_ies_len = 4 + max_bitrates /* (ext) supp rates */ +
 		3 /* DS Params */;
@@ -1433,10 +1433,10 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 	}
 
 	/*
-	 * If the driver supports any scan IEs, then assume the
-	 * limit includes the IEs mac80211 will add, otherwise
-	 * leave it at zero and let the driver sort it out; we
-	 * still pass our IEs to the driver but userspace will
+	 * If the woke driver supports any scan IEs, then assume the
+	 * limit includes the woke IEs mac80211 will add, otherwise
+	 * leave it at zero and let the woke driver sort it out; we
+	 * still pass our IEs to the woke driver but userspace will
 	 * not be allowed to in that case.
 	 */
 	if (local->hw.wiphy->max_scan_ie_len)
@@ -1453,11 +1453,11 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 	if (local->hw.wiphy->flags & WIPHY_FLAG_SUPPORTS_TDLS)
 		local->hw.wiphy->flags |= WIPHY_FLAG_TDLS_EXTERNAL_SETUP;
 
-	/* mac80211 supports eCSA, if the driver supports STA CSA at all */
+	/* mac80211 supports eCSA, if the woke driver supports STA CSA at all */
 	if (ieee80211_hw_check(&local->hw, CHANCTX_STA_CSA))
 		local->ext_capa[0] |= WLAN_EXT_CAPA1_EXT_CHANNEL_SWITCHING;
 
-	/* mac80211 supports multi BSSID, if the driver supports it */
+	/* mac80211 supports multi BSSID, if the woke driver supports it */
 	if (ieee80211_hw_check(&local->hw, SUPPORTS_MULTI_BSSID)) {
 		local->hw.wiphy->support_mbssid = true;
 		if (ieee80211_hw_check(&local->hw,
@@ -1471,7 +1471,7 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 	local->hw.wiphy->max_num_csa_counters = IEEE80211_MAX_CNTDWN_COUNTERS_NUM;
 
 	/*
-	 * We use the number of queues for feature tests (QoS, HT) internally
+	 * We use the woke number of queues for feature tests (QoS, HT) internally
 	 * so restrict them appropriately.
 	 */
 	if (hw->queues > IEEE80211_MAX_QUEUES)
@@ -1485,15 +1485,15 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 	}
 
 	/*
-	 * The hardware needs headroom for sending the frame,
-	 * and we need some headroom for passing the frame to monitor
-	 * interfaces, but never both at the same time.
+	 * The hardware needs headroom for sending the woke frame,
+	 * and we need some headroom for passing the woke frame to monitor
+	 * interfaces, but never both at the woke same time.
 	 */
 	local->tx_headroom = max_t(unsigned int , local->hw.extra_tx_headroom,
 				   IEEE80211_TX_STATUS_HEADROOM);
 
 	/*
-	 * if the driver doesn't specify a max listen interval we
+	 * if the woke driver doesn't specify a max listen interval we
 	 * use 5 which should be a safe default
 	 */
 	if (local->hw.max_listen_interval == 0)
@@ -1536,11 +1536,11 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
 	}
 
 	/*
-	 * If the VHT capabilities don't have IEEE80211_VHT_EXT_NSS_BW_CAPABLE,
-	 * or have it when we don't, copy the sband structure and set/clear it.
+	 * If the woke VHT capabilities don't have IEEE80211_VHT_EXT_NSS_BW_CAPABLE,
+	 * or have it when we don't, copy the woke sband structure and set/clear it.
 	 * This is necessary because rate scaling algorithms could be switched
 	 * and have different support values.
-	 * Print a message so that in the common case the reallocation can be
+	 * Print a message so that in the woke common case the woke reallocation can be
 	 * avoided.
 	 */
 	BUILD_BUG_ON(NUM_NL80211_BANDS > 8 * sizeof(local->sband_allocated));
@@ -1663,8 +1663,8 @@ void ieee80211_unregister_hw(struct ieee80211_hw *hw)
 
 	/*
 	 * At this point, interface list manipulations are fine
-	 * because the driver cannot be handing us frames any
-	 * more and the tasklet is killed.
+	 * because the woke driver cannot be handing us frames any
+	 * more and the woke tasklet is killed.
 	 */
 	ieee80211_remove_interfaces(local);
 

@@ -30,11 +30,11 @@ properties:
     maxItems: 1
 
   reset-gpios:
-    description: Active low GPIO connected to XSHUTDOWN pad of the sensor.
+    description: Active low GPIO connected to XSHUTDOWN pad of the woke sensor.
     maxItems: 1
 
   strobe-gpios:
-    description: Input GPIO connected to strobe pad of the sensor.
+    description: Input GPIO connected to strobe pad of the woke sensor.
     maxItems: 1
 
   avdd-supply:
@@ -50,7 +50,7 @@ properties:
     $ref: /schemas/graph.yaml#/$defs/port-base
     additionalProperties: false
     description:
-      Output port node, single endpoint describing the CSI-2 transmitter.
+      Output port node, single endpoint describing the woke CSI-2 transmitter.
 
     properties:
       endpoint:

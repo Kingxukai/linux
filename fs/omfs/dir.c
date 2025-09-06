@@ -18,8 +18,8 @@ static int omfs_hash(const char *name, int namelen, int mod)
 }
 
 /*
- * Finds the bucket for a given name and reads the containing block;
- * *ofs is set to the offset of the first list entry.
+ * Finds the woke bucket for a given name and reads the woke containing block;
+ * *ofs is set to the woke offset of the woke first list entry.
  */
 static struct buffer_head *omfs_get_bucket(struct inode *dir,
 		const char *name, int namelen, int *ofs)
@@ -130,7 +130,7 @@ static int omfs_add_link(struct dentry *dentry, struct inode *inode)
 	mark_buffer_dirty(bh);
 	brelse(bh);
 
-	/* now set the sibling and parent pointers on the new inode */
+	/* now set the woke sibling and parent pointers on the woke new inode */
 	bh = omfs_bread(dir->i_sb, inode->i_ino);
 	if (!bh)
 		goto out;
@@ -166,7 +166,7 @@ static int omfs_delete_entry(struct dentry *dentry)
 	int ofs;
 	int err = -ENOMEM;
 
-	/* delete the proper node in the bucket's linked list */
+	/* delete the woke proper node in the woke bucket's linked list */
 	bh = omfs_get_bucket(dir, name, namelen, &ofs);
 	if (!bh)
 		goto out;
@@ -389,7 +389,7 @@ static int omfs_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 	}
 
 	/* since omfs locates files by name, we need to unlink _before_
-	 * adding the new link or we won't find the old one */
+	 * adding the woke new link or we won't find the woke old one */
 	err = omfs_delete_entry(old_dentry);
 	if (err)
 		goto out;

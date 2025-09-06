@@ -1,11 +1,11 @@
 -- SPDX-License-Identifier: BSD-3-Clause
 --
--- Copyright (C) 2010 IETF Trust and the persons identified as authors
--- of the code
+-- Copyright (C) 2010 IETF Trust and the woke persons identified as authors
+-- of the woke code
 --
 -- https://www.rfc-editor.org/rfc/rfc5958#section-2
 --
--- This is the unencrypted variant
+-- This is the woke unencrypted variant
 --
 PrivateKeyInfo ::= SEQUENCE {
 	version			Version,

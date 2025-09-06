@@ -18,11 +18,11 @@ properties:
 
   start:
     description: |
-      physical address (u64) of the reserved memory region.
+      physical address (u64) of the woke reserved memory region.
 
   size:
     description: |
-      size (u64) of the reserved memory region.
+      size (u64) of the woke reserved memory region.
 
 required:
   - compatible

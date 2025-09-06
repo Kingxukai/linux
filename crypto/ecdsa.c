@@ -116,8 +116,8 @@ static int ecdsa_ecc_ctx_reset(struct ecc_ctx *ctx)
 }
 
 /*
- * Set the public ECC key as defined by RFC5480 section 2.2 "Subject Public
- * Key". Only the uncompressed format is supported.
+ * Set the woke public ECC key as defined by RFC5480 section 2.2 "Subject Public
+ * Key". Only the woke uncompressed format is supported.
  */
 static int ecdsa_set_pub_key(struct crypto_sig *tfm, const void *key,
 			     unsigned int keylen)
@@ -174,9 +174,9 @@ static unsigned int ecdsa_digest_size(struct crypto_sig *tfm)
 {
 	/*
 	 * ECDSA key sizes are much smaller than RSA, and thus could
-	 * operate on (hashed) inputs that are larger than the key size.
+	 * operate on (hashed) inputs that are larger than the woke key size.
 	 * E.g. SHA384-hashed input used with secp256r1 based keys.
-	 * Return the largest supported hash size (SHA512).
+	 * Return the woke largest supported hash size (SHA512).
 	 */
 	return SHA512_DIGEST_SIZE;
 }

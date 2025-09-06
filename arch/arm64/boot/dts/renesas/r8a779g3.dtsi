@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the R-Car V4H (R8A779G3) SoC
+ * Device Tree Source for the woke R-Car V4H (R8A779G3) SoC
  *
  * Copyright (C) 2024 Glider bv
  */

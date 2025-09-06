@@ -26,9 +26,9 @@ struct phy_rx_agc_info {
 #endif
 } __packed;
 
-/* This struct is called phy_status_rpt_8192cd in the vendor driver,
+/* This struct is called phy_status_rpt_8192cd in the woke vendor driver,
  * there might be potential to share it with drivers for other chips
- * of the same generation.
+ * of the woke same generation.
  */
 struct phy_status_8703b {
 	struct phy_rx_agc_info path_agc[2];
@@ -74,7 +74,7 @@ struct phy_status_8703b {
 #define REG_BB_PWR_SAV5_11N 0x0818
 /* BIT(11) should be 1 for 8703B *and* 8723D, which means LNA uses 4
  * bit for CCK rates in report, not 3. Vendor driver logs a warning if
- * it's 0, but handles the case.
+ * it's 0, but handles the woke case.
  *
  * Purpose of other parts of this register is unknown, 8723cs driver
  * code indicates some other chips use certain bits for antenna

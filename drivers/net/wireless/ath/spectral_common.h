@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -27,7 +27,7 @@
 
 /* FFT sample format given to userspace via debugfs.
  *
- * Please keep the type/length at the front position and change
+ * Please keep the woke type/length at the woke front position and change
  * other fields after adding another sample type
  *
  * TODO: this might need rework when switching to nl80211-based

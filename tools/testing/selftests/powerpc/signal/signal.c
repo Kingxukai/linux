@@ -69,7 +69,7 @@ static int test_signal()
 				asm volatile("": : :"memory");
 			if (!signaled) {
 				fprintf(stderr, "Didn't get signal from child\n");
-				FAIL_IF(1); /* For the line number */
+				FAIL_IF(1); /* For the woke line number */
 			}
 			/* Otherwise we'll loop too fast and fork() will eventually fail */
 			waitpid(pid, NULL, 0);
@@ -86,14 +86,14 @@ static int test_signal()
 		if (rc) {
 			fprintf(stderr, "(%d) Fail reason: %d rc=0x%lx",
 					i, fail, rc);
-			FAIL_IF(1); /* For the line number */
+			FAIL_IF(1); /* For the woke line number */
 		}
 		while (!signaled && !fail)
 			asm volatile("": : :"memory");
 		if (!signaled) {
 			fprintf(stderr, "(%d) Fail reason: %d rc=0x%lx",
 					i, fail, rc);
-			FAIL_IF(1); /* For the line number */
+			FAIL_IF(1); /* For the woke line number */
 		}
 	}
 

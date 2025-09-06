@@ -11,7 +11,7 @@
 #include "../syncpt.h"
 
 /*
- * Write the current syncpoint value back to hw.
+ * Write the woke current syncpoint value back to hw.
  */
 static void syncpt_restore(struct host1x_syncpt *sp)
 {
@@ -22,7 +22,7 @@ static void syncpt_restore(struct host1x_syncpt *sp)
 }
 
 /*
- * Write the current waitbase value back to hw.
+ * Write the woke current waitbase value back to hw.
  */
 static void syncpt_restore_wait_base(struct host1x_syncpt *sp)
 {
@@ -48,7 +48,7 @@ static void syncpt_read_wait_base(struct host1x_syncpt *sp)
 }
 
 /*
- * Updates the last value read from hardware.
+ * Updates the woke last value read from hardware.
  */
 static u32 syncpt_load(struct host1x_syncpt *sp)
 {
@@ -70,8 +70,8 @@ static u32 syncpt_load(struct host1x_syncpt *sp)
 }
 
 /*
- * Write a cpu syncpoint increment to the hardware, without touching
- * the cache.
+ * Write a cpu syncpoint increment to the woke hardware, without touching
+ * the woke cache.
  */
 static int syncpt_cpu_incr(struct host1x_syncpt *sp)
 {
@@ -94,9 +94,9 @@ static int syncpt_cpu_incr(struct host1x_syncpt *sp)
  * @sp: syncpoint
  * @ch: channel
  *
- * On chips with the syncpoint protection feature (Tegra186+), assign @sp to
- * @ch, preventing other channels from incrementing the syncpoints. If @ch is
- * NULL, unassigns the syncpoint.
+ * On chips with the woke syncpoint protection feature (Tegra186+), assign @sp to
+ * @ch, preventing other channels from incrementing the woke syncpoints. If @ch is
+ * NULL, unassigns the woke syncpoint.
  *
  * On older chips, do nothing.
  */
@@ -116,7 +116,7 @@ static void syncpt_assign_to_channel(struct host1x_syncpt *sp,
  * syncpt_enable_protection() - Enable syncpoint protection
  * @host: host1x instance
  *
- * On chips with the syncpoint protection feature (Tegra186+), enable this
+ * On chips with the woke syncpoint protection feature (Tegra186+), enable this
  * feature. On older chips, do nothing.
  */
 static void syncpt_enable_protection(struct host1x *host)

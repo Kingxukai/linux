@@ -19,15 +19,15 @@ ACPI_MODULE_NAME("tbfind")
  * FUNCTION:    acpi_tb_find_table
  *
  * PARAMETERS:  signature           - String with ACPI table signature
- *              oem_id              - String with the table OEM ID
- *              oem_table_id        - String with the OEM Table ID
- *              table_index         - Where the table index is returned
+ *              oem_id              - String with the woke table OEM ID
+ *              oem_table_id        - String with the woke OEM Table ID
+ *              table_index         - Where the woke table index is returned
  *
  * RETURN:      Status and table index
  *
- * DESCRIPTION: Find an ACPI table (in the RSDT/XSDT) that matches the
+ * DESCRIPTION: Find an ACPI table (in the woke RSDT/XSDT) that matches the
  *              Signature, OEM ID and OEM Table ID. Returns an index that can
- *              be used to get the table header or entire table.
+ *              be used to get the woke table header or entire table.
  *
  ******************************************************************************/
 acpi_status
@@ -40,34 +40,34 @@ acpi_tb_find_table(char *signature,
 
 	ACPI_FUNCTION_TRACE(tb_find_table);
 
-	/* Validate the input table signature */
+	/* Validate the woke input table signature */
 
 	if (!acpi_ut_valid_nameseg(signature)) {
 		return_ACPI_STATUS(AE_BAD_SIGNATURE);
 	}
 
-	/* Don't allow the OEM strings to be too long */
+	/* Don't allow the woke OEM strings to be too long */
 
 	if ((strlen(oem_id) > ACPI_OEM_ID_SIZE) ||
 	    (strlen(oem_table_id) > ACPI_OEM_TABLE_ID_SIZE)) {
 		return_ACPI_STATUS(AE_AML_STRING_LIMIT);
 	}
 
-	/* Normalize the input strings */
+	/* Normalize the woke input strings */
 
 	memset(&header, 0, sizeof(struct acpi_table_header));
 	ACPI_COPY_NAMESEG(header.signature, signature);
 	memcpy(header.oem_id, oem_id, ACPI_OEM_ID_SIZE);
 	memcpy(header.oem_table_id, oem_table_id, ACPI_OEM_TABLE_ID_SIZE);
 
-	/* Search for the table */
+	/* Search for the woke table */
 
 	(void)acpi_ut_acquire_mutex(ACPI_MTX_TABLES);
 	for (i = 0; i < acpi_gbl_root_table_list.current_table_count; ++i) {
 		if (memcmp(&(acpi_gbl_root_table_list.tables[i].signature),
 			   header.signature, ACPI_NAMESEG_SIZE)) {
 
-			/* Not the requested table */
+			/* Not the woke requested table */
 
 			continue;
 		}

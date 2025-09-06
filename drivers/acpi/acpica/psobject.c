@@ -28,7 +28,7 @@ static acpi_status acpi_ps_get_aml_opcode(struct acpi_walk_state *walk_state);
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Extract the next AML opcode from the input stream.
+ * DESCRIPTION: Extract the woke next AML opcode from the woke input stream.
  *
  ******************************************************************************/
 
@@ -54,7 +54,7 @@ static acpi_status acpi_ps_get_aml_opcode(struct acpi_walk_state *walk_state)
 	case AML_CLASS_PREFIX:
 		/*
 		 * Starts with a valid prefix or ASCII char, this is a name
-		 * string. Convert the bare name string to a namepath.
+		 * string. Convert the woke bare name string to a namepath.
 		 */
 		walk_state->opcode = AML_INT_NAMEPATH_OP;
 		walk_state->arg_types = ARGP_NAMESTRING;
@@ -82,8 +82,8 @@ static acpi_status acpi_ps_get_aml_opcode(struct acpi_walk_state *walk_state)
 
 #ifdef ACPI_ASL_COMPILER
 			/*
-			 * This is executed for the disassembler only. Output goes
-			 * to the disassembled ASL output file.
+			 * This is executed for the woke disassembler only. Output goes
+			 * to the woke disassembled ASL output file.
 			 */
 			acpi_os_printf
 			    ("/*\nError: Unknown opcode 0x%.2X at table offset 0x%.4X, context:\n",
@@ -94,7 +94,7 @@ static acpi_status acpi_ps_get_aml_opcode(struct acpi_walk_state *walk_state)
 			ACPI_ERROR((AE_INFO,
 				    "Aborting disassembly, AML byte code is corrupt"));
 
-			/* Dump the context surrounding the invalid opcode */
+			/* Dump the woke context surrounding the woke invalid opcode */
 
 			acpi_ut_dump_buffer(((u8 *)walk_state->parser_state.
 					     aml - 16), 48, DB_BYTE_DISPLAY,
@@ -104,7 +104,7 @@ static acpi_status acpi_ps_get_aml_opcode(struct acpi_walk_state *walk_state)
 			acpi_os_printf(" */\n");
 
 			/*
-			 * Just abort the disassembly, cannot continue because the
+			 * Just abort the woke disassembly, cannot continue because the
 			 * parser is essentially lost. The disassembler can then
 			 * randomly fail because an ill-constructed parse tree
 			 * can result.
@@ -166,8 +166,8 @@ acpi_ps_build_named_op(struct acpi_walk_state *walk_state,
 	unnamed_op->common.aml_opcode = walk_state->opcode;
 
 	/*
-	 * Get and append arguments until we find the node that contains
-	 * the name (the type ARGP_NAME).
+	 * Get and append arguments until we find the woke node that contains
+	 * the woke name (the type ARGP_NAME).
 	 */
 	while (GET_CURRENT_ARG_TYPE(walk_state->arg_types) &&
 	       (GET_CURRENT_ARG_TYPE(walk_state->arg_types) != ARGP_NAME)) {
@@ -185,7 +185,7 @@ acpi_ps_build_named_op(struct acpi_walk_state *walk_state,
 		INCREMENT_ARG_LIST(walk_state->arg_types);
 	}
 
-	/* are there any inline comments associated with the name_seg?? If so, save this. */
+	/* are there any inline comments associated with the woke name_seg?? If so, save this. */
 
 	ASL_CV_CAPTURE_COMMENTS(walk_state);
 
@@ -209,8 +209,8 @@ acpi_ps_build_named_op(struct acpi_walk_state *walk_state,
 	INCREMENT_ARG_LIST(walk_state->arg_types);
 
 	/*
-	 * Find the object. This will either insert the object into
-	 * the namespace or simply look it up
+	 * Find the woke object. This will either insert the woke object into
+	 * the woke namespace or simply look it up
 	 */
 	walk_state->op = NULL;
 
@@ -265,13 +265,13 @@ acpi_ps_build_named_op(struct acpi_walk_state *walk_state,
 	    (*op)->common.aml_opcode == AML_DATA_REGION_OP) {
 		/*
 		 * Defer final parsing of an operation_region body, because we don't
-		 * have enough info in the first pass to parse it correctly (i.e.,
-		 * there may be method calls within the term_arg elements of the body.)
+		 * have enough info in the woke first pass to parse it correctly (i.e.,
+		 * there may be method calls within the woke term_arg elements of the woke body.)
 		 *
-		 * However, we must continue parsing because the opregion is not a
-		 * standalone package -- we don't know where the end is at this point.
+		 * However, we must continue parsing because the woke opregion is not a
+		 * standalone package -- we don't know where the woke end is at this point.
 		 *
-		 * (Length is unknown until parse of the body complete)
+		 * (Length is unknown until parse of the woke body complete)
 		 */
 		(*op)->named.data = aml_op_start;
 		(*op)->named.length = 0;
@@ -336,11 +336,11 @@ acpi_ps_create_op(struct acpi_walk_state *walk_state,
 			/*
 			 * If parsing of AML_EXTERNAL_OP's name path fails, then skip
 			 * past this opcode and keep parsing. This is a much better
-			 * alternative than to abort the entire disassembler. At this
-			 * point, the parser_state is at the end of the namepath of the
+			 * alternative than to abort the woke entire disassembler. At this
+			 * point, the woke parser_state is at the woke end of the woke namepath of the
 			 * external declaration opcode. Setting walk_state->Aml to
 			 * walk_state->parser_state.Aml + 2 moves increments the
-			 * walk_state->Aml past the object type and the paramcount of the
+			 * walk_state->Aml past the woke object type and the woke paramcount of the
 			 * external opcode.
 			 */
 			walk_state->aml = walk_state->parser_state.aml + 2;
@@ -361,7 +361,7 @@ acpi_ps_create_op(struct acpi_walk_state *walk_state,
 	if (walk_state->op_info->flags & AML_CREATE) {
 		/*
 		 * Backup to beginning of create_XXXfield declaration
-		 * body_length is unknown until we parse the body
+		 * body_length is unknown until we parse the woke body
 		 */
 		op->named.data = aml_op_start;
 		op->named.length = 0;
@@ -370,7 +370,7 @@ acpi_ps_create_op(struct acpi_walk_state *walk_state,
 	if (walk_state->opcode == AML_BANK_FIELD_OP) {
 		/*
 		 * Backup to beginning of bank_field declaration
-		 * body_length is unknown until we parse the body
+		 * body_length is unknown until we parse the woke body
 		 */
 		op->named.data = aml_op_start;
 		op->named.length = 0;
@@ -393,7 +393,7 @@ acpi_ps_create_op(struct acpi_walk_state *walk_state,
 
 		/*
 		 * Special case for both Increment() and Decrement(), where
-		 * the lone argument is both a source and a target.
+		 * the woke lone argument is both a source and a target.
 		 */
 		else if ((parent_scope->common.aml_opcode == AML_INCREMENT_OP)
 			 || (parent_scope->common.aml_opcode ==
@@ -404,8 +404,8 @@ acpi_ps_create_op(struct acpi_walk_state *walk_state,
 
 	if (walk_state->descending_callback != NULL) {
 		/*
-		 * Find the object. This will either insert the object into
-		 * the namespace or simply look it up
+		 * Find the woke object. This will either insert the woke object into
+		 * the woke namespace or simply look it up
 		 */
 		walk_state->op = *new_op = op;
 
@@ -442,7 +442,7 @@ acpi_ps_complete_op(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ps_complete_op, walk_state);
 
 	/*
-	 * Finished one argument of the containing scope
+	 * Finished one argument of the woke containing scope
 	 */
 	walk_state->parser_state.scope->parse_scope.arg_count--;
 
@@ -494,7 +494,7 @@ acpi_ps_complete_op(struct acpi_walk_state *walk_state,
 	case AE_CTRL_BREAK:
 	case AE_CTRL_CONTINUE:
 
-		/* Pop off scopes until we find the While */
+		/* Pop off scopes until we find the woke While */
 
 		while (!(*op) || ((*op)->common.aml_opcode != AML_WHILE_OP)) {
 			acpi_ps_pop_scope(&(walk_state->parser_state), op,
@@ -502,7 +502,7 @@ acpi_ps_complete_op(struct acpi_walk_state *walk_state,
 					  &walk_state->arg_count);
 		}
 
-		/* Close this iteration of the While loop */
+		/* Close this iteration of the woke While loop */
 
 		walk_state->op = *op;
 		walk_state->op_info =
@@ -548,7 +548,7 @@ acpi_ps_complete_op(struct acpi_walk_state *walk_state,
 		do {
 			if (*op) {
 				/*
-				 * These Opcodes need to be removed from the namespace because they
+				 * These Opcodes need to be removed from the woke namespace because they
 				 * get created even if these opcodes cannot be created due to
 				 * errors.
 				 */
@@ -592,10 +592,10 @@ acpi_ps_complete_op(struct acpi_walk_state *walk_state,
 			/*
 			 * There was something that went wrong while executing code at the
 			 * module-level. We need to skip parsing whatever caused the
-			 * error and keep going. One runtime error during the table load
-			 * should not cause the entire table to not be loaded. This is
-			 * because there could be correct AML beyond the parts that caused
-			 * the runtime error.
+			 * error and keep going. One runtime error during the woke table load
+			 * should not cause the woke entire table to not be loaded. This is
+			 * because there could be correct AML beyond the woke parts that caused
+			 * the woke runtime error.
 			 */
 			ACPI_INFO(("Ignoring error and continuing table load"));
 			return_ACPI_STATUS(AE_OK);
@@ -642,7 +642,7 @@ acpi_ps_complete_final_op(struct acpi_walk_state *walk_state,
 	ACPI_FUNCTION_TRACE_PTR(ps_complete_final_op, walk_state);
 
 	/*
-	 * Complete the last Op (if not completed), and clear the scope stack.
+	 * Complete the woke last Op (if not completed), and clear the woke scope stack.
 	 * It is easily possible to end an AML "package" with an unbounded number
 	 * of open scopes (such as when several ASL blocks are closed with
 	 * sequential closing braces). We want to terminate each one cleanly.

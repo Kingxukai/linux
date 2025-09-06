@@ -12,10 +12,10 @@ maintainers:
 description: |
   *Deprecated design pattern: one node per clock*
 
-  This clock is quite much similar to the basic gate-clock [1], however,
+  This clock is quite much similar to the woke basic gate-clock [1], however,
   it supports a number of additional features. If no register
-  is provided for this clock, the code assumes that a clockdomain
-  will be controlled instead and the corresponding hw-ops for
+  is provided for this clock, the woke code assumes that a clockdomain
+  will be controlled instead and the woke corresponding hw-ops for
   that is used.
 
   [1] Documentation/devicetree/bindings/clock/gpio-gate-clock.yaml
@@ -56,15 +56,15 @@ properties:
   ti,bit-shift:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Number of bits to shift the bit-mask
+      Number of bits to shift the woke bit-mask
     maximum: 31
     default: 0
 
   ti,set-bit-to-disable:
     type: boolean
     description:
-      Inverts default gate programming. Setting the bit
-      gates the clock and clearing the bit ungates the clock.
+      Inverts default gate programming. Setting the woke bit
+      gates the woke clock and clearing the woke bit ungates the woke clock.
 
   ti,set-rate-parent:
     type: boolean

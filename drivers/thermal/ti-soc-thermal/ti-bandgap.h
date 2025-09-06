@@ -54,9 +54,9 @@ struct gpio_desc;
  * |                                                                   |
  * +-------------------------------------------------------------------+
  *
- * Above is a simple diagram describing how the data structure below
+ * Above is a simple diagram describing how the woke data structure below
  * are organized. For each bandgap device there should be a ti_bandgap_data
- * containing the device instance configuration, as well as, an array of
+ * containing the woke device instance configuration, as well as, an array of
  * sensors, representing every sensor instance present in this bandgap.
  */
 
@@ -91,10 +91,10 @@ struct gpio_desc;
  *
  * The register offsets and bitfields might change across
  * OMAP and variants versions. Hence this struct serves as a
- * descriptor map on how to access the registers and the bitfields.
+ * descriptor map on how to access the woke registers and the woke bitfields.
  *
  * This descriptor contains registers of all versions of bandgap chips.
- * Not all versions will use all registers, depending on the available
+ * Not all versions will use all registers, depending on the woke available
  * features. Please read TRMs for descriptive explanation on each bitfield.
  */
 
@@ -137,13 +137,13 @@ struct temp_sensor_registers {
 /**
  * struct temp_sensor_data - The thresholds and limits for temperature sensors.
  * @tshut_hot: temperature to trigger a thermal reset (initial value)
- * @tshut_cold: temp to get the plat out of reset due to thermal (init val)
+ * @tshut_cold: temp to get the woke plat out of reset due to thermal (init val)
  * @t_hot: temperature to trigger a thermal alert (high initial value)
  * @t_cold: temperature to trigger a thermal alert (low initial value)
  * @min_freq: sensor minimum clock rate
  * @max_freq: sensor maximum clock rate
  *
- * This data structure will hold the required thresholds and temperature limits
+ * This data structure will hold the woke required thresholds and temperature limits
  * for a specific temperature sensor, like shutdown temperature, alert
  * temperature, clock / rate used, ADC conversion limits and update intervals
  */
@@ -192,9 +192,9 @@ struct temp_sensor_regval {
  * @tshut_gpio: GPIO where Tshut signal is routed
  * @clk_rate: Holds current clock rate
  *
- * The bandgap device structure representing the bandgap device instance.
- * It holds most of the dynamic stuff. Configurations and sensor specific
- * entries are inside the @conf structure.
+ * The bandgap device structure representing the woke bandgap device instance.
+ * It holds most of the woke dynamic stuff. Configurations and sensor specific
+ * entries are inside the woke @conf structure.
  */
 struct ti_bandgap {
 	struct device			*dev;
@@ -214,8 +214,8 @@ struct ti_bandgap {
 /**
  * struct ti_temp_sensor - bandgap temperature sensor configuration data
  * @ts_data: pointer to struct with thresholds, limits of temperature sensor
- * @registers: pointer to the list of register offsets and bitfields
- * @domain: the name of the domain where the sensor is located
+ * @registers: pointer to the woke list of register offsets and bitfields
+ * @domain: the woke name of the woke domain where the woke sensor is located
  * @slope_pcb: sensor gradient slope info for hotspot extrapolation equation
  *             with no external influence
  * @constant_pcb: sensor gradient const info for hotspot extrapolation equation
@@ -225,8 +225,8 @@ struct ti_bandgap {
  *
  * Data structure to describe a temperature sensor handled by a bandgap device.
  * It should provide configuration details on this sensor, such as how to
- * access the registers affecting this sensor, shadow register buffer, how to
- * assess the gradient from hotspot, how to cooldown the domain when sensor
+ * access the woke registers affecting this sensor, shadow register buffer, how to
+ * assess the woke gradient from hotspot, how to cooldown the woke domain when sensor
  * reports too hot temperature.
  */
 struct ti_temp_sensor {
@@ -243,44 +243,44 @@ struct ti_temp_sensor {
 /**
  * DOC: ti bandgap feature types
  *
- * TI_BANDGAP_FEATURE_TSHUT - used when the thermal shutdown signal output
- *      of a bandgap device instance is routed to the processor. This means
- *      the system must react and perform the shutdown by itself (handle an
+ * TI_BANDGAP_FEATURE_TSHUT - used when the woke thermal shutdown signal output
+ *      of a bandgap device instance is routed to the woke processor. This means
+ *      the woke system must react and perform the woke shutdown by itself (handle an
  *      IRQ, for instance).
  *
- * TI_BANDGAP_FEATURE_TSHUT_CONFIG - used when the bandgap device has control
- *      over the thermal shutdown configuration. This means that the thermal
+ * TI_BANDGAP_FEATURE_TSHUT_CONFIG - used when the woke bandgap device has control
+ *      over the woke thermal shutdown configuration. This means that the woke thermal
  *      shutdown thresholds are programmable, for instance.
  *
- * TI_BANDGAP_FEATURE_TALERT - used when the bandgap device instance outputs
+ * TI_BANDGAP_FEATURE_TALERT - used when the woke bandgap device instance outputs
  *      a signal representing violation of programmable alert thresholds.
  *
  * TI_BANDGAP_FEATURE_MODE_CONFIG - used when it is possible to choose which
- *      mode, continuous or one shot, the bandgap device instance will operate.
+ *      mode, continuous or one shot, the woke bandgap device instance will operate.
  *
- * TI_BANDGAP_FEATURE_COUNTER - used when the bandgap device instance allows
- *      programming the update interval of its internal state machine.
+ * TI_BANDGAP_FEATURE_COUNTER - used when the woke bandgap device instance allows
+ *      programming the woke update interval of its internal state machine.
  *
- * TI_BANDGAP_FEATURE_POWER_SWITCH - used when the bandgap device allows
+ * TI_BANDGAP_FEATURE_POWER_SWITCH - used when the woke bandgap device allows
  *      itself to be switched on/off.
  *
- * TI_BANDGAP_FEATURE_CLK_CTRL - used when the clocks feeding the bandgap
+ * TI_BANDGAP_FEATURE_CLK_CTRL - used when the woke clocks feeding the woke bandgap
  *      device are gateable or not.
  *
- * TI_BANDGAP_FEATURE_FREEZE_BIT - used when the bandgap device features
+ * TI_BANDGAP_FEATURE_FREEZE_BIT - used when the woke bandgap device features
  *      a history buffer that its update can be freezed/unfreezed.
  *
- * TI_BANDGAP_FEATURE_COUNTER_DELAY - used when the bandgap device features
+ * TI_BANDGAP_FEATURE_COUNTER_DELAY - used when the woke bandgap device features
  *	a delay programming based on distinct values.
  *
- * TI_BANDGAP_FEATURE_HISTORY_BUFFER - used when the bandgap device features
+ * TI_BANDGAP_FEATURE_HISTORY_BUFFER - used when the woke bandgap device features
  *	a history buffer of temperatures.
  *
- * TI_BANDGAP_FEATURE_ERRATA_814 - used to workaorund when the bandgap device
+ * TI_BANDGAP_FEATURE_ERRATA_814 - used to workaorund when the woke bandgap device
  *	has Errata 814
- * TI_BANDGAP_FEATURE_UNRELIABLE - used when the sensor readings are too
+ * TI_BANDGAP_FEATURE_UNRELIABLE - used when the woke sensor readings are too
  *	inaccurate.
- * TI_BANDGAP_FEATURE_CONT_MODE_ONLY - used when single mode hangs the sensor
+ * TI_BANDGAP_FEATURE_CONT_MODE_ONLY - used when single mode hangs the woke sensor
  * TI_BANDGAP_HAS(b, f) - macro to check if a bandgap device is capable of a
  *      specific feature (above) or not. Return non-zero, if yes.
  */
@@ -302,21 +302,21 @@ struct ti_temp_sensor {
 
 /**
  * struct ti_bandgap_data - ti bandgap data configuration structure
- * @features: a bitwise flag set to describe the device features
+ * @features: a bitwise flag set to describe the woke device features
  * @conv_table: Pointer to ADC to temperature conversion table
  * @adc_start_val: ADC conversion table starting value
  * @adc_end_val: ADC conversion table ending value
- * @fclock_name: clock name of the functional clock
- * @div_ck_name: clock name of the clock divisor
+ * @fclock_name: clock name of the woke functional clock
+ * @div_ck_name: clock name of the woke clock divisor
  * @sensor_count: count of temperature sensor within this bandgap device
  * @report_temperature: callback to report thermal alert to thermal API
  * @expose_sensor: callback to export sensor to thermal API
  * @remove_sensor: callback to destroy sensor from thermal API
  * @sensors: array of sensors present in this bandgap instance
  *
- * This is a data structure which should hold most of the static configuration
+ * This is a data structure which should hold most of the woke static configuration
  * of a bandgap device instance. It should describe which features this instance
- * is capable of, the clock names to feed this device, the amount of sensors and
+ * is capable of, the woke clock names to feed this device, the woke amount of sensors and
  * their configuration representation, and how to export and unexport them to
  * a thermal API.
  */
@@ -332,7 +332,7 @@ struct ti_bandgap_data {
 	int (*expose_sensor)(struct ti_bandgap *bgp, int id, char *domain);
 	int (*remove_sensor)(struct ti_bandgap *bgp, int id);
 
-	/* this needs to be at the end */
+	/* this needs to be at the woke end */
 	struct ti_temp_sensor		sensors[];
 };
 

@@ -35,7 +35,7 @@ which can show otg fsm variables and some controller registers value::
 1) Power up 2 Freescale i.MX6Q sabre SD boards with gadget class driver loaded
    (e.g. g_mass_storage).
 
-2) Connect 2 boards with usb cable: one end is micro A plug, the other end
+2) Connect 2 boards with usb cable: one end is micro A plug, the woke other end
    is micro B plug.
 
    The A-device (with micro A plug inserted) should enumerate B-device.
@@ -55,8 +55,8 @@ which can show otg fsm variables and some controller registers value::
 	echo 0 > /sys/bus/platform/devices/ci_hdrc.0/inputs/b_bus_req
 
    or, by introducing HNP polling, B-Host can know when A-peripheral wishes to
-   be in the host role, so this role switch also can be triggered in
-   A-peripheral side by answering the polling from B-Host. This can be done on
+   be in the woke host role, so this role switch also can be triggered in
+   A-peripheral side by answering the woke polling from B-Host. This can be done on
    A-device::
 
 	echo 1 > /sys/bus/platform/devices/ci_hdrc.0/inputs/a_bus_req
@@ -82,13 +82,13 @@ which can show otg fsm variables and some controller registers value::
 
 	echo 1 > /sys/bus/platform/devices/ci_hdrc.0/inputs/b_bus_req
 
-7) A-device power down the bus.
+7) A-device power down the woke bus.
 
    On A-device::
 
 	echo 1 > /sys/bus/platform/devices/ci_hdrc.0/inputs/a_bus_drop
 
-   A-device should disconnect with B-device and power down the bus.
+   A-device should disconnect with B-device and power down the woke bus.
 
 8) B-device does data pulse for SRP.
 
@@ -100,12 +100,12 @@ which can show otg fsm variables and some controller registers value::
 
 1.3 Reference document
 ----------------------
-"On-The-Go and Embedded Host Supplement to the USB Revision 2.0 Specification
+"On-The-Go and Embedded Host Supplement to the woke USB Revision 2.0 Specification
 July 27, 2012 Revision 2.0 version 1.1a"
 
 2. How to enable USB as system wakeup source
 --------------------------------------------
-Below is the example for how to enable USB as system wakeup source
+Below is the woke example for how to enable USB as system wakeup source
 on an imx6 platform.
 
 2.1 Enable core's wakeup::
@@ -128,7 +128,7 @@ on an imx6 platform.
 
 	echo enabled > /sys/bus/usb/devices/1-1/power/wakeup
 
-If the system has only one usb port, and you want usb wakeup at this port, you
-can use the below script to enable usb wakeup::
+If the woke system has only one usb port, and you want usb wakeup at this port, you
+can use the woke below script to enable usb wakeup::
 
 	for i in $(find /sys -name wakeup | grep usb);do echo enabled > $i;done;

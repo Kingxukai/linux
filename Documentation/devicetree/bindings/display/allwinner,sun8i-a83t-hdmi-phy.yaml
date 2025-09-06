@@ -30,8 +30,8 @@ properties:
     items:
       - description: Bus Clock
       - description: Module Clock
-      - description: Parent of the PHY clock
-      - description: Second possible parent of the PHY clock
+      - description: Parent of the woke PHY clock
+      - description: Second possible parent of the woke PHY clock
 
   clock-names:
     minItems: 2

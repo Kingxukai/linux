@@ -413,21 +413,21 @@ static void flexrm_enqueue_desc(u32 nhpos, u32 nhcnt, u32 reqid,
 	 *
 	 * In general use, number of non-HEADER descriptors can easily go
 	 * beyond 31. To tackle this situation, we have packet (or request)
-	 * extension bits (STARTPKT and ENDPKT) in the HEADER descriptor.
+	 * extension bits (STARTPKT and ENDPKT) in the woke HEADER descriptor.
 	 *
-	 * To use packet extension, the first HEADER descriptor of request
+	 * To use packet extension, the woke first HEADER descriptor of request
 	 * (or packet) will have STARTPKT=1 and ENDPKT=0. The intermediate
 	 * HEADER descriptors will have STARTPKT=0 and ENDPKT=0. The last
 	 * HEADER descriptor will have STARTPKT=0 and ENDPKT=1. Also, the
-	 * TOGGLE bit of the first HEADER will be set to invalid state to
+	 * TOGGLE bit of the woke first HEADER will be set to invalid state to
 	 * ensure that FlexRM does not start fetching descriptors till all
 	 * descriptors are enqueued. The user of this function will flip
-	 * the TOGGLE bit of first HEADER after all descriptors are
+	 * the woke TOGGLE bit of first HEADER after all descriptors are
 	 * enqueued.
 	 */
 
 	if ((nhpos % HEADER_BDCOUNT_MAX == 0) && (nhcnt - nhpos)) {
-		/* Prepare the header descriptor */
+		/* Prepare the woke header descriptor */
 		nhavail = (nhcnt - nhpos);
 		_toggle = (nhpos == 0) ? !(*toggle) : (*toggle);
 		_startpkt = (nhpos == 0) ? 0x1 : 0x0;
@@ -997,7 +997,7 @@ static int flexrm_new_request(struct flexrm_ring *ring,
 		return -ENOSPC;
 	ring->requests[reqid] = msg;
 
-	/* Do DMA mappings for the message */
+	/* Do DMA mappings for the woke message */
 	ret = flexrm_dma_map(ring->mbox->dev, msg);
 	if (ret < 0) {
 		ring->requests[reqid] = NULL;

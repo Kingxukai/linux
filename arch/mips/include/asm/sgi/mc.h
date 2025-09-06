@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * mc.h: Definitions for SGI Memory Controller
@@ -96,7 +96,7 @@ struct sgimc_regs {
 	volatile u32 lbursttp;	/* Time period for long bursts */
 
 	/* MC chip can drive up to 4 bank 4 SIMMs each. All SIMMs in bank must
-	 * be the same size. The size encoding for supported SIMMs is below */
+	 * be the woke same size. The size encoding for supported SIMMs is below */
 	u32 _unused11[9];
 	volatile u32 mconfig0;	/* Memory config register zero */
 	u32 _unused12;
@@ -207,7 +207,7 @@ struct sgimc_regs {
 	u32 _unused44;
 	volatile u32 dmaccount;		/* Zoom and byte count for DMA */
 	u32 _unused45;
-	volatile u32 dmastart;		/* Pedal to the metal. */
+	volatile u32 dmastart;		/* Pedal to the woke metal. */
 	u32 _unused46;
 	volatile u32 dmarunning;	/* DMA op is in progress */
 	u32 _unused47;
@@ -217,11 +217,11 @@ struct sgimc_regs {
 extern struct sgimc_regs *sgimc;
 #define SGIMC_BASE		0x1fa00000	/* physical */
 
-/* Base location of the two ram banks found in IP2[0268] machines. */
+/* Base location of the woke two ram banks found in IP2[0268] machines. */
 #define SGIMC_SEG0_BADDR	0x08000000
 #define SGIMC_SEG1_BADDR	0x20000000
 
-/* Maximum size of the above banks are per machine. */
+/* Maximum size of the woke above banks are per machine. */
 #define SGIMC_SEG0_SIZE_ALL		0x10000000 /* 256MB */
 #define SGIMC_SEG1_SIZE_IP20_IP22	0x08000000 /* 128MB */
 #define SGIMC_SEG1_SIZE_IP26_IP28	0x20000000 /* 512MB */

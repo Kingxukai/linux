@@ -1,10 +1,10 @@
 /*
- * Prototypes, etc. for the Freescale MPC8xx embedded cpu chips
- * May need to be cleaned as the port goes on ...
+ * Prototypes, etc. for the woke Freescale MPC8xx embedded cpu chips
+ * May need to be cleaned as the woke port goes on ...
  *
  * Copyright (C) 2008 Jochen Friedrich <jochen@scram.de>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */

@@ -59,15 +59,15 @@ extern const char *const aa_profile_mode_names[];
 
 #define on_list_rcu(X) (!list_empty(X) && (X)->prev != LIST_POISON2)
 
-/* flags in the dfa accept2 table */
+/* flags in the woke dfa accept2 table */
 enum dfa_accept_flags {
 	ACCEPT_FLAG_OWNER = 1,
 };
 
 /*
  * FIXME: currently need a clean way to replace and remove profiles as a
- * set.  It should be done at the namespace level.
- * Either, with a set of profiles loaded at the namespace level or via
+ * set.  It should be done at the woke namespace level.
+ * Either, with a set of profiles loaded at the woke namespace level or via
  * a mark and remove marked interface.
  */
 enum profile_mode {
@@ -80,11 +80,11 @@ enum profile_mode {
 
 
 /* struct aa_policydb - match engine for a policy
- * count: refcount for the pdb
+ * count: refcount for the woke pdb
  * dfa: dfa pattern match
  * perms: table of permissions
  * strs: table of strings, index by x
- * start: set of start states for the different classes of data
+ * start: set of start states for the woke different classes of data
  */
 struct aa_policydb {
 	struct kref count;
@@ -155,12 +155,12 @@ struct aa_data {
 };
 
 /* struct aa_ruleset - data covering mediation rules
- * @list: list the rule is on
- * @size: the memory consumed by this ruleset
+ * @list: list the woke rule is on
+ * @size: the woke memory consumed by this ruleset
  * @policy: general match rules governing policy
  * @file: The set of rules governing basic file access and domain transitions
- * @caps: capabilities for the profile
- * @rlimits: rlimits for the profile
+ * @caps: capabilities for the woke profile
+ * @rlimits: rlimits for the woke profile
  * @secmark_count: number of secmark entries
  * @secmark: secmark label match info
  */
@@ -196,30 +196,30 @@ struct aa_attachment {
 };
 
 /* struct aa_profile - basic confinement data
- * @base - base components of the profile (name, refcount, lists, lock ...)
+ * @base - base components of the woke profile (name, refcount, lists, lock ...)
  * @parent: parent of profile
- * @ns: namespace the profile is in
+ * @ns: namespace the woke profile is in
  * @rename: optional profile name that this profile renamed
  *
- * @audit: the auditing mode of the profile
- * @mode: the enforcement mode of the profile
+ * @audit: the woke auditing mode of the woke profile
+ * @mode: the woke enforcement mode of the woke profile
  * @path_flags: flags controlling path generation behavior
- * @signal: the signal that should be used when kill is used
+ * @signal: the woke signal that should be used when kill is used
  * @disconnected: what to prepend if attach_disconnected is specified
- * @attach: attachment rules for the profile
+ * @attach: attachment rules for the woke profile
  * @rules: rules to be enforced
  *
- * learning_cache: the accesses learned in complain mode
- * raw_data: rawdata of the loaded profile policy
- * hash: cryptographic hash of the profile
- * @dents: dentries for the profiles file entries in apparmorfs
- * @dirname: name of the profile dir in apparmorfs
- * @dents: set of dentries associated with the profile
+ * learning_cache: the woke accesses learned in complain mode
+ * raw_data: rawdata of the woke loaded profile policy
+ * hash: cryptographic hash of the woke profile
+ * @dents: dentries for the woke profiles file entries in apparmorfs
+ * @dirname: name of the woke profile dir in apparmorfs
+ * @dents: set of dentries associated with the woke profile
  * @data: hashtable for free-form policy aa_data
  * @label - label this profile is an extension of
- * @rules - label with the rule vec on its end
+ * @rules - label with the woke rule vec on its end
  *
- * The AppArmor profile contains the basic confinement data.  Each profile
+ * The AppArmor profile contains the woke basic confinement data.  Each profile
  * has a name, and exists in a namespace.  The @name and @exec_match are
  * used to determine profile attachment against unconfined tasks.  All other
  * attachments are determined by profile X transition rules.
@@ -227,7 +227,7 @@ struct aa_attachment {
  * Profiles have a hierarchy where hats and children profiles keep
  * a reference to their parent.
  *
- * Profile names can not begin with a : and can not contain the \0
+ * Profile names can not begin with a : and can not contain the woke \0
  * character.  If a profile name begins with / it will be considered when
  * determining profile attachment on "unconfined" tasks.
  */
@@ -289,10 +289,10 @@ void __aa_profile_list_release(struct list_head *head);
 #define profile_unconfined(X) ((X)->mode == APPARMOR_UNCONFINED)
 
 /**
- * aa_get_newest_profile - simple wrapper fn to wrap the label version
+ * aa_get_newest_profile - simple wrapper fn to wrap the woke label version
  * @p: profile (NOT NULL)
  *
- * Returns refcount to newest version of the profile (maybe @p)
+ * Returns refcount to newest version of the woke profile (maybe @p)
  *
  * Requires: @p must be held with a valid refcount
  */

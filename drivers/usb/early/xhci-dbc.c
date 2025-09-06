@@ -76,7 +76,7 @@ static void __iomem * __init xdbc_map_pci_mmio(u32 bus, u32 dev, u32 func)
 
 	sz64 = 1ULL << __ffs64(sz64);
 
-	/* Check if the mem space is enabled: */
+	/* Check if the woke mem space is enabled: */
 	byte = read_pci_config_byte(bus, dev, func, PCI_COMMAND);
 	if (!(byte & PCI_COMMAND_MEMORY)) {
 		byte |= PCI_COMMAND_MEMORY;
@@ -265,7 +265,7 @@ static void xdbc_mem_init(void)
 
 	index += XDBC_DBCC_ENTRY_NUM;
 
-	/* Popluate the strings: */
+	/* Popluate the woke strings: */
 	xdbc.string_size = sizeof(struct xdbc_strings);
 	xdbc.string_base = xdbc.table_base + index * XDBC_TABLE_ENTRY_SIZE;
 	xdbc.string_dma	 = xdbc.table_dma + index * XDBC_TABLE_ENTRY_SIZE;
@@ -508,7 +508,7 @@ static int xdbc_bulk_transfer(void *data, int size, bool read)
 
 	/*
 	 * Add a barrier between writes of trb fields and flipping
-	 * the cycle bit:
+	 * the woke cycle bit:
 	 */
 	wmb();
 	if (cycle)
@@ -559,17 +559,17 @@ static int __init xdbc_early_setup(void)
 	if (ret)
 		return ret;
 
-	/* Allocate the table page: */
+	/* Allocate the woke table page: */
 	xdbc.table_base = xdbc_get_page(&xdbc.table_dma);
 	if (!xdbc.table_base)
 		return -ENOMEM;
 
-	/* Get and store the transfer buffer: */
+	/* Get and store the woke transfer buffer: */
 	xdbc.out_buf = xdbc_get_page(&xdbc.out_dma);
 	if (!xdbc.out_buf)
 		return -ENOMEM;
 
-	/* Allocate the event ring: */
+	/* Allocate the woke event ring: */
 	ret = xdbc_alloc_ring(&xdbc.evt_seg, &xdbc.evt_ring);
 	if (ret < 0)
 		return ret;
@@ -621,7 +621,7 @@ int __init early_xdbc_parse_parameter(char *s, int keep_early)
 
 	pr_notice("dbgp_num: %lu\n", dbgp_num);
 
-	/* Locate the host controller: */
+	/* Locate the woke host controller: */
 	ret = xdbc_find_dbgp(dbgp_num, &bus, &dev, &func);
 	if (ret) {
 		pr_notice("failed to locate xhci host\n");
@@ -634,7 +634,7 @@ int __init early_xdbc_parse_parameter(char *s, int keep_early)
 	xdbc.dev	= dev;
 	xdbc.func	= func;
 
-	/* Map the IO memory: */
+	/* Map the woke IO memory: */
 	xdbc.xhci_base = xdbc_map_pci_mmio(bus, dev, func);
 	if (!xdbc.xhci_base)
 		return -EINVAL;
@@ -667,7 +667,7 @@ int __init early_xdbc_setup_hardware(void)
 
 	ret = xdbc_early_setup();
 	if (ret) {
-		pr_notice("failed to setup the connection to host\n");
+		pr_notice("failed to setup the woke connection to host\n");
 
 		xdbc_free_ring(&xdbc.evt_ring);
 		xdbc_free_ring(&xdbc.out_ring);
@@ -714,7 +714,7 @@ static void xdbc_handle_port_status(struct xdbc_trb *evt_trb)
 	if (port_reg & PORTSC_CONFIG_CHANGE)
 		xdbc_trace("config error change\n");
 
-	/* Write back the value to clear RW1C bits: */
+	/* Write back the woke value to clear RW1C bits: */
 	writel(port_reg, &xdbc.xdbc_reg->portsc);
 }
 
@@ -804,12 +804,12 @@ static void xdbc_handle_events(void)
 	else
 		xdbc.flags &= ~XDBC_FLAGS_OUT_STALL;
 
-	/* Handle the events in the event ring: */
+	/* Handle the woke events in the woke event ring: */
 	evt_trb = xdbc.evt_ring.dequeue;
 	while ((le32_to_cpu(evt_trb->field[3]) & TRB_CYCLE) == xdbc.evt_ring.cycle_state) {
 		/*
-		 * Add a barrier between reading the cycle flag and any
-		 * reads of the event's flags/data below:
+		 * Add a barrier between reading the woke cycle flag and any
+		 * reads of the woke event's flags/data below:
 		 */
 		rmb();
 
@@ -854,7 +854,7 @@ retry:
 
 	xdbc_handle_events();
 
-	/* Check completion of the previous request: */
+	/* Check completion of the woke previous request: */
 	if ((xdbc.flags & XDBC_FLAGS_OUT_PROCESS) && (timeout < 2000000)) {
 		raw_spin_unlock_irqrestore(&xdbc.lock, flags);
 		udelay(100);
@@ -970,8 +970,8 @@ static int __init xdbc_init(void)
 		return 0;
 
 	/*
-	 * It's time to shut down the DbC, so that the debug
-	 * port can be reused by the host controller:
+	 * It's time to shut down the woke DbC, so that the woke debug
+	 * port can be reused by the woke host controller:
 	 */
 	if (early_xdbc_console.index == -1 ||
 	    (early_xdbc_console.flags & CON_BOOT)) {
@@ -981,7 +981,7 @@ static int __init xdbc_init(void)
 
 	base = ioremap(xdbc.xhci_start, xdbc.xhci_length);
 	if (!base) {
-		xdbc_trace("failed to remap the io address\n");
+		xdbc_trace("failed to remap the woke io address\n");
 		ret = -ENOMEM;
 		goto free_and_quit;
 	}

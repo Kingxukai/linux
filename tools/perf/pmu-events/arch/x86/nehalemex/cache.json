@@ -24,7 +24,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "L1D cache lines allocated in the M state",
+        "BriefDescription": "L1D cache lines allocated in the woke M state",
         "Counter": "0,1",
         "EventCode": "0x51",
         "EventName": "L1D.M_REPL",
@@ -48,7 +48,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "All references to the L1 data cache",
+        "BriefDescription": "All references to the woke L1 data cache",
         "Counter": "0,1",
         "EventCode": "0x43",
         "EventName": "L1D_ALL_REF.ANY",
@@ -328,7 +328,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "L2 data prefetches in the I state (misses)",
+        "BriefDescription": "L2 data prefetches in the woke I state (misses)",
         "Counter": "0,1,2,3",
         "EventCode": "0x26",
         "EventName": "L2_DATA_RQSTS.PREFETCH.I_STATE",
@@ -352,7 +352,7 @@
         "UMask": "0x80"
     },
     {
-        "BriefDescription": "L2 data prefetches in the S state",
+        "BriefDescription": "L2 data prefetches in the woke S state",
         "Counter": "0,1,2,3",
         "EventCode": "0x26",
         "EventName": "L2_DATA_RQSTS.PREFETCH.S_STATE",
@@ -368,7 +368,7 @@
         "UMask": "0x7"
     },
     {
-        "BriefDescription": "L2 lines allocated in the E state",
+        "BriefDescription": "L2 lines allocated in the woke E state",
         "Counter": "0,1,2,3",
         "EventCode": "0xF1",
         "EventName": "L2_LINES_IN.E_STATE",
@@ -376,7 +376,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "L2 lines allocated in the S state",
+        "BriefDescription": "L2 lines allocated in the woke S state",
         "Counter": "0,1,2,3",
         "EventCode": "0xF1",
         "EventName": "L2_LINES_IN.S_STATE",
@@ -608,7 +608,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "All demand L2 lock RFOs that hit the cache",
+        "BriefDescription": "All demand L2 lock RFOs that hit the woke cache",
         "Counter": "0,1,2,3",
         "EventCode": "0x27",
         "EventName": "L2_WRITE.LOCK.HIT",
@@ -648,7 +648,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "All L2 demand store RFOs that hit the cache",
+        "BriefDescription": "All L2 demand store RFOs that hit the woke cache",
         "Counter": "0,1,2,3",
         "EventCode": "0x27",
         "EventName": "L2_WRITE.RFO.HIT",
@@ -895,7 +895,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Retired loads that hit the L1 data cache (Precise Event)",
+        "BriefDescription": "Retired loads that hit the woke L1 data cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.L1D_HIT",
@@ -904,7 +904,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Retired loads that hit the L2 cache (Precise Event)",
+        "BriefDescription": "Retired loads that hit the woke L2 cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.L2_HIT",
@@ -913,7 +913,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Retired loads that miss the LLC cache (Precise Event)",
+        "BriefDescription": "Retired loads that miss the woke LLC cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.LLC_MISS",
@@ -922,7 +922,7 @@
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Retired loads that hit valid versions in the LLC cache (Precise Event)",
+        "BriefDescription": "Retired loads that hit valid versions in the woke LLC cache (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.LLC_UNSHARED_HIT",
@@ -976,7 +976,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore data reads satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.IO_CSR_MMIO",
@@ -986,7 +986,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore data reads satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.LLC_HIT_NO_OTHER_CORE",
@@ -996,7 +996,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore data reads satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.LLC_HIT_OTHER_CORE_HIT",
@@ -1006,7 +1006,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore data reads satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.LLC_HIT_OTHER_CORE_HITM",
@@ -1016,7 +1016,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads satisfied by the LLC",
+        "BriefDescription": "Offcore data reads satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.LOCAL_CACHE",
@@ -1026,7 +1026,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore data reads satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.LOCAL_CACHE_DRAM",
@@ -1096,7 +1096,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore code reads satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.IO_CSR_MMIO",
@@ -1106,7 +1106,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore code reads satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.LLC_HIT_NO_OTHER_CORE",
@@ -1116,7 +1116,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore code reads satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.LLC_HIT_OTHER_CORE_HIT",
@@ -1126,7 +1126,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore code reads satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.LLC_HIT_OTHER_CORE_HITM",
@@ -1136,7 +1136,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads satisfied by the LLC",
+        "BriefDescription": "Offcore code reads satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.LOCAL_CACHE",
@@ -1146,7 +1146,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore code reads satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.LOCAL_CACHE_DRAM",
@@ -1216,7 +1216,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore requests satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.IO_CSR_MMIO",
@@ -1226,7 +1226,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.LLC_HIT_NO_OTHER_CORE",
@@ -1236,7 +1236,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.LLC_HIT_OTHER_CORE_HIT",
@@ -1246,7 +1246,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.LLC_HIT_OTHER_CORE_HITM",
@@ -1256,7 +1256,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests satisfied by the LLC",
+        "BriefDescription": "Offcore requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.LOCAL_CACHE",
@@ -1266,7 +1266,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.LOCAL_CACHE_DRAM",
@@ -1336,7 +1336,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore RFO requests satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.IO_CSR_MMIO",
@@ -1346,7 +1346,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore RFO requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.LLC_HIT_NO_OTHER_CORE",
@@ -1356,7 +1356,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore RFO requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.LLC_HIT_OTHER_CORE_HIT",
@@ -1366,7 +1366,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore RFO requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.LLC_HIT_OTHER_CORE_HITM",
@@ -1376,7 +1376,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests satisfied by the LLC",
+        "BriefDescription": "Offcore RFO requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.LOCAL_CACHE",
@@ -1386,7 +1386,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore RFO requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.LOCAL_CACHE_DRAM",
@@ -1456,7 +1456,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore writebacks to the IO, CSR, MMIO unit.",
+        "BriefDescription": "Offcore writebacks to the woke IO, CSR, MMIO unit.",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.COREWB.IO_CSR_MMIO",
@@ -1466,7 +1466,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore writebacks to the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore writebacks to the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.COREWB.LLC_HIT_NO_OTHER_CORE",
@@ -1476,7 +1476,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore writebacks to the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore writebacks to the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.COREWB.LLC_HIT_OTHER_CORE_HITM",
@@ -1486,7 +1486,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore writebacks to the LLC",
+        "BriefDescription": "Offcore writebacks to the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.COREWB.LOCAL_CACHE",
@@ -1496,7 +1496,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore writebacks to the LLC or local DRAM",
+        "BriefDescription": "Offcore writebacks to the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.COREWB.LOCAL_CACHE_DRAM",
@@ -1566,7 +1566,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests satisfied by the IO, CSR, MMIO unit.",
+        "BriefDescription": "Offcore code or data read requests satisfied by the woke IO, CSR, MMIO unit.",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.IO_CSR_MMIO",
@@ -1576,7 +1576,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore code or data read requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.LLC_HIT_NO_OTHER_CORE",
@@ -1586,7 +1586,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore code or data read requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.LLC_HIT_OTHER_CORE_HIT",
@@ -1596,7 +1596,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore code or data read requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.LLC_HIT_OTHER_CORE_HITM",
@@ -1606,7 +1606,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests satisfied by the LLC",
+        "BriefDescription": "Offcore code or data read requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.LOCAL_CACHE",
@@ -1616,7 +1616,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore code or data read requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.LOCAL_CACHE_DRAM",
@@ -1686,7 +1686,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IN.IO_CSR_MMIO",
@@ -1696,7 +1696,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IN.LLC_HIT_NO_OTHER_CORE",
@@ -1706,7 +1706,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IN.LLC_HIT_OTHER_CORE_HIT",
@@ -1716,7 +1716,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IN.LLC_HIT_OTHER_CORE_HITM",
@@ -1806,7 +1806,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests satisfied by the IO, CSR, MMIO unit.",
+        "BriefDescription": "Offcore demand data requests satisfied by the woke IO, CSR, MMIO unit.",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.IO_CSR_MMIO",
@@ -1816,7 +1816,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore demand data requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.LLC_HIT_NO_OTHER_CORE",
@@ -1826,7 +1826,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore demand data requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.LLC_HIT_OTHER_CORE_HIT",
@@ -1836,7 +1836,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore demand data requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.LLC_HIT_OTHER_CORE_HITM",
@@ -1846,7 +1846,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests satisfied by the LLC",
+        "BriefDescription": "Offcore demand data requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.LOCAL_CACHE",
@@ -1856,7 +1856,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore demand data requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.LOCAL_CACHE_DRAM",
@@ -1926,7 +1926,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore demand data reads satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.IO_CSR_MMIO",
@@ -1936,7 +1936,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore demand data reads satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LLC_HIT_NO_OTHER_CORE",
@@ -1946,7 +1946,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore demand data reads satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LLC_HIT_OTHER_CORE_HIT",
@@ -1956,7 +1956,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore demand data reads satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LLC_HIT_OTHER_CORE_HITM",
@@ -1966,7 +1966,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads satisfied by the LLC",
+        "BriefDescription": "Offcore demand data reads satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LOCAL_CACHE",
@@ -1976,7 +1976,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore demand data reads satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LOCAL_CACHE_DRAM",
@@ -2046,7 +2046,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore demand code reads satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.IO_CSR_MMIO",
@@ -2056,7 +2056,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore demand code reads satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.LLC_HIT_NO_OTHER_CORE",
@@ -2066,7 +2066,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore demand code reads satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.LLC_HIT_OTHER_CORE_HIT",
@@ -2076,7 +2076,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore demand code reads satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.LLC_HIT_OTHER_CORE_HITM",
@@ -2086,7 +2086,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads satisfied by the LLC",
+        "BriefDescription": "Offcore demand code reads satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.LOCAL_CACHE",
@@ -2096,7 +2096,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore demand code reads satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.LOCAL_CACHE_DRAM",
@@ -2166,7 +2166,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore demand RFO requests satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.IO_CSR_MMIO",
@@ -2176,7 +2176,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore demand RFO requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_HIT_NO_OTHER_CORE",
@@ -2186,7 +2186,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore demand RFO requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_HIT_OTHER_CORE_HIT",
@@ -2196,7 +2196,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore demand RFO requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_HIT_OTHER_CORE_HITM",
@@ -2206,7 +2206,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests satisfied by the LLC",
+        "BriefDescription": "Offcore demand RFO requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LOCAL_CACHE",
@@ -2216,7 +2216,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore demand RFO requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LOCAL_CACHE_DRAM",
@@ -2286,7 +2286,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore other requests satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore other requests satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.OTHER.IO_CSR_MMIO",
@@ -2296,7 +2296,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore other requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore other requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.OTHER.LLC_HIT_NO_OTHER_CORE",
@@ -2306,7 +2306,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore other requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore other requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.OTHER.LLC_HIT_OTHER_CORE_HIT",
@@ -2316,7 +2316,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore other requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore other requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.OTHER.LLC_HIT_OTHER_CORE_HITM",
@@ -2326,7 +2326,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore other requests satisfied by the LLC",
+        "BriefDescription": "Offcore other requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.OTHER.LOCAL_CACHE",
@@ -2336,7 +2336,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore other requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore other requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.OTHER.LOCAL_CACHE_DRAM",
@@ -2406,7 +2406,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests satisfied by the IO, CSR, MMIO unit.",
+        "BriefDescription": "Offcore prefetch data requests satisfied by the woke IO, CSR, MMIO unit.",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.IO_CSR_MMIO",
@@ -2416,7 +2416,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore prefetch data requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.LLC_HIT_NO_OTHER_CORE",
@@ -2426,7 +2426,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore prefetch data requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.LLC_HIT_OTHER_CORE_HIT",
@@ -2436,7 +2436,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore prefetch data requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.LLC_HIT_OTHER_CORE_HITM",
@@ -2446,7 +2446,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests satisfied by the LLC",
+        "BriefDescription": "Offcore prefetch data requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.LOCAL_CACHE",
@@ -2456,7 +2456,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore prefetch data requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.LOCAL_CACHE_DRAM",
@@ -2526,7 +2526,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore prefetch data reads satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.IO_CSR_MMIO",
@@ -2536,7 +2536,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore prefetch data reads satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.LLC_HIT_NO_OTHER_CORE",
@@ -2546,7 +2546,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore prefetch data reads satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.LLC_HIT_OTHER_CORE_HIT",
@@ -2556,7 +2556,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore prefetch data reads satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.LLC_HIT_OTHER_CORE_HITM",
@@ -2566,7 +2566,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads satisfied by the LLC",
+        "BriefDescription": "Offcore prefetch data reads satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.LOCAL_CACHE",
@@ -2576,7 +2576,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore prefetch data reads satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.LOCAL_CACHE_DRAM",
@@ -2646,7 +2646,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore prefetch code reads satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.IO_CSR_MMIO",
@@ -2656,7 +2656,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore prefetch code reads satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.LLC_HIT_NO_OTHER_CORE",
@@ -2666,7 +2666,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore prefetch code reads satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.LLC_HIT_OTHER_CORE_HIT",
@@ -2676,7 +2676,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore prefetch code reads satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.LLC_HIT_OTHER_CORE_HITM",
@@ -2686,7 +2686,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads satisfied by the LLC",
+        "BriefDescription": "Offcore prefetch code reads satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.LOCAL_CACHE",
@@ -2696,7 +2696,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore prefetch code reads satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.LOCAL_CACHE_DRAM",
@@ -2766,7 +2766,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore prefetch RFO requests satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.IO_CSR_MMIO",
@@ -2776,7 +2776,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore prefetch RFO requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.LLC_HIT_NO_OTHER_CORE",
@@ -2786,7 +2786,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore prefetch RFO requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.LLC_HIT_OTHER_CORE_HIT",
@@ -2796,7 +2796,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore prefetch RFO requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.LLC_HIT_OTHER_CORE_HITM",
@@ -2806,7 +2806,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests satisfied by the LLC",
+        "BriefDescription": "Offcore prefetch RFO requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.LOCAL_CACHE",
@@ -2816,7 +2816,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore prefetch RFO requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.LOCAL_CACHE_DRAM",
@@ -2886,7 +2886,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests satisfied by the IO, CSR, MMIO unit",
+        "BriefDescription": "Offcore prefetch requests satisfied by the woke IO, CSR, MMIO unit",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.IO_CSR_MMIO",
@@ -2896,7 +2896,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests satisfied by the LLC and not found in a sibling core",
+        "BriefDescription": "Offcore prefetch requests satisfied by the woke LLC and not found in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.LLC_HIT_NO_OTHER_CORE",
@@ -2906,7 +2906,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests satisfied by the LLC and HIT in a sibling core",
+        "BriefDescription": "Offcore prefetch requests satisfied by the woke LLC and HIT in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.LLC_HIT_OTHER_CORE_HIT",
@@ -2916,7 +2916,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests satisfied by the LLC  and HITM in a sibling core",
+        "BriefDescription": "Offcore prefetch requests satisfied by the woke LLC  and HITM in a sibling core",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.LLC_HIT_OTHER_CORE_HITM",
@@ -2926,7 +2926,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests satisfied by the LLC",
+        "BriefDescription": "Offcore prefetch requests satisfied by the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.LOCAL_CACHE",
@@ -2936,7 +2936,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests satisfied by the LLC or local DRAM",
+        "BriefDescription": "Offcore prefetch requests satisfied by the woke LLC or local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.LOCAL_CACHE_DRAM",

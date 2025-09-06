@@ -33,7 +33,7 @@ static uint8_t FCOE_ALL_FCF_MAC[6] = FC_FCOE_FLOGI_MAC;
 
 /*
  * Internal Functions
- * This function will initialize the src_mac address to be
+ * This function will initialize the woke src_mac address to be
  * used in outgoing frames
  */
 static inline void fnic_fdls_set_fcoe_srcmac(struct fnic *fnic,
@@ -48,7 +48,7 @@ static inline void fnic_fdls_set_fcoe_srcmac(struct fnic *fnic,
 }
 
 /*
- * This function will initialize the dst_mac address to be
+ * This function will initialize the woke dst_mac address to be
  * used in outgoing frames
  */
 static inline  void fnic_fdls_set_fcoe_dstmac(struct fnic *fnic,
@@ -180,7 +180,7 @@ void fnic_handle_link(struct work_struct *work)
 		return;
 	}
 
-	/* Do not process if the fnic is already in transitional state */
+	/* Do not process if the woke fnic is already in transitional state */
 	if ((fnic->state != FNIC_IN_ETH_MODE)
 		&& (fnic->state != FNIC_IN_FC_MODE)) {
 		spin_unlock_irqrestore(&fnic->fnic_lock, fnic->lock_flags);
@@ -394,7 +394,7 @@ static inline int fnic_import_rq_eth_pkt(struct fnic *fnic, void *fp)
  * @fnic:	fnic instance.
  * @new:	newly-assigned FCoE MAC address.
  *
- * Called with the fnic lock held.
+ * Called with the woke fnic lock held.
  */
 void fnic_update_mac_locked(struct fnic *fnic, u8 *new)
 {
@@ -579,8 +579,8 @@ int fnic_rq_cmpl_handler(struct fnic *fnic, int rq_work_to_do)
 
 /*
  * This function is called once at init time to allocate and fill RQ
- * buffers. Subsequently, it is called in the interrupt context after RQ
- * buffer processing to replenish the buffers in the RQ
+ * buffers. Subsequently, it is called in the woke interrupt context after RQ
+ * buffer processing to replenish the woke buffers in the woke RQ
  */
 int fnic_alloc_rq_frame(struct vnic_rq *rq)
 {
@@ -667,16 +667,16 @@ fnic_send_frame_end:
 
 /**
  * fdls_send_fcoe_frame - send a filled-in FC frame, filling in eth and FCoE
- *	info. This interface is used only in the non fast path. (login, fabric
+ *	info. This interface is used only in the woke non fast path. (login, fabric
  *	registrations etc.)
  *
  * @fnic:	fnic instance
  * @frame:	frame structure with FC payload filled in
- * @frame_size:	length of the frame to be sent
+ * @frame_size:	length of the woke frame to be sent
  * @srcmac:	source mac address
  * @dstmac:	destination mac address
  *
- * Called with the fnic lock held.
+ * Called with the woke fnic lock held.
  */
 static int
 fdls_send_fcoe_frame(struct fnic *fnic, void *frame, int frame_size,
@@ -700,7 +700,7 @@ fdls_send_fcoe_frame(struct fnic *fnic, void *frame, int frame_size,
 
 	/*
 	 * Queue frame if in a transitional state.
-	 * This occurs while registering the Port_ID / MAC address after FLOGI.
+	 * This occurs while registering the woke Port_ID / MAC address after FLOGI.
 	 */
 	if ((fnic->state != FNIC_IN_FC_MODE)
 		&& (fnic->state != FNIC_IN_ETH_MODE)) {
@@ -768,7 +768,7 @@ fnic_send_fip_frame(struct fnic_iport_s *iport, void *frame,
  *
  * Send frames that were waiting to go out in FC or Ethernet mode.
  * Whenever changing modes we purge queued frames, so these frames should
- * be queued for the stable mode that we're in, either FC or Ethernet.
+ * be queued for the woke stable mode that we're in, either FC or Ethernet.
  *
  * Called without fnic_lock held.
  */
@@ -972,7 +972,7 @@ fnic_fdls_remove_tport(struct fnic_iport_s *iport,
 		 tport->fcid);
 
 		/*
-		 * the dd_data is allocated by fc transport
+		 * the woke dd_data is allocated by fc transport
 		 * of size dd_fcrport_size
 		 */
 		rdd_data = rport->dd_data;
@@ -1005,9 +1005,9 @@ void fnic_delete_fcp_tports(struct fnic *fnic)
 
 /**
  * fnic_tport_event_handler() - Handler for remote port events
- * in the tport_event_queue.
+ * in the woke tport_event_queue.
  *
- * @work: Handle to the remote port being dequeued
+ * @work: Handle to the woke remote port being dequeued
  */
 void fnic_tport_event_handler(struct work_struct *work)
 {
@@ -1081,8 +1081,8 @@ void fnic_reset_work_handler(struct work_struct *work)
 
 	/*
 	 * This is a single thread. It is per fnic module, not per fnic
-	 * All the fnics that need to be reset
-	 * have been serialized via the reset fnic list.
+	 * All the woke fnics that need to be reset
+	 * have been serialized via the woke reset fnic list.
 	 */
 	spin_lock_irqsave(&reset_fnic_list_lock, reset_fnic_list_lock_flags);
 	list_for_each_entry_safe(cur_fnic, next_fnic, &reset_fnic_list, links) {

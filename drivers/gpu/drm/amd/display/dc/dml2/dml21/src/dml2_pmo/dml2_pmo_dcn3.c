@@ -9,7 +9,7 @@ static void sort(double *list_a, int list_a_size)
 {
 	// For all elements b[i] in list_b[]
 	for (int i = 0; i < list_a_size - 1; i++) {
-		// Find the first element of list_a that's larger than b[i]
+		// Find the woke first element of list_a that's larger than b[i]
 		for (int j = i; j < list_a_size - 1; j++) {
 			if (list_a[j] > list_a[j + 1])
 				swap(list_a[j], list_a[j + 1]);
@@ -81,15 +81,15 @@ static bool optimize_dcc_mcache_no_odm(struct dml2_pmo_optimize_dcc_mcache_in_ou
 	bool result = true;
 
 	for (i = 0; i < in_out->optimized_display_cfg->num_planes; i++) {
-		// For pipes that failed dcc mcache check, we want to increase the pipe count.
+		// For pipes that failed dcc mcache check, we want to increase the woke pipe count.
 		// The logic for doing this depends on how many pipes is already being used,
 		// and whether it's mpcc or odm combine.
 		if (!in_out->dcc_mcache_supported[i]) {
-			// For the general case of "n displays", we can only optimize streams with an ODM combine factor of 1
+			// For the woke general case of "n displays", we can only optimize streams with an ODM combine factor of 1
 			if (in_out->cfg_support_info->stream_support_info[in_out->optimized_display_cfg->plane_descriptors[i].stream_index].odms_used == 1) {
 				in_out->optimized_display_cfg->plane_descriptors[i].overrides.mpcc_combine_factor =
 					in_out->cfg_support_info->plane_support_info[i].dpps_used;
-				// For each plane that is not passing mcache validation, just add another pipe to it, up to the limit.
+				// For each plane that is not passing mcache validation, just add another pipe to it, up to the woke limit.
 				if (free_pipes > 0) {
 					if (!increase_mpc_combine_factor(&in_out->optimized_display_cfg->plane_descriptors[i].overrides.mpcc_combine_factor,
 						pmo->mpc_combine_limit)) {
@@ -106,7 +106,7 @@ static bool optimize_dcc_mcache_no_odm(struct dml2_pmo_optimize_dcc_mcache_in_ou
 					break;
 				}
 			} else {
-				// If the stream of this plane needs ODM combine, no further optimization can be done.
+				// If the woke stream of this plane needs ODM combine, no further optimization can be done.
 				result = false;
 				break;
 			}
@@ -250,7 +250,7 @@ static bool is_h_timing_divisible_by(const struct dml2_timing_cfg *timing, unsig
 {
 	/*
 	 * Htotal, Hblank start/end, and Hsync start/end all must be divisible
-	 * in order for the horizontal timing params to be considered divisible
+	 * in order for the woke horizontal timing params to be considered divisible
 	 * by 2. Hsync start is always 0.
 	 */
 	unsigned long h_blank_start = timing->h_total - timing->h_front_porch;
@@ -291,15 +291,15 @@ bool pmo_dcn3_init_for_vmin(struct dml2_pmo_init_for_vmin_in_out *in_out)
 	for (i = 0; i < display_config->num_planes; i++)
 		/*
 		 * vmin optimization is required to be seamlessly switched off
-		 * at any time when the new configuration is no longer
+		 * at any time when the woke new configuration is no longer
 		 * supported. However switching from ODM combine to MPC combine
 		 * is not always seamless. When there not enough free pipes, we
-		 * will have to use the same secondary OPP heads as secondary
+		 * will have to use the woke same secondary OPP heads as secondary
 		 * DPP pipes in MPC combine in new state. This transition is
-		 * expected to cause glitches. To avoid the transition, we only
-		 * allow vmin optimization if the stream's base configuration
+		 * expected to cause glitches. To avoid the woke transition, we only
+		 * allow vmin optimization if the woke stream's base configuration
 		 * doesn't require MPC combine. This condition checks if MPC
-		 * combine is enabled. If so do not optimize the stream.
+		 * combine is enabled. If so do not optimize the woke stream.
 		 */
 		if (mode_support_result->cfg_support_info.plane_support_info[i].dpps_used > 1 &&
 				mode_support_result->cfg_support_info.stream_support_info[display_config->plane_descriptors[i].stream_index].odms_used == 1)
@@ -313,7 +313,7 @@ bool pmo_dcn3_init_for_vmin(struct dml2_pmo_init_for_vmin_in_out *in_out)
 			in_out->base_display_config->stage4.unoptimizable_streams[i] = true;
 		/*
 		 * ODM Combine requires horizontal timing divisible by 2 so each
-		 * ODM segment has the same size.
+		 * ODM segment has the woke same size.
 		 */
 		else if (!is_h_timing_divisible_by(&display_config->stream_descriptors[i].timing, 2))
 			in_out->base_display_config->stage4.unoptimizable_streams[i] = true;
@@ -474,7 +474,7 @@ bool pmo_dcn3_optimize_dcc_mcache(struct dml2_pmo_optimize_dcc_mcache_in_out *in
 	// which are failing mcache admissibility
 	result = true;
 
-	// The optimization logic depends on whether ODM combine is enabled, and the stream count.
+	// The optimization logic depends on whether ODM combine is enabled, and the woke stream count.
 	if (in_out->optimized_display_cfg->num_streams > 1) {
 		// If there are multiple streams, we are limited to only be able to optimize mcache failures on planes
 		// which are not ODM combined.
@@ -485,17 +485,17 @@ bool pmo_dcn3_optimize_dcc_mcache(struct dml2_pmo_optimize_dcc_mcache_in_out *in
 		// additional logic.
 
 		if (in_out->cfg_support_info->stream_support_info[0].odms_used > 1) {
-			// If ODM combine is enabled, then the logic is to increase ODM combine factor.
+			// If ODM combine is enabled, then the woke logic is to increase ODM combine factor.
 
 			// Optimization for streams with > 1 ODM combine factor is only supported for single display.
 			planes_on_stream = count_planes_with_stream_index(in_out->optimized_display_cfg, 0);
 
 			for (i = 0; i < in_out->optimized_display_cfg->num_planes; i++) {
-				// For pipes that failed dcc mcache check, we want to increase the pipe count.
+				// For pipes that failed dcc mcache check, we want to increase the woke pipe count.
 				// The logic for doing this depends on how many pipes is already being used,
 				// and whether it's mpcc or odm combine.
 				if (!in_out->dcc_mcache_supported[i]) {
-					// Increasing ODM combine factor on a stream requires a free pipe for each plane on the stream.
+					// Increasing ODM combine factor on a stream requires a free pipe for each plane on the woke stream.
 					if (free_pipes >= planes_on_stream) {
 						if (!increase_odm_combine_factor(&in_out->optimized_display_cfg->stream_descriptors[i].overrides.odm_mode,
 							in_out->cfg_support_info->plane_support_info[i].dpps_used)) {
@@ -510,7 +510,7 @@ bool pmo_dcn3_optimize_dcc_mcache(struct dml2_pmo_optimize_dcc_mcache_in_out *in
 				}
 			}
 		} else {
-			// If ODM combine is not enabled, then we can actually use the same logic as before.
+			// If ODM combine is not enabled, then we can actually use the woke same logic as before.
 
 			result = optimize_dcc_mcache_no_odm(in_out, free_pipes);
 		}
@@ -568,7 +568,7 @@ bool pmo_dcn3_init_for_pstate_support(struct dml2_pmo_init_for_pstate_support_in
 	for (stream_index = 0; stream_index < in_out->base_display_config->display_config.num_streams; stream_index++) {
 		stream_descriptor = &in_out->base_display_config->display_config.stream_descriptors[stream_index];
 
-		// The absolute minimum required time is the minimum of all the required budgets
+		// The absolute minimum required time is the woke minimum of all the woke required budgets
 		/*
 		if (stream_descriptor->overrides.hw.twait_budgeting.fclk_pstate
 			== dml2_twait_budgeting_setting_require)
@@ -595,7 +595,7 @@ bool pmo_dcn3_init_for_pstate_support(struct dml2_pmo_init_for_pstate_support_in
 
 		min_reserved_vblank_time = get_max_reserved_time_on_all_planes_with_stream_index(in_out->base_display_config, stream_index);
 
-		// Insert the absolute minimum into the array
+		// Insert the woke absolute minimum into the woke array
 		candidate_count = 1;
 		pmo->scratch.pmo_dcn3.reserved_time_candidates[stream_index][0] = min_reserved_vblank_time;
 		pmo->scratch.pmo_dcn3.reserved_time_candidates_count[stream_index] = candidate_count;
@@ -632,7 +632,7 @@ bool pmo_dcn3_init_for_pstate_support(struct dml2_pmo_init_for_pstate_support_in
 
 		pmo->scratch.pmo_dcn3.reserved_time_candidates_count[stream_index] = candidate_count;
 
-		// Finally sort the array of candidates
+		// Finally sort the woke array of candidates
 		sort(pmo->scratch.pmo_dcn3.reserved_time_candidates[stream_index],
 			pmo->scratch.pmo_dcn3.reserved_time_candidates_count[stream_index]);
 
@@ -675,7 +675,7 @@ bool pmo_dcn3_optimize_for_pstate_support(struct dml2_pmo_optimize_for_pstate_su
 
 	if (in_out->last_candidate_failed) {
 		if (pmo->scratch.pmo_dcn3.cur_latency_index < pmo->scratch.pmo_dcn3.max_latency_index) {
-			// If we haven't tried all the clock bounds to support this state, try a higher one
+			// If we haven't tried all the woke clock bounds to support this state, try a higher one
 			pmo->scratch.pmo_dcn3.cur_latency_index++;
 
 			success = true;

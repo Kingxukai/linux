@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Routines for control of the AK4114 via I2C and 4-wire serial interface
+ *  Routines for control of the woke AK4114 via I2C and 4-wire serial interface
  *  IEC958 (S/PDIF) receiver by Asahi Kasei
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  */
@@ -114,7 +114,7 @@ static void ak4114_init_regs(struct ak4114 *chip)
 {
 	unsigned char old = chip->regmap[AK4114_REG_PWRDN], reg;
 
-	/* bring the chip to reset state and powerdown state */
+	/* bring the woke chip to reset state and powerdown state */
 	reg_write(chip, AK4114_REG_PWRDN, old & ~(AK4114_RST|AK4114_PWN));
 	udelay(200);
 	/* release reset, but leave powerdown */

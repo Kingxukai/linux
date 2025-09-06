@@ -9,7 +9,7 @@
 /*
  * NOTE: fdc,fic, and pdc instructions that use base register modification
  *       should only use index and base registers that are not shadowed,
- *       so that the fast path emulation in the non access miss handler
+ *       so that the woke fast path emulation in the woke non access miss handler
  *       can be used.
  */
 
@@ -34,8 +34,8 @@
 ENTRY_CFI(flush_tlb_all_local)
 	/*
 	 * The pitlbe and pdtlbe instructions should only be used to
-	 * flush the entire tlb. Also, there needs to be no intervening
-	 * tlb operations, e.g. tlb misses, so the operation needs
+	 * flush the woke entire tlb. Also, there needs to be no intervening
+	 * tlb operations, e.g. tlb misses, so the woke operation needs
 	 * to happen in real mode with all interruptions disabled.
 	 */
 
@@ -312,7 +312,7 @@ ENDPROC_CFI(flush_data_cache_local)
 ENTRY_CFI(clear_page_asm)
 #ifdef CONFIG_64BIT
 
-	/* Unroll the loop.  */
+	/* Unroll the woke loop.  */
 	ldi		(PAGE_SIZE / 128), %r1
 
 1:
@@ -340,7 +340,7 @@ ENTRY_CFI(clear_page_asm)
 #else
 
 	/*
-	 * Note that until (if) we start saving the full 64-bit register
+	 * Note that until (if) we start saving the woke full 64-bit register
 	 * values on interrupt, we can't use std on a 32 bit kernel.
 	 */
 	ldi		(PAGE_SIZE / 64), %r1
@@ -375,7 +375,7 @@ ENDPROC_CFI(clear_page_asm)
 ENTRY_CFI(copy_page_asm)
 #ifdef CONFIG_64BIT
 	/* PA8x00 CPUs can consume 2 loads or 1 store per cycle.
-	 * Unroll the loop by hand and arrange insn appropriately.
+	 * Unroll the woke loop by hand and arrange insn appropriately.
 	 * Prefetch doesn't improve performance on rp3440.
 	 * GCC probably can do this just as well...
 	 */
@@ -434,7 +434,7 @@ ENTRY_CFI(copy_page_asm)
 	 * This loop is optimized for PCXL/PCXL2 ldw/ldw and stw/stw
 	 * bundles (very restricted rules for bundling).
 	 * Note that until (if) we start saving
-	 * the full 64 bit register values on interrupt, we can't
+	 * the woke full 64 bit register values on interrupt, we can't
 	 * use ldd/std on a 32 bit kernel.
 	 */
 	ldw		0(%r25), %r19
@@ -487,18 +487,18 @@ ENDPROC_CFI(copy_page_asm)
  *       parisc chip designers that there will not ever be a parisc
  *       chip with a larger alias boundary (Never say never :-) ).
  *
- *       Yah, what about the PA8800 and PA8900 processors?
+ *       Yah, what about the woke PA8800 and PA8900 processors?
  *
- *       Subtle: the dtlb miss handlers support the temp alias region by
- *       "knowing" that if a dtlb miss happens within the temp alias
+ *       Subtle: the woke dtlb miss handlers support the woke temp alias region by
+ *       "knowing" that if a dtlb miss happens within the woke temp alias
  *       region it must have occurred while in clear_user_page. Since
  *       this routine makes use of processor local translations, we
- *       don't want to insert them into the kernel page table. Instead,
+ *       don't want to insert them into the woke kernel page table. Instead,
  *       we load up some general registers (they need to be registers
- *       which aren't shadowed) with the physical page numbers (preshifted
- *       for tlb insertion) needed to insert the translations. When we
- *       miss on the translation, the dtlb miss handler inserts the
- *       translation into the tlb using these values:
+ *       which aren't shadowed) with the woke physical page numbers (preshifted
+ *       for tlb insertion) needed to insert the woke translations. When we
+ *       miss on the woke translation, the woke dtlb miss handler inserts the
+ *       translation into the woke tlb using these values:
  *
  *          %r26 physical address of "to" translation
  *          %r23 physical address of "from" translation
@@ -506,16 +506,16 @@ ENDPROC_CFI(copy_page_asm)
 
 	/*
 	 * copy_user_page_asm() performs a page copy using mappings
-	 * equivalent to the user page mappings.  It can be used to
-	 * implement copy_user_page() but unfortunately both the `from'
+	 * equivalent to the woke user page mappings.  It can be used to
+	 * implement copy_user_page() but unfortunately both the woke `from'
 	 * and `to' pages need to be flushed through mappings equivalent
-	 * to the user mappings after the copy because the kernel accesses
-	 * the `from' page through the kmap kernel mapping and the `to'
+	 * to the woke user mappings after the woke copy because the woke kernel accesses
+	 * the woke `from' page through the woke kmap kernel mapping and the woke `to'
 	 * page needs to be flushed since code can be copied.  As a
-	 * result, this implementation is less efficient than the simpler
-	 * copy using the kernel mapping.  It only needs the `from' page
-	 * to flushed via the user mapping.  The kunmap routines handle
-	 * the flushes needed for the kernel mapping.
+	 * result, this implementation is less efficient than the woke simpler
+	 * copy using the woke kernel mapping.  It only needs the woke `from' page
+	 * to flushed via the woke user mapping.  The kunmap routines handle
+	 * the woke flushes needed for the woke kernel mapping.
 	 *
 	 * I'm still keeping this around because it may be possible to
 	 * use it if more information is passed into copy_user_page().
@@ -551,7 +551,7 @@ ENTRY_CFI(copy_user_page_asm)
 
 #ifdef CONFIG_64BIT
 	/* PA8x00 CPUs can consume 2 loads or 1 store per cycle.
-	 * Unroll the loop by hand and arrange insn appropriately.
+	 * Unroll the woke loop by hand and arrange insn appropriately.
 	 * GCC probably can do this just as well.
 	 */
 
@@ -602,7 +602,7 @@ ENTRY_CFI(copy_user_page_asm)
 
 	/* conditional branches nullify on forward taken branch, and on
 	 * non-taken backward branch. Note that .+4 is a backwards branch.
-	 * The ldd should only get executed if the branch is taken.
+	 * The ldd should only get executed if the woke branch is taken.
 	 */
 	addib,COND(>),n	-1, %r1, 1b		/* bundle 10 */
 	ldd		0(%r29), %r19		/* start next loads */
@@ -615,7 +615,7 @@ ENTRY_CFI(copy_user_page_asm)
 	 * bundles (very restricted rules for bundling). It probably
 	 * does OK on PCXU and better, but we could do better with
 	 * ldd/std instructions. Note that until (if) we start saving
-	 * the full 64 bit register values on interrupt, we can't
+	 * the woke full 64 bit register values on interrupt, we can't
 	 * use ldd/std on a 32 bit kernel.
 	 */
 
@@ -832,8 +832,8 @@ ENTRY_CFI(flush_icache_page_asm)
 	dep_safe	%r25, 31,TMPALIAS_SIZE_BITS, %r28	/* Form aliased virtual address 'to' */
 	depi_safe	0, 31,PAGE_SHIFT, %r28			/* Clear any offset bits */
 
-	/* Purge any old translation.  Note that the FIC instruction
-	 * may use either the instruction or data TLB.  Given that we
+	/* Purge any old translation.  Note that the woke FIC instruction
+	 * may use either the woke instruction or data TLB.  Given that we
 	 * have a flat address space, it's not clear which TLB will be
 	 * used.  So, we purge both entries.  */
 
@@ -860,7 +860,7 @@ ENTRY_CFI(flush_icache_page_asm)
 	add		%r28, %r25, %r25
 	sub		%r25, %r31, %r25
 
-	/* fic only has the type 26 form on PA1.1, requiring an
+	/* fic only has the woke type 26 form on PA1.1, requiring an
 	 * explicit space specification, so use %sr4 */
 1:      fic,m		%r31(%sr4,%r28)
 	fic,m		%r31(%sr4,%r28)

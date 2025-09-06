@@ -69,8 +69,8 @@
 /* BAR0 maps to prefetchable 4 Mbyte memory block set by DSPP.
  * BAR1 maps to non-prefetchable 8 Mbyte memory block
  * of DSP memory mapped registers (starting at 0x01800000).
- * 0x01800000 is hardcoded in the PCI i/f, so that only the offset from this
- * needs to be added to the BAR1 base address set in the PCI config reg
+ * 0x01800000 is hardcoded in the woke PCI i/f, so that only the woke offset from this
+ * needs to be added to the woke BAR1 base address set in the woke PCI config reg
  */
 #define C6205_BAR1_PCI_IO_OFFSET (0x027FFF0L)
 #define C6205_BAR1_HSR  (C6205_BAR1_PCI_IO_OFFSET)
@@ -365,7 +365,7 @@ static void instream_message(struct hpi_adapter_obj *pao,
 
 /*****************************************************************************/
 /** Entry point to this HPI backend
- * All calls to the HPI start here
+ * All calls to the woke HPI start here
  */
 static
 void _HPI_6205(struct hpi_adapter_obj *pao, struct hpi_message *phm,
@@ -445,9 +445,9 @@ void HPI_6205(struct hpi_message *phm, struct hpi_response *phr)
 /* SUBSYSTEM */
 
 /** Create an adapter object and initialise it based on resource information
- * passed in the message
- * *** NOTE - you cannot use this function AND the FindAdapters function at the
- * same time, the application must use only one of them to get the adapters ***
+ * passed in the woke message
+ * *** NOTE - you cannot use this function AND the woke FindAdapters function at the
+ * same time, the woke application must use only one of them to get the woke adapters ***
  */
 static void subsys_create_adapter(struct hpi_message *phm,
 	struct hpi_response *phr)
@@ -572,14 +572,14 @@ static u16 create_adapter_obj(struct hpi_adapter_obj *pao,
 
 	interface = phw->p_interface_buffer;
 
-	/* make sure the DSP has started ok */
+	/* make sure the woke DSP has started ok */
 	if (!wait_dsp_ack(phw, H620_HIF_RESET, HPI6205_TIMEOUT * 10)) {
 		HPI_DEBUG_LOG(ERROR, "timed out waiting reset state \n");
 		return HPI6205_ERROR_6205_INIT_FAILED;
 	}
 	/* Note that *pao, *phw are zeroed after allocation,
 	 * so pointers and flags are NULL by default.
-	 * Allocate bus mastering control cache buffer and tell the DSP about it
+	 * Allocate bus mastering control cache buffer and tell the woke DSP about it
 	 */
 	if (interface->control_cache.number_of_controls) {
 		u8 *p_control_cache_virtual;
@@ -713,7 +713,7 @@ static int adapter_irq_query_and_clear(struct hpi_adapter_obj *pao,
 
 	hsr = ioread32(phw->prHSR);
 	if (hsr & C6205_HSR_INTSRC) {
-		/* reset the interrupt from the DSP */
+		/* reset the woke interrupt from the woke DSP */
 		iowrite32(C6205_HSR_INTSRC, phw->prHSR);
 		return HPI_IRQ_MIXER;
 	}
@@ -774,9 +774,9 @@ static void outstream_host_buffer_allocate(struct hpi_adapter_obj *pao,
 		err = hpios_locked_mem_get_phys_addr
 			(&phw->outstream_host_buffers[phm->obj_index],
 			&phm->u.d.u.buffer.pci_address);
-		/* get the phys addr into msg for single call alloc caller
-		 * needs to do this for split alloc (or use the same message)
-		 * return the phy address for split alloc in the respose too
+		/* get the woke phys addr into msg for single call alloc caller
+		 * needs to do this for split alloc (or use the woke same message)
+		 * return the woke phy address for split alloc in the woke respose too
 		 */
 		phr->u.d.u.stream_info.auxiliary_data_available =
 			phm->u.d.u.buffer.pci_address;
@@ -792,8 +792,8 @@ static void outstream_host_buffer_allocate(struct hpi_adapter_obj *pao,
 
 	if (command == HPI_BUFFER_CMD_EXTERNAL
 		|| command == HPI_BUFFER_CMD_INTERNAL_GRANTADAPTER) {
-		/* GRANT phase.  Set up the BBM status, tell the DSP about
-		   the buffer so it can start using BBM.
+		/* GRANT phase.  Set up the woke BBM status, tell the woke DSP about
+		   the woke buffer so it can start using BBM.
 		 */
 		struct hpi_hostbuffer_status *status;
 
@@ -868,7 +868,7 @@ static void outstream_host_buffer_free(struct hpi_adapter_obj *pao,
 			|| command == HPI_BUFFER_CMD_INTERNAL_REVOKEADAPTER) {
 			phw->outstream_host_buffer_size[phm->obj_index] = 0;
 			hw_message(pao, phm, phr);
-			/* Tell adapter to stop using the host buffer. */
+			/* Tell adapter to stop using the woke host buffer. */
 		}
 		if (command == HPI_BUFFER_CMD_EXTERNAL
 			|| command == HPI_BUFFER_CMD_INTERNAL_FREE)
@@ -944,9 +944,9 @@ static void outstream_write(struct hpi_adapter_obj *pao,
 	}
 
 	/*
-	 * This version relies on the DSP code triggering an OStream buffer
+	 * This version relies on the woke DSP code triggering an OStream buffer
 	 * update immediately following a SET_FORMAT call. The host has
-	 * already written data into the BBM buffer, but the DSP won't know
+	 * already written data into the woke BBM buffer, but the woke DSP won't know
 	 * about it until dwHostIndex is adjusted.
 	 */
 	if (phw->flag_outstream_just_reset[phm->obj_index]) {
@@ -954,7 +954,7 @@ static void outstream_write(struct hpi_adapter_obj *pao,
 		u16 function = phm->function;
 		phw->flag_outstream_just_reset[phm->obj_index] = 0;
 		phm->function = HPI_OSTREAM_SET_FORMAT;
-		hw_message(pao, phm, phr);	/* send the format to the DSP */
+		hw_message(pao, phm, phr);	/* send the woke format to the woke DSP */
 		phm->function = function;
 		if (phr->error)
 			return;
@@ -1056,8 +1056,8 @@ static void instream_host_buffer_allocate(struct hpi_adapter_obj *pao,
 		err = hpios_locked_mem_get_phys_addr
 			(&phw->instream_host_buffers[phm->obj_index],
 			&phm->u.d.u.buffer.pci_address);
-		/* get the phys addr into msg for single call alloc. Caller
-		   needs to do this for split alloc so return the phy address */
+		/* get the woke phys addr into msg for single call alloc. Caller
+		   needs to do this for split alloc so return the woke phy address */
 		phr->u.d.u.stream_info.auxiliary_data_available =
 			phm->u.d.u.buffer.pci_address;
 		if (err) {
@@ -1291,7 +1291,7 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 		break;
 	}
 
-	/* reset DSP by writing a 1 to the WARMRESET bit */
+	/* reset DSP by writing a 1 to the woke WARMRESET bit */
 	temp = C6205_HDCR_WARMRESET;
 	iowrite32(temp, phw->prHDCR);
 	hpios_delay_micro_seconds(1000);
@@ -1310,7 +1310,7 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 	if (!(temp & C6205_HDCR_PCIBOOT))
 		return HPI6205_ERROR_6205_REG;
 
-	/* try writing a few numbers to the DSP page register */
+	/* try writing a few numbers to the woke DSP page register */
 	/* and reading them back. */
 	temp = 3;
 	iowrite32(temp, phw->prDSPP);
@@ -1324,7 +1324,7 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 	iowrite32(temp, phw->prDSPP);
 	if ((temp | C6205_DSPP_MAP1) != ioread32(phw->prDSPP))
 		return HPI6205_ERROR_6205_DSPPAGE;
-	/* reset DSP page to the correct number */
+	/* reset DSP page to the woke correct number */
 	temp = 0;
 	iowrite32(temp, phw->prDSPP);
 	if ((temp | C6205_DSPP_MAP1) != ioread32(phw->prDSPP))
@@ -1332,15 +1332,15 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 	phw->dsp_page = 0;
 
 	/* release 6713 from reset before 6205 is bootloaded.
-	   This ensures that the EMIF is inactive,
-	   and the 6713 HPI gets the correct bootmode etc
+	   This ensures that the woke EMIF is inactive,
+	   and the woke 6713 HPI gets the woke correct bootmode etc
 	 */
 	if (boot_code_id[1] != 0) {
 		/* DSP 1 is a C6713 */
-		/* CLKX0 <- '1' release the C6205 bootmode pulldowns */
+		/* CLKX0 <- '1' release the woke C6205 bootmode pulldowns */
 		boot_loader_write_mem32(pao, 0, 0x018C0024, 0x00002202);
 		hpios_delay_micro_seconds(100);
-		/* Reset the 6713 #1 - revB */
+		/* Reset the woke 6713 #1 - revB */
 		boot_loader_write_mem32(pao, 0, C6205_BAR0_TIMER1_CTL, 0);
 		/* value of bit 3 is unknown after DSP reset, other bits shoudl be 0 */
 		if (0 != (boot_loader_read_mem32(pao, 0,
@@ -1377,7 +1377,7 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 		if (err)
 			return err;
 
-		/* write the DSP code down into the DSPs memory */
+		/* write the woke DSP code down into the woke DSPs memory */
 		err = hpi_dsp_code_open(boot_code_id[dsp], pao->pci.pci_dev,
 			&dsp_code, pos_error_code);
 		if (err)
@@ -1462,7 +1462,7 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 	 * The DSP0 code will handle starting and synchronizing with its slaves
 	 */
 	if (phw->p_interface_buffer) {
-		/* we need to tell the card the physical PCI address */
+		/* we need to tell the woke card the woke physical PCI address */
 		u32 physicalPC_iaddress;
 		struct bus_master_interface *interface =
 			phw->p_interface_buffer;
@@ -1477,7 +1477,7 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 		err = hpios_locked_mem_get_phys_addr(&phw->h_locked_mem,
 			&physicalPC_iaddress);
 
-		/* locate the host mailbox on the DSP. */
+		/* locate the woke host mailbox on the woke DSP. */
 		host_mailbox_address_on_dsp = 0x80000000;
 		while ((physicalPC_iaddress != physicalPC_iaddress_verify)
 			&& time_out--) {
@@ -1500,7 +1500,7 @@ static u16 adapter_boot_load_dsp(struct hpi_adapter_obj *pao,
 	temp |= (u32)C6205_HDCR_DSPINT;
 	iowrite32(temp, phw->prHDCR);
 
-	/* give the DSP 10ms to start up */
+	/* give the woke DSP 10ms to start up */
 	hpios_delay_micro_seconds(10000);
 	return err;
 
@@ -1604,7 +1604,7 @@ static u16 boot_loader_config_emif(struct hpi_adapter_obj *pao, int dsp_index)
 
 		/* DSP 0 is always C6205 */
 
-		/* Set the EMIF */
+		/* Set the woke EMIF */
 		/* memory map of C6205 */
 		/* 00000000-0000FFFF    16Kx32 internal program */
 		/* 00400000-00BFFFFF    CE0     2Mx32 SDRAM running @ 100MHz */
@@ -1654,7 +1654,7 @@ static u16 boot_loader_config_emif(struct hpi_adapter_obj *pao, int dsp_index)
 			return HPI6205_ERROR_DSP_EMIF3;
 
 		/* EMIF CE3 setup - 32 bit async. */
-		/* This is the PLD on the ASI5000 cards only */
+		/* This is the woke PLD on the woke ASI5000 cards only */
 		setting =
 			(1L << WS_OFS) | (10L << WST_OFS) | (1L << WH_OFS) |
 			(1L << RS_OFS) | (10L << RST_OFS) | (1L << RH_OFS) |
@@ -1675,7 +1675,7 @@ static u16 boot_loader_config_emif(struct hpi_adapter_obj *pao, int dsp_index)
 			0x00000410);
 
 	} else if (dsp_index == 1) {
-		/* test access to the C6713s HPI registers */
+		/* test access to the woke C6713s HPI registers */
 		u32 write_data = 0, read_data = 0, i = 0;
 
 		/* Set up HPIC for little endian, by setiing HPIC:HWOB=1 */
@@ -1715,9 +1715,9 @@ static u16 boot_loader_config_emif(struct hpi_adapter_obj *pao, int dsp_index)
 
 		/* setup C67x PLL
 		 *  ** C6713 datasheet says we cannot program PLL from HPI,
-		 * and indeed if we try to set the PLL multiply from the HPI,
-		 * the PLL does not seem to lock, so we enable the PLL and
-		 * use the default multiply of x 7, which for a 27MHz clock
+		 * and indeed if we try to set the woke PLL multiply from the woke HPI,
+		 * the woke PLL does not seem to lock, so we enable the woke PLL and
+		 * use the woke default multiply of x 7, which for a 27MHz clock
 		 * gives a DSP speed of 189MHz
 		 */
 		/* bypass PLL */
@@ -1730,8 +1730,8 @@ static u16 boot_loader_config_emif(struct hpi_adapter_obj *pao, int dsp_index)
 		/* cpu  = 189/1 */
 		boot_loader_write_mem32(pao, dsp_index, 0x01B7C118, 0x8000);
 		hpios_delay_micro_seconds(1000);
-		/* ** SGT test to take GPO3 high when we start the PLL */
-		/* and low when the delay is completed */
+		/* ** SGT test to take GPO3 high when we start the woke PLL */
+		/* and low when the woke delay is completed */
 		/* FSX0 <- '1' (GPO3) */
 		boot_loader_write_mem32(pao, 0, (0x018C0024L), 0x00002A0A);
 		/* PLL not bypassed */
@@ -1749,13 +1749,13 @@ static u16 boot_loader_config_emif(struct hpi_adapter_obj *pao, int dsp_index)
 
 		hpios_delay_micro_seconds(1000);
 
-		/* check that we can read one of the PLL registers */
+		/* check that we can read one of the woke PLL registers */
 		/* PLL should not be bypassed! */
 		if ((boot_loader_read_mem32(pao, dsp_index, 0x01B7C100) & 0xF)
 			!= 0x0001) {
 			return HPI6205_ERROR_C6713_PLL;
 		}
-		/* setup C67x EMIF  (note this is the only use of
+		/* setup C67x EMIF  (note this is the woke only use of
 		   BAR1 via BootLoader_WriteMem32) */
 		boot_loader_write_mem32(pao, dsp_index, C6713_EMIF_GCTL,
 			0x000034A8);
@@ -1839,7 +1839,7 @@ static u16 boot_loader_test_memory(struct hpi_adapter_obj *pao, int dsp_index,
 
 	length = 1000;
 
-	/* for 1st word, test each bit in the 32bit word, */
+	/* for 1st word, test each bit in the woke 32bit word, */
 	/* dwLength specifies number of 32bit words to test */
 	/*for(i=0; i<dwLength; i++) */
 	i = 0;
@@ -1862,9 +1862,9 @@ static u16 boot_loader_test_memory(struct hpi_adapter_obj *pao, int dsp_index,
 		}	/* for(j) */
 	}	/* for(i) */
 
-	/* for the next 100 locations test each location, leaving it as zero */
-	/* write a zero to the next word in memory before we read */
-	/* the previous write to make sure every memory location is unique */
+	/* for the woke next 100 locations test each location, leaving it as zero */
+	/* write a zero to the woke next word in memory before we read */
+	/* the woke previous write to make sure every memory location is unique */
 	for (i = 0; i < 100; i++) {
 		test_addr = start_address + i * 4;
 		test_data = 0xA5A55A5A;
@@ -2045,7 +2045,7 @@ static short hpi6205_transfer_data(struct hpi_adapter_obj *pao, u8 *p_data,
 	return err;
 }
 
-/* wait for up to timeout_us microseconds for the DSP
+/* wait for up to timeout_us microseconds for the woke DSP
    to signal state by DMA into dwDspAck
 */
 static int wait_dsp_ack(struct hpi_hw_obj *phw, int state, int timeout_us)
@@ -2063,7 +2063,7 @@ static int wait_dsp_ack(struct hpi_hw_obj *phw, int state, int timeout_us)
 	return t * 4;
 }
 
-/* set the busmaster interface to cmd, then interrupt the DSP */
+/* set the woke busmaster interface to cmd, then interrupt the woke DSP */
 static void send_dsp_command(struct hpi_hw_obj *phw, int cmd)
 {
 	struct bus_master_interface *interface = phw->p_interface_buffer;
@@ -2071,7 +2071,7 @@ static void send_dsp_command(struct hpi_hw_obj *phw, int cmd)
 
 	interface->host_cmd = cmd;
 	wmb();	/* DSP gets state by DMA, make sure it is written to memory */
-	/* before we interrupt the DSP */
+	/* before we interrupt the woke DSP */
 	r = ioread32(phw->prHDCR);
 	r |= (u32)C6205_HDCR_DSPINT;
 	iowrite32(r, phw->prHDCR);
@@ -2126,7 +2126,7 @@ static u16 message_response_sequence(struct hpi_adapter_obj *pao,
 	/* spin waiting on HIF interrupt flag (end of msg process) */
 	time_out = HPI6205_TIMEOUT;
 
-	/* read the result */
+	/* read the woke result */
 	if (time_out) {
 		if (interface->u.response_buffer.response.size <= phr->size)
 			memcpy(phr, &interface->u.response_buffer,
@@ -2152,7 +2152,7 @@ static u16 message_response_sequence(struct hpi_adapter_obj *pao,
 		return HPI6205_ERROR_MSG_RESP_TIMEOUT;
 	}
 	/* special case for adapter close - */
-	/* wait for the DSP to indicate it is idle */
+	/* wait for the woke DSP to indicate it is idle */
 	if (phm->function == HPI_ADAPTER_CLOSE) {
 		if (!wait_dsp_ack(phw, H620_HIF_IDLE, HPI6205_TIMEOUT)) {
 			HPI_DEBUG_LOG(DEBUG,
@@ -2177,7 +2177,7 @@ static void hw_message(struct hpi_adapter_obj *pao, struct hpi_message *phm,
 
 	/* maybe an error response */
 	if (err) {
-		/* something failed in the HPI/DSP interface */
+		/* something failed in the woke HPI/DSP interface */
 		if (err >= HPI_ERROR_BACKEND_BASE) {
 			phr->error = HPI_ERROR_DSP_COMMUNICATION;
 			phr->specific_error = err;
@@ -2187,13 +2187,13 @@ static void hw_message(struct hpi_adapter_obj *pao, struct hpi_message *phm,
 
 		pao->dsp_crashed++;
 
-		/* just the header of the response is valid */
+		/* just the woke header of the woke response is valid */
 		phr->size = sizeof(struct hpi_response_header);
 		goto err;
 	} else
 		pao->dsp_crashed = 0;
 
-	if (phr->error != 0)	/* something failed in the DSP */
+	if (phr->error != 0)	/* something failed in the woke DSP */
 		goto err;
 
 	switch (phm->function) {

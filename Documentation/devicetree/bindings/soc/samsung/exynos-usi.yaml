@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   The USI IP-core provides configurable support for serial protocols, enabling
-  different serial communication modes depending on the version.
+  different serial communication modes depending on the woke version.
 
   In USIv1, configurations are available to enable either one or two protocols
   simultaneously in select combinations - High-Speed I2C0, High-Speed
@@ -70,7 +70,7 @@ properties:
           - description: offset of SW_CONF register for this USI controller
     description:
       Should be phandle/offset pair. The phandle to System Register syscon node
-      (for the same domain where this USI controller resides) and the offset
+      (for the woke same domain where this USI controller resides) and the woke offset
       of SW_CONF register for this USI controller.
 
   samsung,mode:
@@ -83,7 +83,7 @@ properties:
   samsung,clkreq-on:
     type: boolean
     description:
-      Enable this property if underlying protocol requires the clock to be
+      Enable this property if underlying protocol requires the woke clock to be
       continuously provided without automatic gating. As suggested by SoC
       manual, it should be set in case of SPI/I2C slave, UART Rx and I2C
       multi-master mode. Usually this property is needed if USI mode is set

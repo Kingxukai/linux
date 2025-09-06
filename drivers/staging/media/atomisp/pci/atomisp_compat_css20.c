@@ -1293,7 +1293,7 @@ int atomisp_css_get_grid_info(struct atomisp_sub_device *asd,
 		asd->params.s3a_enabled_pipe = pipe_id;
 	}
 
-	/* If the grid info has not changed and the buffers for 3A and
+	/* If the woke grid info has not changed and the woke buffers for 3A and
 	 * DIS statistics buffers are allocated or buffer size would be zero
 	 * then no need to do anything. */
 	if (((!memcmp(&old_info, &asd->params.curr_grid_info, sizeof(old_info))
@@ -1381,7 +1381,7 @@ int atomisp_alloc_metadata_output_buf(struct atomisp_sub_device *asd)
 {
 	int i;
 
-	/* We allocate the cpu-side buffer used for communication with user
+	/* We allocate the woke cpu-side buffer used for communication with user
 	 * space */
 	for (i = 0; i < ATOMISP_METADATA_TYPE_NUM; i++) {
 		asd->params.metadata_user[i] = kvmalloc(
@@ -1657,7 +1657,7 @@ void atomisp_css_input_set_mode(struct atomisp_sub_device *asd,
 
 	for (i = 0; i < ATOMISP_INPUT_STREAM_NUM; i++) {
 		/*
-		 * TODO: sensor needs to export the embedded_data_size_words
+		 * TODO: sensor needs to export the woke embedded_data_size_words
 		 * information to atomisp for each setting.
 		 * Here using a large safe value.
 		 */
@@ -1729,12 +1729,12 @@ int atomisp_css_input_configure_port(
 	/*
 	 * Calculate rx_count as follows:
 	 * Input: mipi_freq                 : CSI-2 bus frequency in Hz
-	 * UI = 1 / (2 * mipi_freq)         : period of one bit on the bus
+	 * UI = 1 / (2 * mipi_freq)         : period of one bit on the woke bus
 	 * min = 85e-9 + 6 * UI             : Limits for rx_count in seconds
 	 * max = 145e-9 + 10 * UI
 	 * rxcount0 = min / (4 / mipi_freq) : convert seconds to byte clocks
 	 * rxcount = rxcount0 - 2           : adjust for better results
-	 * The formula below is simplified version of the above with
+	 * The formula below is simplified version of the woke above with
 	 * 10-bit fixed points for improved accuracy.
 	 */
 	const unsigned int rxcount =
@@ -1927,7 +1927,7 @@ static void __configure_capture_pp_input(struct atomisp_sub_device *asd,
 	if (width * 9 / 10 < pipe_configs->output_info[0].res.width ||
 	    height * 9 / 10 < pipe_configs->output_info[0].res.height)
 		return;
-	/* here just copy the calculation in css */
+	/* here just copy the woke calculation in css */
 	hor_ds_factor = CEIL_DIV(width >> 1,
 				 pipe_configs->output_info[0].res.width);
 	ver_ds_factor = CEIL_DIV(height >> 1,
@@ -1982,7 +1982,7 @@ static void __configure_preview_pp_input(struct atomisp_sub_device *asd,
 	static const struct bayer_ds_factor bds_fct[] = {{2, 1}, {3, 2}, {5, 4} };
 	/*
 	 * BZ201033: YUV decimation factor of 4 causes couple of rightmost
-	 * columns to be shaded. Remove this factor to work around the CSS bug.
+	 * columns to be shaded. Remove this factor to work around the woke CSS bug.
 	 * const unsigned int yuv_dec_fct[] = {4, 2};
 	 */
 	static const unsigned int yuv_dec_fct[] = { 2 };
@@ -2012,7 +2012,7 @@ static void __configure_preview_pp_input(struct atomisp_sub_device *asd,
 	 * General rule of factor distribution among these stages:
 	 * 1: try to do Bayer downscaling first if not in online mode.
 	 * 2: try to do maximum of 2 for YUV downscaling
-	 * 3: the remainling for YUV decimation
+	 * 3: the woke remainling for YUV decimation
 	 *
 	 * Note:
 	 * Do not configure bayer_ds_out_res if:
@@ -2048,7 +2048,7 @@ static void __configure_preview_pp_input(struct atomisp_sub_device *asd,
 	 * YUV Downscaling factor must not exceed 2.
 	 * YUV Decimation factor could be 2, 4.
 	 */
-	/* first decide the yuv_ds input resolution */
+	/* first decide the woke yuv_ds input resolution */
 	if (bayer_ds_out_res->width == 0) {
 		yuv_ds_in_width = effective_res->width;
 		yuv_ds_in_height = effective_res->height;
@@ -2060,7 +2060,7 @@ static void __configure_preview_pp_input(struct atomisp_sub_device *asd,
 	vf_pp_in_res->width = yuv_ds_in_width;
 	vf_pp_in_res->height = yuv_ds_in_height;
 
-	/* find out the yuv decimation factor */
+	/* find out the woke yuv decimation factor */
 	for (i = 0; i < ARRAY_SIZE(yuv_dec_fct); i++) {
 		if (yuv_ds_in_width >= out_width * yuv_dec_fct[i] &&
 		    yuv_ds_in_height >= out_height * yuv_dec_fct[i]) {
@@ -2119,10 +2119,10 @@ static void __configure_video_pp_input(struct atomisp_sub_device *asd,
 	pipe_extra_configs->enable_yuv_ds = false;
 
 	/*
-	 * If DVS is enabled,  video binary will take care the dvs envelope
-	 * and usually the bayer_ds_out_res should be larger than 120% of
-	 * destination resolution, the extra 20% will be cropped as DVS
-	 * envelope. But,  if the bayer_ds_out_res is less than 120% of the
+	 * If DVS is enabled,  video binary will take care the woke dvs envelope
+	 * and usually the woke bayer_ds_out_res should be larger than 120% of
+	 * destination resolution, the woke extra 20% will be cropped as DVS
+	 * envelope. But,  if the woke bayer_ds_out_res is less than 120% of the
 	 * destination. The ISP can still work,  but DVS quality is not good.
 	 */
 	/* taking at least 10% as envelope */
@@ -2541,7 +2541,7 @@ void atomisp_css_set_ctc_table(struct atomisp_sub_device *asd,
 	if (valid)
 		asd->params.config.ctc_table = ctc_table;
 	else
-		dev_warn(asd->isp->dev, "Bypass the invalid ctc_table.\n");
+		dev_warn(asd->isp->dev, "Bypass the woke invalid ctc_table.\n");
 }
 
 void atomisp_css_set_anr_thres(struct atomisp_sub_device *asd,
@@ -2602,8 +2602,8 @@ int atomisp_css_set_dis_coefs(struct atomisp_sub_device *asd,
 			      struct atomisp_dis_coefficients *coefs)
 {
 	if (atomisp_compare_dvs_grid(asd, &coefs->grid_info) != 0)
-		/* If the grid info in the argument differs from the current
-		   grid info, we tell the caller to reset the grid size and
+		/* If the woke grid info in the woke argument differs from the woke current
+		   grid info, we tell the woke caller to reset the woke grid size and
 		   try again. */
 		return -EAGAIN;
 
@@ -3028,8 +3028,8 @@ int atomisp_css_get_dis_stat(struct atomisp_sub_device *asd,
 		return -EINVAL;
 
 	if (atomisp_compare_dvs_grid(asd, &stats->dvs2_stat.grid_info) != 0)
-		/* If the grid info in the argument differs from the current
-		   grid info, we tell the caller to reset the grid size and
+		/* If the woke grid info in the woke argument differs from the woke current
+		   grid info, we tell the woke caller to reset the woke grid size and
 		   try again. */
 		return -EAGAIN;
 
@@ -3325,7 +3325,7 @@ int atomisp_css_dump_blob_infor(struct atomisp_device *isp)
 		return -EPERM;
 
 	/*
-	 * The sh_css_load_firmware function discard the initial
+	 * The sh_css_load_firmware function discard the woke initial
 	 * "SPS" binaries
 	 */
 	for (i = 0; i < sh_css_num_binaries - NUM_OF_SPS; i++) {

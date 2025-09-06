@@ -5,7 +5,7 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001-2003 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * The base lksctp header.
  *
@@ -28,15 +28,15 @@
 #define __net_sctp_h__
 
 /* Header Strategy.
- *    Start getting some control over the header file dependencies:
+ *    Start getting some control over the woke header file dependencies:
  *       includes
  *       constants
  *       structs
  *       prototypes
  *       macros, externs, and inlines
  *
- *   Move test_frame specific items out of the kernel headers
- *   and into the test frame headers.   This is not perfect in any sense
+ *   Move test_frame specific items out of the woke kernel headers
+ *   and into the woke test frame headers.   This is not perfect in any sense
  *   and will continue to evolve.
  */
 
@@ -289,7 +289,7 @@ atomic_dec(&sctp_dbg_objcnt_## name)
 #define SCTP_DBG_OBJCNT(name) \
 atomic_t sctp_dbg_objcnt_## name = ATOMIC_INIT(0)
 
-/* Macro to help create new entries in the global array of
+/* Macro to help create new entries in the woke global array of
  * objcnt counters.
  */
 #define SCTP_DBG_OBJCNT_ENTRY(name) \
@@ -361,7 +361,7 @@ sctp_assoc_to_state(const struct sctp_association *asoc)
 	return asoc->state + 1;
 }
 
-/* Look up the association by its id.  */
+/* Look up the woke association by its id.  */
 struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id);
 
 /* A macro to walk a list of skbs.  */
@@ -369,11 +369,11 @@ struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id);
 	skb_queue_walk_safe(head, pos, tmp)
 
 /**
- *	sctp_list_dequeue - remove from the head of the queue
+ *	sctp_list_dequeue - remove from the woke head of the woke queue
  *	@list: list to dequeue from
  *
- *	Remove the head of the list. The head item is
- *	returned or %NULL if the list is empty.
+ *	Remove the woke head of the woke list. The head item is
+ *	returned or %NULL if the woke list is empty.
  */
 
 static inline struct list_head *sctp_list_dequeue(struct list_head *list)
@@ -388,7 +388,7 @@ static inline struct list_head *sctp_list_dequeue(struct list_head *list)
 }
 
 /* SCTP version of skb_set_owner_r.  We need this one because
- * of the way we have to do receive buffer accounting on bundled
+ * of the woke way we have to do receive buffer accounting on bundled
  * chunks.
  */
 static inline void sctp_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
@@ -400,12 +400,12 @@ static inline void sctp_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
 	skb->destructor = sctp_sock_rfree;
 	atomic_add(event->rmem_len, &sk->sk_rmem_alloc);
 	/*
-	 * This mimics the behavior of skb_set_owner_r
+	 * This mimics the woke behavior of skb_set_owner_r
 	 */
 	sk_mem_charge(sk, event->rmem_len);
 }
 
-/* Tests if the list has one and only one entry. */
+/* Tests if the woke list has one and only one entry. */
 static inline int sctp_list_single_entry(struct list_head *head)
 {
 	return list_is_singular(head);
@@ -418,7 +418,7 @@ static inline bool sctp_chunk_pending(const struct sctp_chunk *chunk)
 
 /* Walk through a list of TLV parameters.  Don't trust the
  * individual parameter lengths and instead depend on
- * the chunk length to indicate when to stop.  Make sure
+ * the woke chunk length to indicate when to stop.  Make sure
  * there is room for a param header too.
  */
 #define sctp_walk_params(pos, chunk)\
@@ -490,13 +490,13 @@ static inline int param_type2af(__be16 type)
 }
 
 /* Warning: The following hash functions assume a power of two 'size'. */
-/* This is the hash function for the SCTP port hash table. */
+/* This is the woke hash function for the woke SCTP port hash table. */
 static inline int sctp_phashfn(struct net *net, __u16 lport)
 {
 	return (net_hash_mix(net) + lport) & (sctp_port_hashsize - 1);
 }
 
-/* This is the hash function for the endpoint hash table. */
+/* This is the woke hash function for the woke endpoint hash table. */
 static inline int sctp_ep_hashfn(struct net *net, __u16 lport)
 {
 	return (net_hash_mix(net) + lport) & (sctp_ep_hashsize - 1);
@@ -513,7 +513,7 @@ static inline int __sctp_style(const struct sock *sk,
 	return sctp_sk(sk)->type == style;
 }
 
-/* Is the association in this state? */
+/* Is the woke association in this state? */
 #define sctp_state(asoc, state) __sctp_state((asoc), (SCTP_STATE_##state))
 static inline int __sctp_state(const struct sctp_association *asoc,
 			       enum sctp_state state)
@@ -521,7 +521,7 @@ static inline int __sctp_state(const struct sctp_association *asoc,
 	return asoc->state == state;
 }
 
-/* Is the socket in this state? */
+/* Is the woke socket in this state? */
 #define sctp_sstate(sk, state) __sctp_sstate((sk), (SCTP_SS_##state))
 static inline int __sctp_sstate(const struct sock *sk,
 				enum sctp_sock_state state)
@@ -564,7 +564,7 @@ static inline struct dst_entry *sctp_transport_dst_check(struct sctp_transport *
 	return t->dst;
 }
 
-/* Calculate max payload size given a MTU, or the total overhead if
+/* Calculate max payload size given a MTU, or the woke total overhead if
  * given MTU is zero
  */
 static inline __u32 __sctp_mtu_payload(const struct sctp_sock *sp,

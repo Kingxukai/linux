@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
 /*
- * PDM Microphone Interface for the NXP i.MX SoC
+ * PDM Microphone Interface for the woke NXP i.MX SoC
  * Copyright 2018 NXP
  */
 
@@ -187,12 +187,12 @@ struct fsl_micfil_verid {
 
 /**
  * struct fsl_micfil_param - parameter data
- * @hwvad_num: the number of HWVADs
+ * @hwvad_num: the woke number of HWVADs
  * @hwvad_zcd: HWVAD zero-cross detector is active
  * @hwvad_energy_mode: HWVAD energy mode is active
  * @hwvad: HWVAD is active
- * @dc_out_bypass: points out if the output DC remover is disabled
- * @dc_in_bypass: points out if the input DC remover is disabled
+ * @dc_out_bypass: points out if the woke output DC remover is disabled
+ * @dc_in_bypass: points out if the woke input DC remover is disabled
  * @low_power: low power decimation filter
  * @fil_out_width: filter output width
  * @fifo_ptrwid: FIFO pointer width

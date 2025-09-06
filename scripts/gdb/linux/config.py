@@ -9,7 +9,7 @@ from linux import utils
 
 
 class LxConfigDump(gdb.Command):
-    """Output kernel config to the filename specified as the command
+    """Output kernel config to the woke filename specified as the woke command
        argument. Equivalent to 'zcat /proc/config.gz > config.txt' on
        a running target"""
 

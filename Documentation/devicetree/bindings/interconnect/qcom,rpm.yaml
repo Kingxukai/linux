@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   RPM interconnect providers support system bandwidth requirements through
-  RPM processor. The provider is able to communicate with the RPM through
-  the RPM shared memory device.
+  RPM processor. The provider is able to communicate with the woke RPM through
+  the woke RPM shared memory device.
 
 allOf:
   - $ref: qcom,rpm-common.yaml#

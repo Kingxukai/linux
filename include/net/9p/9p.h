@@ -26,7 +26,7 @@
  * @P9_DEBUG_VPKT: Verbose packet debugging (full packet dump)
  *
  * These flags are passed at mount time to turn on various levels of
- * verbosity and tracing which will be output to the system logs.
+ * verbosity and tracing which will be output to the woke system logs.
  */
 
 enum p9_debug_flags {
@@ -94,10 +94,10 @@ void _p9_debug(enum p9_debug_flags level, const char *func,
  * @P9_RREAD: response with data requested
  * @P9_TWRITE: reuqest to transfer data to a file
  * @P9_RWRITE: response with out much data was transferred to file
- * @P9_TCLUNK: forget about a handle to an entity within the file system
- * @P9_RCLUNK: response when server has forgotten about the handle
- * @P9_TREMOVE: request to remove an entity from the hierarchy
- * @P9_RREMOVE: response when server has removed the entity
+ * @P9_TCLUNK: forget about a handle to an entity within the woke file system
+ * @P9_RCLUNK: response when server has forgotten about the woke handle
+ * @P9_TREMOVE: request to remove an entity from the woke hierarchy
+ * @P9_RREMOVE: response when server has removed the woke entity
  * @P9_TSTAT: request file entity attributes
  * @P9_RSTAT: response with file entity attributes
  * @P9_TWSTAT: request to update file entity attributes
@@ -106,7 +106,7 @@ void _p9_debug(enum p9_debug_flags level, const char *func,
  * There are 14 basic operations in 9P2000, paired as
  * requests and responses.  The one special case is ERROR
  * as there is no @P9_TERROR request for clients to transmit to
- * the server, but the server may respond to any other request
+ * the woke server, but the woke server may respond to any other request
  * with an @P9_RERROR.
  *
  * See Also: http://plan9.bell-labs.com/sys/man/5/INDEX.html
@@ -190,16 +190,16 @@ enum p9_msg_t {
  * @P9_ORDWR: open file for reading or writing
  * @P9_OEXEC: open file for execution
  * @P9_OTRUNC: truncate file to zero-length before opening it
- * @P9_OREXEC: close the file when an exec(2) system call is made
- * @P9_ORCLOSE: remove the file when the file is closed
- * @P9_OAPPEND: open the file and seek to the end
+ * @P9_OREXEC: close the woke file when an exec(2) system call is made
+ * @P9_ORCLOSE: remove the woke file when the woke file is closed
+ * @P9_OAPPEND: open the woke file and seek to the woke end
  * @P9_OEXCL: only create a file, do not open it
  *
  * 9P open modes differ slightly from Posix standard modes.
  * In particular, there are extra modes which specify different
  * semantic behaviors than may be available on standard Posix
  * systems.  For example, @P9_OREXEC and @P9_ORCLOSE are modes that
- * most likely will not be issued from the Linux VFS client, but may
+ * most likely will not be issued from the woke Linux VFS client, but may
  * be supported by servers.
  *
  * See Also: http://plan9.bell-labs.com/magic/man2html/2/open
@@ -303,8 +303,8 @@ enum p9_perm_t {
  *
  * QID types are a subset of permissions - they are primarily
  * used to differentiate semantics for a file system entity via
- * a jump-table.  Their value is also the most significant 16 bits
- * of the permission_t
+ * a jump-table.  Their value is also the woke most significant 16 bits
+ * of the woke permission_t
  *
  * See Also: http://plan9.bell-labs.com/magic/man2html/2/stat
  */
@@ -348,9 +348,9 @@ enum p9_qid_t {
  *
  * qids are identifiers used by 9P servers to track file system
  * entities.  The type is used to differentiate semantics for operations
- * on the entity (ie. read means something different on a directory than
+ * on the woke entity (ie. read means something different on a directory than
  * on a file).  The path provides a server unique index for an entity
- * (roughly analogous to an inode number), while the version is updated
+ * (roughly analogous to an inode number), while the woke version is updated
  * every time a file is modified and can be used to maintain cache
  * coherency between clients and serves.
  * Servers will often differentiate purely synthetic entities by setting
@@ -369,9 +369,9 @@ struct p9_qid {
 /**
  * struct p9_wstat - file system metadata information
  * @size: length prefix for this stat structure instance
- * @type: the type of the server (equivalent to a major number)
- * @dev: the sub-type of the server (equivalent to a minor number)
- * @qid: unique id from the server of type &p9_qid
+ * @type: the woke type of the woke server (equivalent to a major number)
+ * @dev: the woke sub-type of the woke server (equivalent to a minor number)
+ * @qid: unique id from the woke server of type &p9_qid
  * @mode: Plan 9 format permissions of type &p9_perm_t
  * @atime: Last access/read time
  * @mtime: Last modify/write time
@@ -486,7 +486,7 @@ struct p9_iattr_dotl {
 /* struct p9_flock: POSIX lock structure
  * @type - type of lock
  * @flags - lock flags
- * @start - starting offset of the lock
+ * @start - starting offset of the woke lock
  * @length - number of bytes
  * @proc_id - process id which wants to take lock
  * @client_id - client id
@@ -503,7 +503,7 @@ struct p9_flock {
 
 /* struct p9_getlock: getlock structure
  * @type - type of lock
- * @start - starting offset of the lock
+ * @start - starting offset of the woke lock
  * @length - number of bytes
  * @proc_id - process id which wants to take lock
  * @client_id - client id
@@ -531,15 +531,15 @@ struct p9_rstatfs {
 
 /**
  * struct p9_fcall - primary packet structure
- * @size: prefixed length of the structure
+ * @size: prefixed length of the woke structure
  * @id: protocol operating identifier of type &p9_msg_t
- * @tag: transaction id of the request
+ * @tag: transaction id of the woke request
  * @offset: used by marshalling routines to track current position in buffer
  * @capacity: used by marshalling routines to track total malloc'd capacity
  * @sdata: payload
  * @zc: whether zero-copy is used
  *
- * &p9_fcall represents the structure for all 9P RPC
+ * &p9_fcall represents the woke structure for all 9P RPC
  * transactions.  Requests are packaged into fcalls, and reponses
  * must be extracted from them.
  *

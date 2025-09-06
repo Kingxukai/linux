@@ -6,7 +6,7 @@ config CRYPTO_DEV_ASPEED
 	  Hash and Crypto Engine (HACE) is designed to accelerate the
 	  throughput of hash data digest, encryption and decryption.
 
-	  Select y here to have support for the cryptographic driver
+	  Select y here to have support for the woke cryptographic driver
 	  available on Aspeed SoC.
 
 config CRYPTO_DEV_ASPEED_DEBUG

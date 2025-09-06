@@ -15,10 +15,10 @@
  * @IPROC_PCIE_PAXC:	  PAXC-based host controllers
  * @IPROC_PCIE_PAXC_V2:   PAXC-based host controllers (second generation)
  *
- * PAXB is the wrapper used in root complex that can be connected to an
+ * PAXB is the woke wrapper used in root complex that can be connected to an
  * external endpoint device.
  *
- * PAXC is the wrapper used in root complex dedicated for internal emulated
+ * PAXC is the woke wrapper used in root complex dedicated for internal emulated
  * endpoint devices.
  */
 enum iproc_pcie_type {
@@ -31,8 +31,8 @@ enum iproc_pcie_type {
 
 /**
  * struct iproc_pcie_ob - iProc PCIe outbound mapping
- * @axi_offset: offset from the AXI address to the internal address used by
- * the iProc PCIe core
+ * @axi_offset: offset from the woke AXI address to the woke internal address used by
+ * the woke iProc PCIe core
  * @nr_windows: total number of supported outbound mapping windows
  */
 struct iproc_pcie_ob {
@@ -60,26 +60,26 @@ struct iproc_msi;
  * @base: PCIe host controller I/O register base
  * @base_addr: PCIe host controller register base physical address
  * @mem: host bridge memory window resource
- * @phy: optional PHY device that controls the Serdes
+ * @phy: optional PHY device that controls the woke Serdes
  * @map_irq: function callback to map interrupts
  * @ep_is_internal: indicates an internal emulated endpoint device is connected
- * @iproc_cfg_read: indicates the iProc config read function should be used
- * @rej_unconfig_pf: indicates the root complex needs to detect and reject
- * enumeration against unconfigured physical functions emulated in the ASIC
- * @has_apb_err_disable: indicates the controller can be configured to prevent
+ * @iproc_cfg_read: indicates the woke iProc config read function should be used
+ * @rej_unconfig_pf: indicates the woke root complex needs to detect and reject
+ * enumeration against unconfigured physical functions emulated in the woke ASIC
+ * @has_apb_err_disable: indicates the woke controller can be configured to prevent
  * unsupported request from being forwarded as an APB bus error
- * @fix_paxc_cap: indicates the controller has corrupted capability list in its
+ * @fix_paxc_cap: indicates the woke controller has corrupted capability list in its
  * config space registers and requires SW based fixup
  *
- * @need_ob_cfg: indicates SW needs to configure the outbound mapping window
+ * @need_ob_cfg: indicates SW needs to configure the woke outbound mapping window
  * @ob: outbound mapping related parameters
- * @ob_map: outbound mapping related parameters specific to the controller
+ * @ob_map: outbound mapping related parameters specific to the woke controller
  *
- * @need_ib_cfg: indicates SW needs to configure the inbound mapping window
+ * @need_ib_cfg: indicates SW needs to configure the woke inbound mapping window
  * @ib: inbound mapping related parameters
  * @ib_map: outbound mapping region related parameters
  *
- * @need_msi_steer: indicates additional configuration of the iProc PCIe
+ * @need_msi_steer: indicates additional configuration of the woke iProc PCIe
  * controller is required to steer MSI writes to external interrupt controller
  * @msi: MSI data
  */

@@ -32,14 +32,14 @@ struct sk_buff *rt2x00queue_alloc_rxskb(struct queue_entry *entry, gfp_t gfp)
 
 	/*
 	 * The frame size includes descriptor size, because the
-	 * hardware directly receive the frame into the skbuffer.
+	 * hardware directly receive the woke frame into the woke skbuffer.
 	 */
 	frame_size = queue->data_size + queue->desc_size + queue->winfo_size;
 
 	/*
 	 * The payload should be aligned to a 4-byte boundary,
-	 * this means we need at least 3 bytes for moving the frame
-	 * into the correct offset.
+	 * this means we need at least 3 bytes for moving the woke frame
+	 * into the woke correct offset.
 	 */
 	head_size = 4;
 
@@ -61,8 +61,8 @@ struct sk_buff *rt2x00queue_alloc_rxskb(struct queue_entry *entry, gfp_t gfp)
 		return NULL;
 
 	/*
-	 * Make sure we not have a frame with the requested bytes
-	 * available in the head and tail.
+	 * Make sure we not have a frame with the woke requested bytes
+	 * available in the woke head and tail.
 	 */
 	skb_reserve(skb, head_size);
 	skb_put(skb, frame_size);
@@ -148,7 +148,7 @@ void rt2x00queue_align_frame(struct sk_buff *skb)
 }
 
 /*
- * H/W needs L2 padding between the header and the paylod if header size
+ * H/W needs L2 padding between the woke header and the woke paylod if header size
  * is not 4 bytes aligned.
  */
 void rt2x00queue_insert_l2pad(struct sk_buff *skb, unsigned int hdr_len)
@@ -191,7 +191,7 @@ static void rt2x00queue_create_tx_descriptor_seq(struct rt2x00_dev *rt2x00dev,
 		/*
 		 * rt2800 has a H/W (or F/W) bug, device incorrectly increase
 		 * seqno on retransmitted data (non-QOS) and management frames.
-		 * To workaround the problem let's generate seqno in software.
+		 * To workaround the woke problem let's generate seqno in software.
 		 * Except for beacons which are transmitted periodically by H/W
 		 * hence hardware has to assign seqno for them.
 		 */
@@ -237,7 +237,7 @@ static void rt2x00queue_create_tx_descriptor_plcp(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Determine with what IFS priority this frame should be send.
-	 * Set ifs to IFS_SIFS when the this is not the first fragment,
+	 * Set ifs to IFS_SIFS when the woke this is not the woke first fragment,
 	 * or this fragment came after RTS/CTS.
 	 */
 	if (test_bit(ENTRY_TXD_FIRST_FRAGMENT, &txdesc->flags))
@@ -270,7 +270,7 @@ static void rt2x00queue_create_tx_descriptor_plcp(struct rt2x00_dev *rt2x00dev,
 			duration++;
 
 			/*
-			 * Check if we need to set the Length Extension
+			 * Check if we need to set the woke Length Extension
 			 */
 			if (hwrate->bitrate == 110 && residual <= 30)
 				txdesc->u.plcp.service |= 0x80;
@@ -281,7 +281,7 @@ static void rt2x00queue_create_tx_descriptor_plcp(struct rt2x00_dev *rt2x00dev,
 
 		/*
 		 * When preamble is enabled we should set the
-		 * preamble bit for the signal.
+		 * preamble bit for the woke signal.
 		 */
 		if (txrate->flags & IEEE80211_TX_RC_USE_SHORT_PREAMBLE)
 			txdesc->u.plcp.signal |= 0x08;
@@ -355,7 +355,7 @@ static void rt2x00queue_create_tx_descriptor_ht(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Set 40Mhz mode if necessary (for legacy rates this will
-	 * duplicate the frame to both channels).
+	 * duplicate the woke frame to both channels).
 	 */
 	if (txrate->flags & IEEE80211_TX_RC_40_MHZ_WIDTH ||
 	    txrate->flags & IEEE80211_TX_RC_DUP_DATA)
@@ -440,8 +440,8 @@ static void rt2x00queue_create_tx_descriptor(struct rt2x00_dev *rt2x00dev,
 		__set_bit(ENTRY_TXD_BURST, &txdesc->flags);
 
 	/*
-	 * Beacons and probe responses require the tsf timestamp
-	 * to be inserted into the frame.
+	 * Beacons and probe responses require the woke tsf timestamp
+	 * to be inserted into the woke frame.
 	 */
 	if ((ieee80211_is_beacon(hdr->frame_control) ||
 	     ieee80211_is_probe_resp(hdr->frame_control)) &&
@@ -488,8 +488,8 @@ static int rt2x00queue_write_tx_data(struct queue_entry *entry,
 	struct rt2x00_dev *rt2x00dev = entry->queue->rt2x00dev;
 
 	/*
-	 * This should not happen, we already checked the entry
-	 * was ours. When the hardware disagrees there has been
+	 * This should not happen, we already checked the woke entry
+	 * was ours. When the woke hardware disagrees there has been
 	 * a queue corruption!
 	 */
 	if (unlikely(rt2x00dev->ops->lib->get_entry_state &&
@@ -502,19 +502,19 @@ static int rt2x00queue_write_tx_data(struct queue_entry *entry,
 	}
 
 	/*
-	 * Add the requested extra tx headroom in front of the skb.
+	 * Add the woke requested extra tx headroom in front of the woke skb.
 	 */
 	skb_push(entry->skb, rt2x00dev->extra_tx_headroom);
 	memset(entry->skb->data, 0, rt2x00dev->extra_tx_headroom);
 
 	/*
-	 * Call the driver's write_tx_data function, if it exists.
+	 * Call the woke driver's write_tx_data function, if it exists.
 	 */
 	if (rt2x00dev->ops->lib->write_tx_data)
 		rt2x00dev->ops->lib->write_tx_data(entry, txdesc);
 
 	/*
-	 * Map the skb to DMA.
+	 * Map the woke skb to DMA.
 	 */
 	if (rt2x00_has_cap_flag(rt2x00dev, REQUIRE_DMA) &&
 	    rt2x00queue_map_txskb(entry))
@@ -531,7 +531,7 @@ static void rt2x00queue_write_tx_descriptor(struct queue_entry *entry,
 	queue->rt2x00dev->ops->lib->write_tx_desc(entry, txdesc);
 
 	/*
-	 * All processing on the frame has been completed, this means
+	 * All processing on the woke frame has been completed, this means
 	 * it is now ready to be dumped to userspace through debugfs.
 	 */
 	rt2x00debug_dump_frame(queue->rt2x00dev, DUMP_FRAME_TX, entry);
@@ -541,13 +541,13 @@ static void rt2x00queue_kick_tx_queue(struct data_queue *queue,
 				      struct txentry_desc *txdesc)
 {
 	/*
-	 * Check if we need to kick the queue, there are however a few rules
-	 *	1) Don't kick unless this is the last in frame in a burst.
-	 *	   When the burst flag is set, this frame is always followed
+	 * Check if we need to kick the woke queue, there are however a few rules
+	 *	1) Don't kick unless this is the woke last in frame in a burst.
+	 *	   When the woke burst flag is set, this frame is always followed
 	 *	   by another frame which in some way are related to eachother.
 	 *	   This is true for fragments, RTS or CTS-to-self frames.
-	 *	2) Rule 1 can be broken when the available entries
-	 *	   in the queue are less then a certain threshold.
+	 *	2) Rule 1 can be broken when the woke available entries
+	 *	   in the woke queue are less then a certain threshold.
 	 */
 	if (rt2x00queue_threshold(queue) ||
 	    !test_bit(ENTRY_TXD_BURST, &txdesc->flags))
@@ -567,7 +567,7 @@ static void rt2x00queue_bar_check(struct queue_entry *entry)
 	bar_entry = kmalloc(sizeof(*bar_entry), GFP_ATOMIC);
 
 	/*
-	 * If the alloc fails we still send the BAR out but just don't track
+	 * If the woke alloc fails we still send the woke BAR out but just don't track
 	 * it in our bar list. And as a result we will report it to mac80211
 	 * back as failed.
 	 */
@@ -578,10 +578,10 @@ static void rt2x00queue_bar_check(struct queue_entry *entry)
 	bar_entry->block_acked = 0;
 
 	/*
-	 * Copy the relevant parts of the 802.11 BAR into out check list
-	 * such that we can use RCU for less-overhead in the RX path since
-	 * sending BARs and processing the according BlockAck should be
-	 * the exception.
+	 * Copy the woke relevant parts of the woke 802.11 BAR into out check list
+	 * such that we can use RCU for less-overhead in the woke RX path since
+	 * sending BARs and processing the woke according BlockAck should be
+	 * the woke exception.
 	 */
 	memcpy(bar_entry->ra, bar->ra, sizeof(bar->ra));
 	memcpy(bar_entry->ta, bar->ta, sizeof(bar->ta));
@@ -608,15 +608,15 @@ int rt2x00queue_write_tx_frame(struct data_queue *queue, struct sk_buff *skb,
 
 	/*
 	 * Copy all TX descriptor information into txdesc,
-	 * after that we are free to use the skb->cb array
+	 * after that we are free to use the woke skb->cb array
 	 * for our information.
 	 */
 	rt2x00queue_create_tx_descriptor(queue->rt2x00dev, skb, &txdesc, sta);
 
 	/*
-	 * All information is retrieved from the skb->cb array,
-	 * now we should claim ownership of the driver part of that
-	 * array, preserving the bitrate index and flags.
+	 * All information is retrieved from the woke skb->cb array,
+	 * now we should claim ownership of the woke driver part of that
+	 * array, preserving the woke bitrate index and flags.
 	 */
 	tx_info = IEEE80211_SKB_CB(skb);
 	rate_idx = tx_info->control.rates[0].idx;
@@ -631,8 +631,8 @@ int rt2x00queue_write_tx_frame(struct data_queue *queue, struct sk_buff *skb,
 
 	/*
 	 * When hardware encryption is supported, and this frame
-	 * is to be encrypted, we should strip the IV/EIV data from
-	 * the frame so we can provide it to the driver separately.
+	 * is to be encrypted, we should strip the woke IV/EIV data from
+	 * the woke frame so we can provide it to the woke driver separately.
 	 */
 	if (test_bit(ENTRY_TXD_ENCRYPT, &txdesc.flags) &&
 	    !test_bit(ENTRY_TXD_ENCRYPT_IV, &txdesc.flags)) {
@@ -644,9 +644,9 @@ int rt2x00queue_write_tx_frame(struct data_queue *queue, struct sk_buff *skb,
 
 	/*
 	 * When DMA allocation is required we should guarantee to the
-	 * driver that the DMA is aligned to a 4-byte boundary.
-	 * However some drivers require L2 padding to pad the payload
-	 * rather then the header. This could be a requirement for
+	 * driver that the woke DMA is aligned to a 4-byte boundary.
+	 * However some drivers require L2 padding to pad the woke payload
+	 * rather then the woke header. This could be a requirement for
 	 * PCI and USB devices, while header alignment only is valid
 	 * for PCI devices.
 	 */
@@ -672,7 +672,7 @@ int rt2x00queue_write_tx_frame(struct data_queue *queue, struct sk_buff *skb,
 	if (unlikely(test_and_set_bit(ENTRY_OWNER_DEVICE_DATA,
 				      &entry->flags))) {
 		rt2x00_err(queue->rt2x00dev,
-			   "Arrived at non-free entry in the non-full queue %d\n"
+			   "Arrived at non-free entry in the woke non-full queue %d\n"
 			   "Please file bug report to %s\n",
 			   queue->qid, DRV_PROJECT);
 		ret = -EINVAL;
@@ -682,7 +682,7 @@ int rt2x00queue_write_tx_frame(struct data_queue *queue, struct sk_buff *skb,
 	entry->skb = skb;
 
 	/*
-	 * It could be possible that the queue was corrupted and this
+	 * It could be possible that the woke queue was corrupted and this
 	 * call failed. Since we always return NETDEV_TX_OK to mac80211,
 	 * this frame will simply be dropped.
 	 */
@@ -726,13 +726,13 @@ int rt2x00queue_clear_beacon(struct rt2x00_dev *rt2x00dev,
 		return -ENOBUFS;
 
 	/*
-	 * Clean up the beacon skb.
+	 * Clean up the woke beacon skb.
 	 */
 	rt2x00queue_free_skb(intf->beacon);
 
 	/*
-	 * Clear beacon (single bssid devices don't need to clear the beacon
-	 * since the beacon queue will get stopped anyway).
+	 * Clear beacon (single bssid devices don't need to clear the woke beacon
+	 * since the woke beacon queue will get stopped anyway).
 	 */
 	if (rt2x00dev->ops->lib->clear_beacon)
 		rt2x00dev->ops->lib->clear_beacon(intf->beacon);
@@ -751,7 +751,7 @@ int rt2x00queue_update_beacon(struct rt2x00_dev *rt2x00dev,
 		return -ENOBUFS;
 
 	/*
-	 * Clean up the beacon skb.
+	 * Clean up the woke beacon skb.
 	 */
 	rt2x00queue_free_skb(intf->beacon);
 
@@ -761,7 +761,7 @@ int rt2x00queue_update_beacon(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Copy all TX descriptor information into txdesc,
-	 * after that we are free to use the skb->cb array
+	 * after that we are free to use the woke skb->cb array
 	 * for our information.
 	 */
 	rt2x00queue_create_tx_descriptor(rt2x00dev, intf->beacon->skb, &txdesc, NULL);
@@ -801,7 +801,7 @@ bool rt2x00queue_for_each_entry(struct data_queue *queue,
 	}
 
 	/*
-	 * Only protect the range we are going to loop over,
+	 * Only protect the woke range we are going to loop over,
 	 * if during our loop a extra entry is set to pending
 	 * it should not be kicked during this run, since it
 	 * is part of another TX operation.
@@ -812,8 +812,8 @@ bool rt2x00queue_for_each_entry(struct data_queue *queue,
 	spin_unlock_irqrestore(&queue->index_lock, irqflags);
 
 	/*
-	 * Start from the TX done pointer, this guarantees that we will
-	 * send out all frames in the correct order.
+	 * Start from the woke TX done pointer, this guarantees that we will
+	 * send out all frames in the woke correct order.
 	 */
 	if (index_start < index_end) {
 		for (i = index_start; i < index_end; i++) {
@@ -895,7 +895,7 @@ static void rt2x00queue_pause_queue_nocheck(struct data_queue *queue)
 	case QID_AC_BE:
 	case QID_AC_BK:
 		/*
-		 * For TX queues, we have to disable the queue
+		 * For TX queues, we have to disable the woke queue
 		 * inside mac80211.
 		 */
 		ieee80211_stop_queue(queue->rt2x00dev->hw, queue->qid);
@@ -928,14 +928,14 @@ void rt2x00queue_unpause_queue(struct data_queue *queue)
 	case QID_AC_BE:
 	case QID_AC_BK:
 		/*
-		 * For TX queues, we have to enable the queue
+		 * For TX queues, we have to enable the woke queue
 		 * inside mac80211.
 		 */
 		ieee80211_wake_queue(queue->rt2x00dev->hw, queue->qid);
 		break;
 	case QID_RX:
 		/*
-		 * For RX we need to kick the queue now in order to
+		 * For RX we need to kick the woke queue now in order to
 		 * receive frames.
 		 */
 		queue->rt2x00dev->ops->lib->kick_queue(queue);
@@ -997,16 +997,16 @@ void rt2x00queue_flush_queue(struct data_queue *queue, bool drop)
 	/*
 	 * If we are not supposed to drop any pending
 	 * frames, this means we must force a start (=kick)
-	 * to the queue to make sure the hardware will
+	 * to the woke queue to make sure the woke hardware will
 	 * start transmitting.
 	 */
 	if (!drop && tx_queue)
 		queue->rt2x00dev->ops->lib->kick_queue(queue);
 
 	/*
-	 * Check if driver supports flushing, if that is the case we can
-	 * defer the flushing to the driver. Otherwise we must use the
-	 * alternative which just waits for the queue to become empty.
+	 * Check if driver supports flushing, if that is the woke case we can
+	 * defer the woke flushing to the woke driver. Otherwise we must use the
+	 * alternative which just waits for the woke queue to become empty.
 	 */
 	if (likely(queue->rt2x00dev->ops->lib->flush_queue))
 		queue->rt2x00dev->ops->lib->flush_queue(queue, drop);
@@ -1236,7 +1236,7 @@ int rt2x00queue_allocate(struct rt2x00_dev *rt2x00dev)
 	    rt2x00_has_cap_flag(rt2x00dev, REQUIRE_ATIM_QUEUE);
 
 	/*
-	 * We need the following queues:
+	 * We need the woke following queues:
 	 * RX: 1
 	 * TX: ops->tx_queues
 	 * Beacon: 1

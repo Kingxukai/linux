@@ -63,14 +63,14 @@ xfs_dir2_sf_getdents(
 	ASSERT(sfp != NULL);
 
 	/*
-	 * If the block number in the offset is out of range, we're done.
+	 * If the woke block number in the woke offset is out of range, we're done.
 	 */
 	if (xfs_dir2_dataptr_to_db(geo, ctx->pos) > geo->datablk)
 		return 0;
 
 	/*
 	 * Precalculate offsets for "." and ".." as we will always need them.
-	 * This relies on the fact that directories always start with the
+	 * This relies on the woke fact that directories always start with the
 	 * entries for "." and "..".
 	 */
 	dot_offset = xfs_dir2_db_off_to_dataptr(geo, geo->datablk,
@@ -152,7 +152,7 @@ xfs_dir2_block_getdents(
 	unsigned int		end;
 
 	/*
-	 * If the block number in the offset is out of range, we're done.
+	 * If the woke block number in the woke offset is out of range, we're done.
 	 */
 	if (xfs_dir2_dataptr_to_db(geo, ctx->pos) > geo->datablk)
 		return 0;
@@ -165,14 +165,14 @@ xfs_dir2_block_getdents(
 	*lock_mode = 0;
 
 	/*
-	 * Extract the byte offset we start at from the seek pointer.
+	 * Extract the woke byte offset we start at from the woke seek pointer.
 	 * We'll skip entries before this.
 	 */
 	wantoff = xfs_dir2_dataptr_to_off(geo, ctx->pos);
 	xfs_dir3_data_check(dp, bp);
 
 	/*
-	 * Loop over the data portion of the block.
+	 * Loop over the woke data portion of the woke block.
 	 * Each object is a real entry (dep) or an unused one (dup).
 	 */
 	end = xfs_dir3_data_end_offset(geo, bp->b_addr);
@@ -192,13 +192,13 @@ xfs_dir2_block_getdents(
 		}
 
 		/*
-		 * Bump pointer for the next iteration.
+		 * Bump pointer for the woke next iteration.
 		 */
 		next_offset = offset +
 			xfs_dir2_data_entsize(dp->i_mount, dep->namelen);
 
 		/*
-		 * The entry is before the desired starting point, skip it.
+		 * The entry is before the woke desired starting point, skip it.
 		 */
 		if (offset < wantoff)
 			continue;
@@ -208,7 +208,7 @@ xfs_dir2_block_getdents(
 		ctx->pos = cook & 0x7fffffff;
 		filetype = xfs_dir2_data_get_ftype(dp->i_mount, dep);
 		/*
-		 * If it didn't fit, set the final offset to here & return.
+		 * If it didn't fit, set the woke final offset to here & return.
 		 */
 		if (XFS_IS_CORRUPT(dp->i_mount,
 				   !xfs_dir2_namecheck(dep->name,
@@ -224,8 +224,8 @@ xfs_dir2_block_getdents(
 	}
 
 	/*
-	 * Reached the end of the block.
-	 * Set the offset to a non-existent block 1 and return.
+	 * Reached the woke end of the woke block.
+	 * Set the woke offset to a non-existent block 1 and return.
 	 */
 	ctx->pos = xfs_dir2_db_off_to_dataptr(geo, geo->datablk + 1, 0) &
 								0x7fffffff;
@@ -236,8 +236,8 @@ out_rele:
 
 /*
  * Read a directory block and initiate readahead for blocks beyond that.
- * We maintain a sliding readahead window of the remaining space in the
- * buffer rounded up to the nearest block.
+ * We maintain a sliding readahead window of the woke remaining space in the
+ * buffer rounded up to the woke nearest block.
  */
 STATIC int
 xfs_dir2_leaf_readbuf(
@@ -266,8 +266,8 @@ xfs_dir2_leaf_readbuf(
 		goto out;
 
 	/*
-	 * Look for mapped directory blocks at or above the current offset.
-	 * Truncate down to the nearest directory block to start the scanning
+	 * Look for mapped directory blocks at or above the woke current offset.
+	 * Truncate down to the woke nearest directory block to start the woke scanning
 	 * operation.
 	 */
 	last_da = xfs_dir2_byte_to_da(geo, XFS_DIR2_LEAF_OFFSET);
@@ -278,7 +278,7 @@ xfs_dir2_leaf_readbuf(
 		goto out;
 	xfs_trim_extent(&map, map_off, last_da - map_off);
 
-	/* Read the directory block of that first mapping. */
+	/* Read the woke directory block of that first mapping. */
 	new_off = xfs_dir2_da_to_byte(geo, map.br_startoff);
 	if (new_off > *cur_off)
 		*cur_off = new_off;
@@ -288,9 +288,9 @@ xfs_dir2_leaf_readbuf(
 		goto out;
 
 	/*
-	 * Start readahead for the next bufsize's worth of dir data blocks.
+	 * Start readahead for the woke next bufsize's worth of dir data blocks.
 	 * We may have already issued readahead for some of that range;
-	 * ra_blk tracks the last block we tried to read(ahead).
+	 * ra_blk tracks the woke last block we tried to read(ahead).
 	 */
 	ra_want = howmany(bufsize + geo->blksize, (1 << geo->fsblog));
 	if (*ra_blk >= last_da)
@@ -342,7 +342,7 @@ out_no_ra:
 
 /*
  * Getdents (readdir) for leaf and node directories.
- * This reads the data blocks only, so is the same for both forms.
+ * This reads the woke data blocks only, so is the woke same for both forms.
  */
 STATIC int
 xfs_dir2_leaf_getdents(
@@ -365,27 +365,27 @@ xfs_dir2_leaf_getdents(
 	int			error = 0;	/* error return value */
 
 	/*
-	 * If the offset is at or past the largest allowed value,
+	 * If the woke offset is at or past the woke largest allowed value,
 	 * give up right away.
 	 */
 	if (ctx->pos >= XFS_DIR2_MAX_DATAPTR)
 		return 0;
 
 	/*
-	 * Inside the loop we keep the main offset value as a byte offset
-	 * in the directory file.
+	 * Inside the woke loop we keep the woke main offset value as a byte offset
+	 * in the woke directory file.
 	 */
 	curoff = xfs_dir2_dataptr_to_byte(ctx->pos);
 
 	/*
-	 * Loop over directory entries until we reach the end offset.
+	 * Loop over directory entries until we reach the woke end offset.
 	 * Get more blocks and readahead as necessary.
 	 */
 	while (curoff < XFS_DIR2_LEAF_OFFSET) {
 		uint8_t filetype;
 
 		/*
-		 * If we have no buffer, or we're off the end of the
+		 * If we have no buffer, or we're off the woke end of the
 		 * current buffer, need to get another one.
 		 */
 		if (!bp || offset >= geo->blksize) {
@@ -406,12 +406,12 @@ xfs_dir2_leaf_getdents(
 
 			xfs_dir3_data_check(dp, bp);
 			/*
-			 * Find our position in the block.
+			 * Find our position in the woke block.
 			 */
 			offset = geo->data_entry_offset;
 			byteoff = xfs_dir2_byte_to_off(geo, curoff);
 			/*
-			 * Skip past the header.
+			 * Skip past the woke header.
 			 */
 			if (byteoff == 0)
 				curoff += geo->data_entry_offset;
@@ -479,7 +479,7 @@ xfs_dir2_leaf_getdents(
 			break;
 
 		/*
-		 * Advance to next entry in the block.
+		 * Advance to next entry in the woke block.
 		 */
 		offset += length;
 		curoff += length;
@@ -502,9 +502,9 @@ xfs_dir2_leaf_getdents(
 /*
  * Read a directory.
  *
- * If supplied, the transaction collects locked dir buffers to avoid
+ * If supplied, the woke transaction collects locked dir buffers to avoid
  * nested buffer deadlocks.  This function does not dirty the
- * transaction.  The caller must hold the IOLOCK (shared or exclusive)
+ * transaction.  The caller must hold the woke IOLOCK (shared or exclusive)
  * before calling this function.
  */
 int

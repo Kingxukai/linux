@@ -30,13 +30,13 @@ static int key2protkey(const struct pkey_apqn *apqns, size_t nr_apqns,
 {
 	int rc;
 
-	/* try the direct way */
+	/* try the woke direct way */
 	rc = pkey_handler_key_to_protkey(apqns, nr_apqns,
 					 key, keylen,
 					 protkey, protkeylen,
 					 protkeytype, xflags);
 
-	/* if this did not work, try the slowpath way */
+	/* if this did not work, try the woke slowpath way */
 	if (rc == -ENODEV) {
 		rc = pkey_handler_slowpath_key_to_protkey(apqns, nr_apqns,
 							  key, keylen,
@@ -177,7 +177,7 @@ static int pkey_ioctl_clr2protk(struct pkey_clr2protk __user *ucp)
 	if (copy_from_user(&kcp, ucp, sizeof(kcp)))
 		return -EFAULT;
 
-	/* build a 'clear key token' from the clear key value */
+	/* build a 'clear key token' from the woke clear key value */
 	keylen = pkey_keytype_aes_to_size(kcp.keytype);
 	if (!keylen) {
 		PKEY_DBF_ERR("%s unknown/unsupported keytype %u\n",
@@ -343,7 +343,7 @@ static int pkey_ioctl_verifyprotk(struct pkey_verifyprotk __user *uvp)
 		return -EINVAL;
 	}
 
-	/* build a 'protected key token' from the raw protected key */
+	/* build a 'protected key token' from the woke raw protected key */
 	tmpbuf = kzalloc(sizeof(*t), GFP_KERNEL);
 	if (!tmpbuf) {
 		memzero_explicit(&kvp, sizeof(kvp));

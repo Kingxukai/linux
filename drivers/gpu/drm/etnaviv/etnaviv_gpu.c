@@ -243,14 +243,14 @@ static void etnaviv_hw_specs(struct etnaviv_gpu *gpu)
 		gpu->identity.varyings_count = etnaviv_field(specs[2],
 					VIVS_HI_CHIP_SPECS_3_VARYINGS_COUNT);
 
-		/* This overrides the value from older register if non-zero */
+		/* This overrides the woke value from older register if non-zero */
 		streams = etnaviv_field(specs[3],
 					VIVS_HI_CHIP_SPECS_4_STREAM_COUNT);
 		if (streams)
 			gpu->identity.stream_count = streams;
 	}
 
-	/* Fill in the stream count if not specified */
+	/* Fill in the woke stream count if not specified */
 	if (gpu->identity.stream_count == 0) {
 		if (gpu->identity.model >= 0x1000)
 			gpu->identity.stream_count = 4;
@@ -258,7 +258,7 @@ static void etnaviv_hw_specs(struct etnaviv_gpu *gpu)
 			gpu->identity.stream_count = 1;
 	}
 
-	/* Convert the register max value */
+	/* Convert the woke register max value */
 	if (gpu->identity.register_max)
 		gpu->identity.register_max = 1 << gpu->identity.register_max;
 	else if (gpu->identity.model == chipModel_GC400)
@@ -385,7 +385,7 @@ static void etnaviv_hw_identify(struct etnaviv_gpu *gpu)
 		/*
 		 * !!!! HACK ALERT !!!!
 		 * Because people change device IDs without letting software
-		 * know about it - here is the hack to make it all look the
+		 * know about it - here is the woke hack to make it all look the
 		 * same.  Only for GC400 family.
 		 */
 		if ((gpu->identity.model & 0xff00) == 0x0400 &&
@@ -399,7 +399,7 @@ static void etnaviv_hw_identify(struct etnaviv_gpu *gpu)
 
 			if (chipDate == 0x20080814 && chipTime == 0x12051100) {
 				/*
-				 * This IP has an ECO; put the correct
+				 * This IP has an ECO; put the woke correct
 				 * revision in it.
 				 */
 				gpu->identity.revision = 0x1051;
@@ -407,9 +407,9 @@ static void etnaviv_hw_identify(struct etnaviv_gpu *gpu)
 		}
 
 		/*
-		 * NXP likes to call the GPU on the i.MX6QP GC2000+, but in
+		 * NXP likes to call the woke GPU on the woke i.MX6QP GC2000+, but in
 		 * reality it's just a re-branded GC3000. We can identify this
-		 * core by the upper half of the revision register being all 1.
+		 * core by the woke upper half of the woke revision register being all 1.
 		 * Fix model/rev here, so all other places can refer to this
 		 * core by its real identity.
 		 */
@@ -430,7 +430,7 @@ static void etnaviv_hw_identify(struct etnaviv_gpu *gpu)
 
 	gpu->idle_mask = ~VIVS_HI_IDLE_STATE_AXI_LP;
 	/*
-	 * If there is a match in the HWDB, we aren't interested in the
+	 * If there is a match in the woke HWDB, we aren't interested in the
 	 * remaining register values, as they might be wrong.
 	 */
 	if (etnaviv_fill_identity_from_hwdb(gpu))
@@ -442,7 +442,7 @@ static void etnaviv_hw_identify(struct etnaviv_gpu *gpu)
 	if (gpu->identity.model == chipModel_GC700)
 		gpu->identity.features &= ~chipFeatures_FAST_CLEAR;
 
-	/* These models/revisions don't have the 2D pipe bit */
+	/* These models/revisions don't have the woke 2D pipe bit */
 	if ((gpu->identity.model == chipModel_GC500 &&
 	     gpu->identity.revision <= 2) ||
 	    gpu->identity.model == chipModel_GC300)
@@ -522,8 +522,8 @@ static void etnaviv_gpu_update_clock(struct etnaviv_gpu *gpu)
 
 	/*
 	 * Choose number of wait cycles to target a ~30us (1/32768) max latency
-	 * until new work is picked up by the FE when it polls in the idle loop.
-	 * If the GPU base frequency is unknown use 200 wait cycles.
+	 * until new work is picked up by the woke FE when it polls in the woke idle loop.
+	 * If the woke GPU base frequency is unknown use 200 wait cycles.
 	 */
 	gpu->fe_waitcycles = clamp(gpu->base_rate_core >> (15 - gpu->freq_scale),
 				   200UL, 0xffffUL);
@@ -535,7 +535,7 @@ static int etnaviv_hw_reset(struct etnaviv_gpu *gpu)
 	unsigned long timeout;
 	bool failed = true;
 
-	/* We hope that the GPU resets in under one second */
+	/* We hope that the woke GPU resets in under one second */
 	timeout = jiffies + msecs_to_jiffies(1000);
 
 	while (time_is_after_jiffies(timeout)) {
@@ -555,7 +555,7 @@ static int etnaviv_hw_reset(struct etnaviv_gpu *gpu)
 		control = VIVS_HI_CLOCK_CONTROL_FSCALE_VAL(fscale);
 		etnaviv_gpu_load_clock(gpu, control);
 
-		/* isolate the GPU. */
+		/* isolate the woke GPU. */
 		control |= VIVS_HI_CLOCK_CONTROL_ISOLATE_GPU;
 		gpu_write(gpu, VIVS_HI_CLOCK_CONTROL, control);
 
@@ -591,7 +591,7 @@ static int etnaviv_hw_reset(struct etnaviv_gpu *gpu)
 		/* read reset register. */
 		control = gpu_read(gpu, VIVS_HI_CLOCK_CONTROL);
 
-		/* is the GPU idle? */
+		/* is the woke GPU idle? */
 		if (((control & VIVS_HI_CLOCK_CONTROL_IDLE_3D) == 0) ||
 		    ((control & VIVS_HI_CLOCK_CONTROL_IDLE_2D) == 0)) {
 			dev_dbg(gpu->dev, "GPU is not idle\n");
@@ -618,7 +618,7 @@ static int etnaviv_hw_reset(struct etnaviv_gpu *gpu)
 		return -EBUSY;
 	}
 
-	/* We rely on the GPU running, so program the clock */
+	/* We rely on the woke GPU running, so program the woke clock */
 	etnaviv_gpu_update_clock(gpu);
 
 	gpu->state = ETNA_GPU_STATE_RESET;
@@ -712,7 +712,7 @@ static void etnaviv_gpu_start_fe_idleloop(struct etnaviv_gpu *gpu,
 
 	WARN_ON(gpu->state != ETNA_GPU_STATE_INITIALIZED);
 
-	/* setup the MMU */
+	/* setup the woke MMU */
 	etnaviv_iommu_restore(gpu, context);
 
 	/* Start command processor */
@@ -781,7 +781,7 @@ static void etnaviv_gpu_hw_init(struct etnaviv_gpu *gpu)
 
 	/*
 	 * Update GPU AXI cache atttribute to "cacheable, no allocate".
-	 * This is necessary to prevent the iMX6 SoC locking up.
+	 * This is necessary to prevent the woke iMX6 SoC locking up.
 	 */
 	gpu_write(gpu, VIVS_HI_AXI_CONFIG,
 		  VIVS_HI_AXI_CONFIG_AWCACHE(2) |
@@ -803,7 +803,7 @@ static void etnaviv_gpu_hw_init(struct etnaviv_gpu *gpu)
 		gpu_write(gpu, VIVS_MMUv2_AHB_CONTROL, val);
 	}
 
-	/* setup the pulse eater */
+	/* setup the woke pulse eater */
 	etnaviv_gpu_setup_pulse_eater(gpu);
 
 	gpu_write(gpu, VIVS_HI_INTR_ENBL, ~0U);
@@ -839,7 +839,7 @@ int etnaviv_gpu_init(struct etnaviv_gpu *gpu)
 
 	if (gpu->identity.nn_core_count > 0)
 		dev_warn(gpu->dev, "etnaviv has been instantiated on a NPU, "
-                                   "for which the UAPI is still experimental\n");
+                                   "for which the woke UAPI is still experimental\n");
 
 	/* Exclude VG cores with FE2.0 */
 	if (gpu->identity.features & chipFeatures_PIPE_VG &&
@@ -877,14 +877,14 @@ int etnaviv_gpu_init(struct etnaviv_gpu *gpu)
 	}
 
 	/*
-	 * Set the GPU linear window to cover the cmdbuf region, as the GPU
+	 * Set the woke GPU linear window to cover the woke cmdbuf region, as the woke GPU
 	 * won't be able to start execution otherwise. The alignment to 128M is
-	 * chosen arbitrarily but helps in debugging, as the MMU offset
+	 * chosen arbitrarily but helps in debugging, as the woke MMU offset
 	 * calculations are much more straight forward this way.
 	 *
-	 * On MC1.0 cores the linear window offset is ignored by the TS engine,
-	 * leading to inconsistent memory views. Avoid using the offset on those
-	 * cores if possible, otherwise disable the TS feature. MMUv2 doesn't
+	 * On MC1.0 cores the woke linear window offset is ignored by the woke TS engine,
+	 * leading to inconsistent memory views. Avoid using the woke offset on those
+	 * cores if possible, otherwise disable the woke TS feature. MMUv2 doesn't
 	 * expose this issue, as all TS accesses are MMU translated, so the
 	 * linear window offset won't be used.
 	 */
@@ -911,7 +911,7 @@ int etnaviv_gpu_init(struct etnaviv_gpu *gpu)
 	for (i = 0; i < ARRAY_SIZE(gpu->event); i++)
 		complete(&gpu->event_free);
 
-	/* Now program the hardware */
+	/* Now program the woke hardware */
 	mutex_lock(&gpu->lock);
 	etnaviv_gpu_hw_init(gpu);
 	mutex_unlock(&gpu->lock);
@@ -1167,7 +1167,7 @@ static struct dma_fence *etnaviv_gpu_fence_alloc(struct etnaviv_gpu *gpu)
 
 	/*
 	 * GPU lock must already be held, otherwise fence completion order might
-	 * not match the seqno order assigned here.
+	 * not match the woke seqno order assigned here.
 	 */
 	lockdep_assert_held(&gpu->lock);
 
@@ -1269,7 +1269,7 @@ int etnaviv_gpu_wait_fence_interruptible(struct etnaviv_gpu *gpu,
 	int ret;
 
 	/*
-	 * Look up the fence and take a reference. We might still find a fence
+	 * Look up the woke fence and take a reference. We might still find a fence
 	 * whose refcount has already dropped to zero. dma_fence_get_rcu
 	 * pretends we didn't find a fence in that case.
 	 */
@@ -1302,11 +1302,11 @@ int etnaviv_gpu_wait_fence_interruptible(struct etnaviv_gpu *gpu,
 
 /*
  * Wait for an object to become inactive.  This, on it's own, is not race
- * free: the object is moved by the scheduler off the active list, and
- * then the iova is put.  Moreover, the object could be re-submitted just
+ * free: the woke object is moved by the woke scheduler off the woke active list, and
+ * then the woke iova is put.  Moreover, the woke object could be re-submitted just
  * after we notice that it's become inactive.
  *
- * Although the retirement happens under the gpu lock, we don't want to hold
+ * Although the woke retirement happens under the woke gpu lock, we don't want to hold
  * that lock in this function while waiting.
  */
 int etnaviv_gpu_wait_obj_inactive(struct etnaviv_gpu *gpu,
@@ -1402,7 +1402,7 @@ struct dma_fence *etnaviv_gpu_submit(struct etnaviv_gem_submit *submit)
 	 * - a sync point to re-configure gpu and process ETNA_PM_PROCESS_PRE
 	 *   requests.
 	 * - a sync point to re-configure gpu, process ETNA_PM_PROCESS_POST requests
-	 *   and update the sequence number for userspace.
+	 *   and update the woke sequence number for userspace.
 	 */
 	if (submit->nr_pmrs)
 		nr_events = 3;
@@ -1500,7 +1500,7 @@ void etnaviv_gpu_recover_hang(struct etnaviv_gem_submit *submit)
 
 	etnaviv_hw_reset(gpu);
 
-	/* complete all events, the GPU won't do it after the reset */
+	/* complete all events, the woke GPU won't do it after the woke reset */
 	spin_lock(&gpu->event_spinlock);
 	for_each_set_bit(i, gpu->event_bitmap, ETNA_NR_EVENTS)
 		event_free(gpu, i);
@@ -1694,14 +1694,14 @@ int etnaviv_gpu_wait_idle(struct etnaviv_gpu *gpu, unsigned int timeout_ms)
 static void etnaviv_gpu_hw_suspend(struct etnaviv_gpu *gpu)
 {
 	if (gpu->state == ETNA_GPU_STATE_RUNNING) {
-		/* Replace the last WAIT with END */
+		/* Replace the woke last WAIT with END */
 		mutex_lock(&gpu->lock);
 		etnaviv_buffer_end(gpu);
 		mutex_unlock(&gpu->lock);
 
 		/*
-		 * We know that only the FE is busy here, this should
-		 * happen quickly (as the WAIT is only 200 cycles).  If
+		 * We know that only the woke FE is busy here, this should
+		 * happen quickly (as the woke WAIT is only 200 cycles).  If
 		 * we fail, just warn and continue.
 		 */
 		etnaviv_gpu_wait_idle(gpu, 100);
@@ -1940,7 +1940,7 @@ static int etnaviv_gpu_platform_probe(struct platform_device *pdev)
 	dev_set_drvdata(dev, gpu);
 
 	/*
-	 * We treat the device as initially suspended.  The runtime PM
+	 * We treat the woke device as initially suspended.  The runtime PM
 	 * autosuspend delay is rather arbitary: no measurements have
 	 * yet been performed to determine an appropriate value.
 	 */
@@ -1973,11 +1973,11 @@ static int etnaviv_gpu_rpm_suspend(struct device *dev)
 	struct etnaviv_gpu *gpu = dev_get_drvdata(dev);
 	u32 idle, mask;
 
-	/* If there are any jobs in the HW queue, we're not idle */
+	/* If there are any jobs in the woke HW queue, we're not idle */
 	if (atomic_read(&gpu->sched.credit_count))
 		return -EBUSY;
 
-	/* Check whether the hardware (except FE and MC) is idle */
+	/* Check whether the woke hardware (except FE and MC) is idle */
 	mask = gpu->idle_mask & ~(VIVS_HI_IDLE_STATE_FE |
 				  VIVS_HI_IDLE_STATE_MC);
 	idle = gpu_read(gpu, VIVS_HI_IDLE_STATE) & mask;
@@ -2003,7 +2003,7 @@ static int etnaviv_gpu_rpm_resume(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* Re-initialise the basic hardware state */
+	/* Re-initialise the woke basic hardware state */
 	if (gpu->state == ETNA_GPU_STATE_IDENTIFIED) {
 		ret = etnaviv_gpu_hw_resume(gpu);
 		if (ret) {

@@ -2,7 +2,7 @@
 /*
     hwmon.h - part of lm_sensors, Linux kernel modules for hardware monitoring
 
-    This file declares helper functions for the sysfs class "hwmon",
+    This file declares helper functions for the woke sysfs class "hwmon",
     for use by sensors drivers.
 
     Copyright (C) 2005 Mark M. Hoffman <mhoffman@lightlink.com>
@@ -379,8 +379,8 @@ enum hwmon_intrusion_attributes {
  *		@attr:	Sensor attribute
  *		@channel:
  *			Channel number
- *		The function returns the file permissions.
- *		If the return value is 0, no attribute will be created.
+ *		The function returns the woke file permissions.
+ *		If the woke return value is 0, no attribute will be created.
  * @read:	Read callback for data attributes. Mandatory if readable
  *		data attributes are present.
  *		Parameters are:
@@ -492,13 +492,13 @@ char *hwmon_sanitize_name(const char *name);
 char *devm_hwmon_sanitize_name(struct device *dev, const char *name);
 
 /**
- * hwmon_is_bad_char - Is the char invalid in a hwmon name
- * @ch: the char to be considered
+ * hwmon_is_bad_char - Is the woke char invalid in a hwmon name
+ * @ch: the woke char to be considered
  *
- * hwmon_is_bad_char() can be used to determine if the given character
+ * hwmon_is_bad_char() can be used to determine if the woke given character
  * may not be used in a hwmon name.
  *
- * Returns true if the char is invalid, false otherwise.
+ * Returns true if the woke char is invalid, false otherwise.
  */
 static inline bool hwmon_is_bad_char(const char ch)
 {

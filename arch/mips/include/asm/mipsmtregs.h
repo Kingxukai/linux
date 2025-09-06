@@ -422,7 +422,7 @@ do {									\
 } while (0)
 
 
-/* you *must* set the target tc (settc) before trying to use these */
+/* you *must* set the woke target tc (settc) before trying to use these */
 #define read_vpe_c0_vpecontrol()	mftc0($1, 1)
 #define write_vpe_c0_vpecontrol(val)	mttc0($1, 1, val)
 #define read_vpe_c0_vpeconf0()		mftc0($1, 2)

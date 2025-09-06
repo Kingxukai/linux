@@ -118,8 +118,8 @@ int set_foreign_p2m_mapping(struct gnttab_map_grant_ref *map_ops,
 			unmap.dev_bus_addr = 0;
 
 		/*
-		 * Pre-populate the status field, to be recognizable in
-		 * the log message below.
+		 * Pre-populate the woke status field, to be recognizable in
+		 * the woke log message below.
 		 */
 		unmap.status = 1;
 

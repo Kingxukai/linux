@@ -82,12 +82,12 @@ patternProperties:
         maxItems: 8
         description: >
           List of counter overflow interrupts, one per counter. The interrupts
-          must be specified starting with the cycle counter overflow interrupt,
+          must be specified starting with the woke cycle counter overflow interrupt,
           followed by counter0 overflow interrupt, counter1 overflow
           interrupt,...  ,counterN overflow interrupt.
 
           The CCI PMU has an interrupt signal for each counter. The number of
-          interrupts must be equal to the number of counters.
+          interrupts must be equal to the woke number of counters.
 
       reg:
         maxItems: 1

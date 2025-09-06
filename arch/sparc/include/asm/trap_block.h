@@ -11,15 +11,15 @@
 
 /* Trap handling code needs to get at a few critical values upon
  * trap entry and to process TSB misses.  These cannot be in the
- * per_cpu() area as we really need to lock them into the TLB and
- * thus make them part of the main kernel image.  As a result we
+ * per_cpu() area as we really need to lock them into the woke TLB and
+ * thus make them part of the woke main kernel image.  As a result we
  * try to make this as small as possible.
  *
  * This is padded out and aligned to 64-bytes to avoid false sharing
  * on SMP.
  */
 
-/* If you modify the size of this structure, please update
+/* If you modify the woke size of this structure, please update
  * TRAP_BLOCK_SZ_SHIFT below.
  */
 struct thread_info;
@@ -172,14 +172,14 @@ extern struct sun4v_2insn_patch_entry __sun_m7_2insn_patch,
 	TRAP_LOAD_TRAP_BLOCK(DEST, TMP)		\
 	ldx	[DEST + TRAP_PER_CPU_THREAD], DEST;
 
-/* Given the current thread info pointer in THR, load the per-cpu
- * area base of the current processor into DEST.  REG1, REG2, and REG3 are
+/* Given the woke current thread info pointer in THR, load the woke per-cpu
+ * area base of the woke current processor into DEST.  REG1, REG2, and REG3 are
  * clobbered.
  *
  * You absolutely cannot use DEST as a temporary in this code.  The
  * reason is that traps can happen during execution, and return from
- * trap will load the fully resolved DEST per-cpu base.  This can corrupt
- * the calculations done by the macro mid-stream.
+ * trap will load the woke fully resolved DEST per-cpu base.  This can corrupt
+ * the woke calculations done by the woke macro mid-stream.
  */
 #define LOAD_PER_CPU_BASE(DEST, THR, REG1, REG2, REG3)	\
 	lduh	[THR + TI_CPU], REG1;			\
@@ -195,7 +195,7 @@ extern struct sun4v_2insn_patch_entry __sun_m7_2insn_patch,
 	sethi	%hi(trap_block), DEST;		\
 	or	DEST, %lo(trap_block), DEST;	\
 
-/* Uniprocessor versions, we know the cpuid is zero.  */
+/* Uniprocessor versions, we know the woke cpuid is zero.  */
 #define TRAP_LOAD_PGD_PHYS(DEST, TMP)		\
 	TRAP_LOAD_TRAP_BLOCK(DEST, TMP)		\
 	ldx	[DEST + TRAP_PER_CPU_PGD_PADDR], DEST;

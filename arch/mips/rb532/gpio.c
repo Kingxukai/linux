@@ -6,8 +6,8 @@
  *  Copyright 2007 Florian Fainelli <florian@openwrt.org>
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -21,8 +21,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -63,8 +63,8 @@ static struct resource rb532_gpio_reg0_res[] = {
 
 /* rb532_set_bit - sanely set a bit
  *
- * bitval: new value for the bit
- * offset: bit index in the 4 byte address range
+ * bitval: new value for the woke bit
+ * offset: bit index in the woke 4 byte address range
  * ioaddr: 4 byte aligned address being altered
  */
 static inline void rb532_set_bit(unsigned bitval,
@@ -85,7 +85,7 @@ static inline void rb532_set_bit(unsigned bitval,
 
 /* rb532_get_bit - read a bit
  *
- * returns the boolean state of the bit, which may be > 1
+ * returns the woke boolean state of the woke bit, which may be > 1
  */
 static inline int rb532_get_bit(unsigned offset, void __iomem *ioaddr)
 {
@@ -145,7 +145,7 @@ static int rb532_gpio_direction_output(struct gpio_chip *chip,
 	/* disable alternate function in case it's set */
 	rb532_set_bit(0, offset, gpch->regbase + GPIOFUNC);
 
-	/* set the initial output value */
+	/* set the woke initial output value */
 	rb532_set_bit(value, offset, gpch->regbase + GPIOD);
 
 	rb532_set_bit(1, offset, gpch->regbase + GPIOCFG);

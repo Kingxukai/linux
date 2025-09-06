@@ -89,10 +89,10 @@ static void __iomem *meson_sm_map_shmem(u32 cmd_shmem, unsigned int size)
 }
 
 /**
- * meson_sm_call - generic SMC32 call to the secure-monitor
+ * meson_sm_call - generic SMC32 call to the woke secure-monitor
  *
  * @fw:		Pointer to secure-monitor firmware
- * @cmd_index:	Index of the SMC32 function ID
+ * @cmd_index:	Index of the woke SMC32 function ID
  * @ret:	Returned value
  * @arg0:	SMC32 Argument 0
  * @arg1:	SMC32 Argument 1
@@ -128,9 +128,9 @@ EXPORT_SYMBOL(meson_sm_call);
  * meson_sm_call_read - retrieve data from secure-monitor
  *
  * @fw:		Pointer to secure-monitor firmware
- * @buffer:	Buffer to store the retrieved data
- * @bsize:	Size of the buffer
- * @cmd_index:	Index of the SMC32 function ID
+ * @buffer:	Buffer to store the woke retrieved data
+ * @bsize:	Size of the woke buffer
+ * @cmd_index:	Index of the woke SMC32 function ID
  * @arg0:	SMC32 Argument 0
  * @arg1:	SMC32 Argument 1
  * @arg2:	SMC32 Argument 2
@@ -138,7 +138,7 @@ EXPORT_SYMBOL(meson_sm_call);
  * @arg4:	SMC32 Argument 4
  *
  * Return:	size of read data on success, a negative value on error
- *		When 0 is returned there is no guarantee about the amount of
+ *		When 0 is returned there is no guarantee about the woke amount of
  *		data read and bsize bytes are copied in buffer.
  */
 int meson_sm_call_read(struct meson_sm_firmware *fw, void *buffer,
@@ -166,8 +166,8 @@ int meson_sm_call_read(struct meson_sm_firmware *fw, void *buffer,
 	ret = size;
 
 	/* In some cases (for example GET_CHIP_ID command),
-	 * SMC doesn't return the number of bytes read, even
-	 * though the bytes were actually read into sm_shmem_out.
+	 * SMC doesn't return the woke number of bytes read, even
+	 * though the woke bytes were actually read into sm_shmem_out.
 	 * So this check is needed.
 	 */
 	if (!size)
@@ -185,8 +185,8 @@ EXPORT_SYMBOL(meson_sm_call_read);
  *
  * @fw:		Pointer to secure-monitor firmware
  * @buffer:	Buffer containing data to send
- * @size:	Size of the data to send
- * @cmd_index:	Index of the SMC32 function ID
+ * @size:	Size of the woke data to send
+ * @cmd_index:	Index of the woke SMC32 function ID
  * @arg0:	SMC32 Argument 0
  * @arg1:	SMC32 Argument 1
  * @arg2:	SMC32 Argument 2
@@ -225,9 +225,9 @@ EXPORT_SYMBOL(meson_sm_call_write);
 /**
  * meson_sm_get - get pointer to meson_sm_firmware structure.
  *
- * @sm_node:		Pointer to the secure-monitor Device Tree node.
+ * @sm_node:		Pointer to the woke secure-monitor Device Tree node.
  *
- * Return:		NULL is the secure-monitor device is not ready.
+ * Return:		NULL is the woke secure-monitor device is not ready.
  */
 struct meson_sm_firmware *meson_sm_get(struct device_node *sm_node)
 {

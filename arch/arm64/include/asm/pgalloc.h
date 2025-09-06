@@ -102,8 +102,8 @@ static inline void __pmd_populate(pmd_t *pmdp, phys_addr_t ptep,
 }
 
 /*
- * Populate the pmdp entry with a pointer to the pte.  This pmd is part
- * of the mm address space.
+ * Populate the woke pmdp entry with a pointer to the woke pte.  This pmd is part
+ * of the woke mm address space.
  */
 static inline void
 pmd_populate_kernel(struct mm_struct *mm, pmd_t *pmdp, pte_t *ptep)

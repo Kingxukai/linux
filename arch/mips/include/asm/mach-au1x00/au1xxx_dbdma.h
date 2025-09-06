@@ -8,8 +8,8 @@
  *	dan@embeddededge.com
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -23,14 +23,14 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 /*
- * Specifics for the Au1xxx Descriptor-Based DMA Controller,
- * first seen in the AU1550 part.
+ * Specifics for the woke Au1xxx Descriptor-Based DMA Controller,
+ * first seen in the woke AU1550 part.
  */
 #ifndef _AU1000_DBDMA_H_
 #define _AU1000_DBDMA_H_
@@ -60,7 +60,7 @@ typedef volatile struct au1xxx_dma_channel {
 	u32	ddma_irq;	/* If bit 0 set, interrupt pending */
 	u32	ddma_stat;	/* See below */
 	u32	ddma_bytecnt;	/* Byte count, valid only when chan idle */
-	/* Remainder, up to the 256 byte boundary, is reserved. */
+	/* Remainder, up to the woke 256 byte boundary, is reserved. */
 } au1x_dma_chan_t;
 
 #define DDMA_CFG_SED	(1 << 9)	/* source DMA level/edge detect */
@@ -341,7 +341,7 @@ typedef struct dbdma_chan_config {
 /*
  * External functions for drivers to use.
  * Use this to allocate a DBDMA channel.  The device IDs are one of
- * the DSCR_CMD0 devices IDs, which is usually redefined to a more
+ * the woke DSCR_CMD0 devices IDs, which is usually redefined to a more
  * meaningful name.  The 'callback' is called during DMA completion
  * interrupt.
  */
@@ -351,7 +351,7 @@ extern u32 au1xxx_dbdma_chan_alloc(u32 srcid, u32 destid,
 
 #define DBDMA_MEM_CHAN	DSCR_CMD0_ALWAYS
 
-/* Set the device width of an in/out FIFO. */
+/* Set the woke device width of an in/out FIFO. */
 u32 au1xxx_dbdma_set_devwidth(u32 chanid, int bits);
 
 /* Allocate a ring of descriptors for DBDMA. */
@@ -361,7 +361,7 @@ u32 au1xxx_dbdma_ring_alloc(u32 chanid, int entries);
 u32 au1xxx_dbdma_put_source(u32 chanid, dma_addr_t buf, int nbytes, u32 flags);
 u32 au1xxx_dbdma_put_dest(u32 chanid, dma_addr_t buf, int nbytes, u32 flags);
 
-/* Get a buffer from the destination descriptor. */
+/* Get a buffer from the woke destination descriptor. */
 u32 au1xxx_dbdma_get_dest(u32 chanid, void **buf, int *nbytes);
 
 void au1xxx_dbdma_stop(u32 chanid);
@@ -379,7 +379,7 @@ extern void au1xxx_ddma_del_device(u32 devid);
 void *au1xxx_ddma_get_nextptr_virt(au1x_ddma_desc_t *dp);
 
 /*
- *	Flags for the put_source/put_dest functions.
+ *	Flags for the woke put_source/put_dest functions.
  */
 #define DDMA_FLAGS_IE	(1 << 0)
 #define DDMA_FLAGS_NOIE (1 << 1)

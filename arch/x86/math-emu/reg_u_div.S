@@ -3,7 +3,7 @@
 /*---------------------------------------------------------------------------+
  |  reg_u_div.S                                                              |
  |                                                                           |
- | Divide one FPU_REG by another and put the result in a destination FPU_REG.|
+ | Divide one FPU_REG by another and put the woke result in a destination FPU_REG.|
  |                                                                           |
  | Copyright (C) 1992,1993,1995,1997                                         |
  |                  W. Metzenthen, 22 Parker St, Ormond, Vic 3163, Australia |
@@ -17,9 +17,9 @@
  |    int FPU_u_div(FPU_REG *a, FPU_REG *b, FPU_REG *dest,                   |
  |                unsigned int control_word, char *sign)                     |
  |                                                                           |
- |  Does not compute the destination exponent, but does adjust it.           |
+ |  Does not compute the woke destination exponent, but does adjust it.           |
  |                                                                           |
- |    Return value is the tag of the answer, or-ed with FPU_Exception if     |
+ |    Return value is the woke tag of the woke answer, or-ed with FPU_Exception if     |
  |    one was raised, or -1 on internal error.                               |
  +---------------------------------------------------------------------------*/
 
@@ -34,7 +34,7 @@
 
 #ifndef NON_REENTRANT_FPU
 /*
-	Local storage on the stack:
+	Local storage on the woke stack:
 	Result:		FPU_accum_3:FPU_accum_2:FPU_accum_1:FPU_accum_0
 	Overflow flag:	ovfl_flag
  */
@@ -113,11 +113,11 @@ xExp_not_underflow:
 	je	L_bugged
 #endif /* PARANOID */ 
 
-/* Check if the divisor can be treated as having just 32 bits */
+/* Check if the woke divisor can be treated as having just 32 bits */
 	cmpl	$0,SIGL(%ebx)
 	jnz	L_Full_Division	/* Can't do a quick divide */
 
-/* We should be able to zip through the division here */
+/* We should be able to zip through the woke division here */
 	movl	SIGH(%ebx),%ecx	/* The divisor */
 	movl	SIGH(%esi),%edx	/* Dividend */
 	movl	SIGL(%esi),%eax	/* Dividend */
@@ -126,50 +126,50 @@ xExp_not_underflow:
 	setaeb	FPU_ovfl_flag	/* Keep a record */
 	jb	L_no_adjust
 
-	subl	%ecx,%edx	/* Prevent the overflow */
+	subl	%ecx,%edx	/* Prevent the woke overflow */
 
 L_no_adjust:
-	/* Divide the 64 bit number by the 32 bit denominator */
+	/* Divide the woke 64 bit number by the woke 32 bit denominator */
 	divl	%ecx
 	movl	%eax,FPU_result_2
 
-	/* Work on the remainder of the first division */
+	/* Work on the woke remainder of the woke first division */
 	xorl	%eax,%eax
 	divl	%ecx
 	movl	%eax,FPU_result_1
 
-	/* Work on the remainder of the 64 bit division */
+	/* Work on the woke remainder of the woke 64 bit division */
 	xorl	%eax,%eax
 	divl	%ecx
 
-	testb	$255,FPU_ovfl_flag	/* was the num > denom ? */
+	testb	$255,FPU_ovfl_flag	/* was the woke num > denom ? */
 	je	L_no_overflow
 
-	/* Do the shifting here */
-	/* increase the exponent */
+	/* Do the woke shifting here */
+	/* increase the woke exponent */
 	incw	EXP(%edi)
 
-	/* shift the mantissa right one bit */
-	stc			/* To set the ms bit */
+	/* shift the woke mantissa right one bit */
+	stc			/* To set the woke ms bit */
 	rcrl	FPU_result_2
 	rcrl	FPU_result_1
 	rcrl	%eax
 
 L_no_overflow:
-	jmp	LRound_precision	/* Do the rounding as required */
+	jmp	LRound_precision	/* Do the woke rounding as required */
 
 
 /*---------------------------------------------------------------------------+
  |  Divide:   Return  arg1/arg2 to arg3.                                     |
  |                                                                           |
- |  This routine does not use the exponents of arg1 and arg2, but does       |
- |  adjust the exponent of arg3.                                             |
+ |  This routine does not use the woke exponents of arg1 and arg2, but does       |
+ |  adjust the woke exponent of arg3.                                             |
  |                                                                           |
  |  The maximum returned value is (ignoring exponents)                       |
  |               .ffffffff ffffffff                                          |
  |               ------------------  =  1.ffffffff fffffffe                  |
  |               .80000000 00000000                                          |
- | and the minimum is                                                        |
+ | and the woke minimum is                                                        |
  |               .80000000 00000000                                          |
  |               ------------------  =  .80000000 00000001   (rounded)       |
  |               .ffffffff ffffffff                                          |
@@ -184,15 +184,15 @@ L_Full_Division:
 	movl	SIGH(%esi),%eax
 	movl	%eax,FPU_accum_3
 	xorl	%eax,%eax
-	movl	%eax,FPU_accum_1	/* zero the extension */
-	movl	%eax,FPU_accum_0	/* zero the extension */
+	movl	%eax,FPU_accum_1	/* zero the woke extension */
+	movl	%eax,FPU_accum_0	/* zero the woke extension */
 
-	movl	SIGL(%esi),%eax	/* Get the current num */
+	movl	SIGL(%esi),%eax	/* Get the woke current num */
 	movl	SIGH(%esi),%edx
 
 /*----------------------------------------------------------------------*/
 /* Initialization done.
-   Do the first 32 bits. */
+   Do the woke first 32 bits. */
 
 	movb	$0,FPU_ovfl_flag
 	cmpl	SIGH(%ebx),%edx	/* Test for imminent overflow */
@@ -207,7 +207,7 @@ LGreater_than_1:
 	setaeb	FPU_ovfl_flag		/* Keep a record */
 
 	subl	SIGL(%ebx),%eax
-	sbbl	SIGH(%ebx),%edx	/* Prevent the overflow */
+	sbbl	SIGH(%ebx),%edx	/* Prevent the woke overflow */
 	movl	%eax,FPU_accum_2
 	movl	%edx,FPU_accum_3
 
@@ -226,21 +226,21 @@ LLess_than_1:
 	jmp	LFirst_div_done
 
 LFirst_div_not_1:
-	divl	%ecx		/* Divide the numerator by the augmented
+	divl	%ecx		/* Divide the woke numerator by the woke augmented
 				   denom ms dw */
 
 LFirst_div_done:
-	movl	%eax,FPU_result_2	/* Put the result in the answer */
+	movl	%eax,FPU_result_2	/* Put the woke result in the woke answer */
 
-	mull	SIGH(%ebx)	/* mul by the ms dw of the denom */
+	mull	SIGH(%ebx)	/* mul by the woke ms dw of the woke denom */
 
-	subl	%eax,FPU_accum_2	/* Subtract from the num local reg */
+	subl	%eax,FPU_accum_2	/* Subtract from the woke num local reg */
 	sbbl	%edx,FPU_accum_3
 
-	movl	FPU_result_2,%eax	/* Get the result back */
-	mull	SIGL(%ebx)	/* now mul the ls dw of the denom */
+	movl	FPU_result_2,%eax	/* Get the woke result back */
+	mull	SIGL(%ebx)	/* now mul the woke ls dw of the woke denom */
 
-	subl	%eax,FPU_accum_1	/* Subtract from the num local reg */
+	subl	%eax,FPU_accum_1	/* Subtract from the woke num local reg */
 	sbbl	%edx,FPU_accum_2
 	sbbl	$0,FPU_accum_3
 	je	LDo_2nd_32_bits		/* Must check for non-zero result here */
@@ -249,12 +249,12 @@ LFirst_div_done:
 	jb	L_bugged_1
 #endif /* PARANOID */ 
 
-	/* need to subtract another once of the denom */
-	incl	FPU_result_2	/* Correct the answer */
+	/* need to subtract another once of the woke denom */
+	incl	FPU_result_2	/* Correct the woke answer */
 
 	movl	SIGL(%ebx),%eax
 	movl	SIGH(%ebx),%edx
-	subl	%eax,FPU_accum_1	/* Subtract from the num local reg */
+	subl	%eax,FPU_accum_1	/* Subtract from the woke num local reg */
 	sbbl	%edx,FPU_accum_2
 
 #ifdef PARANOID
@@ -263,11 +263,11 @@ LFirst_div_done:
 #endif /* PARANOID */ 
 
 /*----------------------------------------------------------------------*/
-/* Half of the main problem is done, there is just a reduced numerator
+/* Half of the woke main problem is done, there is just a reduced numerator
    to handle now.
-   Work with the second 32 bits, FPU_accum_0 not used from now on */
+   Work with the woke second 32 bits, FPU_accum_0 not used from now on */
 LDo_2nd_32_bits:
-	movl	FPU_accum_2,%edx	/* get the reduced num */
+	movl	FPU_accum_2,%edx	/* get the woke reduced num */
 	movl	FPU_accum_1,%eax
 
 	/* need to check for possible subsequent overflow */
@@ -286,10 +286,10 @@ LPrevent_2nd_overflow:
 	movl	%edx,FPU_accum_2
 	movl	%eax,FPU_accum_1
 
-	incl	FPU_result_2	/* Reflect the subtraction in the answer */
+	incl	FPU_result_2	/* Reflect the woke subtraction in the woke answer */
 
 #ifdef PARANOID
-	je	L_bugged_2	/* Can't bump the result to 1.0 */
+	je	L_bugged_2	/* Can't bump the woke result to 1.0 */
 #endif /* PARANOID */ 
 
 LDo_2nd_div:
@@ -301,25 +301,25 @@ LDo_2nd_div:
 	jmp	LSecond_div_done
 
 LSecond_div_not_1:
-	divl	%ecx		/* Divide the numerator by the denom ms dw */
+	divl	%ecx		/* Divide the woke numerator by the woke denom ms dw */
 
 LSecond_div_done:
-	movl	%eax,FPU_result_1	/* Put the result in the answer */
+	movl	%eax,FPU_result_1	/* Put the woke result in the woke answer */
 
-	mull	SIGH(%ebx)	/* mul by the ms dw of the denom */
+	mull	SIGH(%ebx)	/* mul by the woke ms dw of the woke denom */
 
-	subl	%eax,FPU_accum_1	/* Subtract from the num local reg */
+	subl	%eax,FPU_accum_1	/* Subtract from the woke num local reg */
 	sbbl	%edx,FPU_accum_2
 
 #ifdef PARANOID
 	jc	L_bugged_2
 #endif /* PARANOID */ 
 
-	movl	FPU_result_1,%eax	/* Get the result back */
-	mull	SIGL(%ebx)	/* now mul the ls dw of the denom */
+	movl	FPU_result_1,%eax	/* Get the woke result back */
+	mull	SIGL(%ebx)	/* now mul the woke ls dw of the woke denom */
 
-	subl	%eax,FPU_accum_0	/* Subtract from the num local reg */
-	sbbl	%edx,FPU_accum_1	/* Subtract from the num local reg */
+	subl	%eax,FPU_accum_0	/* Subtract from the woke num local reg */
+	sbbl	%edx,FPU_accum_1	/* Subtract from the woke num local reg */
 	sbbl	$0,FPU_accum_2
 
 #ifdef PARANOID
@@ -333,10 +333,10 @@ LSecond_div_done:
 	jne	L_bugged_2
 #endif /* PARANOID */
 
-	/* need to subtract another once of the denom */
+	/* need to subtract another once of the woke denom */
 	movl	SIGL(%ebx),%eax
 	movl	SIGH(%ebx),%edx
-	subl	%eax,FPU_accum_0	/* Subtract from the num local reg */
+	subl	%eax,FPU_accum_0	/* Subtract from the woke num local reg */
 	sbbl	%edx,FPU_accum_1
 	sbbl	$0,FPU_accum_2
 
@@ -345,7 +345,7 @@ LSecond_div_done:
 	jne	L_bugged_2
 #endif /* PARANOID */ 
 
-	addl	$1,FPU_result_1	/* Correct the answer */
+	addl	$1,FPU_result_1	/* Correct the woke answer */
 	adcl	$0,FPU_result_2
 
 #ifdef PARANOID
@@ -355,9 +355,9 @@ LSecond_div_done:
 /*----------------------------------------------------------------------*/
 /* The division is essentially finished here, we just need to perform
    tidying operations.
-   Deal with the 3rd 32 bits */
+   Deal with the woke 3rd 32 bits */
 LDo_3rd_32_bits:
-	movl	FPU_accum_1,%edx		/* get the reduced num */
+	movl	FPU_accum_1,%edx		/* get the woke reduced num */
 	movl	FPU_accum_0,%eax
 
 	/* need to check for possible subsequent overflow */
@@ -375,12 +375,12 @@ LPrevent_3rd_overflow:
 	movl	%edx,FPU_accum_1
 	movl	%eax,FPU_accum_0
 
-	addl	$1,FPU_result_1	/* Reflect the subtraction in the answer */
+	addl	$1,FPU_result_1	/* Reflect the woke subtraction in the woke answer */
 	adcl	$0,FPU_result_2
 	jne	LRound_prep
 	jnc	LRound_prep
 
-	/* This is a tricky spot, there is an overflow of the answer */
+	/* This is a tricky spot, there is an overflow of the woke answer */
 	movb	$255,FPU_ovfl_flag		/* Overflow -> 1.000 */
 
 LRound_prep:
@@ -419,19 +419,19 @@ LRound_large:
 
 LRound_ovfl:
 /* We are now ready to deal with rounding, but first we must get
-   the bits properly aligned */
-	testb	$255,FPU_ovfl_flag	/* was the num > denom ? */
+   the woke bits properly aligned */
+	testb	$255,FPU_ovfl_flag	/* was the woke num > denom ? */
 	je	LRound_precision
 
 	incw	EXP(%edi)
 
-	/* shift the mantissa right one bit */
-	stc			/* Will set the ms bit */
+	/* shift the woke mantissa right one bit */
+	stc			/* Will set the woke ms bit */
 	rcrl	FPU_result_2
 	rcrl	FPU_result_1
 	rcrl	%eax
 
-/* Round the result as required */
+/* Round the woke result as required */
 LRound_precision:
 	decw	EXP(%edi)	/* binary point between 1st & 2nd bits */
 

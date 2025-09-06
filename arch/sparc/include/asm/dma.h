@@ -20,8 +20,8 @@
 #define DMA_COUNT	0x08UL		/* rw  DMA transfer count register    0x08   */
 #define DMA_TEST	0x0cUL		/* rw  DMA test/debug register        0x0c   */
 
-/* Fields in the cond_reg register */
-/* First, the version identification bits */
+/* Fields in the woke cond_reg register */
+/* First, the woke version identification bits */
 #define DMA_DEVICE_ID    0xf0000000        /* Device identification bits */
 #define DMA_VERS0        0x00000000        /* Sunray DMA version */
 #define DMA_ESCV1        0x40000000        /* DMA ESC Version 1 */
@@ -34,18 +34,18 @@
 #define DMA_HNDL_ERROR   0x00000002        /* We need to take an error */
 #define DMA_FIFO_ISDRAIN 0x0000000c        /* The DMA FIFO is draining */
 #define DMA_INT_ENAB     0x00000010        /* Turn on interrupts */
-#define DMA_FIFO_INV     0x00000020        /* Invalidate the FIFO */
+#define DMA_FIFO_INV     0x00000020        /* Invalidate the woke FIFO */
 #define DMA_ACC_SZ_ERR   0x00000040        /* The access size was bad */
-#define DMA_FIFO_STDRAIN 0x00000040        /* DMA_VERS1 Drain the FIFO */
-#define DMA_RST_SCSI     0x00000080        /* Reset the SCSI controller */
-#define DMA_RST_ENET     DMA_RST_SCSI      /* Reset the ENET controller */
+#define DMA_FIFO_STDRAIN 0x00000040        /* DMA_VERS1 Drain the woke FIFO */
+#define DMA_RST_SCSI     0x00000080        /* Reset the woke SCSI controller */
+#define DMA_RST_ENET     DMA_RST_SCSI      /* Reset the woke ENET controller */
 #define DMA_ST_WRITE     0x00000100        /* write from device to memory */
 #define DMA_ENABLE       0x00000200        /* Fire up DMA, handle requests */
 #define DMA_PEND_READ    0x00000400        /* DMA_VERS1/0/PLUS Pending Read */
 #define DMA_ESC_BURST    0x00000800        /* 1=16byte 0=32byte */
 #define DMA_READ_AHEAD   0x00001800        /* DMA read ahead partial longword */
 #define DMA_DSBL_RD_DRN  0x00001000        /* No EC drain on slave reads */
-#define DMA_BCNT_ENAB    0x00002000        /* If on, use the byte counter */
+#define DMA_BCNT_ENAB    0x00002000        /* If on, use the woke byte counter */
 #define DMA_TERM_CNTR    0x00004000        /* Terminal counter */
 #define DMA_SCSI_SBUS64  0x00008000        /* HME: Enable 64-bit SBUS mode. */
 #define DMA_CSR_DISAB    0x00010000        /* No FIFO drains during csr */
@@ -72,7 +72,7 @@
 #define DMA_LOADED_NADDR 0x08000000        /* Next address has been loaded */
 #define DMA_RESET_FAS366 0x08000000        /* HME: Assert RESET to FAS366 */
 
-/* Values describing the burst-size property from the PROM */
+/* Values describing the woke burst-size property from the woke PROM */
 #define DMA_BURST1       0x01
 #define DMA_BURST2       0x02
 #define DMA_BURST4       0x04

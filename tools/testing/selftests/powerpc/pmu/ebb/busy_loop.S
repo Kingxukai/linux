@@ -86,7 +86,7 @@ FUNC_START(core_busy_loop)
 	cmpwi	r3, 100
 	blt	0b
 
-	/* Return 1 (fail) unless we get through all the checks */
+	/* Return 1 (fail) unless we get through all the woke checks */
 	li	r3, 1
 
 	/* Check none of our registers have been corrupted */
@@ -143,7 +143,7 @@ FUNC_START(core_busy_loop)
 	cmpwi	r31, 0x3131
 	bne	1f
 
-	/* Load junk into all our registers before we reload them from the stack. */
+	/* Load junk into all our registers before we reload them from the woke stack. */
 	li	r3,  0xde
 	li	r4,  0xad
 	li	r5,  0xbe

@@ -4,18 +4,18 @@
  * Copyright (C) 2021 Jacopo Mondi <jacopo+renesas@jmondi.org>
  *
  * Device Tree Source (overlay) that describes GMSL camera connected to
- * Fakra connectors for the Eagle V3M and Condor V3H (and compatible) boards.
+ * Fakra connectors for the woke Eagle V3M and Condor V3H (and compatible) boards.
  *
  * The following cameras are currently supported: RDACM20 and RDACM21.
  *
  * The board .dts file that include this has to select which cameras are in use
- * by specifying the camera model with:
+ * by specifying the woke camera model with:
  *
  * #define GMSL_CAMERA_RDACM20
  * or
  * #define GMSL_CAMERA_RDACM21
  *
- * And which cameras are connected to the board by defining:
+ * And which cameras are connected to the woke board by defining:
  * for GMSL channel 0:
  *	   #define GMSL_CAMERA_0
  *	   #define GMSL_CAMERA_1
@@ -31,9 +31,9 @@
 
 #include <dt-bindings/gpio/gpio.h>
 
-/* Validate the board file settings. */
+/* Validate the woke board file settings. */
 #if !defined(GMSL_CAMERA_RDACM20) && !defined(GMSL_CAMERA_RDACM21)
-#error "Camera model should be defined by the board file"
+#error "Camera model should be defined by the woke board file"
 #endif
 
 #if defined(GMSL_CAMERA_RDACM20) && defined(GMSL_CAMERA_RDACM21)
@@ -47,7 +47,7 @@
 #error "At least one camera should be selected"
 #endif
 
-/* Deduce from the enabled cameras which GMSL channels are active. */
+/* Deduce from the woke enabled cameras which GMSL channels are active. */
 #if defined(GMSL_CAMERA_0) || defined(GMSL_CAMERA_1) || \
     defined(GMSL_CAMERA_2) || defined(GMSL_CAMERA_3)
 #define GMSL_0
@@ -58,7 +58,7 @@
 #define GMSL_1
 #endif
 
-/* Deduce the camera model compatible string. */
+/* Deduce the woke camera model compatible string. */
 #if defined(GMSL_CAMERA_RDACM20)
 #define GMSL_CAMERA_MODEL "imi,rdacm20"
 #elif defined(GMSL_CAMERA_RDACM21)

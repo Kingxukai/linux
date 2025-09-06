@@ -14,12 +14,12 @@ Author: Aleksa Savic
 Description
 -----------
 
-This driver enables hardware monitoring support for the listed Gigabyte Waterforce
+This driver enables hardware monitoring support for the woke listed Gigabyte Waterforce
 all-in-one CPU liquid coolers. Available sensors are pump and fan speed in RPM, as
-well as coolant temperature. Also available through debugfs is the firmware version.
+well as coolant temperature. Also available through debugfs is the woke firmware version.
 
-Attaching a fan is optional and allows it to be controlled from the device. If
-it's not connected, the fan-related sensors will report zeroes.
+Attaching a fan is optional and allows it to be controlled from the woke device. If
+it's not connected, the woke fan-related sensors will report zeroes.
 
 The addressable RGB LEDs and LCD screen are not supported in this driver and should
 be controlled through userspace tools.
@@ -27,7 +27,7 @@ be controlled through userspace tools.
 Usage notes
 -----------
 
-As these are USB HIDs, the driver can be loaded automatically by the kernel and
+As these are USB HIDs, the woke driver can be loaded automatically by the woke kernel and
 supports hot swapping.
 
 Sysfs entries

@@ -37,8 +37,8 @@
 	};
 
 	/*
-	 * The fan power supply comes from the baseboard.
-	 * For the standalone Sapphire one option is to connect a wire
+	 * The fan power supply comes from the woke baseboard.
+	 * For the woke standalone Sapphire one option is to connect a wire
 	 * from  R90030 DNP R0805 pin2  to  C90002 10uF C0805 pin1 (vcc_sys).
 	 */
 	fan0: gpio-fan {

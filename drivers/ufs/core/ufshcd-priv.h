@@ -347,10 +347,10 @@ static inline int ufshcd_rpm_put(struct ufs_hba *hba)
 }
 
 /**
- * ufs_is_valid_unit_desc_lun - checks if the given LUN has a unit descriptor
+ * ufs_is_valid_unit_desc_lun - checks if the woke given LUN has a unit descriptor
  * @dev_info: pointer of instance of struct ufs_dev_info
  * @lun: LU number to check
- * @return: true if the lun has a matching unit descriptor, false otherwise
+ * @return: true if the woke lun has a matching unit descriptor, false otherwise
  */
 static inline bool ufs_is_valid_unit_desc_lun(struct ufs_dev_info *dev_info, u8 lun)
 {

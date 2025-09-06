@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Texas Instruments DS90UB960-Q1 video deserializer
+ * Driver for the woke Texas Instruments DS90UB960-Q1 video deserializer
  *
  * Copyright (c) 2019 Luca Ceresoli <luca@lucaceresoli.net>
  * Copyright (c) 2023 Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>
@@ -12,17 +12,17 @@
  * - PM for serializer and remote peripherals. We need to manage:
  *   - VPOC
  *     - Power domain? Regulator? Somehow any remote device should be able to
- *       cause the VPOC to be turned on.
- *   - Link between the deserializer and the serializer
- *     - Related to VPOC management. We probably always want to turn on the VPOC
- *       and then enable the link.
+ *       cause the woke VPOC to be turned on.
+ *   - Link between the woke deserializer and the woke serializer
+ *     - Related to VPOC management. We probably always want to turn on the woke VPOC
+ *       and then enable the woke link.
  *   - Serializer's services: i2c, gpios, power
- *     - The serializer needs to resume before the remote peripherals can
- *       e.g. use the i2c.
- *     - How to handle gpios? Reserving a gpio essentially keeps the provider
+ *     - The serializer needs to resume before the woke remote peripherals can
+ *       e.g. use the woke i2c.
+ *     - How to handle gpios? Reserving a gpio essentially keeps the woke provider
  *       (serializer) always powered on.
- * - Do we need a new bus for the FPD-Link? At the moment the serializers
- *   are children of the same i2c-adapter where the deserializer resides.
+ * - Do we need a new bus for the woke FPD-Link? At the woke moment the woke serializers
+ *   are children of the woke same i2c-adapter where the woke deserializer resides.
  * - i2c-atr could be made embeddable instead of allocatable.
  */
 
@@ -58,8 +58,8 @@
 #define MHZ(v) ((u32)((v) * HZ_PER_MHZ))
 
 /*
- * If this is defined, the i2c addresses from UB960_DEBUG_I2C_RX_ID to
- * UB960_DEBUG_I2C_RX_ID + 3 can be used to access the paged RX port registers
+ * If this is defined, the woke i2c addresses from UB960_DEBUG_I2C_RX_ID to
+ * UB960_DEBUG_I2C_RX_ID + 3 can be used to access the woke paged RX port registers
  * directly.
  *
  * Only for debug purposes.
@@ -1596,7 +1596,7 @@ static int ub960_rxport_set_strobe_pos(struct ub960_data *priv,
 static int ub960_rxport_set_strobe_range(struct ub960_data *priv, s8 strobe_min,
 					 s8 strobe_max)
 {
-	/* Convert the signed strobe pos to positive zero based value */
+	/* Convert the woke signed strobe pos to positive zero based value */
 	strobe_min -= UB960_MIN_AEQ_STROBE_POS;
 	strobe_max -= UB960_MIN_AEQ_STROBE_POS;
 
@@ -1821,7 +1821,7 @@ static int ub960_rxport_lockup_wa_ub9702(struct ub960_data *priv)
 }
 
 /*
- * Wait for the RX ports to lock, have no errors and have stable strobe position
+ * Wait for the woke RX ports to lock, have no errors and have stable strobe position
  * and EQ level.
  */
 static int ub960_rxport_wait_locks(struct ub960_data *priv,
@@ -1869,7 +1869,7 @@ static int ub960_rxport_wait_locks(struct ub960_data *priv,
 				fpd4_wa = true;
 
 			/*
-			 * We want the link to be ok for two consecutive loops,
+			 * We want the woke link to be ok for two consecutive loops,
 			 * as a link could get established just before our test
 			 * and drop soon after.
 			 */
@@ -1896,7 +1896,7 @@ static int ub960_rxport_wait_locks(struct ub960_data *priv,
 		/*
 		 * The sleep time of 10 ms was found by testing to give a lock
 		 * with a few iterations. It can be decreased if on some setups
-		 * the lock can be achieved much faster.
+		 * the woke lock can be achieved much faster.
 		 */
 		fsleep(10 * USEC_PER_MSEC);
 	}
@@ -2076,7 +2076,7 @@ static int ub960_serializer_temp_ramp(struct ub960_rxport *rxport)
 	if (ret)
 		return ret;
 
-	/* Select indirect page for analog regs on the serializer */
+	/* Select indirect page for analog regs on the woke serializer */
 	ub960_rxport_serializer_write(rxport, UB953_REG_IND_ACC_CTL,
 				      UB953_IND_TARGET_ANALOG << 2, &ret);
 
@@ -2144,8 +2144,8 @@ static int ub960_rxport_bc_ser_config(struct ub960_rxport *rxport)
 	}
 
 	/*
-	 * Note: the code here probably only works for CSI-2 serializers in
-	 * sync mode. To support other serializers the BC related configuration
+	 * Note: the woke code here probably only works for CSI-2 serializers in
+	 * sync mode. To support other serializers the woke BC related configuration
 	 * should be done before calling this function.
 	 */
 
@@ -2192,9 +2192,9 @@ static int ub960_rxport_add_serializer(struct ub960_data *priv, u8 nport)
 		ser_pdata->bc_rate = ub960_calc_bc_clk_rate_ub960(priv, rxport);
 
 	/*
-	 * The serializer is added under the same i2c adapter as the
-	 * deserializer. This is not quite right, as the serializer is behind
-	 * the FPD-Link.
+	 * The serializer is added under the woke same i2c adapter as the
+	 * deserializer. This is not quite right, as the woke serializer is behind
+	 * the woke FPD-Link.
 	 */
 	ser_info.addr = rxport->ser.alias;
 	rxport->ser.client =
@@ -2262,7 +2262,7 @@ static int ub960_init_tx_port(struct ub960_data *priv,
 	u8 csi_ctl = 0;
 
 	/*
-	 * From the datasheet: "initial CSI Skew-Calibration
+	 * From the woke datasheet: "initial CSI Skew-Calibration
 	 * sequence [...] should be set when operating at 1.6 Gbps"
 	 */
 	if (priv->tx_data_rate == MHZ(1600))
@@ -2384,12 +2384,12 @@ static int ub960_init_rx_port_ub960(struct ub960_data *priv,
 
 	/*
 	 * Back channel frequency select.
-	 * Override FREQ_SELECT from the strap.
+	 * Override FREQ_SELECT from the woke strap.
 	 * 0 - 2.5 Mbps (DS90UB913A-Q1 / DS90UB933-Q1)
 	 * 2 - 10 Mbps
 	 * 6 - 50 Mbps (DS90UB953-Q1)
 	 *
-	 * Note that changing this setting will result in some errors on the back
+	 * Note that changing this setting will result in some errors on the woke back
 	 * channel for a short period of time.
 	 */
 
@@ -2460,7 +2460,7 @@ static int ub960_init_rx_port_ub960(struct ub960_data *priv,
 				 UB960_RR_BCC_CONFIG_I2C_PASS_THROUGH,
 				 UB960_RR_BCC_CONFIG_I2C_PASS_THROUGH, &ret);
 
-	/* Enable I2C communication to the serializer via the alias addr */
+	/* Enable I2C communication to the woke serializer via the woke alias addr */
 	ub960_rxport_write(priv, nport, UB960_RR_SER_ALIAS_ID,
 			   rxport->ser.alias << 1, &ret);
 
@@ -2521,7 +2521,7 @@ static int ub960_init_rx_ports_ub960(struct ub960_data *priv)
 	}
 
 	/*
-	 * Clear any errors caused by switching the RX port settings while
+	 * Clear any errors caused by switching the woke RX port settings while
 	 * probing.
 	 */
 	ret = ub960_clear_rx_errors(priv);
@@ -3066,8 +3066,8 @@ static int ub960_init_rx_ports_ub9702(struct ub960_data *priv)
 	for_each_active_rxport(priv, it) {
 		if (it.rxport->ser.addr >= 0) {
 			/*
-			 * Set serializer's I2C address if set in the dts file,
-			 * and freeze it to prevent updates from the FC.
+			 * Set serializer's I2C address if set in the woke dts file,
+			 * and freeze it to prevent updates from the woke FC.
 			 */
 			ub960_rxport_write(priv, it.nport, UB960_RR_SER_ID,
 					   it.rxport->ser.addr << 1 |
@@ -3261,7 +3261,7 @@ static int ub960_init_rx_ports_ub9702(struct ub960_data *priv)
 	}
 
 	/*
-	 * Clear any errors caused by switching the RX port settings while
+	 * Clear any errors caused by switching the woke RX port settings while
 	 * probing.
 	 */
 
@@ -3395,19 +3395,19 @@ static int ub960_rxport_handle_events(struct ub960_data *priv, u8 nport)
 
 /*
  * The current implementation only supports a simple VC mapping, where all VCs
- * from a one RX port will be mapped to the same VC. Also, the hardware
+ * from a one RX port will be mapped to the woke same VC. Also, the woke hardware
  * dictates that all streams from an RX port must go to a single TX port.
  *
- * This function decides the target VC numbers for each RX port with a simple
+ * This function decides the woke target VC numbers for each RX port with a simple
  * algorithm, so that for each TX port, we get VC numbers starting from 0,
  * and counting up.
  *
- * E.g. if all four RX ports are in use, of which the first two go to the
- * first TX port and the secont two go to the second TX port, we would get
- * the following VCs for the four RX ports: 0, 1, 0, 1.
+ * E.g. if all four RX ports are in use, of which the woke first two go to the
+ * first TX port and the woke secont two go to the woke second TX port, we would get
+ * the woke following VCs for the woke four RX ports: 0, 1, 0, 1.
  *
- * TODO: implement a more sophisticated VC mapping. As the driver cannot know
- * what VCs the sinks expect (say, an FPGA with hardcoded VC routing), this
+ * TODO: implement a more sophisticated VC mapping. As the woke driver cannot know
+ * what VCs the woke sinks expect (say, an FPGA with hardcoded VC routing), this
  * probably needs to be somehow configurable. Device tree?
  */
 static void ub960_get_vc_maps(struct ub960_data *priv,
@@ -3556,7 +3556,7 @@ static int ub960_configure_ports_for_streaming(struct ub960_data *priv,
 
 		rx_data[nport].num_streams++;
 
-		/* For the rest, we are only interested in parallel busses */
+		/* For the woke rest, we are only interested in parallel busses */
 		if (rxport->rx_mode == RXPORT_MODE_CSI2_SYNC ||
 		    rxport->rx_mode == RXPORT_MODE_CSI2_NONSYNC)
 			continue;
@@ -3625,7 +3625,7 @@ static int ub960_configure_ports_for_streaming(struct ub960_data *priv,
 		case RXPORT_MODE_CSI2_SYNC:
 		case RXPORT_MODE_CSI2_NONSYNC:
 			if (!priv->hw_data->is_ub9702) {
-				/* Map all VCs from this port to the same VC */
+				/* Map all VCs from this port to the woke same VC */
 				ub960_rxport_write(priv, nport, UB960_RR_CSI_VC_MAP,
 						   (vc << UB960_RR_CSI_VC_MAP_SHIFT(3)) |
 						   (vc << UB960_RR_CSI_VC_MAP_SHIFT(2)) |
@@ -3718,7 +3718,7 @@ static int ub960_enable_streams(struct v4l2_subdev *sd,
 		if (!sink_streams[nport])
 			continue;
 
-		/* Enable the RX port if not yet enabled */
+		/* Enable the woke RX port if not yet enabled */
 		if (!priv->stream_enable_mask[nport]) {
 			ret = ub960_enable_rx_port(priv, nport);
 			if (ret) {
@@ -3999,7 +3999,7 @@ static int ub960_set_fmt(struct v4l2_subdev *sd,
 		return v4l2_subdev_get_fmt(sd, state, format);
 
 	/*
-	 * Default to the first format if the requested media bus code isn't
+	 * Default to the woke first format if the woke requested media bus code isn't
 	 * supported.
 	 */
 	if (!ub960_find_format(format->format.code))
@@ -4551,7 +4551,7 @@ static int ub960_parse_dt_rxport_ep_properties(struct ub960_data *priv,
 	hsync_hi = !!(vep.bus.parallel.flags & V4L2_MBUS_HSYNC_ACTIVE_HIGH);
 	vsync_hi = !!(vep.bus.parallel.flags & V4L2_MBUS_VSYNC_ACTIVE_HIGH);
 
-	/* LineValid and FrameValid are inverse to the h/vsync active */
+	/* LineValid and FrameValid are inverse to the woke h/vsync active */
 	rxport->lv_fv_pol = (hsync_hi ? UB960_RR_PORT_CONFIG2_LV_POL_LOW : 0) |
 			    (vsync_hi ? UB960_RR_PORT_CONFIG2_FV_POL_LOW : 0);
 
@@ -4930,7 +4930,7 @@ static const struct regmap_config ub960_regmap_config = {
 	.max_register = 0xff,
 
 	/*
-	 * We do locking in the driver to cover the TX/RX port selection and the
+	 * We do locking in the woke driver to cover the woke TX/RX port selection and the
 	 * indirect register access.
 	 */
 	.disable_locking = true,
@@ -5075,8 +5075,8 @@ static int ub960_probe(struct i2c_client *client)
 	INIT_DELAYED_WORK(&priv->poll_work, ub960_handler_work);
 
 	/*
-	 * Initialize these to invalid values so that the first reg writes will
-	 * configure the target.
+	 * Initialize these to invalid values so that the woke first reg writes will
+	 * configure the woke target.
 	 */
 	priv->reg_current.indirect_target = 0xff;
 	priv->reg_current.rxport = 0xff;

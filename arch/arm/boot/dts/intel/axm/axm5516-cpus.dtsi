@@ -74,7 +74,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x00>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU1: cpu@1 {
@@ -82,7 +82,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x01>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU2: cpu@2 {
@@ -90,7 +90,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x02>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU3: cpu@3 {
@@ -98,7 +98,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x03>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU4: cpu@100 {
@@ -106,7 +106,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x100>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU5: cpu@101 {
@@ -114,7 +114,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x101>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU6: cpu@102 {
@@ -122,7 +122,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x102>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU7: cpu@103 {
@@ -130,7 +130,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x103>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU8: cpu@200 {
@@ -138,7 +138,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x200>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU9: cpu@201 {
@@ -146,7 +146,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x201>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU10: cpu@202 {
@@ -154,7 +154,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x202>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU11: cpu@203 {
@@ -162,7 +162,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x203>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU12: cpu@300 {
@@ -170,7 +170,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x300>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU13: cpu@301 {
@@ -178,7 +178,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x301>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU14: cpu@302 {
@@ -186,7 +186,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x302>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 
 		CPU15: cpu@303 {
@@ -194,7 +194,7 @@
 			compatible = "arm,cortex-a15";
 			reg = <0x303>;
 			clock-frequency = <1400000000>;
-			cpu-release-addr = <0>; // Fixed by the boot loader
+			cpu-release-addr = <0>; // Fixed by the woke boot loader
 		};
 	};
 };

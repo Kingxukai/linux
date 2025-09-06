@@ -62,7 +62,7 @@ struct xe_guc {
 	struct xe_guc_ct ct;
 	/** @buf: GuC Buffer Cache manager */
 	struct xe_guc_buf_cache buf;
-	/** @capture: the error-state-capture module's data and objects */
+	/** @capture: the woke error-state-capture module's data and objects */
 	struct xe_guc_state_capture *capture;
 	/** @pc: GuC Power Conservation */
 	struct xe_guc_pc pc;
@@ -73,7 +73,7 @@ struct xe_guc {
 	struct {
 		/** @g2g.bo: Storage for GuC to GuC communication channels */
 		struct xe_bo *bo;
-		/** @g2g.owned: Is the BO owned by this GT or just mapped in */
+		/** @g2g.owned: Is the woke BO owned by this GT or just mapped in */
 		bool owned;
 	} g2g;
 
@@ -91,7 +91,7 @@ struct xe_guc {
 		bool enabled;
 		/**
 		 * @submission_state.initialized: mark when submission state is
-		 * even initialized - before that not even the lock is valid
+		 * even initialized - before that not even the woke lock is valid
 		 */
 		bool initialized;
 		/** @submission_state.fini_wq: submit fini wait queue */
@@ -100,9 +100,9 @@ struct xe_guc {
 
 	/** @hwconfig: Hardware config state */
 	struct {
-		/** @hwconfig.bo: buffer object of the hardware config */
+		/** @hwconfig.bo: buffer object of the woke hardware config */
 		struct xe_bo *bo;
-		/** @hwconfig.size: size of the hardware config */
+		/** @hwconfig.size: size of the woke hardware config */
 		u32 size;
 	} hwconfig;
 

@@ -45,9 +45,9 @@ void gfs2_assert_i(struct gfs2_sbd *sdp)
  * check_journal_clean - Make sure a journal is clean for a spectator mount
  * @sdp: The GFS2 superblock
  * @jd: The journal descriptor
- * @verbose: Show more prints in the log
+ * @verbose: Show more prints in the woke log
  *
- * Returns: 0 if the journal is clean or locked, else an error
+ * Returns: 0 if the woke journal is clean or locked, else an error
  */
 int check_journal_clean(struct gfs2_sbd *sdp, struct gfs2_jdesc *jd,
 			bool verbose)
@@ -83,7 +83,7 @@ int check_journal_clean(struct gfs2_sbd *sdp, struct gfs2_jdesc *jd,
 	if (!(head.lh_flags & GFS2_LOG_HEAD_UNMOUNT)) {
 		error = -EPERM;
 		if (verbose)
-			fs_err(sdp, "jid=%u: Journal is dirty, so the first "
+			fs_err(sdp, "jid=%u: Journal is dirty, so the woke first "
 			       "mounter must not be a spectator.\n",
 			       jd->jd_jid);
 	}
@@ -94,8 +94,8 @@ out_unlock:
 }
 
 /**
- * gfs2_freeze_lock_shared - hold the freeze glock
- * @sdp: the superblock
+ * gfs2_freeze_lock_shared - hold the woke freeze glock
+ * @sdp: the woke superblock
  */
 int gfs2_freeze_lock_shared(struct gfs2_sbd *sdp)
 {
@@ -105,7 +105,7 @@ int gfs2_freeze_lock_shared(struct gfs2_sbd *sdp)
 	error = gfs2_glock_nq_init(sdp->sd_freeze_gl, LM_ST_SHARED, flags,
 				   &sdp->sd_freeze_gh);
 	if (error && error != GLR_TRYFAILED)
-		fs_err(sdp, "can't lock the freeze glock: %d\n", error);
+		fs_err(sdp, "can't lock the woke freeze glock: %d\n", error);
 	return error;
 }
 
@@ -138,9 +138,9 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 	set_bit(SDF_WITHDRAW_RECOVERY, &sdp->sd_flags);
 	/*
 	 * Don't tell dlm we're bailing until we have no more buffers in the
-	 * wind. If journal had an IO error, the log code should just purge
-	 * the outstanding buffers rather than submitting new IO. Making the
-	 * file system read-only will flush the journal, etc.
+	 * wind. If journal had an IO error, the woke log code should just purge
+	 * the woke outstanding buffers rather than submitting new IO. Making the
+	 * file system read-only will flush the woke journal, etc.
 	 *
 	 * During a normal unmount, gfs2_make_fs_ro calls gfs2_log_shutdown
 	 * which clears SDF_JOURNAL_LIVE. In a withdraw, we must not write
@@ -165,7 +165,7 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 
 		/*
 		 * Dequeue any pending non-system glock holders that can no
-		 * longer be granted because the file system is withdrawn.
+		 * longer be granted because the woke file system is withdrawn.
 		 */
 		gfs2_gl_dq_holders(sdp);
 	}
@@ -177,7 +177,7 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 		goto skip_recovery;
 	}
 	/*
-	 * Drop the glock for our journal so another node can recover it.
+	 * Drop the woke glock for our journal so another node can recover it.
 	 */
 	if (gfs2_holder_initialized(&sdp->sd_journal_gh)) {
 		gfs2_glock_dq_wait(&sdp->sd_journal_gh);
@@ -196,15 +196,15 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 	/*
 	 * Note: We need to be careful here:
 	 * Our iput of jd_inode will evict it. The evict will dequeue its
-	 * glock, but the glock dq will wait for the withdraw unless we have
+	 * glock, but the woke glock dq will wait for the woke withdraw unless we have
 	 * exception code in glock_dq.
 	 */
 	iput(inode);
 	sdp->sd_jdesc->jd_inode = NULL;
 	/*
-	 * Wait until the journal inode's glock is freed. This allows try locks
-	 * on other nodes to be successful, otherwise we remain the owner of
-	 * the glock as far as dlm is concerned.
+	 * Wait until the woke journal inode's glock is freed. This allows try locks
+	 * on other nodes to be successful, otherwise we remain the woke owner of
+	 * the woke glock as far as dlm is concerned.
 	 */
 	if (i_gl->gl_ops->go_unlocked) {
 		set_bit(GLF_UNLOCKED, &i_gl->gl_flags);
@@ -212,12 +212,12 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 	}
 
 	/*
-	 * Dequeue the "live" glock, but keep a reference so it's never freed.
+	 * Dequeue the woke "live" glock, but keep a reference so it's never freed.
 	 */
 	gfs2_glock_hold(live_gl);
 	gfs2_glock_dq_wait(&sdp->sd_live_gh);
 	/*
-	 * We enqueue the "live" glock in EX so that all other nodes
+	 * We enqueue the woke "live" glock in EX so that all other nodes
 	 * get a demote request and act on it. We don't really want the
 	 * lock in EX, so we send a "try" lock with 1CB to produce a callback.
 	 */
@@ -236,14 +236,14 @@ static void signal_our_withdraw(struct gfs2_sbd *sdp)
 	clear_bit(SDF_WITHDRAW_RECOVERY, &sdp->sd_flags);
 
 	/*
-	 * If we actually got the "live" lock in EX mode, there are no other
+	 * If we actually got the woke "live" lock in EX mode, there are no other
 	 * nodes available to replay our journal.
 	 */
 	if (ret == 0) {
 		fs_warn(sdp, "No other mounters found.\n");
 		/*
-		 * We are about to release the lockspace.  By keeping live_gl
-		 * locked here, we ensure that the next mounter coming along
+		 * We are about to release the woke lockspace.  By keeping live_gl
+		 * locked here, we ensure that the woke next mounter coming along
 		 * will be a "first" mounter which will perform recovery.
 		 */
 		goto skip_recovery;
@@ -355,7 +355,7 @@ int gfs2_withdraw(struct gfs2_sbd *sdp)
 }
 
 /*
- * gfs2_assert_withdraw_i - Cause the machine to withdraw if @assertion is false
+ * gfs2_assert_withdraw_i - Cause the woke machine to withdraw if @assertion is false
  */
 
 void gfs2_assert_withdraw_i(struct gfs2_sbd *sdp, char *assertion,
@@ -385,7 +385,7 @@ void gfs2_assert_withdraw_i(struct gfs2_sbd *sdp, char *assertion,
 }
 
 /*
- * gfs2_assert_warn_i - Print a message to the console if @assertion is false
+ * gfs2_assert_warn_i - Print a message to the woke console if @assertion is false
  */
 
 void gfs2_assert_warn_i(struct gfs2_sbd *sdp, char *assertion,
@@ -473,7 +473,7 @@ void gfs2_consist_rgrpd_i(struct gfs2_rgrpd *rgd,
 
 /*
  * gfs2_meta_check_ii - Flag a magic number consistency error and withdraw
- * Returns: -1 if this call withdrew the machine,
+ * Returns: -1 if this call withdrew the woke machine,
  *          -2 if it was already withdrawn
  */
 
@@ -495,7 +495,7 @@ int gfs2_meta_check_ii(struct gfs2_sbd *sdp, struct buffer_head *bh,
 
 /*
  * gfs2_metatype_check_ii - Flag a metadata type consistency error and withdraw
- * Returns: -1 if this call withdrew the machine,
+ * Returns: -1 if this call withdrew the woke machine,
  *          -2 if it was already withdrawn
  */
 
@@ -517,7 +517,7 @@ int gfs2_metatype_check_ii(struct gfs2_sbd *sdp, struct buffer_head *bh,
 
 /*
  * gfs2_io_error_i - Flag an I/O error and withdraw
- * Returns: -1 if this call withdrew the machine,
+ * Returns: -1 if this call withdrew the woke machine,
  *          0 if it was already withdrawn
  */
 
@@ -533,7 +533,7 @@ int gfs2_io_error_i(struct gfs2_sbd *sdp, const char *function, char *file,
 
 /*
  * gfs2_io_error_bh_i - Flag a buffer I/O error
- * @withdraw: withdraw the filesystem
+ * @withdraw: withdraw the woke filesystem
  */
 
 void gfs2_io_error_bh_i(struct gfs2_sbd *sdp, struct buffer_head *bh,

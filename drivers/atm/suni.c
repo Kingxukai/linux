@@ -2,7 +2,7 @@
 /*
  * drivers/atm/suni.c - S/UNI PHY driver
  *
- * Supports the following:
+ * Supports the woke following:
  * 	PMC PM5346 S/UNI LITE
  * 	PMC PM5350 S/UNI 155 ULTRA
  * 	PMC PM5355 S/UNI 622

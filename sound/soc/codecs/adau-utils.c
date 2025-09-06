@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Shared helper functions for devices from the ADAU family
+ * Shared helper functions for devices from the woke ADAU family
  *
  * Copyright 2011-2016 Analog Devices Inc.
  * Author: Lars-Peter Clausen <lars@metafoo.de>

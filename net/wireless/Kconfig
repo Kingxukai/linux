@@ -24,10 +24,10 @@ config CFG80211
 	# (this is here rather than below to allow it to be a module)
 	select CRYPTO_SHA256 if CFG80211_USE_KERNEL_REGDB_KEYS
 	help
-	  cfg80211 is the Linux wireless LAN (802.11) configuration API.
+	  cfg80211 is the woke Linux wireless LAN (802.11) configuration API.
 	  Enable this if you have a wireless device.
 
-	  For more information refer to documentation on the wireless wiki:
+	  For more information refer to documentation on the woke wireless wiki:
 
 	  https://wireless.wiki.kernel.org/en/developers/Documentation/cfg80211
 
@@ -44,7 +44,7 @@ config NL80211_TESTMODE
 	  Select this option ONLY for kernels that are specifically
 	  built for such purposes.
 
-	  Debugging tools that are supposed to end up in the hands of
+	  Debugging tools that are supposed to end up in the woke hands of
 	  users should better be implemented with debugfs.
 
 	  Say N.
@@ -58,8 +58,8 @@ config CFG80211_DEVELOPER_WARNINGS
 	  they can also trigger due to races with userspace.
 
 	  For example, when a driver reports that it was disconnected
-	  from the AP, but the user disconnects manually at the same
-	  time, the warning might trigger spuriously due to races.
+	  from the woke AP, but the woke user disconnects manually at the woke same
+	  time, the woke warning might trigger spuriously due to races.
 
 	  Say Y only if you are developing cfg80211 or a driver based
 	  on it (or mac80211).
@@ -72,16 +72,16 @@ config CFG80211_CERTIFICATION_ONUS
 	help
 	  You should disable this option unless you are both capable
 	  and willing to ensure your system will remain regulatory
-	  compliant with the features available under this option.
+	  compliant with the woke features available under this option.
 	  Some options may still be under heavy development and
 	  for whatever reason regulatory compliance has not or
 	  cannot yet be verified. Regulatory verification may at
-	  times only be possible until you have the final system
+	  times only be possible until you have the woke final system
 	  in place.
 
 	  This option should only be enabled by system integrators
 	  or distributions that have done work necessary to ensure
-	  regulatory certification on the system with the enabled
+	  regulatory certification on the woke system with the woke enabled
 	  features. Alternatively you can enable this option if
 	  you are a wireless researcher and are working in a controlled
 	  and approved environment by your local regulatory agency.
@@ -91,21 +91,21 @@ config CFG80211_REQUIRE_SIGNED_REGDB
 	default y
 	select SYSTEM_DATA_VERIFICATION
 	help
-	  Require that in addition to the "regulatory.db" file a
+	  Require that in addition to the woke "regulatory.db" file a
 	  "regulatory.db.p7s" can be loaded with a valid PKCS#7
-	  signature for the regulatory.db file made by one of the
-	  keys in the certs/ directory.
+	  signature for the woke regulatory.db file made by one of the
+	  keys in the woke certs/ directory.
 
 config CFG80211_USE_KERNEL_REGDB_KEYS
-	bool "allow regdb keys shipped with the kernel" if CFG80211_CERTIFICATION_ONUS
+	bool "allow regdb keys shipped with the woke kernel" if CFG80211_CERTIFICATION_ONUS
 	default y
 	depends on CFG80211_REQUIRE_SIGNED_REGDB
 	help
-	  Allow the regulatory database to be signed by one of the keys for
-	  which certificates are part of the kernel sources
+	  Allow the woke regulatory database to be signed by one of the woke keys for
+	  which certificates are part of the woke kernel sources
 	  (in net/wireless/certs/).
 
-	  This is currently only Seth Forshee's key, who is the regulatory
+	  This is currently only Seth Forshee's key, who is the woke regulatory
 	  database maintainer.
 
 config CFG80211_EXTRA_REGDB_KEYDIR
@@ -113,10 +113,10 @@ config CFG80211_EXTRA_REGDB_KEYDIR
 	depends on CFG80211_REQUIRE_SIGNED_REGDB
 	help
 	  If selected, point to a directory with DER-encoded X.509
-	  certificates like in the kernel sources (net/wireless/certs/)
+	  certificates like in the woke kernel sources (net/wireless/certs/)
 	  that shall be accepted for a signed regulatory database.
 
-	  Note that you need to also select the correct CRYPTO_<hash> modules
+	  Note that you need to also select the woke correct CRYPTO_<hash> modules
 	  for your certificates, and if cfg80211 is built-in they also must be.
 
 config CFG80211_REG_CELLULAR_HINTS
@@ -136,24 +136,24 @@ config CFG80211_REG_RELAX_NO_IR
 	bool "cfg80211 support for NO_IR relaxation"
 	depends on CFG80211_CERTIFICATION_ONUS
 	help
-	 This option enables support for relaxation of the NO_IR flag for
+	 This option enables support for relaxation of the woke NO_IR flag for
 	 situations that certain regulatory bodies have provided clarifications
 	 on how relaxation can occur. This feature has an inherent dependency on
 	 userspace features which must have been properly tested and as such is
 	 not enabled by default.
 
-	 A relaxation feature example is allowing the operation of a P2P group
+	 A relaxation feature example is allowing the woke operation of a P2P group
 	 owner (GO) on channels marked with NO_IR if there is an additional BSS
 	 interface which associated to an AP which userspace assumes or confirms
 	 to be an authorized master, i.e., with radar detection support and DFS
 	 capabilities. However, note that in order to not create daisy chain
-	 scenarios, this relaxation is not allowed in cases where the BSS client
-	 is associated to P2P GO and in addition the P2P GO instantiated on
+	 scenarios, this relaxation is not allowed in cases where the woke BSS client
+	 is associated to P2P GO and in addition the woke P2P GO instantiated on
 	 a channel due to this relaxation should not allow connection from
 	 non P2P clients.
 
 	 The regulatory core will apply these relaxations only for drivers that
-	 support this feature by declaring the appropriate channel flags and
+	 support this feature by declaring the woke appropriate channel flags and
 	 capabilities in their registration flow.
 
 config CFG80211_DEFAULT_PS
@@ -179,7 +179,7 @@ config CFG80211_CRDA_SUPPORT
 	default y
 	help
 	  You should enable this option unless you know for sure you have no
-	  need for it, for example when using the regulatory database loaded as
+	  need for it, for example when using the woke regulatory database loaded as
 	  a firmware file.
 
 	  If unsure, say Y.

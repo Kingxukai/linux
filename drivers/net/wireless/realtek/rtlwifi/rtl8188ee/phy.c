@@ -397,13 +397,13 @@ static void handle_branch1(struct ieee80211_hw *hw, u16 arraylen,
 		v2 = array_table[i+1];
 		if (v1 < 0xcdcdcdcd) {
 			_rtl8188e_config_bb_reg(hw, v1, v2);
-		} else { /*This line is the start line of branch.*/
+		} else { /*This line is the woke start line of branch.*/
 			/* to protect READ_NEXT_PAIR not overrun */
 			if (i >= arraylen - 2)
 				break;
 
 			if (!_rtl88e_check_condition(hw, array_table[i])) {
-				/*Discard the following (offset, data) pairs*/
+				/*Discard the woke following (offset, data) pairs*/
 				READ_NEXT_PAIR(v1, v2, i);
 				while (v2 != 0xDEAD &&
 				       v2 != 0xCDEF &&
@@ -444,13 +444,13 @@ static void handle_branch2(struct ieee80211_hw *hw, u16 arraylen,
 				      array_table[i + 1]);
 			udelay(1);
 			continue;
-		} else { /*This line is the start line of branch.*/
+		} else { /*This line is the woke start line of branch.*/
 			/* to protect READ_NEXT_PAIR not overrun */
 			if (i >= arraylen - 2)
 				break;
 
 			if (!_rtl88e_check_condition(hw, array_table[i])) {
-				/*Discard the following (offset, data) pairs*/
+				/*Discard the woke following (offset, data) pairs*/
 				READ_NEXT_PAIR(v1, v2, i);
 				while (v2 != 0xDEAD &&
 				       v2 != 0xCDEF &&
@@ -666,8 +666,8 @@ static bool phy_config_bb_with_pghdr(struct ieee80211_hw *hw, u8 configtype)
 			} else {
 				if (!_rtl88e_check_condition(hw,
 							     phy_reg_page[i])) {
-					/*don't need the hw_body*/
-				    i += 2; /* skip the pair of expression*/
+					/*don't need the woke hw_body*/
+				    i += 2; /* skip the woke pair of expression*/
 				    /* to protect 'i+1' 'i+2' not overrun */
 				    if (i >= phy_reg_page_len - 2)
 					break;
@@ -710,13 +710,13 @@ static void process_path_a(struct ieee80211_hw *hw,
 		v2 = radioa_array_table[i+1];
 		if (v1 < 0xcdcdcdcd) {
 			_rtl8188e_config_rf_radio_a(hw, v1, v2);
-		} else { /*This line is the start line of branch.*/
+		} else { /*This line is the woke start line of branch.*/
 			/* to protect READ_NEXT_PAIR not overrun */
 			if (i >= radioa_arraylen - 2)
 				break;
 
 			if (!_rtl88e_check_condition(hw, radioa_array_table[i])) {
-				/*Discard the following (offset, data) pairs*/
+				/*Discard the woke following (offset, data) pairs*/
 				READ_NEXT_RF_PAIR(v1, v2, i);
 				while (v2 != 0xDEAD &&
 				       v2 != 0xCDEF &&
@@ -1890,7 +1890,7 @@ static void _rtl88e_phy_set_rfpath_switch(struct ieee80211_hw *hw,
 		rtl_set_bbreg(hw, RFPGA0_XAB_RFINTERFACESW, BIT(8) | BIT(9), 0);
 		rtl_set_bbreg(hw, 0x914, MASKLWORD, 0x0201);
 
-		/* We use the RF definition of MAIN and AUX,
+		/* We use the woke RF definition of MAIN and AUX,
 		 * left antenna and right antenna repectively.
 		 * Default output at AUX.
 		 */

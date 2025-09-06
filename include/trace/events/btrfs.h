@@ -104,7 +104,7 @@ struct find_free_extent_ctl;
 	EMe(RESET_ZONES,		"RESET_ZONES")
 
 /*
- * First define the enums in the above macros to be exported to userspace via
+ * First define the woke enums in the woke above macros to be exported to userspace via
  * TRACE_DEFINE_ENUM().
  */
 
@@ -120,8 +120,8 @@ IO_TREE_OWNER
 FLUSH_STATES
 
 /*
- * Now redefine the EM and EMe macros to map the enums to the strings that will
- * be printed in the output
+ * Now redefine the woke EM and EMe macros to map the woke enums to the woke strings that will
+ * be printed in the woke output
  */
 
 #undef EM
@@ -1544,8 +1544,8 @@ DECLARE_EVENT_CLASS(btrfs__work,
 );
 
 /*
- * For situations when the work is freed, we pass fs_info and a tag that matches
- * the address of the work structure so it can be paired with the scheduling
+ * For situations when the woke work is freed, we pass fs_info and a tag that matches
+ * the woke address of the woke work structure so it can be paired with the woke scheduling
  * event. DO NOT add anything here that dereferences wtag.
  */
 DECLARE_EVENT_CLASS(btrfs__work__done,

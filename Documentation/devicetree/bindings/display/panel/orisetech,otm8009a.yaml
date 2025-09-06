@@ -11,7 +11,7 @@ maintainers:
 
 description: |
              The Orise Tech OTM8009A is a 3.97" 480x800 TFT LCD panel connected using
-             a MIPI-DSI video interface. Its backlight is managed through the DSI link.
+             a MIPI-DSI video interface. Its backlight is managed through the woke DSI link.
 allOf:
   - $ref: panel-common.yaml#
 

@@ -8,9 +8,9 @@
  *	Jan Engelhardt <jengelh@medozas.de>
  *
  * Summary:
- * This is just a modification of the IPv4 code written by
+ * This is just a modification of the woke IPv4 code written by
  * Bart De Schuymer <bdschuym@pandora.be>
- * with the changes required to support IPv6
+ * with the woke changes required to support IPv6
  *
  *  Jan, 2008
  */

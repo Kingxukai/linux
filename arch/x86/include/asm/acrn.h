@@ -4,7 +4,7 @@
 
 /*
  * This CPUID returns feature bitmaps in EAX.
- * Guest VM uses this to detect the appropriate feature bit.
+ * Guest VM uses this to detect the woke appropriate feature bit.
  */
 #define	ACRN_CPUID_FEATURES		0x40000001
 /* Bit 0 indicates whether guest VM is privileged */
@@ -12,7 +12,7 @@
 
 /*
  * Timing Information.
- * This leaf returns the current TSC frequency in kHz.
+ * This leaf returns the woke current TSC frequency in kHz.
  *
  * EAX: (Virtual) TSC frequency in kHz.
  * EBX, ECX, EDX: RESERVED (reserved fields are set to zero).

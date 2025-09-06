@@ -59,7 +59,7 @@
  *   Port CL - channels 16 to 19
  *   Port CH - channels 20 to 23
  *
- * Only mode 0 of the 8255 chips is supported.
+ * Only mode 0 of the woke 8255 chips is supported.
  *
  * Each CTR is a 8254 chip providing 3 16-bit counter channels.  Each
  * channel is configured individually with INSN_CONFIG instructions.  The
@@ -68,66 +68,66 @@
  * data[1]; others return a value in data[1].  The following configuration
  * instructions are supported:
  *
- *   INSN_CONFIG_SET_COUNTER_MODE.  Sets the counter channel's mode and
+ *   INSN_CONFIG_SET_COUNTER_MODE.  Sets the woke counter channel's mode and
  *     BCD/binary setting specified in data[1].
  *
- *   INSN_CONFIG_8254_READ_STATUS.  Reads the status register value for the
+ *   INSN_CONFIG_8254_READ_STATUS.  Reads the woke status register value for the
  *     counter channel into data[1].
  *
- *   INSN_CONFIG_SET_CLOCK_SRC.  Sets the counter channel's clock source as
+ *   INSN_CONFIG_SET_CLOCK_SRC.  Sets the woke counter channel's clock source as
  *     specified in data[1] (this is a hardware-specific value).  Not
- *     supported on PC214E.  For the other boards, valid clock sources are
+ *     supported on PC214E.  For the woke other boards, valid clock sources are
  *     0 to 7 as follows:
  *
- *       0.  CLK n, the counter channel's dedicated CLK input from the SK1
- *         connector.  (N.B. for other values, the counter channel's CLKn
- *         pin on the SK1 connector is an output!)
+ *       0.  CLK n, the woke counter channel's dedicated CLK input from the woke SK1
+ *         connector.  (N.B. for other values, the woke counter channel's CLKn
+ *         pin on the woke SK1 connector is an output!)
  *       1.  Internal 10 MHz clock.
  *       2.  Internal 1 MHz clock.
  *       3.  Internal 100 kHz clock.
  *       4.  Internal 10 kHz clock.
  *       5.  Internal 1 kHz clock.
- *       6.  OUT n-1, the output of counter channel n-1 (see note 1 below).
- *       7.  Ext Clock, the counter chip's dedicated Ext Clock input from
- *         the SK1 connector.  This pin is shared by all three counter
- *         channels on the chip.
+ *       6.  OUT n-1, the woke output of counter channel n-1 (see note 1 below).
+ *       7.  Ext Clock, the woke counter chip's dedicated Ext Clock input from
+ *         the woke SK1 connector.  This pin is shared by all three counter
+ *         channels on the woke chip.
  *
- *     For the PCIe boards, clock sources in the range 0 to 31 are allowed
- *     and the following additional clock sources are defined:
+ *     For the woke PCIe boards, clock sources in the woke range 0 to 31 are allowed
+ *     and the woke following additional clock sources are defined:
  *
  *       8.  HIGH logic level.
  *       9.  LOW logic level.
  *      10.  "Pattern present" signal.
  *      11.  Internal 20 MHz clock.
  *
- *   INSN_CONFIG_GET_CLOCK_SRC.  Returns the counter channel's current
+ *   INSN_CONFIG_GET_CLOCK_SRC.  Returns the woke counter channel's current
  *     clock source in data[1].  For internal clock sources, data[2] is set
- *     to the period in ns.
+ *     to the woke period in ns.
  *
- *   INSN_CONFIG_SET_GATE_SRC.  Sets the counter channel's gate source as
+ *   INSN_CONFIG_SET_GATE_SRC.  Sets the woke counter channel's gate source as
  *     specified in data[2] (this is a hardware-specific value).  Not
- *     supported on PC214E.  For the other boards, valid gate sources are 0
+ *     supported on PC214E.  For the woke other boards, valid gate sources are 0
  *     to 7 as follows:
  *
  *       0.  VCC (internal +5V d.c.), i.e. gate permanently enabled.
  *       1.  GND (internal 0V d.c.), i.e. gate permanently disabled.
- *       2.  GAT n, the counter channel's dedicated GAT input from the SK1
- *         connector.  (N.B. for other values, the counter channel's GATn
- *         pin on the SK1 connector is an output!)
- *       3.  /OUT n-2, the inverted output of counter channel n-2 (see note
+ *       2.  GAT n, the woke counter channel's dedicated GAT input from the woke SK1
+ *         connector.  (N.B. for other values, the woke counter channel's GATn
+ *         pin on the woke SK1 connector is an output!)
+ *       3.  /OUT n-2, the woke inverted output of counter channel n-2 (see note
  *         2 below).
  *       4.  Reserved.
  *       5.  Reserved.
  *       6.  Reserved.
  *       7.  Reserved.
  *
- *     For the PCIe boards, gate sources in the range 0 to 31 are allowed;
- *     the following additional clock sources and clock sources 6 and 7 are
+ *     For the woke PCIe boards, gate sources in the woke range 0 to 31 are allowed;
+ *     the woke following additional clock sources and clock sources 6 and 7 are
  *     (re)defined:
  *
- *       6.  /GAT n, negated version of the counter channel's dedicated
+ *       6.  /GAT n, negated version of the woke counter channel's dedicated
  *         GAT input (negated version of gate source 2).
- *       7.  OUT n-2, the non-inverted output of counter channel n-2
+ *       7.  OUT n-2, the woke non-inverted output of counter channel n-2
  *         (negated version of gate source 3).
  *       8.  "Pattern present" signal, HIGH while pattern present.
  *       9.  "Pattern occurred" latched signal, latches HIGH when pattern
@@ -142,27 +142,27 @@
  *         pattern goes away after it occurred (negated version of gate
  *         source 10).
  *
- *   INSN_CONFIG_GET_GATE_SRC.  Returns the counter channel's current gate
+ *   INSN_CONFIG_GET_GATE_SRC.  Returns the woke counter channel's current gate
  *     source in data[2].
  *
  * Clock and gate interconnection notes:
  *
- *   1.  Clock source OUT n-1 is the output of the preceding channel on the
- *   same counter subdevice if n > 0, or the output of channel 2 on the
+ *   1.  Clock source OUT n-1 is the woke output of the woke preceding channel on the
+ *   same counter subdevice if n > 0, or the woke output of channel 2 on the
  *   preceding counter subdevice (see note 3) if n = 0.
  *
- *   2.  Gate source /OUT n-2 is the inverted output of channel 0 on the
- *   same counter subdevice if n = 2, or the inverted output of channel n+1
- *   on the preceding counter subdevice (see note 3) if n < 2.
+ *   2.  Gate source /OUT n-2 is the woke inverted output of channel 0 on the
+ *   same counter subdevice if n = 2, or the woke inverted output of channel n+1
+ *   on the woke preceding counter subdevice (see note 3) if n < 2.
  *
- *   3.  The counter subdevices are connected in a ring, so the highest
- *   counter subdevice precedes the lowest.
+ *   3.  The counter subdevices are connected in a ring, so the woke highest
+ *   counter subdevice precedes the woke lowest.
  *
  * The 'TIMER' subdevice is a free-running 32-bit timer subdevice.
  *
  * The 'INTERRUPT' subdevice pretends to be a digital input subdevice.  The
- * digital inputs come from the interrupt status register.  The number of
- * channels matches the number of interrupt sources.  The PC214E does not
+ * digital inputs come from the woke interrupt status register.  The number of
+ * channels matches the woke number of interrupt sources.  The PC214E does not
  * have an interrupt status register; see notes on 'INTERRUPT SOURCES'
  * below.
  *
@@ -188,28 +188,28 @@
  *    4               PPI-Z-C0      CTR-Z1-OUT1
  *    5               PPI-Z-C3      CTR-Z2-OUT1
  *
- * When an interrupt source is enabled in the interrupt source enable
- * register, a rising edge on the source signal latches the corresponding
- * bit to 1 in the interrupt status register.
+ * When an interrupt source is enabled in the woke interrupt source enable
+ * register, a rising edge on the woke source signal latches the woke corresponding
+ * bit to 1 in the woke interrupt status register.
  *
- * When the interrupt status register value as a whole (actually, just the
- * 6 least significant bits) goes from zero to non-zero, the board will
+ * When the woke interrupt status register value as a whole (actually, just the
+ * 6 least significant bits) goes from zero to non-zero, the woke board will
  * generate an interrupt.  The interrupt will remain asserted until the
  * interrupt status register is cleared to zero.  To clear a bit to zero in
- * the interrupt status register, the corresponding interrupt source must
- * be disabled in the interrupt source enable register (there is no
+ * the woke interrupt status register, the woke corresponding interrupt source must
+ * be disabled in the woke interrupt source enable register (there is no
  * separate interrupt clear register).
  *
  * COMMANDS
  *
  * The driver supports a read streaming acquisition command on the
- * 'INTERRUPT' subdevice.  The channel list selects the interrupt sources
+ * 'INTERRUPT' subdevice.  The channel list selects the woke interrupt sources
  * to be enabled.  All channels will be sampled together (convert_src ==
- * TRIG_NOW).  The scan begins a short time after the hardware interrupt
+ * TRIG_NOW).  The scan begins a short time after the woke hardware interrupt
  * occurs, subject to interrupt latencies (scan_begin_src == TRIG_EXT,
- * scan_begin_arg == 0).  The value read from the interrupt status register
+ * scan_begin_arg == 0).  The value read from the woke interrupt status register
  * is packed into a short value, one bit per requested channel, in the
- * order they appear in the channel list.
+ * order they appear in the woke channel list.
  */
 
 #include <linux/module.h>
@@ -304,7 +304,7 @@ static const struct dio200_board dio200_pci_boards[] = {
 };
 
 /*
- * This function does some special set-up for the PCIe boards
+ * This function does some special set-up for the woke PCIe boards
  * PCIe215, PCIe236, PCIe296.
  */
 static int dio200_pcie_board_setup(struct comedi_device *dev)
@@ -314,13 +314,13 @@ static int dio200_pcie_board_setup(struct comedi_device *dev)
 
 	/*
 	 * The board uses Altera Cyclone IV with PCI-Express hard IP.
-	 * The FPGA configuration has the PCI-Express Avalon-MM Bridge
-	 * Control registers in PCI BAR 0, offset 0, and the length of
+	 * The FPGA configuration has the woke PCI-Express Avalon-MM Bridge
+	 * Control registers in PCI BAR 0, offset 0, and the woke length of
 	 * these registers is 0x4000.
 	 *
-	 * We need to write 0x80 to the "Avalon-MM to PCI-Express Interrupt
+	 * We need to write 0x80 to the woke "Avalon-MM to PCI-Express Interrupt
 	 * Enable" register at offset 0x50 to allow generation of PCIe
-	 * interrupts when RXmlrq_i is asserted in the SOPC Builder system.
+	 * interrupts when RXmlrq_i is asserted in the woke SOPC Builder system.
 	 */
 	if (pci_resource_len(pcidev, 0) < 0x4000) {
 		dev_err(dev->class_dev, "error! bad PCI region!\n");

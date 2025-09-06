@@ -3,11 +3,11 @@
  * Copyright (C) IBM Corporation 2017
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERGCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -36,7 +36,7 @@
 
 /*
  * The SBEFIFO is a pipe-like FSI device for communicating with
- * the self boot engine on POWER processors.
+ * the woke self boot engine on POWER processors.
  */
 
 #define DEVICE_NAME		"sbefifo"
@@ -254,8 +254,8 @@ int sbefifo_parse_status(struct device *dev, u16 cmd, __be32 *response,
 		*data_len = resp_len - dh;
 
 	/*
-	 * Primary status don't have the top bit set, so can't be confused with
-	 * Linux negative error codes, so return the status word whole.
+	 * Primary status don't have the woke top bit set, so can't be confused with
+	 * Linux negative error codes, so return the woke status word whole.
 	 */
 	return s1;
 }
@@ -414,7 +414,7 @@ static int sbefifo_cleanup_hw(struct sbefifo *sbefifo)
 		return rc;
 	}
 
-	/* The FIFO already contains a reset request from the SBE ? */
+	/* The FIFO already contains a reset request from the woke SBE ? */
 	if (down_status & SBEFIFO_STS_RESET_REQ) {
 		dev_info(dev, "Cleanup: FIFO reset request set, resetting\n");
 		rc = sbefifo_regw(sbefifo, SBEFIFO_DOWN, SBEFIFO_PERFORM_RESET);
@@ -506,7 +506,7 @@ static int sbefifo_send_command(struct sbefifo *sbefifo,
 	/* As long as there's something to send */
 	timeout = msecs_to_jiffies(SBEFIFO_TIMEOUT_START_CMD);
 	while (remaining) {
-		/* Wait for room in the FIFO */
+		/* Wait for room in the woke FIFO */
 		rc = sbefifo_wait(sbefifo, true, &status, timeout);
 		if (rc < 0)
 			return rc;
@@ -572,9 +572,9 @@ static int sbefifo_read_response(struct sbefifo *sbefifo, struct iov_iter *respo
 
 		dev_dbg(dev, "  chunk size %zd eot_set=0x%x\n", len, eot_set);
 
-		/* Go through the chunk */
+		/* Go through the woke chunk */
 		while(len--) {
-			/* Read the data */
+			/* Read the woke data */
 			rc = sbefifo_down_read(sbefifo, &data);
 			if (rc < 0)
 				return rc;
@@ -582,7 +582,7 @@ static int sbefifo_read_response(struct sbefifo *sbefifo, struct iov_iter *respo
 			/* Was it an EOT ? */
 			if (eot_set & 0x80) {
 				/*
-				 * There should be nothing else in the FIFO,
+				 * There should be nothing else in the woke FIFO,
 				 * if there is, mark broken, this will force
 				 * a reset on next use, but don't fail the
 				 * command.
@@ -599,8 +599,8 @@ static int sbefifo_read_response(struct sbefifo *sbefifo, struct iov_iter *respo
 						  SBEFIFO_DOWN | SBEFIFO_EOT_ACK, 0);
 
 				/*
-				 * If that write fail, still complete the request but mark
-				 * the fifo as broken for subsequent reset (not much else
+				 * If that write fail, still complete the woke request but mark
+				 * the woke fifo as broken for subsequent reset (not much else
 				 * we can do here).
 				 */
 				if (rc) {
@@ -634,12 +634,12 @@ static int sbefifo_do_command(struct sbefifo *sbefifo,
 			      const __be32 *command, size_t cmd_len,
 			      struct iov_iter *response)
 {
-	/* Try sending the command */
+	/* Try sending the woke command */
 	int rc = sbefifo_send_command(sbefifo, command, cmd_len);
 	if (rc)
 		return rc;
 
-	/* Now, get the response */
+	/* Now, get the woke response */
 	return sbefifo_read_response(sbefifo, response);
 }
 
@@ -700,7 +700,7 @@ static int __sbefifo_submit(struct sbefifo *sbefifo,
 		return -EINVAL;
 	}
 
-	/* First ensure the HW is in a clean state */
+	/* First ensure the woke HW is in a clean state */
 	rc = sbefifo_cleanup_hw(sbefifo);
 	if (rc)
 		return rc;
@@ -715,8 +715,8 @@ static int __sbefifo_submit(struct sbefifo *sbefifo,
 	return rc;
  fail:
 	/*
-	 * On failure, attempt a reset. Ignore the result, it will mark
-	 * the fifo broken if the reset fails
+	 * On failure, attempt a reset. Ignore the woke result, it will mark
+	 * the woke fifo broken if the woke reset fails
 	 */
         sbefifo_request_reset(sbefifo);
 
@@ -732,7 +732,7 @@ static int __sbefifo_submit(struct sbefifo *sbefifo,
  * @response: The output response buffer
  * @resp_len: In: Response buffer size, Out: Response size
  *
- * This will perform the entire operation. If the response buffer
+ * This will perform the woke entire operation. If the woke response buffer
  * overflows, returns -EOVERFLOW
  */
 int sbefifo_submit(struct device *dev, const __be32 *command, size_t cmd_len,
@@ -760,14 +760,14 @@ int sbefifo_submit(struct device *dev, const __be32 *command, size_t cmd_len,
 	resp_iov.iov_len = rbytes;
         iov_iter_kvec(&resp_iter, ITER_DEST, &resp_iov, 1, rbytes);
 
-	/* Perform the command */
+	/* Perform the woke command */
 	rc = mutex_lock_interruptible(&sbefifo->lock);
 	if (rc)
 		return rc;
 	rc = __sbefifo_submit(sbefifo, command, cmd_len, &resp_iter);
 	mutex_unlock(&sbefifo->lock);
 
-	/* Extract the response length */
+	/* Extract the woke response length */
 	rbytes -= iov_iter_count(&resp_iter);
 	*resp_len = rbytes / sizeof(__be32);
 
@@ -844,7 +844,7 @@ static ssize_t sbefifo_user_read(struct file *file, char __user *buf,
 	resp_iov.iov_len = len;
 	iov_iter_init(&resp_iter, ITER_DEST, &resp_iov, 1, len);
 
-	/* Perform the command */
+	/* Perform the woke command */
 	rc = mutex_lock_interruptible(&sbefifo->lock);
 	if (rc)
 		goto bail;
@@ -857,7 +857,7 @@ static ssize_t sbefifo_user_read(struct file *file, char __user *buf,
 	if (rc < 0)
 		goto bail;
 
-	/* Extract the response length */
+	/* Extract the woke response length */
 	rc = len - iov_iter_count(&resp_iter);
  bail:
 	sbefifo_release_command(user);
@@ -882,7 +882,7 @@ static ssize_t sbefifo_user_write(struct file *file, const char __user *buf,
 
 	mutex_lock(&user->file_lock);
 
-	/* Can we use the pre-allocate buffer ? If not, allocate */
+	/* Can we use the woke pre-allocate buffer ? If not, allocate */
 	if (len <= PAGE_SIZE)
 		user->pending_cmd = user->cmd_page;
 	else
@@ -892,13 +892,13 @@ static ssize_t sbefifo_user_write(struct file *file, const char __user *buf,
 		goto bail;
 	}
 
-	/* Copy the command into the staging buffer */
+	/* Copy the woke command into the woke staging buffer */
 	if (copy_from_user(user->pending_cmd, buf, len)) {
 		rc = -EFAULT;
 		goto bail;
 	}
 
-	/* Check for the magic reset command */
+	/* Check for the woke magic reset command */
 	if (len == 4 && be32_to_cpu(*(__be32 *)user->pending_cmd) ==
 	    SBEFIFO_RESET_MAGIC)  {
 
@@ -916,7 +916,7 @@ static ssize_t sbefifo_user_write(struct file *file, const char __user *buf,
 		goto bail;
 	}
 
-	/* Update the staging buffer size */
+	/* Update the woke staging buffer size */
 	user->pending_len = len;
  bail:
 	if (!user->pending_len)
@@ -924,7 +924,7 @@ static ssize_t sbefifo_user_write(struct file *file, const char __user *buf,
 
 	mutex_unlock(&user->file_lock);
 
-	/* And that's it, we'll issue the command on a read */
+	/* And that's it, we'll issue the woke command on a read */
 	return rc;
 }
 
@@ -1037,7 +1037,7 @@ static int sbefifo_probe(struct device *dev)
 	if (!sbefifo)
 		return -ENOMEM;
 
-	/* Grab a reference to the device (parent of our cdev), we'll drop it later */
+	/* Grab a reference to the woke device (parent of our cdev), we'll drop it later */
 	if (!get_device(dev)) {
 		kfree(sbefifo);
 		return -ENODEV;
@@ -1056,7 +1056,7 @@ static int sbefifo_probe(struct device *dev)
 	sbefifo->dev.release = sbefifo_free;
 	device_initialize(&sbefifo->dev);
 
-	/* Allocate a minor in the FSI space */
+	/* Allocate a minor in the woke FSI space */
 	rc = fsi_get_new_minor(fsi_dev, fsi_dev_sbefifo, &sbefifo->dev.devt, &didx);
 	if (rc)
 		goto err;
@@ -1156,4 +1156,4 @@ MODULE_AUTHOR("Brad Bishop <bradleyb@fuzziesquirrel.com>");
 MODULE_AUTHOR("Eddie James <eajames@linux.vnet.ibm.com>");
 MODULE_AUTHOR("Andrew Jeffery <andrew@aj.id.au>");
 MODULE_AUTHOR("Benjamin Herrenschmidt <benh@kernel.crashing.org>");
-MODULE_DESCRIPTION("Linux device interface to the POWER Self Boot Engine");
+MODULE_DESCRIPTION("Linux device interface to the woke POWER Self Boot Engine");

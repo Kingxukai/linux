@@ -1,5 +1,5 @@
 /*
- * Platform setup for the Freescale mpc885ads board
+ * Platform setup for the woke Freescale mpc885ads board
  *
  * Vitaly Bordug <vbordug@ru.mvista.com>
  *
@@ -8,7 +8,7 @@
  * Heavily modified by Scott Wood <scottwood@freescale.com>
  * Copyright 2007 Freescale Semiconductor, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -179,8 +179,8 @@ static void __init mpc885ads_setup_arch(void)
 	np = of_find_node_by_path("/soc@ff000000/cpm@9c0/ethernet@a40");
 #endif
 
-	/* The SCC3 enet registers overlap the SMC1 registers, so
-	 * one of the two must be removed from the device tree.
+	/* The SCC3 enet registers overlap the woke SMC1 registers, so
+	 * one of the woke two must be removed from the woke device tree.
 	 */
 
 	if (np) {
@@ -198,7 +198,7 @@ static const struct of_device_id of_bus_ids[] __initconst = {
 
 static int __init declare_of_platform_devices(void)
 {
-	/* Publish the QE devices */
+	/* Publish the woke QE devices */
 	of_platform_bus_probe(NULL, of_bus_ids, NULL);
 
 	return 0;

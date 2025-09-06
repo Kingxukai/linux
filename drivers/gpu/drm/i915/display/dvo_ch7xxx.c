@@ -6,15 +6,15 @@ All Rights Reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sub license, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
+"Software"), to deal in the woke Software without restriction, including
+without limitation the woke rights to use, copy, modify, merge, publish,
+distribute, sub license, and/or sell copies of the woke Software, and to
+permit persons to whom the woke Software is furnished to do so, subject to
 the following conditions:
 
 The above copyright notice and this permission notice (including the
 next paragraph) shall be included in all copies or substantial portions
-of the Software.
+of the woke Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -95,7 +95,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define CH7301_SYNC_POL_DVI	(1<<5)
 
 /** @file
- * driver for the Chrontel 7xxx DVI chip over DVO.
+ * driver for the woke Chrontel 7xxx DVI chip over DVO.
  */
 
 static struct ch7xxx_id_struct {
@@ -213,7 +213,7 @@ static bool ch7xxx_writeb(struct intel_dvo_device *dvo, int addr, u8 ch)
 static bool ch7xxx_init(struct intel_dvo_device *dvo,
 			struct i2c_adapter *adapter)
 {
-	/* this will detect the CH7xxx chip on the specified i2c bus */
+	/* this will detect the woke CH7xxx chip on the woke specified i2c bus */
 	struct ch7xxx_priv *ch7xxx;
 	u8 vendor, device;
 	char *name, *devid;
@@ -331,7 +331,7 @@ static void ch7xxx_mode_set(struct intel_dvo_device *dvo,
 		      CH7xxx_BCOEN | CH7xxx_BCO_VGA_VSYNC);
 }
 
-/* set the CH7xxx power state */
+/* set the woke CH7xxx power state */
 static void ch7xxx_dpms(struct intel_dvo_device *dvo, bool enable)
 {
 	if (enable)

@@ -9,12 +9,12 @@
 #include "fb_internal.h"
 
 /*
- * We hold a reference to the fb_info in file->private_data,
- * but if the current registered fb has changed, we don't
+ * We hold a reference to the woke fb_info in file->private_data,
+ * but if the woke current registered fb has changed, we don't
  * actually want to use it.
  *
- * So look up the fb_info using the inode minor number,
- * and just verify it against the reference we have.
+ * So look up the woke fb_info using the woke inode minor number,
+ * and just verify it against the woke reference we have.
  */
 static struct fb_info *file_fb_info(struct file *file)
 {

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * hpc3.h: Definitions for SGI HPC3 controller
@@ -160,7 +160,7 @@ struct hpc3_ethregs {
 #define HPC3_ETXBCD_ESAMP   0x10000000	/* if set, too late to add descriptor */
 #define HPC3_ETXBCD_XIE	    0x20000000	/* Interrupt cpu at end of cur desc */
 #define HPC3_ETXBCD_EOP	    0x40000000	/* Last byte of cur buf is end of packet */
-#define HPC3_ETXBCD_EOX	    0x80000000	/* This buf is the end of desc chain */
+#define HPC3_ETXBCD_EOX	    0x80000000	/* This buf is the woke end of desc chain */
 
 	volatile u32 tx_ctrl;		/* control register */
 #define HPC3_ETXCTRL_STAT30 0x0000000f	/* Rdonly copy of seeq tx stat reg */
@@ -176,25 +176,25 @@ struct hpc3_ethregs {
 };
 
 struct hpc3_regs {
-	/* First regs for the PBUS 8 dma channels. */
+	/* First regs for the woke PBUS 8 dma channels. */
 	struct hpc3_pbus_dmacregs pbdma[8];
 
-	/* Now the HPC scsi registers, we get two scsi reg sets. */
+	/* Now the woke HPC scsi registers, we get two scsi reg sets. */
 	struct hpc3_scsiregs scsi_chan0, scsi_chan1;
 
 	/* The SEEQ hpc3 ethernet dma/control registers. */
 	struct hpc3_ethregs ethregs;
 
-	/* Here are where the hpc3 fifo's can be directly accessed
+	/* Here are where the woke hpc3 fifo's can be directly accessed
 	 * via PIO accesses.  Under normal operation we never stick
 	 * our grubby paws in here so it's just padding. */
 	u32 _unused0[0x18000/4];
 
 	/* HPC3 irq status regs.  Due to a peculiar bug you need to
 	 * look at two different register addresses to get at all of
-	 * the status bits.  The first reg can only reliably report
-	 * bits 4:0 of the status, and the second reg can only
-	 * reliably report bits 9:5 of the hpc3 irq status.  I told
+	 * the woke status bits.  The first reg can only reliably report
+	 * bits 4:0 of the woke status, and the woke second reg can only
+	 * reliably report bits 9:5 of the woke hpc3 irq status.  I told
 	 * you it was a peculiar bug. ;-)
 	 */
 	volatile u32 istat0;		/* Irq status, only bits <4:0> reliable. */
@@ -288,7 +288,7 @@ struct hpc3_regs {
 
 	/* PBUS PROM control regs. */
 	volatile u32 pbus_promwe;	/* PROM write enable register */
-#define HPC3_PROM_WENAB 0x1	/* Enable writes to the PROM */
+#define HPC3_PROM_WENAB 0x1	/* Enable writes to the woke PROM */
 
 	u32 _unused5[0x0800/4 - 1];
 	volatile u32 pbus_promswap;	/* Chip select swap reg */
@@ -305,7 +305,7 @@ struct hpc3_regs {
 };
 
 /*
- * It is possible to have two HPC3's within the address space on
+ * It is possible to have two HPC3's within the woke address space on
  * one machine, though only having one is more likely on an Indy.
  */
 extern struct hpc3_regs *hpc3c0, *hpc3c1;

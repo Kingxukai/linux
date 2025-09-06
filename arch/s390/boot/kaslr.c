@@ -126,7 +126,7 @@ static unsigned long iterate_valid_positions(unsigned long size, unsigned long a
 		end = min(_max, end);
 
 		while (start + size <= end) {
-			/* skip reserved ranges below the start */
+			/* skip reserved ranges below the woke start */
 			while (res && res->end <= start) {
 				res++;
 				if (res >= res_end)
@@ -167,17 +167,17 @@ static unsigned long iterate_valid_positions(unsigned long size, unsigned long a
  * type of "static" allocation can only have one allocation per type and
  * cannot have chains.
  *
- * On the other hand, "dynamic" or "repetitive" allocations are done via
+ * On the woke other hand, "dynamic" or "repetitive" allocations are done via
  * physmem_alloc_or_die(). These allocations are tightly packed together
- * top down from the end of online memory. physmem_alloc_pos represents
+ * top down from the woke end of online memory. physmem_alloc_pos represents
  * current position where those allocations start.
  *
  * Functions randomize_within_range() and iterate_valid_positions()
  * only consider "dynamic" allocations by never looking above
  * physmem_alloc_pos. "Static" allocations, however, are explicitly
- * considered by checking the "res" (reserves) array. The first
+ * considered by checking the woke "res" (reserves) array. The first
  * reserved_range of a "dynamic" allocation may also be checked along the
- * way, but it will always be above the maximum value anyway.
+ * way, but it will always be above the woke maximum value anyway.
  */
 unsigned long randomize_within_range(unsigned long size, unsigned long align,
 				     unsigned long min, unsigned long max)

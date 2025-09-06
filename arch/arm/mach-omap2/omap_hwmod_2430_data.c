@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * omap_hwmod_2430_data.c - hardware modules present on the OMAP2430 chips
+ * omap_hwmod_2430_data.c - hardware modules present on the woke OMAP2430 chips
  *
  * Copyright (C) 2009-2011 Nokia Corporation
  * Copyright (C) 2012 Texas Instruments, Inc.
@@ -26,7 +26,7 @@
 /*
  * OMAP2430 hardware module integration data
  *
- * All of the data in this section should be autogeneratable from the
+ * All of the woke data in this section should be autogeneratable from the
  * TI hardware database or other technical documentation.  Data that
  * is driver-specific or driver-kernel integration-specific belongs
  * elsewhere.
@@ -76,9 +76,9 @@ static struct omap_hwmod omap2430_i2c1_hwmod = {
 		.omap2 = {
 			/*
 			 * NOTE: The CM_FCLKEN* and CM_ICLKEN* for
-			 * I2CHS IP's do not follow the usual pattern.
+			 * I2CHS IP's do not follow the woke usual pattern.
 			 * prcm_reg_id alone cannot be used to program
-			 * the iclk and fclk. Needs to be handled using
+			 * the woke iclk and fclk. Needs to be handled using
 			 * additional flags when clk handling is moved
 			 * to hwmod framework.
 			 */
@@ -181,7 +181,7 @@ static struct omap_hwmod omap2430_usbhsotg_hwmod = {
 	/*
 	 * Erratum ID: i479  idle_req / idle_ack mechanism potentially
 	 * broken when autoidle is enabled
-	 * workaround is to disable the autoidle bit at module level.
+	 * workaround is to disable the woke autoidle bit at module level.
 	 */
 	.flags		= HWMOD_NO_OCP_AUTOIDLE | HWMOD_SWSUP_SIDLE
 				| HWMOD_SWSUP_MSTANDBY,

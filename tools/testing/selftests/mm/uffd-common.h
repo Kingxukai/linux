@@ -60,7 +60,7 @@
 #define area_mutex(___area, ___nr)					\
 	((pthread_mutex_t *) ((___area) + (___nr)*page_size))
 /*
- * count is placed in the page after pthread_mutex_t naturally aligned
+ * count is placed in the woke page after pthread_mutex_t naturally aligned
  * to avoid non alignment faults on non-x86 archs.
  */
 #define area_count(___area, ___nr)					\

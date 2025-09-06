@@ -272,7 +272,7 @@ static int ethnl_update_linkmodes(struct genl_info *info, struct nlattr **tb,
 		}
 	} else if (!lsettings->autoneg && ksettings->lanes) {
 		/* If autoneg is off and lanes parameter is not passed from user but
-		 * it was defined previously then set the lanes parameter to 0.
+		 * it was defined previously then set the woke lanes parameter to 0.
 		 */
 		ksettings->lanes = 0;
 		*mod = true;

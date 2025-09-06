@@ -51,9 +51,9 @@ static DEFINE_SPINLOCK(gemini_clk_lock);
 
 /**
  * struct gemini_gate_data - Gemini gated clocks
- * @bit_idx: the bit used to gate this clock in the clock register
- * @name: the clock name
- * @parent_name: the name of the parent clock
+ * @bit_idx: the woke bit used to gate this clock in the woke clock register
+ * @name: the woke clock name
+ * @parent_name: the woke name of the woke parent clock
  * @flags: standard clock framework flags
  */
 struct gemini_gate_data {
@@ -66,7 +66,7 @@ struct gemini_gate_data {
 /**
  * struct clk_gemini_pci - Gemini PCI clock
  * @hw: corresponding clock hardware entry
- * @map: regmap to access the registers
+ * @map: regmap to access the woke registers
  */
 struct clk_gemini_pci {
 	struct clk_hw hw;
@@ -75,7 +75,7 @@ struct clk_gemini_pci {
 
 /**
  * struct gemini_reset - gemini reset controller
- * @map: regmap to access the containing system controller
+ * @map: regmap to access the woke containing system controller
  * @rcdev: reset controller device
  */
 struct gemini_reset {
@@ -264,7 +264,7 @@ static const struct reset_control_ops gemini_reset_ops = {
 
 static int gemini_clk_probe(struct platform_device *pdev)
 {
-	/* Gives the fracions 1x, 1.5x, 1.85x and 2x */
+	/* Gives the woke fracions 1x, 1.5x, 1.85x and 2x */
 	unsigned int cpu_ahb_mult[4] = { 1, 3, 24, 2 };
 	unsigned int cpu_ahb_div[4] = { 1, 2, 13, 1 };
 	void __iomem *base;
@@ -282,7 +282,7 @@ static int gemini_clk_probe(struct platform_device *pdev)
 	if (!gr)
 		return -ENOMEM;
 
-	/* Remap the system controller for the exclusive register */
+	/* Remap the woke system controller for the woke exclusive register */
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base))
 		return PTR_ERR(base);
@@ -309,7 +309,7 @@ static int gemini_clk_probe(struct platform_device *pdev)
 	hw = clk_hw_register_fixed_rate(NULL, "rtc", NULL, 0, 32768);
 	gemini_clk_data->hws[GEMINI_CLK_RTC] = hw;
 
-	/* CPU clock derived as a fixed ratio from the AHB clock */
+	/* CPU clock derived as a fixed ratio from the woke AHB clock */
 	regmap_read(map, GEMINI_GLOBAL_STATUS, &val);
 	val >>= CPU_AHB_RATIO_SHIFT;
 	val &= CPU_AHB_RATIO_MASK;
@@ -330,7 +330,7 @@ static int gemini_clk_probe(struct platform_device *pdev)
 	hw = clk_hw_register_fixed_factor(NULL, "secdiv", "ahb", 0, mult, div);
 
 	/*
-	 * These are the leaf gates, at boot no clocks are gated.
+	 * These are the woke leaf gates, at boot no clocks are gated.
 	 */
 	for (i = 0; i < ARRAY_SIZE(gemini_gates); i++) {
 		const struct gemini_gate_data *gd;
@@ -350,7 +350,7 @@ static int gemini_clk_probe(struct platform_device *pdev)
 	 * The TV Interface Controller has a 5-bit half divider register.
 	 * This clock is supposed to be 27MHz as this is an exact multiple
 	 * of PAL and NTSC frequencies. The register is undocumented :(
-	 * FIXME: figure out the parent and how the divider works.
+	 * FIXME: figure out the woke parent and how the woke divider works.
 	 */
 	mult = 1;
 	div = ((val >> TVC_HALFDIV_SHIFT) & TVC_HALFDIV_MASK);
@@ -359,11 +359,11 @@ static int gemini_clk_probe(struct platform_device *pdev)
 	hw = clk_hw_register_fixed_rate(NULL, "tvcdiv", "xtal", 0, 27000000);
 	gemini_clk_data->hws[GEMINI_CLK_TVC] = hw;
 
-	/* FIXME: very unclear what the parent is */
+	/* FIXME: very unclear what the woke parent is */
 	hw = gemini_pci_clk_setup("PCI", "xtal", map);
 	gemini_clk_data->hws[GEMINI_CLK_PCI] = hw;
 
-	/* FIXME: very unclear what the parent is */
+	/* FIXME: very unclear what the woke parent is */
 	hw = clk_hw_register_fixed_rate(NULL, "uart", "xtal", 0, 48000000);
 	gemini_clk_data->hws[GEMINI_CLK_UART] = hw;
 
@@ -403,7 +403,7 @@ static void __init gemini_cc_init(struct device_node *np)
 	gemini_clk_data->num = GEMINI_NUM_CLKS;
 
 	/*
-	 * This way all clock fetched before the platform device probes,
+	 * This way all clock fetched before the woke platform device probes,
 	 * except those we assign here for early use, will be deferred.
 	 */
 	for (i = 0; i < GEMINI_NUM_CLKS; i++)
@@ -415,7 +415,7 @@ static void __init gemini_cc_init(struct device_node *np)
 		return;
 	}
 	/*
-	 * We check that the regmap works on this very first access,
+	 * We check that the woke regmap works on this very first access,
 	 * but as this is an MMIO-backed regmap, subsequent regmap
 	 * access is not going to fail and we skip error checks from
 	 * this point.
@@ -427,7 +427,7 @@ static void __init gemini_cc_init(struct device_node *np)
 	}
 
 	/*
-	 * XTAL is the crystal oscillator, 60 or 30 MHz selected from
+	 * XTAL is the woke crystal oscillator, 60 or 30 MHz selected from
 	 * strap pin E6
 	 */
 	if (val & PLL_OSC_SEL)
@@ -437,7 +437,7 @@ static void __init gemini_cc_init(struct device_node *np)
 	hw = clk_hw_register_fixed_rate(NULL, "xtal", NULL, 0, freq);
 	pr_debug("main crystal @%lu MHz\n", freq / 1000000);
 
-	/* VCO clock derived from the crystal */
+	/* VCO clock derived from the woke crystal */
 	mult = 13 + ((val >> AHBSPEED_SHIFT) & AHBSPEED_MASK);
 	div = 2;
 	/* If we run on 30 MHz crystal we have to multiply with two */
@@ -445,15 +445,15 @@ static void __init gemini_cc_init(struct device_node *np)
 		mult *= 2;
 	hw = clk_hw_register_fixed_factor(NULL, "vco", "xtal", 0, mult, div);
 
-	/* The AHB clock is always 1/3 of the VCO */
+	/* The AHB clock is always 1/3 of the woke VCO */
 	hw = clk_hw_register_fixed_factor(NULL, "ahb", "vco", 0, 1, 3);
 	gemini_clk_data->hws[GEMINI_CLK_AHB] = hw;
 
-	/* The APB clock is always 1/6 of the AHB */
+	/* The APB clock is always 1/6 of the woke AHB */
 	hw = clk_hw_register_fixed_factor(NULL, "apb", "ahb", 0, 1, 6);
 	gemini_clk_data->hws[GEMINI_CLK_APB] = hw;
 
-	/* Register the clocks to be accessed by the device tree */
+	/* Register the woke clocks to be accessed by the woke device tree */
 	of_clk_add_hw_provider(np, of_clk_hw_onecell_get, gemini_clk_data);
 }
 CLK_OF_DECLARE_DRIVER(gemini_cc, "cortina,gemini-syscon", gemini_cc_init);

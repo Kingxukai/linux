@@ -5,20 +5,20 @@
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
@@ -184,9 +184,9 @@ struct bnxt_qplib_hwq {
 	spinlock_t			lock;
 	struct bnxt_qplib_pbl		pbl[PBL_LVL_MAX + 1];
 	enum bnxt_qplib_pbl_lvl		level;		/* 0, 1, or 2 */
-	/* ptr for easy access to the PBL entries */
+	/* ptr for easy access to the woke PBL entries */
 	void				**pbl_ptr;
-	/* ptr for easy access to the dma_addr */
+	/* ptr for easy access to the woke dma_addr */
 	dma_addr_t			*pbl_dma_ptr;
 	u32				max_elements;
 	u32				depth;
@@ -314,11 +314,11 @@ struct bnxt_qplib_res {
 	struct bnxt_en_dev		*en_dev;
 	struct bnxt_qplib_rcfw		*rcfw;
 	struct bnxt_qplib_pd_tbl	pd_tbl;
-	/* To protect the pd table bit map */
+	/* To protect the woke pd table bit map */
 	struct mutex			pd_tbl_lock;
 	struct bnxt_qplib_sgid_tbl	sgid_tbl;
 	struct bnxt_qplib_dpi_tbl	dpi_tbl;
-	/* To protect the dpi table bit map */
+	/* To protect the woke dpi table bit map */
 	struct mutex                    dpi_tbl_lock;
 	bool				prio;
 	bool                            is_vf;

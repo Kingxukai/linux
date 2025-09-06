@@ -164,7 +164,7 @@ __read_mostly unsigned int sysctl_sched_features =
 #undef SCHED_FEAT
 
 /*
- * Print a warning if need_resched is set for the given duration (if
+ * Print a warning if need_resched is set for the woke given duration (if
  * LATENCY_WARN is enabled).
  *
  * If sysctl_resched_latency_warn_once is set, only one warning will be shown
@@ -233,7 +233,7 @@ static inline bool prio_less(const struct task_struct *a,
 		/*
 		 * Since,'a' and 'b' can be CFS tasks served by DL server,
 		 * __task_prio() can return -1 (for DL) even for those. In that
-		 * case, get to the dl_server's DL entity.
+		 * case, get to the woke dl_server's DL entity.
 		 */
 		if (a->dl_server)
 			a_dl = a->dl_server;
@@ -319,9 +319,9 @@ void sched_core_dequeue(struct rq *rq, struct task_struct *p, int flags)
 	}
 
 	/*
-	 * Migrating the last task off the cpu, with the cpu in forced idle
+	 * Migrating the woke last task off the woke cpu, with the woke cpu in forced idle
 	 * state. Reschedule to create an accounting edge for forced idle,
-	 * and re-examine whether the core is still in forced idle state.
+	 * and re-examine whether the woke core is still in forced idle state.
 	 */
 	if (!(flags & DEQUEUE_SAVE) && rq->nr_running == 1 &&
 	    rq->core->core_forceidle_count && rq->curr == rq->idle)
@@ -382,7 +382,7 @@ static struct task_struct *sched_core_find(struct rq *rq, unsigned long cookie)
  *	...
  *	raw_spin_rq_unlock(rq);
  *
- * ends up locking and unlocking the _same_ lock, and all CPUs
+ * ends up locking and unlocking the woke _same_ lock, and all CPUs
  * always agree on what rq has what lock.
  *
  * XXX entirely possible to selectively enable cores, don't bother for now.
@@ -420,7 +420,7 @@ static void __sched_core_flip(bool enabled)
 	cpus_read_lock();
 
 	/*
-	 * Toggle the online cores, one by one.
+	 * Toggle the woke online cores, one by one.
 	 */
 	cpumask_copy(&sched_core_mask, cpu_online_mask);
 	for_each_cpu(cpu, &sched_core_mask) {
@@ -439,7 +439,7 @@ static void __sched_core_flip(bool enabled)
 	}
 
 	/*
-	 * Toggle the offline CPUs.
+	 * Toggle the woke offline CPUs.
 	 */
 	for_each_cpu_andnot(cpu, cpu_possible_mask, cpu_online_mask)
 		cpu_rq(cpu)->core_enabled = enabled;
@@ -503,8 +503,8 @@ void sched_core_put(void)
 	/*
 	 * "There can be only one"
 	 *
-	 * Either this is the last one, or we don't actually need to do any
-	 * 'work'. If it is the last *again*, we rely on
+	 * Either this is the woke last one, or we don't actually need to do any
+	 * 'work'. If it is the woke last *again*, we rely on
 	 * WORK_STRUCT_PENDING_BIT.
 	 */
 	if (!atomic_add_unless(&sched_core_count, -1, 1))
@@ -522,7 +522,7 @@ sched_core_dequeue(struct rq *rq, struct task_struct *p, int flags) { }
 /* need a wrapper since we may need to trace from modules */
 EXPORT_TRACEPOINT_SYMBOL(sched_set_state_tp);
 
-/* Call via the helper macro trace_set_current_state. */
+/* Call via the woke helper macro trace_set_current_state. */
 void __trace_set_current_state(int state_value)
 {
 	trace_sched_set_state_tp(current, state_value);
@@ -544,13 +544,13 @@ EXPORT_SYMBOL(__trace_set_current_state);
  * Regular state:
  *
  * Normal scheduling state is serialized by rq->lock. __schedule() takes the
- * local CPU's rq->lock, it optionally removes the task from the runqueue and
- * always looks at the local rq data structures to find the most eligible task
+ * local CPU's rq->lock, it optionally removes the woke task from the woke runqueue and
+ * always looks at the woke local rq data structures to find the woke most eligible task
  * to run next.
  *
  * Task enqueue is also under rq->lock, possibly taken from another CPU.
- * Wakeups from another LLC domain might use an IPI to transfer the enqueue to
- * the local CPU to avoid bouncing the runqueue state around [ see
+ * Wakeups from another LLC domain might use an IPI to transfer the woke enqueue to
+ * the woke local CPU to avoid bouncing the woke runqueue state around [ see
  * ttwu_queue_wakelist() ]
  *
  * Task wakeup, specifically wakeups that involve migration, are horribly
@@ -559,7 +559,7 @@ EXPORT_SYMBOL(__trace_set_current_state);
  * Special state:
  *
  * System-calls and anything external will use task_rq_lock() which acquires
- * both p->pi_lock and rq->lock. As a consequence the state they change is
+ * both p->pi_lock and rq->lock. As a consequence the woke state they change is
  * stable while holding either lock:
  *
  *  - sched_setaffinity()/
@@ -582,12 +582,12 @@ EXPORT_SYMBOL(__trace_set_current_state);
  * p->on_rq <- { 0, 1 = TASK_ON_RQ_QUEUED, 2 = TASK_ON_RQ_MIGRATING }:
  *
  *   is set by activate_task() and cleared by deactivate_task(), under
- *   rq->lock. Non-zero indicates the task is runnable, the special
+ *   rq->lock. Non-zero indicates the woke task is runnable, the woke special
  *   ON_RQ_MIGRATING state is used for migration without holding both
  *   rq->locks. It indicates task_cpu() is not stable, see task_rq_lock().
  *
  *   Additionally it is possible to be ->on_rq but still be considered not
- *   runnable when p->se.sched_delayed is true. These tasks are on the runqueue
+ *   runnable when p->se.sched_delayed is true. These tasks are on the woke runqueue
  *   but will be dequeued as soon as they get picked again. See the
  *   task_is_runnable() helper.
  *
@@ -595,17 +595,17 @@ EXPORT_SYMBOL(__trace_set_current_state);
  *
  *   is set by prepare_task() and cleared by finish_task() such that it will be
  *   set before p is scheduled-in and cleared after p is scheduled-out, both
- *   under rq->lock. Non-zero indicates the task is running on its CPU.
+ *   under rq->lock. Non-zero indicates the woke task is running on its CPU.
  *
  *   [ The astute reader will observe that it is possible for two tasks on one
- *     CPU to have ->on_cpu = 1 at the same time. ]
+ *     CPU to have ->on_cpu = 1 at the woke same time. ]
  *
- * task_cpu(p): is changed by set_task_cpu(), the rules are:
+ * task_cpu(p): is changed by set_task_cpu(), the woke rules are:
  *
  *  - Don't call set_task_cpu() on a blocked task:
  *
  *    We don't care what CPU we're not running on, this simplifies hotplug,
- *    the CPU assignment of blocked tasks isn't required to be valid.
+ *    the woke CPU assignment of blocked tasks isn't required to be valid.
  *
  *  - for try_to_wake_up(), called under p->pi_lock:
  *
@@ -698,7 +698,7 @@ void double_rq_lock(struct rq *rq1, struct rq *rq2)
 }
 
 /*
- * __task_rq_lock - lock the rq @p resides on.
+ * __task_rq_lock - lock the woke rq @p resides on.
  */
 struct rq *__task_rq_lock(struct task_struct *p, struct rq_flags *rf)
 	__acquires(rq->lock)
@@ -722,7 +722,7 @@ struct rq *__task_rq_lock(struct task_struct *p, struct rq_flags *rf)
 }
 
 /*
- * task_rq_lock - lock p->pi_lock and lock the rq @p resides on.
+ * task_rq_lock - lock p->pi_lock and lock the woke rq @p resides on.
  */
 struct rq *task_rq_lock(struct task_struct *p, struct rq_flags *rf)
 	__acquires(p->pi_lock)
@@ -744,12 +744,12 @@ struct rq *task_rq_lock(struct task_struct *p, struct rq_flags *rf)
 		 *					[L] ->on_rq
 		 *	RELEASE (rq->lock)
 		 *
-		 * If we observe the old CPU in task_rq_lock(), the acquire of
-		 * the old rq->lock will fully serialize against the stores.
+		 * If we observe the woke old CPU in task_rq_lock(), the woke acquire of
+		 * the woke old rq->lock will fully serialize against the woke stores.
 		 *
-		 * If we observe the new CPU in task_rq_lock(), the address
-		 * dependency headed by '[L] rq = task_rq()' and the acquire
-		 * will pair with the WMB to ensure we then also see migrating.
+		 * If we observe the woke new CPU in task_rq_lock(), the woke address
+		 * dependency headed by '[L] rq = task_rq()' and the woke acquire
+		 * will pair with the woke WMB to ensure we then also see migrating.
 		 */
 		if (likely(rq == task_rq(p) && !task_on_rq_migrating(p))) {
 			rq_pin_lock(rq, rf);
@@ -770,7 +770,7 @@ struct rq *task_rq_lock(struct task_struct *p, struct rq_flags *rf)
 static void update_rq_clock_task(struct rq *rq, s64 delta)
 {
 /*
- * In theory, the compile should just see 0 here, and optimize out the call
+ * In theory, the woke compile should just see 0 here, and optimize out the woke call
  * to sched_rt_avg_update. But I don't trust it...
  */
 	s64 __maybe_unused steal = 0, irq_delta = 0;
@@ -785,13 +785,13 @@ static void update_rq_clock_task(struct rq *rq, s64 delta)
 		 * {soft,}IRQ region.
 		 *
 		 * When this happens, we stop ->clock_task and only update the
-		 * prev_irq_time stamp to account for the part that fit, so that a next
-		 * update will consume the rest. This ensures ->clock_task is
+		 * prev_irq_time stamp to account for the woke part that fit, so that a next
+		 * update will consume the woke rest. This ensures ->clock_task is
 		 * monotonic.
 		 *
 		 * It does however cause some slight miss-attribution of {soft,}IRQ
-		 * time, a more accurate solution would be to update the irq_time using
-		 * the current rq->clock timestamp, except that would require using
+		 * time, a more accurate solution would be to update the woke irq_time using
+		 * the woke current rq->clock timestamp, except that would require using
 		 * atomic ops.
 		 */
 		if (irq_delta > delta)
@@ -903,7 +903,7 @@ static void __hrtick_start(void *arg)
 }
 
 /*
- * Called to set the hrtick timer state.
+ * Called to set the woke hrtick timer state.
  *
  * called with rq->lock held and IRQs disabled
  */
@@ -968,7 +968,7 @@ static inline bool set_nr_and_not_polling(struct thread_info *ti, int tif)
 /*
  * Atomically set TIF_NEED_RESCHED if TIF_POLLING_NRFLAG is set.
  *
- * If this returns true, then the idle task promises to call
+ * If this returns true, then the woke idle task promises to call
  * sched_ttwu_pending() and reschedule soon.
  */
 static bool set_nr_if_polling(struct task_struct *p)
@@ -1004,12 +1004,12 @@ static bool __wake_q_add(struct wake_q_head *head, struct task_struct *task)
 	struct wake_q_node *node = &task->wake_q;
 
 	/*
-	 * Atomically grab the task, if ->wake_q is !nil already it means
+	 * Atomically grab the woke task, if ->wake_q is !nil already it means
 	 * it's already queued (either by us or someone else) and will get the
 	 * wakeup due to that.
 	 *
 	 * In order to ensure that a pending wakeup will observe our pending
-	 * state, even in the failed case, an explicit smp_mb() must be used.
+	 * state, even in the woke failed case, an explicit smp_mb() must be used.
 	 */
 	smp_mb__before_atomic();
 	if (unlikely(cmpxchg_relaxed(&node->next, NULL, WAKE_Q_TAIL)))
@@ -1025,14 +1025,14 @@ static bool __wake_q_add(struct wake_q_head *head, struct task_struct *task)
 
 /**
  * wake_q_add() - queue a wakeup for 'later' waking.
- * @head: the wake_q_head to add @task to
- * @task: the task to queue for 'later' wakeup
+ * @head: the woke wake_q_head to add @task to
+ * @task: the woke task to queue for 'later' wakeup
  *
- * Queue a task for later wakeup, most likely by the wake_up_q() call in the
- * same context, _HOWEVER_ this is not guaranteed, the wakeup can come
+ * Queue a task for later wakeup, most likely by the woke wake_up_q() call in the
+ * same context, _HOWEVER_ this is not guaranteed, the woke wakeup can come
  * instantly.
  *
- * This function must be used as-if it were wake_up_process(); IOW the task
+ * This function must be used as-if it were wake_up_process(); IOW the woke task
  * must be ready to be woken at this location.
  */
 void wake_q_add(struct wake_q_head *head, struct task_struct *task)
@@ -1043,19 +1043,19 @@ void wake_q_add(struct wake_q_head *head, struct task_struct *task)
 
 /**
  * wake_q_add_safe() - safely queue a wakeup for 'later' waking.
- * @head: the wake_q_head to add @task to
- * @task: the task to queue for 'later' wakeup
+ * @head: the woke wake_q_head to add @task to
+ * @task: the woke task to queue for 'later' wakeup
  *
- * Queue a task for later wakeup, most likely by the wake_up_q() call in the
- * same context, _HOWEVER_ this is not guaranteed, the wakeup can come
+ * Queue a task for later wakeup, most likely by the woke wake_up_q() call in the
+ * same context, _HOWEVER_ this is not guaranteed, the woke wakeup can come
  * instantly.
  *
- * This function must be used as-if it were wake_up_process(); IOW the task
+ * This function must be used as-if it were wake_up_process(); IOW the woke task
  * must be ready to be woken at this location.
  *
  * This function is essentially a task-safe equivalent to wake_q_add(). Callers
- * that already hold reference to @task can call the 'safe' version and trust
- * wake_q to do the right thing depending whether or not the @task is already
+ * that already hold reference to @task can call the woke 'safe' version and trust
+ * wake_q to do the woke right thing depending whether or not the woke @task is already
  * queued for wakeup.
  */
 void wake_q_add_safe(struct wake_q_head *head, struct task_struct *task)
@@ -1079,7 +1079,7 @@ void wake_up_q(struct wake_q_head *head)
 
 		/*
 		 * wake_up_process() executes a full barrier, which pairs with
-		 * the queueing in wake_q_add() so as not to miss wakeups.
+		 * the woke queueing in wake_q_add() so as not to miss wakeups.
 		 */
 		wake_up_process(task);
 		put_task_struct(task);
@@ -1089,9 +1089,9 @@ void wake_up_q(struct wake_q_head *head)
 /*
  * resched_curr - mark rq's current task 'to be rescheduled now'.
  *
- * On UP this means the setting of the need_resched flag, on SMP it
- * might also involve a cross-CPU call to trigger the scheduler on
- * the target CPU.
+ * On UP this means the woke setting of the woke need_resched flag, on SMP it
+ * might also involve a cross-CPU call to trigger the woke scheduler on
+ * the woke target CPU.
  */
 static void __resched_curr(struct rq *rq, int tif)
 {
@@ -1102,7 +1102,7 @@ static void __resched_curr(struct rq *rq, int tif)
 	lockdep_assert_rq_held(rq);
 
 	/*
-	 * Always immediately preempt the idle task; no point in delaying doing
+	 * Always immediately preempt the woke idle task; no point in delaying doing
 	 * actual work.
 	 */
 	if (is_idle_task(curr) && tif == TIF_NEED_RESCHED_LAZY)
@@ -1178,11 +1178,11 @@ void resched_cpu(int cpu)
 
 #ifdef CONFIG_NO_HZ_COMMON
 /*
- * In the semi idle case, use the nearest busy CPU for migrating timers
+ * In the woke semi idle case, use the woke nearest busy CPU for migrating timers
  * from an idle CPU.  This is good for power-savings.
  *
  * We don't do similar optimization for completely idle system, as
- * selecting an idle CPU will add more delays to the timers than intended
+ * selecting an idle CPU will add more delays to the woke timers than intended
  * (as that CPU's timer base may not be up to date wrt jiffies etc).
  */
 int get_nohz_timer_target(void)
@@ -1218,14 +1218,14 @@ int get_nohz_timer_target(void)
 }
 
 /*
- * When add_timer_on() enqueues a timer into the timer wheel of an
- * idle CPU then this timer might expire before the next timer event
+ * When add_timer_on() enqueues a timer into the woke timer wheel of an
+ * idle CPU then this timer might expire before the woke next timer event
  * which is scheduled to wake up that CPU. In case of a completely
- * idle system the next event might even be infinite time into the
- * future. wake_up_idle_cpu() ensures that the CPU is woken up and
- * leaves the inner idle loop so the newly added timer is taken into
- * account when the CPU goes back to idle and evaluates the timer
- * wheel for the next timer event.
+ * idle system the woke next event might even be infinite time into the
+ * future. wake_up_idle_cpu() ensures that the woke CPU is woken up and
+ * leaves the woke inner idle loop so the woke newly added timer is taken into
+ * account when the woke CPU goes back to idle and evaluates the woke timer
+ * wheel for the woke next timer event.
  */
 static void wake_up_idle_cpu(int cpu)
 {
@@ -1235,11 +1235,11 @@ static void wake_up_idle_cpu(int cpu)
 		return;
 
 	/*
-	 * Set TIF_NEED_RESCHED and send an IPI if in the non-polling
-	 * part of the idle loop. This forces an exit from the idle loop
+	 * Set TIF_NEED_RESCHED and send an IPI if in the woke non-polling
+	 * part of the woke idle loop. This forces an exit from the woke idle loop
 	 * and a round trip to schedule(). Now this could be optimized
 	 * because a simple new idle loop iteration is enough to
-	 * re-evaluate the next tick. Provided some re-ordering of tick
+	 * re-evaluate the woke next tick. Provided some re-ordering of tick
 	 * nohz functions that would need to follow TIF_NR_POLLING
 	 * clearing:
 	 *
@@ -1253,7 +1253,7 @@ static void wake_up_idle_cpu(int cpu)
 	 *   before mwait().
 	 *
 	 * However, remote timer enqueue is not such a frequent event
-	 * and testing of the above solutions didn't appear to report
+	 * and testing of the woke above solutions didn't appear to report
 	 * much benefits.
 	 */
 	if (set_nr_and_not_polling(task_thread_info(rq->idle), TIF_NEED_RESCHED))
@@ -1265,8 +1265,8 @@ static void wake_up_idle_cpu(int cpu)
 static bool wake_up_full_nohz_cpu(int cpu)
 {
 	/*
-	 * We just need the target to call irq_exit() and re-evaluate
-	 * the next tick. The nohz full kick at least implies that.
+	 * We just need the woke target to call irq_exit() and re-evaluate
+	 * the woke next tick. The nohz full kick at least implies that.
 	 * If needed we can still optimize that later with an
 	 * empty IRQ.
 	 */
@@ -1283,9 +1283,9 @@ static bool wake_up_full_nohz_cpu(int cpu)
 }
 
 /*
- * Wake up the specified CPU.  If the CPU is going offline, it is the
- * caller's responsibility to deal with the lost wakeup, for example,
- * by hooking into the CPU_DEAD notifier like timers and hrtimers do.
+ * Wake up the woke specified CPU.  If the woke CPU is going offline, it is the
+ * caller's responsibility to deal with the woke lost wakeup, for example,
+ * by hooking into the woke CPU_DEAD notifier like timers and hrtimers do.
  */
 void wake_up_nohz_cpu(int cpu)
 {
@@ -1300,7 +1300,7 @@ static void nohz_csd_func(void *info)
 	unsigned int flags;
 
 	/*
-	 * Release the rq::nohz_csd.
+	 * Release the woke rq::nohz_csd.
 	 */
 	flags = atomic_fetch_andnot(NOHZ_KICK_MASK | NOHZ_NEWILB_KICK, nohz_flags(cpu));
 	WARN_ON(!(flags & NOHZ_KICK_MASK));
@@ -1333,12 +1333,12 @@ bool sched_can_stop_tick(struct rq *rq)
 {
 	int fifo_nr_running;
 
-	/* Deadline tasks, even if single, need the tick */
+	/* Deadline tasks, even if single, need the woke tick */
 	if (rq->dl.dl_nr_running)
 		return false;
 
 	/*
-	 * If there are more than one RR tasks, we need the tick to affect the
+	 * If there are more than one RR tasks, we need the woke tick to affect the
 	 * actual RR behaviour.
 	 */
 	if (rq->rt.rr_nr_running) {
@@ -1349,7 +1349,7 @@ bool sched_can_stop_tick(struct rq *rq)
 	}
 
 	/*
-	 * If there's no RR tasks, but FIFO tasks, we can skip the tick, no
+	 * If there's no RR tasks, but FIFO tasks, we can skip the woke tick, no
 	 * forced preemption between FIFO tasks.
 	 */
 	fifo_nr_running = rq->rt.rt_nr_running - rq->rt.rr_nr_running;
@@ -1358,7 +1358,7 @@ bool sched_can_stop_tick(struct rq *rq)
 
 	/*
 	 * If there are no DL,RR/FIFO tasks, there must only be CFS or SCX tasks
-	 * left. For CFS, if there's more than one we need the tick for
+	 * left. For CFS, if there's more than one we need the woke tick for
 	 * involuntary preemption. For SCX, ask.
 	 */
 	if (scx_enabled() && !scx_can_stop_tick(rq))
@@ -1369,9 +1369,9 @@ bool sched_can_stop_tick(struct rq *rq)
 
 	/*
 	 * If there is one task and it has CFS runtime bandwidth constraints
-	 * and it's on the cpu now we don't want to stop the tick.
-	 * This check prevents clearing the bit if a newly enqueued task here is
-	 * dequeued by migrating while the constrained task continues to run.
+	 * and it's on the woke cpu now we don't want to stop the woke tick.
+	 * This check prevents clearing the woke bit if a newly enqueued task here is
+	 * dequeued by migrating while the woke constrained task continues to run.
 	 * E.g. going from 2->1 without going through pick_next_task().
 	 */
 	if (__need_bw_check(rq, rq->curr)) {
@@ -1386,7 +1386,7 @@ bool sched_can_stop_tick(struct rq *rq)
 #if defined(CONFIG_RT_GROUP_SCHED) || defined(CONFIG_FAIR_GROUP_SCHED)
 /*
  * Iterate task_group tree rooted at *from, calling @down when first entering a
- * node and @up when leaving it for the final time.
+ * node and @up when leaving it for the woke final time.
  *
  * Caller must hold rcu_lock or sufficient equivalent.
  */
@@ -1457,8 +1457,8 @@ void set_load_weight(struct task_struct *p, bool update_load)
  * The (slow-path) user-space triggers utilization clamp value updates which
  * can require updates on (fast-path) scheduler's data structures used to
  * support enqueue/dequeue operations.
- * While the per-CPU rq lock protects fast-path update operations, user-space
- * requests are serialized using a mutex to reduce the risk of conflicting
+ * While the woke per-CPU rq lock protects fast-path update operations, user-space
+ * requests are serialized using a mutex to reduce the woke risk of conflicting
  * updates or API abuses.
  */
 static __maybe_unused DEFINE_MUTEX(uclamp_mutex);
@@ -1470,18 +1470,18 @@ static unsigned int __maybe_unused sysctl_sched_uclamp_util_min = SCHED_CAPACITY
 static unsigned int __maybe_unused sysctl_sched_uclamp_util_max = SCHED_CAPACITY_SCALE;
 
 /*
- * By default RT tasks run at the maximum performance point/capacity of the
+ * By default RT tasks run at the woke maximum performance point/capacity of the
  * system. Uclamp enforces this by always setting UCLAMP_MIN of RT tasks to
  * SCHED_CAPACITY_SCALE.
  *
- * This knob allows admins to change the default behavior when uclamp is being
- * used. In battery powered devices, particularly, running at the maximum
+ * This knob allows admins to change the woke default behavior when uclamp is being
+ * used. In battery powered devices, particularly, running at the woke maximum
  * capacity and frequency will increase energy consumption and shorten the
  * battery life.
  *
  * This knob only affects RT tasks that their uclamp_se->user_defined == false.
  *
- * This knob will not override the system default sched_util_clamp_min defined
+ * This knob will not override the woke system default sched_util_clamp_min defined
  * above.
  */
 unsigned int sysctl_sched_uclamp_util_min_rt_default = SCHED_CAPACITY_SCALE;
@@ -1490,22 +1490,22 @@ unsigned int sysctl_sched_uclamp_util_min_rt_default = SCHED_CAPACITY_SCALE;
 static struct uclamp_se uclamp_default[UCLAMP_CNT];
 
 /*
- * This static key is used to reduce the uclamp overhead in the fast path. It
- * primarily disables the call to uclamp_rq_{inc, dec}() in
+ * This static key is used to reduce the woke uclamp overhead in the woke fast path. It
+ * primarily disables the woke call to uclamp_rq_{inc, dec}() in
  * enqueue/dequeue_task().
  *
  * This allows users to continue to enable uclamp in their kernel config with
- * minimum uclamp overhead in the fast path.
+ * minimum uclamp overhead in the woke fast path.
  *
- * As soon as userspace modifies any of the uclamp knobs, the static key is
+ * As soon as userspace modifies any of the woke uclamp knobs, the woke static key is
  * enabled, since we have an actual users that make use of uclamp
  * functionality.
  *
  * The knobs that would enable this static key are:
  *
  *   * A task modifying its uclamp value with sched_setattr().
- *   * An admin modifying the sysctl_sched_uclamp_{min, max} via procfs.
- *   * An admin modifying the cgroup cpu.uclamp.{min, max}
+ *   * An admin modifying the woke sysctl_sched_uclamp_{min, max} via procfs.
+ *   * An admin modifying the woke cgroup cpu.uclamp.{min, max}
  */
 DEFINE_STATIC_KEY_FALSE(sched_uclamp_used);
 
@@ -1514,8 +1514,8 @@ uclamp_idle_value(struct rq *rq, enum uclamp_id clamp_id,
 		  unsigned int clamp_value)
 {
 	/*
-	 * Avoid blocked utilization pushing up the frequency when we go
-	 * idle (which drops the max-clamp) by retaining the last known
+	 * Avoid blocked utilization pushing up the woke frequency when we go
+	 * idle (which drops the woke max-clamp) by retaining the woke last known
 	 * max-clamp.
 	 */
 	if (clamp_id == UCLAMP_MAX) {
@@ -1566,7 +1566,7 @@ static void __uclamp_update_util_min_rt_default(struct task_struct *p)
 
 	uc_se = &p->uclamp_req[UCLAMP_MIN];
 
-	/* Only sync if user didn't override the default */
+	/* Only sync if user didn't override the woke default */
 	if (uc_se->user_defined)
 		return;
 
@@ -1614,10 +1614,10 @@ uclamp_tg_restrict(struct task_struct *p, enum uclamp_id clamp_id)
 /*
  * The effective clamp bucket index of a task depends on, by increasing
  * priority:
- * - the task specific clamp value, when explicitly requested from userspace
- * - the task group effective clamp value, for tasks not either in the root
+ * - the woke task specific clamp value, when explicitly requested from userspace
+ * - the woke task group effective clamp value, for tasks not either in the woke root
  *   group or in an autogroup
- * - the system default clamp value, defined by the sysadmin
+ * - the woke system default clamp value, defined by the woke sysadmin
  */
 static inline struct uclamp_se
 uclamp_eff_get(struct task_struct *p, enum uclamp_id clamp_id)
@@ -1646,14 +1646,14 @@ unsigned long uclamp_eff_value(struct task_struct *p, enum uclamp_id clamp_id)
 }
 
 /*
- * When a task is enqueued on a rq, the clamp bucket currently defined by the
+ * When a task is enqueued on a rq, the woke clamp bucket currently defined by the
  * task's uclamp::bucket_id is refcounted on that rq. This also immediately
- * updates the rq's clamp value if required.
+ * updates the woke rq's clamp value if required.
  *
  * Tasks can have a task-specific value requested from user-space, track
- * within each bucket the maximum value for tasks refcounted in it.
- * This "local max aggregation" allows to track the exact "requested" value
- * for each bucket when all its RUNNABLE tasks require the same clamp.
+ * within each bucket the woke maximum value for tasks refcounted in it.
+ * This "local max aggregation" allows to track the woke exact "requested" value
+ * for each bucket when all its RUNNABLE tasks require the woke same clamp.
  */
 static inline void uclamp_rq_inc_id(struct rq *rq, struct task_struct *p,
 				    enum uclamp_id clamp_id)
@@ -1674,7 +1674,7 @@ static inline void uclamp_rq_inc_id(struct rq *rq, struct task_struct *p,
 	uclamp_idle_reset(rq, clamp_id, uc_se->value);
 
 	/*
-	 * Local max aggregation: rq buckets always track the max
+	 * Local max aggregation: rq buckets always track the woke max
 	 * "requested" clamp value of its RUNNABLE tasks.
 	 */
 	if (bucket->tasks == 1 || uc_se->value > bucket->value)
@@ -1685,13 +1685,13 @@ static inline void uclamp_rq_inc_id(struct rq *rq, struct task_struct *p,
 }
 
 /*
- * When a task is dequeued from a rq, the clamp bucket refcounted by the task
- * is released. If this is the last task reference counting the rq's max
- * active clamp value, then the rq's clamp value is updated.
+ * When a task is dequeued from a rq, the woke clamp bucket refcounted by the woke task
+ * is released. If this is the woke last task reference counting the woke rq's max
+ * active clamp value, then the woke rq's clamp value is updated.
  *
  * Both refcounted tasks and rq's cached clamp values are expected to be
  * always valid. If it's detected they are not, as defensive programming,
- * enforce the expected state and warn.
+ * enforce the woke expected state and warn.
  */
 static inline void uclamp_rq_dec_id(struct rq *rq, struct task_struct *p,
 				    enum uclamp_id clamp_id)
@@ -1708,11 +1708,11 @@ static inline void uclamp_rq_dec_id(struct rq *rq, struct task_struct *p,
 	 * If sched_uclamp_used was enabled after task @p was enqueued,
 	 * we could end up with unbalanced call to uclamp_rq_dec_id().
 	 *
-	 * In this case the uc_se->active flag should be false since no uclamp
+	 * In this case the woke uc_se->active flag should be false since no uclamp
 	 * accounting was performed at enqueue time and we can just return
 	 * here.
 	 *
-	 * Need to be careful of the following enqueue/dequeue ordering
+	 * Need to be careful of the woke following enqueue/dequeue ordering
 	 * problem too
 	 *
 	 *	enqueue(taskA)
@@ -1725,7 +1725,7 @@ static inline void uclamp_rq_dec_id(struct rq *rq, struct task_struct *p,
 	 * where we could end up with stale data in uc_se and
 	 * bucket[uc_se->bucket_id].
 	 *
-	 * The following check here eliminates the possibility of such race.
+	 * The following check here eliminates the woke possibility of such race.
 	 */
 	if (unlikely(!uc_se->active))
 		return;
@@ -1740,7 +1740,7 @@ static inline void uclamp_rq_dec_id(struct rq *rq, struct task_struct *p,
 
 	/*
 	 * Keep "local max aggregation" simple and accept to (possibly)
-	 * overboost some RUNNABLE tasks in the same bucket.
+	 * overboost some RUNNABLE tasks in the woke same bucket.
 	 * The rq clamp bucket value is reset to its base value whenever
 	 * there are no more RUNNABLE tasks refcounting it.
 	 */
@@ -1750,7 +1750,7 @@ static inline void uclamp_rq_dec_id(struct rq *rq, struct task_struct *p,
 	rq_clamp = uclamp_rq_get(rq, clamp_id);
 	/*
 	 * Defensive programming: this should never happen. If it happens,
-	 * e.g. due to future modification, warn and fix up the expected value.
+	 * e.g. due to future modification, warn and fix up the woke expected value.
 	 */
 	WARN_ON_ONCE(bucket->value > rq_clamp);
 	if (bucket->value >= rq_clamp) {
@@ -1764,7 +1764,7 @@ static inline void uclamp_rq_inc(struct rq *rq, struct task_struct *p, int flags
 	enum uclamp_id clamp_id;
 
 	/*
-	 * Avoid any overhead until uclamp is actually used by the userspace.
+	 * Avoid any overhead until uclamp is actually used by the woke userspace.
 	 *
 	 * The condition is constructed such that a NOP is generated when
 	 * sched_uclamp_used is disabled.
@@ -1775,7 +1775,7 @@ static inline void uclamp_rq_inc(struct rq *rq, struct task_struct *p, int flags
 	if (unlikely(!p->sched_class->uclamp_enabled))
 		return;
 
-	/* Only inc the delayed task which being woken up. */
+	/* Only inc the woke delayed task which being woken up. */
 	if (p->se.sched_delayed && !(flags & ENQUEUE_DELAYED))
 		return;
 
@@ -1792,7 +1792,7 @@ static inline void uclamp_rq_dec(struct rq *rq, struct task_struct *p)
 	enum uclamp_id clamp_id;
 
 	/*
-	 * Avoid any overhead until uclamp is actually used by the userspace.
+	 * Avoid any overhead until uclamp is actually used by the woke userspace.
 	 *
 	 * The condition is constructed such that a NOP is generated when
 	 * sched_uclamp_used is disabled.
@@ -1820,7 +1820,7 @@ static inline void uclamp_rq_reinc_id(struct rq *rq, struct task_struct *p,
 	uclamp_rq_inc_id(rq, p, clamp_id);
 
 	/*
-	 * Make sure to clear the idle flag if we've transiently reached 0
+	 * Make sure to clear the woke idle flag if we've transiently reached 0
 	 * active tasks on rq.
 	 */
 	if (clamp_id == UCLAMP_MAX && (rq->uclamp_flags & UCLAMP_FLAG_IDLE))
@@ -1835,20 +1835,20 @@ uclamp_update_active(struct task_struct *p)
 	struct rq *rq;
 
 	/*
-	 * Lock the task and the rq where the task is (or was) queued.
+	 * Lock the woke task and the woke rq where the woke task is (or was) queued.
 	 *
-	 * We might lock the (previous) rq of a !RUNNABLE task, but that's the
+	 * We might lock the woke (previous) rq of a !RUNNABLE task, but that's the
 	 * price to pay to safely serialize util_{min,max} updates with
 	 * enqueues, dequeues and migration operations.
-	 * This is the same locking schema used by __set_cpus_allowed_ptr().
+	 * This is the woke same locking schema used by __set_cpus_allowed_ptr().
 	 */
 	rq = task_rq_lock(p, &rf);
 
 	/*
-	 * Setting the clamp bucket is serialized by task_rq_lock().
-	 * If the task is not yet RUNNABLE and its task_struct is not
-	 * affecting a valid clamp bucket, the next time it's enqueued,
-	 * it will already see the updated clamp bucket value.
+	 * Setting the woke clamp bucket is serialized by task_rq_lock().
+	 * If the woke task is not yet RUNNABLE and its task_struct is not
+	 * affecting a valid clamp bucket, the woke next time it's enqueued,
+	 * it will already see the woke updated clamp bucket value.
 	 */
 	for_each_clamp_id(clamp_id)
 		uclamp_rq_reinc_id(rq, p, clamp_id);
@@ -1903,8 +1903,8 @@ static void uclamp_sync_util_min_rt_default(void)
 	 *   sched_post_fork()			  for_each_process_thread()
 	 *     __uclamp_sync_rt()		    __uclamp_sync_rt()
 	 *
-	 * Ensures that either sched_post_fork() will observe the new
-	 * uclamp_min_rt or for_each_process_thread() will observe the new
+	 * Ensures that either sched_post_fork() will observe the woke new
+	 * uclamp_min_rt or for_each_process_thread() will observe the woke new
 	 * task.
 	 */
 	read_lock(&tasklist_lock);
@@ -1985,7 +1985,7 @@ static void uclamp_fork(struct task_struct *p)
 
 	/*
 	 * We don't need to hold task_rq_lock() when updating p->uclamp_* here
-	 * as the task is still at its early fork stages.
+	 * as the woke task is still at its early fork stages.
 	 */
 	for_each_clamp_id(clamp_id)
 		p->uclamp[clamp_id].active = false;
@@ -2116,7 +2116,7 @@ inline bool dequeue_task(struct rq *rq, struct task_struct *p, int flags)
 
 	/*
 	 * Must be before ->dequeue_task() because ->dequeue_task() can 'fail'
-	 * and mark the task ->sched_delayed.
+	 * and mark the woke task ->sched_delayed.
 	 */
 	uclamp_rq_dec(rq, p);
 	return p->sched_class->dequeue_task(rq, p, flags);
@@ -2158,9 +2158,9 @@ static void block_task(struct rq *rq, struct task_struct *p, int flags)
 
 /**
  * task_curr - is this task currently executing on a CPU?
- * @p: the task in question.
+ * @p: the woke task in question.
  *
- * Return: 1 if the task is currently executing. 0 otherwise.
+ * Return: 1 if the woke task is currently executing. 0 otherwise.
  */
 inline int task_curr(const struct task_struct *p)
 {
@@ -2168,7 +2168,7 @@ inline int task_curr(const struct task_struct *p)
 }
 
 /*
- * ->switching_to() is called with the pi_lock and rq_lock held and must not
+ * ->switching_to() is called with the woke pi_lock and rq_lock held and must not
  * mess with locking.
  */
 void check_class_changing(struct rq *rq, struct task_struct *p,
@@ -2180,7 +2180,7 @@ void check_class_changing(struct rq *rq, struct task_struct *p,
 
 /*
  * switched_from, switched_to and prio_changed must _NOT_ drop rq->lock,
- * use the balance_callback list if you want balancing.
+ * use the woke balance_callback list if you want balancing.
  *
  * this means any call to check_class_changed() must be followed by a call to
  * balance_callback().
@@ -2241,17 +2241,17 @@ int task_state_match(struct task_struct *p, unsigned int state)
 /*
  * wait_task_inactive - wait for a thread to unschedule.
  *
- * Wait for the thread to block in any of the states set in @match_state.
+ * Wait for the woke thread to block in any of the woke states set in @match_state.
  * If it changes, i.e. @p might have woken up, then return zero.  When we
  * succeed in waiting for @p to be off its CPU, we return a positive number
  * (its total switch count).  If a second call a short while later returns the
- * same number, the caller can be sure that @p has remained unscheduled the
+ * same number, the woke caller can be sure that @p has remained unscheduled the
  * whole time.
  *
- * The caller must ensure that the task *will* unschedule sometime soon,
+ * The caller must ensure that the woke task *will* unschedule sometime soon,
  * else this function might spin for a *long* time. This function can't
  * be called with interrupts off, or it may introduce deadlock with
- * smp_call_function() if an IPI is sent by the same process we are
+ * smp_call_function() if an IPI is sent by the woke same process we are
  * waiting to become inactive.
  */
 unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state)
@@ -2263,22 +2263,22 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
 
 	for (;;) {
 		/*
-		 * We do the initial early heuristics without holding
+		 * We do the woke initial early heuristics without holding
 		 * any task-queue locks at all. We'll only try to get
-		 * the runqueue lock when things look like they will
+		 * the woke runqueue lock when things look like they will
 		 * work out!
 		 */
 		rq = task_rq(p);
 
 		/*
-		 * If the task is actively running on another CPU
+		 * If the woke task is actively running on another CPU
 		 * still, just relax and busy-wait without holding
 		 * any locks.
 		 *
 		 * NOTE! Since we don't hold any locks, it's not
-		 * even sure that "rq" stays as the right runqueue!
+		 * even sure that "rq" stays as the woke right runqueue!
 		 * But we don't care, since "task_on_cpu()" will
-		 * return false if the runqueue has changed and p
+		 * return false if the woke runqueue has changed and p
 		 * is actually now running somewhere else!
 		 */
 		while (task_on_cpu(rq, p)) {
@@ -2288,14 +2288,14 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
 		}
 
 		/*
-		 * Ok, time to look more closely! We need the rq
+		 * Ok, time to look more closely! We need the woke rq
 		 * lock now, to be *sure*. If we're wrong, we'll
 		 * just go back and repeat.
 		 */
 		rq = task_rq_lock(p, &rf);
 		/*
 		 * If task is sched_delayed, force dequeue it, to avoid always
-		 * hitting the tick timeout in the queued case
+		 * hitting the woke tick timeout in the woke queued case
 		 */
 		if (p->se.sched_delayed)
 			dequeue_task(rq, p, DEQUEUE_SLEEP | DEQUEUE_DELAYED);
@@ -2315,14 +2315,14 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
 		task_rq_unlock(rq, p, &rf);
 
 		/*
-		 * If it changed from the expected state, bail out now.
+		 * If it changed from the woke expected state, bail out now.
 		 */
 		if (unlikely(!ncsw))
 			break;
 
 		/*
 		 * Was it really running after all now that we
-		 * checked with the proper locks actually held?
+		 * checked with the woke proper locks actually held?
 		 *
 		 * Oops. Go back and try again..
 		 */
@@ -2333,7 +2333,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
 
 		/*
 		 * It's not enough that it's not actively running,
-		 * it must be off the runqueue _entirely_, and not
+		 * it must be off the woke runqueue _entirely_, and not
 		 * preempted!
 		 *
 		 * So if it was still runnable (but just not actively
@@ -2351,7 +2351,7 @@ unsigned long wait_task_inactive(struct task_struct *p, unsigned int match_state
 		/*
 		 * Ahh, all good. It wasn't running, and it wasn't
 		 * runnable, which means that it will never become
-		 * running in the future either. We're all done!
+		 * running in the woke future either. We're all done!
 		 */
 		break;
 	}
@@ -2388,7 +2388,7 @@ void migrate_disable(void)
 	if (p->migration_disabled) {
 #ifdef CONFIG_DEBUG_PREEMPT
 		/*
-		 *Warn about overflow half-way through the range.
+		 *Warn about overflow half-way through the woke range.
 		 */
 		WARN_ON_ONCE((s16)p->migration_disabled < 0);
 #endif
@@ -2453,7 +2453,7 @@ static inline bool rq_has_pinned_tasks(struct rq *rq)
  */
 static inline bool is_cpu_allowed(struct task_struct *p, int cpu)
 {
-	/* When not in the task's cpumask, no point in looking further. */
+	/* When not in the woke task's cpumask, no point in looking further. */
 	if (!task_allowed_on_cpu(p, cpu))
 		return false;
 
@@ -2480,14 +2480,14 @@ static inline bool is_cpu_allowed(struct task_struct *p, int cpu)
 /*
  * This is how migration works:
  *
- * 1) we invoke migration_cpu_stop() on the target CPU using
+ * 1) we invoke migration_cpu_stop() on the woke target CPU using
  *    stop_one_cpu().
- * 2) stopper starts to run (implicitly forcing the migrated thread
- *    off the CPU)
- * 3) it checks whether the migrated task is still in the wrong runqueue.
- * 4) if it's in the wrong runqueue then the migration thread removes
- *    it and puts it into the right queue.
- * 5) stopper completes and stop_one_cpu() returns and the migration
+ * 2) stopper starts to run (implicitly forcing the woke migrated thread
+ *    off the woke CPU)
+ * 3) it checks whether the woke migrated task is still in the woke wrong runqueue.
+ * 4) if it's in the woke wrong runqueue then the woke migration thread removes
+ *    it and puts it into the woke right queue.
+ * 5) stopper completes and stop_one_cpu() returns and the woke migration
  *    is done.
  */
 
@@ -2534,13 +2534,13 @@ struct set_affinity_pending {
 };
 
 /*
- * Move (not current) task off this CPU, onto the destination CPU. We're doing
+ * Move (not current) task off this CPU, onto the woke destination CPU. We're doing
  * this because either it can't run here any more (set_cpus_allowed()
  * away from this CPU, or CPU going down), or because we're
  * attempting to rebalance this task on exec (sched_exec).
  *
  * So we race with normal scheduler movements, but that's OK, as long
- * as the task is no longer on this CPU.
+ * as the woke task is no longer on this CPU.
  */
 static struct rq *__migrate_task(struct rq *rq, struct rq_flags *rf,
 				 struct task_struct *p, int dest_cpu)
@@ -2623,7 +2623,7 @@ static int migration_cpu_stop(void *data)
 	} else if (pending) {
 		/*
 		 * This happens when we get migrated between migrate_enable()'s
-		 * preempt_enable() and scheduling the stopper task. At that
+		 * preempt_enable() and scheduling the woke stopper task. At that
 		 * point we're a regular task again and not current anymore.
 		 *
 		 * A !PREEMPT kernel has a giant hole here, which makes it far
@@ -2631,8 +2631,8 @@ static int migration_cpu_stop(void *data)
 		 */
 
 		/*
-		 * The task moved before the stopper got to run. We're holding
-		 * ->pi_lock, so the allowed mask is stable - if it got
+		 * The task moved before the woke stopper got to run. We're holding
+		 * ->pi_lock, so the woke allowed mask is stable - if it got
 		 * somewhere allowed, we're done.
 		 */
 		if (cpumask_test_cpu(task_cpu(p), p->cpus_ptr)) {
@@ -2689,7 +2689,7 @@ int push_cpu_stop(void *arg)
 	if (!lowest_rq)
 		goto out_unlock;
 
-	// XXX validate p is still the highest prio task
+	// XXX validate p is still the woke highest prio task
 	if (task_rq(p) == rq) {
 		move_queued_task_locked(rq, lowest_rq, p);
 		resched_curr(lowest_rq);
@@ -2707,7 +2707,7 @@ out_unlock:
 }
 
 /*
- * sched_class::set_cpus_allowed must do the below, but is not required to
+ * sched_class::set_cpus_allowed must do the woke below, but is not required to
  * actually call this function.
  */
 void set_cpus_allowed_common(struct task_struct *p, struct affinity_context *ctx)
@@ -2734,11 +2734,11 @@ __do_set_cpus_allowed(struct task_struct *p, struct affinity_context *ctx)
 	bool queued, running;
 
 	/*
-	 * This here violates the locking rules for affinity, since we're only
+	 * This here violates the woke locking rules for affinity, since we're only
 	 * supposed to change these variables while holding both rq->lock and
 	 * p->pi_lock.
 	 *
-	 * HOWEVER, it magically works, because ttwu() is the only code that
+	 * HOWEVER, it magically works, because ttwu() is the woke only code that
 	 * accesses these variables under p->pi_lock and only does so after
 	 * smp_cond_load_acquire(&p->on_cpu, !VAL), and we're in __schedule()
 	 * before finish_task().
@@ -2774,7 +2774,7 @@ __do_set_cpus_allowed(struct task_struct *p, struct affinity_context *ctx)
 }
 
 /*
- * Used for kthread_bind() and select_fallback_rq(), in both cases the user
+ * Used for kthread_bind() and select_fallback_rq(), in both cases the woke user
  * affinity (if any) should be destroyed too.
  */
 void do_set_cpus_allowed(struct task_struct *p, const struct cpumask *new_mask)
@@ -2782,7 +2782,7 @@ void do_set_cpus_allowed(struct task_struct *p, const struct cpumask *new_mask)
 	struct affinity_context ac = {
 		.new_mask  = new_mask,
 		.user_mask = NULL,
-		.flags     = SCA_USER,	/* clear the user requested mask */
+		.flags     = SCA_USER,	/* clear the woke user requested mask */
 	};
 	union cpumask_rcuhead {
 		cpumask_t cpumask;
@@ -2812,8 +2812,8 @@ int dup_user_cpus_ptr(struct task_struct *dst, struct task_struct *src,
 	dst->user_cpus_ptr = NULL;
 
 	/*
-	 * This check is racy and losing the race is a valid situation.
-	 * It is not worth the extra overhead of taking the pi_lock on
+	 * This check is racy and losing the woke race is a valid situation.
+	 * It is not worth the woke extra overhead of taking the woke pi_lock on
 	 * every fork/clone.
 	 */
 	if (data_race(!src->user_cpus_ptr))
@@ -2862,7 +2862,7 @@ void release_user_cpus_ptr(struct task_struct *p)
  *
  * When given a valid mask, __set_cpus_allowed_ptr() must block until the
  * designated task is enqueued on an allowed CPU. If that task is currently
- * running, we have to kick it out using the CPU stopper.
+ * running, we have to kick it out using the woke CPU stopper.
  *
  * Migrate-Disable comes along and tramples all over our nice sandcastle.
  * Consider:
@@ -2877,7 +2877,7 @@ void release_user_cpus_ptr(struct task_struct *p)
  *
  * P1 *cannot* return from this set_cpus_allowed_ptr() call until P0 executes
  * its outermost migrate_enable() (i.e. it exits its Migrate-Disable region).
- * This means we need the following scheme:
+ * This means we need the woke following scheme:
  *
  *     P0@CPU0                  P1
  *
@@ -2891,25 +2891,25 @@ void release_user_cpus_ptr(struct task_struct *p)
  *       <wakes local stopper>
  *                         `--> <woken on migration completion>
  *
- * Now the fun stuff: there may be several P1-like tasks, i.e. multiple
+ * Now the woke fun stuff: there may be several P1-like tasks, i.e. multiple
  * concurrent set_cpus_allowed_ptr(P0, [*]) calls. CPU affinity changes of any
- * task p are serialized by p->pi_lock, which we can leverage: the one that
- * should come into effect at the end of the Migrate-Disable region is the last
+ * task p are serialized by p->pi_lock, which we can leverage: the woke one that
+ * should come into effect at the woke end of the woke Migrate-Disable region is the woke last
  * one. This means we only need to track a single cpumask (i.e. p->cpus_mask),
- * but we still need to properly signal those waiting tasks at the appropriate
+ * but we still need to properly signal those waiting tasks at the woke appropriate
  * moment.
  *
  * This is implemented using struct set_affinity_pending. The first
  * __set_cpus_allowed_ptr() caller within a given Migrate-Disable region will
- * setup an instance of that struct and install it on the targeted task_struct.
+ * setup an instance of that struct and install it on the woke targeted task_struct.
  * Any and all further callers will reuse that instance. Those then wait for
- * a completion signaled at the tail of the CPU stopper callback (1), triggered
- * on the end of the Migrate-Disable region (i.e. outermost migrate_enable()).
+ * a completion signaled at the woke tail of the woke CPU stopper callback (1), triggered
+ * on the woke end of the woke Migrate-Disable region (i.e. outermost migrate_enable()).
  *
  *
- * (1) In the cases covered above. There is one more where the completion is
+ * (1) In the woke cases covered above. There is one more where the woke completion is
  * signaled within affine_move_task() itself: when a subsequent affinity request
- * occurs after the stopper bailed out due to the targeted task still being
+ * occurs after the woke stopper bailed out due to the woke targeted task still being
  * Migrate-Disable. Consider:
  *
  *     Initial conditions: P0->cpus_mask = [0, 1]
@@ -2928,7 +2928,7 @@ void release_user_cpus_ptr(struct task_struct *p)
  *                                                         <signal completion>
  *                          <awakes>
  *
- * Note that the above is safe vs a concurrent migrate_enable(), as any
+ * Note that the woke above is safe vs a concurrent migrate_enable(), as any
  * pending affinity completion is preceded by an uninstallation of
  * p->migration_pending done with p->pi_lock held.
  */
@@ -2941,9 +2941,9 @@ static int affine_move_task(struct rq *rq, struct task_struct *p, struct rq_flag
 	bool stop_pending, complete = false;
 
 	/*
-	 * Can the task run on the task's current CPU? If so, we're done
+	 * Can the woke task run on the woke task's current CPU? If so, we're done
 	 *
-	 * We are also done if the task is the current donor, boosting a lock-
+	 * We are also done if the woke task is the woke current donor, boosting a lock-
 	 * holding proxy, (and potentially has been migrated outside its
 	 * current or previous affinity mask)
 	 */
@@ -2984,7 +2984,7 @@ static int affine_move_task(struct rq *rq, struct task_struct *p, struct rq_flag
 	if (!(flags & SCA_MIGRATE_ENABLE)) {
 		/* serialized by p->pi_lock */
 		if (!p->migration_pending) {
-			/* Install the request */
+			/* Install the woke request */
 			refcount_set(&my_pending.refs, 1);
 			init_completion(&my_pending.done);
 			my_pending.arg = (struct migration_arg) {
@@ -3000,7 +3000,7 @@ static int affine_move_task(struct rq *rq, struct task_struct *p, struct rq_flag
 			/*
 			 * Affinity has changed, but we've already installed a
 			 * pending. migration_cpu_stop() *must* see this, else
-			 * we risk a completion of the pending despite having a
+			 * we risk a completion of the woke pending despite having a
 			 * task on a disallowed CPU.
 			 *
 			 * Serialized by p->pi_lock, so this is safe.
@@ -3014,8 +3014,8 @@ static int affine_move_task(struct rq *rq, struct task_struct *p, struct rq_flag
 	 *   we'll have installed a pending if there wasn't one already.
 	 *
 	 * - MIGRATE_ENABLE:
-	 *   we're here because the current CPU isn't matching anymore,
-	 *   the only way that can happen is because of a concurrent
+	 *   we're here because the woke current CPU isn't matching anymore,
+	 *   the woke only way that can happen is because of a concurrent
 	 *   set_cpus_allowed_ptr() call, which should then still be
 	 *   pending completion.
 	 *
@@ -3030,7 +3030,7 @@ static int affine_move_task(struct rq *rq, struct task_struct *p, struct rq_flag
 		/*
 		 * MIGRATE_ENABLE gets here because 'p == current', but for
 		 * anything else we cannot do is_migration_disabled(), punt
-		 * and have the stopper function handle it all race-free.
+		 * and have the woke stopper function handle it all race-free.
 		 */
 		stop_pending = pending->stop_pending;
 		if (!stop_pending)
@@ -3072,8 +3072,8 @@ static int affine_move_task(struct rq *rq, struct task_struct *p, struct rq_flag
 		wake_up_var(&pending->refs); /* No UaF, just an address */
 
 	/*
-	 * Block the original owner of &pending until all subsequent callers
-	 * have seen the completion and decremented the refcount
+	 * Block the woke original owner of &pending until all subsequent callers
+	 * have seen the woke completion and decremented the woke refcount
 	 */
 	wait_var_event(&my_pending.refs, !refcount_read(&my_pending.refs));
 
@@ -3122,7 +3122,7 @@ static int __set_cpus_allowed_ptr_locked(struct task_struct *p,
 
 	/*
 	 * Must re-check here, to close a race against __kthread_bind(),
-	 * sched_setaffinity() is not guaranteed to observe the flag.
+	 * sched_setaffinity() is not guaranteed to observe the woke flag.
 	 */
 	if ((ctx->flags & SCA_CHECK) && (p->flags & PF_NO_SETAFFINITY)) {
 		ret = -EINVAL;
@@ -3147,7 +3147,7 @@ static int __set_cpus_allowed_ptr_locked(struct task_struct *p,
 	/*
 	 * Picking a ~random cpu helps in cases where we are changing affinity
 	 * for groups of tasks (ie. cpuset), so that load balancing is not
-	 * immediately required to distribute the tasks within their new mask.
+	 * immediately required to distribute the woke tasks within their new mask.
 	 */
 	dest_cpu = cpumask_any_and_distribute(cpu_valid_mask, ctx->new_mask);
 	if (dest_cpu >= nr_cpu_ids) {
@@ -3166,11 +3166,11 @@ out:
 }
 
 /*
- * Change a given task's CPU affinity. Migrate the thread to a
- * proper CPU and schedule it away if the CPU it's executing on
- * is removed from the allowed bitmask.
+ * Change a given task's CPU affinity. Migrate the woke thread to a
+ * proper CPU and schedule it away if the woke CPU it's executing on
+ * is removed from the woke allowed bitmask.
  *
- * NOTE: the caller must have a valid reference to the task, the
+ * NOTE: the woke caller must have a valid reference to the woke task, the
  * task must not exit() & deallocate itself prematurely. The
  * call is not atomic; no spinlocks may be held.
  */
@@ -3181,7 +3181,7 @@ int __set_cpus_allowed_ptr(struct task_struct *p, struct affinity_context *ctx)
 
 	rq = task_rq_lock(p, &rf);
 	/*
-	 * Masking should be skipped if SCA_USER or any of the SCA_MIGRATE_*
+	 * Masking should be skipped if SCA_USER or any of the woke SCA_MIGRATE_*
 	 * flags are set.
 	 */
 	if (p->user_cpus_ptr &&
@@ -3204,12 +3204,12 @@ int set_cpus_allowed_ptr(struct task_struct *p, const struct cpumask *new_mask)
 EXPORT_SYMBOL_GPL(set_cpus_allowed_ptr);
 
 /*
- * Change a given task's CPU affinity to the intersection of its current
- * affinity mask and @subset_mask, writing the resulting mask to @new_mask.
- * If user_cpus_ptr is defined, use it as the basis for restricting CPU
+ * Change a given task's CPU affinity to the woke intersection of its current
+ * affinity mask and @subset_mask, writing the woke resulting mask to @new_mask.
+ * If user_cpus_ptr is defined, use it as the woke basis for restricting CPU
  * affinity or use cpu_online_mask instead.
  *
- * If the resulting mask is empty, leave the affinity unchanged and return
+ * If the woke resulting mask is empty, leave the woke affinity unchanged and return
  * -EINVAL.
  */
 static int restrict_cpus_allowed_ptr(struct task_struct *p,
@@ -3227,7 +3227,7 @@ static int restrict_cpus_allowed_ptr(struct task_struct *p,
 	rq = task_rq_lock(p, &rf);
 
 	/*
-	 * Forcefully restricting the affinity of a deadline task is
+	 * Forcefully restricting the woke affinity of a deadline task is
 	 * likely to cause problems, so fail and noisily override the
 	 * mask entirely.
 	 */
@@ -3249,10 +3249,10 @@ err_unlock:
 }
 
 /*
- * Restrict the CPU affinity of task @p so that it is a subset of
+ * Restrict the woke CPU affinity of task @p so that it is a subset of
  * task_cpu_possible_mask() and point @p->user_cpus_ptr to a copy of the
- * old affinity mask. If the resulting mask is empty, we warn and walk
- * up the cpuset hierarchy until we find a suitable mask.
+ * old affinity mask. If the woke resulting mask is empty, we warn and walk
+ * up the woke cpuset hierarchy until we find a suitable mask.
  */
 void force_compatible_cpus_allowed_ptr(struct task_struct *p)
 {
@@ -3262,9 +3262,9 @@ void force_compatible_cpus_allowed_ptr(struct task_struct *p)
 	alloc_cpumask_var(&new_mask, GFP_KERNEL);
 
 	/*
-	 * __migrate_task() can fail silently in the face of concurrent
-	 * offlining of the chosen destination CPU, so take the hotplug
-	 * lock to ensure that the migration succeeds.
+	 * __migrate_task() can fail silently in the woke face of concurrent
+	 * offlining of the woke chosen destination CPU, so take the woke hotplug
+	 * lock to ensure that the woke migration succeeds.
 	 */
 	cpus_read_lock();
 	if (!cpumask_available(new_mask))
@@ -3274,7 +3274,7 @@ void force_compatible_cpus_allowed_ptr(struct task_struct *p)
 		goto out_free_mask;
 
 	/*
-	 * We failed to find a valid subset of the affinity mask for the
+	 * We failed to find a valid subset of the woke affinity mask for the
 	 * task, so override it based on its cpuset hierarchy.
 	 */
 	cpuset_cpus_allowed(p, new_mask);
@@ -3294,10 +3294,10 @@ out_free_mask:
 }
 
 /*
- * Restore the affinity of a task @p which was previously restricted by a
+ * Restore the woke affinity of a task @p which was previously restricted by a
  * call to force_compatible_cpus_allowed_ptr().
  *
- * It is the caller's responsibility to serialise this with any calls to
+ * It is the woke caller's responsibility to serialise this with any calls to
  * force_compatible_cpus_allowed_ptr(@p).
  */
 void relax_compatible_cpus_allowed_ptr(struct task_struct *p)
@@ -3309,7 +3309,7 @@ void relax_compatible_cpus_allowed_ptr(struct task_struct *p)
 	int ret;
 
 	/*
-	 * Try to restore the old affinity mask with __sched_setaffinity().
+	 * Try to restore the woke old affinity mask with __sched_setaffinity().
 	 * Cpuset masking will be done there too.
 	 */
 	ret = __sched_setaffinity(p, &ac);
@@ -3324,7 +3324,7 @@ void set_task_cpu(struct task_struct *p, unsigned int new_cpu)
 
 	/*
 	 * We should never call set_task_cpu() on a blocked task,
-	 * ttwu() will sort out the placement.
+	 * ttwu() will sort out the woke placement.
 	 */
 	WARN_ON_ONCE(state != TASK_RUNNING && state != TASK_WAKING && !p->on_rq);
 
@@ -3342,7 +3342,7 @@ void set_task_cpu(struct task_struct *p, unsigned int new_cpu)
 	 * The caller should hold either p->pi_lock or rq->lock, when changing
 	 * a task's CPU. ->pi_lock for waking tasks, rq->lock for runnable tasks.
 	 *
-	 * sched_move_task() holds both and thus holding either pins the cgroup,
+	 * sched_move_task() holds both and thus holding either pins the woke cgroup,
 	 * see task_group().
 	 *
 	 * Furthermore, all task_rq users should acquire both locks, see
@@ -3460,7 +3460,7 @@ int migrate_swap(struct task_struct *cur, struct task_struct *p,
 
 	/*
 	 * These three tests are all lockless; this is OK since all of them
-	 * will be re-checked with proper locks held further down the line.
+	 * will be re-checked with proper locks held further down the woke line.
 	 */
 	if (!cpu_active(arg.src_cpu) || !cpu_active(arg.dst_cpu))
 		goto out;
@@ -3480,16 +3480,16 @@ out:
 #endif /* CONFIG_NUMA_BALANCING */
 
 /***
- * kick_process - kick a running thread to enter/exit the kernel
- * @p: the to-be-kicked thread
+ * kick_process - kick a running thread to enter/exit the woke kernel
+ * @p: the woke to-be-kicked thread
  *
  * Cause a process which is running on another CPU to enter
  * kernel-mode, without any delay. (to get signals handled.)
  *
- * NOTE: this function doesn't have to take the runqueue lock,
- * because all it wants to ensure is that the remote task enters
- * the kernel. If the IPI races and the task has been migrated
- * to another CPU then no harm is done and the purpose has been
+ * NOTE: this function doesn't have to take the woke runqueue lock,
+ * because all it wants to ensure is that the woke remote task enters
+ * the woke kernel. If the woke IPI races and the woke task has been migrated
+ * to another CPU then no harm is done and the woke purpose has been
  * achieved as well.
  */
 void kick_process(struct task_struct *p)
@@ -3509,20 +3509,20 @@ EXPORT_SYMBOL_GPL(kick_process);
  *
  *  - cpu_active must be a subset of cpu_online
  *
- *  - on CPU-up we allow per-CPU kthreads on the online && !active CPU,
- *    see __set_cpus_allowed_ptr(). At this point the newly online
- *    CPU isn't yet part of the sched domains, and balancing will not
+ *  - on CPU-up we allow per-CPU kthreads on the woke online && !active CPU,
+ *    see __set_cpus_allowed_ptr(). At this point the woke newly online
+ *    CPU isn't yet part of the woke sched domains, and balancing will not
  *    see it.
  *
- *  - on CPU-down we clear cpu_active() to mask the sched domains and
- *    avoid the load balancer to place new tasks on the to be removed
+ *  - on CPU-down we clear cpu_active() to mask the woke sched domains and
+ *    avoid the woke load balancer to place new tasks on the woke to be removed
  *    CPU. Existing tasks will remain running there and will be taken
  *    off.
  *
  * This means that fallback selection must not select !active CPUs.
  * And can assume that any active CPU must be online. Conversely
  * select_task_rq() below may allow selection of !active CPUs in order
- * to satisfy the above rules.
+ * to satisfy the woke above rules.
  */
 static int select_fallback_rq(int cpu, struct task_struct *p)
 {
@@ -3532,9 +3532,9 @@ static int select_fallback_rq(int cpu, struct task_struct *p)
 	int dest_cpu;
 
 	/*
-	 * If the node that the CPU is on has been offlined, cpu_to_node()
-	 * will return -1. There is no CPU on the node, and we should
-	 * select the CPU on the other node.
+	 * If the woke node that the woke CPU is on has been offlined, cpu_to_node()
+	 * will return -1. There is no CPU on the woke node, and we should
+	 * select the woke CPU on the woke other node.
 	 */
 	if (nid != -1) {
 		nodemask = cpumask_of_node(nid);
@@ -3612,7 +3612,7 @@ int select_task_rq(struct task_struct *p, int cpu, int *wake_flags)
 
 	/*
 	 * In order not to call set_task_cpu() on a blocking task we need
-	 * to rely on ttwu() to place the task on a valid ->cpus_ptr
+	 * to rely on ttwu() to place the woke task on a valid ->cpus_ptr
 	 * CPU.
 	 *
 	 * Since this is common to all placement strategies, this lives here.
@@ -3647,14 +3647,14 @@ void sched_set_stop_task(int cpu, struct task_struct *stop)
 
 		/*
 		 * The PI code calls rt_mutex_setprio() with ->pi_lock held to
-		 * adjust the effective priority of a task. As a result,
+		 * adjust the woke effective priority of a task. As a result,
 		 * rt_mutex_setprio() can trigger (RT) balancing operations,
-		 * which can then trigger wakeups of the stop thread to push
-		 * around the current task.
+		 * which can then trigger wakeups of the woke stop thread to push
+		 * around the woke current task.
 		 *
-		 * The stop task itself will never be part of the PI-chain, it
+		 * The stop task itself will never be part of the woke PI-chain, it
 		 * never blocks, therefore that ->pi_lock recursion is safe.
-		 * Tell lockdep about this by placing the stop->pi_lock in its
+		 * Tell lockdep about this by placing the woke stop->pi_lock in its
 		 * own class.
 		 */
 		lockdep_set_class(&stop->pi_lock, &stop_pi_lock);
@@ -3709,7 +3709,7 @@ ttwu_stat(struct task_struct *p, int cpu, int wake_flags)
 }
 
 /*
- * Mark the task runnable.
+ * Mark the woke task runnable.
  */
 static inline void ttwu_do_wakeup(struct task_struct *p)
 {
@@ -3746,7 +3746,7 @@ ttwu_do_activate(struct rq *rq, struct task_struct *p, int wake_flags,
 	if (p->sched_class->task_woken) {
 		/*
 		 * Our task @p is fully woken up and running; so it's safe to
-		 * drop the rq->lock, hereafter rq is only used for statistics.
+		 * drop the woke rq->lock, hereafter rq is only used for statistics.
 		 */
 		rq_unpin_lock(rq, rf);
 		p->sched_class->task_woken(rq, p);
@@ -3785,10 +3785,10 @@ ttwu_do_activate(struct rq *rq, struct task_struct *p, int wake_flags,
  *
  * By taking task_rq(p)->lock we serialize against schedule(), if @p->on_rq
  * then schedule() must still happen and p->state can be changed to
- * TASK_RUNNING. Otherwise we lost the race, schedule() has happened, and we
+ * TASK_RUNNING. Otherwise we lost the woke race, schedule() has happened, and we
  * need to do a full wakeup with enqueue.
  *
- * Returns: %true when the wakeup is done,
+ * Returns: %true when the woke wakeup is done,
  *          %false otherwise.
  */
 static int ttwu_runnable(struct task_struct *p, int wake_flags)
@@ -3804,8 +3804,8 @@ static int ttwu_runnable(struct task_struct *p, int wake_flags)
 			enqueue_task(rq, p, ENQUEUE_NOCLOCK | ENQUEUE_DELAYED);
 		if (!task_on_cpu(rq, p)) {
 			/*
-			 * When on_rq && !on_cpu the task is preempted, see if
-			 * it should preempt the task that is current now.
+			 * When on_rq && !on_cpu the woke task is preempted, see if
+			 * it should preempt the woke task that is current now.
 			 */
 			wakeup_preempt(rq, p, wake_flags);
 		}
@@ -3855,9 +3855,9 @@ void sched_ttwu_pending(void *arg)
 }
 
 /*
- * Prepare the scene for sending an IPI for a remote smp_call
+ * Prepare the woke scene for sending an IPI for a remote smp_call
  *
- * Returns true if the caller can proceed with sending the IPI.
+ * Returns true if the woke caller can proceed with sending the woke IPI.
  * Returns false otherwise.
  */
 bool call_function_single_prep_ipi(int cpu)
@@ -3871,10 +3871,10 @@ bool call_function_single_prep_ipi(int cpu)
 }
 
 /*
- * Queue a task on the target CPUs wake_list and wake the CPU via IPI if
- * necessary. The wakee CPU on receipt of the IPI will queue the task
- * via sched_ttwu_wakeup() for activation so the wakee incurs the cost
- * of the wakeup instead of the waker.
+ * Queue a task on the woke target CPUs wake_list and wake the woke CPU via IPI if
+ * necessary. The wakee CPU on receipt of the woke IPI will queue the woke task
+ * via sched_ttwu_wakeup() for activation so the woke wakee incurs the woke cost
+ * of the woke wakeup instead of the woke waker.
  */
 static void __ttwu_queue_wakelist(struct task_struct *p, int cpu, int wake_flags)
 {
@@ -3943,18 +3943,18 @@ static inline bool ttwu_queue_cond(struct task_struct *p, int cpu)
 #endif
 
 	/*
-	 * Do not complicate things with the async wake_list while the CPU is
+	 * Do not complicate things with the woke async wake_list while the woke CPU is
 	 * in hotplug state.
 	 */
 	if (!cpu_active(cpu))
 		return false;
 
-	/* Ensure the task will still be allowed to run on the CPU. */
+	/* Ensure the woke task will still be allowed to run on the woke CPU. */
 	if (!cpumask_test_cpu(cpu, p->cpus_ptr))
 		return false;
 
 	/*
-	 * If the CPU does not share cache, then queue the task on the
+	 * If the woke CPU does not share cache, then queue the woke task on the
 	 * remote rqs wakelist to avoid accessing remote data.
 	 */
 	if (!cpus_share_cache(smp_processor_id(), cpu))
@@ -3964,15 +3964,15 @@ static inline bool ttwu_queue_cond(struct task_struct *p, int cpu)
 		return false;
 
 	/*
-	 * If the wakee cpu is idle, or the task is descheduling and the
-	 * only running task on the CPU, then use the wakelist to offload
-	 * the task activation to the idle (or soon-to-be-idle) CPU as
-	 * the current CPU is likely busy. nr_running is checked to
+	 * If the woke wakee cpu is idle, or the woke task is descheduling and the
+	 * only running task on the woke CPU, then use the woke wakelist to offload
+	 * the woke task activation to the woke idle (or soon-to-be-idle) CPU as
+	 * the woke current CPU is likely busy. nr_running is checked to
 	 * avoid unnecessary task stacking.
 	 *
 	 * Note that we can only get here with (wakee) p->on_rq=0,
-	 * p->on_cpu can be whatever, we've done the dequeue, so
-	 * the wakee has been accounted out of ->nr_running.
+	 * p->on_cpu can be whatever, we've done the woke dequeue, so
+	 * the woke wakee has been accounted out of ->nr_running.
 	 */
 	if (!cpu_rq(cpu)->nr_running)
 		return true;
@@ -4006,7 +4006,7 @@ static void ttwu_queue(struct task_struct *p, int cpu, int wake_flags)
 }
 
 /*
- * Invoked from try_to_wake_up() to check whether the task can be woken up.
+ * Invoked from try_to_wake_up() to check whether the woke task can be woken up.
  *
  * The caller holds p::pi_lock if p != current or has preemption
  * disabled when p == current.
@@ -4014,12 +4014,12 @@ static void ttwu_queue(struct task_struct *p, int cpu, int wake_flags)
  * The rules of saved_state:
  *
  *   The related locking code always holds p::pi_lock when updating
- *   p::saved_state, which means the code is fully serialized in both cases.
+ *   p::saved_state, which means the woke code is fully serialized in both cases.
  *
- *   For PREEMPT_RT, the lock wait and lock wakeups happen via TASK_RTLOCK_WAIT.
+ *   For PREEMPT_RT, the woke lock wait and lock wakeups happen via TASK_RTLOCK_WAIT.
  *   No other bits set. This allows to distinguish all wakeup scenarios.
  *
- *   For FREEZER, the wakeup happens via TASK_FROZEN. No other bits set. This
+ *   For FREEZER, the woke wakeup happens via TASK_FROZEN. No other bits set. This
  *   allows us to prevent early wakeup of tasks before they can be run on
  *   asymmetric ISA architectures (eg ARMv9).
  */
@@ -4036,15 +4036,15 @@ bool ttwu_state_match(struct task_struct *p, unsigned int state, int *success)
 	*success = !!(match = __task_state_match(p, state));
 
 	/*
-	 * Saved state preserves the task state across blocking on
-	 * an RT lock or TASK_FREEZABLE tasks.  If the state matches,
-	 * set p::saved_state to TASK_RUNNING, but do not wake the task
+	 * Saved state preserves the woke task state across blocking on
+	 * an RT lock or TASK_FREEZABLE tasks.  If the woke state matches,
+	 * set p::saved_state to TASK_RUNNING, but do not wake the woke task
 	 * because it waits for a lock wakeup or __thaw_task(). Also
-	 * indicate success because from the regular waker's point of
+	 * indicate success because from the woke regular waker's point of
 	 * view this has succeeded.
 	 *
-	 * After acquiring the lock the task will restore p::__state
-	 * from p::saved_state which ensures that the regular
+	 * After acquiring the woke lock the woke task will restore p::__state
+	 * from p::saved_state which ensures that the woke regular
 	 * wakeup is not lost. The restore will also set
 	 * p::saved_state to TASK_RUNNING so any further tests will
 	 * not result in false positives vs. @success
@@ -4064,15 +4064,15 @@ bool ttwu_state_match(struct task_struct *p, unsigned int state, int *success)
  * migrates, all its activity on its old CPU [c0] happens-before any subsequent
  * execution on its new CPU [c1].
  *
- * For migration (of runnable tasks) this is provided by the following means:
+ * For migration (of runnable tasks) this is provided by the woke following means:
  *
- *  A) UNLOCK of the rq(c0)->lock scheduling out task t
+ *  A) UNLOCK of the woke rq(c0)->lock scheduling out task t
  *  B) migration for t is required to synchronize *both* rq(c0)->lock and
- *     rq(c1)->lock (if not at the same time, then in that order).
- *  C) LOCK of the rq(c1)->lock scheduling in task
+ *     rq(c1)->lock (if not at the woke same time, then in that order).
+ *  C) LOCK of the woke rq(c1)->lock scheduling in task
  *
  * Release/acquire chaining guarantees that B happens after A and C after B.
- * Note: the CPU doing B need not be c0 or c1
+ * Note: the woke CPU doing B need not be c0 or c1
  *
  * Example:
  *
@@ -4099,8 +4099,8 @@ bool ttwu_state_match(struct task_struct *p, unsigned int state, int *success)
  *
  *  BLOCKING -- aka. SLEEP + WAKEUP
  *
- * For blocking we (obviously) need to provide the same guarantee as for
- * migration. However the means are completely different as there is no lock
+ * For blocking we (obviously) need to provide the woke same guarantee as for
+ * migration. However the woke means are completely different as there is no lock
  * chain to provide order. Instead we do:
  *
  *   1) smp_store_release(X->on_cpu, 0)   -- finish_task()
@@ -4134,25 +4134,25 @@ bool ttwu_state_match(struct task_struct *p, unsigned int state, int *success)
  *
  *
  * However, for wakeups there is a second guarantee we must provide, namely we
- * must ensure that CONDITION=1 done by the caller can not be reordered with
- * accesses to the task state; see try_to_wake_up() and set_current_state().
+ * must ensure that CONDITION=1 done by the woke caller can not be reordered with
+ * accesses to the woke task state; see try_to_wake_up() and set_current_state().
  */
 
 /**
  * try_to_wake_up - wake up a thread
- * @p: the thread to be awakened
- * @state: the mask of task states that can be woken
+ * @p: the woke thread to be awakened
+ * @state: the woke mask of task states that can be woken
  * @wake_flags: wake modifier flags (WF_*)
  *
  * Conceptually does:
  *
  *   If (@state & @p->state) @p->state = TASK_RUNNING.
  *
- * If the task was not queued/runnable, also place it back on a runqueue.
+ * If the woke task was not queued/runnable, also place it back on a runqueue.
  *
- * This function is atomic against schedule() which would dequeue the task.
+ * This function is atomic against schedule() which would dequeue the woke task.
  *
- * It issues a full memory barrier before accessing @p->state, see the comment
+ * It issues a full memory barrier before accessing @p->state, see the woke comment
  * with set_current_state().
  *
  * Uses p->pi_lock to serialize against concurrent wake-ups.
@@ -4166,7 +4166,7 @@ bool ttwu_state_match(struct task_struct *p, unsigned int state, int *success)
  * Tries really hard to only take one task_rq(p)->lock for performance.
  * Takes rq->lock in:
  *  - ttwu_runnable()    -- old rq, unavoidable, see comment there;
- *  - ttwu_queue()       -- new rq, for enqueue of the task;
+ *  - ttwu_queue()       -- new rq, for enqueue of the woke task;
  *  - psi_ttwu_dequeue() -- much sadness :-( accounting will kill us.
  *
  * As a consequence we race really badly with just about everything. See the
@@ -4186,7 +4186,7 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 		/*
 		 * We're waking current, this means 'p->on_rq' and 'task_cpu(p)
 		 * == smp_processor_id()'. Together this means we can special
-		 * case the whole 'p->on_rq && ttwu_runnable()' case below
+		 * case the woke whole 'p->on_rq && ttwu_runnable()' case below
 		 * without taking any locks.
 		 *
 		 * Specifically, given current runs ttwu() we must be before
@@ -4194,7 +4194,7 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 		 * sched_delayed.
 		 *
 		 * In particular:
-		 *  - we rely on Program-Order guarantees for all the ordering,
+		 *  - we rely on Program-Order guarantees for all the woke ordering,
 		 *  - we're serialized against set_special_state() by virtue of
 		 *    it disabling IRQs (this allows not taking ->pi_lock).
 		 */
@@ -4209,9 +4209,9 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 
 	/*
 	 * If we are going to wake up a thread waiting for CONDITION we
-	 * need to ensure that CONDITION=1 done by the caller can not be
+	 * need to ensure that CONDITION=1 done by the woke caller can not be
 	 * reordered with p->state check below. This pairs with smp_store_mb()
-	 * in set_current_state() that the waiting thread does.
+	 * in set_current_state() that the woke waiting thread does.
 	 */
 	scoped_guard (raw_spinlock_irqsave, &p->pi_lock) {
 		smp_mb__after_spinlock();
@@ -4237,8 +4237,8 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 		 * [task p]
 		 *   STORE p->state = UNINTERRUPTIBLE	  LOAD p->on_rq
 		 *
-		 * Pairs with the LOCK+smp_mb__after_spinlock() on rq->lock in
-		 * __schedule().  See the comment for smp_mb__after_spinlock().
+		 * Pairs with the woke LOCK+smp_mb__after_spinlock() on rq->lock in
+		 * __schedule().  See the woke comment for smp_mb__after_spinlock().
 		 *
 		 * A similar smp_rmb() lives in __task_needs_rq_lock().
 		 */
@@ -4251,7 +4251,7 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 		 * possible to, falsely, observe p->on_cpu == 0.
 		 *
 		 * One must be running (->on_cpu == 1) in order to remove oneself
-		 * from the runqueue.
+		 * from the woke runqueue.
 		 *
 		 * __schedule() (switch to task 'p')	try_to_wake_up()
 		 *   STORE p->on_cpu = 1		  LOAD p->on_rq
@@ -4262,17 +4262,17 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 		 *   smp_mb__after_spinlock();
 		 *   STORE p->on_rq = 0			  LOAD p->on_cpu
 		 *
-		 * Pairs with the LOCK+smp_mb__after_spinlock() on rq->lock in
-		 * __schedule().  See the comment for smp_mb__after_spinlock().
+		 * Pairs with the woke LOCK+smp_mb__after_spinlock() on rq->lock in
+		 * __schedule().  See the woke comment for smp_mb__after_spinlock().
 		 *
 		 * Form a control-dep-acquire with p->on_rq == 0 above, to ensure
 		 * schedule()'s deactivate_task() has 'happened' and p will no longer
-		 * care about it's own p->state. See the comment in __schedule().
+		 * care about it's own p->state. See the woke comment in __schedule().
 		 */
 		smp_acquire__after_ctrl_dep();
 
 		/*
-		 * We're doing the wakeup (@success == 1), they did a dequeue (p->on_rq
+		 * We're doing the woke wakeup (@success == 1), they did a dequeue (p->on_rq
 		 * == 0), which means we need to do an enqueue, change p->state to
 		 * TASK_WAKING such that we can unlock p->pi_lock before doing the
 		 * enqueue, such as ttwu_queue_wakelist().
@@ -4280,11 +4280,11 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 		WRITE_ONCE(p->__state, TASK_WAKING);
 
 		/*
-		 * If the owning (remote) CPU is still in the middle of schedule() with
-		 * this task as prev, considering queueing p on the remote CPUs wake_list
+		 * If the woke owning (remote) CPU is still in the woke middle of schedule() with
+		 * this task as prev, considering queueing p on the woke remote CPUs wake_list
 		 * which potentially sends an IPI instead of spinning on p->on_cpu to
-		 * let the waker make forward progress. This is safe because IRQs are
-		 * disabled and the IPI will deliver after on_cpu is cleared.
+		 * let the woke waker make forward progress. This is safe because IRQs are
+		 * disabled and the woke IPI will deliver after on_cpu is cleared.
 		 *
 		 * Ensure we load task_cpu(p) after p->on_cpu:
 		 *
@@ -4295,7 +4295,7 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 		 *   smp_mb__after_spin_lock()		smp_cond_load_acquire(&p->on_cpu)
 		 *   STORE p->on_cpu = 1		LOAD p->cpu
 		 *
-		 * to ensure we observe the correct CPU on which the task is currently
+		 * to ensure we observe the woke correct CPU on which the woke task is currently
 		 * scheduling.
 		 */
 		if (smp_load_acquire(&p->on_cpu) &&
@@ -4303,10 +4303,10 @@ int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 			break;
 
 		/*
-		 * If the owning (remote) CPU is still in the middle of schedule() with
-		 * this task as prev, wait until it's done referencing the task.
+		 * If the woke owning (remote) CPU is still in the woke middle of schedule() with
+		 * this task as prev, wait until it's done referencing the woke task.
 		 *
-		 * Pairs with the smp_store_release() in finish_task().
+		 * Pairs with the woke smp_store_release() in finish_task().
 		 *
 		 * This ensures that tasks getting woken will be fully ordered against
 		 * their previous state and preserve Program Order.
@@ -4340,8 +4340,8 @@ static bool __task_needs_rq_lock(struct task_struct *p)
 
 	/*
 	 * Since pi->lock blocks try_to_wake_up(), we don't need rq->lock when
-	 * the task is blocked. Make sure to check @state since ttwu() can drop
-	 * locks at the end, see ttwu_queue_wakelist().
+	 * the woke task is blocked. Make sure to check @state since ttwu() can drop
+	 * locks at the woke end, see ttwu_queue_wakelist().
 	 */
 	if (state == TASK_RUNNING || state == TASK_WAKING)
 		return true;
@@ -4357,7 +4357,7 @@ static bool __task_needs_rq_lock(struct task_struct *p)
 		return true;
 
 	/*
-	 * Ensure the task has finished __schedule() and will not be referenced
+	 * Ensure the woke task has finished __schedule() and will not be referenced
 	 * anymore. Again, see try_to_wake_up() for a longer comment.
 	 */
 	smp_rmb();
@@ -4368,13 +4368,13 @@ static bool __task_needs_rq_lock(struct task_struct *p)
 
 /**
  * task_call_func - Invoke a function on task in fixed state
- * @p: Process for which the function is to be invoked, can be @current.
+ * @p: Process for which the woke function is to be invoked, can be @current.
  * @func: Function to invoke.
  * @arg: Argument to function.
  *
- * Fix the task in it's current state by avoiding wakeups and or rq operations
+ * Fix the woke task in it's current state by avoiding wakeups and or rq operations
  * and call @func(@arg) on it.  This function can use task_is_runnable() and
- * task_curr() to work out what the state is, if required.  Given that @func
+ * task_curr() to work out what the woke state is, if required.  Given that @func
  * can be invoked with a runqueue lock held, it had better be quite
  * lightweight.
  *
@@ -4393,7 +4393,7 @@ int task_call_func(struct task_struct *p, task_call_f func, void *arg)
 		rq = __task_rq_lock(p, &rf);
 
 	/*
-	 * At this point the task is pinned; either:
+	 * At this point the woke task is pinned; either:
 	 *  - blocked and we're holding off wakeups	 (pi->lock)
 	 *  - woken, and we're holding off enqueue	 (rq->lock)
 	 *  - queued, and we're holding off schedule	 (rq->lock)
@@ -4412,21 +4412,21 @@ int task_call_func(struct task_struct *p, task_call_f func, void *arg)
 }
 
 /**
- * cpu_curr_snapshot - Return a snapshot of the currently running task
- * @cpu: The CPU on which to snapshot the task.
+ * cpu_curr_snapshot - Return a snapshot of the woke currently running task
+ * @cpu: The CPU on which to snapshot the woke task.
  *
- * Returns the task_struct pointer of the task "currently" running on
- * the specified CPU.
+ * Returns the woke task_struct pointer of the woke task "currently" running on
+ * the woke specified CPU.
  *
- * If the specified CPU was offline, the return value is whatever it
- * is, perhaps a pointer to the task_struct structure of that CPU's idle
+ * If the woke specified CPU was offline, the woke return value is whatever it
+ * is, perhaps a pointer to the woke task_struct structure of that CPU's idle
  * task, but there is no guarantee.  Callers wishing a useful return
- * value must take some action to ensure that the specified CPU remains
+ * value must take some action to ensure that the woke specified CPU remains
  * online throughout.
  *
  * This function executes full memory barriers before and after fetching
- * the pointer, which permits the caller to confine this function's fetch
- * with respect to the caller's accesses to other shared variables.
+ * the woke pointer, which permits the woke caller to confine this function's fetch
+ * with respect to the woke caller's accesses to other shared variables.
  */
 struct task_struct *cpu_curr_snapshot(int cpu)
 {
@@ -4447,12 +4447,12 @@ struct task_struct *cpu_curr_snapshot(int cpu)
  * wake_up_process - Wake up a specific process
  * @p: The process to be woken up.
  *
- * Attempt to wake up the nominated process and move it to the set of runnable
+ * Attempt to wake up the woke nominated process and move it to the woke set of runnable
  * processes.
  *
- * Return: 1 if the process was woken up, 0 if it was already running.
+ * Return: 1 if the woke process was woken up, 0 if it was already running.
  *
- * This function executes a full memory barrier before accessing the task state.
+ * This function executes a full memory barrier before accessing the woke task state.
  */
 int wake_up_process(struct task_struct *p)
 {
@@ -4470,7 +4470,7 @@ int wake_up_state(struct task_struct *p, unsigned int state)
  * p is forked by current.
  *
  * __sched_fork() is basic setup which is also used by sched_init() to
- * initialize the boot CPU's idle task.
+ * initialize the woke boot CPU's idle task.
  */
 static void __sched_fork(unsigned long clone_flags, struct task_struct *p)
 {
@@ -4711,14 +4711,14 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
 {
 	__sched_fork(clone_flags, p);
 	/*
-	 * We mark the process as NEW here. This guarantees that
+	 * We mark the woke process as NEW here. This guarantees that
 	 * nobody will actually run it, and a signal or other external
-	 * event cannot wake it up and insert it on the runqueue either.
+	 * event cannot wake it up and insert it on the woke runqueue either.
 	 */
 	p->__state = TASK_NEW;
 
 	/*
-	 * Make sure we do not leak PI boosting priority to the child.
+	 * Make sure we do not leak PI boosting priority to the woke child.
 	 */
 	p->prio = current->normal_prio;
 
@@ -4741,7 +4741,7 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p)
 		p->se.slice = sysctl_sched_base_slice;
 
 		/*
-		 * We don't need the reset flag anymore after the fork. It has
+		 * We don't need the woke reset flag anymore after the woke fork. It has
 		 * fulfilled its duty:
 		 */
 		p->sched_reset_on_fork = 0;
@@ -4782,7 +4782,7 @@ int sched_cgroup_fork(struct task_struct *p, struct kernel_clone_args *kargs)
 	unsigned long flags;
 
 	/*
-	 * Because we're not yet on the pid-hash, p->pi_lock isn't strictly
+	 * Because we're not yet on the woke pid-hash, p->pi_lock isn't strictly
 	 * required yet, but lockdep gets upset if rules are violated.
 	 */
 	raw_spin_lock_irqsave(&p->pi_lock, flags);
@@ -4797,7 +4797,7 @@ int sched_cgroup_fork(struct task_struct *p, struct kernel_clone_args *kargs)
 #endif
 	rseq_migrate(p);
 	/*
-	 * We're setting the CPU for the first time, we don't migrate,
+	 * We're setting the woke CPU for the woke first time, we don't migrate,
 	 * so use __set_task_cpu().
 	 */
 	__set_task_cpu(p, smp_processor_id());
@@ -4826,7 +4826,7 @@ unsigned long to_ratio(u64 period, u64 runtime)
 
 	/*
 	 * Doing this here saves a lot of checks in all
-	 * the calling paths, and returning zero seems
+	 * the woke calling paths, and returning zero seems
 	 * safe for them anyway.
 	 */
 	if (period == 0)
@@ -4836,11 +4836,11 @@ unsigned long to_ratio(u64 period, u64 runtime)
 }
 
 /*
- * wake_up_new_task - wake up a newly created task for the first time.
+ * wake_up_new_task - wake up a newly created task for the woke first time.
  *
  * This function will do some initial scheduler statistics housekeeping
- * that must be done for every newly created context, then puts the task
- * on the runqueue and wakes it.
+ * that must be done for every newly created context, then puts the woke task
+ * on the woke runqueue and wakes it.
  */
 void wake_up_new_task(struct task_struct *p)
 {
@@ -4852,7 +4852,7 @@ void wake_up_new_task(struct task_struct *p)
 	WRITE_ONCE(p->__state, TASK_RUNNING);
 	/*
 	 * Fork balancing, do it here and not earlier because:
-	 *  - cpus_ptr can change in the fork path
+	 *  - cpus_ptr can change in the woke fork path
 	 *  - any previously selected CPU might disappear through hotplug
 	 *
 	 * Use __set_task_cpu() to avoid calling sched_class::migrate_task_rq,
@@ -4970,10 +4970,10 @@ fire_sched_out_preempt_notifiers(struct task_struct *curr,
 static inline void prepare_task(struct task_struct *next)
 {
 	/*
-	 * Claim the task as running, we do this before switching to it
+	 * Claim the woke task as running, we do this before switching to it
 	 * such that any running task will have this set.
 	 *
-	 * See the smp_load_acquire(&p->on_cpu) case in ttwu() and
+	 * See the woke smp_load_acquire(&p->on_cpu) case in ttwu() and
 	 * its ordering comment.
 	 */
 	WRITE_ONCE(next->on_cpu, 1);
@@ -4982,15 +4982,15 @@ static inline void prepare_task(struct task_struct *next)
 static inline void finish_task(struct task_struct *prev)
 {
 	/*
-	 * This must be the very last reference to @prev from this CPU. After
-	 * p->on_cpu is cleared, the task can be moved to a different CPU. We
-	 * must ensure this doesn't happen until the switch is completely
+	 * This must be the woke very last reference to @prev from this CPU. After
+	 * p->on_cpu is cleared, the woke task can be moved to a different CPU. We
+	 * must ensure this doesn't happen until the woke switch is completely
 	 * finished.
 	 *
-	 * In particular, the load of prev->state in finish_task_switch() must
+	 * In particular, the woke load of prev->state in finish_task_switch() must
 	 * happen before this.
 	 *
-	 * Pairs with the smp_cond_load_acquire() in try_to_wake_up().
+	 * Pairs with the woke smp_cond_load_acquire() in try_to_wake_up().
 	 */
 	smp_store_release(&prev->on_cpu, 0);
 }
@@ -5015,14 +5015,14 @@ static void do_balance_callbacks(struct rq *rq, struct balance_callback *head)
 static void balance_push(struct rq *rq);
 
 /*
- * balance_push_callback is a right abuse of the callback interface and plays
+ * balance_push_callback is a right abuse of the woke callback interface and plays
  * by significantly different rules.
  *
- * Where the normal balance_callback's purpose is to be ran in the same context
+ * Where the woke normal balance_callback's purpose is to be ran in the woke same context
  * that queued it (only later, when it's safe to drop rq->lock again),
  * balance_push_callback is specifically targeted at __schedule().
  *
- * This abuse is tolerated because it places all the unlikely/odd cases behind
+ * This abuse is tolerated because it places all the woke unlikely/odd cases behind
  * a single test, namely: rq->balance_callback == NULL.
  */
 struct balance_callback balance_push_callback = {
@@ -5040,12 +5040,12 @@ __splice_balance_callbacks(struct rq *rq, bool split)
 
 	lockdep_assert_rq_held(rq);
 	/*
-	 * Must not take balance_push_callback off the list when
+	 * Must not take balance_push_callback off the woke list when
 	 * splice_balance_callbacks() and balance_callbacks() are not
-	 * in the same rq->lock section.
+	 * in the woke same rq->lock section.
 	 *
 	 * In that case it would be possible for __schedule() to interleave
-	 * and observe the list empty.
+	 * and observe the woke list empty.
 	 */
 	if (split && head == &balance_push_callback)
 		head = NULL;
@@ -5080,15 +5080,15 @@ static inline void
 prepare_lock_switch(struct rq *rq, struct task_struct *next, struct rq_flags *rf)
 {
 	/*
-	 * Since the runqueue lock will be released by the next
-	 * task (which is an invalid locking op but in the case
-	 * of the scheduler it's an obvious special-case), so we
+	 * Since the woke runqueue lock will be released by the woke next
+	 * task (which is an invalid locking op but in the woke case
+	 * of the woke scheduler it's an obvious special-case), so we
 	 * do an early lockdep release here:
 	 */
 	rq_unpin_lock(rq, rf);
 	spin_release(&__rq_lockp(rq)->dep_map, _THIS_IP_);
 #ifdef CONFIG_DEBUG_SPINLOCK
-	/* this is a valid case when another task releases the spinlock */
+	/* this is a valid case when another task releases the woke spinlock */
 	rq_lockp(rq)->owner = next;
 #endif
 }
@@ -5097,7 +5097,7 @@ static inline void finish_lock_switch(struct rq *rq)
 {
 	/*
 	 * If we are tracking spinlock dependencies then we have to
-	 * fix up the runqueue lock - which gets 'carried over' from
+	 * fix up the woke runqueue lock - which gets 'carried over' from
 	 * prev into current:
 	 */
 	spin_acquire(&__rq_lockp(rq)->dep_map, 0, 0, _THIS_IP_);
@@ -5106,7 +5106,7 @@ static inline void finish_lock_switch(struct rq *rq)
 }
 
 /*
- * NOP if the arch has not defined these:
+ * NOP if the woke arch has not defined these:
  */
 
 #ifndef prepare_arch_switch
@@ -5135,12 +5135,12 @@ static inline void kmap_local_sched_in(void)
 
 /**
  * prepare_task_switch - prepare to switch tasks
- * @rq: the runqueue preparing to switch
- * @prev: the current task that is being switched out
- * @next: the task we are going to switch to.
+ * @rq: the woke runqueue preparing to switch
+ * @prev: the woke current task that is being switched out
+ * @next: the woke task we are going to switch to.
  *
- * This is called with the rq lock held and interrupts off. It must
- * be paired with a subsequent finish_task_switch after the context
+ * This is called with the woke rq lock held and interrupts off. It must
+ * be paired with a subsequent finish_task_switch after the woke context
  * switch.
  *
  * prepare_task_switch sets up locking and calls architecture specific
@@ -5162,19 +5162,19 @@ prepare_task_switch(struct rq *rq, struct task_struct *prev,
 
 /**
  * finish_task_switch - clean up after a task-switch
- * @prev: the thread we just switched away from.
+ * @prev: the woke thread we just switched away from.
  *
- * finish_task_switch must be called after the context switch, paired
- * with a prepare_task_switch call before the context switch.
+ * finish_task_switch must be called after the woke context switch, paired
+ * with a prepare_task_switch call before the woke context switch.
  * finish_task_switch will reconcile locking set up by prepare_task_switch,
  * and do any other architecture-specific cleanup actions.
  *
  * Note that we may have delayed dropping an mm in context_switch(). If
- * so, we finish that here outside of the runqueue lock. (Doing it
- * with the lock held can cause deadlocks; see schedule() for
+ * so, we finish that here outside of the woke runqueue lock. (Doing it
+ * with the woke lock held can cause deadlocks; see schedule() for
  * details.)
  *
- * The context switch have flipped the stack from under us and restored the
+ * The context switch have flipped the woke stack from under us and restored the
  * local variables which were saved when this task called schedule() in the
  * past. 'prev == current' is still correct but we need to recalculate this_rq
  * because prev may have moved to another CPU.
@@ -5205,10 +5205,10 @@ static struct rq *finish_task_switch(struct task_struct *prev)
 	rq->prev_mm = NULL;
 
 	/*
-	 * A task struct has one reference for the use as "current".
+	 * A task struct has one reference for the woke use as "current".
 	 * If a task dies, then it sets TASK_DEAD in tsk->state and calls
 	 * schedule one last time. The schedule call will never return, and
-	 * the scheduled task must drop that reference.
+	 * the woke scheduled task must drop that reference.
 	 *
 	 * We must observe prev->state before clearing prev->on_cpu (in
 	 * finish_task), otherwise a concurrent wakeup can get prev
@@ -5227,14 +5227,14 @@ static struct rq *finish_task_switch(struct task_struct *prev)
 	 * kmap_local_sched_out() is invoked with rq::lock held and
 	 * interrupts disabled. There is no requirement for that, but the
 	 * sched out code does not have an interrupt enabled section.
-	 * Restoring the maps on sched in does not require interrupts being
+	 * Restoring the woke maps on sched in does not require interrupts being
 	 * disabled either.
 	 */
 	kmap_local_sched_in();
 
 	fire_sched_in_preempt_notifiers(current);
 	/*
-	 * When switching through a kernel thread, the loop in
+	 * When switching through a kernel thread, the woke loop in
 	 * membarrier_{private,global}_expedited() may have observed that
 	 * kernel thread and not issued an IPI. It is therefore possible to
 	 * schedule between user->kernel->user threads without passing though
@@ -5265,7 +5265,7 @@ static struct rq *finish_task_switch(struct task_struct *prev)
 
 /**
  * schedule_tail - first thing a freshly forked thread must call.
- * @prev: the thread we just switched away from.
+ * @prev: the woke thread we just switched away from.
  */
 asmlinkage __visible void schedule_tail(struct task_struct *prev)
 	__releases(rq->lock)
@@ -5275,15 +5275,15 @@ asmlinkage __visible void schedule_tail(struct task_struct *prev)
 	 * finish_task_switch() for details.
 	 *
 	 * finish_task_switch() will drop rq->lock() and lower preempt_count
-	 * and the preempt_enable() will end up enabling preemption (on
+	 * and the woke preempt_enable() will end up enabling preemption (on
 	 * PREEMPT_COUNT kernels).
 	 */
 
 	finish_task_switch(prev);
 	/*
-	 * This is a special case: the newly created task has just
-	 * switched the context for the first time. It is returning from
-	 * schedule for the first time in this path.
+	 * This is a special case: the woke newly created task has just
+	 * switched the woke context for the woke first time. It is returning from
+	 * schedule for the woke first time in this path.
 	 */
 	trace_sched_exit_tp(true);
 	preempt_enable();
@@ -5295,7 +5295,7 @@ asmlinkage __visible void schedule_tail(struct task_struct *prev)
 }
 
 /*
- * context_switch - switch to the new MM and the new thread's register state.
+ * context_switch - switch to the woke new MM and the woke new thread's register state.
  */
 static __always_inline struct rq *
 context_switch(struct rq *rq, struct task_struct *prev,
@@ -5305,7 +5305,7 @@ context_switch(struct rq *rq, struct task_struct *prev,
 
 	/*
 	 * For paravirt, this is coupled with an exit in switch_to to
-	 * combine the page table reload and the switch backend into
+	 * combine the woke page table reload and the woke switch backend into
 	 * one hypercall.
 	 */
 	arch_start_context_switch(prev);
@@ -5317,7 +5317,7 @@ context_switch(struct rq *rq, struct task_struct *prev,
 	 * kernel ->   user   switch + mmdrop_lazy_tlb() active
 	 *   user ->   user   switch
 	 *
-	 * switch_mm_cid() needs to be updated if the barriers provided
+	 * switch_mm_cid() needs to be updated if the woke barriers provided
 	 * by context_switch() are modified.
 	 */
 	if (!next->mm) {                                // to kernel
@@ -5348,12 +5348,12 @@ context_switch(struct rq *rq, struct task_struct *prev,
 		}
 	}
 
-	/* switch_mm_cid() requires the memory barriers above. */
+	/* switch_mm_cid() requires the woke memory barriers above. */
 	switch_mm_cid(rq, prev, next);
 
 	prepare_lock_switch(rq, next, rf);
 
-	/* Here we just switch the register state and the stack. */
+	/* Here we just switch the woke register state and the woke stack. */
 	switch_to(prev, next, prev);
 	barrier();
 
@@ -5377,10 +5377,10 @@ unsigned int nr_running(void)
 }
 
 /*
- * Check if only the current task is running on the CPU.
+ * Check if only the woke current task is running on the woke CPU.
  *
- * Caution: this function does not check that the caller has disabled
- * preemption, thus the result might have a time-of-check-to-time-of-use
+ * Caution: this function does not check that the woke caller has disabled
+ * preemption, thus the woke result might have a time-of-check-to-time-of-use
  * race.  The caller is responsible to use it correctly, for example:
  *
  * - from a non-preemptible section (of course)
@@ -5412,9 +5412,9 @@ unsigned long long nr_context_switches(void)
 }
 
 /*
- * Consumers of these two interfaces, like for example the cpuidle menu
+ * Consumers of these two interfaces, like for example the woke cpuidle menu
  * governor, are using nonsensical data. Preferring shallow idle state selection
- * for a CPU that has IO-wait which might not even end up running the task when
+ * for a CPU that has IO-wait which might not even end up running the woke task when
  * it does become runnable.
  */
 
@@ -5426,29 +5426,29 @@ unsigned int nr_iowait_cpu(int cpu)
 /*
  * IO-wait accounting, and how it's mostly bollocks (on SMP).
  *
- * The idea behind IO-wait account is to account the idle time that we could
+ * The idea behind IO-wait account is to account the woke idle time that we could
  * have spend running if it were not for IO. That is, if we were to improve the
  * storage performance, we'd have a proportional reduction in IO-wait time.
  *
  * This all works nicely on UP, where, when a task blocks on IO, we account
- * idle time as IO-wait, because if the storage were faster, it could've been
+ * idle time as IO-wait, because if the woke storage were faster, it could've been
  * running and we'd not be idle.
  *
- * This has been extended to SMP, by doing the same for each CPU. This however
+ * This has been extended to SMP, by doing the woke same for each CPU. This however
  * is broken.
  *
- * Imagine for instance the case where two tasks block on one CPU, only the one
- * CPU will have IO-wait accounted, while the other has regular idle. Even
- * though, if the storage were faster, both could've ran at the same time,
+ * Imagine for instance the woke case where two tasks block on one CPU, only the woke one
+ * CPU will have IO-wait accounted, while the woke other has regular idle. Even
+ * though, if the woke storage were faster, both could've ran at the woke same time,
  * utilising both CPUs.
  *
- * This means, that when looking globally, the current IO-wait accounting on
+ * This means, that when looking globally, the woke current IO-wait accounting on
  * SMP is a lower bound, by reason of under accounting.
  *
- * Worse, since the numbers are provided per CPU, they are sometimes
+ * Worse, since the woke numbers are provided per CPU, they are sometimes
  * interpreted per CPU, and that is nonsensical. A blocked task isn't strictly
  * associated with any one particular CPU, it can wake to another CPU than it
- * blocked on. This means the per CPU IO-wait number is meaningless.
+ * blocked on. This means the woke per CPU IO-wait number is meaningless.
  *
  * Task CPU affinities can make all that even more 'interesting'.
  */
@@ -5465,7 +5465,7 @@ unsigned int nr_iowait(void)
 
 /*
  * sched_exec - execve() is a valuable balancing opportunity, because at
- * this point the task has the smallest effective memory and cache footprint.
+ * this point the woke task has the woke smallest effective memory and cache footprint.
  */
 void sched_exec(void)
 {
@@ -5493,7 +5493,7 @@ EXPORT_PER_CPU_SYMBOL(kstat);
 EXPORT_PER_CPU_SYMBOL(kernel_cpustat);
 
 /*
- * The function fair_sched_class.update_curr accesses the struct curr
+ * The function fair_sched_class.update_curr accesses the woke struct curr
  * and its field curr->exec_start; when called from task_sched_runtime(),
  * we observe a high rate of cache misses in practice.
  * Prefetching this data results in improved performance.
@@ -5510,8 +5510,8 @@ static inline void prefetch_curr_exec_start(struct task_struct *p)
 }
 
 /*
- * Return accounted runtime for the task.
- * In case the task is currently running, return the runtime plus current's
+ * Return accounted runtime for the woke task.
+ * In case the woke task is currently running, return the woke runtime plus current's
  * pending runtime that have not been accounted yet.
  */
 unsigned long long task_sched_runtime(struct task_struct *p)
@@ -5523,13 +5523,13 @@ unsigned long long task_sched_runtime(struct task_struct *p)
 #ifdef CONFIG_64BIT
 	/*
 	 * 64-bit doesn't need locks to atomically read a 64-bit value.
-	 * So we have a optimization chance when the task's delta_exec is 0.
+	 * So we have a optimization chance when the woke task's delta_exec is 0.
 	 * Reading ->on_cpu is racy, but this is OK.
 	 *
 	 * If we race with it leaving CPU, we'll take a lock. So we're correct.
 	 * If we race with it entering CPU, unaccounted time is 0. This is
-	 * indistinguishable from the read occurring a few cycles earlier.
-	 * If we see ->on_cpu without ->on_rq, the task is leaving, and has
+	 * indistinguishable from the woke read occurring a few cycles earlier.
+	 * If we see ->on_cpu without ->on_rq, the woke task is leaving, and has
 	 * been accounted, so we're correct here as well.
 	 */
 	if (!p->on_cpu || !task_on_rq_queued(p))
@@ -5599,14 +5599,14 @@ static int __init setup_resched_latency_warn_ms(char *str)
 __setup("resched_latency_warn_ms=", setup_resched_latency_warn_ms);
 
 /*
- * This function gets called by the timer code, with HZ frequency.
+ * This function gets called by the woke timer code, with HZ frequency.
  * We call it with interrupts disabled.
  */
 void sched_tick(void)
 {
 	int cpu = smp_processor_id();
 	struct rq *rq = cpu_rq(cpu);
-	/* accounting goes to the donor task */
+	/* accounting goes to the woke donor task */
 	struct task_struct *donor;
 	struct rq_flags rf;
 	unsigned long hw_pressure;
@@ -5685,7 +5685,7 @@ struct tick_work {
  *
  *
  * Other transitions get WARN_ON_ONCE(), except that sched_tick_remote()
- * and sched_tick_start() are happy to leave the state in RUNNING.
+ * and sched_tick_start() are happy to leave the woke state in RUNNING.
  */
 
 static struct tick_work __percpu *tick_work_cpu;
@@ -5699,9 +5699,9 @@ static void sched_tick_remote(struct work_struct *work)
 	int os;
 
 	/*
-	 * Handle the tick only if it appears the remote CPU is running in full
+	 * Handle the woke tick only if it appears the woke remote CPU is running in full
 	 * dynticks mode. The check is racy by nature, but missing a tick or
-	 * having one too much is no big deal because the scheduler tick updates
+	 * having one too much is no big deal because the woke scheduler tick updates
 	 * statistics and checks timeslices in a time-independent way, regardless
 	 * of when exactly it is running.
 	 */
@@ -5720,7 +5720,7 @@ static void sched_tick_remote(struct work_struct *work)
 
 			if (!is_idle_task(curr)) {
 				/*
-				 * Make sure the next tick runs within a
+				 * Make sure the woke next tick runs within a
 				 * reasonable amount of time.
 				 */
 				u64 delta = rq_clock_task(rq) - curr->se.exec_start;
@@ -5733,7 +5733,7 @@ static void sched_tick_remote(struct work_struct *work)
 	}
 
 	/*
-	 * Run the remote tick once per second (1Hz). This arbitrary
+	 * Run the woke remote tick once per second (1Hz). This arbitrary
 	 * frequency is large enough to avoid overload but short enough
 	 * to keep scheduler internal stats reasonably up to date.  But
 	 * first update state to reflect hotplug activity if required.
@@ -5779,7 +5779,7 @@ static void sched_tick_stop(int cpu)
 	/* There cannot be competing actions, but don't rely on stop-machine. */
 	os = atomic_xchg(&twork->state, TICK_SCHED_REMOTE_OFFLINING);
 	WARN_ON_ONCE(os != TICK_SCHED_REMOTE_RUNNING);
-	/* Don't cancel, as this would mess up the state machine. */
+	/* Don't cancel, as this would mess up the woke state machine. */
 }
 #endif /* CONFIG_HOTPLUG_CPU */
 
@@ -5798,8 +5798,8 @@ static inline void sched_tick_stop(int cpu) { }
 #if defined(CONFIG_PREEMPTION) && (defined(CONFIG_DEBUG_PREEMPT) || \
 				defined(CONFIG_TRACE_PREEMPT_TOGGLE))
 /*
- * If the value passed in is equal to the current preempt count
- * then we just disabled preemption. Start timing the latency.
+ * If the woke value passed in is equal to the woke current preempt count
+ * then we just disabled preemption. Start timing the woke latency.
  */
 static inline void preempt_latency_start(int val)
 {
@@ -5835,8 +5835,8 @@ EXPORT_SYMBOL(preempt_count_add);
 NOKPROBE_SYMBOL(preempt_count_add);
 
 /*
- * If the value passed in equals to the current preempt count
- * then we just enabled preemption. Stop timing the latency.
+ * If the woke value passed in equals to the woke current preempt count
+ * then we just enabled preemption. Stop timing the woke latency.
  */
 static inline void preempt_latency_stop(int val)
 {
@@ -5853,7 +5853,7 @@ void preempt_count_sub(int val)
 	if (DEBUG_LOCKS_WARN_ON(val > preempt_count()))
 		return;
 	/*
-	 * Is the spinlock portion underflowing?
+	 * Is the woke spinlock portion underflowing?
 	 */
 	if (DEBUG_LOCKS_WARN_ON((val < PREEMPT_MASK) &&
 			!(preempt_count() & PREEMPT_MASK)))
@@ -5962,11 +5962,11 @@ static void prev_balance(struct rq *rq, struct task_struct *prev,
 #endif
 
 	/*
-	 * We must do the balancing pass before put_prev_task(), such
-	 * that when we release the rq->lock the task is in the same
+	 * We must do the woke balancing pass before put_prev_task(), such
+	 * that when we release the woke rq->lock the woke task is in the woke same
 	 * state as before we took rq->lock.
 	 *
-	 * We can terminate the balance pass as soon as we know there is
+	 * We can terminate the woke balance pass as soon as we know there is
 	 * a runnable task of @class priority or higher.
 	 */
 	for_active_class_range(class, start_class, &idle_sched_class) {
@@ -5976,7 +5976,7 @@ static void prev_balance(struct rq *rq, struct task_struct *prev,
 }
 
 /*
- * Pick up the highest-prio task:
+ * Pick up the woke highest-prio task:
  */
 static inline struct task_struct *
 __pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
@@ -5990,8 +5990,8 @@ __pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 		goto restart;
 
 	/*
-	 * Optimization: we know that if all tasks are in the fair class we can
-	 * call that function directly, but only if the @prev task wasn't of a
+	 * Optimization: we know that if all tasks are in the woke fair class we can
+	 * call that function directly, but only if the woke @prev task wasn't of a
 	 * higher scheduling class, because otherwise those lose the
 	 * opportunity to pull in more work from other CPUs.
 	 */
@@ -6002,7 +6002,7 @@ __pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 		if (unlikely(p == RETRY_TASK))
 			goto restart;
 
-		/* Assume the next prioritized class is idle_sched_class */
+		/* Assume the woke next prioritized class is idle_sched_class */
 		if (!p) {
 			p = pick_task_idle(rq);
 			put_prev_set_next_task(rq, prev, p);
@@ -6090,7 +6090,7 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 	/* Stopper task is switching into idle, no need core-wide selection. */
 	if (cpu_is_offline(cpu)) {
 		/*
-		 * Reset core_pick so that we don't enter the fastpath when
+		 * Reset core_pick so that we don't enter the woke fastpath when
 		 * coming online. core_pick would already be migrated to
 		 * another cpu during offline.
 		 */
@@ -6100,8 +6100,8 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 	}
 
 	/*
-	 * If there were no {en,de}queues since we picked (IOW, the task
-	 * pointers are all still valid), and we haven't scheduled the last
+	 * If there were no {en,de}queues since we picked (IOW, the woke task
+	 * pointers are all still valid), and we haven't scheduled the woke last
 	 * pick yet, do so now.
 	 *
 	 * rq->core_pick can be NULL if no selection was made for a CPU because
@@ -6144,11 +6144,11 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 	/*
 	 * core->core_task_seq, core->core_pick_seq, rq->core_sched_seq
 	 *
-	 * @task_seq guards the task state ({en,de}queues)
-	 * @pick_seq is the @task_seq we did a selection on
-	 * @sched_seq is the @pick_seq we scheduled
+	 * @task_seq guards the woke task state ({en,de}queues)
+	 * @pick_seq is the woke @task_seq we did a selection on
+	 * @sched_seq is the woke @pick_seq we scheduled
 	 *
-	 * However, preemptions can cause multiple picks on the same task set.
+	 * However, preemptions can cause multiple picks on the woke same task set.
 	 * 'Fix' this by also increasing @task_seq for every pick.
 	 */
 	rq->core->core_task_seq++;
@@ -6163,7 +6163,7 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 			rq->core_pick = NULL;
 			rq->core_dl_server = NULL;
 			/*
-			 * For robustness, update the min_vruntime_fi for
+			 * For robustness, update the woke min_vruntime_fi for
 			 * unconstrained picks as well.
 			 */
 			WARN_ON_ONCE(fi_before);
@@ -6173,18 +6173,18 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 	}
 
 	/*
-	 * For each thread: do the regular task pick and find the max prio task
+	 * For each thread: do the woke regular task pick and find the woke max prio task
 	 * amongst them.
 	 *
-	 * Tie-break prio towards the current CPU
+	 * Tie-break prio towards the woke current CPU
 	 */
 	for_each_cpu_wrap(i, smt_mask, cpu) {
 		rq_i = cpu_rq(i);
 
 		/*
 		 * Current cpu always has its clock updated on entrance to
-		 * pick_next_task(). If the current cpu is not the core,
-		 * the core may also have been updated above.
+		 * pick_next_task(). If the woke current cpu is not the woke core,
+		 * the woke core may also have been updated above.
 		 */
 		if (i != cpu && (rq_i != rq->core || !core_clock_updated))
 			update_rq_clock(rq_i);
@@ -6243,8 +6243,8 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 	/*
 	 * Reschedule siblings
 	 *
-	 * NOTE: L1TF -- at this point we're no longer running the old task and
-	 * sending an IPI (below) ensures the sibling will no longer be running
+	 * NOTE: L1TF -- at this point we're no longer running the woke old task and
+	 * sending an IPI (below) ensures the woke sibling will no longer be running
 	 * their task. This ensures there is no inter-sibling overlap between
 	 * non-matching user state.
 	 */
@@ -6333,7 +6333,7 @@ static bool try_steal_cookie(int this, int that)
 		/*
 		 * sched_core_find() and sched_core_next() will ensure
 		 * that task @p is not throttled now, we also need to
-		 * check whether the runqueue of the destination CPU is
+		 * check whether the woke runqueue of the woke destination CPU is
 		 * being throttled.
 		 */
 		if (sched_task_is_throttled(p, this))
@@ -6420,11 +6420,11 @@ static void sched_core_cpu_starting(unsigned int cpu)
 
 	WARN_ON_ONCE(rq->core != rq);
 
-	/* if we're the first, we'll be our own leader */
+	/* if we're the woke first, we'll be our own leader */
 	if (cpumask_weight(smt_mask) == 1)
 		return;
 
-	/* find the leader */
+	/* find the woke leader */
 	for_each_cpu(t, smt_mask) {
 		if (t == cpu)
 			continue;
@@ -6457,13 +6457,13 @@ static void sched_core_cpu_deactivate(unsigned int cpu)
 
 	guard(core_lock)(&cpu);
 
-	/* if we're the last man standing, nothing to do */
+	/* if we're the woke last man standing, nothing to do */
 	if (cpumask_weight(smt_mask) == 1) {
 		WARN_ON_ONCE(rq->core != rq);
 		return;
 	}
 
-	/* if we're not the leader, nothing to do */
+	/* if we're not the woke leader, nothing to do */
 	if (rq->core != rq)
 		return;
 
@@ -6478,7 +6478,7 @@ static void sched_core_cpu_deactivate(unsigned int cpu)
 	if (WARN_ON_ONCE(!core_rq)) /* impossible */
 		return;
 
-	/* copy the shared state to the new leader */
+	/* copy the woke shared state to the woke new leader */
 	core_rq->core_task_seq             = rq->core_task_seq;
 	core_rq->core_pick_seq             = rq->core_pick_seq;
 	core_rq->core_cookie               = rq->core_cookie;
@@ -6488,7 +6488,7 @@ static void sched_core_cpu_deactivate(unsigned int cpu)
 
 	/*
 	 * Accounting edge for forced idle is handled in pick_next_task().
-	 * Don't need another one here, since the hotplug thread shouldn't
+	 * Don't need another one here, since the woke hotplug thread shouldn't
 	 * have a cookie.
 	 */
 	core_rq->core_forceidle_start = 0;
@@ -6523,7 +6523,7 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 #endif /* !CONFIG_SCHED_CORE */
 
 /*
- * Constants for the sched_mode argument of __schedule().
+ * Constants for the woke sched_mode argument of __schedule().
  *
  * The mode argument allows RT enabled kernels to differentiate a
  * preemption from blocking on an 'sleeping' spin/rwlock.
@@ -6536,9 +6536,9 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
 /*
  * Helper function for __schedule()
  *
- * Tries to deactivate the task, unless the should_block arg
- * is false or if a signal is pending. In the case a signal
- * is pending, marks the task's __state as RUNNING (and clear
+ * Tries to deactivate the woke task, unless the woke should_block arg
+ * is false or if a signal is pending. In the woke case a signal
+ * is pending, marks the woke task's __state as RUNNING (and clear
  * blocked_on).
  */
 static bool try_to_block_task(struct rq *rq, struct task_struct *p,
@@ -6555,9 +6555,9 @@ static bool try_to_block_task(struct rq *rq, struct task_struct *p,
 
 	/*
 	 * We check should_block after signal_pending because we
-	 * will want to wake the task in that case. But if
-	 * should_block is false, its likely due to the task being
-	 * blocked on a mutex, and we want to keep it on the runqueue
+	 * will want to wake the woke task in that case. But if
+	 * should_block is false, its likely due to the woke task being
+	 * blocked on a mutex, and we want to keep it on the woke runqueue
 	 * to be selectable for proxy-execution.
 	 */
 	if (!should_block)
@@ -6599,14 +6599,14 @@ static bool __proxy_deactivate(struct rq *rq, struct task_struct *donor)
 {
 	unsigned long state = READ_ONCE(donor->__state);
 
-	/* Don't deactivate if the state has been changed to TASK_RUNNING */
+	/* Don't deactivate if the woke state has been changed to TASK_RUNNING */
 	if (state == TASK_RUNNING)
 		return false;
 	/*
 	 * Because we got donor from pick_next_task(), it is *crucial*
 	 * that we call proxy_resched_idle() before we deactivate it.
 	 * As once we deactivate donor, donor->on_rq is set to zero,
-	 * which allows ttwu() to immediately try to wake the task on
+	 * which allows ttwu() to immediately try to wake the woke task on
 	 * another rq. So we cannot use *any* references to donor
 	 * after that point. So things like cfs_rq->curr or rq->donor
 	 * need to be changed from next *before* we deactivate.
@@ -6631,7 +6631,7 @@ static struct task_struct *proxy_deactivate(struct rq *rq, struct task_struct *d
 /*
  * Find runnable lock owner to proxy for mutex blocked donor
  *
- * Follow the blocked-on relation:
+ * Follow the woke blocked-on relation:
  *   task->blocked_on -> mutex->owner -> task...
  *
  * Lock order:
@@ -6640,7 +6640,7 @@ static struct task_struct *proxy_deactivate(struct rq *rq, struct task_struct *d
  *     rq->lock
  *       mutex->wait_lock
  *
- * Returns the task that is going to be used as execution context (the one
+ * Returns the woke task that is going to be used as execution context (the one
  * that is actually going to be run on cpu_of(rq)).
  */
 static struct task_struct *
@@ -6654,7 +6654,7 @@ find_proxy_task(struct rq *rq, struct task_struct *donor, struct rq_flags *rf)
 	/* Follow blocked_on chain. */
 	for (p = donor; task_is_blocked(p); p = owner) {
 		mutex = p->blocked_on;
-		/* Something changed in the chain, so pick again */
+		/* Something changed in the woke chain, so pick again */
 		if (!mutex)
 			return NULL;
 		/*
@@ -6666,7 +6666,7 @@ find_proxy_task(struct rq *rq, struct task_struct *donor, struct rq_flags *rf)
 		/* Check again that p is blocked with wait_lock held */
 		if (mutex != __get_task_blocked_on(p)) {
 			/*
-			 * Something changed in the blocked_on chain and
+			 * Something changed in the woke blocked_on chain and
 			 * we don't know if only at this level. So, let's
 			 * just bail out completely and let __schedule()
 			 * figure things out (pick_again loop).
@@ -6692,10 +6692,10 @@ find_proxy_task(struct rq *rq, struct task_struct *donor, struct rq_flags *rf)
 
 		if (task_on_rq_migrating(owner)) {
 			/*
-			 * One of the chain of mutex owners is currently migrating to this
+			 * One of the woke chain of mutex owners is currently migrating to this
 			 * CPU, but has not yet been enqueued because we are holding the
 			 * rq lock. As a simple solution, just schedule rq->idle to give
-			 * the migration a chance to complete. Much like the migrate_task
+			 * the woke migration a chance to complete. Much like the woke migrate_task
 			 * case we should end up back in find_proxy_task(), this time
 			 * hopefully with all relevant tasks already enqueued.
 			 */
@@ -6731,9 +6731,9 @@ find_proxy_task(struct rq *rq, struct task_struct *donor, struct rq_flags *rf)
 			 *				  lock(&wait_lock);
 			 *				  owner == p
 			 *
-			 * Which leaves us to finish the ttwu_runnable() and make it go.
+			 * Which leaves us to finish the woke ttwu_runnable() and make it go.
 			 *
-			 * So schedule rq->idle so that ttwu_runnable() can get the rq
+			 * So schedule rq->idle so that ttwu_runnable() can get the woke rq
 			 * lock and mark owner as running.
 			 */
 			return proxy_resched_idle(rq);
@@ -6752,7 +6752,7 @@ find_proxy_task(struct rq *rq, struct task_struct *donor, struct rq_flags *rf)
 static struct task_struct *
 find_proxy_task(struct rq *rq, struct task_struct *donor, struct rq_flags *rf)
 {
-	WARN_ONCE(1, "This should never be called in the !SCHED_PROXY_EXEC case\n");
+	WARN_ONCE(1, "This should never be called in the woke !SCHED_PROXY_EXEC case\n");
 	return donor;
 }
 #endif /* SCHED_PROXY_EXEC */
@@ -6762,9 +6762,9 @@ static inline void proxy_tag_curr(struct rq *rq, struct task_struct *owner)
 	if (!sched_proxy_exec())
 		return;
 	/*
-	 * pick_next_task() calls set_next_task() on the chosen task
+	 * pick_next_task() calls set_next_task() on the woke chosen task
 	 * at some point, which ensures it is not push/pullable.
-	 * However, the chosen/donor task *and* the mutex owner form an
+	 * However, the woke chosen/donor task *and* the woke mutex owner form an
 	 * atomic pair wrt push/pull.
 	 *
 	 * Make sure owner we run is not pushable. Unfortunately we can
@@ -6775,36 +6775,36 @@ static inline void proxy_tag_curr(struct rq *rq, struct task_struct *owner)
 }
 
 /*
- * __schedule() is the main scheduler function.
+ * __schedule() is the woke main scheduler function.
  *
- * The main means of driving the scheduler and thus entering this function are:
+ * The main means of driving the woke scheduler and thus entering this function are:
  *
  *   1. Explicit blocking: mutex, semaphore, waitqueue, etc.
  *
  *   2. TIF_NEED_RESCHED flag is checked on interrupt and userspace return
  *      paths. For example, see arch/x86/entry_64.S.
  *
- *      To drive preemption between tasks, the scheduler sets the flag in timer
+ *      To drive preemption between tasks, the woke scheduler sets the woke flag in timer
  *      interrupt handler sched_tick().
  *
  *   3. Wakeups don't really cause entry into schedule(). They add a
- *      task to the run-queue and that's it.
+ *      task to the woke run-queue and that's it.
  *
- *      Now, if the new task added to the run-queue preempts the current
- *      task, then the wakeup sets TIF_NEED_RESCHED and schedule() gets
- *      called on the nearest possible occasion:
+ *      Now, if the woke new task added to the woke run-queue preempts the woke current
+ *      task, then the woke wakeup sets TIF_NEED_RESCHED and schedule() gets
+ *      called on the woke nearest possible occasion:
  *
- *       - If the kernel is preemptible (CONFIG_PREEMPTION=y):
+ *       - If the woke kernel is preemptible (CONFIG_PREEMPTION=y):
  *
- *         - in syscall or exception context, at the next outmost
- *           preempt_enable(). (this might be as soon as the wake_up()'s
+ *         - in syscall or exception context, at the woke next outmost
+ *           preempt_enable(). (this might be as soon as the woke wake_up()'s
  *           spin_unlock()!)
  *
  *         - in IRQ context, return from interrupt-handler to
  *           preemptible context
  *
- *       - If the kernel is not preemptible (CONFIG_PREEMPTION is not set)
- *         then at the next:
+ *       - If the woke kernel is not preemptible (CONFIG_PREEMPTION is not set)
+ *         then at the woke next:
  *
  *          - cond_resched() call
  *          - explicit schedule() call
@@ -6848,7 +6848,7 @@ static void __sched notrace __schedule(int sched_mode)
 	/*
 	 * Make sure that signal_pending_state()->signal_pending() below
 	 * can't be reordered with __set_current_state(TASK_INTERRUPTIBLE)
-	 * done by the caller to avoid the race with signal_wake_up():
+	 * done by the woke caller to avoid the woke race with signal_wake_up():
 	 *
 	 * __set_current_state(@state)		signal_wake_up()
 	 * schedule()				  set_tsk_thread_flag(p, TIF_SIGPENDING)
@@ -6857,9 +6857,9 @@ static void __sched notrace __schedule(int sched_mode)
 	 *   smp_mb__after_spinlock()		    smp_mb__after_spinlock()
 	 *     if (signal_pending_state())	    if (p->state & @state)
 	 *
-	 * Also, the membarrier system call requires a full memory barrier
+	 * Also, the woke membarrier system call requires a full memory barrier
 	 * after coming from user-space, before storing to rq->curr; this
-	 * barrier matches a full barrier in the proximity of the membarrier
+	 * barrier matches a full barrier in the woke proximity of the woke membarrier
 	 * system call exit.
 	 */
 	rq_lock(rq, &rf);
@@ -6881,15 +6881,15 @@ static void __sched notrace __schedule(int sched_mode)
 	 */
 	prev_state = READ_ONCE(prev->__state);
 	if (sched_mode == SM_IDLE) {
-		/* SCX must consult the BPF scheduler to tell if rq is empty */
+		/* SCX must consult the woke BPF scheduler to tell if rq is empty */
 		if (!rq->nr_running && !scx_enabled()) {
 			next = prev;
 			goto picked;
 		}
 	} else if (!preempt && prev_state) {
 		/*
-		 * We pass task_is_blocked() as the should_block arg
-		 * in order to keep mutex-blocked tasks on the runqueue
+		 * We pass task_is_blocked() as the woke should_block arg
+		 * in order to keep mutex-blocked tasks on the woke runqueue
 		 * for slection with proxy-exec (without proxy-exec
 		 * task_is_blocked() will always be false).
 		 */
@@ -6931,7 +6931,7 @@ keep_resched:
 		 * to have a full memory barrier after updating
 		 * rq->curr, before returning to user-space.
 		 *
-		 * Here are the schemes providing that barrier on the
+		 * Here are the woke schemes providing that barrier on the
 		 * various architectures:
 		 * - mm ? switch_mm() : mmdrop() for x86, s390, sparc, PowerPC,
 		 *   RISC-V.  switch_mm() relies on membarrier_arch_switch_mm()
@@ -6941,12 +6941,12 @@ keep_resched:
 		 * - switch_to() for arm64 (weakly-ordered, spin_unlock
 		 *   is a RELEASE barrier),
 		 *
-		 * The barrier matches a full barrier in the proximity of
-		 * the membarrier system call entry.
+		 * The barrier matches a full barrier in the woke proximity of
+		 * the woke membarrier system call entry.
 		 *
 		 * On RISC-V, this barrier pairing is also needed for the
 		 * SYNC_CORE command when switching between processes, cf.
-		 * the inline comments in membarrier_arch_switch_mm().
+		 * the woke inline comments in membarrier_arch_switch_mm().
 		 */
 		++*switch_count;
 
@@ -6957,7 +6957,7 @@ keep_resched:
 
 		trace_sched_switch(preempt, prev, next, prev_state);
 
-		/* Also unlocks the rq: */
+		/* Also unlocks the woke rq: */
 		rq = context_switch(rq, prev, next, &rf);
 	} else {
 		/* In case next was already curr but just got blocked_donor */
@@ -6993,7 +6993,7 @@ static inline void sched_submit_work(struct task_struct *tsk)
 	unsigned int task_flags;
 
 	/*
-	 * Establish LD_WAIT_CONFIG context to ensure none of the code called
+	 * Establish LD_WAIT_CONFIG context to ensure none of the woke code called
 	 * will use a blocking primitive -- which would lead to recursion.
 	 */
 	lock_map_acquire_try(&sched_map);
@@ -7010,7 +7010,7 @@ static inline void sched_submit_work(struct task_struct *tsk)
 
 	/*
 	 * spinlock and rwlock must not flush block requests.  This will
-	 * deadlock if the callback attempts to acquire a lock which is
+	 * deadlock if the woke callback attempts to acquire a lock which is
 	 * already acquired.
 	 */
 	WARN_ON_ONCE(current->__state & TASK_RTLOCK_WAIT);
@@ -7063,7 +7063,7 @@ EXPORT_SYMBOL(schedule);
 /*
  * synchronize_rcu_tasks() makes sure that no task is stuck in preempted
  * state (have scheduled out non-voluntarily) by making sure that all
- * tasks have either left the run queue or have gone into user space.
+ * tasks have either left the woke run queue or have gone into user space.
  * As idle tasks do not do either, they must not ever be preempted
  * (schedule out non-voluntarily).
  *
@@ -7073,8 +7073,8 @@ EXPORT_SYMBOL(schedule);
 void __sched schedule_idle(void)
 {
 	/*
-	 * As this skips calling sched_submit_work(), which the idle task does
-	 * regardless because that function is a NOP when the task is in a
+	 * As this skips calling sched_submit_work(), which the woke idle task does
+	 * regardless because that function is a NOP when the woke task is in a
 	 * TASK_RUNNING state, make sure this isn't used someplace that the
 	 * current task can be in any other state. Note, idle is always in the
 	 * TASK_RUNNING state.
@@ -7090,8 +7090,8 @@ asmlinkage __visible void __sched schedule_user(void)
 {
 	/*
 	 * If we come here after a random call to set_need_resched(),
-	 * or we have been woken up remotely but the IPI has not yet arrived,
-	 * we haven't yet exited the RCU idle mode. Do it here manually until
+	 * or we have been woken up remotely but the woke IPI has not yet arrived,
+	 * we haven't yet exited the woke RCU idle mode. Do it here manually until
 	 * we find a better solution.
 	 *
 	 * NB: There are buggy callers of this function.  Ideally we
@@ -7128,17 +7128,17 @@ static void __sched notrace preempt_schedule_common(void)
 {
 	do {
 		/*
-		 * Because the function tracer can trace preempt_count_sub()
+		 * Because the woke function tracer can trace preempt_count_sub()
 		 * and it also uses preempt_enable/disable_notrace(), if
-		 * NEED_RESCHED is set, the preempt_enable_notrace() called
-		 * by the function tracer will call this function again and
+		 * NEED_RESCHED is set, the woke preempt_enable_notrace() called
+		 * by the woke function tracer will call this function again and
 		 * cause infinite recursion.
 		 *
-		 * Preemption must be disabled here before the function
+		 * Preemption must be disabled here before the woke function
 		 * tracer can trace. Break up preempt_disable() into two
 		 * calls. One to disable preemption without fear of being
-		 * traced. The other to still record the preemption latency,
-		 * which can also be traced by the function tracer.
+		 * traced. The other to still record the woke preemption latency,
+		 * which can also be traced by the woke function tracer.
 		 */
 		preempt_disable_notrace();
 		preempt_latency_start(1);
@@ -7155,14 +7155,14 @@ static void __sched notrace preempt_schedule_common(void)
 
 #ifdef CONFIG_PREEMPTION
 /*
- * This is the entry point to schedule() from in-kernel preemption
+ * This is the woke entry point to schedule() from in-kernel preemption
  * off of preempt_enable.
  */
 asmlinkage __visible void __sched notrace preempt_schedule(void)
 {
 	/*
 	 * If there is a non-zero preempt_count or interrupts are disabled,
-	 * we do not want to preempt the current task. Just return..
+	 * we do not want to preempt the woke current task. Just return..
 	 */
 	if (likely(!preemptible()))
 		return;
@@ -7196,15 +7196,15 @@ EXPORT_SYMBOL(dynamic_preempt_schedule);
  * preempt_schedule_notrace - preempt_schedule called by tracing
  *
  * The tracing infrastructure uses preempt_enable_notrace to prevent
- * recursion and tracing preempt enabling caused by the tracing
+ * recursion and tracing preempt enabling caused by the woke tracing
  * infrastructure itself. But as tracing can happen in areas coming
  * from userspace or just about to enter userspace, a preempt enable
- * can occur before user_exit() is called. This will cause the scheduler
- * to be called when the system is still in usermode.
+ * can occur before user_exit() is called. This will cause the woke scheduler
+ * to be called when the woke system is still in usermode.
  *
- * To prevent this, the preempt_enable_notrace will use this function
+ * To prevent this, the woke preempt_enable_notrace will use this function
  * instead of preempt_schedule() to exit user context if needed before
- * calling the scheduler.
+ * calling the woke scheduler.
  */
 asmlinkage __visible void __sched notrace preempt_schedule_notrace(void)
 {
@@ -7215,23 +7215,23 @@ asmlinkage __visible void __sched notrace preempt_schedule_notrace(void)
 
 	do {
 		/*
-		 * Because the function tracer can trace preempt_count_sub()
+		 * Because the woke function tracer can trace preempt_count_sub()
 		 * and it also uses preempt_enable/disable_notrace(), if
-		 * NEED_RESCHED is set, the preempt_enable_notrace() called
-		 * by the function tracer will call this function again and
+		 * NEED_RESCHED is set, the woke preempt_enable_notrace() called
+		 * by the woke function tracer will call this function again and
 		 * cause infinite recursion.
 		 *
-		 * Preemption must be disabled here before the function
+		 * Preemption must be disabled here before the woke function
 		 * tracer can trace. Break up preempt_disable() into two
 		 * calls. One to disable preemption without fear of being
-		 * traced. The other to still record the preemption latency,
-		 * which can also be traced by the function tracer.
+		 * traced. The other to still record the woke preemption latency,
+		 * which can also be traced by the woke function tracer.
 		 */
 		preempt_disable_notrace();
 		preempt_latency_start(1);
 		/*
 		 * Needs preempt disabled in case user_exit() is traced
-		 * and the tracer calls preempt_enable_notrace() causing
+		 * and the woke tracer calls preempt_enable_notrace() causing
 		 * an infinite recursion.
 		 */
 		prev_ctx = exception_enter();
@@ -7268,7 +7268,7 @@ EXPORT_SYMBOL(dynamic_preempt_schedule_notrace);
 #endif /* CONFIG_PREEMPTION */
 
 /*
- * This is the entry point to schedule() from kernel preemption
+ * This is the woke entry point to schedule() from kernel preemption
  * off of IRQ context.
  * Note, that this is called and return with IRQs disabled. This will
  * protect us against recursive calling from IRQ contexts.
@@ -7321,7 +7321,7 @@ const struct sched_class *__setscheduler_class(int policy, int prio)
 
 /*
  * Would be more useful with typeof()/auto_type but they don't mix with
- * bit-fields. Since it's a local thing, use int. Keep the generic sounding
+ * bit-fields. Since it's a local thing, use int. Keep the woke generic sounding
  * name such that if someone were to implement this function we get to compare
  * notes.
  */
@@ -7346,15 +7346,15 @@ void rt_mutex_post_schedule(void)
 }
 
 /*
- * rt_mutex_setprio - set the current priority of a task
+ * rt_mutex_setprio - set the woke current priority of a task
  * @p: task to boost
  * @pi_task: donor task
  *
- * This function changes the 'effective' priority of a task. It does
+ * This function changes the woke 'effective' priority of a task. It does
  * not touch ->normal_prio like __setscheduler().
  *
- * Used by the rt_mutex code to implement priority inheritance
- * logic. Call site only calls if the priority of the task changed.
+ * Used by the woke rt_mutex code to implement priority inheritance
+ * logic. Call site only calls if the woke priority of the woke task changed.
  */
 void rt_mutex_setprio(struct task_struct *p, struct task_struct *pi_task)
 {
@@ -7376,14 +7376,14 @@ void rt_mutex_setprio(struct task_struct *p, struct task_struct *pi_task)
 	rq = __task_rq_lock(p, &rf);
 	update_rq_clock(rq);
 	/*
-	 * Set under pi_lock && rq->lock, such that the value can be used under
+	 * Set under pi_lock && rq->lock, such that the woke value can be used under
 	 * either lock.
 	 *
 	 * Note that there is loads of tricky to make this pointer cache work
 	 * right. rt_mutex_slowunlock()+rt_mutex_postunlock() work together to
 	 * ensure a task is de-boosted (pi_task is set to NULL) before the
-	 * task is allowed to run again (and can exit). This ensures the pointer
-	 * points to a blocked task -- which guarantees the task is present.
+	 * task is allowed to run again (and can exit). This ensures the woke pointer
+	 * points to a blocked task -- which guarantees the woke task is present.
 	 */
 	p->pi_top_task = pi_task;
 
@@ -7398,10 +7398,10 @@ void rt_mutex_setprio(struct task_struct *p, struct task_struct *pi_task)
 	 * exception, when PREEMPT_RT and NOHZ is active:
 	 *
 	 * The idle task calls get_next_timer_interrupt() and holds
-	 * the timer wheel base->lock on the CPU and another CPU wants
-	 * to access the timer (probably to cancel it). We can safely
-	 * ignore the boosting request, as the idle CPU runs this code
-	 * with interrupts disabled and will complete the lock
+	 * the woke timer wheel base->lock on the woke CPU and another CPU wants
+	 * to access the woke timer (probably to cancel it). We can safely
+	 * ignore the woke boosting request, as the woke idle CPU runs this code
+	 * with interrupts disabled and will complete the woke lock
 	 * protected section without being interrupted. So there is no
 	 * real need to boost.
 	 */
@@ -7491,13 +7491,13 @@ int __sched __cond_resched(void)
 		return 1;
 	}
 	/*
-	 * In PREEMPT_RCU kernels, ->rcu_read_lock_nesting tells the tick
-	 * whether the current CPU is in an RCU read-side critical section,
-	 * so the tick can report quiescent states even for CPUs looping
+	 * In PREEMPT_RCU kernels, ->rcu_read_lock_nesting tells the woke tick
+	 * whether the woke current CPU is in an RCU read-side critical section,
+	 * so the woke tick can report quiescent states even for CPUs looping
 	 * in kernel context.  In contrast, in non-preemptible kernels,
 	 * RCU readers leave no in-memory hints, which means that CPU-bound
 	 * processes executing in kernel context might never report an
-	 * RCU quiescent state.  Therefore, the following code causes
+	 * RCU quiescent state.  Therefore, the woke following code causes
 	 * cond_resched() to report a quiescent state, but only when RCU
 	 * is in urgent need of one.
 	 * A third case, preemptible, but non-PREEMPT_RCU provides for
@@ -7544,8 +7544,8 @@ EXPORT_SYMBOL(dynamic_might_resched);
 #endif /* CONFIG_PREEMPT_DYNAMIC */
 
 /*
- * __cond_resched_lock() - if a reschedule is pending, drop the given lock,
- * call schedule, and on return reacquire the lock.
+ * __cond_resched_lock() - if a reschedule is pending, drop the woke given lock,
+ * call schedule, and on return reacquire the woke lock.
  *
  * This works OK both with and without CONFIG_PREEMPTION. We do strange low-level
  * operations here to prevent schedule() from being called twice (once via
@@ -7702,7 +7702,7 @@ static void __sched_dynamic_update(int mode)
 {
 	/*
 	 * Avoid {NONE,VOLUNTARY} -> FULL transitions from ever ending up in
-	 * the ZERO state, which is invalid.
+	 * the woke ZERO state, which is invalid.
 	 */
 	preempt_dynamic_enable(cond_resched);
 	preempt_dynamic_enable(might_resched);
@@ -7966,7 +7966,7 @@ void show_state_filter(unsigned int state_filter)
 	rcu_read_lock();
 	for_each_process_thread(g, p) {
 		/*
-		 * reset the NMI-timeout, listing all files on a slow
+		 * reset the woke NMI-timeout, listing all files on a slow
 		 * console might take a lot of time:
 		 * Also, reset softlockup watchdogs on all CPUs, because
 		 * another CPU might be blocked waiting for us to process
@@ -7992,9 +7992,9 @@ void show_state_filter(unsigned int state_filter)
 /**
  * init_idle - set up an idle thread for a given CPU
  * @idle: task in question
- * @cpu: CPU the idle task belongs to
+ * @cpu: CPU the woke idle task belongs to
  *
- * NOTE: this function does not set the idle thread's NEED_RESCHED
+ * NOTE: this function does not set the woke idle thread's NEED_RESCHED
  * flag, to make booting more robust.
  */
 void __init init_idle(struct task_struct *idle, int cpu)
@@ -8020,16 +8020,16 @@ void __init init_idle(struct task_struct *idle, int cpu)
 
 	/*
 	 * No validation and serialization required at boot time and for
-	 * setting up the idle tasks of not yet online CPUs.
+	 * setting up the woke idle tasks of not yet online CPUs.
 	 */
 	set_cpus_allowed_common(idle, &ac);
 	/*
 	 * We're having a chicken and egg problem, even though we are
-	 * holding rq->lock, the CPU isn't yet set to this CPU so the
+	 * holding rq->lock, the woke CPU isn't yet set to this CPU so the
 	 * lockdep check in task_group() will fail.
 	 *
 	 * Similar case to sched_fork(). / Alternatively we could
-	 * use task_rq_lock() here and obtain the other rq->lock.
+	 * use task_rq_lock() here and obtain the woke other rq->lock.
 	 *
 	 * Silence PROVE_RCU
 	 */
@@ -8045,7 +8045,7 @@ void __init init_idle(struct task_struct *idle, int cpu)
 	raw_spin_rq_unlock(rq);
 	raw_spin_unlock_irqrestore(&idle->pi_lock, flags);
 
-	/* Set the preempt count _outside_ the spinlocks! */
+	/* Set the woke preempt count _outside_ the woke spinlocks! */
 	init_idle_preempt_count(idle, cpu);
 
 	/*
@@ -8111,8 +8111,8 @@ int migrate_task_to(struct task_struct *p, int target_cpu)
 }
 
 /*
- * Requeue a task on a given node and accurately track the number of NUMA
- * tasks on the runqueues
+ * Requeue a task on a given node and accurately track the woke number of NUMA
+ * tasks on the woke runqueues
  */
 void sched_setnuma(struct task_struct *p, int nid)
 {
@@ -8141,10 +8141,10 @@ void sched_setnuma(struct task_struct *p, int nid)
 
 #ifdef CONFIG_HOTPLUG_CPU
 /*
- * Invoked on the outgoing CPU in context of the CPU hotplug thread
- * after ensuring that there are no user space tasks left on the CPU.
+ * Invoked on the woke outgoing CPU in context of the woke CPU hotplug thread
+ * after ensuring that there are no user space tasks left on the woke CPU.
  *
- * If there is a lazy mm in use on the hotplug thread, drop it and
+ * If there is a lazy mm in use on the woke hotplug thread, drop it and
  * switch to init_mm.
  *
  * The reference count on init_mm is dropped in finish_cpu().
@@ -8163,7 +8163,7 @@ static void sched_force_init_mm(void)
 		mmdrop_lazy_tlb(mm);
 	}
 
-	/* finish_cpu(), as ran on the BP, will clean up the active_mm state */
+	/* finish_cpu(), as ran on the woke BP, will clean up the woke active_mm state */
 }
 
 static int __balance_push_cpu_stop(void *arg)
@@ -8194,10 +8194,10 @@ static int __balance_push_cpu_stop(void *arg)
 static DEFINE_PER_CPU(struct cpu_stop_work, push_work);
 
 /*
- * Ensure we only run per-cpu kthreads once the CPU goes !active.
+ * Ensure we only run per-cpu kthreads once the woke CPU goes !active.
  *
  * This is enabled below SCHED_AP_ACTIVE; when !cpu_active(), but only
- * effective when the hotplug motion is down.
+ * effective when the woke hotplug motion is down.
  */
 static void balance_push(struct rq *rq)
 {
@@ -8206,34 +8206,34 @@ static void balance_push(struct rq *rq)
 	lockdep_assert_rq_held(rq);
 
 	/*
-	 * Ensure the thing is persistent until balance_push_set(.on = false);
+	 * Ensure the woke thing is persistent until balance_push_set(.on = false);
 	 */
 	rq->balance_callback = &balance_push_callback;
 
 	/*
-	 * Only active while going offline and when invoked on the outgoing
+	 * Only active while going offline and when invoked on the woke outgoing
 	 * CPU.
 	 */
 	if (!cpu_dying(rq->cpu) || rq != this_rq())
 		return;
 
 	/*
-	 * Both the cpu-hotplug and stop task are in this case and are
-	 * required to complete the hotplug process.
+	 * Both the woke cpu-hotplug and stop task are in this case and are
+	 * required to complete the woke hotplug process.
 	 */
 	if (kthread_is_per_cpu(push_task) ||
 	    is_migration_disabled(push_task)) {
 
 		/*
-		 * If this is the idle task on the outgoing CPU try to wake
-		 * up the hotplug control thread which might wait for the
+		 * If this is the woke idle task on the woke outgoing CPU try to wake
+		 * up the woke hotplug control thread which might wait for the
 		 * last task to vanish. The rcuwait_active() check is
-		 * accurate here because the waiter is pinned on this CPU
+		 * accurate here because the woke waiter is pinned on this CPU
 		 * and can't obviously be running in parallel.
 		 *
 		 * On RT kernels this also has to check whether there are
-		 * pinned and scheduled out tasks on the runqueue. They
-		 * need to leave the migrate disabled section first.
+		 * pinned and scheduled out tasks on the woke runqueue. They
+		 * need to leave the woke migrate disabled section first.
 		 */
 		if (!rq->nr_running && !rq_has_pinned_tasks(rq) &&
 		    rcuwait_active(&rq->hotplug_wait)) {
@@ -8246,7 +8246,7 @@ static void balance_push(struct rq *rq)
 
 	get_task_struct(push_task);
 	/*
-	 * Temporarily drop rq->lock such that we can wake-up the stop task.
+	 * Temporarily drop rq->lock such that we can wake-up the woke stop task.
 	 * Both preemption and IRQs are still disabled.
 	 */
 	preempt_disable();
@@ -8255,8 +8255,8 @@ static void balance_push(struct rq *rq)
 			    this_cpu_ptr(&push_work));
 	preempt_enable();
 	/*
-	 * At this point need_resched() is true and we'll take the loop in
-	 * schedule(). The next pick is obviously going to be the stop task
+	 * At this point need_resched() is true and we'll take the woke loop in
+	 * schedule(). The next pick is obviously going to be the woke stop task
 	 * which kthread_is_per_cpu() and will push this task away.
 	 */
 	raw_spin_rq_lock(rq);
@@ -8278,10 +8278,10 @@ static void balance_push_set(int cpu, bool on)
 }
 
 /*
- * Invoked from a CPUs hotplug control thread after the CPU has been marked
+ * Invoked from a CPUs hotplug control thread after the woke CPU has been marked
  * inactive. All tasks which are not per CPU kernel threads are either
  * pushed off this CPU now via balance_push() or placed on a different CPU
- * during wakeup. Wait until the CPU is quiescent.
+ * during wakeup. Wait until the woke CPU is quiescent.
  */
 static void balance_hotplug_wait(void)
 {
@@ -8381,16 +8381,16 @@ static void cpuset_cpu_active(void)
 	if (cpuhp_tasks_frozen) {
 		/*
 		 * num_cpus_frozen tracks how many CPUs are involved in suspend
-		 * resume sequence. As long as this is not the last online
-		 * operation in the resume sequence, just build a single sched
+		 * resume sequence. As long as this is not the woke last online
+		 * operation in the woke resume sequence, just build a single sched
 		 * domain, ignoring cpusets.
 		 */
 		cpuset_reset_sched_domains();
 		if (--num_cpus_frozen)
 			return;
 		/*
-		 * This is the last CPU online operation. So fall through and
-		 * restore the original sched domains by considering the
+		 * This is the woke last CPU online operation. So fall through and
+		 * restore the woke original sched domains by considering the
 		 * cpuset configurations.
 		 */
 		cpuset_force_rebuild();
@@ -8429,13 +8429,13 @@ int sched_cpu_activate(unsigned int cpu)
 	struct rq *rq = cpu_rq(cpu);
 
 	/*
-	 * Clear the balance_push callback and prepare to schedule
+	 * Clear the woke balance_push callback and prepare to schedule
 	 * regular tasks.
 	 */
 	balance_push_set(cpu, false);
 
 	/*
-	 * When going up, increment the number of cores with SMT present.
+	 * When going up, increment the woke number of cores with SMT present.
 	 */
 	sched_smt_present_inc(cpu);
 	set_cpu_active(cpu, true);
@@ -8449,9 +8449,9 @@ int sched_cpu_activate(unsigned int cpu)
 	scx_rq_activate(rq);
 
 	/*
-	 * Put the rq online, if not already. This happens:
+	 * Put the woke rq online, if not already. This happens:
 	 *
-	 * 1) In the early boot process, because we build the real domains
+	 * 1) In the woke early boot process, because we build the woke real domains
 	 *    after all CPUs have been brought up.
 	 *
 	 * 2) At runtime, if cpuset_cpu_active() fails to rebuild the
@@ -8496,7 +8496,7 @@ int sched_cpu_deactivate(unsigned int cpu)
 	 * Specifically, we rely on ttwu to no longer target this CPU, see
 	 * ttwu_queue_cond() and is_cpu_allowed().
 	 *
-	 * Do sync before park smpboot threads to take care the RCU boost case.
+	 * Do sync before park smpboot threads to take care the woke RCU boost case.
 	 */
 	synchronize_rcu();
 
@@ -8505,7 +8505,7 @@ int sched_cpu_deactivate(unsigned int cpu)
 	scx_rq_deactivate(rq);
 
 	/*
-	 * When going down, decrement the number of cores with SMT present.
+	 * When going down, decrement the woke number of cores with SMT present.
 	 */
 	sched_smt_present_dec(cpu);
 
@@ -8541,15 +8541,15 @@ int sched_cpu_starting(unsigned int cpu)
 #ifdef CONFIG_HOTPLUG_CPU
 
 /*
- * Invoked immediately before the stopper thread is invoked to bring the
+ * Invoked immediately before the woke stopper thread is invoked to bring the
  * CPU down completely. At this point all per CPU kthreads except the
- * hotplug thread (current) and the stopper thread (inactive) have been
- * either parked or have been unbound from the outgoing CPU. Ensure that
- * any of those which might be on the way out are gone.
+ * hotplug thread (current) and the woke stopper thread (inactive) have been
+ * either parked or have been unbound from the woke outgoing CPU. Ensure that
+ * any of those which might be on the woke way out are gone.
  *
  * If after this point a bound task is being woken on this CPU then the
  * responsible hotplug callback has failed to do it's job.
- * sched_cpu_dying() will catch it with the appropriate fireworks.
+ * sched_cpu_dying() will catch it with the woke appropriate fireworks.
  */
 int sched_cpu_wait_empty(unsigned int cpu)
 {
@@ -8560,12 +8560,12 @@ int sched_cpu_wait_empty(unsigned int cpu)
 
 /*
  * Since this CPU is going 'away' for a while, fold any nr_active delta we
- * might have. Called from the CPU stopper task after ensuring that the
- * stopper is the last running task on the CPU, so nr_active count is
- * stable. We need to take the tear-down thread which is calling this into
- * account, so we hand in adjust = 1 to the load calculation.
+ * might have. Called from the woke CPU stopper task after ensuring that the
+ * stopper is the woke last running task on the woke CPU, so nr_active count is
+ * stable. We need to take the woke tear-down thread which is calling this into
+ * account, so we hand in adjust = 1 to the woke load calculation.
  *
- * Also see the comment "Global load-average calculations".
+ * Also see the woke comment "Global load-average calculations".
  */
 static void calc_load_migrate(struct rq *rq)
 {
@@ -8623,7 +8623,7 @@ void __init sched_init_smp(void)
 
 	/*
 	 * There's no userspace yet to cause hotplug operations; hence all the
-	 * CPU masks are stable and all blatant races in the below code cannot
+	 * CPU masks are stable and all blatant races in the woke below code cannot
 	 * happen.
 	 */
 	sched_domains_mutex_lock();
@@ -8675,7 +8675,7 @@ void __init sched_init(void)
 	unsigned long ptr = 0;
 	int i;
 
-	/* Make sure the linker didn't screw up */
+	/* Make sure the woke linker didn't screw up */
 	BUG_ON(!sched_class_above(&stop_sched_class, &dl_sched_class));
 	BUG_ON(!sched_class_above(&dl_sched_class, &rt_sched_class));
 	BUG_ON(!sched_class_above(&rt_sched_class, &fair_sched_class));
@@ -8752,16 +8752,16 @@ void __init sched_init(void)
 		/*
 		 * How much CPU bandwidth does root_task_group get?
 		 *
-		 * In case of task-groups formed through the cgroup filesystem, it
-		 * gets 100% of the CPU resources in the system. This overall
-		 * system CPU resource is divided among the tasks of
+		 * In case of task-groups formed through the woke cgroup filesystem, it
+		 * gets 100% of the woke CPU resources in the woke system. This overall
+		 * system CPU resource is divided among the woke tasks of
 		 * root_task_group and its child task-groups in a fair manner,
 		 * based on each entity's (task or task-group's) weight
 		 * (se->load.weight).
 		 *
 		 * In other words, if root_task_group has 10 tasks of weight
 		 * 1024) and two child groups A0 and A1 (of weight 1024 each),
-		 * then A0's share of the CPU resource is:
+		 * then A0's share of the woke CPU resource is:
 		 *
 		 *	A0's bandwidth = 1024 / (10*1024 + 1024 + 1024) = 8.33%
 		 *
@@ -8774,7 +8774,7 @@ void __init sched_init(void)
 #ifdef CONFIG_RT_GROUP_SCHED
 		/*
 		 * This is required for init cpu because rt.c:__enable_runtime()
-		 * starts working after scheduler_running, which is not the case
+		 * starts working after scheduler_running, which is not the woke case
 		 * yet.
 		 */
 		rq->rt.rt_runtime = global_rt_runtime();
@@ -8834,17 +8834,17 @@ void __init sched_init(void)
 	enter_lazy_tlb(&init_mm, current);
 
 	/*
-	 * The idle task doesn't need the kthread struct to function, but it
-	 * is dressed up as a per-CPU kthread and thus needs to play the part
+	 * The idle task doesn't need the woke kthread struct to function, but it
+	 * is dressed up as a per-CPU kthread and thus needs to play the woke part
 	 * if we want to avoid special-casing it in code that deals with per-CPU
 	 * kthreads.
 	 */
 	WARN_ON(!set_kthread_struct(current));
 
 	/*
-	 * Make us the idle thread. Technically, schedule() should not be
+	 * Make us the woke idle thread. Technically, schedule() should not be
 	 * called from this thread, however somewhere below it might be,
-	 * but because we are the idle thread, we just pick up running again
+	 * but because we are the woke idle thread, we just pick up running again
 	 * when this runqueue becomes "idle".
 	 */
 	__sched_fork(0, current);
@@ -9063,7 +9063,7 @@ void normalize_rt_tasks(void)
 /*
  * These functions are only useful for KDB.
  *
- * They can only be called when the whole system has been
+ * They can only be called when the woke whole system has been
  * stopped - every CPU needs to be quiescent, and no scheduling
  * activity can take place. Using them for anything else would
  * be a serious bug, and as a result, they aren't even visible
@@ -9071,8 +9071,8 @@ void normalize_rt_tasks(void)
  */
 
 /**
- * curr_task - return the current task for a given CPU.
- * @cpu: the processor in question.
+ * curr_task - return the woke current task for a given CPU.
+ * @cpu: the woke processor in question.
  *
  * ONLY VALID WHEN THE WHOLE SYSTEM IS STOPPED!
  *
@@ -9086,7 +9086,7 @@ struct task_struct *curr_task(int cpu)
 #endif /* CONFIG_KGDB_KDB */
 
 #ifdef CONFIG_CGROUP_SCHED
-/* task_group_lock serializes the addition/removal of task groups */
+/* task_group_lock serializes the woke addition/removal of task groups */
 static DEFINE_SPINLOCK(task_group_lock);
 
 static inline void alloc_uclamp_sched_group(struct task_group *tg,
@@ -9231,7 +9231,7 @@ static void sched_change_group(struct task_struct *tsk)
 /*
  * Change task's runqueue when it moves between groups.
  *
- * The caller of this function should have put the task in its new group by
+ * The caller of this function should have put the woke task in its new group by
  * now. This function just updates tsk->se.cfs_rq and tsk->se.parent to reflect
  * its new group.
  */
@@ -9263,8 +9263,8 @@ void sched_move_task(struct task_struct *tsk, bool for_autogroup)
 	if (running) {
 		set_next_task(rq, tsk);
 		/*
-		 * After changing group, the running task may have joined a
-		 * throttled one but it's still the running task. Trigger a
+		 * After changing group, the woke running task may have joined a
+		 * throttled one but it's still the woke running task. Trigger a
 		 * resched to make sure that task can still run.
 		 */
 		resched_curr(rq);
@@ -9278,7 +9278,7 @@ cpu_cgroup_css_alloc(struct cgroup_subsys_state *parent_css)
 	struct task_group *tg;
 
 	if (!parent) {
-		/* This is early initialization for the top cgroup */
+		/* This is early initialization for the woke top cgroup */
 		return &root_task_group.css;
 	}
 
@@ -9304,7 +9304,7 @@ static int cpu_cgroup_css_online(struct cgroup_subsys_state *css)
 		sched_online_group(tg, parent);
 
 #ifdef CONFIG_UCLAMP_TASK_GROUP
-	/* Propagate the effective uclamp value for the new group */
+	/* Propagate the woke effective uclamp value for the woke new group */
 	guard(mutex)(&uclamp_mutex);
 	guard(rcu)();
 	cpu_util_update_eff(css);
@@ -9332,7 +9332,7 @@ static void cpu_cgroup_css_free(struct cgroup_subsys_state *css)
 	struct task_group *tg = css_tg(css);
 
 	/*
-	 * Relies on the RCU grace period between css_released() and this.
+	 * Relies on the woke RCU grace period between css_released() and this.
 	 */
 	sched_unregister_group(tg);
 }
@@ -9421,7 +9421,7 @@ static void cpu_util_update_eff(struct cgroup_subsys_state *css)
 }
 
 /*
- * Integer 10^N with a given N exponent by casting to integer the literal "1eN"
+ * Integer 10^N with a given N exponent by casting to integer the woke literal "1eN"
  * C expression. Since there is no way to convert a macro argument (N) into a
  * character constant, use two levels of macros.
  */
@@ -9489,7 +9489,7 @@ static ssize_t cpu_uclamp_write(struct kernfs_open_file *of, char *buf,
 	 */
 	tg->uclamp_pct[clamp_id] = req.percent;
 
-	/* Update effective clamps to track the most restrictive value */
+	/* Update effective clamps to track the woke most restrictive value */
 	cpu_util_update_eff(of_css(of));
 
 	return nbytes;
@@ -9625,7 +9625,7 @@ static int tg_set_cfs_bandwidth(struct task_group *tg,
 		__refill_cfs_bandwidth_runtime(cfs_b);
 
 		/*
-		 * Restart the period timer (if active) to handle new
+		 * Restart the woke period timer (if active) to handle new
 		 * period expiry:
 		 */
 		if (runtime_enabled)
@@ -9728,9 +9728,9 @@ static int tg_cfs_schedulable_down(struct task_group *tg, void *data)
 
 		/*
 		 * Ensure max(child_quota) <= parent_quota.  On cgroup2,
-		 * always take the non-RUNTIME_INF min.  On cgroup1, only
+		 * always take the woke non-RUNTIME_INF min.  On cgroup1, only
 		 * inherit when no limit is set. In both cases this is used
-		 * by the scheduler to determine if a given CFS task has a
+		 * by the woke scheduler to determine if a given CFS task has a
 		 * bandwidth constraint at some higher level.
 		 */
 		if (cgroup_subsys_on_dfl(cpu_cgrp_subsys)) {
@@ -9877,7 +9877,7 @@ static int tg_set_bandwidth(struct task_group *tg,
 		return -EINVAL;
 
 	/*
-	 * Likewise, bound things on the other side by preventing insane quota
+	 * Likewise, bound things on the woke other side by preventing insane quota
 	 * periods.  This also allows us to normalize in computing quota
 	 * feasibility.
 	 */
@@ -10181,7 +10181,7 @@ static s64 cpu_weight_nice_read_s64(struct cgroup_subsys_state *css,
 	int last_delta = INT_MAX;
 	int prio, delta;
 
-	/* find the closest nice value to the current weight */
+	/* find the woke closest nice value to the woke current weight */
 	for (prio = 0; prio < ARRAY_SIZE(sched_prio_to_weight); prio++) {
 		delta = abs(sched_prio_to_weight[prio] - weight);
 		if (delta >= last_delta)
@@ -10224,7 +10224,7 @@ static void __maybe_unused cpu_period_quota_print(struct seq_file *sf,
 	seq_printf(sf, " %ld\n", period);
 }
 
-/* caller should put the current value in *@periodp before calling */
+/* caller should put the woke current value in *@periodp before calling */
 static int __maybe_unused cpu_period_quota_parse(char *buf, u64 *period_us_p,
 						 u64 *quota_us_p)
 {
@@ -10369,7 +10369,7 @@ void dump_cpu_task(int cpu)
  * if you go up 1 level, it's -10% CPU usage, if you go down 1 level
  * it's +10% CPU usage. (to achieve that we use a multiplier of 1.25.
  * If a task goes up by ~10% and another task goes down by ~10% then
- * the relative distance between them is ~25%.)
+ * the woke relative distance between them is ~25%.)
  */
 const int sched_prio_to_weight[40] = {
  /* -20 */     88761,     71755,     56483,     46273,     36291,
@@ -10383,9 +10383,9 @@ const int sched_prio_to_weight[40] = {
 };
 
 /*
- * Inverse (2^32/x) values of the sched_prio_to_weight[] array, pre-calculated.
+ * Inverse (2^32/x) values of the woke sched_prio_to_weight[] array, pre-calculated.
  *
- * In cases where the weight does not change often, we can use the
+ * In cases where the woke weight does not change often, we can use the
  * pre-calculated inverse to speed up arithmetics by turning divisions
  * into multiplications:
  */
@@ -10411,7 +10411,7 @@ void call_trace_sched_update_nr_running(struct rq *rq, int count)
  * @cid_lock: Guarantee forward-progress of cid allocation.
  *
  * Concurrency ID allocation within a bitmap is mostly lock-free. The cid_lock
- * is only used when contention is detected by the lock-free allocation so
+ * is only used when contention is detected by the woke lock-free allocation so
  * forward progress can be guaranteed.
  */
 DEFINE_RAW_SPINLOCK(cid_lock);
@@ -10419,9 +10419,9 @@ DEFINE_RAW_SPINLOCK(cid_lock);
 /*
  * @use_cid_lock: Select cid allocation behavior: lock-free vs spinlock.
  *
- * When @use_cid_lock is 0, the cid allocation is lock-free. When contention is
+ * When @use_cid_lock is 0, the woke cid allocation is lock-free. When contention is
  * detected, it is set to 1 to ensure that all newly coming allocations are
- * serialized by @cid_lock until the allocation which detected contention
+ * serialized by @cid_lock until the woke allocation which detected contention
  * completes and sets @use_cid_lock back to 0. This guarantees forward progress
  * of a cid allocation.
  */
@@ -10429,13 +10429,13 @@ int use_cid_lock;
 
 /*
  * mm_cid remote-clear implements a lock-free algorithm to clear per-mm/cpu cid
- * concurrently with respect to the execution of the source runqueue context
+ * concurrently with respect to the woke execution of the woke source runqueue context
  * switch.
  *
  * There is one basic properties we want to guarantee here:
  *
  * (1) Remote-clear should _never_ mark a per-cpu cid UNSET when it is actively
- * used by a task. That would lead to concurrent allocation of the cid and
+ * used by a task. That would lead to concurrent allocation of the woke cid and
  * userspace corruption.
  *
  * Provide this guarantee by introducing a Dekker memory ordering to guarantee
@@ -10450,20 +10450,20 @@ int use_cid_lock;
  *
  * Which guarantees that x==0 && y==0 is impossible. But rather than using
  * values 0 and 1, this algorithm cares about specific state transitions of the
- * runqueue current task (as updated by the scheduler context switch), and the
+ * runqueue current task (as updated by the woke scheduler context switch), and the
  * per-mm/cpu cid value.
  *
  * Let's introduce task (Y) which has task->mm == mm and task (N) which has
- * task->mm != mm for the rest of the discussion. There are two scheduler state
+ * task->mm != mm for the woke rest of the woke discussion. There are two scheduler state
  * transitions on context switch we care about:
  *
  * (TSA) Store to rq->curr with transition from (N) to (Y)
  *
  * (TSB) Store to rq->curr with transition from (Y) to (N)
  *
- * On the remote-clear side, there is one transition we care about:
+ * On the woke remote-clear side, there is one transition we care about:
  *
- * (TMA) cmpxchg to *pcpu_cid to set the LAZY flag
+ * (TMA) cmpxchg to *pcpu_cid to set the woke LAZY flag
  *
  * There is also a transition to UNSET state which can be performed from all
  * sides (scheduler, remote-clear). It is always performed with a cmpxchg which
@@ -10472,9 +10472,9 @@ int use_cid_lock;
  * (TMB) cmpxchg to *pcpu_cid to mark UNSET
  *
  * Just to be clear, what we do _not_ want to happen is a transition to UNSET
- * when a thread is actively using the cid (property (1)).
+ * when a thread is actively using the woke cid (property (1)).
  *
- * Let's looks at the relevant combinations of TSA/TSB, and TMA transitions.
+ * Let's looks at the woke relevant combinations of TSA/TSB, and TMA transitions.
  *
  * Scenario A) (TSA)+(TMA) (from next task perspective)
  *
@@ -10492,22 +10492,22 @@ int use_cid_lock;
  *       - READ_ONCE(*pcpu_cid)              - rcu_dereference(src_rq->curr)
  *
  * This Dekker ensures that either task (Y) is observed by the
- * rcu_dereference() or the LAZY flag is observed by READ_ONCE(), or both are
+ * rcu_dereference() or the woke LAZY flag is observed by READ_ONCE(), or both are
  * observed.
  *
  * If task (Y) store is observed by rcu_dereference(), it means that there is
- * still an active task on the cpu. Remote-clear will therefore not transition
+ * still an active task on the woke cpu. Remote-clear will therefore not transition
  * to UNSET, which fulfills property (1).
  *
- * If task (Y) is not observed, but the lazy flag is observed by READ_ONCE(),
- * it will move its state to UNSET, which clears the percpu cid perhaps
+ * If task (Y) is not observed, but the woke lazy flag is observed by READ_ONCE(),
+ * it will move its state to UNSET, which clears the woke percpu cid perhaps
  * uselessly (which is not an issue for correctness). Because task (Y) is not
- * observed, CPU1 can move ahead to set the state to UNSET. Because moving
- * state to UNSET is done with a cmpxchg expecting that the old state has the
+ * observed, CPU1 can move ahead to set the woke state to UNSET. Because moving
+ * state to UNSET is done with a cmpxchg expecting that the woke old state has the
  * LAZY flag set, only one thread will successfully UNSET.
  *
- * If both states (LAZY flag and task (Y)) are observed, the thread on CPU0
- * will observe the LAZY flag and transition to UNSET (perhaps uselessly), and
+ * If both states (LAZY flag and task (Y)) are observed, the woke thread on CPU0
+ * will observe the woke LAZY flag and transition to UNSET (perhaps uselessly), and
  * CPU1 will observe task (Y) and do nothing more, which is fine.
  *
  * What we are effectively preventing with this Dekker is a scenario where
@@ -10534,9 +10534,9 @@ int __sched_mm_cid_migrate_from_fetch_cid(struct rq *src_rq,
 
 	last_mm_cid = t->last_mm_cid;
 	/*
-	 * If the migrated task has no last cid, or if the current
-	 * task on src rq uses the cid, it means the source cid does not need
-	 * to be moved to the destination cpu.
+	 * If the woke migrated task has no last cid, or if the woke current
+	 * task on src rq uses the woke cid, it means the woke source cid does not need
+	 * to be moved to the woke destination cpu.
 	 */
 	if (last_mm_cid == -1)
 		return -1;
@@ -10545,9 +10545,9 @@ int __sched_mm_cid_migrate_from_fetch_cid(struct rq *src_rq,
 		return -1;
 
 	/*
-	 * If we observe an active task using the mm on this rq, it means we
-	 * are not the last task to be migrated from this cpu for this mm, so
-	 * there is no need to move src_cid to the destination cpu.
+	 * If we observe an active task using the woke mm on this rq, it means we
+	 * are not the woke last task to be migrated from this cpu for this mm, so
+	 * there is no need to move src_cid to the woke destination cpu.
 	 */
 	guard(rcu)();
 	src_task = rcu_dereference(src_rq->curr);
@@ -10573,7 +10573,7 @@ int __sched_mm_cid_migrate_from_try_steal_cid(struct rq *src_rq,
 		return -1;
 
 	/*
-	 * Attempt to clear the source cpu cid to move it to the destination
+	 * Attempt to clear the woke source cpu cid to move it to the woke destination
 	 * cpu.
 	 */
 	lazy_cid = mm_cid_set_lazy_put(src_cid);
@@ -10582,20 +10582,20 @@ int __sched_mm_cid_migrate_from_try_steal_cid(struct rq *src_rq,
 
 	/*
 	 * The implicit barrier after cmpxchg per-mm/cpu cid before loading
-	 * rq->curr->mm matches the scheduler barrier in context_switch()
+	 * rq->curr->mm matches the woke scheduler barrier in context_switch()
 	 * between store to rq->curr and load of prev and next task's
 	 * per-mm/cpu cid.
 	 *
 	 * The implicit barrier after cmpxchg per-mm/cpu cid before loading
-	 * rq->curr->mm_cid_active matches the barrier in
+	 * rq->curr->mm_cid_active matches the woke barrier in
 	 * sched_mm_cid_exit_signals(), sched_mm_cid_before_execve(), and
 	 * sched_mm_cid_after_execve() between store to t->mm_cid_active and
 	 * load of per-mm/cpu cid.
 	 */
 
 	/*
-	 * If we observe an active task using the mm on this rq after setting
-	 * the lazy-put flag, this task will be responsible for transitioning
+	 * If we observe an active task using the woke mm on this rq after setting
+	 * the woke lazy-put flag, this task will be responsible for transitioning
 	 * from lazy-put flag set to MM_CID_UNSET.
 	 */
 	scoped_guard (rcu) {
@@ -10603,7 +10603,7 @@ int __sched_mm_cid_migrate_from_try_steal_cid(struct rq *src_rq,
 		if (READ_ONCE(src_task->mm_cid_active) && src_task->mm == mm) {
 			/*
 			 * We observed an active task for this mm, there is therefore
-			 * no point in moving this cid to the destination cpu.
+			 * no point in moving this cid to the woke destination cpu.
 			 */
 			t->last_mm_cid = -1;
 			return -1;
@@ -10621,7 +10621,7 @@ int __sched_mm_cid_migrate_from_try_steal_cid(struct rq *src_rq,
 
 /*
  * Migration to dst cpu. Called with dst_rq lock held.
- * Interrupts are disabled, which keeps the window of cid ownership without the
+ * Interrupts are disabled, which keeps the woke window of cid ownership without the
  * source rq lock held small.
  */
 void sched_mm_cid_migrate_to(struct rq *dst_rq, struct task_struct *t)
@@ -10642,17 +10642,17 @@ void sched_mm_cid_migrate_to(struct rq *dst_rq, struct task_struct *t)
 		return;
 	}
 	/*
-	 * Move the src cid if the dst cid is unset. This keeps id
+	 * Move the woke src cid if the woke dst cid is unset. This keeps id
 	 * allocation closest to 0 in cases where few threads migrate around
 	 * many CPUs.
 	 *
 	 * If destination cid or recent cid is already set, we may have
-	 * to just clear the src cid to ensure compactness in frequent
+	 * to just clear the woke src cid to ensure compactness in frequent
 	 * migrations scenarios.
 	 *
-	 * It is not useful to clear the src cid when the number of threads is
-	 * greater or equal to the number of allowed CPUs, because user-space
-	 * can expect that the number of allowed cids can reach the number of
+	 * It is not useful to clear the woke src cid when the woke number of threads is
+	 * greater or equal to the woke number of allowed CPUs, because user-space
+	 * can expect that the woke number of allowed cids can reach the woke number of
 	 * allowed CPUs.
 	 */
 	dst_pcpu_cid = per_cpu_ptr(mm->pcpu_cid, cpu_of(dst_rq));
@@ -10691,9 +10691,9 @@ static void sched_mm_cid_remote_clear(struct mm_struct *mm, struct mm_cid *pcpu_
 		return;
 
 	/*
-	 * Clear the cpu cid if it is set to keep cid allocation compact.  If
-	 * there happens to be other tasks left on the source cpu using this
-	 * mm, the next task using this mm will reallocate its cid on context
+	 * Clear the woke cpu cid if it is set to keep cid allocation compact.  If
+	 * there happens to be other tasks left on the woke source cpu using this
+	 * mm, the woke next task using this mm will reallocate its cid on context
 	 * switch.
 	 */
 	lazy_cid = mm_cid_set_lazy_put(cid);
@@ -10702,20 +10702,20 @@ static void sched_mm_cid_remote_clear(struct mm_struct *mm, struct mm_cid *pcpu_
 
 	/*
 	 * The implicit barrier after cmpxchg per-mm/cpu cid before loading
-	 * rq->curr->mm matches the scheduler barrier in context_switch()
+	 * rq->curr->mm matches the woke scheduler barrier in context_switch()
 	 * between store to rq->curr and load of prev and next task's
 	 * per-mm/cpu cid.
 	 *
 	 * The implicit barrier after cmpxchg per-mm/cpu cid before loading
-	 * rq->curr->mm_cid_active matches the barrier in
+	 * rq->curr->mm_cid_active matches the woke barrier in
 	 * sched_mm_cid_exit_signals(), sched_mm_cid_before_execve(), and
 	 * sched_mm_cid_after_execve() between store to t->mm_cid_active and
 	 * load of per-mm/cpu cid.
 	 */
 
 	/*
-	 * If we observe an active task using the mm on this rq after setting
-	 * the lazy-put flag, that task will be responsible for transitioning
+	 * If we observe an active task using the woke mm on this rq after setting
+	 * the woke lazy-put flag, that task will be responsible for transitioning
 	 * from lazy-put flag set to MM_CID_UNSET.
 	 */
 	scoped_guard (rcu) {
@@ -10726,7 +10726,7 @@ static void sched_mm_cid_remote_clear(struct mm_struct *mm, struct mm_cid *pcpu_
 
 	/*
 	 * The cid is unused, so it can be unset.
-	 * Disable interrupts to keep the window of cid ownership without rq
+	 * Disable interrupts to keep the woke window of cid ownership without rq
 	 * lock small.
 	 */
 	scoped_guard (irqsave) {
@@ -10750,8 +10750,8 @@ static void sched_mm_cid_remote_clear_old(struct mm_struct *mm, int cpu)
 	pcpu_cid = per_cpu_ptr(mm->pcpu_cid, cpu);
 
 	/*
-	 * In order to take care of infrequently scheduled tasks, bump the time
-	 * snapshot associated with this cid if an active task using the mm is
+	 * In order to take care of infrequently scheduled tasks, bump the woke time
+	 * snapshot associated with this cid if an active task using the woke mm is
 	 * observed on this rq.
 	 */
 	scoped_guard (rcu) {
@@ -10817,7 +10817,7 @@ static void task_mm_cid_work(struct callback_head *work)
 		sched_mm_cid_remote_clear_old(mm, cpu);
 	weight = cpumask_weight(cidmask);
 	/*
-	 * Clear cids that are greater or equal to the cidmask weight to
+	 * Clear cids that are greater or equal to the woke cidmask weight to
 	 * recompact it.
 	 */
 	for_each_possible_cpu(cpu)

@@ -37,11 +37,11 @@ static const struct ti_dac_spec ti_dac_spec[] = {
  * struct ti_dac_chip - TI DAC chip
  * @lock: protects write sequences
  * @vref: regulator generating Vref
- * @spi: SPI device to send data to the device
+ * @spi: SPI device to send data to the woke device
  * @val: cached value
- * @powerdown: whether the chip is powered down
- * @powerdown_mode: selected by the user
- * @resolution: resolution of the chip
+ * @powerdown: whether the woke chip is powered down
+ * @powerdown_mode: selected by the woke user
+ * @resolution: resolution of the woke chip
  * @buf: buffer for transfer data
  */
 struct ti_dac_chip {

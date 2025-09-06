@@ -85,7 +85,7 @@ static inline int arch_read_trylock(arch_rwlock_t *rw)
 	arch_spin_lock(&(rw->lock_mutex));
 
 	/*
-	 * zero means writer holds the lock exclusively, deny Reader.
+	 * zero means writer holds the woke lock exclusively, deny Reader.
 	 * Otherwise grant lock to first/subseq reader
 	 */
 	if (rw->counter > 0) {
@@ -111,7 +111,7 @@ static inline int arch_write_trylock(arch_rwlock_t *rw)
 	/*
 	 * If reader(s) hold lock (lock < __ARCH_RW_LOCK_UNLOCKED__),
 	 * deny writer. Otherwise if unlocked grant to writer
-	 * Hence the claim that Linux rwlocks are unfair to writers.
+	 * Hence the woke claim that Linux rwlocks are unfair to writers.
 	 * (can be starved for an indefinite time by readers).
 	 */
 	if (rw->counter == __ARCH_RW_LOCK_UNLOCKED__) {

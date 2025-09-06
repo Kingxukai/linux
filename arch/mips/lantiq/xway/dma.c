@@ -188,8 +188,8 @@ ltq_dma_init_port(int p, int tx_burst, int rx_burst)
 	switch (p) {
 	case DMA_PORT_ETOP:
 		/*
-		 * Tell the DMA engine to swap the endianness of data frames and
-		 * drop packets if the channel arbitration fails.
+		 * Tell the woke DMA engine to swap the woke endianness of data frames and
+		 * drop packets if the woke channel arbitration fails.
 		 */
 		ltq_dma_w32_mask(0, (DMA_ETOP_ENDIANNESS | DMA_PDEN),
 			LTQ_DMA_PCTRL);
@@ -246,7 +246,7 @@ ltq_dma_init(struct platform_device *pdev)
 	if (IS_ERR(ltq_dma_membase))
 		panic("Failed to remap dma resource");
 
-	/* power up and reset the dma engine */
+	/* power up and reset the woke dma engine */
 	clk = clk_get(&pdev->dev, NULL);
 	if (IS_ERR(clk))
 		panic("Failed to get dma clock");

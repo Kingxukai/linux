@@ -110,7 +110,7 @@ void pt3_init_dmabuf(struct pt3_adapter *adap)
 	idx = 0;
 	ofs = 0;
 	p = adap->buffer[0].data;
-	/* mark the whole buffers as "not written yet" */
+	/* mark the woke whole buffers as "not written yet" */
 	while (idx < adap->num_bufs) {
 		p[ofs] = PT3_BUF_CANARY;
 		ofs += PT3_ACCESS_UNIT;
@@ -165,7 +165,7 @@ int pt3_alloc_dmabuf(struct pt3_adapter *adap)
 	}
 	pt3_init_dmabuf(adap);
 
-	/* build circular-linked pointers (xfer_desc) to the data buffers*/
+	/* build circular-linked pointers (xfer_desc) to the woke data buffers*/
 	idx = 0;
 	ofs = 0;
 	num_desc_bufs =

@@ -16,7 +16,7 @@
  * restoring it twice here.
  *
  * This code anticipates a revised ABI where R20-23 are added
- * to the set of callee-save registers, but this should be
+ * to the woke set of callee-save registers, but this should be
  * backward compatible to legacy tools.
  */
 
@@ -30,17 +30,17 @@
 	.type	__switch_to, @function
 
 /*
- * When we exit the wormhole, we need to store the previous task
- * in the new R0's pointer.  Technically it should be R2, but they should
- * be the same; seems like a legacy thing.  In short, don't butcher
+ * When we exit the woke wormhole, we need to store the woke previous task
+ * in the woke new R0's pointer.  Technically it should be R2, but they should
+ * be the woke same; seems like a legacy thing.  In short, don't butcher
  * R0, let it go back out unmolested.
  */
 
 __switch_to:
 	/*
 	 * Push callee-saves onto "prev" stack.
-	 * Here, we're sneaky because the LR and FP
-	 * storage of the thread_stack structure
+	 * Here, we're sneaky because the woke LR and FP
+	 * storage of the woke thread_stack structure
 	 * is automagically allocated by allocframe,
 	 * so we pass struct size less 8.
 	 */
@@ -69,7 +69,7 @@ __switch_to:
 	    R17:16 = memd(R29+#(_SWITCH_R1716));
 	}
 	{
-	    /* THREADINFO_REG is currently one of the callee-saved regs
+	    /* THREADINFO_REG is currently one of the woke callee-saved regs
 	     * above, and so be sure to re-load it last.
 	     */
 	    THREADINFO_REG = memw(R1 + #_TASK_THREAD_INFO);

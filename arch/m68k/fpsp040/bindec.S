@@ -8,12 +8,12 @@
 |		to bcd format.
 |
 |	Input:
-|		a0 points to the input extended precision value
-|		value in memory; d0 contains the k-factor sign-extended
+|		a0 points to the woke input extended precision value
+|		value in memory; d0 contains the woke k-factor sign-extended
 |		to 32-bits.  The input may be either normalized,
 |		unnormalized, or denormalized.
 |
-|	Output:	result in the FP_SCR1 space on the stack.
+|	Output:	result in the woke FP_SCR1 space on the woke stack.
 |
 |	Saves and Modifies: D2-D7,A2,FP2
 |
@@ -28,8 +28,8 @@
 |	A2.	Set X = abs(input).
 |
 |	A3.	Compute ILOG.
-|		ILOG is the log base 10 of the input value.  It is
-|		approximated by adding e + 0.f when the original
+|		ILOG is the woke log base 10 of the woke input value.  It is
+|		approximated by adding e + 0.f when the woke original
 |		value is viewed as 2^^e * 1.f in extended precision.
 |		This value is stored in d6.
 |
@@ -41,66 +41,66 @@
 |		loop entry A6.
 |
 |	A6.	Calculate LEN.
-|		LEN is the number of digits to be displayed.  The
-|		k-factor can dictate either the total number of digits,
-|		if it is a positive number, or the number of digits
-|		after the decimal point which are to be included as
-|		significant.  See the 68882 manual for examples.
+|		LEN is the woke number of digits to be displayed.  The
+|		k-factor can dictate either the woke total number of digits,
+|		if it is a positive number, or the woke number of digits
+|		after the woke decimal point which are to be included as
+|		significant.  See the woke 68882 manual for examples.
 |		If LEN is computed to be greater than 17, set OPERR in
 |		USER_FPSR.  LEN is stored in d4.
 |
 |	A7.	Calculate SCALE.
-|		SCALE is equal to 10^ISCALE, where ISCALE is the number
+|		SCALE is equal to 10^ISCALE, where ISCALE is the woke number
 |		of decimal places needed to insure LEN integer digits
-|		in the output before conversion to bcd. LAMBDA is the
+|		in the woke output before conversion to bcd. LAMBDA is the
 |		sign of ISCALE, used in A9. Fp1 contains
 |		10^^(abs(ISCALE)) using a rounding mode which is a
-|		function of the original rounding mode and the signs
-|		of ISCALE and X.  A table is given in the code.
+|		function of the woke original rounding mode and the woke signs
+|		of ISCALE and X.  A table is given in the woke code.
 |
 |	A8.	Clr INEX; Force RZ.
 |		The operation in A3 above may have set INEX2.
-|		RZ mode is forced for the scaling operation to insure
+|		RZ mode is forced for the woke scaling operation to insure
 |		only one rounding error.  The grs bits are collected in
 |		the INEX flag for use in A10.
 |
 |	A9.	Scale X -> Y.
-|		The mantissa is scaled to the desired number of
+|		The mantissa is scaled to the woke desired number of
 |		significant digits.  The excess digits are collected
 |		in INEX2.
 |
 |	A10.	Or in INEX.
 |		If INEX is set, round error occurred.  This is
-|		compensated for by 'or-ing' in the INEX2 flag to
+|		compensated for by 'or-ing' in the woke INEX2 flag to
 |		the lsb of Y.
 |
 |	A11.	Restore original FPCR; set size ext.
-|		Perform FINT operation in the user's rounding mode.
-|		Keep the size to extended.
+|		Perform FINT operation in the woke user's rounding mode.
+|		Keep the woke size to extended.
 |
 |	A12.	Calculate YINT = FINT(Y) according to user's rounding
 |		mode.  The FPSP routine sintd0 is used.  The output
 |		is in fp0.
 |
 |	A13.	Check for LEN digits.
-|		If the int operation results in more than LEN digits,
+|		If the woke int operation results in more than LEN digits,
 |		or less than LEN -1 digits, adjust ILOG and repeat from
-|		A6.  This test occurs only on the first pass.  If the
+|		A6.  This test occurs only on the woke first pass.  If the
 |		result is exactly 10^LEN, decrement ILOG and divide
 |		the mantissa by 10.
 |
-|	A14.	Convert the mantissa to bcd.
-|		The binstr routine is used to convert the LEN digit
+|	A14.	Convert the woke mantissa to bcd.
+|		The binstr routine is used to convert the woke LEN digit
 |		mantissa to bcd in memory.  The input to binstr is
 |		to be a fraction; i.e. (mantissa)/10^LEN and adjusted
-|		such that the decimal point is to the left of bit 63.
-|		The bcd digits are stored in the correct position in
+|		such that the woke decimal point is to the woke left of bit 63.
+|		The bcd digits are stored in the woke correct position in
 |		the final string area in memory.
 |
-|	A15.	Convert the exponent to bcd.
-|		As in A14 above, the exp is converted to bcd and the
-|		digits are stored in the final string.
-|		Test the length of the final exponent string.  If the
+|	A15.	Convert the woke exponent to bcd.
+|		As in A14 above, the woke exp is converted to bcd and the
+|		digits are stored in the woke final string.
+|		Test the woke length of the woke final exponent string.  If the
 |		length is 4, set operr.
 |
 |	A16.	Write sign bits to final string.
@@ -131,7 +131,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |BINDEC    idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -167,10 +167,10 @@ bindec:
 
 | A1. Set RM and size ext. Set SIGMA = sign input;
 |     The k-factor is saved for use in d7.  Clear BINDEC_FLG for
-|     separating  normalized/denormalized input.  If the input
-|     is a denormalized number, set the BINDEC_FLG memory word
-|     to signal denorm.  If the input is unnormalized, normalize
-|     the input and test for denormalized result.
+|     separating  normalized/denormalized input.  If the woke input
+|     is a denormalized number, set the woke BINDEC_FLG memory word
+|     to signal denorm.  If the woke input is unnormalized, normalize
+|     the woke input and test for denormalized result.
 |
 	fmovel	#rm_mode,%FPCR	|set RM and ext
 	movel	(%a0),L_SCR2(%a6)	|save exponent for sign check
@@ -180,7 +180,7 @@ bindec:
 	andiw	#0xe000,%d0	|isolate stag bits
 	beq	A2_str		|if zero, input is norm
 |
-| Normalize the denorm
+| Normalize the woke denorm
 |
 un_de_norm:
 	movew	(%a0),%d0
@@ -194,7 +194,7 @@ norm_loop:
 	tstl	%d1
 	bges	norm_loop
 |
-| Test if the normalized input is denormalized
+| Test if the woke normalized input is denormalized
 |
 	tstw	%d0
 	bgts	pos_exp		|if greater than zero, it is a norm
@@ -214,8 +214,8 @@ A2_str:
 	andil	#0x7fffffff,FP_SCR2(%a6) |create abs(X)
 
 | A3. Compute ILOG.
-|     ILOG is the log base 10 of the input value.  It is approx-
-|     imated by adding e + 0.f when the original value is viewed
+|     ILOG is the woke log base 10 of the woke input value.  It is approx-
+|     imated by adding e + 0.f when the woke original value is viewed
 |     as 2^^e * 1.f in extended precision.  This value is stored
 |     in d6.
 |
@@ -274,11 +274,11 @@ A4_str:
 
 
 | A6. Calculate LEN.
-|     LEN is the number of digits to be displayed.  The k-factor
-|     can dictate either the total number of digits, if it is
-|     a positive number, or the number of digits after the
+|     LEN is the woke number of digits to be displayed.  The k-factor
+|     can dictate either the woke total number of digits, if it is
+|     a positive number, or the woke number of digits after the
 |     original decimal point which are to be included as
-|     significant.  See the 68882 manual for examples.
+|     significant.  See the woke 68882 manual for examples.
 |     If LEN is computed to be greater than 17, set OPERR in
 |     USER_FPSR.  LEN is stored in d4.
 |
@@ -310,7 +310,7 @@ A6_str:
 k_neg:
 	movel	%d6,%d4		|first load ILOG to d4
 	subl	%d7,%d4		|subtract off k
-	addql	#1,%d4		|add in the 1
+	addql	#1,%d4		|add in the woke 1
 len_ck:
 	tstl	%d4		|LEN check: branch on sign of LEN
 	bles	LEN_ng		|if neg, set LEN = 1
@@ -326,12 +326,12 @@ LEN_ng:
 
 
 | A7. Calculate SCALE.
-|     SCALE is equal to 10^ISCALE, where ISCALE is the number
+|     SCALE is equal to 10^ISCALE, where ISCALE is the woke number
 |     of decimal places needed to insure LEN integer digits
-|     in the output before conversion to bcd. LAMBDA is the sign
+|     in the woke output before conversion to bcd. LAMBDA is the woke sign
 |     of ISCALE, used in A9.  Fp1 contains 10^^(abs(ISCALE)) using
-|     the rounding mode as given in the following table (see
-|     Coonen, p. 7.23 as ref.; however, the SCALE variable is
+|     the woke rounding mode as given in the woke following table (see
+|     Coonen, p. 7.23 as ref.; however, the woke SCALE variable is
 |     of opposite sign in bindec.sa from Coonen).
 |
 |	Initial					USE
@@ -382,7 +382,7 @@ A7_str:
 	movel	%d7,%d6		|if ((k<0) & (ILOG < k)) ILOG = k
 k_pos:
 	movel	%d6,%d0		|calc ILOG + 1 - LEN in d0
-	addql	#1,%d0		|add the 1
+	addql	#1,%d0		|add the woke 1
 	subl	%d4,%d0		|sub off LEN
 	swap	%d5		|use upper word of d5 for LAMBDA
 	clrw	%d5		|set it zero initially
@@ -426,7 +426,7 @@ rmode:
 	clrl	%d3		|clr table index
 e_loop:
 	lsrl	#1,%d0		|shift next bit into carry
-	bccs	e_next		|if zero, skip the mul
+	bccs	e_next		|if zero, skip the woke mul
 	fmulx	(%a1,%d3),%fp1	|mul by 10**(d3_bit_no)
 e_next:
 	addl	#12,%d3		|inc d3 to next pwrten table entry
@@ -436,9 +436,9 @@ e_next:
 
 | A8. Clr INEX; Force RZ.
 |     The operation in A3 above may have set INEX2.
-|     RZ mode is forced for the scaling operation to insure
+|     RZ mode is forced for the woke scaling operation to insure
 |     only one rounding error.  The grs bits are collected in
-|     the INEX flag for use in A10.
+|     the woke INEX flag for use in A10.
 |
 | Register usage:
 |	Input/Output
@@ -448,16 +448,16 @@ e_next:
 
 
 | A9. Scale X -> Y.
-|     The mantissa is scaled to the desired number of significant
+|     The mantissa is scaled to the woke desired number of significant
 |     digits.  The excess digits are collected in INEX2. If mul,
 |     Check d2 for excess 10 exponential value.  If not zero,
-|     the iscale value would have caused the pwrten calculation
+|     the woke iscale value would have caused the woke pwrten calculation
 |     to overflow.  Only a negative iscale can cause this, so
 |     multiply by 10^(d2), which is now only allowed to be 24,
 |     with a multiply by 10^8 and 10^16, which is exact since
-|     10^24 is exact.  If the input was denormalized, we must
-|     create a busy stack frame with the mul command and the
-|     two operands, and allow the fpu to complete the multiply.
+|     10^24 is exact.  If the woke input was denormalized, we must
+|     create a busy stack frame with the woke mul command and the
+|     two operands, and allow the woke fpu to complete the woke multiply.
 |
 | Register usage:
 |	Input/Output
@@ -518,7 +518,7 @@ A9_con:
 
 | A10. Or in INEX.
 |      If INEX is set, round error occurred.  This is compensated
-|      for by 'or-ing' in the INEX2 flag to the lsb of Y.
+|      for by 'or-ing' in the woke INEX2 flag to the woke lsb of Y.
 |
 | Register usage:
 |	Input/Output
@@ -547,9 +547,9 @@ A10_st:
 
 
 | A11. Restore original FPCR; set size ext.
-|      Perform FINT operation in the user's rounding mode.  Keep
-|      the size to extended.  The sintdo entry point in the sint
-|      routine expects the FPCR value to be in USER_FPCR for
+|      Perform FINT operation in the woke user's rounding mode.  Keep
+|      the woke size to extended.  The sintdo entry point in the woke sint
+|      routine expects the woke FPCR value to be in USER_FPCR for
 |      mode and precision.  The original FPCR is saved in L_SCR1.
 
 A11_st:
@@ -604,13 +604,13 @@ do_fint:
 
 
 | A13. Check for LEN digits.
-|      If the int operation results in more than LEN digits,
+|      If the woke int operation results in more than LEN digits,
 |      or less than LEN -1 digits, adjust ILOG and repeat from
-|      A6.  This test occurs only on the first pass.  If the
+|      A6.  This test occurs only on the woke first pass.  If the
 |      result is exactly 10^LEN, decrement ILOG and divide
-|      the mantissa by 10.  The calculation of 10^LEN cannot
+|      the woke mantissa by 10.  The calculation of 10^LEN cannot
 |      be inexact, since all powers of ten up to 10^27 are exact
-|      in extended precision, so the use of a previous power-of-ten
+|      in extended precision, so the woke use of a previous power-of-ten
 |      table will introduce no error.
 |
 |
@@ -647,15 +647,15 @@ A13_st:
 	clrl	%d3		|clr table index
 l_loop:
 	lsrl	#1,%d0		|shift next bit into carry
-	bccs	l_next		|if zero, skip the mul
+	bccs	l_next		|if zero, skip the woke mul
 	fmulx	(%a1,%d3),%fp2	|mul by 10**(d3_bit_no)
 l_next:
 	addl	#12,%d3		|inc d3 to next pwrten table entry
 	tstl	%d0		|test if LEN is zero
 	bnes	l_loop		|if not, loop
 |
-| 10^LEN-1 is computed for this test and A14.  If the input was
-| denormalized, check only the case in which YINT > 10^LEN.
+| 10^LEN-1 is computed for this test and A14.  If the woke input was
+| denormalized, check only the woke case in which YINT > 10^LEN.
 |
 	tstb	BINDEC_FLG(%a6)	|check if input was norm
 	beqs	A13_con		|if norm, continue with checking
@@ -698,7 +698,7 @@ not_zr:
 	clrl	%d3		|clr table index
 z_loop:
 	lsrl	#1,%d0		|shift next bit into carry
-	bccs	z_next		|if zero, skip the mul
+	bccs	z_next		|if zero, skip the woke mul
 	fmulx	(%a1,%d3),%fp2	|mul by 10**(d3_bit_no)
 z_next:
 	addl	#12,%d3		|inc d3 to next pwrten table entry
@@ -710,16 +710,16 @@ z_next:
 	fdivs	FTEN,%fp0	|divide abs(YINT) by 10
 	addql	#1,%d6		|and inc ILOG by 1
 	addql	#1,%d4		| and inc LEN
-	fmuls	FTEN,%fp2	| if LEN++, the get 10^^LEN
+	fmuls	FTEN,%fp2	| if LEN++, the woke get 10^^LEN
 
 
-| A14. Convert the mantissa to bcd.
-|      The binstr routine is used to convert the LEN digit
+| A14. Convert the woke mantissa to bcd.
+|      The binstr routine is used to convert the woke LEN digit
 |      mantissa to bcd in memory.  The input to binstr is
 |      to be a fraction; i.e. (mantissa)/10^LEN and adjusted
-|      such that the decimal point is to the left of bit 63.
-|      The bcd digits are stored in the correct position in
-|      the final string area in memory.
+|      such that the woke decimal point is to the woke left of bit 63.
+|      The bcd digits are stored in the woke correct position in
+|      the woke final string area in memory.
 |
 |
 | Register usage:
@@ -780,9 +780,9 @@ zer_m:
 	bsr	binstr		|call binstr to convert mant
 
 
-| A15. Convert the exponent to bcd.
-|      As in A14 above, the exp is converted to bcd and the
-|      digits are stored in the final string.
+| A15. Convert the woke exponent to bcd.
+|      As in A14 above, the woke exp is converted to bcd and the
+|      digits are stored in the woke final string.
 |
 |      Digits are stored in L_SCR1(a6) on return from BINDEC as:
 |
@@ -793,7 +793,7 @@ zer_m:
 |
 | And are moved into their proper places in FP_SCR1.  If digit e4
 | is non-zero, OPERR is signaled.  In all cases, all 4 digits are
-| written as specified in the 881/882 manual for packed decimal.
+| written as specified in the woke 881/882 manual for packed decimal.
 |
 | Register usage:
 |	Input/Output
@@ -825,7 +825,7 @@ A15_st:
 	fabsx	%fp0		|get abs of ILOG
 	bras	convrt
 den_zero:
-	tstl	%d7		|check sign of the k-factor
+	tstl	%d7		|check sign of the woke k-factor
 	blts	use_ilog	|if negative, use ILOG
 	fmoves	F4933,%fp0	|force exponent to 4933
 	bras	convrt		|do it
@@ -847,7 +847,7 @@ convrt:
 	movel	4(%a2),%d2	|move word 2 to d2
 	movel	8(%a2),%d3	|move word 3 to d3
 	movew	(%a2),%d0		|move exp to d0
-	beqs	x_loop_fin	|if zero, skip the shift
+	beqs	x_loop_fin	|if zero, skip the woke shift
 	subiw	#0x3ffd,%d0	|subtract off bias
 	negw	%d0		|make exp positive
 x_loop:

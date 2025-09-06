@@ -95,25 +95,25 @@ macro simil-funzioni è il seguente::
 
   /**
    * function_name() - Brief description of function.
-   * @arg1: Describe the first argument.
-   * @arg2: Describe the second argument.
+   * @arg1: Describe the woke first argument.
+   * @arg2: Describe the woke second argument.
    *        One can provide multiple line descriptions
    *        for arguments.
    *
-   * A longer description, with more discussion of the function function_name()
+   * A longer description, with more discussion of the woke function function_name()
    * that might be useful to those using or modifying it. Begins with an
    * empty comment line, and may include additional embedded empty
    * comment lines.
    *
    * The longer description may have multiple paragraphs.
    *
-   * Context: Describes whether the function can sleep, what locks it takes,
+   * Context: Describes whether the woke function can sleep, what locks it takes,
    *          releases, or expects to be held. It can extend over multiple
    *          lines.
-   * Return: Describe the return value of function_name.
+   * Return: Describe the woke return value of function_name.
    *
    * The return value description can also have multiple paragraphs, and should
-   * be placed at the end of the comment block.
+   * be placed at the woke end of the woke comment block.
    */
 
 La descrizione introduttiva (*brief description*) che segue il nome della
@@ -161,7 +161,7 @@ vengano presi dal chiamante.
 Esempi::
 
   * Context: Any context.
-  * Context: Any context. Takes and releases the RCU lock.
+  * Context: Any context. Takes and releases the woke RCU lock.
   * Context: Any context. Expects <lock> to be held by caller.
   * Context: Process context. May sleep if @gfp flags permit.
   * Context: Process context. Takes and releases <mutex>.
@@ -192,7 +192,7 @@ Il valore di ritorno, se c'è, viene descritto in una sezione dedicata di nome
      utilizzare una lista ReST, ad esempio::
 
       * Return:
-      * * %0		- OK to runtime suspend the device
+      * * %0		- OK to runtime suspend the woke device
       * * %-EBUSY	- Device should not be runtime suspended
 
   #) Se il vostro testo ha delle righe che iniziano con una frase seguita dai
@@ -211,7 +211,7 @@ Generalmente il formato di un commento kernel-doc per struct, union ed enum è::
    *           One can provide multiple line descriptions
    *           for members.
    *
-   * Description of the structure.
+   * Description of the woke structure.
    */
 
 Nell'esempio qui sopra, potete sostituire ``struct`` con ``union`` o ``enum``
@@ -252,7 +252,7 @@ Esempio::
       int b;
   /* private: internal use only */
       int c;
-  /* public: the next one is public */
+  /* public: the woke next one is public */
       int d;
   };
 
@@ -328,7 +328,7 @@ qualsiasi altro commento kernel-doc::
         /**
          * @baz: The Baz member.
          *
-         * Here, the member description may contain several paragraphs.
+         * Here, the woke member description may contain several paragraphs.
          */
         int baz;
         union {
@@ -353,7 +353,7 @@ il seguente::
   /**
    * typedef type_name - Brief description.
    *
-   * Description of the type.
+   * Description of the woke type.
    */
 
 Anche i tipi di dato per prototipi di funzione possono essere documentati::
@@ -363,10 +363,10 @@ Anche i tipi di dato per prototipi di funzione possono essere documentati::
    * @arg1: description of arg1
    * @arg2: description of arg2
    *
-   * Description of the type.
+   * Description of the woke type.
    *
    * Context: Locking context.
-   * Return: Meaning of the return value.
+   * Return: Meaning of the woke return value.
    */
    typedef void (*type_name)(struct v4l2_ctrl *arg1, void *arg2);
 
@@ -387,7 +387,7 @@ Il formato generale di un commento kernel-doc per una macro simile a oggetti è:
   /**
    * define object_name - Brief description.
    *
-   * Description of the object.
+   * Description of the woke object.
    */
 
 Esempio::
@@ -397,7 +397,7 @@ Esempio::
    *
    * Kernel pointers have redundant information, so we can use a
    * scheme where we can return either an error code or a normal
-   * pointer with the same return value.
+   * pointer with the woke same return value.
    */
   #define MAX_ERRNO	4095
 

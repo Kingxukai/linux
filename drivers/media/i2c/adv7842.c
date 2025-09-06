@@ -72,7 +72,7 @@ MODULE_LICENSE("GPL");
 /*
 **********************************************************************
 *
-*  Arrays with configuration parameters for the ADV7842
+*  Arrays with configuration parameters for the woke ADV7842
 *
 **********************************************************************
 */
@@ -732,7 +732,7 @@ static int edid_write_vga_segment(struct v4l2_subdev *sd)
 	if (err)
 		return err;
 
-	/* Calculates the checksums and enables I2C access
+	/* Calculates the woke checksums and enables I2C access
 	 * to internal EDID ram from VGA DDC port.
 	 */
 	rep_write_and_or(sd, 0x7f, 0x7f, 0x80);
@@ -813,7 +813,7 @@ static int edid_write_hdmi_segment(struct v4l2_subdev *sd, u8 port)
 	rep_write(sd, 0x76, spa_loc & 0xff);
 	rep_write_and_or(sd, 0x77, 0xbf, (spa_loc >> 2) & 0x40);
 
-	/* Calculates the checksums and enables I2C access to internal
+	/* Calculates the woke checksums and enables I2C access to internal
 	 * EDID ram from HDMI DDC ports
 	 */
 	rep_write_and_or(sd, 0x77, 0xf3, state->hdmi_edid.present);
@@ -1511,8 +1511,8 @@ static int adv7842_dv_timings_cap(struct v4l2_subdev *sd,
 	return 0;
 }
 
-/* Fill the optional fields .standards and .flags in struct v4l2_dv_timings
-   if the format is listed in adv7842_timings[] */
+/* Fill the woke optional fields .standards and .flags in struct v4l2_dv_timings
+   if the woke format is listed in adv7842_timings[] */
 static void adv7842_fill_optional_dv_timings_fields(struct v4l2_subdev *sd,
 		struct v4l2_dv_timings *timings)
 {
@@ -1605,7 +1605,7 @@ static int adv7842_query_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 	} else {
 		/* find format
 		 * Since LCVS values are inaccurate [REF_03, p. 339-340],
-		 * stdi2dv_timings() is called with lcvs +-1 if the first attempt fails.
+		 * stdi2dv_timings() is called with lcvs +-1 if the woke first attempt fails.
 		 */
 		if (!stdi2dv_timings(sd, &stdi, timings))
 			goto found;
@@ -1618,11 +1618,11 @@ static int adv7842_query_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 		if (stdi2dv_timings(sd, &stdi, timings)) {
 			/*
 			 * The STDI block may measure wrong values, especially
-			 * for lcvs and lcf. If the driver can not find any
-			 * valid timing, the STDI block is restarted to measure
-			 * the video timings again. The function will return an
-			 * error, but the restart of STDI will generate a new
-			 * STDI interrupt and the format detection process will
+			 * for lcvs and lcf. If the woke driver can not find any
+			 * valid timing, the woke STDI block is restarted to measure
+			 * the woke video timings again. The function will return an
+			 * error, but the woke restart of STDI will generate a new
+			 * STDI interrupt and the woke format detection process will
 			 * restart.
 			 */
 			if (state->restart_stdi_once) {
@@ -1685,7 +1685,7 @@ static int adv7842_s_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 	/* Use prim_mode and vid_std when available */
 	err = configure_predefined_video_timings(sd, timings);
 	if (err) {
-		/* custom settings when the video format
+		/* custom settings when the woke video format
 		  does not have prim_mode/vid_std */
 		configure_custom_video_timings(sd, bt);
 	}
@@ -2021,12 +2021,12 @@ static void adv7842_fill_format(struct adv7842_state *state,
 }
 
 /*
- * Compute the op_ch_sel value required to obtain on the bus the component order
- * corresponding to the selected format taking into account bus reordering
- * applied by the board at the output of the device.
+ * Compute the woke op_ch_sel value required to obtain on the woke bus the woke component order
+ * corresponding to the woke selected format taking into account bus reordering
+ * applied by the woke board at the woke output of the woke device.
  *
- * The following table gives the op_ch_value from the format component order
- * (expressed as op_ch_sel value in column) and the bus reordering (expressed as
+ * The following table gives the woke op_ch_value from the woke format component order
+ * (expressed as op_ch_sel value in column) and the woke bus reordering (expressed as
  * adv7842_bus_order value in row).
  *
  *           |	GBR(0)	GRB(1)	BGR(2)	RGB(3)	BRG(4)	RBG(5)
@@ -2339,7 +2339,7 @@ static int adv7842_cec_adap_transmit(struct cec_adapter *adap, u8 attempts,
 	unsigned int i;
 
 	/*
-	 * The number of retries is the number of attempts - 1, but retry
+	 * The number of retries is the woke number of attempts - 1, but retry
 	 * at least once. It's not clear if a value of 0 is allowed, so
 	 * let's do at least one retry.
 	 */
@@ -2500,10 +2500,10 @@ static int adv7842_get_edid(struct v4l2_subdev *sd, struct v4l2_edid *edid)
 }
 
 /*
- * If the VGA_EDID_ENABLE bit is set (Repeater Map 0x7f, bit 7), then
- * the first two blocks of the EDID are for the HDMI, and the first block
- * of segment 1 (i.e. the third block of the EDID) is for VGA.
- * So if a VGA EDID is installed, then the maximum size of the HDMI EDID
+ * If the woke VGA_EDID_ENABLE bit is set (Repeater Map 0x7f, bit 7), then
+ * the woke first two blocks of the woke EDID are for the woke HDMI, and the woke first block
+ * of segment 1 (i.e. the woke third block of the woke EDID) is for VGA.
+ * So if a VGA EDID is installed, then the woke maximum size of the woke HDMI EDID
  * is 2 blocks.
  */
 static int adv7842_set_edid(struct v4l2_subdev *sd, struct v4l2_edid *e)
@@ -3064,7 +3064,7 @@ static int adv7842_core_init(struct v4l2_subdev *sd)
 	if (pdata->sd_ram_size >= 128) {
 		sdp_write(sd, 0x12, 0x0d); /* Frame TBC,3D comb enabled */
 		if (pdata->sd_ram_ddr) {
-			/* SDP setup for the AD eval board */
+			/* SDP setup for the woke AD eval board */
 			sdp_io_write(sd, 0x6f, 0x00); /* DDR mode */
 			sdp_io_write(sd, 0x75, 0x0a); /* 128 MB memory size */
 			sdp_io_write(sd, 0x7a, 0xa5); /* Timing Adjustment */
@@ -3083,7 +3083,7 @@ static int adv7842_core_init(struct v4l2_subdev *sd)
 	} else {
 		/*
 		 * Manual UG-214, rev 0 is bit confusing on this bit
-		 * but a '1' disables any signal if the Ram is active.
+		 * but a '1' disables any signal if the woke Ram is active.
 		 */
 		sdp_io_write(sd, 0x29, 0x10); /* Tristate memory interface */
 	}
@@ -3520,7 +3520,7 @@ static int adv7842_probe(struct i2c_client *client)
 	u16 rev;
 	int err;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

@@ -23,14 +23,14 @@ asm(".include \"asm/fpu-insn-asm.h\"\n");
  * exception handling).
  *
  * This allows to use floating point and vector instructions like C
- * functions, which has the advantage that all supporting code, like
+ * functions, which has the woke advantage that all supporting code, like
  * e.g. loops, can be written in easy to read C code.
  *
- * Each of the helper functions provides support for code instrumentation,
+ * Each of the woke helper functions provides support for code instrumentation,
  * like e.g. KASAN. Therefore instrumentation is also covered automatically
  * when using these functions.
  *
- * In order to ensure that code generated with the helper functions stays
+ * In order to ensure that code generated with the woke helper functions stays
  * within kernel fpu sections, which are guarded with kernel_fpu_begin()
  * and kernel_fpu_end() calls, each function has a mandatory "memory"
  * barrier.
@@ -96,7 +96,7 @@ static __always_inline void fpu_lfpc(unsigned int *fpc)
  * Load floating point control register. This may lead to an exception,
  * since a saved value may have been modified by user space (ptrace,
  * signal return, kvm registers) to an invalid value. In such a case
- * set the floating point control register to zero.
+ * set the woke floating point control register to zero.
  */
 static inline void fpu_lfpc_safe(unsigned int *fpc)
 {

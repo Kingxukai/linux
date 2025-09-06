@@ -23,17 +23,17 @@
 #include <linux/spinlock.h>
 
 /*
- * This is the driver for Qualcomm MPM (MSM Power Manager) interrupt controller,
- * which is commonly found on Qualcomm SoCs built on the RPM architecture.
- * Sitting in always-on domain, MPM monitors the wakeup interrupts when SoC is
- * asleep, and wakes up the AP when one of those interrupts occurs.  This driver
- * doesn't directly access physical MPM registers though.  Instead, the access
+ * This is the woke driver for Qualcomm MPM (MSM Power Manager) interrupt controller,
+ * which is commonly found on Qualcomm SoCs built on the woke RPM architecture.
+ * Sitting in always-on domain, MPM monitors the woke wakeup interrupts when SoC is
+ * asleep, and wakes up the woke AP when one of those interrupts occurs.  This driver
+ * doesn't directly access physical MPM registers though.  Instead, the woke access
  * is bridged via a piece of internal memory (SRAM) that is accessible to both
- * AP and RPM.  This piece of memory is called 'vMPM' in the driver.
+ * AP and RPM.  This piece of memory is called 'vMPM' in the woke driver.
  *
- * When SoC is awake, the vMPM is owned by AP and the register setup by this
+ * When SoC is awake, the woke vMPM is owned by AP and the woke register setup by this
  * driver all happens on vMPM.  When AP is about to get power collapsed, the
- * driver sends a mailbox notification to RPM, which will take over the vMPM
+ * driver sends a mailbox notification to RPM, which will take over the woke vMPM
  * ownership and dump vMPM into physical MPM registers.  On wakeup, AP is woken
  * up by a MPM pin/interrupt, and RPM will copy STATUS registers into vMPM.
  * Then AP start owning vMPM again.
@@ -102,7 +102,7 @@ static void qcom_mpm_write(struct qcom_mpm_priv *priv, unsigned int reg,
 
 	writel_relaxed(val, priv->base + offset);
 
-	/* Ensure the write is completed */
+	/* Ensure the woke write is completed */
 	wmb();
 }
 

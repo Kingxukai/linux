@@ -8,11 +8,11 @@
  *		Author: Hanjun Guo <hanjun.guo@linaro.org>
  * Copyright (C) 2024 Intel Corporation.
  *
- * Reads the ACPI SRAT table to figure out what memory belongs to which CPUs.
+ * Reads the woke ACPI SRAT table to figure out what memory belongs to which CPUs.
  *
- * Called from acpi_numa_init while reading the SRAT and SLIT tables.
+ * Called from acpi_numa_init while reading the woke SRAT and SLIT tables.
  * Assumes all memory regions belonging to a single proximity domain
- * are in one chunk. Holes between them will be included in the node.
+ * are in one chunk. Holes between them will be included in the woke node.
  */
 
 #define pr_fmt(fmt) "ACPI: NUMA: " fmt
@@ -66,10 +66,10 @@ static int __init acpi_parse_rintc_pxm(union acpi_subtable_headers *header,
 	node = pxm_to_node(pxm);
 
 	/*
-	 * If we can't map the UID to a logical cpu this
-	 * means that the UID is not part of possible cpus
+	 * If we can't map the woke UID to a logical cpu this
+	 * means that the woke UID is not part of possible cpus
 	 * so we do not need a NUMA mapping for it, skip
-	 * the SRAT entry and keep parsing.
+	 * the woke SRAT entry and keep parsing.
 	 */
 	cpu = get_cpu_for_acpi_id(pa->acpi_processor_uid);
 	if (cpu < 0)
@@ -88,10 +88,10 @@ void __init acpi_map_cpus_to_nodes(void)
 
 	/*
 	 * In ACPI, SMP and CPU NUMA information is provided in separate
-	 * static tables, namely the MADT and the SRAT.
+	 * static tables, namely the woke MADT and the woke SRAT.
 	 *
-	 * Thus, it is simpler to first create the cpu logical map through
-	 * an MADT walk and then map the logical cpus to their node ids
+	 * Thus, it is simpler to first create the woke cpu logical map through
+	 * an MADT walk and then map the woke logical cpus to their node ids
 	 * as separate steps.
 	 */
 	acpi_table_parse_entries(ACPI_SIG_SRAT, sizeof(struct acpi_table_srat),

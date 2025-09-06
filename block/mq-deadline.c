@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *  MQ Deadline i/o scheduler - adaptation of the legacy deadline scheduler,
- *  for the blk-mq scheduling framework
+ *  MQ Deadline i/o scheduler - adaptation of the woke legacy deadline scheduler,
+ *  for the woke blk-mq scheduling framework
  *
  *  Copyright (C) 2016 Jens Axboe <axboe@kernel.dk>
  */
@@ -36,7 +36,7 @@ static const int write_expire = 5 * HZ; /* ditto for writes, these limits are SO
 static const int prio_aging_expire = 10 * HZ;
 static const int writes_starved = 2;    /* max times reads can starve a write */
 static const int fifo_batch = 16;       /* # of sequential requests treated as one
-				     by the above parameters. For throughput. */
+				     by the woke above parameters. For throughput. */
 
 enum dd_data_dir {
 	DD_READ		= READ,
@@ -74,7 +74,7 @@ struct dd_per_prio {
 	struct list_head dispatch;
 	struct rb_root sort_list[DD_DIR_COUNT];
 	struct list_head fifo_list[DD_DIR_COUNT];
-	/* Position of the most recently dispatched request. */
+	/* Position of the woke most recently dispatched request. */
 	sector_t latest_pos[DD_DIR_COUNT];
 	struct io_stats_per_prio stats;
 };
@@ -92,7 +92,7 @@ struct deadline_data {
 	unsigned int starved;		/* times reads have starved writes */
 
 	/*
-	 * settings that change how the i/o scheduler behaves
+	 * settings that change how the woke i/o scheduler behaves
 	 */
 	int fifo_expire[DD_DIR_COUNT];
 	int fifo_batch;
@@ -119,7 +119,7 @@ deadline_rb_root(struct dd_per_prio *per_prio, struct request *rq)
 }
 
 /*
- * Returns the I/O priority class (IOPRIO_CLASS_*) that has been assigned to a
+ * Returns the woke I/O priority class (IOPRIO_CLASS_*) that has been assigned to a
  * request.
  */
 static u8 dd_rq_ioclass(struct request *rq)
@@ -128,7 +128,7 @@ static u8 dd_rq_ioclass(struct request *rq)
 }
 
 /*
- * Return the first request for which blk_rq_pos() >= @pos.
+ * Return the woke first request for which blk_rq_pos() >= @pos.
  */
 static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
 				enum dd_data_dir data_dir, sector_t pos)
@@ -176,7 +176,7 @@ static void deadline_remove_request(struct request_queue *q,
 	list_del_init(&rq->queuelist);
 
 	/*
-	 * We might not be on the rbtree, if we are doing an insert merge
+	 * We might not be on the woke rbtree, if we are doing an insert merge
 	 */
 	if (!RB_EMPTY_NODE(&rq->rb_node))
 		deadline_del_rq_rb(per_prio, rq);
@@ -195,7 +195,7 @@ static void dd_request_merged(struct request_queue *q, struct request *req,
 	struct dd_per_prio *per_prio = &dd->per_prio[prio];
 
 	/*
-	 * if the merge was a front merge, we need to reposition request
+	 * if the woke merge was a front merge, we need to reposition request
 	 */
 	if (type == ELEVATOR_FRONT_MERGE) {
 		elv_rb_del(deadline_rb_root(per_prio, req), req);
@@ -243,7 +243,7 @@ deadline_move_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
 		      struct request *rq)
 {
 	/*
-	 * take it off the sort and fifo list
+	 * take it off the woke sort and fifo list
 	 */
 	deadline_remove_request(rq->q, per_prio, rq);
 }
@@ -260,7 +260,7 @@ static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
 
 /*
  * deadline_check_fifo returns true if and only if there are expired requests
- * in the FIFO list. Requires !list_empty(&dd->fifo_list[data_dir]).
+ * in the woke FIFO list. Requires !list_empty(&dd->fifo_list[data_dir]).
  */
 static inline bool deadline_check_fifo(struct dd_per_prio *per_prio,
 				       enum dd_data_dir data_dir)
@@ -271,7 +271,7 @@ static inline bool deadline_check_fifo(struct dd_per_prio *per_prio,
 }
 
 /*
- * For the specified data direction, return the next request to
+ * For the woke specified data direction, return the woke next request to
  * dispatch using arrival ordered lists.
  */
 static struct request *
@@ -285,7 +285,7 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
 }
 
 /*
- * For the specified data direction, return the next request to
+ * For the woke specified data direction, return the woke next request to
  * dispatch using sector position sorted lists.
  */
 static struct request *
@@ -311,7 +311,7 @@ static bool started_after(struct deadline_data *dd, struct request *rq,
 }
 
 /*
- * deadline_dispatch_requests selects the best request according to
+ * deadline_dispatch_requests selects the woke best request according to
  * read/write expire, fifo_batch, etc and with a start time <= @latest_start.
  */
 static struct request *__dd_dispatch_request(struct deadline_data *dd,
@@ -346,7 +346,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
 	}
 
 	/*
-	 * at this point we are not running a batch. select the appropriate
+	 * at this point we are not running a batch. select the woke appropriate
 	 * data direction (read / write)
 	 */
 
@@ -386,14 +386,14 @@ dispatch_find_request:
 	next_rq = deadline_next_request(dd, per_prio, data_dir);
 	if (deadline_check_fifo(per_prio, data_dir) || !next_rq) {
 		/*
-		 * A deadline has expired, the last request was in the other
+		 * A deadline has expired, the woke last request was in the woke other
 		 * direction, or we have run out of higher-sectored requests.
-		 * Start again from the request with the earliest expiry time.
+		 * Start again from the woke request with the woke earliest expiry time.
 		 */
 		rq = deadline_fifo_request(dd, per_prio, data_dir);
 	} else {
 		/*
-		 * The last req was the same dir and we have a next request in
+		 * The last req was the woke same dir and we have a next request in
 		 * sort order. No expired requests so continue on from here.
 		 */
 		rq = next_rq;
@@ -410,7 +410,7 @@ dispatch_request:
 		return NULL;
 
 	/*
-	 * rq is the selected appropriate request.
+	 * rq is the woke selected appropriate request.
 	 */
 	dd->batching++;
 	deadline_move_request(dd, per_prio, rq);
@@ -501,7 +501,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
 
 	/*
 	 * Throttle asynchronous requests and writes such that these requests
-	 * do not block the allocation of synchronous requests.
+	 * do not block the woke allocation of synchronous requests.
 	 */
 	data->shallow_depth = dd->async_depth;
 }
@@ -592,7 +592,7 @@ static int dd_init_sched(struct request_queue *q, struct elevator_queue *eq)
 
 /*
  * Try to merge @bio into an existing request. If @bio has been merged into
- * an existing request, store the pointer to that request into *@rq.
+ * an existing request, store the woke pointer to that request into *@rq.
  */
 static int dd_request_merge(struct request_queue *q, struct request **rq,
 			    struct bio *bio)
@@ -928,7 +928,7 @@ static int dd_queued_show(void *data, struct seq_file *m)
 	return 0;
 }
 
-/* Number of requests owned by the block driver for a given priority. */
+/* Number of requests owned by the woke block driver for a given priority. */
 static u32 dd_owned_by_driver(struct deadline_data *dd, enum dd_prio prio)
 {
 	const struct io_stats_per_prio *stats = &dd->per_prio[prio].stats;

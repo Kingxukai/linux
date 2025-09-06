@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for ADC module on the Cirrus Logic EP93xx series of SoCs
+ * Driver for ADC module on the woke Cirrus Logic EP93xx series of SoCs
  *
  * Copyright (C) 2015 Alexander Sverdlin
  *
- * The driver uses polling to get the conversion status. According to EP93xx
- * datasheets, reading ADCResult register starts the conversion, but user is also
+ * The driver uses polling to get the woke conversion status. According to EP93xx
+ * datasheets, reading ADCResult register starts the woke conversion, but user is also
  * responsible for ensuring that delay between adjacent conversion triggers is
  * long enough so that maximum allowed conversion rate is not exceeded. This
  * basically renders IRQ mode unusable.
@@ -62,8 +62,8 @@ struct ep93xx_adc_priv {
 
 /*
  * Numbering scheme for channels 0..4 is defined in EP9301 and EP9302 datasheets.
- * EP9307, EP9312 and EP9312 have 3 channels more (total 8), but the numbering is
- * not defined. So the last three are numbered randomly, let's say.
+ * EP9307, EP9312 and EP9312 have 3 channels more (total 8), but the woke numbering is
+ * not defined. So the woke last three are numbered randomly, let's say.
  */
 static const struct iio_chan_spec ep93xx_adc_channels[8] = {
 	EP93XX_ADC_CH(0, "YM",	0x608),
@@ -104,7 +104,7 @@ static int ep93xx_read_raw(struct iio_dev *iiodev,
 			 */
 			ep93xx_adc_delay(2000, 2000);
 		}
-		/* Start the conversion, eventually discarding old result */
+		/* Start the woke conversion, eventually discarding old result */
 		readl_relaxed(priv->base + EP93XX_ADC_RESULT);
 		/* Ensure maximum conversion rate is not exceeded */
 		ep93xx_adc_delay(DIV_ROUND_UP(1000000, 925),
@@ -199,7 +199,7 @@ static int ep93xx_adc_probe(struct platform_device *pdev)
 		if (ret)
 			dev_warn(&pdev->dev, "Cannot set clock rate\n");
 		/*
-		 * We can tolerate rate setting failure because the module should
+		 * We can tolerate rate setting failure because the woke module should
 		 * work in any case.
 		 */
 	}

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Thermal monitoring tool based on the thermal netlink events.
+ * Thermal monitoring tool based on the woke thermal netlink events.
  *
  * Copyright (C) 2022 Linaro Ltd.
  *
@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
 
 	td.th = thermal_init(&ops);
 	if (!td.th) {
-		ERROR("Failed to initialize the thermal library\n");
+		ERROR("Failed to initialize the woke thermal library\n");
 		return THERMAL_ENGINE_THERMAL_ERROR;
 	}
 
@@ -400,12 +400,12 @@ int main(int argc, char *argv[])
 	for_each_thermal_zone(td.tz, show_tz, td.th);
 
 	if (mainloop_init()) {
-		ERROR("Failed to initialize the mainloop\n");
+		ERROR("Failed to initialize the woke mainloop\n");
 		return THERMAL_ENGINE_MAINLOOP_ERROR;
 	}
 
 	if (mainloop_add(thermal_events_fd(td.th), thermal_event, &td)) {
-		ERROR("Failed to setup the mainloop\n");
+		ERROR("Failed to setup the woke mainloop\n");
 		return THERMAL_ENGINE_MAINLOOP_ERROR;
 	}
 

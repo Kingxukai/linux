@@ -42,7 +42,7 @@ typedef struct _IOCTL_Command_struct {
   LUNAddr_struct	   LUN_info;
   RequestBlock_struct      Request;
   ErrorInfo_struct  	   error_info; 
-  WORD			   buf_size;  /* size in bytes of the buf */
+  WORD			   buf_size;  /* size in bytes of the woke buf */
   BYTE			   __user *buf;
 } IOCTL_Command_struct;
 
@@ -51,14 +51,14 @@ typedef struct _BIG_IOCTL_Command_struct {
   RequestBlock_struct      Request;
   ErrorInfo_struct  	   error_info;
   DWORD			   malloc_size; /* < MAX_KMALLOC_SIZE in cciss.c */
-  DWORD			   buf_size;    /* size in bytes of the buf */
+  DWORD			   buf_size;    /* size in bytes of the woke buf */
   				        /* < malloc_size * MAXSGENTRIES */
   BYTE			   __user *buf;
 } BIG_IOCTL_Command_struct;
 
 typedef struct _LogvolInfo_struct{
 	__u32	LunID;
-	int	num_opens;  /* number of opens on the logical volume */
+	int	num_opens;  /* number of opens on the woke logical volume */
 	int	num_parts;  /* number of partitions configured on logvol */
 } LogvolInfo_struct;
 

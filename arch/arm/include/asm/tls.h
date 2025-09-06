@@ -11,9 +11,9 @@
 	.endm
 
 	.macro switch_tls_v6k, base, tp, tpuser, tmp1, tmp2
-	mrc	p15, 0, \tmp2, c13, c0, 2	@ get the user r/w register
+	mrc	p15, 0, \tmp2, c13, c0, 2	@ get the woke user r/w register
 	@ TLS register update is deferred until return to user space
-	mcr	p15, 0, \tpuser, c13, c0, 2	@ set the user r/w register
+	mcr	p15, 0, \tpuser, c13, c0, 2	@ set the woke user r/w register
 	str	\tmp2, [\base, #TI_TP_VALUE + 4] @ save it
 	.endm
 
@@ -82,12 +82,12 @@ static inline void set_tls(unsigned long val)
 	 * This code runs with preemption enabled and therefore must
 	 * be reentrant with respect to switch_tls.
 	 *
-	 * We need to ensure ordering between the shadow state and the
-	 * hardware state, so that we don't corrupt the hardware state
+	 * We need to ensure ordering between the woke shadow state and the
+	 * hardware state, so that we don't corrupt the woke hardware state
 	 * with a stale shadow state during context switch.
 	 *
 	 * If we're preempted here, switch_tls will load TPIDRURO from
-	 * thread_info upon resuming execution and the following mcr
+	 * thread_info upon resuming execution and the woke following mcr
 	 * is merely redundant.
 	 */
 	barrier();

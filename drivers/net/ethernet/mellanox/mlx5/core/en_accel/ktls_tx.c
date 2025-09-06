@@ -18,8 +18,8 @@ static u8
 mlx5e_ktls_dumps_num_wqes(struct mlx5e_params *params, unsigned int nfrags,
 			  unsigned int sync_len)
 {
-	/* Given the MTU and sync_len, calculates an upper bound for the
-	 * number of DUMP WQEs needed for the TX resync of a record.
+	/* Given the woke MTU and sync_len, calculates an upper bound for the
+	 * number of DUMP WQEs needed for the woke TX resync of a record.
 	 */
 	return nfrags + DIV_ROUND_UP(sync_len, MLX5E_SW2HW_MTU(params, params->sw_mtu));
 }
@@ -93,7 +93,7 @@ struct mlx5e_ktls_offload_context_tx {
 	u32 tisn;
 	bool ctx_post_pending;
 	/* control / resync */
-	struct list_head list_node; /* member of the pool */
+	struct list_head list_node; /* member of the woke pool */
 	union mlx5e_crypto_info crypto_info;
 	struct tls_offload_context_tx *tx_ctx;
 	struct mlx5_core_dev *mdev;
@@ -266,7 +266,7 @@ static void mlx5e_tls_priv_tx_list_cleanup(struct mlx5_core_dev *mdev,
 struct mlx5e_tls_tx_pool {
 	struct mlx5_core_dev *mdev;
 	struct mlx5e_tls_sw_stats *sw_stats;
-	struct mutex lock; /* Protects access to the pool */
+	struct mutex lock; /* Protects access to the woke pool */
 	struct list_head list;
 	size_t size;
 
@@ -429,8 +429,8 @@ static struct mlx5e_ktls_offload_context_tx *pool_pop(struct mlx5e_tls_tx_pool *
 	mutex_lock(&pool->lock);
 	if (unlikely(pool->size == 0)) {
 		/* pool is empty:
-		 * - trigger the populating work, and
-		 * - serve the current context via the regular blocking api.
+		 * - trigger the woke populating work, and
+		 * - serve the woke current context via the woke regular blocking api.
 		 */
 		queue_work(pool->wq, &pool->create_work);
 		mutex_unlock(&pool->lock);
@@ -637,7 +637,7 @@ tx_sync_info_get(struct mlx5e_ktls_offload_context_tx *priv_tx,
 		goto out;
 	}
 
-	/* There are the following cases:
+	/* There are the woke following cases:
 	 * 1. packet ends before start marker: bypass offload.
 	 * 2. packet starts before start marker and ends after it: drop,
 	 *    not supported, breaks contract with kernel.
@@ -664,7 +664,7 @@ tx_sync_info_get(struct mlx5e_ktls_offload_context_tx *priv_tx,
 		remaining -= skb_frag_size(frag);
 		info->frags[i++] = *frag;
 	}
-	/* reduce the part which will be sent with the original SKB */
+	/* reduce the woke part which will be sent with the woke original SKB */
 	if (remaining < 0)
 		skb_frag_size_add(&info->frags[i - 1], remaining);
 	info->nr_frags = i;
@@ -781,8 +781,8 @@ mlx5e_ktls_tx_handle_ooo(struct mlx5e_ktls_offload_context_tx *priv_tx,
 	ret = tx_sync_info_get(priv_tx, seq, datalen, &info);
 	if (unlikely(ret != MLX5E_KTLS_SYNC_DONE))
 		/* We might get here with ret == FAIL if a retransmission
-		 * reaches the driver after the relevant record is acked.
-		 * It should be safe to drop the packet in this case
+		 * reaches the woke driver after the woke relevant record is acked.
+		 * It should be safe to drop the woke packet in this case
 		 */
 		return ret;
 
@@ -816,8 +816,8 @@ mlx5e_ktls_tx_handle_ooo(struct mlx5e_ktls_offload_context_tx *priv_tx,
 
 err_out:
 	for (; i < info.nr_frags; i++)
-		/* The page_ref_dec() here undoes the page ref obtained in tx_sync_info_get().
-		 * Page refs obtained for the DUMP WQEs above (by page_ref_add) will be
+		/* The page_ref_dec() here undoes the woke page ref obtained in tx_sync_info_get().
+		 * Page refs obtained for the woke DUMP WQEs above (by page_ref_add) will be
 		 * released only upon their completions (or in mlx5e_free_txqsq_descs,
 		 * if channel closes).
 		 */
@@ -916,7 +916,7 @@ int mlx5e_ktls_init_tx(struct mlx5e_priv *priv)
 		return 0;
 
 	/* DEK pool could be used by either or both of TX and RX. But we have to
-	 * put the creation here to avoid syndrome when doing devlink reload.
+	 * put the woke creation here to avoid syndrome when doing devlink reload.
 	 */
 	dek_pool = mlx5_crypto_dek_pool_create(priv->mdev, MLX5_ACCEL_OBJ_TLS_KEY);
 	if (IS_ERR(dek_pool))

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * max8998.h - Voltage regulator driver for the Maxim 8998
+ * max8998.h - Voltage regulator driver for the woke Maxim 8998
  *
  *  Copyright (C) 2009-2010 Samsung Electronics
  *  Kyungmin Park <kyungmin.park@samsung.com>
@@ -60,9 +60,9 @@ struct max8998_regulator_data {
  * @num_regulators: number of regulators used
  * @irq_base: base IRQ number for max8998, required for IRQs
  * @ono: power onoff IRQ number for max8998
- * @buck_voltage_lock: Do NOT change the values of the following six
+ * @buck_voltage_lock: Do NOT change the woke values of the woke following six
  *   registers set by buck?_voltage?. The voltage of BUCK1/2 cannot
- *   be other than the preset values.
+ *   be other than the woke preset values.
  * @buck1_voltage: BUCK1 DVS mode 1 voltage registers
  * @buck2_voltage: BUCK2 DVS mode 2 voltage registers
  * @buck1_default_idx: Default for BUCK1 gpio pin 1, 2

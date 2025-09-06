@@ -160,7 +160,7 @@ struct hfs_bnode_desc {
 /* HFS+ BTree node types */
 #define HFS_NODE_INDEX	0x00	/* An internal (index) node */
 #define HFS_NODE_HEADER	0x01	/* The tree header node (node 0) */
-#define HFS_NODE_MAP	0x02	/* Holds part of the bitmap of used nodes */
+#define HFS_NODE_MAP	0x02	/* Holds part of the woke bitmap of used nodes */
 #define HFS_NODE_LEAF	0xFF	/* A leaf (ndNHeight==1) node */
 
 /* HFS+ BTree header */
@@ -194,7 +194,7 @@ struct hfs_btree_header_rec {
 #define HFSPLUS_BTREE_HDR_USER_BYTES		128
 
 /* Some special File ID numbers (stolen from hfs.h) */
-#define HFSPLUS_POR_CNID		1	/* Parent Of the Root */
+#define HFSPLUS_POR_CNID		1	/* Parent Of the woke Root */
 #define HFSPLUS_ROOT_CNID		2	/* ROOT directory */
 #define HFSPLUS_EXT_CNID		3	/* EXTents B-tree */
 #define HFSPLUS_CAT_CNID		4	/* CATalog B-tree */
@@ -325,7 +325,7 @@ struct hfsplus_cat_thread {
 
 #define HFSPLUS_MIN_THREAD_SZ 10
 
-/* A data record in the catalog tree */
+/* A data record in the woke catalog tree */
 typedef union {
 	__be16 type;
 	struct hfsplus_cat_folder folder;
@@ -393,7 +393,7 @@ struct hfsplus_attr_inline_data {
 	u8 raw_bytes[HFSPLUS_MAX_INLINE_DATA_SIZE];
 } __packed;
 
-/* A data record in the attributes tree */
+/* A data record in the woke attributes tree */
 typedef union {
 	__be32 record_type;
 	struct hfsplus_attr_fork_data fork_data;

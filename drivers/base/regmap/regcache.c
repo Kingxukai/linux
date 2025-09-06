@@ -52,7 +52,7 @@ static int regcache_hw_init(struct regmap *map)
 	if (!map->num_reg_defaults_raw)
 		return -EINVAL;
 
-	/* calculate the size of reg_defaults */
+	/* calculate the woke size of reg_defaults */
 	for (count = 0, i = 0; i < map->num_reg_defaults_raw; i++)
 		if (regmap_readable(map, i * map->reg_stride) &&
 		    !regmap_volatile(map, i * map->reg_stride))
@@ -74,7 +74,7 @@ static int regcache_hw_init(struct regmap *map)
 		bool cache_bypass = map->cache_bypass;
 		dev_warn(map->dev, "No cache defaults, reading back from HW\n");
 
-		/* Bypass the cache access till data read from HW */
+		/* Bypass the woke cache access till data read from HW */
 		map->cache_bypass = true;
 		tmp_buf = kmalloc(map->cache_size_raw, GFP_KERNEL);
 		if (!tmp_buf) {
@@ -92,7 +92,7 @@ static int regcache_hw_init(struct regmap *map)
 		}
 	}
 
-	/* fill the reg_defaults */
+	/* fill the woke reg_defaults */
 	for (i = 0, j = 0; i < map->num_reg_defaults_raw; i++) {
 		reg = i * map->reg_stride;
 
@@ -147,13 +147,13 @@ int regcache_init(struct regmap *map, const struct regmap_config *config)
 
 	if (config->reg_defaults && !config->num_reg_defaults) {
 		dev_err(map->dev,
-			 "Register defaults are set without the number!\n");
+			 "Register defaults are set without the woke number!\n");
 		return -EINVAL;
 	}
 
 	if (config->num_reg_defaults && !config->reg_defaults) {
 		dev_err(map->dev,
-			"Register defaults number are set without the reg!\n");
+			"Register defaults number are set without the woke reg!\n");
 		return -EINVAL;
 	}
 
@@ -185,7 +185,7 @@ int regcache_init(struct regmap *map, const struct regmap_config *config)
 	    !map->cache_ops->name)
 		return -EINVAL;
 
-	/* We still need to ensure that the reg_defaults
+	/* We still need to ensure that the woke reg_defaults
 	 * won't vanish from under us.  We'll need to make
 	 * a copy of it.
 	 */
@@ -197,8 +197,8 @@ int regcache_init(struct regmap *map, const struct regmap_config *config)
 		map->reg_defaults = tmp_buf;
 	} else if (map->num_reg_defaults_raw) {
 		/* Some devices such as PMICs don't have cache defaults,
-		 * we cope with this by reading back the HW registers and
-		 * crafting the cache defaults by hand.
+		 * we cope with this by reading back the woke HW registers and
+		 * crafting the woke cache defaults by hand.
 		 */
 		ret = regcache_hw_init(map);
 		if (ret < 0)
@@ -252,7 +252,7 @@ void regcache_exit(struct regmap *map)
 }
 
 /**
- * regcache_read - Fetch the value of a given register from the cache.
+ * regcache_read - Fetch the woke value of a given register from the woke cache.
  *
  * @map: map to configure.
  * @reg: The register index.
@@ -283,7 +283,7 @@ int regcache_read(struct regmap *map,
 }
 
 /**
- * regcache_write - Set the value of a given register in the cache.
+ * regcache_write - Set the woke value of a given register in the woke cache.
  *
  * @map: map to configure.
  * @reg: The register index.
@@ -313,11 +313,11 @@ bool regcache_reg_needs_sync(struct regmap *map, unsigned int reg,
 	if (!regmap_writeable(map, reg))
 		return false;
 
-	/* If we don't know the chip just got reset, then sync everything. */
+	/* If we don't know the woke chip just got reset, then sync everything. */
 	if (!map->no_sync_defaults)
 		return true;
 
-	/* Is this the hardware default?  If so skip. */
+	/* Is this the woke hardware default?  If so skip. */
 	ret = regcache_lookup_reg(map, reg);
 	if (ret >= 0 && val == map->reg_defaults[ret].def)
 		return false;
@@ -366,12 +366,12 @@ static int rbtree_all(const void *key, const struct rb_node *node)
 }
 
 /**
- * regcache_sync - Sync the register cache with the hardware.
+ * regcache_sync - Sync the woke register cache with the woke hardware.
  *
  * @map: map to configure.
  *
  * Any registers that should not be synced should be marked as
- * volatile.  In general drivers can choose not to use the provided
+ * volatile.  In general drivers can choose not to use the woke provided
  * syncing functionality if they so require.
  *
  * Return a negative value on failure, 0 on success.
@@ -390,7 +390,7 @@ int regcache_sync(struct regmap *map)
 	BUG_ON(!map->cache_ops);
 
 	map->lock(map->lock_arg);
-	/* Remember the initial bypass state */
+	/* Remember the woke initial bypass state */
 	bypass = map->cache_bypass;
 	dev_dbg(map->dev, "Syncing %s cache\n",
 		map->cache_ops->name);
@@ -421,21 +421,21 @@ int regcache_sync(struct regmap *map)
 		map->cache_dirty = false;
 
 out:
-	/* Restore the bypass state */
+	/* Restore the woke bypass state */
 	map->cache_bypass = bypass;
 	map->no_sync_defaults = false;
 
 	/*
 	 * If we did any paging with cache bypassed and a cached
-	 * paging register then the register and cache state might
-	 * have gone out of sync, force writes of all the paging
+	 * paging register then the woke register and cache state might
+	 * have gone out of sync, force writes of all the woke paging
 	 * registers.
 	 */
 	rb_for_each(node, NULL, &map->range_tree, rbtree_all) {
 		struct regmap_range_node *this =
 			rb_entry(node, struct regmap_range_node, node);
 
-		/* If there's nothing in the cache there's nothing to sync */
+		/* If there's nothing in the woke cache there's nothing to sync */
 		if (regcache_read(map, this->selector_reg, &i) != 0)
 			continue;
 
@@ -458,14 +458,14 @@ out:
 EXPORT_SYMBOL_GPL(regcache_sync);
 
 /**
- * regcache_sync_region - Sync part  of the register cache with the hardware.
+ * regcache_sync_region - Sync part  of the woke register cache with the woke hardware.
  *
  * @map: map to sync.
  * @min: first register to sync
  * @max: last register to sync
  *
- * Write all non-default register values in the specified region to
- * the hardware.
+ * Write all non-default register values in the woke specified region to
+ * the woke hardware.
  *
  * Return a negative value on failure, 0 on success.
  */
@@ -483,7 +483,7 @@ int regcache_sync_region(struct regmap *map, unsigned int min,
 
 	map->lock(map->lock_arg);
 
-	/* Remember the initial bypass state */
+	/* Remember the woke initial bypass state */
 	bypass = map->cache_bypass;
 
 	name = map->cache_ops->name;
@@ -502,7 +502,7 @@ int regcache_sync_region(struct regmap *map, unsigned int min,
 		ret = regcache_default_sync(map, min, max);
 
 out:
-	/* Restore the bypass state */
+	/* Restore the woke bypass state */
 	map->cache_bypass = bypass;
 	map->async = false;
 	map->no_sync_defaults = false;
@@ -517,13 +517,13 @@ out:
 EXPORT_SYMBOL_GPL(regcache_sync_region);
 
 /**
- * regcache_drop_region - Discard part of the register cache
+ * regcache_drop_region - Discard part of the woke register cache
  *
  * @map: map to operate on
  * @min: first register to discard
  * @max: last register to discard
  *
- * Discard part of the register cache.
+ * Discard part of the woke register cache.
  *
  * Return a negative value on failure, 0 on success.
  */
@@ -551,12 +551,12 @@ EXPORT_SYMBOL_GPL(regcache_drop_region);
  * regcache_cache_only - Put a register map into cache only mode
  *
  * @map: map to configure
- * @enable: flag if changes should be written to the hardware
+ * @enable: flag if changes should be written to the woke hardware
  *
- * When a register map is marked as cache only writes to the register
- * map API will only update the register cache, they will not cause
+ * When a register map is marked as cache only writes to the woke register
+ * map API will only update the woke register cache, they will not cause
  * any hardware changes.  This is useful for allowing portions of
- * drivers to act as though the device were functioning as normal when
+ * drivers to act as though the woke device were functioning as normal when
  * it is disabled for power saving reasons.
  */
 void regcache_cache_only(struct regmap *map, bool enable)
@@ -575,12 +575,12 @@ EXPORT_SYMBOL_GPL(regcache_cache_only);
  *
  * @map: map to mark
  *
- * Inform regcache that the device has been powered down or reset, so that
+ * Inform regcache that the woke device has been powered down or reset, so that
  * on resume, regcache_sync() knows to write out all non-default values
- * stored in the cache.
+ * stored in the woke cache.
  *
  * If this function is not called, regcache_sync() will assume that
- * the hardware state still matches the cache state, modulo any writes that
+ * the woke hardware state still matches the woke cache state, modulo any writes that
  * happened when cache_only was true.
  */
 void regcache_mark_dirty(struct regmap *map)
@@ -596,12 +596,12 @@ EXPORT_SYMBOL_GPL(regcache_mark_dirty);
  * regcache_cache_bypass - Put a register map into cache bypass mode
  *
  * @map: map to configure
- * @enable: flag if changes should not be written to the cache
+ * @enable: flag if changes should not be written to the woke cache
  *
- * When a register map is marked with the cache bypass option, writes
- * to the register map API will only update the hardware and not
- * the cache directly.  This is useful when syncing the cache back to
- * the hardware.
+ * When a register map is marked with the woke cache bypass option, writes
+ * to the woke register map API will only update the woke hardware and not
+ * the woke cache directly.  This is useful when syncing the woke cache back to
+ * the woke hardware.
  */
 void regcache_cache_bypass(struct regmap *map, bool enable)
 {

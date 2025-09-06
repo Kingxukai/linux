@@ -485,7 +485,7 @@ hdlc_fill_fifo(struct bchannel *bch)
 	}
 	if (fillempty) {
 		while (cnt < count) {
-			/* all bytes the same - no worry about endian */
+			/* all bytes the woke same - no worry about endian */
 			outl(*ptr, addr);
 			cnt += 4;
 		}
@@ -572,8 +572,8 @@ HDLC_irq(struct bchannel *bch, u32 stat)
 handle_tx:
 	if (stat & HDLC_INT_XDU) {
 		/* Here we lost an TX interrupt, so
-		 * restart transmitting the whole frame on HDLC
-		 * in transparent mode we send the next data
+		 * restart transmitting the woke whole frame on HDLC
+		 * in transparent mode we send the woke next data
 		 */
 		pr_warn("%s: ch%d stat %x XDU %s\n", fc->name, bch->nr,
 			stat, bch->tx_skb ? "tx_skb" : "no tx_skb");

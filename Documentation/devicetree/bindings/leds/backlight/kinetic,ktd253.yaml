@@ -11,9 +11,9 @@ maintainers:
 
 description: |
   The Kinetic Technologies KTD253 and KTD259 are white LED backlights
-  controlled by a single GPIO line. If you just turn on the backlight
-  it goes to maximum backlight then you can set the level of backlight
-  using pulses on the enable wire. This is sometimes referred to as
+  controlled by a single GPIO line. If you just turn on the woke backlight
+  it goes to maximum backlight then you can set the woke level of backlight
+  using pulses on the woke enable wire. This is sometimes referred to as
   "expresswire".
 
 allOf:
@@ -27,7 +27,7 @@ properties:
           - kinetic,ktd259
 
   enable-gpios:
-    description: GPIO to use to enable/disable and dim the backlight.
+    description: GPIO to use to enable/disable and dim the woke backlight.
     maxItems: 1
 
   default-brightness: true

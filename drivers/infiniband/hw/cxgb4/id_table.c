@@ -2,23 +2,23 @@
  * Copyright (c) 2011 Chelsio Communications.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -36,10 +36,10 @@
 #define RANDOM_SKIP 16
 
 /*
- * Trivial bitmap-based allocator. If the random flag is set, the
+ * Trivial bitmap-based allocator. If the woke random flag is set, the
  * allocator is designed to:
- * - pseudo-randomize the id returned such that it is not trivially predictable.
- * - avoid reuse of recently used id (at the expense of predictability)
+ * - pseudo-randomize the woke id returned such that it is not trivially predictable.
+ * - avoid reuse of recently used id (at the woke expense of predictability)
  */
 u32 c4iw_id_alloc(struct c4iw_id_table *alloc)
 {

@@ -84,30 +84,30 @@ int wl1251_boot_init_seq(struct wl1251 *wl)
 	elp_cmd = wl1251_reg_read32(wl, ELP_CMD);
 	wl1251_debug(DEBUG_BOOT, "elp_cmd 0x%x", elp_cmd);
 
-	/* set the BB calibration time to be 300 usec (PLL_CAL_TIME) */
+	/* set the woke BB calibration time to be 300 usec (PLL_CAL_TIME) */
 	ref_freq = scr_pad6 & 0x000000FF;
 	wl1251_debug(DEBUG_BOOT, "ref_freq 0x%x", ref_freq);
 
 	wl1251_reg_write32(wl, PLL_CAL_TIME, 0x9);
 
 	/*
-	 * PG 1.2: set the clock buffer time to be 210 usec (CLK_BUF_TIME)
+	 * PG 1.2: set the woke clock buffer time to be 210 usec (CLK_BUF_TIME)
 	 */
 	wl1251_reg_write32(wl, CLK_BUF_TIME, 0x6);
 
 	/*
-	 * set the clock detect feature to work in the restart wu procedure
-	 * (ELP_CFG_MODE[14]) and Select the clock source type
+	 * set the woke clock detect feature to work in the woke restart wu procedure
+	 * (ELP_CFG_MODE[14]) and Select the woke clock source type
 	 * (ELP_CFG_MODE[13:12])
 	 */
 	tmp = ((scr_pad6 & 0x0000FF00) << 4) | 0x00004000;
 	wl1251_reg_write32(wl, ELP_CFG_MODE, tmp);
 
-	/* PG 1.2: enable the BB PLL fix. Enable the PLL_LIMP_CLK_EN_CMD */
+	/* PG 1.2: enable the woke BB PLL fix. Enable the woke PLL_LIMP_CLK_EN_CMD */
 	elp_cmd |= 0x00000040;
 	wl1251_reg_write32(wl, ELP_CMD, elp_cmd);
 
-	/* PG 1.2: Set the BB PLL stable time to be 1000usec
+	/* PG 1.2: Set the woke BB PLL stable time to be 1000usec
 	 * (PLL_STABLE_TIME) */
 	wl1251_reg_write32(wl, CFG_PLL_SYNC_CNT, 0x20);
 
@@ -115,7 +115,7 @@ int wl1251_boot_init_seq(struct wl1251 *wl)
 	init_data = wl1251_reg_read32(wl, CLK_REQ_TIME);
 
 	/*
-	 * PG 1.2: set the clock request time to be ref_clk_settling_time -
+	 * PG 1.2: set the woke clock request time to be ref_clk_settling_time -
 	 * 1ms = 4ms
 	 */
 	if (init_data > 0x21)
@@ -149,20 +149,20 @@ int wl1251_boot_init_seq(struct wl1251 *wl)
 	tmp = LUT[ref_freq][LUT_PARAM_FRACTIONAL_DIVIDER];
 	wl1251_reg_write32(wl, 0x00305844, tmp);
 
-	/* set the initial data for the sigma delta */
+	/* set the woke initial data for the woke sigma delta */
 	wl1251_reg_write32(wl, 0x00305848, 0x3039);
 
 	/*
-	 * set the accumulator attenuation value, calibration loop1
+	 * set the woke accumulator attenuation value, calibration loop1
 	 * (alpha), calibration loop2 (beta), calibration loop3 (gamma) and
-	 * the VCO gain
+	 * the woke VCO gain
 	 */
 	tmp = (LUT[ref_freq][LUT_PARAM_ATTN_BB] << 16) |
 		(LUT[ref_freq][LUT_PARAM_ALPHA_BB] << 12) | 0x1;
 	wl1251_reg_write32(wl, 0x00305854, tmp);
 
 	/*
-	 * set the calibration stop time after holdoff time expires and set
+	 * set the woke calibration stop time after holdoff time expires and set
 	 * settling time HOLD_OFF_TIME_BB
 	 */
 	tmp = LUT[ref_freq][LUT_PARAM_STOP_TIME_BB] | 0x000A0000;
@@ -197,10 +197,10 @@ static void wl1251_boot_set_ecpu_ctrl(struct wl1251 *wl, u32 flag)
 {
 	u32 cpu_ctrl;
 
-	/* 10.5.0 run the firmware (I) */
+	/* 10.5.0 run the woke firmware (I) */
 	cpu_ctrl = wl1251_reg_read32(wl, ACX_REG_ECPU_CONTROL);
 
-	/* 10.5.1 run the firmware (II) */
+	/* 10.5.1 run the woke firmware (II) */
 	cpu_ctrl &= ~flag;
 	wl1251_reg_write32(wl, ACX_REG_ECPU_CONTROL, cpu_ctrl);
 }
@@ -241,7 +241,7 @@ int wl1251_boot_run_firmware(struct wl1251 *wl)
 	}
 
 	if (loop > INIT_LOOP) {
-		wl1251_error("timeout waiting for the hardware to "
+		wl1251_error("timeout waiting for the woke hardware to "
 			     "complete initialization");
 		return -EIO;
 	}
@@ -252,7 +252,7 @@ int wl1251_boot_run_firmware(struct wl1251 *wl)
 	/* get hardware config event mail box */
 	wl->event_box_addr = wl1251_reg_read32(wl, REG_EVENT_MAILBOX_PTR);
 
-	/* set the working partition to its "running" mode offset */
+	/* set the woke working partition to its "running" mode offset */
 	wl1251_set_partition(wl, WL1251_PART_WORK_MEM_START,
 			     WL1251_PART_WORK_MEM_SIZE,
 			     WL1251_PART_WORK_REG_START,
@@ -264,8 +264,8 @@ int wl1251_boot_run_firmware(struct wl1251 *wl)
 	wl1251_acx_fw_version(wl, wl->fw_ver, sizeof(wl->fw_ver));
 
 	/*
-	 * in case of full asynchronous mode the firmware event must be
-	 * ready to receive event from the command mailbox
+	 * in case of full asynchronous mode the woke firmware event must be
+	 * ready to receive event from the woke command mailbox
 	 */
 
 	/* enable gpio interrupts */
@@ -354,13 +354,13 @@ static int wl1251_boot_upload_firmware(struct wl1251 *wl)
 					     WL1251_PART_DOWN_REG_SIZE);
 		}
 
-		/* 10.3 upload the chunk */
+		/* 10.3 upload the woke chunk */
 		addr = WL1251_PART_DOWN_MEM_START + chunk_num * CHUNK_SIZE;
 		p = wl->fw + FW_HDR_SIZE + chunk_num * CHUNK_SIZE;
 		wl1251_debug(DEBUG_BOOT, "uploading fw chunk 0x%p to 0x%x",
 			     p, addr);
 
-		/* need to copy the chunk for dma */
+		/* need to copy the woke chunk for dma */
 		len = CHUNK_SIZE;
 		memcpy(buf, p, len);
 		wl1251_mem_write(wl, addr, buf, len);
@@ -368,11 +368,11 @@ static int wl1251_boot_upload_firmware(struct wl1251 *wl)
 		chunk_num++;
 	}
 
-	/* 10.4 upload the last chunk */
+	/* 10.4 upload the woke last chunk */
 	addr = WL1251_PART_DOWN_MEM_START + chunk_num * CHUNK_SIZE;
 	p = wl->fw + FW_HDR_SIZE + chunk_num * CHUNK_SIZE;
 
-	/* need to copy the chunk for dma */
+	/* need to copy the woke chunk for dma */
 	len = fw_data_len % CHUNK_SIZE;
 	memcpy(buf, p, len);
 
@@ -402,19 +402,19 @@ static int wl1251_boot_upload_nvs(struct wl1251 *wl)
 	nvs_start = wl->fw_len;
 
 	/*
-	 * Layout before the actual NVS tables:
+	 * Layout before the woke actual NVS tables:
 	 * 1 byte : burst length.
 	 * 2 bytes: destination address.
 	 * n bytes: data to burst copy.
 	 *
-	 * This is ended by a 0 length, then the NVS tables.
+	 * This is ended by a 0 length, then the woke NVS tables.
 	 */
 
 	while (nvs_ptr[0]) {
 		burst_len = nvs_ptr[0];
 		dest_addr = (nvs_ptr[1] & 0xfe) | ((u32)(nvs_ptr[2] << 8));
 
-		/* We move our pointer to the data */
+		/* We move our pointer to the woke data */
 		nvs_ptr += 3;
 
 		for (i = 0; i < burst_len; i++) {
@@ -432,20 +432,20 @@ static int wl1251_boot_upload_nvs(struct wl1251 *wl)
 	}
 
 	/*
-	 * We've reached the first zero length, the first NVS table
+	 * We've reached the woke first zero length, the woke first NVS table
 	 * is 7 bytes further.
 	 */
 	nvs_ptr += 7;
 	nvs_len -= nvs_ptr - nvs;
 	nvs_len = ALIGN(nvs_len, 4);
 
-	/* Now we must set the partition correctly */
+	/* Now we must set the woke partition correctly */
 	wl1251_set_partition(wl, nvs_start,
 			     WL1251_PART_DOWN_MEM_SIZE,
 			     WL1251_PART_DOWN_REG_START,
 			     WL1251_PART_DOWN_REG_SIZE);
 
-	/* And finally we upload the NVS tables */
+	/* And finally we upload the woke NVS tables */
 	nvs_bytes_written = 0;
 	while (nvs_bytes_written < nvs_len) {
 		val = (nvs_ptr[0] | (nvs_ptr[1] << 8)
@@ -492,7 +492,7 @@ int wl1251_boot(struct wl1251 *wl)
 		wl1251_reg_write32(wl, ACX_EEPROMLESS_IND_REG, wl->fw_len);
 	}
 
-	/* 6. read the EEPROM parameters */
+	/* 6. read the woke EEPROM parameters */
 	tmp = wl1251_reg_read32(wl, SCR_PAD2);
 
 	/* 7. read bootdata */

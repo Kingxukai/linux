@@ -5081,7 +5081,7 @@ int rtw89_chip_h2c_ba_cam(struct rtw89_dev *rtwdev, struct rtw89_sta *rtwsta,
 	return 0;
 }
 
-/* Must consider compatibility; don't insert new in the mid.
+/* Must consider compatibility; don't insert new in the woke mid.
  * Fill each field's default value in rtw89_regd_entcpy().
  */
 struct rtw89_fw_regd_entry {
@@ -5093,7 +5093,7 @@ struct rtw89_fw_regd_entry {
 	__le32 fmap;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_txpwr_byrate_entry {
 	u8 band;
 	u8 nss;
@@ -5105,7 +5105,7 @@ struct rtw89_fw_txpwr_byrate_entry {
 	u8 ofdma;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_txpwr_lmt_2ghz_entry {
 	u8 bw;
 	u8 nt;
@@ -5116,7 +5116,7 @@ struct rtw89_fw_txpwr_lmt_2ghz_entry {
 	s8 v;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_txpwr_lmt_5ghz_entry {
 	u8 bw;
 	u8 nt;
@@ -5127,7 +5127,7 @@ struct rtw89_fw_txpwr_lmt_5ghz_entry {
 	s8 v;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_txpwr_lmt_6ghz_entry {
 	u8 bw;
 	u8 nt;
@@ -5139,7 +5139,7 @@ struct rtw89_fw_txpwr_lmt_6ghz_entry {
 	s8 v;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_txpwr_lmt_ru_2ghz_entry {
 	u8 ru;
 	u8 nt;
@@ -5148,7 +5148,7 @@ struct rtw89_fw_txpwr_lmt_ru_2ghz_entry {
 	s8 v;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_txpwr_lmt_ru_5ghz_entry {
 	u8 ru;
 	u8 nt;
@@ -5157,7 +5157,7 @@ struct rtw89_fw_txpwr_lmt_ru_5ghz_entry {
 	s8 v;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_txpwr_lmt_ru_6ghz_entry {
 	u8 ru;
 	u8 nt;
@@ -5167,7 +5167,7 @@ struct rtw89_fw_txpwr_lmt_ru_6ghz_entry {
 	s8 v;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_tx_shape_lmt_entry {
 	u8 band;
 	u8 tx_shape_rs;
@@ -5175,7 +5175,7 @@ struct rtw89_fw_tx_shape_lmt_entry {
 	u8 v;
 } __packed;
 
-/* must consider compatibility; don't insert new in the mid */
+/* must consider compatibility; don't insert new in the woke mid */
 struct rtw89_fw_tx_shape_lmt_ru_entry {
 	u8 band;
 	u8 regd;

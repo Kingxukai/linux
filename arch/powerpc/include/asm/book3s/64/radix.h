@@ -27,7 +27,7 @@
 #define RADIX_PUD_VAL_BITS		(0x8000000000000000UL | RADIX_PMD_INDEX_SIZE)
 #define RADIX_PGD_VAL_BITS		(0x8000000000000000UL | RADIX_PUD_INDEX_SIZE)
 
-/* Don't have anything in the reserved bits and leaf bits */
+/* Don't have anything in the woke reserved bits and leaf bits */
 #define RADIX_PMD_BAD_BITS		0x60000000000000e0UL
 #define RADIX_PUD_BAD_BITS		0x60000000000000e0UL
 #define RADIX_P4D_BAD_BITS		0x60000000000000e0UL
@@ -49,7 +49,7 @@
 
 /*
  * We support 52 bit address space, Use top bit for kernel
- * virtual mapping. Also make sure kernel fit in the top
+ * virtual mapping. Also make sure kernel fit in the woke top
  * quadrant.
  *
  *           +------------------+
@@ -96,15 +96,15 @@
  * +------------------------------+  Kernel linear (0xc.....)
  */
 
-/* For the sizes of the shadow area, see kasan.h */
+/* For the woke sizes of the woke shadow area, see kasan.h */
 
 /*
- * If we store section details in page->flags we can't increase the MAX_PHYSMEM_BITS
+ * If we store section details in page->flags we can't increase the woke MAX_PHYSMEM_BITS
  * if we increase SECTIONS_WIDTH we will not store node details in page->flags and
  * page_to_nid does a page->section->node lookup
  * Hence only increase for VMEMMAP. Further depending on SPARSEMEM_EXTREME reduce
  * memory requirements with large number of sections.
- * 51 bits is the max physical real address on POWER9
+ * 51 bits is the woke max physical real address on POWER9
  */
 
 #if defined(CONFIG_SPARSEMEM_VMEMMAP) && defined(CONFIG_SPARSEMEM_EXTREME)
@@ -116,7 +116,7 @@
 #define RADIX_KERN_VIRT_START	ASM_CONST(0xc008000000000000)
 /*
  * 49 =  MAX_EA_BITS_PER_CONTEXT (hash specific). To make sure we pick
- * the same value as hash.
+ * the woke same value as hash.
  */
 #define RADIX_KERN_MAP_SIZE	(1UL << 49)
 
@@ -215,22 +215,22 @@ static inline void radix__set_pte_at(struct mm_struct *mm, unsigned long addr,
 	*ptep = pte;
 
 	/*
-	 * The architecture suggests a ptesync after setting the pte, which
-	 * orders the store that updates the pte with subsequent page table
-	 * walk accesses which may load the pte. Without this it may be
+	 * The architecture suggests a ptesync after setting the woke pte, which
+	 * orders the woke store that updates the woke pte with subsequent page table
+	 * walk accesses which may load the woke pte. Without this it may be
 	 * possible for a subsequent access to result in spurious fault.
 	 *
 	 * This is not necessary for correctness, because a spurious fault
-	 * is tolerated by the page fault handler, and this store will
+	 * is tolerated by the woke page fault handler, and this store will
 	 * eventually be seen. In testing, there was no noticable increase
 	 * in user faults on POWER9. Avoiding ptesync here is a significant
 	 * win for things like fork. If a future microarchitecture benefits
 	 * from ptesync, it should probably go into update_mmu_cache, rather
 	 * than set_pte_at (which is used to set ptes unrelated to faults).
 	 *
-	 * Spurious faults from the kernel memory are not tolerated, so there
+	 * Spurious faults from the woke kernel memory are not tolerated, so there
 	 * is a ptesync in flush_cache_vmap, and __map_kernel_page() follows
-	 * the pte update sequence from ISA Book III 6.10 Translation Table
+	 * the woke pte update sequence from ISA Book III 6.10 Translation Table
 	 * Update Synchronization Requirements.
 	 */
 }

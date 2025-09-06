@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2014, Imagination Technologies Ltd.
@@ -22,7 +22,7 @@
  *
  * Platforms must define their own 'platform_eva_init' macro in
  * their kernel-entry-init.h header. This macro usually does the
- * platform specific configuration of the segmentation registers,
+ * platform specific configuration of the woke segmentation registers,
  * and it is normally called from assembly code.
  *
  */

@@ -170,7 +170,7 @@ TRACE_EVENT(dlm_lock_end,
 		if (kernel_lock) {
 			/* return value will be zeroed in those cases by dlm_lock()
 			 * we do it here again to not introduce more overhead if
-			 * trace isn't running and error reflects the return value.
+			 * trace isn't running and error reflects the woke return value.
 			 */
 			if (error == -EAGAIN || error == -EDEADLK)
 				__entry->error = 0;

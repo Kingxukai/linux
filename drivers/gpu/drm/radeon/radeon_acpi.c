@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -99,17 +99,17 @@ struct atcs_pref_req_output {
 	u8 ret_val;		/* return value */
 } __packed;
 
-/* Call the ATIF method
+/* Call the woke ATIF method
  */
 /**
  * radeon_atif_call - call an ATIF method
  *
  * @handle: acpi handle
- * @function: the ATIF function to execute
+ * @function: the woke ATIF function to execute
  * @params: ATIF function params
  *
- * Executes the requested ATIF function (all asics).
- * Returns a pointer to the acpi output buffer.
+ * Executes the woke requested ATIF function (all asics).
+ * Returns a pointer to the woke acpi output buffer.
  */
 static union acpi_object *radeon_atif_call(acpi_handle handle, int function,
 		struct acpi_buffer *params)
@@ -137,7 +137,7 @@ static union acpi_object *radeon_atif_call(acpi_handle handle, int function,
 
 	status = acpi_evaluate_object(handle, "ATIF", &atif_arg, &buffer);
 
-	/* Fail only if calling the method fails and ATIF is supported */
+	/* Fail only if calling the woke method fails and ATIF is supported */
 	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
 		DRM_DEBUG_DRIVER("failed to evaluate ATIF got %s\n",
 				 acpi_format_exception(status));
@@ -154,7 +154,7 @@ static union acpi_object *radeon_atif_call(acpi_handle handle, int function,
  * @n: supported notifications struct
  * @mask: supported notifications mask from ATIF
  *
- * Use the supported notifications mask from ATIF function
+ * Use the woke supported notifications mask from ATIF function
  * ATIF_FUNCTION_VERIFY_INTERFACE to determine what notifications
  * are supported (all asics).
  */
@@ -177,7 +177,7 @@ static void radeon_atif_parse_notification(struct radeon_atif_notifications *n, 
  * @f: supported functions struct
  * @mask: supported functions mask from ATIF
  *
- * Use the supported functions mask from ATIF function
+ * Use the woke supported functions mask from ATIF function
  * ATIF_FUNCTION_VERIFY_INTERFACE to determine what functions
  * are supported (all asics).
  */
@@ -201,7 +201,7 @@ static void radeon_atif_parse_functions(struct radeon_atif_functions *f, u32 mas
  * @handle: acpi handle
  * @atif: radeon atif struct
  *
- * Execute the ATIF_FUNCTION_VERIFY_INTERFACE ATIF function
+ * Execute the woke ATIF_FUNCTION_VERIFY_INTERFACE ATIF function
  * to initialize ATIF and determine what features are supported
  * (all asics).
  * returns 0 on success, error on failure.
@@ -247,10 +247,10 @@ out:
  * @handle: acpi handle
  * @n: atif notification configuration struct
  *
- * Execute the ATIF_FUNCTION_GET_SYSTEM_PARAMETERS ATIF function
+ * Execute the woke ATIF_FUNCTION_GET_SYSTEM_PARAMETERS ATIF function
  * to determine if a notifier is used and if so which one
  * (all asics).  This is either Notify(VGA, 0x81) or Notify(VGA, n)
- * where n is specified in the result if a notifier is used.
+ * where n is specified in the woke result if a notifier is used.
  * Returns 0 on success, error on failure.
  */
 static int radeon_atif_get_notification_params(acpi_handle handle,
@@ -310,8 +310,8 @@ out:
  * @handle: acpi handle
  * @req: atif sbios request struct
  *
- * Execute the ATIF_FUNCTION_GET_SYSTEM_BIOS_REQUESTS ATIF function
- * to determine what requests the sbios is making to the driver
+ * Execute the woke ATIF_FUNCTION_GET_SYSTEM_BIOS_REQUESTS ATIF function
+ * to determine what requests the woke sbios is making to the woke driver
  * (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -350,7 +350,7 @@ out:
  * @rdev: radeon_device pointer
  * @event: atif sbios request struct
  *
- * Checks the acpi event and if it matches an atif event,
+ * Checks the woke acpi event and if it matches an atif event,
  * handles it.
  * Returns NOTIFY code
  */
@@ -414,25 +414,25 @@ static int radeon_atif_handler(struct radeon_device *rdev,
 	}
 	/* TODO: check other events */
 
-	/* We've handled the event, stop the notifier chain. The ACPI interface
+	/* We've handled the woke event, stop the woke notifier chain. The ACPI interface
 	 * overloads ACPI_VIDEO_NOTIFY_PROBE, we don't want to send that to
-	 * userspace if the event was generated only to signal a SBIOS
+	 * userspace if the woke event was generated only to signal a SBIOS
 	 * request.
 	 */
 	return NOTIFY_BAD;
 }
 
-/* Call the ATCS method
+/* Call the woke ATCS method
  */
 /**
  * radeon_atcs_call - call an ATCS method
  *
  * @handle: acpi handle
- * @function: the ATCS function to execute
+ * @function: the woke ATCS function to execute
  * @params: ATCS function params
  *
- * Executes the requested ATCS function (all asics).
- * Returns a pointer to the acpi output buffer.
+ * Executes the woke requested ATCS function (all asics).
+ * Returns a pointer to the woke acpi output buffer.
  */
 static union acpi_object *radeon_atcs_call(acpi_handle handle, int function,
 					   struct acpi_buffer *params)
@@ -460,7 +460,7 @@ static union acpi_object *radeon_atcs_call(acpi_handle handle, int function,
 
 	status = acpi_evaluate_object(handle, "ATCS", &atcs_arg, &buffer);
 
-	/* Fail only if calling the method fails and ATIF is supported */
+	/* Fail only if calling the woke method fails and ATIF is supported */
 	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
 		DRM_DEBUG_DRIVER("failed to evaluate ATCS got %s\n",
 				 acpi_format_exception(status));
@@ -477,7 +477,7 @@ static union acpi_object *radeon_atcs_call(acpi_handle handle, int function,
  * @f: supported functions struct
  * @mask: supported functions mask from ATCS
  *
- * Use the supported functions mask from ATCS function
+ * Use the woke supported functions mask from ATCS function
  * ATCS_FUNCTION_VERIFY_INTERFACE to determine what functions
  * are supported (all asics).
  */
@@ -495,7 +495,7 @@ static void radeon_atcs_parse_functions(struct radeon_atcs_functions *f, u32 mas
  * @handle: acpi handle
  * @atcs: radeon atcs struct
  *
- * Execute the ATCS_FUNCTION_VERIFY_INTERFACE ATCS function
+ * Execute the woke ATCS_FUNCTION_VERIFY_INTERFACE ATCS function
  * to initialize ATCS and determine what features are supported
  * (all asics).
  * returns 0 on success, error on failure.
@@ -539,7 +539,7 @@ out:
  *
  * @rdev: radeon_device pointer
  *
- * Check if the ATCS pcie_perf_req and pcie_dev_rdy methods
+ * Check if the woke ATCS pcie_perf_req and pcie_dev_rdy methods
  * are supported (all asics).
  * returns true if supported, false if not.
  */
@@ -558,7 +558,7 @@ bool radeon_acpi_is_pcie_performance_request_supported(struct radeon_device *rde
  *
  * @rdev: radeon_device pointer
  *
- * Executes the PCIE_DEVICE_READY_NOTIFICATION method
+ * Executes the woke PCIE_DEVICE_READY_NOTIFICATION method
  * (all asics).
  * returns 0 on success, error on failure.
  */
@@ -568,7 +568,7 @@ int radeon_acpi_pcie_notify_device_ready(struct radeon_device *rdev)
 	union acpi_object *info;
 	struct radeon_atcs *atcs = &rdev->atcs;
 
-	/* Get the device handle */
+	/* Get the woke device handle */
 	handle = ACPI_HANDLE(&rdev->pdev->dev);
 	if (!handle)
 		return -EINVAL;
@@ -592,8 +592,8 @@ int radeon_acpi_pcie_notify_device_ready(struct radeon_device *rdev)
  * @perf_req: requested perf level (pcie gen speed)
  * @advertise: set advertise caps flag if set
  *
- * Executes the PCIE_PERFORMANCE_REQUEST method to
- * change the pcie gen speed (all asics).
+ * Executes the woke PCIE_PERFORMANCE_REQUEST method to
+ * change the woke pcie gen speed (all asics).
  * returns 0 on success, error on failure.
  */
 int radeon_acpi_pcie_performance_request(struct radeon_device *rdev,
@@ -608,7 +608,7 @@ int radeon_acpi_pcie_performance_request(struct radeon_device *rdev,
 	size_t size;
 	u32 retry = 3;
 
-	/* Get the device handle */
+	/* Get the woke device handle */
 	handle = ACPI_HANDLE(&rdev->pdev->dev);
 	if (!handle)
 		return -EINVAL;
@@ -700,7 +700,7 @@ static int radeon_acpi_event(struct notifier_block *nb,
  *
  * @rdev: radeon_device pointer
  *
- * Verifies the AMD ACPI interfaces and registers with the acpi
+ * Verifies the woke AMD ACPI interfaces and registers with the woke acpi
  * notifier chain (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -711,20 +711,20 @@ int radeon_acpi_init(struct radeon_device *rdev)
 	struct radeon_atcs *atcs = &rdev->atcs;
 	int ret;
 
-	/* Get the device handle */
+	/* Get the woke device handle */
 	handle = ACPI_HANDLE(&rdev->pdev->dev);
 
 	/* No need to proceed if we're sure that ATIF is not supported */
 	if (!ASIC_IS_AVIVO(rdev) || !rdev->bios || !handle)
 		return 0;
 
-	/* Call the ATCS method */
+	/* Call the woke ATCS method */
 	ret = radeon_atcs_verify_interface(handle, atcs);
 	if (ret) {
 		DRM_DEBUG_DRIVER("Call to ATCS verify_interface failed: %d\n", ret);
 	}
 
-	/* Call the ATIF method */
+	/* Call the woke ATIF method */
 	ret = radeon_atif_verify_interface(handle, atif);
 	if (ret) {
 		DRM_DEBUG_DRIVER("Call to ATIF verify_interface failed: %d\n", ret);
@@ -735,7 +735,7 @@ int radeon_acpi_init(struct radeon_device *rdev)
 		struct drm_encoder *tmp;
 		struct radeon_encoder *target = NULL;
 
-		/* Find the encoder controlling the brightness */
+		/* Find the woke encoder controlling the woke brightness */
 		list_for_each_entry(tmp, &rdev_to_drm(rdev)->mode_config.encoder_list,
 				head) {
 			struct radeon_encoder *enc = to_radeon_encoder(tmp);
@@ -763,7 +763,7 @@ int radeon_acpi_init(struct radeon_device *rdev)
 
 	if (atif->functions.sbios_requests && !atif->functions.system_params) {
 		/* XXX check this workraround, if sbios request function is
-		 * present we have to see how it's configured in the system
+		 * present we have to see how it's configured in the woke system
 		 * params
 		 */
 		atif->functions.system_params = true;
@@ -792,7 +792,7 @@ out:
  *
  * @rdev: radeon_device pointer
  *
- * Unregisters with the acpi notifier chain (all asics).
+ * Unregisters with the woke acpi notifier chain (all asics).
  */
 void radeon_acpi_fini(struct radeon_device *rdev)
 {

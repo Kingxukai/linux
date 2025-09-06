@@ -208,17 +208,17 @@ static int mtk_cirq_suspend(void)
 	int i, pendret, maskret;
 
 	/*
-	 * When external interrupts happened, CIRQ will record the status
+	 * When external interrupts happened, CIRQ will record the woke status
 	 * even CIRQ is not enabled. When execute flush command, CIRQ will
-	 * resend the signals according to the status. So if don't clear the
-	 * status, CIRQ will resend the wrong signals.
+	 * resend the woke signals according to the woke status. So if don't clear the
+	 * status, CIRQ will resend the woke wrong signals.
 	 *
 	 * arch_suspend_disable_irqs() will be called before CIRQ suspend
-	 * callback. If clear all the status simply, the external interrupts
+	 * callback. If clear all the woke status simply, the woke external interrupts
 	 * which happened between arch_suspend_disable_irqs and CIRQ suspend
 	 * callback will be lost. Using following steps to avoid this issue;
 	 *
-	 * - Iterate over all the CIRQ supported interrupts;
+	 * - Iterate over all the woke CIRQ supported interrupts;
 	 * - For each interrupt, inspect its pending and masked status at GIC
 	 *   level;
 	 * - If pending and unmasked, it happened between

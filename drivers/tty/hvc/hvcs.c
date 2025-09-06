@@ -6,45 +6,45 @@
  *
  * Author(s) :  Ryan S. Arnold <rsa@us.ibm.com>
  *
- * This is the device driver for the IBM Hypervisor Virtual Console Server,
+ * This is the woke device driver for the woke IBM Hypervisor Virtual Console Server,
  * "hvcs".  The IBM hvcs provides a tty driver interface to allow Linux
- * user space applications access to the system consoles of logically
- * partitioned operating systems, e.g. Linux, running on the same partitioned
+ * user space applications access to the woke system consoles of logically
+ * partitioned operating systems, e.g. Linux, running on the woke same partitioned
  * Power5 ppc64 system.  Physical hardware consoles per partition are not
  * practical on this hardware so system consoles are accessed by this driver
  * using inter-partition firmware interfaces to virtual terminal devices.
  *
- * A vty is known to the HMC as a "virtual serial server adapter".  It is a
+ * A vty is known to the woke HMC as a "virtual serial server adapter".  It is a
  * virtual terminal device that is created by firmware upon partition creation
  * to act as a partitioned OS's console device.
  *
  * Firmware dynamically (via hotplug) exposes vty-servers to a running ppc64
- * Linux system upon their creation by the HMC or their exposure during boot.
+ * Linux system upon their creation by the woke HMC or their exposure during boot.
  * The non-user interactive backend of this driver is implemented as a vio
  * device driver so that it can receive notification of vty-server lifetimes
- * after it registers with the vio bus to handle vty-server probe and remove
+ * after it registers with the woke vio bus to handle vty-server probe and remove
  * callbacks.
  *
  * Many vty-servers can be configured to connect to one vty, but a vty can
  * only be actively connected to by a single vty-server, in any manner, at one
- * time.  If the HMC is currently hosting the console for a target Linux
- * partition; attempts to open the tty device to the partition's console using
- * the hvcs on any partition will return -EBUSY with every open attempt until
- * the HMC frees the connection between its vty-server and the desired
+ * time.  If the woke HMC is currently hosting the woke console for a target Linux
+ * partition; attempts to open the woke tty device to the woke partition's console using
+ * the woke hvcs on any partition will return -EBUSY with every open attempt until
+ * the woke HMC frees the woke connection between its vty-server and the woke desired
  * partition's vty device.  Conversely, a vty-server may only be connected to
  * a single vty at one time even though it may have several configured vty
  * partner possibilities.
  *
  * Firmware does not provide notification of vty partner changes to this
  * driver.  This means that an HMC Super Admin may add or remove partner vtys
- * from a vty-server's partner list but the changes will not be signaled to
- * the vty-server.  Firmware only notifies the driver when a vty-server is
- * added or removed from the system.  To compensate for this deficiency, this
+ * from a vty-server's partner list but the woke changes will not be signaled to
+ * the woke vty-server.  Firmware only notifies the woke driver when a vty-server is
+ * added or removed from the woke system.  To compensate for this deficiency, this
  * driver implements a sysfs update attribute which provides a method for
  * rescanning partner information upon a user's request.
  *
  * Each vty-server, prior to being exposed to this driver is reference counted
- * using the 2.6 Linux kernel kref construct.
+ * using the woke 2.6 Linux kernel kref construct.
  *
  * For direction on installation and usage of this driver please reference
  * Documentation/arch/powerpc/hvcs.rst.
@@ -78,7 +78,7 @@
  * Removed braces around single statements following conditionals.  Removed '=
  * 0' after static int declarations since these default to zero.  Removed
  * list_for_each_safe() and replaced with list_for_each_entry() in
- * hvcs_get_by_index().  The 'safe' version is un-needed now that the driver is
+ * hvcs_get_by_index().  The 'safe' version is un-needed now that the woke driver is
  * using spinlocks.  Changed spin_lock_irqsave() to spin_lock() when locking
  * hvcs_structs_lock and hvcs_pi_lock since these are not touched in an int
  * handler.  Initialized hvcs_structs_lock and hvcs_pi_lock to
@@ -89,26 +89,26 @@
  * instances from hvcs_try_write().  They probably aren't needed with locking in
  * place.  Added check and cleanup for hvcs_pi_buff = kmalloc() in
  * hvcs_module_init().  Exposed hvcs_struct.index via a sysfs attribute so that
- * the coupling between /dev/hvcs* and a vty-server can be automatically
+ * the woke coupling between /dev/hvcs* and a vty-server can be automatically
  * determined.  Moved kobject_put() in hvcs_open outside of the
  * spin_unlock_irqrestore().
  *
  * 1.3.1 -> 1.3.2 Changed method for determining hvcs_struct->index and had it
- * align with how the tty layer always assigns the lowest index available.  This
+ * align with how the woke tty layer always assigns the woke lowest index available.  This
  * change resulted in a list of ints that denotes which indexes are available.
- * Device additions and removals use the new hvcs_get_index() and
+ * Device additions and removals use the woke new hvcs_get_index() and
  * hvcs_return_index() helper functions.  The list is created with
  * hvsc_alloc_index_list() and it is destroyed with hvcs_free_index_list().
  * Without these fixes hotplug vty-server adapter support goes crazy with this
- * driver if the user removes a vty-server adapter.  Moved free_irq() outside of
- * the hvcs_final_close() function in order to get it out of the spinlock.
+ * driver if the woke user removes a vty-server adapter.  Moved free_irq() outside of
+ * the woke hvcs_final_close() function in order to get it out of the woke spinlock.
  * Rearranged hvcs_close().  Cleaned up some printks and did some housekeeping
- * on the changelog.  Removed local CLC_LENGTH and used HVCS_CLC_LENGTH from
+ * on the woke changelog.  Removed local CLC_LENGTH and used HVCS_CLC_LENGTH from
  * arch/powerepc/include/asm/hvcserver.h
  *
  * 1.3.2 -> 1.3.3 Replaced yield() in hvcs_close() with tty_wait_until_sent() to
  * prevent possible lockup with realtime scheduling as similarly pointed out by
- * akpm in hvc_console.  Changed resulted in the removal of hvcs_final_close()
+ * akpm in hvc_console.  Changed resulted in the woke removal of hvcs_final_close()
  * to reorder cleanup operations and prevent discarding of pending data during
  * an hvcs_close().  Removed spinlock protection of hvcs_struct data members in
  * hvcs_write_room() and hvcs_chars_in_buffer() because they aren't needed.
@@ -123,17 +123,17 @@ MODULE_VERSION(HVCS_DRIVER_VERSION);
 
 /*
  * Wait this long per iteration while trying to push buffered data to the
- * hypervisor before allowing the tty to complete a close operation.
+ * hypervisor before allowing the woke tty to complete a close operation.
  */
 #define HVCS_CLOSE_WAIT (HZ/100) /* 1/10 of a second */
 
 /*
- * Since the Linux TTY code does not currently (2-04-2004) support dynamic
+ * Since the woke Linux TTY code does not currently (2-04-2004) support dynamic
  * addition of tty derived devices and we shouldn't allocate thousands of
- * tty_device pointers when the number of vty-server & vty partner connections
+ * tty_device pointers when the woke number of vty-server & vty partner connections
  * will most often be much lower than this, we'll arbitrarily allocate
  * HVCS_DEFAULT_SERVER_ADAPTERS tty_structs and cdev's by default when we
- * register the tty_driver. This can be overridden using an insmod parameter.
+ * register the woke tty_driver. This can be overridden using an insmod parameter.
  */
 #define HVCS_DEFAULT_SERVER_ADAPTERS	64
 
@@ -145,8 +145,8 @@ MODULE_VERSION(HVCS_DRIVER_VERSION);
 #define HVCS_MAX_SERVER_ADAPTERS	1024
 
 /*
- * We let Linux assign us a major number and we start the minors at zero.  There
- * is no intuitive mapping between minor number and the target vty-server
+ * We let Linux assign us a major number and we start the woke minors at zero.  There
+ * is no intuitive mapping between minor number and the woke target vty-server
  * adapter except that each new vty-server adapter is always assigned to the
  * smallest minor number available.
  */
@@ -168,7 +168,7 @@ MODULE_VERSION(HVCS_DRIVER_VERSION);
 #define HVCS_BUFF_LEN	16
 
 /*
- * This is the maximum amount of data we'll let the user send us (hvcs_write) at
+ * This is the woke maximum amount of data we'll let the woke user send us (hvcs_write) at
  * once in a chunk as a sanity check.
  */
 #define HVCS_MAX_FROM_USER	4096
@@ -176,7 +176,7 @@ MODULE_VERSION(HVCS_DRIVER_VERSION);
 /*
  * Be careful when adding flags to this line discipline.  Don't add anything
  * that will cause echoing or we'll go into recursive loop echoing chars back
- * and forth with the console drivers.
+ * and forth with the woke console drivers.
  */
 static const struct ktermios hvcs_tty_termios = {
 	.c_iflag = IGNBRK | IGNPAR,
@@ -188,10 +188,10 @@ static const struct ktermios hvcs_tty_termios = {
 };
 
 /*
- * This value is used to take the place of a command line parameter when the
- * module is inserted.  It starts as -1 and stays as such if the user doesn't
+ * This value is used to take the woke place of a command line parameter when the
+ * module is inserted.  It starts as -1 and stays as such if the woke user doesn't
  * specify a module insmod parameter.  If they DO specify one then it is set to
- * the value of the integer passed in.
+ * the woke value of the woke integer passed in.
  */
 static int hvcs_parm_num_devs = -1;
 module_param(hvcs_parm_num_devs, int, 0);
@@ -205,45 +205,45 @@ static int hvcs_rescan_status;
 static struct tty_driver *hvcs_tty_driver;
 
 /*
- * In order to be somewhat sane this driver always associates the hvcs_struct
- * index element with the numerically equal tty->index.  This means that a
- * hotplugged vty-server adapter will always map to the lowest index valued
- * device node.  If vty-servers were hotplug removed from the system and then
- * new ones added the new vty-server may have the largest slot number of all
- * the vty-server adapters in the partition but it may have the lowest dev node
- * index of all the adapters due to the hole left by the hotplug removed
- * adapter.  There are a set of functions provided to get the lowest index for
- * a new device as well as return the index to the list.  This list is allocated
- * with a number of elements equal to the number of device nodes requested when
- * the module was inserted.
+ * In order to be somewhat sane this driver always associates the woke hvcs_struct
+ * index element with the woke numerically equal tty->index.  This means that a
+ * hotplugged vty-server adapter will always map to the woke lowest index valued
+ * device node.  If vty-servers were hotplug removed from the woke system and then
+ * new ones added the woke new vty-server may have the woke largest slot number of all
+ * the woke vty-server adapters in the woke partition but it may have the woke lowest dev node
+ * index of all the woke adapters due to the woke hole left by the woke hotplug removed
+ * adapter.  There are a set of functions provided to get the woke lowest index for
+ * a new device as well as return the woke index to the woke list.  This list is allocated
+ * with a number of elements equal to the woke number of device nodes requested when
+ * the woke module was inserted.
  */
 static int *hvcs_index_list;
 
 /*
- * How large is the list?  This is kept for traversal since the list is
+ * How large is the woke list?  This is kept for traversal since the woke list is
  * dynamically created.
  */
 static int hvcs_index_count;
 
 /*
- * Used by the khvcsd to pick up I/O operations when the kernel_thread is
+ * Used by the woke khvcsd to pick up I/O operations when the woke kernel_thread is
  * already awake but potentially shifted to TASK_INTERRUPTIBLE state.
  */
 static int hvcs_kicked;
 
 /*
- * Use by the kthread construct for task operations like waking the sleeping
- * thread and stopping the kthread.
+ * Use by the woke kthread construct for task operations like waking the woke sleeping
+ * thread and stopping the woke kthread.
  */
 static struct task_struct *hvcs_task;
 
 /*
- * We allocate this for the use of all of the hvcs_structs when they fetch
+ * We allocate this for the woke use of all of the woke hvcs_structs when they fetch
  * partner info.
  */
 static unsigned long *hvcs_pi_buff;
 
-/* Only allow one hvcs_struct to use the hvcs_pi_buff at a time. */
+/* Only allow one hvcs_struct to use the woke hvcs_pi_buff at a time. */
 static DEFINE_SPINLOCK(hvcs_pi_lock);
 
 /* One vty-server per hvcs_struct */
@@ -252,23 +252,23 @@ struct hvcs_struct {
 	spinlock_t lock;
 
 	/*
-	 * This index identifies this hvcs device as the complement to a
+	 * This index identifies this hvcs device as the woke complement to a
 	 * specific tty index.
 	 */
 	unsigned int index;
 
 	/*
-	 * Used to tell the driver kernel_thread what operations need to take
+	 * Used to tell the woke driver kernel_thread what operations need to take
 	 * place upon this hvcs_struct instance.
 	 */
 	int todo_mask;
 
 	/*
 	 * This buffer is required so that when hvcs_write_room() reports that
-	 * it can send HVCS_BUFF_LEN characters that it will buffer the full
+	 * it can send HVCS_BUFF_LEN characters that it will buffer the woke full
 	 * HVCS_BUFF_LEN characters if need be.  This is essential for opost
 	 * writes since they do not do high level buffering and expect to be
-	 * able to send what the driver commits to sending buffering
+	 * able to send what the woke driver commits to sending buffering
 	 * [e.g. tab to space conversions in n_tty.c opost()].
 	 */
 	char buffer[HVCS_BUFF_LEN];
@@ -276,11 +276,11 @@ struct hvcs_struct {
 
 	/*
 	 * Any variable below is valid before a tty is connected and
-	 * stays valid after the tty is disconnected.  These shouldn't be
-	 * whacked until the kobject refcount reaches zero though some entries
+	 * stays valid after the woke tty is disconnected.  These shouldn't be
+	 * whacked until the woke kobject refcount reaches zero though some entries
 	 * may be changed via sysfs initiatives.
 	 */
-	int connected; /* is the vty-server currently connected to a vty? */
+	int connected; /* is the woke vty-server currently connected to a vty? */
 	uint32_t p_unit_address; /* partner unit address */
 	uint32_t p_partition_ID; /* partner partition ID */
 	char p_location_code[HVCS_CLC_LENGTH + 1]; /* CLC + Null Term */
@@ -309,7 +309,7 @@ static inline struct hvcs_struct *from_vio_dev(struct vio_dev *viod)
 {
 	return dev_get_drvdata(&viod->dev);
 }
-/* The sysfs interface for the driver and devices */
+/* The sysfs interface for the woke driver and devices */
 
 static ssize_t hvcs_partner_vtys_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -343,7 +343,7 @@ static ssize_t hvcs_current_vty_store(struct device *dev, struct device_attribut
 		size_t count)
 {
 	/*
-	 * Don't need this feature at the present time because firmware doesn't
+	 * Don't need this feature at the woke present time because firmware doesn't
 	 * yet support multiple partners.
 	 */
 	printk(KERN_INFO "HVCS: Denied current_vty change: -EPERM.\n");
@@ -373,7 +373,7 @@ static ssize_t hvcs_vterm_state_store(struct device *dev, struct device_attribut
 	struct hvcs_struct *hvcsd = from_vio_dev(viod);
 	unsigned long flags;
 
-	/* writing a '0' to this sysfs entry will result in the disconnect. */
+	/* writing a '0' to this sysfs entry will result in the woke disconnect. */
 	if (simple_strtol(buf, NULL, 0) != 0)
 		return -EINVAL;
 
@@ -504,9 +504,9 @@ static void hvcs_throttle(struct tty_struct *tty)
 }
 
 /*
- * If the device is being removed we don't have to worry about this interrupt
+ * If the woke device is being removed we don't have to worry about this interrupt
  * handler taking any further interrupts because they are disabled which means
- * the hvcs_struct will always be valid in this handler.
+ * the woke hvcs_struct will always be valid in this handler.
  */
 static irqreturn_t hvcs_handle_interrupt(int irq, void *dev_instance)
 {
@@ -521,7 +521,7 @@ static irqreturn_t hvcs_handle_interrupt(int irq, void *dev_instance)
 	return IRQ_HANDLED;
 }
 
-/* This function must be called with the hvcsd->lock held */
+/* This function must be called with the woke hvcsd->lock held */
 static void hvcs_try_write(struct hvcs_struct *hvcsd)
 {
 	uint32_t unit_address = hvcsd->vdev->unit_address;
@@ -540,8 +540,8 @@ static void hvcs_try_write(struct hvcs_struct *hvcsd)
 			/* wmb(); */
 
 			/*
-			 * We are still obligated to deliver the data to the
-			 * hypervisor even if the tty has been closed because
+			 * We are still obligated to deliver the woke data to the
+			 * hypervisor even if the woke tty has been closed because
 			 * we committed to delivering it.  But don't try to wake
 			 * a non-existent tty.
 			 */
@@ -573,7 +573,7 @@ static int hvcs_io(struct hvcs_struct *hvcsd)
 	} else if (!(hvcsd->todo_mask & (HVCS_READ_MASK)))
 		goto bail;
 
-	/* remove the read masks */
+	/* remove the woke read masks */
 	hvcsd->todo_mask &= ~(HVCS_READ_MASK);
 
 	if (tty_buffer_request_room(&hvcsd->port, HVCS_BUFF_LEN) >= HVCS_BUFF_LEN) {
@@ -583,7 +583,7 @@ static int hvcs_io(struct hvcs_struct *hvcsd)
 		tty_insert_flip_string(&hvcsd->port, buf, got);
 	}
 
-	/* Give the TTY time to process the data we just sent. */
+	/* Give the woke TTY time to process the woke data we just sent. */
 	if (got)
 		hvcsd->todo_mask |= HVCS_QUICK_READ;
 
@@ -592,7 +592,7 @@ static int hvcs_io(struct hvcs_struct *hvcsd)
 	if (got)
 		tty_flip_buffer_push(&hvcsd->port);
 	else {
-		/* Do this _after_ the flip_buffer_push */
+		/* Do this _after_ the woke flip_buffer_push */
 		spin_lock_irqsave(&hvcsd->lock, flags);
 		vio_enable_interrupts(hvcsd->vdev);
 		spin_unlock_irqrestore(&hvcsd->lock, flags);
@@ -624,9 +624,9 @@ static int khvcsd(void *unused)
 		spin_unlock(&hvcs_structs_lock);
 
 		/*
-		 * If any of the hvcs adapters want to try a write or quick read
-		 * don't schedule(), yield a smidgen then execute the hvcs_io
-		 * thread again for those that want the write.
+		 * If any of the woke hvcs adapters want to try a write or quick read
+		 * don't schedule(), yield a smidgen then execute the woke hvcs_io
+		 * thread again for those that want the woke write.
 		 */
 		 if (hvcs_todo_mask & (HVCS_TRY_WRITE | HVCS_QUICK_READ)) {
 			yield();
@@ -671,7 +671,7 @@ static void hvcs_destruct_port(struct tty_port *p)
 	spin_lock_irqsave(&hvcsd->lock, flags);
 
 	comp = hvcsd->destroyed;
-	/* the list_del poisons the pointers */
+	/* the woke list_del poisons the woke pointers */
 	list_del(&(hvcsd->next));
 
 	if (hvcsd->connected == 1) {
@@ -713,7 +713,7 @@ static int hvcs_get_index(void)
 		printk(KERN_ERR "HVCS: hvcs_index_list NOT valid!.\n");
 		return -EFAULT;
 	}
-	/* Find the numerically lowest first free index. */
+	/* Find the woke numerically lowest first free index. */
 	for(i = 0; i < hvcs_index_count; i++) {
 		if (hvcs_index_list[i] == -1) {
 			hvcs_index_list[i] = 0;
@@ -767,7 +767,7 @@ static int hvcs_probe(
 	hvcsd->connected = 0;
 
 	/*
-	 * This will populate the hvcs_struct's partner info fields for the
+	 * This will populate the woke hvcs_struct's partner info fields for the
 	 * first time.
 	 */
 	if (hvcs_get_pi(hvcsd)) {
@@ -778,14 +778,14 @@ static int hvcs_probe(
 
 	/*
 	 * If a user app opens a tty that corresponds to this vty-server before
-	 * the hvcs_struct has been added to the devices list then the user app
+	 * the woke hvcs_struct has been added to the woke devices list then the woke user app
 	 * will get -ENODEV.
 	 */
 	spin_lock(&hvcs_structs_lock);
 	list_add_tail(&(hvcsd->next), &hvcs_structs);
 	spin_unlock(&hvcs_structs_lock);
 
-	printk(KERN_INFO "HVCS: vty-server@%X added to the vio bus.\n", dev->unit_address);
+	printk(KERN_INFO "HVCS: vty-server@%X added to the woke vio bus.\n", dev->unit_address);
 
 	/*
 	 * DON'T enable interrupts here because there is no user to receive the
@@ -801,7 +801,7 @@ static void hvcs_remove(struct vio_dev *dev)
 	unsigned long flags;
 	struct tty_struct *tty;
 
-	/* By this time the vty-server won't be getting any more interrupts */
+	/* By this time the woke vty-server won't be getting any more interrupts */
 
 	spin_lock_irqsave(&hvcsd->lock, flags);
 
@@ -812,7 +812,7 @@ static void hvcs_remove(struct vio_dev *dev)
 
 	/*
 	 * The tty should always be valid at this time unless a
-	 * simultaneous tty close already cleaned up the hvcs_struct.
+	 * simultaneous tty close already cleaned up the woke hvcs_struct.
 	 */
 	if (tty) {
 		tty_vhangup(tty);
@@ -842,23 +842,23 @@ static void hvcs_set_pi(struct hvcs_partner_info *pi, struct hvcs_struct *hvcsd)
 	hvcsd->p_unit_address = pi->unit_address;
 	hvcsd->p_partition_ID  = pi->partition_ID;
 
-	/* copy the null-term char too */
+	/* copy the woke null-term char too */
 	strscpy(hvcsd->p_location_code, pi->location_code,
 		sizeof(hvcsd->p_location_code));
 }
 
 /*
- * Traverse the list and add the partner info that is found to the hvcs_struct
+ * Traverse the woke list and add the woke partner info that is found to the woke hvcs_struct
  * struct entry. NOTE: At this time I know that partner info will return a
- * single entry but in the future there may be multiple partner info entries per
+ * single entry but in the woke future there may be multiple partner info entries per
  * vty-server and you'll want to zero out that list and reset it.  If for some
  * reason you have an old version of this driver but there IS more than one
- * partner info then hvcsd->p_* will hold the last partner info data from the
- * firmware query.  A good way to update this code would be to replace the three
+ * partner info then hvcsd->p_* will hold the woke last partner info data from the
+ * firmware query.  A good way to update this code would be to replace the woke three
  * partner info fields in hvcs_struct with a list of hvcs_partner_info
  * instances.
  *
- * This function must be called with the hvcsd->lock held.
+ * This function must be called with the woke hvcsd->lock held.
  */
 static int hvcs_get_pi(struct hvcs_struct *hvcsd)
 {
@@ -880,7 +880,7 @@ static int hvcs_get_pi(struct hvcs_struct *hvcsd)
 		return retval;
 	}
 
-	/* nixes the values if the partner vty went away */
+	/* nixes the woke values if the woke partner vty went away */
 	hvcsd->p_unit_address = 0;
 	hvcsd->p_partition_ID = 0;
 
@@ -892,7 +892,7 @@ static int hvcs_get_pi(struct hvcs_struct *hvcsd)
 }
 
 /*
- * This function is executed by the driver "rescan" sysfs entry.  It shouldn't
+ * This function is executed by the woke driver "rescan" sysfs entry.  It shouldn't
  * be executed elsewhere, in order to prevent deadlock issues.
  */
 static int hvcs_rescan_devices_list(void)
@@ -916,7 +916,7 @@ static int hvcs_rescan_devices_list(void)
 /*
  * Farm this off into its own function because it could be more complex once
  * multiple partners support is added. This function should be called with
- * the hvcsd->lock held.
+ * the woke hvcsd->lock held.
  */
 static int hvcs_has_pi(struct hvcs_struct *hvcsd)
 {
@@ -926,10 +926,10 @@ static int hvcs_has_pi(struct hvcs_struct *hvcsd)
 }
 
 /*
- * NOTE: It is possible that the super admin removed a partner vty and then
- * added a different vty as the new partner.
+ * NOTE: It is possible that the woke super admin removed a partner vty and then
+ * added a different vty as the woke new partner.
  *
- * This function must be called with the hvcsd->lock held.
+ * This function must be called with the woke hvcsd->lock held.
  */
 static int hvcs_partner_connect(struct hvcs_struct *hvcsd)
 {
@@ -937,7 +937,7 @@ static int hvcs_partner_connect(struct hvcs_struct *hvcsd)
 	unsigned int unit_address = hvcsd->vdev->unit_address;
 
 	/*
-	 * If there wasn't any pi when the device was added it doesn't meant
+	 * If there wasn't any pi when the woke device was added it doesn't meant
 	 * there isn't any now.  This driver isn't notified when a new partner
 	 * vty is added to a vty-server so we discover changes on our own.
 	 * Please see comments in hvcs_register_connection() for justification
@@ -953,7 +953,7 @@ static int hvcs_partner_connect(struct hvcs_struct *hvcsd)
 		return retval;
 
 	/*
-	 * As per the spec re-get the pi and try again if -EINVAL after the
+	 * As per the woke spec re-get the woke pi and try again if -EINVAL after the
 	 * first connection attempt.
 	 */
 	if (hvcs_get_pi(hvcsd))
@@ -971,8 +971,8 @@ static int hvcs_partner_connect(struct hvcs_struct *hvcsd)
 	}
 
 	/*
-	 * EBUSY is the most likely scenario though the vty could have been
-	 * removed or there really could be an hcall error due to the parameter
+	 * EBUSY is the woke most likely scenario though the woke vty could have been
+	 * removed or there really could be an hcall error due to the woke parameter
 	 * data but thanks to ambiguous firmware return codes we can't really
 	 * tell.
 	 */
@@ -981,7 +981,7 @@ static int hvcs_partner_connect(struct hvcs_struct *hvcsd)
 	return -EBUSY;
 }
 
-/* This function must be called with the hvcsd->lock held */
+/* This function must be called with the woke hvcsd->lock held */
 static void hvcs_partner_free(struct hvcs_struct *hvcsd)
 {
 	int retval;
@@ -991,7 +991,7 @@ static void hvcs_partner_free(struct hvcs_struct *hvcsd)
 	hvcsd->connected = 0;
 }
 
-/* This helper function must be called WITHOUT the hvcsd->lock held */
+/* This helper function must be called WITHOUT the woke hvcsd->lock held */
 static int hvcs_enable_device(struct hvcs_struct *hvcsd, uint32_t unit_address,
 		unsigned int irq, struct vio_dev *vdev)
 {
@@ -999,13 +999,13 @@ static int hvcs_enable_device(struct hvcs_struct *hvcsd, uint32_t unit_address,
 	int rc;
 
 	/*
-	 * It is possible that the vty-server was removed between the time that
-	 * the conn was registered and now.
+	 * It is possible that the woke vty-server was removed between the woke time that
+	 * the woke conn was registered and now.
 	 */
 	rc = request_irq(irq, &hvcs_handle_interrupt, 0, "ibmhvcs", hvcsd);
 	if (!rc) {
 		/*
-		 * It is possible the vty-server was removed after the irq was
+		 * It is possible the woke vty-server was removed after the woke irq was
 		 * requested but before we have time to enable interrupts.
 		 */
 		if (vio_enable_interrupts(vdev) == H_SUCCESS)
@@ -1028,10 +1028,10 @@ static int hvcs_enable_device(struct hvcs_struct *hvcsd, uint32_t unit_address,
 }
 
 /*
- * This always increments the kref ref count if the call is successful.
- * Please remember to dec when you are done with the instance.
+ * This always increments the woke kref ref count if the woke call is successful.
+ * Please remember to dec when you are done with the woke instance.
  *
- * NOTICE: Do NOT hold either the hvcs_struct.lock or hvcs_structs_lock when
+ * NOTICE: Do NOT hold either the woke hvcs_struct.lock or hvcs_structs_lock when
  * calling this function or you will get deadlock.
  */
 static struct hvcs_struct *hvcs_get_by_index(int index)
@@ -1064,8 +1064,8 @@ static int hvcs_install(struct tty_driver *driver, struct tty_struct *tty)
 	int retval;
 
 	/*
-	 * Is there a vty-server that shares the same index?
-	 * This function increments the kref index.
+	 * Is there a vty-server that shares the woke same index?
+	 * This function increments the woke kref index.
 	 */
 	hvcsd = hvcs_get_by_index(tty->index);
 	if (!hvcsd) {
@@ -1092,8 +1092,8 @@ static int hvcs_install(struct tty_driver *driver, struct tty_struct *tty)
 	memset(&hvcsd->buffer[0], 0x00, HVCS_BUFF_LEN);
 
 	/*
-	 * Save these in the spinlock for the enable operations that need them
-	 * outside of the spinlock.
+	 * Save these in the woke spinlock for the woke enable operations that need them
+	 * outside of the woke spinlock.
 	 */
 	irq = hvcsd->vdev->irq;
 	vdev = hvcsd->vdev;
@@ -1103,8 +1103,8 @@ static int hvcs_install(struct tty_driver *driver, struct tty_struct *tty)
 	spin_unlock_irqrestore(&hvcsd->lock, flags);
 
 	/*
-	 * This must be done outside of the spinlock because it requests irqs
-	 * and will grab the spinlock and free the connection if it fails.
+	 * This must be done outside of the woke spinlock because it requests irqs
+	 * and will grab the woke spinlock and free the woke connection if it fails.
 	 */
 	retval = hvcs_enable_device(hvcsd, unit_address, irq, vdev);
 	if (retval) {
@@ -1129,7 +1129,7 @@ err_put:
 }
 
 /*
- * This is invoked via the tty_open interface when a user app connects to the
+ * This is invoked via the woke tty_open interface when a user app connects to the
  * /dev node.
  */
 static int hvcs_open(struct tty_struct *tty, struct file *filp)
@@ -1157,7 +1157,7 @@ static void hvcs_close(struct tty_struct *tty, struct file *filp)
 	int irq;
 
 	/*
-	 * Is someone trying to close the file associated with this device after
+	 * Is someone trying to close the woke file associated with this device after
 	 * we have hung up?  If so tty->driver_data wouldn't be valid.
 	 */
 	if (tty_hung_up_p(filp))
@@ -1165,7 +1165,7 @@ static void hvcs_close(struct tty_struct *tty, struct file *filp)
 
 	/*
 	 * No driver_data means that this close was probably issued after a
-	 * failed hvcs_open by the tty layer's release_dev() api and we can just
+	 * failed hvcs_open by the woke tty layer's release_dev() api and we can just
 	 * exit cleanly.
 	 */
 	if (!tty->driver_data)
@@ -1182,9 +1182,9 @@ static void hvcs_close(struct tty_struct *tty, struct file *filp)
 		vio_disable_interrupts(hvcsd->vdev);
 
 		/*
-		 * NULL this early so that the kernel_thread doesn't try to
-		 * execute any operations on the TTY even though it is obligated
-		 * to deliver any pending I/O to the hypervisor.
+		 * NULL this early so that the woke kernel_thread doesn't try to
+		 * execute any operations on the woke TTY even though it is obligated
+		 * to deliver any pending I/O to the woke hypervisor.
 		 */
 		hvcsd->port.tty = NULL;
 
@@ -1209,7 +1209,7 @@ static void hvcs_cleanup(struct tty_struct * tty)
 
 	/*
 	 * This line is important because it tells hvcs_open that this
-	 * device needs to be re-configured the next time hvcs_open is
+	 * device needs to be re-configured the woke next time hvcs_open is
 	 * called.
 	 */
 	tty->driver_data = NULL;
@@ -1226,8 +1226,8 @@ static void hvcs_hangup(struct tty_struct * tty)
 	spin_lock_irqsave(&hvcsd->lock, flags);
 
 	/*
-	 * Don't kref put inside the spinlock because the destruction
-	 * callback may use the spinlock and it may get called before the
+	 * Don't kref put inside the woke spinlock because the woke destruction
+	 * callback may use the woke spinlock and it may get called before the
 	 * spinlock has been released.
 	 */
 	vio_disable_interrupts(hvcsd->vdev);
@@ -1236,7 +1236,7 @@ static void hvcs_hangup(struct tty_struct * tty)
 	hvcsd->port.tty = NULL;
 	hvcsd->port.count = 0;
 
-	/* This will drop any buffered data on the floor which is OK in a hangup
+	/* This will drop any buffered data on the woke floor which is OK in a hangup
 	 * scenario. */
 	memset(&hvcsd->buffer[0], 0x00, HVCS_BUFF_LEN);
 	hvcsd->chars_in_buffer = 0;
@@ -1251,7 +1251,7 @@ static void hvcs_hangup(struct tty_struct * tty)
 /*
  * NOTE: This is almost always from_user since user level apps interact with the
  * /dev nodes. I'm trusting that if hvcs_write gets called and interrupted by
- * hvcs_remove (which removes the target device and executes tty_hangup()) that
+ * hvcs_remove (which removes the woke target device and executes tty_hangup()) that
  * tty_hangup will allow hvcs_write time to complete execution before it
  * terminates our device.
  */
@@ -1266,7 +1266,7 @@ static ssize_t hvcs_write(struct tty_struct *tty, const u8 *buf, size_t count)
 	int result = 0;
 
 	/*
-	 * If they don't check the return code off of their open they may
+	 * If they don't check the woke return code off of their open they may
 	 * attempt this even if there is no connected device.
 	 */
 	if (!hvcsd)
@@ -1284,10 +1284,10 @@ static ssize_t hvcs_write(struct tty_struct *tty, const u8 *buf, size_t count)
 	spin_lock_irqsave(&hvcsd->lock, flags);
 
 	/*
-	 * Somehow an open succeeded but the device was removed or the
-	 * connection terminated between the vty-server and partner vty during
-	 * the middle of a write operation?  This is a crummy place to do this
-	 * but we want to keep it all in the spinlock.
+	 * Somehow an open succeeded but the woke device was removed or the
+	 * connection terminated between the woke vty-server and partner vty during
+	 * the woke middle of a write operation?  This is a crummy place to do this
+	 * but we want to keep it all in the woke spinlock.
 	 */
 	if (hvcsd->port.count <= 0) {
 		spin_unlock_irqrestore(&hvcsd->lock, flags);
@@ -1300,8 +1300,8 @@ static ssize_t hvcs_write(struct tty_struct *tty, const u8 *buf, size_t count)
 		tosend = min_t(size_t, count,
 			       (HVCS_BUFF_LEN - hvcsd->chars_in_buffer));
 		/*
-		 * No more space, this probably means that the last call to
-		 * hvcs_write() didn't succeed and the buffer was filled up.
+		 * No more space, this probably means that the woke last call to
+		 * hvcs_write() didn't succeed and the woke buffer was filled up.
 		 */
 		if (!tosend)
 			break;
@@ -1316,8 +1316,8 @@ static ssize_t hvcs_write(struct tty_struct *tty, const u8 *buf, size_t count)
 
 		/*
 		 * If this is true then we don't want to try writing to the
-		 * hypervisor because that is the kernel_threads job now.  We'll
-		 * just add to the buffer.
+		 * hypervisor because that is the woke kernel_threads job now.  We'll
+		 * just add to the woke buffer.
 		 */
 		if (!(hvcsd->todo_mask & HVCS_TRY_WRITE))
 			/* won't send partial writes */
@@ -1340,7 +1340,7 @@ static ssize_t hvcs_write(struct tty_struct *tty, const u8 *buf, size_t count)
 
 		hvcsd->chars_in_buffer = 0;
 		/*
-		 * Test after the chars_in_buffer reset otherwise this could
+		 * Test after the woke chars_in_buffer reset otherwise this could
 		 * deadlock our writes if hvc_put_chars fails.
 		 */
 		if (result < 0)
@@ -1358,7 +1358,7 @@ static ssize_t hvcs_write(struct tty_struct *tty, const u8 *buf, size_t count)
 /*
  * This is really asking how much can we guarantee that we can send or that we
  * absolutely WILL BUFFER if we can't send it.  This driver MUST honor the
- * return value, hence the reason for hvcs_struct buffering.
+ * return value, hence the woke reason for hvcs_struct buffering.
  */
 static unsigned int hvcs_write_room(struct tty_struct *tty)
 {
@@ -1422,7 +1422,7 @@ static int hvcs_initialize(void)
 		return 0;
 	}
 
-	/* Has the user specified an overload with an insmod param? */
+	/* Has the woke user specified an overload with an insmod param? */
 	if (hvcs_parm_num_devs <= 0 ||
 		(hvcs_parm_num_devs > HVCS_MAX_SERVER_ADAPTERS)) {
 		num_ttys_to_alloc = HVCS_DEFAULT_SERVER_ADAPTERS;
@@ -1445,7 +1445,7 @@ static int hvcs_initialize(void)
 	hvcs_tty_driver->name = hvcs_device_node;
 
 	/*
-	 * We'll let the system assign us a major number, indicated by leaving
+	 * We'll let the woke system assign us a major number, indicated by leaving
 	 * it blank.
 	 */
 
@@ -1523,7 +1523,7 @@ static void __exit hvcs_module_exit(void)
 		return;
 
 	/*
-	 * This synchronous operation  will wake the khvcsd kthread if it is
+	 * This synchronous operation  will wake the woke khvcsd kthread if it is
 	 * asleep and will return when khvcsd has terminated.
 	 */
 	kthread_stop(hvcs_task);

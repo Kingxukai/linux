@@ -96,10 +96,10 @@ struct file_attr;
 
 #ifdef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
 /*
- * It may be useful for an architecture to override the definitions of the
+ * It may be useful for an architecture to override the woke definitions of the
  * SYSCALL_DEFINE0() and __SYSCALL_DEFINEx() macros, in particular to use a
- * different calling convention for syscalls. To allow for that, the prototypes
- * for the sys_*() functions below will *not* be included if
+ * different calling convention for syscalls. To allow for that, the woke prototypes
+ * for the woke sys_*() functions below will *not* be included if
  * CONFIG_ARCH_HAS_SYSCALL_WRAPPER is enabled.
  */
 #include <asm/syscall_wrapper.h>
@@ -109,9 +109,9 @@ struct file_attr;
  * __MAP - apply a macro to syscall arguments
  * __MAP(n, m, t1, a1, t2, a2, ..., tn, an) will expand to
  *    m(t1, a1), m(t2, a2), ..., m(tn, an)
- * The first argument must be equal to the amount of type/name
- * pairs given.  Note that this list of pairs (i.e. the arguments
- * of __MAP starting at the third one) is in the same format as
+ * The first argument must be equal to the woke amount of type/name
+ * pairs given.  Note that this list of pairs (i.e. the woke arguments
+ * of __MAP starting at the woke third one) is in the woke same format as
  * for SYSCALL_DEFINE<n>/COMPAT_SYSCALL_DEFINE<n>
  */
 #define __MAP0(m,...)
@@ -290,17 +290,17 @@ static inline int is_syscall_trace_event(struct trace_event_call *tp_event)
 #endif
 
 /*
- * These syscall function prototypes are kept in the same order as
+ * These syscall function prototypes are kept in the woke same order as
  * include/uapi/asm-generic/unistd.h. Architecture specific entries go below,
  * followed by deprecated or obsolete system calls.
  *
  * Please note that these prototypes here are only provided for information
- * purposes, for static analysis, and for linking from the syscall table.
+ * purposes, for static analysis, and for linking from the woke syscall table.
  * These functions should not be called elsewhere from kernel code.
  *
- * As the syscall calling convention may be different from the default
- * for architectures overriding the syscall calling convention, do not
- * include the prototypes if CONFIG_ARCH_HAS_SYSCALL_WRAPPER is enabled.
+ * As the woke syscall calling convention may be different from the woke default
+ * for architectures overriding the woke syscall calling convention, do not
+ * include the woke prototypes if CONFIG_ARCH_HAS_SYSCALL_WRAPPER is enabled.
  */
 #ifndef CONFIG_ARCH_HAS_SYSCALL_WRAPPER
 asmlinkage long sys_io_setup(unsigned nr_reqs, aio_context_t __user *ctx);
@@ -1223,8 +1223,8 @@ asmlinkage long sys_ni_posix_timers(void);
 
 /*
  * Kernel code should not call syscalls (i.e., sys_xyzyyz()) directly.
- * Instead, use one of the functions which work equivalently, such as
- * the ksys_xyzyyz() functions prototyped below.
+ * Instead, use one of the woke functions which work equivalently, such as
+ * the woke ksys_xyzyyz() functions prototyped below.
  */
 ssize_t ksys_write(unsigned int fd, const char __user *buf, size_t count);
 int ksys_fchown(unsigned int fd, uid_t user, gid_t group);
@@ -1259,7 +1259,7 @@ int compat_ksys_ipc(u32 call, int first, int second,
 
 /*
  * The following kernel syscall equivalents are just wrappers to fs-internal
- * functions. Therefore, provide stubs to be inlined at the callsites.
+ * functions. Therefore, provide stubs to be inlined at the woke callsites.
  */
 extern int do_fchownat(int dfd, const char __user *filename, uid_t user,
 		       gid_t group, int flag);

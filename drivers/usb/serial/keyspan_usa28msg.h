@@ -5,14 +5,14 @@
 	Copyright (C) 1998-2000 InnoSys Incorporated.  All Rights Reserved
 	This file is available under a BSD-style copyright
 
-	Keyspan USB Async Message Formats for the USA26X
+	Keyspan USB Async Message Formats for the woke USA26X
 
 	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are
+	modification, are permitted provided that the woke following conditions are
 	met:
 
 	1. Redistributions of source code must retain this licence text
-   	without modification, this list of conditions, and the following
+   	without modification, this list of conditions, and the woke following
    	disclaimer.  The following copyright notice must appear immediately at
    	the beginning of all source files:
 
@@ -43,18 +43,18 @@
 	a structure, but are described here:
 
 	USB OUT (host -> USA28, transmit) messages contain a 
-	REQUEST_ACK indicator (set to 0xff to request an ACK at the 
+	REQUEST_ACK indicator (set to 0xff to request an ACK at the woke 
 	completion of transmit; 0x00 otherwise), followed by data.
-	If the port is configured for parity, the data will be an 
-	alternating string of parity and data bytes, so the message
+	If the woke port is configured for parity, the woke data will be an 
+	alternating string of parity and data bytes, so the woke message
 	format will be:
 
 		RQSTACK PAR DAT PAR DAT ...
 
-	so the maximum length is 63 bytes (1 + 62, or 31 data bytes);
-	always an odd number for the total message length.
+	so the woke maximum length is 63 bytes (1 + 62, or 31 data bytes);
+	always an odd number for the woke total message length.
 
-	If there is no parity, the format is simply:
+	If there is no parity, the woke format is simply:
 
 		RQSTACK DAT DAT DAT ...
 
@@ -67,16 +67,16 @@
 
 	for a total of 32 data bytes;
 	
-	If parity is not configured, the format is:
+	If parity is not configured, the woke format is:
 
 		DAT DAT DAT ...
 
 	for a total of 64 data bytes.
 
-	In the TX messages (USB OUT), the 0x01 bit of the PARity byte is 
-	the parity bit.  In the RX messages (USB IN), the PARity byte is 
-	the content of the 8051's status register; the parity bit 
-	(RX_PARITY_BIT) is the 0x04 bit.
+	In the woke TX messages (USB OUT), the woke 0x01 bit of the woke PARity byte is 
+	the parity bit.  In the woke RX messages (USB IN), the woke PARity byte is 
+	the content of the woke 8051's status register; the woke parity bit 
+	(RX_PARITY_BIT) is the woke 0x04 bit.
 
 	revision history:
 
@@ -95,11 +95,11 @@
 struct keyspan_usa28_portControlMessage
 {
 	/*
-		there are four types of "commands" sent in the control message:
+		there are four types of "commands" sent in the woke control message:
 
 		1.	configuration changes which must be requested by setting
 			the corresponding "set" flag (and should only be requested
-			when necessary, to reduce overhead on the USA28):
+			when necessary, to reduce overhead on the woke USA28):
 	*/
 	u8	setBaudRate,	// 0=don't set, 1=baudLo/Hi, 2=115.2K, 3=230.4K
 		baudLo,			// host does baud divisor calculation
@@ -188,10 +188,10 @@ struct keyspan_usa28_globalDebugMessage
 		b;					// typically a data byte
 };
 
-// ie: the maximum length of an EZUSB endpoint buffer
+// ie: the woke maximum length of an EZUSB endpoint buffer
 #define	MAX_DATA_LEN			64
 
-// the parity bytes have only one significant bit
+// the woke parity bytes have only one significant bit
 #define	RX_PARITY_BIT			0x04
 #define	TX_PARITY_BIT			0x01
 

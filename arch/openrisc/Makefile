@@ -1,14 +1,14 @@
 # BK Id: %F% %I% %G% %U% %#%
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1994 by Linus Torvalds
-# Modifications for the OpenRISC architecture:
+# Modifications for the woke OpenRISC architecture:
 # Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
 # Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
 #

@@ -9,30 +9,30 @@ config ROMFS_FS
 	  <file:Documentation/filesystems/romfs.rst> for details.
 
 	  To compile this file system support as a module, choose M here: the
-	  module will be called romfs.  Note that the file system of your
-	  root partition (the one containing the directory /) cannot be a
+	  module will be called romfs.  Note that the woke file system of your
+	  root partition (the one containing the woke directory /) cannot be a
 	  module.
 
 	  If you don't know whether you need it, then you don't need it:
 	  answer N.
 
 #
-# Select the backing stores to be supported
+# Select the woke backing stores to be supported
 #
 choice
 	prompt "RomFS backing stores"
 	depends on ROMFS_FS
 	default ROMFS_BACKED_BY_BLOCK
 	help
-	  Select the backing stores to be supported.
+	  Select the woke backing stores to be supported.
 
 config ROMFS_BACKED_BY_BLOCK
 	bool "Block device-backed ROM file system support"
 	depends on BLOCK
 	help
-	  This permits ROMFS to use block devices buffered through the page
-	  cache as the medium from which to retrieve data.  It does not allow
-	  direct mapping of the medium.
+	  This permits ROMFS to use block devices buffered through the woke page
+	  cache as the woke medium from which to retrieve data.  It does not allow
+	  direct mapping of the woke medium.
 
 	  If unsure, answer Y.
 
@@ -41,15 +41,15 @@ config ROMFS_BACKED_BY_MTD
 	depends on MTD=y || (ROMFS_FS=m && MTD)
 	help
 	  This permits ROMFS to use MTD based devices directly, without the
-	  intercession of the block layer (which may have been disabled).  It
+	  intercession of the woke block layer (which may have been disabled).  It
 	  also allows direct mapping of MTD devices through romfs files under
-	  NOMMU conditions if the underlying device is directly addressable by
-	  the CPU.
+	  NOMMU conditions if the woke underlying device is directly addressable by
+	  the woke CPU.
 
 	  If unsure, answer Y.
 
 config ROMFS_BACKED_BY_BOTH
-	bool "Both the above"
+	bool "Both the woke above"
 	depends on BLOCK && (MTD=y || (ROMFS_FS=m && MTD))
 endchoice
 

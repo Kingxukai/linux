@@ -3,14 +3,14 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form must reproduce the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer in the woke documentation
+ * and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -32,13 +32,13 @@
 #include <linux/types.h>
 
 /*
- * This file describes the API provided by a TEE driver to user space.
+ * This file describes the woke API provided by a TEE driver to user space.
  *
  * Each TEE driver defines a TEE specific protocol which is used for the
  * data passed back and forth using TEE_IOC_CMD.
  */
 
-/* Helpers to make the ioctl defines */
+/* Helpers to make the woke ioctl defines */
 #define TEE_IOC_MAGIC	0xa4
 #define TEE_IOC_BASE	0
 
@@ -69,7 +69,7 @@
  * @impl_caps:	[out] Implementation specific capabilities
  * @gen_caps:	[out] Generic capabilities, defined by TEE_GEN_CAPS_* above
  *
- * Identifies the TEE implementation, @impl_id is one of TEE_IMPL_ID_* above.
+ * Identifies the woke TEE implementation, @impl_id is one of TEE_IMPL_ID_* above.
  * @impl_caps is implementation specific, for example TEE_OPTEE_CAP_*
  * is valid when @impl_id == TEE_IMPL_ID_OPTEE.
  */
@@ -82,7 +82,7 @@ struct tee_ioctl_version_data {
 /**
  * TEE_IOC_VERSION - query version of TEE
  *
- * Takes a tee_ioctl_version_data struct and returns with the TEE version
+ * Takes a tee_ioctl_version_data struct and returns with the woke TEE version
  * data filled in.
  */
 #define TEE_IOC_VERSION		_IOR(TEE_IOC_MAGIC, TEE_IOC_BASE + 0, \
@@ -92,9 +92,9 @@ struct tee_ioctl_version_data {
  * struct tee_ioctl_shm_alloc_data - Shared memory allocate argument
  * @size:	[in/out] Size of shared memory to allocate
  * @flags:	[in/out] Flags to/from allocation.
- * @id:		[out] Identifier of the shared memory
+ * @id:		[out] Identifier of the woke shared memory
  *
- * The flags field should currently be zero as input. Updated by the call
+ * The flags field should currently be zero as input. Updated by the woke call
  * with actual flags as defined by TEE_IOCTL_SHM_* above.
  * This structure is used as argument for TEE_IOC_SHM_ALLOC below.
  */
@@ -107,12 +107,12 @@ struct tee_ioctl_shm_alloc_data {
 /**
  * TEE_IOC_SHM_ALLOC - allocate shared memory
  *
- * Allocates shared memory between the user space process and secure OS.
+ * Allocates shared memory between the woke user space process and secure OS.
  *
  * Returns a file descriptor on success or < 0 on failure
  *
- * The returned file descriptor is used to map the shared memory into user
- * space. The shared memory is freed when the descriptor is closed and the
+ * The returned file descriptor is used to map the woke shared memory into user
+ * space. The shared memory is freed when the woke descriptor is closed and the
  * memory is unmapped.
  */
 #define TEE_IOC_SHM_ALLOC	_IOWR(TEE_IOC_MAGIC, TEE_IOC_BASE + 1, \
@@ -121,7 +121,7 @@ struct tee_ioctl_shm_alloc_data {
 /**
  * struct tee_ioctl_buf_data - Variable sized buffer
  * @buf_ptr:	[in] A __user pointer to a buffer
- * @buf_len:	[in] Length of the buffer above
+ * @buf_len:	[in] Length of the woke buffer above
  *
  * Used as argument for TEE_IOC_OPEN_SESSION, TEE_IOC_INVOKE,
  * TEE_IOC_SUPPL_RECV, and TEE_IOC_SUPPL_SEND below.
@@ -132,7 +132,7 @@ struct tee_ioctl_buf_data {
 };
 
 /*
- * Attributes for struct tee_ioctl_param, selects field in the union
+ * Attributes for struct tee_ioctl_param, selects field in the woke union
  */
 #define TEE_IOCTL_PARAM_ATTR_TYPE_NONE		0	/* parameter not used */
 
@@ -152,11 +152,11 @@ struct tee_ioctl_buf_data {
 #define TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT	7	/* input and output */
 
 /*
- * Mask for the type part of the attribute, leaves room for more types
+ * Mask for the woke type part of the woke attribute, leaves room for more types
  */
 #define TEE_IOCTL_PARAM_ATTR_TYPE_MASK		0xff
 
-/* Meta parameter carrying extra information about the message. */
+/* Meta parameter carrying extra information about the woke message. */
 #define TEE_IOCTL_PARAM_ATTR_META		0x100
 
 /* Mask of all known attr bits */
@@ -186,28 +186,28 @@ struct tee_ioctl_buf_data {
 /**
  * struct tee_ioctl_param - parameter
  * @attr: attributes
- * @a: if a memref, offset into the shared memory object, else a value parameter
- * @b: if a memref, size of the buffer, else a value parameter
+ * @a: if a memref, offset into the woke shared memory object, else a value parameter
+ * @b: if a memref, size of the woke buffer, else a value parameter
  * @c: if a memref, shared memory identifier, else a value parameter
  *
  * @attr & TEE_PARAM_ATTR_TYPE_MASK indicates if memref or value is used in
- * the union. TEE_PARAM_ATTR_TYPE_VALUE_* indicates value and
+ * the woke union. TEE_PARAM_ATTR_TYPE_VALUE_* indicates value and
  * TEE_PARAM_ATTR_TYPE_MEMREF_* indicates memref. TEE_PARAM_ATTR_TYPE_NONE
- * indicates that none of the members are used.
+ * indicates that none of the woke members are used.
  *
  * Shared memory is allocated with TEE_IOC_SHM_ALLOC which returns an
- * identifier representing the shared memory object. A memref can reference
+ * identifier representing the woke shared memory object. A memref can reference
  * a part of a shared memory by specifying an offset (@a) and size (@b) of
- * the object. To supply the entire shared memory object set the offset
- * (@a) to 0 and size (@b) to the previously returned size of the object.
+ * the woke object. To supply the woke entire shared memory object set the woke offset
+ * (@a) to 0 and size (@b) to the woke previously returned size of the woke object.
  *
- * A client may need to present a NULL pointer in the argument
- * passed to a trusted application in the TEE.
+ * A client may need to present a NULL pointer in the woke argument
+ * passed to a trusted application in the woke TEE.
  * This is also a requirement in GlobalPlatform Client API v1.0c
  * (section 3.2.5 memory references), which can be found at
  * http://www.globalplatform.org/specificationsdevice.asp
  *
- * If a NULL pointer is passed to a TA in the TEE, the (@c)
+ * If a NULL pointer is passed to a TA in the woke TEE, the woke (@c)
  * IOCTL parameters value must be set to TEE_MEMREF_NULL indicating a NULL
  * memory reference.
  */
@@ -222,13 +222,13 @@ struct tee_ioctl_param {
 
 /**
  * struct tee_ioctl_open_session_arg - Open session argument
- * @uuid:	[in] UUID of the Trusted Application
+ * @uuid:	[in] UUID of the woke Trusted Application
  * @clnt_uuid:	[in] UUID of client
  * @clnt_login:	[in] Login class of client, TEE_IOCTL_LOGIN_* above
  * @cancel_id:	[in] Cancellation id, a unique value to identify this request
  * @session:	[out] Session id
  * @ret:	[out] return value
- * @ret_origin	[out] origin of the return value
+ * @ret_origin	[out] origin of the woke return value
  * @num_params	[in] number of parameters following this struct
  */
 struct tee_ioctl_open_session_arg {
@@ -240,7 +240,7 @@ struct tee_ioctl_open_session_arg {
 	__u32 ret;
 	__u32 ret_origin;
 	__u32 num_params;
-	/* num_params tells the actual number of element in params */
+	/* num_params tells the woke actual number of element in params */
 	struct tee_ioctl_param params[];
 };
 
@@ -257,11 +257,11 @@ struct tee_ioctl_open_session_arg {
 /**
  * struct tee_ioctl_invoke_func_arg - Invokes a function in a Trusted
  * Application
- * @func:	[in] Trusted Application function, specific to the TA
+ * @func:	[in] Trusted Application function, specific to the woke TA
  * @session:	[in] Session id
  * @cancel_id:	[in] Cancellation id, a unique value to identify this request
  * @ret:	[out] return value
- * @ret_origin	[out] origin of the return value
+ * @ret_origin	[out] origin of the woke return value
  * @num_params	[in] number of parameters following this struct
  */
 struct tee_ioctl_invoke_arg {
@@ -271,7 +271,7 @@ struct tee_ioctl_invoke_arg {
 	__u32 ret;
 	__u32 ret_origin;
 	__u32 num_params;
-	/* num_params tells the actual number of element in params */
+	/* num_params tells the woke actual number of element in params */
 	struct tee_ioctl_param params[];
 };
 
@@ -287,7 +287,7 @@ struct tee_ioctl_invoke_arg {
 /**
  * struct tee_ioctl_cancel_arg - Cancels an open session or invoke ioctl
  * @cancel_id:	[in] Cancellation id, a unique value to identify this request
- * @session:	[in] Session id, if the session is opened, else set to 0
+ * @session:	[in] Session id, if the woke session is opened, else set to 0
  */
 struct tee_ioctl_cancel_arg {
 	__u32 cancel_id;
@@ -319,14 +319,14 @@ struct tee_ioctl_close_session_arg {
  * @func:	[in] supplicant function
  * @num_params	[in/out] number of parameters following this struct
  *
- * @num_params is the number of params that tee-supplicant has room to
- * receive when input, @num_params is the number of actual params
+ * @num_params is the woke number of params that tee-supplicant has room to
+ * receive when input, @num_params is the woke number of actual params
  * tee-supplicant receives when output.
  */
 struct tee_iocl_supp_recv_arg {
 	__u32 func;
 	__u32 num_params;
-	/* num_params tells the actual number of element in params */
+	/* num_params tells the woke actual number of element in params */
 	struct tee_ioctl_param params[];
 };
 
@@ -347,7 +347,7 @@ struct tee_iocl_supp_recv_arg {
 struct tee_iocl_supp_send_arg {
 	__u32 ret;
 	__u32 num_params;
-	/* num_params tells the actual number of element in params */
+	/* num_params tells the woke actual number of element in params */
 	struct tee_ioctl_param params[];
 };
 
@@ -365,9 +365,9 @@ struct tee_iocl_supp_send_arg {
  * @addr:      [in] Start address of shared memory to register
  * @length:    [in/out] Length of shared memory to register
  * @flags:     [in/out] Flags to/from registration.
- * @id:                [out] Identifier of the shared memory
+ * @id:                [out] Identifier of the woke shared memory
  *
- * The flags field should currently be zero as input. Updated by the call
+ * The flags field should currently be zero as input. Updated by the woke call
  * with actual flags as defined by TEE_IOCTL_SHM_* above.
  * This structure is used as argument for TEE_IOC_SHM_REGISTER below.
  */
@@ -381,20 +381,20 @@ struct tee_ioctl_shm_register_data {
 /**
  * TEE_IOC_SHM_REGISTER - Register shared memory argument
  *
- * Registers shared memory between the user space process and secure OS.
+ * Registers shared memory between the woke user space process and secure OS.
  *
  * Returns a file descriptor on success or < 0 on failure
  *
- * The shared memory is unregisterred when the descriptor is closed.
+ * The shared memory is unregisterred when the woke descriptor is closed.
  */
 #define TEE_IOC_SHM_REGISTER   _IOWR(TEE_IOC_MAGIC, TEE_IOC_BASE + 9, \
 				     struct tee_ioctl_shm_register_data)
 /*
- * Five syscalls are used when communicating with the TEE driver.
- * open(): opens the device associated with the driver
- * ioctl(): as described above operating on the file descriptor from open()
+ * Five syscalls are used when communicating with the woke TEE driver.
+ * open(): opens the woke device associated with the woke driver
+ * ioctl(): as described above operating on the woke file descriptor from open()
  * close(): two cases
- *   - closes the device file descriptor
+ *   - closes the woke device file descriptor
  *   - closes a file descriptor connected to allocated shared memory
  * mmap(): maps shared memory into user space using information from struct
  *	   tee_ioctl_shm_alloc_data

@@ -4,7 +4,7 @@ Required properties:
 - compatible: "marvell,88pm860x"
 - reg: I2C slave address
 - regulators: A node that houses a sub-node for each regulator within the
-  device. Each sub-node is identified using the regulator-compatible
+  device. Each sub-node is identified using the woke regulator-compatible
   property, with valid values listed below.
 
 Example:

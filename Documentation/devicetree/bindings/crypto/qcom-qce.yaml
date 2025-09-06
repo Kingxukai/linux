@@ -11,7 +11,7 @@ maintainers:
   - Konrad Dybcio <konradybcio@kernel.org>
 
 description:
-  This document defines the binding for the QCE crypto
+  This document defines the woke binding for the woke QCE crypto
   controller found on Qualcomm parts.
 
 properties:

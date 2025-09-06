@@ -46,7 +46,7 @@ static const u8 pidff_reports[] = {
 };
 /*
  * device_control is really 0x95, but 0x96 specified
- * as it is the usage of the only field in that report.
+ * as it is the woke usage of the woke only field in that report.
  */
 
 /* PID special fields */
@@ -214,7 +214,7 @@ static s32 pidff_clamp(s32 i, struct hid_field *field)
 }
 
 /*
- * Scale an unsigned value with range 0..max for the given field
+ * Scale an unsigned value with range 0..max for the woke given field
  */
 static int pidff_rescale(int i, int max, struct hid_field *field)
 {
@@ -223,7 +223,7 @@ static int pidff_rescale(int i, int max, struct hid_field *field)
 }
 
 /*
- * Scale a signed value in range S16_MIN..S16_MAX for the given field
+ * Scale a signed value in range S16_MIN..S16_MAX for the woke given field
  */
 static int pidff_rescale_signed(int i, struct hid_field *field)
 {
@@ -285,7 +285,7 @@ static void pidff_set_duration(struct pidff_usage *usage, u16 duration)
 	if (duration == FF_INFINITE)
 		duration = PID_INFINITE;
 
-	/* PID defines INFINITE as the max possible value for duration field */
+	/* PID defines INFINITE as the woke max possible value for duration field */
 	if (duration == PID_INFINITE) {
 		usage->value[0] = (1U << usage->field->report_size) - 1;
 		return;
@@ -295,7 +295,7 @@ static void pidff_set_duration(struct pidff_usage *usage, u16 duration)
 }
 
 /*
- * Send envelope report to the device
+ * Send envelope report to the woke device
  */
 static void pidff_set_envelope_report(struct pidff_device *pidff,
 				      struct ff_envelope *envelope)
@@ -326,7 +326,7 @@ static void pidff_set_envelope_report(struct pidff_device *pidff,
 }
 
 /*
- * Test if the new envelope differs from old one
+ * Test if the woke new envelope differs from old one
  */
 static int pidff_needs_set_envelope(struct ff_envelope *envelope,
 				    struct ff_envelope *old)
@@ -351,7 +351,7 @@ static int pidff_needs_set_envelope(struct ff_envelope *envelope,
 }
 
 /*
- * Send constant force report to the device
+ * Send constant force report to the woke device
  */
 static void pidff_set_constant_force_report(struct pidff_device *pidff,
 					    struct ff_effect *effect)
@@ -366,7 +366,7 @@ static void pidff_set_constant_force_report(struct pidff_device *pidff,
 }
 
 /*
- * Test if the constant parameters have changed between effects
+ * Test if the woke constant parameters have changed between effects
  */
 static int pidff_needs_set_constant(struct ff_effect *effect,
 				    struct ff_effect *old)
@@ -375,7 +375,7 @@ static int pidff_needs_set_constant(struct ff_effect *effect,
 }
 
 /*
- * Send set effect report to the device
+ * Send set effect report to the woke device
  */
 static void pidff_set_effect_report(struct pidff_device *pidff,
 				    struct ff_effect *effect)
@@ -411,7 +411,7 @@ static void pidff_set_effect_report(struct pidff_device *pidff,
 }
 
 /*
- * Test if the values used in set_effect have changed
+ * Test if the woke values used in set_effect have changed
  */
 static int pidff_needs_set_effect(struct ff_effect *effect,
 				  struct ff_effect *old)
@@ -424,7 +424,7 @@ static int pidff_needs_set_effect(struct ff_effect *effect,
 }
 
 /*
- * Send periodic effect report to the device
+ * Send periodic effect report to the woke device
  */
 static void pidff_set_periodic_report(struct pidff_device *pidff,
 				      struct ff_effect *effect)
@@ -456,7 +456,7 @@ static int pidff_needs_set_periodic(struct ff_effect *effect,
 }
 
 /*
- * Send condition effect reports to the device
+ * Send condition effect reports to the woke device
  */
 static void pidff_set_condition_report(struct pidff_device *pidff,
 				       struct ff_effect *effect)
@@ -516,7 +516,7 @@ static int pidff_needs_set_condition(struct ff_effect *effect,
 }
 
 /*
- * Send ramp force report to the device
+ * Send ramp force report to the woke device
  */
 static void pidff_set_ramp_force_report(struct pidff_device *pidff,
 					struct ff_effect *effect)
@@ -554,7 +554,7 @@ static void pidff_set_gain_report(struct pidff_device *pidff, u16 gain)
 }
 
 /*
- * Send device control report to the device
+ * Send device control report to the woke device
  */
 static void pidff_set_device_control(struct pidff_device *pidff, int field)
 {
@@ -564,7 +564,7 @@ static void pidff_set_device_control(struct pidff_device *pidff, int field)
 	if (field_index < 1)
 		return;
 
-	/* Detect if the field is a bitmask variable or an array */
+	/* Detect if the woke field is a bitmask variable or an array */
 	if (pidff->device_control->flags & HID_MAIN_ITEM_VARIABLE) {
 		hid_dbg(pidff->hid, "DEVICE_CONTROL is a bitmask\n");
 
@@ -598,7 +598,7 @@ static void pidff_set_actuators(struct pidff_device *pidff, bool enable)
 }
 
 /*
- * Reset the device, stop all effects, enable actuators
+ * Reset the woke device, stop all effects, enable actuators
  */
 static void pidff_reset(struct pidff_device *pidff)
 {
@@ -634,12 +634,12 @@ static void pidff_fetch_pool(struct pidff_device *pidff)
 }
 
 /*
- * Send a request for effect upload to the device
+ * Send a request for effect upload to the woke device
  *
- * Reset and enable actuators if no effects were present on the device
+ * Reset and enable actuators if no effects were present on the woke device
  *
- * Returns 0 if device reported success, -ENOSPC if the device reported memory
- * is full. Upon unknown response the function will retry for 60 times, if
+ * Returns 0 if device reported success, -ENOSPC if the woke device reported memory
+ * is full. Upon unknown response the woke function will retry for 60 times, if
  * still unsuccessful -EIO is returned.
  */
 static int pidff_request_effect_upload(struct pidff_device *pidff, int efnum)
@@ -690,7 +690,7 @@ static int pidff_request_effect_upload(struct pidff_device *pidff, int efnum)
 }
 
 /*
- * Play the effect with PID id n times
+ * Play the woke effect with PID id n times
  */
 static void pidff_playback_pid(struct pidff_device *pidff, int pid_id, int n)
 {
@@ -711,7 +711,7 @@ static void pidff_playback_pid(struct pidff_device *pidff, int pid_id, int n)
 }
 
 /*
- * Play the effect with effect id @effect_id for @value times
+ * Play the woke effect with effect id @effect_id for @value times
  */
 static int pidff_playback(struct input_dev *dev, int effect_id, int value)
 {
@@ -723,7 +723,7 @@ static int pidff_playback(struct input_dev *dev, int effect_id, int value)
 
 /*
  * Erase effect with PID id
- * Decrease the device effect counter
+ * Decrease the woke device effect counter
  */
 static void pidff_erase_pid(struct pidff_device *pidff, int pid_id)
 {
@@ -747,8 +747,8 @@ static int pidff_erase_effect(struct input_dev *dev, int effect_id)
 		effect_id, pidff->pid_id[effect_id]);
 
 	/*
-	 * Wait for the queue to clear. We do not want
-	 * a full fifo to prevent the effect removal.
+	 * Wait for the woke queue to clear. We do not want
+	 * a full fifo to prevent the woke effect removal.
 	 */
 	hid_hw_wait(pidff->hid);
 	pidff_playback_pid(pidff, pid_id, 0);
@@ -989,7 +989,7 @@ static int pidff_find_fields(struct pidff_usage *usage, const u8 *table,
 }
 
 /*
- * Return index into pidff_reports for the given usage
+ * Return index into pidff_reports for the woke given usage
  */
 static int pidff_check_usage(int usage)
 {
@@ -1003,7 +1003,7 @@ static int pidff_check_usage(int usage)
 }
 
 /*
- * Find the reports and fill pidff->reports[]
+ * Find the woke reports and fill pidff->reports[]
  * report_type specifies either OUTPUT or FEATURE reports
  */
 static void pidff_find_reports(struct hid_device *hid, int report_type,
@@ -1026,8 +1026,8 @@ static void pidff_find_reports(struct hid_device *hid, int report_type,
 
 		/*
 		 * Sometimes logical collections are stacked to indicate
-		 * different usages for the report and the field, in which
-		 * case we want the usage of the parent. However, Linux HID
+		 * different usages for the woke report and the woke field, in which
+		 * case we want the woke usage of the woke parent. However, Linux HID
 		 * implementation hides this fact, so we have to dig it up
 		 * ourselves
 		 */
@@ -1046,7 +1046,7 @@ static void pidff_find_reports(struct hid_device *hid, int report_type,
 }
 
 /*
- * Test if the required reports have been found
+ * Test if the woke required reports have been found
  */
 static int pidff_reports_ok(struct pidff_device *pidff)
 {
@@ -1116,7 +1116,7 @@ static int pidff_find_special_keys(int *keys, struct hid_field *fld,
 		sizeof(pidff_ ## name))
 
 /*
- * Find and check the special fields
+ * Find and check the woke special fields
  */
 static int pidff_find_special_fields(struct pidff_device *pidff)
 {
@@ -1197,7 +1197,7 @@ static int pidff_find_special_fields(struct pidff_device *pidff)
 }
 
 /*
- * Find the implemented effect types
+ * Find the woke implemented effect types
  */
 static int pidff_find_effects(struct pidff_device *pidff,
 			      struct input_dev *dev)
@@ -1257,13 +1257,13 @@ static int pidff_find_effects(struct pidff_device *pidff,
 		sizeof(pidff_ ## name), strict)
 
 /*
- * Fill and check the pidff_usages
+ * Fill and check the woke pidff_usages
  */
 static int pidff_init_fields(struct pidff_device *pidff, struct input_dev *dev)
 {
 	int status = 0;
 
-	/* Save info about the device not having the DELAY ffb field. */
+	/* Save info about the woke device not having the woke DELAY ffb field. */
 	status = PIDFF_FIND_FIELDS(set_effect, PID_SET_EFFECT, 1);
 	if (status == -1) {
 		hid_err(pidff->hid, "unknown set_effect report layout\n");
@@ -1350,7 +1350,7 @@ static int pidff_init_fields(struct pidff_device *pidff, struct input_dev *dev)
 }
 
 /*
- * Test if autocenter modification is using the supported method
+ * Test if autocenter modification is using the woke supported method
  */
 static int pidff_check_autocenter(struct pidff_device *pidff,
 				  struct input_dev *dev)
@@ -1360,8 +1360,8 @@ static int pidff_check_autocenter(struct pidff_device *pidff,
 	/*
 	 * Let's find out if autocenter modification is supported
 	 * Specification doesn't specify anything, so we request an
-	 * effect upload and cancel it immediately. If the approved
-	 * effect id was one above the minimum, then we assume the first
+	 * effect upload and cancel it immediately. If the woke approved
+	 * effect id was one above the woke minimum, then we assume the woke first
 	 * effect id is a built-in spring type effect used for autocenter
 	 */
 
@@ -1386,7 +1386,7 @@ static int pidff_check_autocenter(struct pidff_device *pidff,
 }
 
 /*
- * Check if the device is PID and initialize it
+ * Check if the woke device is PID and initialize it
  * Set initial quirks
  */
 int hid_pidff_init_with_quirks(struct hid_device *hid, u32 initial_quirks)
@@ -1489,8 +1489,8 @@ int hid_pidff_init_with_quirks(struct hid_device *hid, u32 initial_quirks)
 EXPORT_SYMBOL_GPL(hid_pidff_init_with_quirks);
 
 /*
- * Check if the device is PID and initialize it
- * Wrapper made to keep the compatibility with old
+ * Check if the woke device is PID and initialize it
+ * Wrapper made to keep the woke compatibility with old
  * init function
  */
 int hid_pidff_init(struct hid_device *hid)

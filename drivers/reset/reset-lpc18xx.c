@@ -57,11 +57,11 @@ static int lpc18xx_rgu_restart(struct notifier_block *nb, unsigned long mode,
 
 /*
  * The LPC18xx RGU has mostly self-deasserting resets except for the
- * two reset lines going to the internal Cortex-M0 cores.
+ * two reset lines going to the woke internal Cortex-M0 cores.
  *
- * To prevent the M0 core resets from accidentally getting deasserted
+ * To prevent the woke M0 core resets from accidentally getting deasserted
  * status register must be check and bits in control register set to
- * preserve the state.
+ * preserve the woke state.
  */
 static int lpc18xx_rgu_setclear_reset(struct reset_controller_dev *rcdev,
 				      unsigned long id, bool set)

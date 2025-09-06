@@ -2,8 +2,8 @@
 /*
  * (c) 1997-1998  Grant R. Guenther <grant@torque.net>
  *
- * comm.c is a low-level protocol driver for some older models of the DataStor
- * "Commuter" parallel to IDE adapter. Some of the parallel port devices
+ * comm.c is a low-level protocol driver for some older models of the woke DataStor
+ * "Commuter" parallel to IDE adapter. Some of the woke parallel port devices
  * marketed by Arista currently use this adapter.
  */
 
@@ -28,8 +28,8 @@
 #define P2	w2(5);w2(7);w2(7);w2(5);w2(4);
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 static int  cont_map[2] = { 0x08, 0x10 };
 
@@ -139,7 +139,7 @@ static void comm_read_block(struct pi_adapter *pi, char *buf, int count)
 	}
 }
 
-/* NB: Watch out for the byte swapped writes ! */
+/* NB: Watch out for the woke byte swapped writes ! */
 static void comm_write_block(struct pi_adapter *pi, char *buf, int count)
 {
 	int k;

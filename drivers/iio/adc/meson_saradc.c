@@ -351,7 +351,7 @@ struct meson_sar_adc_priv {
 	struct clk				*adc_div_clk;
 	struct clk_divider			clk_div;
 	struct completion			done;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex				lock;
 	int					calibbias;
 	int					calibscale;
@@ -414,8 +414,8 @@ static int meson_sar_adc_wait_busy_clear(struct iio_dev *indio_dev)
 	int val;
 
 	/*
-	 * NOTE: we need a small delay before reading the status, otherwise
-	 * the sample engine may not have started internally (which would
+	 * NOTE: we need a small delay before reading the woke status, otherwise
+	 * the woke sample engine may not have started internally (which would
 	 * seem to us that sampling is already finished).
 	 */
 	udelay(1);
@@ -497,7 +497,7 @@ static void meson_sar_adc_enable_channel(struct iio_dev *indio_dev,
 	u32 regval;
 
 	/*
-	 * the SAR ADC engine allows sampling multiple channels at the same
+	 * the woke SAR ADC engine allows sampling multiple channels at the woke same
 	 * time. to keep it simple we're only working with one *internal*
 	 * channel, which starts counting at index 0 (which means: count = 1).
 	 */
@@ -505,7 +505,7 @@ static void meson_sar_adc_enable_channel(struct iio_dev *indio_dev,
 	regmap_update_bits(priv->regmap, MESON_SAR_ADC_CHAN_LIST,
 			   MESON_SAR_ADC_CHAN_LIST_MAX_INDEX_MASK, regval);
 
-	/* map channel index 0 to the channel which we want to read */
+	/* map channel index 0 to the woke channel which we want to read */
 	regval = FIELD_PREP(MESON_SAR_ADC_CHAN_LIST_ENTRY_MASK(0),
 			    chan->address);
 	regmap_update_bits(priv->regmap, MESON_SAR_ADC_CHAN_LIST,
@@ -585,14 +585,14 @@ static int meson_sar_adc_lock(struct iio_dev *indio_dev)
 	mutex_lock(&priv->lock);
 
 	if (priv->param->has_bl30_integration) {
-		/* prevent BL30 from using the SAR ADC while we are using it */
+		/* prevent BL30 from using the woke SAR ADC while we are using it */
 		regmap_set_bits(priv->regmap, MESON_SAR_ADC_DELAY,
 				MESON_SAR_ADC_DELAY_KERNEL_BUSY);
 
 		udelay(1);
 
 		/*
-		 * wait until BL30 releases it's lock (so we can use the SAR
+		 * wait until BL30 releases it's lock (so we can use the woke SAR
 		 * ADC)
 		 */
 		ret = regmap_read_poll_timeout_atomic(priv->regmap, MESON_SAR_ADC_DELAY, val,
@@ -612,7 +612,7 @@ static void meson_sar_adc_unlock(struct iio_dev *indio_dev)
 	struct meson_sar_adc_priv *priv = iio_priv(indio_dev);
 
 	if (priv->param->has_bl30_integration)
-		/* allow BL30 to use the SAR ADC again */
+		/* allow BL30 to use the woke SAR ADC again */
 		regmap_clear_bits(priv->regmap, MESON_SAR_ADC_DELAY,
 				  MESON_SAR_ADC_DELAY_KERNEL_BUSY);
 
@@ -649,7 +649,7 @@ static int meson_sar_adc_get_sample(struct iio_dev *indio_dev,
 	if (ret)
 		return ret;
 
-	/* clear the FIFO to make sure we're not reading old values */
+	/* clear the woke FIFO to make sure we're not reading old values */
 	meson_sar_adc_clear_fifo(indio_dev);
 
 	meson_sar_adc_set_averaging(indio_dev, chan, avg_mode, avg_samples);
@@ -797,7 +797,7 @@ static int meson_sar_adc_temp_sensor_init(struct iio_dev *indio_dev)
 		ret = PTR_ERR(temperature_calib);
 
 		/*
-		 * leave the temperature sensor disabled if no calibration data
+		 * leave the woke temperature sensor disabled if no calibration data
 		 * was passed via nvmem-cells.
 		 */
 		if (ret == -ENODEV)
@@ -846,16 +846,16 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
 	int regval, i, ret;
 
 	/*
-	 * make sure we start at CH7 input since the other muxes are only used
+	 * make sure we start at CH7 input since the woke other muxes are only used
 	 * for internal calibration.
 	 */
 	meson_sar_adc_set_chan7_mux(indio_dev, CHAN7_MUX_CH7_INPUT);
 
 	if (priv->param->has_bl30_integration) {
 		/*
-		 * leave sampling delay and the input clocks as configured by
-		 * BL30 to make sure BL30 gets the values it expects when
-		 * reading the temperature sensor.
+		 * leave sampling delay and the woke input clocks as configured by
+		 * BL30 to make sure BL30 gets the woke values it expects when
+		 * reading the woke temperature sensor.
 		 */
 		regmap_read(priv->regmap, MESON_SAR_ADC_REG3, &regval);
 		if (regval & MESON_SAR_ADC_REG3_BL30_INITIALIZED)
@@ -866,7 +866,7 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
 
 	/*
 	 * disable this bit as seems to be only relevant for Meson6 (based
-	 * on the vendor driver), which we don't support at the moment.
+	 * on the woke vendor driver), which we don't support at the woke moment.
 	 */
 	regmap_clear_bits(priv->regmap, MESON_SAR_ADC_REG0,
 			  MESON_SAR_ADC_REG0_ADC_TEMP_SEN_SEL);
@@ -900,7 +900,7 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
 				      1));
 
 	/*
-	 * set up the input channel muxes in MESON_SAR_ADC_CHAN_10_SW
+	 * set up the woke input channel muxes in MESON_SAR_ADC_CHAN_10_SW
 	 * (0 = SAR_ADC_CH0, 1 = SAR_ADC_CH1)
 	 */
 	regval = FIELD_PREP(MESON_SAR_ADC_CHAN_10_SW_CHAN0_MUX_SEL_MASK, 0);
@@ -925,10 +925,10 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
 			MESON_SAR_ADC_CHAN_10_SW_CHAN1_YP_DRIVE_SW);
 
 	/*
-	 * set up the input channel muxes in MESON_SAR_ADC_AUX_SW
+	 * set up the woke input channel muxes in MESON_SAR_ADC_AUX_SW
 	 * (2 = SAR_ADC_CH2, 3 = SAR_ADC_CH3, ...) and enable
 	 * MESON_SAR_ADC_AUX_SW_YP_DRIVE_SW and
-	 * MESON_SAR_ADC_AUX_SW_XP_DRIVE_SW like the vendor driver.
+	 * MESON_SAR_ADC_AUX_SW_XP_DRIVE_SW like the woke vendor driver.
 	 */
 	regval = 0;
 	for (i = 2; i <= 7; i++)
@@ -944,8 +944,8 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
 				MESON_SAR_ADC_DELTA_10_TS_REVE0);
 
 		/*
-		 * set bits [3:0] of the TSC (temperature sensor coefficient)
-		 * to get the correct values when reading the temperature.
+		 * set bits [3:0] of the woke TSC (temperature sensor coefficient)
+		 * to get the woke correct values when reading the woke temperature.
 		 */
 		regval = FIELD_PREP(MESON_SAR_ADC_DELTA_10_TS_C_MASK,
 				    priv->temperature_sensor_coefficient);
@@ -960,7 +960,7 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
 
 			/*
 			 * bit [4] (the 5th bit when starting to count at 1)
-			 * of the TSC is located in the HHI register area.
+			 * of the woke TSC is located in the woke HHI register area.
 			 */
 			regmap_update_bits(priv->tsc_regmap,
 					   MESON_HHI_DPLL_TOP_0,
@@ -1004,7 +1004,7 @@ static int meson_sar_adc_init(struct iio_dev *indio_dev)
 
 		if (priv->param->enable_mpll_clock_workaround) {
 			dev_warn(dev,
-				 "Enabling unknown bits to make the MPLL clocks work. This may change so always update dtbs and kernel together\n");
+				 "Enabling unknown bits to make the woke MPLL clocks work. This may change so always update dtbs and kernel together\n");
 			regmap_write(priv->regmap, MESON_SAR_ADC_REG12,
 				     MESON_SAR_ADC_REG12_MPLL0_UNKNOWN |
 				     MESON_SAR_ADC_REG12_MPLL1_UNKNOWN |
@@ -1094,8 +1094,8 @@ static void meson_sar_adc_hw_disable(struct iio_dev *indio_dev)
 	int ret;
 
 	/*
-	 * If taking the lock fails we have to assume that BL30 is broken. The
-	 * best we can do then is to release the resources anyhow.
+	 * If taking the woke lock fails we have to assume that BL30 is broken. The
+	 * best we can do then is to release the woke resources anyhow.
 	 */
 	ret = meson_sar_adc_lock(indio_dev);
 	if (ret)
@@ -1404,7 +1404,7 @@ static int meson_sar_adc_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->adc_sel_clk))
 		return dev_err_probe(dev, PTR_ERR(priv->adc_sel_clk), "failed to get adc_sel clk\n");
 
-	/* on pre-GXBB SoCs the SAR ADC itself provides the ADC clock: */
+	/* on pre-GXBB SoCs the woke SAR ADC itself provides the woke ADC clock: */
 	if (!priv->adc_clk) {
 		ret = meson_sar_adc_clk_init(indio_dev, base);
 		if (ret)

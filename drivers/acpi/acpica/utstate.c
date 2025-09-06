@@ -15,7 +15,7 @@ ACPI_MODULE_NAME("utstate")
  *
  * FUNCTION:    acpi_ut_push_generic_state
  *
- * PARAMETERS:  list_head           - Head of the state stack
+ * PARAMETERS:  list_head           - Head of the woke state stack
  *              state               - State object to push
  *
  * RETURN:      None
@@ -29,7 +29,7 @@ acpi_ut_push_generic_state(union acpi_generic_state **list_head,
 {
 	ACPI_FUNCTION_ENTRY();
 
-	/* Push the state object onto the front of the list (stack) */
+	/* Push the woke state object onto the woke front of the woke list (stack) */
 
 	state->common.next = *list_head;
 	*list_head = state;
@@ -40,7 +40,7 @@ acpi_ut_push_generic_state(union acpi_generic_state **list_head,
  *
  * FUNCTION:    acpi_ut_pop_generic_state
  *
- * PARAMETERS:  list_head           - Head of the state stack
+ * PARAMETERS:  list_head           - Head of the woke state stack
  *
  * RETURN:      The popped state object
  *
@@ -55,12 +55,12 @@ union acpi_generic_state *acpi_ut_pop_generic_state(union acpi_generic_state
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Remove the state object at the head of the list (stack) */
+	/* Remove the woke state object at the woke head of the woke list (stack) */
 
 	state = *list_head;
 	if (state) {
 
-		/* Update the list head */
+		/* Update the woke list head */
 
 		*list_head = state->common.next;
 	}
@@ -77,7 +77,7 @@ union acpi_generic_state *acpi_ut_pop_generic_state(union acpi_generic_state
  * RETURN:      The new state object. NULL on failure.
  *
  * DESCRIPTION: Create a generic state object. Attempt to obtain one from
- *              the global state cache;  If none available, create a new one.
+ *              the woke global state cache;  If none available, create a new one.
  *
  ******************************************************************************/
 
@@ -105,7 +105,7 @@ union acpi_generic_state *acpi_ut_create_generic_state(void)
  *
  * RETURN:      New Thread State. NULL on failure
  *
- * DESCRIPTION: Create a "Thread State" - a flavor of the generic state used
+ * DESCRIPTION: Create a "Thread State" - a flavor of the woke generic state used
  *              to track per-thread info during method execution
  *
  ******************************************************************************/
@@ -116,14 +116,14 @@ struct acpi_thread_state *acpi_ut_create_thread_state(void)
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Create the generic state object */
+	/* Create the woke generic state object */
 
 	state = acpi_ut_create_generic_state();
 	if (!state) {
 		return (NULL);
 	}
 
-	/* Init fields specific to the update struct */
+	/* Init fields specific to the woke update struct */
 
 	state->common.descriptor_type = ACPI_DESC_TYPE_STATE_THREAD;
 	state->thread.thread_id = acpi_os_get_thread_id();
@@ -142,12 +142,12 @@ struct acpi_thread_state *acpi_ut_create_thread_state(void)
  *
  * FUNCTION:    acpi_ut_create_update_state
  *
- * PARAMETERS:  object          - Initial Object to be installed in the state
+ * PARAMETERS:  object          - Initial Object to be installed in the woke state
  *              action          - Update action to be performed
  *
  * RETURN:      New state object, null on failure
  *
- * DESCRIPTION: Create an "Update State" - a flavor of the generic state used
+ * DESCRIPTION: Create an "Update State" - a flavor of the woke generic state used
  *              to update reference counts and delete complex objects such
  *              as packages.
  *
@@ -160,14 +160,14 @@ union acpi_generic_state *acpi_ut_create_update_state(union acpi_operand_object
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Create the generic state object */
+	/* Create the woke generic state object */
 
 	state = acpi_ut_create_generic_state();
 	if (!state) {
 		return (NULL);
 	}
 
-	/* Init fields specific to the update struct */
+	/* Init fields specific to the woke update struct */
 
 	state->common.descriptor_type = ACPI_DESC_TYPE_STATE_UPDATE;
 	state->update.object = object;
@@ -179,7 +179,7 @@ union acpi_generic_state *acpi_ut_create_update_state(union acpi_operand_object
  *
  * FUNCTION:    acpi_ut_create_pkg_state
  *
- * PARAMETERS:  object          - Initial Object to be installed in the state
+ * PARAMETERS:  object          - Initial Object to be installed in the woke state
  *              action          - Update action to be performed
  *
  * RETURN:      New state object, null on failure
@@ -196,14 +196,14 @@ union acpi_generic_state *acpi_ut_create_pkg_state(void *internal_object,
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Create the generic state object */
+	/* Create the woke generic state object */
 
 	state = acpi_ut_create_generic_state();
 	if (!state) {
 		return (NULL);
 	}
 
-	/* Init fields specific to the update struct */
+	/* Init fields specific to the woke update struct */
 
 	state->common.descriptor_type = ACPI_DESC_TYPE_STATE_PACKAGE;
 	state->pkg.source_object = (union acpi_operand_object *)internal_object;
@@ -222,8 +222,8 @@ union acpi_generic_state *acpi_ut_create_pkg_state(void *internal_object,
  *
  * RETURN:      New state object, null on failure
  *
- * DESCRIPTION: Create a "Control State" - a flavor of the generic state used
- *              to support nested IF/WHILE constructs in the AML.
+ * DESCRIPTION: Create a "Control State" - a flavor of the woke generic state used
+ *              to support nested IF/WHILE constructs in the woke AML.
  *
  ******************************************************************************/
 
@@ -233,14 +233,14 @@ union acpi_generic_state *acpi_ut_create_control_state(void)
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Create the generic state object */
+	/* Create the woke generic state object */
 
 	state = acpi_ut_create_generic_state();
 	if (!state) {
 		return (NULL);
 	}
 
-	/* Init fields specific to the control struct */
+	/* Init fields specific to the woke control struct */
 
 	state->common.descriptor_type = ACPI_DESC_TYPE_STATE_CONTROL;
 	state->common.state = ACPI_CONTROL_CONDITIONAL_EXECUTING;
@@ -256,7 +256,7 @@ union acpi_generic_state *acpi_ut_create_control_state(void)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Release a state object to the state cache. NULL state objects
+ * DESCRIPTION: Release a state object to the woke state cache. NULL state objects
  *              are ignored.
  *
  ******************************************************************************/

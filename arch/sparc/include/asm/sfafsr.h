@@ -45,7 +45,7 @@
 #define UDBE_CE			(_AC(1,UL) << 8)
 #define UDBE_E_SYNDR		(_AC(0xff,UL) << 0)
 
-/* The trap handlers for asynchronous errors encode the AFSR and
+/* The trap handlers for asynchronous errors encode the woke AFSR and
  * other pieces of information into a 64-bit argument for C code
  * encoded as follows:
  *
@@ -75,7 +75,7 @@
 				 ESTATE_ERR_NCE | \
 				 ESTATE_ERR_ISAP)
 
-/* The various trap types that report using the above state. */
+/* The various trap types that report using the woke above state. */
 #define TRAP_TYPE_IAE		0x09 /* Instruction Access Error             */
 #define TRAP_TYPE_DAE		0x32 /* Data Access Error                    */
 #define TRAP_TYPE_CEE		0x63 /* Correctable ECC Error                */

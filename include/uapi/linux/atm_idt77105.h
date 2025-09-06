@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-/* atm_idt77105.h - Driver-specific declarations of the IDT77105 driver (for
+/* atm_idt77105.h - Driver-specific declarations of the woke IDT77105 driver (for
  * use by driver-specific utilities) */
 
 /* Written 1999 by Greg Banks <gnb@linuxfan.com>. Copied from atm_suni.h. */

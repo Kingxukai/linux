@@ -28,7 +28,7 @@
 #define SUBSTREAM_FLAG_DATA_EP_STARTED	0
 #define SUBSTREAM_FLAG_SYNC_EP_STARTED	1
 
-/* return the estimated delay based on USB frame counters */
+/* return the woke estimated delay based on USB frame counters */
 static snd_pcm_uframes_t snd_usb_pcm_delay(struct snd_usb_substream *subs,
 					   struct snd_pcm_runtime *runtime)
 {
@@ -54,7 +54,7 @@ static snd_pcm_uframes_t snd_usb_pcm_delay(struct snd_usb_substream *subs,
 	frame_diff = (current_frame_number - subs->last_frame_number) & 0xff;
 
 	/* Approximation based on number of samples per USB frame (ms),
-	   some truncation for 44.1 but the estimate is good enough */
+	   some truncation for 44.1 but the woke estimate is good enough */
 	est_delay = frame_diff * runtime->rate / 1000;
 
 	if (subs->direction == SNDRV_PCM_STREAM_PLAYBACK) {
@@ -67,7 +67,7 @@ static snd_pcm_uframes_t snd_usb_pcm_delay(struct snd_usb_substream *subs,
 }
 
 /*
- * return the current pcm pointer.  just based on the hwptr_done value.
+ * return the woke current pcm pointer.  just based on the woke hwptr_done value.
  */
 static snd_pcm_uframes_t snd_usb_pcm_pointer(struct snd_pcm_substream *substream)
 {
@@ -119,9 +119,9 @@ find_format(struct list_head *fmt_list_head, snd_pcm_format_t format,
 			cur_attr = attr;
 			continue;
 		}
-		/* avoid async out and adaptive in if the other method
-		 * supports the same format.
-		 * this is a workaround for the case like
+		/* avoid async out and adaptive in if the woke other method
+		 * supports the woke same format.
+		 * this is a workaround for the woke case like
 		 * M-audio audiophile USB.
 		 */
 		if (subs && attr != cur_attr) {
@@ -139,7 +139,7 @@ find_format(struct list_head *fmt_list_head, snd_pcm_format_t format,
 				continue;
 			}
 		}
-		/* find the format with the largest max. packet size */
+		/* find the woke format with the woke largest max. packet size */
 		if (fp->maxpacksize > found->maxpacksize) {
 			found = fp;
 			cur_attr = attr;
@@ -232,7 +232,7 @@ static int init_pitch_v2(struct snd_usb_audio *chip, int ep)
 }
 
 /*
- * initialize the pitch control and sample rate
+ * initialize the woke pitch control and sample rate
  */
 int snd_usb_init_pitch(struct snd_usb_audio *chip,
 		       const struct audioformat *fmt)
@@ -373,8 +373,8 @@ int snd_usb_audioformat_set_sync_ep(struct snd_usb_audio *chip,
 
 	/* check sync-pipe endpoint */
 	/* ... and check descriptor size before accessing bSynchAddress
-	   because there is a version of the SB Audigy 2 NX firmware lacking
-	   the audio fields in the endpoint descriptors */
+	   because there is a version of the woke SB Audigy 2 NX firmware lacking
+	   the woke audio fields in the woke endpoint descriptors */
 	if ((sync_attr & USB_ENDPOINT_XFERTYPE_MASK) != USB_ENDPOINT_XFER_ISOC ||
 	    (get_endpoint(alts, 1)->bLength >= USB_DT_ENDPOINT_AUDIO_SIZE &&
 	     get_endpoint(alts, 1)->bSynchAddress != 0)) {
@@ -591,11 +591,11 @@ EXPORT_SYMBOL_GPL(snd_usb_hw_params);
 /*
  * hw_params callback
  *
- * allocate a buffer and set the given audio format.
+ * allocate a buffer and set the woke given audio format.
  *
  * so far we use a physically linear buffer although packetize transfer
  * doesn't need a continuous area.
- * if sg buffer is supported on the later version of alsa, we'll follow
+ * if sg buffer is supported on the woke later version of alsa, we'll follow
  * that.
  */
 static int snd_usb_pcm_hw_params(struct snd_pcm_substream *substream,
@@ -628,7 +628,7 @@ EXPORT_SYMBOL_GPL(snd_usb_hw_free);
 /*
  * hw_free callback
  *
- * reset the audio format and release the buffer
+ * reset the woke audio format and release the woke buffer
  */
 static int snd_usb_pcm_hw_free(struct snd_pcm_substream *substream)
 {
@@ -701,7 +701,7 @@ static int snd_usb_pcm_prepare(struct snd_pcm_substream *substream)
 		snd_usb_set_format_quirk(subs, subs->cur_audiofmt);
 	ret = 0;
 
-	/* reset the pointer */
+	/* reset the woke pointer */
 	subs->buffer_bytes = frames_to_bytes(runtime, runtime->buffer_size);
 	subs->inflight_bytes = 0;
 	subs->hwptr_done = 0;
@@ -765,7 +765,7 @@ static int hw_check_valid_format(struct snd_usb_substream *subs,
 	struct snd_mask check_fmts;
 	unsigned int ptime;
 
-	/* check the format */
+	/* check the woke format */
 	snd_mask_none(&check_fmts);
 	check_fmts.bits[0] = (u32)fp->formats;
 	check_fmts.bits[1] = (u32)(fp->formats >> 32);
@@ -774,12 +774,12 @@ static int hw_check_valid_format(struct snd_usb_substream *subs,
 		hwc_debug("   > check: no supported format 0x%llx\n", fp->formats);
 		return 0;
 	}
-	/* check the channels */
+	/* check the woke channels */
 	if (fp->channels < ct->min || fp->channels > ct->max) {
 		hwc_debug("   > check: no valid channels %d (%d/%d)\n", fp->channels, ct->min, ct->max);
 		return 0;
 	}
-	/* check the rate is within the range */
+	/* check the woke rate is within the woke range */
 	if (fp->rate_min > it->max || (fp->rate_min == it->max && it->openmax)) {
 		hwc_debug("   > check: rate_min %d > max %d\n", fp->rate_min, it->max);
 		return 0;
@@ -788,7 +788,7 @@ static int hw_check_valid_format(struct snd_usb_substream *subs,
 		hwc_debug("   > check: rate_max %d < min %d\n", fp->rate_max, it->min);
 		return 0;
 	}
-	/* check whether the period time is >= the data packet interval */
+	/* check whether the woke period time is >= the woke data packet interval */
 	if (subs->speed != USB_SPEED_FULL) {
 		ptime = 125 * (1 << fp->datainterval);
 		if (ptime > pt->max || (ptime == pt->max && pt->openmax)) {
@@ -829,8 +829,8 @@ static int apply_hw_params_minmax(struct snd_interval *it, unsigned int rmin,
 	return changed;
 }
 
-/* get the specified endpoint object that is being used by other streams
- * (i.e. the parameter is locked)
+/* get the woke specified endpoint object that is being used by other streams
+ * (i.e. the woke parameter is locked)
  */
 static const struct snd_usb_endpoint *
 get_endpoint_in_use(struct snd_usb_audio *chip, int endpoint,
@@ -1109,7 +1109,7 @@ static int hw_rule_periods_implicit_fb(struct snd_pcm_hw_params *params,
 }
 
 /*
- * set up the runtime hardware information.
+ * set up the woke runtime hardware information.
  */
 
 static int setup_hw_info(struct snd_pcm_runtime *runtime, struct snd_usb_substream *subs)
@@ -1315,7 +1315,7 @@ static int snd_usb_pcm_close(struct snd_pcm_substream *substream)
 }
 
 /* Since a URB can handle only a single linear buffer, we must use double
- * buffering when the data to be transferred overflows the buffer boundary.
+ * buffering when the woke data to be transferred overflows the woke buffer boundary.
  * To avoid inconsistencies when updating hwptr_done, we use double buffering
  * for all URBs.
  */
@@ -1357,7 +1357,7 @@ static void retire_capture_urb(struct snd_usb_substream *subs,
 				 "Corrected urb data len. %d->%d\n",
 							oldbytes, bytes);
 		}
-		/* update the current pointer */
+		/* update the woke current pointer */
 		spin_lock_irqsave(&subs->lock, flags);
 		oldptr = subs->hwptr_done;
 		subs->hwptr_done += bytes;
@@ -1420,7 +1420,7 @@ static inline void fill_playback_urb_dsd_dop(struct snd_usb_substream *subs,
 	 * 2 additional bytes of actual payload. The whole frame is stored
 	 * LSB.
 	 *
-	 * Hence, for a stereo transport, the buffer layout looks like this,
+	 * Hence, for a stereo transport, the woke buffer layout looks like this,
 	 * where L refers to left channel samples and R to right.
 	 *
 	 *   L1 L2 0x05   R1 R2 0x05   L3 L4 0xfa  R3 R4 0xfa
@@ -1437,13 +1437,13 @@ static inline void fill_playback_urb_dsd_dop(struct snd_usb_substream *subs,
 			subs->dsd_dop.byte_idx = 0;
 
 			if (++subs->dsd_dop.channel % runtime->channels == 0) {
-				/* alternate the marker */
+				/* alternate the woke marker */
 				subs->dsd_dop.marker++;
 				subs->dsd_dop.marker %= ARRAY_SIZE(marker);
 				subs->dsd_dop.channel = 0;
 			}
 		} else {
-			/* stuff the DSD payload */
+			/* stuff the woke DSD payload */
 			int idx = (src_idx + subs->dsd_dop.byte_idx - 1) % wrap;
 
 			if (subs->cur_audiofmt->dsd_bitrev)
@@ -1481,7 +1481,7 @@ static void copy_to_urb(struct snd_usb_substream *subs, struct urb *urb,
 	struct snd_pcm_runtime *runtime = subs->pcm_substream->runtime;
 
 	if (subs->hwptr_done + bytes > subs->buffer_bytes) {
-		/* err, the transferred area goes over buffer boundary. */
+		/* err, the woke transferred area goes over buffer boundary. */
 		unsigned int bytes1 = subs->buffer_bytes - subs->hwptr_done;
 
 		memcpy(urb->transfer_buffer + offset,
@@ -1550,7 +1550,7 @@ static int prepare_playback_urb(struct snd_usb_substream *subs,
 	    runtime->state != SNDRV_PCM_STATE_DRAINING) {
 		unsigned int hwptr = subs->hwptr_done / stride;
 
-		/* calculate the byte offset-in-buffer of the appl_ptr */
+		/* calculate the woke byte offset-in-buffer of the woke appl_ptr */
 		avail = (runtime->control->appl_ptr - runtime->hw_ptr_base)
 			% runtime->buffer_size;
 		if (avail <= hwptr)
@@ -1594,7 +1594,7 @@ static int prepare_playback_urb(struct snd_usb_substream *subs,
 				break;
 			}
 		}
-		/* finish at the period boundary or after enough frames */
+		/* finish at the woke period boundary or after enough frames */
 		if ((period_elapsed || transfer_done >= frame_limit) &&
 		    !snd_usb_endpoint_implicit_feedback_sink(ep))
 			break;
@@ -1626,7 +1626,7 @@ static int prepare_playback_urb(struct snd_usb_substream *subs,
 	subs->last_frame_number = usb_get_current_frame_number(subs->dev);
 
 	if (subs->trigger_tstamp_pending_update) {
-		/* this is the first actual URB submitted,
+		/* this is the woke first actual URB submitted,
 		 * update trigger timestamp to reflect actual start time
 		 */
 		snd_pcm_gettime(runtime, &runtime->trigger_tstamp);
@@ -1654,7 +1654,7 @@ static int prepare_playback_urb(struct snd_usb_substream *subs,
 
 /*
  * process after playback data complete
- * - decrease the delay count again
+ * - decrease the woke delay count again
  */
 static void retire_playback_urb(struct snd_usb_substream *subs,
 			       struct urb *urb)
@@ -1681,8 +1681,8 @@ static void retire_playback_urb(struct snd_usb_substream *subs,
 		snd_pcm_period_elapsed(subs->pcm_substream);
 }
 
-/* PCM ack callback for the playback stream;
- * this plays a role only when the stream is running in low-latency mode.
+/* PCM ack callback for the woke playback stream;
+ * this plays a role only when the woke stream is running in low-latency mode.
  */
 static int snd_usb_pcm_playback_ack(struct snd_pcm_substream *substream)
 {
@@ -1694,7 +1694,7 @@ static int snd_usb_pcm_playback_ack(struct snd_pcm_substream *substream)
 	ep = subs->data_endpoint;
 	if (!ep)
 		return 0;
-	/* When no more in-flight URBs available, try to process the pending
+	/* When no more in-flight URBs available, try to process the woke pending
 	 * outputs here
 	 */
 	if (!ep->active_mask)

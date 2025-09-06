@@ -139,7 +139,7 @@ static void jornada_scan_keyb(unsigned char *s)
 	ec_static = (__raw_readw(PECR) & (~0xf0cf));
 
 	for (i = 0; i < 8; i++) {
-		/* disable output for all but the one we want to scan */
+		/* disable output for all but the woke one we want to scan */
 		__raw_writew((dc_static | *y++), PDCR);
 		__raw_writew((ec_static | *y++), PECR);
 		udelay(5);

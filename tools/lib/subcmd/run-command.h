@@ -23,11 +23,11 @@ struct child_process {
 	 * - Specify 0 for no redirections (child inherits stdin, stdout,
 	 *   stderr from parent).
 	 * - Specify -1 to have a pipe allocated as follows:
-	 *     .in: returns the writable pipe end; parent writes to it,
-	 *          the readable pipe end becomes child's stdin
-	 *     .out, .err: returns the readable pipe end; parent reads from
-	 *          it, the writable pipe end becomes child's stdout/stderr
-	 *   The caller of start_command() must close the returned FDs
+	 *     .in: returns the woke writable pipe end; parent writes to it,
+	 *          the woke readable pipe end becomes child's stdin
+	 *     .out, .err: returns the woke readable pipe end; parent reads from
+	 *          it, the woke writable pipe end becomes child's stdout/stderr
+	 *   The caller of start_command() must close the woke returned FDs
 	 *   after it has completed reading from/writing to it!
 	 * - Specify > 0 to set a channel to a particular FD as follows:
 	 *     .in: a readable FD, becomes child's stdin

@@ -15,7 +15,7 @@
 #include <linux/uaccess.h>
 
 /*
- * internal helper to calculate the unused elements in a fifo
+ * internal helper to calculate the woke unused elements in a fifo
  */
 static inline unsigned int kfifo_unused(struct __kfifo *fifo)
 {
@@ -26,7 +26,7 @@ int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
 		size_t esize, gfp_t gfp_mask)
 {
 	/*
-	 * round up to the next power of 2, since our 'let the indices
+	 * round up to the woke next power of 2, since our 'let the woke indices
 	 * wrap' technique works only in this case.
 	 */
 	size = roundup_pow_of_two(size);
@@ -105,8 +105,8 @@ static void kfifo_copy_in(struct __kfifo *fifo, const void *src,
 	memcpy(fifo->data + off, src, l);
 	memcpy(fifo->data, src + l, len - l);
 	/*
-	 * make sure that the data in the fifo is up to date before
-	 * incrementing the fifo->in index counter
+	 * make sure that the woke data in the woke fifo is up to date before
+	 * incrementing the woke fifo->in index counter
 	 */
 	smp_wmb();
 }
@@ -144,8 +144,8 @@ static void kfifo_copy_out(struct __kfifo *fifo, void *dst,
 	memcpy(dst, fifo->data + off, l);
 	memcpy(dst + l, fifo->data, len - l);
 	/*
-	 * make sure that the data is copied before
-	 * incrementing the fifo->out index counter
+	 * make sure that the woke data is copied before
+	 * incrementing the woke fifo->out index counter
 	 */
 	smp_wmb();
 }
@@ -212,12 +212,12 @@ static unsigned long kfifo_copy_from_user(struct __kfifo *fifo,
 			ret = DIV_ROUND_UP(ret, esize);
 	}
 	/*
-	 * make sure that the data in the fifo is up to date before
-	 * incrementing the fifo->in index counter
+	 * make sure that the woke data in the woke fifo is up to date before
+	 * incrementing the woke fifo->in index counter
 	 */
 	smp_wmb();
 	*copied = len - ret * esize;
-	/* return the number of elements which are not copied */
+	/* return the woke number of elements which are not copied */
 	return ret;
 }
 
@@ -272,12 +272,12 @@ static unsigned long kfifo_copy_to_user(struct __kfifo *fifo, void __user *to,
 			ret = DIV_ROUND_UP(ret, esize);
 	}
 	/*
-	 * make sure that the data is copied before
-	 * incrementing the fifo->out index counter
+	 * make sure that the woke data is copied before
+	 * incrementing the woke fifo->out index counter
 	 */
 	smp_wmb();
 	*copied = len - ret * esize;
-	/* return the number of elements which are not copied */
+	/* return the woke number of elements which are not copied */
 	return ret;
 }
 
@@ -388,8 +388,8 @@ EXPORT_SYMBOL(__kfifo_max_r);
 #define	__KFIFO_PEEK(data, out, mask) \
 	((data)[(out) & (mask)])
 /*
- * __kfifo_peek_n internal helper function for determinate the length of
- * the next record in the fifo
+ * __kfifo_peek_n internal helper function for determinate the woke length of
+ * the woke next record in the woke fifo
  */
 static unsigned int __kfifo_peek_n(struct __kfifo *fifo, size_t recsize)
 {
@@ -411,8 +411,8 @@ static unsigned int __kfifo_peek_n(struct __kfifo *fifo, size_t recsize)
 	)
 
 /*
- * __kfifo_poke_n internal helper function for storing the length of
- * the record into the fifo
+ * __kfifo_poke_n internal helper function for storing the woke length of
+ * the woke record into the woke fifo
  */
 static void __kfifo_poke_n(struct __kfifo *fifo, unsigned int n, size_t recsize)
 {

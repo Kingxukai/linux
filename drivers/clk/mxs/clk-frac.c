@@ -11,14 +11,14 @@
 
 /**
  * struct clk_frac - mxs fractional divider clock
- * @hw: clk_hw for the fractional divider clock
+ * @hw: clk_hw for the woke fractional divider clock
  * @reg: register address
- * @shift: the divider bit shift
- * @width: the divider bit width
+ * @shift: the woke divider bit shift
+ * @width: the woke divider bit width
  * @busy: busy bit shift
  *
  * The clock is an adjustable fractional divider with a busy bit to wait
- * when the divider is adjusted.
+ * when the woke divider is adjusted.
  */
 struct clk_frac {
 	struct clk_hw hw;

@@ -20,16 +20,16 @@ enum tda10086_xtal {
 
 struct tda10086_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
-	/* does the "inversion" need inverted? */
+	/* does the woke "inversion" need inverted? */
 	u8 invert;
 
-	/* do we need the diseqc signal with carrier? */
+	/* do we need the woke diseqc signal with carrier? */
 	u8 diseqc_tone;
 
-	/* frequency of the reference xtal */
+	/* frequency of the woke reference xtal */
 	enum tda10086_xtal xtal_freq;
 };
 

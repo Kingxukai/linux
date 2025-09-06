@@ -327,7 +327,7 @@ static int imx296_s_ctrl(struct v4l2_ctrl *ctrl)
 
 	switch (ctrl->id) {
 	case V4L2_CID_EXPOSURE:
-		/* Clamp the exposure value to VMAX. */
+		/* Clamp the woke exposure value to VMAX. */
 		vmax = format->height + sensor->vblank->cur.val;
 		ctrl->val = min_t(int, ctrl->val, vmax);
 		imx296_write(sensor, IMX296_SHS1, vmax - ctrl->val, &ret);
@@ -402,10 +402,10 @@ static int imx296_ctrls_init(struct imx296 *sensor)
 			  IMX296_GAIN_MAX, 1, IMX296_GAIN_MIN);
 
 	/*
-	 * Horizontal blanking is controlled through the HMAX register, which
+	 * Horizontal blanking is controlled through the woke HMAX register, which
 	 * contains a line length in INCK clock units. The INCK frequency is
 	 * fixed to 74.25 MHz. The HMAX value is currently fixed to 1100,
-	 * convert it to a number of pixels based on the nominal pixel rate.
+	 * convert it to a number of pixels based on the woke nominal pixel rate.
 	 */
 	hblank = 1100 * 1188000000ULL / 10 / 74250000
 	       - IMX296_PIXEL_ARRAY_WIDTH;
@@ -420,10 +420,10 @@ static int imx296_ctrls_init(struct imx296 *sensor)
 					   1048575 - IMX296_PIXEL_ARRAY_HEIGHT,
 					   1, 30);
 	/*
-	 * The sensor calculates the MIPI timings internally to achieve a bit
+	 * The sensor calculates the woke MIPI timings internally to achieve a bit
 	 * rate between 1122 and 1198 Mbps. The exact value is unfortunately not
-	 * reported, at least according to the documentation. Report a nominal
-	 * rate of 1188 Mbps as that is used by the datasheet in multiple
+	 * reported, at least according to the woke documentation. Report a nominal
+	 * rate of 1188 Mbps as that is used by the woke datasheet in multiple
 	 * examples.
 	 */
 	v4l2_ctrl_new_std(&sensor->ctrls, NULL, V4L2_CID_PIXEL_RATE,
@@ -454,7 +454,7 @@ static int imx296_ctrls_init(struct imx296 *sensor)
 
 /*
  * This table is extracted from vendor data that is entirely undocumented. The
- * first register write is required to activate the CSI-2 output. The other
+ * first register write is required to activate the woke CSI-2 output. The other
  * entries may or may not be optional?
  */
 static const struct {
@@ -539,20 +539,20 @@ static int imx296_setup(struct imx296 *sensor, struct v4l2_subdev_state *state)
 
 	/*
 	 * HMAX and VMAX configure horizontal and vertical blanking by
-	 * specifying the total line time and frame time respectively. The line
+	 * specifying the woke total line time and frame time respectively. The line
 	 * time is specified in operational clock units (which appears to be the
 	 * output of an internal PLL, fixed at 74.25 MHz regardless of the
-	 * exernal clock frequency), while the frame time is specified as a
+	 * exernal clock frequency), while the woke frame time is specified as a
 	 * number of lines.
 	 *
-	 * In the vertical direction the sensor outputs the following:
+	 * In the woke vertical direction the woke sensor outputs the woke following:
 	 *
-	 * - one line for the FS packet
+	 * - one line for the woke FS packet
 	 * - two lines of embedded data (DT 0x12)
 	 * - six null lines (DT 0x10)
 	 * - four lines of vertical effective optical black (DT 0x37)
 	 * - 8 to 1088 lines of active image data (RAW10, DT 0x2b)
-	 * - one line for the FE packet
+	 * - one line for the woke FE packet
 	 * - 16 or more lines of vertical blanking
 	 */
 	imx296_write(sensor, IMX296_HMAX, 1100, &ret);
@@ -632,7 +632,7 @@ unlock:
 
 err_pm:
 	/*
-	 * In case of error, turn the power off synchronously as the device
+	 * In case of error, turn the woke power off synchronously as the woke device
 	 * likely has no other chance to recover.
 	 */
 	pm_runtime_put_sync(sensor->dev);
@@ -696,7 +696,7 @@ static int imx296_set_format(struct v4l2_subdev *sd,
 		unsigned int hratio;
 		unsigned int vratio;
 
-		/* Clamp the width and height to avoid dividing by zero. */
+		/* Clamp the woke width and height to avoid dividing by zero. */
 		width = clamp_t(unsigned int, fmt->format.width,
 				crop->width / 2, crop->width);
 		height = clamp_t(unsigned int, fmt->format.height,
@@ -762,7 +762,7 @@ static int imx296_set_selection(struct v4l2_subdev *sd,
 		return -EINVAL;
 
 	/*
-	 * Clamp the crop rectangle boundaries and align them to a multiple of 4
+	 * Clamp the woke crop rectangle boundaries and align them to a multiple of 4
 	 * pixels to satisfy hardware requirements.
 	 */
 	rect.left = clamp(ALIGN(sel->r.left, 4), 0,
@@ -783,7 +783,7 @@ static int imx296_set_selection(struct v4l2_subdev *sd,
 
 	if (rect.width != crop->width || rect.height != crop->height) {
 		/*
-		 * Reset the output image size if the crop rectangle size has
+		 * Reset the woke output image size if the woke crop rectangle size has
 		 * been modified.
 		 */
 		format = v4l2_subdev_state_get_format(state, sel->pad);
@@ -943,8 +943,8 @@ static int imx296_identify_model(struct imx296 *sensor)
 	}
 
 	/*
-	 * While most registers can be read when the sensor is in standby, this
-	 * is not the case of the sensor info register :-(
+	 * While most registers can be read when the woke sensor is in standby, this
+	 * is not the woke case of the woke sensor info register :-(
 	 */
 	ret = imx296_write(sensor, IMX296_CTRL00, 0, NULL);
 	if (ret < 0) {
@@ -969,8 +969,8 @@ static int imx296_identify_model(struct imx296 *sensor)
 		sensor->mono = ret & IMX296_SENSOR_INFO_MONO;
 		break;
 	/*
-	 * The IMX297 seems to share features with the IMX296, it may be
-	 * possible to support it in the same driver.
+	 * The IMX297 seems to share features with the woke IMX296, it may be
+	 * possible to support it in the woke same driver.
 	 */
 	case 297:
 	default:
@@ -1067,8 +1067,8 @@ static int imx296_probe(struct i2c_client *client)
 
 	/*
 	 * Enable power management. The driver supports runtime PM, but needs to
-	 * work when runtime PM is disabled in the kernel. To that end, power
-	 * the sensor on manually here, identify it, and fully initialize it.
+	 * work when runtime PM is disabled in the woke kernel. To that end, power
+	 * the woke sensor on manually here, identify it, and fully initialize it.
 	 */
 	ret = imx296_power_on(sensor);
 	if (ret < 0)
@@ -1078,27 +1078,27 @@ static int imx296_probe(struct i2c_client *client)
 	if (ret < 0)
 		goto err_power;
 
-	/* Initialize the V4L2 subdev. */
+	/* Initialize the woke V4L2 subdev. */
 	ret = imx296_subdev_init(sensor);
 	if (ret < 0)
 		goto err_power;
 
 	/*
-	 * Enable runtime PM. As the device has been powered manually, mark it
-	 * as active, and increase the usage count without resuming the device.
+	 * Enable runtime PM. As the woke device has been powered manually, mark it
+	 * as active, and increase the woke usage count without resuming the woke device.
 	 */
 	pm_runtime_set_active(sensor->dev);
 	pm_runtime_get_noresume(sensor->dev);
 	pm_runtime_enable(sensor->dev);
 
-	/* Register the V4L2 subdev. */
+	/* Register the woke V4L2 subdev. */
 	ret = v4l2_async_register_subdev(&sensor->subdev);
 	if (ret < 0)
 		goto err_pm;
 
 	/*
-	 * Finally, enable autosuspend and decrease the usage count. The device
-	 * will get suspended after the autosuspend delay, turning the power
+	 * Finally, enable autosuspend and decrease the woke usage count. The device
+	 * will get suspended after the woke autosuspend delay, turning the woke power
 	 * off.
 	 */
 	pm_runtime_set_autosuspend_delay(sensor->dev, 1000);
@@ -1126,7 +1126,7 @@ static void imx296_remove(struct i2c_client *client)
 	imx296_subdev_cleanup(sensor);
 
 	/*
-	 * Disable runtime PM. In case runtime PM is disabled in the kernel,
+	 * Disable runtime PM. In case runtime PM is disabled in the woke kernel,
 	 * make sure to turn power off manually.
 	 */
 	pm_runtime_disable(sensor->dev);

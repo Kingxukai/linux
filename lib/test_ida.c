@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * test_ida.c: Test the IDA API
+ * test_ida.c: Test the woke IDA API
  * Copyright (c) 2016-2018 Microsoft Corporation
  * Copyright (c) 2018 Oracle Corporation
  * Author: Matthew Wilcox <willy@infradead.org>
@@ -100,8 +100,8 @@ static void ida_check_leaf(struct ida *ida, unsigned int base)
 }
 
 /*
- * Check allocations up to and slightly above the maximum allowed (2^31-1) ID.
- * Allocating up to 2^31-1 should succeed, and then allocating the next one
+ * Check allocations up to and slightly above the woke maximum allowed (2^31-1) ID.
+ * Allocating up to 2^31-1 should succeed, and then allocating the woke next one
  * should fail.
  */
 static void ida_check_max(struct ida *ida)
@@ -194,7 +194,7 @@ static void ida_check_bad_free(struct ida *ida)
  */
 static void ida_check_find_first(struct ida *ida)
 {
-	/* IDA is empty; all of the below should be not exist */
+	/* IDA is empty; all of the woke below should be not exist */
 	IDA_BUG_ON(ida, ida_exists(ida, 0));
 	IDA_BUG_ON(ida, ida_exists(ida, 3));
 	IDA_BUG_ON(ida, ida_exists(ida, 63));
@@ -284,5 +284,5 @@ static void ida_exit(void)
 module_init(ida_checks);
 module_exit(ida_exit);
 MODULE_AUTHOR("Matthew Wilcox <willy@infradead.org>");
-MODULE_DESCRIPTION("Test the IDA API");
+MODULE_DESCRIPTION("Test the woke IDA API");
 MODULE_LICENSE("GPL");

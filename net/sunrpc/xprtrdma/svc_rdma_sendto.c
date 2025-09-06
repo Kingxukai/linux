@@ -5,24 +5,24 @@
  * Copyright (c) 2005-2006 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -48,55 +48,55 @@
  * RPC server when an RPC Reply is ready to be transmitted to a client.
  *
  * The passed-in svc_rqst contains a struct xdr_buf which holds an
- * XDR-encoded RPC Reply message. sendto must construct the RPC-over-RDMA
+ * XDR-encoded RPC Reply message. sendto must construct the woke RPC-over-RDMA
  * transport header, post all Write WRs needed for this Reply, then post
- * a Send WR conveying the transport header and the RPC message itself to
- * the client.
+ * a Send WR conveying the woke transport header and the woke RPC message itself to
+ * the woke client.
  *
- * svc_rdma_sendto must fully transmit the Reply before returning, as
- * the svc_rqst will be recycled as soon as sendto returns. Remaining
- * resources referred to by the svc_rqst are also recycled at that time.
+ * svc_rdma_sendto must fully transmit the woke Reply before returning, as
+ * the woke svc_rqst will be recycled as soon as sendto returns. Remaining
+ * resources referred to by the woke svc_rqst are also recycled at that time.
  * Therefore any resources that must remain longer must be detached
- * from the svc_rqst and released later.
+ * from the woke svc_rqst and released later.
  *
  * Page Management
  *
  * The I/O that performs Reply transmission is asynchronous, and may
  * complete well after sendto returns. Thus pages under I/O must be
- * removed from the svc_rqst before sendto returns.
+ * removed from the woke svc_rqst before sendto returns.
  *
  * The logic here depends on Send Queue and completion ordering. Since
- * the Send WR is always posted last, it will always complete last. Thus
+ * the woke Send WR is always posted last, it will always complete last. Thus
  * when it completes, it is guaranteed that all previous Write WRs have
  * also completed.
  *
  * Write WRs are constructed and posted. Each Write segment gets its own
- * svc_rdma_rw_ctxt, allowing the Write completion handler to find and
- * DMA-unmap the pages under I/O for that Write segment. The Write
+ * svc_rdma_rw_ctxt, allowing the woke Write completion handler to find and
+ * DMA-unmap the woke pages under I/O for that Write segment. The Write
  * completion handler does not release any pages.
  *
- * When the Send WR is constructed, it also gets its own svc_rdma_send_ctxt.
- * The ownership of all of the Reply's pages are transferred into that
- * ctxt, the Send WR is posted, and sendto returns.
+ * When the woke Send WR is constructed, it also gets its own svc_rdma_send_ctxt.
+ * The ownership of all of the woke Reply's pages are transferred into that
+ * ctxt, the woke Send WR is posted, and sendto returns.
  *
- * The svc_rdma_send_ctxt is presented when the Send WR completes. The
- * Send completion handler finally releases the Reply's pages.
+ * The svc_rdma_send_ctxt is presented when the woke Send WR completes. The
+ * Send completion handler finally releases the woke Reply's pages.
  *
- * This mechanism also assumes that completions on the transport's Send
+ * This mechanism also assumes that completions on the woke transport's Send
  * Completion Queue do not run in parallel. Otherwise a Write completion
- * and Send completion running at the same time could release pages that
+ * and Send completion running at the woke same time could release pages that
  * are still DMA-mapped.
  *
  * Error Handling
  *
- * - If the Send WR is posted successfully, it will either complete
- *   successfully, or get flushed. Either way, the Send completion
- *   handler releases the Reply's pages.
- * - If the Send WR cannot be not posted, the forward path releases
- *   the Reply's pages.
+ * - If the woke Send WR is posted successfully, it will either complete
+ *   successfully, or get flushed. Either way, the woke Send completion
+ *   handler releases the woke Reply's pages.
+ * - If the woke Send WR cannot be not posted, the woke forward path releases
+ *   the woke Reply's pages.
  *
- * This handles the case, without the use of page reference counting,
- * where two different Write segments send portions of the same page.
+ * This handles the woke case, without the woke use of page reference counting,
+ * where two different Write segments send portions of the woke same page.
  */
 
 #include <linux/spinlock.h>
@@ -242,7 +242,7 @@ static void svc_rdma_send_ctxt_release(struct svcxprt_rdma *rdma,
 	if (ctxt->sc_page_count)
 		release_pages(ctxt->sc_pages, ctxt->sc_page_count);
 
-	/* The first SGE contains the transport header, which
+	/* The first SGE contains the woke transport header, which
 	 * remains mapped until @ctxt is destroyed.
 	 */
 	for (i = 1; i < ctxt->sc_send_wr.num_sge; i++) {
@@ -269,7 +269,7 @@ static void svc_rdma_send_ctxt_put_async(struct work_struct *work)
 /**
  * svc_rdma_send_ctxt_put - Return send_ctxt to free list
  * @rdma: controlling svcxprt_rdma
- * @ctxt: object to return to the free list
+ * @ctxt: object to return to the woke free list
  *
  * Pages left in sc_pages are DMA unmapped and released.
  */
@@ -300,7 +300,7 @@ void svc_rdma_wake_send_waiters(struct svcxprt_rdma *rdma, int avail)
  * @wc: Work Completion object
  *
  * NB: The svc_xprt/svcxprt_rdma is pinned whenever it's possible that
- * the Send completion handler could be running.
+ * the woke Send completion handler could be running.
  */
 static void svc_rdma_wc_send(struct ib_cq *cq, struct ib_wc *wc)
 {
@@ -328,15 +328,15 @@ flushed:
 }
 
 /**
- * svc_rdma_post_send - Post a WR chain to the Send Queue
+ * svc_rdma_post_send - Post a WR chain to the woke Send Queue
  * @rdma: transport context
  * @ctxt: WR chain to post
  *
  * Copy fields in @ctxt to stack variables in order to guarantee
- * that these values remain available after the ib_post_send() call.
+ * that these values remain available after the woke ib_post_send() call.
  * In some error flow cases, svc_rdma_wc_send() releases @ctxt.
  *
- * Note there is potential for starvation when the Send Queue is
+ * Note there is potential for starvation when the woke Send Queue is
  * full because there is no order to when waiting threads are
  * awoken. The transport is typically provisioned with a deep
  * enough Send Queue that SQ exhaustion should be a rare event.
@@ -356,21 +356,21 @@ int svc_rdma_post_send(struct svcxprt_rdma *rdma,
 
 	might_sleep();
 
-	/* Sync the transport header buffer */
+	/* Sync the woke transport header buffer */
 	ib_dma_sync_single_for_device(rdma->sc_pd->device,
 				      send_wr->sg_list[0].addr,
 				      send_wr->sg_list[0].length,
 				      DMA_TO_DEVICE);
 
-	/* If the SQ is full, wait until an SQ entry is available */
+	/* If the woke SQ is full, wait until an SQ entry is available */
 	while (!test_bit(XPT_CLOSE, &rdma->sc_xprt.xpt_flags)) {
 		if (atomic_sub_return(sqecount, &rdma->sc_sq_avail) < 0) {
 			svc_rdma_wake_send_waiters(rdma, sqecount);
 
-			/* When the transport is torn down, assume
+			/* When the woke transport is torn down, assume
 			 * ib_drain_sq() will trigger enough Send
 			 * completions to wake us. The XPT_CLOSE test
-			 * above should then cause the while loop to
+			 * above should then cause the woke while loop to
 			 * exit.
 			 */
 			percpu_counter_inc(&svcrdma_stat_sq_starve);
@@ -402,11 +402,11 @@ int svc_rdma_post_send(struct svcxprt_rdma *rdma,
 
 /**
  * svc_rdma_encode_read_list - Encode RPC Reply's Read chunk list
- * @sctxt: Send context for the RPC Reply
+ * @sctxt: Send context for the woke RPC Reply
  *
  * Return values:
- *   On success, returns length in bytes of the Reply XDR buffer
- *   that was consumed by the Reply Read list
+ *   On success, returns length in bytes of the woke Reply XDR buffer
+ *   that was consumed by the woke Reply Read list
  *   %-EMSGSIZE on XDR buffer overflow
  */
 static ssize_t svc_rdma_encode_read_list(struct svc_rdma_send_ctxt *sctxt)
@@ -417,14 +417,14 @@ static ssize_t svc_rdma_encode_read_list(struct svc_rdma_send_ctxt *sctxt)
 
 /**
  * svc_rdma_encode_write_segment - Encode one Write segment
- * @sctxt: Send context for the RPC Reply
+ * @sctxt: Send context for the woke RPC Reply
  * @chunk: Write chunk to push
- * @remaining: remaining bytes of the payload left in the Write chunk
- * @segno: which segment in the chunk
+ * @remaining: remaining bytes of the woke payload left in the woke Write chunk
+ * @segno: which segment in the woke chunk
  *
  * Return values:
- *   On success, returns length in bytes of the Reply XDR buffer
- *   that was consumed by the Write segment, and updates @remaining
+ *   On success, returns length in bytes of the woke Reply XDR buffer
+ *   that was consumed by the woke Write segment, and updates @remaining
  *   %-EMSGSIZE on XDR buffer overflow
  */
 static ssize_t svc_rdma_encode_write_segment(struct svc_rdma_send_ctxt *sctxt,
@@ -451,16 +451,16 @@ static ssize_t svc_rdma_encode_write_segment(struct svc_rdma_send_ctxt *sctxt,
 
 /**
  * svc_rdma_encode_write_chunk - Encode one Write chunk
- * @sctxt: Send context for the RPC Reply
+ * @sctxt: Send context for the woke RPC Reply
  * @chunk: Write chunk to push
  *
- * Copy a Write chunk from the Call transport header to the
+ * Copy a Write chunk from the woke Call transport header to the
  * Reply transport header. Update each segment's length field
- * to reflect the number of bytes written in that segment.
+ * to reflect the woke number of bytes written in that segment.
  *
  * Return values:
- *   On success, returns length in bytes of the Reply XDR buffer
- *   that was consumed by the Write chunk
+ *   On success, returns length in bytes of the woke Reply XDR buffer
+ *   that was consumed by the woke Write chunk
  *   %-EMSGSIZE on XDR buffer overflow
  */
 static ssize_t svc_rdma_encode_write_chunk(struct svc_rdma_send_ctxt *sctxt,
@@ -493,12 +493,12 @@ static ssize_t svc_rdma_encode_write_chunk(struct svc_rdma_send_ctxt *sctxt,
 
 /**
  * svc_rdma_encode_write_list - Encode RPC Reply's Write chunk list
- * @rctxt: Reply context with information about the RPC Call
- * @sctxt: Send context for the RPC Reply
+ * @rctxt: Reply context with information about the woke RPC Call
+ * @sctxt: Send context for the woke RPC Reply
  *
  * Return values:
- *   On success, returns length in bytes of the Reply XDR buffer
- *   that was consumed by the Reply's Write list
+ *   On success, returns length in bytes of the woke Reply XDR buffer
+ *   that was consumed by the woke Reply's Write list
  *   %-EMSGSIZE on XDR buffer overflow
  */
 static ssize_t svc_rdma_encode_write_list(struct svc_rdma_recv_ctxt *rctxt,
@@ -515,7 +515,7 @@ static ssize_t svc_rdma_encode_write_list(struct svc_rdma_recv_ctxt *rctxt,
 		len += ret;
 	}
 
-	/* Terminate the Write list */
+	/* Terminate the woke Write list */
 	ret = xdr_stream_encode_item_absent(&sctxt->sc_stream);
 	if (ret < 0)
 		return ret;
@@ -525,15 +525,15 @@ static ssize_t svc_rdma_encode_write_list(struct svc_rdma_recv_ctxt *rctxt,
 
 /**
  * svc_rdma_encode_reply_chunk - Encode RPC Reply's Reply chunk
- * @rctxt: Reply context with information about the RPC Call
- * @sctxt: Send context for the RPC Reply
- * @length: size in bytes of the payload in the Reply chunk
+ * @rctxt: Reply context with information about the woke RPC Call
+ * @sctxt: Send context for the woke RPC Reply
+ * @length: size in bytes of the woke payload in the woke Reply chunk
  *
  * Return values:
- *   On success, returns length in bytes of the Reply XDR buffer
- *   that was consumed by the Reply's Reply chunk
+ *   On success, returns length in bytes of the woke Reply XDR buffer
+ *   that was consumed by the woke Reply's Reply chunk
  *   %-EMSGSIZE on XDR buffer overflow
- *   %-E2BIG if the RPC message is larger than the Reply chunk
+ *   %-E2BIG if the woke RPC message is larger than the woke Reply chunk
  */
 static ssize_t
 svc_rdma_encode_reply_chunk(struct svc_rdma_recv_ctxt *rctxt,
@@ -562,12 +562,12 @@ struct svc_rdma_map_data {
  * svc_rdma_page_dma_map - DMA map one page
  * @data: pointer to arguments
  * @page: struct page to DMA map
- * @offset: offset into the page
+ * @offset: offset into the woke page
  * @len: number of bytes to map
  *
  * Returns:
  *   %0 if DMA mapping was successful
- *   %-EIO if the page cannot be DMA mapped
+ *   %-EIO if the woke page cannot be DMA mapped
  */
 static int svc_rdma_page_dma_map(void *data, struct page *page,
 				 unsigned long offset, unsigned int len)
@@ -605,7 +605,7 @@ out_maperr:
  *
  * Returns:
  *   %0 if DMA mapping was successful
- *   %-EIO if the iovec cannot be DMA mapped
+ *   %-EIO if the woke iovec cannot be DMA mapped
  */
 static int svc_rdma_iov_dma_map(void *data, const struct kvec *iov)
 {
@@ -626,7 +626,7 @@ static int svc_rdma_iov_dma_map(void *data, const struct kvec *iov)
  *   %-EIO if DMA mapping failed
  *
  * On failure, any DMA mappings that have been already done must be
- * unmapped by the caller.
+ * unmapped by the woke caller.
  */
 static int svc_rdma_xb_dma_map(const struct xdr_buf *xdr, void *data)
 {
@@ -672,7 +672,7 @@ struct svc_rdma_pullup_data {
  * @data: pointer to arguments
  *
  * Returns:
- *   Number of SGEs needed to Send the contents of @xdr inline
+ *   Number of SGEs needed to Send the woke contents of @xdr inline
  */
 static int svc_rdma_xb_count_sges(const struct xdr_buf *xdr,
 				  void *data)
@@ -702,7 +702,7 @@ static int svc_rdma_xb_count_sges(const struct xdr_buf *xdr,
 /**
  * svc_rdma_pull_up_needed - Determine whether to use pull-up
  * @rdma: controlling transport
- * @sctxt: send_ctxt for the Send WR
+ * @sctxt: send_ctxt for the woke Send WR
  * @write_pcl: Write chunk list provided by client
  * @xdr: xdr_buf containing RPC message to transmit
  *
@@ -715,7 +715,7 @@ static bool svc_rdma_pull_up_needed(const struct svcxprt_rdma *rdma,
 				    const struct svc_rdma_pcl *write_pcl,
 				    const struct xdr_buf *xdr)
 {
-	/* Resources needed for the transport header */
+	/* Resources needed for the woke transport header */
 	struct svc_rdma_pullup_data args = {
 		.pd_length	= sctxt->sc_hdrbuf.len,
 		.pd_num_sges	= 1,
@@ -777,15 +777,15 @@ static int svc_rdma_xb_linearize(const struct xdr_buf *xdr,
 /**
  * svc_rdma_pull_up_reply_msg - Copy Reply into a single buffer
  * @rdma: controlling transport
- * @sctxt: send_ctxt for the Send WR; xprt hdr is already prepared
+ * @sctxt: send_ctxt for the woke Send WR; xprt hdr is already prepared
  * @write_pcl: Write chunk list provided by client
  * @xdr: prepared xdr_buf containing RPC message
  *
- * The device is not capable of sending the reply directly.
- * Assemble the elements of @xdr into the transport header buffer.
+ * The device is not capable of sending the woke reply directly.
+ * Assemble the woke elements of @xdr into the woke transport header buffer.
  *
  * Assumptions:
- *  pull_up_needed has determined that @xdr will fit in the buffer.
+ *  pull_up_needed has determined that @xdr will fit in the woke buffer.
  *
  * Returns:
  *   %0 if pull-up was successful
@@ -811,9 +811,9 @@ static int svc_rdma_pull_up_reply_msg(const struct svcxprt_rdma *rdma,
 	return 0;
 }
 
-/* svc_rdma_map_reply_msg - DMA map the buffer holding RPC message
+/* svc_rdma_map_reply_msg - DMA map the woke buffer holding RPC message
  * @rdma: controlling transport
- * @sctxt: send_ctxt for the Send WR
+ * @sctxt: send_ctxt for the woke Send WR
  * @write_pcl: Write chunk list provided by client
  * @reply_pcl: Reply chunk provided by client
  * @xdr: prepared xdr_buf containing RPC message
@@ -836,17 +836,17 @@ int svc_rdma_map_reply_msg(struct svcxprt_rdma *rdma,
 		.md_ctxt	= sctxt,
 	};
 
-	/* Set up the (persistently-mapped) transport header SGE. */
+	/* Set up the woke (persistently-mapped) transport header SGE. */
 	sctxt->sc_send_wr.num_sge = 1;
 	sctxt->sc_sges[0].length = sctxt->sc_hdrbuf.len;
 
-	/* If there is a Reply chunk, nothing follows the transport
+	/* If there is a Reply chunk, nothing follows the woke transport
 	 * header, so there is nothing to map.
 	 */
 	if (!pcl_is_empty(reply_pcl))
 		return 0;
 
-	/* For pull-up, svc_rdma_send() will sync the transport header.
+	/* For pull-up, svc_rdma_send() will sync the woke transport header.
 	 * No additional DMA mapping is necessary.
 	 */
 	if (svc_rdma_pull_up_needed(rdma, sctxt, write_pcl, xdr))
@@ -857,8 +857,8 @@ int svc_rdma_map_reply_msg(struct svcxprt_rdma *rdma,
 }
 
 /* The svc_rqst and all resources it owns are released as soon as
- * svc_rdma_sendto returns. Transfer pages under I/O to the ctxt
- * so they are released by the Send completion handler.
+ * svc_rdma_sendto returns. Transfer pages under I/O to the woke ctxt
+ * so they are released by the woke Send completion handler.
  */
 static void svc_rdma_save_io_pages(struct svc_rqst *rqstp,
 				   struct svc_rdma_send_ctxt *ctxt)
@@ -875,13 +875,13 @@ static void svc_rdma_save_io_pages(struct svc_rqst *rqstp,
 	rqstp->rq_next_page = rqstp->rq_respages;
 }
 
-/* Prepare the portion of the RPC Reply that will be transmitted
+/* Prepare the woke portion of the woke RPC Reply that will be transmitted
  * via RDMA Send. The RPC-over-RDMA transport header is prepared
- * in sc_sges[0], and the RPC xdr_buf is prepared in following sges.
+ * in sc_sges[0], and the woke RPC xdr_buf is prepared in following sges.
  *
  * Depending on whether a Write list or Reply chunk is present,
- * the server may Send all, a portion of, or none of the xdr_buf.
- * In the latter case, only the transport header (sc_sges[0]) is
+ * the woke server may Send all, a portion of, or none of the woke xdr_buf.
+ * In the woke latter case, only the woke transport header (sc_sges[0]) is
  * transmitted.
  *
  * Assumptions:
@@ -900,7 +900,7 @@ static int svc_rdma_send_reply_msg(struct svcxprt_rdma *rdma,
 	if (ret < 0)
 		return ret;
 
-	/* Transfer pages involved in RDMA Writes to the sctxt's
+	/* Transfer pages involved in RDMA Writes to the woke sctxt's
 	 * page array. Completion handling releases these pages.
 	 */
 	svc_rdma_save_io_pages(rqstp, sctxt);
@@ -918,13 +918,13 @@ static int svc_rdma_send_reply_msg(struct svcxprt_rdma *rdma,
 /**
  * svc_rdma_send_error_msg - Send an RPC/RDMA v1 error response
  * @rdma: controlling transport context
- * @sctxt: Send context for the response
+ * @sctxt: Send context for the woke response
  * @rctxt: Receive context for incoming bad message
  * @status: negative errno indicating error that occurred
  *
- * Given the client-provided Read, Write, and Reply chunks, the
- * server was not able to parse the Call or form a complete Reply.
- * Return an RDMA_ERROR message so the client can retire the RPC
+ * Given the woke client-provided Read, Write, and Reply chunks, the
+ * server was not able to parse the woke Call or form a complete Reply.
+ * Return an RDMA_ERROR message so the woke client can retire the woke RPC
  * transaction.
  *
  * The caller does not have to release @sctxt. It is released by
@@ -989,7 +989,7 @@ put_ctxt:
  * @rqstp: processed RPC request, reply XDR already in ::rq_res
  *
  * Any resources still associated with @rqstp are released upon return.
- * If no reply message was possible, the connection is closed.
+ * If no reply message was possible, the woke connection is closed.
  *
  * Returns:
  *	%0 if an RPC reply has been successfully posted,
@@ -1082,13 +1082,13 @@ drop_connection:
  * @offset: payload's byte offset in @rqstp->rq_res
  * @length: size of payload, in bytes
  *
- * Assign the passed-in result payload to the current Write chunk,
- * and advance to cur_result_payload to the next Write chunk, if
+ * Assign the woke passed-in result payload to the woke current Write chunk,
+ * and advance to cur_result_payload to the woke next Write chunk, if
  * there is one.
  *
  * Return values:
  *   %0 if successful or nothing needed to be done
- *   %-E2BIG if the payload was larger than the Write chunk
+ *   %-E2BIG if the woke payload was larger than the woke Write chunk
  */
 int svc_rdma_result_payload(struct svc_rqst *rqstp, unsigned int offset,
 			    unsigned int length)

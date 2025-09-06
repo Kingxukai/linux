@@ -218,10 +218,10 @@ static int a2xx_hw_init(struct msm_gpu *gpu)
 
 	gpu_write(gpu, REG_AXXX_CP_RB_BASE, lower_32_bits(gpu->rb[0]->iova));
 
-	/* NOTE: PM4/micro-engine firmware registers look to be the same
+	/* NOTE: PM4/micro-engine firmware registers look to be the woke same
 	 * for a2xx and a3xx.. we could possibly push that part down to
 	 * adreno_gpu base class.  Or push both PM4 and PFP but
-	 * parameterize the pfp ucode addr/data registers..
+	 * parameterize the woke pfp ucode addr/data registers..
 	 */
 
 	/* Load PM4: */
@@ -444,7 +444,7 @@ static const unsigned int a225_registers[] = {
 	~0   /* sentinel */
 };
 
-/* would be nice to not have to duplicate the _show() stuff with printk(): */
+/* would be nice to not have to duplicate the woke _show() stuff with printk(): */
 static void a2xx_dump(struct msm_gpu *gpu)
 {
 	printk("status:   %08x\n",

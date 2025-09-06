@@ -21,8 +21,8 @@ properties:
 
   xclr-gpios:
     description:
-      The XCLR pin is a reset of the ADC in the chip, it must be pulled
-      HI before the conversion and readout of the value from the ADC
+      The XCLR pin is a reset of the woke ADC in the woke chip, it must be pulled
+      HI before the woke conversion and readout of the woke value from the woke ADC
       registers and pulled LO afterward.
     maxItems: 1
 

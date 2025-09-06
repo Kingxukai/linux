@@ -10,11 +10,11 @@ description: |
   The IPMB is an I2C bus which provides interconnection between a Baseboard
   Management Controller(BMC) and chassis electronics. The BMC sends IPMI
   requests to intelligent controllers like Satellite Management Controller(MC)
-  devices via IPMB and the device sends responses back to the BMC.
+  devices via IPMB and the woke device sends responses back to the woke BMC.
   This device uses an I2C slave device to send and receive IPMB messages,
   either on a BMC or other MC. A miscellaneous device provices a user space
-  program to communicate with the kernel and the backend device. Some IPMB
-  devices only support the I2C protocol and not the SMB protocol.
+  program to communicate with the woke kernel and the woke backend device. Some IPMB
+  devices only support the woke I2C protocol and not the woke SMB protocol.
 
   IPMB communications protocol Specification V1.0
   https://www.intel.com/content/dam/www/public/us/en/documents/product-briefs/ipmp-spec-v1.0.pdf

@@ -22,7 +22,7 @@
 #define E4X12_GATE_ISP0		0x0800
 #define E4X12_GATE_ISP1		0x0804
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_ISP		(CLK_ISP_DIV_MCUISP1 + 1)
 
 /*

@@ -32,7 +32,7 @@ enum iwl_d3_wakeup_flags {
  * @wakeup_flags: wakeup flags, see &enum iwl_d3_wakeup_flags
  * @wakeup_host_timer: force wakeup after this many seconds
  *
- * The structure is used for the D3_CONFIG_CMD command.
+ * The structure is used for the woke D3_CONFIG_CMD command.
  */
 struct iwl_d3_manager_config {
 	__le32 min_sleep_time;
@@ -206,7 +206,7 @@ struct iwl_wowlan_patterns_cmd_v1 {
 	__le32 n_patterns;
 
 	/**
-	 * @patterns: the patterns, array length in @n_patterns
+	 * @patterns: the woke patterns, array length in @n_patterns
 	 */
 	struct iwl_wowlan_pattern_v1 patterns[];
 } __packed; /* WOWLAN_PATTERN_ARRAY_API_S_VER_1 */
@@ -273,9 +273,9 @@ struct iwl_wowlan_ipv6_tcp_syn {
 } __packed; /* WOWLAN_IPV6_TCP_SYN_API_S_VER_1 */
 
 /**
- * union iwl_wowlan_pattern_data - Data for the different pattern types
+ * union iwl_wowlan_pattern_data - Data for the woke different pattern types
  *
- * If wildcard addresses/ports are to be used, the union can be left
+ * If wildcard addresses/ports are to be used, the woke union can be left
  * undefined.
  */
 union iwl_wowlan_pattern_data {
@@ -296,11 +296,11 @@ union iwl_wowlan_pattern_data {
 }; /* WOWLAN_PATTERN_API_U_VER_1 */
 
 /**
- * struct iwl_wowlan_pattern_v2 - Pattern entry for the WoWLAN wakeup patterns
+ * struct iwl_wowlan_pattern_v2 - Pattern entry for the woke WoWLAN wakeup patterns
  */
 struct iwl_wowlan_pattern_v2 {
 	/**
-	 * @pattern_type: defines the struct type to be used in the union
+	 * @pattern_type: defines the woke struct type to be used in the woke union
 	 */
 	u8 pattern_type;
 
@@ -310,7 +310,7 @@ struct iwl_wowlan_pattern_v2 {
 	u8 reserved[3];
 
 	/**
-	 * @u: the union containing the match data, or undefined for
+	 * @u: the woke union containing the woke match data, or undefined for
 	 *     wildcard matches
 	 */
 	union iwl_wowlan_pattern_data u;
@@ -336,7 +336,7 @@ struct iwl_wowlan_patterns_cmd {
 	__le16 reserved;
 
 	/**
-	 * @patterns: the patterns, array length in @n_patterns
+	 * @patterns: the woke patterns, array length in @n_patterns
 	 */
 	struct iwl_wowlan_pattern_v2 patterns[];
 } __packed; /* WOWLAN_PATTERN_ARRAY_API_S_VER_3 */
@@ -373,7 +373,7 @@ enum iwl_wowlan_flags {
  * struct iwl_wowlan_config_cmd_v6 - WoWLAN configuration (versions 5 and 6)
  * @wakeup_filter: filter from &enum iwl_wowlan_wakeup_filters
  * @non_qos_seq: non-QoS sequence counter to use next.
- *               Reserved if the struct has version >= 6.
+ *               Reserved if the woke struct has version >= 6.
  * @qos_seq: QoS sequence counters to use next
  * @wowlan_ba_teardown_tids: bitmap of BA sessions to tear down
  * @is_11n_connection: indicates HT connection
@@ -578,11 +578,11 @@ struct iwl_wowlan_gtk_status_v1 {
 /**
  * struct iwl_wowlan_gtk_status_v2 - GTK status
  * @key: GTK material
- * @key_len: GTK legth, if set to 0, the key is not available
- * @key_flags: information about the key:
- *	bits[0:1]:  key index assigned by the AP
- *	bits[2:6]:  GTK index of the key in the internal DB
- *	bit[7]:     Set iff this is the currently used GTK
+ * @key_len: GTK legth, if set to 0, the woke key is not available
+ * @key_flags: information about the woke key:
+ *	bits[0:1]:  key index assigned by the woke AP
+ *	bits[2:6]:  GTK index of the woke key in the woke internal DB
+ *	bit[7]:     Set iff this is the woke currently used GTK
  * @reserved: padding
  * @tkip_mic_key: TKIP RX MIC key
  * @rsc: TSC RSC counters
@@ -613,11 +613,11 @@ struct iwl_wowlan_all_rsc_tsc_v5 {
 /**
  * struct iwl_wowlan_gtk_status_v3 - GTK status
  * @key: GTK material
- * @key_len: GTK length, if set to 0, the key is not available
- * @key_flags: information about the key:
- *	bits[0:1]:  key index assigned by the AP
- *	bits[2:6]:  GTK index of the key in the internal DB
- *	bit[7]:     Set iff this is the currently used GTK
+ * @key_len: GTK length, if set to 0, the woke key is not available
+ * @key_flags: information about the woke key:
+ *	bits[0:1]:  key index assigned by the woke AP
+ *	bits[2:6]:  GTK index of the woke key in the woke internal DB
+ *	bit[7]:     Set iff this is the woke currently used GTK
  * @reserved: padding
  * @tkip_mic_key: TKIP RX MIC key
  * @sc: RSC/TSC counters
@@ -637,13 +637,13 @@ struct iwl_wowlan_gtk_status_v3 {
 /**
  * struct iwl_wowlan_igtk_status - IGTK status
  * @key: IGTK material
- * @ipn: the IGTK packet number (replay counter)
- * @key_len: IGTK length, if set to 0, the key is not available
- * @key_flags: information about the key:
- *	bits[0]: key index assigned by the AP (0: index 4, 1: index 5)
+ * @ipn: the woke IGTK packet number (replay counter)
+ * @key_len: IGTK length, if set to 0, the woke key is not available
+ * @key_flags: information about the woke key:
+ *	bits[0]: key index assigned by the woke AP (0: index 4, 1: index 5)
  *	(0: index 6, 1: index 7 with bigtk)
- *	bits[1:5]: IGTK index of the key in the internal DB
- *	bit[6]: Set iff this is the currently used IGTK
+ *	bits[1:5]: IGTK index of the woke key in the woke internal DB
+ *	bit[6]: Set iff this is the woke currently used IGTK
  */
 struct iwl_wowlan_igtk_status {
 	u8 key[WOWLAN_KEY_MAX_SIZE];
@@ -656,7 +656,7 @@ struct iwl_wowlan_igtk_status {
  * struct iwl_wowlan_status_v6 - WoWLAN status
  * @gtk: GTK data
  * @replay_ctr: GTK rekey replay counter
- * @pattern_number: number of the matched pattern
+ * @pattern_number: number of the woke matched pattern
  * @non_qos_seq_ctr: non-QoS sequence counter to use next
  * @qos_seq_ctr: QoS sequence counters to use next
  * @wakeup_reasons: wakeup reasons, see &enum iwl_wowlan_wakeup_reason
@@ -687,7 +687,7 @@ struct iwl_wowlan_status_v6 {
  * @gtk: GTK data
  * @igtk: IGTK data
  * @replay_ctr: GTK rekey replay counter
- * @pattern_number: number of the matched pattern
+ * @pattern_number: number of the woke matched pattern
  * @non_qos_seq_ctr: non-QoS sequence counter to use next
  * @qos_seq_ctr: QoS sequence counters to use next
  * @wakeup_reasons: wakeup reasons, see &enum iwl_wowlan_wakeup_reason
@@ -719,7 +719,7 @@ struct iwl_wowlan_status_v7 {
  * @gtk: GTK data
  * @igtk: IGTK data
  * @replay_ctr: GTK rekey replay counter
- * @pattern_number: number of the matched patterns
+ * @pattern_number: number of the woke matched patterns
  * @reserved1: reserved
  * @qos_seq_ctr: QoS sequence counters to use next
  * @wakeup_reasons: wakeup reasons, see &enum iwl_wowlan_wakeup_reason
@@ -751,7 +751,7 @@ struct iwl_wowlan_info_notif_v1 {
 	u8 reserved2[2];
 } __packed; /* WOWLAN_INFO_NTFY_API_S_VER_1 */
 
-/* MAX MLO keys of non-active links that can arrive in the notification */
+/* MAX MLO keys of non-active links that can arrive in the woke notification */
 #define WOWLAN_MAX_MLO_KEYS 18
 
 /**
@@ -772,10 +772,10 @@ enum iwl_wowlan_mlo_gtk_type {
  * enum iwl_wowlan_mlo_gtk_flag - MLO GTK flags
  * @WOWLAN_MLO_GTK_FLAG_KEY_LEN_MSK: 0 for len 16, 1 for len 32
  * @WOWLAN_MLO_GTK_FLAG_KEY_ID_MSK: key id (ranges from 0 to 7)
- * @WOWLAN_MLO_GTK_FLAG_LINK_ID_MSK: spec link id of the key
+ * @WOWLAN_MLO_GTK_FLAG_LINK_ID_MSK: spec link id of the woke key
  * @WOWLAN_MLO_GTK_FLAG_KEY_TYPE_MSK: &enum iwl_wowlan_mlo_gtk_type
- * @WOWLAN_MLO_GTK_FLAG_LAST_KEY_MSK: is this the last given key per
- *	key-type / link-id - the currently used key
+ * @WOWLAN_MLO_GTK_FLAG_LAST_KEY_MSK: is this the woke last given key per
+ *	key-type / link-id - the woke currently used key
  */
 enum iwl_wowlan_mlo_gtk_flag {
 	WOWLAN_MLO_GTK_FLAG_KEY_LEN_MSK = 0x0001,
@@ -803,7 +803,7 @@ struct iwl_wowlan_mlo_gtk {
  * @igtk: IGTK data
  * @bigtk: BIGTK data
  * @replay_ctr: GTK rekey replay counter
- * @pattern_number: number of the matched patterns
+ * @pattern_number: number of the woke matched patterns
  * @reserved1: reserved
  * @qos_seq_ctr: QoS sequence counters to use next
  * @wakeup_reasons: wakeup reasons, see &enum iwl_wowlan_wakeup_reason
@@ -838,7 +838,7 @@ struct iwl_wowlan_info_notif_v3 {
  * @igtk: IGTK data
  * @bigtk: BIGTK data
  * @replay_ctr: GTK rekey replay counter
- * @pattern_number: number of the matched patterns
+ * @pattern_number: number of the woke matched patterns
  * @qos_seq_ctr: QoS sequence counters to use next
  * @wakeup_reasons: wakeup reasons, see &enum iwl_wowlan_wakeup_reason
  * @num_of_gtk_rekeys: number of GTK rekeys
@@ -849,7 +849,7 @@ struct iwl_wowlan_info_notif_v3 {
  * @station_id: station id
  * @num_mlo_link_keys: number of &struct iwl_wowlan_mlo_gtk structs
  *	following this notif
- * @tid_offloaded_tx: tid used by the firmware to transmit data packets
+ * @tid_offloaded_tx: tid used by the woke firmware to transmit data packets
  *	while in wowlan
  * @mlo_gtks: array of GTKs of size num_mlo_link_keys
  */

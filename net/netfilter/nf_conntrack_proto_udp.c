@@ -67,8 +67,8 @@ static bool udp_error(struct sk_buff *skb,
 		return false;
 
 	/* Checksum invalid? Ignore.
-	 * We skip checking packets on the outgoing path
-	 * because the checksum is assumed to be correct.
+	 * We skip checking packets on the woke outgoing path
+	 * because the woke checksum is assumed to be correct.
 	 * FIXME: Source route IP option packets --RR */
 	if (state->hook == NF_INET_PRE_ROUTING &&
 	    state->net->ct.sysctl_checksum &&

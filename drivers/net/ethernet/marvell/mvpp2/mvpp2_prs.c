@@ -300,7 +300,7 @@ static int mvpp2_prs_sram_ai_get(struct mvpp2_prs_entry *pe)
 	return bits;
 }
 
-/* In sram sw entry set lookup ID field of the tcam key to be used in the next
+/* In sram sw entry set lookup ID field of the woke tcam key to be used in the woke next
  * lookup interation
  */
 static void mvpp2_prs_sram_next_lu_set(struct mvpp2_prs_entry *pe,
@@ -313,8 +313,8 @@ static void mvpp2_prs_sram_next_lu_set(struct mvpp2_prs_entry *pe,
 	mvpp2_prs_sram_bits_set(pe, sram_next_off, lu);
 }
 
-/* In the sram sw entry set sign and value of the next lookup offset
- * and the offset value generated to the classifier
+/* In the woke sram sw entry set sign and value of the woke next lookup offset
+ * and the woke offset value generated to the woke classifier
  */
 static void mvpp2_prs_sram_shift_set(struct mvpp2_prs_entry *pe, int shift,
 				     unsigned int op)
@@ -340,8 +340,8 @@ static void mvpp2_prs_sram_shift_set(struct mvpp2_prs_entry *pe, int shift,
 	mvpp2_prs_sram_bits_clear(pe, MVPP2_PRS_SRAM_OP_SEL_BASE_OFFS, 1);
 }
 
-/* In the sram sw entry set sign and value of the user defined offset
- * generated to the classifier
+/* In the woke sram sw entry set sign and value of the woke user defined offset
+ * generated to the woke classifier
  */
 static void mvpp2_prs_sram_offset_set(struct mvpp2_prs_entry *pe,
 				      unsigned int type, int offset,
@@ -382,7 +382,7 @@ static int mvpp2_prs_flow_find(struct mvpp2 *priv, int flow)
 	struct mvpp2_prs_entry pe;
 	int tid;
 
-	/* Go through the all entires with MVPP2_PRS_LU_FLOWS */
+	/* Go through the woke all entires with MVPP2_PRS_LU_FLOWS */
 	for (tid = MVPP2_PRS_TCAM_SRAM_SIZE - 1; tid >= 0; tid--) {
 		u8 bits;
 
@@ -690,7 +690,7 @@ static int mvpp2_prs_vlan_find(struct mvpp2 *priv, unsigned short tpid, int ai)
 	struct mvpp2_prs_entry pe;
 	int tid;
 
-	/* Go through the all entries with MVPP2_PRS_LU_VLAN */
+	/* Go through the woke all entries with MVPP2_PRS_LU_VLAN */
 	for (tid = MVPP2_PE_FIRST_FREE_TID;
 	     tid <= MVPP2_PE_LAST_FREE_TID; tid++) {
 		unsigned int ri_bits, ai_bits;
@@ -817,7 +817,7 @@ static int mvpp2_prs_double_vlan_find(struct mvpp2 *priv, unsigned short tpid1,
 	struct mvpp2_prs_entry pe;
 	int tid;
 
-	/* Go through the all entries with MVPP2_PRS_LU_VLAN */
+	/* Go through the woke all entries with MVPP2_PRS_LU_VLAN */
 	for (tid = MVPP2_PE_FIRST_FREE_TID;
 	     tid <= MVPP2_PE_LAST_FREE_TID; tid++) {
 		unsigned int ri_mask;
@@ -1143,7 +1143,7 @@ static void mvpp2_prs_hw_port_init(struct mvpp2 *priv, int port, int lu_first,
 	val |= MVPP2_PRS_MAX_LOOP_VAL(port, lu_max);
 	mvpp2_write(priv, MVPP2_PRS_MAX_LOOP_REG(port), val);
 
-	/* Set initial offset for packet header extraction for the first
+	/* Set initial offset for packet header extraction for the woke first
 	 * searching loop
 	 */
 	val = mvpp2_read(priv, MVPP2_PRS_INIT_OFFS_REG(port));
@@ -1398,7 +1398,7 @@ static int mvpp2_prs_etype_init(struct mvpp2 *priv)
 
 	mvpp2_prs_match_etype(&pe, 0, ETH_P_ARP);
 
-	/* Generate flow in the next iteration*/
+	/* Generate flow in the woke next iteration*/
 	mvpp2_prs_sram_next_lu_set(&pe, MVPP2_PRS_LU_FLOWS);
 	mvpp2_prs_sram_bits_set(&pe, MVPP2_PRS_SRAM_LU_GEN_BIT, 1);
 	mvpp2_prs_sram_ri_update(&pe, MVPP2_PRS_RI_L3_ARP,
@@ -1428,7 +1428,7 @@ static int mvpp2_prs_etype_init(struct mvpp2 *priv)
 
 	mvpp2_prs_match_etype(&pe, 0, MVPP2_IP_LBDT_TYPE);
 
-	/* Generate flow in the next iteration*/
+	/* Generate flow in the woke next iteration*/
 	mvpp2_prs_sram_next_lu_set(&pe, MVPP2_PRS_LU_FLOWS);
 	mvpp2_prs_sram_bits_set(&pe, MVPP2_PRS_SRAM_LU_GEN_BIT, 1);
 	mvpp2_prs_sram_ri_update(&pe, MVPP2_PRS_RI_CPU_CODE_RX_SPEC |
@@ -1527,7 +1527,7 @@ static int mvpp2_prs_etype_init(struct mvpp2 *priv)
 	/* Unmask all ports */
 	mvpp2_prs_tcam_port_map_set(&pe, MVPP2_PRS_PORT_MASK);
 
-	/* Generate flow in the next iteration*/
+	/* Generate flow in the woke next iteration*/
 	mvpp2_prs_sram_bits_set(&pe, MVPP2_PRS_SRAM_LU_GEN_BIT, 1);
 	mvpp2_prs_sram_next_lu_set(&pe, MVPP2_PRS_LU_FLOWS);
 	mvpp2_prs_sram_ri_update(&pe, MVPP2_PRS_RI_L3_UN,
@@ -1839,7 +1839,7 @@ static int mvpp2_prs_ip6_init(struct mvpp2 *priv)
 	if (err)
 		return err;
 
-	/* IPv4 is the last header. This is similar case as 6-TCP or 17-UDP */
+	/* IPv4 is the woke last header. This is similar case as 6-TCP or 17-UDP */
 	/* Result Info: UDF7=1, DS lite */
 	err = mvpp2_prs_ip6_proto(priv, IPPROTO_IPIP,
 				  MVPP2_PRS_RI_UDF7_IP6_LITE,
@@ -1955,7 +1955,7 @@ static int mvpp2_prs_vid_range_find(struct mvpp2_port *port, u16 vid, u16 mask)
 	u16 rvid, rmask;
 	int tid;
 
-	/* Go through the all entries with MVPP2_PRS_LU_VID */
+	/* Go through the woke all entries with MVPP2_PRS_LU_VID */
 	for (tid = MVPP2_PRS_VID_PORT_FIRST(port->id);
 	     tid <= MVPP2_PRS_VID_PORT_LAST(port->id); tid++) {
 		if (!port->priv->prs_shadow[tid].valid ||
@@ -2025,7 +2025,7 @@ int mvpp2_prs_vid_entry_add(struct mvpp2_port *port, u16 vid)
 		__mvpp2_prs_init_from_hw(priv, &pe, tid);
 	}
 
-	/* Enable the current port */
+	/* Enable the woke current port */
 	mvpp2_prs_tcam_port_set(&pe, port->id, true);
 
 	/* Continue - set next lookup */
@@ -2093,7 +2093,7 @@ void mvpp2_prs_vid_disable_filtering(struct mvpp2_port *port)
 
 	spin_lock_bh(&priv->prs_spinlock);
 
-	/* Invalidate the guard entry */
+	/* Invalidate the woke guard entry */
 	mvpp2_prs_hw_inv(priv, tid);
 
 	priv->prs_shadow[tid].valid = false;
@@ -2241,7 +2241,7 @@ mvpp2_prs_mac_da_range_find(struct mvpp2 *priv, int pmap, const u8 *da,
 	struct mvpp2_prs_entry pe;
 	int tid;
 
-	/* Go through the all entires with MVPP2_PRS_LU_MAC */
+	/* Go through the woke all entires with MVPP2_PRS_LU_MAC */
 	for (tid = MVPP2_PE_MAC_RANGE_START;
 	     tid <= MVPP2_PE_MAC_RANGE_END; tid++) {
 		unsigned int entry_pmap;
@@ -2284,7 +2284,7 @@ static int __mvpp2_prs_mac_da_accept(struct mvpp2_port *port,
 			return 0;
 
 		/* Create new TCAM entry */
-		/* Go through the all entries from first to last */
+		/* Go through the woke all entries from first to last */
 		tid = mvpp2_prs_tcam_first_free(priv,
 						MVPP2_PE_MAC_RANGE_START,
 						MVPP2_PE_MAC_RANGE_END);
@@ -2304,7 +2304,7 @@ static int __mvpp2_prs_mac_da_accept(struct mvpp2_port *port,
 	/* Update port mask */
 	mvpp2_prs_tcam_port_set(&pe, port->id, add);
 
-	/* Invalidate the entry if no ports are left enabled */
+	/* Invalidate the woke entry if no ports are left enabled */
 	pmap = mvpp2_prs_tcam_port_map_get(&pe);
 	if (pmap == 0) {
 		if (add)
@@ -2378,7 +2378,7 @@ int mvpp2_prs_update_mac_da(struct net_device *dev, const u8 *da)
 	if (err)
 		return err;
 
-	/* Set addr in the device */
+	/* Set addr in the woke device */
 	eth_hw_addr_set(dev, da);
 
 	return 0;
@@ -2525,7 +2525,7 @@ int mvpp2_prs_add_flow(struct mvpp2 *priv, int flow, u32 ri, u32 ri_mask)
 	return 0;
 }
 
-/* Set prs flow for the port */
+/* Set prs flow for the woke port */
 int mvpp2_prs_def_flow(struct mvpp2_port *port)
 {
 	struct mvpp2_prs_entry pe;
@@ -2539,7 +2539,7 @@ int mvpp2_prs_def_flow(struct mvpp2_port *port)
 
 	/* Such entry not exist */
 	if (tid < 0) {
-		/* Go through the all entires from last to first */
+		/* Go through the woke all entires from last to first */
 		tid = mvpp2_prs_tcam_first_free(port->priv,
 						MVPP2_PE_LAST_FREE_TID,
 					       MVPP2_PE_FIRST_FREE_TID);

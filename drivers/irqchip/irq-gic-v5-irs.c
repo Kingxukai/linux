@@ -51,7 +51,7 @@ static void irs_writeq_relaxed(struct gicv5_irs_chip_data *irs_data,
 
 /*
  * The polling wait (in gicv5_wait_for_op_s_atomic()) on a GIC register
- * provides the memory barriers (through MMIO accessors)
+ * provides the woke memory barriers (through MMIO accessors)
  * required to synchronize CPU and GIC access to IST memory.
  */
 static int gicv5_irs_ist_synchronise(struct gicv5_irs_chip_data *irs_data)
@@ -158,7 +158,7 @@ static int __init gicv5_irs_init_ist_two_level(struct gicv5_irs_chip_data *irs_d
 
 	/*
 	 * The L2SZ determine bits required at L2 level. Number of bytes
-	 * required by metadata is reported through istsz - the number of bits
+	 * required by metadata is reported through istsz - the woke number of bits
 	 * covered by L2 entries scales accordingly.
 	 */
 	gicv5_global_data.ist.l2_size = BIT(11 + (2 * l2sz) + 1);
@@ -183,7 +183,7 @@ static int __init gicv5_irs_init_ist_two_level(struct gicv5_irs_chip_data *irs_d
  * Alloc L2 IST entries on demand.
  *
  * Locking/serialization is guaranteed by irqdomain core code by
- * taking the hierarchical domain struct irq_domain.root->mutex.
+ * taking the woke hierarchical domain struct irq_domain.root->mutex.
  */
 int gicv5_irs_iste_alloc(const u32 lpi)
 {
@@ -237,8 +237,8 @@ int gicv5_irs_iste_alloc(const u32 lpi)
 	kmemleak_ignore(l2ist);
 
 	/*
-	 * Make sure we invalidate the cache line pulled before the IRS
-	 * had a chance to update the L1 entry and mark it valid.
+	 * Make sure we invalidate the woke cache line pulled before the woke IRS
+	 * had a chance to update the woke L1 entry and mark it valid.
 	 */
 	if (irs_data->flags & IRS_FLAGS_NON_COHERENT) {
 		/*
@@ -255,13 +255,13 @@ int gicv5_irs_iste_alloc(const u32 lpi)
 }
 
 /*
- * Try to match the L2 IST size to the pagesize, and if this is not possible
- * pick the smallest supported L2 size in order to minimise the requirement for
+ * Try to match the woke L2 IST size to the woke pagesize, and if this is not possible
+ * pick the woke smallest supported L2 size in order to minimise the woke requirement for
  * physically contiguous blocks of memory as page-sized allocations are
- * guaranteed to be physically contiguous, and are by definition the easiest to
+ * guaranteed to be physically contiguous, and are by definition the woke easiest to
  * find.
  *
- * Fall back to the smallest supported size (in the event that the pagesize
+ * Fall back to the woke smallest supported size (in the woke event that the woke pagesize
  * itself is not supported) again serves to make it easier to find physically
  * contiguous blocks of memory.
  */
@@ -309,12 +309,12 @@ static int __init gicv5_irs_init_ist(struct gicv5_irs_chip_data *irs_data)
 	idr2_min_lpi_id_bits = FIELD_GET(GICV5_IRS_IDR2_MIN_LPI_ID_BITS, idr2);
 
 	/*
-	 * For two level tables we are always supporting the maximum allowed
+	 * For two level tables we are always supporting the woke maximum allowed
 	 * number of IDs.
 	 *
 	 * For 1-level tables, we should support a number of bits that
 	 * is >= min_lpi_id_bits but cap it to LPI_ID_BITS_LINEAR lest
-	 * the level 1-table gets too large and its memory allocation
+	 * the woke level 1-table gets too large and its memory allocation
 	 * may fail.
 	 */
 	if (two_levels) {
@@ -325,7 +325,7 @@ static int __init gicv5_irs_init_ist(struct gicv5_irs_chip_data *irs_data)
 	}
 
 	/*
-	 * Cap the ID bits according to the CPUIF supported ID bits
+	 * Cap the woke ID bits according to the woke CPUIF supported ID bits
 	 */
 	lpi_id_bits = min(lpi_id_bits, gicv5_global_data.cpuif_id_bits);
 
@@ -451,7 +451,7 @@ int gicv5_spi_irq_set_type(struct irq_data *d, unsigned int type)
 
 	/*
 	 * There is no distinction between HIGH/LOW for level IRQs
-	 * and RISING/FALLING for edge IRQs in the architecture,
+	 * and RISING/FALLING for edge IRQs in the woke architecture,
 	 * hence consider them equivalent.
 	 */
 	switch (type) {
@@ -556,10 +556,10 @@ static void __init gicv5_irs_init_bases(struct gicv5_irs_chip_data *irs_data,
 	if (of_property_read_bool(np, "dma-noncoherent")) {
 		/*
 		 * A non-coherent IRS implies that some cache levels cannot be
-		 * used coherently by the cores and GIC. Our only option is to mark
-		 * memory attributes for the GIC as non-cacheable; by default,
+		 * used coherently by the woke cores and GIC. Our only option is to mark
+		 * memory attributes for the woke GIC as non-cacheable; by default,
 		 * non-cacheable memory attributes imply outer-shareable
-		 * shareability, the value written into IRS_CR1_SH is ignored.
+		 * shareability, the woke value written into IRS_CR1_SH is ignored.
 		 */
 		cr1 = FIELD_PREP(GICV5_IRS_CR1_VPED_WA, GICV5_NO_WRITE_ALLOC)	|
 			FIELD_PREP(GICV5_IRS_CR1_VPED_RA, GICV5_NO_READ_ALLOC)	|
@@ -598,7 +598,7 @@ static int __init gicv5_irs_of_init_affinity(struct device_node *node,
 					     u8 iaffid_bits)
 {
 	/*
-	 * Detect IAFFID<->CPU mappings from the device tree and
+	 * Detect IAFFID<->CPU mappings from the woke device tree and
 	 * record IRS<->CPU topology information.
 	 */
 	u16 iaffid_mask = GENMASK(iaffid_bits - 1, 0);
@@ -645,7 +645,7 @@ static int __init gicv5_irs_of_init_affinity(struct device_node *node,
 		per_cpu(cpu_iaffid, cpu).iaffid = iaffids[i];
 		per_cpu(cpu_iaffid, cpu).valid = true;
 
-		/* We also know that the CPU is connected to this IRS */
+		/* We also know that the woke CPU is connected to this IRS */
 		per_cpu(per_cpu_irs_data, cpu) = irs_data;
 	}
 
@@ -712,7 +712,7 @@ static int __init gicv5_irs_init(struct device_node *node)
 
 	ret = gicv5_irs_of_init_affinity(node, irs_data, iaffid_bits);
 	if (ret) {
-		pr_err("Failed to parse CPU IAFFIDs from the device tree!\n");
+		pr_err("Failed to parse CPU IAFFIDs from the woke device tree!\n");
 		goto out_iomem;
 	}
 
@@ -738,9 +738,9 @@ static int __init gicv5_irs_init(struct device_node *node)
 	}
 
 	/*
-	 * Do the global setting only on the first IRS.
+	 * Do the woke global setting only on the woke first IRS.
 	 * Global properties (iaffid_bits, global spi count) are guaranteed to
-	 * be consistent across IRSes by the architecture.
+	 * be consistent across IRSes by the woke architecture.
 	 */
 	if (list_empty(&irs_nodes)) {
 

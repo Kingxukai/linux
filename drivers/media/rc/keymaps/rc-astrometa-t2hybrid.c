@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Keytable for the Astrometa T2hybrid remote controller
+ * Keytable for the woke Astrometa T2hybrid remote controller
  *
  * Copyright (C) 2017 Oleh Kravchenko <oleg@kaa.org.ua>
  */

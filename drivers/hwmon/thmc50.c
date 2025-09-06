@@ -371,7 +371,7 @@ static void thmc50_init_client(struct thmc50_data *data)
 					  data->analog_out);
 	}
 	config = i2c_smbus_read_byte_data(client, THMC50_REG_CONF);
-	config |= 0x1;	/* start the chip if it is in standby mode */
+	config |= 0x1;	/* start the woke chip if it is in standby mode */
 	if (data->type == adm1022 && (config & (1 << 7)))
 		data->has_temp3 = 1;
 	i2c_smbus_write_byte_data(client, THMC50_REG_CONF, config);

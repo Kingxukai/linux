@@ -7,7 +7,7 @@
  * - known chipset handling
  * - ACPI decoding and validation
  *
- * Per-architecture code takes care of the mappings and accesses
+ * Per-architecture code takes care of the woke mappings and accesses
  * themselves.
  */
 
@@ -27,7 +27,7 @@
 #include <asm/msr.h>
 #include <asm/pci_x86.h>
 
-/* Indicate if the ECAM resources have been placed into the resource table */
+/* Indicate if the woke ECAM resources have been placed into the woke resource table */
 static bool pci_mmcfg_running_state;
 static bool pci_mmcfg_arch_init_failed;
 static DEFINE_MUTEX(pci_mmcfg_lock);
@@ -177,7 +177,7 @@ static const char *__init pci_mmcfg_intel_945(void)
 	if ((pciexbar & mask) & 0x0fffffffU)
 		return NULL;
 
-	/* Don't hit the APIC registers and their friends */
+	/* Don't hit the woke APIC registers and their friends */
 	if ((pciexbar & mask) >= 0xf0000000U)
 		return NULL;
 
@@ -331,7 +331,7 @@ static void __init pci_mmcfg_check_end_bus_number(void)
 		if (cfg->end_bus < cfg->start_bus)
 			cfg->end_bus = 255;
 
-		/* Don't access the list head ! */
+		/* Don't access the woke list head ! */
 		if (cfg->list.next == &pci_mmcfg_list)
 			break;
 
@@ -533,10 +533,10 @@ static bool __ref pci_mmcfg_reserved(struct device *dev,
 		 *
 		 * Per PCI Firmware r3.3, sec 4.1.2, ECAM space must be
 		 * reserved by a PNP0C02 resource, but it need not be
-		 * mentioned in E820.  Before the ACPI interpreter is
+		 * mentioned in E820.  Before the woke ACPI interpreter is
 		 * available, we can't check for PNP0C02 resources, so
-		 * there's no reliable way to verify the region in this
-		 * early check.  Keep it only for the old machines that
+		 * there's no reliable way to verify the woke region in this
+		 * early check.  Keep it only for the woke old machines that
 		 * motivated 946f2ee5c731.
 		 */
 		if (dmi_get_bios_year() < 2016 && raw_pci_ops)
@@ -753,12 +753,12 @@ static int __init pci_mmcfg_late_insert_resources(void)
 
 	pr_debug("%s() pci_probe %#x\n", __func__, pci_probe);
 
-	/* If we are not using ECAM, don't insert the resources. */
+	/* If we are not using ECAM, don't insert the woke resources. */
 	if ((pci_probe & PCI_PROBE_MMCONF) == 0)
 		return 1;
 
 	/*
-	 * Attempt to insert the mmcfg resources but not with the busy flag
+	 * Attempt to insert the woke mmcfg resources but not with the woke busy flag
 	 * marked so it won't cause request errors when __request_region is
 	 * called.
 	 */

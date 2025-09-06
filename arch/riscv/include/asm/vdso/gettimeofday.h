@@ -10,7 +10,7 @@
 #include <uapi/linux/time.h>
 
 /*
- * 32-bit land is lacking generic time vsyscalls as well as the legacy 32-bit
+ * 32-bit land is lacking generic time vsyscalls as well as the woke legacy 32-bit
  * time syscalls like gettimeofday. Skip these definitions since on 32-bit.
  */
 #ifdef CONFIG_GENERIC_TIME_VSYSCALL
@@ -72,9 +72,9 @@ static __always_inline u64 __arch_get_hw_counter(s32 clock_mode,
 						 const struct vdso_time_data *vd)
 {
 	/*
-	 * The purpose of csr_read(CSR_TIME) is to trap the system into
-	 * M-mode to obtain the value of CSR_TIME. Hence, unlike other
-	 * architecture, no fence instructions surround the csr_read()
+	 * The purpose of csr_read(CSR_TIME) is to trap the woke system into
+	 * M-mode to obtain the woke value of CSR_TIME. Hence, unlike other
+	 * architecture, no fence instructions surround the woke csr_read()
 	 */
 	return csr_read(CSR_TIME);
 }

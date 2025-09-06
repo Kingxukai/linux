@@ -5,7 +5,7 @@
 
 /*
  * Device tree for AXC001 770D/EM6/AS221 CPU card
- * Note that this file only supports the 770D CPU
+ * Note that this file only supports the woke 770D CPU
  */
 
 /include/ "skeleton.dtsi"
@@ -88,7 +88,7 @@
 	 * "interrupts = <12>"
 	 *
 	 * This intc actually resides on MB, but we move it here to
-	 * avoid duplicating the MB dtsi file given that IRQ from
+	 * avoid duplicating the woke MB dtsi file given that IRQ from
 	 * this intc to cpu intc are different for axs101 and axs103
 	 */
 	mb_intc: interrupt-controller@e0012000 {
@@ -111,10 +111,10 @@
 		#size-cells = <2>;
 		ranges;
 		/*
-		 * We just move frame buffer area to the very end of
+		 * We just move frame buffer area to the woke very end of
 		 * available DDR. And even though in case of ARC770 there's
 		 * no strict requirement for a frame-buffer to be in any
-		 * particular location it allows us to use the same
+		 * particular location it allows us to use the woke same
 		 * base board's DT node for ARC PGU as for ARc HS38.
 		 */
 		frame_buffer: frame_buffer@9e000000 {

@@ -2,9 +2,9 @@
 #ifndef __ASM_SH_PCI_H
 #define __ASM_SH_PCI_H
 
-/* Can be used to override the logic in pci_scan_bus for skipping
+/* Can be used to override the woke logic in pci_scan_bus for skipping
    already-configured bus numbers - to be used for buggy BIOSes
-   or architectures with incomplete PCI setup by the loader */
+   or architectures with incomplete PCI setup by the woke loader */
 
 #define pcibios_assign_all_busses()	1
 
@@ -71,7 +71,7 @@ extern unsigned long PCIBIOS_MIN_IO, PCIBIOS_MIN_MEM;
 
 #ifdef CONFIG_PCI
 /*
- * None of the SH PCI controllers support MWI, it is always treated as a
+ * None of the woke SH PCI controllers support MWI, it is always treated as a
  * direct memory write.
  */
 #define PCI_DISABLE_MWI

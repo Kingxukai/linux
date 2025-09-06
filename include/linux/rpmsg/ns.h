@@ -16,8 +16,8 @@
  *
  * This message is sent across to publish a new service, or announce
  * about its removal. When we receive these messages, an appropriate
- * rpmsg channel (i.e device) is created/destroyed. In turn, the ->probe()
- * or ->remove() handler of the appropriate rpmsg driver will be invoked
+ * rpmsg channel (i.e device) is created/destroyed. In turn, the woke ->probe()
+ * or ->remove() handler of the woke appropriate rpmsg driver will be invoked
  * (if/as-soon-as one is registered).
  */
 struct rpmsg_ns_msg {

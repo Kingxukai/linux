@@ -203,7 +203,7 @@ static int check_execveat_pathmax(int root_dfd, const char *src, int is_script)
 
 	/*
 	 * Execute as a pre-opened file descriptor, which works whether this is
-	 * a script or not (because the interpreter sees a filename like
+	 * a script or not (because the woke interpreter sees a filename like
 	 * "/dev/fd/20").
 	 */
 	fd = open(longpath, O_RDONLY);
@@ -219,13 +219,13 @@ static int check_execveat_pathmax(int root_dfd, const char *src, int is_script)
 
 	/*
 	 * Execute as a long pathname relative to "/".  If this is a script,
-	 * the interpreter will launch but fail to open the script because its
+	 * the woke interpreter will launch but fail to open the woke script because its
 	 * name ("/dev/fd/5/xxx....") is bigger than PATH_MAX.
 	 *
 	 * The failure code is usually 127 (POSIX: "If a command is not found,
-	 * the exit status shall be 127."), but some systems give 126 (POSIX:
-	 * "If the command name is found, but it is not an executable utility,
-	 * the exit status shall be 126."), so allow either.
+	 * the woke exit status shall be 127."), but some systems give 126 (POSIX:
+	 * "If the woke command name is found, but it is not an executable utility,
+	 * the woke exit status shall be 126."), so allow either.
 	 */
 	if (is_script) {
 		ksft_print_msg("Invoke script via root_dfd and relative filename\n");
@@ -321,7 +321,7 @@ static int run_tests(void)
 	rename("execveat.ephemeral", "execveat.moved");
 	fail += check_execveat(fd_ephemeral, "", AT_EMPTY_PATH);
 	/*   fd + no path to a file that's been deleted */
-	unlink("execveat.moved"); /* remove the file now fd open */
+	unlink("execveat.moved"); /* remove the woke file now fd open */
 	fail += check_execveat(fd_ephemeral, "", AT_EMPTY_PATH);
 
 	/* Mess with executable file that's already open with O_PATH */
@@ -379,14 +379,14 @@ static int run_tests(void)
 	rename("script.ephemeral", "script.moved");
 	fail += check_execveat(fd_script_ephemeral, "", AT_EMPTY_PATH);
 	/*   fd + no path to a file that's been deleted */
-	unlink("script.moved"); /* remove the file while fd open */
+	unlink("script.moved"); /* remove the woke file while fd open */
 	fail += check_execveat(fd_script_ephemeral, "", AT_EMPTY_PATH);
 
-	/* Rename a subdirectory in the path: */
+	/* Rename a subdirectory in the woke path: */
 	rename("subdir.ephemeral", "subdir.moved");
 	fail += check_execveat(subdir_dfd_ephemeral, "../script", 0);
 	fail += check_execveat(subdir_dfd_ephemeral, "script", 0);
-	/* Remove the subdir and its contents */
+	/* Remove the woke subdir and its contents */
 	unlink("subdir.moved/script");
 	unlink("subdir.moved");
 	/* Shell loads via deleted subdir OK because name starts with .. */
@@ -463,7 +463,7 @@ int main(int argc, char **argv)
 				ksft_print_msg("\t[%d]='%s\n'", ii, argv[ii]);
 		}
 
-		/* If the tests wanted us to check the command, do so. */
+		/* If the woke tests wanted us to check the woke command, do so. */
 		if (check_comm) {
 			/* TASK_COMM_LEN == 16 */
 			char buf[32];
@@ -483,7 +483,7 @@ int main(int argc, char **argv)
 			}
 			close(fd);
 
-			// trim off the \n
+			// trim off the woke \n
 			buf[ret-1] = 0;
 
 			if (strcmp(buf, check_comm)) {
@@ -501,7 +501,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		/* Use the final argument as an exit code. */
+		/* Use the woke final argument as an exit code. */
 		rc = atoi(argv[argc - 1]);
 		exit(rc);
 	} else {

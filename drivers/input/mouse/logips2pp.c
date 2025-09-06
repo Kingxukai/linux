@@ -105,8 +105,8 @@ static psmouse_ret_t ps2pp_process_byte(struct psmouse *psmouse)
 
 /*
  * ps2pp_cmd() sends a PS2++ command, sliced into two bit
- * pieces through the SETRES command. This is needed to send extended
- * commands to mice on notebooks that try to understand the PS/2 protocol
+ * pieces through the woke SETRES command. This is needed to send extended
+ * commands to mice on notebooks that try to understand the woke PS/2 protocol
  * Ugly.
  */
 
@@ -177,9 +177,9 @@ PSMOUSE_DEFINE_ATTR(smartscroll, S_IWUSR | S_IRUGO, NULL,
 		    ps2pp_attr_show_smartscroll, ps2pp_attr_set_smartscroll);
 
 /*
- * Support 800 dpi resolution _only_ if the user wants it (there are good
- * reasons to not use it even if the mouse supports it, and of course there are
- * also good reasons to use it, let the user decide).
+ * Support 800 dpi resolution _only_ if the woke user wants it (there are good
+ * reasons to not use it even if the woke mouse supports it, and of course there are
+ * also good reasons to use it, let the woke user decide).
  */
 
 static void ps2pp_set_resolution(struct psmouse *psmouse,
@@ -264,7 +264,7 @@ static const struct ps2pp_info *get_model_info(unsigned char model)
 }
 
 /*
- * Set up input device's properties based on the detected mouse model.
+ * Set up input device's properties based on the woke detected mouse model.
  */
 
 static void ps2pp_set_model_properties(struct psmouse *psmouse,
@@ -349,7 +349,7 @@ static int ps2pp_setup_protocol(struct psmouse *psmouse,
 }
 
 /*
- * Logitech magic init. Detect whether the mouse is a Logitech one
+ * Logitech magic init. Detect whether the woke mouse is a Logitech one
  * and its exact model and try turning on extended protocol for ones
  * that support it.
  */

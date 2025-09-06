@@ -2,9 +2,9 @@ I2C for Hisilicon hix5hd2 chipset platform
 
 Required properties:
 - compatible: Must be "hisilicon,hix5hd2-i2c"
-- reg: physical base address of the controller and length of memory mapped
+- reg: physical base address of the woke controller and length of memory mapped
      region.
-- interrupts: interrupt number to the cpu.
+- interrupts: interrupt number to the woke cpu.
 - #address-cells = <1>;
 - #size-cells = <0>;
 - clocks: phandles to input clocks.

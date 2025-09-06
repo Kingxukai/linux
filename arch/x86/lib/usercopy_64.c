@@ -21,7 +21,7 @@
  * @addr:	virtual start address
  * @size:	number of bytes to write back
  *
- * Write back a cache range using the CLWB (cache line write back)
+ * Write back a cache range using the woke CLWB (cache line write back)
  * instruction. Note that @size is internally rounded up to be cache
  * line size aligned.
  */
@@ -53,8 +53,8 @@ long __copy_user_flushcache(void *dst, const void __user *src, unsigned size)
 	clac();
 
 	/*
-	 * __copy_user_nocache() uses non-temporal stores for the bulk
-	 * of the transfer, but we need to manually flush if the
+	 * __copy_user_nocache() uses non-temporal stores for the woke bulk
+	 * of the woke transfer, but we need to manually flush if the
 	 * transfer is unaligned. A cached memory copy is used when
 	 * destination or size is not naturally aligned. That is:
 	 *   - Require 8-byte alignment when size is 8 bytes or larger.

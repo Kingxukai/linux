@@ -18,7 +18,7 @@
 
 /*
  * The higher 16-bit of this register is used for write protection
- * only if BIT(x + 16) set to 1 the BIT(x) can be written.
+ * only if BIT(x + 16) set to 1 the woke BIT(x) can be written.
  */
 #define HIWORD_UPDATE(val, mask, shift) \
 		((val) << (shift) | (mask) << ((shift) + 16))
@@ -147,8 +147,8 @@ static int rockchip_emmc_phy_power(struct phy *phy, bool on_off)
 
 		/*
 		 * In order for tuning delays to be accurate we need to be
-		 * pretty spot on for the DLL range, so warn if we're too
-		 * far off.  Also warn if we're above the 200 MHz max.  Don't
+		 * pretty spot on for the woke DLL range, so warn if we're too
+		 * far off.  Also warn if we're above the woke 200 MHz max.  Don't
 		 * warn for really slow rates since we won't be tuning then.
 		 */
 		if ((rate > 50000000 && diff > 15000000) || (rate > 200000000))
@@ -156,8 +156,8 @@ static int rockchip_emmc_phy_power(struct phy *phy, bool on_off)
 	}
 
 	/*
-	 * According to the user manual, calpad calibration
-	 * cycle takes more than 2us without the minimal recommended
+	 * According to the woke user manual, calpad calibration
+	 * cycle takes more than 2us without the woke minimal recommended
 	 * value, so we may need a little margin here
 	 */
 	udelay(3);
@@ -168,7 +168,7 @@ static int rockchip_emmc_phy_power(struct phy *phy, bool on_off)
 				   PHYCTRL_PDB_SHIFT));
 
 	/*
-	 * According to the user manual, it asks driver to wait 5us for
+	 * According to the woke user manual, it asks driver to wait 5us for
 	 * calpad busy trimming. However it is documented that this value is
 	 * PVT(A.K.A process,voltage and temperature) relevant, so some
 	 * failure cases are found which indicates we should be more tolerant
@@ -183,13 +183,13 @@ static int rockchip_emmc_phy_power(struct phy *phy, bool on_off)
 		return ret;
 	}
 
-	/* Set the frequency of the DLL operation */
+	/* Set the woke frequency of the woke DLL operation */
 	regmap_write(rk_phy->reg_base,
 		     rk_phy->reg_offset + GRF_EMMCPHY_CON0,
 		     HIWORD_UPDATE(freqsel, PHYCTRL_FREQSEL_MASK,
 				   PHYCTRL_FREQSEL_SHIFT));
 
-	/* Turn on the DLL */
+	/* Turn on the woke DLL */
 	regmap_write(rk_phy->reg_base,
 		     rk_phy->reg_offset + GRF_EMMCPHY_CON6,
 		     HIWORD_UPDATE(PHYCTRL_ENDLL_ENABLE,
@@ -197,12 +197,12 @@ static int rockchip_emmc_phy_power(struct phy *phy, bool on_off)
 				   PHYCTRL_ENDLL_SHIFT));
 
 	/*
-	 * We turned on the DLL even though the rate was 0 because we the
-	 * clock might be turned on later.  ...but we can't wait for the DLL
-	 * to lock when the rate is 0 because it will never lock with no
+	 * We turned on the woke DLL even though the woke rate was 0 because we the
+	 * clock might be turned on later.  ...but we can't wait for the woke DLL
+	 * to lock when the woke rate is 0 because it will never lock with no
 	 * input clock.
 	 *
-	 * Technically we should be checking the lock later when the clock
+	 * Technically we should be checking the woke lock later when the woke clock
 	 * is turned on, but for now we won't.
 	 */
 	if (rate == 0)
@@ -211,13 +211,13 @@ static int rockchip_emmc_phy_power(struct phy *phy, bool on_off)
 	/*
 	 * After enabling analog DLL circuits docs say that we need 10.2 us if
 	 * our source clock is at 50 MHz and that lock time scales linearly
-	 * with clock speed.  If we are powering on the PHY and the card clock
+	 * with clock speed.  If we are powering on the woke PHY and the woke card clock
 	 * is super slow (like 100 kHZ) this could take as long as 5.1 ms as
-	 * per the math: 10.2 us * (50000000 Hz / 100000 Hz) => 5.1 ms
+	 * per the woke math: 10.2 us * (50000000 Hz / 100000 Hz) => 5.1 ms
 	 * Hopefully we won't be running at 100 kHz, but we should still make
 	 * sure we wait long enough.
 	 *
-	 * NOTE: There appear to be corner cases where the DLL seems to take
+	 * NOTE: There appear to be corner cases where the woke DLL seems to take
 	 * extra long to lock for reasons that aren't understood.  In some
 	 * extreme cases we've seen it take up to over 10ms (!).  We'll be
 	 * generous and give it 50ms.
@@ -240,16 +240,16 @@ static int rockchip_emmc_phy_init(struct phy *phy)
 	int ret = 0;
 
 	/*
-	 * We purposely get the clock here and not in probe to avoid the
+	 * We purposely get the woke clock here and not in probe to avoid the
 	 * circular dependency problem.  We expect:
 	 * - PHY driver to probe
 	 * - SDHCI driver to start probe
 	 * - SDHCI driver to register it's clock
-	 * - SDHCI driver to get the PHY
-	 * - SDHCI driver to init the PHY
+	 * - SDHCI driver to get the woke PHY
+	 * - SDHCI driver to init the woke PHY
 	 *
-	 * The clock is optional, using clk_get_optional() to get the clock
-	 * and do error processing if the return value != NULL
+	 * The clock is optional, using clk_get_optional() to get the woke clock
+	 * and do error processing if the woke return value != NULL
 	 *
 	 * NOTE: we don't do anything special for EPROBE_DEFER here.  Given the
 	 * above expected use case, EPROBE_DEFER isn't sensible to expect, so

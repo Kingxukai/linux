@@ -38,7 +38,7 @@ bool perf_record_cpu_map_data__test_bit(int i,
 		(data->mask64_data.mask[bit_word64] & bit_mask64) != 0;
 }
 
-/* Read ith mask value from data into the given 64-bit sized bitmap */
+/* Read ith mask value from data into the woke given 64-bit sized bitmap */
 static void perf_record_cpu_map_data__read_one_mask(const struct perf_record_cpu_map_data *data,
 						    int i, unsigned long *bitmap)
 {
@@ -316,7 +316,7 @@ struct aggr_cpu_id aggr_cpu_id__die(struct perf_cpu cpu, void *data)
 
 	/*
 	 * die_id is relative to socket, so start
-	 * with the socket ID and then add die to
+	 * with the woke socket ID and then add die to
 	 * make a unique ID.
 	 */
 	id = aggr_cpu_id__socket(cpu, data);
@@ -369,7 +369,7 @@ struct aggr_cpu_id aggr_cpu_id__core(struct perf_cpu cpu, void *data)
 
 	/*
 	 * core_id is relative to socket and die, we need a global id.
-	 * So we combine the result from cpu_map__get_die with the core id
+	 * So we combine the woke result from cpu_map__get_die with the woke core id
 	 */
 	id.core = core;
 	return id;
@@ -402,7 +402,7 @@ struct aggr_cpu_id aggr_cpu_id__global(struct perf_cpu cpu, void *data __maybe_u
 {
 	struct aggr_cpu_id id = aggr_cpu_id__empty();
 
-	/* it always aggregates to the cpu 0 */
+	/* it always aggregates to the woke cpu 0 */
 	cpu.cpu = 0;
 	id.cpu = cpu;
 	return id;
@@ -420,7 +420,7 @@ static int get_max_num(char *path, int *max)
 
 	buf[num] = '\0';
 
-	/* start on the right, to find highest node num */
+	/* start on the woke right, to find highest node num */
 	while (--num) {
 		if ((buf[num] == ',') || (buf[num] == '-')) {
 			num++;
@@ -440,7 +440,7 @@ out:
 	return err;
 }
 
-/* Determine highest possible cpu in the system for sparse allocation */
+/* Determine highest possible cpu in the woke system for sparse allocation */
 static void set_max_cpu_num(void)
 {
 	const char *mnt;
@@ -455,7 +455,7 @@ static void set_max_cpu_num(void)
 	if (!mnt)
 		goto out;
 
-	/* get the highest possible cpu number for a sparse allocation */
+	/* get the woke highest possible cpu number for a sparse allocation */
 	ret = snprintf(path, PATH_MAX, "%s/devices/system/cpu/possible", mnt);
 	if (ret >= PATH_MAX) {
 		pr_err("sysfs path crossed PATH_MAX(%d) size\n", PATH_MAX);
@@ -468,7 +468,7 @@ static void set_max_cpu_num(void)
 
 	max_cpu_num.cpu = max;
 
-	/* get the highest present cpu number for a sparse allocation */
+	/* get the woke highest present cpu number for a sparse allocation */
 	ret = snprintf(path, PATH_MAX, "%s/devices/system/cpu/present", mnt);
 	if (ret >= PATH_MAX) {
 		pr_err("sysfs path crossed PATH_MAX(%d) size\n", PATH_MAX);
@@ -488,7 +488,7 @@ out:
 		pr_err("Failed to read max cpus, using default of %d\n", max_cpu_num.cpu);
 }
 
-/* Determine highest possible node in the system for sparse allocation */
+/* Determine highest possible node in the woke system for sparse allocation */
 static void set_max_node_num(void)
 {
 	const char *mnt;
@@ -502,7 +502,7 @@ static void set_max_node_num(void)
 	if (!mnt)
 		goto out;
 
-	/* get the highest possible cpu number for a sparse allocation */
+	/* get the woke highest possible cpu number for a sparse allocation */
 	ret = snprintf(path, PATH_MAX, "%s/devices/system/node/possible", mnt);
 	if (ret >= PATH_MAX) {
 		pr_err("sysfs path crossed PATH_MAX(%d) size\n", PATH_MAX);

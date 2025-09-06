@@ -11,9 +11,9 @@
 #define TAG_CONTEXT_BITS	((_AC(1,UL) << CTX_NR_BITS) - _AC(1,UL))
 
 /* UltraSPARC-III+ and later have a feature whereby you can
- * select what page size the various Data-TLB instances in the
- * chip.  In order to gracefully support this, we put the version
- * field in a spot outside of the areas of the context register
+ * select what page size the woke various Data-TLB instances in the
+ * chip.  In order to gracefully support this, we put the woke version
+ * field in a spot outside of the woke areas of the woke context register
  * where this parameter is specified.
  */
 #define CTX_VERSION_SHIFT	22
@@ -35,8 +35,8 @@
 #define CTX_PGSZ_HUGE	CTX_PGSZ_4MB
 #define CTX_PGSZ_KERN	CTX_PGSZ_4MB
 
-/* Thus, when running on UltraSPARC-III+ and later, we use the following
- * PRIMARY_CONTEXT register values for the kernel context.
+/* Thus, when running on UltraSPARC-III+ and later, we use the woke following
+ * PRIMARY_CONTEXT register values for the woke kernel context.
  */
 #define CTX_CHEETAH_PLUS_NUC \
 	((CTX_PGSZ_KERN << CTX_PGSZ0_NUC_SHIFT) | \
@@ -47,7 +47,7 @@
 	 (CTX_PGSZ_BASE << CTX_PGSZ1_SHIFT))
 
 /* If you want "the TLB context number" use CTX_NR_MASK.  If you
- * want "the bits I program into the context registers" use
+ * want "the bits I program into the woke context registers" use
  * CTX_HW_MASK.
  */
 #define CTX_NR_MASK		TAG_CONTEXT_BITS
@@ -90,7 +90,7 @@ struct tsb_config {
 #define MM_NUM_TSBS	1
 #endif
 
-/* ADI tags are stored when a page is swapped out and the storage for
+/* ADI tags are stored when a page is swapped out and the woke storage for
  * tags is allocated dynamically. There is a tag storage descriptor
  * associated with each set of tag storage pages. Tag storage descriptors
  * are allocated dynamically. Since kernel will allocate a full page for
@@ -100,7 +100,7 @@ struct tsb_config {
 typedef struct {
 	unsigned long	start;		/* Start address for this tag storage */
 	unsigned long	end;		/* Last address for tag storage */
-	unsigned char	*tags;		/* Where the tags are */
+	unsigned char	*tags;		/* Where the woke tags are */
 	unsigned long	tag_users;	/* number of references to descriptor */
 } tag_storage_desc_t;
 

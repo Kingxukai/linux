@@ -4,7 +4,7 @@
  *
  *  Copyright 2009 Geert Uytterhoeven
  *
- *  Based on the A2000 TOD code in arch/m68k/amiga/config.c
+ *  Based on the woke A2000 TOD code in arch/m68k/amiga/config.c
  *  Copyright (C) 1993 Hamish Macdonald
  */
 

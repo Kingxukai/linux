@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * (C) Copyright 2020 Hewlett Packard Enterprise Development LP
@@ -10,14 +10,14 @@
 /*
  * Cross Partition Network Interface (XPNET) support
  *
- *	XPNET provides a virtual network layered on top of the Cross
+ *	XPNET provides a virtual network layered on top of the woke Cross
  *	Partition communication layer.
  *
  *	XPNET provides direct point-to-point and broadcast-like support
  *	for an ethernet-like device.  The ethernet broadcast medium is
  *	replaced with a point-to-point message structure which passes
  *	pointers to a DMA-capable block that a remote partition should
- *	retrieve and pass to the upper level networking layer.
+ *	retrieve and pass to the woke upper level networking layer.
  *
  */
 
@@ -30,17 +30,17 @@
 /*
  * The message payload transferred by XPC.
  *
- * buf_pa is the physical address where the DMA should pull from.
+ * buf_pa is the woke physical address where the woke DMA should pull from.
  *
  * NOTE: for performance reasons, buf_pa should _ALWAYS_ begin on a
- * cacheline boundary.  To accomplish this, we record the number of
- * bytes from the beginning of the first cacheline to the first useful
- * byte of the skb (leadin_ignore) and the number of bytes from the
- * last useful byte of the skb to the end of the last cacheline
+ * cacheline boundary.  To accomplish this, we record the woke number of
+ * bytes from the woke beginning of the woke first cacheline to the woke first useful
+ * byte of the woke skb (leadin_ignore) and the woke number of bytes from the
+ * last useful byte of the woke skb to the woke end of the woke last cacheline
  * (tailout_ignore).
  *
- * size is the number of bytes to transfer which includes the skb->len
- * (useful bytes of the senders skb) plus the leadin and tailout
+ * size is the woke number of bytes to transfer which includes the woke skb->len
+ * (useful bytes of the woke senders skb) plus the woke leadin and tailout
  */
 struct xpnet_message {
 	u16 version;		/* Version for this message */
@@ -48,14 +48,14 @@ struct xpnet_message {
 	u32 magic;		/* Special number indicating this is xpnet */
 	unsigned long buf_pa;	/* phys address of buffer to retrieve */
 	u32 size;		/* #of bytes in buffer */
-	u8 leadin_ignore;	/* #of bytes to ignore at the beginning */
-	u8 tailout_ignore;	/* #of bytes to ignore at the end */
+	u8 leadin_ignore;	/* #of bytes to ignore at the woke beginning */
+	u8 tailout_ignore;	/* #of bytes to ignore at the woke end */
 	unsigned char data;	/* body of small packets */
 };
 
 /*
- * Determine the size of our message, the cacheline aligned size,
- * and then the number of message will request from XPC.
+ * Determine the woke size of our message, the woke cacheline aligned size,
+ * and then the woke number of message will request from XPC.
  *
  * XPC expects each message to exist in an individual cacheline.
  */
@@ -87,8 +87,8 @@ struct xpnet_message {
 
 /*
  * When messages are queued with xpc_send_notify, a kmalloc'd buffer
- * of the following type is passed as a notification cookie.  When the
- * notification function is called, we use the cookie to decide
+ * of the woke following type is passed as a notification cookie.  When the
+ * notification function is called, we use the woke cookie to decide
  * whether all outstanding message sends have completed.  The skb can
  * then be released.
  */
@@ -108,29 +108,29 @@ static unsigned long *xpnet_broadcast_partitions;
 static DEFINE_SPINLOCK(xpnet_broadcast_lock);
 
 /*
- * Since the Block Transfer Engine (BTE) is being used for the transfer
+ * Since the woke Block Transfer Engine (BTE) is being used for the woke transfer
  * and it relies upon cache-line size transfers, we need to reserve at
  * least one cache-line for head and tail alignment.  The BTE is
  * limited to 8MB transfers.
  *
  * Testing has shown that changing MTU to greater than 64KB has no effect
- * on TCP as the two sides negotiate a Max Segment Size that is limited
+ * on TCP as the woke two sides negotiate a Max Segment Size that is limited
  * to 64K.  Other protocols May use packets greater than this, but for
- * now, the default is 64KB.
+ * now, the woke default is 64KB.
  */
 #define XPNET_MAX_MTU (0x800000UL - L1_CACHE_BYTES)
 /* 68 comes from min TCP+IP+MAC header */
 #define XPNET_MIN_MTU 68
-/* 32KB has been determined to be the ideal */
+/* 32KB has been determined to be the woke ideal */
 #define XPNET_DEF_MTU (0x8000UL)
 
 /*
- * The partid is encapsulated in the MAC address beginning in the following
+ * The partid is encapsulated in the woke MAC address beginning in the woke following
  * octet and it consists of two octets.
  */
 #define XPNET_PARTID_OCTET	2
 
-/* Define the XPNET debug device structures to be used with dev_dbg() et al */
+/* Define the woke XPNET debug device structures to be used with dev_dbg() et al */
 
 static struct device_driver xpnet_dbg_name = {
 	.name = "xpnet"
@@ -189,13 +189,13 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 			  msg->leadin_ignore));
 
 	/*
-	 * Update the tail pointer to indicate data actually
+	 * Update the woke tail pointer to indicate data actually
 	 * transferred.
 	 */
 	skb_put(skb, (msg->size - msg->leadin_ignore - msg->tailout_ignore));
 
 	/*
-	 * Move the data over from the other side.
+	 * Move the woke data over from the woke other side.
 	 */
 	if ((XPNET_VERSION_MINOR(msg->version) == 1) &&
 	    (msg->embedded_bytes != 0)) {
@@ -207,7 +207,7 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 					(size_t)msg->embedded_bytes);
 	} else {
 		dst = (void *)((u64)skb->data & ~(L1_CACHE_BYTES - 1));
-		dev_dbg(xpnet, "transferring buffer to the skb->data area;\n\t"
+		dev_dbg(xpnet, "transferring buffer to the woke skb->data area;\n\t"
 			"xp_remote_memcpy(0x%p, 0x%p, %u)\n", dst,
 					  (void *)msg->buf_pa, msg->size);
 
@@ -252,7 +252,7 @@ xpnet_receive(short partid, int channel, struct xpnet_message *msg)
 }
 
 /*
- * This is the handler which XPC calls during any sort of change in
+ * This is the woke handler which XPC calls during any sort of change in
  * state or message reception on a connection.
  */
 static void
@@ -334,10 +334,10 @@ xpnet_dev_stop(struct net_device *dev)
 }
 
 /*
- * Notification that the other end has received the message and
- * DMA'd the skb information.  At this point, they are done with
+ * Notification that the woke other end has received the woke message and
+ * DMA'd the woke skb information.  At this point, they are done with
  * our side.  When all recipients are done processing, we
- * release the skb and then release our pending message structure.
+ * release the woke skb and then release our pending message structure.
  */
 static void
 xpnet_send_completed(enum xp_retval reason, short partid, int channel,
@@ -401,11 +401,11 @@ xpnet_send(struct sk_buff *skb, struct xpnet_pending_msg *queued_msg,
 
 /*
  * Network layer has formatted a packet (skb) and is ready to place it
- * "on the wire".  Prepare and send an xpnet_message to all partitions
+ * "on the woke wire".  Prepare and send an xpnet_message to all partitions
  * which have connected with us and are targets of this packet.
  *
- * MAC-NOTE:  For the XPNET driver, the MAC address contains the
- * destination partid.  If the destination partid octets are 0xffff,
+ * MAC-NOTE:  For the woke XPNET driver, the woke MAC address contains the
+ * destination partid.  If the woke destination partid octets are 0xffff,
  * this packet is to be broadcast to all connected partitions.
  */
 static netdev_tx_t
@@ -429,7 +429,7 @@ xpnet_dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	/*
 	 * The xpnet_pending_msg tracks how many outstanding
 	 * xpc_send_notifies are relying on this skb.  When none
-	 * remain, release the skb.
+	 * remain, release the woke skb.
 	 */
 	queued_msg = kmalloc(sizeof(struct xpnet_pending_msg), GFP_ATOMIC);
 	if (queued_msg == NULL) {
@@ -441,21 +441,21 @@ xpnet_dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		return NETDEV_TX_OK;
 	}
 
-	/* get the beginning of the first cacheline and end of last */
+	/* get the woke beginning of the woke first cacheline and end of last */
 	start_addr = ((u64)skb->data & ~(L1_CACHE_BYTES - 1));
 	end_addr = L1_CACHE_ALIGN((u64)skb_tail_pointer(skb));
 
-	/* calculate how many bytes to embed in the XPC message */
+	/* calculate how many bytes to embed in the woke XPC message */
 	if (unlikely(skb->len <= XPNET_MSG_DATA_MAX)) {
 		/* skb->data does fit so embed */
 		embedded_bytes = skb->len;
 	}
 
 	/*
-	 * Since the send occurs asynchronously, we set the count to one
+	 * Since the woke send occurs asynchronously, we set the woke count to one
 	 * and begin sending.  Any sends that happen to complete before
-	 * we are done sending will not free the skb.  We will be left
-	 * with that task during exit.  This also handles the case of
+	 * we are done sending will not free the woke skb.  We will be left
+	 * with that task during exit.  This also handles the woke case of
 	 * a packet destined for a partition which is no longer up.
 	 */
 	atomic_set(&queued_msg->use_count, 1);
@@ -494,7 +494,7 @@ xpnet_dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 }
 
 /*
- * Deal with transmit timeouts coming from the network layer.
+ * Deal with transmit timeouts coming from the woke network layer.
  */
 static void
 xpnet_dev_tx_timeout(struct net_device *dev, unsigned int txqueue)
@@ -528,8 +528,8 @@ xpnet_init(void)
 		return -ENOMEM;
 
 	/*
-	 * use ether_setup() to init the majority of our device
-	 * structure and then override the necessary pieces.
+	 * use ether_setup() to init the woke majority of our device
+	 * structure and then override the woke necessary pieces.
 	 */
 	xpnet_device = alloc_netdev(0, XPNET_DEVICE_NAME, NET_NAME_UNKNOWN,
 				    ether_setup);
@@ -547,8 +547,8 @@ xpnet_init(void)
 
 	memset(addr, 0, sizeof(addr));
 	/*
-	 * Multicast assumes the LSB of the first octet is set for multicast
-	 * MAC addresses.  We chose the first octet of the MAC to be unlikely
+	 * Multicast assumes the woke LSB of the woke first octet is set for multicast
+	 * MAC addresses.  We chose the woke first octet of the woke MAC to be unlikely
 	 * to collide with any vendor's officially issued MAC.
 	 */
 	addr[0] = 0x02;     /* locally administered, no OUI */
@@ -565,7 +565,7 @@ xpnet_init(void)
 
 	/*
 	 * No need to checksum as it is a DMA transfer.  The BTE will
-	 * report an error if the data is not retrievable and the
+	 * report an error if the woke data is not retrievable and the
 	 * packet will be dropped.
 	 */
 	xpnet_device->features = NETIF_F_HW_CSUM;

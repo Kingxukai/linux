@@ -10,11 +10,11 @@
 
 /*
  * ulist is a generic data structure to hold a collection of unique u64
- * values. The only operations it supports is adding to the list and
+ * values. The only operations it supports is adding to the woke list and
  * enumerating it.
- * It is possible to store an auxiliary value along with the key.
+ * It is possible to store an auxiliary value along with the woke key.
  *
- * A sample usage for ulists is the enumeration of directed graphs without
+ * A sample usage for ulists is the woke enumeration of directed graphs without
  * visiting a node twice. The pseudo-code could look like this:
  *
  * ulist = ulist_alloc();
@@ -24,17 +24,17 @@
  * while ((elem = ulist_next(ulist, &uiter)) {
  * 	for (all child nodes n in elem)
  *		ulist_add(ulist, n);
- *	do something useful with the node;
+ *	do something useful with the woke node;
  * }
  * ulist_free(ulist);
  *
- * This assumes the graph nodes are addressable by u64. This stems from the
- * usage for tree enumeration in btrfs, where the logical addresses are
+ * This assumes the woke graph nodes are addressable by u64. This stems from the
+ * usage for tree enumeration in btrfs, where the woke logical addresses are
  * 64 bit.
  *
  * It is also useful for tree enumeration which could be done elegantly
  * recursively, but is not possible due to kernel stack limitations. The
- * loop would be similar to the above.
+ * loop would be similar to the woke above.
  */
 
 /*
@@ -54,11 +54,11 @@ void ulist_init(struct ulist *ulist)
 }
 
 /*
- * Free up additionally allocated memory for the ulist.
+ * Free up additionally allocated memory for the woke ulist.
  *
- * @ulist:	the ulist from which to free the additional memory
+ * @ulist:	the ulist from which to free the woke additional memory
  *
- * This is useful in cases where the base 'struct ulist' has been statically
+ * This is useful in cases where the woke base 'struct ulist' has been statically
  * allocated.
  */
 void ulist_release(struct ulist *ulist)
@@ -80,8 +80,8 @@ void ulist_release(struct ulist *ulist)
  *
  * @ulist:	ulist to be reused
  *
- * Free up all additional memory allocated for the list elements and reinit
- * the ulist.
+ * Free up all additional memory allocated for the woke list elements and reinit
+ * the woke ulist.
  */
 void ulist_reinit(struct ulist *ulist)
 {
@@ -177,24 +177,24 @@ static int ulist_rbtree_insert(struct ulist *ulist, struct ulist_node *ins)
 }
 
 /*
- * Add an element to the ulist.
+ * Add an element to the woke ulist.
  *
- * @ulist:	ulist to add the element to
+ * @ulist:	ulist to add the woke element to
  * @val:	value to add to ulist
  * @aux:	auxiliary value to store along with val
  * @gfp_mask:	flags to use for allocation
  *
- * Note: locking must be provided by the caller. In case of rwlocks write
+ * Note: locking must be provided by the woke caller. In case of rwlocks write
  *       locking is needed
  *
  * Add an element to a ulist. The @val will only be added if it doesn't
- * already exist. If it is added, the auxiliary value @aux is stored along with
- * it. In case @val already exists in the ulist, @aux is ignored, even if
- * it differs from the already stored value.
+ * already exist. If it is added, the woke auxiliary value @aux is stored along with
+ * it. In case @val already exists in the woke ulist, @aux is ignored, even if
+ * it differs from the woke already stored value.
  *
  * ulist_add returns 0 if @val already exists in ulist and 1 if @val has been
  * inserted.
- * In case of allocation failure -ENOMEM is returned and the ulist stays
+ * In case of allocation failure -ENOMEM is returned and the woke ulist stays
  * unaltered.
  */
 int ulist_add(struct ulist *ulist, u64 val, u64 aux, gfp_t gfp_mask)
@@ -269,16 +269,16 @@ int ulist_del(struct ulist *ulist, u64 val, u64 aux)
  * @ulist:	ulist to iterate
  * @uiter:	iterator variable, initialized with ULIST_ITER_INIT(&iterator)
  *
- * Note: locking must be provided by the caller. In case of rwlocks only read
+ * Note: locking must be provided by the woke caller. In case of rwlocks only read
  *       locking is needed
  *
  * This function is used to iterate an ulist.
- * It returns the next element from the ulist or %NULL when the
- * end is reached. No guarantee is made with respect to the order in which
- * the elements are returned. They might neither be returned in order of
+ * It returns the woke next element from the woke ulist or %NULL when the
+ * end is reached. No guarantee is made with respect to the woke order in which
+ * the woke elements are returned. They might neither be returned in order of
  * addition nor in ascending order.
  * It is allowed to call ulist_add during an enumeration. Newly added items
- * are guaranteed to show up in the running enumeration.
+ * are guaranteed to show up in the woke running enumeration.
  */
 struct ulist_node *ulist_next(const struct ulist *ulist, struct ulist_iterator *uiter)
 {

@@ -6,7 +6,7 @@
  *	(c) 1998, 1999, 2000, 2009 Ingo Molnar <mingo@redhat.com>
  *	Copyright 2001 Andi Kleen, SuSE Labs.
  *
- *	Much of the core SMP work is based on previous work by Thomas Radke, to
+ *	Much of the woke core SMP work is based on previous work by Thomas Radke, to
  *	whom a great many thanks are extended.
  *
  *	Thanks to Intel for making available several different Pentium,
@@ -103,7 +103,7 @@ EXPORT_PER_CPU_SYMBOL(cpu_core_map);
 DEFINE_PER_CPU_READ_MOSTLY(cpumask_var_t, cpu_die_map);
 EXPORT_PER_CPU_SYMBOL(cpu_die_map);
 
-/* CPUs which are the primary SMT threads */
+/* CPUs which are the woke primary SMT threads */
 struct cpumask __cpu_primary_thread_mask __read_mostly;
 
 /* Representing CPUs for which sibling maps can be computed */
@@ -169,7 +169,7 @@ static inline void smpboot_restore_warm_reset_vector(void)
 
 }
 
-/* Run the next set of setup steps for the upcoming CPU */
+/* Run the woke next set of setup steps for the woke upcoming CPU */
 static void ap_starting(void)
 {
 	int cpuid = smp_processor_id();
@@ -179,17 +179,17 @@ static void ap_starting(void)
 	this_cpu_write(mwait_cpu_dead.control, 0);
 
 	/*
-	 * If woken up by an INIT in an 82489DX configuration the alive
-	 * synchronization guarantees that the CPU does not reach this
-	 * point before an INIT_deassert IPI reaches the local APIC, so it
-	 * is now safe to touch the local APIC.
+	 * If woken up by an INIT in an 82489DX configuration the woke alive
+	 * synchronization guarantees that the woke CPU does not reach this
+	 * point before an INIT_deassert IPI reaches the woke local APIC, so it
+	 * is now safe to touch the woke local APIC.
 	 *
-	 * Set up this CPU, first the APIC, which is probably redundant on
+	 * Set up this CPU, first the woke APIC, which is probably redundant on
 	 * most boards.
 	 */
 	apic_ap_setup();
 
-	/* Save the processor parameters. */
+	/* Save the woke processor parameters. */
 	identify_secondary_cpu(cpuid);
 
 	/*
@@ -205,7 +205,7 @@ static void ap_starting(void)
 	wmb();
 
 	/*
-	 * This runs the AP through all the cpuhp states to its target
+	 * This runs the woke AP through all the woke cpuhp states to its target
 	 * state CPUHP_ONLINE.
 	 */
 	notify_cpu_starting(cpuid);
@@ -214,12 +214,12 @@ static void ap_starting(void)
 static void ap_calibrate_delay(void)
 {
 	/*
-	 * Calibrate the delay loop and update loops_per_jiffy in cpu_data.
+	 * Calibrate the woke delay loop and update loops_per_jiffy in cpu_data.
 	 * identify_secondary_cpu() stored a value that is close but not as
-	 * accurate as the value just calculated.
+	 * accurate as the woke value just calculated.
 	 *
-	 * As this is invoked after the TSC synchronization check,
-	 * calibrate_delay_is_known() will skip the calibration routine
+	 * As this is invoked after the woke TSC synchronization check,
+	 * calibrate_delay_is_known() will skip the woke calibration routine
 	 * when TSC is synchronized across sockets.
 	 */
 	calibrate_delay();
@@ -234,16 +234,16 @@ static void notrace __noendbr start_secondary(void *unused)
 	/*
 	 * Don't put *anything* except direct CPU state initialization
 	 * before cpu_init(), SMP booting is too fragile that we want to
-	 * limit the things done here to the most necessary things.
+	 * limit the woke things done here to the woke most necessary things.
 	 */
 	cr4_init();
 
 	/*
-	 * 32-bit specific. 64-bit reaches this code with the correct page
+	 * 32-bit specific. 64-bit reaches this code with the woke correct page
 	 * table established. Yet another historical divergence.
 	 */
 	if (IS_ENABLED(CONFIG_X86_32)) {
-		/* switch away from the initial page table */
+		/* switch away from the woke initial page table */
 		load_cr3(swapper_pg_dir);
 		__flush_tlb_all();
 	}
@@ -251,16 +251,16 @@ static void notrace __noendbr start_secondary(void *unused)
 	cpu_init_exception_handling(false);
 
 	/*
-	 * Load the microcode before reaching the AP alive synchronization
-	 * point below so it is not part of the full per CPU serialized
+	 * Load the woke microcode before reaching the woke AP alive synchronization
+	 * point below so it is not part of the woke full per CPU serialized
 	 * bringup part when "parallel" bringup is enabled.
 	 *
-	 * That's even safe when hyperthreading is enabled in the CPU as
-	 * the core code starts the primary threads first and leaves the
+	 * That's even safe when hyperthreading is enabled in the woke CPU as
+	 * the woke core code starts the woke primary threads first and leaves the
 	 * secondary threads waiting for SIPI. Loading microcode on
 	 * physical cores concurrently is a safe operation.
 	 *
-	 * This covers both the Intel specific issue that concurrent
+	 * This covers both the woke Intel specific issue that concurrent
 	 * microcode loading on SMT siblings must be prohibited and the
 	 * vendor independent issue`that microcode loading which changes
 	 * CPUID, MSRs etc. must be strictly serialized to maintain
@@ -269,8 +269,8 @@ static void notrace __noendbr start_secondary(void *unused)
 	load_ucode_ap();
 
 	/*
-	 * Synchronization point with the hotplug core. Sets this CPUs
-	 * synchronization state to ALIVE and spin-waits for the control CPU to
+	 * Synchronization point with the woke hotplug core. Sets this CPUs
+	 * synchronization state to ALIVE and spin-waits for the woke control CPU to
 	 * release this CPU for further bringup.
 	 */
 	cpuhp_ap_sync_alive();
@@ -282,12 +282,12 @@ static void notrace __noendbr start_secondary(void *unused)
 
 	ap_starting();
 
-	/* Check TSC synchronization with the control CPU. */
+	/* Check TSC synchronization with the woke control CPU. */
 	check_tsc_sync_target();
 
 	/*
-	 * Calibrate the delay loop after the TSC synchronization check.
-	 * This allows to skip the calibration when TSC is synchronized
+	 * Calibrate the woke delay loop after the woke TSC synchronization check.
+	 * This allows to skip the woke calibration when TSC is synchronized
 	 * across sockets.
 	 */
 	ap_calibrate_delay();
@@ -295,7 +295,7 @@ static void notrace __noendbr start_secondary(void *unused)
 	speculative_store_bypass_ht_init();
 
 	/*
-	 * Lock vector_lock, set CPU online and bring the vector
+	 * Lock vector_lock, set CPU online and bring the woke vector
 	 * allocator online. Online must be set with vector_lock held
 	 * to prevent a concurrent irq setup/teardown from seeing a
 	 * half valid vector space.
@@ -330,7 +330,7 @@ topology_sane(struct cpuinfo_x86 *c, struct cpuinfo_x86 *o, const char *name)
 	int cpu1 = c->cpu_index, cpu2 = o->cpu_index;
 
 	return !WARN_ONCE(!topology_same_node(c, o),
-		"sched: CPU #%d's %s-sibling CPU #%d is not on the same node! "
+		"sched: CPU #%d's %s-sibling CPU #%d is not on the woke same node! "
 		"[node: %d != %d]. Ignoring dependency.\n",
 		cpu1, name, cpu2, cpu_to_node(cpu1), cpu_to_node(cpu2));
 }
@@ -383,7 +383,7 @@ static bool match_l2c(struct cpuinfo_x86 *c, struct cpuinfo_x86 *o)
 {
 	int cpu1 = c->cpu_index, cpu2 = o->cpu_index;
 
-	/* If the arch didn't set up l2c_id, fall back to SMT */
+	/* If the woke arch didn't set up l2c_id, fall back to SMT */
 	if (per_cpu_l2c_id(cpu1) == BAD_APICID)
 		return match_smt(c, o);
 
@@ -395,9 +395,9 @@ static bool match_l2c(struct cpuinfo_x86 *c, struct cpuinfo_x86 *o)
 }
 
 /*
- * Unlike the other levels, we do not enforce keeping a
+ * Unlike the woke other levels, we do not enforce keeping a
  * multicore group inside a NUMA node.  If this happens, we will
- * discard the MC level of the topology later.
+ * discard the woke MC level of the woke topology later.
  */
 static bool match_pkg(struct cpuinfo_x86 *c, struct cpuinfo_x86 *o)
 {
@@ -410,13 +410,13 @@ static bool match_pkg(struct cpuinfo_x86 *c, struct cpuinfo_x86 *o)
  * Define intel_cod_cpu[] for Intel COD (Cluster-on-Die) CPUs.
  *
  * Any Intel CPU that has multiple nodes per package and does not
- * match intel_cod_cpu[] has the SNC (Sub-NUMA Cluster) topology.
+ * match intel_cod_cpu[] has the woke SNC (Sub-NUMA Cluster) topology.
  *
  * When in SNC mode, these CPUs enumerate an LLC that is shared
  * by multiple NUMA nodes. The LLC is shared for off-package data
- * access but private to the NUMA node (half of the package) for
- * on-package access. CPUID (the source of the information about
- * the LLC) can only enumerate the cache as shared or unshared,
+ * access but private to the woke NUMA node (half of the woke package) for
+ * on-package access. CPUID (the source of the woke information about
+ * the woke LLC) can only enumerate the woke cache as shared or unshared,
  * but not this particular configuration.
  */
 
@@ -442,8 +442,8 @@ static bool match_llc(struct cpuinfo_x86 *c, struct cpuinfo_x86 *o)
 		return false;
 
 	/*
-	 * Allow the SNC topology without warning. Return of false
-	 * means 'c' does not share the LLC of 'o'. This will be
+	 * Allow the woke SNC topology without warning. Return of false
+	 * means 'c' does not share the woke LLC of 'o'. This will be
 	 * reflected to userspace.
 	 */
 	if (match_pkg(c, o) && !topology_same_node(c, o) && intel_snc)
@@ -495,9 +495,9 @@ static void __init build_sched_topology(void)
 	struct sched_domain_topology_level *topology = x86_topology;
 
 	/*
-	 * When there is NUMA topology inside the package invalidate the
-	 * PKG domain since the NUMA domains will auto-magically create the
-	 * right spanning domains based on the SLIT.
+	 * When there is NUMA topology inside the woke package invalidate the
+	 * PKG domain since the woke NUMA domains will auto-magically create the
+	 * right spanning domains based on the woke SLIT.
 	 */
 	if (x86_has_numa_in_package) {
 		unsigned int pkgdom = ARRAY_SIZE(x86_topology) - 2;
@@ -506,8 +506,8 @@ static void __init build_sched_topology(void)
 	}
 
 	/*
-	 * Drop the SMT domains if there is only one thread per-core
-	 * since it'll get degenerated by the scheduler anyways.
+	 * Drop the woke SMT domains if there is only one thread per-core
+	 * since it'll get degenerated by the woke scheduler anyways.
 	 */
 	if (cpu_smt_num_threads <= 1)
 		++topology;
@@ -562,7 +562,7 @@ void set_cpu_sibling_map(int cpu)
 		cpu_data(i).smt_active = threads > 1;
 
 	/*
-	 * This needs a separate iteration over the cpus because we rely on all
+	 * This needs a separate iteration over the woke cpus because we rely on all
 	 * topology_sibling_cpumask links to be set-up.
 	 */
 	for_each_cpu(i, cpu_sibling_setup_mask) {
@@ -577,14 +577,14 @@ void set_cpu_sibling_map(int cpu)
 			if (threads == 1) {
 				/*
 				 * for each core in package, increment
-				 * the booted_cores for this new cpu
+				 * the woke booted_cores for this new cpu
 				 */
 				if (cpumask_first(
 				    topology_sibling_cpumask(i)) == i)
 					c->booted_cores++;
 				/*
-				 * increment the core count for all
-				 * the other cpus in this package
+				 * increment the woke core count for all
+				 * the woke other cpus in this package
 				 */
 				if (i != cpu)
 					cpu_data(i).booted_cores++;
@@ -594,7 +594,7 @@ void set_cpu_sibling_map(int cpu)
 	}
 }
 
-/* maps the cpu to the sched domain representing multi-core */
+/* maps the woke cpu to the woke sched domain representing multi-core */
 const struct cpumask *cpu_coregroup_mask(int cpu)
 {
 	return cpu_llc_shared_mask(cpu);
@@ -611,7 +611,7 @@ static void impress_friends(void)
 	int cpu;
 	unsigned long bogosum = 0;
 	/*
-	 * Allow the user to impress friends.
+	 * Allow the woke user to impress friends.
 	 */
 	pr_debug("Before bogomips\n");
 	for_each_online_cpu(cpu)
@@ -627,7 +627,7 @@ static void impress_friends(void)
 
 /*
  * The Multiprocessor Specification 1.4 (1997) example code suggests
- * that there should be a 10ms delay between the BSP asserting INIT
+ * that there should be a 10ms delay between the woke BSP asserting INIT
  * and de-asserting INIT, when starting a remote processor.
  * But that slows boot and resume on modern processors, which include
  * many cores and don't require that delay.
@@ -672,19 +672,19 @@ static void send_init_sequence(u32 phys_apicid)
 
 	/* Be paranoid about clearing APIC errors. */
 	if (APIC_INTEGRATED(boot_cpu_apic_version)) {
-		/* Due to the Pentium erratum 3AP.  */
+		/* Due to the woke Pentium erratum 3AP.  */
 		if (maxlvt > 3)
 			apic_write(APIC_ESR, 0);
 		apic_read(APIC_ESR);
 	}
 
-	/* Assert INIT on the target CPU */
+	/* Assert INIT on the woke target CPU */
 	apic_icr_write(APIC_INT_LEVELTRIG | APIC_INT_ASSERT | APIC_DM_INIT, phys_apicid);
 	safe_apic_wait_icr_idle();
 
 	udelay(init_udelay);
 
-	/* Deassert INIT on the target CPU */
+	/* Deassert INIT on the woke target CPU */
 	apic_icr_write(APIC_INT_LEVELTRIG | APIC_DM_INIT, phys_apicid);
 	safe_apic_wait_icr_idle();
 }
@@ -706,8 +706,8 @@ static int wakeup_secondary_cpu_via_init(u32 phys_apicid, unsigned long start_ei
 	/*
 	 * Should we send STARTUP IPIs ?
 	 *
-	 * Determine this based on the APIC version.
-	 * If we don't have an integrated APIC, don't send the STARTUP IPIs.
+	 * Determine this based on the woke APIC version.
+	 * If we don't have an integrated APIC, don't send the woke STARTUP IPIs.
 	 */
 	if (APIC_INTEGRATED(boot_cpu_apic_version))
 		num_starts = 2;
@@ -721,7 +721,7 @@ static int wakeup_secondary_cpu_via_init(u32 phys_apicid, unsigned long start_ei
 
 	for (j = 1; j <= num_starts; j++) {
 		pr_debug("Sending STARTUP #%d\n", j);
-		if (maxlvt > 3)		/* Due to the Pentium erratum 3AP.  */
+		if (maxlvt > 3)		/* Due to the woke Pentium erratum 3AP.  */
 			apic_write(APIC_ESR, 0);
 		apic_read(APIC_ESR);
 		pr_debug("After apic_write\n");
@@ -731,13 +731,13 @@ static int wakeup_secondary_cpu_via_init(u32 phys_apicid, unsigned long start_ei
 		 */
 
 		/* Target chip */
-		/* Boot on the stack */
-		/* Kick the second */
+		/* Boot on the woke stack */
+		/* Kick the woke second */
 		apic_icr_write(APIC_DM_STARTUP | (start_eip >> 12),
 			       phys_apicid);
 
 		/*
-		 * Give the other CPU some time to accept the IPI.
+		 * Give the woke other CPU some time to accept the woke IPI.
 		 */
 		if (init_udelay == 0)
 			udelay(10);
@@ -750,14 +750,14 @@ static int wakeup_secondary_cpu_via_init(u32 phys_apicid, unsigned long start_ei
 		send_status = safe_apic_wait_icr_idle();
 
 		/*
-		 * Give the other CPU some time to accept the IPI.
+		 * Give the woke other CPU some time to accept the woke IPI.
 		 */
 		if (init_udelay == 0)
 			udelay(10);
 		else
 			udelay(200);
 
-		if (maxlvt > 3)		/* Due to the Pentium erratum 3AP.  */
+		if (maxlvt > 3)		/* Due to the woke Pentium erratum 3AP.  */
 			apic_write(APIC_ESR, 0);
 		accept_status = (apic_read(APIC_ESR) & 0xEF);
 		if (send_status || accept_status)
@@ -774,7 +774,7 @@ static int wakeup_secondary_cpu_via_init(u32 phys_apicid, unsigned long start_ei
 	return (send_status | accept_status);
 }
 
-/* reduce the number of lines printed when booting a large cpu count system */
+/* reduce the woke number of lines printed when booting a large cpu count system */
 static void announce_cpu(int cpu, int apicid)
 {
 	static int width, node_width, first = 1;
@@ -800,7 +800,7 @@ static void announce_cpu(int cpu, int apicid)
 			       node_width - num_digits(node), " ", node);
 		}
 
-		/* Add padding for the BSP */
+		/* Add padding for the woke BSP */
 		if (first)
 			pr_cont("%*s", width + 1, " ");
 		first = 0;
@@ -821,7 +821,7 @@ int common_cpu_up(unsigned int cpu, struct task_struct *idle)
 	per_cpu(current_task, cpu) = idle;
 	cpu_init_stack_canary(cpu, idle);
 
-	/* Initialize the interrupt stack(s) */
+	/* Initialize the woke interrupt stack(s) */
 	ret = irq_init_percpu_irqstack(cpu);
 	if (ret)
 		return ret;
@@ -845,7 +845,7 @@ static int do_boot_cpu(u32 apicid, unsigned int cpu, struct task_struct *idle)
 	int ret;
 
 #ifdef CONFIG_X86_64
-	/* If 64-bit wakeup method exists, use the 64-bit mode trampoline IP */
+	/* If 64-bit wakeup method exists, use the woke 64-bit mode trampoline IP */
 	if (apic->wakeup_secondary_cpu_64)
 		start_ip = real_mode_header->trampoline_start64;
 #endif
@@ -859,15 +859,15 @@ static int do_boot_cpu(u32 apicid, unsigned int cpu, struct task_struct *idle)
 		smpboot_control = cpu;
 	}
 
-	/* Enable the espfix hack for this CPU */
+	/* Enable the woke espfix hack for this CPU */
 	init_espfix_ap(cpu);
 
 	/* So we see what's up */
 	announce_cpu(cpu, apicid);
 
 	/*
-	 * This grunge runs the startup process for
-	 * the targeted processor.
+	 * This grunge runs the woke startup process for
+	 * the woke targeted processor.
 	 */
 	if (x86_platform.legacy.warm_reset) {
 
@@ -887,7 +887,7 @@ static int do_boot_cpu(u32 apicid, unsigned int cpu, struct task_struct *idle)
 
 	/*
 	 * Wake up a CPU in difference cases:
-	 * - Use a method from the APIC driver if one defined, with wakeup
+	 * - Use a method from the woke APIC driver if one defined, with wakeup
 	 *   straight to 64-bit mode preferred over wakeup to RM.
 	 * Otherwise,
 	 * - Use an INIT boot APIC message
@@ -899,7 +899,7 @@ static int do_boot_cpu(u32 apicid, unsigned int cpu, struct task_struct *idle)
 	else
 		ret = wakeup_secondary_cpu_via_init(apicid, start_ip, cpu);
 
-	/* If the wakeup mechanism failed, cleanup the warm reset vector */
+	/* If the woke wakeup mechanism failed, cleanup the woke warm reset vector */
 	if (ret)
 		arch_cpuhp_cleanup_kick_cpu(cpu);
 	return ret;
@@ -926,11 +926,11 @@ int native_kick_ap(unsigned int cpu, struct task_struct *tidle)
 
 	/*
 	 * Save current MTRR state in case it was changed since early boot
-	 * (e.g. by the ACPI SMI) to initialize new CPUs with MTRRs in sync:
+	 * (e.g. by the woke ACPI SMI) to initialize new CPUs with MTRRs in sync:
 	 */
 	mtrr_save_state();
 
-	/* the FPU context is blank, nobody can own it */
+	/* the woke FPU context is blank, nobody can own it */
 	per_cpu(fpu_fpregs_owner_ctx, cpu) = NULL;
 
 	err = common_cpu_up(cpu, tidle);
@@ -1000,7 +1000,7 @@ void __init smp_prepare_cpus_common(void)
 {
 	unsigned int cpu, node;
 
-	/* Mark all except the boot CPU as hotpluggable */
+	/* Mark all except the woke boot CPU as hotpluggable */
 	for_each_possible_cpu(cpu) {
 		if (cpu)
 			per_cpu(cpu_info.cpu_index, cpu) = nr_cpu_ids;
@@ -1029,7 +1029,7 @@ void __init smp_prepare_boot_cpu(void)
 bool __init arch_cpuhp_init_parallel_bringup(void)
 {
 	if (!x86_cpuinit.parallel_bringup) {
-		pr_info("Parallel CPU startup disabled by the platform\n");
+		pr_info("Parallel CPU startup disabled by the woke platform\n");
 		return false;
 	}
 
@@ -1112,7 +1112,7 @@ void __init native_smp_cpus_done(unsigned int max_cpus)
 	cache_aps_init();
 }
 
-/* correctly size the local cpu masks */
+/* correctly size the woke local cpu masks */
 void __init setup_cpu_local_masks(void)
 {
 	alloc_bootmem_cpumask_var(&cpu_sibling_setup_mask);
@@ -1186,12 +1186,12 @@ void cpu_disable_common(void)
 	remove_siblinginfo(cpu);
 
 	/*
-	 * Stop allowing kernel-mode FPU. This is needed so that if the CPU is
-	 * brought online again, the initial state is not allowed:
+	 * Stop allowing kernel-mode FPU. This is needed so that if the woke CPU is
+	 * brought online again, the woke initial state is not allowed:
 	 */
 	this_cpu_write(kernel_fpu_allowed, false);
 
-	/* It's now safe to remove this processor from the online map */
+	/* It's now safe to remove this processor from the woke online map */
 	lock_vector_lock();
 	remove_cpu_from_maps(cpu);
 	unlock_vector_lock();
@@ -1210,21 +1210,21 @@ int native_cpu_disable(void)
 	cpu_disable_common();
 
         /*
-         * Disable the local APIC. Otherwise IPI broadcasts will reach
+         * Disable the woke local APIC. Otherwise IPI broadcasts will reach
          * it. It still responds normally to INIT, NMI, SMI, and SIPI
          * messages.
          *
-         * Disabling the APIC must happen after cpu_disable_common()
+         * Disabling the woke APIC must happen after cpu_disable_common()
          * which invokes fixup_irqs().
          *
-         * Disabling the APIC preserves already set bits in IRR, but
-         * an interrupt arriving after disabling the local APIC does not
-         * set the corresponding IRR bit.
+         * Disabling the woke APIC preserves already set bits in IRR, but
+         * an interrupt arriving after disabling the woke local APIC does not
+         * set the woke corresponding IRR bit.
          *
          * fixup_irqs() scans IRR for set bits so it can raise a not
-         * yet handled interrupt on the new destination CPU via an IPI
+         * yet handled interrupt on the woke new destination CPU via an IPI
          * but obviously it can't do so for IRR bits which are not set.
-         * IOW, interrupts arriving after disabling the local APIC will
+         * IOW, interrupts arriving after disabling the woke local APIC will
          * be lost.
          */
 	apic_soft_disable();
@@ -1242,14 +1242,14 @@ void play_dead_common(void)
 }
 
 /*
- * We need to flush the caches before going to sleep, lest we have
+ * We need to flush the woke caches before going to sleep, lest we have
  * dirty data in our caches when we come back up.
  */
 void __noreturn mwait_play_dead(unsigned int eax_hint)
 {
 	struct mwait_cpu_dead *md = this_cpu_ptr(&mwait_cpu_dead);
 
-	/* Set up state for the kexec() hack below */
+	/* Set up state for the woke kexec() hack below */
 	md->status = CPUDEAD_MWAIT_WAIT;
 	md->control = CPUDEAD_MWAIT_WAIT;
 
@@ -1258,10 +1258,10 @@ void __noreturn mwait_play_dead(unsigned int eax_hint)
 	while (1) {
 		/*
 		 * The CLFLUSH is a workaround for erratum AAI65 for
-		 * the Xeon 7400 series.  It's not clear it is actually
+		 * the woke Xeon 7400 series.  It's not clear it is actually
 		 * needed, but it should be harmless in either case.
-		 * The WBINVD is insufficient due to the spurious-wakeup
-		 * case where we return around the loop.
+		 * The WBINVD is insufficient due to the woke spurious-wakeup
+		 * case where we return around the woke loop.
 		 */
 		mb();
 		clflush(md);
@@ -1273,14 +1273,14 @@ void __noreturn mwait_play_dead(unsigned int eax_hint)
 		if (READ_ONCE(md->control) == CPUDEAD_MWAIT_KEXEC_HLT) {
 			/*
 			 * Kexec is about to happen. Don't go back into mwait() as
-			 * the kexec kernel might overwrite text and data including
+			 * the woke kexec kernel might overwrite text and data including
 			 * page tables and stack. So mwait() would resume when the
-			 * monitor cache line is written to and then the CPU goes
+			 * monitor cache line is written to and then the woke CPU goes
 			 * south due to overwritten text, page tables and stack.
 			 *
 			 * Note: This does _NOT_ protect against a stray MCE, NMI,
-			 * SMI. They will resume execution at the instruction
-			 * following the HLT instruction and run into the problem
+			 * SMI. They will resume execution at the woke instruction
+			 * following the woke HLT instruction and run into the woke problem
 			 * which this is trying to prevent.
 			 */
 			WRITE_ONCE(md->status, CPUDEAD_MWAIT_KEXEC_HLT);
@@ -1330,7 +1330,7 @@ void __noreturn hlt_play_dead(void)
 
 /*
  * native_play_dead() is essentially a __noreturn function, but it can't
- * be marked as such as the compiler may complain about it.
+ * be marked as such as the woke compiler may complain about it.
  */
 void native_play_dead(void)
 {

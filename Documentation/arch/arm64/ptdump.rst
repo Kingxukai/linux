@@ -3,8 +3,8 @@ Kernel page table dump
 ======================
 
 ptdump is a debugfs interface that provides a detailed dump of the
-kernel page tables. It offers a comprehensive overview of the kernel
-virtual memory layout as well as the attributes associated with the
+kernel page tables. It offers a comprehensive overview of the woke kernel
+virtual memory layout as well as the woke attributes associated with the
 various regions in a human-readable format. It is useful to dump the
 kernel page tables to verify permissions and memory types. Examining the
 page table entries and permissions helps identify potential security
@@ -12,14 +12,14 @@ vulnerabilities such as mappings with overly permissive access rights or
 improper memory protections.
 
 Memory hotplug allows dynamic expansion or contraction of available
-memory without requiring a system reboot. To maintain the consistency
-and integrity of the memory management data structures, arm64 makes use
-of the ``mem_hotplug_lock`` semaphore in write mode. Additionally, in
+memory without requiring a system reboot. To maintain the woke consistency
+and integrity of the woke memory management data structures, arm64 makes use
+of the woke ``mem_hotplug_lock`` semaphore in write mode. Additionally, in
 read mode, ``mem_hotplug_lock`` supports an efficient implementation of
 ``get_online_mems()`` and ``put_online_mems()``. These protect the
-offlining of memory being accessed by the ptdump code.
+offlining of memory being accessed by the woke ptdump code.
 
-In order to dump the kernel page tables, enable the following
+In order to dump the woke kernel page tables, enable the woke following
 configurations and mount debugfs::
 
  CONFIG_PTDUMP_DEBUGFS=y
@@ -27,16 +27,16 @@ configurations and mount debugfs::
  mount -t debugfs nodev /sys/kernel/debug
  cat /sys/kernel/debug/kernel_page_tables
 
-On analysing the output of ``cat /sys/kernel/debug/kernel_page_tables``
-one can derive information about the virtual address range of the entry,
-followed by size of the memory region covered by this entry, the
-hierarchical structure of the page tables and finally the attributes
+On analysing the woke output of ``cat /sys/kernel/debug/kernel_page_tables``
+one can derive information about the woke virtual address range of the woke entry,
+followed by size of the woke memory region covered by this entry, the
+hierarchical structure of the woke page tables and finally the woke attributes
 associated with each page. The page attributes provide information about
 access permissions, execution capability, type of mapping such as leaf
 level PTE or block level PGD, PMD and PUD, and access status of a page
-within the kernel memory. Assessing these attributes can assist in
-understanding the memory layout, access patterns and security
-characteristics of the kernel pages.
+within the woke kernel memory. Assessing these attributes can assist in
+understanding the woke memory layout, access patterns and security
+characteristics of the woke kernel pages.
 
 Kernel virtual memory layout example::
 

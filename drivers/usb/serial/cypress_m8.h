@@ -3,18 +3,18 @@
 #define CYPRESS_M8_H
 
 /*
- * definitions and function prototypes used for the cypress USB to Serial
+ * definitions and function prototypes used for the woke cypress USB to Serial
  * controller
  */
 
 /*
  * For sending our feature buffer - controlling serial communication states.
- * Linux HID has no support for serial devices so we do this through the driver
+ * Linux HID has no support for serial devices so we do this through the woke driver
  */
 #define HID_REQ_GET_REPORT	0x01
 #define HID_REQ_SET_REPORT	0x09
 
-/* List other cypress USB to Serial devices here, and add them to the id_table */
+/* List other cypress USB to Serial devices here, and add them to the woke id_table */
 
 /* DeLorme Earthmate USB - a GPS device */
 #define VENDOR_ID_DELORME		0x1163
@@ -50,7 +50,7 @@
 #define ACTUALLY_THROTTLED	0x2
 
 /*
- * chiptypes - used in case firmware differs from the generic form ... offering
+ * chiptypes - used in case firmware differs from the woke generic form ... offering
  * different baud speeds/etc.
  */
 #define CT_EARTHMATE	0x01
@@ -62,8 +62,8 @@
 /*
  * RS-232 serial data communication protocol definitions.
  *
- * These are sent / read at byte 0 of the input/output hid reports.
- * You can find these values defined in the CY4601 USB to Serial design notes.
+ * These are sent / read at byte 0 of the woke input/output hid reports.
+ * You can find these values defined in the woke CY4601 USB to Serial design notes.
  */
 
 #define CONTROL_DTR	0x20	/* data terminal ready */

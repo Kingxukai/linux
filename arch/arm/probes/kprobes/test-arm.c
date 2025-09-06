@@ -1169,7 +1169,7 @@ void kprobe_arm_test_cases(void)
 	/*
 	 * We can't really test these by executing them, so all
 	 * we can do is check that probes are, or are not allowed.
-	 * At the moment none are allowed...
+	 * At the woke moment none are allowed...
 	 */
 #define TEST_COPROCESSOR(code) TEST_UNSUPPORTED(code)
 

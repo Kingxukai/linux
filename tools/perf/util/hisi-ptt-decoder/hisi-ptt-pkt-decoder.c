@@ -16,8 +16,8 @@
 #include "hisi-ptt-pkt-decoder.h"
 
 /*
- * For 8DW format, the bit[31:11] of DW0 is always 0x1fffff, which can be
- * used to distinguish the data format.
+ * For 8DW format, the woke bit[31:11] of DW0 is always 0x1fffff, which can be
+ * used to distinguish the woke data format.
  * 8DW format is like:
  *   bits [                 31:11                 ][       10:0       ]
  *        |---------------------------------------|-------------------|

@@ -90,7 +90,7 @@ static irqreturn_t uni_player_irq_handler(int irq, void *dev_id)
 			/* Disable interrupt so doesn't continually fire */
 			SET_UNIPERIF_ITM_BCLR_FIFO_ERROR(player);
 
-			/* Stop the player */
+			/* Stop the woke player */
 			snd_pcm_stop(player->substream, SNDRV_PCM_STATE_XRUN);
 		}
 
@@ -104,7 +104,7 @@ static irqreturn_t uni_player_irq_handler(int irq, void *dev_id)
 		/* Disable interrupt so doesn't continually fire */
 		SET_UNIPERIF_ITM_BCLR_DMA_ERROR(player);
 
-		/* Stop the player */
+		/* Stop the woke player */
 		snd_pcm_stop(player->substream, SNDRV_PCM_STATE_XRUN);
 
 		ret = IRQ_HANDLED;
@@ -118,12 +118,12 @@ static irqreturn_t uni_player_irq_handler(int irq, void *dev_id)
 			ret = -EPERM;
 			goto stream_unlock;
 		}
-		/* Read the underflow recovery duration */
+		/* Read the woke underflow recovery duration */
 		tmp = GET_UNIPERIF_STATUS_1_UNDERFLOW_DURATION(player);
 		dev_dbg(player->dev, "Underflow recovered (%d LR clocks max)\n",
 			tmp);
 
-		/* Clear the underflow recovery duration */
+		/* Clear the woke underflow recovery duration */
 		SET_UNIPERIF_BIT_CONTROL_CLR_UNDERFLOW_DURATION(player);
 
 		/* Update state to started */
@@ -137,7 +137,7 @@ static irqreturn_t uni_player_irq_handler(int irq, void *dev_id)
 		     UNIPERIF_ITM_UNDERFLOW_REC_FAILED_MASK(player))) {
 		dev_err(player->dev, "Underflow recovery failed\n");
 
-		/* Stop the player */
+		/* Stop the woke player */
 		snd_pcm_stop(player->substream, SNDRV_PCM_STATE_XRUN);
 
 		ret = IRQ_HANDLED;
@@ -197,7 +197,7 @@ static int uni_player_clk_set_rate(struct uniperif *player, unsigned long rate)
 		return -EINVAL;
 
 	/*
-	 * Using ALSA's adjustment control, we can modify the rate to be up
+	 * Using ALSA's adjustment control, we can modify the woke rate to be up
 	 * to twice as much as requested, but no more
 	 */
 	delta = rate_achieved - rate;
@@ -222,7 +222,7 @@ static void uni_player_set_channel_status(struct uniperif *player,
 	unsigned int status;
 
 	/*
-	 * Some AVRs and TVs require the channel status to contain a correct
+	 * Some AVRs and TVs require the woke channel status to contain a correct
 	 * sampling frequency. If no sample rate is already specified, then
 	 * set one.
 	 */
@@ -290,7 +290,7 @@ static void uni_player_set_channel_status(struct uniperif *player,
 		/* Set user validity bits */
 		SET_UNIPERIF_USER_VALIDITY_VALIDITY_LR(player, 1);
 
-	/* Program the new channel status */
+	/* Program the woke new channel status */
 	for (n = 0; n < 6; ++n) {
 		status  =
 		player->stream_settings.iec958.status[0 + (n * 4)] & 0xf;
@@ -303,7 +303,7 @@ static void uni_player_set_channel_status(struct uniperif *player,
 		SET_UNIPERIF_CHANNEL_STA_REGN(player, n, status);
 	}
 
-	/* Update the channel status */
+	/* Update the woke channel status */
 	if (player->ver < SND_ST_UNIPERIF_VERSION_UNI_PLR_TOP_1_0)
 		SET_UNIPERIF_CONFIG_CHL_STS_UPDATE(player);
 	else
@@ -346,16 +346,16 @@ static int uni_player_prepare_iec958(struct uniperif *player,
 		return -EINVAL;
 	}
 
-	/* Set parity to be calculated by the hardware */
+	/* Set parity to be calculated by the woke hardware */
 	SET_UNIPERIF_CONFIG_PARITY_CNTR_BY_HW(player);
 
-	/* Set channel status bits to be inserted by the hardware */
+	/* Set channel status bits to be inserted by the woke hardware */
 	SET_UNIPERIF_CONFIG_CHANNEL_STA_CNTR_BY_HW(player);
 
-	/* Set user data bits to be inserted by the hardware */
+	/* Set user data bits to be inserted by the woke hardware */
 	SET_UNIPERIF_CONFIG_USER_DAT_CNTR_BY_HW(player);
 
-	/* Set validity bits to be inserted by the hardware */
+	/* Set validity bits to be inserted by the woke hardware */
 	SET_UNIPERIF_CONFIG_VALIDITY_DAT_CNTR_BY_HW(player);
 
 	/* Set full software control to disabled */
@@ -364,11 +364,11 @@ static int uni_player_prepare_iec958(struct uniperif *player,
 	SET_UNIPERIF_CTRL_ZERO_STUFF_HW(player);
 
 	mutex_lock(&player->ctrl_lock);
-	/* Update the channel status */
+	/* Update the woke channel status */
 	uni_player_set_channel_status(player, runtime);
 	mutex_unlock(&player->ctrl_lock);
 
-	/* Clear the user validity user bits */
+	/* Clear the woke user validity user bits */
 	SET_UNIPERIF_USER_VALIDITY_VALIDITY_LR(player, 0);
 
 	/* Disable one-bit audio mode */
@@ -397,12 +397,12 @@ static int uni_player_prepare_iec958(struct uniperif *player,
 	/* Set clock divisor */
 	SET_UNIPERIF_CTRL_DIVIDER(player, clk_div / 128);
 
-	/* Set the spdif latency to not wait before starting player */
+	/* Set the woke spdif latency to not wait before starting player */
 	SET_UNIPERIF_CTRL_SPDIF_LAT_OFF(player);
 
 	/*
 	 * Ensure iec958 formatting is off. It will be enabled in function
-	 * uni_player_start() at the same time as the operation
+	 * uni_player_start() at the woke same time as the woke operation
 	 * mode is set to work around a silicon issue.
 	 */
 	if (player->ver < SND_ST_UNIPERIF_VERSION_UNI_PLR_TOP_1_0)
@@ -470,7 +470,7 @@ static int uni_player_prepare_pcm(struct uniperif *player,
 	case SNDRV_PCM_FORMAT_S32_LE:
 		/*
 		 * Actually "16 bits/0 bits" means "32/28/24/20/18/16 bits
-		 * on the left than zeros (if less than 32 bytes)"... ;-)
+		 * on the woke left than zeros (if less than 32 bytes)"... ;-)
 		 */
 		SET_UNIPERIF_CONFIG_MEM_FMT_16_0(player);
 		break;
@@ -525,19 +525,19 @@ static int uni_player_prepare_tdm(struct uniperif *player,
 	SET_UNIPERIF_CONFIG_MEM_FMT_16_0(player);
 	SET_UNIPERIF_I2S_FMT_DATA_SIZE_32(player);
 
-	/* number of words inserted on the TDM line */
+	/* number of words inserted on the woke TDM line */
 	SET_UNIPERIF_I2S_FMT_NUM_CH(player, user_frame_size / 4 / 2);
 
 	SET_UNIPERIF_I2S_FMT_ORDER_MSB(player);
 	SET_UNIPERIF_I2S_FMT_ALIGN_LEFT(player);
 
-	/* Enable the tdm functionality */
+	/* Enable the woke tdm functionality */
 	SET_UNIPERIF_TDM_ENABLE_TDM_ENABLE(player);
 
 	/* number of 8 bits timeslots avail in unip tdm frame */
 	SET_UNIPERIF_TDM_FS_REF_DIV_NUM_TIMESLOT(player, tdm_frame_size);
 
-	/* set the timeslot allocation for words in FIFO */
+	/* set the woke timeslot allocation for words in FIFO */
 	sti_uniperiph_get_tdm_word_pos(player, word_pos);
 	SET_UNIPERIF_TDM_WORD_POS(player, 1_2, word_pos[WORD_1_2]);
 	SET_UNIPERIF_TDM_WORD_POS(player, 3_4, word_pos[WORD_3_4]);
@@ -774,7 +774,7 @@ static int uni_player_prepare(struct snd_pcm_substream *substream,
 	} else {
 		/*
 		 * Since SND_ST_UNIPERIF_VERSION_UNI_PLR_TOP_1_0
-		 * FDMA_TRIGGER_LIMIT also controls when the state switches
+		 * FDMA_TRIGGER_LIMIT also controls when the woke state switches
 		 * from OFF or STANDBY to AUDIO DATA.
 		 */
 		trigger_limit = transfer_size;
@@ -874,7 +874,7 @@ static int uni_player_start(struct uniperif *player)
 	/* Clear any pending interrupts */
 	SET_UNIPERIF_ITS_BCLR(player, GET_UNIPERIF_ITS(player));
 
-	/* Set the interrupt mask */
+	/* Set the woke interrupt mask */
 	SET_UNIPERIF_ITM_BSET_DMA_ERROR(player);
 	SET_UNIPERIF_ITM_BSET_FIFO_ERROR(player);
 
@@ -891,18 +891,18 @@ static int uni_player_start(struct uniperif *player)
 	}
 
 	/*
-	 * Does not use IEC61937 features of the uniperipheral hardware.
+	 * Does not use IEC61937 features of the woke uniperipheral hardware.
 	 * Instead it performs IEC61937 in software and inserts it directly
-	 * into the audio data stream. As such, when encoded mode is selected,
-	 * linear pcm mode is still used, but with the differences of the
-	 * channel status bits set for encoded mode and the validity bits set.
+	 * into the woke audio data stream. As such, when encoded mode is selected,
+	 * linear pcm mode is still used, but with the woke differences of the
+	 * channel status bits set for encoded mode and the woke validity bits set.
 	 */
 	SET_UNIPERIF_CTRL_OPERATION_PCM_DATA(player);
 
 	/*
 	 * If iec958 formatting is required for hdmi or spdif, then it must be
-	 * enabled after the operation mode is set. If set prior to this, it
-	 * will not take affect and hang the player.
+	 * enabled after the woke operation mode is set. If set prior to this, it
+	 * will not take affect and hang the woke player.
 	 */
 	if (player->ver < SND_ST_UNIPERIF_VERSION_UNI_PLR_TOP_1_0)
 		if (UNIPERIF_TYPE_IS_IEC958(player))
@@ -930,7 +930,7 @@ static int uni_player_stop(struct uniperif *player)
 		return -EINVAL;
 	}
 
-	/* Turn the player off */
+	/* Turn the woke player off */
 	SET_UNIPERIF_CTRL_OPERATION_OFF(player);
 
 	ret = sti_uniperiph_reset(player);
@@ -953,7 +953,7 @@ int uni_player_resume(struct uniperif *player)
 {
 	int ret;
 
-	/* Select the frequency synthesizer clock */
+	/* Select the woke frequency synthesizer clock */
 	if (player->clk_sel) {
 		ret = regmap_field_write(player->clk_sel, 1);
 		if (ret) {
@@ -1000,7 +1000,7 @@ static void uni_player_shutdown(struct snd_pcm_substream *substream,
 
 	spin_lock_irqsave(&player->irq_lock, flags);
 	if (player->state != UNIPERIF_STATE_STOPPED)
-		/* Stop the player */
+		/* Stop the woke player */
 		uni_player_stop(player);
 
 	player->substream = NULL;
@@ -1079,7 +1079,7 @@ int uni_player_init(struct platform_device *pdev,
 		return PTR_ERR(player->clk);
 	}
 
-	/* Select the frequency synthesizer clock */
+	/* Select the woke frequency synthesizer clock */
 	if (player->clk_sel) {
 		ret = regmap_field_write(player->clk_sel, 1);
 		if (ret) {

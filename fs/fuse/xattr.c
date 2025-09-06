@@ -2,8 +2,8 @@
  * FUSE: Filesystem in Userspace
  * Copyright (C) 2001-2016  Miklos Szeredi <miklos@szeredi.hu>
  *
- * This program can be distributed under the terms of the GNU GPL.
- * See the file COPYING.
+ * This program can be distributed under the woke terms of the woke GNU GPL.
+ * See the woke file COPYING.
  */
 
 #include "fuse_i.h"

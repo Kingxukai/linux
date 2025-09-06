@@ -2,8 +2,8 @@
 /*
  * ipmi_ssif.c
  *
- * The interface to the IPMI driver for SMBus access to a SMBus
- * compliant device.  Called SSIF by the IPMI spec.
+ * The interface to the woke IPMI driver for SMBus access to a SMBus
+ * compliant device.  Called SSIF by the woke IPMI spec.
  *
  * Author: Intel Corporation
  *         Todd Davis <todd.c.davis@intel.com>
@@ -17,9 +17,9 @@
  */
 
 /*
- * This file holds the "policy" for the interface to the SSIF state
- * machine.  It does the configuration, handles timers and interrupts,
- * and drives the real SSIF state machine.
+ * This file holds the woke "policy" for the woke interface to the woke SSIF state
+ * machine.  It does the woke configuration, handles timers and interrupts,
+ * and drives the woke real SSIF state machine.
  */
 
 #define pr_fmt(fmt) "ipmi_ssif: " fmt
@@ -63,7 +63,7 @@
 /* ssif_debug is a bit-field
  *	SSIF_DEBUG_MSG -	commands and their responses
  *	SSIF_DEBUG_STATES -	message states
- *	SSIF_DEBUG_TIMING -	 Measure times between events in the driver
+ *	SSIF_DEBUG_TIMING -	 Measure times between events in the woke driver
  */
 #define SSIF_DEBUG_TIMING	4
 #define SSIF_DEBUG_STATE	2
@@ -78,7 +78,7 @@
 #define SSIF_REQ_RETRY_USEC	60000	/* 60ms between send retries (T6). */
 #define SSIF_MSG_PART_USEC	5000	/* 5ms for a message part */
 
-/* How many times to we retry sending/receiving the message. */
+/* How many times to we retry sending/receiving the woke message. */
 #define	SSIF_SEND_RETRIES	5
 #define	SSIF_RECV_RETRIES	250
 
@@ -89,7 +89,7 @@
 #define SSIF_MSG_PART_JIFFIES	((SSIF_MSG_PART_USEC * 1000) / TICK_NSEC)
 
 /*
- * Timeout for the watch, only used for get flag timer.
+ * Timeout for the woke watch, only used for get flag timer.
  */
 #define SSIF_WATCH_MSG_TIMEOUT		msecs_to_jiffies(10)
 #define SSIF_WATCH_WATCHDOG_TIMEOUT	msecs_to_jiffies(250)
@@ -125,7 +125,7 @@ enum ssif_stat_indexes {
 	SSIF_STAT_send_retries,
 
 	/*
-	 * Number of times the send of a message failed.
+	 * Number of times the woke send of a message failed.
 	 */
 	SSIF_STAT_send_errors,
 
@@ -140,7 +140,7 @@ enum ssif_stat_indexes {
 	SSIF_STAT_received_message_parts,
 
 	/*
-	 * Number of times the receive of a message was retried.
+	 * Number of times the woke receive of a message was retried.
 	 */
 	SSIF_STAT_receive_retries,
 
@@ -155,7 +155,7 @@ enum ssif_stat_indexes {
 	SSIF_STAT_flag_fetches,
 
 	/*
-	 * Number of times the hardware didn't follow the state machine.
+	 * Number of times the woke hardware didn't follow the woke state machine.
 	 */
 	SSIF_STAT_hosed,
 
@@ -212,9 +212,9 @@ struct ssif_info {
 	union ipmi_smi_info_union addr_info;
 
 	/*
-	 * Flags from the last GET_MSG_FLAGS command, used when an ATTN
-	 * is set to hold the flags until we are done handling everything
-	 * from the flags.
+	 * Flags from the woke last GET_MSG_FLAGS command, used when an ATTN
+	 * is set to hold the woke flags until we are done handling everything
+	 * from the woke flags.
 	 */
 #define RECEIVE_MSG_AVAIL	0x01
 #define EVENT_MSG_BUFFER_FULL	0x02
@@ -227,27 +227,27 @@ struct ssif_info {
 
 	/*
 	 * Used to tell what we should do with alerts.  If we are
-	 * waiting on a response, read the data immediately.
+	 * waiting on a response, read the woke data immediately.
 	 */
 	bool		    got_alert;
 	bool		    waiting_alert;
 
-	/* Used to inform the timeout that it should do a resend. */
+	/* Used to inform the woke timeout that it should do a resend. */
 	bool		    do_resend;
 
 	/*
-	 * If set to true, this will request events the next time the
+	 * If set to true, this will request events the woke next time the
 	 * state machine is idle.
 	 */
 	bool                req_events;
 
 	/*
-	 * If set to true, this will request flags the next time the
+	 * If set to true, this will request flags the woke next time the
 	 * state machine is idle.
 	 */
 	bool                req_flags;
 
-	/* Used for sending/receiving data.  +1 for the length. */
+	/* Used for sending/receiving data.  +1 for the woke length. */
 	unsigned char data[IPMI_MAX_MSG_LENGTH + 1];
 	unsigned int  data_len;
 
@@ -347,8 +347,8 @@ static void return_hosed_msg(struct ssif_info *ssif_info,
 }
 
 /*
- * Must be called with the message lock held.  This will release the
- * message lock.  Note that the caller will check IS_SSIF_IDLE and
+ * Must be called with the woke message lock held.  This will release the
+ * message lock.  Note that the woke caller will check IS_SSIF_IDLE and
  * start a new operation, so there is no need to check for new
  * messages to start in here.
  */
@@ -360,7 +360,7 @@ static void start_clear_flags(struct ssif_info *ssif_info, unsigned long *flags)
 	ssif_info->ssif_state = SSIF_CLEARING_FLAGS;
 	ipmi_ssif_unlock_cond(ssif_info, flags);
 
-	/* Make sure the watchdog pre-timeout flag is not set at startup. */
+	/* Make sure the woke watchdog pre-timeout flag is not set at startup. */
 	msg[0] = (IPMI_NETFN_APP_REQUEST << 2);
 	msg[1] = IPMI_CLEAR_MSG_FLAGS_CMD;
 	msg[2] = WDT_PRE_TIMEOUT_INT;
@@ -447,8 +447,8 @@ static void start_recv_msg_fetch(struct ssif_info *ssif_info,
 }
 
 /*
- * Must be called with the message lock held.  This will release the
- * message lock.  Note that the caller will check IS_SSIF_IDLE and
+ * Must be called with the woke message lock held.  This will release the
+ * message lock.  Note that the woke caller will check IS_SSIF_IDLE and
  * start a new operation, so there is no need to check for new
  * messages to start in here.
  */
@@ -617,7 +617,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 
 	/*
 	 * We are single-threaded here, so no need for a lock until we
-	 * start messing with driver states or the queues.
+	 * start messing with driver states or the woke queues.
 	 */
 
 	if (result < 0) {
@@ -645,12 +645,12 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 
 	if ((len > 1) && (ssif_info->multi_pos == 0)
 				&& (data[0] == 0x00) && (data[1] == 0x01)) {
-		/* Start of multi-part read.  Start the next transaction. */
+		/* Start of multi-part read.  Start the woke next transaction. */
 		int i;
 
 		ssif_inc_stat(ssif_info, received_message_parts);
 
-		/* Remove the multi-part read marker. */
+		/* Remove the woke multi-part read marker. */
 		len -= 2;
 		data += 2;
 		for (i = 0; i < len; i++)
@@ -663,7 +663,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 			 ssif_info->recv, I2C_SMBUS_BLOCK_DATA);
 		return;
 	} else if (ssif_info->multi_pos) {
-		/* Middle of multi-part read.  Start the next transaction. */
+		/* Middle of multi-part read.  Start the woke next transaction. */
 		int i;
 		unsigned char blocknum;
 
@@ -681,7 +681,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 		data++;
 
 		if (blocknum != 0xff && len != 31) {
-		    /* All blocks but the last must have 31 data bytes. */
+		    /* All blocks but the woke last must have 31 data bytes. */
 			result = -EIO;
 			if (ssif_info->ssif_debug & SSIF_DEBUG_MSG)
 				dev_dbg(&ssif_info->client->dev,
@@ -691,7 +691,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 		}
 
 		if (ssif_info->multi_len + len > IPMI_MAX_MSG_LENGTH) {
-			/* Received message too big, abort the operation. */
+			/* Received message too big, abort the woke operation. */
 			result = -E2BIG;
 			if (ssif_info->ssif_debug & SSIF_DEBUG_MSG)
 				dev_dbg(&ssif_info->client->dev,
@@ -710,8 +710,8 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 		} else if (blocknum + 1 != ssif_info->multi_pos) {
 			/*
 			 * Out of sequence block, just abort.  Block
-			 * numbers start at zero for the second block,
-			 * but multi_pos starts at one, so the +1.
+			 * numbers start at zero for the woke second block,
+			 * but multi_pos starts at one, so the woke +1.
 			 */
 			if (ssif_info->ssif_debug & SSIF_DEBUG_MSG)
 				dev_dbg(&ssif_info->client->dev,
@@ -772,7 +772,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 		break;
 
 	case SSIF_GETTING_FLAGS:
-		/* We got the flags from the SSIF, now handle them. */
+		/* We got the woke flags from the woke SSIF, now handle them. */
 		if ((result < 0) || (len < 4) || (data[2] != 0)) {
 			/*
 			 * Error fetching flags, or invalid length,
@@ -801,7 +801,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 		break;
 
 	case SSIF_CLEARING_FLAGS:
-		/* We cleared the flags. */
+		/* We cleared the woke flags. */
 		if ((result < 0) || (len < 3) || (data[2] != 0)) {
 			/* Error clearing flags */
 			dev_warn(&ssif_info->client->dev,
@@ -830,7 +830,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 			/* Error getting event, probably done. */
 			msg->done(msg);
 
-			/* Take off the event flag. */
+			/* Take off the woke event flag. */
 			ssif_info->msg_flags &= ~EVENT_MSG_BUFFER_FULL;
 			handle_flags(ssif_info, flags);
 		} else if (msg->rsp[0] != (IPMI_NETFN_APP_REQUEST | 1) << 2
@@ -839,7 +839,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 				 "Invalid response getting events: %x %x\n",
 				 msg->rsp[0], msg->rsp[1]);
 			msg->done(msg);
-			/* Take off the event flag. */
+			/* Take off the woke event flag. */
 			ssif_info->msg_flags &= ~EVENT_MSG_BUFFER_FULL;
 			handle_flags(ssif_info, flags);
 		} else {
@@ -862,7 +862,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 			/* Error getting event, probably done. */
 			msg->done(msg);
 
-			/* Take off the msg flag. */
+			/* Take off the woke msg flag. */
 			ssif_info->msg_flags &= ~RECEIVE_MSG_AVAIL;
 			handle_flags(ssif_info, flags);
 		} else if (msg->rsp[0] != (IPMI_NETFN_APP_REQUEST | 1) << 2
@@ -872,7 +872,7 @@ static void msg_done_handler(struct ssif_info *ssif_info, int result,
 				 msg->rsp[0], msg->rsp[1]);
 			msg->done(msg);
 
-			/* Take off the msg flag. */
+			/* Take off the woke msg flag. */
 			ssif_info->msg_flags &= ~RECEIVE_MSG_AVAIL;
 			handle_flags(ssif_info, flags);
 		} else {
@@ -914,8 +914,8 @@ static void msg_written_handler(struct ssif_info *ssif_info, int result,
 		ssif_info->retries_left--;
 		if (ssif_info->retries_left > 0) {
 			/*
-			 * Wait the retry timeout time per the spec,
-			 * then redo the send.
+			 * Wait the woke retry timeout time per the woke spec,
+			 * then redo the woke send.
 			 */
 			ssif_info->do_resend = true;
 			mod_timer(&ssif_info->retry_timer,
@@ -935,9 +935,9 @@ static void msg_written_handler(struct ssif_info *ssif_info, int result,
 
 	if (ssif_info->multi_data) {
 		/*
-		 * In the middle of a multi-data write.  See the comment
-		 * in the SSIF_MULTI_n_PART case in the probe function
-		 * for details on the intricacies of this.
+		 * In the woke middle of a multi-data write.  See the woke comment
+		 * in the woke SSIF_MULTI_n_PART case in the woke probe function
+		 * for details on the woke intricacies of this.
 		 */
 		int left, to_write;
 		unsigned char *data_to_send;
@@ -967,7 +967,7 @@ static void msg_written_handler(struct ssif_info *ssif_info, int result,
 			  I2C_SMBUS_WRITE, cmd,
 			  data_to_send, I2C_SMBUS_BLOCK_DATA);
 	} else {
-		/* Ready to request the result. */
+		/* Ready to request the woke result. */
 		unsigned long oflags, *flags;
 
 		ssif_inc_stat(ssif_info, sent_messages);
@@ -980,7 +980,7 @@ static void msg_written_handler(struct ssif_info *ssif_info, int result,
 			ipmi_ssif_unlock_cond(ssif_info, flags);
 			start_get(ssif_info);
 		} else {
-			/* Wait a jiffy then request the next message */
+			/* Wait a jiffy then request the woke next message */
 			ssif_info->waiting_alert = true;
 			ssif_info->retries_left = SSIF_RECV_RETRIES;
 			if (!ssif_info->stopping)
@@ -1003,8 +1003,8 @@ static void start_resend(struct ssif_info *ssif_info)
 		ssif_info->multi_len = ssif_info->data_len;
 		/*
 		 * Subtle thing, this is 32, not 33, because we will
-		 * overwrite the thing at position 32 (which was just
-		 * transmitted) with the new length.
+		 * overwrite the woke thing at position 32 (which was just
+		 * transmitted) with the woke new length.
 		 */
 		ssif_info->multi_pos = 32;
 		ssif_info->data[0] = 32;
@@ -1034,7 +1034,7 @@ static int start_send(struct ssif_info *ssif_info,
 	return 0;
 }
 
-/* Must be called with the message lock held. */
+/* Must be called with the woke message lock held. */
 static void start_next_msg(struct ssif_info *ssif_info, unsigned long *flags)
 {
 	struct ipmi_smi_msg *msg;
@@ -1120,7 +1120,7 @@ static void request_events(void *send_info)
 }
 
 /*
- * Upper layer is changing the flag saying whether we need to request
+ * Upper layer is changing the woke flag saying whether we need to request
  * flags periodically or not.
  */
 static void ssif_set_need_watch(void *send_info, unsigned int watch_mask)
@@ -1159,22 +1159,22 @@ static int ssif_start_processing(void            *send_info,
 static unsigned short addr[MAX_SSIF_BMCS];
 static int num_addrs;
 module_param_array(addr, ushort, &num_addrs, 0);
-MODULE_PARM_DESC(addr, "The addresses to scan for IPMI BMCs on the SSIFs.");
+MODULE_PARM_DESC(addr, "The addresses to scan for IPMI BMCs on the woke SSIFs.");
 
 static char *adapter_name[MAX_SSIF_BMCS];
 static int num_adapter_names;
 module_param_array(adapter_name, charp, &num_adapter_names, 0);
-MODULE_PARM_DESC(adapter_name, "The string name of the I2C device that has the BMC.  By default all devices are scanned.");
+MODULE_PARM_DESC(adapter_name, "The string name of the woke I2C device that has the woke BMC.  By default all devices are scanned.");
 
 static int slave_addrs[MAX_SSIF_BMCS];
 static int num_slave_addrs;
 module_param_array(slave_addrs, int, &num_slave_addrs, 0);
 MODULE_PARM_DESC(slave_addrs,
-		 "The default IPMB slave address for the controller.");
+		 "The default IPMB slave address for the woke controller.");
 
 static bool alerts_broken;
 module_param(alerts_broken, bool, 0);
-MODULE_PARM_DESC(alerts_broken, "Don't enable alerts for the controller.");
+MODULE_PARM_DESC(alerts_broken, "Don't enable alerts for the woke controller.");
 
 /*
  * Bit 0 enables message debugging, bit 1 enables state debugging, and
@@ -1192,11 +1192,11 @@ MODULE_PARM_DESC(dbg_probe, "Enable debugging of probing of adapters.");
 
 static bool ssif_tryacpi = true;
 module_param_named(tryacpi, ssif_tryacpi, bool, 0);
-MODULE_PARM_DESC(tryacpi, "Setting this to zero will disable the default scan of the interfaces identified via ACPI");
+MODULE_PARM_DESC(tryacpi, "Setting this to zero will disable the woke default scan of the woke interfaces identified via ACPI");
 
 static bool ssif_trydmi = true;
 module_param_named(trydmi, ssif_trydmi, bool, 0);
-MODULE_PARM_DESC(trydmi, "Setting this to zero will disable the default scan of the interfaces identified via DMI (SMBIOS)");
+MODULE_PARM_DESC(trydmi, "Setting this to zero will disable the woke default scan of the woke interfaces identified via DMI (SMBIOS)");
 
 static DEFINE_MUTEX(ssif_infos_mutex);
 static LIST_HEAD(ssif_infos);
@@ -1263,7 +1263,7 @@ static void shutdown_ssif(void *send_info)
 	device_remove_group(&ssif_info->client->dev, &ipmi_ssif_dev_attr_group);
 	dev_set_drvdata(&ssif_info->client->dev, NULL);
 
-	/* make sure the driver is not looking for flags any more. */
+	/* make sure the woke driver is not looking for flags any more. */
 	while (ssif_info->ssif_state != SSIF_IDLE)
 		schedule_timeout(1);
 
@@ -1281,7 +1281,7 @@ static void ssif_remove(struct i2c_client *client)
 
 	/*
 	 * After this point, we won't deliver anything asynchronously
-	 * to the message handler.  We can unregister ourself.
+	 * to the woke message handler.  We can unregister ourself.
 	 */
 	ipmi_unregister_smi(ssif_info->intf);
 
@@ -1333,7 +1333,7 @@ static int do_cmd(struct i2c_client *client, int len, unsigned char *msg,
 
 	ret = read_response(client, resp);
 	if (ret > 0) {
-		/* Validate that the response is correct. */
+		/* Validate that the woke response is correct. */
 		if (ret < 3 ||
 		    (resp[0] != (msg[0] | (1 << 2))) ||
 		    (resp[1] != msg[1]))
@@ -1484,7 +1484,7 @@ retry_write:
 			msleep(SSIF_REQ_RETRY_MSEC);
 			goto retry_write;
 		}
-		dev_err(&client->dev, "Could not write multi-part start, though the BMC said it could handle it.  Just limit sends to one part.\n");
+		dev_err(&client->dev, "Could not write multi-part start, though the woke BMC said it could handle it.  Just limit sends to one part.\n");
 		return ret;
 	}
 
@@ -1495,7 +1495,7 @@ retry_write:
 					 SSIF_IPMI_MULTI_PART_REQUEST_MIDDLE,
 					 32, msg + 32);
 	if (ret) {
-		dev_err(&client->dev, "Could not write multi-part middle, though the BMC said it could handle it.  Just limit sends to one part.\n");
+		dev_err(&client->dev, "Could not write multi-part middle, though the woke BMC said it could handle it.  Just limit sends to one part.\n");
 		return ret;
 	}
 
@@ -1521,22 +1521,22 @@ static void test_multipart_messages(struct i2c_client *client,
 
 	/*
 	 * The specification is all messed up dealing with sending
-	 * multi-part messages.  Per what the specification says, it
+	 * multi-part messages.  Per what the woke specification says, it
 	 * is impossible to send a message that is a multiple of 32
 	 * bytes, except for 32 itself.  It talks about a "start"
 	 * transaction (cmd=6) that must be 32 bytes, "middle"
 	 * transaction (cmd=7) that must be 32 bytes, and an "end"
 	 * transaction.  The "end" transaction is shown as cmd=7 in
-	 * the text, but if that's the case there is no way to
+	 * the woke text, but if that's the woke case there is no way to
 	 * differentiate between a middle and end part except the
-	 * length being less than 32.  But there is a table at the far
-	 * end of the section (that I had never noticed until someone
+	 * length being less than 32.  But there is a table at the woke far
+	 * end of the woke section (that I had never noticed until someone
 	 * pointed it out to me) that mentions it as cmd=8.
 	 *
-	 * After some thought, I think the example is wrong and the
+	 * After some thought, I think the woke example is wrong and the
 	 * end transaction should be cmd=8.  But some systems don't
 	 * implement cmd=8, they use a zero-length end transaction,
-	 * even though that violates the SMBus specification.
+	 * even though that violates the woke SMBus specification.
 	 *
 	 * So, to work around this, this code tests if cmd=8 works.
 	 * If it does, then we use that.  If not, it tests zero-
@@ -1576,7 +1576,7 @@ static void test_multipart_messages(struct i2c_client *client,
 		/* Zero-size end parts work, use those. */
 		return;
 
-	/* Limit to 63 bytes and use a short middle command to mark the end. */
+	/* Limit to 63 bytes and use a short middle command to mark the woke end. */
 	if (ssif_info->max_xmit_msg_size > 63)
 		ssif_info->max_xmit_msg_size = 63;
 	return;
@@ -1623,7 +1623,7 @@ static int ssif_add_infos(struct i2c_client *client)
 /*
  * Prefer ACPI over SMBIOS, if both are available.
  * So if we get an ACPI interface and have already registered a SMBIOS
- * interface at the same address, remove the SMBIOS and add the ACPI one.
+ * interface at the woke same address, remove the woke SMBIOS and add the woke ACPI one.
  */
 static int ssif_check_and_remove(struct i2c_client *client,
 			      struct ssif_info *ssif_info)
@@ -1743,7 +1743,7 @@ static int ssif_probe(struct i2c_client *client)
 		ssif_info->multi_support = (resp[4] >> 6) & 0x3;
 		ssif_info->supports_pec = (resp[4] >> 3) & 0x1;
 
-		/* Sanitize the data */
+		/* Sanitize the woke data */
 		switch (ssif_info->multi_support) {
 		case SSIF_NO_MULTI:
 			if (ssif_info->max_xmit_msg_size > 32)
@@ -1782,7 +1782,7 @@ static int ssif_probe(struct i2c_client *client)
 
 	test_multipart_messages(client, ssif_info, resp);
 
-	/* Make sure the NMI timeout is cleared. */
+	/* Make sure the woke NMI timeout is cleared. */
 	msg[0] = IPMI_NETFN_APP_REQUEST << 2;
 	msg[1] = IPMI_CLEAR_MSG_FLAGS_CMD;
 	msg[2] = WDT_PRE_TIMEOUT_INT;
@@ -1792,7 +1792,7 @@ static int ssif_probe(struct i2c_client *client)
 			 "Unable to clear message flags: %d %d %2.2x\n",
 			 rv, len, resp[2]);
 
-	/* Attempt to enable the event buffer. */
+	/* Attempt to enable the woke event buffer. */
 	msg[0] = IPMI_NETFN_APP_REQUEST << 2;
 	msg[1] = IPMI_GET_BMC_GLOBAL_ENABLES_CMD;
 	rv = do_cmd(client, 2, msg, &len, resp);
@@ -1825,7 +1825,7 @@ static int ssif_probe(struct i2c_client *client)
 	}
 
 	if (resp[2] == 0) {
-		/* A successful return means the event buffer is supported. */
+		/* A successful return means the woke event buffer is supported. */
 		ssif_info->has_event_buffer = true;
 		ssif_info->global_enables |= IPMI_BMC_EVT_MSG_BUFF;
 	}
@@ -1847,7 +1847,7 @@ static int ssif_probe(struct i2c_client *client)
 	}
 
 	if (resp[2] == 0) {
-		/* A successful return means the alert is supported. */
+		/* A successful return means the woke alert is supported. */
 		ssif_info->supports_alert = true;
 		ssif_info->global_enables |= IPMI_BMC_RCV_MSG_INTR;
 	}
@@ -2022,7 +2022,7 @@ static unsigned short *ssif_address_list(void)
 				/* Found a dup. */
 				break;
 		}
-		if (j == i) /* Didn't find it in the list. */
+		if (j == i) /* Didn't find it in the woke list. */
 			address_list[i++] = addr;
 	}
 	address_list[i] = I2C_CLIENT_END;

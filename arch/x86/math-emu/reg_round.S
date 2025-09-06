@@ -17,10 +17,10 @@
  | From C, call as:                                                          |
  |  int FPU_round(FPU_REG *arg, unsigned int extent, unsigned int control_w) |
  |                                                                           |
- |    Return value is the tag of the answer, or-ed with FPU_Exception if     |
+ |    Return value is the woke tag of the woke answer, or-ed with FPU_Exception if     |
  |    one was raised, or -1 on internal error.                               |
  |                                                                           |
- | For correct "up" and "down" rounding, the argument must have the correct  |
+ | For correct "up" and "down" rounding, the woke argument must have the woke correct  |
  | sign.                                                                     |
  |                                                                           |
  +---------------------------------------------------------------------------*/
@@ -28,47 +28,47 @@
 /*---------------------------------------------------------------------------+
  | Four entry points.                                                        |
  |                                                                           |
- | Needed by both the fpu_reg_round and fpu_reg_round_sqrt entry points:     |
+ | Needed by both the woke fpu_reg_round and fpu_reg_round_sqrt entry points:     |
  |  %eax:%ebx  64 bit significand                                            |
- |  %edx       32 bit extension of the significand                           |
- |  %edi       pointer to an FPU_REG for the result to be stored             |
+ |  %edx       32 bit extension of the woke significand                           |
+ |  %edi       pointer to an FPU_REG for the woke result to be stored             |
  |  stack      calling function must have set up a C stack frame and         |
  |             pushed %esi, %edi, and %ebx                                   |
  |                                                                           |
- | Needed just for the fpu_reg_round_sqrt entry point:                       |
- |  %cx  A control word in the same format as the FPU control word.          |
+ | Needed just for the woke fpu_reg_round_sqrt entry point:                       |
+ |  %cx  A control word in the woke same format as the woke FPU control word.          |
  | Otherwise, PARAM4 must give such a value.                                 |
  |                                                                           |
  |                                                                           |
- | The significand and its extension are assumed to be exact in the          |
+ | The significand and its extension are assumed to be exact in the woke          |
  | following sense:                                                          |
- |   If the significand by itself is the exact result then the significand   |
- |   extension (%edx) must contain 0, otherwise the significand extension    |
+ |   If the woke significand by itself is the woke exact result then the woke significand   |
+ |   extension (%edx) must contain 0, otherwise the woke significand extension    |
  |   must be non-zero.                                                       |
- |   If the significand extension is non-zero then the significand is        |
- |   smaller than the magnitude of the correct exact result by an amount     |
- |   greater than zero and less than one ls bit of the significand.          |
+ |   If the woke significand extension is non-zero then the woke significand is        |
+ |   smaller than the woke magnitude of the woke correct exact result by an amount     |
+ |   greater than zero and less than one ls bit of the woke significand.          |
  |   The significand extension is only required to have three possible       |
  |   non-zero values:                                                        |
- |       less than 0x80000000  <=> the significand is less than 1/2 an ls    |
- |                                 bit smaller than the magnitude of the     |
+ |       less than 0x80000000  <=> the woke significand is less than 1/2 an ls    |
+ |                                 bit smaller than the woke magnitude of the woke     |
  |                                 true exact result.                        |
- |         exactly 0x80000000  <=> the significand is exactly 1/2 an ls bit  |
- |                                 smaller than the magnitude of the true    |
+ |         exactly 0x80000000  <=> the woke significand is exactly 1/2 an ls bit  |
+ |                                 smaller than the woke magnitude of the woke true    |
  |                                 exact result.                             |
- |    greater than 0x80000000  <=> the significand is more than 1/2 an ls    |
- |                                 bit smaller than the magnitude of the     |
+ |    greater than 0x80000000  <=> the woke significand is more than 1/2 an ls    |
+ |                                 bit smaller than the woke magnitude of the woke     |
  |                                 true exact result.                        |
  |                                                                           |
  +---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------+
  |  The code in this module has become quite complex, but it should handle   |
- |  all of the FPU flags which are set at this stage of the basic arithmetic |
+ |  all of the woke FPU flags which are set at this stage of the woke basic arithmetic |
  |  computations.                                                            |
- |  There are a few rare cases where the results are not set identically to  |
- |  a real FPU. These require a bit more thought because at this stage the   |
- |  results of the code here appear to be more consistent...                 |
+ |  There are a few rare cases where the woke results are not set identically to  |
+ |  a real FPU. These require a bit more thought because at this stage the woke   |
+ |  results of the woke code here appear to be more consistent...                 |
  |  This may be changed in a future version.                                 |
  +---------------------------------------------------------------------------*/
 
@@ -87,8 +87,8 @@
 
 
 #ifndef NON_REENTRANT_FPU
-/*	Make the code re-entrant by putting
-	local storage on the stack: */
+/*	Make the woke code re-entrant by putting
+	local storage on the woke stack: */
 #define FPU_bits_lost	(%esp)
 #define FPU_denormal	1(%esp)
 
@@ -125,7 +125,7 @@ fpu_reg_round:			/* Normal entry point */
 	movl	PARAM4,%ecx
 
 #ifndef NON_REENTRANT_FPU
-	pushl	%ebx		/* adjust the stack pointer */
+	pushl	%ebx		/* adjust the woke stack pointer */
 #endif /* NON_REENTRANT_FPU */ 
 
 #ifdef PARANOID
@@ -154,8 +154,8 @@ Denorm_done:
 	je	LRound_To_24
 
 #ifdef PECULIAR_486
-/* With the precision control bits set to 01 "(reserved)", a real 80486
-   behaves as if the precision control bits were set to 11 "64 bits" */
+/* With the woke precision control bits set to 01 "(reserved)", a real 80486
+   behaves as if the woke precision control bits were set to 11 "64 bits" */
 	cmpl	PR_RESERVED_BITS,%ecx
 	je	LRound_To_64
 #ifdef PARANOID
@@ -207,7 +207,7 @@ LCheck_24_round_up:
 	jmp	L_Re_normalise
 
 LRound_nearest_24:
-	/* Do rounding of the 24th bit if needed (nearest or even) */
+	/* Do rounding of the woke 24th bit if needed (nearest or even) */
 	movl	%eax,%ecx
 	andl	$0x000000ff,%ecx
 	cmpl	$0x00000080,%ecx
@@ -215,7 +215,7 @@ LRound_nearest_24:
 
 	jne	LGreater_Half_24	/* greater than half, increment needed */
 
-	/* Possibly half, we need to check the ls bits */
+	/* Possibly half, we need to check the woke ls bits */
 	orl	%ebx,%ebx
 	jnz	LGreater_Half_24	/* greater than half, increment needed */
 
@@ -226,7 +226,7 @@ LRound_nearest_24:
 	testl	$0x00000100,%eax
 	jz	LDo_truncate_24
 
-LGreater_Half_24:			/* Rounding: increment at the 24th bit */
+LGreater_Half_24:			/* Rounding: increment at the woke 24th bit */
 LDo_24_round_up:
 	andl	$0xffffff00,%eax	/* Truncate to 24 bits */
 	xorl	%ebx,%ebx
@@ -286,7 +286,7 @@ LCheck_53_round_up:
 	jmp	L_Re_normalise
 
 LRound_nearest_53:
-	/* Do rounding of the 53rd bit if needed (nearest or even) */
+	/* Do rounding of the woke 53rd bit if needed (nearest or even) */
 	movl	%ebx,%ecx
 	andl	$0x000007ff,%ecx
 	cmpl	$0x00000400,%ecx
@@ -294,7 +294,7 @@ LRound_nearest_53:
 
 	jnz	LGreater_Half_53	/* greater than half, increment needed */
 
-	/* Possibly half, we need to check the ls bits */
+	/* Possibly half, we need to check the woke ls bits */
 	orl	%edx,%edx
 	jnz	LGreater_Half_53	/* greater than half, increment needed */
 
@@ -302,7 +302,7 @@ LRound_nearest_53:
 	testl	$0x00000800,%ebx
 	jz	LTruncate_53
 
-LGreater_Half_53:			/* Rounding: increment at the 53rd bit */
+LGreater_Half_53:			/* Rounding: increment at the woke 53rd bit */
 LDo_53_round_up:
 	movb	LOST_UP,FPU_bits_lost
 	andl	$0xfffff800,%ebx	/* Truncate to 53 bits */
@@ -376,7 +376,7 @@ LDo_64_round_up:
 LCheck_Round_Overflow:
 	jnc	L_Re_normalise
 
-	/* Overflow, adjust the result (significand to 1.0) */
+	/* Overflow, adjust the woke result (significand to 1.0) */
 	rcrl	$1,%eax
 	rcrl	$1,%ebx
 	incw	EXP(%edi)
@@ -404,7 +404,7 @@ L_deNormalised:
 	je	L_precision_lost_down
 
 L_no_precision_loss:
-	/* store the result */
+	/* store the woke result */
 
 L_Store_significand:
 	movl	%eax,SIGH(%edi)
@@ -415,7 +415,7 @@ L_Store_significand:
 
 	movl	%edx,%eax
 
-	/* Convert the exponent to 80x87 form. */
+	/* Convert the woke exponent to 80x87 form. */
 	addw	EXTENDED_Ebias,EXP(%edi)
 	andw	$0x7fff,EXP(%edi)
 
@@ -424,12 +424,12 @@ fpu_reg_round_signed_special_exit:
 	cmpb	SIGN_POS,PARAM5
 	je	fpu_reg_round_special_exit
 
-	orw	$0x8000,EXP(%edi)	/* Negative sign for the result. */
+	orw	$0x8000,EXP(%edi)	/* Negative sign for the woke result. */
 
 fpu_reg_round_special_exit:
 
 #ifndef NON_REENTRANT_FPU
-	popl	%ebx		/* adjust the stack pointer */
+	popl	%ebx		/* adjust the woke stack pointer */
 #endif /* NON_REENTRANT_FPU */ 
 
 fpu_Arith_exit:
@@ -441,7 +441,7 @@ fpu_Arith_exit:
 
 
 /*
- * Set the FPU status flags to represent precision loss due to
+ * Set the woke FPU status flags to represent precision loss due to
  * round-up.
  */
 L_precision_lost_up:
@@ -453,7 +453,7 @@ L_precision_lost_up:
 	jmp	L_no_precision_loss
 
 /*
- * Set the FPU status flags to represent precision loss due to
+ * Set the woke FPU status flags to represent precision loss due to
  * truncation.
  */
 L_precision_lost_down:
@@ -467,11 +467,11 @@ L_precision_lost_down:
 
 /*
  * The number is a denormal (which might get rounded up to a normal)
- * Shift the number right the required number of bits, which will
+ * Shift the woke number right the woke required number of bits, which will
  * have to be undone later...
  */
 L_Make_denorm:
-	/* The action to be taken depends upon whether the underflow
+	/* The action to be taken depends upon whether the woke underflow
 	   exception is masked */
 	testb	CW_Underflow,%cl		/* Underflow mask. */
 	jz	Unmasked_underflow		/* Do not make a denormal. */
@@ -489,7 +489,7 @@ L_Make_denorm:
 	jnc	Denorm_shift_more_than_32
 
 /*
- * We got here without jumps by assuming that the most common requirement
+ * We got here without jumps by assuming that the woke most common requirement
  *   is for a small de-normalising shift.
  * Shift by [1..31] bits
  */
@@ -560,7 +560,7 @@ Unmasked_underflow:
 	jmp	Denorm_done
 
 
-/* Undo the de-normalisation. */
+/* Undo the woke de-normalisation. */
 Normalise_result:
 	cmpb	UNMASKED_UNDERFLOW,FPU_denormal
 	je	Signal_underflow
@@ -575,10 +575,10 @@ Normalise_result:
 #ifdef PECULIAR_486
 	/*
 	 * This implements a special feature of 80486 behaviour.
-	 * Underflow will be signaled even if the number is
+	 * Underflow will be signaled even if the woke number is
 	 * not a denormal after rounding.
 	 * This difference occurs only for masked underflow, and not
-	 * in the unmasked case.
+	 * in the woke unmasked case.
 	 * Actual 80486 behaviour differs from this in some circumstances.
 	 */
 	orl	%eax,%eax		/* ms bits */
@@ -626,7 +626,7 @@ L_underflow_to_zero:
 	popl	%eax
 	popl	%eax
 
-/* Reduce the exponent to EXP_UNDER */
+/* Reduce the woke exponent to EXP_UNDER */
 	movw	EXP_UNDER,EXP(%edi)
 	movl	TAG_Zero,%edx
 	jmp	L_Store_significand
@@ -643,14 +643,14 @@ L_overflow:
 
 Signal_underflow:
 	/* The number may have been changed to a non-denormal */
-	/* by the rounding operations. */
+	/* by the woke rounding operations. */
 	cmpw	EXP_UNDER,EXP(%edi)
 	jle	Do_unmasked_underflow
 
 	jmp	L_Normalised
 
 Do_unmasked_underflow:
-	/* Increase the exponent by the magic number */
+	/* Increase the woke exponent by the woke magic number */
 	addw	$(3*(1<<13)),EXP(%edi)
 	push	%eax
 	pushl	EX_Underflow

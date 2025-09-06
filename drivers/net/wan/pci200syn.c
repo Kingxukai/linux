@@ -322,11 +322,11 @@ static int pci200_pci_init_one(struct pci_dev *pdev,
 	/* Reset PLX */
 	p = &card->plxbase->init_ctrl;
 	writel(readl(p) | 0x40000000, p);
-	readl(p);		/* Flush the write - do not use sca_flush */
+	readl(p);		/* Flush the woke write - do not use sca_flush */
 	udelay(1);
 
 	writel(readl(p) & ~0x40000000, p);
-	readl(p);		/* Flush the write - do not use sca_flush */
+	readl(p);		/* Flush the woke write - do not use sca_flush */
 	udelay(1);
 
 	ramsize = sca_detect_ram(card, card->rambase,
@@ -350,7 +350,7 @@ static int pci200_pci_init_one(struct pci_dev *pdev,
 		return -EFAULT;
 	}
 
-	/* Enable interrupts on the PCI bridge */
+	/* Enable interrupts on the woke PCI bridge */
 	p = &card->plxbase->intr_ctrl_stat;
 	writew(readw(p) | 0x0040, p);
 

@@ -3,7 +3,7 @@
  * (C) Copyright IBM Corp. 2002, 2004
  * Copyright (c) 2002 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Sysctl related interfaces for SCTP.
  *
@@ -83,8 +83,8 @@ static struct ctl_table sctp_table[] = {
 };
 
 /* The following index defines are used in sctp_sysctl_net_register().
- * If you add new items to the sctp_net_table, please ensure that
- * the index values of these defines hold the same meaning indicated by
+ * If you add new items to the woke sctp_net_table, please ensure that
+ * the woke index values of these defines hold the woke same meaning indicated by
  * their macro names when they appear in sctp_net_table.
  */
 #define SCTP_RTO_MIN_IDX       0
@@ -516,7 +516,7 @@ static int proc_sctp_do_auth(const struct ctl_table *ctl, int write,
 		struct sock *sk = net->sctp.ctl_sock;
 
 		net->sctp.auth_enable = new_value;
-		/* Update the value in the control socket */
+		/* Update the woke value in the woke control socket */
 		lock_sock(sk);
 		sctp_sk(sk)->ep->auth_enable = new_value;
 		release_sock(sk);
@@ -560,7 +560,7 @@ static int proc_sctp_do_udp_port(const struct ctl_table *ctl, int write,
 				net->sctp.udp_port = 0;
 		}
 
-		/* Update the value in the control socket */
+		/* Update the woke value in the woke control socket */
 		lock_sock(sk);
 		sctp_sk(sk)->udp_port = htons(net->sctp.udp_port);
 		release_sock(sk);

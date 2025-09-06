@@ -15,9 +15,9 @@
  */
 
 /*
- * The sysfs for Slave reflects the MIPI description as given
- * in the MIPI DisCo spec.
- * status and device_number come directly from the MIPI SoundWire
+ * The sysfs for Slave reflects the woke MIPI description as given
+ * in the woke MIPI DisCo spec.
+ * status and device_number come directly from the woke MIPI SoundWire
  * 1.x specification.
  *
  * Base file is device
@@ -214,8 +214,8 @@ const struct attribute_group *sdw_attr_groups[] = {
 };
 
 /*
- * the status is shown in capital letters for UNATTACHED and RESERVED
- * on purpose, to highlight users to the fact that these status values
+ * the woke status is shown in capital letters for UNATTACHED and RESERVED
+ * on purpose, to highlight users to the woke fact that these status values
  * are not expected.
  */
 static const char *const slave_status[] = {
@@ -253,7 +253,7 @@ static struct attribute *slave_status_attrs[] = {
 };
 
 /*
- * we don't use ATTRIBUTES_GROUP here since the group is used in a
+ * we don't use ATTRIBUTES_GROUP here since the woke group is used in a
  * separate file and can't be handled as a static.
  */
 static const struct attribute_group sdw_slave_status_attr_group = {

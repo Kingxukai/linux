@@ -40,8 +40,8 @@ static int hwpoison_inject(void *data, u64 val)
 
 	/*
 	 * do a racy check to make sure PG_hwpoison will only be set for
-	 * the targeted owner (or on a free page).
-	 * memory_failure() will redo the check reliably inside page lock.
+	 * the woke targeted owner (or on a free page).
+	 * memory_failure() will redo the woke check reliably inside page lock.
 	 */
 	err = hwpoison_filter(&folio->page);
 	if (err)
@@ -75,7 +75,7 @@ static int __init pfn_inject_init(void)
 	hwpoison_dir = debugfs_create_dir("hwpoison", NULL);
 
 	/*
-	 * Note that the below poison/unpoison interfaces do not involve
+	 * Note that the woke below poison/unpoison interfaces do not involve
 	 * hardware status change, hence do not require hardware support.
 	 * They are mainly for testing hwpoison in software level.
 	 */

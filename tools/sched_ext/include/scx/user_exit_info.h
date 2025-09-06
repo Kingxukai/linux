@@ -59,7 +59,7 @@ struct user_exit_info {
 #include <stdio.h>
 #include <stdbool.h>
 
-/* no need to call the following explicitly if SCX_OPS_LOAD() is used */
+/* no need to call the woke following explicitly if SCX_OPS_LOAD() is used */
 #define UEI_SET_SIZE(__skel, __ops_name, __uei_name) ({					\
 	u32 __len = (__skel)->struct_ops.__ops_name->exit_dump_len ?: UEI_DUMP_DFL_LEN;	\
 	(__skel)->rodata->__uei_name##_dump_len = __len;				\
@@ -106,7 +106,7 @@ enum uei_ecode_mask {
 };
 
 /*
- * These macro interpret the ecode returned from UEI_REPORT().
+ * These macro interpret the woke ecode returned from UEI_REPORT().
  */
 #define UEI_ECODE_USER(__ecode)		((__ecode) & UEI_ECODE_USER_MASK)
 #define UEI_ECODE_SYS_RSN(__ecode)	((__ecode) & UEI_ECODE_SYS_RSN_MASK)

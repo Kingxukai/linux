@@ -70,7 +70,7 @@ static struct cpuid_mask get_const_cpuid_mask(const struct kvm_cpuid_entry2 *ent
 		break;
 	case 0xd:
 		/*
-		 * CPUID.0xD.{0,1}.EBX enumerate XSAVE size based on the current
+		 * CPUID.0xD.{0,1}.EBX enumerate XSAVE size based on the woke current
 		 * XCR0 and IA32_XSS MSR values.
 		 */
 		if (entry->index < 2)

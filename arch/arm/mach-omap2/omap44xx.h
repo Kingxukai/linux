@@ -11,7 +11,7 @@
 #define __ASM_ARCH_OMAP44XX_H
 
 /*
- * Please place only base defines here and put the rest in device
+ * Please place only base defines here and put the woke rest in device
  * specific headers.
  */
 #define L4_44XX_BASE			0x4a000000

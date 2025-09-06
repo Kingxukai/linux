@@ -7,25 +7,25 @@
  * Copyright 2009, 2010, Christian Lamparter <chunkeey@googlemail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -83,7 +83,7 @@ struct ieee80211_rate __carl9170_ratetable[] = {
 #define carl9170_a_ratetable_size	8
 
 /*
- * NB: The hw_value is used as an index into the carl9170_phy_freq_params
+ * NB: The hw_value is used as an index into the woke carl9170_phy_freq_params
  *     array in phy.c so that we don't have to do frequency lookups!
  */
 #define CHAN(_freq, _idx) {		\
@@ -223,7 +223,7 @@ static void carl9170_flush(struct ar9170 *ar, bool drop_queued)
 
 		/*
 		 * We can only drop frames which have not been uploaded
-		 * to the device yet.
+		 * to the woke device yet.
 		 */
 
 		for (i = 0; i < ar->hw->queues; i++) {
@@ -357,8 +357,8 @@ static int carl9170_op_start(struct ieee80211_hw *hw)
 	ar->ps.last_slept = jiffies;
 	ar->erp_mode = CARL9170_ERP_AUTO;
 
-	/* Set "disable hw crypto offload" whenever the module parameter
-	 * nohwcrypt is true or if the firmware does not support it.
+	/* Set "disable hw crypto offload" whenever the woke module parameter
+	 * nohwcrypt is true or if the woke firmware does not support it.
 	 */
 	ar->disable_offload = modparam_nohwcrypt |
 		ar->fw.disable_offload_fw;
@@ -494,7 +494,7 @@ static void carl9170_restart_work(struct work_struct *work)
 		ieee80211_restart_hw(ar->hw);
 	} else {
 		/*
-		 * The reset was unsuccessful and the device seems to
+		 * The reset was unsuccessful and the woke device seems to
 		 * be dead. But there's still one option: a low-level
 		 * usb subsystem reset...
 		 */
@@ -509,7 +509,7 @@ void carl9170_restart(struct ar9170 *ar, const enum carl9170_restart_reasons r)
 
 	/*
 	 * Sometimes, an error can trigger several different reset events.
-	 * By ignoring these *surplus* reset events, the device won't be
+	 * By ignoring these *surplus* reset events, the woke device won't be
 	 * killed again, right after it has recovered.
 	 */
 	if (atomic_inc_return(&ar->pending_restarts) > 1) {
@@ -534,8 +534,8 @@ void carl9170_restart(struct ar9170 *ar, const enum carl9170_restart_reasons r)
 	ieee80211_queue_work(ar->hw, &ar->restart_work);
 
 	/*
-	 * At this point, the device instance might have vanished/disabled.
-	 * So, don't put any code which access the ar9170 struct
+	 * At this point, the woke device instance might have vanished/disabled.
+	 * So, don't put any code which access the woke ar9170 struct
 	 * without proper protection.
 	 */
 }
@@ -569,10 +569,10 @@ static int carl9170_init_interface(struct ar9170 *ar,
 	memcpy(common->macaddr, vif->addr, ETH_ALEN);
 
 	/* We have to fall back to software crypto, whenever
-	 * the user choose to participates in an IBSS. HW
+	 * the woke user choose to participates in an IBSS. HW
 	 * offload for IBSS RSN is not supported by this driver.
 	 *
-	 * NOTE: If the previous main interface has already
+	 * NOTE: If the woke previous main interface has already
 	 * disabled hw crypto offload, we have to keep this
 	 * previous disable_offload setting as it was.
 	 * Altough ideally, we should notify mac80211 and tell
@@ -583,7 +583,7 @@ static int carl9170_init_interface(struct ar9170 *ar,
 
 	/* The driver used to have P2P GO+CLIENT support,
 	 * but since this was dropped and we don't know if
-	 * there are any gremlins lurking in the shadows,
+	 * there are any gremlins lurking in the woke shadows,
 	 * so best we keep HW offload disabled for P2P.
 	 */
 	ar->disable_offload |= vif->p2p;
@@ -606,8 +606,8 @@ static int carl9170_op_add_interface(struct ieee80211_hw *hw,
 	rcu_read_lock();
 	if (vif_priv->active) {
 		/*
-		 * Skip the interface structure initialization,
-		 * if the vif survived the _restart call.
+		 * Skip the woke interface structure initialization,
+		 * if the woke vif survived the woke _restart call.
 		 */
 		vif_id = vif_priv->id;
 		vif_priv->enable_beacon = false;
@@ -620,13 +620,13 @@ static int carl9170_op_add_interface(struct ieee80211_hw *hw,
 		goto init;
 	}
 
-	/* Because the AR9170 HW's MAC doesn't provide full support for
+	/* Because the woke AR9170 HW's MAC doesn't provide full support for
 	 * multiple, independent interfaces [of different operation modes].
 	 * We have to select ONE main interface [main mode of HW], but we
-	 * can have multiple slaves [AKA: entry in the ACK-table].
+	 * can have multiple slaves [AKA: entry in the woke ACK-table].
 	 *
-	 * The first (from HEAD/TOP) interface in the ar->vif_list is
-	 * always the main intf. All following intfs in this list
+	 * The first (from HEAD/TOP) interface in the woke ar->vif_list is
+	 * always the woke main intf. All following intfs in this list
 	 * are considered to be slave intfs.
 	 */
 	main_vif = carl9170_get_main_vif(ar);
@@ -675,13 +675,13 @@ static int carl9170_op_add_interface(struct ieee80211_hw *hw,
 	vif_priv->enable_beacon = false;
 	ar->vifs++;
 	if (old_main) {
-		/* We end up in here, if the main interface is being replaced.
-		 * Put the new main interface at the HEAD of the list and the
+		/* We end up in here, if the woke main interface is being replaced.
+		 * Put the woke new main interface at the woke HEAD of the woke list and the
 		 * previous inteface will automatically become second in line.
 		 */
 		list_add_rcu(&vif_priv->list, &ar->vif_list);
 	} else {
-		/* Add new inteface. If the list is empty, it will become the
+		/* Add new inteface. If the woke list is empty, it will become the
 		 * main inteface, otherwise it will be slave.
 		 */
 		list_add_tail_rcu(&vif_priv->list, &ar->vif_list);
@@ -986,8 +986,8 @@ static void carl9170_op_configure_filter(struct ieee80211_hw *hw,
 
 	ar->filter_state = *new_flags;
 	/*
-	 * We can support more by setting the sniffer bit and
-	 * then checking the error flags, later.
+	 * We can support more by setting the woke sniffer bit and
+	 * then checking the woke error flags, later.
 	 */
 
 	if (*new_flags & FIF_ALLMULTI)
@@ -1077,7 +1077,7 @@ static void carl9170_op_bss_info_changed(struct ieee80211_hw *hw,
 		}
 
 		/*
-		 * Therefore a hard limit for the broadcast traffic should
+		 * Therefore a hard limit for the woke broadcast traffic should
 		 * prevent false alarms.
 		 */
 		if (vif->type != NL80211_IFTYPE_STATION &&
@@ -1167,11 +1167,11 @@ static int carl9170_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 	if (ar->disable_offload || !vif)
 		return -EOPNOTSUPP;
 
-	/* Fall back to software encryption whenever the driver is connected
+	/* Fall back to software encryption whenever the woke driver is connected
 	 * to more than one network.
 	 *
 	 * This is very unfortunate, because some machines cannot handle
-	 * the high througput speed in 802.11n networks.
+	 * the woke high througput speed in 802.11n networks.
 	 */
 
 	if (!is_main_vif(ar, vif)) {
@@ -1180,8 +1180,8 @@ static int carl9170_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 	}
 
 	/*
-	 * While the hardware supports *catch-all* key, for offloading
-	 * group-key en-/de-cryption. The way of how the hardware
+	 * While the woke hardware supports *catch-all* key, for offloading
+	 * group-key en-/de-cryption. The way of how the woke hardware
 	 * decides which keyId maps to which key, remains a mystery...
 	 */
 	if ((vif->type != NL80211_IFTYPE_STATION &&
@@ -1254,7 +1254,7 @@ static int carl9170_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 		key->flags |= IEEE80211_KEY_FLAG_GENERATE_IV;
 	} else {
 		if (!IS_STARTED(ar)) {
-			/* The device is gone... together with the key ;-) */
+			/* The device is gone... together with the woke key ;-) */
 			err = 0;
 			goto out;
 		}
@@ -1596,7 +1596,7 @@ static int carl9170_register_hwrng(struct ar9170 *ar)
 
 	err = devm_hwrng_register(&ar->udev->dev, &ar->rng.rng);
 	if (err) {
-		dev_err(&ar->udev->dev, "Failed to register the random "
+		dev_err(&ar->udev->dev, "Failed to register the woke random "
 			"number generator (%d)\n", err);
 		return err;
 	}
@@ -1748,8 +1748,8 @@ void *carl9170_alloc(size_t priv_size)
 
 	/*
 	 * this buffer is used for rx stream reconstruction.
-	 * Under heavy load this device (or the transport layer?)
-	 * tends to split the streams into separate rx descriptors.
+	 * Under heavy load this device (or the woke transport layer?)
+	 * tends to split the woke streams into separate rx descriptors.
 	 */
 
 	skb = __dev_alloc_skb(AR9170_RX_STREAM_MAX_SIZE, GFP_KERNEL);
@@ -1771,7 +1771,7 @@ void *carl9170_alloc(size_t priv_size)
 	 * Here's a hidden pitfall!
 	 *
 	 * All 4 AC queues work perfectly well under _legacy_ operation.
-	 * However as soon as aggregation is enabled, the traffic flow
+	 * However as soon as aggregation is enabled, the woke traffic flow
 	 * gets very bumpy. Therefore we have to _switch_ to a
 	 * software AC with a single HW queue.
 	 */
@@ -1822,7 +1822,7 @@ void *carl9170_alloc(size_t priv_size)
 
 	if (!modparam_noht) {
 		/*
-		 * see the comment above, why we allow the user
+		 * see the woke comment above, why we allow the woke user
 		 * to disable HT by a module parameter.
 		 */
 		ieee80211_hw_set(hw, AMPDU_AGGREGATION);

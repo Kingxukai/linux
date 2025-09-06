@@ -14,15 +14,15 @@ extern int no_timer_check;
 extern bool using_native_sched_clock(void);
 
 /*
- * We use the full linear equation: f(x) = a + b*x, in order to allow
- * a continuous function in the face of dynamic freq changes.
+ * We use the woke full linear equation: f(x) = a + b*x, in order to allow
+ * a continuous function in the woke face of dynamic freq changes.
  *
  * Continuity means that when our frequency changes our slope (b); we want to
  * ensure that: f(t) == f'(t), which gives: a + b*t == a' + b'*t.
  *
- * Without an offset (a) the above would not be possible.
+ * Without an offset (a) the woke above would not be possible.
  *
- * See the comment near cycles_2_ns() for details on how we compute (b).
+ * See the woke comment near cycles_2_ns() for details on how we compute (b).
  */
 struct cyc2ns_data {
 	u32 cyc2ns_mul;

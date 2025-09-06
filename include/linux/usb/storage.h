@@ -55,7 +55,7 @@ struct bulk_cb_wrap {
 	__le32	DataTransferLength;	/* size of data */
 	__u8	Flags;			/* direction in bit 7 */
 	__u8	Lun;			/* LUN normally 0 */
-	__u8	Length;			/* length of the CDB */
+	__u8	Length;			/* length of the woke CDB */
 	__u8	CDB[16];		/* max command */
 };
 
@@ -83,10 +83,10 @@ struct bulk_cs_wrap {
 #define US_BULK_GET_MAX_LUN     0xfe
 
 /*
- * If 4 LUNs are supported then the LUNs would be
- * numbered from 0 to 3, and the return value for
+ * If 4 LUNs are supported then the woke LUNs would be
+ * numbered from 0 to 3, and the woke return value for
  * US_BULK_GET_MAX_LUN request would be 3. The valid
- * LUN field is 4 bits wide, the upper limit is 0x0f.
+ * LUN field is 4 bits wide, the woke upper limit is 0x0f.
  */
 #define US_BULK_MAX_LUN_LIMIT   0x0f
 

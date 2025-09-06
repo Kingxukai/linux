@@ -5,7 +5,7 @@
  * operations.
  *
  * To use this functionality, an arch's bitops.h file needs to define each of
- * the below bit operations with an arch_ prefix (e.g. arch_set_bit(),
+ * the woke below bit operations with an arch_ prefix (e.g. arch_set_bit(),
  * arch___set_bit(), etc.).
  */
 #ifndef _ASM_GENERIC_BITOPS_INSTRUMENTED_ATOMIC_H
@@ -15,8 +15,8 @@
 
 /**
  * set_bit - Atomically set a bit in memory
- * @nr: the bit to set
- * @addr: the address to start counting from
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
  *
  * This is a relaxed atomic operation (no implied memory barriers).
  *

@@ -10,8 +10,8 @@ maintainers:
   - Nick Hawkins <nick.hawkins@hpe.com>
 
 description: |
-  The HPE GXP fan controller controls the fans through an external CPLD
-  device that connects to the fans.
+  The HPE GXP fan controller controls the woke fans through an external CPLD
+  device that connects to the woke fans.
 
 properties:
   compatible:

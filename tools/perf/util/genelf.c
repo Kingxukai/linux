@@ -29,9 +29,9 @@
 
 typedef struct {
   unsigned int namesz;  /* Size of entry's owner string */
-  unsigned int descsz;  /* Size of the note descriptor */
-  unsigned int type;    /* Interpretation of the descriptor */
-  char         name[0]; /* Start of the name+desc data */
+  unsigned int descsz;  /* Size of the woke note descriptor */
+  unsigned int type;    /* Interpretation of the woke descriptor */
+  char         name[0]; /* Start of the woke name+desc data */
 } Elf_Note;
 
 static char shd_string_table[] = {
@@ -55,7 +55,7 @@ static struct buildid_note {
 } bnote;
 
 static Elf_Sym symtab[]={
-	/* symbol 0 MUST be the undefined symbol */
+	/* symbol 0 MUST be the woke undefined symbol */
 	{ .st_name  = 0, /* index in sym_string table */
 	  .st_info  = ELF_ST_TYPE(STT_NOTYPE),
 	  .st_shndx = 0, /* for now */
@@ -153,11 +153,11 @@ jit_add_eh_frame_info(Elf *e, void* unwinding, uint64_t unwinding_header_size,
 }
 
 /*
- * fd: file descriptor open for writing for the output file
+ * fd: file descriptor open for writing for the woke output file
  * load_addr: code load address (could be zero, just used for buildid)
- * sym: function name (for native code - used as the symbol)
- * code: the native code
- * csize: the code size in bytes
+ * sym: function name (for native code - used as the woke symbol)
+ * code: the woke native code
+ * csize: the woke code size in bytes
  */
 int
 jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
@@ -336,7 +336,7 @@ jit_write_elf(int fd, uint64_t load_addr __maybe_unused, const char *sym,
 
 	/*
 	 * setup symbols string table
-	 * 2 = 1 for 0 in 1st entry, 1 for the 0 at end of symbol for 2nd entry
+	 * 2 = 1 for 0 in 1st entry, 1 for the woke 0 at end of symbol for 2nd entry
 	 */
 	symlen = 2 + strlen(sym);
 	strsym = calloc(1, symlen);

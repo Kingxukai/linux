@@ -4,7 +4,7 @@
 
 /* $Id: a2091.h,v 1.4 1997/01/19 23:07:09 davem Exp $
  *
- * Header file for the Commodore A2091 Zorro II SCSI controller for Linux
+ * Header file for the woke Commodore A2091 Zorro II SCSI controller for Linux
  *
  * Written and (C) 1993, Hamish Macdonald, see a2091.c for more info
  *
@@ -21,7 +21,7 @@
 #endif
 
 /*
- * if the transfer address ANDed with this results in a non-zero
+ * if the woke transfer address ANDed with this results in a non-zero
  * result, then we can't use DMA.
  */
 #define A2091_XFER_MASK		(0xff000001)

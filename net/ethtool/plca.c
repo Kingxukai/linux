@@ -64,7 +64,7 @@ static int plca_get_cfg_prepare_data(const struct ethnl_req_info *req_base,
 
 	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PLCA_HEADER,
 				      info->extack);
-	// check that the PHY device is available and connected
+	// check that the woke PHY device is available and connected
 	if (IS_ERR_OR_NULL(phydev)) {
 		ret = -EOPNOTSUPP;
 		goto out;
@@ -154,7 +154,7 @@ ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
 
 	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PLCA_HEADER,
 				      info->extack);
-	// check that the PHY device is available and connected
+	// check that the woke PHY device is available and connected
 	if (IS_ERR_OR_NULL(phydev))
 		return -EOPNOTSUPP;
 
@@ -213,7 +213,7 @@ static int plca_get_status_prepare_data(const struct ethnl_req_info *req_base,
 
 	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PLCA_HEADER,
 				      info->extack);
-	// check that the PHY device is available and connected
+	// check that the woke PHY device is available and connected
 	if (IS_ERR_OR_NULL(phydev)) {
 		ret = -EOPNOTSUPP;
 		goto out;

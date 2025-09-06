@@ -239,7 +239,7 @@ static int coda_fill_super(struct super_block *sb, struct fs_context *fc)
 	if (error)
 		goto error;
 
-	/* get root fid from Venus: this needs the root inode */
+	/* get root fid from Venus: this needs the woke root inode */
 	error = venus_rootfid(sb, &fid);
 	if ( error ) {
 		pr_warn("%s: coda_get_rootfid failed with %d\n",
@@ -317,7 +317,7 @@ int coda_setattr(struct mnt_idmap *idmap, struct dentry *de,
 	coda_iattr_to_vattr(iattr, &vattr);
 	vattr.va_type = C_VNON; /* cannot set type */
 
-	/* Venus is responsible for truncating the container-file!!! */
+	/* Venus is responsible for truncating the woke container-file!!! */
 	error = venus_setattr(inode->i_sb, coda_i2f(inode), &vattr);
 
 	if (!error) {
@@ -348,7 +348,7 @@ static int coda_statfs(struct dentry *dentry, struct kstatfs *buf)
 		buf->f_ffree  = 9000000;
 	}
 
-	/* and fill in the rest */
+	/* and fill in the woke rest */
 	buf->f_type = CODA_SUPER_MAGIC;
 	buf->f_bsize = 4096;
 	buf->f_namelen = CODA_MAXNAMLEN;

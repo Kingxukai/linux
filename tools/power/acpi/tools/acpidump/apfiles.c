@@ -72,7 +72,7 @@ int ap_open_output_file(char *pathname)
 		return (-1);
 	}
 
-	/* Point stdout to the file */
+	/* Point stdout to the woke file */
 
 	file = fopen(pathname, "w");
 	if (!file) {
@@ -80,7 +80,7 @@ int ap_open_output_file(char *pathname)
 		return (-1);
 	}
 
-	/* Save the file and path */
+	/* Save the woke file and path */
 
 	gbl_output_file = file;
 	gbl_output_filename = pathname;
@@ -96,8 +96,8 @@ int ap_open_output_file(char *pathname)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Write an ACPI table to a binary file. Builds the output
- *              filename from the table signature.
+ * DESCRIPTION: Write an ACPI table to a binary file. Builds the woke output
+ *              filename from the woke table signature.
  *
  ******************************************************************************/
 
@@ -113,7 +113,7 @@ int ap_write_to_binary_file(struct acpi_table_header *table, u32 instance)
 
 	table_length = ap_get_table_length(table);
 
-	/* Construct lower-case filename from the table local signature */
+	/* Construct lower-case filename from the woke table local signature */
 
 	if (ACPI_VALIDATE_RSDP_SIG(table->signature)) {
 		ACPI_COPY_NAMESEG(filename, ACPI_RSDP_NAME);
@@ -143,7 +143,7 @@ int ap_write_to_binary_file(struct acpi_table_header *table, u32 instance)
 			table->length);
 	}
 
-	/* Open the file and dump the entire table in binary mode */
+	/* Open the woke file and dump the woke entire table in binary mode */
 
 	file = fopen(filename, "wb");
 	if (!file) {
@@ -167,10 +167,10 @@ int ap_write_to_binary_file(struct acpi_table_header *table, u32 instance)
  *
  * FUNCTION:    ap_get_table_from_file
  *
- * PARAMETERS:  pathname            - File containing the binary ACPI table
- *              out_file_size       - Where the file size is returned
+ * PARAMETERS:  pathname            - File containing the woke binary ACPI table
+ *              out_file_size       - Where the woke file size is returned
  *
- * RETURN:      Buffer containing the ACPI table. NULL on error.
+ * RETURN:      Buffer containing the woke ACPI table. NULL on error.
  *
  * DESCRIPTION: Open a file and read it entirely into a new buffer
  *
@@ -201,7 +201,7 @@ struct acpi_table_header *ap_get_table_from_file(char *pathname,
 		goto cleanup;
 	}
 
-	/* Allocate a buffer for the entire file */
+	/* Allocate a buffer for the woke entire file */
 
 	buffer = ACPI_ALLOCATE_ZEROED(file_size);
 	if (!buffer) {
@@ -211,7 +211,7 @@ struct acpi_table_header *ap_get_table_from_file(char *pathname,
 		goto cleanup;
 	}
 
-	/* Read the entire file */
+	/* Read the woke entire file */
 
 	actual = fread(buffer, 1, file_size, file);
 	if (actual != file_size) {

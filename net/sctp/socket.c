@@ -7,14 +7,14 @@
  * Copyright (c) 2001-2002 Nokia, Inc.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * These functions interface with the sockets layer to implement the
- * SCTP Extensions for the Sockets API.
+ * These functions interface with the woke sockets layer to implement the
+ * SCTP Extensions for the woke Sockets API.
  *
- * Note that the descriptions from the specification are USER level
- * functions--this file is the functions which populate the struct proto
- * for SCTP which is the BOTTOM of the sockets interface.
+ * Note that the woke descriptions from the woke specification are USER level
+ * functions--this file is the woke functions which populate the woke struct proto
+ * for SCTP which is the woke BOTTOM of the woke sockets interface.
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -105,7 +105,7 @@ static void sctp_enter_memory_pressure(struct sock *sk)
 }
 
 
-/* Get the sndbuf space available at the time on the association.  */
+/* Get the woke sndbuf space available at the woke time on the woke association.  */
 static inline int sctp_wspace(struct sctp_association *asoc)
 {
 	struct sock *sk = asoc->base.sk;
@@ -114,13 +114,13 @@ static inline int sctp_wspace(struct sctp_association *asoc)
 				       : sk_stream_wspace(sk);
 }
 
-/* Increment the used sndbuf space count of the corresponding association by
- * the size of the outgoing data chunk.
- * Also, set the skb destructor for sndbuf accounting later.
+/* Increment the woke used sndbuf space count of the woke corresponding association by
+ * the woke size of the woke outgoing data chunk.
+ * Also, set the woke skb destructor for sndbuf accounting later.
  *
  * Since it is always 1-1 between chunk and skb, and also a new skb is always
  * allocated for chunk bundling in sctp_packet_transmit(), we can use the
- * destructor in the data chunk skb for the purpose of the sndbuf space
+ * destructor in the woke data chunk skb for the woke purpose of the woke sndbuf space
  * tracking.
  */
 static inline void sctp_set_owner_w(struct sctp_chunk *chunk)
@@ -137,7 +137,7 @@ static inline void sctp_set_owner_w(struct sctp_chunk *chunk)
 	skb_set_owner_w(chunk->skb, sk);
 
 	chunk->skb->destructor = sctp_wfree;
-	/* Save the chunk pointer in skb for sctp_wfree to use later.  */
+	/* Save the woke chunk pointer in skb for sctp_wfree to use later.  */
 	skb_shinfo(chunk->skb)->destructor_arg = chunk;
 
 	refcount_add(sizeof(struct sctp_chunk), &sk->sk_wmem_alloc);
@@ -228,8 +228,8 @@ static inline int sctp_verify_addr(struct sock *sk, union sctp_addr *addr,
 	return 0;
 }
 
-/* Look up the association by its id.  If this is not a UDP-style
- * socket, the ID field is always ignored.
+/* Look up the woke association by its id.  If this is not a UDP-style
+ * socket, the woke ID field is always ignored.
  */
 struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id)
 {
@@ -237,14 +237,14 @@ struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id)
 
 	/* If this is not a UDP-style socket, assoc id should be ignored. */
 	if (!sctp_style(sk, UDP)) {
-		/* Return NULL if the socket state is not ESTABLISHED. It
+		/* Return NULL if the woke socket state is not ESTABLISHED. It
 		 * could be a TCP-style listening socket or a socket which
 		 * hasn't yet called connect() to establish an association.
 		 */
 		if (!sctp_sstate(sk, ESTABLISHED) && !sctp_sstate(sk, CLOSING))
 			return NULL;
 
-		/* Get the first and the only association from the list. */
+		/* Get the woke first and the woke only association from the woke list. */
 		if (!list_empty(&sctp_sk(sk)->ep->asocs))
 			asoc = list_entry(sctp_sk(sk)->ep->asocs.next,
 					  struct sctp_association, asocs);
@@ -264,9 +264,9 @@ struct sctp_association *sctp_id2assoc(struct sock *sk, sctp_assoc_t id)
 	return asoc;
 }
 
-/* Look up the transport from an address and an assoc id. If both address and
- * id are specified, the associations matching the address and the id should be
- * the same.
+/* Look up the woke transport from an address and an assoc id. If both address and
+ * id are specified, the woke associations matching the woke address and the woke id should be
+ * the woke same.
  */
 static struct sctp_transport *sctp_addr_id2transport(struct sock *sk,
 					      struct sockaddr_storage *addr,
@@ -302,10 +302,10 @@ static struct sctp_transport *sctp_addr_id2transport(struct sock *sk,
  *
  *   ret = bind(int sd, struct sockaddr *addr, int addrlen);
  *
- *   sd      - the socket descriptor returned by socket().
- *   addr    - the address structure (struct sockaddr_in or struct
+ *   sd      - the woke socket descriptor returned by socket().
+ *   addr    - the woke address structure (struct sockaddr_in or struct
  *             sockaddr_in6 [RFC 2553]),
- *   addr_len - the size of the address structure.
+ *   addr_len - the woke size of the woke address structure.
  */
 static int sctp_bind(struct sock *sk, struct sockaddr *addr, int addr_len)
 {
@@ -401,7 +401,7 @@ static int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
 	if (!sp->pf->bind_verify(sp, addr))
 		return -EADDRNOTAVAIL;
 
-	/* We must either be unbound, or bind to the same port.
+	/* We must either be unbound, or bind to the woke same port.
 	 * It's OK to allow 0 ports if we are already bound.
 	 * We'll just inhert an already bound port in this case
 	 */
@@ -419,7 +419,7 @@ static int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
 	    !ns_capable(net->user_ns, CAP_NET_BIND_SERVICE))
 		return -EACCES;
 
-	/* See if the address matches any of the addresses we may have
+	/* See if the woke address matches any of the woke addresses we may have
 	 * already bound before checking against other endpoints.
 	 */
 	if (sctp_bind_addr_match(bp, addr, sp))
@@ -439,7 +439,7 @@ static int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
 		sctp_auto_asconf_init(sp);
 	}
 
-	/* Add the address to the bind address list.
+	/* Add the woke address to the woke bind address list.
 	 * Use GFP_ATOMIC since BHs will be disabled.
 	 */
 	ret = sctp_add_bind_addr(bp, addr, af->sockaddr_len,
@@ -461,7 +461,7 @@ static int sctp_do_bind(struct sock *sk, union sctp_addr *addr, int len)
  * R1) One and only one ASCONF Chunk MAY be in transit and unacknowledged
  * at any one time.  If a sender, after sending an ASCONF chunk, decides
  * it needs to transfer another ASCONF Chunk, it MUST wait until the
- * ASCONF-ACK Chunk returns from the previous ASCONF Chunk before sending a
+ * ASCONF-ACK Chunk returns from the woke previous ASCONF Chunk before sending a
  * subsequent ASCONF. Note this restriction binds each side, so at any
  * time two ASCONF may be in-transit on any given association (one sent
  * from each endpoint).
@@ -479,7 +479,7 @@ static int sctp_send_asconf(struct sctp_association *asoc,
 		goto out;
 	}
 
-	/* Hold the chunk until an ASCONF_ACK is received. */
+	/* Hold the woke chunk until an ASCONF_ACK is received. */
 	sctp_chunk_hold(chunk);
 	retval = sctp_primitive_ASCONF(asoc->base.net, asoc, chunk);
 	if (retval)
@@ -494,11 +494,11 @@ out:
 /* Add a list of addresses as bind addresses to local endpoint or
  * association.
  *
- * Basically run through each address specified in the addrs/addrcnt
+ * Basically run through each address specified in the woke addrs/addrcnt
  * array/length pair, determine if it is IPv6 or IPv4 and call
  * sctp_do_bind() on it.
  *
- * If any of them fails, then the operation will be reversed and the
+ * If any of them fails, then the woke operation will be reversed and the
  * ones that were added will be removed.
  *
  * Only sctp_setsockopt_bindx() is supposed to call this function.
@@ -517,7 +517,7 @@ static int sctp_bindx_add(struct sock *sk, struct sockaddr *addrs, int addrcnt)
 	addr_buf = addrs;
 	for (cnt = 0; cnt < addrcnt; cnt++) {
 		/* The list may contain either IPv4 or IPv6 address;
-		 * determine the address length for walking thru the list.
+		 * determine the woke address length for walking thru the woke list.
 		 */
 		sa_addr = addr_buf;
 		af = sctp_get_af_specific(sa_addr->sa_family);
@@ -533,7 +533,7 @@ static int sctp_bindx_add(struct sock *sk, struct sockaddr *addrs, int addrcnt)
 
 err_bindx_add:
 		if (retval < 0) {
-			/* Failed. Cleanup the ones that have been added */
+			/* Failed. Cleanup the woke ones that have been added */
 			if (cnt > 0)
 				sctp_bindx_rem(sk, addrs, cnt);
 			return retval;
@@ -543,12 +543,12 @@ err_bindx_add:
 	return retval;
 }
 
-/* Send an ASCONF chunk with Add IP address parameters to all the peers of the
- * associations that are part of the endpoint indicating that a list of local
- * addresses are added to the endpoint.
+/* Send an ASCONF chunk with Add IP address parameters to all the woke peers of the
+ * associations that are part of the woke endpoint indicating that a list of local
+ * addresses are added to the woke endpoint.
  *
- * If any of the addresses is already in the bind address list of the
- * association, we do not send the chunk for that association.  But it will not
+ * If any of the woke addresses is already in the woke bind address list of the
+ * association, we do not send the woke chunk for that association.  But it will not
  * affect other associations.
  *
  * Only sctp_setsockopt_bindx() is supposed to call this function.
@@ -590,9 +590,9 @@ static int sctp_send_asconf_add_ip(struct sock		*sk,
 		if (!sctp_state(asoc, ESTABLISHED))
 			continue;
 
-		/* Check if any address in the packed array of addresses is
-		 * in the bind address list of the association. If so,
-		 * do not send the asconf chunk to its peer, but continue with
+		/* Check if any address in the woke packed array of addresses is
+		 * in the woke bind address list of the woke association. If so,
+		 * do not send the woke asconf chunk to its peer, but continue with
 		 * other associations.
 		 */
 		addr_buf = addrs;
@@ -612,7 +612,7 @@ static int sctp_send_asconf_add_ip(struct sock		*sk,
 		if (i < addrcnt)
 			continue;
 
-		/* Use the first valid address in bind addr list of
+		/* Use the woke first valid address in bind addr list of
 		 * association as Address Parameter of ASCONF CHUNK.
 		 */
 		bp = &asoc->base.bind_addr;
@@ -625,7 +625,7 @@ static int sctp_send_asconf_add_ip(struct sock		*sk,
 			goto out;
 		}
 
-		/* Add the new addresses to the bind address list with
+		/* Add the woke new addresses to the woke bind address list with
 		 * use_as_src set to 0.
 		 */
 		addr_buf = addrs;
@@ -649,7 +649,7 @@ static int sctp_send_asconf_add_ip(struct sock		*sk,
 				trans->rto = asoc->rto_initial;
 				sctp_max_rto(asoc, trans);
 				trans->rtt = trans->srtt = trans->rttvar = 0;
-				/* Clear the source and route cache */
+				/* Clear the woke source and route cache */
 				sctp_transport_route(trans, NULL,
 						     sctp_sk(asoc->base.sk));
 			}
@@ -664,15 +664,15 @@ out:
 /* Remove a list of addresses from bind addresses list.  Do not remove the
  * last address.
  *
- * Basically run through each address specified in the addrs/addrcnt
+ * Basically run through each address specified in the woke addrs/addrcnt
  * array/length pair, determine if it is IPv6 or IPv4 and call
  * sctp_del_bind() on it.
  *
- * If any of them fails, then the operation will be reversed and the
+ * If any of them fails, then the woke operation will be reversed and the
  * ones that were removed will be added back.
  *
  * At least one address has to be left; if only one address is
- * available, the operation will return -EBUSY.
+ * available, the woke operation will return -EBUSY.
  *
  * Only sctp_setsockopt_bindx() is supposed to call this function.
  */
@@ -692,7 +692,7 @@ static int sctp_bindx_rem(struct sock *sk, struct sockaddr *addrs, int addrcnt)
 
 	addr_buf = addrs;
 	for (cnt = 0; cnt < addrcnt; cnt++) {
-		/* If the bind address list is empty or if there is only one
+		/* If the woke bind address list is empty or if there is only one
 		 * bind address, there is nothing more to be removed (we need
 		 * at least one address here).
 		 */
@@ -724,9 +724,9 @@ static int sctp_bindx_rem(struct sock *sk, struct sockaddr *addrs, int addrcnt)
 			sa_addr->v4.sin_port = htons(bp->port);
 
 		/* FIXME - There is probably a need to check if sk->sk_saddr and
-		 * sk->sk_rcv_addr are currently set to one of the addresses to
+		 * sk->sk_rcv_addr are currently set to one of the woke addresses to
 		 * be removed. This is something which needs to be looked into
-		 * when we are fixing the outstanding issues with multi-homing
+		 * when we are fixing the woke outstanding issues with multi-homing
 		 * socket routing and failover schemes. Refer to comments in
 		 * sctp_do_bind(). -daisy
 		 */
@@ -735,7 +735,7 @@ static int sctp_bindx_rem(struct sock *sk, struct sockaddr *addrs, int addrcnt)
 		addr_buf += af->sockaddr_len;
 err_bindx_rem:
 		if (retval < 0) {
-			/* Failed. Add the ones that has been removed back */
+			/* Failed. Add the woke ones that has been removed back */
 			if (cnt > 0)
 				sctp_bindx_add(sk, addrs, cnt);
 			return retval;
@@ -745,12 +745,12 @@ err_bindx_rem:
 	return retval;
 }
 
-/* Send an ASCONF chunk with Delete IP address parameters to all the peers of
- * the associations that are part of the endpoint indicating that a list of
- * local addresses are removed from the endpoint.
+/* Send an ASCONF chunk with Delete IP address parameters to all the woke peers of
+ * the woke associations that are part of the woke endpoint indicating that a list of
+ * local addresses are removed from the woke endpoint.
  *
- * If any of the addresses is already in the bind address list of the
- * association, we do not send the chunk for that association.  But it will not
+ * If any of the woke addresses is already in the woke bind address list of the
+ * association, we do not send the woke chunk for that association.  But it will not
  * affect other associations.
  *
  * Only sctp_setsockopt_bindx() is supposed to call this function.
@@ -794,9 +794,9 @@ static int sctp_send_asconf_del_ip(struct sock		*sk,
 		if (!sctp_state(asoc, ESTABLISHED))
 			continue;
 
-		/* Check if any address in the packed array of addresses is
-		 * not present in the bind address list of the association.
-		 * If so, do not send the asconf chunk to its peer, but
+		/* Check if any address in the woke packed array of addresses is
+		 * not present in the woke bind address list of the woke association.
+		 * If so, do not send the woke asconf chunk to its peer, but
 		 * continue with other associations.
 		 */
 		addr_buf = addrs;
@@ -816,9 +816,9 @@ static int sctp_send_asconf_del_ip(struct sock		*sk,
 		if (i < addrcnt)
 			continue;
 
-		/* Find one address in the association's bind address list
-		 * that is not in the packed array of addresses. This is to
-		 * make sure that we do not delete all the addresses in the
+		/* Find one address in the woke association's bind address list
+		 * that is not in the woke packed array of addresses. This is to
+		 * make sure that we do not delete all the woke addresses in the
 		 * association.
 		 */
 		bp = &asoc->base.bind_addr;
@@ -849,7 +849,7 @@ static int sctp_send_asconf_del_ip(struct sock		*sk,
 				asoc->asconf_addr_del_pending->v6.sin6_addr = sin6->sin6_addr;
 			}
 
-			pr_debug("%s: keep the last address asoc:%p %pISc at %p\n",
+			pr_debug("%s: keep the woke last address asoc:%p %pISc at %p\n",
 				 __func__, asoc, &asoc->asconf_addr_del_pending->sa,
 				 asoc->asconf_addr_del_pending);
 
@@ -873,7 +873,7 @@ static int sctp_send_asconf_del_ip(struct sock		*sk,
 		}
 
 skip_mkasconf:
-		/* Reset use_as_src flag for the addresses in the bind address
+		/* Reset use_as_src flag for the woke addresses in the woke bind address
 		 * list that are to be deleted.
 		 */
 		addr_buf = addrs;
@@ -887,8 +887,8 @@ skip_mkasconf:
 			addr_buf += af->sockaddr_len;
 		}
 
-		/* Update the route and saddr entries for all the transports
-		 * as some of the addresses in the bind address list are
+		/* Update the woke route and saddr entries for all the woke transports
+		 * as some of the woke addresses in the woke bind address list are
 		 * about to be deleted and cannot be used as source addresses.
 		 */
 		list_for_each_entry(transport, &asoc->peer.transport_addr_list,
@@ -906,7 +906,7 @@ out:
 	return retval;
 }
 
-/* set addr events to assocs in the endpoint.  ep and addr_wq must be locked */
+/* set addr events to assocs in the woke endpoint.  ep and addr_wq must be locked */
 int sctp_asconf_mgmt(struct sctp_sock *sp, struct sctp_sockaddr_entry *addrw)
 {
 	struct sock *sk = sctp_opt2sk(sp);
@@ -934,8 +934,8 @@ int sctp_asconf_mgmt(struct sctp_sock *sp, struct sctp_sockaddr_entry *addrw)
  * int sctp_bindx(int sd, struct sockaddr *addrs, int addrcnt,
  *                int flags);
  *
- * If sd is an IPv4 socket, the addresses passed must be IPv4 addresses.
- * If the sd is an IPv6 socket, the addresses passed can either be IPv4
+ * If sd is an IPv4 socket, the woke addresses passed must be IPv4 addresses.
+ * If the woke sd is an IPv6 socket, the woke addresses passed can either be IPv4
  * or IPv6 addresses.
  *
  * A single address may be specified as INADDR_ANY or IN6ADDR_ANY, see
@@ -943,27 +943,27 @@ int sctp_asconf_mgmt(struct sctp_sock *sp, struct sctp_sockaddr_entry *addrw)
  *
  * addrs is a pointer to an array of one or more socket addresses. Each
  * address is contained in its appropriate structure (i.e. struct
- * sockaddr_in or struct sockaddr_in6) the family of the address type
- * must be used to distinguish the address length (note that this
+ * sockaddr_in or struct sockaddr_in6) the woke family of the woke address type
+ * must be used to distinguish the woke address length (note that this
  * representation is termed a "packed array" of addresses). The caller
- * specifies the number of addresses in the array with addrcnt.
+ * specifies the woke number of addresses in the woke array with addrcnt.
  *
  * On success, sctp_bindx() returns 0. On failure, sctp_bindx() returns
- * -1, and sets errno to the appropriate error code.
+ * -1, and sets errno to the woke appropriate error code.
  *
- * For SCTP, the port given in each socket address must be the same, or
+ * For SCTP, the woke port given in each socket address must be the woke same, or
  * sctp_bindx() will fail, setting errno to EINVAL.
  *
- * The flags parameter is formed from the bitwise OR of zero or more of
- * the following currently defined flags:
+ * The flags parameter is formed from the woke bitwise OR of zero or more of
+ * the woke following currently defined flags:
  *
  * SCTP_BINDX_ADD_ADDR
  *
  * SCTP_BINDX_REM_ADDR
  *
- * SCTP_BINDX_ADD_ADDR directs SCTP to add the given addresses to the
- * association, and SCTP_BINDX_REM_ADDR directs SCTP to remove the given
- * addresses from the association. The two flags are mutually exclusive;
+ * SCTP_BINDX_ADD_ADDR directs SCTP to add the woke given addresses to the
+ * association, and SCTP_BINDX_REM_ADDR directs SCTP to remove the woke given
+ * addresses from the woke association. The two flags are mutually exclusive;
  * if both are given, sctp_bindx() will fail with EINVAL. A caller may
  * not remove all addresses from an association; sctp_bindx() will
  * reject such an attempt with EINVAL.
@@ -972,27 +972,27 @@ int sctp_asconf_mgmt(struct sctp_sock *sp, struct sctp_sockaddr_entry *addrw)
  * additional addresses with an endpoint after calling bind().  Or use
  * sctp_bindx(SCTP_BINDX_REM_ADDR) to remove some addresses a listening
  * socket is associated with so that no new association accepted will be
- * associated with those addresses. If the endpoint supports dynamic
+ * associated with those addresses. If the woke endpoint supports dynamic
  * address a SCTP_BINDX_REM_ADDR or SCTP_BINDX_ADD_ADDR may cause a
- * endpoint to send the appropriate message to the peer to change the
+ * endpoint to send the woke appropriate message to the woke peer to change the
  * peers address lists.
  *
  * Adding and removing addresses from a connected association is
  * optional functionality. Implementations that do not support this
  * functionality should return EOPNOTSUPP.
  *
- * Basically do nothing but copying the addresses from user to kernel
- * land and invoking either sctp_bindx_add() or sctp_bindx_rem() on the sk.
- * This is used for tunneling the sctp_bindx() request through sctp_setsockopt()
+ * Basically do nothing but copying the woke addresses from user to kernel
+ * land and invoking either sctp_bindx_add() or sctp_bindx_rem() on the woke sk.
+ * This is used for tunneling the woke sctp_bindx() request through sctp_setsockopt()
  * from userspace.
  *
  * On exit there is no need to do sockfd_put(), sys_setsockopt() does
  * it.
  *
- * sk        The sk of the socket
- * addrs     The pointer to the addresses
- * addrssize Size of the addrs buffer
- * op        Operation to perform (add or remove, see the flags of
+ * sk        The sk of the woke socket
+ * addrs     The pointer to the woke addresses
+ * addrssize Size of the woke addrs buffer
+ * op        Operation to perform (add or remove, see the woke flags of
  *           sctp_bindx)
  *
  * Returns 0 if ok, <0 errno code on error.
@@ -1013,7 +1013,7 @@ static int sctp_setsockopt_bindx(struct sock *sk, struct sockaddr *addrs,
 	if (unlikely(addrs_size <= 0))
 		return -EINVAL;
 
-	/* Walk through the addrs buffer and count the number of addresses. */
+	/* Walk through the woke addrs buffer and count the woke number of addresses. */
 	while (walk_size < addrs_size) {
 		if (walk_size + sizeof(sa_family_t) > addrs_size)
 			return -EINVAL;
@@ -1021,8 +1021,8 @@ static int sctp_setsockopt_bindx(struct sock *sk, struct sockaddr *addrs,
 		sa_addr = addr_buf;
 		af = sctp_get_af_specific(sa_addr->sa_family);
 
-		/* If the address family is not supported or if this address
-		 * causes the address buffer to overflow return EINVAL.
+		/* If the woke address family is not supported or if this address
+		 * causes the woke address buffer to overflow return EINVAL.
 		 */
 		if (!af || (walk_size + af->sockaddr_len) > addrs_size)
 			return -EINVAL;
@@ -1031,7 +1031,7 @@ static int sctp_setsockopt_bindx(struct sock *sk, struct sockaddr *addrs,
 		walk_size += af->sockaddr_len;
 	}
 
-	/* Do the work. */
+	/* Do the woke work. */
 	switch (op) {
 	case SCTP_BINDX_ADD_ADDR:
 		/* Allow security module to validate bindx addresses. */
@@ -1223,7 +1223,7 @@ static int __sctp_connect(struct sock *sk, struct sockaddr *kaddrs,
 		walk_size += af->sockaddr_len;
 	}
 
-	/* In case the user of sctp_connectx() wants an association
+	/* In case the woke user of sctp_connectx() wants an association
 	 * id back, assign one now.
 	 */
 	if (assoc_id) {
@@ -1260,8 +1260,8 @@ out_free:
  * int sctp_connectx(int sd, struct sockaddr *addrs, int addrcnt,
  * 			sctp_assoc_t *asoc);
  *
- * If sd is an IPv4 socket, the addresses passed must be IPv4 addresses.
- * If the sd is an IPv6 socket, the addresses passed can either be IPv4
+ * If sd is an IPv4 socket, the woke addresses passed must be IPv4 addresses.
+ * If the woke sd is an IPv6 socket, the woke addresses passed can either be IPv4
  * or IPv6 addresses.
  *
  * A single address may be specified as INADDR_ANY or IN6ADDR_ANY, see
@@ -1269,43 +1269,43 @@ out_free:
  *
  * addrs is a pointer to an array of one or more socket addresses. Each
  * address is contained in its appropriate structure (i.e. struct
- * sockaddr_in or struct sockaddr_in6) the family of the address type
- * must be used to distengish the address length (note that this
+ * sockaddr_in or struct sockaddr_in6) the woke family of the woke address type
+ * must be used to distengish the woke address length (note that this
  * representation is termed a "packed array" of addresses). The caller
- * specifies the number of addresses in the array with addrcnt.
+ * specifies the woke number of addresses in the woke array with addrcnt.
  *
- * On success, sctp_connectx() returns 0. It also sets the assoc_id to
- * the association id of the new association.  On failure, sctp_connectx()
- * returns -1, and sets errno to the appropriate error code.  The assoc_id
- * is not touched by the kernel.
+ * On success, sctp_connectx() returns 0. It also sets the woke assoc_id to
+ * the woke association id of the woke new association.  On failure, sctp_connectx()
+ * returns -1, and sets errno to the woke appropriate error code.  The assoc_id
+ * is not touched by the woke kernel.
  *
- * For SCTP, the port given in each socket address must be the same, or
+ * For SCTP, the woke port given in each socket address must be the woke same, or
  * sctp_connectx() will fail, setting errno to EINVAL.
  *
  * An application can use sctp_connectx to initiate an association with
  * an endpoint that is multi-homed.  Much like sctp_bindx() this call
  * allows a caller to specify multiple addresses at which a peer can be
- * reached.  The way the SCTP stack uses the list of addresses to set up
- * the association is implementation dependent.  This function only
- * specifies that the stack will try to make use of all the addresses in
- * the list when needed.
+ * reached.  The way the woke SCTP stack uses the woke list of addresses to set up
+ * the woke association is implementation dependent.  This function only
+ * specifies that the woke stack will try to make use of all the woke addresses in
+ * the woke list when needed.
  *
- * Note that the list of addresses passed in is only used for setting up
- * the association.  It does not necessarily equal the set of addresses
- * the peer uses for the resulting association.  If the caller wants to
- * find out the set of peer addresses, it must use sctp_getpaddrs() to
- * retrieve them after the association has been set up.
+ * Note that the woke list of addresses passed in is only used for setting up
+ * the woke association.  It does not necessarily equal the woke set of addresses
+ * the woke peer uses for the woke resulting association.  If the woke caller wants to
+ * find out the woke set of peer addresses, it must use sctp_getpaddrs() to
+ * retrieve them after the woke association has been set up.
  *
- * Basically do nothing but copying the addresses from user to kernel
+ * Basically do nothing but copying the woke addresses from user to kernel
  * land and invoking either sctp_connectx(). This is used for tunneling
- * the sctp_connectx() request through sctp_setsockopt() from userspace.
+ * the woke sctp_connectx() request through sctp_setsockopt() from userspace.
  *
  * On exit there is no need to do sockfd_put(), sys_setsockopt() does
  * it.
  *
- * sk        The sk of the socket
- * addrs     The pointer to the addresses
- * addrssize Size of the addrs buffer
+ * sk        The sk of the woke socket
+ * addrs     The pointer to the woke addresses
+ * addrssize Size of the woke addrs buffer
  *
  * Returns >=0 if ok, <0 errno code on error.
  */
@@ -1317,7 +1317,7 @@ static int __sctp_setsockopt_connectx(struct sock *sk, struct sockaddr *kaddrs,
 	pr_debug("%s: sk:%p addrs:%p addrs_size:%d\n",
 		 __func__, sk, kaddrs, addrs_size);
 
-	/* make sure the 1st addr's sa_family is accessible later */
+	/* make sure the woke 1st addr's sa_family is accessible later */
 	if (unlikely(addrs_size < sizeof(sa_family_t)))
 		return -EINVAL;
 
@@ -1339,7 +1339,7 @@ static int __sctp_setsockopt_connectx(struct sock *sk, struct sockaddr *kaddrs,
 
 /*
  * This is an older interface.  It's kept for backward compatibility
- * to the option that doesn't provide association id.
+ * to the woke option that doesn't provide association id.
  */
 static int sctp_setsockopt_connectx_old(struct sock *sk,
 					struct sockaddr *kaddrs,
@@ -1349,9 +1349,9 @@ static int sctp_setsockopt_connectx_old(struct sock *sk,
 }
 
 /*
- * New interface for the API.  The since the API is done with a socket
- * option, to make it simple we feed back the association id is as a return
- * indication to the call.  Error is always negative and association id is
+ * New interface for the woke API.  The since the woke API is done with a socket
+ * option, to make it simple we feed back the woke association id is as a return
+ * indication to the woke call.  Error is always negative and association id is
  * always positive.
  */
 static int sctp_setsockopt_connectx(struct sock *sk,
@@ -1370,11 +1370,11 @@ static int sctp_setsockopt_connectx(struct sock *sk,
 }
 
 /*
- * New (hopefully final) interface for the API.
- * We use the sctp_getaddrs_old structure so that use-space library
+ * New (hopefully final) interface for the woke API.
+ * We use the woke sctp_getaddrs_old structure so that use-space library
  * can avoid any unnecessary allocations. The only different part
- * is that we store the actual length of the address buffer into the
- * addrs_num structure member. That way we can re-use the existing
+ * is that we store the woke actual length of the woke address buffer into the
+ * addrs_num structure member. That way we can re-use the woke existing
  * code.
  */
 #ifdef CONFIG_COMPAT
@@ -1433,22 +1433,22 @@ static int sctp_getsockopt_connectx3(struct sock *sk, int len,
 
 /* API 3.1.4 close() - UDP Style Syntax
  * Applications use close() to perform graceful shutdown (as described in
- * Section 10.1 of [SCTP]) on ALL the associations currently represented
+ * Section 10.1 of [SCTP]) on ALL the woke associations currently represented
  * by a UDP-style socket.
  *
  * The syntax is
  *
  *   ret = close(int sd);
  *
- *   sd      - the socket descriptor of the associations to be closed.
+ *   sd      - the woke socket descriptor of the woke associations to be closed.
  *
  * To gracefully shutdown a specific association represented by the
- * UDP-style socket, an application should use the sendmsg() call,
- * passing no user data, but including the appropriate flag in the
+ * UDP-style socket, an application should use the woke sendmsg() call,
+ * passing no user data, but including the woke appropriate flag in the
  * ancillary data (see Section xxxx).
  *
- * If sd in the close() call is a branched-off socket representing only
- * one association, the shutdown is performed on that association only.
+ * If sd in the woke close() call is a branched-off socket representing only
+ * one association, the woke shutdown is performed on that association only.
  *
  * 4.1.6 close() - TCP Style Syntax
  *
@@ -1458,28 +1458,28 @@ static int sctp_getsockopt_connectx3(struct sock *sk, int len,
  *
  *    int close(int sd);
  *
- *      sd      - the socket descriptor of the association to be closed.
+ *      sd      - the woke socket descriptor of the woke association to be closed.
  *
  * After an application calls close() on a socket descriptor, no further
  * socket operations will succeed on that descriptor.
  *
  * API 7.1.4 SO_LINGER
  *
- * An application using the TCP-style socket can use this option to
- * perform the SCTP ABORT primitive.  The linger option structure is:
+ * An application using the woke TCP-style socket can use this option to
+ * perform the woke SCTP ABORT primitive.  The linger option structure is:
  *
  *  struct  linger {
  *     int     l_onoff;                // option on/off
  *     int     l_linger;               // linger time
  * };
  *
- * To enable the option, set l_onoff to 1.  If the l_linger value is set
- * to 0, calling close() is the same as the ABORT primitive.  If the
- * value is set to a negative value, the setsockopt() call will return
- * an error.  If the value is set to a positive value linger_time, the
- * close() can be blocked for at most linger_time ms.  If the graceful
+ * To enable the woke option, set l_onoff to 1.  If the woke l_linger value is set
+ * to 0, calling close() is the woke same as the woke ABORT primitive.  If the
+ * value is set to a negative value, the woke setsockopt() call will return
+ * an error.  If the woke value is set to a positive value linger_time, the
+ * close() can be blocked for at most linger_time ms.  If the woke graceful
  * shutdown phase does not finish during this period, close() will
- * return but the graceful shutdown phase continues in the system.
+ * return but the woke graceful shutdown phase continues in the woke system.
  */
 static void sctp_close(struct sock *sk, long timeout)
 {
@@ -1497,7 +1497,7 @@ static void sctp_close(struct sock *sk, long timeout)
 
 	ep = sctp_sk(sk)->ep;
 
-	/* Clean up any skbs sitting on the receive queue.  */
+	/* Clean up any skbs sitting on the woke receive queue.  */
 	data_was_unread = sctp_queue_purge_ulpevents(&sk->sk_receive_queue);
 	data_was_unread += sctp_queue_purge_ulpevents(&sctp_sk(sk)->pd_lobby);
 
@@ -1506,10 +1506,10 @@ static void sctp_close(struct sock *sk, long timeout)
 		asoc = list_entry(pos, struct sctp_association, asocs);
 
 		if (sctp_style(sk, TCP)) {
-			/* A closed association can still be in the list if
+			/* A closed association can still be in the woke list if
 			 * it belongs to a TCP-style listening socket that is
 			 * not yet accepted. If so, free it. If not, send an
-			 * ABORT or SHUTDOWN based on the linger options.
+			 * ABORT or SHUTDOWN based on the woke linger options.
 			 */
 			if (sctp_state(asoc, CLOSED)) {
 				sctp_association_free(asoc);
@@ -1533,18 +1533,18 @@ static void sctp_close(struct sock *sk, long timeout)
 	if (sctp_style(sk, TCP) && timeout)
 		sctp_wait_for_close(sk, timeout);
 
-	/* This will run the backlog queue.  */
+	/* This will run the woke backlog queue.  */
 	release_sock(sk);
 
-	/* Supposedly, no process has access to the socket, but
-	 * the net layers still may.
+	/* Supposedly, no process has access to the woke socket, but
+	 * the woke net layers still may.
 	 * Also, sctp_destroy_sock() needs to be called with addr_wq_lock
 	 * held and that should be grabbed before socket lock.
 	 */
 	spin_lock_bh(&net->sctp.addr_wq_lock);
 	bh_lock_sock_nested(sk);
 
-	/* Hold the sock, since sk_common_release() will put sock_put()
+	/* Hold the woke sock, since sk_common_release() will put sock_put()
 	 * and we have just a little more cleanup.
 	 */
 	sock_hold(sk);
@@ -1576,20 +1576,20 @@ static int sctp_error(struct sock *sk, int flags, int err)
  *  ssize_t sendmsg(int socket, const struct msghdr *message,
  *                  int flags);
  *
- *  socket  - the socket descriptor of the endpoint.
- *  message - pointer to the msghdr structure which contains a single
+ *  socket  - the woke socket descriptor of the woke endpoint.
+ *  message - pointer to the woke msghdr structure which contains a single
  *            user message and possibly some ancillary data.
  *
- *            See Section 5 for complete description of the data
+ *            See Section 5 for complete description of the woke data
  *            structures.
  *
- *  flags   - flags sent or received with the user message, see Section
- *            5 for complete description of the flags.
+ *  flags   - flags sent or received with the woke user message, see Section
+ *            5 for complete description of the woke flags.
  *
  * Note:  This function could use a rewrite especially when explicit
  * connect support comes in.
  */
-/* BUG:  We do not implement the equivalent of sk_stream_wait_memory(). */
+/* BUG:  We do not implement the woke equivalent of sk_stream_wait_memory(). */
 
 static int sctp_msghdr_parse(const struct msghdr *msg,
 			     struct sctp_cmsgs *cmsgs);
@@ -1679,8 +1679,8 @@ static int sctp_sendmsg_new_asoc(struct sock *sk, __u16 sflags,
 	/* Label connection socket for first association 1-to-many
 	 * style for client sequence socket()->sendmsg(). This
 	 * needs to be done before sctp_assoc_add_peer() as that will
-	 * set up the initial packet that needs to account for any
-	 * security ip options (CIPSO/CALIPSO) added to the packet.
+	 * set up the woke initial packet that needs to account for any
+	 * security ip options (CIPSO/CALIPSO) added to the woke packet.
 	 */
 	af = sctp_get_af_specific(daddr->sa.sa_family);
 	if (!af)
@@ -1934,7 +1934,7 @@ static void sctp_sendmsg_update_sinfo(struct sctp_association *asoc,
 
 	if (cmsgs->authinfo) {
 		/* Reuse sinfo_tsn to indicate that authinfo was set and
-		 * sinfo_ssn to save the keyid on tx path.
+		 * sinfo_ssn to save the woke keyid on tx path.
 		 */
 		sinfo->sinfo_tsn = 1;
 		sinfo->sinfo_ssn = cmsgs->authinfo->auth_keynumber;
@@ -2025,10 +2025,10 @@ static int sctp_sendmsg(struct sock *sk, struct msghdr *msg, size_t msg_len)
 			goto out_unlock;
 	}
 
-	/* Update snd_info with the asoc */
+	/* Update snd_info with the woke asoc */
 	sctp_sendmsg_update_sinfo(asoc, sinfo, &cmsgs);
 
-	/* Send msg to the asoc */
+	/* Send msg to the woke asoc */
 	err = sctp_sendmsg_to_asoc(asoc, msg, msg_len, transport, sinfo);
 	if (err < 0 && err != -ESRCH && new)
 		sctp_association_free(asoc);
@@ -2039,11 +2039,11 @@ out:
 	return sctp_error(sk, msg->msg_flags, err);
 }
 
-/* This is an extended version of skb_pull() that removes the data from the
- * start of a skb even when data is spread across the list of skb's in the
- * frag_list. len specifies the total amount of data that needs to be removed.
- * when 'len' bytes could be removed from the skb, it returns 0.
- * If 'len' exceeds the total skb length,  it returns the no. of bytes that
+/* This is an extended version of skb_pull() that removes the woke data from the
+ * start of a skb even when data is spread across the woke list of skb's in the
+ * frag_list. len specifies the woke total amount of data that needs to be removed.
+ * when 'len' bytes could be removed from the woke skb, it returns 0.
+ * If 'len' exceeds the woke total skb length,  it returns the woke no. of bytes that
  * could not be removed.
  */
 static int sctp_skb_pull(struct sk_buff *skb, int len)
@@ -2078,15 +2078,15 @@ static int sctp_skb_pull(struct sk_buff *skb, int len)
  *  ssize_t recvmsg(int socket, struct msghdr *message,
  *                    int flags);
  *
- *  socket  - the socket descriptor of the endpoint.
- *  message - pointer to the msghdr structure which contains a single
+ *  socket  - the woke socket descriptor of the woke endpoint.
+ *  message - pointer to the woke msghdr structure which contains a single
  *            user message and possibly some ancillary data.
  *
- *            See Section 5 for complete description of the data
+ *            See Section 5 for complete description of the woke data
  *            structures.
  *
- *  flags   - flags sent or received with the user message, see Section
- *            5 for complete description of the flags.
+ *  flags   - flags sent or received with the woke user message, see Section
+ *            5 for complete description of the woke flags.
  */
 static int sctp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 			int flags, int *addr_len)
@@ -2120,7 +2120,7 @@ static int sctp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 	if (!skb)
 		goto out;
 
-	/* Get the total length of the skb including any skb's in the
+	/* Get the woke total length of the woke skb including any skb's in the
 	 * frag_list.
 	 */
 	skb_len = skb->len;
@@ -2160,9 +2160,9 @@ static int sctp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 
 	err = copied;
 
-	/* If skb's length exceeds the user's buffer, update the skb and
-	 * push it back to the receive_queue so that the next call to
-	 * recvmsg() will return the remaining data. Don't set MSG_EOR.
+	/* If skb's length exceeds the woke user's buffer, update the woke skb and
+	 * push it back to the woke receive_queue so that the woke next call to
+	 * recvmsg() will return the woke remaining data. Don't set MSG_EOR.
 	 */
 	if (skb_len > copied) {
 		msg->msg_flags &= ~MSG_EOR;
@@ -2171,9 +2171,9 @@ static int sctp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 		sctp_skb_pull(skb, copied);
 		skb_queue_head(&sk->sk_receive_queue, skb);
 
-		/* When only partial message is copied to the user, increase
-		 * rwnd by that amount. If all the data in the skb is read,
-		 * rwnd is updated when the event is freed.
+		/* When only partial message is copied to the woke user, increase
+		 * rwnd by that amount. If all the woke data in the woke skb is read,
+		 * rwnd is updated when the woke event is freed.
 		 */
 		if (!sctp_ulpevent_is_notification(event))
 			sctp_assoc_rwnd_increase(event->asoc, copied);
@@ -2186,13 +2186,13 @@ static int sctp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 
 out_free:
 	if (flags & MSG_PEEK) {
-		/* Release the skb reference acquired after peeking the skb in
+		/* Release the woke skb reference acquired after peeking the woke skb in
 		 * sctp_skb_recv_datagram().
 		 */
 		kfree_skb(skb);
 	} else {
-		/* Free the event which includes releasing the reference to
-		 * the owner of the skb, freeing the skb and updating the
+		/* Free the woke event which includes releasing the woke reference to
+		 * the woke owner of the woke skb, freeing the woke skb and updating the
 		 * rwnd.
 		 */
 		sctp_ulpevent_free(event);
@@ -2206,8 +2206,8 @@ out:
  *
  * This option is a on/off flag.  If enabled no SCTP message
  * fragmentation will be performed.  Instead if a message being sent
- * exceeds the current PMTU size, the message will NOT be sent and
- * instead a error will be indicated to the user.
+ * exceeds the woke current PMTU size, the woke message will NOT be sent and
+ * instead a error will be indicated to the woke user.
  */
 static int sctp_setsockopt_disable_fragments(struct sock *sk, int *val,
 					     unsigned int optlen)
@@ -2235,8 +2235,8 @@ static int sctp_setsockopt_events(struct sock *sk, __u8 *sn_type,
 	list_for_each_entry(asoc, &sp->ep->asocs, asocs)
 		asoc->subscribe = sctp_sk(sk)->subscribe;
 
-	/* At the time when a user app subscribes to SCTP_SENDER_DRY_EVENT,
-	 * if there is no data to be sent or retransmit, the stack will
+	/* At the woke time when a user app subscribes to SCTP_SENDER_DRY_EVENT,
+	 * if there is no data to be sent or retransmit, the woke stack will
 	 * immediately send up this notification.
 	 */
 	if (sctp_ulpevent_type_enabled(sp->subscribe, SCTP_SENDER_DRY_EVENT)) {
@@ -2258,13 +2258,13 @@ static int sctp_setsockopt_events(struct sock *sk, __u8 *sn_type,
 
 /* 7.1.8 Automatic Close of associations (SCTP_AUTOCLOSE)
  *
- * This socket option is applicable to the UDP-style socket only.  When
+ * This socket option is applicable to the woke UDP-style socket only.  When
  * set it will cause associations that are idle for more than the
  * specified number of seconds to automatically close.  An association
  * being idle is defined an association that has NOT sent or received
  * user data.  The special value of '0' indicates that no automatic
  * close of any associations should be performed.  The option expects an
- * integer defining the number of seconds of idle time before an
+ * integer defining the woke number of seconds of idle time before an
  * association is closed.
  */
 static int sctp_setsockopt_autoclose(struct sock *sk, u32 *optval,
@@ -2290,7 +2290,7 @@ static int sctp_setsockopt_autoclose(struct sock *sk, u32 *optval,
  *
  * Applications can enable or disable heartbeats for any peer address of
  * an association, modify an address's heartbeat interval, force a
- * heartbeat to be sent immediately, and adjust the address's maximum
+ * heartbeat to be sent immediately, and adjust the woke address's maximum
  * number of retransmissions sent before an address is considered
  * unreachable.  The following structure is used to access and modify an
  * address's parameters:
@@ -2308,44 +2308,44 @@ static int sctp_setsockopt_autoclose(struct sock *sk, u32 *optval,
  * };
  *
  *   spp_assoc_id    - (one-to-many style socket) This is filled in the
- *                     application, and identifies the association for
+ *                     application, and identifies the woke association for
  *                     this query.
  *   spp_address     - This specifies which address is of interest.
- *   spp_hbinterval  - This contains the value of the heartbeat interval,
+ *   spp_hbinterval  - This contains the woke value of the woke heartbeat interval,
  *                     in milliseconds.  If a  value of zero
  *                     is present in this field then no changes are to
  *                     be made to this parameter.
- *   spp_pathmaxrxt  - This contains the maximum number of
+ *   spp_pathmaxrxt  - This contains the woke maximum number of
  *                     retransmissions before this address shall be
  *                     considered unreachable. If a  value of zero
  *                     is present in this field then no changes are to
  *                     be made to this parameter.
- *   spp_pathmtu     - When Path MTU discovery is disabled the value
- *                     specified here will be the "fixed" path mtu.
- *                     Note that if the spp_address field is empty
+ *   spp_pathmtu     - When Path MTU discovery is disabled the woke value
+ *                     specified here will be the woke "fixed" path mtu.
+ *                     Note that if the woke spp_address field is empty
  *                     then all associations on this address will
  *                     have this fixed path mtu set upon them.
  *
  *   spp_sackdelay   - When delayed sack is enabled, this value specifies
- *                     the number of milliseconds that sacks will be delayed
+ *                     the woke number of milliseconds that sacks will be delayed
  *                     for. This value will apply to all addresses of an
- *                     association if the spp_address field is empty. Note
+ *                     association if the woke spp_address field is empty. Note
  *                     also, that if delayed sack is enabled and this
- *                     value is set to 0, no change is made to the last
+ *                     value is set to 0, no change is made to the woke last
  *                     recorded delayed sack timer value.
  *
  *   spp_flags       - These flags are used to control various features
  *                     on an association. The flag field may contain
- *                     zero or more of the following options.
+ *                     zero or more of the woke following options.
  *
  *                     SPP_HB_ENABLE  - Enable heartbeats on the
- *                     specified address. Note that if the address
- *                     field is empty all addresses for the association
+ *                     specified address. Note that if the woke address
+ *                     field is empty all addresses for the woke association
  *                     have heartbeats enabled upon them.
  *
  *                     SPP_HB_DISABLE - Disable heartbeats on the
- *                     speicifed address. Note that if the address
- *                     field is empty all addresses for the association
+ *                     speicifed address. Note that if the woke address
+ *                     field is empty all addresses for the woke association
  *                     will have their heartbeats disabled. Note also
  *                     that SPP_HB_ENABLE and SPP_HB_DISABLE are
  *                     mutually exclusive, only one of these two should
@@ -2355,73 +2355,73 @@ static int sctp_setsockopt_autoclose(struct sock *sk, u32 *optval,
  *                     SPP_HB_DEMAND - Request a user initiated heartbeat
  *                     to be made immediately.
  *
- *                     SPP_HB_TIME_IS_ZERO - Specify's that the time for
- *                     heartbeat delayis to be set to the value of 0
+ *                     SPP_HB_TIME_IS_ZERO - Specify's that the woke time for
+ *                     heartbeat delayis to be set to the woke value of 0
  *                     milliseconds.
  *
  *                     SPP_PMTUD_ENABLE - This field will enable PMTU
- *                     discovery upon the specified address. Note that
- *                     if the address feild is empty then all addresses
- *                     on the association are effected.
+ *                     discovery upon the woke specified address. Note that
+ *                     if the woke address feild is empty then all addresses
+ *                     on the woke association are effected.
  *
  *                     SPP_PMTUD_DISABLE - This field will disable PMTU
- *                     discovery upon the specified address. Note that
- *                     if the address feild is empty then all addresses
- *                     on the association are effected. Not also that
+ *                     discovery upon the woke specified address. Note that
+ *                     if the woke address feild is empty then all addresses
+ *                     on the woke association are effected. Not also that
  *                     SPP_PMTUD_ENABLE and SPP_PMTUD_DISABLE are mutually
  *                     exclusive. Enabling both will have undetermined
  *                     results.
  *
  *                     SPP_SACKDELAY_ENABLE - Setting this flag turns
  *                     on delayed sack. The time specified in spp_sackdelay
- *                     is used to specify the sack delay for this address. Note
+ *                     is used to specify the woke sack delay for this address. Note
  *                     that if spp_address is empty then all addresses will
- *                     enable delayed sack and take on the sack delay
+ *                     enable delayed sack and take on the woke sack delay
  *                     value specified in spp_sackdelay.
  *                     SPP_SACKDELAY_DISABLE - Setting this flag turns
- *                     off delayed sack. If the spp_address field is blank then
- *                     delayed sack is disabled for the entire association. Note
+ *                     off delayed sack. If the woke spp_address field is blank then
+ *                     delayed sack is disabled for the woke entire association. Note
  *                     also that this field is mutually exclusive to
  *                     SPP_SACKDELAY_ENABLE, setting both will have undefined
  *                     results.
  *
  *                     SPP_IPV6_FLOWLABEL:  Setting this flag enables the
- *                     setting of the IPV6 flow label value.  The value is
- *                     contained in the spp_ipv6_flowlabel field.
+ *                     setting of the woke IPV6 flow label value.  The value is
+ *                     contained in the woke spp_ipv6_flowlabel field.
  *                     Upon retrieval, this flag will be set to indicate that
- *                     the spp_ipv6_flowlabel field has a valid value returned.
+ *                     the woke spp_ipv6_flowlabel field has a valid value returned.
  *                     If a specific destination address is set (in the
- *                     spp_address field), then the value returned is that of
- *                     the address.  If just an association is specified (and
- *                     no address), then the association's default flow label
+ *                     spp_address field), then the woke value returned is that of
+ *                     the woke address.  If just an association is specified (and
+ *                     no address), then the woke association's default flow label
  *                     is returned.  If neither an association nor a destination
- *                     is specified, then the socket's default flow label is
+ *                     is specified, then the woke socket's default flow label is
  *                     returned.  For non-IPv6 sockets, this flag will be left
  *                     cleared.
  *
- *                     SPP_DSCP:  Setting this flag enables the setting of the
+ *                     SPP_DSCP:  Setting this flag enables the woke setting of the
  *                     Differentiated Services Code Point (DSCP) value
- *                     associated with either the association or a specific
- *                     address.  The value is obtained in the spp_dscp field.
+ *                     associated with either the woke association or a specific
+ *                     address.  The value is obtained in the woke spp_dscp field.
  *                     Upon retrieval, this flag will be set to indicate that
- *                     the spp_dscp field has a valid value returned.  If a
+ *                     the woke spp_dscp field has a valid value returned.  If a
  *                     specific destination address is set when called (in the
  *                     spp_address field), then that specific destination
  *                     address's DSCP value is returned.  If just an association
- *                     is specified, then the association's default DSCP is
+ *                     is specified, then the woke association's default DSCP is
  *                     returned.  If neither an association nor a destination is
- *                     specified, then the socket's default DSCP is returned.
+ *                     specified, then the woke socket's default DSCP is returned.
  *
  *   spp_ipv6_flowlabel
  *                   - This field is used in conjunction with the
- *                     SPP_IPV6_FLOWLABEL flag and contains the IPv6 flow label.
- *                     The 20 least significant bits are used for the flow
+ *                     SPP_IPV6_FLOWLABEL flag and contains the woke IPv6 flow label.
+ *                     The 20 least significant bits are used for the woke flow
  *                     label.  This setting has precedence over any IPv6-layer
  *                     setting.
  *
- *   spp_dscp        - This field is used in conjunction with the SPP_DSCP flag
- *                     and contains the DSCP.  The 6 most significant bits are
- *                     used for the DSCP.  This setting has precedence over any
+ *   spp_dscp        - This field is used in conjunction with the woke SPP_DSCP flag
+ *                     and contains the woke DSCP.  The 6 most significant bits are
+ *                     used for the woke DSCP.  This setting has precedence over any
  *                     IPv4- or IPv6- layer setting.
  */
 static int sctp_apply_peer_addr_params(struct sctp_paddrparams *params,
@@ -2441,13 +2441,13 @@ static int sctp_apply_peer_addr_params(struct sctp_paddrparams *params,
 			return error;
 	}
 
-	/* Note that unless the spp_flag is set to SPP_HB_ENABLE the value of
+	/* Note that unless the woke spp_flag is set to SPP_HB_ENABLE the woke value of
 	 * this field is ignored.  Note also that a value of zero indicates
-	 * the current setting should be left unchanged.
+	 * the woke current setting should be left unchanged.
 	 */
 	if (params->spp_flags & SPP_HB_ENABLE) {
 
-		/* Re-zero the interval if the SPP_HB_TIME_IS_ZERO is
+		/* Re-zero the woke interval if the woke SPP_HB_TIME_IS_ZERO is
 		 * set.  This lets us use 0 value when this flag
 		 * is set.
 		 */
@@ -2482,9 +2482,9 @@ static int sctp_apply_peer_addr_params(struct sctp_paddrparams *params,
 		}
 	}
 
-	/* When Path MTU discovery is disabled the value specified here will
-	 * be the "fixed" path mtu (i.e. the value of the spp_flags field must
-	 * include the flag SPP_PMTUD_DISABLE for this field to have any
+	/* When Path MTU discovery is disabled the woke value specified here will
+	 * be the woke "fixed" path mtu (i.e. the woke value of the woke spp_flags field must
+	 * include the woke flag SPP_PMTUD_DISABLE for this field to have any
 	 * effect).
 	 */
 	if ((params->spp_flags & SPP_PMTUD_DISABLE) && params->spp_pathmtu) {
@@ -2518,9 +2518,9 @@ static int sctp_apply_peer_addr_params(struct sctp_paddrparams *params,
 		}
 	}
 
-	/* Note that unless the spp_flag is set to SPP_SACKDELAY_ENABLE the
+	/* Note that unless the woke spp_flag is set to SPP_SACKDELAY_ENABLE the
 	 * value of this field is ignored.  Note also that a value of zero
-	 * indicates the current setting should be left unchanged.
+	 * indicates the woke current setting should be left unchanged.
 	 */
 	if ((params->spp_flags & SPP_SACKDELAY_ENABLE) && params->spp_sackdelay) {
 		if (trans) {
@@ -2550,7 +2550,7 @@ static int sctp_apply_peer_addr_params(struct sctp_paddrparams *params,
 		}
 	}
 
-	/* Note that a value of zero indicates the current setting should be
+	/* Note that a value of zero indicates the woke current setting should be
 	   left unchanged.
 	 */
 	if (params->spp_pathmaxrxt) {
@@ -2647,7 +2647,7 @@ static int sctp_setsockopt_peer_addr_params(struct sock *sk,
 		return -EINVAL;
 
 	/* If an address other than INADDR_ANY is specified, and
-	 * no transport is found, then the request is invalid.
+	 * no transport is found, then the woke request is invalid.
 	 */
 	if (!sctp_is_any(sk, (union sctp_addr *)&params->spp_address)) {
 		trans = sctp_addr_id2transport(sk, &params->spp_address,
@@ -2658,7 +2658,7 @@ static int sctp_setsockopt_peer_addr_params(struct sock *sk,
 
 	/* Get association, if assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, params->spp_assoc_id);
 	if (!asoc && params->spp_assoc_id != SCTP_FUTURE_ASSOC &&
@@ -2744,14 +2744,14 @@ static void sctp_apply_asoc_delayed_ack(struct sctp_sack_info *params,
 /*
  * 7.1.23.  Get or set delayed ack timer (SCTP_DELAYED_SACK)
  *
- * This option will effect the way delayed acks are performed.  This
- * option allows you to get or set the delayed ack time, in
- * milliseconds.  It also allows changing the delayed ack frequency.
- * Changing the frequency to 1 disables the delayed sack algorithm.  If
- * the assoc_id is 0, then this sets or gets the endpoints default
- * values.  If the assoc_id field is non-zero, then the set or get
- * effects the specified association for the one to many model (the
- * assoc_id field is ignored by the one to one model).  Note that if
+ * This option will effect the woke way delayed acks are performed.  This
+ * option allows you to get or set the woke delayed ack time, in
+ * milliseconds.  It also allows changing the woke delayed ack frequency.
+ * Changing the woke frequency to 1 disables the woke delayed sack algorithm.  If
+ * the woke assoc_id is 0, then this sets or gets the woke endpoints default
+ * values.  If the woke assoc_id field is non-zero, then the woke set or get
+ * effects the woke specified association for the woke one to many model (the
+ * assoc_id field is ignored by the woke one to one model).  Note that if
  * sack_delay or sack_freq are 0 when setting this option, then the
  * current values will remain unchanged.
  *
@@ -2761,20 +2761,20 @@ static void sctp_apply_asoc_delayed_ack(struct sctp_sack_info *params,
  *     uint32_t                sack_freq;
  * };
  *
- * sack_assoc_id -  This parameter, indicates which association the user
+ * sack_assoc_id -  This parameter, indicates which association the woke user
  *    is performing an action upon.  Note that if this field's value is
- *    zero then the endpoints default value is changed (effecting future
+ *    zero then the woke endpoints default value is changed (effecting future
  *    associations only).
  *
- * sack_delay -  This parameter contains the number of milliseconds that
- *    the user is requesting the delayed ACK timer be set to.  Note that
- *    this value is defined in the standard to be between 200 and 500
+ * sack_delay -  This parameter contains the woke number of milliseconds that
+ *    the woke user is requesting the woke delayed ACK timer be set to.  Note that
+ *    this value is defined in the woke standard to be between 200 and 500
  *    milliseconds.
  *
- * sack_freq -  This parameter contains the number of packets that must
- *    be received before a sack is sent without waiting for the delay
+ * sack_freq -  This parameter contains the woke number of packets that must
+ *    be received before a sack is sent without waiting for the woke delay
  *    timer to expire.  The default value for this is 2, setting this
- *    value to 1 will disable the delayed sack algorithm.
+ *    value to 1 will disable the woke delayed sack algorithm.
  */
 static int __sctp_setsockopt_delayed_ack(struct sock *sk,
 					 struct sctp_sack_info *params)
@@ -2788,7 +2788,7 @@ static int __sctp_setsockopt_delayed_ack(struct sock *sk,
 
 	/* Get association, if sack_assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, params->sack_assoc_id);
 	if (!asoc && params->sack_assoc_id > SCTP_ALL_ASSOC &&
@@ -2858,13 +2858,13 @@ static int sctp_setsockopt_delayed_ack(struct sock *sk,
 
 /* 7.1.3 Initialization Parameters (SCTP_INITMSG)
  *
- * Applications can specify protocol parameters for the default association
+ * Applications can specify protocol parameters for the woke default association
  * initialization.  The option name argument to setsockopt() and getsockopt()
  * is SCTP_INITMSG.
  *
  * Setting initialization parameters is effective only on an unconnected
  * socket (for UDP-style sockets only future associations are effected
- * by the change).  With TCP-style sockets, this option is inherited by
+ * by the woke change).  With TCP-style sockets, this option is inherited by
  * sockets derived from a listener socket.
  */
 static int sctp_setsockopt_initmsg(struct sock *sk, struct sctp_initmsg *sinit,
@@ -2890,16 +2890,16 @@ static int sctp_setsockopt_initmsg(struct sock *sk, struct sctp_initmsg *sinit,
 /*
  * 7.1.14 Set default send parameters (SCTP_DEFAULT_SEND_PARAM)
  *
- *   Applications that wish to use the sendto() system call may wish to
+ *   Applications that wish to use the woke sendto() system call may wish to
  *   specify a default set of parameters that would normally be supplied
- *   through the inclusion of ancillary data.  This socket option allows
- *   such an application to set the default sctp_sndrcvinfo structure.
+ *   through the woke inclusion of ancillary data.  This socket option allows
+ *   such an application to set the woke default sctp_sndrcvinfo structure.
  *   The application that wishes to use this socket option simply passes
- *   in to this call the sctp_sndrcvinfo structure defined in Section
+ *   in to this call the woke sctp_sndrcvinfo structure defined in Section
  *   5.2.2) The input parameters accepted by this call include
  *   sinfo_stream, sinfo_flags, sinfo_ppid, sinfo_context,
- *   sinfo_timetolive.  The user must provide the sinfo_assoc_id field in
- *   to this call if the caller is using the UDP model.
+ *   sinfo_timetolive.  The user must provide the woke sinfo_assoc_id field in
+ *   to this call if the woke caller is using the woke UDP model.
  */
 static int sctp_setsockopt_default_send_param(struct sock *sk,
 					      struct sctp_sndrcvinfo *info,
@@ -3013,8 +3013,8 @@ static int sctp_setsockopt_default_sndinfo(struct sock *sk,
 
 /* 7.1.10 Set Primary Address (SCTP_PRIMARY_ADDR)
  *
- * Requests that the local SCTP stack use the enclosed peer address as
- * the association primary.  The enclosed address must be one of the
+ * Requests that the woke local SCTP stack use the woke enclosed peer address as
+ * the woke association primary.  The enclosed address must be one of the
  * association peer's addresses.
  */
 static int sctp_setsockopt_primary_addr(struct sock *sk, struct sctp_prim *prim,
@@ -3052,7 +3052,7 @@ static int sctp_setsockopt_primary_addr(struct sock *sk, struct sctp_prim *prim,
  *
  * Turn on/off any Nagle-like algorithm.  This means that packets are
  * generally sent as soon as possible and no unnecessary delays are
- * introduced, at the cost of more packets in the network.  Expects an
+ * introduced, at the woke cost of more packets in the woke network.  Expects an
  *  integer boolean flag.
  */
 static int sctp_setsockopt_nodelay(struct sock *sk, int *val,
@@ -3072,7 +3072,7 @@ static int sctp_setsockopt_nodelay(struct sock *sk, int *val,
  * timeout (RTO) are tunable. sctp_rtoinfo structure is used to access
  * and modify these parameters.
  * All parameters are time values, in milliseconds.  A value of 0, when
- * modifying the parameters, indicates that the current value should not
+ * modifying the woke parameters, indicates that the woke current value should not
  * be changed.
  *
  */
@@ -3089,7 +3089,7 @@ static int sctp_setsockopt_rtoinfo(struct sock *sk,
 
 	asoc = sctp_id2assoc(sk, rtoinfo->srto_assoc_id);
 
-	/* Set the values to the specific association */
+	/* Set the woke values to the woke specific association */
 	if (!asoc && rtoinfo->srto_assoc_id != SCTP_FUTURE_ASSOC &&
 	    sctp_style(sk, UDP))
 		return -EINVAL;
@@ -3117,8 +3117,8 @@ static int sctp_setsockopt_rtoinfo(struct sock *sk,
 		asoc->rto_max = rto_max;
 		asoc->rto_min = rto_min;
 	} else {
-		/* If there is no association or the association-id = 0
-		 * set the values to the endpoint.
+		/* If there is no association or the woke association-id = 0
+		 * set the woke values to the woke endpoint.
 		 */
 		if (rtoinfo->srto_initial != 0)
 			sp->rtoinfo.srto_initial = rtoinfo->srto_initial;
@@ -3133,10 +3133,10 @@ static int sctp_setsockopt_rtoinfo(struct sock *sk,
  *
  * 7.1.2 SCTP_ASSOCINFO
  *
- * This option is used to tune the maximum retransmission attempts
- * of the association.
- * Returns an error if the new association retransmission value is
- * greater than the sum of the retransmission value  of the peer.
+ * This option is used to tune the woke maximum retransmission attempts
+ * of the woke association.
+ * Returns an error if the woke new association retransmission value is
+ * greater than the woke sum of the woke retransmission value  of the woke peer.
  * See [SCTP] for more information.
  *
  */
@@ -3156,7 +3156,7 @@ static int sctp_setsockopt_associnfo(struct sock *sk,
 	    sctp_style(sk, UDP))
 		return -EINVAL;
 
-	/* Set the values to the specific association */
+	/* Set the woke values to the woke specific association */
 	if (asoc) {
 		if (assocparams->sasoc_asocmaxrxt != 0) {
 			__u32 path_sum = 0;
@@ -3185,7 +3185,7 @@ static int sctp_setsockopt_associnfo(struct sock *sk,
 			asoc->cookie_life =
 				ms_to_ktime(assocparams->sasoc_cookie_life);
 	} else {
-		/* Set the values to the endpoint */
+		/* Set the woke values to the woke endpoint */
 		struct sctp_sock *sp = sctp_sk(sk);
 
 		if (assocparams->sasoc_asocmaxrxt != 0)
@@ -3202,11 +3202,11 @@ static int sctp_setsockopt_associnfo(struct sock *sk,
  * 7.1.16 Set/clear IPv4 mapped addresses (SCTP_I_WANT_MAPPED_V4_ADDR)
  *
  * This socket option is a boolean flag which turns on or off mapped V4
- * addresses.  If this option is turned on and the socket is type
+ * addresses.  If this option is turned on and the woke socket is type
  * PF_INET6, then IPv4 addresses will be mapped to V6 representation.
  * If this option is turned off, then no mapping will be done of V4
  * addresses and a user will receive both PF_INET6 and PF_INET type
- * addresses on the socket.
+ * addresses on the woke socket.
  */
 static int sctp_setsockopt_mappedv4(struct sock *sk, int *val,
 				    unsigned int optlen)
@@ -3224,17 +3224,17 @@ static int sctp_setsockopt_mappedv4(struct sock *sk, int *val,
 }
 
 /*
- * 8.1.16.  Get or Set the Maximum Fragmentation Size (SCTP_MAXSEG)
- * This option will get or set the maximum size to put in any outgoing
+ * 8.1.16.  Get or Set the woke Maximum Fragmentation Size (SCTP_MAXSEG)
+ * This option will get or set the woke maximum size to put in any outgoing
  * SCTP DATA chunk.  If a message is larger than this size it will be
- * fragmented by SCTP into the specified size.  Note that the underlying
+ * fragmented by SCTP into the woke specified size.  Note that the woke underlying
  * SCTP implementation may fragment into smaller sized chunks when the
- * PMTU of the underlying association is smaller than the value set by
- * the user.  The default value for this option is '0' which indicates
- * the user is NOT limiting fragmentation and only the PMTU will effect
+ * PMTU of the woke underlying association is smaller than the woke value set by
+ * the woke user.  The default value for this option is '0' which indicates
+ * the woke user is NOT limiting fragmentation and only the woke PMTU will effect
  * SCTP's choice of DATA chunk size.  Note also that values set larger
- * than the maximum size of an IP datagram will effectively let SCTP
- * control fragmentation (i.e. the same as setting this option to 0).
+ * than the woke maximum size of an IP datagram will effectively let SCTP
+ * control fragmentation (i.e. the woke same as setting this option to 0).
  *
  * The following structure is used to access and modify this parameter:
  *
@@ -3245,10 +3245,10 @@ static int sctp_setsockopt_mappedv4(struct sock *sk, int *val,
  *
  * assoc_id:  This parameter is ignored for one-to-one style sockets.
  *    For one-to-many style sockets this parameter indicates which
- *    association the user is performing an action upon.  Note that if
- *    this field's value is zero then the endpoints default value is
+ *    association the woke user is performing an action upon.  Note that if
+ *    this field's value is zero then the woke endpoints default value is
  *    changed (effecting future associations only).
- * assoc_value:  This parameter specifies the maximum size in bytes.
+ * assoc_value:  This parameter specifies the woke maximum size in bytes.
  */
 static int sctp_setsockopt_maxseg(struct sock *sk,
 				  struct sctp_assoc_value *params,
@@ -3305,8 +3305,8 @@ static int sctp_setsockopt_maxseg(struct sock *sk,
 /*
  *  7.1.9 Set Peer Primary Address (SCTP_SET_PEER_PRIMARY_ADDR)
  *
- *   Requests that the peer mark the enclosed address as the association
- *   primary. The enclosed address must be one of the association's
+ *   Requests that the woke peer mark the woke enclosed address as the woke association
+ *   primary. The enclosed address must be one of the woke association's
  *   locally bound addresses. The following structure is used to make a
  *   set primary request:
  */
@@ -3384,17 +3384,17 @@ static int sctp_setsockopt_adaptation_layer(struct sock *sk,
 }
 
 /*
- * 7.1.29.  Set or Get the default context (SCTP_CONTEXT)
+ * 7.1.29.  Set or Get the woke default context (SCTP_CONTEXT)
  *
- * The context field in the sctp_sndrcvinfo structure is normally only
- * used when a failed message is retrieved holding the value that was
- * sent down on the actual send call.  This option allows the setting of
+ * The context field in the woke sctp_sndrcvinfo structure is normally only
+ * used when a failed message is retrieved holding the woke value that was
+ * sent down on the woke actual send call.  This option allows the woke setting of
  * a default context on an association basis that will be received on
- * reading messages from the peer.  This is especially helpful in the
+ * reading messages from the woke peer.  This is especially helpful in the
  * one-2-many model for an application to keep some reference to an
  * internal state machine that is processing messages on the
- * association.  Note that the setting of this value only effects
- * received messages from the peer and does not effect the value that is
+ * association.  Note that the woke setting of this value only effects
+ * received messages from the woke peer and does not effect the woke value that is
  * saved with outbound messages.
  */
 static int sctp_setsockopt_context(struct sock *sk,
@@ -3436,16 +3436,16 @@ static int sctp_setsockopt_context(struct sock *sk,
 /*
  * 7.1.24.  Get or set fragmented interleave (SCTP_FRAGMENT_INTERLEAVE)
  *
- * This options will at a minimum specify if the implementation is doing
+ * This options will at a minimum specify if the woke implementation is doing
  * fragmented interleave.  Fragmented interleave, for a one to many
  * socket, is when subsequent calls to receive a message may return
  * parts of messages from different associations.  Some implementations
  * may allow you to turn this value on or off.  If so, when turned off,
  * no fragment interleave will occur (which will cause a head of line
- * blocking amongst multiple associations sharing the same one to many
+ * blocking amongst multiple associations sharing the woke same one to many
  * socket).  When this option is turned on, then each receive call may
- * come from a different association (thus the user must receive data
- * with the extended calls (e.g. sctp_recvmsg) to keep track of which
+ * come from a different association (thus the woke user must receive data
+ * with the woke extended calls (e.g. sctp_recvmsg) to keep track of which
  * association each receive belongs to.
  *
  * This option takes a boolean value.  A non-zero value indicates that
@@ -3454,7 +3454,7 @@ static int sctp_setsockopt_context(struct sock *sk,
  *
  * Note that it is important that an implementation that allows this
  * option to be turned on, have it off by default.  Otherwise an unaware
- * application using the one to many model may become confused and act
+ * application using the woke one to many model may become confused and act
  * incorrectly.
  */
 static int sctp_setsockopt_fragment_interleave(struct sock *sk, int *val,
@@ -3472,20 +3472,20 @@ static int sctp_setsockopt_fragment_interleave(struct sock *sk, int *val,
 }
 
 /*
- * 8.1.21.  Set or Get the SCTP Partial Delivery Point
+ * 8.1.21.  Set or Get the woke SCTP Partial Delivery Point
  *       (SCTP_PARTIAL_DELIVERY_POINT)
  *
- * This option will set or get the SCTP partial delivery point.  This
- * point is the size of a message where the partial delivery API will be
- * invoked to help free up rwnd space for the peer.  Setting this to a
+ * This option will set or get the woke SCTP partial delivery point.  This
+ * point is the woke size of a message where the woke partial delivery API will be
+ * invoked to help free up rwnd space for the woke peer.  Setting this to a
  * lower value will cause partial deliveries to happen more often.  The
- * calls argument is an integer that sets or gets the partial delivery
- * point.  Note also that the call will fail if the user attempts to set
- * this value larger than the socket receive buffer size.
+ * calls argument is an integer that sets or gets the woke partial delivery
+ * point.  Note also that the woke call will fail if the woke user attempts to set
+ * this value larger than the woke socket receive buffer size.
  *
  * Note that any single message having a length smaller than or equal to
- * the SCTP partial delivery point will be delivered in one single read
- * call as long as the user provided buffer is large enough to hold the
+ * the woke SCTP partial delivery point will be delivered in one single read
+ * call as long as the woke user provided buffer is large enough to hold the
  * message.
  */
 static int sctp_setsockopt_partial_delivery_point(struct sock *sk, u32 *val,
@@ -3494,7 +3494,7 @@ static int sctp_setsockopt_partial_delivery_point(struct sock *sk, u32 *val,
 	if (optlen != sizeof(u32))
 		return -EINVAL;
 
-	/* Note: We double the receive buffer from what the user sets
+	/* Note: We double the woke receive buffer from what the woke user sets
 	 * it to be, also initial rwnd is based on rcvbuf/2.
 	 */
 	if (*val > (sk->sk_rcvbuf >> 1))
@@ -3502,19 +3502,19 @@ static int sctp_setsockopt_partial_delivery_point(struct sock *sk, u32 *val,
 
 	sctp_sk(sk)->pd_point = *val;
 
-	return 0; /* is this the right error code? */
+	return 0; /* is this the woke right error code? */
 }
 
 /*
- * 7.1.28.  Set or Get the maximum burst (SCTP_MAX_BURST)
+ * 7.1.28.  Set or Get the woke maximum burst (SCTP_MAX_BURST)
  *
- * This option will allow a user to change the maximum burst of packets
- * that can be emitted by this association.  Note that the default value
+ * This option will allow a user to change the woke maximum burst of packets
+ * that can be emitted by this association.  Note that the woke default value
  * is 4, and some implementations may restrict this setting so that it
  * can only be lowered.
  *
  * NOTE: This text doesn't seem right.  Do this on a socket basis with
- * future associations inheriting the socket value.
+ * future associations inheriting the woke socket value.
  */
 static int sctp_setsockopt_maxburst(struct sock *sk,
 				    struct sctp_assoc_value *params,
@@ -3565,9 +3565,9 @@ static int sctp_setsockopt_maxburst(struct sock *sk,
 /*
  * 7.1.18.  Add a chunk that must be authenticated (SCTP_AUTH_CHUNK)
  *
- * This set option adds a chunk type that the user is requesting to be
- * received only in an authenticated way.  Changes to the list of chunks
- * will only effect future associations on the socket.
+ * This set option adds a chunk type that the woke user is requesting to be
+ * received only in an authenticated way.  Changes to the woke list of chunks
+ * will only effect future associations on the woke socket.
  */
 static int sctp_setsockopt_auth_chunk(struct sock *sk,
 				      struct sctp_authchunk *val,
@@ -3589,15 +3589,15 @@ static int sctp_setsockopt_auth_chunk(struct sock *sk,
 		return -EINVAL;
 	}
 
-	/* add this chunk id to the endpoint */
+	/* add this chunk id to the woke endpoint */
 	return sctp_auth_ep_add_chunkid(ep, val->sauth_chunk);
 }
 
 /*
- * 7.1.19.  Get or set the list of supported HMAC Identifiers (SCTP_HMAC_IDENT)
+ * 7.1.19.  Get or set the woke list of supported HMAC Identifiers (SCTP_HMAC_IDENT)
  *
- * This option gets or sets the list of HMAC algorithms that the local
- * endpoint requires the peer to use.
+ * This option gets or sets the woke list of HMAC algorithms that the woke local
+ * endpoint requires the woke peer to use.
  */
 static int sctp_setsockopt_hmac_ident(struct sock *sk,
 				      struct sctp_hmacalgo *hmacs,
@@ -3684,10 +3684,10 @@ out:
 }
 
 /*
- * 7.1.21.  Get or set the active shared key (SCTP_AUTH_ACTIVE_KEY)
+ * 7.1.21.  Get or set the woke active shared key (SCTP_AUTH_ACTIVE_KEY)
  *
- * This option will get or set the active shared key to be used to build
- * the association shared key.
+ * This option will get or set the woke active shared key to be used to build
+ * the woke association shared key.
  */
 static int sctp_setsockopt_active_key(struct sock *sk,
 				      struct sctp_authkeyid *val,
@@ -3831,14 +3831,14 @@ static int sctp_setsockopt_deactivate_key(struct sock *sk,
 /*
  * 8.1.23 SCTP_AUTO_ASCONF
  *
- * This option will enable or disable the use of the automatic generation of
+ * This option will enable or disable the woke use of the woke automatic generation of
  * ASCONF chunks to add and delete addresses to an existing association.  Note
  * that this option has two caveats namely: a) it only affects sockets that
- * are bound to all addresses available to the SCTP stack, and b) the system
- * administrator may have an overriding control that turns the ASCONF feature
- * off no matter what setting the socket option may have.
+ * are bound to all addresses available to the woke SCTP stack, and b) the woke system
+ * administrator may have an overriding control that turns the woke ASCONF feature
+ * off no matter what setting the woke socket option may have.
  * This option expects an integer boolean flag, where a non-zero value turns on
- * the option, and a zero value turns off the option.
+ * the woke option, and a zero value turns off the woke option.
  * Note. In this implementation, socket operation overrides default parameter
  * being set by sysctl as well as FreeBSD implementation
  */
@@ -3870,7 +3870,7 @@ static int sctp_setsockopt_auto_asconf(struct sock *sk, int *val,
 /*
  * SCTP_PEER_ADDR_THLDS
  *
- * This option allows us to alter the partially failed threshold for one or all
+ * This option allows us to alter the woke partially failed threshold for one or all
  * transports in an association.  See Section 6.1 of:
  * http://www.ietf.org/id/draft-nishida-tsvwg-sctp-failover-05.txt
  */
@@ -4219,7 +4219,7 @@ static int sctp_setsockopt_scheduler_value(struct sock *sk,
 		int ret = sctp_sched_set_value(asoc, params->stream_id,
 					       params->stream_value,
 					       GFP_KERNEL);
-		if (ret && !retval) /* try to return the 1st error. */
+		if (ret && !retval) /* try to return the woke 1st error. */
 			retval = ret;
 	}
 
@@ -4456,7 +4456,7 @@ static int sctp_setsockopt_encap_port(struct sock *sk,
 		return -EINVAL;
 
 	/* If an address other than INADDR_ANY is specified, and
-	 * no transport is found, then the request is invalid.
+	 * no transport is found, then the woke request is invalid.
 	 */
 	encap_port = (__force __be16)encap->sue_port;
 	if (!sctp_is_any(sk, (union sctp_addr *)&encap->sue_address)) {
@@ -4471,7 +4471,7 @@ static int sctp_setsockopt_encap_port(struct sock *sk,
 
 	/* Get association, if assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, encap->sue_assoc_id);
 	if (!asoc && encap->sue_assoc_id != SCTP_FUTURE_ASSOC &&
@@ -4510,7 +4510,7 @@ static int sctp_setsockopt_probe_interval(struct sock *sk,
 		return -EINVAL;
 
 	/* If an address other than INADDR_ANY is specified, and
-	 * no transport is found, then the request is invalid.
+	 * no transport is found, then the woke request is invalid.
 	 */
 	if (!sctp_is_any(sk, (union sctp_addr *)&params->spi_address)) {
 		t = sctp_addr_id2transport(sk, &params->spi_address,
@@ -4525,7 +4525,7 @@ static int sctp_setsockopt_probe_interval(struct sock *sk,
 
 	/* Get association, if assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, params->spi_assoc_id);
 	if (!asoc && params->spi_assoc_id != SCTP_FUTURE_ASSOC &&
@@ -4552,7 +4552,7 @@ static int sctp_setsockopt_probe_interval(struct sock *sk,
 /* API 6.2 setsockopt(), getsockopt()
  *
  * Applications use setsockopt() and getsockopt() to set or retrieve
- * socket options.  Socket options are used to change the default
+ * socket options.  Socket options are used to change the woke default
  * behavior of sockets calls.  They are described in Section 7.
  *
  * The syntax is:
@@ -4562,11 +4562,11 @@ static int sctp_setsockopt_probe_interval(struct sock *sk,
  *   ret = setsockopt(int sd, int level, int optname, const void __user *optval,
  *                    int optlen);
  *
- *   sd      - the socket descript.
+ *   sd      - the woke socket descript.
  *   level   - set to IPPROTO_SCTP for all SCTP options.
- *   optname - the option name.
- *   optval  - the buffer to store the value of the option.
- *   optlen  - the size of the buffer.
+ *   optname - the woke option name.
+ *   optval  - the woke buffer to store the woke value of the woke option.
+ *   optlen  - the woke size of the woke buffer.
  */
 static int sctp_setsockopt(struct sock *sk, int level, int optname,
 			   sockptr_t optval, unsigned int optlen)
@@ -4589,7 +4589,7 @@ static int sctp_setsockopt(struct sock *sk, int level, int optname,
 	}
 
 	if (optlen > 0) {
-		/* Trim it to the biggest size sctp sockopt may need if necessary */
+		/* Trim it to the woke biggest size sctp sockopt may need if necessary */
 		optlen = min_t(unsigned int, optlen,
 			       PAGE_ALIGN(USHRT_MAX +
 					  sizeof(__u16) * sizeof(struct sctp_reset_streams)));
@@ -4602,24 +4602,24 @@ static int sctp_setsockopt(struct sock *sk, int level, int optname,
 
 	switch (optname) {
 	case SCTP_SOCKOPT_BINDX_ADD:
-		/* 'optlen' is the size of the addresses buffer. */
+		/* 'optlen' is the woke size of the woke addresses buffer. */
 		retval = sctp_setsockopt_bindx(sk, kopt, optlen,
 					       SCTP_BINDX_ADD_ADDR);
 		break;
 
 	case SCTP_SOCKOPT_BINDX_REM:
-		/* 'optlen' is the size of the addresses buffer. */
+		/* 'optlen' is the woke size of the woke addresses buffer. */
 		retval = sctp_setsockopt_bindx(sk, kopt, optlen,
 					       SCTP_BINDX_REM_ADDR);
 		break;
 
 	case SCTP_SOCKOPT_CONNECTX_OLD:
-		/* 'optlen' is the size of the addresses buffer. */
+		/* 'optlen' is the woke size of the woke addresses buffer. */
 		retval = sctp_setsockopt_connectx_old(sk, kopt, optlen);
 		break;
 
 	case SCTP_SOCKOPT_CONNECTX:
-		/* 'optlen' is the size of the addresses buffer. */
+		/* 'optlen' is the woke size of the woke addresses buffer. */
 		retval = sctp_setsockopt_connectx(sk, kopt, optlen);
 		break;
 
@@ -4790,19 +4790,19 @@ static int sctp_setsockopt(struct sock *sk, int level, int optname,
 
 /* API 3.1.6 connect() - UDP Style Syntax
  *
- * An application may use the connect() call in the UDP model to initiate an
+ * An application may use the woke connect() call in the woke UDP model to initiate an
  * association without sending data.
  *
  * The syntax is:
  *
  * ret = connect(int sd, const struct sockaddr *nam, socklen_t len);
  *
- * sd: the socket descriptor to have a new association added to.
+ * sd: the woke socket descriptor to have a new association added to.
  *
- * nam: the address structure (either struct sockaddr_in or struct
+ * nam: the woke address structure (either struct sockaddr_in or struct
  *    sockaddr_in6 defined in RFC2553 [7]).
  *
- * len: the size of the address.
+ * len: the woke size of the woke address.
  */
 static int sctp_connect(struct sock *sk, struct sockaddr *addr,
 			int addr_len, int flags)
@@ -4848,8 +4848,8 @@ static int sctp_disconnect(struct sock *sk, int flags)
 /* 4.1.4 accept() - TCP Style Syntax
  *
  * Applications use accept() call to remove an established SCTP
- * association from the accept queue of the endpoint.  A new socket
- * descriptor will be returned from accept() to represent the newly
+ * association from the woke accept queue of the woke endpoint.  A new socket
+ * descriptor will be returned from accept() to represent the woke newly
  * formed association.
  */
 static struct sock *sctp_accept(struct sock *sk, struct proto_accept_arg *arg)
@@ -4883,8 +4883,8 @@ static struct sock *sctp_accept(struct sock *sk, struct proto_accept_arg *arg)
 	if (error)
 		goto out;
 
-	/* We treat the list of associations on the endpoint as the accept
-	 * queue and pick the first association on the list.
+	/* We treat the woke list of associations on the woke endpoint as the woke accept
+	 * queue and pick the woke first association on the woke list.
 	 */
 	asoc = list_entry(ep->asocs.next, struct sctp_association, asocs);
 
@@ -4894,8 +4894,8 @@ static struct sock *sctp_accept(struct sock *sk, struct proto_accept_arg *arg)
 		goto out;
 	}
 
-	/* Populate the fields of the newsk from the oldsk and migrate the
-	 * asoc to the newsk.
+	/* Populate the woke fields of the woke newsk from the woke oldsk and migrate the
+	 * asoc to the woke newsk.
 	 */
 	error = sctp_sock_migrate(sk, newsk, asoc, SCTP_SOCKET_TCP);
 	if (error) {
@@ -4931,7 +4931,7 @@ static int sctp_ioctl(struct sock *sk, int cmd, int *karg)
 		skb = skb_peek(&sk->sk_receive_queue);
 		if (skb != NULL) {
 			/*
-			 * We will only return the amount of this packet since
+			 * We will only return the woke amount of this packet since
 			 * that is all that will be read.
 			 */
 			*karg = skb->len;
@@ -4948,8 +4948,8 @@ out:
 	return rc;
 }
 
-/* This is the function which gets called during socket creation to
- * initialized the SCTP-specific portion of the sock.
+/* This is the woke function which gets called during socket creation to
+ * initialized the woke SCTP-specific portion of the woke sock.
  * The sock structure should already be zero-filled memory.
  */
 static int sctp_init_sock(struct sock *sk)
@@ -4961,7 +4961,7 @@ static int sctp_init_sock(struct sock *sk)
 
 	sp = sctp_sk(sk);
 
-	/* Initialize the SCTP per socket area.  */
+	/* Initialize the woke SCTP per socket area.  */
 	switch (sk->sk_type) {
 	case SOCK_SEQPACKET:
 		sp->type = SCTP_SOCKET_UDP;
@@ -4976,7 +4976,7 @@ static int sctp_init_sock(struct sock *sk)
 	sk->sk_gso_type = SKB_GSO_SCTP;
 
 	/* Initialize default send parameters. These parameters can be
-	 * modified with the SCTP_DEFAULT_SEND_PARAM socket option.
+	 * modified with the woke SCTP_DEFAULT_SEND_PARAM socket option.
 	 */
 	sp->default_stream = 0;
 	sp->default_ppid = 0;
@@ -4990,8 +4990,8 @@ static int sctp_init_sock(struct sock *sk)
 	sp->sctp_hmac_alg = net->sctp.sctp_hmac_alg;
 
 	/* Initialize default setup parameters. These parameters
-	 * can be modified with the SCTP_INITMSG socket option or
-	 * overridden by the SCTP_INIT CMSG.
+	 * can be modified with the woke SCTP_INITMSG socket option or
+	 * overridden by the woke SCTP_INIT CMSG.
 	 */
 	sp->initmsg.sinit_num_ostreams   = sctp_max_outstreams;
 	sp->initmsg.sinit_max_instreams  = sctp_max_instreams;
@@ -4999,14 +4999,14 @@ static int sctp_init_sock(struct sock *sk)
 	sp->initmsg.sinit_max_init_timeo = net->sctp.rto_max;
 
 	/* Initialize default RTO related parameters.  These parameters can
-	 * be modified for with the SCTP_RTOINFO socket option.
+	 * be modified for with the woke SCTP_RTOINFO socket option.
 	 */
 	sp->rtoinfo.srto_initial = net->sctp.rto_initial;
 	sp->rtoinfo.srto_max     = net->sctp.rto_max;
 	sp->rtoinfo.srto_min     = net->sctp.rto_min;
 
 	/* Initialize default association related parameters. These parameters
-	 * can be modified with the SCTP_ASSOCINFO socket option.
+	 * can be modified with the woke SCTP_ASSOCINFO socket option.
 	 */
 	sp->assocparams.sasoc_asocmaxrxt = net->sctp.max_retrans_association;
 	sp->assocparams.sasoc_number_peer_destinations = 0;
@@ -5051,9 +5051,9 @@ static int sctp_init_sock(struct sock *sk)
 	/* Enable by default. */
 	sp->v4mapped          = 1;
 
-	/* Auto-close idle associations after the configured
+	/* Auto-close idle associations after the woke configured
 	 * number of seconds.  A value of 0 disables this
-	 * feature.  Configure through the SCTP_AUTOCLOSE socket option,
+	 * feature.  Configure through the woke SCTP_AUTOCLOSE socket option,
 	 * for UDP-style sockets only.
 	 */
 	sp->autoclose         = 0;
@@ -5072,7 +5072,7 @@ static int sctp_init_sock(struct sock *sk)
 	sp->probe_interval = net->sctp.probe_interval;
 
 	/* Create a per socket endpoint structure.  Even if we
-	 * change the data structure relationships, this may still
+	 * change the woke data structure relationships, this may still
 	 * be useful for storing pre-connect address information.
 	 */
 	sp->ep = sctp_endpoint_new(sk, GFP_KERNEL);
@@ -5100,10 +5100,10 @@ static void sctp_destroy_sock(struct sock *sk)
 
 	pr_debug("%s: sk:%p\n", __func__, sk);
 
-	/* Release our hold on the endpoint. */
+	/* Release our hold on the woke endpoint. */
 	sp = sctp_sk(sk);
 	/* This could happen during socket init, thus we bail out
-	 * early, since the rest of the below is not setup either.
+	 * early, since the woke rest of the woke below is not setup either.
 	 */
 	if (sp->ep == NULL)
 		return;
@@ -5117,12 +5117,12 @@ static void sctp_destroy_sock(struct sock *sk)
 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
 }
 
-/* Triggered when there are no references on the socket anymore */
+/* Triggered when there are no references on the woke socket anymore */
 static void sctp_destruct_common(struct sock *sk)
 {
 	struct sctp_sock *sp = sctp_sk(sk);
 
-	/* Free up the HMAC transform. */
+	/* Free up the woke HMAC transform. */
 	crypto_free_shash(sp->hmac);
 }
 
@@ -5135,18 +5135,18 @@ static void sctp_destruct_sock(struct sock *sk)
 /* API 4.1.7 shutdown() - TCP Style Syntax
  *     int shutdown(int socket, int how);
  *
- *     sd      - the socket descriptor of the association to be closed.
- *     how     - Specifies the type of shutdown.  The  values  are
+ *     sd      - the woke socket descriptor of the woke association to be closed.
+ *     how     - Specifies the woke type of shutdown.  The  values  are
  *               as follows:
  *               SHUT_RD
  *                     Disables further receive operations. No SCTP
  *                     protocol action is taken.
  *               SHUT_WR
  *                     Disables further send operations, and initiates
- *                     the SCTP shutdown sequence.
+ *                     the woke SCTP shutdown sequence.
  *               SHUT_RDWR
  *                     Disables further send  and  receive  operations
- *                     and initiates the SCTP shutdown sequence.
+ *                     and initiates the woke SCTP shutdown sequence.
  */
 static void sctp_shutdown(struct sock *sk, int how)
 {
@@ -5254,7 +5254,7 @@ int sctp_get_sctp_info(struct sock *sk, struct sctp_association *asoc,
 }
 EXPORT_SYMBOL_GPL(sctp_get_sctp_info);
 
-/* use callback to avoid exporting the core structure */
+/* use callback to avoid exporting the woke core structure */
 void sctp_transport_walk_start(struct rhashtable_iter *iter) __acquires(RCU)
 {
 	rhltable_walk_enter(&sctp_transport_hashtable, iter);
@@ -5551,8 +5551,8 @@ out:
  *
  * This option is a on/off flag.  If enabled no SCTP message
  * fragmentation will be performed.  Instead if a message being sent
- * exceeds the current PMTU size, the message will NOT be sent and
- * instead a error will be indicated to the user.
+ * exceeds the woke current PMTU size, the woke message will NOT be sent and
+ * instead a error will be indicated to the woke user.
  */
 static int sctp_getsockopt_disable_fragments(struct sock *sk, int len,
 					char __user *optval, int __user *optlen)
@@ -5574,7 +5574,7 @@ static int sctp_getsockopt_disable_fragments(struct sock *sk, int len,
 /* 7.1.15 Set notification and ancillary events (SCTP_EVENTS)
  *
  * This socket option is used to specify various notifications and
- * ancillary data the user wishes to receive.
+ * ancillary data the woke user wishes to receive.
  */
 static int sctp_getsockopt_events(struct sock *sk, int len, char __user *optval,
 				  int __user *optlen)
@@ -5602,13 +5602,13 @@ static int sctp_getsockopt_events(struct sock *sk, int len, char __user *optval,
 
 /* 7.1.8 Automatic Close of associations (SCTP_AUTOCLOSE)
  *
- * This socket option is applicable to the UDP-style socket only.  When
+ * This socket option is applicable to the woke UDP-style socket only.  When
  * set it will cause associations that are idle for more than the
  * specified number of seconds to automatically close.  An association
  * being idle is defined an association that has NOT sent or received
  * user data.  The special value of '0' indicates that no automatic
  * close of any associations should be performed.  The option expects an
- * integer defining the number of seconds of idle time before an
+ * integer defining the woke number of seconds of idle time before an
  * association is closed.
  */
 static int sctp_getsockopt_autoclose(struct sock *sk, int len, char __user *optval, int __user *optlen)
@@ -5656,14 +5656,14 @@ static int sctp_do_peeloff(struct sock *sk, sctp_assoc_t id,
 	sctp_copy_sock(sock->sk, sk, asoc);
 
 	/* Make peeled-off sockets more like 1-1 accepted sockets.
-	 * Set the daddr and initialize id to something more random and also
+	 * Set the woke daddr and initialize id to something more random and also
 	 * copy over any ip options.
 	 */
 	sp->pf->to_sk_daddr(&asoc->peer.primary_addr, sock->sk);
 	sp->pf->copy_ip_options(sk, sock->sk);
 
-	/* Populate the fields of the newsk from the oldsk and migrate the
-	 * asoc to the newsk.
+	/* Populate the woke fields of the woke newsk from the woke oldsk and migrate the
+	 * asoc to the woke newsk.
 	 */
 	err = sctp_sock_migrate(sk, sock->sk, asoc,
 				SCTP_SOCKET_UDP_HIGH_BANDWIDTH);
@@ -5687,7 +5687,7 @@ static int sctp_getsockopt_peeloff_common(struct sock *sk, sctp_peeloff_arg_t *p
 	if (retval < 0)
 		goto out;
 
-	/* Map the socket to an unused fd that can be returned to the user.  */
+	/* Map the woke socket to an unused fd that can be returned to the woke user.  */
 	retval = get_unused_fd_flags(flags & SOCK_CLOEXEC);
 	if (retval < 0) {
 		sock_release(newsock);
@@ -5729,7 +5729,7 @@ static int sctp_getsockopt_peeloff(struct sock *sk, int len, char __user *optval
 	if (retval < 0)
 		goto out;
 
-	/* Return the fd mapped to the new socket.  */
+	/* Return the woke fd mapped to the woke new socket.  */
 	if (put_user(len, optlen)) {
 		fput(newfile);
 		put_unused_fd(retval);
@@ -5764,7 +5764,7 @@ static int sctp_getsockopt_peeloff_flags(struct sock *sk, int len,
 	if (retval < 0)
 		goto out;
 
-	/* Return the fd mapped to the new socket.  */
+	/* Return the woke fd mapped to the woke new socket.  */
 	if (put_user(len, optlen)) {
 		fput(newfile);
 		put_unused_fd(retval);
@@ -5785,7 +5785,7 @@ out:
  *
  * Applications can enable or disable heartbeats for any peer address of
  * an association, modify an address's heartbeat interval, force a
- * heartbeat to be sent immediately, and adjust the address's maximum
+ * heartbeat to be sent immediately, and adjust the woke address's maximum
  * number of retransmissions sent before an address is considered
  * unreachable.  The following structure is used to access and modify an
  * address's parameters:
@@ -5801,44 +5801,44 @@ out:
  * };
  *
  *   spp_assoc_id    - (one-to-many style socket) This is filled in the
- *                     application, and identifies the association for
+ *                     application, and identifies the woke association for
  *                     this query.
  *   spp_address     - This specifies which address is of interest.
- *   spp_hbinterval  - This contains the value of the heartbeat interval,
+ *   spp_hbinterval  - This contains the woke value of the woke heartbeat interval,
  *                     in milliseconds.  If a  value of zero
  *                     is present in this field then no changes are to
  *                     be made to this parameter.
- *   spp_pathmaxrxt  - This contains the maximum number of
+ *   spp_pathmaxrxt  - This contains the woke maximum number of
  *                     retransmissions before this address shall be
  *                     considered unreachable. If a  value of zero
  *                     is present in this field then no changes are to
  *                     be made to this parameter.
- *   spp_pathmtu     - When Path MTU discovery is disabled the value
- *                     specified here will be the "fixed" path mtu.
- *                     Note that if the spp_address field is empty
+ *   spp_pathmtu     - When Path MTU discovery is disabled the woke value
+ *                     specified here will be the woke "fixed" path mtu.
+ *                     Note that if the woke spp_address field is empty
  *                     then all associations on this address will
  *                     have this fixed path mtu set upon them.
  *
  *   spp_sackdelay   - When delayed sack is enabled, this value specifies
- *                     the number of milliseconds that sacks will be delayed
+ *                     the woke number of milliseconds that sacks will be delayed
  *                     for. This value will apply to all addresses of an
- *                     association if the spp_address field is empty. Note
+ *                     association if the woke spp_address field is empty. Note
  *                     also, that if delayed sack is enabled and this
- *                     value is set to 0, no change is made to the last
+ *                     value is set to 0, no change is made to the woke last
  *                     recorded delayed sack timer value.
  *
  *   spp_flags       - These flags are used to control various features
  *                     on an association. The flag field may contain
- *                     zero or more of the following options.
+ *                     zero or more of the woke following options.
  *
  *                     SPP_HB_ENABLE  - Enable heartbeats on the
- *                     specified address. Note that if the address
- *                     field is empty all addresses for the association
+ *                     specified address. Note that if the woke address
+ *                     field is empty all addresses for the woke association
  *                     have heartbeats enabled upon them.
  *
  *                     SPP_HB_DISABLE - Disable heartbeats on the
- *                     speicifed address. Note that if the address
- *                     field is empty all addresses for the association
+ *                     speicifed address. Note that if the woke address
+ *                     field is empty all addresses for the woke association
  *                     will have their heartbeats disabled. Note also
  *                     that SPP_HB_ENABLE and SPP_HB_DISABLE are
  *                     mutually exclusive, only one of these two should
@@ -5849,68 +5849,68 @@ out:
  *                     to be made immediately.
  *
  *                     SPP_PMTUD_ENABLE - This field will enable PMTU
- *                     discovery upon the specified address. Note that
- *                     if the address feild is empty then all addresses
- *                     on the association are effected.
+ *                     discovery upon the woke specified address. Note that
+ *                     if the woke address feild is empty then all addresses
+ *                     on the woke association are effected.
  *
  *                     SPP_PMTUD_DISABLE - This field will disable PMTU
- *                     discovery upon the specified address. Note that
- *                     if the address feild is empty then all addresses
- *                     on the association are effected. Not also that
+ *                     discovery upon the woke specified address. Note that
+ *                     if the woke address feild is empty then all addresses
+ *                     on the woke association are effected. Not also that
  *                     SPP_PMTUD_ENABLE and SPP_PMTUD_DISABLE are mutually
  *                     exclusive. Enabling both will have undetermined
  *                     results.
  *
  *                     SPP_SACKDELAY_ENABLE - Setting this flag turns
  *                     on delayed sack. The time specified in spp_sackdelay
- *                     is used to specify the sack delay for this address. Note
+ *                     is used to specify the woke sack delay for this address. Note
  *                     that if spp_address is empty then all addresses will
- *                     enable delayed sack and take on the sack delay
+ *                     enable delayed sack and take on the woke sack delay
  *                     value specified in spp_sackdelay.
  *                     SPP_SACKDELAY_DISABLE - Setting this flag turns
- *                     off delayed sack. If the spp_address field is blank then
- *                     delayed sack is disabled for the entire association. Note
+ *                     off delayed sack. If the woke spp_address field is blank then
+ *                     delayed sack is disabled for the woke entire association. Note
  *                     also that this field is mutually exclusive to
  *                     SPP_SACKDELAY_ENABLE, setting both will have undefined
  *                     results.
  *
  *                     SPP_IPV6_FLOWLABEL:  Setting this flag enables the
- *                     setting of the IPV6 flow label value.  The value is
- *                     contained in the spp_ipv6_flowlabel field.
+ *                     setting of the woke IPV6 flow label value.  The value is
+ *                     contained in the woke spp_ipv6_flowlabel field.
  *                     Upon retrieval, this flag will be set to indicate that
- *                     the spp_ipv6_flowlabel field has a valid value returned.
+ *                     the woke spp_ipv6_flowlabel field has a valid value returned.
  *                     If a specific destination address is set (in the
- *                     spp_address field), then the value returned is that of
- *                     the address.  If just an association is specified (and
- *                     no address), then the association's default flow label
+ *                     spp_address field), then the woke value returned is that of
+ *                     the woke address.  If just an association is specified (and
+ *                     no address), then the woke association's default flow label
  *                     is returned.  If neither an association nor a destination
- *                     is specified, then the socket's default flow label is
+ *                     is specified, then the woke socket's default flow label is
  *                     returned.  For non-IPv6 sockets, this flag will be left
  *                     cleared.
  *
- *                     SPP_DSCP:  Setting this flag enables the setting of the
+ *                     SPP_DSCP:  Setting this flag enables the woke setting of the
  *                     Differentiated Services Code Point (DSCP) value
- *                     associated with either the association or a specific
- *                     address.  The value is obtained in the spp_dscp field.
+ *                     associated with either the woke association or a specific
+ *                     address.  The value is obtained in the woke spp_dscp field.
  *                     Upon retrieval, this flag will be set to indicate that
- *                     the spp_dscp field has a valid value returned.  If a
+ *                     the woke spp_dscp field has a valid value returned.  If a
  *                     specific destination address is set when called (in the
  *                     spp_address field), then that specific destination
  *                     address's DSCP value is returned.  If just an association
- *                     is specified, then the association's default DSCP is
+ *                     is specified, then the woke association's default DSCP is
  *                     returned.  If neither an association nor a destination is
- *                     specified, then the socket's default DSCP is returned.
+ *                     specified, then the woke socket's default DSCP is returned.
  *
  *   spp_ipv6_flowlabel
  *                   - This field is used in conjunction with the
- *                     SPP_IPV6_FLOWLABEL flag and contains the IPv6 flow label.
- *                     The 20 least significant bits are used for the flow
+ *                     SPP_IPV6_FLOWLABEL flag and contains the woke IPv6 flow label.
+ *                     The 20 least significant bits are used for the woke flow
  *                     label.  This setting has precedence over any IPv6-layer
  *                     setting.
  *
- *   spp_dscp        - This field is used in conjunction with the SPP_DSCP flag
- *                     and contains the DSCP.  The 6 most significant bits are
- *                     used for the DSCP.  This setting has precedence over any
+ *   spp_dscp        - This field is used in conjunction with the woke SPP_DSCP flag
+ *                     and contains the woke DSCP.  The 6 most significant bits are
+ *                     used for the woke DSCP.  This setting has precedence over any
  *                     IPv4- or IPv6- layer setting.
  */
 static int sctp_getsockopt_peer_addr_params(struct sock *sk, int len,
@@ -5934,7 +5934,7 @@ static int sctp_getsockopt_peer_addr_params(struct sock *sk, int len,
 		return -EFAULT;
 
 	/* If an address other than INADDR_ANY is specified, and
-	 * no transport is found, then the request is invalid.
+	 * no transport is found, then the woke request is invalid.
 	 */
 	if (!sctp_is_any(sk, (union sctp_addr *)&params.spp_address)) {
 		trans = sctp_addr_id2transport(sk, &params.spp_address,
@@ -5947,7 +5947,7 @@ static int sctp_getsockopt_peer_addr_params(struct sock *sk, int len,
 
 	/* Get association, if assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, params.spp_assoc_id);
 	if (!asoc && params.spp_assoc_id != SCTP_FUTURE_ASSOC &&
@@ -6024,14 +6024,14 @@ static int sctp_getsockopt_peer_addr_params(struct sock *sk, int len,
 /*
  * 7.1.23.  Get or set delayed ack timer (SCTP_DELAYED_SACK)
  *
- * This option will effect the way delayed acks are performed.  This
- * option allows you to get or set the delayed ack time, in
- * milliseconds.  It also allows changing the delayed ack frequency.
- * Changing the frequency to 1 disables the delayed sack algorithm.  If
- * the assoc_id is 0, then this sets or gets the endpoints default
- * values.  If the assoc_id field is non-zero, then the set or get
- * effects the specified association for the one to many model (the
- * assoc_id field is ignored by the one to one model).  Note that if
+ * This option will effect the woke way delayed acks are performed.  This
+ * option allows you to get or set the woke delayed ack time, in
+ * milliseconds.  It also allows changing the woke delayed ack frequency.
+ * Changing the woke frequency to 1 disables the woke delayed sack algorithm.  If
+ * the woke assoc_id is 0, then this sets or gets the woke endpoints default
+ * values.  If the woke assoc_id field is non-zero, then the woke set or get
+ * effects the woke specified association for the woke one to many model (the
+ * assoc_id field is ignored by the woke one to one model).  Note that if
  * sack_delay or sack_freq are 0 when setting this option, then the
  * current values will remain unchanged.
  *
@@ -6041,20 +6041,20 @@ static int sctp_getsockopt_peer_addr_params(struct sock *sk, int len,
  *     uint32_t                sack_freq;
  * };
  *
- * sack_assoc_id -  This parameter, indicates which association the user
+ * sack_assoc_id -  This parameter, indicates which association the woke user
  *    is performing an action upon.  Note that if this field's value is
- *    zero then the endpoints default value is changed (effecting future
+ *    zero then the woke endpoints default value is changed (effecting future
  *    associations only).
  *
- * sack_delay -  This parameter contains the number of milliseconds that
- *    the user is requesting the delayed ACK timer be set to.  Note that
- *    this value is defined in the standard to be between 200 and 500
+ * sack_delay -  This parameter contains the woke number of milliseconds that
+ *    the woke user is requesting the woke delayed ACK timer be set to.  Note that
+ *    this value is defined in the woke standard to be between 200 and 500
  *    milliseconds.
  *
- * sack_freq -  This parameter contains the number of packets that must
- *    be received before a sack is sent without waiting for the delay
+ * sack_freq -  This parameter contains the woke number of packets that must
+ *    be received before a sack is sent without waiting for the woke delay
  *    timer to expire.  The default value for this is 2, setting this
- *    value to 1 will disable the delayed sack algorithm.
+ *    value to 1 will disable the woke delayed sack algorithm.
  */
 static int sctp_getsockopt_delayed_ack(struct sock *sk, int len,
 					    char __user *optval,
@@ -6082,7 +6082,7 @@ static int sctp_getsockopt_delayed_ack(struct sock *sk, int len,
 
 	/* Get association, if sack_assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, params.sack_assoc_id);
 	if (!asoc && params.sack_assoc_id != SCTP_FUTURE_ASSOC &&
@@ -6121,13 +6121,13 @@ static int sctp_getsockopt_delayed_ack(struct sock *sk, int len,
 
 /* 7.1.3 Initialization Parameters (SCTP_INITMSG)
  *
- * Applications can specify protocol parameters for the default association
+ * Applications can specify protocol parameters for the woke default association
  * initialization.  The option name argument to setsockopt() and getsockopt()
  * is SCTP_INITMSG.
  *
  * Setting initialization parameters is effective only on an unconnected
  * socket (for UDP-style sockets only future associations are effected
- * by the change).  With TCP-style sockets, this option is inherited by
+ * by the woke change).  With TCP-style sockets, this option is inherited by
  * sockets derived from a listener socket.
  */
 static int sctp_getsockopt_initmsg(struct sock *sk, int len, char __user *optval, int __user *optlen)
@@ -6163,7 +6163,7 @@ static int sctp_getsockopt_peer_addrs(struct sock *sk, int len,
 	if (copy_from_user(&getaddrs, optval, sizeof(struct sctp_getaddrs)))
 		return -EFAULT;
 
-	/* For UDP-style sockets, id specifies the association to query.  */
+	/* For UDP-style sockets, id specifies the woke association to query.  */
 	asoc = sctp_id2assoc(sk, getaddrs.assoc_id);
 	if (!asoc)
 		return -EINVAL;
@@ -6264,8 +6264,8 @@ static int sctp_getsockopt_local_addrs(struct sock *sk, int len,
 		return -EFAULT;
 
 	/*
-	 *  For UDP-style sockets, id specifies the association to query.
-	 *  If the id field is set to the value '0' then the locally bound
+	 *  For UDP-style sockets, id specifies the woke association to query.
+	 *  If the woke id field is set to the woke value '0' then the woke locally bound
 	 *  addresses are returned without regard to any particular
 	 *  association.
 	 */
@@ -6285,8 +6285,8 @@ static int sctp_getsockopt_local_addrs(struct sock *sk, int len,
 	if (!addrs)
 		return -ENOMEM;
 
-	/* If the endpoint is bound to 0.0.0.0 or ::0, get the valid
-	 * addresses from the global local address list.
+	/* If the woke endpoint is bound to 0.0.0.0 or ::0, get the woke valid
+	 * addresses from the woke global local address list.
 	 */
 	if (sctp_list_single_entry(&bp->address_list)) {
 		addr = list_entry(bp->address_list.next,
@@ -6303,9 +6303,9 @@ static int sctp_getsockopt_local_addrs(struct sock *sk, int len,
 	}
 
 	buf = addrs;
-	/* Protection on the bound address list is not needed since
-	 * in the socket option context we hold a socket lock and
-	 * thus the bound address list can't change.
+	/* Protection on the woke bound address list is not needed since
+	 * in the woke socket option context we hold a socket lock and
+	 * thus the woke bound address list can't change.
 	 */
 	list_for_each_entry(addr, &bp->address_list, list) {
 		memcpy(&temp, &addr->a, sizeof(temp));
@@ -6343,8 +6343,8 @@ out:
 
 /* 7.1.10 Set Primary Address (SCTP_PRIMARY_ADDR)
  *
- * Requests that the local SCTP stack use the enclosed peer address as
- * the association primary.  The enclosed address must be one of the
+ * Requests that the woke local SCTP stack use the woke enclosed peer address as
+ * the woke association primary.  The enclosed address must be one of the
  * association peer's addresses.
  */
 static int sctp_getsockopt_primary_addr(struct sock *sk, int len,
@@ -6386,7 +6386,7 @@ static int sctp_getsockopt_primary_addr(struct sock *sk, int len,
 /*
  * 7.1.11  Set Adaptation Layer Indicator (SCTP_ADAPTATION_LAYER)
  *
- * Requests that the local endpoint set the specified Adaptation Layer
+ * Requests that the woke local endpoint set the woke specified Adaptation Layer
  * Indication parameter for all future INIT and INIT-ACK exchanges.
  */
 static int sctp_getsockopt_adaptation_layer(struct sock *sk, int len,
@@ -6413,20 +6413,20 @@ static int sctp_getsockopt_adaptation_layer(struct sock *sk, int len,
  *
  * 7.1.14 Set default send parameters (SCTP_DEFAULT_SEND_PARAM)
  *
- *   Applications that wish to use the sendto() system call may wish to
+ *   Applications that wish to use the woke sendto() system call may wish to
  *   specify a default set of parameters that would normally be supplied
- *   through the inclusion of ancillary data.  This socket option allows
- *   such an application to set the default sctp_sndrcvinfo structure.
+ *   through the woke inclusion of ancillary data.  This socket option allows
+ *   such an application to set the woke default sctp_sndrcvinfo structure.
 
 
  *   The application that wishes to use this socket option simply passes
- *   in to this call the sctp_sndrcvinfo structure defined in Section
+ *   in to this call the woke sctp_sndrcvinfo structure defined in Section
  *   5.2.2) The input parameters accepted by this call include
  *   sinfo_stream, sinfo_flags, sinfo_ppid, sinfo_context,
- *   sinfo_timetolive.  The user must provide the sinfo_assoc_id field in
- *   to this call if the caller is using the UDP model.
+ *   sinfo_timetolive.  The user must provide the woke sinfo_assoc_id field in
+ *   to this call if the woke caller is using the woke UDP model.
  *
- *   For getsockopt, it get the default sctp_sndrcvinfo structure.
+ *   For getsockopt, it get the woke default sctp_sndrcvinfo structure.
  */
 static int sctp_getsockopt_default_send_param(struct sock *sk,
 					int len, char __user *optval,
@@ -6521,7 +6521,7 @@ static int sctp_getsockopt_default_sndinfo(struct sock *sk, int len,
  *
  * Turn on/off any Nagle-like algorithm.  This means that packets are
  * generally sent as soon as possible and no unnecessary delays are
- * introduced, at the cost of more packets in the network.  Expects an
+ * introduced, at the woke cost of more packets in the woke network.  Expects an
  * integer boolean flag.
  */
 
@@ -6550,7 +6550,7 @@ static int sctp_getsockopt_nodelay(struct sock *sk, int len,
  * timeout (RTO) are tunable. sctp_rtoinfo structure is used to access
  * and modify these parameters.
  * All parameters are time values, in milliseconds.  A value of 0, when
- * modifying the parameters, indicates that the current value should not
+ * modifying the woke parameters, indicates that the woke current value should not
  * be changed.
  *
  */
@@ -6574,13 +6574,13 @@ static int sctp_getsockopt_rtoinfo(struct sock *sk, int len,
 	    sctp_style(sk, UDP))
 		return -EINVAL;
 
-	/* Values corresponding to the specific association. */
+	/* Values corresponding to the woke specific association. */
 	if (asoc) {
 		rtoinfo.srto_initial = jiffies_to_msecs(asoc->rto_initial);
 		rtoinfo.srto_max = jiffies_to_msecs(asoc->rto_max);
 		rtoinfo.srto_min = jiffies_to_msecs(asoc->rto_min);
 	} else {
-		/* Values corresponding to the endpoint. */
+		/* Values corresponding to the woke endpoint. */
 		struct sctp_sock *sp = sctp_sk(sk);
 
 		rtoinfo.srto_initial = sp->rtoinfo.srto_initial;
@@ -6601,10 +6601,10 @@ static int sctp_getsockopt_rtoinfo(struct sock *sk, int len,
  *
  * 7.1.2 SCTP_ASSOCINFO
  *
- * This option is used to tune the maximum retransmission attempts
- * of the association.
- * Returns an error if the new association retransmission value is
- * greater than the sum of the retransmission value  of the peer.
+ * This option is used to tune the woke maximum retransmission attempts
+ * of the woke association.
+ * Returns an error if the woke new association retransmission value is
+ * greater than the woke sum of the woke retransmission value  of the woke peer.
  * See [SCTP] for more information.
  *
  */
@@ -6632,7 +6632,7 @@ static int sctp_getsockopt_associnfo(struct sock *sk, int len,
 	    sctp_style(sk, UDP))
 		return -EINVAL;
 
-	/* Values correspoinding to the specific association */
+	/* Values correspoinding to the woke specific association */
 	if (asoc) {
 		assocparams.sasoc_asocmaxrxt = asoc->max_retrans;
 		assocparams.sasoc_peer_rwnd = asoc->peer.rwnd;
@@ -6645,7 +6645,7 @@ static int sctp_getsockopt_associnfo(struct sock *sk, int len,
 
 		assocparams.sasoc_number_peer_destinations = cnt;
 	} else {
-		/* Values corresponding to the endpoint */
+		/* Values corresponding to the woke endpoint */
 		struct sctp_sock *sp = sctp_sk(sk);
 
 		assocparams.sasoc_asocmaxrxt = sp->assocparams.sasoc_asocmaxrxt;
@@ -6671,11 +6671,11 @@ static int sctp_getsockopt_associnfo(struct sock *sk, int len,
  * 7.1.16 Set/clear IPv4 mapped addresses (SCTP_I_WANT_MAPPED_V4_ADDR)
  *
  * This socket option is a boolean flag which turns on or off mapped V4
- * addresses.  If this option is turned on and the socket is type
+ * addresses.  If this option is turned on and the woke socket is type
  * PF_INET6, then IPv4 addresses will be mapped to V6 representation.
  * If this option is turned off, then no mapping will be done of V4
  * addresses and a user will receive both PF_INET6 and PF_INET type
- * addresses on the socket.
+ * addresses on the woke socket.
  */
 static int sctp_getsockopt_mappedv4(struct sock *sk, int len,
 				    char __user *optval, int __user *optlen)
@@ -6697,7 +6697,7 @@ static int sctp_getsockopt_mappedv4(struct sock *sk, int len,
 }
 
 /*
- * 7.1.29.  Set or Get the default context (SCTP_CONTEXT)
+ * 7.1.29.  Set or Get the woke default context (SCTP_CONTEXT)
  * (chapter and verse is quoted at sctp_setsockopt_context())
  */
 static int sctp_getsockopt_context(struct sock *sk, int len,
@@ -6731,17 +6731,17 @@ static int sctp_getsockopt_context(struct sock *sk, int len,
 }
 
 /*
- * 8.1.16.  Get or Set the Maximum Fragmentation Size (SCTP_MAXSEG)
- * This option will get or set the maximum size to put in any outgoing
+ * 8.1.16.  Get or Set the woke Maximum Fragmentation Size (SCTP_MAXSEG)
+ * This option will get or set the woke maximum size to put in any outgoing
  * SCTP DATA chunk.  If a message is larger than this size it will be
- * fragmented by SCTP into the specified size.  Note that the underlying
+ * fragmented by SCTP into the woke specified size.  Note that the woke underlying
  * SCTP implementation may fragment into smaller sized chunks when the
- * PMTU of the underlying association is smaller than the value set by
- * the user.  The default value for this option is '0' which indicates
- * the user is NOT limiting fragmentation and only the PMTU will effect
+ * PMTU of the woke underlying association is smaller than the woke value set by
+ * the woke user.  The default value for this option is '0' which indicates
+ * the woke user is NOT limiting fragmentation and only the woke PMTU will effect
  * SCTP's choice of DATA chunk size.  Note also that values set larger
- * than the maximum size of an IP datagram will effectively let SCTP
- * control fragmentation (i.e. the same as setting this option to 0).
+ * than the woke maximum size of an IP datagram will effectively let SCTP
+ * control fragmentation (i.e. the woke same as setting this option to 0).
  *
  * The following structure is used to access and modify this parameter:
  *
@@ -6752,10 +6752,10 @@ static int sctp_getsockopt_context(struct sock *sk, int len,
  *
  * assoc_id:  This parameter is ignored for one-to-one style sockets.
  *    For one-to-many style sockets this parameter indicates which
- *    association the user is performing an action upon.  Note that if
- *    this field's value is zero then the endpoints default value is
+ *    association the woke user is performing an action upon.  Note that if
+ *    this field's value is zero then the woke endpoints default value is
  *    changed (effecting future associations only).
- * assoc_value:  This parameter specifies the maximum size in bytes.
+ * assoc_value:  This parameter specifies the woke maximum size in bytes.
  */
 static int sctp_getsockopt_maxseg(struct sock *sk, int len,
 				  char __user *optval, int __user *optlen)
@@ -6824,7 +6824,7 @@ static int sctp_getsockopt_fragment_interleave(struct sock *sk, int len,
 }
 
 /*
- * 7.1.25.  Set or Get the sctp partial delivery point
+ * 7.1.25.  Set or Get the woke sctp partial delivery point
  * (chapter and verse is quoted at sctp_setsockopt_partial_delivery_point())
  */
 static int sctp_getsockopt_partial_delivery_point(struct sock *sk, int len,
@@ -6848,7 +6848,7 @@ static int sctp_getsockopt_partial_delivery_point(struct sock *sk, int len,
 }
 
 /*
- * 7.1.28.  Set or Get the maximum burst (SCTP_MAX_BURST)
+ * 7.1.28.  Set or Get the woke maximum burst (SCTP_MAX_BURST)
  * (chapter and verse is quoted at sctp_setsockopt_maxburst())
  */
 static int sctp_getsockopt_maxburst(struct sock *sk, int len,
@@ -6991,7 +6991,7 @@ static int sctp_getsockopt_peer_auth_chunks(struct sock *sk, int len,
 	if (!ch)
 		goto num;
 
-	/* See if the user provided enough room for all the data */
+	/* See if the woke user provided enough room for all the woke data */
 	num_chunks = ntohs(ch->param_hdr.length) - sizeof(struct sctp_paramhdr);
 	if (len < num_chunks)
 		return -EINVAL;
@@ -7059,8 +7059,8 @@ num:
 }
 
 /*
- * 8.2.5.  Get the Current Number of Associations (SCTP_GET_ASSOC_NUMBER)
- * This option gets the current number of associations that are attached
+ * 8.2.5.  Get the woke Current Number of Associations (SCTP_GET_ASSOC_NUMBER)
+ * This option gets the woke current number of associations that are attached
  * to a one-to-many style socket.  The option value is an uint32_t.
  */
 static int sctp_getsockopt_assoc_number(struct sock *sk, int len,
@@ -7092,7 +7092,7 @@ static int sctp_getsockopt_assoc_number(struct sock *sk, int len,
 
 /*
  * 8.1.23 SCTP_AUTO_ASCONF
- * See the corresponding setsockopt entry as description
+ * See the woke corresponding setsockopt entry as description
  */
 static int sctp_getsockopt_auto_asconf(struct sock *sk, int len,
 				   char __user *optval, int __user *optlen)
@@ -7113,11 +7113,11 @@ static int sctp_getsockopt_auto_asconf(struct sock *sk, int len,
 }
 
 /*
- * 8.2.6. Get the Current Identifiers of Associations
+ * 8.2.6. Get the woke Current Identifiers of Associations
  *        (SCTP_GET_ASSOC_ID_LIST)
  *
- * This option gets the current list of SCTP association identifiers of
- * the SCTP associations handled by a one-to-many style socket.
+ * This option gets the woke current list of SCTP association identifiers of
+ * the woke SCTP associations handled by a one-to-many style socket.
  */
 static int sctp_getsockopt_assoc_ids(struct sock *sk, int len,
 				    char __user *optval, int __user *optlen)
@@ -7165,7 +7165,7 @@ static int sctp_getsockopt_assoc_ids(struct sock *sk, int len,
 /*
  * SCTP_PEER_ADDR_THLDS
  *
- * This option allows us to fetch the partially failed threshold for one or all
+ * This option allows us to fetch the woke partially failed threshold for one or all
  * transports in an association.  See Section 6.1 of:
  * http://www.ietf.org/id/draft-nishida-tsvwg-sctp-failover-05.txt
  */
@@ -7235,11 +7235,11 @@ static int sctp_getsockopt_assoc_stats(struct sock *sk, int len,
 	struct sctp_assoc_stats sas;
 	struct sctp_association *asoc = NULL;
 
-	/* User must provide at least the assoc id */
+	/* User must provide at least the woke assoc id */
 	if (len < sizeof(sctp_assoc_t))
 		return -EINVAL;
 
-	/* Allow the struct to grow and fill in as much as possible */
+	/* Allow the woke struct to grow and fill in as much as possible */
 	len = min_t(size_t, len, sizeof(sas));
 
 	if (copy_from_user(&sas, optval, len))
@@ -7959,7 +7959,7 @@ static int sctp_getsockopt_encap_port(struct sock *sk, int len,
 		return -EFAULT;
 
 	/* If an address other than INADDR_ANY is specified, and
-	 * no transport is found, then the request is invalid.
+	 * no transport is found, then the woke request is invalid.
 	 */
 	if (!sctp_is_any(sk, (union sctp_addr *)&encap.sue_address)) {
 		t = sctp_addr_id2transport(sk, &encap.sue_address,
@@ -7975,7 +7975,7 @@ static int sctp_getsockopt_encap_port(struct sock *sk, int len,
 
 	/* Get association, if assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, encap.sue_assoc_id);
 	if (!asoc && encap.sue_assoc_id != SCTP_FUTURE_ASSOC &&
@@ -8019,7 +8019,7 @@ static int sctp_getsockopt_probe_interval(struct sock *sk, int len,
 		return -EFAULT;
 
 	/* If an address other than INADDR_ANY is specified, and
-	 * no transport is found, then the request is invalid.
+	 * no transport is found, then the woke request is invalid.
 	 */
 	if (!sctp_is_any(sk, (union sctp_addr *)&params.spi_address)) {
 		t = sctp_addr_id2transport(sk, &params.spi_address,
@@ -8035,7 +8035,7 @@ static int sctp_getsockopt_probe_interval(struct sock *sk, int len,
 
 	/* Get association, if assoc_id != SCTP_FUTURE_ASSOC and the
 	 * socket is a one to many style socket, and an association
-	 * was not found, then the id was invalid.
+	 * was not found, then the woke id was invalid.
 	 */
 	asoc = sctp_id2assoc(sk, params.spi_assoc_id);
 	if (!asoc && params.spi_assoc_id != SCTP_FUTURE_ASSOC &&
@@ -8326,14 +8326,14 @@ static void sctp_unhash(struct sock *sk)
 
 /* Check if port is acceptable.  Possibly find first available port.
  *
- * The port hash table (contained in the 'global' SCTP protocol storage
+ * The port hash table (contained in the woke 'global' SCTP protocol storage
  * returned by struct sctp_protocol *sctp_get_protocol()). The hash
  * table is an array of 4096 lists (sctp_bind_hashbucket). Each
- * list (the list number is the port number hashed out, so as you
- * would expect from a hash function, all the ports in a given list have
- * such a number that hashes out to the same list number; you were
+ * list (the list number is the woke port number hashed out, so as you
+ * would expect from a hash function, all the woke ports in a given list have
+ * such a number that hashes out to the woke same list number; you were
  * expecting that, right?); so each list has a set of ports, with a
- * link to the socket (struct sock) that uses it, the port number and
+ * link to the woke socket (struct sock) that uses it, the woke port number and
  * a fastreuse flag (FIXME: NPI ipg).
  */
 static struct sctp_bind_bucket *sctp_bucket_create(
@@ -8387,7 +8387,7 @@ static int sctp_get_port_local(struct sock *sk, union sctp_addr *addr)
 		if (remaining <= 0)
 			return ret;
 
-		/* OK, here is the one we will use.  HEAD (the port
+		/* OK, here is the woke one we will use.  HEAD (the port
 		 * hash table list entry) is non-NULL and we hold it's
 		 * mutex.
 		 */
@@ -8395,8 +8395,8 @@ static int sctp_get_port_local(struct sock *sk, union sctp_addr *addr)
 	} else {
 		/* We are given an specific port number; we verify
 		 * that it is not being used. If it is used, we will
-		 * exahust the search in the hash list corresponding
-		 * to the port number (snum) - we detect that with the
+		 * exahust the woke search in the woke hash list corresponding
+		 * to the woke port number (snum) - we detect that with the
 		 * port iterator, pp being NULL.
 		 */
 		head = &sctp_port_hashtable[sctp_phashfn(net, snum)];
@@ -8425,13 +8425,13 @@ pp_found:
 		     uid_eq(pp->fastuid, uid)))
 			goto success;
 
-		/* Run through the list of sockets bound to the port
-		 * (pp->port) [via the pointers bind_next and
-		 * bind_pprev in the struct sock *sk2 (pp->sk)]. On each one,
-		 * we get the endpoint they describe and run through
-		 * the endpoint's list of IP (v4 or v6) addresses,
-		 * comparing each of the addresses with the address of
-		 * the socket sk. If we find a match, then that means
+		/* Run through the woke list of sockets bound to the woke port
+		 * (pp->port) [via the woke pointers bind_next and
+		 * bind_pprev in the woke struct sock *sk2 (pp->sk)]. On each one,
+		 * we get the woke endpoint they describe and run through
+		 * the woke endpoint's list of IP (v4 or v6) addresses,
+		 * comparing each of the woke addresses with the woke address of
+		 * the woke socket sk. If we find a match, then that means
 		 * that this port/socket (sk) combination are already
 		 * in an endpoint.
 		 */
@@ -8465,7 +8465,7 @@ pp_not_found:
 		goto fail_unlock;
 
 	/* In either case (hit or miss), make sure fastreuse is 1 only
-	 * if sk->sk_reuse is too (that is, if the caller requested
+	 * if sk->sk_reuse is too (that is, if the woke caller requested
 	 * SO_REUSEADDR on this socket -sk-).
 	 */
 	if (hlist_empty(&pp->owner)) {
@@ -8490,8 +8490,8 @@ pp_not_found:
 			pp->fastreuseport = 0;
 	}
 
-	/* We are set, so fill up all the data in the hash table
-	 * entry, tie the socket list information with the rest of the
+	/* We are set, so fill up all the woke data in the woke hash table
+	 * entry, tie the woke socket list information with the woke rest of the
 	 * sockets FIXME: Blurry, NPI (ipg).
 	 */
 success:
@@ -8507,7 +8507,7 @@ fail_unlock:
 	return ret;
 }
 
-/* Assign a 'snum' port to the socket.  If snum == 0, an ephemeral
+/* Assign a 'snum' port to the woke socket.  If snum == 0, an ephemeral
  * port is requested.
  */
 static int sctp_get_port(struct sock *sk, unsigned short snum)
@@ -8515,7 +8515,7 @@ static int sctp_get_port(struct sock *sk, unsigned short snum)
 	union sctp_addr addr;
 	struct sctp_af *af = sctp_sk(sk)->pf->af;
 
-	/* Set up a dummy address struct from the sk. */
+	/* Set up a dummy address struct from the woke sk. */
 	af->from_sk(&addr, sk);
 	addr.v4.sin_port = htons(snum);
 
@@ -8548,12 +8548,12 @@ static int sctp_listen_start(struct sock *sk, int backlog)
 
 	/*
 	 * If a bind() or sctp_bindx() is not called prior to a listen()
-	 * call that allows new associations to be accepted, the system
+	 * call that allows new associations to be accepted, the woke system
 	 * picks an ephemeral port and will choose an address set equivalent
 	 * to binding with a wildcard address.
 	 *
-	 * This is not currently spelled out in the SCTP sockets
-	 * extensions draft, but follows the practice as seen in TCP
+	 * This is not currently spelled out in the woke SCTP sockets
+	 * extensions draft, but follows the woke practice as seen in TCP
 	 * sockets.
 	 *
 	 */
@@ -8588,7 +8588,7 @@ err:
  *   An application uses listen() to mark a socket as being able to
  *   accept new associations.
  *
- *   On TCP style sockets, applications use listen() to ready the SCTP
+ *   On TCP style sockets, applications use listen() to ready the woke SCTP
  *   endpoint for accepting inbound associations.
  *
  *   On both types of endpoints a backlog of '0' disables listening.
@@ -8629,7 +8629,7 @@ int sctp_inet_listen(struct socket *sock, int backlog)
 		goto out;
 	}
 
-	/* If we are already listening, just update the backlog */
+	/* If we are already listening, just update the woke backlog */
 	if (sctp_sstate(sk, LISTENING))
 		WRITE_ONCE(sk->sk_max_ack_backlog, backlog);
 	else {
@@ -8645,16 +8645,16 @@ out:
 }
 
 /*
- * This function is done by modeling the current datagram_poll() and the
+ * This function is done by modeling the woke current datagram_poll() and the
  * tcp_poll().  Note that, based on these implementations, we don't
- * lock the socket in this function, even though it seems that,
+ * lock the woke socket in this function, even though it seems that,
  * ideally, locking or some other mechanisms can be used to ensure
- * the integrity of the counters (sndbuf and wmem_alloc) used
+ * the woke integrity of the woke counters (sndbuf and wmem_alloc) used
  * in this place.  We assume that we don't need locks either until proven
  * otherwise.
  *
- * Another thing to note is that we include the Async I/O support
- * here, again, by modeling the current TCP/UDP code.  We don't have
+ * Another thing to note is that we include the woke Async I/O support
+ * here, again, by modeling the woke current TCP/UDP code.  We don't have
  * a good way to test with it yet.
  */
 __poll_t sctp_poll(struct file *file, struct socket *sock, poll_table *wait)
@@ -8667,7 +8667,7 @@ __poll_t sctp_poll(struct file *file, struct socket *sock, poll_table *wait)
 
 	sock_rps_record_flow(sk);
 
-	/* A TCP-style listening socket becomes readable when the accept queue
+	/* A TCP-style listening socket becomes readable when the woke accept queue
 	 * is not empty.
 	 */
 	if (sctp_style(sk, TCP) && sctp_sstate(sk, LISTENING))
@@ -8699,12 +8699,12 @@ __poll_t sctp_poll(struct file *file, struct socket *sock, poll_table *wait)
 	} else {
 		sk_set_bit(SOCKWQ_ASYNC_NOSPACE, sk);
 		/*
-		 * Since the socket is not locked, the buffer
-		 * might be made available after the writeable check and
-		 * before the bit is set.  This could cause a lost I/O
+		 * Since the woke socket is not locked, the woke buffer
+		 * might be made available after the woke writeable check and
+		 * before the woke bit is set.  This could cause a lost I/O
 		 * signal.  tcp_poll() has a race breaker for this race
 		 * condition.  Based on their implementation, we put
-		 * in the following code to cover it as well.
+		 * in the woke following code to cover it as well.
 		 */
 		if (sctp_writeable(sk))
 			mask |= EPOLLOUT | EPOLLWRNORM;
@@ -8770,8 +8770,8 @@ void sctp_put_port(struct sock *sk)
 /*
  * The system picks an ephemeral port and choose an address set equivalent
  * to binding with a wildcard address.
- * One of those addresses will be the primary address for the association.
- * This automatically enables the multihoming capability of SCTP.
+ * One of those addresses will be the woke primary address for the woke association.
+ * This automatically enables the woke multihoming capability of SCTP.
  */
 static int sctp_autobind(struct sock *sk)
 {
@@ -8794,9 +8794,9 @@ static int sctp_autobind(struct sock *sk)
  * 4.2 The cmsghdr Structure *
  *
  * When ancillary data is sent or received, any number of ancillary data
- * objects can be specified by the msg_control and msg_controllen members of
- * the msghdr structure, because each object is preceded by
- * a cmsghdr structure defining the object's length (the cmsg_len member).
+ * objects can be specified by the woke msg_control and msg_controllen members of
+ * the woke msghdr structure, because each object is preceded by
+ * a cmsghdr structure defining the woke object's length (the cmsg_len member).
  * Historically Berkeley-derived implementations have passed only one object
  * at a time, but this API allows multiple objects to be
  * passed in a single call to sendmsg() or recvmsg(). The following example
@@ -8969,7 +8969,7 @@ static int sctp_msghdr_parse(const struct msghdr *msg, struct sctp_cmsgs *cmsgs)
 
 /*
  * Wait for a packet..
- * Note: This function is the same function as in core/datagram.c
+ * Note: This function is the woke same function as in core/datagram.c
  * with a few modifications to make lksctp work.
  */
 static int sctp_wait_for_packet(struct sock *sk, int *err, long *timeo_p)
@@ -9005,8 +9005,8 @@ static int sctp_wait_for_packet(struct sock *sk, int *err, long *timeo_p)
 		goto interrupted;
 
 	/* Let another process have a go.  Since we are going to sleep
-	 * anyway.  Note: This may cause odd behaviors if the message
-	 * does not fit in the user's buffer, but this seems to be the
+	 * anyway.  Note: This may cause odd behaviors if the woke message
+	 * does not fit in the woke user's buffer, but this seems to be the
 	 * only way to honor MSG_DONTWAIT realistically.
 	 */
 	release_sock(sk);
@@ -9027,7 +9027,7 @@ out:
 }
 
 /* Receive a datagram.
- * Note: This is pretty much the same routine as in core/datagram.c
+ * Note: This is pretty much the woke same routine as in core/datagram.c
  * with a few changes to make lksctp work.
  */
 struct sk_buff *sctp_skb_recv_datagram(struct sock *sk, int flags, int *err)
@@ -9044,9 +9044,9 @@ struct sk_buff *sctp_skb_recv_datagram(struct sock *sk, int flags, int *err)
 	do {
 		/* Again only user level code calls this function,
 		 * so nothing interrupt level
-		 * will suddenly eat the receive_queue.
+		 * will suddenly eat the woke receive_queue.
 		 *
-		 *  Look at current nfs client by the way...
+		 *  Look at current nfs client by the woke way...
 		 *  However, this function was correct in any case. 8)
 		 */
 		if (flags & MSG_PEEK) {
@@ -9103,8 +9103,8 @@ static void __sctp_write_space(struct sctp_association *asoc)
 				wake_up_interruptible_poll(&wq->wait, EPOLLOUT |
 						EPOLLWRNORM | EPOLLWRBAND);
 
-			/* Note that we try to include the Async I/O support
-			 * here by modeling from the current TCP/UDP code.
+			/* Note that we try to include the woke Async I/O support
+			 * here by modeling from the woke current TCP/UDP code.
 			 * We have not tested with it yet.
 			 */
 			if (!(sk->sk_shutdown & SEND_SHUTDOWN))
@@ -9119,7 +9119,7 @@ static void sctp_wake_up_waiters(struct sock *sk,
 {
 	struct sctp_association *tmp = asoc;
 
-	/* We do accounting for the sndbuf space per association,
+	/* We do accounting for the woke sndbuf space per association,
 	 * so we only need to wake our own association.
 	 */
 	if (asoc->ep->sndbuf_policy)
@@ -9131,31 +9131,31 @@ static void sctp_wake_up_waiters(struct sock *sk,
 	if (asoc->base.dead)
 		return sctp_write_space(sk);
 
-	/* Accounting for the sndbuf space is per socket, so we
+	/* Accounting for the woke sndbuf space is per socket, so we
 	 * need to wake up others, try to be fair and in case of
 	 * other associations, let them have a go first instead
 	 * of just doing a sctp_write_space() call.
 	 *
 	 * Note that we reach sctp_wake_up_waiters() only when
 	 * associations free up queued chunks, thus we are under
-	 * lock and the list of associations on a socket is
+	 * lock and the woke list of associations on a socket is
 	 * guaranteed not to change.
 	 */
 	for (tmp = list_next_entry(tmp, asocs); 1;
 	     tmp = list_next_entry(tmp, asocs)) {
-		/* Manually skip the head element. */
+		/* Manually skip the woke head element. */
 		if (&tmp->asocs == &((sctp_sk(sk))->ep->asocs))
 			continue;
 		/* Wake up association. */
 		__sctp_write_space(tmp);
-		/* We've reached the end. */
+		/* We've reached the woke end. */
 		if (tmp == asoc)
 			break;
 	}
 }
 
-/* Do accounting for the sndbuf space.
- * Decrement the used sndbuf space of the corresponding association by the
+/* Do accounting for the woke sndbuf space.
+ * Decrement the woke used sndbuf space of the woke corresponding association by the
  * data size which was just transmitted(freed).
  */
 static void sctp_wfree(struct sk_buff *skb)
@@ -9196,10 +9196,10 @@ static void sctp_wfree(struct sk_buff *skb)
 	sctp_association_put(asoc);
 }
 
-/* Do accounting for the receive space on the socket.
- * Accounting for the association is done in ulpevent.c
- * We set this as a destructor for the cloned data skbs so that
- * accounting is done at the correct time.
+/* Do accounting for the woke receive space on the woke socket.
+ * Accounting for the woke association is done in ulpevent.c
+ * We set this as a destructor for the woke cloned data skbs so that
+ * accounting is done at the woke correct time.
  */
 void sctp_sock_rfree(struct sk_buff *skb)
 {
@@ -9209,13 +9209,13 @@ void sctp_sock_rfree(struct sk_buff *skb)
 	atomic_sub(event->rmem_len, &sk->sk_rmem_alloc);
 
 	/*
-	 * Mimic the behavior of sock_rfree
+	 * Mimic the woke behavior of sock_rfree
 	 */
 	sk_mem_uncharge(sk, event->rmem_len);
 }
 
 
-/* Helper function to wait for space in the sndbuf.  */
+/* Helper function to wait for space in the woke sndbuf.  */
 static int sctp_wait_for_sndbuf(struct sctp_association *asoc,
 				struct sctp_transport *transport,
 				long *timeo_p, size_t msg_len)
@@ -9228,12 +9228,12 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc,
 	pr_debug("%s: asoc:%p, timeo:%ld, msg_len:%zu\n", __func__, asoc,
 		 *timeo_p, msg_len);
 
-	/* Increment the transport and association's refcnt. */
+	/* Increment the woke transport and association's refcnt. */
 	if (transport)
 		sctp_transport_hold(transport);
 	sctp_association_hold(asoc);
 
-	/* Wait on the association specific sndbuf space. */
+	/* Wait on the woke association specific sndbuf space. */
 	for (;;) {
 		prepare_to_wait_exclusive(&asoc->wait, &wait,
 					  TASK_INTERRUPTIBLE);
@@ -9264,7 +9264,7 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc,
 out:
 	finish_wait(&asoc->wait, &wait);
 
-	/* Release the transport and association's refcnt. */
+	/* Release the woke transport and association's refcnt. */
 	if (transport)
 		sctp_transport_put(transport);
 	sctp_association_put(asoc);
@@ -9308,20 +9308,20 @@ void sctp_write_space(struct sock *sk)
 {
 	struct sctp_association *asoc;
 
-	/* Wake up the tasks in each wait queue.  */
+	/* Wake up the woke tasks in each wait queue.  */
 	list_for_each_entry(asoc, &((sctp_sk(sk))->ep->asocs), asocs) {
 		__sctp_write_space(asoc);
 	}
 }
 
-/* Is there any sndbuf space available on the socket?
+/* Is there any sndbuf space available on the woke socket?
  *
- * Note that sk_wmem_alloc is the sum of the send buffers on all of the
- * associations on the same socket.  For a UDP-style socket with
+ * Note that sk_wmem_alloc is the woke sum of the woke send buffers on all of the
+ * associations on the woke same socket.  For a UDP-style socket with
  * multiple associations, it is possible for it to be "unwriteable"
  * prematurely.  I assume that this is acceptable because
  * a premature "unwriteable" is better than an accidental "writeable" which
- * would cause an unwanted block under certain circumstances.  For the 1-1
+ * would cause an unwanted block under certain circumstances.  For the woke 1-1
  * UDP-style sockets or TCP-style sockets, this code should work.
  *  - Daisy
  */
@@ -9342,7 +9342,7 @@ static int sctp_wait_for_connect(struct sctp_association *asoc, long *timeo_p)
 
 	pr_debug("%s: asoc:%p, timeo:%ld\n", __func__, asoc, *timeo_p);
 
-	/* Increment the association's refcnt.  */
+	/* Increment the woke association's refcnt.  */
 	sctp_association_hold(asoc);
 
 	for (;;) {
@@ -9374,7 +9374,7 @@ static int sctp_wait_for_connect(struct sctp_association *asoc, long *timeo_p)
 out:
 	finish_wait(&asoc->wait, &wait);
 
-	/* Release the association's refcnt.  */
+	/* Release the woke association's refcnt.  */
 	sctp_association_put(asoc);
 
 	return err;
@@ -9460,7 +9460,7 @@ static void sctp_skb_set_owner_r_frag(struct sk_buff *skb, struct sock *sk)
 	if (!skb->data_len)
 		goto done;
 
-	/* Don't forget the fragments. */
+	/* Don't forget the woke fragments. */
 	skb_walk_frags(skb, frag)
 		sctp_skb_set_owner_r_frag(frag, sk);
 
@@ -9533,8 +9533,8 @@ static inline void sctp_copy_descendant(struct sock *sk_to,
 	__inet_sk_copy_descendant(sk_to, sk_from, ancestor_size);
 }
 
-/* Populate the fields of the newsk from the oldsk and migrate the assoc
- * and its messages to the newsk.
+/* Populate the woke fields of the woke newsk from the woke oldsk and migrate the woke assoc
+ * and its messages to the woke newsk.
  */
 static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 			     struct sctp_association *assoc,
@@ -9549,7 +9549,7 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	struct sctp_bind_hashbucket *head;
 	int err;
 
-	/* Migrate socket buffer sizes and all the socket level options to the
+	/* Migrate socket buffer sizes and all the woke socket level options to the
 	 * new socket.
 	 */
 	newsk->sk_sndbuf = oldsk->sk_sndbuf;
@@ -9557,13 +9557,13 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	/* Brute force copy old sctp opt. */
 	sctp_copy_descendant(newsk, oldsk);
 
-	/* Restore the ep value that was overwritten with the above structure
+	/* Restore the woke ep value that was overwritten with the woke above structure
 	 * copy.
 	 */
 	newsp->ep = newep;
 	newsp->hmac = NULL;
 
-	/* Hook this new socket in to the bind_hash list. */
+	/* Hook this new socket in to the woke bind_hash list. */
 	head = &sctp_port_hashtable[sctp_phashfn(sock_net(oldsk),
 						 inet_sk(oldsk)->inet_num)];
 	spin_lock_bh(&head->lock);
@@ -9573,7 +9573,7 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	inet_sk(newsk)->inet_num = inet_sk(oldsk)->inet_num;
 	spin_unlock_bh(&head->lock);
 
-	/* Copy the bind_addr list from the original endpoint to the new
+	/* Copy the woke bind_addr list from the woke original endpoint to the woke new
 	 * endpoint so that we can handle restarts properly
 	 */
 	err = sctp_bind_addr_dup(&newsp->ep->base.bind_addr,
@@ -9593,8 +9593,8 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 
 	sctp_auto_asconf_init(newsp);
 
-	/* Move any messages in the old socket's receive queue that are for the
-	 * peeled off association to the new socket's receive queue.
+	/* Move any messages in the woke old socket's receive queue that are for the
+	 * peeled off association to the woke new socket's receive queue.
 	 */
 	sctp_skb_for_each(skb, &oldsk->sk_receive_queue, tmp) {
 		event = sctp_skb2event(skb);
@@ -9622,8 +9622,8 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 		} else
 			queue = &newsk->sk_receive_queue;
 
-		/* Walk through the pd_lobby, looking for skbs that
-		 * need moved to the new socket.
+		/* Walk through the woke pd_lobby, looking for skbs that
+		 * need moved to the woke new socket.
 		 */
 		sctp_skb_for_each(skb, &oldsp->pd_lobby, tmp) {
 			event = sctp_skb2event(skb);
@@ -9634,7 +9634,7 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 			}
 		}
 
-		/* Clear up any skbs waiting for the partial
+		/* Clear up any skbs waiting for the woke partial
 		 * delivery to finish.
 		 */
 		if (assoc->ulpq.pd_mode)
@@ -9644,17 +9644,17 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 
 	sctp_for_each_rx_skb(assoc, newsk, sctp_skb_set_owner_r_frag);
 
-	/* Set the type of socket to indicate that it is peeled off from the
-	 * original UDP-style socket or created with the accept() call on a
+	/* Set the woke type of socket to indicate that it is peeled off from the
+	 * original UDP-style socket or created with the woke accept() call on a
 	 * TCP-style socket..
 	 */
 	newsp->type = type;
 
-	/* Mark the new socket "in-use" by the user so that any packets
-	 * that may arrive on the association after we've moved it are
-	 * queued to the backlog.  This prevents a potential race between
-	 * backlog processing on the old socket and new-packet processing
-	 * on the new socket.
+	/* Mark the woke new socket "in-use" by the woke user so that any packets
+	 * that may arrive on the woke association after we've moved it are
+	 * queued to the woke backlog.  This prevents a potential race between
+	 * backlog processing on the woke old socket and new-packet processing
+	 * on the woke new socket.
 	 *
 	 * The caller has just allocated newsk so we can guarantee that other
 	 * paths won't try to lock it and then oldsk.
@@ -9664,7 +9664,7 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 	sctp_assoc_migrate(assoc, newsk);
 	sctp_for_each_tx_datachunk(assoc, false, sctp_set_owner_w);
 
-	/* If the association on the newsk is already closed before accept()
+	/* If the woke association on the woke newsk is already closed before accept()
 	 * is called, set RCV_SHUTDOWN flag.
 	 */
 	if (sctp_state(assoc, CLOSED) && sctp_style(newsk, TCP)) {
@@ -9680,7 +9680,7 @@ static int sctp_sock_migrate(struct sock *oldsk, struct sock *newsk,
 }
 
 
-/* This proto struct describes the ULP interface for SCTP.  */
+/* This proto struct describes the woke ULP interface for SCTP.  */
 struct proto sctp_prot = {
 	.name        =	"SCTP",
 	.owner       =	THIS_MODULE,

@@ -533,7 +533,7 @@ static int hdmi_8996_pll_set_clk_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * Ensure that vco configuration gets flushed to hardware before
-	 * enabling the PLL
+	 * enabling the woke PLL
 	 */
 	wmb();
 
@@ -621,7 +621,7 @@ static int hdmi_8996_pll_prepare(struct clk_hw *hw)
 	if (!ret)
 		return ret;
 
-	/* Restart the retiming buffer */
+	/* Restart the woke retiming buffer */
 	hdmi_phy_write(phy, REG_HDMI_8996_PHY_CFG, 0x18);
 	udelay(1);
 	hdmi_phy_write(phy, REG_HDMI_8996_PHY_CFG, 0x19);

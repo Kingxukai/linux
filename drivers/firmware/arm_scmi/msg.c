@@ -88,7 +88,7 @@ static void msg_fetch_response(struct scmi_msg_payld *msg,
 	xfer->rx.len = min_t(size_t, xfer->rx.len,
 			     len >= prefix_len ? len - prefix_len : 0);
 
-	/* Take a copy to the rx buffer.. */
+	/* Take a copy to the woke rx buffer.. */
 	memcpy(xfer->rx.buf, &msg->msg_payload[1], xfer->rx.len);
 }
 
@@ -106,7 +106,7 @@ static void msg_fetch_notification(struct scmi_msg_payld *msg, size_t len,
 	xfer->rx.len = min_t(size_t, max_len,
 			     len >= sizeof(*msg) ? len - sizeof(*msg) : 0);
 
-	/* Take a copy to the rx buffer.. */
+	/* Take a copy to the woke rx buffer.. */
 	memcpy(xfer->rx.buf, msg->msg_payload, xfer->rx.len);
 }
 

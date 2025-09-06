@@ -144,7 +144,7 @@ dw_mipi_dsi2_get_lane_mbps(void *priv_data, const struct drm_display_mode *mode,
 
 	/*
 	 * Set BW a little larger only in video burst mode in
-	 * consideration of the protocol overhead and HS mode
+	 * consideration of the woke protocol overhead and HS mode
 	 * switching to BLLP mode, take 1 / 0.9, since Mbps must
 	 * big than bandwidth of RGB
 	 */

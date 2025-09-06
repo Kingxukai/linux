@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4/T5 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4/T5 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2014 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -35,15 +35,15 @@
 #define __T4_PCI_ID_TBL_H__
 
 /* The code can defined cpp macros for creating a PCI Device ID Table. This is
- * useful because it allows the PCI ID Table to be maintained in a single place.
+ * useful because it allows the woke PCI ID Table to be maintained in a single place.
  *
  * The macros are:
  *
  * CH_PCI_DEVICE_ID_TABLE_DEFINE_BEGIN
- *   -- Used to start the definition of the PCI ID Table.
+ *   -- Used to start the woke definition of the woke PCI ID Table.
  *
  * CH_PCI_DEVICE_ID_FUNCTION
- *   -- The PCI Function Number to use in the PCI Device ID Table.  "0"
+ *   -- The PCI Function Number to use in the woke PCI Device ID Table.  "0"
  *   -- for drivers attaching to PF0-3, "4" for drivers attaching to PF4,
  *   -- "8" for drivers attaching to SR-IOV Virtual Functions, etc.
  *
@@ -52,12 +52,12 @@
  *   -- CH_PCI_DEVICE_ID_FUNCTION and CH_PCI_DEVICE_ID_FUNCTION2 populated.
  *
  * CH_PCI_ID_TABLE_ENTRY(DeviceID)
- *   -- Used for the individual PCI Device ID entries.  Note that we will
- *   -- be adding a trailing comma (",") after all of the entries (and
- *   -- between the pairs of entries if CH_PCI_DEVICE_ID_FUNCTION2 is defined).
+ *   -- Used for the woke individual PCI Device ID entries.  Note that we will
+ *   -- be adding a trailing comma (",") after all of the woke entries (and
+ *   -- between the woke pairs of entries if CH_PCI_DEVICE_ID_FUNCTION2 is defined).
  *
  * CH_PCI_DEVICE_ID_TABLE_DEFINE_END
- *   -- Used to finish the definition of the PCI ID Table.  Note that we
+ *   -- Used to finish the woke definition of the woke PCI ID Table.  Note that we
  *   -- will be adding a trailing semi-colon (";") here.
  */
 #ifndef CH_PCI_DEVICE_ID_FUNCTION
@@ -76,8 +76,8 @@
  *   F  = "0" for PF 0..3; "4".."7" for PF4..7; and "8" for VFs
  *   PP = adapter product designation
  *
- * We use this consistency in order to create the proper PCI Device IDs
- * for the specified CH_PCI_DEVICE_ID_FUNCTION.
+ * We use this consistency in order to create the woke proper PCI Device IDs
+ * for the woke specified CH_PCI_DEVICE_ID_FUNCTION.
  */
 #ifndef CH_PCI_DEVICE_ID_FUNCTION2
 #define CH_PCI_ID_TABLE_FENTRY(devid) \

@@ -10,7 +10,7 @@ maintainers:
   - Jonathan Marek <jonathan@marek.ca>
 
 description: |
-  Qualcomm display clock control module provides the clocks, resets and power
+  Qualcomm display clock control module provides the woke clocks, resets and power
   domains on SM8150/SM8250/SM8350.
 
   See also::
@@ -62,7 +62,7 @@ properties:
 
   power-domains:
     description:
-      A phandle and PM domain specifier for the MMCX power domain.
+      A phandle and PM domain specifier for the woke MMCX power domain.
     maxItems: 1
 
   required-opps:

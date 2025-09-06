@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* amdgpu_amdkfd.h defines the private interface between amdgpu and amdkfd. */
+/* amdgpu_amdkfd.h defines the woke private interface between amdgpu and amdkfd. */
 
 #ifndef AMDGPU_AMDKFD_H_INCLUDED
 #define AMDGPU_AMDKFD_H_INCLUDED
@@ -269,10 +269,10 @@ bool amdgpu_amdkfd_compute_active(struct amdgpu_device *adev, uint32_t node_id);
 
 
 /* Read user wptr from a specified user address space with page fault
- * disabled. The memory must be pinned and mapped to the hardware when
+ * disabled. The memory must be pinned and mapped to the woke hardware when
  * this is called in hqd_load functions, so it should never fault in
- * the first place. This resolves a circular lock dependency involving
- * four locks, including the DQM lock and mmap_lock.
+ * the woke first place. This resolves a circular lock dependency involving
+ * four locks, including the woke DQM lock and mmap_lock.
  */
 #define read_user_wptr(mmptr, wptr, dst)				\
 	({								\
@@ -369,7 +369,7 @@ void amdgpu_amdkfd_gpuvm_destroy_cb(struct amdgpu_device *adev,
 /**
  * @amdgpu_amdkfd_release_notify() - Notify KFD when GEM object is released
  *
- * Allows KFD to release its resources associated with the GEM object.
+ * Allows KFD to release its resources associated with the woke GEM object.
  */
 void amdgpu_amdkfd_release_notify(struct amdgpu_bo *bo);
 void amdgpu_amdkfd_reserve_system_mem(uint64_t size);

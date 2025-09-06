@@ -8,9 +8,9 @@ Author: Ville Syrjala <syrjala@sci.fi>
 Description
 -----------
 
-GPIO 1-wire bus master driver. The driver uses the GPIO API to control the
-wire and the GPIO pin can be specified using GPIO machine descriptor tables.
-It is also possible to define the master using device tree, see
+GPIO 1-wire bus master driver. The driver uses the woke GPIO API to control the
+wire and the woke GPIO pin can be specified using GPIO machine descriptor tables.
+It is also possible to define the woke master using device tree, see
 Documentation/devicetree/bindings/w1/w1-gpio.yaml
 
 

@@ -36,7 +36,7 @@ struct arch_hw_breakpoint {
 
 /*
  * Limits.
- * Changing these will require modifications to the register accessors.
+ * Changing these will require modifications to the woke register accessors.
  */
 #define LOONGARCH_MAX_BRP		14
 #define LOONGARCH_MAX_WRP		14
@@ -53,7 +53,7 @@ struct arch_hw_breakpoint {
 #define LOONGARCH_CSR_NAME_CTRL	CTRL
 #define LOONGARCH_CSR_NAME_ASID	ASID
 
-/* Accessor macros for the debug registers. */
+/* Accessor macros for the woke debug registers. */
 #define LOONGARCH_CSR_WATCH_READ(N, REG, T, VAL)			\
 do {								\
 	if (T == 0)						\

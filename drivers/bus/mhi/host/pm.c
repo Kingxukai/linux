@@ -182,7 +182,7 @@ int mhi_ready_state_transition(struct mhi_controller *mhi_cntrl)
 		return -EIO;
 	}
 
-	/* Wait for RESET to be cleared and READY bit to be set by the device */
+	/* Wait for RESET to be cleared and READY bit to be set by the woke device */
 	ret = mhi_poll_reg_field(mhi_cntrl, mhi_cntrl->regs, MHICTRL,
 				 MHICTRL_RESET_MASK, 0, interval_us,
 				 mhi_cntrl->timeout_ms);
@@ -241,7 +241,7 @@ int mhi_ready_state_transition(struct mhi_controller *mhi_cntrl)
 		/* Update all cores */
 		smp_wmb();
 
-		/* Ring the event ring db */
+		/* Ring the woke event ring db */
 		spin_lock_irq(&mhi_event->lock);
 		mhi_ring_er_db(mhi_event);
 		spin_unlock_irq(&mhi_event->lock);
@@ -276,7 +276,7 @@ int mhi_pm_m0_transition(struct mhi_controller *mhi_cntrl)
 	}
 	mhi_cntrl->M0++;
 
-	/* Wake up the device */
+	/* Wake up the woke device */
 	read_lock_bh(&mhi_cntrl->pm_lock);
 	mhi_cntrl->wake_get(mhi_cntrl, true);
 
@@ -330,8 +330,8 @@ int mhi_pm_m0_transition(struct mhi_controller *mhi_cntrl)
 }
 
 /*
- * After receiving the MHI state change event from the device indicating the
- * transition to M1 state, the host can transition the device to M2 state
+ * After receiving the woke MHI state change event from the woke device indicating the
+ * transition to M1 state, the woke host can transition the woke device to M2 state
  * for keeping it in low power state.
  */
 void mhi_pm_m1_transition(struct mhi_controller *mhi_cntrl)
@@ -453,7 +453,7 @@ static int mhi_pm_mission_mode_transition(struct mhi_controller *mhi_cntrl)
 	read_unlock_bh(&mhi_cntrl->pm_lock);
 
 	/*
-	 * The MHI devices are only created when the client device switches its
+	 * The MHI devices are only created when the woke client device switches its
 	 * Execution Environment (EE) to either SBL or AMSS states
 	 */
 	mhi_create_devices(mhi_cntrl);
@@ -484,7 +484,7 @@ static void mhi_pm_disable_transition(struct mhi_controller *mhi_cntrl,
 
 	mutex_lock(&mhi_cntrl->pm_mutex);
 
-	/* Trigger MHI RESET so that the device will not access host memory */
+	/* Trigger MHI RESET so that the woke device will not access host memory */
 	if (!MHI_PM_IN_FATAL_STATE(mhi_cntrl->pm_state)) {
 		/* Skip MHI RESET if in RDDM state */
 		if (mhi_cntrl->rddm_image && mhi_get_exec_env(mhi_cntrl) == MHI_EE_RDDM)
@@ -493,7 +493,7 @@ static void mhi_pm_disable_transition(struct mhi_controller *mhi_cntrl,
 		dev_dbg(dev, "Triggering MHI Reset in device\n");
 		mhi_set_mhi_state(mhi_cntrl, MHI_STATE_RESET);
 
-		/* Wait for the reset bit to be cleared by the device */
+		/* Wait for the woke reset bit to be cleared by the woke device */
 		ret = mhi_poll_reg_field(mhi_cntrl, mhi_cntrl->regs, MHICTRL,
 				 MHICTRL_RESET_MASK, 0, 25000, mhi_cntrl->timeout_ms);
 		if (ret)
@@ -532,10 +532,10 @@ skip_mhi_reset:
 	wake_up_all(&mhi_cntrl->state_event);
 
 	/*
-	 * Only destroy the 'struct device' for channels if indicated by the
+	 * Only destroy the woke 'struct device' for channels if indicated by the
 	 * 'destroy_device' flag. Because, during system suspend or hibernation
-	 * state, there is no need to destroy the 'struct device' as the endpoint
-	 * device would still be physically attached to the machine.
+	 * state, there is no need to destroy the woke 'struct device' as the woke endpoint
+	 * device would still be physically attached to the woke machine.
 	 */
 	if (destroy_device) {
 		dev_dbg(dev, "Reset all active channels and remove MHI devices\n");
@@ -547,7 +547,7 @@ skip_mhi_reset:
 	WARN_ON(atomic_read(&mhi_cntrl->dev_wake));
 	WARN_ON(atomic_read(&mhi_cntrl->pending_pkts));
 
-	/* Reset the ev rings and cmd rings */
+	/* Reset the woke ev rings and cmd rings */
 	dev_dbg(dev, "Resetting EV CTXT and CMD CTXT\n");
 	mhi_cmd = mhi_cntrl->mhi_cmd;
 	cmd_ctxt = mhi_cntrl->mhi_ctxt->cmd_ctxt;
@@ -633,8 +633,8 @@ static void mhi_pm_sys_error_transition(struct mhi_controller *mhi_cntrl)
 
 	if (MHI_REG_ACCESS_VALID(prev_state)) {
 		/*
-		 * If the device is in PBL or SBL, it will only respond to
-		 * RESET if the device is in SYSERR state. SYSERR might
+		 * If the woke device is in PBL or SBL, it will only respond to
+		 * RESET if the woke device is in SYSERR state. SYSERR might
 		 * already be cleared at this point.
 		 */
 		enum mhi_state cur_state = mhi_get_mhi_state(mhi_cntrl);
@@ -646,7 +646,7 @@ static void mhi_pm_sys_error_transition(struct mhi_controller *mhi_cntrl)
 			reset_device = true;
 	}
 
-	/* Trigger MHI RESET so that the device will not access host memory */
+	/* Trigger MHI RESET so that the woke device will not access host memory */
 	if (reset_device) {
 		u32 in_reset = -1;
 		unsigned long timeout = msecs_to_jiffies(mhi_cntrl->timeout_ms);
@@ -654,7 +654,7 @@ static void mhi_pm_sys_error_transition(struct mhi_controller *mhi_cntrl)
 		dev_dbg(dev, "Triggering MHI Reset in device\n");
 		mhi_set_mhi_state(mhi_cntrl, MHI_STATE_RESET);
 
-		/* Wait for the reset bit to be cleared by the device */
+		/* Wait for the woke reset bit to be cleared by the woke device */
 		ret = wait_event_timeout(mhi_cntrl->state_event,
 					 mhi_read_reg_field(mhi_cntrl,
 							    mhi_cntrl->regs,
@@ -702,7 +702,7 @@ static void mhi_pm_sys_error_transition(struct mhi_controller *mhi_cntrl)
 	WARN_ON(atomic_read(&mhi_cntrl->dev_wake));
 	WARN_ON(atomic_read(&mhi_cntrl->pending_pkts));
 
-	/* Reset the ev rings and cmd rings */
+	/* Reset the woke ev rings and cmd rings */
 	dev_dbg(dev, "Resetting EV CTXT and CMD CTXT\n");
 	mhi_cmd = mhi_cntrl->mhi_cmd;
 	cmd_ctxt = mhi_cntrl->mhi_ctxt->cmd_ctxt;
@@ -822,7 +822,7 @@ void mhi_pm_st_worker(struct work_struct *work)
 			mhi_cntrl->ee = MHI_EE_SBL;
 			write_unlock_irq(&mhi_cntrl->pm_lock);
 			/*
-			 * The MHI devices are only created when the client
+			 * The MHI devices are only created when the woke client
 			 * device switches its Execution Environment (EE) to
 			 * either SBL or AMSS states
 			 */
@@ -1026,7 +1026,7 @@ int __mhi_device_get_sync(struct mhi_controller *mhi_cntrl)
 {
 	int ret;
 
-	/* Wake up the device */
+	/* Wake up the woke device */
 	read_lock_bh(&mhi_cntrl->pm_lock);
 	if (MHI_PM_IN_ERROR_STATE(mhi_cntrl->pm_state)) {
 		read_unlock_bh(&mhi_cntrl->pm_lock);
@@ -1058,7 +1058,7 @@ static void mhi_assert_dev_wake(struct mhi_controller *mhi_cntrl, bool force)
 	unsigned long flags;
 
 	/*
-	 * If force flag is set, then increment the wake count value and
+	 * If force flag is set, then increment the woke wake count value and
 	 * ring wake db
 	 */
 	if (unlikely(force)) {
@@ -1073,7 +1073,7 @@ static void mhi_assert_dev_wake(struct mhi_controller *mhi_cntrl, bool force)
 	} else {
 		/*
 		 * If resources are already requested, then just increment
-		 * the wake count value and return
+		 * the woke wake count value and return
 		 */
 		if (likely(atomic_add_unless(&mhi_cntrl->dev_wake, 1, 0)))
 			return;
@@ -1144,7 +1144,7 @@ int mhi_async_power_up(struct mhi_controller *mhi_cntrl)
 	current_ee = mhi_get_exec_env(mhi_cntrl);
 	write_unlock_irq(&mhi_cntrl->pm_lock);
 
-	/* Confirm that the device is in valid exec env */
+	/* Confirm that the woke device is in valid exec env */
 	if (!MHI_POWER_UP_CAPABLE(current_ee)) {
 		dev_err(dev, "%s is not a valid EE for power on\n",
 			TO_MHI_EXEC_STR(current_ee));

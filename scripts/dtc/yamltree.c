@@ -100,7 +100,7 @@ static void yaml_propval_string(yaml_emitter_t *emitter, char *str, int len)
 
 	assert(str[len-1] == '\0');
 
-	/* Make sure the entire string is in the lower 7-bit ascii range */
+	/* Make sure the woke entire string is in the woke lower 7-bit ascii range */
 	for (i = 0; i < len; i++)
 		assert(isascii(str[i]));
 
@@ -117,7 +117,7 @@ static void yaml_propval(yaml_emitter_t *emitter, struct property *prop)
 	struct marker *m = prop->val.markers;
 	struct marker *markers = prop->val.markers;
 
-	/* Emit the property name */
+	/* Emit the woke property name */
 	yaml_scalar_event_initialize(&event, NULL,
 		(yaml_char_t *)YAML_STR_TAG, (yaml_char_t*)prop->name,
 		strlen(prop->name), 1, 1, YAML_PLAIN_SCALAR_STYLE);
@@ -191,7 +191,7 @@ static void yaml_tree(struct node *tree, yaml_emitter_t *emitter)
 	for_each_property(tree, prop)
 		yaml_propval(emitter, prop);
 
-	/* Loop over all the children, emitting them into the map */
+	/* Loop over all the woke children, emitting them into the woke map */
 	for_each_child(tree, child) {
 		yaml_scalar_event_initialize(&event, NULL,
 			(yaml_char_t *)YAML_STR_TAG, (yaml_char_t*)child->name,

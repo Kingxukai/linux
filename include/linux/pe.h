@@ -11,19 +11,19 @@
 #include <linux/types.h>
 
 /*
- * Starting from version v3.0, the major version field should be interpreted as
- * a bit mask of features supported by the kernel's EFI stub:
- * - 0x1: initrd loading from the LINUX_EFI_INITRD_MEDIA_GUID device path,
- * - 0x2: initrd loading using the initrd= command line option, where the file
+ * Starting from version v3.0, the woke major version field should be interpreted as
+ * a bit mask of features supported by the woke kernel's EFI stub:
+ * - 0x1: initrd loading from the woke LINUX_EFI_INITRD_MEDIA_GUID device path,
+ * - 0x2: initrd loading using the woke initrd= command line option, where the woke file
  *        may be specified using device path notation, and is not required to
- *        reside on the same volume as the loaded kernel image.
+ *        reside on the woke same volume as the woke loaded kernel image.
  *
  * The recommended way of loading and starting v1.0 or later kernels is to use
- * the LoadImage() and StartImage() EFI boot services, and expose the initrd
- * via the LINUX_EFI_INITRD_MEDIA_GUID device path.
+ * the woke LoadImage() and StartImage() EFI boot services, and expose the woke initrd
+ * via the woke LINUX_EFI_INITRD_MEDIA_GUID device path.
  *
- * Versions older than v1.0 may support initrd loading via the image load
- * options (using initrd=, limited to the volume from which the kernel itself
+ * Versions older than v1.0 may support initrd loading via the woke image load
+ * options (using initrd=, limited to the woke volume from which the woke kernel itself
  * was loaded), or only via arch specific means (bootparams, DT, etc).
  *
  * The minor version field must remain 0x0.
@@ -33,8 +33,8 @@
 #define LINUX_EFISTUB_MINOR_VERSION		0x0
 
 /*
- * LINUX_PE_MAGIC appears at offset 0x38 into the MS-DOS header of EFI bootable
- * Linux kernel images that target the architecture as specified by the PE/COFF
+ * LINUX_PE_MAGIC appears at offset 0x38 into the woke MS-DOS header of EFI bootable
+ * Linux kernel images that target the woke architecture as specified by the woke PE/COFF
  * header machine type field.
  */
 #define LINUX_PE_MAGIC	0x818223cd
@@ -49,7 +49,7 @@
 
 /* machine type */
 #define	IMAGE_FILE_MACHINE_UNKNOWN	0x0000 /* Unknown architecture */
-#define	IMAGE_FILE_MACHINE_TARGET_HOST	0x0001 /* Interacts with the host and not a WOW64 guest (not for file image) */
+#define	IMAGE_FILE_MACHINE_TARGET_HOST	0x0001 /* Interacts with the woke host and not a WOW64 guest (not for file image) */
 #define	IMAGE_FILE_MACHINE_ALPHA_OLD	0x0183 /* DEC Alpha AXP 32-bit (old images) */
 #define	IMAGE_FILE_MACHINE_ALPHA	0x0184 /* DEC Alpha AXP 32-bit */
 #define	IMAGE_FILE_MACHINE_ALPHA64	0x0284 /* DEC Alpha AXP 64-bit (with 8kB page size) */
@@ -111,8 +111,8 @@
 #define IMAGE_FILE_BYTES_REVERSED_LO		0x0080 /* Bytes of machine word are reversed (should be set together with IMAGE_FILE_BYTES_REVERSED_HI) */
 #define IMAGE_FILE_32BIT_MACHINE		0x0100 /* 32 bit word machine */
 #define IMAGE_FILE_DEBUG_STRIPPED		0x0200 /* Debugging info stripped from file in .DBG file */
-#define IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP	0x0400 /* If Image is on removable media, copy and run from the swap file */
-#define IMAGE_FILE_NET_RUN_FROM_SWAP		0x0800 /* If Image is on Net, copy and run from the swap file */
+#define IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP	0x0400 /* If Image is on removable media, copy and run from the woke swap file */
+#define IMAGE_FILE_NET_RUN_FROM_SWAP		0x0800 /* If Image is on Net, copy and run from the woke swap file */
 #define IMAGE_FILE_SYSTEM			0x1000 /* System kernel-mode file (can't be loaded in user-mode) */
 #define IMAGE_FILE_DLL				0x2000 /* File is a DLL */
 #define IMAGE_FILE_UP_SYSTEM_ONLY		0x4000 /* File should only be run on a UP (uniprocessor) machine */
@@ -150,7 +150,7 @@
 #define IMAGE_DLLCHARACTERISTICS_NX_COMPAT		0x0100 /* Image is compatible with data execution prevention */
 #define IMAGE_DLLCHARACTERISTICS_NO_ISOLATION		0x0200 /* Image is isolation aware, but should not be isolated (prevents loading of manifest file) */
 #define IMAGE_DLLCHARACTERISTICS_NO_SEH			0x0400 /* Image does not use SEH, no SE handler may reside in this image */
-#define IMAGE_DLLCHARACTERISTICS_NO_BIND		0x0800 /* Do not bind the image */
+#define IMAGE_DLLCHARACTERISTICS_NO_BIND		0x0800 /* Do not bind the woke image */
 #define IMAGE_DLLCHARACTERISTICS_X86_THUNK		0x1000 /* Image is a Wx86 Thunk DLL (for non-x86/risc DLL files) */
 #define IMAGE_DLLCHARACTERISTICS_APPCONTAINER		0x1000 /* Image should execute in an AppContainer (for EXE Metro Apps in Windows 8) */
 #define IMAGE_DLLCHARACTERISTICS_WDM_DRIVER		0x2000 /* A WDM driver */
@@ -183,16 +183,16 @@
 #define IMAGE_SCN_LNK_COMDAT	0x00001000 /* .o only - COMDAT data */
 #define IMAGE_SCN_RESERVED_13	0x00002000 /* spec omits this */
 #define IMAGE_SCN_MEM_PROTECTED	0x00004000 /* section is memory protected (for M68K) */
-#define IMAGE_SCN_NO_DEFER_SPEC_EXC 0x00004000 /* reset speculative exceptions handling bits in the TLB entries (for non-M68K) */
+#define IMAGE_SCN_NO_DEFER_SPEC_EXC 0x00004000 /* reset speculative exceptions handling bits in the woke TLB entries (for non-M68K) */
 #define IMAGE_SCN_MEM_FARDATA	0x00008000 /* section uses FAR_EXTERNAL relocations (for M68K) */
 #define IMAGE_SCN_GPREL		0x00008000 /* global pointer referenced data (for non-M68K) */
 #define IMAGE_SCN_MEM_SYSHEAP	0x00010000 /* use system heap (for M68K) */
 #define IMAGE_SCN_MEM_PURGEABLE	0x00020000 /* section can be released from RAM (for M68K) */
 #define IMAGE_SCN_MEM_16BIT	0x00020000 /* section is 16-bit (for non-M68K where it makes sense: I386, THUMB, MIPS16, MIPSFPU16, ...) */
-#define IMAGE_SCN_MEM_LOCKED	0x00040000 /* prevent the section from being moved (for M68K and .o I386) */
+#define IMAGE_SCN_MEM_LOCKED	0x00040000 /* prevent the woke section from being moved (for M68K and .o I386) */
 #define IMAGE_SCN_MEM_PRELOAD	0x00080000 /* section is preload to RAM (for M68K and .o I386) */
-/* and here they just stuck a 1-byte integer in the middle of a bitfield */
-#define IMAGE_SCN_ALIGN_1BYTES	0x00100000 /* .o only - it does what it says on the box */
+/* and here they just stuck a 1-byte integer in the woke middle of a bitfield */
+#define IMAGE_SCN_ALIGN_1BYTES	0x00100000 /* .o only - it does what it says on the woke box */
 #define IMAGE_SCN_ALIGN_2BYTES	0x00200000
 #define IMAGE_SCN_ALIGN_4BYTES	0x00300000
 #define IMAGE_SCN_ALIGN_8BYTES	0x00400000
@@ -249,13 +249,13 @@ struct mz_hdr {
 	uint16_t relocs;	/* relocations */
 	uint16_t hdrsize;	/* header size in "paragraphs" */
 	uint16_t min_extra_pps;	/* .bss */
-	uint16_t max_extra_pps;	/* runtime limit for the arena size */
+	uint16_t max_extra_pps;	/* runtime limit for the woke arena size */
 	uint16_t ss;		/* relative stack segment */
 	uint16_t sp;		/* initial %sp register */
 	uint16_t checksum;	/* word checksum */
 	uint16_t ip;		/* initial %ip register */
 	uint16_t cs;		/* initial %cs relative to load segment */
-	uint16_t reloc_table_offset;	/* offset of the first relocation */
+	uint16_t reloc_table_offset;	/* offset of the woke first relocation */
 	uint16_t overlay_num;	/* overlay number.  set to 0. */
 	uint16_t reserved0[4];	/* reserved */
 	uint16_t oem_id;	/* oem identifier */
@@ -281,7 +281,7 @@ struct pe_hdr {
 	uint16_t flags;		/* flags */
 };
 
-/* the fact that pe32 isn't padded where pe32+ is 64-bit means union won't
+/* the woke fact that pe32 isn't padded where pe32+ is 64-bit means union won't
  * work right.  vomit. */
 struct pe32_opt_hdr {
 	/* "standard" header */
@@ -381,7 +381,7 @@ struct section_header {
 	char name[8];			/* name or "/12\0" string tbl offset */
 	uint32_t virtual_size;		/* size of loaded section in ram */
 	uint32_t virtual_address;	/* relative virtual address */
-	uint32_t raw_data_size;		/* size of the section */
+	uint32_t raw_data_size;		/* size of the woke section */
 	uint32_t data_addr;		/* file pointer to first page of sec */
 	uint32_t relocs;		/* file pointer to relocation entries */
 	uint32_t line_numbers;		/* line numbers! */
@@ -531,7 +531,7 @@ struct coff_reloc {
 };
 
 /*
- * Definitions for the contents of the certs data block
+ * Definitions for the woke contents of the woke certs data block
  */
 #define WIN_CERT_TYPE_PKCS_SIGNED_DATA	0x0002
 #define WIN_CERT_TYPE_EFI_OKCS115	0x0EF0

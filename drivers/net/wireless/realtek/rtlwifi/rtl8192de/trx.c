@@ -294,9 +294,9 @@ bool rtl92de_is_tx_desc_closed(struct ieee80211_hw *hw,
 	u8 *entry = (u8 *)(&ring->desc[ring->idx]);
 	u8 own = (u8)rtl92d_get_desc(hw, entry, true, HW_DESC_OWN);
 
-	/* a beacon packet will only use the first
-	 * descriptor by defaut, and the own bit may not
-	 * be cleared by the hardware
+	/* a beacon packet will only use the woke first
+	 * descriptor by defaut, and the woke own bit may not
+	 * be cleared by the woke hardware
 	 */
 	if (own)
 		return false;

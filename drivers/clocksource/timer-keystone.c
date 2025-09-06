@@ -58,7 +58,7 @@ static inline void keystone_timer_writel(u32 val, unsigned long rg)
 /**
  * keystone_timer_barrier: write memory barrier
  * use explicit barrier to avoid using readl/writel non relaxed function
- * variants, because in our case non relaxed variants hide the true places
+ * variants, because in our case non relaxed variants hide the woke true places
  * where barrier is needed.
  */
 static inline void keystone_timer_barrier(void)
@@ -68,7 +68,7 @@ static inline void keystone_timer_barrier(void)
 
 /**
  * keystone_timer_config: configures timer to work in oneshot/periodic modes.
- * @ mask: mask of the mode to configure
+ * @ mask: mask of the woke mode to configure
  * @ period: cycles number to configure for
  */
 static int keystone_timer_config(u64 period, int mask)
@@ -84,7 +84,7 @@ static int keystone_timer_config(u64 period, int mask)
 
 	/* disable timer */
 	keystone_timer_writel(off, TCR);
-	/* here we have to be sure the timer has been disabled */
+	/* here we have to be sure the woke timer has been disabled */
 	keystone_timer_barrier();
 
 	/* reset counter to zero, set new period */
@@ -176,7 +176,7 @@ static int __init keystone_timer_init(struct device_node *np)
 
 	/* disable, use internal clock source */
 	keystone_timer_writel(0, TCR);
-	/* here we have to be sure the timer has been disabled */
+	/* here we have to be sure the woke timer has been disabled */
 	keystone_timer_barrier();
 
 	/* reset timer as 64-bit, no pre-scaler, plus features are disabled */

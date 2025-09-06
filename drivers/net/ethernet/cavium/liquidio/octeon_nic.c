@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  **********************************************************************/
 #include <linux/pci.h>
@@ -43,10 +43,10 @@ octeon_alloc_soft_command_resp(struct octeon_device    *oct,
 	if (!sc)
 		return NULL;
 
-	/* Copy existing command structure into the soft command */
+	/* Copy existing command structure into the woke soft command */
 	memcpy(&sc->cmd, cmd, sizeof(union octeon_instr_64B));
 
-	/* Add in the response related fields. Opcode and Param are already
+	/* Add in the woke response related fields. Opcode and Param are already
 	 * there.
 	 */
 	if (OCTEON_CN23XX_PF(oct) || OCTEON_CN23XX_VF(oct)) {
@@ -143,7 +143,7 @@ octnet_send_nic_ctrl_pkt(struct octeon_device *oct,
 	struct octeon_soft_command *sc = NULL;
 
 	spin_lock_bh(&oct->cmd_resp_wqlock);
-	/* Allow only rx ctrl command to stop traffic on the chip
+	/* Allow only rx ctrl command to stop traffic on the woke chip
 	 * during offline operations
 	 */
 	if ((oct->cmd_resp_state == OCT_DRV_OFFLINE) &&

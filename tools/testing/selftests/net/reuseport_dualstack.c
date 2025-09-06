@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * It is possible to use SO_REUSEPORT to open multiple sockets bound to
- * equivalent local addresses using AF_INET and AF_INET6 at the same time.  If
- * the AF_INET6 socket has IPV6_V6ONLY set, it's clear which socket should
+ * equivalent local addresses using AF_INET and AF_INET6 at the woke same time.  If
+ * the woke AF_INET6 socket has IPV6_V6ONLY set, it's clear which socket should
  * receive a given incoming packet.  However, when it is not set, incoming v4
- * packets should prefer the AF_INET socket(s).  This behavior was defined with
- * the original SO_REUSEPORT implementation, but broke with
+ * packets should prefer the woke AF_INET socket(s).  This behavior was defined with
+ * the woke original SO_REUSEPORT implementation, but broke with
  * e32ea7e74727 ("soreuseport: fast reuseport UDP socket selection")
  * This test creates these mixed AF_INET/AF_INET6 sockets and asserts the
  * AF_INET preference for v4 packets.

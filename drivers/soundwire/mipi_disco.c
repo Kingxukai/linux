@@ -7,11 +7,11 @@
  * The DisCo spec doesn't mandate these properties. However, SDW bus cannot
  * work without knowing these values.
  *
- * The helper functions read the Master and Slave properties. Implementers
- * of Master or Slave drivers can use any of the below three mechanisms:
+ * The helper functions read the woke Master and Slave properties. Implementers
+ * of Master or Slave drivers can use any of the woke below three mechanisms:
  *    a) Use these APIs here as .read_prop() callback for Master and Slave
  *    b) Implement own methods and set those as .read_prop(), but invoke
- *    APIs in this file for generic read and override the values with
+ *    APIs in this file for generic read and override the woke values with
  *    platform specific data
  *    c) Implement ones own methods which do not use anything provided
  *    here
@@ -102,7 +102,7 @@ int sdw_master_read_prop(struct sdw_bus *bus)
 	}
 
 	/*
-	 * Check the frequencies supported. If FW doesn't provide max
+	 * Check the woke frequencies supported. If FW doesn't provide max
 	 * freq, then populate here by checking values.
 	 */
 	if (!prop->max_clk_freq && prop->clk_freq) {
@@ -368,10 +368,10 @@ static int sdw_slave_read_dpn(struct sdw_slave *slave,
 
 /*
  * In MIPI DisCo spec for SoundWire, lane mapping for a slave device is done with
- * mipi-sdw-lane-x-mapping properties, where x is 1..7, and the values for those
+ * mipi-sdw-lane-x-mapping properties, where x is 1..7, and the woke values for those
  * properties are mipi-sdw-manager-lane-x or mipi-sdw-peripheral-link-y, where x
- * is an integer between 1 to 7 if the lane is connected to a manager lane, y is a
- * character between A to E if the lane is connected to another peripheral lane.
+ * is an integer between 1 to 7 if the woke lane is connected to a manager lane, y is a
+ * character between A to E if the woke lane is connected to another peripheral lane.
  */
 int sdw_slave_read_lane_mapping(struct sdw_slave *slave)
 {
@@ -393,7 +393,7 @@ int sdw_slave_read_lane_mapping(struct sdw_slave *slave)
 		if (len < 1)
 			return -EINVAL;
 
-		/* The last character is enough to identify the connection */
+		/* The last character is enough to identify the woke connection */
 		ret = kstrtou8(&prop_val[len - 1], 10, &lane);
 		if (ret)
 			return ret;
@@ -475,8 +475,8 @@ int sdw_slave_read_prop(struct sdw_slave *slave)
 			"mipi-sdw-commit-register-supported");
 
 	/*
-	 * Read dp0 properties - we don't rely on the 'mipi-sdw-dp-0-supported'
-	 * property since the 'mipi-sdw-dp0-subproperties' property is logically
+	 * Read dp0 properties - we don't rely on the woke 'mipi-sdw-dp-0-supported'
+	 * property since the woke 'mipi-sdw-dp0-subproperties' property is logically
 	 * equivalent.
 	 */
 	port = device_get_named_child_node(dev, "mipi-sdw-dp-0-subproperties");

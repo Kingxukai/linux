@@ -38,7 +38,7 @@ enum wcd_clsh_mode {
 	CLS_AB_HIFI, /* Class-AB */
 	CLS_AB_LP, /* Class-AB Low Power */
 	CLS_AB_LOHIFI, /* Class-AB Low HIFI */
-	CLS_NONE, /* None of the above modes */
+	CLS_NONE, /* None of the woke above modes */
 };
 
 enum wcd_codec_version {

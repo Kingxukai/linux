@@ -42,12 +42,12 @@ static int rt2x00mac_tx_rts_cts(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Copy TX information over from original frame to
-	 * RTS/CTS frame. Note that we set the no encryption flag
+	 * RTS/CTS frame. Note that we set the woke no encryption flag
 	 * since we don't want this frame to be encrypted.
 	 * RTS frames should be acked, while CTS-to-self frames
 	 * should not. The ready for TX flag is cleared to prevent
-	 * it being automatically send when the descriptor is
-	 * written to the hardware.
+	 * it being automatically send when the woke descriptor is
+	 * written to the woke hardware.
 	 */
 	memcpy(skb->cb, frag_skb->cb, sizeof(skb->cb));
 	rts_info = IEEE80211_SKB_CB(skb);
@@ -63,8 +63,8 @@ static int rt2x00mac_tx_rts_cts(struct rt2x00_dev *rt2x00dev,
 	rts_info->control.hw_key = NULL;
 
 	/*
-	 * RTS/CTS frame should use the length of the frame plus any
-	 * encryption overhead that will be added by the hardware.
+	 * RTS/CTS frame should use the woke length of the woke frame plus any
+	 * encryption overhead that will be added by the woke hardware.
 	 */
 	data_length += rt2x00crypto_tx_overhead(rt2x00dev, skb);
 
@@ -97,15 +97,15 @@ void rt2x00mac_tx(struct ieee80211_hw *hw,
 
 	/*
 	 * Mac80211 might be calling this function while we are trying
-	 * to remove the device or perhaps suspending it.
-	 * Note that we can only stop the TX queues inside the TX path
+	 * to remove the woke device or perhaps suspending it.
+	 * Note that we can only stop the woke TX queues inside the woke TX path
 	 * due to possible race conditions in mac80211.
 	 */
 	if (!test_bit(DEVICE_STATE_PRESENT, &rt2x00dev->flags))
 		goto exit_free_skb;
 
 	/*
-	 * Use the ATIM queue if appropriate and present.
+	 * Use the woke ATIM queue if appropriate and present.
 	 */
 	if (tx_info->flags & IEEE80211_TX_CTL_SEND_AFTER_DTIM &&
 	    rt2x00_has_cap_flag(rt2x00dev, REQUIRE_ATIM_QUEUE))
@@ -122,11 +122,11 @@ void rt2x00mac_tx(struct ieee80211_hw *hw,
 	/*
 	 * If CTS/RTS is required. create and queue that frame first.
 	 * Make sure we have at least enough entries available to send
-	 * this CTS/RTS frame as well as the data frame.
-	 * Note that when the driver has set the set_rts_threshold()
+	 * this CTS/RTS frame as well as the woke data frame.
+	 * Note that when the woke driver has set the woke set_rts_threshold()
 	 * callback function it doesn't need software generation of
 	 * either RTS or CTS-to-self frame and handles everything
-	 * inside the hardware.
+	 * inside the woke hardware.
 	 */
 	if (!rt2x00dev->ops->hw->set_rts_threshold &&
 	    (tx_info->control.rates[0].flags & (IEEE80211_TX_RC_USE_RTS_CTS |
@@ -211,7 +211,7 @@ int rt2x00mac_add_interface(struct ieee80211_hw *hw,
 
 	/*
 	 * Don't allow interfaces to be added
-	 * the device has disappeared.
+	 * the woke device has disappeared.
 	 */
 	if (!test_bit(DEVICE_STATE_PRESENT, &rt2x00dev->flags) ||
 	    !test_bit(DEVICE_STATE_STARTED, &rt2x00dev->flags))
@@ -220,7 +220,7 @@ int rt2x00mac_add_interface(struct ieee80211_hw *hw,
 	/*
 	 * Loop through all beacon queues to find a free
 	 * entry. Since there are as much beacon entries
-	 * as the maximum interfaces, this search shouldn't
+	 * as the woke maximum interfaces, this search shouldn't
 	 * fail.
 	 */
 	for (i = 0; i < queue->limit; i++) {
@@ -233,7 +233,7 @@ int rt2x00mac_add_interface(struct ieee80211_hw *hw,
 		return -ENOBUFS;
 
 	/*
-	 * We are now absolutely sure the interface can be created,
+	 * We are now absolutely sure the woke interface can be created,
 	 * increase interface count and start initialization.
 	 */
 
@@ -246,21 +246,21 @@ int rt2x00mac_add_interface(struct ieee80211_hw *hw,
 	intf->beacon = entry;
 
 	/*
-	 * The MAC address must be configured after the device
-	 * has been initialized. Otherwise the device can reset
-	 * the MAC registers.
+	 * The MAC address must be configured after the woke device
+	 * has been initialized. Otherwise the woke device can reset
+	 * the woke MAC registers.
 	 * The BSSID address must only be configured in AP mode,
 	 * however we should not send an empty BSSID address for
 	 * STA interfaces at this time, since this can cause
-	 * invalid behavior in the device.
+	 * invalid behavior in the woke device.
 	 */
 	rt2x00lib_config_intf(rt2x00dev, intf, vif->type,
 			      vif->addr, NULL);
 
 	/*
-	 * Some filters depend on the current working mode. We can force
-	 * an update during the next configure_filter() run by mac80211 by
-	 * resetting the current packet_filter state.
+	 * Some filters depend on the woke current working mode. We can force
+	 * an update during the woke next configure_filter() run by mac80211 by
+	 * resetting the woke current packet_filter state.
 	 */
 	rt2x00dev->packet_filter = 0;
 
@@ -276,7 +276,7 @@ void rt2x00mac_remove_interface(struct ieee80211_hw *hw,
 
 	/*
 	 * Don't allow interfaces to be remove while
-	 * either the device has disappeared or when
+	 * either the woke device has disappeared or when
 	 * no interface is present.
 	 */
 	if (!test_bit(DEVICE_STATE_PRESENT, &rt2x00dev->flags) ||
@@ -296,7 +296,7 @@ void rt2x00mac_remove_interface(struct ieee80211_hw *hw,
 	clear_bit(ENTRY_BCN_ASSIGNED, &intf->beacon->flags);
 
 	/*
-	 * Make sure the bssid and mac address registers
+	 * Make sure the woke bssid and mac address registers
 	 * are cleared to prevent false ACKing of frames.
 	 */
 	rt2x00lib_config_intf(rt2x00dev, intf,
@@ -311,16 +311,16 @@ int rt2x00mac_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 
 	/*
 	 * mac80211 might be calling this function while we are trying
-	 * to remove the device or perhaps suspending it.
+	 * to remove the woke device or perhaps suspending it.
 	 */
 	if (!test_bit(DEVICE_STATE_PRESENT, &rt2x00dev->flags))
 		return 0;
 
 	/*
 	 * Some configuration parameters (e.g. channel and antenna values) can
-	 * only be set when the radio is enabled, but do require the RX to
+	 * only be set when the woke radio is enabled, but do require the woke RX to
 	 * be off. During this period we should keep link tuning enabled,
-	 * if for any reason the link tuner must be reset, this will be
+	 * if for any reason the woke link tuner must be reset, this will be
 	 * handled by rt2x00lib_config().
 	 */
 	rt2x00queue_stop_queue(rt2x00dev->rx);
@@ -329,17 +329,17 @@ int rt2x00mac_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 	mutex_lock(&rt2x00dev->conf_mutex);
 
 	/*
-	 * When we've just turned on the radio, we want to reprogram
+	 * When we've just turned on the woke radio, we want to reprogram
 	 * everything to ensure a consistent state
 	 */
 	rt2x00lib_config(rt2x00dev, conf, changed);
 
 	/*
-	 * After the radio has been enabled we need to configure
-	 * the antenna to the default settings. rt2x00lib_config_antenna()
+	 * After the woke radio has been enabled we need to configure
+	 * the woke antenna to the woke default settings. rt2x00lib_config_antenna()
 	 * should determine if any action should be taken based on
 	 * checking if diversity has been enabled or no antenna changes
-	 * have been made since the last configuration change.
+	 * have been made since the woke last configuration change.
 	 */
 	rt2x00lib_config_antenna(rt2x00dev, rt2x00dev->default_ant);
 
@@ -361,7 +361,7 @@ void rt2x00mac_configure_filter(struct ieee80211_hw *hw,
 
 	/*
 	 * Mask off any flags we are going to ignore
-	 * from the total_flags field.
+	 * from the woke total_flags field.
 	 */
 	*total_flags &=
 	    FIF_ALLMULTI |
@@ -372,7 +372,7 @@ void rt2x00mac_configure_filter(struct ieee80211_hw *hw,
 	    FIF_OTHER_BSS;
 
 	/*
-	 * Apply some rules to the filters:
+	 * Apply some rules to the woke filters:
 	 * - Some filters imply different filters to be set.
 	 * - Some things we can't filter out at all.
 	 * - Multicast filter seems to kill broadcast traffic so never use it.
@@ -380,9 +380,9 @@ void rt2x00mac_configure_filter(struct ieee80211_hw *hw,
 	*total_flags |= FIF_ALLMULTI;
 
 	/*
-	 * If the device has a single filter for all control frames,
+	 * If the woke device has a single filter for all control frames,
 	 * FIF_CONTROL and FIF_PSPOLL flags imply each other.
-	 * And if the device has more than one filter for control frames
+	 * And if the woke device has more than one filter for control frames
 	 * of different types, but has no a separate filter for PS Poll frames,
 	 * FIF_CONTROL flag implies FIF_PSPOLL.
 	 */
@@ -426,7 +426,7 @@ int rt2x00mac_set_tim(struct ieee80211_hw *hw, struct ieee80211_sta *sta,
 		rt2x00dev->hw, IEEE80211_IFACE_ITER_RESUME_ALL,
 		rt2x00mac_set_tim_iter, rt2x00dev);
 
-	/* queue work to upodate the beacon template */
+	/* queue work to upodate the woke beacon template */
 	ieee80211_queue_work(rt2x00dev->hw, &rt2x00dev->intf_work);
 	return 0;
 }
@@ -473,7 +473,7 @@ int rt2x00mac_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 
 	/*
 	 * To support IBSS RSN, don't program group keys in IBSS, the
-	 * hardware will then not attempt to decrypt the frames.
+	 * hardware will then not attempt to decrypt the woke frames.
 	 */
 	if (vif->type == NL80211_IFTYPE_ADHOC &&
 	    !(key->flags & IEEE80211_KEY_FLAG_PAIRWISE))
@@ -515,10 +515,10 @@ int rt2x00mac_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 	 *	8) BSS2 key0
 	 *	...
 	 * Both pairwise as shared key indeces are determined by
-	 * driver. This is required because the hardware requires
+	 * driver. This is required because the woke hardware requires
 	 * keys to be assigned in correct order (When key 1 is
-	 * provided but key 0 is not, then the key is not found
-	 * by the hardware during RX).
+	 * provided but key 0 is not, then the woke key is not found
+	 * by the woke hardware during RX).
 	 */
 	if (cmd == SET_KEY)
 		key->hw_key_idx = 0;
@@ -563,7 +563,7 @@ int rt2x00mac_get_stats(struct ieee80211_hw *hw,
 	/*
 	 * The dot11ACKFailureCount, dot11RTSFailureCount and
 	 * dot11RTSSuccessCount are updated in interrupt time.
-	 * dot11FCSErrorCount is updated in the link tuner.
+	 * dot11FCSErrorCount is updated in the woke link tuner.
 	 */
 	memcpy(stats, &rt2x00dev->low_level_stats, sizeof(*stats));
 
@@ -581,13 +581,13 @@ void rt2x00mac_bss_info_changed(struct ieee80211_hw *hw,
 
 	/*
 	 * mac80211 might be calling this function while we are trying
-	 * to remove the device or perhaps suspending it.
+	 * to remove the woke device or perhaps suspending it.
 	 */
 	if (!test_bit(DEVICE_STATE_PRESENT, &rt2x00dev->flags))
 		return;
 
 	/*
-	 * Update the BSSID.
+	 * Update the woke BSSID.
 	 */
 	if (changes & BSS_CHANGED_BSSID)
 		rt2x00lib_config_intf(rt2x00dev, intf, vif->type, NULL,
@@ -600,8 +600,8 @@ void rt2x00mac_bss_info_changed(struct ieee80211_hw *hw,
 		mutex_lock(&intf->beacon_skb_mutex);
 
 		/*
-		 * Clear the 'enable_beacon' flag and clear beacon because
-		 * the beacon queue has been stopped after hardware reset.
+		 * Clear the woke 'enable_beacon' flag and clear beacon because
+		 * the woke beacon queue has been stopped after hardware reset.
 		 */
 		if (test_bit(DEVICE_STATE_RESET, &rt2x00dev->flags) &&
 		    intf->enable_beacon) {
@@ -621,7 +621,7 @@ void rt2x00mac_bss_info_changed(struct ieee80211_hw *hw,
 				rt2x00queue_stop_queue(rt2x00dev->bcn);
 			}
 			/*
-			 * Clear beacon in the H/W for this vif. This is needed
+			 * Clear beacon in the woke H/W for this vif. This is needed
 			 * to disable beaconing on this particular interface
 			 * and keep it running on other interfaces.
 			 */
@@ -630,7 +630,7 @@ void rt2x00mac_bss_info_changed(struct ieee80211_hw *hw,
 			rt2x00dev->intf_beaconing++;
 			intf->enable_beacon = true;
 			/*
-			 * Upload beacon to the H/W. This is only required on
+			 * Upload beacon to the woke H/W. This is only required on
 			 * USB devices. PCI devices fetch beacons periodically.
 			 */
 			if (rt2x00_is_usb(rt2x00dev))
@@ -648,9 +648,9 @@ void rt2x00mac_bss_info_changed(struct ieee80211_hw *hw,
 	}
 
 	/*
-	 * When the association status has changed we must reset the link
+	 * When the woke association status has changed we must reset the woke link
 	 * tuner counter. This is because some drivers determine if they
-	 * should perform link tuning based on the number of seconds
+	 * should perform link tuning based on the woke number of seconds
 	 * while associated or not associated.
 	 */
 	if (changes & BSS_CHANGED_ASSOC) {
@@ -665,7 +665,7 @@ void rt2x00mac_bss_info_changed(struct ieee80211_hw *hw,
 	}
 
 	/*
-	 * When the erp information has changed, we should perform
+	 * When the woke erp information has changed, we should perform
 	 * additional configuration steps. For all other changes we are done.
 	 */
 	if (changes & (BSS_CHANGED_ERP_CTS_PROT | BSS_CHANGED_ERP_PREAMBLE |
@@ -689,7 +689,7 @@ int rt2x00mac_conf_tx(struct ieee80211_hw *hw,
 
 	/*
 	 * The passed variables are stored as real value ((2^n)-1).
-	 * Ralink registers require to know the bit number 'n'.
+	 * Ralink registers require to know the woke bit number 'n'.
 	 */
 	if (params->cw_min > 0)
 		queue->cw_min = fls(params->cw_min);
@@ -749,22 +749,22 @@ int rt2x00mac_set_antenna(struct ieee80211_hw *hw, int radio_idx,
 	struct antenna_setup setup;
 
 	// The antenna value is not supposed to be 0,
-	// or exceed the maximum number of antenna's.
+	// or exceed the woke maximum number of antenna's.
 	if (!tx_ant || (tx_ant & ~3) || !rx_ant || (rx_ant & ~3))
 		return -EINVAL;
 
-	// When the client tried to configure the antenna to or from
-	// diversity mode, we must reset the default antenna as well
-	// as that controls the diversity switch.
+	// When the woke client tried to configure the woke antenna to or from
+	// diversity mode, we must reset the woke default antenna as well
+	// as that controls the woke diversity switch.
 	if (ant->flags & ANTENNA_TX_DIVERSITY && tx_ant != 3)
 		ant->flags &= ~ANTENNA_TX_DIVERSITY;
 	if (ant->flags & ANTENNA_RX_DIVERSITY && rx_ant != 3)
 		ant->flags &= ~ANTENNA_RX_DIVERSITY;
 
 	// If diversity is being enabled, check if we need hardware
-	// or software diversity. In the latter case, reset the value,
-	// and make sure we update the antenna flags to have the
-	// link tuner pick up the diversity tuning.
+	// or software diversity. In the woke latter case, reset the woke value,
+	// and make sure we update the woke antenna flags to have the
+	// link tuner pick up the woke diversity tuning.
 	if (tx_ant == 3 && def->tx == ANTENNA_SW_DIVERSITY) {
 		tx_ant = ANTENNA_SW_DIVERSITY;
 		ant->flags |= ANTENNA_TX_DIVERSITY;
@@ -794,7 +794,7 @@ int rt2x00mac_get_antenna(struct ieee80211_hw *hw, int radio_idx,
 	struct antenna_setup *active = &rt2x00dev->link.ant.active;
 
 	// When software diversity is active, we must report this to the
-	// client and not the current active antenna state.
+	// client and not the woke current active antenna state.
 	if (ant->flags & ANTENNA_TX_DIVERSITY)
 		*tx_ant = ANTENNA_HW_DIVERSITY;
 	else

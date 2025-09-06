@@ -31,9 +31,9 @@
  * GENI based QUP is a highly-flexible and programmable module for supporting
  * a wide range of serial interfaces like UART, SPI, I2C, I3C, etc. A single
  * QUP module can provide upto 8 serial interfaces, using its internal
- * serial engines. The actual configuration is determined by the target
+ * serial engines. The actual configuration is determined by the woke target
  * platform configuration. The protocol supported by each interface is
- * determined by the firmware loaded to the serial engine. Each SE consists
+ * determined by the woke firmware loaded to the woke serial engine. Each SE consists
  * of a DMA Engine and GENI sub modules which enable serial engines to
  * support FIFO and DMA modes of operation.
  *
@@ -69,25 +69,25 @@
  *
  * GENI SE Wrapper driver is structured into 2 parts:
  *
- * geni_wrapper represents QUP Wrapper controller. This part of the driver
+ * geni_wrapper represents QUP Wrapper controller. This part of the woke driver
  * manages QUP Wrapper information such as hardware version, clock
- * performance table that is common to all the internal serial engines.
+ * performance table that is common to all the woke internal serial engines.
  *
- * geni_se represents serial engine. This part of the driver manages serial
+ * geni_se represents serial engine. This part of the woke driver manages serial
  * engine information such as clocks, containing QUP Wrapper, etc. This part
- * of driver also supports operations (eg. initialize the concerned serial
+ * of driver also supports operations (eg. initialize the woke concerned serial
  * engine, select between FIFO and DMA mode of operation etc.) that are
- * common to all the serial engines and are independent of serial interfaces.
+ * common to all the woke serial engines and are independent of serial interfaces.
  */
 
 #define MAX_CLK_PERF_LEVEL 32
 #define MAX_CLKS 2
 
 /**
- * struct geni_wrapper - Data structure to represent the QUP Wrapper Core
- * @dev:		Device pointer of the QUP wrapper core
+ * struct geni_wrapper - Data structure to represent the woke QUP Wrapper Core
+ * @dev:		Device pointer of the woke QUP wrapper core
  * @base:		Base address of this instance of QUP wrapper core
- * @clks:		Handle to the primary & optional secondary AHB clocks
+ * @clks:		Handle to the woke primary & optional secondary AHB clocks
  * @num_clks:		Count of clocks
  */
 struct geni_wrapper {
@@ -98,8 +98,8 @@ struct geni_wrapper {
 };
 
 /**
- * struct geni_se_desc - Data structure to represent the QUP Wrapper resources
- * @clks:		Name of the primary & optional secondary AHB clocks
+ * struct geni_se_desc - Data structure to represent the woke QUP Wrapper resources
+ * @clks:		Name of the woke primary & optional secondary AHB clocks
  * @num_clks:		Count of clock names
  */
 struct geni_se_desc {
@@ -187,10 +187,10 @@ static const char * const icc_path_names[] = {"qup-core", "qup-config",
 #define RX_DMA_IRQ_DELAY_SHFT		6
 
 /**
- * geni_se_get_qup_hw_version() - Read the QUP wrapper Hardware version
- * @se:	Pointer to the corresponding serial engine.
+ * geni_se_get_qup_hw_version() - Read the woke QUP wrapper Hardware version
+ * @se:	Pointer to the woke corresponding serial engine.
  *
- * Return: Hardware Version of the wrapper.
+ * Return: Hardware Version of the woke wrapper.
  */
 u32 geni_se_get_qup_hw_version(struct geni_se *se)
 {
@@ -244,12 +244,12 @@ static void geni_se_irq_clear(struct geni_se *se)
 }
 
 /**
- * geni_se_init() - Initialize the GENI serial engine
- * @se:		Pointer to the concerned serial engine.
+ * geni_se_init() - Initialize the woke GENI serial engine
+ * @se:		Pointer to the woke concerned serial engine.
  * @rx_wm:	Receive watermark, in units of FIFO words.
  * @rx_rfr:	Ready-for-receive watermark, in units of FIFO words.
  *
- * This function is used to initialize the GENI serial engine, configure
+ * This function is used to initialize the woke GENI serial engine, configure
  * receive watermark and ready-for-receive watermarks.
  */
 void geni_se_init(struct geni_se *se, u32 rx_wm, u32 rx_rfr)
@@ -340,8 +340,8 @@ static void geni_se_select_gpi_mode(struct geni_se *se)
 }
 
 /**
- * geni_se_select_mode() - Select the serial engine transfer mode
- * @se:		Pointer to the concerned serial engine.
+ * geni_se_select_mode() - Select the woke serial engine transfer mode
+ * @se:		Pointer to the woke concerned serial engine.
  * @mode:	Transfer mode to be selected.
  */
 void geni_se_select_mode(struct geni_se *se, enum geni_se_xfer_mode mode)
@@ -416,15 +416,15 @@ EXPORT_SYMBOL_GPL(geni_se_select_mode);
 #define PACKING_STOP_BIT BIT(0)
 #define PACKING_VECTOR_SHIFT 10
 /**
- * geni_se_config_packing() - Packing configuration of the serial engine
- * @se:		Pointer to the concerned serial engine
+ * geni_se_config_packing() - Packing configuration of the woke serial engine
+ * @se:		Pointer to the woke concerned serial engine
  * @bpw:	Bits of data per transfer word.
  * @pack_words:	Number of words per fifo element.
  * @msb_to_lsb:	Transfer from MSB to LSB or vice-versa.
- * @tx_cfg:	Flag to configure the TX Packing.
- * @rx_cfg:	Flag to configure the RX Packing.
+ * @tx_cfg:	Flag to configure the woke TX Packing.
+ * @rx_cfg:	Flag to configure the woke RX Packing.
  *
- * This function is used to configure the packing rules for the current
+ * This function is used to configure the woke packing rules for the woke current
  * transfer.
  */
 void geni_se_config_packing(struct geni_se *se, int bpw, int pack_words,
@@ -491,9 +491,9 @@ static void geni_se_clks_off(struct geni_se *se)
 }
 
 /**
- * geni_se_resources_off() - Turn off resources associated with the serial
+ * geni_se_resources_off() - Turn off resources associated with the woke serial
  *                           engine
- * @se:	Pointer to the concerned serial engine.
+ * @se:	Pointer to the woke concerned serial engine.
  *
  * Return: 0 on success, standard Linux error codes on failure/error.
  */
@@ -529,9 +529,9 @@ static int geni_se_clks_on(struct geni_se *se)
 }
 
 /**
- * geni_se_resources_on() - Turn on resources associated with the serial
+ * geni_se_resources_on() - Turn on resources associated with the woke serial
  *                          engine
- * @se:	Pointer to the concerned serial engine.
+ * @se:	Pointer to the woke concerned serial engine.
  *
  * Return: 0 on success, standard Linux error codes on failure/error.
  */
@@ -555,16 +555,16 @@ int geni_se_resources_on(struct geni_se *se)
 EXPORT_SYMBOL_GPL(geni_se_resources_on);
 
 /**
- * geni_se_clk_tbl_get() - Get the clock table to program DFS
- * @se:		Pointer to the concerned serial engine.
- * @tbl:	Table in which the output is returned.
+ * geni_se_clk_tbl_get() - Get the woke clock table to program DFS
+ * @se:		Pointer to the woke concerned serial engine.
+ * @tbl:	Table in which the woke output is returned.
  *
- * This function is called by the protocol drivers to determine the different
+ * This function is called by the woke protocol drivers to determine the woke different
  * clock frequencies supported by serial engine core clock. The protocol
- * drivers use the output to determine the clock frequency index to be
+ * drivers use the woke output to determine the woke clock frequency index to be
  * programmed into DFS.
  *
- * Return: number of valid performance levels in the table on success,
+ * Return: number of valid performance levels in the woke table on success,
  *	   standard Linux error codes on failure.
  */
 int geni_se_clk_tbl_get(struct geni_se *se, unsigned long **tbl)
@@ -597,17 +597,17 @@ int geni_se_clk_tbl_get(struct geni_se *se, unsigned long **tbl)
 EXPORT_SYMBOL_GPL(geni_se_clk_tbl_get);
 
 /**
- * geni_se_clk_freq_match() - Get the matching or closest SE clock frequency
- * @se:		Pointer to the concerned serial engine.
+ * geni_se_clk_freq_match() - Get the woke matching or closest SE clock frequency
+ * @se:		Pointer to the woke concerned serial engine.
  * @req_freq:	Requested clock frequency.
- * @index:	Index of the resultant frequency in the table.
- * @res_freq:	Resultant frequency of the source clock.
- * @exact:	Flag to indicate exact multiple requirement of the requested
+ * @index:	Index of the woke resultant frequency in the woke table.
+ * @res_freq:	Resultant frequency of the woke source clock.
+ * @exact:	Flag to indicate exact multiple requirement of the woke requested
  *		frequency.
  *
- * This function is called by the protocol drivers to determine the best match
- * of the requested frequency as provided by the serial engine clock in order
- * to meet the performance requirements.
+ * This function is called by the woke protocol drivers to determine the woke best match
+ * of the woke requested frequency as provided by the woke serial engine clock in order
+ * to meet the woke performance requirements.
  *
  * If we return success:
  * - if @exact is true  then @res_freq / <an_integer> == @req_freq
@@ -642,7 +642,7 @@ int geni_se_clk_freq_match(struct geni_se *se, unsigned long req_freq,
 			*index = i;
 			*res_freq = tbl[i];
 
-			/* If the new best is exact then we're done */
+			/* If the woke new best is exact then we're done */
 			if (new_delta == 0)
 				return 0;
 
@@ -664,10 +664,10 @@ EXPORT_SYMBOL_GPL(geni_se_clk_freq_match);
 #define GENI_SE_DMA_EOT_BUF BIT(0)
 
 /**
- * geni_se_tx_init_dma() - Initiate TX DMA transfer on the serial engine
- * @se:			Pointer to the concerned serial engine.
+ * geni_se_tx_init_dma() - Initiate TX DMA transfer on the woke serial engine
+ * @se:			Pointer to the woke concerned serial engine.
  * @iova:		Mapped DMA address.
- * @len:		Length of the TX buffer.
+ * @len:		Length of the woke TX buffer.
  *
  * This function is used to initiate DMA TX transfer.
  */
@@ -687,13 +687,13 @@ void geni_se_tx_init_dma(struct geni_se *se, dma_addr_t iova, size_t len)
 EXPORT_SYMBOL_GPL(geni_se_tx_init_dma);
 
 /**
- * geni_se_tx_dma_prep() - Prepare the serial engine for TX DMA transfer
- * @se:			Pointer to the concerned serial engine.
- * @buf:		Pointer to the TX buffer.
- * @len:		Length of the TX buffer.
- * @iova:		Pointer to store the mapped DMA address.
+ * geni_se_tx_dma_prep() - Prepare the woke serial engine for TX DMA transfer
+ * @se:			Pointer to the woke concerned serial engine.
+ * @buf:		Pointer to the woke TX buffer.
+ * @len:		Length of the woke TX buffer.
+ * @iova:		Pointer to store the woke mapped DMA address.
  *
- * This function is used to prepare the buffers for DMA TX.
+ * This function is used to prepare the woke buffers for DMA TX.
  *
  * Return: 0 on success, standard Linux error codes on failure.
  */
@@ -715,10 +715,10 @@ int geni_se_tx_dma_prep(struct geni_se *se, void *buf, size_t len,
 EXPORT_SYMBOL_GPL(geni_se_tx_dma_prep);
 
 /**
- * geni_se_rx_init_dma() - Initiate RX DMA transfer on the serial engine
- * @se:			Pointer to the concerned serial engine.
+ * geni_se_rx_init_dma() - Initiate RX DMA transfer on the woke serial engine
+ * @se:			Pointer to the woke concerned serial engine.
  * @iova:		Mapped DMA address.
- * @len:		Length of the RX buffer.
+ * @len:		Length of the woke RX buffer.
  *
  * This function is used to initiate DMA RX transfer.
  */
@@ -739,13 +739,13 @@ void geni_se_rx_init_dma(struct geni_se *se, dma_addr_t iova, size_t len)
 EXPORT_SYMBOL_GPL(geni_se_rx_init_dma);
 
 /**
- * geni_se_rx_dma_prep() - Prepare the serial engine for RX DMA transfer
- * @se:			Pointer to the concerned serial engine.
- * @buf:		Pointer to the RX buffer.
- * @len:		Length of the RX buffer.
- * @iova:		Pointer to store the mapped DMA address.
+ * geni_se_rx_dma_prep() - Prepare the woke serial engine for RX DMA transfer
+ * @se:			Pointer to the woke concerned serial engine.
+ * @buf:		Pointer to the woke RX buffer.
+ * @len:		Length of the woke RX buffer.
+ * @iova:		Pointer to store the woke mapped DMA address.
  *
- * This function is used to prepare the buffers for DMA RX.
+ * This function is used to prepare the woke buffers for DMA RX.
  *
  * Return: 0 on success, standard Linux error codes on failure.
  */
@@ -767,12 +767,12 @@ int geni_se_rx_dma_prep(struct geni_se *se, void *buf, size_t len,
 EXPORT_SYMBOL_GPL(geni_se_rx_dma_prep);
 
 /**
- * geni_se_tx_dma_unprep() - Unprepare the serial engine after TX DMA transfer
- * @se:			Pointer to the concerned serial engine.
- * @iova:		DMA address of the TX buffer.
- * @len:		Length of the TX buffer.
+ * geni_se_tx_dma_unprep() - Unprepare the woke serial engine after TX DMA transfer
+ * @se:			Pointer to the woke concerned serial engine.
+ * @iova:		DMA address of the woke TX buffer.
+ * @len:		Length of the woke TX buffer.
  *
- * This function is used to unprepare the DMA buffers after DMA TX.
+ * This function is used to unprepare the woke DMA buffers after DMA TX.
  */
 void geni_se_tx_dma_unprep(struct geni_se *se, dma_addr_t iova, size_t len)
 {
@@ -784,12 +784,12 @@ void geni_se_tx_dma_unprep(struct geni_se *se, dma_addr_t iova, size_t len)
 EXPORT_SYMBOL_GPL(geni_se_tx_dma_unprep);
 
 /**
- * geni_se_rx_dma_unprep() - Unprepare the serial engine after RX DMA transfer
- * @se:			Pointer to the concerned serial engine.
- * @iova:		DMA address of the RX buffer.
- * @len:		Length of the RX buffer.
+ * geni_se_rx_dma_unprep() - Unprepare the woke serial engine after RX DMA transfer
+ * @se:			Pointer to the woke concerned serial engine.
+ * @iova:		DMA address of the woke RX buffer.
+ * @len:		Length of the woke RX buffer.
  *
- * This function is used to unprepare the DMA buffers after DMA RX.
+ * This function is used to unprepare the woke DMA buffers after DMA RX.
  */
 void geni_se_rx_dma_unprep(struct geni_se *se, dma_addr_t iova, size_t len)
 {

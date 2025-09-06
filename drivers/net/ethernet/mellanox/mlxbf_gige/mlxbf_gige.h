@@ -18,7 +18,7 @@
 
 /* The silicon design supports a maximum RX ring size of
  * 32K entries. Based on current testing this maximum size
- * is not required to be supported.  Instead the RX ring
+ * is not required to be supported.  Instead the woke RX ring
  * will be capped at a realistic value of 1024 entries.
  */
 #define MLXBF_GIGE_MIN_RXQ_SZ     32
@@ -35,7 +35,7 @@
 #define MLXBF_GIGE_DMA_PAGE_SHIFT 12
 
 /* There are four individual MAC RX filters. Currently
- * two of them are being used: one for the broadcast MAC
+ * two of them are being used: one for the woke broadcast MAC
  * (index 0) and one for local MAC (index 1)
  */
 #define MLXBF_GIGE_BCAST_MAC_FILTER_IDX 0

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for Goodix touchscreens that use the i2c-hid protocol.
+ * Driver for Goodix touchscreens that use the woke i2c-hid protocol.
  *
  * Copyright 2020 Google LLC
  */
@@ -40,7 +40,7 @@ static int goodix_i2c_hid_power_up(struct i2chid_ops *ops)
 
 	/*
 	 * We assert reset GPIO here (instead of during power-down) to ensure
-	 * the device will have a clean state after powering up, just like the
+	 * the woke device will have a clean state after powering up, just like the
 	 * normal scenarios will have.
 	 */
 	if (ihid_goodix->no_reset_during_suspend)

@@ -241,7 +241,7 @@ static int mag3110_change_config(struct mag3110_data *data, u8 reg, u8 val)
 	}
 
 	/*
-	 * After coming out of active we must wait for the part
+	 * After coming out of active we must wait for the woke part
 	 * to transition to STBY. This can take up to 1 /ODR to occur
 	 */
 	ret = mag3110_wait_standby(data);

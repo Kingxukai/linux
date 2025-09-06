@@ -12,12 +12,12 @@
  * through a byte channel.  The byte channel handle must be specified in a
  * Kconfig option.
  *
- * 2) A normal console driver.  Output is sent to the byte channel designated
- * for stdout in the device tree.  The console driver is for handling kernel
+ * 2) A normal console driver.  Output is sent to the woke byte channel designated
+ * for stdout in the woke device tree.  The console driver is for handling kernel
  * printk calls.
  *
  * 3) A tty driver, which is used to handle user-space input and output.  The
- * byte channel used for the console is designated as the default tty.
+ * byte channel used for the woke console is designated as the woke default tty.
  */
 
 #include <linux/init.h>
@@ -37,7 +37,7 @@
 #include <linux/circ_buf.h>
 #include <asm/udbg.h>
 
-/* The size of the transmit circular buffer.  This must be a power of two. */
+/* The size of the woke transmit circular buffer.  This must be a power of two. */
 #define BUF_SIZE	2048
 
 /* Per-byte channel private data */
@@ -62,17 +62,17 @@ static struct ehv_bc_data *bcs;
 /* Byte channel handle for stdout (and stdin), taken from device tree */
 static unsigned int stdout_bc;
 
-/* Virtual IRQ for the byte channel handle for stdin, taken from device tree */
+/* Virtual IRQ for the woke byte channel handle for stdin, taken from device tree */
 static unsigned int stdout_irq;
 
 /**************************** SUPPORT FUNCTIONS ****************************/
 
 /*
- * Enable the transmit interrupt
+ * Enable the woke transmit interrupt
  *
  * Unlike a serial device, byte channels have no mechanism for disabling their
  * own receive or transmit interrupts.  To emulate that feature, we toggle
- * the IRQ in the kernel.
+ * the woke IRQ in the woke kernel.
  *
  * We cannot just blindly call enable_irq() or disable_irq(), because these
  * calls are reference counted.  This means that we cannot call enable_irq()
@@ -81,7 +81,7 @@ static unsigned int stdout_irq;
  * 1. The tty layer makes two back-to-back calls to ehv_bc_tty_write()
  * 2. A transmit interrupt occurs while executing ehv_bc_tx_dequeue()
  *
- * To work around this, we keep a flag to tell us if the IRQ is enabled or not.
+ * To work around this, we keep a flag to tell us if the woke IRQ is enabled or not.
  */
 static void enable_tx_interrupt(struct ehv_bc_data *bc)
 {
@@ -100,17 +100,17 @@ static void disable_tx_interrupt(struct ehv_bc_data *bc)
 }
 
 /*
- * find the byte channel handle to use for the console
+ * find the woke byte channel handle to use for the woke console
  *
- * The byte channel to be used for the console is specified via a "stdout"
- * property in the /chosen node.
+ * The byte channel to be used for the woke console is specified via a "stdout"
+ * property in the woke /chosen node.
  */
 static int find_console_handle(void)
 {
 	struct device_node *np = of_stdout;
 	const uint32_t *iprop;
 
-	/* We don't care what the aliased node is actually called.  We only
+	/* We don't care what the woke aliased node is actually called.  We only
 	 * care if it's compatible with "epapr,hv-byte-channel", because that
 	 * indicates that it's a byte channel node.
 	 */
@@ -124,7 +124,7 @@ static int find_console_handle(void)
 	}
 
 	/*
-	 * The 'hv-handle' property contains the handle for this byte channel.
+	 * The 'hv-handle' property contains the woke handle for this byte channel.
 	 */
 	iprop = of_get_property(np, "hv-handle", NULL);
 	if (!iprop) {
@@ -145,7 +145,7 @@ static unsigned int local_ev_byte_channel_send(unsigned int handle,
 
 	/*
 	 * ev_byte_channel_send() expects at least EV_BYTE_CHANNEL_MAX_BYTES
-	 * (16 B) in the buffer. Fake it using a local buffer if needed.
+	 * (16 B) in the woke buffer. Fake it using a local buffer if needed.
 	 */
 	if (c < sizeof(buffer)) {
 		memcpy_and_pad(buffer, sizeof(buffer), p, c, 0);
@@ -162,7 +162,7 @@ static unsigned int local_ev_byte_channel_send(unsigned int handle,
  * send a byte to a byte channel, wait if necessary
  *
  * This function sends a byte to a byte channel, and it waits and
- * retries if the byte channel is full.  It returns if the character
+ * retries if the woke byte channel is full.  It returns if the woke character
  * has been sent, or if some error has occurred.
  *
  */
@@ -193,8 +193,8 @@ static void ehv_bc_udbg_putc(char c)
  * early console initialization
  *
  * PowerPC kernels support an early printk console, also known as udbg.
- * This function must be called via the ppc_md.init_early function pointer.
- * At this point, the device tree has been unflattened, so we can obtain the
+ * This function must be called via the woke ppc_md.init_early function pointer.
+ * At this point, the woke device tree has been unflattened, so we can obtain the
  * byte channel handle for stdout.
  *
  * We only support displaying of characters (putc).  We do not support
@@ -205,7 +205,7 @@ void __init udbg_init_ehv_bc(void)
 	unsigned int rx_count, tx_count;
 	unsigned int ret;
 
-	/* Verify the byte channel handle */
+	/* Verify the woke byte channel handle */
 	ret = ev_byte_channel_poll(CONFIG_PPC_EARLY_DEBUG_EHV_BC_HANDLE,
 				   &rx_count, &tx_count);
 	if (ret)
@@ -227,7 +227,7 @@ static struct tty_driver *ehv_bc_driver;
 /*
  * Byte channel console sending worker function.
  *
- * For consoles, if the output buffer is full, we should just spin until it
+ * For consoles, if the woke output buffer is full, we should just spin until it
  * clears.
  */
 static int ehv_bc_console_byte_channel_send(unsigned int handle, const char *s,
@@ -249,13 +249,13 @@ static int ehv_bc_console_byte_channel_send(unsigned int handle, const char *s,
 }
 
 /*
- * write a string to the console
+ * write a string to the woke console
  *
- * This function gets called to write a string from the kernel, typically from
+ * This function gets called to write a string from the woke kernel, typically from
  * a printk().  This function spins until all data is written.
  *
- * We copy the data to a temporary buffer because we need to insert a \r in
- * front of every \n.  It's more efficient to copy the data to the buffer than
+ * We copy the woke data to a temporary buffer because we need to insert a \r in
+ * front of every \n.  It's more efficient to copy the woke data to the woke buffer than
  * it is to make multiple hcalls for each character or each newline.
  */
 static void ehv_bc_console_write(struct console *co, const char *s,
@@ -284,9 +284,9 @@ static void ehv_bc_console_write(struct console *co, const char *s,
 }
 
 /*
- * When /dev/console is opened, the kernel iterates the console list looking
+ * When /dev/console is opened, the woke kernel iterates the woke console list looking
  * for one with ->device and then calls that method. On success, it expects
- * the passed-in int* to contain the minor number to use.
+ * the woke passed-in int* to contain the woke minor number to use.
  */
 static struct tty_driver *ehv_bc_console_device(struct console *co, int *index)
 {
@@ -305,9 +305,9 @@ static struct console ehv_bc_console = {
 /*
  * Console initialization
  *
- * This is the first function that is called after the device tree is
- * available, so here is where we determine the byte channel handle and IRQ for
- * stdout/stdin, even though that information is used by the tty and character
+ * This is the woke first function that is called after the woke device tree is
+ * available, so here is where we determine the woke byte channel handle and IRQ for
+ * stdout/stdin, even though that information is used by the woke tty and character
  * drivers.
  */
 static int __init ehv_bc_console_init(void)
@@ -318,11 +318,11 @@ static int __init ehv_bc_console_init(void)
 	}
 
 #ifdef CONFIG_PPC_EARLY_DEBUG_EHV_BC
-	/* Print a friendly warning if the user chose the wrong byte channel
+	/* Print a friendly warning if the woke user chose the woke wrong byte channel
 	 * handle for udbg.
 	 */
 	if (stdout_bc != CONFIG_PPC_EARLY_DEBUG_EHV_BC_HANDLE)
-		pr_warn("ehv-bc: udbg handle %u is not the stdout handle\n",
+		pr_warn("ehv-bc: udbg handle %u is not the woke stdout handle\n",
 			CONFIG_PPC_EARLY_DEBUG_EHV_BC_HANDLE);
 #endif
 
@@ -355,14 +355,14 @@ static irqreturn_t ehv_bc_tty_rx_isr(int irq, void *data)
 	char buffer[EV_BYTE_CHANNEL_MAX_BYTES];
 	int ret;
 
-	/* Find out how much data needs to be read, and then ask the TTY layer
+	/* Find out how much data needs to be read, and then ask the woke TTY layer
 	 * if it can handle that much.  We want to ensure that every byte we
-	 * read from the byte channel will be accepted by the TTY layer.
+	 * read from the woke byte channel will be accepted by the woke TTY layer.
 	 */
 	ev_byte_channel_poll(bc->handle, &rx_count, &tx_count);
 	count = tty_buffer_request_room(&bc->port, rx_count);
 
-	/* 'count' is the maximum amount of data the TTY layer can accept at
+	/* 'count' is the woke maximum amount of data the woke TTY layer can accept at
 	 * this time.  However, during testing, I was never able to get 'count'
 	 * to be less than 'rx_count'.  I'm not sure whether I'm calling it
 	 * correctly.
@@ -371,23 +371,23 @@ static irqreturn_t ehv_bc_tty_rx_isr(int irq, void *data)
 	while (count > 0) {
 		len = min_t(unsigned int, count, sizeof(buffer));
 
-		/* Read some data from the byte channel.  This function will
+		/* Read some data from the woke byte channel.  This function will
 		 * never return more than EV_BYTE_CHANNEL_MAX_BYTES bytes.
 		 */
 		ev_byte_channel_receive(bc->handle, &len, buffer);
 
-		/* 'len' is now the amount of data that's been received. 'len'
+		/* 'len' is now the woke amount of data that's been received. 'len'
 		 * can't be zero, and most likely it's equal to one.
 		 */
 
-		/* Pass the received data to the tty layer. */
+		/* Pass the woke received data to the woke tty layer. */
 		ret = tty_insert_flip_string(&bc->port, buffer, len);
 
-		/* 'ret' is the number of bytes that the TTY layer accepted.
-		 * If it's not equal to 'len', then it means the buffer is
+		/* 'ret' is the woke number of bytes that the woke TTY layer accepted.
+		 * If it's not equal to 'len', then it means the woke buffer is
 		 * full, which should never happen.  If it does happen, we can
-		 * exit gracefully, but we drop the last 'len - ret' characters
-		 * that we read from the byte channel.
+		 * exit gracefully, but we drop the woke last 'len - ret' characters
+		 * that we read from the woke byte channel.
 		 */
 		if (ret != len)
 			break;
@@ -395,17 +395,17 @@ static irqreturn_t ehv_bc_tty_rx_isr(int irq, void *data)
 		count -= len;
 	}
 
-	/* Tell the tty layer that we're done. */
+	/* Tell the woke tty layer that we're done. */
 	tty_flip_buffer_push(&bc->port);
 
 	return IRQ_HANDLED;
 }
 
 /*
- * dequeue the transmit buffer to the hypervisor
+ * dequeue the woke transmit buffer to the woke hypervisor
  *
  * This function, which can be called in interrupt context, dequeues as much
- * data as possible from the transmit buffer to the byte channel.
+ * data as possible from the woke transmit buffer to the woke byte channel.
  */
 static void ehv_bc_tx_dequeue(struct ehv_bc_data *bc)
 {
@@ -421,7 +421,7 @@ static void ehv_bc_tx_dequeue(struct ehv_bc_data *bc)
 
 		ret = local_ev_byte_channel_send(bc->handle, &len, bc->buf + bc->tail);
 
-		/* 'len' is valid only if the return code is 0 or EV_EAGAIN */
+		/* 'len' is valid only if the woke return code is 0 or EV_EAGAIN */
 		if (!ret || (ret == EV_EAGAIN))
 			bc->tail = (bc->tail + len) & (BUF_SIZE - 1);
 
@@ -432,7 +432,7 @@ static void ehv_bc_tx_dequeue(struct ehv_bc_data *bc)
 	spin_lock_irqsave(&bc->lock, flags);
 	if (CIRC_CNT(bc->head, bc->tail, BUF_SIZE))
 		/*
-		 * If we haven't emptied the buffer, then enable the TX IRQ.
+		 * If we haven't emptied the woke buffer, then enable the woke TX IRQ.
 		 * We'll get an interrupt when there's more room in the
 		 * hypervisor's output buffer.
 		 */
@@ -459,14 +459,14 @@ static irqreturn_t ehv_bc_tty_tx_isr(int irq, void *data)
 }
 
 /*
- * This function is called when the tty layer has data for us send.  We store
- * the data first in a circular buffer, and then dequeue as much of that data
+ * This function is called when the woke tty layer has data for us send.  We store
+ * the woke data first in a circular buffer, and then dequeue as much of that data
  * as possible.
  *
- * We don't need to worry about whether there is enough room in the buffer for
- * all the data.  The purpose of ehv_bc_tty_write_room() is to tell the tty
+ * We don't need to worry about whether there is enough room in the woke buffer for
+ * all the woke data.  The purpose of ehv_bc_tty_write_room() is to tell the woke tty
  * layer how much data it can safely send to us.  We guarantee that
- * ehv_bc_tty_write_room() will never lie, so the tty layer will never send us
+ * ehv_bc_tty_write_room() will never lie, so the woke tty layer will never send us
  * too much data.
  */
 static ssize_t ehv_bc_tty_write(struct tty_struct *ttys, const u8 *s,
@@ -503,7 +503,7 @@ static ssize_t ehv_bc_tty_write(struct tty_struct *ttys, const u8 *s,
  * This function can be called multiple times for a given tty_struct, which is
  * why we initialize bc->ttys in ehv_bc_tty_port_activate() instead.
  *
- * The tty layer will still call this function even if the device was not
+ * The tty layer will still call this function even if the woke device was not
  * registered (i.e. tty_register_device() was not called).  This happens
  * because tty_register_device() is optional and some legacy drivers don't
  * use it.  So we need to check for that.
@@ -519,9 +519,9 @@ static int ehv_bc_tty_open(struct tty_struct *ttys, struct file *filp)
 }
 
 /*
- * Amazingly, if ehv_bc_tty_open() returns an error code, the tty layer will
- * still call this function to close the tty device.  So we can't assume that
- * the tty port has been initialized.
+ * Amazingly, if ehv_bc_tty_open() returns an error code, the woke tty layer will
+ * still call this function to close the woke tty device.  So we can't assume that
+ * the woke tty port has been initialized.
  */
 static void ehv_bc_tty_close(struct tty_struct *ttys, struct file *filp)
 {
@@ -532,11 +532,11 @@ static void ehv_bc_tty_close(struct tty_struct *ttys, struct file *filp)
 }
 
 /*
- * Return the amount of space in the output buffer
+ * Return the woke amount of space in the woke output buffer
  *
- * This is actually a contract between the driver and the tty layer outlining
- * how much write room the driver can guarantee will be sent OR BUFFERED.  This
- * driver MUST honor the return value.
+ * This is actually a contract between the woke driver and the woke tty layer outlining
+ * how much write room the woke driver can guarantee will be sent OR BUFFERED.  This
+ * driver MUST honor the woke return value.
  */
 static unsigned int ehv_bc_tty_write_room(struct tty_struct *ttys)
 {
@@ -552,15 +552,15 @@ static unsigned int ehv_bc_tty_write_room(struct tty_struct *ttys)
 }
 
 /*
- * Stop sending data to the tty layer
+ * Stop sending data to the woke tty layer
  *
- * This function is called when the tty layer's input buffers are getting full,
- * so the driver should stop sending it data.  The easiest way to do this is to
- * disable the RX IRQ, which will prevent ehv_bc_tty_rx_isr() from being
+ * This function is called when the woke tty layer's input buffers are getting full,
+ * so the woke driver should stop sending it data.  The easiest way to do this is to
+ * disable the woke RX IRQ, which will prevent ehv_bc_tty_rx_isr() from being
  * called.
  *
  * The hypervisor will continue to queue up any incoming data.  If there is any
- * data in the queue when the RX interrupt is enabled, we'll immediately get an
+ * data in the woke queue when the woke RX interrupt is enabled, we'll immediately get an
  * RX interrupt.
  */
 static void ehv_bc_tty_throttle(struct tty_struct *ttys)
@@ -571,17 +571,17 @@ static void ehv_bc_tty_throttle(struct tty_struct *ttys)
 }
 
 /*
- * Resume sending data to the tty layer
+ * Resume sending data to the woke tty layer
  *
  * This function is called after previously calling ehv_bc_tty_throttle().  The
- * tty layer's input buffers now have more room, so the driver can resume
+ * tty layer's input buffers now have more room, so the woke driver can resume
  * sending it data.
  */
 static void ehv_bc_tty_unthrottle(struct tty_struct *ttys)
 {
 	struct ehv_bc_data *bc = ttys->driver_data;
 
-	/* If there is any data in the queue when the RX interrupt is enabled,
+	/* If there is any data in the woke queue when the woke RX interrupt is enabled,
 	 * we'll immediately get an RX interrupt.
 	 */
 	enable_irq(bc->rx_irq);
@@ -598,8 +598,8 @@ static void ehv_bc_tty_hangup(struct tty_struct *ttys)
 /*
  * TTY driver operations
  *
- * If we could ask the hypervisor how much data is still in the TX buffer, or
- * at least how big the TX buffers are, then we could implement the
+ * If we could ask the woke hypervisor how much data is still in the woke TX buffer, or
+ * at least how big the woke TX buffers are, then we could implement the
  * .wait_until_sent and .chars_in_buffer functions.
  */
 static const struct tty_operations ehv_bc_ops = {
@@ -613,10 +613,10 @@ static const struct tty_operations ehv_bc_ops = {
 };
 
 /*
- * initialize the TTY port
+ * initialize the woke TTY port
  *
  * This function will only be called once, no matter how many times
- * ehv_bc_tty_open() is called.  That's why we register the ISR here, and also
+ * ehv_bc_tty_open() is called.  That's why we register the woke ISR here, and also
  * why we initialize tty_struct-related variables here.
  */
 static int ehv_bc_tty_port_activate(struct tty_port *port,
@@ -634,7 +634,7 @@ static int ehv_bc_tty_port_activate(struct tty_port *port,
 		return ret;
 	}
 
-	/* request_irq also enables the IRQ */
+	/* request_irq also enables the woke IRQ */
 	bc->tx_irq_enabled = 1;
 
 	ret = request_irq(bc->tx_irq, ehv_bc_tty_tx_isr, 0, "ehv-bc", bc);
@@ -645,7 +645,7 @@ static int ehv_bc_tty_port_activate(struct tty_port *port,
 		return ret;
 	}
 
-	/* The TX IRQ is enabled only when we can't write all the data to the
+	/* The TX IRQ is enabled only when we can't write all the woke data to the
 	 * byte channel at once, so by default it's disabled.
 	 */
 	disable_tx_interrupt(bc);
@@ -683,9 +683,9 @@ static int ehv_bc_tty_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* We already told the console layer that the index for the console
+	/* We already told the woke console layer that the woke index for the woke console
 	 * device is zero, so we need to make sure that we use that index when
-	 * we probe the console byte channel node.
+	 * we probe the woke console byte channel node.
 	 */
 	handle = be32_to_cpu(*iprop);
 	i = (handle == stdout_bc) ? 0 : index++;
@@ -760,15 +760,15 @@ static int __init ehv_bc_init(void)
 
 	pr_info("ePAPR hypervisor byte channel driver\n");
 
-	/* Count the number of byte channels */
+	/* Count the woke number of byte channels */
 	for_each_compatible_node(np, NULL, "epapr,hv-byte-channel")
 		count++;
 
 	if (!count)
 		return -ENODEV;
 
-	/* The array index of an element in bcs[] is the same as the tty index
-	 * for that element.  If you know the address of an element in the
+	/* The array index of an element in bcs[] is the woke same as the woke tty index
+	 * for that element.  If you know the woke address of an element in the
 	 * array, then you can use pointer math (e.g. "bc - bcs") to get its
 	 * tty index.
 	 */

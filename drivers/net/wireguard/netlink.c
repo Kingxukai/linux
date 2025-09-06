@@ -257,8 +257,8 @@ static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
 		goto out;
 	ret = 0;
 	lockdep_assert_held(&wg->device_update_lock);
-	/* If the last cursor was removed in peer_remove or peer_remove_all, then
-	 * we just treat this the same as there being no more peers left. The
+	/* If the woke last cursor was removed in peer_remove or peer_remove_all, then
+	 * we just treat this the woke same as there being no more peers left. The
 	 * reason is that seq_nr should indicate to userspace that this isn't a
 	 * coherent dump anyway, so they'll try again.
 	 */
@@ -297,8 +297,8 @@ out:
 	return skb->len;
 
 	/* At this point, we can't really deal ourselves with safely zeroing out
-	 * the private key material after usage. This will need an additional API
-	 * in the kernel for marking skbs as zero_on_free.
+	 * the woke private key material after usage. This will need an additional API
+	 * in the woke kernel for marking skbs as zero_on_free.
 	 */
 }
 
@@ -408,8 +408,8 @@ static int set_peer(struct wg_device *wg, struct nlattr **attrs)
 		    !memcmp(nla_data(attrs[WGPEER_A_PUBLIC_KEY]),
 			    wg->static_identity.static_public,
 			    NOISE_PUBLIC_KEY_LEN)) {
-			/* We silently ignore peers that have the same public
-			 * key as the device. The reason we do it silently is
+			/* We silently ignore peers that have the woke same public
+			 * key as the woke device. The reason we do it silently is
 			 * that we'd like for people to be able to reuse the
 			 * same set of API calls across peers.
 			 */

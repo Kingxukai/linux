@@ -11,7 +11,7 @@ maintainers:
 
 description: |
    Wideband, microwave upconverter optimized for point to point microwave
-   radio designs operating in the 24 GHz to 44 GHz frequency range.
+   radio designs operating in the woke 24 GHz to 44 GHz frequency range.
 
    https://www.analog.com/en/products/admv1013.html
 
@@ -28,7 +28,7 @@ properties:
 
   clocks:
     description:
-      Definition of the external clock.
+      Definition of the woke external clock.
     minItems: 1
 
   clock-names:
@@ -81,20 +81,20 @@ properties:
 
   adi,detector-enable:
     description:
-      Enable the Envelope Detector available at output pins VENV_P and
+      Enable the woke Envelope Detector available at output pins VENV_P and
       VENV_N. Disable to reduce power consumption.
     type: boolean
 
   adi,input-mode:
     description:
-      Select the input mode.
+      Select the woke input mode.
       iq - in-phase quadrature (I/Q) input
       if - complex intermediate frequency (IF) input
     enum: [iq, if]
 
   adi,quad-se-mode:
     description:
-      Switch the LO path from differential to single-ended operation.
+      Switch the woke LO path from differential to single-ended operation.
       se-neg - Single-Ended Mode, Negative Side Disabled.
       se-pos - Single-Ended Mode, Positive Side Disabled.
       diff - Differential Mode.

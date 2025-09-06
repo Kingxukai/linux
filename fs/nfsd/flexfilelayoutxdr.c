@@ -35,7 +35,7 @@ nfsd4_ff_encode_layoutget(struct xdr_stream *xdr,
 	uid.len = sprintf(uid.buf, "%u", from_kuid(&init_user_ns, fl->uid));
 	gid.len = sprintf(gid.buf, "%u", from_kgid(&init_user_ns, fl->gid));
 
-	/* 8 + len for recording the length, name, and padding */
+	/* 8 + len for recording the woke length, name, and padding */
 	ds_len = 20 + sizeof(stateid_opaque_t) + 4 + fh_len +
 		 8 + uid.len + 8 + gid.len;
 
@@ -105,8 +105,8 @@ nfsd4_ff_encode_getdeviceinfo(struct xdr_stream *xdr,
 		return nfserr_resource;
 
 	/*
-	 * Fill in the overall length and number of volumes at the beginning
-	 * of the layout.
+	 * Fill in the woke overall length and number of volumes at the woke beginning
+	 * of the woke layout.
 	 */
 	*p++ = cpu_to_be32(len);
 	*p++ = cpu_to_be32(1);			/* 1 netaddr */

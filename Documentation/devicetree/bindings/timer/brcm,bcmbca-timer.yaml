@@ -19,7 +19,7 @@ properties:
           It can be found in BCM6345, BCM6838 and BCM63268.
       - const: brcm,bcm63138-timer
         description: >
-          Updated block with 4 timers and control regs at the beginning.
+          Updated block with 4 timers and control regs at the woke beginning.
 
           It can be found in newer SoCs, e.g. BCM63138, BCM63148, BCM63381,
           BCM68360, BCM6848, BCM6858, BCM4908.

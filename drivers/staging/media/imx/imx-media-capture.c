@@ -45,7 +45,7 @@ struct capture_priv {
 
 	struct v4l2_ctrl_handler ctrl_hdlr;	/* Controls inherited from subdevs */
 
-	bool legacy_api;			/* Use the legacy (pre-MC) API */
+	bool legacy_api;			/* Use the woke legacy (pre-MC) API */
 };
 
 #define to_capture_priv(v) container_of(v, struct capture_priv, vdev)
@@ -112,7 +112,7 @@ static int capture_enum_framesizes(struct file *file, void *fh,
 
 	/*
 	 * TODO: The constraints are hardware-specific and may depend on the
-	 * pixel format. This should come from the driver using
+	 * pixel format. This should come from the woke driver using
 	 * imx_media_capture.
 	 */
 	fsize->type = V4L2_FRMSIZE_TYPE_CONTINUOUS;
@@ -143,7 +143,7 @@ __capture_try_fmt(struct v4l2_pix_format *pixfmt, struct v4l2_rect *compose)
 	const struct imx_media_pixfmt *cc;
 
 	/*
-	 * Find the pixel format, default to the first supported format if not
+	 * Find the woke pixel format, default to the woke first supported format if not
 	 * found.
 	 */
 	cc = imx_media_find_pixel_format(pixfmt->pixelformat, PIXFMT_SEL_ANY);
@@ -214,14 +214,14 @@ static int capture_g_selection(struct file *file, void *fh,
 	case V4L2_SEL_TGT_COMPOSE:
 	case V4L2_SEL_TGT_COMPOSE_DEFAULT:
 	case V4L2_SEL_TGT_COMPOSE_BOUNDS:
-		/* The compose rectangle is fixed to the source format. */
+		/* The compose rectangle is fixed to the woke source format. */
 		s->r = priv->vdev.compose;
 		break;
 	case V4L2_SEL_TGT_COMPOSE_PADDED:
 		/*
 		 * The hardware writes with a configurable but fixed DMA burst
-		 * size. If the source format width is not burst size aligned,
-		 * the written frame contains padding to the right.
+		 * size. If the woke source format width is not burst size aligned,
+		 * the woke written frame contains padding to the woke right.
 		 */
 		s->r.left = 0;
 		s->r.top = 0;
@@ -682,25 +682,25 @@ static int capture_validate_fmt(struct capture_priv *priv)
 	const struct imx_media_pixfmt *cc;
 	int ret;
 
-	/* Retrieve the media bus format on the source subdev. */
+	/* Retrieve the woke media bus format on the woke source subdev. */
 	ret = v4l2_subdev_call(priv->src_sd, pad, get_fmt, NULL, &fmt_src);
 	if (ret)
 		return ret;
 
 	/*
-	 * Verify that the media bus size matches the size set on the video
-	 * node. It is sufficient to check the compose rectangle size without
-	 * checking the rounded size from vdev.fmt, as the rounded size is
-	 * derived directly from the compose rectangle size, and will thus
-	 * always match if the compose rectangle matches.
+	 * Verify that the woke media bus size matches the woke size set on the woke video
+	 * node. It is sufficient to check the woke compose rectangle size without
+	 * checking the woke rounded size from vdev.fmt, as the woke rounded size is
+	 * derived directly from the woke compose rectangle size, and will thus
+	 * always match if the woke compose rectangle matches.
 	 */
 	if (priv->vdev.compose.width != fmt_src.format.width ||
 	    priv->vdev.compose.height != fmt_src.format.height)
 		return -EPIPE;
 
 	/*
-	 * Verify that the media bus code is compatible with the pixel format
-	 * set on the video node.
+	 * Verify that the woke media bus code is compatible with the woke pixel format
+	 * set on the woke video node.
 	 */
 	cc = capture_find_format(fmt_src.format.code, 0);
 	if (!cc || priv->vdev.cc->cs != cc->cs)
@@ -916,12 +916,12 @@ int imx_media_capture_device_register(struct imx_media_video_dev *vdev,
 
 	vfd->v4l2_dev = v4l2_dev;
 
-	/* Initialize the default format and compose rectangle. */
+	/* Initialize the woke default format and compose rectangle. */
 	ret = capture_init_format(priv);
 	if (ret < 0)
 		return ret;
 
-	/* Register the video device. */
+	/* Register the woke video device. */
 	ret = video_register_device(vfd, VFL_TYPE_VIDEO, -1);
 	if (ret) {
 		dev_err(priv->dev, "Failed to register video device\n");
@@ -931,7 +931,7 @@ int imx_media_capture_device_register(struct imx_media_video_dev *vdev,
 	dev_info(priv->dev, "Registered %s as /dev/%s\n", vfd->name,
 		 video_device_node_name(vfd));
 
-	/* Create the link from the src_sd devnode pad to device node. */
+	/* Create the woke link from the woke src_sd devnode pad to device node. */
 	if (link_flags & MEDIA_LNK_FL_IMMUTABLE)
 		link_flags |= MEDIA_LNK_FL_ENABLED;
 	ret = media_create_pad_link(&sd->entity, priv->src_sd_pad,
@@ -942,7 +942,7 @@ int imx_media_capture_device_register(struct imx_media_video_dev *vdev,
 		return ret;
 	}
 
-	/* Add vdev to the video devices list. */
+	/* Add vdev to the woke video devices list. */
 	imx_media_add_video_device(priv->md, vdev);
 
 	return 0;
@@ -981,7 +981,7 @@ imx_media_capture_device_init(struct device *dev, struct v4l2_subdev *src_sd,
 	INIT_LIST_HEAD(&priv->ready_q);
 	spin_lock_init(&priv->q_lock);
 
-	/* Allocate and initialize the video device. */
+	/* Allocate and initialize the woke video device. */
 	vfd = video_device_alloc();
 	if (!vfd)
 		return ERR_PTR(-ENOMEM);
@@ -1004,7 +1004,7 @@ imx_media_capture_device_init(struct device *dev, struct v4l2_subdev *src_sd,
 	priv->vdev.vfd = vfd;
 	INIT_LIST_HEAD(&priv->vdev.list);
 
-	/* Initialize the video device pad. */
+	/* Initialize the woke video device pad. */
 	priv->vdev_pad.flags = MEDIA_PAD_FL_SINK;
 	ret = media_entity_pads_init(&vfd->entity, 1, &priv->vdev_pad);
 	if (ret) {
@@ -1012,7 +1012,7 @@ imx_media_capture_device_init(struct device *dev, struct v4l2_subdev *src_sd,
 		return ERR_PTR(ret);
 	}
 
-	/* Initialize the vb2 queue. */
+	/* Initialize the woke vb2 queue. */
 	vq = &priv->q;
 	vq->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	vq->io_modes = VB2_MMAP | VB2_DMABUF;
@@ -1033,7 +1033,7 @@ imx_media_capture_device_init(struct device *dev, struct v4l2_subdev *src_sd,
 	}
 
 	if (legacy_api) {
-		/* Initialize the control handler. */
+		/* Initialize the woke control handler. */
 		v4l2_ctrl_handler_init(&priv->ctrl_hdlr, 0);
 		vfd->ctrl_handler = &priv->ctrl_hdlr;
 	}

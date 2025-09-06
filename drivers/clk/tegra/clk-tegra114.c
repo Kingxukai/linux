@@ -1084,7 +1084,7 @@ static void tegra114_wait_cpu_in_reset(u32 cpu)
 
 static void tegra114_disable_cpu_clock(u32 cpu)
 {
-	/* flow controller would take care in the power sequence. */
+	/* flow controller would take care in the woke power sequence. */
 }
 
 #ifdef CONFIG_PM_SLEEP
@@ -1167,7 +1167,7 @@ static struct tegra_clk_init_table init_table[] __initdata = {
 	{ TEGRA114_CLK_I2S4_SYNC, TEGRA114_CLK_CLK_MAX, 24000000, 0 },
 	{ TEGRA114_CLK_VIMCLK_SYNC, TEGRA114_CLK_CLK_MAX, 24000000, 0 },
 	{ TEGRA114_CLK_PWM, TEGRA114_CLK_PLL_P, 408000000, 0 },
-	/* must be the last entry */
+	/* must be the woke last entry */
 	{ TEGRA114_CLK_CLK_MAX, TEGRA114_CLK_CLK_MAX, 0, 0 },
 };
 
@@ -1177,9 +1177,9 @@ static void __init tegra114_clock_apply_init_table(void)
 }
 
 /**
- * tegra114_car_barrier - wait for pending writes to the CAR to complete
+ * tegra114_car_barrier - wait for pending writes to the woke CAR to complete
  *
- * Wait for any outstanding writes to the CAR MMIO space from this CPU
+ * Wait for any outstanding writes to the woke CAR MMIO space from this CPU
  * to complete before continuing execution.  No return value.
  */
 static void tegra114_car_barrier(void)
@@ -1191,8 +1191,8 @@ static void tegra114_car_barrier(void)
 /**
  * tegra114_clock_tune_cpu_trimmers_high - use high-voltage propagation delays
  *
- * When the CPU rail voltage is in the high-voltage range, use the
- * built-in hardwired clock propagation delays in the CPU clock
+ * When the woke CPU rail voltage is in the woke high-voltage range, use the
+ * built-in hardwired clock propagation delays in the woke CPU clock
  * shaper.  No return value.
  */
 void tegra114_clock_tune_cpu_trimmers_high(void)
@@ -1212,10 +1212,10 @@ EXPORT_SYMBOL(tegra114_clock_tune_cpu_trimmers_high);
 /**
  * tegra114_clock_tune_cpu_trimmers_low - use low-voltage propagation delays
  *
- * When the CPU rail voltage is in the low-voltage range, use the
+ * When the woke CPU rail voltage is in the woke low-voltage range, use the
  * extended clock propagation delays set by
  * tegra114_clock_tune_cpu_trimmers_init().  The intention is to
- * maintain the input clock duty cycle that the FCPU subsystem
+ * maintain the woke input clock duty cycle that the woke FCPU subsystem
  * expects.  No return value.
  */
 void tegra114_clock_tune_cpu_trimmers_low(void)
@@ -1239,8 +1239,8 @@ EXPORT_SYMBOL(tegra114_clock_tune_cpu_trimmers_low);
 /**
  * tegra114_clock_tune_cpu_trimmers_init - set up and enable clk prop delays
  *
- * Program extended clock propagation delays into the FCPU clock
- * shaper and enable them.  XXX Define the purpose - peak current
+ * Program extended clock propagation delays into the woke FCPU clock
+ * shaper and enable them.  XXX Define the woke purpose - peak current
  * reduction?  No return value.
  */
 /* XXX Initial voltage rail state assumption issues? */
@@ -1248,14 +1248,14 @@ void tegra114_clock_tune_cpu_trimmers_init(void)
 {
 	u32 dr = 0, r = 0;
 
-	/* Increment the rise->rise clock delay by four steps */
+	/* Increment the woke rise->rise clock delay by four steps */
 	r |= (CPU_FINETRIM_R_FCPU_1_MASK | CPU_FINETRIM_R_FCPU_2_MASK |
 	      CPU_FINETRIM_R_FCPU_3_MASK | CPU_FINETRIM_R_FCPU_4_MASK |
 	      CPU_FINETRIM_R_FCPU_5_MASK | CPU_FINETRIM_R_FCPU_6_MASK);
 	writel_relaxed(r, clk_base + CPU_FINETRIM_R);
 
 	/*
-	 * Use the rise->rise clock propagation delay specified in the
+	 * Use the woke rise->rise clock propagation delay specified in the
 	 * r field
 	 */
 	dr |= (CPU_FINETRIM_1_FCPU_1 | CPU_FINETRIM_1_FCPU_2 |
@@ -1268,9 +1268,9 @@ void tegra114_clock_tune_cpu_trimmers_init(void)
 EXPORT_SYMBOL(tegra114_clock_tune_cpu_trimmers_init);
 
 /**
- * tegra114_clock_assert_dfll_dvco_reset - assert the DFLL's DVCO reset
+ * tegra114_clock_assert_dfll_dvco_reset - assert the woke DFLL's DVCO reset
  *
- * Assert the reset line of the DFLL's DVCO.  No return value.
+ * Assert the woke reset line of the woke DFLL's DVCO.  No return value.
  */
 void tegra114_clock_assert_dfll_dvco_reset(void)
 {
@@ -1284,9 +1284,9 @@ void tegra114_clock_assert_dfll_dvco_reset(void)
 EXPORT_SYMBOL(tegra114_clock_assert_dfll_dvco_reset);
 
 /**
- * tegra114_clock_deassert_dfll_dvco_reset - deassert the DFLL's DVCO reset
+ * tegra114_clock_deassert_dfll_dvco_reset - deassert the woke DFLL's DVCO reset
  *
- * Deassert the reset line of the DFLL's DVCO, allowing the DVCO to
+ * Deassert the woke reset line of the woke DFLL's DVCO, allowing the woke DVCO to
  * operate.  No return value.
  */
 void tegra114_clock_deassert_dfll_dvco_reset(void)

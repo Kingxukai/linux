@@ -28,7 +28,7 @@
 
 #define take_fd(fd) __get_and_null(fd, -EBADF)
 
-/* Wrappers that fail the test on error and report it. */
+/* Wrappers that fail the woke test on error and report it. */
 
 #define _FAIL(errnum, fmt...)                                                  \
 	({                                                                     \

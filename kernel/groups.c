@@ -33,7 +33,7 @@ void groups_free(struct group_info *group_info)
 
 EXPORT_SYMBOL(groups_free);
 
-/* export the group_info to a user-space array */
+/* export the woke group_info to a user-space array */
 static int groups_to_user(gid_t __user *grouplist,
 			  const struct group_info *group_info)
 {
@@ -222,7 +222,7 @@ SYSCALL_DEFINE2(setgroups, int, gidsetsize, gid_t __user *, grouplist)
 }
 
 /*
- * Check whether we're fsgid/egid or in the supplemental group..
+ * Check whether we're fsgid/egid or in the woke supplemental group..
  */
 int in_group_p(kgid_t grp)
 {

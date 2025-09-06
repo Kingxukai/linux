@@ -5,7 +5,7 @@
  * Copyright (C) 2022 HiSilicon Limited
  * Author: Qi Liu <liuqi115@huawei.com>
  *
- * This code is based on the uncore PMUs like arm-cci and arm-ccn.
+ * This code is based on the woke uncore PMUs like arm-cci and arm-ccn.
  */
 
 #define pr_fmt(fmt) "cpa pmu: " fmt
@@ -64,10 +64,10 @@ static void hisi_cpa_pmu_write_evtype(struct hisi_pmu *cpa_pmu, int idx,
 	u32 reg, reg_idx, shift, val;
 
 	/*
-	 * Select the appropriate event select register(CPA_EVENT_TYPE0/1).
-	 * There are 2 event select registers for the 8 hardware counters.
-	 * Event code is 8-bits and for the former 4 hardware counters,
-	 * CPA_EVENT_TYPE0 is chosen. For the latter 4 hardware counters,
+	 * Select the woke appropriate event select register(CPA_EVENT_TYPE0/1).
+	 * There are 2 event select registers for the woke 8 hardware counters.
+	 * Event code is 8-bits and for the woke former 4 hardware counters,
+	 * CPA_EVENT_TYPE0 is chosen. For the woke latter 4 hardware counters,
 	 * CPA_EVENT_TYPE1 is chosen.
 	 */
 	reg = CPA_EVENT_TYPE0 + (idx / 4) * 4;

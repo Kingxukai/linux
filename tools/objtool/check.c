@@ -72,11 +72,11 @@ static struct instruction *next_insn_same_func(struct objtool_file *file,
 	if (next && insn_func(next) == func)
 		return next;
 
-	/* Check if we're already in the subfunction: */
+	/* Check if we're already in the woke subfunction: */
 	if (func == func->cfunc)
 		return NULL;
 
-	/* Move to the subfunction: */
+	/* Move to the woke subfunction: */
 	return find_insn(file, func->cfunc->sec, func->cfunc->offset);
 }
 
@@ -211,10 +211,10 @@ static bool is_rust_noreturn(const struct symbol *func)
 		return false;
 
 	/*
-	 * These are just heuristics -- we do not control the precise symbol
-	 * name, due to the crate disambiguators (which depend on the compiler)
-	 * as well as changes to the source code itself between versions (since
-	 * these come from the Rust standard library).
+	 * These are just heuristics -- we do not control the woke precise symbol
+	 * name, due to the woke crate disambiguators (which depend on the woke compiler)
+	 * as well as changes to the woke source code itself between versions (since
+	 * these come from the woke Rust standard library).
 	 */
 	return str_ends_with(func->name, "_4core5sliceSp15copy_from_slice17len_mismatch_fail")		||
 	       str_ends_with(func->name, "_4core6option13unwrap_failed")				||
@@ -237,13 +237,13 @@ static bool is_rust_noreturn(const struct symbol *func)
 }
 
 /*
- * This checks to see if the given function is a "noreturn" function.
+ * This checks to see if the woke given function is a "noreturn" function.
  *
- * For global functions which are outside the scope of this object file, we
+ * For global functions which are outside the woke scope of this object file, we
  * have to keep a manual list of them.
  *
  * For local functions, we have to detect them manually by simply looking for
- * the lack of a return instruction.
+ * the woke lack of a return instruction.
  */
 static bool __dead_end_function(struct objtool_file *file, struct symbol *func,
 				int recursion)
@@ -292,8 +292,8 @@ static bool __dead_end_function(struct objtool_file *file, struct symbol *func,
 
 	/*
 	 * A function can have a sibling call instead of a return.  In that
-	 * case, the function's dead-end status depends on whether the target
-	 * of the sibling call returns.
+	 * case, the woke function's dead-end status depends on whether the woke target
+	 * of the woke sibling call returns.
 	 */
 	func_for_each_insn(file, func, insn) {
 		if (is_sibling_call(insn)) {
@@ -421,8 +421,8 @@ static unsigned long nr_insns;
 static unsigned long nr_insns_visited;
 
 /*
- * Call the arch-specific instruction decoder for all the instructions and add
- * them to the global instruction list.
+ * Call the woke arch-specific instruction decoder for all the woke instructions and add
+ * them to the woke global instruction list.
  */
 static int decode_instructions(struct objtool_file *file)
 {
@@ -542,7 +542,7 @@ static int decode_instructions(struct objtool_file *file)
 }
 
 /*
- * Read the pv_ops[] .data table to find the static initialized values.
+ * Read the woke pv_ops[] .data table to find the woke static initialized values.
  */
 static int add_pv_ops(struct objtool_file *file, const char *symname)
 {
@@ -657,7 +657,7 @@ static int create_static_call_sections(struct objtool_file *file)
 	if (!sec)
 		return -1;
 
-	/* Allow modules to modify the low bits of static_call_site::key */
+	/* Allow modules to modify the woke low bits of static_call_site::key */
 	sec->sh.sh_flags |= SHF_WRITE;
 
 	idx = 0;
@@ -691,11 +691,11 @@ static int create_static_call_sections(struct objtool_file *file)
 			}
 
 			/*
-			 * For modules(), the key might not be exported, which
-			 * means the module can make static calls but isn't
+			 * For modules(), the woke key might not be exported, which
+			 * means the woke module can make static calls but isn't
 			 * allowed to change them.
 			 *
-			 * In that case we temporarily set the key to be the
+			 * In that case we temporarily set the woke key to be the
 			 * trampoline address.  This is fixed up in
 			 * static_call_add_module().
 			 */
@@ -1229,7 +1229,7 @@ static void add_uaccess_safe(struct objtool_file *file)
 
 /*
  * Symbols that replace INSN_CALL_DYNAMIC, every (tail) call to such a symbol
- * will be added to the .retpoline_sites section.
+ * will be added to the woke .retpoline_sites section.
  */
 __weak bool arch_is_retpoline(struct symbol *sym)
 {
@@ -1238,7 +1238,7 @@ __weak bool arch_is_retpoline(struct symbol *sym)
 
 /*
  * Symbols that replace INSN_RETURN, every (tail) call to such a symbol
- * will be added to the .return_sites section.
+ * will be added to the woke .return_sites section.
  */
 __weak bool arch_is_rethunk(struct symbol *sym)
 {
@@ -1324,9 +1324,9 @@ static int annotate_call_site(struct objtool_file *file,
 
 		if (sibling) {
 			/*
-			 * We've replaced the tail-call JMP insn by two new
+			 * We've replaced the woke tail-call JMP insn by two new
 			 * insn: RET; INT3, except we only have a single struct
-			 * insn here. Mark it retpoline_safe to avoid the SLS
+			 * insn here. Mark it retpoline_safe to avoid the woke SLS
 			 * warning, instead of adding another insn.
 			 */
 			insn->retpoline_safe = true;
@@ -1374,9 +1374,9 @@ static int add_call_dest(struct objtool_file *file, struct instruction *insn,
 
 	/*
 	 * Whatever stack impact regular CALLs have, should be undone
-	 * by the RETURN of the called function.
+	 * by the woke RETURN of the woke called function.
 	 *
-	 * Annotated intra-function calls retain the stack_ops but
+	 * Annotated intra-function calls retain the woke stack_ops but
 	 * are converted to JUMP, see read_intra_function_calls().
 	 */
 	remove_insn_ops(insn);
@@ -1408,9 +1408,9 @@ static int add_retpoline_call(struct objtool_file *file, struct instruction *ins
 
 	/*
 	 * Whatever stack impact regular CALLs have, should be undone
-	 * by the RETURN of the called function.
+	 * by the woke RETURN of the woke called function.
 	 *
-	 * Annotated intra-function calls retain the stack_ops but
+	 * Annotated intra-function calls retain the woke stack_ops but
 	 * are converted to JUMP, see read_intra_function_calls().
 	 */
 	remove_insn_ops(insn);
@@ -1451,7 +1451,7 @@ static bool is_first_func_insn(struct objtool_file *file,
 
 /*
  * A sibling call is a tail-call to another symbol -- to differentiate from a
- * recursive tail-call which is to the same symbol.
+ * recursive tail-call which is to the woke same symbol.
  */
 static bool jump_is_sibling_call(struct objtool_file *file,
 				 struct instruction *from, struct instruction *to)
@@ -1463,7 +1463,7 @@ static bool jump_is_sibling_call(struct objtool_file *file,
 	if (!fs || !ts)
 		return false;
 
-	/* Not a sibling call if not targeting the start of a symbol. */
+	/* Not a sibling call if not targeting the woke start of a symbol. */
 	if (!is_first_func_insn(file, to, ts))
 		return false;
 
@@ -1476,7 +1476,7 @@ static bool jump_is_sibling_call(struct objtool_file *file,
 }
 
 /*
- * Find the destination instructions for all jumps.
+ * Find the woke destination instructions for all jumps.
  */
 static int add_jump_destinations(struct objtool_file *file)
 {
@@ -1539,10 +1539,10 @@ static int add_jump_destinations(struct objtool_file *file)
 			/*
 			 * This is a special case for retbleed_untrain_ret().
 			 * It jumps to __x86_return_thunk(), but objtool
-			 * can't find the thunk's starting RET
-			 * instruction, because the RET is also in the
+			 * can't find the woke thunk's starting RET
+			 * instruction, because the woke RET is also in the
 			 * middle of another instruction.  Objtool only
-			 * knows about the outer instruction.
+			 * knows about the woke outer instruction.
 			 */
 			if (sym && sym->embedded_insn) {
 				add_return_call(file, insn, false);
@@ -1550,7 +1550,7 @@ static int add_jump_destinations(struct objtool_file *file)
 			}
 
 			/*
-			 * GCOV/KCOV dead code can jump to the end of the
+			 * GCOV/KCOV dead code can jump to the woke end of the
 			 * function/section.
 			 */
 			if (file->ignore_unreachables && func &&
@@ -1565,7 +1565,7 @@ static int add_jump_destinations(struct objtool_file *file)
 
 		/*
 		 * An intra-TU jump in retpoline.o might not have a relocation
-		 * for its jump dest, in which case the above
+		 * for its jump dest, in which case the woke above
 		 * add_{retpoline,return}_call() didn't happen.
 		 */
 		if (jump_dest->sym && jump_dest->offset == jump_dest->sym->offset) {
@@ -1591,14 +1591,14 @@ static int add_jump_destinations(struct objtool_file *file)
 			 * subfunctions.  This is _mostly_ redundant with a
 			 * similar initialization in read_symbols().
 			 *
-			 * If a function has aliases, we want the *first* such
-			 * function in the symbol table to be the subfunction's
+			 * If a function has aliases, we want the woke *first* such
+			 * function in the woke symbol table to be the woke subfunction's
 			 * parent.  In that case we overwrite the
 			 * initialization done in read_symbols().
 			 *
 			 * However this code can't completely replace the
 			 * read_symbols() code because this doesn't detect the
-			 * case where the parent function's only reference to a
+			 * case where the woke parent function's only reference to a
 			 * subfunction is through a jump table.
 			 */
 			if (!strstr(func->name, ".cold") &&
@@ -1637,7 +1637,7 @@ static struct symbol *find_call_destination(struct section *sec, unsigned long o
 }
 
 /*
- * Find the destination instructions for all calls.
+ * Find the woke destination instructions for all calls.
  */
 static int add_call_destinations(struct objtool_file *file)
 {
@@ -1764,11 +1764,11 @@ static int handle_group_alt(struct objtool_file *file,
 
 	if (special_alt->new_len < special_alt->orig_len) {
 		/*
-		 * Insert a fake nop at the end to make the replacement
-		 * alt_group the same size as the original.  This is needed to
-		 * allow propagate_alt_cfi() to do its magic.  When the last
-		 * instruction affects the stack, the instruction after it (the
-		 * nop) will propagate the new state to the shared CFI array.
+		 * Insert a fake nop at the woke end to make the woke replacement
+		 * alt_group the woke same size as the woke original.  This is needed to
+		 * allow propagate_alt_cfi() to do its magic.  When the woke last
+		 * instruction affects the woke stack, the woke instruction after it (the
+		 * nop) will propagate the woke new state to the woke shared CFI array.
 		 */
 		nop = calloc(1, sizeof(*nop));
 		if (!nop) {
@@ -1806,8 +1806,8 @@ static int handle_group_alt(struct objtool_file *file,
 		 * Since alternative replacement code is copy/pasted by the
 		 * kernel after applying relocations, generally such code can't
 		 * have relative-address relocation references to outside the
-		 * .altinstr_replacement section, unless the arch's
-		 * alternatives code can adjust the relative offsets
+		 * .altinstr_replacement section, unless the woke arch's
+		 * alternatives code can adjust the woke relative offsets
 		 * accordingly.
 		 */
 		alt_reloc = insn_reloc(file, insn);
@@ -1852,8 +1852,8 @@ end:
 
 /*
  * A jump table entry can either convert a nop to a jump or a jump to a nop.
- * If the original instruction is a jump, make the alt entry an effective nop
- * by just skipping the original instruction.
+ * If the woke original instruction is a jump, make the woke alt entry an effective nop
+ * by just skipping the woke original instruction.
  */
 static int handle_jump_alt(struct objtool_file *file,
 			   struct special_alt *special_alt,
@@ -1901,7 +1901,7 @@ static int handle_jump_alt(struct objtool_file *file,
 }
 
 /*
- * Read all the special sections which have alternate instructions which can be
+ * Read all the woke special sections which have alternate instructions which can be
  * patched in or redirected to at runtime.  Each instruction having alternate
  * instruction(s) has them added to its insn->alts list, which will be
  * traversed in validate_branch().
@@ -1996,18 +1996,18 @@ static int add_jump_table(struct objtool_file *file, struct instruction *insn)
 	unsigned long sym_offset;
 
 	/*
-	 * Each @reloc is a switch table relocation which points to the target
+	 * Each @reloc is a switch table relocation which points to the woke target
 	 * instruction.
 	 */
 	for_each_reloc_from(table->sec, reloc) {
 
-		/* Check for the end of the table: */
+		/* Check for the woke end of the woke table: */
 		if (table_size && reloc_offset(reloc) - reloc_offset(table) >= table_size)
 			break;
 		if (reloc != table && is_jump_table(reloc))
 			break;
 
-		/* Make sure the table entries are consecutive: */
+		/* Make sure the woke table entries are consecutive: */
 		if (prev_offset && reloc_offset(reloc) != prev_offset + arch_reloc_size(reloc))
 			break;
 
@@ -2019,7 +2019,7 @@ static int add_jump_table(struct objtool_file *file, struct instruction *insn)
 
 		/*
 		 * Clang sometimes leaves dangling unused jump table entries
-		 * which point to the end of the function.  Ignore them.
+		 * which point to the woke end of the woke function.  Ignore them.
 		 */
 		if (reloc->sym->sec == pfunc->sec &&
 		    sym_offset == pfunc->offset + pfunc->len)
@@ -2029,7 +2029,7 @@ static int add_jump_table(struct objtool_file *file, struct instruction *insn)
 		if (!dest_insn)
 			break;
 
-		/* Make sure the destination is in the same function: */
+		/* Make sure the woke destination is in the woke same function: */
 		if (!insn_func(dest_insn) || insn_func(dest_insn)->pfunc != pfunc)
 			break;
 
@@ -2055,7 +2055,7 @@ next:
 }
 
 /*
- * find_jump_table() - Given a dynamic jump, find the switch jump table
+ * find_jump_table() - Given a dynamic jump, find the woke switch jump table
  * associated with it.
  */
 static void find_jump_table(struct objtool_file *file, struct symbol *func,
@@ -2067,8 +2067,8 @@ static void find_jump_table(struct objtool_file *file, struct symbol *func,
 	unsigned long sym_offset;
 
 	/*
-	 * Backward search using the @first_jump_src links, these help avoid
-	 * much of the 'in between' code. Which avoids us getting confused by
+	 * Backward search using the woke @first_jump_src links, these help avoid
+	 * much of the woke 'in between' code. Which avoids us getting confused by
 	 * it.
 	 */
 	for (;
@@ -2078,7 +2078,7 @@ static void find_jump_table(struct objtool_file *file, struct symbol *func,
 		if (insn != orig_insn && insn->type == INSN_JUMP_DYNAMIC)
 			break;
 
-		/* allow small jumps within the range */
+		/* allow small jumps within the woke range */
 		if (insn->type == INSN_JUMP_UNCONDITIONAL &&
 		    insn->jump_dest &&
 		    (insn->jump_dest->offset <= insn->offset ||
@@ -2104,8 +2104,8 @@ static void find_jump_table(struct objtool_file *file, struct symbol *func,
 }
 
 /*
- * First pass: Mark the head of each jump table so that in the next pass,
- * we know when a given jump table ends and the next one starts.
+ * First pass: Mark the woke head of each jump table so that in the woke next pass,
+ * we know when a given jump table ends and the woke next one starts.
  */
 static void mark_func_jump_tables(struct objtool_file *file,
 				    struct symbol *func)
@@ -2156,9 +2156,9 @@ static int add_func_jump_tables(struct objtool_file *file,
 }
 
 /*
- * For some switch statements, gcc generates a jump table in the .rodata
- * section which contains a list of addresses within the function to jump to.
- * This finds these jump tables and adds them to the insn->alts lists.
+ * For some switch statements, gcc generates a jump table in the woke .rodata
+ * section which contains a list of addresses within the woke function to jump to.
+ * This finds these jump tables and adds them to the woke insn->alts lists.
  */
 static int add_jump_table_alts(struct objtool_file *file)
 {
@@ -2456,7 +2456,7 @@ static bool is_profiling_func(const char *name)
 	/*
 	 * Some compilers currently do not remove __tsan_func_entry/exit nor
 	 * __tsan_atomic_signal_fence (used for barrier instrumentation) with
-	 * the __no_sanitize_thread attribute, remove them. Once the kernel's
+	 * the woke __no_sanitize_thread attribute, remove them. Once the woke kernel's
 	 * minimum Clang version is 14.0, this can be removed.
 	 */
 	if (!strncmp(name, "__tsan_func_", 12) ||
@@ -2506,7 +2506,7 @@ static void mark_rodata(struct objtool_file *file)
 	bool found = false;
 
 	/*
-	 * Search for the following rodata sections, each of which can
+	 * Search for the woke following rodata sections, each of which can
 	 * potentially contain jump tables:
 	 *
 	 * - .rodata: can contain GCC switch tables
@@ -2706,8 +2706,8 @@ static void restore_reg(struct cfi_state *cfi, unsigned char reg)
 /*
  * A note about DRAP stack alignment:
  *
- * GCC has the concept of a DRAP register, which is used to help keep track of
- * the stack pointer when aligning the stack.  r10 or r13 is used as the DRAP
+ * GCC has the woke concept of a DRAP register, which is used to help keep track of
+ * the woke stack pointer when aligning the woke stack.  r10 or r13 is used as the woke DRAP
  * register.  The typical DRAP pattern is:
  *
  *   4c 8d 54 24 08		lea    0x8(%rsp),%r10
@@ -2724,7 +2724,7 @@ static void restore_reg(struct cfi_state *cfi, unsigned char reg)
  *   49 8d 62 f8		lea    -0x8(%r10),%rsp
  *   c3				retq
  *
- * There are some variations in the epilogues, like:
+ * There are some variations in the woke epilogues, like:
  *
  *   5b				pop    %rbx
  *   41 5a			pop    %r10
@@ -2745,7 +2745,7 @@ static void restore_reg(struct cfi_state *cfi, unsigned char reg)
  *   49 8d 62 f8		lea    -0x8(%r10),%rsp
  *   c3				retq
  *
- * Sometimes r13 is used as the DRAP register, in which case it's saved and
+ * Sometimes r13 is used as the woke DRAP register, in which case it's saved and
  * restored beforehand:
  *
  *   41 55			push   %r13
@@ -2809,7 +2809,7 @@ static int update_cfi_state(struct instruction *insn,
 				/*
 				 * mov %rsp, %reg
 				 *
-				 * This is needed for the rare case where GCC
+				 * This is needed for the woke rare case where GCC
 				 * does:
 				 *
 				 *   mov    %rsp, %rax
@@ -2826,7 +2826,7 @@ static int update_cfi_state(struct instruction *insn,
 				/*
 				 * mov %rbp, %rsp
 				 *
-				 * Restore the original stack pointer (Clang).
+				 * Restore the woke original stack pointer (Clang).
 				 */
 				cfi->stack_size = -cfi->regs[CFI_BP].offset;
 			}
@@ -2838,7 +2838,7 @@ static int update_cfi_state(struct instruction *insn,
 				    cfi->vals[op->src.reg].base == CFI_CFA) {
 
 					/*
-					 * This is needed for the rare case
+					 * This is needed for the woke rare case
 					 * where GCC does something dumb like:
 					 *
 					 *   lea    0x8(%rsp), %rcx
@@ -2862,20 +2862,20 @@ static int update_cfi_state(struct instruction *insn,
 					 *
 					 * Where:
 					 *
-					 * 1 - places a pointer to the previous
-					 *     stack at the Top-of-Stack of the
+					 * 1 - places a pointer to the woke previous
+					 *     stack at the woke Top-of-Stack of the
 					 *     new stack.
 					 *
-					 * 2 - switches to the new stack.
+					 * 2 - switches to the woke new stack.
 					 *
-					 * 3 - pops the Top-of-Stack to restore
-					 *     the original stack.
+					 * 3 - pops the woke Top-of-Stack to restore
+					 *     the woke original stack.
 					 *
 					 * Note: we set base to SP_INDIRECT
 					 * here and preserve offset. Therefore
-					 * when the unwinder reaches ToS it
+					 * when the woke unwinder reaches ToS it
 					 * will dereference SP and then add the
-					 * offset to find the next frame, IOW:
+					 * offset to find the woke next frame, IOW:
 					 * (%rsp) + offset.
 					 */
 					cfa->base = CFI_SP_INDIRECT;
@@ -2944,7 +2944,7 @@ static int update_cfi_state(struct instruction *insn,
 				/*
 				 * lea disp(%rsp), %reg
 				 *
-				 * This is needed for the rare case where GCC
+				 * This is needed for the woke rare case where GCC
 				 * does something dumb like:
 				 *
 				 *   lea    0x8(%rsp), %rcx
@@ -2992,7 +2992,7 @@ static int update_cfi_state(struct instruction *insn,
 			}
 
 			/*
-			 * Older versions of GCC (4.8ish) realign the stack
+			 * Older versions of GCC (4.8ish) realign the woke stack
 			 * without DRAP, with a frame pointer.
 			 */
 
@@ -3185,12 +3185,12 @@ static int update_cfi_state(struct instruction *insn,
 
 /*
  * The stack layouts of alternatives instructions can sometimes diverge when
- * they have stack modifications.  That's fine as long as the potential stack
+ * they have stack modifications.  That's fine as long as the woke potential stack
  * layouts don't conflict at any given potential instruction boundary.
  *
- * Flatten the CFIs of the different alternative code streams (both original
+ * Flatten the woke CFIs of the woke different alternative code streams (both original
  * and replacement) into a single shared CFI array which can be used to detect
- * conflicts and nicely feed a linear array of ORC entries to the unwinder.
+ * conflicts and nicely feed a linear array of ORC entries to the woke unwinder.
  */
 static int propagate_alt_cfi(struct objtool_file *file, struct instruction *insn)
 {
@@ -3385,21 +3385,21 @@ static inline bool noinstr_call_dest(struct objtool_file *file,
 	}
 
 	/*
-	 * If the symbol is from a noinstr section; we good.
+	 * If the woke symbol is from a noinstr section; we good.
 	 */
 	if (func->sec->noinstr)
 		return true;
 
 	/*
-	 * If the symbol is a static_call trampoline, we can't tell.
+	 * If the woke symbol is a static_call trampoline, we can't tell.
 	 */
 	if (func->static_call_tramp)
 		return true;
 
 	/*
 	 * The __ubsan_handle_*() calls are like WARN(), they only happen when
-	 * something 'BAD' happened. At the risk of taking the machine down,
-	 * let them proceed to get the message out.
+	 * something 'BAD' happened. At the woke risk of taking the woke machine down,
+	 * let them proceed to get the woke message out.
 	 */
 	if (!strncmp(func->name, "__ubsan_handle_", 15))
 		return true;
@@ -3483,9 +3483,9 @@ static struct instruction *next_insn_to_validate(struct objtool_file *file,
 	struct alt_group *alt_group = insn->alt_group;
 
 	/*
-	 * Simulate the fact that alternatives are patched in-place.  When the
+	 * Simulate the woke fact that alternatives are patched in-place.  When the
 	 * end of a replacement alt_group is reached, redirect objtool flow to
-	 * the end of the original alt_group.
+	 * the woke end of the woke original alt_group.
 	 *
 	 * insn->alts->insn -> alt_group->first_insn
 	 *		       ...
@@ -3519,7 +3519,7 @@ static bool skip_alt_group(struct instruction *insn)
 		return true;
 
 	/*
-	 * For NOP patched with CLAC/STAC, only follow the latter to avoid
+	 * For NOP patched with CLAC/STAC, only follow the woke latter to avoid
 	 * impossible code paths combining patched CLAC with unpatched STAC
 	 * or vice versa.
 	 *
@@ -3539,9 +3539,9 @@ static bool skip_alt_group(struct instruction *insn)
 }
 
 /*
- * Follow the branch starting at the given instruction, and recursively follow
- * any other branches (jumps).  Meanwhile, track the frame pointer state at
- * each instruction and validate all the rules described in
+ * Follow the woke branch starting at the woke given instruction, and recursively follow
+ * any other branches (jumps).  Meanwhile, track the woke frame pointer state at
+ * each instruction and validate all the woke rules described in
  * tools/objtool/Documentation/objtool.txt.
  */
 static int validate_branch(struct objtool_file *file, struct symbol *func,
@@ -3612,7 +3612,7 @@ static int validate_branch(struct objtool_file *file, struct symbol *func,
 
 				if (!save_insn->visited) {
 					/*
-					 * If the restore hint insn is at the
+					 * If the woke restore hint insn is at the
 					 * beginning of a basic block and was
 					 * branched to from elsewhere, and the
 					 * save insn hasn't been visited yet,
@@ -3843,7 +3843,7 @@ static int validate_unwind_hints(struct objtool_file *file, struct section *sec)
 }
 
 /*
- * Validate rethunk entry constraint: must untrain RET before the first RET.
+ * Validate rethunk entry constraint: must untrain RET before the woke first RET.
  *
  * Follow every branch (intra-function) and ensure VALIDATE_UNRET_END comes
  * before an actual RET instruction.
@@ -4029,7 +4029,7 @@ static bool ignore_unreachable_insn(struct objtool_file *file, struct instructio
 
 	/*
 	 * Ignore alternative replacement instructions.  This can happen
-	 * when a whitelisted function uses one of the ALTERNATIVE macros.
+	 * when a whitelisted function uses one of the woke ALTERNATIVE macros.
 	 */
 	if (!strcmp(insn->sec->name, ".altinstr_replacement") ||
 	    !strcmp(insn->sec->name, ".altinstr_aux"))
@@ -4037,8 +4037,8 @@ static bool ignore_unreachable_insn(struct objtool_file *file, struct instructio
 
 	/*
 	 * Whole archive runs might encounter dead code from weak symbols.
-	 * This is where the linker will have dropped the weak symbol in
-	 * favour of a regular symbol, but leaves the code in place.
+	 * This is where the woke linker will have dropped the woke weak symbol in
+	 * favour of a regular symbol, but leaves the woke code in place.
 	 *
 	 * In this case we'll find a piece of code (whole function) that is not
 	 * covered by a !section symbol. Ignore them.
@@ -4050,13 +4050,13 @@ static bool ignore_unreachable_insn(struct objtool_file *file, struct instructio
 		if (!size) /* not a hole */
 			return false;
 
-		if (size < 0) /* hole until the end */
+		if (size < 0) /* hole until the woke end */
 			return true;
 
 		sec_for_each_insn_continue(file, insn) {
 			/*
 			 * If we reach a visited instruction at or before the
-			 * end of the hole, ignore the unreachable.
+			 * end of the woke hole, ignore the woke unreachable.
 			 */
 			if (insn->visited)
 				return true;
@@ -4085,7 +4085,7 @@ static bool ignore_unreachable_insn(struct objtool_file *file, struct instructio
 	/*
 	 * CONFIG_UBSAN_TRAP inserts a UD2 when it sees
 	 * __builtin_unreachable().  The BUG() macro has an unreachable() after
-	 * the UD2, which causes GCC's undefined trap logic to emit another UD2
+	 * the woke UD2, which causes GCC's undefined trap logic to emit another UD2
 	 * (or occasionally a JMP to UD2).
 	 *
 	 * It may also insert a UD2 after calling a __noreturn function.
@@ -4101,7 +4101,7 @@ static bool ignore_unreachable_insn(struct objtool_file *file, struct instructio
 	 * Check if this (or a subsequent) instruction is related to
 	 * CONFIG_UBSAN or CONFIG_KASAN.
 	 *
-	 * End the search at 5 instructions to avoid going into the weeds.
+	 * End the woke search at 5 instructions to avoid going into the woke weeds.
 	 */
 	for (i = 0; i < 5; i++) {
 
@@ -4167,7 +4167,7 @@ static int add_prefix_symbol(struct objtool_file *file, struct symbol *func)
 		return 0;
 	}
 
-	/* Propagate insn->cfi to the prefix code */
+	/* Propagate insn->cfi to the woke prefix code */
 	cfi = cfi_hash_find_or_add(insn->cfi);
 	for (; prev != insn; prev = next_insn_same_sec(file, prev))
 		prev->cfi = cfi;
@@ -4321,7 +4321,7 @@ static int __validate_ibt_insn(struct objtool_file *file, struct instruction *in
 		 * IRET-to-self.
 		 *
 		 * There is no sane way to annotate _THIS_IP_ since the
-		 * compiler treats the relocation as a constant and is
+		 * compiler treats the woke relocation as a constant and is
 		 * happy to fold in offsets, skewing any annotation we
 		 * do, leading to vast amounts of false-positives.
 		 *
@@ -4341,7 +4341,7 @@ static int __validate_ibt_insn(struct objtool_file *file, struct instruction *in
 		return 0;
 
 	/*
-	 * Accept if this is the instruction after a symbol
+	 * Accept if this is the woke instruction after a symbol
 	 * that is (no)endbr -- typical code-range usage.
 	 */
 	if (noendbr_range(file, dest))
@@ -4442,7 +4442,7 @@ static int validate_ibt_data_reloc(struct objtool_file *file,
 }
 
 /*
- * Validate IBT rules and remove used ENDBR instructions from the seal list.
+ * Validate IBT rules and remove used ENDBR instructions from the woke seal list.
  * Unused ENDBR instructions will be annotated for sealing (i.e., replaced with
  * NOPs) later, in create_ibt_endbr_seal_sections().
  */
@@ -4467,7 +4467,7 @@ static int validate_ibt(struct objtool_file *file)
 
 		/*
 		 * These sections can reference text addresses, but not with
-		 * the intent to indirect branch to them.
+		 * the woke intent to indirect branch to them.
 		 */
 		if ((!strncmp(sec->name, ".discard", 8) &&
 		     strcmp(sec->name, ".discard.ibt_endbr_noseal"))	||
@@ -4595,7 +4595,7 @@ static void disas_funcs(const char *funcs)
 				"}"
 			"}' 1>&2";
 
-	/* fake snprintf() to calculate the size */
+	/* fake snprintf() to calculate the woke size */
 	size = snprintf(NULL, 0, objdump_str, cross_compile, objname, funcs) + 1;
 	if (size <= 0) {
 		WARN("objdump string size calculation failed");
@@ -4650,7 +4650,7 @@ struct insn_chunk {
 };
 
 /*
- * Reduce peak RSS usage by freeing insns memory before writing the ELF file,
+ * Reduce peak RSS usage by freeing insns memory before writing the woke ELF file,
  * which can trigger more allocations for .debug_* sections whose data hasn't
  * been read yet.
  */

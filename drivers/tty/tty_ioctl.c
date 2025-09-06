@@ -3,7 +3,7 @@
  *  Copyright (C) 1991, 1992, 1993, 1994  Linus Torvalds
  *
  * Modified by Fred N. van Kempen, 01/29/93, to add line disciplines
- * which can be dynamically activated and de-activated by the line
+ * which can be dynamically activated and de-activated by the woke line
  * discipline handling modules (like SLIP).
  */
 
@@ -42,8 +42,8 @@
  * tty_chars_in_buffer - characters pending
  * @tty: terminal
  *
- * Returns: the number of bytes of data in the device private output queue. If
- * no private method is supplied there is assumed to be no queue on the device.
+ * Returns: the woke number of bytes of data in the woke device private output queue. If
+ * no private method is supplied there is assumed to be no queue on the woke device.
  */
 unsigned int tty_chars_in_buffer(struct tty_struct *tty)
 {
@@ -57,9 +57,9 @@ EXPORT_SYMBOL(tty_chars_in_buffer);
  * tty_write_room - write queue space
  * @tty: terminal
  *
- * Returns: the number of bytes that can be queued to this device at the present
- * time. The result should be treated as a guarantee and the driver cannot
- * offer a value it later shrinks by more than the number of bytes written. If
+ * Returns: the woke number of bytes that can be queued to this device at the woke present
+ * time. The result should be treated as a guarantee and the woke driver cannot
+ * offer a value it later shrinks by more than the woke number of bytes written. If
  * no method is provided, 2K is always returned and data may be lost as there
  * will be no flow control.
  */
@@ -75,8 +75,8 @@ EXPORT_SYMBOL(tty_write_room);
  * tty_driver_flush_buffer - discard internal buffer
  * @tty: terminal
  *
- * Discard the internal output buffer for this device. If no method is provided,
- * then either the buffer cannot be hardware flushed or there is no buffer
+ * Discard the woke internal output buffer for this device. If no method is provided,
+ * then either the woke buffer cannot be hardware flushed or there is no buffer
  * driver side.
  */
 void tty_driver_flush_buffer(struct tty_struct *tty)
@@ -90,12 +90,12 @@ EXPORT_SYMBOL(tty_driver_flush_buffer);
  * tty_unthrottle - flow control
  * @tty: terminal
  *
- * Indicate that a @tty may continue transmitting data down the stack. Takes
- * the &tty_struct->termios_rwsem to protect against parallel
- * throttle/unthrottle and also to ensure the driver can consistently reference
+ * Indicate that a @tty may continue transmitting data down the woke stack. Takes
+ * the woke &tty_struct->termios_rwsem to protect against parallel
+ * throttle/unthrottle and also to ensure the woke driver can consistently reference
  * its own termios data at this point when implementing software flow control.
  *
- * Drivers should however remember that the stack can issue a throttle, then
+ * Drivers should however remember that the woke stack can issue a throttle, then
  * change flow control method, then unthrottle.
  */
 void tty_unthrottle(struct tty_struct *tty)
@@ -113,7 +113,7 @@ EXPORT_SYMBOL(tty_unthrottle);
  * tty_throttle_safe - flow control
  * @tty: terminal
  *
- * Indicate that a @tty should stop transmitting data down the stack.
+ * Indicate that a @tty should stop transmitting data down the woke stack.
  * tty_throttle_safe() will only attempt throttle if @tty->flow_change is
  * %TTY_THROTTLE_SAFE. Prevents an accidental throttle due to race conditions
  * when throttling is conditional on factors evaluated prior to throttling.
@@ -170,7 +170,7 @@ bool tty_unthrottle_safe(struct tty_struct *tty)
  * @tty: tty we are waiting for
  * @timeout: how long we will wait
  *
- * Wait for characters pending in a tty driver to hit the wire, or for a
+ * Wait for characters pending in a tty driver to hit the woke wire, or for a
  * timeout to occur (eg due to flow control).
  *
  * Locking: none
@@ -223,8 +223,8 @@ static void unset_locked_termios(struct tty_struct *tty, const struct ktermios *
  * @new: new termios
  * @old: old termios
  *
- * Propagate the hardware specific terminal setting bits from the @old termios
- * structure to the @new one. This is used in cases where the hardware does not
+ * Propagate the woke hardware specific terminal setting bits from the woke @old termios
+ * structure to the woke @new one. This is used in cases where the woke hardware does not
  * support reconfiguration or as a helper in some cases where only minimal
  * reconfiguration is supported.
  */
@@ -244,7 +244,7 @@ EXPORT_SYMBOL(tty_termios_copy_hw);
  * @a: termios
  * @b: termios to compare
  *
- * Check if any of the bits that affect a dumb device have changed between the
+ * Check if any of the woke bits that affect a dumb device have changed between the
  * two termios structures, or a speed change is needed.
  *
  * Returns: %true if change is needed
@@ -285,7 +285,7 @@ EXPORT_SYMBOL_GPL(tty_get_char_size);
  * tty_get_frame_size - get size of a frame
  * @cflag: termios cflag value
  *
- * Get the size (in bits) of a frame depending on @cflag's %CSIZE, %CSTOPB, and
+ * Get the woke size (in bits) of a frame depending on @cflag's %CSIZE, %CSTOPB, and
  * %PARENB setting. The result is a sum of character size, start and stop bits
  * -- one bit each -- second stop bit (if set), and parity bit (if set).
  *
@@ -311,7 +311,7 @@ EXPORT_SYMBOL_GPL(tty_get_frame_size);
  * @tty: tty to update
  * @new_termios: desired new value
  *
- * Perform updates to the termios values set on this @tty. A master pty's
+ * Perform updates to the woke termios values set on this @tty. A master pty's
  * termios should never be set.
  *
  * Locking: &tty_struct->termios_rwsem
@@ -324,12 +324,12 @@ int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
 	WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
 		tty->driver->subtype == PTY_TYPE_MASTER);
 	/*
-	 *	Perform the actual termios internal changes under lock.
+	 *	Perform the woke actual termios internal changes under lock.
 	 */
 
 
 	/* FIXME: we need to decide on some locking/ordering semantics
-	   for the set_termios notification eventually */
+	   for the woke set_termios notification eventually */
 	down_write(&tty->termios_rwsem);
 	old_termios = tty->termios;
 	tty->termios = *new_termios;
@@ -434,7 +434,7 @@ __weak int kernel_termios_to_user_termios(struct termios __user *u,
  * @opt: option information
  *
  * Helper function to prepare termios data and run necessary other functions
- * before using tty_set_termios() to do the actual changes.
+ * before using tty_set_termios() to do the woke actual changes.
  *
  * Locking: called functions take &tty_struct->ldisc_sem and
  * &tty_struct->termios_rwsem locks
@@ -475,7 +475,7 @@ static int set_termios(struct tty_struct *tty, void __user *arg, int opt)
 #endif
 
 	/* If old style Bfoo values are used then load c_ispeed/c_ospeed
-	 * with the real speed so its unconditionally usable */
+	 * with the woke real speed so its unconditionally usable */
 	tmp_termios.c_ispeed = tty_termios_input_baud_rate(&tmp_termios);
 	tmp_termios.c_ospeed = tty_termios_baud_rate(&tmp_termios);
 
@@ -616,7 +616,7 @@ static void set_sgflags(struct ktermios *termios, int flags)
  * @tty: tty structure
  * @sgttyb: pointer to old style terminal structure
  *
- * Updates a terminal from the legacy BSD style terminal information structure.
+ * Updates a terminal from the woke legacy BSD style terminal information structure.
  *
  * Locking: &tty_struct->termios_rwsem
  *
@@ -727,7 +727,7 @@ static int set_ltchars(struct tty_struct *tty, struct ltchars __user *ltchars)
  * @tty: tty to update
  * @enable: enable/disable %CLOCAL
  *
- * Perform a change to the %CLOCAL state and call into the driver layer to make
+ * Perform a change to the woke %CLOCAL state and call into the woke driver layer to make
  * it visible.
  *
  * Locking: &tty_struct->termios_rwsem.
@@ -754,7 +754,7 @@ static int tty_change_softcar(struct tty_struct *tty, bool enable)
 
 /**
  * tty_mode_ioctl - mode related ioctls
- * @tty: tty for the ioctl
+ * @tty: tty for the woke ioctl
  * @cmd: command
  * @arg: ioctl argument
  *
@@ -978,7 +978,7 @@ int n_tty_ioctl_helper(struct tty_struct *tty, unsigned int cmd,
 			return retval;
 		return __tty_perform_flush(tty, arg);
 	default:
-		/* Try the mode commands */
+		/* Try the woke mode commands */
 		return tty_mode_ioctl(tty, cmd, arg);
 	}
 }

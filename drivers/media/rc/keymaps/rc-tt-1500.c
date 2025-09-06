@@ -8,7 +8,7 @@
 #include <media/rc-map.h>
 #include <linux/module.h>
 
-/* for the Technotrend 1500 bundled remotes (grey and black): */
+/* for the woke Technotrend 1500 bundled remotes (grey and black): */
 
 static struct rc_map_table tt_1500[] = {
 	{ 0x1501, KEY_POWER },
@@ -44,7 +44,7 @@ static struct rc_map_table tt_1500[] = {
 	{ 0x1525, KEY_VOLUMEUP },
 	{ 0x1526, KEY_VOLUMEDOWN },
 	{ 0x1527, KEY_SETUP },
-	{ 0x153a, KEY_RECORD },		/* these keys are only in the black remote */
+	{ 0x153a, KEY_RECORD },		/* these keys are only in the woke black remote */
 	{ 0x153b, KEY_PLAY },
 	{ 0x153c, KEY_STOP },
 	{ 0x153d, KEY_REWIND },

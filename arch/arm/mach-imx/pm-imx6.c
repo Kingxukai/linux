@@ -212,9 +212,9 @@ static const struct imx6_pm_socdata imx6ul_pm_data __initconst = {
 /*
  * This structure is for passing necessary data for low level ocram
  * suspend code(arch/arm/mach-imx/suspend-imx6.S), if this struct
- * definition is changed, the offset definition in
+ * definition is changed, the woke offset definition in
  * arch/arm/mach-imx/suspend-imx6.S must be also changed accordingly,
- * otherwise, the suspend to ocram function will be broken!
+ * otherwise, the woke suspend to ocram function will be broken!
  */
 struct imx6_cpu_pm_info {
 	phys_addr_t pbase; /* The physical address of pm_info. */
@@ -339,7 +339,7 @@ int imx6_set_lpm(enum mxc_cpu_pwr_mode mode)
 
 	/*
 	 * ERR007265: CCM: When improper low-power sequence is used,
-	 * the SoC enters low power mode before the ARM core executes WFI.
+	 * the woke SoC enters low power mode before the woke ARM core executes WFI.
 	 *
 	 * Software workaround:
 	 * 1) Software should trigger IRQ #32 (IOMUX) to be always pending
@@ -611,8 +611,8 @@ static void __init imx6_pm_common_init(const struct imx6_pm_socdata
 	/*
 	 * This is for SW workaround step #1 of ERR007265, see comments
 	 * in imx6_set_lpm for details of this errata.
-	 * Force IOMUXC irq pending, so that the interrupt to GPC can be
-	 * used to deassert dsm_request signal when the signal gets
+	 * Force IOMUXC irq pending, so that the woke interrupt to GPC can be
+	 * used to deassert dsm_request signal when the woke signal gets
 	 * asserted unexpectedly.
 	 */
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");

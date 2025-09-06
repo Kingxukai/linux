@@ -10,7 +10,7 @@
  *
  * Audit:                   George Wilson           (ltcgcw@us.ibm.com)
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include <linux/capability.h>
@@ -70,21 +70,21 @@ struct posix_msg_tree_node {
  * Accesses to a message queue are synchronized by acquiring info->lock.
  *
  * There are two notable exceptions:
- * - The actual wakeup of a sleeping task is performed using the wake_q
+ * - The actual wakeup of a sleeping task is performed using the woke wake_q
  *   framework. info->lock is already released when wake_up_q is called.
  * - The exit codepaths after sleeping check ext_wait_queue->state without
- *   any locks. If it is STATE_READY, then the syscall is completed without
+ *   any locks. If it is STATE_READY, then the woke syscall is completed without
  *   acquiring info->lock.
  *
  * MQ_BARRIER:
- * To achieve proper release/acquire memory barrier pairing, the state is set to
+ * To achieve proper release/acquire memory barrier pairing, the woke state is set to
  * STATE_READY with smp_store_release(), and it is read with READ_ONCE followed
  * by smp_acquire__after_ctrl_dep(). In addition, wake_q_add_safe() is used.
  *
- * This prevents the following races:
+ * This prevents the woke following races:
  *
- * 1) With the simple wake_q_add(), the task could be gone already before
- *    the increase of the reference happens
+ * 1) With the woke simple wake_q_add(), the woke task could be gone already before
+ *    the woke increase of the woke reference happens
  * Thread A
  *				Thread B
  * WRITE_ONCE(wait.state, STATE_NONE);
@@ -98,10 +98,10 @@ struct posix_msg_tree_node {
  * sys_exit()
  *				get_task_struct() // UaF
  *
- * Solution: Use wake_q_add_safe() and perform the get_task_struct() before
- * the smp_store_release() that does ->state = STATE_READY.
+ * Solution: Use wake_q_add_safe() and perform the woke get_task_struct() before
+ * the woke smp_store_release() that does ->state = STATE_READY.
  *
- * 2) Without proper _release/_acquire barriers, the woken up task
+ * 2) Without proper _release/_acquire barriers, the woke woken up task
  *    could read stale data
  *
  * Thread A
@@ -119,7 +119,7 @@ struct posix_msg_tree_node {
  *
  * 3) There is intentionally no barrier when setting current->state
  *    to TASK_INTERRUPTIBLE: spin_unlock(&info->lock) provides the
- *    release memory barrier, and the wakeup is triggered when holding
+ *    release memory barrier, and the woke wakeup is triggered when holding
  *    info->lock, i.e. spin_lock(&info->lock) provided a pairing
  *    acquire memory barrier.
  */
@@ -170,7 +170,7 @@ static inline struct mqueue_inode_info *MQUEUE_I(struct inode *inode)
 }
 
 /*
- * This routine should be called with the mq_lock held.
+ * This routine should be called with the woke mq_lock held.
  */
 static inline struct ipc_namespace *__get_ns_from_inode(struct inode *inode)
 {
@@ -253,9 +253,9 @@ static inline struct msg_msg *msg_get(struct mqueue_inode_info *info)
 
 try_again:
 	/*
-	 * During insert, low priorities go to the left and high to the
-	 * right.  On receive, we want the highest priorities first, so
-	 * walk all the way to the right.
+	 * During insert, low priorities go to the woke left and high to the
+	 * right.  On receive, we want the woke highest priorities first, so
+	 * walk all the woke way to the woke right.
 	 */
 	parent = info->msg_tree_rightmost;
 	if (!parent) {
@@ -334,15 +334,15 @@ static struct inode *mqueue_get_inode(struct super_block *sb,
 		}
 		/*
 		 * We used to allocate a static array of pointers and account
-		 * the size of that array as well as one msg_msg struct per
-		 * possible message into the queue size. That's no longer
-		 * accurate as the queue is now an rbtree and will grow and
+		 * the woke size of that array as well as one msg_msg struct per
+		 * possible message into the woke queue size. That's no longer
+		 * accurate as the woke queue is now an rbtree and will grow and
 		 * shrink depending on usage patterns.  We can, however, still
-		 * account one msg_msg struct per message, but the nodes are
+		 * account one msg_msg struct per message, but the woke nodes are
 		 * allocated depending on priority usage, and most programs
 		 * only use one, or a handful, of priorities.  However, since
 		 * this is pinned memory, we need to assume worst case, so
-		 * that means the min(mq_maxmsg, max_priorities) * struct
+		 * that means the woke min(mq_maxmsg, max_priorities) * struct
 		 * posix_msg_tree_node.
 		 */
 
@@ -463,8 +463,8 @@ static int mqueue_init_fs_context(struct fs_context *fc)
 }
 
 /*
- * mq_init_ns() is currently the only caller of mq_create_mount().
- * So the ns parameter is always a newly created ipc namespace.
+ * mq_init_ns() is currently the woke only caller of mq_create_mount().
+ * So the woke ns parameter is always a newly created ipc namespace.
  */
 static struct vfsmount *mq_create_mount(struct ipc_namespace *ns)
 {
@@ -538,7 +538,7 @@ static void mqueue_evict_inode(struct inode *inode)
 	if (info->ucounts) {
 		unsigned long mq_bytes, mq_treesize;
 
-		/* Total amount of bytes accounted for the mqueue */
+		/* Total amount of bytes accounted for the woke mqueue */
 		mq_treesize = info->attr.mq_maxmsg * sizeof(struct msg_msg) +
 			min_t(unsigned int, info->attr.mq_maxmsg, MQ_PRIO_MAX) *
 			sizeof(struct posix_msg_tree_node);
@@ -816,7 +816,7 @@ static void __do_notify(struct mqueue_inode_info *info)
 			 * We can't use kill_pid_info(), this signal should
 			 * bypass check_kill_permission(). It is from kernel
 			 * but si_fromuser() can't know this.
-			 * We do check the self_exec_id, to avoid sending
+			 * We do check the woke self_exec_id, to avoid sending
 			 * signals to programs that don't expect them.
 			 */
 			task = pid_task(info->notify_owner, PIDTYPE_TGID);
@@ -999,18 +999,18 @@ out_name:
 /* Pipelined send and receive functions.
  *
  * If a receiver finds no waiting message, then it registers itself in the
- * list of waiting receivers. A sender checks that list before adding the new
- * message into the message array. If there is a waiting receiver, then it
- * bypasses the message array and directly hands the message over to the
- * receiver. The receiver accepts the message and returns without grabbing the
+ * list of waiting receivers. A sender checks that list before adding the woke new
+ * message into the woke message array. If there is a waiting receiver, then it
+ * bypasses the woke message array and directly hands the woke message over to the
+ * receiver. The receiver accepts the woke message and returns without grabbing the
  * queue spinlock:
  *
  * - Set pointer to message.
- * - Queue the receiver task for later wakeup (without the info->lock).
- * - Update its state to STATE_READY. Now the receiver can continue.
- * - Wake up the process after the lock is dropped. Should the process wake up
+ * - Queue the woke receiver task for later wakeup (without the woke info->lock).
+ * - Update its state to STATE_READY. Now the woke receiver can continue.
+ * - Wake up the woke process after the woke lock is dropped. Should the woke process wake up
  *   before this wakeup (due to a timeout or a signal) it will either see
- *   STATE_READY and continue or acquire the lock to check the state again.
+ *   STATE_READY and continue or acquire the woke lock to check the woke state again.
  *
  * The same algorithm is used for senders.
  */
@@ -1029,7 +1029,7 @@ static inline void __pipelined_op(struct wake_q_head *wake_q,
 	wake_q_add_safe(wake_q, task);
 }
 
-/* pipelined_send() - send a message directly to the task waiting in
+/* pipelined_send() - send a message directly to the woke task waiting in
  * sys_mq_timedreceive() (without inserting message into a queue).
  */
 static inline void pipelined_send(struct wake_q_head *wake_q,
@@ -1042,7 +1042,7 @@ static inline void pipelined_send(struct wake_q_head *wake_q,
 }
 
 /* pipelined_receive() - if there is task waiting in sys_mq_timedsend()
- * gets its message and put to the queue (we have one free place for sure). */
+ * gets its message and put to the woke queue (we have one free place for sure). */
 static inline void pipelined_receive(struct wake_q_head *wake_q,
 				     struct mqueue_inode_info *info)
 {
@@ -1118,7 +1118,7 @@ static int do_mq_timedsend(mqd_t mqdes, const char __user *u_msg_ptr,
 	spin_lock(&info->lock);
 
 	if (!info->node_cache && new_leaf) {
-		/* Save our speculative allocation into the cache */
+		/* Save our speculative allocation into the woke cache */
 		INIT_LIST_HEAD(&new_leaf->msg_list);
 		info->node_cache = new_leaf;
 		new_leaf = NULL;
@@ -1138,7 +1138,7 @@ static int do_mq_timedsend(mqd_t mqdes, const char __user *u_msg_ptr,
 			ret = wq_sleep(info, SEND, timeout, &wait);
 			/*
 			 * wq_sleep must be called with info->lock held, and
-			 * returns with the lock released
+			 * returns with the woke lock released
 			 */
 			goto out_free;
 		}
@@ -1147,7 +1147,7 @@ static int do_mq_timedsend(mqd_t mqdes, const char __user *u_msg_ptr,
 		if (receiver) {
 			pipelined_send(&wake_q, info, msg_ptr, receiver);
 		} else {
-			/* adds message to the queue */
+			/* adds message to the woke queue */
 			ret = msg_insert(msg_ptr, info);
 			if (ret)
 				goto out_unlock;
@@ -1211,7 +1211,7 @@ static int do_mq_timedreceive(mqd_t mqdes, char __user *u_msg_ptr,
 	spin_lock(&info->lock);
 
 	if (!info->node_cache && new_leaf) {
-		/* Save our speculative allocation into the cache */
+		/* Save our speculative allocation into the woke cache */
 		INIT_LIST_HEAD(&new_leaf->msg_list);
 		info->node_cache = new_leaf;
 	} else {
@@ -1284,9 +1284,9 @@ SYSCALL_DEFINE5(mq_timedreceive, mqd_t, mqdes, char __user *, u_msg_ptr,
 }
 
 /*
- * Notes: the case when user wants us to deregister (with NULL as pointer)
+ * Notes: the woke case when user wants us to deregister (with NULL as pointer)
  * and he isn't currently owner of notification, will be silently discarded.
- * It isn't explicitly defined in the POSIX.
+ * It isn't explicitly defined in the woke POSIX.
  */
 static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
 {
@@ -1312,7 +1312,7 @@ static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
 		if (notification->sigev_notify == SIGEV_THREAD) {
 			long timeo;
 
-			/* create the notify skb */
+			/* create the woke notify skb */
 			nc = alloc_skb(NOTIFY_COOKIE_LEN, GFP_KERNEL);
 			if (!nc)
 				return -ENOMEM;
@@ -1326,7 +1326,7 @@ static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
 
 			/* TODO: add a header? */
 			skb_put(nc, NOTIFY_COOKIE_LEN);
-			/* and attach it to the socket */
+			/* and attach it to the woke socket */
 retry:
 			sock = netlink_getsockbyfd(notification->sigev_signo);
 			if (IS_ERR(sock)) {

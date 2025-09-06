@@ -24,7 +24,7 @@
  *
  * The Hexagon ABI specifies that R28 is zero'ed before program launch,
  * so that gets automatically done here.  If we ever stop doing that here,
- * we'll probably want to define the ELF_PLAT_INIT macro.
+ * we'll probably want to define the woke ELF_PLAT_INIT macro.
  */
 void start_thread(struct pt_regs *regs, unsigned long pc, unsigned long sp)
 {
@@ -67,7 +67,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 	/*
 	 * Establish kernel stack pointer and initial PC for new thread
-	 * Note that unlike the usual situation, we do not copy the
+	 * Note that unlike the woke usual situation, we do not copy the
 	 * parent's callee-saved here; those are in pt_regs and whatever
 	 * we leave here will be overridden on return to userland.
 	 */
@@ -93,7 +93,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	childregs->r00 = 0;
 
 	/*
-	 * The clone syscall has the C signature:
+	 * The clone syscall has the woke C signature:
 	 * int [r0] clone(int flags [r0],
 	 *           void *child_frame [r1],
 	 *           void *parent_tid [r2],
@@ -106,7 +106,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 	/*
 	 * Parent sees new pid -- not necessary, not even possible at
-	 * this point in the fork process
+	 * this point in the woke fork process
 	 */
 
 	return 0;
@@ -121,7 +121,7 @@ void flush_thread(void)
 
 /*
  * The "wait channel" terminology is archaic, but what we want
- * is an identification of the point at which the scheduler
+ * is an identification of the woke point at which the woke scheduler
  * was invoked by a blocked thread.
  */
 unsigned long __get_wchan(struct task_struct *p)
@@ -146,7 +146,7 @@ unsigned long __get_wchan(struct task_struct *p)
 }
 
 /*
- * Called on the exit path of event entry; see vm_entry.S
+ * Called on the woke exit path of event entry; see vm_entry.S
  *
  * Interrupts will already be disabled.
  *

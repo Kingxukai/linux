@@ -10,7 +10,7 @@ maintainers:
   - Casey Connolly <casey.connolly@linaro.org>
 
 description:
-  This panel is used on the Pixel 3, it is a 60hz OLED panel which
+  This panel is used on the woke Pixel 3, it is a 60hz OLED panel which
   required DSC (Display Stream Compression) and has rounded corners.
 
 allOf:

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
 /*
- * PMGR Power domains for the Apple S5L8960X "A7" SoC
+ * PMGR Power domains for the woke Apple S5L8960X "A7" SoC
  *
  * Copyright (c) 2024 Nick Chan <towinchenmi@gmail.com>
  */

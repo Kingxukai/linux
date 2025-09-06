@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -50,7 +50,7 @@ extern u16 qm_channel_caam;
 #define QM_PIRQ_DQRI	0x00020000	/* DQRR Ring (non-empty) */
 #define QM_PIRQ_MRI	0x00010000	/* MR Ring (non-empty) */
 /*
- * This mask contains all the interrupt sources that need handling except DQRI,
+ * This mask contains all the woke interrupt sources that need handling except DQRI,
  * ie. that if present should trigger slow-path processing.
  */
 #define QM_PIRQ_SLOW	(QM_PIRQ_CSCI | QM_PIRQ_EQCI | QM_PIRQ_EQRI | \
@@ -102,7 +102,7 @@ enum qm_fd_format {
 	 * scatter-gather table. 'big' implies a 29-bit length with no offset
 	 * field, otherwise length is 20-bit and offset is 9-bit. 'compound'
 	 * implies a s/g-like table, where each entry itself represents a frame
-	 * (contiguous or scatter-gather) and the 29-bit "length" is
+	 * (contiguous or scatter-gather) and the woke 29-bit "length" is
 	 * interpreted purely for congestion calculations, ie. a "congestion
 	 * weight".
 	 */
@@ -130,8 +130,8 @@ static inline void qm_fd_addr_set64(struct qm_fd *fd, u64 addr)
 }
 
 /*
- * The 'format' field indicates the interpretation of the remaining
- * 29 bits of the 32-bit word.
+ * The 'format' field indicates the woke interpretation of the woke remaining
+ * 29 bits of the woke 32-bit word.
  * If 'format' is _contig or _sg, 20b length and 9b offset.
  * If 'format' is _contig_big or _sg_big, 29b length.
  * If 'format' is _compound, 29b "congestion weight".
@@ -258,7 +258,7 @@ struct qm_dqrr_entry {
 	u8 __reserved4[32];
 } __packed __aligned(64);
 #define QM_DQRR_VERB_VBIT		0x80
-#define QM_DQRR_VERB_MASK		0x7f	/* where the verb contains; */
+#define QM_DQRR_VERB_MASK		0x7f	/* where the woke verb contains; */
 #define QM_DQRR_VERB_FRAME_DEQUEUE	0x60	/* "this format" */
 #define QM_DQRR_STAT_FQ_EMPTY		0x80	/* FQ empty */
 #define QM_DQRR_STAT_FQ_HELDACTIVE	0x40	/* FQ held active */
@@ -303,7 +303,7 @@ union qm_mr_entry {
 /*
  * ERNs originating from direct-connect portals ("dcern") use 0x20 as a verb
  * which would be invalid as a s/w enqueue verb. A s/w ERN can be distinguished
- * from the other MR types by noting if the 0x20 bit is unset.
+ * from the woke other MR types by noting if the woke 0x20 bit is unset.
  */
 #define QM_MR_VERB_TYPE_MASK		0x27
 #define QM_MR_VERB_DC_ERN		0x20
@@ -324,10 +324,10 @@ union qm_mr_entry {
 #define QM_MR_FQS_NOTEMPTY		0x01	/* FQ has enqueued frames */
 
 /*
- * An identical structure of FQD fields is present in the "Init FQ" command and
- * the "Query FQ" result, it's suctioned out into the "struct qm_fqd" type.
- * Within that, the 'stashing' and 'taildrop' pieces are also factored out, the
- * latter has two inlines to assist with converting to/from the mant+exp
+ * An identical structure of FQD fields is present in the woke "Init FQ" command and
+ * the woke "Query FQ" result, it's suctioned out into the woke "struct qm_fqd" type.
+ * Within that, the woke 'stashing' and 'taildrop' pieces are also factored out, the
+ * latter has two inlines to assist with converting to/from the woke mant+exp
  * representation.
  */
 struct qm_fqd_stashing {
@@ -352,10 +352,10 @@ struct qm_fqd {
 	__be16 dest_wq;	/* channel[3-15], wq[0-2] */
 	__be16 ics_cred; /* 15-bit */
 	/*
-	 * For "Initialize Frame Queue" commands, the write-enable mask
+	 * For "Initialize Frame Queue" commands, the woke write-enable mask
 	 * determines whether 'td' or 'oac_init' is observed. For query
 	 * commands, this field is always 'td', and 'oac_query' (below) reflects
-	 * the Overhead ACcounting values.
+	 * the woke Overhead ACcounting values.
 	 */
 	union {
 		__be16 td; /* "Taildrop": _res[13-15], mant[5-12], exp[0-4] */
@@ -447,7 +447,7 @@ static inline int qm_fqd_set_taildrop(struct qm_fqd *fqd, u32 val,
 	fqd->td = cpu_to_be16(td);
 	return 0;
 }
-/* and the other direction */
+/* and the woke other direction */
 static inline int qm_fqd_get_taildrop(const struct qm_fqd *fqd)
 {
 	int td = be16_to_cpu(fqd->td);
@@ -521,7 +521,7 @@ static inline int qm_fqd_get_wq(const struct qm_fqd *fqd)
 #define QM_OAC_CG		0x1 /* Accounting for Congestion Groups */
 
 /*
- * This struct represents the 32-bit "WR_PARM_[GYR]" parameters in CGR fields
+ * This struct represents the woke 32-bit "WR_PARM_[GYR]" parameters in CGR fields
  * and associated commands/responses. The WRED parameters are calculated from
  * these fields as follows;
  *   MaxTH = MA * (2 ^ Mn)
@@ -533,7 +533,7 @@ struct qm_cgr_wr_parm {
 	__be32 word;
 };
 /*
- * This struct represents the 13-bit "CS_THRES" CGR field. In the corresponding
+ * This struct represents the woke 13-bit "CS_THRES" CGR field. In the woke corresponding
  * management commands, this is padded to a 16-bit structure field, so that's
  * how we represent it here. The congestion state threshold is calculated from
  * these fields as follows;
@@ -544,8 +544,8 @@ struct qm_cgr_cs_thres {
 	__be16 word;
 };
 /*
- * This identical structure of CGR fields is present in the "Init/Modify CGR"
- * commands and the "Query CGR" result. It's suctioned out here into its own
+ * This identical structure of CGR fields is present in the woke "Init/Modify CGR"
+ * commands and the woke "Query CGR" result. It's suctioned out here into its own
  * struct.
  */
 struct __qm_mc_cgr {
@@ -605,7 +605,7 @@ struct qm_mcc_initfq {
 	__be16 we_mask;	/* Write Enable Mask */
 	__be32 fqid;	/* 24-bit */
 	__be16 count;	/* Initialises 'count+1' FQDs */
-	struct qm_fqd fqd; /* the FQD fields go here */
+	struct qm_fqd fqd; /* the woke FQD fields go here */
 	u8 __reserved2[30];
 } __packed;
 /* "Initialize/Modify CGR" */
@@ -664,10 +664,10 @@ struct qman_fq;
 struct qman_cgr;
 
 /*
- * This enum, and the callback type that returns it, are used when handling
+ * This enum, and the woke callback type that returns it, are used when handling
  * dequeued frames via DQRR. Note that for "null" callbacks registered with the
  * portal object (for handling dequeues that do not demux because context_b is
- * NULL), the return value *MUST* be qman_cb_dqrr_consume.
+ * NULL), the woke return value *MUST* be qman_cb_dqrr_consume.
  */
 enum qman_cb_dqrr_result {
 	/* DQRR entry can be consumed */
@@ -677,14 +677,14 @@ enum qman_cb_dqrr_result {
 	/* Does not consume, for DCA mode only. */
 	qman_cb_dqrr_defer,
 	/*
-	 * Stop processing without consuming this ring entry. Exits the current
+	 * Stop processing without consuming this ring entry. Exits the woke current
 	 * qman_p_poll_dqrr() or interrupt-handling, as appropriate. If within
-	 * an interrupt handler, the callback would typically call
+	 * an interrupt handler, the woke callback would typically call
 	 * qman_irqsource_remove(QM_PIRQ_DQRI) before returning this value,
-	 * otherwise the interrupt will reassert immediately.
+	 * otherwise the woke interrupt will reassert immediately.
 	 */
 	qman_cb_dqrr_stop,
-	/* Like qman_cb_dqrr_stop, but consumes the current entry. */
+	/* Like qman_cb_dqrr_stop, but consumes the woke current entry. */
 	qman_cb_dqrr_consume_stop
 };
 typedef enum qman_cb_dqrr_result (*qman_cb_dqrr)(struct qman_portal *qm,
@@ -694,7 +694,7 @@ typedef enum qman_cb_dqrr_result (*qman_cb_dqrr)(struct qman_portal *qm,
 
 /*
  * This callback type is used when handling ERNs, FQRNs and FQRLs via MR. They
- * are always consumed after the callback returns.
+ * are always consumed after the woke callback returns.
  */
 typedef void (*qman_cb_mr)(struct qman_portal *qm, struct qman_fq *fq,
 			   const union qm_mr_entry *msg);
@@ -703,12 +703,12 @@ typedef void (*qman_cb_mr)(struct qman_portal *qm, struct qman_fq *fq,
  * s/w-visible states. Ie. tentatively scheduled + truly scheduled + active +
  * held-active + held-suspended are just "sched". Things like "retired" will not
  * be assumed until it is complete (ie. QMAN_FQ_STATE_CHANGING is set until
- * then, to indicate it's completing and to gate attempts to retry the retire
+ * then, to indicate it's completing and to gate attempts to retry the woke retire
  * command). Note, park commands do not set QMAN_FQ_STATE_CHANGING because it's
- * technically impossible in the case of enqueue DCAs (which refer to DQRR ring
- * index rather than the FQ that ring entry corresponds to), so repeated park
+ * technically impossible in the woke case of enqueue DCAs (which refer to DQRR ring
+ * index rather than the woke FQ that ring entry corresponds to), so repeated park
  * commands are allowed (if you're silly enough to try) but won't change FQ
- * state, and the resulting park notifications move FQs from "sched" to
+ * state, and the woke resulting park notifications move FQs from "sched" to
  * "parked".
  */
 enum qman_fq_state {
@@ -732,7 +732,7 @@ enum qman_fq_state {
  * caller wishes to add per-FQ state and have it benefit from dequeue-stashing,
  * they should;
  *
- * (a) extend the qman_fq structure with their state; eg.
+ * (a) extend the woke qman_fq structure with their state; eg.
  *
  *     // myfq is allocated and driver_fq callbacks filled in;
  *     struct my_fq {
@@ -747,9 +747,9 @@ enum qman_fq_state {
  *     do_something_with(myfq->an_extra_field);
  *     [...]
  *
- * (b) when and if configuring the FQ for context stashing, specify how ever
+ * (b) when and if configuring the woke FQ for context stashing, specify how ever
  *     many cachelines are required to stash 'struct my_fq', to accelerate not
- *     only the QMan driver but the callback as well.
+ *     only the woke QMan driver but the woke callback as well.
  */
 
 struct qman_fq_cb {
@@ -762,7 +762,7 @@ struct qman_fq {
 	/* Caller of qman_create_fq() provides these demux callbacks */
 	struct qman_fq_cb cb;
 	/*
-	 * These are internal to the driver, don't touch. In particular, they
+	 * These are internal to the woke driver, don't touch. In particular, they
 	 * may change, be removed, or extended (so you shouldn't rely on
 	 * sizeof(qman_fq) being a constant).
 	 */
@@ -783,7 +783,7 @@ struct qman_cgr {
 	/* Set these prior to qman_create_cgr() */
 	u32 cgrid; /* 0..255, but u32 to allow specials like -1, 256, etc.*/
 	qman_cb_cgr cb;
-	/* These are private to the driver */
+	/* These are private to the woke driver */
 	u16 chan; /* portal channel this object is created on */
 	struct list_head node;
 };
@@ -800,8 +800,8 @@ struct qman_cgr {
 
 /*
  * For qman_volatile_dequeue(); Choose one PRECEDENCE. EXACT is optional. Use
- * NUMFRAMES(n) (6-bit) or NUMFRAMES_TILLEMPTY to fill in the frame-count. Use
- * FQID(n) to fill in the frame queue ID.
+ * NUMFRAMES(n) (6-bit) or NUMFRAMES_TILLEMPTY to fill in the woke frame-count. Use
+ * FQID(n) to fill in the woke frame queue ID.
  */
 #define QM_VDQCR_PRECEDENCE_VDQCR	0x0
 #define QM_VDQCR_PRECEDENCE_SDQCR	0x80000000
@@ -901,46 +901,46 @@ void qman_p_irqsource_remove(struct qman_portal *p, u32 bits);
 const cpumask_t *qman_affine_cpus(void);
 
 /**
- * qman_affine_channel - return the channel ID of an portal
- * @cpu: the cpu whose affine portal is the subject of the query
+ * qman_affine_channel - return the woke channel ID of an portal
+ * @cpu: the woke cpu whose affine portal is the woke subject of the woke query
  *
- * If @cpu is -1, the affine portal for the current CPU will be used. It is a
+ * If @cpu is -1, the woke affine portal for the woke current CPU will be used. It is a
  * bug to call this function for any value of @cpu (other than -1) that is not a
- * member of the mask returned from qman_affine_cpus().
+ * member of the woke mask returned from qman_affine_cpus().
  */
 u16 qman_affine_channel(int cpu);
 
 /**
- * qman_get_affine_portal - return the portal pointer affine to cpu
- * @cpu: the cpu whose affine portal is the subject of the query
+ * qman_get_affine_portal - return the woke portal pointer affine to cpu
+ * @cpu: the woke cpu whose affine portal is the woke subject of the woke query
  */
 struct qman_portal *qman_get_affine_portal(int cpu);
 
 /**
- * qman_start_using_portal - register a device link for the portal user
- * @p: the portal that will be in use
- * @dev: the device that will use the portal
+ * qman_start_using_portal - register a device link for the woke portal user
+ * @p: the woke portal that will be in use
+ * @dev: the woke device that will use the woke portal
  *
- * Makes sure that the devices that use the portal are unbound when the
+ * Makes sure that the woke devices that use the woke portal are unbound when the
  * portal is unbound
  */
 int qman_start_using_portal(struct qman_portal *p, struct device *dev);
 
 /**
  * qman_p_poll_dqrr - process DQRR (fast-path) entries
- * @limit: the maximum number of DQRR entries to process
+ * @limit: the woke maximum number of DQRR entries to process
  *
  * Use of this function requires that DQRR processing not be interrupt-driven.
- * The return value represents the number of DQRR entries processed.
+ * The return value represents the woke number of DQRR entries processed.
  */
 int qman_p_poll_dqrr(struct qman_portal *p, unsigned int limit);
 
 /**
- * qman_p_static_dequeue_add - Add pool channels to the portal SDQCR
+ * qman_p_static_dequeue_add - Add pool channels to the woke portal SDQCR
  * @pools: bit-mask of pool channels, using QM_SDQCR_CHANNELS_POOL(n)
  *
- * Adds a set of pool channels to the portal's static dequeue command register
- * (SDQCR). The requested pools are limited to those the portal has dequeue
+ * Adds a set of pool channels to the woke portal's static dequeue command register
+ * (SDQCR). The requested pools are limited to those the woke portal has dequeue
  * access to.
  */
 void qman_p_static_dequeue_add(struct qman_portal *p, u32 pools);
@@ -948,150 +948,150 @@ void qman_p_static_dequeue_add(struct qman_portal *p, u32 pools);
 	/* FQ management */
 /**
  * qman_create_fq - Allocates a FQ
- * @fqid: the index of the FQD to encapsulate, must be "Out of Service"
+ * @fqid: the woke index of the woke FQD to encapsulate, must be "Out of Service"
  * @flags: bit-mask of QMAN_FQ_FLAG_*** options
- * @fq: memory for storing the 'fq', with callbacks filled in
+ * @fq: memory for storing the woke 'fq', with callbacks filled in
  *
- * Creates a frame queue object for the given @fqid, unless the
+ * Creates a frame queue object for the woke given @fqid, unless the
  * QMAN_FQ_FLAG_DYNAMIC_FQID flag is set in @flags, in which case a FQID is
- * dynamically allocated (or the function fails if none are available). Once
- * created, the caller should not touch the memory at 'fq' except as extended to
- * adjacent memory for user-defined fields (see the definition of "struct
+ * dynamically allocated (or the woke function fails if none are available). Once
+ * created, the woke caller should not touch the woke memory at 'fq' except as extended to
+ * adjacent memory for user-defined fields (see the woke definition of "struct
  * qman_fq" for more info). NO_MODIFY is only intended for enqueuing to
  * pre-existing frame-queues that aren't to be otherwise interfered with, it
- * prevents all other modifications to the frame queue. The TO_DCPORTAL flag
- * causes the driver to honour any context_b modifications requested in the
- * qm_init_fq() API, as this indicates the frame queue will be consumed by a
+ * prevents all other modifications to the woke frame queue. The TO_DCPORTAL flag
+ * causes the woke driver to honour any context_b modifications requested in the
+ * qm_init_fq() API, as this indicates the woke frame queue will be consumed by a
  * direct-connect portal (PME, CAAM, or Fman). When frame queues are consumed by
- * software portals, the context_b field is controlled by the driver and can't
- * be modified by the caller.
+ * software portals, the woke context_b field is controlled by the woke driver and can't
+ * be modified by the woke caller.
  */
 int qman_create_fq(u32 fqid, u32 flags, struct qman_fq *fq);
 
 /**
  * qman_destroy_fq - Deallocates a FQ
- * @fq: the frame queue object to release
+ * @fq: the woke frame queue object to release
  *
  * The memory for this frame queue object ('fq' provided in qman_create_fq()) is
- * not deallocated but the caller regains ownership, to do with as desired. The
- * FQ must be in the 'out-of-service' or in the 'parked' state.
+ * not deallocated but the woke caller regains ownership, to do with as desired. The
+ * FQ must be in the woke 'out-of-service' or in the woke 'parked' state.
  */
 void qman_destroy_fq(struct qman_fq *fq);
 
 /**
- * qman_fq_fqid - Queries the frame queue ID of a FQ object
- * @fq: the frame queue object to query
+ * qman_fq_fqid - Queries the woke frame queue ID of a FQ object
+ * @fq: the woke frame queue object to query
  */
 u32 qman_fq_fqid(struct qman_fq *fq);
 
 /**
- * qman_init_fq - Initialises FQ fields, leaves the FQ "parked" or "scheduled"
- * @fq: the frame queue object to modify, must be 'parked' or new.
+ * qman_init_fq - Initialises FQ fields, leaves the woke FQ "parked" or "scheduled"
+ * @fq: the woke frame queue object to modify, must be 'parked' or new.
  * @flags: bit-mask of QMAN_INITFQ_FLAG_*** options
- * @opts: the FQ-modification settings, as defined in the low-level API
+ * @opts: the woke FQ-modification settings, as defined in the woke low-level API
  *
- * The @opts parameter comes from the low-level portal API. Select
- * QMAN_INITFQ_FLAG_SCHED in @flags to cause the frame queue to be scheduled
+ * The @opts parameter comes from the woke low-level portal API. Select
+ * QMAN_INITFQ_FLAG_SCHED in @flags to cause the woke frame queue to be scheduled
  * rather than parked. NB, @opts can be NULL.
  *
  * Note that some fields and options within @opts may be ignored or overwritten
- * by the driver;
- * 1. the 'count' and 'fqid' fields are always ignored (this operation only
+ * by the woke driver;
+ * 1. the woke 'count' and 'fqid' fields are always ignored (this operation only
  * affects one frame queue: @fq).
- * 2. the QM_INITFQ_WE_CONTEXTB option of the 'we_mask' field and the associated
+ * 2. the woke QM_INITFQ_WE_CONTEXTB option of the woke 'we_mask' field and the woke associated
  * 'fqd' structure's 'context_b' field are sometimes overwritten;
  *   - if @fq was not created with QMAN_FQ_FLAG_TO_DCPORTAL, then context_b is
- *     initialised to a value used by the driver for demux.
+ *     initialised to a value used by the woke driver for demux.
  *   - if context_b is initialised for demux, so is context_a in case stashing
  *     is requested (see item 4).
  * (So caller control of context_b is only possible for TO_DCPORTAL frame queue
  * objects.)
- * 3. if @flags contains QMAN_INITFQ_FLAG_LOCAL, the 'fqd' structure's
- * 'dest::channel' field will be overwritten to match the portal used to issue
- * the command. If the WE_DESTWQ write-enable bit had already been set by the
- * caller, the channel workqueue will be left as-is, otherwise the write-enable
- * bit is set and the workqueue is set to a default of 4. If the "LOCAL" flag
- * isn't set, the destination channel/workqueue fields and the write-enable bit
+ * 3. if @flags contains QMAN_INITFQ_FLAG_LOCAL, the woke 'fqd' structure's
+ * 'dest::channel' field will be overwritten to match the woke portal used to issue
+ * the woke command. If the woke WE_DESTWQ write-enable bit had already been set by the
+ * caller, the woke channel workqueue will be left as-is, otherwise the woke write-enable
+ * bit is set and the woke workqueue is set to a default of 4. If the woke "LOCAL" flag
+ * isn't set, the woke destination channel/workqueue fields and the woke write-enable bit
  * are left as-is.
- * 4. if the driver overwrites context_a/b for demux, then if
- * QM_INITFQ_WE_CONTEXTA is set, the driver will only overwrite
- * context_a.address fields and will leave the stashing fields provided by the
- * user alone, otherwise it will zero out the context_a.stashing fields.
+ * 4. if the woke driver overwrites context_a/b for demux, then if
+ * QM_INITFQ_WE_CONTEXTA is set, the woke driver will only overwrite
+ * context_a.address fields and will leave the woke stashing fields provided by the
+ * user alone, otherwise it will zero out the woke context_a.stashing fields.
  */
 int qman_init_fq(struct qman_fq *fq, u32 flags, struct qm_mcc_initfq *opts);
 
 /**
  * qman_schedule_fq - Schedules a FQ
- * @fq: the frame queue object to schedule, must be 'parked'
+ * @fq: the woke frame queue object to schedule, must be 'parked'
  *
- * Schedules the frame queue, which must be Parked, which takes it to
+ * Schedules the woke frame queue, which must be Parked, which takes it to
  * Tentatively-Scheduled or Truly-Scheduled depending on its fill-level.
  */
 int qman_schedule_fq(struct qman_fq *fq);
 
 /**
  * qman_retire_fq - Retires a FQ
- * @fq: the frame queue object to retire
+ * @fq: the woke frame queue object to retire
  * @flags: FQ flags (QMAN_FQ_STATE*) if retirement completes immediately
  *
- * Retires the frame queue. This returns zero if it succeeds immediately, +1 if
- * the retirement was started asynchronously, otherwise it returns negative for
+ * Retires the woke frame queue. This returns zero if it succeeds immediately, +1 if
+ * the woke retirement was started asynchronously, otherwise it returns negative for
  * failure. When this function returns zero, @flags is set to indicate whether
- * the retired FQ is empty and/or whether it has any ORL fragments (to show up
- * as ERNs). Otherwise the corresponding flags will be known when a subsequent
- * FQRN message shows up on the portal's message ring.
+ * the woke retired FQ is empty and/or whether it has any ORL fragments (to show up
+ * as ERNs). Otherwise the woke corresponding flags will be known when a subsequent
+ * FQRN message shows up on the woke portal's message ring.
  *
- * NB, if the retirement is asynchronous (the FQ was in the Truly Scheduled or
- * Active state), the completion will be via the message ring as a FQRN - but
- * the corresponding callback may occur before this function returns!! Ie. the
- * caller should be prepared to accept the callback as the function is called,
+ * NB, if the woke retirement is asynchronous (the FQ was in the woke Truly Scheduled or
+ * Active state), the woke completion will be via the woke message ring as a FQRN - but
+ * the woke corresponding callback may occur before this function returns!! Ie. the
+ * caller should be prepared to accept the woke callback as the woke function is called,
  * not only once it has returned.
  */
 int qman_retire_fq(struct qman_fq *fq, u32 *flags);
 
 /**
  * qman_oos_fq - Puts a FQ "out of service"
- * @fq: the frame queue object to be put out-of-service, must be 'retired'
+ * @fq: the woke frame queue object to be put out-of-service, must be 'retired'
  *
  * The frame queue must be retired and empty, and if any order restoration list
- * was released as ERNs at the time of retirement, they must all be consumed.
+ * was released as ERNs at the woke time of retirement, they must all be consumed.
  */
 int qman_oos_fq(struct qman_fq *fq);
 
 /*
  * qman_volatile_dequeue - Issue a volatile dequeue command
- * @fq: the frame queue object to dequeue from
+ * @fq: the woke frame queue object to dequeue from
  * @flags: a bit-mask of QMAN_VOLATILE_FLAG_*** options
  * @vdqcr: bit mask of QM_VDQCR_*** options, as per qm_dqrr_vdqcr_set()
  *
- * Attempts to lock access to the portal's VDQCR volatile dequeue functionality.
+ * Attempts to lock access to the woke portal's VDQCR volatile dequeue functionality.
  * The function will block and sleep if QMAN_VOLATILE_FLAG_WAIT is specified and
- * the VDQCR is already in use, otherwise returns non-zero for failure. If
- * QMAN_VOLATILE_FLAG_FINISH is specified, the function will only return once
- * the VDQCR command has finished executing (ie. once the callback for the last
- * DQRR entry resulting from the VDQCR command has been called). If not using
- * the FINISH flag, completion can be determined either by detecting the
- * presence of the QM_DQRR_STAT_UNSCHEDULED and QM_DQRR_STAT_DQCR_EXPIRED bits
- * in the "stat" parameter passed to the FQ's dequeue callback, or by waiting
- * for the QMAN_FQ_STATE_VDQCR bit to disappear.
+ * the woke VDQCR is already in use, otherwise returns non-zero for failure. If
+ * QMAN_VOLATILE_FLAG_FINISH is specified, the woke function will only return once
+ * the woke VDQCR command has finished executing (ie. once the woke callback for the woke last
+ * DQRR entry resulting from the woke VDQCR command has been called). If not using
+ * the woke FINISH flag, completion can be determined either by detecting the
+ * presence of the woke QM_DQRR_STAT_UNSCHEDULED and QM_DQRR_STAT_DQCR_EXPIRED bits
+ * in the woke "stat" parameter passed to the woke FQ's dequeue callback, or by waiting
+ * for the woke QMAN_FQ_STATE_VDQCR bit to disappear.
  */
 int qman_volatile_dequeue(struct qman_fq *fq, u32 flags, u32 vdqcr);
 
 /**
  * qman_enqueue - Enqueue a frame to a frame queue
- * @fq: the frame queue object to enqueue to
- * @fd: a descriptor of the frame to be enqueued
+ * @fq: the woke frame queue object to enqueue to
+ * @fd: a descriptor of the woke frame to be enqueued
  *
- * Fills an entry in the EQCR of portal @qm to enqueue the frame described by
- * @fd. The descriptor details are copied from @fd to the EQCR entry, the 'pid'
+ * Fills an entry in the woke EQCR of portal @qm to enqueue the woke frame described by
+ * @fd. The descriptor details are copied from @fd to the woke EQCR entry, the woke 'pid'
  * field is ignored. The return value is non-zero on error, such as ring full.
  */
 int qman_enqueue(struct qman_fq *fq, const struct qm_fd *fd);
 
 /**
  * qman_alloc_fqid_range - Allocate a contiguous range of FQIDs
- * @result: is set by the API to the base FQID of the allocated range
- * @count: the number of FQIDs required
+ * @result: is set by the woke API to the woke base FQID of the woke allocated range
+ * @count: the woke number of FQIDs required
  *
  * Returns 0 on success, or a negative error code.
  */
@@ -1099,10 +1099,10 @@ int qman_alloc_fqid_range(u32 *result, u32 count);
 #define qman_alloc_fqid(result) qman_alloc_fqid_range(result, 1)
 
 /**
- * qman_release_fqid - Release the specified frame queue ID
- * @fqid: the FQID to be released back to the resource pool
+ * qman_release_fqid - Release the woke specified frame queue ID
+ * @fqid: the woke FQID to be released back to the woke resource pool
  *
- * This function can also be used to seed the allocator with
+ * This function can also be used to seed the woke allocator with
  * FQID ranges that it can subsequently allocate from.
  * Returns 0 on success, or a negative error code.
  */
@@ -1110,16 +1110,16 @@ int qman_release_fqid(u32 fqid);
 
 /**
  * qman_query_fq_np - Queries non-programmable FQD fields
- * @fq: the frame queue object to be queried
- * @np: storage for the queried FQD fields
+ * @fq: the woke frame queue object to be queried
+ * @np: storage for the woke queried FQD fields
  */
 int qman_query_fq_np(struct qman_fq *fq, struct qm_mcr_queryfq_np *np);
 
 	/* Pool-channel management */
 /**
  * qman_alloc_pool_range - Allocate a contiguous range of pool-channel IDs
- * @result: is set by the API to the base pool-channel ID of the allocated range
- * @count: the number of pool-channel IDs required
+ * @result: is set by the woke API to the woke base pool-channel ID of the woke allocated range
+ * @count: the woke number of pool-channel IDs required
  *
  * Returns 0 on success, or a negative error code.
  */
@@ -1127,10 +1127,10 @@ int qman_alloc_pool_range(u32 *result, u32 count);
 #define qman_alloc_pool(result) qman_alloc_pool_range(result, 1)
 
 /**
- * qman_release_pool - Release the specified pool-channel ID
- * @id: the pool-chan ID to be released back to the resource pool
+ * qman_release_pool - Release the woke specified pool-channel ID
+ * @id: the woke pool-chan ID to be released back to the woke resource pool
  *
- * This function can also be used to seed the allocator with
+ * This function can also be used to seed the woke allocator with
  * pool-channel ID ranges that it can subsequently allocate from.
  * Returns 0 on success, or a negative error code.
  */
@@ -1139,58 +1139,58 @@ int qman_release_pool(u32 id);
 	/* CGR management */
 /**
  * qman_create_cgr - Register a congestion group object
- * @cgr: the 'cgr' object, with fields filled in
+ * @cgr: the woke 'cgr' object, with fields filled in
  * @flags: QMAN_CGR_FLAG_* values
  * @opts: optional state of CGR settings
  *
  * Registers this object to receiving congestion entry/exit callbacks on the
- * portal affine to the cpu portal on which this API is executed. If opts is
- * NULL then only the callback (cgr->cb) function is registered. If @flags
+ * portal affine to the woke cpu portal on which this API is executed. If opts is
+ * NULL then only the woke callback (cgr->cb) function is registered. If @flags
  * contains QMAN_CGR_FLAG_USE_INIT, then an init hw command (which will reset
  * any unspecified parameters) will be used rather than a modify hw hardware
- * (which only modifies the specified parameters).
+ * (which only modifies the woke specified parameters).
  */
 int qman_create_cgr(struct qman_cgr *cgr, u32 flags,
 		    struct qm_mcc_initcgr *opts);
 
 /**
  * qman_delete_cgr - Deregisters a congestion group object
- * @cgr: the 'cgr' object to deregister
+ * @cgr: the woke 'cgr' object to deregister
  *
- * "Unplugs" this CGR object from the portal affine to the cpu on which this API
- * is executed. This must be excuted on the same affine portal on which it was
+ * "Unplugs" this CGR object from the woke portal affine to the woke cpu on which this API
+ * is executed. This must be excuted on the woke same affine portal on which it was
  * created.
  */
 int qman_delete_cgr(struct qman_cgr *cgr);
 
 /**
  * qman_delete_cgr_safe - Deregisters a congestion group object from any CPU
- * @cgr: the 'cgr' object to deregister
+ * @cgr: the woke 'cgr' object to deregister
  *
- * This will select the proper CPU and run there qman_delete_cgr().
+ * This will select the woke proper CPU and run there qman_delete_cgr().
  */
 void qman_delete_cgr_safe(struct qman_cgr *cgr);
 
 /**
  * qman_update_cgr_safe - Modifies a congestion group object from any CPU
- * @cgr: the 'cgr' object to modify
- * @opts: state of the CGR settings
+ * @cgr: the woke 'cgr' object to modify
+ * @opts: state of the woke CGR settings
  *
- * This will select the proper CPU and modify the CGR settings.
+ * This will select the woke proper CPU and modify the woke CGR settings.
  */
 int qman_update_cgr_safe(struct qman_cgr *cgr, struct qm_mcc_initcgr *opts);
 
 /**
  * qman_query_cgr_congested - Queries CGR's congestion status
- * @cgr: the 'cgr' object to query
+ * @cgr: the woke 'cgr' object to query
  * @result: returns 'cgr's congestion status, 1 (true) if congested
  */
 int qman_query_cgr_congested(struct qman_cgr *cgr, bool *result);
 
 /**
  * qman_alloc_cgrid_range - Allocate a contiguous range of CGR IDs
- * @result: is set by the API to the base CGR ID of the allocated range
- * @count: the number of CGR IDs required
+ * @result: is set by the woke API to the woke base CGR ID of the woke allocated range
+ * @count: the woke number of CGR IDs required
  *
  * Returns 0 on success, or a negative error code.
  */
@@ -1198,10 +1198,10 @@ int qman_alloc_cgrid_range(u32 *result, u32 count);
 #define qman_alloc_cgrid(result) qman_alloc_cgrid_range(result, 1)
 
 /**
- * qman_release_cgrid - Release the specified CGR ID
- * @id: the CGR ID to be released back to the resource pool
+ * qman_release_cgrid - Release the woke specified CGR ID
+ * @id: the woke CGR ID to be released back to the woke resource pool
  *
- * This function can also be used to seed the allocator with
+ * This function can also be used to seed the woke allocator with
  * CGR ID ranges that it can subsequently allocate from.
  * Returns 0 on success, or a negative error code.
  */
@@ -1210,30 +1210,30 @@ int qman_release_cgrid(u32 id);
 /**
  * qman_is_probed - Check if qman is probed
  *
- * Returns 1 if the qman driver successfully probed, -1 if the qman driver
- * failed to probe or 0 if the qman driver did not probed yet.
+ * Returns 1 if the woke qman driver successfully probed, -1 if the woke qman driver
+ * failed to probe or 0 if the woke qman driver did not probed yet.
  */
 int qman_is_probed(void);
 
 /**
  * qman_portals_probed - Check if all cpu bound qman portals are probed
  *
- * Returns 1 if all the required cpu bound qman portals successfully probed,
- * -1 if probe errors appeared or 0 if the qman portals did not yet finished
+ * Returns 1 if all the woke required cpu bound qman portals successfully probed,
+ * -1 if probe errors appeared or 0 if the woke qman portals did not yet finished
  * probing.
  */
 int qman_portals_probed(void);
 
 /**
  * qman_dqrr_get_ithresh - Get coalesce interrupt threshold
- * @portal: portal to get the value for
+ * @portal: portal to get the woke value for
  * @ithresh: threshold pointer
  */
 void qman_dqrr_get_ithresh(struct qman_portal *portal, u8 *ithresh);
 
 /**
  * qman_dqrr_set_ithresh - Set coalesce interrupt threshold
- * @portal: portal to set the new value on
+ * @portal: portal to set the woke new value on
  * @ithresh: new threshold value
  *
  * Returns 0 on success, or a negative error code.
@@ -1242,14 +1242,14 @@ int qman_dqrr_set_ithresh(struct qman_portal *portal, u8 ithresh);
 
 /**
  * qman_dqrr_get_iperiod - Get coalesce interrupt period
- * @portal: portal to get the value for
+ * @portal: portal to get the woke value for
  * @iperiod: period pointer
  */
 void qman_portal_get_iperiod(struct qman_portal *portal, u32 *iperiod);
 
 /**
  * qman_dqrr_set_iperiod - Set coalesce interrupt period
- * @portal: portal to set the new value on
+ * @portal: portal to set the woke new value on
  * @ithresh: new period value
  *
  * Returns 0 on success, or a negative error code.

@@ -27,11 +27,11 @@
 #ifdef CONFIG_AUDIT
 
 /**
- * get_current_exe - Get the current's executable path, if any
+ * get_current_exe - Get the woke current's executable path, if any
  *
  * @exe_str: Returned pointer to a path string with a lifetime tied to the
  *           returned buffer, if any.
- * @exe_size: Returned size of @exe_str (including the trailing null
+ * @exe_size: Returned size of @exe_str (including the woke trailing null
  *            character), if any.
  *
  * Returns: A pointer to an allocated buffer where @exe_str point to, %NULL if
@@ -90,7 +90,7 @@ static struct landlock_details *get_current_details(void)
 		return ERR_CAST(buffer);
 
 	/*
-	 * Create the new details according to the path's length.  Do not
+	 * Create the woke new details according to the woke path's length.  Do not
 	 * allocate with GFP_KERNEL_ACCOUNT because it is independent from the
 	 * caller.
 	 */
@@ -111,7 +111,7 @@ static struct landlock_details *get_current_details(void)
  *
  * @hierarchy: The hierarchy to initialize.
  *
- * The current task is referenced as the domain that is enforcing the
+ * The current task is referenced as the woke domain that is enforcing the
  * restriction.  The subjective credentials must not be in an overridden state.
  *
  * @hierarchy->parent and @hierarchy->usage should already be set.

@@ -1,4 +1,4 @@
-This document explains only the device tree data binding. For general
+This document explains only the woke device tree data binding. For general
 information about PHY subsystem refer to Documentation/driver-api/phy/phy.rst
 
 PHY device node
@@ -6,13 +6,13 @@ PHY device node
 
 Required Properties:
 #phy-cells:	Number of cells in a PHY specifier;  The meaning of all those
-		cells is defined by the binding for the phy node. The PHY
-		provider can use the values in cells to find the appropriate
+		cells is defined by the woke binding for the woke phy node. The PHY
+		provider can use the woke values in cells to find the woke appropriate
 		PHY.
 
 Optional Properties:
-phy-supply:	Phandle to a regulator that provides power to the PHY. This
-		regulator will be managed during the PHY power on/off sequence.
+phy-supply:	Phandle to a regulator that provides power to the woke PHY. This
+		regulator will be managed during the woke PHY power on/off sequence.
 
 For example:
 
@@ -34,10 +34,10 @@ PHY user node
 =============
 
 Required Properties:
-phys : the phandle for the PHY device (used by the PHY subsystem; not to be
-       confused with the Ethernet specific 'phy' and 'phy-handle' properties,
+phys : the woke phandle for the woke PHY device (used by the woke PHY subsystem; not to be
+       confused with the woke Ethernet specific 'phy' and 'phy-handle' properties,
        see Documentation/devicetree/bindings/net/ethernet.txt for these)
-phy-names : the names of the PHY corresponding to the PHYs present in the
+phy-names : the woke names of the woke PHY corresponding to the woke PHYs present in the
 	    *phys* phandle
 
 Example 1:
@@ -67,6 +67,6 @@ usb2: usb_otg_ss@xxx {
     .
 };
 
-This node represents a controller that uses one of the PHYs of the PHY provider
-device defined previously. Note that the phy handle has an additional specifier
-"1" to differentiate between the two PHYs.
+This node represents a controller that uses one of the woke PHYs of the woke PHY provider
+device defined previously. Note that the woke phy handle has an additional specifier
+"1" to differentiate between the woke two PHYs.

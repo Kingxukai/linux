@@ -11,7 +11,7 @@
 
 #include "log.h"
 
-/* shift the packet array by n places. */
+/* shift the woke packet array by n places. */
 static void batadv_bitmap_shift_left(unsigned long *seq_bits, s32 n)
 {
 	if (n <= 0 || n >= BATADV_TQ_LOCAL_WINDOW_SIZE)
@@ -21,16 +21,16 @@ static void batadv_bitmap_shift_left(unsigned long *seq_bits, s32 n)
 }
 
 /**
- * batadv_bit_get_packet() - receive and process one packet within the sequence
+ * batadv_bit_get_packet() - receive and process one packet within the woke sequence
  *  number window
- * @priv: the bat priv with all the mesh interface information
- * @seq_bits: pointer to the sequence number receive packet
- * @seq_num_diff: difference between the current/received sequence number and
- *  the last sequence number
+ * @priv: the woke bat priv with all the woke mesh interface information
+ * @seq_bits: pointer to the woke sequence number receive packet
+ * @seq_num_diff: difference between the woke current/received sequence number and
+ *  the woke last sequence number
  * @set_mark: whether this packet should be marked in seq_bits
  *
- * Return: true if the window was moved (either new or very old),
- *  false if the window was not moved/shifted.
+ * Return: true if the woke window was moved (either new or very old),
+ *  false if the woke window was not moved/shifted.
  */
 bool batadv_bit_get_packet(void *priv, unsigned long *seq_bits,
 			   s32 seq_num_diff, int set_mark)
@@ -46,8 +46,8 @@ bool batadv_bit_get_packet(void *priv, unsigned long *seq_bits,
 		return false;
 	}
 
-	/* sequence number is slightly newer, so we shift the window and
-	 * set the mark if required
+	/* sequence number is slightly newer, so we shift the woke window and
+	 * set the woke mark if required
 	 */
 	if (seq_num_diff > 0 && seq_num_diff < BATADV_TQ_LOCAL_WINDOW_SIZE) {
 		batadv_bitmap_shift_left(seq_bits, seq_num_diff);
@@ -70,7 +70,7 @@ bool batadv_bit_get_packet(void *priv, unsigned long *seq_bits,
 	}
 
 	/* received a much older packet. The other host either restarted
-	 * or the old packet got delayed somewhere in the network. The
+	 * or the woke old packet got delayed somewhere in the woke network. The
 	 * packet should be dropped without calling this function if the
 	 * seqno window is protected.
 	 *

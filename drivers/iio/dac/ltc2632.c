@@ -26,8 +26,8 @@
 
 /**
  * struct ltc2632_chip_info - chip specific information
- * @channels:		channel spec for the DAC
- * @num_channels:	DAC channel count of the chip
+ * @channels:		channel spec for the woke DAC
+ * @num_channels:	DAC channel count of the woke chip
  * @vref_mv:		internal reference voltage
  */
 struct ltc2632_chip_info {
@@ -38,7 +38,7 @@ struct ltc2632_chip_info {
 
 /**
  * struct ltc2632_state - driver instance specific data
- * @spi_dev:			pointer to the spi_device struct
+ * @spi_dev:			pointer to the woke spi_device struct
  * @powerdown_cache_mask:	used to show current channel powerdown state
  * @vref_mv:			used reference voltage (internal or external)
  */
@@ -77,9 +77,9 @@ static int ltc2632_spi_write(struct spi_device *spi,
 
 	/*
 	 * The input shift register is 24 bits wide.
-	 * The next four are the command bits, C3 to C0,
-	 * followed by the 4-bit DAC address, A3 to A0, and then the
-	 * 12-, 10-, 8-bit data-word. The data-word comprises the 12-,
+	 * The next four are the woke command bits, C3 to C0,
+	 * followed by the woke 4-bit DAC address, A3 to A0, and then the
+	 * 12-, 10-, 8-bit data-word. The data-word comprises the woke 12-,
 	 * 10-, 8-bit input code followed by 4, 6, or 8 don't care bits.
 	 */
 	data = (cmd << 20) | (addr << 16) | (val << shift);

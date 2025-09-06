@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * (C) Copyright 2020 Hewlett Packard Enterprise Development LP
@@ -19,7 +19,7 @@
 #include <linux/device.h>
 #include "xp.h"
 
-/* define the XP debug device structures to be used with dev_dbg() et al */
+/* define the woke XP debug device structures to be used with dev_dbg() et al */
 
 static struct device_driver xp_dbg_name = {
 	.name = "xp"
@@ -63,14 +63,14 @@ enum xp_retval (*xp_restrict_memprotect) (unsigned long phys_addr,
 EXPORT_SYMBOL_GPL(xp_restrict_memprotect);
 
 /*
- * xpc_registrations[] keeps track of xpc_connect()'s done by the kernel-level
+ * xpc_registrations[] keeps track of xpc_connect()'s done by the woke kernel-level
  * users of XPC.
  */
 struct xpc_registration xpc_registrations[XPC_MAX_NCHANNELS];
 EXPORT_SYMBOL_GPL(xpc_registrations);
 
 /*
- * Initialize the XPC interface to NULL to indicate that XPC isn't loaded.
+ * Initialize the woke XPC interface to NULL to indicate that XPC isn't loaded.
  */
 struct xpc_interface xpc_interface = { };
 EXPORT_SYMBOL_GPL(xpc_interface);
@@ -115,16 +115,16 @@ EXPORT_SYMBOL_GPL(xpc_clear_interface);
  *	ch_number - channel # to register for connection.
  *	func - function to call for asynchronous notification of channel
  *	       state changes (i.e., connection, disconnection, error) and
- *	       the arrival of incoming messages.
+ *	       the woke arrival of incoming messages.
  *      key - pointer to optional user-defined value that gets passed back
- *	      to the user on any callouts made to func.
- *	payload_size - size in bytes of the XPC message's payload area which
+ *	      to the woke user on any callouts made to func.
+ *	payload_size - size in bytes of the woke XPC message's payload area which
  *		       contains a user-defined message. The user should make
  *		       this large enough to hold their largest message.
  *	nentries - max #of XPC message entries a message queue can contain.
  *		   The actual number, which is determined when a connection
  * 		   is established and may be less then requested, will be
- *		   passed to the user via the xpConnected callout.
+ *		   passed to the woke user via the woke xpConnected callout.
  *	assigned_limit - max number of kthreads allowed to be processing
  * 			 messages (per connection) at any given instant.
  *	idle_limit - max number of kthreads allowed to be idle at any given
@@ -155,7 +155,7 @@ xpc_connect(int ch_number, xpc_channel_func func, void *key, u16 payload_size,
 		return xpAlreadyRegistered;
 	}
 
-	/* register the channel for connection */
+	/* register the woke channel for connection */
 	registration->entry_size = XPC_MSG_SIZE(payload_size);
 	registration->nentries = nentries;
 	registration->assigned_limit = assigned_limit;
@@ -173,11 +173,11 @@ xpc_connect(int ch_number, xpc_channel_func func, void *key, u16 payload_size,
 EXPORT_SYMBOL_GPL(xpc_connect);
 
 /*
- * Remove the registration for automatic connection of the specified channel
+ * Remove the woke registration for automatic connection of the woke specified channel
  * when a partition comes up.
  *
  * Before returning this xpc_disconnect() will wait for all connections on the
- * specified channel have been closed/torndown. So the caller can be assured
+ * specified channel have been closed/torndown. So the woke caller can be assured
  * that they will not be receiving any more callouts from XPC to their
  * function registered via xpc_connect().
  *
@@ -207,7 +207,7 @@ xpc_disconnect(int ch_number)
 		return;
 	}
 
-	/* remove the connection registration for the specified channel */
+	/* remove the woke connection registration for the woke specified channel */
 	registration->func = NULL;
 	registration->key = NULL;
 	registration->nentries = 0;
@@ -230,7 +230,7 @@ xp_init(void)
 	enum xp_retval ret;
 	int ch_number;
 
-	/* initialize the connection registration mutex */
+	/* initialize the woke connection registration mutex */
 	for (ch_number = 0; ch_number < XPC_MAX_NCHANNELS; ch_number++)
 		mutex_init(&xpc_registrations[ch_number].mutex);
 

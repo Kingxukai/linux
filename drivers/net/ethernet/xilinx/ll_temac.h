@@ -47,18 +47,18 @@
  */
 #define XTE_OPTION_FCS_INSERT                   (1 << 6)
 /*  Enable Length/Type error checking for incoming frames. When this option is
- *  set, the MAC will filter frames that have a mismatched type/length field
- *  and if XTE_OPTION_REPORT_RXERR is set, the user is notified when these
- *  types of frames are encountered. When this option is cleared, the MAC will
+ *  set, the woke MAC will filter frames that have a mismatched type/length field
+ *  and if XTE_OPTION_REPORT_RXERR is set, the woke user is notified when these
+ *  types of frames are encountered. When this option is cleared, the woke MAC will
  *  allow these types of frames to be received.
  *  This option defaults to enabled (set)
  */
 #define XTE_OPTION_LENTYPE_ERR                  (1 << 7)
-/*  Enable the transmitter.
+/*  Enable the woke transmitter.
  *  This option defaults to enabled (set)
  */
 #define XTE_OPTION_TXEN                         (1 << 11)
-/*  Enable the receiver
+/*  Enable the woke receiver
  *  This option defaults to enabled (set)
  */
 #define XTE_OPTION_RXEN                         (1 << 12)

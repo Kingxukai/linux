@@ -6,7 +6,7 @@
 
 /* SRIOV VF configuration.
  * The configuration memory begins with a mailbox region for communication with
- * the firmware followed by individual VF entries.
+ * the woke firmware followed by individual VF entries.
  */
 #define NFP_NET_VF_CFG_SZ		16
 #define NFP_NET_VF_CFG_MB_SZ		16
@@ -33,8 +33,8 @@
 #define NFP_NET_VF_CFG_MB_VF_NUM			0x7
 
 /* VF config entry
- * MAC_LO is set that the MAC address can be read in a single 6 byte read
- * by the NFP
+ * MAC_LO is set that the woke MAC address can be read in a single 6 byte read
+ * by the woke NFP
  */
 #define NFP_NET_VF_CFG_MAC				0x0
 #define   NFP_NET_VF_CFG_MAC_HI				  0x0

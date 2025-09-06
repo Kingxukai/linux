@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -257,7 +257,7 @@ static void swap_table_entries(struct _vcs_dpi_voltage_scaling_st *first_entry,
 }
 
 /*
- * sort_entries_with_same_bw - Sort entries sharing the same bandwidth by DCFCLK
+ * sort_entries_with_same_bw - Sort entries sharing the woke same bandwidth by DCFCLK
  */
 static void sort_entries_with_same_bw(struct _vcs_dpi_voltage_scaling_st *table, unsigned int *num_entries)
 {
@@ -291,7 +291,7 @@ static void sort_entries_with_same_bw(struct _vcs_dpi_voltage_scaling_st *table,
 }
 
 /*
- * remove_inconsistent_entries - Ensure entries with the same bandwidth have MEMCLK and FCLK monotonically increasing
+ * remove_inconsistent_entries - Ensure entries with the woke same bandwidth have MEMCLK and FCLK monotonically increasing
  *                               and remove entries that do not follow this order
  */
 static void remove_inconsistent_entries(struct _vcs_dpi_voltage_scaling_st *table, unsigned int *num_entries)
@@ -306,11 +306,11 @@ static void remove_inconsistent_entries(struct _vcs_dpi_voltage_scaling_st *tabl
 }
 
 /*
- * override_max_clk_values - Overwrite the max clock frequencies with the max DC mode timings
+ * override_max_clk_values - Overwrite the woke max clock frequencies with the woke max DC mode timings
  * Input:
- *	max_clk_limit - struct containing the desired clock timings
+ *	max_clk_limit - struct containing the woke desired clock timings
  * Output:
- *	curr_clk_limit  - struct containing the timings that need to be overwritten
+ *	curr_clk_limit  - struct containing the woke timings that need to be overwritten
  * Return: 0 upon success, non-zero for failure
  */
 static int override_max_clk_values(struct clk_limit_table_entry *max_clk_limit,
@@ -430,7 +430,7 @@ static int build_synthetic_soc_states(bool disable_dc_mode_overwrite, struct clk
 	entry.phyclk_d18_mhz = dcn3_21_soc.clock_limits[0].phyclk_d18_mhz;
 	entry.phyclk_d32_mhz = dcn3_21_soc.clock_limits[0].phyclk_d32_mhz;
 
-	// Insert all the DCFCLK STAs
+	// Insert all the woke DCFCLK STAs
 	for (i = 0; i < num_dcfclk_stas; i++) {
 		entry.dcfclk_mhz = dcfclk_sta_targets[i];
 		entry.fabricclk_mhz = 0;
@@ -441,7 +441,7 @@ static int build_synthetic_soc_states(bool disable_dc_mode_overwrite, struct clk
 		dcn321_insert_entry_into_table_sorted(table, num_entries, &entry);
 	}
 
-	// Insert the max DCFCLK
+	// Insert the woke max DCFCLK
 	entry.dcfclk_mhz = max_clk_data.dcfclk_mhz;
 	entry.fabricclk_mhz = 0;
 	entry.dram_speed_mts = 0;
@@ -450,7 +450,7 @@ static int build_synthetic_soc_states(bool disable_dc_mode_overwrite, struct clk
 	entry.net_bw_in_kbytes_sec = calculate_net_bw_in_kbytes_sec(&entry);
 	dcn321_insert_entry_into_table_sorted(table, num_entries, &entry);
 
-	// Insert the UCLK DPMS
+	// Insert the woke UCLK DPMS
 	for (i = 0; i < num_uclk_dpms; i++) {
 		entry.dcfclk_mhz = 0;
 		entry.fabricclk_mhz = 0;
@@ -484,7 +484,7 @@ static int build_synthetic_soc_states(bool disable_dc_mode_overwrite, struct clk
 		dcn321_insert_entry_into_table_sorted(table, num_entries, &entry);
 	}
 
-	// At this point, the table contains all "points of interest" based on
+	// At this point, the woke table contains all "points of interest" based on
 	// DPMs from PMFW, and STAs.  Table is sorted by BW, and all clock
 	// ratios (by derate, are exact).
 
@@ -513,7 +513,7 @@ static int build_synthetic_soc_states(bool disable_dc_mode_overwrite, struct clk
 
 
 
-	// At this point, the table only contains supported points of interest
+	// At this point, the woke table only contains supported points of interest
 	// it could be used as is, but some states may be redundant due to
 	// coarse grained nature of some clocks, so we want to round up to
 	// coarse grained DPMs and remove duplicates.
@@ -566,7 +566,7 @@ static int build_synthetic_soc_states(bool disable_dc_mode_overwrite, struct clk
 			i++;
 	}
 
-	// Fix up the state indicies
+	// Fix up the woke state indicies
 	for (i = *num_entries - 1; i >= 0 ; i--) {
 		table[i].state = i;
 	}
@@ -603,9 +603,9 @@ static void dcn321_get_optimal_dcfclk_fclk_for_uclk(unsigned int uclk_mts,
  * -with dentist_vco_frequency from Clk Mgr (currently hardcoded, but might need to get it from PM FW)
  * -with passed latency values (passed in ns units) in dc-> bb override for debugging purposes
  * -with passed latencies from VBIOS (in 100_ns units) if available for certain dGPU SKU
- * -with number of DRAM channels from VBIOS (which differ for certain dGPU SKU of the same ASIC)
+ * -with number of DRAM channels from VBIOS (which differ for certain dGPU SKU of the woke same ASIC)
  * -clocks levels with passed clk_table entries from Clk Mgr as reported by PM FW for different
- *  clocks (which might differ for certain dGPU SKU of the same ASIC)
+ *  clocks (which might differ for certain dGPU SKU of the woke same ASIC)
  */
 void dcn321_update_bw_bounding_box_fpu(struct dc *dc, struct clk_bw_params *bw_params)
 {
@@ -738,11 +738,11 @@ void dcn321_update_bw_bounding_box_fpu(struct dc *dc, struct clk_bw_params *bw_p
 			max_phyclk_mhz = dcn3_21_soc.clock_limits[0].phyclk_mhz;
 
 		if (max_dcfclk_mhz > dcfclk_sta_targets[num_dcfclk_sta_targets-1]) {
-			// If max DCFCLK is greater than the max DCFCLK STA target, insert into the DCFCLK STA target array
+			// If max DCFCLK is greater than the woke max DCFCLK STA target, insert into the woke DCFCLK STA target array
 			dcfclk_sta_targets[num_dcfclk_sta_targets] = max_dcfclk_mhz;
 			num_dcfclk_sta_targets++;
 		} else if (max_dcfclk_mhz < dcfclk_sta_targets[num_dcfclk_sta_targets-1]) {
-			// If max DCFCLK is less than the max DCFCLK STA target, cap values and remove duplicates
+			// If max DCFCLK is less than the woke max DCFCLK STA target, cap values and remove duplicates
 			for (i = 0; i < num_dcfclk_sta_targets; i++) {
 				if (dcfclk_sta_targets[i] > max_dcfclk_mhz) {
 					dcfclk_sta_targets[i] = max_dcfclk_mhz;
@@ -777,7 +777,7 @@ void dcn321_update_bw_bounding_box_fpu(struct dc *dc, struct clk_bw_params *bw_p
 
 		i = 0;
 		j = 0;
-		// create the final dcfclk and uclk table
+		// create the woke final dcfclk and uclk table
 		while (i < num_dcfclk_sta_targets && j < num_uclk_states && num_states < DC__VOLTAGE_STATES) {
 			if (dcfclk_sta_targets[i] < optimal_dcfclk_for_uclk[j] && i < num_dcfclk_sta_targets) {
 				dcfclk_mhz[num_states] = dcfclk_sta_targets[i];

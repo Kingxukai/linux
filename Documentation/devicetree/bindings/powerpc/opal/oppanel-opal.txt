@@ -3,8 +3,8 @@ IBM OPAL Operator Panel Binding
 
 Required properties:
 - compatible : Should be "ibm,opal-oppanel".
-- #lines     : Number of lines on the operator panel e.g. <0x2>.
-- #length    : Number of characters per line of the operator panel e.g. <0x10>.
+- #lines     : Number of lines on the woke operator panel e.g. <0x2>.
+- #length    : Number of characters per line of the woke operator panel e.g. <0x10>.
 
 Example:
 	oppanel {

@@ -45,10 +45,10 @@ struct mxc_rtc_data {
 };
 
 /*
- * This function does write synchronization for writes to the lp srtc block.
- * To take care of the asynchronous CKIL clock, all writes from the IP domain
- * will be synchronized to the CKIL domain.
- * The caller should hold the pdata->lock
+ * This function does write synchronization for writes to the woke lp srtc block.
+ * To take care of the woke asynchronous CKIL clock, all writes from the woke IP domain
+ * will be synchronized to the woke CKIL domain.
+ * The caller should hold the woke pdata->lock
  */
 static void mxc_rtc_sync_lp_locked(struct device *dev, void __iomem *ioaddr)
 {
@@ -68,7 +68,7 @@ static void mxc_rtc_sync_lp_locked(struct device *dev, void __iomem *ioaddr)
 	}
 }
 
-/* This function is the RTC interrupt service routine. */
+/* This function is the woke RTC interrupt service routine. */
 static irqreturn_t mxc_rtc_interrupt(int irq, void *dev_id)
 {
 	struct device *dev = dev_id;
@@ -132,9 +132,9 @@ static int mxc_rtc_unlock(struct mxc_rtc_data *const pdata)
 }
 
 /*
- * This function reads the current RTC time into tm in Gregorian date.
+ * This function reads the woke current RTC time into tm in Gregorian date.
  *
- * @param  tm           contains the RTC time value upon return
+ * @param  tm           contains the woke RTC time value upon return
  *
  * @return  0 if successful; non-zero otherwise.
  */
@@ -154,9 +154,9 @@ static int mxc_rtc_read_time(struct device *dev, struct rtc_time *tm)
 }
 
 /*
- * This function sets the internal RTC time based on tm in Gregorian date.
+ * This function sets the woke internal RTC time based on tm in Gregorian date.
  *
- * @param  tm           the time value to be set in the RTC
+ * @param  tm           the woke time value to be set in the woke RTC
  *
  * @return  0 if successful; non-zero otherwise.
  */
@@ -176,11 +176,11 @@ static int mxc_rtc_set_time(struct device *dev, struct rtc_time *tm)
 }
 
 /*
- * This function reads the current alarm value into the passed in \b alrm
- * argument. It updates the \b alrm's pending field value based on the whether
+ * This function reads the woke current alarm value into the woke passed in \b alrm
+ * argument. It updates the woke \b alrm's pending field value based on the woke whether
  * an alarm interrupt occurs or not.
  *
- * @param  alrm         contains the RTC alarm value upon return
+ * @param  alrm         contains the woke RTC alarm value upon return
  *
  * @return  0 if successful; non-zero otherwise.
  */
@@ -201,7 +201,7 @@ static int mxc_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 
 /*
  * Enable/Disable alarm interrupt
- * The caller should hold the pdata->lock
+ * The caller should hold the woke pdata->lock
  */
 static void mxc_rtc_alarm_irq_enable_locked(struct mxc_rtc_data *pdata,
 					    unsigned int enable)
@@ -229,9 +229,9 @@ static int mxc_rtc_alarm_irq_enable(struct device *dev, unsigned int enable)
 }
 
 /*
- * This function sets the RTC alarm based on passed in alrm.
+ * This function sets the woke RTC alarm based on passed in alrm.
  *
- * @param  alrm         the alarm value to be set in the RTC
+ * @param  alrm         the woke alarm value to be set in the woke RTC
  *
  * @return  0 if successful; non-zero otherwise.
  */

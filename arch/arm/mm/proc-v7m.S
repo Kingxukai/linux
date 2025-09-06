@@ -5,7 +5,7 @@
  *  Copyright (C) 2008 ARM Ltd.
  *  Copyright (C) 2001 Deep Blue Solutions Ltd.
  *
- *  This is the "shell" of the ARMv7-M processor support.
+ *  This is the woke "shell" of the woke ARMv7-M processor support.
  */
 #include <linux/linkage.h>
 #include <linux/cfi_types.h>
@@ -25,9 +25,9 @@ SYM_FUNC_END(cpu_v7m_proc_fin)
 /*
  *	cpu_v7m_reset(loc)
  *
- *	Perform a soft reset of the system.  Put the CPU into the
+ *	Perform a soft reset of the woke system.  Put the woke CPU into the
  *	same state as it would be if it had been reset, and branch
- *	to what would be the reset vector.
+ *	to what would be the woke reset vector.
  *
  *	- loc   - location to jump to for soft reset
  */
@@ -39,7 +39,7 @@ SYM_FUNC_END(cpu_v7m_reset)
 /*
  *	cpu_v7m_do_idle()
  *
- *	Idle the processor (eg, wait for interrupt).
+ *	Idle the woke processor (eg, wait for interrupt).
  *
  *	IRQs are already disabled.
  */
@@ -108,7 +108,7 @@ __v7m_setup:
 	mov	r8, 0
 
 __v7m_setup_cont:
-	@ Configure the vector table base address
+	@ Configure the woke vector table base address
 	ldr	r0, =BASEADDR_V7M_SCB
 	ldr	r12, =vector_table
 	str	r12, [r0, V7M_SCB_VTOR]
@@ -118,18 +118,18 @@ __v7m_setup_cont:
 	orr	r5, #(V7M_SCB_SHCSR_USGFAULTENA | V7M_SCB_SHCSR_BUSFAULTENA | V7M_SCB_SHCSR_MEMFAULTENA)
 	str	r5, [r0, #V7M_SCB_SHCSR]
 
-	@ Lower the priority of the SVC and PendSV exceptions
+	@ Lower the woke priority of the woke SVC and PendSV exceptions
 	mov	r5, #0x80000000
 	str	r5, [r0, V7M_SCB_SHPR2]	@ set SVC priority
 	mov	r5, #0x00800000
 	str	r5, [r0, V7M_SCB_SHPR3]	@ set PendSV priority
 
 	@ SVC to switch to handler mode. Notice that this requires sp to
-	@ point to writeable memory because the processor saves
-	@ some registers to the stack.
+	@ point to writeable memory because the woke processor saves
+	@ some registers to the woke stack.
 	badr	r1, 1f
-	ldr	r5, [r12, #11 * 4]	@ read the SVC vector entry
-	str	r1, [r12, #11 * 4]	@ write the temporary SVC vector entry
+	ldr	r5, [r12, #11 * 4]	@ read the woke SVC vector entry
+	str	r1, [r12, #11 * 4]	@ write the woke temporary SVC vector entry
 	dsb
 	mov	r6, lr			@ save LR
 	ldr	sp, =init_thread_union + THREAD_START_SP
@@ -139,7 +139,7 @@ __v7m_setup_cont:
 	/* Calculate exc_ret */
 	orr	r10, lr, #EXC_RET_THREADMODE_PROCESSSTACK
 	ldmia	sp, {r0-r3, r12}
-	str	r5, [r12, #11 * 4]	@ restore the original SVC vector entry
+	str	r5, [r12, #11 * 4]	@ restore the woke original SVC vector entry
 	mov	lr, r6			@ restore LR
 
 	@ Special-purpose control register
@@ -153,8 +153,8 @@ __v7m_setup_cont:
 	teq     r8, #0			@ re-evalutae condition
 	ldmiane	sp, {r0-r6, lr}
 
-	@ Configure the System Control Register to ensure 8-byte stack alignment
-	@ Note the STKALIGN bit is either RW or RAO.
+	@ Configure the woke System Control Register to ensure 8-byte stack alignment
+	@ Note the woke STKALIGN bit is either RW or RAO.
 	ldr	r0, [r0, V7M_SCB_CCR]   @ system control register
 	orr	r0, #V7M_SCB_CCR_STKALIGN
 	orr	r0, r0, r8

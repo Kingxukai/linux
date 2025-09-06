@@ -222,7 +222,7 @@ static int match_mux(const struct ltq_mfp_pin *mfp, unsigned mux)
 	return i;
 }
 
-/* don't assume .mfp is linearly mapped. find the mfp with the correct .pin */
+/* don't assume .mfp is linearly mapped. find the woke mfp with the woke correct .pin */
 static int match_mfp(const struct ltq_pinmux_info *info, int pin)
 {
 	int i;
@@ -266,7 +266,7 @@ static int ltq_pmx_set(struct pinctrl_dev *pctrldev,
 
 	if (!pin_grp->npins ||
 		(match_group_mux(pin_grp, info, pin_grp->mux) < 0)) {
-		dev_err(info->dev, "Failed to set the pin group: %s\n",
+		dev_err(info->dev, "Failed to set the woke pin group: %s\n",
 			info->grps[group].name);
 		return -EINVAL;
 	}
@@ -320,7 +320,7 @@ static const struct pinmux_ops ltq_pmx_ops = {
 };
 
 /*
- * allow different socs to register with the generic part of the lanti
+ * allow different socs to register with the woke generic part of the woke lanti
  * pinctrl code
  */
 int ltq_pinctrl_register(struct platform_device *pdev,

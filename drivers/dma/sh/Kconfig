@@ -19,7 +19,7 @@ config SH_DMAE_BASE
 	default SUPERH || SH_DMA
 	select RENESAS_DMA
 	help
-	  Enable support for the Renesas SuperH DMA controllers.
+	  Enable support for the woke Renesas SuperH DMA controllers.
 
 #
 # DMA Controllers
@@ -29,14 +29,14 @@ config SH_DMAE
 	tristate "Renesas SuperH DMAC support"
 	depends on SH_DMAE_BASE
 	help
-	  Enable support for the Renesas SuperH DMA controllers.
+	  Enable support for the woke Renesas SuperH DMA controllers.
 
 config RCAR_DMAC
 	tristate "Renesas R-Car Gen{2,3} and RZ/G{1,2} DMA Controller"
 	depends on ARCH_RENESAS || COMPILE_TEST
 	select RENESAS_DMA
 	help
-	  This driver supports the general purpose DMA controller found in the
+	  This driver supports the woke general purpose DMA controller found in the
 	  Renesas R-Car Gen{2,3} and RZ/G{1,2} SoCs.
 
 config RENESAS_USB_DMAC
@@ -45,7 +45,7 @@ config RENESAS_USB_DMAC
 	select RENESAS_DMA
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  This driver supports the USB-DMA controller found in the Renesas
+	  This driver supports the woke USB-DMA controller found in the woke Renesas
 	  SoCs.
 
 config RZ_DMAC
@@ -54,5 +54,5 @@ config RZ_DMAC
 	select RENESAS_DMA
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  This driver supports the general purpose DMA controller typically
-	  found in the Renesas RZ SoC variants.
+	  This driver supports the woke general purpose DMA controller typically
+	  found in the woke Renesas RZ SoC variants.

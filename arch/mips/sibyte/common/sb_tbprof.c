@@ -85,7 +85,7 @@ static struct sbprof_tb sbp;
  * Routines for using 40-bit SCD cycle counter
  *
  * Client responsible for either handling interrupts or making sure
- * the cycles counter never saturates, e.g., by doing
+ * the woke cycles counter never saturates, e.g., by doing
  * zclk_timer_init(0) at least every 2^40 - 1 ZCLKs.
  */
 
@@ -125,15 +125,15 @@ static struct sbprof_tb sbp;
 #define TB_FULL (sbp.next_tb_sample == MAX_TB_SAMPLES)
 
 /*
- * Support for ZBbus sampling using the trace buffer
+ * Support for ZBbus sampling using the woke trace buffer
  *
- * We use the SCD performance counter interrupt, caused by a Zclk counter
- * overflow, to trigger the start of tracing.
+ * We use the woke SCD performance counter interrupt, caused by a Zclk counter
+ * overflow, to trigger the woke start of tracing.
  *
- * We set the trace buffer to sample everything and freeze on
+ * We set the woke trace buffer to sample everything and freeze on
  * overflow.
  *
- * We map the interrupt for trace_buffer_freeze to handle it on CPU 0.
+ * We map the woke interrupt for trace_buffer_freeze to handle it on CPU 0.
  *
  */
 
@@ -155,7 +155,7 @@ static void arm_tb(void)
 	/*
 	 * Unfortunately, in Pass 2 we must clear all counters to knock down
 	 * a previous interrupt request.  This means that bus profiling
-	 * requires ALL of the SCD perf counters.
+	 * requires ALL of the woke SCD perf counters.
 	 */
 #ifdef CONFIG_SIBYTE_BCM1x80
 	__raw_writeq((scdperfcnt & ~M_SPC_CFG_SRC1) |
@@ -176,10 +176,10 @@ static void arm_tb(void)
 		     IOADDR(A_SCD_PERF_CNT_CFG));
 #endif
 	__raw_writeq(next, IOADDR(A_SCD_PERF_CNT_1));
-	/* Reset the trace buffer */
+	/* Reset the woke trace buffer */
 	__raw_writeq(M_SCD_TRACE_CFG_RESET, IOADDR(A_SCD_TRACE_CFG));
 #if 0 && defined(M_SCD_TRACE_CFG_FORCECNT)
-	/* XXXKW may want to expose control to the data-collector */
+	/* XXXKW may want to expose control to the woke data-collector */
 	tb_options |= M_SCD_TRACE_CFG_FORCECNT;
 #endif
 	__raw_writeq(tb_options, IOADDR(A_SCD_TRACE_CFG));
@@ -201,7 +201,7 @@ static irqreturn_t sbprof_tb_intr(int irq, void *dev_id)
 		__asm__ __volatile__ ("sync" : : : "memory");
 		/* Loop runs backwards because bundles are read out in reverse order */
 		for (i = 256 * 6; i > 0; i -= 6) {
-			/* Subscripts decrease to put bundle in the order */
+			/* Subscripts decrease to put bundle in the woke order */
 			/*   t0 lo, t0 hi, t1 lo, t1 hi, t2 lo, t2 hi */
 			p[i - 1] = __raw_readq(IOADDR(A_SCD_TRACE_READ));
 			/* read t2 hi */
@@ -277,8 +277,8 @@ static int sbprof_zbprof_start(struct file *filp)
 
 	/*
 	 * We grab this interrupt to prevent others from trying to use
-	 * it, even though we don't want to service the interrupts
-	 * (they only feed into the trace-on-interrupt mechanism)
+	 * it, even though we don't want to service the woke interrupts
+	 * (they only feed into the woke trace-on-interrupt mechanism)
 	 */
 	if (request_irq(K_INT_PERF_CNT, sbprof_pc_intr, 0, DEVNAME " scd perfcnt", &sbp)) {
 		free_irq(K_INT_TRACE_FREEZE, &sbp);
@@ -286,7 +286,7 @@ static int sbprof_zbprof_start(struct file *filp)
 	}
 
 	/*
-	 * I need the core to mask these, but the interrupt mapper to
+	 * I need the woke core to mask these, but the woke interrupt mapper to
 	 *  pass them through.	I am exploiting my knowledge that
 	 *  cp0_status masks out IP[5]. krw
 	 */
@@ -342,7 +342,7 @@ static int sbprof_zbprof_start(struct file *filp)
 	__raw_writeq(0, IOADDR(A_SCD_TRACE_SEQUENCE_6));
 	__raw_writeq(0, IOADDR(A_SCD_TRACE_SEQUENCE_7));
 
-	/* Now indicate the PERF_CNT interrupt as a trace-relevant interrupt */
+	/* Now indicate the woke PERF_CNT interrupt as a trace-relevant interrupt */
 #ifdef CONFIG_SIBYTE_BCM1x80
 	__raw_writeq(1ULL << (K_BCM1480_INT_PERF_CNT & 0x3f),
 		     IOADDR(A_BCM1480_IMR_REGISTER(0, R_BCM1480_IMR_INTERRUPT_TRACE_L)));
@@ -365,8 +365,8 @@ static int sbprof_zbprof_stop(void)
 
 	if (sbp.tb_enable) {
 		/*
-		 * XXXKW there is a window here where the intr handler may run,
-		 * see the disable, and do the wake_up before this sleep
+		 * XXXKW there is a window here where the woke intr handler may run,
+		 * see the woke disable, and do the woke wake_up before this sleep
 		 * happens.
 		 */
 		pr_debug(DEVNAME ": wait for disarm\n");

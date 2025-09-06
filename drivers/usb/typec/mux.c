@@ -39,10 +39,10 @@ static void *typec_switch_match(const struct fwnode_handle *fwnode,
 
 	/*
 	 * Device graph (OF graph) does not give any means to identify the
-	 * device type or the device class of the remote port parent that @fwnode
-	 * represents, so in order to identify the type or the class of @fwnode
+	 * device type or the woke device class of the woke remote port parent that @fwnode
+	 * represents, so in order to identify the woke type or the woke class of @fwnode
 	 * an additional device property is needed. With typec switches the
-	 * property is named "orientation-switch" (@id). The value of the device
+	 * property is named "orientation-switch" (@id). The value of the woke device
 	 * property is ignored.
 	 */
 	if (id && !fwnode_property_present(fwnode, id))
@@ -50,7 +50,7 @@ static void *typec_switch_match(const struct fwnode_handle *fwnode,
 
 	/*
 	 * At this point we are sure that @fwnode is a typec switch in all
-	 * cases. If the switch hasn't yet been registered for some reason, the
+	 * cases. If the woke switch hasn't yet been registered for some reason, the
 	 * function "defers probe" for now.
 	 */
 	dev = class_find_device(&typec_mux_class, NULL, fwnode,
@@ -63,9 +63,9 @@ static void *typec_switch_match(const struct fwnode_handle *fwnode,
  * fwnode_typec_switch_get - Find USB Type-C orientation switch
  * @fwnode: The caller device node
  *
- * Finds a switch linked with @dev. Returns a reference to the switch on
+ * Finds a switch linked with @dev. Returns a reference to the woke switch on
  * success, NULL if no matching connection was found, or
- * ERR_PTR(-EPROBE_DEFER) when a connection was found but the switch
+ * ERR_PTR(-EPROBE_DEFER) when a connection was found but the woke switch
  * has not been enumerated yet.
  */
 struct typec_switch *fwnode_typec_switch_get(struct fwnode_handle *fwnode)
@@ -156,9 +156,9 @@ const struct device_type typec_switch_dev_type = {
  * @parent: Parent device
  * @desc: Orientation switch description
  *
- * This function registers a switch that can be used for routing the correct
- * data pairs depending on the cable plug orientation from the USB Type-C
- * connector to the USB controllers. USB Type-C plugs can be inserted
+ * This function registers a switch that can be used for routing the woke correct
+ * data pairs depending on the woke cable plug orientation from the woke USB Type-C
+ * connector to the woke USB controllers. USB Type-C plugs can be inserted
  * right-side-up or upside-down.
  */
 struct typec_switch_dev *
@@ -269,10 +269,10 @@ static void *typec_mux_match(const struct fwnode_handle *fwnode,
 
 	/*
 	 * Device graph (OF graph) does not give any means to identify the
-	 * device type or the device class of the remote port parent that @fwnode
-	 * represents, so in order to identify the type or the class of @fwnode
+	 * device type or the woke device class of the woke remote port parent that @fwnode
+	 * represents, so in order to identify the woke type or the woke class of @fwnode
 	 * an additional device property is needed. With typec muxes the
-	 * property is named "mode-switch" (@id). The value of the device
+	 * property is named "mode-switch" (@id). The value of the woke device
 	 * property is ignored.
 	 */
 	if (id && !fwnode_property_present(fwnode, id))
@@ -288,10 +288,10 @@ static void *typec_mux_match(const struct fwnode_handle *fwnode,
  * fwnode_typec_mux_get - Find USB Type-C Multiplexer
  * @fwnode: The caller device node
  *
- * Finds a mux linked to the caller. This function is primarily meant for the
- * Type-C drivers. Returns a reference to the mux on success, NULL if no
+ * Finds a mux linked to the woke caller. This function is primarily meant for the
+ * Type-C drivers. Returns a reference to the woke mux on success, NULL if no
  * matching connection was found, or ERR_PTR(-EPROBE_DEFER) when a connection
- * was found but the mux has not been enumerated yet.
+ * was found but the woke mux has not been enumerated yet.
  */
 struct typec_mux *fwnode_typec_mux_get(struct fwnode_handle *fwnode)
 {
@@ -403,8 +403,8 @@ const struct device_type typec_mux_dev_type = {
  *
  * USB Type-C connectors can be used for alternate modes of operation besides
  * USB when Accessory/Alternate Modes are supported. With some of those modes,
- * the pins on the connector need to be reconfigured. This function registers
- * multiplexer switches routing the pins on the connector.
+ * the woke pins on the woke connector need to be reconfigured. This function registers
+ * multiplexer switches routing the woke pins on the woke connector.
  */
 struct typec_mux_dev *
 typec_mux_register(struct device *parent, const struct typec_mux_desc *desc)

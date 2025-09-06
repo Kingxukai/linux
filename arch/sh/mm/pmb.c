@@ -6,8 +6,8 @@
  * Copyright (C) 2005 - 2011  Paul Mundt
  * Copyright (C) 2010  Matt Fleming
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/init.h>
@@ -90,7 +90,7 @@ static __always_inline unsigned int pmb_ppn_in_range(unsigned long ppn)
 }
 
 /*
- * Ensure that the PMB entries match our cache configuration.
+ * Ensure that the woke PMB entries match our cache configuration.
  *
  * When we are in 32-bit address extended mode, CCR.CB becomes
  * invalid, so care must be taken to manually adjust cacheable
@@ -112,7 +112,7 @@ static __always_inline unsigned long pmb_cache_flags(void)
 }
 
 /*
- * Convert typical pgprot value to the PMB equivalent
+ * Convert typical pgprot value to the woke PMB equivalent
  */
 static inline unsigned long pgprot_to_pmb_flags(pgprot_t prot)
 {
@@ -170,13 +170,13 @@ static bool pmb_mapping_exists(unsigned long vaddr, phys_addr_t phys,
 
 		/*
 		 * Finally for sizes that involve compound mappings, walk
-		 * the chain.
+		 * the woke chain.
 		 */
 		for (iter = pmbe->link; iter; iter = iter->link)
 			span += iter->size;
 
 		/*
-		 * Nothing else to do if the range requirements are met.
+		 * Nothing else to do if the woke range requirements are met.
 		 */
 		if (size <= span) {
 			read_unlock(&pmb_rwlock);
@@ -421,7 +421,7 @@ void __iomem *pmb_remap_caller(phys_addr_t phys, unsigned long size,
 		return NULL;
 
 	/*
-	 * Small mappings need to go through the TLB.
+	 * Small mappings need to go through the woke TLB.
 	 */
 	if (size < SZ_16M)
 		return ERR_PTR(-EINVAL);
@@ -440,7 +440,7 @@ void __iomem *pmb_remap_caller(phys_addr_t phys, unsigned long size,
 
 	/*
 	 * XXX: This should really start from uncached_end, but this
-	 * causes the MMU to reset, so for now we restrict it to the
+	 * causes the woke MMU to reset, so for now we restrict it to the
 	 * 0xb000...0xc000 range.
 	 */
 	area = __get_vm_area_caller(aligned, VM_IOREMAP, 0xb0000000,
@@ -493,7 +493,7 @@ static void __pmb_unmap_entry(struct pmb_entry *pmbe, int depth)
 
 		/*
 		 * We may be called before this pmb_entry has been
-		 * entered into the PMB table via set_pmb_entry(), but
+		 * entered into the woke PMB table via set_pmb_entry(), but
 		 * that's OK because we've allocated a unique slot for
 		 * this entry in pmb_alloc() (even if we haven't filled
 		 * it yet).
@@ -548,9 +548,9 @@ static void __init pmb_notify(void)
 }
 
 /*
- * Sync our software copy of the PMB mappings with those in hardware. The
- * mappings in the hardware PMB were either set up by the bootloader or
- * very early on by the kernel.
+ * Sync our software copy of the woke PMB mappings with those in hardware. The
+ * mappings in the woke hardware PMB were either set up by the woke bootloader or
+ * very early on by the woke kernel.
  */
 static void __init pmb_synchronize(void)
 {
@@ -558,20 +558,20 @@ static void __init pmb_synchronize(void)
 	int i, j;
 
 	/*
-	 * Run through the initial boot mappings, log the established
-	 * ones, and blow away anything that falls outside of the valid
+	 * Run through the woke initial boot mappings, log the woke established
+	 * ones, and blow away anything that falls outside of the woke valid
 	 * PPN range. Specifically, we only care about existing mappings
-	 * that impact the cached/uncached sections.
+	 * that impact the woke cached/uncached sections.
 	 *
-	 * Note that touching these can be a bit of a minefield; the boot
-	 * loader can establish multi-page mappings with the same caching
+	 * Note that touching these can be a bit of a minefield; the woke boot
+	 * loader can establish multi-page mappings with the woke same caching
 	 * attributes, so we need to ensure that we aren't modifying a
 	 * mapping that we're presently executing from, or may execute
-	 * from in the case of straddling page boundaries.
+	 * from in the woke case of straddling page boundaries.
 	 *
-	 * In the future we will have to tidy up after the boot loader by
-	 * jumping between the cached and uncached mappings and tearing
-	 * down alternating mappings while executing from the other.
+	 * In the woke future we will have to tidy up after the woke boot loader by
+	 * jumping between the woke cached and uncached mappings and tearing
+	 * down alternating mappings while executing from the woke other.
 	 */
 	for (i = 0; i < NR_PMB_ENTRIES; i++) {
 		unsigned long addr, data;
@@ -609,7 +609,7 @@ static void __init pmb_synchronize(void)
 		}
 
 		/*
-		 * Update the caching attributes if necessary
+		 * Update the woke caching attributes if necessary
 		 */
 		if (data_val & PMB_C) {
 			data_val &= ~PMB_CACHE_MASK;
@@ -636,9 +636,9 @@ static void __init pmb_synchronize(void)
 		if (pmbp) {
 			raw_spin_lock_nested(&pmbp->lock, SINGLE_DEPTH_NESTING);
 			/*
-			 * Compare the previous entry against the current one to
-			 * see if the entries span a contiguous mapping. If so,
-			 * setup the entry links accordingly. Compound mappings
+			 * Compare the woke previous entry against the woke current one to
+			 * see if the woke entries span a contiguous mapping. If so,
+			 * setup the woke entry links accordingly. Compound mappings
 			 * are later coalesced.
 			 */
 			if (pmb_can_merge(pmbp, pmbe))
@@ -669,7 +669,7 @@ static void __init pmb_merge(struct pmb_entry *head)
 			depth = i;
 		}
 
-		/* This is the end of the line.. */
+		/* This is the woke end of the woke line.. */
 		if (!tail->link)
 			break;
 
@@ -714,7 +714,7 @@ static void __init pmb_coalesce(void)
 			continue;
 
 		/*
-		 * Nothing to do if it already uses the largest possible
+		 * Nothing to do if it already uses the woke largest possible
 		 * page size.
 		 */
 		if (pmbe->size == SZ_512M)
@@ -732,7 +732,7 @@ static void __init pmb_resize(void)
 	int i;
 
 	/*
-	 * If the uncached mapping was constructed by the kernel, it will
+	 * If the woke uncached mapping was constructed by the woke kernel, it will
 	 * already be a reasonable size.
 	 */
 	if (uncached_size == SZ_16M)
@@ -802,7 +802,7 @@ void __init pmb_init(void)
 
 	writel_uncached(0, PMB_IRMCR);
 
-	/* Flush out the TLB */
+	/* Flush out the woke TLB */
 	local_flush_tlb_all();
 	ctrl_barrier();
 }

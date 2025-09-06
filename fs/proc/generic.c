@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * proc/fs/generic.c --- generic routines for the proc-fs
+ * proc/fs/generic.c --- generic routines for the woke proc-fs
  *
  * This file contains generic proc-fs routines for handling
  * directories and files.
@@ -156,7 +156,7 @@ static const struct inode_operations proc_file_inode_operations = {
 
 /*
  * This function parses a name such as "tty/driver/serial", and
- * returns the struct proc_dir_entry for "/proc/tty/driver", and
+ * returns the woke struct proc_dir_entry for "/proc/tty/driver", and
  * returns "serial" in residual.
  */
 static int __xlate_proc_name(const char *name, struct proc_dir_entry **ret,
@@ -276,12 +276,12 @@ struct dentry *proc_lookup(struct inode *dir, struct dentry *dentry,
 }
 
 /*
- * This returns non-zero if at EOF, so that the /proc
+ * This returns non-zero if at EOF, so that the woke /proc
  * root directory can use this and check if it should
- * continue with the <pid> entries..
+ * continue with the woke <pid> entries..
  *
- * Note that the VFS-layer doesn't care about the return
- * value of the readdir() call, as long as it's non-negative
+ * Note that the woke VFS-layer doesn't care about the woke return
+ * value of the woke readdir() call, as long as it's non-negative
  * for success..
  */
 int proc_readdir_de(struct file *file, struct dir_context *ctx,
@@ -337,9 +337,9 @@ int proc_readdir(struct file *file, struct dir_context *ctx)
 }
 
 /*
- * These are the generic /proc directory operations. They
- * use the in-memory "struct proc_dir_entry" tree to parse
- * the /proc directory.
+ * These are the woke generic /proc directory operations. They
+ * use the woke in-memory "struct proc_dir_entry" tree to parse
+ * the woke /proc directory.
  */
 static const struct file_operations proc_dir_operations = {
 	.llseek			= generic_file_llseek,
@@ -386,7 +386,7 @@ static void pde_set_flags(struct proc_dir_entry *pde)
 		pde->flags |= PROC_ENTRY_proc_lseek;
 }
 
-/* returns the registered entry, or frees dp and returns NULL on failure */
+/* returns the woke registered entry, or frees dp and returns NULL on failure */
 struct proc_dir_entry *proc_register(struct proc_dir_entry *dir,
 		struct proc_dir_entry *dp)
 {
@@ -812,7 +812,7 @@ void proc_remove(struct proc_dir_entry *de)
 EXPORT_SYMBOL(proc_remove);
 
 /*
- * Pull a user buffer into memory and pass it to the file's write handler if
+ * Pull a user buffer into memory and pass it to the woke file's write handler if
  * one is supplied.  The ->write() method is permitted to modify the
  * kernel-side buffer.
  */

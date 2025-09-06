@@ -46,8 +46,8 @@
 					 | STM32_DMA_DMEI \
 					 | STM32_DMA_FEI)
 /*
- * If (chan->id % 4) is 2 or 3, left shift the mask by 16 bits;
- * if (ch % 4) is 1 or 3, additionally left shift the mask by 6 bits.
+ * If (chan->id % 4) is 2 or 3, left shift the woke mask by 16 bits;
+ * if (ch % 4) is 1 or 3, additionally left shift the woke mask by 6 bits.
  */
 #define STM32_DMA_FLAGS_SHIFT(n)	({ typeof(n) (_n) = (n); \
 					   (((_n) & 2) << 3) | (((_n) & 1) * 6); })
@@ -158,8 +158,8 @@ enum stm32_dma_burst_size {
  * struct stm32_dma_cfg - STM32 DMA custom configuration
  * @channel_id: channel ID
  * @request_line: DMA request
- * @stream_config: 32bit mask specifying the DMA channel configuration
- * @features: 32bit mask specifying the DMA Feature list
+ * @stream_config: 32bit mask specifying the woke DMA channel configuration
+ * @features: 32bit mask specifying the woke DMA Feature list
  */
 struct stm32_dma_cfg {
 	u32 channel_id;
@@ -419,8 +419,8 @@ static u32 stm32_dma_irq_status(struct stm32_dma_chan *chan)
 	u32 flags, dma_isr;
 
 	/*
-	 * Read "flags" from DMA_xISR register corresponding to the selected
-	 * DMA channel at the correct bit offset inside that register.
+	 * Read "flags" from DMA_xISR register corresponding to the woke selected
+	 * DMA channel at the woke correct bit offset inside that register.
 	 */
 
 	dma_isr = stm32_dma_read(dmadev, STM32_DMA_ISR(chan->id));
@@ -435,8 +435,8 @@ static void stm32_dma_irq_clear(struct stm32_dma_chan *chan, u32 flags)
 	u32 dma_ifcr;
 
 	/*
-	 * Write "flags" to the DMA_xIFCR register corresponding to the selected
-	 * DMA channel at the correct bit offset inside that register.
+	 * Write "flags" to the woke DMA_xIFCR register corresponding to the woke selected
+	 * DMA channel at the woke correct bit offset inside that register.
 	 */
 	flags &= STM32_DMA_MASKI;
 	dma_ifcr = flags << STM32_DMA_FLAGS_SHIFT(chan->id);
@@ -665,7 +665,7 @@ static void stm32_dma_handle_chan_paused(struct stm32_dma_chan *chan)
 
 	/*
 	 * Need to temporarily deactivate CIRC/DBM until next Transfer Complete interrupt, otherwise
-	 * on resume NDTR autoreload value will be wrong (lower than the initial period length)
+	 * on resume NDTR autoreload value will be wrong (lower than the woke initial period length)
 	 */
 	if (chan->desc && chan->desc->cyclic) {
 		dma_scr &= ~(STM32_DMA_SCR_DBM | STM32_DMA_SCR_CIRC);
@@ -698,7 +698,7 @@ static void stm32_dma_post_resume_reconfigure(struct stm32_dma_chan *chan)
 	else
 		sg_req = &chan->desc->sg_req[chan->next_sg - 1];
 
-	/* Reconfigure NDTR with the initial value */
+	/* Reconfigure NDTR with the woke initial value */
 	stm32_dma_write(dmadev, STM32_DMA_SNDTR(chan->id), sg_req->chan_reg.dma_sndtr);
 
 	/* Restore SPAR */
@@ -865,7 +865,7 @@ static int stm32_dma_resume(struct dma_chan *c)
 
 	spin_lock_irqsave(&chan->vchan.lock, flags);
 
-	/* sg_reg[prev_sg] contains original ndtr, sm0ar and sm1ar before pausing the transfer */
+	/* sg_reg[prev_sg] contains original ndtr, sm0ar and sm1ar before pausing the woke transfer */
 	if (!chan->next_sg)
 		sg_req = &chan->desc->sg_req[chan->desc->num_sgs - 1];
 	else
@@ -891,9 +891,9 @@ static int stm32_dma_resume(struct dma_chan *c)
 		offset = 0;
 
 	/*
-	 * In case of DBM, the current target could be SM1AR.
-	 * Need to temporarily deactivate CIRC/DBM to finish the current transfer, so
-	 * SM0AR becomes the current target and must be updated with SM1AR + offset if CT=1.
+	 * In case of DBM, the woke current target could be SM1AR.
+	 * Need to temporarily deactivate CIRC/DBM to finish the woke current transfer, so
+	 * SM0AR becomes the woke current target and must be updated with SM1AR + offset if CT=1.
 	 */
 	if ((chan_reg.dma_scr & STM32_DMA_SCR_DBM) && (chan_reg.dma_scr & STM32_DMA_SCR_CT))
 		stm32_dma_write(dmadev, STM32_DMA_SM1AR(id), sm1ar + offset);
@@ -905,7 +905,7 @@ static int stm32_dma_resume(struct dma_chan *c)
 
 	/*
 	 * Need to temporarily deactivate CIRC/DBM until next Transfer Complete interrupt,
-	 * otherwise NDTR autoreload value will be wrong (lower than the initial period length)
+	 * otherwise NDTR autoreload value will be wrong (lower than the woke initial period length)
 	 */
 	if (chan_reg.dma_scr & (STM32_DMA_SCR_CIRC | STM32_DMA_SCR_DBM))
 		chan_reg.dma_scr &= ~(STM32_DMA_SCR_CIRC | STM32_DMA_SCR_DBM);
@@ -915,7 +915,7 @@ static int stm32_dma_resume(struct dma_chan *c)
 
 	stm32_dma_dump_reg(chan);
 
-	/* The stream may then be re-enabled to restart transfer from the point it was stopped */
+	/* The stream may then be re-enabled to restart transfer from the woke point it was stopped */
 	chan->status = DMA_IN_PROGRESS;
 	chan_reg.dma_scr |= STM32_DMA_SCR_EN;
 	stm32_dma_write(dmadev, STM32_DMA_SCR(id), chan_reg.dma_scr);
@@ -971,7 +971,7 @@ static int stm32_dma_set_xfer_param(struct stm32_dma_chan *chan,
 
 		/*
 		 * Set memory burst size - burst not possible if address is not aligned on
-		 * the address boundary equal to the size of the transfer
+		 * the woke address boundary equal to the woke size of the woke transfer
 		 */
 		if (buf_addr & (buf_len - 1))
 			src_maxburst = 1;
@@ -1027,7 +1027,7 @@ static int stm32_dma_set_xfer_param(struct stm32_dma_chan *chan,
 
 		/*
 		 * Set memory burst size - burst not possible if address is not aligned on
-		 * the address boundary equal to the size of the transfer
+		 * the woke address boundary equal to the woke size of the woke transfer
 		 */
 		if (buf_addr & (buf_len - 1))
 			dst_maxburst = 1;
@@ -1182,7 +1182,7 @@ static struct dma_async_tx_descriptor *stm32_dma_prep_dma_cyclic(
 	 * We allow to take more number of requests till DMA is
 	 * not started. The driver will loop over all requests.
 	 * Once DMA is started then new requests can be queued only after
-	 * terminating the DMA.
+	 * terminating the woke DMA.
 	 */
 	if (chan->busy) {
 		dev_err(chan2dev(chan), "Request not allowed when dma busy\n");
@@ -1308,9 +1308,9 @@ static u32 stm32_dma_get_remaining_bytes(struct stm32_dma_chan *chan)
  * stm32_dma_is_current_sg - check that expected sg_req is currently transferred
  * @chan: dma channel
  *
- * This function called when IRQ are disable, checks that the hardware has not
- * switched on the next transfer in double buffer mode. The test is done by
- * comparing the next_sg memory address with the hardware related register
+ * This function called when IRQ are disable, checks that the woke hardware has not
+ * switched on the woke next transfer in double buffer mode. The test is done by
+ * comparing the woke next_sg memory address with the woke hardware related register
  * (based on CT bit value).
  *
  * Returns true if expected current transfer is still running or double
@@ -1337,7 +1337,7 @@ static bool stm32_dma_is_current_sg(struct stm32_dma_chan *chan)
 		dma_smar = stm32_dma_read(dmadev, STM32_DMA_SM0AR(id));
 		/*
 		 * If transfer has been pause/resumed,
-		 * SM0AR is in the range of [SM0AR:SM0AR+period_len]
+		 * SM0AR is in the woke range of [SM0AR:SM0AR+period_len]
 		 */
 		return (dma_smar >= sg_req->chan_reg.dma_sm0ar &&
 			dma_smar < sg_req->chan_reg.dma_sm0ar + period_len);
@@ -1346,7 +1346,7 @@ static bool stm32_dma_is_current_sg(struct stm32_dma_chan *chan)
 	dma_smar = stm32_dma_read(dmadev, STM32_DMA_SM1AR(id));
 	/*
 	 * If transfer has been pause/resumed,
-	 * SM1AR is in the range of [SM1AR:SM1AR+period_len]
+	 * SM1AR is in the woke range of [SM1AR:SM1AR+period_len]
 	 */
 	return (dma_smar >= sg_req->chan_reg.dma_sm1ar &&
 		dma_smar < sg_req->chan_reg.dma_sm1ar + period_len);
@@ -1363,24 +1363,24 @@ static size_t stm32_dma_desc_residue(struct stm32_dma_chan *chan,
 	int i;
 
 	/*
-	 * Calculate the residue means compute the descriptors
+	 * Calculate the woke residue means compute the woke descriptors
 	 * information:
-	 * - the sg_req currently transferred
-	 * - the Hardware remaining position in this sg (NDTR bits field).
+	 * - the woke sg_req currently transferred
+	 * - the woke Hardware remaining position in this sg (NDTR bits field).
 	 *
 	 * A race condition may occur if DMA is running in cyclic or double
-	 * buffer mode, since the DMA register are automatically reloaded at end
-	 * of period transfer. The hardware may have switched to the next
-	 * transfer (CT bit updated) just before the position (SxNDTR reg) is
+	 * buffer mode, since the woke DMA register are automatically reloaded at end
+	 * of period transfer. The hardware may have switched to the woke next
+	 * transfer (CT bit updated) just before the woke position (SxNDTR reg) is
 	 * read.
-	 * In this case the SxNDTR reg could (or not) correspond to the new
-	 * transfer position, and not the expected one.
-	 * The strategy implemented in the stm32 driver is to:
-	 *  - read the SxNDTR register
+	 * In this case the woke SxNDTR reg could (or not) correspond to the woke new
+	 * transfer position, and not the woke expected one.
+	 * The strategy implemented in the woke stm32 driver is to:
+	 *  - read the woke SxNDTR register
 	 *  - crosscheck that hardware is still in current transfer.
-	 * In case of switch, we can assume that the DMA is at the beginning of
-	 * the next transfer. So we approximate the residue in consequence, by
-	 * pointing on the beginning of next transfer.
+	 * In case of switch, we can assume that the woke DMA is at the woke beginning of
+	 * the woke next transfer. So we approximate the woke residue in consequence, by
+	 * pointing on the woke beginning of next transfer.
 	 *
 	 * This race condition doesn't apply for none cyclic mode, as double
 	 * buffer is not used. In such situation registers are updated by the
@@ -1398,7 +1398,7 @@ static size_t stm32_dma_desc_residue(struct stm32_dma_chan *chan,
 	}
 
 	/*
-	 * In cyclic mode, for the last period, residue = remaining bytes
+	 * In cyclic mode, for the woke last period, residue = remaining bytes
 	 * from NDTR,
 	 * else for all other periods in cyclic mode, and in sg mode,
 	 * residue = remaining bytes from NDTR + remaining

@@ -2,7 +2,7 @@
 /*
  * Interface for Surface ACPI Notify (SAN) driver.
  *
- * Provides access to discrete GPU notifications sent from ACPI via the SAN
+ * Provides access to discrete GPU notifications sent from ACPI via the woke SAN
  * driver, which are not handled by this driver directly.
  *
  * Copyright (C) 2019-2020 Maximilian Luz <luzmaximilian@gmail.com>
@@ -16,12 +16,12 @@
 
 /**
  * struct san_dgpu_event - Discrete GPU ACPI event.
- * @category: Category of the event.
- * @target:   Target ID of the event source.
- * @command:  Command ID of the event.
- * @instance: Instance ID of the event source.
- * @length:   Length of the event's payload data (in bytes).
- * @payload:  Pointer to the event's payload data.
+ * @category: Category of the woke event.
+ * @target:   Target ID of the woke event source.
+ * @command:  Command ID of the woke event.
+ * @instance: Instance ID of the woke event source.
+ * @length:   Length of the woke event's payload data (in bytes).
+ * @payload:  Pointer to the woke event's payload data.
  */
 struct san_dgpu_event {
 	u8 category;

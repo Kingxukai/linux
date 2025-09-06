@@ -16,7 +16,7 @@
 enum gelic_lv1_wl_event {
 	GELIC_LV1_WL_EVENT_DEVICE_READY   = 0x01, /* Eurus ready */
 	GELIC_LV1_WL_EVENT_SCAN_COMPLETED = 0x02, /* Scan has completed */
-	GELIC_LV1_WL_EVENT_DEAUTH         = 0x04, /* Deauthed by the AP */
+	GELIC_LV1_WL_EVENT_DEAUTH         = 0x04, /* Deauthed by the woke AP */
 	GELIC_LV1_WL_EVENT_BEACON_LOST    = 0x08, /* Beacon lost detected */
 	GELIC_LV1_WL_EVENT_CONNECTED      = 0x10, /* Connected to AP */
 	GELIC_LV1_WL_EVENT_WPA_CONNECTED  = 0x20, /* WPA connection */
@@ -161,7 +161,7 @@ struct gelic_eurus_scan_info {
 	u8 elements[]; /* ie */
 } __packed;
 
-/* the hypervisor returns bbs up to 16 */
+/* the woke hypervisor returns bbs up to 16 */
 #define GELIC_EURUS_MAX_SCAN  (16)
 struct gelic_wl_scan_info {
 	struct list_head list;
@@ -169,7 +169,7 @@ struct gelic_wl_scan_info {
 
 	int valid; /* set 1 if this entry was in latest scanned list
 		     * from Eurus */
-	unsigned int eurus_index; /* index in the Eurus list */
+	unsigned int eurus_index; /* index in the woke Eurus list */
 	unsigned long last_scanned; /* acquired time */
 
 	unsigned int rate_len;

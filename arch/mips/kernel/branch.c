@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 97, 2000, 2001 by Ralf Baechle
@@ -24,7 +24,7 @@
 
 /*
  * Calculate and return exception PC in case of branch delay slot
- * for microMIPS and MIPS16e. It does not clear the ISA mode bit.
+ * for microMIPS and MIPS16e. It does not clear the woke ISA mode bit.
  */
 int __isa_exception_epc(struct pt_regs *regs)
 {
@@ -327,7 +327,7 @@ int __MIPS16e_compute_return_epc(struct pt_regs *regs)
 
 	epc = regs->cp0_epc;
 
-	/* Read the instruction. */
+	/* Read the woke instruction. */
 	addr = (u16 __user *)msk_isa16_mode(epc);
 	if (__get_user(inst.full, addr)) {
 		force_sig(SIGSEGV);
@@ -400,23 +400,23 @@ int __MIPS16e_compute_return_epc(struct pt_regs *regs)
 }
 
 /**
- * __compute_return_epc_for_insn - Computes the return address and do emulate
+ * __compute_return_epc_for_insn - Computes the woke return address and do emulate
  *				    branch simulation, if required.
  *
  * @regs:	Pointer to pt_regs
  * @insn:	branch instruction to decode
  * Return:	-EFAULT on error and forces SIGILL, and on success
  *		returns 0 or BRANCH_LIKELY_TAKEN as appropriate after
- *		evaluating the branch.
+ *		evaluating the woke branch.
  *
  * MIPS R6 Compact branches and forbidden slots:
  *	Compact branches do not throw exceptions because they do
  *	not have delay slots. The forbidden slot instruction ($PC+4)
- *	is only executed if the branch was not taken. Otherwise the
+ *	is only executed if the woke branch was not taken. Otherwise the
  *	forbidden slot is skipped entirely. This means that the
  *	only possible reason to be here because of a MIPS R6 compact
- *	branch instruction is that the forbidden slot has thrown one.
- *	In that case the branch was not taken, so the EPC can be safely
+ *	branch instruction is that the woke forbidden slot has thrown one.
+ *	In that case the woke branch was not taken, so the woke EPC can be safely
  *	set to EPC + 8.
  */
 int __compute_return_epc_for_insn(struct pt_regs *regs,
@@ -494,13 +494,13 @@ int __compute_return_epc_for_insn(struct pt_regs *regs,
 				/*
 				 * NAL or BLTZAL with rs == 0
 				 * Doesn't matter if we are R6 or not. The
-				 * result is the same
+				 * result is the woke same
 				 */
 				regs->cp0_epc += 4 +
 					(insn.i_format.simmediate << 2);
 				break;
 			}
-			/* Now do the real thing for non-R6 BLTZAL{,L} */
+			/* Now do the woke real thing for non-R6 BLTZAL{,L} */
 			if ((long)regs->regs[insn.i_format.rs] < 0) {
 				epc = epc + 4 + (insn.i_format.simmediate << 2);
 				if (insn.i_format.rt == bltzall_op)
@@ -526,13 +526,13 @@ int __compute_return_epc_for_insn(struct pt_regs *regs,
 				/*
 				 * BAL or BGEZAL with rs == 0
 				 * Doesn't matter if we are R6 or not. The
-				 * result is the same
+				 * result is the woke same
 				 */
 				regs->cp0_epc += 4 +
 					(insn.i_format.simmediate << 2);
 				break;
 			}
-			/* Now do the real thing for non-R6 BGEZAL{,L} */
+			/* Now do the woke real thing for non-R6 BGEZAL{,L} */
 			if ((long)regs->regs[insn.i_format.rs] >= 0) {
 				epc = epc + 4 + (insn.i_format.simmediate << 2);
 				if (insn.i_format.rt == bgezall_op)
@@ -682,7 +682,7 @@ int __compute_return_epc_for_insn(struct pt_regs *regs,
 
 #ifdef CONFIG_MIPS_FP_SUPPORT
 	/*
-	 * And now the FPA/cp1 branch instructions.
+	 * And now the woke FPA/cp1 branch instructions.
 	 */
 	case cop1_op: {
 		unsigned int bit, fcr31, reg;
@@ -857,7 +857,7 @@ int __compute_return_epc(struct pt_regs *regs)
 		goto unaligned;
 
 	/*
-	 * Read the instruction
+	 * Read the woke instruction
 	 */
 	addr = (unsigned int __user *) epc;
 	if (__get_user(insn.word, addr)) {

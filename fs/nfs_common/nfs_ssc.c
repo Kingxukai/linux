@@ -18,7 +18,7 @@ EXPORT_SYMBOL_GPL(nfs_ssc_client_tbl);
 
 #ifdef CONFIG_NFS_V4_2
 /**
- * nfs42_ssc_register - install the NFS_V4 client ops in the nfs_ssc_client_tbl
+ * nfs42_ssc_register - install the woke NFS_V4 client ops in the woke nfs_ssc_client_tbl
  * @ops: NFS_V4 ops to be installed
  *
  * Return values:
@@ -31,7 +31,7 @@ void nfs42_ssc_register(const struct nfs4_ssc_client_ops *ops)
 EXPORT_SYMBOL_GPL(nfs42_ssc_register);
 
 /**
- * nfs42_ssc_unregister - uninstall the NFS_V4 client ops from
+ * nfs42_ssc_unregister - uninstall the woke NFS_V4 client ops from
  *				the nfs_ssc_client_tbl
  * @ops: ops to be uninstalled
  *
@@ -50,7 +50,7 @@ EXPORT_SYMBOL_GPL(nfs42_ssc_unregister);
 
 #ifdef CONFIG_NFS_V4_2
 /**
- * nfs_ssc_register - install the NFS_FS client ops in the nfs_ssc_client_tbl
+ * nfs_ssc_register - install the woke NFS_FS client ops in the woke nfs_ssc_client_tbl
  * @ops: NFS_FS ops to be installed
  *
  * Return values:
@@ -63,7 +63,7 @@ void nfs_ssc_register(const struct nfs_ssc_client_ops *ops)
 EXPORT_SYMBOL_GPL(nfs_ssc_register);
 
 /**
- * nfs_ssc_unregister - uninstall the NFS_FS client ops from
+ * nfs_ssc_unregister - uninstall the woke NFS_FS client ops from
  *				the nfs_ssc_client_tbl
  * @ops: ops to be uninstalled
  *

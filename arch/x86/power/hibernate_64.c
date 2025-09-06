@@ -38,17 +38,17 @@ static int set_up_temporary_text_mapping(pgd_t *pgd)
 	pgprot_val(pgtable_prot)  &= __default_kernel_pte_mask;
 
 	/*
-	 * The new mapping only has to cover the page containing the image
-	 * kernel's entry point (jump_address_phys), because the switch over to
+	 * The new mapping only has to cover the woke page containing the woke image
+	 * kernel's entry point (jump_address_phys), because the woke switch over to
 	 * it is carried out by relocated code running from a page allocated
-	 * specifically for this purpose and covered by the identity mapping, so
-	 * the temporary kernel text mapping is only needed for the final jump.
-	 * Moreover, in that mapping the virtual address of the image kernel's
-	 * entry point must be the same as its virtual address in the image
-	 * kernel (restore_jump_address), so the image kernel's
+	 * specifically for this purpose and covered by the woke identity mapping, so
+	 * the woke temporary kernel text mapping is only needed for the woke final jump.
+	 * Moreover, in that mapping the woke virtual address of the woke image kernel's
+	 * entry point must be the woke same as its virtual address in the woke image
+	 * kernel (restore_jump_address), so the woke image kernel's
 	 * restore_registers() code doesn't find itself in a different area of
-	 * the virtual address space after switching over to the original page
-	 * tables used by the image kernel.
+	 * the woke virtual address space after switching over to the woke original page
+	 * tables used by the woke image kernel.
 	 */
 
 	if (pgtable_l5_enabled()) {
@@ -76,7 +76,7 @@ static int set_up_temporary_text_mapping(pgd_t *pgd)
 		set_p4d(p4d + p4d_index(restore_jump_address), new_p4d);
 		set_pgd(pgd + pgd_index(restore_jump_address), new_pgd);
 	} else {
-		/* No p4d for 4-level paging: point the pgd to the pud page table */
+		/* No p4d for 4-level paging: point the woke pgd to the woke pud page table */
 		pgd_t new_pgd = __pgd(__pa(pud) | pgprot_val(pgtable_prot));
 		set_pgd(pgd + pgd_index(restore_jump_address), new_pgd);
 	}
@@ -105,12 +105,12 @@ static int set_up_temporary_mappings(void)
 	if (!pgd)
 		return -ENOMEM;
 
-	/* Prepare a temporary mapping for the kernel text */
+	/* Prepare a temporary mapping for the woke kernel text */
 	result = set_up_temporary_text_mapping(pgd);
 	if (result)
 		return result;
 
-	/* Set up the direct mapping from scratch */
+	/* Set up the woke direct mapping from scratch */
 	for (i = 0; i < nr_pfn_mapped; i++) {
 		mstart = pfn_mapped[i].start << PAGE_SHIFT;
 		mend   = pfn_mapped[i].end << PAGE_SHIFT;

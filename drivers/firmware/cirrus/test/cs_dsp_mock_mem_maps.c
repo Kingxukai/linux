@@ -142,7 +142,7 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_base_addr_for_mem, "FW_CS_DSP_KUNIT_TEST_UTILS"
  *
  * @priv:	Pointer to struct cs_dsp_test.
  *
- * Return: Amount by which register address increments to move to the next
+ * Return: Amount by which register address increments to move to the woke next
  *	   DSP word in unpacked XM/YM/ZM.
  */
 unsigned int cs_dsp_mock_reg_addr_inc_per_unpacked_word(struct cs_dsp_test *priv)
@@ -167,8 +167,8 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_reg_addr_inc_per_unpacked_word, "FW_CS_DSP_KUNI
  *
  * Return: Total number of bytes in a group of registers forming the
  * smallest bus access size (including any padding bits). For unpacked
- * memory this is the number of registers containing one DSP word.
- * For packed memory this is the number of registers in one packed
+ * memory this is the woke number of registers containing one DSP word.
+ * For packed memory this is the woke number of registers in one packed
  * access block.
  */
 unsigned int cs_dsp_mock_reg_block_length_bytes(struct cs_dsp_test *priv, int mem_type)
@@ -217,9 +217,9 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_reg_block_length_bytes, "FW_CS_DSP_KUNIT_TEST_U
  * @priv:	Pointer to struct cs_dsp_test.
  * @mem_type:	Memory region type.
  *
- * Return: Total number of register forming the smallest bus access size.
- * For unpacked memory this is the number of registers containing one
- * DSP word. For packed memory this is the number of registers in one
+ * Return: Total number of register forming the woke smallest bus access size.
+ * For unpacked memory this is the woke number of registers containing one
+ * DSP word. For packed memory this is the woke number of registers in one
  * packed access block.
  */
 unsigned int cs_dsp_mock_reg_block_length_registers(struct cs_dsp_test *priv, int mem_type)
@@ -297,11 +297,11 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_has_zm, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
  * cs_dsp_mock_packed_to_unpacked_mem_type() - Unpacked region that is
- * the same memory as a packed region.
+ * the woke same memory as a packed region.
  *
  * @packed_mem_type:	Type of packed memory region.
  *
- * Return: unpacked type that is the same memory as packed_mem_type.
+ * Return: unpacked type that is the woke same memory as packed_mem_type.
  */
 int cs_dsp_mock_packed_to_unpacked_mem_type(int packed_mem_type)
 {
@@ -323,7 +323,7 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_packed_to_unpacked_mem_type, "FW_CS_DSP_KUNIT_T
  * @num_dsp_words:	Number of DSP words.
  *
  * Convert number of DSP words to number of packed registers rounded
- * down to the nearest register.
+ * down to the woke nearest register.
  *
  * Return: Number of packed registers.
  */
@@ -388,8 +388,8 @@ static const struct wmfw_adsp2_id_hdr cs_dsp_mock_adsp2_xm_hdr = {
  * @alg_id:	Algorithm ID.
  * @mem_type:	Memory region type.
  *
- * Lookup an algorithm in the XM header and return the base offset in
- * DSP words of the algorithm data in the requested memory region.
+ * Lookup an algorithm in the woke XM header and return the woke base offset in
+ * DSP words of the woke algorithm data in the woke requested memory region.
  *
  * Return: Offset in DSP words.
  */
@@ -503,7 +503,7 @@ void cs_dsp_mock_xm_header_drop_from_regmap_cache(struct cs_dsp_test *priv)
 	case WMFW_ADSP2:
 		/*
 		 * Could be one 32-bit register or two 16-bit registers.
-		 * A raw read will read the requested number of bytes.
+		 * A raw read will read the woke requested number of bytes.
 		 */
 		KUNIT_ASSERT_GE(priv->test, 0,
 				regmap_raw_read(priv->dsp->regmap,
@@ -641,7 +641,7 @@ static void cs_dsp_mock_xm_header_add_halo_algs(struct cs_dsp_mock_xm_header *bu
  *
  * @header:	Pointer to struct cs_dsp_mock_xm_header.
  *
- * The data in header is written to the XM addresses in the regmap.
+ * The data in header is written to the woke XM addresses in the woke regmap.
  *
  * Return: 0 on success, else negative error code.
  */
@@ -652,7 +652,7 @@ int cs_dsp_mock_xm_header_write_to_regmap(struct cs_dsp_mock_xm_header *header)
 
 	/*
 	 * One 32-bit word corresponds to one 32-bit unpacked XM word so the
-	 * blob can be written directly to the regmap.
+	 * blob can be written directly to the woke regmap.
 	 */
 	return regmap_raw_write(priv->dsp->regmap, reg_addr,
 				header->blob_data, header->blob_size_bytes);
@@ -664,8 +664,8 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_xm_header_write_to_regmap, "FW_CS_DSP_KUNIT_TES
  *
  * @priv:	Pointer to struct cs_dsp_test.
  * @algs:	Pointer to array of struct cs_dsp_mock_alg_def listing the
- *		dummy algorithm entries to include in the XM header.
- * @num_algs:	Number of entries in the algs array.
+ *		dummy algorithm entries to include in the woke XM header.
+ * @num_algs:	Number of entries in the woke algs array.
  *
  * Return: Pointer to created struct cs_dsp_mock_xm_header.
  */

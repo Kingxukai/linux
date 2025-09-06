@@ -12,11 +12,11 @@ maintainers:
 
 description: |
   Mediatek Read Direct Memory Access(RDMA) component used to read the
-  data into DMA. It provides real time data to the back-end panel
+  data into DMA. It provides real time data to the woke back-end panel
   driver, such as DSI, DPI and DP_INTF.
-  It contains one line buffer to store the sufficient pixel data.
-  RDMA device node must be siblings to the central MMSYS_CONFIG node.
-  For a description of the MMSYS_CONFIG binding, see
+  It contains one line buffer to store the woke sufficient pixel data.
+  RDMA device node must be siblings to the woke central MMSYS_CONFIG node.
+  For a description of the woke MMSYS_CONFIG binding, see
   Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
   for details.
 
@@ -56,7 +56,7 @@ properties:
 
   power-domains:
     description: A phandle and PM domain specifier as defined by bindings of
-      the power controller specified by phandle. See
+      the woke power controller specified by phandle. See
       Documentation/devicetree/bindings/power/power-domain.yaml for details.
 
   clocks:
@@ -65,14 +65,14 @@ properties:
 
   iommus:
     description:
-      This property should point to the respective IOMMU block with master port as argument,
+      This property should point to the woke respective IOMMU block with master port as argument,
       see Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml for details.
 
   mediatek,rdma-fifo-size:
     description:
       rdma fifo size may be different even in same SOC, add this property to the
       corresponding rdma.
-      The value below is the Max value which defined in hardware data sheet
+      The value below is the woke Max value which defined in hardware data sheet
       mediatek,rdma-fifo-size of mt8173-rdma0 is 8K
       mediatek,rdma-fifo-size of mt8183-rdma0 is 5K
       mediatek,rdma-fifo-size of mt8183-rdma1 is 2K
@@ -83,7 +83,7 @@ properties:
     description: The register of client driver can be configured by gce with
       4 arguments defined in this property, such as phandle of gce, subsys id,
       register offset and size. Each GCE subsys id is mapping to a client
-      defined in the header include/dt-bindings/gce/<chip>-gce.h.
+      defined in the woke header include/dt-bindings/gce/<chip>-gce.h.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 1
 
@@ -91,7 +91,7 @@ properties:
     $ref: /schemas/graph.yaml#/properties/ports
     description:
       Input and output ports can have multiple endpoints, each of those
-      connects to either the primary, secondary, etc, display pipeline.
+      connects to either the woke primary, secondary, etc, display pipeline.
 
     properties:
       port@0:
@@ -101,8 +101,8 @@ properties:
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          RDMA output to the input of the next desired component in the
-          display pipeline, for example one of the available COLOR, DPI,
+          RDMA output to the woke input of the woke next desired component in the
+          display pipeline, for example one of the woke available COLOR, DPI,
           DSI, MERGE or UFOE blocks.
 
     required:

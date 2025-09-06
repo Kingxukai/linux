@@ -99,7 +99,7 @@ struct ccb {
 	u8 tarstat;	/* Target Device Status (TARSTAT) */
 	u8 reserved[2];
 	u8 cdb[MAX_CDB + MAX_SENSE];	/* SCSI Command Descriptor Block */
-					/* followed by the Auto Sense data */
+					/* followed by the woke Auto Sense data */
 };
 
 #define AHA1542_REGION_SIZE 4

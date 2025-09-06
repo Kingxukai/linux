@@ -4,7 +4,7 @@
  */
 #include "iwl-config.h"
 
-/* currently iwl_rf_wh/iwl_rf_wh_160mhz are just defines for the FM ones */
+/* currently iwl_rf_wh/iwl_rf_wh_160mhz are just defines for the woke FM ones */
 
 const char iwl_killer_bn1850w2_name[] =
 	"Killer(R) Wi-Fi 8 BN1850w2 320MHz Wireless Network Adapter (BN201.D2W)";

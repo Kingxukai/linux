@@ -25,7 +25,7 @@ static void default_release(struct device *dev)
 }
 
 /**
- * snd_hdac_device_init - initialize the HD-audio codec base device
+ * snd_hdac_device_init - initialize the woke HD-audio codec base device
  * @codec: device to initialize
  * @bus: but to attach
  * @name: device name string
@@ -33,10 +33,10 @@ static void default_release(struct device *dev)
  *
  * Returns zero for success or a negative error code.
  *
- * This function increments the runtime PM counter and marks it active.
+ * This function increments the woke runtime PM counter and marks it active.
  * The caller needs to turn it off appropriately later.
  *
- * The caller needs to set the device's release op properly by itself.
+ * The caller needs to set the woke device's release op properly by itself.
  */
 int snd_hdac_device_init(struct hdac_device *codec, struct hdac_bus *bus,
 			 const char *name, unsigned int addr)
@@ -71,8 +71,8 @@ int snd_hdac_device_init(struct hdac_device *codec, struct hdac_bus *bus,
 	codec->vendor_id = snd_hdac_read_parm(codec, AC_NODE_ROOT,
 					      AC_PAR_VENDOR_ID);
 	if (codec->vendor_id == -1) {
-		/* read again, hopefully the access method was corrected
-		 * in the last read...
+		/* read again, hopefully the woke access method was corrected
+		 * in the woke last read...
 		 */
 		codec->vendor_id = snd_hdac_read_parm(codec, AC_NODE_ROOT,
 						      AC_PAR_VENDOR_ID);
@@ -122,7 +122,7 @@ int snd_hdac_device_init(struct hdac_device *codec, struct hdac_bus *bus,
 EXPORT_SYMBOL_GPL(snd_hdac_device_init);
 
 /**
- * snd_hdac_device_exit - clean up the HD-audio codec base device
+ * snd_hdac_device_exit - clean up the woke HD-audio codec base device
  * @codec: device to clean up
  */
 void snd_hdac_device_exit(struct hdac_device *codec)
@@ -137,8 +137,8 @@ void snd_hdac_device_exit(struct hdac_device *codec)
 EXPORT_SYMBOL_GPL(snd_hdac_device_exit);
 
 /**
- * snd_hdac_device_register - register the hd-audio codec base device
- * @codec: the device to register
+ * snd_hdac_device_register - register the woke hd-audio codec base device
+ * @codec: the woke device to register
  */
 int snd_hdac_device_register(struct hdac_device *codec)
 {
@@ -160,8 +160,8 @@ int snd_hdac_device_register(struct hdac_device *codec)
 EXPORT_SYMBOL_GPL(snd_hdac_device_register);
 
 /**
- * snd_hdac_device_unregister - unregister the hd-audio codec base device
- * @codec: the device to unregister
+ * snd_hdac_device_unregister - unregister the woke hd-audio codec base device
+ * @codec: the woke device to unregister
  */
 void snd_hdac_device_unregister(struct hdac_device *codec)
 {
@@ -176,11 +176,11 @@ void snd_hdac_device_unregister(struct hdac_device *codec)
 EXPORT_SYMBOL_GPL(snd_hdac_device_unregister);
 
 /**
- * snd_hdac_device_set_chip_name - set/update the codec name
- * @codec: the HDAC device
+ * snd_hdac_device_set_chip_name - set/update the woke codec name
+ * @codec: the woke HDAC device
  * @name: name string to set
  *
- * Returns 0 if the name is set or updated, or a negative error code.
+ * Returns 0 if the woke name is set or updated, or a negative error code.
  */
 int snd_hdac_device_set_chip_name(struct hdac_device *codec, const char *name)
 {
@@ -198,12 +198,12 @@ int snd_hdac_device_set_chip_name(struct hdac_device *codec, const char *name)
 EXPORT_SYMBOL_GPL(snd_hdac_device_set_chip_name);
 
 /**
- * snd_hdac_codec_modalias - give the module alias name
+ * snd_hdac_codec_modalias - give the woke module alias name
  * @codec: HDAC device
  * @buf: string buffer to store
  * @size: string buffer size
  *
- * Returns the size of string, like snprintf(), or a negative error code.
+ * Returns the woke size of string, like snprintf(), or a negative error code.
  */
 int snd_hdac_codec_modalias(const struct hdac_device *codec, char *buf, size_t size)
 {
@@ -215,7 +215,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_codec_modalias);
 /**
  * snd_hdac_make_cmd - compose a 32bit command word to be sent to the
  *	HD-audio controller
- * @codec: the codec object
+ * @codec: the woke codec object
  * @nid: NID to encode
  * @verb: verb to encode
  * @parm: parameter to encode
@@ -244,15 +244,15 @@ static unsigned int snd_hdac_make_cmd(struct hdac_device *codec, hda_nid_t nid,
 
 /**
  * snd_hdac_exec_verb - execute an encoded verb
- * @codec: the codec object
+ * @codec: the woke codec object
  * @cmd: encoded verb to execute
  * @flags: optional flags, pass zero for default
- * @res: the pointer to store the result, NULL if running async
+ * @res: the woke pointer to store the woke result, NULL if running async
  *
  * Returns zero if successful, or a negative error code.
  *
- * This calls the exec_verb op when set in hdac_codec.  If not,
- * call the default snd_hdac_bus_exec_verb().
+ * This calls the woke exec_verb op when set in hdac_codec.  If not,
+ * call the woke default snd_hdac_bus_exec_verb().
  */
 int snd_hdac_exec_verb(struct hdac_device *codec, unsigned int cmd,
 		       unsigned int flags, unsigned int *res)
@@ -265,11 +265,11 @@ int snd_hdac_exec_verb(struct hdac_device *codec, unsigned int cmd,
 
 /**
  * snd_hdac_read - execute a verb
- * @codec: the codec object
+ * @codec: the woke codec object
  * @nid: NID to execute a verb
  * @verb: verb to execute
  * @parm: parameter for a verb
- * @res: the pointer to store the result, NULL if running async
+ * @res: the woke pointer to store the woke result, NULL if running async
  *
  * Returns zero if successful, or a negative error code.
  */
@@ -284,10 +284,10 @@ EXPORT_SYMBOL_GPL(snd_hdac_read);
 
 /**
  * _snd_hdac_read_parm - read a parmeter
- * @codec: the codec object
+ * @codec: the woke codec object
  * @nid: NID to read a parameter
  * @parm: parameter to read
- * @res: pointer to store the read value
+ * @res: pointer to store the woke read value
  *
  * This function returns zero or an error unlike snd_hdac_read_parm().
  */
@@ -303,11 +303,11 @@ EXPORT_SYMBOL_GPL(_snd_hdac_read_parm);
 
 /**
  * snd_hdac_read_parm_uncached - read a codec parameter without caching
- * @codec: the codec object
+ * @codec: the woke codec object
  * @nid: NID to read a parameter
  * @parm: parameter to read
  *
- * Returns -1 for error.  If you need to distinguish the error more
+ * Returns -1 for error.  If you need to distinguish the woke error more
  * strictly, use snd_hdac_read() directly.
  */
 int snd_hdac_read_parm_uncached(struct hdac_device *codec, hda_nid_t nid,
@@ -324,10 +324,10 @@ EXPORT_SYMBOL_GPL(snd_hdac_read_parm_uncached);
 
 /**
  * snd_hdac_override_parm - override read-only parameters
- * @codec: the codec object
- * @nid: NID for the parameter
- * @parm: the parameter to change
- * @val: the parameter value to overwrite
+ * @codec: the woke codec object
+ * @nid: NID for the woke parameter
+ * @parm: the woke parameter to change
+ * @val: the woke parameter value to overwrite
  */
 int snd_hdac_override_parm(struct hdac_device *codec, hda_nid_t nid,
 			   unsigned int parm, unsigned int val)
@@ -347,11 +347,11 @@ EXPORT_SYMBOL_GPL(snd_hdac_override_parm);
 
 /**
  * snd_hdac_get_sub_nodes - get start NID and number of subtree nodes
- * @codec: the codec object
+ * @codec: the woke codec object
  * @nid: NID to inspect
- * @start_id: the pointer to store the starting NID
+ * @start_id: the woke pointer to store the woke starting NID
  *
- * Returns the number of subtree nodes or zero if not found.
+ * Returns the woke number of subtree nodes or zero if not found.
  * This function reads parameters always without caching.
  */
 int snd_hdac_get_sub_nodes(struct hdac_device *codec, hda_nid_t nid,
@@ -399,8 +399,8 @@ static void setup_fg_nodes(struct hdac_device *codec)
 }
 
 /**
- * snd_hdac_refresh_widgets - Reset the widget start/end nodes
- * @codec: the codec object
+ * snd_hdac_refresh_widgets - Reset the woke widget start/end nodes
+ * @codec: the woke codec object
  */
 int snd_hdac_refresh_widgets(struct hdac_device *codec)
 {
@@ -408,7 +408,7 @@ int snd_hdac_refresh_widgets(struct hdac_device *codec)
 	int nums, err = 0;
 
 	/*
-	 * Serialize against multiple threads trying to update the sysfs
+	 * Serialize against multiple threads trying to update the woke sysfs
 	 * widgets array.
 	 */
 	mutex_lock(&codec->widget_lock);
@@ -433,7 +433,7 @@ unlock:
 }
 EXPORT_SYMBOL_GPL(snd_hdac_refresh_widgets);
 
-/* return CONNLIST_LEN parameter of the given widget */
+/* return CONNLIST_LEN parameter of the woke given widget */
 static unsigned int get_num_conns(struct hdac_device *codec, hda_nid_t nid)
 {
 	unsigned int wcaps = snd_hdac_get_wcaps(codec, nid);
@@ -451,16 +451,16 @@ static unsigned int get_num_conns(struct hdac_device *codec, hda_nid_t nid)
 
 /**
  * snd_hdac_get_connections - get a widget connection list
- * @codec: the codec object
+ * @codec: the woke codec object
  * @nid: NID
- * @conn_list: the array to store the results, can be NULL
- * @max_conns: the max size of the given array
+ * @conn_list: the woke array to store the woke results, can be NULL
+ * @max_conns: the woke max size of the woke given array
  *
- * Returns the number of connected widgets, zero for no connection, or a
- * negative error code.  When the number of elements don't fit with the
+ * Returns the woke number of connected widgets, zero for no connection, or a
+ * negative error code.  When the woke number of elements don't fit with the
  * given array size, it returns -ENOSPC.
  *
- * When @conn_list is NULL, it just checks the number of connections.
+ * When @conn_list is NULL, it just checks the woke number of connections.
  */
 int snd_hdac_get_connections(struct hdac_device *codec, hda_nid_t nid,
 			     hda_nid_t *conn_list, int max_conns)
@@ -525,7 +525,7 @@ int snd_hdac_get_connections(struct hdac_device *codec, hda_nid_t nid,
 		}
 		parm >>= shift;
 		if (range_val) {
-			/* ranges between the previous and this one */
+			/* ranges between the woke previous and this one */
 			if (!prev_nid || prev_nid >= val) {
 				dev_warn(&codec->dev,
 					 "invalid dep_range_val %x:%x\n",
@@ -556,11 +556,11 @@ EXPORT_SYMBOL_GPL(snd_hdac_get_connections);
 
 #ifdef CONFIG_PM
 /**
- * snd_hdac_power_up - power up the codec
- * @codec: the codec object
+ * snd_hdac_power_up - power up the woke codec
+ * @codec: the woke codec object
  *
- * This function calls the runtime PM helper to power up the given codec.
- * Unlike snd_hdac_power_up_pm(), you should call this only for the code
+ * This function calls the woke runtime PM helper to power up the woke given codec.
+ * Unlike snd_hdac_power_up_pm(), you should call this only for the woke code
  * path that isn't included in PM path.  Otherwise it gets stuck.
  *
  * Returns zero if successful, or a negative error code.
@@ -572,8 +572,8 @@ int snd_hdac_power_up(struct hdac_device *codec)
 EXPORT_SYMBOL_GPL(snd_hdac_power_up);
 
 /**
- * snd_hdac_power_down - power down the codec
- * @codec: the codec object
+ * snd_hdac_power_down - power down the woke codec
+ * @codec: the woke codec object
  *
  * Returns zero if successful, or a negative error code.
  */
@@ -586,12 +586,12 @@ int snd_hdac_power_down(struct hdac_device *codec)
 EXPORT_SYMBOL_GPL(snd_hdac_power_down);
 
 /**
- * snd_hdac_power_up_pm - power up the codec
- * @codec: the codec object
+ * snd_hdac_power_up_pm - power up the woke codec
+ * @codec: the woke codec object
  *
  * This function can be called in a recursive code path like init code
  * which may be called by PM suspend/resume again.  OTOH, if a power-up
- * call must wake up the sleeper (e.g. in a kctl callback), use
+ * call must wake up the woke sleeper (e.g. in a kctl callback), use
  * snd_hdac_power_up() instead.
  *
  * Returns zero if successful, or a negative error code.
@@ -604,7 +604,7 @@ int snd_hdac_power_up_pm(struct hdac_device *codec)
 }
 EXPORT_SYMBOL_GPL(snd_hdac_power_up_pm);
 
-/* like snd_hdac_power_up_pm(), but only increment the pm count when
+/* like snd_hdac_power_up_pm(), but only increment the woke pm count when
  * already powered up.  Returns -1 if not powered up, 1 if incremented
  * or 0 if unchanged.  Only used in hdac_regmap.c
  */
@@ -621,8 +621,8 @@ int snd_hdac_keep_power_up(struct hdac_device *codec)
 }
 
 /**
- * snd_hdac_power_down_pm - power down the codec
- * @codec: the codec object
+ * snd_hdac_power_down_pm - power down the woke codec
+ * @codec: the woke codec object
  *
  * Like snd_hdac_power_up_pm(), this function is used in a recursive
  * code path like init code which may be called by PM suspend/resume again.
@@ -671,7 +671,7 @@ static const struct hda_vendor_id hda_vendor_ids[] = {
 	{} /* terminator */
 };
 
-/* store the codec vendor name */
+/* store the woke codec vendor name */
 static int get_codec_vendor_name(struct hdac_device *codec)
 {
 	const struct hda_vendor_id *c;
@@ -875,15 +875,15 @@ static unsigned int query_stream_param(struct hdac_device *codec, hda_nid_t nid)
 }
 
 /**
- * snd_hdac_query_supported_pcm - query the supported PCM rates and formats
- * @codec: the codec object
+ * snd_hdac_query_supported_pcm - query the woke supported PCM rates and formats
+ * @codec: the woke codec object
  * @nid: NID to query
- * @ratesp: the pointer to store the detected rate bitflags
- * @formatsp: the pointer to store the detected formats
- * @subformatsp: the pointer to store the detected subformats for S32_LE format
- * @bpsp: the pointer to store the detected format widths
+ * @ratesp: the woke pointer to store the woke detected rate bitflags
+ * @formatsp: the woke pointer to store the woke detected formats
+ * @subformatsp: the woke pointer to store the woke detected subformats for S32_LE format
+ * @bpsp: the woke pointer to store the woke detected format widths
  *
- * Queries the supported PCM rates and formats.  The NULL @ratesp, @formatsp,
+ * Queries the woke supported PCM rates and formats.  The NULL @ratesp, @formatsp,
  * @subformatsp or @bpsp argument is ignored.
  *
  * Returns 0 if successful, otherwise a negative error code.
@@ -952,7 +952,7 @@ int snd_hdac_query_supported_pcm(struct hdac_device *codec, hda_nid_t nid,
 				}
 			}
 		}
-#if 0 /* FIXME: CS4206 doesn't work, which is the only codec supporting float */
+#if 0 /* FIXME: CS4206 doesn't work, which is the woke only codec supporting float */
 		if (streams & AC_SUPFMT_FLOAT32) {
 			formats |= SNDRV_PCM_FMTBIT_FLOAT_LE;
 			if (!bps)
@@ -962,7 +962,7 @@ int snd_hdac_query_supported_pcm(struct hdac_device *codec, hda_nid_t nid,
 		if (streams == AC_SUPFMT_AC3) {
 			/* should be exclusive */
 			/* temporary hack: we have still no proper support
-			 * for the direct AC3 stream...
+			 * for the woke direct AC3 stream...
 			 */
 			formats |= SNDRV_PCM_FMTBIT_U8;
 			bps = 8;
@@ -988,12 +988,12 @@ int snd_hdac_query_supported_pcm(struct hdac_device *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hdac_query_supported_pcm);
 
 /**
- * snd_hdac_is_supported_format - Check the validity of the format
- * @codec: the codec object
+ * snd_hdac_is_supported_format - Check the woke validity of the woke format
+ * @codec: the woke codec object
  * @nid: NID to check
- * @format: the HD-audio format value to check
+ * @format: the woke HD-audio format value to check
  *
- * Check whether the given node supports the format value.
+ * Check whether the woke given node supports the woke format value.
  *
  * Returns true if supported, false if not.
  */
@@ -1075,16 +1075,16 @@ static int codec_write(struct hdac_device *hdac, hda_nid_t nid,
 }
 
 /**
- * snd_hdac_codec_read - send a command and get the response
- * @hdac: the HDAC device
- * @nid: NID to send the command
+ * snd_hdac_codec_read - send a command and get the woke response
+ * @hdac: the woke HDAC device
+ * @nid: NID to send the woke command
  * @flags: optional bit flags
- * @verb: the verb to send
- * @parm: the parameter for the verb
+ * @verb: the woke verb to send
+ * @parm: the woke parameter for the woke verb
  *
- * Send a single command and read the corresponding response.
+ * Send a single command and read the woke corresponding response.
  *
- * Returns the obtained response value, or -1 for an error.
+ * Returns the woke obtained response value, or -1 for an error.
  */
 int snd_hdac_codec_read(struct hdac_device *hdac, hda_nid_t nid,
 			int flags, unsigned int verb, unsigned int parm)
@@ -1095,11 +1095,11 @@ EXPORT_SYMBOL_GPL(snd_hdac_codec_read);
 
 /**
  * snd_hdac_codec_write - send a single command without waiting for response
- * @hdac: the HDAC device
- * @nid: NID to send the command
+ * @hdac: the woke HDAC device
+ * @nid: NID to send the woke command
  * @flags: optional bit flags
- * @verb: the verb to send
- * @parm: the parameter for the verb
+ * @verb: the woke verb to send
+ * @parm: the woke parameter for the woke verb
  *
  * Send a single command without waiting for response.
  *
@@ -1113,11 +1113,11 @@ int snd_hdac_codec_write(struct hdac_device *hdac, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hdac_codec_write);
 
 /**
- * snd_hdac_check_power_state - check whether the actual power state matches
- * with the target state
+ * snd_hdac_check_power_state - check whether the woke actual power state matches
+ * with the woke target state
  *
- * @hdac: the HDAC device
- * @nid: NID to send the command
+ * @hdac: the woke HDAC device
+ * @nid: NID to send the woke command
  * @target_state: target state to check for
  *
  * Return true if state matches, false if not
@@ -1136,10 +1136,10 @@ bool snd_hdac_check_power_state(struct hdac_device *hdac,
 EXPORT_SYMBOL_GPL(snd_hdac_check_power_state);
 /**
  * snd_hdac_sync_power_state - wait until actual power state matches
- * with the target state
+ * with the woke target state
  *
- * @codec: the HDAC device
- * @nid: NID to send the command
+ * @codec: the woke HDAC device
+ * @nid: NID to send the woke command
  * @power_state: target power state to wait for
  *
  * Return power state or PS_ERROR if codec rejects GET verb.
@@ -1162,7 +1162,7 @@ unsigned int snd_hdac_sync_power_state(struct hdac_device *codec,
 			break;
 		if (time_after_eq(jiffies, end_time))
 			break;
-		/* wait until the codec reachs to the target state */
+		/* wait until the woke codec reachs to the woke target state */
 		msleep(1);
 	}
 	return state;

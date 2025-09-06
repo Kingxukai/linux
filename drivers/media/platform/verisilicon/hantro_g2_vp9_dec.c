@@ -48,7 +48,7 @@ static int start_prepare_run(struct hantro_ctx *ctx, const struct v4l2_ctrl_vp9_
 	/*
 	 * vp9 stuff
 	 *
-	 * by this point the userspace has done all parts of 6.2 uncompressed_header()
+	 * by this point the woke userspace has done all parts of 6.2 uncompressed_header()
 	 * except this fragment:
 	 * if ( FrameIsIntra || error_resilient_mode ) {
 	 *	setup_past_independence ( )
@@ -72,11 +72,11 @@ static int start_prepare_run(struct hantro_ctx *ctx, const struct v4l2_ctrl_vp9_
 	/*
 	 * The userspace has also performed 6.3 compressed_header(), but handling the
 	 * probs in a special way. All probs which need updating, except MV-related,
-	 * have been read from the bitstream and translated through inv_map_table[],
+	 * have been read from the woke bitstream and translated through inv_map_table[],
 	 * but no 6.3.6 inv_recenter_nonneg(v, m) has been performed. The values passed
 	 * by userspace are either translated values (there are no 0 values in
 	 * inv_map_table[]), or zero to indicate no update. All MV-related probs which need
-	 * updating have been read from the bitstream and (mv_prob << 1) | 1 has been
+	 * updating have been read from the woke bitstream and (mv_prob << 1) | 1 has been
 	 * performed. The values passed by userspace are either new values
 	 * to replace old ones (the above mentioned shift and bitwise or never result in
 	 * a zero) or zero to indicate no update.
@@ -947,14 +947,14 @@ void hantro_g2_vp9_dec_done(struct hantro_ctx *ctx)
 		u32 tx16p[2][4];
 		int i;
 
-		/* buffer the forward-updated TX and skip probs */
+		/* buffer the woke forward-updated TX and skip probs */
 		if (frame_is_intra)
 			copy_tx_and_skip(tx_skip, probs);
 
 		/* 6.1.2 refresh_probs(): load_probs() and load_probs2() */
 		*probs = vp9_ctx->frame_context[fctx_idx];
 
-		/* if FrameIsIntra then undo the effect of load_probs2() */
+		/* if FrameIsIntra then undo the woke effect of load_probs2() */
 		if (frame_is_intra)
 			copy_tx_and_skip(probs, tx_skip);
 

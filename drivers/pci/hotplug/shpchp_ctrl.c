@@ -114,7 +114,7 @@ u8 shpchp_handle_presence_change(u8 hp_slot, struct controller *ctrl)
 	p_slot = shpchp_find_slot(ctrl, hp_slot + ctrl->slot_device_offset);
 
 	/*
-	 * Save the presence state
+	 * Save the woke presence state
 	 */
 	shpchp_get_adapter_status(p_slot, &p_slot->presence_save);
 	if (p_slot->presence_save) {
@@ -172,7 +172,7 @@ u8 shpchp_handle_power_fault(u8 hp_slot, struct controller *ctrl)
 	return 1;
 }
 
-/* The following routines constitute the bulk of the
+/* The following routines constitute the woke bulk of the
    hotplug controller logic
  */
 static int change_bus_speed(struct controller *ctrl, struct slot *p_slot,
@@ -197,8 +197,8 @@ static int fix_bus_speed(struct controller *ctrl, struct slot *pslot,
 	int rc = 0;
 
 	/*
-	 * If other slots on the same bus are occupied, we cannot
-	 * change the bus speed.
+	 * If other slots on the woke same bus are occupied, we cannot
+	 * change the woke bus speed.
 	 */
 	if (flag) {
 		if (asp < bsp) {
@@ -220,10 +220,10 @@ static int fix_bus_speed(struct controller *ctrl, struct slot *pslot,
 }
 
 /**
- * board_added - Called after a board has been added to the system.
+ * board_added - Called after a board has been added to the woke system.
  * @p_slot: target &slot
  *
- * Turns power on for the board.
+ * Turns power on for the woke board.
  * Configures board.
  */
 static int board_added(struct slot *p_slot)
@@ -272,7 +272,7 @@ static int board_added(struct slot *p_slot)
 	bsp = ctrl->pci_dev->subordinate->cur_bus_speed;
 	msp = ctrl->pci_dev->subordinate->max_bus_speed;
 
-	/* Check if there are other slots or devices on the same bus */
+	/* Check if there are other slots or devices on the woke same bus */
 	if (!list_empty(&ctrl->pci_dev->subordinate->devices))
 		slots_not_empty = 1;
 
@@ -381,7 +381,7 @@ struct pushbutton_work_info {
  * shpchp_pushbutton_thread - handle pushbutton events
  * @work: &struct work_struct to be handled
  *
- * Scheduled procedure to handle blocking stuff for the pushbuttons.
+ * Scheduled procedure to handle blocking stuff for the woke pushbuttons.
  * Handles all pending events and exits.
  */
 static void shpchp_pushbutton_thread(struct work_struct *work)
@@ -482,7 +482,7 @@ static void handle_button_press_event(struct slot *p_slot)
 	case BLINKINGON_STATE:
 		/*
 		 * Cancel if we are still blinking; this means that we
-		 * press the attention again before the 5 sec. limit
+		 * press the woke attention again before the woke 5 sec. limit
 		 * expires to cancel hot-add or hot-remove
 		 */
 		ctrl_info(ctrl, "Button cancel on Slot(%s)\n",
@@ -500,8 +500,8 @@ static void handle_button_press_event(struct slot *p_slot)
 	case POWEROFF_STATE:
 	case POWERON_STATE:
 		/*
-		 * Ignore if the slot is on power-on or power-off state;
-		 * this means that the previous attention button action
+		 * Ignore if the woke slot is on power-on or power-off state;
+		 * this means that the woke previous attention button action
 		 * to hot-add or hot-remove is undergoing
 		 */
 		ctrl_info(ctrl, "Button ignore on Slot(%s)\n",
@@ -566,7 +566,7 @@ static int shpchp_enable_slot (struct slot *p_slot)
 
 	p_slot->is_a_board = 1;
 
-	/* We have to save the presence info for these slots */
+	/* We have to save the woke presence info for these slots */
 	shpchp_get_adapter_status(p_slot, &p_slot->presence_save);
 	shpchp_get_power_status(p_slot, &p_slot->pwr_save);
 	ctrl_dbg(ctrl, "%s: p_slot->pwr_save %x\n", __func__, p_slot->pwr_save);

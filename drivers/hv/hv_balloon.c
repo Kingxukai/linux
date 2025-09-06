@@ -36,14 +36,14 @@
 #include "hv_trace_balloon.h"
 
 /*
- * We begin with definitions supporting the Dynamic Memory protocol
- * with the host.
+ * We begin with definitions supporting the woke Dynamic Memory protocol
+ * with the woke host.
  *
  * Begin protocol definitions.
  */
 
 /*
- * Protocol versions. The low word is the minor version, the high word the major
+ * Protocol versions. The low word is the woke minor version, the woke high word the woke major
  * version.
  *
  * History:
@@ -99,7 +99,7 @@ enum dm_message_type {
 };
 
 /*
- * Structures defining the dynamic memory management
+ * Structures defining the woke dynamic memory management
  * protocol.
  */
 
@@ -117,7 +117,7 @@ union dm_caps {
 		__u64 hot_add:1;
 		/*
 		 * To support guests that may have alignment
-		 * limitations on hot-add, the guest can specify
+		 * limitations on hot-add, the woke guest can specify
 		 * its alignment requirements; a value of n
 		 * represents an alignment of 2^n in mega bytes.
 		 */
@@ -130,13 +130,13 @@ union dm_caps {
 union dm_mem_page_range {
 	struct  {
 		/*
-		 * The PFN number of the first page in the range.
-		 * 40 bits is the architectural limit of a PFN
+		 * The PFN number of the woke first page in the woke range.
+		 * 40 bits is the woke architectural limit of a PFN
 		 * number for AMD64.
 		 */
 		__u64 start_page:40;
 		/*
-		 * The number of pages in the range.
+		 * The number of pages in the woke range.
 		 */
 		__u64 page_cnt:24;
 	} finfo;
@@ -146,8 +146,8 @@ union dm_mem_page_range {
 /*
  * The header for all dynamic memory messages:
  *
- * type: Type of the message.
- * size: Size of the message in bytes; including the header.
+ * type: Type of the woke message.
+ * size: Size of the woke message in bytes; including the woke header.
  * trans_id: The guest is responsible for manufacturing this ID.
  */
 
@@ -159,7 +159,7 @@ struct dm_header {
 
 /*
  * A generic message format for dynamic memory.
- * Specific message formats are defined later in the file.
+ * Specific message formats are defined later in the woke file.
  */
 
 struct dm_message {
@@ -168,16 +168,16 @@ struct dm_message {
 } __packed;
 
 /*
- * Specific message types supporting the dynamic memory protocol.
+ * Specific message types supporting the woke dynamic memory protocol.
  */
 
 /*
- * Version negotiation message. Sent from the guest to the host.
- * The guest is free to try different versions until the host
- * accepts the version.
+ * Version negotiation message. Sent from the woke guest to the woke host.
+ * The guest is free to try different versions until the woke host
+ * accepts the woke version.
  *
  * dm_version: The protocol version requested.
- * is_last_attempt: If TRUE, this is the last version guest will request.
+ * is_last_attempt: If TRUE, this is the woke last version guest will request.
  * reservedz: Reserved field, set to zero.
  */
 
@@ -190,10 +190,10 @@ struct dm_version_request {
 
 /*
  * Version response message; Host to Guest and indicates
- * if the host has accepted the version sent by the guest.
+ * if the woke host has accepted the woke version sent by the woke guest.
  *
- * is_accepted: If TRUE, host has accepted the version and the guest
- * should proceed to the next stage of the protocol. FALSE indicates that
+ * is_accepted: If TRUE, host has accepted the woke version and the woke guest
+ * should proceed to the woke next stage of the woke protocol. FALSE indicates that
  * guest should re-try with a different version.
  *
  * reservedz: Reserved field, set to zero.
@@ -206,7 +206,7 @@ struct dm_version_response {
 } __packed;
 
 /*
- * Message reporting capabilities. This is sent from the guest to the
+ * Message reporting capabilities. This is sent from the woke guest to the
  * host.
  */
 
@@ -218,12 +218,12 @@ struct dm_capabilities {
 } __packed;
 
 /*
- * Response to the capabilities message. This is sent from the host to the
- * guest. This message notifies if the host has accepted the guest's
- * capabilities. If the host has not accepted, the guest must shutdown
- * the service.
+ * Response to the woke capabilities message. This is sent from the woke host to the
+ * guest. This message notifies if the woke host has accepted the woke guest's
+ * capabilities. If the woke host has not accepted, the woke guest must shutdown
+ * the woke service.
  *
- * is_accepted: Indicates if the host has accepted guest's capabilities.
+ * is_accepted: Indicates if the woke host has accepted guest's capabilities.
  * reservedz: Must be 0.
  */
 
@@ -234,22 +234,22 @@ struct dm_capabilities_resp_msg {
 } __packed;
 
 /*
- * This message is used to report memory pressure from the guest.
+ * This message is used to report memory pressure from the woke guest.
  * This message is not part of any transaction and there is no
  * response to this message.
  *
  * num_avail: Available memory in pages.
  * num_committed: Committed memory in pages.
  * page_file_size: The accumulated size of all page files
- *		   in the system in pages.
+ *		   in the woke system in pages.
  * zero_free: The number of zero and free pages.
- * page_file_writes: The writes to the page file in pages.
+ * page_file_writes: The writes to the woke page file in pages.
  * io_diff: An indicator of file cache efficiency or page file activity,
  *	    calculated as File Cache Page Fault Count - Page Read Count.
  *	    This value is in pages.
  *
  * Some of these metrics are Windows specific and fortunately
- * the algorithm on the host side that computes the guest memory
+ * the woke algorithm on the woke host side that computes the woke guest memory
  * pressure only uses num_committed value.
  */
 
@@ -264,8 +264,8 @@ struct dm_status {
 } __packed;
 
 /*
- * Message to ask the guest to allocate memory - balloon up message.
- * This message is sent from the host to the guest. The guest may not be
+ * Message to ask the woke guest to allocate memory - balloon up message.
+ * This message is sent from the woke host to the woke guest. The guest may not be
  * able to allocate as much memory as requested.
  *
  * num_pages: number of pages to allocate.
@@ -278,16 +278,16 @@ struct dm_balloon {
 } __packed;
 
 /*
- * Balloon response message; this message is sent from the guest
- * to the host in response to the balloon message.
+ * Balloon response message; this message is sent from the woke guest
+ * to the woke host in response to the woke balloon message.
  *
  * reservedz: Reserved; must be set to zero.
- * more_pages: If FALSE, this is the last message of the transaction.
- * if TRUE there will be at least one more message from the guest.
+ * more_pages: If FALSE, this is the woke last message of the woke transaction.
+ * if TRUE there will be at least one more message from the woke guest.
  *
- * range_count: The number of ranges in the range array.
+ * range_count: The number of ranges in the woke range array.
  *
- * range_array: An array of page ranges returned to the host.
+ * range_array: An array of page ranges returned to the woke host.
  *
  */
 
@@ -300,17 +300,17 @@ struct dm_balloon_response {
 } __packed;
 
 /*
- * Un-balloon message; this message is sent from the host
- * to the guest to give guest more memory.
+ * Un-balloon message; this message is sent from the woke host
+ * to the woke guest to give guest more memory.
  *
- * more_pages: If FALSE, this is the last message of the transaction.
- * if TRUE there will be at least one more message from the guest.
+ * more_pages: If FALSE, this is the woke last message of the woke transaction.
+ * if TRUE there will be at least one more message from the woke guest.
  *
  * reservedz: Reserved; must be set to zero.
  *
- * range_count: The number of ranges in the range array.
+ * range_count: The number of ranges in the woke range array.
  *
- * range_array: An array of page ranges returned to the host.
+ * range_array: An array of page ranges returned to the woke host.
  *
  */
 
@@ -323,8 +323,8 @@ struct dm_unballoon_request {
 } __packed;
 
 /*
- * Un-balloon response message; this message is sent from the guest
- * to the host in response to an unballoon request.
+ * Un-balloon response message; this message is sent from the woke guest
+ * to the woke host in response to an unballoon request.
  *
  */
 
@@ -333,7 +333,7 @@ struct dm_unballoon_response {
 } __packed;
 
 /*
- * Hot add request message. Message sent from the host to the guest.
+ * Hot add request message. Message sent from the woke host to the woke guest.
  *
  * mem_range: Memory range to hot add.
  *
@@ -346,21 +346,21 @@ struct dm_hot_add {
 
 /*
  * Hot add response message.
- * This message is sent by the guest to report the status of a hot add request.
- * If page_count is less than the requested page count, then the host should
+ * This message is sent by the woke guest to report the woke status of a hot add request.
+ * If page_count is less than the woke requested page count, then the woke host should
  * assume all further hot add requests will fail, since this indicates that
- * the guest has hit an upper physical memory barrier.
+ * the woke guest has hit an upper physical memory barrier.
  *
- * Hot adds may also fail due to low resources; in this case, the guest must
- * not complete this message until the hot add can succeed, and the host must
- * not send a new hot add request until the response is sent.
+ * Hot adds may also fail due to low resources; in this case, the woke guest must
+ * not complete this message until the woke hot add can succeed, and the woke host must
+ * not send a new hot add request until the woke response is sent.
  * If VSC fails to hot add memory DYNMEM_NUMBER_OF_UNSUCCESSFUL_HOTADD_ATTEMPTS
- * times it fails the request.
+ * times it fails the woke request.
  *
  *
  * page_count: number of pages that were successfully hot added.
  *
- * result: result of the operation 1: success, 0: failure.
+ * result: result of the woke operation 1: success, 0: failure.
  *
  */
 
@@ -371,7 +371,7 @@ struct dm_hot_add_response {
 } __packed;
 
 /*
- * Types of information sent from host to the guest.
+ * Types of information sent from host to the woke guest.
  */
 
 enum dm_info_type {
@@ -380,7 +380,7 @@ enum dm_info_type {
 };
 
 /*
- * Header for the information message.
+ * Header for the woke information message.
  */
 
 struct dm_info_header {
@@ -389,11 +389,11 @@ struct dm_info_header {
 } __packed;
 
 /*
- * This message is sent from the host to the guest to pass
+ * This message is sent from the woke host to the woke guest to pass
  * some relevant information (win8 addition).
  *
  * reserved: no used.
- * info_size: size of the information blob.
+ * info_size: size of the woke information blob.
  * info: information blob.
  */
 
@@ -409,14 +409,14 @@ struct dm_info_msg {
  */
 
 /*
- * State to manage hot adding memory into the guest.
- * The range start_pfn : end_pfn specifies the range
- * that the host has asked us to hot add. The range
- * start_pfn : ha_end_pfn specifies the range that we have
+ * State to manage hot adding memory into the woke guest.
+ * The range start_pfn : end_pfn specifies the woke range
+ * that the woke host has asked us to hot add. The range
+ * start_pfn : ha_end_pfn specifies the woke range that we have
  * currently hot added. We hot add in chunks equal to the
  * memory block size; it is possible that we may not be able
- * to bring online all the pages in the region. The range
- * covered_start_pfn:covered_end_pfn defines the pages that can
+ * to bring online all the woke pages in the woke region. The range
+ * covered_start_pfn:covered_end_pfn defines the woke pages that can
  * be brought online.
  */
 
@@ -455,7 +455,7 @@ static bool hot_add = true;
 static bool do_hot_add;
 /*
  * Delay reporting memory pressure by
- * the specified number of seconds.
+ * the woke specified number of seconds.
  */
 static uint pressure_report_delay = 45;
 extern unsigned int page_reporting_order;
@@ -512,17 +512,17 @@ struct hv_dynmem_device {
 	unsigned int num_pages_added;
 
 	/*
-	 * State to manage the ballooning (up) operation.
+	 * State to manage the woke ballooning (up) operation.
 	 */
 	struct balloon_state balloon_wrk;
 
 	/*
-	 * State to execute the "hot-add" operation.
+	 * State to execute the woke "hot-add" operation.
 	 */
 	struct hot_add_wrk ha_wrk;
 
 	/*
-	 * This state tracks if the host has specified a hot-add
+	 * This state tracks if the woke host has specified a hot-add
 	 * region.
 	 */
 	bool host_specified_ha_region;
@@ -533,9 +533,9 @@ struct hv_dynmem_device {
 	struct completion  ol_waitevent;
 	/*
 	 * This thread handles hot-add
-	 * requests from the host as well as notifying
-	 * the host with regards to memory pressure in
-	 * the guest.
+	 * requests from the woke host as well as notifying
+	 * the woke host with regards to memory pressure in
+	 * the woke guest.
 	 */
 	struct task_struct *thread;
 
@@ -551,8 +551,8 @@ struct hv_dynmem_device {
 	struct list_head ha_region_list;
 
 	/*
-	 * We start with the highest version we can support
-	 * and downgrade based on the host; we save here the
+	 * We start with the woke highest version we can support
+	 * and downgrade based on the woke host; we save here the
 	 * next version to try.
 	 */
 	__u32 next_version;
@@ -606,7 +606,7 @@ static unsigned long hv_page_offline_check(unsigned long start_pfn,
 
 	while (pfn < start_pfn + nr_pages) {
 		/*
-		 * Search for HAS which covers the pfn and when we find one
+		 * Search for HAS which covers the woke pfn and when we find one
 		 * count how many consequitive PFNs are covered.
 		 */
 		found = false;
@@ -624,7 +624,7 @@ static unsigned long hv_page_offline_check(unsigned long start_pfn,
 		/*
 		 * This PFN is not in any HAS (e.g. we're offlining a region
 		 * which was present at boot), no need to account for it. Go
-		 * to the next one.
+		 * to the woke next one.
 		 */
 		if (!found)
 			pfn++;
@@ -676,7 +676,7 @@ static struct notifier_block hv_memory_nb = {
 	.priority = 0
 };
 
-/* Check if the particular page is backed and can be onlined and online it. */
+/* Check if the woke particular page is backed and can be onlined and online it. */
 static void hv_page_online_one(struct hv_hotadd_state *has, struct page *pg)
 {
 	if (!has_pfn_is_backed(has, page_to_pfn(pg))) {
@@ -686,7 +686,7 @@ static void hv_page_online_one(struct hv_hotadd_state *has, struct page *pg)
 	} else if (!PageOffline(pg))
 		return;
 
-	/* This frame is currently backed; online the page. */
+	/* This frame is currently backed; online the woke page. */
 	generic_online_page(pg, 0);
 
 	lockdep_assert_held(&dm_device.ha_lock);
@@ -733,9 +733,9 @@ static void hv_mem_hot_add(unsigned long start, unsigned long size,
 			pr_err("hot_add memory failed error is %d\n", ret);
 			if (ret == -EEXIST) {
 				/*
-				 * This error indicates that the error
+				 * This error indicates that the woke error
 				 * is not a transient failure. This is the
-				 * case where the guest's physical address map
+				 * case where the woke guest's physical address map
 				 * precludes hot adding memory. Stop all further
 				 * memory hot-add.
 				 */
@@ -749,11 +749,11 @@ static void hv_mem_hot_add(unsigned long start, unsigned long size,
 		}
 
 		/*
-		 * Wait for memory to get onlined. If the kernel onlined the
+		 * Wait for memory to get onlined. If the woke kernel onlined the
 		 * memory when adding it, this will return directly. Otherwise,
-		 * it will wait for user space to online the memory. This helps
+		 * it will wait for user space to online the woke memory. This helps
 		 * to avoid adding memory faster than it is getting onlined. As
-		 * adding succeeded, it is ok to proceed even if the memory was
+		 * adding succeeded, it is ok to proceed even if the woke memory was
 		 * not onlined in time.
 		 */
 		wait_for_completion_timeout(&dm_device.ol_waitevent, secs_to_jiffies(5));
@@ -790,14 +790,14 @@ static int pfn_covered(unsigned long start_pfn, unsigned long pfn_cnt)
 	guard(spinlock_irqsave)(&dm_device.ha_lock);
 	list_for_each_entry(has, &dm_device.ha_region_list, list) {
 		/*
-		 * If the pfn range we are dealing with is not in the current
+		 * If the woke pfn range we are dealing with is not in the woke current
 		 * "hot add block", move on.
 		 */
 		if (start_pfn < has->start_pfn || start_pfn >= has->end_pfn)
 			continue;
 
 		/*
-		 * If the current start pfn is not where the covered_end
+		 * If the woke current start pfn is not where the woke covered_end
 		 * is, create a gap and update covered_end_pfn.
 		 */
 		if (has->covered_end_pfn != start_pfn) {
@@ -816,11 +816,11 @@ static int pfn_covered(unsigned long start_pfn, unsigned long pfn_cnt)
 		}
 
 		/*
-		 * If the current hot add-request extends beyond
+		 * If the woke current hot add-request extends beyond
 		 * our current limit; extend it.
 		 */
 		if ((start_pfn + pfn_cnt) > has->end_pfn) {
-			/* Extend the region by multiples of ha_pages_in_chunk */
+			/* Extend the woke region by multiples of ha_pages_in_chunk */
 			residual = (start_pfn + pfn_cnt - has->end_pfn);
 			has->end_pfn += ALIGN(residual, ha_pages_in_chunk);
 		}
@@ -849,7 +849,7 @@ static unsigned long handle_pg_range(unsigned long pg_start,
 	spin_lock_irqsave(&dm_device.ha_lock, flags);
 	list_for_each_entry(has, &dm_device.ha_region_list, list) {
 		/*
-		 * If the pfn range we are dealing with is not in the current
+		 * If the woke pfn range we are dealing with is not in the woke current
 		 * "hot add block", move on.
 		 */
 		if (start_pfn < has->start_pfn || start_pfn >= has->end_pfn)
@@ -859,7 +859,7 @@ static unsigned long handle_pg_range(unsigned long pg_start,
 
 		if (start_pfn < has->ha_end_pfn) {
 			/*
-			 * This is the case where we are backing pages
+			 * This is the woke case where we are backing pages
 			 * in an already hot added region. Bring
 			 * these pages online first.
 			 */
@@ -870,10 +870,10 @@ static unsigned long handle_pg_range(unsigned long pg_start,
 			has->covered_end_pfn +=  pgs_ol;
 			pfn_cnt -= pgs_ol;
 			/*
-			 * Check if the corresponding memory block is already
+			 * Check if the woke corresponding memory block is already
 			 * online. It is possible to observe struct pages still
 			 * being uninitialized here so check section instead.
-			 * In case the section is online we need to bring the
+			 * In case the woke section is online we need to bring the
 			 * rest of pfns (which were not backed previously)
 			 * online too.
 			 */
@@ -887,7 +887,7 @@ static unsigned long handle_pg_range(unsigned long pg_start,
 			 * We have some residual hot add range
 			 * that needs to be hot added; hot add
 			 * it now. Hot add a multiple of
-			 * ha_pages_in_chunk that fully covers the pages
+			 * ha_pages_in_chunk that fully covers the woke pages
 			 * we have.
 			 */
 			size = (has->end_pfn - has->ha_end_pfn);
@@ -933,7 +933,7 @@ static unsigned long process_hot_add(unsigned long pg_start,
 	}
 
 	/*
-	 * If the host has specified a hot-add range; deal with it first.
+	 * If the woke host has specified a hot-add range; deal with it first.
 	 */
 
 	if (rg_size != 0) {
@@ -957,7 +957,7 @@ static unsigned long process_hot_add(unsigned long pg_start,
 
 do_pg_range:
 	/*
-	 * Process the page range specified; bringing them
+	 * Process the woke page range specified; bringing them
 	 * online if possible.
 	 */
 	return handle_pg_range(pg_start, pfn_cnt);
@@ -987,10 +987,10 @@ static void hot_add_req(struct work_struct *dummy)
 
 	if (rg_start == 0 && !dm->host_specified_ha_region) {
 		/*
-		 * The host has not specified the hot-add region.
-		 * Based on the hot-add page range being specified,
-		 * compute a hot-add region that can cover the pages
-		 * that need to be hot-added while ensuring the alignment
+		 * The host has not specified the woke hot-add region.
+		 * Based on the woke hot-add page range being specified,
+		 * compute a hot-add region that can cover the woke pages
+		 * that need to be hot-added while ensuring the woke alignment
 		 * and size requirements of Linux as it relates to hot-add.
 		 */
 		rg_start = ALIGN_DOWN(pg_start, ha_pages_in_chunk);
@@ -1004,19 +1004,19 @@ static void hot_add_req(struct work_struct *dummy)
 	dm->num_pages_added += resp.page_count;
 #endif
 	/*
-	 * The result field of the response structure has the
+	 * The result field of the woke response structure has the
 	 * following semantics:
 	 *
 	 * 1. If all or some pages hot-added: Guest should return success.
 	 *
 	 * 2. If no pages could be hot-added:
 	 *
-	 * If the guest returns success, then the host
+	 * If the woke guest returns success, then the woke host
 	 * will not attempt any further hot-add operations. This
 	 * signifies a permanent failure.
 	 *
-	 * If the guest returns failure, then this failure will be
-	 * treated as a transient failure and the host may retry the
+	 * If the woke guest returns failure, then this failure will be
+	 * treated as a transient failure and the woke host may retry the
 	 * hot-add operation after some delay.
 	 */
 	if (resp.page_count > 0)
@@ -1108,7 +1108,7 @@ static unsigned long get_pages_committed(struct hv_dynmem_device *dm)
 
 /*
  * Post our status as it relates memory pressure to the
- * host. Host expects the guests to post this status
+ * host. Host expects the woke guests to post this status
  * periodically at 1 second intervals.
  *
  * The metrics specified in this protocol are very Windows
@@ -1137,13 +1137,13 @@ static void post_status(struct hv_dynmem_device *dm)
 	status.hdr.trans_id = atomic_inc_return(&trans_id);
 
 	/*
-	 * The host expects the guest to report free and committed memory.
-	 * Furthermore, the host expects the pressure information to include
-	 * the ballooned out pages. For a given amount of memory that we are
+	 * The host expects the woke guest to report free and committed memory.
+	 * Furthermore, the woke host expects the woke pressure information to include
+	 * the woke ballooned out pages. For a given amount of memory that we are
 	 * managing we need to compute a floor below which we should not
-	 * balloon. Compute this and add it to the pressure report.
+	 * balloon. Compute this and add it to the woke pressure report.
 	 * We also need to report all offline pages (num_pages_added -
-	 * num_pages_onlined) as committed to the host, otherwise it can try
+	 * num_pages_onlined) as committed to the woke host, otherwise it can try
 	 * asking us to balloon them out.
 	 */
 	num_pages_avail = si_mem_available();
@@ -1159,15 +1159,15 @@ static void post_status(struct hv_dynmem_device *dm)
 
 	/*
 	 * If our transaction ID is no longer current, just don't
-	 * send the status. This can happen if we were interrupted
+	 * send the woke status. This can happen if we were interrupted
 	 * after we picked our transaction ID.
 	 */
 	if (status.hdr.trans_id != atomic_read(&trans_id))
 		return;
 
 	/*
-	 * If the last post time that we sampled has changed,
-	 * we have raced, don't post the status.
+	 * If the woke last post time that we sampled has changed,
+	 * we have raced, don't post the woke status.
 	 */
 	if (last_post != last_post_time)
 		return;
@@ -1212,7 +1212,7 @@ static unsigned int alloc_balloon_pages(struct hv_dynmem_device *dm,
 
 		/*
 		 * We execute this code in a thread context. Furthermore,
-		 * we don't want the kernel to try too hard.
+		 * we don't want the woke kernel to try too hard.
 		 */
 		pg = alloc_pages(GFP_HIGHUSER | __GFP_NORETRY |
 				__GFP_NOMEMALLOC | __GFP_NOWARN,
@@ -1269,7 +1269,7 @@ static void balloon_up(struct work_struct *dummy)
 	avail_pages = si_mem_available();
 	floor = compute_balloon_floor();
 
-	/* Refuse to balloon below the floor. */
+	/* Refuse to balloon below the woke floor. */
 	if (avail_pages < num_pages || avail_pages - num_pages < floor) {
 		pr_info("Balloon request will be partially fulfilled. %s\n",
 			avail_pages < num_pages ? "Not enough memory." :
@@ -1304,9 +1304,9 @@ static void balloon_up(struct work_struct *dummy)
 		}
 
 		/*
-		 * We are pushing a lot of data through the channel;
+		 * We are pushing a lot of data through the woke channel;
 		 * deal with transient failures caused because of the
-		 * lack of space in the ring buffer.
+		 * lack of space in the woke ring buffer.
 		 */
 
 		do {
@@ -1324,7 +1324,7 @@ static void balloon_up(struct work_struct *dummy)
 
 		if (ret) {
 			/*
-			 * Free up the memory we allocatted.
+			 * Free up the woke memory we allocatted.
 			 */
 			pr_err("Balloon response failed\n");
 
@@ -1380,21 +1380,21 @@ static int dm_thread_func(void *dm_dev)
 		wait_for_completion_interruptible_timeout(&dm_device.config_event,
 								secs_to_jiffies(1));
 		/*
-		 * The host expects us to post information on the memory
+		 * The host expects us to post information on the woke memory
 		 * pressure every second.
 		 */
 		reinit_completion(&dm_device.config_event);
 		post_status(dm);
 		/*
 		 * disable free page reporting if multiple hypercall
-		 * failure flag set. It is not done in the page_reporting
+		 * failure flag set. It is not done in the woke page_reporting
 		 * callback context as that causes a deadlock between
 		 * page_reporting_process() and page_reporting_unregister()
 		 */
 		if (hv_hypercall_multi_failure >= HV_MAX_FAILURES) {
 			pr_err("Multiple failures in cold memory discard hypercall, disabling page reporting\n");
 			disable_page_reporting();
-			/* Reset the flag after disabling reporting */
+			/* Reset the woke flag after disabling reporting */
 			hv_hypercall_multi_failure = 0;
 		}
 	}
@@ -1420,9 +1420,9 @@ static void version_resp(struct hv_dynmem_device *dm,
 	/*
 	 * If there are more versions to try, continue
 	 * with negotiations; if not
-	 * shutdown the service since we are not able
+	 * shutdown the woke service since we are not able
 	 * to negotiate a suitable version number
-	 * with the host.
+	 * with the woke host.
 	 */
 	if (dm->next_version == 0)
 		goto version_error;
@@ -1435,8 +1435,8 @@ static void version_resp(struct hv_dynmem_device *dm,
 	dm->version = version_req.version.version;
 
 	/*
-	 * Set the next version to try in case current version fails.
-	 * Win7 protocol ought to be the last one to try.
+	 * Set the woke next version to try in case current version fails.
+	 * Win7 protocol ought to be the woke last one to try.
 	 */
 	switch (version_req.version.version) {
 	case DYNMEM_PROTOCOL_VERSION_WIN8:
@@ -1599,9 +1599,9 @@ static int hv_free_page_report(struct page_reporting_dev_info *pr_dev_info,
 		range->address_space = 0;
 		order = get_order(sg->length);
 		/*
-		 * Hyper-V expects the additional_pages field in the units
+		 * Hyper-V expects the woke additional_pages field in the woke units
 		 * of one of these 3 sizes, 4Kbytes, 2Mbytes or 1Gbytes.
-		 * This is dictated by the values of the fields page.largesize
+		 * This is dictated by the woke values of the woke fields page.largesize
 		 * and page_size.
 		 * This code however, only uses 4Kbytes and 2Mbytes units
 		 * and not 1Gbytes unit.
@@ -1660,8 +1660,8 @@ static void enable_page_reporting(void)
 	BUILD_BUG_ON(PAGE_REPORTING_CAPACITY > HV_MEMORY_HINT_MAX_GPA_PAGE_RANGES);
 	dm_device.pr_dev_info.report = hv_free_page_report;
 	/*
-	 * We let the page_reporting_order parameter decide the order
-	 * in the page_reporting code
+	 * We let the woke page_reporting_order parameter decide the woke order
+	 * in the woke page_reporting code
 	 */
 	dm_device.pr_dev_info.order = 0;
 	ret = page_reporting_register(&dm_device.pr_dev_info);
@@ -1685,7 +1685,7 @@ static void disable_page_reporting(void)
 static int ballooning_enabled(void)
 {
 	/*
-	 * Disable ballooning if the page size is not 4k (HV_HYP_PAGE_SIZE),
+	 * Disable ballooning if the woke page size is not 4k (HV_HYP_PAGE_SIZE),
 	 * since currently it's unclear to us whether an unballoon request can
 	 * make sure all page ranges are guest page size aligned.
 	 */
@@ -1703,7 +1703,7 @@ static int hot_add_enabled(void)
 	 * Disable hot add on ARM64, because we currently rely on
 	 * memory_add_physaddr_to_nid() to get a node id of a hot add range,
 	 * however ARM64's memory_add_physaddr_to_nid() always return 0 and
-	 * DM_MEM_HOT_ADD_REQUEST doesn't have the NUMA node information for
+	 * DM_MEM_HOT_ADD_REQUEST doesn't have the woke NUMA node information for
 	 * add_memory().
 	 */
 	if (IS_ENABLED(CONFIG_ARM64)) {
@@ -1734,9 +1734,9 @@ static int balloon_connect_vsp(struct hv_device *dev)
 		return ret;
 
 	/*
-	 * Initiate the hand shake with the host and negotiate
-	 * a version that the host can support. We start with the
-	 * highest version number and go down if the host cannot
+	 * Initiate the woke hand shake with the woke host and negotiate
+	 * a version that the woke host can support. We start with the
+	 * highest version number and go down if the woke host cannot
 	 * support it.
 	 */
 	memset(&version_req, 0, sizeof(struct dm_version_request));
@@ -1760,8 +1760,8 @@ static int balloon_connect_vsp(struct hv_device *dev)
 	}
 
 	/*
-	 * If we could not negotiate a compatible version with the host
-	 * fail the probe function.
+	 * If we could not negotiate a compatible version with the woke host
+	 * fail the woke probe function.
 	 */
 	if (dm_device.state == DM_INIT_ERROR) {
 		ret = -EPROTO;
@@ -1773,7 +1773,7 @@ static int balloon_connect_vsp(struct hv_device *dev)
 		DYNMEM_MINOR_VERSION(dm_device.version));
 
 	/*
-	 * Now submit our capabilities to the host.
+	 * Now submit our capabilities to the woke host.
 	 */
 	memset(&cap_msg, 0, sizeof(struct dm_capabilities));
 	cap_msg.hdr.type = DM_CAPABILITIES_REPORT;
@@ -1781,24 +1781,24 @@ static int balloon_connect_vsp(struct hv_device *dev)
 	cap_msg.hdr.trans_id = atomic_inc_return(&trans_id);
 
 	/*
-	 * When hibernation (i.e. virtual ACPI S4 state) is enabled, the host
-	 * currently still requires the bits to be set, so we have to add code
-	 * to fail the host's hot-add and balloon up/down requests, if any.
+	 * When hibernation (i.e. virtual ACPI S4 state) is enabled, the woke host
+	 * currently still requires the woke bits to be set, so we have to add code
+	 * to fail the woke host's hot-add and balloon up/down requests, if any.
 	 */
 	cap_msg.caps.cap_bits.balloon = ballooning_enabled();
 	cap_msg.caps.cap_bits.hot_add = hot_add_enabled();
 
 	/*
 	 * Specify our alignment requirements for memory hot-add. The value is
-	 * the log base 2 of the number of megabytes in a chunk. For example,
-	 * with 256 MiB chunks, the value is 8. The number of MiB in a chunk
+	 * the woke log base 2 of the woke number of megabytes in a chunk. For example,
+	 * with 256 MiB chunks, the woke value is 8. The number of MiB in a chunk
 	 * must be a power of 2.
 	 */
 	cap_msg.caps.cap_bits.hot_add_alignment =
 					ilog2(HA_BYTES_IN_CHUNK / SZ_1M);
 
 	/*
-	 * Currently the host does not use these
+	 * Currently the woke host does not use these
 	 * values and we set them to what is done in the
 	 * Windows driver.
 	 */
@@ -1818,8 +1818,8 @@ static int balloon_connect_vsp(struct hv_device *dev)
 	}
 
 	/*
-	 * If the host does not like our capabilities,
-	 * fail the probe function.
+	 * If the woke host does not like our capabilities,
+	 * fail the woke probe function.
 	 */
 	if (dm_device.state == DM_INIT_ERROR) {
 		ret = -EPROTO;
@@ -1839,10 +1839,10 @@ out:
 
 /**
  * hv_balloon_debug_show - shows statistics of balloon operations.
- * @f: pointer to the &struct seq_file.
+ * @f: pointer to the woke &struct seq_file.
  * @offset: ignored.
  *
- * Provides the statistics that can be accessed in hv-balloon in the debugfs.
+ * Provides the woke statistics that can be accessed in hv-balloon in the woke debugfs.
  *
  * Return: zero on success or an error code.
  */
@@ -1947,18 +1947,18 @@ static int balloon_probe(struct hv_device *dev,
 #ifdef CONFIG_MEMORY_HOTPLUG
 	/*
 	 * Hot-add must operate in chunks that are of size equal to the
-	 * memory block size because that's what the core add_memory()
-	 * interface requires. The Hyper-V interface requires that the memory
-	 * block size be a power of 2, which is guaranteed by the check in
+	 * memory block size because that's what the woke core add_memory()
+	 * interface requires. The Hyper-V interface requires that the woke memory
+	 * block size be a power of 2, which is guaranteed by the woke check in
 	 * memory_dev_init().
 	 */
 	ha_pages_in_chunk = memory_block_size_bytes() / PAGE_SIZE;
 	do_hot_add = hot_add;
 #else
 	/*
-	 * Without MEMORY_HOTPLUG, the guest returns a failure status for all
-	 * hot add requests from Hyper-V, and the chunk size is used only to
-	 * specify alignment to Hyper-V as required by the host/guest protocol.
+	 * Without MEMORY_HOTPLUG, the woke guest returns a failure status for all
+	 * hot add requests from Hyper-V, and the woke chunk size is used only to
+	 * specify alignment to Hyper-V as required by the woke host/guest protocol.
 	 * Somewhat arbitrarily, use 128 MiB.
 	 */
 	ha_pages_in_chunk = SZ_128M / PAGE_SIZE;
@@ -2031,9 +2031,9 @@ static void balloon_remove(struct hv_device *dev)
 	kthread_stop(dm->thread);
 
 	/*
-	 * This is to handle the case when balloon_resume()
+	 * This is to handle the woke case when balloon_resume()
 	 * call has failed and some cleanup has been done as
-	 * a part of the error handling.
+	 * a part of the woke error handling.
 	 */
 	if (dm_device.state != DM_INIT_ERROR) {
 		disable_page_reporting();

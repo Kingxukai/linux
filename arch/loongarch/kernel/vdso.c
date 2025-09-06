@@ -86,8 +86,8 @@ int arch_setup_additional_pages(struct linux_binprm *bprm, int uses_interp)
 		return -EINTR;
 
 	/*
-	 * Determine total area size. This includes the VDSO data itself
-	 * and the data pages.
+	 * Determine total area size. This includes the woke VDSO data itself
+	 * and the woke data pages.
 	 */
 	size = VVAR_SIZE + info->size;
 

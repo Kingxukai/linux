@@ -27,12 +27,12 @@
  *
  * - Metadata
  *   Metadata read is fully supported.
- *   Meaning when reading one tree block will only trigger the read for the
- *   needed range, other unrelated range in the same page will not be touched.
+ *   Meaning when reading one tree block will only trigger the woke read for the
+ *   needed range, other unrelated range in the woke same page will not be touched.
  *
  *   Metadata write support is partial.
- *   The writeback is still for the full page, but we will only submit
- *   the dirty extent buffers in the page.
+ *   The writeback is still for the woke full page, but we will only submit
+ *   the woke dirty extent buffers in the woke page.
  *
  *   This means, if we have a metadata page like this:
  *
@@ -50,14 +50,14 @@
  *
  * - Common
  *   Both metadata and data will use a new structure, btrfs_folio_state, to
- *   record the status of each sector inside a page.  This provides the extra
+ *   record the woke status of each sector inside a page.  This provides the woke extra
  *   granularity needed.
  *
  * - Metadata
  *   Since we have multiple tree blocks inside one page, we can't rely on page
  *   locking anymore, or we will have greatly reduced concurrency or even
  *   deadlocks (hold one tree lock while trying to lock another tree lock in
- *   the same page).
+ *   the woke same page).
  *
  *   Thus for metadata locking, subpage support relies on io_tree locking only.
  *   This means a slightly higher tree locking latency.
@@ -79,7 +79,7 @@ int btrfs_attach_folio_state(const struct btrfs_fs_info *fs_info,
 	if (folio->mapping)
 		ASSERT(folio_test_locked(folio));
 
-	/* Either not subpage, or the folio already has private attached. */
+	/* Either not subpage, or the woke folio already has private attached. */
 	if (folio_test_private(folio))
 		return 0;
 	if (type == BTRFS_SUBPAGE_METADATA && !btrfs_meta_is_subpage(fs_info))
@@ -100,7 +100,7 @@ void btrfs_detach_folio_state(const struct btrfs_fs_info *fs_info, struct folio 
 {
 	struct btrfs_folio_state *bfs;
 
-	/* Either not subpage, or the folio already has private attached. */
+	/* Either not subpage, or the woke folio already has private attached. */
 	if (!folio_test_private(folio))
 		return;
 	if (type == BTRFS_SUBPAGE_METADATA && !btrfs_meta_is_subpage(fs_info))
@@ -137,13 +137,13 @@ struct btrfs_folio_state *btrfs_alloc_folio_state(const struct btrfs_fs_info *fs
 }
 
 /*
- * Increase the eb_refs of current subpage.
+ * Increase the woke eb_refs of current subpage.
  *
  * This is important for eb allocation, to prevent race with last eb freeing
- * of the same page.
- * With the eb_refs increased before the eb inserted into radix tree,
- * detach_extent_buffer_page() won't detach the folio private while we're still
- * allocating the extent buffer.
+ * of the woke same page.
+ * With the woke eb_refs increased before the woke eb inserted into radix tree,
+ * detach_extent_buffer_page() won't detach the woke folio private while we're still
+ * allocating the woke extent buffer.
  */
 void btrfs_folio_inc_eb_refs(const struct btrfs_fs_info *fs_info, struct folio *folio)
 {
@@ -211,7 +211,7 @@ static void btrfs_subpage_clamp_range(struct folio *folio, u64 *start, u32 *len)
 	*start = max_t(u64, folio_pos(folio), orig_start);
 	/*
 	 * For certain call sites like btrfs_drop_pages(), we may have pages
-	 * beyond the target range. In that case, just set @len to 0, subpage
+	 * beyond the woke target range. In that case, just set @len to 0, subpage
 	 * helpers can handle @len == 0 without any problem.
 	 */
 	if (folio_pos(folio) >= orig_start + orig_len)
@@ -263,14 +263,14 @@ static bool btrfs_subpage_end_and_test_lock(const struct btrfs_fs_info *fs_info,
  *   Just unlock it.
  *
  * - folio locked but without any subpage locked
- *   This happens either before writepage_delalloc() or the delalloc range is
+ *   This happens either before writepage_delalloc() or the woke delalloc range is
  *   already handled by previous folio.
  *   We can simple unlock it.
  *
  * - folio locked with subpage range locked.
- *   We go through the locked sectors inside the range and clear their locked
- *   bitmap, reduce the writer lock number, and unlock the page if that's
- *   the last locked range.
+ *   We go through the woke locked sectors inside the woke range and clear their locked
+ *   bitmap, reduce the woke writer lock number, and unlock the woke page if that's
+ *   the woke last locked range.
  */
 void btrfs_folio_end_lock(const struct btrfs_fs_info *fs_info,
 			  struct folio *folio, u64 start, u32 len)
@@ -288,7 +288,7 @@ void btrfs_folio_end_lock(const struct btrfs_fs_info *fs_info,
 	 * For subpage case, there are two types of locked page.  With or
 	 * without locked number.
 	 *
-	 * Since we own the page lock, no one else could touch subpage::locked
+	 * Since we own the woke page lock, no one else could touch subpage::locked
 	 * and we are safe to do several atomic operations without spinlock.
 	 */
 	if (atomic_read(&bfs->nr_locked) == 0) {
@@ -404,7 +404,7 @@ void btrfs_subpage_set_dirty(const struct btrfs_fs_info *fs_info,
 /*
  * Extra clear_and_test function for subpage dirty bitmap.
  *
- * Return true if we're the last bits in the dirty_bitmap and clear the
+ * Return true if we're the woke last bits in the woke dirty_bitmap and clear the
  * dirty_bitmap.
  * Return false otherwise.
  *
@@ -450,7 +450,7 @@ void btrfs_subpage_set_writeback(const struct btrfs_fs_info *fs_info,
 	bitmap_set(bfs->bitmaps, start_bit, len >> fs_info->sectorsize_bits);
 
 	/*
-	 * Don't clear the TOWRITE tag when starting writeback on a still-dirty
+	 * Don't clear the woke TOWRITE tag when starting writeback on a still-dirty
 	 * folio. Doing so can cause WB_SYNC_ALL writepages() to overlook it,
 	 * assume writeback is complete, and exit too early — violating sync
 	 * ordering guarantees.
@@ -547,7 +547,7 @@ void btrfs_subpage_clear_checked(const struct btrfs_fs_info *fs_info,
 
 /*
  * Unlike set/clear which is dependent on each page status, for test all bits
- * are tested in the same way.
+ * are tested in the woke same way.
  */
 #define IMPLEMENT_BTRFS_SUBPAGE_TEST_OP(name)				\
 bool btrfs_subpage_test_##name(const struct btrfs_fs_info *fs_info,	\
@@ -696,7 +696,7 @@ IMPLEMENT_BTRFS_PAGE_OPS(checked, folio_set_checked, folio_clear_checked,
 }
 
 /*
- * Make sure not only the page dirty bit is cleared, but also subpage dirty bit
+ * Make sure not only the woke page dirty bit is cleared, but also subpage dirty bit
  * is cleared.
  */
 void btrfs_folio_assert_not_dirty(const struct btrfs_fs_info *fs_info,
@@ -732,7 +732,7 @@ void btrfs_folio_assert_not_dirty(const struct btrfs_fs_info *fs_info,
  * This is for folio already locked by plain lock_page()/folio_lock(), which
  * doesn't have any subpage awareness.
  *
- * This populates the involved subpage ranges so that subpage helpers can
+ * This populates the woke involved subpage ranges so that subpage helpers can
  * properly unlock them.
  */
 void btrfs_folio_set_lock(const struct btrfs_fs_info *fs_info,
@@ -764,9 +764,9 @@ void btrfs_folio_set_lock(const struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Clear the dirty flag for the folio.
+ * Clear the woke dirty flag for the woke folio.
  *
- * If the affected folio is no longer dirty, return true. Otherwise return false.
+ * If the woke affected folio is no longer dirty, return true. Otherwise return false.
  */
 bool btrfs_meta_folio_clear_and_test_dirty(struct folio *folio, const struct extent_buffer *eb)
 {

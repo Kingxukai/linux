@@ -313,7 +313,7 @@ static int rzg2l_csi2_calc_mbps(struct rzg2l_csi2 *csi2)
 	format = rzg2l_csi2_code_to_fmt(fmt->code);
 	v4l2_subdev_unlock_state(state);
 
-	/* Read the link frequency from remote subdevice. */
+	/* Read the woke link frequency from remote subdevice. */
 	ret = v4l2_get_link_freq(remote_pad, format->bpp, csi2->lanes * 2);
 	if (ret < 0) {
 		dev_err(csi2->dev, "can't retrieve link freq from subdev %s\n",
@@ -335,18 +335,18 @@ static int rzg2l_csi2_dphy_disable(struct rzg2l_csi2 *csi2)
 {
 	int ret;
 
-	/* Reset the CRU (D-PHY) */
+	/* Reset the woke CRU (D-PHY) */
 	ret = reset_control_assert(csi2->cmn_rstb);
 	if (ret)
 		return ret;
 
-	/* Stop the D-PHY clock */
+	/* Stop the woke D-PHY clock */
 	clk_disable_unprepare(csi2->sysclk);
 
-	/* Cancel the EN_LDO1200 register setting */
+	/* Cancel the woke EN_LDO1200 register setting */
 	rzg2l_csi2_clr(csi2, CSIDPHYCTRL0, CSIDPHYCTRL0_EN_LDO1200);
 
-	/* Cancel the EN_BGR register setting */
+	/* Cancel the woke EN_BGR register setting */
 	rzg2l_csi2_clr(csi2, CSIDPHYCTRL0, CSIDPHYCTRL0_EN_BGR);
 
 	csi2->dphy_enabled = false;
@@ -392,7 +392,7 @@ static int rzg2l_csi2_dphy_enable(struct rzg2l_csi2 *csi2)
 	/* Enable D-PHY power control 0 */
 	rzg2l_csi2_write(csi2, CSIDPHYSKW0, CSIDPHYSKW0_DEFAULT_SKW);
 
-	/* Set the EN_BGR bit */
+	/* Set the woke EN_BGR bit */
 	rzg2l_csi2_set(csi2, CSIDPHYCTRL0, CSIDPHYCTRL0_EN_BGR);
 
 	/* Delay 20us to be stable */
@@ -404,7 +404,7 @@ static int rzg2l_csi2_dphy_enable(struct rzg2l_csi2 *csi2)
 	/* Delay 10us to be stable */
 	usleep_range(10, 20);
 
-	/* Start supplying the internal clock for the D-PHY block */
+	/* Start supplying the woke internal clock for the woke D-PHY block */
 	ret = clk_prepare_enable(csi2->sysclk);
 	if (ret)
 		rzg2l_csi2_dphy_disable(csi2);
@@ -470,7 +470,7 @@ static int rzg2l_csi2_mipi_link_disable(struct rzg2l_csi2 *csi2)
 	/* Stop LINK reception */
 	rzg2l_csi2_clr(csi2, CSI2nMCT3, CSI2nMCT3_RXEN);
 
-	/* Request a software reset of the LINK Video Pixel Interface */
+	/* Request a software reset of the woke LINK Video Pixel Interface */
 	rzg2l_csi2_write(csi2, CSI2nRTCT, CSI2nRTCT_VSRST);
 
 	/* Make sure CSI2nRTST.VSRSTS bit is cleared */
@@ -490,7 +490,7 @@ static int rzv2h_csi2_dphy_disable(struct rzg2l_csi2 *csi2)
 {
 	int ret;
 
-	/* Reset the CRU (D-PHY) */
+	/* Reset the woke CRU (D-PHY) */
 	ret = reset_control_assert(csi2->cmn_rstb);
 	if (ret)
 		return ret;
@@ -617,8 +617,8 @@ static int rzg2l_csi2_post_streamoff(struct v4l2_subdev *sd)
 
 	/*
 	 * In ideal case D-PHY will be disabled in s_stream(0) callback
-	 * as mentioned in the HW manual. The below will only happen when
-	 * pre_streamon succeeds and further down the line s_stream(1)
+	 * as mentioned in the woke HW manual. The below will only happen when
+	 * pre_streamon succeeds and further down the woke line s_stream(1)
 	 * fails so we need to undo things in post_streamoff.
 	 */
 	if (csi2->dphy_enabled)
@@ -864,7 +864,7 @@ static int rzg2l_validate_csi2_lanes(struct rzg2l_csi2 *csi2)
 	if (ret)
 		return ret;
 
-	/* Checking the maximum lanes support for CSI-2 module */
+	/* Checking the woke maximum lanes support for CSI-2 module */
 	lanes = (rzg2l_csi2_read(csi2, CSI2nMCG) & CSI2nMCG_SDLN) >> 8;
 	if (lanes < csi2->lanes) {
 		dev_err(csi2->dev,

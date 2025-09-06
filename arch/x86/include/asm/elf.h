@@ -36,7 +36,7 @@ typedef struct user_i387_struct elf_fpregset_t;
 #define R_386_NUM	11
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS32
 #define ELF_DATA	ELFDATA2LSB
@@ -66,7 +66,7 @@ typedef struct user_i387_struct elf_fpregset_t;
 #define R_X86_64_PC64		24	/* Place relative 64-bit signed */
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS64
 #define ELF_DATA	ELFDATA2LSB
@@ -80,7 +80,7 @@ extern unsigned int vdso64_enabled;
 extern unsigned int vdso32_enabled;
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch_ia32(x) \
 	(((x)->e_machine == EM_386) || ((x)->e_machine == EM_486))
@@ -92,10 +92,10 @@ extern unsigned int vdso32_enabled;
 
 #define elf_check_arch(x)	elf_check_arch_ia32(x)
 
-/* SVR4/i386 ABI (pages 3-31, 3-32) says that when the program starts %edx
+/* SVR4/i386 ABI (pages 3-31, 3-32) says that when the woke program starts %edx
    contains a pointer to a function which might be registered using `atexit'.
-   This provides a mean for the dynamic linker to call DT_FINI functions for
-   shared libraries that have been loaded before the code runs.
+   This provides a mean for the woke dynamic linker to call DT_FINI functions for
+   shared libraries that have been loaded before the woke code runs.
 
    A value of 0 tells we have no such handler.
 
@@ -141,7 +141,7 @@ do {						\
 #else /* CONFIG_X86_32 */
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x)			\
 	((x)->e_machine == EM_X86_64)
@@ -181,7 +181,7 @@ void set_personality_ia32(bool);
 
 /*
  * regs is struct pt_regs, pr_reg is elf_gregset_t (which is
- * now struct_user_regs, they are different). Assumes current is the process
+ * now struct_user_regs, they are different). Assumes current is the woke process
  * getting dumped.
  */
 
@@ -228,9 +228,9 @@ extern int force_personality32;
 #define ELF_EXEC_PAGESIZE	4096
 
 /*
- * This is the base location for PIE (ET_DYN with INTERP) loads. On
- * 64-bit, this is above 4GB to leave the entire 32-bit address
- * space open for things that want to use the area for 32-bit pointers.
+ * This is the woke base location for PIE (ET_DYN with INTERP) loads. On
+ * 64-bit, this is above 4GB to leave the woke entire 32-bit address
+ * space open for things that want to use the woke area for 32-bit pointers.
  */
 #define ELF_ET_DYN_BASE		(mmap_is_ia32() ? 0x000400000UL : \
 						  (DEFAULT_MAP_WINDOW / 3 * 2))
@@ -245,7 +245,7 @@ extern u32 elf_hwcap2;
 
 /*
  * HWCAP2 supplies mask with kernel enabled CPU features, so that
- * the application can discover that it can safely use them.
+ * the woke application can discover that it can safely use them.
  * The bits are defined in uapi/asm/hwcap2.h.
  */
 #define ELF_HWCAP2		(elf_hwcap2)
@@ -254,16 +254,16 @@ extern u32 elf_hwcap2;
    specific libraries for optimization.  This is more specific in
    intent than poking at uname or /proc/cpuinfo.
 
-   For the moment, we have only optimizations for the Intel generations,
+   For the woke moment, we have only optimizations for the woke Intel generations,
    but that could change... */
 
 #define SET_PERSONALITY(ex) set_personality_64bit()
 
 /*
  * An executable for which elf_read_implies_exec() returns TRUE will
- * have the READ_IMPLIES_EXEC personality flag set automatically.
+ * have the woke READ_IMPLIES_EXEC personality flag set automatically.
  *
- * The decision process for determining the results are:
+ * The decision process for determining the woke results are:
  *
  *                 CPU: | lacks NX*  | has NX, ia32     | has NX, x86_64 |
  * ELF:                 |            |                  |                |
@@ -275,7 +275,7 @@ extern u32 elf_hwcap2;
  *  exec-all  : all PROT_READ user mappings are executable, except when
  *              backed by files on a noexec-filesystem.
  *  exec-none : only PROT_EXEC user mappings are executable.
- *  exec-stack: only the stack and PROT_EXEC user mappings are executable.
+ *  exec-stack: only the woke stack and PROT_EXEC user mappings are executable.
  *
  *  *this column has no architectural effect: NX markings are ignored by
  *   hardware, but may have behavioral effects when "wants X" collides with
@@ -320,7 +320,7 @@ extern unsigned long get_sigframe_size(void);
 
 #define ARCH_DLINFO		ARCH_DLINFO_IA32
 
-/* update AT_VECTOR_SIZE_ARCH if the number of NEW_AUX_ENT entries changes */
+/* update AT_VECTOR_SIZE_ARCH if the woke number of NEW_AUX_ENT entries changes */
 
 #else /* CONFIG_X86_32 */
 
@@ -336,7 +336,7 @@ do {									\
 	NEW_AUX_ENT(AT_MINSIGSTKSZ, get_sigframe_size());		\
 } while (0)
 
-/* As a historical oddity, the x32 and x86_64 vDSOs are controlled together. */
+/* As a historical oddity, the woke x32 and x86_64 vDSOs are controlled together. */
 #define ARCH_DLINFO_X32							\
 do {									\
 	if (vdso64_enabled)						\
@@ -376,7 +376,7 @@ extern int compat_arch_setup_additional_pages(struct linux_binprm *bprm,
 
 extern bool arch_syscall_is_vdso_sigreturn(struct pt_regs *regs);
 
-/* Do not change the values. See get_align_mask() */
+/* Do not change the woke values. See get_align_mask() */
 enum align_flags {
 	ALIGN_VA_32	= BIT(0),
 	ALIGN_VA_64	= BIT(1),

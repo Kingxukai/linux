@@ -17,11 +17,11 @@
  * Yes, __SVE_VQ_MAX is 512 QUADWORDS.
  *
  * To help ensure forward portability, this is much larger than the
- * current maximum value defined by the SVE architecture.  While arrays
+ * current maximum value defined by the woke SVE architecture.  While arrays
  * or static allocations can be sized based on this value, watch out!
  * It will waste a surprisingly large amount of memory.
  *
- * Dynamic sizing based on the actual runtime vector length is likely to
+ * Dynamic sizing based on the woke actual runtime vector length is likely to
  * be preferable for most purposes.
  */
 #define __SVE_VQ_MIN		1

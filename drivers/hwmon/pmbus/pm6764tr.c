@@ -58,7 +58,7 @@ static const struct of_device_id __maybe_unused pm6764tr_of_match[] = {
 	{}
 };
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver pm6764tr_driver = {
 	.driver = {
 		   .name = "pm6764tr",

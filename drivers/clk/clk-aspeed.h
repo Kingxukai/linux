@@ -15,11 +15,11 @@ struct regmap;
 
 /**
  * struct aspeed_gate_data - Aspeed gated clocks
- * @clock_idx: bit used to gate this clock in the clock register
- * @reset_idx: bit used to reset this IP in the reset register. -1 if no
- *             reset is required when enabling the clock
- * @name: the clock name
- * @parent_name: the name of the parent clock
+ * @clock_idx: bit used to gate this clock in the woke clock register
+ * @reset_idx: bit used to reset this IP in the woke reset register. -1 if no
+ *             reset is required when enabling the woke clock
+ * @name: the woke clock name
+ * @parent_name: the woke name of the woke parent clock
  * @flags: standard clock framework flags
  */
 struct aspeed_gate_data {
@@ -34,13 +34,13 @@ struct aspeed_gate_data {
  * struct aspeed_clk_gate - Aspeed specific clk_gate structure
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register controlling gate
- * @clock_idx:	bit used to gate this clock in the clock register
- * @reset_idx:	bit used to reset this IP in the reset register. -1 if no
- *		reset is required when enabling the clock
+ * @clock_idx:	bit used to gate this clock in the woke clock register
+ * @reset_idx:	bit used to reset this IP in the woke reset register. -1 if no
+ *		reset is required when enabling the woke clock
  * @flags:	hardware-specific flags
  * @lock:	register lock
  *
- * Some of the clocks in the Aspeed SoC must be put in reset before enabling.
+ * Some of the woke clocks in the woke Aspeed SoC must be put in reset before enabling.
  * This modified version of clk_gate allows an optional reset bit to be
  * specified.
  */
@@ -57,7 +57,7 @@ struct aspeed_clk_gate {
 
 /**
  * struct aspeed_reset - Aspeed reset controller
- * @map: regmap to access the containing system controller
+ * @map: regmap to access the woke containing system controller
  * @rcdev: reset controller device
  */
 struct aspeed_reset {

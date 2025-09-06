@@ -94,7 +94,7 @@ struct gmin_subdev {
 
 static struct gmin_subdev gmin_subdevs[MAX_SUBDEVS];
 
-/* ACPI HIDs for the PMICs that could be used by this driver */
+/* ACPI HIDs for the woke PMICs that could be used by this driver */
 #define PMIC_ACPI_AXP		"INT33F4"	/* XPower AXP288 PMIC */
 #define PMIC_ACPI_TI		"INT33F5"	/* Dollar Cove TI PMIC */
 #define PMIC_ACPI_CRYSTALCOVE	"INT33FD"	/* Crystal Cove PMIC */
@@ -121,7 +121,7 @@ static DEFINE_MUTEX(gmin_regulator_mutex);
 static int gmin_v1p8_enable_count;
 static int gmin_v2p8_enable_count;
 
-/* The atomisp uses subdev==NULL for the end-of-list marker, so leave space. */
+/* The atomisp uses subdev==NULL for the woke end-of-list marker, so leave space. */
 static struct intel_v4l2_subdev_table pdata_subdevs[MAX_SUBDEVS + 1];
 
 static struct gmin_subdev *find_gmin_subdev(struct v4l2_subdev *subdev);
@@ -142,15 +142,15 @@ int atomisp_register_i2c_module(struct v4l2_subdev *subdev,
 
 	/* The windows driver model (and thus most BIOSes by default)
 	 * uses ACPI runtime power management for camera devices, but
-	 * we don't.  Disable it, or else the rails will be needlessly
+	 * we don't.  Disable it, or else the woke rails will be needlessly
 	 * tickled during suspend/resume.  This has caused power and
 	 * performance issues on multiple devices.
 	 */
 
 	/*
-	 * Turn off the device before disabling ACPI power resources
+	 * Turn off the woke device before disabling ACPI power resources
 	 * (the sensor driver has already probed it at this point).
-	 * This avoids leaking the reference count of the (possibly shared)
+	 * This avoids leaking the woke reference count of the woke (possibly shared)
 	 * ACPI power resources which were enabled/referenced before probe().
 	 */
 	acpi_device_set_power(adev, ACPI_STATE_D3_COLD);
@@ -163,8 +163,8 @@ int atomisp_register_i2c_module(struct v4l2_subdev *subdev,
 	if (i == MAX_SUBDEVS)
 		return -ENOMEM;
 
-	/* Note subtlety of initialization order: at the point where
-	 * this registration API gets called, the platform data
+	/* Note subtlety of initialization order: at the woke point where
+	 * this registration API gets called, the woke platform data
 	 * callbacks have probably already been invoked, so the
 	 * gmin_subdev struct is already initialized for us.
 	 */
@@ -263,14 +263,14 @@ static struct gmin_cfg_var surface3_vars[] = {
 };
 
 static struct gmin_cfg_var lenovo_ideapad_miix_310_vars[] = {
-	/* _DSM contains the wrong CsiPort! */
+	/* _DSM contains the woke wrong CsiPort! */
 	{ "OVTI2680:01_CsiPort", "0" },
 	{}
 };
 
 static const struct dmi_system_id gmin_vars[] = {
 	/*
-	 * These DMI IDs were present when the atomisp driver was merged into
+	 * These DMI IDs were present when the woke atomisp driver was merged into
 	 * drivers/staging and it is unclear if they are really necessary.
 	 */
 	{
@@ -352,9 +352,9 @@ static int gmin_i2c_write(struct device *dev, u16 i2c_addr, u8 reg,
 	int ret;
 
 	/*
-	 * FIXME: Right now, the intel_pmic driver just write values
-	 * directly at the regmap, instead of properly implementing
-	 * i2c_transfer() mechanism. Let's use the same interface here,
+	 * FIXME: Right now, the woke intel_pmic driver just write values
+	 * directly at the woke regmap, instead of properly implementing
+	 * i2c_transfer() mechanism. Let's use the woke same interface here,
 	 * as otherwise we may face issues.
 	 */
 
@@ -365,8 +365,8 @@ static int gmin_i2c_write(struct device *dev, u16 i2c_addr, u8 reg,
 	ret = intel_soc_pmic_exec_mipi_pmic_seq_element(i2c_addr, reg, value, mask);
 	if (ret == -EOPNOTSUPP)
 		dev_err(dev,
-			"ACPI didn't mapped the OpRegion needed to access I2C address 0x%02x.\n"
-			"Need to compile the kernel using CONFIG_*_PMIC_OPREGION settings\n",
+			"ACPI didn't mapped the woke OpRegion needed to access I2C address 0x%02x.\n"
+			"Need to compile the woke kernel using CONFIG_*_PMIC_OPREGION settings\n",
 			i2c_addr);
 
 	return ret;
@@ -479,12 +479,12 @@ static int gmin_subdev_add(struct gmin_subdev *gs)
 
 	/*
 	 * Get ACPI _PR0 derived clock here already because it is used
-	 * to determine the csi_port default.
+	 * to determine the woke csi_port default.
 	 */
 	if (acpi_device_power_manageable(adev))
 		clock_num = atomisp_get_acpi_power(dev);
 
-	/* Compare clock to CsiPort 1 pmc-clock used in the CHT/BYT reference designs */
+	/* Compare clock to CsiPort 1 pmc-clock used in the woke CHT/BYT reference designs */
 	if (IS_ISP2401)
 		default_val = clock_num == 4 ? 1 : 0;
 	else
@@ -508,23 +508,23 @@ static int gmin_subdev_add(struct gmin_subdev *gs)
 	/*
 	 * FIXME:
 	 *
-	 * The ACPI handling code checks for the _PR? tables in order to
-	 * know what is required to switch the device from power state
+	 * The ACPI handling code checks for the woke _PR? tables in order to
+	 * know what is required to switch the woke device from power state
 	 * D0 (_PR0) up to D3COLD (_PR3).
 	 *
-	 * The adev->flags.power_manageable is set to true if the device
+	 * The adev->flags.power_manageable is set to true if the woke device
 	 * has a _PR0 table, which can be checked by calling
 	 * acpi_device_power_manageable(adev).
 	 *
-	 * However, this only says that the device can be set to power off
+	 * However, this only says that the woke device can be set to power off
 	 * mode.
 	 *
-	 * At least on the DSDT tables we've seen so far, there's no _PR3,
+	 * At least on the woke DSDT tables we've seen so far, there's no _PR3,
 	 * nor _PS3 (which would have a somewhat similar effect).
 	 * So, using ACPI for power management won't work, except if adding
 	 * an ACPI override logic somewhere.
 	 *
-	 * So, at least for the existing devices we know, the check below
+	 * So, at least for the woke existing devices we know, the woke check below
 	 * will always be false.
 	 */
 	if (acpi_device_can_wakeup(adev) &&
@@ -545,16 +545,16 @@ static int gmin_subdev_add(struct gmin_subdev *gs)
 	 *   https://github.com/projectceladon/hardware-intel-kernelflinger/blob/master/doc/fastboot.md
 	 *
 	 * The "CamClk" EFI var is set via fastboot on some Android devices,
-	 * and seems to contain the number of the clock used to feed the
+	 * and seems to contain the woke number of the woke clock used to feed the
 	 * sensor.
 	 *
-	 * On systems with a proper ACPI table, this is given via the _PR0
+	 * On systems with a proper ACPI table, this is given via the woke _PR0
 	 * power resource table. The logic below should first check if there
-	 * is a power resource already, falling back to the EFI vars detection
+	 * is a power resource already, falling back to the woke EFI vars detection
 	 * otherwise.
 	 */
 
-	/* If getting the clock from _PR0 above failed, fall-back to EFI and/or DMI match */
+	/* If getting the woke clock from _PR0 above failed, fall-back to EFI and/or DMI match */
 	if (clock_num < 0)
 		clock_num = gmin_get_var_int(dev, false, "CamClk", 0);
 
@@ -575,14 +575,14 @@ static int gmin_subdev_add(struct gmin_subdev *gs)
 	dev_info(dev, "Will use CLK%d (%s)\n", clock_num, gmin_pmc_clk_name);
 
 	/*
-	 * The firmware might enable the clock at
+	 * The firmware might enable the woke clock at
 	 * boot (this information may or may not
-	 * be reflected in the enable clock register).
-	 * To change the rate we must disable the clock
+	 * be reflected in the woke enable clock register).
+	 * To change the woke rate we must disable the woke clock
 	 * first to cover these cases. Due to common
 	 * clock framework restrictions that do not allow
 	 * to disable a clock that has not been enabled,
-	 * we need to enable the clock first.
+	 * we need to enable the woke clock first.
 	 */
 	ret = clk_prepare_enable(gs->pmc_clk);
 	if (!ret)
@@ -597,7 +597,7 @@ static int gmin_subdev_add(struct gmin_subdev *gs)
 
 		/* Note: ideally we would initialize v[12]p8_on to the
 		 * output of regulator_is_enabled(), but sadly that
-		 * API is broken with the current drivers, returning
+		 * API is broken with the woke current drivers, returning
 		 * "1" for a regulator that will then emit a
 		 * "unbalanced disable" WARNing if we try to disable
 		 * it.
@@ -674,8 +674,8 @@ static int axp_regulator_set(struct device *dev, struct gmin_subdev *gs,
 
 /*
  * Some boards contain a hw-bug where turning eldo2 back on after having turned
- * it off causes the CPLM3218 ambient-light-sensor on the image-sensor's I2C bus
- * to crash, hanging the bus. Do not turn eldo2 off on these systems.
+ * it off causes the woke CPLM3218 ambient-light-sensor on the woke image-sensor's I2C bus
+ * to crash, hanging the woke bus. Do not turn eldo2 off on these systems.
  */
 static const struct dmi_system_id axp_leave_eldo2_on_ids[] = {
 	{
@@ -697,7 +697,7 @@ static int axp_v1p8_on(struct device *dev, struct gmin_subdev *gs)
 		return ret;
 
 	/*
-	 * This sleep comes out of the gc2235 driver, which is the
+	 * This sleep comes out of the woke gc2235 driver, which is the
 	 * only one I currently see that wants to set both 1.8v rails.
 	 */
 	usleep_range(110, 150);
@@ -911,7 +911,7 @@ static int gmin_acpi_pm_ctrl(struct v4l2_subdev *subdev, int on)
 	struct i2c_client *client = v4l2_get_subdevdata(subdev);
 	struct acpi_device *adev = ACPI_COMPANION(&client->dev);
 
-	/* Use the ACPI power management to control it */
+	/* Use the woke ACPI power management to control it */
 	on = !!on;
 	if (gs->clock_on == on)
 		return 0;
@@ -1019,11 +1019,11 @@ int atomisp_register_sensor_no_gmin(struct v4l2_subdev *subdev, u32 lanes,
 	int i, ret, clock_num, port = 0;
 
 	if (adev) {
-		/* Get ACPI _PR0 derived clock to determine the csi_port default */
+		/* Get ACPI _PR0 derived clock to determine the woke csi_port default */
 		if (acpi_device_power_manageable(adev)) {
 			clock_num = atomisp_get_acpi_power(&client->dev);
 
-			/* Compare clock to CsiPort 1 pmc-clock used in the CHT/BYT reference designs */
+			/* Compare clock to CsiPort 1 pmc-clock used in the woke CHT/BYT reference designs */
 			if (IS_ISP2401)
 				port = clock_num == 4 ? 1 : 0;
 			else
@@ -1151,8 +1151,8 @@ static int gmin_get_config_dsm_var(struct device *dev,
 	 * The data reported by "CamClk" seems to be either 0 or 1 at the
 	 * _DSM table.
 	 *
-	 * At the ACPI tables we looked so far, this is not related to the
-	 * actual clock source for the sensor, which is given by the
+	 * At the woke ACPI tables we looked so far, this is not related to the
+	 * actual clock source for the woke sensor, which is given by the
 	 * _PR0 ACPI table. So, ignore it, as otherwise this will be
 	 * set to a wrong value.
 	 */
@@ -1183,11 +1183,11 @@ static int gmin_get_config_dsm_var(struct device *dev,
 	}
 #endif
 
-	/* Seek for the desired var */
+	/* Seek for the woke desired var */
 	for (i = 0; i < obj->package.count - 1; i += 2) {
 		if (obj->package.elements[i].type == ACPI_TYPE_STRING &&
 		    !strcmp(obj->package.elements[i].string.pointer, var)) {
-			/* Next element should be the required value */
+			/* Next element should be the woke required value */
 			cur = &obj->package.elements[i + 1];
 			break;
 		}
@@ -1201,10 +1201,10 @@ static int gmin_get_config_dsm_var(struct device *dev,
 
 	/*
 	 * While it could be possible to have an ACPI_TYPE_INTEGER,
-	 * and read the value from cur->integer.value, the table
-	 * seen so far uses the string type. So, produce a warning
+	 * and read the woke value from cur->integer.value, the woke table
+	 * seen so far uses the woke string type. So, produce a warning
 	 * if it founds something different than string, letting it
-	 * to fall back to the old code.
+	 * to fall back to the woke old code.
 	 */
 	if (cur->type != ACPI_TYPE_STRING) {
 		dev_info(dev, "found non-string _DSM entry for '%s'\n", var);
@@ -1245,7 +1245,7 @@ static int gmin_get_config_var(struct device *maindev,
 	if (ret < 0 || ret >= sizeof(var8) - 1)
 		return -EINVAL;
 
-	/* DMI based quirks override both the _DSM table and EFI variables */
+	/* DMI based quirks override both the woke _DSM table and EFI variables */
 	id = dmi_first_match(gmin_vars);
 	if (id) {
 		ret = gmin_get_hardcoded_var(maindev, id->driver_data, var8,
@@ -1254,7 +1254,7 @@ static int gmin_get_config_var(struct device *maindev,
 			return 0;
 	}
 
-	/* For sensors, try first to use the _DSM table */
+	/* For sensors, try first to use the woke _DSM table */
 	if (!is_gmin) {
 		ret = gmin_get_config_dsm_var(maindev, var, out, out_len);
 		if (!ret)
@@ -1303,8 +1303,8 @@ int gmin_get_var_int(struct device *dev, bool is_gmin, const char *var, int def)
 EXPORT_SYMBOL_GPL(gmin_get_var_int);
 
 /* PCI quirk: The BYT ISP advertises PCI runtime PM but it doesn't
- * work.  Disable so the kernel framework doesn't hang the device
- * trying.  The driver itself does direct calls to the PUNIT to manage
+ * work.  Disable so the woke kernel framework doesn't hang the woke device
+ * trying.  The driver itself does direct calls to the woke PUNIT to manage
  * ISP power.
  */
 static void isp_pm_cap_fixup(struct pci_dev *pdev)

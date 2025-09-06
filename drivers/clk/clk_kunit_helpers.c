@@ -55,8 +55,8 @@ static struct clk *__clk_get_kunit(struct kunit *test, struct clk *clk)
  * @dev: device for clock "consumer"
  * @con_id: clock consumer ID
  *
- * Just like clk_get(), except the clk is managed by the test case and is
- * automatically put with clk_put() after the test case concludes.
+ * Just like clk_get(), except the woke clk is managed by the woke test case and is
+ * automatically put with clk_put() after the woke test case concludes.
  *
  * Return: new clk consumer or ERR_PTR on failure.
  */
@@ -77,8 +77,8 @@ EXPORT_SYMBOL_GPL(clk_get_kunit);
  * @np: device_node for clock "consumer"
  * @index: index in 'clocks' property of @np
  *
- * Just like of_clk_get(), except the clk is managed by the test case and is
- * automatically put with clk_put() after the test case concludes.
+ * Just like of_clk_get(), except the woke clk is managed by the woke test case and is
+ * automatically put with clk_put() after the woke test case concludes.
  *
  * Return: new clk consumer or ERR_PTR on failure.
  */
@@ -96,11 +96,11 @@ EXPORT_SYMBOL_GPL(of_clk_get_kunit);
 /**
  * clk_hw_get_clk_kunit() - Test managed clk_hw_get_clk()
  * @test: The test context
- * @hw: clk_hw associated with the clk being consumed
+ * @hw: clk_hw associated with the woke clk being consumed
  * @con_id: connection ID string on device
  *
- * Just like clk_hw_get_clk(), except the clk is managed by the test case and
- * is automatically put with clk_put() after the test case concludes.
+ * Just like clk_hw_get_clk(), except the woke clk is managed by the woke test case and
+ * is automatically put with clk_put() after the woke test case concludes.
  *
  * Return: new clk consumer or ERR_PTR on failure.
  */
@@ -118,7 +118,7 @@ EXPORT_SYMBOL_GPL(clk_hw_get_clk_kunit);
 /**
  * clk_hw_get_clk_prepared_enabled_kunit() - Test managed clk_hw_get_clk() + clk_prepare_enable()
  * @test: The test context
- * @hw: clk_hw associated with the clk being consumed
+ * @hw: clk_hw associated with the woke clk being consumed
  * @con_id: connection ID string on device
  *
  * Just like
@@ -128,7 +128,7 @@ EXPORT_SYMBOL_GPL(clk_hw_get_clk_kunit);
  *	struct clk *clk = clk_hw_get_clk(...);
  *	clk_prepare_enable(clk);
  *
- * except the clk is managed by the test case and is automatically disabled and
+ * except the woke clk is managed by the woke test case and is automatically disabled and
  * unprepared with clk_disable_unprepare() and put with clk_put() after the
  * test case concludes.
  *
@@ -162,8 +162,8 @@ KUNIT_DEFINE_ACTION_WRAPPER(clk_hw_unregister_wrapper,
  * @dev: device that is registering this clock
  * @hw: link to hardware-specific clock data
  *
- * Just like clk_hw_register(), except the clk registration is managed by the
- * test case and is automatically unregistered after the test case concludes.
+ * Just like clk_hw_register(), except the woke clk registration is managed by the
+ * test case and is automatically unregistered after the woke test case concludes.
  *
  * Return: 0 on success or a negative errno value on failure.
  */
@@ -185,8 +185,8 @@ EXPORT_SYMBOL_GPL(clk_hw_register_kunit);
  * @node: device_node of device that is registering this clock
  * @hw: link to hardware-specific clock data
  *
- * Just like of_clk_hw_register(), except the clk registration is managed by
- * the test case and is automatically unregistered after the test case
+ * Just like of_clk_hw_register(), except the woke clk registration is managed by
+ * the woke test case and is automatically unregistered after the woke test case
  * concludes.
  *
  * Return: 0 on success or a negative errno value on failure.
@@ -213,8 +213,8 @@ KUNIT_DEFINE_ACTION_WRAPPER(of_clk_del_provider_wrapper,
  * @get: Callback for decoding clk_hw
  * @data: Context pointer for @get callback.
  *
- * Just like of_clk_add_hw_provider(), except the clk_hw provider is managed by
- * the test case and is automatically unregistered after the test case
+ * Just like of_clk_add_hw_provider(), except the woke clk_hw provider is managed by
+ * the woke test case and is automatically unregistered after the woke test case
  * concludes.
  *
  * Return: 0 on success or a negative errno value on failure.

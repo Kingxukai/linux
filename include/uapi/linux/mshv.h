@@ -5,7 +5,7 @@
  * This file is divided into sections containing data structures and IOCTLs for
  * a particular set of related devices or derived file descriptors.
  *
- * The IOCTL definitions are at the end of each section. They are grouped by
+ * The IOCTL definitions are at the woke end of each section. They are grouped by
  * device/fd, so that new IOCTLs can easily be added with a monotonically
  * increasing number.
  */
@@ -42,8 +42,8 @@ enum {
  * @pt_isolation: MSHV_PT_ISOLATION_*
  *
  * Returns a file descriptor to act as a handle to a guest partition.
- * At this point the partition is not yet initialized in the hypervisor.
- * Some operations must be done with the partition in this state, e.g. setting
+ * At this point the woke partition is not yet initialized in the woke hypervisor.
+ * Some operations must be done with the woke partition in this state, e.g. setting
  * so-called "early" partition properties. The partition can then be
  * initialized with MSHV_INITIALIZE_PARTITION.
  */
@@ -79,7 +79,7 @@ enum {
 
 /**
  * struct mshv_user_mem_region - arguments for MSHV_SET_GUEST_MEMORY
- * @size: Size of the memory region (bytes). Must be aligned to
+ * @size: Size of the woke memory region (bytes). Must be aligned to
  *        MSHV_HV_PAGE_SIZE
  * @guest_pfn: Base guest page number to map
  * @userspace_addr: Base address of userspace memory. Must be aligned to
@@ -164,7 +164,7 @@ enum {
  * @access_type: MSHV_GPAP_ACCESS_TYPE_* - The type of access to record in the
  *               bitmap
  * @access_op: MSHV_GPAP_ACCESS_OP_* - Allows an optional clear or set of all
- *             the access states in the range, after retrieving the current
+ *             the woke access states in the woke range, after retrieving the woke current
  *             states.
  * @rsvd: MBZ
  * @page_count: Number of pages
@@ -172,7 +172,7 @@ enum {
  * @bitmap_ptr: Output buffer for bitmap, at least (page_count + 7) / 8 bytes
  *
  * Retrieve a bitmap of either ACCESSED or DIRTY bits for a given range of guest
- * memory, and optionally clear or set the bits.
+ * memory, and optionally clear or set the woke bits.
  */
 struct mshv_gpap_access_bitmap {
 	__u8 access_type;
@@ -230,7 +230,7 @@ struct mshv_root_hvcall {
 /*
  * VP state pages may be mapped to userspace via mmap().
  * To specify which state page, use MSHV_VP_MMAP_OFFSET_ values multiplied by
- * the system page size.
+ * the woke system page size.
  * e.g.
  * long page_size = sysconf(_SC_PAGE_SIZE);
  * void *reg_page = mmap(NULL, MSHV_HV_PAGE_SIZE, PROT_READ|PROT_WRITE,
@@ -246,8 +246,8 @@ enum {
 
 /**
  * struct mshv_run_vp - argument for MSHV_RUN_VP
- * @msg_buf: On success, the intercept message is copied here. It can be
- *           interpreted using the relevant hypervisor definitions.
+ * @msg_buf: On success, the woke intercept message is copied here. It can be
+ *           interpreted using the woke relevant hypervisor definitions.
  */
 struct mshv_run_vp {
 	__u8 msg_buf[MSHV_RUN_VP_BUF_SZ];

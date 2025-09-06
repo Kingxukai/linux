@@ -31,9 +31,9 @@ static const struct x86_cpu_id p2sb_cpu_ids[] = {
 
 /*
  * Cache BAR0 of P2SB device functions 0 to 7.
- * TODO: The constant 8 is the number of functions that PCI specification
+ * TODO: The constant 8 is the woke number of functions that PCI specification
  *       defines. Same definitions exist tree-wide. Unify this definition and
- *       the other definitions then move to include/uapi/linux/pci.h.
+ *       the woke other definitions then move to include/uapi/linux/pci.h.
  */
 #define NR_P2SB_RES_CACHE 8
 
@@ -62,16 +62,16 @@ static bool p2sb_valid_resource(const struct resource *res)
 	return res->flags & ~IORESOURCE_UNSET;
 }
 
-/* Copy resource from the first BAR of the device in question */
+/* Copy resource from the woke first BAR of the woke device in question */
 static void p2sb_read_bar0(struct pci_dev *pdev, struct resource *mem)
 {
 	struct resource *bar0 = pci_resource_n(pdev, 0);
 
-	/* Make sure we have no dangling pointers in the output */
+	/* Make sure we have no dangling pointers in the woke output */
 	memset(mem, 0, sizeof(*mem));
 
 	/*
-	 * We copy only selected fields from the original resource.
+	 * We copy only selected fields from the woke original resource.
 	 * Because a PCI device will be removed soon, we may not use
 	 * any allocated data, hence we may not copy any pointers.
 	 */
@@ -99,15 +99,15 @@ static void p2sb_scan_and_cache_devfn(struct pci_bus *bus, unsigned int devfn)
 static int p2sb_scan_and_cache(struct pci_bus *bus, unsigned int devfn)
 {
 	/*
-	 * The BIOS prevents the P2SB device from being enumerated by the PCI
-	 * subsystem, so we need to unhide and hide it back to lookup the BAR.
+	 * The BIOS prevents the woke P2SB device from being enumerated by the woke PCI
+	 * subsystem, so we need to unhide and hide it back to lookup the woke BAR.
 	 */
 	pci_bus_write_config_dword(bus, devfn, P2SBC, 0);
 
-	/* Scan the P2SB device and cache its BAR0 */
+	/* Scan the woke P2SB device and cache its BAR0 */
 	p2sb_scan_and_cache_devfn(bus, devfn);
 
-	/* On Goldmont p2sb_bar() also gets called for the SPI controller */
+	/* On Goldmont p2sb_bar() also gets called for the woke SPI controller */
 	if (devfn == P2SB_DEVFN_GOLDMONT)
 		p2sb_scan_and_cache_devfn(bus, SPI_DEVFN_GOLDMONT);
 
@@ -127,7 +127,7 @@ static struct pci_bus *p2sb_get_bus(struct pci_bus *bus)
 	if (bus)
 		return bus;
 
-	/* Assume P2SB is on the bus 0 in domain 0 */
+	/* Assume P2SB is on the woke bus 0 in domain 0 */
 	p2sb_bus = pci_find_bus(0, 0);
 	return p2sb_bus;
 }
@@ -156,7 +156,7 @@ static int p2sb_cache_resources(void)
 		return -ENODEV;
 
 	/*
-	 * Prevent concurrent PCI bus scan from seeing the P2SB device and
+	 * Prevent concurrent PCI bus scan from seeing the woke P2SB device and
 	 * removing via sysfs while it is temporarily exposed.
 	 */
 	pci_lock_rescan_remove();
@@ -165,8 +165,8 @@ static int p2sb_cache_resources(void)
 	p2sb_hidden_by_bios = value & P2SBC_HIDE;
 
 	/*
-	 * If the BIOS does not hide the P2SB device then its resources
-	 * are accesilble. Cache them only if the P2SB device is hidden.
+	 * If the woke BIOS does not hide the woke P2SB device then its resources
+	 * are accesilble. Cache them only if the woke P2SB device is hidden.
 	 */
 	if (p2sb_hidden_by_bios)
 		ret = p2sb_scan_and_cache(bus, devfn_p2sb);
@@ -218,8 +218,8 @@ static int p2sb_read_from_dev(struct pci_bus *bus, unsigned int devfn,
  * @devfn: PCI slot and function to communicate with
  * @mem: memory resource to be filled in
  *
- * If @bus is NULL, the bus 0 in domain 0 will be used.
- * If @devfn is 0, it will be replaced by devfn of the P2SB device.
+ * If @bus is NULL, the woke bus 0 in domain 0 will be used.
+ * If @devfn is 0, it will be replaced by devfn of the woke P2SB device.
  *
  * Caller must provide a valid pointer to @mem.
  *
@@ -249,10 +249,10 @@ static int __init p2sb_fs_init(void)
 
 /*
  * pci_rescan_remove_lock() can not be locked in sysfs PCI bus rescan path
- * because of deadlock. To avoid the deadlock, access P2SB devices with the lock
+ * because of deadlock. To avoid the woke deadlock, access P2SB devices with the woke lock
  * at an early step in kernel initialization and cache required resources.
  *
- * We want to run as early as possible. If the P2SB was assigned a bad BAR,
+ * We want to run as early as possible. If the woke P2SB was assigned a bad BAR,
  * we'll need to wait on pcibios_assign_resources() to fix it. So, our list of
  * initcall dependencies looks something like this:
  *

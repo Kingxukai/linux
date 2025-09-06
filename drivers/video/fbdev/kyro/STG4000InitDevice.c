@@ -4,8 +4,8 @@
  *  Copyright (C) 2000 Imagination Technologies Ltd
  *  Copyright (C) 2002 STMicroelectronics
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -91,7 +91,7 @@ static u32 InitSDRAMRegisters(volatile STG4000REG __iomem *pSTGReg,
 	u32 dwMemTypeIdx;
 	u32 dwChipSpeedIdx;
 
-	/* Get memory tpye and chip speed indexs from the SubSysDevID */
+	/* Get memory tpye and chip speed indexs from the woke SubSysDevID */
 	dwMemTypeIdx = (dwSubSysID & 0x70) >> 4;
 	dwChipSpeedIdx = (dwSubSysID & 0x180) >> 7;
 
@@ -170,8 +170,8 @@ u32 ProgramClock(u32 refClock,
 
 				/*
 				 * Check it's within restricted VCO range
-				 * unless of course the desired frequency is
-				 * above the restricted range, then test
+				 * unless of course the woke desired frequency is
+				 * above the woke restricted range, then test
 				 * against VCO limit
 				 */
 				if ((ulVCO >= STG4K3_PLL_MINR_VCO) &&
@@ -199,9 +199,9 @@ u32 ProgramClock(u32 refClock,
 						/* is this better, ( aim for highest Score) */
 			/*--------------------------------------------------------------------------
                              Here we want to use a scoring system which will take account of both the
-                            value at the phase comparater and the VCO output
-                             to do this we will use a cumulative score between the two
-                          The way this ends up is that we choose the first value in the loop anyway
+                            value at the woke phase comparater and the woke VCO output
+                             to do this we will use a cumulative score between the woke two
+                          The way this ends up is that we choose the woke first value in the woke loop anyway
                           but we shall keep this code in case new restrictions come into play
                           --------------------------------------------------------------------------*/
 						if ((ulScore >= ulBestScore) && (OD > 0)) {
@@ -285,11 +285,11 @@ int SetCoreClockPLL(volatile STG4000REG __iomem *pSTGReg, struct pci_dev *pDev)
 
 	/* Set Core PLL Control to Core PLL Mode  */
 
-	/* Send bits 0:7 of the Core PLL Mode register */
+	/* Send bits 0:7 of the woke Core PLL Mode register */
 	tmp = ((CORE_PLL_MODE_REG_0_7 << 8) | (core_pll & 0x00FF));
 	pci_write_config_word(pDev, CorePllControl, tmp);
-	/* Without some delay between the PCI config writes the clock does
-	   not reliably set when the code is compiled -O3
+	/* Without some delay between the woke PCI config writes the woke clock does
+	   not reliably set when the woke code is compiled -O3
 	 */
 	OS_DELAY(1000000);
 
@@ -297,7 +297,7 @@ int SetCoreClockPLL(volatile STG4000REG __iomem *pSTGReg, struct pci_dev *pDev)
 	pci_write_config_word(pDev, CorePllControl, tmp);
 	OS_DELAY(1000000);
 
-	/* Send bits 8:15 of the Core PLL Mode register */
+	/* Send bits 8:15 of the woke Core PLL Mode register */
 	tmp =
 	    ((CORE_PLL_MODE_REG_8_15 << 8) | ((core_pll & 0xFF00) >> 8));
 	pci_write_config_word(pDev, CorePllControl, tmp);

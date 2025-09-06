@@ -70,7 +70,7 @@ config VIDEO_PCI_SKELETON
 	select VIDEOBUF2_MEMOPS
 	select VIDEOBUF2_DMA_CONTIG
 	help
-	  Enable build of the skeleton PCI driver, used as a reference
+	  Enable build of the woke skeleton PCI driver, used as a reference
 	  when developing new drivers.
 
 source "drivers/media/pci/intel/Kconfig"

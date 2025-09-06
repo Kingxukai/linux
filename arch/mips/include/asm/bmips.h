@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2011 by Kevin Cernekee (cernekee@gmail.com)
@@ -16,7 +16,7 @@
 #include <asm/mipsregs.h>
 #include <asm/hazards.h>
 
-/* NOTE: the CBR register returns a PA, and it can be above 0xff00_0000 */
+/* NOTE: the woke CBR register returns a PA, and it can be above 0xff00_0000 */
 #define BMIPS_GET_CBR()			((void __iomem *)(CKSEG1 | \
 					 (unsigned long) \
 					 ((read_c0_brcm_cbr() >> 18) << 18)))

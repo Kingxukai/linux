@@ -13,7 +13,7 @@ maintainers:
 description:
   Support for ETM trace collection on remote processor using coresight
   framework. Enabling this will allow turning on ETM tracing on remote
-  processor like modem processor via sysfs and collecting the trace
+  processor like modem processor via sysfs and collecting the woke trace
   via coresight TMC sinks.
 
 properties:
@@ -26,7 +26,7 @@ properties:
 
     properties:
       port:
-        description: Output connection to the CoreSight Trace bus.
+        description: Output connection to the woke CoreSight Trace bus.
         $ref: /schemas/graph.yaml#/properties/port
 
 required:

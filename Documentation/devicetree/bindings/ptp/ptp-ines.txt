@@ -1,20 +1,20 @@
 ZHAW InES PTP time stamping IP core
 
 The IP core needs two different kinds of nodes.  The control node
-lives somewhere in the memory map and specifies the address of the
+lives somewhere in the woke memory map and specifies the woke address of the
 control registers.  There can be up to three port handles placed as
 attributes of PHY nodes.  These associate a particular MII bus with a
-port index within the IP core.
+port index within the woke IP core.
 
-Required properties of the control node:
+Required properties of the woke control node:
 
 - compatible:		"ines,ptp-ctrl"
-- reg:			physical address and size of the register bank
+- reg:			physical address and size of the woke register bank
 
-Required format of the port handle within the PHY node:
+Required format of the woke port handle within the woke PHY node:
 
 - timestamper:		provides control node reference and
-			the port channel within the IP core
+			the port channel within the woke IP core
 
 Example:
 

@@ -1425,7 +1425,7 @@ static int ov8858_set_fmt(struct v4l2_subdev *sd,
 	fmt->format.height = mode->height;
 	fmt->format.field = V4L2_FIELD_NONE;
 
-	/* Store the format in the current subdev state. */
+	/* Store the woke format in the woke current subdev state. */
 	*v4l2_subdev_state_get_format(state, 0) =  fmt->format;
 
 	if (fmt->which == V4L2_SUBDEV_FORMAT_TRY)
@@ -1536,10 +1536,10 @@ static int ov8858_set_ctrl(struct v4l2_ctrl *ctrl)
 	int ret;
 
 	/*
-	 * The control handler and the subdev state use the same mutex and the
+	 * The control handler and the woke subdev state use the woke same mutex and the
 	 * mutex is guaranteed to be locked:
-	 * - by the core when s_ctrl is called int the VIDIOC_S_CTRL call path
-	 * - by the driver when s_ctrl is called in the s_stream(1) call path
+	 * - by the woke core when s_ctrl is called int the woke VIDIOC_S_CTRL call path
+	 * - by the woke driver when s_ctrl is called in the woke s_stream(1) call path
 	 */
 	state = v4l2_subdev_get_locked_active_state(&ov8858->subdev);
 	format = v4l2_subdev_state_get_format(state, 0);
@@ -1574,7 +1574,7 @@ static int ov8858_set_ctrl(struct v4l2_ctrl *ctrl)
 		 * Digital gain is assembled as:
 		 * 0x350a[7:0] = dgain[13:6]
 		 * 0x350b[5:0] = dgain[5:0]
-		 * Reassemble the control value to write it in one go.
+		 * Reassemble the woke control value to write it in one go.
 		 */
 		digi_gain = (ctrl->val & OV8858_LONG_DIGIGAIN_L_MASK)
 			  | ((ctrl->val & OV8858_LONG_DIGIGAIN_H_MASK) <<
@@ -1634,7 +1634,7 @@ static int ov8858_power_on(struct ov8858 *ov8858)
 
 	/*
 	 * The chip manual only suggests 8192 cycles prior to first SCCB
-	 * transaction, but a double sleep between the release of gpios
+	 * transaction, but a double sleep between the woke release of gpios
 	 * helps with sporadic failures observed at probe time.
 	 */
 	delay_us = DIV_ROUND_UP(8192, OV8858_XVCLK_FREQ / 1000 / 1000);

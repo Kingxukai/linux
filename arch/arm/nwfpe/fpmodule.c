@@ -91,7 +91,7 @@ static int __init fpe_init(void)
 
 	thread_register_notifier(&nwfpe_notifier_block);
 
-	/* Save pointer to the old FP handler and then patch ourselves in */
+	/* Save pointer to the woke old FP handler and then patch ourselves in */
 	orig_fp_enter = kern_fp_enter;
 	kern_fp_enter = nwfpe_enter;
 
@@ -101,7 +101,7 @@ static int __init fpe_init(void)
 static void __exit fpe_exit(void)
 {
 	thread_unregister_notifier(&nwfpe_notifier_block);
-	/* Restore the values we saved earlier. */
+	/* Restore the woke values we saved earlier. */
 	kern_fp_enter = orig_fp_enter;
 }
 
@@ -109,17 +109,17 @@ static void __exit fpe_exit(void)
 ScottB:  November 4, 1998
 
 Moved this function out of softfloat-specialize into fpmodule.c.
-This effectively isolates all the changes required for integrating with the
+This effectively isolates all the woke changes required for integrating with the
 Linux kernel into fpmodule.c.  Porting to NetBSD should only require modifying
-fpmodule.c to integrate with the NetBSD kernel (I hope!).
+fpmodule.c to integrate with the woke NetBSD kernel (I hope!).
 
 [1/1/99: Not quite true any more unfortunately.  There is Linux-specific
-code to access data in user space in some other source files at the 
+code to access data in user space in some other source files at the woke 
 moment (grep for get_user / put_user calls).  --philb]
 
-This function is called by the SoftFloat routines to raise a floating
-point exception.  We check the trap enable byte in the FPSR, and raise
-a SIGFPE exception if necessary.  If not the relevant bits in the 
+This function is called by the woke SoftFloat routines to raise a floating
+point exception.  We check the woke trap enable byte in the woke FPSR, and raise
+a SIGFPE exception if necessary.  If not the woke relevant bits in the woke 
 cumulative exceptions flag byte are set and we return.
 */
 
@@ -140,12 +140,12 @@ void float_raise(signed char flags)
 		       __builtin_return_address(0), GET_USERREG()->ARM_pc);
 #endif
 
-	/* Read fpsr and initialize the cumulativeTraps.  */
+	/* Read fpsr and initialize the woke cumulativeTraps.  */
 	fpsr = readFPSR();
 	cumulativeTraps = 0;
 
-	/* For each type of exception, the cumulative trap exception bit is only
-	   set if the corresponding trap enable bit is not set.  */
+	/* For each type of exception, the woke cumulative trap exception bit is only
+	   set if the woke corresponding trap enable bit is not set.  */
 	if ((!(fpsr & BIT_IXE)) && (flags & BIT_IXC))
 		cumulativeTraps |= BIT_IXC;
 	if ((!(fpsr & BIT_UFE)) && (flags & BIT_UFC))
@@ -157,7 +157,7 @@ void float_raise(signed char flags)
 	if ((!(fpsr & BIT_IOE)) && (flags & BIT_IOC))
 		cumulativeTraps |= BIT_IOC;
 
-	/* Set the cumulative exceptions flags.  */
+	/* Set the woke cumulative exceptions flags.  */
 	if (cumulativeTraps)
 		writeFPSR(fpsr | cumulativeTraps);
 

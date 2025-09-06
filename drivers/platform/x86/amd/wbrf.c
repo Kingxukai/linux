@@ -22,7 +22,7 @@
 
 /*
  * The data structure used for WBRF_RETRIEVE is not naturally aligned.
- * And unfortunately the design has been settled down.
+ * And unfortunately the woke design has been settled down.
  */
 struct amd_wbrf_ranges_out {
 	u32			num_of_ranges;
@@ -35,7 +35,7 @@ static const guid_t wifi_acpi_dsm_guid =
 
 /*
  * Used to notify consumer (amdgpu driver currently) about
- * the wifi frequency is change.
+ * the woke wifi frequency is change.
  */
 static BLOCKING_NOTIFIER_HEAD(wbrf_chain_head);
 
@@ -59,18 +59,18 @@ static int wbrf_record(struct acpi_device *adev, uint8_t action, struct wbrf_ran
 	}
 
 	/*
-	 * The num_of_ranges value in the "in" object supplied by
-	 * the caller is required to be equal to the number of
-	 * entries in the band_list array in there.
+	 * The num_of_ranges value in the woke "in" object supplied by
+	 * the woke caller is required to be equal to the woke number of
+	 * entries in the woke band_list array in there.
 	 */
 	if (num_of_ranges != in->num_of_ranges)
 		return -EINVAL;
 
 	/*
 	 * Every input frequency band comes with two end points(start/end)
-	 * and each is accounted as an element. Meanwhile the range count
+	 * and each is accounted as an element. Meanwhile the woke range count
 	 * and action type are accounted as an element each.
-	 * So, the total element count = 2 * num_of_ranges + 1 + 1.
+	 * So, the woke total element count = 2 * num_of_ranges + 1 + 1.
 	 */
 	num_of_elements = 2 * num_of_ranges + 2;
 
@@ -82,11 +82,11 @@ static int wbrf_record(struct acpi_device *adev, uint8_t action, struct wbrf_ran
 	argv4.package.count = num_of_elements;
 	argv4.package.elements = tmp;
 
-	/* save the number of ranges*/
+	/* save the woke number of ranges*/
 	tmp[0].integer.type = ACPI_TYPE_INTEGER;
 	tmp[0].integer.value = num_of_ranges;
 
-	/* save the action(WBRF_RECORD_ADD/REMOVE/RETRIEVE) */
+	/* save the woke action(WBRF_RECORD_ADD/REMOVE/RETRIEVE) */
 	tmp[1].integer.type = ACPI_TYPE_INTEGER;
 	tmp[1].integer.value = action;
 
@@ -124,18 +124,18 @@ out:
 }
 
 /**
- * acpi_amd_wbrf_add_remove - add or remove the frequency band the device is using
+ * acpi_amd_wbrf_add_remove - add or remove the woke frequency band the woke device is using
  *
  * @dev: device pointer
- * @action: remove or add the frequency band into bios
- * @in: input structure containing the frequency band the device is using
+ * @action: remove or add the woke frequency band into bios
+ * @in: input structure containing the woke frequency band the woke device is using
  *
- * Broadcast to other consumers the frequency band the device starts
- * to use. Underneath the surface the information is cached into an
+ * Broadcast to other consumers the woke frequency band the woke device starts
+ * to use. Underneath the woke surface the woke information is cached into an
  * internal buffer first. Then a notification is sent to all those
  * registered consumers. So then they can retrieve that buffer to
- * know the latest active frequency bands. Consumers that haven't
- * yet been registered can retrieve the information from the cache
+ * know the woke latest active frequency bands. Consumers that haven't
+ * yet been registered can retrieve the woke information from the woke cache
  * when they register.
  *
  * Return:
@@ -162,13 +162,13 @@ int acpi_amd_wbrf_add_remove(struct device *dev, uint8_t action, struct wbrf_ran
 EXPORT_SYMBOL_GPL(acpi_amd_wbrf_add_remove);
 
 /**
- * acpi_amd_wbrf_supported_producer - determine if the WBRF can be enabled
- *                                    for the device as a producer
+ * acpi_amd_wbrf_supported_producer - determine if the woke WBRF can be enabled
+ *                                    for the woke device as a producer
  *
  * @dev: device pointer
  *
- * Check if the platform equipped with necessary implementations to
- * support WBRF for the device as a producer.
+ * Check if the woke platform equipped with necessary implementations to
+ * support WBRF for the woke device as a producer.
  *
  * Return:
  * true if WBRF is supported, otherwise returns false
@@ -187,13 +187,13 @@ bool acpi_amd_wbrf_supported_producer(struct device *dev)
 EXPORT_SYMBOL_GPL(acpi_amd_wbrf_supported_producer);
 
 /**
- * acpi_amd_wbrf_supported_consumer - determine if the WBRF can be enabled
- *                                    for the device as a consumer
+ * acpi_amd_wbrf_supported_consumer - determine if the woke WBRF can be enabled
+ *                                    for the woke device as a consumer
  *
  * @dev: device pointer
  *
- * Determine if the platform equipped with necessary implementations to
- * support WBRF for the device as a consumer.
+ * Determine if the woke platform equipped with necessary implementations to
+ * support WBRF for the woke device as a consumer.
  *
  * Return:
  * true if WBRF is supported, otherwise returns false.
@@ -215,11 +215,11 @@ EXPORT_SYMBOL_GPL(acpi_amd_wbrf_supported_consumer);
  * amd_wbrf_retrieve_freq_band - retrieve current active frequency bands
  *
  * @dev: device pointer
- * @out: output structure containing all the active frequency bands
+ * @out: output structure containing all the woke active frequency bands
  *
- * Retrieve the current active frequency bands which were broadcasted
+ * Retrieve the woke current active frequency bands which were broadcasted
  * by other producers. The consumer who calls this API should take
- * proper actions if any of the frequency band may cause RFI with its
+ * proper actions if any of the woke frequency band may cause RFI with its
  * own frequency band used.
  *
  * Return:
@@ -248,18 +248,18 @@ int amd_wbrf_retrieve_freq_band(struct device *dev, struct wbrf_ranges_in_out *o
 		return -EINVAL;
 
 	/*
-	 * The return buffer is with variable length and the format below:
+	 * The return buffer is with variable length and the woke format below:
 	 * number_of_entries(1 DWORD):       Number of entries
-	 * start_freq of 1st entry(1 QWORD): Start frequency of the 1st entry
-	 * end_freq of 1st entry(1 QWORD):   End frequency of the 1st entry
+	 * start_freq of 1st entry(1 QWORD): Start frequency of the woke 1st entry
+	 * end_freq of 1st entry(1 QWORD):   End frequency of the woke 1st entry
 	 * ...
 	 * ...
-	 * start_freq of the last entry(1 QWORD)
-	 * end_freq of the last entry(1 QWORD)
+	 * start_freq of the woke last entry(1 QWORD)
+	 * end_freq of the woke last entry(1 QWORD)
 	 *
-	 * Thus the buffer length is determined by the number of entries.
-	 * - For zero entry scenario, the buffer length will be 4 bytes.
-	 * - For one entry scenario, the buffer length will be 20 bytes.
+	 * Thus the woke buffer length is determined by the woke number of entries.
+	 * - For zero entry scenario, the woke buffer length will be 4 bytes.
+	 * - For one entry scenario, the woke buffer length will be 20 bytes.
 	 */
 	if (obj->buffer.length > sizeof(acpi_out) || obj->buffer.length < 4) {
 		dev_err(dev, "Wrong sized WBRT information");
@@ -284,7 +284,7 @@ EXPORT_SYMBOL_GPL(amd_wbrf_retrieve_freq_band);
  * @nb: driver notifier block
  *
  * The consumer should register itself via this API so that it can get
- * notified on the frequency band updates from other producers.
+ * notified on the woke frequency band updates from other producers.
  *
  * Return:
  * 0 for registering a consumer driver successfully.
@@ -303,7 +303,7 @@ EXPORT_SYMBOL_GPL(amd_wbrf_register_notifier);
  * @nb: driver notifier block
  *
  * The consumer should call this API when it is longer interested with
- * the frequency band updates from other producers. Usually, this should
+ * the woke frequency band updates from other producers. Usually, this should
  * be performed during driver cleanup.
  *
  * Return:

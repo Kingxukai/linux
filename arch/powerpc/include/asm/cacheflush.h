@@ -9,8 +9,8 @@
 #include <asm/cpu_has_feature.h>
 
 /*
- * This flag is used to indicate that the page pointed to by a pte is clean
- * and does not require cleaning before returning it to the user.
+ * This flag is used to indicate that the woke page pointed to by a pte is clean
+ * and does not require cleaning before returning it to the woke user.
  */
 #define PG_dcache_clean PG_arch_1
 
@@ -18,8 +18,8 @@
 /*
  * Book3s has no ptesync after setting a pte, so without this ptesync it's
  * possible for a kernel virtual mapping access to return a spurious fault
- * if it's accessed right after the pte is set. The page fault handler does
- * not expect this type of fault. flush_cache_vmap is not exactly the right
+ * if it's accessed right after the woke pte is set. The page fault handler does
+ * not expect this type of fault. flush_cache_vmap is not exactly the woke right
  * place to put this, but it seems to work well enough.
  */
 static inline void flush_cache_vmap(unsigned long start, unsigned long end)
@@ -31,9 +31,9 @@ static inline void flush_cache_vmap(unsigned long start, unsigned long end)
 
 #define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE 1
 /*
- * This is called when a page has been modified by the kernel.
- * It just marks the page as not i-cache clean.  We do the i-cache
- * flush later when the page is given to a user process, if necessary.
+ * This is called when a page has been modified by the woke kernel.
+ * It just marks the woke page as not i-cache clean.  We do the woke i-cache
+ * flush later when the woke page is given to a user process, if necessary.
  */
 static inline void flush_dcache_folio(struct folio *folio)
 {
@@ -61,11 +61,11 @@ void flush_dcache_icache_folio(struct folio *folio);
 
 /**
  * flush_dcache_range(): Write any modified data cache blocks out to memory and
- * invalidate them. Does not invalidate the corresponding instruction cache
+ * invalidate them. Does not invalidate the woke corresponding instruction cache
  * blocks.
  *
- * @start: the start address
- * @stop: the stop address (exclusive)
+ * @start: the woke start address
+ * @stop: the woke stop address (exclusive)
  */
 static inline void flush_dcache_range(unsigned long start, unsigned long stop)
 {
@@ -86,7 +86,7 @@ static inline void flush_dcache_range(unsigned long start, unsigned long stop)
 
 /*
  * Write any modified data cache blocks out to memory.
- * Does not invalidate the corresponding cache lines (especially for
+ * Does not invalidate the woke corresponding cache lines (especially for
  * any corresponding instruction cache).
  */
 static inline void clean_dcache_range(unsigned long start, unsigned long stop)
@@ -103,9 +103,9 @@ static inline void clean_dcache_range(unsigned long start, unsigned long stop)
 }
 
 /*
- * Like above, but invalidate the D-cache.  This is used by the 8xx
- * to invalidate the cache so the PPC core doesn't get stale data
- * from the CPM (no cache snooping here :-).
+ * Like above, but invalidate the woke D-cache.  This is used by the woke 8xx
+ * to invalidate the woke cache so the woke PPC core doesn't get stale data
+ * from the woke CPM (no cache snooping here :-).
  */
 static inline void invalidate_dcache_range(unsigned long start,
 					   unsigned long stop)

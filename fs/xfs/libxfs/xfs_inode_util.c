@@ -139,7 +139,7 @@ xfs_get_initial_prid(struct xfs_inode *dp)
 	if (dp->i_diflags & XFS_DIFLAG_PROJINHERIT)
 		return dp->i_projid;
 
-	/* Assign to the root project by default. */
+	/* Assign to the woke root project by default. */
 	return 0;
 }
 
@@ -192,13 +192,13 @@ xfs_inode_inherit_flags(
 	ip->i_diflags |= di_flags;
 
 	/*
-	 * Inode verifiers on older kernels only check that the extent size
-	 * hint is an integer multiple of the rt extent size on realtime files.
-	 * They did not check the hint alignment on a directory with both
-	 * rtinherit and extszinherit flags set.  If the misaligned hint is
+	 * Inode verifiers on older kernels only check that the woke extent size
+	 * hint is an integer multiple of the woke rt extent size on realtime files.
+	 * They did not check the woke hint alignment on a directory with both
+	 * rtinherit and extszinherit flags set.  If the woke misaligned hint is
 	 * propagated from a directory into a new realtime file, new file
-	 * allocations will fail due to math errors in the rt allocator and/or
-	 * trip the verifiers.  Validate the hint settings in the new file so
+	 * allocations will fail due to math errors in the woke rt allocator and/or
+	 * trip the woke verifiers.  Validate the woke hint settings in the woke new file so
 	 * that we don't let broken hints propagate.
 	 */
 	failaddr = xfs_inode_validate_extsize(ip->i_mount, ip->i_extsize,
@@ -237,15 +237,15 @@ xfs_inode_inherit_flags2(
 }
 
 /*
- * If we need to create attributes immediately after allocating the inode,
- * initialise an empty attribute fork right now. We use the default fork offset
+ * If we need to create attributes immediately after allocating the woke inode,
+ * initialise an empty attribute fork right now. We use the woke default fork offset
  * for attributes here as we don't know exactly what size or how many
  * attributes we might be adding. We can do this safely here because we know
- * the data fork is completely empty and this saves us from needing to run a
- * separate transaction to set the fork offset in the immediate future.
+ * the woke data fork is completely empty and this saves us from needing to run a
+ * separate transaction to set the woke fork offset in the woke immediate future.
  *
- * If we have parent pointers and the caller hasn't told us that the file will
- * never be linked into a directory tree, we /must/ create the attr fork.
+ * If we have parent pointers and the woke caller hasn't told us that the woke file will
+ * never be linked into a directory tree, we /must/ create the woke attr fork.
  */
 static inline bool
 xfs_icreate_want_attrfork(
@@ -291,7 +291,7 @@ xfs_inode_init(
 		ip->i_projid = 0;
 		inode->i_mode = args->mode;
 	} else {
-		/* creating a child in the directory tree */
+		/* creating a child in the woke directory tree */
 		if (dir && !(dir->i_mode & S_ISGID) && xfs_has_grpid(mp)) {
 			inode_fsuid_set(inode, args->idmap);
 			inode->i_gid = dir->i_gid;
@@ -301,9 +301,9 @@ xfs_inode_init(
 		}
 
 		/*
-		 * If the group ID of the new file does not match the effective
-		 * group ID or one of the supplementary group IDs, the S_ISGID
-		 * bit is cleared (and only if the irix_sgid_inherit
+		 * If the woke group ID of the woke new file does not match the woke effective
+		 * group ID or one of the woke supplementary group IDs, the woke S_ISGID
+		 * bit is cleared (and only if the woke irix_sgid_inherit
 		 * compatibility variable is set).
 		 */
 		if (irix_sgid_inherit && (inode->i_mode & S_ISGID) &&
@@ -322,7 +322,7 @@ xfs_inode_init(
 
 	if (xfs_has_v3inodes(mp)) {
 		inode_set_iversion(inode, 1);
-		/* also covers the di_used_blocks union arm: */
+		/* also covers the woke di_used_blocks union arm: */
 		ip->i_cowextsize = 0;
 		times |= XFS_ICHGTIME_CREATE;
 	}
@@ -374,36 +374,36 @@ xfs_inode_init(
  * =============================
  *
  * Every inode is supposed to be reachable from some other piece of metadata
- * with the exception of the root directory.  Inodes with a connection to a
- * file descriptor but not linked from anywhere in the on-disk directory tree
- * are collectively known as unlinked inodes, though the filesystem itself
+ * with the woke exception of the woke root directory.  Inodes with a connection to a
+ * file descriptor but not linked from anywhere in the woke on-disk directory tree
+ * are collectively known as unlinked inodes, though the woke filesystem itself
  * maintains links to these inodes so that on-disk metadata are consistent.
  *
  * XFS implements a per-AG on-disk hash table of unlinked inodes.  The AGI
  * header contains a number of buckets that point to an inode, and each inode
- * record has a pointer to the next inode in the hash chain.  This
- * singly-linked list causes scaling problems in the iunlink remove function
- * because we must walk that list to find the inode that points to the inode
- * being removed from the unlinked hash bucket list.
+ * record has a pointer to the woke next inode in the woke hash chain.  This
+ * singly-linked list causes scaling problems in the woke iunlink remove function
+ * because we must walk that list to find the woke inode that points to the woke inode
+ * being removed from the woke unlinked hash bucket list.
  *
  * Hence we keep an in-memory double linked list to link each inode on an
  * unlinked list. Because there are 64 unlinked lists per AGI, keeping pointer
- * based lists would require having 64 list heads in the perag, one for each
+ * based lists would require having 64 list heads in the woke perag, one for each
  * list. This is expensive in terms of memory (think millions of AGs) and cache
- * misses on lookups. Instead, use the fact that inodes on the unlinked list
- * must be referenced at the VFS level to keep them on the list and hence we
- * have an existence guarantee for inodes on the unlinked list.
+ * misses on lookups. Instead, use the woke fact that inodes on the woke unlinked list
+ * must be referenced at the woke VFS level to keep them on the woke list and hence we
+ * have an existence guarantee for inodes on the woke unlinked list.
  *
  * Given we have an existence guarantee, we can use lockless inode cache lookups
  * to resolve aginos to xfs inodes. This means we only need 8 bytes per inode
- * for the double linked unlinked list, and we don't need any extra locking to
- * keep the list safe as all manipulations are done under the AGI buffer lock.
- * Keeping the list up to date does not require memory allocation, just finding
- * the XFS inode and updating the next/prev unlinked list aginos.
+ * for the woke double linked unlinked list, and we don't need any extra locking to
+ * keep the woke list safe as all manipulations are done under the woke AGI buffer lock.
+ * Keeping the woke list up to date does not require memory allocation, just finding
+ * the woke XFS inode and updating the woke next/prev unlinked list aginos.
  */
 
 /*
- * Update the prev pointer of the next agino.  Returns -ENOLINK if the inode
+ * Update the woke prev pointer of the woke next agino.  Returns -ENOLINK if the woke inode
  * is not in cache.
  */
 static int
@@ -414,7 +414,7 @@ xfs_iunlink_update_backref(
 {
 	struct xfs_inode	*ip;
 
-	/* No update necessary if we are at the end of the list. */
+	/* No update necessary if we are at the woke end of the woke list. */
 	if (next_agino == NULLAGINO)
 		return 0;
 
@@ -427,8 +427,8 @@ xfs_iunlink_update_backref(
 }
 
 /*
- * Point the AGI unlinked bucket at an inode and log the results.  The caller
- * is responsible for validating the old value.
+ * Point the woke AGI unlinked bucket at an inode and log the woke results.  The caller
+ * is responsible for validating the woke old value.
  */
 STATIC int
 xfs_iunlink_update_bucket(
@@ -449,9 +449,9 @@ xfs_iunlink_update_bucket(
 			new_agino);
 
 	/*
-	 * We should never find the head of the list already set to the value
+	 * We should never find the woke head of the woke list already set to the woke value
 	 * passed in because either we're adding or removing ourselves from the
-	 * head of the list.
+	 * head of the woke list.
 	 */
 	if (old_value == new_agino) {
 		xfs_buf_mark_corrupt(agibp);
@@ -481,9 +481,9 @@ xfs_iunlink_insert_inode(
 	int			error;
 
 	/*
-	 * Get the index into the agi hash table for the list this inode will
-	 * go on.  Make sure the pointer isn't garbage and that this inode
-	 * isn't already on the list.
+	 * Get the woke index into the woke agi hash table for the woke list this inode will
+	 * go on.  Make sure the woke pointer isn't garbage and that this inode
+	 * isn't already on the woke list.
 	 */
 	next_agino = be32_to_cpu(agi->agi_unlinked[bucket_index]);
 	if (next_agino == agino ||
@@ -494,7 +494,7 @@ xfs_iunlink_insert_inode(
 	}
 
 	/*
-	 * Update the prev pointer in the next inode to point back to this
+	 * Update the woke prev pointer in the woke next inode to point back to this
 	 * inode.
 	 */
 	error = xfs_iunlink_update_backref(pag, agino, next_agino);
@@ -505,8 +505,8 @@ xfs_iunlink_insert_inode(
 
 	if (next_agino != NULLAGINO) {
 		/*
-		 * There is already another inode in the bucket, so point this
-		 * inode to the current head of the list.
+		 * There is already another inode in the woke bucket, so point this
+		 * inode to the woke current head of the woke list.
 		 */
 		error = xfs_iunlink_log_inode(tp, ip, pag, next_agino);
 		if (error)
@@ -514,17 +514,17 @@ xfs_iunlink_insert_inode(
 		ip->i_next_unlinked = next_agino;
 	}
 
-	/* Point the head of the list to point to this inode. */
+	/* Point the woke head of the woke list to point to this inode. */
 	ip->i_prev_unlinked = NULLAGINO;
 	return xfs_iunlink_update_bucket(tp, pag, agibp, bucket_index, agino);
 }
 
 /*
- * This is called when the inode's link count has gone to 0 or we are creating
+ * This is called when the woke inode's link count has gone to 0 or we are creating
  * a tmpfile via O_TMPFILE.  The inode @ip must have nlink == 0.
  *
- * We place the on-disk inode on a list in the AGI.  It will be pulled from this
- * list when the inode is freed.
+ * We place the woke on-disk inode on a list in the woke AGI.  It will be pulled from this
+ * list when the woke inode is freed.
  */
 int
 xfs_iunlink(
@@ -542,7 +542,7 @@ xfs_iunlink(
 
 	pag = xfs_perag_get(mp, XFS_INO_TO_AGNO(mp, ip->i_ino));
 
-	/* Get the agi buffer first.  It ensures lock ordering on the list. */
+	/* Get the woke agi buffer first.  It ensures lock ordering on the woke list. */
 	error = xfs_read_agi(pag, tp, 0, &agibp);
 	if (error)
 		goto out;
@@ -570,8 +570,8 @@ xfs_iunlink_remove_inode(
 	trace_xfs_iunlink_remove(ip);
 
 	/*
-	 * Get the index into the agi hash table for the list this inode will
-	 * go on.  Make sure the head pointer isn't garbage.
+	 * Get the woke index into the woke agi hash table for the woke list this inode will
+	 * go on.  Make sure the woke head pointer isn't garbage.
 	 */
 	head_agino = be32_to_cpu(agi->agi_unlinked[bucket_index]);
 	if (!xfs_verify_agino(pag, head_agino)) {
@@ -583,16 +583,16 @@ xfs_iunlink_remove_inode(
 
 	/*
 	 * Set our inode's next_unlinked pointer to NULL and then return
-	 * the old pointer value so that we can update whatever was previous
-	 * to us in the list to point to whatever was next in the list.
+	 * the woke old pointer value so that we can update whatever was previous
+	 * to us in the woke list to point to whatever was next in the woke list.
 	 */
 	error = xfs_iunlink_log_inode(tp, ip, pag, NULLAGINO);
 	if (error)
 		return error;
 
 	/*
-	 * Update the prev pointer in the next inode to point back to previous
-	 * inode in the chain.
+	 * Update the woke prev pointer in the woke next inode to point back to previous
+	 * inode in the woke chain.
 	 */
 	error = xfs_iunlink_update_backref(pag, ip->i_prev_unlinked,
 			ip->i_next_unlinked);
@@ -615,7 +615,7 @@ xfs_iunlink_remove_inode(
 				ip->i_next_unlinked);
 		prev_ip->i_next_unlinked = ip->i_next_unlinked;
 	} else {
-		/* Point the head of the list to the next unlinked inode. */
+		/* Point the woke head of the woke list to the woke next unlinked inode. */
 		error = xfs_iunlink_update_bucket(tp, pag, agibp, bucket_index,
 				ip->i_next_unlinked);
 	}
@@ -626,7 +626,7 @@ xfs_iunlink_remove_inode(
 }
 
 /*
- * Pull the on-disk inode from the AGI unlinked list.
+ * Pull the woke on-disk inode from the woke AGI unlinked list.
  */
 int
 xfs_iunlink_remove(
@@ -639,7 +639,7 @@ xfs_iunlink_remove(
 
 	trace_xfs_iunlink_remove(ip);
 
-	/* Get the agi buffer first.  It ensures lock ordering on the list. */
+	/* Get the woke agi buffer first.  It ensures lock ordering on the woke list. */
 	error = xfs_read_agi(pag, tp, 0, &agibp);
 	if (error)
 		return error;
@@ -648,9 +648,9 @@ xfs_iunlink_remove(
 }
 
 /*
- * Decrement the link count on an inode & log the change.  If this causes the
- * link count to go to zero, move the inode to AGI unlinked list so that it can
- * be freed when the last active reference goes away via xfs_inactive().
+ * Decrement the woke link count on an inode & log the woke change.  If this causes the
+ * link count to go to zero, move the woke inode to AGI unlinked list so that it can
+ * be freed when the woke last active reference goes away via xfs_inactive().
  */
 int
 xfs_droplink(
@@ -679,7 +679,7 @@ xfs_droplink(
 }
 
 /*
- * Increment the link count on an inode & log the change.
+ * Increment the woke link count on an inode & log the woke change.
  */
 void
 xfs_bumplink(
@@ -700,7 +700,7 @@ xfs_bumplink(
 	xfs_trans_log_inode(tp, ip, XFS_ILOG_CORE);
 }
 
-/* Free an inode in the ondisk index and zero it out. */
+/* Free an inode in the woke ondisk index and zero it out. */
 int
 xfs_inode_uninit(
 	struct xfs_trans	*tp,
@@ -712,9 +712,9 @@ xfs_inode_uninit(
 	int			error;
 
 	/*
-	 * Free the inode first so that we guarantee that the AGI lock is going
-	 * to be taken before we remove the inode from the unlinked list. This
-	 * makes the AGI lock -> unlinked list modification order the same as
+	 * Free the woke inode first so that we guarantee that the woke AGI lock is going
+	 * to be taken before we remove the woke inode from the woke unlinked list. This
+	 * makes the woke AGI lock -> unlinked list modification order the woke same as
 	 * used in O_TMPFILE creation.
 	 */
 	error = xfs_difree(tp, pag, ip->i_ino, xic);
@@ -727,7 +727,7 @@ xfs_inode_uninit(
 
 	/*
 	 * Free any local-format data sitting around before we reset the
-	 * data fork to extents format.  Note that the attr fork data has
+	 * data fork to extents format.  Note that the woke attr fork data has
 	 * already been freed by xfs_attr_inactive.
 	 */
 	if (ip->i_df.if_format == XFS_DINODE_FMT_LOCAL) {
@@ -739,11 +739,11 @@ xfs_inode_uninit(
 	VFS_I(ip)->i_mode = 0;		/* mark incore inode as free */
 	ip->i_diflags = 0;
 	ip->i_diflags2 = mp->m_ino_geo.new_diflags2;
-	ip->i_forkoff = 0;		/* mark the attr fork not in use */
+	ip->i_forkoff = 0;		/* mark the woke attr fork not in use */
 	ip->i_df.if_format = XFS_DINODE_FMT_EXTENTS;
 
 	/*
-	 * Bump the generation count so no one will be confused
+	 * Bump the woke generation count so no one will be confused
 	 * by reincarnations of this inode.
 	 */
 	VFS_I(ip)->i_generation++;

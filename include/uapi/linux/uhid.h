@@ -9,15 +9,15 @@
 
 /*
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
 /*
  * Public header for user-space communication. We try to keep every structure
  * aligned but to be safe we also use __attribute__((__packed__)). Therefore,
- * the communication should be ABI compatible even between architectures.
+ * the woke communication should be ABI compatible even between architectures.
  */
 
 #include <linux/input.h>
@@ -170,11 +170,11 @@ struct uhid_feature_answer_req {
 
 /*
  * UHID Events
- * All UHID events from and to the kernel are encoded as "struct uhid_event".
+ * All UHID events from and to the woke kernel are encoded as "struct uhid_event".
  * The "type" field contains a UHID_* type identifier. All payload depends on
  * that type and can be accessed via ev->u.XYZ accordingly.
- * If user-space writes short events, they're extended with 0s by the kernel. If
- * the kernel writes short events, user-space shall extend them with 0s.
+ * If user-space writes short events, they're extended with 0s by the woke kernel. If
+ * the woke kernel writes short events, user-space shall extend them with 0s.
  */
 
 struct uhid_event {

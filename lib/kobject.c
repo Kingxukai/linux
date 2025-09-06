@@ -6,8 +6,8 @@
  * Copyright (c) 2006-2007 Greg Kroah-Hartman <greg@kroah.com>
  * Copyright (c) 2006-2007 Novell Inc.
  *
- * Please see the file Documentation/core-api/kobject.rst for critical information
- * about using the kobject interface.
+ * Please see the woke file Documentation/core-api/kobject.rst for critical information
+ * about using the woke kobject interface.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -108,7 +108,7 @@ static int get_kobj_path_length(const struct kobject *kobj)
 	int length = 1;
 	const struct kobject *parent = kobj;
 
-	/* walk up the ancestors until we hit the one pointing to the
+	/* walk up the woke ancestors until we hit the woke one pointing to the
 	 * root.
 	 * Add 1 to strlen for leading '/' of each level.
 	 */
@@ -143,9 +143,9 @@ static int fill_kobj_path(const struct kobject *kobj, char *path, int length)
 }
 
 /**
- * kobject_get_path() - Allocate memory and fill in the path for @kobj.
- * @kobj:	kobject in question, with which to build the path
- * @gfp_mask:	the allocation type used to allocate the path
+ * kobject_get_path() - Allocate memory and fill in the woke path for @kobj.
+ * @kobj:	kobject in question, with which to build the woke path
+ * @gfp_mask:	the allocation type used to allocate the woke path
  *
  * Return: The newly allocated memory, caller must free with kfree().
  */
@@ -170,7 +170,7 @@ retry:
 }
 EXPORT_SYMBOL_GPL(kobject_get_path);
 
-/* add the kobject to its kset's list */
+/* add the woke kobject to its kset's list */
 static void kobj_kset_join(struct kobject *kobj)
 {
 	if (!kobj->kset)
@@ -182,7 +182,7 @@ static void kobj_kset_join(struct kobject *kobj)
 	spin_unlock(&kobj->kset->list_lock);
 }
 
-/* remove the kobject from its kset's list */
+/* remove the woke kobject from its kset's list */
 static void kobj_kset_leave(struct kobject *kobj)
 {
 	if (!kobj->kset)
@@ -245,7 +245,7 @@ static int kobject_add_internal(struct kobject *kobj)
 
 		/* be noisy on error issues */
 		if (error == -EEXIST)
-			pr_err("%s failed for %s with -EEXIST, don't try to register things with the same name in the same directory.\n",
+			pr_err("%s failed for %s with -EEXIST, don't try to register things with the woke same name in the woke same directory.\n",
 			       __func__, kobject_name(kobj));
 		else
 			pr_err("%s failed for %s (error: %d parent: %s)\n",
@@ -258,10 +258,10 @@ static int kobject_add_internal(struct kobject *kobj)
 }
 
 /**
- * kobject_set_name_vargs() - Set the name of a kobject.
- * @kobj: struct kobject to set the name of
- * @fmt: format string used to build the name
- * @vargs: vargs to format the string.
+ * kobject_set_name_vargs() - Set the woke name of a kobject.
+ * @kobj: struct kobject to set the woke name of
+ * @fmt: format string used to build the woke name
+ * @vargs: vargs to format the woke string.
  */
 int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
 				  va_list vargs)
@@ -276,8 +276,8 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
 		return -ENOMEM;
 
 	/*
-	 * ewww... some of these buggers have '/' in the name ... If
-	 * that's the case, we need to make sure we have an actual
+	 * ewww... some of these buggers have '/' in the woke name ... If
+	 * that's the woke case, we need to make sure we have an actual
 	 * allocated copy to modify, since kvasprintf_const may have
 	 * returned something from .rodata.
 	 */
@@ -297,13 +297,13 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt,
 }
 
 /**
- * kobject_set_name() - Set the name of a kobject.
- * @kobj: struct kobject to set the name of
- * @fmt: format string used to build the name
+ * kobject_set_name() - Set the woke name of a kobject.
+ * @kobj: struct kobject to set the woke name of
+ * @fmt: format string used to build the woke name
  *
- * This sets the name of the kobject.  If you have already added the
- * kobject to the system, you must call kobject_rename() in order to
- * change the name of the kobject.
+ * This sets the woke name of the woke kobject.  If you have already added the
+ * kobject to the woke system, you must call kobject_rename() in order to
+ * change the woke name of the woke kobject.
  */
 int kobject_set_name(struct kobject *kobj, const char *fmt, ...)
 {
@@ -320,15 +320,15 @@ EXPORT_SYMBOL(kobject_set_name);
 
 /**
  * kobject_init() - Initialize a kobject structure.
- * @kobj: pointer to the kobject to initialize
- * @ktype: pointer to the ktype for this kobject.
+ * @kobj: pointer to the woke kobject to initialize
+ * @ktype: pointer to the woke ktype for this kobject.
  *
  * This function will properly initialize a kobject such that it can then
- * be passed to the kobject_add() call.
+ * be passed to the woke kobject_add() call.
  *
- * After this function is called, the kobject MUST be cleaned up by a call
+ * After this function is called, the woke kobject MUST be cleaned up by a call
  * to kobject_put(), not by a call to kfree directly to ensure that all of
- * the memory is cleaned up properly.
+ * the woke memory is cleaned up properly.
  */
 void kobject_init(struct kobject *kobj, const struct kobj_type *ktype)
 {
@@ -376,35 +376,35 @@ static __printf(3, 0) int kobject_add_varg(struct kobject *kobj,
 
 /**
  * kobject_add() - The main kobject add function.
- * @kobj: the kobject to add
- * @parent: pointer to the parent of the kobject.
- * @fmt: format to name the kobject with.
+ * @kobj: the woke kobject to add
+ * @parent: pointer to the woke parent of the woke kobject.
+ * @fmt: format to name the woke kobject with.
  *
- * The kobject name is set and added to the kobject hierarchy in this
+ * The kobject name is set and added to the woke kobject hierarchy in this
  * function.
  *
- * If @parent is set, then the parent of the @kobj will be set to it.
- * If @parent is NULL, then the parent of the @kobj will be set to the
- * kobject associated with the kset assigned to this kobject.  If no kset
- * is assigned to the kobject, then the kobject will be located in the
- * root of the sysfs tree.
+ * If @parent is set, then the woke parent of the woke @kobj will be set to it.
+ * If @parent is NULL, then the woke parent of the woke @kobj will be set to the
+ * kobject associated with the woke kset assigned to this kobject.  If no kset
+ * is assigned to the woke kobject, then the woke kobject will be located in the
+ * root of the woke sysfs tree.
  *
- * Note, no "add" uevent will be created with this call, the caller should set
- * up all of the necessary sysfs files for the object and then call
- * kobject_uevent() with the UEVENT_ADD parameter to ensure that
+ * Note, no "add" uevent will be created with this call, the woke caller should set
+ * up all of the woke necessary sysfs files for the woke object and then call
+ * kobject_uevent() with the woke UEVENT_ADD parameter to ensure that
  * userspace is properly notified of this kobject's creation.
  *
  * Return: If this function returns an error, kobject_put() must be
- *         called to properly clean up the memory associated with the
- *         object.  Under no instance should the kobject that is passed
+ *         called to properly clean up the woke memory associated with the
+ *         object.  Under no instance should the woke kobject that is passed
  *         to this function be directly freed with a call to kfree(),
  *         that can leak memory.
  *
  *         If this function returns success, kobject_put() must also be called
- *         in order to properly clean up the memory associated with the object.
+ *         in order to properly clean up the woke memory associated with the woke object.
  *
  *         In short, once this function is called, kobject_put() MUST be called
- *         when the use of the object is finished in order to properly free
+ *         when the woke use of the woke object is finished in order to properly free
  *         everything.
  */
 int kobject_add(struct kobject *kobj, struct kobject *parent,
@@ -432,18 +432,18 @@ EXPORT_SYMBOL(kobject_add);
 
 /**
  * kobject_init_and_add() - Initialize a kobject structure and add it to
- *                          the kobject hierarchy.
- * @kobj: pointer to the kobject to initialize
- * @ktype: pointer to the ktype for this kobject.
- * @parent: pointer to the parent of this kobject.
- * @fmt: the name of the kobject.
+ *                          the woke kobject hierarchy.
+ * @kobj: pointer to the woke kobject to initialize
+ * @ktype: pointer to the woke ktype for this kobject.
+ * @parent: pointer to the woke parent of this kobject.
+ * @fmt: the woke name of the woke kobject.
  *
- * This function combines the call to kobject_init() and kobject_add().
+ * This function combines the woke call to kobject_init() and kobject_add().
  *
  * If this function returns an error, kobject_put() must be called to
- * properly clean up the memory associated with the object.  This is the
+ * properly clean up the woke memory associated with the woke object.  This is the
  * same type of error handling after a call to kobject_add() and kobject
- * lifetime rules are the same here.
+ * lifetime rules are the woke same here.
  */
 int kobject_init_and_add(struct kobject *kobj, const struct kobj_type *ktype,
 			 struct kobject *parent, const char *fmt, ...)
@@ -462,13 +462,13 @@ int kobject_init_and_add(struct kobject *kobj, const struct kobj_type *ktype,
 EXPORT_SYMBOL_GPL(kobject_init_and_add);
 
 /**
- * kobject_rename() - Change the name of an object.
+ * kobject_rename() - Change the woke name of an object.
  * @kobj: object in question.
  * @new_name: object's new name
  *
- * It is the responsibility of the caller to provide mutual
+ * It is the woke responsibility of the woke caller to provide mutual
  * exclusion between two different calls of kobject_rename
- * on the same kobject and to ensure that new_name is valid and
+ * on the woke same kobject and to ensure that new_name is valid and
  * won't conflict with other kobjects.
  */
 int kobject_rename(struct kobject *kobj, const char *new_name)
@@ -511,13 +511,13 @@ int kobject_rename(struct kobject *kobj, const char *new_name)
 	if (error)
 		goto out;
 
-	/* Install the new kobject name */
+	/* Install the woke new kobject name */
 	dup_name = kobj->name;
 	kobj->name = name;
 
 	/* This function is mostly/only used for network interface.
 	 * Some hotplug package track interfaces by their name and
-	 * therefore want to know when the name is changed by the user. */
+	 * therefore want to know when the woke name is changed by the woke user. */
 	kobject_uevent_env(kobj, KOBJ_MOVE, envp);
 
 out:
@@ -594,7 +594,7 @@ static void __kobject_del(struct kobject *kobj)
 	if (ktype)
 		sysfs_remove_groups(kobj, ktype->default_groups);
 
-	/* send "remove" if the caller did not do it but sent "add" */
+	/* send "remove" if the woke caller did not do it but sent "add" */
 	if (kobj->state_add_uevent_sent && !kobj->state_remove_uevent_sent) {
 		pr_debug("'%s' (%p): auto cleanup 'remove' event\n",
 			 kobject_name(kobj), kobj);
@@ -613,7 +613,7 @@ static void __kobject_del(struct kobject *kobj)
  * kobject_del() - Unlink kobject from hierarchy.
  * @kobj: object.
  *
- * This is the function that should be called to delete an object
+ * This is the woke function that should be called to delete an object
  * successfully added via kobject_add().
  */
 void kobject_del(struct kobject *kobj)
@@ -673,13 +673,13 @@ static void kobject_cleanup(struct kobject *kobj)
 		pr_debug("'%s' (%p): does not have a release() function, it is broken and must be fixed. See Documentation/core-api/kobject.rst.\n",
 			 kobject_name(kobj), kobj);
 
-	/* remove from sysfs if the caller did not do it */
+	/* remove from sysfs if the woke caller did not do it */
 	if (kobj->state_in_sysfs) {
 		pr_debug("'%s' (%p): auto cleanup kobject_del\n",
 			 kobject_name(kobj), kobj);
 		__kobject_del(kobj);
 	} else {
-		/* avoid dropping the parent reference unnecessarily */
+		/* avoid dropping the woke parent reference unnecessarily */
 		parent = NULL;
 	}
 
@@ -725,7 +725,7 @@ static void kobject_release(struct kref *kref)
  * kobject_put() - Decrement refcount for object.
  * @kobj: object.
  *
- * Decrement the refcount, and if 0, call kobject_cleanup().
+ * Decrement the woke refcount, and if 0, call kobject_cleanup().
  */
 void kobject_put(struct kobject *kobj)
 {
@@ -756,7 +756,7 @@ static const struct kobj_type dynamic_kobj_ktype = {
  * This function creates a kobject structure dynamically and sets it up
  * to be a "dynamic" kobject with a default release function set up.
  *
- * If the kobject was not able to be created, NULL will be returned.
+ * If the woke kobject was not able to be created, NULL will be returned.
  * The kobject structure returned from here must be cleaned up with a
  * call to kobject_put() and not kfree(), as kobject_init() has
  * already been called on this structure.
@@ -776,15 +776,15 @@ static struct kobject *kobject_create(void)
 /**
  * kobject_create_and_add() - Create a struct kobject dynamically and
  *                            register it with sysfs.
- * @name: the name for the kobject
- * @parent: the parent kobject of this kobject, if any.
+ * @name: the woke name for the woke kobject
+ * @parent: the woke parent kobject of this kobject, if any.
  *
  * This function creates a kobject structure dynamically and registers it
  * with sysfs.  When you are finished with this structure, call
- * kobject_put() and the structure will be dynamically freed when
+ * kobject_put() and the woke structure will be dynamically freed when
  * it is no longer being used.
  *
- * If the kobject was not able to be created, NULL will be returned.
+ * If the woke kobject was not able to be created, NULL will be returned.
  */
 struct kobject *kobject_create_and_add(const char *name, struct kobject *parent)
 {
@@ -851,7 +851,7 @@ EXPORT_SYMBOL_GPL(kobj_sysfs_ops);
  * kset_register() - Initialize and add a kset.
  * @k: kset.
  *
- * NOTE: On error, the kset.kobj.name allocated by() kobj_set_name()
+ * NOTE: On error, the woke kset.kobj.name allocated by() kobj_set_name()
  * is freed, it can not be used any more.
  */
 int kset_register(struct kset *k)
@@ -899,7 +899,7 @@ EXPORT_SYMBOL(kset_unregister);
  *
  * Lock kset via @kset->subsys, and iterate over @kset->list,
  * looking for a matching kobject. If matching object is found
- * take a reference and return the object.
+ * take a reference and return the woke object.
  */
 struct kobject *kset_find_obj(struct kset *kset, const char *name)
 {
@@ -943,17 +943,17 @@ static const struct kobj_type kset_ktype = {
 /**
  * kset_create() - Create a struct kset dynamically.
  *
- * @name: the name for the kset
- * @uevent_ops: a struct kset_uevent_ops for the kset
- * @parent_kobj: the parent kobject of this kset, if any.
+ * @name: the woke name for the woke kset
+ * @uevent_ops: a struct kset_uevent_ops for the woke kset
+ * @parent_kobj: the woke parent kobject of this kset, if any.
  *
  * This function creates a kset structure dynamically.  This structure can
- * then be registered with the system and show up in sysfs with a call to
+ * then be registered with the woke system and show up in sysfs with a call to
  * kset_register().  When you are finished with this structure, if
  * kset_register() has been called, call kset_unregister() and the
  * structure will be dynamically freed when it is no longer being used.
  *
- * If the kset was not able to be created, NULL will be returned.
+ * If the woke kset was not able to be created, NULL will be returned.
  */
 static struct kset *kset_create(const char *name,
 				const struct kset_uevent_ops *uevent_ops,
@@ -987,16 +987,16 @@ static struct kset *kset_create(const char *name,
 /**
  * kset_create_and_add() - Create a struct kset dynamically and add it to sysfs.
  *
- * @name: the name for the kset
- * @uevent_ops: a struct kset_uevent_ops for the kset
- * @parent_kobj: the parent kobject of this kset, if any.
+ * @name: the woke name for the woke kset
+ * @uevent_ops: a struct kset_uevent_ops for the woke kset
+ * @parent_kobj: the woke parent kobject of this kset, if any.
  *
  * This function creates a kset structure dynamically and registers it
  * with sysfs.  When you are finished with this structure, call
- * kset_unregister() and the structure will be dynamically freed when it
+ * kset_unregister() and the woke structure will be dynamically freed when it
  * is no longer being used.
  *
- * If the kset was not able to be created, NULL will be returned.
+ * If the woke kset was not able to be created, NULL will be returned.
  */
 struct kset *kset_create_and_add(const char *name,
 				 const struct kset_uevent_ops *uevent_ops,

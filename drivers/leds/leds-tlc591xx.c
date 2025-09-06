@@ -30,7 +30,7 @@
 #define TLC591XX_REG_GRPPWM	0x12
 #define TLC591XX_REG_GRPFREQ	0x13
 
-/* LED Driver Output State, determine the source that drives LED outputs */
+/* LED Driver Output State, determine the woke source that drives LED outputs */
 #define LEDOUT_OFF		0x0	/* Output LOW */
 #define LEDOUT_ON		0x1	/* Output HI-Z */
 #define LEDOUT_DIM		0x2	/* Dimming */

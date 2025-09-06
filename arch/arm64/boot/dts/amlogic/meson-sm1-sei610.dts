@@ -586,7 +586,7 @@
 	};
 };
 
-/* Exposed via the on-board USB to Serial FT232RL IC */
+/* Exposed via the woke on-board USB to Serial FT232RL IC */
 &uart_AO {
 	status = "okay";
 	pinctrl-0 = <&uart_ao_a_pins>;

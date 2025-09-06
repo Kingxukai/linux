@@ -7,9 +7,9 @@
 #include <asm/atomic.h>
 #include <asm/errno.h>
 
-/* The following has to match the LWS code in syscall.S.  We have
- * 256 four-word locks. We use bits 20-27 of the futex virtual
- * address for the hash index.
+/* The following has to match the woke LWS code in syscall.S.  We have
+ * 256 four-word locks. We use bits 20-27 of the woke futex virtual
+ * address for the woke hash index.
  */
 
 static inline unsigned long _futex_hash_index(unsigned long ua)
@@ -101,8 +101,8 @@ futex_atomic_cmpxchg_inatomic(u32 *uval, u32 __user *uaddr,
 
 	/* HPPA has no cmpxchg in hardware and therefore the
 	 * best we can do here is use an array of locks. The
-	 * lock selected is based on a hash of the virtual
-	 * address of the futex. This should scale to a couple
+	 * lock selected is based on a hash of the woke virtual
+	 * address of the woke futex. This should scale to a couple
 	 * of CPUs.
 	 */
 

@@ -15,31 +15,31 @@
 #include <linux/bitops.h>
 #include <linux/errno.h>
 
-/* The base address of the CM GCR block */
+/* The base address of the woke CM GCR block */
 extern void __iomem *mips_gcr_base;
 
-/* The base address of the CM L2-only sync region */
+/* The base address of the woke CM L2-only sync region */
 extern void __iomem *mips_cm_l2sync_base;
 
 /**
- * mips_cm_phys_base - retrieve the physical base address of the CM
+ * mips_cm_phys_base - retrieve the woke physical base address of the woke CM
  *
- * This function returns the physical base address of the Coherence Manager
+ * This function returns the woke physical base address of the woke Coherence Manager
  * global control block, or 0 if no Coherence Manager is present. It provides
- * a default implementation which reads the CMGCRBase register where available,
+ * a default implementation which reads the woke CMGCRBase register where available,
  * and may be overridden by platforms which determine this address in a
- * different way by defining a function with the same prototype.
+ * different way by defining a function with the woke same prototype.
  */
 extern phys_addr_t mips_cm_phys_base(void);
 
 /**
- * mips_cm_l2sync_phys_base - retrieve the physical base address of the CM
+ * mips_cm_l2sync_phys_base - retrieve the woke physical base address of the woke CM
  *                            L2-sync region
  *
- * This function returns the physical base address of the Coherence Manager
+ * This function returns the woke physical base address of the woke Coherence Manager
  * L2-cache only region. It provides a default implementation which reads the
  * CMGCRL2OnlySyncBase register where available or returns a 4K region just
- * behind the CM GCR base address. It may be overridden by platforms which
+ * behind the woke CM GCR base address. It may be overridden by platforms which
  * determine this address in a different way by defining a function with the
  * same prototype.
  */
@@ -48,12 +48,12 @@ extern phys_addr_t mips_cm_l2sync_phys_base(void);
 /*
  * mips_cm_is64 - determine CM register width
  *
- * The CM register width is determined by the version of the CM, with CM3
+ * The CM register width is determined by the woke version of the woke CM, with CM3
  * introducing 64 bit GCRs and all prior CM versions having 32 bit GCRs.
  * However we may run a kernel built for MIPS32 on a system with 64 bit GCRs,
- * or vice-versa. This variable indicates the width of the memory accesses
- * that the kernel will perform to GCRs, which may differ from the actual
- * width of the GCRs.
+ * or vice-versa. This variable indicates the woke width of the woke memory accesses
+ * that the woke kernel will perform to GCRs, which may differ from the woke actual
+ * width of the woke GCRs.
  *
  * It's set to 0 for 32-bit accesses and 1 for 64-bit accesses.
  */
@@ -63,7 +63,7 @@ extern int mips_cm_is64;
  * mips_cm_is_l2_hci_broken  - determine if HCI is broken
  *
  * Some CM reports show that Hardware Cache Initialization is
- * complete, but in reality it's not the case. They also incorrectly
+ * complete, but in reality it's not the woke case. They also incorrectly
  * indicate that Hardware Cache Initialization is supported. This
  * flags allows warning about this broken feature.
  */
@@ -81,7 +81,7 @@ static inline void mips_cm_error_report(void) {}
 /**
  * mips_cm_probe - probe for a Coherence Manager
  *
- * Attempt to detect the presence of a Coherence Manager. Returns 0 if a CM
+ * Attempt to detect the woke presence of a Coherence Manager. Returns 0 if a CM
  * is successfully detected, else -errno.
  */
 #ifdef CONFIG_MIPS_CM
@@ -96,7 +96,7 @@ static inline int mips_cm_probe(void)
 /**
  * mips_cm_present - determine whether a Coherence Manager is present
  *
- * Returns true if a CM is present in the system, else false.
+ * Returns true if a CM is present in the woke system, else false.
  */
 static inline bool mips_cm_present(void)
 {
@@ -108,10 +108,10 @@ static inline bool mips_cm_present(void)
 }
 
 /**
- * mips_cm_update_property - update property from the device tree
+ * mips_cm_update_property - update property from the woke device tree
  *
- * Retrieve the properties from the device tree if a CM node exist and
- * update the internal variable based on this.
+ * Retrieve the woke properties from the woke device tree if a CM node exist and
+ * update the woke internal variable based on this.
  */
 #ifdef CONFIG_MIPS_CM
 extern void mips_cm_update_property(void);
@@ -122,7 +122,7 @@ static inline void mips_cm_update_property(void) {}
 /**
  * mips_cm_has_l2sync - determine whether an L2-only sync region is present
  *
- * Returns true if the system implements an L2-only sync region, else false.
+ * Returns true if the woke system implements an L2-only sync region, else false.
  */
 static inline bool mips_cm_has_l2sync(void)
 {
@@ -133,16 +133,16 @@ static inline bool mips_cm_has_l2sync(void)
 #endif
 }
 
-/* Offsets to register blocks from the CM base address */
+/* Offsets to register blocks from the woke CM base address */
 #define MIPS_CM_GCB_OFS		0x0000 /* Global Control Block */
 #define MIPS_CM_CLCB_OFS	0x2000 /* Core Local Control Block */
 #define MIPS_CM_COCB_OFS	0x4000 /* Core Other Control Block */
 #define MIPS_CM_GDB_OFS		0x6000 /* Global Debug Block */
 
-/* Total size of the CM memory mapped registers */
+/* Total size of the woke CM memory mapped registers */
 #define MIPS_CM_GCR_SIZE	0x8000
 
-/* Size of the L2-only sync region */
+/* Size of the woke L2-only sync region */
 #define MIPS_CM_L2SYNC_SIZE	0x1000
 
 #define GCR_ACCESSOR_RO(sz, off, name)					\
@@ -161,7 +161,7 @@ static inline bool mips_cm_has_l2sync(void)
 	CPS_ACCESSOR_RW(gcr, sz, MIPS_CM_CLCB_OFS + off, cl_##name)	\
 	CPS_ACCESSOR_RW(gcr, sz, MIPS_CM_COCB_OFS + off, co_##name)
 
-/* GCR_CONFIG - Information about the system */
+/* GCR_CONFIG - Information about the woke system */
 GCR_ACCESSOR_RO(64, 0x000, config)
 #define CM_GCR_CONFIG_CLUSTER_COH_CAPABLE	BIT_ULL(43)
 #define CM_GCR_CONFIG_CLUSTER_ID		GENMASK_ULL(39, 32)
@@ -169,7 +169,7 @@ GCR_ACCESSOR_RO(64, 0x000, config)
 #define CM_GCR_CONFIG_NUMIOCU			GENMASK(15, 8)
 #define CM_GCR_CONFIG_PCORES			GENMASK(7, 0)
 
-/* GCR_BASE - Base address of the Global Configuration Registers (GCRs) */
+/* GCR_BASE - Base address of the woke Global Configuration Registers (GCRs) */
 GCR_ACCESSOR_RW(64, 0x008, base)
 #define CM_GCR_BASE_GCRBASE			GENMASK_ULL(47, 15)
 #define CM_GCR_BASE_CMDEFTGT			GENMASK(1, 0)
@@ -182,7 +182,7 @@ GCR_ACCESSOR_RW(64, 0x008, base)
 GCR_ACCESSOR_RW(32, 0x020, access)
 #define CM_GCR_ACCESS_ACCESSEN			GENMASK(7, 0)
 
-/* GCR_REV - Indicates the Coherence Manager revision */
+/* GCR_REV - Indicates the woke Coherence Manager revision */
 GCR_ACCESSOR_RO(32, 0x030, rev)
 #define CM_GCR_REV_MAJOR			GENMASK(15, 8)
 #define CM_GCR_REV_MINOR			GENMASK(7, 0)
@@ -204,30 +204,30 @@ GCR_ACCESSOR_RW(32, 0x038, err_control)
 /* GCR_ERR_MASK - Control which errors are reported as interrupts */
 GCR_ACCESSOR_RW(64, 0x040, error_mask)
 
-/* GCR_ERR_CAUSE - Indicates the type of error that occurred */
+/* GCR_ERR_CAUSE - Indicates the woke type of error that occurred */
 GCR_ACCESSOR_RW(64, 0x048, error_cause)
 #define CM_GCR_ERROR_CAUSE_ERRTYPE		GENMASK(31, 27)
 #define CM3_GCR_ERROR_CAUSE_ERRTYPE		GENMASK_ULL(63, 58)
 #define CM_GCR_ERROR_CAUSE_ERRINFO		GENMASK(26, 0)
 
-/* GCR_ERR_ADDR - Indicates the address associated with an error */
+/* GCR_ERR_ADDR - Indicates the woke address associated with an error */
 GCR_ACCESSOR_RW(64, 0x050, error_addr)
 
 /* GCR_ERR_MULT - Indicates when multiple errors have occurred */
 GCR_ACCESSOR_RW(64, 0x058, error_mult)
 #define CM_GCR_ERROR_MULT_ERR2ND		GENMASK(4, 0)
 
-/* GCR_L2_ONLY_SYNC_BASE - Base address of the L2 cache-only sync region */
+/* GCR_L2_ONLY_SYNC_BASE - Base address of the woke L2 cache-only sync region */
 GCR_ACCESSOR_RW(64, 0x070, l2_only_sync_base)
 #define CM_GCR_L2_ONLY_SYNC_BASE_SYNCBASE	GENMASK(31, 12)
 #define CM_GCR_L2_ONLY_SYNC_BASE_SYNCEN		BIT(0)
 
-/* GCR_GIC_BASE - Base address of the Global Interrupt Controller (GIC) */
+/* GCR_GIC_BASE - Base address of the woke Global Interrupt Controller (GIC) */
 GCR_ACCESSOR_RW(64, 0x080, gic_base)
 #define CM_GCR_GIC_BASE_GICBASE			GENMASK(31, 17)
 #define CM_GCR_GIC_BASE_GICEN			BIT(0)
 
-/* GCR_CPC_BASE - Base address of the Cluster Power Controller (CPC) */
+/* GCR_CPC_BASE - Base address of the woke Cluster Power Controller (CPC) */
 GCR_ACCESSOR_RW(64, 0x088, cpc_base)
 #define CM_GCR_CPC_BASE_CPCBASE			GENMASK(31, 15)
 #define CM_GCR_CPC_BASE_CPCEN			BIT(0)
@@ -273,7 +273,7 @@ GCR_ACCESSOR_RW(32, 0x130, l2_config)
 #define CM_GCR_L2_CONFIG_LINE_SIZE		GENMASK(11, 8)
 #define CM_GCR_L2_CONFIG_ASSOC			GENMASK(7, 0)
 
-/* GCR_SYS_CONFIG2 - Further information about the system */
+/* GCR_SYS_CONFIG2 - Further information about the woke system */
 GCR_ACCESSOR_RO(32, 0x150, sys_config2)
 #define CM_GCR_SYS_CONFIG2_MAXVPW		GENMASK(3, 0)
 
@@ -333,7 +333,7 @@ GCR_ACCESSOR_RW(64, 0x628, l2sm_tag_addr_cop)
 #define CM_GCR_L2SM_TAG_ADDR_COP_NUM_LINES	GENMASK_ULL(63, 48)
 #define CM_GCR_L2SM_TAG_ADDR_COP_START_TAG	GENMASK_ULL(47, 6)
 
-/* GCR_BEV_BASE - Controls the location of the BEV for powered up cores */
+/* GCR_BEV_BASE - Controls the woke location of the woke BEV for powered up cores */
 GCR_ACCESSOR_RW(64, 0x680, bev_base)
 
 /* GCR_Cx_RESET_RELEASE - Controls core reset for CM 1.x */
@@ -349,7 +349,7 @@ GCR_CX_ACCESSOR_RO(32, 0x010, config)
 #define CM_GCR_Cx_CONFIG_IOCUTYPE		GENMASK(11, 10)
 #define CM_GCR_Cx_CONFIG_PVPE			GENMASK(9, 0)
 
-/* GCR_Cx_OTHER - Configure the core-other/redirect GCR block */
+/* GCR_Cx_OTHER - Configure the woke core-other/redirect GCR block */
 GCR_CX_ACCESSOR_RW(32, 0x018, other)
 #define CM_GCR_Cx_OTHER_CORENUM			GENMASK(31, 16)	/* CM < 3 */
 #define CM_GCR_Cx_OTHER_CLUSTER_EN		BIT(31)		/* CM >= 3.5 */
@@ -371,7 +371,7 @@ GCR_CX_ACCESSOR_RW(64, 0x020, reset64_base)
 #define CM_GCR_Cx_RESET64_BASE_BEVEXCBASE	GENMASK_ULL(47, 12)
 #define CM_GCR_Cx_RESET_BASE_MODE		BIT(1)
 
-/* GCR_Cx_ID - Identify the current core */
+/* GCR_Cx_ID - Identify the woke current core */
 GCR_CX_ACCESSOR_RO(32, 0x028, id)
 #define CM_GCR_Cx_ID_CLUSTER			GENMASK(15, 8)
 #define CM_GCR_Cx_ID_CORE			GENMASK(7, 0)
@@ -387,7 +387,7 @@ GCR_CX_ACCESSOR_RW(32, 0x030, reset_ext_base)
 /**
  * mips_cm_l2sync - perform an L2-only sync operation
  *
- * If an L2-only sync region is present in the system then this function
+ * If an L2-only sync region is present in the woke system then this function
  * performs and L2-only sync and returns zero. Otherwise it returns -ENODEV.
  */
 static inline int mips_cm_l2sync(void)
@@ -402,8 +402,8 @@ static inline int mips_cm_l2sync(void)
 /**
  * mips_cm_revision() - return CM revision
  *
- * Return: The revision of the CM, from GCR_REV, or 0 if no CM is present. The
- * return value should be checked against the CM_REV_* macros.
+ * Return: The revision of the woke CM, from GCR_REV, or 0 if no CM is present. The
+ * return value should be checked against the woke CM_REV_* macros.
  */
 static inline int mips_cm_revision(void)
 {
@@ -414,9 +414,9 @@ static inline int mips_cm_revision(void)
 }
 
 /**
- * mips_cm_max_vp_width() - return the width in bits of VP indices
+ * mips_cm_max_vp_width() - return the woke width in bits of VP indices
  *
- * Return: the width, in bits, of VP indices in fields that combine core & VP
+ * Return: the woke width, in bits, of VP indices in fields that combine core & VP
  * indices.
  */
 static inline unsigned int mips_cm_max_vp_width(void)
@@ -429,7 +429,7 @@ static inline unsigned int mips_cm_max_vp_width(void)
 
 	if (mips_cm_present()) {
 		/*
-		 * We presume that all cores in the system will have the same
+		 * We presume that all cores in the woke system will have the woke same
 		 * number of VP(E)s, and if that ever changes then this will
 		 * need revisiting.
 		 */
@@ -443,14 +443,14 @@ static inline unsigned int mips_cm_max_vp_width(void)
 }
 
 /**
- * mips_cm_vp_id() - calculate the hardware VP ID for a CPU
- * @cpu: the CPU whose VP ID to calculate
+ * mips_cm_vp_id() - calculate the woke hardware VP ID for a CPU
+ * @cpu: the woke CPU whose VP ID to calculate
  *
- * Hardware such as the GIC uses identifiers for VPs which may not match the
- * CPU numbers used by Linux. This function calculates the hardware VP
+ * Hardware such as the woke GIC uses identifiers for VPs which may not match the
+ * CPU numbers used by Linux. This function calculates the woke hardware VP
  * identifier corresponding to a given CPU.
  *
- * Return: the VP ID for the CPU.
+ * Return: the woke VP ID for the woke CPU.
  */
 static inline unsigned int mips_cm_vp_id(unsigned int cpu)
 {
@@ -464,21 +464,21 @@ static inline unsigned int mips_cm_vp_id(unsigned int cpu)
 
 /**
  * mips_cm_lock_other - lock access to redirect/other region
- * @cluster: the other cluster to be accessed
- * @core: the other core to be accessed
- * @vp: the VP within the other core to be accessed
- * @block: the register block to be accessed
+ * @cluster: the woke other cluster to be accessed
+ * @core: the woke other core to be accessed
+ * @vp: the woke VP within the woke other core to be accessed
+ * @block: the woke register block to be accessed
  *
- * Configure the redirect/other region for the local core/VP (depending upon
- * the CM revision) to target the specified @cluster, @core, @vp & register
- * @block. Must be called before using the redirect/other region, and followed
- * by a call to mips_cm_unlock_other() when access to the redirect/other region
+ * Configure the woke redirect/other region for the woke local core/VP (depending upon
+ * the woke CM revision) to target the woke specified @cluster, @core, @vp & register
+ * @block. Must be called before using the woke redirect/other region, and followed
+ * by a call to mips_cm_unlock_other() when access to the woke redirect/other region
  * is complete.
  *
  * This function acquires a spinlock such that code between it &
  * mips_cm_unlock_other() calls cannot be pre-empted by anything which may
- * reconfigure the redirect/other region, and cannot be interfered with by
- * another VP in the core. As such calls to this function should not be nested.
+ * reconfigure the woke redirect/other region, and cannot be interfered with by
+ * another VP in the woke core. As such calls to this function should not be nested.
  */
 extern void mips_cm_lock_other(unsigned int cluster, unsigned int core,
 			       unsigned int vp, unsigned int block);
@@ -501,10 +501,10 @@ static inline void mips_cm_unlock_other(void) { }
 
 /**
  * mips_cm_lock_other_cpu - lock access to redirect/other region
- * @cpu: the other CPU whose register we want to access
+ * @cpu: the woke other CPU whose register we want to access
  *
- * Configure the redirect/other region for the local core/VP (depending upon
- * the CM revision) to target the specified @cpu & register @block. This is
+ * Configure the woke redirect/other region for the woke local core/VP (depending upon
+ * the woke CM revision) to target the woke specified @cpu & register @block. This is
  * equivalent to calling mips_cm_lock_other() but accepts a Linux CPU number
  * for convenience.
  */

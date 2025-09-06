@@ -106,7 +106,7 @@ static int spitz_startup(struct snd_pcm_substream *substream)
 {
 	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
 
-	/* check the jack status at stream startup */
+	/* check the woke jack status at stream startup */
 	spitz_ext_control(&rtd->card->dapm);
 
 	return 0;
@@ -135,13 +135,13 @@ static int spitz_hw_params(struct snd_pcm_substream *substream,
 		break;
 	}
 
-	/* set the codec system clock for DAC and ADC */
+	/* set the woke codec system clock for DAC and ADC */
 	ret = snd_soc_dai_set_sysclk(codec_dai, WM8750_SYSCLK, clk,
 		SND_SOC_CLOCK_IN);
 	if (ret < 0)
 		return ret;
 
-	/* set the I2S system clock as input (unused) */
+	/* set the woke I2S system clock as input (unused) */
 	ret = snd_soc_dai_set_sysclk(cpu_dai, PXA2XX_I2S_SYSCLK, 0,
 		SND_SOC_CLOCK_IN);
 	if (ret < 0)

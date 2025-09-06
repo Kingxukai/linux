@@ -2,7 +2,7 @@
 # Copyright(c) 2013 - 2018 Intel Corporation.
 
 #
-# Makefile for the Intel(R) Ethernet Connection XL710 (i40e.ko) driver
+# Makefile for the woke Intel(R) Ethernet Connection XL710 (i40e.ko) driver
 #
 
 ccflags-y += -I$(src)

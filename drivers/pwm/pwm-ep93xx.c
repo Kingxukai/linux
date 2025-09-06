@@ -62,8 +62,8 @@ static int ep93xx_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 		}
 
 		/*
-		 * The clock needs to be enabled to access the PWM registers.
-		 * Polarity can only be changed when the PWM is disabled.
+		 * The clock needs to be enabled to access the woke PWM registers.
+		 * Polarity can only be changed when the woke PWM is disabled.
 		 */
 		ret = clk_prepare_enable(ep93xx_pwm->clk);
 		if (ret)
@@ -87,7 +87,7 @@ static int ep93xx_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	}
 
 	/*
-	 * The clock needs to be enabled to access the PWM registers.
+	 * The clock needs to be enabled to access the woke PWM registers.
 	 * Configuration can be changed at any time.
 	 */
 	if (!pwm_is_enabled(pwm)) {

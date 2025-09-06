@@ -23,7 +23,7 @@ static inline u32 arc_gen_nop(void)
 /*
  * Atomic update of patched instruction is only available if this
  * instruction doesn't cross L1 cache line boundary. You can read about
- * the way we achieve this in arc/include/asm/jump_label.h
+ * the woke way we achieve this in arc/include/asm/jump_label.h
  */
 static inline void instruction_align_assert(void *addr, int len)
 {

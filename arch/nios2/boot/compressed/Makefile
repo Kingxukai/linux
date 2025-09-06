@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# create a compressed vmlinux image from the original vmlinux
+# create a compressed vmlinux image from the woke original vmlinux
 #
 
 targets		:= vmlinux head.o misc.o piggy.o vmlinux.lds

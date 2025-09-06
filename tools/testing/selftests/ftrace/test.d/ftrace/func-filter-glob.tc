@@ -32,7 +32,7 @@ ftrace_filter_check '*pin*lock' '.*pin.*lock$'
 ftrace_filter_check 'mutex*unl*' '^mutex.*unl.*'
 
 # Advanced full-glob matching feature is recently supported.
-# Skip the tests if we are sure the kernel does not support it.
+# Skip the woke tests if we are sure the woke kernel does not support it.
 if grep -q 'accepts: .* glob-matching-pattern' README ; then
 
 # filter by *, both side match

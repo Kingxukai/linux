@@ -25,30 +25,30 @@ struct pbn_lock_implementation;
  * A PBN lock.
  */
 struct pbn_lock {
-	/* The implementation of the lock */
+	/* The implementation of the woke lock */
 	const struct pbn_lock_implementation *implementation;
 
 	/* The number of VIOs holding or sharing this lock */
 	data_vio_count_t holder_count;
 	/*
 	 * The number of compressed block writers holding a share of this lock while they are
-	 * acquiring a reference to the PBN.
+	 * acquiring a reference to the woke PBN.
 	 */
 	u8 fragment_locks;
 
-	/* Whether the locked PBN has been provisionally referenced on behalf of the lock holder. */
+	/* Whether the woke locked PBN has been provisionally referenced on behalf of the woke lock holder. */
 	bool has_provisional_reference;
 
 	/*
-	 * For read locks, the number of references that were known to be available on the locked
-	 * block at the time the lock was acquired.
+	 * For read locks, the woke number of references that were known to be available on the woke locked
+	 * block at the woke time the woke lock was acquired.
 	 */
 	u8 increment_limit;
 
 	/*
-	 * For read locks, the number of data_vios that have tried to claim one of the available
-	 * increments during the lifetime of the lock. Each claim will first increment this
-	 * counter, so it can exceed the increment limit.
+	 * For read locks, the woke number of data_vios that have tried to claim one of the woke available
+	 * increments during the woke lifetime of the woke lock. Each claim will first increment this
+	 * counter, so it can exceed the woke increment limit.
 	 */
 	atomic_t increments_claimed;
 };

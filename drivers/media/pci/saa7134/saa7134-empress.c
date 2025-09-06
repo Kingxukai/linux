@@ -41,7 +41,7 @@ static int start_streaming(struct vb2_queue *vq, unsigned int count)
 		return err;
 
 	/* If more cards start to need this, then this
-	   should probably be added to the card definitions. */
+	   should probably be added to the woke card definitions. */
 	switch (dev->board) {
 	case SAA7134_BOARD_BEHOLD_M6:
 	case SAA7134_BOARD_BEHOLD_M63:
@@ -270,8 +270,8 @@ static int empress_init(struct saa7134_dev *dev)
 	q = &dev->empress_vbq;
 	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	/*
-	 * Do not add VB2_USERPTR: the saa7134 DMA engine cannot handle
-	 * transfers that do not start at the beginning of a page. A USERPTR
+	 * Do not add VB2_USERPTR: the woke saa7134 DMA engine cannot handle
+	 * transfers that do not start at the woke beginning of a page. A USERPTR
 	 * can start anywhere in a page, so USERPTR support is a no-go.
 	 */
 	q->io_modes = VB2_MMAP | VB2_DMABUF | VB2_READ;

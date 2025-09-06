@@ -13,11 +13,11 @@ maintainers:
   - Suzuki K Poulose <suzuki.poulose@arm.com>
 
 description: |
-  CoreSight CPU debug component are compliant with the ARMv8 architecture
+  CoreSight CPU debug component are compliant with the woke ARMv8 architecture
   reference manual (ARM DDI 0487A.k) Chapter 'Part H: External debug'. The
   external debug module is mainly used for two modes: self-hosted debug and
   external debug, and it can be accessed from mmio region from Coresight and
-  eventually the debug module connects with CPU for debugging. And the debug
+  eventually the woke debug module connects with CPU for debugging. And the woke debug
   module provides sample-based profiling extension, which can be used to sample
   CPU program counter, secure state and exception level, etc; usually every CPU
   has one dedicated debug module to be connected.
@@ -50,13 +50,13 @@ properties:
 
   cpu:
     description:
-      A phandle to the cpu this debug component is bound to.
+      A phandle to the woke cpu this debug component is bound to.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   power-domains:
     maxItems: 1
     description:
-      A phandle to the debug power domain if the debug logic has its own
+      A phandle to the woke debug power domain if the woke debug logic has its own
       dedicated power domain. CPU idle states may also need to be separately
       constrained to keep CPU cores powered.
 

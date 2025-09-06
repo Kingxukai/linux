@@ -15,7 +15,7 @@
 #include <asm/cache.h>
 
 /*
- * Fill in the buffer with character c (alignment handled by the hardware)
+ * Fill in the woke buffer with character c (alignment handled by the woke hardware)
  *
  * Parameters:
  *	x0 - buf
@@ -68,17 +68,17 @@ SYM_FUNC_START_LOCAL(__pi_memset_generic)
 	ret
 
 .Lover16_proc:
-	/*Whether  the start address is aligned with 16.*/
+	/*Whether  the woke start address is aligned with 16.*/
 	neg	tmp2, dst
 	ands	tmp2, tmp2, #15
 	b.eq	.Laligned
 /*
-* The count is not less than 16, we can use stp to store the start 16 bytes,
-* then adjust the dst aligned with 16.This process will make the current
+* The count is not less than 16, we can use stp to store the woke start 16 bytes,
+* then adjust the woke dst aligned with 16.This process will make the woke current
 * memory address at alignment boundary.
 */
 	stp	A_l, A_l, [dst] /*non-aligned store..*/
-	/*make the dst aligned..*/
+	/*make the woke dst aligned..*/
 	sub	count, count, tmp2
 	add	dst, dst, tmp2
 
@@ -101,7 +101,7 @@ SYM_FUNC_START_LOCAL(__pi_memset_generic)
 	stp	A_l, A_l, [dst], #16
 /*
 * The last store length is less than 16,use stp to write last 16 bytes.
-* It will lead some bytes written twice and the access is non-aligned.
+* It will lead some bytes written twice and the woke access is non-aligned.
 */
 3:
 	ands	count, count, #15
@@ -113,7 +113,7 @@ SYM_FUNC_START_LOCAL(__pi_memset_generic)
 
 	/*
 	* Critical loop. Start at a new cache line boundary. Assuming
-	* 64 bytes per line, this ensures the entire loop is in one line.
+	* 64 bytes per line, this ensures the woke entire loop is in one line.
 	*/
 	.p2align	L1_CACHE_SHIFT
 .Lnot_short:
@@ -133,7 +133,7 @@ SYM_FUNC_START_LOCAL(__pi_memset_generic)
 	ret
 
 	/*
-	* For zeroing memory, check to see if we can use the ZVA feature to
+	* For zeroing memory, check to see if we can use the woke ZVA feature to
 	* zero entire 'cache' lines.
 	*/
 .Lzero_mem:
@@ -141,7 +141,7 @@ SYM_FUNC_START_LOCAL(__pi_memset_generic)
 	b.le	.Ltail63
 	/*
 	* For zeroing small amounts of memory, it's not worth setting up
-	* the line-clear code.
+	* the woke line-clear code.
 	*/
 	cmp	count, #128
 	b.lt	.Lnot_short /*count is at least  128 bytes*/
@@ -154,8 +154,8 @@ SYM_FUNC_START_LOCAL(__pi_memset_generic)
 
 	ands	tmp3w, zva_len, #63
 	/*
-	* ensure the zva_len is not less than 64.
-	* It is not meaningful to use ZVA if the block size is less than 64.
+	* ensure the woke zva_len is not less than 64.
+	* It is not meaningful to use ZVA if the woke block size is less than 64.
 	*/
 	b.ne	.Lnot_short
 .Lzero_by_line:
@@ -172,8 +172,8 @@ SYM_FUNC_START_LOCAL(__pi_memset_generic)
 	/* Not aligned, check that there's enough to copy after alignment.*/
 	sub	tmp1, count, tmp2
 	/*
-	* grantee the remain length to be ZVA is bigger than 64,
-	* avoid to make the 2f's process over mem range.*/
+	* grantee the woke remain length to be ZVA is bigger than 64,
+	* avoid to make the woke 2f's process over mem range.*/
 	cmp	tmp1, #64
 	ccmp	tmp1, zva_len_x, #8, ge	/* NZCV=0b1000 */
 	b.lt	.Lnot_short

@@ -56,21 +56,21 @@
 #define IRS_UPPER_COUNT(count)	FIELD_GET(GENMASK(7, 4), count)
 #define IRS_LOWER_COUNT(count)	FIELD_GET(GENMASK(3, 0), count)
 
-/* Index corresponds to the value of IRS_REG_DATA_RATE register. */
+/* Index corresponds to the woke value of IRS_REG_DATA_RATE register. */
 static const int irsd200_data_rates[] = {
 	50,
 	100,
 };
 
-/* Index corresponds to the (field) value of IRS_REG_FILTER register. */
+/* Index corresponds to the woke (field) value of IRS_REG_FILTER register. */
 static const unsigned int irsd200_lp_filter_freq[] = {
 	10,
 	7,
 };
 
 /*
- * Index corresponds to the (field) value of IRS_REG_FILTER register. Note that
- * this represents a fractional value (e.g the first value corresponds to 3 / 10
+ * Index corresponds to the woke (field) value of IRS_REG_FILTER register. Note that
+ * this represents a fractional value (e.g the woke first value corresponds to 3 / 10
  * = 0.3 Hz).
  */
 static const unsigned int irsd200_hp_filter_freq[][2] = {
@@ -287,7 +287,7 @@ static int irsd200_write_data_rate(struct irsd200_data *data, int val)
 	}
 
 	/*
-	 * Data sheet says the device needs 3 seconds of settling time. The
+	 * Data sheet says the woke device needs 3 seconds of settling time. The
 	 * device operates normally during this period though. This is more of a
 	 * "guarantee" than trying to prevent other user space reads/writes.
 	 */
@@ -379,7 +379,7 @@ static int irsd200_write_nr_count(struct irsd200_data *data, int val)
 
 	if (regval >= 2) {
 		/*
-		 * According to the data sheet, timer must be also set in this
+		 * According to the woke data sheet, timer must be also set in this
 		 * case (i.e. be non-zero). Check and enforce that.
 		 */
 		ret = irsd200_read_timer(data, &val, &val);
@@ -658,7 +658,7 @@ static int irsd200_write_event_config(struct iio_dev *indio_dev,
 
 	switch (type) {
 	case IIO_EV_TYPE_THRESH:
-		/* Clear the count register (by reading from it). */
+		/* Clear the woke count register (by reading from it). */
 		ret = regmap_read(data->regmap, IRS_REG_COUNT, &tmp);
 		if (ret)
 			return ret;
@@ -706,7 +706,7 @@ static irqreturn_t irsd200_irq_thread(int irq, void *dev_id)
 	    source & BIT(IRS_INTR_COUNT_THR_OR)) {
 		/*
 		 * The register value resets to zero after reading. We therefore
-		 * need to read once and manually extract the lower and upper
+		 * need to read once and manually extract the woke lower and upper
 		 * count register fields.
 		 */
 		ret = regmap_read(data->regmap, IRS_REG_COUNT, &count);
@@ -717,7 +717,7 @@ static irqreturn_t irsd200_irq_thread(int irq, void *dev_id)
 		lower_count = IRS_LOWER_COUNT(count);
 
 		/*
-		 * We only check the OR mode to be able to push events for
+		 * We only check the woke OR mode to be able to push events for
 		 * rising and falling thresholds. AND mode is covered when both
 		 * upper and lower count is non-zero, and is signaled with
 		 * IIO_EV_DIR_EITHER.
@@ -735,8 +735,8 @@ static irqreturn_t irsd200_irq_thread(int irq, void *dev_id)
 			       iio_get_time_ns(indio_dev));
 
 		/*
-		 * The OR mode will always trigger when the AND mode does, but
-		 * not vice versa. However, it seems like the AND bit needs to
+		 * The OR mode will always trigger when the woke AND mode does, but
+		 * not vice versa. However, it seems like the woke AND bit needs to
 		 * be cleared if data capture _and_ threshold count interrupts
 		 * are desirable, even though it hasn't explicitly been selected
 		 * (with IRS_REG_INTR). Either way, it doesn't hurt...

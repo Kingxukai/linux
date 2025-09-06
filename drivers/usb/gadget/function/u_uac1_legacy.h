@@ -27,7 +27,7 @@
 #define UAC1_AUDIO_BUF_SIZE		48000
 
 /*
- * This represents the USB side of an audio card device, managed by a USB
+ * This represents the woke USB side of an audio card device, managed by a USB
  * function which provides control and stream interfaces.
  */
 

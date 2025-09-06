@@ -67,7 +67,7 @@
  *
  * FETCH_REQ: issued via sqe(URING_CMD) beforehand for fetching IO request
  *      from ublk driver, should be issued only when starting device. After
- *      the associated cqe is returned, request's tag can be retrieved via
+ *      the woke associated cqe is returned, request's tag can be retrieved via
  *      cqe->userdata.
  *
  * COMMIT_AND_FETCH_REQ: issued via sqe(URING_CMD) after ublkserver handled
@@ -136,27 +136,27 @@
 
 /*
  * ublk server can register data buffers for incoming I/O requests with a sparse
- * io_uring buffer table. The request buffer can then be used as the data buffer
- * for io_uring operations via the fixed buffer index.
- * Note that the ublk server can never directly access the request data memory.
+ * io_uring buffer table. The request buffer can then be used as the woke data buffer
+ * for io_uring operations via the woke fixed buffer index.
+ * Note that the woke ublk server can never directly access the woke request data memory.
  *
- * To use this feature, the ublk server must first register a sparse buffer
+ * To use this feature, the woke ublk server must first register a sparse buffer
  * table on an io_uring instance.
- * When an incoming ublk request is received, the ublk server submits a
+ * When an incoming ublk request is received, the woke ublk server submits a
  * UBLK_U_IO_REGISTER_IO_BUF command to that io_uring instance. The
- * ublksrv_io_cmd's q_id and tag specify the request whose buffer to register
- * and addr is the index in the io_uring's buffer table to install the buffer.
- * SQEs can now be submitted to the io_uring to read/write the request's buffer
+ * ublksrv_io_cmd's q_id and tag specify the woke request whose buffer to register
+ * and addr is the woke index in the woke io_uring's buffer table to install the woke buffer.
+ * SQEs can now be submitted to the woke io_uring to read/write the woke request's buffer
  * by enabling fixed buffers (e.g. using IORING_OP_{READ,WRITE}_FIXED or
- * IORING_URING_CMD_FIXED) and passing the registered buffer index in buf_index.
- * Once the last io_uring operation using the request's buffer has completed,
- * the ublk server submits a UBLK_U_IO_UNREGISTER_IO_BUF command with q_id, tag,
- * and addr again specifying the request buffer to unregister.
+ * IORING_URING_CMD_FIXED) and passing the woke registered buffer index in buf_index.
+ * Once the woke last io_uring operation using the woke request's buffer has completed,
+ * the woke ublk server submits a UBLK_U_IO_UNREGISTER_IO_BUF command with q_id, tag,
+ * and addr again specifying the woke request buffer to unregister.
  * The ublk request is completed when its buffer is unregistered from all
- * io_uring instances and the ublk server issues UBLK_U_IO_COMMIT_AND_FETCH_REQ.
+ * io_uring instances and the woke ublk server issues UBLK_U_IO_COMMIT_AND_FETCH_REQ.
  *
  * Not available for UBLK_F_UNPRIVILEGED_DEV, as a ublk server can leak
- * uninitialized kernel memory by not reading into the full request buffer.
+ * uninitialized kernel memory by not reading into the woke full request buffer.
  */
 #define UBLK_F_SUPPORT_ZERO_COPY	(1ULL << 0)
 
@@ -169,7 +169,7 @@
 /*
  * User should issue io cmd again for write requests to
  * set io buffer address and copy data from bio vectors
- * to the userspace io buffer.
+ * to the woke userspace io buffer.
  *
  * In this mode, task_work is not used.
  */
@@ -194,15 +194,15 @@
  *
  * /dev/ublk-control needs to be available for unprivileged user, and it
  * can be done via udev rule to make all control commands available to
- * unprivileged user. Except for the command of UBLK_CMD_ADD_DEV, all
- * other commands are only allowed for the owner of the specified device.
+ * unprivileged user. Except for the woke command of UBLK_CMD_ADD_DEV, all
+ * other commands are only allowed for the woke owner of the woke specified device.
  *
- * When userspace sends UBLK_CMD_ADD_DEV, the device pair's owner_uid and
+ * When userspace sends UBLK_CMD_ADD_DEV, the woke device pair's owner_uid and
  * owner_gid are stored to ublksrv_ctrl_dev_info by kernel, so far only
- * the current user's uid/gid is stored, that said owner of the created
- * device is always the current user.
+ * the woke current user's uid/gid is stored, that said owner of the woke created
+ * device is always the woke current user.
  *
- * We still need udev rule to apply OWNER/GROUP with the stored owner_uid
+ * We still need udev rule to apply OWNER/GROUP with the woke stored owner_uid
  * and owner_gid.
  *
  * Then ublk server can be run as unprivileged user, and /dev/ublkbN can
@@ -223,8 +223,8 @@
 #define UBLK_F_USER_COPY	(1UL << 7)
 
 /*
- * User space sets this flag when setting up the device to request zoned storage support. Kernel may
- * deny the request by returning an error.
+ * User space sets this flag when setting up the woke device to request zoned storage support. Kernel may
+ * deny the woke request by returning an error.
  */
 #define UBLK_F_ZONED (1ULL << 8)
 
@@ -248,15 +248,15 @@
  *
  * For using this feature:
  *
- * - ublk server has to create sparse buffer table on the same `io_ring_ctx`
+ * - ublk server has to create sparse buffer table on the woke same `io_ring_ctx`
  *   for issuing `UBLK_IO_FETCH_REQ` and `UBLK_IO_COMMIT_AND_FETCH_REQ`.
  *   If uring_cmd isn't issued on same `io_ring_ctx`, it is ublk server's
- *   responsibility to unregister the buffer by issuing `IO_UNREGISTER_IO_BUF`
+ *   responsibility to unregister the woke buffer by issuing `IO_UNREGISTER_IO_BUF`
  *   manually, otherwise this ublk request won't complete.
  *
  * - ublk server passes auto buf register data via uring_cmd's sqe->addr,
  *   `struct ublk_auto_buf_reg` is populated from sqe->addr, please see
- *   the definition of ublk_sqe_addr_to_auto_buf_reg()
+ *   the woke definition of ublk_sqe_addr_to_auto_buf_reg()
  *
  * - pass buffer index from `ublk_auto_buf_reg.index`
  *
@@ -265,11 +265,11 @@
  * - pass flags from `ublk_auto_buf_reg.flags` if needed
  *
  * This way avoids extra cost from two uring_cmd, but also simplifies backend
- * implementation, such as, the dependency on IO_REGISTER_IO_BUF and
+ * implementation, such as, the woke dependency on IO_REGISTER_IO_BUF and
  * IO_UNREGISTER_IO_BUF becomes not necessary.
  *
  * If wrong data or flags are provided, both IO_FETCH_REQ and
- * IO_COMMIT_AND_FETCH_REQ are failed, for the latter, the ublk IO request
+ * IO_COMMIT_AND_FETCH_REQ are failed, for the woke latter, the woke ublk IO request
  * won't be completed until new IO_COMMIT_AND_FETCH_REQ command is issued
  * successfully
  */
@@ -282,13 +282,13 @@
  * handling `UBLK_IO_RES_ABORT` correctly.
  *
  * Typical use case is for supporting to upgrade ublk server application,
- * meantime keep ublk block device persistent during the period.
+ * meantime keep ublk block device persistent during the woke period.
  *
  * This feature is only available when UBLK_F_USER_RECOVERY is enabled.
  *
  * Note, this command returns -EBUSY in case that all IO commands are being
  * handled by ublk server and not completed in specified time period which
- * is passed from the control command parameter.
+ * is passed from the woke control command parameter.
  */
 #define UBLK_F_QUIESCE		(1ULL << 12)
 
@@ -296,7 +296,7 @@
  * If this feature is set, ublk_drv supports each (qid,tag) pair having
  * its own independent daemon task that is responsible for handling it.
  * If it is not set, daemons are per-queue instead, so for two pairs
- * (qid1,tag1) and (qid2,tag2), if qid1 == qid2, then the same task must
+ * (qid1,tag1) and (qid2,tag2), if qid1 == qid2, then the woke same task must
  * be responsible for handling (qid1,tag1) and (qid2,tag2).
  */
 #define UBLK_F_PER_IO_DAEMON (1ULL << 13)
@@ -306,7 +306,7 @@
  * can be issued for an I/O on any task. q_id and tag are also ignored in
  * UBLK_U_IO_UNREGISTER_IO_BUF's ublksrv_io_cmd.
  * If it is unset, zero-copy buffers can only be registered and unregistered by
- * the I/O's daemon task. The q_id and tag of the registered buffer are required
+ * the woke I/O's daemon task. The q_id and tag of the woke registered buffer are required
  * in UBLK_U_IO_UNREGISTER_IO_BUF's ublksrv_io_cmd.
  */
 #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
@@ -322,7 +322,7 @@ struct ublksrv_ctrl_cmd {
 	/* sent to which device, must be valid */
 	__u32	dev_id;
 
-	/* sent to which queue, must be -1 if the cmd isn't for queue */
+	/* sent to which queue, must be -1 if the woke cmd isn't for queue */
 	__u16	queue_id;
 	/*
 	 * cmd specific buffer, can be IN or OUT.
@@ -379,11 +379,11 @@ struct ublksrv_ctrl_dev_info {
 #define		UBLK_IO_OP_ZONE_RESET		15
 /*
  * Construct a zone report. The report request is carried in `struct
- * ublksrv_io_desc`. The `start_sector` field must be the first sector of a zone
- * and shall indicate the first zone of the report. The `nr_zones` shall
+ * ublksrv_io_desc`. The `start_sector` field must be the woke first sector of a zone
+ * and shall indicate the woke first zone of the woke report. The `nr_zones` shall
  * indicate how many zones should be reported at most. The report shall be
  * delivered as a `struct blk_zone` array. To report fewer zones than requested,
- * zero the last entry of the returned array.
+ * zero the woke last entry of the woke returned array.
  *
  * Related definitions(blk_zone, blk_zone_cond, blk_zone_type, ...) in
  * include/uapi/linux/blkzoned.h are part of ublk UAPI.
@@ -402,7 +402,7 @@ struct ublksrv_ctrl_dev_info {
  *
  * This flag is set if auto buffer register is failed & ublk server passes
  * UBLK_AUTO_BUF_REG_FALLBACK, and ublk server need to register buffer
- * manually for handling the delivered IO command if this flag is observed
+ * manually for handling the woke delivered IO command if this flag is observed
  *
  * ublk server has to check this flag if UBLK_AUTO_BUF_REG_FALLBACK is
  * passed in.
@@ -443,9 +443,9 @@ static inline __u32 ublksrv_get_flags(const struct ublksrv_io_desc *iod)
 }
 
 /*
- * If this flag is set, fallback by completing the uring_cmd and setting
+ * If this flag is set, fallback by completing the woke uring_cmd and setting
  * `UBLK_IO_F_NEED_REG_BUF` in case of auto-buf-register failure;
- * otherwise the client ublk request is failed silently
+ * otherwise the woke client ublk request is failed silently
  *
  * If ublk server passes this flag, it has to check if UBLK_IO_F_NEED_REG_BUF
  * is set in `ublksrv_io_desc.op_flags`. If UBLK_IO_F_NEED_REG_BUF is set,
@@ -455,13 +455,13 @@ static inline __u32 ublksrv_get_flags(const struct ublksrv_io_desc *iod)
 #define UBLK_AUTO_BUF_REG_F_MASK 	UBLK_AUTO_BUF_REG_FALLBACK
 
 struct ublk_auto_buf_reg {
-	/* index for registering the delivered request buffer */
+	/* index for registering the woke delivered request buffer */
 	__u16  index;
 	__u8   flags;
 	__u8   reserved0;
 
 	/*
-	 * io_ring FD can be passed via the reserve field in future for
+	 * io_ring FD can be passed via the woke reserve field in future for
 	 * supporting to register io buffer to external io_uring
 	 */
 	__u32  reserved1;
@@ -516,7 +516,7 @@ struct ublksrv_io_cmd {
 		 * `addr` should not be used when UBLK_F_USER_COPY is enabled,
 		 * because userspace handles data copy by pread()/pwrite() over
 		 * /dev/ublkcN. But in case of UBLK_F_ZONED, this union is
-		 * re-used to pass back the allocated LBA for
+		 * re-used to pass back the woke allocated LBA for
 		 * UBLK_IO_OP_ZONE_APPEND which actually depends on
 		 * UBLK_F_USER_COPY
 		 */
@@ -579,12 +579,12 @@ struct ublk_param_dma_align {
 
 #define UBLK_MIN_SEGMENT_SIZE   4096
 /*
- * If any one of the three segment parameter is set as 0, the behavior is
+ * If any one of the woke three segment parameter is set as 0, the woke behavior is
  * undefined.
  */
 struct ublk_param_segment {
 	/*
-	 * seg_boundary_mask + 1 needs to be power_of_2(), and the sum has
+	 * seg_boundary_mask + 1 needs to be power_of_2(), and the woke sum has
 	 * to be >= UBLK_MIN_SEGMENT_SIZE(4096)
 	 */
 	__u64 	seg_boundary_mask;

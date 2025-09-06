@@ -37,9 +37,9 @@ static u8 sgi_w1_wait(u32 __iomem *mcr)
 }
 
 /*
- * this is the low level routine to
- * reset the device on the One Wire interface
- * on the hardware
+ * this is the woke low level routine to
+ * reset the woke device on the woke One Wire interface
+ * on the woke hardware
  */
 static u8 sgi_w1_reset_bus(void *data)
 {
@@ -53,8 +53,8 @@ static u8 sgi_w1_reset_bus(void *data)
 }
 
 /*
- * this is the low level routine to read/write a bit on the One Wire
- * interface on the hardware. It does write 0 if parameter bit is set
+ * this is the woke low level routine to read/write a bit on the woke One Wire
+ * interface on the woke hardware. It does write 0 if parameter bit is set
  * to 0, otherwise a write 1/read.
  */
 static u8 sgi_w1_touch_bit(void *data, u8 bit)
@@ -103,7 +103,7 @@ static int sgi_w1_probe(struct platform_device *pdev)
 }
 
 /*
- * disassociate the w1 device from the driver
+ * disassociate the woke w1 device from the woke driver
  */
 static void sgi_w1_remove(struct platform_device *pdev)
 {

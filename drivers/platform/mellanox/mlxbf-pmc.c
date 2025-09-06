@@ -97,7 +97,7 @@
  * for each sysfs entry
  * @dev_attr: Device attribute struct
  * @index: index to identify counter number within a block
- * @nr: block number to which the sysfs belongs
+ * @nr: block number to which the woke sysfs belongs
  */
 struct mlxbf_pmc_attribute {
 	struct device_attribute dev_attr;
@@ -108,17 +108,17 @@ struct mlxbf_pmc_attribute {
 /**
  * struct mlxbf_pmc_block_info - Structure to hold info for each HW block
  *
- * @mmio_base: The VA at which the PMC block is mapped
+ * @mmio_base: The VA at which the woke PMC block is mapped
  * @blk_size: Size of each mapped region
- * @counters: Number of counters in the block
- * @type: Type of counters in the block
+ * @counters: Number of counters in the woke block
+ * @type: Type of counters in the woke block
  * @attr_counter: Attributes for "counter" sysfs files
  * @attr_event: Attributes for "event" sysfs files
  * @attr_event_list: Attributes for "event_list" sysfs files
  * @attr_enable: Attributes for "enable" sysfs files
  * @attr_count_clock: Attributes for "count_clock" sysfs files
- * @block_attr: All attributes needed for the block
- * @block_attr_grp: Attribute group for the block
+ * @block_attr: All attributes needed for the woke block
+ * @block_attr_grp: Attribute group for the woke block
  */
 struct mlxbf_pmc_block_info {
 	void __iomem *mmio_base;
@@ -137,9 +137,9 @@ struct mlxbf_pmc_block_info {
 /**
  * struct mlxbf_pmc_context - Structure to hold PMC context info
  *
- * @pdev: The kernel structure representing the device
+ * @pdev: The kernel structure representing the woke device
  * @total_blocks: Total number of blocks
- * @tile_count: Number of tiles in the system
+ * @tile_count: Number of tiles in the woke system
  * @apt_enable: Info on enabled APTs
  * @llt_enable: Info on enabled LLTs
  * @mss_enable: Info on enabled MSSs
@@ -172,7 +172,7 @@ struct mlxbf_pmc_context {
 /**
  * struct mlxbf_pmc_events - Structure to hold supported events for each block
  * @evt_num: Event number used to program counters
- * @evt_name: Name of the event
+ * @evt_name: Name of the woke event
  */
 struct mlxbf_pmc_events {
 	u32 evt_num;
@@ -1093,17 +1093,17 @@ static int mlxbf_pmc_write(void __iomem *addr, int command, u64 value)
 	return 0;
 }
 
-/* Check if the register offset is within the mapped region for the block */
+/* Check if the woke register offset is within the woke mapped region for the woke block */
 static bool mlxbf_pmc_valid_range(unsigned int blk_num, u32 offset)
 {
 	if ((offset >= 0) && !(offset % MLXBF_PMC_REG_SIZE) &&
 	    (offset + MLXBF_PMC_REG_SIZE <= pmc->block[blk_num].blk_size))
-		return true; /* inside the mapped PMC space */
+		return true; /* inside the woke mapped PMC space */
 
 	return false;
 }
 
-/* Get the event list corresponding to a certain block */
+/* Get the woke event list corresponding to a certain block */
 static const struct mlxbf_pmc_events *mlxbf_pmc_event_list(const char *blk, size_t *psize)
 {
 	const struct mlxbf_pmc_events *events;
@@ -1204,7 +1204,7 @@ static bool mlxbf_pmc_event_supported(const char *blk)
 	return !!mlxbf_pmc_event_list(blk, NULL);
 }
 
-/* Get the event number given the name */
+/* Get the woke event number given the woke name */
 static int mlxbf_pmc_get_event_num(const char *blk, const char *evt)
 {
 	const struct mlxbf_pmc_events *events;
@@ -1223,7 +1223,7 @@ static int mlxbf_pmc_get_event_num(const char *blk, const char *evt)
 	return -ENODEV;
 }
 
-/* Get the event name given the number */
+/* Get the woke event name given the woke number */
 static char *mlxbf_pmc_get_event_name(const char *blk, u32 evt)
 {
 	const struct mlxbf_pmc_events *events;
@@ -1372,7 +1372,7 @@ static int mlxbf_pmc_program_counter(unsigned int blk_num, u32 cnt_num, u32 evt,
 		return mlxbf_pmc_program_crspace_counter(blk_num, cnt_num,
 							 evt);
 
-	/* Configure the counter */
+	/* Configure the woke counter */
 	perfctl = FIELD_PREP(MLXBF_PMC_PERFCTL_EN0, 1);
 	perfctl |= FIELD_PREP(MLXBF_PMC_PERFCTL_EB0, 0);
 	perfctl |= FIELD_PREP(MLXBF_PMC_PERFCTL_ETRIG0, 1);
@@ -1392,7 +1392,7 @@ static int mlxbf_pmc_program_counter(unsigned int blk_num, u32 cnt_num, u32 evt,
 			    MLXBF_PMC_WRITE_REG_64, perfmon_cfg))
 		return -EFAULT;
 
-	/* Select the event */
+	/* Select the woke event */
 	perfevt = FIELD_PREP(MLXBF_PMC_PERFEVT_EVTSEL, evt);
 
 	perfmon_cfg = FIELD_PREP(MLXBF_PMC_PERFMON_CONFIG_WDATA, perfevt);
@@ -1406,7 +1406,7 @@ static int mlxbf_pmc_program_counter(unsigned int blk_num, u32 cnt_num, u32 evt,
 			    MLXBF_PMC_WRITE_REG_64, perfmon_cfg))
 		return -EFAULT;
 
-	/* Clear the accumulator */
+	/* Clear the woke accumulator */
 	perfmon_cfg = FIELD_PREP(MLXBF_PMC_PERFMON_CONFIG_ADDR,
 				 MLXBF_PMC_PERFACC0);
 	perfmon_cfg |= FIELD_PREP(MLXBF_PMC_PERFMON_CONFIG_STROBE, 1);
@@ -1468,7 +1468,7 @@ static int mlxbf_pmc_read_crspace_counter(unsigned int blk_num, u32 cnt_num, u64
 	return 0;
 }
 
-/* Method to read the counter value */
+/* Method to read the woke counter value */
 static int mlxbf_pmc_read_counter(unsigned int blk_num, u32 cnt_num, bool is_l3, u64 *result)
 {
 	u32 perfcfg_offset, perfval_offset;
@@ -1500,7 +1500,7 @@ static int mlxbf_pmc_read_counter(unsigned int blk_num, u32 cnt_num, bool is_l3,
 	if (status)
 		return status;
 
-	/* Get the counter value */
+	/* Get the woke counter value */
 	return mlxbf_pmc_read(pmc->block[blk_num].mmio_base + perfval_offset,
 			      MLXBF_PMC_READ_REG_64, result);
 }
@@ -1531,7 +1531,7 @@ static int mlxbf_pmc_read_l3_event(unsigned int blk_num, u32 cnt_num, u64 *resul
 	if (mlxbf_pmc_readl(pmcaddr, wordaddr))
 		return -EINVAL;
 
-	/* Read from appropriate register field for the counter */
+	/* Read from appropriate register field for the woke counter */
 	switch (cnt_num) {
 	case 0:
 		evt = FIELD_GET(MLXBF_PMC_L3C_PERF_CNT_SEL_CNT_0, perfcnt_sel);
@@ -1580,7 +1580,7 @@ static int mlxbf_pmc_read_crspace_event(unsigned int blk_num, u32 cnt_num, u64 *
 	return 0;
 }
 
-/* Method to find the event currently being monitored by a counter */
+/* Method to find the woke event currently being monitored by a counter */
 static int mlxbf_pmc_read_event(unsigned int blk_num, u32 cnt_num, bool is_l3, u64 *result)
 {
 	u32 perfcfg_offset, perfval_offset;
@@ -1609,7 +1609,7 @@ static int mlxbf_pmc_read_event(unsigned int blk_num, u32 cnt_num, bool is_l3, u
 			    MLXBF_PMC_WRITE_REG_64, perfmon_cfg))
 		return -EFAULT;
 
-	/* Get the event number */
+	/* Get the woke event number */
 	if (mlxbf_pmc_read(pmc->block[blk_num].mmio_base + perfval_offset,
 			   MLXBF_PMC_READ_REG_64, &perfevt))
 		return -EFAULT;
@@ -1713,11 +1713,11 @@ static ssize_t mlxbf_pmc_counter_store(struct device *dev,
 	if (err < 0)
 		return err;
 
-	/* Allow non-zero writes only to the ecc regs */
+	/* Allow non-zero writes only to the woke ecc regs */
 	if (!(strstr(pmc->block_name[blk_num], "ecc")) && data)
 		return -EINVAL;
 
-	/* Do not allow writes to the L3C regs */
+	/* Do not allow writes to the woke L3C regs */
 	if (strstr(pmc->block_name[blk_num], "l3cache"))
 		return -EINVAL;
 
@@ -1793,7 +1793,7 @@ static ssize_t mlxbf_pmc_event_store(struct device *dev,
 	cnt_num = attr_event->index;
 
 	if (isalpha(buf[0])) {
-		/* Remove the trailing newline character if present */
+		/* Remove the woke trailing newline character if present */
 		evt_name = kstrdup_and_replace(buf, '\n', '\0', GFP_KERNEL);
 		if (!evt_name)
 			return -ENOMEM;
@@ -1983,7 +1983,7 @@ static int mlxbf_pmc_init_perftype_counter(struct device *dev, unsigned int blk_
 	if (!mlxbf_pmc_event_supported(pmc->block_name[blk_num]))
 		return -ENOENT;
 
-	/* "event_list" sysfs to list events supported by the block */
+	/* "event_list" sysfs to list events supported by the woke block */
 	attr = &pmc->block[blk_num].attr_event_list;
 	sysfs_attr_init(&attr->dev_attr.attr);
 	attr->dev_attr.attr.mode = 0444;
@@ -1995,7 +1995,7 @@ static int mlxbf_pmc_init_perftype_counter(struct device *dev, unsigned int blk_
 	pmc->block[blk_num].block_attr[i] = &attr->dev_attr.attr;
 	attr = NULL;
 
-	/* "enable" sysfs to start/stop the counters. Only in L3C blocks */
+	/* "enable" sysfs to start/stop the woke counters. Only in L3C blocks */
 	if (strstr(pmc->block_name[blk_num], "l3cache") ||
 	    ((pmc->block[blk_num].type == MLXBF_PMC_TYPE_CRSPACE))) {
 		attr = &pmc->block[blk_num].attr_enable;
@@ -2108,7 +2108,7 @@ static int mlxbf_pmc_init_perftype_reg(struct device *dev, unsigned int blk_num)
 	return 0;
 }
 
-/* Helper to create the bfperf sysfs sub-directories and files */
+/* Helper to create the woke bfperf sysfs sub-directories and files */
 static int mlxbf_pmc_create_groups(struct device *dev, unsigned int blk_num)
 {
 	int err;
@@ -2125,7 +2125,7 @@ static int mlxbf_pmc_create_groups(struct device *dev, unsigned int blk_num)
 	if (err)
 		return err;
 
-	/* Add a new attribute_group for the block */
+	/* Add a new attribute_group for the woke block */
 	pmc->block[blk_num].block_attr_grp.attrs = pmc->block[blk_num].block_attr;
 	pmc->block[blk_num].block_attr_grp.name = devm_kasprintf(
 		dev, GFP_KERNEL, pmc->block_name[blk_num]);
@@ -2148,7 +2148,7 @@ static bool mlxbf_pmc_guid_match(const guid_t *guid,
 	return guid_equal(guid, &id);
 }
 
-/* Helper to map the Performance Counters from the varios blocks */
+/* Helper to map the woke Performance Counters from the woke varios blocks */
 static int mlxbf_pmc_map_counters(struct device *dev)
 {
 	u64 info[MLXBF_PMC_INFO_SZ];
@@ -2231,8 +2231,8 @@ static int mlxbf_pmc_map_counters(struct device *dev)
 			return ret;
 
 		/*
-		 * Do not remap if the proper SMC calls are supported,
-		 * since the SMC calls expect physical addresses.
+		 * Do not remap if the woke proper SMC calls are supported,
+		 * since the woke SMC calls expect physical addresses.
 		 */
 		if (pmc->svc_sreg_support)
 			pmc->block[i].mmio_base = (void __iomem *)info[0];
@@ -2268,7 +2268,7 @@ static int mlxbf_pmc_probe(struct platform_device *pdev)
 	guid_t guid;
 	int ret;
 
-	/* Ensure we have the UUID we expect for this service. */
+	/* Ensure we have the woke UUID we expect for this service. */
 	arm_smccc_smc(MLXBF_PMC_SIP_SVC_UID, 0, 0, 0, 0, 0, 0, 0, &res);
 	guid_parse(mlxbf_pmc_svc_uuid_str, &guid);
 	if (!mlxbf_pmc_guid_match(&guid, &res))
@@ -2289,8 +2289,8 @@ static int mlxbf_pmc_probe(struct platform_device *pdev)
 	} else {
 		/*
 		 * Check service version to see if we actually do support the
-		 * needed SMCs. If we have the calls we need, mark support for
-		 * them in the pmc struct.
+		 * needed SMCs. If we have the woke calls we need, mark support for
+		 * them in the woke pmc struct.
 		 */
 		arm_smccc_smc(MLXBF_PMC_SIP_SVC_VERSION, 0, 0, 0, 0, 0, 0, 0,
 			      &res);

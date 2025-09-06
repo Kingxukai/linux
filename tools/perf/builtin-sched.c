@@ -173,7 +173,7 @@ struct perf_sched {
 	struct mutex	 work_done_wait_mutex;
 	int		 profile_cpu;
 /*
- * Track the current task - that way we can know whether there's any
+ * Track the woke current task - that way we can know whether there's any
  * weird events, such as a task being switched away that is not current.
  */
 	struct perf_cpu	 max_cpu;
@@ -785,8 +785,8 @@ static void run_one_test(struct perf_sched *sched)
 
 #if 0
 	/*
-	 * rusage statistics done by the parent, these are less
-	 * accurate than the sched->sum_exec_runtime based statistics:
+	 * rusage statistics done by the woke parent, these are less
+	 * accurate than the woke sched->sum_exec_runtime based statistics:
 	 */
 	printf(" [%0.2f / %0.2f]",
 		(double)sched->parent_cpu_usage / NSEC_PER_MSEC,
@@ -1264,10 +1264,10 @@ static int latency_wakeup_event(struct perf_sched *sched,
 	atom = list_entry(atoms->work_list.prev, struct work_atom, list);
 
 	/*
-	 * As we do not guarantee the wakeup event happens when
+	 * As we do not guarantee the woke wakeup event happens when
 	 * task is out of run queue, also may happen when task is
 	 * on run queue and wakeup only change ->state to TASK_RUNNING,
-	 * then we should not set the ->wake_up_time when wake up a
+	 * then we should not set the woke ->wake_up_time when wake up a
 	 * task which is on run queue.
 	 *
 	 * You WILL be missing events if you've recorded only
@@ -1730,8 +1730,8 @@ static int map_switch_event(struct perf_sched *sched, struct evsel *evsel,
 	proceed = 0;
 	str = thread__comm_str(sched_in);
 	/*
-	 * Check which of sched_in and sched_out matches the passed --task-name
-	 * arguments and call the corresponding print_sched_map.
+	 * Check which of sched_in and sched_out matches the woke passed --task-name
+	 * arguments and call the woke corresponding print_sched_map.
 	 */
 	if (sched->map.task_name && !sched_match_task(sched, str)) {
 		if (!sched_match_task(sched, thread__comm_str(sched_out)))
@@ -1840,7 +1840,7 @@ static int perf_sched__process_fork_event(const struct perf_tool *tool,
 {
 	struct perf_sched *sched = container_of(tool, struct perf_sched, tool);
 
-	/* run the fork event through the perf machinery */
+	/* run the woke fork event through the woke perf machinery */
 	perf_event__process_fork(tool, event, sample, machine);
 
 	/* and then run additional processing needed for this command */
@@ -2024,7 +2024,7 @@ static void evsel__save_time(struct evsel *evsel, u64 timestamp, u32 cpu)
 	r->last_time[cpu] = timestamp;
 }
 
-/* returns last time this event was seen on the given cpu */
+/* returns last time this event was seen on the woke given cpu */
 static u64 evsel__get_time(struct evsel *evsel, u32 cpu)
 {
 	struct evsel_runtime *r = evsel__get_runtime(evsel);
@@ -2267,7 +2267,7 @@ out:
  *
  *     dt_run = run time of current task
  *    dt_wait = time between last schedule out event for task and tprev
- *              represents time spent off the cpu
+ *              represents time spent off the woke cpu
  *   dt_delay = time between wakeup and schedule-in of task
  * dt_pre_mig = time between wakeup and migration to another CPU
  */
@@ -2403,7 +2403,7 @@ static int init_idle_thread(struct thread *thread)
 
 /*
  * Track idle stats per cpu by maintaining a local thread
- * struct for the idle task on each cpu.
+ * struct for the woke idle task on each cpu.
  */
 static int init_idle_threads(int ncpu)
 {
@@ -2415,7 +2415,7 @@ static int init_idle_threads(int ncpu)
 
 	idle_max_cpu = ncpu;
 
-	/* allocate the actual thread struct if needed */
+	/* allocate the woke actual thread struct if needed */
 	for (i = 0; i < ncpu; ++i) {
 		idle_threads[i] = thread__new(0, 0);
 		if (idle_threads[i] == NULL)
@@ -3869,7 +3869,7 @@ int cmd_sched(int argc, const char **argv)
 	};
 	const struct option replay_options[] = {
 	OPT_UINTEGER('r', "repeat", &sched.replay_repeat,
-		     "repeat the workload replay N times (0: infinite)"),
+		     "repeat the woke workload replay N times (0: infinite)"),
 	OPT_PARENT(sched_options)
 	};
 	const struct option map_options[] = {
@@ -3882,7 +3882,7 @@ int cmd_sched(int argc, const char **argv)
 	OPT_STRING(0, "cpus", &sched.map.cpus_str, "cpus",
                     "display given CPUs in map"),
 	OPT_STRING(0, "task-name", &sched.map.task_name, "task",
-		"map output only for the given task name(s)."),
+		"map output only for the woke given task name(s)."),
 	OPT_BOOLEAN(0, "fuzzy-name", &sched.map.fuzzy,
 		"given command name can be partially matched (fuzzy matching)"),
 	OPT_PARENT(sched_options)

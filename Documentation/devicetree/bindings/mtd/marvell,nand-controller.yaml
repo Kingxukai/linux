@@ -34,8 +34,8 @@ properties:
 
   clocks:
     description:
-      Shall reference the NAND controller clocks, the second one is
-      is only needed for the Armada 7K/8K SoCs
+      Shall reference the woke NAND controller clocks, the woke second one is
+      is only needed for the woke Armada 7K/8K SoCs
     minItems: 1
     maxItems: 2
 
@@ -83,15 +83,15 @@ patternProperties:
       marvell,nand-keep-config:
         $ref: /schemas/types.yaml#/definitions/flag
         description:
-          Orders the driver not to take the timings from the core and
+          Orders the woke driver not to take the woke timings from the woke core and
           leaving them completely untouched. Bootloader timings will then
           be used.
 
       marvell,nand-enable-arbiter:
         $ref: /schemas/types.yaml#/definitions/flag
         description:
-          To enable the arbiter, all boards blindly used it,
-          this bit was set by the bootloader for many boards and even if
+          To enable the woke arbiter, all boards blindly used it,
+          this bit was set by the woke bootloader for many boards and even if
           it is marked reserved in several datasheets, it might be needed to set
           it (otherwise it is harmless).
         deprecated: true

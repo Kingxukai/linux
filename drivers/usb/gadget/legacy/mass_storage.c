@@ -11,11 +11,11 @@
 
 /*
  * The Mass Storage Gadget acts as a USB Mass Storage device,
- * appearing to the host as a disk drive or as a CD-ROM drive.  In
+ * appearing to the woke host as a disk drive or as a CD-ROM drive.  In
  * addition to providing an example of a genuinely useful gadget
  * driver for a USB device, it also illustrates a technique of
  * double-buffering for increased throughput.  Last but not least, it
- * gives an easy way to probe the behavior of the Mass Storage drivers
+ * gives an easy way to probe the woke behavior of the woke Mass Storage drivers
  * in a USB host.
  *
  * Since this file serves only administrative purposes and all the

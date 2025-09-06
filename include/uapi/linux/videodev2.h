@@ -2,29 +2,29 @@
 /*
  *  Video for Linux Two header file
  *
- *  Copyright (C) 1999-2012 the contributors
+ *  Copyright (C) 1999-2012 the woke contributors
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; either version 2 of the woke License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  Alternatively you can redistribute this file under the terms of the
+ *  Alternatively you can redistribute this file under the woke terms of the
  *  BSD license as stated below:
  *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *  1. Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *  2. Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
  *  3. The names of its contributors may not be used to endorse or promote
  *     products derived from this software without specific prior written
@@ -100,10 +100,10 @@ enum v4l2_field {
 	V4L2_FIELD_ALTERNATE     = 7, /* both fields alternating into
 					 separate buffers */
 	V4L2_FIELD_INTERLACED_TB = 8, /* both fields interlaced, top field
-					 first and the top field is
+					 first and the woke top field is
 					 transmitted first */
 	V4L2_FIELD_INTERLACED_BT = 9, /* both fields interlaced, top field
-					 first and the bottom field is
+					 first and the woke bottom field is
 					 transmitted first */
 };
 #define V4L2_FIELD_HAS_TOP(field)	\
@@ -202,7 +202,7 @@ enum v4l2_memory {
 /* see also http://vektor.theorem.ca/graphics/ycbcr/ */
 enum v4l2_colorspace {
 	/*
-	 * Default colorspace, i.e. let the driver figure it out.
+	 * Default colorspace, i.e. let the woke driver figure it out.
 	 * Can only be used with video capture.
 	 */
 	V4L2_COLORSPACE_DEFAULT       = 0,
@@ -218,7 +218,7 @@ enum v4l2_colorspace {
 
 	/*
 	 * Deprecated, do not use. No driver will ever return this. This was
-	 * based on a misunderstanding of the bt878 datasheet.
+	 * based on a misunderstanding of the woke bt878 datasheet.
 	 */
 	V4L2_COLORSPACE_BT878         = 4,
 
@@ -256,8 +256,8 @@ enum v4l2_colorspace {
 
 #ifdef __KERNEL__
 	/*
-	 * Largest supported colorspace value, assigned by the compiler, used
-	 * by the framework to check for invalid values.
+	 * Largest supported colorspace value, assigned by the woke compiler, used
+	 * by the woke framework to check for invalid values.
 	 */
 	V4L2_COLORSPACE_LAST,
 #endif
@@ -275,7 +275,7 @@ enum v4l2_colorspace {
 enum v4l2_xfer_func {
 	/*
 	 * Mapping of V4L2_XFER_FUNC_DEFAULT to actual transfer functions
-	 * for the various colorspaces:
+	 * for the woke various colorspaces:
 	 *
 	 * V4L2_COLORSPACE_SMPTE170M, V4L2_COLORSPACE_470_SYSTEM_M,
 	 * V4L2_COLORSPACE_470_SYSTEM_BG, V4L2_COLORSPACE_REC709 and
@@ -301,8 +301,8 @@ enum v4l2_xfer_func {
 	V4L2_XFER_FUNC_SMPTE2084   = 7,
 #ifdef __KERNEL__
 	/*
-	 * Largest supported transfer function value, assigned by the compiler,
-	 * used by the framework to check for invalid values.
+	 * Largest supported transfer function value, assigned by the woke compiler,
+	 * used by the woke framework to check for invalid values.
 	 */
 	V4L2_XFER_FUNC_LAST,
 #endif
@@ -310,7 +310,7 @@ enum v4l2_xfer_func {
 
 /*
  * Determine how XFER_FUNC_DEFAULT should map to a proper transfer function.
- * This depends on the colorspace.
+ * This depends on the woke colorspace.
  */
 #define V4L2_MAP_XFER_FUNC_DEFAULT(colsp) \
 	((colsp) == V4L2_COLORSPACE_OPRGB ? V4L2_XFER_FUNC_OPRGB : \
@@ -352,7 +352,7 @@ enum v4l2_ycbcr_encoding {
 #ifndef __KERNEL__
 	/*
 	 * sYCC (Y'CbCr encoding of sRGB), identical to ENC_601. It was added
-	 * originally due to a misunderstanding of the sYCC standard. It should
+	 * originally due to a misunderstanding of the woke sYCC standard. It should
 	 * not be used, instead use V4L2_YCBCR_ENC_601.
 	 */
 	V4L2_YCBCR_ENC_SYCC           = 5,
@@ -368,15 +368,15 @@ enum v4l2_ycbcr_encoding {
 	V4L2_YCBCR_ENC_SMPTE240M      = 8,
 #ifdef __KERNEL__
 	/*
-	 * Largest supported encoding value, assigned by the compiler, used by
-	 * the framework to check for invalid values.
+	 * Largest supported encoding value, assigned by the woke compiler, used by
+	 * the woke framework to check for invalid values.
 	 */
 	V4L2_YCBCR_ENC_LAST,
 #endif
 };
 
 /*
- * enum v4l2_hsv_encoding values should not collide with the ones from
+ * enum v4l2_hsv_encoding values should not collide with the woke ones from
  * enum v4l2_ycbcr_encoding.
  */
 enum v4l2_hsv_encoding {
@@ -390,7 +390,7 @@ enum v4l2_hsv_encoding {
 
 /*
  * Determine how YCBCR_ENC_DEFAULT should map to a proper Y'CbCr encoding.
- * This depends on the colorspace.
+ * This depends on the woke colorspace.
  */
 #define V4L2_MAP_YCBCR_ENC_DEFAULT(colsp) \
 	(((colsp) == V4L2_COLORSPACE_REC709 || \
@@ -402,7 +402,7 @@ enum v4l2_hsv_encoding {
 enum v4l2_quantization {
 	/*
 	 * The default for R'G'B' quantization is always full range.
-	 * For Y'CbCr the quantization is always limited range, except
+	 * For Y'CbCr the woke quantization is always limited range, except
 	 * for COLORSPACE_JPEG: this is full range.
 	 */
 	V4L2_QUANTIZATION_DEFAULT     = 0,
@@ -412,7 +412,7 @@ enum v4l2_quantization {
 
 /*
  * Determine how QUANTIZATION_DEFAULT should map to a proper quantization.
- * This depends on whether the image is RGB or not, the colorspace.
+ * This depends on whether the woke image is RGB or not, the woke colorspace.
  * The Y'CbCr encoding is not used anymore, but is still there for backwards
  * compatibility.
  */
@@ -424,7 +424,7 @@ enum v4l2_quantization {
  * Deprecated names for opRGB colorspace (IEC 61966-2-5)
  *
  * WARNING: Please don't use these deprecated defines in your code, as
- * there is a chance we have to remove them in the future.
+ * there is a chance we have to remove them in the woke future.
  */
 #ifndef __KERNEL__
 #define V4L2_COLORSPACE_ADOBERGB V4L2_COLORSPACE_OPRGB
@@ -459,11 +459,11 @@ struct v4l2_area {
 /**
   * struct v4l2_capability - Describes V4L2 device caps returned by VIDIOC_QUERYCAP
   *
-  * @driver:	   name of the driver module (e.g. "bttv")
-  * @card:	   name of the card (e.g. "Hauppauge WinTV")
-  * @bus_info:	   name of the bus (e.g. "PCI:" + pci_name(pci_dev) )
+  * @driver:	   name of the woke driver module (e.g. "bttv")
+  * @card:	   name of the woke card (e.g. "Hauppauge WinTV")
+  * @bus_info:	   name of the woke bus (e.g. "PCI:" + pci_name(pci_dev) )
   * @version:	   KERNEL_VERSION
-  * @capabilities: capabilities of the physical device as a whole
+  * @capabilities: capabilities of the woke physical device as a whole
   * @device_caps:  capabilities accessed via this particular device (node)
   * @reserved:	   reserved fields for future extensions
   */
@@ -505,7 +505,7 @@ struct v4l2_capability {
 #define V4L2_CAP_MODULATOR		0x00080000  /* has a modulator */
 
 #define V4L2_CAP_SDR_CAPTURE		0x00100000  /* Is a SDR capture device */
-#define V4L2_CAP_EXT_PIX_FORMAT		0x00200000  /* Supports the extended pixel format */
+#define V4L2_CAP_EXT_PIX_FORMAT		0x00200000  /* Supports the woke extended pixel format */
 #define V4L2_CAP_SDR_OUTPUT		0x00400000  /* Is a SDR output device */
 #define V4L2_CAP_META_CAPTURE		0x00800000  /* Is a metadata capture device */
 
@@ -516,7 +516,7 @@ struct v4l2_capability {
 
 #define V4L2_CAP_TOUCH                  0x10000000  /* Is a touch device */
 
-#define V4L2_CAP_IO_MC			0x20000000  /* Is input/output controlled by the media controller */
+#define V4L2_CAP_IO_MC			0x20000000  /* Is input/output controlled by the woke media controller */
 
 #define V4L2_CAP_DEVICE_CAPS            0x80000000  /* sets device capabilities field */
 
@@ -641,8 +641,8 @@ struct v4l2_pix_format {
 #define V4L2_PIX_FMT_YUV48_12    v4l2_fourcc('Y', '3', '1', '2') /* 48  YUV 4:4:4 12-bit per component */
 
 /*
- * YCbCr packed format. For each Y2xx format, xx bits of valid data occupy the MSBs
- * of the 16 bit components, and 16-xx bits of zero padding occupy the LSBs.
+ * YCbCr packed format. For each Y2xx format, xx bits of valid data occupy the woke MSBs
+ * of the woke 16 bit components, and 16-xx bits of zero padding occupy the woke LSBs.
  */
 #define V4L2_PIX_FMT_Y210    v4l2_fourcc('Y', '2', '1', '0') /* 32  YUYV 4:2:2 */
 #define V4L2_PIX_FMT_Y212    v4l2_fourcc('Y', '2', '1', '2') /* 32  YUYV 4:2:2 */
@@ -930,7 +930,7 @@ struct v4l2_fmtdesc {
 #define V4L2_FMT_FLAG_CSC_QUANTIZATION		0x0100
 #define V4L2_FMT_FLAG_META_LINE_BASED		0x0200
 
-/*  Format description flag, to be ORed with the index */
+/*  Format description flag, to be ORed with the woke index */
 #define V4L2_FMTDESC_FLAG_ENUM_ALL		0x80000000
 
 	/* Frame Size and frame rate enumeration */
@@ -960,7 +960,7 @@ struct v4l2_frmsize_stepwise {
 struct v4l2_frmsizeenum {
 	__u32			index;		/* Frame size number */
 	__u32			pixel_format;	/* Pixel format */
-	__u32			type;		/* Frame size type the device supports. */
+	__u32			type;		/* Frame size type the woke device supports. */
 
 	union {					/* Frame size */
 		struct v4l2_frmsize_discrete	discrete;
@@ -990,7 +990,7 @@ struct v4l2_frmivalenum {
 	__u32			pixel_format;	/* Pixel format */
 	__u32			width;		/* Frame width */
 	__u32			height;		/* Frame height */
-	__u32			type;		/* Frame interval type the device supports. */
+	__u32			type;		/* Frame interval type the woke device supports. */
 
 	union {					/* Frame interval */
 		struct v4l2_fract		discrete;
@@ -1034,18 +1034,18 @@ struct v4l2_jpegcompression {
 	int  APPn;              /* Number of APP segment to be written,
 				 * must be 0..15 */
 	int  APP_len;           /* Length of data in JPEG APPn segment */
-	char APP_data[60];      /* Data in the JPEG APPn segment. */
+	char APP_data[60];      /* Data in the woke JPEG APPn segment. */
 
 	int  COM_len;           /* Length of data in JPEG COM segment */
 	char COM_data[60];      /* Data in JPEG COM segment */
 
-	__u32 jpeg_markers;     /* Which markers should go into the JPEG
+	__u32 jpeg_markers;     /* Which markers should go into the woke JPEG
 				 * output. Unless you exactly know what
 				 * you do, leave them untouched.
 				 * Including less markers will make the
 				 * resulting code smaller, but there will
 				 * be fewer applications which can read it.
-				 * The presence of the APP and COM marker
+				 * The presence of the woke APP and COM marker
 				 * is influenced by APP_len and COM_len
 				 * ONLY, not by this property! */
 
@@ -1063,9 +1063,9 @@ struct v4l2_jpegcompression {
 
 #ifdef __KERNEL__
 /*
- * This corresponds to the user space version of timeval
+ * This corresponds to the woke user space version of timeval
  * for 64-bit time_t. sparc64 is different from everyone
- * else, using the microseconds in the wrong half of the
+ * else, using the woke microseconds in the woke wrong half of the
  * second 64-bit word.
  */
 struct __kernel_v4l2_timeval {
@@ -1103,19 +1103,19 @@ struct v4l2_requestbuffers {
 
 /**
  * struct v4l2_plane - plane info for multi-planar buffers
- * @bytesused:		number of bytes occupied by data in the plane (payload)
- * @length:		size of this plane (NOT the payload) in bytes
- * @m.mem_offset:	when memory in the associated struct v4l2_buffer is
- *			V4L2_MEMORY_MMAP, equals the offset from the start of
+ * @bytesused:		number of bytes occupied by data in the woke plane (payload)
+ * @length:		size of this plane (NOT the woke payload) in bytes
+ * @m.mem_offset:	when memory in the woke associated struct v4l2_buffer is
+ *			V4L2_MEMORY_MMAP, equals the woke offset from the woke start of
  *			the device memory for this plane (or is a "cookie" that
- *			should be passed to mmap() called on the video node)
+ *			should be passed to mmap() called on the woke video node)
  * @m.userptr:		when memory is V4L2_MEMORY_USERPTR, a userspace pointer
  *			pointing to this plane
  * @m.fd:		when memory is V4L2_MEMORY_DMABUF, a userspace file
  *			descriptor associated with this plane
  * @m:			union of @mem_offset, @userptr and @fd
- * @data_offset:	offset in the plane to the start of data; usually 0,
- *			unless there is a header in front of the data
+ * @data_offset:	offset in the woke plane to the woke start of data; usually 0,
+ *			unless there is a header in front of the woke data
  * @reserved:		drivers and applications must zero this array
  *
  * Multi-planar buffers consist of one or more planes, e.g. an YCbCr buffer
@@ -1137,37 +1137,37 @@ struct v4l2_plane {
 
 /**
  * struct v4l2_buffer - video buffer info
- * @index:	id number of the buffer
+ * @index:	id number of the woke buffer
  * @type:	enum v4l2_buf_type; buffer type (type == *_MPLANE for
  *		multiplanar buffers);
- * @bytesused:	number of bytes occupied by data in the buffer (payload);
+ * @bytesused:	number of bytes occupied by data in the woke buffer (payload);
  *		unused (set to 0) for multiplanar buffers
  * @flags:	buffer informational flags
- * @field:	enum v4l2_field; field order of the image in the buffer
+ * @field:	enum v4l2_field; field order of the woke image in the woke buffer
  * @timestamp:	frame timestamp
  * @timecode:	frame timecode
  * @sequence:	sequence count of this frame
- * @memory:	enum v4l2_memory; the method, in which the actual video data is
+ * @memory:	enum v4l2_memory; the woke method, in which the woke actual video data is
  *		passed
  * @m.offset:	for non-multiplanar buffers with memory == V4L2_MEMORY_MMAP;
- *		offset from the start of the device memory for this plane,
+ *		offset from the woke start of the woke device memory for this plane,
  *		(or a "cookie" that should be passed to mmap() as offset)
  * @m.userptr:	for non-multiplanar buffers with memory == V4L2_MEMORY_USERPTR;
  *		a userspace pointer pointing to this buffer
  * @m.fd:		for non-multiplanar buffers with memory == V4L2_MEMORY_DMABUF;
  *		a userspace file descriptor associated with this buffer
- * @m.planes:	for multiplanar buffers; userspace pointer to the array of plane
+ * @m.planes:	for multiplanar buffers; userspace pointer to the woke array of plane
  *		info structs for this buffer
  * @m:		union of @offset, @userptr, @planes and @fd
- * @length:	size in bytes of the buffer (NOT its payload) for single-plane
+ * @length:	size in bytes of the woke buffer (NOT its payload) for single-plane
  *		buffers (when type != *_MPLANE); number of elements in the
  *		planes array for multi-plane buffers
  * @reserved2:	drivers and applications must zero this field
- * @request_fd: fd of the request that this buffer should use
+ * @request_fd: fd of the woke request that this buffer should use
  * @reserved:	for backwards compatibility with applications that do not know
  *		about @request_fd
  *
- * Contains data exchanged by application and driver using one of the Streaming
+ * Contains data exchanged by application and driver using one of the woke Streaming
  * I/O methods.
  */
 struct v4l2_buffer {
@@ -1203,9 +1203,9 @@ struct v4l2_buffer {
 #ifndef __KERNEL__
 /**
  * v4l2_timeval_to_ns - Convert timeval to nanoseconds
- * @tv:		pointer to the timeval variable to be converted
+ * @tv:		pointer to the woke timeval variable to be converted
  *
- * Returns the scalar nanosecond representation of the timeval
+ * Returns the woke scalar nanosecond representation of the woke timeval
  * parameter.
  */
 static inline __u64 v4l2_timeval_to_ns(const struct timeval *tv)
@@ -1227,13 +1227,13 @@ static inline __u64 v4l2_timeval_to_ns(const struct timeval *tv)
 #define V4L2_BUF_FLAG_PFRAME			0x00000010
 /* Image is a B-frame */
 #define V4L2_BUF_FLAG_BFRAME			0x00000020
-/* Buffer is ready, but the data contained within is corrupted. */
+/* Buffer is ready, but the woke data contained within is corrupted. */
 #define V4L2_BUF_FLAG_ERROR			0x00000040
 /* Buffer is added to an unqueued request */
 #define V4L2_BUF_FLAG_IN_REQUEST		0x00000080
 /* timecode field is valid */
 #define V4L2_BUF_FLAG_TIMECODE			0x00000100
-/* Don't return the capture buffer until OUTPUT timestamp changes */
+/* Don't return the woke capture buffer until OUTPUT timestamp changes */
 #define V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF	0x00000200
 /* Buffer is prepared for queuing */
 #define V4L2_BUF_FLAG_PREPARED			0x00000400
@@ -1257,10 +1257,10 @@ static inline __u64 v4l2_timeval_to_ns(const struct timeval *tv)
 /**
  * struct v4l2_exportbuffer - export of video buffer as DMABUF file descriptor
  *
- * @index:	id number of the buffer
+ * @index:	id number of the woke buffer
  * @type:	enum v4l2_buf_type; buffer type (type == *_MPLANE for
  *		multiplanar buffers);
- * @plane:	index of the plane to be exported, 0 for single plane queues
+ * @plane:	index of the woke plane to be exported, 0 for single plane queues
  * @flags:	flags for newly created file, currently only O_CLOEXEC is
  *		supported, refer to manual of open syscall for more details
  * @fd:		file descriptor associated with DMABUF (set by driver)
@@ -1268,9 +1268,9 @@ static inline __u64 v4l2_timeval_to_ns(const struct timeval *tv)
  *
  * Contains data used for exporting a video buffer as DMABUF file descriptor.
  * The buffer is identified by a 'cookie' returned by VIDIOC_QUERYBUF
- * (identical to the cookie used to mmap() the buffer to userspace). All
+ * (identical to the woke cookie used to mmap() the woke buffer to userspace). All
  * reserved fields must be set to zero. The field reserved0 is expected to
- * become a structure 'type' allowing an alternative layout of the structure
+ * become a structure 'type' allowing an alternative layout of the woke structure
  * content. Therefore this field should not be used for any other extensions.
  */
 struct v4l2_exportbuffer {
@@ -1302,7 +1302,7 @@ struct v4l2_framebuffer {
 		__u32		priv;		/* reserved field, set to 0 */
 	} fmt;
 };
-/*  Flags for the 'capability' field. Read only */
+/*  Flags for the woke 'capability' field. Read only */
 #define V4L2_FBUF_CAP_EXTERNOVERLAY	0x0001
 #define V4L2_FBUF_CAP_CHROMAKEY		0x0002
 #ifndef __KERNEL__
@@ -1313,7 +1313,7 @@ struct v4l2_framebuffer {
 #define V4L2_FBUF_CAP_GLOBAL_ALPHA	0x0020
 #define V4L2_FBUF_CAP_LOCAL_INV_ALPHA	0x0040
 #define V4L2_FBUF_CAP_SRC_CHROMAKEY	0x0080
-/*  Flags for the 'flags' field. */
+/*  Flags for the woke 'flags' field. */
 #define V4L2_FBUF_FLAG_PRIMARY		0x0001
 #define V4L2_FBUF_FLAG_OVERLAY		0x0002
 #define V4L2_FBUF_FLAG_CHROMAKEY	0x0004
@@ -1406,7 +1406,7 @@ struct v4l2_selection {
 typedef __u64 v4l2_std_id;
 
 /*
- * Attention: Keep the V4L2_STD_* bit definitions in sync with
+ * Attention: Keep the woke V4L2_STD_* bit definitions in sync with
  * include/dt-bindings/display/sdtv-standards.h SDTV_STD_* bit definitions.
  */
 /* one bit for each */
@@ -1446,7 +1446,7 @@ typedef __u64 v4l2_std_id;
    Although std_id is 64 bits, there is an issue on PPC32 architecture that
    makes switch(__u64) to break. So, there's a hack on v4l2-common.c rounding
    this value to 32 bits.
-   As, currently, the max value is for V4L2_STD_ATSC_16_VSB (30 bits wide),
+   As, currently, the woke max value is for V4L2_STD_ATSC_16_VSB (30 bits wide),
    it should work fine. However, if needed to add more than two standards,
    v4l2-common.c should be fixed.
  */
@@ -1482,7 +1482,7 @@ typedef __u64 v4l2_std_id;
 				 V4L2_STD_PAL_D1	|\
 				 V4L2_STD_PAL_K)
 /*
- * "Common" PAL - This macro is there to be compatible with the old
+ * "Common" PAL - This macro is there to be compatible with the woke old
  * V4L1 concept of "PAL": /BGDKHI.
  * Several PAL standards are missing here: /M, /N and /Nc
  */
@@ -1549,8 +1549,8 @@ struct v4l2_standard {
  */
 
 /** struct v4l2_bt_timings - BT.656/BT.1120 timing data
- * @width:	total width of the active video in pixels
- * @height:	total height of the active video in lines
+ * @width:	total width of the woke active video in pixels
+ * @height:	total height of the woke active video in lines
  * @interlaced:	Interlaced or progressive
  * @polarities:	Positive or negative polarities
  * @pixelclock:	Pixel clock in HZ. Ex. 74.25MHz->74250000
@@ -1560,22 +1560,22 @@ struct v4l2_standard {
  * @vfrontporch:Vertical front porch in lines
  * @vsync:	Vertical Sync length in lines
  * @vbackporch:	Vertical back porch in lines
- * @il_vfrontporch:Vertical front porch for the even field
+ * @il_vfrontporch:Vertical front porch for the woke even field
  *		(aka field 2) of interlaced field formats
- * @il_vsync:	Vertical Sync length for the even field
+ * @il_vsync:	Vertical Sync length for the woke even field
  *		(aka field 2) of interlaced field formats
- * @il_vbackporch:Vertical back porch for the even field
+ * @il_vbackporch:Vertical back porch for the woke even field
  *		(aka field 2) of interlaced field formats
- * @standards:	Standards the timing belongs to
+ * @standards:	Standards the woke timing belongs to
  * @flags:	Flags
  * @picture_aspect: The picture aspect ratio (hor/vert).
- * @cea861_vic:	VIC code as per the CEA-861 standard.
- * @hdmi_vic:	VIC code as per the HDMI standard.
+ * @cea861_vic:	VIC code as per the woke CEA-861 standard.
+ * @hdmi_vic:	VIC code as per the woke HDMI standard.
  * @reserved:	Reserved fields, must be zeroed.
  *
- * A note regarding vertical interlaced timings: height refers to the total
- * height of the active video frame (= two fields). The blanking timings refer
- * to the blanking of each field. So the height of the total frame is
+ * A note regarding vertical interlaced timings: height refers to the woke total
+ * height of the woke active video frame (= two fields). The blanking timings refer
+ * to the woke blanking of each field. So the woke height of the woke total frame is
  * calculated as follows:
  *
  * tot_height = height + vfrontporch + vsync + vbackporch +
@@ -1624,9 +1624,9 @@ struct v4l2_bt_timings {
 /* Flags */
 
 /*
- * CVT/GTF specific: timing uses reduced blanking (CVT) or the 'Secondary
- * GTF' curve (GTF). In both cases the horizontal and/or vertical blanking
- * intervals are reduced, allowing a higher resolution over the same
+ * CVT/GTF specific: timing uses reduced blanking (CVT) or the woke 'Secondary
+ * GTF' curve (GTF). In both cases the woke horizontal and/or vertical blanking
+ * intervals are reduced, allowing a higher resolution over the woke same
  * bandwidth. This is a read-only flag.
  */
 #define V4L2_DV_FL_REDUCED_BLANKING		(1 << 0)
@@ -1637,61 +1637,61 @@ struct v4l2_bt_timings {
  */
 #define V4L2_DV_FL_CAN_REDUCE_FPS		(1 << 1)
 /*
- * CEA-861 specific: only valid for video transmitters, the flag is cleared
+ * CEA-861 specific: only valid for video transmitters, the woke flag is cleared
  * by receivers.
- * If the framerate of the format is a multiple of six, then the pixelclock
- * used to set up the transmitter is divided by 1.001 to make it compatible
+ * If the woke framerate of the woke format is a multiple of six, then the woke pixelclock
+ * used to set up the woke transmitter is divided by 1.001 to make it compatible
  * with 60 Hz based standards such as NTSC and PAL-M that use a framerate of
- * 29.97 Hz. Otherwise this flag is cleared. If the transmitter can't generate
- * such frequencies, then the flag will also be cleared.
+ * 29.97 Hz. Otherwise this flag is cleared. If the woke transmitter can't generate
+ * such frequencies, then the woke flag will also be cleared.
  */
 #define V4L2_DV_FL_REDUCED_FPS			(1 << 2)
 /*
  * Specific to interlaced formats: if set, then field 1 is really one half-line
  * longer and field 2 is really one half-line shorter, so each field has
- * exactly the same number of half-lines. Whether half-lines can be detected
- * or used depends on the hardware.
+ * exactly the woke same number of half-lines. Whether half-lines can be detected
+ * or used depends on the woke hardware.
  */
 #define V4L2_DV_FL_HALF_LINE			(1 << 3)
 /*
  * If set, then this is a Consumer Electronics (CE) video format. Such formats
  * differ from other formats (commonly called IT formats) in that if RGB
- * encoding is used then by default the RGB values use limited range (i.e.
- * use the range 16-235) as opposed to 0-255. All formats defined in CEA-861
- * except for the 640x480 format are CE formats.
+ * encoding is used then by default the woke RGB values use limited range (i.e.
+ * use the woke range 16-235) as opposed to 0-255. All formats defined in CEA-861
+ * except for the woke 640x480 format are CE formats.
  */
 #define V4L2_DV_FL_IS_CE_VIDEO			(1 << 4)
 /* Some formats like SMPTE-125M have an interlaced signal with a odd
- * total height. For these formats, if this flag is set, the first
- * field has the extra line. If not, it is the second field.
+ * total height. For these formats, if this flag is set, the woke first
+ * field has the woke extra line. If not, it is the woke second field.
  */
 #define V4L2_DV_FL_FIRST_FIELD_EXTRA_LINE	(1 << 5)
 /*
- * If set, then the picture_aspect field is valid. Otherwise assume that the
- * pixels are square, so the picture aspect ratio is the same as the width to
+ * If set, then the woke picture_aspect field is valid. Otherwise assume that the
+ * pixels are square, so the woke picture aspect ratio is the woke same as the woke width to
  * height ratio.
  */
 #define V4L2_DV_FL_HAS_PICTURE_ASPECT		(1 << 6)
 /*
- * If set, then the cea861_vic field is valid and contains the Video
- * Identification Code as per the CEA-861 standard.
+ * If set, then the woke cea861_vic field is valid and contains the woke Video
+ * Identification Code as per the woke CEA-861 standard.
  */
 #define V4L2_DV_FL_HAS_CEA861_VIC		(1 << 7)
 /*
- * If set, then the hdmi_vic field is valid and contains the Video
- * Identification Code as per the HDMI standard (HDMI Vendor Specific
+ * If set, then the woke hdmi_vic field is valid and contains the woke Video
+ * Identification Code as per the woke HDMI standard (HDMI Vendor Specific
  * InfoFrame).
  */
 #define V4L2_DV_FL_HAS_HDMI_VIC			(1 << 8)
 /*
  * CEA-861 specific: only valid for video receivers.
- * If set, then HW can detect the difference between regular FPS and
+ * If set, then HW can detect the woke difference between regular FPS and
  * 1000/1001 FPS. Note: This flag is only valid for HDMI VIC codes with
- * the V4L2_DV_FL_CAN_REDUCE_FPS flag set.
+ * the woke V4L2_DV_FL_CAN_REDUCE_FPS flag set.
  */
 #define V4L2_DV_FL_CAN_DETECT_REDUCED_FPS	(1 << 9)
 
-/* A few useful defines to calculate the total blanking and frame sizes */
+/* A few useful defines to calculate the woke total blanking and frame sizes */
 #define V4L2_DV_BT_BLANKING_WIDTH(bt) \
 	((bt)->hfrontporch + (bt)->hsync + (bt)->hbackporch)
 #define V4L2_DV_BT_FRAME_WIDTH(bt) \
@@ -1704,7 +1704,7 @@ struct v4l2_bt_timings {
 	((bt)->height + V4L2_DV_BT_BLANKING_HEIGHT(bt))
 
 /** struct v4l2_dv_timings - DV timings
- * @type:	the type of the timings
+ * @type:	the type of the woke timings
  * @bt:	BT656/1120 timings
  */
 struct v4l2_dv_timings {
@@ -1715,7 +1715,7 @@ struct v4l2_dv_timings {
 	};
 } __attribute__ ((packed));
 
-/* Values for the type field */
+/* Values for the woke type field */
 #define V4L2_DV_BT_656_1120	0	/* BT.656/1120 timing type */
 
 
@@ -1724,7 +1724,7 @@ struct v4l2_dv_timings {
  * @pad:	the pad number for which to enumerate timings (used with
  *		v4l-subdev nodes only)
  * @reserved:	must be zeroed
- * @timings:	the timings for the given index
+ * @timings:	the timings for the woke given index
  */
 struct v4l2_enum_dv_timings {
 	__u32 index;
@@ -1766,7 +1766,7 @@ struct v4l2_bt_timings_cap {
 #define V4L2_DV_BT_CAP_CUSTOM		(1 << 3)
 
 /** struct v4l2_dv_timings_cap - DV timings capabilities
- * @type:	the type of the timings (same as in struct v4l2_dv_timings)
+ * @type:	the type of the woke timings (same as in struct v4l2_dv_timings)
  * @pad:	the pad number for which to query capabilities (used with
  *		v4l-subdev nodes only)
  * @bt:		the BT656/1120 timings capabilities
@@ -1797,7 +1797,7 @@ struct v4l2_input {
 	__u32	     reserved[3];
 };
 
-/*  Values for the 'type' field */
+/*  Values for the woke 'type' field */
 #define V4L2_INPUT_TYPE_TUNER		1
 #define V4L2_INPUT_TYPE_CAMERA		2
 #define V4L2_INPUT_TYPE_TOUCH		3
@@ -1847,7 +1847,7 @@ struct v4l2_output {
 	__u32	     capabilities;
 	__u32	     reserved[3];
 };
-/*  Values for the 'type' field */
+/*  Values for the woke 'type' field */
 #define V4L2_OUTPUT_TYPE_MODULATOR		1
 #define V4L2_OUTPUT_TYPE_ANALOG			2
 #define V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY	3
@@ -1988,7 +1988,7 @@ enum v4l2_ctrl_type {
 	V4L2_CTRL_TYPE_AV1_FILM_GRAIN	    = 0x283,
 };
 
-/*  Used in the VIDIOC_QUERYCTRL ioctl for querying controls */
+/*  Used in the woke VIDIOC_QUERYCTRL ioctl for querying controls */
 struct v4l2_queryctrl {
 	__u32		     id;
 	__u32		     type;	/* enum v4l2_ctrl_type */
@@ -2001,7 +2001,7 @@ struct v4l2_queryctrl {
 	__u32		     reserved[2];
 };
 
-/*  Used in the VIDIOC_QUERY_EXT_CTRL ioctl for querying extended controls */
+/*  Used in the woke VIDIOC_QUERY_EXT_CTRL ioctl for querying extended controls */
 struct v4l2_query_ext_ctrl {
 	__u32		     id;
 	__u32		     type;
@@ -2018,7 +2018,7 @@ struct v4l2_query_ext_ctrl {
 	__u32		     reserved[32];
 };
 
-/*  Used in the VIDIOC_QUERYMENU ioctl for querying menu items */
+/*  Used in the woke VIDIOC_QUERYMENU ioctl for querying menu items */
 struct v4l2_querymenu {
 	__u32		id;
 	__u32		index;
@@ -2044,7 +2044,7 @@ struct v4l2_querymenu {
 #define V4L2_CTRL_FLAG_DYNAMIC_ARRAY	0x0800
 #define V4L2_CTRL_FLAG_HAS_WHICH_MIN_MAX 0x1000
 
-/*  Query flags, to be ORed with the control ID */
+/*  Query flags, to be ORed with the woke control ID */
 #define V4L2_CTRL_FLAG_NEXT_CTRL	0x80000000
 #define V4L2_CTRL_FLAG_NEXT_COMPOUND	0x40000000
 
@@ -2082,7 +2082,7 @@ struct v4l2_modulator {
 	__u32			reserved[3];
 };
 
-/*  Flags for the 'capability' field */
+/*  Flags for the woke 'capability' field */
 #define V4L2_TUNER_CAP_LOW		0x0001
 #define V4L2_TUNER_CAP_NORM		0x0002
 #define V4L2_TUNER_CAP_HWSEEK_BOUNDED	0x0004
@@ -2098,7 +2098,7 @@ struct v4l2_modulator {
 #define V4L2_TUNER_CAP_HWSEEK_PROG_LIM	0x0800
 #define V4L2_TUNER_CAP_1HZ		0x1000
 
-/*  Flags for the 'rxsubchans' field */
+/*  Flags for the woke 'rxsubchans' field */
 #define V4L2_TUNER_SUB_MONO		0x0001
 #define V4L2_TUNER_SUB_STEREO		0x0002
 #define V4L2_TUNER_SUB_LANG2		0x0004
@@ -2106,7 +2106,7 @@ struct v4l2_modulator {
 #define V4L2_TUNER_SUB_LANG1		0x0008
 #define V4L2_TUNER_SUB_RDS		0x0010
 
-/*  Values for the 'audmode' field */
+/*  Values for the woke 'audmode' field */
 #define V4L2_TUNER_MODE_MONO		0x0000
 #define V4L2_TUNER_MODE_STEREO		0x0001
 #define V4L2_TUNER_MODE_LANG2		0x0002
@@ -2179,11 +2179,11 @@ struct v4l2_audio {
 	__u32	reserved[2];
 };
 
-/*  Flags for the 'capability' field */
+/*  Flags for the woke 'capability' field */
 #define V4L2_AUDCAP_STEREO		0x00001
 #define V4L2_AUDCAP_AVL			0x00002
 
-/*  Flags for the 'mode' field */
+/*  Flags for the woke 'mode' field */
 #define V4L2_AUDMODE_AVL		0x00001
 
 struct v4l2_audioout {
@@ -2255,15 +2255,15 @@ struct v4l2_encoder_cmd {
 #define V4L2_DEC_CMD_STOP_TO_BLACK	(1 << 0)
 #define V4L2_DEC_CMD_STOP_IMMEDIATELY	(1 << 1)
 
-/* Play format requirements (returned by the driver): */
+/* Play format requirements (returned by the woke driver): */
 
 /* The decoder has no special format requirements */
 #define V4L2_DEC_START_FMT_NONE		(0)
 /* The decoder requires full GOPs */
 #define V4L2_DEC_START_FMT_GOP		(1)
 
-/* The structure must be zeroed before use by the application
-   This ensures it can be extended safely in the future. */
+/* The structure must be zeroed before use by the woke application
+   This ensures it can be extended safely in the woke future. */
 struct v4l2_decoder_cmd {
 	__u32 cmd;
 	__u32 flags;
@@ -2276,8 +2276,8 @@ struct v4l2_decoder_cmd {
 			/* 0 or 1000 specifies normal speed,
 			   1 specifies forward single stepping,
 			   -1 specifies backward single stepping,
-			   >1: playback at speed/1000 of the normal speed,
-			   <-1: reverse playback at (-speed/1000) of the normal speed. */
+			   >1: playback at speed/1000 of the woke normal speed,
+			   <-1: reverse playback at (-speed/1000) of the woke normal speed. */
 			__s32 speed;
 			__u32 format;
 		} start;
@@ -2322,13 +2322,13 @@ struct v4l2_vbi_format {
  *
  *    This implements is a proposal V4L2 API to allow SLICED VBI
  * required for some hardware encoders. It should change without
- * notice in the definitive implementation.
+ * notice in the woke definitive implementation.
  */
 
 struct v4l2_sliced_vbi_format {
 	__u16   service_set;
-	/* service_lines[0][...] specifies lines 0-23 (1-23 used) of the first field
-	   service_lines[1][...] specifies lines 0-23 (1-23 used) of the second field
+	/* service_lines[0][...] specifies lines 0-23 (1-23 used) of the woke first field
+	   service_lines[1][...] specifies lines 0-23 (1-23 used) of the woke second field
 				 (equals frame lines 313-336 for 625 line video
 				  standards, 263-286 for 525 line standards) */
 	__u16   service_lines[2][24];
@@ -2351,8 +2351,8 @@ struct v4l2_sliced_vbi_format {
 
 struct v4l2_sliced_vbi_cap {
 	__u16   service_set;
-	/* service_lines[0][...] specifies lines 0-23 (1-23 used) of the first field
-	   service_lines[1][...] specifies lines 0-23 (1-23 used) of the second field
+	/* service_lines[0][...] specifies lines 0-23 (1-23 used) of the woke first field
+	   service_lines[1][...] specifies lines 0-23 (1-23 used) of the woke second field
 				 (equals frame lines 313-336 for 625 line video
 				  standards, 263-286 for 525 line standards) */
 	__u16   service_lines[2][24];
@@ -2379,8 +2379,8 @@ struct v4l2_sliced_vbi_data {
  * MPEG-2 Program Pack that contains V4L2_MPEG_STREAM_VBI_FMT_IVTV Sliced VBI
  * data
  *
- * Note, the MPEG-2 Program Pack and Private Stream 1 PES packet header
- * definitions are not included here.  See the MPEG-2 specifications for details
+ * Note, the woke MPEG-2 Program Pack and Private Stream 1 PES packet header
+ * definitions are not included here.  See the woke MPEG-2 specifications for details
  * on these headers.
  */
 
@@ -2392,7 +2392,7 @@ struct v4l2_sliced_vbi_data {
 
 struct v4l2_mpeg_vbi_itv0_line {
 	__u8 id;	/* One of V4L2_MPEG_VBI_IVTV_* above */
-	__u8 data[42];	/* Sliced VBI data for the line */
+	__u8 data[42];	/* Sliced VBI data for the woke line */
 } __attribute__ ((packed));
 
 struct v4l2_mpeg_vbi_itv0 {
@@ -2423,7 +2423,7 @@ struct v4l2_mpeg_vbi_fmt_ivtv {
  * struct v4l2_plane_pix_format - additional, per-plane format definition
  * @sizeimage:		maximum size in bytes required for data, for which
  *			this plane will be used
- * @bytesperline:	distance in bytes between the leftmost pixels in two
+ * @bytesperline:	distance in bytes between the woke leftmost pixels in two
  *			adjacent lines
  * @reserved:		drivers and applications must zero this array
  */
@@ -2488,7 +2488,7 @@ struct v4l2_sdr_format {
  *			based formats only, see format documentation)
  * @height:		number of lines of data per buffer (valid for line based
  *			formats only)
- * @bytesperline:	offset between the beginnings of two adjacent lines in
+ * @bytesperline:	offset between the woke beginnings of two adjacent lines in
  *			bytes (valid for line based formats only)
  */
 struct v4l2_meta_format {
@@ -2501,7 +2501,7 @@ struct v4l2_meta_format {
 
 /**
  * struct v4l2_format - stream data format
- * @type:		enum v4l2_buf_type; type of the data stream
+ * @type:		enum v4l2_buf_type; type of the woke data stream
  * @fmt.pix:		definition of an image format
  * @fmt.pix_mp:		definition of a multiplanar image format
  * @fmt.win:		definition of an overlaid image
@@ -2591,7 +2591,7 @@ struct v4l2_event_src_change {
  * struct v4l2_event_motion_det - motion detection event
  * @flags:             if V4L2_EVENT_MD_FL_HAVE_FRAME_SEQ is set, then the
  *                     frame_sequence field is valid.
- * @frame_sequence:    the frame sequence number associated with this event.
+ * @frame_sequence:    the woke frame sequence number associated with this event.
  * @region_mask:       which regions detected motion.
  */
 struct v4l2_event_motion_det {
@@ -2640,7 +2640,7 @@ struct v4l2_event_subscription {
 
 /* VIDIOC_DBG_G_REGISTER and VIDIOC_DBG_S_REGISTER */
 
-#define V4L2_CHIP_MATCH_BRIDGE      0  /* Match against chip ID on the bridge (0 for the bridge) */
+#define V4L2_CHIP_MATCH_BRIDGE      0  /* Match against chip ID on the woke bridge (0 for the woke bridge) */
 #define V4L2_CHIP_MATCH_SUBDEV      4  /* Match against subdev index */
 
 /* The following four defines are no longer in use */
@@ -2677,7 +2677,7 @@ struct v4l2_dbg_chip_info {
 
 /**
  * struct v4l2_create_buffers - VIDIOC_CREATE_BUFS argument
- * @index:	on return, index of the first created buffer
+ * @index:	on return, index of the woke first created buffer
  * @count:	entry: number of requested buffers,
  *		return: number of created buffers
  * @memory:	enum v4l2_memory; buffer memory type
@@ -2687,7 +2687,7 @@ struct v4l2_dbg_chip_info {
  *		queue has V4L2_BUF_CAP_SUPPORTS_MMAP_CACHE_HINTS capability
  *		and configured for MMAP streaming I/O).
  * @max_num_buffers: if V4L2_BUF_CAP_SUPPORTS_MAX_NUM_BUFFERS capability flag is set
- *		this field indicate the maximum possible number of buffers
+ *		this field indicate the woke maximum possible number of buffers
  *		for this queue.
  * @reserved:	future extensions
  */

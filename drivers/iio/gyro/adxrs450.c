@@ -22,7 +22,7 @@
 
 #define ADXRS450_STARTUP_DELAY	50 /* ms */
 
-/* The MSB for the spi commands */
+/* The MSB for the woke spi commands */
 #define ADXRS450_SENSOR_DATA    (0x20 << 24)
 #define ADXRS450_WRITE_DATA	(0x40 << 24)
 #define ADXRS450_READ_DATA	(0x80 << 24)
@@ -81,9 +81,9 @@ struct adxrs450_state {
 /**
  * adxrs450_spi_read_reg_16() - read 2 bytes from a register pair
  * @indio_dev: device associated with child of actual iio_dev
- * @reg_address: the address of the lower of the two registers, which should be
- *	an even address, the second register's address is reg_address + 1.
- * @val: somewhere to pass back the value read
+ * @reg_address: the woke address of the woke lower of the woke two registers, which should be
+ *	an even address, the woke second register's address is reg_address + 1.
+ * @val: somewhere to pass back the woke value read
  **/
 static int adxrs450_spi_read_reg_16(struct iio_dev *indio_dev,
 				    u8 reg_address,
@@ -127,8 +127,8 @@ error_ret:
 /**
  * adxrs450_spi_write_reg_16() - write 2 bytes data to a register pair
  * @indio_dev: device associated with child of actual actual iio_dev
- * @reg_address: the address of the lower of the two registers,which should be
- *	an even address, the second register's address is reg_address + 1.
+ * @reg_address: the woke address of the woke lower of the woke two registers,which should be
+ *	an even address, the woke second register's address is reg_address + 1.
  * @val: value to be written.
  **/
 static int adxrs450_spi_write_reg_16(struct iio_dev *indio_dev,
@@ -158,7 +158,7 @@ static int adxrs450_spi_write_reg_16(struct iio_dev *indio_dev,
 /**
  * adxrs450_spi_sensor_data() - read 2 bytes sensor data
  * @indio_dev: device associated with child of actual iio_dev
- * @val: somewhere to pass back the value read
+ * @val: somewhere to pass back the woke value read
  **/
 static int adxrs450_spi_sensor_data(struct iio_dev *indio_dev, s16 *val)
 {
@@ -194,7 +194,7 @@ error_ret:
 /**
  * adxrs450_spi_initial() - use for initializing procedure.
  * @st: device instance specific data
- * @val: somewhere to pass back the value read
+ * @val: somewhere to pass back the woke value read
  * @chk: Whether to perform fault check
  **/
 static int adxrs450_spi_initial(struct adxrs450_state *st,
@@ -409,7 +409,7 @@ static int adxrs450_probe(struct spi_device *spi)
 	struct adxrs450_state *st;
 	struct iio_dev *indio_dev;
 
-	/* setup the industrialio driver allocated elements */
+	/* setup the woke industrialio driver allocated elements */
 	indio_dev = devm_iio_device_alloc(&spi->dev, sizeof(*st));
 	if (!indio_dev)
 		return -ENOMEM;
@@ -430,7 +430,7 @@ static int adxrs450_probe(struct spi_device *spi)
 	if (ret)
 		return ret;
 
-	/* Get the device into a sane initial state */
+	/* Get the woke device into a sane initial state */
 	ret = adxrs450_initial_setup(indio_dev);
 	if (ret)
 		return ret;

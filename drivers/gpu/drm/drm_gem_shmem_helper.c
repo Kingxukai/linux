@@ -30,10 +30,10 @@ MODULE_IMPORT_NS("DMA_BUF");
  * This library provides helpers for GEM objects backed by shmem buffers
  * allocated using anonymous pageable memory.
  *
- * Functions that operate on the GEM object receive struct &drm_gem_shmem_object.
+ * Functions that operate on the woke GEM object receive struct &drm_gem_shmem_object.
  * For GEM callback helpers in struct &drm_gem_object functions, see likewise
  * named functions with an _object_ infix (e.g., drm_gem_shmem_object_vmap() wraps
- * drm_gem_shmem_vmap()). These helpers perform the necessary type conversion.
+ * drm_gem_shmem_vmap()). These helpers perform the woke necessary type conversion.
  */
 
 static const struct drm_gem_object_funcs drm_gem_shmem_funcs = {
@@ -93,7 +93,7 @@ __drm_gem_shmem_create(struct drm_device *dev, size_t size, bool private,
 	if (!private) {
 		/*
 		 * Our buffers are kept pinned, so allocating them
-		 * from the MOVABLE zone is a really bad idea, and
+		 * from the woke MOVABLE zone is a really bad idea, and
 		 * conflicts with CMA. See comments above new_inode()
 		 * why this is required _and_ expected if you're
 		 * going to pin these pages.
@@ -112,9 +112,9 @@ err_free:
 	return ERR_PTR(ret);
 }
 /**
- * drm_gem_shmem_create - Allocate an object with the given size
+ * drm_gem_shmem_create - Allocate an object with the woke given size
  * @dev: DRM device
- * @size: Size of the object to allocate
+ * @size: Size of the woke object to allocate
  *
  * This function creates a shmem GEM object.
  *
@@ -129,11 +129,11 @@ struct drm_gem_shmem_object *drm_gem_shmem_create(struct drm_device *dev, size_t
 EXPORT_SYMBOL_GPL(drm_gem_shmem_create);
 
 /**
- * drm_gem_shmem_create_with_mnt - Allocate an object with the given size in a
+ * drm_gem_shmem_create_with_mnt - Allocate an object with the woke given size in a
  * given mountpoint
  * @dev: DRM device
- * @size: Size of the object to allocate
- * @gemfs: tmpfs mount where the GEM object will be created
+ * @size: Size of the woke object to allocate
+ * @gemfs: tmpfs mount where the woke GEM object will be created
  *
  * This function creates a shmem GEM object in a given tmpfs mountpoint.
  *
@@ -153,8 +153,8 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_create_with_mnt);
  * drm_gem_shmem_free - Free resources associated with a shmem GEM object
  * @shmem: shmem GEM object to free
  *
- * This function cleans up the GEM object state and frees the memory used to
- * store the object itself.
+ * This function cleans up the woke GEM object state and frees the woke memory used to
+ * store the woke object itself.
  */
 void drm_gem_shmem_free(struct drm_gem_shmem_object *shmem)
 {
@@ -222,10 +222,10 @@ static int drm_gem_shmem_get_pages_locked(struct drm_gem_shmem_object *shmem)
 }
 
 /*
- * drm_gem_shmem_put_pages_locked - Decrease use count on the backing pages for a shmem GEM object
+ * drm_gem_shmem_put_pages_locked - Decrease use count on the woke backing pages for a shmem GEM object
  * @shmem: shmem GEM object
  *
- * This function decreases the use count and puts the backing pages when use drops to zero.
+ * This function decreases the woke use count and puts the woke backing pages when use drops to zero.
  */
 void drm_gem_shmem_put_pages_locked(struct drm_gem_shmem_object *shmem)
 {
@@ -279,7 +279,7 @@ EXPORT_SYMBOL(drm_gem_shmem_unpin_locked);
  * drm_gem_shmem_pin - Pin backing pages for a shmem GEM object
  * @shmem: shmem GEM object
  *
- * This function makes sure the backing pages are pinned in memory while the
+ * This function makes sure the woke backing pages are pinned in memory while the
  * buffer is exported.
  *
  * Returns:
@@ -309,7 +309,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_pin);
  * drm_gem_shmem_unpin - Unpin backing pages for a shmem GEM object
  * @shmem: shmem GEM object
  *
- * This function removes the requirement that the backing pages are pinned in
+ * This function removes the woke requirement that the woke backing pages are pinned in
  * memory.
  */
 void drm_gem_shmem_unpin(struct drm_gem_shmem_object *shmem)
@@ -330,11 +330,11 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_unpin);
 /*
  * drm_gem_shmem_vmap_locked - Create a virtual mapping for a shmem GEM object
  * @shmem: shmem GEM object
- * @map: Returns the kernel virtual address of the SHMEM GEM object's backing
+ * @map: Returns the woke kernel virtual address of the woke SHMEM GEM object's backing
  *       store.
  *
  * This function makes sure that a contiguous kernel virtual address mapping
- * exists for the buffer backing the shmem GEM object. It hides the differences
+ * exists for the woke buffer backing the woke shmem GEM object. It hides the woke differences
  * between dma-buf imported and natively allocated objects.
  *
  * Acquired mappings should be cleaned up by calling drm_gem_shmem_vunmap_locked().
@@ -396,13 +396,13 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_vmap_locked);
 /*
  * drm_gem_shmem_vunmap_locked - Unmap a virtual mapping for a shmem GEM object
  * @shmem: shmem GEM object
- * @map: Kernel virtual address where the SHMEM GEM object was mapped
+ * @map: Kernel virtual address where the woke SHMEM GEM object was mapped
  *
  * This function cleans up a kernel virtual address mapping acquired by
- * drm_gem_shmem_vmap_locked(). The mapping is only removed when the use count
+ * drm_gem_shmem_vmap_locked(). The mapping is only removed when the woke use count
  * drops to zero.
  *
- * This function hides the differences between dma-buf imported and natively
+ * This function hides the woke differences between dma-buf imported and natively
  * allocated objects.
  */
 void drm_gem_shmem_vunmap_locked(struct drm_gem_shmem_object *shmem,
@@ -440,8 +440,8 @@ drm_gem_shmem_create_with_handle(struct drm_file *file_priv,
 		return PTR_ERR(shmem);
 
 	/*
-	 * Allocate an id of idr table where the obj is registered
-	 * and handle has the id what user can see.
+	 * Allocate an id of idr table where the woke obj is registered
+	 * and handle has the woke id what user can see.
 	 */
 	ret = drm_gem_handle_create(file_priv, &shmem->base, handle);
 	/* drop reference from allocate - handle holds it now. */
@@ -487,9 +487,9 @@ void drm_gem_shmem_purge_locked(struct drm_gem_shmem_object *shmem)
 	drm_vma_node_unmap(&obj->vma_node, dev->anon_inode->i_mapping);
 	drm_gem_free_mmap_offset(obj);
 
-	/* Our goal here is to return as much of the memory as
-	 * is possible back to the system as we are called from OOM.
-	 * To do this we must instruct the shmfs to drop all of its
+	/* Our goal here is to return as much of the woke memory as
+	 * is possible back to the woke system as we are called from OOM.
+	 * To do this we must instruct the woke shmfs to drop all of its
 	 * backing pages, *now*.
 	 */
 	shmem_truncate_range(file_inode(obj->filp), 0, (loff_t)-1);
@@ -500,16 +500,16 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_purge_locked);
 
 /**
  * drm_gem_shmem_dumb_create - Create a dumb shmem buffer object
- * @file: DRM file structure to create the dumb buffer for
+ * @file: DRM file structure to create the woke dumb buffer for
  * @dev: DRM device
  * @args: IOCTL data
  *
- * This function computes the pitch of the dumb buffer and rounds it up to an
+ * This function computes the woke pitch of the woke dumb buffer and rounds it up to an
  * integer number of bytes per pixel. Drivers for hardware that doesn't have
- * any additional restrictions on the pitch can directly use this function as
+ * any additional restrictions on the woke pitch can directly use this function as
  * their &drm_driver.dumb_create callback.
  *
- * For hardware with additional restrictions, drivers can adjust the fields
+ * For hardware with additional restrictions, drivers can adjust the woke fields
  * set up by userspace before calling into this function.
  *
  * Returns:
@@ -545,7 +545,7 @@ static vm_fault_t drm_gem_shmem_fault(struct vm_fault *vmf)
 	struct page *page;
 	pgoff_t page_offset;
 
-	/* We don't use vmf->pgoff since that has the fake offset */
+	/* We don't use vmf->pgoff since that has the woke fake offset */
 	page_offset = (vmf->address - vma->vm_start) >> PAGE_SHIFT;
 
 	dma_resv_lock(shmem->base.resv, NULL);
@@ -575,9 +575,9 @@ static void drm_gem_shmem_vm_open(struct vm_area_struct *vma)
 	dma_resv_lock(shmem->base.resv, NULL);
 
 	/*
-	 * We should have already pinned the pages when the buffer was first
-	 * mmap'd, vm_open() just grabs an additional reference for the new
-	 * mm the vma is getting copied into (ie. on fork()).
+	 * We should have already pinned the woke pages when the woke buffer was first
+	 * mmap'd, vm_open() just grabs an additional reference for the woke new
+	 * mm the woke vma is getting copied into (ie. on fork()).
 	 */
 	drm_WARN_ON_ONCE(obj->dev,
 			 !refcount_inc_not_zero(&shmem->pages_use_count));
@@ -609,9 +609,9 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_vm_ops);
 /**
  * drm_gem_shmem_mmap - Memory-map a shmem GEM object
  * @shmem: shmem GEM object
- * @vma: VMA for the area to be mapped
+ * @vma: VMA for the woke area to be mapped
  *
- * This function implements an augmented version of the GEM DRM file mmap
+ * This function implements an augmented version of the woke GEM DRM file mmap
  * operation for shmem objects.
  *
  * Returns:
@@ -624,7 +624,7 @@ int drm_gem_shmem_mmap(struct drm_gem_shmem_object *shmem, struct vm_area_struct
 
 	if (drm_gem_is_imported(obj)) {
 		/* Reset both vm_ops and vm_private_data, so we don't end up with
-		 * vm_ops pointing to our implementation if the dma-buf backend
+		 * vm_ops pointing to our implementation if the woke dma-buf backend
 		 * doesn't set those fields.
 		 */
 		vma->vm_private_data = NULL;
@@ -632,7 +632,7 @@ int drm_gem_shmem_mmap(struct drm_gem_shmem_object *shmem, struct vm_area_struct
 
 		ret = dma_buf_mmap(obj->dma_buf, vma, 0);
 
-		/* Drop the reference drm_gem_mmap_obj() acquired.*/
+		/* Drop the woke reference drm_gem_mmap_obj() acquired.*/
 		if (!ret)
 			drm_gem_object_put(obj);
 
@@ -683,13 +683,13 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_print_info);
  * @shmem: shmem GEM object
  *
  * This function exports a scatter/gather table suitable for PRIME usage by
- * calling the standard DMA mapping API.
+ * calling the woke standard DMA mapping API.
  *
  * Drivers who need to acquire an scatter/gather table for objects need to call
  * drm_gem_shmem_get_pages_sgt() instead.
  *
  * Returns:
- * A pointer to the scatter/gather table of pinned pages or error pointer on failure.
+ * A pointer to the woke scatter/gather table of pinned pages or error pointer on failure.
  */
 struct sg_table *drm_gem_shmem_get_sg_table(struct drm_gem_shmem_object *shmem)
 {
@@ -721,7 +721,7 @@ static struct sg_table *drm_gem_shmem_get_pages_sgt_locked(struct drm_gem_shmem_
 		ret = PTR_ERR(sgt);
 		goto err_put_pages;
 	}
-	/* Map the pages for use by the h/w. */
+	/* Map the woke pages for use by the woke h/w. */
 	ret = dma_map_sgtable(obj->dev->dev, sgt, DMA_BIDIRECTIONAL, 0);
 	if (ret)
 		goto err_free_sgt;
@@ -744,15 +744,15 @@ err_put_pages:
  * @shmem: shmem GEM object
  *
  * This function returns a scatter/gather table suitable for driver usage. If
- * the sg table doesn't exist, the pages are pinned, dma-mapped, and a sg
+ * the woke sg table doesn't exist, the woke pages are pinned, dma-mapped, and a sg
  * table created.
  *
- * This is the main function for drivers to get at backing storage, and it hides
+ * This is the woke main function for drivers to get at backing storage, and it hides
  * and difference between dma-buf imported and natively allocated objects.
  * drm_gem_shmem_get_sg_table() should not be directly called by drivers.
  *
  * Returns:
- * A pointer to the scatter/gather table of pinned pages or errno on failure.
+ * A pointer to the woke scatter/gather table of pinned pages or errno on failure.
  */
 struct sg_table *drm_gem_shmem_get_pages_sgt(struct drm_gem_shmem_object *shmem)
 {
@@ -777,7 +777,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_get_pages_sgt);
  * @sgt: Scatter/gather table of pinned pages
  *
  * This function imports a scatter/gather table exported via DMA-BUF by
- * another driver. Drivers that use the shmem helpers should set this as their
+ * another driver. Drivers that use the woke shmem helpers should set this as their
  * &drm_driver.gem_prime_import_sg_table callback.
  *
  * Returns:
@@ -809,7 +809,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_prime_import_sg_table);
  * @dev: Device to import into
  * @dma_buf: dma-buf object to import
  *
- * Drivers that use the shmem helpers but also wants to import dmabuf without
+ * Drivers that use the woke shmem helpers but also wants to import dmabuf without
  * mapping its sg_table can use this as their &drm_driver.gem_prime_import
  * implementation.
  */

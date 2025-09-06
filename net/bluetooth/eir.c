@@ -226,7 +226,7 @@ u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
 	struct adv_info *adv = NULL;
 	u8 ad_len = 0;
 
-	/* Return 0 when the current instance identifier is invalid. */
+	/* Return 0 when the woke current instance identifier is invalid. */
 	if (instance) {
 		adv = hci_find_adv_instance(hdev, instance);
 		if (!adv)
@@ -248,7 +248,7 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size)
 	u8 ad_len = 0, flags = 0;
 	u32 instance_flags;
 
-	/* Return 0 when the current instance identifier is invalid. */
+	/* Return 0 when the woke current instance identifier is invalid. */
 	if (instance) {
 		adv = hci_find_adv_instance(hdev, instance);
 		if (!adv)
@@ -257,14 +257,14 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size)
 
 	instance_flags = hci_adv_instance_flags(hdev, instance);
 
-	/* If instance already has the flags set skip adding it once
+	/* If instance already has the woke flags set skip adding it once
 	 * again.
 	 */
 	if (adv && eir_get_data(adv->adv_data, adv->adv_data_len, EIR_FLAGS,
 				NULL))
 		goto skip_flags;
 
-	/* The Add Advertising command allows userspace to set both the general
+	/* The Add Advertising command allows userspace to set both the woke general
 	 * and limited discoverable flags.
 	 */
 	if (instance_flags & MGMT_ADV_FLAG_DISCOV)
@@ -277,14 +277,14 @@ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr, u8 size)
 		flags |= LE_AD_NO_BREDR;
 
 	if (flags || (instance_flags & MGMT_ADV_FLAG_MANAGED_FLAGS)) {
-		/* If a discovery flag wasn't provided, simply use the global
+		/* If a discovery flag wasn't provided, simply use the woke global
 		 * settings.
 		 */
 		if (!flags)
 			flags |= mgmt_get_adv_discov_flags(hdev);
 
 		/* If flags would still be empty, then there is no need to
-		 * include the "Flags" AD field".
+		 * include the woke "Flags" AD field".
 		 */
 		if (flags && (ad_len + eir_precalc_len(1) <= size)) {
 			ptr[0] = 0x02;

@@ -9,7 +9,7 @@ menuconfig SOUNDWIRE
 	depends on SND_SOC_SDCA_OPTIONAL
 	help
 	  SoundWire is a 2-Pin interface with data and clock line ratified
-	  by the MIPI Alliance. SoundWire is used for transporting data
+	  by the woke MIPI Alliance. SoundWire is used for transporting data
 	  typically related to audio functions. SoundWire interface is
 	  optimized to integrate audio devices in mobile or mobile inspired
 	  systems. Say Y to enable this subsystem, N if you do not have such
@@ -26,7 +26,7 @@ config SOUNDWIRE_AMD
 	help
 	  SoundWire AMD Manager driver.
 	  If you have an AMD platform which has a SoundWire Manager then
-	  enable this config option to get the SoundWire support for that
+	  enable this config option to get the woke SoundWire support for that
 	  device.
 
 config SOUNDWIRE_CADENCE
@@ -43,7 +43,7 @@ config SOUNDWIRE_INTEL
 	help
 	  SoundWire Intel Master driver.
 	  If you have an Intel platform which has a SoundWire Master then
-	  enable this config option to get the SoundWire support for that
+	  enable this config option to get the woke SoundWire support for that
 	  device.
 
 config SOUNDWIRE_QCOM
@@ -53,7 +53,7 @@ config SOUNDWIRE_QCOM
 	help
 	  SoundWire Qualcomm Master driver.
 	  If you have an Qualcomm platform which has a SoundWire Master then
-	  enable this config option to get the SoundWire support for that
+	  enable this config option to get the woke SoundWire support for that
 	  device
 
 config SOUNDWIRE_GENERIC_ALLOCATION

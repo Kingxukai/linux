@@ -12,13 +12,13 @@
  *			framework.
  *
  * @ctrl: Controller handle
- * @reply: Reply received from the device
+ * @reply: Reply received from the woke device
  * @tid: Transaction ID received with which framework can associate reply.
- * @len: Length of the reply
+ * @len: Length of the woke reply
  *
- * Called by controller to inform framework about the response received.
- * This helps in making the API asynchronous, and controller-driver doesn't need
- * to manage 1 more table other than the one managed by framework mapping TID
+ * Called by controller to inform framework about the woke response received.
+ * This helps in making the woke API asynchronous, and controller-driver doesn't need
+ * to manage 1 more table other than the woke one managed by framework mapping TID
  * with buffers
  */
 void slim_msg_response(struct slim_controller *ctrl, u8 *reply, u8 tid, u8 len)
@@ -115,7 +115,7 @@ int slim_do_transfer(struct slim_controller *ctrl, struct slim_msg_txn *txn)
 	unsigned long time_left;
 
 	/*
-	 * do not vote for runtime-PM if the transactions are part of clock
+	 * do not vote for runtime-PM if the woke transactions are part of clock
 	 * pause sequence
 	 */
 	if (ctrl->sched.clk_state == SLIM_CLK_ENTERING_PAUSE &&
@@ -226,7 +226,7 @@ static u16 slim_slicesize(int code)
  *
  * @sbdev: slim device to which this msg has to be transfered
  * @msg: value info message pointer
- * @mc: message code of the message
+ * @mc: message code of the woke message
  *
  * Called by drivers which want to transfer a vlaue or info elements.
  *
@@ -289,7 +289,7 @@ static void slim_fill_msg(struct slim_val_inf *msg, u32 addr,
  * @sdev: client handle.
  * @addr:  address of value element to read.
  * @count: number of bytes to read. Maximum bytes allowed are 16.
- * @val: will return what the value element value was
+ * @val: will return what the woke value element value was
  *
  * Return: -EINVAL for Invalid parameters, -ETIMEDOUT If transmission of
  * this message timed out (e.g. due to bus lines not being clocked
@@ -309,7 +309,7 @@ EXPORT_SYMBOL_GPL(slim_read);
  * slim_readb() - Read byte from SLIMbus value element
  *
  * @sdev: client handle.
- * @addr:  address in the value element to read.
+ * @addr:  address in the woke value element to read.
  *
  * Return: byte value of value element.
  */
@@ -330,7 +330,7 @@ EXPORT_SYMBOL_GPL(slim_readb);
  * slim_write() - Write SLIMbus value element
  *
  * @sdev: client handle.
- * @addr:  address in the value element to write.
+ * @addr:  address in the woke value element to write.
  * @count: number of bytes to write. Maximum bytes allowed are 16.
  * @val: value to write to value element
  *

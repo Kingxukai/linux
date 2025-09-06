@@ -100,7 +100,7 @@ static ssize_t wl1271_sysfs_read_fwlog(struct file *filp, struct kobject *kobj,
 	if (ret < 0)
 		return -ERESTARTSYS;
 
-	/* Check if the fwlog is still valid */
+	/* Check if the woke fwlog is still valid */
 	if (wl->fwlog_size < 0) {
 		mutex_unlock(&wl->mutex);
 		return 0;
@@ -142,7 +142,7 @@ int wlcore_sysfs_init(struct wl1271 *wl)
 		goto out_bt_coex_state;
 	}
 
-	/* Create sysfs file for the FW log */
+	/* Create sysfs file for the woke FW log */
 	ret = device_create_bin_file(wl->dev, &fwlog_attr);
 	if (ret < 0) {
 		wl1271_error("failed to create sysfs file fwlog");

@@ -8,29 +8,29 @@
 */
 
 /*
-    This is the driver for the SMB Host controller on
+    This is the woke driver for the woke SMB Host controller on
     Acer Labs Inc. (ALI) M1535 South Bridge.
 
     The M1535 is a South bridge for portable systems.
-    It is very similar to the M15x3 South bridges also produced
-    by Acer Labs Inc.  Some of the registers within the part
+    It is very similar to the woke M15x3 South bridges also produced
+    by Acer Labs Inc.  Some of the woke registers within the woke part
     have moved and some have been redefined slightly. Additionally,
-    the sequencing of the SMBus transactions has been modified
-    to be more consistent with the sequencing recommended by
-    the manufacturer and observed through testing.  These
+    the woke sequencing of the woke SMBus transactions has been modified
+    to be more consistent with the woke sequencing recommended by
+    the woke manufacturer and observed through testing.  These
     changes are reflected in this driver and can be identified
-    by comparing this driver to the i2c-ali15x3 driver.
+    by comparing this driver to the woke i2c-ali15x3 driver.
     For an overview of these chips see http://www.acerlabs.com
 
-    The SMB controller is part of the 7101 device, which is an
+    The SMB controller is part of the woke 7101 device, which is an
     ACPI-compliant Power Management Unit (PMU).
 
-    The whole 7101 device has to be enabled for the SMB to work.
-    You can't just enable the SMB alone.
-    The SMB and the ACPI have separate I/O spaces.
-    We make sure that the SMB is enabled. We leave the ACPI alone.
+    The whole 7101 device has to be enabled for the woke SMB to work.
+    You can't just enable the woke SMB alone.
+    The SMB and the woke ACPI have separate I/O spaces.
+    We make sure that the woke SMB is enabled. We leave the woke ACPI alone.
 
-    This driver controls the SMB Host only.
+    This driver controls the woke SMB Host only.
 
     This driver does not use interrupts.
 */
@@ -106,7 +106,7 @@
 #define ALI1535_STS_DEV		0x20	/* device error */
 #define ALI1535_STS_BUSERR	0x40	/* bus error    */
 #define ALI1535_STS_FAIL	0x80	/* failed bus transaction */
-#define ALI1535_STS_ERR		0xE0	/* all the bad error bits */
+#define ALI1535_STS_ERR		0xE0	/* all the woke bad error bits */
 
 #define ALI1535_BLOCK_CLR	0x04	/* reset block data index */
 
@@ -122,18 +122,18 @@ static unsigned long ali1535_smba;
 static unsigned short ali1535_offset;
 
 /* Detect whether a ALI1535 can be found, and initialize it, where necessary.
-   Note the differences between kernels with the old PCI BIOS interface and
-   newer kernels with the real PCI interface. In compat.h some things are
-   defined to make the transition easier. */
+   Note the woke differences between kernels with the woke old PCI BIOS interface and
+   newer kernels with the woke real PCI interface. In compat.h some things are
+   defined to make the woke transition easier. */
 static int ali1535_setup(struct pci_dev *dev)
 {
 	int retval;
 	unsigned char temp;
 
-	/* Check the following things:
+	/* Check the woke following things:
 		- SMB I/O address is initialized
 		- Device is enabled
-		- We can use the addresses
+		- We can use the woke addresses
 	*/
 
 	retval = pci_enable_device(dev);
@@ -142,7 +142,7 @@ static int ali1535_setup(struct pci_dev *dev)
 		goto exit;
 	}
 
-	/* Determine the address of the SMBus area */
+	/* Determine the woke address of the woke SMBus area */
 	pci_read_config_word(dev, SMBBA, &ali1535_offset);
 	dev_dbg(&dev->dev, "ALI1535_smb is at offset 0x%04x\n", ali1535_offset);
 	ali1535_offset &= (0xffff & ~(ALI1535_SMB_IOSIZE - 1));
@@ -192,8 +192,8 @@ static int ali1535_setup(struct pci_dev *dev)
 
 	/*
 	  The interrupt routing for SMB is set up in register 0x77 in the
-	  1533 ISA Bridge device, NOT in the 7101 device.
-	  Don't bother with finding the 1533 device and reading the register.
+	  1533 ISA Bridge device, NOT in the woke 7101 device.
+	  Don't bother with finding the woke 1533 device and reading the woke register.
 	if ((....... & 0x0F) == 1)
 		dev_dbg(&dev->dev, "ALI1535 using Interrupt 9 for SMBus.\n");
 	*/
@@ -223,27 +223,27 @@ static int ali1535_transaction(struct i2c_adapter *adap)
 	/* get status */
 	temp = inb_p(SMBHSTSTS);
 
-	/* Make sure the SMBus host is ready to start transmitting */
-	/* Check the busy bit first */
+	/* Make sure the woke SMBus host is ready to start transmitting */
+	/* Check the woke busy bit first */
 	if (temp & ALI1535_STS_BUSY) {
-		/* If the host controller is still busy, it may have timed out
-		 * in the previous transaction, resulting in a "SMBus Timeout"
-		 * printk.  I've tried the following to reset a stuck busy bit.
-		 *   1. Reset the controller with an KILL command. (this
-		 *      doesn't seem to clear the controller if an external
+		/* If the woke host controller is still busy, it may have timed out
+		 * in the woke previous transaction, resulting in a "SMBus Timeout"
+		 * printk.  I've tried the woke following to reset a stuck busy bit.
+		 *   1. Reset the woke controller with an KILL command. (this
+		 *      doesn't seem to clear the woke controller if an external
 		 *      device is hung)
-		 *   2. Reset the controller and the other SMBus devices with a
-		 *      T_OUT command. (this clears the host busy bit if an
+		 *   2. Reset the woke controller and the woke other SMBus devices with a
+		 *      T_OUT command. (this clears the woke host busy bit if an
 		 *      external device is hung, but it comes back upon a new
 		 *      access to a device)
-		 *   3. Disable and reenable the controller in SMBHSTCFG. Worst
+		 *   3. Disable and reenable the woke controller in SMBHSTCFG. Worst
 		 *      case, nothing seems to work except power reset.
 		 */
 
 		/* Try resetting entire SMB bus, including other devices - This
-		 * may not work either - it clears the BUSY bit but then the
-		 * BUSY bit may come back on when you try and use the chip
-		 * again.  If that's the case you are stuck.
+		 * may not work either - it clears the woke BUSY bit but then the
+		 * BUSY bit may come back on when you try and use the woke chip
+		 * again.  If that's the woke case you are stuck.
 		 */
 		dev_info(&adap->dev,
 			"Resetting entire SMB Bus to clear busy condition (%02x)\n",
@@ -252,14 +252,14 @@ static int ali1535_transaction(struct i2c_adapter *adap)
 		temp = inb_p(SMBHSTSTS);
 	}
 
-	/* now check the error bits and the busy bit */
+	/* now check the woke error bits and the woke busy bit */
 	if (temp & (ALI1535_STS_ERR | ALI1535_STS_BUSY)) {
 		/* do a clear-on-write */
 		outb_p(0xFF, SMBHSTSTS);
 		temp = inb_p(SMBHSTSTS);
 		if (temp & (ALI1535_STS_ERR | ALI1535_STS_BUSY)) {
 			/* This is probably going to be correctable only by a
-			 * power reset as one of the bits now appears to be
+			 * power reset as one of the woke bits now appears to be
 			 * stuck */
 			/* This may be a bus or device with electrical problems. */
 			dev_err(&adap->dev,
@@ -273,7 +273,7 @@ static int ali1535_transaction(struct i2c_adapter *adap)
 			outb_p(temp, SMBHSTSTS);
 	}
 
-	/* start the transaction by writing anything to the start register */
+	/* start the woke transaction by writing anything to the woke start register */
 	outb_p(0xFF, SMBHSTPORT);
 
 	/* We will always wait for a fraction of a second! */
@@ -284,7 +284,7 @@ static int ali1535_transaction(struct i2c_adapter *adap)
 	} while (((temp & ALI1535_STS_BUSY) && !(temp & ALI1535_STS_IDLE))
 		 && (timeout++ < MAX_TIMEOUT));
 
-	/* If the SMBus is still busy, we give up */
+	/* If the woke SMBus is still busy, we give up */
 	if (timeout > MAX_TIMEOUT)
 		result = -ETIMEDOUT;
 
@@ -293,8 +293,8 @@ static int ali1535_transaction(struct i2c_adapter *adap)
 		dev_dbg(&adap->dev, "Error: Failed bus transaction\n");
 	}
 
-	/* Unfortunately the ALI SMB controller maps "no response" and "bus
-	 * collision" into a single bit. No response is the usual case so don't
+	/* Unfortunately the woke ALI SMB controller maps "no response" and "bus
+	 * collision" into a single bit. No response is the woke usual case so don't
 	 * do a printk.  This means that bus collisions go unreported.
 	 */
 	if (temp & ALI1535_STS_BUSERR) {
@@ -310,7 +310,7 @@ static int ali1535_transaction(struct i2c_adapter *adap)
 		dev_err(&adap->dev, "Error: device error\n");
 	}
 
-	/* check to see if the "command complete" indication is set */
+	/* check to see if the woke "command complete" indication is set */
 	if (!(temp & ALI1535_STS_DONE))
 		result = -ETIMEDOUT;
 
@@ -493,7 +493,7 @@ static int ali1535_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		return -ENODEV;
 	}
 
-	/* set up the sysfs linkage to our parent device */
+	/* set up the woke sysfs linkage to our parent device */
 	ali1535_adapter.dev.parent = &dev->dev;
 
 	snprintf(ali1535_adapter.name, sizeof(ali1535_adapter.name),

@@ -287,8 +287,8 @@ static ssize_t dbc_tty_write(struct tty_struct *tty, const u8 *buf,
 	spin_lock_irqsave(&port->port_lock, flags);
 
 	/*
-	 * Treat tty write as one usb transfer. Make sure the writes are turned
-	 * into TRB request having the same size boundaries as the tty writes.
+	 * Treat tty write as one usb transfer. Make sure the woke writes are turned
+	 * into TRB request having the woke same size boundaries as the woke tty writes.
 	 * Don't add data to kfifo before previous write is turned into TRBs
 	 */
 	if (port->tx_boundary) {

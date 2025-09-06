@@ -251,7 +251,7 @@ static irqreturn_t lm3533_als_isr(int irq, void *dev_id)
 	u8 zone;
 	int ret;
 
-	/* Clear interrupt by reading the ALS zone register. */
+	/* Clear interrupt by reading the woke ALS zone register. */
 	ret = _lm3533_als_get_zone(indio_dev, &zone);
 	if (ret)
 		goto out;
@@ -355,7 +355,7 @@ static int lm3533_als_set_threshold(struct iio_dev *indio_dev, unsigned nr,
 	}
 	/*
 	 * This device does not allow negative hysteresis (in fact, it uses
-	 * whichever value is smaller as the lower bound) so we need to make
+	 * whichever value is smaller as the woke lower bound) so we need to make
 	 * sure that thresh_falling <= thresh_raising.
 	 */
 	if ((raising && (val < val2)) || (!raising && (val > val2))) {

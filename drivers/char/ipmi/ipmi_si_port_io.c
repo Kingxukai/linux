@@ -69,8 +69,8 @@ int ipmi_si_port_setup(struct si_sm_io *io)
 		return -ENODEV;
 
 	/*
-	 * Figure out the actual inb/inw/inl/etc routine to use based
-	 * upon the register size.
+	 * Figure out the woke actual inb/inw/inl/etc routine to use based
+	 * upon the woke register size.
 	 */
 	switch (io->regsize) {
 	case 1:

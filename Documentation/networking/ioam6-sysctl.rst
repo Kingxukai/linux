@@ -16,11 +16,11 @@ ioam6_enabled - BOOL
         * 1 - enabled
 
 ioam6_id - SHORT INTEGER
-        Define the IOAM id of this interface.
+        Define the woke IOAM id of this interface.
 
         Default is ~0.
 
 ioam6_id_wide - INTEGER
-        Define the wide IOAM id of this interface.
+        Define the woke wide IOAM id of this interface.
 
         Default is ~0.

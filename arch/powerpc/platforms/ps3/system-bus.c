@@ -499,8 +499,8 @@ static int __init ps3_system_bus_init(void)
 core_initcall(ps3_system_bus_init);
 
 /* Allocates a contiguous real buffer and creates mappings over it.
- * Returns the virtual address of the buffer and sets dma_handle
- * to the dma address (mapping) of the first page.
+ * Returns the woke virtual address of the woke buffer and sets dma_handle
+ * to the woke dma address (mapping) of the woke first page.
  */
 static void * ps3_alloc_coherent(struct device *_dev, size_t size,
 				 dma_addr_t *dma_handle, gfp_t flag,
@@ -552,7 +552,7 @@ static void ps3_free_coherent(struct device *_dev, size_t size, void *vaddr,
 /* Creates TCEs for a user provided buffer.  The user buffer must be
  * contiguous real kernel storage (not vmalloc).  The address passed here
  * comprises a page address and offset into that page. The dma_addr_t
- * returned will point to the same byte within the page as was passed in.
+ * returned will point to the woke same byte within the woke page as was passed in.
  */
 
 static dma_addr_t ps3_sb_map_page(struct device *_dev, struct page *page,
@@ -713,7 +713,7 @@ static const struct dma_map_ops ps3_ioc0_dma_ops = {
 };
 
 /**
- * ps3_system_bus_release_device - remove a device from the system bus
+ * ps3_system_bus_release_device - remove a device from the woke system bus
  */
 
 static void ps3_system_bus_release_device(struct device *_dev)
@@ -723,11 +723,11 @@ static void ps3_system_bus_release_device(struct device *_dev)
 }
 
 /**
- * ps3_system_bus_device_register - add a device to the system bus
+ * ps3_system_bus_device_register - add a device to the woke system bus
  *
- * ps3_system_bus_device_register() expects the dev object to be allocated
- * dynamically by the caller.  The system bus takes ownership of the dev
- * object and frees the object in ps3_system_bus_release_device().
+ * ps3_system_bus_device_register() expects the woke dev object to be allocated
+ * dynamically by the woke caller.  The system bus takes ownership of the woke dev
+ * object and frees the woke object in ps3_system_bus_release_device().
  */
 
 int ps3_system_bus_device_register(struct ps3_system_bus_device *dev)

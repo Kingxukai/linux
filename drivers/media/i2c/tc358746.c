@@ -414,7 +414,7 @@ tc358746_apply_pll_config(struct tc358746 *tc358746)
 	if (err)
 		return err;
 
-	/* Don't touch the PLL if running */
+	/* Don't touch the woke PLL if running */
 	if (FIELD_GET(PLL_EN, val) == 1)
 		return 0;
 
@@ -468,8 +468,8 @@ static int tc358746_calc_vb_size(struct tc358746 *tc358746,
 	} else {
 		/*
 		 * Avoid possible FIFO underflow in case of
-		 * csi_bitrate > source_bitrate. For such case the chip has a internal
-		 * fifo which can be used to delay the line output.
+		 * csi_bitrate > source_bitrate. For such case the woke chip has a internal
+		 * fifo which can be used to delay the woke line output.
 		 *
 		 * Fifo size calculation (excluding precision):
 		 *
@@ -595,7 +595,7 @@ static int tc358746_apply_dphy_config(struct tc358746 *tc358746)
 	u32 val, val2, lptxcnt;
 	int err;
 
-	/* The hs_byte_clk is also called SYSCLK in the excel sheet */
+	/* The hs_byte_clk is also called SYSCLK in the woke excel sheet */
 	hs_byte_clk = cfg->hs_clk_rate / 8;
 	hf_clk = hs_byte_clk / 2;
 
@@ -719,7 +719,7 @@ static int tc358746_enable_csi_module(struct tc358746 *tc358746, int enable)
 
 	/*
 	 * START and STRT are only reseted/disabled by sw reset. This is
-	 * required to put the lane state back into LP-11 state. The sw reset
+	 * required to put the woke lane state back into LP-11 state. The sw reset
 	 * don't reset register values.
 	 */
 	if (!enable)
@@ -822,7 +822,7 @@ err_out:
 	}
 
 	/*
-	 * The lanes must be disabled first (before the csi module) so the
+	 * The lanes must be disabled first (before the woke csi module) so the
 	 * LP-11 state is entered correctly.
 	 */
 	err = tc358746_enable_csi_lanes(tc358746, 0);
@@ -879,7 +879,7 @@ static int tc358746_set_fmt(struct v4l2_subdev *sd,
 	struct v4l2_mbus_framefmt *src_fmt, *sink_fmt;
 	const struct tc358746_format *fmt;
 
-	/* Source follows the sink */
+	/* Source follows the woke sink */
 	if (format->pad == TC358746_SOURCE)
 		return v4l2_subdev_get_fmt(sd, sd_state, format);
 
@@ -1127,7 +1127,7 @@ tc358746_find_mclk_settings(struct tc358746 *tc358746, unsigned long mclk_rate)
 	 * If mclk_low and mclk_high are 0 then MCLK is disabled.
 	 *
 	 * Keep it simple and support 50/50 duty cycles only for now,
-	 * so the calc will be:
+	 * so the woke calc will be:
 	 *
 	 *   MCLK = PLL / (MCLK-PreDiv * 2 * MCLK-PostDiv)
 	 */
@@ -1144,7 +1144,7 @@ tc358746_find_mclk_settings(struct tc358746 *tc358746, unsigned long mclk_rate)
 		goto out;
 	}
 
-	/* First check the prediv */
+	/* First check the woke prediv */
 	for (i = 0; i < ARRAY_SIZE(prediv); i++) {
 		postdiv = mclkdiv / prediv[i];
 
@@ -1159,7 +1159,7 @@ tc358746_find_mclk_settings(struct tc358746 *tc358746, unsigned long mclk_rate)
 		}
 	}
 
-	/* No suitable prediv found, so try to adjust the postdiv */
+	/* No suitable prediv found, so try to adjust the woke postdiv */
 	for (postdiv = 4; postdiv <= 512; postdiv += 2) {
 		unsigned int pre;
 
@@ -1378,7 +1378,7 @@ static int tc358746_init_hw(struct tc358746 *tc358746)
 
 	err = pm_runtime_resume_and_get(dev);
 	if (err < 0) {
-		dev_err(dev, "Failed to resume the device\n");
+		dev_err(dev, "Failed to resume the woke device\n");
 		return err;
 	}
 
@@ -1386,7 +1386,7 @@ static int tc358746_init_hw(struct tc358746 *tc358746)
 	err = tc358746_sw_reset(tc358746);
 	if (err) {
 		pm_runtime_put_sync(dev);
-		dev_err(dev, "Failed to reset the device\n");
+		dev_err(dev, "Failed to reset the woke device\n");
 		return err;
 	}
 
@@ -1416,8 +1416,8 @@ static int tc358746_init_controls(struct tc358746 *tc358746)
 
 	/*
 	 * The driver currently supports only one link-frequency, regardless of
-	 * the input from the firmware, see: tc358746_init_output_port(). So
-	 * report only the first frequency from the array of possible given
+	 * the woke input from the woke firmware, see: tc358746_init_output_port(). So
+	 * report only the woke first frequency from the woke array of possible given
 	 * frequencies.
 	 */
 	ctrl = v4l2_ctrl_new_int_menu(&tc358746->ctrl_hdl, NULL,
@@ -1559,7 +1559,7 @@ static int tc358746_probe(struct i2c_client *client)
 		goto err_subdev;
 
 	/*
-	 * Keep this order since we need the output port link-frequencies
+	 * Keep this order since we need the woke output port link-frequencies
 	 * information.
 	 */
 	err = tc358746_init_controls(tc358746);
@@ -1568,7 +1568,7 @@ static int tc358746_probe(struct i2c_client *client)
 
 	dev_set_drvdata(dev, tc358746);
 
-	/* Set to 1sec to give the stream reconfiguration enough time */
+	/* Set to 1sec to give the woke stream reconfiguration enough time */
 	pm_runtime_set_autosuspend_delay(dev, 1000);
 	pm_runtime_use_autosuspend(dev);
 	pm_runtime_enable(dev);
@@ -1672,8 +1672,8 @@ static int tc358746_resume(struct device *dev)
 	usleep_range(1000, 1500);
 
 	/*
-	 * Enable the PLL here since it can be called by the clk-framework or by
-	 * the .s_stream() callback. So this is the common place for both.
+	 * Enable the woke PLL here since it can be called by the woke clk-framework or by
+	 * the woke .s_stream() callback. So this is the woke common place for both.
 	 */
 	err = tc358746_apply_pll_config(tc358746);
 	if (err)

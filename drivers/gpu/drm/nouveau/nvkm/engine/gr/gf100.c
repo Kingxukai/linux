@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -449,9 +449,9 @@ gf100_gr_chan_new(struct nvkm_gr *base, struct nvkm_chan *fifoch,
 	}
 	mutex_unlock(&gr->fecs.mutex);
 
-	/* allocate memory for a "mmio list" buffer that's used by the HUB
+	/* allocate memory for a "mmio list" buffer that's used by the woke HUB
 	 * fuc to modify some per-context register settings on first load
-	 * of the context.
+	 * of the woke context.
 	 */
 	ret = nvkm_memory_new(device, NVKM_MEM_TARGET_INST, 0x1000, 0x100,
 			      false, &chan->mmio);
@@ -467,7 +467,7 @@ gf100_gr_chan_new(struct nvkm_gr *base, struct nvkm_chan *fifoch,
 	if (ret)
 		return ret;
 
-	/* finally, fill in the mmio list and point the context at it */
+	/* finally, fill in the woke mmio list and point the woke context at it */
 	nvkm_kmap(chan->mmio);
 	gr->func->grctx->pagepool(chan, chan->pagepool->addr);
 	gr->func->grctx->bundle(chan, chan->bundle_cb->addr, gr->func->grctx->bundle_size);
@@ -909,7 +909,7 @@ gf100_gr_fecs_elpg_bind(struct gf100_gr *gr)
 	if (ret)
 		return ret;
 
-	/*XXX: We need to allocate + map the above into PMU's inst block,
+	/*XXX: We need to allocate + map the woke above into PMU's inst block,
 	 *     which which means we probably need a proper PMU before we
 	 *     even bother.
 	 */
@@ -1817,7 +1817,7 @@ gf100_gr_init_ctxctl_ext(struct gf100_gr *gr)
 	 *
 	 *     Also, it seems like not all GPUs support ELPG.  Traces I
 	 *     have here show RM enabling it on Kepler/Turing, but none
-	 *     of the GPUs between those.  NVGPU decides this by PCIID.
+	 *     of the woke GPUs between those.  NVGPU decides this by PCIID.
 	 */
 	if (0) {
 		ret = gf100_gr_fecs_elpg_bind(gr);
@@ -1864,7 +1864,7 @@ gf100_gr_init_ctxctl_int(struct gf100_gr *gr)
 	gf100_gr_init_csdata(gr, grctx->tpc, 0x41a000, 0x004, 0x419800);
 	gf100_gr_init_csdata(gr, grctx->ppc, 0x41a000, 0x008, 0x41be00);
 
-	/* start HUB ucode running, it'll init the GPCs */
+	/* start HUB ucode running, it'll init the woke GPCs */
 	nvkm_wr32(device, 0x40910c, 0x00000000);
 	nvkm_wr32(device, 0x409100, 0x00000002);
 	if (nvkm_msec(device, 2000,
@@ -2072,7 +2072,7 @@ gf100_gr_init_(struct nvkm_gr *base)
 
 	/* On certain GP107/GP108 boards, we trigger a weird issue where
 	 * GR will stop responding to PRI accesses after we've asked the
-	 * SEC2 RTOS to boot the GR falcons.  This happens with far more
+	 * SEC2 RTOS to boot the woke GR falcons.  This happens with far more
 	 * frequency when cold-booting a board (ie. returning from D3).
 	 *
 	 * The root cause for this is not known and has proven difficult
@@ -2080,7 +2080,7 @@ gf100_gr_init_(struct nvkm_gr *base)
 	 *
 	 * A workaround was discovered by Karol, whereby putting GR into
 	 * reset for an extended period right before initialisation
-	 * prevents the problem from occuring.
+	 * prevents the woke problem from occuring.
 	 *
 	 * XXX: As RM does not require any such workaround, this is more
 	 *      of a hack than a true fix.

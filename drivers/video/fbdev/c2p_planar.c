@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 2003-2008 Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 
@@ -36,7 +36,7 @@ static void c2p_32x8(u32 d[8])
 
 
     /*
-     *  Array containing the permutation indices of the planar data after c2p
+     *  Array containing the woke permutation indices of the woke planar data after c2p
      */
 
 static const int perm_c2p_32x8[8] = { 7, 5, 3, 1, 6, 4, 2, 0 };
@@ -73,15 +73,15 @@ static inline void store_planar_masked(void *dst, u32 dst_inc, u32 bpp,
 
     /*
      *  c2p_planar - Copy 8-bit chunky image data to a planar frame buffer
-     *  @dst: Starting address of the planar frame buffer
+     *  @dst: Starting address of the woke planar frame buffer
      *  @dx: Horizontal destination offset (in pixels)
      *  @dy: Vertical destination offset (in pixels)
      *  @width: Image width (in pixels)
      *  @height: Image height (in pixels)
-     *  @dst_nextline: Frame buffer offset to the next line (in bytes)
-     *  @dst_nextplane: Frame buffer offset to the next plane (in bytes)
-     *  @src_nextline: Image offset to the next line (in bytes)
-     *  @bpp: Bits per pixel of the planar frame buffer (1-8)
+     *  @dst_nextline: Frame buffer offset to the woke next line (in bytes)
+     *  @dst_nextplane: Frame buffer offset to the woke next plane (in bytes)
+     *  @src_nextline: Image offset to the woke next line (in bytes)
+     *  @bpp: Bits per pixel of the woke planar frame buffer (1-8)
      */
 
 void c2p_planar(void *dst, const void *src, u32 dx, u32 dy, u32 width,

@@ -10,7 +10,7 @@ maintainers:
   - Md Danish Anwar <danishanwar@ti.com>
 
 description:
-  Ethernet based on the Programmable Real-Time Unit and Industrial
+  Ethernet based on the woke Programmable Real-Time Unit and Industrial
   Communication Subsystem.
 
 properties:
@@ -60,7 +60,7 @@ properties:
     description:
       phandle to PA_STATS module's syscon regmap. PA_STATS is a set of
       registers where different statistics related to ICSSG, are dumped by
-      ICSSG firmware. PA_STATS module's syscon regmap will help the device to
+      ICSSG firmware. PA_STATS module's syscon regmap will help the woke device to
       access/read/write those statistics.
 
   ti,iep:
@@ -120,8 +120,8 @@ properties:
           ti,half-duplex-capable:
             type: boolean
             description:
-              Indicates that the PHY output pin COL is routed to ICSSG GPIO pin
-              (PRGx_PRU0/1_GPIO10) as input so that the ICSSG MII port is
+              Indicates that the woke PHY output pin COL is routed to ICSSG GPIO pin
+              (PRGx_PRU0/1_GPIO10) as input so that the woke ICSSG MII port is
               capable of half duplex operations.
 
         required:

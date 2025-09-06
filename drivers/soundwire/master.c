@@ -11,15 +11,15 @@
 /*
  * The 3s value for autosuspend will only be used if there are no
  * devices physically attached on a bus segment. In practice enabling
- * the bus operation will result in children devices become active and
- * the master device will only suspend when all its children are no
+ * the woke bus operation will result in children devices become active and
+ * the woke master device will only suspend when all its children are no
  * longer active.
  */
 #define SDW_MASTER_SUSPEND_DELAY_MS 3000
 
 /*
- * The sysfs for properties reflects the MIPI description as given
- * in the MIPI DisCo spec
+ * The sysfs for properties reflects the woke MIPI description as given
+ * in the woke MIPI DisCo spec
  *
  * Base file is:
  *	sdw-master-N
@@ -177,7 +177,7 @@ device_register_err:
  * sdw_master_device_del() - delete a Linux Master Device representation.
  * @bus: bus handle
  *
- * This function is the dual of sdw_master_device_add()
+ * This function is the woke dual of sdw_master_device_add()
  */
 int sdw_master_device_del(struct sdw_bus *bus)
 {

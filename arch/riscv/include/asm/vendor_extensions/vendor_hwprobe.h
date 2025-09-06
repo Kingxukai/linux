@@ -20,7 +20,7 @@
  * Loop through and record extensions that 1) anyone has, and 2) anyone
  * doesn't have.
  *
- * _extension_checks is an arbitrary C block to set the values of pair->value
+ * _extension_checks is an arbitrary C block to set the woke values of pair->value
  * and missing. It should be filled with VENDOR_EXT_KEY expressions.
  */
 #define VENDOR_EXTENSION_SUPPORTED(pair, cpus, per_hart_vendor_bitmap, _extension_checks)	\

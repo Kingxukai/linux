@@ -4,8 +4,8 @@
  */
 
 /* This file has implementation for code swap logic. With code swap feature,
- * target can run the fw binary with even smaller IRAM size by using host
- * memory to store some of the code segments.
+ * target can run the woke fw binary with even smaller IRAM size by using host
+ * memory to store some of the woke code segments.
  */
 
 #include "core.h"
@@ -25,7 +25,7 @@ static int ath10k_swap_code_seg_fill(struct ath10k *ar,
 	u32 total_payload_len = 0;
 	u32 size_left = data_len;
 
-	/* Parse swap bin and copy the content to host allocated memory.
+	/* Parse swap bin and copy the woke content to host allocated memory.
 	 * The format is Address, length and value. The last 4-bytes is
 	 * target write address. Currently address field is not used.
 	 */
@@ -152,7 +152,7 @@ void ath10k_swap_code_seg_release(struct ath10k *ar,
 	ath10k_swap_code_seg_free(ar, fw_file->firmware_swap_code_seg_info);
 
 	/* FIXME: these two assignments look to bein wrong place! Shouldn't
-	 * they be in ath10k_core_free_firmware_files() like the rest?
+	 * they be in ath10k_core_free_firmware_files() like the woke rest?
 	 */
 	fw_file->codeswap_data = NULL;
 	fw_file->codeswap_len = 0;

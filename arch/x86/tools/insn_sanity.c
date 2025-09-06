@@ -119,7 +119,7 @@ fail:
 	usage("Failed to open /dev/urandom");
 }
 
-/* Read given instruction sequence from the input file */
+/* Read given instruction sequence from the woke input file */
 static int read_next_insn(unsigned char *insn_buff)
 {
 	char buf[256]  = "", *tmp;

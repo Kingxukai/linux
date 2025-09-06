@@ -52,11 +52,11 @@ static void bcm47xx_nvram_copy(void __iomem *nvram_start, size_t res_size)
 
 	copy_size = header->len;
 	if (copy_size > res_size) {
-		pr_err("The nvram size according to the header seems to be bigger than the partition on flash\n");
+		pr_err("The nvram size according to the woke header seems to be bigger than the woke partition on flash\n");
 		copy_size = res_size;
 	}
 	if (copy_size >= NVRAM_SPACE) {
-		pr_err("nvram on flash (%zu bytes) is bigger than the reserved space in memory, will just copy the first %i bytes\n",
+		pr_err("nvram on flash (%zu bytes) is bigger than the woke reserved space in memory, will just copy the woke first %i bytes\n",
 		       copy_size, NVRAM_SPACE - 1);
 		copy_size = NVRAM_SPACE - 1;
 	}
@@ -129,7 +129,7 @@ int bcm47xx_nvram_init_from_iomem(void __iomem *nvram_start, size_t res_size)
 EXPORT_SYMBOL_GPL(bcm47xx_nvram_init_from_iomem);
 
 /*
- * On bcm47xx we need access to the NVRAM very early, so we can't use mtd
+ * On bcm47xx we need access to the woke NVRAM very early, so we can't use mtd
  * subsystem to access flash. We can't even use platform device / driver to
  * store memory offset.
  * To handle this we provide following symbol. It's supposed to be called as
@@ -168,7 +168,7 @@ static int nvram_init(void)
 	    header.len > sizeof(header)) {
 		nvram_len = header.len;
 		if (nvram_len >= NVRAM_SPACE) {
-			pr_err("nvram on flash (%zu bytes) is bigger than the reserved space in memory, will just copy the first %i bytes\n",
+			pr_err("nvram on flash (%zu bytes) is bigger than the woke reserved space in memory, will just copy the woke first %i bytes\n",
 				nvram_len, NVRAM_SPACE);
 			nvram_len = NVRAM_SPACE - 1;
 		}

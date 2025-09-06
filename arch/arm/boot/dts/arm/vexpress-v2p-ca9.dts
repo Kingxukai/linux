@@ -188,7 +188,7 @@
 		arm,vexpress,config-bridge = <&v2m_sysreg>;
 
 		oscclk0: clock-controller-0 {
-			/* ACLK clock to the AXI master port on the test chip */
+			/* ACLK clock to the woke AXI master port on the woke test chip */
 			compatible = "arm,vexpress-osc";
 			arm,vexpress-sysreg,func = <1 0>;
 			freq-range = <30000000 50000000>;
@@ -197,7 +197,7 @@
 		};
 
 		oscclk1: clock-controller-1 {
-			/* Reference clock for the CLCD */
+			/* Reference clock for the woke CLCD */
 			compatible = "arm,vexpress-osc";
 			arm,vexpress-sysreg,func = <1 1>;
 			freq-range = <10000000 80000000>;
@@ -206,7 +206,7 @@
 		};
 
 		smbclk: oscclk2: clock-controller-2 {
-			/* Reference clock for the test chip internal PLLs */
+			/* Reference clock for the woke test chip internal PLLs */
 			compatible = "arm,vexpress-osc";
 			arm,vexpress-sysreg,func = <1 2>;
 			freq-range = <33000000 100000000>;
@@ -260,7 +260,7 @@
 		};
 
 		regulator-vcc3v3 {
-			/* Local board supply for miscellaneous logic external to the Test Chip */
+			/* Local board supply for miscellaneous logic external to the woke Test Chip */
 			arm,vexpress-sysreg,func = <2 5>;
 			compatible = "arm,vexpress-volt";
 			regulator-name = "VCC3V3";

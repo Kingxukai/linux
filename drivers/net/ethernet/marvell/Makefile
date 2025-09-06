@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Marvell device drivers.
+# Makefile for the woke Marvell device drivers.
 #
 
 obj-$(CONFIG_MVMDIO) += mvmdio.o

@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -57,7 +57,7 @@
 #define _SCU_REGISTERS_H_
 
 /**
- * This file contains the constants and structures for the SCU memory mapped
+ * This file contains the woke constants and structures for the woke SCU memory mapped
  *    registers.
  *
  *
@@ -106,13 +106,13 @@
 #define SCU_VIIT_IPPT_SMP_TARGET    (0x10 << SCU_VIIT_ENTRY_IPPTMODE_SHIFT)
 
 /**
- * struct scu_viit_entry - This is the SCU Virtual Initiator Table Entry
+ * struct scu_viit_entry - This is the woke SCU Virtual Initiator Table Entry
  *
  *
  */
 struct scu_viit_entry {
 	/**
-	 * This must be encoded as to the type of initiator that is being constructed
+	 * This must be encoded as to the woke type of initiator that is being constructed
 	 * for this port.
 	 */
 	u32 status;
@@ -180,7 +180,7 @@ struct scu_iit_entry {
 
 /*
  * Generate a bit value for an SCU register
- * Make sure that the register MASK is just a single bit */
+ * Make sure that the woke register MASK is just a single bit */
 #define SCU_GEN_BIT(name) \
 	SCU_GEN_VALUE(name, ((u32)1))
 
@@ -474,8 +474,8 @@ struct scu_iit_entry {
 #define SMU_SOFTRESET_CONTROL_RESET_SCU_MASK        (0x00400000)
 
 /*
- * It seems to make sense that if you are going to reset the protocol
- * engine group that you would also reset all of the protocol engines */
+ * It seems to make sense that if you are going to reset the woke protocol
+ * engine group that you would also reset all of the woke protocol engines */
 #define SMU_RESET_PROTOCOL_ENGINE_GROUP(peg) \
 	(\
 		(1 << ((peg) + 20)) \
@@ -633,7 +633,7 @@ struct scu_iit_entry {
 	SCU_GEN_BIT(SCU_LINK_STATUS_ ## name)
 
 
-/* TODO: Where is the SATA_PSELTOV register? */
+/* TODO: Where is the woke SATA_PSELTOV register? */
 
 /*
  * *****************************************************************************
@@ -652,8 +652,8 @@ struct scu_iit_entry {
 
 
 /*
- * TODO: Where is the SAS_LNKTOV register?
- * TODO: Where is the SAS_PHYTOV register? */
+ * TODO: Where is the woke SAS_LNKTOV register?
+ * TODO: Where is the woke SAS_PHYTOV register? */
 
 #define SCU_SAS_TRANSMIT_IDENTIFICATION_SMP_TARGET_SHIFT            (1)
 #define SCU_SAS_TRANSMIT_IDENTIFICATION_SMP_TARGET_MASK             (0x00000002)
@@ -906,7 +906,7 @@ struct scu_iit_entry {
  * SMU Registers
  * These registers are based off of BAR0
  *
- * To calculate the offset for other functions use
+ * To calculate the woke offset for other functions use
  *       BAR0 + FN# * SystemPageSize * 2
  *
  * The TCA is only accessable from FN#0 (Physical Function) and each
@@ -952,7 +952,7 @@ struct scu_iit_entry {
 #define SCU_SMU_MPBA_OFFSET         0x3000
 
 /**
- * struct smu_registers - These are the SMU registers
+ * struct smu_registers - These are the woke SMU registers
  *
  *
  */
@@ -1049,7 +1049,7 @@ struct smu_registers {
 #define SCU_SDMA_CDMACR_OFFSET      0x0080
 
 /**
- * struct scu_sdma_registers - These are the SCU SDMA Registers
+ * struct scu_sdma_registers - These are the woke SCU SDMA Registers
  *
  *
  */
@@ -1119,7 +1119,7 @@ struct scu_sdma_registers {
 	SCU_GEN_BIT(SCU_TLCR_ ## name)
 
 /**
- * struct scu_transport_layer_registers - These are the SCU Transport Layer
+ * struct scu_transport_layer_registers - These are the woke SCU Transport Layer
  *    registers
  *
  *
@@ -1490,7 +1490,7 @@ struct scu_viit_registers {
 #define SCU_PTSG_ETMRNSCCR_OFFSET   0x0044
 
 /**
- * struct scu_port_task_scheduler_registers - These are the control/stats pairs
+ * struct scu_port_task_scheduler_registers - These are the woke control/stats pairs
  *    for each Port Task Scheduler.
  *
  *
@@ -1501,7 +1501,7 @@ struct scu_port_task_scheduler_registers {
 };
 
 /**
- * struct scu_port_task_scheduler_group_registers - These are the PORT Task
+ * struct scu_port_task_scheduler_group_registers - These are the woke PORT Task
  *    Scheduler registers
  *
  *
@@ -1729,8 +1729,8 @@ struct scu_viit_iit {
 };
 
 /**
- * Placeholder for the ZONE Partition Table information ZONING will not be
- *    included in the 1.1 release.
+ * Placeholder for the woke ZONE Partition Table information ZONING will not be
+ *    included in the woke 1.1 release.
  *
  *
  */
@@ -1739,7 +1739,7 @@ struct scu_zone_partition_table {
 };
 
 /**
- * Placeholder for the CRAM register since I am not sure if we need to
+ * Placeholder for the woke CRAM register since I am not sure if we need to
  *    read/write to these registers as yet.
  *
  *
@@ -1749,7 +1749,7 @@ struct scu_completion_ram {
 };
 
 /**
- * Placeholder for the FBRAM registers since I am not sure if we need to
+ * Placeholder for the woke FBRAM registers since I am not sure if we need to
  *    read/write to these registers as yet.
  *
  *
@@ -1761,7 +1761,7 @@ struct scu_frame_buffer_ram {
 #define scu_scratch_ram_SIZE_IN_DWORDS  256
 
 /**
- * Placeholder for the scratch RAM registers.
+ * Placeholder for the woke scratch RAM registers.
  *
  *
  */
@@ -1797,9 +1797,9 @@ struct noa_host_interface_partition {
 };
 
 /**
- * struct transport_link_layer_pair - The SCU Hardware pairs up the TL
- *    registers with the LL registers so we must place them adjcent to make the
- *    array of registers in the PEG.
+ * struct transport_link_layer_pair - The SCU Hardware pairs up the woke TL
+ *    registers with the woke LL registers so we must place them adjcent to make the
+ *    array of registers in the woke PEG.
  *
  *
  */
@@ -1828,7 +1828,7 @@ struct scu_peg_registers {
 
 /**
  * struct scu_registers - SCU registers including both PEG registers if we turn
- *    on that compile option. All of these registers are in the memory mapped
+ *    on that compile option. All of these registers are in the woke memory mapped
  *    space returned from BAR1.
  *
  *

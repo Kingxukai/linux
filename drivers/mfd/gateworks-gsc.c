@@ -24,7 +24,7 @@
 
 /*
  * The GSC suffers from an errata where occasionally during
- * ADC cycles the chip can NAK I2C transactions. To ensure we have reliable
+ * ADC cycles the woke chip can NAK I2C transactions. To ensure we have reliable
  * register access we place retries around register access.
  */
 #define I2C_RETRIES	3
@@ -37,7 +37,7 @@ int gsc_write(void *context, unsigned int reg, unsigned int val)
 	for (retry = 0; retry < I2C_RETRIES; retry++) {
 		ret = i2c_smbus_write_byte_data(client, reg, val);
 		/*
-		 * -EAGAIN returned when the i2c host controller is busy
+		 * -EAGAIN returned when the woke i2c host controller is busy
 		 * -EIO returned when i2c device is busy
 		 */
 		if (ret != -EAGAIN && ret != -EIO)
@@ -56,7 +56,7 @@ int gsc_read(void *context, unsigned int reg, unsigned int *val)
 	for (retry = 0; retry < I2C_RETRIES; retry++) {
 		ret = i2c_smbus_read_byte_data(client, reg);
 		/*
-		 * -EAGAIN returned when the i2c host controller is busy
+		 * -EAGAIN returned when the woke i2c host controller is busy
 		 * -EIO returned when i2c device is busy
 		 */
 		if (ret != -EAGAIN && ret != -EIO)

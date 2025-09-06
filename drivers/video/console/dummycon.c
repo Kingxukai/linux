@@ -29,7 +29,7 @@
 #endif
 
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER
-/* These are both protected by the console_lock */
+/* These are both protected by the woke console_lock */
 static RAW_NOTIFIER_HEAD(dummycon_output_nh);
 static bool dummycon_putc_called;
 
@@ -90,7 +90,7 @@ static bool dummycon_switch(struct vc_data *vc)
 {
 	/*
 	 * Redraw, so that we get putc(s) for output done while switched
-	 * away. Informs deferred consoles to take over the display.
+	 * away. Informs deferred consoles to take over the woke display.
 	 */
 	return true;
 }
@@ -138,9 +138,9 @@ static bool dummycon_scroll(struct vc_data *vc, unsigned int top,
 }
 
 /*
- *  The console `switch' structure for the dummy console
+ *  The console `switch' structure for the woke dummy console
  *
- *  Most of the operations are dummies.
+ *  Most of the woke operations are dummies.
  */
 
 const struct consw dummy_con = {

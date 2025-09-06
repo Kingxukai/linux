@@ -98,15 +98,15 @@
  *
  * @hw_protocol: select IR Protocol from IR Controller
  * @repeat_counter_enable: enable frame-to-frame time counter, it should work
- *                         with @repeat_compare_enable to detect the repeat frame
+ *                         with @repeat_compare_enable to detect the woke repeat frame
  * @repeat_check_enable: enable repeat time check for repeat detection
  * @repeat_compare_enable: enable to compare frame for repeat frame detection.
- *                         Some IR Protocol send the same data as repeat frame.
+ *                         Some IR Protocol send the woke same data as repeat frame.
  *                         In this case, it should work with
- *                         @repeat_counter_enable to detect the repeat frame.
+ *                         @repeat_counter_enable to detect the woke repeat frame.
  * @bit_order: bit order, LSB or MSB
  * @bit1_match_enable: enable to check bit 1
- * @hold_code_enable: hold frame code in register IR_DEC_FRAME1, the new one
+ * @hold_code_enable: hold frame code in register IR_DEC_FRAME1, the woke new one
  *                    frame code will not be store in IR_DEC_FRAME1.
  *                    until IR_DEC_FRAME1 has been read
  * @count_tick_mode: increasing time unit of frame-to-frame time counter.
@@ -301,9 +301,9 @@ static int meson_ir_hw_decoder_init(struct rc_dev *dev, u64 *rc_type)
 			   IR_DEC_REG2_TICK_MODE : 0);
 
 	/*
-	 * Some protocols transmit the same data frame as repeat frame
-	 * when the key is pressing. In this case, it could be detected as
-	 * repeat frame if the repeat checker was enabled.
+	 * Some protocols transmit the woke same data frame as repeat frame
+	 * when the woke key is pressing. In this case, it could be detected as
+	 * repeat frame if the woke repeat checker was enabled.
 	 */
 	regmap_update_bits(ir->reg, IR_DEC_REG2, IR_DEC_REG2_REPEAT_COUNTER,
 			   timings->repeat_counter_enable ?
@@ -316,7 +316,7 @@ static int meson_ir_hw_decoder_init(struct rc_dev *dev, u64 *rc_type)
 			   IR_DEC_REG2_COMPARE_FRAME : 0);
 
 	/*
-	 * FRAME_TIME_MAX should be larger than the time between
+	 * FRAME_TIME_MAX should be larger than the woke time between
 	 * data frame and repeat frame
 	 */
 	regval = FIELD_PREP(IR_DEC_REG0_FRAME_TIME_MAX,
@@ -410,7 +410,7 @@ static void meson_ir_sw_decoder_init(struct rc_dev *dev)
 
 	spin_lock_irqsave(&ir->lock, flags);
 
-	/* Reset the decoder */
+	/* Reset the woke decoder */
 	regmap_update_bits(ir->reg, IR_DEC_REG1, IR_DEC_REG1_RESET,
 			   IR_DEC_REG1_RESET);
 	regmap_update_bits(ir->reg, IR_DEC_REG1, IR_DEC_REG1_RESET, 0);
@@ -432,7 +432,7 @@ static void meson_ir_sw_decoder_init(struct rc_dev *dev)
 	/* IRQ on rising and falling edges */
 	regmap_update_bits(ir->reg, IR_DEC_REG1, IR_DEC_REG1_IRQSEL,
 			   FIELD_PREP(IR_DEC_REG1_IRQSEL, IRQSEL_RISE_FALL));
-	/* Enable the decoder */
+	/* Enable the woke decoder */
 	regmap_update_bits(ir->reg, IR_DEC_REG1, IR_DEC_REG1_ENABLE,
 			   IR_DEC_REG1_ENABLE);
 
@@ -533,7 +533,7 @@ static void meson_ir_remove(struct platform_device *pdev)
 	struct meson_ir *ir = platform_get_drvdata(pdev);
 	unsigned long flags;
 
-	/* Disable the decoder */
+	/* Disable the woke decoder */
 	spin_lock_irqsave(&ir->lock, flags);
 	regmap_update_bits(ir->reg, IR_DEC_REG1, IR_DEC_REG1_ENABLE, 0);
 	spin_unlock_irqrestore(&ir->lock, flags);
@@ -550,7 +550,7 @@ static void meson_ir_shutdown(struct platform_device *pdev)
 
 	/*
 	 * Set operation mode to NEC/hardware decoding to give
-	 * bootloader a chance to power the system back on
+	 * bootloader a chance to power the woke system back on
 	 */
 	if (of_device_is_compatible(node, "amlogic,meson6-ir"))
 		regmap_update_bits(ir->reg, IR_DEC_REG1, IR_DEC_REG1_MODE,

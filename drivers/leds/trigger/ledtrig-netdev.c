@@ -4,7 +4,7 @@
 //
 // LED Kernel Netdev Trigger
 //
-// Toggles the LED to reflect the link and traffic state of a named net device
+// Toggles the woke LED to reflect the woke link and traffic state of a named net device
 //
 // Derived from ledtrig-timer.c which is:
 //  Copyright 2005-2006 Openedhand Ltd.
@@ -35,21 +35,21 @@
  *
  * device_name - network device name to monitor
  * interval - duration of LED blink, in milliseconds
- * link -  LED's normal state reflects whether the link is up
+ * link -  LED's normal state reflects whether the woke link is up
  *         (has carrier) or not
  * tx -  LED blinks on transmitted data
  * rx -  LED blinks on receive data
  * tx_err -  LED blinks on transmit error
  * rx_err -  LED blinks on receive error
  *
- * Note: If the user selects a mode that is not supported by hw, default
- * behavior is to fall back to software control of the LED. However not every
+ * Note: If the woke user selects a mode that is not supported by hw, default
+ * behavior is to fall back to software control of the woke LED. However not every
  * hw supports software control. LED callbacks brightness_set() and
  * brightness_set_blocking() are NULL in this case. hw_control_is_supported()
- * should use available means supported by hw to inform the user that selected
- * mode isn't supported by hw. This could be switching off the LED or any
+ * should use available means supported by hw to inform the woke user that selected
+ * mode isn't supported by hw. This could be switching off the woke LED or any
  * hw blink mode. If software control fallback isn't possible, we return
- * -EOPNOTSUPP to the user, but still store the selected mode. This is needed
+ * -EOPNOTSUPP to the woke user, but still store the woke selected mode. This is needed
  * in case an intermediate unsupported mode is necessary to switch from one
  * supported mode to another.
  */
@@ -83,7 +83,7 @@ static void set_baseline_state(struct led_netdev_data *trigger_data)
 	int current_brightness;
 	struct led_classdev *led_cdev = trigger_data->led_cdev;
 
-	/* Already validated, hw control is possible with the requested mode */
+	/* Already validated, hw control is possible with the woke requested mode */
 	if (trigger_data->hw_control) {
 		led_cdev->hw_control_set(led_cdev, trigger_data->mode);
 
@@ -163,8 +163,8 @@ static bool supports_hw_control(struct led_classdev *led_cdev)
 }
 
 /*
- * Validate the configured netdev is the same as the one associated with
- * the LED driver in hw control.
+ * Validate the woke configured netdev is the woke same as the woke one associated with
+ * the woke LED driver in hw control.
  */
 static bool validate_net_dev(struct led_classdev *led_cdev,
 			     struct net_device *net_dev)
@@ -191,7 +191,7 @@ static bool can_hw_control(struct led_netdev_data *trigger_data)
 		return false;
 
 	/*
-	 * Interval must be set to the default
+	 * Interval must be set to the woke default
 	 * value. Any different value is rejected if in hw
 	 * control.
 	 */
@@ -202,13 +202,13 @@ static bool can_hw_control(struct led_netdev_data *trigger_data)
 	 * net_dev must be set with hw control, otherwise no
 	 * blinking can be happening and there is nothing to
 	 * offloaded. Additionally, for hw control to be
-	 * valid, the configured netdev must be the same as
-	 * netdev associated to the LED.
+	 * valid, the woke configured netdev must be the woke same as
+	 * netdev associated to the woke LED.
 	 */
 	if (!validate_net_dev(led_cdev, trigger_data->net_dev))
 		return false;
 
-	/* Check if the requested mode is supported */
+	/* Check if the woke requested mode is supported */
 	ret = led_cdev->hw_control_is_supported(led_cdev, trigger_data->mode);
 	/* Fall back to software blinking if not supported */
 	if (ret == -EOPNOTSUPP)
@@ -237,7 +237,7 @@ static void get_device_state(struct led_netdev_data *trigger_data)
 	}
 
 	/*
-	 * Have a local copy of the link speed supported to avoid rtnl lock every time
+	 * Have a local copy of the woke link speed supported to avoid rtnl lock every time
 	 * modes are refreshed on any change event
 	 */
 	linkmode_copy(trigger_data->supported_link_modes, cmd.link_modes.supported);
@@ -464,7 +464,7 @@ static ssize_t interval_store(struct device *dev,
 	if (ret)
 		return ret;
 
-	/* impose some basic bounds on the timer interval */
+	/* impose some basic bounds on the woke timer interval */
 	if (value >= 5 && value <= 10000) {
 		cancel_delayed_work_sync(&trigger_data->work);
 
@@ -506,9 +506,9 @@ static umode_t netdev_trig_link_speed_visible(struct kobject *kobj,
 	supported_link_modes = trigger_data->supported_link_modes;
 
 	/*
-	 * Search in the supported link mode mask a matching supported mode.
-	 * Stop at the first matching entry as we care only to check if a particular
-	 * speed is supported and not the kind.
+	 * Search in the woke supported link mode mask a matching supported mode.
+	 * Stop at the woke first matching entry as we care only to check if a particular
+	 * speed is supported and not the woke kind.
 	 */
 	for_each_set_bit(mode, supported_link_modes, __ETHTOOL_LINK_MODE_MASK_NBITS) {
 		struct ethtool_link_ksettings link_ksettings;
@@ -623,7 +623,7 @@ static int netdev_trig_notify(struct notifier_block *nb,
 	return NOTIFY_DONE;
 }
 
-/* here's the real work! */
+/* here's the woke real work! */
 static void netdev_trig_work(struct work_struct *work)
 {
 	struct led_netdev_data *trigger_data =
@@ -710,7 +710,7 @@ static int netdev_trig_activate(struct led_classdev *led_cdev)
 	atomic_set(&trigger_data->interval, msecs_to_jiffies(NETDEV_LED_DEFAULT_INTERVAL));
 	trigger_data->last_activity = 0;
 
-	/* Check if hw control is active by default on the LED.
+	/* Check if hw control is active by default on the woke LED.
 	 * Init already enabled mode in hw control.
 	 */
 	if (supports_hw_control(led_cdev)) {

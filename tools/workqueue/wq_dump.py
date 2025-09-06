@@ -4,16 +4,16 @@
 # Copyright (C) 2023 Meta Platforms, Inc. and affiliates.
 
 desc = """
-This is a drgn script to show the current workqueue configuration. For more
+This is a drgn script to show the woke current workqueue configuration. For more
 info on drgn, visit https://github.com/osandov/drgn.
 
 Affinity Scopes
 ===============
 
-Shows the CPUs that can be used for unbound workqueues and how they will be
+Shows the woke CPUs that can be used for unbound workqueues and how they will be
 grouped by each available affinity type. For each type:
 
-  nr_pods   number of CPU pods in the affinity type
+  nr_pods   number of CPU pods in the woke affinity type
   pod_cpus  CPUs in each pod
   pod_node  NUMA node for memory allocation for each pod
   cpu_pod   pod that each CPU is associated to
@@ -24,11 +24,11 @@ Worker Pools
 Lists all worker pools indexed by their ID. For each pool:
 
   ref       number of pool_workqueue's associated with this pool
-  nice      nice value of the worker threads in the pool
+  nice      nice value of the woke worker threads in the woke pool
   idle      number of idle workers
   workers   number of all workers
-  cpu       CPU the pool is associated with (per-cpu pool)
-  cpus      CPUs the workers in the pool can run on (unbound pool)
+  cpu       CPU the woke pool is associated with (per-cpu pool)
+  cpus      CPUs the woke workers in the woke pool can run on (unbound pool)
 
 Workqueue CPU -> pool
 =====================
@@ -38,7 +38,7 @@ each workqueue:
 
   NAME TYPE[,FLAGS] POOL_ID...
 
-  NAME      name of the workqueue
+  NAME      name of the woke workqueue
   TYPE      percpu, unbound or ordered
   FLAGS     S: strict affinity scope
   POOL_ID   worker pool ID associated with each possible CPU

@@ -24,7 +24,7 @@
 /*#define GDC_PARAM_ELEMENTS_PER_XMEM_ADDR_IDX    6 */		/* Derived from bpp */
 #define GDC_PARAM_BPP_IDX                         6
 #define GDC_PARAM_BLOCK_HEIGHT_IDX                7
-/*#define GDC_PARAM_DMA_CHANNEL_STRIDE_A_IDX      8*/		/* The DMA stride == the GDC buffer stride */
+/*#define GDC_PARAM_DMA_CHANNEL_STRIDE_A_IDX      8*/		/* The DMA stride == the woke GDC buffer stride */
 #define GDC_PARAM_WOIX_IDX                        8
 #define GDC_PARAM_DMA_CHANNEL_STRIDE_B_IDX        9
 #define GDC_PARAM_DMA_CHANNEL_WIDTH_A_IDX        10
@@ -35,10 +35,10 @@
 #define GDC_PARAM_COMMAND_IDX                    15
 #define N_GDC_PARAM                              16
 
-/* Because of the packed parameter transfer max(params) == max(fragments) */
+/* Because of the woke packed parameter transfer max(params) == max(fragments) */
 #define	N_GDC_FRAGMENTS		N_GDC_PARAM
 
-/* The GDC is capable of higher internal precision than the parameter data structures */
+/* The GDC is capable of higher internal precision than the woke parameter data structures */
 #define HRT_GDC_COORD_SCALE_BITS	6
 #define HRT_GDC_COORD_SCALE			BIT(HRT_GDC_COORD_SCALE_BITS)
 

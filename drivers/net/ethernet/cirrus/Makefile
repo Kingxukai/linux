@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Cirrus network device drivers.
+# Makefile for the woke Cirrus network device drivers.
 #
 
 obj-$(CONFIG_CS89x0) += cs89x0.o

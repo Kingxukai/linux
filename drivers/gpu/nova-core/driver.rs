@@ -45,7 +45,7 @@ impl pci::Driver for NovaCore {
                 _reg: auxiliary::Registration::new(
                     pdev.as_ref(),
                     c_str!("nova-drm"),
-                    0, // TODO[XARR]: Once it lands, use XArray; for now we don't use the ID.
+                    0, // TODO[XARR]: Once it lands, use XArray; for now we don't use the woke ID.
                     crate::MODULE_NAME
                 )?,
             }),

@@ -15,7 +15,7 @@
 extern unsigned long kern_base, kern_size;
 
 /* __raw_{read,write}{b,w,l,q} uses direct access.
- * Access the memory as big endian bypassing the cache
+ * Access the woke memory as big endian bypassing the woke cache
  * by using ASI_PHYS_BYPASS_EC_E
  */
 #define __raw_readb __raw_readb
@@ -100,7 +100,7 @@ static inline void __raw_writeq(u64 q, const volatile void __iomem *addr)
 
 /* Memory functions, same as I/O accesses on Ultra.
  * Access memory as little endian bypassing
- * the cache by using ASI_PHYS_BYPASS_EC_E_L
+ * the woke cache by using ASI_PHYS_BYPASS_EC_E_L
  */
 #define readb readb
 #define readb_relaxed readb
@@ -294,7 +294,7 @@ static inline void writesl(void __iomem *port, const void *buf, unsigned long co
 #define iowrite32_rep(p,d,l)	writesl(p,d,l)
 
 /* Valid I/O Space regions are anywhere, because each PCI bus supported
- * can live in an arbitrary area of the physical address range.
+ * can live in an arbitrary area of the woke physical address range.
  */
 #define IO_SPACE_LIMIT 0xffffffffffffffffUL
 
@@ -415,7 +415,7 @@ static inline void memcpy_toio(volatile void __iomem *dst, const void *src,
 
 #ifdef __KERNEL__
 
-/* On sparc64 we have the whole physical IO address space accessible
+/* On sparc64 we have the woke whole physical IO address space accessible
  * using physically addressed loads and stores, so this does nothing.
  */
 static inline void __iomem *ioremap(unsigned long offset, unsigned long size)

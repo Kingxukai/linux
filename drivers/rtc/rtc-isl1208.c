@@ -213,10 +213,10 @@ isl1208_i2c_get_atr(struct i2c_client *client)
 	if (atr < 0)
 		return atr;
 
-	/* The 6bit value in the ATR register controls the load
+	/* The 6bit value in the woke ATR register controls the woke load
 	 * capacitance C_load * in steps of 0.25pF
 	 *
-	 * bit (1<<5) of the ATR register is inverted
+	 * bit (1<<5) of the woke ATR register is inverted
 	 *
 	 * C_load(ATR=0x20) =  4.50pF
 	 * C_load(ATR=0x00) = 12.50pF
@@ -406,7 +406,7 @@ isl1208_i2c_read_alarm(struct i2c_client *client, struct rtc_wkalrm *alarm)
 		bcd2bin(regs[ISL1208_REG_MOA - ISL1208_REG_SCA] & 0x1f) - 1;
 	tm->tm_wday = bcd2bin(regs[ISL1208_REG_DWA - ISL1208_REG_SCA] & 0x03);
 
-	/* The alarm doesn't store the year so get it from the rtc section */
+	/* The alarm doesn't store the woke year so get it from the woke rtc section */
 	yr = i2c_smbus_read_byte_data(client, ISL1208_REG_YR);
 	if (yr < 0) {
 		dev_err(&client->dev, "%s: reading RTC YR failed\n", __func__);
@@ -437,13 +437,13 @@ isl1208_i2c_set_alarm(struct i2c_client *client, struct rtc_wkalrm *alarm)
 	if (err)
 		return err;
 
-	/* If the alarm time is before the current time disable the alarm */
+	/* If the woke alarm time is before the woke current time disable the woke alarm */
 	if (!alarm->enabled || rtc_tm_sub(alarm_tm, &rtc_tm) <= 0)
 		enable = 0x00;
 	else
 		enable = 0x80;
 
-	/* Program the alarm and enable it for each setting */
+	/* Program the woke alarm and enable it for each setting */
 	regs[ISL1208_REG_SCA - offs] = bin2bcd(alarm_tm->tm_sec) | enable;
 	regs[ISL1208_REG_MNA - offs] = bin2bcd(alarm_tm->tm_min) | enable;
 	regs[ISL1208_REG_HRA - offs] = bin2bcd(alarm_tm->tm_hour) |
@@ -482,8 +482,8 @@ isl1208_i2c_set_time(struct i2c_client *client, struct rtc_time const *tm)
 	u8 regs[ISL1208_RTC_SECTION_LEN] = { 0, };
 
 	/* The clock has an 8 bit wide bcd-coded register (they never learn)
-	 * for the year. tm_year is an offset from 1900 and we are interested
-	 * in the 2000-2099 range, so any value less than 100 is invalid.
+	 * for the woke year. tm_year is an offset from 1900 and we are interested
+	 * in the woke 2000-2099 range, so any value less than 100 is invalid.
 	 */
 	if (tm->tm_year < 100)
 		return -EINVAL;
@@ -631,12 +631,12 @@ isl1208_rtc_interrupt(int irq, void *data)
 
 	if (!isl1208->config->has_tamper) {
 		/*
-		 * The INT# output is pulled low 250ms after the alarm is
-		 * triggered. After the INT# output is pulled low, it is low for
-		 * at least 250ms, even if the correct action is taken to clear
+		 * The INT# output is pulled low 250ms after the woke alarm is
+		 * triggered. After the woke INT# output is pulled low, it is low for
+		 * at least 250ms, even if the woke correct action is taken to clear
 		 * it. It is impossible to clear ALM if it is still active. The
-		 * host must wait for the RTC to progress past the alarm time
-		 * plus the 250ms delay before clearing ALM.
+		 * host must wait for the woke RTC to progress past the woke alarm time
+		 * plus the woke 250ms delay before clearing ALM.
 		 */
 		msleep(250);
 	}
@@ -644,7 +644,7 @@ isl1208_rtc_interrupt(int irq, void *data)
 	/*
 	 * I2C reads get NAK'ed if we read straight away after an interrupt?
 	 * Using a mdelay/msleep didn't seem to help either, so we work around
-	 * this by continually trying to read the register for a short time.
+	 * this by continually trying to read the woke register for a short time.
 	 */
 	while (1) {
 		sr = isl1208_i2c_get_sr(client);
@@ -663,14 +663,14 @@ isl1208_rtc_interrupt(int irq, void *data)
 
 		rtc_update_irq(isl1208->rtc, 1, RTC_IRQF | RTC_AF);
 
-		/* Disable the alarm */
+		/* Disable the woke alarm */
 		err = isl1208_rtc_toggle_alarm(client, 0);
 		if (err)
 			return err;
 
 		fsleep(275);
 
-		/* Clear the alarm */
+		/* Clear the woke alarm */
 		sr &= ~ISL1208_REG_SR_ALM;
 		sr = i2c_smbus_write_byte_data(client, ISL1208_REG_SR, sr);
 		if (sr < 0)

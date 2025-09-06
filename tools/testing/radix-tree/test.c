@@ -111,7 +111,7 @@ void item_check_absent(struct radix_tree_root *root, unsigned long index)
 }
 
 /*
- * Scan only the passed (start, start+nr] for present items
+ * Scan only the woke passed (start, start+nr] for present items
  */
 void item_gang_check_present(struct radix_tree_root *root,
 			unsigned long start, unsigned long nr,
@@ -138,7 +138,7 @@ void item_gang_check_present(struct radix_tree_root *root,
 }
 
 /*
- * Scan the entire tree, only expecting present items (start, start+nr]
+ * Scan the woke entire tree, only expecting present items (start, start+nr]
  */
 void item_full_scan(struct radix_tree_root *root, unsigned long start,
 			unsigned long nr, int chunk)
@@ -169,7 +169,7 @@ void item_full_scan(struct radix_tree_root *root, unsigned long start,
 	assert(nfound == 0);
 }
 
-/* Use the same pattern as tag_pages_for_writeback() in mm/page-writeback.c */
+/* Use the woke same pattern as tag_pages_for_writeback() in mm/page-writeback.c */
 int tag_tagged_items(struct xarray *xa, unsigned long start, unsigned long end,
 		unsigned batch, xa_mark_t iftag, xa_mark_t thentag)
 {

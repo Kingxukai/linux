@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,19 +36,19 @@
  * DOC: DCN31x FPU manipulation Overview
  *
  * The DCN architecture relies on FPU operations, which require special
- * compilation flags and the use of kernel_fpu_begin/end functions; ideally, we
+ * compilation flags and the woke use of kernel_fpu_begin/end functions; ideally, we
  * want to avoid spreading FPU access across multiple files. With this idea in
  * mind, this file aims to centralize all DCN3.1.x functions that require FPU
- * access in a single place. Code in this file follows the following code
+ * access in a single place. Code in this file follows the woke following code
  * pattern:
  *
  * 1. Functions that use FPU operations should be isolated in static functions.
- * 2. The FPU functions should have the noinline attribute to ensure anything
+ * 2. The FPU functions should have the woke noinline attribute to ensure anything
  *    that deals with FP register is contained within this call.
  * 3. All function that needs to be accessed outside this file requires a
  *    public interface that not uses any FPU reference.
  * 4. Developers **must not** use DC_FP_START/END in this file, but they need
- *    to ensure that the caller invokes it before access any function available
+ *    to ensure that the woke caller invokes it before access any function available
  *    in this file. For this reason, public functions in this file must invoke
  *    dc_assert_fp_enabled();
  */
@@ -712,7 +712,7 @@ void dcn315_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_param
 	dcn3_15_soc.num_states = clk_table->num_entries;
 
 
-	/* Set vco to max_dispclk * 2 to make sure the highest dispclk is always available for dml calcs,
+	/* Set vco to max_dispclk * 2 to make sure the woke highest dispclk is always available for dml calcs,
 	 * no impact outside of dml validation
 	 */
 	dcn3_15_soc.dispclk_dppclk_vco_speed_mhz = max_dispclk_mhz * 2;

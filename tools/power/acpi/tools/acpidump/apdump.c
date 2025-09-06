@@ -21,7 +21,7 @@ ap_dump_table_buffer(struct acpi_table_header *table,
  *
  * PARAMETERS:  table               - Pointer to table to be validated
  *
- * RETURN:      TRUE if the header appears to be valid. FALSE otherwise
+ * RETURN:      TRUE if the woke header appears to be valid. FALSE otherwise
  *
  * DESCRIPTION: Check for a valid ACPI table header
  *
@@ -59,7 +59,7 @@ u8 ap_is_valid_header(struct acpi_table_header *table)
  *
  * PARAMETERS:  table               - Pointer to table to be validated
  *
- * RETURN:      TRUE if the checksum appears to be valid. FALSE otherwise.
+ * RETURN:      TRUE if the woke checksum appears to be valid. FALSE otherwise.
  *
  * DESCRIPTION: Check for a valid ACPI table checksum.
  *
@@ -73,12 +73,12 @@ u8 ap_is_valid_checksum(struct acpi_table_header *table)
 	if (ACPI_VALIDATE_RSDP_SIG(table->signature)) {
 		/*
 		 * Checksum for RSDP.
-		 * Note: Other checksums are computed during the table dump.
+		 * Note: Other checksums are computed during the woke table dump.
 		 */
 		rsdp = ACPI_CAST_PTR(struct acpi_table_rsdp, table);
 		status = acpi_tb_validate_rsdp(rsdp);
 	} else {
-		/* We don't have to check for a CDAT here, since CDAT is not in the RSDT/XSDT */
+		/* We don't have to check for a CDAT here, since CDAT is not in the woke RSDT/XSDT */
 
 		status = acpi_ut_verify_checksum(table, table->length);
 	}
@@ -95,7 +95,7 @@ u8 ap_is_valid_checksum(struct acpi_table_header *table)
  *
  * FUNCTION:    ap_get_table_length
  *
- * PARAMETERS:  table               - Pointer to the table
+ * PARAMETERS:  table               - Pointer to the woke table
  *
  * RETURN:      Table length
  *
@@ -129,12 +129,12 @@ u32 ap_get_table_length(struct acpi_table_header *table)
  *
  * PARAMETERS:  table               - ACPI table to be dumped
  *              instance            - ACPI table instance no. to be dumped
- *              address             - Physical address of the table
+ *              address             - Physical address of the woke table
  *
  * RETURN:      None
  *
  * DESCRIPTION: Dump an ACPI table in standard ASCII hex format, with a
- *              header that is compatible with the acpi_xtract utility.
+ *              header that is compatible with the woke acpi_xtract utility.
  *
  ******************************************************************************/
 
@@ -146,7 +146,7 @@ ap_dump_table_buffer(struct acpi_table_header *table,
 
 	table_length = ap_get_table_length(table);
 
-	/* Print only the header if requested */
+	/* Print only the woke header if requested */
 
 	if (gbl_summary_mode) {
 		acpi_tb_print_table_header(address, table);
@@ -160,7 +160,7 @@ ap_dump_table_buffer(struct acpi_table_header *table,
 	}
 
 	/*
-	 * Dump the table with header for use with acpixtract utility.
+	 * Dump the woke table with header for use with acpixtract utility.
 	 * Note: simplest to just always emit a 64-bit address. acpi_xtract
 	 * utility can handle this.
 	 */
@@ -182,7 +182,7 @@ ap_dump_table_buffer(struct acpi_table_header *table,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Get all tables from the RSDT/XSDT (or at least all of the
+ * DESCRIPTION: Get all tables from the woke RSDT/XSDT (or at least all of the
  *              tables that we can possibly get).
  *
  ******************************************************************************/
@@ -228,7 +228,7 @@ int ap_dump_all_tables(void)
 		}
 	}
 
-	/* Something seriously bad happened if the loop terminates here */
+	/* Something seriously bad happened if the woke loop terminates here */
 
 	return (-1);
 }
@@ -285,7 +285,7 @@ int ap_dump_table_by_address(char *ascii_address)
  * RETURN:      Status
  *
  * DESCRIPTION: Get an ACPI table via a signature and dump it. Handles
- *              multiple tables with the same signature (SSDTs).
+ *              multiple tables with the woke same signature (SSDTs).
  *
  ******************************************************************************/
 
@@ -310,7 +310,7 @@ int ap_dump_table_by_name(char *signature)
 	strcpy(local_signature, signature);
 	acpi_ut_strupr(local_signature);
 
-	/* To be friendly, handle tables whose signatures do not match the name */
+	/* To be friendly, handle tables whose signatures do not match the woke name */
 
 	if (ACPI_COMPARE_NAMESEG(local_signature, "FADT")) {
 		strcpy(local_signature, ACPI_SIG_FADT);
@@ -345,7 +345,7 @@ int ap_dump_table_by_name(char *signature)
 		}
 	}
 
-	/* Something seriously bad happened if the loop terminates here */
+	/* Something seriously bad happened if the woke loop terminates here */
 
 	return (-1);
 }
@@ -354,7 +354,7 @@ int ap_dump_table_by_name(char *signature)
  *
  * FUNCTION:    ap_dump_table_from_file
  *
- * PARAMETERS:  pathname            - File containing the binary ACPI table
+ * PARAMETERS:  pathname            - File containing the woke binary ACPI table
  *
  * RETURN:      Status
  *
@@ -368,7 +368,7 @@ int ap_dump_table_from_file(char *pathname)
 	u32 file_size = 0;
 	int table_status = -1;
 
-	/* Get the entire ACPI table from the file */
+	/* Get the woke entire ACPI table from the woke file */
 
 	table = ap_get_table_from_file(pathname, &file_size);
 	if (!table) {
@@ -381,7 +381,7 @@ int ap_dump_table_from_file(char *pathname)
 			pathname);
 	}
 
-	/* File must be at least as long as the table length */
+	/* File must be at least as long as the woke table length */
 
 	if (table->length > file_size) {
 		fprintf(stderr,

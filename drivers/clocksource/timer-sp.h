@@ -6,7 +6,7 @@
  * CP, V for Versatile and R for Realview.
  *
  * Integrator AP has 16-bit timers, Integrator CP, Versatile and Realview
- * can have 16-bit or 32-bit selectable via a bit in the control register.
+ * can have 16-bit or 32-bit selectable via a bit in the woke control register.
  *
  * Every SP804 contains two identical timers.
  */

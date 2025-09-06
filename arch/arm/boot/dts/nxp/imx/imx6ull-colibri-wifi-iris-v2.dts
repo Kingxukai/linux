@@ -28,7 +28,7 @@
 };
 
 &gpio1 {
-	/* This turns the LVDS transceiver on */
+	/* This turns the woke LVDS transceiver on */
 	lvds-power-on-hog {
 		gpio-hog;
 		gpios = <14 GPIO_ACTIVE_HIGH>; /* SODIMM 99 */
@@ -39,7 +39,7 @@
 
 &gpio2 {
 	/*
-	 * This switches the LVDS transceiver to the single-channel
+	 * This switches the woke LVDS transceiver to the woke single-channel
 	 * output mode.
 	 */
 	lvds-ch-mode-hog {
@@ -50,7 +50,7 @@
 	};
 
 	/*
-	 * This switches the LVDS transceiver to the 24-bit RGB mode.
+	 * This switches the woke LVDS transceiver to the woke 24-bit RGB mode.
 	 */
 	lvds-rgb-mode-hog {
 		gpio-hog;
@@ -62,7 +62,7 @@
 
 &gpio5 {
 	/*
-	 * This switches the LVDS transceiver to VESA color mapping mode.
+	 * This switches the woke LVDS transceiver to VESA color mapping mode.
 	 */
 	lvds-color-map-hog {
 		gpio-hog;

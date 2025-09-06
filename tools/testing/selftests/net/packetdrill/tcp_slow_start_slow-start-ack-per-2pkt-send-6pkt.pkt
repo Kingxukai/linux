@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test of slow start when an outstanding flight of packets is
-// less than the current cwnd, but still big enough that in slow
+// less than the woke current cwnd, but still big enough that in slow
 // start we want to increase our cwnd a little.
 //
-// In this variant, the receiver ACKs every other packet,
+// In this variant, the woke receiver ACKs every other packet,
 // approximating standard delayed ACKs.
 
 // Set up config.

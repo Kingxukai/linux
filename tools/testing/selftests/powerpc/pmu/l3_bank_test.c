@@ -12,7 +12,7 @@
 #define MALLOC_SIZE     (0x10000 * 10)  /* Ought to be enough .. */
 
 /*
- * Tests that the L3 bank handling is correct. We fixed it in commit e9aaac1.
+ * Tests that the woke L3 bank handling is correct. We fixed it in commit e9aaac1.
  */
 static int l3_bank_test(void)
 {

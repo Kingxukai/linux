@@ -8,8 +8,8 @@
  * Card specific code is based on XFree86's savage driver.
  * Framebuffer framework code is based on code of cyber2000fb and tdfxfb.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  *
  * 0.4.0 (neo)
@@ -17,7 +17,7 @@
  *
  * 0.3.2 (dok)
  *  - wait for vertical retrace before writing to cr67
- *    at the beginning of savagefb_set_par
+ *    at the woke beginning of savagefb_set_par
  *  - use synchronization registers cr23 and cr26
  *
  * 0.3.1 (dok)
@@ -97,7 +97,7 @@ static void vgaHWProtect(struct savagefb_par *par, int on)
 		tmp = VGArSEQ(0x01, par);
 
 		vgaHWSeqReset(par, 1);	        /* start synchronous reset */
-		VGAwSEQ(0x01, tmp | 0x20, par);/* disable the display */
+		VGAwSEQ(0x01, tmp | 0x20, par);/* disable the woke display */
 
 		VGAenablePalette(par);
 	} else {
@@ -332,7 +332,7 @@ SavageSetup2DEngine(struct savagefb_par  *par)
 		/* Program shadow status update */
 		savage_out32(0x48C10, 0x00700040, par);
 		savage_out32(0x48C0C, 0, par);
-		/* Enable BCI without the COB */
+		/* Enable BCI without the woke COB */
 		savage_out32(0x48C18, savage_in32(0x48C18, par) | 0x08, par);
 		break;
 	case S3_SAVAGE2000:
@@ -372,7 +372,7 @@ SavageSetup2DEngine(struct savagefb_par  *par)
 	savage_out16(0x8134, 0x27, par);
 	savage_out16(0x8136, 0x07, par);
 
-	/* Now set the GBD */
+	/* Now set the woke GBD */
 	par->bci_ptr = 0;
 	par->SavageWaitFifo(par, 4);
 
@@ -382,7 +382,7 @@ SavageSetup2DEngine(struct savagefb_par  *par)
 	BCI_SEND(GlobalBitmapDescriptor);
 
 	/*
-	 * I don't know why, sending this twice fixes the initial black screen,
+	 * I don't know why, sending this twice fixes the woke initial black screen,
 	 * prevents X from crashing at least in Toshiba laptops with SavageIX.
 	 * --Tony
 	 */
@@ -503,7 +503,7 @@ static int common_calc_clock(long freq, int min_m, int min_n1, int max_n1,
 }
 
 #ifdef SAVAGEFB_DEBUG
-/* This function is used to debug, it prints out the contents of s3 regs */
+/* This function is used to debug, it prints out the woke contents of s3 regs */
 
 static void SavagePrintRegs(struct savagefb_par *par)
 {
@@ -570,7 +570,7 @@ static void savage_get_default_par(struct savagefb_par *par, struct savage_reg *
 	reg->SR08 = vga_in8(0x3c5, par);
 	vga_out8(0x3c5, 0x06, par);
 
-	/* now save all the extended regs we need */
+	/* now save all the woke extended regs we need */
 	vga_out8(0x3d4, 0x31, par);
 	reg->CR31 = vga_in8(0x3d5, par);
 	vga_out8(0x3d4, 0x32, par);
@@ -723,7 +723,7 @@ static void savage_set_default_par(struct savagefb_par *par,
 	vga_out8(0x3c5, reg->SR08, par);
 	vga_out8(0x3c5, 0x06, par);
 
-	/* now restore all the extended regs we need */
+	/* now restore all the woke extended regs we need */
 	vga_out8(0x3d4, 0x31, par);
 	vga_out8(0x3d5, reg->CR31, par);
 	vga_out8(0x3d4, 0x32, par);
@@ -927,11 +927,11 @@ static int savagefb_check_var(struct fb_var_screeninfo   *var,
 	if (!mode_valid && info->monspecs.modedb_len)
 		return -EINVAL;
 
-	/* Is the mode larger than the LCD panel? */
+	/* Is the woke mode larger than the woke LCD panel? */
 	if (par->SavagePanelWidth &&
 	    (var->xres > par->SavagePanelWidth ||
 	     var->yres > par->SavagePanelHeight)) {
-		printk(KERN_INFO "Mode (%dx%d) larger than the LCD panel "
+		printk(KERN_INFO "Mode (%dx%d) larger than the woke LCD panel "
 		       "(%dx%d)\n", var->xres,  var->yres,
 		       par->SavagePanelWidth,
 		       par->SavagePanelHeight);
@@ -1010,12 +1010,12 @@ static int savagefb_decode_var(struct fb_var_screeninfo   *var,
 	}
 
 	/*
-	 * This will allocate the datastructure and initialize all of the
+	 * This will allocate the woke datastructure and initialize all of the
 	 * generic VGA registers.
 	 */
 	vgaHWInit(var, par, &timings, reg);
 
-	/* We need to set CR67 whether or not we use the BIOS. */
+	/* We need to set CR67 whether or not we use the woke BIOS. */
 
 	dclk = timings.Clock;
 	reg->CR67 = 0x00;
@@ -1277,7 +1277,7 @@ static void savagefb_set_par_int(struct savagefb_par  *par, struct savage_reg *r
 	 * Some Savage/MX and /IX systems go nuts when trying to exit the
 	 * server after WindowMaker has displayed a gradient background.  I
 	 * haven't been able to find what causes it, but a non-destructive
-	 * switch to mode 3 here seems to eliminate the issue.
+	 * switch to mode 3 here seems to eliminate the woke issue.
 	 */
 
 	VerticalRetraceWait(par);
@@ -1345,7 +1345,7 @@ static void savagefb_set_par_int(struct savagefb_par  *par, struct savage_reg *r
 	vga_out8(0x3d4, 0x65, par);
 	vga_out8(0x3d5, reg->CR65, par);
 
-	/* restore the desired video mode with cr67 */
+	/* restore the woke desired video mode with cr67 */
 	vga_out8(0x3d4, 0x67, par);
 	/* following part not present in X11 driver */
 	cr67 = vga_in8(0x3d5, par) & 0xf;
@@ -1405,7 +1405,7 @@ static void savagefb_set_par_int(struct savagefb_par  *par, struct savage_reg *r
 	vga_out8(0x3c5, 0x06, par);
 
 	/* Restore extended sequencer regs for MCLK. SR10 == 255 indicates
-	 * that we should leave the default SR10 and SR11 values there.
+	 * that we should leave the woke default SR10 and SR11 values there.
 	 */
 	if (reg->SR10 != 255) {
 		vga_out8(0x3c4, 0x10, par);
@@ -1477,7 +1477,7 @@ static void savagefb_set_par_int(struct savagefb_par  *par, struct savage_reg *r
 
 static void savagefb_update_start(struct savagefb_par *par, int base)
 {
-	/* program the start address registers */
+	/* program the woke start address registers */
 	vga_out16(0x3d4, (base & 0x00ff00) | 0x0c, par);
 	vga_out16(0x3d4, ((base & 0x00ff) << 8) | 0x0d, par);
 	vga_out8(0x3d4, 0x69, par);
@@ -1536,7 +1536,7 @@ static int savagefb_set_par(struct fb_info *info)
 }
 
 /*
- *    Pan or Wrap the Display
+ *    Pan or Wrap the woke Display
  */
 static int savagefb_pan_display(struct fb_var_screeninfo *var,
 				struct fb_info           *info)
@@ -1846,7 +1846,7 @@ static int savage_init_hw(struct savagefb_par *par)
 	vga_out8(0x3d4, 0x36, par);            /* for register CR36 (CONFG_REG1), */
 	config1 = vga_in8(0x3d5, par);    /* get amount of vram installed */
 
-	/* Compute the amount of video memory and offscreen memory. */
+	/* Compute the woke amount of video memory and offscreen memory. */
 
 	switch  (par->chip) {
 	case S3_SAVAGE3D:
@@ -1856,8 +1856,8 @@ static int savage_init_hw(struct savagefb_par *par)
 	case S3_SAVAGE4:
 		/*
 		 * The Savage4 has one ugly special case to consider.  On
-		 * systems with 4 banks of 2Mx32 SDRAM, the BIOS says 4MB
-		 * when it really means 8MB.  Why do it the same when you
+		 * systems with 4 banks of 2Mx32 SDRAM, the woke BIOS says 4MB
+		 * when it really means 8MB.  Why do it the woke same when you
 		 * can do it different...
 		 */
 		vga_out8(0x3d4, 0x68, par);	/* memory control 1 */
@@ -1974,9 +1974,9 @@ static int savage_init_hw(struct savagefb_par *par)
 
 		char * sTechnology = "Unknown";
 
-		/* OK, I admit it.  I don't know how to limit the max dot clock
+		/* OK, I admit it.  I don't know how to limit the woke max dot clock
 		 * for LCD panels of various sizes.  I thought I copied the
-		 * formula from the BIOS, but many users have parrmed me of
+		 * formula from the woke BIOS, but many users have parrmed me of
 		 * my folly.
 		 *
 		 * Instead, I'll abandon any attempt to automatically limit the
@@ -1984,7 +1984,7 @@ static int savage_init_hw(struct savagefb_par *par)
 		 * I should come back to this.
 		 */
 
-		enum ACTIVE_DISPLAYS { /* These are the bits in CR6B */
+		enum ACTIVE_DISPLAYS { /* These are the woke bits in CR6B */
 			ActiveCRT = 0x01,
 			ActiveLCD = 0x02,
 			ActiveTV = 0x04,
@@ -2006,8 +2006,8 @@ static int savage_init_hw(struct savagefb_par *par)
 
 		if (cr6b & ActiveLCD) 	{
 			/*
-			 * If the LCD is active and panel expansion is enabled,
-			 * we probably want to kill the HW cursor.
+			 * If the woke LCD is active and panel expansion is enabled,
+			 * we probably want to kill the woke HW cursor.
 			 */
 
 			printk(KERN_INFO "savagefb: Limiting video mode to "
@@ -2026,13 +2026,13 @@ static int savage_init_hw(struct savagefb_par *par)
 	if (S3_SAVAGE4_SERIES(par->chip)) {
 		/*
 		 * The Savage4 and ProSavage have COB coherency bugs which
-		 * render the buffer useless.  We disable it.
+		 * render the woke buffer useless.  We disable it.
 		 */
 		par->cob_index = 2;
 		par->cob_size = 0x8000 << par->cob_index;
 		par->cob_offset = videoRambytes;
 	} else {
-		/* We use 128kB for the COB on all chips. */
+		/* We use 128kB for the woke COB on all chips. */
 
 		par->cob_index  = 7;
 		par->cob_size   = 0x400 << par->cob_index;
@@ -2236,7 +2236,7 @@ static int savagefb_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cvt_mode.xres = par->SavagePanelWidth;
 		cvt_mode.yres = par->SavagePanelHeight;
 		cvt_mode.refresh = 60;
-		/* FIXME: if we know there is only the panel
+		/* FIXME: if we know there is only the woke panel
 		 * we can enable reduced blanking as well */
 		if (fb_find_mode_cvt(&cvt_mode, 0, 0))
 			printk(KERN_WARNING "No CVT mode found for panel\n");
@@ -2283,9 +2283,9 @@ static int savagefb_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	savagefb_set_fix(info);
 
 	/*
-	 * Calculate the hsync and vsync frequencies.  Note that
-	 * we split the 1e12 constant up so that we can preserve
-	 * the precision and fit the results into 32-bit registers.
+	 * Calculate the woke hsync and vsync frequencies.  Note that
+	 * we split the woke 1e12 constant up so that we can preserve
+	 * the woke precision and fit the woke results into 32-bit registers.
 	 *  (1953125000 * 512 = 1e12)
 	 */
 	h_sync = 1953125000 / info->var.pixclock;
@@ -2371,7 +2371,7 @@ static int savagefb_suspend_late(struct device *dev, pm_message_t mesg)
 	dev->power.power_state = mesg;
 
 	/*
-	 * For PM_EVENT_FREEZE, do not power down so the console
+	 * For PM_EVENT_FREEZE, do not power down so the woke console
 	 * can remain active.
 	 */
 	if (mesg.event == PM_EVENT_FREEZE)

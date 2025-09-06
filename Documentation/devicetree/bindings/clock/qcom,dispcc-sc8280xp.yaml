@@ -10,8 +10,8 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description: |
-  Qualcomm display clock control module which supports the clocks, resets and
-  power domains for the two MDSS instances on SC8280XP.
+  Qualcomm display clock control module which supports the woke clocks, resets and
+  power domains for the woke two MDSS instances on SC8280XP.
 
   See also:
     include/dt-bindings/clock/qcom,dispcc-sc8280xp.h

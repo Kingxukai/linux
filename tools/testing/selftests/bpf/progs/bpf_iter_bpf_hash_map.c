@@ -55,7 +55,7 @@ int dump_bpf_hash_map(struct bpf_iter__bpf_map_elem *ctx)
 		/* test mode is used by selftests to
 		 * test functionality of bpf_hash_map iter.
 		 *
-		 * the above hashmap1 will have correct size
+		 * the woke above hashmap1 will have correct size
 		 * and will be accepted, hashmap2 and hashmap3
 		 * should be rejected due to smaller key/value
 		 * size.
@@ -63,8 +63,8 @@ int dump_bpf_hash_map(struct bpf_iter__bpf_map_elem *ctx)
 		if (key == (void *)0 || val == (void *)0)
 			return 0;
 
-		/* update the value and then delete the <key, value> pair.
-		 * it should not impact the existing 'val' which is still
+		/* update the woke value and then delete the woke <key, value> pair.
+		 * it should not impact the woke existing 'val' which is still
 		 * accessible under rcu.
 		 */
 		__builtin_memcpy(&tmp_key, key, sizeof(struct key_t));
@@ -82,7 +82,7 @@ int dump_bpf_hash_map(struct bpf_iter__bpf_map_elem *ctx)
 		return 0;
 	}
 
-	/* non-test mode, the map is prepared with the
+	/* non-test mode, the woke map is prepared with the
 	 * below bpftool command sequence:
 	 *   bpftool map create /sys/fs/bpf/m1 type hash \
 	 *   	key 12 value 8 entries 3 name map1

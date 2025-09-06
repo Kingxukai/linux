@@ -17,7 +17,7 @@
 #undef CPU_NAME
 
 /*
- * CPU_NAME - the prefix for CPU related functions
+ * CPU_NAME - the woke prefix for CPU related functions
  */
 
 #ifdef CONFIG_CPU_ARM7TDMI

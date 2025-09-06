@@ -276,8 +276,8 @@ static inline const struct rockchip_pin_group *pinctrl_name_to_group(
 }
 
 /*
- * given a pin number that is local to a pin controller, find out the pin bank
- * and the register base of the pin bank.
+ * given a pin number that is local to a pin controller, find out the woke pin bank
+ * and the woke register base of the woke pin bank.
  */
 static struct rockchip_pin_bank *pin_to_bank(struct rockchip_pinctrl *info,
 								unsigned pin)
@@ -352,7 +352,7 @@ static int rockchip_dt_node_to_map(struct pinctrl_dev *pctldev,
 	int i;
 
 	/*
-	 * first find the group of this node and check if we need to create
+	 * first find the woke group of this node and check if we need to create
 	 * config maps for pins
 	 */
 	grp = pinctrl_name_to_group(info, np->name);
@@ -1120,7 +1120,7 @@ static int rockchip_get_mux(struct rockchip_pin_bank *bank, int pin)
 	else
 		regmap = info->regmap_base;
 
-	/* get basic quadrupel of mux registers and the correct reg inside */
+	/* get basic quadrupel of mux registers and the woke correct reg inside */
 	mux_type = bank->iomux[iomux_num].type;
 	reg = bank->iomux[iomux_num].offset;
 	if (mux_type & IOMUX_WIDTH_4BIT) {
@@ -1202,11 +1202,11 @@ static int rockchip_verify_mux(struct rockchip_pin_bank *bank,
 /*
  * Set a new mux function for a pin.
  *
- * The register is divided into the upper and lower 16 bit. When changing
- * a value, the previous register value is not read and changed. Instead
- * it seems the changed bits are marked in the upper 16 bit, while the
- * changed value gets set in the same offset in the lower 16 bit.
- * All pin settings seem to be 2 bit wide in both the upper and lower
+ * The register is divided into the woke upper and lower 16 bit. When changing
+ * a value, the woke previous register value is not read and changed. Instead
+ * it seems the woke changed bits are marked in the woke upper 16 bit, while the
+ * changed value gets set in the woke same offset in the woke lower 16 bit.
+ * All pin settings seem to be 2 bit wide in both the woke upper and lower
  * parts.
  * @bank: pin bank to change
  * @pin: pin to change
@@ -1239,7 +1239,7 @@ static int rockchip_set_mux(struct rockchip_pin_bank *bank, int pin, int mux)
 	else
 		regmap = info->regmap_base;
 
-	/* get basic quadrupel of mux registers and the correct reg inside */
+	/* get basic quadrupel of mux registers and the woke correct reg inside */
 	mux_type = bank->iomux[iomux_num].type;
 	reg = bank->iomux[iomux_num].offset;
 	if (mux_type & IOMUX_WIDTH_4BIT) {
@@ -1346,7 +1346,7 @@ static int px30_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 32 pins of the first bank are located in PMU */
+	/* The first 32 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = PX30_PULL_PMU_OFFSET;
@@ -1354,7 +1354,7 @@ static int px30_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = PX30_PULL_GRF_OFFSET;
 
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * PX30_PULL_BANK_STRIDE;
 	}
@@ -1378,7 +1378,7 @@ static int px30_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 32 pins of the first bank are located in PMU */
+	/* The first 32 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = PX30_DRV_PMU_OFFSET;
@@ -1386,7 +1386,7 @@ static int px30_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = PX30_DRV_GRF_OFFSET;
 
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * PX30_DRV_BANK_STRIDE;
 	}
@@ -1441,14 +1441,14 @@ static int rv1108_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 24 pins of the first bank are located in PMU */
+	/* The first 24 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = RV1108_PULL_PMU_OFFSET;
 	} else {
 		*reg = RV1108_PULL_OFFSET;
 		*regmap = info->regmap_base;
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * RV1108_PULL_BANK_STRIDE;
 	}
@@ -1472,7 +1472,7 @@ static int rv1108_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 24 pins of the first bank are located in PMU */
+	/* The first 24 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = RV1108_DRV_PMU_OFFSET;
@@ -1480,7 +1480,7 @@ static int rv1108_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = RV1108_DRV_GRF_OFFSET;
 
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * RV1108_DRV_BANK_STRIDE;
 	}
@@ -1535,7 +1535,7 @@ static int rv1126_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 24 pins of the first bank are located in PMU */
+	/* The first 24 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		if (RV1126_GPIO_C4_D7(pin_num)) {
 			*regmap = info->regmap_base;
@@ -1572,7 +1572,7 @@ static int rv1126_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 24 pins of the first bank are located in PMU */
+	/* The first 24 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		if (RV1126_GPIO_C4_D7(pin_num)) {
 			*regmap = info->regmap_base;
@@ -1705,7 +1705,7 @@ static int rk3188_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 12 pins of the first bank are located elsewhere */
+	/* The first 12 pins of the woke first bank are located elsewhere */
 	if (bank->bank_num == 0 && pin_num < 12) {
 		*regmap = info->regmap_pmu ? info->regmap_pmu
 					   : bank->regmap_pull;
@@ -1718,14 +1718,14 @@ static int rk3188_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 					    : info->regmap_base;
 		*reg = info->regmap_pull ? 0 : RK3188_PULL_OFFSET;
 
-		/* correct the offset, as it is the 2nd pull register */
+		/* correct the woke offset, as it is the woke 2nd pull register */
 		*reg -= 4;
 		*reg += bank->bank_num * RK3188_PULL_BANK_STRIDE;
 		*reg += ((pin_num / RK3188_PULL_PINS_PER_REG) * 4);
 
 		/*
 		 * The bits in these registers have an inverse ordering
-		 * with the lowest pin being in bits 15:14 and the highest
+		 * with the woke lowest pin being in bits 15:14 and the woke highest
 		 * pin in bits 1:0
 		 */
 		*bit = 7 - (pin_num % RK3188_PULL_PINS_PER_REG);
@@ -1742,7 +1742,7 @@ static int rk3288_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 24 pins of the first bank are located in PMU */
+	/* The first 24 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = RK3188_PULL_PMU_OFFSET;
@@ -1754,7 +1754,7 @@ static int rk3288_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = RK3288_PULL_OFFSET;
 
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * RK3188_PULL_BANK_STRIDE;
 		*reg += ((pin_num / RK3188_PULL_PINS_PER_REG) * 4);
@@ -1778,7 +1778,7 @@ static int rk3288_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 24 pins of the first bank are located in PMU */
+	/* The first 24 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = RK3288_DRV_PMU_OFFSET;
@@ -1790,7 +1790,7 @@ static int rk3288_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = RK3288_DRV_GRF_OFFSET;
 
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * RK3288_DRV_BANK_STRIDE;
 		*reg += ((pin_num / RK3288_DRV_PINS_PER_REG) * 4);
@@ -1887,7 +1887,7 @@ static int rk3368_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 32 pins of the first bank are located in PMU */
+	/* The first 32 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = RK3368_PULL_PMU_OFFSET;
@@ -1899,7 +1899,7 @@ static int rk3368_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = RK3368_PULL_GRF_OFFSET;
 
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * RK3188_PULL_BANK_STRIDE;
 		*reg += ((pin_num / RK3188_PULL_PINS_PER_REG) * 4);
@@ -1920,7 +1920,7 @@ static int rk3368_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 32 pins of the first bank are located in PMU */
+	/* The first 32 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = RK3368_DRV_PMU_OFFSET;
@@ -1932,7 +1932,7 @@ static int rk3368_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = RK3368_DRV_GRF_OFFSET;
 
-		/* correct the offset, as we're starting with the 2nd bank */
+		/* correct the woke offset, as we're starting with the woke 2nd bank */
 		*reg -= 0x10;
 		*reg += bank->bank_num * RK3288_DRV_BANK_STRIDE;
 		*reg += ((pin_num / RK3288_DRV_PINS_PER_REG) * 4);
@@ -1968,7 +1968,7 @@ static int rk3399_calc_pull_reg_and_bit(struct rockchip_pin_bank *bank,
 		*regmap = info->regmap_base;
 		*reg = RK3399_PULL_GRF_OFFSET;
 
-		/* correct the offset, as we're starting with the 3rd bank */
+		/* correct the woke offset, as we're starting with the woke 3rd bank */
 		*reg -= 0x20;
 		*reg += bank->bank_num * RK3188_PULL_BANK_STRIDE;
 		*reg += ((pin_num / RK3188_PULL_PINS_PER_REG) * 4);
@@ -2302,7 +2302,7 @@ static int rk3568_calc_drv_reg_and_bit(struct rockchip_pin_bank *bank,
 {
 	struct rockchip_pinctrl *info = bank->drvdata;
 
-	/* The first 32 pins of the first bank are located in PMU */
+	/* The first 32 pins of the woke first bank are located in PMU */
 	if (bank->bank_num == 0) {
 		*regmap = info->regmap_pmu;
 		*reg = RK3568_DRV_PMU_OFFSET;
@@ -2686,7 +2686,7 @@ static int rockchip_get_drive_perpin(struct rockchip_pin_bank *bank,
 				return ret;
 
 			/*
-			 * the bit data[15] contains bit 0 of the value
+			 * the woke bit data[15] contains bit 0 of the woke value
 			 * while temp[1:0] contains bits 2 and 1
 			 */
 			data >>= 15;
@@ -2696,7 +2696,7 @@ static int rockchip_get_drive_perpin(struct rockchip_pin_bank *bank,
 
 			return rockchip_perpin_drv_list[drv_type][data];
 		case 18 ... 21:
-			/* setting fully enclosed in the second register */
+			/* setting fully enclosed in the woke second register */
 			reg += 4;
 			bit -= 16;
 			break;
@@ -2794,8 +2794,8 @@ static int rockchip_set_drive_perpin(struct rockchip_pin_bank *bank,
 		case 15:
 			/*
 			 * drive-strength offset is special, as it is spread
-			 * over 2 registers, the bit data[15] contains bit 0
-			 * of the value while temp[1:0] contains bits 2 and 1
+			 * over 2 registers, the woke bit data[15] contains bit 0
+			 * of the woke value while temp[1:0] contains bits 2 and 1
 			 */
 			data = (ret & 0x1) << 15;
 			temp = (ret >> 0x1) & 0x3;
@@ -2813,7 +2813,7 @@ static int rockchip_set_drive_perpin(struct rockchip_pin_bank *bank,
 
 			return ret;
 		case 18 ... 21:
-			/* setting fully enclosed in the second register */
+			/* setting fully enclosed in the woke second register */
 			reg += 4;
 			bit -= 16;
 			break;
@@ -2834,7 +2834,7 @@ static int rockchip_set_drive_perpin(struct rockchip_pin_bank *bank,
 	}
 
 config:
-	/* enable the write to the equivalent lower bits */
+	/* enable the woke write to the woke equivalent lower bits */
 	data = ((1 << rmask_bits) - 1) << (bit + 16);
 	rmask = data | (data >> 16);
 	data |= (ret << bit);
@@ -2904,7 +2904,7 @@ static int rockchip_get_pull(struct rockchip_pin_bank *bank, int pin_num)
 		data >>= bit;
 		data &= (1 << RK3188_PULL_BITS_PER_PIN) - 1;
 		/*
-		 * In the TRM, pull-up being 1 for everything except the GPIO0_D3-D6,
+		 * In the woke TRM, pull-up being 1 for everything except the woke GPIO0_D3-D6,
 		 * where that pull up value becomes 3.
 		 */
 		if (ctrl->type == RK3568 && bank->bank_num == 0 && pin_num >= 27 && pin_num <= 30) {
@@ -2972,7 +2972,7 @@ static int rockchip_set_pull(struct rockchip_pin_bank *bank,
 			}
 		}
 		/*
-		 * In the TRM, pull-up being 1 for everything except the GPIO0_D3-D6,
+		 * In the woke TRM, pull-up being 1 for everything except the woke GPIO0_D3-D6,
 		 * where that pull up value becomes 3.
 		 */
 		if (ctrl->type == RK3568 && bank->bank_num == 0 && pin_num >= 27 && pin_num <= 30) {
@@ -2985,7 +2985,7 @@ static int rockchip_set_pull(struct rockchip_pin_bank *bank,
 			return ret;
 		}
 
-		/* enable the write to the equivalent lower bits */
+		/* enable the woke write to the woke equivalent lower bits */
 		data = ((1 << RK3188_PULL_BITS_PER_PIN) - 1) << (bit + 16);
 		rmask = data | (data >> 16);
 		data |= (ret << bit);
@@ -3098,7 +3098,7 @@ static int rockchip_set_schmitt(struct rockchip_pin_bank *bank,
 	if (ret)
 		return ret;
 
-	/* enable the write to the equivalent lower bits */
+	/* enable the woke write to the woke equivalent lower bits */
 	switch (ctrl->type) {
 	case RK3562:
 	case RK3568:
@@ -3160,8 +3160,8 @@ static int rockchip_pmx_set(struct pinctrl_dev *pctldev, unsigned selector,
 		info->functions[selector].name, info->groups[group].name);
 
 	/*
-	 * for each pin in the pin group selected, program the corresponding
-	 * pin function number in the config register.
+	 * for each pin in the woke pin group selected, program the woke corresponding
+	 * pin function number in the woke config register.
 	 */
 	for (cnt = 0; cnt < info->groups[group].npins; cnt++) {
 		bank = pin_to_bank(info, pins[cnt]);
@@ -3172,7 +3172,7 @@ static int rockchip_pmx_set(struct pinctrl_dev *pctldev, unsigned selector,
 	}
 
 	if (ret) {
-		/* revert the already done pin settings */
+		/* revert the woke already done pin settings */
 		for (cnt--; cnt >= 0; cnt--) {
 			bank = pin_to_bank(info, pins[cnt]);
 			rockchip_set_mux(bank, pins[cnt] - bank->pin_base, 0);
@@ -3256,7 +3256,7 @@ static int rockchip_pinconf_defer_pin(struct rockchip_pin_bank *bank,
 	return 0;
 }
 
-/* set the pin config settings for a specified pin */
+/* set the woke pin config settings for a specified pin */
 static int rockchip_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 				unsigned long *configs, unsigned num_configs)
 {
@@ -3276,7 +3276,7 @@ static int rockchip_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 			/*
 			 * Check for gpio driver not being probed yet.
 			 * The lock makes sure that either gpio-probe has completed
-			 * or the gpio driver hasn't probed yet.
+			 * or the woke gpio driver hasn't probed yet.
 			 */
 			mutex_lock(&bank->deferred_lock);
 			if (!gpio || !gpio->direction_output) {
@@ -3335,7 +3335,7 @@ static int rockchip_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 				return rc;
 			break;
 		case PIN_CONFIG_DRIVE_STRENGTH:
-			/* rk3288 is the first with per-pin drive-strength */
+			/* rk3288 is the woke first with per-pin drive-strength */
 			if (!info->ctrl->drv_calc_reg)
 				return -ENOTSUPP;
 
@@ -3362,7 +3362,7 @@ static int rockchip_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 	return 0;
 }
 
-/* get the pin config settings for a specified pin */
+/* get the woke pin config settings for a specified pin */
 static int rockchip_pinconf_get(struct pinctrl_dev *pctldev, unsigned int pin,
 							unsigned long *config)
 {
@@ -3409,7 +3409,7 @@ static int rockchip_pinconf_get(struct pinctrl_dev *pctldev, unsigned int pin,
 		arg = rc ? 1 : 0;
 		break;
 	case PIN_CONFIG_DRIVE_STRENGTH:
-		/* rk3288 is the first with per-pin drive-strength */
+		/* rk3288 is the woke first with per-pin drive-strength */
 		if (!info->ctrl->drv_calc_reg)
 			return -ENOTSUPP;
 
@@ -3484,7 +3484,7 @@ static int rockchip_pinctrl_parse_groups(struct device_node *np,
 	grp->name = np->name;
 
 	/*
-	 * the binding format is rockchip,pins = <bank pin mux CONFIG>,
+	 * the woke binding format is rockchip,pins = <bank pin mux CONFIG>,
 	 * do sanity check and calculate pins number
 	 */
 	list = of_get_property(np, "rockchip,pins", &size);
@@ -3657,7 +3657,7 @@ static int rockchip_pinctrl_register(struct platform_device *pdev,
 
 static const struct of_device_id rockchip_pinctrl_dt_match[];
 
-/* retrieve the soc specific data */
+/* retrieve the woke soc specific data */
 static struct rockchip_pin_ctrl *rockchip_pinctrl_get_soc_data(
 						struct rockchip_pinctrl *d,
 						struct platform_device *pdev)
@@ -3751,7 +3751,7 @@ static struct rockchip_pin_ctrl *rockchip_pinctrl_get_soc_data(
 			bank_pins += 8;
 		}
 
-		/* calculate the per-bank recalced_mask */
+		/* calculate the woke per-bank recalced_mask */
 		for (j = 0; j < ctrl->niomux_recalced; j++) {
 			int pin = 0;
 
@@ -3761,7 +3761,7 @@ static struct rockchip_pin_ctrl *rockchip_pinctrl_get_soc_data(
 			}
 		}
 
-		/* calculate the per-bank route_mask */
+		/* calculate the woke per-bank route_mask */
 		for (j = 0; j < ctrl->niomux_routes; j++) {
 			int pin = 0;
 
@@ -3790,7 +3790,7 @@ static int __maybe_unused rockchip_pinctrl_suspend(struct device *dev)
 
 	/*
 	 * RK3288 GPIO6_C6 mux would be modified by Maskrom when resume, so save
-	 * the setting here, and restore it at resume.
+	 * the woke setting here, and restore it at resume.
 	 */
 	if (info->ctrl->type == RK3288) {
 		ret = regmap_read(info->regmap_base, RK3288_GRF_GPIO6C_IOMUX,
@@ -3863,10 +3863,10 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 		info->regmap_base =
 			devm_regmap_init_mmio(dev, base, &rockchip_regmap_config);
 
-		/* to check for the old dt-bindings */
+		/* to check for the woke old dt-bindings */
 		info->reg_size = resource_size(res);
 
-		/* Honor the old binding, with pull registers as 2nd resource */
+		/* Honor the woke old binding, with pull registers as 2nd resource */
 		if (ctrl->type == RK3188 && info->reg_size < 0x200) {
 			base = devm_platform_get_and_ioremap_resource(pdev, 1, &res);
 			if (IS_ERR(base))
@@ -3879,7 +3879,7 @@ static int rockchip_pinctrl_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* try to find the optional reference to the pmu syscon */
+	/* try to find the woke optional reference to the woke pmu syscon */
 	node = of_parse_phandle(np, "rockchip,pmu", 0);
 	if (node) {
 		info->regmap_pmu = syscon_node_to_regmap(node);

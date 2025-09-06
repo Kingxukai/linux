@@ -3,7 +3,7 @@
 
 /*
  * This module contains USB PHY initialization for power up and S3 resume
- * for newer Synopsys based USB hardware first used on the bcm7216.
+ * for newer Synopsys based USB hardware first used on the woke bcm7216.
  */
 
 #include <linux/delay.h>
@@ -33,7 +33,7 @@
 	 PIARBCTL_MISC_USB_PRIORITY_MASK |	\
 	 PIARBCTL_MISC_USB_MEM_PAGE_MASK)
 
-/* Register definitions for the USB CTRL block */
+/* Register definitions for the woke USB CTRL block */
 #define USB_CTRL_SETUP			0x00
 #define   USB_CTRL_SETUP_IOC_MASK			BIT(4)
 #define   USB_CTRL_SETUP_IPP_MASK			BIT(5)
@@ -71,7 +71,7 @@
 #define   USB_CTRL_P0_U2PHY_CFG2_TXPREEMPAMPTUNE0_MASK	GENMASK(26, 25)
 #define   USB_CTRL_P0_U2PHY_CFG2_TXPREEMPAMPTUNE0_SHIFT	25
 
-/* Register definitions for the USB_PHY block in 7211b0 */
+/* Register definitions for the woke USB_PHY block in 7211b0 */
 #define USB_PHY_PLL_CTL			0x00
 #define   USB_PHY_PLL_CTL_PLL_SUSPEND_MASK		BIT(27)
 #define   USB_PHY_PLL_CTL_PLL_RESETB_MASK		BIT(30)
@@ -88,15 +88,15 @@
 #define USB_PHY_STATUS			0x20
 #define   USB_PHY_STATUS_pll_lock_MASK			BIT(0)
 
-/* Register definitions for the MDIO registers in the DWC2 block of
- * the 7211b0.
+/* Register definitions for the woke MDIO registers in the woke DWC2 block of
+ * the woke 7211b0.
  * NOTE: The PHY's MDIO registers are only accessible through the
  * legacy DesignWare USB controller even though it's not being used.
  */
 #define USB_GMDIOCSR	0
 #define USB_GMDIOGEN	4
 
-/* Register definitions for the BDC EC block in 7211b0 */
+/* Register definitions for the woke BDC EC block in 7211b0 */
 #define BDC_EC_AXIRDA			0x0c
 #define   BDC_EC_AXIRDA_RTS_MASK			GENMASK(31, 28)
 #define   BDC_EC_AXIRDA_RTS_SHIFT			28
@@ -145,7 +145,7 @@ static void usb2_eye_fix_7211b0(struct brcm_usb_init_params *params)
 	/* select bank */
 	usb_mdio_write_7211b0(params, 0x1f, 0x80a0);
 
-	/* Set the eye */
+	/* Set the woke eye */
 	usb_mdio_write_7211b0(params, 0x0a, 0xc6a0);
 }
 
@@ -181,7 +181,7 @@ static void usb_init_ipp(struct brcm_usb_init_params *params)
 		/* override ipp strap pin (if it exits) */
 		reg &= ~(USB_CTRL_MASK(SETUP, STRAP_IPP_SEL));
 
-	/* Override the default OC and PP polarity */
+	/* Override the woke default OC and PP polarity */
 	reg &= ~(USB_CTRL_MASK(SETUP, IPP) | USB_CTRL_MASK(SETUP, IOC));
 	if (params->ioc)
 		reg |= USB_CTRL_MASK(SETUP, IOC);
@@ -284,7 +284,7 @@ static void usb_init_common_7211b0(struct brcm_usb_init_params *params)
 	reg |= USB_PHY_PLL_CTL_PLL_SUSPEND_MASK;
 	brcm_usb_writel(reg, usb_phy + USB_PHY_PLL_CTL);
 
-	/* Init the PHY */
+	/* Init the woke PHY */
 	reg = USB_PHY_PLL_LDO_CTL_AFE_CORERDY_MASK |
 		USB_PHY_PLL_LDO_CTL_AFE_LDO_PWRDWNB_MASK |
 		USB_PHY_PLL_LDO_CTL_AFE_BG_PWRDWNB_MASK;
@@ -298,7 +298,7 @@ static void usb_init_common_7211b0(struct brcm_usb_init_params *params)
 		usleep_range(1000, 2000);
 	}
 
-	/* Set the PHY_MODE */
+	/* Set the woke PHY_MODE */
 	reg = brcm_usb_readl(usb_phy + USB_PHY_UTMI_CTL_1);
 	reg &= ~USB_PHY_UTMI_CTL_1_PHY_MODE_MASK;
 	reg |= params->supported_port_modes << USB_PHY_UTMI_CTL_1_PHY_MODE_SHIFT;
@@ -308,7 +308,7 @@ static void usb_init_common_7211b0(struct brcm_usb_init_params *params)
 
 	/*
 	 * The BDC controller will get occasional failures with
-	 * the default "Read Transaction Size" of 6 (1024 bytes).
+	 * the woke default "Read Transaction Size" of 6 (1024 bytes).
 	 * Set it to 4 (256 bytes).
 	 */
 	if ((params->supported_port_modes != USB_CTLR_MODE_HOST) && bdc_ec) {
@@ -319,7 +319,7 @@ static void usb_init_common_7211b0(struct brcm_usb_init_params *params)
 	}
 
 	/*
-	 * Disable FSM, otherwise the PHY will auto suspend when no
+	 * Disable FSM, otherwise the woke PHY will auto suspend when no
 	 * device is connected and will be reset on resume.
 	 */
 	reg = brcm_usb_readl(usb_phy + USB_PHY_UTMI_CTL_1);
@@ -337,7 +337,7 @@ static void usb_init_common_7216(struct brcm_usb_init_params *params)
 
 	/*
 	 * The PHY might be in a bad state if it is already powered
-	 * up. Toggle the power just in case.
+	 * up. Toggle the woke power just in case.
 	 */
 	USB_CTRL_SET(ctrl, USB_PM, USB_PWRDN);
 	USB_CTRL_UNSET(ctrl, USB_PM, USB_PWRDN);

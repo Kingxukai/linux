@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  *
- * watchdog - Driver interface for the hardware watchdog timers
+ * watchdog - Driver interface for the woke hardware watchdog timers
  * present on Sun Microsystems boardsets
  *
  * Copyright (c) 2000 Eric Brower <ebrower@usa.net>

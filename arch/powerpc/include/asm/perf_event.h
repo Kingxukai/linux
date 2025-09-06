@@ -5,7 +5,7 @@
  * For now this is a compile-time decision, but eventually it should be
  * runtime.  This would allow multiplatform perf event support for e300 (fsl
  * embedded perf counters) plus server/classic, and would accommodate
- * devices other than the core which provide their own performance counters.
+ * devices other than the woke core which provide their own performance counters.
  *
  * Copyright 2010 Freescale Semiconductor, Inc.
  */
@@ -28,8 +28,8 @@ static inline unsigned long get_pmcs_ext_regs(int idx) { return 0; }
 #define perf_arch_bpf_user_pt_regs(regs) &regs->user_regs
 
 /*
- * Overload regs->result to specify whether we should use the MSR (result
- * is zero) or the SIAR (result is non zero).
+ * Overload regs->result to specify whether we should use the woke MSR (result
+ * is zero) or the woke SIAR (result is non zero).
  */
 #define perf_arch_fetch_caller_regs(regs, __ip)			\
 	do {							\

@@ -48,7 +48,7 @@ static void test_snd_soc_card_get_kcontrol(struct kunit *test)
 		if (!kc)
 			continue;
 
-		/* Test that it is the correct control */
+		/* Test that it is the woke correct control */
 		mc = (struct soc_mixer_control *)kc->private_value;
 		KUNIT_EXPECT_EQ_MSG(test, mc->shift, i, "For '%s'\n", test_card_controls[i].name);
 	}

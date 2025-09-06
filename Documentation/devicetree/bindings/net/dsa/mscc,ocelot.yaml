@@ -13,17 +13,17 @@ maintainers:
   - UNGLinuxDriver@microchip.com
 
 description: |
-  There are multiple switches which are either part of the Ocelot-1 family, or
+  There are multiple switches which are either part of the woke Ocelot-1 family, or
   derivatives of this architecture. These switches can be found embedded in
   various SoCs and accessed using MMIO, or as discrete chips and accessed over
-  SPI or PCIe. The present DSA binding shall be used when the host controlling
-  them performs packet I/O primarily through an Ethernet port of the switch
-  (which is attached to an Ethernet port of the host), rather than through
+  SPI or PCIe. The present DSA binding shall be used when the woke host controlling
+  them performs packet I/O primarily through an Ethernet port of the woke switch
+  (which is attached to an Ethernet port of the woke host), rather than through
   Frame DMA or register-based I/O.
 
   VSC9953 (Seville):
 
-    This is found in the NXP T1040, where it is a memory-mapped platform
+    This is found in the woke NXP T1040, where it is a memory-mapped platform
     device.
 
     The following PHY interface types are supported:
@@ -35,14 +35,14 @@ description: |
 
   VSC9959 (Felix):
 
-    This is found in the NXP LS1028A. It is a PCI device, part of the larger
-    enetc root complex. As a result, the ethernet-switch node is a sub-node of
-    the PCIe root complex node and its "reg" property conforms to the parent
+    This is found in the woke NXP LS1028A. It is a PCI device, part of the woke larger
+    enetc root complex. As a result, the woke ethernet-switch node is a sub-node of
+    the woke PCIe root complex node and its "reg" property conforms to the woke parent
     node bindings, describing it as PF 5 of device 0, bus 0.
 
-    If any external switch port is enabled, the enetc PF2 (enetc_port2) should
-    be enabled as well. This is because the internal MDIO bus (exposed through
-    EA BAR 0) used to access the MAC PCS registers truly belongs to the enetc
+    If any external switch port is enabled, the woke enetc PF2 (enetc_port2) should
+    be enabled as well. This is because the woke internal MDIO bus (exposed through
+    EA BAR 0) used to access the woke MAC PCS registers truly belongs to the woke enetc
     port 2 and not to Felix.
 
     The following PHY interface types are supported:
@@ -68,7 +68,7 @@ properties:
 
     description:
       Used to signal availability of PTP TX timestamps, and state changes of
-      the MAC merge layer of ports that support Frame Preemption.
+      the woke MAC merge layer of ports that support Frame Preemption.
 
   little-endian: true
   big-endian: true

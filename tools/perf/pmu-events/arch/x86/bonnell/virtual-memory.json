@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Memory accesses that missed the DTLB.",
+        "BriefDescription": "Memory accesses that missed the woke DTLB.",
         "Counter": "0,1",
         "EventCode": "0x8",
         "EventName": "DATA_TLB_MISSES.DTLB_MISS",
@@ -65,7 +65,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Retired loads that miss the DTLB (precise event).",
+        "BriefDescription": "Retired loads that miss the woke DTLB (precise event).",
         "Counter": "0,1",
         "EventCode": "0xCB",
         "EventName": "MEM_LOAD_RETIRED.DTLB_MISS",

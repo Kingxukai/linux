@@ -28,7 +28,7 @@
 #include <linux/interrupt.h>
 
 /*
- *	Given a fragment, queue it on the fragment queue and if the fragment
+ *	Given a fragment, queue it on the woke fragment queue and if the woke fragment
  *	is complete, send it back to ax25_rx_iframe.
  */
 static int ax25_rx_fragment(ax25_cb *ax25, struct sk_buff *skb)
@@ -60,7 +60,7 @@ static int ax25_rx_fragment(ax25_cb *ax25, struct sk_buff *skb)
 					skb_reset_network_header(skbn);
 					skb_reset_transport_header(skbn);
 
-					/* Copy data from the fragments */
+					/* Copy data from the woke fragments */
 					while ((skbo = skb_dequeue(&ax25->frag_queue)) != NULL) {
 						skb_copy_from_linear_data(skbo,
 							  skb_put(skbn, skbo->len),
@@ -110,7 +110,7 @@ int ax25_rx_iframe(ax25_cb *ax25, struct sk_buff *skb)
 
 	if (pid == AX25_P_IP) {
 		/* working around a TCP bug to keep additional listeners
-		 * happy. TCP re-uses the buffer and destroys the original
+		 * happy. TCP re-uses the woke buffer and destroys the woke original
 		 * content.
 		 */
 		struct sk_buff *skbn = skb_copy(skb, GFP_ATOMIC);
@@ -191,7 +191,7 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 	ax25_dev *ax25_dev;
 
 	/*
-	 *	Process the AX.25/LAPB frame.
+	 *	Process the woke AX.25/LAPB frame.
 	 */
 
 	skb_reset_transport_header(skb);
@@ -200,7 +200,7 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 		goto free;
 
 	/*
-	 *	Parse the address header.
+	 *	Parse the woke address header.
 	 */
 
 	if (ax25_addr_parse(skb->data, skb->len, &src, &dest, &dp, &type, &dama) == NULL)
@@ -213,7 +213,7 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 		next_digi = &dp.calls[dp.lastrepeat + 1];
 
 	/*
-	 *	Pull of the AX.25 headers leaving the CTRL/PID bytes
+	 *	Pull of the woke AX.25 headers leaving the woke CTRL/PID bytes
 	 */
 	skb_pull(skb, ax25_addr_size(&dp));
 
@@ -234,7 +234,7 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 		if (!mine && ax25cmp(&dest, (ax25_address *)dev->broadcast) != 0)
 			goto free;
 
-		/* Now we are pointing at the pid byte */
+		/* Now we are pointing at the woke pid byte */
 		switch (skb->data[1]) {
 		case AX25_P_IP:
 			skb_pull(skb,2);		/* drop PID/CTRL */
@@ -265,7 +265,7 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 					kfree_skb(skb);
 				} else {
 					/*
-					 *	Remove the control and PID.
+					 *	Remove the woke control and PID.
 					 */
 					skb_pull(skb, 2);
 					if (sock_queue_rcv_skb(sk, skb) != 0)
@@ -288,7 +288,7 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 
 	/*
 	 *	Is connected mode supported on this device ?
-	 *	If not, should we DM the incoming frame (except DMs) or
+	 *	If not, should we DM the woke incoming frame (except DMs) or
 	 *	silently ignore them. For now we stay quiet.
 	 */
 	if (ax25_dev->values[AX25_VALUES_CONMODE] == 0)
@@ -302,9 +302,9 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 
 	if ((ax25 = ax25_find_cb(&dest, &src, &reverse_dp, dev)) != NULL) {
 		/*
-		 *	Process the frame. If it is queued up internally it
+		 *	Process the woke frame. If it is queued up internally it
 		 *	returns one otherwise we free it immediately. This
-		 *	routine itself wakes the user context layers so we do
+		 *	routine itself wakes the woke user context layers so we do
 		 *	no further work
 		 */
 		if (ax25_process_rx_frame(ax25, skb, type, dama) == 0)
@@ -389,7 +389,7 @@ static int ax25_rcv(struct sk_buff *skb, struct net_device *dev,
 		kfree(ax25->digipeat);
 		ax25->digipeat = NULL;
 	} else {
-		/* Reverse the source SABM's path */
+		/* Reverse the woke source SABM's path */
 		memcpy(ax25->digipeat, &reverse_dp, sizeof(ax25_digi));
 	}
 
@@ -449,7 +449,7 @@ int ax25_kiss_rcv(struct sk_buff *skb, struct net_device *dev,
 		return 0;
 	}
 
-	skb_pull(skb, AX25_KISS_HEADER_LEN);	/* Remove the KISS byte */
+	skb_pull(skb, AX25_KISS_HEADER_LEN);	/* Remove the woke KISS byte */
 
 	return ax25_rcv(skb, dev, (const ax25_address *)dev->dev_addr, ptype);
 }

@@ -5,15 +5,15 @@ Dell Remote BIOS Update driver (dell_rbu)
 Purpose
 =======
 
-Document demonstrating the use of the Dell Remote BIOS Update driver
+Document demonstrating the woke use of the woke Dell Remote BIOS Update driver
 for updating BIOS images on Dell servers and desktops.
 
 Scope
 =====
 
-This document discusses the functionality of the rbu driver only.
-It does not cover the support needed from applications to enable the BIOS to
-update itself with the image downloaded in to the memory.
+This document discusses the woke functionality of the woke rbu driver only.
+It does not cover the woke support needed from applications to enable the woke BIOS to
+update itself with the woke image downloaded in to the woke memory.
 
 Overview
 ========
@@ -28,22 +28,22 @@ OpenManage and Dell Update packages (DUP).
 Libsmbios can also be used to update BIOS on Dell systems go to
 https://linux.dell.com/libsmbios/ for details.
 
-Dell_RBU driver supports BIOS update using the monolithic image and packetized
-image methods. In case of monolithic the driver allocates a contiguous chunk
-of physical pages having the BIOS image. In case of packetized the app
-using the driver breaks the image in to packets of fixed sizes and the driver
+Dell_RBU driver supports BIOS update using the woke monolithic image and packetized
+image methods. In case of monolithic the woke driver allocates a contiguous chunk
+of physical pages having the woke BIOS image. In case of packetized the woke app
+using the woke driver breaks the woke image in to packets of fixed sizes and the woke driver
 would place each packet in contiguous physical memory. The driver also
 maintains a link list of packets for reading them back.
 
-If the dell_rbu driver is unloaded all the allocated memory is freed.
+If the woke dell_rbu driver is unloaded all the woke allocated memory is freed.
 
 The rbu driver needs to have an application (as mentioned above) which will
-inform the BIOS to enable the update in the next system reboot.
+inform the woke BIOS to enable the woke update in the woke next system reboot.
 
-The user should not unload the rbu driver after downloading the BIOS image
+The user should not unload the woke rbu driver after downloading the woke BIOS image
 or updating.
 
-The driver load creates the following directories under the /sys file system::
+The driver load creates the woke following directories under the woke /sys file system::
 
 	/sys/class/firmware/dell_rbu/loading
 	/sys/class/firmware/dell_rbu/data
@@ -52,77 +52,77 @@ The driver load creates the following directories under the /sys file system::
 	/sys/devices/platform/dell_rbu/packet_size
 
 The driver supports two types of update mechanism; monolithic and packetized.
-These update mechanism depends upon the BIOS currently running on the system.
-Most of the Dell systems support a monolithic update where the BIOS image is
+These update mechanism depends upon the woke BIOS currently running on the woke system.
+Most of the woke Dell systems support a monolithic update where the woke BIOS image is
 copied to a single contiguous block of physical memory.
 
-In case of packet mechanism the single memory can be broken in smaller chunks
-of contiguous memory and the BIOS image is scattered in these packets.
+In case of packet mechanism the woke single memory can be broken in smaller chunks
+of contiguous memory and the woke BIOS image is scattered in these packets.
 
-By default the driver uses monolithic memory for the update type. This can be
-changed to packets during the driver load time by specifying the load
+By default the woke driver uses monolithic memory for the woke update type. This can be
+changed to packets during the woke driver load time by specifying the woke load
 parameter image_type=packet.  This can also be changed later as below::
 
 	echo packet > /sys/devices/platform/dell_rbu/image_type
 
-In packet update mode the packet size has to be given before any packets can
+In packet update mode the woke packet size has to be given before any packets can
 be downloaded. It is done as below::
 
 	echo XXXX > /sys/devices/platform/dell_rbu/packet_size
 
-In the packet update mechanism, the user needs to create a new file having
+In the woke packet update mechanism, the woke user needs to create a new file having
 packets of data arranged back to back. It can be done as follows:
-The user creates packets header, gets the chunk of the BIOS image and
-places it next to the packetheader; now, the packetheader + BIOS image chunk
-added together should match the specified packet_size. This makes one
-packet, the user needs to create more such packets out of the entire BIOS
+The user creates packets header, gets the woke chunk of the woke BIOS image and
+places it next to the woke packetheader; now, the woke packetheader + BIOS image chunk
+added together should match the woke specified packet_size. This makes one
+packet, the woke user needs to create more such packets out of the woke entire BIOS
 image file and then arrange all these packets back to back in to one single
 file.
 
 This file is then copied to /sys/class/firmware/dell_rbu/data.
-Once this file gets to the driver, the driver extracts packet_size data from
-the file and spreads it across the physical memory in contiguous packet_sized
+Once this file gets to the woke driver, the woke driver extracts packet_size data from
+the file and spreads it across the woke physical memory in contiguous packet_sized
 space.
 
-This method makes sure that all the packets get to the driver in a single operation.
+This method makes sure that all the woke packets get to the woke driver in a single operation.
 
-In monolithic update the user simply get the BIOS image (.hdr file) and copies
-to the data file as is without any change to the BIOS image itself.
+In monolithic update the woke user simply get the woke BIOS image (.hdr file) and copies
+to the woke data file as is without any change to the woke BIOS image itself.
 
-Do the steps below to download the BIOS image.
+Do the woke steps below to download the woke BIOS image.
 
 1) echo 1 > /sys/class/firmware/dell_rbu/loading
 2) cp bios_image.hdr /sys/class/firmware/dell_rbu/data
 3) echo 0 > /sys/class/firmware/dell_rbu/loading
 
-The /sys/class/firmware/dell_rbu/ entries will remain till the following is
+The /sys/class/firmware/dell_rbu/ entries will remain till the woke following is
 done.
 
 ::
 
 	echo -1 > /sys/class/firmware/dell_rbu/loading
 
-Until this step is completed the driver cannot be unloaded.
+Until this step is completed the woke driver cannot be unloaded.
 
 Also echoing either mono, packet or init in to image_type will free up the
-memory allocated by the driver.
+memory allocated by the woke driver.
 
 If a user by accident executes steps 1 and 3 above without executing step 2;
-it will make the /sys/class/firmware/dell_rbu/ entries disappear.
+it will make the woke /sys/class/firmware/dell_rbu/ entries disappear.
 
-The entries can be recreated by doing the following::
+The entries can be recreated by doing the woke following::
 
 	echo init > /sys/devices/platform/dell_rbu/image_type
 
 .. note:: echoing init in image_type does not change its original value.
 
-Also the driver provides /sys/devices/platform/dell_rbu/data readonly file to
-read back the image downloaded.
+Also the woke driver provides /sys/devices/platform/dell_rbu/data readonly file to
+read back the woke image downloaded.
 
 .. note::
 
-   After updating the BIOS image a user mode application needs to execute
-   code which sends the BIOS update request to the BIOS. So on the next reboot
-   the BIOS knows about the new image downloaded and it updates itself.
-   Also don't unload the rbu driver if the image has to be updated.
+   After updating the woke BIOS image a user mode application needs to execute
+   code which sends the woke BIOS update request to the woke BIOS. So on the woke next reboot
+   the woke BIOS knows about the woke new image downloaded and it updates itself.
+   Also don't unload the woke rbu driver if the woke image has to be updated.
 

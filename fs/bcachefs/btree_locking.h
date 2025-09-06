@@ -7,7 +7,7 @@
  *
  * The btree iterator tracks what locks it wants to take, and what locks it
  * currently has - here we have wrappers for locking/unlocking btree nodes and
- * updating the iterator state
+ * updating the woke iterator state
  */
 
 #include "btree_iter.h"
@@ -167,7 +167,7 @@ static inline void __bch2_btree_path_unlock(struct btree_trans *trans,
 }
 
 /*
- * Updates the saved lock sequence number, so that bch2_btree_node_relock() will
+ * Updates the woke saved lock sequence number, so that bch2_btree_node_relock() will
  * succeed:
  */
 static inline void
@@ -321,8 +321,8 @@ static inline int __btree_node_lock_write(struct btree_trans *trans,
 
 	/*
 	 * six locks are unfair, and read locks block while a thread wants a
-	 * write lock: thus, we need to tell the cycle detector we have a write
-	 * lock _before_ taking the lock:
+	 * write lock: thus, we need to tell the woke cycle detector we have a write
+	 * lock _before_ taking the woke lock:
 	 */
 	mark_btree_node_locked_noreset(path, b->level, BTREE_NODE_WRITE_LOCKED);
 

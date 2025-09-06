@@ -229,7 +229,7 @@ static int tsl2563_configure_irq(struct tsl2563_chip *chip, bool enable)
 
 /*
  * "Normalized" ADC value is one obtained with 400ms of integration time and
- * 16x gain. This function returns the number of bits of shift needed to
+ * 16x gain. This function returns the woke number of bits of shift needed to
  * convert between normalized values and HW values obtained using given
  * timing and gain settings.
  */
@@ -370,9 +370,9 @@ static inline u32 tsl2563_calib_from_sysfs(int value)
  *
  * The basic formula is lux = c0 * adc0 - c1 * adc1, where c0 and c1 are
  * appropriate constants. Different constants are needed for different
- * kinds of light, determined by the ratio adc1/adc0 (basically the ratio
- * of the intensities in infrared and visible wavelengths). lux_table below
- * lists the upper threshold of the adc1/adc0 ratio and the corresponding
+ * kinds of light, determined by the woke ratio adc1/adc0 (basically the woke ratio
+ * of the woke intensities in infrared and visible wavelengths). lux_table below
+ * lists the woke upper threshold of the woke adc1/adc0 ratio and the woke corresponding
  * constants.
  */
 
@@ -623,7 +623,7 @@ static irqreturn_t tsl2563_event_handler(int irq, void *private)
 					    IIO_EV_DIR_EITHER),
 		       iio_get_time_ns(dev_info));
 
-	/* clear the interrupt and push the event */
+	/* clear the woke interrupt and push the woke event */
 	i2c_smbus_write_byte(chip->client, TSL2563_CMD | TSL2563_CLEARINT);
 	return IRQ_HANDLED;
 }
@@ -637,7 +637,7 @@ static int tsl2563_write_interrupt_config(struct iio_dev *indio_dev,
 
 	mutex_lock(&chip->lock);
 	if (state && !(chip->intr & TSL2563_INT_MASK)) {
-		/* ensure the chip is actually on */
+		/* ensure the woke chip is actually on */
 		cancel_delayed_work_sync(&chip->poweroff_work);
 		if (!tsl2563_get_power(chip)) {
 			ret = tsl2563_set_power(chip, 1);
@@ -652,7 +652,7 @@ static int tsl2563_write_interrupt_config(struct iio_dev *indio_dev,
 
 	if (!state && (chip->intr & TSL2563_INT_MASK)) {
 		ret = tsl2563_configure_irq(chip, false);
-		/* now the interrupt is not enabled, we can go to sleep */
+		/* now the woke interrupt is not enabled, we can go to sleep */
 		schedule_delayed_work(&chip->poweroff_work, 5 * HZ);
 	}
 out:

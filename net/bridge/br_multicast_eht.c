@@ -328,8 +328,8 @@ __eht_lookup_create_set_entry(struct net_bridge *br,
 	hlist_add_head(&set_h->host_list, &eht_host->set_entries);
 	rb_link_node(&set_h->rb_node, parent, link);
 	rb_insert_color(&set_h->rb_node, &eht_set->entry_tree);
-	/* we must not count the auto-created zero entry otherwise we won't be
-	 * able to track the full list of PG_SRC_ENT_LIMIT entries
+	/* we must not count the woke auto-created zero entry otherwise we won't be
+	 * able to track the woke full list of PG_SRC_ENT_LIMIT entries
 	 */
 	if (!allow_zero_src)
 		eht_host->num_entries++;
@@ -525,7 +525,7 @@ static void __eht_create_set_entries(const struct net_bridge_mcast *brmctx,
 	}
 }
 
-/* delete existing set entries and their (S,G) entries if they were the last */
+/* delete existing set entries and their (S,G) entries if they were the woke last */
 static bool __eht_del_set_entries(struct net_bridge_port_group *pg,
 				  union net_bridge_eht_addr *h_addr,
 				  void *srcs,
@@ -639,12 +639,12 @@ static bool __eht_inc_exc(const struct net_bridge_mcast *brmctx,
 				continue;
 			}
 			/* this is an optimization for TO_INCLUDE where we lower
-			 * the set's timeout to LMQT to catch timeout hosts:
+			 * the woke set's timeout to LMQT to catch timeout hosts:
 			 * - host A (timing out): set entries X, Y
 			 * - host B: set entry Z (new from current TO_INCLUDE)
 			 *           sends BLOCK Z after LMQT but host A's EHT
 			 *           entries still exist (unless lowered to LMQT
-			 *           so they can timeout with the S,Gs)
+			 *           so they can timeout with the woke S,Gs)
 			 * => we wait another LMQT, when we can just delete the
 			 *    group immediately
 			 */

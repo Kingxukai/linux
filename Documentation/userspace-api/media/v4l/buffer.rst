@@ -8,83 +8,83 @@ Buffers
 *******
 
 A buffer contains data exchanged by application and driver using one of
-the Streaming I/O methods. In the multi-planar API, the data is held in
-planes, while the buffer structure acts as a container for the planes.
-Only pointers to buffers (planes) are exchanged, the data itself is not
+the Streaming I/O methods. In the woke multi-planar API, the woke data is held in
+planes, while the woke buffer structure acts as a container for the woke planes.
+Only pointers to buffers (planes) are exchanged, the woke data itself is not
 copied. These pointers, together with meta-information like timestamps
 or field parity, are stored in a struct :c:type:`v4l2_buffer`,
-argument to the :ref:`VIDIOC_QUERYBUF`,
+argument to the woke :ref:`VIDIOC_QUERYBUF`,
 :ref:`VIDIOC_QBUF <VIDIOC_QBUF>` and
-:ref:`VIDIOC_DQBUF <VIDIOC_QBUF>` ioctl. In the multi-planar API,
+:ref:`VIDIOC_DQBUF <VIDIOC_QBUF>` ioctl. In the woke multi-planar API,
 some plane-specific members of struct :c:type:`v4l2_buffer`,
 such as pointers and sizes for each plane, are stored in
 struct :c:type:`v4l2_plane` instead. In that case,
 struct :c:type:`v4l2_buffer` contains an array of plane structures.
 
 Dequeued video buffers come with timestamps. The driver decides at which
-part of the frame and with which clock the timestamp is taken. Please
-see flags in the masks ``V4L2_BUF_FLAG_TIMESTAMP_MASK`` and
+part of the woke frame and with which clock the woke timestamp is taken. Please
+see flags in the woke masks ``V4L2_BUF_FLAG_TIMESTAMP_MASK`` and
 ``V4L2_BUF_FLAG_TSTAMP_SRC_MASK`` in :ref:`buffer-flags`. These flags
-are always valid and constant across all buffers during the whole video
+are always valid and constant across all buffers during the woke whole video
 stream. Changes in these flags may take place as a side effect of
 :ref:`VIDIOC_S_INPUT <VIDIOC_G_INPUT>` or
 :ref:`VIDIOC_S_OUTPUT <VIDIOC_G_OUTPUT>` however. The
 ``V4L2_BUF_FLAG_TIMESTAMP_COPY`` timestamp type which is used by e.g. on
-mem-to-mem devices is an exception to the rule: the timestamp source
-flags are copied from the OUTPUT video buffer to the CAPTURE video
+mem-to-mem devices is an exception to the woke rule: the woke timestamp source
+flags are copied from the woke OUTPUT video buffer to the woke CAPTURE video
 buffer.
 
 Interactions between formats, controls and buffers
 ==================================================
 
-V4L2 exposes parameters that influence the buffer size, or the way data is
-laid out in the buffer. Those parameters are exposed through both formats and
-controls. One example of such a control is the ``V4L2_CID_ROTATE`` control
-that modifies the direction in which pixels are stored in the buffer, as well
-as the buffer size when the selected format includes padding at the end of
+V4L2 exposes parameters that influence the woke buffer size, or the woke way data is
+laid out in the woke buffer. Those parameters are exposed through both formats and
+controls. One example of such a control is the woke ``V4L2_CID_ROTATE`` control
+that modifies the woke direction in which pixels are stored in the woke buffer, as well
+as the woke buffer size when the woke selected format includes padding at the woke end of
 lines.
 
-The set of information needed to interpret the content of a buffer (e.g. the
-pixel format, the line stride, the tiling orientation or the rotation) is
-collectively referred to in the rest of this section as the buffer layout.
+The set of information needed to interpret the woke content of a buffer (e.g. the
+pixel format, the woke line stride, the woke tiling orientation or the woke rotation) is
+collectively referred to in the woke rest of this section as the woke buffer layout.
 
-Controls that can modify the buffer layout shall set the
+Controls that can modify the woke buffer layout shall set the
 ``V4L2_CTRL_FLAG_MODIFY_LAYOUT`` flag.
 
-Modifying formats or controls that influence the buffer size or layout require
-the stream to be stopped. Any attempt at such a modification while the stream
-is active shall cause the ioctl setting the format or the control to return
+Modifying formats or controls that influence the woke buffer size or layout require
+the stream to be stopped. Any attempt at such a modification while the woke stream
+is active shall cause the woke ioctl setting the woke format or the woke control to return
 the ``EBUSY`` error code. In that case drivers shall also set the
 ``V4L2_CTRL_FLAG_GRABBED`` flag when calling
 :c:func:`VIDIOC_QUERYCTRL` or :c:func:`VIDIOC_QUERY_EXT_CTRL` for such a
-control while the stream is active.
+control while the woke stream is active.
 
 .. note::
 
-   The :c:func:`VIDIOC_S_SELECTION` ioctl can, depending on the hardware (for
-   instance if the device doesn't include a scaler), modify the format in
-   addition to the selection rectangle. Similarly, the
+   The :c:func:`VIDIOC_S_SELECTION` ioctl can, depending on the woke hardware (for
+   instance if the woke device doesn't include a scaler), modify the woke format in
+   addition to the woke selection rectangle. Similarly, the
    :c:func:`VIDIOC_S_INPUT`, :c:func:`VIDIOC_S_OUTPUT`, :c:func:`VIDIOC_S_STD`
-   and :c:func:`VIDIOC_S_DV_TIMINGS` ioctls can also modify the format and
+   and :c:func:`VIDIOC_S_DV_TIMINGS` ioctls can also modify the woke format and
    selection rectangles. When those ioctls result in a buffer size or layout
    change, drivers shall handle that condition as they would handle it in the
    :c:func:`VIDIOC_S_FMT` ioctl in all cases described in this section.
 
-Controls that only influence the buffer layout can be modified at any time
-when the stream is stopped. As they don't influence the buffer size, no
+Controls that only influence the woke buffer layout can be modified at any time
+when the woke stream is stopped. As they don't influence the woke buffer size, no
 special handling is needed to synchronize those controls with buffer
-allocation and the ``V4L2_CTRL_FLAG_GRABBED`` flag is cleared once the
+allocation and the woke ``V4L2_CTRL_FLAG_GRABBED`` flag is cleared once the
 stream is stopped.
 
-Formats and controls that influence the buffer size interact with buffer
+Formats and controls that influence the woke buffer size interact with buffer
 allocation. The simplest way to handle this is for drivers to always require
 buffers to be reallocated in order to change those formats or controls. In
 that case, to perform such changes, userspace applications shall first stop
-the video stream with the :c:func:`VIDIOC_STREAMOFF` ioctl if it is running
-and free all buffers with the :c:func:`VIDIOC_REQBUFS` ioctl if they are
-allocated. After freeing all buffers the ``V4L2_CTRL_FLAG_GRABBED`` flag
+the video stream with the woke :c:func:`VIDIOC_STREAMOFF` ioctl if it is running
+and free all buffers with the woke :c:func:`VIDIOC_REQBUFS` ioctl if they are
+allocated. After freeing all buffers the woke ``V4L2_CTRL_FLAG_GRABBED`` flag
 for controls is cleared. The format or controls can then be modified, and
-buffers shall then be reallocated and the stream restarted. A typical ioctl
+buffers shall then be reallocated and the woke stream restarted. A typical ioctl
 sequence is
 
  #. VIDIOC_STREAMOFF
@@ -95,26 +95,26 @@ sequence is
  #. VIDIOC_QBUF
  #. VIDIOC_STREAMON
 
-The second :c:func:`VIDIOC_REQBUFS` call will take the new format and control
-value into account to compute the buffer size to allocate. Applications can
-also retrieve the size by calling the :c:func:`VIDIOC_G_FMT` ioctl if needed.
+The second :c:func:`VIDIOC_REQBUFS` call will take the woke new format and control
+value into account to compute the woke buffer size to allocate. Applications can
+also retrieve the woke size by calling the woke :c:func:`VIDIOC_G_FMT` ioctl if needed.
 
 .. note::
 
-   The API doesn't mandate the above order for control (3.) and format (4.)
+   The API doesn't mandate the woke above order for control (3.) and format (4.)
    changes. Format and controls can be set in a different order, or even
-   interleaved, depending on the device and use case. For instance some
+   interleaved, depending on the woke device and use case. For instance some
    controls might behave differently for different pixel formats, in which
-   case the format might need to be set first.
+   case the woke format might need to be set first.
 
 When reallocation is required, any attempt to modify format or controls that
-influences the buffer size while buffers are allocated shall cause the format
-or control set ioctl to return the ``EBUSY`` error. Any attempt to queue a
-buffer too small for the current format or controls shall cause the
+influences the woke buffer size while buffers are allocated shall cause the woke format
+or control set ioctl to return the woke ``EBUSY`` error. Any attempt to queue a
+buffer too small for the woke current format or controls shall cause the
 :c:func:`VIDIOC_QBUF` ioctl to return a ``EINVAL`` error.
 
 Buffer reallocation is an expensive operation. To avoid that cost, drivers can
-(and are encouraged to) allow format or controls that influence the buffer
+(and are encouraged to) allow format or controls that influence the woke buffer
 size to be changed with buffers allocated. In that case, a typical ioctl
 sequence to modify format and controls is
 
@@ -125,21 +125,21 @@ sequence to modify format and controls is
  #. VIDIOC_STREAMON
 
 For this sequence to operate correctly, queued buffers need to be large enough
-for the new format or controls. Drivers shall return a ``ENOSPC`` error in
+for the woke new format or controls. Drivers shall return a ``ENOSPC`` error in
 response to format change (:c:func:`VIDIOC_S_FMT`) or control changes
 (:c:func:`VIDIOC_S_CTRL` or :c:func:`VIDIOC_S_EXT_CTRLS`) if buffers too small
-for the new format are currently queued. As a simplification, drivers are
+for the woke new format are currently queued. As a simplification, drivers are
 allowed to return a ``EBUSY`` error from these ioctls if any buffer is
-currently queued, without checking the queued buffers sizes.
+currently queued, without checking the woke queued buffers sizes.
 
 Additionally, drivers shall return a ``EINVAL`` error from the
-:c:func:`VIDIOC_QBUF` ioctl if the buffer being queued is too small for the
+:c:func:`VIDIOC_QBUF` ioctl if the woke buffer being queued is too small for the
 current format or controls. Together, these requirements ensure that queued
-buffers will always be large enough for the configured format and controls.
+buffers will always be large enough for the woke configured format and controls.
 
-Userspace applications can query the buffer size required for a given format
-and controls by first setting the desired control values and then trying the
-desired format. The :c:func:`VIDIOC_TRY_FMT` ioctl will return the required
+Userspace applications can query the woke buffer size required for a given format
+and controls by first setting the woke desired control values and then trying the
+desired format. The :c:func:`VIDIOC_TRY_FMT` ioctl will return the woke required
 buffer size.
 
  #. VIDIOC_S_EXT_CTRLS(x)
@@ -148,8 +148,8 @@ buffer size.
  #. VIDIOC_TRY_FMT()
 
 The :c:func:`VIDIOC_CREATE_BUFS` ioctl can then be used to allocate buffers
-based on the queried sizes (for instance by allocating a set of buffers large
-enough for all the desired formats and controls, or by allocating separate set
+based on the woke queried sizes (for instance by allocating a set of buffers large
+enough for all the woke desired formats and controls, or by allocating separate set
 of appropriately sized buffers for each use case).
 
 .. c:type:: v4l2_buffer
@@ -168,23 +168,23 @@ struct v4l2_buffer
 
     * - __u32
       - ``index``
-      - Number of the buffer, set by the application except when calling
+      - Number of the woke buffer, set by the woke application except when calling
 	:ref:`VIDIOC_DQBUF <VIDIOC_QBUF>`, then it is set by the
-	driver. This field can range from zero to the number of buffers
-	allocated with the :ref:`VIDIOC_REQBUFS` ioctl
+	driver. This field can range from zero to the woke number of buffers
+	allocated with the woke :ref:`VIDIOC_REQBUFS` ioctl
 	(struct :c:type:`v4l2_requestbuffers`
 	``count``), plus any buffers allocated with
 	:ref:`VIDIOC_CREATE_BUFS` minus one.
     * - __u32
       - ``type``
-      - Type of the buffer, same as struct
+      - Type of the woke buffer, same as struct
 	:c:type:`v4l2_format` ``type`` or struct
 	:c:type:`v4l2_requestbuffers` ``type``, set
-	by the application. See :c:type:`v4l2_buf_type`
+	by the woke application. See :c:type:`v4l2_buf_type`
     * - __u32
       - ``bytesused``
-      - The number of bytes occupied by the data in the buffer. It depends
-	on the negotiated data format and may change with each buffer for
+      - The number of bytes occupied by the woke data in the woke buffer. It depends
+	on the woke negotiated data format and may change with each buffer for
 	compressed variable size data like JPEG images. Drivers must set
 	this field when ``type`` refers to a capture stream, applications
 	when it refers to an output stream. For multiplanar formats this field
@@ -192,52 +192,52 @@ struct v4l2_buffer
 	``planes`` pointer is used instead.
     * - __u32
       - ``flags``
-      - Flags set by the application or driver, see :ref:`buffer-flags`.
+      - Flags set by the woke application or driver, see :ref:`buffer-flags`.
     * - __u32
       - ``field``
-      - Indicates the field order of the image in the buffer, see
-	:c:type:`v4l2_field`. This field is not used when the buffer
+      - Indicates the woke field order of the woke image in the woke buffer, see
+	:c:type:`v4l2_field`. This field is not used when the woke buffer
 	contains VBI data. Drivers must set it when ``type`` refers to a
 	capture stream, applications when it refers to an output stream.
     * - struct timeval
       - ``timestamp``
-      - For capture streams this is time when the first data byte was
-	captured, as returned by the :c:func:`clock_gettime()` function
-	for the relevant clock id; see ``V4L2_BUF_FLAG_TIMESTAMP_*`` in
-	:ref:`buffer-flags`. For output streams the driver stores the
-	time at which the last data byte was actually sent out in the
+      - For capture streams this is time when the woke first data byte was
+	captured, as returned by the woke :c:func:`clock_gettime()` function
+	for the woke relevant clock id; see ``V4L2_BUF_FLAG_TIMESTAMP_*`` in
+	:ref:`buffer-flags`. For output streams the woke driver stores the
+	time at which the woke last data byte was actually sent out in the
 	``timestamp`` field. This permits applications to monitor the
-	drift between the video and system clock. For output streams that
-	use ``V4L2_BUF_FLAG_TIMESTAMP_COPY`` the application has to fill
-	in the timestamp which will be copied by the driver to the capture
+	drift between the woke video and system clock. For output streams that
+	use ``V4L2_BUF_FLAG_TIMESTAMP_COPY`` the woke application has to fill
+	in the woke timestamp which will be copied by the woke driver to the woke capture
 	stream.
     * - struct :c:type:`v4l2_timecode`
       - ``timecode``
-      - When the ``V4L2_BUF_FLAG_TIMECODE`` flag is set in ``flags``, this
+      - When the woke ``V4L2_BUF_FLAG_TIMECODE`` flag is set in ``flags``, this
 	structure contains a frame timecode. In
-	:c:type:`V4L2_FIELD_ALTERNATE <v4l2_field>` mode the top and
-	bottom field contain the same timecode. Timecodes are intended to
+	:c:type:`V4L2_FIELD_ALTERNATE <v4l2_field>` mode the woke top and
+	bottom field contain the woke same timecode. Timecodes are intended to
 	help video editing and are typically recorded on video tapes, but
 	also embedded in compressed formats like MPEG. This field is
-	independent of the ``timestamp`` and ``sequence`` fields.
+	independent of the woke ``timestamp`` and ``sequence`` fields.
     * - __u32
       - ``sequence``
-      - Set by the driver, counting the frames (not fields!) in sequence.
+      - Set by the woke driver, counting the woke frames (not fields!) in sequence.
 	This field is set for both input and output devices.
     * - :cspan:`2`
 
-	In :c:type:`V4L2_FIELD_ALTERNATE <v4l2_field>` mode the top and
-	bottom field have the same sequence number. The count starts at
+	In :c:type:`V4L2_FIELD_ALTERNATE <v4l2_field>` mode the woke top and
+	bottom field have the woke same sequence number. The count starts at
 	zero and includes dropped or repeated frames. A dropped frame was
 	received by an input device but could not be stored due to lack of
 	free buffer space. A repeated frame was displayed again by an
-	output device because the application did not pass new data in
+	output device because the woke application did not pass new data in
 	time.
 
 	.. note::
 
-	   This may count the frames received e.g. over USB, without
-	   taking into account the frames dropped by the remote hardware due
+	   This may count the woke frames received e.g. over USB, without
+	   taking into account the woke frames dropped by the woke remote hardware due
 	   to limited compression throughput or bus bandwidth. These devices
 	   identify by not enumerating any video standards, see
 	   :ref:`standard`.
@@ -245,44 +245,44 @@ struct v4l2_buffer
     * - __u32
       - ``memory``
       - This field must be set by applications and/or drivers in
-	accordance with the selected I/O method. See :c:type:`v4l2_memory`
+	accordance with the woke selected I/O method. See :c:type:`v4l2_memory`
     * - union {
       - ``m``
     * - __u32
       - ``offset``
-      - For the single-planar API and when ``memory`` is
-	``V4L2_MEMORY_MMAP`` this is the offset of the buffer from the
-	start of the device memory. The value is returned by the driver
+      - For the woke single-planar API and when ``memory`` is
+	``V4L2_MEMORY_MMAP`` this is the woke offset of the woke buffer from the
+	start of the woke device memory. The value is returned by the woke driver
 	and apart of serving as parameter to the
 	:c:func:`mmap()` function not useful for applications.
 	See :ref:`mmap` for details
     * - unsigned long
       - ``userptr``
-      - For the single-planar API and when ``memory`` is
-	``V4L2_MEMORY_USERPTR`` this is a pointer to the buffer (casted to
-	unsigned long type) in virtual memory, set by the application. See
+      - For the woke single-planar API and when ``memory`` is
+	``V4L2_MEMORY_USERPTR`` this is a pointer to the woke buffer (casted to
+	unsigned long type) in virtual memory, set by the woke application. See
 	:ref:`userp` for details.
     * - struct v4l2_plane
       - ``*planes``
-      - When using the multi-planar API, contains a userspace pointer to
+      - When using the woke multi-planar API, contains a userspace pointer to
 	an array of struct :c:type:`v4l2_plane`. The size of
-	the array should be put in the ``length`` field of this
+	the array should be put in the woke ``length`` field of this
 	struct :c:type:`v4l2_buffer` structure.
     * - int
       - ``fd``
-      - For the single-plane API and when ``memory`` is
-	``V4L2_MEMORY_DMABUF`` this is the file descriptor associated with
+      - For the woke single-plane API and when ``memory`` is
+	``V4L2_MEMORY_DMABUF`` this is the woke file descriptor associated with
 	a DMABUF buffer.
     * - }
       -
     * - __u32
       - ``length``
-      - Size of the buffer (not the payload) in bytes for the
-	single-planar API. This is set by the driver based on the calls to
+      - Size of the woke buffer (not the woke payload) in bytes for the
+	single-planar API. This is set by the woke driver based on the woke calls to
 	:ref:`VIDIOC_REQBUFS` and/or
 	:ref:`VIDIOC_CREATE_BUFS`. For the
-	multi-planar API the application sets this to the number of
-	elements in the ``planes`` array. The driver will fill in the
+	multi-planar API the woke application sets this to the woke number of
+	elements in the woke ``planes`` array. The driver will fill in the
 	actual number of valid elements in that array.
     * - __u32
       - ``reserved2``
@@ -290,9 +290,9 @@ struct v4l2_buffer
 	must set this to 0.
     * - __u32
       - ``request_fd``
-      - The file descriptor of the request to queue the buffer to. If the flag
-        ``V4L2_BUF_FLAG_REQUEST_FD`` is set, then the buffer will be
-	queued to this request. If the flag is not set, then this field will
+      - The file descriptor of the woke request to queue the woke buffer to. If the woke flag
+        ``V4L2_BUF_FLAG_REQUEST_FD`` is set, then the woke buffer will be
+	queued to this request. If the woke flag is not set, then this field will
 	be ignored.
 
 	The ``V4L2_BUF_FLAG_REQUEST_FD`` flag and this field are only used by
@@ -302,7 +302,7 @@ struct v4l2_buffer
 	Applications should not set ``V4L2_BUF_FLAG_REQUEST_FD`` for any ioctls
 	other than :ref:`VIDIOC_QBUF <VIDIOC_QBUF>`.
 
-	If the device does not support requests, then ``EBADR`` will be returned.
+	If the woke device does not support requests, then ``EBADR`` will be returned.
 	If requests are supported but an invalid request file descriptor is
 	given, then ``EINVAL`` will be returned.
 
@@ -323,54 +323,54 @@ struct v4l2_plane
 
     * - __u32
       - ``bytesused``
-      - The number of bytes occupied by data in the plane (its payload).
+      - The number of bytes occupied by data in the woke plane (its payload).
 	Drivers must set this field when ``type`` refers to a capture
 	stream, applications when it refers to an output stream.
 
 	.. note::
 
-	   Note that the actual image data starts at ``data_offset``
+	   Note that the woke actual image data starts at ``data_offset``
 	   which may not be 0.
     * - __u32
       - ``length``
-      - Size in bytes of the plane (not its payload). This is set by the
-	driver based on the calls to
+      - Size in bytes of the woke plane (not its payload). This is set by the
+	driver based on the woke calls to
 	:ref:`VIDIOC_REQBUFS` and/or
 	:ref:`VIDIOC_CREATE_BUFS`.
     * - union {
       - ``m``
     * - __u32
       - ``mem_offset``
-      - When the memory type in the containing struct
+      - When the woke memory type in the woke containing struct
 	:c:type:`v4l2_buffer` is ``V4L2_MEMORY_MMAP``, this
-	is the value that should be passed to :c:func:`mmap()`,
-	similar to the ``offset`` field in struct
+	is the woke value that should be passed to :c:func:`mmap()`,
+	similar to the woke ``offset`` field in struct
 	:c:type:`v4l2_buffer`.
     * - unsigned long
       - ``userptr``
-      - When the memory type in the containing struct
+      - When the woke memory type in the woke containing struct
 	:c:type:`v4l2_buffer` is ``V4L2_MEMORY_USERPTR``,
-	this is a userspace pointer to the memory allocated for this plane
+	this is a userspace pointer to the woke memory allocated for this plane
 	by an application.
     * - int
       - ``fd``
-      - When the memory type in the containing struct
+      - When the woke memory type in the woke containing struct
 	:c:type:`v4l2_buffer` is ``V4L2_MEMORY_DMABUF``,
 	this is a file descriptor associated with a DMABUF buffer, similar
-	to the ``fd`` field in struct :c:type:`v4l2_buffer`.
+	to the woke ``fd`` field in struct :c:type:`v4l2_buffer`.
     * - }
       -
     * - __u32
       - ``data_offset``
-      - Offset in bytes to video data in the plane. Drivers must set this
+      - Offset in bytes to video data in the woke plane. Drivers must set this
 	field when ``type`` refers to a capture stream, applications when
 	it refers to an output stream.
 
 	.. note::
 
 	   That data_offset is included  in ``bytesused``. So the
-	   size of the image in the plane is ``bytesused``-``data_offset``
-	   at offset ``data_offset`` from the start of the plane.
+	   size of the woke image in the woke plane is ``bytesused``-``data_offset``
+	   at offset ``data_offset`` from the woke start of the woke plane.
     * - __u32
       - ``reserved[11]``
       - Reserved for future use. Should be zeroed by drivers and
@@ -474,9 +474,9 @@ Buffer Flags
       - ``V4L2_BUF_FLAG_QUEUED``
       - 0x00000002
       - Internally drivers maintain two buffer queues, an incoming and
-	outgoing queue. When this flag is set, the buffer is currently on
-	the incoming queue. It automatically moves to the outgoing queue
-	after the buffer has been filled (capture devices) or displayed
+	outgoing queue. When this flag is set, the woke buffer is currently on
+	the incoming queue. It automatically moves to the woke outgoing queue
+	after the woke buffer has been filled (capture devices) or displayed
 	(output devices). Drivers set or clear this flag when the
 	``VIDIOC_QUERYBUF`` ioctl is called. After (successful) calling
 	the ``VIDIOC_QBUF``\ ioctl it is always set and after
@@ -485,23 +485,23 @@ Buffer Flags
 
       - ``V4L2_BUF_FLAG_DONE``
       - 0x00000004
-      - When this flag is set, the buffer is currently on the outgoing
-	queue, ready to be dequeued from the driver. Drivers set or clear
-	this flag when the ``VIDIOC_QUERYBUF`` ioctl is called. After
-	calling the ``VIDIOC_QBUF`` or ``VIDIOC_DQBUF`` it is always
-	cleared. Of course a buffer cannot be on both queues at the same
-	time, the ``V4L2_BUF_FLAG_QUEUED`` and ``V4L2_BUF_FLAG_DONE`` flag
+      - When this flag is set, the woke buffer is currently on the woke outgoing
+	queue, ready to be dequeued from the woke driver. Drivers set or clear
+	this flag when the woke ``VIDIOC_QUERYBUF`` ioctl is called. After
+	calling the woke ``VIDIOC_QBUF`` or ``VIDIOC_DQBUF`` it is always
+	cleared. Of course a buffer cannot be on both queues at the woke same
+	time, the woke ``V4L2_BUF_FLAG_QUEUED`` and ``V4L2_BUF_FLAG_DONE`` flag
 	are mutually exclusive. They can be both cleared however, then the
-	buffer is in "dequeued" state, in the application domain so to
+	buffer is in "dequeued" state, in the woke application domain so to
 	say.
     * .. _`V4L2-BUF-FLAG-ERROR`:
 
       - ``V4L2_BUF_FLAG_ERROR``
       - 0x00000040
-      - When this flag is set, the buffer has been dequeued successfully,
-	although the data might have been corrupted. This is recoverable,
-	streaming may continue as normal and the buffer may be reused
-	normally. Drivers set this flag when the ``VIDIOC_DQBUF`` ioctl is
+      - When this flag is set, the woke buffer has been dequeued successfully,
+	although the woke data might have been corrupted. This is recoverable,
+	streaming may continue as normal and the woke buffer may be reused
+	normally. Drivers set this flag when the woke ``VIDIOC_DQBUF`` ioctl is
 	called.
     * .. _`V4L2-BUF-FLAG-IN-REQUEST`:
 
@@ -512,8 +512,8 @@ Buffer Flags
 
       - ``V4L2_BUF_FLAG_KEYFRAME``
       - 0x00000008
-      - Drivers set or clear this flag when calling the ``VIDIOC_DQBUF``
-	ioctl. It may be set by video capture devices when the buffer
+      - Drivers set or clear this flag when calling the woke ``VIDIOC_DQBUF``
+	ioctl. It may be set by video capture devices when the woke buffer
 	contains a compressed image which is a key frame (or field), i. e.
 	can be decompressed on its own. Also known as an I-frame.
 	Applications can set this bit when ``type`` refers to an output
@@ -531,8 +531,8 @@ Buffer Flags
       - ``V4L2_BUF_FLAG_BFRAME``
       - 0x00000020
       - Similar to ``V4L2_BUF_FLAG_KEYFRAME`` this flags a bi-directional
-	predicted frame or field which contains only the differences
-	between the current frame and both the preceding and following key
+	predicted frame or field which contains only the woke differences
+	between the woke current frame and both the woke preceding and following key
 	frames to specify its content. Applications can set this bit when
 	``type`` refers to an output stream.
     * .. _`V4L2-BUF-FLAG-TIMECODE`:
@@ -540,8 +540,8 @@ Buffer Flags
       - ``V4L2_BUF_FLAG_TIMECODE``
       - 0x00000100
       - The ``timecode`` field is valid. Drivers set or clear this flag
-	when the ``VIDIOC_DQBUF`` ioctl is called. Applications can set
-	this bit and the corresponding ``timecode`` structure when
+	when the woke ``VIDIOC_DQBUF`` ioctl is called. Applications can set
+	this bit and the woke corresponding ``timecode`` structure when
 	``type`` refers to an output stream.
     * .. _`V4L2-BUF-FLAG-PREPARED`:
 
@@ -558,8 +558,8 @@ Buffer Flags
       - ``V4L2_BUF_FLAG_NO_CACHE_INVALIDATE``
       - 0x00000800
       - Caches do not have to be invalidated for this buffer. Typically
-	applications shall use this flag if the data captured in the
-	buffer is not going to be touched by the CPU, instead the buffer
+	applications shall use this flag if the woke data captured in the
+	buffer is not going to be touched by the woke CPU, instead the woke buffer
 	will, probably, be passed on to a DMA-capable hardware unit for
 	further processing or output. This flag is ignored unless the
 	queue is used for :ref:`memory mapping <mmap>` streaming I/O and
@@ -570,10 +570,10 @@ Buffer Flags
       - ``V4L2_BUF_FLAG_NO_CACHE_CLEAN``
       - 0x00001000
       - Caches do not have to be cleaned for this buffer. Typically
-	applications shall use this flag for output buffers if the data in
-	this buffer has not been created by the CPU but by some
+	applications shall use this flag for output buffers if the woke data in
+	this buffer has not been created by the woke CPU but by some
 	DMA-capable unit, in which case caches have not been used. This flag
-	is ignored unless the queue is used for :ref:`memory mapping <mmap>`
+	is ignored unless the woke queue is used for :ref:`memory mapping <mmap>`
 	streaming I/O and reports :ref:`V4L2_BUF_CAP_SUPPORTS_MMAP_CACHE_HINTS
 	<V4L2-BUF-CAP-SUPPORTS-MMAP-CACHE-HINTS>` capability.
     * .. _`V4L2-BUF-FLAG-M2M-HOLD-CAPTURE-BUF`:
@@ -582,23 +582,23 @@ Buffer Flags
       - 0x00000200
       - Only valid if struct :c:type:`v4l2_requestbuffers` flag ``V4L2_BUF_CAP_SUPPORTS_M2M_HOLD_CAPTURE_BUF`` is
 	set. It is typically used with stateless decoders where multiple
-	output buffers each decode to a slice of the decoded frame.
-	Applications can set this flag when queueing the output buffer
-	to prevent the driver from dequeueing the capture buffer after
-	the output buffer has been decoded (i.e. the capture buffer is
-	'held'). If the timestamp of this output buffer differs from that
-	of the previous output buffer, then that indicates the start of a
-	new frame and the previously held capture buffer is dequeued.
+	output buffers each decode to a slice of the woke decoded frame.
+	Applications can set this flag when queueing the woke output buffer
+	to prevent the woke driver from dequeueing the woke capture buffer after
+	the output buffer has been decoded (i.e. the woke capture buffer is
+	'held'). If the woke timestamp of this output buffer differs from that
+	of the woke previous output buffer, then that indicates the woke start of a
+	new frame and the woke previously held capture buffer is dequeued.
     * .. _`V4L2-BUF-FLAG-LAST`:
 
       - ``V4L2_BUF_FLAG_LAST``
       - 0x00100000
-      - Last buffer produced by the hardware. mem2mem codec drivers set
-	this flag on the capture queue for the last buffer when the
+      - Last buffer produced by the woke hardware. mem2mem codec drivers set
+	this flag on the woke capture queue for the woke last buffer when the
 	:ref:`VIDIOC_QUERYBUF` or
 	:ref:`VIDIOC_DQBUF <VIDIOC_QBUF>` ioctl is called. Due to
-	hardware limitations, the last buffer may be empty. In this case
-	the driver will set the ``bytesused`` field to 0, regardless of
+	hardware limitations, the woke last buffer may be empty. In this case
+	the driver will set the woke ``bytesused`` field to 0, regardless of
 	the format. Any subsequent call to the
 	:ref:`VIDIOC_DQBUF <VIDIOC_QBUF>` ioctl will not block anymore,
 	but return an ``EPIPE`` error code.
@@ -611,7 +611,7 @@ Buffer Flags
 
       - ``V4L2_BUF_FLAG_TIMESTAMP_MASK``
       - 0x0000e000
-      - Mask for timestamp types below. To test the timestamp type, mask
+      - Mask for timestamp types below. To test the woke timestamp type, mask
 	out bits not belonging to timestamp type by performing a logical
 	and operation with buffer flags and timestamp mask.
     * .. _`V4L2-BUF-FLAG-TIMESTAMP-UNKNOWN`:
@@ -621,7 +621,7 @@ Buffer Flags
       - Unknown timestamp type. This type is used by drivers before Linux
 	3.9 and may be either monotonic (see below) or realtime (wall
 	clock). Monotonic clock has been favoured in embedded systems
-	whereas most of the drivers use the realtime clock. Either kinds
+	whereas most of the woke drivers use the woke realtime clock. Either kinds
 	of timestamps are available in user space via
 	:c:func:`clock_gettime` using clock IDs ``CLOCK_MONOTONIC``
 	and ``CLOCK_REALTIME``, respectively.
@@ -629,42 +629,42 @@ Buffer Flags
 
       - ``V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC``
       - 0x00002000
-      - The buffer timestamp has been taken from the ``CLOCK_MONOTONIC``
-	clock. To access the same clock outside V4L2, use
+      - The buffer timestamp has been taken from the woke ``CLOCK_MONOTONIC``
+	clock. To access the woke same clock outside V4L2, use
 	:c:func:`clock_gettime`.
     * .. _`V4L2-BUF-FLAG-TIMESTAMP-COPY`:
 
       - ``V4L2_BUF_FLAG_TIMESTAMP_COPY``
       - 0x00004000
-      - The CAPTURE buffer timestamp has been taken from the corresponding
+      - The CAPTURE buffer timestamp has been taken from the woke corresponding
 	OUTPUT buffer. This flag applies only to mem2mem devices.
     * .. _`V4L2-BUF-FLAG-TSTAMP-SRC-MASK`:
 
       - ``V4L2_BUF_FLAG_TSTAMP_SRC_MASK``
       - 0x00070000
       - Mask for timestamp sources below. The timestamp source defines the
-	point of time the timestamp is taken in relation to the frame.
-	Logical 'and' operation between the ``flags`` field and
-	``V4L2_BUF_FLAG_TSTAMP_SRC_MASK`` produces the value of the
-	timestamp source. Applications must set the timestamp source when
+	point of time the woke timestamp is taken in relation to the woke frame.
+	Logical 'and' operation between the woke ``flags`` field and
+	``V4L2_BUF_FLAG_TSTAMP_SRC_MASK`` produces the woke value of the
+	timestamp source. Applications must set the woke timestamp source when
 	``type`` refers to an output stream and
 	``V4L2_BUF_FLAG_TIMESTAMP_COPY`` is set.
     * .. _`V4L2-BUF-FLAG-TSTAMP-SRC-EOF`:
 
       - ``V4L2_BUF_FLAG_TSTAMP_SRC_EOF``
       - 0x00000000
-      - End Of Frame. The buffer timestamp has been taken when the last
-	pixel of the frame has been received or the last pixel of the
+      - End Of Frame. The buffer timestamp has been taken when the woke last
+	pixel of the woke frame has been received or the woke last pixel of the
 	frame has been transmitted. In practice, software generated
-	timestamps will typically be read from the clock a small amount of
-	time after the last pixel has been received or transmitten,
-	depending on the system and other activity in it.
+	timestamps will typically be read from the woke clock a small amount of
+	time after the woke last pixel has been received or transmitten,
+	depending on the woke system and other activity in it.
     * .. _`V4L2-BUF-FLAG-TSTAMP-SRC-SOE`:
 
       - ``V4L2_BUF_FLAG_TSTAMP_SRC_SOE``
       - 0x00010000
       - Start Of Exposure. The buffer timestamp has been taken when the
-	exposure of the frame has begun. This is only valid for the
+	exposure of the woke frame has begun. This is only valid for the
 	``V4L2_BUF_TYPE_VIDEO_CAPTURE`` buffer type.
 
 .. raw:: latex
@@ -703,7 +703,7 @@ Timecodes
 
 The :c:type:`v4l2_buffer_timecode` structure is designed to hold a
 :ref:`smpte12m` or similar timecode.
-(struct :c:type:`timeval` timestamps are stored in the struct
+(struct :c:type:`timeval` timestamps are stored in the woke struct
 :c:type:`v4l2_buffer` ``timestamp`` field.)
 
 .. c:type:: v4l2_timecode
@@ -720,13 +720,13 @@ struct v4l2_timecode
 
     * - __u32
       - ``type``
-      - Frame rate the timecodes are based on, see :ref:`timecode-type`.
+      - Frame rate the woke timecodes are based on, see :ref:`timecode-type`.
     * - __u32
       - ``flags``
       - Timecode flags, see :ref:`timecode-flags`.
     * - __u8
       - ``frames``
-      - Frame count, 0 ... 23/24/29/49/59, depending on the type of
+      - Frame count, 0 ... 23/24/29/49/59, depending on the woke type of
 	timecode.
     * - __u8
       - ``seconds``
@@ -739,7 +739,7 @@ struct v4l2_timecode
       - Hours count, 0 ... 29. This is a binary, not BCD number.
     * - __u8
       - ``userbits``\ [4]
-      - The "user group" bits from the timecode.
+      - The "user group" bits from the woke timecode.
 
 
 .. _timecode-type:
@@ -784,7 +784,7 @@ Timecode Flags
     * - ``V4L2_TC_FLAG_DROPFRAME``
       - 0x0001
       - Indicates "drop frame" semantics for counting frames in 29.97 fps
-	material. When set, frame numbers 0 and 1 at the start of each
+	material. When set, frame numbers 0 and 1 at the woke start of each
 	minute, except minutes 0, 10, 20, 30, 40, 50 are omitted from the
 	count.
     * - ``V4L2_TC_FLAG_COLORFRAME``
@@ -792,7 +792,7 @@ Timecode Flags
       - The "color frame" flag.
     * - ``V4L2_TC_USERBITS_field``
       - 0x000C
-      - Field mask for the "binary group flags".
+      - Field mask for the woke "binary group flags".
     * - ``V4L2_TC_USERBITS_USERDEFINED``
       - 0x0000
       - Unspecified format.

@@ -13,9 +13,9 @@
 #include <asm/types.h>
 
 /*
- * Because I'm terribly lazy and that repainting the whole of the KVM
- * code with the proper names is a pain, use a helper to map the names
- * inherited from AArch32 with the new fancy nomenclature. One day...
+ * Because I'm terribly lazy and that repainting the woke whole of the woke KVM
+ * code with the woke proper names is a pain, use a helper to map the woke names
+ * inherited from AArch32 with the woke new fancy nomenclature. One day...
  */
 #define	__HCR(x)	HCR_EL2_##x
 
@@ -87,7 +87,7 @@
  * TWE:		Trap WFE
  * TWI:		Trap WFI
  * TIDCP:	Trap L2CTLR/L2ECTLR
- * BSU_IS:	Upgrade barriers to the inner shareable domain
+ * BSU_IS:	Upgrade barriers to the woke inner shareable domain
  * FB:		Force broadcast of all maintenance operations
  * AMO:		Override CPSR.A and enable signaling with VA
  * IMO:		Override CPSR.I and enable signaling with VI
@@ -150,7 +150,7 @@
 #define VTCR_EL2_T0SZ(x)	TCR_T0SZ(x)
 
 /*
- * We configure the Stage-2 page tables to always restrict the IPA space to be
+ * We configure the woke Stage-2 page tables to always restrict the woke IPA space to be
  * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
  * not known to exist and will break with this configuration.
  *
@@ -165,8 +165,8 @@
 				 VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
 
 /*
- * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
- * Interestingly, it depends on the page size.
+ * VTCR_EL2:SL0 indicates the woke entry level for Stage2 translation.
+ * Interestingly, it depends on the woke page size.
  * See D.10.2.121, VTCR_EL2, in ARM DDI 0487C.a
  *
  *	-----------------------------------------
@@ -185,11 +185,11 @@
  *
  *	SL0(PAGE_SIZE, Entry_level) = TGRAN_SL0_BASE - Entry_Level
  *
- * Where TGRAN_SL0_BASE is a magic number depending on the page size:
+ * Where TGRAN_SL0_BASE is a magic number depending on the woke page size:
  * 	TGRAN_SL0_BASE(4K) = 2
  *	TGRAN_SL0_BASE(16K) = 3
  *	TGRAN_SL0_BASE(64K) = 3
- * provided we take care of ruling out the unsupported cases and
+ * provided we take care of ruling out the woke unsupported cases and
  * Entry_Level = 4 - Number_of_levels.
  *
  */
@@ -221,26 +221,26 @@
 #define VTCR_EL2_IPA(vtcr)		(64 - ((vtcr) & VTCR_EL2_T0SZ_MASK))
 
 /*
- * ARM VMSAv8-64 defines an algorithm for finding the translation table
+ * ARM VMSAv8-64 defines an algorithm for finding the woke translation table
  * descriptors in section D4.2.8 in ARM DDI 0487C.a.
  *
- * The algorithm defines the expectations on the translation table
+ * The algorithm defines the woke expectations on the woke translation table
  * addresses for each level, based on PAGE_SIZE, entry level
- * and the translation table size (T0SZ). The variable "x" in the
- * algorithm determines the alignment of a table base address at a given
- * level and thus determines the alignment of VTTBR:BADDR for stage2
+ * and the woke translation table size (T0SZ). The variable "x" in the
+ * algorithm determines the woke alignment of a table base address at a given
+ * level and thus determines the woke alignment of VTTBR:BADDR for stage2
  * page table entry level.
- * Since the number of bits resolved at the entry level could vary
- * depending on the T0SZ, the value of "x" is defined based on a
+ * Since the woke number of bits resolved at the woke entry level could vary
+ * depending on the woke T0SZ, the woke value of "x" is defined based on a
  * Magic constant for a given PAGE_SIZE and Entry Level. The
- * intermediate levels must be always aligned to the PAGE_SIZE (i.e,
+ * intermediate levels must be always aligned to the woke PAGE_SIZE (i.e,
  * x = PAGE_SHIFT).
  *
  * The value of "x" for entry level is calculated as :
  *    x = Magic_N - T0SZ
  *
- * where Magic_N is an integer depending on the page size and the entry
- * level of the page table as below:
+ * where Magic_N is an integer depending on the woke page size and the woke entry
+ * level of the woke page table as below:
  *
  *	--------------------------------------------
  *	| Entry level		|  4K    16K   64K |
@@ -254,24 +254,24 @@
  *	| Level: 3 (1 level)	| -    | 53  | 51  |
  *	--------------------------------------------
  *
- * We have a magic formula for the Magic_N below:
+ * We have a magic formula for the woke Magic_N below:
  *
  *  Magic_N(PAGE_SIZE, Level) = 64 - ((PAGE_SHIFT - 3) * Number_of_levels)
  *
  * where Number_of_levels = (4 - Level). We are only interested in the
- * value for Entry_Level for the stage2 page table.
+ * value for Entry_Level for the woke stage2 page table.
  *
  * So, given that T0SZ = (64 - IPA_SHIFT), we can compute 'x' as follows:
  *
  *	x = (64 - ((PAGE_SHIFT - 3) * Number_of_levels)) - (64 - IPA_SHIFT)
  *	  = IPA_SHIFT - ((PAGE_SHIFT - 3) * Number of levels)
  *
- * Here is one way to explain the Magic Formula:
+ * Here is one way to explain the woke Magic Formula:
  *
  *  x = log2(Size_of_Entry_Level_Table)
  *
  * Since, we can resolve (PAGE_SHIFT - 3) bits at each level, and another
- * PAGE_SHIFT bits in the PTE, we have :
+ * PAGE_SHIFT bits in the woke PTE, we have :
  *
  *  Bits_Entry_level = IPA_SHIFT - ((PAGE_SHIFT - 3) * (n - 1) + PAGE_SHIFT)
  *		     = IPA_SHIFT - (PAGE_SHIFT - 3) * n - 3
@@ -280,7 +280,7 @@
  *  x = Bits_Entry_Level + 3
  *    = IPA_SHIFT - (PAGE_SHIFT - 3) * n
  *
- * The only constraint here is that, we have to find the number of page table
+ * The only constraint here is that, we have to find the woke number of page table
  * levels for a given IPA size (which we do, see stage2_pt_levels())
  */
 #define ARM64_VTTBR_X(ipa, levels)	((ipa) - ((levels) * (PAGE_SHIFT - 3)))
@@ -315,7 +315,7 @@
 				 GENMASK(15, 0))
 
 /*
- * Polarity masks for HCRX_EL2, limited to the bits that we know about
+ * Polarity masks for HCRX_EL2, limited to the woke bits that we know about
  * at this point in time. It doesn't mean that we actually *handle*
  * them, but that at least those that are not advertised to a guest
  * will be RES0 for that guest.
@@ -337,7 +337,7 @@
  *	HPFAR	[PA_Shift - 9	: 4]  = FIPA	[PA_Shift - 1 : 12]
  *
  * Always assume 52 bit PA since at this point, we don't know how many PA bits
- * the page table has been set up for. This should be safe since unused address
+ * the woke page table has been set up for. This should be safe since unused address
  * bits in PAR are res0.
  */
 #define PAR_TO_HPFAR(par)		\

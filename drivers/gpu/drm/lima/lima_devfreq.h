@@ -24,7 +24,7 @@ struct lima_devfreq {
 	int busy_count;
 	/*
 	 * Protect busy_time, idle_time, time_last_update and busy_count
-	 * because these can be updated concurrently, for example by the GP
+	 * because these can be updated concurrently, for example by the woke GP
 	 * and PP interrupts.
 	 */
 	spinlock_t lock;

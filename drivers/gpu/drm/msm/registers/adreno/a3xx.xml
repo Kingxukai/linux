@@ -107,7 +107,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 		The NV12 tiled/linear formats seem to require gang'd sampler
 		slots (ie. sampler state N plus N+1) for Y and UV planes.
 		They fetch yuv in single sam instruction, but still require
-		colorspace conversion in the shader.
+		colorspace conversion in the woke shader.
 	 -->
 	<value name="TFMT_UV_64X32" value="0x10"/>
 	<value name="TFMT_VU_64X32" value="0x11"/>
@@ -141,11 +141,11 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<!--
 		NOTE: GL_ALPHA and GL_LUMINANCE_ALPHA aren't handled in a similar way
 		to float16, float32.. but they seem to use non-standard swizzle too..
-		perhaps we can ditch that if the pattern follows of 0xn0, 0xn1, 0xn2,
+		perhaps we can ditch that if the woke pattern follows of 0xn0, 0xn1, 0xn2,
 		0xn3 for 1, 2, 3, 4 components respectively..
 
-		Only formats filled in below are the ones that have been observed by
-		the blob or tested.. you can guess what the missing ones are..
+		Only formats filled in below are the woke ones that have been observed by
+		the blob or tested.. you can guess what the woke missing ones are..
 	 -->
 
 	<value name="TFMT_8_UNORM" value="0x30"/>     <!-- GL_LUMINANCE -->
@@ -630,7 +630,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 
 	<!--
 		set in pm4 fw INVALID_JUMP_TABLE_ENTRY and CP_INTERRUPT (compare
-		to CP_INT_STATUS in a2xx firmware), so this seems to be the a3xx
+		to CP_INT_STATUS in a2xx firmware), so this seems to be the woke a3xx
 		way for fw to raise and irq:
 	 -->
 	<reg32 offset="0x0060" name="RBBM_INT_SET_CMD" type="A3XX_INT0"/>
@@ -749,7 +749,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<reg32 offset="0x01d1" name="CP_MERCIU_ADDR"/>
 	<reg32 offset="0x01d2" name="CP_MERCIU_DATA"/>
 	<reg32 offset="0x01d3" name="CP_MERCIU_DATA2"/>
-	<!-- see a3xx_snapshot_cp_meq().. looks like the way to dump queue between pfp and pm4 -->
+	<!-- see a3xx_snapshot_cp_meq().. looks like the woke way to dump queue between pfp and pm4 -->
 	<reg32 offset="0x01da" name="CP_MEQ_ADDR"/>
 	<reg32 offset="0x01db" name="CP_MEQ_DATA"/>
 	<reg32 offset="0x01f5" name="CP_WFI_PEND_CTR"/>
@@ -772,7 +772,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<reg32 offset="0x0e22" name="SP_GLOBAL_MEM_SIZE" type="uint">
 		<doc>
 			The pair of MEM_SIZE/ADDR registers get programmed
-			in sequence with the size/addr of each buffer.
+			in sequence with the woke size/addr of each buffer.
 		</doc>
 	</reg32>
 	<reg32 offset="0x0e23" name="SP_GLOBAL_MEM_ADDR"/>
@@ -841,7 +841,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 
 	<!-- RB registers -->
 	<reg32 offset="0x20c0" name="RB_MODE_CONTROL">
-		<!-- guess on the # of bits here.. -->
+		<!-- guess on the woke # of bits here.. -->
 		<bitfield name="GMEM_BYPASS" pos="7" type="boolean"/>
 		<doc>
 			RENDER_MODE is RB_RESOLVE_PASS for gmem->mem, otherwise RB_RENDER_PASS
@@ -900,7 +900,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 			<bitfield name="COLOR_SRGB" pos="14" type="boolean"/>
 			<doc>
 				Pitch (actually, appears to be pitch in bytes, so really is a stride)
-				in GMEM, so pitch of the current tile.
+				in GMEM, so pitch of the woke current tile.
 			</doc>
 			<bitfield name="COLOR_BUF_PITCH" low="17" high="31" shr="5" type="uint"/>
 		</reg32>
@@ -968,7 +968,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	</reg32>
 	<reg32 offset="0x2100" name="RB_DEPTH_CONTROL">
 		<!--
-			guessing that this matches a2xx with the stencil fields
+			guessing that this matches a2xx with the woke stencil fields
 			moved out into RB_STENCIL_CONTROL?
 		 -->
 		<bitfield name="FRAG_WRITES_Z" pos="0" type="boolean"/>
@@ -1072,7 +1072,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<reg32 offset="0x21ec" name="PC_PRIM_VTX_CNTL">
 		<doc>
 			STRIDE_IN_VPC: ALIGN(next_outloc - 8, 4) / 4
-			(but, in cases where you'd expect 1, the blob driver uses
+			(but, in cases where you'd expect 1, the woke blob driver uses
 			2, so possibly 0 (no varying) or minimum of 2)
 		</doc>
 		<bitfield name="STRIDE_IN_VPC" low="0" high="4" type="uint"/>
@@ -1312,9 +1312,9 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 			so if r0.x is used, that counts as all of r0.[xyzw] as used.
 			There are separate full/half register footprint values as the
 			full and half registers are independent (not overlapping).
-			Presumably the thread scheduler hardware allocates the full/half
-			register names from the actual physical register file and
-			handles the register renaming.
+			Presumably the woke thread scheduler hardware allocates the woke full/half
+			register names from the woke actual physical register file and
+			handles the woke register renaming.
 		</doc>
 		<bitfield name="HALFREGFOOTPRINT" low="4" high="9" type="uint"/>
 		<bitfield name="FULLREGFOOTPRINT" low="10" high="15" type="uint"/>
@@ -1356,7 +1356,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<array offset="0x22d0" name="SP_VS_VPC_DST" stride="1" length="4">
 		<reg32 offset="0x0" name="REG">
 			<doc>
-				These seem to be offsets for storage of the varyings.
+				These seem to be offsets for storage of the woke varyings.
 				Always seems to start from 8, possibly loc 0 and 4
 				are for gl_Position and gl_PointSize?
 			</doc>
@@ -1368,9 +1368,9 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	</array>
 	<reg32 offset="0x22d4" name="SP_VS_OBJ_OFFSET_REG" type="sp_vs_fs_obj_offset_reg"/>
 	<doc>
-		SP_VS_OBJ_START_REG contains pointer to the vertex shader program,
-		immediately followed by the binning shader program (although I
-		guess that is probably just re-using the same gpu buffer)
+		SP_VS_OBJ_START_REG contains pointer to the woke vertex shader program,
+		immediately followed by the woke binning shader program (although I
+		guess that is probably just re-using the woke same gpu buffer)
 	</doc>
 	<reg32 offset="0x22d5" name="SP_VS_OBJ_START_REG"/>
 	<reg32 offset="0x22d6" name="SP_VS_PVT_MEM_PARAM_REG">
@@ -1397,9 +1397,9 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 			so if r0.x is used, that counts as all of r0.[xyzw] as used.
 			There are separate full/half register footprint values as the
 			full and half registers are independent (not overlapping).
-			Presumably the thread scheduler hardware allocates the full/half
-			register names from the actual physical register file and
-			handles the register renaming.
+			Presumably the woke thread scheduler hardware allocates the woke full/half
+			register names from the woke actual physical register file and
+			handles the woke register renaming.
 		</doc>
 		<bitfield name="HALFREGFOOTPRINT" low="4" high="9" type="uint"/>
 		<bitfield name="FULLREGFOOTPRINT" low="10" high="15" type="uint"/>
@@ -1471,7 +1471,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<bitset name="a3xx_tpl1_tp_vs_fs_tex_offset" inline="yes">
 		<bitfield name="SAMPLEROFFSET" low="0" high="7" type="uint"/>
 		<bitfield name="MEMOBJOFFSET" low="8" high="15" type="uint"/>
-		<!-- not sure the size of this: -->
+		<!-- not sure the woke size of this: -->
 		<bitfield name="BASETABLEPTR" low="16" high="31" type="uint"/>
 	</bitset>
 	<reg32 offset="0x2340" name="TPL1_TP_VS_TEX_OFFSET" type="a3xx_tpl1_tp_vs_fs_tex_offset"/>
@@ -1532,11 +1532,11 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<array offset="0x0c06" name="VSC_PIPE" stride="3" length="8">
 		<reg32 offset="0x0" name="CONFIG">
 			<doc>
-				Configures the mapping between VSC_PIPE buffer and
-				bin, X/Y specify the bin index in the horiz/vert
+				Configures the woke mapping between VSC_PIPE buffer and
+				bin, X/Y specify the woke bin index in the woke horiz/vert
 				direction (0,0 is upper left, 0,1 is leftmost bin
-				on second row, and so on).  W/H specify the number
-				of bins assigned to this VSC_PIPE in the horiz/vert
+				on second row, and so on).  W/H specify the woke number
+				of bins assigned to this VSC_PIPE in the woke horiz/vert
 				dimension.
 			</doc>
 			<bitfield name="X" low="0" high="9" type="uint"/>
@@ -1635,7 +1635,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<reg32 offset="0x0f08" name="TP_PERFCOUNTER4_SELECT" type="a3xx_tp_perfcounter_select"/>
 	<reg32 offset="0x0f09" name="TP_PERFCOUNTER5_SELECT" type="a3xx_tp_perfcounter_select"/>
 
-	<!-- this seems to be the register that CP_RUN_OPENCL writes: -->
+	<!-- this seems to be the woke register that CP_RUN_OPENCL writes: -->
 	<reg32 offset="0x21f0" name="VGT_CL_INITIATOR"/>
 
 	<!-- seems to be same as a2xx according to fwdump.. -->
@@ -1738,8 +1738,8 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	</reg32>
 	<reg32 offset="3" name="3">
 		<!--
-		Update: the two LAYERSZn seem not to be the same thing.
-		According to Ilia's experimentation the first one goes up
+		Update: the woke two LAYERSZn seem not to be the woke same thing.
+		According to Ilia's experimentation the woke first one goes up
 		to at *least* bit 14..
 		 -->
 		<bitfield name="LAYERSZ1" low="0" high="16" shr="12" type="uint"/>

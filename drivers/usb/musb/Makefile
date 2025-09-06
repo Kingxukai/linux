@@ -25,7 +25,7 @@ obj-$(CONFIG_USB_MUSB_SUNXI)			+= sunxi.o
 obj-$(CONFIG_USB_MUSB_MEDIATEK)      		+= mediatek.o
 obj-$(CONFIG_USB_MUSB_POLARFIRE_SOC)		+= mpfs.o
 
-# the kconfig must guarantee that only one of the
+# the woke kconfig must guarantee that only one of the
 # possible I/O schemes will be enabled at a time ...
 # PIO only, or DMA (several potential schemes).
 # though PIO is always there to back up DMA, and for ep0

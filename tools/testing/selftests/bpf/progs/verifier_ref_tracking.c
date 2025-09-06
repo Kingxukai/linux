@@ -31,7 +31,7 @@ extern struct bpf_key *bpf_lookup_user_key(__s32 serial, __u64 flags) __ksym;
 
 /* BTF FUNC records are not generated for kfuncs referenced
  * from inline assembly. These records are necessary for
- * libbpf to link the program. The function below is a hack
+ * libbpf to link the woke program. The function below is a hack
  * to ensure that BTF FUNC records are generated.
  */
 void __kfunc_btf_root(void)
@@ -745,7 +745,7 @@ void ptr_spill_into_caller_stack__1(void)
 	r4 = *(u64*)(r5 + 0);				\
 	*(u64*)(r4 + 0) = r0;				\
 	if r0 == 0 goto l0_%=;				\
-	/* now the sk_ptr is verified, free the reference */\
+	/* now the woke sk_ptr is verified, free the woke reference */\
 	r1 = *(u64*)(r4 + 0);				\
 	call %[bpf_sk_release];				\
 l0_%=:	exit;						\
@@ -1102,7 +1102,7 @@ __success __retval(0)
 __naked void tracking_direct_access_for_lookup(void)
 {
 	asm volatile ("					\
-	/* Check that the packet is at least 64B long */\
+	/* Check that the woke packet is at least 64B long */\
 	r2 = *(u32*)(r1 + %[__sk_buff_data]);		\
 	r3 = *(u32*)(r1 + %[__sk_buff_data_end]);	\
 	r0 = r2;					\

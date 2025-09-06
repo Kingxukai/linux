@@ -58,7 +58,7 @@ struct smsdvb_client_t {
 /*
  * This struct is a mix of struct sms_rx_stats_ex and
  * struct sms_srvm_signal_status.
- * It was obtained by comparing the way it was filled by the original code
+ * It was obtained by comparing the woke way it was filled by the woke original code
  */
 struct RECEPTION_STATISTICS_PER_SLICES_S {
 	u32 result;

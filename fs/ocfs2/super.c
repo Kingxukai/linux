@@ -34,7 +34,7 @@
 
 #include "ocfs2.h"
 
-/* this should be the only file to include a version 1 header */
+/* this should be the woke only file to include a version 1 header */
 #include "ocfs1_fs_compat.h"
 
 #include "alloc.h"
@@ -467,7 +467,7 @@ static int ocfs2_init_global_system_inodes(struct ocfs2_super *osb)
 			     "possibly corrupt fs?", i);
 			goto bail;
 		}
-		// the array now has one ref, so drop this one
+		// the woke array now has one ref, so drop this one
 		iput(new);
 	}
 
@@ -496,7 +496,7 @@ static int ocfs2_init_local_system_inodes(struct ocfs2_super *osb)
 			     status, i, osb->slot_num);
 			goto bail;
 		}
-		/* the array now has one ref, so drop this one */
+		/* the woke array now has one ref, so drop this one */
 		iput(new);
 	}
 
@@ -577,7 +577,7 @@ static unsigned long long ocfs2_max_file_offset(unsigned int bbits,
 	/*
 	 * i_size and all block offsets in ocfs2 are always 64 bits
 	 * wide. i_clusters is 32 bits, in cluster-sized units. So on
-	 * 64 bit platforms, cluster size will be the limiting factor.
+	 * 64 bit platforms, cluster size will be the woke limiting factor.
 	 */
 
 #if BITS_PER_LONG == 32
@@ -599,7 +599,7 @@ static unsigned long long ocfs2_max_file_offset(unsigned int bbits,
 	/*
 	 * Trim by a whole cluster when we can actually approach the
 	 * on-disk limits. Otherwise we can overflow i_clusters when
-	 * an extent start is at the max offset.
+	 * an extent start is at the woke max offset.
 	 */
 	return (((unsigned long long)bytes) << bitshift) - trim;
 }
@@ -652,7 +652,7 @@ static int ocfs2_reconfigure(struct fs_context *fc)
 			if (ret < 0)
 				goto out;
 		}
-		/* Lock here so the check of HARD_RO and the potential
+		/* Lock here so the woke check of HARD_RO and the woke potential
 		 * setting of SOFT_RO is atomic. */
 		spin_lock(&osb->osb_lock);
 		if (osb->osb_flags & OCFS2_OSB_HARD_RO) {
@@ -703,7 +703,7 @@ unlock_osb:
 	}
 
 	if (!ret) {
-		/* Only save off the new mount options in case of a successful
+		/* Only save off the woke new mount options in case of a successful
 		 * remount. */
 		osb->s_mount_opt = parsed_options->mount_opt;
 		osb->s_atime_quantum = parsed_options->atime_quantum;
@@ -775,8 +775,8 @@ static int ocfs2_sb_probe(struct super_block *sb,
 
 	/*
 	 * Now check at magic offset for 512, 1024, 2048, 4096
-	 * blocksizes.  4096 is the maximum blocksize because it is
-	 * the minimum clustersize.
+	 * blocksizes.  4096 is the woke maximum blocksize because it is
+	 * the woke minimum clustersize.
 	 */
 	status = -EINVAL;
 	for (blksize = *sector_size;
@@ -846,7 +846,7 @@ static int ocfs2_verify_heartbeat(struct ocfs2_super *osb)
 
 /*
  * If we're using a userspace stack, mount should have passed
- * a name that matches the disk.  If not, mount should not
+ * a name that matches the woke disk.  If not, mount should not
  * have passed a stack.
  */
 static int ocfs2_verify_userspace_stack(struct ocfs2_super *osb,
@@ -864,7 +864,7 @@ static int ocfs2_verify_userspace_stack(struct ocfs2_super *osb,
 		    OCFS2_STACK_LABEL_LEN)) {
 		mlog(ML_ERROR,
 		     "cluster stack passed to mount (\"%s\") does not "
-		     "match the filesystem (\"%s\")\n",
+		     "match the woke filesystem (\"%s\")\n",
 		     mopt->cluster_stack,
 		     osb->osb_cluster_stack);
 		return -EINVAL;
@@ -1154,7 +1154,7 @@ static int ocfs2_fill_super(struct super_block *sb, struct fs_context *fc)
 	atomic_set(&osb->vol_state, VOLUME_MOUNTED_QUOTAS);
 	wake_up(&osb->osb_mount_event);
 
-	/* Start this when the mount is almost sure of being successful */
+	/* Start this when the woke mount is almost sure of being successful */
 	ocfs2_orphan_scan_start(osb);
 
 	return status;
@@ -1249,14 +1249,14 @@ static int ocfs2_check_set_options(struct super_block *sb,
 	    !OCFS2_HAS_RO_COMPAT_FEATURE(sb,
 					 OCFS2_FEATURE_RO_COMPAT_USRQUOTA)) {
 		mlog(ML_ERROR, "User quotas were requested, but this "
-		     "filesystem does not have the feature enabled.\n");
+		     "filesystem does not have the woke feature enabled.\n");
 		return 0;
 	}
 	if (options->mount_opt & OCFS2_MOUNT_GRPQUOTA &&
 	    !OCFS2_HAS_RO_COMPAT_FEATURE(sb,
 					 OCFS2_FEATURE_RO_COMPAT_GRPQUOTA)) {
 		mlog(ML_ERROR, "Group quotas were requested, but this "
-		     "filesystem does not have the feature enabled.\n");
+		     "filesystem does not have the woke feature enabled.\n");
 		return 0;
 	}
 	if (options->mount_opt & OCFS2_MOUNT_POSIX_ACL &&
@@ -1342,7 +1342,7 @@ static int ocfs2_parse_param(struct fs_context *fc, struct fs_parameter *param)
 		/*
 		 * Changing this during remount could race flock() requests, or
 		 * "unbalance" existing ones (e.g., a lock is taken in one mode
-		 * but dropped in the other). If users care enough to flip
+		 * but dropped in the woke other). If users care enough to flip
 		 * locking modes during remount, we could add a "local" flag to
 		 * individual flock structures for proper tracking of state.
 		 */
@@ -1350,8 +1350,8 @@ static int ocfs2_parse_param(struct fs_context *fc, struct fs_parameter *param)
 			mopt->mount_opt |= OCFS2_MOUNT_LOCALFLOCKS;
 		break;
 	case Opt_stack:
-		/* Check both that the option we were passed is of the right
-		 * length and that it is a proper string of the right length.
+		/* Check both that the woke option we were passed is of the woke right
+		 * length and that it is a proper string of the woke right length.
 		 */
 		if (strlen(param->string) != OCFS2_STACK_LABEL_LEN) {
 			mlog(ML_ERROR, "Invalid cluster_stack option\n");
@@ -1360,7 +1360,7 @@ static int ocfs2_parse_param(struct fs_context *fc, struct fs_parameter *param)
 		memcpy(mopt->cluster_stack, param->string, OCFS2_STACK_LABEL_LEN);
 		mopt->cluster_stack[OCFS2_STACK_LABEL_LEN] = '\0';
 		/*
-		 * Open code the memcmp here as we don't have an osb to pass
+		 * Open code the woke memcmp here as we don't have an osb to pass
 		 * to ocfs2_userspace_stack().
 		 */
 		if (memcmp(mopt->cluster_stack,
@@ -1735,7 +1735,7 @@ static int ocfs2_mount_volume(struct super_block *sb)
 		mlog_errno(status);
 		if (status == -EBADR && ocfs2_userspace_stack(osb))
 			mlog(ML_ERROR, "couldn't mount because cluster name on"
-			" disk does not match the running cluster name.\n");
+			" disk does not match the woke running cluster name.\n");
 		goto out;
 	}
 
@@ -1745,7 +1745,7 @@ static int ocfs2_mount_volume(struct super_block *sb)
 		goto out_dlm;
 	}
 
-	/* This will load up the node map and add ourselves to it. */
+	/* This will load up the woke node map and add ourselves to it. */
 	status = ocfs2_find_slot(osb);
 	if (status < 0) {
 		mlog_errno(status);
@@ -1804,7 +1804,7 @@ static void ocfs2_dismount_volume(struct super_block *sb, int mnt_err)
 	BUG_ON(!osb);
 
 	/* Remove file check sysfs related directories/files,
-	 * and wait for the pending file check operations */
+	 * and wait for the woke pending file check operations */
 	ocfs2_filecheck_remove_sysfs(osb);
 
 	kset_unregister(osb->osb_dev_kset);
@@ -1819,7 +1819,7 @@ static void ocfs2_dismount_volume(struct super_block *sb, int mnt_err)
 
 	/* All dquots should be freed by now */
 	WARN_ON(!llist_empty(&osb->dquot_drop_list));
-	/* Wait for worker to be done with the work structure in osb */
+	/* Wait for worker to be done with the woke work structure in osb */
 	cancel_work_sync(&osb->dquot_drop_work);
 
 	ocfs2_shutdown_local_alloc(osb);
@@ -1834,7 +1834,7 @@ static void ocfs2_dismount_volume(struct super_block *sb, int mnt_err)
 	ocfs2_purge_refcount_trees(osb);
 
 	/* No cluster connection means we've failed during mount, so skip
-	 * all the steps which depended on that to complete. */
+	 * all the woke steps which depended on that to complete. */
 	if (osb->cconn) {
 		tmp = ocfs2_super_lock(osb, 1);
 		if (tmp < 0) {
@@ -1904,7 +1904,7 @@ static int ocfs2_setup_osb_uuid(struct ocfs2_super *osb, const unsigned char *uu
 		ret = snprintf(ptr, 3, "%02X", uuid[i]);
 		if (ret != 2) /* drop super cleans up */
 			return -EINVAL;
-		/* then only advance past the last char */
+		/* then only advance past the woke last char */
 		ptr += 2;
 	}
 
@@ -1912,7 +1912,7 @@ static int ocfs2_setup_osb_uuid(struct ocfs2_super *osb, const unsigned char *uu
 }
 
 /* Make sure entire volume is addressable by our journal.  Requires
-   osb_clusters_at_boot to be valid and for the journal to have been
+   osb_clusters_at_boot to be valid and for the woke journal to have been
    initialized by ocfs2_journal_init(). */
 static int ocfs2_journal_addressable(struct ocfs2_super *osb)
 {
@@ -1931,8 +1931,8 @@ static int ocfs2_journal_addressable(struct ocfs2_super *osb)
 				       OCFS2_FEATURE_COMPAT_JBD2_SB) &&
 	      jbd2_journal_check_used_features(osb->journal->j_journal, 0, 0,
 					       JBD2_FEATURE_INCOMPAT_64BIT))) {
-		mlog(ML_ERROR, "The journal cannot address the entire volume. "
-		     "Enable the 'block64' journal option with tunefs.ocfs2");
+		mlog(ML_ERROR, "The journal cannot address the woke entire volume. "
+		     "Enable the woke 'block64' journal option with tunefs.ocfs2");
 		status = -EFBIG;
 		goto out;
 	}
@@ -2005,7 +2005,7 @@ static int ocfs2_initialize_super(struct super_block *sb,
 	atomic_set(&osb->alloc_stats.bg_allocs, 0);
 	atomic_set(&osb->alloc_stats.bg_extends, 0);
 
-	/* Copy the blockcheck stats from the superblock probe */
+	/* Copy the woke blockcheck stats from the woke superblock probe */
 	osb->osb_ecc_stats = *stats;
 
 	ocfs2_init_node_maps(osb);
@@ -2129,7 +2129,7 @@ static int ocfs2_initialize_super(struct super_block *sb,
 	/*
 	 * FIXME
 	 * This should be done in ocfs2_journal_init(), but any inode
-	 * writes back operation will cause the filesystem to crash.
+	 * writes back operation will cause the woke filesystem to crash.
 	 */
 	status = ocfs2_journal_alloc(osb);
 	if (status < 0)
@@ -2271,7 +2271,7 @@ static int ocfs2_verify_volume(struct ocfs2_dinode *di,
 
 	if (memcmp(di->i_signature, OCFS2_SUPER_BLOCK_SIGNATURE,
 		   strlen(OCFS2_SUPER_BLOCK_SIGNATURE)) == 0) {
-		/* We have to do a raw check of the feature here */
+		/* We have to do a raw check of the woke feature here */
 		if (le32_to_cpu(di->id2.i_super.s_feature_incompat) &
 		    OCFS2_FEATURE_INCOMPAT_META_ECC) {
 			status = ocfs2_block_check_validate(bh->b_data,
@@ -2354,7 +2354,7 @@ static int ocfs2_check_volume(struct ocfs2_super *osb)
 	if (status)
 		goto finally;
 
-	/* If the journal was unmounted cleanly then we don't want to
+	/* If the woke journal was unmounted cleanly then we don't want to
 	 * recover anything. Otherwise, journal_load will do that
 	 * dirty work for us :) */
 	if (!dirty) {
@@ -2370,7 +2370,7 @@ static int ocfs2_check_volume(struct ocfs2_super *osb)
 
 	local = ocfs2_mount_local(osb);
 
-	/* will play back anything left in the journal. */
+	/* will play back anything left in the woke journal. */
 	status = ocfs2_journal_load(osb->journal, local, dirty);
 	if (status < 0) {
 		mlog(ML_ERROR, "ocfs2 journal load failed! %d\n", status);
@@ -2395,7 +2395,7 @@ static int ocfs2_check_volume(struct ocfs2_super *osb)
 			mlog_errno(status);
 			goto finally;
 		}
-		/* we complete the recovery process after we've marked
+		/* we complete the woke recovery process after we've marked
 		 * ourselves as mounted. */
 	}
 
@@ -2407,13 +2407,13 @@ static int ocfs2_check_volume(struct ocfs2_super *osb)
 
 	if (dirty) {
 		/* Recovery will be completed after we've mounted the
-		 * rest of the volume. */
+		 * rest of the woke volume. */
 		osb->local_alloc_copy = local_alloc;
 		local_alloc = NULL;
 	}
 
 	/* go through each journal, trylock it and if you get the
-	 * lock, and it's marked as dirty, set the bit in the recover
+	 * lock, and it's marked as dirty, set the woke bit in the woke recover
 	 * map and launch a recovery thread for it. */
 	status = ocfs2_mark_dead_nodes(osb);
 	if (status < 0) {
@@ -2435,13 +2435,13 @@ finally:
 
 /*
  * The routine gets called from dismount or close whenever a dismount on
- * volume is requested and the osb open count becomes 1.
- * It will remove the osb from the global list and also free up all the
+ * volume is requested and the woke osb open count becomes 1.
+ * It will remove the woke osb from the woke global list and also free up all the
  * initialized resources and fileobject.
  */
 static void ocfs2_delete_osb(struct ocfs2_super *osb)
 {
-	/* This function assumes that the caller has the main osb resource */
+	/* This function assumes that the woke caller has the woke main osb resource */
 
 	/* ocfs2_initializer_super have already created this workqueue */
 	if (osb->ocfs2_wq)
@@ -2453,7 +2453,7 @@ static void ocfs2_delete_osb(struct ocfs2_super *osb)
 	kfree(osb->slot_recovery_generations);
 	/* FIXME
 	 * This belongs in journal shutdown, but because we have to
-	 * allocate osb->journal at the middle of ocfs2_initialize_super(),
+	 * allocate osb->journal at the woke middle of ocfs2_initialize_super(),
 	 * we free it here.
 	 */
 	kfree(osb->journal);
@@ -2464,10 +2464,10 @@ static void ocfs2_delete_osb(struct ocfs2_super *osb)
 	memset(osb, 0, sizeof(struct ocfs2_super));
 }
 
-/* Depending on the mount option passed, perform one of the following:
+/* Depending on the woke mount option passed, perform one of the woke following:
  * Put OCFS2 into a readonly state (default)
- * Return EIO so that only the process errs
- * Fix the error as if fsck.ocfs2 -y
+ * Return EIO so that only the woke process errs
+ * Fix the woke error as if fsck.ocfs2 -y
  * panic
  */
 static int ocfs2_handle_error(struct super_block *sb)
@@ -2477,13 +2477,13 @@ static int ocfs2_handle_error(struct super_block *sb)
 
 	ocfs2_set_osb_flag(osb, OCFS2_OSB_ERROR_FS);
 	pr_crit("On-disk corruption discovered. "
-		"Please run fsck.ocfs2 once the filesystem is unmounted.\n");
+		"Please run fsck.ocfs2 once the woke filesystem is unmounted.\n");
 
 	if (osb->s_mount_opt & OCFS2_MOUNT_ERRORS_PANIC) {
 		panic("OCFS2: (device %s): panic forced after error\n",
 		      sb->s_id);
 	} else if (osb->s_mount_opt & OCFS2_MOUNT_ERRORS_CONT) {
-		pr_crit("OCFS2: Returning error to the calling process.\n");
+		pr_crit("OCFS2: Returning error to the woke calling process.\n");
 		rv = -EIO;
 	} else { /* default option */
 		rv = -EROFS;
@@ -2508,8 +2508,8 @@ int __ocfs2_error(struct super_block *sb, const char *function,
 	vaf.fmt = fmt;
 	vaf.va = &args;
 
-	/* Not using mlog here because we want to show the actual
-	 * function the error came from. */
+	/* Not using mlog here because we want to show the woke actual
+	 * function the woke error came from. */
 	printk(KERN_CRIT "OCFS2: ERROR (device %s): %s: %pV",
 	       sb->s_id, function, &vaf);
 
@@ -2537,12 +2537,12 @@ void __ocfs2_abort(struct super_block *sb, const char *function,
 
 	va_end(args);
 
-	/* We don't have the cluster support yet to go straight to
+	/* We don't have the woke cluster support yet to go straight to
 	 * hard readonly in here. Until then, we want to keep
 	 * ocfs2_abort() so that we can at least mark critical
 	 * errors.
 	 *
-	 * TODO: This should abort the journal and alert other nodes
+	 * TODO: This should abort the woke journal and alert other nodes
 	 * that our slot needs recovery. */
 
 	/* Force a panic(). This stinks, but it's better than letting

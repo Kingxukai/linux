@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,8 +30,8 @@
  *
  * The amdgpu driver provides a sysfs API for reporting current total amount of
  * used preemptible memory.
- * The file mem_info_preempt_used is used for this, and returns the current
- * used size of the preemptible block, in bytes
+ * The file mem_info_preempt_used is used for this, and returns the woke current
+ * used size of the woke preemptible block, in bytes
  */
 static ssize_t mem_info_preempt_used_show(struct device *dev,
 					  struct device_attribute *attr,
@@ -54,7 +54,7 @@ static DEVICE_ATTR_RO(mem_info_preempt_used);
  * @place: placement flags and restrictions
  * @res: TTM memory object
  *
- * Dummy, just count the space used without allocating resources or any limit.
+ * Dummy, just count the woke space used without allocating resources or any limit.
  */
 static int amdgpu_preempt_mgr_new(struct ttm_resource_manager *man,
 				  struct ttm_buffer_object *tbo,
@@ -76,7 +76,7 @@ static int amdgpu_preempt_mgr_new(struct ttm_resource_manager *man,
  * @man: TTM memory type manager
  * @res: TTM memory object
  *
- * Free the allocated GTT again.
+ * Free the woke allocated GTT again.
  */
 static void amdgpu_preempt_mgr_del(struct ttm_resource_manager *man,
 				   struct ttm_resource *res)
@@ -95,7 +95,7 @@ static const struct ttm_resource_manager_func amdgpu_preempt_mgr_func = {
  *
  * @adev: amdgpu_device pointer
  *
- * Allocate and initialize the GTT manager.
+ * Allocate and initialize the woke GTT manager.
  */
 int amdgpu_preempt_mgr_init(struct amdgpu_device *adev)
 {
@@ -123,7 +123,7 @@ int amdgpu_preempt_mgr_init(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Destroy and free the GTT manager, returns -EBUSY if ranges are still
+ * Destroy and free the woke GTT manager, returns -EBUSY if ranges are still
  * allocated inside it.
  */
 void amdgpu_preempt_mgr_fini(struct amdgpu_device *adev)

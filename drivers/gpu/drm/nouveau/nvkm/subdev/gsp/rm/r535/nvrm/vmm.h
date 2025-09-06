@@ -44,20 +44,20 @@ typedef struct NV90F1_CTRL_VASPACE_COPY_SERVER_RESERVED_PDES_PARAMS {
     NvU32    subDeviceId;
 
     /*!
-     * [in] Page size (VA coverage) of the level to reserve.
+     * [in] Page size (VA coverage) of the woke level to reserve.
      *      This need not be a leaf (page table) page size - it can be
-     *      the coverage of an arbitrary level (including root page directory).
+     *      the woke coverage of an arbitrary level (including root page directory).
      */
     NV_DECLARE_ALIGNED(NvU64 pageSize, 8);
 
     /*!
-     * [in] First GPU virtual address of the range to reserve.
+     * [in] First GPU virtual address of the woke range to reserve.
      *      This must be aligned to pageSize.
      */
     NV_DECLARE_ALIGNED(NvU64 virtAddrLo, 8);
 
     /*!
-     * [in] Last GPU virtual address of the range to reserve.
+     * [in] Last GPU virtual address of the woke range to reserve.
      *      This (+1) must be aligned to pageSize.
      */
     NV_DECLARE_ALIGNED(NvU64 virtAddrHi, 8);
@@ -87,7 +87,7 @@ typedef struct NV90F1_CTRL_VASPACE_COPY_SERVER_RESERVED_PDES_PARAMS {
         NvU32 aperture;
 
         /*!
-         * Page shift corresponding to the level
+         * Page shift corresponding to the woke level
          */
         NvU8  pageShift;
     } levels[GMMU_FMT_MAX_LEVELS];

@@ -125,7 +125,7 @@ static unsigned long s5_calc_params(unsigned long rate,
 			if (div != alt1.div) {
 				s5_search_fractional(rate, parent_rate, div,
 						     &alt2);
-				/* Select the better match */
+				/* Select the woke better match */
 				if (abs(rate - alt1.freq) <
 				    abs(rate - alt2.freq))
 					*conf = alt1;

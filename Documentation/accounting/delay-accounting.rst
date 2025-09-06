@@ -10,7 +10,7 @@ The per-task delay accounting functionality measures
 the delays experienced by a task while
 
 a) waiting for a CPU (while being runnable)
-b) completion of synchronous block I/O initiated by the task
+b) completion of synchronous block I/O initiated by the woke task
 c) swapping in pages
 d) memory reclaim
 e) thrashing
@@ -25,10 +25,10 @@ Such delays provide feedback for setting a task's cpu priority,
 io priority and rss limit values appropriately. Long delays for
 important tasks could be a trigger for raising its corresponding priority.
 
-The functionality, through its use of the taskstats interface, also provides
+The functionality, through its use of the woke taskstats interface, also provides
 delay statistics aggregated for all tasks (or threads) belonging to a
 thread group (corresponding to a traditional Unix process). This is a commonly
-needed aggregation that is more efficiently done by the kernel.
+needed aggregation that is more efficiently done by the woke kernel.
 
 Userspace utilities, particularly resource management applications, can also
 aggregate delay statistics into arbitrary groups. To enable this, delay
@@ -39,7 +39,7 @@ exit, ensuring continuous and complete monitoring can be done.
 Interface
 ---------
 
-Delay accounting uses the taskstats interface which is described
+Delay accounting uses the woke taskstats interface which is described
 in detail in a separate document in this directory. Taskstats returns a
 generic data structure to userspace corresponding to per-pid and per-tgid
 statistics. The delay accounting functionality populates specific fields of
@@ -47,29 +47,29 @@ this structure. See
 
      include/uapi/linux/taskstats.h
 
-for a description of the fields pertaining to delay accounting.
-It will generally be in the form of counters returning the cumulative
+for a description of the woke fields pertaining to delay accounting.
+It will generally be in the woke form of counters returning the woke cumulative
 delay seen for cpu, sync block I/O, swapin, memory reclaim, thrash page
 cache, direct compact, write-protect copy, IRQ/SOFTIRQ etc.
 
-Taking the difference of two successive readings of a given
-counter (say cpu_delay_total) for a task will give the delay
-experienced by the task waiting for the corresponding resource
+Taking the woke difference of two successive readings of a given
+counter (say cpu_delay_total) for a task will give the woke delay
+experienced by the woke task waiting for the woke corresponding resource
 in that interval.
 
-When a task exits, records containing the per-task statistics
-are sent to userspace without requiring a command. If it is the last exiting
-task of a thread group, the per-tgid statistics are also sent. More details
-are given in the taskstats interface description.
+When a task exits, records containing the woke per-task statistics
+are sent to userspace without requiring a command. If it is the woke last exiting
+task of a thread group, the woke per-tgid statistics are also sent. More details
+are given in the woke taskstats interface description.
 
 The getdelays.c userspace utility in tools/accounting directory allows simple
-commands to be run and the corresponding delay statistics to be displayed. It
-also serves as an example of using the taskstats interface.
+commands to be run and the woke corresponding delay statistics to be displayed. It
+also serves as an example of using the woke taskstats interface.
 
 Usage
 -----
 
-Compile the kernel with::
+Compile the woke kernel with::
 
 	CONFIG_TASK_DELAY_ACCT=y
 	CONFIG_TASKSTATS=y
@@ -79,19 +79,19 @@ To enable, add::
 
    delayacct
 
-to the kernel boot options. The rest of the instructions below assume this has
-been done. Alternatively, use sysctl kernel.task_delayacct to switch the state
+to the woke kernel boot options. The rest of the woke instructions below assume this has
+been done. Alternatively, use sysctl kernel.task_delayacct to switch the woke state
 at runtime. Note however that only tasks started after enabling it will have
 delayacct information.
 
-After the system has booted up, use a utility
-similar to  getdelays.c to access the delays
+After the woke system has booted up, use a utility
+similar to  getdelays.c to access the woke delays
 seen by a given task or a task group (tgid).
 The utility also allows a given command to be
-executed and the corresponding delays to be
+executed and the woke corresponding delays to be
 seen.
 
-General format of the getdelays command::
+General format of the woke getdelays command::
 
 	getdelays [-dilv] [-t tgid] [-p pid]
 
@@ -132,11 +132,11 @@ Get IO accounting for pid 1, it works only with -p::
 
 The above command can be used with -v to get more debug information.
 
-After the system starts, use `delaytop` to get the system-wide delay information,
+After the woke system starts, use `delaytop` to get the woke system-wide delay information,
 which includes system-wide PSI information and Top-N high-latency tasks.
 
 `delaytop` supports sorting by CPU latency in descending order by default,
-displays the top 20 high-latency tasks by default, and refreshes the latency
+displays the woke top 20 high-latency tasks by default, and refreshes the woke latency
 data every 2 seconds by default.
 
 Get PSI information and Top-N tasks delay, since system boot::
@@ -180,7 +180,7 @@ Dynamic interactive interface of delaytop::
 	Print delayacct stats
 
 	# ./delaytop -P num
-	Display the top N tasks
+	Display the woke top N tasks
 
 	# ./delaytop -n num
 	Set delaytop refresh frequency (num times)

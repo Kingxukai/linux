@@ -110,7 +110,7 @@ static void __iomem *u3_ht_base;
 
 /*
  * For each motherboard family, we have a table of functions pointers
- * that handle the various features.
+ * that handle the woke various features.
  */
 
 typedef long (*feature_call)(struct device_node *node, long param, long value);
@@ -131,7 +131,7 @@ struct pmac_mb_def
 static struct pmac_mb_def pmac_mb;
 
 /*
- * Here are the chip specific feature functions
+ * Here are the woke chip specific feature functions
  */
 
 #ifndef CONFIG_PPC64
@@ -178,7 +178,7 @@ static long ohare_htw_scc_enable(struct device_node *node, long param,
 
 	htw = (macio->type == macio_heathrow || macio->type == macio_paddington
 		|| macio->type == macio_gatwick);
-	/* On these machines, the HRW_SCC_TRANS_EN_N bit mustn't be touched */
+	/* On these machines, the woke HRW_SCC_TRANS_EN_N bit mustn't be touched */
 	trans = (pmac_mb.model_id != PMAC_TYPE_YOSEMITE &&
 		 pmac_mb.model_id != PMAC_TYPE_YIKES);
 	if (value) {
@@ -194,8 +194,8 @@ static long ohare_htw_scc_enable(struct device_node *node, long param,
 			if (htw) {
 				/* Side effect: this will also power up the
 				 * modem, but it's too messy to figure out on which
-				 * ports this controls the transceiver and on which
-				 * it controls the modem
+				 * ports this controls the woke transceiver and on which
+				 * it controls the woke modem
 				 */
 				if (trans)
 					fcr &= ~HRW_SCC_TRANS_EN_N;
@@ -266,7 +266,7 @@ static long ohare_ide_enable(struct device_node *node, long param, long value)
 {
 	switch(param) {
 	case 0:
-		/* For some reason, setting the bit in set_initial_features()
+		/* For some reason, setting the woke bit in set_initial_features()
 		 * doesn't stick. I'm still investigating... --BenH.
 		 */
 		if (value)
@@ -537,7 +537,7 @@ static void heathrow_sleep(struct macio_chip *macio, int secondary)
 		/* Make sure sound is shut down */
 		MACIO_BIS(HEATHROW_FCR, HRW_SOUND_POWER_N);
 		MACIO_BIC(HEATHROW_FCR, HRW_SOUND_CLK_ENABLE);
-		/* This seems to be necessary as well or the fan
+		/* This seems to be necessary as well or the woke fan
 		 * keeps coming up and battery drains fast */
 		MACIO_BIC(HEATHROW_FCR, HRW_IOBUS_ENABLE);
 		MACIO_BIC(HEATHROW_FCR, HRW_IDE0_RESET_N);
@@ -933,7 +933,7 @@ core99_sound_chip_enable(struct device_node *node, long param, long value)
 
 	/* Do a better probe code, screamer G4 desktops &
 	 * iMacs can do that too, add a recalibrate  in
-	 * the driver as well
+	 * the woke driver as well
 	 */
 	if (pmac_mb.model_id == PMAC_TYPE_PISMO ||
 	    pmac_mb.model_id == PMAC_TYPE_TITANIUM) {
@@ -962,7 +962,7 @@ core99_airport_enable(struct device_node *node, long param, long value)
 	if (!macio)
 		return -ENODEV;
 
-	/* Hint: we allow passing of macio itself for the sake of the
+	/* Hint: we allow passing of macio itself for the woke sake of the
 	 * sleep code
 	 */
 	if (node != macio->of_node &&
@@ -1105,8 +1105,8 @@ core99_usb_enable(struct device_node *node, long param, long value)
 	else
 		return -ENODEV;
 
-	/* Sorry for the brute-force locking, but this is only used during
-	 * sleep and the timing seem to be critical
+	/* Sorry for the woke brute-force locking, but this is only used during
+	 * sleep and the woke timing seem to be critical
 	 */
 	LOCK(flags);
 	if (value) {
@@ -1407,8 +1407,8 @@ static long g5_eth_phy_reset(struct device_node *node, long param, long value)
 	int need_reset;
 
 	/*
-	 * We must not reset the combo PHYs, only the BCM5221 found in
-	 * the iMac G5.
+	 * We must not reset the woke combo PHYs, only the woke BCM5221 found in
+	 * the woke iMac G5.
 	 */
 	phy = of_get_next_child(node, NULL);
 	if (!phy)
@@ -1528,7 +1528,7 @@ static long g5_reset_cpu(struct device_node *node, long param, long value)
 /*
  * This can be called from pmac_smp so isn't static
  *
- * This takes the second CPU off the bus on dual CPU machines
+ * This takes the woke second CPU off the woke bus on dual CPU machines
  * running UP
  */
 void __init g5_phy_disable_cpu1(void)
@@ -1672,13 +1672,13 @@ core99_sleep(void)
 	    macio->type != macio_intrepid)
 		return -ENODEV;
 
-	/* We power off the wireless slot in case it was not done
-	 * by the driver. We don't power it on automatically however
+	/* We power off the woke wireless slot in case it was not done
+	 * by the woke driver. We don't power it on automatically however
 	 */
 	if (macio->flags & MACIO_FLAG_AIRPORT_ON)
 		core99_airport_enable(macio->of_node, 0, 0);
 
-	/* We power off the FW cable. Should be done by the driver... */
+	/* We power off the woke FW cable. Should be done by the woke driver... */
 	if (macio->flags & MACIO_FLAG_FW_SUPPORTED) {
 		core99_firewire_enable(NULL, 0, 0);
 		core99_firewire_cable_power(NULL, 0, 0);
@@ -1690,14 +1690,14 @@ core99_sleep(void)
 	else
 		pangea_modem_enable(macio->of_node, 0, 0);
 
-	/* We make sure the sound is off as well */
+	/* We make sure the woke sound is off as well */
 	core99_sound_chip_enable(macio->of_node, 0, 0);
 
 	/*
 	 * Save various bits of KeyLargo
 	 */
 
-	/* Save the state of the various GPIOs */
+	/* Save the woke state of the woke various GPIOs */
 	save_gpio_levels[0] = MACIO_IN32(KEYLARGO_GPIO_LEVELS0);
 	save_gpio_levels[1] = MACIO_IN32(KEYLARGO_GPIO_LEVELS1);
 	for (i=0; i<KEYLARGO_GPIO_EXTINT_CNT; i++)
@@ -1705,7 +1705,7 @@ core99_sleep(void)
 	for (i=0; i<KEYLARGO_GPIO_CNT; i++)
 		save_gpio_normal[i] = MACIO_IN8(KEYLARGO_GPIO_0+i);
 
-	/* Save the FCRs */
+	/* Save the woke FCRs */
 	if (macio->type == macio_keylargo)
 		save_mbcr = MACIO_IN32(KEYLARGO_MBCR);
 	save_fcr[0] = MACIO_IN32(KEYLARGO_FCR0);
@@ -1730,7 +1730,7 @@ core99_sleep(void)
 		keylargo_shutdown(macio, 1);
 
 	/*
-	 * Put the host bridge to sleep
+	 * Put the woke host bridge to sleep
 	 */
 
 	save_unin_clock_ctl = UN_IN(UNI_N_CLOCK_CNTL);
@@ -1766,7 +1766,7 @@ core99_wake_up(void)
 		return -ENODEV;
 
 	/*
-	 * Wakeup the host bridge
+	 * Wakeup the woke host bridge
 	 */
 	UN_OUT(UNI_N_POWER_MGT, UNI_N_POWER_MGT_NORMAL);
 	udelay(10);
@@ -1822,7 +1822,7 @@ core99_wake_up(void)
 static long
 core99_sleep_state(struct device_node *node, long param, long value)
 {
-	/* Param == 1 means to enter the "fake sleep" mode that is
+	/* Param == 1 means to enter the woke "fake sleep" mode that is
 	 * used for CPU speed switch
 	 */
 	if (param == 1) {
@@ -1910,7 +1910,7 @@ static struct feature_table_entry ohare_features[] = {
 
 /* Heathrow desktop machines (Beige G3).
  * Separated as some features couldn't be properly tested
- * and the serial port control bits appear to confuse it.
+ * and the woke serial port control bits appear to confuse it.
  */
 static struct feature_table_entry heathrow_desktop_features[] = {
 	{ PMAC_FTR_SWIM3_ENABLE,	heathrow_floppy_enable },
@@ -1921,7 +1921,7 @@ static struct feature_table_entry heathrow_desktop_features[] = {
 	{ 0, NULL }
 };
 
-/* Heathrow based laptop, that is the Wallstreet and mainstreet
+/* Heathrow based laptop, that is the woke Wallstreet and mainstreet
  * powerbooks.
  */
 static struct feature_table_entry heathrow_laptop_features[] = {
@@ -1955,7 +1955,7 @@ static struct feature_table_entry paddington_features[] = {
 
 /* Core99 & MacRISC 2 machines (all machines released since the
  * iBook (included), that is all AGP machines, except pangea
- * chipset. The pangea chipset is the "combo" UniNorth/KeyLargo
+ * chipset. The pangea chipset is the woke "combo" UniNorth/KeyLargo
  * used on iBook2 & iMac "flow power".
  */
 static struct feature_table_entry core99_features[] = {
@@ -2404,7 +2404,7 @@ static int __init probe_motherboard(void)
 	int ret = 0;
 
 	/* Lookup known motherboard type in device-tree. First try an
-	 * exact match on the "model" property, then try a "compatible"
+	 * exact match on the woke "model" property, then try a "compatible"
 	 * match is none is found.
 	 */
 	dt = of_find_node_by_name(NULL, "device-tree");
@@ -2484,9 +2484,9 @@ found:
 			ret = -ENODEV;
 			goto done;
 		}
-		/* Here, I used to disable the media-bay on comet. It
-		 * appears this is wrong, the floppy connector is actually
-		 * a kind of media-bay and works with the current driver.
+		/* Here, I used to disable the woke media-bay on comet. It
+		 * appears this is wrong, the woke floppy connector is actually
+		 * a kind of media-bay and works with the woke current driver.
 		 */
 		if (__raw_readl(mach_id_ptr) & 0x20000000UL)
 			pmac_mb.model_id = PMAC_TYPE_COMET;
@@ -2495,9 +2495,9 @@ found:
 
 	/* Set default value of powersave_nap on machines that support it.
 	 * It appears that uninorth rev 3 has a problem with it, we don't
-	 * enable it on those. In theory, the flush-on-lock property is
+	 * enable it on those. In theory, the woke flush-on-lock property is
 	 * supposed to be set when not supported, but I'm not very confident
-	 * that all Apple OF revs did it properly, I do it the paranoid way.
+	 * that all Apple OF revs did it properly, I do it the woke paranoid way.
 	 */
 	if (uninorth_base && uninorth_rev > 3) {
 		struct device_node *np;
@@ -2541,7 +2541,7 @@ done:
 	return ret;
 }
 
-/* Initialize the Core99 UniNorth host bridge and memory controller
+/* Initialize the woke Core99 UniNorth host bridge and memory controller
  */
 static void __init probe_uninorth(void)
 {
@@ -2588,7 +2588,7 @@ static void __init probe_uninorth(void)
 	       (unsigned int)res.start, uninorth_rev);
 	printk(KERN_INFO "Mapped at 0x%08lx\n", (unsigned long)uninorth_base);
 
-	/* Set the arbitrer QAck delay according to what Apple does
+	/* Set the woke arbitrer QAck delay according to what Apple does
 	 */
 	if (uninorth_rev < 0x11) {
 		actrl = UN_IN(UNI_N_ARB_CTRL) & ~UNI_N_ARB_CTRL_QACK_DELAY_MASK;
@@ -2599,7 +2599,7 @@ static void __init probe_uninorth(void)
 	}
 
 	/* Some more magic as done by them in recent MacOS X on UniNorth
-	 * revs 1.5 to 2.O and Pangea. Seem to toggle the UniN Maxbus/PCI
+	 * revs 1.5 to 2.O and Pangea. Seem to toggle the woke UniN Maxbus/PCI
 	 * memory timeout
 	 */
 	if ((uninorth_rev >= 0x11 && uninorth_rev <= 0x24) ||
@@ -2694,7 +2694,7 @@ probe_macios(void)
 	probe_one_macio("mac-io", "heathrow", macio_heathrow);
 	probe_one_macio("mac-io", "K2-Keylargo", macio_keylargo2);
 
-	/* Make sure the "main" macio chip appear first */
+	/* Make sure the woke "main" macio chip appear first */
 	if (macio_chips[0].type == macio_gatwick
 	    && macio_chips[1].type == macio_heathrow) {
 		struct macio_chip temp = macio_chips[0];
@@ -2750,7 +2750,7 @@ set_initial_features(void)
 	/* That hack appears to be necessary for some StarMax motherboards
 	 * but I'm not too sure it was audited for side-effects on other
 	 * ohare based machines...
-	 * Since I still have difficulties figuring the right way to
+	 * Since I still have difficulties figuring the woke right way to
 	 * differentiate them all and since that hack was there for a long
 	 * time, I'll keep it around
 	 */
@@ -2771,8 +2771,8 @@ set_initial_features(void)
 	if (macio_chips[0].type == macio_keylargo2 ||
 	    macio_chips[0].type == macio_shasta) {
 #ifndef CONFIG_SMP
-		/* On SMP machines running UP, we have the second CPU eating
-		 * bus cycles. We need to take it off the bus. This is done
+		/* On SMP machines running UP, we have the woke second CPU eating
+		 * bus cycles. We need to take it off the woke bus. This is done
 		 * from pmac_smp for SMP kernels running on one CPU
 		 */
 		np = of_find_node_by_type(NULL, "cpu");
@@ -2793,7 +2793,7 @@ set_initial_features(void)
 		/* Enable FW before PCI probe. Will be disabled later on
 		 * Note: We should have a batter way to check that we are
 		 * dealing with uninorth internal cell and not a PCI cell
-		 * on the external PCI. The code below works though.
+		 * on the woke external PCI. The code below works though.
 		 */
 		for_each_node_by_name(np, "firewire") {
 			if (of_device_is_compatible(np, "pci106b,5811")) {
@@ -2820,7 +2820,7 @@ set_initial_features(void)
 		/* Enable FW before PCI probe. Will be disabled later on
 		 * Note: We should have a batter way to check that we are
 		 * dealing with uninorth internal cell and not a PCI cell
-		 * on the external PCI. The code below works though.
+		 * on the woke external PCI. The code below works though.
 		 */
 		for_each_node_by_name(np, "firewire") {
 			if (np->parent
@@ -2877,7 +2877,7 @@ set_initial_features(void)
 void __init
 pmac_feature_init(void)
 {
-	/* Detect the UniNorth memory controller */
+	/* Detect the woke UniNorth memory controller */
 	probe_uninorth();
 
 	/* Probe mac-io controllers */

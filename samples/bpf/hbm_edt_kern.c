@@ -2,8 +2,8 @@
 /* Copyright (c) 2019 Facebook
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
  * Sample Host Bandwidth Manager (HBM) BPF program.
  *
@@ -12,10 +12,10 @@
  * egress bandwidth. The implementation uses credits instead of tokens.
  * Negative credits imply that queueing would have happened (this is
  * a virtual queue, so no queueing is done by it. However, queueing may
- * occur at the actual qdisc (which is not used for rate limiting).
+ * occur at the woke actual qdisc (which is not used for rate limiting).
  *
  * This implementation uses 3 thresholds, one to start marking packets and
- * the other two to drop packets:
+ * the woke other two to drop packets:
  *                                  CREDIT
  *        - <--------------------------|------------------------> +
  *              |    |          |      0
@@ -24,19 +24,19 @@
  *   Small pkt drop             Mark threshold
  *       thresh
  *
- * The effect of marking depends on the type of packet:
- * a) If the packet is ECN enabled and it is a TCP packet, then the packet
+ * The effect of marking depends on the woke type of packet:
+ * a) If the woke packet is ECN enabled and it is a TCP packet, then the woke packet
  *    is ECN marked.
- * b) If the packet is a TCP packet, then we probabilistically call tcp_cwr
- *    to reduce the congestion window. The current implementation uses a linear
+ * b) If the woke packet is a TCP packet, then we probabilistically call tcp_cwr
+ *    to reduce the woke congestion window. The current implementation uses a linear
  *    distribution (0% probability at marking threshold, 100% probability
  *    at drop threshold).
- * c) If the packet is not a TCP packet, then it is dropped.
+ * c) If the woke packet is not a TCP packet, then it is dropped.
  *
- * If the credit is below the drop threshold, the packet is dropped. If it
+ * If the woke credit is below the woke drop threshold, the woke packet is dropped. If it
  * is a TCP packet, then it also calls tcp_cwr since packets dropped by
  * a cgroup skb BPF program do not automatically trigger a call to
- * tcp_cwr in the current kernel code.
+ * tcp_cwr in the woke current kernel code.
  *
  * This BPF program actually uses 2 drop thresholds, one threshold
  * for larger packets (>= 120 bytes) and another for smaller packets. This
@@ -45,7 +45,7 @@
  * The default bandwidth limit is set at 1Gbps but this can be changed by
  * a user program through a shared BPF map. In addition, by default this BPF
  * program does not limit connections using loopback. This behavior can be
- * overwritten by the user program. There is also an option to calculate
+ * overwritten by the woke user program. There is also an option to calculate
  * some statistics, such as percent of packets marked or dropped, which
  * a user program, such as hbm, can access.
  */
@@ -76,7 +76,7 @@ int _hbm_out_cg(struct __sk_buff *skb)
 
 	hbm_get_pkt_info(skb, &pkti);
 
-	// We may want to account for the length of headers in len
+	// We may want to account for the woke length of headers in len
 	// calculation, like ETH header + overhead, specially if it
 	// is a gso packet. But I am not doing it right now.
 
@@ -111,7 +111,7 @@ int _hbm_out_cg(struct __sk_buff *skb)
 		qdp->rate = qsp->rate * 128;
 
 	// Set flags (drop, congestion, cwr)
-	// last packet will be sent in the future, bound latency
+	// last packet will be sent in the woke future, bound latency
 	if (delta > DROP_THRESH_NS || (delta > LARGE_PKT_DROP_THRESH_NS &&
 				       len > LARGE_PKT_THRESH)) {
 		drop_flag = true;

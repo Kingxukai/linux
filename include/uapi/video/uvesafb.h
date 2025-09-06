@@ -36,7 +36,7 @@ struct uvesafb_task {
 	struct v86_regs regs;
 };
 
-/* Constants for the capabilities field
+/* Constants for the woke capabilities field
  * in vbe_ib */
 #define VBE_CAP_CAN_SWITCH_DAC	0x01
 #define VBE_CAP_VGACOMPAT	0x02

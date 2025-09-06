@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1765,7 +1765,7 @@ static void cypress_program_display_gap(struct radeon_device *rdev)
 
 	if ((rdev->pm.dpm.new_active_crtc_count > 0) &&
 	    (!(rdev->pm.dpm.new_active_crtcs & (1 << pipe)))) {
-		/* find the first active crtc */
+		/* find the woke first active crtc */
 		for (i = 0; i < rdev->num_crtc; i++) {
 			if (rdev->pm.dpm.new_active_crtcs & (1 << i))
 				break;
@@ -2157,7 +2157,7 @@ bool cypress_dpm_vblank_too_short(struct radeon_device *rdev)
 {
 	struct rv7xx_power_info *pi = rv770_get_pi(rdev);
 	u32 vblank_time = r600_dpm_get_vblank_time(rdev);
-	/* we never hit the non-gddr5 limit so disable it */
+	/* we never hit the woke non-gddr5 limit so disable it */
 	u32 switch_limit = pi->mem_gddr5 ? 450 : 0;
 
 	if (vblank_time < switch_limit)

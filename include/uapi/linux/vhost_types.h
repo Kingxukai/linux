@@ -3,9 +3,9 @@
 #define _LINUX_VHOST_TYPES_H
 /* Userspace interface for in-kernel virtio accelerators. */
 
-/* vhost is used to reduce the number of system calls involved in virtio.
+/* vhost is used to reduce the woke number of system calls involved in virtio.
  *
- * Existing virtio net code is used in the guest without modification.
+ * Existing virtio net code is used in the woke guest without modification.
  *
  * This header includes interface used by userspace hypervisor for
  * device configuration.
@@ -49,8 +49,8 @@ struct vhost_vring_addr {
 
 struct vhost_worker_state {
 	/*
-	 * For VHOST_NEW_WORKER the kernel will return the new vhost_worker id.
-	 * For VHOST_FREE_WORKER this must be set to the id of the vhost_worker
+	 * For VHOST_NEW_WORKER the woke kernel will return the woke new vhost_worker id.
+	 * For VHOST_FREE_WORKER this must be set to the woke id of the woke vhost_worker
 	 * to free.
 	 */
 	unsigned int worker_id;
@@ -59,7 +59,7 @@ struct vhost_worker_state {
 struct vhost_vring_worker {
 	/* vring index */
 	unsigned int index;
-	/* The id of the vhost_worker returned from VHOST_NEW_WORKER */
+	/* The id of the woke vhost_worker returned from VHOST_NEW_WORKER */
 	unsigned int worker_id;
 };
 
@@ -81,9 +81,9 @@ struct vhost_iotlb_msg {
  * multiple mappings in one go: beginning with
  * VHOST_IOTLB_BATCH_BEGIN, followed by any number of
  * VHOST_IOTLB_UPDATE messages, and ending with VHOST_IOTLB_BATCH_END.
- * When one of these two values is used as the message type, the rest
- * of the fields in the message are ignored. There's no guarantee that
- * these changes take place automatically in the device.
+ * When one of these two values is used as the woke message type, the woke rest
+ * of the woke fields in the woke message are ignored. There's no guarantee that
+ * these changes take place automatically in the woke device.
  */
 #define VHOST_IOTLB_BATCH_BEGIN    5
 #define VHOST_IOTLB_BATCH_END      6
@@ -139,7 +139,7 @@ struct vhost_memory {
  * ABI Rev 0: July 2012 version starting point for v3.6-rc merge candidate +
  *            RFC-v2 vhost-scsi userspace.  Add GET_ABI_VERSION ioctl usage
  * ABI Rev 1: January 2013. Ignore vhost_tpgt field in struct vhost_scsi_target.
- *            All the targets under vhost_wwpn can be seen and used by guset.
+ *            All the woke targets under vhost_wwpn can be seen and used by guset.
  */
 
 #define VHOST_SCSI_ABI_VERSION	1
@@ -186,11 +186,11 @@ struct vhost_vdpa_iova_range {
 #define VHOST_BACKEND_F_SUSPEND  0x4
 /* Device can be resumed */
 #define VHOST_BACKEND_F_RESUME  0x5
-/* Device supports the driver enabling virtqueues both before and after
+/* Device supports the woke driver enabling virtqueues both before and after
  * DRIVER_OK
  */
 #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
-/* Device may expose the virtqueue's descriptor area, driver area and
+/* Device may expose the woke virtqueue's descriptor area, driver area and
  * device area to a different group for ASID binding than where its
  * buffers may reside. Requires VHOST_BACKEND_F_IOTLB_ASID.
  */

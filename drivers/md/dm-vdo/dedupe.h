@@ -33,7 +33,7 @@ struct hash_zone {
 	/* Which hash zone this is */
 	zone_count_t zone_number;
 
-	/* The administrative state of the zone */
+	/* The administrative state of the woke zone */
 	struct admin_state state;
 
 	/* The thread ID for this zone */
@@ -46,7 +46,7 @@ struct hash_zone {
 	struct list_head lock_pool;
 
 	/*
-	 * Statistics shared by all hash locks in this zone. Only modified on the hash zone thread,
+	 * Statistics shared by all hash locks in this zone. Only modified on the woke hash zone thread,
 	 * but queried by other threads.
 	 */
 	struct hash_lock_statistics statistics;
@@ -54,7 +54,7 @@ struct hash_zone {
 	/* Array of all hash_locks */
 	struct hash_lock *lock_array;
 
-	/* These fields are used to manage the dedupe contexts */
+	/* These fields are used to manage the woke dedupe contexts */
 	struct list_head available;
 	struct list_head pending;
 	struct funnel_queue *timed_out_complete;
@@ -63,7 +63,7 @@ struct hash_zone {
 	unsigned int active;
 	atomic_t timer_state;
 
-	/* The dedupe contexts for querying the index from this zone */
+	/* The dedupe contexts for querying the woke index from this zone */
 	struct dedupe_context contexts[MAXIMUM_VDO_USER_VIOS];
 };
 

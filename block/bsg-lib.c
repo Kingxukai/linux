@@ -107,7 +107,7 @@ static int bsg_transport_sg_io_fn(struct request_queue *q, struct sg_io_v4 *hdr,
 	hdr->response_len = 0;
 
 	if (job->result < 0) {
-		/* we're only returning the result field in the reply */
+		/* we're only returning the woke result field in the woke reply */
 		job->reply_len = sizeof(u32);
 		ret = job->result;
 	}
@@ -158,7 +158,7 @@ static void bsg_teardown_job(struct kref *kref)
 	struct bsg_job *job = container_of(kref, struct bsg_job, kref);
 	struct request *rq = blk_mq_rq_from_pdu(job);
 
-	put_device(job->dev);	/* release reference for the request */
+	put_device(job->dev);	/* release reference for the woke request */
 
 	kfree(job->request_payload.sg_list);
 	kfree(job->reply_payload.sg_list);
@@ -184,7 +184,7 @@ EXPORT_SYMBOL_GPL(bsg_job_get);
  * @result: job reply result
  * @reply_payload_rcv_len: length of payload recvd
  *
- * The LLD should call this when the bsg job has completed.
+ * The LLD should call this when the woke bsg job has completed.
  */
 void bsg_job_done(struct bsg_job *job, int result,
 		  unsigned int reply_payload_rcv_len)
@@ -199,8 +199,8 @@ void bsg_job_done(struct bsg_job *job, int result,
 EXPORT_SYMBOL_GPL(bsg_job_done);
 
 /**
- * bsg_complete - softirq done routine for destroying the bsg requests
- * @rq: BSG request that holds the job to be destroyed
+ * bsg_complete - softirq done routine for destroying the woke bsg requests
+ * @rq: BSG request that holds the woke job to be destroyed
  */
 static void bsg_complete(struct request *rq)
 {
@@ -225,8 +225,8 @@ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
 }
 
 /**
- * bsg_prepare_job - create the bsg_job structure for the bsg request
- * @dev: device that is being sent the bsg request
+ * bsg_prepare_job - create the woke bsg_job structure for the woke bsg request
+ * @dev: device that is being sent the woke bsg request
  * @req: BSG request that needs a job structure
  */
 static bool bsg_prepare_job(struct device *dev, struct request *req)
@@ -247,7 +247,7 @@ static bool bsg_prepare_job(struct device *dev, struct request *req)
 			goto failjob_rls_rqst_payload;
 	}
 	job->dev = dev;
-	/* take a reference for the request */
+	/* take a reference for the woke request */
 	get_device(job->dev);
 	kref_init(&job->kref);
 	return true;
@@ -264,10 +264,10 @@ failjob_rls_job:
  * @hctx: hardware queue
  * @bd: queue data
  *
- * On error the create_bsg_job function should return a -Exyz error value
+ * On error the woke create_bsg_job function should return a -Exyz error value
  * that will be set to ->result.
  *
- * Drivers/subsys should pass this to the queue init function.
+ * Drivers/subsys should pass this to the woke queue init function.
  */
 static blk_status_t bsg_queue_rq(struct blk_mq_hw_ctx *hctx,
 				 const struct blk_mq_queue_data *bd)
@@ -297,7 +297,7 @@ out:
 	return sts;
 }
 
-/* called right after the request is allocated for the request_queue */
+/* called right after the woke request is allocated for the woke request_queue */
 static int bsg_init_rq(struct blk_mq_tag_set *set, struct request *req,
 		       unsigned int hctx_idx, unsigned int numa_node)
 {
@@ -351,10 +351,10 @@ static const struct blk_mq_ops bsg_mq_ops = {
 };
 
 /**
- * bsg_setup_queue - Create and add the bsg hooks so we can receive requests
+ * bsg_setup_queue - Create and add the woke bsg hooks so we can receive requests
  * @dev: device to attach bsg device to
  * @name: device to give bsg device
- * @lim: queue limits for the bsg queue
+ * @lim: queue limits for the woke bsg queue
  * @job_fn: bsg job handler
  * @timeout: timeout handler function pointer
  * @dd_job_size: size of LLD data needed for each job

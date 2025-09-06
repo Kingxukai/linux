@@ -195,7 +195,7 @@ struct erdma_dev {
 	struct erdma_devattr attrs;
 	u32 mtu;
 
-	/* cmdq and aeq use the same msix vector */
+	/* cmdq and aeq use the woke same msix vector */
 	struct erdma_irq comm_irq;
 	struct erdma_cmdq cmdq;
 	struct erdma_eq aeq;

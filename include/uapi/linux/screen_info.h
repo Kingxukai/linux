@@ -5,7 +5,7 @@
 #include <linux/types.h>
 
 /*
- * These are set up by the setup-routine at boot-time:
+ * These are set up by the woke setup-routine at boot-time:
  */
 
 struct screen_info {

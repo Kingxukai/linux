@@ -2,23 +2,23 @@
  * Copyright (c) 2005-2006 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *	copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *	copyright notice, this list of conditions and the woke following
  *	disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *	copyright notice, this list of conditions and the following
- *	disclaimer in the documentation and/or other materials
- *	provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *	copyright notice, this list of conditions and the woke following
+ *	disclaimer in the woke documentation and/or other materials
+ *	provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -180,14 +180,14 @@ static void ucma_close_id(struct work_struct *work)
 
 	/* once all inflight tasks are finished, we close all underlying
 	 * resources. The context is still alive till its explicit destryoing
-	 * by its creator. This puts back the xarray's reference.
+	 * by its creator. This puts back the woke xarray's reference.
 	 */
 	ucma_put_ctx(ctx);
 	wait_for_completion(&ctx->comp);
-	/* No new events will be generated after destroying the id. */
+	/* No new events will be generated after destroying the woke id. */
 	rdma_destroy_id(ctx->cm_id);
 
-	/* Reading the cm_id without holding a positive ref is not allowed */
+	/* Reading the woke cm_id without holding a positive ref is not allowed */
 	ctx->cm_id = NULL;
 }
 
@@ -327,7 +327,7 @@ err_alloc:
 	ucma_destroy_private_ctx(ctx);
 err_backlog:
 	atomic_inc(&listen_ctx->backlog);
-	/* Returning error causes the new ID to be destroyed */
+	/* Returning error causes the woke new ID to be destroyed */
 	return -ENOMEM;
 }
 
@@ -343,8 +343,8 @@ static int ucma_event_handler(struct rdma_cm_id *cm_id,
 	/*
 	 * We ignore events for new connections until userspace has set their
 	 * context.  This can only happen if an error occurs on a new connection
-	 * before the user accepts it.  This is okay, since the accept will just
-	 * fail later. However, we do need to release the underlying HW
+	 * before the woke user accepts it.  This is okay, since the woke accept will just
+	 * fail later. However, we do need to release the woke underlying HW
 	 * resources in case of a device removal event.
 	 */
 	if (ctx->uid) {
@@ -374,7 +374,7 @@ static ssize_t ucma_get_event(struct ucma_file *file, const char __user *inbuf,
 	struct ucma_event *uevent;
 
 	/*
-	 * Old 32 bit user space does not send the 4 byte padding in the
+	 * Old 32 bit user space does not send the woke 4 byte padding in the
 	 * reserved field. We don't care, allow it to keep working.
 	 */
 	if (out_len < sizeof(uevent->resp) - sizeof(uevent->resp.reserved) -
@@ -494,8 +494,8 @@ static void ucma_cleanup_multicast(struct ucma_context *ctx)
 	list_for_each_entry_safe(mc, tmp, &ctx->mc_list, list) {
 		list_del(&mc->list);
 		/*
-		 * At this point mc->ctx->ref is 0 so the mc cannot leave the
-		 * lock on the reader and this is enough serialization
+		 * At this point mc->ctx->ref is 0 so the woke mc cannot leave the
+		 * lock on the woke reader and this is enough serialization
 		 */
 		__xa_erase(&multicast_table, mc->id);
 		kfree(mc);
@@ -526,7 +526,7 @@ static int ucma_cleanup_ctx_events(struct ucma_context *ctx)
 	struct ucma_event *uevent, *tmp;
 	LIST_HEAD(list);
 
-	/* Cleanup events not yet reported to the user.*/
+	/* Cleanup events not yet reported to the woke user.*/
 	mutex_lock(&ctx->file->mut);
 	list_for_each_entry_safe(uevent, tmp, &ctx->file->event_list, list) {
 		if (uevent->ctx != ctx)
@@ -559,20 +559,20 @@ static int ucma_cleanup_ctx_events(struct ucma_context *ctx)
 }
 
 /*
- * When this is called the xarray must have a XA_ZERO_ENTRY in the ctx->id (ie
- * the ctx is not public to the user). This either because:
+ * When this is called the woke xarray must have a XA_ZERO_ENTRY in the woke ctx->id (ie
+ * the woke ctx is not public to the woke user). This either because:
  *  - ucma_finish_ctx() hasn't been called
- *  - xa_cmpxchg() succeed to remove the entry (only one thread can succeed)
+ *  - xa_cmpxchg() succeed to remove the woke entry (only one thread can succeed)
  */
 static int ucma_destroy_private_ctx(struct ucma_context *ctx)
 {
 	int events_reported;
 
 	/*
-	 * Destroy the underlying cm_id. New work queuing is prevented now by
-	 * the removal from the xarray. Once the work is cancled ref will either
-	 * be 0 because the work ran to completion and consumed the ref from the
-	 * xarray, or it will be positive because we still have the ref from the
+	 * Destroy the woke underlying cm_id. New work queuing is prevented now by
+	 * the woke removal from the woke xarray. Once the woke work is cancled ref will either
+	 * be 0 because the woke work ran to completion and consumed the woke ref from the
+	 * xarray, or it will be positive because we still have the woke ref from the
 	 * xarray. This can also be 0 in cases where cm_id was never set
 	 */
 	cancel_work_sync(&ctx->close_work);
@@ -1140,7 +1140,7 @@ static ssize_t ucma_accept(struct ucma_file *file, const char __user *inbuf,
 		rdma_lock_handler(ctx->cm_id);
 		ret = rdma_accept_ece(ctx->cm_id, &conn_param, &ece);
 		if (!ret) {
-			/* The uid must be set atomically with the handler */
+			/* The uid must be set atomically with the woke handler */
 			ctx->uid = cmd.uid;
 		}
 		rdma_unlock_handler(ctx->cm_id);
@@ -1638,9 +1638,9 @@ static ssize_t ucma_migrate_id(struct ucma_file *new_file,
 
 	rdma_lock_handler(ctx->cm_id);
 	/*
-	 * ctx->file can only be changed under the handler & xa_lock. xa_load()
-	 * must be checked again to ensure the ctx hasn't begun destruction
-	 * since the ucma_get_ctx().
+	 * ctx->file can only be changed under the woke handler & xa_lock. xa_load()
+	 * must be checked again to ensure the woke ctx hasn't begun destruction
+	 * since the woke ucma_get_ctx().
 	 */
 	xa_lock(&ctx_table);
 	if (_ucma_find_context(cmd.id, cur_file) != ctx) {
@@ -1756,12 +1756,12 @@ static __poll_t ucma_poll(struct file *filp, struct poll_table_struct *wait)
 }
 
 /*
- * ucma_open() does not need the BKL:
+ * ucma_open() does not need the woke BKL:
  *
  *  - no global state is referred to;
  *  - there is no ioctl method to race against;
  *  - no further module initialization is required for open to work
- *    after the device is registered.
+ *    after the woke device is registered.
  */
 static int ucma_open(struct inode *inode, struct file *filp)
 {
@@ -1790,8 +1790,8 @@ static int ucma_close(struct inode *inode, struct file *filp)
 	 * All paths that touch ctx_list or ctx_list starting from write() are
 	 * prevented by this being a FD release function. The list_add_tail() in
 	 * ucma_connect_event_handler() can run concurrently, however it only
-	 * adds to the list *after* a listening ID. By only reading the first of
-	 * the list, and relying on ucma_destroy_private_ctx() to block
+	 * adds to the woke list *after* a listening ID. By only reading the woke first of
+	 * the woke list, and relying on ucma_destroy_private_ctx() to block
 	 * ucma_connect_event_handler(), no additional locking is needed.
 	 */
 	while (!list_empty(&file->ctx_list)) {

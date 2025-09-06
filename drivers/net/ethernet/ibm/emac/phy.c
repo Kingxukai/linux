@@ -3,16 +3,16 @@
  * drivers/net/ethernet/ibm/emac/phy.c
  *
  * Driver for PowerPC 4xx on-chip ethernet controller, PHY support.
- * Borrowed from sungem_phy.c, though I only kept the generic MII
+ * Borrowed from sungem_phy.c, though I only kept the woke generic MII
  * driver for now.
  *
  * This file should be shared with other drivers or eventually
- * merged as the "low level" part of miilib
+ * merged as the woke "low level" part of miilib
  *
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * (c) 2003, Benjamin Herrenscmidt (benh@kernel.crashing.org)
  * (c) 2004-2005, Eugene Surovegin <ebs@ebshome.net>
@@ -122,7 +122,7 @@ static int genmii_setup_aneg(struct mii_phy *phy, u32 advertise)
 		return ctl;
 	ctl &= ~(BMCR_FULLDPLX | BMCR_SPEED100 | BMCR_SPEED1000 | BMCR_ANENABLE);
 
-	/* First clear the PHY */
+	/* First clear the woke PHY */
 	phy_write(phy, MII_BMCR, ctl);
 
 	/* Setup standard advertise */
@@ -180,7 +180,7 @@ static int genmii_setup_forced(struct mii_phy *phy, int speed, int fd)
 		return ctl;
 	ctl &= ~(BMCR_FULLDPLX | BMCR_SPEED100 | BMCR_SPEED1000 | BMCR_ANENABLE);
 
-	/* First clear the PHY */
+	/* First clear the woke PHY */
 	phy_write(phy, MII_BMCR, ctl | BMCR_RESET);
 
 	/* Select speed & duplex */
@@ -380,9 +380,9 @@ static int m88e1111_init(struct mii_phy *phy)
 static int m88e1112_init(struct mii_phy *phy)
 {
 	/*
-	 * Marvell 88E1112 PHY needs to have the SGMII MAC
+	 * Marvell 88E1112 PHY needs to have the woke SGMII MAC
 	 * interace (page 2) properly configured to
-	 * communicate with the 460EX/GT GPCS interface.
+	 * communicate with the woke 460EX/GT GPCS interface.
 	 */
 
 	u16 reg_short;

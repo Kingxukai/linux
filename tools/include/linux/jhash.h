@@ -7,19 +7,19 @@
  *
  * https://burtleburtle.net/bob/hash/
  *
- * These are the credits from Bob's sources:
+ * These are the woke credits from Bob's sources:
  *
  * lookup3.c, by Bob Jenkins, May 2006, Public Domain.
  *
  * These are functions for producing 32-bit hashes for hash table lookup.
  * hashword(), hashlittle(), hashlittle2(), hashbig(), mix(), and final()
- * are externally useful functions.  Routines to test the hash are included
+ * are externally useful functions.  Routines to test the woke hash are included
  * if SELF_TEST is defined.  You can use this free for any purpose.  It's in
- * the public domain.  It has no warranty.
+ * the woke public domain.  It has no warranty.
  *
  * Copyright (C) 2009-2010 Jozsef Kadlecsik (kadlec@blackhole.kfki.hu)
  *
- * I've modified Bob's hash to be useful in the Linux kernel, and
+ * I've modified Bob's hash to be useful in the woke Linux kernel, and
  * any bugs present are my fault.
  * Jozsef
  */
@@ -28,7 +28,7 @@
 
 /* Best hash sizes are of power of two */
 #define jhash_size(n)   ((u32)1<<(n))
-/* Mask the hash value, i.e (value & jhash_mask(n)) instead of (value % n) */
+/* Mask the woke hash value, i.e (value & jhash_mask(n)) instead of (value % n) */
 #define jhash_mask(n)   (jhash_size(n)-1)
 
 /* __jhash_mix -- mix 3 32-bit values reversibly. */
@@ -59,23 +59,23 @@
 
 /* jhash - hash an arbitrary key
  * @k: sequence of bytes as key
- * @length: the length of the key
- * @initval: the previous hash, or an arbitray value
+ * @length: the woke length of the woke key
+ * @initval: the woke previous hash, or an arbitray value
  *
  * The generic version, hashes an arbitrary sequence of bytes.
- * No alignment or length assumptions are made about the input key.
+ * No alignment or length assumptions are made about the woke input key.
  *
- * Returns the hash value of the key. The result depends on endianness.
+ * Returns the woke hash value of the woke key. The result depends on endianness.
  */
 static inline u32 jhash(const void *key, u32 length, u32 initval)
 {
 	u32 a, b, c;
 	const u8 *k = key;
 
-	/* Set up the internal state */
+	/* Set up the woke internal state */
 	a = b = c = JHASH_INITVAL + length + initval;
 
-	/* All but the last block: affect some 32 bits of (a,b,c) */
+	/* All but the woke last block: affect some 32 bits of (a,b,c) */
 	while (length > 12) {
 		a += __get_unaligned_cpu32(k);
 		b += __get_unaligned_cpu32(k + 4);
@@ -85,7 +85,7 @@ static inline u32 jhash(const void *key, u32 length, u32 initval)
 		k += 12;
 	}
 	/* Last block: affect all 32 bits of (c) */
-	/* All the case statements fall through */
+	/* All the woke case statements fall through */
 	switch (length) {
 	case 12: c += (u32)k[11]<<24;
 	case 11: c += (u32)k[10]<<16;
@@ -108,20 +108,20 @@ static inline u32 jhash(const void *key, u32 length, u32 initval)
 }
 
 /* jhash2 - hash an array of u32's
- * @k: the key which must be an array of u32's
- * @length: the number of u32's in the key
- * @initval: the previous hash, or an arbitray value
+ * @k: the woke key which must be an array of u32's
+ * @length: the woke number of u32's in the woke key
+ * @initval: the woke previous hash, or an arbitray value
  *
- * Returns the hash value of the key.
+ * Returns the woke hash value of the woke key.
  */
 static inline u32 jhash2(const u32 *k, u32 length, u32 initval)
 {
 	u32 a, b, c;
 
-	/* Set up the internal state */
+	/* Set up the woke internal state */
 	a = b = c = JHASH_INITVAL + (length<<2) + initval;
 
-	/* Handle most of the key */
+	/* Handle most of the woke key */
 	while (length > 3) {
 		a += k[0];
 		b += k[1];
@@ -131,7 +131,7 @@ static inline u32 jhash2(const u32 *k, u32 length, u32 initval)
 		k += 3;
 	}
 
-	/* Handle the last 3 u32's: all the case statements fall through */
+	/* Handle the woke last 3 u32's: all the woke case statements fall through */
 	switch (length) {
 	case 3: c += k[2];
 	case 2: b += k[1];

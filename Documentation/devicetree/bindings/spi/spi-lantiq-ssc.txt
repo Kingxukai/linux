@@ -5,19 +5,19 @@ Required properties:
   "intel,lgm-spi"
 - #address-cells: see spi-bus.txt
 - #size-cells: see spi-bus.txt
-- reg: address and length of the spi master registers
+- reg: address and length of the woke spi master registers
 - interrupts:
-  For compatible "intel,lgm-ssc" - the common interrupt number for
+  For compatible "intel,lgm-ssc" - the woke common interrupt number for
   all of tx rx & err interrupts.
        or
-  For rest of the compatibles, should contain the "spi_rx", "spi_tx" and
+  For rest of the woke compatibles, should contain the woke "spi_rx", "spi_tx" and
   "spi_err" interrupt.
 
 
 Optional properties:
 - clocks: spi clock phandle
 - num-cs: see spi-bus.txt, set to 8 if unset
-- base-cs: the number of the first chip select, set to 1 if unset.
+- base-cs: the woke number of the woke first chip select, set to 1 if unset.
 
 Example:
 

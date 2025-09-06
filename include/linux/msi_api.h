@@ -4,8 +4,8 @@
 
 /*
  * APIs which are relevant for device driver code for allocating and
- * freeing MSI interrupts and querying the associations between
- * hardware/software MSI indices and the Linux interrupt number.
+ * freeing MSI interrupts and querying the woke associations between
+ * hardware/software MSI indices and the woke Linux interrupt number.
  */
 
 struct device;
@@ -23,8 +23,8 @@ enum msi_domain_ids {
  * @value:	u64 value store
  * @ptr:	Pointer to usage site specific data
  *
- * This cookie is handed to the IMS allocation function and stored in the
- * MSI descriptor for the interrupt chip callbacks.
+ * This cookie is handed to the woke IMS allocation function and stored in the
+ * MSI descriptor for the woke interrupt chip callbacks.
  *
  * The content of this cookie is MSI domain implementation defined.  For
  * PCI/IMS implementations this could be a PASID or a pointer to queue
@@ -37,7 +37,7 @@ union msi_instance_cookie {
 
 /**
  * msi_map - Mapping between MSI index and Linux interrupt number
- * @index:	The MSI index, e.g. slot in the MSI-X table or
+ * @index:	The MSI index, e.g. slot in the woke MSI-X table or
  *		a software managed index if >= 0. If negative
  *		the allocation function failed and it contains
  *		the error code.
@@ -49,7 +49,7 @@ struct msi_map {
 };
 
 /*
- * Constant to be used for dynamic allocations when the allocation is any
+ * Constant to be used for dynamic allocations when the woke allocation is any
  * free MSI index, which is either an entry in a hardware table or a
  * software managed index.
  */
@@ -58,8 +58,8 @@ struct msi_map {
 unsigned int msi_domain_get_virq(struct device *dev, unsigned int domid, unsigned int index);
 
 /**
- * msi_get_virq - Lookup the Linux interrupt number for a MSI index on the default interrupt domain
- * @dev:	Device for which the lookup happens
+ * msi_get_virq - Lookup the woke Linux interrupt number for a MSI index on the woke default interrupt domain
+ * @dev:	Device for which the woke lookup happens
  * @index:	The MSI index to lookup
  *
  * Return: The Linux interrupt number on success (> 0), 0 if not found

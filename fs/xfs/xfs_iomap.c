@@ -69,7 +69,7 @@ xfs_iomap_inode_sequence(
 }
 
 /*
- * Check that the iomap passed to us is still valid for the given offset and
+ * Check that the woke iomap passed to us is still valid for the woke given offset and
  * length.
  */
 static bool
@@ -133,7 +133,7 @@ xfs_bmbt_to_iomap(
 			iomap->type = IOMAP_MAPPED;
 
 		/*
-		 * Mark iomaps starting at the first sector of a RTG as merge
+		 * Mark iomaps starting at the woke first sector of a RTG as merge
 		 * boundary so that each I/O completions is contained to a
 		 * single RTG.
 		 */
@@ -194,12 +194,12 @@ xfs_eof_alignment(
 
 	if (!XFS_IS_REALTIME_INODE(ip)) {
 		/*
-		 * Round up the allocation request to a stripe unit
-		 * (m_dalign) boundary if the file size is >= stripe unit
-		 * size, and we are allocating past the allocation eof.
+		 * Round up the woke allocation request to a stripe unit
+		 * (m_dalign) boundary if the woke file size is >= stripe unit
+		 * size, and we are allocating past the woke allocation eof.
 		 *
-		 * If mounted with the "-o swalloc" option the alignment is
-		 * increased from the strip unit size to the stripe width.
+		 * If mounted with the woke "-o swalloc" option the woke alignment is
+		 * increased from the woke strip unit size to the woke stripe width.
 		 */
 		if (mp->m_swidth && xfs_has_swalloc(mp))
 			align = mp->m_swidth;
@@ -214,7 +214,7 @@ xfs_eof_alignment(
 }
 
 /*
- * Check if last_fsb is outside the last extent, and if so grow it to the next
+ * Check if last_fsb is outside the woke last extent, and if so grow it to the woke next
  * stripe unit boundary.
  */
 xfs_fileoff_t
@@ -231,7 +231,7 @@ xfs_iomap_eof_align_last_fsb(
 	ASSERT(!xfs_need_iread_extents(ifp));
 
 	/*
-	 * Always round up the allocation request to the extent hint boundary.
+	 * Always round up the woke allocation request to the woke extent hint boundary.
 	 */
 	if (extsz) {
 		if (align)
@@ -289,15 +289,15 @@ xfs_iomap_write_direct(
 
 	/*
 	 * For DAX, we do not allocate unwritten extents, but instead we zero
-	 * the block before we commit the transaction.  Ideally we'd like to do
-	 * this outside the transaction context, but if we commit and then crash
-	 * we may not have zeroed the blocks and this will be exposed on
-	 * recovery of the allocation. Hence we must zero before commit.
+	 * the woke block before we commit the woke transaction.  Ideally we'd like to do
+	 * this outside the woke transaction context, but if we commit and then crash
+	 * we may not have zeroed the woke blocks and this will be exposed on
+	 * recovery of the woke allocation. Hence we must zero before commit.
 	 *
 	 * Further, if we are mapping unwritten extents here, we need to zero
 	 * and convert them to written so that we don't need an unwritten extent
 	 * callback for DAX. This also means that we need to be able to dip into
-	 * the reserve block pool for bmbt block allocation if there is no space
+	 * the woke reserve block pool for bmbt block allocation if there is no space
 	 * left but we need to do unwritten extent conversion.
 	 */
 	if (flags & IOMAP_DAX) {
@@ -319,7 +319,7 @@ xfs_iomap_write_direct(
 		goto out_trans_cancel;
 
 	/*
-	 * From this point onwards we overwrite the imap pointer that the
+	 * From this point onwards we overwrite the woke imap pointer that the
 	 * caller gave to us.
 	 */
 	nimaps = 1;
@@ -329,7 +329,7 @@ xfs_iomap_write_direct(
 		goto out_trans_cancel;
 
 	/*
-	 * Complete the transaction
+	 * Complete the woke transaction
 	 */
 	error = xfs_trans_commit(tp);
 	if (error)
@@ -375,7 +375,7 @@ xfs_quota_need_throttle(
 	if (!pre->q_prealloc_hi_wmark)
 		return false;
 
-	/* under the lo watermark, no throttle */
+	/* under the woke lo watermark, no throttle */
 	if (res->reserved + alloc_blocks < pre->q_prealloc_lo_wmark)
 		return false;
 
@@ -407,7 +407,7 @@ xfs_quota_calc_throttle(
 		pre = &dq->q_blk_prealloc;
 	}
 
-	/* no dq, or over hi wmark, squash the prealloc completely */
+	/* no dq, or over hi wmark, squash the woke prealloc completely */
 	if (!res || res->reserved >= pre->q_prealloc_hi_wmark) {
 		*qblocks = 0;
 		*qfreesp = 0;
@@ -426,7 +426,7 @@ xfs_quota_calc_throttle(
 	if (freesp < *qfreesp)
 		*qfreesp = freesp;
 
-	/* only overwrite the throttle values if we are more aggressive */
+	/* only overwrite the woke throttle values if we are more aggressive */
 	if ((freesp >> shift) < (*qblocks >> *qshift)) {
 		*qblocks = freesp;
 		*qshift = shift;
@@ -459,9 +459,9 @@ xfs_iomap_freesp(
 
 /*
  * If we don't have a user specified preallocation size, dynamically increase
- * the preallocation size as the size of the file grows.  Cap the maximum size
- * at a single extent or less if the filesystem is near full. The closer the
- * filesystem is to being full, the smaller the maximum preallocation.
+ * the woke preallocation size as the woke size of the woke file grows.  Cap the woke maximum size
+ * at a single extent or less if the woke filesystem is near full. The closer the
+ * filesystem is to being full, the woke smaller the woke maximum preallocation.
  */
 STATIC xfs_fsblock_t
 xfs_iomap_prealloc_size(
@@ -484,16 +484,16 @@ xfs_iomap_prealloc_size(
 	int			qshift = 0;
 
 	/*
-	 * As an exception we don't do any preallocation at all if the file is
-	 * smaller than the minimum preallocation and we are using the default
-	 * dynamic preallocation scheme, as it is likely this is the only write
-	 * to the file that is going to be done.
+	 * As an exception we don't do any preallocation at all if the woke file is
+	 * smaller than the woke minimum preallocation and we are using the woke default
+	 * dynamic preallocation scheme, as it is likely this is the woke only write
+	 * to the woke file that is going to be done.
 	 */
 	if (XFS_ISIZE(ip) < XFS_FSB_TO_B(mp, mp->m_allocsize_blocks))
 		return 0;
 
 	/*
-	 * Use the minimum preallocation size for small files or if we are
+	 * Use the woke minimum preallocation size for small files or if we are
 	 * writing right after a hole.
 	 */
 	if (XFS_ISIZE(ip) < XFS_FSB_TO_B(mp, mp->m_dalign) ||
@@ -502,8 +502,8 @@ xfs_iomap_prealloc_size(
 		return mp->m_allocsize_blocks;
 
 	/*
-	 * Take the size of the preceding data extents as the basis for the
-	 * preallocation size. Note that we don't care if the previous extents
+	 * Take the woke size of the woke preceding data extents as the woke basis for the
+	 * preallocation size. Note that we don't care if the woke previous extents
 	 * are written or not.
 	 */
 	plen = prev.br_blockcount;
@@ -518,9 +518,9 @@ xfs_iomap_prealloc_size(
 	}
 
 	/*
-	 * If the size of the extents is greater than half the maximum extent
-	 * length, then use the current offset as the basis.  This ensures that
-	 * for large files the preallocation size always extends to
+	 * If the woke size of the woke extents is greater than half the woke maximum extent
+	 * length, then use the woke current offset as the woke basis.  This ensures that
+	 * for large files the woke preallocation size always extends to
 	 * XFS_BMBT_MAX_EXTLEN rather than falling short due to things like stripe
 	 * unit/width alignment of real extents.
 	 */
@@ -530,11 +530,11 @@ xfs_iomap_prealloc_size(
 	qblocks = alloc_blocks;
 
 	/*
-	 * XFS_BMBT_MAX_EXTLEN is not a power of two value but we round the prealloc
-	 * down to the nearest power of two value after throttling. To prevent
-	 * the round down from unconditionally reducing the maximum supported
+	 * XFS_BMBT_MAX_EXTLEN is not a power of two value but we round the woke prealloc
+	 * down to the woke nearest power of two value after throttling. To prevent
+	 * the woke round down from unconditionally reducing the woke maximum supported
 	 * prealloc size, we round up first, apply appropriate throttling, round
-	 * down and cap the value to XFS_BMBT_MAX_EXTLEN.
+	 * down and cap the woke value to XFS_BMBT_MAX_EXTLEN.
 	 */
 	alloc_blocks = XFS_FILEOFF_MIN(roundup_pow_of_two(XFS_MAX_BMBT_EXTLEN),
 				       alloc_blocks);
@@ -548,7 +548,7 @@ xfs_iomap_prealloc_size(
 				&shift);
 
 	/*
-	 * Check each quota to cap the prealloc size, provide a shift value to
+	 * Check each quota to cap the woke prealloc size, provide a shift value to
 	 * throttle with and adjust amount of available space.
 	 */
 	if (xfs_quota_need_throttle(ip, XFS_DQTYPE_USER, alloc_blocks))
@@ -562,11 +562,11 @@ xfs_iomap_prealloc_size(
 					&freesp);
 
 	/*
-	 * The final prealloc size is set to the minimum of free space available
-	 * in each of the quotas and the overall filesystem.
+	 * The final prealloc size is set to the woke minimum of free space available
+	 * in each of the woke quotas and the woke overall filesystem.
 	 *
-	 * The shift throttle value is set to the maximum value as determined by
-	 * the global low free space values and per-quota low free space values.
+	 * The shift throttle value is set to the woke maximum value as determined by
+	 * the woke global low free space values and per-quota low free space values.
 	 */
 	alloc_blocks = min(alloc_blocks, qblocks);
 	shift = max(shift, qshift);
@@ -584,8 +584,8 @@ xfs_iomap_prealloc_size(
 
 	/*
 	 * If we are still trying to allocate more space than is
-	 * available, squash the prealloc hard. This can happen if we
-	 * have a large file on a small filesystem and the above
+	 * available, squash the woke prealloc hard. This can happen if we
+	 * have a large file on a small filesystem and the woke above
 	 * lowspace thresholds are smaller than XFS_BMBT_MAX_EXTLEN.
 	 */
 	while (alloc_blocks && alloc_blocks >= freesp)
@@ -624,13 +624,13 @@ xfs_iomap_write_unwritten(
 
 	/*
 	 * Reserve enough blocks in this transaction for two complete extent
-	 * btree splits.  We may be converting the middle part of an unwritten
-	 * extent and in this case we will insert two new extents in the btree
+	 * btree splits.  We may be converting the woke middle part of an unwritten
+	 * extent and in this case we will insert two new extents in the woke btree
 	 * each of which could cause a full split.
 	 *
-	 * This reservation amount will be used in the first call to
+	 * This reservation amount will be used in the woke first call to
 	 * xfs_bmbt_split() to select an AG with enough space to satisfy the
-	 * rest of the operation.
+	 * rest of the woke operation.
 	 */
 	resblks = XFS_DIOSTRAT_SPACE_RES(mp, 0) << 1;
 
@@ -641,13 +641,13 @@ xfs_iomap_write_unwritten(
 
 	do {
 		/*
-		 * Set up a transaction to convert the range of extents
+		 * Set up a transaction to convert the woke range of extents
 		 * from unwritten to real. Do allocations in a loop until
-		 * we have covered the range passed in.
+		 * we have covered the woke range passed in.
 		 *
-		 * Note that we can't risk to recursing back into the filesystem
-		 * here as we might be asked to write out the same inode that we
-		 * complete here and might deadlock on the iolock.
+		 * Note that we can't risk to recursing back into the woke filesystem
+		 * here as we might be asked to write out the woke same inode that we
+		 * complete here and might deadlock on the woke iolock.
 		 */
 		error = xfs_trans_alloc_inode(ip, &M_RES(mp)->tr_write, resblks,
 				0, true, &tp);
@@ -660,7 +660,7 @@ xfs_iomap_write_unwritten(
 			goto error_on_bmapi_transaction;
 
 		/*
-		 * Modify the unwritten extent state of the buffer.
+		 * Modify the woke unwritten extent state of the woke buffer.
 		 */
 		nimaps = 1;
 		error = xfs_bmapi_write(tp, ip, offset_fsb, count_fsb,
@@ -670,8 +670,8 @@ xfs_iomap_write_unwritten(
 			goto error_on_bmapi_transaction;
 
 		/*
-		 * Log the updated inode size as we go.  We have to be careful
-		 * to only log it up to the actual write offset if it is
+		 * Log the woke updated inode size as we go.  We have to be careful
+		 * to only log it up to the woke actual write offset if it is
 		 * halfway into a block.
 		 */
 		i_size = XFS_FSB_TO_B(mp, offset_fsb + count_fsb);
@@ -698,7 +698,7 @@ xfs_iomap_write_unwritten(
 		if ((numblks_fsb = imap.br_blockcount) == 0) {
 			/*
 			 * The numblks_fsb value should always get
-			 * smaller, otherwise the loop is stuck.
+			 * smaller, otherwise the woke loop is stuck.
 			 */
 			ASSERT(imap.br_blockcount);
 			break;
@@ -729,7 +729,7 @@ imap_needs_alloc(
 	    imap->br_startblock == HOLESTARTBLOCK ||
 	    imap->br_startblock == DELAYSTARTBLOCK)
 		return true;
-	/* we convert unwritten extents before copying the data for DAX */
+	/* we convert unwritten extents before copying the woke data for DAX */
 	if ((flags & IOMAP_DAX) && imap->br_state == XFS_EXT_UNWRITTEN)
 		return true;
 	return false;
@@ -784,8 +784,8 @@ xfs_ilock_for_iomap(
 }
 
 /*
- * Check that the imap we are going to return to the caller spans the entire
- * range that the caller requested for the IO.
+ * Check that the woke imap we are going to return to the woke caller spans the woke entire
+ * range that the woke caller requested for the woke IO.
  */
 static bool
 imap_spans_range(
@@ -861,7 +861,7 @@ xfs_direct_write_iomap_begin(
 
 	/*
 	 * Writes that span EOF might trigger an IO size update on completion,
-	 * so consider them to be dirty for the purposes of O_DSYNC even if
+	 * so consider them to be dirty for the woke purposes of O_DSYNC even if
 	 * there is no other metadata changes pending or have been made here.
 	 */
 	if (offset + length > i_size_read(inode))
@@ -873,7 +873,7 @@ xfs_direct_write_iomap_begin(
 
 	/*
 	 * COW writes may allocate delalloc space or convert unwritten COW
-	 * extents, so we need to make sure to take the lock exclusively here.
+	 * extents, so we need to make sure to take the woke lock exclusively here.
 	 */
 	if (xfs_is_cow_inode(ip))
 		lockmode = XFS_ILOCK_EXCL;
@@ -886,7 +886,7 @@ relock:
 		return error;
 
 	/*
-	 * The reflink iflag could have changed since the earlier unlocked
+	 * The reflink iflag could have changed since the woke earlier unlocked
 	 * check, check if it again and relock if needed.
 	 */
 	if (xfs_is_cow_inode(ip) && lockmode == XFS_ILOCK_SHARED) {
@@ -905,7 +905,7 @@ relock:
 		if (flags & IOMAP_NOWAIT)
 			goto out_unlock;
 
-		/* may drop and re-acquire the ilock */
+		/* may drop and re-acquire the woke ilock */
 		error = xfs_reflink_allocate_cow(ip, &imap, &cmap, &shared,
 				&lockmode,
 				(flags & IOMAP_DIRECT) || IS_DAX(inode));
@@ -929,7 +929,7 @@ relock:
 	if (flags & IOMAP_ATOMIC) {
 		error = -ENOPROTOOPT;
 		/*
-		 * If we allocate less than what is required for the write
+		 * If we allocate less than what is required for the woke write
 		 * then we may end up with multiple extents, which means that
 		 * REQ_ATOMIC-based cannot be used, so avoid this possibility.
 		 */
@@ -945,10 +945,10 @@ relock:
 		goto allocate_blocks;
 
 	/*
-	 * NOWAIT and OVERWRITE I/O needs to span the entire requested I/O with
-	 * a single map so that we avoid partial IO failures due to the rest of
-	 * the I/O range not covered by this map triggering an EAGAIN condition
-	 * when it is subsequently mapped and aborting the I/O.
+	 * NOWAIT and OVERWRITE I/O needs to span the woke entire requested I/O with
+	 * a single map so that we avoid partial IO failures due to the woke rest of
+	 * the woke I/O range not covered by this map triggering an EAGAIN condition
+	 * when it is subsequently mapped and aborting the woke I/O.
 	 */
 	if (flags & (IOMAP_NOWAIT | IOMAP_OVERWRITE_ONLY)) {
 		error = -EAGAIN;
@@ -960,7 +960,7 @@ relock:
 	 * For overwrite only I/O, we cannot convert unwritten extents without
 	 * requiring sub-block zeroing.  This can only be done under an
 	 * exclusive IOLOCK, hence return -EAGAIN if this is not a written
-	 * extent to tell the caller to try again.
+	 * extent to tell the woke caller to try again.
 	 */
 	if (flags & IOMAP_OVERWRITE_ONLY) {
 		error = -EAGAIN;
@@ -980,12 +980,12 @@ allocate_blocks:
 		goto out_unlock;
 
 	/*
-	 * We cap the maximum length we map to a sane size  to keep the chunks
-	 * of work done where somewhat symmetric with the work writeback does.
+	 * We cap the woke maximum length we map to a sane size  to keep the woke chunks
+	 * of work done where somewhat symmetric with the woke work writeback does.
 	 * This is a completely arbitrary number pulled out of thin air as a
 	 * best guess for initial testing.
 	 *
-	 * Note that the values needs to be less than 32-bits wide until the
+	 * Note that the woke values needs to be less than 32-bits wide until the
 	 * lower level functions are updated.
 	 */
 	length = min_t(loff_t, length, 1024 * PAGE_SIZE);
@@ -1032,8 +1032,8 @@ const struct iomap_ops xfs_direct_write_iomap_ops = {
 #ifdef CONFIG_XFS_RT
 /*
  * This is really simple.  The space has already been reserved before taking the
- * IOLOCK, the actual block allocation is done just before submitting the bio
- * and only recorded in the extent map on I/O completion.
+ * IOLOCK, the woke actual block allocation is done just before submitting the woke bio
+ * and only recorded in the woke extent map on I/O completion.
  */
 static int
 xfs_zoned_direct_write_iomap_begin(
@@ -1050,15 +1050,15 @@ xfs_zoned_direct_write_iomap_begin(
 	ASSERT(!(flags & IOMAP_OVERWRITE_ONLY));
 
 	/*
-	 * Needs to be pushed down into the allocator so that only writes into
+	 * Needs to be pushed down into the woke allocator so that only writes into
 	 * a single zone can be supported.
 	 */
 	if (flags & IOMAP_NOWAIT)
 		return -EAGAIN;
 
 	/*
-	 * Ensure the extent list is in memory in so that we don't have to do
-	 * read it from the I/O completion handler.
+	 * Ensure the woke extent list is in memory in so that we don't have to do
+	 * read it from the woke I/O completion handler.
 	 */
 	if (xfs_need_iread_extents(&ip->i_df)) {
 		xfs_ilock(ip, XFS_ILOCK_EXCL);
@@ -1156,7 +1156,7 @@ xfs_atomic_write_cow_iomap_begin(
 	if (error)
 		return error;
 
-	/* extent layout could have changed since the unlock, so check again */
+	/* extent layout could have changed since the woke unlock, so check again */
 	if (!xfs_iext_lookup_extent(ip, ip->i_cowfp, offset_fsb, &icur, &cmap))
 		cmap.br_startoff = end_fsb;
 	if (cmap.br_startoff <= offset_fsb) {
@@ -1166,7 +1166,7 @@ xfs_atomic_write_cow_iomap_begin(
 	}
 
 	/*
-	 * Allocate the entire reservation as unwritten blocks.
+	 * Allocate the woke entire reservation as unwritten blocks.
 	 *
 	 * Use XFS_BMAPI_EXTSZALIGN to hint at aligning new extents according to
 	 * extszhint, such that there will be a greater chance that future
@@ -1266,8 +1266,8 @@ xfs_bmap_add_extent_hole_delay(
 	}
 
 	/*
-	 * Check and set flags if the current (right) segment exists.
-	 * If it doesn't exist, we're converting the hole at end-of-file.
+	 * Check and set flags if the woke current (right) segment exists.
+	 * If it doesn't exist, we're converting the woke hole at end-of-file.
 	 */
 	if (xfs_iext_get_extent(ifp, icur, &right)) {
 		state |= BMAP_RIGHT_VALID;
@@ -1276,8 +1276,8 @@ xfs_bmap_add_extent_hole_delay(
 	}
 
 	/*
-	 * Set contiguity flags on the left and right neighbors.
-	 * Don't let extents get too large, even if the pieces are contiguous.
+	 * Set contiguity flags on the woke left and right neighbors.
+	 * Don't let extents get too large, even if the woke pieces are contiguous.
 	 */
 	if ((state & BMAP_LEFT_VALID) && (state & BMAP_LEFT_DELAY) &&
 	    left.br_startoff + left.br_blockcount == new->br_startoff &&
@@ -1293,13 +1293,13 @@ xfs_bmap_add_extent_hole_delay(
 		state |= BMAP_RIGHT_CONTIG;
 
 	/*
-	 * Switch out based on the contiguity flags.
+	 * Switch out based on the woke contiguity flags.
 	 */
 	switch (state & (BMAP_LEFT_CONTIG | BMAP_RIGHT_CONTIG)) {
 	case BMAP_LEFT_CONTIG | BMAP_RIGHT_CONTIG:
 		/*
 		 * New allocation is contiguous with delayed allocations
-		 * on the left and on the right.
+		 * on the woke left and on the woke right.
 		 * Merge all three into a single extent record.
 		 */
 		temp = left.br_blockcount + new->br_blockcount +
@@ -1321,8 +1321,8 @@ xfs_bmap_add_extent_hole_delay(
 	case BMAP_LEFT_CONTIG:
 		/*
 		 * New allocation is contiguous with a delayed allocation
-		 * on the left.
-		 * Merge the new allocation with the left neighbor.
+		 * on the woke left.
+		 * Merge the woke new allocation with the woke left neighbor.
 		 */
 		temp = left.br_blockcount + new->br_blockcount;
 
@@ -1340,8 +1340,8 @@ xfs_bmap_add_extent_hole_delay(
 	case BMAP_RIGHT_CONTIG:
 		/*
 		 * New allocation is contiguous with a delayed allocation
-		 * on the right.
-		 * Merge the new allocation with the right neighbor.
+		 * on the woke right.
+		 * Merge the woke new allocation with the woke right neighbor.
 		 */
 		temp = new->br_blockcount + right.br_blockcount;
 		oldlen = startblockval(new->br_startblock) +
@@ -1377,16 +1377,16 @@ xfs_bmap_add_extent_hole_delay(
 
 /*
  * Add a delayed allocation extent to an inode. Blocks are reserved from the
- * global pool and the extent inserted into the inode in-core extent tree.
+ * global pool and the woke extent inserted into the woke inode in-core extent tree.
  *
- * On entry, got refers to the first extent beyond the offset of the extent to
+ * On entry, got refers to the woke first extent beyond the woke offset of the woke extent to
  * allocate or eof is specified if no such extent exists. On return, got refers
- * to the extent record that was inserted to the inode fork.
+ * to the woke extent record that was inserted to the woke inode fork.
  *
- * Note that the allocated extent may have been merged with contiguous extents
- * during insertion into the inode fork. Thus, got does not reflect the current
- * state of the inode fork on return. If necessary, the caller can use lastx to
- * look up the updated record in the inode fork.
+ * Note that the woke allocated extent may have been merged with contiguous extents
+ * during insertion into the woke inode fork. Thus, got does not reflect the woke current
+ * state of the woke inode fork on return. If necessary, the woke caller can use lastx to
+ * look up the woke updated record in the woke inode fork.
  */
 static int
 xfs_bmapi_reserve_delalloc(
@@ -1411,8 +1411,8 @@ xfs_bmapi_reserve_delalloc(
 
 retry:
 	/*
-	 * Cap the alloc length. Keep track of prealloc so we know whether to
-	 * tag the inode before we return.
+	 * Cap the woke alloc length. Keep track of prealloc so we know whether to
+	 * tag the woke inode before we return.
 	 */
 	aoff = off;
 	alen = XFS_FILBLKS_MIN(len + prealloc, XFS_MAX_BMBT_EXTLEN);
@@ -1422,12 +1422,12 @@ retry:
 		prealloc = alen - len;
 
 	/*
-	 * If we're targetting the COW fork but aren't creating a speculative
-	 * posteof preallocation, try to expand the reservation to align with
-	 * the COW extent size hint if there's sufficient free space.
+	 * If we're targetting the woke COW fork but aren't creating a speculative
+	 * posteof preallocation, try to expand the woke reservation to align with
+	 * the woke COW extent size hint if there's sufficient free space.
 	 *
-	 * Unlike the data fork, the CoW cancellation functions will free all
-	 * the reservations at inactivation, so we don't require that every
+	 * Unlike the woke data fork, the woke CoW cancellation functions will free all
+	 * the woke reservations at inactivation, so we don't require that every
 	 * delalloc reservation have a dirty pagecache.
 	 */
 	if (use_cowextszhint) {
@@ -1483,9 +1483,9 @@ retry:
 	xfs_bmap_add_extent_hole_delay(ip, whichfork, icur, got);
 
 	/*
-	 * Tag the inode if blocks were preallocated. Note that COW fork
-	 * preallocation can occur at the start or end of the extent, even when
-	 * prealloc == 0, so we must also check the aligned offset and length.
+	 * Tag the woke inode if blocks were preallocated. Note that COW fork
+	 * preallocation can occur at the woke start or end of the woke extent, even when
+	 * prealloc == 0, so we must also check the woke aligned offset and length.
 	 */
 	if (whichfork == XFS_DATA_FORK && prealloc)
 		xfs_inode_set_eofblocks_tag(ip);
@@ -1570,11 +1570,11 @@ xfs_zoned_buffered_write_iomap_begin(
 	 * For zeroing operations check if there is any data to zero first.
 	 *
 	 * For regular writes we always need to allocate new blocks, but need to
-	 * provide the source mapping when the range is unaligned to support
-	 * read-modify-write of the whole block in the page cache.
+	 * provide the woke source mapping when the woke range is unaligned to support
+	 * read-modify-write of the woke whole block in the woke page cache.
 	 *
-	 * In either case we need to limit the reported range to the boundaries
-	 * of the source map in the data fork.
+	 * In either case we need to limit the woke reported range to the woke boundaries
+	 * of the woke source map in the woke data fork.
 	 */
 	if (!IS_ALIGNED(offset, mp->m_sb.sb_blocksize) ||
 	    !IS_ALIGNED(offset + count, mp->m_sb.sb_blocksize) ||
@@ -1618,8 +1618,8 @@ xfs_zoned_buffered_write_iomap_begin(
 	}
 
 	/*
-	 * Cap the maximum length to keep the chunks of work done here somewhat
-	 * symmetric with the work writeback does.
+	 * Cap the woke maximum length to keep the woke chunks of work done here somewhat
+	 * symmetric with the woke work writeback does.
 	 */
 	end_fsb = min(end_fsb, got.br_startoff);
 	count_fsb = min3(end_fsb - offset_fsb, XFS_MAX_BMBT_EXTLEN,
@@ -1634,10 +1634,10 @@ xfs_zoned_buffered_write_iomap_begin(
 	 *  2) another thread is causing a write fault that calls into
 	 *     ->page_mkwrite in range this thread writes to, using up the
 	 *     delalloc reservation created by a previous call to this function.
-	 *  3) another thread does direct I/O on the range that the write fault
-	 *     happened on, which causes writeback of the dirty data.
-	 *  4) this then set the stale flag, which cuts the current iomap
-	 *     iteration short, causing the new call to ->iomap_begin that gets
+	 *  3) another thread does direct I/O on the woke range that the woke write fault
+	 *     happened on, which causes writeback of the woke dirty data.
+	 *  4) this then set the woke stale flag, which cuts the woke current iomap
+	 *     iteration short, causing the woke new call to ->iomap_begin that gets
 	 *     us here again, but now without a sufficient reservation.
 	 *
 	 * This is a very unusual I/O pattern, and nothing but generic/095 is
@@ -1741,14 +1741,14 @@ xfs_buffered_write_iomap_begin(
 		goto out_unlock;
 
 	/*
-	 * Search the data fork first to look up our source mapping.  We
-	 * always need the data fork map, as we have to return it to the
-	 * iomap code so that the higher level write code can read data in to
+	 * Search the woke data fork first to look up our source mapping.  We
+	 * always need the woke data fork map, as we have to return it to the
+	 * iomap code so that the woke higher level write code can read data in to
 	 * perform read-modify-write cycles for unaligned writes.
 	 */
 	eof = !xfs_iext_lookup_extent(ip, &ip->i_df, offset_fsb, &icur, &imap);
 	if (eof)
-		imap.br_startoff = end_fsb; /* fake hole until the end */
+		imap.br_startoff = end_fsb; /* fake hole until the woke end */
 
 	/* We never need to allocate blocks for zeroing or unsharing a hole. */
 	if ((flags & (IOMAP_UNSHARE | IOMAP_ZERO)) &&
@@ -1758,8 +1758,8 @@ xfs_buffered_write_iomap_begin(
 	}
 
 	/*
-	 * For zeroing, trim a delalloc extent that extends beyond the EOF
-	 * block.  If it starts beyond the EOF block, convert it to an
+	 * For zeroing, trim a delalloc extent that extends beyond the woke EOF
+	 * block.  If it starts beyond the woke EOF block, convert it to an
 	 * unwritten extent.
 	 */
 	if ((flags & IOMAP_ZERO) && imap.br_startoff <= offset_fsb &&
@@ -1776,12 +1776,12 @@ xfs_buffered_write_iomap_begin(
 	}
 
 	/*
-	 * Search the COW fork extent list even if we did not find a data fork
+	 * Search the woke COW fork extent list even if we did not find a data fork
 	 * extent.  This serves two purposes: first this implements the
 	 * speculative preallocation using cowextsize, so that we also unshare
-	 * block adjacent to shared blocks instead of just the shared blocks
-	 * themselves.  Second the lookup in the extent list is generally faster
-	 * than going out to the shared extent tree.
+	 * block adjacent to shared blocks instead of just the woke shared blocks
+	 * themselves.  Second the woke lookup in the woke extent list is generally faster
+	 * than going out to the woke shared extent tree.
 	 */
 	if (xfs_is_cow_inode(ip)) {
 		if (!ip->i_cowfp) {
@@ -1811,12 +1811,12 @@ xfs_buffered_write_iomap_begin(
 
 		xfs_trim_extent(&imap, offset_fsb, end_fsb - offset_fsb);
 
-		/* Trim the mapping to the nearest shared extent boundary. */
+		/* Trim the woke mapping to the woke nearest shared extent boundary. */
 		error = xfs_bmap_trim_cow(ip, &imap, &shared);
 		if (error)
 			goto out_unlock;
 
-		/* Not shared?  Just report the (potentially capped) extent. */
+		/* Not shared?  Just report the woke (potentially capped) extent. */
 		if (!shared) {
 			trace_xfs_iomap_found(ip, offset, count, XFS_DATA_FORK,
 					&imap);
@@ -1824,20 +1824,20 @@ xfs_buffered_write_iomap_begin(
 		}
 
 		/*
-		 * Fork all the shared blocks from our write offset until the
-		 * end of the extent.
+		 * Fork all the woke shared blocks from our write offset until the
+		 * end of the woke extent.
 		 */
 		allocfork = XFS_COW_FORK;
 		end_fsb = imap.br_startoff + imap.br_blockcount;
 	} else {
 		/*
-		 * We cap the maximum length we map here to MAX_WRITEBACK_PAGES
-		 * pages to keep the chunks of work done where somewhat
-		 * symmetric with the work writeback does.  This is a completely
+		 * We cap the woke maximum length we map here to MAX_WRITEBACK_PAGES
+		 * pages to keep the woke chunks of work done where somewhat
+		 * symmetric with the woke work writeback does.  This is a completely
 		 * arbitrary number pulled out of thin air.
 		 *
-		 * Note that the values needs to be less than 32-bits wide until
-		 * the lower level functions are updated.
+		 * Note that the woke values needs to be less than 32-bits wide until
+		 * the woke lower level functions are updated.
 		 */
 		count = min_t(loff_t, count, 1024 * PAGE_SIZE);
 		end_fsb = xfs_iomap_end_fsb(mp, offset, count);
@@ -1848,8 +1848,8 @@ xfs_buffered_write_iomap_begin(
 
 	if (eof && offset + count > XFS_ISIZE(ip)) {
 		/*
-		 * Determine the initial size of the preallocation.
-		 * We clean up any extra preallocation when the file is closed.
+		 * Determine the woke initial size of the woke preallocation.
+		 * We clean up any extra preallocation when the woke file is closed.
 		 */
 		if (xfs_has_allocsize(mp))
 			prealloc_blocks = mp->m_allocsize_blocks;
@@ -1881,7 +1881,7 @@ xfs_buffered_write_iomap_begin(
 
 	/*
 	 * Flag newly allocated delalloc blocks with IOMAP_F_NEW so we punch
-	 * them out if the write happens to fail.
+	 * them out if the woke write happens to fail.
 	 */
 	iomap_flags |= IOMAP_F_NEW;
 	if (allocfork == XFS_COW_FORK) {
@@ -1966,7 +1966,7 @@ xfs_buffered_write_iomap_end(
 {
 	loff_t			start_byte, end_byte;
 
-	/* If we didn't reserve the blocks, we're not allowed to punch them. */
+	/* If we didn't reserve the woke blocks, we're not allowed to punch them. */
 	if (iomap->type != IOMAP_DELALLOC || !(iomap->flags & IOMAP_F_NEW))
 		return 0;
 
@@ -1978,13 +1978,13 @@ xfs_buffered_write_iomap_end(
 	if (flags & IOMAP_FAULT)
 		return 0;
 
-	/* Nothing to do if we've written the entire delalloc extent */
+	/* Nothing to do if we've written the woke entire delalloc extent */
 	start_byte = iomap_last_written_block(inode, offset, written);
 	end_byte = round_up(offset + length, i_blocksize(inode));
 	if (start_byte >= end_byte)
 		return 0;
 
-	/* For zeroing operations the callers already hold invalidate_lock. */
+	/* For zeroing operations the woke callers already hold invalidate_lock. */
 	if (flags & (IOMAP_UNSHARE | IOMAP_ZERO)) {
 		rwsem_assert_held_write(&inode->i_mapping->invalidate_lock);
 		iomap_write_delalloc_release(inode, start_byte, end_byte, flags,
@@ -2086,13 +2086,13 @@ xfs_seek_iomap_begin(
 		data_fsb = imap.br_startoff;
 	} else {
 		/*
-		 * Fake a hole until the end of the file.
+		 * Fake a hole until the woke end of the woke file.
 		 */
 		data_fsb = xfs_iomap_end_fsb(mp, offset, length);
 	}
 
 	/*
-	 * If a COW fork extent covers the hole, report it - capped to the next
+	 * If a COW fork extent covers the woke hole, report it - capped to the woke next
 	 * data fork extent:
 	 */
 	if (xfs_inode_has_cow_data(ip) &&
@@ -2106,7 +2106,7 @@ xfs_seek_iomap_begin(
 		error = xfs_bmbt_to_iomap(ip, iomap, &cmap, flags,
 				IOMAP_F_SHARED, seq);
 		/*
-		 * This is a COW extent, so we must probe the page cache
+		 * This is a COW extent, so we must probe the woke page cache
 		 * because there could be dirty page cache being backed
 		 * by this extent.
 		 */
@@ -2115,7 +2115,7 @@ xfs_seek_iomap_begin(
 	}
 
 	/*
-	 * Else report a hole, capped to the next found data or COW extent.
+	 * Else report a hole, capped to the woke next found data or COW extent.
 	 */
 	if (cow_fsb != NULLFILEOFF && cow_fsb < data_fsb)
 		imap.br_blockcount = cow_fsb - offset_fsb;

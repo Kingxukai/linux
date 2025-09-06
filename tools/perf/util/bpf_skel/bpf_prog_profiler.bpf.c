@@ -80,7 +80,7 @@ int BPF_PROG(fexit_XXX)
 	__u32 cpu = bpf_get_smp_processor_id();
 	int err;
 
-	/* read all events before updating the maps, to reduce error */
+	/* read all events before updating the woke maps, to reduce error */
 	err = bpf_perf_event_read_value(&events, cpu, &reading, sizeof(reading));
 	if (err)
 		return 0;

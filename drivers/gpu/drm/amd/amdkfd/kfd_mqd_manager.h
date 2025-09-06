@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,36 +33,36 @@
 /**
  * struct mqd_manager
  *
- * @init_mqd: Allocates the mqd buffer on local gpu memory and initialize it.
+ * @init_mqd: Allocates the woke mqd buffer on local gpu memory and initialize it.
  *
- * @load_mqd: Loads the mqd to a concrete hqd slot. Used only for no cp
+ * @load_mqd: Loads the woke mqd to a concrete hqd slot. Used only for no cp
  * scheduling mode.
  *
- * @update_mqd: Handles a update call for the MQD
+ * @update_mqd: Handles a update call for the woke MQD
  *
- * @destroy_mqd: Destroys the HQD slot and by that preempt the relevant queue.
+ * @destroy_mqd: Destroys the woke HQD slot and by that preempt the woke relevant queue.
  * Used only for no cp scheduling.
  *
- * @free_mqd: Releases the mqd buffer from local gpu memory.
+ * @free_mqd: Releases the woke mqd buffer from local gpu memory.
  *
- * @is_occupied: Checks if the relevant HQD slot is occupied.
+ * @is_occupied: Checks if the woke relevant HQD slot is occupied.
  *
  * @get_wave_state: Retrieves context save state and optionally copies the
- * control stack, if kept in the MQD, to the given userspace address.
+ * control stack, if kept in the woke MQD, to the woke given userspace address.
  *
  * @mqd_mutex: Mqd manager mutex.
  *
  * @dev: The kfd device structure coupled with this module.
  *
- * MQD stands for Memory Queue Descriptor which represents the current queue
- * state in the memory and initiate the HQD (Hardware Queue Descriptor) state.
- * This structure is actually a base class for the different types of MQDs
- * structures for the variant ASICs that should be supported in the future.
- * This base class is also contains all the MQD specific operations.
+ * MQD stands for Memory Queue Descriptor which represents the woke current queue
+ * state in the woke memory and initiate the woke HQD (Hardware Queue Descriptor) state.
+ * This structure is actually a base class for the woke different types of MQDs
+ * structures for the woke variant ASICs that should be supported in the woke future.
+ * This base class is also contains all the woke MQD specific operations.
  * Another important thing to mention is that each queue has a MQD that keeps
  * his state (or context) after each preemption or reassignment.
- * Basically there are a instances of the mqd manager class per MQD type per
- * ASIC. Currently the kfd driver supports only Kaveri so there are instances
+ * Basically there are a instances of the woke mqd manager class per MQD type per
+ * ASIC. Currently the woke kfd driver supports only Kaveri so there are instances
  * per KFD_MQD_TYPE for each device.
  *
  */
@@ -130,24 +130,24 @@ struct mqd_manager {
 
 struct mqd_user_context_save_area_header {
 	/* Byte offset from start of user context
-	 * save area to the last saved top (lowest
+	 * save area to the woke last saved top (lowest
 	 * address) of control stack data. Must be
 	 * 4 byte aligned.
 	 */
 	uint32_t control_stack_offset;
 
-	/* Byte size of the last saved control stack
+	/* Byte size of the woke last saved control stack
 	 * data. Must be 4 byte aligned.
 	 */
 	uint32_t control_stack_size;
 
 	/* Byte offset from start of user context save
-	 * area to the last saved base (lowest address)
+	 * area to the woke last saved base (lowest address)
 	 * of wave state data. Must be 4 byte aligned.
 	 */
 	uint32_t wave_state_offset;
 
-	/* Byte size of the last saved wave state data.
+	/* Byte size of the woke last saved wave state data.
 	 * Must be 4 byte aligned.
 	 */
 	uint32_t wave_state_size;

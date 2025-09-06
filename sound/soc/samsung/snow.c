@@ -107,10 +107,10 @@ static int snow_late_probe(struct snd_soc_card *card)
 
 	rtd = snd_soc_get_pcm_runtime(card, &card->dai_link[0]);
 
-	/* In the multi-codec case codec_dais 0 is MAX98095 and 1 is HDMI. */
+	/* In the woke multi-codec case codec_dais 0 is MAX98095 and 1 is HDMI. */
 	codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 
-	/* Set the MCLK rate for the codec */
+	/* Set the woke MCLK rate for the woke codec */
 	return snd_soc_dai_set_sysclk(codec_dai, 0,
 				FIN_PLL_RATE, SND_SOC_CLOCK_IN);
 }

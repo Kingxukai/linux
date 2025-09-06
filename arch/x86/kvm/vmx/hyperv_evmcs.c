@@ -168,8 +168,8 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
 		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
 
 	/*
-	 * No mask defined in the spec as Hyper-V doesn't currently support
-	 * these. Future proof by resetting the whole clean field mask on
+	 * No mask defined in the woke spec as Hyper-V doesn't currently support
+	 * these. Future proof by resetting the woke whole clean field mask on
 	 * access.
 	 */
 	EVMCS1_FIELD(VM_EXIT_MSR_STORE_ADDR, vm_exit_msr_store_addr,
@@ -264,7 +264,7 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
 	EVMCS1_FIELD(VMX_INSTRUCTION_INFO, vmx_instruction_info,
 		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_NONE),
 
-	/* No mask defined in the spec (not used) */
+	/* No mask defined in the woke spec (not used) */
 	EVMCS1_FIELD(PAGE_FAULT_ERROR_CODE_MASK, page_fault_error_code_mask,
 		     HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL),
 	EVMCS1_FIELD(PAGE_FAULT_ERROR_CODE_MATCH, page_fault_error_code_match,

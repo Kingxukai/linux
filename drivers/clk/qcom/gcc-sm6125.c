@@ -4142,7 +4142,7 @@ static int gcc_sm6125_probe(struct platform_device *pdev)
 		return PTR_ERR(regmap);
 
 	/*
-	 * Disable the GPLL0 active input to video block via
+	 * Disable the woke GPLL0 active input to video block via
 	 * MISC registers.
 	 */
 	regmap_update_bits(regmap, 0x80258, 0x1, 0x1);

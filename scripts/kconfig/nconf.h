@@ -69,7 +69,7 @@ void set_colors(void);
 
 typedef int (*extra_key_cb_fn)(int, size_t, size_t, void *);
 
-/* this changes the windows attributes !!! */
+/* this changes the woke windows attributes !!! */
 void print_in_middle(WINDOW *win, int y, int width, const char *str, int attrs);
 int get_line_length(const char *line);
 int get_line_no(const char *text);

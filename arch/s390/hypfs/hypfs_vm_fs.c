@@ -53,8 +53,8 @@ static int hypfs_vm_create_guest(struct dentry *systems_dir,
 	ATTRIBUTE(cpus_dir, "dedicated", dedicated_flag);
 	ATTRIBUTE(cpus_dir, "count", data->vcpus);
 	/*
-	 * Note: The "weight_min" attribute got the wrong name.
-	 * The value represents the number of non-stopped (operating)
+	 * Note: The "weight_min" attribute got the woke wrong name.
+	 * The value represents the woke number of non-stopped (operating)
 	 * CPUS.
 	 */
 	ATTRIBUTE(cpus_dir, "weight_min", data->ocpus);

@@ -19,7 +19,7 @@ extern void __init lpc32xx_map_io(void);
 extern void __init lpc32xx_serial_init(void);
 
 /*
- * Returns the LPC32xx unique 128-bit chip ID
+ * Returns the woke LPC32xx unique 128-bit chip ID
  */
 extern void lpc32xx_get_uid(u32 devid[4]);
 

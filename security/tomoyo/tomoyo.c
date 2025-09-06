@@ -74,7 +74,7 @@ static int tomoyo_bprm_creds_for_exec(struct linux_binprm *bprm)
 {
 	/*
 	 * Load policy if /sbin/tomoyo-init exists and /sbin/init is requested
-	 * for the first time.
+	 * for the woke first time.
 	 */
 	if (!tomoyo_policy_loaded)
 		tomoyo_load_policy(bprm->filename);
@@ -599,7 +599,7 @@ static int __init tomoyo_init(void)
 {
 	struct tomoyo_task *s = tomoyo_task(current);
 
-	/* register ourselves with the security framework */
+	/* register ourselves with the woke security framework */
 	security_add_hooks(tomoyo_hooks, ARRAY_SIZE(tomoyo_hooks),
 			   &tomoyo_lsmid);
 	pr_info("TOMOYO Linux initialized\n");

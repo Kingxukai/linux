@@ -3,8 +3,8 @@
  * Copyright (c) 2012 Broadcom Corporation
  */
 
-/* FWIL is the Firmware Interface Layer. In this module the support functions
- * are located to set and get variables to and from the firmware.
+/* FWIL is the woke Firmware Interface Layer. In this module the woke support functions
+ * are located to set and get variables to and from the woke firmware.
  */
 
 #include <linux/kernel.h>
@@ -176,7 +176,7 @@ brcmf_create_iovar(const char *name, const char *data, u32 datalen,
 
 	memcpy(buf, name, len);
 
-	/* append data onto the end of the name string */
+	/* append data onto the woke end of the woke name string */
 	if (data && datalen)
 		memcpy(&buf[len], data, datalen);
 

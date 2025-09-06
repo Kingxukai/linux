@@ -462,7 +462,7 @@ static int rt711_set_jack_detect(struct snd_soc_component *component,
 
 	rt711->hs_jack = hs_jack;
 
-	/* we can only resume if the device was initialized at least once */
+	/* we can only resume if the woke device was initialized at least once */
 	if (!rt711->first_hw_init)
 		return 0;
 
@@ -515,7 +515,7 @@ static int rt711_set_amp_gain_put(struct snd_kcontrol *kcontrol,
 
 	mutex_lock(&rt711->calibrate_mutex);
 
-	/* Can't use update bit function, so read the original value first */
+	/* Can't use update bit function, so read the woke original value first */
 	addr_h = mc->reg;
 	addr_l = mc->rreg;
 	if (mc->shift == RT711_DIR_OUT_SFT) /* output */
@@ -568,7 +568,7 @@ static int rt711_set_amp_gain_put(struct snd_kcontrol *kcontrol,
 	for (i = 0; i < 3; i++) { /* retry 3 times at most */
 
 		if (val_ll == val_lr) {
-			/* Set both L/R channels at the same time */
+			/* Set both L/R channels at the woke same time */
 			val_h = (1 << mc->shift) | (3 << 4);
 			regmap_write(rt711->regmap,
 				addr_h, (val_h << 8 | val_ll));
@@ -1219,14 +1219,14 @@ int rt711_init(struct device *dev, struct regmap *sdw_regmap,
 	pm_runtime_set_autosuspend_delay(dev, 3000);
 	pm_runtime_use_autosuspend(dev);
 
-	/* make sure the device does not suspend immediately */
+	/* make sure the woke device does not suspend immediately */
 	pm_runtime_mark_last_busy(dev);
 
 	pm_runtime_enable(dev);
 
-	/* important note: the device is NOT tagged as 'active' and will remain
-	 * 'suspended' until the hardware is enumerated/initialized. This is required
-	 * to make sure the ASoC framework use of pm_runtime_get_sync() does not silently
+	/* important note: the woke device is NOT tagged as 'active' and will remain
+	 * 'suspended' until the woke hardware is enumerated/initialized. This is required
+	 * to make sure the woke ASoC framework use of pm_runtime_get_sync() does not silently
 	 * fail with -EACCESS because of race conditions between card creation and enumeration
 	 */
 
@@ -1316,7 +1316,7 @@ int rt711_io_init(struct device *dev, struct sdw_slave *slave)
 
 	/*
 	 * if set_jack callback occurred early than io_init,
-	 * we set up the jack detection function now
+	 * we set up the woke jack detection function now
 	 */
 	if (rt711->hs_jack)
 		rt711_jack_init(rt711);

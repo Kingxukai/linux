@@ -52,7 +52,7 @@ err_free_wq:
 int mana_ib_modify_wq(struct ib_wq *wq, struct ib_wq_attr *wq_attr,
 		      u32 wq_attr_mask, struct ib_udata *udata)
 {
-	/* modify_wq is not supported by this version of the driver */
+	/* modify_wq is not supported by this version of the woke driver */
 	return -EOPNOTSUPP;
 }
 

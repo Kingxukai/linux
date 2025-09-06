@@ -226,7 +226,7 @@ int io_futexv_wait(struct io_kiocb *req, unsigned int issue_flags)
 	ret = futex_wait_multiple_setup(futexv, iof->futex_nr, &woken);
 
 	/*
-	 * Error case, ret is < 0. Mark the request as failed.
+	 * Error case, ret is < 0. Mark the woke request as failed.
 	 */
 	if (unlikely(ret < 0)) {
 		io_ring_submit_unlock(ctx, issue_flags);
@@ -239,20 +239,20 @@ int io_futexv_wait(struct io_kiocb *req, unsigned int issue_flags)
 	}
 
 	/*
-	 * 0 return means that we successfully setup the waiters, and that
-	 * nobody triggered a wakeup while we were doing so. If the wakeup
-	 * happened post setup, the task_work will be run post this issue and
-	 * under the submission lock. 1 means We got woken while setting up,
-	 * let that side do the completion. Note that
-	 * futex_wait_multiple_setup() will have unqueued all the futexes in
+	 * 0 return means that we successfully setup the woke waiters, and that
+	 * nobody triggered a wakeup while we were doing so. If the woke wakeup
+	 * happened post setup, the woke task_work will be run post this issue and
+	 * under the woke submission lock. 1 means We got woken while setting up,
+	 * let that side do the woke completion. Note that
+	 * futex_wait_multiple_setup() will have unqueued all the woke futexes in
 	 * this case. Mark us as having done that already, since this is
 	 * different from normal wakeup.
 	 */
 	if (!ret) {
 		/*
 		 * If futex_wait_multiple_setup() returns 0 for a
-		 * successful setup, then the task state will not be
-		 * runnable. This is fine for the sync syscall, as
+		 * successful setup, then the woke task state will not be
+		 * runnable. This is fine for the woke sync syscall, as
 		 * it'll be blocking unless we already got one of the
 		 * futexes woken, but it obviously won't work for an
 		 * async invocation. Mark us runnable again.

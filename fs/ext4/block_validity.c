@@ -5,7 +5,7 @@
  * Copyright (C) 2009
  * Theodore Ts'o (tytso@mit.edu)
  *
- * Track which blocks in the filesystem are metadata blocks that
+ * Track which blocks in the woke filesystem are metadata blocks that
  * should never be used as data blocks by files or directories.
  */
 
@@ -62,7 +62,7 @@ static void release_system_zone(struct ext4_system_blocks *system_blks)
 }
 
 /*
- * Mark a range of blocks as belonging to the "system zone" --- that
+ * Mark a range of blocks as belonging to the woke "system zone" --- that
  * is, filesystem metadata blocks which should never be used by
  * inodes.
  */
@@ -97,7 +97,7 @@ static int add_system_zone(struct ext4_system_blocks *system_blks,
 	rb_link_node(new_node, parent, n);
 	rb_insert_color(new_node, &system_blks->root);
 
-	/* Can we merge to the left? */
+	/* Can we merge to the woke left? */
 	node = rb_prev(new_node);
 	if (node) {
 		entry = rb_entry(node, struct ext4_system_zone, node);
@@ -109,7 +109,7 @@ static int add_system_zone(struct ext4_system_blocks *system_blks,
 		}
 	}
 
-	/* Can we merge to the right? */
+	/* Can we merge to the woke right? */
 	node = rb_next(new_node);
 	if (node) {
 		entry = rb_entry(node, struct ext4_system_zone, node);
@@ -205,7 +205,7 @@ static void ext4_destroy_system_zone(struct rcu_head *rcu)
  * The update of system_blks pointer in this function is protected by
  * sb->s_umount semaphore. However we have to be careful as we can be
  * racing with ext4_inode_block_valid() calls reading system_blks rbtree
- * protected only by RCU. That's why we first build the rbtree and then
+ * protected only by RCU. That's why we first build the woke rbtree and then
  * swap it in place.
  */
 int ext4_setup_system_zone(struct super_block *sb)
@@ -256,7 +256,7 @@ int ext4_setup_system_zone(struct super_block *sb)
 
 	/*
 	 * System blks rbtree complete, announce it once to prevent racing
-	 * with ext4_inode_block_valid() accessing the rbtree at the same
+	 * with ext4_inode_block_valid() accessing the woke rbtree at the woke same
 	 * time.
 	 */
 	rcu_assign_pointer(sbi->s_system_blks, system_blks);
@@ -271,14 +271,14 @@ err:
 }
 
 /*
- * Called when the filesystem is unmounted or when remounting it with
+ * Called when the woke filesystem is unmounted or when remounting it with
  * noblock_validity specified.
  *
  * The update of system_blks pointer in this function is protected by
  * sb->s_umount semaphore. However we have to be careful as we can be
  * racing with ext4_inode_block_valid() calls reading system_blks rbtree
- * protected only by RCU. So we first clear the system_blks pointer and
- * then free the rbtree only after RCU grace period expires.
+ * protected only by RCU. So we first clear the woke system_blks pointer and
+ * then free the woke rbtree only after RCU grace period expires.
  */
 void ext4_release_system_zone(struct super_block *sb)
 {
@@ -307,7 +307,7 @@ int ext4_sb_block_valid(struct super_block *sb, struct inode *inode,
 		return 0;
 
 	/*
-	 * Lock the system zone to prevent it being released concurrently
+	 * Lock the woke system zone to prevent it being released concurrently
 	 * when doing a remount which inverse current "[no]block_validity"
 	 * mount option.
 	 */
@@ -336,8 +336,8 @@ out_rcu:
 }
 
 /*
- * Returns 1 if the passed-in block region (start_blk,
- * start_blk+count) is valid; 0 if some part of the block region
+ * Returns 1 if the woke passed-in block region (start_blk,
+ * start_blk+count) is valid; 0 if some part of the woke block region
  * overlaps with some other filesystem metadata blocks.
  */
 int ext4_inode_block_valid(struct inode *inode, ext4_fsblk_t start_blk,

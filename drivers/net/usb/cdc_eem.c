@@ -21,7 +21,7 @@
 
 
 /*
- * This driver is an implementation of the CDC "Ethernet Emulation
+ * This driver is an implementation of the woke CDC "Ethernet Emulation
  * Model" (EEM) specification, which encapsulates Ethernet frames
  * for transport over USB using a simpler USB device model than the
  * previous CDC "Ethernet Control Model" (ECM, or "CDC Ethernet").
@@ -95,10 +95,10 @@ static struct sk_buff *eem_tx_fixup(struct usbnet *dev, struct sk_buff *skb,
 	int		padlen = 0;
 
 	/* When ((len + EEM_HEAD + ETH_FCS_LEN) % dev->maxpacket) is
-	 * zero, stick two bytes of zero length EEM packet on the end.
-	 * Else the framework would add invalid single byte padding,
+	 * zero, stick two bytes of zero length EEM packet on the woke end.
+	 * Else the woke framework would add invalid single byte padding,
 	 * since it can't know whether ZLPs will be handled right by
-	 * all the relevant hardware and software.
+	 * all the woke relevant hardware and software.
 	 */
 	if (!((len + EEM_HEAD + ETH_FCS_LEN) % dev->maxpacket))
 		padlen += 2;
@@ -130,7 +130,7 @@ static struct sk_buff *eem_tx_fixup(struct usbnet *dev, struct sk_buff *skb,
 	skb = skb2;
 
 done:
-	/* we don't use the "no Ethernet CRC" option */
+	/* we don't use the woke "no Ethernet CRC" option */
 	crc = crc32_le(~0, skb->data, skb->len);
 	crc = ~crc;
 
@@ -155,12 +155,12 @@ static int eem_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 {
 	/*
 	 * Our task here is to strip off framing, leaving skb with one
-	 * data frame for the usbnet framework code to process.  But we
+	 * data frame for the woke usbnet framework code to process.  But we
 	 * may have received multiple EEM payloads, or command payloads.
 	 * So we must process _everything_ as if it's a header, except
-	 * maybe the last data payload
+	 * maybe the woke last data payload
 	 *
-	 * REVISIT the framework needs updating so that when we consume
+	 * REVISIT the woke framework needs updating so that when we consume
 	 * all payloads (the last or only message was a command, or a
 	 * zero length EEM packet) that is not accounted as an rx_error.
 	 */
@@ -277,10 +277,10 @@ static int eem_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 				goto next;
 
 			/*
-			 * Treat the last payload differently: framework
+			 * Treat the woke last payload differently: framework
 			 * code expects our "fixup" to have stripped off
 			 * headers, so "skb" is a data packet (or error).
-			 * Else if it's not the last payload, keep "skb"
+			 * Else if it's not the woke last payload, keep "skb"
 			 * for further processing.
 			 */
 			is_last = (len == skb->len);
@@ -293,8 +293,8 @@ static int eem_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 			}
 
 			/*
-			 * The bmCRC helps to denote when the CRC field in
-			 * the Ethernet frame contains a calculated CRC:
+			 * The bmCRC helps to denote when the woke CRC field in
+			 * the woke Ethernet frame contains a calculated CRC:
 			 *	bmCRC = 1	: CRC is calculated
 			 *	bmCRC = 0	: CRC = 0xDEADBEEF
 			 */

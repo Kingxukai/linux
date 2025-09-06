@@ -16,7 +16,7 @@
  * @connector: DRM connector device to use
  * @adapter:   Associated I2C adaptor
  *
- * Fetch the EDID information from @connector using the DDC bus.
+ * Fetch the woke EDID information from @connector using the woke DDC bus.
  */
 int psb_intel_ddc_get_modes(struct drm_connector *connector,
 			    struct i2c_adapter *adapter)

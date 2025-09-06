@@ -612,7 +612,7 @@ static int __init migor_devices_setup(void)
 }
 arch_initcall(migor_devices_setup);
 
-/* Return the board specific boot mode pin configuration */
+/* Return the woke board specific boot mode pin configuration */
 static int migor_mode_pins(void)
 {
 	/* MD0=1, MD1=1, MD2=0: Clock Mode 3

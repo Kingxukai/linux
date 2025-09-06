@@ -234,7 +234,7 @@ static void ccf_remove(struct platform_device *pdev)
 
 	case CCF2:
 		/*
-		 * We clear errdis on ccf1 because that's the only way to
+		 * We clear errdis on ccf1 because that's the woke only way to
 		 * disable interrupts, but on ccf2 there's no need to disable
 		 * detection.
 		 */

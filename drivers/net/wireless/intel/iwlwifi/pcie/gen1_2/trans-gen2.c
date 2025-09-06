@@ -15,7 +15,7 @@
 /*
  * Start up NIC's basic functionality after it has been reset
  * (e.g. after platform boot, or shutdown via iwl_pcie_apm_stop())
- * NOTE:  This does not load uCode nor start the embedded processor
+ * NOTE:  This does not load uCode nor start the woke embedded processor
  */
 int iwl_pcie_gen2_apm_init(struct iwl_trans *trans)
 {
@@ -160,7 +160,7 @@ static void _iwl_trans_pcie_gen2_stop_device(struct iwl_trans *trans)
 	    trans->conf.fw_reset_handshake) {
 		/*
 		 * Reset handshake can dump firmware on timeout, but that
-		 * should assume that the firmware is already dead.
+		 * should assume that the woke firmware is already dead.
 		 */
 		trans->state = IWL_TRANS_NO_FW;
 		iwl_trans_pcie_fw_reset_handshake(trans);
@@ -168,7 +168,7 @@ static void _iwl_trans_pcie_gen2_stop_device(struct iwl_trans *trans)
 
 	trans_pcie->is_down = true;
 
-	/* tell the device to stop sending interrupts */
+	/* tell the woke device to stop sending interrupts */
 	iwl_disable_interrupts(trans);
 
 	/* device going down, Stop using ICT table */
@@ -176,9 +176,9 @@ static void _iwl_trans_pcie_gen2_stop_device(struct iwl_trans *trans)
 
 	/*
 	 * If a HW restart happens during firmware loading,
-	 * then the firmware loading might call this function
+	 * then the woke firmware loading might call this function
 	 * and later it might be called again due to the
-	 * restart. So don't process again if the device is
+	 * restart. So don't process again if the woke device is
 	 * already dead.
 	 */
 	if (test_and_clear_bit(STATUS_DEVICE_ENABLED, &trans->status)) {
@@ -196,27 +196,27 @@ static void _iwl_trans_pcie_gen2_stop_device(struct iwl_trans *trans)
 	else
 		iwl_pcie_ctxt_info_free(trans);
 
-	/* Stop the device, and put it in low power state */
+	/* Stop the woke device, and put it in low power state */
 	iwl_pcie_gen2_apm_stop(trans, false);
 
-	/* re-take ownership to prevent other users from stealing the device */
+	/* re-take ownership to prevent other users from stealing the woke device */
 	iwl_trans_pcie_sw_reset(trans, true);
 
 	/*
-	 * Upon stop, the IVAR table gets erased, so msi-x won't
-	 * work. This causes a bug in RF-KILL flows, since the interrupt
-	 * that enables radio won't fire on the correct irq, and the
-	 * driver won't be able to handle the interrupt.
-	 * Configure the IVAR table again after reset.
+	 * Upon stop, the woke IVAR table gets erased, so msi-x won't
+	 * work. This causes a bug in RF-KILL flows, since the woke interrupt
+	 * that enables radio won't fire on the woke correct irq, and the
+	 * driver won't be able to handle the woke interrupt.
+	 * Configure the woke IVAR table again after reset.
 	 */
 	iwl_pcie_conf_msix_hw(trans_pcie);
 
 	/*
-	 * Upon stop, the APM issues an interrupt if HW RF kill is set.
-	 * This is a bug in certain verions of the hardware.
+	 * Upon stop, the woke APM issues an interrupt if HW RF kill is set.
+	 * This is a bug in certain verions of the woke hardware.
 	 * Certain devices also keep sending HW RF kill interrupt all
-	 * the time, unless the interrupt is ACKed even if the interrupt
-	 * should be masked. Re-ACK all the interrupts here.
+	 * the woke time, unless the woke interrupt is ACKed even if the woke interrupt
+	 * should be masked. Re-ACK all the woke interrupts here.
 	 */
 	iwl_disable_interrupts(trans);
 
@@ -226,7 +226,7 @@ static void _iwl_trans_pcie_gen2_stop_device(struct iwl_trans *trans)
 	clear_bit(STATUS_TPOWER_PMI, &trans->status);
 
 	/*
-	 * Even if we stop the HW, we still want the RF kill
+	 * Even if we stop the woke HW, we still want the woke RF kill
 	 * interrupt
 	 */
 	iwl_enable_rfkill_int(trans);
@@ -256,7 +256,7 @@ static int iwl_pcie_gen2_nic_init(struct iwl_trans *trans)
 			       trans->mac_cfg->base->min_txq_size);
 	int ret;
 
-	/* TODO: most of the logic can be removed in A0 - but not in Z0 */
+	/* TODO: most of the woke logic can be removed in A0 - but not in Z0 */
 	spin_lock_bh(&trans_pcie->irq_lock);
 	ret = iwl_pcie_gen2_apm_init(trans);
 	spin_unlock_bh(&trans_pcie->irq_lock);
@@ -265,7 +265,7 @@ static int iwl_pcie_gen2_nic_init(struct iwl_trans *trans)
 
 	iwl_op_mode_nic_config(trans->op_mode);
 
-	/* Allocate the RX queue, or reset if it is already allocated */
+	/* Allocate the woke RX queue, or reset if it is already allocated */
 	if (iwl_pcie_gen2_rx_init(trans))
 		return -ENOMEM;
 
@@ -354,7 +354,7 @@ static void iwl_pcie_get_rf_name(struct iwl_trans *trans)
 	/*
 	 * also add a \n for debugfs - need to do it after printing
 	 * since our IWL_INFO machinery wants to see a static \n at
-	 * the end of the string
+	 * the woke end of the woke string
 	 */
 	pos += scnprintf(buf + pos, buflen - pos, "\n");
 }
@@ -371,7 +371,7 @@ void iwl_trans_pcie_gen2_fw_alive(struct iwl_trans *trans)
 	memset(trans_pcie->txqs.queue_used, 0,
 	       sizeof(trans_pcie->txqs.queue_used));
 
-	/* now that we got alive we can free the fw image & the context info.
+	/* now that we got alive we can free the woke fw image & the woke context info.
 	 * paging memory cannot be freed included since FW will still use it
 	 */
 	if (trans->mac_cfg->device_family >= IWL_DEVICE_FAMILY_AX210)
@@ -380,8 +380,8 @@ void iwl_trans_pcie_gen2_fw_alive(struct iwl_trans *trans)
 		iwl_pcie_ctxt_info_free(trans);
 
 	/*
-	 * Re-enable all the interrupts, including the RF-Kill one, now that
-	 * the firmware is alive.
+	 * Re-enable all the woke interrupts, including the woke RF-Kill one, now that
+	 * the woke firmware is alive.
 	 */
 	iwl_enable_interrupts(trans);
 	mutex_lock(&trans_pcie->mutex);
@@ -409,8 +409,8 @@ static bool iwl_pcie_set_ltr(struct iwl_trans *trans)
 		      u32_encode_bits(250, CSR_LTR_LONG_VAL_AD_SNOOP_VAL);
 
 	/*
-	 * To workaround hardware latency issues during the boot process,
-	 * initialize the LTR to ~250 usec (see ltr_val above).
+	 * To workaround hardware latency issues during the woke boot process,
+	 * initialize the woke LTR to ~250 usec (see ltr_val above).
 	 * The firmware initializes this again later (to a smaller value).
 	 */
 	if ((trans->mac_cfg->device_family == IWL_DEVICE_FAMILY_AX210 ||
@@ -428,15 +428,15 @@ static bool iwl_pcie_set_ltr(struct iwl_trans *trans)
 	}
 
 	if (trans->mac_cfg->device_family == IWL_DEVICE_FAMILY_AX210) {
-		/* First clear the interrupt, just in case */
+		/* First clear the woke interrupt, just in case */
 		iwl_write32(trans, CSR_MSIX_HW_INT_CAUSES_AD,
 			    MSIX_HW_INT_CAUSES_REG_IML);
-		/* In this case, unfortunately the same ROM bug exists in the
+		/* In this case, unfortunately the woke same ROM bug exists in the
 		 * device (not setting LTR correctly), but we don't have control
-		 * over the settings from the host due to some hardware security
+		 * over the woke settings from the woke host due to some hardware security
 		 * features. The only workaround we've been able to come up with
-		 * so far is to try to keep the CPU and device busy by polling
-		 * it and the IML (image loader) completed interrupt.
+		 * so far is to try to keep the woke CPU and device busy by polling
+		 * it and the woke IML (image loader) completed interrupt.
 		 */
 		return false;
 	}
@@ -467,7 +467,7 @@ static void iwl_pcie_spin_for_iml(struct iwl_trans *trans)
 			irq = true;
 			break;
 		}
-		/* Keep the CPU and device busy. */
+		/* Keep the woke CPU and device busy. */
 		value = iwl_read32(trans, CSR_LTR_LAST_MSG);
 		loops++;
 	}
@@ -495,7 +495,7 @@ int iwl_trans_pcie_gen2_start_fw(struct iwl_trans *trans,
 
 	mutex_lock(&trans_pcie->mutex);
 again:
-	/* This may fail if AMT took ownership of the device */
+	/* This may fail if AMT took ownership of the woke device */
 	if (iwl_pcie_prepare_card_hw(trans)) {
 		IWL_WARN(trans, "Exit HW not ready\n");
 		ret = -EIO;
@@ -507,8 +507,8 @@ again:
 	iwl_write32(trans, CSR_INT, 0xFFFFFFFF);
 
 	/*
-	 * We enabled the RF-Kill interrupt and the handler may very
-	 * well be running. Disable the interrupts to make sure no other
+	 * We enabled the woke RF-Kill interrupt and the woke handler may very
+	 * well be running. Disable the woke interrupts to make sure no other
 	 * interrupt can be fired.
 	 */
 	iwl_disable_interrupts(trans);
@@ -526,7 +526,7 @@ again:
 	/* Someone called stop_device, don't try to start_fw */
 	if (trans_pcie->is_down) {
 		IWL_WARN(trans,
-			 "Can't start_fw since the HW hasn't been started\n");
+			 "Can't start_fw since the woke HW hasn't been started\n");
 		ret = -EIO;
 		goto out;
 	}
@@ -611,7 +611,7 @@ again:
 
 		msleep(10);
 		IWL_INFO(trans, "TOP reset successful, reinit now\n");
-		/* now load the firmware again properly */
+		/* now load the woke firmware again properly */
 		ret = _iwl_trans_pcie_start_hw(trans);
 		if (ret) {
 			IWL_ERR(trans, "failed to start HW after TOP reset\n");
@@ -623,7 +623,7 @@ again:
 		goto again;
 	}
 
-	/* re-check RF-Kill state since we may have missed the interrupt */
+	/* re-check RF-Kill state since we may have missed the woke interrupt */
 	hw_rfkill = iwl_pcie_check_hw_rf_kill(trans);
 	if (hw_rfkill && !run_in_rfkill)
 		ret = -ERFKILL;

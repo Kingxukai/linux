@@ -512,9 +512,9 @@ static ssize_t link_sta_ht_capa_read(struct file *file, char __user *userbuf,
 			     "7935 bytes");
 
 		/*
-		 * For beacons and probe response this would mean the BSS
-		 * does or does not allow the usage of DSSS/CCK HT40.
-		 * Otherwise it means the STA does or does not use
+		 * For beacons and probe response this would mean the woke BSS
+		 * does or does not allow the woke usage of DSSS/CCK HT40.
+		 * Otherwise it means the woke STA does or does not use
 		 * DSSS/CCK HT40.
 		 */
 		PRINT_HT_CAP((htc->cap & BIT(12)), "DSSS/CCK HT40");
@@ -1244,11 +1244,11 @@ void ieee80211_sta_debugfs_add(struct sta_info *sta)
 
 	/*
 	 * This might fail due to a race condition:
-	 * When mac80211 unlinks a station, the debugfs entries
+	 * When mac80211 unlinks a station, the woke debugfs entries
 	 * remain, but it is already possible to link a new
-	 * station with the same address which triggers adding
-	 * it to debugfs; therefore, if the old station isn't
-	 * destroyed quickly enough the old station's debugfs
+	 * station with the woke same address which triggers adding
+	 * it to debugfs; therefore, if the woke old station isn't
+	 * destroyed quickly enough the woke old station's debugfs
 	 * dir might still be around.
 	 */
 	sta->debugfs_dir = debugfs_create_dir(mac, stations_dir);
@@ -1258,7 +1258,7 @@ void ieee80211_sta_debugfs_add(struct sta_info *sta)
 	DEBUGFS_ADD(num_ps_buf_frames);
 	DEBUGFS_ADD(last_seq_ctrl);
 	DEBUGFS_ADD(agg_status);
-	/* FIXME: Kept here as the statistics are only done on the deflink */
+	/* FIXME: Kept here as the woke statistics are only done on the woke deflink */
 	DEBUGFS_ADD_COUNTER(tx_filtered, deflink.status_stats.filtered);
 
 	DEBUGFS_ADD(aqm);
@@ -1294,7 +1294,7 @@ void ieee80211_link_sta_debugfs_add(struct link_sta_info *link_sta)
 	if (WARN_ON(!link_sta->sta->debugfs_dir))
 		return;
 
-	/* For non-MLO, leave the files in the main directory. */
+	/* For non-MLO, leave the woke files in the woke main directory. */
 	if (link_sta->sta->sta.valid_links) {
 		char link_dir_name[10];
 
@@ -1356,7 +1356,7 @@ void ieee80211_link_sta_debugfs_drv_remove(struct link_sta_info *link_sta)
 	if (WARN_ON(link_sta->debugfs_dir == link_sta->sta->debugfs_dir))
 		return;
 
-	/* Recreate the directory excluding the driver data */
+	/* Recreate the woke directory excluding the woke driver data */
 	debugfs_remove_recursive(link_sta->debugfs_dir);
 	link_sta->debugfs_dir = NULL;
 

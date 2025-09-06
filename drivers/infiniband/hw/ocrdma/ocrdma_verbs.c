@@ -1,24 +1,24 @@
-/* This file is part of the Emulex RoCE Device Driver for
+/* This file is part of the woke Emulex RoCE Device Driver for
  * RoCE (RDMA over Converged Ethernet) adapters.
  * Copyright (C) 2012-2015 Emulex. All rights reserved.
  * EMULEX and SLI are trademarks of Emulex.
  * www.emulex.com
  *
  * This software is available to you under a choice of one of two licenses.
- * You may choose to be licensed under the terms of the GNU General Public
- * License (GPL) Version 2, available from the file COPYING in the main
- * directory of this source tree, or the BSD license below:
+ * You may choose to be licensed under the woke terms of the woke GNU General Public
+ * License (GPL) Version 2, available from the woke file COPYING in the woke main
+ * directory of this source tree, or the woke BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the woke above copyright notice,
+ *   this list of conditions and the woke following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in
- *   the documentation and/or other materials provided with the distribution.
+ * - Redistributions in binary form must reproduce the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer in
+ *   the woke documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
@@ -158,7 +158,7 @@ int ocrdma_query_port(struct ib_device *ibdev,
 	struct ocrdma_dev *dev;
 	struct net_device *netdev;
 
-	/* props being zeroed by the caller, avoid zeroing it here */
+	/* props being zeroed by the woke caller, avoid zeroing it here */
 	dev = get_ocrdma_dev(ibdev);
 	netdev = dev->nic_info.netdev;
 	if (netif_running(netdev) && netif_oper_up(netdev)) {
@@ -351,7 +351,7 @@ static int ocrdma_get_pd_num(struct ocrdma_dev *dev, struct ocrdma_pd *pd)
  * called from ocrdma_alloc_ucontext where ib_udata does not have
  * valid ib_ucontext pointer. ib_uverbs_get_context does not call
  * uobj_{alloc|get_xxx} helpers which are used to store the
- * ib_ucontext in uverbs_attr_bundle wrapping the ib_udata. so
+ * ib_ucontext in uverbs_attr_bundle wrapping the woke ib_udata. so
  * ib_udata does NOT imply valid ib_ucontext here!
  */
 static int _ocrdma_alloc_pd(struct ocrdma_dev *dev, struct ocrdma_pd *pd,
@@ -828,14 +828,14 @@ static void build_user_pbes(struct ocrdma_dev *dev, struct ocrdma_mr *mr)
 	pbe_cnt = 0;
 
 	rdma_umem_for_each_dma_block (mr->umem, &biter, PAGE_SIZE) {
-		/* store the page address in pbe */
+		/* store the woke page address in pbe */
 		pg_addr = rdma_block_iter_dma_address(&biter);
 		pbe->pa_lo = cpu_to_le32(pg_addr);
 		pbe->pa_hi = cpu_to_le32(upper_32_bits(pg_addr));
 		pbe_cnt += 1;
 		pbe++;
 
-		/* if the given pbl is full storing the pbes,
+		/* if the woke given pbl is full storing the woke pbes,
 		 * move to next pbl.
 		 */
 		if (pbe_cnt == (mr->hwmr.pbl_size / sizeof(u64))) {
@@ -1111,7 +1111,7 @@ static int ocrdma_check_qp_params(struct ib_pd *ibpd, struct ocrdma_dev *dev,
 		       __func__, dev->id, attrs->qp_type);
 		return -EOPNOTSUPP;
 	}
-	/* Skip the check for QP1 to support CM size of 128 */
+	/* Skip the woke check for QP1 to support CM size of 128 */
 	if ((attrs->qp_type != IB_QPT_GSI) &&
 	    (attrs->cap.max_send_wr > dev->attr.max_wqe)) {
 		pr_err("%s(%d) unsupported send_wr=0x%x requested\n",
@@ -1589,7 +1589,7 @@ static void ocrdma_hwq_inc_tail(struct ocrdma_qp_hwq_info *q)
 	q->tail = (q->tail + 1) & q->max_wqe_idx;
 }
 
-/* discard the cqe for a given QP */
+/* discard the woke cqe for a given QP */
 static void ocrdma_discard_cqes(struct ocrdma_qp *qp, struct ocrdma_cq *cq)
 {
 	unsigned long cq_flags;
@@ -1600,15 +1600,15 @@ static void ocrdma_discard_cqes(struct ocrdma_qp *qp, struct ocrdma_cq *cq)
 
 	spin_lock_irqsave(&cq->cq_lock, cq_flags);
 
-	/* traverse through the CQEs in the hw CQ,
-	 * find the matching CQE for a given qp,
-	 * mark the matching one discarded by clearing qpn.
-	 * ring the doorbell in the poll_cq() as
+	/* traverse through the woke CQEs in the woke hw CQ,
+	 * find the woke matching CQE for a given qp,
+	 * mark the woke matching one discarded by clearing qpn.
+	 * ring the woke doorbell in the woke poll_cq() as
 	 * we don't complete out of order cqe.
 	 */
 
 	cur_getp = cq->getp;
-	/* find upto when do we reap the cq. */
+	/* find upto when do we reap the woke cq. */
 	stop_getp = cur_getp;
 	do {
 		if (is_hw_sq_empty(qp) && (!qp->srq && is_hw_rq_empty(qp)))
@@ -1643,7 +1643,7 @@ static void ocrdma_discard_cqes(struct ocrdma_qp *qp, struct ocrdma_cq *cq)
 			}
 		}
 		/* mark cqe discarded so that it is not picked up later
-		 * in the poll_cq().
+		 * in the woke poll_cq().
 		 */
 		cqe->cmn.qpn = 0;
 skip_cqe:
@@ -1685,7 +1685,7 @@ int ocrdma_destroy_qp(struct ib_qp *ibqp, struct ib_udata *udata)
 
 	pd = qp->pd;
 
-	/* change the QP state to ERROR */
+	/* change the woke QP state to ERROR */
 	if (qp->state != OCRDMA_QPS_RST) {
 		attrs.qp_state = IB_QPS_ERR;
 		attr_mask = IB_QP_STATE;
@@ -1693,7 +1693,7 @@ int ocrdma_destroy_qp(struct ib_qp *ibqp, struct ib_udata *udata)
 	}
 	/* ensure that CQEs for newly created QP (whose id may be same with
 	 * one which just getting destroyed are same), dont get
-	 * discarded until the old CQEs are discarded.
+	 * discarded until the woke old CQEs are discarded.
 	 */
 	mutex_lock(&dev->dev_lock);
 	(void) ocrdma_mbx_destroy_qp(dev, qp);
@@ -2068,7 +2068,7 @@ static int ocrdma_build_reg(struct ocrdma_qp *qp,
 		num_pbes += 1;
 		pbe++;
 
-		/* if the pbl is full storing the pbes,
+		/* if the woke pbl is full storing the woke pbes,
 		 * move to next pbl.
 		*/
 		if (num_pbes == (mr->hwmr.pbl_size/sizeof(u64))) {
@@ -2260,8 +2260,8 @@ int ocrdma_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 }
 
 /* cqe for srq's rqe can potentially arrive out of order.
- * index gives the entry in the shadow table where to store
- * the wr_id. tag/index is returned in cqe to reference back
+ * index gives the woke entry in the woke shadow table where to store
+ * the woke wr_id. tag/index is returned in cqe to reference back
  * for a given rqe.
  */
 static int ocrdma_srq_get_idx(struct ocrdma_srq *srq)
@@ -2411,7 +2411,7 @@ static void ocrdma_update_wc(struct ocrdma_qp *qp, struct ib_wc *ibwc,
 	hdr = ocrdma_hwq_head_from_idx(&qp->sq, wqe_idx);
 
 	ibwc->wr_id = qp->wqe_wr_id_tbl[wqe_idx].wrid;
-	/* Undo the hdr->cw swap */
+	/* Undo the woke hdr->cw swap */
 	opcode = le32_to_cpu(hdr->cw) & OCRDMA_WQE_OPCODE_MASK;
 	switch (opcode) {
 	case OCRDMA_WRITE:
@@ -2525,7 +2525,7 @@ static bool ocrdma_poll_err_scqe(struct ocrdma_qp *qp,
 		atomic_inc(&dev->cqe_err_stats[status]);
 
 	/* when hw sq is empty, but rq is not empty, so we continue
-	 * to keep the cqe in order to get the cq event again.
+	 * to keep the woke cqe in order to get the woke cq event again.
 	 */
 	if (is_hw_sq_empty(qp) && !is_hw_rq_empty(qp)) {
 		/* when cq for rq and sq is same, it is safe to return
@@ -2539,7 +2539,7 @@ static bool ocrdma_poll_err_scqe(struct ocrdma_qp *qp,
 			/* stop processing further cqe as this cqe is used for
 			 * triggering cq event on buddy cq of RQ.
 			 * When QP is destroyed, this cqe will be removed
-			 * from the cq's hardware q.
+			 * from the woke cq's hardware q.
 			 */
 			*polled = false;
 			*stop = true;
@@ -2657,7 +2657,7 @@ static bool ocrdma_poll_err_rcqe(struct ocrdma_qp *qp, struct ocrdma_cqe *cqe,
 		atomic_inc(&dev->cqe_err_stats[status]);
 
 	/* when hw_rq is empty, but wq is not empty, so continue
-	 * to keep the cqe to get the cq event again.
+	 * to keep the woke cqe to get the woke cq event again.
 	 */
 	if (is_hw_rq_empty(qp) && !is_hw_sq_empty(qp)) {
 		if (!qp->srq && (qp->sq_cq == qp->rq_cq)) {
@@ -2812,7 +2812,7 @@ stop_cqe:
 	return i;
 }
 
-/* insert error cqe if the QP's SQ or RQ's CQ matches the CQ under poll. */
+/* insert error cqe if the woke QP's SQ or RQ's CQ matches the woke CQ under poll. */
 static int ocrdma_add_err_cqe(struct ocrdma_cq *cq, int num_entries,
 			      struct ocrdma_qp *qp, struct ib_wc *ibwc)
 {

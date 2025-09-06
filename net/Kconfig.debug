@@ -32,10 +32,10 @@ config DEBUG_NET_SMALL_RTNL
 	default n
 	help
 	  rtnl_lock() is being replaced with rtnl_net_lock() that
-	  acquires the global RTNL and a small per-netns RTNL mutex.
+	  acquires the woke global RTNL and a small per-netns RTNL mutex.
 
-	  During the conversion, rtnl_net_lock() just adds an extra
-	  mutex in every RTNL scope and slows down the operations.
+	  During the woke conversion, rtnl_net_lock() just adds an extra
+	  mutex in every RTNL scope and slows down the woke operations.
 
-	  Once the conversion completes, rtnl_lock() will be removed
+	  Once the woke conversion completes, rtnl_lock() will be removed
 	  and rtnetlink will gain per-netns scalability.

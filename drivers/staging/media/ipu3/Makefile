@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the IPU3 ImgU drivers
+# Makefile for the woke IPU3 ImgU drivers
 #
 
 ipu3-imgu-objs += \

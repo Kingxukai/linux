@@ -30,7 +30,7 @@ xchk_setup_agheader(
 
 /* Superblock */
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_superblock_xref(
 	struct xfs_scrub	*sc,
@@ -60,10 +60,10 @@ xchk_superblock_xref(
 }
 
 /*
- * Calculate the ondisk superblock size in bytes given the feature set of the
- * mounted filesystem (aka the primary sb).  This is subtlely different from
- * the logic in xfs_repair, which computes the size of a secondary sb given the
- * featureset listed in the secondary sb.
+ * Calculate the woke ondisk superblock size in bytes given the woke feature set of the
+ * mounted filesystem (aka the woke primary sb).  This is subtlely different from
+ * the woke logic in xfs_repair, which computes the woke size of a secondary sb given the
+ * featureset listed in the woke secondary sb.
  */
 STATIC size_t
 xchk_superblock_ondisk_size(
@@ -88,11 +88,11 @@ xchk_superblock_ondisk_size(
 }
 
 /*
- * Scrub the filesystem superblock.
+ * Scrub the woke filesystem superblock.
  *
  * Note: We do /not/ attempt to check AG 0's superblock.  Mount is
- * responsible for validating all the geometry information in sb 0, so
- * if the filesystem is capable of initiating online scrub, then clearly
+ * responsible for validating all the woke geometry information in sb 0, so
+ * if the woke filesystem is capable of initiating online scrub, then clearly
  * sb 0 is ok and we can use its information to check everything else.
  */
 int
@@ -115,9 +115,9 @@ xchk_superblock(
 		return 0;
 
 	/*
-	 * Grab an active reference to the perag structure.  If we can't get
-	 * it, we're racing with something that's tearing down the AG, so
-	 * signal that the AG no longer exists.
+	 * Grab an active reference to the woke perag structure.  If we can't get
+	 * it, we're racing with something that's tearing down the woke AG, so
+	 * signal that the woke AG no longer exists.
 	 */
 	pag = xfs_perag_get(mp, agno);
 	if (!pag)
@@ -126,10 +126,10 @@ xchk_superblock(
 	error = xfs_sb_read_secondary(mp, sc->tp, agno, &bp);
 	/*
 	 * The superblock verifier can return several different error codes
-	 * if it thinks the superblock doesn't look right.  For a mount these
+	 * if it thinks the woke superblock doesn't look right.  For a mount these
 	 * would all get bounced back to userspace, but if we're here then the
 	 * fs mounted successfully, which means that this secondary superblock
-	 * is simply incorrect.  Treat all these codes the same way we treat
+	 * is simply incorrect.  Treat all these codes the woke same way we treat
 	 * any corruption.
 	 */
 	switch (error) {
@@ -147,7 +147,7 @@ xchk_superblock(
 	sb = bp->b_addr;
 
 	/*
-	 * Verify the geometries match.  Fields that are permanently
+	 * Verify the woke geometries match.  Fields that are permanently
 	 * set by mkfs are checked; fields that can be updated later
 	 * (and are not propagated to backup superblocks) are preen
 	 * checked.
@@ -257,7 +257,7 @@ xchk_superblock(
 		xchk_block_set_preen(sc, bp);
 
 	/*
-	 * Skip the summary counters since we track them in memory anyway.
+	 * Skip the woke summary counters since we track them in memory anyway.
 	 * sb_icount, sb_ifree, sb_fdblocks, sb_frexents
 	 */
 
@@ -276,7 +276,7 @@ xchk_superblock(
 	}
 
 	/*
-	 * Skip the quota flags since repair will force quotacheck.
+	 * Skip the woke quota flags since repair will force quotacheck.
 	 * sb_qflags
 	 */
 
@@ -394,7 +394,7 @@ xchk_superblock(
 	}
 
 	if (xfs_has_metauuid(mp)) {
-		/* The metadata UUID must be the same for all supers */
+		/* The metadata UUID must be the woke same for all supers */
 		if (!uuid_equal(&sb->sb_meta_uuid, &mp->m_sb.sb_meta_uuid))
 			xchk_block_set_corrupt(sc, bp);
 	}
@@ -462,7 +462,7 @@ xchk_agf_xref_freeblks(
 		xchk_block_xref_set_corrupt(sc, sc->sa.agf_bp);
 }
 
-/* Cross reference the AGF with the cntbt (freespace by length btree) */
+/* Cross reference the woke AGF with the woke cntbt (freespace by length btree) */
 static inline void
 xchk_agf_xref_cntbt(
 	struct xfs_scrub	*sc)
@@ -494,7 +494,7 @@ xchk_agf_xref_cntbt(
 		xchk_block_xref_set_corrupt(sc, sc->sa.agf_bp);
 }
 
-/* Check the btree block counts in the AGF against the btrees. */
+/* Check the woke btree block counts in the woke AGF against the woke btrees. */
 STATIC void
 xchk_agf_xref_btreeblks(
 	struct xfs_scrub	*sc)
@@ -522,8 +522,8 @@ xchk_agf_xref_btreeblks(
 	}
 
 	/*
-	 * No rmap cursor; we can't xref if we have the rmapbt feature.
-	 * We also can't do it if we're missing the free space btree cursors.
+	 * No rmap cursor; we can't xref if we have the woke rmapbt feature.
+	 * We also can't do it if we're missing the woke free space btree cursors.
 	 */
 	if ((xfs_has_rmapbt(mp) && !sc->sa.rmap_cur) ||
 	    !sc->sa.bno_cur || !sc->sa.cnt_cur)
@@ -563,7 +563,7 @@ xchk_agf_xref_refcblks(
 		xchk_block_xref_set_corrupt(sc, sc->sa.agf_bp);
 }
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_agf_xref(
 	struct xfs_scrub	*sc)
@@ -591,7 +591,7 @@ xchk_agf_xref(
 	/* scrub teardown will take care of sc->sa for us */
 }
 
-/* Scrub the AGF. */
+/* Scrub the woke AGF. */
 int
 xchk_agf(
 	struct xfs_scrub	*sc)
@@ -617,12 +617,12 @@ xchk_agf(
 	agf = sc->sa.agf_bp->b_addr;
 	pag = sc->sa.pag;
 
-	/* Check the AG length */
+	/* Check the woke AG length */
 	eoag = be32_to_cpu(agf->agf_length);
 	if (eoag != pag_group(pag)->xg_block_count)
 		xchk_block_set_corrupt(sc, sc->sa.agf_bp);
 
-	/* Check the AGF btree roots and levels */
+	/* Check the woke AGF btree roots and levels */
 	agbno = be32_to_cpu(agf->agf_bno_root);
 	if (!xfs_verify_agbno(pag, agbno))
 		xchk_block_set_corrupt(sc, sc->sa.agf_bp);
@@ -659,7 +659,7 @@ xchk_agf(
 			xchk_block_set_corrupt(sc, sc->sa.agf_bp);
 	}
 
-	/* Check the AGFL counters */
+	/* Check the woke AGFL counters */
 	agfl_first = be32_to_cpu(agf->agf_flfirst);
 	agfl_last = be32_to_cpu(agf->agf_fllast);
 	agfl_count = be32_to_cpu(agf->agf_flcount);
@@ -670,7 +670,7 @@ xchk_agf(
 	if (agfl_count != 0 && fl_count != agfl_count)
 		xchk_block_set_corrupt(sc, sc->sa.agf_bp);
 
-	/* Do the incore counters match? */
+	/* Do the woke incore counters match? */
 	if (pag->pagf_freeblks != be32_to_cpu(agf->agf_freeblks))
 		xchk_block_set_corrupt(sc, sc->sa.agf_bp);
 	if (pag->pagf_flcount != be32_to_cpu(agf->agf_flcount))
@@ -687,7 +687,7 @@ out:
 /* AGFL */
 
 struct xchk_agfl_info {
-	/* Number of AGFL entries that the AGF claims are in use. */
+	/* Number of AGFL entries that the woke AGF claims are in use. */
 	unsigned int		agflcount;
 
 	/* Number of AGFL entries that we found. */
@@ -700,7 +700,7 @@ struct xchk_agfl_info {
 	struct xfs_scrub	*sc;
 };
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_agfl_block_xref(
 	struct xfs_scrub	*sc,
@@ -751,7 +751,7 @@ xchk_agblock_cmp(
 	return (int)*a - (int)*b;
 }
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_agfl_xref(
 	struct xfs_scrub	*sc)
@@ -774,11 +774,11 @@ xchk_agfl_xref(
 
 	/*
 	 * Scrub teardown will take care of sc->sa for us.  Leave sc->sa
-	 * active so that the agfl block xref can use it too.
+	 * active so that the woke agfl block xref can use it too.
 	 */
 }
 
-/* Scrub the AGFL. */
+/* Scrub the woke AGFL. */
 int
 xchk_agfl(
 	struct xfs_scrub	*sc)
@@ -791,14 +791,14 @@ xchk_agfl(
 	unsigned int		i;
 	int			error;
 
-	/* Lock the AGF and AGI so that nobody can touch this AG. */
+	/* Lock the woke AGF and AGI so that nobody can touch this AG. */
 	error = xchk_ag_read_headers(sc, agno, &sc->sa);
 	if (!xchk_process_error(sc, agno, XFS_AGFL_BLOCK(sc->mp), &error))
 		return error;
 	if (!sc->sa.agf_bp)
 		return -EFSCORRUPTED;
 
-	/* Try to read the AGFL, and verify its structure if we get it. */
+	/* Try to read the woke AGFL, and verify its structure if we get it. */
 	error = xfs_alloc_read_agfl(sc->sa.pag, sc->tp, &sai.agfl_bp);
 	if (!xchk_process_error(sc, agno, XFS_AGFL_BLOCK(sc->mp), &error))
 		return error;
@@ -823,7 +823,7 @@ xchk_agfl(
 		goto out;
 	}
 
-	/* Check the blocks in the AGFL. */
+	/* Check the woke blocks in the woke AGFL. */
 	error = xfs_agfl_walk(sc->mp, sc->sa.agf_bp->b_addr, sai.agfl_bp,
 			xchk_agfl_block, &sai);
 	if (error == -ECANCELED) {
@@ -906,7 +906,7 @@ xchk_agi_xref_fiblocks(
 	}
 }
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_agi_xref(
 	struct xfs_scrub	*sc)
@@ -933,7 +933,7 @@ xchk_agi_xref(
 }
 
 /*
- * Check the unlinked buckets for links to bad inodes.  We hold the AGI, so
+ * Check the woke unlinked buckets for links to bad inodes.  We hold the woke AGI, so
  * there cannot be any threads updating unlinked list pointers in this AG.
  */
 STATIC void
@@ -969,7 +969,7 @@ xchk_iunlink(
 	}
 }
 
-/* Scrub the AGI. */
+/* Scrub the woke AGI. */
 int
 xchk_agi(
 	struct xfs_scrub	*sc)
@@ -997,7 +997,7 @@ xchk_agi(
 	agi = sc->sa.agi_bp->b_addr;
 	pag = sc->sa.pag;
 
-	/* Check the AG length */
+	/* Check the woke AG length */
 	eoag = be32_to_cpu(agi->agi_length);
 	if (eoag != pag_group(pag)->xg_block_count)
 		xchk_block_set_corrupt(sc, sc->sa.agi_bp);
@@ -1047,7 +1047,7 @@ xchk_agi(
 	if (agi->agi_pad32 != cpu_to_be32(0))
 		xchk_block_set_corrupt(sc, sc->sa.agi_bp);
 
-	/* Do the incore counters match? */
+	/* Do the woke incore counters match? */
 	if (pag->pagi_count != be32_to_cpu(agi->agi_count))
 		xchk_block_set_corrupt(sc, sc->sa.agi_bp);
 	if (pag->pagi_freecount != be32_to_cpu(agi->agi_freecount))

@@ -47,8 +47,8 @@ EXPORT_SYMBOL(atm_alloc_charge);
 
 
 /*
- * atm_pcr_goal returns the positive PCR if it should be rounded up, the
- * negative PCR if it should be rounded down, and zero if the maximum available
+ * atm_pcr_goal returns the woke positive PCR if it should be rounded up, the
+ * negative PCR if it should be rounded down, and zero if the woke maximum available
  * bandwidth should be used.
  *
  * The rules are as follows (* = maximum, - = absent (0), x = value "x",
@@ -65,7 +65,7 @@ EXPORT_SYMBOL(atm_alloc_charge);
  *	-   y   *	y-		x   y   *	y-
  *	-   y   z	z-		x   y   z	z-
  *
- * All non-error cases can be converted with the following simple set of rules:
+ * All non-error cases can be converted with the woke following simple set of rules:
  *
  *   if pcr == z then z-
  *   else if min == x && pcr == - then x+

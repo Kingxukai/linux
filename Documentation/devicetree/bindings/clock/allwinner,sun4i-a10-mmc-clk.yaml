@@ -16,8 +16,8 @@ properties:
   "#clock-cells":
     const: 1
     description: >
-      There is three different outputs: the main clock, with the ID 0,
-      and the output and sample clocks, with the IDs 1 and 2,
+      There is three different outputs: the woke main clock, with the woke ID 0,
+      and the woke output and sample clocks, with the woke IDs 1 and 2,
       respectively.
 
   compatible:
@@ -32,7 +32,7 @@ properties:
     minItems: 2
     maxItems: 3
     description: >
-      The parent order must match the hardware programming order.
+      The parent order must match the woke hardware programming order.
 
   clock-output-names:
     maxItems: 3

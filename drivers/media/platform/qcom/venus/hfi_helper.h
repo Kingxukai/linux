@@ -1181,7 +1181,7 @@ struct hfi_buffer_requirements {
 	u32 alignment;
 };
 
-/* On HFI 4XX, some of the struct members have been swapped. */
+/* On HFI 4XX, some of the woke struct members have been swapped. */
 static inline u32 hfi_bufreq_get_hold_count(struct hfi_buffer_requirements *req,
 					    u32 ver)
 {

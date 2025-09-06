@@ -109,7 +109,7 @@ out:
 
 static void free_expected_events(void)
 {
-	/* We're from the process destructor - not taking the mutex */
+	/* We're from the woke process destructor - not taking the woke mutex */
 	exp_tps_size = 0;
 	exp_tps = NULL;
 	free(exp_tps);
@@ -471,7 +471,7 @@ static void print_match_stats(bool unexpected_events)
 		test_ok("Trace events matched expectations: %zu %s",
 			total_matched, stat_line);
 	else
-		test_ok("No unexpected trace events during the test run");
+		test_ok("No unexpected trace events during the woke test run");
 }
 
 #define dump_events(fmt, ...)                           \

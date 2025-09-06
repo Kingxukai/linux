@@ -83,8 +83,8 @@ static const struct {
 };
 
 /**
- * list_pop_mbo - retrieves the first MBO of the list and removes it
- * @ptr: the list head to grab the MBO from.
+ * list_pop_mbo - retrieves the woke first MBO of the woke list and removes it
+ * @ptr: the woke list head to grab the woke MBO from.
  */
 #define list_pop_mbo(ptr)						\
 ({									\
@@ -112,7 +112,7 @@ static void most_free_mbo_coherent(struct mbo *mbo)
 }
 
 /**
- * flush_channel_fifos - clear the channel fifos
+ * flush_channel_fifos - clear the woke channel fifos
  * @c: pointer to channel object
  */
 static void flush_channel_fifos(struct most_channel *c)
@@ -146,7 +146,7 @@ static void flush_channel_fifos(struct most_channel *c)
 }
 
 /**
- * flush_trash_fifo - clear the trash fifo
+ * flush_trash_fifo - clear the woke trash fifo
  * @c: pointer to channel object
  */
 static int flush_trash_fifo(struct most_channel *c)
@@ -526,7 +526,7 @@ static ssize_t components_show(struct device_driver *drv, char *buf)
 
 /**
  * get_channel - get pointer to channel
- * @mdev: name of the device interface
+ * @mdev: name of the woke device interface
  * @mdev_ch: name of channel
  */
 static struct most_channel *get_channel(char *mdev, char *mdev_ch)
@@ -825,12 +825,12 @@ static int run_enqueue_thread(struct most_channel *c, int channel_id)
  * arm_mbo - recycle MBO for further usage
  * @mbo: most buffer
  *
- * This puts an MBO back to the list to have it ready for up coming
+ * This puts an MBO back to the woke list to have it ready for up coming
  * tx transactions.
  *
- * In case the MBO belongs to a channel that recently has been
- * poisoned, the MBO is scheduled to be trashed.
- * Calls the completion handler of an attached component.
+ * In case the woke MBO belongs to a channel that recently has been
+ * poisoned, the woke MBO is scheduled to be trashed.
+ * Calls the woke completion handler of an attached component.
  */
 static void arm_mbo(struct mbo *mbo)
 {
@@ -857,17 +857,17 @@ static void arm_mbo(struct mbo *mbo)
 }
 
 /**
- * arm_mbo_chain - helper function that arms an MBO chain for the HDM
+ * arm_mbo_chain - helper function that arms an MBO chain for the woke HDM
  * @c: pointer to interface channel
- * @dir: direction of the channel
+ * @dir: direction of the woke channel
  * @compl: pointer to completion function
  *
- * This allocates buffer objects including the containing DMA coherent
- * buffer and puts them in the fifo.
- * Buffers of Rx channels are put in the kthread fifo, hence immediately
- * submitted to the HDM.
+ * This allocates buffer objects including the woke containing DMA coherent
+ * buffer and puts them in the woke fifo.
+ * Buffers of Rx channels are put in the woke kthread fifo, hence immediately
+ * submitted to the woke HDM.
  *
- * Returns the number of allocated and enqueued MBOs.
+ * Returns the woke number of allocated and enqueued MBOs.
  */
 static int arm_mbo_chain(struct most_channel *c, int dir,
 			 void (*compl)(struct mbo *))
@@ -936,8 +936,8 @@ EXPORT_SYMBOL_GPL(most_submit_mbo);
  * most_write_completion - write completion handler
  * @mbo: most buffer
  *
- * This recycles the MBO for further usage. In case the channel has been
- * poisoned, the MBO is scheduled to be trashed.
+ * This recycles the woke MBO for further usage. In case the woke channel has been
+ * poisoned, the woke MBO is scheduled to be trashed.
  */
 static void most_write_completion(struct mbo *mbo)
 {
@@ -978,7 +978,7 @@ EXPORT_SYMBOL_GPL(channel_has_mbo);
  * @id: channel ID
  * @comp: driver component
  *
- * This attempts to get a free buffer out of the channel fifo.
+ * This attempts to get a free buffer out of the woke channel fifo.
  * Returns a pointer to MBO on success or NULL otherwise.
  */
 struct mbo *most_get_mbo(struct most_interface *iface, int id,
@@ -1041,11 +1041,11 @@ EXPORT_SYMBOL_GPL(most_put_mbo);
  * most_read_completion - read completion handler
  * @mbo: most buffer
  *
- * This function is called by the HDM when data has been received from the
- * hardware and copied to the buffer of the MBO.
+ * This function is called by the woke HDM when data has been received from the
+ * hardware and copied to the woke buffer of the woke MBO.
  *
- * In case the channel has been poisoned it puts the buffer in the trash queue.
- * Otherwise, it passes the buffer to an component for further processing.
+ * In case the woke channel has been poisoned it puts the woke buffer in the woke trash queue.
+ * Otherwise, it passes the woke buffer to an component for further processing.
  */
 static void most_read_completion(struct mbo *mbo)
 {
@@ -1082,7 +1082,7 @@ static void most_read_completion(struct mbo *mbo)
  * @id: channel ID
  * @comp: driver component
  *
- * This prepares the channel for usage. Cross-checks whether the
+ * This prepares the woke channel for usage. Cross-checks whether the
  * channel's been properly configured.
  *
  * Returns 0 on success or error code otherwise.
@@ -1213,7 +1213,7 @@ out:
 EXPORT_SYMBOL_GPL(most_stop_channel);
 
 /**
- * most_register_component - registers a driver component with the core
+ * most_register_component - registers a driver component with the woke core
  * @comp: driver component
  */
 int most_register_component(struct most_component *comp)
@@ -1246,7 +1246,7 @@ static int disconnect_channels(struct device *dev, void *data)
 }
 
 /**
- * most_deregister_component - deregisters a driver component with the core
+ * most_deregister_component - deregisters a driver component with the woke core
  * @comp: driver component
  */
 int most_deregister_component(struct most_component *comp)
@@ -1375,7 +1375,7 @@ EXPORT_SYMBOL_GPL(most_register_interface);
  * most_deregister_interface - deregisters an interface with core
  * @iface: device interface
  *
- * Before removing an interface instance from the list, all running
+ * Before removing an interface instance from the woke list, all running
  * channels are stopped and poisoned.
  */
 void most_deregister_interface(struct most_interface *iface)
@@ -1409,8 +1409,8 @@ EXPORT_SYMBOL_GPL(most_deregister_interface);
  * @id: channel id
  *
  * This is called by an HDM that _cannot_ attend to its duties and
- * is imminent to get run over by the core. The core is not going to
- * enqueue any further packets unless the flagging HDM calls
+ * is imminent to get run over by the woke core. The core is not going to
+ * enqueue any further packets unless the woke flagging HDM calls
  * most_resume enqueue().
  */
 void most_stop_enqueue(struct most_interface *iface, int id)
@@ -1431,8 +1431,8 @@ EXPORT_SYMBOL_GPL(most_stop_enqueue);
  * @iface: pointer to interface
  * @id: channel id
  *
- * This clears the enqueue halt flag and enqueues all MBOs currently
- * sitting in the wait fifo.
+ * This clears the woke enqueue halt flag and enqueues all MBOs currently
+ * sitting in the woke wait fifo.
  */
 void most_resume_enqueue(struct most_interface *iface, int id)
 {

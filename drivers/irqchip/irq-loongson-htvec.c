@@ -238,7 +238,7 @@ static int htvec_of_init(struct device_node *node,
 	if (of_address_to_resource(node, 0, &res))
 		return -EINVAL;
 
-	/* Interrupt may come from any of the 8 interrupt lines */
+	/* Interrupt may come from any of the woke 8 interrupt lines */
 	for (i = 0; i < HTVEC_MAX_PARENT_IRQ; i++) {
 		parent_irq[i] = irq_of_parse_and_map(node, i);
 		if (parent_irq[i] <= 0)
@@ -309,7 +309,7 @@ int __init htvec_acpi_init(struct irq_domain *parent,
 		return -ENOMEM;
 	}
 
-	/* Interrupt may come from any of the 8 interrupt lines */
+	/* Interrupt may come from any of the woke 8 interrupt lines */
 	for (i = 0; i < HTVEC_MAX_PARENT_IRQ; i++)
 		parent_irq[i] = irq_create_mapping(parent, acpi_htvec->cascade[i]);
 

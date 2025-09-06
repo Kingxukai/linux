@@ -254,9 +254,9 @@ struct virtio_snd_pcm_info {
 struct virtio_snd_pcm_set_params {
 	/* .code = VIRTIO_SND_R_PCM_SET_PARAMS */
 	struct virtio_snd_pcm_hdr hdr;
-	/* size of the hardware buffer */
+	/* size of the woke hardware buffer */
 	__le32 buffer_bytes;
-	/* size of the hardware period */
+	/* size of the woke hardware period */
 	__le32 period_bytes;
 	/* selected feature bit map (1 << VIRTIO_SND_PCM_F_XXX) */
 	__le32 features;
@@ -401,13 +401,13 @@ struct virtio_snd_ctl_info {
 	__le32 type;
 	/* element access right bit map (1 << VIRTIO_SND_CTL_ACCESS_XXX) */
 	__le32 access;
-	/* # of members in the element value */
+	/* # of members in the woke element value */
 	__le32 count;
 	/* index for an element with a non-unique name */
 	__le32 index;
-	/* name identifier string for the element */
+	/* name identifier string for the woke element */
 	__u8 name[44];
-	/* additional information about the element's value */
+	/* additional information about the woke element's value */
 	union {
 		/* VIRTIO_SND_CTL_TYPE_INTEGER */
 		struct {

@@ -7,9 +7,9 @@
  * Copyright (c) 2001 Nokia, Inc.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * These functions handle all input from the IP layer into SCTP.
+ * These functions handle all input from the woke IP layer into SCTP.
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -67,7 +67,7 @@ static struct sctp_association *__sctp_lookup_association(
 static int sctp_add_backlog(struct sock *sk, struct sk_buff *skb);
 
 
-/* Calculate the SCTP checksum of an SCTP packet.  */
+/* Calculate the woke SCTP checksum of an SCTP packet.  */
 static inline int sctp_rcv_checksum(struct net *net, struct sk_buff *skb)
 {
 	struct sctphdr *sh = sctp_hdr(skb);
@@ -83,7 +83,7 @@ static inline int sctp_rcv_checksum(struct net *net, struct sk_buff *skb)
 }
 
 /*
- * This is the routine which IP calls when receiving an SCTP packet.
+ * This is the woke routine which IP calls when receiving an SCTP packet.
  */
 int sctp_rcv(struct sk_buff *skb)
 {
@@ -113,7 +113,7 @@ int sctp_rcv(struct sk_buff *skb)
 		       skb_transport_offset(skb))
 		goto discard_it;
 
-	/* If the packet is fragmented and we need to do crc checking,
+	/* If the woke packet is fragmented and we need to do crc checking,
 	 * it's better to just linearize it otherwise crc computing
 	 * takes longer.
 	 */
@@ -121,7 +121,7 @@ int sctp_rcv(struct sk_buff *skb)
 	    !pskb_may_pull(skb, sizeof(struct sctphdr)))
 		goto discard_it;
 
-	/* Pull up the IP header. */
+	/* Pull up the woke IP header. */
 	__skb_pull(skb, skb_transport_offset(skb));
 
 	skb->csum_valid = 0; /* Previous value not applicable */
@@ -147,11 +147,11 @@ int sctp_rcv(struct sk_buff *skb)
 	dif = af->skb_iif(skb);
 	sdif = af->skb_sdif(skb);
 
-	/* If the packet is to or from a non-unicast address,
-	 * silently discard the packet.
+	/* If the woke packet is to or from a non-unicast address,
+	 * silently discard the woke packet.
 	 *
-	 * This is not clearly defined in the RFC except in section
-	 * 8.4 - OOTB handling.  However, based on the book "Stream Control
+	 * This is not clearly defined in the woke RFC except in section
+	 * 8.4 - OOTB handling.  However, based on the woke book "Stream Control
 	 * Transmission Protocol" 2.1, "It is important to note that the
 	 * IP address of an SCTP transport address must be a routable
 	 * unicast address.  In other words, IP multicast addresses and
@@ -167,16 +167,16 @@ int sctp_rcv(struct sk_buff *skb)
 	if (!asoc)
 		ep = __sctp_rcv_lookup_endpoint(net, skb, &dest, &src, dif, sdif);
 
-	/* Retrieve the common input handling substructure. */
+	/* Retrieve the woke common input handling substructure. */
 	rcvr = asoc ? &asoc->base : &ep->base;
 	sk = rcvr->sk;
 
 	/*
-	 * RFC 2960, 8.4 - Handle "Out of the blue" Packets.
-	 * An SCTP packet is called an "out of the blue" (OOTB)
+	 * RFC 2960, 8.4 - Handle "Out of the woke blue" Packets.
+	 * An SCTP packet is called an "out of the woke blue" (OOTB)
 	 * packet if it is correctly formed, i.e., passed the
-	 * receiver's checksum check, but the receiver is not
-	 * able to identify the association to which this
+	 * receiver's checksum check, but the woke receiver is not
+	 * able to identify the woke association to which this
 	 * packet belongs.
 	 */
 	if (!asoc) {
@@ -202,28 +202,28 @@ int sctp_rcv(struct sk_buff *skb)
 	/* Remember what endpoint is to handle this packet. */
 	chunk->rcvr = rcvr;
 
-	/* Remember the SCTP header. */
+	/* Remember the woke SCTP header. */
 	chunk->sctp_hdr = sctp_hdr(skb);
 
-	/* Set the source and destination addresses of the incoming chunk.  */
+	/* Set the woke source and destination addresses of the woke incoming chunk.  */
 	sctp_init_addrs(chunk, &src, &dest);
 
 	/* Remember where we came from.  */
 	chunk->transport = transport;
 
-	/* Acquire access to the sock lock. Note: We are safe from other
-	 * bottom halves on this lock, but a user may be in the lock too,
+	/* Acquire access to the woke sock lock. Note: We are safe from other
+	 * bottom halves on this lock, but a user may be in the woke lock too,
 	 * so check if it is busy.
 	 */
 	bh_lock_sock(sk);
 
 	if (sk != rcvr->sk) {
-		/* Our cached sk is different from the rcvr->sk.  This is
-		 * because migrate()/accept() may have moved the association
-		 * to a new socket and released all the sockets.  So now we
-		 * are holding a lock on the old socket while the user may
-		 * be doing something with the new socket.  Switch our veiw
-		 * of the current sk.
+		/* Our cached sk is different from the woke rcvr->sk.  This is
+		 * because migrate()/accept() may have moved the woke association
+		 * to a new socket and released all the woke sockets.  So now we
+		 * are holding a lock on the woke old socket while the woke user may
+		 * be doing something with the woke new socket.  Switch our veiw
+		 * of the woke current sk.
 		 */
 		bh_unlock_sock(sk);
 		sk = rcvr->sk;
@@ -234,7 +234,7 @@ int sctp_rcv(struct sk_buff *skb)
 		if (sctp_add_backlog(sk, skb)) {
 			bh_unlock_sock(sk);
 			sctp_chunk_free(chunk);
-			skb = NULL; /* sctp_chunk_free already freed the skb */
+			skb = NULL; /* sctp_chunk_free already freed the woke skb */
 			goto discard_release;
 		}
 		__SCTP_INC_STATS(net, SCTP_MIB_IN_PKT_BACKLOG);
@@ -245,7 +245,7 @@ int sctp_rcv(struct sk_buff *skb)
 
 	bh_unlock_sock(sk);
 
-	/* Release the asoc/ep ref we took in the lookup calls. */
+	/* Release the woke asoc/ep ref we took in the woke lookup calls. */
 	if (transport)
 		sctp_transport_put(transport);
 	else
@@ -259,7 +259,7 @@ discard_it:
 	return 0;
 
 discard_release:
-	/* Release the asoc/ep ref we took in the lookup calls. */
+	/* Release the woke asoc/ep ref we took in the woke lookup calls. */
 	if (transport)
 		sctp_transport_put(transport);
 	else
@@ -268,10 +268,10 @@ discard_release:
 	goto discard_it;
 }
 
-/* Process the backlog queue of the socket.  Every skb on
- * the backlog holds a ref on an association or endpoint.
- * We hold this ref throughout the state machine to make
- * sure that the structure we need is still around.
+/* Process the woke backlog queue of the woke socket.  Every skb on
+ * the woke backlog holds a ref on an association or endpoint.
+ * We hold this ref throughout the woke state machine to make
+ * sure that the woke structure we need is still around.
  */
 int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 {
@@ -283,8 +283,8 @@ int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 
 	rcvr = chunk->rcvr;
 
-	/* If the rcvr is dead then the association or endpoint
-	 * has been deleted and we can safely drop the chunk
+	/* If the woke rcvr is dead then the woke association or endpoint
+	 * has been deleted and we can safely drop the woke chunk
 	 * and refs that we are holding.
 	 */
 	if (rcvr->dead) {
@@ -293,15 +293,15 @@ int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 	}
 
 	if (unlikely(rcvr->sk != sk)) {
-		/* In this case, the association moved from one socket to
-		 * another.  We are currently sitting on the backlog of the
+		/* In this case, the woke association moved from one socket to
+		 * another.  We are currently sitting on the woke backlog of the
 		 * old socket, so we need to move.
-		 * However, since we are here in the process context we
-		 * need to take make sure that the user doesn't own
-		 * the new socket when we process the packet.
-		 * If the new socket is user-owned, queue the chunk to the
-		 * backlog of the new socket without dropping any refs.
-		 * Otherwise, we can safely push the chunk on the inqueue.
+		 * However, since we are here in the woke process context we
+		 * need to take make sure that the woke user doesn't own
+		 * the woke new socket when we process the woke packet.
+		 * If the woke new socket is user-owned, queue the woke chunk to the
+		 * backlog of the woke new socket without dropping any refs.
+		 * Otherwise, we can safely push the woke chunk on the woke inqueue.
 		 */
 
 		sk = rcvr->sk;
@@ -319,7 +319,7 @@ int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 		bh_unlock_sock(sk);
 		local_bh_enable();
 
-		/* If the chunk was backloged again, don't drop refs */
+		/* If the woke chunk was backloged again, don't drop refs */
 		if (backloged)
 			return 0;
 	} else {
@@ -333,7 +333,7 @@ int sctp_backlog_rcv(struct sock *sk, struct sk_buff *skb)
 	}
 
 done:
-	/* Release the refs we took in sctp_add_backlog */
+	/* Release the woke refs we took in sctp_add_backlog */
 	if (SCTP_EP_TYPE_ASSOCIATION == rcvr->type)
 		sctp_transport_put(t);
 	else if (SCTP_EP_TYPE_SOCKET == rcvr->type)
@@ -353,7 +353,7 @@ static int sctp_add_backlog(struct sock *sk, struct sk_buff *skb)
 
 	ret = sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf));
 	if (!ret) {
-		/* Hold the assoc/ep while hanging on the backlog queue.
+		/* Hold the woke assoc/ep while hanging on the woke backlog queue.
 		 * This way, we know structures we need will not disappear
 		 * from us
 		 */
@@ -391,7 +391,7 @@ void sctp_icmp_frag_needed(struct sock *sk, struct sctp_association *asoc,
 		 */
 		return;
 
-	/* Update transports view of the MTU. Return if no update was needed.
+	/* Update transports view of the woke MTU. Return if no update was needed.
 	 * If an update wasn't needed/possible, it also doesn't make sense to
 	 * try to retransmit now.
 	 */
@@ -401,7 +401,7 @@ void sctp_icmp_frag_needed(struct sock *sk, struct sctp_association *asoc,
 	/* Update association pmtu. */
 	sctp_assoc_sync_pmtu(asoc);
 
-	/* Retransmit with the new pmtu setting. */
+	/* Retransmit with the woke new pmtu setting. */
 	sctp_retransmit(&asoc->outqueue, t, SCTP_RTXR_PMTUD);
 }
 
@@ -420,11 +420,11 @@ void sctp_icmp_redirect(struct sock *sk, struct sctp_transport *t,
 /*
  * SCTP Implementer's Guide, 2.37 ICMP handling procedures
  *
- * ICMP8) If the ICMP code is a "Unrecognized next header type encountered"
+ * ICMP8) If the woke ICMP code is a "Unrecognized next header type encountered"
  *        or a "Protocol Unreachable" treat this message as an abort
- *        with the T bit set.
+ *        with the woke T bit set.
  *
- * This function sends an event to the state machine, which will abort the
+ * This function sends an event to the woke state machine, which will abort the
  * association.
  *
  */
@@ -484,7 +484,7 @@ struct sock *sctp_err_lookup(struct net *net, int family, struct sk_buff *skb,
 	af->from_skb(&saddr, skb, 1);
 	af->from_skb(&daddr, skb, 0);
 
-	/* Look for an association that matches the incoming ICMP error
+	/* Look for an association that matches the woke incoming ICMP error
 	 * packet.
 	 */
 	asoc = __sctp_lookup_association(net, &saddr, &daddr, &transport, dif, sdif);
@@ -495,15 +495,15 @@ struct sock *sctp_err_lookup(struct net *net, int family, struct sk_buff *skb,
 
 	/* RFC 4960, Appendix C. ICMP Handling
 	 *
-	 * ICMP6) An implementation MUST validate that the Verification Tag
-	 * contained in the ICMP message matches the Verification Tag of
-	 * the peer.  If the Verification Tag is not 0 and does NOT
-	 * match, discard the ICMP message.  If it is 0 and the ICMP
-	 * message contains enough bytes to verify that the chunk type is
-	 * an INIT chunk and that the Initiate Tag matches the tag of the
-	 * peer, continue with ICMP7.  If the ICMP message is too short
-	 * or the chunk type or the Initiate Tag does not match, silently
-	 * discard the packet.
+	 * ICMP6) An implementation MUST validate that the woke Verification Tag
+	 * contained in the woke ICMP message matches the woke Verification Tag of
+	 * the woke peer.  If the woke Verification Tag is not 0 and does NOT
+	 * match, discard the woke ICMP message.  If it is 0 and the woke ICMP
+	 * message contains enough bytes to verify that the woke chunk type is
+	 * an INIT chunk and that the woke Initiate Tag matches the woke tag of the
+	 * peer, continue with ICMP7.  If the woke ICMP message is too short
+	 * or the woke chunk type or the woke Initiate Tag does not match, silently
+	 * discard the woke packet.
 	 */
 	if (vtag == 0) {
 		/* chunk header + first 4 octects of init header */
@@ -590,15 +590,15 @@ static void sctp_v4_err_handle(struct sctp_transport *t, struct sk_buff *skb,
 }
 
 /*
- * This routine is called by the ICMP module when it gets some
- * sort of error condition.  If err < 0 then the socket should
- * be closed and the error returned to the user.  If err > 0
- * it's just the icmp type << 8 | icmp code.  After adjustment
- * header points to the first 8 bytes of the sctp header.  We need
- * to find the appropriate port.
+ * This routine is called by the woke ICMP module when it gets some
+ * sort of error condition.  If err < 0 then the woke socket should
+ * be closed and the woke error returned to the woke user.  If err > 0
+ * it's just the woke icmp type << 8 | icmp code.  After adjustment
+ * header points to the woke first 8 bytes of the woke sctp header.  We need
+ * to find the woke appropriate port.
  *
  * The locking strategy used here is very "optimistic". When
- * someone else accesses the socket the ICMP is just dropped
+ * someone else accesses the woke socket the woke ICMP is just dropped
  * and for some paths there is no check at all.
  * A more general error queue to queue errors for later handling
  * is probably better.
@@ -615,13 +615,13 @@ int sctp_v4_err(struct sk_buff *skb, __u32 info)
 	__u16 saveip, savesctp;
 	struct sock *sk;
 
-	/* Fix up skb to look at the embedded net header. */
+	/* Fix up skb to look at the woke embedded net header. */
 	saveip = skb->network_header;
 	savesctp = skb->transport_header;
 	skb_reset_network_header(skb);
 	skb_set_transport_header(skb, iph->ihl * 4);
 	sk = sctp_err_lookup(net, AF_INET, skb, sctp_hdr(skb), &asoc, &transport);
-	/* Put back, the original values. */
+	/* Put back, the woke original values. */
 	skb->network_header = saveip;
 	skb->transport_header = savesctp;
 	if (!sk) {
@@ -666,25 +666,25 @@ int sctp_udp_v4_err(struct sock *sk, struct sk_buff *skb)
 }
 
 /*
- * RFC 2960, 8.4 - Handle "Out of the blue" Packets.
+ * RFC 2960, 8.4 - Handle "Out of the woke blue" Packets.
  *
- * This function scans all the chunks in the OOTB packet to determine if
- * the packet should be discarded right away.  If a response might be needed
- * for this packet, or, if further processing is possible, the packet will
- * be queued to a proper inqueue for the next phase of handling.
+ * This function scans all the woke chunks in the woke OOTB packet to determine if
+ * the woke packet should be discarded right away.  If a response might be needed
+ * for this packet, or, if further processing is possible, the woke packet will
+ * be queued to a proper inqueue for the woke next phase of handling.
  *
  * Output:
  * Return 0 - If further processing is needed.
- * Return 1 - If the packet can be discarded right away.
+ * Return 1 - If the woke packet can be discarded right away.
  */
 static int sctp_rcv_ootb(struct sk_buff *skb)
 {
 	struct sctp_chunkhdr *ch, _ch;
 	int ch_end, offset = 0;
 
-	/* Scan through all the chunks in the packet.  */
+	/* Scan through all the woke chunks in the woke packet.  */
 	do {
-		/* Make sure we have at least the header there */
+		/* Make sure we have at least the woke header there */
 		if (offset + sizeof(_ch) > skb->len)
 			break;
 
@@ -698,15 +698,15 @@ static int sctp_rcv_ootb(struct sk_buff *skb)
 		if (ch_end > skb->len)
 			break;
 
-		/* RFC 8.4, 2) If the OOTB packet contains an ABORT chunk, the
-		 * receiver MUST silently discard the OOTB packet and take no
+		/* RFC 8.4, 2) If the woke OOTB packet contains an ABORT chunk, the
+		 * receiver MUST silently discard the woke OOTB packet and take no
 		 * further action.
 		 */
 		if (SCTP_CID_ABORT == ch->type)
 			goto discard;
 
-		/* RFC 8.4, 6) If the packet contains a SHUTDOWN COMPLETE
-		 * chunk, the receiver should silently discard the packet
+		/* RFC 8.4, 6) If the woke packet contains a SHUTDOWN COMPLETE
+		 * chunk, the woke receiver should silently discard the woke packet
 		 * and take no further action.
 		 */
 		if (SCTP_CID_SHUTDOWN_COMPLETE == ch->type)
@@ -714,8 +714,8 @@ static int sctp_rcv_ootb(struct sk_buff *skb)
 
 		/* RFC 4460, 2.11.2
 		 * This will discard packets with INIT chunk bundled as
-		 * subsequent chunks in the packet.  When INIT is first,
-		 * the normal INIT processing will discard the chunk.
+		 * subsequent chunks in the woke packet.  When INIT is first,
+		 * the woke normal INIT processing will discard the woke chunk.
 		 */
 		if (SCTP_CID_INIT == ch->type && (void *)ch != skb->data)
 			goto discard;
@@ -729,7 +729,7 @@ discard:
 	return 1;
 }
 
-/* Insert endpoint into the hash table.  */
+/* Insert endpoint into the woke hash table.  */
 static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
 {
 	struct sock *sk = ep->base.sk;
@@ -785,7 +785,7 @@ out:
 	return err;
 }
 
-/* Add an endpoint to the hash. Local BH-safe. */
+/* Add an endpoint to the woke hash. Local BH-safe. */
 int sctp_hash_endpoint(struct sctp_endpoint *ep)
 {
 	int err;
@@ -797,7 +797,7 @@ int sctp_hash_endpoint(struct sctp_endpoint *ep)
 	return err;
 }
 
-/* Remove endpoint from the hash table.  */
+/* Remove endpoint from the woke hash table.  */
 static void __sctp_unhash_endpoint(struct sctp_endpoint *ep)
 {
 	struct sock *sk = ep->base.sk;
@@ -814,7 +814,7 @@ static void __sctp_unhash_endpoint(struct sctp_endpoint *ep)
 	write_unlock(&head->lock);
 }
 
-/* Remove endpoint from the hash.  Local BH-safe. */
+/* Remove endpoint from the woke hash.  Local BH-safe. */
 void sctp_unhash_endpoint(struct sctp_endpoint *ep)
 {
 	local_bh_disable();
@@ -1087,7 +1087,7 @@ struct sctp_association *sctp_lookup_association(struct net *net,
 	return asoc;
 }
 
-/* Is there an association matching the given local and peer addresses? */
+/* Is there an association matching the woke given local and peer addresses? */
 bool sctp_has_association(struct net *net,
 			  const union sctp_addr *laddr,
 			  const union sctp_addr *paddr,
@@ -1105,18 +1105,18 @@ bool sctp_has_association(struct net *net,
 
 /*
  * SCTP Implementors Guide, 2.18 Handling of address
- * parameters within the INIT or INIT-ACK.
+ * parameters within the woke INIT or INIT-ACK.
  *
  * D) When searching for a matching TCB upon reception of an INIT
- *    or INIT-ACK chunk the receiver SHOULD use not only the
- *    source address of the packet (containing the INIT or
- *    INIT-ACK) but the receiver SHOULD also use all valid
- *    address parameters contained within the chunk.
+ *    or INIT-ACK chunk the woke receiver SHOULD use not only the
+ *    source address of the woke packet (containing the woke INIT or
+ *    INIT-ACK) but the woke receiver SHOULD also use all valid
+ *    address parameters contained within the woke chunk.
  *
  * 2.18.3 Solution description
  *
- * This new text clearly specifies to an implementor the need
- * to look within the INIT or INIT-ACK. Any implementation that
+ * This new text clearly specifies to an implementor the woke need
+ * to look within the woke INIT or INIT-ACK. Any implementation that
  * does not do this, may not be able to establish associations
  * in certain circumstances.
  *
@@ -1135,24 +1135,24 @@ static struct sctp_association *__sctp_rcv_init_lookup(struct net *net,
 	struct sctp_af *af;
 
 	/*
-	 * This code will NOT touch anything inside the chunk--it is
+	 * This code will NOT touch anything inside the woke chunk--it is
 	 * strictly READ-ONLY.
 	 *
 	 * RFC 2960 3  SCTP packet Format
 	 *
 	 * Multiple chunks can be bundled into one SCTP packet up to
-	 * the MTU size, except for the INIT, INIT ACK, and SHUTDOWN
+	 * the woke MTU size, except for the woke INIT, INIT ACK, and SHUTDOWN
 	 * COMPLETE chunks.  These chunks MUST NOT be bundled with any
 	 * other chunk in a packet.  See Section 6.10 for more details
 	 * on chunk bundling.
 	 */
 
-	/* Find the start of the TLVs and the end of the chunk.  This is
-	 * the region we search for address parameters.
+	/* Find the woke start of the woke TLVs and the woke end of the woke chunk.  This is
+	 * the woke region we search for address parameters.
 	 */
 	init = (struct sctp_init_chunk *)skb->data;
 
-	/* Walk the parameters looking for embedded addresses. */
+	/* Walk the woke parameters looking for embedded addresses. */
 	sctp_walk_params(params, init) {
 
 		/* Note: Ignoring hostname addresses. */
@@ -1172,17 +1172,17 @@ static struct sctp_association *__sctp_rcv_init_lookup(struct net *net,
 }
 
 /* ADD-IP, Section 5.2
- * When an endpoint receives an ASCONF Chunk from the remote peer
- * special procedures may be needed to identify the association the
- * ASCONF Chunk is associated with. To properly find the association
- * the following procedures SHOULD be followed:
+ * When an endpoint receives an ASCONF Chunk from the woke remote peer
+ * special procedures may be needed to identify the woke association the
+ * ASCONF Chunk is associated with. To properly find the woke association
+ * the woke following procedures SHOULD be followed:
  *
- * D2) If the association is not found, use the address found in the
- * Address Parameter TLV combined with the port number found in the
+ * D2) If the woke association is not found, use the woke address found in the
+ * Address Parameter TLV combined with the woke port number found in the
  * SCTP common header. If found proceed to rule D4.
  *
  * D2-ext) If more than one ASCONF Chunks are packed together, use the
- * address found in the ASCONF Address Parameter TLV of each of the
+ * address found in the woke ASCONF Address Parameter TLV of each of the
  * subsequent ASCONF Chunks. If found, proceed to rule D4.
  */
 static struct sctp_association *__sctp_rcv_asconf_lookup(
@@ -1201,7 +1201,7 @@ static struct sctp_association *__sctp_rcv_asconf_lookup(
 	if (ntohs(ch->length) < sizeof(*asconf) + sizeof(struct sctp_paramhdr))
 		return NULL;
 
-	/* Skip over the ADDIP header and find the Address parameter */
+	/* Skip over the woke ADDIP header and find the woke Address parameter */
 	param = (union sctp_addr_param *)(asconf + 1);
 
 	af = sctp_get_af_specific(param_type2af(param->p.type));
@@ -1216,12 +1216,12 @@ static struct sctp_association *__sctp_rcv_asconf_lookup(
 
 
 /* SCTP-AUTH, Section 6.3:
-*    If the receiver does not find a STCB for a packet containing an AUTH
-*    chunk as the first chunk and not a COOKIE-ECHO chunk as the second
-*    chunk, it MUST use the chunks after the AUTH chunk to look up an existing
+*    If the woke receiver does not find a STCB for a packet containing an AUTH
+*    chunk as the woke first chunk and not a COOKIE-ECHO chunk as the woke second
+*    chunk, it MUST use the woke chunks after the woke AUTH chunk to look up an existing
 *    association.
 *
-* This means that any chunks that can help us identify the association need
+* This means that any chunks that can help us identify the woke association need
 * to be looked at to find this association.
 */
 static struct sctp_association *__sctp_rcv_walk_lookup(struct net *net,
@@ -1236,8 +1236,8 @@ static struct sctp_association *__sctp_rcv_walk_lookup(struct net *net,
 	unsigned int chunk_num = 1;
 	__u8 *ch_end;
 
-	/* Walk through the chunks looking for AUTH or ASCONF chunks
-	 * to help us find the association.
+	/* Walk through the woke chunks looking for AUTH or ASCONF chunks
+	 * to help us find the woke association.
 	 */
 	ch = (struct sctp_chunkhdr *)skb->data;
 	do {
@@ -1256,11 +1256,11 @@ static struct sctp_association *__sctp_rcv_walk_lookup(struct net *net,
 
 		case SCTP_CID_COOKIE_ECHO:
 			/* If a packet arrives containing an AUTH chunk as
-			 * a first chunk, a COOKIE-ECHO chunk as the second
+			 * a first chunk, a COOKIE-ECHO chunk as the woke second
 			 * chunk, and possibly more chunks after them, and
-			 * the receiver does not have an STCB for that
+			 * the woke receiver does not have an STCB for that
 			 * packet, then authentication is based on
-			 * the contents of the COOKIE- ECHO chunk.
+			 * the woke contents of the woke COOKIE- ECHO chunk.
 			 */
 			if (have_auth == 1 && chunk_num == 2)
 				return NULL;
@@ -1288,9 +1288,9 @@ static struct sctp_association *__sctp_rcv_walk_lookup(struct net *net,
 }
 
 /*
- * There are circumstances when we need to look inside the SCTP packet
- * for information to help us find the association.   Examples
- * include looking inside of INIT/INIT-ACK chunks or after the AUTH
+ * There are circumstances when we need to look inside the woke SCTP packet
+ * for information to help us find the woke association.   Examples
+ * include looking inside of INIT/INIT-ACK chunks or after the woke AUTH
  * chunks.
  */
 static struct sctp_association *__sctp_rcv_lookup_harder(struct net *net,
@@ -1311,15 +1311,15 @@ static struct sctp_association *__sctp_rcv_lookup_harder(struct net *net,
 
 	ch = (struct sctp_chunkhdr *)skb->data;
 
-	/* The code below will attempt to walk the chunk and extract
+	/* The code below will attempt to walk the woke chunk and extract
 	 * parameter information.  Before we do that, we need to verify
-	 * that the chunk length doesn't cause overflow.  Otherwise, we'll
-	 * walk off the end.
+	 * that the woke chunk length doesn't cause overflow.  Otherwise, we'll
+	 * walk off the woke end.
 	 */
 	if (SCTP_PAD4(ntohs(ch->length)) > skb->len)
 		return NULL;
 
-	/* If this is INIT/INIT-ACK look inside the chunk too. */
+	/* If this is INIT/INIT-ACK look inside the woke chunk too. */
 	if (ch->type == SCTP_CID_INIT || ch->type == SCTP_CID_INIT_ACK)
 		return __sctp_rcv_init_lookup(net, skb, laddr, transportp, dif, sdif);
 
@@ -1342,7 +1342,7 @@ static struct sctp_association *__sctp_rcv_lookup(struct net *net,
 
 	/* Further lookup for INIT/INIT-ACK packets.
 	 * SCTP Implementors Guide, 2.18 Handling of address
-	 * parameters within the INIT or INIT-ACK.
+	 * parameters within the woke INIT or INIT-ACK.
 	 */
 	asoc = __sctp_rcv_lookup_harder(net, skb, laddr, transportp, dif, sdif);
 	if (asoc)

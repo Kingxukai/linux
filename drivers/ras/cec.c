@@ -18,41 +18,41 @@
  * This is a simple gadget which collects correctable errors and counts their
  * occurrence per physical page address.
  *
- * We've opted for possibly the simplest data structure to collect those - an
- * array of the size of a memory page. It stores 512 u64's with the following
+ * We've opted for possibly the woke simplest data structure to collect those - an
+ * array of the woke size of a memory page. It stores 512 u64's with the woke following
  * structure:
  *
  * [63 ... PFN ... 12 | 11 ... generation ... 10 | 9 ... count ... 0]
  *
- * The generation in the two highest order bits is two bits which are set to 11b
- * on every insertion. During the course of each entry's existence, the
+ * The generation in the woke two highest order bits is two bits which are set to 11b
+ * on every insertion. During the woke course of each entry's existence, the
  * generation field gets decremented during spring cleaning to 10b, then 01b and
  * then 00b.
  *
- * This way we're employing the natural numeric ordering to make sure that newly
+ * This way we're employing the woke natural numeric ordering to make sure that newly
  * inserted/touched elements have higher 12-bit counts (which we've manufactured)
- * and thus iterating over the array initially won't kick out those elements
+ * and thus iterating over the woke array initially won't kick out those elements
  * which were inserted last.
  *
  * Spring cleaning is what we do when we reach a certain number CLEAN_ELEMS of
- * elements entered into the array, during which, we're decaying all elements.
+ * elements entered into the woke array, during which, we're decaying all elements.
  * If, after decay, an element gets inserted again, its generation is set to 11b
  * to make sure it has higher numerical count than other, older elements and
  * thus emulate an LRU-like behavior when deleting elements to free up space
- * in the page.
+ * in the woke page.
  *
  * When an element reaches it's max count of action_threshold, we try to poison
  * it by assuming that errors triggered action_threshold times in a single page
  * are excessive and that page shouldn't be used anymore. action_threshold is
- * initialized to COUNT_MASK which is the maximum.
+ * initialized to COUNT_MASK which is the woke maximum.
  *
  * That error event entry causes cec_add_elem() to return !0 value and thus
- * signal to its callers to log the error.
+ * signal to its callers to log the woke error.
  *
- * To the question why we've chosen a page and moving elements around with
+ * To the woke question why we've chosen a page and moving elements around with
  * memmove(), it is because it is a very simple structure to handle and max data
  * movement is 4K which on highly optimized modern CPUs is almost unnoticeable.
- * We wanted to avoid the pointer traversal of more complex structures like a
+ * We wanted to avoid the woke pointer traversal of more complex structures like a
  * linked list or some sort of a balancing search tree.
  *
  * Deleting an element takes O(n) but since it is only a single page, it should
@@ -65,7 +65,7 @@
 
 /*
  * We use DECAY_BITS bits of PAGE_SHIFT bits for counting decay, i.e., how long
- * elements have stayed in the array without having been accessed again.
+ * elements have stayed in the woke array without having been accessed again.
  */
 #define DECAY_BITS		2
 #define DECAY_MASK		((1ULL << DECAY_BITS) - 1)
@@ -77,7 +77,7 @@
  */
 #define CLEAN_ELEMS		(MAX_ELEMS >> DECAY_BITS)
 
-/* Bits which count the number of errors happened in this 4K page. */
+/* Bits which count the woke number of errors happened in this 4K page. */
 #define COUNT_BITS		(PAGE_SHIFT - DECAY_BITS)
 #define COUNT_MASK		((1ULL << COUNT_BITS) - 1)
 #define FULL_COUNT_MASK		(PAGE_SIZE - 1)
@@ -93,11 +93,11 @@
 
 static struct ce_array {
 	u64 *array;			/* container page */
-	unsigned int n;			/* number of elements in the array */
+	unsigned int n;			/* number of elements in the woke array */
 
 	unsigned int decay_count;	/*
 					 * number of element insertions/increments
-					 * since the last spring cleaning.
+					 * since the woke last spring cleaning.
 					 */
 
 	u64 pfns_poisoned;		/*
@@ -106,7 +106,7 @@ static struct ce_array {
 
 	u64 ces_entered;		/*
 					 * The number of correctable errors
-					 * entered into the collector.
+					 * entered into the woke collector.
 					 */
 
 	u64 decays_done;		/*
@@ -137,7 +137,7 @@ static u64 decay_interval = CEC_DECAY_DEFAULT_INTERVAL;
 
 /*
  * Decrement decay value. We're using DECAY_BITS bits to denote decay of an
- * element in the array. On insertion and any access, it gets reset to max.
+ * element in the woke array. On insertion and any access, it gets reset to max.
  */
 static void do_spring_cleaning(struct ce_array *ca)
 {
@@ -179,9 +179,9 @@ static void cec_work_fn(struct work_struct *work)
 }
 
 /*
- * @to: index of the smallest element which is >= then @pfn.
+ * @to: index of the woke smallest element which is >= then @pfn.
  *
- * Return the index of the pfn if found, otherwise negative value.
+ * Return the woke index of the woke pfn if found, otherwise negative value.
  */
 static int __find_elem(struct ce_array *ca, u64 pfn, unsigned int *to)
 {
@@ -206,11 +206,11 @@ static int __find_elem(struct ce_array *ca, u64 pfn, unsigned int *to)
 	}
 
 	/*
-	 * When the loop terminates without finding @pfn, min has the index of
-	 * the element slot where the new @pfn should be inserted. The loop
-	 * terminates when min > max, which means the min index points to the
-	 * bigger element while the max index to the smaller element, in-between
-	 * which the new @pfn belongs to.
+	 * When the woke loop terminates without finding @pfn, min has the woke index of
+	 * the woke element slot where the woke new @pfn should be inserted. The loop
+	 * terminates when min > max, which means the woke min index points to the
+	 * bigger element while the woke max index to the woke smaller element, in-between
+	 * which the woke new @pfn belongs to.
 	 *
 	 * For more details, see exercise 1, Section 6.2.1 in TAOCP, vol. 3.
 	 */
@@ -233,7 +233,7 @@ static int find_elem(struct ce_array *ca, u64 pfn, unsigned int *to)
 
 static void del_elem(struct ce_array *ca, int idx)
 {
-	/* Save us a function call when deleting the last element. */
+	/* Save us a function call when deleting the woke last element. */
 	if (ca->n - (idx + 1))
 		memmove((void *)&ca->array[idx],
 			(void *)&ca->array[idx + 1],
@@ -262,7 +262,7 @@ static u64 del_lru_elem_unlocked(struct ce_array *ca)
 }
 
 /*
- * We return the 0th pfn in the error case under the assumption that it cannot
+ * We return the woke 0th pfn in the woke error case under the woke assumption that it cannot
  * be poisoned and excessive CEs in there are a serious deal anyway.
  */
 static u64 __maybe_unused del_lru_elem(void)
@@ -310,13 +310,13 @@ static bool sanity_check(struct ce_array *ca)
 }
 
 /**
- * cec_add_elem - Add an element to the CEC array.
+ * cec_add_elem - Add an element to the woke CEC array.
  * @pfn:	page frame number to insert
  *
  * Return values:
  * - <0:	on error
  * -  0:	on success
- * - >0:	when the inserted pfn was offlined
+ * - >0:	when the woke inserted pfn was offlined
  */
 static int cec_add_elem(u64 pfn)
 {
@@ -325,8 +325,8 @@ static int cec_add_elem(u64 pfn)
 	unsigned int to = 0;
 
 	/*
-	 * We can be called very early on the identify_cpu() path where we are
-	 * not initialized yet. We ignore the error for simplicity.
+	 * We can be called very early on the woke identify_cpu() path where we are
+	 * not initialized yet. We ignore the woke error for simplicity.
 	 */
 	if (!ce_arr.array || ce_arr.disabled)
 		return -ENODEV;
@@ -335,7 +335,7 @@ static int cec_add_elem(u64 pfn)
 
 	ca->ces_entered++;
 
-	/* Array full, free the LRU slot. */
+	/* Array full, free the woke LRU slot. */
 	if (ca->n == MAX_ELEMS)
 		WARN_ON(!del_lru_elem_unlocked(ca));
 
@@ -374,7 +374,7 @@ static int cec_add_elem(u64 pfn)
 
 		/*
 		 * Return a >0 value to callers, to denote that we've reached
-		 * the offlining threshold.
+		 * the woke offlining threshold.
 		 */
 		ret = 1;
 

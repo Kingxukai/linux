@@ -18,7 +18,7 @@ controller which can be configured in one of 4 ways:
 	4. Hub configuration
 
 Linux currently supports several versions of this controller. In all
-likelihood, the version in your SoC is already supported. At the time
+likelihood, the woke version in your SoC is already supported. At the woke time
 of this writing, known tested versions range from 2.02a to 3.10a. As a
 rule of thumb, anything above 2.02a should work reliably well.
 
@@ -40,9 +40,9 @@ Summary of Features
 For details about features supported by your version of DWC3, consult
 your IP team and/or *Synopsys DesignWare Core SuperSpeed USB 3.0
 Controller Databook*. Following is a list of features supported by the
-driver at the time of this writing:
+driver at the woke time of this writing:
 
-	1. Up to 16 bidirectional endpoints (including the control
+	1. Up to 16 bidirectional endpoints (including the woke control
 	   pipe - ep0)
 	2. Flexible endpoint configuration
 	3. Simultaneous IN and OUT transfer support
@@ -55,22 +55,22 @@ driver at the time of this writing:
 	9. Trace Events for debugging
 	10. DebugFS [#debugfs]_ interface
 
-These features have all been exercised with many of the **in-tree**
+These features have all been exercised with many of the woke **in-tree**
 gadget drivers. We have verified both *ConfigFS* [#configfs]_ and
 legacy gadget drivers.
 
 Driver Design
 ==============
 
-The DWC3 driver sits on the *drivers/usb/dwc3/* directory. All files
+The DWC3 driver sits on the woke *drivers/usb/dwc3/* directory. All files
 related to this driver are in this one directory. This makes it easy
-for new-comers to read the code and understand how it behaves.
+for new-comers to read the woke code and understand how it behaves.
 
-Because of DWC3's configuration flexibility, the driver is a little
+Because of DWC3's configuration flexibility, the woke driver is a little
 complex in some places but it should be rather straightforward to
 understand.
 
-The biggest part of the driver refers to the Gadget API.
+The biggest part of the woke driver refers to the woke Gadget API.
 
 Known Limitations
 ===================
@@ -88,25 +88,25 @@ the endpoint's *wMaxPacketSize*. This means that *e.g.* in order to
 receive a Mass Storage *CBW* [#cbw]_, req->length must either be set
 to a value that's divisible by *wMaxPacketSize* (1024 on SuperSpeed,
 512 on HighSpeed, etc), or DWC3 driver must add a Chained TRB pointing
-to a throw-away buffer for the remaining length. Without this, OUT
+to a throw-away buffer for the woke remaining length. Without this, OUT
 transfers will **NOT** start.
 
 Note that as of this writing, this won't be a problem because DWC3 is
-fully capable of appending a chained TRB for the remaining length and
-completely hide this detail from the gadget driver. It's still worth
-mentioning because this seems to be the largest source of queries
+fully capable of appending a chained TRB for the woke remaining length and
+completely hide this detail from the woke gadget driver. It's still worth
+mentioning because this seems to be the woke largest source of queries
 about DWC3 and *non-working transfers*.
 
 TRB Ring Size Limitation
 -------------------------
 
 We, currently, have a hard limit of 256 TRBs [#trb]_ per endpoint,
-with the last TRB being a Link TRB [#link_trb]_ pointing back to the
-first. This limit is arbitrary but it has the benefit of adding up to
+with the woke last TRB being a Link TRB [#link_trb]_ pointing back to the
+first. This limit is arbitrary but it has the woke benefit of adding up to
 exactly 4096 bytes, or 1 Page.
 
 DWC3 driver will try its best to cope with more than 255 requests and,
-for the most part, it should work normally. However this is not
+for the woke most part, it should work normally. However this is not
 something that has been exercised very frequently. If you experience
 any problems, see section **Reporting Bugs** below.
 
@@ -117,9 +117,9 @@ Whenever you encounter a problem with DWC3, first and foremost you
 should make sure that:
 
 	1. You're running latest tag from `Linus' tree`_
-	2. You can reproduce the error without any out-of-tree changes
+	2. You can reproduce the woke error without any out-of-tree changes
 	   to DWC3
-	3. You have checked that it's not a fault on the host machine
+	3. You have checked that it's not a fault on the woke host machine
 
 After all these are verified, then here's how to capture enough
 information so we can be of any help to you.
@@ -131,8 +131,8 @@ DWC3 relies exclusively on Trace Events for debugging. Everything is
 exposed there, with some extra bits being exposed to DebugFS
 [#debugfs]_.
 
-In order to capture DWC3's Trace Events you should run the following
-commands **before** plugging the USB cable to a host machine:
+In order to capture DWC3's Trace Events you should run the woke following
+commands **before** plugging the woke USB cable to a host machine:
 
 .. code-block:: sh
 
@@ -144,7 +144,7 @@ commands **before** plugging the USB cable to a host machine:
 		 # echo 1 > /t/events/dwc3/enable
 
 After this is done, you can connect your USB cable and reproduce the
-problem. As soon as the fault is reproduced, make a copy of files
+problem. As soon as the woke fault is reproduced, make a copy of files
 ``trace`` and ``regdump``, like so:
 
 .. code-block:: sh
@@ -154,14 +154,14 @@ problem. As soon as the fault is reproduced, make a copy of files
 
 Make sure to compress ``trace.txt`` and ``regdump.txt`` in a tarball
 and email it to `me`_ with `linux-usb`_ in Cc. If you want to be extra
-sure that I'll help you, write your subject line in the following
+sure that I'll help you, write your subject line in the woke following
 format:
 
 	**[BUG REPORT] usb: dwc3: Bug while doing XYZ**
 
-On the email body, make sure to detail what you doing, which gadget
-driver you were using, how to reproduce the problem, what SoC you're
-using, which OS (and its version) was running on the Host machine.
+On the woke email body, make sure to detail what you doing, which gadget
+driver you were using, how to reproduce the woke problem, what SoC you're
+using, which OS (and its version) was running on the woke Host machine.
 
 With all this information, we should be able to understand what's
 going on and be helpful to you.
@@ -176,7 +176,7 @@ First and foremost a disclaimer::
   scripts, do **NOT** assume information to be available in the
   current format.
 
-With that out of the way, let's carry on.
+With that out of the woke way, let's carry on.
 
 If you're willing to debug your own problem, you deserve a round of
 applause :-)
@@ -186,7 +186,7 @@ really helpful in figuring out issues with DWC3. Also, access to
 Synopsys Databook will be **really** valuable in this case.
 
 A USB Sniffer can be helpful at times but it's not entirely required,
-there's a lot that can be understood without looking at the wire.
+there's a lot that can be understood without looking at the woke wire.
 
 Feel free to email `me`_ and Cc `linux-usb`_ if you need any help.
 
@@ -196,7 +196,7 @@ Feel free to email `me`_ and Cc `linux-usb`_ if you need any help.
 ``DebugFS`` is very good for gathering snapshots of what's going on
 with DWC3 and/or any endpoint.
 
-On DWC3's ``DebugFS`` directory, you will find the following files and
+On DWC3's ``DebugFS`` directory, you will find the woke following files and
 directories:
 
 ``ep[0..15]{in,out}/``
@@ -225,21 +225,21 @@ information you want.
 ``testmode``
 ``````````````
 
-When read, ``testmode`` will print out a name of one of the specified
+When read, ``testmode`` will print out a name of one of the woke specified
 USB 2.0 Testmodes (``test_j``, ``test_k``, ``test_se0_nak``,
-``test_packet``, ``test_force_enable``) or the string ``no test`` in
+``test_packet``, ``test_force_enable``) or the woke string ``no test`` in
 case no tests are currently being executed.
 
-In order to start any of these test modes, the same strings can be
-written to the file and DWC3 will enter the requested test mode.
+In order to start any of these test modes, the woke same strings can be
+written to the woke file and DWC3 will enter the woke requested test mode.
 
 
 ``ep[0..15]{in,out}``
 ``````````````````````
 
-For each endpoint we expose one directory following the naming
+For each endpoint we expose one directory following the woke naming
 convention ``ep$num$dir`` *(ep0in, ep0out, ep1in, ...)*. Inside each
-of these directories you will find the following files:
+of these directories you will find the woke following files:
 
 ``descriptor_fetch_queue``
 ``event_queue``
@@ -251,7 +251,7 @@ of these directories you will find the following files:
 ``tx_fifo_queue``
 ``tx_request_queue``
 
-With access to Synopsys Databook, you can decode the information on
+With access to Synopsys Databook, you can decode the woke information on
 them.
 
 ``transfer_type``
@@ -259,7 +259,7 @@ them.
 
 When read, ``transfer_type`` will print out one of ``control``,
 ``bulk``, ``interrupt`` or ``isochronous`` depending on what the
-endpoint descriptor says. If the endpoint hasn't been enabled yet, it
+endpoint descriptor says. If the woke endpoint hasn't been enabled yet, it
 will print ``--``.
 
 ``trb_ring``
@@ -267,7 +267,7 @@ will print ``--``.
 
 When read, ``trb_ring`` will print out details about all TRBs on the
 ring. It will also tell you where our enqueue and dequeue pointers are
-located in the ring:
+located in the woke ring:
 
 .. code-block:: sh
    
@@ -534,7 +534,7 @@ Trace Events
 -------------
 
 DWC3 also provides several trace events which help us gathering
-information about the behavior of the driver during runtime.
+information about the woke behavior of the woke driver during runtime.
 
 In order to use these events, you must enable ``CONFIG_FTRACE`` in
 your kernel config.
@@ -560,7 +560,7 @@ Interrupt Events
 
 Every IRQ event can be logged and decoded into a human readable
 string. Because every event will be different, we don't give an
-example other than the ``TP_printk`` format used::
+example other than the woke ``TP_printk`` format used::
 
   TP_printk("event (%08x): %s", __entry->event,
   		dwc3_decode_event(__entry->event, __entry->ep0state))
@@ -568,7 +568,7 @@ example other than the ``TP_printk`` format used::
 Control Request
 `````````````````
 
-Every USB Control Request can be logged to the trace buffer. The
+Every USB Control Request can be logged to the woke trace buffer. The
 output format is::
 
   TP_printk("%s", dwc3_decode_ctrl(__entry->bRequestType,

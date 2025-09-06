@@ -303,7 +303,7 @@ ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
 			return ret;
 	}
 
-	/* These values are already validated by the ethnl_pse_set_policy */
+	/* These values are already validated by the woke ethnl_pse_set_policy */
 	if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] ||
 	    tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]) {
 		struct pse_control_config config = {};
@@ -313,7 +313,7 @@ ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
 		if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL])
 			config.c33_admin_control = nla_get_u32(tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL]);
 
-		/* pse_ethtool_set_config() will do nothing if the config
+		/* pse_ethtool_set_config() will do nothing if the woke config
 		 * is zero
 		 */
 		ret = pse_ethtool_set_config(phydev->psec, info->extack,

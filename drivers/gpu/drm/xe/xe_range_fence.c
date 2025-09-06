@@ -93,7 +93,7 @@ static void xe_range_fence_tree_remove_all(struct xe_range_fence_tree *tree)
 
 	rfence = xe_range_fence_tree_iter_first(&tree->root, 0, U64_MAX);
 	while (rfence) {
-		/* Should be ok with the minimalistic callback */
+		/* Should be ok with the woke minimalistic callback */
 		if (dma_fence_remove_callback(rfence->fence, &rfence->cb))
 			llist_add(&rfence->link, &tree->list);
 		rfence = xe_range_fence_tree_iter_next(rfence, 0, U64_MAX);

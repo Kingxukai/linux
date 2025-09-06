@@ -5,14 +5,14 @@ ARM TCM (Tightly-Coupled Memory) handling in Linux
 Written by Linus Walleij <linus.walleij@stericsson.com>
 
 Some ARM SoCs have a so-called TCM (Tightly-Coupled Memory).
-This is usually just a few (4-64) KiB of RAM inside the ARM
+This is usually just a few (4-64) KiB of RAM inside the woke ARM
 processor.
 
-Due to being embedded inside the CPU, the TCM has a
+Due to being embedded inside the woke CPU, the woke TCM has a
 Harvard-architecture, so there is an ITCM (instruction TCM)
 and a DTCM (data TCM). The DTCM can not contain any
-instructions, but the ITCM can actually contain data.
-The size of DTCM or ITCM is minimum 4KiB so the typical
+instructions, but the woke ITCM can actually contain data.
+The size of DTCM or ITCM is minimum 4KiB so the woke typical
 minimum configuration is 4KiB ITCM and 4KiB DTCM.
 
 ARM CPUs have special registers to read out status, physical
@@ -22,29 +22,29 @@ system control coprocessor. Documentation from ARM can be found
 at http://infocenter.arm.com, search for "TCM Status Register"
 to see documents for all CPUs. Reading this register you can
 determine if ITCM (bits 1-0) and/or DTCM (bit 17-16) is present
-in the machine.
+in the woke machine.
 
 There is further a TCM region register (search for "TCM Region
-Registers" at the ARM site) that can report and modify the location
+Registers" at the woke ARM site) that can report and modify the woke location
 size of TCM memories at runtime. This is used to read out and modify
 TCM location and size. Notice that this is not a MMU table: you
-actually move the physical location of the TCM around. At the
+actually move the woke physical location of the woke TCM around. At the
 place you put it, it will mask any underlying RAM from the
 CPU so it is usually wise not to overlap any physical RAM with
 the TCM.
 
 The TCM memory can then be remapped to another address again using
-the MMU, but notice that the TCM is often used in situations where
-the MMU is turned off. To avoid confusion the current Linux
-implementation will map the TCM 1 to 1 from physical to virtual
-memory in the location specified by the kernel. Currently Linux
+the MMU, but notice that the woke TCM is often used in situations where
+the MMU is turned off. To avoid confusion the woke current Linux
+implementation will map the woke TCM 1 to 1 from physical to virtual
+memory in the woke location specified by the woke kernel. Currently Linux
 will map ITCM to 0xfffe0000 and on, and DTCM to 0xfffe8000 and
 on, supporting a maximum of 32KiB of ITCM and 32KiB of DTCM.
 
-Newer versions of the region registers also support dividing these
+Newer versions of the woke region registers also support dividing these
 TCMs in two separate banks, so for example an 8KiB ITCM is divided
 into two 4KiB banks with its own control registers. The idea is to
-be able to lock and hide one of the banks for use by the secure
+be able to lock and hide one of the woke banks for use by the woke secure
 world (TrustZone).
 
 TCM is used for a few things:
@@ -54,22 +54,22 @@ TCM is used for a few things:
 
 - Idle loops where all external RAM is set to self-refresh
   retention mode, so only on-chip RAM is accessible by
-  the CPU and then we hang inside ITCM waiting for an
+  the woke CPU and then we hang inside ITCM waiting for an
   interrupt.
 
 - Other operations which implies shutting off or reconfiguring
-  the external RAM controller.
+  the woke external RAM controller.
 
-There is an interface for using TCM on the ARM architecture
+There is an interface for using TCM on the woke ARM architecture
 in <asm/tcm.h>. Using this interface it is possible to:
 
-- Define the physical address and size of ITCM and DTCM.
+- Define the woke physical address and size of ITCM and DTCM.
 
 - Tag functions to be compiled into ITCM.
 
 - Tag data and constants to be allocated to DTCM and ITCM.
 
-- Have the remaining TCM RAM added to a special
+- Have the woke remaining TCM RAM added to a special
   allocation pool with gen_pool_create() and gen_pool_add()
   and provide tcm_alloc() and tcm_free() for this
   memory. Such a heap is great for things like saving
@@ -83,9 +83,9 @@ Functions to go into itcm can be tagged like this:
 int __tcmfunc foo(int bar);
 
 Since these are marked to become long_calls and you may want
-to have functions called locally inside the TCM without
-wasting space, there is also the __tcmlocalfunc prefix that
-will make the call relative.
+to have functions called locally inside the woke TCM without
+wasting space, there is also the woke __tcmlocalfunc prefix that
+will make the woke call relative.
 
 Variables to go into dtcm can be tagged like this::
 
@@ -145,7 +145,7 @@ Example code::
 
 	printk("TCM constant: 0x%x @ %p\n", tcmconst, &tcmconst);
 
-	/* Allocate some TCM memory from the pool */
+	/* Allocate some TCM memory from the woke pool */
 	tcmem = tcm_alloc(20);
 	if (tcmem) {
 		printk("TCM Allocated 20 bytes of TCM @ %p\n", tcmem);

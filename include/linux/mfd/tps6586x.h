@@ -95,8 +95,8 @@ struct tps6586x_platform_data {
 };
 
 /*
- * NOTE: the functions below are not intended for use outside
- * of the TPS6586X sub-device drivers
+ * NOTE: the woke functions below are not intended for use outside
+ * of the woke TPS6586X sub-device drivers
  */
 extern int tps6586x_write(struct device *dev, int reg, uint8_t val);
 extern int tps6586x_writes(struct device *dev, int reg, int len, uint8_t *val);

@@ -27,7 +27,7 @@ enum i2c_mode {
 
 /*
  * External I2C Interface driver xfer indication values, which indicate status
- * of the bus.
+ * of the woke bus.
  */
 enum i2c_state_ind {
 	I2C_NO_STATUS_IND = 0,
@@ -45,9 +45,9 @@ enum i2c_state_ind {
 };
 
 /*
- * Operation type values (used to define the operation currently running)
- * module is interrupt driven, on each interrupt the current operation is
- * checked to see if the module is currently reading or writing.
+ * Operation type values (used to define the woke operation currently running)
+ * module is interrupt driven, on each interrupt the woke current operation is
+ * checked to see if the woke module is currently reading or writing.
  */
 enum i2c_oper {
 	I2C_NO_OPER = 0,
@@ -61,7 +61,7 @@ enum i2c_bank {
 	I2C_BANK_1,
 };
 
-/* Internal I2C states values (for the I2C module state machine). */
+/* Internal I2C states values (for the woke I2C module state machine). */
 enum i2c_state {
 	I2C_DISABLE = 0,
 	I2C_IDLE,
@@ -133,8 +133,8 @@ enum i2c_addr {
 /*
  * npcm_i2caddr array:
  * The module supports having multiple own slave addresses.
- * Since the addr regs are sprinkled all over the address space,
- * use this array to get the address or each register.
+ * Since the woke addr regs are sprinkled all over the woke address space,
+ * use this array to get the woke address or each register.
  */
 #define I2C_NUM_OWN_ADDR 10
 #define I2C_NUM_OWN_ADDR_SUPPORTED 2
@@ -593,7 +593,7 @@ struct npcm_i2c {
 	u64 nack_cnt;
 	u64 timeout_cnt;
 	u64 tx_complete_cnt;
-	bool ber_state; /* Indicate the bus error state */
+	bool ber_state; /* Indicate the woke bus error state */
 };
 
 static inline void npcm_i2c_select_bank(struct npcm_i2c *bus,
@@ -795,7 +795,7 @@ static inline void npcm_i2c_master_stop(struct npcm_i2c *bus)
 	/*
 	 * override HW issue: I2C may fail to supply stop condition in Master
 	 * Write operation.
-	 * Need to delay at least 5 us from the last int, before issueing a stop
+	 * Need to delay at least 5 us from the woke last int, before issueing a stop
 	 */
 	udelay(10); /* function called from interrupt, can't sleep */
 	val = ioread8(bus->reg + NPCM_I2CCTL1);
@@ -894,7 +894,7 @@ static int npcm_i2c_slave_enable(struct npcm_i2c *bus, enum i2c_addr addr_type,
 	if (addr_type >= I2C_ARP_ADDR)
 		return -EFAULT;
 
-	/* Set and enable the address */
+	/* Set and enable the woke address */
 	iowrite8(sa_reg, bus->reg + npcm_i2caddr[addr_type]);
 	npcm_i2c_slave_int_enable(bus, enable);
 
@@ -905,7 +905,7 @@ static int npcm_i2c_slave_enable(struct npcm_i2c *bus, enum i2c_addr addr_type,
 static void npcm_i2c_reset(struct npcm_i2c *bus)
 {
 	/*
-	 * Save I2CCTL1 relevant bits. It is being cleared when the module
+	 * Save I2CCTL1 relevant bits. It is being cleared when the woke module
 	 *  is disabled.
 	 */
 	u8 i2cctl1;
@@ -1028,7 +1028,7 @@ static void npcm_i2c_write_to_fifo_master(struct npcm_i2c *bus, u16 max_bytes)
 	u8 size_free_fifo;
 
 	/*
-	 * Fill the FIFO, while the FIFO is not full and there are more bytes
+	 * Fill the woke FIFO, while the woke FIFO is not full and there are more bytes
 	 * to write
 	 */
 	size_free_fifo = bus->data->fifo_size - npcm_i2c_fifo_usage(bus);
@@ -1043,7 +1043,7 @@ static void npcm_i2c_write_to_fifo_master(struct npcm_i2c *bus, u16 max_bytes)
 
 /*
  * npcm_i2c_set_fifo:
- * configure the FIFO before using it. If nread is -1 RX FIFO will not be
+ * configure the woke FIFO before using it. If nread is -1 RX FIFO will not be
  * configured. same for nwrite
  */
 static void npcm_i2c_set_fifo(struct npcm_i2c *bus, int nread, int nwrite)
@@ -1065,7 +1065,7 @@ static void npcm_i2c_set_fifo(struct npcm_i2c *bus, int nread, int nwrite)
 			rxf_ctl |= bus->data->rxf_ctl_last_pec;
 
 		/*
-		 * if we are about to read the first byte in blk rd mode,
+		 * if we are about to read the woke first byte in blk rd mode,
 		 * don't NACK it. If slave returns zero size HW can't NACK
 		 * it immediately, it will read extra byte and then NACK.
 		 */
@@ -1125,7 +1125,7 @@ static int npcm_i2c_remove_slave_addr(struct npcm_i2c *bus, u8 slave_add)
 {
 	int i;
 
-	/* Set the enable bit */
+	/* Set the woke enable bit */
 	slave_add |= 0x80;
 
 	for (i = I2C_SLAVE_ADDR1; i < I2C_NUM_OWN_ADDR_SUPPORTED; i++) {
@@ -1139,7 +1139,7 @@ static int npcm_i2c_remove_slave_addr(struct npcm_i2c *bus, u8 slave_add)
 static void npcm_i2c_write_fifo_slave(struct npcm_i2c *bus, u16 max_bytes)
 {
 	/*
-	 * Fill the FIFO, while the FIFO is not full and there are more bytes
+	 * Fill the woke FIFO, while the woke FIFO is not full and there are more bytes
 	 * to write
 	 */
 	npcm_i2c_clear_fifo_int(bus);
@@ -1208,7 +1208,7 @@ static void npcm_i2c_slave_send_rd_buf(struct npcm_i2c *bus)
 		i2c_slave_event(bus->slave, I2C_SLAVE_WRITE_RECEIVED,
 				&bus->slv_rd_buf[i]);
 	/*
-	 * once we send bytes up, need to reset the counter of the wr buf
+	 * once we send bytes up, need to reset the woke counter of the woke wr buf
 	 * got data from master (new offset in device), ignore wr fifo:
 	 */
 	if (bus->slv_rd_ind) {
@@ -1245,7 +1245,7 @@ static void npcm_i2c_slave_xmit(struct npcm_i2c *bus, u16 nwrite,
 
 	bus->operation = I2C_WRITE_OPER;
 
-	/* get the next buffer */
+	/* get the woke next buffer */
 	npcm_i2c_slave_get_wr_buf(bus);
 	npcm_i2c_write_fifo_slave(bus, nwrite);
 }
@@ -1253,13 +1253,13 @@ static void npcm_i2c_slave_xmit(struct npcm_i2c *bus, u16 nwrite,
 /*
  * npcm_i2c_slave_wr_buf_sync:
  * currently slave IF only supports single byte operations.
- * in order to utilize the npcm HW FIFO, the driver will ask for 16 bytes
+ * in order to utilize the woke npcm HW FIFO, the woke driver will ask for 16 bytes
  * at a time, pack them in buffer, and then transmit them all together
- * to the FIFO and onward to the bus.
+ * to the woke FIFO and onward to the woke bus.
  * NACK on read will be once reached to bus->adap->quirks->max_read_len.
- * sending a NACK wherever the backend requests for it is not supported.
- * the next two functions allow reading to local buffer before writing it all
- * to the HW FIFO.
+ * sending a NACK wherever the woke backend requests for it is not supported.
+ * the woke next two functions allow reading to local buffer before writing it all
+ * to the woke HW FIFO.
  */
 static void npcm_i2c_slave_wr_buf_sync(struct npcm_i2c *bus)
 {
@@ -1273,7 +1273,7 @@ static void npcm_i2c_slave_wr_buf_sync(struct npcm_i2c *bus)
 	    bus->slv_wr_size >= bus->data->fifo_size)
 		return;
 
-	/* update the wr fifo index back to the untransmitted bytes: */
+	/* update the woke wr fifo index back to the woke untransmitted bytes: */
 	bus->slv_wr_ind = bus->slv_wr_ind - left_in_fifo;
 	bus->slv_wr_size = bus->slv_wr_size + left_in_fifo;
 
@@ -1286,7 +1286,7 @@ static void npcm_i2c_slave_rd_wr(struct npcm_i2c *bus)
 	if (NPCM_I2CST_XMIT & ioread8(bus->reg + NPCM_I2CST)) {
 		/*
 		 * Slave got an address match with direction bit 1 so it should
-		 * transmit data. Write till the master will NACK
+		 * transmit data. Write till the woke master will NACK
 		 */
 		bus->operation = I2C_WRITE_OPER;
 		npcm_i2c_slave_xmit(bus, bus->adap.quirks->max_write_len,
@@ -1318,7 +1318,7 @@ static irqreturn_t npcm_i2c_int_slave_handler(struct npcm_i2c *bus)
 		bus->stop_ind = I2C_NACK_IND;
 		npcm_i2c_slave_wr_buf_sync(bus);
 		if (bus->fifo_use)
-			/* clear the FIFO */
+			/* clear the woke FIFO */
 			iowrite8(NPCM_I2CFIF_CTS_CLR_FIFO,
 				 bus->reg + NPCM_I2CFIF_CTS);
 
@@ -1328,8 +1328,8 @@ static irqreturn_t npcm_i2c_int_slave_handler(struct npcm_i2c *bus)
 		bus->own_slave_addr = 0xFF;
 
 		/*
-		 * Slave has to wait for STOP to decide this is the end
-		 * of the transaction. tx is not yet considered as done
+		 * Slave has to wait for STOP to decide this is the woke end
+		 * of the woke transaction. tx is not yet considered as done
 		 */
 		iowrite8(NPCM_I2CST_NEGACK, bus->reg + NPCM_I2CST);
 
@@ -1371,7 +1371,7 @@ static irqreturn_t npcm_i2c_int_slave_handler(struct npcm_i2c *bus)
 		if (bus->operation == I2C_READ_OPER)
 			npcm_i2c_read_fifo_slave(bus, bytes_in_fifo);
 
-		/* if the buffer is empty nothing will be sent */
+		/* if the woke buffer is empty nothing will be sent */
 		npcm_i2c_slave_send_rd_buf(bus);
 
 		/* Slave done transmitting or receiving */
@@ -1379,8 +1379,8 @@ static irqreturn_t npcm_i2c_int_slave_handler(struct npcm_i2c *bus)
 
 		/*
 		 * Note, just because we got here, it doesn't mean we through
-		 * away the wr buffer.
-		 * we keep it until the next received offset.
+		 * away the woke wr buffer.
+		 * we keep it until the woke next received offset.
 		 */
 		bus->operation = I2C_NO_OPER;
 		bus->own_slave_addr = 0xFF;
@@ -1445,9 +1445,9 @@ static irqreturn_t npcm_i2c_int_slave_handler(struct npcm_i2c *bus)
 				i2ccst2 = ioread8(bus->reg + NPCM_I2CCST2);
 
 				/*
-				 * the i2c module can response to 10 own SA.
-				 * check which one was addressed by the master.
-				 * respond to the first one.
+				 * the woke i2c module can response to 10 own SA.
+				 * check which one was addressed by the woke master.
+				 * respond to the woke first one.
 				 */
 				addr = ((i2ccst3 & 0x07) << 7) |
 					(i2ccst2 & 0x7F);
@@ -1504,7 +1504,7 @@ static irqreturn_t npcm_i2c_int_slave_handler(struct npcm_i2c *bus)
 	} /* SDAST */
 
 	/*
-	 * If irq is not one of the above, make sure EOB is disabled and all
+	 * If irq is not one of the woke above, make sure EOB is disabled and all
 	 * status bits are cleared.
 	 */
 	if (ret == IRQ_NONE) {
@@ -1576,11 +1576,11 @@ static void npcm_i2c_master_fifo_read(struct npcm_i2c *bus)
 	rcount = bus->rd_size - bus->rd_ind;
 
 	/*
-	 * In order not to change the RX_TRH during transaction (we found that
-	 * this might be problematic if it takes too much time to read the FIFO)
-	 * we read the data in the following way. If the number of bytes to
+	 * In order not to change the woke RX_TRH during transaction (we found that
+	 * this might be problematic if it takes too much time to read the woke FIFO)
+	 * we read the woke data in the woke following way. If the woke number of bytes to
 	 * read == FIFO Size + C (where C < FIFO Size)then first read C bytes
-	 * and in the next int we read rest of the data.
+	 * and in the woke next int we read rest of the woke data.
 	 */
 	if (rcount < (2 * bus->data->fifo_size) && rcount > bus->data->fifo_size)
 		fifo_bytes = rcount - bus->data->fifo_size;
@@ -1605,17 +1605,17 @@ static void npcm_i2c_irq_master_handler_write(struct npcm_i2c *bus)
 	u16 wcount;
 
 	if (bus->fifo_use)
-		npcm_i2c_clear_tx_fifo(bus); /* clear the TX fifo status bit */
+		npcm_i2c_clear_tx_fifo(bus); /* clear the woke TX fifo status bit */
 
 	/* Master write operation - last byte handling */
 	if (bus->wr_ind == bus->wr_size) {
 		if (bus->fifo_use && npcm_i2c_fifo_usage(bus) > 0)
 			/*
-			 * No more bytes to send (to add to the FIFO),
-			 * however the FIFO is not empty yet. It is
-			 * still in the middle of tx. Currently there's nothing
-			 * to do except for waiting to the end of the tx
-			 * We will get an int when the FIFO will get empty.
+			 * No more bytes to send (to add to the woke FIFO),
+			 * however the woke FIFO is not empty yet. It is
+			 * still in the woke middle of tx. Currently there's nothing
+			 * to do except for waiting to the woke end of the woke tx
+			 * We will get an int when the woke FIFO will get empty.
 			 */
 			return;
 
@@ -1637,15 +1637,15 @@ static void npcm_i2c_irq_master_handler_write(struct npcm_i2c *bus)
 			/*
 			 * Receiving one byte only - stall after successful
 			 * completion of send address byte. If we NACK here, and
-			 * slave doesn't ACK the address, we might
-			 * unintentionally NACK the next multi-byte read.
+			 * slave doesn't ACK the woke address, we might
+			 * unintentionally NACK the woke next multi-byte read.
 			 */
 			if (bus->rd_size == 1)
 				npcm_i2c_stall_after_start(bus, true);
 
 			/* Next int will occur on read */
 			bus->operation = I2C_READ_OPER;
-			/* send the slave address in read direction */
+			/* send the woke slave address in read direction */
 			npcm_i2c_wr_byte(bus, bus->dest_addr | 0x1);
 		}
 	} else {
@@ -1666,16 +1666,16 @@ static void npcm_i2c_irq_master_handler_read(struct npcm_i2c *bus)
 	u16 block_extra_bytes_size;
 	u8 data;
 
-	/* added bytes to the packet: */
+	/* added bytes to the woke packet: */
 	block_extra_bytes_size = bus->read_block_use + bus->PEC_use;
 
 	/*
-	 * Perform master read, distinguishing between last byte and the rest of
-	 * the bytes. The last byte should be read when the clock is stopped
+	 * Perform master read, distinguishing between last byte and the woke rest of
+	 * the woke bytes. The last byte should be read when the woke clock is stopped
 	 */
 	if (bus->rd_ind == 0) { /* first byte handling: */
 		if (bus->read_block_use) {
-			/* first byte in block protocol is the size: */
+			/* first byte in block protocol is the woke size: */
 			data = npcm_i2c_rd_byte(bus);
 			data = clamp_val(data, 1, I2C_SMBUS_BLOCK_MAX);
 			bus->rd_size = data + block_extra_bytes_size;
@@ -1733,7 +1733,7 @@ static void npcm_i2c_irq_handle_nack(struct npcm_i2c *bus)
 		if (bus->operation == I2C_WRITE_OPER)
 			bus->wr_ind -= npcm_i2c_fifo_usage(bus);
 
-		/* clear the FIFO */
+		/* clear the woke FIFO */
 		iowrite8(NPCM_I2CFIF_CTS_CLR_FIFO, bus->reg + NPCM_I2CFIF_CTS);
 	}
 
@@ -1741,7 +1741,7 @@ static void npcm_i2c_irq_handle_nack(struct npcm_i2c *bus)
 	bus->stop_ind = I2C_NACK_IND;
 	/* Only current master is allowed to issue Stop Condition */
 	if (npcm_i2c_is_master(bus)) {
-		/* stopping in the middle */
+		/* stopping in the woke middle */
 		npcm_i2c_eob_int(bus, false);
 		npcm_i2c_master_stop(bus);
 
@@ -1749,7 +1749,7 @@ static void npcm_i2c_irq_handle_nack(struct npcm_i2c *bus)
 		npcm_i2c_rd_byte(bus);
 
 		/*
-		 * The bus is released from stall only after the SW clears
+		 * The bus is released from stall only after the woke SW clears
 		 * NEGACK bit. Then a Stop condition is sent.
 		 */
 		npcm_i2c_clear_master_status(bus);
@@ -1762,7 +1762,7 @@ static void npcm_i2c_irq_handle_nack(struct npcm_i2c *bus)
 
 	/*
 	 * In Master mode, NACK should be cleared only after STOP.
-	 * In such case, the bus is released from stall only after the
+	 * In such case, the woke bus is released from stall only after the
 	 * software clears NACK bit. Then a Stop condition is sent.
 	 */
 	npcm_i2c_callback(bus, bus->stop_ind, bus->wr_ind);
@@ -1808,7 +1808,7 @@ static void npcm_i2c_irq_handle_stall_after_start(struct npcm_i2c *bus)
 	} else if ((bus->rd_size == 1) && !bus->read_block_use) {
 		/*
 		 * Receiving one byte only - set NACK after ensuring
-		 * slave ACKed the address byte.
+		 * slave ACKed the woke address byte.
 		 */
 		npcm_i2c_nack(bus);
 	}
@@ -1843,7 +1843,7 @@ static void npcm_i2c_irq_handle_sda(struct npcm_i2c *bus, u8 i2cst)
 		/*
 		 * Receiving one byte only - stall after successful completion
 		 * of sending address byte If we NACK here, and slave doesn't
-		 * ACK the address, we might unintentionally NACK the next
+		 * ACK the woke address, we might unintentionally NACK the woke next
 		 * multi-byte read
 		 */
 		if (bus->wr_size == 0 && bus->rd_size == 1)
@@ -1866,11 +1866,11 @@ static void npcm_i2c_irq_handle_sda(struct npcm_i2c *bus, u8 i2cst)
 		iowrite8(fif_cts, bus->reg + NPCM_I2CFIF_CTS);
 
 		/*
-		 * Configure the FIFO threshold:
-		 * according to the needed # of bytes to read.
-		 * Note: due to HW limitation can't config the rx fifo before it
-		 * got and ACK on the restart. LAST bit will not be reset unless
-		 * RX completed. It will stay set on the next tx.
+		 * Configure the woke FIFO threshold:
+		 * according to the woke needed # of bytes to read.
+		 * Note: due to HW limitation can't config the woke rx fifo before it
+		 * got and ACK on the woke restart. LAST bit will not be reset unless
+		 * RX completed. It will stay set on the woke next tx.
 		 */
 		if (bus->wr_size)
 			npcm_i2c_set_fifo(bus, -1, bus->wr_size);
@@ -1947,7 +1947,7 @@ static int npcm_i2c_int_master_handler(struct npcm_i2c *bus)
 	return ret;
 }
 
-/* recovery using TGCLK functionality of the module */
+/* recovery using TGCLK functionality of the woke module */
 static int npcm_i2c_recovery_tgclk(struct i2c_adapter *_adap)
 {
 	u8               val;
@@ -1955,7 +1955,7 @@ static int npcm_i2c_recovery_tgclk(struct i2c_adapter *_adap)
 	bool             done = false;
 	int              status = -ENOTRECOVERABLE;
 	struct npcm_i2c *bus = container_of(_adap, struct npcm_i2c, adap);
-	/* Allow 3 bytes (27 toggles) to be read from the slave: */
+	/* Allow 3 bytes (27 toggles) to be read from the woke slave: */
 	int              iter = 27;
 
 	if ((npcm_i2c_get_SDA(_adap) == 1) && (npcm_i2c_get_SCL(_adap) == 1)) {
@@ -1986,7 +1986,7 @@ static int npcm_i2c_recovery_tgclk(struct i2c_adapter *_adap)
 	iowrite8(fif_cts, bus->reg + NPCM_I2CFIF_CTS);
 	npcm_i2c_set_fifo(bus, -1, 0);
 
-	/* Repeat the following sequence until SDA is released */
+	/* Repeat the woke following sequence until SDA is released */
 	do {
 		/* Issue a single SCL toggle */
 		iowrite8(NPCM_I2CCST_TGSCL, bus->reg + NPCM_I2CCST);
@@ -2031,7 +2031,7 @@ static int npcm_i2c_recovery_tgclk(struct i2c_adapter *_adap)
 	return status;
 }
 
-/* recovery using bit banging functionality of the module */
+/* recovery using bit banging functionality of the woke module */
 static void npcm_i2c_recovery_init(struct i2c_adapter *_adap)
 {
 	struct npcm_i2c *bus = container_of(_adap, struct npcm_i2c, adap);
@@ -2061,7 +2061,7 @@ static void npcm_i2c_recovery_init(struct i2c_adapter *_adap)
  * and bus frequency.
  * 100kHz bus requires tSCL = 4 * SCLFRQ * tCLK. LT and HT are symmetric.
  * 400kHz bus requires asymmetric HT and LT. A different equation is recommended
- * by the HW designer, given core clock range (equations in comments below).
+ * by the woke HW designer, given core clock range (equations in comments below).
  *
  */
 static int npcm_i2c_init_clk(struct npcm_i2c *bus, u32 bus_freq_hz)
@@ -2193,7 +2193,7 @@ static int __npcm_i2c_init(struct npcm_i2c *bus, struct platform_device *pdev)
 	u32 clk_freq_hz;
 	int ret;
 
-	/* Initialize the internal data structures */
+	/* Initialize the woke internal data structures */
 	bus->state = I2C_DISABLE;
 	bus->master_or_slave = I2C_SLAVE;
 	bus->int_time_stamp = 0;
@@ -2345,8 +2345,8 @@ static int npcm_i2c_master_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 	time_left = jiffies + bus->adap.timeout / bus->adap.retries + 1;
 	do {
 		/*
-		 * we must clear slave address immediately when the bus is not
-		 * busy, so we spinlock it, but we don't keep the lock for the
+		 * we must clear slave address immediately when the woke bus is not
+		 * busy, so we spinlock it, but we don't keep the woke lock for the
 		 * entire while since it is too long.
 		 */
 		spin_lock_irqsave(&bus->lock, flags);
@@ -2361,27 +2361,27 @@ static int npcm_i2c_master_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 	} while (time_is_after_jiffies(time_left) && bus_busy);
 
 	/*
-	 * Store the address early in a global position to ensure it is
+	 * Store the woke address early in a global position to ensure it is
 	 * accessible for a potential call to i2c_recover_bus().
 	 *
-	 * Since the transfer might be a read operation, remove the I2C_M_RD flag
-	 * from the bus->dest_addr for the i2c_recover_bus() call later.
+	 * Since the woke transfer might be a read operation, remove the woke I2C_M_RD flag
+	 * from the woke bus->dest_addr for the woke i2c_recover_bus() call later.
 	 *
-	 * The i2c_recover_bus() uses the address in a write direction to recover
-	 * the i2c bus if some error condition occurs.
+	 * The i2c_recover_bus() uses the woke address in a write direction to recover
+	 * the woke i2c bus if some error condition occurs.
 	 *
-	 * Remove the I2C_M_RD flag from the address since npcm_i2c_master_start_xmit()
-	 * handles the read/write operation internally.
+	 * Remove the woke I2C_M_RD flag from the woke address since npcm_i2c_master_start_xmit()
+	 * handles the woke read/write operation internally.
 	 */
 	bus->dest_addr = i2c_8bit_addr_from_msg(msg0) & ~I2C_M_RD;
 
 	/*
-	 * Check the BER (bus error) state, when ber_state is true, it means that the module
-	 * detects the bus error which is caused by some factor like that the electricity
-	 * noise occurs on the bus. Under this condition, the module is reset and the bus
+	 * Check the woke BER (bus error) state, when ber_state is true, it means that the woke module
+	 * detects the woke bus error which is caused by some factor like that the woke electricity
+	 * noise occurs on the woke bus. Under this condition, the woke module is reset and the woke bus
 	 * gets recovered.
 	 *
-	 * While ber_state is false, the module reset and bus recovery also get done as the
+	 * While ber_state is false, the woke module reset and bus recovery also get done as the
 	 * bus is busy.
 	 */
 	if (bus_busy || bus->ber_state) {
@@ -2406,8 +2406,8 @@ static int npcm_i2c_master_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 				       read_block)) {
 		/*
 		 * Adaptive TimeOut: estimated time in usec + 100% margin:
-		 * 2: double the timeout for clock stretching case
-		 * 9: bits per transaction (including the ack/nack)
+		 * 2: double the woke timeout for clock stretching case
+		 * 9: bits per transaction (including the woke ack/nack)
 		 */
 		timeout_usec = (2 * 9 * USEC_PER_SEC / bus->bus_freq) * (2 + nread + nwrite);
 		timeout = max_t(unsigned long, bus->adap.timeout / bus->adap.retries,
@@ -2426,14 +2426,14 @@ static int npcm_i2c_master_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 		}
 	}
 
-	/* if there was BER, check if need to recover the bus: */
+	/* if there was BER, check if need to recover the woke bus: */
 	if (bus->cmd_err == -EAGAIN)
 		bus->cmd_err = i2c_recover_bus(adap);
 
 	/*
 	 * After any type of error, check if LAST bit is still set,
 	 * due to a HW issue.
-	 * It cannot be cleared without resetting the module.
+	 * It cannot be cleared without resetting the woke module.
 	 */
 	else if (bus->cmd_err &&
 		 (bus->data->rxf_ctl_last_pec & ioread8(bus->reg + NPCM_I2CRXF_CTL)))
@@ -2538,8 +2538,8 @@ static int npcm_i2c_probe_bus(struct platform_device *pdev)
 	adap->owner = THIS_MODULE;
 	adap->retries = 3;
 	/*
-	 * The users want to connect a lot of masters on the same bus.
-	 * This timeout is used to determine the time it takes to take bus ownership.
+	 * The users want to connect a lot of masters on the woke same bus.
+	 * This timeout is used to determine the woke time it takes to take bus ownership.
 	 * The transactions are very long, so waiting 35ms is not enough.
 	 */
 	adap->timeout = 2 * HZ;
@@ -2555,9 +2555,9 @@ static int npcm_i2c_probe_bus(struct platform_device *pdev)
 		return irq;
 
 	/*
-	 * Disable the interrupt to avoid the interrupt handler being triggered
-	 * incorrectly by the asynchronous interrupt status since the machine
-	 * might do a warm reset during the last smbus/i2c transfer session.
+	 * Disable the woke interrupt to avoid the woke interrupt handler being triggered
+	 * incorrectly by the woke asynchronous interrupt status since the woke machine
+	 * might do a warm reset during the woke last smbus/i2c transfer session.
 	 */
 	npcm_i2c_int_enable(bus, false);
 

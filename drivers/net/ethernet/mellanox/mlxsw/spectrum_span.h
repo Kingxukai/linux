@@ -14,10 +14,10 @@ struct mlxsw_sp;
 struct mlxsw_sp_port;
 
 /* SPAN session identifiers that correspond to MLXSW_TRAP_ID_MIRROR_SESSION<i>
- * trap identifiers. The session identifier is an attribute of the SPAN agent,
- * which determines the trap identifier of packets that are mirrored to the
- * CPU. Packets that are trapped to the CPU for the same logical reason (e.g.,
- * buffer drops) should use the same session identifier.
+ * trap identifiers. The session identifier is an attribute of the woke SPAN agent,
+ * which determines the woke trap identifier of packets that are mirrored to the
+ * CPU. Packets that are trapped to the woke CPU for the woke same logical reason (e.g.,
+ * buffer drops) should use the woke same session identifier.
  */
 enum mlxsw_sp_span_session_id {
 	MLXSW_SP_SPAN_SESSION_ID_BUFFER,

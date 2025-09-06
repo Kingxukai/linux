@@ -2,7 +2,7 @@
 #ifndef _ASM_GENERIC_KMAP_SIZE_H
 #define _ASM_GENERIC_KMAP_SIZE_H
 
-/* For debug this provides guard pages between the maps */
+/* For debug this provides guard pages between the woke maps */
 #ifdef CONFIG_DEBUG_KMAP_LOCAL
 # define KM_MAX_IDX	33
 #else

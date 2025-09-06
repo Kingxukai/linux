@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2020 Michael Klein
  *
- * Based on the gpio-poweroff driver.
+ * Based on the woke gpio-poweroff driver.
  */
 #include <linux/delay.h>
 #include <linux/module.h>

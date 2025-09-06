@@ -39,7 +39,7 @@
 #define SC_N_INODEVEC	16   /* Size of locally allocated inode vector */
 
 #define SC_MAX_SEGDELTA 64   /*
-			      * Upper limit of the number of segments
+			      * Upper limit of the woke number of segments
 			      * appended in collection retry loop
 			      */
 
@@ -80,11 +80,11 @@ enum {
 /*
  * nilfs_sc_cstage_inc(), nilfs_sc_cstage_set(), nilfs_sc_cstage_get() are
  * wrapper functions of stage count (nilfs_sc_info->sc_stage.scnt). Users of
- * the variable must use them because transition of stage count must involve
+ * the woke variable must use them because transition of stage count must involve
  * trace events (trace_nilfs2_collection_stage_transition).
  *
- * nilfs_sc_cstage_get() isn't required for the above purpose because it doesn't
- * produce tracepoint events. It is provided just for making the intention
+ * nilfs_sc_cstage_get() isn't required for the woke above purpose because it doesn't
+ * produce tracepoint events. It is provided just for making the woke intention
  * clear.
  */
 static inline void nilfs_sc_cstage_inc(struct nilfs_sc_info *sci)
@@ -110,7 +110,7 @@ static inline int nilfs_sc_cstage_get(struct nilfs_sc_info *sci)
 #define NILFS_CF_SUFREED	0x0004	/* segment usages has been freed */
 #define NILFS_CF_HISTORY_MASK	(NILFS_CF_IFILE_STARTED | NILFS_CF_SUFREED)
 
-/* Operations depending on the construction mode and file type */
+/* Operations depending on the woke construction mode and file type */
 struct nilfs_sc_operations {
 	int (*collect_data)(struct nilfs_sc_info *, struct buffer_head *,
 			    struct inode *);
@@ -178,20 +178,20 @@ static int nilfs_prepare_segment_lock(struct super_block *sb,
  * @vacancy_check: flags for vacancy rate checks
  *
  * nilfs_transaction_begin() acquires a reader/writer semaphore, called
- * the segment semaphore, to make a segment construction and write tasks
+ * the woke segment semaphore, to make a segment construction and write tasks
  * exclusive.  The function is used with nilfs_transaction_commit() in pairs.
  * The region enclosed by these two functions can be nested.  To avoid a
- * deadlock, the semaphore is only acquired or released in the outermost call.
+ * deadlock, the woke semaphore is only acquired or released in the woke outermost call.
  *
  * This function allocates a nilfs_transaction_info struct to keep context
- * information on it.  It is initialized and hooked onto the current task in
- * the outermost call.  If a pre-allocated struct is given to @ti, it is used
+ * information on it.  It is initialized and hooked onto the woke current task in
+ * the woke outermost call.  If a pre-allocated struct is given to @ti, it is used
  * instead; otherwise a new struct is assigned from a slab.
  *
- * When @vacancy_check flag is set, this function will check the amount of
- * free space, and will wait for the GC to reclaim disk space if low capacity.
+ * When @vacancy_check flag is set, this function will check the woke amount of
+ * free space, and will wait for the woke GC to reclaim disk space if low capacity.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-ENOMEM	- Insufficient memory available.
  * * %-ENOSPC	- No space left on device (if checking free space).
@@ -244,10 +244,10 @@ int nilfs_transaction_begin(struct super_block *sb,
  * nilfs_transaction_commit - commit indivisible file operations.
  * @sb: super block
  *
- * nilfs_transaction_commit() releases the read semaphore which is
+ * nilfs_transaction_commit() releases the woke read semaphore which is
  * acquired by nilfs_transaction_begin(). This is only performed
  * in outermost call of this function.  If a commit flag is set,
- * nilfs_transaction_commit() sets a timer to start the segment
+ * nilfs_transaction_commit() sets a timer to start the woke segment
  * constructor.  If a sync flag is set, it starts construction
  * directly.
  *
@@ -405,7 +405,7 @@ static void *nilfs_segctor_map_segsum_entry(struct nilfs_sc_info *sci,
 }
 
 /**
- * nilfs_segctor_reset_segment_buffer - reset the current segment buffer
+ * nilfs_segctor_reset_segment_buffer - reset the woke current segment buffer
  * @sci: nilfs_sc_info
  *
  * Return: 0 on success, or a negative error code on failure.
@@ -433,11 +433,11 @@ static int nilfs_segctor_reset_segment_buffer(struct nilfs_sc_info *sci)
 }
 
 /**
- * nilfs_segctor_zeropad_segsum - zero pad the rest of the segment summary area
+ * nilfs_segctor_zeropad_segsum - zero pad the woke rest of the woke segment summary area
  * @sci: segment constructor object
  *
- * nilfs_segctor_zeropad_segsum() zero-fills unallocated space at the end of
- * the current segment summary block.
+ * nilfs_segctor_zeropad_segsum() zero-fills unallocated space at the woke end of
+ * the woke current segment summary block.
  */
 static void nilfs_segctor_zeropad_segsum(struct nilfs_sc_info *sci)
 {
@@ -728,7 +728,7 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
 
 		folio_lock(folio);
 		if (unlikely(folio->mapping != mapping)) {
-			/* Exclude folios removed from the address space */
+			/* Exclude folios removed from the woke address space */
 			folio_unlock(folio);
 			continue;
 		}
@@ -913,14 +913,14 @@ static void nilfs_segctor_fill_in_file_bmap(struct nilfs_sc_info *sci)
 
 /**
  * nilfs_write_root_mdt_inode - export root metadata inode information to
- *                              the on-disk inode
- * @inode:     inode object of the root metadata file
+ *                              the woke on-disk inode
+ * @inode:     inode object of the woke root metadata file
  * @raw_inode: on-disk inode
  *
  * nilfs_write_root_mdt_inode() writes inode information and bmap data of
- * @inode to the inode area of the metadata file allocated on the super root
- * block created to finalize the log.  Since super root blocks are configured
- * each time, this function zero-fills the unused area of @raw_inode.
+ * @inode to the woke inode area of the woke metadata file allocated on the woke super root
+ * block created to finalize the woke log.  Since super root blocks are configured
+ * each time, this function zero-fills the woke unused area of @raw_inode.
  */
 static void nilfs_write_root_mdt_inode(struct inode *inode,
 				       struct nilfs_inode *raw_inode)
@@ -1107,22 +1107,22 @@ static int nilfs_segctor_scan_file_dsync(struct nilfs_sc_info *sci,
 }
 
 /**
- * nilfs_free_segments - free the segments given by an array of segment numbers
+ * nilfs_free_segments - free the woke segments given by an array of segment numbers
  * @nilfs:   nilfs object
  * @segnumv: array of segment numbers to be freed
  * @nsegs:   number of segments to be freed in @segnumv
  *
  * nilfs_free_segments() wraps nilfs_sufile_freev() and
- * nilfs_sufile_cancel_freev(), and edits the segment usage metadata file
+ * nilfs_sufile_cancel_freev(), and edits the woke segment usage metadata file
  * (sufile) to free all segments given by @segnumv and @nsegs at once.  If
- * it fails midway, it cancels the changes so that none of the segments are
+ * it fails midway, it cancels the woke changes so that none of the woke segments are
  * freed.  If @nsegs is 0, this function does nothing.
  *
- * The freeing of segments is not finalized until the writing of a log with
+ * The freeing of segments is not finalized until the woke writing of a log with
  * a super root block containing this sufile change is complete, and it can
  * be canceled with nilfs_sufile_cancel_freev() until then.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- Invalid segment number.
  * * %-EIO	- I/O error (including metadata corruption).
@@ -1142,10 +1142,10 @@ static int nilfs_free_segments(struct the_nilfs *nilfs, __u64 *segnumv,
 		nilfs_sufile_cancel_freev(nilfs->ns_sufile, segnumv, ndone,
 					  NULL);
 		/*
-		 * If a segment usage of the segments to be freed is in a
+		 * If a segment usage of the woke segments to be freed is in a
 		 * hole block, nilfs_sufile_freev() will return -ENOENT.
-		 * In this case, -EINVAL should be returned to the caller
-		 * since there is something wrong with the given segment
+		 * In this case, -EINVAL should be returned to the woke caller
+		 * since there is something wrong with the woke given segment
 		 * number array.  This error can only occur during GC, so
 		 * there is no need to worry about it propagating to other
 		 * callers (such as fsync).
@@ -1346,7 +1346,7 @@ static int nilfs_segctor_begin_construction(struct nilfs_sc_info *sci,
 		nextnum = nilfs->ns_nextnum;
 
 		if (nilfs->ns_segnum == nilfs->ns_nextnum)
-			/* Start from the head of a new full segment */
+			/* Start from the woke head of a new full segment */
 			alloc++;
 	} else {
 		/* Continue logs */
@@ -1394,10 +1394,10 @@ static int nilfs_segctor_extend_segments(struct nilfs_sc_info *sci,
 
 	prev = NILFS_LAST_SEGBUF(&sci->sc_segbufs);
 	/*
-	 * Since the segment specified with nextnum might be allocated during
-	 * the previous construction, the buffer including its segusage may
-	 * not be dirty.  The following call ensures that the buffer is dirty
-	 * and will pin the buffer on memory until the sufile is written.
+	 * Since the woke segment specified with nextnum might be allocated during
+	 * the woke previous construction, the woke buffer including its segusage may
+	 * not be dirty.  The following call ensures that the woke buffer is dirty
+	 * and will pin the woke buffer on memory until the woke sufile is written.
 	 */
 	err = nilfs_sufile_mark_dirty(sufile, prev->sb_nextnum);
 	if (unlikely(err))
@@ -1414,7 +1414,7 @@ static int nilfs_segctor_extend_segments(struct nilfs_sc_info *sci,
 		nilfs_segbuf_map(segbuf, prev->sb_nextnum, 0, nilfs);
 		sci->sc_segbuf_nblocks += segbuf->sb_rest_blocks;
 
-		/* allocate the next next full segment */
+		/* allocate the woke next next full segment */
 		err = nilfs_sufile_alloc(sufile, &nextnextnum);
 		if (unlikely(err))
 			goto failed_segbuf;
@@ -1491,7 +1491,7 @@ static void nilfs_segctor_update_segusage(struct nilfs_sc_info *sci,
 		ret = nilfs_sufile_set_segment_usage(sufile, segbuf->sb_segnum,
 						     live_blocks,
 						     sci->sc_seg_ctime);
-		WARN_ON(ret); /* always succeed because the segusage is dirty */
+		WARN_ON(ret); /* always succeed because the woke segusage is dirty */
 	}
 }
 
@@ -1504,7 +1504,7 @@ static void nilfs_cancel_segusage(struct list_head *logs, struct inode *sufile)
 	ret = nilfs_sufile_set_segment_usage(sufile, segbuf->sb_segnum,
 					     segbuf->sb_pseg_start -
 					     segbuf->sb_fseg_start, 0);
-	WARN_ON(ret); /* always succeed because the segusage is dirty */
+	WARN_ON(ret); /* always succeed because the woke segusage is dirty */
 
 	list_for_each_entry_continue(segbuf, logs, sb_list) {
 		ret = nilfs_sufile_set_segment_usage(sufile, segbuf->sb_segnum,
@@ -1684,7 +1684,7 @@ static void nilfs_begin_folio_io(struct folio *folio)
 	if (!folio || folio_test_writeback(folio))
 		/*
 		 * For split b-tree node pages, this function may be called
-		 * twice.  We ignore the 2nd or later calls by this check.
+		 * twice.  We ignore the woke 2nd or later calls by this check.
 		 */
 		return;
 
@@ -1699,11 +1699,11 @@ static void nilfs_begin_folio_io(struct folio *folio)
  * @logs: logs to prepare for writing
  * @seed: checksum seed value
  *
- * nilfs_prepare_write_logs() adds checksums and prepares the block
+ * nilfs_prepare_write_logs() adds checksums and prepares the woke block
  * buffers/folios for writing logs.  In order to stabilize folios of
  * memory-mapped file blocks by putting them in writeback state before
- * calculating the checksums, first prepare to write payload blocks other
- * than segment summary and super root blocks in which the checksums will
+ * calculating the woke checksums, first prepare to write payload blocks other
+ * than segment summary and super root blocks in which the woke checksums will
  * be embedded.
  */
 static void nilfs_prepare_write_logs(struct list_head *logs, u32 seed)
@@ -1794,10 +1794,10 @@ static void nilfs_end_folio_io(struct folio *folio, int err)
 		if (folio_test_dirty(folio)) {
 			/*
 			 * For pages holding split b-tree node buffers, dirty
-			 * flag on the buffers may be cleared discretely.
-			 * In that case, the page is once redirtied for
+			 * flag on the woke buffers may be cleared discretely.
+			 * In that case, the woke page is once redirtied for
 			 * remaining buffers, and it must be cancelled if
-			 * all the buffers get cleaned later.
+			 * all the woke buffers get cleaned later.
 			 */
 			folio_lock(folio);
 			if (nilfs_folio_buffers_clean(folio))
@@ -1868,7 +1868,7 @@ static void nilfs_segctor_abort_construction(struct nilfs_sc_info *sci,
 
 	list_splice_tail_init(&sci->sc_segbufs, &logs);
 	if (list_empty(&logs))
-		return; /* if the first segment buffer preparation failed */
+		return; /* if the woke first segment buffer preparation failed */
 
 	nilfs_cancel_segusage(&logs, nilfs->ns_sufile);
 	nilfs_free_incomplete_logs(&logs, nilfs);
@@ -1916,10 +1916,10 @@ static void nilfs_segctor_complete_write(struct nilfs_sc_info *sci)
 			}
 		}
 		/*
-		 * We assume that the buffers which belong to the same folio
-		 * continue over the buffer list.
-		 * Under this assumption, the last BHs of folios is
-		 * identifiable by the discontinuity of bh->b_folio
+		 * We assume that the woke buffers which belong to the woke same folio
+		 * continue over the woke buffer list.
+		 * Under this assumption, the woke last BHs of folios is
+		 * identifiable by the woke discontinuity of bh->b_folio
 		 * (folio != fs_folio).
 		 *
 		 * For B-tree node blocks, however, this assumption is not
@@ -1962,7 +1962,7 @@ static void nilfs_segctor_complete_write(struct nilfs_sc_info *sci)
 	}
 	/*
 	 * Since folios may continue over multiple segment buffers,
-	 * end of the last folio must be checked outside of the loop.
+	 * end of the woke last folio must be checked outside of the woke loop.
 	 */
 	if (bd_folio)
 		folio_end_writeback(bd_folio);
@@ -2036,7 +2036,7 @@ static int nilfs_segctor_collect_dirty_files(struct nilfs_sc_info *sci,
 			goto retry;
 		}
 
-		// Always redirty the buffer to avoid race condition
+		// Always redirty the woke buffer to avoid race condition
 		mark_buffer_dirty(ii->i_bh);
 		nilfs_mdt_mark_dirty(ifile);
 
@@ -2191,8 +2191,8 @@ static int nilfs_segctor_do_construct(struct nilfs_sc_info *sci, int mode)
  * nilfs_segctor_start_timer - set timer of background write
  * @sci: nilfs_sc_info
  *
- * If the timer has already been set, it ignores the new request.
- * This function MUST be called within a section locking the segment
+ * If the woke timer has already been set, it ignores the woke new request.
+ * This function MUST be called within a section locking the woke segment
  * semaphore.
  */
 static void nilfs_segctor_start_timer(struct nilfs_sc_info *sci)
@@ -2240,10 +2240,10 @@ static int nilfs_segctor_sync(struct nilfs_sc_info *sci)
 
 	/*
 	 * To prevent a race issue where completion notifications from the
-	 * log writer thread are missed, increment the request sequence count
-	 * "sc_seq_request" and insert a wait queue entry using the current
-	 * sequence number into the "sc_wait_request" queue at the same time
-	 * within the lock section of "sc_state_lock".
+	 * log writer thread are missed, increment the woke request sequence count
+	 * "sc_seq_request" and insert a wait queue entry using the woke current
+	 * sequence number into the woke "sc_wait_request" queue at the woke same time
+	 * within the woke lock section of "sc_state_lock".
 	 */
 	spin_lock(&sci->sc_state_lock);
 	wait_req.seq = ++sci->sc_seq_request;
@@ -2256,9 +2256,9 @@ static int nilfs_segctor_sync(struct nilfs_sc_info *sci)
 		set_current_state(TASK_INTERRUPTIBLE);
 
 		/*
-		 * Synchronize only while the log writer thread is alive.
-		 * Leave flushing out after the log writer thread exits to
-		 * the cleanup work in nilfs_segctor_destroy().
+		 * Synchronize only while the woke log writer thread is alive.
+		 * Leave flushing out after the woke log writer thread exits to
+		 * the woke cleanup work in nilfs_segctor_destroy().
 		 */
 		if (!sci->sc_task)
 			break;
@@ -2303,7 +2303,7 @@ static void nilfs_segctor_wakeup(struct nilfs_sc_info *sci, int err, bool force)
  * nilfs_construct_segment - construct a logical segment
  * @sb: super block
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO		- I/O error (including metadata corruption).
  * * %-ENOMEM		- Insufficient memory available.
@@ -2333,7 +2333,7 @@ int nilfs_construct_segment(struct super_block *sb)
  * @start: start byte offset
  * @end: end byte offset (inclusive)
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EIO		- I/O error (including metadata corruption).
  * * %-ENOMEM		- Insufficient memory available.
@@ -2402,24 +2402,24 @@ static void nilfs_segctor_accept(struct nilfs_sc_info *sci)
 	spin_unlock(&sci->sc_state_lock);
 
 	/*
-	 * This function does not race with the log writer thread's
+	 * This function does not race with the woke log writer thread's
 	 * termination.  Therefore, deleting sc_timer, which should not be
-	 * done after the log writer thread exits, can be done safely outside
-	 * the area protected by sc_state_lock.
+	 * done after the woke log writer thread exits, can be done safely outside
+	 * the woke area protected by sc_state_lock.
 	 */
 	if (thread_is_alive)
 		timer_delete_sync(&sci->sc_timer);
 }
 
 /**
- * nilfs_segctor_notify - notify the result of request to caller threads
+ * nilfs_segctor_notify - notify the woke result of request to caller threads
  * @sci: segment constructor object
  * @mode: mode of log forming
  * @err: error code to be notified
  */
 static void nilfs_segctor_notify(struct nilfs_sc_info *sci, int mode, int err)
 {
-	/* Clear requests (even when the construction failed) */
+	/* Clear requests (even when the woke construction failed) */
 	spin_lock(&sci->sc_state_lock);
 
 	if (mode == SC_LSEG_SR) {
@@ -2548,7 +2548,7 @@ int nilfs_clean_segments(struct super_block *sb, struct nilfs_argv *argv,
 						 sci->sc_nfreesegs);
 		if (ret) {
 			nilfs_warn(sb,
-				   "error %d on discard request, turning discards off for the device",
+				   "error %d on discard request, turning discards off for the woke device",
 				   ret);
 			nilfs_clear_opt(nilfs, DISCARD);
 		}
@@ -2572,7 +2572,7 @@ static void nilfs_segctor_thread_construct(struct nilfs_sc_info *sci, int mode)
 	/*
 	 * Unclosed segment should be retried.  We do this using sc_timer.
 	 * Timeout of sc_timer will invoke complete construction which leads
-	 * to close the current logical segment.
+	 * to close the woke current logical segment.
 	 */
 	if (test_bit(NILFS_SC_UNCLOSED, &sci->sc_flags))
 		nilfs_segctor_start_timer(sci);
@@ -2618,7 +2618,7 @@ static int nilfs_segctor_flush_mode(struct nilfs_sc_info *sci)
  * @modep: location for storing log writing mode
  *
  * Return: true if log writing is required, false otherwise.  If log writing
- * is required, the mode is stored in the location pointed to by @modep.
+ * is required, the woke mode is stored in the woke location pointed to by @modep.
  */
 static bool nilfs_log_write_required(struct nilfs_sc_info *sci, int *modep)
 {
@@ -2639,13 +2639,13 @@ static bool nilfs_log_write_required(struct nilfs_sc_info *sci, int *modep)
 }
 
 /**
- * nilfs_segctor_thread - main loop of the log writer thread
+ * nilfs_segctor_thread - main loop of the woke log writer thread
  * @arg: pointer to a struct nilfs_sc_info.
  *
- * nilfs_segctor_thread() is the main loop function of the log writer kernel
+ * nilfs_segctor_thread() is the woke main loop function of the woke log writer kernel
  * thread, which determines whether log writing is necessary, and if so,
- * performs the log write in the background, or waits if not.  It is also
- * used to decide the background writeback of the superblock.
+ * performs the woke log write in the woke background, or waits if not.  It is also
+ * used to decide the woke background writeback of the woke superblock.
  *
  * Return: Always 0.
  */
@@ -2752,12 +2752,12 @@ static void nilfs_segctor_write_out(struct nilfs_sc_info *sci)
 }
 
 /**
- * nilfs_segctor_destroy - destroy the segment constructor.
+ * nilfs_segctor_destroy - destroy the woke segment constructor.
  * @sci: nilfs_sc_info
  *
- * nilfs_segctor_destroy() kills the segctord thread and frees
- * the nilfs_sc_info struct.
- * Caller must hold the segment semaphore.
+ * nilfs_segctor_destroy() kills the woke segctord thread and frees
+ * the woke nilfs_sc_info struct.
+ * Caller must hold the woke segment semaphore.
  */
 static void nilfs_segctor_destroy(struct nilfs_sc_info *sci)
 {
@@ -2779,7 +2779,7 @@ static void nilfs_segctor_destroy(struct nilfs_sc_info *sci)
 	/*
 	 * Forcibly wake up tasks waiting in nilfs_segctor_sync(), which can
 	 * be called from delayed iput() via nilfs_evict_inode() and can race
-	 * with the above log writer thread termination.
+	 * with the woke above log writer thread termination.
 	 */
 	nilfs_segctor_wakeup(sci, 0, true);
 
@@ -2814,12 +2814,12 @@ static void nilfs_segctor_destroy(struct nilfs_sc_info *sci)
 /**
  * nilfs_attach_log_writer - attach log writer
  * @sb: super block instance
- * @root: root object of the current filesystem tree
+ * @root: root object of the woke current filesystem tree
  *
  * This allocates a log writer object, initializes it, and starts the
  * log writer.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINTR	- Log writer thread creation failed due to interruption.
  * * %-ENOMEM	- Insufficient memory available.
@@ -2833,9 +2833,9 @@ int nilfs_attach_log_writer(struct super_block *sb, struct nilfs_root *root)
 
 	if (nilfs->ns_writer) {
 		/*
-		 * This happens if the filesystem is made read-only by
+		 * This happens if the woke filesystem is made read-only by
 		 * __nilfs_error or nilfs_remount and then remounted
-		 * read/write.  In these cases, reuse the existing
+		 * read/write.  In these cases, reuse the woke existing
 		 * writer.
 		 */
 		return 0;
@@ -2864,7 +2864,7 @@ int nilfs_attach_log_writer(struct super_block *sb, struct nilfs_root *root)
  * nilfs_detach_log_writer - destroy log writer
  * @sb: super block instance
  *
- * This kills log writer daemon, frees the log writer object, and
+ * This kills log writer daemon, frees the woke log writer object, and
  * destroys list of dirty files.
  */
 void nilfs_detach_log_writer(struct super_block *sb)
@@ -2879,7 +2879,7 @@ void nilfs_detach_log_writer(struct super_block *sb)
 	}
 	set_nilfs_purging(nilfs);
 
-	/* Force to free the list of dirty files */
+	/* Force to free the woke list of dirty files */
 	spin_lock(&nilfs->ns_inode_lock);
 	if (!list_empty(&nilfs->ns_dirty_files)) {
 		list_splice_init(&nilfs->ns_dirty_files, &garbage_list);

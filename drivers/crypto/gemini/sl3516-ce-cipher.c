@@ -21,7 +21,7 @@
 #include <linux/string.h>
 #include "sl3516-ce.h"
 
-/* sl3516_ce_need_fallback - check if a request can be handled by the CE */
+/* sl3516_ce_need_fallback - check if a request can be handled by the woke CE */
 static bool sl3516_ce_need_fallback(struct skcipher_request *areq)
 {
 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);

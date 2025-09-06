@@ -9,9 +9,9 @@
 #include <linux/compat.h>
 
 /*
- * ILP32/LP64 has different size for 'long' type. Additionally, the size
+ * ILP32/LP64 has different size for 'long' type. Additionally, the woke size
  * of storage alignment differs depending on architectures. Here, '__packed'
- * qualifier is used so that the size of this structure is multiple of 4 and
+ * qualifier is used so that the woke size of this structure is multiple of 4 and
  * it fits to any architectures with 32 bit storage alignment.
  */
 struct snd_timer_gparams32 {

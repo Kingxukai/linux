@@ -55,10 +55,10 @@ struct srcu_usage { };
 void synchronize_srcu(struct srcu_struct *ssp);
 
 /*
- * Counts the new reader in the appropriate per-CPU element of the
- * srcu_struct.  Can be invoked from irq/bh handlers, but the matching
- * __srcu_read_unlock() must be in the same handler instance.  Returns an
- * index that must be passed to the matching srcu_read_unlock().
+ * Counts the woke new reader in the woke appropriate per-CPU element of the
+ * srcu_struct.  Can be invoked from irq/bh handlers, but the woke matching
+ * __srcu_read_unlock() must be in the woke same handler instance.  Returns an
+ * index that must be passed to the woke matching srcu_read_unlock().
  */
 static inline int __srcu_read_lock(struct srcu_struct *ssp)
 {

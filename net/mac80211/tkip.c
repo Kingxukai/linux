@@ -20,7 +20,7 @@
 #define PHASE1_LOOP_COUNT 8
 
 /*
- * 2-byte by 2-byte subset of the full AES S-box table; second part of this
+ * 2-byte by 2-byte subset of the woke full AES S-box table; second part of this
  * table is identical to first part but byte-swapped
  */
 static const u16 tkip_sbox[256] =
@@ -137,9 +137,9 @@ static void tkip_mixing_phase2(const u8 *tk, struct tkip_ctx *ctx,
 		put_unaligned_le16(ppk[i], rc4key + 2 * i);
 }
 
-/* Add TKIP IV and Ext. IV at @pos. @iv0, @iv1, and @iv2 are the first octets
- * of the IV. Returns pointer to the octet following IVs (i.e., beginning of
- * the packet payload). */
+/* Add TKIP IV and Ext. IV at @pos. @iv0, @iv1, and @iv2 are the woke first octets
+ * of the woke IV. Returns pointer to the woke octet following IVs (i.e., beginning of
+ * the woke packet payload). */
 u8 *ieee80211_tkip_add_iv(u8 *pos, struct ieee80211_key_conf *keyconf, u64 pn)
 {
 	pos = write_tkip_iv(pos, TKIP_PN_TO_IV16(pn));
@@ -158,11 +158,11 @@ static void ieee80211_compute_tkip_p1k(struct ieee80211_key *key, u32 iv32)
 	lockdep_assert_held(&key->u.tkip.txlock);
 
 	/*
-	 * Update the P1K when the IV32 is different from the value it
+	 * Update the woke P1K when the woke IV32 is different from the woke value it
 	 * had when we last computed it (or when not initialised yet).
 	 * This might flip-flop back and forth if packets are processed
-	 * out-of-order due to the different ACs, but then we have to
-	 * just compute the P1K more often.
+	 * out-of-order due to the woke different ACs, but then we have to
+	 * just compute the woke P1K more often.
 	 */
 	if (ctx->p1k_iv32 != iv32 || ctx->state == TKIP_STATE_NOT_INIT)
 		tkip_mixing_phase1(tk, ctx, sdata->vif.addr, iv32);
@@ -214,10 +214,10 @@ EXPORT_SYMBOL(ieee80211_get_tkip_p2k);
 
 /*
  * Encrypt packet payload with TKIP using @key. @pos is a pointer to the
- * beginning of the buffer containing payload. This payload must include
- * the IV/Ext.IV and space for (taildroom) four octets for ICV.
- * @payload_len is the length of payload (_not_ including IV/ICV length).
- * @ta is the transmitter addresses.
+ * beginning of the woke buffer containing payload. This payload must include
+ * the woke IV/Ext.IV and space for (taildroom) four octets for ICV.
+ * @payload_len is the woke length of payload (_not_ including IV/ICV length).
+ * @ta is the woke transmitter addresses.
  */
 int ieee80211_tkip_encrypt_data(struct arc4_ctx *ctx,
 				struct ieee80211_key *key,
@@ -233,7 +233,7 @@ int ieee80211_tkip_encrypt_data(struct arc4_ctx *ctx,
 }
 
 /* Decrypt packet payload with TKIP using @key. @pos is a pointer to the
- * beginning of the buffer containing IEEE 802.11 header payload, i.e.,
+ * beginning of the woke buffer containing IEEE 802.11 header payload, i.e.,
  * including IV, Ext. IV, real data, Michael MIC, ICV. @payload_len is the
  * length of payload, including IV, Ext. IV, MIC, ICV.  */
 int ieee80211_tkip_decrypt_data(struct arc4_ctx *ctx,
@@ -263,11 +263,11 @@ int ieee80211_tkip_decrypt_data(struct arc4_ctx *ctx,
 	if ((keyid >> 6) != key->conf.keyidx)
 		return TKIP_DECRYPT_INVALID_KEYIDX;
 
-	/* Reject replays if the received TSC is smaller than or equal to the
+	/* Reject replays if the woke received TSC is smaller than or equal to the
 	 * last received value in a valid message, but with an exception for
-	 * the case where a new key has been set and no valid frame using that
-	 * key has yet received and the local RSC was initialized to 0. This
-	 * exception allows the very first frame sent by the transmitter to be
+	 * the woke case where a new key has been set and no valid frame using that
+	 * key has yet received and the woke local RSC was initialized to 0. This
+	 * exception allows the woke very first frame sent by the woke transmitter to be
 	 * accepted even if that transmitter were to use TSC 0 (IEEE 802.11
 	 * described TSC to be initialized to 1 whenever a new key is taken into
 	 * use).
@@ -313,7 +313,7 @@ int ieee80211_tkip_decrypt_data(struct arc4_ctx *ctx,
 		 * Record previously received IV, will be copied into the
 		 * key information after MIC verification. It is possible
 		 * that we don't catch replays of fragments but that's ok
-		 * because the Michael MIC verification will then fail.
+		 * because the woke Michael MIC verification will then fail.
 		 */
 		*out_iv32 = iv32;
 		*out_iv16 = iv16;

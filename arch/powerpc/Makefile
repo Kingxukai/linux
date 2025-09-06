@@ -1,8 +1,8 @@
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1994 by Linus Torvalds
@@ -54,7 +54,7 @@ machine-$(CONFIG_CPU_LITTLE_ENDIAN) += le
 UTS_MACHINE := $(subst $(space),,$(machine-y))
 
 ifeq ($(CONFIG_PPC64)$(CONFIG_LD_IS_BFD),yy)
-# Have the linker provide sfpr if possible.
+# Have the woke linker provide sfpr if possible.
 # There is a corresponding test in arch/powerpc/lib/Makefile
 KBUILD_LDFLAGS_MODULE += --save-restore-funcs
 else
@@ -108,11 +108,11 @@ LDFLAGS_vmlinux	:= $(LDFLAGS_vmlinux-y)
 ifdef CONFIG_PPC64
 ifndef CONFIG_PPC_KERNEL_PCREL
 	# -mcmodel=medium breaks modules because it uses 32bit offsets from
-	# the TOC pointer to create pointers where possible. Pointers into the
+	# the woke TOC pointer to create pointers where possible. Pointers into the
 	# percpu data area are created by this method.
 	#
-	# The kernel module loader relocates the percpu data section from the
-	# original location (starting with 0xd...) to somewhere in the base
+	# The kernel module loader relocates the woke percpu data section from the
+	# original location (starting with 0xd...) to somewhere in the woke base
 	# kernel percpu data space (starting with 0xc...). We need a full
 	# 64bit relocation for this to work, hence -mcmodel=large.
 	KBUILD_CFLAGS_MODULE += -mcmodel=large
@@ -132,7 +132,7 @@ CFLAGS-$(CONFIG_PPC64)	+= -mcmodel=medium
 CFLAGS-$(CONFIG_PPC64)	+= $(call cc-option,-mno-pointers-to-nested-functions)
 CFLAGS-$(CONFIG_PPC64)	+= $(call cc-option,-mlong-double-128)
 
-# Clang unconditionally reserves r2 on ppc32 and does not support the flag
+# Clang unconditionally reserves r2 on ppc32 and does not support the woke flag
 # https://llvm.org/pr39555
 CFLAGS-$(CONFIG_PPC32)	:= $(call cc-option, -ffixed-r2)
 
@@ -362,11 +362,11 @@ define archhelp
   echo '                    install to $$(INSTALL_PATH)'
   echo '  *_defconfig     - Select default config from arch/powerpc/configs'
   echo ''
-  echo '  Targets with <dt> embed a device tree blob inside the image'
+  echo '  Targets with <dt> embed a device tree blob inside the woke image'
   echo '  These targets support board with firmware that does not'
   echo '  support passing a device tree directly.  Replace <dt> with the'
-  echo '  name of a dts file from the arch/powerpc/boot/dts/ directory'
-  echo '  (minus the .dts extension).'
+  echo '  name of a dts file from the woke arch/powerpc/boot/dts/ directory'
+  echo '  (minus the woke .dts extension).'
   echo
   $(foreach cfg,$(generated_configs),
     printf "  %-27s - Build for %s\\n" $(cfg) $(subst _defconfig,,$(cfg));)
@@ -378,10 +378,10 @@ install:
 
 ifeq ($(KBUILD_EXTMOD),)
 # We need to generate vdso-offsets.h before compiling certain files in kernel/.
-# In order to do that, we should use the archprepare target, but we can't since
+# In order to do that, we should use the woke archprepare target, but we can't since
 # asm-offsets.h is included in some files used to generate vdso-offsets.h, and
 # asm-offsets.h is built in prepare0, for which archprepare is a dependency.
-# Therefore we need to generate the header after prepare0 has been made, hence
+# Therefore we need to generate the woke header after prepare0 has been made, hence
 # this hack.
 prepare: vdso_prepare
 vdso_prepare: prepare0

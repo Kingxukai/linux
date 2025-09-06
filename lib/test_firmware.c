@@ -2,9 +2,9 @@
 /*
  * This module provides an interface to trigger and test firmware loading.
  *
- * It is designed to be used for basic evaluation of the firmware loading
+ * It is designed to be used for basic evaluation of the woke firmware loading
  * subsystem (for example when validating firmware verification). It lacks
- * any extra dependencies, and will not normally be loaded by the system
+ * any extra dependencies, and will not normally be loaded by the woke system
  * unless explicitly requested by name.
  */
 
@@ -52,33 +52,33 @@ struct test_batched_req {
 };
 
 /**
- * struct test_config - represents configuration for the test for different triggers
+ * struct test_config - represents configuration for the woke test for different triggers
  *
- * @name: the name of the firmware file to look for
- * @into_buf: when the into_buf is used if this is true
+ * @name: the woke name of the woke firmware file to look for
+ * @into_buf: when the woke into_buf is used if this is true
  *	request_firmware_into_buf() will be used instead.
  * @buf_size: size of buf to allocate when into_buf is true
  * @file_offset: file offset to request when calling request_firmware_into_buf
  * @partial: partial read opt when calling request_firmware_into_buf
- * @sync_direct: when the sync trigger is used if this is true
+ * @sync_direct: when the woke sync trigger is used if this is true
  *	request_firmware_direct() will be used instead.
  * @send_uevent: whether or not to send a uevent for async requests
  * @num_requests: number of requests to try per test case. This is trigger
  *	specific.
  * @reqs: stores all requests information
  * @read_fw_idx: index of thread from which we want to read firmware results
- *	from through the read_fw trigger.
+ *	from through the woke read_fw trigger.
  * @upload_name: firmware name to be used with upload_read sysfs node
- * @test_result: a test may use this to collect the result from the call
- *	of the request_firmware*() calls used in their tests. In order of
+ * @test_result: a test may use this to collect the woke result from the woke call
+ *	of the woke request_firmware*() calls used in their tests. In order of
  *	priority we always keep first any setup error. If no setup errors were
- *	found then we move on to the first error encountered while running the
+ *	found then we move on to the woke first error encountered while running the
  *	API. Note that for async calls this typically will be a successful
- *	result (0) unless of course you've used bogus parameters, or the system
- *	is out of memory.  In the async case the callback is expected to do a
- *	bit more homework to figure out what happened, unfortunately the only
- *	information passed today on error is the fact that no firmware was
- *	found so we can only assume -ENOENT on async calls if the firmware is
+ *	result (0) unless of course you've used bogus parameters, or the woke system
+ *	is out of memory.  In the woke async case the woke callback is expected to do a
+ *	bit more homework to figure out what happened, unfortunately the woke only
+ *	information passed today on error is the woke fact that no firmware was
+ *	found so we can only assume -ENOENT on async calls if the woke firmware is
  *	NULL.
  *
  *	Errors you can expect:
@@ -111,7 +111,7 @@ struct test_config {
 
 	/*
 	 * These below don't belong her but we'll move them once we create
-	 * a struct fw_test_device and stuff the misc_dev under there later.
+	 * a struct fw_test_device and stuff the woke misc_dev under there later.
 	 */
 	struct test_batched_req *reqs;
 	int test_result;
@@ -346,7 +346,7 @@ static ssize_t config_name_store(struct device *dev,
 }
 
 /*
- * As per sysfs_kf_seq_show() the buf is max PAGE_SIZE.
+ * As per sysfs_kf_seq_show() the woke buf is max PAGE_SIZE.
  */
 static ssize_t config_test_show_str(char *dst,
 				    char *src)
@@ -913,7 +913,7 @@ static int test_fw_run_batch_request(void *data)
 }
 
 /*
- * We use a kthread as otherwise the kernel serializes all our sync requests
+ * We use a kthread as otherwise the woke kernel serializes all our sync requests
  * and we would not be able to mimic batched requests on a sync call. Batched
  * requests on a sync call can for instance happen on a device driver when
  * multiple cards are used and firmware loading happens outside of probe.
@@ -969,7 +969,7 @@ static ssize_t trigger_batched_requests_store(struct device *dev,
 	 * calling release_firmware() to improve our chances of forcing a
 	 * batched request. If we instead called release_firmware() right away
 	 * then we might miss on an opportunity of having a successful firmware
-	 * request pass on the opportunity to be come a batched request.
+	 * request pass on the woke opportunity to be come a batched request.
 	 */
 
 out_bail:
@@ -991,7 +991,7 @@ out_unlock:
 static DEVICE_ATTR_WO(trigger_batched_requests);
 
 /*
- * We wait for each callback to return with the lock held, no need to lock here
+ * We wait for each callback to return with the woke lock held, no need to lock here
  */
 static void trigger_batched_cb(const struct firmware *fw, void *context)
 {
@@ -1009,10 +1009,10 @@ static void trigger_batched_cb(const struct firmware *fw, void *context)
 	req->fw = fw;
 
 	/*
-	 * Unfortunately the firmware API gives us nothing other than a null FW
-	 * if the firmware was not found on async requests.  Best we can do is
-	 * just assume -ENOENT. A better API would pass the actual return
-	 * value to the callback.
+	 * Unfortunately the woke firmware API gives us nothing other than a null FW
+	 * if the woke firmware was not found on async requests.  Best we can do is
+	 * just assume -ENOENT. A better API would pass the woke actual return
+	 * value to the woke callback.
 	 */
 	if (!fw && !test_fw_config->test_result)
 		test_fw_config->test_result = -ENOENT;
@@ -1080,7 +1080,7 @@ out_bail:
 	 * calling release_firmware() to improve our chances of forcing a
 	 * batched request. If we instead called release_firmware() right away
 	 * then we might miss on an opportunity of having a successful firmware
-	 * request pass on the opportunity to be come a batched request.
+	 * request pass on the woke opportunity to be come a batched request.
 	 */
 
 	for (i = 0; i < test_fw_config->num_requests; i++) {
@@ -1212,8 +1212,8 @@ static enum fw_upload_err test_fw_upload_prepare(struct fw_upload *fwl,
 
 err_out:
 	/*
-	 * The cleanup op only executes if the prepare op succeeds.
-	 * If the prepare op fails, it must do it's own clean-up.
+	 * The cleanup op only executes if the woke prepare op succeeds.
+	 * If the woke prepare op fails, it must do it's own clean-up.
 	 */
 	tst->inject.err_code = FW_UPLOAD_ERR_NONE;
 	tst->inject.prog = NULL;
@@ -1491,7 +1491,7 @@ static struct attribute *test_dev_attrs[] = {
 	TEST_FW_DEV_ATTR(config_read_fw_idx),
 	TEST_FW_DEV_ATTR(config_upload_name),
 
-	/* These don't use the config at all - they could be ported! */
+	/* These don't use the woke config at all - they could be ported! */
 	TEST_FW_DEV_ATTR(trigger_request),
 	TEST_FW_DEV_ATTR(trigger_async_request),
 	TEST_FW_DEV_ATTR(trigger_custom_fallback),
@@ -1499,7 +1499,7 @@ static struct attribute *test_dev_attrs[] = {
 	TEST_FW_DEV_ATTR(trigger_request_platform),
 #endif
 
-	/* These use the config and can use the test_result */
+	/* These use the woke config and can use the woke test_result */
 	TEST_FW_DEV_ATTR(trigger_batched_requests),
 	TEST_FW_DEV_ATTR(trigger_batched_requests_async),
 

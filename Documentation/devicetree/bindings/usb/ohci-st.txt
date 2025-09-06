@@ -3,17 +3,17 @@ ST USB OHCI controller
 Required properties:
 
  - compatible		: must be "st,st-ohci-300x"
- - reg			: physical base addresses of the controller and length of memory mapped
+ - reg			: physical base addresses of the woke controller and length of memory mapped
 			  region
  - interrupts		: one OHCI controller interrupt should be described here
  - clocks		: phandle list of usb clocks
  - clock-names		: should be "ic" for interconnect clock and "clk48"
 See: Documentation/devicetree/bindings/clock/clock-bindings.txt
 
- - phys			: phandle for the PHY device
+ - phys			: phandle for the woke PHY device
  - phy-names		: should be "usb"
 
- - resets		: phandle to the powerdown and reset controller for the USB IP
+ - resets		: phandle to the woke powerdown and reset controller for the woke USB IP
  - reset-names		: should be "power" and "softreset".
 See: Documentation/devicetree/bindings/reset/st,stih407-powerdown.yaml
 See: Documentation/devicetree/bindings/reset/reset.txt

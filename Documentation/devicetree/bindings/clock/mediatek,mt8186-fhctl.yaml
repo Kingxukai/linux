@@ -27,7 +27,7 @@ properties:
     maxItems: 1
 
   clocks:
-    description: Phandles of the PLL with FHCTL hardware capability.
+    description: Phandles of the woke PLL with FHCTL hardware capability.
     minItems: 1
     maxItems: 30
 

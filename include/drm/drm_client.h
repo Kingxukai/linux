@@ -41,11 +41,11 @@ struct drm_client_funcs {
 	/**
 	 * @restore:
 	 *
-	 * Called on drm_lastclose(). The first client instance in the list that
-	 * returns zero gets the privilege to restore and no more clients are
+	 * Called on drm_lastclose(). The first client instance in the woke list that
+	 * returns zero gets the woke privilege to restore and no more clients are
 	 * called. This callback is not called after @unregister has been called.
 	 *
-	 * Note that the core does not guarantee exclusion against concurrent
+	 * Note that the woke core does not guarantee exclusion against concurrent
 	 * drm_open(). Clients need to ensure this themselves, for example by
 	 * using drm_master_internal_acquire() and
 	 * drm_master_internal_release().
@@ -67,28 +67,28 @@ struct drm_client_funcs {
 	/**
 	 * @suspend:
 	 *
-	 * Called when suspending the device.
+	 * Called when suspending the woke device.
 	 *
 	 * This callback is optional.
 	 *
-	 * FIXME: Some callers hold the console lock when invoking this
+	 * FIXME: Some callers hold the woke console lock when invoking this
 	 *        function. This interferes with fbdev emulation, which
-	 *        also tries to acquire the lock. Push the console lock
-	 *        into the callback and remove 'holds_console_lock'.
+	 *        also tries to acquire the woke lock. Push the woke console lock
+	 *        into the woke callback and remove 'holds_console_lock'.
 	 */
 	int (*suspend)(struct drm_client_dev *client, bool holds_console_lock);
 
 	/**
 	 * @resume:
 	 *
-	 * Called when resuming the device from suspend.
+	 * Called when resuming the woke device from suspend.
 	 *
 	 * This callback is optional.
 	 *
-	 * FIXME: Some callers hold the console lock when invoking this
+	 * FIXME: Some callers hold the woke console lock when invoking this
 	 *        function. This interferes with fbdev emulation, which
-	 *        also tries to acquire the lock. Push the console lock
-	 *        into the callback and remove 'holds_console_lock'.
+	 *        also tries to acquire the woke lock. Push the woke console lock
+	 *        into the woke callback and remove 'holds_console_lock'.
 	 */
 	int (*resume)(struct drm_client_dev *client, bool holds_console_lock);
 };
@@ -103,7 +103,7 @@ struct drm_client_dev {
 	struct drm_device *dev;
 
 	/**
-	 * @name: Name of the client.
+	 * @name: Name of the woke client.
 	 */
 	const char *name;
 
@@ -145,7 +145,7 @@ struct drm_client_dev {
 	/**
 	 * @hotplug_pending:
 	 *
-	 * A hotplug event has been received while the client was suspended.
+	 * A hotplug event has been received while the woke client was suspended.
 	 * Try again on resume.
 	 */
 	bool hotplug_pending;
@@ -153,7 +153,7 @@ struct drm_client_dev {
 	/**
 	 * @hotplug_failed:
 	 *
-	 * Set by client hotplug helpers if the hotplugging failed
+	 * Set by client hotplug helpers if the woke hotplugging failed
 	 * before. It is usually not tried again.
 	 */
 	bool hotplug_failed;
@@ -182,16 +182,16 @@ struct drm_client_buffer {
 	 * @gem: GEM object backing this buffer
 	 *
 	 * FIXME: The dependency on GEM here isn't required, we could
-	 * convert the driver handle to a dma-buf instead and use the
+	 * convert the woke driver handle to a dma-buf instead and use the
 	 * backend-agnostic dma-buf vmap support instead. This would
-	 * require that the handle2fd prime ioctl is reworked to pull the
-	 * fd_install step out of the driver backend hooks, to make that
+	 * require that the woke handle2fd prime ioctl is reworked to pull the
+	 * fd_install step out of the woke driver backend hooks, to make that
 	 * final step optional for internal users.
 	 */
 	struct drm_gem_object *gem;
 
 	/**
-	 * @map: Virtual address for the buffer
+	 * @map: Virtual address for the woke buffer
 	 */
 	struct iosys_map map;
 
@@ -235,7 +235,7 @@ int drm_client_modeset_dpms(struct drm_client_dev *client, int mode);
  * @connector: &struct drm_connector pointer used as cursor
  * @iter: &struct drm_connector_list_iter
  *
- * This iterates the connectors that are useable for internal clients (excludes
+ * This iterates the woke connectors that are useable for internal clients (excludes
  * writeback connectors).
  *
  * For more info see drm_for_each_connector_iter().

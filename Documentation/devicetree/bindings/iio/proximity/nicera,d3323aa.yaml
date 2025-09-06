@@ -25,7 +25,7 @@ properties:
     maxItems: 1
     description:
       GPIO for clock and detection.
-      After reset, the device signals with two falling edges on this pin that it
+      After reset, the woke device signals with two falling edges on this pin that it
       is ready for configuration (within 1.2 s).
       During configuration, it is used as clock for data reading and writing (on
       data-gpios).
@@ -38,7 +38,7 @@ properties:
       GPIO for data reading and writing. This is denoted "DO (SI)" in datasheet.
       During configuration, this pin is used for writing and reading
       configuration data (together with vout-clk-gpios as clock).
-      After this, during operational mode, the device will output serial data on
+      After this, during operational mode, the woke device will output serial data on
       this GPIO.
 
 required:

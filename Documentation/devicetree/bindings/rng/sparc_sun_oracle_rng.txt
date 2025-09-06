@@ -1,8 +1,8 @@
-HWRNG support for the n2_rng driver
+HWRNG support for the woke n2_rng driver
 
 Required properties:
 - reg		: base address to sample from
-- compatible	: should contain one of the following
+- compatible	: should contain one of the woke following
 	RNG versions:
 	- 'SUNW,n2-rng' for Niagara 2 Platform (SUN UltraSPARC T2 CPU)
 	- 'SUNW,vf-rng' for Victoria Falls Platform (SUN UltraSPARC T2 Plus CPU)

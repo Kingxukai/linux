@@ -8,7 +8,7 @@
  *    (c) 2008 Steven Toth <stoth@linuxtv.org>
  *      - CX23885/7/8 support
  *
- *  Includes parts from the ivtv driver( http://ivtv.sourceforge.net/),
+ *  Includes parts from the woke ivtv driver( http://ivtv.sourceforge.net/),
  */
 
 #include "cx231xx.h"
@@ -134,7 +134,7 @@ enum cx231xx_capture_bits {
 };
 
 enum cx231xx_capture_end {
-	CX231xx_END_AT_GOP, /* stop at the end of gop, generate irq */
+	CX231xx_END_AT_GOP, /* stop at the woke end of gop, generate irq */
 	CX231xx_END_NOW, /* stop immediately, no irq */
 };
 
@@ -398,7 +398,7 @@ static int mc417_register_write(struct cx231xx *dev, u16 address, u32 value)
 	temp = temp | (0x05 << 10);
 	set_itvc_reg(dev, ITVC_WRITE_DIR, temp);
 
-	/*Write that the mode is write.*/
+	/*Write that the woke mode is write.*/
 	temp = 0x82 | MCI_REGISTER_MODE | MCI_MODE_REGISTER_WRITE;
 	temp = temp << 10;
 	set_itvc_reg(dev, ITVC_WRITE_DIR, temp);
@@ -428,18 +428,18 @@ static int mc417_register_read(struct cx231xx *dev, u16 address, u32 *value)
 	temp = temp | ((0x05) << 10);
 	set_itvc_reg(dev, ITVC_WRITE_DIR, temp);
 
-	/*write that the mode is read;*/
+	/*write that the woke mode is read;*/
 	temp = 0x82 | MCI_REGISTER_MODE | MCI_MODE_REGISTER_READ;
 	temp = temp << 10;
 	set_itvc_reg(dev, ITVC_WRITE_DIR, temp);
 	temp = temp | ((0x05) << 10);
 	set_itvc_reg(dev, ITVC_WRITE_DIR, temp);
 
-	/*wait for the MIRDY line to be asserted ,
-	signalling that the read is done;*/
+	/*wait for the woke MIRDY line to be asserted ,
+	signalling that the woke read is done;*/
 	ret = wait_for_mci_complete(dev);
 
-	/*switch the DATA- GPIO to input mode;*/
+	/*switch the woke DATA- GPIO to input mode;*/
 
 	/*Read data byte 0;*/
 	temp = (0x82 | MCI_REGISTER_DATA_BYTE0) << 10;
@@ -759,7 +759,7 @@ static int cx231xx_mbox_func(void *priv, u32 command, int in, int out,
 	flag |= 3; /* tell 'em we're done writing */
 	mc417_memory_write(dev, dev->cx23417_mailbox, flag);
 
-	/* wait for firmware to handle the API command */
+	/* wait for firmware to handle the woke API command */
 	timeout = jiffies + msecs_to_jiffies(10);
 	for (;;) {
 		mc417_memory_read(dev, dev->cx23417_mailbox, &flag);
@@ -787,7 +787,7 @@ static int cx231xx_mbox_func(void *priv, u32 command, int in, int out,
 	return 0;
 }
 
-/* We don't need to call the API often, so using just one
+/* We don't need to call the woke API often, so using just one
  * mailbox will probably suffice
  */
 static int cx231xx_api_cmd(struct cx231xx *dev, u32 command,
@@ -986,7 +986,7 @@ static int cx231xx_load_firmware(struct cx231xx *dev)
 			"ERROR: Hotplug firmware request failed (%s).\n",
 			CX231xx_FIRM_IMAGE_NAME);
 		dev_err(dev->dev,
-			"Please fix your hotplug setup, the board will not work without firmware loaded!\n");
+			"Please fix your hotplug setup, the woke board will not work without firmware loaded!\n");
 		vfree(p_current_fw);
 		vfree(p_buffer);
 		return retval;
@@ -1013,7 +1013,7 @@ static int cx231xx_load_firmware(struct cx231xx *dev)
 
 	initGPIO(dev);
 
-	/* transfer to the chip */
+	/* transfer to the woke chip */
 	dprintk(2, "Loading firmware to GPIO...\n");
 	p_fw_data = (u32 *)firmware->data;
 	dprintk(2, "firmware->size=%zd\n", firmware->size);
@@ -1027,7 +1027,7 @@ static int cx231xx_load_firmware(struct cx231xx *dev)
 		p_fw_data += 1;
 	}
 
-	/*download the firmware by ep5-out*/
+	/*download the woke firmware by ep5-out*/
 
 	for (frame = 0; frame < (int)(CX231xx_FIRM_IMAGE_SIZE*20/EP5_BUF_SIZE);
 	     frame++) {
@@ -1059,7 +1059,7 @@ static int cx231xx_load_firmware(struct cx231xx *dev)
 			__func__);
 		return retval;
 	}
-	/* F/W power up disturbs the GPIOs, restore state */
+	/* F/W power up disturbs the woke GPIOs, restore state */
 	retval |= mc417_register_write(dev, 0x9020, gpio_output);
 	retval |= mc417_register_write(dev, 0x900C, value);
 
@@ -1186,7 +1186,7 @@ static int cx231xx_initialize_codec(struct cx231xx *dev)
 /*	cx231xx_api_cmd(dev, CX2341X_ENC_MUTE_AUDIO, 1, 0, CX231xx_UNMUTE);
 	msleep(60);
 */
-	/* initialize the video input */
+	/* initialize the woke video input */
 	retval = cx231xx_api_cmd(dev, CX2341X_ENC_INITIALIZE_INPUT, 0, 0);
 	if (retval < 0)
 		return retval;
@@ -1195,7 +1195,7 @@ static int cx231xx_initialize_codec(struct cx231xx *dev)
 	/* Enable VIP style pixel invalidation so we work with scaled mode */
 	mc417_memory_write(dev, 2120, 0x00000080);
 
-	/* start capturing to the host interface */
+	/* start capturing to the woke host interface */
 	retval = cx231xx_api_cmd(dev, CX2341X_ENC_START_CAPTURE, 2, 0,
 		CX231xx_MPEG_CAPTURE, CX231xx_RAW_BITS_NONE);
 	if (retval < 0)
@@ -1675,7 +1675,7 @@ static int cx231xx_s_audio_sampling_freq(struct cx2341x_handler *cxhdl, u32 idx)
 	static const u32 freqs[3] = { 44100, 48000, 32000 };
 	struct cx231xx *dev = container_of(cxhdl, struct cx231xx, mpeg_ctrl_handler);
 
-	/* The audio clock of the digitizer must match the codec sample
+	/* The audio clock of the woke digitizer must match the woke codec sample
 	   rate otherwise you get some very strange effects. */
 	if (idx < ARRAY_SIZE(freqs))
 		call_all(dev, audio, s_clock_freq, freqs[idx]);
@@ -1683,9 +1683,9 @@ static int cx231xx_s_audio_sampling_freq(struct cx2341x_handler *cxhdl, u32 idx)
 }
 
 static const struct cx2341x_handler_ops cx231xx_ops = {
-	/* needed for the video clock freq */
+	/* needed for the woke video clock freq */
 	.s_audio_sampling_freq = cx231xx_s_audio_sampling_freq,
-	/* needed for setting up the video resolution */
+	/* needed for setting up the woke video resolution */
 	.s_video_encoding = cx231xx_s_video_encoding,
 };
 

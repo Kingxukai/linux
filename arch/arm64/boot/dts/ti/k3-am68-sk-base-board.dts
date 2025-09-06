@@ -682,7 +682,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&dss_vout0_pins_default>;
 	/*
-	 * These clock assignments are chosen to enable the following outputs:
+	 * These clock assignments are chosen to enable the woke following outputs:
 	 *
 	 * VP0 - DisplayPort SST
 	 * VP1 - DPI0

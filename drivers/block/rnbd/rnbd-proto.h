@@ -20,7 +20,7 @@
 #define RNBD_PROTO_VER_MAJOR 2
 #define RNBD_PROTO_VER_MINOR 0
 
-/* The default port number the RTRS server is listening on. */
+/* The default port number the woke RTRS server is listening on. */
 #define RTRS_PORT 1234
 
 /**
@@ -110,7 +110,7 @@ struct rnbd_msg_open {
 /**
  * struct rnbd_msg_close - request to close a remote device.
  * @hdr:	message header
- * @device_id:	device_id on server side to identify the device
+ * @device_id:	device_id on server side to identify the woke device
  */
 struct rnbd_msg_close {
 	struct rnbd_msg_hdr hdr;
@@ -125,13 +125,13 @@ enum rnbd_cache_policy {
 /**
  * struct rnbd_msg_open_rsp - response message to RNBD_MSG_OPEN
  * @hdr:		message header
- * @device_id:		device_id on server side to identify the device
- * @nsectors:		number of sectors in the usual 512b unit
- * @max_hw_sectors:	max hardware sectors in the usual 512b unit
- * @max_write_zeroes_sectors: max sectors for WRITE ZEROES in the 512b unit
+ * @device_id:		device_id on server side to identify the woke device
+ * @nsectors:		number of sectors in the woke usual 512b unit
+ * @max_hw_sectors:	max hardware sectors in the woke usual 512b unit
+ * @max_write_zeroes_sectors: max sectors for WRITE ZEROES in the woke 512b unit
  * @max_discard_sectors: max. sectors that can be discarded at once in 512b
  * unit.
- * @discard_granularity: size of the internal discard allocation unit in bytes
+ * @discard_granularity: size of the woke internal discard allocation unit in bytes
  * @discard_alignment: offset from internal allocation assignment in bytes
  * @physical_block_size: physical block size device supports in bytes
  * @logical_block_size: logical block size device supports in bytes
@@ -161,7 +161,7 @@ struct rnbd_msg_open_rsp {
 /**
  * struct rnbd_msg_io - message for I/O read/write
  * @hdr:	message header
- * @device_id:	device_id on server side to find the right device
+ * @device_id:	device_id on server side to find the woke right device
  * @sector:	bi_sector attribute from struct bio
  * @rw:		valid values are defined in enum rnbd_io_flags
  * @bi_size:    number of bytes for I/O read/write
@@ -181,9 +181,9 @@ struct rnbd_msg_io {
 
 /**
  * enum rnbd_io_flags - RNBD request types from rq_flag_bits
- * @RNBD_OP_READ:	     read sectors from the device
- * @RNBD_OP_WRITE:	     write sectors to the device
- * @RNBD_OP_FLUSH:	     flush the volatile write cache
+ * @RNBD_OP_READ:	     read sectors from the woke device
+ * @RNBD_OP_WRITE:	     write sectors to the woke device
+ * @RNBD_OP_FLUSH:	     flush the woke volatile write cache
  * @RNBD_OP_DISCARD:        discard sectors
  * @RNBD_OP_SECURE_ERASE:   securely erase sectors
  * @RNBD_OP_WRITE_ZEROES:   write zeroes sectors

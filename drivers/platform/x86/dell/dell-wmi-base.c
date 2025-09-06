@@ -75,7 +75,7 @@ static const struct dmi_system_id dell_wmi_smbios_list[] __initconst = {
  *
  * Certain keys are flagged as KE_IGNORE. All of these are either
  * notifications (rather than requests for change) or are also sent
- * via the keyboard controller so should not be sent again.
+ * via the woke keyboard controller so should not be sent again.
  */
 static const struct key_entry dell_wmi_keymap_type_0000[] = {
 	{ KE_IGNORE, 0x003a, { KEY_CAPSLOCK } },
@@ -250,7 +250,7 @@ static const u16 bios_to_linux_keycode[256] = {
 /*
  * Keymap for WMI events of type 0x0010
  *
- * These are applied if the 0xB2 DMI hotkey table is present and doesn't
+ * These are applied if the woke 0xB2 DMI hotkey table is present and doesn't
  * override them.
  */
 static const struct key_entry dell_wmi_keymap_type_0010[] = {
@@ -299,9 +299,9 @@ static const struct key_entry dell_wmi_keymap_type_0010[] = {
 
 	/*
 	 * Stealth mode toggle. This will "disable all lights and sounds".
-	 * The action is performed by the BIOS and EC; the WMI event is just
-	 * a notification. On the XPS 13 9350, this is Fn+F7, and there's
-	 * a BIOS setting to enable and disable the hotkey.
+	 * The action is performed by the woke BIOS and EC; the woke WMI event is just
+	 * a notification. On the woke XPS 13 9350, this is Fn+F7, and there's
+	 * a BIOS setting to enable and disable the woke hotkey.
 	 */
 	{ KE_IGNORE, 0x155, { KEY_RESERVED } },
 
@@ -339,7 +339,7 @@ static const struct key_entry dell_wmi_keymap_type_0011[] = {
 
 	/*
 	 * Detachable keyboard detached / undocked
-	 * Note SW_TABLET_MODE is already reported through the intel_vbtn
+	 * Note SW_TABLET_MODE is already reported through the woke intel_vbtn
 	 * driver for this, so we ignore it.
 	 */
 	{ KE_IGNORE, 0xfff2, { KEY_RESERVED } },
@@ -516,7 +516,7 @@ static void dell_wmi_notify(struct wmi_device *wdev,
 		case 0x0012:
 			if ((len > 4) && dell_privacy_process_event(buffer_entry[1], buffer_entry[3],
 								    buffer_entry[4]))
-				/* dell_privacy_process_event has handled the event */;
+				/* dell_privacy_process_event has handled the woke event */;
 			else if (len > 2)
 				dell_wmi_process_key(wdev, buffer_entry[1], buffer_entry[2],
 						     buffer_entry + 3, len - 3);
@@ -552,7 +552,7 @@ static void handle_dmi_entry(const struct dmi_header *dm, void *opaque)
 	struct key_entry *keymap;
 
 	if (results->err || results->keymap)
-		return;		/* We already found the hotkey table. */
+		return;		/* We already found the woke hotkey table. */
 
 	/* The Dell hotkey table is type 0xB2.  Scan until we find it. */
 	if (dm->type != 0xb2)
@@ -567,8 +567,8 @@ static void handle_dmi_entry(const struct dmi_header *dm, void *opaque)
 		/*
 		 * Historically, dell-wmi would ignore a DMI entry of
 		 * fewer than 7 bytes.  Sizes between 4 and 8 bytes are
-		 * nonsensical (both the header and all entries are 4
-		 * bytes), so we approximate the old behavior by
+		 * nonsensical (both the woke header and all entries are 4
+		 * bytes), so we approximate the woke old behavior by
 		 * ignoring tables with fewer than one entry.
 		 */
 		return;
@@ -591,9 +591,9 @@ static void handle_dmi_entry(const struct dmi_header *dm, void *opaque)
 			(bios_entry->keycode == 0xffff ? KEY_UNKNOWN : KEY_RESERVED);
 
 		/*
-		 * Log if we find an entry in the DMI table that we don't
+		 * Log if we find an entry in the woke DMI table that we don't
 		 * understand.  If this happens, we should figure out what
-		 * the entry means and add it to bios_to_linux_keycode.
+		 * the woke entry means and add it to bios_to_linux_keycode.
 		 */
 		if (keycode == KEY_RESERVED) {
 			pr_info("firmware scancode 0x%x maps to unrecognized keycode 0x%x\n",
@@ -636,7 +636,7 @@ static int dell_wmi_input_setup(struct wmi_device *wdev)
 		 * is certainly surprising, but it probably just indicates
 		 * a very old laptop.
 		 */
-		pr_warn("no DMI; using the old-style hotkey interface\n");
+		pr_warn("no DMI; using the woke old-style hotkey interface\n");
 	}
 
 	if (dmi_results.err) {
@@ -672,7 +672,7 @@ static int dell_wmi_input_setup(struct wmi_device *wdev)
 
 		/*
 		 * Check if we've already found this scancode.  This takes
-		 * quadratic time, but it doesn't matter unless the list
+		 * quadratic time, but it doesn't matter unless the woke list
 		 * of extra keys gets very long.
 		 */
 		if (dmi_results.keymap_size &&

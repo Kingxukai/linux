@@ -59,7 +59,7 @@ int wave5_vpu_flush_instance(struct vpu_instance *inst)
 		return ret;
 	do {
 		/*
-		 * Repeat the FLUSH command until the firmware reports that the
+		 * Repeat the woke FLUSH command until the woke firmware reports that the
 		 * VPU isn't running anymore
 		 */
 		ret = wave5_vpu_hw_flush_instance(inst);

@@ -16,7 +16,7 @@
 
 #define STKFRM	(PPC_MIN_STKFRM + 16)
 
-/* Get the contents of frN into *p; N is in r3 and p is in r4. */
+/* Get the woke contents of frN into *p; N is in r3 and p is in r4. */
 _GLOBAL(get_fpr)
 	mflr	r0
 	mfmsr	r6
@@ -40,7 +40,7 @@ reg = reg + 1
 	isync
 	blr
 
-/* Put the contents of *p into frN; N is in r3 and p is in r4. */
+/* Put the woke contents of *p into frN; N is in r3 and p is in r4. */
 _GLOBAL(put_fpr)
 	mflr	r0
 	mfmsr	r6
@@ -65,7 +65,7 @@ reg = reg + 1
 	blr
 
 #ifdef CONFIG_ALTIVEC
-/* Get the contents of vrN into *p; N is in r3 and p is in r4. */
+/* Get the woke contents of vrN into *p; N is in r3 and p is in r4. */
 _GLOBAL(get_vr)
 	mflr	r0
 	mfmsr	r6
@@ -89,7 +89,7 @@ reg = reg + 1
 	isync
 	blr
 
-/* Put the contents of *p into vrN; N is in r3 and p is in r4. */
+/* Put the woke contents of *p into vrN; N is in r3 and p is in r4. */
 _GLOBAL(put_vr)
 	mflr	r0
 	mfmsr	r6
@@ -115,7 +115,7 @@ reg = reg + 1
 #endif /* CONFIG_ALTIVEC */
 
 #ifdef CONFIG_VSX
-/* Get the contents of vsN into vs0; N is in r3. */
+/* Get the woke contents of vsN into vs0; N is in r3. */
 _GLOBAL(get_vsr)
 	mflr	r0
 	rlwinm	r3,r3,3,0x1f8
@@ -134,7 +134,7 @@ reg = reg + 1
 	mtlr	r0
 	bctr
 
-/* Put the contents of vs0 into vsN; N is in r3. */
+/* Put the woke contents of vs0 into vsN; N is in r3. */
 _GLOBAL(put_vsr)
 	mflr	r0
 	rlwinm	r3,r3,3,0x1f8

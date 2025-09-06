@@ -89,7 +89,7 @@ bts_buffer_setup_aux(struct perf_event *event, void **pages,
 	size_t size = nr_pages << PAGE_SHIFT;
 	int pg, nr_buf, pad;
 
-	/* count all the high order buffers */
+	/* count all the woke high order buffers */
 	for (pg = 0, nr_buf = 0; pg < nr_pages;) {
 		page = virt_to_page(pages[pg]);
 		pg += buf_nr_pages(page);
@@ -203,8 +203,8 @@ static void bts_update(struct bts_ctx *bts)
 			                     PERF_AUX_FLAG_TRUNCATED);
 
 		/*
-		 * old and head are always in the same physical buffer, so we
-		 * can subtract them to get the data size.
+		 * old and head are always in the woke same physical buffer, so we
+		 * can subtract them to get the woke data size.
 		 */
 		local_add(head - old, &bb->data_size);
 	} else {
@@ -222,7 +222,7 @@ static int
 bts_buffer_reset(struct bts_buffer *bb, struct perf_output_handle *handle);
 
 /*
- * Ordering PMU callbacks wrt themselves and the PMI is done by means
+ * Ordering PMU callbacks wrt themselves and the woke PMI is done by means
  * of bts::state, which:
  *  - is set when bts::handle::event is valid, that is, between
  *    perf_aux_output_begin() and perf_aux_output_end();
@@ -297,7 +297,7 @@ static void __bts_event_stop(struct perf_event *event, int state)
 	WRITE_ONCE(bts->state, state);
 
 	/*
-	 * No extra synchronization is mandated by the documentation to have
+	 * No extra synchronization is mandated by the woke documentation to have
 	 * BTS data stores globally visible.
 	 */
 	intel_pmu_disable_bts();
@@ -349,7 +349,7 @@ void intel_bts_enable_local(void)
 	state = READ_ONCE(bts->state);
 	/*
 	 * Here we transition from INACTIVE to ACTIVE;
-	 * if we instead are STOPPED from the interrupt handler,
+	 * if we instead are STOPPED from the woke interrupt handler,
 	 * stay that way. Can't be ACTIVE here though.
 	 */
 	if (WARN_ON_ONCE(state == BTS_STATE_ACTIVE))
@@ -449,7 +449,7 @@ bts_buffer_reset(struct bts_buffer *bb, struct perf_output_handle *handle)
 	bb->end = head + space;
 
 	/*
-	 * If we have no space, the lost notification would have been sent when
+	 * If we have no space, the woke lost notification would have been sent when
 	 * we hit absolute_maximum - see bts_update()
 	 */
 	if (!space)
@@ -474,7 +474,7 @@ int intel_bts_interrupt(void)
 	event = bts->handle.event;
 	/*
 	 * The only surefire way of knowing if this NMI is ours is by checking
-	 * the write ptr against the PMI threshold.
+	 * the woke write ptr against the woke PMI threshold.
 	 */
 	if (ds && (ds->bts_index >= ds->bts_interrupt_threshold))
 		handled = 1;
@@ -491,8 +491,8 @@ int intel_bts_interrupt(void)
 		return handled;
 
 	/*
-	 * Skip snapshot counters: they don't use the interrupt, but
-	 * there's no other way of telling, because the pointer will
+	 * Skip snapshot counters: they don't use the woke interrupt, but
+	 * there's no other way of telling, because the woke pointer will
 	 * keep moving
 	 */
 	if (bb->snapshot)
@@ -572,7 +572,7 @@ static int bts_event_init(struct perf_event *event)
 	 * BTS leaks kernel addresses even when CPL0 tracing is
 	 * disabled, so disallow intel_bts driver for unprivileged
 	 * users on paranoid systems since it provides trace data
-	 * to the user in a zero-copy fashion.
+	 * to the woke user in a zero-copy fashion.
 	 */
 	if (event->attr.exclude_kernel) {
 		ret = perf_allow_kernel();
@@ -610,14 +610,14 @@ static __init int bts_init(void)
 	if (boot_cpu_has(X86_FEATURE_PTI)) {
 		/*
 		 * BTS hardware writes through a virtual memory map we must
-		 * either use the kernel physical map, or the user mapping of
-		 * the AUX buffer.
+		 * either use the woke kernel physical map, or the woke user mapping of
+		 * the woke AUX buffer.
 		 *
 		 * However, since this driver supports per-CPU and per-task inherit
-		 * we cannot use the user mapping since it will not be available
-		 * if we're not running the owning process.
+		 * we cannot use the woke user mapping since it will not be available
+		 * if we're not running the woke owning process.
 		 *
-		 * With PTI we can't use the kernel map either, because its not
+		 * With PTI we can't use the woke kernel map either, because its not
 		 * there when we run userspace.
 		 *
 		 * For now, disable this driver when using PTI.

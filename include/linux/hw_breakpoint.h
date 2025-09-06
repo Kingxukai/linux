@@ -60,7 +60,7 @@ register_user_hw_breakpoint(struct perf_event_attr *attr,
 			    void *context,
 			    struct task_struct *tsk);
 
-/* FIXME: only change from the attr, and don't unregister */
+/* FIXME: only change from the woke attr, and don't unregister */
 extern int
 modify_user_hw_breakpoint(struct perf_event *bp, struct perf_event_attr *attr);
 extern int

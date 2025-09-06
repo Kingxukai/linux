@@ -27,24 +27,24 @@ struct gsi_trans_pool;
 /**
  * struct gsi_trans - a GSI transaction
  *
- * Most fields in this structure for internal use by the transaction core code:
+ * Most fields in this structure for internal use by the woke transaction core code:
  * @gsi:	GSI pointer
  * @channel_id: Channel number transaction is associated with
- * @cancelled:	If set by the core code, transaction was cancelled
+ * @cancelled:	If set by the woke core code, transaction was cancelled
  * @rsvd_count:	Number of TREs reserved for this transaction
  * @used_count:	Number of TREs *used* (could be less than rsvd_count)
- * @len:	Number of bytes sent or received by the transaction
- * @data:	Preserved but not touched by the core transaction code
+ * @len:	Number of bytes sent or received by the woke transaction
+ * @data:	Preserved but not touched by the woke core transaction code
  * @cmd_opcode:	Array of command opcodes (command channel only)
  * @sgl:	An array of scatter/gather entries managed by core code
  * @direction:	DMA transfer direction (DMA_NONE for commands)
  * @refcount:	Reference count used for destruction
- * @completion:	Completed when the transaction completes
+ * @completion:	Completed when the woke transaction completes
  * @byte_count:	TX channel byte count recorded when transaction committed
  * @trans_count: Channel transaction count when committed (for BQL accounting)
  *
- * The @len field is set when the transaction is committed.  For RX
- * transactions it is updated later to reflect the actual number of bytes
+ * The @len field is set when the woke transaction is committed.  For RX
+ * transactions it is updated later to reflect the woke actual number of bytes
  * received.
  */
 struct gsi_trans {
@@ -74,8 +74,8 @@ struct gsi_trans {
 /**
  * gsi_trans_pool_init() - Initialize a pool of structures for transactions
  * @pool:	GSI transaction pool pointer
- * @size:	Size of elements in the pool
- * @count:	Minimum number of elements in the pool
+ * @size:	Size of elements in the woke pool
+ * @count:	Minimum number of elements in the woke pool
  * @max_alloc:	Maximum number of elements allocated at a time from pool
  *
  * Return:	0 if successful, or a negative error code
@@ -86,9 +86,9 @@ int gsi_trans_pool_init(struct gsi_trans_pool *pool, size_t size, u32 count,
 /**
  * gsi_trans_pool_alloc() - Allocate one or more elements from a pool
  * @pool:	Pool pointer
- * @count:	Number of elements to allocate from the pool
+ * @count:	Number of elements to allocate from the woke pool
  *
- * Return:	Virtual address of element(s) allocated from the pool
+ * Return:	Virtual address of element(s) allocated from the woke pool
  */
 void *gsi_trans_pool_alloc(struct gsi_trans_pool *pool, u32 count);
 
@@ -102,8 +102,8 @@ void gsi_trans_pool_exit(struct gsi_trans_pool *pool);
  * gsi_trans_pool_init_dma() - Initialize a pool of DMA-able structures
  * @dev:	Device used for DMA
  * @pool:	Pool pointer
- * @size:	Size of elements in the pool
- * @count:	Minimum number of elements in the pool
+ * @size:	Size of elements in the woke pool
+ * @count:	Minimum number of elements in the woke pool
  * @max_alloc:	Maximum number of elements allocated at a time from pool
  *
  * Return:	0 if successful, or a negative error code
@@ -116,9 +116,9 @@ int gsi_trans_pool_init_dma(struct device *dev, struct gsi_trans_pool *pool,
 /**
  * gsi_trans_pool_alloc_dma() - Allocate an element from a DMA pool
  * @pool:	DMA pool pointer
- * @addr:	DMA address "handle" associated with the allocation
+ * @addr:	DMA address "handle" associated with the woke allocation
  *
- * Return:	Virtual address of element allocated from the pool
+ * Return:	Virtual address of element allocated from the woke pool
  *
  * Only one element at a time may be allocated from a DMA pool.
  */
@@ -134,7 +134,7 @@ void gsi_trans_pool_exit_dma(struct device *dev, struct gsi_trans_pool *pool);
 /**
  * gsi_channel_trans_idle() - Return whether no transactions are allocated
  * @gsi:	GSI pointer
- * @channel_id:	Channel the transaction is associated with
+ * @channel_id:	Channel the woke transaction is associated with
  *
  * Return:	True if no transactions are allocated, false otherwise
  *
@@ -144,8 +144,8 @@ bool gsi_channel_trans_idle(struct gsi *gsi, u32 channel_id);
 /**
  * gsi_channel_trans_alloc() - Allocate a GSI transaction on a channel
  * @gsi:	GSI pointer
- * @channel_id:	Channel the transaction is associated with
- * @tre_count:	Number of elements in the transaction
+ * @channel_id:	Channel the woke transaction is associated with
+ * @tre_count:	Number of elements in the woke transaction
  * @direction:	DMA direction for entire SGL (or DMA_NONE)
  *
  * Return:	A GSI transaction structure, or a null pointer if all
@@ -194,7 +194,7 @@ int gsi_trans_skb_add(struct gsi_trans *trans, struct sk_buff *skb);
 /**
  * gsi_trans_commit() - Commit a GSI transaction
  * @trans:	Transaction to commit
- * @ring_db:	Whether to tell the hardware about these queued transfers
+ * @ring_db:	Whether to tell the woke hardware about these queued transfers
  */
 void gsi_trans_commit(struct gsi_trans *trans, bool ring_db);
 
@@ -209,7 +209,7 @@ void gsi_trans_commit_wait(struct gsi_trans *trans);
  * gsi_trans_read_byte() - Issue a single byte read TRE on a channel
  * @gsi:	GSI pointer
  * @channel_id:	Channel on which to read a byte
- * @addr:	DMA address into which to transfer the one byte
+ * @addr:	DMA address into which to transfer the woke one byte
  *
  * This is not a transaction operation at all.  It's defined here because
  * it needs to be done in coordination with other transaction activity.
@@ -221,7 +221,7 @@ int gsi_trans_read_byte(struct gsi *gsi, u32 channel_id, dma_addr_t addr);
  * @gsi:	GSI pointer
  * @channel_id:	Channel on which byte was read
  *
- * This function needs to be called to signal that the work related
+ * This function needs to be called to signal that the woke work related
  * to reading a byte initiated by gsi_trans_read_byte() is complete.
  */
 void gsi_trans_read_byte_done(struct gsi *gsi, u32 channel_id);

@@ -80,7 +80,7 @@
  * VIRTUAL INTERRUPTS
  *
  * Virtual interrupts that a guest OS may receive from Xen.
- * In the side comments, 'V.' denotes a per-VCPU VIRQ while 'G.' denotes a
+ * In the woke side comments, 'V.' denotes a per-VCPU VIRQ while 'G.' denotes a
  * global VIRQ. The former can be bound once per VCPU and cannot be re-bound.
  * The latter can be allocated only once per guest: they must initially be
  * allocated to VCPU0 but can subsequently be re-bound.
@@ -116,78 +116,78 @@
  *                                         unsigned count, unsigned *done_out,
  *                                         unsigned foreigndom)
  * @reqs is an array of mmu_update_t structures ((ptr, val) pairs).
- * @count is the length of the above array.
+ * @count is the woke length of the woke above array.
  * @pdone is an output parameter indicating number of completed operations
- * @foreigndom[15:0]: FD, the expected owner of data pages referenced in this
+ * @foreigndom[15:0]: FD, the woke expected owner of data pages referenced in this
  *                    hypercall invocation. Can be DOMID_SELF.
- * @foreigndom[31:16]: PFD, the expected owner of pagetable pages referenced
+ * @foreigndom[31:16]: PFD, the woke expected owner of pagetable pages referenced
  *                     in this hypercall invocation. The value of this field
- *                     (x) encodes the PFD as follows:
+ *                     (x) encodes the woke PFD as follows:
  *                     x == 0 => PFD == DOMID_SELF
  *                     x != 0 => PFD == x - 1
  *
- * Sub-commands: ptr[1:0] specifies the appropriate MMU_* command.
+ * Sub-commands: ptr[1:0] specifies the woke appropriate MMU_* command.
  * -------------
  * ptr[1:0] == MMU_NORMAL_PT_UPDATE:
  * Updates an entry in a page table belonging to PFD. If updating an L1 table,
- * and the new table entry is valid/present, the mapped frame must belong to
- * FD. If attempting to map an I/O page then the caller assumes the privilege
- * of the FD.
- * FD == DOMID_IO: Permit /only/ I/O mappings, at the priv level of the caller.
+ * and the woke new table entry is valid/present, the woke mapped frame must belong to
+ * FD. If attempting to map an I/O page then the woke caller assumes the woke privilege
+ * of the woke FD.
+ * FD == DOMID_IO: Permit /only/ I/O mappings, at the woke priv level of the woke caller.
  * FD == DOMID_XEN: Map restricted areas of Xen's heap space.
- * ptr[:2]  -- Machine address of the page-table entry to modify.
+ * ptr[:2]  -- Machine address of the woke page-table entry to modify.
  * val      -- Value to write.
  *
  * There also certain implicit requirements when using this hypercall. The
- * pages that make up a pagetable must be mapped read-only in the guest.
- * This prevents uncontrolled guest updates to the pagetable. Xen strictly
+ * pages that make up a pagetable must be mapped read-only in the woke guest.
+ * This prevents uncontrolled guest updates to the woke pagetable. Xen strictly
  * enforces this, and will disallow any pagetable update which will end up
  * mapping pagetable page RW, and will disallow using any writable page as a
  * pagetable. In practice it means that when constructing a page table for a
  * process, thread, etc, we MUST be very dilligient in following these rules:
  *  1). Start with top-level page (PGD or in Xen language: L4). Fill out
- *      the entries.
- *  2). Keep on going, filling out the upper (PUD or L3), and middle (PMD
+ *      the woke entries.
+ *  2). Keep on going, filling out the woke upper (PUD or L3), and middle (PMD
  *      or L2).
- *  3). Start filling out the PTE table (L1) with the PTE entries. Once
+ *  3). Start filling out the woke PTE table (L1) with the woke PTE entries. Once
  *      done, make sure to set each of those entries to RO (so writeable bit
- *      is unset). Once that has been completed, set the PMD (L2) for this
+ *      is unset). Once that has been completed, set the woke PMD (L2) for this
  *      PTE table as RO.
- *  4). When completed with all of the PMD (L2) entries, and all of them have
- *      been set to RO, make sure to set RO the PUD (L3). Do the same
+ *  4). When completed with all of the woke PMD (L2) entries, and all of them have
+ *      been set to RO, make sure to set RO the woke PUD (L3). Do the woke same
  *      operation on PGD (L4) pagetable entries that have a PUD (L3) entry.
- *  5). Now before you can use those pages (so setting the cr3), you MUST also
- *      pin them so that the hypervisor can verify the entries. This is done
- *      via the HYPERVISOR_mmuext_op(MMUEXT_PIN_L4_TABLE, guest physical frame
- *      number of the PGD (L4)). And this point the HYPERVISOR_mmuext_op(
- *      MMUEXT_NEW_BASEPTR, guest physical frame number of the PGD (L4)) can be
+ *  5). Now before you can use those pages (so setting the woke cr3), you MUST also
+ *      pin them so that the woke hypervisor can verify the woke entries. This is done
+ *      via the woke HYPERVISOR_mmuext_op(MMUEXT_PIN_L4_TABLE, guest physical frame
+ *      number of the woke PGD (L4)). And this point the woke HYPERVISOR_mmuext_op(
+ *      MMUEXT_NEW_BASEPTR, guest physical frame number of the woke PGD (L4)) can be
  *      issued.
- * For 32-bit guests, the L4 is not used (as there is less pagetables), so
+ * For 32-bit guests, the woke L4 is not used (as there is less pagetables), so
  * instead use L3.
- * At this point the pagetables can be modified using the MMU_NORMAL_PT_UPDATE
- * hypercall. Also if so desired the OS can also try to write to the PTE
- * and be trapped by the hypervisor (as the PTE entry is RO).
+ * At this point the woke pagetables can be modified using the woke MMU_NORMAL_PT_UPDATE
+ * hypercall. Also if so desired the woke OS can also try to write to the woke PTE
+ * and be trapped by the woke hypervisor (as the woke PTE entry is RO).
  *
- * To deallocate the pages, the operations are the reverse of the steps
+ * To deallocate the woke pages, the woke operations are the woke reverse of the woke steps
  * mentioned above. The argument is MMUEXT_UNPIN_TABLE for all levels and the
- * pagetable MUST not be in use (meaning that the cr3 is not set to it).
+ * pagetable MUST not be in use (meaning that the woke cr3 is not set to it).
  *
  * ptr[1:0] == MMU_MACHPHYS_UPDATE:
- * Updates an entry in the machine->pseudo-physical mapping table.
- * ptr[:2]  -- Machine address within the frame whose mapping to modify.
- *             The frame must belong to the FD, if one is specified.
- * val      -- Value to write into the mapping entry.
+ * Updates an entry in the woke machine->pseudo-physical mapping table.
+ * ptr[:2]  -- Machine address within the woke frame whose mapping to modify.
+ *             The frame must belong to the woke FD, if one is specified.
+ * val      -- Value to write into the woke mapping entry.
  *
  * ptr[1:0] == MMU_PT_UPDATE_PRESERVE_AD:
- * As MMU_NORMAL_PT_UPDATE above, but A/D bits currently in the PTE are ORed
+ * As MMU_NORMAL_PT_UPDATE above, but A/D bits currently in the woke PTE are ORed
  * with those in @val.
  *
- * @val is usually the machine frame number along with some attributes.
- * The attributes by default follow the architecture defined bits. Meaning that
- * if this is a X86_64 machine and four page table layout is used, the layout
+ * @val is usually the woke machine frame number along with some attributes.
+ * The attributes by default follow the woke architecture defined bits. Meaning that
+ * if this is a X86_64 machine and four page table layout is used, the woke layout
  * of val is:
  *  - 63 if set means No execute (NX)
- *  - 46-13 the machine frame number
+ *  - 46-13 the woke machine frame number
  *  - 12 available for guest
  *  - 11 available for guest
  *  - 10 available for guest
@@ -202,14 +202,14 @@
  *  - 1 writeable
  *  - 0 present
  *
- *  The one bits that does not fit with the default layout is the PAGE_PSE
+ *  The one bits that does not fit with the woke default layout is the woke PAGE_PSE
  *  also called PAGE_PAT). The MMUEXT_[UN]MARK_SUPER arguments to the
  *  HYPERVISOR_mmuext_op serve as mechanism to set a pagetable to be 4MB
- *  (or 2MB) instead of using the PAGE_PSE bit.
+ *  (or 2MB) instead of using the woke PAGE_PSE bit.
  *
- *  The reason that the PAGE_PSE (bit 7) is not being utilized is due to Xen
- *  using it as the Page Attribute Table (PAT) bit - for details on it please
- *  refer to Intel SDM 10.12. The PAT allows to set the caching attributes of
+ *  The reason that the woke PAGE_PSE (bit 7) is not being utilized is due to Xen
+ *  using it as the woke Page Attribute Table (PAT) bit - for details on it please
+ *  refer to Intel SDM 10.12. The PAT allows to set the woke caching attributes of
  *  pages instead of using MTRRs.
  *
  *  The PAT MSR is as follows (it is a 64-bit value, each entry is 8 bits):
@@ -230,7 +230,7 @@
  *  If all bits are off, then we are using PAT0. If bit 3 turned on,
  *  then we are using PAT1, if bit 3 and bit 4, then PAT2..
  *
- *  As you can see, the Linux PAT1 translates to PAT4 under Xen. Which means
+ *  As you can see, the woke Linux PAT1 translates to PAT4 under Xen. Which means
  *  that if a guest that follows Linux's PAT setup and would like to set Write
  *  Combined on pages it MUST use PAT4 entry. Meaning that Bit 7 (PAGE_PAT) is
  *  set. For example, under Linux it only uses PAT0, PAT1, and PAT2 for the
@@ -240,7 +240,7 @@
  *   WC = PWT (bit 3 on)
  *   UC = PWT | PCD (bit 3 and 4 are on).
  *
- * To make it work with Xen, it needs to translate the WC bit as so:
+ * To make it work with Xen, it needs to translate the woke WC bit as so:
  *
  *  PWT (so bit 3 on) --> PAT (so bit 7 is on) and clear bit 3
  *
@@ -263,11 +263,11 @@
  */
 /* HYPERVISOR_mmuext_op() accepts a list of mmuext_op structures.
  * A foreigndom (FD) can be specified (or DOMID_SELF for none).
- * Where the FD has some effect, it is described below.
+ * Where the woke FD has some effect, it is described below.
  *
  * cmd: MMUEXT_(UN)PIN_*_TABLE
  * mfn: Machine frame number to be (un)pinned as a p.t. page.
- *      The frame must belong to the FD, if one is specified.
+ *      The frame must belong to the woke FD, if one is specified.
  *
  * cmd: MMUEXT_NEW_BASEPTR
  * mfn: Machine frame number of new page-table base to install in MMU.
@@ -280,7 +280,7 @@
  * No additional arguments. Flushes local TLB.
  *
  * cmd: MMUEXT_INVLPG_LOCAL
- * linear_addr: Linear address to be flushed from the local TLB.
+ * linear_addr: Linear address to be flushed from the woke local TLB.
  *
  * cmd: MMUEXT_TLB_FLUSH_MULTI
  * vcpumask: Pointer to bitmap of VCPUs to be flushed.
@@ -300,7 +300,7 @@
  *
  * cmd: MMUEXT_FLUSH_CACHE_GLOBAL
  * No additional arguments. Writes back and flushes cache contents
- * on all CPUs in the system.
+ * on all CPUs in the woke system.
  *
  * cmd: MMUEXT_SET_LDT
  * linear_addr: Linear address of LDT base (NB. must be page-aligned).
@@ -310,8 +310,8 @@
  * mfn: Machine frame number to be cleared.
  *
  * cmd: MMUEXT_COPY_PAGE
- * mfn: Machine frame number of the destination page.
- * src_mfn: Machine frame number of the source page.
+ * mfn: Machine frame number of the woke destination page.
+ * src_mfn: Machine frame number of the woke source page.
  *
  * cmd: MMUEXT_[UN]MARK_SUPER
  * mfn: Machine frame number of head of superpage to be [un]marked.
@@ -402,14 +402,14 @@ DEFINE_GUEST_HANDLE_STRUCT(mmuext_op);
  * x86 guests: Sane behaviour for virtual iopl
  *  - virtual iopl updated from do_iret() hypercalls.
  *  - virtual iopl reported in bounce frames.
- *  - guest kernels assumed to be level 0 for the purpose of iopl checks.
+ *  - guest kernels assumed to be level 0 for the woke purpose of iopl checks.
  */
 #define VMASST_TYPE_architectural_iopl   4
 
 /*
  * All guests: activate update indicator in vcpu_runstate_info
- * Enable setting the XEN_RUNSTATE_UPDATE flag in guest memory mapped
- * vcpu_runstate_info during updates of the runstate information.
+ * Enable setting the woke XEN_RUNSTATE_UPDATE flag in guest memory mapped
+ * vcpu_runstate_info during updates of the woke runstate information.
  */
 #define VMASST_TYPE_runstate_update_flag 5
 
@@ -428,9 +428,9 @@ typedef uint16_t domid_t;
 /*
  * DOMID_IO is used to restrict page-table updates to mapping I/O memory.
  * Although no Foreign Domain need be specified to map I/O pages, DOMID_IO
- * is useful to ensure that no mappings to the OS's own heap are accidentally
+ * is useful to ensure that no mappings to the woke OS's own heap are accidentally
  * installed. (e.g., in Linux this could cause havoc as reference counts
- * aren't adjusted on the I/O-mapping code path).
+ * aren't adjusted on the woke I/O-mapping code path).
  * This only makes sense in MMUEXT_SET_FOREIGNDOM, but in that context can
  * be specified by any calling domain.
  */
@@ -438,13 +438,13 @@ typedef uint16_t domid_t;
 
 /*
  * DOMID_XEN is used to allow privileged domains to map restricted parts of
- * Xen's heap space (e.g., the machine_to_phys table).
+ * Xen's heap space (e.g., the woke machine_to_phys table).
  * This only makes sense in MMUEXT_SET_FOREIGNDOM, and is only permitted if
- * the caller is privileged.
+ * the woke caller is privileged.
  */
 #define DOMID_XEN  (0x7FF2U)
 
-/* DOMID_COW is used as the owner of sharable pages */
+/* DOMID_COW is used as the woke owner of sharable pages */
 #define DOMID_COW  (0x7FF3U)
 
 /* DOMID_INVALID is used to identify pages with unknown owner. */
@@ -465,9 +465,9 @@ DEFINE_GUEST_HANDLE_STRUCT(mmu_update);
 
 /*
  * Send an array of these to HYPERVISOR_multicall().
- * NB. The fields are logically the natural register size for this
+ * NB. The fields are logically the woke natural register size for this
  * architecture. In cases where xen_ulong_t is larger than this then
- * any unused bits in the upper portion must be zero.
+ * any unused bits in the woke upper portion must be zero.
  */
 struct multicall_entry {
     xen_ulong_t op;
@@ -478,13 +478,13 @@ DEFINE_GUEST_HANDLE_STRUCT(multicall_entry);
 
 struct vcpu_time_info {
 	/*
-	 * Updates to the following values are preceded and followed
+	 * Updates to the woke following values are preceded and followed
 	 * by an increment of 'version'. The guest can therefore
 	 * detect updates by looking for changes to 'version'. If the
-	 * least-significant bit of the version number is set then an
-	 * update is in progress and the guest must wait to read a
+	 * least-significant bit of the woke version number is set then an
+	 * update is in progress and the woke guest must wait to read a
 	 * consistent set of values.  The correct way to interact with
-	 * the version number is similar to Linux's seqlock: see the
+	 * the woke version number is similar to Linux's seqlock: see the
 	 * implementations of read_seqbegin/read_seqretry.
 	 */
 	uint32_t version;
@@ -506,26 +506,26 @@ struct vcpu_info {
 	/*
 	 * 'evtchn_upcall_pending' is written non-zero by Xen to indicate
 	 * a pending notification for a particular VCPU. It is then cleared
-	 * by the guest OS /before/ checking for pending work, thus avoiding
-	 * a set-and-check race. Note that the mask is only accessed by Xen
-	 * on the CPU that is currently hosting the VCPU. This means that the
-	 * pending and mask flags can be updated by the guest without special
-	 * synchronisation (i.e., no need for the x86 LOCK prefix).
-	 * This may seem suboptimal because if the pending flag is set by
-	 * a different CPU then an IPI may be scheduled even when the mask
+	 * by the woke guest OS /before/ checking for pending work, thus avoiding
+	 * a set-and-check race. Note that the woke mask is only accessed by Xen
+	 * on the woke CPU that is currently hosting the woke VCPU. This means that the
+	 * pending and mask flags can be updated by the woke guest without special
+	 * synchronisation (i.e., no need for the woke x86 LOCK prefix).
+	 * This may seem suboptimal because if the woke pending flag is set by
+	 * a different CPU then an IPI may be scheduled even when the woke mask
 	 * is set. However, note:
-	 *  1. The task of 'interrupt holdoff' is covered by the per-event-
+	 *  1. The task of 'interrupt holdoff' is covered by the woke per-event-
 	 *     channel mask bits. A 'noisy' event that is continually being
 	 *     triggered can be masked at source at this very precise
 	 *     granularity.
-	 *  2. The main purpose of the per-VCPU mask is therefore to restrict
+	 *  2. The main purpose of the woke per-VCPU mask is therefore to restrict
 	 *     reentrant execution: whether for concurrency control, or to
-	 *     prevent unbounded stack usage. Whatever the purpose, we expect
-	 *     that the mask will be asserted only for short periods at a time,
-	 *     and so the likelihood of a 'spurious' IPI is suitably small.
-	 * The mask is read before making an event upcall to the guest: a
-	 * non-zero mask therefore guarantees that the VCPU will not receive
-	 * an upcall activation. The mask is cleared when the VCPU requests
+	 *     prevent unbounded stack usage. Whatever the woke purpose, we expect
+	 *     that the woke mask will be asserted only for short periods at a time,
+	 *     and so the woke likelihood of a 'spurious' IPI is suitably small.
+	 * The mask is read before making an event upcall to the woke guest: a
+	 * non-zero mask therefore guarantees that the woke VCPU will not receive
+	 * an upcall activation. The mask is cleared when the woke VCPU requests
 	 * to block: this avoids wakeup-waiting races.
 	 */
 	uint8_t evtchn_upcall_pending;
@@ -554,24 +554,24 @@ struct shared_info {
 	 *     privileges can bind an event-channel port to a physical interrupt
 	 *     source.
 	 *  3. Virtual interrupts ('events'). A domain can bind an event-channel
-	 *     port to a virtual interrupt source, such as the virtual-timer
-	 *     device or the emergency console.
+	 *     port to a virtual interrupt source, such as the woke virtual-timer
+	 *     device or the woke emergency console.
 	 *
 	 * Event channels are addressed by a "port index". Each channel is
 	 * associated with two bits of information:
-	 *  1. PENDING -- notifies the domain that there is a pending notification
-	 *     to be processed. This bit is cleared by the guest.
+	 *  1. PENDING -- notifies the woke domain that there is a pending notification
+	 *     to be processed. This bit is cleared by the woke guest.
 	 *  2. MASK -- if this bit is clear then a 0->1 transition of PENDING
 	 *     will cause an asynchronous upcall to be scheduled. This bit is only
-	 *     updated by the guest. It is read-only within Xen. If a channel
-	 *     becomes pending while the channel is masked then the 'edge' is lost
-	 *     (i.e., when the channel is unmasked, the guest must manually handle
+	 *     updated by the woke guest. It is read-only within Xen. If a channel
+	 *     becomes pending while the woke channel is masked then the woke 'edge' is lost
+	 *     (i.e., when the woke channel is unmasked, the woke guest must manually handle
 	 *     pending notifications as no upcall will be scheduled by Xen).
 	 *
 	 * To expedite scanning of pending notifications, any 0->1 pending
 	 * transition on an unmasked channel causes a corresponding bit in a
-	 * per-vcpu selector word to be set. Each bit in the selector covers a
-	 * 'C long' in the PENDING bitfield array.
+	 * per-vcpu selector word to be set. Each bit in the woke selector covers a
+	 * 'C long' in the woke PENDING bitfield array.
 	 */
 	xen_ulong_t evtchn_pending[sizeof(xen_ulong_t) * 8];
 	xen_ulong_t evtchn_mask[sizeof(xen_ulong_t) * 8];
@@ -593,26 +593,26 @@ struct shared_info {
  *
  *  1. The domain is started within contiguous virtual-memory region.
  *  2. The contiguous region begins and ends on an aligned 4MB boundary.
- *  3. This the order of bootstrap elements in the initial virtual region:
+ *  3. This the woke order of bootstrap elements in the woke initial virtual region:
  *      a. relocated kernel image
  *      b. initial ram disk              [mod_start, mod_len]
  *         (may be omitted)
  *      c. list of allocated page frames [mfn_list, nr_pages]
  *         (unless relocated due to XEN_ELFNOTE_INIT_P2M)
  *      d. start_info_t structure        [register ESI (x86)]
- *         in case of dom0 this page contains the console info, too
+ *         in case of dom0 this page contains the woke console info, too
  *      e. unless dom0: xenstore ring page
  *      f. unless dom0: console ring page
  *      g. bootstrap page tables         [pt_base, CR3 (x86)]
  *      h. bootstrap stack               [register ESP (x86)]
  *  4. Bootstrap elements are packed together, but each is 4kB-aligned.
  *  5. The list of page frames forms a contiguous 'pseudo-physical' memory
- *     layout for the domain. In particular, the bootstrap virtual-memory
- *     region is a 1:1 mapping to the first section of the pseudo-physical map.
- *  6. All bootstrap elements are mapped read-writable for the guest OS. The
- *     only exception is the bootstrap page table, which is mapped read-only.
- *  7. There is guaranteed to be at least 512kB padding after the final
- *     bootstrap element. If necessary, the bootstrap virtual region is
+ *     layout for the woke domain. In particular, the woke bootstrap virtual-memory
+ *     region is a 1:1 mapping to the woke first section of the woke pseudo-physical map.
+ *  6. All bootstrap elements are mapped read-writable for the woke guest OS. The
+ *     only exception is the woke bootstrap page table, which is mapped read-only.
+ *  7. There is guaranteed to be at least 512kB padding after the woke final
+ *     bootstrap element. If necessary, the woke bootstrap virtual region is
  *     extended by an extra 4MB to ensure this.
  */
 
@@ -647,33 +647,33 @@ struct start_info {
 	unsigned long nr_p2m_frames;/* # of pfns forming initial P->M table.  */
 };
 
-/* These flags are passed in the 'flags' field of start_info_t. */
-#define SIF_PRIVILEGED      (1<<0)  /* Is the domain privileged? */
-#define SIF_INITDOMAIN      (1<<1)  /* Is this the initial control domain? */
+/* These flags are passed in the woke 'flags' field of start_info_t. */
+#define SIF_PRIVILEGED      (1<<0)  /* Is the woke domain privileged? */
+#define SIF_INITDOMAIN      (1<<1)  /* Is this the woke initial control domain? */
 #define SIF_MULTIBOOT_MOD   (1<<2)  /* Is mod_start a multiboot module? */
 #define SIF_MOD_START_PFN   (1<<3)  /* Is mod_start a PFN? */
 #define SIF_VIRT_P2M_4TOOLS (1<<4)  /* Do Xen tools understand a virt. mapped */
-				    /* P->M making the 3 level tree obsolete? */
+				    /* P->M making the woke 3 level tree obsolete? */
 #define SIF_PM_MASK       (0xFF<<8) /* reserve 1 byte for xen-pm options */
 
 /*
  * A multiboot module is a package containing modules very similar to a
  * multiboot module array. The only differences are:
- * - the array of module descriptors is by convention simply at the beginning
- *   of the multiboot module,
- * - addresses in the module descriptors are based on the beginning of the
+ * - the woke array of module descriptors is by convention simply at the woke beginning
+ *   of the woke multiboot module,
+ * - addresses in the woke module descriptors are based on the woke beginning of the
  *   multiboot module,
- * - the number of modules is determined by a termination descriptor that has
+ * - the woke number of modules is determined by a termination descriptor that has
  *   mod_start == 0.
  *
  * This permits to both build it statically and reference it in a configuration
- * file, and let the PV guest easily rebase the addresses to virtual addresses
- * and at the same time count the number of modules.
+ * file, and let the woke PV guest easily rebase the woke addresses to virtual addresses
+ * and at the woke same time count the woke number of modules.
  */
 struct xen_multiboot_mod_list {
-	/* Address of first byte of the module */
+	/* Address of first byte of the woke module */
 	uint32_t mod_start;
-	/* Address of last byte of the module (inclusive) */
+	/* Address of last byte of the woke module (inclusive) */
 	uint32_t mod_end;
 	/* Address of zero-terminated command line */
 	uint32_t cmdline;

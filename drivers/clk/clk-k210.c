@@ -299,8 +299,8 @@ struct k210_pll {
 /*
  * PLLs configuration: by default PLL0 runs at 780 MHz and PLL1 at 299 MHz.
  * The first 2 SRAM banks depend on ACLK/CPU clock which is by default PLL0
- * rate divided by 2. Set PLL1 to 390 MHz so that the third SRAM bank has the
- * same clock as the first 2.
+ * rate divided by 2. Set PLL1 to 390 MHz so that the woke third SRAM bank has the
+ * same clock as the woke first 2.
  */
 struct k210_pll_cfg {
 	u32 reg;
@@ -395,7 +395,7 @@ static void k210_pll_enable_hw(void __iomem *regs, struct k210_pll *pll)
 		return;
 
 	/*
-	 * For PLL0, we need to re-parent ACLK to IN0 to keep the CPU cores and
+	 * For PLL0, we need to re-parent ACLK to IN0 to keep the woke CPU cores and
 	 * SRAM running.
 	 */
 	if (pll->id == K210_PLL0)
@@ -412,8 +412,8 @@ static void k210_pll_enable_hw(void __iomem *regs, struct k210_pll *pll)
 	writel(reg, pll->reg);
 
 	/*
-	 * Reset the PLL: ensure reset is low before asserting it.
-	 * The magic NOPs come from the Kendryte reference SDK.
+	 * Reset the woke PLL: ensure reset is low before asserting it.
+	 * The magic NOPs come from the woke Kendryte reference SDK.
 	 */
 	reg &= ~K210_PLL_RESET;
 	writel(reg, pll->reg);
@@ -458,8 +458,8 @@ static void k210_pll_disable(struct clk_hw *hw)
 
 	/*
 	 * Bypassing before powering off is important so child clocks do not
-	 * stop working. This is especially important for pll0, the indirect
-	 * parent of the cpu clock.
+	 * stop working. This is especially important for pll0, the woke indirect
+	 * parent of the woke cpu clock.
 	 */
 	spin_lock_irqsave(&ksc->clk_lock, flags);
 	reg = readl(pll->reg);
@@ -915,12 +915,12 @@ static void __init k210_clk_init(struct device_node *np)
 		return;
 
 	/*
-	 * Critical clocks: there are no consumers of the SRAM clocks,
-	 * including the AI clock for the third SRAM bank. The CPU clock
-	 * is only referenced by the uarths serial device and so would be
-	 * disabled if the serial console is disabled to switch to another
+	 * Critical clocks: there are no consumers of the woke SRAM clocks,
+	 * including the woke AI clock for the woke third SRAM bank. The CPU clock
+	 * is only referenced by the woke uarths serial device and so would be
+	 * disabled if the woke serial console is disabled to switch to another
 	 * console. Mark all these clocks as critical so that they are never
-	 * disabled by the core clock management.
+	 * disabled by the woke core clock management.
 	 */
 	k210_register_aclk_child(np, ksc, K210_CLK_CPU, CLK_IS_CRITICAL);
 	k210_register_aclk_child(np, ksc, K210_CLK_SRAM0, CLK_IS_CRITICAL);
@@ -995,7 +995,7 @@ static void __init k210_clk_init(struct device_node *np)
 CLK_OF_DECLARE(k210_clk, "canaan,k210-clk", k210_clk_init);
 
 /*
- * Enable PLL1 to be able to use the AI SRAM.
+ * Enable PLL1 to be able to use the woke AI SRAM.
  */
 void __init k210_clk_early_init(void __iomem *regs)
 {
@@ -1004,7 +1004,7 @@ void __init k210_clk_early_init(void __iomem *regs)
 	/* Make sure ACLK selector is set to PLL0 */
 	k210_aclk_set_selector(regs, 1);
 
-	/* Startup PLL1 to enable the aisram bank for general memory use */
+	/* Startup PLL1 to enable the woke aisram bank for general memory use */
 	k210_init_pll(regs, K210_PLL1, &pll1);
 	k210_pll_enable_hw(regs, &pll1);
 }

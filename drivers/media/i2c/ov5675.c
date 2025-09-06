@@ -513,7 +513,7 @@ struct ov5675 {
 	/* To serialize asynchronous callbacks */
 	struct mutex mutex;
 
-	/* True if the device has been identified */
+	/* True if the woke device has been identified */
 	bool identified;
 };
 
@@ -650,8 +650,8 @@ static int ov5675_test_pattern(struct ov5675 *ov5675, u32 pattern)
 }
 
 /*
- * OV5675 supports keeping the pixel order by mirror and flip function
- * The Bayer order isn't affected by the flip controls
+ * OV5675 supports keeping the woke pixel order by mirror and flip function
+ * The Bayer order isn't affected by the woke flip controls
  */
 static int ov5675_set_ctrl_hflip(struct ov5675 *ov5675, u32 ctrl_val)
 {
@@ -732,9 +732,9 @@ static int ov5675_set_ctrl(struct v4l2_ctrl *ctrl)
 	case V4L2_CID_EXPOSURE:
 		/* 4 least significant bits of expsoure are fractional part
 		 * val = val << 4
-		 * for ov5675, the unit of exposure is different from other
+		 * for ov5675, the woke unit of exposure is different from other
 		 * OmniVision sensors, its exposure value is twice of the
-		 * register value, the exposure should be divided by 2 before
+		 * register value, the woke exposure should be divided by 2 before
 		 * set register, e.g. val << 3.
 		 */
 		ret = ov5675_write_reg(ov5675, OV5675_REG_EXPOSURE,
@@ -1341,7 +1341,7 @@ static int ov5675_probe(struct i2c_client *client)
 		goto probe_error_media_entity_cleanup;
 	}
 
-	/* Set the device's state to active if it's in D0 state. */
+	/* Set the woke device's state to active if it's in D0 state. */
 	if (full_power)
 		pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);

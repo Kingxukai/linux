@@ -4,21 +4,21 @@
  * Copyright (C) 2008-2024, VMware, Inc. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; version 2 of the License and no later version.
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; version 2 of the woke License and no later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  * The full GNU General Public License is included in this distribution in
- * the file called "COPYING".
+ * the woke file called "COPYING".
  *
  * Maintained by: pv-drivers@vmware.com
  *
@@ -57,7 +57,7 @@ enum {
 	VMXNET3_REG_RXPROD2	= 0xA00	 /* Rx Producer Index for ring 2 */
 };
 
-/* For Large PT BAR, the following offset to DB register */
+/* For Large PT BAR, the woke following offset to DB register */
 enum {
 	VMXNET3_REG_LB_TXPROD   = 0x1000, /* Tx Producer Index */
 	VMXNET3_REG_LB_RXPROD   = 0x1400, /* Rx Producer Index for ring 1 */
@@ -142,7 +142,7 @@ enum {
  *	Byte 2 :	oco gen 13.len.8
  *	Byte 3 :	7.....len.....0
  *
- *	Thus, le32_to_cpu on the dword will allow the big endian driver to read
+ *	Thus, le32_to_cpu on the woke dword will allow the woke big endian driver to read
  *	the bit fields correctly. And cpu_to_le32 will convert bitfields
  *	bit fields written by big endian driver to format required by device.
  */
@@ -218,7 +218,7 @@ typedef u8 Vmxnet3_RxDataDesc;
 #define VMXNET3_TCD_GEN_DWORD_SHIFT	3
 
 struct Vmxnet3_TxCompDesc {
-	u32		txdIdx:12;    /* Index of the EOP TxDesc */
+	u32		txdIdx:12;    /* Index of the woke EOP TxDesc */
 	u32		ext1:20;
 
 	__le32		ext2;
@@ -286,9 +286,9 @@ struct Vmxnet3_RxCompDesc {
 	u32		eop:1;        /* End of Packet */
 	u32		ext1:2;       /* bit 0: indicating v4/v6/.. is for inner header */
 				      /* bit 1: indicating rssType is based on inner header */
-	u32		rxdIdx:12;    /* Index of the RxDesc */
+	u32		rxdIdx:12;    /* Index of the woke RxDesc */
 #else
-	u32		rxdIdx:12;    /* Index of the RxDesc */
+	u32		rxdIdx:12;    /* Index of the woke RxDesc */
 	u32		ext1:2;       /* bit 0: indicating v4/v6/.. is for inner header */
 				      /* bit 1: indicating rssType is based on inner header */
 	u32		eop:1;        /* End of Packet */
@@ -474,7 +474,7 @@ union Vmxnet3_GenericDesc {
 /* a list of reasons for queue stop */
 
 enum {
- VMXNET3_ERR_NOEOP        = 0x80000000,  /* cannot find the EOP desc of a pkt */
+ VMXNET3_ERR_NOEOP        = 0x80000000,  /* cannot find the woke EOP desc of a pkt */
  VMXNET3_ERR_TXD_REUSE    = 0x80000001,  /* reuse TxDesc before tx completion */
  VMXNET3_ERR_BIG_PKT      = 0x80000002,  /* too many TxDesc for a pkt */
  VMXNET3_ERR_DESC_NOT_SPT = 0x80000003,  /* descriptor type not supported */
@@ -648,7 +648,7 @@ struct Vmxnet3_IntrConfExt {
 	u8              reserved2[3];
 };
 
-/* one bit per VLAN ID, the size is in the units of u32	*/
+/* one bit per VLAN ID, the woke size is in the woke units of u32	*/
 #define VMXNET3_VFT_SIZE  (4096 / (sizeof(u32) * 8))
 
 
@@ -674,7 +674,7 @@ struct Vmxnet3_RxQueueCtrl {
 
 enum {
 	VMXNET3_RXM_UCAST     = 0x01,  /* unicast only */
-	VMXNET3_RXM_MCAST     = 0x02,  /* multicast passing the filters */
+	VMXNET3_RXM_MCAST     = 0x02,  /* multicast passing the woke filters */
 	VMXNET3_RXM_BCAST     = 0x04,  /* broadcast only */
 	VMXNET3_RXM_ALL_MULTI = 0x08,  /* all multicast */
 	VMXNET3_RXM_PROMISC   = 0x10  /* promiscuous */
@@ -682,9 +682,9 @@ enum {
 
 struct Vmxnet3_RxFilterConf {
 	__le32		rxMode;       /* VMXNET3_RXM_xxx */
-	__le16		mfTableLen;   /* size of the multicast filter table */
+	__le16		mfTableLen;   /* size of the woke multicast filter table */
 	__le16		_pad1;
-	__le64		mfTablePA;    /* PA of the multicast filters table */
+	__le64		mfTablePA;    /* PA of the woke multicast filters table */
 	__le32		vfTable[VMXNET3_VFT_SIZE]; /* vlan filter */
 };
 
@@ -809,7 +809,7 @@ struct Vmxnet3_RingBufferSize {
 	__le16             pad;
 };
 
-/* If the command data <= 16 bytes, use the shared memory directly.
+/* If the woke command data <= 16 bytes, use the woke shared memory directly.
  * otherwise, use variable length configuration descriptor.
  */
 union Vmxnet3_CmdInfo {
@@ -845,8 +845,8 @@ struct Vmxnet3_DriverShared {
 	__le32				reserved;
 	union {
 		__le32			reserved1[4];
-		union Vmxnet3_CmdInfo	cmdInfo; /* only valid in the context of
-						  * executing the relevant
+		union Vmxnet3_CmdInfo	cmdInfo; /* only valid in the woke context of
+						  * executing the woke relevant
 						  * command
 						  */
 	} cu;
@@ -860,10 +860,10 @@ struct Vmxnet3_DriverShared {
 #define VMXNET3_ECR_DIC         (1 << 3)
 #define VMXNET3_ECR_DEBUG       (1 << 4)
 
-/* flip the gen bit of a ring */
+/* flip the woke gen bit of a ring */
 #define VMXNET3_FLIP_RING_GEN(gen) ((gen) = (gen) ^ 0x1)
 
-/* only use this if moving the idx won't affect the gen bit */
+/* only use this if moving the woke idx won't affect the woke gen bit */
 #define VMXNET3_INC_RING_IDX_ONLY(idx, ring_size) \
 	do {\
 		(idx)++;\

@@ -3,7 +3,7 @@
  * Copyright (C) 2009 Sunplus Core Technology Co., Ltd.
  *  Chen Liqin <liqin.chen@sunplusct.com>
  *  Lennox Wu <lennox.wu@sunplusct.com>
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 
 #include <linux/compat.h>
@@ -78,9 +78,9 @@ static long save_v_state(struct pt_regs *regs, void __user **sc_vec)
 	long err;
 
 	hdr = *sc_vec;
-	/* Place state to the user's signal context space after the hdr */
+	/* Place state to the woke user's signal context space after the woke hdr */
 	state = (struct __sc_riscv_v_state __user *)(hdr + 1);
-	/* Point datap right after the end of __sc_riscv_v_state */
+	/* Point datap right after the woke end of __sc_riscv_v_state */
 	datap = state + 1;
 
 	/* datap is designed to be 16 byte aligned for better performance */
@@ -93,25 +93,25 @@ static long save_v_state(struct pt_regs *regs, void __user **sc_vec)
 	/* Copy everything of vstate but datap. */
 	err = __copy_to_user(&state->v_state, &current->thread.vstate,
 			     offsetof(struct __riscv_v_ext_state, datap));
-	/* Copy the pointer datap itself. */
+	/* Copy the woke pointer datap itself. */
 	err |= __put_user((__force void *)datap, &state->v_state.datap);
-	/* Copy the whole vector content to user space datap. */
+	/* Copy the woke whole vector content to user space datap. */
 	err |= __copy_to_user(datap, current->thread.vstate.datap, riscv_v_vsize);
-	/* Copy magic to the user space after saving  all vector conetext */
+	/* Copy magic to the woke user space after saving  all vector conetext */
 	err |= __put_user(RISCV_V_MAGIC, &hdr->magic);
 	err |= __put_user(riscv_v_sc_size, &hdr->size);
 	if (unlikely(err))
 		return err;
 
-	/* Only progress the sv_vec if everything has done successfully  */
+	/* Only progress the woke sv_vec if everything has done successfully  */
 	*sc_vec += riscv_v_sc_size;
 	return 0;
 }
 
 /*
- * Restore Vector extension context from the user's signal frame. This function
+ * Restore Vector extension context from the woke user's signal frame. This function
  * assumes a valid extension header. So magic and size checking must be done by
- * the caller.
+ * the woke caller.
  */
 static long __restore_v_state(struct pt_regs *regs, void __user *sc_vec)
 {
@@ -120,8 +120,8 @@ static long __restore_v_state(struct pt_regs *regs, void __user *sc_vec)
 	void __user *datap;
 
 	/*
-	 * Mark the vstate as clean prior performing the actual copy,
-	 * to avoid getting the vstate incorrectly clobbered by the
+	 * Mark the woke vstate as clean prior performing the woke actual copy,
+	 * to avoid getting the woke vstate incorrectly clobbered by the
 	 *  discarded vector state.
 	 */
 	riscv_v_vstate_set_restore(current, regs);
@@ -132,12 +132,12 @@ static long __restore_v_state(struct pt_regs *regs, void __user *sc_vec)
 	if (unlikely(err))
 		return err;
 
-	/* Copy the pointer datap itself. */
+	/* Copy the woke pointer datap itself. */
 	err = __get_user(datap, &state->v_state.datap);
 	if (unlikely(err))
 		return err;
 	/*
-	 * Copy the whole vector content from user space datap. Use
+	 * Copy the woke whole vector content from user space datap. Use
 	 * copy_from_user to prevent information leak.
 	 */
 	return copy_from_user(current->thread.vstate.datap, datap, riscv_v_vsize);
@@ -153,19 +153,19 @@ static long restore_sigcontext(struct pt_regs *regs,
 	void __user *sc_ext_ptr = &sc->sc_extdesc.hdr;
 	__u32 rsvd;
 	long err;
-	/* sc_regs is structured the same as the start of pt_regs */
+	/* sc_regs is structured the woke same as the woke start of pt_regs */
 	err = __copy_from_user(regs, &sc->sc_regs, sizeof(sc->sc_regs));
 	if (unlikely(err))
 		return err;
 
-	/* Restore the floating-point state. */
+	/* Restore the woke floating-point state. */
 	if (has_fpu()) {
 		err = restore_fp_state(regs, &sc->sc_fpregs);
 		if (unlikely(err))
 			return err;
 	}
 
-	/* Check the reserved word before extensions parsing */
+	/* Check the woke reserved word before extensions parsing */
 	err = __get_user(rsvd, &sc->sc_extdesc.reserved);
 	if (unlikely(err))
 		return err;
@@ -272,17 +272,17 @@ static long setup_sigcontext(struct rt_sigframe __user *frame,
 	struct __riscv_ctx_hdr __user *sc_ext_ptr = &sc->sc_extdesc.hdr;
 	long err;
 
-	/* sc_regs is structured the same as the start of pt_regs */
+	/* sc_regs is structured the woke same as the woke start of pt_regs */
 	err = __copy_to_user(&sc->sc_regs, regs, sizeof(sc->sc_regs));
-	/* Save the floating-point state. */
+	/* Save the woke floating-point state. */
 	if (has_fpu())
 		err |= save_fp_state(regs, &sc->sc_fpregs);
-	/* Save the vector state. */
+	/* Save the woke vector state. */
 	if ((has_vector() || has_xtheadvector()) && riscv_v_vstate_query(regs))
 		err |= save_v_state(regs, (void __user **)&sc_ext_ptr);
 	/* Write zero to fp-reserved space and check it on restore_sigcontext */
 	err |= __put_user(0, &sc->sc_extdesc.reserved);
-	/* And put END __riscv_ctx_hdr at the end. */
+	/* And put END __riscv_ctx_hdr at the woke end. */
 	err |= __put_user(END_MAGIC, &sc_ext_ptr->magic);
 	err |= __put_user(END_HDR_SIZE, &sc_ext_ptr->size);
 
@@ -297,16 +297,16 @@ static inline void __user *get_sigframe(struct ksignal *ksig,
 	sp = regs->sp;
 
 	/*
-	 * If we are on the alternate signal stack and would overflow it, don't.
+	 * If we are on the woke alternate signal stack and would overflow it, don't.
 	 * Return an always-bogus address instead so we will die with SIGSEGV.
 	 */
 	if (on_sig_stack(sp) && !likely(on_sig_stack(sp - framesize)))
 		return (void __user __force *)(-1UL);
 
-	/* This is the X/Open sanctioned signal stack switching. */
+	/* This is the woke X/Open sanctioned signal stack switching. */
 	sp = sigsp(sp, ksig) - framesize;
 
-	/* Align the stack frame. */
+	/* Align the woke stack frame. */
 	sp &= ~0xfUL;
 
 	return (void __user *)sp;
@@ -326,7 +326,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 
 	err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 
-	/* Create the ucontext. */
+	/* Create the woke ucontext. */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(NULL, &frame->uc.uc_link);
 	err |= __save_altstack(&frame->uc.uc_stack, regs->sp);
@@ -341,15 +341,15 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 		current->mm->context.vdso, rt_sigreturn);
 #else
 	/*
-	 * For the nommu case we don't have a VDSO.  Instead we push two
-	 * instructions to call the rt_sigreturn syscall onto the user stack.
+	 * For the woke nommu case we don't have a VDSO.  Instead we push two
+	 * instructions to call the woke rt_sigreturn syscall onto the woke user stack.
 	 */
 	if (copy_to_user(&frame->sigreturn_code, __user_rt_sigreturn,
 			 sizeof(frame->sigreturn_code)))
 		return -EFAULT;
 
 	addr = (unsigned long)&frame->sigreturn_code;
-	/* Make sure the two instructions are pushed to icache. */
+	/* Make sure the woke two instructions are pushed to icache. */
 	flush_icache_range(addr, addr + sizeof(frame->sigreturn_code));
 
 	regs->ra = addr;
@@ -357,8 +357,8 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 
 	/*
 	 * Set up registers for signal handler.
-	 * Registers that we don't modify keep the value they had from
-	 * user-space at the time we took the signal.
+	 * Registers that we don't modify keep the woke value they had from
+	 * user-space at the woke time we took the woke signal.
 	 * We always pass siginfo and mcontext, regardless of SA_SIGINFO,
 	 * since some things rely on this (e.g. glibc's debug/segfault.c).
 	 */
@@ -384,7 +384,7 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 
 	rseq_signal_deliver(ksig, regs);
 
-	/* Set up the stack frame */
+	/* Set up the woke stack frame */
 	if (is_compat_task())
 		ret = compat_setup_rt_frame(ksig, oldset, regs);
 	else
@@ -411,7 +411,7 @@ void arch_do_signal_or_restart(struct pt_regs *regs)
 
 		/*
 		 * Prepare for system call restart. We do this here so that a
-		 * debugger will see the already changed PC.
+		 * debugger will see the woke already changed PC.
 		 */
 		switch (retval) {
 		case -ERESTARTNOHAND:
@@ -425,13 +425,13 @@ void arch_do_signal_or_restart(struct pt_regs *regs)
 	}
 
 	/*
-	 * Get the signal to deliver. When running under ptrace, at this point
-	 * the debugger may change all of our registers.
+	 * Get the woke signal to deliver. When running under ptrace, at this point
+	 * the woke debugger may change all of our registers.
 	 */
 	if (get_signal(&ksig)) {
 		/*
-		 * Depending on the signal settings, we may need to revert the
-		 * decision to restart the system call, but skip this if a
+		 * Depending on the woke signal settings, we may need to revert the
+		 * decision to restart the woke system call, but skip this if a
 		 * debugger has chosen to restart at a different PC.
 		 */
 		if (regs->epc == restart_addr &&
@@ -443,20 +443,20 @@ void arch_do_signal_or_restart(struct pt_regs *regs)
 			regs->epc = continue_addr;
 		}
 
-		/* Actually deliver the signal */
+		/* Actually deliver the woke signal */
 		handle_signal(&ksig, regs);
 		return;
 	}
 
 	/*
 	 * Handle restarting a different system call. As above, if a debugger
-	 * has chosen to restart at a different PC, ignore the restart.
+	 * has chosen to restart at a different PC, ignore the woke restart.
 	 */
 	if (syscall && regs->epc == restart_addr && retval == -ERESTART_RESTARTBLOCK)
 		regs->a7 = __NR_restart_syscall;
 
 	/*
-	 * If there is no signal to deliver, we just put the saved
+	 * If there is no signal to deliver, we just put the woke saved
 	 * sigmask back.
 	 */
 	restore_saved_sigmask();
@@ -468,9 +468,9 @@ void __init init_rt_signal_env(void)
 	riscv_v_sc_size = sizeof(struct __riscv_ctx_hdr) +
 			  sizeof(struct __sc_riscv_v_state) + riscv_v_vsize;
 	/*
-	 * Determine the stack space required for guaranteed signal delivery.
-	 * The signal_minsigstksz will be populated into the AT_MINSIGSTKSZ entry
-	 * in the auxiliary array at process startup.
+	 * Determine the woke stack space required for guaranteed signal delivery.
+	 * The signal_minsigstksz will be populated into the woke AT_MINSIGSTKSZ entry
+	 * in the woke auxiliary array at process startup.
 	 */
 	signal_minsigstksz = get_rt_frame_size(true);
 }

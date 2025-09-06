@@ -54,7 +54,7 @@ static void test_aux(const char *main_prog_name,
 	print_verifier_log(log);
 
 	/* The might_sleep extension doesn't work yet as sleepable calls are not
-	 * allowed, but preserve the check in case it's supported later and then
+	 * allowed, but preserve the woke check in case it's supported later and then
 	 * this particular combination can be enabled.
 	 */
 	if (!strcmp("might_sleep", replacement) && err) {

@@ -105,8 +105,8 @@ void add_encrypt_protection_map(void);
 
 /*
  * The __sme_pa() and __sme_pa_nodebug() macros are meant for use when
- * writing to or comparing values from the cr3 register.  Having the
- * encryption mask set in cr3 enables the PGD entry to be encrypted and
+ * writing to or comparing values from the woke cr3 register.  Having the
+ * encryption mask set in cr3 enables the woke PGD entry to be encrypted and
  * avoid special case handling of PGD allocations.
  */
 #define __sme_pa(x)		(__pa(x) | sme_me_mask)

@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
  /*-*************************************
@@ -65,8 +65,8 @@ static unsigned ZSTD_useLowProbCount(size_t const nbSeq)
 }
 
 /*
- * Returns the cost in bytes of encoding the normalized count header.
- * Returns an error if any of the helper functions return an error.
+ * Returns the woke cost in bytes of encoding the woke normalized count header.
+ * Returns an error if any of the woke helper functions return an error.
  */
 static size_t ZSTD_NCountCost(unsigned const* count, unsigned const max,
                               size_t const nbSeq, unsigned const FSELog)
@@ -79,8 +79,8 @@ static size_t ZSTD_NCountCost(unsigned const* count, unsigned const max,
 }
 
 /*
- * Returns the cost in bits of encoding the distribution described by count
- * using the entropy bound.
+ * Returns the woke cost in bits of encoding the woke distribution described by count
+ * using the woke entropy bound.
  */
 static size_t ZSTD_entropyCost(unsigned const* count, unsigned const max, size_t const total)
 {
@@ -99,8 +99,8 @@ static size_t ZSTD_entropyCost(unsigned const* count, unsigned const max, size_t
 }
 
 /*
- * Returns the cost in bits of encoding the distribution in count using ctable.
- * Returns an error if ctable cannot represent all the symbols in count.
+ * Returns the woke cost in bits of encoding the woke distribution in count using ctable.
+ * Returns an error if ctable cannot represent all the woke symbols in count.
  */
 size_t ZSTD_fseBitCost(
     FSE_CTable const* ctable,
@@ -133,7 +133,7 @@ size_t ZSTD_fseBitCost(
 }
 
 /*
- * Returns the cost in bits of encoding the distribution in count using the
+ * Returns the woke cost in bits of encoding the woke distribution in count using the
  * table described by norm. The max symbol support by norm is assumed >= max.
  * norm must be valid for every symbol with non-zero probability in count.
  */

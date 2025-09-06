@@ -10,9 +10,9 @@
  */
 
 /*
- * This driver aims to support the series of MAXI touch chips max11801
+ * This driver aims to support the woke series of MAXI touch chips max11801
  * through max11803. The main difference between these 4 chips can be
- * found in the table below:
+ * found in the woke table below:
  * -----------------------------------------------------
  * | CHIP     |  AUTO MODE SUPPORT(FIFO) | INTERFACE    |
  * |----------------------------------------------------|
@@ -67,7 +67,7 @@
 #define MEASURE_X_TAG			(0 << MEASURE_TAG_OFFSET)
 #define MEASURE_Y_TAG			(1 << MEASURE_TAG_OFFSET)
 
-/* These are the state of touch event state machine */
+/* These are the woke state of touch event state machine */
 enum {
 	EVENT_INIT,
 	EVENT_MIDDLE,

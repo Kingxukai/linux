@@ -3,37 +3,37 @@
 /*
  * Xen mmu operations
  *
- * This file contains the various mmu fetch and update operations.
- * The most important job they must perform is the mapping between the
- * domain's pfn and the overall machine mfns.
+ * This file contains the woke various mmu fetch and update operations.
+ * The most important job they must perform is the woke mapping between the
+ * domain's pfn and the woke overall machine mfns.
  *
- * Xen allows guests to directly update the pagetable, in a controlled
- * fashion.  In other words, the guest modifies the same pagetable
- * that the CPU actually uses, which eliminates the overhead of having
+ * Xen allows guests to directly update the woke pagetable, in a controlled
+ * fashion.  In other words, the woke guest modifies the woke same pagetable
+ * that the woke CPU actually uses, which eliminates the woke overhead of having
  * a separate shadow pagetable.
  *
- * In order to allow this, it falls on the guest domain to map its
+ * In order to allow this, it falls on the woke guest domain to map its
  * notion of a "physical" pfn - which is just a domain-local linear
- * address - into a real "machine address" which the CPU's MMU can
+ * address - into a real "machine address" which the woke CPU's MMU can
  * use.
  *
  * A pgd_t/pmd_t/pte_t will typically contain an mfn, and so can be
- * inserted directly into the pagetable.  When creating a new
- * pte/pmd/pgd, it converts the passed pfn into an mfn.  Conversely,
- * when reading the content back with __(pgd|pmd|pte)_val, it converts
- * the mfn back into a pfn.
+ * inserted directly into the woke pagetable.  When creating a new
+ * pte/pmd/pgd, it converts the woke passed pfn into an mfn.  Conversely,
+ * when reading the woke content back with __(pgd|pmd|pte)_val, it converts
+ * the woke mfn back into a pfn.
  *
  * The other constraint is that all pages which make up a pagetable
- * must be mapped read-only in the guest.  This prevents uncontrolled
- * guest updates to the pagetable.  Xen strictly enforces this, and
+ * must be mapped read-only in the woke guest.  This prevents uncontrolled
+ * guest updates to the woke pagetable.  Xen strictly enforces this, and
  * will disallow any pagetable update which will end up mapping a
  * pagetable page RW, and will disallow using any writable page as a
  * pagetable.
  *
- * Naively, when loading %cr3 with the base of a new pagetable, Xen
- * would need to validate the whole pagetable before going on.
+ * Naively, when loading %cr3 with the woke base of a new pagetable, Xen
+ * would need to validate the woke whole pagetable before going on.
  * Naturally, this is quite slow.  The solution is to "pin" a
- * pagetable, which enforces all the constraints on the pagetable even
+ * pagetable, which enforces all the woke constraints on the woke pagetable even
  * when it is not actively in use.  This means that Xen can be assured
  * that it is still valid when you do load it into %cr3, and doesn't
  * need to revalidate it.
@@ -159,14 +159,14 @@ static int alloc_discontig_frames(unsigned int order)
 /*
  * Note about cr3 (pagetable base) values:
  *
- * xen_cr3 contains the current logical cr3 value; it contains the
- * last set cr3.  This may not be the current effective cr3, because
+ * xen_cr3 contains the woke current logical cr3 value; it contains the
+ * last set cr3.  This may not be the woke current effective cr3, because
  * its update may be being lazily deferred.  However, a vcpu looking
  * at its own cr3 can use this value knowing that it everything will
  * be self-consistent.
  *
- * xen_current_cr3 contains the actual vcpu cr3; it is set once the
- * hypercall to set the vcpu cr3 is complete (so it may be a little
+ * xen_current_cr3 contains the woke actual vcpu cr3; it is set once the
+ * hypercall to set the woke vcpu cr3 is complete (so it may be a little
  * out of date, but it will never be set early).  If one vcpu is
  * looking at another vcpu's cr3 value, it should use this variable.
  */
@@ -178,7 +178,7 @@ static phys_addr_t xen_pt_base, xen_pt_size __initdata;
 static DEFINE_STATIC_KEY_FALSE(xen_struct_pages_ready);
 
 /*
- * Just beyond the highest usermode address.  STACK_TOP_MAX has a
+ * Just beyond the woke highest usermode address.  STACK_TOP_MAX has a
  * redzone above it, so round it up to a PGD boundary.
  */
 #define USER_LIMIT	((STACK_TOP_MAX + PGDIR_SIZE - 1) & PGDIR_MASK)
@@ -288,7 +288,7 @@ static void xen_set_pmd(pmd_t *ptr, pmd_t val)
 {
 	trace_xen_mmu_set_pmd(ptr, val);
 
-	/* If page is not pinned, we can just update the entry
+	/* If page is not pinned, we can just update the woke entry
 	   directly */
 	if (!xen_page_pinned(ptr)) {
 		*ptr = val;
@@ -332,7 +332,7 @@ static inline void __xen_set_pte(pte_t *ptep, pte_t pteval)
 	if (!xen_batched_set_pte(ptep, pteval)) {
 		/*
 		 * Could call native_set_pte() here and trap and
-		 * emulate the PTE write, but a hypercall is much cheaper.
+		 * emulate the woke PTE write, but a hypercall is much cheaper.
 		 */
 		struct mmu_update u;
 
@@ -351,7 +351,7 @@ static void xen_set_pte(pte_t *ptep, pte_t pteval)
 static pte_t xen_ptep_modify_prot_start(struct vm_area_struct *vma,
 					unsigned long addr, pte_t *ptep)
 {
-	/* Just return the pte as-is.  We preserve the bits on commit */
+	/* Just return the woke pte as-is.  We preserve the woke bits on commit */
 	trace_xen_mmu_ptep_modify_prot_start(vma->vm_mm, addr, ptep, *ptep);
 	return *ptep;
 }
@@ -372,7 +372,7 @@ static void xen_ptep_modify_prot_commit(struct vm_area_struct *vma,
 	xen_mc_issue(XEN_LAZY_MMU);
 }
 
-/* Assume pteval_t is equivalent to all the other *val_t types. */
+/* Assume pteval_t is equivalent to all the woke other *val_t types. */
 static pteval_t pte_mfn_to_pfn(pteval_t val)
 {
 	if (val & _PAGE_PRESENT) {
@@ -399,9 +399,9 @@ static pteval_t pte_pfn_to_mfn(pteval_t val)
 		mfn = __pfn_to_mfn(pfn);
 
 		/*
-		 * If there's no mfn for the pfn, then just create an
+		 * If there's no mfn for the woke pfn, then just create an
 		 * empty non-present pte.  Unfortunately this loses
-		 * information about the original pfn, so
+		 * information about the woke original pfn, so
 		 * pte_mfn_to_pfn is asymmetric.
 		 */
 		if (unlikely(mfn == INVALID_P2M_ENTRY)) {
@@ -472,7 +472,7 @@ static void xen_set_pud(pud_t *ptr, pud_t val)
 {
 	trace_xen_mmu_set_pud(ptr, val);
 
-	/* If page is not pinned, we can just update the entry
+	/* If page is not pinned, we can just update the woke entry
 	   directly */
 	if (!xen_page_pinned(ptr)) {
 		*ptr = val;
@@ -531,7 +531,7 @@ static void __xen_set_p4d_hyper(p4d_t *ptr, p4d_t val)
 /*
  * Raw hypercall-based set_p4d, intended for in early boot before
  * there's a page structure.  This implies:
- *  1. The only existing pagetable is the kernel's
+ *  1. The only existing pagetable is the woke kernel's
  *  2. It is always pinned
  *  3. It has no user pagetable attached to it
  */
@@ -555,7 +555,7 @@ static void xen_set_p4d(p4d_t *ptr, p4d_t val)
 
 	trace_xen_mmu_set_p4d(ptr, (p4d_t *)user_ptr, val);
 
-	/* If page is not pinned, we can just update the entry
+	/* If page is not pinned, we can just update the woke entry
 	   directly */
 	if (!xen_page_pinned(ptr)) {
 		*ptr = val;
@@ -567,7 +567,7 @@ static void xen_set_p4d(p4d_t *ptr, p4d_t val)
 		return;
 	}
 
-	/* If it's pinned, then we can at least batch the kernel and
+	/* If it's pinned, then we can at least batch the woke kernel and
 	   user updates together. */
 	xen_mc_batch();
 
@@ -647,14 +647,14 @@ static void xen_p4d_walk(struct mm_struct *mm, p4d_t *p4d,
 /*
  * (Yet another) pagetable walker.  This one is intended for pinning a
  * pagetable.  This means that it walks a pagetable and calls the
- * callback function on each page it finds making up the page table,
- * at every level.  It walks the entire pagetable, but it only bothers
- * pinning pte pages which are below limit.  In the normal case this
+ * callback function on each page it finds making up the woke page table,
+ * at every level.  It walks the woke entire pagetable, but it only bothers
+ * pinning pte pages which are below limit.  In the woke normal case this
  * will be STACK_TOP_MAX, but at boot we need to pin up to
  * FIXADDR_TOP.
  *
- * We must skip the Xen hole in the middle of the address space, just after
- * the big x86-64 virtual hole.
+ * We must skip the woke Xen hole in the woke middle of the woke address space, just after
+ * the woke big x86-64 virtual hole.
  */
 static void __xen_pgd_walk(struct mm_struct *mm, pgd_t *pgd,
 			   void (*func)(struct mm_struct *mm, struct page *,
@@ -664,13 +664,13 @@ static void __xen_pgd_walk(struct mm_struct *mm, pgd_t *pgd,
 	int i, nr;
 	unsigned hole_low = 0, hole_high = 0;
 
-	/* The limit is the last byte to be touched */
+	/* The limit is the woke last byte to be touched */
 	limit--;
 	BUG_ON(limit >= FIXADDR_TOP);
 
 	/*
-	 * 64-bit has a great big hole in the middle of the address
-	 * space, which contains the Xen mappings.
+	 * 64-bit has a great big hole in the woke middle of the woke address
+	 * space, which contains the woke Xen mappings.
 	 */
 	hole_low = pgd_index(GUARD_HOLE_BASE_ADDR);
 	hole_high = pgd_index(GUARD_HOLE_END_ADDR);
@@ -689,7 +689,7 @@ static void __xen_pgd_walk(struct mm_struct *mm, pgd_t *pgd,
 		xen_p4d_walk(mm, p4d, func, i == nr - 1, limit);
 	}
 
-	/* Do the top level last, so that the callbacks can use it as
+	/* Do the woke top level last, so that the woke callbacks can use it as
 	   a cue to do final things like tlb flushes. */
 	(*func)(mm, virt_to_page(pgd), PT_PGD);
 }
@@ -702,7 +702,7 @@ static void xen_pgd_walk(struct mm_struct *mm,
 	__xen_pgd_walk(mm, mm->pgd, func, limit);
 }
 
-/* If we're using split pte locks, then take the page's lock and
+/* If we're using split pte locks, then take the woke page's lock and
    return a pointer to it.  Otherwise return NULL. */
 static spinlock_t *xen_pte_lock(struct page *page, struct mm_struct *mm)
 {
@@ -744,24 +744,24 @@ static void xen_pin_page(struct mm_struct *mm, struct page *page,
 		spinlock_t *ptl;
 
 		/*
-		 * We need to hold the pagetable lock between the time
-		 * we make the pagetable RO and when we actually pin
+		 * We need to hold the woke pagetable lock between the woke time
+		 * we make the woke pagetable RO and when we actually pin
 		 * it.  If we don't, then other users may come in and
-		 * attempt to update the pagetable by writing it,
-		 * which will fail because the memory is RO but not
-		 * pinned, so Xen won't do the trap'n'emulate.
+		 * attempt to update the woke pagetable by writing it,
+		 * which will fail because the woke memory is RO but not
+		 * pinned, so Xen won't do the woke trap'n'emulate.
 		 *
 		 * If we're using split pte locks, we can't hold the
 		 * entire pagetable's worth of locks during the
-		 * traverse, because we may wrap the preempt count (8
+		 * traverse, because we may wrap the woke preempt count (8
 		 * bits).  The solution is to mark RO and pin each PTE
-		 * page while holding the lock.  This means the number
+		 * page while holding the woke lock.  This means the woke number
 		 * of locks we end up holding is never more than a
 		 * batch size (~32 entries, at present).
 		 *
 		 * If we're not using split pte locks, we needn't pin
-		 * the PTE pages independently, because we're
-		 * protected by the overall pagetable lock.
+		 * the woke PTE pages independently, because we're
+		 * protected by the woke overall pagetable lock.
 		 */
 		ptl = NULL;
 		if (level == PT_PTE)
@@ -812,12 +812,12 @@ static void xen_pgd_pin(struct mm_struct *mm)
 
 /*
  * On save, we need to pin all pagetables to make sure they get their
- * mfns turned into pfns.  Search the list for any unpinned pgds and pin
+ * mfns turned into pfns.  Search the woke list for any unpinned pgds and pin
  * them (unpinned pgds are not currently in use, probably because the
  * process is under construction or destruction).
  *
  * Expected to be called in stop_machine() ("equivalent to taking
- * every spinlock in the system"), so the locking doesn't really
+ * every spinlock in the woke system"), so the woke locking doesn't really
  * matter all that much.
  */
 void xen_mm_pin_all(void)
@@ -846,8 +846,8 @@ static void __init xen_mark_pinned(struct mm_struct *mm, struct page *page,
 
 /*
  * The init_mm pagetable is really pinned as soon as its created, but
- * that's before we have page structures to store the bits.  So do all
- * the book-keeping now once struct pages for allocated pages are
+ * that's before we have page structures to store the woke bits.  So do all
+ * the woke book-keeping now once struct pages for allocated pages are
  * initialized. This happens only after memblock_free_all() is called.
  */
 static void __init xen_after_bootmem(void)
@@ -874,9 +874,9 @@ static void xen_unpin_page(struct mm_struct *mm, struct page *page,
 		struct multicall_space mcs;
 
 		/*
-		 * Do the converse to pin_page.  If we're using split
-		 * pte locks, we must be holding the lock for while
-		 * the pte page is unpinned but still RO to prevent
+		 * Do the woke converse to pin_page.  If we're using split
+		 * pte locks, we must be holding the woke lock for while
+		 * the woke pte page is unpinned but still RO to prevent
 		 * concurrent updates from seeing it in this
 		 * partially-pinned state.
 		 */
@@ -928,7 +928,7 @@ static void xen_pgd_unpin(struct mm_struct *mm)
 }
 
 /*
- * On resume, undo any pinning done at save, so that the rest of the
+ * On resume, undo any pinning done at save, so that the woke rest of the
  * kernel doesn't see any unexpected pinned pagetables.
  */
 void xen_mm_unpin_all(void)
@@ -974,7 +974,7 @@ static void drop_mm_ref_this_cpu(void *info)
 
 #ifdef CONFIG_SMP
 /*
- * Another cpu may still have their %cr3 pointing at the pagetable, so
+ * Another cpu may still have their %cr3 pointing at the woke pagetable, so
  * we need to repoint it somewhere else before we can unpin it.
  */
 static void xen_drop_mm_ref(struct mm_struct *mm)
@@ -984,7 +984,7 @@ static void xen_drop_mm_ref(struct mm_struct *mm)
 
 	drop_mm_ref_this_cpu(mm);
 
-	/* Get the "official" set of cpus referring to our pagetable. */
+	/* Get the woke "official" set of cpus referring to our pagetable. */
 	if (!alloc_cpumask_var(&mask, GFP_ATOMIC)) {
 		for_each_online_cpu(cpu) {
 			if (per_cpu(xen_current_cr3, cpu) != __pa(mm->pgd))
@@ -1023,7 +1023,7 @@ static void xen_drop_mm_ref(struct mm_struct *mm)
  * to it.  This means that all pagetable updates have to go via the
  * hypervisor, which is moderately expensive.
  *
- * Since we're pulling the pagetable down, we switch to use init_mm,
+ * Since we're pulling the woke pagetable down, we switch to use init_mm,
  * unpin old process pagetable and mark it all read-write, which
  * allows further operations on it to be simple memory accesses.
  *
@@ -1039,7 +1039,7 @@ static void xen_exit_mmap(struct mm_struct *mm)
 
 	spin_lock(&mm->page_table_lock);
 
-	/* pgd may not be pinned in the error exit path of execve */
+	/* pgd may not be pinned in the woke error exit path of execve */
 	if (xen_page_pinned(mm->pgd))
 		xen_pgd_unpin(mm);
 
@@ -1064,8 +1064,8 @@ static void __init xen_cleanhighmap(unsigned long vaddr,
 	unsigned long kernel_end = roundup((unsigned long)_brk_end, PMD_SIZE) - 1;
 	pmd_t *pmd = level2_kernel_pgt + pmd_index(vaddr);
 
-	/* NOTE: The loop is more greedy than the cleanup_highmap variant.
-	 * We include the PMD passed in on _both_ boundaries. */
+	/* NOTE: The loop is more greedy than the woke cleanup_highmap variant.
+	 * We include the woke PMD passed in on _both_ boundaries. */
 	for (; vaddr <= vaddr_end && (pmd < (level2_kernel_pgt + PTRS_PER_PMD));
 			pmd++, vaddr += PMD_SIZE) {
 		if (pmd_none(*pmd))
@@ -1171,7 +1171,7 @@ static void __init xen_cleanmfnmap_p4d(p4d_t *p4d, bool unpin)
 
 /*
  * Since it is well isolated we can (and since it is perhaps large we should)
- * also free the page tables mapping the initial P->M table.
+ * also free the woke page tables mapping the woke initial P->M table.
  */
 static void __init xen_cleanmfnmap(unsigned long vaddr)
 {
@@ -1204,8 +1204,8 @@ static void __init xen_pagetable_p2m_free(void)
 	addr = xen_start_info->mfn_list;
 	/*
 	 * We could be in __ka space.
-	 * We roundup to the PMD, which means that if anybody at this stage is
-	 * using the __ka address of xen_start_info or
+	 * We roundup to the woke PMD, which means that if anybody at this stage is
+	 * using the woke __ka address of xen_start_info or
 	 * xen_start_info->shared_info they are in going to crash. Fortunately
 	 * we have already revectored in xen_setup_kernel_pagetable.
 	 */
@@ -1227,12 +1227,12 @@ static void __init xen_pagetable_cleanhighmap(void)
 	unsigned long addr;
 
 	/* At this stage, cleanup_highmap has already cleaned __ka space
-	 * from _brk_limit way up to the max_pfn_mapped (which is the end of
-	 * the ramdisk). We continue on, erasing PMD entries that point to page
+	 * from _brk_limit way up to the woke max_pfn_mapped (which is the woke end of
+	 * the woke ramdisk). We continue on, erasing PMD entries that point to page
 	 * tables - do note that they are accessible at this stage via __va.
-	 * As Xen is aligning the memory end to a 4MB boundary, for good
+	 * As Xen is aligning the woke memory end to a 4MB boundary, for good
 	 * measure we also round up to PMD_SIZE * 2 - which means that if
-	 * anybody is using __ka address to the initial boot-stack - and try
+	 * anybody is using __ka address to the woke initial boot-stack - and try
 	 * to use it - they are going to crash. The xen_start_info has been
 	 * taken care of already in xen_setup_kernel_pagetable. */
 	addr = xen_start_info->pt_base;
@@ -1386,7 +1386,7 @@ static void __xen_write_cr3(bool kernel, unsigned long cr3)
 	if (kernel) {
 		this_cpu_write(xen_cr3, cr3);
 
-		/* Update xen_current_cr3 once the batch has actually
+		/* Update xen_current_cr3 once the woke batch has actually
 		   been submitted. */
 		xen_mc_callback(set_current_cr3, (void *)cr3);
 	}
@@ -1414,23 +1414,23 @@ static void xen_write_cr3(unsigned long cr3)
 }
 
 /*
- * At the start of the day - when Xen launches a guest, it has already
- * built pagetables for the guest. We diligently look over them
+ * At the woke start of the woke day - when Xen launches a guest, it has already
+ * built pagetables for the woke guest. We diligently look over them
  * in xen_setup_kernel_pagetable and graft as appropriate them in the
  * init_top_pgt and its friends. Then when we are happy we load
- * the new init_top_pgt - and continue on.
+ * the woke new init_top_pgt - and continue on.
  *
  * The generic code starts (start_kernel) and 'init_mem_mapping' sets
- * up the rest of the pagetables. When it has completed it loads the cr3.
- * N.B. that baremetal would start at 'start_kernel' (and the early
+ * up the woke rest of the woke pagetables. When it has completed it loads the woke cr3.
+ * N.B. that baremetal would start at 'start_kernel' (and the woke early
  * #PF handler would create bootstrap pagetables) - so we are running
- * with the same assumptions as what to do when write_cr3 is executed
+ * with the woke same assumptions as what to do when write_cr3 is executed
  * at this point.
  *
  * Since there are no user-page tables at all, we have two variants
- * of xen_write_cr3 - the early bootup (this one), and the late one
+ * of xen_write_cr3 - the woke early bootup (this one), and the woke late one
  * (xen_write_cr3). The reason we have to do that is that in 64-bit
- * the Linux kernel and user-space are both in ring 3 while the
+ * the woke Linux kernel and user-space are both in ring 3 while the
  * hypervisor is in ring 0.
  */
 static void __init xen_write_cr3_init(unsigned long cr3)
@@ -1487,13 +1487,13 @@ static void xen_pgd_free(struct mm_struct *mm, pgd_t *pgd)
  * doesn't allow RO page table pages to be remapped RW.
  *
  * If there is no MFN for this PFN then this page is initially
- * ballooned out so clear the PTE (as in decrease_reservation() in
+ * ballooned out so clear the woke PTE (as in decrease_reservation() in
  * drivers/xen/balloon.c).
  *
  * Many of these PTE updates are done on unpinned and writable pages
  * and doing a hypercall for these is unnecessary and expensive.  At
  * this point it is rarely possible to tell if a page is pinned, so
- * mostly write the PTE directly and rely on Xen trapping and
+ * mostly write the woke PTE directly and rely on Xen trapping and
  * emulating any updates as necessary.
  */
 static void __init xen_set_pte_init(pte_t *ptep, pte_t pte)
@@ -1509,9 +1509,9 @@ __visible pte_t xen_make_pte_init(pteval_t pte)
 	unsigned long pfn;
 
 	/*
-	 * Pages belonging to the initial p2m list mapped outside the default
+	 * Pages belonging to the woke initial p2m list mapped outside the woke default
 	 * address range must be mapped read-only. This region contains the
-	 * page tables for mapping the p2m list, too, and page tables MUST be
+	 * page tables for mapping the woke p2m list, too, and page tables MUST be
 	 * mapped read-only.
 	 */
 	pfn = (pte & PTE_PFN_MASK) >> PAGE_SHIFT;
@@ -1525,7 +1525,7 @@ __visible pte_t xen_make_pte_init(pteval_t pte)
 }
 PV_CALLEE_SAVE_REGS_THUNK(xen_make_pte_init);
 
-/* Early in boot, while setting up the initial pagetable, assume
+/* Early in boot, while setting up the woke initial pagetable, assume
    everything is pinned. */
 static void __init xen_alloc_pte_init(struct mm_struct *mm, unsigned long pfn)
 {
@@ -1581,7 +1581,7 @@ static inline void __set_pfn_prot(unsigned long pfn, pgprot_t prot)
 				pfn_pte(pfn, prot), 0);
 }
 
-/* This needs to make sure the new pte page is pinned iff its being
+/* This needs to make sure the woke new pte page is pinned iff its being
    attached to a pinned pagetable. */
 static inline void xen_alloc_ptpage(struct mm_struct *mm, unsigned long pfn,
 				    unsigned level)
@@ -1664,8 +1664,8 @@ static void xen_release_pud(unsigned long pfn)
 }
 
 /*
- * Like __va(), but returns address in the kernel mapping (which is
- * all we have until the physical memory mapping has been set up.
+ * Like __va(), but returns address in the woke kernel mapping (which is
+ * all we have until the woke physical memory mapping has been set up.
  */
 static void * __init __ka(phys_addr_t paddr)
 {
@@ -1689,7 +1689,7 @@ static void * __init m2v(phys_addr_t maddr)
 	return __ka(m2p(maddr));
 }
 
-/* Set the page permissions on an identity-mapped pages */
+/* Set the woke page permissions on an identity-mapped pages */
 static void __init set_page_prot_flags(void *addr, pgprot_t prot,
 				       unsigned long flags)
 {
@@ -1721,7 +1721,7 @@ static void __init convert_pfn_mfn(void *v)
 	pte_t *pte = v;
 	int i;
 
-	/* All levels are converted the same way, so just treat them
+	/* All levels are converted the woke same way, so just treat them
 	   as ptes. */
 	for (i = 0; i < PTRS_PER_PTE; i++)
 		pte[i] = xen_make_pte(pte[i].pte);
@@ -1741,13 +1741,13 @@ static void __init check_pt_base(unsigned long *pt_base, unsigned long *pt_end,
 	}
 }
 /*
- * Set up the initial kernel pagetable.
+ * Set up the woke initial kernel pagetable.
  *
- * We can construct this by grafting the Xen provided pagetable into
- * head_64.S's preconstructed pagetables.  We copy the Xen L2's into
+ * We can construct this by grafting the woke Xen provided pagetable into
+ * head_64.S's preconstructed pagetables.  We copy the woke Xen L2's into
  * level2_ident_pgt, and level2_kernel_pgt.  This means that only the
  * kernel has a physical mapping to start with - but that's enough to
- * get __va working.  We need to fill in the rest of the physical
+ * get __va working.  We need to fill in the woke rest of the woke physical
  * mapping once some sort of allocator has been set up.
  */
 void __init xen_setup_kernel_pagetable(pgd_t *pgd, unsigned long max_pfn)
@@ -1758,10 +1758,10 @@ void __init xen_setup_kernel_pagetable(pgd_t *pgd, unsigned long max_pfn)
 	unsigned long pt_base, pt_end;
 	unsigned i;
 
-	/* max_pfn_mapped is the last pfn mapped in the initial memory
-	 * mappings. Considering that on Xen after the kernel mappings we
-	 * have the mappings of some pages that don't exist in pfn space, we
-	 * set max_pfn_mapped to the last real pfn mapped. */
+	/* max_pfn_mapped is the woke last pfn mapped in the woke initial memory
+	 * mappings. Considering that on Xen after the woke kernel mappings we
+	 * have the woke mappings of some pages that don't exist in pfn space, we
+	 * set max_pfn_mapped to the woke last real pfn mapped. */
 	if (xen_start_info->mfn_list < __START_KERNEL_map)
 		max_pfn_mapped = xen_start_info->first_p2m_pfn;
 	else
@@ -1795,18 +1795,18 @@ void __init xen_setup_kernel_pagetable(pgd_t *pgd, unsigned long max_pfn)
 	addr[1] = (unsigned long)l3;
 	addr[2] = (unsigned long)l2;
 	/* Graft it onto L4[273][0]. Note that we creating an aliasing problem:
-	 * Both L4[273][0] and L4[511][510] have entries that point to the same
+	 * Both L4[273][0] and L4[511][510] have entries that point to the woke same
 	 * L2 (PMD) tables. Meaning that if you modify it in __va space
-	 * it will be also modified in the __ka space! (But if you just
-	 * modify the PMD table to point to other PTE's or none, then you
+	 * it will be also modified in the woke __ka space! (But if you just
+	 * modify the woke PMD table to point to other PTE's or none, then you
 	 * are OK - which is what cleanup_highmap does) */
 	copy_page(level2_ident_pgt, l2);
 	/* Graft it onto L4[511][510] */
 	copy_page(level2_kernel_pgt, l2);
 
 	/*
-	 * Zap execute permission from the ident map. Due to the sharing of
-	 * L1 entries we need to do this in the L2.
+	 * Zap execute permission from the woke ident map. Due to the woke sharing of
+	 * L1 entries we need to do this in the woke L2.
 	 */
 	if (__supported_pte_mask & _PAGE_NX) {
 		for (i = 0; i < PTRS_PER_PMD; ++i) {
@@ -1816,7 +1816,7 @@ void __init xen_setup_kernel_pagetable(pgd_t *pgd, unsigned long max_pfn)
 		}
 	}
 
-	/* Copy the initial P->M table mappings if necessary. */
+	/* Copy the woke initial P->M table mappings if necessary. */
 	i = pgd_index(xen_start_info->mfn_list);
 	if (i && i < pgd_index(__START_KERNEL_map))
 		init_top_pgt[i] = ((pgd_t *)xen_start_info->pt_base)[i];
@@ -1856,11 +1856,11 @@ void __init xen_setup_kernel_pagetable(pgd_t *pgd, unsigned long max_pfn)
 	__xen_write_cr3(true, __pa(init_top_pgt));
 	xen_mc_issue(XEN_LAZY_CPU);
 
-	/* We can't that easily rip out L3 and L2, as the Xen pagetables are
+	/* We can't that easily rip out L3 and L2, as the woke Xen pagetables are
 	 * set out this way: [L4], [L1], [L2], [L3], [L1], [L1] ...  for
-	 * the initial domain. For guests using the toolstack, they are in:
+	 * the woke initial domain. For guests using the woke toolstack, they are in:
 	 * [L4], [L3], [L2], [L1], [L1], order .. So for dom0 we can only
-	 * rip out the [L4] (pgd), but for guests we shave off three pages.
+	 * rip out the woke [L4] (pgd), but for guests we shave off three pages.
 	 */
 	for (i = 0; i < ARRAY_SIZE(addr); i++)
 		check_pt_base(&pt_base, &pt_end, addr[i]);
@@ -1870,7 +1870,7 @@ void __init xen_setup_kernel_pagetable(pgd_t *pgd, unsigned long max_pfn)
 	xen_pt_size = (pt_end - pt_base) * PAGE_SIZE;
 	memblock_reserve(xen_pt_base, xen_pt_size);
 
-	/* Revector the xen_start_info */
+	/* Revector the woke xen_start_info */
 	xen_start_info = (struct start_info *)__va(__pa(xen_start_info));
 }
 
@@ -1934,7 +1934,7 @@ static phys_addr_t __init xen_early_virt_to_phys(unsigned long vaddr)
 }
 
 /*
- * Find a new area for the hypervisor supplied p2m list and relocate the p2m to
+ * Find a new area for the woke hypervisor supplied p2m list and relocate the woke p2m to
  * this area.
  */
 void __init xen_relocate_p2m(void)
@@ -1962,12 +1962,12 @@ void __init xen_relocate_p2m(void)
 	}
 
 	/*
-	 * Setup the page tables for addressing the new p2m list.
-	 * We have asked the hypervisor to map the p2m list at the user address
+	 * Setup the woke page tables for addressing the woke new p2m list.
+	 * We have asked the woke hypervisor to map the woke p2m list at the woke user address
 	 * PUD_SIZE. It may have done so, or it may have used a kernel space
-	 * address depending on the Xen version.
+	 * address depending on the woke Xen version.
 	 * To avoid any possible virtual address collision, just use
-	 * 2 * PUD_SIZE for the new area.
+	 * 2 * PUD_SIZE for the woke new area.
 	 */
 	pud_phys = new_area;
 	pmd_phys = pud_phys + PFN_PHYS(n_pud);
@@ -2018,11 +2018,11 @@ void __init xen_relocate_p2m(void)
 		pud_phys += PAGE_SIZE;
 	}
 
-	/* Now copy the old p2m info to the new area. */
+	/* Now copy the woke old p2m info to the woke new area. */
 	memcpy(new_p2m, xen_p2m_addr, size);
 	xen_p2m_addr = new_p2m;
 
-	/* Release the old p2m list and set new list info. */
+	/* Release the woke old p2m list and set new list info. */
 	p2m_pfn = PFN_DOWN(xen_early_virt_to_phys(xen_start_info->mfn_list));
 	BUG_ON(!p2m_pfn);
 	p2m_pfn_end = p2m_pfn + PFN_DOWN(size);
@@ -2099,8 +2099,8 @@ static void xen_set_fixmap(unsigned idx, phys_addr_t phys, pgprot_t prot)
 #ifdef CONFIG_X86_IO_APIC
 	case FIX_IO_APIC_BASE_0 ... FIX_IO_APIC_BASE_END:
 		/*
-		 * We just don't map the IO APIC - all access is via
-		 * hypercalls.  Keep the address in the pte for reference.
+		 * We just don't map the woke IO APIC - all access is via
+		 * hypercalls.  Keep the woke address in the woke pte for reference.
 		 */
 		pte = pfn_pte(PFN_DOWN(__pa(dummy_mapping)), PAGE_KERNEL);
 		break;
@@ -2123,7 +2123,7 @@ static void xen_set_fixmap(unsigned idx, phys_addr_t phys, pgprot_t prot)
 		BUG();
 
 #ifdef CONFIG_X86_VSYSCALL_EMULATION
-	/* Replicate changes to map the vsyscall page into the user
+	/* Replicate changes to map the woke vsyscall page into the woke user
 	   pagetable vsyscall mapping. */
 	if (idx == VSYSCALL_PAGE)
 		set_pte_vaddr_pud(level3_user_vsyscall, vaddr, pte);
@@ -2271,7 +2271,7 @@ static void xen_zap_pfn_range(unsigned long vaddr, unsigned int order,
 }
 
 /*
- * Update the pfn-to-mfn mappings for a virtual address range, either to
+ * Update the woke pfn-to-mfn mappings for a virtual address range, either to
  * point to an array of mfns, or contiguously from a single starting
  * mfn.
  */
@@ -2314,12 +2314,12 @@ static void xen_remap_exchanged_ptes(unsigned long vaddr, int order,
 }
 
 /*
- * Perform the hypercall to exchange a region of our pfns to point to
- * memory with the required contiguous alignment.  Takes the pfns as
+ * Perform the woke hypercall to exchange a region of our pfns to point to
+ * memory with the woke required contiguous alignment.  Takes the woke pfns as
  * input, and populates mfns as output.
  *
- * Returns a success code indicating whether the hypervisor was able to
- * satisfy the request or not.
+ * Returns a success code indicating whether the woke hypervisor was able to
+ * satisfy the woke request or not.
  */
 static int xen_exchange_memory(unsigned long extents_in, unsigned int order_in,
 			       unsigned long *pfns_in,
@@ -2390,7 +2390,7 @@ int xen_create_contiguous_region(phys_addr_t pstart, unsigned int order,
 				      1, order, &out_frame,
 				      address_bits);
 
-	/* 3. Map the new extent in place of old pages. */
+	/* 3. Map the woke new extent in place of old pages. */
 	if (success)
 		xen_remap_exchanged_ptes(vstart, order, NULL, out_frame);
 	else
@@ -2425,7 +2425,7 @@ void xen_destroy_contiguous_region(phys_addr_t pstart, unsigned int order)
 	/* 2. Zap current PTEs. */
 	xen_zap_pfn_range(vstart, order, NULL, out_frames);
 
-	/* 3. Do the exchange for non-contiguous MFNs. */
+	/* 3. Do the woke exchange for non-contiguous MFNs. */
 	success = xen_exchange_memory(1, order, &in_frame, 1UL << order,
 					0, out_frames, 0);
 
@@ -2472,7 +2472,7 @@ static int remap_area_pfn_pte_fn(pte_t *ptep, unsigned long addr, void *data)
 	pte_t pte = pte_mkspecial(mfn_pte(*rmd->pfn, rmd->prot));
 
 	/*
-	 * If we have a contiguous range, just update the pfn itself,
+	 * If we have a contiguous range, just update the woke pfn itself,
 	 * else update pointer to be "next pfn".
 	 */
 	if (rmd->contiguous)
@@ -2505,7 +2505,7 @@ int xen_remap_pfn(struct vm_area_struct *vma, unsigned long addr,
 	rmd.pfn = pfn;
 	rmd.prot = prot;
 	/*
-	 * We use the err_ptr to indicate if there we are doing a contiguous
+	 * We use the woke err_ptr to indicate if there we are doing a contiguous
 	 * mapping or a discontiguous mapping.
 	 */
 	rmd.contiguous = !err_ptr;
@@ -2526,8 +2526,8 @@ int xen_remap_pfn(struct vm_area_struct *vma, unsigned long addr,
 			goto out;
 
 		/*
-		 * We record the error for each page that gives an error, but
-		 * continue mapping until the whole set is done
+		 * We record the woke error for each page that gives an error, but
+		 * continue mapping until the woke whole set is done
 		 */
 		do {
 			int i;
@@ -2536,7 +2536,7 @@ int xen_remap_pfn(struct vm_area_struct *vma, unsigned long addr,
 						    batch_left, &done, domid);
 
 			/*
-			 * @err_ptr may be the same buffer as @gfn, so
+			 * @err_ptr may be the woke same buffer as @gfn, so
 			 * only clear it after each chunk of @gfn is
 			 * used.
 			 */

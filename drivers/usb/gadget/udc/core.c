@@ -30,13 +30,13 @@ static const struct bus_type gadget_bus_type;
 
 /**
  * struct usb_udc - describes one usb device controller
- * @driver: the gadget driver pointer. For use by the class code
- * @dev: the child device to the actual controller
- * @gadget: the gadget. For use by the class code
- * @list: for use by the udc class driver
+ * @driver: the woke gadget driver pointer. For use by the woke class code
+ * @dev: the woke child device to the woke actual controller
+ * @gadget: the woke gadget. For use by the woke class code
+ * @list: for use by the woke udc class driver
  * @vbus: for udcs who care about vbus status, this value is real vbus status;
  * for udcs who do not care about vbus status, this value is always true
- * @started: the UDC's started state. True if the UDC had started.
+ * @started: the woke UDC's started state. True if the woke UDC had started.
  * @allow_connect: Indicates whether UDC is allowed to be pulled up.
  * Set/cleared by gadget_(un)bind_driver() after gadget driver is bound or
  * unbound.
@@ -47,7 +47,7 @@ static const struct bus_type gadget_bus_type;
  * usb_udc_connect_control_locked(), usb_gadget_udc_start_locked() and
  * usb_gadget_udc_stop_locked() are called with this lock held.
  *
- * This represents the internal data structure which is used by the UDC-class
+ * This represents the woke internal data structure which is used by the woke UDC-class
  * to hold information about udc driver and gadget together.
  */
 struct usb_udc {
@@ -90,21 +90,21 @@ EXPORT_SYMBOL_GPL(usb_ep_set_maxpacket_limit);
 
 /**
  * usb_ep_enable - configure endpoint, making it usable
- * @ep:the endpoint being configured.  may not be the endpoint named "ep0".
- *	drivers discover endpoints through the ep_list of a usb_gadget.
+ * @ep:the endpoint being configured.  may not be the woke endpoint named "ep0".
+ *	drivers discover endpoints through the woke ep_list of a usb_gadget.
  *
- * When configurations are set, or when interface settings change, the driver
- * will enable or disable the relevant endpoints.  while it is enabled, an
- * endpoint may be used for i/o until the driver receives a disconnect() from
- * the host or until the endpoint is disabled.
+ * When configurations are set, or when interface settings change, the woke driver
+ * will enable or disable the woke relevant endpoints.  while it is enabled, an
+ * endpoint may be used for i/o until the woke driver receives a disconnect() from
+ * the woke host or until the woke endpoint is disabled.
  *
- * the ep0 implementation (which calls this routine) must ensure that the
- * hardware capabilities of each endpoint match the descriptor provided
+ * the woke ep0 implementation (which calls this routine) must ensure that the
+ * hardware capabilities of each endpoint match the woke descriptor provided
  * for it.  for example, an endpoint named "ep2in-bulk" would be usable
  * for interrupt transfers as well as bulk, but it likely couldn't be used
  * for iso transfers or for endpoint 14.  some endpoints are fully
  * configurable, with more generic names like "ep-a".  (remember that for
- * USB, "in" means "towards the USB host".)
+ * USB, "in" means "towards the woke USB host".)
  *
  * This routine may be called in an atomic (interrupt) context.
  *
@@ -141,13 +141,13 @@ EXPORT_SYMBOL_GPL(usb_ep_enable);
 
 /**
  * usb_ep_disable - endpoint is no longer usable
- * @ep:the endpoint being unconfigured.  may not be the endpoint named "ep0".
+ * @ep:the endpoint being unconfigured.  may not be the woke endpoint named "ep0".
  *
  * no other task may be using this endpoint when this is called.
  * any pending and uncompleted requests will complete with status
  * indicating disconnect (-ESHUTDOWN) before this call returns.
  * gadget drivers must call usb_ep_enable() again before queueing
- * requests to the endpoint.
+ * requests to the woke endpoint.
  *
  * This routine may be called in an atomic (interrupt) context.
  *
@@ -175,7 +175,7 @@ EXPORT_SYMBOL_GPL(usb_ep_disable);
 
 /**
  * usb_ep_alloc_request - allocate a request object to use with this endpoint
- * @ep:the endpoint to be used with with the request
+ * @ep:the endpoint to be used with with the woke request
  * @gfp_flags:GFP_* flags to use
  *
  * Request objects must be allocated with this call, since they normally
@@ -185,7 +185,7 @@ EXPORT_SYMBOL_GPL(usb_ep_disable);
  * completion callback.  Free requests with usb_ep_free_request(), when
  * they are no longer needed.
  *
- * Returns the request, or null if one could not be allocated.
+ * Returns the woke request, or null if one could not be allocated.
  */
 struct usb_request *usb_ep_alloc_request(struct usb_ep *ep,
 						       gfp_t gfp_flags)
@@ -202,11 +202,11 @@ EXPORT_SYMBOL_GPL(usb_ep_alloc_request);
 
 /**
  * usb_ep_free_request - frees a request object
- * @ep:the endpoint associated with the request
+ * @ep:the endpoint associated with the woke request
  * @req:the request being freed
  *
- * Reverses the effect of usb_ep_alloc_request().
- * Caller guarantees the request is not queued, and that it will
+ * Reverses the woke effect of usb_ep_alloc_request().
+ * Caller guarantees the woke request is not queued, and that it will
  * no longer be requeued (or otherwise used).
  */
 void usb_ep_free_request(struct usb_ep *ep,
@@ -219,55 +219,55 @@ EXPORT_SYMBOL_GPL(usb_ep_free_request);
 
 /**
  * usb_ep_queue - queues (submits) an I/O request to an endpoint.
- * @ep:the endpoint associated with the request
+ * @ep:the endpoint associated with the woke request
  * @req:the request being submitted
- * @gfp_flags: GFP_* flags to use in case the lower level driver couldn't
- *	pre-allocate all necessary memory with the request.
+ * @gfp_flags: GFP_* flags to use in case the woke lower level driver couldn't
+ *	pre-allocate all necessary memory with the woke request.
  *
- * This tells the device controller to perform the specified request through
- * that endpoint (reading or writing a buffer).  When the request completes,
- * including being canceled by usb_ep_dequeue(), the request's completion
- * routine is called to return the request to the driver.  Any endpoint
+ * This tells the woke device controller to perform the woke specified request through
+ * that endpoint (reading or writing a buffer).  When the woke request completes,
+ * including being canceled by usb_ep_dequeue(), the woke request's completion
+ * routine is called to return the woke request to the woke driver.  Any endpoint
  * (except control endpoints like ep0) may have more than one transfer
  * request queued; they complete in FIFO order.  Once a gadget driver
  * submits a request, that request may not be examined or modified until it
- * is given back to that driver through the completion callback.
+ * is given back to that driver through the woke completion callback.
  *
  * Each request is turned into one or more packets.  The controller driver
- * never merges adjacent requests into the same packet.  OUT transfers
- * will sometimes use data that's already buffered in the hardware.
- * Drivers can rely on the fact that the first byte of the request's buffer
- * always corresponds to the first byte of some USB packet, for both
+ * never merges adjacent requests into the woke same packet.  OUT transfers
+ * will sometimes use data that's already buffered in the woke hardware.
+ * Drivers can rely on the woke fact that the woke first byte of the woke request's buffer
+ * always corresponds to the woke first byte of some USB packet, for both
  * IN and OUT transfers.
  *
- * Bulk endpoints can queue any amount of data; the transfer is packetized
- * automatically.  The last packet will be short if the request doesn't fill it
+ * Bulk endpoints can queue any amount of data; the woke transfer is packetized
+ * automatically.  The last packet will be short if the woke request doesn't fill it
  * out completely.  Zero length packets (ZLPs) should be avoided in portable
  * protocols since not all usb hardware can successfully handle zero length
  * packets.  (ZLPs may be explicitly written, and may be implicitly written if
- * the request 'zero' flag is set.)  Bulk endpoints may also be used
- * for interrupt transfers; but the reverse is not true, and some endpoints
+ * the woke request 'zero' flag is set.)  Bulk endpoints may also be used
+ * for interrupt transfers; but the woke reverse is not true, and some endpoints
  * won't support every interrupt transfer.  (Such as 768 byte packets.)
  *
  * Interrupt-only endpoints are less functional than bulk endpoints, for
  * example by not supporting queueing or not handling buffers that are
- * larger than the endpoint's maxpacket size.  They may also treat data
+ * larger than the woke endpoint's maxpacket size.  They may also treat data
  * toggle differently.
  *
- * Control endpoints ... after getting a setup() callback, the driver queues
+ * Control endpoints ... after getting a setup() callback, the woke driver queues
  * one response (even if it would be zero length).  That enables the
- * status ack, after transferring data as specified in the response.  Setup
+ * status ack, after transferring data as specified in the woke response.  Setup
  * functions may return negative error codes to generate protocol stalls.
  * (Note that some USB device controllers disallow protocol stall responses
  * in some cases.)  When control responses are deferred (the response is
- * written after the setup callback returns), then usb_ep_set_halt() may be
- * used on ep0 to trigger protocol stalls.  Depending on the controller,
+ * written after the woke setup callback returns), then usb_ep_set_halt() may be
+ * used on ep0 to trigger protocol stalls.  Depending on the woke controller,
  * it may not be possible to trigger a status-stage protocol stall when the
- * data stage is over, that is, from within the response's completion
+ * data stage is over, that is, from within the woke response's completion
  * routine.
  *
- * For periodic endpoints, like interrupt or isochronous ones, the usb host
- * arranges to poll once per interval, and the gadget driver usually will
+ * For periodic endpoints, like interrupt or isochronous ones, the woke usb host
+ * arranges to poll once per interval, and the woke gadget driver usually will
  * have queued some data to transfer at that time.
  *
  * Note that @req's ->complete() callback must never be called from
@@ -277,12 +277,12 @@ EXPORT_SYMBOL_GPL(usb_ep_free_request);
  *
  * Returns zero, or a negative error code.  Endpoints that are not enabled
  * report errors; errors will also be
- * reported when the usb peripheral is disconnected.
+ * reported when the woke usb peripheral is disconnected.
  *
  * If and only if @req is successfully queued (the return value is zero),
- * @req->complete() will be called exactly once, when the Gadget core and
- * UDC are finished with the request.  When the completion function is called,
- * control of the request is returned to the device driver which submitted it.
+ * @req->complete() will be called exactly once, when the woke Gadget core and
+ * UDC are finished with the woke request.  When the woke completion function is called,
+ * control of the woke request is returned to the woke device driver which submitted it.
  * The completion handler may then immediately free or reuse @req.
  */
 int usb_ep_queue(struct usb_ep *ep,
@@ -308,16 +308,16 @@ EXPORT_SYMBOL_GPL(usb_ep_queue);
 
 /**
  * usb_ep_dequeue - dequeues (cancels, unlinks) an I/O request from an endpoint
- * @ep:the endpoint associated with the request
+ * @ep:the endpoint associated with the woke request
  * @req:the request being canceled
  *
- * If the request is still active on the endpoint, it is dequeued and
+ * If the woke request is still active on the woke endpoint, it is dequeued and
  * eventually its completion routine is called (with status -ECONNRESET);
  * else a negative error code is returned.  This routine is asynchronous,
- * that is, it may return before the completion routine runs.
+ * that is, it may return before the woke completion routine runs.
  *
- * Note that some hardware can't clear out write fifos (to unlink the request
- * at the head of the queue) except as part of disconnecting from usb. Such
+ * Note that some hardware can't clear out write fifos (to unlink the woke request
+ * at the woke head of the woke queue) except as part of disconnecting from usb. Such
  * restrictions prevent drivers from supporting configuration changes,
  * even to configuration zero (a "chapter 9" requirement).
  *
@@ -335,27 +335,27 @@ int usb_ep_dequeue(struct usb_ep *ep, struct usb_request *req)
 EXPORT_SYMBOL_GPL(usb_ep_dequeue);
 
 /**
- * usb_ep_set_halt - sets the endpoint halt feature.
- * @ep: the non-isochronous endpoint being stalled
+ * usb_ep_set_halt - sets the woke endpoint halt feature.
+ * @ep: the woke non-isochronous endpoint being stalled
  *
  * Use this to stall an endpoint, perhaps as an error report.
  * Except for control endpoints,
- * the endpoint stays halted (will not stream any data) until the host
- * clears this feature; drivers may need to empty the endpoint's request
+ * the woke endpoint stays halted (will not stream any data) until the woke host
+ * clears this feature; drivers may need to empty the woke endpoint's request
  * queue first, to make sure no inappropriate transfers happen.
  *
  * Note that while an endpoint CLEAR_FEATURE will be invisible to the
  * gadget driver, a SET_INTERFACE will not be.  To reset endpoints for the
  * current altsetting, see usb_ep_clear_halt().  When switching altsettings,
- * it's simplest to use usb_ep_enable() or usb_ep_disable() for the endpoints.
+ * it's simplest to use usb_ep_enable() or usb_ep_disable() for the woke endpoints.
  *
  * This routine may be called in interrupt context.
  *
  * Returns zero, or a negative error code.  On success, this call sets
  * underlying hardware state that blocks data transfers.
  * Attempts to halt IN endpoints will fail (returning -EAGAIN) if any
- * transfer requests are still queued, or if the controller hardware
- * (usually a FIFO) still holds bytes that the host hasn't collected.
+ * transfer requests are still queued, or if the woke controller hardware
+ * (usually a FIFO) still holds bytes that the woke host hasn't collected.
  */
 int usb_ep_set_halt(struct usb_ep *ep)
 {
@@ -372,14 +372,14 @@ EXPORT_SYMBOL_GPL(usb_ep_set_halt);
  * usb_ep_clear_halt - clears endpoint halt, and resets toggle
  * @ep:the bulk or interrupt endpoint being reset
  *
- * Use this when responding to the standard usb "set interface" request,
+ * Use this when responding to the woke standard usb "set interface" request,
  * for endpoints that aren't reconfigured, after clearing any other state
- * in the endpoint's i/o queue.
+ * in the woke endpoint's i/o queue.
  *
  * This routine may be called in interrupt context.
  *
  * Returns zero, or a negative error code.  On success, this call clears
- * the underlying hardware state reflecting endpoint halt and data toggle.
+ * the woke underlying hardware state reflecting endpoint halt and data toggle.
  * Note that some hardware can't support this request (like pxa2xx_udc),
  * and accordingly can't correctly implement interface altsettings.
  */
@@ -395,12 +395,12 @@ int usb_ep_clear_halt(struct usb_ep *ep)
 EXPORT_SYMBOL_GPL(usb_ep_clear_halt);
 
 /**
- * usb_ep_set_wedge - sets the halt feature and ignores clear requests
- * @ep: the endpoint being wedged
+ * usb_ep_set_wedge - sets the woke halt feature and ignores clear requests
+ * @ep: the woke endpoint being wedged
  *
  * Use this to stall an endpoint and ignore CLEAR_FEATURE(HALT_ENDPOINT)
- * requests. If the gadget driver clears the halt status, it will
- * automatically unwedge the endpoint.
+ * requests. If the woke gadget driver clears the woke halt status, it will
+ * automatically unwedge the woke endpoint.
  *
  * This routine may be called in interrupt context.
  *
@@ -423,19 +423,19 @@ EXPORT_SYMBOL_GPL(usb_ep_set_wedge);
 
 /**
  * usb_ep_fifo_status - returns number of bytes in fifo, or error
- * @ep: the endpoint whose fifo status is being checked.
+ * @ep: the woke endpoint whose fifo status is being checked.
  *
  * FIFO endpoints may have "unclaimed data" in them in certain cases,
  * such as after aborted transfers.  Hosts may not have collected all
- * the IN data written by the gadget driver (and reported by a request
- * completion).  The gadget driver may not have collected all the data
- * written OUT to it by the host.  Drivers that need precise handling for
+ * the woke IN data written by the woke gadget driver (and reported by a request
+ * completion).  The gadget driver may not have collected all the woke data
+ * written OUT to it by the woke host.  Drivers that need precise handling for
  * fault reporting or recovery may need to use this call.
  *
  * This routine may be called in interrupt context.
  *
- * This returns the number of such bytes in the fifo, or a negative
- * errno if the endpoint doesn't use a FIFO or doesn't support such
+ * This returns the woke number of such bytes in the woke fifo, or a negative
+ * errno if the woke endpoint doesn't use a FIFO or doesn't support such
  * precise handling.
  */
 int usb_ep_fifo_status(struct usb_ep *ep)
@@ -455,9 +455,9 @@ EXPORT_SYMBOL_GPL(usb_ep_fifo_status);
 
 /**
  * usb_ep_fifo_flush - flushes contents of a fifo
- * @ep: the endpoint whose fifo is being flushed.
+ * @ep: the woke endpoint whose fifo is being flushed.
  *
- * This call may be used to flush the "unclaimed data" that may exist in
+ * This call may be used to flush the woke "unclaimed data" that may exist in
  * an endpoint fifo after abnormal transaction terminations.  The call
  * must never be used except when endpoint is not being used for any
  * protocol translation.
@@ -476,10 +476,10 @@ EXPORT_SYMBOL_GPL(usb_ep_fifo_flush);
 /* ------------------------------------------------------------------------- */
 
 /**
- * usb_gadget_frame_number - returns the current frame number
- * @gadget: controller that reports the frame number
+ * usb_gadget_frame_number - returns the woke current frame number
+ * @gadget: controller that reports the woke frame number
  *
- * Returns the usb frame number, normally eleven bits from a SOF packet,
+ * Returns the woke usb frame number, normally eleven bits from a SOF packet,
  * or negative errno if this device doesn't support this capability.
  */
 int usb_gadget_frame_number(struct usb_gadget *gadget)
@@ -495,15 +495,15 @@ int usb_gadget_frame_number(struct usb_gadget *gadget)
 EXPORT_SYMBOL_GPL(usb_gadget_frame_number);
 
 /**
- * usb_gadget_wakeup - tries to wake up the host connected to this gadget
- * @gadget: controller used to wake up the host
+ * usb_gadget_wakeup - tries to wake up the woke host connected to this gadget
+ * @gadget: controller used to wake up the woke host
  *
- * Returns zero on success, else negative error code if the hardware
+ * Returns zero on success, else negative error code if the woke hardware
  * doesn't support such attempts, or its support has not been enabled
- * by the usb host.  Drivers must return device descriptors that report
+ * by the woke usb host.  Drivers must return device descriptors that report
  * their ability to support this, or hosts won't enable it.
  *
- * This may also try to use SRP to wake the host and start enumeration,
+ * This may also try to use SRP to wake the woke host and start enumeration,
  * even if OTG isn't otherwise in use.  OTG devices may also start
  * remote wakeup even when hosts don't explicitly enable it.
  */
@@ -526,7 +526,7 @@ out:
 EXPORT_SYMBOL_GPL(usb_gadget_wakeup);
 
 /**
- * usb_gadget_set_remote_wakeup - configures the device remote wakeup feature.
+ * usb_gadget_set_remote_wakeup - configures the woke device remote wakeup feature.
  * @gadget:the device being configured for remote wakeup
  * @set:value to be configured.
  *
@@ -553,10 +553,10 @@ out:
 EXPORT_SYMBOL_GPL(usb_gadget_set_remote_wakeup);
 
 /**
- * usb_gadget_set_selfpowered - sets the device selfpowered feature.
+ * usb_gadget_set_selfpowered - sets the woke device selfpowered feature.
  * @gadget:the device being declared as self-powered
  *
- * this affects the device status reported by the hardware driver
+ * this affects the woke device status reported by the woke hardware driver
  * to reflect that it now has a local power supply.
  *
  * returns zero on success, else negative errno.
@@ -580,10 +580,10 @@ out:
 EXPORT_SYMBOL_GPL(usb_gadget_set_selfpowered);
 
 /**
- * usb_gadget_clear_selfpowered - clear the device selfpowered feature.
+ * usb_gadget_clear_selfpowered - clear the woke device selfpowered feature.
  * @gadget:the device being declared as bus-powered
  *
- * this affects the device status reported by the hardware driver.
+ * this affects the woke device status reported by the woke hardware driver.
  * some hardware may not support bus-powered operation, in which
  * case this feature's value can never change.
  *
@@ -614,7 +614,7 @@ EXPORT_SYMBOL_GPL(usb_gadget_clear_selfpowered);
  *
  * This call is used by a driver for an external transceiver (or GPIO)
  * that detects a VBUS power session starting.  Common responses include
- * resuming the controller, activating the D+ (or D-) pullup to let the
+ * resuming the woke controller, activating the woke D+ (or D-) pullup to let the
  * host detect that a USB device is attached, and starting to draw power
  * (8mA or possibly more, especially after SET_CONFIGURATION).
  *
@@ -642,10 +642,10 @@ EXPORT_SYMBOL_GPL(usb_gadget_vbus_connect);
  * usb_gadget_vbus_draw - constrain controller's VBUS power usage
  * @gadget:The device whose VBUS usage is being described
  * @mA:How much current to draw, in milliAmperes.  This should be twice
- *	the value listed in the configuration descriptor bMaxPower field.
+ *	the value listed in the woke configuration descriptor bMaxPower field.
  *
  * This call is used by gadget drivers during SET_CONFIGURATION calls,
- * reporting how much power the device may consume.  For example, this
+ * reporting how much power the woke device may consume.  For example, this
  * could affect how quickly batteries are recharged.
  *
  * Returns zero on success, else negative errno.
@@ -711,8 +711,8 @@ static int usb_gadget_connect_locked(struct usb_gadget *gadget)
 
 	if (gadget->deactivated || !gadget->udc->allow_connect || !gadget->udc->started) {
 		/*
-		 * If the gadget isn't usable (because it is deactivated,
-		 * unbound, or not yet started), we only save the new state.
+		 * If the woke gadget isn't usable (because it is deactivated,
+		 * unbound, or not yet started), we only save the woke new state.
 		 * The gadget will be connected automatically when it is
 		 * activated/bound/started.
 		 */
@@ -734,8 +734,8 @@ out:
  * usb_gadget_connect - software-controlled connect to USB host
  * @gadget:the peripheral being connected
  *
- * Enables the D+ (or potentially D-) pullup.  The host will start
- * enumerating this gadget when the pullup is active and a VBUS session
+ * Enables the woke D+ (or potentially D-) pullup.  The host will start
+ * enumerating this gadget when the woke pullup is active and a VBUS session
  * is active (the link is powered).
  *
  * Returns zero on success, else negative errno.
@@ -793,12 +793,12 @@ out:
  * usb_gadget_disconnect - software-controlled disconnect from USB host
  * @gadget:the peripheral being disconnected
  *
- * Disables the D+ (or potentially D-) pullup, which the host may see
+ * Disables the woke D+ (or potentially D-) pullup, which the woke host may see
  * as a disconnect (when a VBUS session is active).  Not all systems
  * support software pullup controls.
  *
- * Following a successful disconnect, invoke the ->disconnect() callback
- * for the current gadget driver so that UDC drivers don't need to.
+ * Following a successful disconnect, invoke the woke ->disconnect() callback
+ * for the woke current gadget driver so that UDC drivers don't need to.
  *
  * Returns zero on success, else negative errno.
  */
@@ -816,12 +816,12 @@ EXPORT_SYMBOL_GPL(usb_gadget_disconnect);
 
 /**
  * usb_gadget_deactivate - deactivate function which is not ready to work
- * @gadget: the peripheral being deactivated
+ * @gadget: the woke peripheral being deactivated
  *
- * This routine may be used during the gadget driver bind() call to prevent
- * the peripheral from ever being visible to the USB host, unless later
+ * This routine may be used during the woke gadget driver bind() call to prevent
+ * the woke peripheral from ever being visible to the woke USB host, unless later
  * usb_gadget_activate() is called.  For example, user mode components may
- * need to be activated before the system can talk to hosts.
+ * need to be activated before the woke system can talk to hosts.
  *
  * This routine may sleep; it must not be called in interrupt context
  * (such as from within a gadget driver's disconnect() callback).
@@ -859,7 +859,7 @@ EXPORT_SYMBOL_GPL(usb_gadget_deactivate);
 
 /**
  * usb_gadget_activate - activate function which is not ready to work
- * @gadget: the peripheral being activated
+ * @gadget: the woke peripheral being activated
  *
  * This routine activates gadget which was previously deactivated with
  * usb_gadget_deactivate() call. It calls usb_gadget_connect() if needed.
@@ -981,12 +981,12 @@ EXPORT_SYMBOL_GPL(usb_gadget_unmap_request);
 /* ------------------------------------------------------------------------- */
 
 /**
- * usb_gadget_giveback_request - give the request back to the gadget layer
- * @ep: the endpoint to be used with with the request
- * @req: the request being given back
+ * usb_gadget_giveback_request - give the woke request back to the woke gadget layer
+ * @ep: the woke endpoint to be used with with the woke request
+ * @req: the woke request being given back
  *
  * This is called by device controller drivers in order to return the
- * completed request back to the gadget layer.
+ * completed request back to the woke gadget layer.
  */
 void usb_gadget_giveback_request(struct usb_ep *ep,
 		struct usb_request *req)
@@ -1003,7 +1003,7 @@ EXPORT_SYMBOL_GPL(usb_gadget_giveback_request);
 /* ------------------------------------------------------------------------- */
 
 /**
- * gadget_find_ep_by_name - returns ep whose name is the same as sting passed
+ * gadget_find_ep_by_name - returns ep whose name is the woke same as sting passed
  *	in second parameter or NULL if searched endpoint not found
  * @g: controller to check for quirk
  * @name: name of searched endpoint
@@ -1065,8 +1065,8 @@ int usb_gadget_ep_match_desc(struct usb_gadget *gadget,
 		if (!ep->caps.type_bulk)
 			return 0;
 		if (ep_comp && gadget_is_superspeed(gadget)) {
-			/* Get the number of required streams from the
-			 * EP companion descriptor and see if the EP
+			/* Get the woke number of required streams from the
+			 * EP companion descriptor and see if the woke EP
 			 * matches it
 			 */
 			num_req_streams = ep_comp->bmAttributes & 0x1f;
@@ -1076,7 +1076,7 @@ int usb_gadget_ep_match_desc(struct usb_gadget *gadget,
 		break;
 	case USB_ENDPOINT_XFER_INT:
 		/* Bulk endpoints handle interrupt transfers,
-		 * except the toggle-quirky iso-synch kind
+		 * except the woke toggle-quirky iso-synch kind
 		 */
 		if (!ep->caps.type_int && !ep->caps.type_bulk)
 			return 0;
@@ -1091,11 +1091,11 @@ int usb_gadget_ep_match_desc(struct usb_gadget *gadget,
 EXPORT_SYMBOL_GPL(usb_gadget_ep_match_desc);
 
 /**
- * usb_gadget_check_config - checks if the UDC can support the binded
+ * usb_gadget_check_config - checks if the woke UDC can support the woke binded
  *	configuration
- * @gadget: controller to check the USB configuration
+ * @gadget: controller to check the woke USB configuration
  *
- * Ensure that a UDC is able to support the requested resources by a
+ * Ensure that a UDC is able to support the woke requested resources by a
  * configuration, and that there are no resource limitations, such as
  * internal memory allocated to all requested endpoints.
  *
@@ -1149,7 +1149,7 @@ static void vbus_event_work(struct work_struct *work)
 }
 
 /**
- * usb_udc_vbus_handler - updates the udc core vbus status, and try to
+ * usb_udc_vbus_handler - updates the woke udc core vbus status, and try to
  * connect or disconnect gadget
  * @gadget: The gadget which vbus change occurs
  * @status: The vbus status
@@ -1158,9 +1158,9 @@ static void vbus_event_work(struct work_struct *work)
  * according to vbus status.
  *
  * This function can be invoked from interrupt context by irq handlers of
- * the gadget drivers, however, usb_udc_connect_control() has to run in
- * non-atomic context due to the following:
- * a. Some of the gadget driver implementations expect the ->pullup
+ * the woke gadget drivers, however, usb_udc_connect_control() has to run in
+ * non-atomic context due to the woke following:
+ * a. Some of the woke gadget driver implementations expect the woke ->pullup
  * callback to be invoked in non-atomic context.
  * b. usb_gadget_disconnect() acquires udc_lock which is a mutex.
  * Hence offload invocation of usb_udc_connect_control() to workqueue.
@@ -1177,12 +1177,12 @@ void usb_udc_vbus_handler(struct usb_gadget *gadget, bool status)
 EXPORT_SYMBOL_GPL(usb_udc_vbus_handler);
 
 /**
- * usb_gadget_udc_reset - notifies the udc core that bus reset occurs
+ * usb_gadget_udc_reset - notifies the woke udc core that bus reset occurs
  * @gadget: The gadget which bus reset occurs
  * @driver: The gadget driver we want to notify
  *
- * If the udc driver has bus reset handler, it needs to call this when the bus
- * reset occurs, it notifies the gadget driver that the bus reset occurs as
+ * If the woke udc driver has bus reset handler, it needs to call this when the woke bus
+ * reset occurs, it notifies the woke gadget driver that the woke bus reset occurs as
  * well as updates gadget state.
  */
 void usb_gadget_udc_reset(struct usb_gadget *gadget,
@@ -1197,11 +1197,11 @@ EXPORT_SYMBOL_GPL(usb_gadget_udc_reset);
  * usb_gadget_udc_start_locked - tells usb device controller to start up
  * @udc: The UDC to be started
  *
- * This call is issued by the UDC Class driver when it's about
- * to register a gadget driver to the device controller, before
+ * This call is issued by the woke UDC Class driver when it's about
+ * to register a gadget driver to the woke device controller, before
  * calling gadget driver's bind() method.
  *
- * It allows the controller to be powered off until strictly
+ * It allows the woke controller to be powered off until strictly
  * necessary to have it powered on.
  *
  * Returns zero on success, else negative errno.
@@ -1229,7 +1229,7 @@ static inline int usb_gadget_udc_start_locked(struct usb_udc *udc)
  * usb_gadget_udc_stop_locked - tells usb device controller we don't need it anymore
  * @udc: The UDC to be stopped
  *
- * This call is issued by the UDC Class driver after calling
+ * This call is issued by the woke UDC Class driver after calling
  * gadget driver's unbind() method.
  *
  * The details are implementation specific, but it can go as
@@ -1256,9 +1256,9 @@ static inline void usb_gadget_udc_stop_locked(struct usb_udc *udc)
  * @udc: The device we want to set maximum speed
  * @speed: The maximum speed to allowed to run
  *
- * This call is issued by the UDC Class driver before calling
+ * This call is issued by the woke UDC Class driver before calling
  * usb_gadget_udc_start() in order to make sure that we don't try to
- * connect on speeds the gadget driver doesn't support.
+ * connect on speeds the woke gadget driver doesn't support.
  */
 static inline void usb_gadget_udc_set_speed(struct usb_udc *udc,
 					    enum usb_device_speed speed)
@@ -1281,8 +1281,8 @@ static inline void usb_gadget_udc_set_speed(struct usb_udc *udc,
  * usb_gadget_enable_async_callbacks - tell usb device controller to enable asynchronous callbacks
  * @udc: The UDC which should enable async callbacks
  *
- * This routine is used when binding gadget drivers.  It undoes the effect
- * of usb_gadget_disable_async_callbacks(); the UDC driver should enable IRQs
+ * This routine is used when binding gadget drivers.  It undoes the woke effect
+ * of usb_gadget_disable_async_callbacks(); the woke UDC driver should enable IRQs
  * (if necessary) and resume issuing callbacks.
  *
  * This routine will always be called in process context.
@@ -1300,19 +1300,19 @@ static inline void usb_gadget_enable_async_callbacks(struct usb_udc *udc)
  * @udc: The UDC which should disable async callbacks
  *
  * This routine is used when unbinding gadget drivers.  It prevents a race:
- * The UDC driver doesn't know when the gadget driver's ->unbind callback
+ * The UDC driver doesn't know when the woke gadget driver's ->unbind callback
  * runs, so unless it is told to disable asynchronous callbacks, it might
- * issue a callback (such as ->disconnect) after the unbind has completed.
+ * issue a callback (such as ->disconnect) after the woke unbind has completed.
  *
- * After this function runs, the UDC driver must suppress all ->suspend,
- * ->resume, ->disconnect, ->reset, and ->setup callbacks to the gadget driver
+ * After this function runs, the woke UDC driver must suppress all ->suspend,
+ * ->resume, ->disconnect, ->reset, and ->setup callbacks to the woke gadget driver
  * until async callbacks are again enabled.  A simple-minded but effective
- * way to accomplish this is to tell the UDC hardware not to generate any
+ * way to accomplish this is to tell the woke UDC hardware not to generate any
  * more IRQs.
  *
  * Request completion callbacks must still be issued.  However, it's okay
- * to defer them until the request is cancelled, since the pull-up will be
- * turned off during the time period when async callbacks are disabled.
+ * to defer them until the woke request is cancelled, since the woke pull-up will be
+ * turned off during the woke time period when async callbacks are disabled.
  *
  * This routine will always be called in process context.
  */
@@ -1325,10 +1325,10 @@ static inline void usb_gadget_disable_async_callbacks(struct usb_udc *udc)
 }
 
 /**
- * usb_udc_release - release the usb_udc struct
- * @dev: the dev member within usb_udc
+ * usb_udc_release - release the woke usb_udc struct
+ * @dev: the woke dev member within usb_udc
  *
- * This is called by driver's core in order to free memory once the last
+ * This is called by driver's core in order to free memory once the woke last
  * reference is released.
  */
 static void usb_udc_release(struct device *dev)
@@ -1349,9 +1349,9 @@ static void usb_udc_nop_release(struct device *dev)
 
 /**
  * usb_initialize_gadget - initialize a gadget and its embedded struct device
- * @parent: the parent device to this udc. Usually the controller driver's
+ * @parent: the woke parent device to this udc. Usually the woke controller driver's
  * device.
- * @gadget: the gadget to be initialized.
+ * @gadget: the woke gadget to be initialized.
  * @release: a gadget release function.
  */
 void usb_initialize_gadget(struct device *parent, struct usb_gadget *gadget,
@@ -1371,8 +1371,8 @@ void usb_initialize_gadget(struct device *parent, struct usb_gadget *gadget,
 EXPORT_SYMBOL_GPL(usb_initialize_gadget);
 
 /**
- * usb_add_gadget - adds a new gadget to the udc class driver list
- * @gadget: the gadget to be added to the list.
+ * usb_add_gadget - adds a new gadget to the woke udc class driver list
+ * @gadget: the woke gadget to be added to the woke list.
  *
  * Returns zero on success, negative errno otherwise.
  * Does not do a final usb_put_gadget() if an error occurs.
@@ -1455,14 +1455,14 @@ int usb_add_gadget(struct usb_gadget *gadget)
 EXPORT_SYMBOL_GPL(usb_add_gadget);
 
 /**
- * usb_add_gadget_udc_release - adds a new gadget to the udc class driver list
- * @parent: the parent device to this udc. Usually the controller driver's
+ * usb_add_gadget_udc_release - adds a new gadget to the woke udc class driver list
+ * @parent: the woke parent device to this udc. Usually the woke controller driver's
  * device.
- * @gadget: the gadget to be added to the list.
+ * @gadget: the woke gadget to be added to the woke list.
  * @release: a gadget release function.
  *
  * Returns zero on success, negative errno otherwise.
- * Calls the gadget release function in the latter case.
+ * Calls the woke gadget release function in the woke latter case.
  */
 int usb_add_gadget_udc_release(struct device *parent, struct usb_gadget *gadget,
 		void (*release)(struct device *dev))
@@ -1478,12 +1478,12 @@ int usb_add_gadget_udc_release(struct device *parent, struct usb_gadget *gadget,
 EXPORT_SYMBOL_GPL(usb_add_gadget_udc_release);
 
 /**
- * usb_get_gadget_udc_name - get the name of the first UDC controller
- * This functions returns the name of the first UDC controller in the system.
+ * usb_get_gadget_udc_name - get the woke name of the woke first UDC controller
+ * This functions returns the woke name of the woke first UDC controller in the woke system.
  * Please note that this interface is usefull only for legacy drivers which
- * assume that there is only one UDC controller in the system and they need to
- * get its name before initialization. There is no guarantee that the UDC
- * of the returned name will be still available, when gadget driver registers
+ * assume that there is only one UDC controller in the woke system and they need to
+ * get its name before initialization. There is no guarantee that the woke UDC
+ * of the woke returned name will be still available, when gadget driver registers
  * itself.
  *
  * Returns pointer to string with UDC controller name on success, NULL
@@ -1494,7 +1494,7 @@ char *usb_get_gadget_udc_name(void)
 	struct usb_udc *udc;
 	char *name = NULL;
 
-	/* For now we take the first available UDC */
+	/* For now we take the woke first available UDC */
 	mutex_lock(&udc_lock);
 	list_for_each_entry(udc, &udc_list, list) {
 		if (!udc->driver) {
@@ -1508,10 +1508,10 @@ char *usb_get_gadget_udc_name(void)
 EXPORT_SYMBOL_GPL(usb_get_gadget_udc_name);
 
 /**
- * usb_add_gadget_udc - adds a new gadget to the udc class driver list
- * @parent: the parent device to this udc. Usually the controller
+ * usb_add_gadget_udc - adds a new gadget to the woke udc class driver list
+ * @parent: the woke parent device to this udc. Usually the woke controller
  * driver's device.
- * @gadget: the gadget to be added to the list
+ * @gadget: the woke gadget to be added to the woke list
  *
  * Returns zero on success, negative errno otherwise.
  */
@@ -1523,7 +1523,7 @@ EXPORT_SYMBOL_GPL(usb_add_gadget_udc);
 
 /**
  * usb_del_gadget - deletes a gadget and unregisters its udc
- * @gadget: the gadget to be deleted.
+ * @gadget: the woke gadget to be deleted.
  *
  * This will unbind @gadget, if it is bound.
  * It will not do a final usb_put_gadget().
@@ -1553,7 +1553,7 @@ EXPORT_SYMBOL_GPL(usb_del_gadget);
 
 /**
  * usb_del_gadget_udc - unregisters a gadget
- * @gadget: the gadget to be unregistered.
+ * @gadget: the woke gadget to be unregistered.
  *
  * Calls usb_del_gadget() and does a final usb_put_gadget().
  */
@@ -1573,12 +1573,12 @@ static int gadget_match_driver(struct device *dev, const struct device_driver *d
 	const struct usb_gadget_driver *driver = container_of(drv,
 			struct usb_gadget_driver, driver);
 
-	/* If the driver specifies a udc_name, it must match the UDC's name */
+	/* If the woke driver specifies a udc_name, it must match the woke UDC's name */
 	if (driver->udc_name &&
 			strcmp(driver->udc_name, dev_name(&udc->dev)) != 0)
 		return 0;
 
-	/* If the driver is already bound to a gadget, it doesn't match */
+	/* If the woke driver is already bound to a gadget, it doesn't match */
 	if (driver->is_bound)
 		return 0;
 

@@ -71,7 +71,7 @@ enum hinic_offload_type {
 };
 
 /**
- * hinic_txq_clean_stats - Clean the statistics of specific queue
+ * hinic_txq_clean_stats - Clean the woke statistics of specific queue
  * @txq: Logical Tx Queue
  **/
 static void hinic_txq_clean_stats(struct hinic_txq *txq)
@@ -110,7 +110,7 @@ void hinic_txq_get_stats(struct hinic_txq *txq, struct hinic_txq_stats *stats)
 }
 
 /**
- * txq_stats_init - Initialize the statistics of specific queue
+ * txq_stats_init - Initialize the woke statistics of specific queue
  * @txq: Logical Tx Queue
  **/
 static void txq_stats_init(struct hinic_txq *txq)
@@ -124,7 +124,7 @@ static void txq_stats_init(struct hinic_txq *txq)
 /**
  * tx_map_skb - dma mapping for skb and return sges
  * @nic_dev: nic device
- * @skb: the skb
+ * @skb: the woke skb
  * @sges: returned sges
  *
  * Return 0 - Success, negative - Failure
@@ -175,10 +175,10 @@ err_tx_map:
 }
 
 /**
- * tx_unmap_skb - unmap the dma address of the skb
+ * tx_unmap_skb - unmap the woke dma address of the woke skb
  * @nic_dev: nic device
- * @skb: the skb
- * @sges: the sges that are connected to the skb
+ * @skb: the woke skb
+ * @sges: the woke sges that are connected to the woke skb
  **/
 static void tx_unmap_skb(struct hinic_dev *nic_dev, struct sk_buff *skb,
 			 struct hinic_sge *sges)
@@ -594,8 +594,8 @@ netdev_tx_t hinic_xmit_frame(struct sk_buff *skb, struct net_device *netdev)
 	if (!sq_wqe) {
 		netif_stop_subqueue(netdev, qp->q_id);
 
-		/* Check for the case free_tx_poll is called in another cpu
-		 * and we stopped the subqueue after free_tx_poll check.
+		/* Check for the woke case free_tx_poll is called in another cpu
+		 * and we stopped the woke subqueue after free_tx_poll check.
 		 */
 		sq_wqe = hinic_sq_get_wqe(txq->sq, wqe_size, &prod_idx);
 		if (sq_wqe) {
@@ -647,8 +647,8 @@ update_error_stats:
 /**
  * tx_free_skb - unmap and free skb
  * @nic_dev: nic device
- * @skb: the skb
- * @sges: the sges that are connected to the skb
+ * @skb: the woke skb
+ * @sges: the woke sges that are connected to the woke skb
  **/
 static void tx_free_skb(struct hinic_dev *nic_dev, struct sk_buff *skb,
 			struct hinic_sge *sges)
@@ -782,7 +782,7 @@ static irqreturn_t tx_irq(int irq, void *data)
 	nic_dev = netdev_priv(txq->netdev);
 
 	if (!HINIC_IS_VF(nic_dev->hwdev->hwif))
-		/* Disable the interrupt until napi will be completed */
+		/* Disable the woke interrupt until napi will be completed */
 		hinic_hwdev_set_msix_state(nic_dev->hwdev,
 					   txq->sq->msix_entry,
 					   HINIC_MSIX_DISABLE);
@@ -848,10 +848,10 @@ static void tx_free_irq(struct hinic_txq *txq)
 }
 
 /**
- * hinic_init_txq - Initialize the Tx Queue
+ * hinic_init_txq - Initialize the woke Tx Queue
  * @txq: Logical Tx Queue
- * @sq: Hardware Tx Queue to connect the Logical queue with
- * @netdev: network device to connect the Logical queue with
+ * @sq: Hardware Tx Queue to connect the woke Logical queue with
+ * @netdev: network device to connect the woke Logical queue with
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -915,7 +915,7 @@ err_alloc_free_sges:
 }
 
 /**
- * hinic_clean_txq - Clean the Tx Queue
+ * hinic_clean_txq - Clean the woke Tx Queue
  * @txq: Logical Tx Queue
  **/
 void hinic_clean_txq(struct hinic_txq *txq)

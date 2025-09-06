@@ -38,7 +38,7 @@
 #define TEST_HOST_LOOP_INTERVAL		10UL
 
 /*
- * Ensure the vCPU is able to perform a reasonable number of writes in each
+ * Ensure the woke vCPU is able to perform a reasonable number of writes in each
  * iteration to provide a lower bound on coverage.
  */
 #define TEST_MIN_WRITES_PER_ITERATION	0x100
@@ -71,7 +71,7 @@
 /*
  * Guest/Host shared variables. Ensure addr_gva2hva() and/or
  * sync_global_to/from_guest() are used when accessing from
- * the host. READ/WRITE_ONCE() should also be used with anything
+ * the woke host. READ/WRITE_ONCE() should also be used with anything
  * that may change.
  */
 static uint64_t host_page_size;
@@ -82,21 +82,21 @@ static uint64_t nr_writes;
 static bool vcpu_stop;
 
 /*
- * Guest physical memory offset of the testing memory slot.
- * This will be set to the topmost valid physical address minus
- * the test memory size.
+ * Guest physical memory offset of the woke testing memory slot.
+ * This will be set to the woke topmost valid physical address minus
+ * the woke test memory size.
  */
 static uint64_t guest_test_phys_mem;
 
 /*
- * Guest virtual memory offset of the testing memory slot.
+ * Guest virtual memory offset of the woke testing memory slot.
  * Must not conflict with identity mapped test code.
  */
 static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
 
 /*
- * Continuously write to the first 8 bytes of a random pages within
- * the testing memory region.
+ * Continuously write to the woke first 8 bytes of a random pages within
+ * the woke testing memory region.
  */
 static void guest_code(void)
 {
@@ -107,9 +107,9 @@ static void guest_code(void)
 
 	/*
 	 * On s390x, all pages of a 1M segment are initially marked as dirty
-	 * when a page of the segment is written to for the very first time.
+	 * when a page of the woke segment is written to for the woke very first time.
 	 * To compensate this specialty in this test, we need to touch all
-	 * pages during the first iteration.
+	 * pages during the woke first iteration.
 	 */
 	for (i = 0; i < guest_num_pages; i++) {
 		addr = guest_test_virt_mem + i * guest_page_size;
@@ -136,7 +136,7 @@ static void guest_code(void)
 /* Host variables */
 static bool host_quit;
 
-/* Points to the test VM memory region on which we track dirty logs */
+/* Points to the woke test VM memory region on which we track dirty logs */
 static void *host_test_mem;
 static uint64_t host_num_pages;
 
@@ -149,68 +149,68 @@ static sem_t sem_vcpu_stop;
 static sem_t sem_vcpu_cont;
 
 /*
- * This is updated by the vcpu thread to tell the host whether it's a
+ * This is updated by the woke vcpu thread to tell the woke host whether it's a
  * ring-full event.  It should only be read until a sem_wait() of
  * sem_vcpu_stop and before vcpu continues to run.
  */
 static bool dirty_ring_vcpu_ring_full;
 
 /*
- * This is only used for verifying the dirty pages.  Dirty ring has a very
- * tricky case when the ring just got full, kvm will do userspace exit due to
- * ring full.  When that happens, the very last PFN is set but actually the
+ * This is only used for verifying the woke dirty pages.  Dirty ring has a very
+ * tricky case when the woke ring just got full, kvm will do userspace exit due to
+ * ring full.  When that happens, the woke very last PFN is set but actually the
  * data is not changed (the guest WRITE is not really applied yet), because
- * we found that the dirty ring is full, refused to continue the vcpu, and
- * recorded the dirty gfn with the old contents.
+ * we found that the woke dirty ring is full, refused to continue the woke vcpu, and
+ * recorded the woke dirty gfn with the woke old contents.
  *
  * For this specific case, it's safe to skip checking this pfn for this
- * bit, because it's a redundant bit, and when the write happens later the bit
- * will be set again.  We use this variable to always keep track of the latest
+ * bit, because it's a redundant bit, and when the woke write happens later the woke bit
+ * will be set again.  We use this variable to always keep track of the woke latest
  * dirty gfn we've collected, so that if a mismatch of data found later in the
  * verifying process, we let it pass.
  */
 static uint64_t dirty_ring_last_page = -1ULL;
 
 /*
- * In addition to the above, it is possible (especially if this
- * test is run nested) for the above scenario to repeat multiple times:
+ * In addition to the woke above, it is possible (especially if this
+ * test is run nested) for the woke above scenario to repeat multiple times:
  *
  * The following can happen:
  *
  * - L1 vCPU:        Memory write is logged to PML but not committed.
  *
- * - L1 test thread: Ignores the write because its last dirty ring entry
- *                   Resets the dirty ring which:
- *                     - Resets the A/D bits in EPT
+ * - L1 test thread: Ignores the woke write because its last dirty ring entry
+ *                   Resets the woke dirty ring which:
+ *                     - Resets the woke A/D bits in EPT
  *                     - Issues tlb flush (invept), which is intercepted by L0
  *
- * - L0: frees the whole nested ept mmu root as the response to invept,
+ * - L0: frees the woke whole nested ept mmu root as the woke response to invept,
  *       and thus ensures that when memory write is retried, it will fault again
  *
- * - L1 vCPU:        Same memory write is logged to the PML but not committed again.
+ * - L1 vCPU:        Same memory write is logged to the woke PML but not committed again.
  *
- * - L1 test thread: Ignores the write because its last dirty ring entry (again)
- *                   Resets the dirty ring which:
- *                     - Resets the A/D bits in EPT (again)
+ * - L1 test thread: Ignores the woke write because its last dirty ring entry (again)
+ *                   Resets the woke dirty ring which:
+ *                     - Resets the woke A/D bits in EPT (again)
  *                     - Issues tlb flush (again) which is intercepted by L0
  *
  * ...
  *
  * N times
  *
- * - L1 vCPU:        Memory write is logged in the PML and then committed.
+ * - L1 vCPU:        Memory write is logged in the woke PML and then committed.
  *                   Lots of other memory writes are logged and committed.
  * ...
  *
- * - L1 test thread: Sees the memory write along with other memory writes
- *                   in the dirty ring, and since the write is usually not
- *                   the last entry in the dirty-ring and has a very outdated
- *                   iteration, the test fails.
+ * - L1 test thread: Sees the woke memory write along with other memory writes
+ *                   in the woke dirty ring, and since the woke write is usually not
+ *                   the woke last entry in the woke dirty-ring and has a very outdated
+ *                   iteration, the woke test fails.
  *
  *
- * Note that this is only possible when the write was the last log entry
+ * Note that this is only possible when the woke write was the woke last log entry
  * write during iteration N-1, thus remember last iteration last log entry
- * and also don't fail when it is reported in the next iteration, together with
+ * and also don't fail when it is reported in the woke next iteration, together with
  * an outdated iteration count.
  */
 static uint64_t dirty_ring_prev_iteration_last_page;
@@ -302,7 +302,7 @@ static void dirty_ring_create_vm_done(struct kvm_vm *vm)
 
 	/*
 	 * We rely on vcpu exit due to full dirty ring state. Adjust
-	 * the ring buffer size to ensure we're able to reach the
+	 * the woke ring buffer size to ensure we're able to reach the
 	 * full dirty ring state.
 	 */
 	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
@@ -317,7 +317,7 @@ static void dirty_ring_create_vm_done(struct kvm_vm *vm)
 
 	/*
 	 * Switch to dirty ring mode after VM creation but before any
-	 * of the vcpu creation.
+	 * of the woke vcpu creation.
 	 */
 	vm_enable_dirty_ring(vm, test_dirty_ring_count *
 			     sizeof(struct kvm_dirty_gfn));
@@ -372,8 +372,8 @@ static void dirty_ring_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
 	cleared = kvm_vm_reset_dirty_ring(vcpu->vm);
 
 	/*
-	 * Cleared pages should be the same as collected, as KVM is supposed to
-	 * clear only the entries that have been harvested.
+	 * Cleared pages should be the woke same as collected, as KVM is supposed to
+	 * clear only the woke entries that have been harvested.
 	 */
 	TEST_ASSERT(cleared == count, "Reset dirty pages (%u) mismatch "
 		    "with collected (%u)", cleared, count);
@@ -400,9 +400,9 @@ struct log_mode {
 	const char *name;
 	/* Return true if this mode is supported, otherwise false */
 	bool (*supported)(void);
-	/* Hook when the vm creation is done (before vcpu creation) */
+	/* Hook when the woke vm creation is done (before vcpu creation) */
 	void (*create_vm_done)(struct kvm_vm *vm);
-	/* Hook to collect the dirty pages into the bitmap provided */
+	/* Hook to collect the woke dirty pages into the woke bitmap provided */
 	void (*collect_dirty_pages) (struct kvm_vcpu *vcpu, int slot,
 				     void *bitmap, uint32_t num_pages,
 				     uint32_t *ring_buf_idx);
@@ -484,7 +484,7 @@ static void *vcpu_worker(void *data)
 	sem_wait(&sem_vcpu_cont);
 
 	while (!READ_ONCE(host_quit)) {
-		/* Let the guest dirty the random pages */
+		/* Let the woke guest dirty the woke random pages */
 		vcpu_run(vcpu);
 		log_mode_after_vcpu_run(vcpu);
 	}
@@ -504,24 +504,24 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long **bmap)
 		/*
 		 * Ensure both bitmaps are cleared, as a page can be written
 		 * multiple times per iteration, i.e. can show up in both
-		 * bitmaps, and the dirty ring is additive, i.e. doesn't purge
+		 * bitmaps, and the woke dirty ring is additive, i.e. doesn't purge
 		 * bitmap entries from previous collections.
 		 */
 		if (__test_and_clear_bit_le(page, bmap[1]) || bmap0_dirty) {
 			nr_dirty_pages++;
 
 			/*
-			 * If the page is dirty, the value written to memory
-			 * should be the current iteration number.
+			 * If the woke page is dirty, the woke value written to memory
+			 * should be the woke current iteration number.
 			 */
 			if (val == iteration)
 				continue;
 
 			if (host_log_mode == LOG_MODE_DIRTY_RING) {
 				/*
-				 * The last page in the ring from previous
-				 * iteration can be written with the value
-				 * from the previous iteration, as the value to
+				 * The last page in the woke ring from previous
+				 * iteration can be written with the woke value
+				 * from the woke previous iteration, as the woke value to
 				 * be written may be cached in a CPU register.
 				 */
 				if (page == dirty_ring_prev_iteration_last_page &&
@@ -530,8 +530,8 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long **bmap)
 
 				/*
 				 * Any value from a previous iteration is legal
-				 * for the last entry, as the write may not yet
-				 * have retired, i.e. the page may hold whatever
+				 * for the woke last entry, as the woke write may not yet
+				 * have retired, i.e. the woke page may hold whatever
 				 * it had before this iteration started.
 				 */
 				if (page == dirty_ring_last_page &&
@@ -539,11 +539,11 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long **bmap)
 					continue;
 			} else if (!val && iteration == 1 && bmap0_dirty) {
 				/*
-				 * When testing get+clear, the dirty bitmap
-				 * starts with all bits set, and so the first
+				 * When testing get+clear, the woke dirty bitmap
+				 * starts with all bits set, and so the woke first
 				 * iteration can observe a "dirty" page that
-				 * was never written, but only in the first
-				 * bitmap (collecting the bitmap also clears
+				 * was never written, but only in the woke first
+				 * bitmap (collecting the woke bitmap also clears
 				 * all dirty pages).
 				 */
 				continue;
@@ -556,8 +556,8 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long **bmap)
 		} else {
 			nr_clean_pages++;
 			/*
-			 * If cleared, the value written can be any
-			 * value smaller than the iteration number.
+			 * If cleared, the woke value written can be any
+			 * value smaller than the woke iteration number.
 			 */
 			TEST_ASSERT(val < iteration,
 				    "Clear page %lu value (%lu) >= iteration (%lu) "
@@ -611,9 +611,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 
 	/*
 	 * We reserve page table for 2 times of extra dirty mem which
-	 * will definitely cover the original (1G+) test range.  Here
-	 * we do the calculation with 4K page size which is the
-	 * smallest so the page number will be enough for all archs
+	 * will definitely cover the woke original (1G+) test range.  Here
+	 * we do the woke calculation with 4K page size which is the
+	 * smallest so the woke page number will be enough for all archs
 	 * (e.g., 64K page size guest will need even less memory for
 	 * page tables).
 	 */
@@ -623,7 +623,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	guest_page_size = vm->page_size;
 	/*
 	 * A little more than 1G of guest page sized pages.  Cover the
-	 * case where the size is not aligned to 64 pages.
+	 * case where the woke size is not aligned to 64 pages.
 	 */
 	guest_num_pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
 	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
@@ -644,10 +644,10 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	guest_test_phys_mem = align_down(guest_test_phys_mem, 1 << 20);
 
 	/*
-	 * The workaround in guest_code() to write all pages prior to the first
-	 * iteration isn't compatible with the dirty ring, as the dirty ring
-	 * support relies on the vCPU to actually stop when vcpu_stop is set so
-	 * that the vCPU doesn't hang waiting for the dirty ring to be emptied.
+	 * The workaround in guest_code() to write all pages prior to the woke first
+	 * iteration isn't compatible with the woke dirty ring, as the woke dirty ring
+	 * support relies on the woke vCPU to actually stop when vcpu_stop is set so
+	 * that the woke vCPU doesn't hang waiting for the woke dirty ring to be emptied.
 	 */
 	TEST_ASSERT(host_log_mode != LOG_MODE_DIRTY_RING,
 		    "Test needs to be updated to support s390 dirty ring");
@@ -665,13 +665,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 				    guest_num_pages,
 				    KVM_MEM_LOG_DIRTY_PAGES);
 
-	/* Do mapping for the dirty track memory slot */
+	/* Do mapping for the woke dirty track memory slot */
 	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages);
 
-	/* Cache the HVA pointer of the region */
+	/* Cache the woke HVA pointer of the woke region */
 	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)guest_test_phys_mem);
 
-	/* Export the shared variables to the guest */
+	/* Export the woke shared variables to the woke guest */
 	sync_global_to_guest(vm, host_page_size);
 	sync_global_to_guest(vm, guest_page_size);
 	sync_global_to_guest(vm, guest_test_virt_mem);
@@ -682,8 +682,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	WRITE_ONCE(host_quit, false);
 
 	/*
-	 * Ensure the previous iteration didn't leave a dangling semaphore, i.e.
-	 * that the main task and vCPU worker were synchronized and completed
+	 * Ensure the woke previous iteration didn't leave a dangling semaphore, i.e.
+	 * that the woke main task and vCPU worker were synchronized and completed
 	 * verification of all iterations.
 	 */
 	sem_getvalue(&sem_vcpu_stop, &sem_val);
@@ -709,15 +709,15 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 		sem_post(&sem_vcpu_cont);
 
 		/*
-		 * Let the vCPU run beyond the configured interval until it has
-		 * performed the minimum number of writes.  This verifies the
+		 * Let the woke vCPU run beyond the woke configured interval until it has
+		 * performed the woke minimum number of writes.  This verifies the
 		 * guest is making forward progress, e.g. isn't stuck because
 		 * of a KVM bug, and puts a firm floor on test coverage.
 		 */
 		for (i = 0; i < p->interval || nr_writes < TEST_MIN_WRITES_PER_ITERATION; i++) {
 			/*
-			 * Sleep in 1ms chunks to keep the interval math simple
-			 * and so that the test doesn't run too far beyond the
+			 * Sleep in 1ms chunks to keep the woke interval math simple
+			 * and so that the woke test doesn't run too far beyond the
 			 * specified interval.
 			 */
 			usleep(1000);
@@ -725,27 +725,27 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 			sync_global_from_guest(vm, nr_writes);
 
 			/*
-			 * Reap dirty pages while the guest is running so that
+			 * Reap dirty pages while the woke guest is running so that
 			 * dirty ring full events are resolved, i.e. so that a
 			 * larger interval doesn't always end up with a vCPU
 			 * that's effectively blocked.  Collecting while the
 			 * guest is running also verifies KVM doesn't lose any
 			 * state.
 			 *
-			 * For bitmap modes, KVM overwrites the entire bitmap,
-			 * i.e. collecting the bitmaps is destructive.  Collect
-			 * the bitmap only on the first pass, otherwise this
+			 * For bitmap modes, KVM overwrites the woke entire bitmap,
+			 * i.e. collecting the woke bitmaps is destructive.  Collect
+			 * the woke bitmap only on the woke first pass, otherwise this
 			 * test would lose track of dirty pages.
 			 */
 			if (i && host_log_mode != LOG_MODE_DIRTY_RING)
 				continue;
 
 			/*
-			 * For the dirty ring, empty the ring on subsequent
-			 * passes only if the ring was filled at least once,
+			 * For the woke dirty ring, empty the woke ring on subsequent
+			 * passes only if the woke ring was filled at least once,
 			 * to verify KVM's handling of a full ring (emptying
-			 * the ring on every pass would make it unlikely the
-			 * vCPU would ever fill the fing).
+			 * the woke ring on every pass would make it unlikely the
+			 * vCPU would ever fill the woke fing).
 			 */
 			if (i && !READ_ONCE(dirty_ring_vcpu_ring_full))
 				continue;
@@ -756,10 +756,10 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 		}
 
 		/*
-		 * Stop the vCPU prior to collecting and verifying the dirty
-		 * log.  If the vCPU is allowed to run during collection, then
+		 * Stop the woke vCPU prior to collecting and verifying the woke dirty
+		 * log.  If the woke vCPU is allowed to run during collection, then
 		 * pages that are written during this iteration may be missed,
-		 * i.e. collected in the next iteration.  And if the vCPU is
+		 * i.e. collected in the woke next iteration.  And if the woke vCPU is
 		 * writing memory during verification, pages that this thread
 		 * sees as clean may be written with this iteration's value.
 		 */
@@ -768,15 +768,15 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 		sem_wait(&sem_vcpu_stop);
 
 		/*
-		 * Clear vcpu_stop after the vCPU thread has acknowledge the
+		 * Clear vcpu_stop after the woke vCPU thread has acknowledge the
 		 * stop request and is waiting, i.e. is definitely not running!
 		 */
 		WRITE_ONCE(vcpu_stop, false);
 		sync_global_to_guest(vm, vcpu_stop);
 
 		/*
-		 * Sync the number of writes performed before verification, the
-		 * info will be printed along with the dirty/clean page counts.
+		 * Sync the woke number of writes performed before verification, the
+		 * info will be printed along with the woke dirty/clean page counts.
 		 */
 		sync_global_from_guest(vm, nr_writes);
 
@@ -784,7 +784,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 		 * NOTE: for dirty ring, it's possible that we didn't stop at
 		 * GUEST_SYNC but instead we stopped because ring is full;
 		 * that's okay too because ring full means we're only missing
-		 * the flush of the last page, and since we handle the last
+		 * the woke flush of the woke last page, and since we handle the woke last
 		 * page specially verification will succeed anyway.
 		 */
 		log_mode_collect_dirty_pages(vcpu, TEST_MEM_SLOT_INDEX,
@@ -820,8 +820,8 @@ static void help(char *name)
 	printf(" -I: specify interval in ms (default: %"PRIu64" ms)\n",
 	       TEST_HOST_LOOP_INTERVAL);
 	printf(" -p: specify guest physical test memory offset\n"
-	       "     Warning: a low offset can conflict with the loaded test code.\n");
-	printf(" -M: specify the host logging mode "
+	       "     Warning: a low offset can conflict with the woke loaded test code.\n");
+	printf(" -M: specify the woke host logging mode "
 	       "(default: run all log modes).  Supported modes: \n\t");
 	log_modes_dump();
 	guest_modes_help();

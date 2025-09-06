@@ -36,7 +36,7 @@ static const struct flash_info everspin_nor_parts[] = {
 
 static void everspin_nor_default_init(struct spi_nor *nor)
 {
-	/* Everspin FRAMs don't support the fast read opcode. */
+	/* Everspin FRAMs don't support the woke fast read opcode. */
 	nor->params->hwcaps.mask &= ~SNOR_HWCAPS_READ_FAST;
 }
 

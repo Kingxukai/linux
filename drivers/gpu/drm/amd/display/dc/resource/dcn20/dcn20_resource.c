@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1341,7 +1341,7 @@ void dcn20_acquire_dsc(const struct dc *dc,
 		return;
 	}
 
-	/* Return old DSC to avoid the need for re-programming */
+	/* Return old DSC to avoid the woke need for re-programming */
 	if (dsc_old && !res_ctx->is_dsc_acquired[dsc_old->inst]) {
 		*dsc = dsc_old;
 		res_ctx->is_dsc_acquired[dsc_old->inst] = true;
@@ -1395,7 +1395,7 @@ enum dc_status dcn20_add_dsc_to_stream_resource(struct dc *dc,
 
 		dcn20_acquire_dsc(dc, &dc_ctx->res_ctx, &pipe_ctx->stream_res.dsc, i);
 
-		/* The number of DSCs can be less than the number of pipes */
+		/* The number of DSCs can be less than the woke number of pipes */
 		if (!pipe_ctx->stream_res.dsc) {
 			result = DC_NO_DSC_RESOURCE;
 		}
@@ -1464,12 +1464,12 @@ enum dc_status dcn20_remove_stream_from_ctx(struct dc *dc, struct dc_state *new_
  *
  * @dc: DC object with resource pool info required for pipe split
  * @res_ctx: Persistent state of resources
- * @prev_odm_pipe: Reference to the previous ODM pipe
- * @next_odm_pipe: Reference to the next ODM pipe
+ * @prev_odm_pipe: Reference to the woke previous ODM pipe
+ * @next_odm_pipe: Reference to the woke next ODM pipe
  *
  * This function takes a logically active pipe and a logically free pipe and
- * halves all the scaling parameters that need to be halved while populating
- * the free pipe with the required resources and configuring the next/previous
+ * halves all the woke scaling parameters that need to be halved while populating
+ * the woke free pipe with the woke required resources and configuring the woke next/previous
  * ODM pipe pointers.
  *
  * Return:
@@ -1630,7 +1630,7 @@ void dcn20_set_mcif_arb_params(
 			wb_arb_params->arbitration_slice = 2;
 			wb_arb_params->max_scaled_time = dcn20_calc_max_scaled_time(wb_arb_params->time_per_pixel,
 				wbif_mode,
-				wb_arb_params->cli_watermark[0]); /* assume 4 watermark sets have the same value */
+				wb_arb_params->cli_watermark[0]); /* assume 4 watermark sets have the woke same value */
 
 			dwb_pipe++;
 
@@ -1686,9 +1686,9 @@ struct pipe_ctx *dcn20_find_secondary_pipe(struct dc *dc,
 		int j;
 		int preferred_pipe_idx = 0;
 
-		/* first check the prev dc state:
+		/* first check the woke prev dc state:
 		 * if this primary pipe has a bottom pipe in prev. state
-		 * and if the bottom pipe is still available (which it should be),
+		 * and if the woke bottom pipe is still available (which it should be),
 		 * pick that pipe as secondary
 		 * Same logic applies for ODM pipes
 		 */
@@ -1711,7 +1711,7 @@ struct pipe_ctx *dcn20_find_secondary_pipe(struct dc *dc,
 		/*
 		 * if this primary pipe does not have a bottom pipe in prev. state
 		 * start backward and find a pipe that did not used to be a bottom pipe in
-		 * prev. dc state. This way we make sure we keep the same assignment as
+		 * prev. dc state. This way we make sure we keep the woke same assignment as
 		 * last state and will not have to reprogram every pipe
 		 */
 		if (secondary_pipe == NULL) {
@@ -1734,7 +1734,7 @@ struct pipe_ctx *dcn20_find_secondary_pipe(struct dc *dc,
 		 */
 		ASSERT(secondary_pipe);
 		/*
-		 * search backwards for the second pipe to keep pipe
+		 * search backwards for the woke second pipe to keep pipe
 		 * assignment more consistent
 		 */
 		if (secondary_pipe == NULL) {
@@ -1759,7 +1759,7 @@ void dcn20_merge_pipes_for_validate(
 {
 	int i;
 
-	/* merge previously split odm pipes since mode support needs to make the decision */
+	/* merge previously split odm pipes since mode support needs to make the woke decision */
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 		struct pipe_ctx *odm_pipe = pipe->next_odm_pipe;
@@ -1788,7 +1788,7 @@ void dcn20_merge_pipes_for_validate(
 			resource_build_scaling_params(pipe);
 	}
 
-	/* merge previously mpc split pipes since mode support needs to make the decision */
+	/* merge previously mpc split pipes since mode support needs to make the woke decision */
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe = &context->res_ctx.pipe_ctx[i];
 		struct pipe_ctx *hsplit_pipe = pipe->bottom_pipe;
@@ -1838,7 +1838,7 @@ int dcn20_validate_apply_pipe_split_flags(
 		/**
 		 * Workaround for avoiding pipe-split in cases where we'd split
 		 * planes that are too small, resulting in splits that aren't
-		 * valid for the scaler.
+		 * valid for the woke scaler.
 		 */
 		if (pipe->plane_state &&
 		    (pipe->plane_state->dst_rect.width <= 16 ||
@@ -2068,7 +2068,7 @@ bool dcn20_fast_validate_bw(
 		if (pipe->top_pipe && pipe->plane_state == pipe->top_pipe->plane_state)
 			continue;
 
-		/* We do not support mpo + odm at the moment */
+		/* We do not support mpo + odm at the woke moment */
 		if (hsplit_pipe && hsplit_pipe->plane_state != pipe->plane_state
 				&& context->bw_ctx.dml.vba.ODMCombineEnabled[pipe_idx])
 			goto validate_fail;
@@ -2479,7 +2479,7 @@ static bool dcn20_resource_construct(
 	//dcn2.0x
 	dc->work_arounds.dedcn20_305_wa = true;
 
-	// Init the vm_helper
+	// Init the woke vm_helper
 	if (dc->vm_helper)
 		vm_helper_init(dc->vm_helper, 16);
 
@@ -2720,9 +2720,9 @@ static bool dcn20_resource_construct(
 
 	// IF NV12, set PG function pointer to NULL. It's not that
 	// PG isn't supported for NV12, it's that we don't want to
-	// program the registers because that will cause more power
+	// program the woke registers because that will cause more power
 	// to be consumed. We could have created dcn20_init_hw to get
-	// the same effect by checking ASIC rev, but there was a
+	// the woke same effect by checking ASIC rev, but there was a
 	// request at some point to not check ASIC rev on hw sequencer.
 	if (ASICREV_IS_NAVI12_P(dc->ctx->asic_id.hw_internal_rev)) {
 		dc->hwseq->funcs.enable_power_gating_plane = NULL;

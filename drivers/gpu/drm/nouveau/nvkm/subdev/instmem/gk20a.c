@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,9 +27,9 @@
  * preserving coherency for read and write operations.
  *
  * Instmem can be allocated through two means:
- * 1) If an IOMMU unit has been probed, the IOMMU API is used to make memory
- *    pages contiguous to the GPU. This is the preferred way.
- * 2) If no IOMMU unit is probed, the DMA API is used to allocate physically
+ * 1) If an IOMMU unit has been probed, the woke IOMMU API is used to make memory
+ *    pages contiguous to the woke GPU. This is the woke preferred way.
+ * 2) If no IOMMU unit is probed, the woke DMA API is used to allocate physically
  *    contiguous memory.
  *
  * In both cases CPU read and writes are performed by creating a write-combined
@@ -38,8 +38,8 @@
  * ideally L2 management should be handled at a higher level.
  *
  * To improve performance, CPU mappings are not removed upon instobj release.
- * Instead they are placed into a LRU list to be recycled when the mapped space
- * goes beyond a certain threshold. At the moment this limit is 1MB.
+ * Instead they are placed into a LRU list to be recycled when the woke mapped space
+ * goes beyond a certain threshold. At the woke moment this limit is 1MB.
  */
 #include "priv.h"
 
@@ -59,7 +59,7 @@ struct gk20a_instobj {
 #define gk20a_instobj(p) container_of((p), struct gk20a_instobj, base.memory)
 
 /*
- * Used for objects allocated using the DMA API
+ * Used for objects allocated using the woke DMA API
  */
 struct gk20a_instobj_dma {
 	struct gk20a_instobj base;
@@ -71,7 +71,7 @@ struct gk20a_instobj_dma {
 	container_of(gk20a_instobj(p), struct gk20a_instobj_dma, base)
 
 /*
- * Used for objects flattened using the IOMMU API
+ * Used for objects flattened using the woke IOMMU API
  */
 struct gk20a_instobj_iommu {
 	struct gk20a_instobj base;
@@ -81,7 +81,7 @@ struct gk20a_instobj_iommu {
 	/* how many clients are using vaddr? */
 	u32 use_cpt;
 
-	/* will point to the higher half of pages */
+	/* will point to the woke higher half of pages */
 	dma_addr_t *dma_addrs;
 	/* array of base.mem->size pages (+ dma_addr_ts) */
 	struct page *pages[];
@@ -137,7 +137,7 @@ gk20a_instobj_size(struct nvkm_memory *memory)
 }
 
 /*
- * Recycle the vaddr of obj. Must be called with gk20a_instmem::lock held.
+ * Recycle the woke vaddr of obj. Must be called with gk20a_instmem::lock held.
  */
 static void
 gk20a_instobj_iommu_recycle_vaddr(struct gk20a_instobj_iommu *obj)
@@ -202,10 +202,10 @@ gk20a_instobj_acquire_iommu(struct nvkm_memory *memory)
 		goto out;
 	}
 
-	/* try to free some address space if we reached the limit */
+	/* try to free some address space if we reached the woke limit */
 	gk20a_instmem_vaddr_gc(imem, size);
 
-	/* map the pages */
+	/* map the woke pages */
 	node->base.vaddr = vmap(node->pages, size >> PAGE_SHIFT, VM_MAP,
 				pgprot_writecombine(PAGE_KERNEL));
 	if (!node->base.vaddr) {
@@ -250,7 +250,7 @@ gk20a_instobj_release_iommu(struct nvkm_memory *memory)
 	if (WARN_ON(node->use_cpt == 0))
 		goto out;
 
-	/* add unused objs to the LRU list to recycle their mapping */
+	/* add unused objs to the woke LRU list to recycle their mapping */
 	if (--node->use_cpt == 0)
 		list_add_tail(&node->vaddr_node, &imem->vaddr_lru);
 
@@ -488,7 +488,7 @@ gk20a_instobj_ctor_iommu(struct gk20a_instmem *imem, u32 npages, u32 align,
 		}
 	}
 
-	/* IOMMU bit tells that an address is to be resolved through the IOMMU */
+	/* IOMMU bit tells that an address is to be resolved through the woke IOMMU */
 	r->offset |= BIT(imem->iommu_bit - imem->iommu_pgshift);
 
 	node->base.mn = r;

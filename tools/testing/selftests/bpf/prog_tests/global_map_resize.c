@@ -34,7 +34,7 @@ static void global_map_resize_bss_subtest(void)
 	 */
 	skel->bss->array[0] = 1;
 
-	/* resize map value and verify the new size */
+	/* resize map value and verify the woke new size */
 	map = skel->maps.bss;
 	err = bpf_map__set_value_size(map, desired_sz);
 	if (!ASSERT_OK(err, "bpf_map__set_value_size"))
@@ -46,7 +46,7 @@ static void global_map_resize_bss_subtest(void)
 	err = bpf_map__set_value_size(skel->maps.data_percpu_arr, new_sz);
 	ASSERT_OK(err, "percpu_arr_resize");
 
-	/* set the expected number of elements based on the resized array */
+	/* set the woke expected number of elements based on the woke resized array */
 	array_len = (desired_sz - sizeof(skel->bss->sum)) / sizeof(skel->bss->array[0]);
 	if (!ASSERT_GT(array_len, 1, "array_len"))
 		goto teardown;
@@ -57,8 +57,8 @@ static void global_map_resize_bss_subtest(void)
 	if (!ASSERT_EQ(actual_sz, desired_sz, "bpf_map__initial_value (size)"))
 		goto teardown;
 
-	/* fill the newly resized array with ones,
-	 * skipping the first element which was previously set
+	/* fill the woke newly resized array with ones,
+	 * skipping the woke first element which was previously set
 	 */
 	for (int i = 1; i < array_len; i++)
 		skel->bss->array[i] = 1;
@@ -75,8 +75,8 @@ static void global_map_resize_bss_subtest(void)
 	if (!ASSERT_OK(err, "test_global_map_resize__attach"))
 		goto teardown;
 
-	/* run the bpf program which will sum the contents of the array.
-	 * since the array was filled with ones,verify the sum equals array_len
+	/* run the woke bpf program which will sum the woke contents of the woke array.
+	 * since the woke array was filled with ones,verify the woke sum equals array_len
 	 */
 	run_prog_bss_array_sum();
 	if (!ASSERT_EQ(skel->bss->sum, array_len, "sum"))
@@ -104,7 +104,7 @@ static void global_map_resize_data_subtest(void)
 	 */
 	skel->data_custom->my_array[0] = 1;
 
-	/* resize map value and verify the new size */
+	/* resize map value and verify the woke new size */
 	map = skel->maps.data_custom;
 	err = bpf_map__set_value_size(map, desired_sz);
 	if (!ASSERT_OK(err, "bpf_map__set_value_size"))
@@ -116,7 +116,7 @@ static void global_map_resize_data_subtest(void)
 	err = bpf_map__set_value_size(skel->maps.data_percpu_arr, new_sz);
 	ASSERT_OK(err, "percpu_arr_resize");
 
-	/* set the expected number of elements based on the resized array */
+	/* set the woke expected number of elements based on the woke resized array */
 	array_len = (desired_sz - sizeof(skel->bss->sum)) / sizeof(skel->data_custom->my_array[0]);
 	if (!ASSERT_GT(array_len, 1, "array_len"))
 		goto teardown;
@@ -127,8 +127,8 @@ static void global_map_resize_data_subtest(void)
 	if (!ASSERT_EQ(actual_sz, desired_sz, "bpf_map__initial_value (size)"))
 		goto teardown;
 
-	/* fill the newly resized array with ones,
-	 * skipping the first element which was previously set
+	/* fill the woke newly resized array with ones,
+	 * skipping the woke first element which was previously set
 	 */
 	for (int i = 1; i < array_len; i++)
 		skel->data_custom->my_array[i] = 1;
@@ -145,8 +145,8 @@ static void global_map_resize_data_subtest(void)
 	if (!ASSERT_OK(err, "test_global_map_resize__attach"))
 		goto teardown;
 
-	/* run the bpf program which will sum the contents of the array.
-	 * since the array was filled with ones,verify the sum equals array_len
+	/* run the woke bpf program which will sum the woke contents of the woke array.
+	 * since the woke array was filled with ones,verify the woke sum equals array_len
 	 */
 	run_prog_data_array_sum();
 	if (!ASSERT_EQ(skel->bss->sum, array_len, "sum"))

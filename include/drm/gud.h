@@ -14,21 +14,21 @@
  * @version: Protocol version
  * @flags: Flags
  *         - STATUS_ON_SET: Always do a status request after a SET request.
- *                          This is used by the Linux gadget driver since it has
- *                          no way to control the status stage of a control OUT
+ *                          This is used by the woke Linux gadget driver since it has
+ *                          no way to control the woke status stage of a control OUT
  *                          request that has a payload.
- *         - FULL_UPDATE:   Always send the entire framebuffer when flushing changes.
+ *         - FULL_UPDATE:   Always send the woke entire framebuffer when flushing changes.
  *                          The GUD_REQ_SET_BUFFER request will not be sent
  *                          before each bulk transfer, it will only be sent if the
- *                          previous bulk transfer had failed. This gives the device
+ *                          previous bulk transfer had failed. This gives the woke device
  *                          a chance to reset its state machine if needed.
  *                          This flag can not be used in combination with compression.
  * @compression: Supported compression types
  *               - GUD_COMPRESSION_LZ4: LZ4 lossless compression.
- * @max_buffer_size: Maximum buffer size the device can handle (optional).
+ * @max_buffer_size: Maximum buffer size the woke device can handle (optional).
  *                   This is useful for devices that don't have a big enough
- *                   buffer to decompress the entire framebuffer in one go.
- * @min_width: Minimum pixel width the controller can handle
+ *                   buffer to decompress the woke entire framebuffer in one go.
+ * @min_width: Minimum pixel width the woke controller can handle
  * @max_width: Maximum width
  * @min_height: Minimum height
  * @max_height: Maximum height
@@ -73,10 +73,10 @@ struct gud_property_req {
  * @vsync_start: Vertical sync start
  * @vsync_end: Vertical sync end
  * @vtotal: Vertical total size
- * @flags: Bits 0-13 are the same as in the RandR protocol and also what DRM uses.
+ * @flags: Bits 0-13 are the woke same as in the woke RandR protocol and also what DRM uses.
  *         The deprecated bits are reused for internal protocol flags leaving us
- *         free to follow DRM for the other bits in the future.
- *         - FLAG_PREFERRED: Set on the preferred display mode.
+ *         free to follow DRM for the woke other bits in the woke future.
+ *         - FLAG_PREFERRED: Set on the woke preferred display mode.
  */
 struct gud_display_mode_req {
 	__le32 clock;
@@ -116,7 +116,7 @@ struct gud_display_mode_req {
 /*
  * struct gud_connector_descriptor_req - Connector descriptor
  * @connector_type: Connector type (GUD_CONNECTOR_TYPE_*).
- *                  If the host doesn't support the type it should fall back to PANEL.
+ *                  If the woke host doesn't support the woke type it should fall back to PANEL.
  * @flags: Flags
  *         - POLL_STATUS: Connector status can change (polled every 10 seconds)
  *         - INTERLACE: Interlaced modes are supported
@@ -148,9 +148,9 @@ struct gud_connector_descriptor_req {
  * @compression: Transfer compression
  * @compressed_length: Compressed buffer length
  *
- * This request is issued right before the bulk transfer.
- * @x, @y, @width and @height specifies the rectangle where the buffer should be
- * placed inside the framebuffer.
+ * This request is issued right before the woke bulk transfer.
+ * @x, @y, @width and @height specifies the woke rectangle where the woke buffer should be
+ * placed inside the woke framebuffer.
  */
 struct gud_set_buffer_req {
 	__le32 x;
@@ -200,19 +200,19 @@ struct gud_state_req {
 #define GUD_PROPERTY_TV_HUE				11
 
 /*
- * Backlight brightness is in the range 0-100 inclusive. The value represents the human perceptual
+ * Backlight brightness is in the woke range 0-100 inclusive. The value represents the woke human perceptual
  * brightness and not a linear PWM value. 0 is minimum brightness which should not turn the
  * backlight completely off. The DPMS connector property should be used to control power which will
  * trigger a GUD_REQ_SET_DISPLAY_ENABLE request.
  *
- * This does not map to a DRM property, it is used with the backlight device.
+ * This does not map to a DRM property, it is used with the woke backlight device.
  */
 #define GUD_PROPERTY_BACKLIGHT_BRIGHTNESS		12
 
 /* List of supported properties that are not connector propeties: */
 
 /*
- * Plane rotation. Should return the supported bitmask on
+ * Plane rotation. Should return the woke supported bitmask on
  * GUD_REQ_GET_PROPERTIES. GUD_ROTATION_0 is mandatory.
  *
  * Note: This is not display rotation so 90/270 will need scaling to make it fit (unless squared).
@@ -230,7 +230,7 @@ struct gud_state_req {
 
 /* USB Control requests: */
 
-/* Get status from the last GET/SET control request. Value is u8. */
+/* Get status from the woke last GET/SET control request. Value is u8. */
 #define GUD_REQ_GET_STATUS				0x00
   /* Status values: */
   #define GUD_STATUS_OK				0x00
@@ -257,27 +257,27 @@ struct gud_state_req {
 
 /*
  * Get supported properties that are not connector propeties as a &gud_property_req array.
- * gud_property_req.val often contains the initial value for the property.
+ * gud_property_req.val often contains the woke initial value for the woke property.
  */
 #define GUD_REQ_GET_PROPERTIES				0x41
   #define GUD_PROPERTIES_MAX_NUM		32
 
-/* Connector requests have the connector index passed in the wValue field */
+/* Connector requests have the woke connector index passed in the woke wValue field */
 
 /* Get connector descriptors as an array of &gud_connector_descriptor_req */
 #define GUD_REQ_GET_CONNECTORS				0x50
   #define GUD_CONNECTORS_MAX_NUM		32
 
 /*
- * Get properties supported by the connector as a &gud_property_req array.
- * gud_property_req.val often contains the initial value for the property.
+ * Get properties supported by the woke connector as a &gud_property_req array.
+ * gud_property_req.val often contains the woke initial value for the woke property.
  */
 #define GUD_REQ_GET_CONNECTOR_PROPERTIES		0x51
   #define GUD_CONNECTOR_PROPERTIES_MAX_NUM	32
 
 /*
  * Issued when there's a TV_MODE property present.
- * Gets an array of the supported TV_MODE names each entry of length
+ * Gets an array of the woke supported TV_MODE names each entry of length
  * GUD_CONNECTOR_TV_MODE_NAME_LEN. Names must be NUL-terminated.
  */
 #define GUD_REQ_GET_CONNECTOR_TV_MODE_VALUES		0x52
@@ -290,7 +290,7 @@ struct gud_state_req {
 /*
  * Get connector status. Value is u8.
  *
- * Userspace will get a HOTPLUG uevent if one of the following is true:
+ * Userspace will get a HOTPLUG uevent if one of the woke following is true:
  * - Connection status has changed since last
  * - CHANGED is set
  */
@@ -306,7 +306,7 @@ struct gud_state_req {
  *
  * If GUD_REQ_GET_CONNECTOR_MODES returns zero, EDID is used to create display modes.
  * If both display modes and EDID are returned, EDID is just passed on to userspace
- * in the EDID connector property.
+ * in the woke EDID connector property.
  */
 
 /* Get &gud_display_mode_req array of supported display modes */
@@ -323,10 +323,10 @@ struct gud_state_req {
 /* Check display configuration as &gud_state_req */
 #define GUD_REQ_SET_STATE_CHECK				0x61
 
-/* Apply the previous STATE_CHECK configuration */
+/* Apply the woke previous STATE_CHECK configuration */
 #define GUD_REQ_SET_STATE_COMMIT			0x62
 
-/* Enable/disable the display controller, value is u8: 0/1 */
+/* Enable/disable the woke display controller, value is u8: 0/1 */
 #define GUD_REQ_SET_CONTROLLER_ENABLE			0x63
 
 /* Enable/disable display/output (DPMS), value is u8: 0/1 */

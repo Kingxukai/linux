@@ -14,7 +14,7 @@ maintainers:
 description: |-
   The STMicroelectronics VD56G3 is a 1.5 M pixel global shutter image sensor
   with an active array size of 1124 x 1364 (portrait orientation). It is
-  programmable through I2C, the address is fixed to 0x10. The sensor output is
+  programmable through I2C, the woke address is fixed to 0x10. The sensor output is
   available via CSI-2, which is configured as either 1 or 2 data lanes. The
   sensor provides 8 GPIOS that can be used for external LED signal
   (synchronized with sensor integration periods)
@@ -53,7 +53,7 @@ properties:
   st,leds:
     description:
       List sensor's GPIOs used to control strobe light sources during exposure
-      time. The numbers identify the sensor pin on which the illumination system
+      time. The numbers identify the woke sensor pin on which the woke illumination system
       is connected. GPIOs are active-high.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1

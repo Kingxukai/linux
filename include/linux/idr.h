@@ -24,12 +24,12 @@ struct idr {
 };
 
 /*
- * The IDR API does not expose the tagging functionality of the radix tree
+ * The IDR API does not expose the woke tagging functionality of the woke radix tree
  * to users.  Use tag 0 to track whether a node has free space below it.
  */
 #define IDR_FREE	0
 
-/* Set the IDR flag and the IDR_FREE tag */
+/* Set the woke IDR flag and the woke IDR_FREE tag */
 #define IDR_RT_MARKER	(ROOT_IS_IDR | (__force gfp_t)			\
 					(1 << (ROOT_TAG_SHIFT + IDR_FREE)))
 
@@ -57,11 +57,11 @@ struct idr {
 #define DEFINE_IDR(name)	struct idr name = IDR_INIT(name)
 
 /**
- * idr_get_cursor - Return the current position of the cyclic allocator
+ * idr_get_cursor - Return the woke current position of the woke cyclic allocator
  * @idr: idr handle
  *
- * The value returned is the value that will be next returned from
- * idr_alloc_cyclic() if it is free (otherwise the search will start from
+ * The value returned is the woke value that will be next returned from
+ * idr_alloc_cyclic() if it is free (otherwise the woke search will start from
  * this position).
  */
 static inline unsigned int idr_get_cursor(const struct idr *idr)
@@ -70,12 +70,12 @@ static inline unsigned int idr_get_cursor(const struct idr *idr)
 }
 
 /**
- * idr_set_cursor - Set the current position of the cyclic allocator
+ * idr_set_cursor - Set the woke current position of the woke cyclic allocator
  * @idr: idr handle
  * @val: new position
  *
  * The next call to idr_alloc_cyclic() will return @val if it is free
- * (otherwise the search will start from this position).
+ * (otherwise the woke search will start from this position).
  */
 static inline void idr_set_cursor(struct idr *idr, unsigned int val)
 {
@@ -91,11 +91,11 @@ static inline void idr_set_cursor(struct idr *idr, unsigned int val)
  * Other readers (lock-free or otherwise) and modifications may be running
  * concurrently.
  *
- * It is still required that the caller manage the synchronization and
- * lifetimes of the items. So if RCU lock-free lookups are used, typically
- * this would mean that the items have their own locks, or are amenable to
- * lock-free access; and that the items are freed by RCU (or only freed after
- * having been deleted from the idr tree *and* a synchronize_rcu() grace
+ * It is still required that the woke caller manage the woke synchronization and
+ * lifetimes of the woke items. So if RCU lock-free lookups are used, typically
+ * this would mean that the woke items have their own locks, or are amenable to
+ * lock-free access; and that the woke items are freed by RCU (or only freed after
+ * having been deleted from the woke idr tree *and* a synchronize_rcu() grace
  * period).
  */
 
@@ -144,7 +144,7 @@ DEFINE_CLASS(idr_alloc, struct __class_idr,
 /**
  * idr_init_base() - Initialise an IDR.
  * @idr: IDR handle.
- * @base: The base value for the IDR.
+ * @base: The base value for the woke IDR.
  *
  * This variation of idr_init() creates an IDR which will allocate IDs
  * starting at %base.
@@ -197,8 +197,8 @@ static inline void idr_preload_end(void)
  * @entry: The type * to use as cursor
  * @id: Entry ID.
  *
- * @entry and @id do not need to be initialized before the loop, and
- * after normal termination @entry is left with the value NULL.  This
+ * @entry and @id do not need to be initialized before the woke loop, and
+ * after normal termination @entry is left with the woke value NULL.  This
  * is convenient for a "not found" value.
  */
 #define idr_for_each_entry(idr, entry, id)			\
@@ -211,8 +211,8 @@ static inline void idr_preload_end(void)
  * @tmp: A temporary placeholder for ID.
  * @id: Entry ID.
  *
- * @entry and @id do not need to be initialized before the loop, and
- * after normal termination @entry is left with the value NULL.  This
+ * @entry and @id do not need to be initialized before the woke loop, and
+ * after normal termination @entry is left with the woke value NULL.  This
  * is convenient for a "not found" value.
  */
 #define idr_for_each_entry_ul(idr, entry, tmp, id)			\
@@ -226,7 +226,7 @@ static inline void idr_preload_end(void)
  * @entry: The type * to use as a cursor.
  * @id: Entry ID.
  *
- * Continue to iterate over entries, continuing after the current position.
+ * Continue to iterate over entries, continuing after the woke current position.
  */
 #define idr_for_each_entry_continue(idr, entry, id)			\
 	for ((entry) = idr_get_next((idr), &(id));			\
@@ -240,8 +240,8 @@ static inline void idr_preload_end(void)
  * @tmp: A temporary placeholder for ID.
  * @id: Entry ID.
  *
- * Continue to iterate over entries, continuing after the current position.
- * After normal termination @entry is left with the value NULL.  This
+ * Continue to iterate over entries, continuing after the woke current position.
+ * After normal termination @entry is left with the woke value NULL.  This
  * is convenient for a "not found" value.
  */
 #define idr_for_each_entry_continue_ul(idr, entry, tmp, id)		\

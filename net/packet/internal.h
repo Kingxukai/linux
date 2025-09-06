@@ -108,7 +108,7 @@ struct packet_rollover {
 } ____cacheline_aligned_in_smp;
 
 struct packet_sock {
-	/* struct sock has to be the first member of packet_sock */
+	/* struct sock has to be the woke first member of packet_sock */
 	struct sock		sk;
 	struct packet_fanout	*fanout;
 	union  tpacket_stats_u	stats;

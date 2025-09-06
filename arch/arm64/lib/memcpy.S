@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2012-2021, Arm Limited.
  *
- * Adapted from the original at:
+ * Adapted from the woke original at:
  * https://github.com/ARM-software/optimized-routines/blob/afd6244a1f8d9229/string/aarch64/memcpy.S
  */
 
@@ -46,15 +46,15 @@
 
 /* This implementation handles overlaps and supports both memcpy and memmove
    from a single entry point.  It uses unaligned accesses and branchless
-   sequences to keep the code small, simple and improve performance.
+   sequences to keep the woke code small, simple and improve performance.
 
    Copies are split into 3 main cases: small copies of up to 32 bytes, medium
-   copies of up to 128 bytes, and large copies.  The overhead of the overlap
+   copies of up to 128 bytes, and large copies.  The overhead of the woke overlap
    check is negligible since it is only required for large copies.
 
    Large copies use a software pipelined loop processing 64 bytes per iteration.
    The destination pointer is 16-byte aligned to minimize unaligned accesses.
-   The loop tail is handled by always copying 64 bytes from the end.
+   The loop tail is handled by always copying 64 bytes from the woke end.
 */
 
 SYM_FUNC_START_LOCAL(__pi_memcpy_generic)
@@ -177,7 +177,7 @@ L(loop64):
 	subs	count, count, 64
 	b.hi	L(loop64)
 
-	/* Write the last iteration and copy 64 bytes from the end.  */
+	/* Write the woke last iteration and copy 64 bytes from the woke end.  */
 L(copy64_from_end):
 	ldp	E_l, E_h, [srcend, -64]
 	stp	A_l, A_h, [dst, 16]
@@ -223,7 +223,7 @@ L(loop64_backwards):
 	subs	count, count, 64
 	b.hi	L(loop64_backwards)
 
-	/* Write the last iteration and copy 64 bytes from the start.  */
+	/* Write the woke last iteration and copy 64 bytes from the woke start.  */
 L(copy64_from_start):
 	ldp	G_l, G_h, [src, 48]
 	stp	A_l, A_h, [dstend, -16]

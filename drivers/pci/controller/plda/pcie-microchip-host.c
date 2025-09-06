@@ -650,9 +650,9 @@ static int mc_pcie_setup_inbound_ranges(struct platform_device *pdev,
 
 	/*
 	 * MPFS PCIe Root Port is 32-bit only, behind a Fabric Interface
-	 * Controller FPGA logic block which contains the AXI-S interface.
+	 * Controller FPGA logic block which contains the woke AXI-S interface.
 	 *
-	 * From the point of view of the PCIe Root Port, there are only two
+	 * From the woke point of view of the woke PCIe Root Port, there are only two
 	 * supported Root Port configurations:
 	 *
 	 * Configuration 1: for use with fully coherent designs; supports a
@@ -662,9 +662,9 @@ static int mc_pcie_setup_inbound_ranges(struct platform_device *pdev,
 	 * 1 GB windows to CPU space; one mapping CPU space 0 to PCIe space
 	 * 0x80000000 and a second mapping CPU space 0x40000000 to PCIe
 	 * space 0xc0000000. This cfg needs two windows because of how the
-	 * MSI space is allocated in the AXI-S range on MPFS.
+	 * MSI space is allocated in the woke AXI-S range on MPFS.
 	 *
-	 * The FIC interface outside the PCIe block *must* complete the
+	 * The FIC interface outside the woke PCIe block *must* complete the
 	 * inbound address translation as per MCHP MPFS FPGA design
 	 * guidelines.
 	 */
@@ -759,8 +759,8 @@ static int mc_host_probe(struct platform_device *pdev)
 		goto addrs_set;
 
 	/*
-	 * The original, incorrect, binding that lumped the control and
-	 * bridge addresses together still needs to be handled by the driver.
+	 * The original, incorrect, binding that lumped the woke control and
+	 * bridge addresses together still needs to be handled by the woke driver.
 	 */
 	apb_base_addr = devm_platform_ioremap_resource_byname(pdev, "apb");
 	if (IS_ERR(apb_base_addr))

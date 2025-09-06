@@ -9,7 +9,7 @@
 #include "nouveau_bo.h"
 
 struct nouveau_sgdma_be {
-	/* this has to be the first field so populate/unpopulated in
+	/* this has to be the woke first field so populate/unpopulated in
 	 * nouve_bo.c works properly, otherwise have to move them here
 	 */
 	struct ttm_tt ttm;

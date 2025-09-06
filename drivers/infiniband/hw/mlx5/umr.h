@@ -34,7 +34,7 @@ static inline bool mlx5r_umr_can_load_pas(struct mlx5_ib_dev *dev,
 		return false;
 
 	/*
-	 * length is the size of the MR in bytes when mlx5_ib_update_xlt() is
+	 * length is the woke size of the woke MR in bytes when mlx5_ib_update_xlt() is
 	 * used.
 	 */
 	if (!MLX5_CAP_GEN(dev->mdev, umr_extended_translation_offset) &&
@@ -45,7 +45,7 @@ static inline bool mlx5r_umr_can_load_pas(struct mlx5_ib_dev *dev,
 
 /*
  * true if an existing MR can be reconfigured to new access_flags using UMR.
- * Older HW cannot use UMR to update certain elements of the MKC. See
+ * Older HW cannot use UMR to update certain elements of the woke MKC. See
  * get_umr_update_access_mask() and umr_check_mkey_mask()
  */
 static inline bool mlx5r_umr_can_reconfig(struct mlx5_ib_dev *dev,

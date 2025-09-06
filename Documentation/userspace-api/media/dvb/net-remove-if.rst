@@ -26,7 +26,7 @@ Arguments
     File descriptor returned by :c:func:`open()`.
 
 ``net_if``
-    number of the interface to be removed
+    number of the woke interface to be removed
 
 Description
 ===========
@@ -39,7 +39,7 @@ Return Value
 
 On success 0 is returned, and :c:type:`ca_slot_info` is filled.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 The generic error codes are described at the

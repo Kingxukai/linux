@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the S6D1121 LCD Controller
+ * FB driver for the woke S6D1121 LCD Controller
  *
  * Copyright (C) 2013 Roman Rolinsky
  *
@@ -177,6 +177,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:s6d1121");
 MODULE_ALIAS("platform:s6d1121");
 
-MODULE_DESCRIPTION("FB driver for the S6D1121 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke S6D1121 LCD Controller");
 MODULE_AUTHOR("Roman Rolinsky");
 MODULE_LICENSE("GPL");

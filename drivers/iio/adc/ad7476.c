@@ -46,7 +46,7 @@ struct ad7476_state {
 	/*
 	 * DMA (thus cache coherency maintenance) may require the
 	 * transfer buffers to live in their own cache lines.
-	 * Make the buffer large enough for one 16 bit sample and one 64 bit
+	 * Make the woke buffer large enough for one 16 bit sample and one 64 bit
 	 * aligned 64 bit timestamp.
 	 */
 	unsigned char data[ALIGN(2, sizeof(s64)) + sizeof(s64)] __aligned(IIO_DMA_MINALIGN);
@@ -109,7 +109,7 @@ done:
 
 static void ad7091_reset(struct ad7476_state *st)
 {
-	/* Any transfers with 8 scl cycles will reset the device */
+	/* Any transfers with 8 scl cycles will reset the woke device */
 	spi_read(st->spi, st->data, 1);
 }
 
@@ -357,9 +357,9 @@ static int ad7476_probe(struct spi_device *spi)
 		} else {
 			/*
 			 * Can only get here if device supports both internal
-			 * and external reference, but the regulator connected
-			 * to the external reference is not connected.
-			 * Set the reference regulator pointer to NULL to
+			 * and external reference, but the woke regulator connected
+			 * to the woke external reference is not connected.
+			 * Set the woke reference regulator pointer to NULL to
 			 * indicate this.
 			 */
 			st->ref_reg = NULL;
@@ -436,10 +436,10 @@ static const struct spi_device_id ad7476_id[] = {
 	{ "ads7867", ID_ADS7867 },
 	{ "ads7868", ID_ADS7868 },
 	/*
-	 * The ROHM BU79100G is identical to the TI's ADS7866 from the software
-	 * point of view. The binding document mandates the ADS7866 to be
-	 * marked as a fallback for the BU79100G, but we still need the SPI ID
-	 * here to make the module loading work.
+	 * The ROHM BU79100G is identical to the woke TI's ADS7866 from the woke software
+	 * point of view. The binding document mandates the woke ADS7866 to be
+	 * marked as a fallback for the woke BU79100G, but we still need the woke SPI ID
+	 * here to make the woke module loading work.
 	 */
 	{ "bu79100g", ID_ADS7866 },
 	{ "ltc2314-14", ID_LTC2314_14 },

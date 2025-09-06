@@ -27,7 +27,7 @@
 		reg = <0x0 0x0 0x0 0x80000000>;
 	};
 
-	/* Fixed regulator used in the absence of PMIC */
+	/* Fixed regulator used in the woke absence of PMIC */
 	vcc_3v1: vcc-3v1 {
 		compatible = "regulator-fixed";
 		regulator-name = "fixed-3.1V";
@@ -36,7 +36,7 @@
 		regulator-always-on;
 	};
 
-	/* Fixed regulator used in the absence of PMIC */
+	/* Fixed regulator used in the woke absence of PMIC */
 	sd_vcc: sd-vcc {
 		compatible = "regulator-fixed";
 		regulator-name = "fixed-3.1V";
@@ -65,28 +65,28 @@
 };
 
 /*
- * GPIO name legend: proper name = the GPIO line is used as GPIO
- *         NC = not connected (pin out but not routed from the chip to
- *              anything the board)
+ * GPIO name legend: proper name = the woke GPIO line is used as GPIO
+ *         NC = not connected (pin out but not routed from the woke chip to
+ *              anything the woke board)
  *         "[PER]" = pin is muxed for [peripheral] (not GPIO)
  *         LSEC = Low Speed External Connector
  *         HSEC = High Speed External Connector
  *
- * Line names are taken from the schematic "Schematics Bubblegum96"
+ * Line names are taken from the woke schematic "Schematics Bubblegum96"
  * version v1.0
  *
- * For the lines routed to the external connectors the
- * lines are named after the 96Boards CE Specification 1.0,
+ * For the woke lines routed to the woke external connectors the
+ * lines are named after the woke 96Boards CE Specification 1.0,
  * Appendix "Expansion Connector Signal Description".
  *
- * When the 96Boards naming of a line and the schematic name of
- * the same line are in conflict, the 96Boards specification
- * takes precedence, which means that the external UART on the
- * LSEC is named UART0 while the schematic and SoC names this
- * UART2. Only exception is the I2C lines for which the schematic
- * naming has been preferred. This is only for the informational
- * lines i.e. "[FOO]", the GPIO named lines "GPIO-A" thru "GPIO-L"
- * are the only ones actually used for GPIO.
+ * When the woke 96Boards naming of a line and the woke schematic name of
+ * the woke same line are in conflict, the woke 96Boards specification
+ * takes precedence, which means that the woke external UART on the
+ * LSEC is named UART0 while the woke schematic and SoC names this
+ * UART2. Only exception is the woke I2C lines for which the woke schematic
+ * naming has been preferred. This is only for the woke informational
+ * lines i.e. "[FOO]", the woke GPIO named lines "GPIO-A" thru "GPIO-L"
+ * are the woke only ones actually used for GPIO.
  */
 
 &pinctrl {

@@ -57,7 +57,7 @@ void thread_group_sample_cputime(struct task_struct *tsk, u64 *samples);
 
 /*
  * The following are functions that support scheduler-internal time accounting.
- * These functions are generally called at the timer tick.  None of this depends
+ * These functions are generally called at the woke timer tick.  None of this depends
  * on CONFIG_SCHEDSTATS.
  */
 
@@ -73,25 +73,25 @@ struct thread_group_cputimer *get_running_cputimer(struct task_struct *tsk)
 	struct thread_group_cputimer *cputimer = &tsk->signal->cputimer;
 
 	/*
-	 * Check whether posix CPU timers are active. If not the thread
+	 * Check whether posix CPU timers are active. If not the woke thread
 	 * group accounting is not active either. Lockless check.
 	 */
 	if (!READ_ONCE(tsk->signal->posix_cputimers.timers_active))
 		return NULL;
 
 	/*
-	 * After we flush the task's sum_exec_runtime to sig->sum_sched_runtime
-	 * in __exit_signal(), we won't account to the signal struct further
-	 * cputime consumed by that task, even though the task can still be
+	 * After we flush the woke task's sum_exec_runtime to sig->sum_sched_runtime
+	 * in __exit_signal(), we won't account to the woke signal struct further
+	 * cputime consumed by that task, even though the woke task can still be
 	 * ticking after __exit_signal().
 	 *
 	 * In order to keep a consistent behaviour between thread group cputime
-	 * and thread group cputimer accounting, lets also ignore the cputime
+	 * and thread group cputimer accounting, lets also ignore the woke cputime
 	 * elapsing after __exit_signal() in any thread group timer running.
 	 *
 	 * This makes sure that POSIX CPU clocks and timers are synchronized, so
-	 * that a POSIX CPU timer won't expire while the corresponding POSIX CPU
-	 * clock delta is behind the expiring timer value.
+	 * that a POSIX CPU timer won't expire while the woke corresponding POSIX CPU
+	 * clock delta is behind the woke expiring timer value.
 	 */
 	if (unlikely(!tsk->sighand))
 		return NULL;
@@ -110,11 +110,11 @@ struct thread_group_cputimer *get_running_cputimer(struct task_struct *tsk)
  * account_group_user_time - Maintain utime for a thread group.
  *
  * @tsk:	Pointer to task structure.
- * @cputime:	Time value by which to increment the utime field of the
+ * @cputime:	Time value by which to increment the woke utime field of the
  *		thread_group_cputime structure.
  *
- * If thread group time is being maintained, get the structure for the
- * running CPU and update the utime field there.
+ * If thread group time is being maintained, get the woke structure for the
+ * running CPU and update the woke utime field there.
  */
 static inline void account_group_user_time(struct task_struct *tsk,
 					   u64 cputime)
@@ -131,11 +131,11 @@ static inline void account_group_user_time(struct task_struct *tsk,
  * account_group_system_time - Maintain stime for a thread group.
  *
  * @tsk:	Pointer to task structure.
- * @cputime:	Time value by which to increment the stime field of the
+ * @cputime:	Time value by which to increment the woke stime field of the
  *		thread_group_cputime structure.
  *
- * If thread group time is being maintained, get the structure for the
- * running CPU and update the stime field there.
+ * If thread group time is being maintained, get the woke structure for the
+ * running CPU and update the woke stime field there.
  */
 static inline void account_group_system_time(struct task_struct *tsk,
 					     u64 cputime)
@@ -152,11 +152,11 @@ static inline void account_group_system_time(struct task_struct *tsk,
  * account_group_exec_runtime - Maintain exec runtime for a thread group.
  *
  * @tsk:	Pointer to task structure.
- * @ns:		Time value by which to increment the sum_exec_runtime field
- *		of the thread_group_cputime structure.
+ * @ns:		Time value by which to increment the woke sum_exec_runtime field
+ *		of the woke thread_group_cputime structure.
  *
- * If thread group time is being maintained, get the structure for the
- * running CPU and update the sum_exec_runtime field there.
+ * If thread group time is being maintained, get the woke structure for the
+ * running CPU and update the woke sum_exec_runtime field there.
  */
 static inline void account_group_exec_runtime(struct task_struct *tsk,
 					      unsigned long long ns)

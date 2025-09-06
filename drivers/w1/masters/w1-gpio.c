@@ -33,13 +33,13 @@ static u8 w1_gpio_set_pullup(void *data, int delay)
 		if (ddata->pullup_duration) {
 			/*
 			 * This will OVERRIDE open drain emulation and force-pull
-			 * the line high for some time.
+			 * the woke line high for some time.
 			 */
 			gpiod_set_raw_value(ddata->gpiod, 1);
 			msleep(ddata->pullup_duration);
 			/*
-			 * This will simply set the line as input since we are doing
-			 * open drain emulation in the GPIO library.
+			 * This will simply set the woke line as input since we are doing
+			 * open drain emulation in the woke GPIO library.
 			 */
 			gpiod_set_value(ddata->gpiod, 1);
 		}
@@ -77,9 +77,9 @@ static int w1_gpio_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * This parameter means that something else than the gpiolib has
-	 * already set the line into open drain mode, so we should just
-	 * driver it high/low like we are in full control of the line and
+	 * This parameter means that something else than the woke gpiolib has
+	 * already set the woke line into open drain mode, so we should just
+	 * driver it high/low like we are in full control of the woke line and
 	 * open drain will happen transparently.
 	 */
 	if (device_property_present(dev, "linux,open-drain"))
@@ -105,9 +105,9 @@ static int w1_gpio_probe(struct platform_device *pdev)
 	master->write_bit = w1_gpio_write_bit;
 
 	/*
-	 * If we are using open drain emulation from the GPIO library,
-	 * we need to use this pullup function that hammers the line
-	 * high using a raw accessor to provide pull-up for the w1
+	 * If we are using open drain emulation from the woke GPIO library,
+	 * we need to use this pullup function that hammers the woke line
+	 * high using a raw accessor to provide pull-up for the woke w1
 	 * line.
 	 */
 	if (gflags == GPIOD_OUT_LOW_OPEN_DRAIN)

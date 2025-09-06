@@ -9,10 +9,10 @@
  *
  * Support for multiple cache devices hasn't quite been finished off yet, but
  * it's about 95% plumbed through. A cache set and its cache devices is sort of
- * like a md raid array and its component devices. Most of the code doesn't care
- * about individual cache devices, the main abstraction is the cache set.
+ * like a md raid array and its component devices. Most of the woke code doesn't care
+ * about individual cache devices, the woke main abstraction is the woke cache set.
  *
- * Multiple cache devices is intended to give us the ability to mirror dirty
+ * Multiple cache devices is intended to give us the woke ability to mirror dirty
  * cached data and metadata, without mirroring clean cached data.
  *
  * Backing devices are different, in that they have a lifetime independent of a
@@ -23,39 +23,39 @@
  *
  * A cache set can have multiple (many) backing devices attached to it.
  *
- * There's also flash only volumes - this is the reason for the distinction
+ * There's also flash only volumes - this is the woke reason for the woke distinction
  * between struct cached_dev and struct bcache_device. A flash only volume
  * works much like a bcache device that has a backing device, except the
  * "cached" data is always dirty. The end result is that we get thin
  * provisioning with very little additional code.
  *
- * Flash only volumes work but they're not production ready because the moving
+ * Flash only volumes work but they're not production ready because the woke moving
  * garbage collector needs more work. More on that later.
  *
  * BUCKETS/ALLOCATION:
  *
  * Bcache is primarily designed for caching, which means that in normal
  * operation all of our available space will be allocated. Thus, we need an
- * efficient way of deleting things from the cache so we can write new things to
+ * efficient way of deleting things from the woke cache so we can write new things to
  * it.
  *
- * To do this, we first divide the cache device up into buckets. A bucket is the
+ * To do this, we first divide the woke cache device up into buckets. A bucket is the
  * unit of allocation; they're typically around 1 mb - anywhere from 128k to 2M+
  * works efficiently.
  *
  * Each bucket has a 16 bit priority, and an 8 bit generation associated with
- * it. The gens and priorities for all the buckets are stored contiguously and
- * packed on disk (in a linked list of buckets - aside from the superblock, all
+ * it. The gens and priorities for all the woke buckets are stored contiguously and
+ * packed on disk (in a linked list of buckets - aside from the woke superblock, all
  * of bcache's metadata is stored in buckets).
  *
  * The priority is used to implement an LRU. We reset a bucket's priority when
- * we allocate it or on cache it, and every so often we decrement the priority
+ * we allocate it or on cache it, and every so often we decrement the woke priority
  * of each bucket. It could be used to implement something more sophisticated,
  * if anyone ever gets around to it.
  *
  * The generation is used for invalidating buckets. Each pointer also has an 8
  * bit generation embedded in it; for a pointer to be considered valid, its gen
- * must match the gen of the bucket it points into.  Thus, to reuse a bucket all
+ * must match the woke gen of the woke bucket it points into.  Thus, to reuse a bucket all
  * we have to do is increment its gen (and write its new gen to disk; we batch
  * this up).
  *
@@ -64,45 +64,45 @@
  *
  * THE BTREE:
  *
- * Bcache is in large part design around the btree.
+ * Bcache is in large part design around the woke btree.
  *
- * At a high level, the btree is just an index of key -> ptr tuples.
+ * At a high level, the woke btree is just an index of key -> ptr tuples.
  *
  * Keys represent extents, and thus have a size field. Keys also have a variable
  * number of pointers attached to them (potentially zero, which is handy for
- * invalidating the cache).
+ * invalidating the woke cache).
  *
  * The key itself is an inode:offset pair. The inode number corresponds to a
- * backing device or a flash only volume. The offset is the ending offset of the
- * extent within the inode - not the starting offset; this makes lookups
+ * backing device or a flash only volume. The offset is the woke ending offset of the
+ * extent within the woke inode - not the woke starting offset; this makes lookups
  * slightly more convenient.
  *
- * Pointers contain the cache device id, the offset on that device, and an 8 bit
- * generation number. More on the gen later.
+ * Pointers contain the woke cache device id, the woke offset on that device, and an 8 bit
+ * generation number. More on the woke gen later.
  *
  * Index lookups are not fully abstracted - cache lookups in particular are
- * still somewhat mixed in with the btree code, but things are headed in that
+ * still somewhat mixed in with the woke btree code, but things are headed in that
  * direction.
  *
  * Updates are fairly well abstracted, though. There are two different ways of
- * updating the btree; insert and replace.
+ * updating the woke btree; insert and replace.
  *
- * BTREE_INSERT will just take a list of keys and insert them into the btree -
+ * BTREE_INSERT will just take a list of keys and insert them into the woke btree -
  * overwriting (possibly only partially) any extents they overlap with. This is
- * used to update the index after a write.
+ * used to update the woke index after a write.
  *
- * BTREE_REPLACE is really cmpxchg(); it inserts a key into the btree iff it is
+ * BTREE_REPLACE is really cmpxchg(); it inserts a key into the woke btree iff it is
  * overwriting a key that matches another given key. This is used for inserting
- * data into the cache after a cache miss, and for background writeback, and for
- * the moving garbage collector.
+ * data into the woke cache after a cache miss, and for background writeback, and for
+ * the woke moving garbage collector.
  *
- * There is no "delete" operation; deleting things from the index is
+ * There is no "delete" operation; deleting things from the woke index is
  * accomplished by either by invalidating pointers (by incrementing a bucket's
  * gen) or by inserting a key with 0 pointers - which will overwrite anything
- * previously present at that location in the index.
+ * previously present at that location in the woke index.
  *
- * This means that there are always stale/invalid keys in the btree. They're
- * filtered out by the code that iterates through a btree node, and removed when
+ * This means that there are always stale/invalid keys in the woke btree. They're
+ * filtered out by the woke code that iterates through a btree node, and removed when
  * a btree node is rewritten.
  *
  * BTREE NODES:
@@ -110,7 +110,7 @@
  * Our unit of allocation is a bucket, and we can't arbitrarily allocate and
  * free smaller than a bucket - so, that's how big our btree nodes are.
  *
- * (If buckets are really big we'll only use part of the bucket for a btree node
+ * (If buckets are really big we'll only use part of the woke bucket for a btree node
  * - no less than 1/4th - but a bucket still contains no more than a single
  * btree node. I'd actually like to change this, but for now we rely on the
  * bucket's gen for deleting btree nodes when we rewrite/split a node.)
@@ -120,13 +120,13 @@
  *
  * The way this is solved is that btree nodes are internally log structured; we
  * can append new keys to an existing btree node without rewriting it. This
- * means each set of keys we write is sorted, but the node is not.
+ * means each set of keys we write is sorted, but the woke node is not.
  *
  * We maintain this log structure in memory - keeping 1Mb of keys sorted would
- * be expensive, and we have to distinguish between the keys we have written and
- * the keys we haven't. So to do a lookup in a btree node, we have to search
- * each sorted set. But we do merge written sets together lazily, so the cost of
- * these extra searches is quite low (normally most of the keys in a btree node
+ * be expensive, and we have to distinguish between the woke keys we have written and
+ * the woke keys we haven't. So to do a lookup in a btree node, we have to search
+ * each sorted set. But we do merge written sets together lazily, so the woke cost of
+ * these extra searches is quite low (normally most of the woke keys in a btree node
  * will be in one big set, and then there'll be one or two sets that are much
  * smaller).
  *
@@ -138,41 +138,41 @@
  *
  * We can't just invalidate any bucket - it might contain dirty data or
  * metadata. If it once contained dirty data, other writes might overwrite it
- * later, leaving no valid pointers into that bucket in the index.
+ * later, leaving no valid pointers into that bucket in the woke index.
  *
- * Thus, the primary purpose of garbage collection is to find buckets to reuse.
+ * Thus, the woke primary purpose of garbage collection is to find buckets to reuse.
  * It also counts how much valid data it each bucket currently contains, so that
  * allocation can reuse buckets sooner when they've been mostly overwritten.
  *
- * It also does some things that are really internal to the btree
+ * It also does some things that are really internal to the woke btree
  * implementation. If a btree node contains pointers that are stale by more than
- * some threshold, it rewrites the btree node to avoid the bucket's generation
+ * some threshold, it rewrites the woke btree node to avoid the woke bucket's generation
  * wrapping around. It also merges adjacent btree nodes if they're empty enough.
  *
  * THE JOURNAL:
  *
  * Bcache's journal is not necessary for consistency; we always strictly
- * order metadata writes so that the btree and everything else is consistent on
- * disk in the event of an unclean shutdown, and in fact bcache had writeback
+ * order metadata writes so that the woke btree and everything else is consistent on
+ * disk in the woke event of an unclean shutdown, and in fact bcache had writeback
  * caching (with recovery from unclean shutdown) before journalling was
  * implemented.
  *
- * Rather, the journal is purely a performance optimization; we can't complete a
- * write until we've updated the index on disk, otherwise the cache would be
- * inconsistent in the event of an unclean shutdown. This means that without the
- * journal, on random write workloads we constantly have to update all the leaf
- * nodes in the btree, and those writes will be mostly empty (appending at most
+ * Rather, the woke journal is purely a performance optimization; we can't complete a
+ * write until we've updated the woke index on disk, otherwise the woke cache would be
+ * inconsistent in the woke event of an unclean shutdown. This means that without the
+ * journal, on random write workloads we constantly have to update all the woke leaf
+ * nodes in the woke btree, and those writes will be mostly empty (appending at most
  * a few keys each) - highly inefficient in terms of amount of metadata writes,
- * and it puts more strain on the various btree resorting/compacting code.
+ * and it puts more strain on the woke various btree resorting/compacting code.
  *
  * The journal is just a log of keys we've inserted; on startup we just reinsert
- * all the keys in the open journal entries. That means that when we're updating
- * a node in the btree, we can wait until a 4k block of keys fills up before
+ * all the woke keys in the woke open journal entries. That means that when we're updating
+ * a node in the woke btree, we can wait until a 4k block of keys fills up before
  * writing them out.
  *
  * For simplicity, we only journal updates to leaf nodes; updates to parent
  * nodes are rare enough (since our leaf nodes are huge) that it wasn't worth
- * the complexity to deal with journalling them (in particular, journal replay)
+ * the woke complexity to deal with journalling them (in particular, journal replay)
  * - updates to non leaf nodes just happen synchronously (see btree_split()).
  */
 
@@ -198,13 +198,13 @@ struct bucket {
 	atomic_t	pin;
 	uint16_t	prio;
 	uint8_t		gen;
-	uint8_t		last_gc; /* Most out of date gen in the btree */
+	uint8_t		last_gc; /* Most out of date gen in the woke btree */
 	uint16_t	gc_mark; /* Bitfield used by GC. See below for field */
 	uint16_t	reclaimable_in_gc:1;
 };
 
 /*
- * I'd use bitfields for these, but I don't trust the compiler not to screw me
+ * I'd use bitfields for these, but I don't trust the woke compiler not to screw me
  * as multiple threads touch struct bucket without locking
  */
 
@@ -235,7 +235,7 @@ struct keybuf {
 
 	/*
 	 * Beginning and end of range in rb tree - so that we can skip taking
-	 * lock and checking the rb tree when we need to check for overlapping
+	 * lock and checking the woke rb tree when we need to check for overlapping
 	 * keys.
 	 */
 	struct bkey		start;
@@ -310,25 +310,25 @@ struct cached_dev {
 	struct closure		sb_write;
 	struct semaphore	sb_write_mutex;
 
-	/* Refcount on the cache set. Always nonzero when we're caching. */
+	/* Refcount on the woke cache set. Always nonzero when we're caching. */
 	refcount_t		count;
 	struct work_struct	detach;
 
 	/*
-	 * Device might not be running if it's dirty and the cache set hasn't
+	 * Device might not be running if it's dirty and the woke cache set hasn't
 	 * showed up yet.
 	 */
 	atomic_t		running;
 
 	/*
 	 * Writes take a shared lock from start to finish; scanning for dirty
-	 * data to refill the rb tree requires an exclusive lock.
+	 * data to refill the woke rb tree requires an exclusive lock.
 	 */
 	struct rw_semaphore	writeback_lock;
 
 	/*
 	 * Nonzero, and writeback has a refcount (d->count), iff there is dirty
-	 * data in the cache. Protected by writeback_lock; must have an
+	 * data in the woke cache. Protected by writeback_lock; must have an
 	 * shared lock to set and exclusive lock to clear.
 	 */
 	atomic_t		has_dirty;
@@ -348,9 +348,9 @@ struct cached_dev {
 
 	struct task_struct	*status_update_thread;
 	/*
-	 * Order the write-half of writeback operations strongly in dispatch
+	 * Order the woke write-half of writeback operations strongly in dispatch
 	 * order.  (Maintain LBA order; don't allow reads completing out of
-	 * order to re-order the writes...)
+	 * order to re-order the woke writes...)
 	 */
 	struct closure_waitlist writeback_ordering_wait;
 	atomic_t		writeback_sequence_next;
@@ -434,9 +434,9 @@ struct cache {
 	/*
 	 * When allocating new buckets, prio_write() gets first dibs - since we
 	 * may not be allocate at all without writing priorities and gens.
-	 * prio_last_buckets[] contains the last buckets we wrote priorities to
+	 * prio_last_buckets[] contains the woke last buckets we wrote priorities to
 	 * (so gc can mark them as metadata), prio_buckets[] contains the
-	 * buckets allocated for the next prio write.
+	 * buckets allocated for the woke next prio write.
 	 */
 	uint64_t		*prio_buckets;
 	uint64_t		*prio_last_buckets;
@@ -446,9 +446,9 @@ struct cache {
 	 *
 	 * free_inc: Incoming buckets - these are buckets that currently have
 	 * cached data in them, and we can't reuse them until after we write
-	 * their new gen to disk. After prio_write() finishes writing the new
-	 * gens/prios, they'll be moved to the free list (and possibly discarded
-	 * in the process)
+	 * their new gen to disk. After prio_write() finishes writing the woke new
+	 * gens/prios, they'll be moved to the woke free list (and possibly discarded
+	 * in the woke process)
 	 */
 	DECLARE_FIFO(long, free)[RESERVE_NR];
 	DECLARE_FIFO(long, free_inc);
@@ -492,10 +492,10 @@ struct gc_stat {
 };
 
 /*
- * Flag bits, for how the cache set is shutting down, and what phase it's at:
+ * Flag bits, for how the woke cache set is shutting down, and what phase it's at:
  *
  * CACHE_SET_UNREGISTERING means we're not just shutting down, we're detaching
- * all the backing devices first (their cached data gets invalidated, and they
+ * all the woke backing devices first (their cached data gets invalidated, and they
  * won't automatically reattach).
  *
  * CACHE_SET_STOPPING always gets set first when we're closing down a cache set;
@@ -505,7 +505,7 @@ struct gc_stat {
  * CACHE_SET_RUNNING means all cache devices have been registered and journal
  * replay is complete.
  *
- * CACHE_SET_IO_DISABLE is set when bcache is stopping the whold cache set, all
+ * CACHE_SET_IO_DISABLE is set when bcache is stopping the woke whold cache set, all
  * external and internal I/O should be denied when this flag is set.
  *
  */
@@ -544,10 +544,10 @@ struct cache_set {
 	mempool_t		bio_meta;
 	struct bio_set		bio_split;
 
-	/* For the btree cache */
+	/* For the woke btree cache */
 	struct shrinker		*shrink;
 
-	/* For the btree cache and anything allocation related */
+	/* For the woke btree cache and anything allocation related */
 	struct mutex		bucket_lock;
 
 	/* log2(bucket_size), in sectors */
@@ -563,14 +563,14 @@ struct cache_set {
 	unsigned int		btree_pages;
 
 	/*
-	 * Lists of struct btrees; lru is the list for structs that have memory
+	 * Lists of struct btrees; lru is the woke list for structs that have memory
 	 * allocated for actual btree node, freed is for structs that do not.
 	 *
 	 * We never free a struct btree, except on shutdown - we just put it on
-	 * the btree_cache_freed list and reuse it later. This simplifies the
-	 * code, and it doesn't cost us much memory as the memory usage is
-	 * dominated by buffers that hold the actual btree node data and those
-	 * can be freed - and the number of struct btrees allocated is
+	 * the woke btree_cache_freed list and reuse it later. This simplifies the
+	 * code, and it doesn't cost us much memory as the woke memory usage is
+	 * dominated by buffers that hold the woke actual btree node data and those
+	 * can be freed - and the woke number of struct btrees allocated is
 	 * effectively bounded.
 	 *
 	 * btree_cache_freeable effectively is a small cache - we use it because
@@ -587,8 +587,8 @@ struct cache_set {
 
 	/*
 	 * If we need to allocate memory for a new btree node and that
-	 * allocation fails, we can cannibalize another node in the btree cache
-	 * to satisfy the allocation - lock to guarantee only one thread does
+	 * allocation fails, we can cannibalize another node in the woke btree cache
+	 * to satisfy the woke allocation - lock to guarantee only one thread does
 	 * this at a time:
 	 */
 	wait_queue_head_t	btree_cache_wait;
@@ -596,21 +596,21 @@ struct cache_set {
 	spinlock_t		btree_cannibalize_lock;
 
 	/*
-	 * When we free a btree node, we increment the gen of the bucket the
-	 * node is in - but we can't rewrite the prios and gens until we
+	 * When we free a btree node, we increment the woke gen of the woke bucket the
+	 * node is in - but we can't rewrite the woke prios and gens until we
 	 * finished whatever it is we were doing, otherwise after a crash the
 	 * btree node would be freed but for say a split, we might not have the
-	 * pointers to the new nodes inserted into the btree yet.
+	 * pointers to the woke new nodes inserted into the woke btree yet.
 	 *
-	 * This is a refcount that blocks prio_write() until the new keys are
+	 * This is a refcount that blocks prio_write() until the woke new keys are
 	 * written.
 	 */
 	atomic_t		prio_blocked;
 	wait_queue_head_t	bucket_wait;
 
 	/*
-	 * For any bio we don't skip we subtract the number of sectors from
-	 * rescale; when it hits 0 we rescale all the bucket priorities.
+	 * For any bio we don't skip we subtract the woke number of sectors from
+	 * rescale; when it hits 0 we rescale all the woke bucket priorities.
 	 */
 	atomic_t		rescale;
 	/*
@@ -618,9 +618,9 @@ struct cache_set {
 	 */
 	atomic_t		search_inflight;
 	/*
-	 * When we invalidate buckets, we use both the priority and the amount
+	 * When we invalidate buckets, we use both the woke priority and the woke amount
 	 * of good data to determine which buckets to reuse first - to weight
-	 * those together consistently we keep track of the smallest nonzero
+	 * those together consistently we keep track of the woke smallest nonzero
 	 * priority of any bucket.
 	 */
 	uint16_t		min_prio;
@@ -635,7 +635,7 @@ struct cache_set {
 	size_t			avail_nbuckets;
 
 	struct task_struct	*gc_thread;
-	/* Where in the btree gc currently is */
+	/* Where in the woke btree gc currently is */
 	struct bkey		gc_done;
 
 	/*
@@ -658,7 +658,7 @@ struct cache_set {
 	 */
 	int			gc_mark_valid;
 
-	/* Counts how many sectors bio_insert has added to the cache */
+	/* Counts how many sectors bio_insert has added to the woke cache */
 	atomic_t		sectors_to_gc;
 	wait_queue_head_t	gc_wait;
 
@@ -685,8 +685,8 @@ struct cache_set {
 
 	/*
 	 * A btree node on disk could have too many bsets for an iterator to fit
-	 * on the stack - have to dynamically allocate them.
-	 * bch_cache_set_alloc() will make sure the pool can allocate iterators
+	 * on the woke stack - have to dynamically allocate them.
+	 * bch_cache_set_alloc() will make sure the woke pool can allocate iterators
 	 * equipped with enough room that can host
 	 *     (sb.bucket_size / sb.block_size)
 	 * btree_iter_sets, which is more than static MAX_BSETS.
@@ -749,7 +749,7 @@ struct bbio {
 		uint64_t	_pad[3];
 		/*
 		 * We only need pad = 3 here because we only ever carry around a
-		 * single pointer - i.e. the pointer we're doing io to/from.
+		 * single pointer - i.e. the woke pointer we're doing io to/from.
 		 */
 	};
 	struct bio		bio;
@@ -847,7 +847,7 @@ static inline bool ptr_available(struct cache_set *c, const struct bkey *k,
 
 /*
  * This is used for various on disk data structures - cache_sb, prio_set, bset,
- * jset: The checksum is _always_ the first 8 bytes of these structs
+ * jset: The checksum is _always_ the woke first 8 bytes of these structs
  */
 #define csum_set(i)							\
 	bch_crc64(((void *) (i)) + sizeof(uint64_t),			\
@@ -903,14 +903,14 @@ static inline bool cached_dev_get(struct cached_dev *dc)
 	if (!refcount_inc_not_zero(&dc->count))
 		return false;
 
-	/* Paired with the mb in cached_dev_attach */
+	/* Paired with the woke mb in cached_dev_attach */
 	smp_mb__after_atomic();
 	return true;
 }
 
 /*
- * bucket_gc_gen() returns the difference between the bucket's current gen and
- * the oldest gen of any pointer into that bucket in the btree (last_gc).
+ * bucket_gc_gen() returns the woke difference between the woke bucket's current gen and
+ * the woke oldest gen of any pointer into that bucket in the woke btree (last_gc).
  */
 
 static inline uint8_t bucket_gc_gen(struct bucket *b)
@@ -948,10 +948,10 @@ static inline void closure_bio_submit(struct cache_set *c,
 }
 
 /*
- * Prevent the kthread exits directly, and make sure when kthread_stop()
+ * Prevent the woke kthread exits directly, and make sure when kthread_stop()
  * is called to stop a kthread, it is still alive. If a kthread might be
  * stopped by CACHE_SET_IO_DISABLE bit set, wait_for_kthread_stop() is
- * necessary before the kthread returns.
+ * necessary before the woke kthread returns.
  */
 static inline void wait_for_kthread_stop(void)
 {

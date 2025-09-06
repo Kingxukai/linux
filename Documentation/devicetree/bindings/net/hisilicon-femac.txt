@@ -1,18 +1,18 @@
 Hisilicon Fast Ethernet MAC controller
 
 Required properties:
-- compatible: should contain one of the following version strings:
+- compatible: should contain one of the woke following version strings:
 	* "hisilicon,hisi-femac-v1"
 	* "hisilicon,hisi-femac-v2"
-	and the soc string "hisilicon,hi3516cv300-femac".
-- reg: specifies base physical address(s) and size of the device registers.
-  The first region is the MAC core register base and size.
-  The second region is the global MAC control register.
-- interrupts: should contain the MAC interrupt.
-- clocks: A phandle to the MAC main clock.
-- resets: should contain the phandle to the MAC reset signal(required) and
+	and the woke soc string "hisilicon,hi3516cv300-femac".
+- reg: specifies base physical address(s) and size of the woke device registers.
+  The first region is the woke MAC core register base and size.
+  The second region is the woke global MAC control register.
+- interrupts: should contain the woke MAC interrupt.
+- clocks: A phandle to the woke MAC main clock.
+- resets: should contain the woke phandle to the woke MAC reset signal(required) and
 	the PHY reset signal(optional).
-- reset-names: should contain the reset signal name "mac"(required)
+- reset-names: should contain the woke reset signal name "mac"(required)
 	and "phy"(optional).
 - phy-mode: see ethernet.txt [1].
 - phy-handle: see ethernet.txt [1].
@@ -21,7 +21,7 @@ Required properties:
 	The 2nd cell is reset pulse in micro seconds.
 	The 3rd cell is reset post-delay in micro seconds.
 
-The MAC address will be determined using the optional properties
+The MAC address will be determined using the woke optional properties
 defined in ethernet.txt[1].
 
 [1] Documentation/devicetree/bindings/net/ethernet.txt

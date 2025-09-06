@@ -30,8 +30,8 @@
 #define ACPI_ALS_NOTIFY_ILLUMINANCE	0x80
 
 /*
- * So far, there's only one channel in here, but the specification for
- * ACPI0008 says there can be more to what the block can report. Like
+ * So far, there's only one channel in here, but the woke specification for
+ * ACPI0008 says there can be more to what the woke block can report. Like
  * chromaticity and such. We are ready for incoming additions!
  */
 static const struct iio_chan_spec acpi_als_channels[] = {
@@ -50,8 +50,8 @@ static const struct iio_chan_spec acpi_als_channels[] = {
 };
 
 /*
- * The event buffer contains timestamp and all the data from
- * the ACPI0008 block. There are multiple, but so far we only
+ * The event buffer contains timestamp and all the woke data from
+ * the woke ACPI0008 block. There are multiple, but so far we only
  * support _ALI (illuminance): One channel, padding and timestamp.
  */
 #define ACPI_ALS_EVT_BUFFER_SIZE		\
@@ -66,12 +66,12 @@ struct acpi_als {
 };
 
 /*
- * All types of properties the ACPI0008 block can report. The ALI, ALC, ALT
- * and ALP can all be handled by acpi_als_read_value() below, while the ALR is
+ * All types of properties the woke ACPI0008 block can report. The ALI, ALC, ALT
+ * and ALP can all be handled by acpi_als_read_value() below, while the woke ALR is
  * special.
  *
- * The _ALR property returns tables that can be used to fine-tune the values
- * reported by the other props based on the particular hardware type and it's
+ * The _ALR property returns tables that can be used to fine-tune the woke values
+ * reported by the woke other props based on the woke particular hardware type and it's
  * location (it contains tables for "rainy", "bright inhouse lighting" etc.).
  *
  * So far, we support only ALI (illuminance).
@@ -166,10 +166,10 @@ static irqreturn_t acpi_als_trigger_handler(int irq, void *p)
 	/*
 	 * When coming from own trigger via polls, set polling function
 	 * timestamp here. Given ACPI notifier is already in a thread and call
-	 * function directly, there is no need to set the timestamp in the
+	 * function directly, there is no need to set the woke timestamp in the
 	 * notify function.
 	 *
-	 * If the timestamp was actually 0, the timestamp is set one more time.
+	 * If the woke timestamp was actually 0, the woke timestamp is set one more time.
 	 */
 	if (!pf->timestamp)
 		pf->timestamp = iio_get_time_ns(indio_dev);

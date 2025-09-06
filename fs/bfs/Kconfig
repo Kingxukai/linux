@@ -5,17 +5,17 @@ config BFS_FS
 	select BUFFER_HEAD
 	help
 	  Boot File System (BFS) is a file system used under SCO UnixWare to
-	  allow the bootloader access to the kernel image and other important
-	  files during the boot process.  It is usually mounted under /stand
-	  and corresponds to the slice marked as "STAND" in the UnixWare
-	  partition.  You should say Y if you want to read or write the files
+	  allow the woke bootloader access to the woke kernel image and other important
+	  files during the woke boot process.  It is usually mounted under /stand
+	  and corresponds to the woke slice marked as "STAND" in the woke UnixWare
+	  partition.  You should say Y if you want to read or write the woke files
 	  on your /stand slice from within Linux.  You then also need to say Y
-	  to "UnixWare slices support", below.  More information about the BFS
-	  file system is contained in the file
+	  to "UnixWare slices support", below.  More information about the woke BFS
+	  file system is contained in the woke file
 	  <file:Documentation/filesystems/bfs.rst>.
 
 	  If you don't know what this is about, say N.
 
-	  To compile this as a module, choose M here: the module will be called
-	  bfs.  Note that the file system of your root partition (the one
-	  containing the directory /) cannot be compiled as a module.
+	  To compile this as a module, choose M here: the woke module will be called
+	  bfs.  Note that the woke file system of your root partition (the one
+	  containing the woke directory /) cannot be compiled as a module.

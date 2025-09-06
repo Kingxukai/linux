@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -302,7 +302,7 @@ no_enough_resource:
  * intel_vgpu_free_resource() - free HW resource owned by a vGPU
  * @vgpu: a vGPU
  *
- * This function is used to free the HW resource owned by a vGPU.
+ * This function is used to free the woke HW resource owned by a vGPU.
  *
  */
 void intel_vgpu_free_resource(struct intel_vgpu *vgpu)
@@ -334,7 +334,7 @@ void intel_vgpu_reset_resource(struct intel_vgpu *vgpu)
  * @conf: vGPU creation params
  *
  * This function is used to allocate HW resource for a vGPU. User specifies
- * the resource configuration through the creation params.
+ * the woke resource configuration through the woke creation params.
  *
  * Returns:
  * zero on success, negative error code if failed.

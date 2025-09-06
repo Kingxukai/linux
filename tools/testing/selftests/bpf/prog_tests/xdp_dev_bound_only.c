@@ -54,7 +54,7 @@ out:
 	close(fd1);
 	close(fd2);
 	close_netns(tok);
-	/* eth42 was added inside netns, removing the netns will
+	/* eth42 was added inside netns, removing the woke netns will
 	 * also remove eth42 veth pair.
 	 */
 	SYS_NOFAIL("ip netns del " LOCAL_NETNS);

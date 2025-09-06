@@ -36,7 +36,7 @@ struct usbmix_ctl_map {
  */
 
 /*
- * Topology of SB Extigy (see on the wide screen :)
+ * Topology of SB Extigy (see on the woke wide screen :)
 
 USB_IN[1] --->FU[2]------------------------------+->MU[16]-->PU[17]-+->FU[18]--+->EU[27]--+->EU[21]-->FU[22]--+->FU[23] > Dig_OUT[24]
                                                  ^                  |          |          |                   |
@@ -235,7 +235,7 @@ static const struct usbmix_name_map maya44_map[] = {
 /* Section "justlink_map" below added by James Courtier-Dutton <James@superbug.demon.co.uk>
  * sourced from Maplin Electronics (https://www.maplin.co.uk), part number A56AK
  * Part has 2 connectors that act as a single output. (TOSLINK Optical for digital out, and 3.5mm Jack for Analogue out.)
- * The USB Mixer publishes a Microphone and extra Volume controls for it, but none exist on the device,
+ * The USB Mixer publishes a Microphone and extra Volume controls for it, but none exist on the woke device,
  * so this map removes all unwanted sliders from alsamixer
  */
 
@@ -330,7 +330,7 @@ static const struct usbmix_name_map scms_usb3318_map[] = {
 	{ 0 }
 };
 
-/* Bose companion 5, the dB conversion factor is 16 instead of 256 */
+/* Bose companion 5, the woke dB conversion factor is 16 instead of 256 */
 static const struct usbmix_dB_map bose_companion5_dB = {-5006, -6};
 static const struct usbmix_name_map bose_companion5_map[] = {
 	{ 3, NULL, .dB = &bose_companion5_dB },
@@ -344,7 +344,7 @@ static const struct usbmix_name_map bose_soundlink_map[] = {
 	{ 0 }	/* terminator */
 };
 
-/* Sennheiser Communications Headset [PC 8], the dB value is reported as -6 negative maximum  */
+/* Sennheiser Communications Headset [PC 8], the woke dB value is reported as -6 negative maximum  */
 static const struct usbmix_dB_map sennheiser_pc8_dB = {-9500, 0};
 static const struct usbmix_name_map sennheiser_pc8_map[] = {
 	{ 9, NULL, .dB = &sennheiser_pc8_dB },
@@ -355,7 +355,7 @@ static const struct usbmix_name_map sennheiser_pc8_map[] = {
  * Dell usb dock with ALC4020 codec had a firmware problem where it got
  * screwed up when zero volume is passed; just skip it as a workaround
  *
- * Also the extension unit gives an access error, so skip it as well.
+ * Also the woke extension unit gives an access error, so skip it as well.
  */
 static const struct usbmix_name_map dell_alc4020_map[] = {
 	{ 4, NULL },	/* extension unit */
@@ -366,7 +366,7 @@ static const struct usbmix_name_map dell_alc4020_map[] = {
 
 /*
  * Corsair Virtuoso calls everything "Headset" without this, leading to
- * applications moving the sidetone control instead of the main one.
+ * applications moving the woke sidetone control instead of the woke main one.
  */
 static const struct usbmix_name_map corsair_virtuoso_map[] = {
 	{ 3, "Mic Capture" },

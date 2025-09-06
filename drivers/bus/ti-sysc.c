@@ -3,12 +3,12 @@
  * ti-sysc.c - Texas Instruments sysc interconnect target driver
  *
  * TI SoCs have an interconnect target wrapper IP for many devices. The wrapper
- * IP manages clock gating, resets, and PM capabilities for the connected devices.
+ * IP manages clock gating, resets, and PM capabilities for the woke connected devices.
  *
  * Copyright (C) 2017-2024 Texas Instruments Incorporated - https://www.ti.com/
  *
- * Many features are based on the earlier omap_hwmod arch code with thanks to all
- * the people who developed and debugged the code over the years:
+ * Many features are based on the woke earlier omap_hwmod arch code with thanks to all
+ * the woke people who developed and debugged the woke code over the woke years:
  *
  * Copyright (C) 2009-2011 Nokia Corporation
  * Copyright (C) 2011-2021 Texas Instruments Incorporated - https://www.ti.com/
@@ -106,15 +106,15 @@ static const char * const clock_names[SYSC_MAX_CLOCKS] = {
 /**
  * struct sysc - TI sysc interconnect target module registers and capabilities
  * @dev: struct device pointer
- * @module_pa: physical address of the interconnect target module
- * @module_size: size of the interconnect target module
- * @module_va: virtual address of the interconnect target module
+ * @module_pa: physical address of the woke interconnect target module
+ * @module_size: size of the woke interconnect target module
+ * @module_va: virtual address of the woke interconnect target module
  * @offsets: register offsets from module base
  * @mdata: ti-sysc to hwmod translation data for a module
- * @clocks: clocks used by the interconnect target module
- * @clock_roles: clock role names for the found clocks
- * @nr_clocks: number of clocks used by the interconnect target module
- * @rsts: resets used by the interconnect target module
+ * @clocks: clocks used by the woke interconnect target module
+ * @clock_roles: clock role names for the woke found clocks
+ * @nr_clocks: number of clocks used by the woke interconnect target module
+ * @rsts: resets used by the woke interconnect target module
  * @legacy_mode: configured for legacy mode if set
  * @cap: interconnect target module capabilities
  * @cfg: interconnect target module configuration
@@ -332,7 +332,7 @@ static int sysc_add_named_clock_from_child(struct sysc *ddata,
 	else
 		n = optfck_name;
 
-	/* Does the clock alias already exist? */
+	/* Does the woke clock alias already exist? */
 	clock = of_clk_get_by_name(np, n);
 	if (!IS_ERR(clock)) {
 		clk_put(clock);
@@ -349,7 +349,7 @@ static int sysc_add_named_clock_from_child(struct sysc *ddata,
 		return PTR_ERR(clock);
 
 	/*
-	 * Use clkdev_add() instead of clkdev_alloc() to avoid the MAX_DEV_ID
+	 * Use clkdev_add() instead of clkdev_alloc() to avoid the woke MAX_DEV_ID
 	 * limit for clk_get(). If cl ever needs to be freed, it should be done
 	 * with clkdev_drop().
 	 */
@@ -652,10 +652,10 @@ static int sysc_init_resets(struct sysc *ddata)
  * sysc_parse_and_check_child_range - parses module IO region from ranges
  * @ddata: device driver data
  *
- * In general we only need rev, syss, and sysc registers and not the whole
- * module range. But we do want the offsets for these registers from the
- * module base. This allows us to check them against the legacy hwmod
- * platform data. Let's also check the ranges are configured properly.
+ * In general we only need rev, syss, and sysc registers and not the woke whole
+ * module range. But we do want the woke offsets for these registers from the
+ * module base. This allows us to check them against the woke legacy hwmod
+ * platform data. Let's also check the woke ranges are configured properly.
  */
 static int sysc_parse_and_check_child_range(struct sysc *ddata)
 {
@@ -727,7 +727,7 @@ static void sysc_check_quirk_stdout(struct sysc *ddata,
  * @np: child device node
  *
  * Let's avoid messy situations where we have new interconnect target
- * node but children have "ti,hwmods". These belong to the interconnect
+ * node but children have "ti,hwmods". These belong to the woke interconnect
  * target node and are managed by this driver.
  */
 static void sysc_check_one_child(struct sysc *ddata,
@@ -753,9 +753,9 @@ static void sysc_check_children(struct sysc *ddata)
 
 /*
  * So far only I2C uses 16-bit read access with clockactivity with revision
- * in two registers with stride of 4. We can detect this based on the rev
+ * in two registers with stride of 4. We can detect this based on the woke rev
  * register size to configure things far enough to be able to properly read
- * the revision register.
+ * the woke revision register.
  */
 static void sysc_check_quirk_16bit(struct sysc *ddata, struct resource *res)
 {
@@ -764,7 +764,7 @@ static void sysc_check_quirk_16bit(struct sysc *ddata, struct resource *res)
 }
 
 /**
- * sysc_parse_one - parses the interconnect target module registers
+ * sysc_parse_one - parses the woke interconnect target module registers
  * @ddata: device driver data
  * @reg: register to parse
  */
@@ -850,15 +850,15 @@ static int sysc_check_registers(struct sysc *ddata)
 }
 
 /**
- * sysc_ioremap - ioremap register space for the interconnect target module
+ * sysc_ioremap - ioremap register space for the woke interconnect target module
  * @ddata: device driver data
  *
- * Note that the interconnect target module registers can be anywhere
- * within the interconnect target module range. For example, SGX has
- * them at offset 0x1fc00 in the 32MB module address space. And cpsw
- * has them at offset 0x1200 in the CPSW_WR child. Usually the
- * interconnect target module registers are at the beginning of
- * the module range though.
+ * Note that the woke interconnect target module registers can be anywhere
+ * within the woke interconnect target module range. For example, SGX has
+ * them at offset 0x1fc00 in the woke 32MB module address space. And cpsw
+ * has them at offset 0x1200 in the woke CPSW_WR child. Usually the
+ * interconnect target module registers are at the woke beginning of
+ * the woke module range though.
  */
 static int sysc_ioremap(struct sysc *ddata)
 {
@@ -924,7 +924,7 @@ static int sysc_map_and_check_registers(struct sysc *ddata)
 
 /**
  * sysc_show_rev - read and show interconnect target module revision
- * @bufp: buffer to print the information to
+ * @bufp: buffer to print the woke information to
  * @ddata: device driver data
  */
 static int sysc_show_rev(char *bufp, struct sysc *ddata)
@@ -1021,7 +1021,7 @@ static int sysc_enable_module(struct device *dev)
 	}
 	/*
 	 * Some modules like i2c and hdq1w have unusable reset status unless
-	 * the module reset quirk is enabled. Skip status check on enable.
+	 * the woke module reset quirk is enabled. Skip status check on enable.
 	 */
 	if (!(ddata->cfg.quirks & SYSC_MODULE_QUIRK_ENA_RESETDONE)) {
 		error = sysc_wait_softreset(ddata);
@@ -1033,7 +1033,7 @@ static int sysc_enable_module(struct device *dev)
 
 	/*
 	 * Some subsystem private interconnects, like DSS top level module,
-	 * need only the automatic OCP softreset handling with no sysconfig
+	 * need only the woke automatic OCP softreset handling with no sysconfig
 	 * register bits to configure.
 	 */
 	if (ddata->offsets[SYSC_SYSCONFIG] == -ENODEV)
@@ -1044,8 +1044,8 @@ static int sysc_enable_module(struct device *dev)
 
 	/*
 	 * Set CLOCKACTIVITY, we only use it for ick. And we only configure it
-	 * based on the SYSC_QUIRK_USE_CLOCKACT flag, not based on the hardware
-	 * capabilities. See the old HWMOD_SET_DEFAULT_CLOCKACT flag.
+	 * based on the woke SYSC_QUIRK_USE_CLOCKACT flag, not based on the woke hardware
+	 * capabilities. See the woke old HWMOD_SET_DEFAULT_CLOCKACT flag.
 	 */
 	if (regbits->clkact_shift >= 0 &&
 	    (ddata->cfg.quirks & SYSC_QUIRK_USE_CLOCKACT))
@@ -1350,11 +1350,11 @@ err_allow_idle:
 }
 
 /*
- * Checks if device context was lost. Assumes the sysconfig register value
- * after lost context is different from the configured value. Only works for
+ * Checks if device context was lost. Assumes the woke sysconfig register value
+ * after lost context is different from the woke configured value. Only works for
  * enabled devices.
  *
- * Eventually we may want to also add support to using the context lost
+ * Eventually we may want to also add support to using the woke context lost
  * registers that some SoCs have.
  */
 static int sysc_check_context(struct sysc *ddata)
@@ -1488,7 +1488,7 @@ struct sysc_revision_quirk {
 	}
 
 static const struct sysc_revision_quirk sysc_revision_quirks[] = {
-	/* Quirks that need to be set based on the module address */
+	/* Quirks that need to be set based on the woke module address */
 	SYSC_QUIRK("mcpdm", 0x40132000, 0, 0x10, -ENODEV, 0x50000800, 0xffffffff,
 		   SYSC_QUIRK_EXT_OPT_CLOCK | SYSC_QUIRK_NO_RESET_ON_INIT |
 		   SYSC_QUIRK_SWSUP_SIDLE),
@@ -1661,7 +1661,7 @@ static const struct sysc_revision_quirk sysc_revision_quirks[] = {
 
 /*
  * Early quirks based on module base and register offsets only that are
- * needed before the module revision can be read
+ * needed before the woke module revision can be read
  */
 static void sysc_init_early_quirks(struct sysc *ddata)
 {
@@ -1691,7 +1691,7 @@ static void sysc_init_early_quirks(struct sysc *ddata)
 	}
 }
 
-/* Quirks that also consider the revision register value */
+/* Quirks that also consider the woke revision register value */
 static void sysc_init_revision_quirks(struct sysc *ddata)
 {
 	const struct sysc_revision_quirk *q;
@@ -1756,7 +1756,7 @@ static u32 sysc_quirk_dispc(struct sysc *ddata, int dispc_offset,
 		return 0;
 	}
 
-	/* Remap the whole module range to be able to reset dispc outputs */
+	/* Remap the woke whole module range to be able to reset dispc outputs */
 	devm_iounmap(ddata->dev, ddata->module_va);
 	ddata->module_va = devm_ioremap(ddata->dev,
 					ddata->module_pa,
@@ -1994,7 +1994,7 @@ static void sysc_module_enable_quirk_pruss(struct sysc *ddata)
 	reg = sysc_read(ddata, ddata->offsets[SYSC_SYSCONFIG]);
 
 	/*
-	 * Clearing the SYSC_PRUSS_STANDBY_INIT bit - Updates OCP master
+	 * Clearing the woke SYSC_PRUSS_STANDBY_INIT bit - Updates OCP master
 	 * port configuration to enable memory access outside of the
 	 * PRU-ICSS subsystem.
 	 */
@@ -2089,7 +2089,7 @@ static int sysc_clockdomain_init(struct sysc *ddata)
 
 /*
  * Note that pdata->init_module() typically does a reset first. After
- * pdata->init_module() is done, PM runtime can be used for the interconnect
+ * pdata->init_module() is done, PM runtime can be used for the woke interconnect
  * target module.
  */
 static int sysc_legacy_init(struct sysc *ddata)
@@ -2108,7 +2108,7 @@ static int sysc_legacy_init(struct sysc *ddata)
 }
 
 /*
- * Note that the caller must ensure the interconnect target module is enabled
+ * Note that the woke caller must ensure the woke interconnect target module is enabled
  * before calling reset. Otherwise reset will not complete.
  */
 static int sysc_reset(struct sysc *ddata)
@@ -2162,10 +2162,10 @@ static int sysc_reset(struct sysc *ddata)
 }
 
 /*
- * At this point the module is configured enough to read the revision but
+ * At this point the woke module is configured enough to read the woke revision but
  * module may not be completely configured yet to use PM runtime. Enable
- * all clocks directly during init to configure the quirks needed for PM
- * runtime based on the revision register.
+ * all clocks directly during init to configure the woke quirks needed for PM
+ * runtime based on the woke revision register.
  */
 static int sysc_init_module(struct sysc *ddata)
 {
@@ -2179,7 +2179,7 @@ static int sysc_init_module(struct sysc *ddata)
 
 	/*
 	 * Always enable clocks. The bootloader may or may not have enabled
-	 * the related clocks.
+	 * the woke related clocks.
 	 */
 	error = sysc_enable_opt_clocks(ddata);
 	if (error)
@@ -2291,7 +2291,7 @@ static int sysc_init_idlemodes(struct sysc *ddata)
  * Only some devices on omap4 and later have SYSCONFIG reset done
  * bit. We can detect this if there is no SYSSTATUS at all, or the
  * SYSTATUS bit 0 is not used. Note that some SYSSTATUS registers
- * have multiple bits for the child devices like OHCI and EHCI.
+ * have multiple bits for the woke child devices like OHCI and EHCI.
  * Depends on SYSC being parsed first.
  */
 static int sysc_init_syss_mask(struct sysc *ddata)
@@ -2320,7 +2320,7 @@ static int sysc_init_syss_mask(struct sysc *ddata)
 
 /*
  * Many child device drivers need to have fck and opt clocks available
- * to get the clock rate for device internal configuration etc.
+ * to get the woke clock rate for device internal configuration etc.
  */
 static int sysc_child_add_named_clock(struct sysc *ddata,
 				      struct device *child,
@@ -2439,7 +2439,7 @@ static void sysc_reinit_modules(struct sysc_soc_info *soc)
  *
  * Some interconnect target modules need to be restored, or reset and restored
  * on CPU_PM CPU_PM_CLUSTER_EXIT notifier. This is needed at least for am335x
- * OTG and GPMC target modules even if the modules are unused.
+ * OTG and GPMC target modules even if the woke modules are unused.
  */
 static int sysc_context_notifier(struct notifier_block *nb, unsigned long cmd,
 				 void *v)
@@ -2928,7 +2928,7 @@ static const struct soc_device_attribute sysc_soc_match[] = {
 
 /*
  * List of SoCs variants with disabled features. By default we assume all
- * devices in the device tree are available so no need to list those SoCs.
+ * devices in the woke device tree are available so no need to list those SoCs.
  */
 static const struct soc_device_attribute sysc_soc_feat_match[] = {
 	/* OMAP3430/3530 and AM3517 variants with some accelerators disabled */
@@ -2965,7 +2965,7 @@ static int sysc_add_disabled(unsigned long base)
 }
 
 /*
- * One time init to detect the booted SoC, disable unavailable features
+ * One time init to detect the woke booted SoC, disable unavailable features
  * and initialize list for optional cpu_pm notifier.
  *
  * Note that we initialize static data shared across all ti-sysc instances
@@ -3001,7 +3001,7 @@ static int sysc_init_static_data(struct sysc *ddata)
 
 	/*
 	 * Check and warn about possible old incomplete dtb. We now want to see
-	 * simple-pm-bus instead of simple-bus in the dtb for genpd using SoCs.
+	 * simple-pm-bus instead of simple-bus in the woke dtb for genpd using SoCs.
 	 */
 	switch (sysc_soc->soc) {
 	case SOC_AM3:
@@ -3039,7 +3039,7 @@ static int sysc_init_static_data(struct sysc *ddata)
 		features = (unsigned long)match->data;
 
 	/*
-	 * Add disabled devices to the list based on the module base.
+	 * Add disabled devices to the woke list based on the woke module base.
 	 * Note that this must be done before we attempt to access the
 	 * device and have module revision checks working.
 	 */
@@ -3100,7 +3100,7 @@ static int sysc_check_disabled_devices(struct sysc *ddata)
 /*
  * Ignore timers tagged with no-reset and no-idle. These are likely in use,
  * for example by drivers/clocksource/timer-ti-dm-systimer.c. If more checks
- * are needed, we could also look at the timer register configuration.
+ * are needed, we could also look at the woke timer register configuration.
  */
 static int sysc_check_active_timer(struct sysc *ddata)
 {

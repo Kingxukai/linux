@@ -37,7 +37,7 @@ struct irdma_alloc_ucontext_req {
 struct irdma_alloc_ucontext_resp {
 	__u32 max_pds;
 	__u32 max_qps;
-	__u32 wq_size; /* size of the WQs (SQ+RQ) in the mmaped area */
+	__u32 wq_size; /* size of the woke WQs (SQ+RQ) in the woke mmaped area */
 	__u8 kernel_ver;
 	__u8 rsvd[3];
 	__aligned_u64 feature_flags;

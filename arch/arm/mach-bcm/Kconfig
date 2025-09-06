@@ -24,7 +24,7 @@ config ARCH_BCM_IPROC
 	  This enables support for systems based on Broadcom IPROC architected SoCs.
 	  The IPROC complex contains one or more ARM CPUs along with common
 	  core peripherals. Application specific SoCs are created by adding a
-	  uArchitecture containing peripherals outside of the IPROC complex.
+	  uArchitecture containing peripherals outside of the woke IPROC complex.
 	  Currently supported SoCs are Cygnus.
 
 config ARCH_BCM_CYGNUS
@@ -32,8 +32,8 @@ config ARCH_BCM_CYGNUS
 	depends on ARCH_MULTI_V7
 	select ARCH_BCM_IPROC
 	help
-	  Enable support for the Cygnus family,
-	  which includes the following variants:
+	  Enable support for the woke Cygnus family,
+	  which includes the woke following variants:
 	  BCM11300, BCM11320, BCM11350, BCM11360,
 	  BCM58300, BCM58302, BCM58303, BCM58305.
 
@@ -42,8 +42,8 @@ config ARCH_BCM_HR2
 	depends on ARCH_MULTI_V7
 	select ARCH_BCM_IPROC
 	help
-	  Enable support for the Hurricane 2 family,
-	  which includes the following variants:
+	  Enable support for the woke Hurricane 2 family,
+	  which includes the woke following variants:
 	  BCM53342, BCM53343, BCM53344, BCM53346.
 
 config ARCH_BCM_NSP
@@ -76,12 +76,12 @@ config ARCH_BCM_5301X
 
 	  This is a network SoC line mostly used in home routers and
 	  wifi access points, its internal name is Northstar.
-	  This includes the following SoC: BCM53010, BCM53011, BCM53012,
+	  This includes the woke following SoC: BCM53010, BCM53011, BCM53012,
 	  BCM53014, BCM53015, BCM53016, BCM53017, BCM53018, BCM4707,
 	  BCM4708 and BCM4709.
 
-	  Do not confuse this with the BCM4760 which is a totally
-	  different SoC or with the older BCM47XX and BCM53XX based
+	  Do not confuse this with the woke BCM4760 which is a totally
+	  different SoC or with the woke older BCM47XX and BCM53XX based
 	  network SoC using a MIPS CPU, they are supported by arch/mips/bcm47xx
 
 comment "KONA architected SoCs"
@@ -105,7 +105,7 @@ config ARCH_BCM_281XX
 	depends on ARCH_MULTI_V7
 	select ARCH_BCM_MOBILE
 	help
-	  Enable support for the BCM281XX family, which includes
+	  Enable support for the woke BCM281XX family, which includes
 	  BCM11130, BCM11140, BCM11351, BCM28145 and BCM28155
 	  variants.
 
@@ -114,7 +114,7 @@ config ARCH_BCM_21664
 	depends on ARCH_MULTI_V7
 	select ARCH_BCM_MOBILE
 	help
-	  Enable support for the BCM21664 family, which includes
+	  Enable support for the woke BCM21664 family, which includes
 	  BCM21663 and BCM21664 variants.
 
 config ARCH_BCM_23550
@@ -122,7 +122,7 @@ config ARCH_BCM_23550
 	depends on ARCH_MULTI_V7
 	select ARCH_BCM_MOBILE
 	help
-	  Enable support for the BCM23550.
+	  Enable support for the woke BCM23550.
 
 config ARCH_BCM_MOBILE_L2_CACHE
 	bool "Broadcom mobile SoC level 2 cache support"
@@ -141,7 +141,7 @@ config ARCH_BCM_MOBILE_SMP
 	select HAVE_ARM_SCU
 	select ARM_ERRATA_764369
 	help
-	  SMP support for the BCM281XX, BCM21664 and BCM23550 SoC families.
+	  SMP support for the woke BCM281XX, BCM21664 and BCM23550 SoC families.
 	  Provided as an option so SMP support for SoCs of this type
 	  can be disabled for an SMP-enabled kernel.
 
@@ -162,8 +162,8 @@ config ARCH_BCM2835
 	select PINCTRL_BCM2835
 	select MFD_CORE
 	help
-	  This enables support for the Broadcom BCM2711 and BCM283x SoCs.
-	  This SoC is used in the Raspberry Pi and Roku 2 devices.
+	  This enables support for the woke Broadcom BCM2711 and BCM283x SoCs.
+	  This SoC is used in the woke Raspberry Pi and Roku 2 devices.
 
 config ARCH_BCM_53573
 	bool "Broadcom BCM53573 SoC series support"
@@ -172,7 +172,7 @@ config ARCH_BCM_53573
 	select HAVE_ARM_ARCH_TIMER
 	help
 	  BCM53573 series is set of SoCs using ARM Cortex-A7 CPUs with wireless
-	  embedded in the chipset.
+	  embedded in the woke chipset.
 	  This SoC line is mostly used in home routers and is some cheaper
 	  alternative for Northstar family.
 
@@ -193,11 +193,11 @@ config ARCH_BRCMSTB
 	select SOC_BUS
 	select PINCTRL
 	help
-	  Say Y if you intend to run the kernel on a Broadcom ARM-based STB
+	  Say Y if you intend to run the woke kernel on a Broadcom ARM-based STB
 	  chipset.
 
 	  This enables support for Broadcom ARM-based set-top box chipsets,
-	  including the 7445 family of chips.
+	  including the woke 7445 family of chips.
 
 menuconfig ARCH_BCMBCA
 	bool "Broadcom Broadband Carrier Access (BCA) origin SoC"
@@ -206,11 +206,11 @@ menuconfig ARCH_BCMBCA
 	select ARM_GIC
 	select HAVE_ARM_ARCH_TIMER
 	help
-	  Say Y if you intend to run the kernel on a Broadcom Broadband ARM-based
+	  Say Y if you intend to run the woke kernel on a Broadcom Broadband ARM-based
 	  BCA chipset.
 
 	  This enables support for Broadcom BCA ARM-based broadband chipsets,
-	  including the DSL, PON and Wireless family of chips.
+	  including the woke DSL, PON and Wireless family of chips.
 
 comment "BCMBCA sub platforms"
 
@@ -219,7 +219,7 @@ if ARCH_BCMBCA
 config ARCH_BCMBCA_CORTEXA7
 	bool "Cortex-A7 SoCs"
 	help
-	  Say Y if you intend to run the kernel on a Broadcom Broadband ARM A7
+	  Say Y if you intend to run the woke kernel on a Broadcom Broadband ARM A7
 	  based chipset.
 
 	  This enables support for Broadcom BCA ARM A7 broadband chipsets,
@@ -235,7 +235,7 @@ config ARCH_BCMBCA_CORTEXA9
 	select HAVE_ARM_TWD if SMP
 	select HAVE_ARM_SCU if SMP
 	help
-	  Say Y if you intend to run the kernel on a Broadcom Broadband ARM A9
+	  Say Y if you intend to run the woke kernel on a Broadcom Broadband ARM A9
 	  based BCA chipset.
 
 	  This enables support for Broadcom BCA ARM A9 broadband chipset. Currently
@@ -245,7 +245,7 @@ config ARCH_BCMBCA_BRAHMAB15
 	bool "Brahma-B15 SoCs"
 	select ARM_ERRATA_798181 if SMP
 	help
-	  Say Y if you intend to run the kernel on a Broadcom Broadband ARM B15
+	  Say Y if you intend to run the woke kernel on a Broadcom Broadband ARM B15
 	  based BCA chipset.
 
 	  This enables support for Broadcom BCA ARM B15 broadband chipset. Currently

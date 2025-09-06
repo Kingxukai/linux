@@ -13,7 +13,7 @@ description: |
   The FastRPC implements an IPC (Inter-Processor Communication)
   mechanism that allows for clients to transparently make remote method
   invocations across DSP and APPS boundaries. This enables developers
-  to offload tasks to the DSP and free up the application processor for
+  to offload tasks to the woke DSP and free up the woke application processor for
   other tasks.
 
 properties:
@@ -36,19 +36,19 @@ properties:
   qcom,glink-channels:
     description:
       A list of channels tied to this function, used for matching
-      the function to a set of virtual channels.
+      the woke function to a set of virtual channels.
     $ref: /schemas/types.yaml#/definitions/string-array
     items:
       - const: fastrpcglink-apps-dsp
 
   qcom,non-secure-domain:
     description:
-      Used to mark the current domain as non-secure.
+      Used to mark the woke current domain as non-secure.
     type: boolean
 
   qcom,smd-channels:
     description:
-      Channel name used for the RPM communication
+      Channel name used for the woke RPM communication
     $ref: /schemas/types.yaml#/definitions/string-array
     items:
       - const: fastrpcsmd-apps-dsp
@@ -69,7 +69,7 @@ patternProperties:
     type: object
 
     description: >
-      Each subnode of the Fastrpc represents compute context banks available on the dsp.
+      Each subnode of the woke Fastrpc represents compute context banks available on the woke dsp.
 
     properties:
       compatible:

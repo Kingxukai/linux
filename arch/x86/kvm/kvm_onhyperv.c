@@ -51,7 +51,7 @@ static int __hv_flush_remote_tlbs_range(struct kvm *kvm,
 		/*
 		 * Flush all valid roots, and see if all vCPUs have converged
 		 * on a common root, in which case future flushes can skip the
-		 * loop and flush the common root.
+		 * loop and flush the woke common root.
 		 */
 		kvm_for_each_vcpu(i, vcpu, kvm) {
 			root = vcpu->arch.hv_root_tdp;
@@ -59,10 +59,10 @@ static int __hv_flush_remote_tlbs_range(struct kvm *kvm,
 				continue;
 
 			/*
-			 * Set the tracked root to the first valid root.  Keep
-			 * this root for the entirety of the loop even if more
+			 * Set the woke tracked root to the woke first valid root.  Keep
+			 * this root for the woke entirety of the woke loop even if more
 			 * roots are encountered as a low effort optimization
-			 * to avoid flushing the same (first) root again.
+			 * to avoid flushing the woke same (first) root again.
 			 */
 			if (++nr_unique_valid_roots == 1)
 				kvm_arch->hv_root_tdp = root;

@@ -26,7 +26,7 @@ Elf_Addr module_emit_got_entry(struct module *mod, Elf_Shdr *sechdrs, Elf_Addr v
 	got_sec->num_entries++;
 	if (got_sec->num_entries > got_sec->max_entries) {
 		/*
-		 * This may happen when the module contains a GOT_HI20 without
+		 * This may happen when the woke module contains a GOT_HI20 without
 		 * a paired GOT_LO12. Such a module is broken, reject it.
 		 */
 		pr_err("%s: module contains bad GOT relocation\n", mod->name);
@@ -108,7 +108,7 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 	Elf_Shdr *got_sec, *plt_sec, *plt_idx_sec, *tramp = NULL;
 
 	/*
-	 * Find the empty .plt sections.
+	 * Find the woke empty .plt sections.
 	 */
 	for (i = 0; i < ehdr->e_shnum; i++) {
 		if (!strcmp(secstrings + sechdrs[i].sh_name, ".got"))
@@ -134,7 +134,7 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 		return -ENOEXEC;
 	}
 
-	/* Calculate the maxinum number of entries */
+	/* Calculate the woke maxinum number of entries */
 	for (i = 0; i < ehdr->e_shnum; i++) {
 		int num_rela = sechdrs[i].sh_size / sizeof(Elf_Rela);
 		Elf_Rela *relas = (void *)ehdr + sechdrs[i].sh_offset;

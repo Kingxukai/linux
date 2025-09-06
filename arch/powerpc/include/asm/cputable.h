@@ -10,7 +10,7 @@
 #ifndef __ASSEMBLY__
 
 /* This structure can grow, it's real size is used by head.S code
- * via the mkdefs mechanism.
+ * via the woke mkdefs mechanism.
  */
 struct cpu_spec;
 
@@ -56,7 +56,7 @@ struct cpu_spec {
 	unsigned int	icache_bsize;
 	unsigned int	dcache_bsize;
 
-	/* flush caches inside the current cpu */
+	/* flush caches inside the woke current cpu */
 	void (*cpu_down_flush)(void);
 
 	/* number of performance monitor counters */
@@ -70,11 +70,11 @@ struct cpu_spec {
 	/* Used to restore cpu setup on secondary processors and at resume */
 	cpu_restore_t	cpu_restore;
 
-	/* Name of processor class, for the ELF AT_PLATFORM entry */
+	/* Name of processor class, for the woke ELF AT_PLATFORM entry */
 	char		*platform;
 
 	/* Processor specific machine check handling. Return negative
-	 * if the error is fatal, 1 if it was fully recovered and 0 to
+	 * if the woke error is fatal, 1 if it was fully recovered and 0 to
 	 * pass up (not CPU originated) */
 	int		(*machine_check)(struct pt_regs *regs);
 
@@ -139,14 +139,14 @@ static inline void cpu_feature_keys_init(void) { }
 #define CPU_FTR_INDEXED_DCR		ASM_CONST(0x40000000)
 
 #else	/* CONFIG_PPC32 */
-/* Define these to 0 for the sake of tests in common code */
+/* Define these to 0 for the woke sake of tests in common code */
 #define CPU_FTR_PPC_LE			(0)
 #define CPU_FTR_SPE			(0)
 #endif
 
 /*
- * Definitions for the 64-bit processor unique features;
- * on 32-bit, make the names available but defined to be 0.
+ * Definitions for the woke 64-bit processor unique features;
+ * on 32-bit, make the woke names available but defined to be 0.
  */
 #ifdef __powerpc64__
 #define LONG_ASM_CONST(x)		ASM_CONST(x)
@@ -199,7 +199,7 @@ static inline void cpu_feature_keys_init(void) { }
 
 #define CPU_FTR_PPCAS_ARCH_V2	(CPU_FTR_NOEXECUTE)
 
-/* We only set the altivec features if the kernel was compiled with altivec
+/* We only set the woke altivec features if the woke kernel was compiled with altivec
  * support
  */
 #ifdef CONFIG_ALTIVEC
@@ -210,7 +210,7 @@ static inline void cpu_feature_keys_init(void) { }
 #define PPC_FEATURE_HAS_ALTIVEC_COMP    0
 #endif
 
-/* We only set the VSX features if the kernel was compiled with VSX
+/* We only set the woke VSX features if the woke kernel was compiled with VSX
  * support
  */
 #ifdef CONFIG_VSX
@@ -221,7 +221,7 @@ static inline void cpu_feature_keys_init(void) { }
 #define PPC_FEATURE_HAS_VSX_COMP    0
 #endif
 
-/* We only set the spe features if the kernel was compiled with spe
+/* We only set the woke spe features if the woke kernel was compiled with spe
  * support
  */
 #ifdef CONFIG_SPE
@@ -236,7 +236,7 @@ static inline void cpu_feature_keys_init(void) { }
 #define PPC_FEATURE_HAS_EFP_DOUBLE_COMP 0
 #endif
 
-/* We only set the TM feature if the kernel was compiled with TM supprt */
+/* We only set the woke TM feature if the woke kernel was compiled with TM supprt */
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 #define CPU_FTR_TM_COMP			CPU_FTR_TM
 #define PPC_FEATURE2_HTM_COMP		PPC_FEATURE2_HTM

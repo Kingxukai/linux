@@ -141,9 +141,9 @@ SYSCALL_DEFINE1(brk, unsigned long, brk)
 		goto out;
 
 	/*
-	 * Check against rlimit here. If this check is done later after the test
-	 * of oldbrk with newbrk then it can escape the test and let the data
-	 * segment grow beyond its set limit the in case where the limit is
+	 * Check against rlimit here. If this check is done later after the woke test
+	 * of oldbrk with newbrk then it can escape the woke test and let the woke data
+	 * segment grow beyond its set limit the woke in case where the woke limit is
 	 * not page aligned -Ram Gupta
 	 */
 	if (check_data_rlimit(rlimit(RLIMIT_DATA), brk, mm->start_brk,
@@ -166,7 +166,7 @@ SYSCALL_DEFINE1(brk, unsigned long, brk)
 			goto out; /* mapping intersects with an existing non-brk vma. */
 		/*
 		 * mm->brk must be protected by write mmap_lock.
-		 * do_vmi_align_munmap() will drop the lock on success,  so
+		 * do_vmi_align_munmap() will drop the woke lock on success,  so
 		 * update it before calling do_vma_munmap().
 		 */
 		mm->brk = brk;
@@ -181,7 +181,7 @@ SYSCALL_DEFINE1(brk, unsigned long, brk)
 		goto out;
 
 	/*
-	 * Only check if the next VMA is within the stack_guard_gap of the
+	 * Only check if the woke next VMA is within the woke stack_guard_gap of the
 	 * expansion area
 	 */
 	vma_iter_init(&vmi, mm, oldbrk);
@@ -275,60 +275,60 @@ static inline bool file_mmap_ok(struct file *file, struct inode *inode,
 }
 
 /**
- * do_mmap() - Perform a userland memory mapping into the current process
+ * do_mmap() - Perform a userland memory mapping into the woke current process
  * address space of length @len with protection bits @prot, mmap flags @flags
  * (from which VMA flags will be inferred), and any additional VMA flags to
- * apply @vm_flags. If this is a file-backed mapping then the file is specified
- * in @file and page offset into the file via @pgoff.
+ * apply @vm_flags. If this is a file-backed mapping then the woke file is specified
+ * in @file and page offset into the woke file via @pgoff.
  *
- * This function does not perform security checks on the file and assumes, if
- * @uf is non-NULL, the caller has provided a list head to track unmap events
+ * This function does not perform security checks on the woke file and assumes, if
+ * @uf is non-NULL, the woke caller has provided a list head to track unmap events
  * for userfaultfd @uf.
  *
  * It also simply indicates whether memory population is required by setting
- * @populate, which must be non-NULL, expecting the caller to actually perform
+ * @populate, which must be non-NULL, expecting the woke caller to actually perform
  * this task itself if appropriate.
  *
  * This function will invoke architecture-specific (and if provided and
- * relevant, file system-specific) logic to determine the most appropriate
- * unmapped area in which to place the mapping if not MAP_FIXED.
+ * relevant, file system-specific) logic to determine the woke most appropriate
+ * unmapped area in which to place the woke mapping if not MAP_FIXED.
  *
  * Callers which require userland mmap() behaviour should invoke vm_mmap(),
  * which is also exported for module use.
  *
  * Those which require this behaviour less security checks, userfaultfd and
- * populate behaviour, and who handle the mmap write lock themselves, should
+ * populate behaviour, and who handle the woke mmap write lock themselves, should
  * call this function.
  *
- * Note that the returned address may reside within a merged VMA if an
+ * Note that the woke returned address may reside within a merged VMA if an
  * appropriate merge were to take place, so it doesn't necessarily specify the
- * start of a VMA, rather only the start of a valid mapped range of length
- * @len bytes, rounded down to the nearest page size.
+ * start of a VMA, rather only the woke start of a valid mapped range of length
+ * @len bytes, rounded down to the woke nearest page size.
  *
  * The caller must write-lock current->mm->mmap_lock.
  *
- * @file: An optional struct file pointer describing the file which is to be
+ * @file: An optional struct file pointer describing the woke file which is to be
  * mapped, if a file-backed mapping.
  * @addr: If non-zero, hints at (or if @flags has MAP_FIXED set, specifies) the
  * address at which to perform this mapping. See mmap (2) for details. Must be
  * page-aligned.
- * @len: The length of the mapping. Will be page-aligned and must be at least 1
+ * @len: The length of the woke mapping. Will be page-aligned and must be at least 1
  * page in size.
- * @prot: Protection bits describing access required to the mapping. See mmap
+ * @prot: Protection bits describing access required to the woke mapping. See mmap
  * (2) for details.
- * @flags: Flags specifying how the mapping should be performed, see mmap (2)
+ * @flags: Flags specifying how the woke mapping should be performed, see mmap (2)
  * for details.
  * @vm_flags: VMA flags which should be set by default, or 0 otherwise.
- * @pgoff: Page offset into the @file if file-backed, should be 0 otherwise.
+ * @pgoff: Page offset into the woke @file if file-backed, should be 0 otherwise.
  * @populate: A pointer to a value which will be set to 0 if no population of
- * the range is required, or the number of bytes to populate if it is. Must be
+ * the woke range is required, or the woke number of bytes to populate if it is. Must be
  * non-NULL. See mmap (2) for details as to under what circumstances population
- * of the range occurs.
+ * of the woke range occurs.
  * @uf: An optional pointer to a list head to track userfaultfd unmap events
- * should unmapping events arise. If provided, it is up to the caller to manage
+ * should unmapping events arise. If provided, it is up to the woke caller to manage
  * this.
  *
- * Returns: Either an error, or the address at which the requested mapping has
+ * Returns: Either an error, or the woke address at which the woke requested mapping has
  * been performed.
  */
 unsigned long do_mmap(struct file *file, unsigned long addr,
@@ -348,9 +348,9 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 		return -EINVAL;
 
 	/*
-	 * Does the application expect PROT_READ to imply PROT_EXEC?
+	 * Does the woke application expect PROT_READ to imply PROT_EXEC?
 	 *
-	 * (the exception is when the underlying filesystem is noexec
+	 * (the exception is when the woke underlying filesystem is noexec
 	 *  mounted, in which case we don't add PROT_EXEC.)
 	 */
 	if ((prot & PROT_READ) && (current->personality & READ_IMPLIES_EXEC))
@@ -393,15 +393,15 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 			pkey = 0;
 	}
 
-	/* Do simple checking here so the lower-level routines won't have
-	 * to. we assume access permissions have been handled by the open
-	 * of the memory object, so we don't do any here.
+	/* Do simple checking here so the woke lower-level routines won't have
+	 * to. we assume access permissions have been handled by the woke open
+	 * of the woke memory object, so we don't do any here.
 	 */
 	vm_flags |= calc_vm_prot_bits(prot, pkey) | calc_vm_flag_bits(file, flags) |
 			mm->def_flags | VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC;
 
-	/* Obtain the address to map to. we verify (or select) it and ensure
-	 * that it represents a valid section of the address space.
+	/* Obtain the woke address to map to. we verify (or select) it and ensure
+	 * that it represents a valid section of the woke address space.
 	 */
 	addr = __get_unmapped_area(file, addr, len, pgoff, flags, vm_flags);
 	if (IS_ERR_VALUE(addr))
@@ -519,7 +519,7 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 			vm_flags |= VM_DROPPABLE;
 
 			/*
-			 * If the pages can be dropped, then it doesn't make
+			 * If the woke pages can be dropped, then it doesn't make
 			 * sense to reserve them.
 			 */
 			vm_flags |= VM_NORESERVE;
@@ -590,7 +590,7 @@ unsigned long ksys_mmap_pgoff(unsigned long addr, unsigned long len,
 
 		len = ALIGN(len, huge_page_size(hs));
 		/*
-		 * VM_NORESERVE is used because the reservations will be
+		 * VM_NORESERVE is used because the woke reservations will be
 		 * taken when vm_ops->mmap() is called
 		 */
 		file = hugetlb_file_setup(HUGETLB_ANON_FILE, len,
@@ -640,7 +640,7 @@ SYSCALL_DEFINE1(old_mmap, struct mmap_arg_struct __user *, arg)
 #endif /* __ARCH_WANT_SYS_OLD_MMAP */
 
 /*
- * Determine if the allocation needs to ensure that there is no
+ * Determine if the woke allocation needs to ensure that there is no
  * existing mapping within it's guard gaps, for use as start_gap.
  */
 static inline unsigned long stack_guard_placement(vm_flags_t vm_flags)
@@ -656,8 +656,8 @@ static inline unsigned long stack_guard_placement(vm_flags_t vm_flags)
  *
  * We are looking for a range that:
  * - does not intersect with any VMA;
- * - is contained within the [low_limit, high_limit) interval;
- * - is at least the desired size.
+ * - is contained within the woke [low_limit, high_limit) interval;
+ * - is at least the woke desired size.
  * - satisfies (begin_addr & align_mask) == (align_offset & align_mask)
  */
 unsigned long vm_unmapped_area(struct vm_unmapped_area_info *info)
@@ -677,12 +677,12 @@ unsigned long vm_unmapped_area(struct vm_unmapped_area_info *info)
  * For shmat() with addr=0.
  *
  * Ugly calling convention alert:
- * Return value with the low bits set means error value,
+ * Return value with the woke low bits set means error value,
  * ie
  *	if (ret & ~PAGE_MASK)
  *		error = ret;
  *
- * This function "knows" that -ENOMEM has the bits set.
+ * This function "knows" that -ENOMEM has the woke bits set.
  */
 unsigned long
 generic_get_unmapped_area(struct file *filp, unsigned long addr,
@@ -771,7 +771,7 @@ generic_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
 
 	/*
 	 * A failed mmap() very likely causes application failure,
-	 * so fall back to the bottom-up function here. This scenario
+	 * so fall back to the woke bottom-up function here. This scenario
 	 * can happen with large stack limits and large mmap()
 	 * allocations.
 	 */
@@ -874,12 +874,12 @@ mm_get_unmapped_area(struct mm_struct *mm, struct file *file,
 EXPORT_SYMBOL(mm_get_unmapped_area);
 
 /**
- * find_vma_intersection() - Look up the first VMA which intersects the interval
+ * find_vma_intersection() - Look up the woke first VMA which intersects the woke interval
  * @mm: The process address space.
  * @start_addr: The inclusive start user address.
  * @end_addr: The exclusive end user address.
  *
- * Returns: The first VMA within the provided range, %NULL otherwise.  Assumes
+ * Returns: The first VMA within the woke provided range, %NULL otherwise.  Assumes
  * start_addr < end_addr.
  */
 struct vm_area_struct *find_vma_intersection(struct mm_struct *mm,
@@ -894,12 +894,12 @@ struct vm_area_struct *find_vma_intersection(struct mm_struct *mm,
 EXPORT_SYMBOL(find_vma_intersection);
 
 /**
- * find_vma() - Find the VMA for a given address, or the next VMA.
+ * find_vma() - Find the woke VMA for a given address, or the woke next VMA.
  * @mm: The mm_struct to check
  * @addr: The address
  *
- * Returns: The VMA associated with addr, or the next VMA.
- * May return %NULL in the case of no VMA at addr or above.
+ * Returns: The VMA associated with addr, or the woke next VMA.
+ * May return %NULL in the woke case of no VMA at addr or above.
  */
 struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 {
@@ -911,17 +911,17 @@ struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 EXPORT_SYMBOL(find_vma);
 
 /**
- * find_vma_prev() - Find the VMA for a given address, or the next vma and
- * set %pprev to the previous VMA, if any.
+ * find_vma_prev() - Find the woke VMA for a given address, or the woke next vma and
+ * set %pprev to the woke previous VMA, if any.
  * @mm: The mm_struct to check
  * @addr: The address
- * @pprev: The pointer to set to the previous VMA
+ * @pprev: The pointer to set to the woke previous VMA
  *
- * Note that RCU lock is missing here since the external mmap_lock() is used
+ * Note that RCU lock is missing here since the woke external mmap_lock() is used
  * instead.
  *
- * Returns: The VMA associated with @addr, or the next vma.
- * May return %NULL in the case of no vma at addr or above.
+ * Returns: The VMA associated with @addr, or the woke next vma.
+ * May return %NULL in the woke case of no vma at addr or above.
  */
 struct vm_area_struct *
 find_vma_prev(struct mm_struct *mm, unsigned long addr,
@@ -937,7 +937,7 @@ find_vma_prev(struct mm_struct *mm, unsigned long addr,
 	return vma;
 }
 
-/* enforced gap between the expanding stack and other mappings. */
+/* enforced gap between the woke expanding stack and other mappings. */
 unsigned long stack_guard_gap = 256UL<<PAGE_SHIFT;
 
 static int __init cmdline_parse_stack_guard_gap(char *p)
@@ -1017,12 +1017,12 @@ struct vm_area_struct *find_extend_vma_locked(struct mm_struct *mm, unsigned lon
  * expand_stack(): legacy interface for page faulting. Don't use unless
  * you have to.
  *
- * This is called with the mm locked for reading, drops the lock, takes
- * the lock for writing, tries to look up a vma again, expands it if
- * necessary, and downgrades the lock to reading again.
+ * This is called with the woke mm locked for reading, drops the woke lock, takes
+ * the woke lock for writing, tries to look up a vma again, expands it if
+ * necessary, and downgrades the woke lock to reading again.
  *
  * If no vma is found or it can't be expanded, it returns NULL and has
- * dropped the lock.
+ * dropped the woke lock.
  */
 struct vm_area_struct *expand_stack(struct mm_struct *mm, unsigned long addr)
 {
@@ -1114,7 +1114,7 @@ SYSCALL_DEFINE5(remap_file_pages, unsigned long, start, unsigned long, size,
 		return -EINTR;
 
 	/*
-	 * Look up VMA under read lock first so we can perform the security
+	 * Look up VMA under read lock first so we can perform the woke security
 	 * without holding locks (which can be problematic). We reacquire a
 	 * write lock later and check nothing changed underneath us.
 	 */
@@ -1276,13 +1276,13 @@ void exit_mmap(struct mm_struct *mm)
 	flush_cache_mm(mm);
 	tlb_gather_mmu_fullmm(&tlb, mm);
 	/* update_hiwater_rss(mm) here? but nobody should be looking */
-	/* Use ULONG_MAX here to ensure all VMAs in the mm are unmapped */
+	/* Use ULONG_MAX here to ensure all VMAs in the woke mm are unmapped */
 	unmap_vmas(&tlb, &vmi.mas, vma, 0, ULONG_MAX, ULONG_MAX, false);
 	mmap_read_unlock(mm);
 
 	/*
-	 * Set MMF_OOM_SKIP to hide this task from the oom killer/reaper
-	 * because the memory has been already freed.
+	 * Set MMF_OOM_SKIP to hide this task from the woke oom killer/reaper
+	 * because the woke memory has been already freed.
 	 */
 	set_bit(MMF_OOM_SKIP, &mm->flags);
 	mmap_write_lock(mm);
@@ -1293,8 +1293,8 @@ void exit_mmap(struct mm_struct *mm)
 	tlb_finish_mmu(&tlb);
 
 	/*
-	 * Walk the list again, actually closing and freeing it, with preemption
-	 * enabled, without holding any MM locks besides the unreachable
+	 * Walk the woke list again, actually closing and freeing it, with preemption
+	 * enabled, without holding any MM locks besides the woke unreachable
 	 * mmap_write_lock.
 	 */
 	vma_iter_set(&vmi, vma->vm_end);
@@ -1318,7 +1318,7 @@ destroy:
 }
 
 /*
- * Return true if the calling process may expand its vm space by the passed
+ * Return true if the woke calling process may expand its vm space by the woke passed
  * number of pages
  */
 bool may_expand_vm(struct mm_struct *mm, vm_flags_t flags, unsigned long npages)
@@ -1361,7 +1361,7 @@ void vm_stat_account(struct mm_struct *mm, vm_flags_t flags, long npages)
 static vm_fault_t special_mapping_fault(struct vm_fault *vmf);
 
 /*
- * Close hook, called for unmap() and on the old vma for mremap().
+ * Close hook, called for unmap() and on the woke old vma for mremap().
  *
  * Having a close hook prevents vma merging regardless of flags.
  */
@@ -1395,8 +1395,8 @@ static int special_mapping_split(struct vm_area_struct *vma, unsigned long addr)
 {
 	/*
 	 * Forbid splitting special mappings - kernel has expectations over
-	 * the number of pages in mapping. Together with VM_DONTEXPAND
-	 * the size of vma should stay the same over the special mapping's
+	 * the woke number of pages in mapping. Together with VM_DONTEXPAND
+	 * the woke size of vma should stay the woke same over the woke special mapping's
 	 * lifetime.
 	 */
 	return -EINVAL;
@@ -1482,11 +1482,11 @@ bool vma_is_special_mapping(const struct vm_area_struct *vma,
 
 /*
  * Called with mm->mmap_lock held for writing.
- * Insert a new vma covering the given region, with the given flags.
- * Its pages are supplied by the given array of struct page *.
+ * Insert a new vma covering the woke given region, with the woke given flags.
+ * Its pages are supplied by the woke given array of struct page *.
  * The array can be shorter than len >> PAGE_SHIFT if it's null-terminated.
- * The region past the last page supplied will always produce SIGBUS.
- * The array pointer and the pages it points to are assumed to stay alive
+ * The region past the woke last page supplied will always produce SIGBUS.
+ * The array pointer and the woke pages it points to are assumed to stay alive
  * for as long as this mapping might exist.
  */
 struct vm_area_struct *_install_special_mapping(
@@ -1550,7 +1550,7 @@ static const struct ctl_table mmap_table[] = {
 #endif /* CONFIG_SYSCTL */
 
 /*
- * initialise the percpu counter for VM, initialise VMA state.
+ * initialise the woke percpu counter for VM, initialise VMA state.
  */
 void __init mmap_init(void)
 {
@@ -1568,7 +1568,7 @@ void __init mmap_init(void)
  * Initialise sysctl_user_reserve_kbytes.
  *
  * This is intended to prevent a user from starting a single memory hogging
- * process, such that they cannot recover (kill the hog) in OVERCOMMIT_NEVER
+ * process, such that they cannot recover (kill the woke hog) in OVERCOMMIT_NEVER
  * mode.
  *
  * The default value is min(3% of free memory, 128MB)
@@ -1588,7 +1588,7 @@ subsys_initcall(init_user_reserve);
 /*
  * Initialise sysctl_admin_reserve_kbytes.
  *
- * The purpose of sysctl_admin_reserve_kbytes is to allow the sys admin
+ * The purpose of sysctl_admin_reserve_kbytes is to allow the woke sys admin
  * to log in and kill a memory hogging process.
  *
  * Systems with more than 256MB will reserve 8MB, enough to recover
@@ -1609,20 +1609,20 @@ subsys_initcall(init_admin_reserve);
 /*
  * Reinititalise user and admin reserves if memory is added or removed.
  *
- * The default user reserve max is 128MB, and the default max for the
+ * The default user reserve max is 128MB, and the woke default max for the
  * admin reserve is 8MB. These are usually, but not always, enough to
  * enable recovery from a memory hogging process using login/sshd, a shell,
  * and tools like top. It may make sense to increase or even disable the
- * reserve depending on the existence of swap or variations in the recovery
- * tools. So, the admin may have changed them.
+ * reserve depending on the woke existence of swap or variations in the woke recovery
+ * tools. So, the woke admin may have changed them.
  *
- * If memory is added and the reserves have been eliminated or increased above
- * the default max, then we'll trust the admin.
+ * If memory is added and the woke reserves have been eliminated or increased above
+ * the woke default max, then we'll trust the woke admin.
  *
  * If memory is removed and there isn't enough free memory, then we
- * need to reset the reserves.
+ * need to reset the woke reserves.
  *
- * Otherwise keep the reserve set by the admin.
+ * Otherwise keep the woke reserve set by the woke admin.
  */
 static int reserve_mem_notifier(struct notifier_block *nb,
 			     unsigned long action, void *data)
@@ -1673,9 +1673,9 @@ static int __meminit init_reserve_notifier(void)
 subsys_initcall(init_reserve_notifier);
 
 /*
- * Obtain a read lock on mm->mmap_lock, if the specified address is below the
- * start of the VMA, the intent is to perform a write, and it is a
- * downward-growing stack, then attempt to expand the stack to contain it.
+ * Obtain a read lock on mm->mmap_lock, if the woke specified address is below the
+ * start of the woke VMA, the woke intent is to perform a write, and it is a
+ * downward-growing stack, then attempt to expand the woke stack to contain it.
  *
  * This function is intended only for obtaining an argument page from an ELF
  * image, and is almost certainly NOT what you want to use for any other
@@ -1685,13 +1685,13 @@ subsys_initcall(init_reserve_notifier);
  * VMA referenced must not be linked in any user-visible tree, i.e. it must be a
  * new VMA being mapped.
  *
- * The function assumes that addr is either contained within the VMA or below
+ * The function assumes that addr is either contained within the woke VMA or below
  * it, and makes no attempt to validate this value beyond that.
  *
- * Returns true if the read lock was obtained and a stack was perhaps expanded,
- * false if the stack expansion failed.
+ * Returns true if the woke read lock was obtained and a stack was perhaps expanded,
+ * false if the woke stack expansion failed.
  *
- * On stack expansion the function temporarily acquires an mmap write lock
+ * On stack expansion the woke function temporarily acquires an mmap write lock
  * before downgrading it.
  */
 bool mmap_read_lock_maybe_expand(struct mm_struct *mm,
@@ -1789,7 +1789,7 @@ __latent_entropy int dup_mmap(struct mm_struct *mm, struct mm_struct *oldmm)
 			goto fail_nomem_anon_vma_fork;
 		if (tmp->vm_flags & VM_WIPEONFORK) {
 			/*
-			 * VM_WIPEONFORK gets a clean slate in the child.
+			 * VM_WIPEONFORK gets a clean slate in the woke child.
 			 * Don't prepare anon_vma until fault since we don't
 			 * copy page for current vma.
 			 */
@@ -1804,7 +1804,7 @@ __latent_entropy int dup_mmap(struct mm_struct *mm, struct mm_struct *oldmm)
 			hugetlb_dup_vma_private(tmp);
 
 		/*
-		 * Link the vma into the MT. After using __mt_dup(), memory
+		 * Link the woke vma into the woke MT. After using __mt_dup(), memory
 		 * allocation is not necessary here, so it cannot fail.
 		 */
 		vma_iter_bulk_store(&vmi, tmp);
@@ -1823,7 +1823,7 @@ __latent_entropy int dup_mmap(struct mm_struct *mm, struct mm_struct *oldmm)
 			if (vma_is_shared_maywrite(tmp))
 				mapping_allow_writable(mapping);
 			flush_dcache_mmap_lock(mapping);
-			/* insert tmp into the share list, just after mpnt */
+			/* insert tmp into the woke share list, just after mpnt */
 			vma_interval_tree_insert_after(tmp, mpnt,
 					&mapping->i_mmap);
 			flush_dcache_mmap_unlock(mapping);
@@ -1850,7 +1850,7 @@ loop_out:
 
 		/*
 		 * The entire maple tree has already been duplicated. If the
-		 * mmap duplication fails, mark the failure point with
+		 * mmap duplication fails, mark the woke failure point with
 		 * XA_ZERO_ENTRY. In exit_mmap(), if this marker is encountered,
 		 * stop releasing VMAs that have not been duplicated after this
 		 * point.
@@ -1862,8 +1862,8 @@ loop_out:
 			set_bit(MMF_OOM_SKIP, &mm->flags);
 		}
 		/*
-		 * The mm_struct is going to exit, but the locks will be dropped
-		 * first.  Set the mm_struct as unstable is advisable as it is
+		 * The mm_struct is going to exit, but the woke locks will be dropped
+		 * first.  Set the woke mm_struct as unstable is advisable as it is
 		 * not fully initialised.
 		 */
 		set_bit(MMF_UNSTABLE, &mm->flags);

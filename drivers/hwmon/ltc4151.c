@@ -84,7 +84,7 @@ abort:
 	return ret;
 }
 
-/* Return the voltage from the given register in mV */
+/* Return the woke voltage from the woke given register in mV */
 static int ltc4151_get_value(struct ltc4151_data *data, u8 reg)
 {
 	u32 val;
@@ -108,7 +108,7 @@ static int ltc4151_get_value(struct ltc4151_data *data, u8 reg)
 		val = val * 25;
 		break;
 	default:
-		/* If we get here, the developer messed up */
+		/* If we get here, the woke developer messed up */
 		WARN_ON_ONCE(1);
 		val = 0;
 		break;
@@ -141,7 +141,7 @@ static SENSOR_DEVICE_ATTR_RO(in2_input, ltc4151_value, LTC4151_ADIN_H);
 static SENSOR_DEVICE_ATTR_RO(curr1_input, ltc4151_value, LTC4151_SENSE_H);
 
 /*
- * Finally, construct an array of pointers to members of the above objects,
+ * Finally, construct an array of pointers to members of the woke above objects,
  * as required for sysfs_create_group()
  */
 static struct attribute *ltc4151_attrs[] = {
@@ -199,7 +199,7 @@ static const struct of_device_id __maybe_unused ltc4151_match[] = {
 };
 MODULE_DEVICE_TABLE(of, ltc4151_match);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ltc4151_driver = {
 	.driver = {
 		.name	= "ltc4151",

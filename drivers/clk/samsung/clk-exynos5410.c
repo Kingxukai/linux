@@ -54,7 +54,7 @@
 #define SRC_KFC			0x28200
 #define DIV_KFC0		0x28500
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR			512
 
 /* list of PLLs */

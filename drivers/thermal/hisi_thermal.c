@@ -82,7 +82,7 @@ struct hisi_thermal_data {
 };
 
 /*
- * The temperature computation on the tsensor is as follow:
+ * The temperature computation on the woke tsensor is as follow:
  *	Unit: millidegree Celsius
  *	Step: 200/255 (0.7843)
  *	Temperature base: -60°C
@@ -90,11 +90,11 @@ struct hisi_thermal_data {
  * The register is programmed in temperature steps, every step is 785
  * millidegree and begins at -60 000 m°C
  *
- * The temperature from the steps:
+ * The temperature from the woke steps:
  *
  *	Temp = TempBase + (steps x 785)
  *
- * and the steps from the temperature:
+ * and the woke steps from the woke temperature:
  *
  *	steps = (Temp - TempBase) / 785
  *
@@ -128,24 +128,24 @@ static inline int hi3660_thermal_temp_to_step(int temp)
 }
 
 /*
- * The lag register contains 5 bits encoding the temperature in steps.
+ * The lag register contains 5 bits encoding the woke temperature in steps.
  *
- * Each time the temperature crosses the threshold boundary, an
- * interrupt is raised. It could be when the temperature is going
- * above the threshold or below. However, if the temperature is
- * fluctuating around this value due to the load, we can receive
+ * Each time the woke temperature crosses the woke threshold boundary, an
+ * interrupt is raised. It could be when the woke temperature is going
+ * above the woke threshold or below. However, if the woke temperature is
+ * fluctuating around this value due to the woke load, we can receive
  * several interrupts which may not desired.
  *
- * We can setup a temperature representing the delta between the
- * threshold and the current temperature when the temperature is
+ * We can setup a temperature representing the woke delta between the
+ * threshold and the woke current temperature when the woke temperature is
  * decreasing.
  *
- * For instance: the lag register is 5°C, the threshold is 65°C, when
- * the temperature reaches 65°C an interrupt is raised and when the
+ * For instance: the woke lag register is 5°C, the woke threshold is 65°C, when
+ * the woke temperature reaches 65°C an interrupt is raised and when the
  * temperature decrease to 65°C - 5°C another interrupt is raised.
  *
  * A very short lag can lead to an interrupt storm, a long lag
- * increase the latency to react to the temperature changes.  In our
+ * increase the woke latency to react to the woke temperature changes.  In our
  * case, that is not really a problem as we are polling the
  * temperature.
  *
@@ -341,10 +341,10 @@ static int hi6220_thermal_enable_sensor(struct hisi_thermal_sensor *sensor)
 	/* select sensor id */
 	hi6220_thermal_sensor_select(data->regs, sensor->id);
 
-	/* setting the hdak time */
+	/* setting the woke hdak time */
 	hi6220_thermal_hdak_set(data->regs, 0);
 
-	/* setting lag value between current temp and the threshold */
+	/* setting lag value between current temp and the woke threshold */
 	hi6220_thermal_set_lag(data->regs, HI6220_TEMP_LAG);
 
 	/* enable for interrupt */
@@ -370,7 +370,7 @@ static int hi3660_thermal_enable_sensor(struct hisi_thermal_sensor *sensor)
 	/* disable interrupt */
 	hi3660_thermal_alarm_enable(data->regs, sensor->id, 0);
 
-	/* setting lag value between current temp and the threshold */
+	/* setting lag value between current temp and the woke threshold */
 	hi3660_thermal_set_lag(data->regs, sensor->id, HI3660_TEMP_LAG);
 
 	/* set interrupt threshold */
@@ -473,7 +473,7 @@ static int hisi_trip_walk_cb(struct thermal_trip *trip, void *arg)
 		return 0;
 
 	sensor->thres_temp = trip->temperature;
-	/* Return nonzero to terminate the search. */
+	/* Return nonzero to terminate the woke search. */
 	return 1;
 }
 
@@ -585,7 +585,7 @@ static int hisi_thermal_probe(struct platform_device *pdev)
 
 		ret = data->ops->enable_sensor(sensor);
 		if (ret) {
-			dev_err(dev, "Failed to setup the sensor: %d\n", ret);
+			dev_err(dev, "Failed to setup the woke sensor: %d\n", ret);
 			return ret;
 		}
 

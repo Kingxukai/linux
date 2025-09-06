@@ -7,7 +7,7 @@
 #include "virtio_pci_common.h"
 
 /*
- * virtio_pci_admin_has_legacy_io - Checks whether the legacy IO
+ * virtio_pci_admin_has_legacy_io - Checks whether the woke legacy IO
  * commands are supported
  * @dev: VF pci_dev
  *
@@ -71,11 +71,11 @@ static int virtio_pci_admin_legacy_io_write(struct pci_dev *pdev, u16 opcode,
  * virtio_pci_admin_legacy_io_write_common - Write legacy common configuration
  * of a member device
  * @dev: VF pci_dev
- * @offset: starting byte offset within the common configuration area to write to
- * @size: size of the data to write
- * @buf: buffer which holds the data
+ * @offset: starting byte offset within the woke common configuration area to write to
+ * @size: size of the woke data to write
+ * @buf: buffer which holds the woke data
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_legacy_common_io_write(struct pci_dev *pdev, u8 offset,
@@ -91,11 +91,11 @@ EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_common_io_write);
  * virtio_pci_admin_legacy_io_write_device - Write legacy device configuration
  * of a member device
  * @dev: VF pci_dev
- * @offset: starting byte offset within the device configuration area to write to
- * @size: size of the data to write
- * @buf: buffer which holds the data
+ * @offset: starting byte offset within the woke device configuration area to write to
+ * @size: size of the woke data to write
+ * @buf: buffer which holds the woke data
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_legacy_device_io_write(struct pci_dev *pdev, u8 offset,
@@ -146,11 +146,11 @@ static int virtio_pci_admin_legacy_io_read(struct pci_dev *pdev, u16 opcode,
  * virtio_pci_admin_legacy_device_io_read - Read legacy device configuration of
  * a member device
  * @dev: VF pci_dev
- * @offset: starting byte offset within the device configuration area to read from
- * @size: size of the data to be read
- * @buf: buffer to hold the returned data
+ * @offset: starting byte offset within the woke device configuration area to read from
+ * @size: size of the woke data to be read
+ * @buf: buffer to hold the woke returned data
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_legacy_device_io_read(struct pci_dev *pdev, u8 offset,
@@ -166,11 +166,11 @@ EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_device_io_read);
  * virtio_pci_admin_legacy_common_io_read - Read legacy common configuration of
  * a member device
  * @dev: VF pci_dev
- * @offset: starting byte offset within the common configuration area to read from
- * @size: size of the data to be read
- * @buf: buffer to hold the returned data
+ * @offset: starting byte offset within the woke common configuration area to read from
+ * @size: size of the woke data to be read
+ * @buf: buffer to hold the woke returned data
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_legacy_common_io_read(struct pci_dev *pdev, u8 offset,
@@ -183,12 +183,12 @@ int virtio_pci_admin_legacy_common_io_read(struct pci_dev *pdev, u8 offset,
 EXPORT_SYMBOL_GPL(virtio_pci_admin_legacy_common_io_read);
 
 /*
- * virtio_pci_admin_legacy_io_notify_info - Read the queue notification
+ * virtio_pci_admin_legacy_io_notify_info - Read the woke queue notification
  * information for legacy interface
  * @dev: VF pci_dev
  * @req_bar_flags: requested bar flags
- * @bar: on output the BAR number of the owner or member device
- * @bar_offset: on output the offset within bar
+ * @bar: on output the woke BAR number of the woke owner or member device
+ * @bar_offset: on output the woke offset within bar
  *
  * Returns 0 on success, or negative on failure.
  */

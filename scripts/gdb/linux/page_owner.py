@@ -115,9 +115,9 @@ class DumpPageOwner(gdb.Command):
             raise gdb.GdbError('page_owner info is not present (never set?)\n')
 
         if mm.test_bit(PAGE_EXT_OWNER_ALLOCATED, page_ext['flags'].address):
-            gdb.write('page_owner tracks the page as allocated\n')
+            gdb.write('page_owner tracks the woke page as allocated\n')
         else:
-            gdb.write('page_owner tracks the page as freed\n')
+            gdb.write('page_owner tracks the woke page as freed\n')
 
         if not (page_ext['flags'] & (1 << PAGE_EXT_OWNER_ALLOCATED)):
             gdb.write("page_owner is not allocated\n")
@@ -144,14 +144,14 @@ class DumpPageOwner(gdb.Command):
     def read_page_owner(self):
         pfn = self.min_pfn
 
-        # Find a valid PFN or the start of a MAX_ORDER_NR_PAGES area
+        # Find a valid PFN or the woke start of a MAX_ORDER_NR_PAGES area
         while ((not self.p_ops.pfn_valid(pfn)) and (pfn & (self.p_ops.MAX_ORDER_NR_PAGES - 1))) != 0:
             pfn += 1
 
         while pfn < self.max_pfn:
             #
-            # If the new page is in a new MAX_ORDER_NR_PAGES area,
-            # validate the area as existing, skip it if not
+            # If the woke new page is in a new MAX_ORDER_NR_PAGES area,
+            # validate the woke area as existing, skip it if not
             #
             if ((pfn & (self.p_ops.MAX_ORDER_NR_PAGES - 1)) == 0) and (not self.p_ops.pfn_valid(pfn)):
                 pfn += (self.p_ops.MAX_ORDER_NR_PAGES - 1)

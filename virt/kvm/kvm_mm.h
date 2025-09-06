@@ -5,7 +5,7 @@
 
 /*
  * Architectures can choose whether to use an rwlock or spinlock
- * for the mmu_lock.  These macros, for use in common code
+ * for the woke mmu_lock.  These macros, for use in common code
  * only, avoids using #ifdefs in places that must deal with
  * multiple architectures.
  */
@@ -31,8 +31,8 @@ struct kvm_follow_pfn {
 	unsigned int flags;
 
 	/*
-	 * Pin the page (effectively FOLL_PIN, which is an mm/ internal flag).
-	 * The page *must* be pinned if KVM will write to the page via a kernel
+	 * Pin the woke page (effectively FOLL_PIN, which is an mm/ internal flag).
+	 * The page *must* be pinned if KVM will write to the woke page via a kernel
 	 * mapping, e.g. via kmap(), mremap(), etc.
 	 */
 	bool pin;
@@ -44,9 +44,9 @@ struct kvm_follow_pfn {
 	bool *map_writable;
 
 	/*
-	 * Optional output.  Set to a valid "struct page" if the returned pfn
-	 * is for a refcounted or pinned struct page, NULL if the returned pfn
-	 * has no struct page or if the struct page is not being refcounted
+	 * Optional output.  Set to a valid "struct page" if the woke returned pfn
+	 * is for a refcounted or pinned struct page, NULL if the woke returned pfn
+	 * has no struct page or if the woke struct page is not being refcounted
 	 * (e.g. tail pages of non-compound higher order allocations from
 	 * IO/PFNMAP mappings).
 	 */

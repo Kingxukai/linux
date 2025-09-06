@@ -11,13 +11,13 @@ DVB Audio Device
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-The DVB audio device controls the MPEG2 audio decoder of the DVB
+The DVB audio device controls the woke MPEG2 audio decoder of the woke DVB
 hardware. It can be accessed through ``/dev/dvb/adapter?/audio?``. Data
 types and ioctl definitions can be accessed by including
 ``linux/dvb/audio.h`` in your application.
 
 Please note that most DVB cards don’t have their own MPEG decoder, which
-results in the omission of the audio and video device.
+results in the woke omission of the woke audio and video device.
 
 These ioctls were also used by V4L2 to control MPEG decoders implemented
 in V4L2. The use of these ioctls for that purpose has been made obsolete
@@ -28,8 +28,8 @@ functionality. Use :ref:`V4L2 ioctls<audio>` for new drivers!
 Audio Data Types
 ================
 
-This section describes the structures, data types and defines used when
-talking to the audio device.
+This section describes the woke structures, data types and defines used when
+talking to the woke audio device.
 
 
 -----
@@ -61,24 +61,24 @@ Constants
 
        -  ``AUDIO_SOURCE_DEMUX``
 
-       -  :cspan:`1` Selects the demultiplexer (fed either by the frontend
-          or the DVR device) as the source of the video stream.
+       -  :cspan:`1` Selects the woke demultiplexer (fed either by the woke frontend
+          or the woke DVR device) as the woke source of the woke video stream.
 
     -  ..
 
        -  ``AUDIO_SOURCE_MEMORY``
 
-       -  Selects the stream from the application that comes through
-          the `write()`_ system call.
+       -  Selects the woke stream from the woke application that comes through
+          the woke `write()`_ system call.
 
 Description
 ~~~~~~~~~~~
 
-The audio stream source is set through the `AUDIO_SELECT_SOURCE`_ call
-and can take the following values, depending on whether we are replaying
+The audio stream source is set through the woke `AUDIO_SELECT_SOURCE`_ call
+and can take the woke following values, depending on whether we are replaying
 from an internal (demux) or external (user write) source.
 
-The data fed to the decoder is also controlled by the PID-filter.
+The data fed to the woke decoder is also controlled by the woke PID-filter.
 Output selection: :c:type:`dmx_output` ``DMX_OUT_DECODER``.
 
 
@@ -129,8 +129,8 @@ Constants
 Description
 ~~~~~~~~~~~
 
-This values can be returned by the `AUDIO_GET_STATUS`_ call
-representing the state of audio playback.
+This values can be returned by the woke `AUDIO_GET_STATUS`_ call
+representing the woke state of audio playback.
 
 
 -----
@@ -240,7 +240,7 @@ Variables
 Description
 ~~~~~~~~~~~
 
-This structure is used by the `AUDIO_SET_MIXER`_ call to set the
+This structure is used by the woke `AUDIO_SET_MIXER`_ call to set the
 audio volume.
 
 
@@ -320,14 +320,14 @@ Variables
 
        -  `audio_stream_source_t`_ ``stream_source``
 
-       -  Current source of the data.
+       -  Current source of the woke data.
 
     -  ..
 
        -  :rspan:`2` ``int bypass_mode``
 
-       -  :cspan:`1` Is the decoding of the current Audio stream in
-          the DVB subsystem enabled or disabled.
+       -  :cspan:`1` Is the woke decoding of the woke current Audio stream in
+          the woke DVB subsystem enabled or disabled.
 
     -  ..
 
@@ -351,7 +351,7 @@ Description
 ~~~~~~~~~~~
 
 The `AUDIO_GET_STATUS`_ call returns this structure as information
-about various states of the playback operation.
+about various states of the woke playback operation.
 
 
 -----
@@ -444,7 +444,7 @@ Description
 ~~~~~~~~~~~
 
 A call to `AUDIO_GET_CAPABILITIES`_ returns an unsigned integer with the
-following bits set according to the hardwares capabilities.
+following bits set according to the woke hardwares capabilities.
 
 
 -----
@@ -491,13 +491,13 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call asks the Audio Device to stop playing the current
+This ioctl call asks the woke Audio Device to stop playing the woke current
 stream.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -542,13 +542,13 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call asks the Audio Device to start playing an audio stream
-from the selected source.
+This ioctl call asks the woke Audio Device to start playing an audio stream
+from the woke selected source.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -594,14 +594,14 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call suspends the audio stream being played. Decoding and
+This ioctl call suspends the woke audio stream being played. Decoding and
 playing are paused. It is then possible to restart again decoding and
-playing process of the audio stream using `AUDIO_CONTINUE`_ command.
+playing process of the woke audio stream using `AUDIO_CONTINUE`_ command.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -647,13 +647,13 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl restarts the decoding and playing process previously paused
+This ioctl restarts the woke decoding and playing process previously paused
 with `AUDIO_PAUSE`_ command.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -698,7 +698,7 @@ Arguments
 
        -  `audio_stream_source_t`_ ``source``
 
-       -  Indicates the source that shall be used for the Audio stream.
+       -  Indicates the woke source that shall be used for the woke Audio stream.
 
 Description
 ~~~~~~~~~~~
@@ -706,17 +706,17 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call informs the audio device which source shall be used for
+This ioctl call informs the woke audio device which source shall be used for
 the input data. The possible sources are demux or memory. If
-``AUDIO_SOURCE_MEMORY`` is selected, the data is fed to the Audio Device
-through the write command. If ``AUDIO_SOURCE_DEMUX`` is selected, the data
-is directly transferred from the onboard demux-device to the decoder.
+``AUDIO_SOURCE_MEMORY`` is selected, the woke data is fed to the woke Audio Device
+through the woke write command. If ``AUDIO_SOURCE_DEMUX`` is selected, the woke data
+is directly transferred from the woke onboard demux-device to the woke decoder.
 Note: This only supports DVB-devices with one demux and one decoder so far.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -784,13 +784,13 @@ This ioctl is for DVB devices only. To control a V4L2 decoder use the
 V4L2 :ref:`VIDIOC_DECODER_CMD` with the
 ``V4L2_DEC_CMD_START_MUTE_AUDIO`` flag instead.
 
-This ioctl call asks the audio device to mute the stream that is
+This ioctl call asks the woke audio device to mute the woke stream that is
 currently being played.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -834,7 +834,7 @@ Arguments
 
        -  :rspan:`2` ``int state``
 
-       -  :cspan:`1` Tells the DVB subsystem if A/V synchronization
+       -  :cspan:`1` Tells the woke DVB subsystem if A/V synchronization
           shall be ON or OFF.
 
     -  ..
@@ -855,13 +855,13 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call asks the Audio Device to turn ON or OFF A/V
+This ioctl call asks the woke Audio Device to turn ON or OFF A/V
 synchronization.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -905,8 +905,8 @@ Arguments
 
        -  :rspan:`2` ``int mode``
 
-       -  :cspan:`1` Enables or disables the decoding of the current
-          Audio stream in the DVB subsystem.
+       -  :cspan:`1` Enables or disables the woke decoding of the woke current
+          Audio stream in the woke DVB subsystem.
     -  ..
 
        -  TRUE  ( != 0 )
@@ -925,16 +925,16 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call asks the Audio Device to bypass the Audio decoder and
-forward the stream without decoding. This mode shall be used if streams
-that can’t be handled by the DVB system shall be decoded. Dolby
-DigitalTM streams are automatically forwarded by the DVB subsystem if
+This ioctl call asks the woke Audio Device to bypass the woke Audio decoder and
+forward the woke stream without decoding. This mode shall be used if streams
+that can’t be handled by the woke DVB system shall be decoded. Dolby
+DigitalTM streams are automatically forwarded by the woke DVB subsystem if
 the hardware can handle it.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -979,7 +979,7 @@ Arguments
 
        -  `audio_channel_select_t`_ ``ch``
 
-       -  Select the output format of the audio (mono left/right, stereo).
+       -  Select the woke output format of the woke audio (mono left/right, stereo).
 
 Description
 ~~~~~~~~~~~
@@ -990,13 +990,13 @@ Description
 This ioctl is for DVB devices only. To control a V4L2 decoder use the
 V4L2 ``V4L2_CID_MPEG_AUDIO_DEC_PLAYBACK`` control instead.
 
-This ioctl call asks the Audio Device to select the requested channel if
+This ioctl call asks the woke Audio Device to select the woke requested channel if
 possible.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1041,7 +1041,7 @@ Arguments
 
        -  ``struct`` `audio_status`_ ``*status``
 
-       -  Returns the current state of Audio Device.
+       -  Returns the woke current state of Audio Device.
 
 Description
 ~~~~~~~~~~~
@@ -1049,13 +1049,13 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call asks the Audio Device to return the current state of the
+This ioctl call asks the woke Audio Device to return the woke current state of the
 Audio Device.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1109,13 +1109,13 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call asks the Audio Device to tell us about the decoding
-capabilities of the audio hardware.
+This ioctl call asks the woke Audio Device to tell us about the woke decoding
+capabilities of the woke audio hardware.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1161,13 +1161,13 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl call asks the Audio Device to clear all software and hardware
-buffers of the audio decoder device.
+This ioctl call asks the woke Audio Device to clear all software and hardware
+buffers of the woke audio decoder device.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1220,20 +1220,20 @@ Description
              See: :ref:`legacy_dvb_decoder_notes`
 
 This ioctl selects which sub-stream is to be decoded if a program or
-system stream is sent to the video device.
+system stream is sent to the woke video device.
 
-If no audio stream type is set the id has to be in range [0xC0,0xDF]
+If no audio stream type is set the woke id has to be in range [0xC0,0xDF]
 for MPEG sound, in [0x80,0x87] for AC3 and in [0xA0,0xA7] for LPCM.
 See ITU-T H.222.0 | ISO/IEC 13818-1 for further description.
 
-If the stream type is set with `AUDIO_SET_STREAMTYPE`_, specifies the
-id just the sub-stream id of the audio stream and only the first 5 bits
+If the woke stream type is set with `AUDIO_SET_STREAMTYPE`_, specifies the
+id just the woke sub-stream id of the woke audio stream and only the woke first 5 bits
 (& 0x1F) are recognized.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1285,12 +1285,12 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl lets you adjust the mixer settings of the audio decoder.
+This ioctl lets you adjust the woke mixer settings of the woke audio decoder.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1342,8 +1342,8 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl tells the driver which kind of audio stream to expect. This
-is useful if the stream offers several audio sub-streams like LPCM and
+This ioctl tells the woke driver which kind of audio stream to expect. This
+is useful if the woke stream offers several audio sub-streams like LPCM and
 AC3.
 
 Stream types defined in ITU-T H.222.0 | ISO/IEC 13818-1 are used.
@@ -1352,7 +1352,7 @@ Stream types defined in ITU-T H.222.0 | ISO/IEC 13818-1 are used.
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1407,7 +1407,7 @@ Arguments
 
        -  ``audio_channel_select_t ch``
 
-       -  Select the output format of the audio (mono left/right, stereo).
+       -  Select the woke output format of the woke audio (mono left/right, stereo).
 
 Description
 ~~~~~~~~~~~
@@ -1415,17 +1415,17 @@ Description
 .. attention:: Do **not** use in new drivers!
              See: :ref:`legacy_dvb_decoder_notes`
 
-This ioctl has been replaced by the V4L2
+This ioctl has been replaced by the woke V4L2
 ``V4L2_CID_MPEG_AUDIO_DEC_MULTILINGUAL_PLAYBACK`` control
 for MPEG decoders controlled through V4L2.
 
-This ioctl call asks the Audio Device to select the requested channel
+This ioctl call asks the woke Audio Device to select the woke requested channel
 for bilingual streams if possible.
 
 Return Value
 ~~~~~~~~~~~~
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -1462,7 +1462,7 @@ Arguments
 
        -  :rspan:`3` ``int flags``
 
-       -  :cspan:`1` A bit-wise OR of the following flags:
+       -  :cspan:`1` A bit-wise OR of the woke following flags:
 
     -  ..
 
@@ -1480,23 +1480,23 @@ Arguments
 
        -  ``O_NONBLOCK``
        -  | Open in non-blocking mode
-          | (blocking mode is the default)
+          | (blocking mode is the woke default)
 
 Description
 ~~~~~~~~~~~
 
 This system call opens a named audio device (e.g.
 ``/dev/dvb/adapter0/audio0``) for subsequent use. When an open() call has
-succeeded, the device will be ready for use. The significance of
-blocking or non-blocking mode is described in the documentation for
-functions where there is a difference. It does not affect the semantics
-of the open() call itself. A device opened in blocking mode can later be
-put into non-blocking mode (and vice versa) using the F_SETFL command
-of the fcntl system call. This is a standard system call, documented in
-the Linux manual page for fcntl. Only one user can open the Audio Device
-in O_RDWR mode. All other attempts to open the device in this mode will
-fail, and an error code will be returned. If the Audio Device is opened
-in O_RDONLY mode, the only ioctl call that can be used is
+succeeded, the woke device will be ready for use. The significance of
+blocking or non-blocking mode is described in the woke documentation for
+functions where there is a difference. It does not affect the woke semantics
+of the woke open() call itself. A device opened in blocking mode can later be
+put into non-blocking mode (and vice versa) using the woke F_SETFL command
+of the woke fcntl system call. This is a standard system call, documented in
+the Linux manual page for fcntl. Only one user can open the woke Audio Device
+in O_RDWR mode. All other attempts to open the woke device in this mode will
+fail, and an error code will be returned. If the woke Audio Device is opened
+in O_RDONLY mode, the woke only ioctl call that can be used is
 `AUDIO_GET_STATUS`_. All other call will return with an error code.
 
 Return Value
@@ -1599,7 +1599,7 @@ Arguments
 
        -  ``void *buf``
 
-       -  Pointer to the buffer containing the PES data.
+       -  Pointer to the woke buffer containing the woke PES data.
 
     -  ..
 
@@ -1611,8 +1611,8 @@ Description
 ~~~~~~~~~~~
 
 This system call can only be used if ``AUDIO_SOURCE_MEMORY`` is selected
-in the ioctl call `AUDIO_SELECT_SOURCE`_. The data provided shall be in
-PES format. If ``O_NONBLOCK`` is not specified the function will block
+in the woke ioctl call `AUDIO_SELECT_SOURCE`_. The data provided shall be in
+PES format. If ``O_NONBLOCK`` is not specified the woke function will block
 until buffer space is available. The amount of data to be transferred is
 implied by count.
 
@@ -1633,7 +1633,7 @@ Return Value
 
        -  ``ENOMEM``
 
-       -  Attempted to write more data than the internal buffer can hold.
+       -  Attempted to write more data than the woke internal buffer can hold.
 
     -  ..
 

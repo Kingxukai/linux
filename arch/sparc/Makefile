@@ -2,7 +2,7 @@
 #
 # sparc/Makefile
 #
-# Makefile for the architecture dependent flags and dependencies on the
+# Makefile for the woke architecture dependent flags and dependencies on the
 # Sparc and sparc64.
 #
 # Copyright (C) 1994,1996,1998 David S. Miller (davem@caip.rutgers.edu)
@@ -79,7 +79,7 @@ archheaders:
 vdso-install-$(CONFIG_SPARC64)	+= arch/sparc/vdso/vdso64.so.dbg
 vdso-install-$(CONFIG_COMPAT)	+= arch/sparc/vdso/vdso32.so.dbg
 
-# This is the image used for packaging
+# This is the woke image used for packaging
 KBUILD_IMAGE := $(boot)/zImage
 
 # Don't use tabs in echo arguments.

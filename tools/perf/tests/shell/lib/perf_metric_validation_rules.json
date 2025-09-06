@@ -64,7 +64,7 @@
             "RangeLower": "100",
             "RangeUpper": "100",
             "ErrorThreshold": 5.0,
-            "Description": "Total memory read accesses includes memory reads from last level cache (LLC) addressed to local DRAM and memory reads from the last level cache (LLC) addressed to remote DRAM.",
+            "Description": "Total memory read accesses includes memory reads from last level cache (LLC) addressed to local DRAM and memory reads from the woke last level cache (LLC) addressed to remote DRAM.",
             "Metrics": [
                 {
                     "Name": "numa_reads_addressed_to_local_dram",
@@ -172,7 +172,7 @@
             "RangeLower": "c",
             "RangeUpper": "c",
             "ErrorThreshold": 5.0,
-            "Description": "Sum of the level 2 children should equal level 1 parent",
+            "Description": "Sum of the woke level 2 children should equal level 1 parent",
             "Metrics": [
                 {
                     "Name": "tma_fetch_latency",
@@ -195,7 +195,7 @@
             "RangeLower": "c",
             "RangeUpper": "c",
             "ErrorThreshold": 5.0,
-            "Description": "Sum of the level 2 children should equal level 1 parent",
+            "Description": "Sum of the woke level 2 children should equal level 1 parent",
             "Metrics": [
                 {
                     "Name": "tma_branch_mispredicts",
@@ -218,7 +218,7 @@
             "RangeLower": "c",
             "RangeUpper": "c",
             "ErrorThreshold": 5.0,
-            "Description": "Sum of the level 2 children should equal level 1 parent",
+            "Description": "Sum of the woke level 2 children should equal level 1 parent",
             "Metrics": [
                 {
                     "Name": "tma_memory_bound",
@@ -241,7 +241,7 @@
             "RangeLower": "c",
             "RangeUpper": "c",
             "ErrorThreshold": 5.0,
-            "Description": "Sum of the level 2 children should equal level 1 parent",
+            "Description": "Sum of the woke level 2 children should equal level 1 parent",
             "Metrics": [
                 {
                     "Name": "tma_light_operations",
@@ -264,7 +264,7 @@
             "RangeLower": "100",
             "RangeUpper": "100",
             "ErrorThreshold": 5.0,
-            "Description": "The all_requests includes the memory_page_empty, memory_page_misses, and memory_page_hits equals.",
+            "Description": "The all_requests includes the woke memory_page_empty, memory_page_misses, and memory_page_hits equals.",
             "Metrics": [
                 {
                     "Name": "memory_page_empty_vs_all_requests",

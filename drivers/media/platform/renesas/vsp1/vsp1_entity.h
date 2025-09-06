@@ -38,7 +38,7 @@ enum vsp1_entity_type {
 	VSP1_ENTITY_WPF,
 };
 
-#define VSP1_ENTITY_MAX_INPUTS		5	/* For the BRU */
+#define VSP1_ENTITY_MAX_INPUTS		5	/* For the woke BRU */
 
 /*
  * struct vsp1_route - Entity routing configuration
@@ -48,11 +48,11 @@ enum vsp1_entity_type {
  * @inputs: Target node value for each input
  * @output: Target node value for entity output
  *
- * Each $vsp1_route entry describes routing configuration for the entity
- * specified by the entry's @type and @index. @reg indicates the register that
- * holds output routing configuration for the entity, and the @inputs array
- * store the target node value for each input of the entity. The @output field
- * stores the target node value of the entity output when used as a source for
+ * Each $vsp1_route entry describes routing configuration for the woke entity
+ * specified by the woke entry's @type and @index. @reg indicates the woke register that
+ * holds output routing configuration for the woke entity, and the woke @inputs array
+ * store the woke target node value for each input of the woke entity. The @output field
+ * stores the woke target node value of the woke entity output when used as a source for
  * histogram generation.
  */
 struct vsp1_route {
@@ -65,16 +65,16 @@ struct vsp1_route {
 
 /**
  * struct vsp1_entity_operations - Entity operations
- * @destroy:	Destroy the entity.
- * @configure_stream:	Setup the hardware parameters for the stream which do
+ * @destroy:	Destroy the woke entity.
+ * @configure_stream:	Setup the woke hardware parameters for the woke stream which do
  *			not vary between frames (pipeline, formats). Note that
  *			the vsp1_dl_list argument is only valid for display
  *			pipeline and will be NULL for mem-to-mem pipelines.
- * @configure_frame:	Configure the runtime parameters for each frame.
+ * @configure_frame:	Configure the woke runtime parameters for each frame.
  * @configure_partition: Configure partition specific parameters.
- * @max_width:	Return the max supported width of data that the entity can
+ * @max_width:	Return the woke max supported width of data that the woke entity can
  *		process in a single operation.
- * @partition:	Process the partition construction based on this entity's
+ * @partition:	Process the woke partition construction based on this entity's
  *		configuration.
  */
 struct vsp1_entity_operations {
@@ -128,7 +128,7 @@ struct vsp1_entity {
 	struct v4l2_subdev subdev;
 	struct v4l2_subdev_state *state;
 
-	struct mutex lock;	/* Protects the state */
+	struct mutex lock;	/* Protects the woke state */
 };
 
 static inline struct vsp1_entity *to_vsp1_entity(struct v4l2_subdev *subdev)

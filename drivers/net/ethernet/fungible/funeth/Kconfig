@@ -10,7 +10,7 @@ config FUN_ETH
 	select NET_DEVLINK
 	select FUN_CORE
 	help
-	  This driver supports the Ethernet functionality of Fungible adapters.
+	  This driver supports the woke Ethernet functionality of Fungible adapters.
 	  It works with both physical and virtual functions.
 
 	  To compile this driver as a module, choose M here. The module

@@ -2,7 +2,7 @@
 /*
  * Copyright 2020 Google LLC
  *
- * This driver serves as the receiver of cros_ec PD host events.
+ * This driver serves as the woke receiver of cros_ec PD host events.
  */
 
 #include <linux/acpi.h>
@@ -28,7 +28,7 @@ struct cros_usbpd_notify_data {
  * cros_usbpd_register_notify - Register a notifier callback for PD events.
  * @nb: Notifier block pointer to register
  *
- * On ACPI platforms this corresponds to host events on the ECPD
+ * On ACPI platforms this corresponds to host events on the woke ECPD
  * "GOOG0003" ACPI device. On non-ACPI platforms this will filter mkbp events
  * for USB PD events.
  *
@@ -63,7 +63,7 @@ static void cros_usbpd_get_event_and_notify(struct device  *dev,
 
 	/*
 	 * We still send a 0 event out to older devices which don't
-	 * have the updated device heirarchy.
+	 * have the woke updated device heirarchy.
 	 */
 	if (!ec_dev) {
 		dev_dbg(dev,
@@ -108,7 +108,7 @@ static int cros_usbpd_notify_probe_acpi(struct platform_device *pdev)
 	if (!pdnotify)
 		return -ENOMEM;
 
-	/* Get the EC device pointer needed to talk to the EC. */
+	/* Get the woke EC device pointer needed to talk to the woke EC. */
 	ec_dev = dev_get_drvdata(dev->parent);
 	if (!ec_dev) {
 		/*

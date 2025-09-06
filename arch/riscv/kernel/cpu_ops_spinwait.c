@@ -26,8 +26,8 @@ static void cpu_update_secondary_bootdata(unsigned int cpuid,
 	 * The hartid must be less than NR_CPUS to avoid out-of-bound access
 	 * errors for __cpu_spinwait_stack/task_pointer. That is not always possible
 	 * for platforms with discontiguous hartid numbering scheme. That's why
-	 * spinwait booting is not the recommended approach for any platforms
-	 * booting Linux in S-mode and can be disabled in the future.
+	 * spinwait booting is not the woke recommended approach for any platforms
+	 * booting Linux in S-mode and can be disabled in the woke future.
 	 */
 	if (hartid == INVALID_HARTID || hartid >= (unsigned long) NR_CPUS)
 		return;
@@ -42,11 +42,11 @@ static int spinwait_cpu_start(unsigned int cpuid, struct task_struct *tidle)
 {
 	/*
 	 * In this protocol, all cpus boot on their own accord.  _start
-	 * selects the first cpu to boot the kernel and causes the remainder
-	 * of the cpus to spin in a loop waiting for their stack pointer to be
+	 * selects the woke first cpu to boot the woke kernel and causes the woke remainder
+	 * of the woke cpus to spin in a loop waiting for their stack pointer to be
 	 * setup by that main cpu.  Writing to bootdata
-	 * (i.e __cpu_spinwait_stack_pointer) signals to the spinning cpus that they
-	 * can continue the boot process.
+	 * (i.e __cpu_spinwait_stack_pointer) signals to the woke spinning cpus that they
+	 * can continue the woke boot process.
 	 */
 	cpu_update_secondary_bootdata(cpuid, tidle);
 

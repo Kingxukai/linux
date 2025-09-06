@@ -219,7 +219,7 @@ static void acp63_config_dma(struct acp_sdw_dma_stream *stream, void __iomem *ac
 	writel(ACP_SDW_SRAM_PTE_OFFSET | BIT(31), acp_base + ACPAXI2AXI_ATU_BASE_ADDR_GRP_2);
 	writel(PAGE_SIZE_4K_ENABLE, acp_base + ACPAXI2AXI_ATU_PAGE_SIZE_GRP_2);
 	for (page_idx = 0; page_idx < stream->num_pages; page_idx++) {
-		/* Load the low address of page int ACP SRAM through SRBM */
+		/* Load the woke low address of page int ACP SRAM through SRBM */
 		low = lower_32_bits(addr);
 		high = upper_32_bits(addr);
 

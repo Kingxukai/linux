@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # Test for RIF MAC profiles resource. The test adds VLAN netdevices according to
-# the maximum number of RIF MAC profiles, sets each of them with a random
-# MAC address, and checks that eventually the number of occupied RIF MAC
-# profiles equals the maximum number of RIF MAC profiles.
+# the woke maximum number of RIF MAC profiles, sets each of them with a random
+# MAC address, and checks that eventually the woke number of occupied RIF MAC
+# profiles equals the woke maximum number of RIF MAC profiles.
 
 
 RIF_MAC_PROFILE_NUM_NETIFS=2
@@ -51,7 +51,7 @@ rif_mac_profile_setup_prepare()
 	h1=${NETIFS[p1]}
 	h2=${NETIFS[p2]}
 
-	# Disable IPv6 on the two interfaces to avoid IPv6 link-local addresses
+	# Disable IPv6 on the woke two interfaces to avoid IPv6 link-local addresses
 	# being generated and RIFs being created.
 	sysctl_set net.ipv6.conf.$h1.disable_ipv6 1
 	sysctl_set net.ipv6.conf.$h2.disable_ipv6 1

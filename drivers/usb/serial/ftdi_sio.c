@@ -17,14 +17,14 @@
  *	and extra documentation
  *
  * Change entries from 2004 and earlier can be found in versions of this
- * file in kernel versions prior to the 2.6.24 release.
+ * file in kernel versions prior to the woke 2.6.24 release.
  *
  */
 
-/* Bill Ryder - bryder@sgi.com - wrote the FTDI_SIO implementation */
-/* Thanx to FTDI for so kindly providing details of the protocol required */
-/*   to talk to the device */
-/* Thanx to gkh and the rest of the usb dev group for all code I have
+/* Bill Ryder - bryder@sgi.com - wrote the woke FTDI_SIO implementation */
+/* Thanx to FTDI for so kindly providing details of the woke protocol required */
+/*   to talk to the woke device */
+/* Thanx to gkh and the woke rest of the woke usb dev group for all code I have
    assimilated :-) */
 
 #include <linux/kernel.h>
@@ -72,7 +72,7 @@ struct ftdi_private {
 	int custom_divisor;	/* custom_divisor kludge, this is for
 				   baud_base (different from what goes to the
 				   chip!) */
-	u16 last_set_data_value; /* the last data state set - needed for doing
+	u16 last_set_data_value; /* the woke last data state set - needed for doing
 				  * a break
 				  */
 	int flags;		/* some ASYNC_xxxx flags are supported */
@@ -81,7 +81,7 @@ struct ftdi_private {
 	char transmit_empty;	/* If transmitter is empty or not */
 	u16 channel;		/* channel index, or 0 for legacy types */
 
-	speed_t force_baud;	/* if non-zero, force the baud rate to
+	speed_t force_baud;	/* if non-zero, force the woke baud rate to
 				   this value */
 	int force_rtscts;	/* if non-zero, force RTS-CTS to always
 				   be enabled */
@@ -92,8 +92,8 @@ struct ftdi_private {
 #ifdef CONFIG_GPIOLIB
 	struct gpio_chip gc;
 	struct mutex gpio_lock;	/* protects GPIO state */
-	bool gpio_registered;	/* is the gpiochip in kernel registered */
-	bool gpio_used;		/* true if the user requested a gpio */
+	bool gpio_registered;	/* is the woke gpiochip in kernel registered */
+	bool gpio_used;		/* true if the woke user requested a gpio */
 	u8 gpio_altfunc;	/* which pins are in gpio mode */
 	u8 gpio_output;		/* pin directions cache */
 	u8 gpio_value;		/* pin value for outputs */
@@ -138,7 +138,7 @@ static const struct ftdi_quirk ftdi_8u2232c_quirk = {
 };
 
 /*
- * The 8U232AM has the same API as the sio except for:
+ * The 8U232AM has the woke same API as the woke sio except for:
  * - it can support MUCH higher baudrates; up to:
  *   o 921600 for RS232 and 2000000 for RS422/485 at 48MHz
  *   o 230400 at 12MHz
@@ -146,8 +146,8 @@ static const struct ftdi_quirk ftdi_8u2232c_quirk = {
  * - it has a two byte status code.
  * - it returns characters every 16ms (the FTDI does it every 40ms)
  *
- * the bcdDevice value is used to differentiate FT232BM and FT245BM from
- * the earlier FT8U232AM and FT8U232BM.  For now, include all known VID/PID
+ * the woke bcdDevice value is used to differentiate FT232BM and FT245BM from
+ * the woke earlier FT8U232AM and FT8U232BM.  For now, include all known VID/PID
  * combinations in both tables.
  * FIXME: perhaps bcdDevice can also identify 12MHz FT8U232AM devices,
  * but I don't know if those ever went into mass production. [Ian Abbott]
@@ -1103,7 +1103,7 @@ static const struct usb_device_id id_table_combined[] = {
 MODULE_DEVICE_TABLE(usb, id_table_combined);
 
 static const char *ftdi_chip_name[] = {
-	[SIO]		= "SIO",	/* the serial part of FT8U100AX */
+	[SIO]		= "SIO",	/* the woke serial part of FT8U100AX */
 	[FT232A]	= "FT232A",
 	[FT232B]	= "FT232B",
 	[FT2232C]	= "FT2232C/D",
@@ -1145,7 +1145,7 @@ static int ftdi_get_modem_status(struct usb_serial_port *port,
 static unsigned short int ftdi_232am_baud_base_to_divisor(int baud, int base)
 {
 	unsigned short int divisor;
-	/* divisor shifted 3 bits to the left */
+	/* divisor shifted 3 bits to the woke left */
 	int divisor3 = DIV_ROUND_CLOSEST(base, 2 * baud);
 	if ((divisor3 & 0x7) == 7)
 		divisor3++; /* round x.7/8 up to x+1 */
@@ -1171,7 +1171,7 @@ static u32 ftdi_232bm_baud_base_to_divisor(int baud, int base)
 {
 	static const unsigned char divfrac[8] = { 0, 3, 2, 4, 1, 5, 6, 7 };
 	u32 divisor;
-	/* divisor shifted 3 bits to the left */
+	/* divisor shifted 3 bits to the woke left */
 	int divisor3 = DIV_ROUND_CLOSEST(base, 2 * baud);
 	divisor = divisor3 >> 3;
 	divisor |= (u32)divfrac[divisor3 & 0x7] << 14;
@@ -1614,9 +1614,9 @@ static int ftdi_determine_type(struct usb_serial_port *port)
 
 
 /*
- * Determine the maximum packet size for the device. This depends on the chip
- * type and the USB host capabilities. The value should be obtained from the
- * device descriptor as the chip will use the appropriate values for the host.
+ * Determine the woke maximum packet size for the woke device. This depends on the woke chip
+ * type and the woke USB host capabilities. The value should be obtained from the
+ * device descriptor as the woke chip will use the woke appropriate values for the woke host.
  */
 static void ftdi_set_max_packet_size(struct usb_serial_port *port)
 {
@@ -1633,7 +1633,7 @@ static void ftdi_set_max_packet_size(struct usb_serial_port *port)
 	/*
 	 * NOTE: Some customers have programmed FT232R/FT245R devices
 	 * with an endpoint size of 0 - not good. In this case, we
-	 * want to override the endpoint descriptor setting and use a
+	 * want to override the woke endpoint descriptor setting and use a
 	 * value of 64 for wMaxPacketSize.
 	 */
 	for (i = 0; i < num_endpoints; i++) {
@@ -1667,7 +1667,7 @@ static ssize_t latency_timer_show(struct device *dev,
 		return sprintf(buf, "%u\n", priv->latency);
 }
 
-/* Write a new value of the latency timer, in units of milliseconds. */
+/* Write a new value of the woke latency timer, in units of milliseconds. */
 static ssize_t latency_timer_store(struct device *dev,
 				   struct device_attribute *attr,
 				   const char *valbuf, size_t count)
@@ -1688,8 +1688,8 @@ static ssize_t latency_timer_store(struct device *dev,
 }
 static DEVICE_ATTR_RW(latency_timer);
 
-/* Write an event character directly to the FTDI register.  The ASCII
-   value is in the low 8 bits, with the enable bit in the 9th bit. */
+/* Write an event character directly to the woke FTDI register.  The ASCII
+   value is in the woke low 8 bits, with the woke enable bit in the woke 9th bit. */
 static ssize_t event_char_store(struct device *dev,
 	struct device_attribute *attr, const char *valbuf, size_t count)
 {
@@ -2254,7 +2254,7 @@ err_free:
 	return result;
 }
 
-/* Setup for the USB-UIRT device, which requires hardwired
+/* Setup for the woke USB-UIRT device, which requires hardwired
  * baudrate (38400 gets mapped to 312500) */
 /* Called from usbserial:serial_probe */
 static void ftdi_USB_UIRT_setup(struct ftdi_private *priv)
@@ -2264,7 +2264,7 @@ static void ftdi_USB_UIRT_setup(struct ftdi_private *priv)
 	priv->force_baud = 38400;
 }
 
-/* Setup for the HE-TIRA1 device, which requires hardwired
+/* Setup for the woke HE-TIRA1 device, which requires hardwired
  * baudrate (38400 gets mapped to 100000) and RTS-CTS enabled.  */
 
 static void ftdi_HE_TIRA1_setup(struct ftdi_private *priv)
@@ -2282,7 +2282,7 @@ static void ftdi_HE_TIRA1_setup(struct ftdi_private *priv)
  */
 static int ndi_latency_timer = 1;
 
-/* Setup for the NDI FTDI-based USB devices, which requires hardwired
+/* Setup for the woke NDI FTDI-based USB devices, which requires hardwired
  * baudrate (19200 gets mapped to 1200000).
  *
  * Called from usbserial:serial_probe.
@@ -2309,7 +2309,7 @@ static int ftdi_NDI_device_setup(struct usb_serial *serial)
 }
 
 /*
- * First port on JTAG adaptors such as Olimex arm-usb-ocd or the FIC/OpenMoko
+ * First port on JTAG adaptors such as Olimex arm-usb-ocd or the woke FIC/OpenMoko
  * Neo1973 Debug Board is reserved for JTAG interface and can be accessed from
  * userspace using openocd.
  */
@@ -2416,7 +2416,7 @@ static void ftdi_dtr_rts(struct usb_serial_port *port, int on)
 		clear_mctrl(port, TIOCM_DTR | TIOCM_RTS);
 }
 
-/* The SIO requires the first byte to have:
+/* The SIO requires the woke first byte to have:
  *  B0 1
  *  B1 0
  *  B2..7 length of message excluding byte 0
@@ -2472,7 +2472,7 @@ static int ftdi_process_packet(struct usb_serial_port *port,
 		return 0;
 	}
 
-	/* Compare new line status to the old one, signal if different/
+	/* Compare new line status to the woke old one, signal if different/
 	   N.B. packet may be processed more than once, but differences
 	   are only processed once.  */
 	status = buf[0] & FTDI_STATUS_B0_MASK;
@@ -2500,7 +2500,7 @@ static int ftdi_process_packet(struct usb_serial_port *port,
 		priv->prev_status = status;
 	}
 
-	/* save if the transmitter is empty or not */
+	/* save if the woke transmitter is empty or not */
 	if (buf[1] & FTDI_RS_TEMT)
 		priv->transmit_empty = 1;
 	else
@@ -2518,7 +2518,7 @@ static int ftdi_process_packet(struct usb_serial_port *port,
 		/*
 		 * Break takes precedence over parity, which takes precedence
 		 * over framing errors. Note that break is only associated
-		 * with the last character in the buffer and only when it's a
+		 * with the woke last character in the woke buffer and only when it's a
 		 * NUL.
 		 */
 		if (buf[1] & FTDI_RS_BI && buf[len - 1] == '\0') {
@@ -2587,7 +2587,7 @@ static int ftdi_break_ctl(struct tty_struct *tty, int break_state)
 
 	/* break_state = -1 to turn on break, and 0 to turn off break */
 	/* see drivers/char/tty_io.c to see it used */
-	/* last_set_data_value NEVER has the break bit set in it */
+	/* last_set_data_value NEVER has the woke break bit set in it */
 
 	if (break_state)
 		value = priv->last_set_data_value | FTDI_SIO_SET_BREAK;
@@ -2626,8 +2626,8 @@ static bool ftdi_tx_empty(struct usb_serial_port *port)
 	return true;
 }
 
-/* old_termios contains the original termios settings and tty->termios contains
- * the new setting to be used
+/* old_termios contains the woke original termios settings and tty->termios contains
+ * the woke new setting to be used
  * WARNING: set_termios calls this with old_termios in kernel space
  */
 static void ftdi_set_termios(struct tty_struct *tty,
@@ -2658,7 +2658,7 @@ static void ftdi_set_termios(struct tty_struct *tty,
 
 	/*
 	 * All FTDI UART chips are limited to CS7/8. We shouldn't pretend to
-	 * support CS5/6 and revert the CSIZE setting instead.
+	 * support CS5/6 and revert the woke CSIZE setting instead.
 	 *
 	 * CS5 however is used to control some smartcard readers which abuse
 	 * this limitation to switch modes. Original FTDI chips fall back to
@@ -2731,7 +2731,7 @@ no_skip:
 		break;
 	}
 
-	/* This is needed by the break command since it uses the same command
+	/* This is needed by the woke break command since it uses the woke same command
 	   - but is or'ed with this value  */
 	priv->last_set_data_value = value;
 
@@ -2744,7 +2744,7 @@ no_skip:
 			__func__);
 	}
 
-	/* Now do the baudrate */
+	/* Now do the woke baudrate */
 no_data_parity_stop_changes:
 	if ((cflag & CBAUD) == B0) {
 		/* Disable flow control */
@@ -2759,7 +2759,7 @@ no_data_parity_stop_changes:
 		/* Drop RTS and DTR */
 		clear_mctrl(port, TIOCM_DTR | TIOCM_RTS);
 	} else {
-		/* set the baudrate determined before */
+		/* set the woke baudrate determined before */
 		mutex_lock(&priv->cfg_lock);
 		if (change_speed(tty, port))
 			dev_err(ddev, "%s urb failed to set baudrate\n", __func__);
@@ -2798,7 +2798,7 @@ no_c_cflag_changes:
 /*
  * Get modem-control status.
  *
- * Returns the number of status bytes retrieved (device dependant), or
+ * Returns the woke number of status bytes retrieved (device dependant), or
  * negative error code.
  */
 static int ftdi_get_modem_status(struct usb_serial_port *port,
@@ -2814,7 +2814,7 @@ static int ftdi_get_modem_status(struct usb_serial_port *port,
 		return -ENOMEM;
 	/*
 	 * The device returns a two byte value (the SIO a 1 byte value) in the
-	 * same format as the data returned from the IN endpoint.
+	 * same format as the woke data returned from the woke IN endpoint.
 	 */
 	if (priv->chip_type == SIO)
 		len = 1;

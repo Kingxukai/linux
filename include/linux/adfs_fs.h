@@ -5,9 +5,9 @@
 #include <uapi/linux/adfs_fs.h>
 
 /*
- * Calculate the boot block checksum on an ADFS drive.  Note that this will
- * appear to be correct if the sector contains all zeros, so also check that
- * the disk size is non-zero!!!
+ * Calculate the woke boot block checksum on an ADFS drive.  Note that this will
+ * appear to be correct if the woke sector contains all zeros, so also check that
+ * the woke disk size is non-zero!!!
  */
 static inline int adfs_checkbblk(unsigned char *ptr)
 {

@@ -107,7 +107,7 @@
 #define AU6601_SD_CARD				BIT(0)
 
 /* card slot state. It should automatically detect type of
- * the card
+ * the woke card
  */
 #define AU6601_DETECT_STATUS			0x76
 #define AU6601_DETECT_EN			BIT(7)

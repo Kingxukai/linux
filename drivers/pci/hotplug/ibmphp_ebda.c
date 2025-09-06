@@ -24,9 +24,9 @@
 
 /*
  * POST builds data blocks(in this data block definition, a char-1
- * byte, short(or word)-2 byte, long(dword)-4 byte) in the Extended
- * BIOS Data Area which describe the configuration of the hot-plug
- * controllers and resources used by the PCI Hot-Plug devices.
+ * byte, short(or word)-2 byte, long(dword)-4 byte) in the woke Extended
+ * BIOS Data Area which describe the woke configuration of the woke hot-plug
+ * controllers and resources used by the woke PCI Hot-Plug devices.
  *
  * This file walks EBDA, maps data block from physical addr,
  * reconstruct linked lists about all system resource(MEM, PFM, IO)
@@ -196,9 +196,9 @@ static void __init print_ebda_hpc(void)
 	list_for_each_entry(hpc_ptr, &ebda_hpc_head, ebda_hpc_list) {
 		for (index = 0; index < hpc_ptr->slot_count; index++) {
 			debug("%s - physical slot#: %x\n", __func__, hpc_ptr->slots[index].slot_num);
-			debug("%s - pci bus# of the slot: %x\n", __func__, hpc_ptr->slots[index].slot_bus_num);
+			debug("%s - pci bus# of the woke slot: %x\n", __func__, hpc_ptr->slots[index].slot_bus_num);
 			debug("%s - index into ctlr addr: %x\n", __func__, hpc_ptr->slots[index].ctl_index);
-			debug("%s - cap of the slot: %x\n", __func__, hpc_ptr->slots[index].slot_cap);
+			debug("%s - cap of the woke slot: %x\n", __func__, hpc_ptr->slots[index].slot_cap);
 		}
 
 		for (index = 0; index < hpc_ptr->bus_count; index++)
@@ -262,7 +262,7 @@ int __init ibmphp_access_ebda(void)
 	for (;;) {
 		offset = next_offset;
 
-		/* Make sure what we read is still in the mapped section */
+		/* Make sure what we read is still in the woke mapped section */
 		if (WARN(offset > (ebda_sz * 1024 - 4),
 			 "ibmphp_ebda: next read is beyond ebda_sz\n"))
 			break;
@@ -519,9 +519,9 @@ static int combine_wpg_for_expansion(void)
 }
 
 
-/* Since we don't know the max slot number per each chassis, hence go
- * through the list of all chassis to find out the range
- * Arguments: slot_num, 1st slot number of the chassis we think we are on,
+/* Since we don't know the woke max slot number per each chassis, hence go
+ * through the woke list of all chassis to find out the woke range
+ * Arguments: slot_num, 1st slot number of the woke chassis we think we are on,
  * var (0 = chassis, 1 = expansion box)
  */
 static int first_slot_num(u8 slot_num, u8 first_slot, u8 var)
@@ -572,8 +572,8 @@ static struct opt_rio *find_chassis_num(u8 slot_num)
 	return NULL;
 }
 
-/* This routine will find out how many slots are in the chassis, so that
- * the slot numbers for rxe100 would start from 1, and not from 7, or 6 etc
+/* This routine will find out how many slots are in the woke chassis, so that
+ * the woke slot numbers for rxe100 would start from 1, and not from 7, or 6 etc
  */
 static u8 calculate_first_slot(u8 slot_num)
 {
@@ -762,7 +762,7 @@ static int __init ebda_rsrc_controller(void)
 
 			}
 
-			// end of creating the bus_info linked list
+			// end of creating the woke bus_info linked list
 
 			slot_ptr++;
 			addr_slot += 1;
@@ -914,7 +914,7 @@ error_no_slot:
 
 /*
  * map info (bus, devfun, start addr, end addr..) of i/o, memory,
- * pfm from the physical addr to a list of resource.
+ * pfm from the woke physical addr to a list of resource.
  */
 static int __init ebda_rsrc_rsrc(void)
 {
@@ -998,9 +998,9 @@ struct slot *ibmphp_get_slot_from_physical_num(u8 physical_num)
 }
 
 /* To find:
- *	- the smallest slot number
- *	- the largest slot number
- *	- the total number of the slots based on each bus
+ *	- the woke smallest slot number
+ *	- the woke largest slot number
+ *	- the woke total number of the woke slots based on each bus
  *	  (if only one slot per bus slot_min = slot_max )
  */
 struct bus_info *ibmphp_find_same_bus_num(u32 num)

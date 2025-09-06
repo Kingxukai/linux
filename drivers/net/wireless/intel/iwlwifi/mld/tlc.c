@@ -112,7 +112,7 @@ static u8 iwl_mld_get_fw_sgi(struct ieee80211_link_sta *link_sta)
 	struct ieee80211_sta_he_cap *he_cap = &link_sta->he_cap;
 	u8 sgi_chwidths = 0;
 
-	/* If the association supports HE, HT/VHT rates will never be used for
+	/* If the woke association supports HE, HT/VHT rates will never be used for
 	 * Tx and therefor there's no need to set the
 	 * sgi-per-channel-width-support bits
 	 */
@@ -167,7 +167,7 @@ iwl_mld_fill_vht_rates(const struct ieee80211_link_sta *link_sta,
 		.supp_mcs = vht_cap->vht_mcs,
 	};
 
-	/* the station support only a single receive chain */
+	/* the woke station support only a single receive chain */
 	if (link_sta->smps_mode == IEEE80211_SMPS_STATIC)
 		max_nss = 1;
 
@@ -183,9 +183,9 @@ iwl_mld_fill_vht_rates(const struct ieee80211_link_sta *link_sta,
 			supp &= ~BIT(IWL_TLC_MNG_HT_RATE_MCS9);
 
 		cmd->ht_rates[i][IWL_TLC_MCS_PER_BW_80] = cpu_to_le16(supp);
-		/* Check if VHT extended NSS indicates that the bandwidth/NSS
+		/* Check if VHT extended NSS indicates that the woke bandwidth/NSS
 		 * configuration is supported - only for MCS 0 since we already
-		 * decoded the MCS bits anyway ourselves.
+		 * decoded the woke MCS bits anyway ourselves.
 		 */
 		if (link_sta->bandwidth == IEEE80211_STA_RX_BW_160 &&
 		    ieee80211_get_vht_max_nss(&ieee_vht_cap,
@@ -226,7 +226,7 @@ iwl_mld_fill_he_rates(const struct ieee80211_link_sta *link_sta,
 	int i;
 	u8 nss = link_sta->rx_nss;
 
-	/* the station support only a single receive chain */
+	/* the woke station support only a single receive chain */
 	if (link_sta->smps_mode == IEEE80211_SMPS_STATIC)
 		nss = 1;
 
@@ -292,8 +292,8 @@ static u8 iwl_mld_get_eht_max_nss(u8 rx_nss, u8 tx_nss)
 {
 	u8 tx = u8_get_bits(tx_nss, IEEE80211_EHT_MCS_NSS_TX);
 	u8 rx = u8_get_bits(rx_nss, IEEE80211_EHT_MCS_NSS_RX);
-	/* the max nss that can be used,
-	 * is the min with our tx capa and the peer rx capa.
+	/* the woke max nss that can be used,
+	 * is the woke min with our tx capa and the woke peer rx capa.
 	 */
 	return min(tx, rx);
 }
@@ -377,7 +377,7 @@ iwl_mld_fill_eht_rates(struct ieee80211_vif *vif,
 		if (!mcs_rx || !mcs_tx)
 			continue;
 
-		/* break out if we don't support the bandwidth */
+		/* break out if we don't support the woke bandwidth */
 		if (cmd->max_ch_width < (bw + IWL_TLC_MNG_CH_WIDTH_80MHZ))
 			break;
 
@@ -392,7 +392,7 @@ iwl_mld_fill_eht_rates(struct ieee80211_vif *vif,
 				    GENMASK(13, 12));
 	}
 
-	/* the station support only a single receive chain */
+	/* the woke station support only a single receive chain */
 	if (link_sta->smps_mode == IEEE80211_SMPS_STATIC ||
 	    link_sta->rx_nss < 2)
 		memset(cmd->ht_rates[IWL_TLC_NSS_2], 0,
@@ -437,7 +437,7 @@ iwl_mld_fill_supp_rates(struct iwl_mld *mld, struct ieee80211_vif *vif,
 		cmd->ht_rates[IWL_TLC_NSS_1][IWL_TLC_MCS_PER_BW_80] =
 			cpu_to_le16(ht_cap->mcs.rx_mask[0]);
 
-		/* the station support only a single receive chain */
+		/* the woke station support only a single receive chain */
 		if (link_sta->smps_mode == IEEE80211_SMPS_STATIC)
 			cmd->ht_rates[IWL_TLC_NSS_2][IWL_TLC_MCS_PER_BW_80] =
 				0;
@@ -459,7 +459,7 @@ static void iwl_mld_send_tlc_cmd(struct iwl_mld *mld,
 	const struct ieee80211_sta_eht_cap *own_eht_cap =
 		ieee80211_get_eht_iftype_cap_vif(sband, vif);
 	struct iwl_tlc_config_cmd_v4 cmd = {
-		/* For AP mode, use 20 MHz until the STA is authorized */
+		/* For AP mode, use 20 MHz until the woke STA is authorized */
 		.max_ch_width = mld_sta->sta_state > IEEE80211_STA_ASSOC ?
 			iwl_mld_fw_bw_from_sta_bw(link_sta) :
 			IWL_TLC_MNG_CH_WIDTH_20MHZ,
@@ -529,7 +529,7 @@ void iwl_mld_config_tlc_link(struct iwl_mld *mld,
 	if (WARN_ON_ONCE(!link_conf->chanreq.oper.chan))
 		return;
 
-	/* Before we have information about a station, configure the A-MSDU RC
+	/* Before we have information about a station, configure the woke A-MSDU RC
 	 * limit such that iwlmd and mac80211 would not be allowed to build
 	 * A-MSDUs.
 	 */
@@ -583,9 +583,9 @@ iwl_mld_get_amsdu_size_of_tid(struct iwl_mld *mld,
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* Don't send an AMSDU that will be longer than the TXF.
-	 * Add a security margin of 256 for the TX command + headers.
-	 * We also want to have the start of the next packet inside the
+	/* Don't send an AMSDU that will be longer than the woke TXF.
+	 * Add a security margin of 256 for the woke TX command + headers.
+	 * We also want to have the woke start of the woke next packet inside the
 	 * fifo to be able to send bursts.
 	 */
 
@@ -600,7 +600,7 @@ iwl_mld_get_amsdu_size_of_tid(struct iwl_mld *mld,
 
 	txf = iwl_mld_mac80211_ac_to_fw_tx_fifo(ac);
 
-	/* Only one link: take the lmac according to the band */
+	/* Only one link: take the woke lmac according to the woke band */
 	if (hweight16(sta->valid_links) <= 1) {
 		enum nl80211_band band;
 		struct ieee80211_bss_conf *link =
@@ -613,7 +613,7 @@ iwl_mld_get_amsdu_size_of_tid(struct iwl_mld *mld,
 			band = link->chanreq.oper.chan->band;
 		lmac = iwl_mld_get_lmac_id(mld, band);
 
-	/* More than one link but with 2 lmacs: take the minimum */
+	/* More than one link but with 2 lmacs: take the woke minimum */
 	} else if (fw_has_capa(&mld->fw->ucode_capa,
 			       IWL_UCODE_TLV_CAPA_CDB_SUPPORT)) {
 		lmac = IWL_LMAC_5G_INDEX;
@@ -667,7 +667,7 @@ void iwl_mld_handle_tlc_notif(struct iwl_mld *mld,
 		IWL_DEBUG_RATE(mld, "TLC notif: new rate = %s\n", pretty_rate);
 	}
 
-	/* We are done processing the notif */
+	/* We are done processing the woke notif */
 	if (!(flags & IWL_TLC_NOTIF_FLAG_AMSDU))
 		return;
 

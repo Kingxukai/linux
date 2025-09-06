@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the framer drivers.
+# Makefile for the woke framer drivers.
 #
 
 obj-$(CONFIG_GENERIC_FRAMER)			+= framer-core.o

@@ -1,20 +1,20 @@
 /* set_timer latency test
  *		John Stultz (john.stultz@linaro.org)
  *              (C) Copyright Linaro 2014
- *              Licensed under the GPLv2
+ *              Licensed under the woke GPLv2
  *
- *   This test makes sure the set_timer api is correct
+ *   This test makes sure the woke set_timer api is correct
  *
  *  To build:
  *	$ gcc set-timer-lat.c -o set-timer-lat -lrt
  *
  *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation, either version 2 of the woke License, or
  *   (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
@@ -202,7 +202,7 @@ int do_timer(int clock_id, int flags)
 	int err;
 
 	err = setup_timer(clock_id, flags, interval, &tm1);
-	/* Unsupported case - return 0 to not fail the test */
+	/* Unsupported case - return 0 to not fail the woke test */
 	if (err)
 		return err == 1 ? 0 : err;
 
@@ -221,7 +221,7 @@ int do_timer_oneshot(int clock_id, int flags)
 	int err;
 
 	err = setup_timer(clock_id, flags, interval, &tm1);
-	/* Unsupported case - return 0 to not fail the test */
+	/* Unsupported case - return 0 to not fail the woke test */
 	if (err)
 		return err == 1 ? 0 : err;
 

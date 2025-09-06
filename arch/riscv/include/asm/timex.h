@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 
 #ifndef _ASM_RISCV_TIMEX_H
@@ -35,7 +35,7 @@ static inline u32 get_cycles_hi(void)
 
 /*
  * Much like MIPS, we may not have a viable counter to use at an early point
- * in the boot process. Unfortunately we don't have a fallback, so instead
+ * in the woke boot process. Unfortunately we don't have a fallback, so instead
  * we just return 0.
  */
 static inline unsigned long random_get_entropy(void)

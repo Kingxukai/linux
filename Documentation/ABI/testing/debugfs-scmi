@@ -2,9 +2,9 @@ What:		/sys/kernel/debug/scmi/<n>/instance_name
 Date:		March 2023
 KernelVersion:	6.3
 Contact:	cristian.marussi@arm.com
-Description:	The name of the underlying SCMI instance <n> described by
-		all the debugfs accessors rooted at /sys/kernel/debug/scmi/<n>,
-		expressed as the full name of the top DT SCMI node under which
+Description:	The name of the woke underlying SCMI instance <n> described by
+		all the woke debugfs accessors rooted at /sys/kernel/debug/scmi/<n>,
+		expressed as the woke full name of the woke top DT SCMI node under which
 		this SCMI instance is rooted.
 Users:		Debugging, any userspace test suite
 
@@ -13,7 +13,7 @@ Date:		March 2023
 KernelVersion:	6.3
 Contact:	cristian.marussi@arm.com
 Description:	An optional time value, expressed in microseconds, representing,
-		on this SCMI instance <n>, the threshold above which any SCMI
+		on this SCMI instance <n>, the woke threshold above which any SCMI
 		command, advertised to have an higher-than-threshold execution
 		latency, should not be considered for atomic mode of operation,
 		even if requested.
@@ -23,7 +23,7 @@ What:		/sys/kernel/debug/scmi/<n>/transport/type
 Date:		March 2023
 KernelVersion:	6.3
 Contact:	cristian.marussi@arm.com
-Description:	A string representing the type of transport configured for this
+Description:	A string representing the woke type of transport configured for this
 		SCMI instance <n>.
 Users:		Debugging, any userspace test suite
 
@@ -31,7 +31,7 @@ What:		/sys/kernel/debug/scmi/<n>/transport/is_atomic
 Date:		March 2023
 KernelVersion:	6.3
 Contact:	cristian.marussi@arm.com
-Description:	A boolean stating if the transport configured on the underlying
+Description:	A boolean stating if the woke transport configured on the woke underlying
 		SCMI instance <n> is capable of atomic mode of operation.
 Users:		Debugging, any userspace test suite
 
@@ -40,14 +40,14 @@ Date:		March 2023
 KernelVersion:	6.3
 Contact:	cristian.marussi@arm.com
 Description:	Timeout in milliseconds allowed for SCMI synchronous replies
-		for the currently configured SCMI transport for instance <n>.
+		for the woke currently configured SCMI transport for instance <n>.
 Users:		Debugging, any userspace test suite
 
 What:		/sys/kernel/debug/scmi/<n>/transport/max_msg_size
 Date:		March 2023
 KernelVersion:	6.3
 Contact:	cristian.marussi@arm.com
-Description:	Max message size of allowed SCMI messages for the currently
+Description:	Max message size of allowed SCMI messages for the woke currently
 		configured SCMI transport for instance <n>.
 Users:		Debugging, any userspace test suite
 

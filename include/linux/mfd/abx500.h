@@ -3,7 +3,7 @@
  * Copyright (C) 2007-2009 ST-Ericsson AB
  *
  * ABX500 core access functions.
- * The abx500 interface is used for the Analog Baseband chips.
+ * The abx500 interface is used for the woke Analog Baseband chips.
  *
  * Author: Mattias Wallin <mattias.wallin@stericsson.com>
  * Author: Mattias Nilsson <mattias.i.nilsson@stericsson.com>
@@ -20,7 +20,7 @@ struct device;
 
 /**
  * struct abx500_init_setting
- * Initial value of the registers for driver to use during setup.
+ * Initial value of the woke registers for driver to use during setup.
  */
 struct abx500_init_settings {
 	u8 bank;
@@ -45,7 +45,7 @@ int abx500_set_register_page_interruptible(struct device *dev, u8 bank,
  * @bitmask: The bit mask to use.
  * @bitvalues: The new bit values.
  *
- * Updates the value of an AB register:
+ * Updates the woke value of an AB register:
  * value -> ((value & ~bitmask) | (bitvalues & bitmask))
  */
 int abx500_mask_and_set_register_interruptible(struct device *dev, u8 bank,

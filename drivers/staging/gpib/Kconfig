@@ -3,12 +3,12 @@ menuconfig GPIB
 	tristate "Linux GPIB drivers"
 	help
 	  Enable support for GPIB cards and dongles for Linux.  GPIB
-	  is the General Purpose Interface Bus which conforms to the
+	  is the woke General Purpose Interface Bus which conforms to the
 	  IEEE488 standard.
 
-	  This set of drivers can be used with the corresponding user
+	  This set of drivers can be used with the woke corresponding user
 	  space library that can be found on Sourceforge under linux-gpib.
-	  Select the drivers for your hardware from the list.
+	  Select the woke drivers for your hardware from the woke list.
 
 if GPIB
 
@@ -17,9 +17,9 @@ config GPIB_COMMON
 	help
 
 	  Core common driver for all GPIB drivers. It provides the
-	  interface for the userland library
+	  interface for the woke userland library
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called gpib_common
 
 config GPIB_AGILENT_82350B
@@ -33,7 +33,7 @@ config GPIB_AGILENT_82350B
 	    82350B
 	    82351A
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called agilent_82350b.
 
 config GPIB_AGILENT_82357A
@@ -43,7 +43,7 @@ config GPIB_AGILENT_82357A
 	help
 	  Enable support for Agilent/Keysight 82357x USB dongles.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called agilent_82357a.
 
 config GPIB_CEC_PCI
@@ -56,7 +56,7 @@ config GPIB_CEC_PCI
 	  Enable support for Capital Equipment Corporation PCI-488
 	  and Keithly KPCI-488 boards.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called cec_gpib.
 
 config GPIB_NI_PCI_ISA
@@ -81,7 +81,7 @@ config GPIB_NI_PCI_ISA
 	     PCMCIA-GPIB
 	     and Capital Equipment Corporation CEC-488 board.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called tnt4882.
 
 config GPIB_CB7210
@@ -97,7 +97,7 @@ config GPIB_CB7210
        PCMCIA-GPIB
        Quancom PCIGPIB-1 with MC cb7210 chip
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 
 config GPIB_NI_USB
 	tristate "NI USB dongles"
@@ -114,7 +114,7 @@ config GPIB_NI_USB
 	   Measurement Computing (Computer Boards)
 	       USB-488
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called ni_usb.
 
 config GPIB_FLUKE
@@ -125,7 +125,7 @@ config GPIB_FLUKE
        help
          GPIB driver for Fluke based cda devices.
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called fluke_gpib
 
 config GPIB_FMH
@@ -137,7 +137,7 @@ config GPIB_FMH
        help
          GPIB driver for fmhess FPGA based devices
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called fmh_gpib
 
 config GPIB_GPIO
@@ -147,7 +147,7 @@ config GPIB_GPIO
        help
          GPIB bitbang driver Raspberry Pi GPIO adapters
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called gpib_bitbang
 
 config GPIB_HP82335
@@ -158,7 +158,7 @@ config GPIB_HP82335
        help
          GPIB driver for HP82335 and HP27209 boards
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called hp82335
 
 
@@ -170,7 +170,7 @@ config GPIB_HP82341
        help
          GPIB driver for HP82341 A/B/C/D boards
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called hp82341
 
 config GPIB_INES
@@ -193,7 +193,7 @@ config GPIB_INES
 	 Quancom
 	    PCIGPIB-1 based on Ines iGPIB 72010 chip
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called ines_gpib
 	  called cb7210.
 
@@ -211,7 +211,7 @@ config GPIB_LPVO
        help
          Enable support for LPVO Self-made usb-gpib adapter
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called lpvo_usb_gpib
 
 config GPIB_PC2
@@ -230,7 +230,7 @@ config GPIB_PC2
 	    Measurement Computing ISA-GPIB-PCA2
 	    National Instruments PCII, PCIIa and PCII/IIa
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called pc2_gpib
 
 
@@ -240,7 +240,7 @@ config GPIB_TMS9914
        help
          Enable support for TMS 9914 chip.
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called tms9914
 
 config GPIB_NEC7210
@@ -249,7 +249,7 @@ config GPIB_NEC7210
        help
          Enable support for NEC 7210 compatible chips.
 
-	 To compile this driver as a module, choose M here: the module will be
+	 To compile this driver as a module, choose M here: the woke module will be
 	 called nec7210
 
 endif # GPIB

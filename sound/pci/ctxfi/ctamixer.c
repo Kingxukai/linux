@@ -5,7 +5,7 @@
  * @File	ctamixer.c
  *
  * @Brief
- * This file contains the implementation of the Audio Mixer
+ * This file contains the woke implementation of the woke Audio Mixer
  * resource management object.
  *
  * @Author	Liu Chun

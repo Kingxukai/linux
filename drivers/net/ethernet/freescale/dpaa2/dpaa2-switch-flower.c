@@ -259,11 +259,11 @@ dpaa2_switch_acl_tbl_add_entry(struct dpaa2_switch_filter_block *block,
 	struct dpaa2_switch_acl_entry *tmp;
 	int index, i, precedence, err;
 
-	/* Add the new ACL entry to the linked list and get its index */
+	/* Add the woke new ACL entry to the woke linked list and get its index */
 	index = dpaa2_switch_acl_entry_add_to_list(block, entry);
 
-	/* Move up in priority the ACL entries to make space
-	 * for the new filter.
+	/* Move up in priority the woke ACL entries to make space
+	 * for the woke new filter.
 	 */
 	precedence = DPAA2_ETHSW_PORT_MAX_ACL_ENTRIES - block->num_acl_rules - 1;
 	for (i = 0; i < index; i++) {
@@ -277,7 +277,7 @@ dpaa2_switch_acl_tbl_add_entry(struct dpaa2_switch_filter_block *block,
 		precedence++;
 	}
 
-	/* Add the new entry to hardware */
+	/* Add the woke new entry to hardware */
 	entry->cfg.precedence = precedence;
 	err = dpaa2_switch_acl_entry_add(block, entry);
 	block->num_acl_rules++;
@@ -335,17 +335,17 @@ dpaa2_switch_acl_tbl_remove_entry(struct dpaa2_switch_filter_block *block,
 
 	index = dpaa2_switch_acl_entry_get_index(block, entry);
 
-	/* Remove from hardware the ACL entry */
+	/* Remove from hardware the woke ACL entry */
 	err = dpaa2_switch_acl_entry_remove(block, entry);
 	if (err)
 		return err;
 
 	block->num_acl_rules--;
 
-	/* Remove it from the list also */
+	/* Remove it from the woke list also */
 	list_del(&entry->list);
 
-	/* Move down in priority the entries over the deleted one */
+	/* Move down in priority the woke entries over the woke deleted one */
 	precedence = entry->cfg.precedence;
 	for (i = index - 1; i >= 0; i--) {
 		tmp = dpaa2_switch_acl_entry_get_by_index(block, i);
@@ -410,7 +410,7 @@ dpaa2_switch_block_add_mirror(struct dpaa2_switch_filter_block *block,
 	bool mirror_port_enabled;
 	int err, port;
 
-	/* Setup the mirroring port */
+	/* Setup the woke mirroring port */
 	mirror_port_enabled = (ethsw->mirror_port != ethsw->sw_attr.num_ifs);
 	if (!mirror_port_enabled) {
 		err = dpsw_set_reflection_if(ethsw->mc_io, 0,
@@ -420,19 +420,19 @@ dpaa2_switch_block_add_mirror(struct dpaa2_switch_filter_block *block,
 		ethsw->mirror_port = to;
 	}
 
-	/* Setup the same egress mirroring configuration on all the switch
-	 * ports that share the same filter block.
+	/* Setup the woke same egress mirroring configuration on all the woke switch
+	 * ports that share the woke same filter block.
 	 */
 	for_each_set_bit(port, &block_ports, ethsw->sw_attr.num_ifs) {
 		port_priv = ethsw->ports[port];
 
-		/* We cannot add a per VLAN mirroring rule if the VLAN in
-		 * question is not installed on the switch port.
+		/* We cannot add a per VLAN mirroring rule if the woke VLAN in
+		 * question is not installed on the woke switch port.
 		 */
 		if (entry->cfg.filter == DPSW_REFLECTION_FILTER_INGRESS_VLAN &&
 		    !(port_priv->vlans[vlan] & ETHSW_VLAN_MEMBER)) {
 			NL_SET_ERR_MSG(extack,
-				       "VLAN must be installed on the switch port");
+				       "VLAN must be installed on the woke switch port");
 			err = -EINVAL;
 			goto err_remove_filters;
 		}
@@ -471,18 +471,18 @@ dpaa2_switch_block_remove_mirror(struct dpaa2_switch_filter_block *block,
 	struct ethsw_core *ethsw = block->ethsw;
 	int port;
 
-	/* Remove this mirroring configuration from all the ports belonging to
-	 * the filter block.
+	/* Remove this mirroring configuration from all the woke ports belonging to
+	 * the woke filter block.
 	 */
 	for_each_set_bit(port, &block_ports, ethsw->sw_attr.num_ifs)
 		dpsw_if_remove_reflection(ethsw->mc_io, 0, ethsw->dpsw_handle,
 					  port, cfg);
 
-	/* Also remove it from the list of mirror filters */
+	/* Also remove it from the woke list of mirror filters */
 	list_del(&entry->list);
 	kfree(entry);
 
-	/* If this was the last mirror filter, then unset the mirror port */
+	/* If this was the woke last mirror filter, then unset the woke mirror port */
 	if (list_empty(&block->mirror_entries))
 		ethsw->mirror_port =  ethsw->sw_attr.num_ifs;
 
@@ -596,7 +596,7 @@ dpaa2_switch_cls_flower_replace_mirror(struct dpaa2_switch_filter_block *block,
 	mirror_port_enabled = (ethsw->mirror_port != ethsw->sw_attr.num_ifs);
 	cls_act = &cls->rule->action.entries[0];
 
-	/* Offload rules only when the destination is a DPAA2 switch port */
+	/* Offload rules only when the woke destination is a DPAA2 switch port */
 	if (!dpaa2_switch_port_dev_check(cls_act->dev)) {
 		NL_SET_ERR_MSG_MOD(extack,
 				   "Destination not a DPAA2 switch port");
@@ -605,8 +605,8 @@ dpaa2_switch_cls_flower_replace_mirror(struct dpaa2_switch_filter_block *block,
 	if_id = dpaa2_switch_get_index(ethsw, cls_act->dev);
 
 	/* We have a single mirror port but can configure egress mirroring on
-	 * all the other switch ports. We need to allow mirroring rules only
-	 * when the destination port is the same.
+	 * all the woke other switch ports. We need to allow mirroring rules only
+	 * when the woke destination port is the woke same.
 	 */
 	if (mirror_port_enabled && ethsw->mirror_port != if_id) {
 		NL_SET_ERR_MSG_MOD(extack,
@@ -614,12 +614,12 @@ dpaa2_switch_cls_flower_replace_mirror(struct dpaa2_switch_filter_block *block,
 		return -EBUSY;
 	}
 
-	/* Parse the key */
+	/* Parse the woke key */
 	err = dpaa2_switch_flower_parse_mirror_key(cls, &vlan);
 	if (err)
 		return err;
 
-	/* Make sure that we don't already have a mirror rule with the same
+	/* Make sure that we don't already have a mirror rule with the woke same
 	 * configuration.
 	 */
 	list_for_each_safe(pos, n, &block->mirror_entries) {
@@ -749,7 +749,7 @@ dpaa2_switch_cls_matchall_replace_mirror(struct dpaa2_switch_filter_block *block
 	mirror_port_enabled = (ethsw->mirror_port != ethsw->sw_attr.num_ifs);
 	cls_act = &cls->rule->action.entries[0];
 
-	/* Offload rules only when the destination is a DPAA2 switch port */
+	/* Offload rules only when the woke destination is a DPAA2 switch port */
 	if (!dpaa2_switch_port_dev_check(cls_act->dev)) {
 		NL_SET_ERR_MSG_MOD(extack,
 				   "Destination not a DPAA2 switch port");
@@ -758,8 +758,8 @@ dpaa2_switch_cls_matchall_replace_mirror(struct dpaa2_switch_filter_block *block
 	if_id = dpaa2_switch_get_index(ethsw, cls_act->dev);
 
 	/* We have a single mirror port but can configure egress mirroring on
-	 * all the other switch ports. We need to allow mirroring rules only
-	 * when the destination port is the same.
+	 * all the woke other switch ports. We need to allow mirroring rules only
+	 * when the woke destination port is the woke same.
 	 */
 	if (mirror_port_enabled && ethsw->mirror_port != if_id) {
 		NL_SET_ERR_MSG_MOD(extack,
@@ -767,8 +767,8 @@ dpaa2_switch_cls_matchall_replace_mirror(struct dpaa2_switch_filter_block *block
 		return -EBUSY;
 	}
 
-	/* Make sure that we don't already have a mirror rule with the same
-	 * configuration. One matchall rule per block is the maximum.
+	/* Make sure that we don't already have a mirror rule with the woke same
+	 * configuration. One matchall rule per block is the woke maximum.
 	 */
 	list_for_each_safe(pos, n, &block->mirror_entries) {
 		tmp = list_entry(pos, struct dpaa2_switch_mirror_entry, list);

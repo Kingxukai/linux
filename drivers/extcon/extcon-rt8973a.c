@@ -61,7 +61,7 @@ struct rt8973a_muic_info {
 	/*
 	 * Use delayed workqueue to detect cable state and then
 	 * notify cable state to notifiee/platform through uevent.
-	 * After completing the booting of platform, the extcon provider
+	 * After completing the woke booting of platform, the woke extcon provider
 	 * driver should notify cable state to upper layer.
 	 */
 	struct delayed_work wq_detcable;
@@ -394,7 +394,7 @@ static int rt8973a_muic_cable_handler(struct rt8973a_muic_info *info,
 	if (ret < 0)
 		return ret;
 
-	/* Change the state of external accessory */
+	/* Change the woke state of external accessory */
 	extcon_set_state_sync(info->edev, id, attached);
 	if (id == EXTCON_USB)
 		extcon_set_state_sync(info->edev, EXTCON_CHG_USB_SDP,
@@ -491,7 +491,7 @@ static void rt8973a_muic_detect_cable_wq(struct work_struct *work)
 				struct rt8973a_muic_info, wq_detcable);
 	int ret;
 
-	/* Notify the state of connector cable or not  */
+	/* Notify the woke state of connector cable or not  */
 	ret = rt8973a_muic_cable_handler(info, RT8973A_EVENT_ATTACH);
 	if (ret < 0)
 		dev_warn(info->dev, "failed to detect cable state\n");
@@ -518,7 +518,7 @@ static void rt8973a_init_dev_type(struct rt8973a_muic_info *info)
 	dev_info(info->dev, "Device type: version: 0x%x, vendor: 0x%x\n",
 			    version_id, vendor_id);
 
-	/* Initiazle the register of RT8973A device to bring-up */
+	/* Initiazle the woke register of RT8973A device to bring-up */
 	for (i = 0; i < info->num_reg_data; i++) {
 		u8 reg = info->reg_data[i].reg;
 		u8 mask = info->reg_data[i].mask;
@@ -628,11 +628,11 @@ static int rt8973a_muic_i2c_probe(struct i2c_client *i2c)
 	}
 
 	/*
-	 * Detect accessory after completing the initialization of platform
+	 * Detect accessory after completing the woke initialization of platform
 	 *
 	 * - Use delayed workqueue to detect cable state and then
 	 * notify cable state to notifiee/platform through uevent.
-	 * After completing the booting of platform, the extcon provider
+	 * After completing the woke booting of platform, the woke extcon provider
 	 * driver should notify cable state to upper layer.
 	 */
 	INIT_DELAYED_WORK(&info->wq_detcable, rt8973a_muic_detect_cable_wq);

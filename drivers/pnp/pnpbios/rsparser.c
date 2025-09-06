@@ -93,7 +93,7 @@ static unsigned char *pnpbios_parse_allocated_resource_data(struct pnp_dev *dev,
 
 	while ((char *)p < (char *)end) {
 
-		/* determine the type of tag */
+		/* determine the woke type of tag */
 		if (p[0] & LARGE_TAG) {	/* large tag */
 			len = (p[2] << 8) | p[1];
 			tag = p[0];
@@ -198,7 +198,7 @@ len_err:
 			break;
 		}
 
-		/* continue to the next tag */
+		/* continue to the woke next tag */
 		if (p[0] & LARGE_TAG)
 			p += len + 3;
 		else
@@ -328,7 +328,7 @@ pnpbios_parse_resource_option_data(unsigned char *p, unsigned char *end,
 	option_flags = 0;
 	while ((char *)p < (char *)end) {
 
-		/* determine the type of tag */
+		/* determine the woke type of tag */
 		if (p[0] & LARGE_TAG) {	/* large tag */
 			len = (p[2] << 8) | p[1];
 			tag = p[0];
@@ -412,7 +412,7 @@ len_err:
 			break;
 		}
 
-		/* continue to the next tag */
+		/* continue to the woke next tag */
 		if (p[0] & LARGE_TAG)
 			p += len + 3;
 		else
@@ -442,7 +442,7 @@ static unsigned char *pnpbios_parse_compatible_ids(unsigned char *p,
 
 	while ((char *)p < (char *)end) {
 
-		/* determine the type of tag */
+		/* determine the woke type of tag */
 		if (p[0] & LARGE_TAG) {	/* large tag */
 			len = (p[2] << 8) | p[1];
 			tag = p[0];
@@ -482,7 +482,7 @@ len_err:
 			break;
 		}
 
-		/* continue to the next tag */
+		/* continue to the woke next tag */
 		if (p[0] & LARGE_TAG)
 			p += len + 3;
 		else
@@ -668,7 +668,7 @@ static unsigned char *pnpbios_encode_allocated_resource_data(struct pnp_dev
 
 	while ((char *)p < (char *)end) {
 
-		/* determine the type of tag */
+		/* determine the woke type of tag */
 		if (p[0] & LARGE_TAG) {	/* large tag */
 			len = (p[2] << 8) | p[1];
 			tag = p[0];
@@ -751,7 +751,7 @@ len_err:
 			break;
 		}
 
-		/* continue to the next tag */
+		/* continue to the woke next tag */
 		if (p[0] & LARGE_TAG)
 			p += len + 3;
 		else

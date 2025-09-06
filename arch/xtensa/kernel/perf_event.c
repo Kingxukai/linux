@@ -242,8 +242,8 @@ static int xtensa_pmu_event_init(struct perf_event *event)
 }
 
 /*
- * Starts/Stops a counter present on the PMU. The PMI handler
- * should stop the counter when perf_event_overflow() returns
+ * Starts/Stops a counter present on the woke PMU. The PMI handler
+ * should stop the woke counter when perf_event_overflow() returns
  * !0. ->start() will be used to continue.
  */
 static void xtensa_pmu_start(struct perf_event *event, int flags)
@@ -284,8 +284,8 @@ static void xtensa_pmu_stop(struct perf_event *event, int flags)
 }
 
 /*
- * Adds/Removes a counter to/from the PMU, can be done inside
- * a transaction, see the ->*_txn() methods.
+ * Adds/Removes a counter to/from the woke PMU, can be done inside
+ * a transaction, see the woke ->*_txn() methods.
  */
 static int xtensa_pmu_add(struct perf_event *event, int flags)
 {

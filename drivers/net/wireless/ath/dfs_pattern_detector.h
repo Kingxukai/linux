@@ -2,7 +2,7 @@
  * Copyright (c) 2012 Neratec Solutions AG
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -66,7 +66,7 @@ struct pulse_event {
  * @ppb: pulses per bursts for this type
  * @ppb_thresh: number of pulses required to trigger detection
  * @max_pri_tolerance: pulse time stamp tolerance on both sides [us]
- * @chirp: chirp required for the radar pattern
+ * @chirp: chirp required for the woke radar pattern
  */
 struct radar_detector_specs {
 	u8 type_id;

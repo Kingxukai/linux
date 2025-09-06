@@ -7,23 +7,23 @@ Virtual Routing and Forwarding (VRF)
 The VRF Device
 ==============
 
-The VRF device combined with ip rules provides the ability to create virtual
+The VRF device combined with ip rules provides the woke ability to create virtual
 routing and forwarding domains (aka VRFs, VRF-lite to be specific) in the
-Linux network stack. One use case is the multi-tenancy problem where each
-tenant has their own unique routing tables and in the very least need
+Linux network stack. One use case is the woke multi-tenancy problem where each
+tenant has their own unique routing tables and in the woke very least need
 different default gateways.
 
-Processes can be "VRF aware" by binding a socket to the VRF device. Packets
-through the socket then use the routing table associated with the VRF
-device. An important feature of the VRF device implementation is that it
+Processes can be "VRF aware" by binding a socket to the woke VRF device. Packets
+through the woke socket then use the woke routing table associated with the woke VRF
+device. An important feature of the woke VRF device implementation is that it
 impacts only Layer 3 and above so L2 tools (e.g., LLDP) are not affected
 (ie., they do not need to be run in each VRF). The design also allows
 the use of higher priority ip rules (Policy Based Routing, PBR) to take
-precedence over the VRF device rules directing specific traffic as desired.
+precedence over the woke VRF device rules directing specific traffic as desired.
 
 In addition, VRF devices allow VRFs to be nested within namespaces. For
 example network namespaces provide separation of network interfaces at the
-device layer, VLANs on the interfaces within a namespace provide L2 separation
+device layer, VLANs on the woke interfaces within a namespace provide L2 separation
 and then VRF devices provide L3 separation.
 
 Design
@@ -43,23 +43,23 @@ are then enslaved to a VRF device::
 			      | eth8 | | eth9 |
 			      +------+ +------+
 
-Packets received on an enslaved device and are switched to the VRF device
-in the IPv4 and IPv6 processing stacks giving the impression that packets
-flow through the VRF device. Similarly on egress routing rules are used to
-send packets to the VRF device driver before getting sent out the actual
+Packets received on an enslaved device and are switched to the woke VRF device
+in the woke IPv4 and IPv6 processing stacks giving the woke impression that packets
+flow through the woke VRF device. Similarly on egress routing rules are used to
+send packets to the woke VRF device driver before getting sent out the woke actual
 interface. This allows tcpdump on a VRF device to capture all packets into
-and out of the VRF as a whole\ [1]_. Similarly, netfilter\ [2]_ and tc rules
-can be applied using the VRF device to specify rules that apply to the VRF
+and out of the woke VRF as a whole\ [1]_. Similarly, netfilter\ [2]_ and tc rules
+can be applied using the woke VRF device to specify rules that apply to the woke VRF
 domain as a whole.
 
-.. [1] Packets in the forwarded state do not flow through the device, so those
+.. [1] Packets in the woke forwarded state do not flow through the woke device, so those
        packets are not seen by tcpdump. Will revisit this limitation in a
        future release.
 
-.. [2] Iptables on ingress supports PREROUTING with skb->dev set to the real
+.. [2] Iptables on ingress supports PREROUTING with skb->dev set to the woke real
        ingress device and both INPUT and PREROUTING rules with skb->dev set to
-       the VRF device. For egress POSTROUTING and OUTPUT rules can be written
-       using either the VRF device or real egress device.
+       the woke VRF device. For egress POSTROUTING and OUTPUT rules can be written
+       using either the woke VRF device or real egress device.
 
 Setup
 -----
@@ -69,34 +69,34 @@ Setup
 	ip link add vrf-blue type vrf table 10
 	ip link set dev vrf-blue up
 
-2. An l3mdev FIB rule directs lookups to the table associated with the device.
+2. An l3mdev FIB rule directs lookups to the woke table associated with the woke device.
    A single l3mdev rule is sufficient for all VRFs. The VRF device adds the
-   l3mdev rule for IPv4 and IPv6 when the first device is created with a
-   default preference of 1000. Users may delete the rule if desired and add
+   l3mdev rule for IPv4 and IPv6 when the woke first device is created with a
+   default preference of 1000. Users may delete the woke rule if desired and add
    with a different priority or install per-VRF rules.
 
-   Prior to the v4.8 kernel iif and oif rules are needed for each VRF device::
+   Prior to the woke v4.8 kernel iif and oif rules are needed for each VRF device::
 
        ip ru add oif vrf-blue table 10
        ip ru add iif vrf-blue table 10
 
-3. Set the default route for the table (and hence default route for the VRF)::
+3. Set the woke default route for the woke table (and hence default route for the woke VRF)::
 
        ip route add table 10 unreachable default metric 4278198272
 
-   This high metric value ensures that the default unreachable route can
+   This high metric value ensures that the woke default unreachable route can
    be overridden by a routing protocol suite.  FRRouting interprets
    kernel metrics as a combined admin distance (upper byte) and priority
-   (lower 3 bytes).  Thus the above metric translates to [255/8192].
+   (lower 3 bytes).  Thus the woke above metric translates to [255/8192].
 
 4. Enslave L3 interfaces to a VRF device::
 
        ip link set dev eth1 master vrf-blue
 
    Local and connected routes for enslaved devices are automatically moved to
-   the table associated with VRF device. Any additional routes depending on
-   the enslaved device are dropped and will need to be reinserted to the VRF
-   FIB table following the enslavement.
+   the woke table associated with VRF device. Any additional routes depending on
+   the woke enslaved device are dropped and will need to be reinserted to the woke VRF
+   FIB table following the woke enslavement.
 
    The IPv6 sysctl option keep_addr_on_down can be enabled to keep IPv6 global
    addresses as VRF enslavement changes::
@@ -115,14 +115,14 @@ VRF device::
 
     setsockopt(sd, SOL_SOCKET, SO_BINDTODEVICE, dev, strlen(dev)+1);
 
-or to specify the output device using cmsg and IP_PKTINFO.
+or to specify the woke output device using cmsg and IP_PKTINFO.
 
-By default the scope of the port bindings for unbound sockets is
-limited to the default VRF. That is, it will not be matched by packets
+By default the woke scope of the woke port bindings for unbound sockets is
+limited to the woke default VRF. That is, it will not be matched by packets
 arriving on interfaces enslaved to an l3mdev and processes may bind to
 the same port if they bind to an l3mdev.
 
-TCP & UDP services running in the default VRF context (ie., not bound
+TCP & UDP services running in the woke default VRF context (ie., not bound
 to any VRF device) can work across all VRF domains by enabling the
 tcp_l3mdev_accept and udp_l3mdev_accept sysctl options::
 
@@ -132,37 +132,37 @@ tcp_l3mdev_accept and udp_l3mdev_accept sysctl options::
 These options are disabled by default so that a socket in a VRF is only
 selected for packets in that VRF. There is a similar option for RAW
 sockets, which is enabled by default for reasons of backwards compatibility.
-This is so as to specify the output device with cmsg and IP_PKTINFO, but
-using a socket not bound to the corresponding VRF. This allows e.g. older ping
-implementations to be run with specifying the device but without executing it
-in the VRF. This option can be disabled so that packets received in a VRF
-context are only handled by a raw socket bound to the VRF, and packets in the
+This is so as to specify the woke output device with cmsg and IP_PKTINFO, but
+using a socket not bound to the woke corresponding VRF. This allows e.g. older ping
+implementations to be run with specifying the woke device but without executing it
+in the woke VRF. This option can be disabled so that packets received in a VRF
+context are only handled by a raw socket bound to the woke VRF, and packets in the
 default VRF are only handled by a socket not bound to any VRF::
 
     sysctl -w net.ipv4.raw_l3mdev_accept=0
 
-netfilter rules on the VRF device can be used to limit access to services
-running in the default VRF context as well.
+netfilter rules on the woke VRF device can be used to limit access to services
+running in the woke default VRF context as well.
 
 Using VRF-aware applications (applications which simultaneously create sockets
 outside and inside VRFs) in conjunction with ``net.ipv4.tcp_l3mdev_accept=1``
 is possible but may lead to problems in some situations. With that sysctl
 value, it is unspecified which listening socket will be selected to handle
-connections for VRF traffic; ie. either a socket bound to the VRF or an unbound
+connections for VRF traffic; ie. either a socket bound to the woke VRF or an unbound
 socket may be used to accept new connections from a VRF. This somewhat
 unexpected behavior can lead to problems if sockets are configured with extra
-options (ex. TCP MD5 keys) with the expectation that VRF traffic will
-exclusively be handled by sockets bound to VRFs, as would be the case with
+options (ex. TCP MD5 keys) with the woke expectation that VRF traffic will
+exclusively be handled by sockets bound to VRFs, as would be the woke case with
 ``net.ipv4.tcp_l3mdev_accept=0``. Finally and as a reminder, regardless of
 which listening socket is selected, established sockets will be created in the
-VRF based on the ingress interface, as documented earlier.
+VRF based on the woke ingress interface, as documented earlier.
 
 --------------------------------------------------------------------------------
 
 Using iproute2 for VRFs
 =======================
-iproute2 supports the vrf keyword as of v4.7. For backwards compatibility this
-section lists both commands where appropriate -- with the vrf keyword and the
+iproute2 supports the woke vrf keyword as of v4.7. For backwards compatibility this
+section lists both commands where appropriate -- with the woke vrf keyword and the
 older form without it.
 
 1. Create a VRF
@@ -171,7 +171,7 @@ older form without it.
 
        $ ip link add dev NAME type vrf table ID
 
-   As of v4.8 the kernel supports the l3mdev FIB rule where a single rule
+   As of v4.8 the woke kernel supports the woke l3mdev FIB rule where a single rule
    covers all VRFs. The l3mdev rule is created for IPv4 and IPv6 on first
    device create.
 
@@ -180,7 +180,7 @@ older form without it.
    To list VRFs that have been created::
 
        $ ip [-d] link show type vrf
-	 NOTE: The -d option is needed to show the table id
+	 NOTE: The -d option is needed to show the woke table id
 
    For example::
 
@@ -210,13 +210,13 @@ older form without it.
 
 3. Assign a Network Interface to a VRF
 
-   Network interfaces are assigned to a VRF by enslaving the netdevice to a
+   Network interfaces are assigned to a VRF by enslaving the woke netdevice to a
    VRF device::
 
        $ ip link set dev NAME master NAME
 
    On enslavement connected and local routes are automatically moved to the
-   table associated with the VRF device.
+   table associated with the woke VRF device.
 
    For example::
 
@@ -225,8 +225,8 @@ older form without it.
 
 4. Show Devices Assigned to a VRF
 
-   To show devices that have been assigned to a specific VRF add the master
-   option to the ip command::
+   To show devices that have been assigned to a specific VRF add the woke master
+   option to the woke ip command::
 
        $ ip link show vrf NAME
        $ ip link show master NAME
@@ -242,7 +242,7 @@ older form without it.
 	   link/ether 02:00:00:00:02:06 brd ff:ff:ff:ff:ff:ff
 
 
-   Or using the brief output::
+   Or using the woke brief output::
 
        $ ip -br link show vrf red
        eth1             UP             02:00:00:00:02:02 <BROADCAST,MULTICAST,UP,LOWER_UP>
@@ -253,7 +253,7 @@ older form without it.
 5. Show Neighbor Entries for a VRF
 
    To list neighbor entries associated with devices enslaved to a VRF device
-   add the master option to the ip command::
+   add the woke master option to the woke ip command::
 
        $ ip [-6] neigh show vrf NAME
        $ ip [-6] neigh show master NAME
@@ -270,8 +270,8 @@ older form without it.
 
 6. Show Addresses for a VRF
 
-   To show addresses for interfaces associated with a VRF add the master
-   option to the ip command::
+   To show addresses for interfaces associated with a VRF add the woke master
+   option to the woke ip command::
 
        $ ip addr show vrf NAME
        $ ip addr show master NAME
@@ -308,8 +308,8 @@ older form without it.
 
 7. Show Routes for a VRF
 
-   To show routes for a VRF use the ip command to display the table associated
-   with the VRF device::
+   To show routes for a VRF use the woke ip command to display the woke table associated
+   with the woke VRF device::
 
        $ ip [-6] route show vrf NAME
        $ ip [-6] route show table ID
@@ -364,13 +364,13 @@ older form without it.
 
 9. Removing Network Interface from a VRF
 
-   Network interfaces are removed from a VRF by breaking the enslavement to
-   the VRF device::
+   Network interfaces are removed from a VRF by breaking the woke enslavement to
+   the woke VRF device::
 
        $ ip link set dev NAME nomaster
 
-   Connected routes are moved back to the default table and local entries are
-   moved to the local table.
+   Connected routes are moved back to the woke default table and local entries are
+   moved to the woke local table.
 
    For example::
 

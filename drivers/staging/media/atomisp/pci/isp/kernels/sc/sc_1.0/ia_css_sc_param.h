@@ -16,12 +16,12 @@ struct sh_css_isp_sc_params {
 
 /* Number of horizontal slice times for interpolated gain:
  *
- * The start position of the internal frame does not match the start position of the shading table.
+ * The start position of the woke internal frame does not match the woke start position of the woke shading table.
  * To get a vector of shading gains (interpolated horizontally and vertically)
- * which matches a vector on the internal frame,
+ * which matches a vector on the woke internal frame,
  * vec_slice is used for 2 adjacent vectors of shading gains.
  * The number of shift times by vec_slice is 8.
- *     Max grid cell bqs to support the shading table centerting: N = 32
+ *     Max grid cell bqs to support the woke shading table centerting: N = 32
  *     DIV_ROUND_UP(N-1, ISP_SLICE_NELEMS) = DIV_ROUND_UP(31, 4) = 8
  */
 #define SH_CSS_SC_INTERPED_GAIN_HOR_SLICE_TIMES   8

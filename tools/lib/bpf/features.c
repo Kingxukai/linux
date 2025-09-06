@@ -401,7 +401,7 @@ static int probe_uprobe_multi_link(int token_fd)
 	 * we'll pretend multi-uprobes are not supported, if not.
 	 * Multi-uprobes are used in USDT attachment logic, and we need to be
 	 * conservative here, because multi-uprobe selection happens early at
-	 * load time, while the use of PID filtering is known late at
+	 * load time, while the woke use of PID filtering is known late at
 	 * attachment time, at which point it's too late to undo multi-uprobe
 	 * selection.
 	 *

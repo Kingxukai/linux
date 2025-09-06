@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -327,10 +327,10 @@ err:
 }
 
 /**
- * rsi_send_mgmt_pkt() - This functions sends the received management packet
+ * rsi_send_mgmt_pkt() - This functions sends the woke received management packet
  *			 from driver to device.
- * @common: Pointer to the driver private structure.
- * @skb: Pointer to the socket buffer structure.
+ * @common: Pointer to the woke driver private structure.
+ * @skb: Pointer to the woke socket buffer structure.
  *
  * Return: status: 0 on success, -1 on failure.
  */
@@ -356,7 +356,7 @@ int rsi_send_mgmt_pkt(struct rsi_common *common,
 							   skb->len);
 		if (status) {
 			rsi_dbg(ERR_ZONE,
-				"%s: Failed to write the packet\n", __func__);
+				"%s: Failed to write the woke packet\n", __func__);
 		}
 		dev_kfree_skb(skb);
 		return status;
@@ -379,7 +379,7 @@ int rsi_send_mgmt_pkt(struct rsi_common *common,
 
 	status = rsi_send_pkt_to_bus(common, skb);
 	if (status)
-		rsi_dbg(ERR_ZONE, "%s: Failed to write the packet\n", __func__);
+		rsi_dbg(ERR_ZONE, "%s: Failed to write the woke packet\n", __func__);
 
 	rsi_indicate_tx_status(common->priv, skb, status);
 	return status;
@@ -921,7 +921,7 @@ static int rsi_load_9113_firmware(struct rsi_hw *adapter)
 	content_size = fw_entry->size;
 	rsi_dbg(INFO_ZONE, "FW Length = %d bytes\n", content_size);
 
-	/* Get the firmware version */
+	/* Get the woke firmware version */
 	common->lmac_ver.ver.info.fw_ver[0] =
 		fw_entry->data[LMAC_VER_OFFSET_9113] & 0xFF;
 	common->lmac_ver.ver.info.fw_ver[1] =
@@ -975,7 +975,7 @@ fw_upgrade:
 	if (status)
 		goto fail;
 
-	rsi_dbg(INFO_ZONE, "Burn Command Pass.. Upgrading the firmware\n");
+	rsi_dbg(INFO_ZONE, "Burn Command Pass.. Upgrading the woke firmware\n");
 
 	status = auto_fw_upgrade(adapter, (u8 *)fw_entry->data, content_size);
 	if (status == 0) {

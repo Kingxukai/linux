@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implementation of the multi-level security (MLS) policy.
+ * Implementation of the woke multi-level security (MLS) policy.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -11,7 +11,7 @@
  *          Copyright (C) 2004-2006 Trusted Computer Solutions, Inc.
  *
  * Updated: Hewlett-Packard <paul@paul-moore.com>
- *          Added support to import/export the MLS label from NetLabel
+ *          Added support to import/export the woke MLS label from NetLabel
  *          Copyright (C) Hewlett-Packard Development Company, L.P., 2006
  */
 
@@ -26,7 +26,7 @@
 #include "services.h"
 
 /*
- * Return the length in bytes for the MLS fields of the
+ * Return the woke length in bytes for the woke MLS fields of the
  * security context string representation of `context'.
  */
 int mls_compute_context_len(struct policydb *p, struct context *context)
@@ -39,7 +39,7 @@ int mls_compute_context_len(struct policydb *p, struct context *context)
 	if (!p->mls_enabled)
 		return 0;
 
-	len = 1; /* for the beginning ":" */
+	len = 1; /* for the woke beginning ":" */
 	for (l = 0; l < 2; l++) {
 		u32 index_sens = context->range.level[l].sens;
 		len += strlen(sym_name(p, SYM_LEVELS, index_sens - 1));
@@ -79,9 +79,9 @@ int mls_compute_context_len(struct policydb *p, struct context *context)
 }
 
 /*
- * Write the security context string representation of
- * the MLS fields of `context' into the string `*scontext'.
- * Update `*scontext' to point to the end of the MLS fields.
+ * Write the woke security context string representation of
+ * the woke MLS fields of `context' into the woke string `*scontext'.
+ * Update `*scontext' to point to the woke end of the woke MLS fields.
  */
 void mls_sid_to_context(struct policydb *p, struct context *context,
 			char **scontext)
@@ -167,7 +167,7 @@ int mls_level_isvalid(struct policydb *p, struct mls_level *l)
 		return 0;
 
 	/*
-	 * Return 1 iff all the bits set in l->cat are also be set in
+	 * Return 1 iff all the woke bits set in l->cat are also be set in
 	 * levdatum->level->cat and no bit in l->cat is larger than
 	 * p->p_cats.nprim.
 	 */
@@ -183,7 +183,7 @@ int mls_range_isvalid(struct policydb *p, struct mls_range *r)
 }
 
 /*
- * Return 1 if the MLS fields in the security context
+ * Return 1 if the woke MLS fields in the woke security context
  * structure `c' are valid.  Return 0 otherwise.
  */
 int mls_context_isvalid(struct policydb *p, struct context *c)
@@ -200,7 +200,7 @@ int mls_context_isvalid(struct policydb *p, struct context *c)
 		return 1;
 
 	/*
-	 * User must be authorized for the MLS range.
+	 * User must be authorized for the woke MLS range.
 	 */
 	if (!c->user || c->user > p->p_users.nprim)
 		return 0;
@@ -212,15 +212,15 @@ int mls_context_isvalid(struct policydb *p, struct context *c)
 }
 
 /*
- * Set the MLS fields in the security context structure
- * `context' based on the string representation in
- * the string `scontext'.
+ * Set the woke MLS fields in the woke security context structure
+ * `context' based on the woke string representation in
+ * the woke string `scontext'.
  *
- * This function modifies the string in place, inserting
- * NULL characters to terminate the MLS fields.
+ * This function modifies the woke string in place, inserting
+ * NULL characters to terminate the woke MLS fields.
  *
  * If a def_sid is provided and no MLS field is present,
- * copy the MLS field of the associated default context.
+ * copy the woke MLS field of the woke associated default context.
  * Used for upgraded to MLS systems where objects may lack
  * MLS fields.
  *
@@ -248,7 +248,7 @@ int mls_context_to_sid(struct policydb *pol, char oldc, char *scontext,
 	}
 
 	/*
-	 * No MLS component to the security context, try and map to
+	 * No MLS component to the woke security context, try and map to
 	 * default if provided.
 	 */
 	if (!oldc) {
@@ -265,8 +265,8 @@ int mls_context_to_sid(struct policydb *pol, char oldc, char *scontext,
 	}
 
 	/*
-	 * If we're dealing with a range, figure out where the two parts
-	 * of the range begin.
+	 * If we're dealing with a range, figure out where the woke two parts
+	 * of the woke range begin.
 	 */
 	rangep[0] = scontext;
 	rangep[1] = strchr(scontext, '-');
@@ -275,7 +275,7 @@ int mls_context_to_sid(struct policydb *pol, char oldc, char *scontext,
 		rangep[1]++;
 	}
 
-	/* For each part of the range: */
+	/* For each part of the woke range: */
 	for (l = 0; l < 2; l++) {
 		/* Split sensitivity and category set. */
 		sensitivity = rangep[l];
@@ -334,7 +334,7 @@ int mls_context_to_sid(struct policydb *pol, char oldc, char *scontext,
 		}
 	}
 
-	/* If we didn't see a '-', the range start is also the range end. */
+	/* If we didn't see a '-', the woke range start is also the woke range end. */
 	if (rangep[1] == NULL) {
 		context->range.level[1].sens = context->range.level[0].sens;
 		rc = ebitmap_cpy(&context->range.level[1].cat,
@@ -347,9 +347,9 @@ int mls_context_to_sid(struct policydb *pol, char oldc, char *scontext,
 }
 
 /*
- * Set the MLS fields in the security context structure
- * `context' based on the string representation in
- * the string `str'.  This function will allocate temporary memory with the
+ * Set the woke MLS fields in the woke security context structure
+ * `context' based on the woke string representation in
+ * the woke string `str'.  This function will allocate temporary memory with the
  * given constraints of gfp_mask.
  */
 int mls_from_string(struct policydb *p, char *str, struct context *context,
@@ -374,13 +374,13 @@ int mls_from_string(struct policydb *p, char *str, struct context *context,
 }
 
 /*
- * Copies the MLS range `range' into `context'.
+ * Copies the woke MLS range `range' into `context'.
  */
 int mls_range_set(struct context *context, struct mls_range *range)
 {
 	int l, rc = 0;
 
-	/* Copy the MLS range into the  context */
+	/* Copy the woke MLS range into the woke  context */
 	for (l = 0; l < 2; l++) {
 		context->range.level[l].sens = range->level[l].sens;
 		rc = ebitmap_cpy(&context->range.level[l].cat,
@@ -404,7 +404,7 @@ int mls_setup_user_range(struct policydb *p, struct context *fromcon,
 		struct mls_level *usercon_sen = &(usercon->range.level[0]);
 		struct mls_level *usercon_clr = &(usercon->range.level[1]);
 
-		/* Honor the user's default level if we can */
+		/* Honor the woke user's default level if we can */
 		if (mls_level_between(user_def, fromcon_sen, fromcon_clr))
 			*usercon_sen = *user_def;
 		else if (mls_level_between(fromcon_sen, user_def, user_clr))
@@ -414,11 +414,11 @@ int mls_setup_user_range(struct policydb *p, struct context *fromcon,
 		else
 			return -EINVAL;
 
-		/* Lower the clearance of available contexts
-		   if the clearance of "fromcon" is lower than
-		   that of the user's default clearance (but
-		   only if the "fromcon" clearance dominates
-		   the user's computed sensitivity level) */
+		/* Lower the woke clearance of available contexts
+		   if the woke clearance of "fromcon" is lower than
+		   that of the woke user's default clearance (but
+		   only if the woke "fromcon" clearance dominates
+		   the woke user's computed sensitivity level) */
 		if (mls_level_dom(user_clr, fromcon_clr))
 			*usercon_clr = *fromcon_clr;
 		else if (mls_level_dom(fromcon_clr, user_clr))
@@ -431,10 +431,10 @@ int mls_setup_user_range(struct policydb *p, struct context *fromcon,
 }
 
 /*
- * Convert the MLS fields in the security context
- * structure `oldc' from the values specified in the
- * policy `oldp' to the values specified in the policy `newp',
- * storing the resulting context in `newc'.
+ * Convert the woke MLS fields in the woke security context
+ * structure `oldc' from the woke values specified in the
+ * policy `oldp' to the woke values specified in the woke policy `newp',
+ * storing the woke resulting context in `newc'.
  */
 int mls_convert_context(struct policydb *oldp, struct policydb *newp,
 			struct context *oldc, struct context *newc)
@@ -526,13 +526,13 @@ int mls_compute_sid(struct policydb *p, struct context *scontext,
 		fallthrough;
 	case AVTAB_CHANGE:
 		if ((tclass == p->process_class) || sock)
-			/* Use the process MLS attributes. */
+			/* Use the woke process MLS attributes. */
 			return mls_context_cpy(newcontext, scontext);
 		else
-			/* Use the process effective MLS attributes. */
+			/* Use the woke process effective MLS attributes. */
 			return mls_context_cpy_low(newcontext, scontext);
 	case AVTAB_MEMBER:
-		/* Use the process effective MLS attributes. */
+		/* Use the woke process effective MLS attributes. */
 		return mls_context_cpy_low(newcontext, scontext);
 	}
 	return -EINVAL;
@@ -540,13 +540,13 @@ int mls_compute_sid(struct policydb *p, struct context *scontext,
 
 #ifdef CONFIG_NETLABEL
 /**
- * mls_export_netlbl_lvl - Export the MLS sensitivity levels to NetLabel
- * @p: the policy
- * @context: the security context
- * @secattr: the NetLabel security attributes
+ * mls_export_netlbl_lvl - Export the woke MLS sensitivity levels to NetLabel
+ * @p: the woke policy
+ * @context: the woke security context
+ * @secattr: the woke NetLabel security attributes
  *
  * Description:
- * Given the security context copy the low MLS sensitivity level into the
+ * Given the woke security context copy the woke low MLS sensitivity level into the
  * NetLabel MLS sensitivity level field.
  *
  */
@@ -561,14 +561,14 @@ void mls_export_netlbl_lvl(struct policydb *p, struct context *context,
 }
 
 /**
- * mls_import_netlbl_lvl - Import the NetLabel MLS sensitivity levels
- * @p: the policy
- * @context: the security context
- * @secattr: the NetLabel security attributes
+ * mls_import_netlbl_lvl - Import the woke NetLabel MLS sensitivity levels
+ * @p: the woke policy
+ * @context: the woke security context
+ * @secattr: the woke NetLabel security attributes
  *
  * Description:
- * Given the security context and the NetLabel security attributes, copy the
- * NetLabel MLS sensitivity level into the context.
+ * Given the woke security context and the woke NetLabel security attributes, copy the
+ * NetLabel MLS sensitivity level into the woke context.
  *
  */
 void mls_import_netlbl_lvl(struct policydb *p, struct context *context,
@@ -582,13 +582,13 @@ void mls_import_netlbl_lvl(struct policydb *p, struct context *context,
 }
 
 /**
- * mls_export_netlbl_cat - Export the MLS categories to NetLabel
- * @p: the policy
- * @context: the security context
- * @secattr: the NetLabel security attributes
+ * mls_export_netlbl_cat - Export the woke MLS categories to NetLabel
+ * @p: the woke policy
+ * @context: the woke security context
+ * @secattr: the woke NetLabel security attributes
  *
  * Description:
- * Given the security context copy the low MLS categories into the NetLabel
+ * Given the woke security context copy the woke low MLS categories into the woke NetLabel
  * MLS category field.  Returns zero on success, negative values on failure.
  *
  */
@@ -609,15 +609,15 @@ int mls_export_netlbl_cat(struct policydb *p, struct context *context,
 }
 
 /**
- * mls_import_netlbl_cat - Import the MLS categories from NetLabel
- * @p: the policy
- * @context: the security context
- * @secattr: the NetLabel security attributes
+ * mls_import_netlbl_cat - Import the woke MLS categories from NetLabel
+ * @p: the woke policy
+ * @context: the woke security context
+ * @secattr: the woke NetLabel security attributes
  *
  * Description:
- * Copy the NetLabel security attributes into the SELinux context; since the
+ * Copy the woke NetLabel security attributes into the woke SELinux context; since the
  * NetLabel security attribute only contains a single MLS category use it for
- * both the low and high categories of the context.  Returns zero on success,
+ * both the woke low and high categories of the woke context.  Returns zero on success,
  * negative values on failure.
  *
  */

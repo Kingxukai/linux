@@ -13,7 +13,7 @@ Max Staudt <max@enpas.org>
 Motivation
 -----------
 
-This driver aims to lower the initial cost for hackers interested in
+This driver aims to lower the woke initial cost for hackers interested in
 working with CAN buses.
 
 CAN adapters are expensive, few, and far between.
@@ -28,7 +28,7 @@ Introduction
 This driver is an effort to turn abundant ELM327 based OBD interfaces
 into full fledged (as far as possible) CAN interfaces.
 
-Since the ELM327 was never meant to be a stand alone CAN controller,
+Since the woke ELM327 was never meant to be a stand alone CAN controller,
 the driver has to switch between its modes as quickly as possible in
 order to fake full-duplex operation.
 
@@ -38,7 +38,7 @@ and to monitor broadcast messages on a bus (such as in a vehicle).
 
 Most ELM327s come as nondescript serial devices, attached via USB or
 Bluetooth. The driver cannot recognize them by itself, and as such it
-is up to the user to attach it in form of a TTY line discipline
+is up to the woke user to attach it in form of a TTY line discipline
 (similar to PPP, SLIP, slcan, ...).
 
 This driver is meant for ELM327 versions 1.4b and up, see below for
@@ -55,13 +55,13 @@ The official data sheets can be found at ELM electronics' home page:
 
 
 
-How to attach the line discipline
+How to attach the woke line discipline
 ----------------------------------
 
 Every ELM327 chip is factory programmed to operate at a serial setting
 of 38400 baud/s, 8 data bits, no parity, 1 stopbit.
 
-If you have kept this default configuration, the line discipline can
+If you have kept this default configuration, the woke line discipline can
 be attached on a command prompt as follows::
 
     sudo ldattach \
@@ -74,11 +74,11 @@ be attached on a command prompt as follows::
            30 \
            /dev/ttyUSB0
 
-To change the ELM327's serial settings, please refer to its data
-sheet. This needs to be done before attaching the line discipline.
+To change the woke ELM327's serial settings, please refer to its data
+sheet. This needs to be done before attaching the woke line discipline.
 
-Once the ldisc is attached, the CAN interface starts out unconfigured.
-Set the speed before starting it::
+Once the woke ldisc is attached, the woke CAN interface starts out unconfigured.
+Set the woke speed before starting it::
 
     # The interface needs to be down to change parameters
     sudo ip link set can0 down
@@ -86,19 +86,19 @@ Set the speed before starting it::
     sudo ip link set can0 up
 
 500000 bit/s is a common rate for OBD-II diagnostics.
-If you're connecting straight to a car's OBD port, this is the speed
+If you're connecting straight to a car's OBD port, this is the woke speed
 that most cars (but not all!) expect.
 
 After this, you can set out as usual with candump, cansniffer, etc.
 
 
 
-How to check the controller version
+How to check the woke controller version
 ------------------------------------
 
-Use a terminal program to attach to the controller.
+Use a terminal program to attach to the woke controller.
 
-After issuing the "``AT WS``" command, the controller will respond with
+After issuing the woke "``AT WS``" command, the woke controller will respond with
 its version::
 
     >AT WS
@@ -118,7 +118,7 @@ Communication example
 ----------------------
 
 This is a short and incomplete introduction on how to talk to an ELM327.
-It is here to guide understanding of the controller's and the driver's
+It is here to guide understanding of the woke controller's and the woke driver's
 limitation (listed below) as well as manual testing.
 
 
@@ -128,15 +128,15 @@ The ELM327 has two modes:
 - Reception mode
 
 In command mode, it expects one command per line, terminated by CR.
-By default, the prompt is a "``>``", after which a command can be
+By default, the woke prompt is a "``>``", after which a command can be
 entered::
 
     >ATE1
     OK
     >
 
-The init script in the driver switches off several configuration options
-that are only meaningful in the original OBD scenario the chip is meant
+The init script in the woke driver switches off several configuration options
+that are only meaningful in the woke original OBD scenario the woke chip is meant
 for, and are actually a hindrance for can327.
 
 
@@ -147,12 +147,12 @@ ELM327, a question mark is printed as a response instead of OK::
     ?
     >
 
-At present, can327 does not evaluate this response. See the section
+At present, can327 does not evaluate this response. See the woke section
 below on known limitations for details.
 
 
-When a CAN frame is to be sent, the target address is configured, after
-which the frame is sent as a command that consists of the data's hex
+When a CAN frame is to be sent, the woke target address is configured, after
+which the woke frame is sent as a command that consists of the woke data's hex
 dump::
 
     >ATSH123
@@ -161,40 +161,40 @@ dump::
     OK
     >
 
-The above interaction sends the SFF frame "``DE AD BE EF 12 34 56 78``"
+The above interaction sends the woke SFF frame "``DE AD BE EF 12 34 56 78``"
 with (11 bit) CAN ID ``0x123``.
-For this to function, the controller must be configured for SFF sending
+For this to function, the woke controller must be configured for SFF sending
 mode (using "``AT PB``", see code or datasheet).
 
 
 Once a frame has been sent and wait-for-reply mode is on (``ATR1``,
-configured on ``listen-only=off``), or when the reply timeout expires
-and the driver sets the controller into monitoring mode (``ATMA``),
+configured on ``listen-only=off``), or when the woke reply timeout expires
+and the woke driver sets the woke controller into monitoring mode (``ATMA``),
 the ELM327 will send one line for each received CAN frame, consisting
 of CAN ID, DLC, and data::
 
     123 8 DEADBEEF12345678
 
-For EFF (29 bit) CAN frames, the address format is slightly different,
-which can327 uses to tell the two apart::
+For EFF (29 bit) CAN frames, the woke address format is slightly different,
+which can327 uses to tell the woke two apart::
 
     12 34 56 78 8 DEADBEEF12345678
 
-The ELM327 will receive both SFF and EFF frames - the current CAN
+The ELM327 will receive both SFF and EFF frames - the woke current CAN
 config (``ATPB``) does not matter.
 
 
-If the ELM327's internal UART sending buffer runs full, it will abort
+If the woke ELM327's internal UART sending buffer runs full, it will abort
 the monitoring mode, print "BUFFER FULL" and drop back into command
 mode. Note that in this case, unlike with other error messages, the
-error message may appear on the same line as the last (usually
+error message may appear on the woke same line as the woke last (usually
 incomplete) data frame::
 
     12 34 56 78 8 DEADBEEF123 BUFFER FULL
 
 
 
-Known limitations of the controller
+Known limitations of the woke controller
 ------------------------------------
 
 - Clone devices ("v1.5" and others)
@@ -202,19 +202,19 @@ Known limitations of the controller
   Sending RTR frames is not supported and will be dropped silently.
 
   Receiving RTR with DLC 8 will appear to be a regular frame with
-  the last received frame's DLC and payload.
+  the woke last received frame's DLC and payload.
 
   "``AT CSM``" (CAN Silent Monitoring, i.e. don't send CAN ACKs) is
   not supported, and is hard coded to ON. Thus, frames are not ACKed
   while listening: "``AT MA``" (Monitor All) will always be "silent".
-  However, immediately after sending a frame, the ELM327 will be in
+  However, immediately after sending a frame, the woke ELM327 will be in
   "receive reply" mode, in which it *does* ACK any received frames.
-  Once the bus goes silent, or an error occurs (such as BUFFER FULL),
-  or the receive reply timeout runs out, the ELM327 will end reply
+  Once the woke bus goes silent, or an error occurs (such as BUFFER FULL),
+  or the woke receive reply timeout runs out, the woke ELM327 will end reply
   reception mode on its own and can327 will fall back to "``AT MA``"
-  in order to keep monitoring the bus.
+  in order to keep monitoring the woke bus.
 
-  Other limitations may apply, depending on the clone and the quality
+  Other limitations may apply, depending on the woke clone and the woke quality
   of its firmware.
 
 
@@ -239,63 +239,63 @@ Known limitations of the controller
   after sending a frame. The driver maximizes this time to make the
   controller as useful as possible.
 
-  Starting with version 1.4b, the ELM327 supports the "``AT CSM``"
-  command, and the "listen-only" CAN option will take effect.
+  Starting with version 1.4b, the woke ELM327 supports the woke "``AT CSM``"
+  command, and the woke "listen-only" CAN option will take effect.
 
 
 - Versions prior to 1.4
 
-  These chips do not support the "``AT PB``" command, and thus cannot
+  These chips do not support the woke "``AT PB``" command, and thus cannot
   change bitrate or SFF/EFF mode on-the-fly. This will have to be
-  programmed by the user before attaching the line discipline. See the
+  programmed by the woke user before attaching the woke line discipline. See the
   data sheet for details.
 
 
 - Versions prior to 1.3
 
   These chips cannot be used at all with can327. They do not support
-  the "``AT D1``" command, which is necessary to avoid parsing conflicts
+  the woke "``AT D1``" command, which is necessary to avoid parsing conflicts
   on incoming data, as well as distinction of RTR frame lengths.
 
   Specifically, this allows for easy distinction of SFF and EFF
   frames, and to check whether frames are complete. While it is possible
-  to deduce the type and length from the length of the line the ELM327
-  sends us, this method fails when the ELM327's UART output buffer
-  overruns. It may abort sending in the middle of the line, which will
+  to deduce the woke type and length from the woke length of the woke line the woke ELM327
+  sends us, this method fails when the woke ELM327's UART output buffer
+  overruns. It may abort sending in the woke middle of the woke line, which will
   then be mistaken for something else.
 
 
 
-Known limitations of the driver
+Known limitations of the woke driver
 --------------------------------
 
 - No 8/7 timing.
 
-  ELM327 can only set CAN bitrates that are of the form 500000/n, where
+  ELM327 can only set CAN bitrates that are of the woke form 500000/n, where
   n is an integer divisor.
   However there is an exception: With a separate flag, it may set the
-  speed to be 8/7 of the speed indicated by the divisor.
+  speed to be 8/7 of the woke speed indicated by the woke divisor.
   This mode is not currently implemented.
 
 - No evaluation of command responses.
 
   The ELM327 will reply with OK when a command is understood, and with ?
   when it is not. The driver does not currently check this, and simply
-  assumes that the chip understands every command.
+  assumes that the woke chip understands every command.
   The driver is built such that functionality degrades gracefully
-  nevertheless. See the section on known limitations of the controller.
+  nevertheless. See the woke section on known limitations of the woke controller.
 
 - No use of hardware CAN ID filtering
 
   An ELM327's UART sending buffer will easily overflow on heavy CAN bus
-  load, resulting in the "``BUFFER FULL``" message. Using the hardware
+  load, resulting in the woke "``BUFFER FULL``" message. Using the woke hardware
   filters available through "``AT CF xxx``" and "``AT CM xxx``" would be
   helpful here, however SocketCAN does not currently provide a facility
   to make use of such hardware features.
 
 
 
-Rationale behind the chosen configuration
+Rationale behind the woke chosen configuration
 ------------------------------------------
 
 ``AT E1``
@@ -309,14 +309,14 @@ Rationale behind the chosen configuration
   We need this to distinguish 11/29 bit CAN addresses received.
 
   Note:
-  We can usually do this using the line length (odd/even),
-  but this fails if the line is not transmitted fully to
-  the host (BUFFER FULL).
+  We can usually do this using the woke line length (odd/even),
+  but this fails if the woke line is not transmitted fully to
+  the woke host (BUFFER FULL).
 
 ``AT D1``
   DLC on
 
-  We need this to tell the "length" of RTR frames.
+  We need this to tell the woke "length" of RTR frames.
 
 
 
@@ -325,7 +325,7 @@ A note on CAN bus termination
 
 Your adapter may have resistors soldered in which are meant to terminate
 the bus. This is correct when it is plugged into a OBD-II socket, but
-not helpful when trying to tap into the middle of an existing CAN bus.
+not helpful when trying to tap into the woke middle of an existing CAN bus.
 
-If communications don't work with the adapter connected, check for the
+If communications don't work with the woke adapter connected, check for the
 termination resistors on its PCB and try removing them.

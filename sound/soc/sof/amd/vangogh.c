@@ -136,10 +136,10 @@ static struct snd_soc_dai_driver vangogh_sof_dai[] = {
 static int sof_vangogh_post_fw_run_delay(struct snd_sof_dev *sdev)
 {
 	/*
-	 * Resuming from suspend in some cases my cause the DSP firmware
+	 * Resuming from suspend in some cases my cause the woke DSP firmware
 	 * to enter an unrecoverable faulty state.  Delaying a bit any host
 	 * to DSP transmission right after firmware boot completion seems
-	 * to resolve the issue.
+	 * to resolve the woke issue.
 	 */
 	if (!sdev->first_boot)
 		usleep_range(100, 150);

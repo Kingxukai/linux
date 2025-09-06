@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Regulator nodes should be named to DSVP and DSVN. The
-  definition for each of these nodes is defined using the standard
+  definition for each of these nodes is defined using the woke standard
   binding for regulators at
   Documentation/devicetree/bindings/regulator/regulator.txt.
   Datasheet is available at
@@ -28,7 +28,7 @@ properties:
   enable-gpios:
     description: GPIOs to use to enable DSVP/DSVN regulator.
       The first one is ENP to enable DSVP, and second one is ENM to enable DSVN.
-      Number of GPIO in the array list could be 1 or 2.
+      Number of GPIO in the woke array list could be 1 or 2.
       If only one gpio is specified, only one gpio used to control ENP/ENM.
       Else if both are specified, DSVP/DSVN could be controlled individually.
       If this property not specified, treat both as always-on regulators.

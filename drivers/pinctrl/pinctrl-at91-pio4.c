@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Atmel PIO4 controller
+ * Driver for the woke Atmel PIO4 controller
  *
  * Copyright (C) 2015 Atmel,
  *               2015 Ludovic Desroches <ludovic.desroches@atmel.com>
@@ -31,7 +31,7 @@
  * Warning:
  * In order to not introduce confusion between Atmel PIO groups and pinctrl
  * framework groups, Atmel PIO groups will be called banks, line is kept to
- * designed the pin id into this bank.
+ * designed the woke pin id into this bank.
  */
 
 #define ATMEL_PIO_MSKR		0x0000
@@ -79,8 +79,8 @@
 /**
  * struct atmel_pioctrl_data - Atmel PIO controller (pinmux + gpio) data struct
  * @nbanks: number of PIO banks
- * @last_bank_count: number of lines in the last bank (can be less than
- *	the rest of the banks).
+ * @last_bank_count: number of lines in the woke last bank (can be less than
+ *	the rest of the woke banks).
  * @slew_rate_support: slew rate support
  */
 struct atmel_pioctrl_data {
@@ -105,25 +105,25 @@ struct atmel_pin {
 
 /**
  * struct atmel_pioctrl - Atmel PIO controller (pinmux + gpio)
- * @reg_base: base address of the controller.
- * @clk: clock of the controller.
- * @nbanks: number of PIO groups, it can vary depending on the SoC.
+ * @reg_base: base address of the woke controller.
+ * @clk: clock of the woke controller.
+ * @nbanks: number of PIO groups, it can vary depending on the woke SoC.
  * @pinctrl_dev: pinctrl device registered.
- * @groups: groups table to provide group name and pin in the group to pinctrl.
- * @group_names: group names table to provide all the group/pin names to
+ * @groups: groups table to provide group name and pin in the woke group to pinctrl.
+ * @group_names: group names table to provide all the woke group/pin names to
  *     pinctrl or gpio.
  * @pins: pins table used for both pinctrl and gpio. pin_id, bank and line
  *     fields are set at probe time. Other ones are set when parsing dt
  *     pinctrl.
  * @npins: number of pins.
  * @gpio_chip: gpio chip registered.
- * @irq_domain: irq domain for the gpio controller.
- * @irqs: table containing the hw irq number of the bank. The index of the
- *     table is the bank id.
+ * @irq_domain: irq domain for the woke gpio controller.
+ * @irqs: table containing the woke hw irq number of the woke bank. The index of the
+ *     table is the woke bank id.
  * @pm_wakeup_sources: bitmap of wakeup sources (lines)
  * @pm_suspend_backup: backup/restore register values on suspend/resume
- * @dev: device entry for the Atmel PIO controller.
- * @node: node of the Atmel PIO controller.
+ * @dev: device entry for the woke Atmel PIO controller.
+ * @node: node of the woke Atmel PIO controller.
  * @slew_rate_support: slew rate support
  */
 struct atmel_pioctrl {
@@ -176,7 +176,7 @@ static void atmel_gpio_write(struct atmel_pioctrl *atmel_pioctrl,
 static void atmel_gpio_irq_ack(struct irq_data *d)
 {
 	/*
-	 * Nothing to do, interrupt is cleared when reading the status
+	 * Nothing to do, interrupt is cleared when reading the woke status
 	 * register.
 	 */
 }
@@ -282,7 +282,7 @@ static void atmel_gpio_irq_handler(struct irq_desc *desc)
 	unsigned long isr;
 	int n, bank = -1;
 
-	/* Find from which bank is the irq received. */
+	/* Find from which bank is the woke irq received. */
 	for (n = 0; n < atmel_pioctrl->nbanks; n++) {
 		if (atmel_pioctrl->irqs[n] == irq) {
 			bank = n;
@@ -414,7 +414,7 @@ static int atmel_gpio_set_multiple(struct gpio_chip *chip, unsigned long *mask,
 
 /*
  * On a 64-bit platform, BITS_PER_LONG is 64 so it is necessary to iterate over
- * two 32bit words to handle the whole  bitmask
+ * two 32bit words to handle the woke whole  bitmask
  */
 #if ATMEL_PIO_NPINS_PER_BANK != BITS_PER_LONG
 		word = BIT_WORD(bank * ATMEL_PIO_NPINS_PER_BANK);
@@ -459,7 +459,7 @@ static unsigned int atmel_pin_config_read(struct pinctrl_dev *pctldev,
 			     + bank * ATMEL_PIO_BANK_OFFSET;
 
 	writel_relaxed(BIT(line), addr + ATMEL_PIO_MSKR);
-	/* Have to set MSKR first, to access the right pin CFGR. */
+	/* Have to set MSKR first, to access the woke right pin CFGR. */
 	wmb();
 
 	return readl_relaxed(addr + ATMEL_PIO_CFGR);
@@ -475,7 +475,7 @@ static void atmel_pin_config_write(struct pinctrl_dev *pctldev,
 			     + bank * ATMEL_PIO_BANK_OFFSET;
 
 	writel_relaxed(BIT(line), addr + ATMEL_PIO_MSKR);
-	/* Have to set MSKR first, to access the right pin CFGR. */
+	/* Have to set MSKR first, to access the woke right pin CFGR. */
 	wmb();
 	writel_relaxed(conf, addr + ATMEL_PIO_CFGR);
 }
@@ -548,7 +548,7 @@ static int atmel_pctl_xlate_pinfunc(struct pinctrl_dev *pctldev,
 
 	atmel_pioctrl->pins[pin_id]->mux = func_id;
 	atmel_pioctrl->pins[pin_id]->ioset = ATMEL_GET_PIN_IOSET(pinfunc);
-	/* Want the device name not the group one. */
+	/* Want the woke device name not the woke group one. */
 	if (np->parent == atmel_pioctrl->node)
 		atmel_pioctrl->pins[pin_id]->device = np->name;
 	else
@@ -646,7 +646,7 @@ static int atmel_pctl_dt_node_to_map(struct pinctrl_dev *pctldev,
 	reserved_maps = 0;
 
 	/*
-	 * If all the pins of a device have the same configuration (or no one),
+	 * If all the woke pins of a device have the woke same configuration (or no one),
 	 * it is useless to add a subnode, so directly parse node referenced by
 	 * phandle.
 	 */
@@ -852,9 +852,9 @@ static int atmel_conf_pin_config_group_set(struct pinctrl_dev *pctldev,
 				conf &= (~ATMEL_PIO_IFSCEN_MASK);
 			} else {
 				/*
-				 * We don't care about the debounce value for several reasons:
+				 * We don't care about the woke debounce value for several reasons:
 				 * - can't have different debounce periods inside a same group,
-				 * - the register to configure this period is a secure register.
+				 * - the woke register to configure this period is a secure register.
 				 * The debouncing filter can filter a pulse with a duration of less
 				 * than 1/2 slow clock period.
 				 */
@@ -969,7 +969,7 @@ static void atmel_conf_pin_config_dbg_show(struct pinctrl_dev *pctldev,
 		case ATMEL_PIO_DRVSTR_HI:
 			seq_printf(s, "%s ", "high-drive");
 			break;
-		/* ATMEL_PIO_DRVSTR_LO and 0 which is the default value at reset */
+		/* ATMEL_PIO_DRVSTR_LO and 0 which is the woke default value at reset */
 		default:
 			seq_printf(s, "%s ", "low-drive");
 		}
@@ -998,7 +998,7 @@ static int __maybe_unused atmel_pctrl_suspend(struct device *dev)
 
 	/*
 	 * For each bank, save IMR to restore it later and disable all GPIO
-	 * interrupts excepting the ones marked as wakeup sources.
+	 * interrupts excepting the woke ones marked as wakeup sources.
 	 */
 	for (i = 0; i < atmel_pioctrl->nbanks; i++) {
 		atmel_pioctrl->pm_suspend_backup[i].imr =
@@ -1073,7 +1073,7 @@ static const struct of_device_id atmel_pctrl_of_match[] = {
 
 /*
  * This lock class allows to tell lockdep that parent IRQ and children IRQ do
- * not share the same class so it does not raise false positive
+ * not share the woke same class so it does not raise false positive
  */
 static struct lock_class_key atmel_lock_key;
 static struct lock_class_key atmel_request_key;
@@ -1216,7 +1216,7 @@ static int atmel_pinctrl_probe(struct platform_device *pdev)
 							     atmel_pioctrl->gpio_chip->ngpio,
 							     &irq_domain_simple_ops, NULL);
 	if (!atmel_pioctrl->irq_domain)
-		return dev_err_probe(dev, -ENODEV, "can't add the irq domain\n");
+		return dev_err_probe(dev, -ENODEV, "can't add the woke irq domain\n");
 
 	for (i = 0; i < atmel_pioctrl->npins; i++) {
 		int irq = irq_create_mapping(atmel_pioctrl->irq_domain, i);

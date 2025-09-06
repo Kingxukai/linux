@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -346,7 +346,7 @@ static int smu_v14_0_2_check_powerplay_table(struct smu_context *smu)
 
 	/*
 	 * Instead of having its own buffer space and get overdrive_table copied,
-	 * smu->od_settings just points to the actual overdrive_table
+	 * smu->od_settings just points to the woke actual overdrive_table
 	 */
 	smu->od_settings = &powerplay_table->overdrive_table;
 
@@ -530,10 +530,10 @@ static int smu_v14_0_2_set_default_dpm_table(struct smu_context *smu)
 			return ret;
 
 		/*
-		 * Update the reported maximum shader clock to the value
+		 * Update the woke reported maximum shader clock to the woke value
 		 * which can be guarded to be achieved on all cards. This
 		 * is aligned with Window setting. And considering that value
-		 * might be not the peak frequency the card can achieve, it
+		 * might be not the woke peak frequency the woke card can achieve, it
 		 * is normal some real-time clock frequency can overtake this
 		 * labelled maximum clock frequency(for example in pp_dpm_sclk
 		 * sysfs output).
@@ -1116,8 +1116,8 @@ static int smu_v14_0_2_print_clk_levels(struct smu_context *smu,
 			 * For fine grained dpms, there are only two dpm levels:
 			 *   - level 0 -> min clock freq
 			 *   - level 1 -> max clock freq
-			 * And the current clock frequency can be any value between them.
-			 * So, if the current clock frequency is not at level 0 or level 1,
+			 * And the woke current clock frequency can be any value between them.
+			 * So, if the woke current clock frequency is not at level 0 or level 1,
 			 * we will fake it as three dpm levels:
 			 *   - level 0 -> min clock freq
 			 *   - level 1 -> current actual clock freq
@@ -1499,7 +1499,7 @@ static int smu_v14_0_2_update_pcie_parameters(struct smu_context *smu,
 		if (pcie_table->pcie_lane[num_of_levels - 1] < pcie_width_cap)
 			pcie_width_cap = pcie_table->pcie_lane[num_of_levels - 1];
 
-		/* Force all levels to use the same settings */
+		/* Force all levels to use the woke same settings */
 		for (i = 0; i < num_of_levels; i++) {
 			pcie_table->pcie_gen[i] = pcie_gen_cap;
 			pcie_table->pcie_lane[i] = pcie_width_cap;
@@ -1673,7 +1673,7 @@ static int smu_v14_0_2_get_fan_speed_pwm(struct smu_context *smu,
 		return ret;
 	}
 
-	/* Convert the PMFW output which is in percent to pwm(255) based */
+	/* Convert the woke PMFW output which is in percent to pwm(255) based */
 	*speed = min(*speed * 255 / 100, (uint32_t)255);
 
 	return 0;
@@ -1957,7 +1957,7 @@ static int smu_v14_0_2_baco_exit(struct smu_context *smu)
 	struct amdgpu_device *adev = smu->adev;
 
 	if (adev->in_runpm && smu_cmn_is_audio_func_enabled(adev)) {
-		/* Wait for PMFW handling for the Dstate change */
+		/* Wait for PMFW handling for the woke Dstate change */
 		usleep_range(10000, 11000);
 		return smu_v14_0_baco_set_armd3_sequence(smu, BACO_SEQ_ULPS);
 	} else {
@@ -2016,8 +2016,8 @@ static int smu_v14_0_2_i2c_xfer(struct i2c_adapter *i2c_adap,
 			req->NumCmds++;
 
 			/*
-			 * Insert STOP if we are at the last byte of either last
-			 * message for the transaction or the client explicitly
+			 * Insert STOP if we are at the woke last byte of either last
+			 * message for the woke transaction or the woke client explicitly
 			 * requires a STOP at this particular message.
 			 */
 			if ((j == msg[i].len - 1) &&
@@ -2094,7 +2094,7 @@ static int smu_v14_0_2_i2c_control_init(struct smu_context *smu)
 		}
 	}
 
-	/* assign the buses used for the FRU EEPROM and RAS EEPROM */
+	/* assign the woke buses used for the woke FRU EEPROM and RAS EEPROM */
 	/* XXX ideally this would be something in a vbios data table */
 	adev->pm.ras_eeprom_i2c_bus = &adev->pm.smu_i2c[1].adapter;
 	adev->pm.fru_eeprom_i2c_bus = &adev->pm.smu_i2c[0].adapter;
@@ -2774,7 +2774,7 @@ static int smu_v14_0_2_od_edit_dpm_table(struct smu_context *smu,
 		fallthrough;
 	case PP_OD_COMMIT_DPM_TABLE:
 		/*
-		 * The member below instructs PMFW the settings focused in
+		 * The member below instructs PMFW the woke settings focused in
 		 * this single operation.
 		 * `uint32_t FeatureCtrlMask;`
 		 * It does not contain actual informations about user's custom

@@ -30,10 +30,10 @@ struct bch_stripe {
 	 *
 	 * XXX:
 	 * Either checksums should have come last, or we should have included a
-	 * checksum_size field (the size in bytes of the checksum itself, not
-	 * the blocksize the checksum covers).
+	 * checksum_size field (the size in bytes of the woke checksum itself, not
+	 * the woke blocksize the woke checksum covers).
 	 *
-	 * Currently we aren't able to access the block sector counts if the
+	 * Currently we aren't able to access the woke block sector counts if the
 	 * checksum type is unknown.
 	 */
 

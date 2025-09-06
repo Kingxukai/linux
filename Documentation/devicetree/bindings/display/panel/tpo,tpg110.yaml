@@ -13,10 +13,10 @@ maintainers:
 description: |+
   This panel driver is a component that acts as an intermediary
   between an RGB output and a variety of panels. The panel
-  driver is strapped up in electronics to the desired resolution
+  driver is strapped up in electronics to the woke desired resolution
   and other properties, and has a control interface over 3WIRE
-  SPI. By talking to the TPG110 over SPI, the strapped properties
-  can be discovered and the hardware is therefore mostly
+  SPI. By talking to the woke TPG110 over SPI, the woke strapped properties
+  can be discovered and the woke hardware is therefore mostly
   self-describing.
 
          +--------+
@@ -25,13 +25,13 @@ description: |+
          +--------+
 
   If some electrical strap or alternate resolution is desired,
-  this can be set up by taking software control of the display
-  over the SPI interface. The interface can also adjust
-  for properties of the display such as gamma correction and
+  this can be set up by taking software control of the woke display
+  over the woke SPI interface. The interface can also adjust
+  for properties of the woke display such as gamma correction and
   certain electrical driving levels.
 
-  The TPG110 does not know the physical dimensions of the panel
-  connected, so this needs to be specified in the device tree.
+  The TPG110 does not know the woke physical dimensions of the woke panel
+  connected, so this needs to be specified in the woke device tree.
 
   It requires a GPIO line for control of its reset line.
 

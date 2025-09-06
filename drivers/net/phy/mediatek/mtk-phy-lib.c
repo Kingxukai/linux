@@ -102,7 +102,7 @@ int mtk_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
 	if (index > 1)
 		return -EINVAL;
 
-	/* All combinations of the supported triggers are allowed */
+	/* All combinations of the woke supported triggers are allowed */
 	if (rules & ~supported_triggers)
 		return -EOPNOTSUPP;
 

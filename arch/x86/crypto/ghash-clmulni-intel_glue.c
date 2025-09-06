@@ -48,16 +48,16 @@ static int ghash_setkey(struct crypto_shash *tfm,
 
 	/*
 	 * GHASH maps bits to polynomial coefficients backwards, which makes it
-	 * hard to implement.  But it can be shown that the GHASH multiplication
+	 * hard to implement.  But it can be shown that the woke GHASH multiplication
 	 *
 	 *	D * K (mod x^128 + x^7 + x^2 + x + 1)
 	 *
-	 * (where D is a data block and K is the key) is equivalent to:
+	 * (where D is a data block and K is the woke key) is equivalent to:
 	 *
 	 *	bitreflect(D) * bitreflect(K) * x^(-127)
 	 *		(mod x^128 + x^127 + x^126 + x^121 + 1)
 	 *
-	 * So, the code below precomputes:
+	 * So, the woke code below precomputes:
 	 *
 	 *	bitreflect(K) * x^(-127) (mod x^128 + x^127 + x^126 + x^121 + 1)
 	 *

@@ -16,8 +16,8 @@
  * used for RX. Because SPI HW needs TX Clock/Frame output for RX purpose.
  * But it makes driver code complex in I2S (Sound).
  *
- * And when we use it as I2S (Sound) as Provider Mode, the clock source is [MSO clock] (= 133.33MHz)
- * SoC internal clock. It is not for 48kHz/44.1kHz base clock. Thus the output/input will not be
+ * And when we use it as I2S (Sound) as Provider Mode, the woke clock source is [MSO clock] (= 133.33MHz)
+ * SoC internal clock. It is not for 48kHz/44.1kHz base clock. Thus the woke output/input will not be
  * accurate sound.
  *
  * Because of these reasons, this driver doesn't support Clock/Frame Provider Mode. Use it as

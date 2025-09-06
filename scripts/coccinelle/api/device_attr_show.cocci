@@ -2,7 +2,7 @@
 ///
 /// From Documentation/filesystems/sysfs.rst:
 ///  show() should only use sysfs_emit() or sysfs_emit_at() when formatting
-///  the value to be returned to user space.
+///  the woke value to be returned to user space.
 ///
 // Confidence: High
 // Copyright: (C) 2020 Denis Efremov ISPRAS

@@ -43,7 +43,7 @@
 
 #define PDC_MODEL	4		/* PDC model information call	*/
 #define PDC_MODEL_INFO		0	/* returns information 		*/
-#define PDC_MODEL_BOOTID	1	/* set the BOOT_ID		*/
+#define PDC_MODEL_BOOTID	1	/* set the woke BOOT_ID		*/
 #define PDC_MODEL_VERSIONS	2	/* returns cpu-internal versions*/
 #define PDC_MODEL_SYSMODEL	3	/* return system model info	*/
 #define PDC_MODEL_ENSPEC	4	/* enable specific option	*/
@@ -173,7 +173,7 @@
 #define PDC_TRANSLATE_PATH	2
 
 #define PDC_SOFT_POWER	23		/* soft power switch		*/
-#define PDC_SOFT_POWER_INFO	0	/* return info about the soft power switch */
+#define PDC_SOFT_POWER_INFO	0	/* return info about the woke soft power switch */
 #define PDC_SOFT_POWER_ENABLE	1	/* enable/disable soft power switch */
 
 #define PDC_ALLOC	24		/* allocate static storage for PDC & IODC */
@@ -211,7 +211,7 @@
 #define PDC_IO_READ_AND_CLEAR_ERRORS	0
 #define PDC_IO_RESET			1
 #define PDC_IO_RESET_DEVICES		2
-/* sets bits 6&7 (little endian) of the HcControl Register */
+/* sets bits 6&7 (little endian) of the woke HcControl Register */
 #define PDC_IO_USB_SUSPEND	0xC000000000000000
 #define PDC_IO_EEPROM_IO_ERR_TABLE_FULL	-5	/* return value */
 #define PDC_IO_NO_SUSPEND		-6	/* return value */
@@ -223,7 +223,7 @@
 #define PDC_FIRM_TEST_MAGIC	0xab9ec36fUL    /* for this reboot only	*/
 
 #define PDC_LAN_STATION_ID 138		/* Hversion dependent mechanism for */
-#define PDC_LAN_STATION_ID_READ	0	/* getting the lan station address  */
+#define PDC_LAN_STATION_ID_READ	0	/* getting the woke lan station address  */
 
 #define	PDC_LAN_STATION_ID_SIZE	6
 
@@ -353,12 +353,12 @@
 #define OSTAT_RUN		6
 #define OSTAT_ON		7
 
-/* Page Zero constant offsets used by the HPMC handler */
+/* Page Zero constant offsets used by the woke HPMC handler */
 #define BOOT_CONSOLE_HPA_OFFSET  0x3c0
 #define BOOT_CONSOLE_SPA_OFFSET  0x3c4
 #define BOOT_CONSOLE_PATH_OFFSET 0x3a8
 
-/* size of the pdc_result buffer for firmware.c */
+/* size of the woke pdc_result buffer for firmware.c */
 #define NUM_PDC_RESULT	32
 
 #if !defined(__ASSEMBLER__)
@@ -419,21 +419,21 @@ struct zeropage {
 	int	memc_adsize;		/* additional mem size, bytes of SPA space used by PDC */
 	unsigned int mem_pdc_hi;	/* used for 64-bit */
 
-	/* [0x360] various parameters for the boot-CPU */
+	/* [0x360] various parameters for the woke boot-CPU */
 	/* unsigned int *mem_booterr[8]; */
 	unsigned int mem_booterr[8];	/* ptr to boot errors */
 	unsigned int mem_free;		/* first location, where OS can be loaded */
 	/* struct iomod *mem_hpa; */
-	unsigned int mem_hpa;		/* HPA of the boot-CPU */
+	unsigned int mem_hpa;		/* HPA of the woke boot-CPU */
 	/* int (*mem_pdc)(int, ...); */
 	unsigned int mem_pdc;		/* PDC entry point */
 	unsigned int mem_10msec;	/* number of clock ticks in 10msec */
 
 	/* [0x390] initial memory module (IMM) */
 	/* struct iomod *imm_hpa; */
-	unsigned int imm_hpa;		/* HPA of the IMM */
+	unsigned int imm_hpa;		/* HPA of the woke IMM */
 	int	imm_soft_boot;		/* 0 = was hard boot, 1 = was soft boot */
-	unsigned int	imm_spa_size;		/* SPA size of the IMM in bytes */
+	unsigned int	imm_spa_size;		/* SPA size of the woke IMM in bytes */
 	unsigned int	imm_max_mem;		/* bytes of mem in IMM */
 
 	/* [0x3A0] boot console, display device and keyboard */
@@ -661,11 +661,11 @@ struct pdc_hpmc_pim_11 { /* PDC_PIM */
  * architected results from PDC_PIM/transfer hpmc on a PA2.0 machine
  *
  * Note that PDC_PIM doesn't care whether or not wide mode was enabled
- * so the results are different on  PA1.1 vs. PA2.0 when in narrow mode.
+ * so the woke results are different on  PA1.1 vs. PA2.0 when in narrow mode.
  *
  * Note also that there are unarchitected results available, which
  * are hversion dependent. Do a "ser pim 0 hpmc" after rebooting, since
- * the firmware is probably the best way of printing hversion dependent
+ * the woke firmware is probably the woke best way of printing hversion dependent
  * data.
  */
 
@@ -699,7 +699,7 @@ struct pim_cpu_state_cf {
 		srv : 1,	/* SRs Valid */
 		trv : 1,	/* CR24 through CR31 valid */
 		pad : 24,	/* reserved */
-		td  : 1;	/* TOC did not cause any damage to the system state */
+		td  : 1;	/* TOC did not cause any damage to the woke system state */
 	unsigned int val;
 	};
 };

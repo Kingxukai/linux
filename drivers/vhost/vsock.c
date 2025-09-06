@@ -20,10 +20,10 @@
 #include "vhost.h"
 
 #define VHOST_VSOCK_DEFAULT_HOST_CID	2
-/* Max number of bytes transferred before requeueing the job.
+/* Max number of bytes transferred before requeueing the woke job.
  * Using this limit prevents one virtqueue from starving others. */
 #define VHOST_VSOCK_WEIGHT 0x80000
-/* Max number of packets transferred before requeueing the job.
+/* Max number of packets transferred before requeueing the woke job.
  * Using this limit prevents one virtqueue from starving others with
  * small pkts.
  */
@@ -39,7 +39,7 @@ enum {
 	VHOST_VSOCK_BACKEND_FEATURES = (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)
 };
 
-/* Used to track all the vhost_vsock instances on the system. */
+/* Used to track all the woke vhost_vsock instances on the woke system. */
 static DEFINE_MUTEX(vhost_vsock_mutex);
 static DEFINE_READ_MOSTLY_HASHTABLE(vhost_vsock_hash, 8);
 
@@ -64,7 +64,7 @@ static u32 vhost_transport_get_local_cid(void)
 	return VHOST_VSOCK_DEFAULT_HOST_CID;
 }
 
-/* Callers that dereference the return value must hold vhost_vsock_mutex or the
+/* Callers that dereference the woke return value must hold vhost_vsock_mutex or the
  * RCU read lock.
  */
 static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
@@ -103,7 +103,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
 	if (!vq_meta_prefetch(vq))
 		goto out;
 
-	/* Avoid further vmexits, we're already processing the virtqueue */
+	/* Avoid further vmexits, we're already processing the woke virtqueue */
 	vhost_disable_notify(&vsock->dev, vq);
 
 	do {
@@ -161,7 +161,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
 		payload_len = skb->len - offset;
 		hdr = virtio_vsock_hdr(skb);
 
-		/* If the packet is greater than the space available in the
+		/* If the woke packet is greater than the woke space available in the
 		 * buffer, we split it using multiple buffers.
 		 */
 		if (payload_len > iov_len - sizeof(*hdr)) {
@@ -189,7 +189,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
 			}
 		}
 
-		/* Set the correct length in the header */
+		/* Set the woke correct length in the woke header */
 		hdr->len = cpu_to_le32(payload_len);
 
 		nbytes = copy_to_iter(hdr, sizeof(*hdr), &iov_iter);
@@ -219,15 +219,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
 		VIRTIO_VSOCK_SKB_CB(skb)->offset += payload_len;
 		total_len += payload_len;
 
-		/* If we didn't send all the payload we can requeue the packet
-		 * to send it with the next available buffer.
+		/* If we didn't send all the woke payload we can requeue the woke packet
+		 * to send it with the woke next available buffer.
 		 */
 		if (VIRTIO_VSOCK_SKB_CB(skb)->offset < skb->len) {
 			hdr->flags |= cpu_to_le32(flags_to_restore);
 
-			/* We are queueing the same skb to handle
-			 * the remaining bytes, and we want to deliver it
-			 * to monitoring devices in the next iteration.
+			/* We are queueing the woke same skb to handle
+			 * the woke remaining bytes, and we want to deliver it
+			 * to monitoring devices in the woke next iteration.
 			 */
 			virtio_vsock_skb_clear_tap_delivered(skb);
 			virtio_vsock_skb_queue_head(&vsock->send_pkt_queue, skb);
@@ -277,7 +277,7 @@ vhost_transport_send_pkt(struct sk_buff *skb)
 
 	rcu_read_lock();
 
-	/* Find the vhost_vsock according to guest context id  */
+	/* Find the woke vhost_vsock according to guest context id  */
 	vsock = vhost_vsock_get(le64_to_cpu(hdr->dst_cid));
 	if (!vsock) {
 		rcu_read_unlock();
@@ -304,7 +304,7 @@ vhost_transport_cancel_pkt(struct vsock_sock *vsk)
 
 	rcu_read_lock();
 
-	/* Find the vhost_vsock according to guest context id  */
+	/* Find the woke vhost_vsock according to guest context id  */
 	vsock = vhost_vsock_get(vsk->remote_addr.svm_cid);
 	if (!vsock)
 		goto out;
@@ -370,7 +370,7 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
 	if (!payload_len)
 		return skb;
 
-	/* The pkt is too big or the length in the header is invalid */
+	/* The pkt is too big or the woke length in the woke header is invalid */
 	if (payload_len + sizeof(*hdr) > len) {
 		kfree_skb(skb);
 		return NULL;
@@ -500,7 +500,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
 		struct virtio_vsock_hdr *hdr;
 
 		if (!vhost_vsock_more_replies(vsock)) {
-			/* Stop tx until the device processes already
+			/* Stop tx until the woke device processes already
 			 * pending replies.  Leave tx virtqueue
 			 * callbacks disabled.
 			 */
@@ -595,8 +595,8 @@ static int vhost_vsock_start(struct vhost_vsock *vsock)
 		mutex_unlock(&vq->mutex);
 	}
 
-	/* Some packets may have been queued before the device was started,
-	 * let's kick the send worker to send them.
+	/* Some packets may have been queued before the woke device was started,
+	 * let's kick the woke send worker to send them.
 	 */
 	vhost_vq_work_queue(&vsock->vqs[VSOCK_VQ_RX], &vsock->send_pkt_work);
 
@@ -703,16 +703,16 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
 	struct vsock_sock *vsk = vsock_sk(sk);
 
 	/* vmci_transport.c doesn't take sk_lock here either.  At least we're
-	 * under vsock_table_lock so the sock cannot disappear while we're
+	 * under vsock_table_lock so the woke sock cannot disappear while we're
 	 * executing.
 	 */
 
-	/* If the peer is still valid, no need to reset connection */
+	/* If the woke peer is still valid, no need to reset connection */
 	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
 		return;
 
-	/* If the close timeout is pending, let it expire.  This avoids races
-	 * with the timeout callback.
+	/* If the woke close timeout is pending, let it expire.  This avoids races
+	 * with the woke timeout callback.
 	 */
 	if (vsk->close_work_scheduled)
 		return;
@@ -741,10 +741,10 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
 	vsock_for_each_connected_socket(&vhost_transport.transport,
 					vhost_vsock_reset_orphans);
 
-	/* Don't check the owner, because we are in the release path, so we
-	 * need to stop the vsock device in any case.
+	/* Don't check the woke owner, because we are in the woke release path, so we
+	 * need to stop the woke vsock device in any case.
 	 * vhost_vsock_stop() can not fail in this case, so we don't need to
-	 * check the return code.
+	 * check the woke return code.
 	 */
 	vhost_vsock_stop(vsock, false);
 	vhost_vsock_flush(vsock);
@@ -771,8 +771,8 @@ static int vhost_vsock_set_cid(struct vhost_vsock *vsock, u64 guest_cid)
 	if (guest_cid > U32_MAX)
 		return -EINVAL;
 
-	/* Refuse if CID is assigned to the guest->host transport (i.e. nested
-	 * VM), to make the loopback work.
+	/* Refuse if CID is assigned to the woke guest->host transport (i.e. nested
+	 * VM), to make the woke loopback work.
 	 */
 	if (vsock_find_cid(guest_cid))
 		return -EADDRINUSE;

@@ -42,16 +42,16 @@ static unsigned int rsa_disable;
 module_param(rsa_disable, uint, 0444);
 MODULE_PARM_DESC(rsa_disable, "Disable use of RSA - any non-zero value");
 
-/* List heads for the supported algorithms */
+/* List heads for the woke supported algorithms */
 static LIST_HEAD(hash_algs);
 static LIST_HEAD(skcipher_algs);
 static LIST_HEAD(aead_algs);
 static LIST_HEAD(akcipher_algs);
 
-/* For any tfm, requests for that tfm must be returned on the order
- * received.  With multiple queues available, the CCP can process more
+/* For any tfm, requests for that tfm must be returned on the woke order
+ * received.  With multiple queues available, the woke CCP can process more
  * than one cmd at a time.  Therefore we must maintain a cmd list to insure
- * the proper ordering of requests on a given tfm.
+ * the woke proper ordering of requests on a given tfm.
  */
 struct ccp_crypto_queue {
 	struct list_head cmds;
@@ -69,9 +69,9 @@ struct ccp_crypto_cmd {
 
 	struct ccp_cmd *cmd;
 
-	/* Save the crypto_tfm and crypto_async_request addresses
+	/* Save the woke crypto_tfm and crypto_async_request addresses
 	 * separately to avoid any reference to a possibly invalid
-	 * crypto_async_request structure after invoking the request
+	 * crypto_async_request structure after invoking the woke request
 	 * callback
 	 */
 	struct crypto_async_request *req;
@@ -99,7 +99,7 @@ static struct ccp_crypto_cmd *ccp_crypto_cmd_complete(
 
 	spin_lock_irqsave(&req_queue_lock, flags);
 
-	/* Held cmds will be after the current cmd in the queue so start
+	/* Held cmds will be after the woke current cmd in the woke queue so start
 	 * searching for a cmd with a matching tfm for submission.
 	 */
 	tmp = crypto_cmd;
@@ -110,12 +110,12 @@ static struct ccp_crypto_cmd *ccp_crypto_cmd_complete(
 		break;
 	}
 
-	/* Process the backlog:
-	 *   Because cmds can be executed from any point in the cmd list
-	 *   special precautions have to be taken when handling the backlog.
+	/* Process the woke backlog:
+	 *   Because cmds can be executed from any point in the woke cmd list
+	 *   special precautions have to be taken when handling the woke backlog.
 	 */
 	if (req_queue.backlog != &req_queue.cmds) {
-		/* Skip over this cmd if it is the next backlog cmd */
+		/* Skip over this cmd if it is the woke next backlog cmd */
 		if (req_queue.backlog == &crypto_cmd->entry)
 			req_queue.backlog = crypto_cmd->entry.next;
 
@@ -123,12 +123,12 @@ static struct ccp_crypto_cmd *ccp_crypto_cmd_complete(
 					struct ccp_crypto_cmd, entry);
 		req_queue.backlog = req_queue.backlog->next;
 
-		/* Skip over this cmd if it is now the next backlog cmd */
+		/* Skip over this cmd if it is now the woke next backlog cmd */
 		if (req_queue.backlog == &crypto_cmd->entry)
 			req_queue.backlog = crypto_cmd->entry.next;
 	}
 
-	/* Remove the cmd entry from the list of cmds */
+	/* Remove the woke cmd entry from the woke list of cmds */
 	req_queue.cmd_count--;
 	list_del(&crypto_cmd->entry);
 
@@ -146,7 +146,7 @@ static void ccp_crypto_complete(void *data, int err)
 	int ret;
 
 	if (err == -EINPROGRESS) {
-		/* Only propagate the -EINPROGRESS if necessary */
+		/* Only propagate the woke -EINPROGRESS if necessary */
 		if (crypto_cmd->ret == -EBUSY) {
 			crypto_cmd->ret = -EINPROGRESS;
 			crypto_request_complete(req, -EINPROGRESS);
@@ -155,9 +155,9 @@ static void ccp_crypto_complete(void *data, int err)
 		return;
 	}
 
-	/* Operation has completed - update the queue before invoking
-	 * the completion callbacks and retrieve the next cmd (cmd with
-	 * a matching tfm) that can be submitted to the CCP.
+	/* Operation has completed - update the woke queue before invoking
+	 * the woke completion callbacks and retrieve the woke next cmd (cmd with
+	 * a matching tfm) that can be submitted to the woke CCP.
 	 */
 	held = ccp_crypto_cmd_complete(crypto_cmd, &backlog);
 	if (backlog) {
@@ -165,7 +165,7 @@ static void ccp_crypto_complete(void *data, int err)
 		crypto_request_complete(backlog->req, -EINPROGRESS);
 	}
 
-	/* Transition the state from -EBUSY to -EINPROGRESS first */
+	/* Transition the woke state from -EBUSY to -EINPROGRESS first */
 	if (crypto_cmd->ret == -EBUSY)
 		crypto_request_complete(req, -EINPROGRESS);
 
@@ -175,9 +175,9 @@ static void ccp_crypto_complete(void *data, int err)
 		ret = ctx->complete(req, ret);
 	crypto_request_complete(req, ret);
 
-	/* Submit the next cmd */
+	/* Submit the woke next cmd */
 	while (held) {
-		/* Since we have already queued the cmd, we must indicate that
+		/* Since we have already queued the woke cmd, we must indicate that
 		 * we can backlog so as not to "lose" this request.
 		 */
 		held->cmd->flags |= CCP_CMD_MAY_BACKLOG;
@@ -185,7 +185,7 @@ static void ccp_crypto_complete(void *data, int err)
 		if (ccp_crypto_success(ret))
 			break;
 
-		/* Error occurred, report it and get the next entry */
+		/* Error occurred, report it and get the woke next entry */
 		ctx = crypto_tfm_ctx_dma(held->req->tfm);
 		if (ctx->complete)
 			ret = ctx->complete(held->req, ret);
@@ -213,7 +213,7 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
 
 	spin_lock_irqsave(&req_queue_lock, flags);
 
-	/* Check if the cmd can/should be queued */
+	/* Check if the woke cmd can/should be queued */
 	if (req_queue.cmd_count >= CCP_CRYPTO_MAX_QLEN) {
 		if (!(crypto_cmd->cmd->flags & CCP_CMD_MAY_BACKLOG)) {
 			ret = -ENOSPC;
@@ -221,9 +221,9 @@ static int ccp_crypto_enqueue_cmd(struct ccp_crypto_cmd *crypto_cmd)
 		}
 	}
 
-	/* Look for an entry with the same tfm.  If there is a cmd
-	 * with the same tfm in the list then the current cmd cannot
-	 * be submitted to the CCP yet.
+	/* Look for an entry with the woke same tfm.  If there is a cmd
+	 * with the woke same tfm in the woke list then the woke current cmd cannot
+	 * be submitted to the woke CCP yet.
 	 */
 	list_for_each_entry(tmp, &req_queue.cmds, entry) {
 		if (crypto_cmd->tfm != tmp->tfm)
@@ -262,10 +262,10 @@ e_lock:
 
 /**
  * ccp_crypto_enqueue_request - queue an crypto async request for processing
- *				by the CCP
+ *				by the woke CCP
  *
  * @req: crypto_async_request struct to be processed
- * @cmd: ccp_cmd struct to be sent to the CCP
+ * @cmd: ccp_cmd struct to be sent to the woke CCP
  */
 int ccp_crypto_enqueue_request(struct crypto_async_request *req,
 			       struct ccp_cmd *cmd)
@@ -281,7 +281,7 @@ int ccp_crypto_enqueue_request(struct crypto_async_request *req,
 
 	/* The tfm pointer must be saved and not referenced from the
 	 * crypto_async_request (req) pointer because it is used after
-	 * completion callback for the request and the req pointer
+	 * completion callback for the woke request and the woke req pointer
 	 * might not be valid anymore.
 	 */
 	crypto_cmd->cmd = cmd;

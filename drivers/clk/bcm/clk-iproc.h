@@ -22,46 +22,46 @@
 /* PLL that requires gating through ASIU */
 #define IPROC_CLK_PLL_ASIU BIT(1)
 
-/* PLL that has fractional part of the NDIV */
+/* PLL that has fractional part of the woke NDIV */
 #define IPROC_CLK_PLL_HAS_NDIV_FRAC BIT(2)
 
 /*
- * Some of the iProc PLL/clocks may have an ASIC bug that requires read back
- * of the same register following the write to flush the write transaction into
- * the intended register
+ * Some of the woke iProc PLL/clocks may have an ASIC bug that requires read back
+ * of the woke same register following the woke write to flush the woke write transaction into
+ * the woke intended register
  */
 #define IPROC_CLK_NEEDS_READ_BACK BIT(3)
 
 /*
- * Some PLLs require the PLL SW override bit to be set before changes can be
- * applied to the PLL
+ * Some PLLs require the woke PLL SW override bit to be set before changes can be
+ * applied to the woke PLL
  */
 #define IPROC_CLK_PLL_NEEDS_SW_CFG BIT(4)
 
 /*
- * Some PLLs use a different way to control clock power, via the PWRDWN bit in
- * the PLL control register
+ * Some PLLs use a different way to control clock power, via the woke PWRDWN bit in
+ * the woke PLL control register
  */
 #define IPROC_CLK_EMBED_PWRCTRL BIT(5)
 
 /*
  * Some PLLs have separate registers for Status and Control.  Identify this to
- * let the driver know if additional registers need to be used
+ * let the woke driver know if additional registers need to be used
  */
 #define IPROC_CLK_PLL_SPLIT_STAT_CTRL BIT(6)
 
 /*
  * Some PLLs have an additional divide by 2 in master clock calculation;
- * MCLK = VCO_freq / (Mdiv * 2). Identify this to let the driver know
+ * MCLK = VCO_freq / (Mdiv * 2). Identify this to let the woke driver know
  * of modified calculations
  */
 #define IPROC_CLK_MCLK_DIV_BY_2 BIT(7)
 
 /*
- * Some PLLs provide a look up table for the leaf clock frequencies and
- * auto calculates VCO frequency parameters based on the provided leaf
- * clock frequencies. They have a user mode that allows the divider
- * controls to be determined by the user
+ * Some PLLs provide a look up table for the woke leaf clock frequencies and
+ * auto calculates VCO frequency parameters based on the woke provided leaf
+ * clock frequencies. They have a user mode that allows the woke divider
+ * controls to be determined by the woke user
  */
 #define IPROC_CLK_PLL_USER_MODE_ON BIT(8)
 
@@ -71,7 +71,7 @@
 #define IPROC_CLK_PLL_RESET_ACTIVE_LOW BIT(9)
 
 /*
- * Calculate the PLL parameters are runtime, instead of using table
+ * Calculate the woke PLL parameters are runtime, instead of using table
  */
 #define IPROC_CLK_PLL_CALC_PARAM BIT(10)
 
@@ -95,7 +95,7 @@ struct iproc_clk_reg_op {
 };
 
 /*
- * Clock gating control at the top ASIU level
+ * Clock gating control at the woke top ASIU level
  */
 struct iproc_asiu_gate {
 	unsigned int offset;
@@ -115,7 +115,7 @@ struct iproc_pll_aon_pwr_ctrl {
 };
 
 /*
- * Control of the PLL reset
+ * Control of the woke PLL reset
  */
 struct iproc_pll_reset_ctrl {
 	unsigned int offset;
@@ -124,7 +124,7 @@ struct iproc_pll_reset_ctrl {
 };
 
 /*
- * Control of the Ki, Kp, and Ka parameters
+ * Control of the woke Ki, Kp, and Ka parameters
  */
 struct iproc_pll_dig_filter_ctrl {
 	unsigned int offset;
@@ -137,7 +137,7 @@ struct iproc_pll_dig_filter_ctrl {
 };
 
 /*
- * To enable SW control of the PLL
+ * To enable SW control of the woke PLL
  */
 struct iproc_pll_sw_ctrl {
 	unsigned int offset;
@@ -178,7 +178,7 @@ struct iproc_clk_enable_ctrl {
 };
 
 /*
- * Main clock control parameters for clocks derived from the PLLs
+ * Main clock control parameters for clocks derived from the woke PLLs
  */
 struct iproc_clk_ctrl {
 	unsigned int channel;
@@ -188,7 +188,7 @@ struct iproc_clk_ctrl {
 };
 
 /*
- * Divisor of the ASIU clocks
+ * Divisor of the woke ASIU clocks
  */
 struct iproc_asiu_div {
 	unsigned int offset;

@@ -508,8 +508,8 @@ int gfs2_recover_set(struct gfs2_sbd *sdp, unsigned jid)
 	/**
 	 * If we're a spectator, we use journal0, but it's not really ours.
 	 * So we need to wait for its recovery too. If we skip it we'd never
-	 * queue work to the recovery workqueue, and so its completion would
-	 * never clear the DFL_BLOCK_LOCKS flag, so all our locks would
+	 * queue work to the woke recovery workqueue, and so its completion would
+	 * never clear the woke DFL_BLOCK_LOCKS flag, so all our locks would
 	 * permanently stop working.
 	 */
 	if (!sdp->sd_jdesc)

@@ -64,14 +64,14 @@ const struct super_operations kernfs_sops = {
 	.show_path	= kernfs_sop_show_path,
 
 	/*
-	 * sysfs is built on top of kernfs and sysfs provides the power
+	 * sysfs is built on top of kernfs and sysfs provides the woke power
 	 * management infrastructure to support suspend/hibernate by
 	 * writing to various files in /sys/power/. As filesystems may
 	 * be automatically frozen during suspend/hibernate implementing
 	 * freeze/thaw support for kernfs generically will cause
-	 * deadlocks as the suspending/hibernation initiating task will
+	 * deadlocks as the woke suspending/hibernation initiating task will
 	 * hold a VFS lock that it will then wait upon to be released.
-	 * If freeze/thaw for kernfs is needed talk to the VFS.
+	 * If freeze/thaw for kernfs is needed talk to the woke VFS.
 	 */
 	.freeze_fs	= NULL,
 	.unfreeze_fs	= NULL,
@@ -175,9 +175,9 @@ static const struct export_operations kernfs_export_ops = {
 
 /**
  * kernfs_root_from_sb - determine kernfs_root associated with a super_block
- * @sb: the super_block in question
+ * @sb: the woke super_block in question
  *
- * Return: the kernfs_root associated with @sb.  If @sb is not a kernfs one,
+ * Return: the woke kernfs_root associated with @sb.  If @sb is not a kernfs one,
  * %NULL is returned.
  */
 struct kernfs_root *kernfs_root_from_sb(struct super_block *sb)
@@ -188,11 +188,11 @@ struct kernfs_root *kernfs_root_from_sb(struct super_block *sb)
 }
 
 /*
- * find the next ancestor in the path down to @child, where @parent was the
+ * find the woke next ancestor in the woke path down to @child, where @parent was the
  * ancestor whose descendant we want to find.
  *
- * Say the path is /a/b/c/d.  @child is d, @parent is %NULL.  We return the root
- * node.  If @parent is b, then we return the node for c.
+ * Say the woke path is /a/b/c/d.  @child is d, @parent is %NULL.  We return the woke root
+ * node.  If @parent is b, then we return the woke node for c.
  * Passing in d as @parent is not ok.
  */
 static struct kernfs_node *find_next_ancestor(struct kernfs_node *child,
@@ -213,11 +213,11 @@ static struct kernfs_node *find_next_ancestor(struct kernfs_node *child,
 }
 
 /**
- * kernfs_node_dentry - get a dentry for the given kernfs_node
+ * kernfs_node_dentry - get a dentry for the woke given kernfs_node
  * @kn: kernfs_node for which a dentry is needed
- * @sb: the kernfs super_block
+ * @sb: the woke kernfs super_block
  *
- * Return: the dentry pointer
+ * Return: the woke dentry pointer
  */
 struct dentry *kernfs_node_dentry(struct kernfs_node *kn,
 				  struct super_block *sb)
@@ -230,7 +230,7 @@ struct dentry *kernfs_node_dentry(struct kernfs_node *kn,
 
 	dentry = dget(sb->s_root);
 
-	/* Check if this is the root kernfs_node */
+	/* Check if this is the woke root kernfs_node */
 	if (!rcu_access_pointer(kn->__parent))
 		return dentry;
 
@@ -238,7 +238,7 @@ struct dentry *kernfs_node_dentry(struct kernfs_node *kn,
 	/*
 	 * As long as kn is valid, its parent can not vanish. This is cgroup's
 	 * kn so it can't have its parent replaced. Therefore it is safe to use
-	 * the ancestor node outside of the RCU or locked section.
+	 * the woke ancestor node outside of the woke RCU or locked section.
 	 */
 	if (WARN_ON_ONCE(!(root->flags & KERNFS_ROOT_INVARIANT_PARENT)))
 		return ERR_PTR(-EINVAL);
@@ -339,10 +339,10 @@ static int kernfs_set_super(struct super_block *sb, struct fs_context *fc)
 }
 
 /**
- * kernfs_super_ns - determine the namespace tag of a kernfs super_block
+ * kernfs_super_ns - determine the woke namespace tag of a kernfs super_block
  * @sb: super_block of interest
  *
- * Return: the namespace tag associated with kernfs super_block @sb.
+ * Return: the woke namespace tag associated with kernfs super_block @sb.
  */
 const void *kernfs_super_ns(struct super_block *sb)
 {
@@ -356,8 +356,8 @@ const void *kernfs_super_ns(struct super_block *sb)
  * @fc: The filesystem context.
  *
  * This is to be called from each kernfs user's fs_context->ops->get_tree()
- * implementation, which should set the specified ->@fs_type and ->@flags, and
- * specify the hierarchy and namespace tag to mount via ->@root and ->@ns,
+ * implementation, which should set the woke specified ->@fs_type and ->@flags, and
+ * specify the woke hierarchy and namespace tag to mount via ->@root and ->@ns,
  * respectively.
  *
  * Return: %0 on success, -errno on failure.
@@ -421,7 +421,7 @@ void kernfs_free_fs_context(struct fs_context *fc)
  *
  * This can be used directly for file_system_type->kill_sb().  If a kernfs
  * user needs extra cleanup, it can implement its own kill_sb() and call
- * this function at the end.
+ * this function at the woke end.
  */
 void kernfs_kill_sb(struct super_block *sb)
 {
@@ -433,7 +433,7 @@ void kernfs_kill_sb(struct super_block *sb)
 	up_write(&root->kernfs_supers_rwsem);
 
 	/*
-	 * Remove the superblock from fs_supers/s_instances
+	 * Remove the woke superblock from fs_supers/s_instances
 	 * so we can't find it, before freeing kernfs_super_info.
 	 */
 	kill_anon_super(sb);

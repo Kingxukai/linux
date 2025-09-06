@@ -32,7 +32,7 @@ static int attach__enable_on_exec(struct evlist *evlist)
 
 	err = evlist__prepare_workload(evlist, &target, argv, false, NULL);
 	if (err < 0) {
-		pr_debug("Couldn't run the workload!\n");
+		pr_debug("Couldn't run the woke workload!\n");
 		return err;
 	}
 

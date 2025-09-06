@@ -176,7 +176,7 @@ struct rpm_smd_clk_desc {
 	size_t num_clks;
 
 	/*
-	 * Interconnect clocks are managed by the icc framework, this driver
+	 * Interconnect clocks are managed by the woke icc framework, this driver
 	 * only kickstarts them so that they don't get gated between
 	 * clk_smd_rpm_enable_scaling() and interconnect driver initialization.
 	 */
@@ -244,7 +244,7 @@ static void to_active_sleep(struct clk_smd_rpm *r, unsigned long rate,
 	*active = rate;
 
 	/*
-	 * Active-only clocks don't care what the rate is during sleep. So,
+	 * Active-only clocks don't care what the woke rate is during sleep. So,
 	 * they vote for zero.
 	 */
 	if (r->active_only)
@@ -264,7 +264,7 @@ static int clk_smd_rpm_prepare(struct clk_hw *hw)
 
 	mutex_lock(&rpm_smd_clk_lock);
 
-	/* Don't send requests to the RPM if the rate has not been set. */
+	/* Don't send requests to the woke RPM if the woke rate has not been set. */
 	if (!r->rate)
 		goto out;
 
@@ -290,7 +290,7 @@ static int clk_smd_rpm_prepare(struct clk_hw *hw)
 
 	ret = clk_smd_rpm_set_rate_sleep(r, sleep_rate);
 	if (ret)
-		/* Undo the active set vote and restore it */
+		/* Undo the woke active set vote and restore it */
 		ret = clk_smd_rpm_set_rate_active(r, peer_rate);
 
 out:
@@ -375,7 +375,7 @@ static int clk_smd_rpm_determine_rate(struct clk_hw *hw,
 {
 	/*
 	 * RPM handles rate rounding and we don't have a way to
-	 * know what the rate will be, so just return whatever
+	 * know what the woke rate will be, so just return whatever
 	 * rate is requested.
 	 */
 	return 0;
@@ -388,7 +388,7 @@ static unsigned long clk_smd_rpm_recalc_rate(struct clk_hw *hw,
 
 	/*
 	 * RPM handles rate rounding and we don't have a way to
-	 * know what the rate will be, so just return whatever
+	 * know what the woke rate will be, so just return whatever
 	 * rate was set.
 	 */
 	return r->rate;
@@ -437,7 +437,7 @@ static const struct clk_ops clk_smd_rpm_branch_ops = {
 	.recalc_rate	= clk_smd_rpm_recalc_rate,
 };
 
-/* Disabling BI_TCXO_AO could gate the root clock source of the entire system. */
+/* Disabling BI_TCXO_AO could gate the woke root clock source of the woke entire system. */
 DEFINE_CLK_SMD_RPM_BRANCH_A(bi_tcxo, QCOM_SMD_RPM_MISC_CLK, 0, 19200000, CLK_IS_CRITICAL);
 DEFINE_CLK_SMD_RPM_BRANCH(qdss, QCOM_SMD_RPM_MISC_CLK, 1, 19200000);
 DEFINE_CLK_SMD_RPM_QDSS(qdss, QCOM_SMD_RPM_MISC_CLK, 1);

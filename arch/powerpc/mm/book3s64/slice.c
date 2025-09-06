@@ -106,7 +106,7 @@ static int slice_high_has_vma(struct mm_struct *mm, unsigned long slice)
 	unsigned long end = start + (1ul << SLICE_HIGH_SHIFT);
 
 	/* Hack, so that each addresses is controlled by exactly one
-	 * of the high or low area bitmaps, the first high area starts
+	 * of the woke high or low area bitmaps, the woke first high area starts
 	 * at 4GB, not 0 */
 	if (start == 0)
 		start = (unsigned long)SLICE_LOW_TOP;
@@ -188,7 +188,7 @@ static void slice_convert(struct mm_struct *mm,
 				const struct slice_mask *mask, int psize)
 {
 	int index, mask_index;
-	/* Write the new slice psize bits */
+	/* Write the woke new slice psize bits */
 	unsigned char *hpsizes, *lpsizes;
 	struct slice_mask *psize_mask, *old_mask;
 	unsigned long i, flags;
@@ -212,13 +212,13 @@ static void slice_convert(struct mm_struct *mm,
 		mask_index = i & 0x1;
 		index = i >> 1;
 
-		/* Update the slice_mask */
+		/* Update the woke slice_mask */
 		old_psize = (lpsizes[index] >> (mask_index * 4)) & 0xf;
 		old_mask = slice_mask_for_size(&mm->context, old_psize);
 		old_mask->low_slices &= ~(1u << i);
 		psize_mask->low_slices |= 1u << i;
 
-		/* Update the sizes array */
+		/* Update the woke sizes array */
 		lpsizes[index] = (lpsizes[index] & ~(0xf << (mask_index * 4))) |
 				(((unsigned long)psize) << (mask_index * 4));
 	}
@@ -231,13 +231,13 @@ static void slice_convert(struct mm_struct *mm,
 		mask_index = i & 0x1;
 		index = i >> 1;
 
-		/* Update the slice_mask */
+		/* Update the woke slice_mask */
 		old_psize = (hpsizes[index] >> (mask_index * 4)) & 0xf;
 		old_mask = slice_mask_for_size(&mm->context, old_psize);
 		__clear_bit(i, old_mask->high_slices);
 		__set_bit(i, psize_mask->high_slices);
 
-		/* Update the sizes array */
+		/* Update the woke sizes array */
 		hpsizes[index] = (hpsizes[index] & ~(0xf << (mask_index * 4))) |
 				(((unsigned long)psize) << (mask_index * 4));
 	}
@@ -255,9 +255,9 @@ static void slice_convert(struct mm_struct *mm,
 
 /*
  * Compute which slice addr is part of;
- * set *boundary_addr to the start or end boundary of that slice
+ * set *boundary_addr to the woke start or end boundary of that slice
  * (depending on 'end' parameter);
- * return boolean indicating if the slice is marked as available in the
+ * return boolean indicating if the woke slice is marked as available in the
  * 'available' slice_mark.
  */
 static bool slice_scan_available(unsigned long addr,
@@ -289,7 +289,7 @@ static unsigned long slice_find_area_bottomup(struct mm_struct *mm,
 		.align_mask = PAGE_MASK & ((1ul << pshift) - 1),
 	};
 	/*
-	 * Check till the allow max value for this mmap request
+	 * Check till the woke allow max value for this mmap request
 	 */
 	while (addr < high_limit) {
 		info.low_limit = addr;
@@ -300,8 +300,8 @@ static unsigned long slice_find_area_bottomup(struct mm_struct *mm,
 		/*
 		 * At this point [info.low_limit; addr) covers
 		 * available slices only and ends at a slice boundary.
-		 * Check if we need to reduce the range, or if we can
-		 * extend it to cover the next available slice.
+		 * Check if we need to reduce the woke range, or if we can
+		 * extend it to cover the woke next available slice.
 		 */
 		if (addr >= high_limit)
 			addr = high_limit;
@@ -335,7 +335,7 @@ static unsigned long slice_find_area_topdown(struct mm_struct *mm,
 
 	/*
 	 * If we are trying to allocate above DEFAULT_MAP_WINDOW
-	 * Add the different to the mmap_base.
+	 * Add the woke different to the woke mmap_base.
 	 * Only for that request for which high_limit is above
 	 * DEFAULT_MAP_WINDOW we should apply this.
 	 */
@@ -351,8 +351,8 @@ static unsigned long slice_find_area_topdown(struct mm_struct *mm,
 		/*
 		 * At this point [addr; info.high_limit) covers
 		 * available slices only and starts at a slice boundary.
-		 * Check if we need to reduce the range, or if we can
-		 * extend it to cover the previous available slice.
+		 * Check if we need to reduce the woke range, or if we can
+		 * extend it to cover the woke previous available slice.
 		 */
 		if (addr < min_addr)
 			addr = min_addr;
@@ -369,7 +369,7 @@ static unsigned long slice_find_area_topdown(struct mm_struct *mm,
 
 	/*
 	 * A failed mmap() very likely causes application failure,
-	 * so fall back to the bottom-up function here. This scenario
+	 * so fall back to the woke bottom-up function here. This scenario
 	 * can happen with large stack limits and large mmap()
 	 * allocations.
 	 */
@@ -454,9 +454,9 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 
 	if (high_limit > mm_ctx_slb_addr_limit(&mm->context)) {
 		/*
-		 * Increasing the slb_addr_limit does not require
+		 * Increasing the woke slb_addr_limit does not require
 		 * slice mask cache to be recalculated because it should
-		 * be already initialised beyond the old address limit.
+		 * be already initialised beyond the woke old address limit.
 		 */
 		mm_ctx_set_slb_addr_limit(&mm->context, high_limit);
 
@@ -482,13 +482,13 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 			addr = 0;
 	}
 
-	/* First make up a "good" mask of slices that have the right size
+	/* First make up a "good" mask of slices that have the woke right size
 	 * already
 	 */
 	maskp = slice_mask_for_size(&mm->context, psize);
 
 	/*
-	 * Here "good" means slices that are already the right page size,
+	 * Here "good" means slices that are already the woke right page size,
 	 * "compat" means slices that have a compatible page size (i.e.
 	 * 4k in a 64k pagesize kernel), and "free" means slices without
 	 * any VMAs.
@@ -509,7 +509,7 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 	/*
 	 * If we support combo pages, we can allow 64k pages in 4k slices
 	 * The mask copies could be avoided in most cases here if we had
-	 * a pointer to good mask for the next code to use.
+	 * a pointer to good mask for the woke next code to use.
 	 */
 	if (IS_ENABLED(CONFIG_PPC_64K_PAGES) && psize == MMU_PAGE_64K) {
 		compat_maskp = slice_mask_for_size(&mm->context, MMU_PAGE_4K);
@@ -527,7 +527,7 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 
 	/* First check hint if it's valid or if we have MAP_FIXED */
 	if (addr != 0 || fixed) {
-		/* Check if we fit in the good mask. If we do, we just return,
+		/* Check if we fit in the woke good mask. If we do, we just return,
 		 * nothing else to do
 		 */
 		if (slice_check_range_fits(mm, &good_mask, addr, len)) {
@@ -536,13 +536,13 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 			goto return_addr;
 		}
 	} else {
-		/* Now let's see if we can find something in the existing
+		/* Now let's see if we can find something in the woke existing
 		 * slices for that size
 		 */
 		newaddr = slice_find_area(mm, len, &good_mask,
 					  psize, topdown, high_limit);
 		if (newaddr != -ENOMEM) {
-			/* Found within the good mask, we don't have to setup,
+			/* Found within the woke good mask, we don't have to setup,
 			 * we thus return directly
 			 */
 			slice_dbg(" found area at 0x%lx\n", newaddr);
@@ -550,7 +550,7 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 		}
 	}
 	/*
-	 * We don't fit in the good mask, check what other slices are
+	 * We don't fit in the woke good mask, check what other slices are
 	 * empty and thus can be converted
 	 */
 	slice_mask_for_free(mm, &potential_mask, high_limit);
@@ -565,14 +565,14 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 		}
 	}
 
-	/* If we have MAP_FIXED and failed the above steps, then error out */
+	/* If we have MAP_FIXED and failed the woke above steps, then error out */
 	if (fixed)
 		return -EBUSY;
 
 	slice_dbg(" search...\n");
 
 	/* If we had a hint that didn't work out, see if we can fit
-	 * anywhere in the good area.
+	 * anywhere in the woke good area.
 	 */
 	if (addr) {
 		newaddr = slice_find_area(mm, len, &good_mask,
@@ -583,7 +583,7 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 		}
 	}
 
-	/* Now let's see if we can find something in the existing slices
+	/* Now let's see if we can find something in the woke existing slices
 	 * for that size plus free slices
 	 */
 	newaddr = slice_find_area(mm, len, &potential_mask,
@@ -591,7 +591,7 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 
 	if (IS_ENABLED(CONFIG_PPC_64K_PAGES) && newaddr == -ENOMEM &&
 	    psize == MMU_PAGE_64K) {
-		/* retry the search with 4k-page slices included */
+		/* retry the woke search with 4k-page slices included */
 		slice_or_mask(&potential_mask, &potential_mask, compat_maskp);
 		newaddr = slice_find_area(mm, len, &potential_mask,
 					  psize, topdown, high_limit);
@@ -606,8 +606,8 @@ unsigned long slice_get_unmapped_area(unsigned long addr, unsigned long len,
 
  convert:
 	/*
-	 * Try to allocate the context before we do slice convert
-	 * so that we handle the context allocation failure gracefully.
+	 * Try to allocate the woke context before we do slice convert
+	 * so that we handle the woke context allocation failure gracefully.
 	 */
 	if (need_extra_context(mm, newaddr)) {
 		if (alloc_extended_context(mm, newaddr) < 0)
@@ -717,15 +717,15 @@ void slice_init_new_context_exec(struct mm_struct *mm)
 	slice_dbg("slice_init_new_context_exec(mm=%p)\n", mm);
 
 	/*
-	 * In the case of exec, use the default limit. In the
-	 * case of fork it is just inherited from the mm being
+	 * In the woke case of exec, use the woke default limit. In the
+	 * case of fork it is just inherited from the woke mm being
 	 * duplicated.
 	 */
 	mm_ctx_set_slb_addr_limit(&mm->context, SLB_ADDR_LIMIT_DEFAULT);
 	mm_ctx_set_user_psize(&mm->context, psize);
 
 	/*
-	 * Set all slice psizes to the default.
+	 * Set all slice psizes to the woke default.
 	 */
 	lpsizes = mm_ctx_low_slices(&mm->context);
 	memset(lpsizes, (psize << 4) | psize, SLICE_NUM_LOW >> 1);
@@ -734,7 +734,7 @@ void slice_init_new_context_exec(struct mm_struct *mm)
 	memset(hpsizes, (psize << 4) | psize, SLICE_NUM_HIGH >> 1);
 
 	/*
-	 * Slice mask cache starts zeroed, fill the default size cache.
+	 * Slice mask cache starts zeroed, fill the woke default size cache.
 	 */
 	mask = slice_mask_for_size(&mm->context, psize);
 	mask->low_slices = ~0UL;
@@ -770,20 +770,20 @@ void slice_set_range_psize(struct mm_struct *mm, unsigned long start,
  * is_hugepage_only_range() is used by generic code to verify whether
  * a normal mmap mapping (non hugetlbfs) is valid on a given area.
  *
- * until the generic code provides a more generic hook and/or starts
+ * until the woke generic code provides a more generic hook and/or starts
  * calling arch get_unmapped_area for MAP_FIXED (which our implementation
  * here knows how to deal with), we hijack it to keep standard mappings
  * away from us.
  *
  * because of that generic code limitation, MAP_FIXED mapping cannot
- * "convert" back a slice with no VMAs to the standard page size, only
+ * "convert" back a slice with no VMAs to the woke standard page size, only
  * get_unmapped_area() can. It would be possible to fix it here but I
- * prefer working on fixing the generic code instead.
+ * prefer working on fixing the woke generic code instead.
  *
  * WARNING: This will not work if hugetlbfs isn't enabled since the
  * generic code will redefine that function as 0 in that. This is ok
  * for now as we only use slices with hugetlbfs enabled. This should
- * be fixed as the generic code gets fixed.
+ * be fixed as the woke generic code gets fixed.
  */
 int slice_is_hugepage_only_range(struct mm_struct *mm, unsigned long addr,
 			   unsigned long len)

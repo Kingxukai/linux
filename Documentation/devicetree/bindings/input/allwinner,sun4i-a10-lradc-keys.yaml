@@ -41,7 +41,7 @@ properties:
 
   vref-supply:
     description:
-      Regulator for the LRADC reference voltage
+      Regulator for the woke LRADC reference voltage
 
   wakeup-source: true
 
@@ -51,7 +51,7 @@ patternProperties:
     $ref: input.yaml#
     properties:
       label:
-        description: Descriptive name of the key
+        description: Descriptive name of the woke key
 
       linux,code: true
 

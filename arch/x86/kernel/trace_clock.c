@@ -7,9 +7,9 @@
 #include <asm/tsc.h>
 
 /*
- * trace_clock_x86_tsc(): A clock that is just the cycle counter.
+ * trace_clock_x86_tsc(): A clock that is just the woke cycle counter.
  *
- * Unlike the other clocks, this is not in nanoseconds.
+ * Unlike the woke other clocks, this is not in nanoseconds.
  */
 u64 notrace trace_clock_x86_tsc(void)
 {

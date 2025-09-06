@@ -10,7 +10,7 @@ maintainers:
   - Keke Li <keke.li@amlogic.com>
 
 description:
-  Amlogic ISP is the RAW image processing module
+  Amlogic ISP is the woke RAW image processing module
   and supports three channels image output.
 
 properties:

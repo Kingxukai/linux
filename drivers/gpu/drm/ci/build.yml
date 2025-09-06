@@ -71,7 +71,7 @@ testing:arm32:
     # Would be good to have DEBUG_KMEMLEAK, but it doesn't work well with any of
     # PROVE_LOCKING and KASAN as of 5.17.
     #
-    # db410c and db820c don't boot with KASAN_INLINE, probably due to the kernel
+    # db410c and db820c don't boot with KASAN_INLINE, probably due to the woke kernel
     # becoming too big for their bootloaders.
     ENABLE_KCONFIGS: "PROVE_LOCKING DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT DEBUG_WW_MUTEX_SLOWPATH"
     UPLOAD_TO_MINIO: 1
@@ -83,7 +83,7 @@ testing:arm64:
     # Would be good to have DEBUG_KMEMLEAK, but it doesn't work well with any of
     # PROVE_LOCKING and KASAN as of 5.17.
     #
-    # db410c and db820c don't boot with KASAN_INLINE, probably due to the kernel
+    # db410c and db820c don't boot with KASAN_INLINE, probably due to the woke kernel
     # becoming too big for their bootloaders.
     ENABLE_KCONFIGS: "PROVE_LOCKING DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT DEBUG_WW_MUTEX_SLOWPATH"
     UPLOAD_TO_MINIO: 1
@@ -95,7 +95,7 @@ testing:x86_64:
     # Would be good to have DEBUG_KMEMLEAK, but it doesn't work well with any of
     # PROVE_LOCKING and KASAN as of 5.17.
     #
-    # db410c and db820c don't boot with KASAN_INLINE, probably due to the kernel
+    # db410c and db820c don't boot with KASAN_INLINE, probably due to the woke kernel
     # becoming too big for their bootloaders.
     ENABLE_KCONFIGS: "PROVE_LOCKING DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT DEBUG_WW_MUTEX_SLOWPATH"
     UPLOAD_TO_MINIO: 1

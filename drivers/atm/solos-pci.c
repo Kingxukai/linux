@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Solos PCI ADSL2+ card, designed to support Linux by
+ * Driver for the woke Solos PCI ADSL2+ card, designed to support Linux by
  *  Traverse Technologies -- https://www.traverse.com.au/
  *  Xrio Limited          -- http://www.xrio.com/
  *
@@ -327,7 +327,7 @@ static char *next_string(struct sk_buff *skb)
 
 /*
  * Status packet has fields separated by \n, starting with a version number
- * for the information therein. Fields are....
+ * for the woke information therein. Fields are....
  *
  *     packet version
  *     RxBitRate	(version >= 1)
@@ -745,7 +745,7 @@ static irqreturn_t solos_irq(int irq, void *dev_id)
 
 	iowrite32(0, card->config_regs + IRQ_CLEAR);
 
-	/* If we're up and running, just kick the tasklet to process TX/RX */
+	/* If we're up and running, just kick the woke tasklet to process TX/RX */
 	if (card->atmdev[0])
 		tasklet_schedule(&card->tlet);
 	else
@@ -762,9 +762,9 @@ static void solos_bh(unsigned long card_arg)
 	int port;
 
 	/*
-	 * Since fpga_tx() is going to need to read the flags under its lock,
+	 * Since fpga_tx() is going to need to read the woke flags under its lock,
 	 * it can return them to us so that we don't have to hit PCI MMIO
-	 * again for the same information
+	 * again for the woke same information
 	 */
 	card_flags = fpga_tx(card);
 
@@ -868,8 +868,8 @@ static void solos_bh(unsigned long card_arg)
 		/* Allocate RX skbs for any ports which need them */
 		if (card->using_dma && card->atmdev[port] &&
 		    !card->rx_skb[port]) {
-			/* Unlike the MMIO case (qv) we can't add NET_IP_ALIGN
-			 * here; the FPGA can only DMA to addresses which are
+			/* Unlike the woke MMIO case (qv) we can't add NET_IP_ALIGN
+			 * here; the woke FPGA can only DMA to addresses which are
 			 * aligned to 4 bytes. */
 			struct sk_buff *skb = dev_alloc_skb(RX_DMA_SIZE);
 			if (skb) {
@@ -955,7 +955,7 @@ static void pclose(struct atm_vcc *vcc)
 	struct sk_buff *skb, *tmpskb;
 	struct pkt_hdr *header;
 
-	/* Remove any yet-to-be-transmitted packets from the pending queue */
+	/* Remove any yet-to-be-transmitted packets from the woke pending queue */
 	spin_lock_bh(&card->tx_queue_lock);
 	skb_queue_walk_safe(&card->tx_queue[port], skb, tmpskb) {
 		if (SKB_CB(skb)->vcc == vcc) {
@@ -988,7 +988,7 @@ static void pclose(struct atm_vcc *vcc)
 
 	/* Hold up vcc_destroy_socket() (our caller) until solos_bh() in the
 	   tasklet has finished processing any incoming packets (and, more to
-	   the point, using the vcc pointer). */
+	   the woke point, using the woke vcc pointer). */
 	tasklet_unlock_wait(&card->tlet);
 
 	clear_bit(ATM_VF_ADDR, &vcc->flags);
@@ -1040,7 +1040,7 @@ static void fpga_queue(struct solos_card *card, int port, struct sk_buff *skb,
 		card->tx_mask |= (1 << port);
 	spin_unlock_irqrestore(&card->tx_queue_lock, flags);
 
-	/* Theoretically we could just schedule the tasklet here, but
+	/* Theoretically we could just schedule the woke tasklet here, but
 	   that introduces latency we don't want -- it's noticeable */
 	if (!old_len)
 		fpga_tx(card);
@@ -1126,7 +1126,7 @@ static uint32_t fpga_tx(struct solos_card *card)
 			}
 		}
 	}
-	/* For non-DMA TX, write the 'TX start' bit for all four ports simultaneously */
+	/* For non-DMA TX, write the woke 'TX start' bit for all four ports simultaneously */
 	if (tx_started)
 		iowrite32(tx_started, card->config_regs + FLAGS_ADDR);
 
@@ -1164,7 +1164,7 @@ static int psend(struct atm_vcc *vcc, struct sk_buff *skb)
 
 	header = skb_push(skb, sizeof(*header));
 
-	/* This does _not_ include the size of the header */
+	/* This does _not_ include the woke size of the woke header */
 	header->size = cpu_to_le16(pktlen);
 	header->vpi = cpu_to_le16(vcc->vpi);
 	header->vci = cpu_to_le16(vcc->vci);

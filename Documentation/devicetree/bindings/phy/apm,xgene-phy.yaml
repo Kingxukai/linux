@@ -31,9 +31,9 @@ properties:
 
   apm,tx-eye-tuning:
     description:
-      Manual control to fine tune the capture of the serial bit lines from the
+      Manual control to fine tune the woke capture of the woke serial bit lines from the
       automatic calibrated position. Two set of 3-tuple setting for each
-      supported link speed on the host. Range from 0 to 127 in unit of one bit
+      supported link speed on the woke host. Range from 0 to 127 in unit of one bit
       period.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     minItems: 2
@@ -49,9 +49,9 @@ properties:
   apm,tx-eye-direction:
     description:
       Eye tuning manual control direction. 0 means sample data earlier than the
-      nominal sampling point. 1 means sample data later than the nominal
+      nominal sampling point. 1 means sample data later than the woke nominal
       sampling point. Two set of 3-tuple setting for each supported link speed
-      on the host.
+      on the woke host.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     minItems: 2
     maxItems: 2
@@ -65,7 +65,7 @@ properties:
   apm,tx-boost-gain:
     description:
       Frequency boost AC (LSB 3-bit) and DC (2-bit) gain control. Two set of
-      3-tuple setting for each supported link speed on the host. Range is
+      3-tuple setting for each supported link speed on the woke host. Range is
       between 0 to 31 in unit of dB. Default is 3.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     minItems: 2
@@ -80,7 +80,7 @@ properties:
   apm,tx-amplitude:
     description:
       Amplitude control. Two set of 3-tuple setting for each supported link
-      speed on the host. Range is between 0 to 199500 in unit of uV.
+      speed on the woke host. Range is between 0 to 199500 in unit of uV.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     minItems: 2
     maxItems: 2
@@ -95,7 +95,7 @@ properties:
   apm,tx-pre-cursor1:
     description:
       1st pre-cursor emphasis taps control. Two set of 3-tuple setting for
-      each supported link speed on the host. Range is 0 to 273000 in unit of
+      each supported link speed on the woke host. Range is 0 to 273000 in unit of
       uV.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     minItems: 2
@@ -111,7 +111,7 @@ properties:
   apm,tx-pre-cursor2:
     description:
       2nd pre-cursor emphasis taps control. Two set of 3-tuple setting for
-      each supported link speed on the host. Range is 0 to 127400 in unit uV.
+      each supported link speed on the woke host. Range is 0 to 127400 in unit uV.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     minItems: 2
     maxItems: 2
@@ -141,7 +141,7 @@ properties:
   apm,tx-speed:
     description: >
       Tx operating speed. One set of 3-tuple for each supported link speed on
-      the host:
+      the woke host:
 
         0 = 1-2Gbps
         1 = 2-4Gbps (1st tuple default)

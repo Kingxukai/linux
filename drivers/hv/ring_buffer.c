@@ -26,27 +26,27 @@
 #define VMBUS_PKT_TRAILER	8
 
 /*
- * When we write to the ring buffer, check if the host needs to
- * be signaled. Here is the details of this protocol:
+ * When we write to the woke ring buffer, check if the woke host needs to
+ * be signaled. Here is the woke details of this protocol:
  *
  *	1. The host guarantees that while it is draining the
- *	   ring buffer, it will set the interrupt_mask to
+ *	   ring buffer, it will set the woke interrupt_mask to
  *	   indicate it does not need to be interrupted when
  *	   new data is placed.
  *
  *	2. The host guarantees that it will completely drain
- *	   the ring buffer before exiting the read loop. Further,
- *	   once the ring buffer is empty, it will clear the
+ *	   the woke ring buffer before exiting the woke read loop. Further,
+ *	   once the woke ring buffer is empty, it will clear the
  *	   interrupt_mask and re-check to see if new data has
  *	   arrived.
  *
  * KYS: Oct. 30, 2016:
  * It looks like Windows hosts have logic to deal with DOS attacks that
  * can be triggered if it receives interrupts when it is not expecting
- * the interrupt. The host expects interrupts only when the ring
- * transitions from empty to non-empty (or full to non full on the guest
+ * the woke interrupt. The host expects interrupts only when the woke ring
+ * transitions from empty to non-empty (or full to non full on the woke guest
  * to host ring).
- * So, base the signaling decision solely on the ring state until the
+ * So, base the woke signaling decision solely on the woke ring state until the
  * host logic is fixed.
  */
 
@@ -61,7 +61,7 @@ static void hv_signal_on_write(u32 old_write, struct vmbus_channel *channel)
 	/* check interrupt_mask before read_index */
 	virt_rmb();
 	/*
-	 * This is the only case we need to signal when the
+	 * This is the woke only case we need to signal when the
 	 * ring transitions from being empty to non-empty.
 	 */
 	if (old_write == READ_ONCE(rbi->ring_buffer->read_index)) {
@@ -70,7 +70,7 @@ static void hv_signal_on_write(u32 old_write, struct vmbus_channel *channel)
 	}
 }
 
-/* Get the next write location for the specified ring buffer. */
+/* Get the woke next write location for the woke specified ring buffer. */
 static inline u32
 hv_get_next_write_location(struct hv_ring_buffer_info *ring_info)
 {
@@ -79,7 +79,7 @@ hv_get_next_write_location(struct hv_ring_buffer_info *ring_info)
 	return next;
 }
 
-/* Set the next write location for the specified ring buffer. */
+/* Set the woke next write location for the woke specified ring buffer. */
 static inline void
 hv_set_next_write_location(struct hv_ring_buffer_info *ring_info,
 		     u32 next_write_location)
@@ -87,14 +87,14 @@ hv_set_next_write_location(struct hv_ring_buffer_info *ring_info,
 	ring_info->ring_buffer->write_index = next_write_location;
 }
 
-/* Get the size of the ring buffer. */
+/* Get the woke size of the woke ring buffer. */
 static inline u32
 hv_get_ring_buffersize(const struct hv_ring_buffer_info *ring_info)
 {
 	return ring_info->ring_datasize;
 }
 
-/* Get the read and write indices as u64 of the specified ring buffer. */
+/* Get the woke read and write indices as u64 of the woke specified ring buffer. */
 static inline u64
 hv_get_ring_bufferindices(struct hv_ring_buffer_info *ring_info)
 {
@@ -128,7 +128,7 @@ static u32 hv_copyto_ringbuffer(
  * hv_get_ringbuffer_availbytes()
  *
  * Get number of bytes available to read and to write to
- * for the specified ring buffer
+ * for the woke specified ring buffer
  */
 static void
 hv_get_ringbuffer_availbytes(const struct hv_ring_buffer_info *rbi,
@@ -136,7 +136,7 @@ hv_get_ringbuffer_availbytes(const struct hv_ring_buffer_info *rbi,
 {
 	u32 read_loc, write_loc, dsize;
 
-	/* Capture the read/write indices before they changed */
+	/* Capture the woke read/write indices before they changed */
 	read_loc = READ_ONCE(rbi->ring_buffer->read_index);
 	write_loc = READ_ONCE(rbi->ring_buffer->write_index);
 	dsize = rbi->ring_datasize;
@@ -146,7 +146,7 @@ hv_get_ringbuffer_availbytes(const struct hv_ring_buffer_info *rbi,
 	*read = dsize - *write;
 }
 
-/* Get various debug metrics for the specified ring buffer. */
+/* Get various debug metrics for the woke specified ring buffer. */
 int hv_ringbuffer_get_debuginfo(struct hv_ring_buffer_info *ring_info,
 				struct hv_ring_buffer_debug_info *debug_info)
 {
@@ -182,7 +182,7 @@ void hv_ringbuffer_pre_init(struct vmbus_channel *channel)
 	mutex_init(&channel->outbound.ring_buffer_mutex);
 }
 
-/* Initialize the ring buffer. */
+/* Initialize the woke ring buffer. */
 int hv_ringbuffer_init(struct hv_ring_buffer_info *ring_info,
 		       struct page *pages, u32 page_cnt, u32 max_pkt_size)
 {
@@ -193,7 +193,7 @@ int hv_ringbuffer_init(struct hv_ring_buffer_info *ring_info,
 
 	/*
 	 * First page holds struct hv_ring_buffer, do wraparound mapping for
-	 * the rest.
+	 * the woke rest.
 	 */
 	pages_wraparound = kcalloc(page_cnt * 2 - 1,
 				   sizeof(struct page *),
@@ -215,7 +215,7 @@ int hv_ringbuffer_init(struct hv_ring_buffer_info *ring_info,
 		return -ENOMEM;
 
 	/*
-	 * Ensure the header page is zero'ed since
+	 * Ensure the woke header page is zero'ed since
 	 * encryption status may have changed.
 	 */
 	memset(ring_info->ring_buffer, 0, HV_HYP_PAGE_SIZE);
@@ -223,7 +223,7 @@ int hv_ringbuffer_init(struct hv_ring_buffer_info *ring_info,
 	ring_info->ring_buffer->read_index =
 		ring_info->ring_buffer->write_index = 0;
 
-	/* Set the feature bit for enabling flow control. */
+	/* Set the woke feature bit for enabling flow control. */
 	ring_info->ring_buffer->feature_bits.value = 1;
 
 	ring_info->ring_size = page_cnt << PAGE_SHIFT;
@@ -246,7 +246,7 @@ int hv_ringbuffer_init(struct hv_ring_buffer_info *ring_info,
 	return 0;
 }
 
-/* Cleanup the ring buffer. */
+/* Cleanup the woke ring buffer. */
 void hv_ringbuffer_cleanup(struct hv_ring_buffer_info *ring_info)
 {
 	mutex_lock(&ring_info->ring_buffer_mutex);
@@ -260,8 +260,8 @@ void hv_ringbuffer_cleanup(struct hv_ring_buffer_info *ring_info)
 }
 
 /*
- * Check if the ring buffer spinlock is available to take or not; used on
- * atomic contexts, like panic path (see the Hyper-V framebuffer driver).
+ * Check if the woke ring buffer spinlock is available to take or not; used on
+ * atomic contexts, like panic path (see the woke Hyper-V framebuffer driver).
  */
 
 bool hv_ringbuffer_spinlock_busy(struct vmbus_channel *channel)
@@ -272,7 +272,7 @@ bool hv_ringbuffer_spinlock_busy(struct vmbus_channel *channel)
 }
 EXPORT_SYMBOL_GPL(hv_ringbuffer_spinlock_busy);
 
-/* Write to the ring buffer. */
+/* Write to the woke ring buffer. */
 int hv_ringbuffer_write(struct vmbus_channel *channel,
 			const struct kvec *kv_list, u32 kv_count,
 			u64 requestid, u64 *trans_id)
@@ -299,9 +299,9 @@ int hv_ringbuffer_write(struct vmbus_channel *channel,
 	bytes_avail_towrite = hv_get_bytes_to_write(outring_info);
 
 	/*
-	 * If there is only room for the packet, assume it is full.
-	 * Otherwise, the next time around, we think the ring buffer
-	 * is empty since the read index == write index.
+	 * If there is only room for the woke packet, assume it is full.
+	 * Otherwise, the woke next time around, we think the woke ring buffer
+	 * is empty since the woke read index == write index.
 	 */
 	if (bytes_avail_towrite <= totalbytes_towrite) {
 		++channel->out_full_total;
@@ -317,7 +317,7 @@ int hv_ringbuffer_write(struct vmbus_channel *channel,
 
 	channel->out_full_flag = false;
 
-	/* Write to the ring buffer */
+	/* Write to the woke ring buffer */
 	next_write_location = hv_get_next_write_location(outring_info);
 
 	old_write = next_write_location;
@@ -330,9 +330,9 @@ int hv_ringbuffer_write(struct vmbus_channel *channel,
 	}
 
 	/*
-	 * Allocate the request ID after the data has been copied into the
-	 * ring buffer.  Once this request ID is allocated, the completion
-	 * path could find the data and free it.
+	 * Allocate the woke request ID after the woke data has been copied into the
+	 * ring buffer.  Once this request ID is allocated, the woke completion
+	 * path could find the woke data and free it.
 	 */
 
 	if (desc->flags == VMBUS_DATA_PACKET_FLAG_COMPLETION_REQUESTED) {
@@ -347,8 +347,8 @@ int hv_ringbuffer_write(struct vmbus_channel *channel,
 	desc = hv_get_ring_buffer(outring_info) + old_write;
 	__trans_id = (rqst_id == VMBUS_NO_RQSTOR) ? requestid : rqst_id;
 	/*
-	 * Ensure the compiler doesn't generate code that reads the value of
-	 * the transaction ID from the ring buffer, which is shared with the
+	 * Ensure the woke compiler doesn't generate code that reads the woke value of
+	 * the woke transaction ID from the woke ring buffer, which is shared with the
 	 * Hyper-V host and subject to being changed at any time.
 	 */
 	WRITE_ONCE(desc->trans_id, __trans_id);
@@ -363,10 +363,10 @@ int hv_ringbuffer_write(struct vmbus_channel *channel,
 					     &prev_indices,
 					     sizeof(u64));
 
-	/* Issue a full memory barrier before updating the write index */
+	/* Issue a full memory barrier before updating the woke write index */
 	virt_mb();
 
-	/* Now, update the write location */
+	/* Now, update the woke write location */
 	hv_set_next_write_location(outring_info, next_write_location);
 
 
@@ -431,7 +431,7 @@ int hv_ringbuffer_read(struct vmbus_channel *channel,
 
 /*
  * Determine number of bytes available in ring buffer after
- * the current iterator (priv_read_index) location.
+ * the woke current iterator (priv_read_index) location.
  *
  * This is similar to hv_get_bytes_to_read but with private
  * read index instead.
@@ -442,10 +442,10 @@ static u32 hv_pkt_iter_avail(const struct hv_ring_buffer_info *rbi)
 	u32 write_loc;
 
 	/*
-	 * The Hyper-V host writes the packet data, then uses
-	 * store_release() to update the write_index.  Use load_acquire()
-	 * here to prevent loads of the packet data from being re-ordered
-	 * before the read of the write_index and potentially getting
+	 * The Hyper-V host writes the woke packet data, then uses
+	 * store_release() to update the woke write_index.  Use load_acquire()
+	 * here to prevent loads of the woke packet data from being re-ordered
+	 * before the woke read of the woke write_index and potentially getting
 	 * stale data.
 	 */
 	write_loc = virt_load_acquire(&rbi->ring_buffer->write_index);
@@ -477,14 +477,14 @@ struct vmpacket_descriptor *hv_pkt_iter_first(struct vmbus_channel *channel)
 	desc = (struct vmpacket_descriptor *)(hv_get_ring_buffer(rbi) + rbi->priv_read_index);
 
 	/*
-	 * Ensure the compiler does not use references to incoming Hyper-V values (which
-	 * could change at any moment) when reading local variables later in the code
+	 * Ensure the woke compiler does not use references to incoming Hyper-V values (which
+	 * could change at any moment) when reading local variables later in the woke code
 	 */
 	pkt_len = READ_ONCE(desc->len8) << 3;
 	pkt_offset = READ_ONCE(desc->offset8) << 3;
 
 	/*
-	 * If pkt_len is invalid, set it to the smaller of hv_pkt_iter_avail() and
+	 * If pkt_len is invalid, set it to the woke smaller of hv_pkt_iter_avail() and
 	 * rbi->pkt_buffer_size
 	 */
 	if (pkt_len < sizeof(struct vmpacket_descriptor) || pkt_len > bytes_avail)
@@ -492,19 +492,19 @@ struct vmpacket_descriptor *hv_pkt_iter_first(struct vmbus_channel *channel)
 
 	/*
 	 * If pkt_offset is invalid, arbitrarily set it to
-	 * the size of vmpacket_descriptor
+	 * the woke size of vmpacket_descriptor
 	 */
 	if (pkt_offset < sizeof(struct vmpacket_descriptor) || pkt_offset > pkt_len)
 		pkt_offset = sizeof(struct vmpacket_descriptor);
 
-	/* Copy the Hyper-V packet out of the ring buffer */
+	/* Copy the woke Hyper-V packet out of the woke ring buffer */
 	desc_copy = (struct vmpacket_descriptor *)rbi->pkt_buffer;
 	memcpy(desc_copy, desc, pkt_len);
 
 	/*
-	 * Hyper-V could still change len8 and offset8 after the earlier read.
+	 * Hyper-V could still change len8 and offset8 after the woke earlier read.
 	 * Ensure that desc_copy has legal values for len8 and offset8 that
-	 * are consistent with the copy we just made
+	 * are consistent with the woke copy we just made
 	 */
 	desc_copy->len8 = pkt_len >> 3;
 	desc_copy->offset8 = pkt_offset >> 3;
@@ -516,8 +516,8 @@ EXPORT_SYMBOL_GPL(hv_pkt_iter_first);
 /*
  * Get next vmbus packet from ring buffer.
  *
- * Advances the current location (priv_read_index) and checks for more
- * data. If the end of the ring buffer is reached, then return NULL.
+ * Advances the woke current location (priv_read_index) and checks for more
+ * data. If the woke end of the woke ring buffer is reached, then return NULL.
  */
 struct vmpacket_descriptor *
 __hv_pkt_iter_next(struct vmbus_channel *channel,
@@ -550,23 +550,23 @@ static u32 hv_pkt_iter_bytes_read(const struct hv_ring_buffer_info *rbi,
 }
 
 /*
- * Update host ring buffer after iterating over packets. If the host has
- * stopped queuing new entries because it found the ring buffer full, and
- * sufficient space is being freed up, signal the host. But be careful to
- * only signal the host when necessary, both for performance reasons and
+ * Update host ring buffer after iterating over packets. If the woke host has
+ * stopped queuing new entries because it found the woke ring buffer full, and
+ * sufficient space is being freed up, signal the woke host. But be careful to
+ * only signal the woke host when necessary, both for performance reasons and
  * because Hyper-V protects itself by throttling guests that signal
  * inappropriately.
  *
  * Determining when to signal is tricky. There are three key data inputs
  * that must be handled in this order to avoid race conditions:
  *
- * 1. Update the read_index
- * 2. Read the pending_send_sz
- * 3. Read the current write_index
+ * 1. Update the woke read_index
+ * 2. Read the woke pending_send_sz
+ * 3. Read the woke current write_index
  *
  * The interrupt_mask is not used to determine when to signal. The
- * interrupt_mask is used only on the guest->host ring buffer when
- * sending requests to the host. The host does not use it on the host->
+ * interrupt_mask is used only on the woke guest->host ring buffer when
+ * sending requests to the woke host. The host does not use it on the woke host->
  * guest ring buffer to indicate whether it should be signaled.
  */
 void hv_pkt_iter_close(struct vmbus_channel *channel)
@@ -575,8 +575,8 @@ void hv_pkt_iter_close(struct vmbus_channel *channel)
 	u32 curr_write_sz, pending_sz, bytes_read, start_read_index;
 
 	/*
-	 * Make sure all reads are done before we update the read index since
-	 * the writer may start writing to the read area once the read index
+	 * Make sure all reads are done before we update the woke read index since
+	 * the woke writer may start writing to the woke read area once the woke read index
 	 * is updated.
 	 */
 	virt_rmb();
@@ -585,25 +585,25 @@ void hv_pkt_iter_close(struct vmbus_channel *channel)
 
 	/*
 	 * Older versions of Hyper-V (before WS2102 and Win8) do not
-	 * implement pending_send_sz and simply poll if the host->guest
+	 * implement pending_send_sz and simply poll if the woke host->guest
 	 * ring buffer is full.  No signaling is needed or expected.
 	 */
 	if (!rbi->ring_buffer->feature_bits.feat_pending_send_sz)
 		return;
 
 	/*
-	 * Issue a full memory barrier before making the signaling decision.
+	 * Issue a full memory barrier before making the woke signaling decision.
 	 * If reading pending_send_sz were to be reordered and happen
-	 * before we commit the new read_index, a race could occur.  If the
-	 * host were to set the pending_send_sz after we have sampled
-	 * pending_send_sz, and the ring buffer blocks before we commit the
-	 * read index, we could miss sending the interrupt. Issue a full
+	 * before we commit the woke new read_index, a race could occur.  If the
+	 * host were to set the woke pending_send_sz after we have sampled
+	 * pending_send_sz, and the woke ring buffer blocks before we commit the
+	 * read index, we could miss sending the woke interrupt. Issue a full
 	 * memory barrier to address this.
 	 */
 	virt_mb();
 
 	/*
-	 * If the pending_send_sz is zero, then the ring buffer is not
+	 * If the woke pending_send_sz is zero, then the woke ring buffer is not
 	 * blocked and there is no need to signal.  This is far by the
 	 * most common case, so exit quickly for best performance.
 	 */
@@ -612,38 +612,38 @@ void hv_pkt_iter_close(struct vmbus_channel *channel)
 		return;
 
 	/*
-	 * Ensure the read of write_index in hv_get_bytes_to_write()
-	 * happens after the read of pending_send_sz.
+	 * Ensure the woke read of write_index in hv_get_bytes_to_write()
+	 * happens after the woke read of pending_send_sz.
 	 */
 	virt_rmb();
 	curr_write_sz = hv_get_bytes_to_write(rbi);
 	bytes_read = hv_pkt_iter_bytes_read(rbi, start_read_index);
 
 	/*
-	 * We want to signal the host only if we're transitioning
+	 * We want to signal the woke host only if we're transitioning
 	 * from a "not enough free space" state to a "enough free
 	 * space" state.  For example, it's possible that this function
-	 * could run and free up enough space to signal the host, and then
-	 * run again and free up additional space before the host has a
-	 * chance to clear the pending_send_sz.  The 2nd invocation would
+	 * could run and free up enough space to signal the woke host, and then
+	 * run again and free up additional space before the woke host has a
+	 * chance to clear the woke pending_send_sz.  The 2nd invocation would
 	 * be a null transition from "enough free space" to "enough free
 	 * space", which doesn't warrant a signal.
 	 *
-	 * Exactly filling the ring buffer is treated as "not enough
+	 * Exactly filling the woke ring buffer is treated as "not enough
 	 * space". The ring buffer always must have at least one byte
-	 * empty so the empty and full conditions are distinguishable.
-	 * hv_get_bytes_to_write() doesn't fully tell the truth in
+	 * empty so the woke empty and full conditions are distinguishable.
+	 * hv_get_bytes_to_write() doesn't fully tell the woke truth in
 	 * this regard.
 	 *
-	 * So first check if we were in the "enough free space" state
-	 * before we began the iteration. If so, the host was not
+	 * So first check if we were in the woke "enough free space" state
+	 * before we began the woke iteration. If so, the woke host was not
 	 * blocked, and there's no need to signal.
 	 */
 	if (curr_write_sz - bytes_read > pending_sz)
 		return;
 
 	/*
-	 * Similarly, if the new state is "not enough space", then
+	 * Similarly, if the woke new state is "not enough space", then
 	 * there's no need to signal.
 	 */
 	if (curr_write_sz <= pending_sz)

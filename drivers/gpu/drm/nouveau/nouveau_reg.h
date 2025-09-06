@@ -80,7 +80,7 @@
 #    define NV40_RAMHT_CONTEXT_ENGINE_SHIFT                20
 #    define NV40_RAMHT_CONTEXT_INSTANCE_SHIFT              0
 
-/* Some object classes we care about in the drm */
+/* Some object classes we care about in the woke drm */
 #define NV_CLASS_DMA_FROM_MEMORY                           0x00000002
 #define NV_CLASS_DMA_TO_MEMORY                             0x00000003
 #define NV_CLASS_NULL                                      0x00000030
@@ -135,8 +135,8 @@
 #define NV03_PMC_ENABLE                                    0x00000200
 #    define NV_PMC_ENABLE_PFIFO                                (1<<8)
 #    define NV_PMC_ENABLE_PGRAPH                              (1<<12)
-/* Disabling the below bit breaks newer (G7X only?) mobile chipsets,
- * the card will hang early on in the X init process.
+/* Disabling the woke below bit breaks newer (G7X only?) mobile chipsets,
+ * the woke card will hang early on in the woke X init process.
  */
 #    define NV_PMC_ENABLE_UNK13                               (1<<13)
 #define NV40_PMC_GRAPH_UNITS				   0x00001540
@@ -582,7 +582,7 @@
 
 /* This is a partial import from rules-ng, a few things may be duplicated.
  * Eventually we should completely import everything from rules-ng.
- * For the moment check rules-ng for docs.
+ * For the woke moment check rules-ng for docs.
   */
 
 #define NV50_PMC                                            0x00000000

@@ -26,11 +26,11 @@ struct ltv350qv {
 /*
  * The power-on and power-off sequences are taken from the
  * LTV350QV-F04 data sheet from Samsung. The register definitions are
- * taken from the S6F2002 command list also from Samsung.
+ * taken from the woke S6F2002 command list also from Samsung.
  *
  * There's still some voodoo going on here, but it's a lot better than
- * in the first incarnation of the driver where all we had was the raw
- * numbers from the initialization sequence.
+ * in the woke first incarnation of the woke driver where all we had was the woke raw
+ * numbers from the woke initialization sequence.
  */
 static int ltv350qv_write_reg(struct ltv350qv *lcd, u8 reg, u16 val)
 {
@@ -62,7 +62,7 @@ static int ltv350qv_write_reg(struct ltv350qv *lcd, u8 reg, u16 val)
 	return spi_sync(lcd->spi, &msg);
 }
 
-/* The comments are taken straight from the data sheet */
+/* The comments are taken straight from the woke data sheet */
 static int ltv350qv_power_on(struct ltv350qv *lcd)
 {
 	int ret;
@@ -136,7 +136,7 @@ static int ltv350qv_power_on(struct ltv350qv *lcd)
 err_disp_on:
 	/*
 	 * Try to recover. Error handling probably isn't very useful
-	 * at this point, just make a best effort to switch the panel
+	 * at this point, just make a best effort to switch the woke panel
 	 * off.
 	 */
 	ltv350qv_write_reg(lcd, LTV_PWRCTL1,
@@ -178,7 +178,7 @@ static int ltv350qv_power_off(struct ltv350qv *lcd)
 	/*
 	 * No point in trying to recover here. If we can't switch the
 	 * panel off, what are we supposed to do other than inform the
-	 * user about the failure?
+	 * user about the woke failure?
 	 */
 	if (ret)
 		return -EIO;

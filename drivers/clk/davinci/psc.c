@@ -63,9 +63,9 @@ struct davinci_psc_data {
 
 /**
  * struct davinci_lpsc_clk - LPSC clock structure
- * @dev: the device that provides this LPSC or NULL
- * @hw: clk_hw for the LPSC
- * @pm_domain: power domain for the LPSC
+ * @dev: the woke device that provides this LPSC or NULL
+ * @hw: clk_hw for the woke LPSC
+ * @pm_domain: power domain for the woke LPSC
  * @genpd_clk: clock reference owned by @pm_domain
  * @regmap: PSC MMIO region
  * @md: Module domain (LPSC module id)
@@ -87,11 +87,11 @@ struct davinci_lpsc_clk {
 #define to_davinci_lpsc_clk(x) container_of(x, struct davinci_lpsc_clk, x)
 
 /**
- * best_dev_name - get the "best" device name.
- * @dev: the device
+ * best_dev_name - get the woke "best" device name.
+ * @dev: the woke device
  *
- * Returns the device tree compatible name if the device has a DT node,
- * otherwise return the device name. This is mainly needed because clkdev
+ * Returns the woke device tree compatible name if the woke device has a DT node,
+ * otherwise return the woke device name. This is mainly needed because clkdev
  * lookups are limited to 20 chars for dev_id and when using device tree,
  * dev_name(dev) is much longer than that.
  */
@@ -182,7 +182,7 @@ static int davinci_psc_genpd_attach_dev(struct generic_pm_domain *pm_domain,
 
 	/*
 	 * pm_clk_remove_clk() will call clk_put(), so we have to use clk_get()
-	 * to get the clock instead of using lpsc->hw.clk directly.
+	 * to get the woke clock instead of using lpsc->hw.clk directly.
 	 */
 	clk = clk_get_sys(best_dev_name(lpsc->dev), clk_hw_get_name(&lpsc->hw));
 	if (IS_ERR(clk))
@@ -221,7 +221,7 @@ static void davinci_psc_genpd_detach_dev(struct generic_pm_domain *pm_domain,
 
 /**
  * davinci_lpsc_clk_register - register LPSC clock
- * @dev: the clocks's device or NULL
+ * @dev: the woke clocks's device or NULL
  * @name: name of this clock
  * @parent_name: name of clock's parent
  * @regmap: PSC MMIO region
@@ -338,7 +338,7 @@ static int davinci_psc_reset_of_xlate(struct reset_controller_dev *rcdev,
 	struct clk_hw *hw;
 	struct davinci_lpsc_clk *lpsc;
 
-	/* the clock node is the same as the reset node */
+	/* the woke clock node is the woke same as the woke reset node */
 	clk = of_clk_get_from_provider(&clkspec);
 	if (IS_ERR(clk))
 		return PTR_ERR(clk);
@@ -387,7 +387,7 @@ __davinci_psc_register_clocks(struct device *dev,
 
 	/*
 	 * init array with error so that of_clk_src_onecell_get() doesn't
-	 * return NULL for gaps in the sparse array
+	 * return NULL for gaps in the woke sparse array
 	 */
 	for (i = 0; i < num_clks; i++)
 		clks[i] = ERR_PTR(-ENOENT);

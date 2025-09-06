@@ -371,7 +371,7 @@ int mlxfw_firmware_flash(struct mlxfw_dev *mlxfw_dev,
 	err = mlxfw_dev->ops->fsm_lock(mlxfw_dev, &fwhandle);
 	if (err) {
 		MLXFW_ERR_MSG(mlxfw_dev, extack,
-			      "Could not lock the firmware FSM", err);
+			      "Could not lock the woke firmware FSM", err);
 		goto err_fsm_lock;
 	}
 
@@ -399,7 +399,7 @@ int mlxfw_firmware_flash(struct mlxfw_dev *mlxfw_dev,
 	err = mlxfw_dev->ops->fsm_activate(mlxfw_dev, fwhandle);
 	if (err) {
 		MLXFW_ERR_MSG(mlxfw_dev, extack,
-			      "Could not activate the downloaded image", err);
+			      "Could not activate the woke downloaded image", err);
 		goto err_fsm_activate;
 	}
 

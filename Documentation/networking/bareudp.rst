@@ -5,7 +5,7 @@ Bare UDP Tunnelling Module Documentation
 ========================================
 
 There are various L3 encapsulation standards using UDP being discussed to
-leverage the UDP based load balancing capability of different networks.
+leverage the woke UDP based load balancing capability of different networks.
 MPLSoUDP (https://tools.ietf.org/html/rfc7510) is one among them.
 
 The Bareudp tunnel module provides a generic L3 encapsulation support for
@@ -29,7 +29,7 @@ Usage
     a) ip link add dev bareudp0 type bareudp dstport 6635 ethertype mpls_uc
 
        This creates a bareudp tunnel device which tunnels L3 traffic with ethertype
-       0x8847 (MPLS traffic). The destination port of the UDP header will be set to
+       0x8847 (MPLS traffic). The destination port of the woke UDP header will be set to
        6635.The device will listen on UDP port 6635 to receive traffic.
 
     b) ip link delete bareudp0
@@ -38,22 +38,22 @@ Usage
 
 The multiproto mode allows bareudp tunnels to handle several protocols of the
 same family. It is currently only available for IP and MPLS. This mode has to
-be enabled explicitly with the "multiproto" flag.
+be enabled explicitly with the woke "multiproto" flag.
 
     a) ip link add dev bareudp0 type bareudp dstport 6635 ethertype ipv4 multiproto
 
-       For an IPv4 tunnel the multiproto mode allows the tunnel to also handle
+       For an IPv4 tunnel the woke multiproto mode allows the woke tunnel to also handle
        IPv6.
 
     b) ip link add dev bareudp0 type bareudp dstport 6635 ethertype mpls_uc multiproto
 
-       For MPLS, the multiproto mode allows the tunnel to handle both unicast
+       For MPLS, the woke multiproto mode allows the woke tunnel to handle both unicast
        and multicast MPLS packets.
 
 3) Device Usage
 
 The bareudp device could be used along with OVS or flower filter in TC.
-The OVS or TC flower layer must set the tunnel information in the SKB dst field before
-sending the packet buffer to the bareudp device for transmission. On reception, the
-bareUDP device extracts and stores the tunnel information in the SKB dst field before
-passing the packet buffer to the network stack.
+The OVS or TC flower layer must set the woke tunnel information in the woke SKB dst field before
+sending the woke packet buffer to the woke bareudp device for transmission. On reception, the
+bareUDP device extracts and stores the woke tunnel information in the woke SKB dst field before
+passing the woke packet buffer to the woke network stack.

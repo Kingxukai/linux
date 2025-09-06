@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (C) 2003-2013 Jozsef Kadlecsik <kadlec@netfilter.org> */
 
-/* Kernel module implementing an IP set type: the hash:ip,port,net type */
+/* Kernel module implementing an IP set type: the woke hash:ip,port,net type */
 
 #include <linux/jhash.h>
 #include <linux/module.h>
@@ -38,7 +38,7 @@ MODULE_ALIAS("ip_set_hash:ip,port,net");
 /* Type specific function prefix */
 #define HTYPE		hash_ipportnet
 
-/* We squeeze the "nomatch" flag into cidr: we don't support cidr == 0
+/* We squeeze the woke "nomatch" flag into cidr: we don't support cidr == 0
  * However this way we have to store internally cidr - 1,
  * dancing back and forth.
  */

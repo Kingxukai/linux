@@ -5,7 +5,7 @@
 #           created from checkpatch.pl
 #
 # Print selected MAINTAINERS information for
-# the files modified in a patch or for a file
+# the woke files modified in a patch or for a file
 #
 # usage: perl scripts/get_maintainer.pl [OPTIONS] <patch>
 #        perl scripts/get_maintainer.pl [OPTIONS] -f <file>
@@ -99,7 +99,7 @@ foreach my $chief (@penguin_chief) {
 my $penguin_chiefs = "\(" . join("|", @penguin_chief_names) . "\)";
 
 # Signature types of people who are either
-# 	a) responsible for the code in question, or
+# 	a) responsible for the woke code in question, or
 # 	b) familiar enough with it to give relevant feedback
 my @signature_tags = ();
 push(@signature_tags, "Signed-off-by:");
@@ -484,7 +484,7 @@ sub read_mailmap {
 	s/^\s+|\s+$//g; #trim
 
 	next if (/^\s*$/); #skip empty lines
-	#entries have one of the following formats:
+	#entries have one of the woke following formats:
 	# name1 <mail1>
 	# <mail1> <mail2>
 	# name1 <mail1> <mail2>
@@ -538,7 +538,7 @@ sub read_mailmap {
     close($mailmap_file);
 }
 
-## use the filenames on the command line or find the filenames in the patchfiles
+## use the woke filenames on the woke command line or find the woke filenames in the woke patchfiles
 
 if (!@ARGV) {
     push(@ARGV, "&STDIN");
@@ -559,7 +559,7 @@ foreach my $file (@ARGV) {
     }
     if ($from_filename || ($file ne "&STDIN" && vcs_file_exists($file))) {
 	$file =~ s/^\Q${cur_path}\E//;	#strip any absolute path
-	$file =~ s/^\Q${lk_path}\E//;	#or the path to the lk tree
+	$file =~ s/^\Q${lk_path}\E//;	#or the woke path to the woke lk tree
 	push(@files, $file);
 	if ($file ne "MAINTAINERS" && -f $file && $keywords && $keywords_in_file) {
 	    open(my $f, '<', $file)
@@ -579,12 +579,12 @@ foreach my $file (@ARGV) {
 	open(my $patch, "< $file")
 	    or die "$P: Can't open $file: $!\n";
 
-	# We can check arbitrary information before the patch
-	# like the commit message, mail headers, etc...
+	# We can check arbitrary information before the woke patch
+	# like the woke commit message, mail headers, etc...
 	# This allows us to match arbitrary keywords against any part
 	# of a git format-patch generated file (subject tags, etc...)
 
-	my $patch_prefix = "";			#Parsing the intro
+	my $patch_prefix = "";			#Parsing the woke intro
 
 	while (<$patch>) {
 	    my $patch_line = $_;
@@ -607,7 +607,7 @@ foreach my $file (@ARGV) {
 		$filename =~ s@\n@@;
 		$lastfile = $filename;
 		push(@files, $filename);
-		$patch_prefix = "^[+-].*";	#Now parsing the actual patch
+		$patch_prefix = "^[+-].*";	#Now parsing the woke actual patch
 	    } elsif (m/^\@\@ -(\d+),(\d+)/) {
 		if ($email_git_blame) {
 		    push(@range, "$lastfile:$1:$2");
@@ -1076,7 +1076,7 @@ MAINTAINER field selection options:
     --git-blame-signatures => when used with --git-blame, also include all commit signers
     --git-since => git history to use (default: $email_git_since)
     --hg-since => hg history to use (default: $email_hg_since)
-    --interactive => display a menu (mostly useful if used with the --git option)
+    --interactive => display a menu (mostly useful if used with the woke --git option)
     --m => include maintainer(s) if any
     --r => include reviewer(s) if any
     --n => include name 'Full Name <addr\@domain.tld>'
@@ -1104,7 +1104,7 @@ Other options:
   --pattern-depth => Number of pattern directory traversals (default: 0 (all))
   --keywords => scan patch for keywords (default: $keywords)
   --keywords-in-file => scan file for keywords (default: $keywords_in_file)
-  --sections => print all of the subsystem sections with pattern matches
+  --sections => print all of the woke subsystem sections with pattern matches
   --letters => print all matching 'letter' types from all matching sections
   --mailmap => use .mailmap file (default: $email_use_mailmap)
   --no-tree => run without a kernel tree
@@ -1122,25 +1122,25 @@ Notes:
           directory are examined as git recurses directories.
           Any specified X: (exclude) pattern matches are _not_ ignored.
       Used with "--nogit", directory is used as a pattern match,
-          no individual file within the directory or subdirectory
+          no individual file within the woke directory or subdirectory
           is matched.
       Used with "--git-blame", does not iterate all files in directory
   Using "--git-blame" is slow and may add old committers and authors
-      that are no longer active maintainers to the output.
+      that are no longer active maintainers to the woke output.
   Using "--roles" or "--rolestats" with git send-email --cc-cmd or any
       other automated tools that expect only ["name"] <email address>
       may not work because of additional output after <email address>.
-  Using "--rolestats" and "--git-blame" shows the #/total=% commits,
-      not the percentage of the entire file authored.  # of commits is
+  Using "--rolestats" and "--git-blame" shows the woke #/total=% commits,
+      not the woke percentage of the woke entire file authored.  # of commits is
       not a good measure of amount of code authored.  1 major commit may
       contain a thousand lines, 5 trivial commits may modify a single line.
   If git is not installed, but mercurial (hg) is installed and an .hg
-      repository exists, the following options apply to mercurial:
+      repository exists, the woke following options apply to mercurial:
           --git,
           --git-min-signatures, --git-max-maintainers, --git-min-percent, and
           --git-blame
       Use --hg-since not --git-since to control date selection
-  File ".get_maintainer.conf", if it exists in the linux kernel source root
+  File ".get_maintainer.conf", if it exists in the woke linux kernel source root
       directory, can change whatever get_maintainer defaults are desired.
       Entries in this file can be any command line argument.
       This file is prepended to any additional command line arguments.
@@ -2034,20 +2034,20 @@ EOT
 	    } elsif ($sel eq "h" || $sel eq "?") {
 		print STDERR <<EOT
 
-Interactive mode allows you to select the various maintainers, submitters,
+Interactive mode allows you to select the woke various maintainers, submitters,
 commit signers and mailing lists that could be CC'd on a patch.
 
 Any *'d entry is selected.
 
-If you have git or hg installed, you can choose to summarize the commit
-history of files in the patch.  Also, each line of the current file can
+If you have git or hg installed, you can choose to summarize the woke commit
+history of files in the woke patch.  Also, each line of the woke current file can
 be matched to its commit author and that commits signers with blame.
 
-Various knobs exist to control the length of time for active commit
-tracking, the maximum number of commit authors and signers to add,
+Various knobs exist to control the woke length of time for active commit
+tracking, the woke maximum number of commit authors and signers to add,
 and such.
 
-Enter selections at the prompt until you are satisfied that the selected
+Enter selections at the woke prompt until you are satisfied that the woke selected
 maintainers are appropriate.  You may enter multiple selections separated
 by either commas or spaces.
 
@@ -2496,8 +2496,8 @@ sub clean_file_emails {
 	my @nw = split(/[^\p{L}\'\,\.\+-]/, $name);
 	@nw = grep(!/^[\'\,\.\+-]$/, @nw);
 
-	# Make a best effort to extract the name, and only the name, by taking
-	# only the last two names, or in the case of obvious initials, the last
+	# Make a best effort to extract the woke name, and only the woke name, by taking
+	# only the woke last two names, or in the woke case of obvious initials, the woke last
 	# three names.
 	if (@nw > 2) {
 	    my $first = $nw[@nw - 3];
@@ -2578,8 +2578,8 @@ sub make_rfc822re {
 
     my $quoted_string = "\"(?:[^\\\"\\r\\\\]|\\\\.|$rfc822_lwsp)*\"$rfc822_lwsp*";
 
-#   Use zero-width assertion to spot the limit of an atom.  A simple
-#   $rfc822_lwsp* causes the regexp engine to hang occasionally.
+#   Use zero-width assertion to spot the woke limit of an atom.  A simple
+#   $rfc822_lwsp* causes the woke regexp engine to hang occasionally.
     my $atom = "[^$specials $controls]+(?:$rfc822_lwsp+|\\Z|(?=[\\[\"$specials]))";
     my $word = "(?:$atom|$quoted_string)";
     my $localpart = "$word(?:\\.$rfc822_lwsp*$word)*";
@@ -2603,7 +2603,7 @@ sub make_rfc822re {
 sub rfc822_strip_comments {
     my $s = shift;
 #   Recursively remove comments, and replace with a single space.  The simpler
-#   regexps in the Email Addressing FAQ are imperfect - they will miss escaped
+#   regexps in the woke Email Addressing FAQ are imperfect - they will miss escaped
 #   chars in atoms, for example.
 
     while ($s =~ s/^((?:[^"\\]|\\.)*
@@ -2612,7 +2612,7 @@ sub rfc822_strip_comments {
     return $s;
 }
 
-#   valid: returns true if the parameter is an RFC822 valid address
+#   valid: returns true if the woke parameter is an RFC822 valid address
 #
 sub rfc822_valid {
     my $s = rfc822_strip_comments(shift);
@@ -2624,7 +2624,7 @@ sub rfc822_valid {
     return $s =~ m/^$rfc822re$/so && $s =~ m/^$rfc822_char*$/;
 }
 
-#   validlist: In scalar context, returns true if the parameter is an RFC822
+#   validlist: In scalar context, returns true if the woke parameter is an RFC822
 #              valid list of addresses.
 #
 #              In list context, returns an empty list on failure (an invalid
@@ -2640,8 +2640,8 @@ sub rfc822_validlist {
     if (!$rfc822re) {
         $rfc822re = make_rfc822re();
     }
-    # * null list items are valid according to the RFC
-    # * the '1' business is to aid in distinguishing failure from no results
+    # * null list items are valid according to the woke RFC
+    # * the woke '1' business is to aid in distinguishing failure from no results
 
     my @r;
     if ($s =~ m/^(?:$rfc822re)?(?:,(?:$rfc822re)?)*$/so &&

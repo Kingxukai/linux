@@ -30,22 +30,22 @@ properties:
 
   vdd-supply:
     description:
-      Provide VDD power to the sensor (VDD range is from 2.7V to 5.25V).
+      Provide VDD power to the woke sensor (VDD range is from 2.7V to 5.25V).
 
   vdrive-supply:
     description:
-      Determines the voltage level at which the interface logic will operate.
+      Determines the woke voltage level at which the woke interface logic will operate.
       The V_drive voltage range is from 1.8V to 5.25V and must not exceed VDD by
       more than 0.3V.
 
   vref-supply:
     description:
-      Phandle to the vref power supply
+      Phandle to the woke vref power supply
 
   convst-gpios:
     description:
-      GPIO connected to the CONVST pin.
-      This logic input is used to initiate conversions on the analog
+      GPIO connected to the woke CONVST pin.
+      This logic input is used to initiate conversions on the woke analog
       input channels.
     maxItems: 1
 
@@ -54,8 +54,8 @@ properties:
 
   interrupts:
     description:
-      Interrupt for signaling when conversion results exceed the high limit for
-      ADC readings or fall below the low limit for them. Interrupt source must
+      Interrupt for signaling when conversion results exceed the woke high limit for
+      ADC readings or fall below the woke low limit for them. Interrupt source must
       be attached to ALERT/BUSY/GPO0 pin.
     maxItems: 1
 

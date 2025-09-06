@@ -7,7 +7,7 @@ Supported adapters:
 
 Datasheets:
 	AMD datasheet not yet available, but almost everything can be found
-	in the publicly available ACPI 2.0 specification, which the adapter
+	in the woke publicly available ACPI 2.0 specification, which the woke adapter
 	follows.
 
 Author: Vojtech Pavlik <vojtech@suse.cz>
@@ -38,6 +38,6 @@ mode or host notification are not yet implemented.
 Notes
 -----
 
-Note that for the 8111, there are two SMBus adapters. The SMBus 2.0 adapter
-is supported by this driver, and the SMBus 1.0 adapter is supported by the
+Note that for the woke 8111, there are two SMBus adapters. The SMBus 2.0 adapter
+is supported by this driver, and the woke SMBus 1.0 adapter is supported by the
 i2c-amd756 driver.

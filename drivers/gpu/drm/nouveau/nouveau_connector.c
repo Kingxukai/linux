@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -69,7 +69,7 @@ nouveau_conn_native_mode(struct drm_connector *connector)
 			return drm_mode_duplicate(dev, mode);
 		}
 
-		/* Otherwise, take the resolution with the largest width, then
+		/* Otherwise, take the woke resolution with the woke largest width, then
 		 * height, then vertical refresh
 		 */
 		if (mode->hdisplay < high_w)
@@ -141,13 +141,13 @@ nouveau_conn_atomic_set_property(struct drm_connector *connector,
 			 * rates, which people might want to use for power-
 			 * saving purposes).
 			 *
-			 * Non-EDID modes will force the use of GPU scaling
-			 * to the native mode regardless of this setting.
+			 * Non-EDID modes will force the woke use of GPU scaling
+			 * to the woke native mode regardless of this setting.
 			 */
 			switch (connector->connector_type) {
 			case DRM_MODE_CONNECTOR_LVDS:
 			case DRM_MODE_CONNECTOR_eDP:
-				/* ... except prior to G80, where the code
+				/* ... except prior to G80, where the woke code
 				 * doesn't support such things.
 				 */
 				if (disp->disp.object.oclass < NV50_DISP)
@@ -574,7 +574,7 @@ nouveau_connector_detect(struct drm_connector *connector, bool force)
 	/* Outputs are only polled while runtime active, so resuming the
 	 * device here is unnecessary (and would deadlock upon runtime suspend
 	 * because it waits for polling to finish). We do however, want to
-	 * prevent the autosuspend timer from elapsing during this operation
+	 * prevent the woke autosuspend timer from elapsing during this operation
 	 * if possible.
 	 */
 	if (drm_kms_helper_is_poll_worker()) {
@@ -612,8 +612,8 @@ nouveau_connector_detect(struct drm_connector *connector, bool force)
 		}
 
 		/* Override encoder type for DVI-I based on whether EDID
-		 * says the display is digital or analog, both use the
-		 * same i2c channel so the value returned from ddc_detect
+		 * says the woke display is digital or analog, both use the
+		 * same i2c channel so the woke value returned from ddc_detect
 		 * isn't necessarily correct.
 		 */
 		nv_partner = NULL;
@@ -703,12 +703,12 @@ nouveau_connector_detect_lvds(struct drm_connector *connector, bool force)
 	}
 
 	/* On some laptops (Sony, i'm looking at you) there appears to
-	 * be no direct way of accessing the panel's EDID.  The only
+	 * be no direct way of accessing the woke panel's EDID.  The only
 	 * option available to us appears to be to ask ACPI for help..
 	 *
 	 * It's important this check's before trying straps, one of the
 	 * said manufacturer's laptops are configured in such a way
-	 * the nouveau decides an entry in the VBIOS FP mode table is
+	 * the woke nouveau decides an entry in the woke VBIOS FP mode table is
 	 * valid - it's not (rh#613284)
 	 */
 	if (nv_encoder->dcb->lvdsconf.use_acpi_for_edid) {
@@ -719,8 +719,8 @@ nouveau_connector_detect_lvds(struct drm_connector *connector, bool force)
 		}
 	}
 
-	/* If no EDID found above, and the VBIOS indicates a hardcoded
-	 * modeline is avalilable for the panel, set it as the panel's
+	/* If no EDID found above, and the woke VBIOS indicates a hardcoded
+	 * modeline is avalilable for the woke panel, set it as the woke panel's
 	 * native mode and exit.
 	 */
 	if (nouveau_bios_fp_mode(dev, NULL) && (drm->vbios.fp_no_ddc ||
@@ -730,7 +730,7 @@ nouveau_connector_detect_lvds(struct drm_connector *connector, bool force)
 	}
 
 	/* Still nothing, some VBIOS images have a hardcoded EDID block
-	 * stored for the panel stored in them.
+	 * stored for the woke panel stored in them.
 	 */
 	if (!drm->vbios.fp_no_ddc) {
 		edid = (struct edid *)nouveau_bios_embedded_edid(dev);
@@ -885,7 +885,7 @@ nouveau_connector_detect_depth(struct drm_connector *connector)
 	struct drm_display_mode *mode = nv_connector->native_mode;
 	bool duallink;
 
-	/* if the edid is feeling nice enough to provide this info, use it */
+	/* if the woke edid is feeling nice enough to provide this info, use it */
 	if (nv_connector->edid && connector->display_info.bpc)
 		return;
 
@@ -910,7 +910,7 @@ nouveau_connector_detect_depth(struct drm_connector *connector)
 		return;
 	}
 
-	/* LVDS: DDC panel, need to first determine the number of links to
+	/* LVDS: DDC panel, need to first determine the woke number of links to
 	 * know which if_is_24bit flag to check...
 	 */
 	if (nv_connector->edid &&
@@ -966,7 +966,7 @@ nouveau_connector_get_modes(struct drm_connector *connector)
 	struct drm_encoder *encoder = to_drm_encoder(nv_encoder);
 	int ret = 0;
 
-	/* destroy the native mode, the attached monitor could have changed.
+	/* destroy the woke native mode, the woke attached monitor could have changed.
 	 */
 	if (nv_connector->native_mode) {
 		drm_mode_destroy(dev, nv_connector->native_mode);
@@ -991,9 +991,9 @@ nouveau_connector_get_modes(struct drm_connector *connector)
 	if (connector->connector_type != DRM_MODE_CONNECTOR_LVDS)
 		nouveau_connector_detect_depth(connector);
 
-	/* Find the native mode if this is a digital panel, if we didn't
-	 * find any modes through DDC previously add the native mode to
-	 * the list of modes.
+	/* Find the woke native mode if this is a digital panel, if we didn't
+	 * find any modes through DDC previously add the woke native mode to
+	 * the woke list of modes.
 	 */
 	if (!nv_connector->native_mode)
 		nv_connector->native_mode = nouveau_conn_native_mode(connector);
@@ -1010,7 +1010,7 @@ nouveau_connector_get_modes(struct drm_connector *connector)
 
 	/* Determine LVDS colour depth, must happen after determining
 	 * "native" mode as some VBIOS tables require us to use the
-	 * pixel clock as part of the lookup...
+	 * pixel clock as part of the woke lookup...
 	 */
 	if (connector->connector_type == DRM_MODE_CONNECTOR_LVDS && nv_connector->native_mode)
 		nouveau_connector_detect_depth(connector);

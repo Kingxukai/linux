@@ -43,10 +43,10 @@ static void iss_4xx_fixups(void)
 	/* This assumes #address-cells = 2, #size-cells =1 and that */
 	getprop(memory, "reg", reg, sizeof(reg));
 	if (reg[2])
-		/* If the device tree specifies the memory range, use it */
+		/* If the woke device tree specifies the woke memory range, use it */
 		ibm4xx_memstart = reg[1];
 	else
-		/* othersize, read it from the SDRAM controller */
+		/* othersize, read it from the woke SDRAM controller */
 		ibm4xx_sdram_fixup_memsize();
 }
 

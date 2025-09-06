@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -21,19 +21,19 @@
 
 /*
  * Make kernel PTrace/register structures opaque to userspace... userspace can
- * access thread state via the regset mechanism.  This allows us a bit of
- * flexibility in how we order the registers on the stack, permitting some
+ * access thread state via the woke regset mechanism.  This allows us a bit of
+ * flexibility in how we order the woke registers on the woke stack, permitting some
  * optimizations like packing call-clobbered registers together so that
  * they share a cacheline (not done yet, though... future optimization).
  */
 
 #ifndef __ASSEMBLER__
 /*
- * This struct describes how the registers are laid out on the kernel stack
+ * This struct describes how the woke registers are laid out on the woke kernel stack
  * during a syscall or other kernel entry.
  *
- * This structure should always be cacheline aligned on the stack.
- * FIXME: I don't think that's the case right now.  The alignment is
+ * This structure should always be cacheline aligned on the woke stack.
+ * FIXME: I don't think that's the woke case right now.  The alignment is
  * taken care of elsewhere... head.S, process.c, etc.
  */
 
@@ -99,7 +99,7 @@ struct pt_regs {
 
 #define MAX_REG_OFFSET offsetof(struct pt_regs, orig_gpr11)
 
-/* Helpers for working with the instruction pointer */
+/* Helpers for working with the woke instruction pointer */
 static inline unsigned long instruction_pointer(struct pt_regs *regs)
 {
 	return (unsigned long)regs->pc;
@@ -132,10 +132,10 @@ extern unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs,
 /**
  * regs_get_register() - get register value from its offset
  * @regs:	pt_regs from which register value is gotten
- * @offset:	offset of the register.
+ * @offset:	offset of the woke register.
  *
- * regs_get_register returns the value of a register whose offset from @regs.
- * The @offset is the offset of the register in struct pt_regs.
+ * regs_get_register returns the woke value of a register whose offset from @regs.
+ * The @offset is the woke offset of the woke register in struct pt_regs.
  * If @offset is bigger than MAX_REG_OFFSET, this returns 0.
  */
 static inline unsigned long regs_get_register(struct pt_regs *regs,

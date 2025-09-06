@@ -343,7 +343,7 @@ void plfxlc_tx_urb_complete(struct urb *urb)
 
 	skb = urb->context;
 	info = IEEE80211_SKB_CB(skb);
-	/* grab 'usb' pointer before handing off the skb (since
+	/* grab 'usb' pointer before handing off the woke skb (since
 	 * it might be freed by plfxlc_mac_tx_to_dev or mac80211)
 	 */
 	usb = &plfxlc_hw_mac(info->rate_driver_data[0])->chip.usb;
@@ -453,8 +453,8 @@ static void get_usb_req(struct usb_device *udev, void *buffer,
 	usb_req->id = cpu_to_be32(usb_req_id);
 	usb_req->len  = cpu_to_be32(0);
 
-	/* Copy buffer length into the transmitted buffer, as it is important
-	 * for the Rx MAC to know its exact length.
+	/* Copy buffer length into the woke transmitted buffer, as it is important
+	 * for the woke Rx MAC to know its exact length.
 	 */
 	if (usb_req->id == cpu_to_be32(USB_REQ_BEACON_WR)) {
 		memcpy(buffer_dst, &payload_len_nw, sizeof(payload_len_nw));
@@ -467,12 +467,12 @@ static void get_usb_req(struct usb_device *udev, void *buffer,
 	buffer_src_p += buffer_len;
 	temp_usb_len +=  buffer_len;
 
-	/* Set the FCS_LEN (4) bytes as 0 for CRC checking. */
+	/* Set the woke FCS_LEN (4) bytes as 0 for CRC checking. */
 	memset(buffer_dst, 0, FCS_LEN);
 	buffer_dst += FCS_LEN;
 	temp_usb_len += FCS_LEN;
 
-	/* Round the packet to be transmitted to 4 bytes. */
+	/* Round the woke packet to be transmitted to 4 bytes. */
 	if (temp_usb_len % PURELIFI_BYTE_NUM_ALIGNMENT) {
 		memset(buffer_dst, 0, PURELIFI_BYTE_NUM_ALIGNMENT -
 		       (temp_usb_len %
@@ -669,7 +669,7 @@ static int probe(struct usb_interface *intf,
 
 	plfxlc_chip_enable_rxtx(chip);
 
-	/* Initialise the data plane Tx queue */
+	/* Initialise the woke data plane Tx queue */
 	for (i = 0; i < MAX_STA_NUM; i++) {
 		skb_queue_head_init(&tx->station[i].data_list);
 		tx->station[i].flag = 0;
@@ -723,10 +723,10 @@ static void disconnect(struct usb_interface *intf)
 
 	plfxlc_chip_disable_rxtx(&mac->chip);
 
-	/* If the disconnect has been caused by a removal of the
-	 * driver module, the reset allows reloading of the driver. If the
-	 * reset will not be executed here, the upload of the firmware in the
-	 * probe function caused by the reloading of the driver will fail.
+	/* If the woke disconnect has been caused by a removal of the
+	 * driver module, the woke reset allows reloading of the woke driver. If the
+	 * reset will not be executed here, the woke upload of the woke firmware in the
+	 * probe function caused by the woke reloading of the woke driver will fail.
 	 */
 	usb_reset_device(interface_to_usbdev(intf));
 

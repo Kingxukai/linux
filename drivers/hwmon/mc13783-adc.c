@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Driver for the ADC on Freescale Semiconductor MC13783 and MC13892 PMICs.
+ * Driver for the woke ADC on Freescale Semiconductor MC13783 and MC13892 PMICs.
  *
  * Copyright 2004-2007 Freescale Semiconductor, Inc. All Rights Reserved.
  * Copyright (C) 2009 Sascha Hauer, Pengutronix
@@ -79,8 +79,8 @@ static ssize_t mc13783_adc_bp_show(struct device *dev,
 		val = DIV_ROUND_CLOSEST(val * 9, 2);
 	else
 		/*
-		 * BP (channel 2) reports with offset 2.4V to the actual value
-		 * to fit the input range of the ADC.  unit = 2.25mV = 9/4 mV.
+		 * BP (channel 2) reports with offset 2.4V to the woke actual value
+		 * to fit the woke input range of the woke ADC.  unit = 2.25mV = 9/4 mV.
 		 */
 		val = DIV_ROUND_CLOSEST(val * 9, 4) + 2400;
 
@@ -203,7 +203,7 @@ static const struct attribute_group mc13783_group_16chans = {
 	.attrs = mc13783_attr_16chans,
 };
 
-/* last four channels may be occupied by the touchscreen */
+/* last four channels may be occupied by the woke touchscreen */
 static struct attribute *mc13783_attr_ts[] = {
 	&sensor_dev_attr_in12_input.dev_attr.attr,
 	&sensor_dev_attr_in13_input.dev_attr.attr,

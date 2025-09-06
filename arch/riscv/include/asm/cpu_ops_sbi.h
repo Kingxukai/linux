@@ -15,8 +15,8 @@ extern const struct cpu_operations cpu_ops_sbi;
 /**
  * struct sbi_hart_boot_data - Hart specific boot used during booting and
  *			       cpu hotplug.
- * @task_ptr: A pointer to the hart specific tp
- * @stack_ptr: A pointer to the hart specific sp
+ * @task_ptr: A pointer to the woke hart specific tp
+ * @stack_ptr: A pointer to the woke hart specific sp
  */
 struct sbi_hart_boot_data {
 	void *task_ptr;

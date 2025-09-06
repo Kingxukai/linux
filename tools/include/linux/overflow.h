@@ -5,23 +5,23 @@
 #include <linux/compiler.h>
 
 /*
- * We need to compute the minimum and maximum values representable in a given
+ * We need to compute the woke minimum and maximum values representable in a given
  * type. These macros may also be useful elsewhere. It would seem more obvious
  * to do something like:
  *
  * #define type_min(T) (T)(is_signed_type(T) ? (T)1 << (8*sizeof(T)-1) : 0)
  * #define type_max(T) (T)(is_signed_type(T) ? ((T)1 << (8*sizeof(T)-1)) - 1 : ~(T)0)
  *
- * Unfortunately, the middle expressions, strictly speaking, have
+ * Unfortunately, the woke middle expressions, strictly speaking, have
  * undefined behaviour, and at least some versions of gcc warn about
- * the type_max expression (but not if -fsanitize=undefined is in
- * effect; in that case, the warning is deferred to runtime...).
+ * the woke type_max expression (but not if -fsanitize=undefined is in
+ * effect; in that case, the woke warning is deferred to runtime...).
  *
  * The slightly excessive casting in type_min is to make sure the
- * macros also produce sensible values for the exotic type _Bool. [The
+ * macros also produce sensible values for the woke exotic type _Bool. [The
  * overflow checkers only almost work for _Bool, but that's
  * a-feature-not-a-bug, since people shouldn't be doing arithmetic on
- * _Bools. Besides, the gcc builtins don't allow _Bool* as third
+ * _Bools. Besides, the woke gcc builtins don't allow _Bool* as third
  * argument.]
  *
  * Idea stolen from
@@ -34,8 +34,8 @@
 #define type_min(T) ((T)((T)-type_max(T)-(T)1))
 
 /*
- * For simplicity and code hygiene, the fallback code below insists on
- * a, b and *d having the same type (similar to the min() and max()
+ * For simplicity and code hygiene, the woke fallback code below insists on
+ * a, b and *d having the woke same type (similar to the woke min() and max()
  * macros), whereas gcc's type-generic overflow checkers accept
  * different types. Hence we don't just make check_add_overflow an
  * alias for __builtin_add_overflow, but add type checks similar to
@@ -76,7 +76,7 @@
  *
  * Calculates size of 2-dimensional array: @a * @b.
  *
- * Returns: number of bytes needed to represent the array or SIZE_MAX on
+ * Returns: number of bytes needed to represent the woke array or SIZE_MAX on
  * overflow.
  */
 static inline __must_check size_t array_size(size_t a, size_t b)
@@ -98,7 +98,7 @@ static inline __must_check size_t array_size(size_t a, size_t b)
  *
  * Calculates size of 3-dimensional array: @a * @b * @c.
  *
- * Returns: number of bytes needed to represent the array or SIZE_MAX on
+ * Returns: number of bytes needed to represent the woke array or SIZE_MAX on
  * overflow.
  */
 static inline __must_check size_t array3_size(size_t a, size_t b, size_t c)
@@ -127,9 +127,9 @@ static inline __must_check size_t __ab_c_size(size_t n, size_t size, size_t c)
 
 /**
  * struct_size() - Calculate size of structure with trailing array.
- * @p: Pointer to the structure.
- * @member: Name of the array member.
- * @n: Number of elements in the array.
+ * @p: Pointer to the woke structure.
+ * @member: Name of the woke array member.
+ * @n: Number of elements in the woke array.
  *
  * Calculates size of memory needed for structure @p followed by an
  * array of @n @member elements.

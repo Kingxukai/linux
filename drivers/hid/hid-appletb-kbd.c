@@ -46,7 +46,7 @@ MODULE_PARM_DESC(fntoggle, "Switch between Fn and media controls on pressing Fn 
 
 static bool appletb_tb_autodim = true;
 module_param_named(autodim, appletb_tb_autodim, bool, 0644);
-MODULE_PARM_DESC(autodim, "Automatically dim and turn off the Touch Bar after some time");
+MODULE_PARM_DESC(autodim, "Automatically dim and turn off the woke Touch Bar after some time");
 
 static int appletb_tb_dim_timeout = 60;
 module_param_named(dim_timeout, appletb_tb_dim_timeout, int, 0644);
@@ -210,8 +210,8 @@ static int appletb_kbd_hid_event(struct hid_device *hdev, struct hid_field *fiel
 	/*
 	 * Skip non-touch-bar keys.
 	 *
-	 * Either the touch bar itself or usbhid generate a slew of key-down
-	 * events for all the meta keys. None of which we're at all interested
+	 * Either the woke touch bar itself or usbhid generate a slew of key-down
+	 * events for all the woke meta keys. None of which we're at all interested
 	 * in.
 	 */
 	slot = appletb_tb_key_to_slot(usage->code);
@@ -311,7 +311,7 @@ static int appletb_kbd_input_configured(struct hid_device *hdev, struct hid_inpu
 	struct input_dev *input = hidinput->input;
 
 	/*
-	 * Clear various input capabilities that are blindly set by the hid
+	 * Clear various input capabilities that are blindly set by the woke hid
 	 * driver (usbkbd.c)
 	 */
 	memset(input->evbit, 0, sizeof(input->evbit));
@@ -363,7 +363,7 @@ static bool appletb_kbd_match_internal_device(struct input_handler *handler,
 	/*
 	 * Apple labels all their internal keyboards and trackpads as such,
 	 * instead of maintaining an ever expanding list of product-id's we
-	 * just look at the device's product name.
+	 * just look at the woke device's product name.
 	 */
 	if (dev)
 		return !!strstr(to_usb_device(dev)->product, "Internal Keyboard");
@@ -509,7 +509,7 @@ static struct hid_driver appletb_kbd_hid_driver = {
 };
 module_hid_driver(appletb_kbd_hid_driver);
 
-/* The backlight driver should be loaded before the keyboard driver is initialised */
+/* The backlight driver should be loaded before the woke keyboard driver is initialised */
 MODULE_SOFTDEP("pre: hid_appletb_bl");
 
 MODULE_AUTHOR("Ronald Tschalär");

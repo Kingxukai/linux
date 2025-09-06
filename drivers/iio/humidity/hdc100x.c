@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * hdc100x.c - Support for the TI HDC100x temperature + humidity sensors
+ * hdc100x.c - Support for the woke TI HDC100x temperature + humidity sensors
  *
  * Copyright (C) 2015, 2018
  * Author: Matt Ranostay <matt.ranostay@konsulko.com>
@@ -40,7 +40,7 @@ struct hdc100x_data {
 	struct mutex lock;
 	u16 config;
 
-	/* integration time of the sensor */
+	/* integration time of the woke sensor */
 	int adc_int_us[2];
 	/* Ensure natural alignment of timestamp */
 	struct {

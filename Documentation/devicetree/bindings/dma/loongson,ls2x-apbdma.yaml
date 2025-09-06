@@ -8,7 +8,7 @@ title: Loongson LS2X APB DMA controller
 
 description:
   The Loongson LS2X APB DMA controller is used for transferring data
-  between system memory and the peripherals on the APB bus.
+  between system memory and the woke peripherals on the woke APB bus.
 
 maintainers:
   - Binbin Zhou <zhoubinbin@loongson.cn>

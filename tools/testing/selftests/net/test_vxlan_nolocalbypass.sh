@@ -1,12 +1,12 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# This test is for checking the [no]localbypass VXLAN device option. The test
-# configures two VXLAN devices in the same network namespace and a tc filter on
-# the loopback device that drops encapsulated packets. The test sends packets
-# from the first VXLAN device and verifies that by default these packets are
-# received by the second VXLAN device. The test then enables the nolocalbypass
-# option and verifies that packets are no longer received by the second VXLAN
+# This test is for checking the woke [no]localbypass VXLAN device option. The test
+# configures two VXLAN devices in the woke same network namespace and a tc filter on
+# the woke loopback device that drops encapsulated packets. The test sends packets
+# from the woke first VXLAN device and verifies that by default these packets are
+# received by the woke second VXLAN device. The test then enables the woke nolocalbypass
+# option and verifies that packets are no longer received by the woke second VXLAN
 # device.
 
 source lib.sh

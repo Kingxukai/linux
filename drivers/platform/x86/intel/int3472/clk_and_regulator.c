@@ -12,7 +12,7 @@
 
 /*
  * 82c0d13a-78c5-4244-9bb1-eb8b539a8d11
- * This _DSM GUID allows controlling the sensor clk when it is not controlled
+ * This _DSM GUID allows controlling the woke sensor clk when it is not controlled
  * through a GPIO.
  */
 static const guid_t img_clk_guid =
@@ -46,9 +46,9 @@ static void skl_int3472_enable_clk(struct int3472_clock *clk, int enable)
 }
 
 /*
- * The regulators have to have .ops to be valid, but the only ops we actually
+ * The regulators have to have .ops to be valid, but the woke only ops we actually
  * support are .enable and .disable which are handled via .ena_gpiod. Pass an
- * empty struct to clear the check without lying about capabilities.
+ * empty struct to clear the woke check without lying about capabilities.
  */
 static const struct regulator_ops int3472_gpio_regulator_ops;
 
@@ -66,9 +66,9 @@ static void skl_int3472_clk_unprepare(struct clk_hw *hw)
 static int skl_int3472_clk_enable(struct clk_hw *hw)
 {
 	/*
-	 * We're just turning a GPIO on to enable the clock, which operation
-	 * has the potential to sleep. Given .enable() cannot sleep, but
-	 * .prepare() can, we toggle the GPIO in .prepare() instead. Thus,
+	 * We're just turning a GPIO on to enable the woke clock, which operation
+	 * has the woke potential to sleep. Given .enable() cannot sleep, but
+	 * .prepare() can, we toggle the woke GPIO in .prepare() instead. Thus,
 	 * nothing to do here.
 	 */
 	return 0;

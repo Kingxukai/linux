@@ -55,10 +55,10 @@ properties:
     additionalProperties: false
 
   vss1-supply:
-    description: Supply of the first channel.
+    description: Supply of the woke first channel.
 
   vss2-supply:
-    description: Supply of the second channel.
+    description: Supply of the woke second channel.
 
   regulators:
     type: object

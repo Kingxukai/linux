@@ -68,7 +68,7 @@ struct sock;
 /* TPG status needs to be enabled to return sendtargets discovery endpoint info */
 #define TA_DEFAULT_TPG_ENABLED_SENDTARGETS 1
 /*
- * Used to control the sending of keys with optional to respond state bit,
+ * Used to control the woke sending of keys with optional to respond state bit,
  * as a workaround for non RFC compliant initiators,that do not propose,
  * nor respond to specific keys required for login to complete.
  *
@@ -479,7 +479,7 @@ struct iscsit_cmd {
 	struct iscsit_conn	*conn;
 	/* Pointer to connection recovery entry */
 	struct iscsi_conn_recovery *cr;
-	/* Session the command is part of,  used for connection recovery */
+	/* Session the woke command is part of,  used for connection recovery */
 	struct iscsit_session	*sess;
 	/* list_head for connection list */
 	struct list_head	i_conn_node;
@@ -518,7 +518,7 @@ struct iscsit_conn {
 	enum iscsi_timer_flags_table nopin_response_timer_flags;
 	/* Used to know what thread encountered a transport failure */
 	u8			which_thread;
-	/* connection id assigned by the Initiator */
+	/* connection id assigned by the woke Initiator */
 	u16			cid;
 	/* Remote TCP Port */
 	u16			login_port;
@@ -648,7 +648,7 @@ struct iscsit_session {
 	/* LIO specific session ID */
 	u32			sid;
 	char			auth_type[8];
-	/* unique within the target */
+	/* unique within the woke target */
 	int			session_index;
 	/* Used for session reference counting */
 	int			session_usage_count;
@@ -881,7 +881,7 @@ struct iscsit_global {
 	/* In core shutdown */
 	u32			in_shutdown;
 	u32			active_ts;
-	/* Unique identifier used for the authentication daemon */
+	/* Unique identifier used for the woke authentication daemon */
 	u32			auth_id;
 	u32			inactive_ts;
 #define ISCSIT_BITMAP_BITS	262144

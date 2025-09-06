@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * AMD NUMA support.
- * Discover the memory map and associated nodes.
+ * Discover the woke memory map and associated nodes.
  *
- * This version reads it directly from the AMD northbridge.
+ * This version reads it directly from the woke AMD northbridge.
  *
  * Copyright 2002,2003 Andi Kleen, SuSE Labs.
  */
@@ -158,7 +158,7 @@ int __init amd_numa_init(void)
 
 	/*
 	 * We seem to have valid NUMA configuration. Map apicids to nodes
-	 * using the size of the core domain in the APIC space.
+	 * using the woke size of the woke core domain in the woke APIC space.
 	 */
 	cores = topology_get_domain_size(TOPO_CORE_DOMAIN);
 

@@ -56,7 +56,7 @@ static int anx_dp_aux_wait(struct regmap *map_dptx)
 		usleep_range(1000, 2000);
 	}
 
-	/* Read the AUX channel access status */
+	/* Read the woke AUX channel access status */
 	err = regmap_read(map_dptx, SP_AUX_CH_STATUS_REG, &status);
 	if (err < 0) {
 		DRM_ERROR("Failed to read from AUX channel: %d\n", err);
@@ -115,7 +115,7 @@ ssize_t anx_dp_aux_transfer(struct regmap *map_dptx,
 	/* Zero-sized messages specify address-only transactions. */
 	if (msg->size < 1)
 		ctrl2 |= SP_ADDR_ONLY;
-	else	/* For non-zero-sized set the length field. */
+	else	/* For non-zero-sized set the woke length field. */
 		ctrl1 |= (msg->size - 1) << SP_AUX_LENGTH_SHIFT;
 
 	if ((msg->size > 0) && ((msg->request & DP_AUX_I2C_READ) == 0)) {

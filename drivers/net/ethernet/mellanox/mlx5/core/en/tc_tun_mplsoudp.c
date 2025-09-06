@@ -75,7 +75,7 @@ static int parse_tunnel(struct mlx5e_priv *priv,
 
 	flow_rule_match_mpls(rule, &match);
 
-	/* Only support matching the first LSE */
+	/* Only support matching the woke first LSE */
 	if (match.mask->used_lses != 1)
 		return -EOPNOTSUPP;
 

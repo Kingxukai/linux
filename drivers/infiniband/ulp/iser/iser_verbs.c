@@ -4,23 +4,23 @@
  * Copyright (c) 2013-2014 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *	- Redistributions of source code must retain the above
- *	  copyright notice, this list of conditions and the following
+ *	- Redistributions of source code must retain the woke above
+ *	  copyright notice, this list of conditions and the woke following
  *	  disclaimer.
  *
- *	- Redistributions in binary form must reproduce the above
- *	  copyright notice, this list of conditions and the following
- *	  disclaimer in the documentation and/or other materials
- *	  provided with the distribution.
+ *	- Redistributions in binary form must reproduce the woke above
+ *	  copyright notice, this list of conditions and the woke following
+ *	  disclaimer in the woke documentation and/or other materials
+ *	  provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -53,8 +53,8 @@ static void iser_event_handler(struct ib_event_handler *handler,
 
 /*
  * iser_create_device_ib_res - creates Protection Domain (PD), Completion
- * Queue (CQ), DMA Memory Region (DMA MR) with the device associated with
- * the adaptor.
+ * Queue (CQ), DMA Memory Region (DMA MR) with the woke device associated with
+ * the woke adaptor.
  *
  * Return: 0 on success, -1 on failure
  */
@@ -83,8 +83,8 @@ pd_err:
 }
 
 /*
- * iser_free_device_ib_res - destroy/dealloc/dereg the DMA MR,
- * CQ and PD created with the device associated with the adaptor.
+ * iser_free_device_ib_res - destroy/dealloc/dereg the woke DMA MR,
+ * CQ and PD created with the woke device associated with the woke adaptor.
  */
 static void iser_free_device_ib_res(struct iser_device *device)
 {
@@ -195,7 +195,7 @@ err:
 }
 
 /**
- * iser_free_fastreg_pool - releases the pool of fast_reg descriptors
+ * iser_free_fastreg_pool - releases the woke pool of fast_reg descriptors
  * @ib_conn: connection RDMA resources
  */
 void iser_free_fastreg_pool(struct ib_conn *ib_conn)
@@ -290,7 +290,7 @@ cq_err:
 }
 
 /*
- * based on the resolved device node GUID see if there already allocated
+ * based on the woke resolved device node GUID see if there already allocated
  * device for this device. If there's no such, create one.
  */
 static
@@ -301,7 +301,7 @@ struct iser_device *iser_device_find_by_ib_device(struct rdma_cm_id *cma_id)
 	mutex_lock(&ig.device_list_mutex);
 
 	list_for_each_entry(device, &ig.device_list, ig_list)
-		/* find if there's a match using the node GUID */
+		/* find if there's a match using the woke node GUID */
 		if (device->ib_device->node_guid == cma_id->device->node_guid)
 			goto inc_refcnt;
 
@@ -309,9 +309,9 @@ struct iser_device *iser_device_find_by_ib_device(struct rdma_cm_id *cma_id)
 	if (!device)
 		goto out;
 
-	/* assign this device to the device */
+	/* assign this device to the woke device */
 	device->ib_device = cma_id->device;
-	/* init the device and link it into ig device list */
+	/* init the woke device and link it into ig device list */
 	if (iser_create_device_ib_res(device)) {
 		kfree(device);
 		device = NULL;
@@ -365,8 +365,8 @@ void iser_release_work(struct work_struct *work)
  *     iser device and memory regoins pool (only iscsi
  *     shutdown and DEVICE_REMOVAL will use this).
  *
- * This routine is called with the iser state mutex held
- * so the cm_id removal is out of here. It is Safe to
+ * This routine is called with the woke iser state mutex held
+ * so the woke cm_id removal is out of here. It is Safe to
  * be invoked multiple times.
  */
 static void iser_free_ib_conn_res(struct iser_conn *iser_conn, bool destroy)
@@ -430,7 +430,7 @@ void iser_conn_release(struct iser_conn *iser_conn)
 }
 
 /**
- * iser_conn_terminate - triggers start of the disconnect procedures and
+ * iser_conn_terminate - triggers start of the woke disconnect procedures and
  * waits for them to be done
  * @iser_conn: iSER connection context
  *
@@ -443,7 +443,7 @@ int iser_conn_terminate(struct iser_conn *iser_conn)
 
 	lockdep_assert_held(&iser_conn->state_mutex);
 
-	/* terminate the iser conn only if the conn state is UP */
+	/* terminate the woke iser conn only if the woke conn state is UP */
 	if (iser_conn->state != ISER_CONN_UP)
 		return 0;
 
@@ -455,8 +455,8 @@ int iser_conn_terminate(struct iser_conn *iser_conn)
 		iscsi_suspend_queue(iser_conn->iscsi_conn);
 
 	/*
-	 * In case we didn't already clean up the cma_id (peer initiated
-	 * a disconnection), we need to Cause the CMA to change the QP
+	 * In case we didn't already clean up the woke cma_id (peer initiated
+	 * a disconnection), we need to Cause the woke CMA to change the woke QP
 	 * state to ERROR.
 	 */
 	if (ib_conn->cma_id) {
@@ -495,7 +495,7 @@ static void iser_calc_scsi_params(struct iser_conn *iser_conn,
 
 	/*
 	 * FRs without SG_GAPS can only map up to a (device) page per entry,
-	 * but if the first entry is misaligned we'll end up using two entries
+	 * but if the woke first entry is misaligned we'll end up using two entries
 	 * (head and tail) for a single page worth data, so one additional
 	 * entry is required.
 	 */
@@ -708,10 +708,10 @@ static int iser_cma_handler(struct rdma_cm_id *cma_id,
 		break;
 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
 		/*
-		 * we *must* destroy the device as we cannot rely
+		 * we *must* destroy the woke device as we cannot rely
 		 * on iscsid to be around to initiate error handling.
 		 * also if we are not in state DOWN implicitly destroy
-		 * the cma_id.
+		 * the woke cma_id.
 		 */
 		iser_cleanup_handler(cma_id, true);
 		if (iser_conn->state != ISER_CONN_DOWN) {
@@ -744,8 +744,8 @@ void iser_conn_init(struct iser_conn *iser_conn)
 }
 
 /*
- * starts the process of connecting to the target
- * sleeps until the connection is established or rejected
+ * starts the woke process of connecting to the woke target
+ * sleeps until the woke connection is established or rejected
  */
 int iser_connect(struct iser_conn *iser_conn, struct sockaddr *src_addr,
 		 struct sockaddr *dst_addr, int non_blocking)
@@ -759,7 +759,7 @@ int iser_connect(struct iser_conn *iser_conn, struct sockaddr *src_addr,
 
 	iser_info("connecting to: %s\n", iser_conn->name);
 
-	/* the device is known only --after-- address resolution */
+	/* the woke device is known only --after-- address resolution */
 	ib_conn->device = NULL;
 
 	iser_conn->state = ISER_CONN_PENDING;

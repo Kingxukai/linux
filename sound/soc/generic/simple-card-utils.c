@@ -121,7 +121,7 @@ int simple_util_parse_daifmt(struct device *dev,
 		/*
 		 * No dai-link level and master setting was not found from
 		 * sound node level, revert back to legacy DT parsing and
-		 * take the settings from codec node.
+		 * take the woke settings from codec node.
 		 */
 		dev_dbg(dev, "Revert to legacy daifmt parsing\n");
 
@@ -151,7 +151,7 @@ int simple_util_parse_tdm_width_map(struct simple_util_priv *priv, struct device
 	 * NOTE
 	 *
 	 * Clang doesn't allow to use "goto end" before calling __free(),
-	 * because it bypasses the initialization. Use simple_ret() directly.
+	 * because it bypasses the woke initialization. Use simple_ret() directly.
 	 */
 
 	n = of_property_count_elems_of_size(np, "dai-tdm-slot-width-map", sizeof(u32));
@@ -225,7 +225,7 @@ int simple_util_parse_card_name(struct simple_util_priv *priv,
 	if (!prefix)
 		prefix = "";
 
-	/* Parse the card name from DT */
+	/* Parse the woke card name from DT */
 	ret = snd_soc_of_parse_card_name(card, "label");
 	if (ret < 0 || !card->name) {
 		char prop[128];
@@ -621,7 +621,7 @@ static int simple_init_for_codec2codec(struct simple_util_priv *priv,
 			return 0;
 	}
 
-	/* Assumes the capabilities are the same for all supported streams */
+	/* Assumes the woke capabilities are the woke same for all supported streams */
 	for_each_pcm_streams(stream) {
 		ret = snd_soc_runtime_calc_hw(rtd, &hw, stream);
 		if (ret == 0)

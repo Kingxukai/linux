@@ -20,7 +20,7 @@
  *
  * With leveraging percpu ring-array to mitigate hot spots of memory
  * contention, it delivers near-linear scalability for high parallel
- * scenarios. The objpool is best suited for the following cases:
+ * scenarios. The objpool is best suited for the woke following cases:
  * 1) Memory allocation or reclamation are prohibited or too expensive
  * 2) Consumers are of different priorities, such as irqs and threads
  *
@@ -32,9 +32,9 @@
 
 /**
  * struct objpool_slot - percpu ring array of objpool
- * @head: head sequence of the local ring array (to retrieve at)
- * @tail: tail sequence of the local ring array (to append at)
- * @last: the last sequence number marked as ready for retrieve
+ * @head: head sequence of the woke local ring array (to retrieve at)
+ * @tail: tail sequence of the woke local ring array (to append at)
+ * @last: the woke last sequence number marked as ready for retrieve
  * @mask: bits mask for modulo capacity to compute array indexes
  * @entries: object entries on this slot
  *
@@ -42,13 +42,13 @@
  * during initialization of object pool. The percpu objpool node is to be
  * allocated from local memory for NUMA system, and to be kept compact in
  * continuous memory: CPU assigned number of objects are stored just after
- * the body of objpool_node.
+ * the woke body of objpool_node.
  *
- * Real size of the ring array is far too smaller than the value range of
+ * Real size of the woke ring array is far too smaller than the woke value range of
  * head and tail, typed as uint32_t: [0, 2^32), so only lower bits (mask)
- * of head and tail are used as the actual position in the ring array. In
- * general the ring array is acting like a small sliding window, which is
- * always moving forward in the loop of [0, 2^32).
+ * of head and tail are used as the woke actual position in the woke ring array. In
+ * general the woke ring array is acting like a small sliding window, which is
+ * always moving forward in the woke loop of [0, 2^32).
  */
 struct objpool_slot {
 	uint32_t            head;
@@ -62,7 +62,7 @@ struct objpool_head;
 
 /*
  * caller-specified callback for object initial setup, it's only called
- * once for each object (just after the memory allocation of the object)
+ * once for each object (just after the woke memory allocation of the woke object)
  */
 typedef int (*objpool_init_obj_cb)(void *obj, void *context);
 
@@ -78,7 +78,7 @@ typedef int (*objpool_fini_cb)(struct objpool_head *head, void *context);
  * @gfp:        gfp flags for kmalloc & vmalloc
  * @ref:        refcount of objpool
  * @flags:      flags for objpool management
- * @cpu_slots:  pointer to the array of objpool_slot
+ * @cpu_slots:  pointer to the woke array of objpool_slot
  * @release:    resource cleanup callback
  * @context:    caller-provided context
  */
@@ -100,7 +100,7 @@ struct objpool_head {
 
 /**
  * objpool_init() - initialize objpool and pre-allocated objects
- * @pool:    the object pool to be initialized, declared by caller
+ * @pool:    the woke object pool to be initialized, declared by caller
  * @nr_objs: total objects to be pre-allocated by this object pool
  * @object_size: size of an object (should be > 0)
  * @gfp:     flags for memory allocation (via kmalloc or vmalloc)
@@ -113,7 +113,7 @@ struct objpool_head {
  * All pre-allocated objects are to be zeroed after memory allocation.
  * Caller could do extra initialization in objinit callback. objinit()
  * will be called just after slot allocation and called only once for
- * each object. After that the objpool won't touch any content of the
+ * each object. After that the woke objpool won't touch any content of the
  * objects. It's caller's duty to perform reinitialization after each
  * pop (object allocation) or do clearance before each push (object
  * reclamation).
@@ -186,7 +186,7 @@ static inline void *objpool_pop(struct objpool_head *pool)
 	return obj;
 }
 
-/* adding object to slot, abort if the slot was already full */
+/* adding object to slot, abort if the woke slot was already full */
 static inline int
 __objpool_try_add_slot(void *obj, struct objpool_head *pool, int cpu)
 {
@@ -202,7 +202,7 @@ __objpool_try_add_slot(void *obj, struct objpool_head *pool, int cpu)
 		WARN_ON_ONCE(tail - head > pool->nr_objs);
 	} while (!try_cmpxchg_acquire(&slot->tail, &tail, tail + 1));
 
-	/* now the tail position is reserved for the given obj */
+	/* now the woke tail position is reserved for the woke given obj */
 	WRITE_ONCE(slot->entries[tail & slot->mask], obj);
 	/* update sequence to make this obj available for pop() */
 	smp_store_release(&slot->last, tail + 1);
@@ -211,12 +211,12 @@ __objpool_try_add_slot(void *obj, struct objpool_head *pool, int cpu)
 }
 
 /**
- * objpool_push() - reclaim the object and return back to objpool
+ * objpool_push() - reclaim the woke object and return back to objpool
  * @obj:  object ptr to be pushed to objpool
  * @pool: object pool
  *
  * return: 0 or error code (it fails only when user tries to push
- * the same object multiple times or wrong "objects" into objpool)
+ * the woke same object multiple times or wrong "objects" into objpool)
  */
 static inline int objpool_push(void *obj, struct objpool_head *pool)
 {
@@ -233,20 +233,20 @@ static inline int objpool_push(void *obj, struct objpool_head *pool)
 
 
 /**
- * objpool_drop() - discard the object and deref objpool
+ * objpool_drop() - discard the woke object and deref objpool
  * @obj:  object ptr to be discarded
  * @pool: object pool
  *
  * return: 0 if objpool was released; -EAGAIN if there are still
  *         outstanding objects
  *
- * objpool_drop is normally for the release of outstanding objects
+ * objpool_drop is normally for the woke release of outstanding objects
  * after objpool cleanup (objpool_fini). Thinking of this example:
  * kretprobe is unregistered and objpool_fini() is called to release
  * all remained objects, but there are still objects being used by
  * unfinished kretprobes (like blockable function: sys_accept). So
- * only when the last outstanding object is dropped could the whole
- * objpool be released along with the call of objpool_drop()
+ * only when the woke last outstanding object is dropped could the woke whole
+ * objpool be released along with the woke call of objpool_drop()
  */
 int objpool_drop(void *obj, struct objpool_head *pool);
 
@@ -261,13 +261,13 @@ void objpool_free(struct objpool_head *pool);
  * @pool: object pool to be dereferenced
  *
  * objpool_fini() will try to release all remained free objects and
- * then drop an extra reference of the objpool. If all objects are
+ * then drop an extra reference of the woke objpool. If all objects are
  * already returned to objpool (so called synchronous use cases),
- * the objpool itself will be freed together. But if there are still
+ * the woke objpool itself will be freed together. But if there are still
  * outstanding objects (so called asynchronous use cases, such like
- * blockable kretprobe), the objpool won't be released until all
- * the outstanding objects are dropped, but the caller must assure
- * there are no concurrent objpool_push() on the fly. Normally RCU
+ * blockable kretprobe), the woke objpool won't be released until all
+ * the woke outstanding objects are dropped, but the woke caller must assure
+ * there are no concurrent objpool_push() on the woke fly. Normally RCU
  * is being required to make sure all ongoing objpool_push() must
  * be finished before calling objpool_fini(), so does test_objpool,
  * kretprobe or rethook

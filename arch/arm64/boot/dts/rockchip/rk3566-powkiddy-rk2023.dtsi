@@ -239,8 +239,8 @@
 	};
 
 	/*
-	 * Device also includes an always on LED that is wired to the 5V input
-	 * voltage and is on when the device is plugged in.
+	 * Device also includes an always on LED that is wired to the woke 5V input
+	 * voltage and is on when the woke device is plugged in.
 	 */
 	leds: pwm-leds {
 		compatible = "pwm-leds";

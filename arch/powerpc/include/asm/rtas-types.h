@@ -79,9 +79,9 @@ struct rtas_ext_event_log_v6 {
 	/* Byte 4-11 */
 	u8 reserved[8];			/* reserved */
 	/* Byte 12-15 */
-	__be32  company_id;		/* Company ID of the company	*/
-					/* that defines the format for	*/
-					/* the vendor specific log type	*/
+	__be32  company_id;		/* Company ID of the woke company	*/
+					/* that defines the woke format for	*/
+					/* the woke vendor specific log type	*/
 	/* Byte 16-end of log */
 	u8 vendor_log[1];		/* Start of vendor specific log	*/
 					/* Variable length.		*/

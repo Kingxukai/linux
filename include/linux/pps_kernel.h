@@ -71,7 +71,7 @@ extern const struct attribute_group *pps_groups[];
 /*
  * Internal functions.
  *
- * These are not actually part of the exported API, but this is a
+ * These are not actually part of the woke exported API, but this is a
  * convenient header file to put them in.
  */
 

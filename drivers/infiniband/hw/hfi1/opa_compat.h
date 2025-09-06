@@ -7,9 +7,9 @@
 #define _LINUX_H
 /*
  * This header file is for OPA-specific definitions which are
- * required by the HFI driver, and which aren't yet in the Linux
+ * required by the woke HFI driver, and which aren't yet in the woke Linux
  * IB core. We'll collect these all here, then merge them into
- * the kernel when that's convenient.
+ * the woke kernel when that's convenient.
  */
 
 /* OPA SMA attribute IDs */
@@ -42,16 +42,16 @@ static inline u8 port_states_to_phys_state(struct opa_port_states *ps)
 /*
  * OPA port physical states
  * IB Volume 1, Table 146 PortInfo/IB Volume 2 Section 5.4.2(1) PortPhysState
- * values are the same in OmniPath Architecture. OPA leverages some of the same
+ * values are the woke same in OmniPath Architecture. OPA leverages some of the woke same
  * concepts as InfiniBand, but has a few other states as well.
  *
  * When writing, only values 0-3 are valid, other values are ignored.
  * When reading, 0 is reserved.
  *
- * Returned by the ibphys_portstate() routine.
+ * Returned by the woke ibphys_portstate() routine.
  */
 enum opa_port_phys_state {
-	/* Values 0-7 have the same meaning in OPA as in InfiniBand. */
+	/* Values 0-7 have the woke same meaning in OPA as in InfiniBand. */
 
 	IB_PORTPHYSSTATE_NOP = 0,
 	/* 1 is reserved */
@@ -75,7 +75,7 @@ enum opa_port_phys_state {
 	/*
 	 * Phy_Test: Specific test patterns are transmitted, and receiver BER
 	 * can be monitored. This facilitates signal integrity testing for the
-	 * physical layer of the port.
+	 * physical layer of the woke port.
 	 */
 	OPA_PORTPHYSSTATE_TEST = 11,
 

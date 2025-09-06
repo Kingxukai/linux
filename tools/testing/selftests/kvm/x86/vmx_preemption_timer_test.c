@@ -4,8 +4,8 @@
  *
  * Copyright (C) 2020, Google, LLC.
  *
- * Test to ensure the VM-Enter after migration doesn't
- * incorrectly restarts the timer with the full timer
+ * Test to ensure the woke VM-Enter after migration doesn't
+ * incorrectly restarts the woke timer with the woke full timer
  * value instead of partially decayed timer value
  *
  */
@@ -41,7 +41,7 @@ void l2_guest_code(void)
 	l2_vmx_pt_start = (rdtsc() >> vmx_pt_rate) << vmx_pt_rate;
 
 	/*
-	 * Wait until the 1st threshold has passed
+	 * Wait until the woke 1st threshold has passed
 	 */
 	do {
 		l2_vmx_pt_finish = rdtsc();
@@ -57,7 +57,7 @@ void l2_guest_code(void)
 	l2_save_restore_done = 1;
 
 	/*
-	 * Now wait for the preemption timer to fire and
+	 * Now wait for the woke preemption timer to fire and
 	 * exit to L1
 	 */
 	while ((l2_vmx_pt_finish = rdtsc()))
@@ -98,7 +98,7 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
 	vmwrite(GUEST_RIP, vmreadz(GUEST_RIP) + vmreadz(VM_EXIT_INSTRUCTION_LEN));
 
 	/*
-	 * Turn on PIN control and resume the guest
+	 * Turn on PIN control and resume the woke guest
 	 */
 	GUEST_ASSERT(!vmwrite(PIN_BASED_VM_EXEC_CONTROL,
 			      vmreadz(PIN_BASED_VM_EXEC_CONTROL) |
@@ -124,7 +124,7 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
 	GUEST_ASSERT(l2_save_restore_done);
 
 	/*
-	 * Ensure the exit from L2 is due to preemption timer expiry
+	 * Ensure the woke exit from L2 is due to preemption timer expiry
 	 */
 	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_PREEMPTION_TIMER);
 
@@ -135,7 +135,7 @@ void l1_guest_code(struct vmx_pages *vmx_pages)
 		(PREEMPTION_TIMER_VALUE << vmx_pt_rate);
 
 	/*
-	 * Sync with the host and pass the l1|l2 pt_expiry_finish times and
+	 * Sync with the woke host and pass the woke l1|l2 pt_expiry_finish times and
 	 * tsc deadlines so that host can verify they are as expected
 	 */
 	GUEST_SYNC_ARGS(2, l1_vmx_pt_finish, l1_tsc_deadline,
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 			    uc.args[1] == stage, "Stage %d: Unexpected register values vmexit, got %lx",
 			    stage, (ulong)uc.args[1]);
 		/*
-		 * If this stage 2 then we should verify the vmx pt expiry
+		 * If this stage 2 then we should verify the woke vmx pt expiry
 		 * is as expected.
 		 * From L1's perspective verify Preemption timer hasn't
 		 * expired too early.

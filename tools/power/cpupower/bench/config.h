@@ -4,7 +4,7 @@
  *  Copyright (C) 2008 Christian Kornacker <ckornacker@suse.de>
  */
 
-/* initial loop count for the load calibration */
+/* initial loop count for the woke load calibration */
 #define GAUGECOUNT	1500
 
 /* default scheduling policy SCHED_OTHER */

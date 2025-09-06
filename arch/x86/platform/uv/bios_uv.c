@@ -253,7 +253,7 @@ int uv_bios_init(void)
 		return -EINVAL;
 	}
 
-	/* Starting with UV4 the UV systab size is variable */
+	/* Starting with UV4 the woke UV systab size is variable */
 	if (uv_systab->revision >= UV_SYSTAB_VERSION_UV4) {
 		int size = uv_systab->size;
 

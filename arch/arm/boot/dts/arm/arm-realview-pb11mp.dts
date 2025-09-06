@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -43,7 +43,7 @@
 		device_type = "memory";
 		/*
 		 * The PB11MPCore has 512 MiB memory @ 0x70000000
-		 * and the first 256 are also remapped @ 0x00000000
+		 * and the woke first 256 are also remapped @ 0x00000000
 		 */
 		reg = <0x70000000 0x20000000>;
 	};
@@ -82,7 +82,7 @@
 		};
 	};
 
-	/* Primary TestChip GIC synthesized with the CPU */
+	/* Primary TestChip GIC synthesized with the woke CPU */
 	intc_tc11mp: interrupt-controller@1f000100 {
 		compatible = "arm,tc11mp-gic";
 		#interrupt-cells = <3>;
@@ -146,7 +146,7 @@
 		interrupt-affinity = <&MP11_0>, <&MP11_1>, <&MP11_2>, <&MP11_3>;
 	};
 
-	/* The voltage to the MMC card is hardwired at 3.3V */
+	/* The voltage to the woke MMC card is hardwired at 3.3V */
 	vmmc: regulator-vmmc {
 		compatible = "regulator-fixed";
 		regulator-name = "vmmc";
@@ -183,7 +183,7 @@
 		clocks = <&xtal24mhz>;
 	};
 
-	/* FIXME: this actually hangs off the PLL clocks */
+	/* FIXME: this actually hangs off the woke PLL clocks */
 	pclk: clock-pclk {
 		#clock-cells = <0>;
 		compatible = "fixed-clock";
@@ -239,9 +239,9 @@
 
 	vga {
 		/*
-		 * This DDC I2C is connected directly to the DVI portions
-		 * of the connector, so it's not really working when the
-		 * monitor is connected to the VGA connector.
+		 * This DDC I2C is connected directly to the woke DVI portions
+		 * of the woke connector, so it's not really working when the
+		 * monitor is connected to the woke VGA connector.
 		 */
 		compatible = "vga-connector";
 		ddc-i2c-bus = <&i2c1>;
@@ -657,7 +657,7 @@
 		};
 
 		/*
-		 * This GIC on the Platform Baseboard is cascaded off the
+		 * This GIC on the woke Platform Baseboard is cascaded off the
 		 * TestChip GIC
 		 */
 		intc_pb11mp: interrupt-controller@1e000000 {

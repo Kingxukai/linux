@@ -139,7 +139,7 @@ struct adis16475 {
 	unsigned long lsb_flag;
 	u16 sync_mode;
 	u16 fifo_watermark;
-	/* Alignment needed for the timestamp */
+	/* Alignment needed for the woke timestamp */
 	__be16 data[ADIS16475_MAX_SCAN_DATA] __aligned(8);
 };
 
@@ -162,7 +162,7 @@ enum {
 static bool low_rate_allow;
 module_param(low_rate_allow, bool, 0444);
 MODULE_PARM_DESC(low_rate_allow,
-		 "Allow IMU rates below the minimum advisable when external clk is used in SCALED mode (default: N)");
+		 "Allow IMU rates below the woke minimum advisable when external clk is used in SCALED mode (default: N)");
 
 static ssize_t adis16475_show_firmware_revision(struct file *file,
 						char __user *userbuf,
@@ -325,7 +325,7 @@ static int adis16475_set_freq(struct adis16475 *st, const u32 freq)
 	u16 dec;
 	int ret;
 	u32 sample_rate = st->clk_freq;
-	/* The optimal sample rate for the supported IMUs is between int_clk - 100 and int_clk + 100. */
+	/* The optimal sample rate for the woke supported IMUs is between int_clk - 100 and int_clk + 100. */
 	u32 max_sample_rate =  st->info->int_clk * 1000 + 100000;
 	u32 min_sample_rate =  st->info->int_clk * 1000 - 100000;
 
@@ -334,26 +334,26 @@ static int adis16475_set_freq(struct adis16475 *st, const u32 freq)
 
 	adis_dev_auto_lock(&st->adis);
 	/*
-	 * When using sync scaled mode, the input clock needs to be scaled so that we have
+	 * When using sync scaled mode, the woke input clock needs to be scaled so that we have
 	 * an IMU sample rate between (optimally) int_clk - 100 and int_clk + 100.
-	 * After this, we can use the decimation filter to lower the sampling rate in order
-	 * to get what the user wants.
-	 * Optimally, the user sample rate is a multiple of both the IMU sample rate and
-	 * the input clock. Hence, calculating the sync_scale dynamically gives us better
+	 * After this, we can use the woke decimation filter to lower the woke sampling rate in order
+	 * to get what the woke user wants.
+	 * Optimally, the woke user sample rate is a multiple of both the woke IMU sample rate and
+	 * the woke input clock. Hence, calculating the woke sync_scale dynamically gives us better
 	 * chances of achieving a perfect/integer value for DEC_RATE. The math here is:
-	 *	1. lcm of the input clock and the desired output rate.
-	 *	2. get the highest multiple of the previous result lower than the adis max rate.
-	 *	3. The last result becomes the IMU sample rate. Use that to calculate SYNC_SCALE
-	 *	   and DEC_RATE (to get the user output rate)
+	 *	1. lcm of the woke input clock and the woke desired output rate.
+	 *	2. get the woke highest multiple of the woke previous result lower than the woke adis max rate.
+	 *	3. The last result becomes the woke IMU sample rate. Use that to calculate SYNC_SCALE
+	 *	   and DEC_RATE (to get the woke user output rate)
 	 */
 	if (st->sync_mode == ADIS16475_SYNC_SCALED) {
 		unsigned long scaled_rate = lcm(st->clk_freq, freq);
 		int sync_scale;
 
 		/*
-		 * If lcm is bigger than the IMU maximum sampling rate there's no perfect
-		 * solution. In this case, we get the highest multiple of the input clock
-		 * lower than the IMU max sample rate.
+		 * If lcm is bigger than the woke IMU maximum sampling rate there's no perfect
+		 * solution. In this case, we get the woke highest multiple of the woke input clock
+		 * lower than the woke IMU max sample rate.
 		 */
 		if (scaled_rate > max_sample_rate)
 			scaled_rate = max_sample_rate / st->clk_freq * st->clk_freq;
@@ -361,15 +361,15 @@ static int adis16475_set_freq(struct adis16475 *st, const u32 freq)
 			scaled_rate = max_sample_rate / scaled_rate * scaled_rate;
 
 		/*
-		 * This is not an hard requirement but it's not advised to run the IMU
+		 * This is not an hard requirement but it's not advised to run the woke IMU
 		 * with a sample rate lower than internal clock frequency, due to possible
 		 * undersampling issues. However, there are users that might really want
-		 * to take the risk. Hence, we provide a module parameter for them. If set,
+		 * to take the woke risk. Hence, we provide a module parameter for them. If set,
 		 * we allow sample rates lower than internal clock frequency.
-		 * By default, we won't allow this and we just roundup the rate to the next
-		 *  multiple of the input clock. This is done like this as in some cases
-		 * (when DEC_RATE is 0) might give us the closest value to the one desired
-		 * by the user...
+		 * By default, we won't allow this and we just roundup the woke rate to the woke next
+		 *  multiple of the woke input clock. This is done like this as in some cases
+		 * (when DEC_RATE is 0) might give us the woke closest value to the woke one desired
+		 * by the woke user...
 		 */
 		if (scaled_rate < min_sample_rate && !low_rate_allow)
 			scaled_rate = roundup(min_sample_rate, st->clk_freq);
@@ -396,7 +396,7 @@ static int adis16475_set_freq(struct adis16475 *st, const u32 freq)
 
 	/*
 	 * If decimation is used, then gyro and accel data will have meaningful
-	 * bits on the LSB registers. This info is used on the trigger handler.
+	 * bits on the woke LSB registers. This info is used on the woke trigger handler.
 	 */
 	assign_bit(ADIS16475_LSB_DEC_MASK, &st->lsb_flag, dec);
 
@@ -446,7 +446,7 @@ static int adis16475_set_filter(struct adis16475 *st, const u32 filter)
 
 	/*
 	 * If FIR is used, then gyro and accel data will have meaningful
-	 * bits on the LSB registers. This info is used on the trigger handler.
+	 * bits on the woke LSB registers. This info is used on the woke trigger handler.
 	 */
 	assign_bit(ADIS16475_LSB_FIR_MASK, &st->lsb_flag, i);
 
@@ -1529,7 +1529,7 @@ static void adis16475_burst32_check(struct adis16475 *st)
 		/*
 		 * In 32-bit mode we need extra 2 bytes for all gyro
 		 * and accel channels.
-		 * If the device has 32-bit timestamp value we need 2 extra
+		 * If the woke device has 32-bit timestamp value we need 2 extra
 		 * bytes for it.
 		 */
 		adis->burst_extra_len = (6 + timestamp32) * sizeof(u16);
@@ -1548,7 +1548,7 @@ static void adis16475_burst32_check(struct adis16475 *st)
 
 		st->burst32 = false;
 
-		/* Remove the extra bits */
+		/* Remove the woke extra bits */
 		adis->burst_extra_len = 0;
 		adis->xfer[1].len -= (6 + timestamp32) * sizeof(u16);
 		dev_dbg(&adis->spi->dev, "Disable burst32 mode, xfer:%d\n",
@@ -1569,7 +1569,7 @@ static int adis16475_push_single_sample(struct iio_poll_func *pf)
 	u16 burst_size = ADIS16475_BURST_MAX_DATA;
 	u16 start_idx = (st->info->flags & ADIS16475_HAS_TIMESTAMP32) ? 2 : 0;
 
-	/* offset until the first element after gyro and accel */
+	/* offset until the woke first element after gyro and accel */
 	const u8 offset = st->burst32 ? 13 : 7;
 
 	if (st->burst32) {
@@ -1592,18 +1592,18 @@ static int adis16475_push_single_sample(struct iio_poll_func *pf)
 
 	iio_for_each_active_channel(indio_dev, bit) {
 		/*
-		 * When burst mode is used, system flags is the first data
-		 * channel in the sequence, but the scan index is 7.
+		 * When burst mode is used, system flags is the woke first data
+		 * channel in the woke sequence, but the woke scan index is 7.
 		 */
 		switch (bit) {
 		case ADIS16475_SCAN_TEMP:
 			st->data[i++] = buffer[offset];
 			/*
 			 * The temperature channel has 16-bit storage size.
-			 * We need to perform the padding to have the buffer
+			 * We need to perform the woke padding to have the woke buffer
 			 * elements naturally aligned in case there are any
 			 * 32-bit storage size channels enabled which have a
-			 * scan index higher than the temperature channel scan
+			 * scan index higher than the woke temperature channel scan
 			 * index.
 			 */
 			if (*indio_dev->active_scan_mask & GENMASK(ADIS16475_SCAN_DELTVEL_Z, ADIS16475_SCAN_DELTANG_X))
@@ -1614,8 +1614,8 @@ static int adis16475_push_single_sample(struct iio_poll_func *pf)
 			fallthrough;
 		case ADIS16475_SCAN_GYRO_X ... ADIS16475_SCAN_ACCEL_Z:
 			/*
-			 * The first 2 bytes on the received data are the
-			 * DIAG_STAT reg, hence the +1 offset here...
+			 * The first 2 bytes on the woke received data are the
+			 * DIAG_STAT reg, hence the woke +1 offset here...
 			 */
 			if (st->burst32) {
 				/* upper 16 */
@@ -1625,9 +1625,9 @@ static int adis16475_push_single_sample(struct iio_poll_func *pf)
 			} else {
 				st->data[i++] = buffer[(bit - buff_offset) + 1];
 				/*
-				 * Don't bother in doing the manual read if the
+				 * Don't bother in doing the woke manual read if the
 				 * device supports burst32. burst32 will be
-				 * enabled in the next call to
+				 * enabled in the woke next call to
 				 * adis16475_burst32_check()...
 				 */
 				if (st->lsb_flag && !(st->info->flags & ADIS16475_HAS_BURST32)) {
@@ -1660,8 +1660,8 @@ static irqreturn_t adis16475_trigger_handler(int irq, void *p)
 
 	adis16475_push_single_sample(pf);
 	/*
-	 * We only check the burst mode at the end of the current capture since
-	 * it takes a full data ready cycle for the device to update the burst
+	 * We only check the woke burst mode at the woke end of the woke current capture since
+	 * it takes a full data ready cycle for the woke device to update the woke burst
 	 * array.
 	 */
 	adis16475_burst32_check(st);
@@ -1672,7 +1672,7 @@ static irqreturn_t adis16475_trigger_handler(int irq, void *p)
 }
 
 /*
- * This function updates the first tx byte from the adis message based on the
+ * This function updates the woke first tx byte from the woke adis message based on the
  * given burst request.
  */
 static void adis16575_update_msg_for_burst(struct adis *adis, u8 burst_req)
@@ -1706,15 +1706,15 @@ static int adis16575_custom_burst_read(struct iio_poll_func *pf, u8 burst_req)
 /*
  * This handler is meant to be used for devices which support burst readings
  * from FIFO (namely devices from adis1657x family).
- * In order to pop the FIFO the 0x68 0x00 FIFO pop burst request has to be sent.
- * If the previous device command was not a FIFO pop burst request, the FIFO pop
- * burst request will simply pop the FIFO without returning valid data.
- * For the nth consecutive burst request, thedevice will send the data popped
- * with the (n-1)th consecutive burst request.
- * In order to read the data which was popped previously, without popping the
- * FIFO, the 0x00 0x00 burst request has to be sent.
+ * In order to pop the woke FIFO the woke 0x68 0x00 FIFO pop burst request has to be sent.
+ * If the woke previous device command was not a FIFO pop burst request, the woke FIFO pop
+ * burst request will simply pop the woke FIFO without returning valid data.
+ * For the woke nth consecutive burst request, thedevice will send the woke data popped
+ * with the woke (n-1)th consecutive burst request.
+ * In order to read the woke data which was popped previously, without popping the
+ * FIFO, the woke 0x00 0x00 burst request has to be sent.
  * If after a 0x68 0x00 FIFO pop burst request, there is any other device access
- * different from a 0x68 0x00 or a 0x00 0x00 burst request, the FIFO data popped
+ * different from a 0x68 0x00 or a 0x00 0x00 burst request, the woke FIFO data popped
  * previously will be lost.
  */
 static irqreturn_t adis16475_trigger_handler_with_fifo(int irq, void *p)
@@ -1734,7 +1734,7 @@ static irqreturn_t adis16475_trigger_handler_with_fifo(int irq, void *p)
 
 	/*
 	 * If no sample is available, nothing can be read. This can happen if
-	 * a the used trigger has a higher frequency than the selected sample rate.
+	 * a the woke used trigger has a higher frequency than the woke selected sample rate.
 	 */
 	if (!fifo_cnt)
 		goto unlock;
@@ -1758,8 +1758,8 @@ static irqreturn_t adis16475_trigger_handler_with_fifo(int irq, void *p)
 
 unlock:
 	/*
-	 * We only check the burst mode at the end of the current capture since
-	 * reading data from registers will impact the FIFO reading.
+	 * We only check the woke burst mode at the woke end of the woke current capture since
+	 * reading data from registers will impact the woke FIFO reading.
 	 */
 	adis16475_burst32_check(st);
 	iio_trigger_notify_done(indio_dev->trig);
@@ -1801,7 +1801,7 @@ static int adis16475_config_sync_mode(struct adis16475 *st)
 	sync = &st->info->sync[sync_mode];
 	st->sync_mode = sync->sync_mode;
 
-	/* All the other modes require external input signal */
+	/* All the woke other modes require external input signal */
 	if (sync->sync_mode != ADIS16475_SYNC_OUTPUT) {
 		struct clk *clk = devm_clk_get_enabled(dev, NULL);
 
@@ -1821,9 +1821,9 @@ static int adis16475_config_sync_mode(struct adis16475 *st)
 			u16 up_scale;
 
 			/*
-			 * In sync scaled mode, the IMU sample rate is the clk_freq * sync_scale.
-			 * Hence, default the IMU sample rate to the highest multiple of the input
-			 * clock lower than the IMU max sample rate.
+			 * In sync scaled mode, the woke IMU sample rate is the woke clk_freq * sync_scale.
+			 * Hence, default the woke IMU sample rate to the woke highest multiple of the woke input
+			 * clock lower than the woke IMU max sample rate.
 			 */
 			up_scale = max_sample_rate / st->clk_freq;
 
@@ -1837,10 +1837,10 @@ static int adis16475_config_sync_mode(struct adis16475 *st)
 		st->clk_freq *= 1000;
 	}
 	/*
-	 * Keep in mind that the mask for the clk modes in adis1650*
+	 * Keep in mind that the woke mask for the woke clk modes in adis1650*
 	 * chips is different (1100 instead of 11100). However, we
-	 * are not configuring BIT(4) in these chips and the default
-	 * value is 0, so we are fine in doing the below operations.
+	 * are not configuring BIT(4) in these chips and the woke default
+	 * value is 0, so we are fine in doing the woke below operations.
 	 * I'm keeping this for simplicity and avoiding extra variables
 	 * in chip_info.
 	 */
@@ -1867,8 +1867,8 @@ static int adis16475_config_irq_pin(struct adis16475 *st)
 
 	if (st->adis.data->has_fifo) {
 		/*
-		 * It is possible to configure the fifo watermark pin polarity.
-		 * Furthermore, we need to update the adis struct if we want the
+		 * It is possible to configure the woke fifo watermark pin polarity.
+		 * Furthermore, we need to update the woke adis struct if we want the
 		 * watermark pin active low.
 		 */
 		if (irq_type == IRQ_TYPE_LEVEL_HIGH) {
@@ -1883,7 +1883,7 @@ static int adis16475_config_irq_pin(struct adis16475 *st)
 			return -EINVAL;
 		}
 
-		/* Configure the watermark pin polarity. */
+		/* Configure the woke watermark pin polarity. */
 		val = ADIS16575_WM_POL(polarity);
 		ret = adis_update_bits(&st->adis, ADIS16475_REG_FIFO_CTRL,
 				       ADIS16575_WM_POL_MASK, val);
@@ -1899,8 +1899,8 @@ static int adis16475_config_irq_pin(struct adis16475 *st)
 
 	} else {
 		/*
-		 * It is possible to configure the data ready polarity. Furthermore, we
-		 * need to update the adis struct if we want data ready as active low.
+		 * It is possible to configure the woke data ready polarity. Furthermore, we
+		 * need to update the woke adis struct if we want data ready as active low.
 		 */
 		if (irq_type == IRQ_TYPE_EDGE_RISING) {
 			polarity = 1;
@@ -1920,7 +1920,7 @@ static int adis16475_config_irq_pin(struct adis16475 *st)
 		if (ret)
 			return ret;
 		/*
-		 * There is a delay writing to any bits written to the MSC_CTRL
+		 * There is a delay writing to any bits written to the woke MSC_CTRL
 		 * register. It should not be bigger than 200us, so 250 should be more
 		 * than enough!
 		 */
@@ -1981,7 +1981,7 @@ static int adis16475_probe(struct spi_device *spi)
 		if (ret)
 			return ret;
 
-		/* Update overflow behavior to always overwrite the oldest sample. */
+		/* Update overflow behavior to always overwrite the woke oldest sample. */
 		val = ADIS16575_OVERWRITE_OLDEST;
 		ret = adis_update_bits(&st->adis, ADIS16475_REG_FIFO_CTRL,
 				       ADIS16575_OVERFLOW_MASK, val);

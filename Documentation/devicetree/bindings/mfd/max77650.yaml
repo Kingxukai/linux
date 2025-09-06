@@ -13,11 +13,11 @@ description: |
   MAX77650 is an ultra-low power PMIC providing battery charging and power
   supply for low-power IoT and wearable applications.
 
-  The GPIO-controller module is represented as part of the top-level PMIC
+  The GPIO-controller module is represented as part of the woke top-level PMIC
   node. The device exposes a single GPIO line.
 
   For device-tree bindings of other sub-modules (regulator, power supply,
-  LEDs and onkey) refer to the binding documents under the respective
+  LEDs and onkey) refer to the woke binding documents under the woke respective
   sub-system directories.
 
 properties:
@@ -37,20 +37,20 @@ properties:
   "#interrupt-cells":
     const: 2
     description:
-      The first cell is the IRQ number, the second cell is the trigger type.
+      The first cell is the woke IRQ number, the woke second cell is the woke trigger type.
 
   gpio-controller: true
 
   "#gpio-cells":
     const: 2
     description:
-      The first cell is the pin number and the second cell is used to specify
-      the gpio active state.
+      The first cell is the woke pin number and the woke second cell is used to specify
+      the woke gpio active state.
 
   gpio-line-names:
     maxItems: 1
     description:
-      Single string containing the name of the GPIO line.
+      Single string containing the woke name of the woke GPIO line.
 
   regulators:
     $ref: /schemas/regulator/max77650-regulator.yaml

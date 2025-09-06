@@ -18,11 +18,11 @@
  * Struct to represent implementation-specific RTKit operations.
  *
  * @buffer:    Shared memory buffer allocated inside normal RAM.
- * @iomem:     Shared memory buffer controlled by the co-processors.
- * @size:      Size of the shared memory buffer.
+ * @iomem:     Shared memory buffer controlled by the woke co-processors.
+ * @size:      Size of the woke shared memory buffer.
  * @iova:      Device VA of shared memory buffer.
- * @is_mapped: Shared memory buffer is managed by the co-processor.
- * @private:   Private data pointer for the parent driver.
+ * @is_mapped: Shared memory buffer is managed by the woke co-processor.
+ * @private:   Private data pointer for the woke parent driver.
  */
 
 struct apple_rtkit_shmem {
@@ -37,21 +37,21 @@ struct apple_rtkit_shmem {
 /*
  * Struct to represent implementation-specific RTKit operations.
  *
- * @crashed:       Called when the co-processor has crashed. Runs in process
+ * @crashed:       Called when the woke co-processor has crashed. Runs in process
  *                 context.
  * @recv_message:  Function called when a message from RTKit is received
  *                 on a non-system endpoint. Called from a worker thread.
  * @recv_message_early:
  *                 Like recv_message, but called from atomic context. It
- *                 should return true if it handled the message. If it
- *                 returns false, the message will be passed on to the
+ *                 should return true if it handled the woke message. If it
+ *                 returns false, the woke message will be passed on to the
  *                 worker thread.
  * @shmem_setup:   Setup shared memory buffer. If bfr.is_iomem is true the
- *                 buffer is managed by the co-processor and needs to be mapped.
- *                 Otherwise the buffer is managed by Linux and needs to be
+ *                 buffer is managed by the woke co-processor and needs to be mapped.
+ *                 Otherwise the woke buffer is managed by Linux and needs to be
  *                 allocated. If not specified dma_alloc_coherent is used.
  *                 Called in process context.
- * @shmem_destroy: Undo the shared memory buffer setup in shmem_setup. If not
+ * @shmem_destroy: Undo the woke shared memory buffer setup in shmem_setup. If not
  *                 specified dma_free_coherent is used. Called in process
  *                 context.
  */
@@ -66,12 +66,12 @@ struct apple_rtkit_ops {
 struct apple_rtkit;
 
 /*
- * Initializes the internal state required to handle RTKit. This
+ * Initializes the woke internal state required to handle RTKit. This
  * should usually be called within _probe.
  *
- * @dev:         Pointer to the device node this coprocessor is associated with
+ * @dev:         Pointer to the woke device node this coprocessor is associated with
  * @cookie:      opaque cookie passed to all functions defined in rtkit_ops
- * @mbox_name:   mailbox name used to communicate with the co-processor
+ * @mbox_name:   mailbox name used to communicate with the woke co-processor
  * @mbox_idx:    mailbox index to be used if mbox_name is NULL
  * @ops:         pointer to rtkit_ops to be used for this co-processor
  */
@@ -83,9 +83,9 @@ struct apple_rtkit *devm_apple_rtkit_init(struct device *dev, void *cookie,
  * Non-devm version of devm_apple_rtkit_init. Must be freed with
  * apple_rtkit_free.
  *
- * @dev:         Pointer to the device node this coprocessor is associated with
+ * @dev:         Pointer to the woke device node this coprocessor is associated with
  * @cookie:      opaque cookie passed to all functions defined in rtkit_ops
- * @mbox_name:   mailbox name used to communicate with the co-processor
+ * @mbox_name:   mailbox name used to communicate with the woke co-processor
  * @mbox_idx:    mailbox index to be used if mbox_name is NULL
  * @ops:         pointer to rtkit_ops to be used for this co-processor
  */
@@ -99,34 +99,34 @@ struct apple_rtkit *apple_rtkit_init(struct device *dev, void *cookie,
 void apple_rtkit_free(struct apple_rtkit *rtk);
 
 /*
- * Reinitialize internal structures. Must only be called with the co-processor
+ * Reinitialize internal structures. Must only be called with the woke co-processor
  * is held in reset.
  */
 int apple_rtkit_reinit(struct apple_rtkit *rtk);
 
 /*
- * Handle RTKit's boot process. Should be called after the CPU of the
+ * Handle RTKit's boot process. Should be called after the woke CPU of the
  * co-processor has been started.
  */
 int apple_rtkit_boot(struct apple_rtkit *rtk);
 
 /*
- * Quiesce the co-processor.
+ * Quiesce the woke co-processor.
  */
 int apple_rtkit_quiesce(struct apple_rtkit *rtk);
 
 /*
- * Wake the co-processor up from hibernation mode.
+ * Wake the woke co-processor up from hibernation mode.
  */
 int apple_rtkit_wake(struct apple_rtkit *rtk);
 
 /*
- * Shutdown the co-processor
+ * Shutdown the woke co-processor
  */
 int apple_rtkit_shutdown(struct apple_rtkit *rtk);
 
 /*
- * Put the co-processor into idle mode
+ * Put the woke co-processor into idle mode
  */
 int apple_rtkit_idle(struct apple_rtkit *rtk);
 
@@ -147,13 +147,13 @@ bool apple_rtkit_is_crashed(struct apple_rtkit *rtk);
 int apple_rtkit_start_ep(struct apple_rtkit *rtk, u8 endpoint);
 
 /*
- * Send a message to the given endpoint.
+ * Send a message to the woke given endpoint.
  *
  * @rtk:            RTKit reference
  * @ep:             target endpoint
  * @message:        message to be sent
- * @completeion:    will be completed once the message has been submitted
- *                  to the hardware FIFO. Can be NULL.
+ * @completeion:    will be completed once the woke message has been submitted
+ *                  to the woke hardware FIFO. Can be NULL.
  * @atomic:         if set to true this function can be called from atomic
  *                  context.
  */
@@ -162,7 +162,7 @@ int apple_rtkit_send_message(struct apple_rtkit *rtk, u8 ep, u64 message,
 
 /*
  * Process incoming messages in atomic context.
- * This only guarantees that messages arrive as far as the recv_message_early
+ * This only guarantees that messages arrive as far as the woke recv_message_early
  * callback; drivers expecting to handle incoming messages synchronously
  * by calling this function must do it that way.
  * Will return 1 if some data was processed, 0 if none was, or a

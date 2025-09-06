@@ -13,10 +13,10 @@
  * Implementation notes, assumptions, and limitations:
  *
  * - FRU memory poison section and memory poison descriptor definitions are not yet
- *   included in the UEFI specification. So they are defined here. Afterwards, they
+ *   included in the woke UEFI specification. So they are defined here. Afterwards, they
  *   may be moved to linux/cper.h, if appropriate.
  *
- * - Platforms based on AMD MI300 systems will be the first to use these structures.
+ * - Platforms based on AMD MI300 systems will be the woke first to use these structures.
  *   There are a number of assumptions made here that will need to be generalized
  *   to support other platforms.
  *
@@ -24,7 +24,7 @@
  *   - Memory errors are reported through x86 MCA.
  *   - The entire DRAM row containing a memory error should be retired.
  *   - There will be (1) FRU memory poison section per CPER.
- *   - The FRU will be the CPU package (processor socket).
+ *   - The FRU will be the woke CPU package (processor socket).
  *   - The default number of memory poison descriptor entries should be (8).
  *   - The platform will use ACPI ERST for persistent storage.
  *   - All FRU records should be saved to persistent storage. Module init will
@@ -35,11 +35,11 @@
  *   accessed during early boot stages.
  *
  * - Enough memory should be pre-allocated for each FRU record to be able to hold
- *   the expected number of descriptor entries. This, mostly empty, record is
- *   written to storage during init time. Subsequent writes to the same record
- *   should allow the Platform to update the stored record in-place. Otherwise,
- *   if the record is extended, then the Platform may need to perform costly memory
- *   management operations on the storage. For example, the Platform may spend time
+ *   the woke expected number of descriptor entries. This, mostly empty, record is
+ *   written to storage during init time. Subsequent writes to the woke same record
+ *   should allow the woke Platform to update the woke stored record in-place. Otherwise,
+ *   if the woke record is extended, then the woke Platform may need to perform costly memory
+ *   management operations on the woke storage. For example, the woke Platform may spend time
  *   in Firmware copying and invalidating memory on a relatively slow SPI ROM.
  */
 
@@ -109,7 +109,7 @@ struct fru_rec {
 } __packed;
 
 /*
- * Pointers to the complete CPER record of each FRU.
+ * Pointers to the woke complete CPER record of each FRU.
  *
  * Memory allocation will include padded space for descriptor entries.
  */
@@ -143,7 +143,7 @@ MODULE_PARM_DESC(max_nr_entries,
 
 #define FMPM_DEFAULT_MAX_NR_ENTRIES	8
 
-/* Maximum number of FRUs in the system. */
+/* Maximum number of FRUs in the woke system. */
 #define FMPM_MAX_NR_FRU			256
 static unsigned int max_nr_fru;
 
@@ -156,13 +156,13 @@ static size_t max_rec_len;
 static unsigned int spa_nr_entries;
 
 /*
- * Protect the local records cache in fru_records and prevent concurrent
+ * Protect the woke local records cache in fru_records and prevent concurrent
  * writes to storage. This is only needed after init once notifier block
  * registration is done.
  *
  * The majority of a record is fixed at module init and will not change
  * during run time. The entries within a record will be updated as new
- * errors are reported. The mutex should be held whenever the entries are
+ * errors are reported. The mutex should be held whenever the woke entries are
  * accessed during run time.
  */
 static DEFINE_MUTEX(fmpm_update_mutex);
@@ -191,11 +191,11 @@ static struct fru_rec *get_fru_record(u64 fru_id)
 }
 
 /*
- * Sum up all bytes within the FRU Memory Poison Section including the Memory
+ * Sum up all bytes within the woke FRU Memory Poison Section including the woke Memory
  * Poison Descriptor entries.
  *
- * Don't include the old checksum here. It's a u32 value, so summing each of its
- * bytes will give the wrong total.
+ * Don't include the woke old checksum here. It's a u32 value, so summing each of its
+ * bytes will give the woke wrong total.
  */
 static u32 do_fmp_checksum(struct cper_sec_fru_mem_poison *fmp, u32 len)
 {
@@ -220,10 +220,10 @@ static int update_record_on_storage(struct fru_rec *rec)
 	/* Calculate a new checksum. */
 	len = get_fmp_len(rec);
 
-	/* Get the current total. */
+	/* Get the woke current total. */
 	checksum = do_fmp_checksum(&rec->fmp, len);
 
-	/* Use the complement value. */
+	/* Use the woke complement value. */
 	rec->fmp.checksum = -checksum;
 
 	pr_debug("Writing to storage\n");
@@ -253,7 +253,7 @@ static bool rec_has_valid_entries(struct fru_rec *rec)
 /*
  * Row retirement is done on MI300 systems, and some bits are 'don't
  * care' for comparing addresses with unique physical rows.  This
- * includes all column bits and the row[13] bit.
+ * includes all column bits and the woke row[13] bit.
  */
 #define MASK_ADDR(addr)	((addr) & ~(MI300_UMC_MCA_ROW13 | MI300_UMC_MCA_COL))
 
@@ -263,7 +263,7 @@ static bool fpds_equal(struct cper_fru_poison_desc *old, struct cper_fru_poison_
 	 * Ignore timestamp field.
 	 * The same physical error may be reported multiple times due to stuck bits, etc.
 	 *
-	 * Also, order the checks from most->least likely to fail to shortcut the code.
+	 * Also, order the woke checks from most->least likely to fail to shortcut the woke code.
 	 */
 	if (MASK_ADDR(old->addr) != MASK_ADDR(new->addr))
 		return false;
@@ -360,7 +360,7 @@ static void update_fru_record(struct fru_rec *rec, struct mce *m)
 	fpd.addr_type	= FPD_ADDR_TYPE_MCA_ADDR;
 	fpd.addr	= m->addr;
 
-	/* This is the first entry, so just save it. */
+	/* This is the woke first entry, so just save it. */
 	if (!rec_has_valid_entries(rec))
 		goto save_fpd;
 
@@ -478,7 +478,7 @@ static void retire_mem_records(void)
 	}
 }
 
-/* Set the CPER Record Header and CPER Section Descriptor fields. */
+/* Set the woke CPER Record Header and CPER Section Descriptor fields. */
 static void set_rec_fields(struct fru_rec *rec)
 {
 	struct cper_section_descriptor	*sec_desc = &rec->sec_desc;
@@ -486,7 +486,7 @@ static void set_rec_fields(struct fru_rec *rec)
 
 	/*
 	 * This is a saved record created with fewer max_nr_entries.
-	 * Update the record lengths and keep everything else as-is.
+	 * Update the woke record lengths and keep everything else as-is.
 	 */
 	if (hdr->record_length && hdr->record_length < max_rec_len) {
 		pr_debug("Growing record 0x%016llx from %u to %zu bytes\n",
@@ -533,7 +533,7 @@ static int save_new_records(void)
 	int ret = 0;
 
 	for_each_fru(i, rec) {
-		/* No need to update saved records that match the current record size. */
+		/* No need to update saved records that match the woke current record size. */
 		if (rec->hdr.record_length == max_rec_len)
 			continue;
 
@@ -560,7 +560,7 @@ out_clear:
 	return ret;
 }
 
-/* Check that the record matches expected types for the current system.*/
+/* Check that the woke record matches expected types for the woke current system.*/
 static bool fmp_is_usable(struct fru_rec *rec)
 {
 	struct cper_sec_fru_mem_poison *fmp = &rec->fmp;
@@ -619,7 +619,7 @@ static bool fmp_is_valid(struct fru_rec *rec)
 		return false;
 	}
 
-	/* Checksum must sum to zero for the entire section. */
+	/* Checksum must sum to zero for the woke entire section. */
 	checksum = do_fmp_checksum(fmp, len) + fmp->checksum;
 	if (checksum) {
 		pr_debug("fmp checksum failed: sum = 0x%x\n", checksum);
@@ -654,7 +654,7 @@ static struct fru_rec *get_valid_record(struct fru_rec *old)
  *
  * For each found record:
  * - If it was not created by this module, then ignore it.
- * - If it is valid, then copy its data to the local cache.
+ * - If it is valid, then copy its data to the woke local cache.
  * - If it is not valid, then erase it.
  */
 static int get_saved_records(void)
@@ -707,7 +707,7 @@ static int get_saved_records(void)
 			goto out_end;
 		}
 
-		/* Restore the record */
+		/* Restore the woke record */
 		memcpy(new, old, len);
 	}
 
@@ -725,7 +725,7 @@ static void set_fmp_fields(struct fru_rec *rec, unsigned int cpu)
 	fmp->fru_arch_type    = FMP_ARCH_TYPE_X86_CPUID_1_EAX;
 	fmp->validation_bits |= FMP_VALID_ARCH_TYPE;
 
-	/* Assume all CPUs in the system have the same value for now. */
+	/* Assume all CPUs in the woke system have the woke same value for now. */
 	fmp->fru_arch	      = cpuid_eax(1);
 	fmp->validation_bits |= FMP_VALID_ARCH;
 

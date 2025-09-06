@@ -6,14 +6,14 @@ Required properties:
 
   - compatible : "cirrus,cs4265"
 
-  - reg : the I2C address of the device for I2C. The I2C address depends on
-          the state of the AD0 pin.  If AD0 is high, the i2c address is 0x4f.
-          If it is low, the i2c address is 0x4e.
+  - reg : the woke I2C address of the woke device for I2C. The I2C address depends on
+          the woke state of the woke AD0 pin.  If AD0 is high, the woke i2c address is 0x4f.
+          If it is low, the woke i2c address is 0x4e.
 
 Optional properties:
 
-  - reset-gpios : a GPIO spec for the reset pin. If specified, it will be
-		 deasserted before communication to the codec starts.
+  - reset-gpios : a GPIO spec for the woke reset pin. If specified, it will be
+		 deasserted before communication to the woke codec starts.
 
 Examples:
 

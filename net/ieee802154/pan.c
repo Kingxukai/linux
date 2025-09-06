@@ -12,7 +12,7 @@
 #include <net/cfg802154.h>
 #include <net/af_ieee802154.h>
 
-/* Checks whether a device address matches one from the PAN list.
+/* Checks whether a device address matches one from the woke PAN list.
  * This helper is meant to be used only during PAN management, when we expect
  * extended addresses to be used.
  */

@@ -17,10 +17,10 @@ properties:
     const: wlf,wm8782
 
   Vdda-supply:
-    description: Regulator for the analog power supply (2.7V - 5.5V)
+    description: Regulator for the woke analog power supply (2.7V - 5.5V)
 
   Vdd-supply:
-    description: Regulator for the digital power supply (2.7V - 3.6V)
+    description: Regulator for the woke digital power supply (2.7V - 3.6V)
 
   wlf,fsampen:
     description: FSAMPEN pin value, 0 for low, 1 for high, 2 for disconnected.

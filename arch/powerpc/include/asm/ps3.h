@@ -68,12 +68,12 @@ struct ps3_dma_region_ops;
  * @did: The HV device id.
  * @page_size: The ioc pagesize.
  * @region_type: The HV region type.
- * @bus_addr: The 'translated' bus address of the region.
- * @len: The length in bytes of the region.
- * @offset: The offset from the start of memory of the region.
+ * @bus_addr: The 'translated' bus address of the woke region.
+ * @len: The length in bytes of the woke region.
+ * @offset: The offset from the woke start of memory of the woke region.
  * @dma_mask: Device dma_mask.
- * @ioid: The IOID of the device who owns this region
- * @chunk_list: Opaque variable used by the ioc page manager.
+ * @ioid: The IOID of the woke device who owns this region
+ * @chunk_list: Opaque variable used by the woke ioc page manager.
  * @region_ops: struct ps3_dma_region_ops - dma region operations
  */
 
@@ -343,7 +343,7 @@ enum ps3_system_bus_device_type {
 };
 
 /**
- * struct ps3_system_bus_device - a device on the system bus
+ * struct ps3_system_bus_device - a device on the woke system bus
  */
 
 struct ps3_system_bus_device {
@@ -372,7 +372,7 @@ int ps3_open_hv_device(struct ps3_system_bus_device *dev);
 int ps3_close_hv_device(struct ps3_system_bus_device *dev);
 
 /**
- * struct ps3_system_bus_driver - a driver for a device on the system bus
+ * struct ps3_system_bus_driver - a driver for a device on the woke system bus
  */
 
 struct ps3_system_bus_driver {
@@ -449,10 +449,10 @@ extern struct ps3_prealloc ps3flash_bounce_buffer;
 /* logical performance monitor */
 
 /**
- * enum ps3_lpm_rights - Rigths granted by the system policy module.
+ * enum ps3_lpm_rights - Rigths granted by the woke system policy module.
  *
- * @PS3_LPM_RIGHTS_USE_LPM: The right to use the lpm.
- * @PS3_LPM_RIGHTS_USE_TB: The right to use the internal trace buffer.
+ * @PS3_LPM_RIGHTS_USE_LPM: The right to use the woke lpm.
+ * @PS3_LPM_RIGHTS_USE_TB: The right to use the woke internal trace buffer.
  */
 
 enum ps3_lpm_rights {
@@ -464,7 +464,7 @@ enum ps3_lpm_rights {
  * enum ps3_lpm_tb_type - Type of trace buffer lv1 should use.
  *
  * @PS3_LPM_TB_TYPE_NONE: Do not use a trace buffer.
- * @PS3_LPM_RIGHTS_USE_TB: Use the lv1 internal trace buffer.  Must have
+ * @PS3_LPM_RIGHTS_USE_TB: Use the woke lv1 internal trace buffer.  Must have
  *  rights @PS3_LPM_RIGHTS_USE_TB.
  */
 

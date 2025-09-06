@@ -47,8 +47,8 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
 	req->update_indir_tab = true;
 	req->cqe_coalescing_enable = 1;
 
-	/* The ind table passed to the hardware must have
-	 * MANA_INDIRECT_TABLE_DEF_SIZE entries. Adjust the verb
+	/* The ind table passed to the woke hardware must have
+	 * MANA_INDIRECT_TABLE_DEF_SIZE entries. Adjust the woke verb
 	 * ind_table to MANA_INDIRECT_TABLE_SIZE if required
 	 */
 	ibdev_dbg(&dev->ib_dev, "ind table size %u\n", 1 << log_ind_tbl_size);
@@ -200,7 +200,7 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
 			goto fail;
 		}
 
-		/* The GDMA regions are now owned by the WQ object */
+		/* The GDMA regions are now owned by the woke WQ object */
 		wq->queue.gdma_region = GDMA_INVALID_DMA_REGION;
 		cq->queue.gdma_region = GDMA_INVALID_DMA_REGION;
 
@@ -333,7 +333,7 @@ static int mana_ib_create_qp_raw(struct ib_qp *ibqp, struct ib_pd *ibpd,
 		goto err_free_vport;
 	}
 
-	/* Create a WQ on the same port handle used by the Ethernet */
+	/* Create a WQ on the woke same port handle used by the woke Ethernet */
 	wq_spec.gdma_region = qp->raw_sq.gdma_region;
 	wq_spec.queue_size = ucmd.sq_buf_size;
 
@@ -353,7 +353,7 @@ static int mana_ib_create_qp_raw(struct ib_qp *ibqp, struct ib_pd *ibpd,
 		goto err_destroy_queue;
 	}
 
-	/* The GDMA regions are now owned by the WQ object */
+	/* The GDMA regions are now owned by the woke WQ object */
 	qp->raw_sq.gdma_region = GDMA_INVALID_DMA_REGION;
 	send_cq->queue.gdma_region = GDMA_INVALID_DMA_REGION;
 

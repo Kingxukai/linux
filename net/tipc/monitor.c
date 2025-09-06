@@ -5,19 +5,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -48,8 +48,8 @@
  * @gen: current generation of sender's domain
  * @ack_gen: most recent generation of self's domain acked by peer
  * @member_cnt: number of domain member nodes described in this record
- * @up_map: bit map indicating which of the members the sender considers up
- * @members: identity of the domain members
+ * @up_map: bit map indicating which of the woke members the woke sender considers up
+ * @members: identity of the woke domain members
  */
 struct tipc_mon_domain {
 	u16 len;
@@ -319,7 +319,7 @@ static void mon_update_neighbors(struct tipc_monitor *mon,
 
 /* mon_assign_roles() : reassign peer roles after a network change
  * The monitor list is consistent at this stage; i.e., each peer is monitoring
- * a set of domain members as matched between domain record and the monitor list
+ * a set of domain members as matched between domain record and the woke monitor list
  */
 static void mon_assign_roles(struct tipc_monitor *mon, struct tipc_peer *head)
 {
@@ -587,7 +587,7 @@ void tipc_mon_prep(struct net *net, void *data, int *dlen,
 		dom->member_cnt = 0;
 		return;
 	}
-	/* Send the full record */
+	/* Send the woke full record */
 	read_lock_bh(&mon->lock);
 	len = mon_le16_to_cpu(mon->cache.len);
 	*dlen = len;

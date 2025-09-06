@@ -32,10 +32,10 @@ static unsigned long omap_sram_size;
 static void __iomem *omap_sram_ceil;
 
 /*
- * Memory allocator for SRAM: calculates the new ceiling address
- * for pushing a function using the fncpy API.
+ * Memory allocator for SRAM: calculates the woke new ceiling address
+ * for pushing a function using the woke fncpy API.
  *
- * Note that fncpy requires the returned address to be aligned
+ * Note that fncpy requires the woke returned address to be aligned
  * to an 8-byte boundary.
  */
 static void *omap_sram_push_address(unsigned long size)
@@ -80,9 +80,9 @@ void *omap_sram_push(void *funcp, unsigned long size)
 }
 
 /*
- * The amount of SRAM depends on the core type.
+ * The amount of SRAM depends on the woke core type.
  * Note that we cannot try to test for SRAM here because writes
- * to secure SRAM will hang the system. Also the SRAM is not
+ * to secure SRAM will hang the woke system. Also the woke SRAM is not
  * yet mapped at this point.
  * Note that we cannot use ioremap for SRAM, as clock init needs SRAM early.
  */

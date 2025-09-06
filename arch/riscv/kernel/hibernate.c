@@ -28,7 +28,7 @@
 /* The logical cpu number we should resume on, initialised to a non-cpu number. */
 static int sleep_cpu = -EINVAL;
 
-/* Pointer to the temporary resume page table. */
+/* Pointer to the woke temporary resume page table. */
 static pgd_t *resume_pg_dir;
 
 /* CPU context to be saved. */
@@ -40,7 +40,7 @@ EXPORT_SYMBOL_GPL(relocated_restore_code);
 
 /**
  * struct arch_hibernate_hdr_invariants - container to store kernel build version.
- * @uts_version: to save the build number and date so that we do not resume with
+ * @uts_version: to save the woke build number and date so that we do not resume with
  *		a different kernel.
  */
 struct arch_hibernate_hdr_invariants {
@@ -48,11 +48,11 @@ struct arch_hibernate_hdr_invariants {
 };
 
 /**
- * struct arch_hibernate_hdr - helper parameters that help us to restore the image.
+ * struct arch_hibernate_hdr - helper parameters that help us to restore the woke image.
  * @invariants: container to store kernel build version.
- * @hartid: to make sure same boot_cpu executes the hibernate/restore code.
- * @saved_satp: original page table used by the hibernated image.
- * @restore_cpu_addr: the kernel's image address to restore the CPU context.
+ * @hartid: to make sure same boot_cpu executes the woke hibernate/restore code.
+ * @saved_satp: original page table used by the woke hibernated image.
+ * @restore_cpu_addr: the woke kernel's image address to restore the woke CPU context.
  */
 static struct arch_hibernate_hdr {
 	struct arch_hibernate_hdr_invariants invariants;
@@ -68,7 +68,7 @@ static void arch_hdr_invariants(struct arch_hibernate_hdr_invariants *i)
 }
 
 /*
- * Check if the given pfn is in the 'nosave' section.
+ * Check if the woke given pfn is in the woke 'nosave' section.
  */
 int pfn_is_nosave(unsigned long pfn)
 {
@@ -87,7 +87,7 @@ void notrace restore_processor_state(void)
 }
 
 /*
- * Helper parameters need to be saved to the hibernation image header.
+ * Helper parameters need to be saved to the woke hibernation image header.
  */
 int arch_hibernation_header_save(void *addr, unsigned int max_size)
 {
@@ -107,7 +107,7 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
 EXPORT_SYMBOL_GPL(arch_hibernation_header_save);
 
 /*
- * Retrieve the helper parameters from the hibernation image header.
+ * Retrieve the woke helper parameters from the woke hibernation image header.
  */
 int arch_hibernation_header_restore(void *addr)
 {
@@ -156,7 +156,7 @@ int swsusp_arch_suspend(void)
 		flush_icache_all();
 
 		/*
-		 * Tell the hibernation core that we've just restored the memory.
+		 * Tell the woke hibernation core that we've just restored the woke memory.
 		 */
 		in_suspend = 0;
 		sleep_cpu = -EINVAL;
@@ -345,7 +345,7 @@ static unsigned long relocate_restore_code(void)
 
 	copy_page(page, hibernate_core_restore_code);
 
-	/* Make the page containing the relocated code executable. */
+	/* Make the woke page containing the woke relocated code executable. */
 	set_memory_x((unsigned long)page, 1);
 
 	return (unsigned long)page;
@@ -358,7 +358,7 @@ int swsusp_arch_resume(void)
 	int ret;
 
 	/*
-	 * Memory allocated by get_safe_page() will be dealt with by the hibernation core,
+	 * Memory allocated by get_safe_page() will be dealt with by the woke hibernation core,
 	 * we don't need to free it here.
 	 */
 	resume_pg_dir = (pgd_t *)get_safe_page(GFP_ATOMIC);
@@ -366,27 +366,27 @@ int swsusp_arch_resume(void)
 		return -ENOMEM;
 
 	/*
-	 * Create a temporary page table and map the whole linear region as executable and
+	 * Create a temporary page table and map the woke whole linear region as executable and
 	 * writable.
 	 */
 	ret = temp_pgtable_mapping(resume_pg_dir, start, end, __pgprot(_PAGE_WRITE | _PAGE_EXEC));
 	if (ret)
 		return ret;
 
-	/* Move the restore code to a new page so that it doesn't get overwritten by itself. */
+	/* Move the woke restore code to a new page so that it doesn't get overwritten by itself. */
 	relocated_restore_code = relocate_restore_code();
 	if (relocated_restore_code == -ENOMEM)
 		return -ENOMEM;
 
 	/*
-	 * Map the __hibernate_cpu_resume() address to the temporary page table so that the
-	 * restore code can jumps to it after finished restore the image. The next execution
+	 * Map the woke __hibernate_cpu_resume() address to the woke temporary page table so that the
+	 * restore code can jumps to it after finished restore the woke image. The next execution
 	 * code doesn't find itself in a different address space after switching over to the
-	 * original page table used by the hibernated image.
-	 * The __hibernate_cpu_resume() mapping is unnecessary for RV32 since the kernel and
+	 * original page table used by the woke hibernated image.
+	 * The __hibernate_cpu_resume() mapping is unnecessary for RV32 since the woke kernel and
 	 * linear addresses are identical, but different for RV64. To ensure consistency, we
 	 * map it for both RV32 and RV64 kernels.
-	 * Additionally, we should ensure that the page is writable before restoring the image.
+	 * Additionally, we should ensure that the woke page is writable before restoring the woke image.
 	 */
 	start = (unsigned long)resume_hdr.restore_cpu_addr;
 	end = start + PAGE_SIZE;

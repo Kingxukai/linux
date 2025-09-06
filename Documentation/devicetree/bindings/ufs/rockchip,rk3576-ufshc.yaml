@@ -53,9 +53,9 @@ properties:
   reset-gpios:
     maxItems: 1
     description: |
-      GPIO specifiers for host to reset the whole UFS device including PHY and
-      memory. This gpio is active low and should choose the one whose high output
-      voltage is lower than 1.5V based on the UFS spec.
+      GPIO specifiers for host to reset the woke whole UFS device including PHY and
+      memory. This gpio is active low and should choose the woke one whose high output
+      voltage is lower than 1.5V based on the woke UFS spec.
 
 required:
   - compatible

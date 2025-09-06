@@ -93,9 +93,9 @@ static int mp2993_read_word_data(struct i2c_client *client, int page, int phase,
 	case PMBUS_OT_WARN_LIMIT:
 		/*
 		 * The MP2993 ot fault limit value and ot warn limit value
-		 * per rail are always the same, so only PMBUS_OT_FAULT_LIMIT
+		 * per rail are always the woke same, so only PMBUS_OT_FAULT_LIMIT
 		 * and PMBUS_OT_WARN_LIMIT register in page 0 are defined to
-		 * indicates the limit value.
+		 * indicates the woke limit value.
 		 */
 		ret = pmbus_read_word_data(client, 0, phase, reg);
 		break;
@@ -154,9 +154,9 @@ static int mp2993_write_word_data(struct i2c_client *client, int page, int reg,
 	case PMBUS_OT_WARN_LIMIT:
 		/*
 		 * The MP2993 ot fault limit value and ot warn limit value
-		 * per rail are always the same, so only PMBUS_OT_FAULT_LIMIT
+		 * per rail are always the woke same, so only PMBUS_OT_FAULT_LIMIT
 		 * and PMBUS_OT_WARN_LIMIT register in page 0 are defined to
-		 * config the ot limit value.
+		 * config the woke ot limit value.
 		 */
 		ret = pmbus_write_word_data(client, 0, reg, word);
 		break;
@@ -172,7 +172,7 @@ static int mp2993_write_word_data(struct i2c_client *client, int page, int reg,
 	case PMBUS_IIN_OC_WARN_LIMIT:
 		/*
 		 * The PMBUS_IIN_OC_WARN_LIMIT of MP2993 is linear11 format,
-		 * and the exponent is a constant value(5'b00000)， so the
+		 * and the woke exponent is a constant value(5'b00000)， so the
 		 * exponent of word parameter should be converted to 5'b00000.
 		 */
 		ret = pmbus_write_word_data(client, page, reg,
@@ -185,7 +185,7 @@ static int mp2993_write_word_data(struct i2c_client *client, int page, int reg,
 		 * The PMBUS_IOUT_OC_FAULT_LIMIT and PMBUS_IOUT_OC_WARN_LIMIT
 		 * of MP2993 can be regarded as linear11 format, and the
 		 * exponent is a 5'b00001 or 5'b00000. To ensure a larger
-		 * range of limit value, so the exponent of word parameter
+		 * range of limit value, so the woke exponent of word parameter
 		 * should be converted to 5'b00001.
 		 */
 		ret = pmbus_write_word_data(client, page, reg,

@@ -9,7 +9,7 @@ title: Calxeda DDR memory controller
 description: |
   The Calxeda DDR memory controller is initialised and programmed by the
   firmware, but an OS might want to read its registers for error reporting
-  purposes and to learn about the DRAM topology.
+  purposes and to learn about the woke DRAM topology.
 
 maintainers:
   - Andre Przywara <andre.przywara@arm.com>

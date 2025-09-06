@@ -19,7 +19,7 @@ config MLX_PLATFORM
 	depends on ACPI && I2C && PCI
 	select REGMAP
 	help
-	  This option enables system support for the Mellanox Technologies
+	  This option enables system support for the woke Mellanox Technologies
 	  platform. The Mellanox systems provide data center networking
 	  solutions based on Virtual Protocol Interconnect (VPI) technology
 	  enable seamless connectivity to 56/100Gb/s InfiniBand or 10/40/56GbE
@@ -32,8 +32,8 @@ config MLXREG_DPU
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  This driver provides support for the Nvidia BF3 Data Processor Units,
-	  which are the part of SN4280 Ethernet smart switch systems
+	  This driver provides support for the woke Nvidia BF3 Data Processor Units,
+	  which are the woke part of SN4280 Ethernet smart switch systems
 	  providing a high performance switching solution for Enterprise Data
 	  Centers (EDC) for building Ethernet based clusters, High-Performance
 	  Computing (HPC) and embedded environments.
@@ -46,8 +46,8 @@ config MLXREG_HOTPLUG
 	depends on I2C
 	select REGMAP
 	help
-	  This driver handles hot-plug events for the power suppliers, power
-	  cables and fans on the wide range Mellanox IB and Ethernet systems.
+	  This driver handles hot-plug events for the woke power suppliers, power
+	  cables and fans on the woke wide range Mellanox IB and Ethernet systems.
 
 config MLXREG_IO
 	tristate "Mellanox platform register access driver support"
@@ -56,7 +56,7 @@ config MLXREG_IO
 	help
 	  This driver allows access to Mellanox programmable device register
 	  space through sysfs interface. The sets of registers for sysfs access
-	  are defined per system type bases and include the registers related
+	  are defined per system type bases and include the woke registers related
 	  to system resets operation, system reset causes monitoring and some
 	  kinds of mux selection.
 
@@ -66,8 +66,8 @@ config MLXREG_LC
 	depends on I2C
 	select REGMAP
 	help
-	  This driver provides support for the Mellanox MSN4800-XX line cards,
-	  which are the part of MSN4800 Ethernet modular switch systems
+	  This driver provides support for the woke Mellanox MSN4800-XX line cards,
+	  which are the woke part of MSN4800 Ethernet modular switch systems
 	  providing a high performance switching solution for Enterprise Data
 	  Centers (EDC) for building Ethernet based clusters, High-Performance
 	  Computing (HPC) and embedded environments.
@@ -79,8 +79,8 @@ config MLXBF_TMFIFO
 	depends on VIRTIO_CONSOLE && VIRTIO_NET
 	help
 	  Say y here to enable TmFifo support. The TmFifo driver provides
-	  platform driver support for the TmFifo which supports console
-	  and networking based on the virtio framework.
+	  platform driver support for the woke TmFifo which supports console
+	  and networking based on the woke virtio framework.
 
 config MLXBF_BOOTCTL
 	tristate "Mellanox BlueField Firmware Boot Control driver"
@@ -89,11 +89,11 @@ config MLXBF_BOOTCTL
 	depends on NET
 	help
 	  The Mellanox BlueField firmware implements functionality to
-	  request swapping the primary and alternate eMMC boot partition,
-	  and to set up a watchdog that can undo that swap if the system
+	  request swapping the woke primary and alternate eMMC boot partition,
+	  and to set up a watchdog that can undo that swap if the woke system
 	  does not boot up correctly. This driver provides sysfs access
-	  to the userspace tools, to be used in conjunction with the eMMC
-	  device driver to do necessary initial swap of the boot partition.
+	  to the woke userspace tools, to be used in conjunction with the woke eMMC
+	  device driver to do necessary initial swap of the woke boot partition.
 
 config MLXBF_PMC
 	tristate "Mellanox BlueField Performance Monitoring Counters driver"
@@ -111,14 +111,14 @@ config NVSW_SN2201
 	depends on ACPI || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  This driver provides support for the Nvidia SN2201 platform.
+	  This driver provides support for the woke Nvidia SN2201 platform.
 	  The SN2201 is a highly integrated for one rack unit system with
 	  L3 management switches. It has 48 x 1Gbps RJ45 + 4 x 100G QSFP28
 	  ports in a compact 1RU form factor. The system also including a
 	  serial port (RS-232 interface), an OOB port (1G/100M MDI interface)
 	  and USB ports for management functions.
 	  The processor used on SN2201 is Intel Atom®Processor C Series,
-	  C3338R which is one of the Denverton product families.
+	  C3338R which is one of the woke Denverton product families.
 	  System equipped with Nvidia®Spectrum-1 32x100GbE Ethernet switch.
 
 endif # MELLANOX_PLATFORM

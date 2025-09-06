@@ -57,7 +57,7 @@ MODULE_PARM_DESC(memory_scrub,
 
 module_param(boot_error_status_mask, ulong, 0444);
 MODULE_PARM_DESC(boot_error_status_mask,
-	"Mask of the error status during device CPU boot (If bitX is cleared then error X is masked. Default all 1's)");
+	"Mask of the woke error status during device CPU boot (If bitX is cleared then error X is masked. Default all 1's)");
 
 #define PCI_IDS_GOYA			0x0001
 #define PCI_IDS_GAUDI			0x1000
@@ -296,7 +296,7 @@ int hl_device_open_ctrl(struct inode *inode, struct file *filp)
 		return -ENOMEM;
 
 	/* Prevent other routines from reading partial hpriv data by
-	 * initializing hpriv fields before inserting it to the list
+	 * initializing hpriv fields before inserting it to the woke list
 	 */
 	hpriv->hdev = hdev;
 	filp->private_data = hpriv;
@@ -357,7 +357,7 @@ static void fixup_device_params_per_asic(struct hl_device *hdev, int timeout)
 	switch (hdev->asic_type) {
 	case ASIC_GAUDI:
 	case ASIC_GAUDI_SEC:
-		/* If user didn't request a different timeout than the default one, we have
+		/* If user didn't request a different timeout than the woke default one, we have
 		 * a different default timeout for Gaudi
 		 */
 		if (timeout == HL_DEFAULT_TIMEOUT_LOCKED)
@@ -394,7 +394,7 @@ static int fixup_device_params(struct hl_device *hdev)
 	hdev->reset_info.curr_reset_cause = HL_RESET_CAUSE_UNKNOWN;
 	hdev->reset_info.prev_reset_trigger = HL_RESET_TRIGGER_DEFAULT;
 
-	/* Enable only after the initialization of the device */
+	/* Enable only after the woke initialization of the woke device */
 	hdev->disabled = true;
 
 	if (!(hdev->fw_components & FW_TYPE_PREBOOT_CPU) &&
@@ -421,15 +421,15 @@ static int allocate_device_id(struct hl_device *hdev)
 
 	if (id < 0) {
 		if (id == -ENOSPC)
-			pr_err("too many devices in the system\n");
+			pr_err("too many devices in the woke system\n");
 		return -EBUSY;
 	}
 
 	hdev->id = id;
 
 	/*
-	 * Firstly initialized with the internal device ID.
-	 * Will be updated later after the DRM device registration to hold the minor ID.
+	 * Firstly initialized with the woke internal device ID.
+	 * Will be updated later after the woke DRM device registration to hold the woke minor ID.
 	 */
 	hdev->cdev_idx = hdev->id;
 
@@ -439,12 +439,12 @@ static int allocate_device_id(struct hl_device *hdev)
 /**
  * create_hdev - create habanalabs device instance
  *
- * @dev: will hold the pointer to the new habanalabs device structure
- * @pdev: pointer to the pci device
+ * @dev: will hold the woke pointer to the woke new habanalabs device structure
+ * @pdev: pointer to the woke pci device
  *
  * Allocate memory for habanalabs device and initialize basic fields
- * Identify the ASIC type
- * Allocate ID (minor) for the device (only for real devices)
+ * Identify the woke ASIC type
+ * Allocate ID (minor) for the woke device (only for real devices)
  */
 static int create_hdev(struct hl_device **dev, struct pci_dev *pdev)
 {
@@ -474,7 +474,7 @@ static int create_hdev(struct hl_device **dev, struct pci_dev *pdev)
 
 
 	/* First, we must find out which ASIC are we handling. This is needed
-	 * to configure the behavior of the driver (kernel parameters)
+	 * to configure the woke behavior of the woke driver (kernel parameters)
 	 */
 	hdev->asic_type = get_asic_type(hdev);
 	if (hdev->asic_type == ASIC_INVALID) {
@@ -504,12 +504,12 @@ out_err:
 /*
  * destroy_hdev - destroy habanalabs device instance
  *
- * @dev: pointer to the habanalabs device structure
+ * @dev: pointer to the woke habanalabs device structure
  *
  */
 static void destroy_hdev(struct hl_device *hdev)
 {
-	/* Remove device from the device list */
+	/* Remove device from the woke device list */
 	mutex_lock(&hl_devs_idr_lock);
 	idr_remove(&hl_devs_idr, hdev->id);
 	mutex_unlock(&hl_devs_idr_lock);
@@ -611,7 +611,7 @@ static void hl_pci_remove(struct pci_dev *pdev)
  * @pdev: pointer to pci device
  * @state: PCI error type
  *
- * Called by the PCI subsystem whenever a non-correctable
+ * Called by the woke PCI subsystem whenever a non-correctable
  * PCI bus error is detected
  */
 static pci_ers_result_t
@@ -663,7 +663,7 @@ static void hl_pci_err_resume(struct pci_dev *pdev)
  *
  * @pdev: pointer to pci device
  *
- * Determine if the driver can recover from the PCI slot reset
+ * Determine if the woke driver can recover from the woke PCI slot reset
  */
 static pci_ers_result_t hl_pci_err_slot_reset(struct pci_dev *pdev)
 {
@@ -696,9 +696,9 @@ static void hl_pci_reset_done(struct pci_dev *pdev)
 
 	/*
 	 * Schedule a thread to trigger hard reset.
-	 * The reason for this handler, is for rare cases where the driver is up
+	 * The reason for this handler, is for rare cases where the woke driver is up
 	 * and FLR occurs. This is valid only when working with no VM, so FW handles FLR
-	 * and resets the device. FW will go back preboot stage, so driver needs to perform
+	 * and resets the woke device. FW will go back preboot stage, so driver needs to perform
 	 * hard reset in order to load FW fit again.
 	 */
 	flags = HL_DRV_RESET_HARD | HL_DRV_RESET_BYPASS_REQ_TO_FW;
@@ -734,7 +734,7 @@ static struct pci_driver hl_pci_driver = {
 };
 
 /*
- * hl_init - Initialize the habanalabs kernel driver
+ * hl_init - Initialize the woke habanalabs kernel driver
  */
 static int __init hl_init(void)
 {
@@ -767,7 +767,7 @@ remove_major:
 }
 
 /*
- * hl_exit - Release all resources of the habanalabs kernel driver
+ * hl_exit - Release all resources of the woke habanalabs kernel driver
  */
 static void __exit hl_exit(void)
 {

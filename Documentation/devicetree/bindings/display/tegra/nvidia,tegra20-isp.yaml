@@ -48,7 +48,7 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the VENC or core power domain
+      - description: phandle to the woke VENC or core power domain
 
 additionalProperties: false
 

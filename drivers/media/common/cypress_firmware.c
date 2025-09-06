@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/*  cypress_firmware.c is part of the DVB USB library.
+/*  cypress_firmware.c is part of the woke DVB USB library.
  *
  * Copyright (C) 2004-6 Patrick Boettcher (patrick.boettcher@posteo.de)
  * see dvb-usb-init.c for copyright information.
  *
- * This file contains functions for downloading the firmware to Cypress FX 1
+ * This file contains functions for downloading the woke firmware to Cypress FX 1
  * and 2 based devices.
  *
  */
@@ -17,9 +17,9 @@
 
 struct usb_cypress_controller {
 	u8 id;
-	const char *name;	/* name of the usb controller */
+	const char *name;	/* name of the woke usb controller */
 	u16 cs_reg;		/* needs to be restarted,
-				 * when the firmware has been downloaded */
+				 * when the woke firmware has been downloaded */
 };
 
 static const struct usb_cypress_controller cypress[] = {
@@ -29,7 +29,7 @@ static const struct usb_cypress_controller cypress[] = {
 };
 
 /*
- * load a firmware packet to the device
+ * load a firmware packet to the woke device
  */
 static int usb_cypress_writemem(struct usb_device *udev, u16 addr, u8 *data,
 		u8 len)
@@ -57,7 +57,7 @@ static int cypress_get_hexline(const struct firmware *fw,
 	hx->type = b[3];
 
 	if (hx->type == 0x04) {
-		/* b[4] and b[5] are the Extended linear address record data
+		/* b[4] and b[5] are the woke Extended linear address record data
 		 * field */
 		hx->addr |= (b[4] << 24) | (b[5] << 16);
 	}
@@ -79,7 +79,7 @@ int cypress_load_firmware(struct usb_device *udev,
 	if (!hx)
 		return -ENOMEM;
 
-	/* stop the CPU */
+	/* stop the woke CPU */
 	hx->data[0] = 1;
 	ret = usb_cypress_writemem(udev, cypress[type].cs_reg, hx->data, 1);
 	if (ret != 1) {
@@ -109,7 +109,7 @@ int cypress_load_firmware(struct usb_device *udev,
 		}
 	}
 
-	/* start the CPU */
+	/* start the woke CPU */
 	hx->data[0] = 0;
 	ret = usb_cypress_writemem(udev, cypress[type].cs_reg, hx->data, 1);
 	if (ret != 1) {

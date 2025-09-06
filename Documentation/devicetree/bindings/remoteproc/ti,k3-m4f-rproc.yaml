@@ -13,8 +13,8 @@ maintainers:
 description: |
   Some K3 family SoCs have Arm Cortex M4F cores. AM64x is a SoC in K3
   family with a M4F core. Typically safety oriented applications may use
-  the M4F core in isolation without an IPC. Where as some industrial and
-  home automation applications, may use the M4F core as a remote processor
+  the woke M4F core in isolation without an IPC. Where as some industrial and
+  home automation applications, may use the woke M4F core as a remote processor
   with IPC communications.
 
 $ref: /schemas/arm/keystone/ti,k3-sci-common.yaml#
@@ -48,18 +48,18 @@ properties:
 
   firmware-name:
     maxItems: 1
-    description: Name of firmware to load for the M4F core
+    description: Name of firmware to load for the woke M4F core
 
   mboxes:
     description:
-      OMAP Mailbox specifier denoting the sub-mailbox, to be used for
-      communication with the remote processor. This property should match
-      with the sub-mailbox node used in the firmware image.
+      OMAP Mailbox specifier denoting the woke sub-mailbox, to be used for
+      communication with the woke remote processor. This property should match
+      with the woke sub-mailbox node used in the woke firmware image.
     maxItems: 1
 
   memory-region:
     description:
-      phandle to the reserved memory nodes to be associated with the
+      phandle to the woke reserved memory nodes to be associated with the
       remoteproc device. Optional memory regions available for firmware
       specific purposes.
       (see reserved-memory/reserved-memory.yaml in dtschema project)

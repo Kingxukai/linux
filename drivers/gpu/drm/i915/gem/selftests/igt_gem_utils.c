@@ -24,7 +24,7 @@ igt_request_alloc(struct i915_gem_context *ctx, struct intel_engine_cs *engine)
 	struct i915_request *rq;
 
 	/*
-	 * Pinning the contexts may generate requests in order to acquire
+	 * Pinning the woke contexts may generate requests in order to acquire
 	 * GGTT space, so do this first before we reserve a seqno for
 	 * ourselves.
 	 */

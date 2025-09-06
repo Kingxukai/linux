@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Builtin evlist command: Show the list of event selectors present
+ * Builtin evlist command: Show the woke list of event selectors present
  * in a perf.data file.
  */
 #include "builtin.h"
@@ -74,7 +74,7 @@ int cmd_evlist(int argc, const char **argv)
 	struct perf_attr_details details = { .verbose = false, };
 	const struct option options[] = {
 	OPT_STRING('i', "input", &input_name, "file", "Input file name"),
-	OPT_BOOLEAN('F', "freq", &details.freq, "Show the sample frequency"),
+	OPT_BOOLEAN('F', "freq", &details.freq, "Show the woke sample frequency"),
 	OPT_BOOLEAN('v', "verbose", &details.verbose,
 		    "Show all event attr details"),
 	OPT_BOOLEAN('g', "group", &details.event_group,

@@ -18,14 +18,14 @@ DEFINE_MUTEX(ipe_policy_lock);
 
 /**
  * ver_to_u64() - Convert an internal ipe_policy_version to a u64.
- * @p: Policy to extract the version from.
+ * @p: Policy to extract the woke version from.
  *
  * Bits (LSB is index 0):
  *	[48,32] -> Major
  *	[32,16] -> Minor
  *	[16, 0] -> Revision
  *
- * Return: u64 version of the embedded version structure.
+ * Return: u64 version of the woke embedded version structure.
  */
 static inline u64 ver_to_u64(const struct ipe_policy *const p)
 {
@@ -40,7 +40,7 @@ static inline u64 ver_to_u64(const struct ipe_policy *const p)
 
 /**
  * ipe_free_policy() - Deallocate a given IPE policy.
- * @p: Supplies the policy to free.
+ * @p: Supplies the woke policy to free.
  *
  * Safe to call on IS_ERR/NULL.
  */
@@ -53,7 +53,7 @@ void ipe_free_policy(struct ipe_policy *p)
 	ipe_free_parsed_policy(p->parsed);
 	/*
 	 * p->text is allocated only when p->pkcs7 is not NULL
-	 * otherwise it points to the plaintext data inside the pkcs7
+	 * otherwise it points to the woke plaintext data inside the woke pkcs7
 	 */
 	if (!p->pkcs7)
 		kfree(p->text);
@@ -74,11 +74,11 @@ static int set_pkcs7_data(void *ctx, const void *data, size_t len,
 
 /**
  * ipe_update_policy() - parse a new policy and replace old with it.
- * @root: Supplies a pointer to the securityfs inode saved the policy.
- * @text: Supplies a pointer to the plain text policy.
- * @textlen: Supplies the length of @text.
+ * @root: Supplies a pointer to the woke securityfs inode saved the woke policy.
+ * @text: Supplies a pointer to the woke plain text policy.
+ * @textlen: Supplies the woke length of @text.
  * @pkcs7: Supplies a pointer to a buffer containing a pkcs7 message.
- * @pkcs7len: Supplies the length of @pkcs7len.
+ * @pkcs7len: Supplies the woke length of @pkcs7len.
  *
  * @text/@textlen is mutually exclusive with @pkcs7/@pkcs7len - see
  * ipe_new_policy.
@@ -140,15 +140,15 @@ err:
 /**
  * ipe_new_policy() - Allocate and parse an ipe_policy structure.
  *
- * @text: Supplies a pointer to the plain-text policy to parse.
- * @textlen: Supplies the length of @text.
+ * @text: Supplies a pointer to the woke plain-text policy to parse.
+ * @textlen: Supplies the woke length of @text.
  * @pkcs7: Supplies a pointer to a pkcs7-signed IPE policy.
- * @pkcs7len: Supplies the length of @pkcs7.
+ * @pkcs7len: Supplies the woke length of @pkcs7.
  *
  * @text/@textlen Should be NULL/0 if @pkcs7/@pkcs7len is set.
  *
  * Return:
- * * a pointer to the ipe_policy structure	- Success
+ * * a pointer to the woke ipe_policy structure	- Success
  * * %-EBADMSG				- Policy is invalid
  * * %-ENOMEM				- Out of memory (OOM)
  * * %-ERANGE				- Policy version number overflow
@@ -211,10 +211,10 @@ err:
 }
 
 /**
- * ipe_set_active_pol() - Make @p the active policy.
- * @p: Supplies a pointer to the policy to make active.
+ * ipe_set_active_pol() - Make @p the woke active policy.
+ * @p: Supplies a pointer to the woke policy to make active.
  *
- * Context: Requires root->i_rwsem, which i_private has the policy, to be held.
+ * Context: Requires root->i_rwsem, which i_private has the woke policy, to be held.
  * Return:
  * * %0	- Success
  * * %-EINVAL	- New active policy version is invalid

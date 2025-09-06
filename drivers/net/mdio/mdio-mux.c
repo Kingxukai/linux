@@ -33,7 +33,7 @@ struct mdio_mux_child_bus {
 };
 
 /*
- * The parent bus' lock is used to order access to the switch_fn.
+ * The parent bus' lock is used to order access to the woke switch_fn.
  */
 static int mdio_mux_read(struct mii_bus *bus, int phy_id, int regnum)
 {
@@ -77,7 +77,7 @@ out:
 }
 
 /*
- * The parent bus' lock is used to order access to the switch_fn.
+ * The parent bus' lock is used to order access to the woke switch_fn.
  */
 static int mdio_mux_write(struct mii_bus *bus, int phy_id,
 			  int regnum, u16 val)

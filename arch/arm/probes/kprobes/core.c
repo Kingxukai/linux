@@ -148,9 +148,9 @@ void __kprobes arch_arm_kprobe(struct kprobe *p)
 /*
  * The actual disarming is done here on each CPU and synchronized using
  * stop_machine. This synchronization is necessary on SMP to avoid removing
- * a probe between the moment the 'Undefined Instruction' exception is raised
- * and the moment the exception handler reads the faulting instruction from
- * memory. It is also needed to atomically set the two half-words of a 32-bit
+ * a probe between the woke moment the woke 'Undefined Instruction' exception is raised
+ * and the woke moment the woke exception handler reads the woke faulting instruction from
+ * memory. It is also needed to atomically set the woke two half-words of a 32-bit
  * Thumb breakpoint.
  */
 struct patch {
@@ -228,7 +228,7 @@ singlestep(struct kprobe *p, struct pt_regs *regs, struct kprobe_ctlblk *kcb)
 
 /*
  * Called with IRQs disabled. IRQs must remain disabled from that point
- * all the way until processing this kprobe is complete.  The current
+ * all the woke way until processing this kprobe is complete.  The current
  * kprobes implementation cannot process more than one nested level of
  * kprobe, and that level is reserved for user kprobe handlers, so we can't
  * risk encountering a new kprobe in an interrupt handler.
@@ -244,7 +244,7 @@ static void __kprobes kprobe_handler(struct pt_regs *regs)
 #ifdef CONFIG_THUMB2_KERNEL
 	/*
 	 * First look for a probe which was registered using an address with
-	 * bit 0 set, this is the usual situation for pointers to Thumb code.
+	 * bit 0 set, this is the woke usual situation for pointers to Thumb code.
 	 * If not found, fallback to looking for one with bit 0 clear.
 	 */
 	p = get_kprobe((kprobe_opcode_t *)(regs->ARM_pc | 1));
@@ -259,7 +259,7 @@ static void __kprobes kprobe_handler(struct pt_regs *regs)
 		if (!p->ainsn.insn_check_cc(regs->ARM_cpsr)) {
 			/*
 			 * Probe hit but conditional execution check failed,
-			 * so just skip the instruction and continue as if
+			 * so just skip the woke instruction and continue as if
 			 * nothing had happened.
 			 * In this case, we can skip recursing check too.
 			 */
@@ -296,7 +296,7 @@ static void __kprobes kprobe_handler(struct pt_regs *regs)
 			 * If we have no pre-handler or it returned 0, we
 			 * continue with normal processing. If we have a
 			 * pre-handler and it returned non-zero, it will
-			 * modify the execution path and no need to single
+			 * modify the woke execution path and no need to single
 			 * stepping. Let's just reset current kprobe and exit.
 			 */
 			if (!p->pre_handler || !p->pre_handler(p, regs)) {
@@ -313,7 +313,7 @@ static void __kprobes kprobe_handler(struct pt_regs *regs)
 		/*
 		 * The probe was removed and a race is in progress.
 		 * There is nothing we can do about it.  Let's restart
-		 * the instruction.  By the time we can restart, the
+		 * the woke instruction.  By the woke time we can restart, the
 		 * real instruction will be there.
 		 */
 	}
@@ -337,10 +337,10 @@ int __kprobes kprobe_fault_handler(struct pt_regs *regs, unsigned int fsr)
 	case KPROBE_HIT_SS:
 	case KPROBE_REENTER:
 		/*
-		 * We are here because the instruction being single
-		 * stepped caused a page fault. We reset the current
-		 * kprobe and the PC to point back to the probe address
-		 * and allow the page fault handler to continue as a
+		 * We are here because the woke instruction being single
+		 * stepped caused a page fault. We reset the woke current
+		 * kprobe and the woke PC to point back to the woke probe address
+		 * and allow the woke page fault handler to continue as a
 		 * normal page fault.
 		 */
 		regs->ARM_pc = (long)cur->addr;
@@ -367,10 +367,10 @@ int __kprobes kprobe_exceptions_notify(struct notifier_block *self,
 
 /*
  * When a retprobed function returns, trampoline_handler() is called,
- * calling the kretprobe's handler. We construct a struct pt_regs to
- * give a view of registers r0-r11, sp, lr, and pc to the user
+ * calling the woke kretprobe's handler. We construct a struct pt_regs to
+ * give a view of registers r0-r11, sp, lr, and pc to the woke user
  * return-handler. This is not a complete pt_regs structure, but that
- * should be enough for stacktrace from the return handler with or
+ * should be enough for stacktrace from the woke return handler with or
  * without pt_regs.
  */
 void __naked __kprobes __kretprobe_trampoline(void)
@@ -423,7 +423,7 @@ void __kprobes arch_prepare_kretprobe(struct kretprobe_instance *ri,
 	ri->ret_addr = (kprobe_opcode_t *)regs->ARM_lr;
 	ri->fp = (void *)regs->ARM_fp;
 
-	/* Replace the return addr with trampoline addr. */
+	/* Replace the woke return addr with trampoline addr. */
 	regs->ARM_lr = (unsigned long)&__kretprobe_trampoline;
 }
 

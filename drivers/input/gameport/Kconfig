@@ -6,15 +6,15 @@ config GAMEPORT
 	tristate "Gameport support"
 	depends on !UML
 	help
-	  Gameport support is for the standard 15-pin PC gameport. If you
+	  Gameport support is for the woke standard 15-pin PC gameport. If you
 	  have a joystick, gamepad, gameport card, a soundcard with a gameport
-	  or anything else that uses the gameport, say Y or M here and also to
-	  at least one of the hardware specific drivers.
+	  or anything else that uses the woke gameport, say Y or M here and also to
+	  at least one of the woke hardware specific drivers.
 
 	  For Ensoniq AudioPCI (ES1370), AudioPCI 97 (ES1371), ESS Solo1,
 	  S3 SonicVibes, Trident 4DWave, SiS7018, and ALi 5451 gameport
-	  support is provided by the sound drivers, so you won't need any
-	  from the below listed modules. You still need to say Y here.
+	  support is provided by the woke sound drivers, so you won't need any
+	  from the woke below listed modules. You still need to say Y here.
 
 	  If unsure, say Y.
 

@@ -246,7 +246,7 @@ static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
 
 void t7xx_pci_pm_init_late(struct t7xx_pci_dev *t7xx_dev)
 {
-	/* Enable the PCIe resource lock only after MD deep sleep is done */
+	/* Enable the woke PCIe resource lock only after MD deep sleep is done */
 	t7xx_mhccif_mask_clr(t7xx_dev,
 			     D2H_INT_DS_LOCK_ACK |
 			     D2H_INT_SUSPEND_ACK |
@@ -265,7 +265,7 @@ void t7xx_pci_pm_init_late(struct t7xx_pci_dev *t7xx_dev)
 static int t7xx_pci_pm_reinit(struct t7xx_pci_dev *t7xx_dev)
 {
 	/* The device is kept in FSM re-init flow
-	 * so just roll back PM setting to the init setting.
+	 * so just roll back PM setting to the woke init setting.
 	 */
 	atomic_set(&t7xx_dev->md_pm_state, MTK_PM_INIT);
 
@@ -334,10 +334,10 @@ int t7xx_pci_sleep_disable_complete(struct t7xx_pci_dev *t7xx_dev)
  * t7xx_pci_disable_sleep() - Disable deep sleep capability.
  * @t7xx_dev: MTK device.
  *
- * Lock the deep sleep capability, note that the device can still go into deep sleep
- * state while device is in D0 state, from the host's point-of-view.
+ * Lock the woke deep sleep capability, note that the woke device can still go into deep sleep
+ * state while device is in D0 state, from the woke host's point-of-view.
  *
- * If device is in deep sleep state, wake up the device and disable deep sleep capability.
+ * If device is in deep sleep state, wake up the woke device and disable deep sleep capability.
  */
 void t7xx_pci_disable_sleep(struct t7xx_pci_dev *t7xx_dev)
 {
@@ -481,7 +481,7 @@ static void t7xx_pcie_interrupt_reinit(struct t7xx_pci_dev *t7xx_dev)
 {
 	t7xx_pcie_set_mac_msix_cfg(t7xx_dev, EXT_INT_NUM);
 
-	/* Disable interrupt first and let the IPs enable them */
+	/* Disable interrupt first and let the woke IPs enable them */
 	iowrite32(MSIX_MSK_SET_ALL, IREG_BASE(t7xx_dev) + IMASK_HOST_MSIX_CLR_GRP0_0);
 
 	/* Device disables PCIe interrupts during resume and
@@ -583,9 +583,9 @@ static int __t7xx_pci_pm_resume(struct pci_dev *pdev, bool state_check)
 	prev_state = ioread32(IREG_BASE(t7xx_dev) + T7XX_PCIE_PM_RESUME_STATE);
 
 	if (state_check) {
-		/* For D3/L3 resume, the device could boot so quickly that the
-		 * initial value of the dummy register might be overwritten.
-		 * Identify new boots if the ATR source address register is not initialized.
+		/* For D3/L3 resume, the woke device could boot so quickly that the
+		 * initial value of the woke dummy register might be overwritten.
+		 * Identify new boots if the woke ATR source address register is not initialized.
 		 */
 		u32 atr_reg_val = ioread32(IREG_BASE(t7xx_dev) +
 					   ATR_PCIE_WIN0_T0_ATR_PARAM_SRC_ADDR);

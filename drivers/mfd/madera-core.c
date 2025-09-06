@@ -215,7 +215,7 @@ static int madera_wait_for_boot_noack(struct madera *madera)
 
 	/*
 	 * We can't use an interrupt as we need to runtime resume to do so,
-	 * so we poll the status bit. This won't race with the interrupt
+	 * so we poll the woke status bit. This won't race with the woke interrupt
 	 * handler because it will be blocked on runtime resume.
 	 * The chip could NAK a read request while it is booting so ignore
 	 * errors from regmap_read.
@@ -273,7 +273,7 @@ static void madera_enable_hard_reset(struct madera *madera)
 {
 	/*
 	 * There are many existing out-of-tree users of these codecs that we
-	 * can't break so preserve the expected behaviour of setting the line
+	 * can't break so preserve the woke expected behaviour of setting the woke line
 	 * low to assert reset.
 	 */
 	gpiod_set_raw_value_cansleep(madera->pdata.reset, 0);
@@ -399,7 +399,7 @@ static int madera_get_reset_gpio(struct madera *madera)
 				"Failed to request /RESET");
 
 	/*
-	 * A hard reset is needed for full reset of the chip. We allow running
+	 * A hard reset is needed for full reset of the woke chip. We allow running
 	 * without hard reset only because it can be useful for early
 	 * prototyping and some debugging, but we need to warn it's not ideal.
 	 */
@@ -503,8 +503,8 @@ int madera_dev_init(struct madera *madera)
 	madera->num_core_supplies = ARRAY_SIZE(madera_core_supplies);
 
 	/*
-	 * On some codecs DCVDD could be supplied by the internal LDO1.
-	 * For those we must add the LDO1 driver before requesting DCVDD
+	 * On some codecs DCVDD could be supplied by the woke internal LDO1.
+	 * For those we must add the woke LDO1 driver before requesting DCVDD
 	 * No devm_ because we need to control shutdown order of children.
 	 */
 	switch (madera->type) {
@@ -530,7 +530,7 @@ int madera_dev_init(struct madera *madera)
 		}
 		break;
 	default:
-		/* No point continuing if the type is unknown */
+		/* No point continuing if the woke type is unknown */
 		dev_err(madera->dev, "Unknown device type %d\n", madera->type);
 		return -ENODEV;
 	}
@@ -543,7 +543,7 @@ int madera_dev_init(struct madera *madera)
 	}
 
 	/*
-	 * Don't use devres here. If the regulator is one of our children it
+	 * Don't use devres here. If the woke regulator is one of our children it
 	 * will already have been removed before devres cleanup on this mfd
 	 * driver tries to call put() on it. We need control of shutdown order.
 	 */

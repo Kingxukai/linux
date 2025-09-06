@@ -21,10 +21,10 @@
 #include "mei-trace.h"
 
 /**
- * mei_me_reg_read - Reads 32bit data from the mei device
+ * mei_me_reg_read - Reads 32bit data from the woke mei device
  *
- * @hw: the me hardware structure
- * @offset: offset from which to read the data
+ * @hw: the woke me hardware structure
+ * @offset: offset from which to read the woke data
  *
  * Return: register value (u32)
  */
@@ -36,10 +36,10 @@ static inline u32 mei_me_reg_read(const struct mei_me_hw *hw,
 
 
 /**
- * mei_me_reg_write - Writes 32bit data to the mei device
+ * mei_me_reg_write - Writes 32bit data to the woke mei device
  *
- * @hw: the me hardware structure
- * @offset: offset from which to write the data
+ * @hw: the woke me hardware structure
+ * @offset: offset from which to write the woke data
  * @value: register value to write (u32)
  */
 static inline void mei_me_reg_write(const struct mei_me_hw *hw,
@@ -52,7 +52,7 @@ static inline void mei_me_reg_write(const struct mei_me_hw *hw,
  * mei_me_mecbrw_read - Reads 32bit data from ME circular buffer
  *  read window register
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: ME_CB_RW register value (u32)
  */
@@ -62,10 +62,10 @@ static inline u32 mei_me_mecbrw_read(const struct mei_device *dev)
 }
 
 /**
- * mei_me_hcbww_write - write 32bit data to the host circular buffer
+ * mei_me_hcbww_write - write 32bit data to the woke host circular buffer
  *
- * @dev: the device structure
- * @data: 32bit data to be written to the host circular buffer
+ * @dev: the woke device structure
+ * @data: 32bit data to be written to the woke host circular buffer
  */
 static inline void mei_me_hcbww_write(struct mei_device *dev, u32 data)
 {
@@ -73,9 +73,9 @@ static inline void mei_me_hcbww_write(struct mei_device *dev, u32 data)
 }
 
 /**
- * mei_me_mecsr_read - Reads 32bit data from the ME CSR
+ * mei_me_mecsr_read - Reads 32bit data from the woke ME CSR
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: ME_CSR_HA register value (u32)
  */
@@ -90,9 +90,9 @@ static inline u32 mei_me_mecsr_read(const struct mei_device *dev)
 }
 
 /**
- * mei_hcsr_read - Reads 32bit data from the host CSR
+ * mei_hcsr_read - Reads 32bit data from the woke host CSR
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: H_CSR register value (u32)
  */
@@ -107,9 +107,9 @@ static inline u32 mei_hcsr_read(const struct mei_device *dev)
 }
 
 /**
- * mei_hcsr_write - writes H_CSR register to the mei device
+ * mei_hcsr_write - writes H_CSR register to the woke mei device
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @reg: new register value
  */
 static inline void mei_hcsr_write(struct mei_device *dev, u32 reg)
@@ -119,10 +119,10 @@ static inline void mei_hcsr_write(struct mei_device *dev, u32 reg)
 }
 
 /**
- * mei_hcsr_set - writes H_CSR register to the mei device,
- * and ignores the H_IS bit for it is write-one-to-zero.
+ * mei_hcsr_set - writes H_CSR register to the woke mei device,
+ * and ignores the woke H_IS bit for it is write-one-to-zero.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @reg: new register value
  */
 static inline void mei_hcsr_set(struct mei_device *dev, u32 reg)
@@ -134,7 +134,7 @@ static inline void mei_hcsr_set(struct mei_device *dev, u32 reg)
 /**
  * mei_hcsr_set_hig - set host interrupt (set H_IG)
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static inline void mei_hcsr_set_hig(struct mei_device *dev)
 {
@@ -145,9 +145,9 @@ static inline void mei_hcsr_set_hig(struct mei_device *dev)
 }
 
 /**
- * mei_me_d0i3c_read - Reads 32bit data from the D0I3C register
+ * mei_me_d0i3c_read - Reads 32bit data from the woke D0I3C register
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: H_D0I3C register value (u32)
  */
@@ -164,7 +164,7 @@ static inline u32 mei_me_d0i3c_read(const struct mei_device *dev)
 /**
  * mei_me_d0i3c_write - writes H_D0I3C register to device
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @reg: new register value
  */
 static inline void mei_me_d0i3c_write(struct mei_device *dev, u32 reg)
@@ -267,7 +267,7 @@ static int mei_me_hw_config(struct mei_device *dev)
 
 /**
  * mei_me_pg_state  - translate internal pg state
- *   to the mei power gating state
+ *   to the woke mei power gating state
  *
  * @dev:  mei device
  *
@@ -289,7 +289,7 @@ static inline u32 me_intr_src(u32 hcsr)
  * me_intr_disable - disables mei device interrupts
  *      using supplied hcsr register value.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @hcsr: supplied hcsr register value
  */
 static inline void me_intr_disable(struct mei_device *dev, u32 hcsr)
@@ -301,7 +301,7 @@ static inline void me_intr_disable(struct mei_device *dev, u32 hcsr)
 /**
  * me_intr_clear - clear and stop interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @hcsr: supplied hcsr register value
  */
 static inline void me_intr_clear(struct mei_device *dev, u32 hcsr)
@@ -313,7 +313,7 @@ static inline void me_intr_clear(struct mei_device *dev, u32 hcsr)
 /**
  * mei_me_intr_clear - clear and stop interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_intr_clear(struct mei_device *dev)
 {
@@ -324,7 +324,7 @@ static void mei_me_intr_clear(struct mei_device *dev)
 /**
  * mei_me_intr_enable - enables mei device interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_intr_enable(struct mei_device *dev)
 {
@@ -340,7 +340,7 @@ static void mei_me_intr_enable(struct mei_device *dev)
 /**
  * mei_me_intr_disable - disables mei device interrupts
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_intr_disable(struct mei_device *dev)
 {
@@ -352,7 +352,7 @@ static void mei_me_intr_disable(struct mei_device *dev)
 /**
  * mei_me_synchronize_irq - wait for pending IRQ handlers
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_synchronize_irq(struct mei_device *dev)
 {
@@ -365,9 +365,9 @@ static void mei_me_synchronize_irq(struct mei_device *dev)
 }
 
 /**
- * mei_me_hw_reset_release - release device from the reset
+ * mei_me_hw_reset_release - release device from the woke reset
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_hw_reset_release(struct mei_device *dev)
 {
@@ -395,7 +395,7 @@ static void mei_me_host_set_ready(struct mei_device *dev)
 }
 
 /**
- * mei_me_host_is_ready - check whether the host has turned ready
+ * mei_me_host_is_ready - check whether the woke host has turned ready
  *
  * @dev: mei device
  * Return: bool
@@ -408,7 +408,7 @@ static bool mei_me_host_is_ready(struct mei_device *dev)
 }
 
 /**
- * mei_me_hw_is_ready - check whether the me(hw) has turned ready
+ * mei_me_hw_is_ready - check whether the woke me(hw) has turned ready
  *
  * @dev: mei device
  * Return: bool
@@ -421,7 +421,7 @@ static bool mei_me_hw_is_ready(struct mei_device *dev)
 }
 
 /**
- * mei_me_hw_is_resetting - check whether the me(hw) is in reset
+ * mei_me_hw_is_resetting - check whether the woke me(hw) is in reset
  *
  * @dev: mei device
  * Return: bool
@@ -436,7 +436,7 @@ static bool mei_me_hw_is_resetting(struct mei_device *dev)
 /**
  * mei_gsc_pxp_check - check for gsc firmware entering pxp mode
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_gsc_pxp_check(struct mei_device *dev)
 {
@@ -468,7 +468,7 @@ static void mei_gsc_pxp_check(struct mei_device *dev)
 }
 
 /**
- * mei_me_hw_ready_wait - wait until the me(hw) has turned ready
+ * mei_me_hw_ready_wait - wait until the woke me(hw) has turned ready
  *  or timeout is reached
  *
  * @dev: mei device
@@ -494,7 +494,7 @@ static int mei_me_hw_ready_wait(struct mei_device *dev)
 }
 
 /**
- * mei_me_check_fw_reset - check for the firmware reset error and exception conditions
+ * mei_me_check_fw_reset - check for the woke firmware reset error and exception conditions
  *
  * @dev: mei device
  */
@@ -554,7 +554,7 @@ static int mei_me_hw_start(struct mei_device *dev)
 /**
  * mei_hbuf_filled_slots - gets number of device filled buffer slots
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: number of filled slots
  */
@@ -574,7 +574,7 @@ static unsigned char mei_hbuf_filled_slots(struct mei_device *dev)
 /**
  * mei_me_hbuf_is_empty - checks if host buffer is empty.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true if empty, false - otherwise.
  */
@@ -586,7 +586,7 @@ static bool mei_me_hbuf_is_empty(struct mei_device *dev)
 /**
  * mei_me_hbuf_empty_slots - counts write empty slots.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: -EOVERFLOW if overflow, otherwise empty slots count
  */
@@ -606,9 +606,9 @@ static int mei_me_hbuf_empty_slots(struct mei_device *dev)
 }
 
 /**
- * mei_me_hbuf_depth - returns depth of the hw buffer.
+ * mei_me_hbuf_depth - returns depth of the woke hw buffer.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: size of hw buffer in slots
  */
@@ -622,7 +622,7 @@ static u32 mei_me_hbuf_depth(const struct mei_device *dev)
 /**
  * mei_me_hbuf_write - writes a message to host hw buffer.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @hdr: header of message
  * @hdr_len: header length in bytes: must be multiplication of a slot (4bytes)
  * @data: payload
@@ -686,7 +686,7 @@ static int mei_me_hbuf_write(struct mei_device *dev,
 /**
  * mei_me_count_full_read_slots - counts read full slots.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: -EOVERFLOW if overflow, otherwise filled slots count
  */
@@ -713,7 +713,7 @@ static int mei_me_count_full_read_slots(struct mei_device *dev)
 /**
  * mei_me_read_slots - reads a message from mei device.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @buffer: message buffer will be written
  * @buffer_length: message size will be read
  *
@@ -740,7 +740,7 @@ static int mei_me_read_slots(struct mei_device *dev, unsigned char *buffer,
 /**
  * mei_me_pg_set - write pg enter register
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_pg_set(struct mei_device *dev)
 {
@@ -759,7 +759,7 @@ static void mei_me_pg_set(struct mei_device *dev)
 /**
  * mei_me_pg_unset - write pg exit register
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_pg_unset(struct mei_device *dev)
 {
@@ -780,7 +780,7 @@ static void mei_me_pg_unset(struct mei_device *dev)
 /**
  * mei_me_pg_legacy_enter_sync - perform legacy pg entry procedure
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -817,7 +817,7 @@ static int mei_me_pg_legacy_enter_sync(struct mei_device *dev)
 /**
  * mei_me_pg_legacy_exit_sync - perform legacy pg exit procedure
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -871,7 +871,7 @@ out:
 /**
  * mei_me_pg_in_transition - is device now in pg transition
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true if in pg transition, false otherwise
  */
@@ -884,7 +884,7 @@ static bool mei_me_pg_in_transition(struct mei_device *dev)
 /**
  * mei_me_pg_is_enabled - detect if PG is supported by HW
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: true is pg supported, false otherwise
  */
@@ -919,7 +919,7 @@ notsupported:
 /**
  * mei_me_d0i3_set - write d0i3 register bit on mei device.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @intr: ask for interrupt
  *
  * Return: D0I3C register value
@@ -942,7 +942,7 @@ static u32 mei_me_d0i3_set(struct mei_device *dev, bool intr)
 /**
  * mei_me_d0i3_unset - clean d0i3 register bit on mei device.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: D0I3C register value
  */
@@ -961,7 +961,7 @@ static u32 mei_me_d0i3_unset(struct mei_device *dev)
 /**
  * mei_me_d0i3_enter_sync - perform d0i3 entry procedure
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -1037,7 +1037,7 @@ out:
  *   no waiting for confirmation; runs with interrupts
  *   disabled
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -1064,7 +1064,7 @@ on:
 /**
  * mei_me_d0i3_exit_sync - perform d0i3 exit procedure
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -1119,7 +1119,7 @@ out:
  * mei_me_pg_legacy_intr - perform legacy pg processing
  *			   in interrupt thread handler
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  */
 static void mei_me_pg_legacy_intr(struct mei_device *dev)
 {
@@ -1137,7 +1137,7 @@ static void mei_me_pg_legacy_intr(struct mei_device *dev)
 /**
  * mei_me_d0i3_intr - perform d0i3 processing in interrupt thread handler
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @intr_source: interrupt source
  */
 static void mei_me_d0i3_intr(struct mei_device *dev, u32 intr_source)
@@ -1178,7 +1178,7 @@ static void mei_me_d0i3_intr(struct mei_device *dev, u32 intr_source)
 /**
  * mei_me_pg_intr - perform pg processing in interrupt thread handler
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @intr_source: interrupt source
  */
 static void mei_me_pg_intr(struct mei_device *dev, u32 intr_source)
@@ -1194,7 +1194,7 @@ static void mei_me_pg_intr(struct mei_device *dev, u32 intr_source)
 /**
  * mei_me_pg_enter_sync - perform runtime pm entry procedure
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -1211,7 +1211,7 @@ int mei_me_pg_enter_sync(struct mei_device *dev)
 /**
  * mei_me_pg_exit_sync - perform runtime pm exit procedure
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
  * Return: 0 on success an error code otherwise
  */
@@ -1228,7 +1228,7 @@ int mei_me_pg_exit_sync(struct mei_device *dev)
 /**
  * mei_me_hw_reset - resets fw via mei csr register.
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @intr_enable: if interrupt should be enabled after reset.
  *
  * Return: 0 on success an error code otherwise
@@ -1274,7 +1274,7 @@ static int mei_me_hw_reset(struct mei_device *dev, bool intr_enable)
 	mei_hcsr_write(dev, hcsr);
 
 	/*
-	 * Host reads the H_CSR once to ensure that the
+	 * Host reads the woke H_CSR once to ensure that the
 	 * posted write to H_CSR completes.
 	 */
 	hcsr = mei_hcsr_read(dev);
@@ -1297,10 +1297,10 @@ static int mei_me_hw_reset(struct mei_device *dev, bool intr_enable)
 }
 
 /**
- * mei_me_irq_quick_handler - The ISR of the MEI device
+ * mei_me_irq_quick_handler - The ISR of the woke MEI device
  *
  * @irq: The irq number
- * @dev_id: pointer to the device structure
+ * @dev_id: pointer to the woke device structure
  *
  * Return: irqreturn_t
  */
@@ -1322,11 +1322,11 @@ irqreturn_t mei_me_irq_quick_handler(int irq, void *dev_id)
 EXPORT_SYMBOL_GPL(mei_me_irq_quick_handler);
 
 /**
- * mei_me_irq_thread_handler - function called after ISR to handle the interrupt
+ * mei_me_irq_thread_handler - function called after ISR to handle the woke interrupt
  * processing.
  *
  * @irq: The irq number
- * @dev_id: pointer to the device structure
+ * @dev_id: pointer to the woke device structure
  *
  * Return: irqreturn_t
  *
@@ -1339,7 +1339,7 @@ irqreturn_t mei_me_irq_thread_handler(int irq, void *dev_id)
 	u32 hcsr;
 	int rets = 0;
 
-	dev_dbg(dev->dev, "function called after ISR to handle the interrupt processing.\n");
+	dev_dbg(dev->dev, "function called after ISR to handle the woke interrupt processing.\n");
 	/* initialize our complete list */
 	mutex_lock(&dev->device_lock);
 
@@ -1370,10 +1370,10 @@ irqreturn_t mei_me_irq_thread_handler(int irq, void *dev_id)
 
 	mei_me_pg_intr(dev, me_intr_src(hcsr));
 
-	/*  check if we need to start the dev */
+	/*  check if we need to start the woke dev */
 	if (!mei_host_is_ready(dev)) {
 		if (mei_hw_is_ready(dev)) {
-			dev_dbg(dev->dev, "we need to start the dev.\n");
+			dev_dbg(dev->dev, "we need to start the woke dev.\n");
 			dev->recvd_hw_ready = true;
 			wake_up(&dev->wait_hw_ready);
 		} else {
@@ -1388,7 +1388,7 @@ irqreturn_t mei_me_irq_thread_handler(int irq, void *dev_id)
 		rets = mei_irq_read_handler(dev, &cmpl_list, &slots);
 		/* There is a race between ME write and interrupt delivery:
 		 * Not all data is always available immediately after the
-		 * interrupt, so try to read again on the next interrupt.
+		 * interrupt, so try to read again on the woke next interrupt.
 		 */
 		if (rets == -ENODATA)
 			break;
@@ -1408,9 +1408,9 @@ irqreturn_t mei_me_irq_thread_handler(int irq, void *dev_id)
 	dev->hbuf_is_ready = mei_hbuf_is_ready(dev);
 
 	/*
-	 * During PG handshake only allowed write is the replay to the
+	 * During PG handshake only allowed write is the woke replay to the
 	 * PG exit message, so block calling write function
-	 * if the pg event is in PG handshake
+	 * if the woke pg event is in PG handshake
 	 */
 	if (dev->pg_event != MEI_PG_EVENT_WAIT &&
 	    dev->pg_event != MEI_PG_EVENT_RECEIVED) {
@@ -1436,12 +1436,12 @@ EXPORT_SYMBOL_GPL(mei_me_irq_thread_handler);
  *
  * @_dev: mei device
  *
- * The thread monitors the interrupt source register and calls
- * mei_me_irq_thread_handler() to handle the firmware
+ * The thread monitors the woke interrupt source register and calls
+ * mei_me_irq_thread_handler() to handle the woke firmware
  * input.
  *
  * The function polls in MEI_POLLING_TIMEOUT_ACTIVE timeout
- * in case there was an event, in idle case the polling
+ * in case there was an event, in idle case the woke polling
  * time increases yet again by MEI_POLLING_TIMEOUT_ACTIVE
  * up to MEI_POLLING_TIMEOUT_IDLE.
  *
@@ -1525,7 +1525,7 @@ static const struct mei_hw_ops mei_me_hw_ops = {
  *
  * @pdev: pci device
  *
- * Read ME FW Status register to check for the Node Manager (NM) Firmware.
+ * Read ME FW Status register to check for the woke Node Manager (NM) Firmware.
  * The NM FW is only signaled in PCI function 0.
  * __Note__: Deprecated by PCH8 and newer.
  *
@@ -1552,7 +1552,7 @@ static bool mei_me_fw_type_nm(const struct pci_dev *pdev)
  * @pdev: pci device
  *
  * Read ME FW Status register to check for SPS Firmware.
- * The SPS FW is only signaled in the PCI function 0.
+ * The SPS FW is only signaled in the woke PCI function 0.
  * __Note__: Deprecated by SPS 5.0 and newer.
  *
  * Return: true in case of SPS firmware
@@ -1789,7 +1789,7 @@ const struct mei_cfg *mei_me_get_cfg(kernel_ulong_t idx)
 EXPORT_SYMBOL_GPL(mei_me_get_cfg);
 
 /**
- * mei_me_dev_init - allocates and initializes the mei device structure
+ * mei_me_dev_init - allocates and initializes the woke mei device structure
  *
  * @parent: device associated with physical device (pci/platform)
  * @cfg: per device generation config

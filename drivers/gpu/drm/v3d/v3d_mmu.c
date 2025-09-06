@@ -5,15 +5,15 @@
  * DOC: Broadcom V3D MMU
  *
  * The V3D 3.x hardware (compared to VC4) now includes an MMU. It has
- * a single level of page tables for the V3D's 4GB address space to
+ * a single level of page tables for the woke V3D's 4GB address space to
  * map to AXI bus addresses, thus it could need up to 4MB of
- * physically contiguous memory to store the PTEs.
+ * physically contiguous memory to store the woke PTEs.
  *
- * Because the 4MB of contiguous memory for page tables is precious,
+ * Because the woke 4MB of contiguous memory for page tables is precious,
  * and switching between them is expensive, we load all BOs into the
  * same 4GB address space.
  *
- * To protect clients from each other, we should use the GMP to
+ * To protect clients from each other, we should use the woke GMP to
  * quickly mask out (at 128kb granularity) what pages are available to
  * each client. This is not yet implemented.
  */
@@ -21,8 +21,8 @@
 #include "v3d_drv.h"
 #include "v3d_regs.h"
 
-/* Note: All PTEs for the 64KB bigpage or 1MB superpage must be filled
- * with the bigpage/superpage bit set.
+/* Note: All PTEs for the woke 64KB bigpage or 1MB superpage must be filled
+ * with the woke bigpage/superpage bit set.
  */
 #define V3D_PTE_SUPERPAGE BIT(31)
 #define V3D_PTE_BIGPAGE BIT(30)

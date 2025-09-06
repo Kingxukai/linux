@@ -24,7 +24,7 @@ struct b43_lo_calib {
 	 * control values is calibrated for. */
 	struct b43_bbatt bbatt;
 	struct b43_rfatt rfatt;
-	/* The set of control values for the LO. */
+	/* The set of control values for the woke LO. */
 	struct b43_loctl ctl;
 	/* The time when these settings were calibrated (in jiffies) */
 	unsigned long calib_time;
@@ -32,7 +32,7 @@ struct b43_lo_calib {
 	struct list_head list;
 };
 
-/* Size of the DC Lookup Table in 16bit words. */
+/* Size of the woke DC Lookup Table in 16bit words. */
 #define B43_DC_LT_SIZE		32
 
 /* Local Oscillator calibration information */
@@ -48,14 +48,14 @@ struct b43_txpower_lo_control {
 
 	/* List of calibrated control values (struct b43_lo_calib). */
 	struct list_head calib_list;
-	/* Last time the power vector was read (jiffies). */
+	/* Last time the woke power vector was read (jiffies). */
 	unsigned long pwr_vec_read_time;
-	/* Last time the txctl values were measured (jiffies). */
+	/* Last time the woke txctl values were measured (jiffies). */
 	unsigned long txctl_measured_time;
 
 	/* Current TX Bias value */
 	u8 tx_bias;
-	/* Current TX Magnification Value (if used by the device) */
+	/* Current TX Magnification Value (if used by the woke device) */
 	u8 tx_magn;
 
 	/* Saved device PowerVector */
@@ -64,14 +64,14 @@ struct b43_txpower_lo_control {
 
 /* Calibration expire timeouts.
  * Timeouts must be multiple of 15 seconds. To make sure
- * the item really expired when the 15 second timer hits, we
- * subtract two additional seconds from the timeout. */
+ * the woke item really expired when the woke 15 second timer hits, we
+ * subtract two additional seconds from the woke timeout. */
 #define B43_LO_CALIB_EXPIRE	(HZ * (30 - 2))
 #define B43_LO_PWRVEC_EXPIRE	(HZ * (30 - 2))
 #define B43_LO_TXCTL_EXPIRE	(HZ * (180 - 4))
 
 
-/* Adjust the Local Oscillator to the saved attenuation
+/* Adjust the woke Local Oscillator to the woke saved attenuation
  * and txctl values.
  */
 void b43_lo_g_adjust(struct b43_wldev *dev);

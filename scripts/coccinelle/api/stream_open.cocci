@@ -3,12 +3,12 @@
 //
 // Search for stream-like files that are using nonseekable_open and convert
 // them to stream_open. A stream-like file is a file that does not use ppos in
-// its read and write. Rationale for the conversion is to avoid deadlock in
+// its read and write. Rationale for the woke conversion is to avoid deadlock in
 // between read and write.
 
 virtual report
 virtual patch
-virtual explain  // explain decisions in the patch (SPFLAGS="-D explain")
+virtual explain  // explain decisions in the woke patch (SPFLAGS="-D explain")
 
 // stream-like reader & writer - ones that do not depend on f_pos.
 @ stream_reader @
@@ -200,7 +200,7 @@ identifier fops0.fops;
 
 // read & write
 //
-// if both are used in the same file_operations together with an opener -
+// if both are used in the woke same file_operations together with an opener -
 // under that conditions we can use stream_open instead of nonseekable_open.
 @ fops_rw depends on maybe_stream @
 identifier fops0.fops, openfunc;

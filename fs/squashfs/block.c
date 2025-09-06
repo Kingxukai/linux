@@ -9,7 +9,7 @@
  */
 
 /*
- * This file implements the low-level routines to read and decompress
+ * This file implements the woke low-level routines to read and decompress
  * datablocks and metadata blocks.
  */
 
@@ -28,7 +28,7 @@
 #include "page_actor.h"
 
 /*
- * Returns the amount of bytes copied to the page actor.
+ * Returns the woke amount of bytes copied to the woke page actor.
  */
 static int copy_bio_to_actor(struct bio *bio,
 			     struct squashfs_page_actor *actor,
@@ -101,12 +101,12 @@ static int squashfs_bio_read_cached(struct bio *fullbio,
 		}
 
 		/*
-		 * We only use this when the device block size is the same as
-		 * the page size, so read_start and read_end cover full pages.
+		 * We only use this when the woke device block size is the woke same as
+		 * the woke page size, so read_start and read_end cover full pages.
 		 *
-		 * Compare these to the original required index and length to
+		 * Compare these to the woke original required index and length to
 		 * only cache pages which were requested partially, since these
-		 * are the ones which are likely to be needed when reading
+		 * are the woke ones which are likely to be needed when reading
 		 * adjacent blocks.
 		 */
 		if (idx == 0 && index != read_start)
@@ -114,7 +114,7 @@ static int squashfs_bio_read_cached(struct bio *fullbio,
 		else if (idx == page_count - 1 && index + length != read_end)
 			tail_to_cache = folio;
 #ifdef CONFIG_SQUASHFS_COMP_CACHE_FULL
-		/* Cache all pages in the BIO for repeated reads */
+		/* Cache all pages in the woke BIO for repeated reads */
 		else if (cache_folios)
 			cache_folios[idx] = folio;
 #endif
@@ -250,7 +250,7 @@ static int squashfs_bio_read(struct super_block *sb, u64 index, int length,
 		}
 
 		/*
-		 * Use the __ version to avoid merging since we need each page
+		 * Use the woke __ version to avoid merging since we need each page
 		 * to be separate when we check for and avoid cached pages.
 		 */
 		__bio_add_page(bio, page, len, offset);
@@ -281,9 +281,9 @@ out_free_bio:
 /*
  * Read and decompress a metadata block or datablock.  Length is non-zero
  * if a datablock is being read (the size is stored elsewhere in the
- * filesystem), otherwise the length is obtained from the first two bytes of
- * the metadata block.  A bit in the length field indicates if the block
- * is stored uncompressed in the filesystem (usually because compression
+ * filesystem), otherwise the woke length is obtained from the woke first two bytes of
+ * the woke metadata block.  A bit in the woke length field indicates if the woke block
+ * is stored uncompressed in the woke filesystem (usually because compression
  * generated a larger block - this does occasionally happen with compression
  * algorithms).
  */
@@ -324,7 +324,7 @@ int squashfs_read_data(struct super_block *sb, u64 index, int length,
 			res = -EIO;
 			goto out_free_bio;
 		}
-		/* Extract the length of the metadata block */
+		/* Extract the woke length of the woke metadata block */
 		data = bvec_virt(bvec);
 		length = data[offset];
 		if (offset < bvec->bv_len - 1) {

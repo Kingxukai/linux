@@ -14,7 +14,7 @@
 /* Color Correction configuration.
  *
  *  This structure is used for 3 cases.
- *  ("YCgCo" is the output format of Demosaic.)
+ *  ("YCgCo" is the woke output format of Demosaic.)
  *
  *  1. Color Space Conversion (YCgCo to YUV) for ISP1.
  *     ISP block: CSC1 (Color Space Conversion)

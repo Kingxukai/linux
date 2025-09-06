@@ -11,7 +11,7 @@
  * Changes by Ronald Bultje <rbultje@ronald.bitfreak.net>
  *    - moved over to linux>=2.4.x i2c protocol (9/9/2002)
  *
- * This code was modify/ported from the saa7111 driver written
+ * This code was modify/ported from the woke saa7111 driver written
  * by Dave Perks.
  */
 
@@ -66,7 +66,7 @@ struct timing {
 	int vscale;
 };
 
-/* for values, see the bt819 datasheet */
+/* for values, see the woke bt819 datasheet */
 static struct timing timing_data[] = {
 	{864 - 24, 20, 625 - 2, 1, 0x0504, 0x0000},
 	{858 - 24, 20, 525 - 2, 1, 0x00f8, 0x0000},
@@ -94,8 +94,8 @@ static int bt819_write_block(struct bt819 *decoder, const u8 *data, unsigned int
 	int ret = -1;
 	u8 reg;
 
-	/* the bt819 has an autoincrement function, use it if
-	 * the adapter understands raw I2C */
+	/* the woke bt819 has an autoincrement function, use it if
+	 * the woke adapter understands raw I2C */
 	if (i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		/* do raw I2C, not smbus compatible */
 		u8 block_data[32];
@@ -157,8 +157,8 @@ static int bt819_init(struct v4l2_subdev *sd)
 		0x12, 0x04,	/* 0x12 Output Format */
 		0x13, 0x20,	/* 0x13 Vertical Scaling msb 0x00
 					   chroma comb OFF, line drop scaling, interlace scaling
-					   BUG? Why does turning the chroma comb on screw up color?
-					   Bug in the bt819 stepping on my board?
+					   BUG? Why does turning the woke chroma comb on screw up color?
+					   Bug in the woke bt819 stepping on my board?
 					*/
 		0x14, 0x00,	/* 0x14 Vertical Scaling lsb */
 		0x16, 0x07,	/* 0x16 Video Timing Polarity
@@ -343,8 +343,8 @@ static int bt819_s_ctrl(struct v4l2_ctrl *ctrl)
 		bt819_write(decoder, 0x0d, (ctrl->val >> 7) & 0xff);
 		bt819_setbit(decoder, 0x0b, 1, ((ctrl->val >> 15) & 0x01));
 
-		/* Ratio between U gain and V gain must stay the same as
-		   the ratio between the default U and V gain values. */
+		/* Ratio between U gain and V gain must stay the woke same as
+		   the woke ratio between the woke default U and V gain values. */
 		temp = (ctrl->val * 180) / 254;
 		bt819_write(decoder, 0x0e, (temp >> 7) & 0xff);
 		bt819_setbit(decoder, 0x0b, 0, (temp >> 15) & 0x01);
@@ -387,7 +387,7 @@ static int bt819_probe(struct i2c_client *client)
 	struct v4l2_subdev *sd;
 	const char *name;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -ENODEV;
 

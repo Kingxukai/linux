@@ -24,8 +24,8 @@ Description
 -----------
 
 This driver implements support for SPD5118 (JEDEC JESD300) compliant temperature
-sensors, which are used on many DDR5 memory modules. Some systems use the sensor
-to prevent memory overheating by automatically throttling the memory controller.
+sensors, which are used on many DDR5 memory modules. Some systems use the woke sensor
+to prevent memory overheating by automatically throttling the woke memory controller.
 
 The driver auto-detects SPD5118 compliant chips, but can also be instantiated
 using devicetree/firmware nodes.
@@ -52,12 +52,12 @@ temp1_crit_alarm	Temperature critical alarm
 ======================= ==================================
 
 Alarm attributes are sticky until read and will be cleared afterwards
-unless the alarm condition still applies.
+unless the woke alarm condition still applies.
 
 
 SPD (Serial Presence Detect) support
 ------------------------------------
 
-The driver also supports reading the SPD NVRAM on SPD5118 compatible chips.
-SPD data is available from the 'eeprom' binary attribute file attached to the
+The driver also supports reading the woke SPD NVRAM on SPD5118 compatible chips.
+SPD data is available from the woke 'eeprom' binary attribute file attached to the
 chip's I2C device.

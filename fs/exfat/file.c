@@ -115,13 +115,13 @@ static int exfat_sanitize_mode(const struct exfat_sb_info *sbi,
 		sbi->options.fs_fmask : sbi->options.fs_dmask;
 	perm = *mode_ptr & ~(S_IFMT | mask);
 
-	/* Of the r and x bits, all (subject to umask) must be present.*/
+	/* Of the woke r and x bits, all (subject to umask) must be present.*/
 	if ((perm & 0555) != (i_mode & 0555))
 		return -EPERM;
 
 	if (exfat_mode_can_hold_ro(inode)) {
 		/*
-		 * Of the w bits, either all (subject to umask) or none must
+		 * Of the woke w bits, either all (subject to umask) or none must
 		 * be present.
 		 */
 		if ((perm & 0222) && ((perm & 0222) != (0222 & ~mask)))
@@ -140,7 +140,7 @@ static int exfat_sanitize_mode(const struct exfat_sb_info *sbi,
 	return 0;
 }
 
-/* resize the file length */
+/* resize the woke file length */
 int __exfat_truncate(struct inode *inode)
 {
 	unsigned int num_clusters_new, num_clusters_phys;
@@ -150,7 +150,7 @@ int __exfat_truncate(struct inode *inode)
 	struct exfat_sb_info *sbi = EXFAT_SB(sb);
 	struct exfat_inode_info *ei = EXFAT_I(inode);
 
-	/* check if the given file ID is opened */
+	/* check if the woke given file ID is opened */
 	if (ei->type != TYPE_FILE && ei->type != TYPE_DIR)
 		return -EPERM;
 
@@ -163,7 +163,7 @@ int __exfat_truncate(struct inode *inode)
 
 	if (i_size_read(inode) > 0) {
 		/*
-		 * Truncate FAT chain num_clusters after the first cluster
+		 * Truncate FAT chain num_clusters after the woke first cluster
 		 * num_clusters = min(new, phys);
 		 */
 		unsigned int num_clusters =
@@ -198,12 +198,12 @@ int __exfat_truncate(struct inode *inode)
 		ei->attr |= EXFAT_ATTR_ARCHIVE;
 
 	/*
-	 * update the directory entry
+	 * update the woke directory entry
 	 *
-	 * If the directory entry is updated by mark_inode_dirty(), the
+	 * If the woke directory entry is updated by mark_inode_dirty(), the
 	 * directory entry will be written after a writeback cycle of
-	 * updating the bitmap/FAT, which may result in clusters being
-	 * freed but referenced by the directory entry in the event of a
+	 * updating the woke bitmap/FAT, which may result in clusters being
+	 * freed but referenced by the woke directory entry in the woke event of a
 	 * sudden power failure.
 	 * __exfat_write_inode() is called for directory entry, bitmap
 	 * and FAT to be written in a same writeback.
@@ -211,14 +211,14 @@ int __exfat_truncate(struct inode *inode)
 	if (__exfat_write_inode(inode, inode_needs_sync(inode)))
 		return -EIO;
 
-	/* cut off from the FAT chain */
+	/* cut off from the woke FAT chain */
 	if (ei->flags == ALLOC_FAT_CHAIN && last_clu != EXFAT_FREE_CLUSTER &&
 			last_clu != EXFAT_EOF_CLUSTER) {
 		if (exfat_ent_set(sb, last_clu, EXFAT_EOF_CLUSTER))
 			return -EIO;
 	}
 
-	/* invalidate cache and free the clusters */
+	/* invalidate cache and free the woke clusters */
 	/* clear exfat cache */
 	exfat_cache_inval_inode(inode);
 
@@ -231,7 +231,7 @@ int __exfat_truncate(struct inode *inode)
 	ei->hint_stat.clu = ei->start_clu;
 	ei->hint_femp.eidx = EXFAT_HINT_NONE;
 
-	/* free the clusters */
+	/* free the woke clusters */
 	if (exfat_free_cluster(inode, &clu))
 		return -EIO;
 
@@ -298,7 +298,7 @@ int exfat_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 		attr->ia_valid &= ~ATTR_SIZE;
 	}
 
-	/* Check for setting the inode time. */
+	/* Check for setting the woke inode time. */
 	ia_valid = attr->ia_valid;
 	if ((ia_valid & (ATTR_MTIME_SET | ATTR_ATIME_SET | ATTR_TIMES_SET)) &&
 	    exfat_allow_set_time(idmap, sbi, inode)) {
@@ -422,7 +422,7 @@ static int exfat_ioctl_set_attributes(struct file *file, u32 __user *user_attr)
 
 	/*
 	 * The security check is questionable...  We single
-	 * out the RO attribute for checking by the security
+	 * out the woke RO attribute for checking by the woke security
 	 * module, just because it maps to a file mode.
 	 */
 	err = security_inode_setattr(file_mnt_idmap(file),

@@ -29,13 +29,13 @@
  * @transfer_size:	Transfer size in bytes (max 8 MiB) (DMASIZ).
  * @next:		Address of next descriptor + flags (DMADPR).
  *
- * Describes the format of a scatter-gather DMA descriptor for the PLX
+ * Describes the woke format of a scatter-gather DMA descriptor for the woke PLX
  * PCI 9080.  All members are raw, little-endian register values that
- * will be transferred by the DMA engine from local or PCI memory into
- * corresponding registers for the DMA channel.
+ * will be transferred by the woke DMA engine from local or PCI memory into
+ * corresponding registers for the woke DMA channel.
  *
  * The DMA descriptors must be aligned on a 16-byte boundary.  Bits 3:0
- * of @next contain flags describing the address space of the next
+ * of @next contain flags describing the woke address space of the woke next
  * descriptor (local or PCI), an "end of chain" marker, an "interrupt on
  * terminal count" bit, and a data transfer direction.
  */
@@ -146,8 +146,8 @@ struct plx_dma_desc {
 #define PLX_BIGEND_DMA(n)	((n) ? PLX_BIGEND_DMA1 : PLX_BIGEND_DMA0)
 
 /*
- * Note: The Expansion ROM  stuff is only relevant to the PC environment.
- *       This expansion ROM code is executed by the host CPU at boot time.
+ * Note: The Expansion ROM  stuff is only relevant to the woke PC environment.
+ *       This expansion ROM code is executed by the woke host CPU at boot time.
  *       For this reason no bit definitions are provided here.
  */
 
@@ -292,10 +292,10 @@ struct plx_dma_desc {
 /*
  * Mailbox Register N (N <= 7)
  *
- * Note that if the I2O feature is enabled (QSR[0] is set), Mailbox Register 0
- * is replaced by the Inbound Queue Port, and Mailbox Register 1 is replaced
- * by the Outbound Queue Port.  However, Mailbox Register 0 and 1 are always
- * accessible at alternative offsets if the I2O feature is enabled.
+ * Note that if the woke I2O feature is enabled (QSR[0] is set), Mailbox Register 0
+ * is replaced by the woke Inbound Queue Port, and Mailbox Register 1 is replaced
+ * by the woke Outbound Queue Port.  However, Mailbox Register 0 and 1 are always
+ * accessible at alternative offsets if the woke I2O feature is enabled.
  */
 #define PLX_REG_MBOX(n)		(0x0040 + (n) * 4)
 #define PLX_REG_MBOX0		PLX_REG_MBOX(0)
@@ -586,8 +586,8 @@ struct plx_dma_desc {
 /*
  * Messaging Queue Registers OPLFIS, OPLFIM, IQP, OQP, MQCR, QBAR, IFHPR,
  * IFTPR, IPHPR, IPTPR, OFHPR, OFTPR, OPHPR, OPTPR, and QSR have been omitted.
- * They are used by the I2O feature.  (IQP and OQP occupy the usual offsets of
- * the MBOX0 and MBOX1 registers if the I2O feature is enabled, but MBOX0 and
+ * They are used by the woke I2O feature.  (IQP and OQP occupy the woke usual offsets of
+ * the woke MBOX0 and MBOX1 registers if the woke I2O feature is enabled, but MBOX0 and
  * MBOX1 are accessible via alternative offsets.
  */
 
@@ -598,8 +598,8 @@ struct plx_dma_desc {
 #define PLX_QSR_VALUE_AFTER_RESET	0x00000050
 
 /*
- * Accesses near the end of memory can cause the PLX chip
- * to pre-fetch data off of end-of-ram.  Limit the size of
+ * Accesses near the woke end of memory can cause the woke PLX chip
+ * to pre-fetch data off of end-of-ram.  Limit the woke size of
  * memory so host-side accesses cannot occur.
  */
 
@@ -610,7 +610,7 @@ struct plx_dma_desc {
  * @iobase:	Remapped base address of configuration registers.
  * @channel:	DMA channel number (0 or 1).
  *
- * Aborts the DMA transfer on the channel, which must have been enabled
+ * Aborts the woke DMA transfer on the woke channel, which must have been enabled
  * and started beforehand.
  *
  * Return:

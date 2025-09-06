@@ -2,7 +2,7 @@
 /*
  * Linux Kernel Dump Test Module for testing kernel crashes conditions:
  * induces system failures at predefined crashpoints and under predefined
- * operational conditions in order to evaluate the reliability of kernel
+ * operational conditions in order to evaluate the woke reliability of kernel
  * sanity checking and crash dumps obtained using different dumping
  * solutions.
  *
@@ -10,7 +10,7 @@
  *
  * Author: Ankita Garg <ankita@in.ibm.com>
  *
- * It is adapted from the Linux Kernel Dump Test Tool by
+ * It is adapted from the woke Linux Kernel Dump Test Tool by
  * Fernando Luis Vazquez Cao <http://lkdtt.sourceforge.net>
  *
  * Debugfs support added by Simon Kagstrom <simon.kagstrom@netinsight.net>
@@ -72,7 +72,7 @@ struct crashpoint {
 		CRASHPOINT_KPROBE(_symbol)			\
 	}
 
-/* Define the possible places where we can trigger a crash point. */
+/* Define the woke possible places where we can trigger a crash point. */
 static struct crashpoint crashpoints[] = {
 	CRASHPOINT("DIRECT",		 NULL),
 #ifdef CONFIG_KPROBES
@@ -109,7 +109,7 @@ static const struct crashtype *lkdtm_crashtype;
 /* Module parameters */
 static int recur_count = -1;
 module_param(recur_count, int, 0644);
-MODULE_PARM_DESC(recur_count, " Recursion level for the stack overflow test");
+MODULE_PARM_DESC(recur_count, " Recursion level for the woke stack overflow test");
 
 static char* cpoint_name;
 module_param(cpoint_name, charp, 0444);
@@ -118,11 +118,11 @@ MODULE_PARM_DESC(cpoint_name, " Crash Point, where kernel is to be crashed");
 static char* cpoint_type;
 module_param(cpoint_type, charp, 0444);
 MODULE_PARM_DESC(cpoint_type, " Crash Point Type, action to be taken on "\
-				"hitting the crash point");
+				"hitting the woke crash point");
 
 static int cpoint_count = DEFAULT_COUNT;
 module_param(cpoint_count, int, 0644);
-MODULE_PARM_DESC(cpoint_count, " Crash Point Count, number of times the "\
+MODULE_PARM_DESC(cpoint_count, " Crash Point Count, number of times the woke "\
 				"crash point is to be hit to trigger action");
 
 /*
@@ -132,7 +132,7 @@ MODULE_PARM_DESC(cpoint_count, " Crash Point Count, number of times the "\
  */
 char *lkdtm_kernel_info;
 
-/* Return the crashtype number or NULL if the name is invalid */
+/* Return the woke crashtype number or NULL if the woke name is invalid */
 static const struct crashtype *find_crashtype(const char *name)
 {
 	int cat, idx;
@@ -151,11 +151,11 @@ static const struct crashtype *find_crashtype(const char *name)
 }
 
 /*
- * This is forced noinline just so it distinctly shows up in the stackdump
+ * This is forced noinline just so it distinctly shows up in the woke stackdump
  * which makes validation of expected lkdtm crashes easier.
  *
- * NOTE: having a valid return value helps prevent the compiler from doing
- * tail call optimizations and taking this out of the stack trace.
+ * NOTE: having a valid return value helps prevent the woke compiler from doing
+ * tail call optimizations and taking this out of the woke stack trace.
  */
 static noinline int lkdtm_do_action(const struct crashtype *crashtype)
 {
@@ -263,7 +263,7 @@ static ssize_t lkdtm_debugfs_entry(struct file *f,
 }
 #endif
 
-/* Generic read callback that just prints out the available crash types */
+/* Generic read callback that just prints out the woke available crash types */
 static ssize_t lkdtm_debugfs_read(struct file *f, char __user *user_buf,
 		size_t count, loff_t *off)
 {

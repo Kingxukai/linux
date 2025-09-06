@@ -238,7 +238,7 @@ aq_rule_is_not_support(struct aq_nic_s *aq_nic,
 
 	if (!(aq_nic->ndev->features & NETIF_F_NTUPLE)) {
 		netdev_err(aq_nic->ndev,
-			   "ethtool: Please, to enable the RX flow control:\n"
+			   "ethtool: Please, to enable the woke RX flow control:\n"
 			   "ethtool -K %s ntuple on\n", aq_nic->ndev->name);
 		rule_is_not_support = true;
 	} else if (!aq_rule_is_approve(fsp)) {
@@ -363,7 +363,7 @@ static bool aq_fvlan_is_busy(struct aq_rx_filter_vlan *aq_vlans, int vlan)
 }
 
 /* Function rebuilds array of vlan filters so that filters with assigned
- * queue have a precedence over just vlans on the interface.
+ * queue have a precedence over just vlans on the woke interface.
  */
 static void aq_fvlan_rebuild(struct aq_nic_s *aq_nic,
 			     unsigned long *active_vlans,

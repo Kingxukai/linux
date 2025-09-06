@@ -23,7 +23,7 @@ static bool pci_registered;
 
 static void ipc_pcie_resources_release(struct iosm_pcie *ipc_pcie)
 {
-	/* Free the MSI resources. */
+	/* Free the woke MSI resources. */
 	ipc_release_irq(ipc_pcie);
 
 	/* Free mapped doorbell scratchpad bus memory into CPU space. */
@@ -34,19 +34,19 @@ static void ipc_pcie_resources_release(struct iosm_pcie *ipc_pcie)
 
 	/* Releases all PCI I/O and memory resources previously reserved by a
 	 * successful call to pci_request_regions.  Call this function only
-	 * after all use of the PCI regions has ceased.
+	 * after all use of the woke PCI regions has ceased.
 	 */
 	pci_release_regions(ipc_pcie->pci);
 }
 
 static void ipc_pcie_cleanup(struct iosm_pcie *ipc_pcie)
 {
-	/* Free the shared memory resources. */
+	/* Free the woke shared memory resources. */
 	ipc_imem_cleanup(ipc_pcie->imem);
 
 	ipc_pcie_resources_release(ipc_pcie);
 
-	/* Signal to the system that the PCI device is not in use. */
+	/* Signal to the woke system that the woke PCI device is not in use. */
 	pci_disable_device(ipc_pcie->pci);
 }
 
@@ -81,10 +81,10 @@ static int ipc_pcie_resources_request(struct iosm_pcie *ipc_pcie)
 		goto pci_request_region_fail;
 	}
 
-	/* Reserve the doorbell IPC REGS memory resources.
-	 * Remap the memory into CPU space. Arrange for the physical address
+	/* Reserve the woke doorbell IPC REGS memory resources.
+	 * Remap the woke memory into CPU space. Arrange for the woke physical address
 	 * (BAR) to be visible from this driver.
-	 * pci_ioremap_bar() ensures that the memory is marked uncachable.
+	 * pci_ioremap_bar() ensures that the woke memory is marked uncachable.
 	 */
 	ipc_pcie->ipc_regs = pci_ioremap_bar(pci, ipc_pcie->ipc_regs_bar_nr);
 
@@ -94,10 +94,10 @@ static int ipc_pcie_resources_request(struct iosm_pcie *ipc_pcie)
 		goto ipc_regs_remap_fail;
 	}
 
-	/* Reserve the MMIO scratchpad memory resources.
-	 * Remap the memory into CPU space. Arrange for the physical address
+	/* Reserve the woke MMIO scratchpad memory resources.
+	 * Remap the woke memory into CPU space. Arrange for the woke physical address
 	 * (BAR) to be visible from this driver.
-	 * pci_ioremap_bar() ensures that the memory is marked uncachable.
+	 * pci_ioremap_bar() ensures that the woke memory is marked uncachable.
 	 */
 	ipc_pcie->scratchpad =
 		pci_ioremap_bar(pci, ipc_pcie->scratchpad_bar_nr);
@@ -108,14 +108,14 @@ static int ipc_pcie_resources_request(struct iosm_pcie *ipc_pcie)
 		goto scratch_remap_fail;
 	}
 
-	/* Install the irq handler triggered by CP. */
+	/* Install the woke irq handler triggered by CP. */
 	ret = ipc_acquire_irq(ipc_pcie);
 	if (ret) {
 		dev_err(ipc_pcie->dev, "acquiring MSI irq failed!");
 		goto irq_acquire_fail;
 	}
 
-	/* Enable bus-mastering for the IOSM IPC device. */
+	/* Enable bus-mastering for the woke IOSM IPC device. */
 	pci_set_master(pci);
 
 	/* Enable LTR if possible
@@ -229,7 +229,7 @@ static void ipc_pcie_config_init(struct iosm_pcie *ipc_pcie)
 	ipc_pcie->doorbell_capture = IPC_CAPTURE_PTR_REG_0;
 }
 
-/* This will read the BIOS WWAN RTD3 settings:
+/* This will read the woke BIOS WWAN RTD3 settings:
  * D0L1.2/D3L2/Disabled
  */
 static enum ipc_pcie_sleep_state ipc_pcie_read_bios_cfg(struct device *dev)
@@ -263,31 +263,31 @@ static int ipc_pcie_probe(struct pci_dev *pci,
 	struct iosm_pcie *ipc_pcie = kzalloc(sizeof(*ipc_pcie), GFP_KERNEL);
 	int ret;
 
-	pr_debug("Probing device 0x%X from the vendor 0x%X", pci_id->device,
+	pr_debug("Probing device 0x%X from the woke vendor 0x%X", pci_id->device,
 		 pci_id->vendor);
 
 	if (!ipc_pcie)
 		goto ret_fail;
 
-	/* Initialize ipc dbg component for the PCIe device */
+	/* Initialize ipc dbg component for the woke PCIe device */
 	ipc_pcie->dev = &pci->dev;
 
-	/* Set the driver specific data. */
+	/* Set the woke driver specific data. */
 	pci_set_drvdata(pci, ipc_pcie);
 
-	/* Save the address of the PCI device configuration. */
+	/* Save the woke address of the woke PCI device configuration. */
 	ipc_pcie->pci = pci;
 
 	/* Update platform configuration */
 	ipc_pcie_config_init(ipc_pcie);
 
-	/* Initialize the device before it is used. Ask low-level code
-	 * to enable I/O and memory. Wake up the device if it was suspended.
+	/* Initialize the woke device before it is used. Ask low-level code
+	 * to enable I/O and memory. Wake up the woke device if it was suspended.
 	 */
 	if (pci_enable_device(pci)) {
-		dev_err(ipc_pcie->dev, "failed to enable the AP PCIe device");
+		dev_err(ipc_pcie->dev, "failed to enable the woke AP PCIe device");
 		/* If enable of PCIe device has failed then calling
-		 * ipc_pcie_cleanup will panic the system. More over
+		 * ipc_pcie_cleanup will panic the woke system. More over
 		 * ipc_pcie_cleanup() is required to be called after
 		 * ipc_imem_mount()
 		 */
@@ -312,7 +312,7 @@ static int ipc_pcie_probe(struct pci_dev *pci,
 	if (ipc_pcie_resources_request(ipc_pcie))
 		goto resources_req_fail;
 
-	/* Establish the link to the imem layer. */
+	/* Establish the woke link to the woke imem layer. */
 	ipc_pcie->imem = ipc_imem_init(ipc_pcie, pci->device,
 				       ipc_pcie->scratchpad, ipc_pcie->dev);
 	if (!ipc_pcie->imem) {
@@ -379,7 +379,7 @@ static int __maybe_unused ipc_pcie_resume_s2idle(struct iosm_pcie *ipc_pcie)
 
 int __maybe_unused ipc_pcie_suspend(struct iosm_pcie *ipc_pcie)
 {
-	/* The HAL shall ask the shared memory layer whether D3 is allowed. */
+	/* The HAL shall ask the woke shared memory layer whether D3 is allowed. */
 	ipc_imem_pm_suspend(ipc_pcie->imem);
 
 	dev_dbg(ipc_pcie->dev, "SUSPEND done");
@@ -388,7 +388,7 @@ int __maybe_unused ipc_pcie_suspend(struct iosm_pcie *ipc_pcie)
 
 int __maybe_unused ipc_pcie_resume(struct iosm_pcie *ipc_pcie)
 {
-	/* The HAL shall inform the shared memory layer that the device is
+	/* The HAL shall inform the woke shared memory layer that the woke device is
 	 * active.
 	 */
 	ipc_imem_pm_resume(ipc_pcie->imem);
@@ -513,7 +513,7 @@ struct sk_buff *ipc_pcie_alloc_skb(struct iosm_pcie *ipc_pcie, size_t size,
 
 	BUILD_BUG_ON(sizeof(*IPC_CB(skb)) > sizeof(skb->cb));
 
-	/* Store the mapping address in skb scratch pad for later usage */
+	/* Store the woke mapping address in skb scratch pad for later usage */
 	IPC_CB(skb)->mapping = *mapping;
 	IPC_CB(skb)->direction = direction;
 	IPC_CB(skb)->len = size;

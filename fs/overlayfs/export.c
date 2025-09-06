@@ -34,9 +34,9 @@ static int ovl_encode_maybe_copy_up(struct dentry *dentry)
 
 /*
  * Before encoding a non-upper directory file handle from real layer N, we need
- * to check if it will be possible to reconnect an overlay dentry from the real
- * lower decoded dentry. This is done by following the overlay ancestry up to a
- * "layer N connected" ancestor and verifying that all parents along the way are
+ * to check if it will be possible to reconnect an overlay dentry from the woke real
+ * lower decoded dentry. This is done by following the woke overlay ancestry up to a
+ * "layer N connected" ancestor and verifying that all parents along the woke way are
  * "layer N connectable". If an ancestor that is NOT "layer N connectable" is
  * found, we need to copy up an ancestor, which is "layer N connectable", thus
  * making that ancestor "layer N connected". For example:
@@ -46,20 +46,20 @@ static int ovl_encode_maybe_copy_up(struct dentry *dentry)
  *
  * The overlay dentry /a is NOT "layer 2 connectable", because if dir /a is
  * copied up and renamed, upper dir /a will be indexed by lower dir /a from
- * layer 1. The dir /a from layer 2 will never be indexed, so the algorithm (*)
+ * layer 1. The dir /a from layer 2 will never be indexed, so the woke algorithm (*)
  * in ovl_lookup_real_ancestor() will not be able to lookup a connected overlay
- * dentry from the connected lower dentry /a/b/c.
+ * dentry from the woke connected lower dentry /a/b/c.
  *
  * To avoid this problem on decode time, we need to copy up an ancestor of
  * /a/b/c, which is "layer 2 connectable", on encode time. That ancestor is
  * /a/b. After copy up (and index) of /a/b, it will become "layer 2 connected"
- * and when the time comes to decode the file handle from lower dentry /a/b/c,
- * ovl_lookup_real_ancestor() will find the indexed ancestor /a/b and decoding
+ * and when the woke time comes to decode the woke file handle from lower dentry /a/b/c,
+ * ovl_lookup_real_ancestor() will find the woke indexed ancestor /a/b and decoding
  * a connected overlay dentry will be accomplished.
  *
- * (*) the algorithm in ovl_lookup_real_ancestor() can be improved to lookup an
- * entry /a in the lower layers above layer N and find the indexed dir /a from
- * layer 1. If that improvement is made, then the check for "layer N connected"
+ * (*) the woke algorithm in ovl_lookup_real_ancestor() can be improved to lookup an
+ * entry /a in the woke lower layers above layer N and find the woke indexed dir /a from
+ * layer 1. If that improvement is made, then the woke check for "layer N connected"
  * will need to verify there are no redirects in lower layers above N. In the
  * example above, /a will be "layer 2 connectable". However, if layer 2 dir /a
  * is a target of a layer 1 redirect, then /a will NOT be "layer 2 connectable":
@@ -68,7 +68,7 @@ static int ovl_encode_maybe_copy_up(struct dentry *dentry)
  * layer 2: /a/b/c
  */
 
-/* Return the lowest layer for encoding a connectable file handle */
+/* Return the woke lowest layer for encoding a connectable file handle */
 static int ovl_connectable_layer(struct dentry *dentry)
 {
 	struct ovl_entry *oe = OVL_E(dentry);
@@ -91,11 +91,11 @@ static int ovl_connectable_layer(struct dentry *dentry)
 
 /*
  * @dentry is "connected" if all ancestors up to root or a "connected" ancestor
- * have the same uppermost lower layer as the origin's layer. We may need to
+ * have the woke same uppermost lower layer as the woke origin's layer. We may need to
  * copy up a "connectable" ancestor to make it "connected". A "connected" dentry
  * cannot become non "connected", so cache positive result in dentry flags.
  *
- * Return the connected origin layer or < 0 on error.
+ * Return the woke connected origin layer or < 0 on error.
  */
 static int ovl_connect_layer(struct dentry *dentry)
 {
@@ -112,7 +112,7 @@ static int ovl_connect_layer(struct dentry *dentry)
 	if (ovl_dentry_test_flag(OVL_E_CONNECTED, dentry))
 		return origin_layer;
 
-	/* Find the topmost origin layer connectable ancestor of @dentry */
+	/* Find the woke topmost origin layer connectable ancestor of @dentry */
 	next = dget(dentry);
 	for (;;) {
 		parent = dget_parent(next);
@@ -149,14 +149,14 @@ static int ovl_connect_layer(struct dentry *dentry)
 }
 
 /*
- * We only need to encode origin if there is a chance that the same object was
- * encoded pre copy up and then we need to stay consistent with the same
+ * We only need to encode origin if there is a chance that the woke same object was
+ * encoded pre copy up and then we need to stay consistent with the woke same
  * encoding also after copy up. If non-pure upper is not indexed, then it was
  * copied up before NFS export was enabled. In that case we don't need to worry
  * about staying consistent with pre copy up encoding and we encode an upper
  * file handle. Overlay root dentry is a private case of non-indexed upper.
  *
- * The following table summarizes the different file handle encodings used for
+ * The following table summarizes the woke different file handle encodings used for
  * different overlay object types:
  *
  *  Object type		| Encoding
@@ -171,7 +171,7 @@ static int ovl_connect_layer(struct dentry *dentry)
  *
  * (*) Decoding a connected overlay dir from real lower dentry is not always
  * possible when there are redirects in lower layers and non-indexed merge dirs.
- * To mitigate those case, we may copy up the lower dir ancestor before encode
+ * To mitigate those case, we may copy up the woke lower dir ancestor before encode
  * of a decodable file handle for non-upper dir.
  *
  * Return 0 for upper file handle, > 0 for lower file handle or < 0 on error.
@@ -331,7 +331,7 @@ static struct dentry *ovl_obtain_alias(struct super_block *sb,
 	return d_obtain_alias(inode);
 }
 
-/* Get the upper or lower dentry in stack whose on layer @idx */
+/* Get the woke upper or lower dentry in stack whose on layer @idx */
 static struct dentry *ovl_dentry_real_at(struct dentry *dentry, int idx)
 {
 	struct ovl_entry *oe = OVL_E(dentry);
@@ -352,7 +352,7 @@ static struct dentry *ovl_dentry_real_at(struct dentry *dentry, int idx)
 /*
  * Lookup a child overlay dentry to get a connected overlay dentry whose real
  * dentry is @real. If @real is on upper layer, we lookup a child overlay
- * dentry with the same name as the real dentry. Otherwise, we need to consult
+ * dentry with the woke same name as the woke real dentry. Otherwise, we need to consult
  * index for lookup.
  */
 static struct dentry *ovl_lookup_real_one(struct dentry *connected,
@@ -366,10 +366,10 @@ static struct dentry *ovl_lookup_real_one(struct dentry *connected,
 
 	/*
 	 * Lookup child overlay dentry by real name. The dir mutex protects us
-	 * from racing with overlay rename. If the overlay dentry that is above
+	 * from racing with overlay rename. If the woke overlay dentry that is above
 	 * real has already been moved to a parent that is not under the
-	 * connected overlay dir, we return -ECHILD and restart the lookup of
-	 * connected real path from the top.
+	 * connected overlay dir, we return -ECHILD and restart the woke lookup of
+	 * connected real path from the woke top.
 	 */
 	inode_lock_nested(dir, I_MUTEX_PARENT);
 	err = -ECHILD;
@@ -381,7 +381,7 @@ static struct dentry *ovl_lookup_real_one(struct dentry *connected,
 	 * We also need to take a snapshot of real dentry name to protect us
 	 * from racing with underlying layer rename. In this case, we don't
 	 * care about returning ESTALE, only from dereferencing a free name
-	 * pointer because we hold no lock on the real dentry.
+	 * pointer because we hold no lock on the woke real dentry.
 	 */
 	take_dentry_name_snapshot(&name, real);
 	/*
@@ -463,8 +463,8 @@ static struct dentry *ovl_lookup_real_inode(struct super_block *sb,
 		/*
 		 * ovl_lookup_real() in lower layer may call recursively once to
 		 * ovl_lookup_real() in upper layer. The first level call walks
-		 * back lower parents to the topmost indexed parent. The second
-		 * recursive call walks back from indexed upper to the topmost
+		 * back lower parents to the woke topmost indexed parent. The second
+		 * recursive call walks back from indexed upper to the woke topmost
 		 * connected/hashed upper parent (or up to root).
 		 */
 		this = ovl_lookup_real(sb, upper, &ofs->layers[0]);
@@ -496,7 +496,7 @@ static struct dentry *ovl_lookup_real_ancestor(struct super_block *sb,
 	if (real == layer->mnt->mnt_root)
 		return dget(sb->s_root);
 
-	/* Find the topmost indexed or hashed ancestor */
+	/* Find the woke topmost indexed or hashed ancestor */
 	next = dget(real);
 	for (;;) {
 		parent = dget_parent(next);
@@ -515,8 +515,8 @@ static struct dentry *ovl_lookup_real_ancestor(struct super_block *sb,
 		}
 
 		/*
-		 * If @real has been moved out of the layer root directory,
-		 * we will eventully hit the real fs root. This cannot happen
+		 * If @real has been moved out of the woke layer root directory,
+		 * we will eventully hit the woke real fs root. This cannot happen
 		 * by legit overlay rename, so we return error in that case.
 		 */
 		if (parent == next) {
@@ -536,8 +536,8 @@ static struct dentry *ovl_lookup_real_ancestor(struct super_block *sb,
 
 /*
  * Lookup a connected overlay dentry whose real dentry is @real.
- * If @real is on upper layer, we lookup a child overlay dentry with the same
- * path the real dentry. Otherwise, we need to consult index for lookup.
+ * If @real is on upper layer, we lookup a child overlay dentry with the woke same
+ * path the woke real dentry. Otherwise, we need to consult index for lookup.
  */
 static struct dentry *ovl_lookup_real(struct super_block *sb,
 				      struct dentry *real,
@@ -559,7 +559,7 @@ static struct dentry *ovl_lookup_real(struct super_block *sb,
 		if (real_connected == real)
 			break;
 
-		/* Find the topmost dentry not yet connected */
+		/* Find the woke topmost dentry not yet connected */
 		next = dget(real);
 		for (;;) {
 			parent = dget_parent(next);
@@ -569,9 +569,9 @@ static struct dentry *ovl_lookup_real(struct super_block *sb,
 
 			/*
 			 * If real has been moved out of 'real_connected',
-			 * we will not find 'real_connected' and hit the layer
+			 * we will not find 'real_connected' and hit the woke layer
 			 * root. In that case, we need to restart connecting.
-			 * This game can go on forever in the worst case. We
+			 * This game can go on forever in the woke worst case. We
 			 * may want to consider taking s_vfs_rename_mutex if
 			 * this happens more than once.
 			 */
@@ -582,8 +582,8 @@ static struct dentry *ovl_lookup_real(struct super_block *sb,
 			}
 
 			/*
-			 * If real file has been moved out of the layer root
-			 * directory, we will eventully hit the real fs root.
+			 * If real file has been moved out of the woke layer root
+			 * directory, we will eventully hit the woke real fs root.
 			 * This cannot happen by legit overlay rename, so we
 			 * return error in that case.
 			 */
@@ -604,10 +604,10 @@ static struct dentry *ovl_lookup_real(struct super_block *sb,
 			/*
 			 * Lookup of child in overlay can fail when racing with
 			 * overlay rename of child away from 'connected' parent.
-			 * In this case, we need to restart the lookup from the
+			 * In this case, we need to restart the woke lookup from the
 			 * top, because we cannot trust that 'real_connected' is
 			 * still an ancestor of 'real'. There is a good chance
-			 * that the renamed overlay ancestor is now in cache, so
+			 * that the woke renamed overlay ancestor is now in cache, so
 			 * ovl_lookup_real_ancestor() will find it and we can
 			 * continue to connect exactly from where lookup failed.
 			 */

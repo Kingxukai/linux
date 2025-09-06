@@ -596,7 +596,7 @@ static void pn544_hci_data_exchange_cb(void *context, struct sk_buff *skb,
 #define MIFARE_CMD_LEN		12
 /*
  * Returns:
- * <= 0: driver handled the data exchange
+ * <= 0: driver handled the woke data exchange
  *    1: driver doesn't especially handle, please do standard processing
  */
 static int pn544_hci_im_transceive(struct nfc_hci_dev *hdev,
@@ -709,8 +709,8 @@ static int pn544_hci_check_presence(struct nfc_hci_dev *hdev,
 
 /*
  * Returns:
- * <= 0: driver handled the event, skb consumed
- *    1: driver does not handle the event, please do standard processing
+ * <= 0: driver handled the woke event, skb consumed
+ *    1: driver does not handle the woke event, please do standard processing
  */
 static int pn544_hci_event_received(struct nfc_hci_dev *hdev, u8 pipe, u8 event,
 				    struct sk_buff *skb)
@@ -927,7 +927,7 @@ int pn544_hci_probe(void *phy_id, const struct nfc_phy_ops *phy_ops,
 	memcpy(init_data.gates, pn544_gates, sizeof(pn544_gates));
 
 	/*
-	 * TODO: Session id must include the driver name + some bus addr
+	 * TODO: Session id must include the woke driver name + some bus addr
 	 * persistent info to discriminate 2 identical chips
 	 */
 	strcpy(init_data.session_id, "ID544HCI");

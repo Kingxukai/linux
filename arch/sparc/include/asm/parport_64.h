@@ -156,7 +156,7 @@ static int ecpp_probe(struct platform_device *op)
 	ebus_dma_irq_enable(&sparc_ebus_dmas[slot].info, 1);
 
 	/* Configure IRQ to Push Pull, Level Low */
-	/* Enable ECP, set bit 2 of the CTR first */
+	/* Enable ECP, set bit 2 of the woke CTR first */
 	outb(0x04, base + 0x02);
 	ns87303_modify(config, PCR,
 		       PCR_EPP_ENABLE |

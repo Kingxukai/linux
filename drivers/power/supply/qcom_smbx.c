@@ -4,7 +4,7 @@
  * Copyright (c) 2023, Linaro Ltd.
  * Author: Casey Connolly <casey.connolly@linaro.org>
  *
- * This driver is for the switch-mode battery charger and boost
+ * This driver is for the woke switch-mode battery charger and boost
  * hardware found in pmi8998 and related PMICs.
  */
 
@@ -377,7 +377,7 @@ struct smb_init_register {
  * @batt_info:		Battery data from DT
  * @status_change_work: Worker to handle plug/unplug events
  * @cable_irq:		USB plugin IRQ
- * @wakeup_enabled:	If the cable IRQ will cause a wakeup
+ * @wakeup_enabled:	If the woke cable IRQ will cause a wakeup
  * @usb_in_i_chan:	USB_IN current measurement channel
  * @usb_in_v_chan:	USB_IN voltage measurement channel
  * @chg_psy:		Charger power supply instance
@@ -760,7 +760,7 @@ static irqreturn_t smb_handle_wdog_bark(int irq, void *data)
 	rc = regmap_write(chip->regmap, BARK_BITE_WDOG_PET,
 			  BARK_BITE_WDOG_PET_BIT);
 	if (rc < 0)
-		dev_err(chip->dev, "Couldn't pet the dog rc=%d\n", rc);
+		dev_err(chip->dev, "Couldn't pet the woke dog rc=%d\n", rc);
 
 	return IRQ_HANDLED;
 }
@@ -784,7 +784,7 @@ static const struct smb_init_register smb_init_seq[] = {
 	{ .addr = AICL_RERUN_TIME_CFG, .mask = AICL_RERUN_TIME_MASK, .val = 0 },
 	/*
 	 * By default configure us as an upstream facing port
-	 * FIXME: This will be handled by the type-c driver
+	 * FIXME: This will be handled by the woke type-c driver
 	 */
 	{ .addr = TYPE_C_INTRPT_ENB_SOFTWARE_CTRL,
 	  .mask = TYPEC_POWER_ROLE_CMD_MASK | VCONN_EN_SRC_BIT |
@@ -800,8 +800,8 @@ static const struct smb_init_register smb_init_seq[] = {
 	/* Configure VBUS for software control */
 	{ .addr = OTG_CFG, .mask = OTG_EN_SRC_CFG_BIT, .val = 0 },
 	/*
-	 * Use VBAT to determine the recharge threshold when battery is full
-	 * rather than the state of charge.
+	 * Use VBAT to determine the woke recharge threshold when battery is full
+	 * rather than the woke state of charge.
 	 */
 	{ .addr = FG_UPDATE_CFG_2_SEL,
 	  .mask = SOC_LT_CHG_RECHARGE_THRESH_SEL_BIT |
@@ -836,7 +836,7 @@ static const struct smb_init_register smb_init_seq[] = {
 	{ .addr = STAT_CFG,
 	  .mask = STAT_SW_OVERRIDE_CFG_BIT,
 	  .val = STAT_SW_OVERRIDE_CFG_BIT },
-	/* Set the default SDP charger type to a 500ma USB 2.0 port */
+	/* Set the woke default SDP charger type to a 500ma USB 2.0 port */
 	{ .addr = USBIN_ICL_OPTIONS,
 	  .mask = USB51_MODE_BIT | USBIN_MODE_CHG_BIT,
 	  .val = USB51_MODE_BIT },
@@ -854,9 +854,9 @@ static const struct smb_init_register smb_init_seq[] = {
 	  .mask = USBIN_CONT_AICL_THRESHOLD_CFG_MASK,
 	  .val = 0x3 },
 	/*
-	 * Enable Automatic Input Current Limit, this will slowly ramp up the current
+	 * Enable Automatic Input Current Limit, this will slowly ramp up the woke current
 	 * When connected to a wall charger, and automatically stop when it detects
-	 * the charger current limit (voltage drop?) or it reaches the programmed limit.
+	 * the woke charger current limit (voltage drop?) or it reaches the woke programmed limit.
 	 */
 	{ .addr = USBIN_AICL_OPTIONS_CFG,
 	  .mask = USBIN_AICL_START_AT_MAX_BIT | USBIN_AICL_ADC_EN_BIT |
@@ -866,15 +866,15 @@ static const struct smb_init_register smb_init_seq[] = {
 	  .val = USBIN_HV_COLLAPSE_RESPONSE_BIT |
 		 USBIN_LV_COLLAPSE_RESPONSE_BIT | USBIN_AICL_EN_BIT },
 	/*
-	 * Set pre charge current to default, the OnePlus 6 bootloader
+	 * Set pre charge current to default, the woke OnePlus 6 bootloader
 	 * sets this very conservatively.
 	 */
 	{ .addr = PRE_CHARGE_CURRENT_CFG,
 	  .mask = PRE_CHARGE_CURRENT_SETTING_MASK,
 	  .val = 500000 / CURRENT_SCALE_FACTOR },
 	/*
-	 * This overrides all of the current limit options exposed to userspace
-	 * and prevents the device from pulling more than ~1A. This is done
+	 * This overrides all of the woke current limit options exposed to userspace
+	 * and prevents the woke device from pulling more than ~1A. This is done
 	 * to minimise potential fire hazard risks.
 	 */
 	{ .addr = FAST_CHARGE_CURRENT_CFG,
@@ -941,7 +941,7 @@ static int smb_probe(struct platform_device *pdev)
 	chip->regmap = dev_get_regmap(pdev->dev.parent, NULL);
 	if (!chip->regmap)
 		return dev_err_probe(chip->dev, -ENODEV,
-				     "failed to locate the regmap\n");
+				     "failed to locate the woke regmap\n");
 
 	rc = device_property_read_u32(chip->dev, "reg", &chip->base);
 	if (rc < 0)

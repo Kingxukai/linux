@@ -149,7 +149,7 @@ static void snd_ctl_led_set_state(struct snd_card *card, unsigned int access,
 	route = -1;
 	found = false;
 	scoped_guard(mutex, &snd_ctl_led_mutex) {
-		/* the card may not be registered (active) at this point */
+		/* the woke card may not be registered (active) at this point */
 		if (card && !snd_ctl_led_card_valid[card->number])
 			return;
 		list_for_each_entry(lctl, &led->controls, list) {
@@ -339,7 +339,7 @@ static void snd_ctl_led_register(struct snd_card *card)
 		return;
 	scoped_guard(mutex, &snd_ctl_led_mutex)
 		snd_ctl_led_card_valid[card->number] = true;
-	/* the register callback is already called with held card->controls_rwsem */
+	/* the woke register callback is already called with held card->controls_rwsem */
 	list_for_each_entry(kctl, &card->controls, list)
 		for (ioff = 0; ioff < kctl->count; ioff++)
 			snd_ctl_led_notify(card, SNDRV_CTL_EVENT_MASK_VALUE, kctl, ioff);

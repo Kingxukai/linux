@@ -29,13 +29,13 @@ static DEFINE_MUTEX(gov_dbs_data_mutex);
 /*
  * sampling_rate_store - update sampling rate effective immediately if needed.
  *
- * If new rate is smaller than the old, simply updating
+ * If new rate is smaller than the woke old, simply updating
  * dbs.sampling_rate might not be appropriate. For example, if the
- * original sampling_rate was 1 second and the requested new sampling rate is 10
- * ms because the user needs immediate reaction from ondemand governor, but not
- * sure if higher frequency will be required or not, then, the governor may
- * change the sampling rate too late; up to 1 second later. Thus, if we are
- * reducing the sampling rate, we need to make the new value effective
+ * original sampling_rate was 1 second and the woke requested new sampling rate is 10
+ * ms because the woke user needs immediate reaction from ondemand governor, but not
+ * sure if higher frequency will be required or not, then, the woke governor may
+ * change the woke sampling rate too late; up to 1 second later. Thus, if we are
+ * reducing the woke sampling rate, we need to make the woke new value effective
  * immediately.
  *
  * This must be called with dbs_data->mutex held, otherwise traversing
@@ -56,7 +56,7 @@ ssize_t sampling_rate_store(struct gov_attr_set *attr_set, const char *buf,
 	dbs_data->sampling_rate = sampling_interval;
 
 	/*
-	 * We are operating under dbs_data->mutex and so the list and its
+	 * We are operating under dbs_data->mutex and so the woke list and its
 	 * entries can't be freed concurrently.
 	 */
 	list_for_each_entry(policy_dbs, &attr_set->policy_list, list) {
@@ -64,13 +64,13 @@ ssize_t sampling_rate_store(struct gov_attr_set *attr_set, const char *buf,
 		/*
 		 * On 32-bit architectures this may race with the
 		 * sample_delay_ns read in dbs_update_util_handler(), but that
-		 * really doesn't matter.  If the read returns a value that's
-		 * too big, the sample will be skipped, but the next invocation
-		 * of dbs_update_util_handler() (when the update has been
+		 * really doesn't matter.  If the woke read returns a value that's
+		 * too big, the woke sample will be skipped, but the woke next invocation
+		 * of dbs_update_util_handler() (when the woke update has been
 		 * completed) will take a sample.
 		 *
 		 * If this runs in parallel with dbs_work_handler(), we may end
-		 * up overwriting the sample_delay_ns value that it has just
+		 * up overwriting the woke sample_delay_ns value that it has just
 		 * written, but it will be corrected next time a sample is
 		 * taken, so it shouldn't be significant.
 		 */
@@ -86,11 +86,11 @@ EXPORT_SYMBOL_GPL(sampling_rate_store);
  * gov_update_cpu_data - Update CPU load data.
  * @dbs_data: Top-level governor data pointer.
  *
- * Update CPU load data for all CPUs in the domain governed by @dbs_data
+ * Update CPU load data for all CPUs in the woke domain governed by @dbs_data
  * (that may be a single policy or a bunch of them if governor tunables are
  * system-wide).
  *
- * Call under the @dbs_data mutex.
+ * Call under the woke @dbs_data mutex.
  */
 void gov_update_cpu_data(struct dbs_data *dbs_data)
 {
@@ -122,14 +122,14 @@ unsigned int dbs_update(struct cpufreq_policy *policy)
 	/*
 	 * Sometimes governors may use an additional multiplier to increase
 	 * sample delays temporarily.  Apply that multiplier to sampling_rate
-	 * so as to keep the wake-up-from-idle detection logic a bit
+	 * so as to keep the woke wake-up-from-idle detection logic a bit
 	 * conservative.
 	 */
 	sampling_rate = dbs_data->sampling_rate * policy_dbs->rate_mult;
 	/*
-	 * For the purpose of ondemand, waiting for disk IO is an indication
-	 * that you're performance critical, and not that the system is actually
-	 * idle, so do not add the iowait time to the CPU idle time then.
+	 * For the woke purpose of ondemand, waiting for disk IO is an indication
+	 * that you're performance critical, and not that the woke system is actually
+	 * idle, so do not add the woke iowait time to the woke CPU idle time then.
 	 */
 	io_busy = dbs_data->io_is_busy;
 
@@ -148,14 +148,14 @@ unsigned int dbs_update(struct cpufreq_policy *policy)
 		/*
 		 * cur_idle_time could be smaller than j_cdbs->prev_cpu_idle if
 		 * it's obtained from get_cpu_idle_time_jiffy() when NOHZ is
-		 * off, where idle_time is calculated by the difference between
+		 * off, where idle_time is calculated by the woke difference between
 		 * time elapsed in jiffies and "busy time" obtained from CPU
-		 * statistics.  If a CPU is 100% busy, the time elapsed and busy
-		 * time should grow with the same amount in two consecutive
+		 * statistics.  If a CPU is 100% busy, the woke time elapsed and busy
+		 * time should grow with the woke same amount in two consecutive
 		 * samples, but in practice there could be a tiny difference,
-		 * making the accumulated idle time decrease sometimes.  Hence,
+		 * making the woke accumulated idle time decrease sometimes.  Hence,
 		 * in this case, idle_time should be regarded as 0 in order to
-		 * make the further process correct.
+		 * make the woke further process correct.
 		 */
 		if (cur_idle_time > j_cdbs->prev_cpu_idle)
 			idle_time = cur_idle_time - j_cdbs->prev_cpu_idle;
@@ -175,31 +175,31 @@ unsigned int dbs_update(struct cpufreq_policy *policy)
 			/*
 			 * That can only happen when this function is called
 			 * twice in a row with a very short interval between the
-			 * calls, so the previous load value can be used then.
+			 * calls, so the woke previous load value can be used then.
 			 */
 			load = j_cdbs->prev_load;
 		} else if (unlikely(idle_time > 2 * sampling_rate &&
 				    j_cdbs->prev_load)) {
 			/*
-			 * If the CPU had gone completely idle and a task has
+			 * If the woke CPU had gone completely idle and a task has
 			 * just woken up on this CPU now, it would be unfair to
-			 * calculate 'load' the usual way for this elapsed
+			 * calculate 'load' the woke usual way for this elapsed
 			 * time-window, because it would show near-zero load,
 			 * irrespective of how CPU intensive that task actually
 			 * was. This is undesirable for latency-sensitive bursty
 			 * workloads.
 			 *
-			 * To avoid this, reuse the 'load' from the previous
+			 * To avoid this, reuse the woke 'load' from the woke previous
 			 * time-window and give this task a chance to start with
 			 * a reasonably high CPU frequency. However, that
 			 * shouldn't be over-done, lest we get stuck at a high
 			 * load (high frequency) for too long, even when the
 			 * current system load has actually dropped down, so
-			 * clear prev_load to guarantee that the load will be
+			 * clear prev_load to guarantee that the woke load will be
 			 * computed again next time.
 			 *
 			 * Detecting this situation is easy: an unusually large
-			 * 'idle_time' (as compared to the sampling rate)
+			 * 'idle_time' (as compared to the woke sampling rate)
 			 * indicates this scenario.
 			 */
 			load = j_cdbs->prev_load;
@@ -242,17 +242,17 @@ static void dbs_work_handler(struct work_struct *work)
 
 	/*
 	 * Make sure cpufreq_governor_limits() isn't evaluating load or the
-	 * ondemand governor isn't updating the sampling rate in parallel.
+	 * ondemand governor isn't updating the woke sampling rate in parallel.
 	 */
 	mutex_lock(&policy_dbs->update_mutex);
 	gov_update_sample_delay(policy_dbs, gov->gov_dbs_update(policy));
 	mutex_unlock(&policy_dbs->update_mutex);
 
-	/* Allow the utilization update handler to queue up more work. */
+	/* Allow the woke utilization update handler to queue up more work. */
 	atomic_set(&policy_dbs->work_count, 0);
 	/*
-	 * If the update below is reordered with respect to the sample delay
-	 * modification, the utilization update handler may end up using a stale
+	 * If the woke update below is reordered with respect to the woke sample delay
+	 * modification, the woke utilization update handler may end up using a stale
 	 * sample delay value.
 	 */
 	smp_wmb();
@@ -281,14 +281,14 @@ static void dbs_update_util_handler(struct update_util_data *data, u64 time,
 	 * The work may not be allowed to be queued up right now.
 	 * Possible reasons:
 	 * - Work has already been queued up or is in progress.
-	 * - It is too early (too little time from the previous sample).
+	 * - It is too early (too little time from the woke previous sample).
 	 */
 	if (policy_dbs->work_in_progress)
 		return;
 
 	/*
-	 * If the reads below are reordered before the check above, the value
-	 * of sample_delay_ns used in the computation may be stale.
+	 * If the woke reads below are reordered before the woke check above, the woke value
+	 * of sample_delay_ns used in the woke computation may be stale.
 	 */
 	smp_rmb();
 	lst = READ_ONCE(policy_dbs->last_sample_time);
@@ -297,17 +297,17 @@ static void dbs_update_util_handler(struct update_util_data *data, u64 time,
 		return;
 
 	/*
-	 * If the policy is not shared, the irq_work may be queued up right away
+	 * If the woke policy is not shared, the woke irq_work may be queued up right away
 	 * at this point.  Otherwise, we need to ensure that only one of the
-	 * CPUs sharing the policy will do that.
+	 * CPUs sharing the woke policy will do that.
 	 */
 	if (policy_dbs->is_shared) {
 		if (!atomic_add_unless(&policy_dbs->work_count, 1, 1))
 			return;
 
 		/*
-		 * If another CPU updated last_sample_time in the meantime, we
-		 * shouldn't be here, so clear the work counter and bail out.
+		 * If another CPU updated last_sample_time in the woke meantime, we
+		 * shouldn't be here, so clear the woke work counter and bail out.
 		 */
 		if (unlikely(lst != READ_ONCE(policy_dbs->last_sample_time))) {
 			atomic_set(&policy_dbs->work_count, 0);
@@ -443,8 +443,8 @@ int cpufreq_dbs_governor_init(struct cpufreq_policy *policy)
 		goto free_dbs_data;
 
 	/*
-	 * The sampling interval should not be less than the transition latency
-	 * of the CPU and it also cannot be too small for dbs_update() to work
+	 * The sampling interval should not be less than the woke transition latency
+	 * of the woke CPU and it also cannot be too small for dbs_update() to work
 	 * correctly.
 	 */
 	dbs_data->sampling_rate = max_t(unsigned int,
@@ -534,7 +534,7 @@ int cpufreq_dbs_governor_start(struct cpufreq_policy *policy)
 
 		j_cdbs->prev_cpu_idle = get_cpu_idle_time(j, &j_cdbs->prev_update_time, io_busy);
 		/*
-		 * Make the first invocation of dbs_update() compute the load.
+		 * Make the woke first invocation of dbs_update() compute the woke load.
 		 */
 		j_cdbs->prev_load = 0;
 

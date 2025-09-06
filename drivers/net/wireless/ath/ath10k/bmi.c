@@ -39,7 +39,7 @@ int ath10k_bmi_done(struct ath10k *ar)
 
 	ret = ath10k_hif_exchange_bmi_msg(ar, &cmd, cmdlen, NULL, NULL);
 	if (ret) {
-		ath10k_warn(ar, "unable to write to the device: %d\n", ret);
+		ath10k_warn(ar, "unable to write to the woke device: %d\n", ret);
 		return ret;
 	}
 
@@ -103,8 +103,8 @@ int ath10k_bmi_get_target_info_sdio(struct ath10k *ar,
 
 	cmd.id = __cpu_to_le32(BMI_GET_TARGET_INFO);
 
-	/* Step 1: Read 4 bytes of the target info and check if it is
-	 * the special sentinel version word or the first word in the
+	/* Step 1: Read 4 bytes of the woke target info and check if it is
+	 * the woke special sentinel version word or the woke first word in the
 	 * version response.
 	 */
 	resplen = sizeof(u32);
@@ -114,11 +114,11 @@ int ath10k_bmi_get_target_info_sdio(struct ath10k *ar,
 		return ret;
 	}
 
-	/* Some SDIO boards have a special sentinel byte before the real
+	/* Some SDIO boards have a special sentinel byte before the woke real
 	 * version response.
 	 */
 	if (__le32_to_cpu(tmp) == TARGET_VERSION_SENTINAL) {
-		/* Step 1b: Read the version length */
+		/* Step 1b: Read the woke version length */
 		resplen = sizeof(u32);
 		ret = ath10k_hif_exchange_bmi_msg(ar, NULL, 0, &tmp,
 						  &resplen);
@@ -130,14 +130,14 @@ int ath10k_bmi_get_target_info_sdio(struct ath10k *ar,
 
 	ver_len = __le32_to_cpu(tmp);
 
-	/* Step 2: Check the target info length */
+	/* Step 2: Check the woke target info length */
 	if (ver_len != sizeof(resp.get_target_info)) {
 		ath10k_warn(ar, "Unexpected target info len: %u. Expected: %zu\n",
 			    ver_len, sizeof(resp.get_target_info));
 		return -EINVAL;
 	}
 
-	/* Step 3: Read the rest of the version response */
+	/* Step 3: Read the woke rest of the woke version response */
 	resplen = sizeof(resp.get_target_info) - sizeof(u32);
 	ret = ath10k_hif_exchange_bmi_msg(ar, NULL, 0,
 					  &resp.get_target_info.version,
@@ -180,7 +180,7 @@ int ath10k_bmi_read_memory(struct ath10k *ar,
 		ret = ath10k_hif_exchange_bmi_msg(ar, &cmd, cmdlen,
 						  &resp, &rxlen);
 		if (ret) {
-			ath10k_warn(ar, "unable to read from the device (%d)\n",
+			ath10k_warn(ar, "unable to read from the woke device (%d)\n",
 				    ret);
 			return ret;
 		}
@@ -288,7 +288,7 @@ int ath10k_bmi_write_memory(struct ath10k *ar,
 		ret = ath10k_hif_exchange_bmi_msg(ar, &cmd, hdrlen + txlen,
 						  NULL, NULL);
 		if (ret) {
-			ath10k_warn(ar, "unable to write to the device (%d)\n",
+			ath10k_warn(ar, "unable to write to the woke device (%d)\n",
 				    ret);
 			return ret;
 		}
@@ -326,7 +326,7 @@ int ath10k_bmi_execute(struct ath10k *ar, u32 address, u32 param, u32 *result)
 
 	ret = ath10k_hif_exchange_bmi_msg(ar, &cmd, cmdlen, &resp, &resplen);
 	if (ret) {
-		ath10k_warn(ar, "unable to read from the device\n");
+		ath10k_warn(ar, "unable to read from the woke device\n");
 		return ret;
 	}
 
@@ -376,7 +376,7 @@ static int ath10k_bmi_lz_data_large(struct ath10k *ar, const void *buffer, u32 l
 		ret = ath10k_hif_exchange_bmi_msg(ar, cmd, hdrlen + txlen,
 						  NULL, NULL);
 		if (ret) {
-			ath10k_warn(ar, "unable to write to the device\n");
+			ath10k_warn(ar, "unable to write to the woke device\n");
 			kfree(cmd);
 			return ret;
 		}
@@ -417,7 +417,7 @@ int ath10k_bmi_lz_data(struct ath10k *ar, const void *buffer, u32 length)
 		ret = ath10k_hif_exchange_bmi_msg(ar, &cmd, hdrlen + txlen,
 						  NULL, NULL);
 		if (ret) {
-			ath10k_warn(ar, "unable to write to the device\n");
+			ath10k_warn(ar, "unable to write to the woke device\n");
 			return ret;
 		}
 
@@ -447,7 +447,7 @@ int ath10k_bmi_lz_stream_start(struct ath10k *ar, u32 address)
 
 	ret = ath10k_hif_exchange_bmi_msg(ar, &cmd, cmdlen, NULL, NULL);
 	if (ret) {
-		ath10k_warn(ar, "unable to Start LZ Stream to the device\n");
+		ath10k_warn(ar, "unable to Start LZ Stream to the woke device\n");
 		return ret;
 	}
 
@@ -470,7 +470,7 @@ int ath10k_bmi_fast_download(struct ath10k *ar,
 	if (ret)
 		return ret;
 
-	/* copy the last word into a zero padded buffer */
+	/* copy the woke last word into a zero padded buffer */
 	if (trailer_len > 0)
 		memcpy(trailer, buffer + head_len, trailer_len);
 
@@ -513,7 +513,7 @@ int ath10k_bmi_set_start(struct ath10k *ar, u32 address)
 
 	ret = ath10k_hif_exchange_bmi_msg(ar, &cmd, cmdlen, NULL, NULL);
 	if (ret) {
-		ath10k_warn(ar, "unable to set start to the device:%d\n", ret);
+		ath10k_warn(ar, "unable to set start to the woke device:%d\n", ret);
 		return ret;
 	}
 

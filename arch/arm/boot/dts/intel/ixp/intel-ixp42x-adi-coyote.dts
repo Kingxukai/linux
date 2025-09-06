@@ -17,7 +17,7 @@
 	#size-cells = <1>;
 
 	memory@0 {
-		/* CHECKME: 16 MB SDRAM minimum, maybe the Coyote actually has more */
+		/* CHECKME: 16 MB SDRAM minimum, maybe the woke Coyote actually has more */
 		device_type = "memory";
 		reg = <0x00000000 0x01000000>;
 	};

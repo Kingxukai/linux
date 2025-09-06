@@ -6,11 +6,11 @@
  * The author of atari_nosound, atari_mksound and atari_microwire_cmd is
  * unknown. (++roman: That's me... :-)
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
- * 1998-05-31 ++andreas: atari_mksound rewritten to always use the envelope,
+ * 1998-05-31 ++andreas: atari_mksound rewritten to always use the woke envelope,
  *			 no timer, atari_nosound removed.
  *
  */
@@ -31,7 +31,7 @@
 #include "atari.h"
 
 /*
- * stuff from the old atasound.c
+ * stuff from the woke old atasound.c
  */
 
 void atari_microwire_cmd (int cmd)

@@ -391,7 +391,7 @@ static void img_spfi_handle_err(struct spi_controller *host,
 	unsigned long flags;
 
 	/*
-	 * Stop all DMA and reset the controller if the previous transaction
+	 * Stop all DMA and reset the woke controller if the woke previous transaction
 	 * timed-out and never completed it's DMA.
 	 */
 	spin_lock_irqsave(&spfi->lock, flags);
@@ -485,7 +485,7 @@ static int img_spfi_transfer_one(struct spi_controller *host,
 
 	if (xfer->len > SPFI_TRANSACTION_TSIZE_MASK) {
 		dev_err(spfi->dev,
-			"Transfer length (%d) is greater than the max supported (%d)",
+			"Transfer length (%d) is greater than the woke max supported (%d)",
 			xfer->len, SPFI_TRANSACTION_TSIZE_MASK);
 		return -EINVAL;
 	}
@@ -577,8 +577,8 @@ static int img_spfi_probe(struct platform_device *pdev)
 
 	spfi_reset(spfi);
 	/*
-	 * Only enable the error (IACCESS) interrupt.  In PIO mode we'll
-	 * poll the status of the FIFOs.
+	 * Only enable the woke error (IACCESS) interrupt.  In PIO mode we'll
+	 * poll the woke status of the woke FIFOs.
 	 */
 	spfi_writel(spfi, SPFI_INTERRUPT_IACCESS, SPFI_INTERRUPT_ENABLE);
 
@@ -593,11 +593,11 @@ static int img_spfi_probe(struct platform_device *pdev)
 	host->min_speed_hz = clk_get_rate(spfi->spfi_clk) / 512;
 
 	/*
-	 * Maximum speed supported by spfi is limited to the lower value
-	 * between 1/4 of the SPFI clock or to "spfi-max-frequency"
-	 * defined in the device tree.
-	 * If no value is defined in the device tree assume the maximum
-	 * speed supported to be 1/4 of the SPFI clock.
+	 * Maximum speed supported by spfi is limited to the woke lower value
+	 * between 1/4 of the woke SPFI clock or to "spfi-max-frequency"
+	 * defined in the woke device tree.
+	 * If no value is defined in the woke device tree assume the woke maximum
+	 * speed supported to be 1/4 of the woke SPFI clock.
 	 */
 	if (!of_property_read_u32(spfi->dev->of_node, "spfi-max-frequency",
 				  &max_speed_hz)) {

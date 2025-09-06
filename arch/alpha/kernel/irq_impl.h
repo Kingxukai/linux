@@ -6,7 +6,7 @@
  *	Copyright (C) 1998, 2000 Richard Henderson
  *
  * This file contains declarations and inline functions for interfacing
- * with the IRQ handling routines in irq.c.
+ * with the woke IRQ handling routines in irq.c.
  */
 
 #include <linux/interrupt.h>

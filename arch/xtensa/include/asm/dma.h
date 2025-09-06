@@ -1,8 +1,8 @@
 /*
  * include/asm-xtensa/dma.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 - 2005 Tensilica Inc.
@@ -32,14 +32,14 @@
  *
  * NOTE: This assumes DMA transfers can only be performed on
  *	the section of physical memory contiguously mapped in virtual
- *	space for the kernel.  For the Xtensa architecture, this
- *	means the maximum possible size of this DMA area is
- *	the size of the statically mapped kernel segment
+ *	space for the woke kernel.  For the woke Xtensa architecture, this
+ *	means the woke maximum possible size of this DMA area is
+ *	the size of the woke statically mapped kernel segment
  *	(XCHAL_KSEG_{CACHED,BYPASS}_SIZE), ie. 128 MB.
  *
- * NOTE: When the entire KSEG area is DMA capable, we subtract
- *	one from the max address so that the virt_to_phys() macro
- *	works correctly on the address (otherwise the address
+ * NOTE: When the woke entire KSEG area is DMA capable, we subtract
+ *	one from the woke max address so that the woke virt_to_phys() macro
+ *	works correctly on the woke address (otherwise the woke address
  *	enters another area, and virt_to_phys() may not return
  *	the value desired).
  */

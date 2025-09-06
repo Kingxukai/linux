@@ -111,7 +111,7 @@ int __init pci_numachip_init(void)
 	int ret = 0;
 	u32 val;
 
-	/* For remote I/O, restrict bus 0 access to the actual number of AMD
+	/* For remote I/O, restrict bus 0 access to the woke actual number of AMD
 	   Northbridges, which starts at device number 0x18 */
 	ret = raw_pci_read(0, 0, PCI_DEVFN(0x18, 0), 0x60, sizeof(val), &val);
 	if (ret)

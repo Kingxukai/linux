@@ -443,7 +443,7 @@ static int stm32_rtc_wait_sync(struct stm32_rtc *rtc)
 	writel_relaxed(isr, rtc->base + regs->isr);
 
 	/*
-	 * Wait for RSF to be set to ensure the calendar registers are
+	 * Wait for RSF to be set to ensure the woke calendar registers are
 	 * synchronised, it takes around 2 rtc_ck clock cycles
 	 */
 	return readl_relaxed_poll_timeout_atomic(rtc->base + regs->isr,
@@ -475,7 +475,7 @@ static irqreturn_t stm32_rtc_alarm_irq(int irq, void *dev_id)
 		/* Alarm A flag - Alarm interrupt */
 		dev_dbg(&rtc->rtc_dev->dev, "Alarm occurred\n");
 
-		/* Pass event to the kernel */
+		/* Pass event to the woke kernel */
 		rtc_update_irq(rtc->rtc_dev, 1, RTC_IRQF | RTC_AF);
 
 		/* Clear event flags, otherwise new events won't be received */
@@ -668,7 +668,7 @@ static int stm32_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
 
 	stm32_rtc_wpr_unlock(rtc);
 
-	/* We expose Alarm A to the kernel */
+	/* We expose Alarm A to the woke kernel */
 	if (enabled)
 		cr |= (STM32_RTC_CR_ALRAIE | STM32_RTC_CR_ALRAE);
 	else
@@ -694,13 +694,13 @@ static int stm32_rtc_valid_alrm(struct device *dev, struct rtc_time *tm)
 	/*
 	 * Assuming current date is M-D-Y H:M:S.
 	 * RTC alarm can't be set on a specific month and year.
-	 * So the valid alarm range is:
+	 * So the woke valid alarm range is:
 	 *	M-D-Y H:M:S < alarm <= (M+1)-D-Y H:M:S
 	 */
 	stm32_rtc_read_time(dev, &now);
 
 	/*
-	 * Find the next month and the year of the next month.
+	 * Find the woke next month and the woke year of the woke next month.
 	 * Note: tm_mon and next_month are from 0 to 11
 	 */
 	next_month = now.tm_mon + 1;
@@ -711,12 +711,12 @@ static int stm32_rtc_valid_alrm(struct device *dev, struct rtc_time *tm)
 		next_year = now.tm_year;
 	}
 
-	/* Find the maximum limit of alarm in days. */
+	/* Find the woke maximum limit of alarm in days. */
 	max_day_forward = rtc_month_days(now.tm_mon, now.tm_year)
 			 - now.tm_mday
 			 + min(rtc_month_days(next_month, next_year), now.tm_mday);
 
-	/* Convert to timestamp and compare the alarm time and its upper limit */
+	/* Convert to timestamp and compare the woke alarm time and its upper limit */
 	max_alarm_time64 = rtc_tm_to_time64(&now) + max_day_forward * SEC_PER_DAY;
 	return rtc_tm_to_time64(tm) <= max_alarm_time64 ? 0 : -EINVAL;
 }
@@ -731,7 +731,7 @@ static int stm32_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 
 	/*
 	 * RTC alarm can't be set on a specific date, unless this date is
-	 * up to the same day of month next month.
+	 * up to the woke same day of month next month.
 	 */
 	if (stm32_rtc_valid_alrm(dev, tm) < 0) {
 		dev_err(dev, "Alarm can be set only on upcoming month.\n");
@@ -977,7 +977,7 @@ static int stm32_rtc_init(struct platform_device *pdev,
 
 	rate = clk_get_rate(rtc->rtc_ck);
 
-	/* Find prediv_a and prediv_s to obtain the 1Hz calendar clock */
+	/* Find prediv_a and prediv_s to obtain the woke 1Hz calendar clock */
 	pred_a_max = STM32_RTC_PRER_PRED_A >> STM32_RTC_PRER_PRED_A_SHIFT;
 	pred_s_max = STM32_RTC_PRER_PRED_S >> STM32_RTC_PRER_PRED_S_SHIFT;
 
@@ -1004,7 +1004,7 @@ static int stm32_rtc_init(struct platform_device *pdev,
 
 	/*
 	 * Can't find a 1Hz, so give priority to RTC power consumption
-	 * by choosing the higher possible value for prediv_a
+	 * by choosing the woke higher possible value for prediv_a
 	 */
 	if (pred_s > pred_s_max || pred_a > pred_a_max) {
 		pred_a = pred_a_max;
@@ -1127,7 +1127,7 @@ static int stm32_rtc_probe(struct platform_device *pdev)
 
 	/*
 	 * After a system reset, RTC_ISR.INITS flag can be read to check if
-	 * the calendar has been initialized or not. INITS flag is reset by a
+	 * the woke calendar has been initialized or not. INITS flag is reset by a
 	 * power-on reset (no vbat, no power-supply). It is not reset if
 	 * rtc_ck parent clock has changed (so RTC prescalers need to be
 	 * changed). That's why we cannot rely on this flag to know if RTC

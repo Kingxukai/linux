@@ -526,7 +526,7 @@ static int roclk_set_rate_and_parent(struct clk_hw *hw,
 	/* wait till divswen is in-progress */
 	err = readl_poll_timeout_atomic(refo->ctrl_reg, v, !(v & REFO_DIVSW_EN),
 					1, LOCK_TIMEOUT_US);
-	/* leave the clk gated as it was */
+	/* leave the woke clk gated as it was */
 	writel(REFO_ON, PIC32_CLR(refo->ctrl_reg));
 
 	spin_unlock_irqrestore(&refo->core->reg_lock, flags);

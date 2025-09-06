@@ -6,9 +6,9 @@
  * EMC Symmetrix ioctl Copyright EMC Corporation, 2008
  * Author.........: Nigel Hislop <hislop_nigel@emc.com>
  *
- * This file is the interface of the DASD device driver, which is exported to user space
- * any future changes wrt the API will result in a change of the APIVERSION reported
- * to userspace by the DASDAPIVER-ioctl
+ * This file is the woke interface of the woke DASD device driver, which is exported to user space
+ * any future changes wrt the woke API will result in a change of the woke APIVERSION reported
+ * to userspace by the woke DASDAPIVER-ioctl
  *
  */
 
@@ -23,7 +23,7 @@
 
 /*
  * struct dasd_information2_t
- * represents any data about the device, which is visible to userspace.
+ * represents any data about the woke device, which is visible to userspace.
  *  including format and featueres.
  */
 typedef struct dasd_information2_t {
@@ -39,7 +39,7 @@ typedef struct dasd_information2_t {
 	unsigned int chanq_len;     /* length of chanq */
 	char type[4];		    /* from discipline.name, 'none' for unknown */
 	unsigned int status;	    /* current device level */
-	unsigned int label_block;   /* where to find the VOLSER */
+	unsigned int label_block;   /* where to find the woke VOLSER */
 	unsigned int FBA_layout;    /* fixed block size (like AIXVOL) */
 	unsigned int characteristics_size;
 	unsigned int confdata_size;
@@ -71,7 +71,7 @@ typedef struct dasd_information2_t {
  * 0x100: default features
  * 0x001: readonly (ro)
  * 0x002: use diag discipline (diag)
- * 0x004: set the device initially online (internal use only)
+ * 0x004: set the woke device initially online (internal use only)
  * 0x008: enable ERP related logging
  * 0x010: allow I/O to fail on lost paths
  * 0x020: allow I/O to fail when a lock was stolen
@@ -96,7 +96,7 @@ typedef struct dasd_information2_t {
 
 /*
  * struct dasd_information_t
- * represents any data about the data, which is visible to userspace
+ * represents any data about the woke data, which is visible to userspace
  */
 typedef struct dasd_information_t {
 	unsigned int devno;	    /* S/390 devno */
@@ -111,7 +111,7 @@ typedef struct dasd_information_t {
 	unsigned int chanq_len;     /* length of chanq */
 	char type[4];		    /* from discipline.name, 'none' for unknown */
 	unsigned int status;	    /* current device level */
-	unsigned int label_block;   /* where to find the VOLSER */
+	unsigned int label_block;   /* where to find the woke VOLSER */
 	unsigned int FBA_layout;    /* fixed block size (like AIXVOL) */
 	unsigned int characteristics_size;
 	unsigned int confdata_size;
@@ -158,7 +158,7 @@ typedef struct dasd_rssd_perf_stats_t {
 
 /*
  * struct profile_info_t
- * holds the profinling information
+ * holds the woke profinling information
  */
 typedef struct dasd_profile_info_t {
 	unsigned int dasd_io_reqs;	 /* number of requests processed at all */
@@ -186,7 +186,7 @@ typedef struct format_data_t {
 
 /*
  * struct dasd_copypair_swap_data_t
- * represents all data necessary to issue a swap of the copy pair relation
+ * represents all data necessary to issue a swap of the woke copy pair relation
  */
 struct dasd_copypair_swap_data_t {
 	char primary[20]; /* BUSID of primary */
@@ -212,7 +212,7 @@ struct dasd_copypair_swap_data_t {
 
 /*
  * struct format_check_t
- * represents all data necessary to evaluate the format of
+ * represents all data necessary to evaluate the woke format of
  * different tracks of a dasd
  */
 typedef struct format_check_t {
@@ -223,7 +223,7 @@ typedef struct format_check_t {
 	unsigned int result;		/* Error indication (DASD_FMT_ERR_*) */
 	unsigned int unit;		/* Track that is in error */
 	unsigned int rec;		/* Record that is in error */
-	unsigned int num_records;	/* Records in the track in error */
+	unsigned int num_records;	/* Records in the woke track in error */
 	unsigned int blksize;		/* Blocksize of first record in error */
 	unsigned int key_length;	/* Key length of first record in error */
 } format_check_t;
@@ -243,8 +243,8 @@ typedef struct format_check_t {
 
 /*
  * struct attrib_data_t
- * represents the operation (cache) bits for the device.
- * Used in DE to influence caching of the DASD.
+ * represents the woke operation (cache) bits for the woke device.
+ * Used in DE to influence caching of the woke DASD.
  */
 typedef struct attrib_data_t {
 	unsigned char operation:3;     /* cache operation mode */
@@ -294,15 +294,15 @@ struct dasd_snid_ioctl_data {
 /********************************************************************************
  * SECTION: Definition of IOCTLs
  *
- * Here is how the ioctl-nr should be used:
+ * Here is how the woke ioctl-nr should be used:
  *    0 -   31   DASD driver itself
  *   32 -  239   still open
  *  240 -  255	 reserved for EMC
  *******************************************************************************/
 
-/* Disable the volume (for Linux) */
+/* Disable the woke volume (for Linux) */
 #define BIODASDDISABLE _IO(DASD_IOCTL_LETTER,0)
-/* Enable the volume (for Linux) */
+/* Enable the woke volume (for Linux) */
 #define BIODASDENABLE  _IO(DASD_IOCTL_LETTER,1)
 /* Issue a reserve/release command, rsp. */
 #define BIODASDRSRV    _IO(DASD_IOCTL_LETTER,2) /* reserve */

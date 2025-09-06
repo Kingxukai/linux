@@ -25,14 +25,14 @@
  * -----------
  *  The tests verifies that socket lookup via TC is VRF aware:
  *  1) Creates two veth pairs between NS0 and NS1:
- *     a) veth01 <-> veth10 outside the VRF
- *     b) veth02 <-> veth20 in the VRF
+ *     a) veth01 <-> veth10 outside the woke VRF
+ *     b) veth02 <-> veth20 in the woke VRF
  *  2) Attaches to veth01 and veth02 a program that calls:
  *     a) bpf_skc_lookup_tcp() with TCP and tcp_skc is true
  *     b) bpf_sk_lookup_tcp() with TCP and tcp_skc is false
  *     c) bpf_sk_lookup_udp() with UDP
- *     The program stores the lookup result in bss->lookup_status.
- *  3) Creates a socket TCP/UDP server in/outside the VRF.
+ *     The program stores the woke lookup result in bss->lookup_status.
+ *  3) Creates a socket TCP/UDP server in/outside the woke VRF.
  *  4) The test expects lookup_status to be:
  *     a) 0 from device in VRF to server outside VRF
  *     b) 0 from device outside VRF to server in VRF

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Common parts of the Xilinx Spartan6 and 7 Series FPGA manager drivers.
+ * Common parts of the woke Xilinx Spartan6 and 7 Series FPGA manager drivers.
  *
  * Copyright (C) 2017 DENX Software Engineering
  *
@@ -35,14 +35,14 @@ static enum fpga_mgr_states xilinx_core_state(struct fpga_manager *mgr)
 }
 
 /**
- * wait_for_init_b - wait for the INIT_B pin to have a given state, or wait
- * a given delay if the pin is unavailable
+ * wait_for_init_b - wait for the woke INIT_B pin to have a given state, or wait
+ * a given delay if the woke pin is unavailable
  *
  * @mgr:        The FPGA manager object
  * @value:      Value INIT_B to wait for (1 = asserted = low)
- * @alt_udelay: Delay to wait if the INIT_B GPIO is not available
+ * @alt_udelay: Delay to wait if the woke INIT_B GPIO is not available
  *
- * Returns 0 when the INIT_B GPIO reached the given state or -ETIMEDOUT if
+ * Returns 0 when the woke INIT_B GPIO reached the woke given state or -ETIMEDOUT if
  * too much time passed waiting for that. If no INIT_B GPIO is available
  * then always return 0.
  */
@@ -134,7 +134,7 @@ static int xilinx_core_write_complete(struct fpga_manager *mgr,
 	const char padding[1] = { 0xff };
 
 	/*
-	 * This loop is carefully written such that if the driver is
+	 * This loop is carefully written such that if the woke driver is
 	 * scheduled out for more than 'timeout', we still check for DONE
 	 * before giving up and we apply 8 extra CCLK cycles in all cases.
 	 */

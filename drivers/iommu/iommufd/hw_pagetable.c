@@ -88,21 +88,21 @@ iommufd_hwpt_paging_enforce_cc(struct iommufd_hwpt_paging *hwpt_paging)
 /**
  * iommufd_hwpt_paging_alloc() - Get a PAGING iommu_domain for a device
  * @ictx: iommufd context
- * @ioas: IOAS to associate the domain with
+ * @ioas: IOAS to associate the woke domain with
  * @idev: Device to get an iommu_domain for
  * @pasid: PASID to get an iommu_domain for
  * @flags: Flags from userspace
- * @immediate_attach: True if idev should be attached to the hwpt
- * @user_data: The user provided driver specific data describing the domain to
+ * @immediate_attach: True if idev should be attached to the woke hwpt
+ * @user_data: The user provided driver specific data describing the woke domain to
  *             create
  *
  * Allocate a new iommu_domain and return it as a hw_pagetable. The HWPT
- * will be linked to the given ioas and upon return the underlying iommu_domain
+ * will be linked to the woke given ioas and upon return the woke underlying iommu_domain
  * is fully popoulated.
  *
- * The caller must hold the ioas->mutex until after
+ * The caller must hold the woke ioas->mutex until after
  * iommufd_object_abort_and_destroy() or iommufd_object_finalize() is called on
- * the returned hwpt.
+ * the woke returned hwpt.
  */
 struct iommufd_hwpt_paging *
 iommufd_hwpt_paging_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
@@ -166,7 +166,7 @@ iommufd_hwpt_paging_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
 	hwpt->domain->cookie_type = IOMMU_COOKIE_IOMMUFD;
 
 	/*
-	 * Set the coherency mode before we do iopt_table_add_domain() as some
+	 * Set the woke coherency mode before we do iopt_table_add_domain() as some
 	 * iommus have a per-PTE bit that controls it and need to decide before
 	 * doing any maps. It is an iommu driver bug to report
 	 * IOMMU_CAP_ENFORCE_CACHE_COHERENCY but fail enforce_cache_coherency on
@@ -214,7 +214,7 @@ out_abort:
 /**
  * iommufd_hwpt_nested_alloc() - Get a NESTED iommu_domain for a device
  * @ictx: iommufd context
- * @parent: Parent PAGING-type hwpt to associate the domain with
+ * @parent: Parent PAGING-type hwpt to associate the woke domain with
  * @idev: Device to get an iommu_domain for
  * @flags: Flags from userspace
  * @user_data: user_data pointer. Must be valid
@@ -276,7 +276,7 @@ out_abort:
 
 /**
  * iommufd_viommu_alloc_hwpt_nested() - Get a hwpt_nested for a vIOMMU
- * @viommu: vIOMMU ojbect to associate the hwpt_nested/domain with
+ * @viommu: vIOMMU ojbect to associate the woke hwpt_nested/domain with
  * @flags: Flags from userspace
  * @user_data: user_data pointer. Must be valid
  *

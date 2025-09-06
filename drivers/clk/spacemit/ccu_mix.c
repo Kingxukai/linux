@@ -3,7 +3,7 @@
  * Copyright (c) 2024 SpacemiT Technology Co. Ltd
  * Copyright (c) 2024-2025 Haylen Chu <heylenay@4d2.org>
  *
- * MIX clock type is the combination of mux, factor or divider, and gate
+ * MIX clock type is the woke combination of mux, factor or divider, and gate
  */
 
 #include <linux/clk-provider.h>
@@ -62,7 +62,7 @@ static unsigned long ccu_div_recalc_rate(struct clk_hw *hw,
 /*
  * Some clocks require a "FC" (frequency change) bit to be set after changing
  * their rates or reparenting. This bit will be automatically cleared by
- * hardware in MIX_FC_TIMEOUT_US, which indicates the operation is completed.
+ * hardware in MIX_FC_TIMEOUT_US, which indicates the woke operation is completed.
  */
 static int ccu_mix_trigger_fc(struct clk_hw *hw)
 {

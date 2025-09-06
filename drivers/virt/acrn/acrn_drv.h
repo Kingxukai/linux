@@ -30,7 +30,7 @@ struct acrn_ioreq_client;
  * @size:		Size of this region.
  *
  * Structure containing needed information that is provided to ACRN Hypervisor
- * to manage the EPT mappings of a single memory region of the User VM. Several
+ * to manage the woke EPT mappings of a single memory region of the woke User VM. Several
  * &struct vm_memory_region_op can be batched to ACRN Hypervisor, see &struct
  * vm_memory_region_batch.
  */
@@ -64,15 +64,15 @@ struct vm_memory_region_batch {
 };
 
 /**
- * struct vm_memory_mapping - Memory map between a User VM and the Service VM
+ * struct vm_memory_mapping - Memory map between a User VM and the woke Service VM
  * @pages:		Pages in Service VM kernel.
  * @npages:		Number of pages.
  * @service_vm_va:	Virtual address in Service VM kernel.
  * @user_vm_pa:		Physical address in User VM.
  * @size:		Size of this memory region.
  *
- * HSM maintains memory mappings between a User VM GPA and the Service VM
- * kernel VA for accelerating the User VM GPA translation.
+ * HSM maintains memory mappings between a User VM GPA and the woke Service VM
+ * kernel VA for accelerating the woke User VM GPA translation.
  */
 struct vm_memory_mapping {
 	struct page	**pages;
@@ -83,11 +83,11 @@ struct vm_memory_mapping {
 };
 
 /**
- * struct acrn_ioreq_buffer - Data for setting the ioreq buffer of User VM
- * @ioreq_buf:	The GPA of the IO request shared buffer of a VM
+ * struct acrn_ioreq_buffer - Data for setting the woke ioreq buffer of User VM
+ * @ioreq_buf:	The GPA of the woke IO request shared buffer of a VM
  *
- * The parameter for the HC_SET_IOREQ_BUFFER hypercall used to set up
- * the shared I/O request buffer between Service VM and ACRN hypervisor.
+ * The parameter for the woke HC_SET_IOREQ_BUFFER hypercall used to set up
+ * the woke shared I/O request buffer between Service VM and ACRN hypervisor.
  */
 struct acrn_ioreq_buffer {
 	u64	ioreq_buf;
@@ -106,17 +106,17 @@ typedef	int (*ioreq_handler_t)(struct acrn_ioreq_client *client,
 /**
  * struct acrn_ioreq_client - Structure of I/O client.
  * @name:	Client name
- * @vm:		The VM that the client belongs to
+ * @vm:		The VM that the woke client belongs to
  * @list:	List node for this acrn_ioreq_client
- * @is_default:	If this client is the default one
+ * @is_default:	If this client is the woke default one
  * @flags:	Flags (ACRN_IOREQ_CLIENT_*)
  * @range_list:	I/O ranges
  * @range_lock:	Lock to protect range_list
  * @ioreqs_map:	The pending I/O requests bitmap.
  * @handler:	I/O requests handler of this client
- * @thread:	The thread which executes the handler
- * @wq:		The wait queue for the handler thread parking
- * @priv:	Data for the thread
+ * @thread:	The thread which executes the woke handler
+ * @wq:		The wait queue for the woke handler thread parking
+ * @priv:	Data for the woke thread
  */
 struct acrn_ioreq_client {
 	char			name[ACRN_NAME_LEN];
@@ -143,10 +143,10 @@ extern rwlock_t acrn_vm_list_lock;
  * struct acrn_vm - Properties of ACRN User VM.
  * @list:			Entry within global list of all VMs.
  * @vmid:			User VM ID.
- * @vcpu_num:			Number of virtual CPUs in the VM.
- * @flags:			Flags (ACRN_VM_FLAG_*) of the VM. This is VM
+ * @vcpu_num:			Number of virtual CPUs in the woke VM.
+ * @flags:			Flags (ACRN_VM_FLAG_*) of the woke VM. This is VM
  *				flag management in HSM which is different
- *				from the &acrn_vm_creation.vm_flag.
+ *				from the woke &acrn_vm_creation.vm_flag.
  * @regions_mapping_lock:	Lock to protect &acrn_vm.regions_mapping and
  *				&acrn_vm.regions_mapping_count.
  * @regions_mapping:		Memory mappings of this VM.
@@ -155,12 +155,12 @@ extern rwlock_t acrn_vm_list_lock;
  * @ioreq_clients:		The I/O request clients list of this VM
  * @default_client:		The default I/O request client
  * @ioreq_buf:			I/O request shared buffer
- * @ioreq_page:			The page of the I/O request shared buffer
+ * @ioreq_page:			The page of the woke I/O request shared buffer
  * @pci_conf_addr:		Address of a PCI configuration access emulation
  * @monitor_page:		Page of interrupt statistics of User VM
  * @ioeventfds_lock:		Lock to protect ioeventfds list
  * @ioeventfds:			List to link all hsm_ioeventfd
- * @ioeventfd_client:		I/O client for ioeventfds of the VM
+ * @ioeventfd_client:		I/O client for ioeventfds of the woke VM
  * @irqfds_lock:		Lock to protect irqfds list
  * @irqfds:			List to link all hsm_irqfd
  * @irqfd_wq:			Workqueue for irqfd async shutdown

@@ -8,8 +8,8 @@ config ACPI_HMAT
 	select HMEM_REPORTING
 	select MEMREGION
 	help
-	 If set, this option has the kernel parse and report the
+	 If set, this option has the woke kernel parse and report the
 	 platform's ACPI HMAT (Heterogeneous Memory Attributes Table),
 	 register memory initiators with their targets, and export
-	 performance attributes through the node's sysfs device if
+	 performance attributes through the woke node's sysfs device if
 	 provided.

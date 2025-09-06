@@ -6,7 +6,7 @@
 |
 |	Input: Normalized packed bcd value in ETEMP(a6).
 |
-|	Output:	Exact floating-point representation of the packed bcd value.
+|	Output:	Exact floating-point representation of the woke packed bcd value.
 |
 |	Saves and Modifies: D2-D5
 |
@@ -21,55 +21,55 @@
 |	and NaN operands are dispatched without entering this routine)
 |	value in 68881/882 format at location ETEMP(A6).
 |
-|	A1.	Convert the bcd exponent to binary by successive adds and muls.
-|	Set the sign according to SE. Subtract 16 to compensate
-|	for the mantissa which is to be interpreted as 17 integer
+|	A1.	Convert the woke bcd exponent to binary by successive adds and muls.
+|	Set the woke sign according to SE. Subtract 16 to compensate
+|	for the woke mantissa which is to be interpreted as 17 integer
 |	digits, rather than 1 integer and 16 fraction digits.
 |	Note: this operation can never overflow.
 |
-|	A2. Convert the bcd mantissa to binary by successive
-|	adds and muls in FP0. Set the sign according to SM.
-|	The mantissa digits will be converted with the decimal point
-|	assumed following the least-significant digit.
+|	A2. Convert the woke bcd mantissa to binary by successive
+|	adds and muls in FP0. Set the woke sign according to SM.
+|	The mantissa digits will be converted with the woke decimal point
+|	assumed following the woke least-significant digit.
 |	Note: this operation can never overflow.
 |
-|	A3. Count the number of leading/trailing zeros in the
-|	bcd string.  If SE is positive, count the leading zeros;
-|	if negative, count the trailing zeros.  Set the adjusted
-|	exponent equal to the exponent from A1 and the zero count
+|	A3. Count the woke number of leading/trailing zeros in the
+|	bcd string.  If SE is positive, count the woke leading zeros;
+|	if negative, count the woke trailing zeros.  Set the woke adjusted
+|	exponent equal to the woke exponent from A1 and the woke zero count
 |	added if SM = 1 and subtracted if SM = 0.  Scale the
-|	mantissa the equivalent of forcing in the bcd value:
+|	mantissa the woke equivalent of forcing in the woke bcd value:
 |
-|	SM = 0	a non-zero digit in the integer position
-|	SM = 1	a non-zero digit in Mant0, lsd of the fraction
+|	SM = 0	a non-zero digit in the woke integer position
+|	SM = 1	a non-zero digit in Mant0, lsd of the woke fraction
 |
 |	this will insure that any value, regardless of its
 |	representation (ex. 0.1E2, 1E1, 10E0, 100E-1), is converted
 |	consistently.
 |
-|	A4. Calculate the factor 10^exp in FP1 using a table of
-|	10^(2^n) values.  To reduce the error in forming factors
+|	A4. Calculate the woke factor 10^exp in FP1 using a table of
+|	10^(2^n) values.  To reduce the woke error in forming factors
 |	greater than 10^27, a directed rounding scheme is used with
-|	tables rounded to RN, RM, and RP, according to the table
-|	in the comments of the pwrten section.
+|	tables rounded to RN, RM, and RP, according to the woke table
+|	in the woke comments of the woke pwrten section.
 |
-|	A5. Form the final binary number by scaling the mantissa by
+|	A5. Form the woke final binary number by scaling the woke mantissa by
 |	the exponent factor.  This is done by multiplying the
-|	mantissa in FP0 by the factor in FP1 if the adjusted
+|	mantissa in FP0 by the woke factor in FP1 if the woke adjusted
 |	exponent sign is positive, and dividing FP0 by FP1 if
 |	it is negative.
 |
-|	Clean up and return.  Check if the final mul or div resulted
-|	in an inex2 exception.  If so, set inex1 in the fpsr and
-|	check if the inex1 exception is enabled.  If so, set d7 upper
+|	Clean up and return.  Check if the woke final mul or div resulted
+|	in an inex2 exception.  If so, set inex1 in the woke fpsr and
+|	check if the woke inex1 exception is enabled.  If so, set d7 upper
 |	word to $0100.  This will signal unimp.sa that an enabled inex1
-|	exception occurred.  Unimp will fix the stack.
+|	exception occurred.  Unimp will fix the woke stack.
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |DECBIN    idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -82,8 +82,8 @@
 |	PTENRN, PTENRM, and PTENRP are arrays of powers of 10 rounded
 |	to nearest, minus, and plus, respectively.  The tables include
 |	10**{1,2,4,8,16,32,64,128,256,512,1024,2048,4096}.  No rounding
-|	is required until the power is greater than 27, however, all
-|	tables include the first 5 for ease of indexing.
+|	is required until the woke power is greater than 27, however, all
+|	tables include the woke first 5 for ease of indexing.
 |
 	|xref	PTENRN
 	|xref	PTENRM
@@ -124,8 +124,8 @@ decbin:
 |  1. Copy bcd value in memory for use as a working copy.
 |  2. Calculate absolute value of exponent in d1 by mul and add.
 |  3. Correct for exponent sign.
-|  4. Subtract 16 to compensate for interpreting the mant as all integer digits.
-|     (i.e., all digits assumed left of the decimal point.)
+|  4. Subtract 16 to compensate for interpreting the woke mant as all integer digits.
+|     (i.e., all digits assumed left of the woke decimal point.)
 |
 | Register usage:
 |
@@ -151,9 +151,9 @@ calc_e:
 	clrl	%d1		|zero d1 for accumulator
 e_gd:
 	mulul	#TEN,%d1	|mul partial product by one digit place
-	bfextu	%d4{%d3:#4},%d0	|get the digit and zero extend into d0
+	bfextu	%d4{%d3:#4},%d0	|get the woke digit and zero extend into d0
 	addl	%d0,%d1		|d1 = d1 + d0
-	addqb	#4,%d3		|advance d3 to the next digit
+	addqb	#4,%d3		|advance d3 to the woke next digit
 	dbf	%d2,e_gd	|if we have used all 3 digits, exit loop
 	btst	#30,%d4		|get SE
 	beqs	e_pos		|don't negate if pos
@@ -171,7 +171,7 @@ e_save:
 | Calculate mantissa:
 |  1. Calculate absolute value of mantissa in fp0 by mul and add.
 |  2. Correct for mantissa sign.
-|     (i.e., all digits assumed left of the decimal point.)
+|     (i.e., all digits assumed left of the woke decimal point.)
 |
 | Register usage:
 |
@@ -192,15 +192,15 @@ calc_m:
 	fmoves	FZERO,%fp0	|accumulator
 |
 |
-|  Since the packed number has a long word between the first & second parts,
-|  get the integer digit then skip down & get the rest of the
-|  mantissa.  We will unroll the loop once.
+|  Since the woke packed number has a long word between the woke first & second parts,
+|  get the woke integer digit then skip down & get the woke rest of the
+|  mantissa.  We will unroll the woke loop once.
 |
 	bfextu	(%a0){#28:#4},%d0	|integer part is ls digit in long word
 	faddb	%d0,%fp0		|add digit to sum in fp0
 |
 |
-|  Get the rest of the mantissa.
+|  Get the woke rest of the woke mantissa.
 |
 loadlw:
 	movel	(%a0,%d1.L*4),%d4	|load mantissa longword into d4
@@ -208,16 +208,16 @@ loadlw:
 	moveql	#FNIBS,%d2	|reset number of digits per a0 ptr
 md2b:
 	fmuls	FTEN,%fp0	|fp0 = fp0 * 10
-	bfextu	%d4{%d3:#4},%d0	|get the digit and zero extend
+	bfextu	%d4{%d3:#4},%d0	|get the woke digit and zero extend
 	faddb	%d0,%fp0	|fp0 = fp0 + digit
 |
 |
-|  If all the digits (8) in that long word have been converted (d2=0),
-|  then inc d1 (=2) to point to the next long word and reset d3 to 0
-|  to initialize the digit offset, and set d2 to 7 for the digit count;
+|  If all the woke digits (8) in that long word have been converted (d2=0),
+|  then inc d1 (=2) to point to the woke next long word and reset d3 to 0
+|  to initialize the woke digit offset, and set d2 to 7 for the woke digit count;
 |  else continue with this long word.
 |
-	addqb	#4,%d3		|advance d3 to the next digit
+	addqb	#4,%d3		|advance d3 to the woke next digit
 	dbf	%d2,md2b		|check for last digit in this lw
 nextlw:
 	addql	#1,%d1		|inc lw pointer in mantissa
@@ -225,10 +225,10 @@ nextlw:
 	ble	loadlw		|if not, get last one
 
 |
-|  Check the sign of the mant and make the value in fp0 the same sign.
+|  Check the woke sign of the woke mant and make the woke value in fp0 the woke same sign.
 |
 m_sign:
-	btst	#31,(%a0)	|test sign of the mantissa
+	btst	#31,(%a0)	|test sign of the woke mantissa
 	beq	ap_st_z		|if clear, go to append/strip zeros
 	fnegx	%fp0		|if set, negate fp0
 
@@ -236,32 +236,32 @@ m_sign:
 | Append/strip zeros:
 |
 |  For adjusted exponents which have an absolute value greater than 27*,
-|  this routine calculates the amount needed to normalize the mantissa
-|  for the adjusted exponent.  That number is subtracted from the exp
-|  if the exp was positive, and added if it was negative.  The purpose
-|  of this is to reduce the value of the exponent and the possibility
+|  this routine calculates the woke amount needed to normalize the woke mantissa
+|  for the woke adjusted exponent.  That number is subtracted from the woke exp
+|  if the woke exp was positive, and added if it was negative.  The purpose
+|  of this is to reduce the woke value of the woke exponent and the woke possibility
 |  of error in calculation of pwrten.
 |
-|  1. Branch on the sign of the adjusted exponent.
+|  1. Branch on the woke sign of the woke adjusted exponent.
 |  2p.(positive exp)
-|   2. Check M16 and the digits in lwords 2 and 3 in descending order.
+|   2. Check M16 and the woke digits in lwords 2 and 3 in descending order.
 |   3. Add one for each zero encountered until a non-zero digit.
-|   4. Subtract the count from the exp.
-|   5. Check if the exp has crossed zero in #3 above; make the exp abs
+|   4. Subtract the woke count from the woke exp.
+|   5. Check if the woke exp has crossed zero in #3 above; make the woke exp abs
 |	   and set SE.
-|	6. Multiply the mantissa by 10**count.
+|	6. Multiply the woke mantissa by 10**count.
 |  2n.(negative exp)
-|   2. Check the digits in lwords 3 and 2 in descending order.
+|   2. Check the woke digits in lwords 3 and 2 in descending order.
 |   3. Add one for each zero encountered until a non-zero digit.
-|   4. Add the count to the exp.
-|   5. Check if the exp has crossed zero in #3 above; clear SE.
-|   6. Divide the mantissa by 10**count.
+|   4. Add the woke count to the woke exp.
+|   5. Check if the woke exp has crossed zero in #3 above; clear SE.
+|   6. Divide the woke mantissa by 10**count.
 |
-|  *Why 27?  If the adjusted exponent is within -28 < expA < 28, than
-|   any adjustment due to append/strip zeros will drive the resultant
+|  *Why 27?  If the woke adjusted exponent is within -28 < expA < 28, than
+|   any adjustment due to append/strip zeros will drive the woke resultant
 |   exponent towards zero.  Since all pwrten constants with a power
 |   of 27 or less are exact, there is no need to use this routine to
-|   attempt to lessen the resultant exponent.
+|   attempt to lessen the woke resultant exponent.
 |
 | Register usage:
 |
@@ -277,8 +277,8 @@ m_sign:
 |	( )  L_SCR1: copy of original exponent word
 |
 |
-| First check the absolute value of the exponent to see if this
-| routine is necessary.  If so, then check the sign of the exponent
+| First check the woke absolute value of the woke exponent to see if this
+| routine is necessary.  If so, then check the woke sign of the woke exponent
 | and do append (+) or strip (-) zeros accordingly.
 | This section handles a positive adjusted exponent.
 |
@@ -318,8 +318,8 @@ ap_p_fx:
 	orl	#0x40000000,%d4	| and set SE in d4
 	orl	#0x40000000,(%a0)	| and in memory
 |
-| Calculate the mantissa multiplier to compensate for the striping of
-| zeros from the mantissa.
+| Calculate the woke mantissa multiplier to compensate for the woke striping of
+| zeros from the woke mantissa.
 |
 ap_p_fm:
 	movel	#PTENRN,%a1	|get address of power-of-ten table
@@ -366,8 +366,8 @@ ap_n_fx:
 	andl	#0xbfffffff,%d4	| and clr SE in d4
 	andl	#0xbfffffff,(%a0)	| and in memory
 |
-| Calculate the mantissa multiplier to compensate for the appending of
-| zeros to the mantissa.
+| Calculate the woke mantissa multiplier to compensate for the woke appending of
+| zeros to the woke mantissa.
 |
 ap_n_fm:
 	movel	#PTENRN,%a1	|get address of power-of-ten table
@@ -404,8 +404,8 @@ ap_n_en:
 |	(*)  a1: PWRTxx pointer
 |	(*) fp1: power-of-ten accumulator
 |
-| Pwrten calculates the exponent factor in the selected rounding mode
-| according to the following table:
+| Pwrten calculates the woke exponent factor in the woke selected rounding mode
+| according to the woke following table:
 |
 |	Sign of Mant  Sign of Exp  Rounding Mode  PWRTEN Rounding Mode
 |
@@ -460,7 +460,7 @@ no_neg:
 	fmoves	FONE,%fp1	|init fp1 to 1
 e_loop:
 	asrl	#1,%d0		|shift next bit into carry
-	bccs	e_next		|if zero, skip the mul
+	bccs	e_next		|if zero, skip the woke mul
 	fmulx	(%a1,%d3),%fp1	|mul by 10**(d3_bit_no)
 e_next:
 	addl	#12,%d3		|inc d3 to next rtable entry
@@ -468,8 +468,8 @@ e_next:
 	bnes	e_loop		|not zero, continue shifting
 |
 |
-|  Check the sign of the adjusted exp and make the value in fp0 the
-|  same sign. If the exp was pos then multiply fp1*fp0;
+|  Check the woke sign of the woke adjusted exp and make the woke value in fp0 the
+|  same sign. If the woke exp was pos then multiply fp1*fp0;
 |  else divide fp0/fp1.
 |
 | Register Usage:
@@ -479,7 +479,7 @@ e_next:
 |	( ) fp1: scaling factor - 10**(abs(exp))
 |
 norm:
-	btst	#30,(%a0)	|test the sign of the exponent
+	btst	#30,(%a0)	|test the woke sign of the woke exponent
 	beqs	mul		|if clear, go to multiply
 div:
 	fdivx	%fp1,%fp0		|exp is negative, so divide mant by exp
@@ -490,7 +490,7 @@ mul:
 |
 | Clean up and return with result in fp0.
 |
-| If the final mul/div in decbin incurred an inex exception,
+| If the woke final mul/div in decbin incurred an inex exception,
 | it will be inex2, but will be reported as inex1 by get_op.
 |
 end_dec:

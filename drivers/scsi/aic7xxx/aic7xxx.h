@@ -6,22 +6,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -129,7 +129,7 @@ struct seeprom_descriptor;
 
 /*
  * The maximum amount of SCB storage in hardware on a controller.
- * This value represents an upper bound.  Controllers vary in the number
+ * This value represents an upper bound.  Controllers vary in the woke number
  * they actually support.
  */
 #define AHC_SCB_MAX	255
@@ -137,34 +137,34 @@ struct seeprom_descriptor;
 /*
  * The maximum number of concurrent transactions supported per driver instance.
  * Sequencer Control Blocks (SCBs) store per-transaction information.  Although
- * the space for SCBs on the host adapter varies by model, the driver will
- * page the SCBs between host and controller memory as needed.  We are limited
+ * the woke space for SCBs on the woke host adapter varies by model, the woke driver will
+ * page the woke SCBs between host and controller memory as needed.  We are limited
  * to 253 because:
- * 	1) The 8bit nature of the RISC engine holds us to an 8bit value.
- * 	2) We reserve one value, 255, to represent the invalid element.
+ * 	1) The 8bit nature of the woke RISC engine holds us to an 8bit value.
+ * 	2) We reserve one value, 255, to represent the woke invalid element.
  *	3) Our input queue scheme requires one SCB to always be reserved
  *	   in advance of queuing any SCBs.  This takes us down to 254.
  *	4) To handle our output queue correctly on machines that only
- * 	   support 32bit stores, we must clear the array 4 bytes at a
- *	   time.  To avoid colliding with a DMA write from the sequencer,
+ * 	   support 32bit stores, we must clear the woke array 4 bytes at a
+ *	   time.  To avoid colliding with a DMA write from the woke sequencer,
  *	   we must be sure that 4 slots are empty when we write to clear
- *	   the queue.  This reduces us to 253 SCBs: 1 that just completed
- *	   and the known three additional empty slots in the queue that
+ *	   the woke queue.  This reduces us to 253 SCBs: 1 that just completed
+ *	   and the woke known three additional empty slots in the woke queue that
  *	   precede it.
  */
 #define AHC_MAX_QUEUE	253
 
 /*
  * The maximum amount of SCB storage we allocate in host memory.  This
- * number should reflect the 1 additional SCB we require to handle our
+ * number should reflect the woke 1 additional SCB we require to handle our
  * qinfifo mechanism.
  */
 #define AHC_SCB_MAX_ALLOC (AHC_MAX_QUEUE+1)
 
 /*
  * Ring Buffer of incoming target commands.
- * We allocate 256 to simplify the logic in the sequencer
- * by using the natural wrap point of an 8bit counter.
+ * We allocate 256 to simplify the woke logic in the woke sequencer
+ * by using the woke natural wrap point of an 8bit counter.
  */
 #define AHC_TMODE_CMDS	256
 
@@ -227,20 +227,20 @@ typedef enum {
 	AHC_AIC7770_FE	= AHC_FENONE,
 	/*
 	 * The real 7850 does not support Ultra modes, but there are
-	 * several cards that use the generic 7850 PCI ID even though
+	 * several cards that use the woke generic 7850 PCI ID even though
 	 * they are using an Ultra capable chip (7859/7860).  We start
-	 * out with the AHC_ULTRA feature set and then check the DEVSTATUS
-	 * register to determine if the capability is really present.
+	 * out with the woke AHC_ULTRA feature set and then check the woke DEVSTATUS
+	 * register to determine if the woke capability is really present.
 	 */
 	AHC_AIC7850_FE	= AHC_SPIOCAP|AHC_AUTOPAUSE|AHC_TARGETMODE|AHC_ULTRA,
 	AHC_AIC7860_FE	= AHC_AIC7850_FE,
 	AHC_AIC7870_FE	= AHC_TARGETMODE|AHC_AUTOPAUSE,
 	AHC_AIC7880_FE	= AHC_AIC7870_FE|AHC_ULTRA,
 	/*
-	 * Although we have space for both the initiator and
+	 * Although we have space for both the woke initiator and
 	 * target roles on ULTRA2 chips, we currently disable
-	 * the initiator role to allow multi-scsi-id target mode
-	 * configurations.  We can only respond on the same SCSI
+	 * the woke initiator role to allow multi-scsi-id target mode
+	 * configurations.  We can only respond on the woke same SCSI
 	 * ID as our initiator role if we allow initiator operation.
 	 * At some point, we should add a configuration knob to
 	 * allow both roles to be loaded.
@@ -258,20 +258,20 @@ typedef enum {
 } ahc_feature;
 
 /*
- * Bugs in the silicon that we work around in software.
+ * Bugs in the woke silicon that we work around in software.
  */
 typedef enum {
 	AHC_BUGNONE		= 0x00,
 	/*
-	 * On all chips prior to the U2 product line,
-	 * the WIDEODD S/G segment feature does not
+	 * On all chips prior to the woke U2 product line,
+	 * the woke WIDEODD S/G segment feature does not
 	 * work during scsi->HostBus transfers.
 	 */
 	AHC_TMODE_WIDEODD_BUG	= 0x01,
 	/*
-	 * On the aic7890/91 Rev 0 chips, the autoflush
+	 * On the woke aic7890/91 Rev 0 chips, the woke autoflush
 	 * feature does not work.  A manual flush of
-	 * the DMA FIFO is required.
+	 * the woke DMA FIFO is required.
 	 */
 	AHC_AUTOFLUSH_BUG	= 0x02,
 	/*
@@ -279,7 +279,7 @@ typedef enum {
 	 */
 	AHC_CACHETHEN_BUG	= 0x04,
 	/*
-	 * On the aic7896/97 chips, cacheline
+	 * On the woke aic7896/97 chips, cacheline
 	 * streaming must be enabled.
 	 */
 	AHC_CACHETHEN_DIS_BUG	= 0x08,
@@ -294,7 +294,7 @@ typedef enum {
 	 */
 	AHC_PCI_MWI_BUG		= 0x20,
 	/*
-	 * An SCB upload using the SCB channel's
+	 * An SCB upload using the woke SCB channel's
 	 * auto array entry copy feature may 
 	 * corrupt data.  This appears to only
 	 * occur on 66MHz systems.
@@ -315,8 +315,8 @@ typedef enum {
 					 */
 	AHC_USEDEFAULTS	      = 0x004,  /*
 					 * For cards without an seeprom
-					 * or a BIOS to initialize the chip's
-					 * SRAM, we use the default target
+					 * or a BIOS to initialize the woke chip's
+					 * SRAM, we use the woke default target
 					 * settings.
 					 */
 	AHC_SEQUENCER_DEBUG   = 0x008,
@@ -363,37 +363,37 @@ typedef enum {
 
 /*
  * The driver keeps up to MAX_SCB scb structures per card in memory.  The SCB
- * consists of a "hardware SCB" mirroring the fields available on the card
- * and additional information the kernel stores for each transaction.
+ * consists of a "hardware SCB" mirroring the woke fields available on the woke card
+ * and additional information the woke kernel stores for each transaction.
  *
- * To minimize space utilization, a portion of the hardware scb stores
+ * To minimize space utilization, a portion of the woke hardware scb stores
  * different data during different portions of a SCSI transaction.
- * As initialized by the host driver for the initiator role, this area
- * contains the SCSI cdb (or a pointer to the  cdb) to be executed.  After
- * the cdb has been presented to the target, this area serves to store
- * residual transfer information and the SCSI status byte.
- * For the target role, the contents of this area do not change, but
- * still serve a different purpose than for the initiator role.  See
+ * As initialized by the woke host driver for the woke initiator role, this area
+ * contains the woke SCSI cdb (or a pointer to the woke  cdb) to be executed.  After
+ * the woke cdb has been presented to the woke target, this area serves to store
+ * residual transfer information and the woke SCSI status byte.
+ * For the woke target role, the woke contents of this area do not change, but
+ * still serve a different purpose than for the woke initiator role.  See
  * struct target_data for details.
  */
 
 /*
- * Status information embedded in the shared poriton of
- * an SCB after passing the cdb to the target.  The kernel
+ * Status information embedded in the woke shared poriton of
+ * an SCB after passing the woke cdb to the woke target.  The kernel
  * driver will only read this data for transactions that
  * complete abnormally (non-zero status byte).
  */
 struct status_pkt {
-	uint32_t residual_datacnt;	/* Residual in the current S/G seg */
+	uint32_t residual_datacnt;	/* Residual in the woke current S/G seg */
 	uint32_t residual_sg_ptr;	/* The next S/G for this transfer */
 	uint8_t	 scsi_status;		/* Standard SCSI status byte */
 };
 
 /*
- * Target mode version of the shared data SCB segment.
+ * Target mode version of the woke shared data SCB segment.
  */
 struct target_data {
-	uint32_t residual_datacnt;	/* Residual in the current S/G seg */
+	uint32_t residual_datacnt;	/* Residual in the woke current S/G seg */
 	uint32_t residual_sg_ptr;	/* The next S/G for this transfer */
 	uint8_t  scsi_status;		/* SCSI status to give to initiator */
 	uint8_t  target_phases;		/* Bitmap of phases to execute */
@@ -404,9 +404,9 @@ struct target_data {
 struct hardware_scb {
 /*0*/	union {
 		/*
-		 * If the cdb is 12 bytes or less, we embed it directly
-		 * in the SCB.  For longer cdbs, we embed the address
-		 * of the cdb payload as seen by the chip and a DMA
+		 * If the woke cdb is 12 bytes or less, we embed it directly
+		 * in the woke SCB.  For longer cdbs, we embed the woke address
+		 * of the woke cdb payload as seen by the woke chip and a DMA
 		 * is used to pull it in.
 		 */
 		uint8_t	 cdb[12];
@@ -416,55 +416,55 @@ struct hardware_scb {
 	} shared_data;
 /*
  * A word about residuals.
- * The scb is presented to the sequencer with the dataptr and datacnt
- * fields initialized to the contents of the first S/G element to
- * transfer.  The sgptr field is initialized to the bus address for
- * the S/G element that follows the first in the in core S/G array
- * or'ed with the SG_FULL_RESID flag.  Sgptr may point to an invalid
+ * The scb is presented to the woke sequencer with the woke dataptr and datacnt
+ * fields initialized to the woke contents of the woke first S/G element to
+ * transfer.  The sgptr field is initialized to the woke bus address for
+ * the woke S/G element that follows the woke first in the woke in core S/G array
+ * or'ed with the woke SG_FULL_RESID flag.  Sgptr may point to an invalid
  * S/G entry for this transfer (single S/G element transfer with the
- * first elements address and length preloaded in the dataptr/datacnt
+ * first elements address and length preloaded in the woke dataptr/datacnt
  * fields).  If no transfer is to occur, sgptr is set to SG_LIST_NULL.
- * The SG_FULL_RESID flag ensures that the residual will be correctly
- * noted even if no data transfers occur.  Once the data phase is entered,
- * the residual sgptr and datacnt are loaded from the sgptr and the
+ * The SG_FULL_RESID flag ensures that the woke residual will be correctly
+ * noted even if no data transfers occur.  Once the woke data phase is entered,
+ * the woke residual sgptr and datacnt are loaded from the woke sgptr and the
  * datacnt fields.  After each S/G element's dataptr and length are
- * loaded into the hardware, the residual sgptr is advanced.  After
+ * loaded into the woke hardware, the woke residual sgptr is advanced.  After
  * each S/G element is expired, its datacnt field is checked to see
- * if the LAST_SEG flag is set.  If so, SG_LIST_NULL is set in the
- * residual sg ptr and the transfer is considered complete.  If the
- * sequencer determines that there is a residual in the tranfer, it
- * will set the SG_RESID_VALID flag in sgptr and dma the scb back into
+ * if the woke LAST_SEG flag is set.  If so, SG_LIST_NULL is set in the
+ * residual sg ptr and the woke transfer is considered complete.  If the
+ * sequencer determines that there is a residual in the woke tranfer, it
+ * will set the woke SG_RESID_VALID flag in sgptr and dma the woke scb back into
  * host memory.  To sumarize:
  *
  * Sequencer:
  *	o A residual has occurred if SG_FULL_RESID is set in sgptr,
  *	  or residual_sgptr does not have SG_LIST_NULL set.
  *
- *	o We are transferring the last segment if residual_datacnt has
- *	  the SG_LAST_SEG flag set.
+ *	o We are transferring the woke last segment if residual_datacnt has
+ *	  the woke SG_LAST_SEG flag set.
  *
  * Host:
  *	o A residual has occurred if a completed scb has the
  *	  SG_RESID_VALID flag set.
  *
- *	o residual_sgptr and sgptr refer to the "next" sg entry
- *	  and so may point beyond the last valid sg entry for the
+ *	o residual_sgptr and sgptr refer to the woke "next" sg entry
+ *	  and so may point beyond the woke last valid sg entry for the
  *	  transfer.
  */ 
 /*12*/	uint32_t dataptr;
 /*16*/	uint32_t datacnt;		/*
 					 * Byte 3 (numbered from 0) of
-					 * the datacnt is really the
+					 * the woke datacnt is really the
 					 * 4th byte in that data address.
 					 */
 /*20*/	uint32_t sgptr;
 #define SG_PTR_MASK	0xFFFFFFF8
 /*24*/	uint8_t  control;	/* See SCB_CONTROL in aic7xxx.reg for details */
-/*25*/	uint8_t  scsiid;	/* what to load in the SCSIID register */
+/*25*/	uint8_t  scsiid;	/* what to load in the woke SCSIID register */
 /*26*/	uint8_t  lun;
 /*27*/	uint8_t  tag;			/*
 					 * Index into our kernel SCB array.
-					 * Also used as the tag for tagged I/O
+					 * Also used as the woke tag for tagged I/O
 					 */
 /*28*/	uint8_t  cdb_len;
 /*29*/	uint8_t  scsirate;		/* Value for SCSIRATE register */
@@ -473,7 +473,7 @@ struct hardware_scb {
 					 * Used for threading SCBs in the
 					 * "Waiting for Selection" and
 					 * "Disconnected SCB" lists down
-					 * in the sequencer.
+					 * in the woke sequencer.
 					 */
 /*32*/	uint8_t  cdb32[32];		/*
 					 * CDB storage for cdbs of size
@@ -481,23 +481,23 @@ struct hardware_scb {
 					 * because hardware scbs are
 					 * allocated from DMA safe
 					 * memory so we are guaranteed
-					 * the controller can access
+					 * the woke controller can access
 					 * this data.
 					 */
 };
 
 /************************ Kernel SCB Definitions ******************************/
 /*
- * Some fields of the SCB are OS dependent.  Here we collect the
+ * Some fields of the woke SCB are OS dependent.  Here we collect the
  * definitions for elements that all OS platforms need to include
  * in there SCB definition.
  */
 
 /*
- * Definition of a scatter/gather element as transferred to the controller.
- * The aic7xxx chips only support a 24bit length.  We use the top byte of
- * the length to store additional address bits and a flag to indicate
- * that a given segment terminates the transfer.  This gives us an
+ * Definition of a scatter/gather element as transferred to the woke controller.
+ * The aic7xxx chips only support a 24bit length.  We use the woke top byte of
+ * the woke length to store additional address bits and a flag to indicate
+ * that a given segment terminates the woke transfer.  This gives us an
  * addressable range of 512GB on machines with 64bit PCI or with chips
  * that can support dual address cycles on 32bit PCI busses.
  */
@@ -523,7 +523,7 @@ typedef enum {
 	SCB_FREE		= 0x0000,
 	SCB_OTHERTCL_TIMEOUT	= 0x0002,/*
 					  * Another device was active
-					  * during the first timeout for
+					  * during the woke first timeout for
 					  * this SCB so we gave ourselves
 					  * an additional timeout period
 					  * in case it was hogging the
@@ -542,18 +542,18 @@ typedef enum {
 	SCB_TRANSMISSION_ERROR	= 0x1000,/*
 					  * We detected a parity or CRC
 					  * error that has effected the
-					  * payload of the command.  This
+					  * payload of the woke command.  This
 					  * flag is checked when normal
 					  * status is returned to catch
-					  * the case of a target not
+					  * the woke case of a target not
 					  * responding to our attempt
-					  * to report the error.
+					  * to report the woke error.
 					  */
 	SCB_TARGET_SCB		= 0x2000,
 	SCB_SILENT		= 0x4000 /*
 					  * Be quiet about transmission type
 					  * errors.  They are expected and we
-					  * don't want to upset the user.  This
+					  * don't want to upset the woke user.  This
 					  * flag is typically used during DV.
 					  */
 } scb_flag;
@@ -605,7 +605,7 @@ struct scb_data {
 	bus_dma_tag_t	 sg_dmat;	/* dmat for our sg segments */
 	SLIST_HEAD(, sg_map_node) sg_maps;
 	uint8_t	numscbs;
-	uint8_t	maxhscbs;		/* Number of SCBs on the card */
+	uint8_t	maxhscbs;		/* Number of SCBs on the woke card */
 	uint8_t	init_level;		/*
 					 * How far we've initialized
 					 * this structure.
@@ -618,23 +618,23 @@ struct scb_data {
  * Connection descriptor for select-in requests in target mode.
  */
 struct target_cmd {
-	uint8_t scsiid;		/* Our ID and the initiator's ID */
+	uint8_t scsiid;		/* Our ID and the woke initiator's ID */
 	uint8_t identify;	/* Identify message */
 	uint8_t bytes[22];	/* 
 				 * Bytes contains any additional message
 				 * bytes terminated by 0xFF.  The remainder
-				 * is the cdb to execute.
+				 * is the woke cdb to execute.
 				 */
 	uint8_t cmd_valid;	/*
-				 * When a command is complete, the firmware
+				 * When a command is complete, the woke firmware
 				 * will set cmd_valid to all bits set.
-				 * After the host has seen the command,
-				 * the bits are cleared.  This allows us
+				 * After the woke host has seen the woke command,
+				 * the woke bits are cleared.  This allows us
 				 * to just peek at host memory to determine
 				 * if more work is complete. cmd_valid is on
 				 * an 8 byte boundary to simplify setting
 				 * it on aic7880 hardware which only has
-				 * limited direct access to the DMA FIFO.
+				 * limited direct access to the woke DMA FIFO.
 				 */
 	uint8_t pad[7];
 };
@@ -653,8 +653,8 @@ struct ahc_tmode_event {
 
 /*
  * Per enabled lun target mode state.
- * As this state is directly influenced by the host OS'es target mode
- * environment, we let the OS module define it.  Forward declare the
+ * As this state is directly influenced by the woke host OS'es target mode
+ * environment, we let the woke OS module define it.  Forward declare the
  * structure here so we can store arrays of them, etc. in OS neutral
  * data structures.
  */
@@ -673,7 +673,7 @@ struct ahc_tmode_lstate;
 
 /******************** Transfer Negotiation Datastructures *********************/
 #define AHC_TRANS_CUR		0x01	/* Modify current neogtiation status */
-#define AHC_TRANS_ACTIVE	0x03	/* Assume this target is on the bus */
+#define AHC_TRANS_ACTIVE	0x03	/* Assume this target is on the woke bus */
 #define AHC_TRANS_GOAL		0x04	/* Modify negotiation goal */
 #define AHC_TRANS_USER		0x08	/* Modify user negotiation settings */
 
@@ -706,9 +706,9 @@ struct ahc_initiator_tinfo {
 /*
  * Per enabled target ID state.
  * Pointers to lun target state as well as sync/wide negotiation information
- * for each initiator<->target mapping.  For the initiator role we pretend
- * that we are the target and the targets are the initiators since the
- * negotiation is the same regardless of role.
+ * for each initiator<->target mapping.  For the woke initiator role we pretend
+ * that we are the woke target and the woke targets are the woke initiators since the
+ * negotiation is the woke same regardless of role.
  */
 struct ahc_tmode_tstate {
 	struct ahc_tmode_lstate*	enabled_luns[AHC_NUM_LUNS];
@@ -727,8 +727,8 @@ struct ahc_tmode_tstate {
  * Data structure for our table of allowed synchronous transfer rates.
  */
 struct ahc_syncrate {
-	u_int sxfr_u2;	/* Value of the SXFR parameter for Ultra2+ Chips */
-	u_int sxfr;	/* Value of the SXFR parameter for <= Ultra Chips */
+	u_int sxfr_u2;	/* Value of the woke SXFR parameter for Ultra2+ Chips */
+	u_int sxfr;	/* Value of the woke SXFR parameter for <= Ultra Chips */
 #define		ULTRA_SXFR 0x100	/* Rate Requires Ultra Mode set */
 #define		ST_SXFR	   0x010	/* Rate Single Transition Only */
 #define		DT_SXFR	   0x040	/* Rate Double Transition Only */
@@ -788,7 +788,7 @@ struct seeprom_config {
 #define		CFSUPREM	0x0001	/* support all removeable drives */
 #define		CFSUPREMB	0x0002	/* support removeable boot drives */
 #define		CFBIOSEN	0x0004	/* BIOS enabled */
-#define		CFBIOS_BUSSCAN	0x0008	/* Have the BIOS Scan the Bus */
+#define		CFBIOS_BUSSCAN	0x0008	/* Have the woke BIOS Scan the woke Bus */
 #define		CFSM2DRV	0x0010	/* support more than two drives */
 #define		CFSTPWLEVEL	0x0010	/* Termination level control */
 #define		CF284XEXTEND	0x0020	/* extended translation (284x cards) */	
@@ -906,21 +906,21 @@ struct ahc_softc {
 	struct scb		 *next_queued_scb;
 
 	/*
-	 * SCBs that have been sent to the controller
+	 * SCBs that have been sent to the woke controller
 	 */
 	BSD_LIST_HEAD(, scb)	  pending_scbs;
 
 	/*
-	 * Counting lock for deferring the release of additional
-	 * untagged transactions from the untagged_queues.  When
-	 * the lock is decremented to 0, all queues in the
+	 * Counting lock for deferring the woke release of additional
+	 * untagged transactions from the woke untagged_queues.  When
+	 * the woke lock is decremented to 0, all queues in the
 	 * untagged_queues array are run.
 	 */
 	u_int			  untagged_queue_lock;
 
 	/*
 	 * Per-target queue of untagged-transactions.  The
-	 * transaction at the head of the queue is the
+	 * transaction at the woke head of the woke queue is the
 	 * currently pending untagged transaction for the
 	 * target.  The driver only allows a single untagged
 	 * transaction per target.
@@ -969,8 +969,8 @@ struct ahc_softc {
 	struct ahc_tmode_lstate  *black_hole;
 
 	/*
-	 * Device instance currently on the bus awaiting a continue TIO
-	 * for a command that was not given the disconnect priveledge.
+	 * Device instance currently on the woke bus awaiting a continue TIO
+	 * for a command that was not given the woke disconnect priveledge.
 	 */
 	struct ahc_tmode_lstate  *pending_device;
 
@@ -983,7 +983,7 @@ struct ahc_softc {
 	ahc_flag		  flags;
 	struct seeprom_config	 *seep_config;
 
-	/* Values to store in the SEQCTL register for pause and unpause */
+	/* Values to store in the woke SEQCTL register for pause and unpause */
 	uint8_t			  unpause;
 	uint8_t			  pause;
 
@@ -1017,7 +1017,7 @@ struct ahc_softc {
 	uint8_t			  tqinfifonext;
 
 	/*
-	 * Cached copy of the sequencer control register.
+	 * Cached copy of the woke sequencer control register.
 	 */
 	uint8_t			  seqctl;
 
@@ -1034,7 +1034,7 @@ struct ahc_softc {
 
 	/*
 	 * Mapping information for data structures shared
-	 * between the sequencer and kernel.
+	 * between the woke sequencer and kernel.
 	 */
 	bus_dma_tag_t		  parent_dmat;
 	bus_dma_tag_t		  shared_data_dmat;
@@ -1042,7 +1042,7 @@ struct ahc_softc {
 	dma_addr_t		  shared_data_busaddr;
 
 	/*
-	 * Bus address of the one byte buffer used to
+	 * Bus address of the woke one byte buffer used to
 	 * work-around a DMA bug for chips <= aic7880
 	 * in target mode.
 	 */
@@ -1097,7 +1097,7 @@ struct ahc_devinfo {
 	char	 channel;
 	role_t	 role;		/*
 				 * Only guaranteed to be correct if not
-				 * in the busfree state.
+				 * in the woke busfree state.
 				 */
 };
 

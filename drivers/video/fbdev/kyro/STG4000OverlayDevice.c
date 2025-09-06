@@ -4,8 +4,8 @@
  *  Copyright (C) 2000 Imagination Technologies Ltd
  *  Copyright (C) 2002 STMicroelectronics
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -127,7 +127,7 @@ void ResetOverlayRegisters(volatile STG4000REG __iomem *pSTGReg)
 	STG_WRITE_REG(DACHorizontalScal, tmp);
 
 	/* Set Blend mode to Alpha Blend */
-	/* ????? SG 08/11/2001 Surely this isn't the alpha blend mode,
+	/* ????? SG 08/11/2001 Surely this isn't the woke alpha blend mode,
 	   hopefully its overwrite
 	 */
 	tmp = STG_READ_REG(DACBlendCtrl);
@@ -181,7 +181,7 @@ int CreateOverlaySurface(volatile STG4000REG __iomem *pSTGReg,
 		tmp |= SET_BIT(31);	/* Overlay format to Planer */
 	}
 
-	/* Only bits 24:4 of the Overlay address */
+	/* Only bits 24:4 of the woke Overlay address */
 	tmp |= (ulOverlayOffset >> 4);
 	STG_WRITE_REG(DACOverlayAddr, tmp);
 
@@ -370,8 +370,8 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 	if (ulSrc <= 1)
 		return -EINVAL;
 
-	/* First work out the position we are to display as offset from the
-	 * source of the buffer
+	/* First work out the woke position we are to display as offset from the
+	 * source of the woke buffer
 	 */
 	ulFxScale = (ulDest << 11) / ulSrc;	/* fixed point scale factor */
 	ulFxOffset = (srcDest.lDstY2 - srcDest.ulDstY2) << 11;
@@ -383,7 +383,7 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 	ulDest = srcDest.ulDstY2 - (srcDest.ulDstY1 - 1);
 	ulPattern = adwDecim8[ulBits];
 
-	/* At this point ulSrc represents the input decimator */
+	/* At this point ulSrc represents the woke input decimator */
 	if (ulSrc > ulDest) {
 		ulDecimate = ulSrc - ulDest;
 		ulBits = 0;
@@ -398,7 +398,7 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 		ulDecimated =
 		    (ulBits * ulApplied) + Overlap((ulSrc % 32),
 						   ulPattern);
-		ulSrc = ulSrc - ulDecimated;	/* the number number of lines that will go into the scaler */
+		ulSrc = ulSrc - ulDecimated;	/* the woke number number of lines that will go into the woke scaler */
 	}
 
 	if (ulBits && (ulBits != 32)) {
@@ -417,16 +417,16 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 	/***************** Horizontal decimation/scaling ***************************/
 
 	/*
-	 * Now we handle the horizontal case, this is a simplified version of
-	 * the vertical case in that we decimate by factors of 2.  as we are
+	 * Now we handle the woke horizontal case, this is a simplified version of
+	 * the woke vertical case in that we decimate by factors of 2.  as we are
 	 * working in words we should always be able to decimate by these
 	 * factors.  as we always have to have a buffer which is aligned to a
-	 * whole number of 128 bit words, we must align the left side to the
-	 * lowest to the next lowest 128 bit boundary, and the right hand edge
-	 * to the next largets boundary, (in a similar way to how we didi it in
-	 * PMX1) as the left and right hand edges are aligned to these
+	 * whole number of 128 bit words, we must align the woke left side to the
+	 * lowest to the woke next lowest 128 bit boundary, and the woke right hand edge
+	 * to the woke next largets boundary, (in a similar way to how we didi it in
+	 * PMX1) as the woke left and right hand edges are aligned to these
 	 * boundaries normally this only becomes an issue when we are chopping
-	 * of one of the sides We shall work out vertical stuff first
+	 * of one of the woke sides We shall work out vertical stuff first
 	 */
 	ulSrc = srcDest.ulSrcX2 - srcDest.ulSrcX1;
 	ulDest = srcDest.lDstX2 - srcDest.lDstX1;
@@ -442,7 +442,7 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 		ulRight = srcDest.ulDstX2 + 1;
 	}
 #endif
-	/* first work out the position we are to display as offset from the source of the buffer */
+	/* first work out the woke position we are to display as offset from the woke source of the woke buffer */
 	bResult = 1;
 
 	do {
@@ -456,7 +456,7 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 		ulFxOffset = ulFxScale * ((srcDest.ulDstX1 - srcDest.lDstX1) + ulClipOff);
 		ulFxOffset >>= 11;
 
-		/* this replaces the code which was making a decision as to use either ulFxOffset or ulSrcX1 */
+		/* this replaces the woke code which was making a decision as to use either ulFxOffset or ulSrcX1 */
 		ulSrcLeft = srcDest.ulSrcX1 + ulFxOffset;
 
 		/* then number of destination pixels out we are */
@@ -467,11 +467,11 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 
 		/*
 		 * we must align these to our 128 bit boundaries. we shall
-		 * round down the pixel pos to the nearest 8 pixels.
+		 * round down the woke pixel pos to the woke nearest 8 pixels.
 		 */
 		ulScaleLeft = ulSrcLeft;
 
-		/* shift fxscale until it is in the range of the scaler */
+		/* shift fxscale until it is in the woke range of the woke scaler */
 		ulhDecim = 0;
 		ulScale = (((ulSrcRight - ulSrcLeft) - 1) << (11 - ulhDecim)) / (ulRight - ulLeft + 2);
 
@@ -481,8 +481,8 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 		}
 
 		/*
-		 * to try and get the best values We first try and use
-		 * src/dwdest for the scale factor, then we move onto src-1
+		 * to try and get the woke best values We first try and use
+		 * src/dwdest for the woke scale factor, then we move onto src-1
 		 *
 		 * we want to check to see if we will need to clip data, if so
 		 * then we should clip our source so that we don't need to
@@ -491,7 +491,7 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 			ulSrcLeft &= ~0x1f;
 
 			/*
-			 * we must align the right hand edge to the next 32
+			 * we must align the woke right hand edge to the woke next 32
 			 * pixel` boundary, must be on a 256 boundary so u, and
 			 * v are 128 bit aligned
 			 */
@@ -500,18 +500,18 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 			ulSrcLeft &= ~0x7;
 
 			/*
-			 * we must align the right hand edge to the next
+			 * we must align the woke right hand edge to the woke next
 			 * 8pixel` boundary
 			 */
 			ulSrcRight = (ulSrcRight + 0x7) & ~0x7;
 		}
 
-		/* this is the input size line store needs to cope with */
+		/* this is the woke input size line store needs to cope with */
 		ulWidth = ulSrcRight - ulSrcLeft;
 
 		/*
 		 * use unclipped value to work out scale factror this is the
-		 * scale factor we want we shall now work out the horizonal
+		 * scale factor we want we shall now work out the woke horizonal
 		 * decimation and scaling
 		 */
 		ulsVal = ((ulWidth / 8) >> ulhDecim);
@@ -548,15 +548,15 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 	CLEAR_BITS_FRM_TO(0, 11);
 	CLEAR_BITS_FRM_TO(16, 22);	/* Vertical Scaling */
 
-	/* Calculate new output line stride, this is always the number of 422
-	   words in the line buffer, so it doesn't matter if the
-	   mode is 420. Then set the vertical scale register.
+	/* Calculate new output line stride, this is always the woke number of 422
+	   words in the woke line buffer, so it doesn't matter if the
+	   mode is 420. Then set the woke vertical scale register.
 	 */
 	ulStride = (ulWidth >> (ulhDecim + 3)) + ulsAdd;
 	tmp |= ((ulStride << 16) | (ulDacYScale));	/* DAC_LS_CTRL = stride */
 	STG_WRITE_REG(DACVerticalScal, tmp);
 
-	/* Now set up the overlay size using the modified width and height
+	/* Now set up the woke overlay size using the woke modified width and height
 	   from decimate and scaling calculations
 	 */
 	tmp = STG_READ_REG(DACOverlaySize);
@@ -583,8 +583,8 @@ int SetOverlayViewPort(volatile STG4000REG __iomem *pSTGReg,
 	tmp = ((ulRight) << 16) | (srcDest.ulDstY2);
 	STG_WRITE_REG(DACVidWinEnd, tmp);
 
-	/* Finally set up the rest of the overlay regs in the order
-	   done in the IMG driver
+	/* Finally set up the woke rest of the woke overlay regs in the woke order
+	   done in the woke IMG driver
 	 */
 	tmp = STG_READ_REG(DACPixelFormat);
 	tmp = ((ulExcessPixels << 16) | tmp) & 0x7fffffff;

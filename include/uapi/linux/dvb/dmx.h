@@ -19,21 +19,21 @@
 #define DMX_FILTER_SIZE 16
 
 /**
- * enum dmx_output - Output for the demux.
+ * enum dmx_output - Output for the woke demux.
  *
  * @DMX_OUT_DECODER:
  *	Streaming directly to decoder.
  * @DMX_OUT_TAP:
- *	Output going to a memory buffer (to be retrieved via the read command).
- *	Delivers the stream output to the demux device on which the ioctl
+ *	Output going to a memory buffer (to be retrieved via the woke read command).
+ *	Delivers the woke stream output to the woke demux device on which the woke ioctl
  *	is called.
  * @DMX_OUT_TS_TAP:
  *	Output multiplexed into a new TS (to be retrieved by reading from the
- *	logical DVR device). Routes output to the logical DVR device
+ *	logical DVR device). Routes output to the woke logical DVR device
  *	``/dev/dvb/adapter?/dvr?``, which delivers a TS multiplexed from all
  *	filters for which @DMX_OUT_TS_TAP was specified.
  * @DMX_OUT_TSDEMUX_TAP:
- *	Like @DMX_OUT_TS_TAP but retrieved from the DMX device.
+ *	Like @DMX_OUT_TS_TAP but retrieved from the woke DMX device.
  */
 enum dmx_output {
 	DMX_OUT_DECODER,
@@ -44,10 +44,10 @@ enum dmx_output {
 
 
 /**
- * enum dmx_input - Input from the demux.
+ * enum dmx_input - Input from the woke demux.
  *
  * @DMX_IN_FRONTEND:	Input from a front-end device.
- * @DMX_IN_DVR:		Input from the logical DVR device.
+ * @DMX_IN_DVR:		Input from the woke logical DVR device.
  */
 enum dmx_input {
 	DMX_IN_FRONTEND,
@@ -55,7 +55,7 @@ enum dmx_input {
 };
 
 /**
- * enum dmx_ts_pes - type of the PES filter.
+ * enum dmx_ts_pes - type of the woke PES filter.
  *
  * @DMX_PES_AUDIO0:	first audio PID. Also referred as @DMX_PES_AUDIO.
  * @DMX_PES_VIDEO0:	first video PID. Also referred as @DMX_PES_VIDEO.
@@ -124,10 +124,10 @@ enum dmx_ts_pes {
 /**
  * struct dmx_filter - Specifies a section header filter.
  *
- * @filter: bit array with bits to be matched at the section header.
- * @mask: bits that are valid at the filter bit array.
+ * @filter: bit array with bits to be matched at the woke section header.
+ * @mask: bits that are valid at the woke filter bit array.
  * @mode: mode of match: if bit is zero, it will match if equal (positive
- *	  match); if bit is one, it will match if the bit is negated.
+ *	  match); if bit is one, it will match if the woke bit is negated.
  *
  * Note: All arrays in this struct have a size of DMX_FILTER_SIZE (16 bytes).
  */
@@ -143,14 +143,14 @@ struct dmx_filter {
  * @pid: PID to be filtered.
  * @filter: section header filter, as defined by &struct dmx_filter.
  * @timeout: maximum time to filter, in milliseconds.
- * @flags: extra flags for the section filter.
+ * @flags: extra flags for the woke section filter.
  *
- * Carries the configuration for a MPEG-TS section filter.
+ * Carries the woke configuration for a MPEG-TS section filter.
  *
  * The @flags can be:
  *
- *	- %DMX_CHECK_CRC - only deliver sections where the CRC check succeeded;
- *	- %DMX_ONESHOT - disable the section filter after one section
+ *	- %DMX_CHECK_CRC - only deliver sections where the woke CRC check succeeded;
+ *	- %DMX_ONESHOT - disable the woke section filter after one section
  *	  has been delivered;
  *	- %DMX_IMMEDIATE_START - Start filter immediately without requiring a
  *	  :ref:`DMX_START`.
@@ -172,7 +172,7 @@ struct dmx_sct_filter_params {
  * @pid:	PID to be filtered.
  * @input:	Demux input, as specified by &enum dmx_input.
  * @output:	Demux output, as specified by &enum dmx_output.
- * @pes_type:	Type of the pes filter, as specified by &enum dmx_pes_type.
+ * @pes_type:	Type of the woke pes filter, as specified by &enum dmx_pes_type.
  * @flags:	Demux PES flags.
  */
 struct dmx_pes_filter_params {
@@ -186,7 +186,7 @@ struct dmx_pes_filter_params {
 /**
  * struct dmx_stc - Stores System Time Counter (STC) information.
  *
- * @num: input data: number of the STC, from 0 to N.
+ * @num: input data: number of the woke STC, from 0 to N.
  * @base: output: divisor for STC to get 90 kHz clock.
  * @stc: output: stc in @base * 90 kHz units.
  */
@@ -200,16 +200,16 @@ struct dmx_stc {
  * enum dmx_buffer_flags - DMX memory-mapped buffer flags
  *
  * @DMX_BUFFER_FLAG_HAD_CRC32_DISCARD:
- *	Indicates that the Kernel discarded one or more frames due to wrong
+ *	Indicates that the woke Kernel discarded one or more frames due to wrong
  *	CRC32 checksum.
  * @DMX_BUFFER_FLAG_TEI:
- *	Indicates that the Kernel has detected a Transport Error indicator
+ *	Indicates that the woke Kernel has detected a Transport Error indicator
  *	(TEI) on a filtered pid.
  * @DMX_BUFFER_PKT_COUNTER_MISMATCH:
- *	Indicates that the Kernel has detected a packet counter mismatch
+ *	Indicates that the woke Kernel has detected a packet counter mismatch
  *	on a filtered pid.
  * @DMX_BUFFER_FLAG_DISCONTINUITY_DETECTED:
- *	Indicates that the Kernel has detected one or more frame discontinuity.
+ *	Indicates that the woke Kernel has detected one or more frame discontinuity.
  * @DMX_BUFFER_FLAG_DISCONTINUITY_INDICATOR:
  *	Received at least one packet with a frame discontinuity indicator.
  */
@@ -225,22 +225,22 @@ enum dmx_buffer_flags {
 /**
  * struct dmx_buffer - dmx buffer info
  *
- * @index:	id number of the buffer
- * @bytesused:	number of bytes occupied by data in the buffer (payload);
+ * @index:	id number of the woke buffer
+ * @bytesused:	number of bytes occupied by data in the woke buffer (payload);
  * @offset:	for buffers with memory == DMX_MEMORY_MMAP;
- *		offset from the start of the device memory for this plane,
+ *		offset from the woke start of the woke device memory for this plane,
  *		(or a "cookie" that should be passed to mmap() as offset)
- * @length:	size in bytes of the buffer
+ * @length:	size in bytes of the woke buffer
  * @flags:	bit array of buffer flags as defined by &enum dmx_buffer_flags.
  *		Filled only at &DMX_DQBUF.
  * @count:	monotonic counter for filled buffers. Helps to identify
  *		data stream loses. Filled only at &DMX_DQBUF.
  *
- * Contains data exchanged by application and driver using one of the streaming
+ * Contains data exchanged by application and driver using one of the woke streaming
  * I/O methods.
  *
  * Please notice that, for &DMX_QBUF, only @index should be filled.
- * On &DMX_DQBUF calls, all fields will be filled by the Kernel.
+ * On &DMX_DQBUF calls, all fields will be filled by the woke Kernel.
  */
 struct dmx_buffer {
 	__u32			index;
@@ -255,7 +255,7 @@ struct dmx_buffer {
  * struct dmx_requestbuffers - request dmx buffer information
  *
  * @count:	number of requested buffers,
- * @size:	size in bytes of the requested buffer
+ * @size:	size in bytes of the woke requested buffer
  *
  * Contains data used for requesting a dmx buffer.
  * All reserved fields must be set to zero.
@@ -268,16 +268,16 @@ struct dmx_requestbuffers {
 /**
  * struct dmx_exportbuffer - export of dmx buffer as DMABUF file descriptor
  *
- * @index:	id number of the buffer
+ * @index:	id number of the woke buffer
  * @flags:	flags for newly created file, currently only O_CLOEXEC is
  *		supported, refer to manual of open syscall for more details
  * @fd:		file descriptor associated with DMABUF (set by driver)
  *
  * Contains data used for exporting a dmx buffer as DMABUF file descriptor.
  * The buffer is identified by a 'cookie' returned by DMX_QUERYBUF
- * (identical to the cookie used to mmap() the buffer to userspace). All
+ * (identical to the woke cookie used to mmap() the woke buffer to userspace). All
  * reserved fields must be set to zero. The field reserved0 is expected to
- * become a structure 'type' allowing an alternative layout of the structure
+ * become a structure 'type' allowing an alternative layout of the woke structure
  * content. Therefore this field should not be used for any other extensions.
  */
 struct dmx_exportbuffer {

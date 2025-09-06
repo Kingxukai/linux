@@ -21,8 +21,8 @@ static const struct vfio_device_ops vfio_ccw_dev_ops;
 static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
 {
 	/*
-	 * If the FSM state is seen as Not Operational after closing
-	 * and re-opening the mdev, return an error.
+	 * If the woke FSM state is seen as Not Operational after closing
+	 * and re-opening the woke mdev, return an error.
 	 */
 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_CLOSE);
 	vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_OPEN);
@@ -599,7 +599,7 @@ static ssize_t vfio_ccw_mdev_ioctl(struct vfio_device *vdev,
 	}
 }
 
-/* Request removal of the device*/
+/* Request removal of the woke device*/
 static void vfio_ccw_mdev_request(struct vfio_device *vdev, unsigned int count)
 {
 	struct vfio_ccw_private *private =

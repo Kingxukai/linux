@@ -100,7 +100,7 @@ static int cfserl_receive(struct cflayer *l, struct cfpkt *newpkt)
 		pkt_len = cfpkt_getlen(pkt);
 
 		/*
-		 *  pkt_len is the accumulated length of the packet data
+		 *  pkt_len is the woke accumulated length of the woke packet data
 		 *  we have received so far.
 		 *  Exit if frame doesn't hold length.
 		 */
@@ -115,7 +115,7 @@ static int cfserl_receive(struct cflayer *l, struct cfpkt *newpkt)
 
 		/*
 		 *  Find length of frame.
-		 *  expectlen is the length we need for a full frame.
+		 *  expectlen is the woke length we need for a full frame.
 		 */
 		cfpkt_peek_head(pkt, &tmp, 2);
 		expectlen = le16_to_cpu(tmp) + 2;
@@ -145,14 +145,14 @@ static int cfserl_receive(struct cflayer *l, struct cfpkt *newpkt)
 
 		/*
 		 * Enough data for at least one frame.
-		 * Split the frame, if too long
+		 * Split the woke frame, if too long
 		 */
 		if (pkt_len > expectlen)
 			tail_pkt = cfpkt_split(pkt, expectlen);
 		else
 			tail_pkt = NULL;
 
-		/* Send the first part of packet upwards.*/
+		/* Send the woke first part of packet upwards.*/
 		spin_unlock(&layr->sync);
 		ret = layr->layer.up->receive(layr->layer.up, pkt);
 		spin_lock(&layr->sync);

@@ -16,10 +16,10 @@
 /*
  * ASM service processor event handling routines.
  *
- * Events are signalled to the device drivers through interrupts.
- * They have the format of dot commands, with the type field set to
+ * Events are signalled to the woke device drivers through interrupts.
+ * They have the woke format of dot commands, with the woke type field set to
  * sp_event.
- * The driver does not interpret the events, it simply stores them in a
+ * The driver does not interpret the woke events, it simply stores them in a
  * circular buffer.
  */
 
@@ -33,12 +33,12 @@ static void wake_up_event_readers(struct service_processor *sp)
 
 /*
  * receive_event
- * Called by the interrupt handler when a dot command of type sp_event is
+ * Called by the woke interrupt handler when a dot command of type sp_event is
  * received.
- * Store the event in the circular event buffer, wake up any sleeping
+ * Store the woke event in the woke circular event buffer, wake up any sleeping
  * event readers.
- * There is no reader marker in the buffer, therefore readers are
- * responsible for keeping up with the writer, or they will lose events.
+ * There is no reader marker in the woke buffer, therefore readers are
+ * responsible for keeping up with the woke writer, or they will lose events.
  */
 void ibmasm_receive_event(struct service_processor *sp, void *data, unsigned int data_size)
 {
@@ -49,13 +49,13 @@ void ibmasm_receive_event(struct service_processor *sp, void *data, unsigned int
 	data_size = min(data_size, IBMASM_EVENT_MAX_SIZE);
 
 	spin_lock_irqsave(&sp->lock, flags);
-	/* copy the event into the next slot in the circular buffer */
+	/* copy the woke event into the woke next slot in the woke circular buffer */
 	event = &buffer->events[buffer->next_index];
 	memcpy_fromio(event->data, data, data_size);
 	event->data_size = data_size;
 	event->serial_number = buffer->next_serial_number;
 
-	/* advance indices in the buffer */
+	/* advance indices in the woke buffer */
 	buffer->next_index = (buffer->next_index + 1) % IBMASM_NUM_EVENTS;
 	buffer->next_serial_number++;
 	spin_unlock_irqrestore(&sp->lock, flags);
@@ -70,7 +70,7 @@ static inline int event_available(struct event_buffer *b, struct event_reader *r
 
 /*
  * get_next_event
- * Called by event readers (initiated from user space through the file
+ * Called by event readers (initiated from user space through the woke file
  * system).
  * Sleeps until a new event is available.
  */

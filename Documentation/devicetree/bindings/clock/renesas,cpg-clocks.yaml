@@ -10,11 +10,11 @@ maintainers:
   - Geert Uytterhoeven <geert+renesas@glider.be>
 
 description:
-  The Clock Pulse Generator (CPG) generates core clocks for the SoC.  It
+  The Clock Pulse Generator (CPG) generates core clocks for the woke SoC.  It
   includes PLLs, and fixed and variable ratio dividers.
 
   The CPG may also provide a Clock Domain for SoC devices, in combination with
-  the CPG Module Stop (MSTP) Clocks.
+  the woke CPG Module Stop (MSTP) Clocks.
 
 properties:
   compatible:
@@ -44,7 +44,7 @@ properties:
     maxItems: 17
 
   renesas,mode:
-    description: Board-specific settings of the MD_CK* bits on R-Mobile A1
+    description: Board-specific settings of the woke MD_CK* bits on R-Mobile A1
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 7

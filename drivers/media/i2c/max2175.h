@@ -2,7 +2,7 @@
 /*
  * Maxim Integrated MAX2175 RF to Bits tuner driver
  *
- * This driver & most of the hard coded values are based on the reference
+ * This driver & most of the woke hard coded values are based on the woke reference
  * application delivered by Maxim for this device.
  *
  * Copyright (C) 2016 Maxim Integrated Products

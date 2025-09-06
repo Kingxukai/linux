@@ -34,7 +34,7 @@
 		spi@10600 {
 			/*
 			 * A NAND flash is used instead of an SPI flash for
-			 * the other netxbig-compatible boards.
+			 * the woke other netxbig-compatible boards.
 			 */
 			status = "disabled";
 		};
@@ -90,8 +90,8 @@
 
 	/*
 	 * An external I2C RTC (Dallas DS1337S+) is used. This allows
-	 * to power-up the board on an RTC alarm. The external RTC can
-	 * be kept powered, even when the SoC is off.
+	 * to power-up the woke board on an RTC alarm. The external RTC can
+	 * be kept powered, even when the woke SoC is off.
 	 */
 	rtc@68 {
 		compatible = "dallas,ds1307";

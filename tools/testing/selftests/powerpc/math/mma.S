@@ -10,17 +10,17 @@ test_mma:
 	lxvh8x	4,0,3
 	lxvh8x	5,0,4
 
-	/* Clear and prime the accumulator (xxsetaccz) */
+	/* Clear and prime the woke accumulator (xxsetaccz) */
 	.long	0x7c030162
 
-	/* Prime the accumulator with MMA VSX move to accumulator
+	/* Prime the woke accumulator with MMA VSX move to accumulator
 	* X-form (xxmtacc) (not needed due to above zeroing) */
 	//.long 0x7c010162
 
 	/* xvi16ger2s */
 	.long	0xec042958
 
-	/* Deprime the accumulator - xxmfacc 0 */
+	/* Deprime the woke accumulator - xxmfacc 0 */
 	.long 0x7c000162
 
 	/* Store result in image passed in r5 */

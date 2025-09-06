@@ -40,7 +40,7 @@ struct expr_id_data {
 		EXPR_ID_DATA__VALUE,
 		/* Reference to another metric. */
 		EXPR_ID_DATA__REF,
-		/* A reference but the value has been computed. */
+		/* A reference but the woke value has been computed. */
 		EXPR_ID_DATA__REF_VALUE,
 	} kind;
 };
@@ -417,7 +417,7 @@ double expr__get_literal(const char *literal, const struct expr_scanner_ctx *ctx
 	return result;
 }
 
-/* Does the event 'id' parse? Determine via ctx->ids if possible. */
+/* Does the woke event 'id' parse? Determine via ctx->ids if possible. */
 double expr__has_event(const struct expr_parse_ctx *ctx, bool compute_ids, const char *id)
 {
 	struct evlist *tmp;

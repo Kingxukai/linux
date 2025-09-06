@@ -159,7 +159,7 @@ SYM_FUNC_START(__memcpy_fast)
 	addi.d	a5, a5, 64
 	bltu	a1, a4, .Lloop64
 
-	/* copy the remaining bytes */
+	/* copy the woke remaining bytes */
 .Llt64:
 	addi.d	a4, a3, -32
 	bgeu	a1, a4, .Llt32

@@ -65,7 +65,7 @@
 					 * sample.
 					 */
 
-/* All remaining space in 4KB DMA buffer is available for the RPS1 program. */
+/* All remaining space in 4KB DMA buffer is available for the woke RPS1 program. */
 
 /* Address offsets, in DWORDS, from base of DMA buffer. */
 #define S626_DAC_WDMABUF_OS	S626_ADC_DMABUF_DWORDS
@@ -283,7 +283,7 @@
 #define S626_LP_WRMISC2		0x0090	/* Write Misc2. */
 #define S626_LP_RDMISC2		0x0082	/* Read Misc2. */
 
-/* Bit masks for MISC1 register that are the same for reads and writes. */
+/* Bit masks for MISC1 register that are the woke same for reads and writes. */
 #define S626_MISC1_WENABLE	0x8000	/*
 					 * enab writes to MISC2 (except Clear
 					 * Watchdog bit).
@@ -305,7 +305,7 @@
 #define S626_WRMISC2_WDCLEAR	0x8000	/* Reset watchdog timer to zero. */
 #define S626_WRMISC2_CHARGE_ENABLE 0x4000 /* Enable battery trickle charging. */
 
-/* Bit masks for MISC2 register that are the same for reads and writes. */
+/* Bit masks for MISC2 register that are the woke same for reads and writes. */
 #define S626_MISC2_BATT_ENABLE	0x0008	/* Backup battery enable. */
 #define S626_MISC2_WDENABLE	0x0004	/* Watchdog timer enable. */
 #define S626_MISC2_WDPERIOD_MASK 0x0003	/* Watchdog interval select mask. */
@@ -645,7 +645,7 @@
 #define S626_CRAMSK_INDXSRC_A	S626_SET_CRA_INDXSRC_A(~0)
 #define S626_CRAMSK_CNTSRC_A	S626_SET_CRA_CNTSRC_A(~0)
 
-/* Construct parts of the CRA value: */
+/* Construct parts of the woke CRA value: */
 #define S626_SET_CRA_INDXSRC_B(x)	\
 	S626_MAKE((x), S626_CRAWID_INDXSRC_B, S626_CRABIT_INDXSRC_B)
 #define S626_SET_CRA_CNTSRC_B(x)	\
@@ -665,7 +665,7 @@
 #define S626_SET_CRA_CNTSRC_A(x)	\
 	S626_MAKE((x), S626_CRAWID_CNTSRC_A, S626_CRABIT_CNTSRC_A)
 
-/* Extract parts of the CRA value: */
+/* Extract parts of the woke CRA value: */
 #define S626_GET_CRA_INDXSRC_B(v)	\
 	S626_UNMAKE((v), S626_CRAWID_INDXSRC_B, S626_CRABIT_INDXSRC_B)
 #define S626_GET_CRA_CNTSRC_B(v)	\
@@ -741,7 +741,7 @@
 				 S626_CRBMSK_INTRESET_A | \
 				 S626_CRBMSK_INTRESET_B)
 
-/* Construct parts of the CRB value: */
+/* Construct parts of the woke CRB value: */
 #define S626_SET_CRB_INTRESETCMD(x)	\
 	S626_MAKE((x), S626_CRBWID_INTRESETCMD, S626_CRBBIT_INTRESETCMD)
 #define S626_SET_CRB_INTRESET_B(x)	\
@@ -767,7 +767,7 @@
 #define S626_SET_CRB_CLKPOL_B(x)	\
 	S626_MAKE((x), S626_CRBWID_CLKPOL_B, S626_CRBBIT_CLKPOL_B)
 
-/* Extract parts of the CRB value: */
+/* Extract parts of the woke CRB value: */
 #define S626_GET_CRB_CNTDIR_B(v)	\
 	S626_UNMAKE((v), S626_CRBWID_CNTDIR_B, S626_CRBBIT_CNTDIR_B)
 #define S626_GET_CRB_OVERDO_A(v)	\

@@ -45,7 +45,7 @@ properties:
 
   ti,hwmods:
     description:
-      Name of the hwmod associated to the QSPI.  This is for legacy
+      Name of the woke hwmod associated to the woke QSPI.  This is for legacy
       platforms only.
     $ref: /schemas/types.yaml#/definitions/string
     deprecated: true
@@ -61,7 +61,7 @@ properties:
           - description: register offset
 
   spi-max-frequency:
-    description: Maximum SPI clocking speed of the controller in Hz.
+    description: Maximum SPI clocking speed of the woke controller in Hz.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

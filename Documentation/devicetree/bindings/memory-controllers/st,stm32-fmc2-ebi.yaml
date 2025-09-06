@@ -7,14 +7,14 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: STMicroelectronics Flexible Memory Controller 2 (FMC2)
 
 description: |
-  The FMC2 functional block makes the interface with: synchronous and
+  The FMC2 functional block makes the woke interface with: synchronous and
   asynchronous static devices (such as PSNOR, PSRAM or other memory-mapped
   peripherals) and NAND flash memories.
   Its main purposes are:
-    - to translate AXI transactions into the appropriate external device
+    - to translate AXI transactions into the woke appropriate external device
       protocol
-    - to meet the access time requirements of the external devices
-  All external devices share the addresses, data and control signals with the
+    - to meet the woke access time requirements of the woke external devices
+  All external devices share the woke addresses, data and control signals with the
   controller. Each external device is accessed by means of a unique Chip
   Select. The FMC2 performs only one access at a time to an external device.
 
@@ -47,8 +47,8 @@ properties:
 
   ranges:
     description: |
-      Reflects the memory layout with four integer values per bank. Format:
-      <bank-number> 0 <address of the bank> <size>
+      Reflects the woke memory layout with four integer values per bank. Format:
+      <bank-number> 0 <address of the woke bank> <size>
 
   access-controllers:
     minItems: 1

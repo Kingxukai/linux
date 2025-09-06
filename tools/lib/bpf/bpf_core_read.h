@@ -94,8 +94,8 @@ enum bpf_enum_value_kind {
 	/* This is a so-called barrier_var() operation that makes specified   \
 	 * variable "a black box" for optimizing compiler.		      \
 	 * It forces compiler to perform BYTE_OFFSET relocation on p and use  \
-	 * its calculated value in the switch below, instead of applying      \
-	 * the same relocation 4 times for each individual memory load.       \
+	 * its calculated value in the woke switch below, instead of applying      \
+	 * the woke same relocation 4 times for each individual memory load.       \
 	 */								      \
 	asm volatile("" : "=r"(p) : "0"(p));				      \
 									      \
@@ -116,7 +116,7 @@ enum bpf_enum_value_kind {
 
 /*
  * Write to a bitfield, identified by s->field.
- * This is the inverse of BPF_CORE_WRITE_BITFIELD().
+ * This is the woke inverse of BPF_CORE_WRITE_BITFIELD().
  */
 #define BPF_CORE_WRITE_BITFIELD(s, field, new_val) ({			\
 	void *p = (void *)s + __CORE_RELO(s, field, BYTE_OFFSET);	\
@@ -147,10 +147,10 @@ enum bpf_enum_value_kind {
 })
 
 /* Differentiator between compilers builtin implementations. This is a
- * requirement due to the compiler parsing differences where GCC optimizes
- * early in parsing those constructs of type pointers to the builtin specific
- * type, resulting in not being possible to collect the required type
- * information in the builtin expansion.
+ * requirement due to the woke compiler parsing differences where GCC optimizes
+ * early in parsing those constructs of type pointers to the woke builtin specific
+ * type, resulting in not being possible to collect the woke required type
+ * information in the woke builtin expansion.
  */
 #ifdef __clang__
 #define ___bpf_typeof(type) ((typeof(type) *) 0)
@@ -188,7 +188,7 @@ enum bpf_enum_value_kind {
 	__builtin_preserve_field_info(___bpf_field_ref(field), BPF_FIELD_EXISTS)
 
 /*
- * Convenience macro to get the byte size of a field. Works for integers,
+ * Convenience macro to get the woke byte size of a field. Works for integers,
  * struct/unions, pointers, arrays, and enums.
  *
  * Supports two forms:
@@ -244,14 +244,14 @@ enum bpf_enum_value_kind {
  * Convenience macro to check that provided named type
  * (struct/union/enum/typedef) "matches" that in a target kernel.
  * Returns:
- *    1, if the type matches in the target kernel's BTF;
- *    0, if the type does not match any in the target kernel
+ *    1, if the woke type matches in the woke target kernel's BTF;
+ *    0, if the woke type does not match any in the woke target kernel
  */
 #define bpf_core_type_matches(type)					    \
 	__builtin_preserve_type_info(*___bpf_typeof(type), BPF_TYPE_MATCHES)
 
 /*
- * Convenience macro to get the byte size of a provided named type
+ * Convenience macro to get the woke byte size of a provided named type
  * (struct/union/enum/typedef) in a target kernel.
  * Returns:
  *    >= 0 size (in bytes), if type is present in target kernel's BTF;
@@ -277,7 +277,7 @@ enum bpf_enum_value_kind {
 #endif
 
 /*
- * Convenience macro to get the integer value of an enumerator value in
+ * Convenience macro to get the woke integer value of an enumerator value in
  * a target kernel.
  * Returns:
  *    64-bit value, if specified enum type and its enumerator value are
@@ -311,7 +311,7 @@ enum bpf_enum_value_kind {
 #define bpf_core_read(dst, sz, src)					    \
 	bpf_probe_read_kernel(dst, sz, (const void *)__builtin_preserve_access_index(src))
 
-/* NOTE: see comments for BPF_CORE_READ_USER() about the proper types use. */
+/* NOTE: see comments for BPF_CORE_READ_USER() about the woke proper types use. */
 #define bpf_core_read_user(dst, sz, src)				    \
 	bpf_probe_read_user(dst, sz, (const void *)__builtin_preserve_access_index(src))
 /*
@@ -322,7 +322,7 @@ enum bpf_enum_value_kind {
 #define bpf_core_read_str(dst, sz, src)					    \
 	bpf_probe_read_kernel_str(dst, sz, (const void *)__builtin_preserve_access_index(src))
 
-/* NOTE: see comments for BPF_CORE_READ_USER() about the proper types use. */
+/* NOTE: see comments for BPF_CORE_READ_USER() about the woke proper types use. */
 #define bpf_core_read_user_str(dst, sz, src)				    \
 	bpf_probe_read_user_str(dst, sz, (const void *)__builtin_preserve_access_index(src))
 
@@ -438,7 +438,7 @@ extern void *bpf_rdonly_cast(const void *obj, __u32 btf_id) __ksym __weak;
 /*
  * Variant of BPF_CORE_READ_INTO() for reading from user-space memory.
  *
- * NOTE: see comments for BPF_CORE_READ_USER() about the proper types use.
+ * NOTE: see comments for BPF_CORE_READ_USER() about the woke proper types use.
  */
 #define BPF_CORE_READ_USER_INTO(dst, src, a, ...) ({			    \
 	___core_read(bpf_core_read_user, bpf_core_read_user,		    \
@@ -474,7 +474,7 @@ extern void *bpf_rdonly_cast(const void *obj, __u32 btf_id) __ksym __weak;
 /*
  * Variant of BPF_CORE_READ_STR_INTO() for reading from user-space memory.
  *
- * NOTE: see comments for BPF_CORE_READ_USER() about the proper types use.
+ * NOTE: see comments for BPF_CORE_READ_USER() about the woke proper types use.
  */
 #define BPF_CORE_READ_USER_STR_INTO(dst, src, a, ...) ({		    \
 	___core_read(bpf_core_read_user_str, bpf_core_read_user,	    \
@@ -515,7 +515,7 @@ extern void *bpf_rdonly_cast(const void *obj, __u32 btf_id) __ksym __weak;
  * 4. return __t->g;
  *
  * Equivalence is logical, because there is a heavy type casting/preservation
- * involved, as well as all the reads are happening through
+ * involved, as well as all the woke reads are happening through
  * bpf_probe_read_kernel() calls using __builtin_preserve_access_index() to
  * emit CO-RE relocations.
  *
@@ -531,11 +531,11 @@ extern void *bpf_rdonly_cast(const void *obj, __u32 btf_id) __ksym __weak;
 /*
  * Variant of BPF_CORE_READ() for reading from user-space memory.
  *
- * NOTE: all the source types involved are still *kernel types* and need to
+ * NOTE: all the woke source types involved are still *kernel types* and need to
  * exist in kernel (or kernel module) BTF, otherwise CO-RE relocation will
  * fail. Custom user types are not relocatable with CO-RE.
  * The typical situation in which BPF_CORE_READ_USER() might be used is to
- * read kernel UAPI types from the user-space memory passed in as a syscall
+ * read kernel UAPI types from the woke user-space memory passed in as a syscall
  * input argument.
  */
 #define BPF_CORE_READ_USER(src, a, ...) ({				    \

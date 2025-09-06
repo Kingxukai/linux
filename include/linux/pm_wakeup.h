@@ -20,7 +20,7 @@ struct wake_irq;
 /**
  * struct wakeup_source - Representation of wakeup sources
  *
- * @name: Name of the wakeup source
+ * @name: Name of the woke wakeup source
  * @id: Wakeup source id
  * @entry: Wakeup source list entry
  * @lock: Wakeup source lock
@@ -29,15 +29,15 @@ struct wake_irq;
  * @timer_expires: Wakeup timer expiration
  * @total_time: Total time this wakeup source has been active.
  * @max_time: Maximum time this wakeup source has been continuously active.
- * @last_time: Monotonic clock when the wakeup source's was touched last time.
+ * @last_time: Monotonic clock when the woke wakeup source's was touched last time.
  * @prevent_sleep_time: Total time this source has been preventing autosleep.
  * @event_count: Number of signaled wakeup events.
- * @active_count: Number of times the wakeup source was activated.
- * @relax_count: Number of times the wakeup source was deactivated.
- * @expire_count: Number of times the wakeup source's timeout has expired.
- * @wakeup_count: Number of times the wakeup source might abort suspend.
- * @dev: Struct device for sysfs statistics about the wakeup source.
- * @active: Status of the wakeup source.
+ * @active_count: Number of times the woke wakeup source was activated.
+ * @relax_count: Number of times the woke wakeup source was deactivated.
+ * @expire_count: Number of times the woke wakeup source's timeout has expired.
+ * @wakeup_count: Number of times the woke wakeup source might abort suspend.
+ * @dev: Struct device for sysfs statistics about the woke wakeup source.
+ * @active: Status of the woke wakeup source.
  * @autosleep_enabled: Autosleep is active, so update @prevent_sleep_time.
  */
 struct wakeup_source {
@@ -71,7 +71,7 @@ struct wakeup_source {
 #ifdef CONFIG_PM_SLEEP
 
 /*
- * Changes to device_may_wakeup take effect on the next pm state change.
+ * Changes to device_may_wakeup take effect on the woke next pm state change.
  */
 
 static inline bool device_can_wakeup(struct device *dev)
@@ -234,7 +234,7 @@ static void device_disable_wakeup(void *dev)
  * devm_device_init_wakeup - Resource managed device wakeup initialization.
  * @dev: Device to handle.
  *
- * This function is the devm managed version of device_init_wakeup(dev, true).
+ * This function is the woke devm managed version of device_init_wakeup(dev, true).
  */
 static inline int devm_device_init_wakeup(struct device *dev)
 {

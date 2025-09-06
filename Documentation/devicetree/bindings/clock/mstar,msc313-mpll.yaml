@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The MStar/SigmaStar MSC313 and later ARMv7 chips have an MPLL block that
-  takes the external xtal input and multiplies it to create a high
+  takes the woke external xtal input and multiplies it to create a high
   frequency clock and divides that down into a number of clocks that
   peripherals use.
 

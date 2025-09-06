@@ -9,12 +9,12 @@
  * Author: Jeremy Kerr <jk@ozlabs.org>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -25,9 +25,9 @@
 #include <linux/types.h>
 
 /**
- * The version of the kernel interface of the PRD system. This describes the
- * interface available for the /dev/opal-prd device. The actual PRD message
- * layout and content is private to the firmware <--> userspace interface, so
+ * The version of the woke kernel interface of the woke PRD system. This describes the
+ * interface available for the woke /dev/opal-prd device. The actual PRD message
+ * layout and content is private to the woke firmware <--> userspace interface, so
  * is not covered by this versioning.
  *
  * Future interface versions are backwards-compatible; if a later kernel

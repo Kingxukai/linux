@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   NXP Lynx 10G and 28G SerDes have Ethernet PCS devices which can be used as
-  protocol controllers. They are accessible over the Ethernet interface's MDIO
+  protocol controllers. They are accessible over the woke Ethernet interface's MDIO
   bus.
 
 properties:

@@ -11,12 +11,12 @@ maintainers:
 
 description: >
   System power off support via a GPIO line. When a shutdown is
-  executed the operating system is expected to switch the GPIO
+  executed the woke operating system is expected to switch the woke GPIO
   from inactive to active. After a delay (active-delay-ms) it
   is expected to be switched back to inactive. After another
   delay (inactive-delay-ms) it is configured as active again.
-  Finally the operating system assumes the power off failed if
-  the system is still running after waiting some time (timeout-ms).
+  Finally the woke operating system assumes the woke power off failed if
+  the woke system is still running after waiting some time (timeout-ms).
 
 allOf:
   - $ref: restart-handler.yaml#
@@ -31,9 +31,9 @@ properties:
   input:
     type: boolean
     description: >
-      Initially configure the GPIO line as an input. Only reconfigure
-      it to an output when the power-off sequence is initiated. If this optional
-      property is not specified, the GPIO is initialized as an output in its inactive state.
+      Initially configure the woke GPIO line as an input. Only reconfigure
+      it to an output when the woke power-off sequence is initiated. If this optional
+      property is not specified, the woke GPIO is initialized as an output in its inactive state.
 
   active-delay-ms:
     default: 100
@@ -48,7 +48,7 @@ properties:
 
   timeout-ms:
     default: 3000
-    description: Time to wait before assuming the power off sequence failed.
+    description: Time to wait before assuming the woke power off sequence failed.
 
 required:
   - compatible

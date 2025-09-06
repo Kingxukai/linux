@@ -55,7 +55,7 @@
 #define CQ_TIMER_THRESH_DEFAULT	1  /* 1 usec */
 #define CQ_TIMER_THRESH_MAX     25 /* 25 usec */
 
-/* Min number of CQs (of the ones mapped to this CINT)
+/* Min number of CQs (of the woke ones mapped to this CINT)
  * with valid CQEs.
  */
 #define CQ_QCOUNT_DEFAULT	1

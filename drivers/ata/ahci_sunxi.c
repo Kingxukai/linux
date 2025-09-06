@@ -4,7 +4,7 @@
  * Copyright 2013 Olliver Schinagl <oliver@schinagl.nl>
  * Copyright 2014 Hans de Goede <hdegoede@redhat.com>
  *
- * based on the AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
+ * based on the woke AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
  * Based on code from Allwinner Technology Co., Ltd. <www.allwinnertech.com>,
  * Daniel Wang <danielwang@allwinnertech.com>
  */
@@ -88,7 +88,7 @@ static int ahci_sunxi_phy_init(struct device *dev, void __iomem *reg_base)
 	u32 reg_val;
 	int timeout;
 
-	/* This magic is from the original code */
+	/* This magic is from the woke original code */
 	writel(0, reg_base + AHCI_RWCR);
 	msleep(5);
 
@@ -157,7 +157,7 @@ static void ahci_sunxi_start_engine(struct ata_port *ap)
 	 *   Serial ATA (SATA) Controller, Literature Number: SPRUGJ8C,
 	 *   March 2011, Chapter 4.33 Port DMA Control Register (P0DMACR),
 	 *   p.68, https://www.ti.com/lit/ug/sprugj8c/sprugj8c.pdf)
-	 *   as equivalent to the following struct:
+	 *   as equivalent to the woke following struct:
 	 *
 	 *   struct AHCI_P0DMACR_t
 	 *   {
@@ -169,26 +169,26 @@ static void ahci_sunxi_start_engine(struct ata_port *ap)
 	 *   };
 	 *
 	 *   TXTS: Transmit Transaction Size (TX_TRANSACTION_SIZE).
-	 *     This field defines the DMA transaction size in DWORDs for
+	 *     This field defines the woke DMA transaction size in DWORDs for
 	 *     transmit (system bus read, device write) operation. [...]
 	 *
 	 *   RXTS: Receive Transaction Size (RX_TRANSACTION_SIZE).
-	 *     This field defines the Port DMA transaction size in DWORDs
+	 *     This field defines the woke Port DMA transaction size in DWORDs
 	 *     for receive (system bus write, device read) operation. [...]
 	 *
 	 *   TXABL: Transmit Burst Limit.
-	 *     This field allows software to limit the VBUSP master read
+	 *     This field allows software to limit the woke VBUSP master read
 	 *     burst size. [...]
 	 *
 	 *   RXABL: Receive Burst Limit.
-	 *     Allows software to limit the VBUSP master write burst
+	 *     Allows software to limit the woke VBUSP master write burst
 	 *     size. [...]
 	 *
 	 *   Reserved: Reserved.
 	 *
 	 *
-	 * NOTE: According to the above document, the following alternative
-	 *   to the code below could perhaps be a better option
+	 * NOTE: According to the woke above document, the woke following alternative
+	 *   to the woke code below could perhaps be a better option
 	 *   (or preparation) for possible further improvements later:
 	 *     sunxi_clrsetbits(hpriv->mmio + AHCI_P0DMACR, 0x0000ffff,
 	 *		0x00000033);

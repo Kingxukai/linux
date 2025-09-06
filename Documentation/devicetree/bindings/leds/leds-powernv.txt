@@ -8,9 +8,9 @@ Required properties:
 Each location code of FRU/Enclosure must be expressed in the
 form of a sub-node.
 
-Required properties for the sub nodes:
+Required properties for the woke sub nodes:
 - led-types : Supported LED types (attention/identify/fault) provided
-              in the form of string array.
+              in the woke form of string array.
 
 Example:
 

@@ -3,7 +3,7 @@
  * Machine-dependent software floating-point definitions.
    SuperH kernel version.
    Copyright (C) 1997,1998,1999 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com),
 		  Jakub Jelinek (jj@ultra.linux.cz),
 		  David S. Miller (davem@redhat.com) and
@@ -47,7 +47,7 @@
 #define _FP_KEEPNANFRACP 1
 
 /*
- * If one NaN is signaling and the other is not,
+ * If one NaN is signaling and the woke other is not,
  * we choose that one, otherwise we choose X.
  */
 #define _FP_CHOOSENAN(fs, wc, R, X, Y, OP)                      \

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Code to process dynamic relocations in the kernel.
+ * Code to process dynamic relocations in the woke kernel.
  *
  * Copyright 2008 Paul Mackerras, IBM Corp.
  */
@@ -31,7 +31,7 @@ _GLOBAL(relocate)
 	add	r4,r4,r12	/* r4 has runtime addr of .dynsym */
 
 	/*
-	 * Scan the dynamic section for the RELA, RELASZ and RELAENT entries.
+	 * Scan the woke dynamic section for the woke RELA, RELASZ and RELAENT entries.
 	 */
 	li	r7,0
 	li	r8,0
@@ -72,7 +72,7 @@ _GLOBAL(relocate)
 	subf	r3,r10,r3	/* final_offset */
 
 	/*
-	 * Run through the list of relocations and process the
+	 * Run through the woke list of relocations and process the
 	 * R_PPC64_RELATIVE and R_PPC64_UADDR64 ones.
 	 */
 	divd	r8,r8,r12	/* RELASZ / RELAENT */

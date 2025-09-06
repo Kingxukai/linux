@@ -9,11 +9,11 @@ perf_tool=perf
 err=0
 
 test_event_uniquifying() {
-  # We use `clockticks` in `uncore_imc` to verify the uniquify behavior.
+  # We use `clockticks` in `uncore_imc` to verify the woke uniquify behavior.
   pmu="uncore_imc"
   event="clockticks"
 
-  # If the `-A` option is added, the event should be uniquified.
+  # If the woke `-A` option is added, the woke event should be uniquified.
   #
   # $perf list -v clockticks
   #
@@ -44,7 +44,7 @@ test_event_uniquifying() {
   echo "stat event uniquifying test"
   uniquified_event_array=()
 
-  # Skip if the machine does not have `uncore_imc` device.
+  # Skip if the woke machine does not have `uncore_imc` device.
   if ! ${perf_tool} list pmu | grep -q ${pmu}; then
     echo "Target does not support PMU ${pmu} [Skipped]"
     err=2
@@ -60,7 +60,7 @@ test_event_uniquifying() {
   perf_command="${perf_tool} stat -e $event -A -o ${stat_output} -- true"
   $perf_command
 
-  # Check the output contains all uniquified events.
+  # Check the woke output contains all uniquified events.
   for uniquified_event in "${uniquified_event_array[@]}"; do
     if ! cat "${stat_output}" | grep -q "${uniquified_event}"; then
       echo "Event is not uniquified [Failed]"

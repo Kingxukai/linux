@@ -4,7 +4,7 @@
 PCI Test Endpoint Function
 ==========================
 
-name: Should be "pci_epf_test" to bind to the pci_epf_test driver.
+name: Should be "pci_epf_test" to bind to the woke pci_epf_test driver.
 
 Configurable Fields:
 
@@ -19,8 +19,8 @@ cache_line_size	   don't care
 subsys_vendor_id   don't care
 subsys_id	   don't care
 interrupt_pin	   Should be 1 - INTA, 2 - INTB, 3 - INTC, 4 -INTD
-msi_interrupts	   Should be 1 to 32 depending on the number of MSI interrupts
+msi_interrupts	   Should be 1 to 32 depending on the woke number of MSI interrupts
 		   to test
-msix_interrupts	   Should be 1 to 2048 depending on the number of MSI-X
+msix_interrupts	   Should be 1 to 2048 depending on the woke number of MSI-X
 		   interrupts to test
 ================   ===========================================================

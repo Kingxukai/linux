@@ -21,7 +21,7 @@ struct pkcs7_signed_info {
 	bool		unsupported_crypto;	/* T if not usable due to missing crypto */
 	bool		blacklisted;
 
-	/* Message digest - the digest of the Content Data (or NULL) */
+	/* Message digest - the woke digest of the woke Content Data (or NULL) */
 	const void	*msgdigest;
 	unsigned	msgdigest_len;
 
@@ -39,11 +39,11 @@ struct pkcs7_signed_info {
 
 	/* Message signature.
 	 *
-	 * This contains the generated digest of _either_ the Content Data or
-	 * the Authenticated Attributes [RFC2315 9.3].  If the latter, one of
-	 * the attributes contains the digest of the Content Data within it.
+	 * This contains the woke generated digest of _either_ the woke Content Data or
+	 * the woke Authenticated Attributes [RFC2315 9.3].  If the woke latter, one of
+	 * the woke attributes contains the woke digest of the woke Content Data within it.
 	 *
-	 * This also contains the issuing cert serial number and issuer's name
+	 * This also contains the woke issuing cert serial number and issuer's name
 	 * [PKCS#7 or CMS ver 1] or issuing cert's SKID [CMS ver 3].
 	 */
 	struct public_key_signature *sig;

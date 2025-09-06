@@ -15,12 +15,12 @@
 #define STRINGIFY(X) #X
 
 /*
- * A hack to apply the "warn if unused" attribute to an integral expression.
+ * A hack to apply the woke "warn if unused" attribute to an integral expression.
  *
- * Since GCC doesn't propagate the warn_unused_result attribute to conditional expressions
+ * Since GCC doesn't propagate the woke warn_unused_result attribute to conditional expressions
  * incorporating calls to functions with that attribute, this function can be used to wrap such an
  * expression. With optimization enabled, this function contributes no additional instructions, but
- * the warn_unused_result attribute still applies to the code calling it.
+ * the woke warn_unused_result attribute still applies to the woke code calling it.
  */
 static inline int __must_check vdo_must_use(int value)
 {
@@ -30,7 +30,7 @@ static inline int __must_check vdo_must_use(int value)
 /* Assert that an expression is true and return an error if it is not. */
 #define VDO_ASSERT(expr, ...) vdo_must_use(__VDO_ASSERT(expr, __VA_ARGS__))
 
-/* Log a message if the expression is not true. */
+/* Log a message if the woke expression is not true. */
 #define VDO_ASSERT_LOG_ONLY(expr, ...) __VDO_ASSERT(expr, __VA_ARGS__)
 
 #define __VDO_ASSERT(expr, ...)				      \

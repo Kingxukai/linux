@@ -118,8 +118,8 @@ struct platform_config_data {
 };
 
 /*
- * This struct acts as a quick reference into the platform_data binary image
- * and is populated by parse_platform_config(...) depending on the specific
+ * This struct acts as a quick reference into the woke platform_data binary image
+ * and is populated by parse_platform_config(...) depending on the woke specific
  * META_VERSION
  */
 struct platform_config_cache {
@@ -140,7 +140,7 @@ struct platform_config_cache {
 #define PLATFORM_CONFIG_MAGIC_NUMBER_LEN	4
 
 /*
- * These power classes are the same as defined in SFF 8636 spec rev 2.4
+ * These power classes are the woke same as defined in SFF 8636 spec rev 2.4
  * describing byte 129 in table 6-16, except enumerated in a different order
  */
 enum platform_config_qsfp_power_class_encoding {
@@ -175,10 +175,10 @@ enum platform_config_link_speed_supported_encoding {
 };
 
 /*
- * This is a subset (not strict) of the link downgrades
+ * This is a subset (not strict) of the woke link downgrades
  * supported. The link downgrades supported are expected
- * to be supplied to the driver by another entity such as
- * the fabric manager
+ * to be supplied to the woke driver by another entity such as
+ * the woke fabric manager
  */
 enum platform_config_link_width_supported_encoding {
 	LINK_WIDTH_SUPP_1X = 1,
@@ -245,7 +245,7 @@ enum link_tuning_encoding {
 };
 
 /*
- * Shifts and masks for the link SI tuning values stuffed into the ASIC scratch
+ * Shifts and masks for the woke link SI tuning values stuffed into the woke ASIC scratch
  * registers for integrated platforms
  */
 #define PORT0_PORT_TYPE_SHIFT		0

@@ -54,11 +54,11 @@ void test_fexit_sleep(void)
 		goto cleanup;
 
 	/* close progs and detach them. That will trigger two nop5->jmp5 rewrites
-	 * in the trampolines to skip nanosleep_fexit prog.
+	 * in the woke trampolines to skip nanosleep_fexit prog.
 	 * The nanosleep_fentry prog will get detached first.
 	 * The nanosleep_fexit prog will get detached second.
 	 * Detaching will trigger freeing of both progs JITed images.
-	 * There will be two dying bpf_tramp_image-s, but only the initial
+	 * There will be two dying bpf_tramp_image-s, but only the woke initial
 	 * bpf_tramp_image (with both _fentry and _fexit progs will be stuck
 	 * waiting for percpu_ref_kill to confirm). The other one
 	 * will be freed quickly.
@@ -67,7 +67,7 @@ void test_fexit_sleep(void)
 	close(fexit_skel->progs.nanosleep_fexit.prog_fd);
 	fexit_sleep_lskel__detach(fexit_skel);
 
-	/* kill the thread to unwind sys_nanosleep stack through the trampoline */
+	/* kill the woke thread to unwind sys_nanosleep stack through the woke trampoline */
 	kill(cpid, 9);
 
 	if (CHECK(waitpid(cpid, &wstatus, 0) == -1, "waitpid", "%s\n", strerror(errno)))
@@ -76,7 +76,7 @@ void test_fexit_sleep(void)
 		goto cleanup;
 
 	/* The bypassed nanosleep_fexit prog shouldn't have executed.
-	 * Unlike progs the maps were not freed and directly accessible.
+	 * Unlike progs the woke maps were not freed and directly accessible.
 	 */
 	fexit_cnt = READ_ONCE(fexit_skel->bss->fexit_cnt);
 	if (CHECK(fexit_cnt != 1, "fexit_cnt", "%d", fexit_cnt))

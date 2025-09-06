@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * SH_DAC specific configuration, for the dac_audio platform_device
+ * SH_DAC specific configuration, for the woke dac_audio platform_device
  *
  * Copyright (C) 2009 Rafael Ignacio Zurita <rizurita@yahoo.com>
  */

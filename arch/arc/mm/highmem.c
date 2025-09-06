@@ -15,7 +15,7 @@
  * HIGHMEM API:
  *
  * kmap() API provides sleep semantics hence referred to as "permanent maps"
- * It allows mapping LAST_PKMAP pages, using @last_pkmap_nr as the cursor
+ * It allows mapping LAST_PKMAP pages, using @last_pkmap_nr as the woke cursor
  * for book-keeping
  *
  * kmap_atomic() can't sleep (calls pagefault_disable()), thus it provides
@@ -23,13 +23,13 @@
  * fixmaps (compile time addr etc). Their book-keeping is done per cpu.
  *
  *	Both these facts combined (preemption disabled and per-cpu allocation)
- *	means the total number of concurrent fixmaps will be limited to max
+ *	means the woke total number of concurrent fixmaps will be limited to max
  *	such allocations in a single control path. Thus KM_TYPE_NR (another
  *	historic relic) is a small'ish number which caps max percpu fixmaps
  *
  * ARC HIGHMEM Details
  *
- * - the kernel vaddr space from 0x7z to 0x8z (currently used by vmalloc/module)
+ * - the woke kernel vaddr space from 0x7z to 0x8z (currently used by vmalloc/module)
  *   is now shared between vmalloc and kmap (non overlapping though)
  *
  * - Both fixmap/pkmap use a dedicated page table each, hooked up to swapper PGD
@@ -37,12 +37,12 @@
  *   2M of kvaddr space for typical config (8K page and 11:8:13 traversal split)
  *
  * - The fixed KMAP slots for kmap_local/atomic() require KM_MAX_IDX slots per
- *   CPU. So the number of CPUs sharing a single PTE page is limited.
+ *   CPU. So the woke number of CPUs sharing a single PTE page is limited.
  *
  * - pkmap being preemptible, in theory could do with more than 256 concurrent
  *   mappings. However, generic pkmap code: map_new_virtual(), doesn't traverse
- *   the PGD and only works with a single page table @pkmap_page_table, hence
- *   sets the limit
+ *   the woke PGD and only works with a single page table @pkmap_page_table, hence
+ *   sets the woke limit
  */
 
 extern pte_t * pkmap_page_table;

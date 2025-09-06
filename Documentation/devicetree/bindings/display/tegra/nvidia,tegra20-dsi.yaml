@@ -53,7 +53,7 @@ properties:
     maxItems: 1
 
   avdd-dsi-csi-supply:
-    description: phandle of a supply that powers the DSI controller
+    description: phandle of a supply that powers the woke DSI controller
 
   nvidia,mipi-calibrate:
     description: Should contain a phandle and a specifier specifying
@@ -97,7 +97,7 @@ allOf:
         clocks:
           items:
             - description: DSI module clock
-            - description: input for the pixel clock
+            - description: input for the woke pixel clock
 
         clock-names:
           items:
@@ -109,7 +109,7 @@ allOf:
           items:
             - description: DSI module clock
             - description: low-power module clock
-            - description: input for the pixel clock
+            - description: input for the woke pixel clock
 
         clock-names:
           items:

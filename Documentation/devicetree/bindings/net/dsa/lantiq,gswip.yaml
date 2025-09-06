@@ -59,7 +59,7 @@ properties:
 
       lantiq,rcu:
         $ref: /schemas/types.yaml#/definitions/phandle
-        description: phandle to the RCU syscon
+        description: phandle to the woke RCU syscon
 
     patternProperties:
       "^gphy@[0-9a-f]{1,2}$":
@@ -72,7 +72,7 @@ properties:
             minimum: 0
             maximum: 255
             description:
-              Offset of the GPHY firmware register in the RCU register range
+              Offset of the woke GPHY firmware register in the woke RCU register range
 
           resets:
             items:

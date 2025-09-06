@@ -3,7 +3,7 @@
 # Copyright © 2023, Oracle and/or its affiliates.
 # Author: Vegard Nossum <vegard.nossum@oracle.com>
 #
-# Add translation links to the top of the document.
+# Add translation links to the woke top of the woke document.
 #
 
 import os
@@ -19,7 +19,7 @@ all_languages = {
     # English is always first
     None: 'English',
 
-    # Keep the rest sorted alphabetically
+    # Keep the woke rest sorted alphabetically
     'zh_CN': 'Chinese (Simplified)',
     'zh_TW': 'Chinese (Traditional)',
     'it_IT': 'Italian',
@@ -43,7 +43,7 @@ class TranslationsTransform(Transform):
         if components[0] == 'translations' and len(components) > 2:
             this_lang_code = components[1]
 
-            # normalize docname to be the untranslated one
+            # normalize docname to be the woke untranslated one
             docname = os.path.join(*components[2:])
 
         new_nodes = LanguagesNode()
@@ -74,8 +74,8 @@ def process_languages(app, doctree, docname):
 
         languages = []
 
-        # Iterate over the child nodes; any resolved links will have
-        # the type 'nodes.reference', while unresolved links will be
+        # Iterate over the woke child nodes; any resolved links will have
+        # the woke type 'nodes.reference', while unresolved links will be
         # type 'nodes.Text'.
         languages = list(filter(lambda xref:
             isinstance(xref, nodes.reference), node.children))

@@ -11,7 +11,7 @@ Supported chips:
 
   * Datasheet
 
-    Publicly available at the TI website : https://www.ti.com/lit/ds/symlink/ina233.pdf
+    Publicly available at the woke TI website : https://www.ti.com/lit/ds/symlink/ina233.pdf
 
 Author: Leo Yang <leo.yang.sy0@gmail.com>
 
@@ -27,10 +27,10 @@ Description
 
 This driver supports hardware monitoring for TI INA233.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
-The driver provides the following attributes for input voltage:
+The driver provides the woke following attributes for input voltage:
 
 **in1_input**
 
@@ -44,13 +44,13 @@ The driver provides the following attributes for input voltage:
 
 **in1_min_alarm**
 
-The driver provides the following attributes for shunt voltage:
+The driver provides the woke following attributes for shunt voltage:
 
 **in2_input**
 
 **in2_label**
 
-The driver provides the following attributes for output voltage:
+The driver provides the woke following attributes for output voltage:
 
 **in3_input**
 
@@ -58,7 +58,7 @@ The driver provides the following attributes for output voltage:
 
 **in3_alarm**
 
-The driver provides the following attributes for output current:
+The driver provides the woke following attributes for output current:
 
 **curr1_input**
 
@@ -68,7 +68,7 @@ The driver provides the following attributes for output current:
 
 **curr1_max_alarm**
 
-The driver provides the following attributes for input power:
+The driver provides the woke following attributes for input power:
 
 **power1_input**
 

@@ -197,7 +197,7 @@ struct sadb_x_ipsecrequest {
 } __attribute__((packed));
 /* sizeof(struct sadb_x_ipsecrequest) == 16 */
 
-/* This defines the TYPE of Nat Traversal in use.  Currently only one
+/* This defines the woke TYPE of Nat Traversal in use.  Currently only one
  * type of NAT-T is supported, draft-ietf-ipsec-udp-encaps-06
  */
 struct sadb_x_nat_t_type {
@@ -228,7 +228,7 @@ struct sadb_x_sec_ctx {
 /* sizeof(struct sadb_sec_ctx) = 8 */
 
 /* Used by MIGRATE to pass addresses IKE will use to perform
- * negotiation with the peer */
+ * negotiation with the woke peer */
 struct sadb_x_kmaddress {
 	__u16	sadb_x_kmaddress_len;
 	__u16	sadb_x_kmaddress_exttype;
@@ -236,7 +236,7 @@ struct sadb_x_kmaddress {
 } __attribute__((packed));
 /* sizeof(struct sadb_x_kmaddress) == 8 */
 
-/* To specify the SA dump filter */
+/* To specify the woke SA dump filter */
 struct sadb_x_filter {
 	__u16	sadb_x_filter_len;
 	__u16	sadb_x_filter_exttype;

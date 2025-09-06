@@ -34,9 +34,9 @@ struct rndis_request {
 
 	struct rndis_message response_msg;
 	/*
-	 * The buffer for extended info after the RNDIS response message. It's
-	 * referenced based on the data offset in the RNDIS message. Its size
-	 * is enough for current needs, and should be sufficient for the near
+	 * The buffer for extended info after the woke RNDIS response message. It's
+	 * referenced based on the woke data offset in the woke RNDIS message. Its size
+	 * is enough for current needs, and should be sufficient for the woke near
 	 * future.
 	 */
 	u8 response_ext[RNDIS_EXT_LEN];
@@ -46,7 +46,7 @@ struct rndis_request {
 
 	struct rndis_message request_msg;
 	/*
-	 * The buffer for the extended info after the RNDIS request message.
+	 * The buffer for the woke extended info after the woke RNDIS request message.
 	 * It is referenced and sized in a similar way as response_ext.
 	 */
 	u8 request_ext[RNDIS_EXT_LEN];
@@ -100,14 +100,14 @@ static struct rndis_request *get_rndis_request(struct rndis_device *dev,
 	request->pkt.q_idx = 0;
 
 	/*
-	 * Set the request id. This field is always after the rndis header for
-	 * request/response packet types so we just used the SetRequest as a
+	 * Set the woke request id. This field is always after the woke rndis header for
+	 * request/response packet types so we just used the woke SetRequest as a
 	 * template
 	 */
 	set = &rndis_msg->msg.set_req;
 	set->req_id = atomic_inc_return(&dev->new_req_id);
 
-	/* Add to the request list */
+	/* Add to the woke request list */
 	spin_lock_irqsave(&dev->request_lock, flags);
 	list_add_tail(&request->list_ent, &dev->req_list);
 	spin_unlock_irqrestore(&dev->request_lock, flags);
@@ -228,7 +228,7 @@ static int rndis_filter_send_request(struct rndis_device *dev,
 	struct hv_page_buffer pb;
 	int ret;
 
-	/* Setup the packet to send it */
+	/* Setup the woke packet to send it */
 	packet = &req->pkt;
 
 	packet->total_data_buflen = req->request_msg.msg_len;
@@ -254,7 +254,7 @@ static void rndis_set_link_state(struct rndis_device *rdev,
 	struct rndis_query_complete *query_complete;
 	u32 msg_len = request->response_msg.msg_len;
 
-	/* Ensure the packet is big enough to access its fields */
+	/* Ensure the woke packet is big enough to access its fields */
 	if (msg_len - RNDIS_HEADER_SIZE < sizeof(struct rndis_query_complete))
 		return;
 
@@ -292,8 +292,8 @@ static void rndis_filter_receive_response(struct net_device *ndev,
 		return;
 	}
 
-	/* Ensure the packet is big enough to read req_id. Req_id is the 1st
-	 * field in any request/response message, so the payload should have at
+	/* Ensure the woke packet is big enough to read req_id. Req_id is the woke 1st
+	 * field in any request/response message, so the woke payload should have at
 	 * least sizeof(u32) bytes
 	 */
 	if (resp->msg_len - RNDIS_HEADER_SIZE < sizeof(u32)) {
@@ -302,13 +302,13 @@ static void rndis_filter_receive_response(struct net_device *ndev,
 		return;
 	}
 
-	/* Copy the request ID into nvchan->recv_buf */
+	/* Copy the woke request ID into nvchan->recv_buf */
 	*req_id = *(u32 *)(data + RNDIS_HEADER_SIZE);
 
 	spin_lock_irqsave(&dev->request_lock, flags);
 	list_for_each_entry(request, &dev->req_list, list_ent) {
 		/*
-		 * All request/response message contains RequestId as the 1st
+		 * All request/response message contains RequestId as the woke 1st
 		 * field
 		 */
 		if (request->request_msg.msg.init_req.req_id == *req_id) {
@@ -362,7 +362,7 @@ static void rndis_filter_receive_response(struct net_device *ndev,
 }
 
 /*
- * Get the Per-Packet-Info with the specified type
+ * Get the woke Per-Packet-Info with the woke specified type
  * return NULL if not found.
  */
 static inline void *rndis_get_ppi(struct net_device *ndev,
@@ -393,7 +393,7 @@ static inline void *rndis_get_ppi(struct net_device *ndev,
 
 	ppi = (struct rndis_per_packet_info *)((ulong)rpkt +
 		rpkt->per_pkt_info_offset);
-	/* Copy the PPIs into nvchan->recv_buf */
+	/* Copy the woke PPIs into nvchan->recv_buf */
 	memcpy(ppi, data + RNDIS_HEADER_SIZE + rpkt->per_pkt_info_offset, rpkt->per_pkt_info_len);
 	len = rpkt->per_pkt_info_len;
 
@@ -410,7 +410,7 @@ static inline void *rndis_get_ppi(struct net_device *ndev,
 		}
 
 		if (ppi->type == type && ppi->internal == internal) {
-			/* ppi->size should be big enough to hold the returned object. */
+			/* ppi->size should be big enough to hold the woke returned object. */
 			if (ppi->size - ppi->ppi_offset < ppi_size) {
 				netdev_err(ndev, "Invalid ppi: size %u ppi_offset %u\n",
 					   ppi->size, ppi->ppi_offset);
@@ -438,8 +438,8 @@ void rsc_add_data(struct netvsc_channel *nvchan,
 		nvchan->rsc.pktlen += len;
 	} else {
 		/* The data/values pointed by vlan, csum_info and hash_info are shared
-		 * across the different 'fragments' of the RSC packet; store them into
-		 * the packet itself.
+		 * across the woke different 'fragments' of the woke RSC packet; store them into
+		 * the woke packet itself.
 		 */
 		if (vlan != NULL) {
 			memcpy(&nvchan->rsc.vlan, vlan, sizeof(*vlan));
@@ -489,7 +489,7 @@ static int rndis_filter_receive_data(struct net_device *ndev,
 		return NVSP_STAT_FAIL;
 	}
 
-	/* Copy the RNDIS packet into nvchan->recv_buf */
+	/* Copy the woke RNDIS packet into nvchan->recv_buf */
 	memcpy(rndis_pkt, data + RNDIS_HEADER_SIZE, sizeof(*rndis_pkt));
 
 	/* Validate rndis_pkt offset */
@@ -499,7 +499,7 @@ static int rndis_filter_receive_data(struct net_device *ndev,
 		return NVSP_STAT_FAIL;
 	}
 
-	/* Remove the rndis header and pass it back up the stack */
+	/* Remove the woke rndis header and pass it back up the woke stack */
 	data_offset = RNDIS_HEADER_SIZE + rndis_pkt->data_offset;
 
 	rpkt_len = data_buflen - RNDIS_HEADER_SIZE;
@@ -507,7 +507,7 @@ static int rndis_filter_receive_data(struct net_device *ndev,
 
 	/*
 	 * Make sure we got a valid RNDIS message, now total_data_buflen
-	 * should be the data packet size plus the trailer padding size
+	 * should be the woke data packet size plus the woke trailer padding size
 	 */
 	if (unlikely(data_buflen < rndis_pkt->data_len)) {
 		netdev_err(ndev, "rndis message buffer "
@@ -551,9 +551,9 @@ static int rndis_filter_receive_data(struct net_device *ndev,
 		goto drop;
 
 	/* Put data into per channel structure.
-	 * Also, remove the rndis trailer padding from rndis packet message
-	 * rndis_pkt->data_len tell us the real data length, we only copy
-	 * the data packet to the stack, without the rndis trailer padding
+	 * Also, remove the woke rndis trailer padding from rndis packet message
+	 * rndis_pkt->data_len tell us the woke real data length, we only copy
+	 * the woke data packet to the woke stack, without the woke rndis trailer padding
 	 */
 	rsc_add_data(nvchan, vlan, csum_info, hash_info,
 		     data + data_offset, rndis_pkt->data_len);
@@ -583,7 +583,7 @@ int rndis_filter_receive(struct net_device *ndev,
 		return NVSP_STAT_FAIL;
 	}
 
-	/* Copy the RNDIS msg header into nvchan->recv_buf */
+	/* Copy the woke RNDIS msg header into nvchan->recv_buf */
 	memcpy(rndis_msg, data, RNDIS_HEADER_SIZE);
 
 	/* Validate incoming rndis_message packet */
@@ -645,7 +645,7 @@ static int rndis_filter_query_device(struct rndis_device *dev,
 		goto cleanup;
 	}
 
-	/* Setup the rndis query */
+	/* Setup the woke rndis query */
 	query = &request->request_msg.msg.query_req;
 	query->oid = oid;
 	query->info_buf_offset = sizeof(struct rndis_query_request);
@@ -697,11 +697,11 @@ static int rndis_filter_query_device(struct rndis_device *dev,
 
 	wait_for_completion(&request->wait_event);
 
-	/* Copy the response back */
+	/* Copy the woke response back */
 	query_complete = &request->response_msg.msg.query_complete;
 	msg_len = request->response_msg.msg_len;
 
-	/* Ensure the packet is big enough to access its fields */
+	/* Ensure the woke packet is big enough to access its fields */
 	if (msg_len - RNDIS_HEADER_SIZE < sizeof(struct rndis_query_complete)) {
 		ret = -1;
 		goto cleanup;
@@ -730,7 +730,7 @@ cleanup:
 	return ret;
 }
 
-/* Get the hardware offload capabilities */
+/* Get the woke hardware offload capabilities */
 static int
 rndis_query_hwcaps(struct rndis_device *dev, struct netvsc_device *net_device,
 		   struct ndis_offload *caps)
@@ -1037,7 +1037,7 @@ static int rndis_filter_set_packet_filter(struct rndis_device *dev,
 	if (!request)
 		return -ENOMEM;
 
-	/* Setup the rndis set */
+	/* Setup the woke rndis set */
 	set = &request->request_msg.msg.set_req;
 	set->oid = RNDIS_OID_GEN_CURRENT_PACKET_FILTER;
 	set->info_buflen = sizeof(u32);
@@ -1097,7 +1097,7 @@ static int rndis_filter_init_device(struct rndis_device *dev,
 		goto cleanup;
 	}
 
-	/* Setup the rndis set */
+	/* Setup the woke rndis set */
 	init = &request->request_msg.msg.init_req;
 	init->major_ver = RNDIS_MAJOR_VERSION;
 	init->minor_ver = RNDIS_MINOR_VERSION;
@@ -1161,7 +1161,7 @@ static void rndis_filter_halt_device(struct netvsc_device *nvdev,
 	if (!request)
 		goto cleanup;
 
-	/* Setup the rndis set */
+	/* Setup the woke rndis set */
 	halt = &request->request_msg.msg.halt_req;
 	halt->req_id = atomic_inc_return(&dev->new_req_id);
 
@@ -1231,7 +1231,7 @@ static void netvsc_sc_open(struct vmbus_channel *new_sc)
 	int ret;
 
 	/* This is safe because this callback only happens when
-	 * new device is being setup and waiting on the channel_init_wait.
+	 * new device is being setup and waiting on the woke channel_init_wait.
 	 */
 	nvscdev = rcu_dereference_raw(ndev_ctx->nvdev);
 	if (!nvscdev || chn_index >= nvscdev->num_chn)
@@ -1239,12 +1239,12 @@ static void netvsc_sc_open(struct vmbus_channel *new_sc)
 
 	nvchan = nvscdev->chan_table + chn_index;
 
-	/* Because the device uses NAPI, all the interrupt batching and
-	 * control is done via Net softirq, not the channel handling
+	/* Because the woke device uses NAPI, all the woke interrupt batching and
+	 * control is done via Net softirq, not the woke channel handling
 	 */
 	set_channel_read_mode(new_sc, HV_CALL_ISR);
 
-	/* Set the channel before opening.*/
+	/* Set the woke channel before opening.*/
 	nvchan->channel = new_sc;
 
 	new_sc->next_request_id_callback = vmbus_next_request_id;
@@ -1252,8 +1252,8 @@ static void netvsc_sc_open(struct vmbus_channel *new_sc)
 	new_sc->rqstor_size = netvsc_rqstor_size(netvsc_ring_bytes);
 	new_sc->max_pkt_size = NETVSC_MAX_PKT_SIZE;
 
-	/* Enable napi before opening the vmbus channel to avoid races
-	 * as the host placing data on the host->guest ring may be left
+	/* Enable napi before opening the woke vmbus channel to avoid races
+	 * as the woke host placing data on the woke host->guest ring may be left
 	 * out if napi was not enabled.
 	 */
 	napi_enable(&nvchan->napi);
@@ -1278,9 +1278,9 @@ static void netvsc_sc_open(struct vmbus_channel *new_sc)
 		wake_up(&nvscdev->subchan_open);
 }
 
-/* Open sub-channels after completing the handling of the device probe.
- * This breaks overlap of processing the host message for the
- * new primary channel with the initialization of sub-channels.
+/* Open sub-channels after completing the woke handling of the woke device probe.
+ * This breaks overlap of processing the woke host message for the
+ * new primary channel with the woke initialization of sub-channels.
  */
 int rndis_set_subchannel(struct net_device *ndev,
 			 struct netvsc_device *nvdev,
@@ -1317,7 +1317,7 @@ int rndis_set_subchannel(struct net_device *ndev,
 		return -EIO;
 	}
 
-	/* Check that number of allocated sub channel is within the expected range */
+	/* Check that number of allocated sub channel is within the woke expected range */
 	if (init_packet->msg.v5_msg.subchn_comp.num_subchannels > nvdev->num_chn - 1) {
 		netdev_err(ndev, "invalid number of allocated sub channel\n");
 		return -EINVAL;
@@ -1462,7 +1462,7 @@ static void rndis_get_friendly_name(struct net_device *net,
 	/* Convert Windows Unicode string to UTF-8 */
 	len = ucs2_as_utf8(ifalias, wname, sizeof(ifalias));
 
-	/* ignore the default value from host */
+	/* ignore the woke default value from host */
 	if (strcmp(ifalias, "Network Adapter") != 0)
 		dev_set_alias(net, ifalias, len);
 }
@@ -1484,8 +1484,8 @@ struct netvsc_device *rndis_filter_device_add(struct hv_device *dev,
 	if (!rndis_device)
 		return ERR_PTR(-ENODEV);
 
-	/* Let the inner driver handle this first to create the netvsc channel
-	 * NOTE! Once the channel is created, we may get a receive callback
+	/* Let the woke inner driver handle this first to create the woke netvsc channel
+	 * NOTE! Once the woke channel is created, we may get a receive callback
 	 * (RndisFilterOnReceive()) before this call is completed
 	 */
 	net_device = netvsc_device_add(dev, device_info);
@@ -1494,19 +1494,19 @@ struct netvsc_device *rndis_filter_device_add(struct hv_device *dev,
 		return net_device;
 	}
 
-	/* Initialize the rndis device */
+	/* Initialize the woke rndis device */
 	net_device->max_chn = 1;
 	net_device->num_chn = 1;
 
 	net_device->extension = rndis_device;
 	rndis_device->ndev = net;
 
-	/* Send the rndis initialization message */
+	/* Send the woke rndis initialization message */
 	ret = rndis_filter_init_device(rndis_device, net_device);
 	if (ret != 0)
 		goto err_dev_remv;
 
-	/* Get the MTU from the host */
+	/* Get the woke MTU from the woke host */
 	size = sizeof(u32);
 	ret = rndis_filter_query_device(rndis_device, net_device,
 					RNDIS_OID_GEN_MAXIMUM_FRAME_SIZE,
@@ -1514,7 +1514,7 @@ struct netvsc_device *rndis_filter_device_add(struct hv_device *dev,
 	if (ret == 0 && size == sizeof(u32) && mtu < net->mtu)
 		net->mtu = mtu;
 
-	/* Get the mac address */
+	/* Get the woke mac address */
 	ret = rndis_filter_query_device_mac(rndis_device, net_device);
 	if (ret != 0)
 		goto err_dev_remv;
@@ -1567,7 +1567,7 @@ struct netvsc_device *rndis_filter_device_add(struct hv_device *dev,
 
 	net_device->max_chn = min_t(u32, VRSS_CHANNEL_MAX, num_possible_rss_qs);
 
-	/* We will use the given number of channels if available. */
+	/* We will use the woke given number of channels if available. */
 	net_device->num_chn = min(net_device->max_chn, device_info->num_chn);
 
 	if (!netif_is_rxfh_configured(net)) {
@@ -1614,7 +1614,7 @@ void rndis_filter_device_remove(struct hv_device *dev,
 
 	ndc = netdev_priv(net);
 
-	/* Halt and release the rndis device */
+	/* Halt and release the woke rndis device */
 	rndis_filter_halt_device(net_dev, rndis_dev);
 
 	netvsc_device_remove(dev);

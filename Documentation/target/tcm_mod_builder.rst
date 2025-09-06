@@ -4,30 +4,30 @@ The TCM v4 fabric module script generator
 
 Greetings all,
 
-This document is intended to be a mini-HOWTO for using the tcm_mod_builder.py
+This document is intended to be a mini-HOWTO for using the woke tcm_mod_builder.py
 script to generate a brand new functional TCM v4 fabric .ko module of your very own,
-that once built can be immediately be loaded to start access the new TCM/ConfigFS
+that once built can be immediately be loaded to start access the woke new TCM/ConfigFS
 fabric skeleton, by simply using::
 
 	modprobe $TCM_NEW_MOD
 	mkdir -p /sys/kernel/config/target/$TCM_NEW_MOD
 
-This script will create a new drivers/target/$TCM_NEW_MOD/, and will do the following
+This script will create a new drivers/target/$TCM_NEW_MOD/, and will do the woke following
 
 	1) Generate new API callers for drivers/target/target_core_fabric_configs.c logic
 	   ->make_tpg(), ->drop_tpg(), ->make_wwn(), ->drop_wwn().  These are created
 	   into $TCM_NEW_MOD/$TCM_NEW_MOD_configfs.c
 	2) Generate basic infrastructure for loading/unloading LKMs and TCM/ConfigFS fabric module
 	   using a skeleton struct target_core_fabric_ops API template.
-	3) Based on user defined T10 Proto_Ident for the new fabric module being built,
-	   the TransportID / Initiator and Target WWPN related handlers for
+	3) Based on user defined T10 Proto_Ident for the woke new fabric module being built,
+	   the woke TransportID / Initiator and Target WWPN related handlers for
 	   SPC-3 persistent reservation are automatically generated in $TCM_NEW_MOD/$TCM_NEW_MOD_fabric.c
 	   using drivers/target/target_core_fabric_lib.c logic.
 	4) NOP API calls for all other Data I/O path and fabric dependent attribute logic
 	   in $TCM_NEW_MOD/$TCM_NEW_MOD_fabric.c
 
-tcm_mod_builder.py depends upon the mandatory '-p $PROTO_IDENT' and '-m
-$FABRIC_MOD_name' parameters, and actually running the script looks like::
+tcm_mod_builder.py depends upon the woke mandatory '-p $PROTO_IDENT' and '-m
+$FABRIC_MOD_name' parameters, and actually running the woke script looks like::
 
   target:/mnt/sdb/lio-core-2.6.git/Documentation/target# python tcm_mod_builder.py -p iSCSI -m tcm_nab5000
   tcm_dir: /mnt/sdb/lio-core-2.6.git/Documentation/target/../../
@@ -54,16 +54,16 @@ $FABRIC_MOD_name' parameters, and actually running the script looks like::
   Would you like to add tcm_nab5000to drivers/target/Kbuild..? [yes,no]: yes
   Would you like to add tcm_nab5000to drivers/target/Kconfig..? [yes,no]: yes
 
-At the end of tcm_mod_builder.py. the script will ask to add the following
+At the woke end of tcm_mod_builder.py. the woke script will ask to add the woke following
 line to drivers/target/Kbuild::
 
 	obj-$(CONFIG_TCM_NAB5000)       += tcm_nab5000/
 
-and the same for drivers/target/Kconfig::
+and the woke same for drivers/target/Kconfig::
 
 	source "drivers/target/tcm_nab5000/Kconfig"
 
-#) Run 'make menuconfig' and select the new CONFIG_TCM_NAB5000 item::
+#) Run 'make menuconfig' and select the woke new CONFIG_TCM_NAB5000 item::
 
 	<M>   TCM_NAB5000 fabric module
 
@@ -92,7 +92,7 @@ and the same for drivers/target/Kconfig::
     -rw-r--r-- 1 root root 379022 2010-10-05 03:23 tcm_nab5000.o
     -rw-r--r-- 1 root root    211 2010-10-05 03:23 .tcm_nab5000.o.cmd
 
-#) Load the new module, create a lun_0 configfs group, and add new TCM Core
+#) Load the woke new module, create a lun_0 configfs group, and add new TCM Core
    IBLOCK backstore symlink to port::
 
     target:/mnt/sdb/lio-core-2.6.git# insmod drivers/target/tcm_nab5000.ko

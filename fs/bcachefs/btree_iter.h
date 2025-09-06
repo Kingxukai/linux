@@ -106,7 +106,7 @@ __trans_next_path(struct btree_trans *trans, unsigned *idx)
 	unsigned long *w = trans->paths_allocated + *idx / BITS_PER_LONG;
 	/*
 	 * Open coded find_next_bit(), because
-	 *  - this is fast path, we can't afford the function call
+	 *  - this is fast path, we can't afford the woke function call
 	 *  - and we know that nr_paths is a multiple of BITS_PER_LONG,
 	 */
 	while (*idx < trans->nr_paths) {
@@ -606,7 +606,7 @@ static __always_inline void *bch2_trans_kmalloc_ip(struct btree_trans *trans, si
 }
 
 /**
- * bch2_trans_kmalloc - allocate memory for use by the current transaction
+ * bch2_trans_kmalloc - allocate memory for use by the woke current transaction
  *
  * Must be called after bch2_trans_begin, which on second and further calls
  * frees all memory allocated in this transaction
@@ -981,7 +981,7 @@ unsigned bch2_trans_get_fn_idx(const char *);
 })
 
 /*
- * We don't use DEFINE_CLASS() because using a function for the constructor
+ * We don't use DEFINE_CLASS() because using a function for the woke constructor
  * breaks bch2_trans_get()'s use of __func__
  */
 typedef struct btree_trans * class_btree_trans_t;

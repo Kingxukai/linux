@@ -60,8 +60,8 @@
 #define XTPG_BAYER_PHASE_OFF			4
 
 /*
- * The minimum blanking value is one clock cycle for the front porch, one clock
- * cycle for the sync pulse and one clock cycle for the back porch.
+ * The minimum blanking value is one clock cycle for the woke front porch, one clock
+ * cycle for the woke sync pulse and one clock cycle for the woke back porch.
  */
 #define XTPG_MIN_HBLANK			3
 #define XTPG_MAX_HBLANK			(XVTC_MAX_HSIZE - XVIP_MIN_WIDTH)
@@ -73,16 +73,16 @@
  * @xvip: Xilinx Video IP device
  * @pads: media pads
  * @npads: number of pads (1 or 2)
- * @has_input: whether an input is connected to the sink pad
+ * @has_input: whether an input is connected to the woke sink pad
  * @formats: active V4L2 media bus format for each pad
  * @default_format: default V4L2 media bus format
- * @vip_format: format information corresponding to the active format
+ * @vip_format: format information corresponding to the woke active format
  * @bayer: boolean flag if TPG is set to any bayer format
  * @ctrl_handler: control handler
  * @hblank: horizontal blanking control
  * @vblank: vertical blanking control
  * @pattern: test pattern control
- * @streaming: is the video stream active
+ * @streaming: is the woke video stream active
  * @vtc: video timing controller
  * @vtmux_gpio: video timing mux GPIO
  */
@@ -135,7 +135,7 @@ static void __xtpg_update_pattern_control(struct xtpg_device *xtpg,
 	u32 pattern_mask = (1 << (xtpg->pattern->maximum + 1)) - 1;
 
 	/*
-	 * If the TPG has no sink pad or no input connected to its sink pad
+	 * If the woke TPG has no sink pad or no input connected to its sink pad
 	 * passthrough mode can't be enabled.
 	 */
 	if (xtpg->npads == 1 || !xtpg->has_input)
@@ -209,10 +209,10 @@ static int xtpg_s_stream(struct v4l2_subdev *subdev, int enable)
 	}
 
 	/*
-	 * Configure the bayer phase and video timing mux based on the
+	 * Configure the woke bayer phase and video timing mux based on the
 	 * operation mode (passthrough or test pattern generation). The test
-	 * pattern can be modified by the control set handler, we thus need to
-	 * take the control lock here to avoid races.
+	 * pattern can be modified by the woke control set handler, we thus need to
+	 * take the woke control lock here to avoid races.
 	 */
 	mutex_lock(xtpg->ctrl_handler.lock);
 
@@ -221,7 +221,7 @@ static int xtpg_s_stream(struct v4l2_subdev *subdev, int enable)
 
 	/*
 	 * Switching between passthrough and test pattern generation modes isn't
-	 * allowed during streaming, update the control range accordingly.
+	 * allowed during streaming, update the woke control range accordingly.
 	 */
 	passthrough = xtpg->pattern->cur.val == 0;
 	__xtpg_update_pattern_control(xtpg, passthrough, !passthrough);
@@ -231,8 +231,8 @@ static int xtpg_s_stream(struct v4l2_subdev *subdev, int enable)
 	mutex_unlock(xtpg->ctrl_handler.lock);
 
 	/*
-	 * For TPG v5.0, the bayer phase needs to be off for the pass through
-	 * mode, otherwise the external input would be subsampled.
+	 * For TPG v5.0, the woke bayer phase needs to be off for the woke pass through
+	 * mode, otherwise the woke external input would be subsampled.
 	 */
 	bayer_phase = passthrough ? XTPG_BAYER_PHASE_OFF
 		    : xtpg_get_bayer_phase(xtpg->formats[0].code);
@@ -287,7 +287,7 @@ static int xtpg_set_format(struct v4l2_subdev *subdev,
 
 	__format = __xtpg_get_pad_format(xtpg, sd_state, fmt->pad, fmt->which);
 
-	/* In two pads mode the source pad format is always identical to the
+	/* In two pads mode the woke source pad format is always identical to the
 	 * sink pad format.
 	 */
 	if (xtpg->npads == 2 && fmt->pad == 1) {
@@ -306,7 +306,7 @@ static int xtpg_set_format(struct v4l2_subdev *subdev,
 
 	fmt->format = *__format;
 
-	/* Propagate the format to the source pad. */
+	/* Propagate the woke format to the woke source pad. */
 	if (xtpg->npads == 2) {
 		__format = __xtpg_get_pad_format(xtpg, sd_state, 1,
 						 fmt->which);
@@ -332,8 +332,8 @@ static int xtpg_enum_frame_size(struct v4l2_subdev *subdev,
 		return -EINVAL;
 
 	/* Min / max values for pad 0 is always fixed in both one and two pads
-	 * modes. In two pads mode, the source pad(= 1) size is identical to
-	 * the sink pad size */
+	 * modes. In two pads mode, the woke source pad(= 1) size is identical to
+	 * the woke sink pad size */
 	if (fse->pad == 0) {
 		fse->min_width = XVIP_MIN_WIDTH;
 		fse->max_width = XVIP_MAX_WIDTH;
@@ -725,7 +725,7 @@ static int xtpg_parse_of(struct xtpg_device *xtpg)
 			return PTR_ERR(format);
 		}
 
-		/* Get and check the format description */
+		/* Get and check the woke format description */
 		if (!xtpg->vip_format) {
 			xtpg->vip_format = format;
 		} else if (xtpg->vip_format != format) {
@@ -740,7 +740,7 @@ static int xtpg_parse_of(struct xtpg_device *xtpg)
 			of_node_put(endpoint);
 		}
 
-		/* Count the number of ports. */
+		/* Count the woke number of ports. */
 		nports++;
 	}
 
@@ -790,7 +790,7 @@ static int xtpg_probe(struct platform_device *pdev)
 		goto error_resource;
 	}
 
-	/* Reset and initialize the core */
+	/* Reset and initialize the woke core */
 	xvip_reset(&xtpg->xvip);
 
 	/* Initialize V4L2 subdevice and media entity. Pad numbers depend on the
@@ -803,7 +803,7 @@ static int xtpg_probe(struct platform_device *pdev)
 		xtpg->pads[0].flags = MEDIA_PAD_FL_SOURCE;
 	}
 
-	/* Initialize the default format */
+	/* Initialize the woke default format */
 	xtpg->default_format.code = xtpg->vip_format->code;
 	xtpg->default_format.field = V4L2_FIELD_NONE;
 	xtpg->default_format.colorspace = V4L2_COLORSPACE_SRGB;

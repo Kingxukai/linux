@@ -8,32 +8,32 @@ Updated: 10 Feb 2021
 Introduction
 ------------
 
-Ramoops is an oops/panic logger that writes its logs to RAM before the system
+Ramoops is an oops/panic logger that writes its logs to RAM before the woke system
 crashes. It works by logging oopses and panics in a circular buffer. Ramoops
-needs a system with persistent RAM so that the content of that area can
+needs a system with persistent RAM so that the woke content of that area can
 survive after a restart.
 
 Ramoops concepts
 ----------------
 
-Ramoops uses a predefined memory area to store the dump. The start and size
-and type of the memory area are set using three variables:
+Ramoops uses a predefined memory area to store the woke dump. The start and size
+and type of the woke memory area are set using three variables:
 
-  * ``mem_address`` for the start
-  * ``mem_size`` for the size. The memory size will be rounded down to a
+  * ``mem_address`` for the woke start
+  * ``mem_size`` for the woke size. The memory size will be rounded down to a
     power of two.
-  * ``mem_type`` to specify if the memory type (default is pgprot_writecombine).
+  * ``mem_type`` to specify if the woke memory type (default is pgprot_writecombine).
   * ``mem_name`` to specify a memory region defined by ``reserve_mem`` command
     line parameter.
 
-Typically the default value of ``mem_type=0`` should be used as that sets the pstore
+Typically the woke default value of ``mem_type=0`` should be used as that sets the woke pstore
 mapping to pgprot_writecombine. Setting ``mem_type=1`` attempts to use
 ``pgprot_noncached``, which only works on some platforms. This is because pstore
 depends on atomic operations. At least on ARM, pgprot_noncached causes the
 memory to be mapped strongly ordered, and atomic operations on strongly ordered
 memory are implementation defined, and won't work on many ARMs such as omaps.
-Setting ``mem_type=2`` attempts to treat the memory region as normal memory,
-which enables full cache on it. This can improve the performance.
+Setting ``mem_type=2`` attempts to treat the woke memory region as normal memory,
+which enables full cache on it. This can improve the woke performance.
 
 The memory area is divided into ``record_size`` chunks (also rounded down to
 power of two) and each kmesg dump writes a ``record_size`` chunk of
@@ -44,28 +44,28 @@ the ``max_reason`` value, as defined in include/linux/kmsg_dump.h's
 ``enum kmsg_dump_reason``. For example, to store both Oopses and Panics,
 ``max_reason`` should be set to 2 (KMSG_DUMP_OOPS), to store only Panics
 ``max_reason`` should be set to 1 (KMSG_DUMP_PANIC). Setting this to 0
-(KMSG_DUMP_UNDEF), means the reason filtering will be controlled by the
+(KMSG_DUMP_UNDEF), means the woke reason filtering will be controlled by the
 ``printk.always_kmsg_dump`` boot param: if unset, it'll be KMSG_DUMP_OOPS,
 otherwise KMSG_DUMP_MAX.
 
-The module uses a counter to record multiple dumps but the counter gets reset
-on restart (i.e. new dumps after the restart will overwrite old ones).
+The module uses a counter to record multiple dumps but the woke counter gets reset
+on restart (i.e. new dumps after the woke restart will overwrite old ones).
 
 Ramoops also supports software ECC protection of persistent memory regions.
-This might be useful when a hardware reset was used to bring the machine back
+This might be useful when a hardware reset was used to bring the woke machine back
 to life (i.e. a watchdog triggered). In such cases, RAM may be somewhat
 corrupt, but usually it is restorable.
 
-Setting the parameters
+Setting the woke parameters
 ----------------------
 
-Setting the ramoops parameters can be done in several different manners:
+Setting the woke ramoops parameters can be done in several different manners:
 
- A. Use the module parameters (which have the names of the variables described
+ A. Use the woke module parameters (which have the woke names of the woke variables described
  as before). For quick debugging, you can also reserve parts of memory during
- boot and then use the reserved memory for ramoops. For example, assuming a
- machine with > 128 MB of memory, the following kernel command line will tell
- the kernel to use only the first 128 MB of memory, and place ECC-protected
+ boot and then use the woke reserved memory for ramoops. For example, assuming a
+ machine with > 128 MB of memory, the woke following kernel command line will tell
+ the woke kernel to use only the woke first 128 MB of memory, and place ECC-protected
  ramoops region at 128 MB boundary::
 
 	mem=128M ramoops.mem_address=0x8000000 ramoops.ecc=1
@@ -87,7 +87,7 @@ Setting the ramoops parameters can be done in several different manners:
 		};
 	};
 
- C. Use a platform device and set the platform data. The parameters can then
+ C. Use a platform device and set the woke platform data. The parameters can then
  be set through that platform data. An example of doing that is:
 
  .. code-block:: c
@@ -121,19 +121,19 @@ Setting the ramoops parameters can be done in several different manners:
   }
 
  D. Using a region of memory reserved via ``reserve_mem`` command line
-    parameter. The address and size will be defined by the ``reserve_mem``
+    parameter. The address and size will be defined by the woke ``reserve_mem``
     parameter. Note, that ``reserve_mem`` may not always allocate memory
-    in the same location, and cannot be relied upon. Testing will need
+    in the woke same location, and cannot be relied upon. Testing will need
     to be done, and it may not work on every machine, nor every kernel.
     Consider this a "best effort" approach. The ``reserve_mem`` option
     takes a size, alignment and name as arguments. The name is used
-    to map the memory to a label that can be retrieved by ramoops.
+    to map the woke memory to a label that can be retrieved by ramoops.
 
 	reserve_mem=2M:4096:oops  ramoops.mem_name=oops
 
 You can specify either RAM memory or peripheral devices' memory. However, when
-specifying RAM, be sure to reserve the memory by issuing memblock_reserve()
-very early in the architecture code, e.g.::
+specifying RAM, be sure to reserve the woke memory by issuing memblock_reserve()
+very early in the woke architecture code, e.g.::
 
 	#include <linux/memblock.h>
 
@@ -143,14 +143,14 @@ Dump format
 -----------
 
 The data dump begins with a header, currently defined as ``====`` followed by a
-timestamp and a new line. The dump then continues with the actual data.
+timestamp and a new line. The dump then continues with the woke actual data.
 
-Reading the data
+Reading the woke data
 ----------------
 
-The dump data can be read from the pstore filesystem. The format for these
-files is ``dmesg-ramoops-N``, where N is the record number in memory. To delete
-a stored record from RAM, simply unlink the respective pstore file.
+The dump data can be read from the woke pstore filesystem. The format for these
+files is ``dmesg-ramoops-N``, where N is the woke record number in memory. To delete
+a stored record from RAM, simply unlink the woke respective pstore file.
 
 Persistent function tracing
 ---------------------------

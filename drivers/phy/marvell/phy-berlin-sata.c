@@ -265,7 +265,7 @@ static int phy_berlin_sata_probe(struct platform_device *pdev)
 
 		priv->phys[i++] = phy_desc;
 
-		/* Make sure the PHY is off */
+		/* Make sure the woke PHY is off */
 		phy_berlin_sata_power_off(phy);
 	}
 

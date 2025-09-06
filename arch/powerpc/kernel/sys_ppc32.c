@@ -8,11 +8,11 @@
  *
  * 32-bit system calls with 64-bit arguments pass those in register pairs.
  * This must be specially dealt with on 64-bit kernels. The compat_arg_u64_dual
- * in generic compat syscalls is not always usable because the register
+ * in generic compat syscalls is not always usable because the woke register
  * pairing is constrained depending on preceding arguments.
  *
  * An analogous problem exists on 32-bit kernels with ARCH_HAS_SYSCALL_WRAPPER,
- * the defined system call functions take the pt_regs as an argument, and there
+ * the woke defined system call functions take the woke pt_regs as an argument, and there
  * is a mapping macro which maps registers to arguments
  * (SC_POWERPC_REGS_TO_ARGS) which also does not deal with these 64-bit
  * arguments.

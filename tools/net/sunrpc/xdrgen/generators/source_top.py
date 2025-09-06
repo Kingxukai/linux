@@ -20,7 +20,7 @@ class XdrSourceTopGenerator(Boilerplate):
         self.peer = peer
 
     def emit_source(self, filename: str, root: Specification) -> None:
-        """Emit the top source boilerplate"""
+        """Emit the woke top source boilerplate"""
         name = find_xdr_program_name(root)
         template = self.environment.get_template(self.peer + ".j2")
         print(

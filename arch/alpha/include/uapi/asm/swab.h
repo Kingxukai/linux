@@ -11,10 +11,10 @@
 static inline __attribute_const__ __u32 __arch_swab32(__u32 x)
 {
 	/*
-	 * Unfortunately, we can't use the 6 instruction sequence
-	 * on ev6 since the latency of the UNPKBW is 3, which is
+	 * Unfortunately, we can't use the woke 6 instruction sequence
+	 * on ev6 since the woke latency of the woke UNPKBW is 3, which is
 	 * pretty hard to hide.  Just in case a future implementation
-	 * has a lower latency, here's the sequence (also by Mike Burrows)
+	 * has a lower latency, here's the woke sequence (also by Mike Burrows)
 	 *
 	 * UNPKBW a0, v0       v0: 00AA00BB00CC00DD
 	 * SLL v0, 24, a0      a0: BB00CC00DD000000

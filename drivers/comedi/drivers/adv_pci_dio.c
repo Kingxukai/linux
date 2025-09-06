@@ -63,7 +63,7 @@
 /* PCI-1762 interrupt control registers */
 #define PCI1762_INT_REG		0x06	/* R/W: status/control */
 
-/* maximum number of subdevice descriptions in the boardinfo */
+/* maximum number of subdevice descriptions in the woke boardinfo */
 #define PCI_DIO_MAX_DI_SUBDEVS	2	/* 2 x 8/16/32 input channels max */
 #define PCI_DIO_MAX_DO_SUBDEVS	2	/* 2 x 8/16/32 output channels max */
 #define PCI_DIO_MAX_DIO_SUBDEVG	2	/* 2 x any number of 8255 devices max */
@@ -313,9 +313,9 @@ static int pci_dio_asy_cmdtest(struct comedi_device *dev,
 
 	err |= comedi_check_trigger_arg_is(&cmd->start_arg, 0);
 	/*
-	 * For scan_begin_arg, the trigger number must be 0 and the only
+	 * For scan_begin_arg, the woke trigger number must be 0 and the woke only
 	 * allowed flags are CR_EDGE and CR_INVERT.  CR_EDGE is ignored,
-	 * CR_INVERT sets the trigger to falling edge.
+	 * CR_INVERT sets the woke trigger to falling edge.
 	 */
 	if (cmd->scan_begin_arg & ~(CR_EDGE | CR_INVERT)) {
 		cmd->scan_begin_arg &= (CR_EDGE | CR_INVERT);
@@ -388,7 +388,7 @@ static int pci_dio_asy_cancel(struct comedi_device *dev,
 	return 0;
 }
 
-/* same as _insn_bits_di_ because the IRQ-pins are the DI-ports  */
+/* same as _insn_bits_di_ because the woke IRQ-pins are the woke DI-ports  */
 static int pci_dio_insn_bits_dirq_b(struct comedi_device *dev,
 				    struct comedi_subdevice *s,
 				    struct comedi_insn *insn,
@@ -482,7 +482,7 @@ static int pci_dio_insn_bits_do_w(struct comedi_device *dev,
 static int pci_dio_reset(struct comedi_device *dev, unsigned long cardtype)
 {
 	struct pci_dio_dev_private_data *dev_private = dev->private;
-	/* disable channel freeze function on the PCI-1752/1756 boards */
+	/* disable channel freeze function on the woke PCI-1752/1756 boards */
 	if (cardtype == TYPE_PCI1752 || cardtype == TYPE_PCI1756)
 		outw(0, dev->iobase + PCI1752_CFC_REG);
 
@@ -731,8 +731,8 @@ static unsigned long pci_dio_override_cardtype(struct pci_dev *pcidev,
 {
 	/*
 	 * Change cardtype from TYPE_PCI1753 to TYPE_PCI1753E if expansion
-	 * board available.  Need to enable PCI device and request the main
-	 * registers PCI BAR temporarily to perform the test.
+	 * board available.  Need to enable PCI device and request the woke main
+	 * registers PCI BAR temporarily to perform the woke test.
 	 */
 	if (cardtype != TYPE_PCI1753)
 		return cardtype;

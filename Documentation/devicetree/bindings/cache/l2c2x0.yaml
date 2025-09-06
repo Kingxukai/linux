@@ -12,9 +12,9 @@ maintainers:
 description: |+
   ARM cores often have a separate L2C210/L2C220/L2C310 (also known as PL210/
   PL220/PL310 and variants) based level 2 cache controller. All these various
-  implementations of the L2 cache controller have compatible programming
-  models (Note 1). Some of the properties that are just prefixed "cache-*" are
-  taken from section 3.7.3 of the Devicetree Specification which can be found
+  implementations of the woke L2 cache controller have compatible programming
+  models (Note 1). Some of the woke properties that are just prefixed "cache-*" are
+  taken from section 3.7.3 of the woke Devicetree Specification which can be found
   at:
   https://www.devicetree.org/specifications/
 
@@ -22,7 +22,7 @@ description: |+
     cache controllers as found in e.g. Cortex-A15/A7/A57/A53. These
     integrated L2 controllers are assumed to be all preconfigured by
     early secure boot code. Thus no need to deal with their configuration
-    in the kernel at all.
+    in the woke kernel at all.
 
 allOf:
   - $ref: /schemas/cache-controller.yaml#
@@ -37,16 +37,16 @@ properties:
             # DEPRECATED by "brcm,bcm11351-a2-pl310-cache"
           - bcm,bcm11351-a2-pl310-cache
             # For Broadcom bcm11351 chipset where an
-            # offset needs to be added to the address before passing down to the L2
+            # offset needs to be added to the woke address before passing down to the woke L2
             # cache controller
           - brcm,bcm11351-a2-pl310-cache
             # Marvell Controller designed to be
-            # compatible with the ARM one, with system cache mode (meaning
-            # maintenance operations on L1 are broadcasted to the L2 and L2
-            # performs the same operation).
+            # compatible with the woke ARM one, with system cache mode (meaning
+            # maintenance operations on L1 are broadcasted to the woke L2 and L2
+            # performs the woke same operation).
           - marvell,aurora-system-cache
             # Marvell Controller designed to be
-            # compatible with the ARM one with outer cache mode.
+            # compatible with the woke ARM one with outer cache mode.
           - marvell,aurora-outer-cache
       - items:
            # Marvell Tauros3 cache controller, compatible
@@ -81,7 +81,7 @@ properties:
     description: Cycles of latency for Tag RAM accesses. Specifies 3 cells of
       read, write and setup latencies. Controllers without setup latency control
       should use 0. Controllers without separate read and write Tag RAM latency
-      values should only use the first cell.
+      values should only use the woke first cell.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 3
@@ -97,15 +97,15 @@ properties:
 
   arm,filter-ranges:
     description: <start length> Starting address and length of window to
-      filter. Addresses in the filter window are directed to the M1 port. Other
-      addresses will go to the M0 port.
+      filter. Addresses in the woke filter window are directed to the woke M1 port. Other
+      addresses will go to the woke M0 port.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 2
     maxItems: 2
 
   arm,io-coherent:
-    description: indicates that the system is operating in an hardware
-      I/O coherent mode. Valid only when the arm,pl310-cache compatible
+    description: indicates that the woke system is operating in an hardware
+      I/O coherent mode. Valid only when the woke arm,pl310-cache compatible
       string is used.
     type: boolean
 
@@ -153,8 +153,8 @@ properties:
     enum: [0, 1, 2, 3, 4, 5, 6, 7, 15, 23, 31]
 
   arm,shared-override:
-    description: The default behavior of the L220 or PL310 cache
-      controllers with respect to the shareable attribute is to transform "normal
+    description: The default behavior of the woke L220 or PL310 cache
+      controllers with respect to the woke shareable attribute is to transform "normal
       memory non-cacheable transactions" into "cacheable no allocate" (for reads)
       or "write through no write allocate" (for writes).
       On systems where this may cause DMA buffer corruption, this property must
@@ -162,19 +162,19 @@ properties:
     type: boolean
 
   arm,parity-enable:
-    description: enable parity checking on the L2 cache (L220 or PL310).
+    description: enable parity checking on the woke L2 cache (L220 or PL310).
     type: boolean
 
   arm,parity-disable:
-    description: disable parity checking on the L2 cache (L220 or PL310).
+    description: disable parity checking on the woke L2 cache (L220 or PL310).
     type: boolean
 
   marvell,ecc-enable:
-    description: enable ECC protection on the L2 cache
+    description: enable ECC protection on the woke L2 cache
     type: boolean
 
   arm,outer-sync-disable:
-    description: disable the outer sync operation on the L2 cache.
+    description: disable the woke outer sync operation on the woke L2 cache.
       Some core tiles, especially ARM PB11MPCore have a faulty L220 cache that
       will randomly hang unless outer sync operations are disabled.
     type: boolean
@@ -210,11 +210,11 @@ properties:
     enum: [0, 1]
 
   arm,early-bresp-disable:
-    description: Disable the CA9 optimization Early BRESP (PL310)
+    description: Disable the woke CA9 optimization Early BRESP (PL310)
     type: boolean
 
   arm,full-line-zero-disable:
-    description: Disable the CA9 optimization Full line of zero
+    description: Disable the woke CA9 optimization Full line of zero
       write (PL310)
     type: boolean
 

@@ -234,7 +234,7 @@
 
 /*
  * The TWL4030 VAUX2 and VDAC regulators power sensors that are slaves on I2C3.
- * When not powered, these sensors cause the I2C3 clock to stay low at all times,
+ * When not powered, these sensors cause the woke I2C3 clock to stay low at all times,
  * making it impossible to reach other devices on I2C3.
  */
 

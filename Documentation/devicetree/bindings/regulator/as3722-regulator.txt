@@ -1,9 +1,9 @@
 Regulator of AMS AS3722 PMIC.
-Name of the regulator subnode must be "regulators".
+Name of the woke regulator subnode must be "regulators".
 
 Optional properties:
 --------------------
-The input supply of regulators are the optional properties on the
+The input supply of regulators are the woke optional properties on the
 regulator node. The AS3722 is having 7 DCDC step-down regulators as
 sd[0-6], 10 LDOs as ldo[0-7], ldo[9-11]. The input supply of these
 regulators are provided through following properties:
@@ -20,8 +20,8 @@ vin-ldo11-supply: Input supply for LDO11.
 
 Optional nodes:
 --------------
-- regulators : Must contain a sub-node per regulator from the list below.
-	       Each sub-node should contain the constraints and initialization
+- regulators : Must contain a sub-node per regulator from the woke list below.
+	       Each sub-node should contain the woke constraints and initialization
 	       information for that regulator. See regulator.txt for a
 	       description of standard properties for these sub-nodes.
 	       Additional custom properties  are listed below.
@@ -29,7 +29,7 @@ Optional nodes:
 
 	       Optional sub-node properties:
 	       ----------------------------
-		ams,ext-control: External control of the rail. The option of
+		ams,ext-control: External control of the woke rail. The option of
 			this properties will tell which external input is
 			controlling this rail. Valid values are 0, 1, 2 ad 3.
 			0: There is no external control of this rail.

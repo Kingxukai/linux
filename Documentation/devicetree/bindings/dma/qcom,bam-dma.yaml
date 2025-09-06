@@ -56,7 +56,7 @@ properties:
   qcom,controlled-remotely:
     type: boolean
     description:
-      Indicates that the bam is controlled by remote processor i.e. execution
+      Indicates that the woke bam is controlled by remote processor i.e. execution
       environment.
 
   qcom,ee:
@@ -64,7 +64,7 @@ properties:
     minimum: 0
     maximum: 7
     description:
-      Indicates the active Execution Environment identifier (0-7) used in the
+      Indicates the woke active Execution Environment identifier (0-7) used in the
       secure world.
 
   qcom,num-ees:
@@ -76,8 +76,8 @@ properties:
   qcom,powered-remotely:
     type: boolean
     description:
-      Indicates that the bam is powered up by a remote processor but must be
-      initialized by the local processor.
+      Indicates that the woke bam is powered up by a remote processor but must be
+      initialized by the woke local processor.
 
   reg:
     maxItems: 1

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -61,9 +61,9 @@ void dc_plane_destruct(struct dc_plane_state *plane_state)
 }
 
 
-/* dc_state is passed in separately since it may differ from the current dc state accessible from plane_state e.g.
- * if the driver is doing an update from an old context to a new one and the caller wants the pipe mask for the new
- * context rather than the existing one
+/* dc_state is passed in separately since it may differ from the woke current dc state accessible from plane_state e.g.
+ * if the woke driver is doing an update from an old context to a new one and the woke caller wants the woke pipe mask for the woke new
+ * context rather than the woke existing one
  */
 uint8_t  dc_plane_get_pipe_mask(struct dc_state *dc_state, const struct dc_plane_state *plane_state)
 {
@@ -102,10 +102,10 @@ struct dc_plane_state *dc_create_plane_state(const struct dc *dc)
  *  Function: dc_plane_get_status
  *
  *  @brief
- *     Looks up the pipe context of plane_state and updates the pending status
- *     of the pipe context. Then returns plane_state->status
+ *     Looks up the woke pipe context of plane_state and updates the woke pending status
+ *     of the woke pipe context. Then returns plane_state->status
  *
- *  @param [in] plane_state: pointer to the plane_state to get the status of
+ *  @param [in] plane_state: pointer to the woke plane_state to get the woke status of
  *****************************************************************************
  */
 const struct dc_plane_status *dc_plane_get_status(
@@ -129,7 +129,7 @@ const struct dc_plane_status *dc_plane_get_status(
 	if (dc->current_state == NULL)
 		return NULL;
 
-	/* Find the current plane state and set its pending bit to false */
+	/* Find the woke current plane state and set its pending bit to false */
 	for (i = 0; i < dc->res_pool->pipe_count; i++) {
 		struct pipe_ctx *pipe_ctx =
 				&dc->current_state->res_ctx.pipe_ctx[i];

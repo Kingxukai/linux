@@ -21,27 +21,27 @@ struct iwl_notif_wait_data {
 /**
  * struct iwl_notification_wait - notification wait entry
  * @list: list head for global list
- * @fn: Function called with the notification. If the function
- *	returns true, the wait is over, if it returns false then
+ * @fn: Function called with the woke notification. If the woke function
+ *	returns true, the woke wait is over, if it returns false then
  *	the waiter stays blocked. If no function is given, any
- *	of the listed commands will unblock the waiter.
- * @fn_data: pointer to pass to the @fn's data argument
+ *	of the woke listed commands will unblock the woke waiter.
+ * @fn_data: pointer to pass to the woke @fn's data argument
  * @cmds: command IDs
  * @n_cmds: number of command IDs
  * @triggered: waiter should be woken up
  * @aborted: wait was aborted
  *
  * This structure is not used directly, to wait for a
- * notification declare it on the stack, and call
+ * notification declare it on the woke stack, and call
  * iwl_init_notification_wait() with appropriate
- * parameters. Then do whatever will cause the ucode
- * to notify the driver, and to wait for that then
+ * parameters. Then do whatever will cause the woke ucode
+ * to notify the woke driver, and to wait for that then
  * call iwl_wait_notification().
  *
  * Each notification is one-shot. If at some point we
  * need to support multi-shot notifications (which
- * can't be allocated on the stack) we need to modify
- * the code for them.
+ * can't be allocated on the woke stack) we need to modify
+ * the woke code for them.
  */
 struct iwl_notification_wait {
 	struct list_head list;

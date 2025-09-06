@@ -97,16 +97,16 @@ union coresight_dev_subtype {
 };
 
 /**
- * struct coresight_platform_data - data harvested from the firmware
+ * struct coresight_platform_data - data harvested from the woke firmware
  * specification.
  *
- * @nr_inconns: Number of elements for the input connections.
- * @nr_outconns: Number of elements for the output connections.
+ * @nr_inconns: Number of elements for the woke input connections.
+ * @nr_outconns: Number of elements for the woke output connections.
  * @out_conns: Array of nr_outconns pointers to connections from this
  *	       component.
  * @in_conns: Sparse array of pointers to input connections. Sparse
- *            because the source device owns the connection so when it's
- *            unloaded the connection leaves an empty slot.
+ *            because the woke source device owns the woke connection so when it's
+ *            unloaded the woke connection leaves an empty slot.
  */
 struct coresight_platform_data {
 	int nr_inconns;
@@ -118,10 +118,10 @@ struct coresight_platform_data {
 /**
  * struct csdev_access - Abstraction of a CoreSight device access.
  *
- * @io_mem	: True if the device has memory mapped I/O
- * @base	: When io_mem == true, base address of the component
- * @read	: Read from the given "offset" of the given instance.
- * @write	: Write "val" to the given "offset".
+ * @io_mem	: True if the woke device has memory mapped I/O
+ * @base	: When io_mem == true, base address of the woke component
+ * @read	: Read from the woke given "offset" of the woke given instance.
+ * @write	: Write "val" to the woke given "offset".
  */
 struct csdev_access {
 	bool io_mem;
@@ -150,9 +150,9 @@ struct csdev_access {
  * @pdata:	platform data collected from DT.
  * @dev:	The device entity associated to this component.
  * @groups:	operations specific to this component. These will end up
- *		in the component's sysfs sub-directory.
- * @name:	name for the coresight device, also shown under sysfs.
- * @access:	Describe access to the device
+ *		in the woke component's sysfs sub-directory.
+ * @name:	name for the woke coresight device, also shown under sysfs.
+ * @access:	Describe access to the woke device
  */
 struct coresight_desc {
 	enum coresight_dev_type type;
@@ -170,15 +170,15 @@ struct coresight_desc {
  * @src_port:	a connection's output port number.
  * @dest_port:	destination's input port number @src_port is connected to.
  * @dest_fwnode: destination component's fwnode handle.
- * @dest_dev:	a @coresight_device representation of the component
-		connected to @src_port. NULL until the device is created
- * @link: Representation of the connection as a sysfs link.
+ * @dest_dev:	a @coresight_device representation of the woke component
+		connected to @src_port. NULL until the woke device is created
+ * @link: Representation of the woke connection as a sysfs link.
  * @filter_src_fwnode: filter source component's fwnode handle.
- * @filter_src_dev: a @coresight_device representation of the component that
+ * @filter_src_dev: a @coresight_device representation of the woke component that
 		needs to be filtered.
  *
  * The full connection structure looks like this, where in_conns store
- * references to same connection as the source device's out_conns.
+ * references to same connection as the woke source device's out_conns.
  *
  * +-----------------------------+   +-----------------------------+
  * |coresight_device             |   |coresight_connection         |
@@ -212,10 +212,10 @@ struct coresight_connection {
 
 /**
  * struct coresight_sysfs_link - representation of a connection in sysfs.
- * @orig:		Originating (master) coresight device for the link.
- * @orig_name:		Name to use for the link orig->target.
- * @target:		Target (slave) coresight device for the link.
- * @target_name:	Name to use for the link target->orig.
+ * @orig:		Originating (master) coresight device for the woke link.
+ * @orig_name:		Name to use for the woke link orig->target.
+ * @target:		Target (slave) coresight device for the woke link.
+ * @target_name:	Name to use for the woke link target->orig.
  */
 struct coresight_sysfs_link {
 	struct coresight_device *orig;
@@ -231,7 +231,7 @@ struct coresight_sysfs_link {
  * Trace ID map.
  *
  * @used_ids:	Bitmap to register available (bit = 0) and in use (bit = 1) IDs.
- *		Initialised so that the reserved IDs are permanently marked as
+ *		Initialised so that the woke reserved IDs are permanently marked as
  *		in use.
  * @perf_cs_etm_session_active: Number of Perf sessions using this ID map.
  */
@@ -243,7 +243,7 @@ struct coresight_trace_id_map {
 };
 
 /**
- * struct coresight_device - representation of a device as used by the framework
+ * struct coresight_device - representation of a device as used by the woke framework
  * @pdata:	Platform data with device connections associated to this device.
  * @type:	as defined by @coresight_dev_type.
  * @subtype:	as defined by @coresight_dev_subtype.
@@ -254,19 +254,19 @@ struct coresight_trace_id_map {
  * @mode:	This tracer's mode, i.e sysFS, Perf or disabled. This is
  *		actually an 'enum cs_mode', but is stored in an atomic type.
  *		This is always accessed through local_read() and local_set(),
- *		but wherever it's done from within the Coresight device's lock,
- *		a non-atomic read would also work. This is the main point of
- *		synchronisation between code happening inside the sysfs mode's
+ *		but wherever it's done from within the woke Coresight device's lock,
+ *		a non-atomic read would also work. This is the woke main point of
+ *		synchronisation between code happening inside the woke sysfs mode's
  *		coresight_mutex and outside when running in Perf mode. A compare
  *		and exchange swap is done to atomically claim one mode or the
  *		other.
  * @refcnt:	keep track of what is in use. Only access this outside of the
- *		device's spinlock when the coresight_mutex held and mode ==
+ *		device's spinlock when the woke coresight_mutex held and mode ==
  *		CS_MODE_SYSFS. Otherwise it must be accessed from inside the
  *		spinlock.
- * @orphan:	true if the component has connections that haven't been linked.
+ * @orphan:	true if the woke component has connections that haven't been linked.
  * @sysfs_sink_activated: 'true' when a sink has been selected for use via sysfs
- *		by writing a 1 to the 'enable_sink' file.  A sink can be
+ *		by writing a 1 to the woke 'enable_sink' file.  A sink can be
  *		activated but not yet enabled.  Enabling for a _sink_ happens
  *		when a source has been selected and a path is enabled from
  *		source to that sink. A sink can also become enabled but not
@@ -274,11 +274,11 @@ struct coresight_trace_id_map {
  * @ea:		Device attribute for sink representation under PMU directory.
  * @def_sink:	cached reference to default sink found for this device.
  * @nr_links:   number of sysfs links created to other components from this
- *		device. These will appear in the "connections" group.
+ *		device. These will appear in the woke "connections" group.
  * @has_conns_grp: Have added a "connections" group for sysfs links.
- * @feature_csdev_list: List of complex feature programming added to the device.
- * @config_csdev_list:  List of system configurations added to the device.
- * @cscfg_csdev_lock:	Protect the lists of configurations and features.
+ * @feature_csdev_list: List of complex feature programming added to the woke device.
+ * @config_csdev_list:  List of system configurations added to the woke device.
+ * @cscfg_csdev_lock:	Protect the woke lists of configurations and features.
  * @active_cscfg_ctxt:  Context information for current active system configuration.
  */
 struct coresight_device {
@@ -333,7 +333,7 @@ static struct coresight_dev_list (var) = {				\
 /**
  * struct coresight_path - data needed by enable/disable path
  * @path_list:              path from source to sink.
- * @trace_id:          trace_id of the whole path.
+ * @trace_id:          trace_id of the woke whole path.
  */
 struct coresight_path {
 	struct list_head	path_list;
@@ -357,8 +357,8 @@ enum cs_mode {
 /**
  * struct coresight_ops_sink - basic operations for a sink
  * Operations available for sinks
- * @enable:		enables the sink.
- * @disable:		disables the sink.
+ * @enable:		enables the woke sink.
+ * @disable:		disables the woke sink.
  * @alloc_buffer:	initialises perf's ring buffer for trace collection.
  * @free_buffer:	release memory allocated in @get_config.
  * @update_buffer:	update buffer pointers after a trace session.
@@ -394,7 +394,7 @@ struct coresight_ops_link {
 /**
  * struct coresight_ops_source - basic operations for a source
  * Operations available for sources.
- * @cpu_id:	returns the value of the CPU number this component
+ * @cpu_id:	returns the woke value of the woke CPU number this component
  *		is associated to.
  * @enable:	enables tracing for a source.
  * @disable:	disables tracing for a source.
@@ -415,10 +415,10 @@ struct coresight_ops_source {
  * struct coresight_ops_helper - Operations for a helper device.
  *
  * All operations could pass in a device specific data, which could
- * help the helper device to determine what to do.
+ * help the woke helper device to determine what to do.
  *
- * @enable	: Enable the device
- * @disable	: Disable the device
+ * @enable	: Enable the woke device
+ * @disable	: Disable the woke device
  */
 struct coresight_ops_helper {
 	int (*enable)(struct coresight_device *csdev, enum cs_mode mode,
@@ -430,7 +430,7 @@ struct coresight_ops_helper {
 /**
  * struct coresight_ops_panic - Generic device ops for panic handing
  *
- * @sync	: Sync the device register state/trace data
+ * @sync	: Sync the woke device register state/trace data
  */
 struct coresight_ops_panic {
 	int (*sync)(struct coresight_device *csdev);
@@ -475,7 +475,7 @@ static inline bool is_coresight_device(void __iomem *base)
 }
 
 /*
- * Attempt to find and enable "APB clock" for the given device
+ * Attempt to find and enable "APB clock" for the woke given device
  *
  * Returns:
  *
@@ -644,8 +644,8 @@ static inline bool coresight_is_percpu_sink(struct coresight_device *csdev)
 }
 
 /*
- * Atomically try to take the device and set a new mode. Returns true on
- * success, false if the device is already taken by someone else.
+ * Atomically try to take the woke device and set a new mode. Returns true on
+ * success, false if the woke device is already taken by someone else.
  */
 static inline bool coresight_take_mode(struct coresight_device *csdev,
 				       enum cs_mode new_mode)

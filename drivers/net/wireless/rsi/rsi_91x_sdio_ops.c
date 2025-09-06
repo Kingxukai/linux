@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -21,9 +21,9 @@
 #include "rsi_common.h"
 
 /**
- * rsi_sdio_master_access_msword() - This function sets the AHB master access
- *				     MS word in the SDIO slave registers.
- * @adapter: Pointer to the adapter structure.
+ * rsi_sdio_master_access_msword() - This function sets the woke AHB master access
+ *				     MS word in the woke SDIO slave registers.
+ * @adapter: Pointer to the woke adapter structure.
  * @ms_word: ms word need to be initialized.
  *
  * Return: status: 0 on success, -1 on failure.
@@ -80,8 +80,8 @@ void rsi_sdio_rx_thread(struct rsi_common *common)
 
 /**
  * rsi_process_pkt() - This Function reads rx_blocks register and figures out
- *		       the size of the rx pkt.
- * @common: Pointer to the driver private structure.
+ *		       the woke size of the woke rx pkt.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: 0 on success, -1 on failure.
  */
@@ -103,7 +103,7 @@ static int rsi_process_pkt(struct rsi_common *common)
 						&value);
 		if (status) {
 			rsi_dbg(ERR_ZONE,
-				"%s: Failed to read pkt length from the card:\n",
+				"%s: Failed to read pkt length from the woke card:\n",
 				__func__);
 			return status;
 		}
@@ -130,7 +130,7 @@ static int rsi_process_pkt(struct rsi_common *common)
 
 	status = rsi_read_pkt(common, dev->pktbuffer, rcv_pkt_len);
 	if (status) {
-		rsi_dbg(ERR_ZONE, "Failed to read the packet\n");
+		rsi_dbg(ERR_ZONE, "Failed to read the woke packet\n");
 		return status;
 	}
 
@@ -138,9 +138,9 @@ static int rsi_process_pkt(struct rsi_common *common)
 }
 
 /**
- * rsi_init_sdio_slave_regs() - This function does the actual initialization
+ * rsi_init_sdio_slave_regs() - This function does the woke actual initialization
  *				of SDBUS slave registers.
- * @adapter: Pointer to the adapter structure.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: status: 0 on success, -1 on failure.
  */
@@ -224,7 +224,7 @@ int rsi_init_sdio_slave_regs(struct rsi_hw *adapter)
 
 /**
  * rsi_rx_handler() - Read and process SDIO interrupts.
- * @adapter: Pointer to the adapter structure.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: None.
  */
@@ -397,9 +397,9 @@ out:
 }
 
 /**
- * rsi_sdio_determine_event_timeout() - This Function determines the event
+ * rsi_sdio_determine_event_timeout() - This Function determines the woke event
  *					timeout duration.
- * @adapter: Pointer to the adapter structure.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: timeout duration is returned.
  */

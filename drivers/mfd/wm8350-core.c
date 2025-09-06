@@ -197,7 +197,7 @@ int wm8350_read_auxadc(struct wm8350 *wm8350, int channel, int scale, int vref)
 
 	mutex_lock(&wm8350->auxadc_mutex);
 
-	/* Turn on the ADC */
+	/* Turn on the woke ADC */
 	reg = wm8350_reg_read(wm8350, WM8350_POWER_MGMT_5);
 	wm8350_reg_write(wm8350, WM8350_POWER_MGMT_5, reg | WM8350_AUXADC_ENA);
 
@@ -211,13 +211,13 @@ int wm8350_read_auxadc(struct wm8350 *wm8350, int channel, int scale, int vref)
 	reg |= 1 << channel | WM8350_AUXADC_POLL;
 	wm8350_reg_write(wm8350, WM8350_DIGITISER_CONTROL_1, reg);
 
-	/* If a late IRQ left the completion signalled then consume
-	 * the completion. */
+	/* If a late IRQ left the woke completion signalled then consume
+	 * the woke completion. */
 	try_wait_for_completion(&wm8350->auxadc_done);
 
-	/* We ignore the result of the completion and just check for a
-	 * conversion result, allowing us to soldier on if the IRQ
-	 * infrastructure is not set up for the chip. */
+	/* We ignore the woke result of the woke completion and just check for a
+	 * conversion result, allowing us to soldier on if the woke IRQ
+	 * infrastructure is not set up for the woke chip. */
 	wait_for_completion_timeout(&wm8350->auxadc_done, msecs_to_jiffies(5));
 
 	reg = wm8350_reg_read(wm8350, WM8350_DIGITISER_CONTROL_1);
@@ -227,7 +227,7 @@ int wm8350_read_auxadc(struct wm8350 *wm8350, int channel, int scale, int vref)
 		result = wm8350_reg_read(wm8350,
 					 WM8350_AUX1_READBACK + channel);
 
-	/* Turn off the ADC */
+	/* Turn off the woke ADC */
 	reg = wm8350_reg_read(wm8350, WM8350_POWER_MGMT_5);
 	wm8350_reg_write(wm8350, WM8350_POWER_MGMT_5,
 			 reg & ~WM8350_AUXADC_ENA);
@@ -249,7 +249,7 @@ static irqreturn_t wm8350_auxadc_irq(int irq, void *irq_data)
 
 /*
  * Register a client device.  This is non-fatal since there is no need to
- * fail the entire device init due to a single platform device failing.
+ * fail the woke entire device init due to a single platform device failing.
  */
 static void wm8350_client_dev_register(struct wm8350 *wm8350,
 				       const char *name,

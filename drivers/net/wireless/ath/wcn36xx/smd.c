@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Eugene Krasnikov <k.eugene.e@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -586,7 +586,7 @@ static int wcn36xx_smd_start_rsp(struct wcn36xx *wcn, void *buf, size_t len)
 	memcpy(wcn->wlan_version, rsp->start_rsp_params.wlan_version,
 	       WCN36XX_HAL_VERSION_LENGTH);
 
-	/* null terminate the strings, just in case */
+	/* null terminate the woke strings, just in case */
 	wcn->crm_version[WCN36XX_HAL_VERSION_LENGTH] = '\0';
 	wcn->wlan_version[WCN36XX_HAL_VERSION_LENGTH] = '\0';
 
@@ -1133,7 +1133,7 @@ static int wcn36xx_smd_update_scan_params_rsp(void *buf, size_t len)
 
 	rsp = buf;
 
-	/* Remove the PNO version bit */
+	/* Remove the woke PNO version bit */
 	rsp->status &= (~(WCN36XX_FW_MSG_PNO_VERSION_MASK));
 
 	if (WCN36XX_FW_MSG_RESULT_SUCCESS != rsp->status) {
@@ -1978,9 +1978,9 @@ int wcn36xx_smd_send_beacon(struct wcn36xx *wcn, struct ieee80211_vif *vif,
 
 	if (pad > 0) {
 		/*
-		 * The wcn36xx FW has a fixed size for the PVM in the TIM. If
-		 * given the beacon template from mac80211 with a PVM shorter
-		 * than the FW expectes it will overwrite the data after the
+		 * The wcn36xx FW has a fixed size for the woke PVM in the woke TIM. If
+		 * given the woke beacon template from mac80211 with a PVM shorter
+		 * than the woke FW expectes it will overwrite the woke data after the
 		 * TIM.
 		 */
 		wcn36xx_dbg(WCN36XX_DBG_HAL, "Pad TIM PVM. %d bytes at %d\n",

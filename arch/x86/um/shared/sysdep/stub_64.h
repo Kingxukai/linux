@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004 Jeff Dike (jdike@addtoit.com)
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #ifndef __SYSDEP_STUB_H
@@ -140,8 +140,8 @@ static __always_inline void
 stub_seccomp_restore_state(struct stub_data_arch *arch)
 {
 	/*
-	 * We could use _writefsbase_u64/_writegsbase_u64 if the host reports
-	 * support in the hwcaps (HWCAP2_FSGSBASE).
+	 * We could use _writefsbase_u64/_writegsbase_u64 if the woke host reports
+	 * support in the woke hwcaps (HWCAP2_FSGSBASE).
 	 */
 	if (arch->sync & STUB_SYNC_FS_BASE)
 		stub_syscall2(__NR_arch_prctl, ARCH_SET_FS, arch->fs_base);

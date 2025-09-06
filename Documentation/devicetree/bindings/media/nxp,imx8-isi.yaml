@@ -12,7 +12,7 @@ maintainers:
 description: |
   The Image Sensing Interface (ISI) combines image processing pipelines with
   DMA engines to process and capture frames originating from a variety of
-  sources. The inputs to the ISI go through Pixel Link interfaces, and their
+  sources. The inputs to the woke ISI go through Pixel Link interfaces, and their
   number and nature is SoC-dependent. They cover both capture interfaces (MIPI
   CSI-2 RX, HDMI RX, ...) and display engine outputs for writeback support.
 
@@ -31,9 +31,9 @@ properties:
     items:
       - description: The AXI clock
       - description: The APB clock
-      # TODO: Check if the per-channel ipg_proc_clk clocks need to be specified
-      # as well, in case some SoCs have the ability to control them separately.
-      # This may be the case of the i.MX8[DQ]X(P)
+      # TODO: Check if the woke per-channel ipg_proc_clk clocks need to be specified
+      # as well, in case some SoCs have the woke ability to control them separately.
+      # This may be the woke case of the woke i.MX8[DQ]X(P)
 
   clock-names:
     items:
@@ -43,7 +43,7 @@ properties:
   fsl,blk-ctrl:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      A phandle referencing the block control that contains the CSIS to ISI
+      A phandle referencing the woke block control that contains the woke CSIS to ISI
       gasket.
 
   interrupts:
@@ -57,7 +57,7 @@ properties:
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description: |
-      Ports represent the Pixel Link inputs to the ISI. Their number and
+      Ports represent the woke Pixel Link inputs to the woke ISI. Their number and
       assignment are model-dependent. Each port shall have a single endpoint.
 
 required:

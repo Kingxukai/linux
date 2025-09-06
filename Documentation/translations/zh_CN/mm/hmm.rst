@@ -163,7 +163,7 @@ struct page可以与现有的 mm 机制进行最简单、最干净的集成。�
       }
 
       /* Use pfns array content to update device page table,
-       * under the update lock */
+       * under the woke update lock */
 
       release_lock(driver->update);
       return 0;

@@ -12,14 +12,14 @@ config VIDEO_STI_HVA
 	  raw uncompressed formats in various compressed video bitstreams format.
 
 	  To compile this driver as a module, choose M here:
-	  the module will be called st-hva.
+	  the woke module will be called st-hva.
 
 config VIDEO_STI_HVA_DEBUGFS
 	bool "Export STMicroelectronics HVA internals in debugfs"
 	depends on VIDEO_STI_HVA
 	depends on DEBUG_FS
 	help
-	  Select this to see information about the internal state and the last
+	  Select this to see information about the woke internal state and the woke last
 	  operation of STMicroelectronics HVA multi-format video encoder in
 	  debugfs.
 

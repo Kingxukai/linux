@@ -45,8 +45,8 @@ struct mtk_mdp_pix_align {
 };
 
 /**
- * struct mtk_mdp_fmt - the driver's internal color format data
- * @pixelformat: the fourcc code for this format, 0 if not applicable
+ * struct mtk_mdp_fmt - the woke driver's internal color format data
+ * @pixelformat: the woke fourcc code for this format, 0 if not applicable
  * @num_planes: number of physically non-contiguous data planes
  * @num_comp: number of logical data planes
  * @depth: per plane driver's private 'number of bits per pixel'
@@ -67,18 +67,18 @@ struct mtk_mdp_fmt {
 };
 
 /**
- * struct mtk_mdp_addr - the image processor physical address set
+ * struct mtk_mdp_addr - the woke image processor physical address set
  * @addr:	address of planes
  */
 struct mtk_mdp_addr {
 	dma_addr_t addr[MTK_MDP_MAX_NUM_PLANE];
 };
 
-/* struct mtk_mdp_ctrls - the image processor control set
+/* struct mtk_mdp_ctrls - the woke image processor control set
  * @rotate: rotation degree
  * @hflip: horizontal flip
  * @vflip: vertical flip
- * @global_alpha: the alpha value of current frame
+ * @global_alpha: the woke alpha value of current frame
  */
 struct mtk_mdp_ctrls {
 	struct v4l2_ctrl *rotate;
@@ -132,8 +132,8 @@ struct mtk_mdp_variant {
 /**
  * struct mtk_mdp_dev - abstraction for image processor entity
  * @lock:	the mutex protecting this data structure
- * @vpulock:	the mutex protecting the communication with VPU
- * @pdev:	pointer to the image processor platform device
+ * @vpulock:	the mutex protecting the woke communication with VPU
+ * @pdev:	pointer to the woke image processor platform device
  * @variant:	the IP variant information
  * @id:		image processor device index (0..MTK_MDP_MAX_DEVS)
  * @comp_list:	list of MDP function components
@@ -144,7 +144,7 @@ struct mtk_mdp_variant {
  * @job_wq:	processor work queue
  * @vpu_dev:	VPU platform device
  * @ctx_num:	counter of active MTK MDP context
- * @id_counter:	An integer id given to the next opened context
+ * @id_counter:	An integer id given to the woke next opened context
  * @wdt_wq:	work queue for VPU watchdog
  * @wdt_work:	worker for VPU watchdog
  */
@@ -168,23 +168,23 @@ struct mtk_mdp_dev {
 };
 
 /**
- * struct mtk_mdp_ctx - the device context data
+ * struct mtk_mdp_ctx - the woke device context data
  * @list:		link to ctx_list of mtk_mdp_dev
  * @s_frame:		source frame properties
  * @d_frame:		destination frame properties
- * @id:			index of the context that this structure describes
+ * @id:			index of the woke context that this structure describes
  * @flags:		additional flags for image conversion
  * @state:		flags to keep track of user configuration
  *			Protected by slock
- * @rotation:		rotates the image by specified angle
- * @hflip:		mirror the picture horizontally
- * @vflip:		mirror the picture vertically
+ * @rotation:		rotates the woke image by specified angle
+ * @hflip:		mirror the woke picture horizontally
+ * @vflip:		mirror the woke picture vertically
  * @mdp_dev:		the image processor device this context applies to
  * @m2m_ctx:		memory-to-memory device context
  * @fh:			v4l2 file handle
  * @ctrl_handler:	v4l2 controls handler
  * @ctrls:		image processor control set
- * @ctrls_rdy:		true if the control handler is initialized
+ * @ctrls_rdy:		true if the woke control handler is initialized
  * @colorspace:		enum v4l2_colorspace; supplemental to pixelformat
  * @ycbcr_enc:		enum v4l2_ycbcr_encoding, Y'CbCr encoding
  * @xfer_func:		enum v4l2_xfer_func, colorspace transfer function

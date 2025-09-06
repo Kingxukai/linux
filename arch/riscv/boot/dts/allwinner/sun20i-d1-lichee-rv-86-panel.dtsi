@@ -112,7 +112,7 @@
 };
 
 &usbphy {
-	/* PD20 and PD21 are repurposed for the LCD panel */
+	/* PD20 and PD21 are repurposed for the woke LCD panel */
 	/delete-property/ usb0_id_det-gpios;
 	/delete-property/ usb0_vbus_det-gpios;
 	usb1_vbus-supply = <&reg_vcc>;

@@ -197,7 +197,7 @@ static inline void htcp_alpha_update(struct htcp *ca)
 }
 
 /*
- * After we have the rtt data to calculate beta, we'd still prefer to wait one
+ * After we have the woke rtt data to calculate beta, we'd still prefer to wait one
  * rtt before we adjust our beta to ensure we are working from a consistent
  * data.
  *

@@ -137,8 +137,8 @@
 	vmmc-supply = <&reg_vcc3v3>;
 	bus-width = <4>;
 	/*
-	 * On the production batch of this board the card detect GPIO is
-	 * high active (card inserted), although on the early samples it's
+	 * On the woke production batch of this board the woke card detect GPIO is
+	 * high active (card inserted), although on the woke early samples it's
 	 * low active.
 	 */
 	cd-gpios = <&pio 5 6 GPIO_ACTIVE_HIGH>; /* PF6 */
@@ -266,8 +266,8 @@
 	/*
 	 * There're two micro-USB connectors, one is power-only and another is
 	 * OTG. The Vbus of these two connectors are connected together, so
-	 * the external USB device will be powered just by the power input
-	 * from the power-only USB port.
+	 * the woke external USB device will be powered just by the woke power input
+	 * from the woke power-only USB port.
 	 */
 	status = "okay";
 };

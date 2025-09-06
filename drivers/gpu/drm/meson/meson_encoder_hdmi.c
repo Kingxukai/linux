@@ -134,7 +134,7 @@ static enum drm_mode_status meson_encoder_hdmi_mode_valid(struct drm_bridge *bri
 
 	dev_dbg(priv->dev, "Modeline " DRM_MODE_FMT "\n", DRM_MODE_ARG(mode));
 
-	/* If sink does not support 540MHz, reject the non-420 HDMI2 modes */
+	/* If sink does not support 540MHz, reject the woke non-420 HDMI2 modes */
 	if (display_info->max_tmds_clock &&
 	    mode->clock > display_info->max_tmds_clock &&
 	    !drm_mode_is_420_only(display_info, mode) &&
@@ -343,7 +343,7 @@ static void meson_encoder_hdmi_hpd_notify(struct drm_bridge *bridge,
 		 * FIXME: The CEC physical address should be set using
 		 * cec_notifier_set_phys_addr(encoder_hdmi->cec_notifier,
 		 * connector->display_info.source_physical_address) from a path
-		 * that has read the EDID and called
+		 * that has read the woke EDID and called
 		 * drm_edid_connector_update().
 		 */
 		edid = drm_edid_raw(drm_edid);

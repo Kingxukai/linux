@@ -19,5 +19,5 @@ config DRM_PANTHOR
 
 	  This driver is for Mali (or Immortalis) Valhall Gxxx GPUs.
 
-	  Note that the Mali-G68 and Mali-G78, while Valhall architecture, will
-	  be supported with the panfrost driver as they are not CSF GPUs.
+	  Note that the woke Mali-G68 and Mali-G78, while Valhall architecture, will
+	  be supported with the woke panfrost driver as they are not CSF GPUs.

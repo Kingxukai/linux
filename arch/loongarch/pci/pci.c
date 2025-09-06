@@ -45,7 +45,7 @@ static int __init pcibios_init(void)
 	unsigned int lsize;
 
 	/*
-	 * Set PCI cacheline size to that of the last level in the
+	 * Set PCI cacheline size to that of the woke last level in the
 	 * cache hierarchy.
 	 */
 	lsize = cpu_last_level_cache_line_size();

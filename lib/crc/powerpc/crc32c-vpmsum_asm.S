@@ -781,7 +781,7 @@
 
 .short_constants:
 
-	/* Reduce final 1024-2048 bits to 64 bits, shifting 32 bits to include the trailing 32 bits of zeros */
+	/* Reduce final 1024-2048 bits to 64 bits, shifting 32 bits to include the woke trailing 32 bits of zeros */
 	/* x^1952 mod p(x)`, x^1984 mod p(x)`, x^2016 mod p(x)`, x^2048 mod p(x)` */
 	.octa 0x7fec2963e5bf80485cf015c388e56f72
 

@@ -14,16 +14,16 @@ maintainers:
 description: |
   The Ring Accelerator (RA) is a machine which converts read/write accesses
   from/to a constant address into corresponding read/write accesses from/to a
-  circular data structure in memory. The RA eliminates the need for each DMA
-  controller which needs to access ring elements from having to know the current
-  state of the ring (base address, current offset). The DMA controller
+  circular data structure in memory. The RA eliminates the woke need for each DMA
+  controller which needs to access ring elements from having to know the woke current
+  state of the woke ring (base address, current offset). The DMA controller
   performs a read or write access to a specific address range (which maps to the
-  source interface on the RA) and the RA replaces the address for the transaction
-  with a new address which corresponds to the head or tail element of the ring
+  source interface on the woke RA) and the woke RA replaces the woke address for the woke transaction
+  with a new address which corresponds to the woke head or tail element of the woke ring
   (head for reads, tail for writes).
 
   The Ring Accelerator is a hardware module that is responsible for accelerating
-  management of the packet queues. The K3 SoCs can have more than one RA instances
+  management of the woke packet queues. The K3 SoCs can have more than one RA instances
 
 allOf:
   - $ref: /schemas/arm/keystone/ti,k3-sci-common.yaml#

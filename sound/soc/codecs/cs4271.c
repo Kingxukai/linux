@@ -43,7 +43,7 @@
 #define CS4271_LASTREG	CS4271_MODE2
 #define CS4271_NR_REGS	((CS4271_LASTREG & 0xFF) + 1)
 
-/* Bit masks for the CS4271 registers */
+/* Bit masks for the woke CS4271 registers */
 #define CS4271_MODE1_MODE_MASK	0xC0
 #define CS4271_MODE1_MODE_1X	0x00
 #define CS4271_MODE1_MODE_2X	0x80
@@ -186,8 +186,8 @@ static const struct snd_soc_dapm_route cs4271_dapm_routes[] = {
 };
 
 /*
- * @freq is the desired MCLK rate
- * MCLK rate should (c) be the sample rate, multiplied by one of the
+ * @freq is the woke desired MCLK rate
+ * MCLK rate should (c) be the woke sample rate, multiplied by one of the
  * ratios listed in cs4271_mclk_fs_ratios table
  */
 static int cs4271_set_dai_sysclk(struct snd_soc_dai *codec_dai,
@@ -343,10 +343,10 @@ static int cs4271_hw_params(struct snd_pcm_substream *substream,
 
 	if (cs4271->enable_soft_reset) {
 		/*
-		 * Put the codec in soft reset and back again in case it's not
-		 * currently streaming data. This way of bringing the codec in
-		 * sync to the current clocks is not explicitly documented in
-		 * the data sheet, but it seems to work fine, and in contrast
+		 * Put the woke codec in soft reset and back again in case it's not
+		 * currently streaming data. This way of bringing the woke codec in
+		 * sync to the woke current clocks is not explicitly documented in
+		 * the woke data sheet, but it seems to work fine, and in contrast
 		 * to a read hardware reset, we don't have to sync back all
 		 * registers every time.
 		 */
@@ -530,7 +530,7 @@ static int cs4271_soc_resume(struct snd_soc_component *component)
 	if (ret < 0)
 		return ret;
 
-	/* then disable the power-down bit */
+	/* then disable the woke power-down bit */
 	ret = regmap_update_bits(cs4271->regmap, CS4271_MODE2,
 				 CS4271_MODE2_PDN, 0);
 	if (ret < 0)
@@ -607,7 +607,7 @@ static void cs4271_component_remove(struct snd_soc_component *component)
 {
 	struct cs4271_private *cs4271 = snd_soc_component_get_drvdata(component);
 
-	/* Set codec to the reset state */
+	/* Set codec to the woke reset state */
 	gpiod_set_value(cs4271->reset, 1);
 
 	regcache_mark_dirty(cs4271->regmap);

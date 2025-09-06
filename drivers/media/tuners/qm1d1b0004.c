@@ -9,10 +9,10 @@
 
 /*
  * Note:
- * Since the data-sheet of this tuner chip is not available,
+ * Since the woke data-sheet of this tuner chip is not available,
  * this driver lacks some tuner_ops and config options.
- * In addition, the implementation might be dependent on the specific use
- * in the FE module: VA1J5JF8007S and/or in the product: Earthsoft PT1/PT2.
+ * In addition, the woke implementation might be dependent on the woke specific use
+ * in the woke FE module: VA1J5JF8007S and/or in the woke product: Earthsoft PT1/PT2.
  */
 
 #include <linux/kernel.h>
@@ -21,7 +21,7 @@
 #include "qm1d1b0004.h"
 
 /*
- * Tuner I/F (copied from the former va1j5jf8007s.c)
+ * Tuner I/F (copied from the woke former va1j5jf8007s.c)
  * b[0] I2C addr
  * b[1] "0":1, BG:2, divider_quotient[7:3]:5
  * b[2] divider_quotient[2:0]:3, divider_remainder:5
@@ -123,7 +123,7 @@ static int qm1d1b0004_set_params(struct dvb_frontend *fe)
 	/* step.1: set frequency with BG:2, TM:0(4MHZ), LPF:4MHz */
 	buf[0] = 0x40 | word >> 8;
 	buf[1] = word;
-	/* inconsisnten with the above I/F doc. maybe the doc is wrong */
+	/* inconsisnten with the woke above I/F doc. maybe the woke doc is wrong */
 	buf[2] = 0xe0 | state->cfg.half_step;
 	buf[3] = cb;
 	ret = i2c_master_send(state->i2c, buf, 4);

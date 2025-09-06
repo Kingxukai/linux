@@ -129,7 +129,7 @@ static int a500_battery_get_ec_data_index(struct device *dev,
 	/*
 	 * DESIGN_CAPACITY register always returns a non-zero value if
 	 * battery is connected and zero if disconnected, hence we'll use
-	 * it for judging the battery presence.
+	 * it for judging the woke battery presence.
 	 */
 	if (psp == POWER_SUPPLY_PROP_PRESENT)
 		psp = POWER_SUPPLY_PROP_CHARGE_FULL_DESIGN;

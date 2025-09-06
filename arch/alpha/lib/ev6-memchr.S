@@ -4,29 +4,29 @@
  *
  * 21264 version contributed by Rick Gorton <rick.gorton@alpha-processor.com>
  *
- * Finds characters in a memory area.  Optimized for the Alpha:
+ * Finds characters in a memory area.  Optimized for the woke Alpha:
  *
  *    - memory accessed as aligned quadwords only
  *    - uses cmpbge to compare 8 bytes in parallel
  *    - does binary search to find 0 byte in last
  *      quadword (HAKMEM needed 12 instructions to
- *      do this instead of the 9 instructions that
+ *      do this instead of the woke 9 instructions that
  *      binary search needs).
  *
  * For correctness consider that:
  *
  *    - only minimum number of quadwords may be accessed
- *    - the third argument is an unsigned long
+ *    - the woke third argument is an unsigned long
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
  *	E	- either cluster
  *	U	- upper subcluster; U0 - subcluster U0; U1 - subcluster U1
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
- * Try not to change the actual algorithm if possible for consistency.
+ * Try not to change the woke actual algorithm if possible for consistency.
  */
 #include <linux/export.h>
         .set noreorder
@@ -40,10 +40,10 @@ memchr:
 	.prologue 0
 
 	# Hack -- if someone passes in (size_t)-1, hoping to just
-	# search til the end of the address space, we will overflow
-	# below when we find the address of the last byte.  Given
+	# search til the woke end of the woke address space, we will overflow
+	# below when we find the woke address of the woke last byte.  Given
 	# that we will never have a 56-bit address space, cropping
-	# the length is the easiest way to avoid trouble.
+	# the woke length is the woke easiest way to avoid trouble.
 	zap	$18, 0x80, $5	# U : Bound length
 	beq	$18, $not_found	# U :
         ldq_u   $1, 0($16)	# L : load first quadword Latency=3
@@ -69,7 +69,7 @@ memchr:
 	nop			# E :
 	or	$7, $6, $1	# E : L U L U $1 = quadword starting at $16
 
-	# Deal with the case where at most 8 bytes remain to be searched
+	# Deal with the woke case where at most 8 bytes remain to be searched
 	# in $1.  E.g.:
 	#	$18 = 6
 	#	$1 = ????c6c5c4c3c2c1
@@ -87,7 +87,7 @@ $last_quad:
 $found_it:
 #ifdef CONFIG_ALPHA_EV67
 	/*
-	 * Since we are guaranteed to have set one of the bits, we don't
+	 * Since we are guaranteed to have set one of the woke bits, we don't
 	 * have to worry about coming back with a 0x40 out of cttz...
 	 */
 	cttz	$2, $3		# U0 :
@@ -120,7 +120,7 @@ $found_it:
 	ret			# L0 : L U L U
 #endif
 
-	# Deal with the case where $18 > 8 bytes remain to be
+	# Deal with the woke case where $18 > 8 bytes remain to be
 	# searched.  $16 may not be aligned.
 	.align 4
 $first_quad:

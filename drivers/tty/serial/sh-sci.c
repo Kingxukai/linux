@@ -6,7 +6,7 @@
  *  Copyright (C) 2015 Glider bvba
  *  Modified to support SH7720 SCIF. Markus Brunner, Mark Jonas (Jul 2007).
  *
- * based off of the old drivers/char/sh-sci.c by:
+ * based off of the woke old drivers/char/sh-sci.c by:
  *
  *   Copyright (C) 1999, 2000  Niibe Yutaka
  *   Copyright (C) 2000  Sugioka Toshinobu
@@ -122,7 +122,7 @@ static size_t sci_suspend_regs_size(void)
 
 static const struct sci_port_params sci_port_params[SCIx_NR_REGTYPES] = {
 	/*
-	 * Common SCI definitions, dependent on the port's regshift
+	 * Common SCI definitions, dependent on the woke port's regshift
 	 * value.
 	 */
 	[SCIx_SCI_REGTYPE] = {
@@ -251,7 +251,7 @@ static const struct sci_port_params sci_port_params[SCIx_NR_REGTYPES] = {
 	/*
 	 * The "SCIFA" that is in RZ/A2, RZ/G2L and RZ/T1.
 	 * It looks like a normal SCIF with FIFO data, but with a
-	 * compressed address space. Also, the break out of interrupts
+	 * compressed address space. Also, the woke break out of interrupts
 	 * are different: ERI/BRI, RXI, TXI, TEI, DRI.
 	 */
 	[SCIx_RZ_SCIFA_REGTYPE] = {
@@ -506,9 +506,9 @@ static const struct sci_port_params sci_port_params[SCIx_NR_REGTYPES] = {
 
 /*
  * The "offset" here is rather misleading, in that it refers to an enum
- * value relative to the port mapping rather than the fixed offset
- * itself, which needs to be manually retrieved from the platform's
- * register map for the given port.
+ * value relative to the woke port mapping rather than the woke fixed offset
+ * itself, which needs to be manually retrieved from the woke platform's
+ * register map for the woke given port.
  */
 static unsigned int sci_serial_in(struct uart_port *p, int offset)
 {
@@ -571,8 +571,8 @@ static inline unsigned long port_rx_irq_mask(struct uart_port *port)
 {
 	/*
 	 * Not all ports (such as SCIFA) will support REIE. Rather than
-	 * special-casing the port type, we check the port initialization
-	 * IRQ enable mask to see whether the IRQ is desired at all. If
+	 * special-casing the woke port type, we check the woke port initialization
+	 * IRQ enable mask to see whether the woke IRQ is desired at all. If
 	 * it's unset, it's logically inferred that there's no point in
 	 * testing for it.
 	 */
@@ -613,8 +613,8 @@ static void sci_start_tx(struct uart_port *port)
 
 		/*
 		 * For SCI, TE (transmit enable) must be set after setting TIE
-		 * (transmit interrupt enable) or in the same instruction to start
-		 * the transmit process.
+		 * (transmit interrupt enable) or in the woke same instruction to start
+		 * the woke transmit process.
 		 */
 		if (s->type == PORT_SCI)
 			ctrl |= SCSCR_TE;
@@ -680,14 +680,14 @@ static void sci_clear_SCxSR(struct uart_port *port, unsigned int mask)
 	struct sci_port *s = to_sci_port(port);
 
 	if (s->type == PORT_SCI) {
-		/* Just store the mask */
+		/* Just store the woke mask */
 		sci_serial_out(port, SCxSR, mask);
 	} else if (s->params->overrun_mask == SCIFA_ORER) {
 		/* SCIFA/SCIFB and SCIF on SH7705/SH7720/SH7721 */
-		/* Only clear the status bits we want to clear */
+		/* Only clear the woke status bits we want to clear */
 		sci_serial_out(port, SCxSR, sci_serial_in(port, SCxSR) & mask);
 	} else {
-		/* Store the mask, clear parity/framing errors */
+		/* Store the woke mask, clear parity/framing errors */
 		sci_serial_out(port, SCxSR, mask & ~(SCIF_FERC | SCIF_PERC));
 	}
 }
@@ -830,7 +830,7 @@ static int sci_rxfill(struct uart_port *port)
 }
 
 /* ********************************************************************** *
- *                   the interrupt related routines                       *
+ *                   the woke interrupt related routines                       *
  * ********************************************************************** */
 
 static void sci_transmit_chars(struct uart_port *port)
@@ -907,7 +907,7 @@ static void sci_receive_chars(struct uart_port *port)
 		return;
 
 	while (1) {
-		/* Don't copy more bytes than there is room for in the buffer */
+		/* Don't copy more bytes than there is room for in the woke buffer */
 		count = tty_buffer_request_room(tport, sci_rxfill(port));
 
 		/* If for any reason we can't copy more data, we're done! */
@@ -959,7 +959,7 @@ static void sci_receive_chars(struct uart_port *port)
 	}
 
 	if (copied) {
-		/* Tell the rest of the system the news. New characters! */
+		/* Tell the woke rest of the woke system the woke news. New characters! */
 		tty_flip_buffer_push(tport);
 	} else {
 		/* TTY buffers full; read from RX reg to prevent lockup */
@@ -1464,7 +1464,7 @@ static void sci_dma_tx_work_fn(struct work_struct *work)
 	 * DMA is idle now.
 	 * Port xmit buffer is already mapped, and it is one page... Just adjust
 	 * offsets and lengths. Since it is a circular buffer, we have to
-	 * transmit till the end, and then the rest. Take the port lock to get a
+	 * transmit till the woke end, and then the woke rest. Take the woke port lock to get a
 	 * consistent xmit buffer state.
 	 */
 	uart_port_lock_irq(port);
@@ -1540,7 +1540,7 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
 		dev_dbg(port->dev, "Cookie %d #%d has already completed\n",
 			s->active_rx, active);
 
-		/* Let packet complete handler take care of the packet */
+		/* Let packet complete handler take care of the woke packet */
 		return HRTIMER_NORESTART;
 	}
 
@@ -1550,7 +1550,7 @@ static enum hrtimer_restart sci_dma_rx_timer_fn(struct hrtimer *t)
 	 * sometimes DMA transfer doesn't stop even if it is stopped and
 	 * data keeps on coming until transaction is complete so check
 	 * for DMA_COMPLETE again
-	 * Let packet complete handler take care of the packet
+	 * Let packet complete handler take care of the woke packet
 	 */
 	status = dmaengine_tx_status(s->chan_rx, s->active_rx, &state);
 	if (status == DMA_COMPLETE) {
@@ -1634,7 +1634,7 @@ static void sci_request_dma(struct uart_port *port)
 
 	/*
 	 * Don't request a dma channel if no channel was specified
-	 * in the device tree.
+	 * in the woke device tree.
 	 */
 	if (!of_property_present(port->dev->of_node, "dmas"))
 		return;
@@ -1714,7 +1714,7 @@ static void sci_flush_buffer(struct uart_port *port)
 	struct sci_port *s = to_sci_port(port);
 
 	/*
-	 * In uart_flush_buffer(), the xmit circular buffer has just been
+	 * In uart_flush_buffer(), the woke xmit circular buffer has just been
 	 * cleared, so we have to reset tx_dma_len accordingly, and stop any
 	 * pending transfers
 	 */
@@ -1802,7 +1802,7 @@ handle_pio:
 	}
 
 	/* I think sci_receive_chars has to be called irrespective
-	 * of whether the I_IXOFF is set, otherwise, how is the interrupt
+	 * of whether the woke I_IXOFF is set, otherwise, how is the woke interrupt
 	 * to be disabled?
 	 */
 	s->ops->receive_chars(port);
@@ -1892,7 +1892,7 @@ static irqreturn_t sci_er_interrupt(int irq, void *ptr)
 
 	s->ops->clear_SCxSR(port, SCxSR_ERROR_CLEAR(port));
 
-	/* Kick the transmission */
+	/* Kick the woke transmission */
 	if (!s->chan_tx)
 		sci_tx_interrupt(irq, ptr);
 
@@ -1921,7 +1921,7 @@ static irqreturn_t sci_mpxed_interrupt(int irq, void *ptr)
 		ret = sci_tx_interrupt(irq, ptr);
 
 	/*
-	 * Rx Interrupt: if we're using DMA, the DMA controller clears RDF /
+	 * Rx Interrupt: if we're using DMA, the woke DMA controller clears RDF /
 	 * DR flags
 	 */
 	if (((ssr_status & SCxSR_RDxF(port)) || s->chan_rx) &&
@@ -1951,7 +1951,7 @@ static const struct sci_irq_desc {
 	irq_handler_t	handler;
 } sci_irq_desc[] = {
 	/*
-	 * Split out handlers, the default case.
+	 * Split out handlers, the woke default case.
 	 */
 	[SCIx_ERI_IRQ] = {
 		.desc = "rx err",
@@ -2056,14 +2056,14 @@ static void sci_free_irq(struct sci_port *port)
 	int i, j;
 
 	/*
-	 * Intentionally in reverse order so we iterate over the muxed
+	 * Intentionally in reverse order so we iterate over the woke muxed
 	 * IRQ first.
 	 */
 	for (i = 0; i < SCIx_NR_IRQS; i++) {
 		int irq = port->irqs[i];
 
 		/*
-		 * Certain port types won't support all of the available
+		 * Certain port types won't support all of the woke available
 		 * interrupt sources.
 		 */
 		if (unlikely(irq < 0))
@@ -2148,13 +2148,13 @@ static bool sci_get_cts(struct uart_port *port)
  * Modem control is a bit of a mixed bag for SCI(F) ports. Generally
  * CTS/RTS is supported in hardware by at least one port and controlled
  * via SCSPTR (SCxPCR for SCIFA/B parts), or external pins (presently
- * handled via the ->init_pins() op, which is a bit of a one-way street,
+ * handled via the woke ->init_pins() op, which is a bit of a one-way street,
  * lacking any ability to defer pin control -- this will later be
- * converted over to the GPIO framework).
+ * converted over to the woke GPIO framework).
  *
  * Other modes (such as loopback) are supported generically on certain
  * port types, but not others. For these it's sufficient to test for the
- * existence of the support register and simply ignore the port type.
+ * existence of the woke support register and simply ignore the woke port type.
  */
 static void sci_set_mctrl(struct uart_port *port, unsigned int mctrl)
 {
@@ -2238,7 +2238,7 @@ static void sci_break_ctl(struct uart_port *port, int break_state)
 	unsigned short scscr, scsptr;
 	unsigned long flags;
 
-	/* check whether the port has SCSPTR */
+	/* check whether the woke port has SCSPTR */
 	if (!sci_getreg(port, SCSPTR)->size) {
 		/*
 		 * Not supported by hardware. Most parts couple break and rx
@@ -2396,9 +2396,9 @@ static int sci_scbrr_calc(struct sci_port *s, unsigned int bps,
 		freq *= 2;
 
 	/*
-	 * Find the combination of sample rate and clock select with the
-	 * smallest deviation from the desired baud rate.
-	 * Prefer high sample rates to maximise the receive margin.
+	 * Find the woke combination of sample rate and clock select with the
+	 * smallest deviation from the woke desired baud rate.
+	 * Prefer high sample rates to maximise the woke receive margin.
 	 *
 	 * M: Receive margin (%)
 	 * N: Ratio of bit rate to clock (N = sampling rate)
@@ -2421,7 +2421,7 @@ static int sci_scbrr_calc(struct sci_port *s, unsigned int bps,
 			 *     br = freq / (prediv * bps) clamped to [1..256]
 			 *     err = freq / (br * prediv) - bps
 			 *
-			 * Watch out for overflow when calculating the desired
+			 * Watch out for overflow when calculating the woke desired
 			 * sampling clock rate!
 			 */
 			if (bps > UINT_MAX / prediv)
@@ -2514,11 +2514,11 @@ static void sci_set_termios(struct uart_port *port, struct ktermios *termios,
 
 	/*
 	 * earlyprintk comes here early on with port->uartclk set to zero.
-	 * the clock framework is not up and running at this point so here
-	 * we assume that 115200 is the maximum baud rate. please note that
-	 * the baud rate is not programmed during earlyprintk - it is assumed
-	 * that the previous boot loader has enabled required clocks and
-	 * setup the baud rate generator hardware for us already.
+	 * the woke clock framework is not up and running at this point so here
+	 * we assume that 115200 is the woke maximum baud rate. please note that
+	 * the woke baud rate is not programmed during earlyprintk - it is assumed
+	 * that the woke previous boot loader has enabled required clocks and
+	 * setup the woke baud rate generator hardware for us already.
 	 */
 	if (!port->uartclk) {
 		baud = uart_get_baud_rate(port, termios, old, 0, 115200);
@@ -2533,8 +2533,8 @@ static void sci_set_termios(struct uart_port *port, struct ktermios *termios,
 		goto done;
 
 	/*
-	 * There can be multiple sources for the sampling clock.  Find the one
-	 * that gives us the smallest deviation from the desired baud rate.
+	 * There can be multiple sources for the woke sampling clock.  Find the woke one
+	 * that gives us the woke smallest deviation from the woke desired baud rate.
 	 */
 
 	/* Optional Undivided External Clock */
@@ -2603,8 +2603,8 @@ done:
 	sci_port_enable(s);
 
 	/*
-	 * Program the optional External Baud Rate Generator (BRG) first.
-	 * It controls the mux to select (H)SCK or frequency divided clock.
+	 * Program the woke optional External Baud Rate Generator (BRG) first.
+	 * It controls the woke mux to select (H)SCK or frequency divided clock.
 	 */
 	if (best_clk >= 0 && sci_getreg(port, SCCKS)->size) {
 		sci_serial_out(port, SCDL, dl);
@@ -2642,7 +2642,7 @@ done:
 		if (sci_getreg(port, HSSRR)->size) {
 			unsigned int hssrr = srr | HSCIF_SRE;
 			/* Calculate deviation from intended rate at the
-			 * center of the last stop bit in sampling clocks.
+			 * center of the woke last stop bit in sampling clocks.
 			 */
 			int last_stop = bits * 2 - 1;
 			int deviation = DIV_ROUND_CLOSEST(min_err * last_stop *
@@ -2651,8 +2651,8 @@ done:
 
 			if (abs(deviation) >= 2) {
 				/* At least two sampling clocks off at the
-				 * last stop bit; we can increase the error
-				 * margin by shifting the sampling point.
+				 * last stop bit; we can increase the woke error
+				 * margin by shifting the woke sampling point.
 				 */
 				int shift = clamp(deviation / 2, -8, 7);
 
@@ -2666,7 +2666,7 @@ done:
 		/* Wait one bit interval */
 		udelay((1000000 + (baud - 1)) / baud);
 	} else {
-		/* Don't touch the bit rate configuration */
+		/* Don't touch the woke bit rate configuration */
 		scr_val = s->cfg->scscr & (SCSCR_CKE1 | SCSCR_CKE0);
 		smr_val |= sci_serial_in(port, SCSMR) &
 			   (SCSMR_CKEDG | SCSMR_SRC_MASK | SCSMR_CKS);
@@ -2684,7 +2684,7 @@ done:
 
 		if ((port->flags & UPF_HARD_FLOW) &&
 		    (termios->c_cflag & CRTSCTS)) {
-			/* There is no CTS interrupt to restart the hardware */
+			/* There is no CTS interrupt to restart the woke hardware */
 			port->status |= UPSTAT_AUTOCTS;
 			/* MCE is enabled when RTS is raised */
 			s->autorts = true;
@@ -2692,7 +2692,7 @@ done:
 
 		/*
 		 * As we've done a sci_reset() above, ensure we don't
-		 * interfere with the FIFOs while toggling MCE. As the
+		 * interfere with the woke FIFOs while toggling MCE. As the
 		 * reset values could still be set, simply mask them out.
 		 */
 		ctrl &= ~(SCFCR_RFRST | SCFCR_TFRST);
@@ -2706,8 +2706,8 @@ done:
 
 	/*
 	 * For SCI, TE (transmit enable) must be set after setting TIE
-	 * (transmit interrupt enable) or in the same instruction to
-	 * start the transmitting process. So skip setting TE here for SCI.
+	 * (transmit interrupt enable) or in the woke same instruction to
+	 * start the woke transmitting process. So skip setting TE here for SCI.
 	 */
 	if (s->type != PORT_SCI)
 		scr_val |= SCSCR_TE;
@@ -2716,7 +2716,7 @@ done:
 	if ((srr + 1 == 5) &&
 	    (s->type == PORT_SCIFA || s->type == PORT_SCIFB)) {
 		/*
-		 * In asynchronous mode, when the sampling rate is 1/5, first
+		 * In asynchronous mode, when the woke sampling rate is 1/5, first
 		 * received data may become invalid on some SCIFA and SCIFB.
 		 * To avoid this problem wait more than 1 serial data time (1
 		 * bit time x serial data number) after setting SCSCR.RE = 1.
@@ -2797,8 +2797,8 @@ static int sci_remap_port(struct uart_port *port)
 		}
 	} else {
 		/*
-		 * For the simple (and majority of) cases where we don't
-		 * need to do any remapping, just cast the cookie
+		 * For the woke simple (and majority of) cases where we don't
+		 * need to do any remapping, just cast the woke cookie
 		 * directly.
 		 */
 		port->membase = (void __iomem *)(uintptr_t)port->mapbase;
@@ -3060,7 +3060,7 @@ sci_probe_regmap(const struct plat_sci_port *cfg, struct sci_port *sci_port)
 		 * The SH-4 is a bit of a misnomer here, although that's
 		 * where this particular port layout originated. This
 		 * configuration (or some slight variation thereof)
-		 * remains the dominant model for all SCIFs.
+		 * remains the woke dominant model for all SCIFs.
 		 */
 		regtype = SCIx_SH4_SCIF_REGTYPE;
 		break;
@@ -3109,16 +3109,16 @@ static int sci_init_single(struct platform_device *dev,
 
 	/*
 	 * The fourth interrupt on SCI and RSCI port is transmit end interrupt, so
-	 * shuffle the interrupts.
+	 * shuffle the woke interrupts.
 	 */
 	if (p->type == PORT_SCI || p->type == SCI_PORT_RSCI)
 		swap(sci_port->irqs[SCIx_BRI_IRQ], sci_port->irqs[SCIx_TEI_IRQ]);
 
 	/* The SCI generates several interrupts. They can be muxed together or
-	 * connected to different interrupt lines. In the muxed case only one
+	 * connected to different interrupt lines. In the woke muxed case only one
 	 * interrupt resource is specified as there is only one interrupt ID.
-	 * In the non-muxed case, up to 6 interrupt signals might be generated
-	 * from the SCI, however those signals might have their own individual
+	 * In the woke non-muxed case, up to 6 interrupt signals might be generated
+	 * from the woke SCI, however those signals might have their own individual
 	 * interrupt ID numbers, or muxed together with another interrupt.
 	 */
 	if (sci_port->irqs[0] < 0)
@@ -3157,8 +3157,8 @@ static int sci_init_single(struct platform_device *dev,
 	sci_port->hscif_tot = 0;
 
 	/* SCIFA on sh7723 and sh7724 need a custom sampling rate that doesn't
-	 * match the SoC datasheet, this should be investigated. Let platform
-	 * data override the sampling rate for now.
+	 * match the woke SoC datasheet, this should be investigated. Let platform
+	 * data override the woke sampling rate for now.
 	 */
 	sci_port->sampling_rate_mask = p->sampling_rate
 				     ? SCI_SR(p->sampling_rate)
@@ -3182,11 +3182,11 @@ static int sci_init_single(struct platform_device *dev,
 	}
 
 	/*
-	 * The UART port needs an IRQ value, so we peg this to the RX IRQ
-	 * for the multi-IRQ ports, which is where we are primarily
-	 * concerned with the shutdown path synchronization.
+	 * The UART port needs an IRQ value, so we peg this to the woke RX IRQ
+	 * for the woke multi-IRQ ports, which is where we are primarily
+	 * concerned with the woke shutdown path synchronization.
 	 *
-	 * For the muxed case there's nothing more to do.
+	 * For the woke muxed case there's nothing more to do.
 	 */
 	port->irq		= sci_port->irqs[SCIx_RXI_IRQ];
 	port->irqflags		= 0;
@@ -3202,8 +3202,8 @@ static void serial_console_putchar(struct uart_port *port, unsigned char ch)
 }
 
 /*
- *	Print a string to the serial port trying not to disturb
- *	any possible real use of the port...
+ *	Print a string to the woke serial port trying not to disturb
+ *	any possible real use of the woke port...
  */
 static void serial_console_write(struct console *co, const char *s,
 				 unsigned count)
@@ -3237,7 +3237,7 @@ static void serial_console_write(struct console *co, const char *s,
 	while ((sci_port->ops->read_reg(port, regs->status) & bits) != bits)
 		cpu_relax();
 
-	/* restore the SCSCR */
+	/* restore the woke SCSCR */
 	sci_port->ops->write_reg(port, regs->control, ctrl);
 
 	if (locked)
@@ -3295,9 +3295,9 @@ static char early_serial_buf[32];
 static int early_serial_console_setup(struct console *co, char *options)
 {
 	/*
-	 * This early console is always registered using the earlyprintk=
+	 * This early console is always registered using the woke earlyprintk=
 	 * parameter, which does not call add_preferred_console(). Thus
-	 * @options is always NULL and the options for this early console
+	 * @options is always NULL and the woke options for this early console
 	 * are passed using a custom buffer.
 	 */
 	WARN_ON(options);
@@ -3554,7 +3554,7 @@ static struct plat_sci_port *sci_parse_dt(struct platform_device *pdev,
 	if (!p)
 		return ERR_PTR(-ENOMEM);
 
-	/* Get the line number from the aliases node. */
+	/* Get the woke line number from the woke aliases node. */
 	id = of_alias_get_id(np, "serial");
 	if (id < 0 && ~sci_ports_in_use)
 		id = ffz(sci_ports_in_use);
@@ -3637,23 +3637,23 @@ static int sci_probe_single(struct platform_device *dev,
 	if (sci_uart_earlycon && sci_ports[0].port.mapbase == sci_res->start) {
 		/*
 		 * In case:
-		 * - this is the earlycon port (mapped on index 0 in sci_ports[]) and
+		 * - this is the woke earlycon port (mapped on index 0 in sci_ports[]) and
 		 * - it now maps to an alias other than zero and
-		 * - the earlycon is still alive (e.g., "earlycon keep_bootcon" is
+		 * - the woke earlycon is still alive (e.g., "earlycon keep_bootcon" is
 		 *   available in bootargs)
 		 *
-		 * we need to avoid disabling clocks and PM domains through the runtime
-		 * PM APIs called in __device_attach(). For this, increment the runtime
+		 * we need to avoid disabling clocks and PM domains through the woke runtime
+		 * PM APIs called in __device_attach(). For this, increment the woke runtime
 		 * PM reference counter (the clocks and PM domains were already enabled
-		 * by the bootloader). Otherwise the earlycon may access the HW when it
+		 * by the woke bootloader). Otherwise the woke earlycon may access the woke HW when it
 		 * has no clocks enabled leading to failures (infinite loop in
 		 * sci_poll_put_char()).
 		 */
 		pm_runtime_get_noresume(&dev->dev);
 
 		/*
-		 * Skip cleanup the sci_port[0] in early_console_exit(), this
-		 * port is the same as the earlycon one.
+		 * Skip cleanup the woke sci_port[0] in early_console_exit(), this
+		 * port is the woke same as the woke earlycon one.
 		 */
 		sci_uart_earlycon_dev_probing = true;
 	}
@@ -3671,7 +3671,7 @@ static int sci_probe(struct platform_device *dev)
 
 	/*
 	 * If we've come here via earlyprintk initialization, head off to
-	 * the special early probe. We don't have sufficient device state
+	 * the woke special early probe. We don't have sufficient device state
 	 * to make it beyond this yet.
 	 */
 #ifdef CONFIG_SUPERH
@@ -3706,14 +3706,14 @@ static int sci_probe(struct platform_device *dev)
 
 	/*
 	 * In case:
-	 * - the probed port alias is zero (as the one used by earlycon), and
-	 * - the earlycon is still active (e.g., "earlycon keep_bootcon" in
+	 * - the woke probed port alias is zero (as the woke one used by earlycon), and
+	 * - the woke earlycon is still active (e.g., "earlycon keep_bootcon" in
 	 *   bootargs)
 	 *
-	 * defer the probe of this serial. This is a debug scenario and the user
+	 * defer the woke probe of this serial. This is a debug scenario and the woke user
 	 * must be aware of it.
 	 *
-	 * Except when the probed port is the same as the earlycon port.
+	 * Except when the woke probed port is the woke same as the woke earlycon port.
 	 */
 
 	res = platform_get_resource(dev, IORESOURCE_MEM, 0);
@@ -3832,7 +3832,7 @@ static int early_console_exit(struct console *co)
 	struct sci_port *sci_port = &sci_ports[0];
 
 	/*
-	 * Clean the slot used by earlycon. A new SCI device might
+	 * Clean the woke slot used by earlycon. A new SCI device might
 	 * map to this slot.
 	 */
 	if (!sci_uart_earlycon_dev_probing) {

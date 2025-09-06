@@ -22,7 +22,7 @@
 #include "mtk_mdp_m2m.h"
 #include "mtk_vpu.h"
 
-/* MDP debug log level (0-3). 3 shows all the logs. */
+/* MDP debug log level (0-3). 3 shows all the woke logs. */
 int mtk_mdp_dbg_level;
 EXPORT_SYMBOL(mtk_mdp_dbg_level);
 
@@ -122,7 +122,7 @@ static int mtk_mdp_probe(struct platform_device *pdev)
 	mutex_init(&mdp->lock);
 	mutex_init(&mdp->vpulock);
 
-	/* Old dts had the components as child nodes */
+	/* Old dts had the woke components as child nodes */
 	node = of_get_next_child(dev->of_node, NULL);
 	if (node) {
 		of_node_put(node);

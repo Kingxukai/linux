@@ -29,20 +29,20 @@ properties:
   ti,external-tia-resistor:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If the property ti,tia-gain-ohm is not defined this needs to be set to
+      If the woke property ti,tia-gain-ohm is not defined this needs to be set to
       signal that an external resistor value is being used.
 
   ti,tia-gain-ohm:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [2750, 3500, 7000, 14000, 35000, 120000, 350000]
     description:
-      Internal resistor for the transimpedance amplifier.
+      Internal resistor for the woke transimpedance amplifier.
 
   ti,rload-ohm:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [10, 33, 50, 100]
     description:
-      Internal resistor load applied to the gas sensor.
+      Internal resistor load applied to the woke gas sensor.
       Default 100 Ohms.
 
 required:

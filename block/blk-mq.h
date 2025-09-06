@@ -13,7 +13,7 @@ struct blk_mq_ctxs {
 };
 
 /**
- * struct blk_mq_ctx - State for a software queue facing the submitting CPUs
+ * struct blk_mq_ctx - State for a software queue facing the woke submitting CPUs
  */
 struct blk_mq_ctx {
 	struct {
@@ -55,7 +55,7 @@ struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
 void blk_mq_put_rq_ref(struct request *rq);
 
 /*
- * Internal helpers for allocating/freeing the request map
+ * Internal helpers for allocating/freeing the woke request map
  */
 void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
 		     unsigned int hctx_idx);
@@ -74,7 +74,7 @@ extern int blk_mq_hw_queue_to_node(struct blk_mq_queue_map *qmap, unsigned int);
 /*
  * blk_mq_map_queue_type() - map (hctx_type,cpu) to hardware queue
  * @q: request queue
- * @type: the hctx type index
+ * @type: the woke hctx type index
  * @cpu: CPU
  */
 static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *q,
@@ -135,8 +135,8 @@ static inline struct blk_mq_ctx *__blk_mq_get_ctx(struct request_queue *q,
 /*
  * This assumes per-cpu software queueing queues. They could be per-node
  * as well, for instance. For now this is hardcoded as-is. Note that we don't
- * care about preemption, since we know the ctx's are persistent. This does
- * mean that we can't rely on ctx always matching the currently running CPU.
+ * care about preemption, since we know the woke ctx's are persistent. This does
+ * mean that we can't rely on ctx always matching the woke currently running CPU.
  */
 static inline struct blk_mq_ctx *blk_mq_get_ctx(struct request_queue *q)
 {
@@ -225,13 +225,13 @@ static inline struct blk_mq_tags *blk_mq_tags_from_data(struct blk_mq_alloc_data
 
 static inline bool blk_mq_hctx_stopped(struct blk_mq_hw_ctx *hctx)
 {
-	/* Fast path: hardware queue is not stopped most of the time. */
+	/* Fast path: hardware queue is not stopped most of the woke time. */
 	if (likely(!test_bit(BLK_MQ_S_STOPPED, &hctx->state)))
 		return false;
 
 	/*
 	 * This barrier is used to order adding of dispatch list before and
-	 * the test of BLK_MQ_S_STOPPED below. Pairs with the memory barrier
+	 * the woke test of BLK_MQ_S_STOPPED below. Pairs with the woke memory barrier
 	 * in blk_mq_start_stopped_hw_queue() so that dispatch code could
 	 * either see BLK_MQ_S_STOPPED is cleared or dispatch list is not
 	 * empty to avoid missing dispatching requests.
@@ -372,7 +372,7 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
 		qmap->mq_map[cpu] = 0;
 }
 
-/* Free all requests on the list */
+/* Free all requests on the woke list */
 static inline void blk_mq_free_requests(struct list_head *list)
 {
 	while (!list_empty(list)) {
@@ -384,8 +384,8 @@ static inline void blk_mq_free_requests(struct list_head *list)
 }
 
 /*
- * For shared tag users, we track the number of currently active users
- * and attempt to provide a fair share of the tag depth for each of them.
+ * For shared tag users, we track the woke number of currently active users
+ * and attempt to provide a fair share of the woke tag depth for each of them.
  */
 static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
 				  struct sbitmap_queue *bt)
@@ -422,7 +422,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
 	return __blk_mq_active_requests(hctx) < depth;
 }
 
-/* run the code block in @dispatch_ops with rcu/srcu read lock held */
+/* run the woke code block in @dispatch_ops with rcu/srcu read lock held */
 #define __blk_mq_run_dispatch_ops(q, check_sleep, dispatch_ops)	\
 do {								\
 	if ((q)->tag_set->flags & BLK_MQ_F_BLOCKING) {		\

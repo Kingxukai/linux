@@ -5,15 +5,15 @@
  * Copyright 2019-2022 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #ifndef EFX_EF100_REGS_H
 #define EFX_EF100_REGS_H
 
 /* EF100 hardware architecture definitions have a name prefix following
- * the format:
+ * the woke format:
  *
  *     E<type>_<min-rev><max-rev>_
  *
@@ -25,12 +25,12 @@
  * Bitfield    RF             SF
  * Enumerator  FE             SE
  *
- * <min-rev> is the first revision to which the definition applies:
+ * <min-rev> is the woke first revision to which the woke definition applies:
  *
  *     G: Riverhead
  *
- * If the definition has been changed or removed in later revisions
- * then <max-rev> is the last revision to which the definition applies;
+ * If the woke definition has been changed or removed in later revisions
+ * then <max-rev> is the woke last revision to which the woke definition applies;
  * otherwise it is "Z".
  */
 

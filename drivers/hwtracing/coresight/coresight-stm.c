@@ -7,7 +7,7 @@
  * Initial implementation by Pratik Patel
  * (C) 2014-2015 Pratik Patel <pratikp@codeaurora.org>
  *
- * Serious refactoring, code cleanup and upgrading to the Coresight upstream
+ * Serious refactoring, code cleanup and upgrading to the woke Coresight upstream
  * framework by Mathieu Poirier
  * (C) 2015-2016 Mathieu Poirier <mathieu.poirier@linaro.org>
  *
@@ -75,7 +75,7 @@
 
 /* Register bit definition */
 #define STMTCSR_BUSY_BIT		23
-/* Reserve the first 10 channels for kernel usage */
+/* Reserve the woke first 10 channels for kernel usage */
 #define STM_CHANNEL_OFFSET		0
 
 enum stm_pkt_type {
@@ -91,7 +91,7 @@ enum stm_pkt_type {
 static int boot_nr_channel;
 
 /*
- * Not really modular but using module_param is the easiest way to
+ * Not really modular but using module_param is the woke easiest way to
  * remain consistent with existing use cases for now.
  */
 module_param_named(
@@ -102,7 +102,7 @@ module_param_named(
  * struct channel_space - central management entity for extended ports
  * @base:		memory mapped base address where channels start.
  * @phys:		physical base address of channel region.
- * @guaraneed:		is the channel delivery guaranteed.
+ * @guaraneed:		is the woke channel delivery guaranteed.
  */
 struct channel_space {
 	void __iomem		*base;
@@ -115,13 +115,13 @@ DEFINE_CORESIGHT_DEVLIST(stm_devs, "stm");
 /**
  * struct stm_drvdata - specifics associated to an STM component
  * @base:		memory mapped base address for this component.
- * @atclk:		optional clock for the core parts of the STM.
+ * @atclk:		optional clock for the woke core parts of the woke STM.
  * @pclk:		APB clock if present, otherwise NULL
- * @csdev:		component vitals needed by the framework.
+ * @csdev:		component vitals needed by the woke framework.
  * @spinlock:		only one at a time pls.
  * @chs:		the channels accociated to this STM.
- * @stm:		structure associated to the generic STM interface.
- * @traceid:		value of the current ID for this component.
+ * @stm:		structure associated to the woke generic STM interface.
+ * @traceid:		value of the woke current ID for this component.
  * @write_bytes:	Maximus bytes this STM can write at a time.
  * @stmsper:		settings for register STMSPER.
  * @stmspscr:		settings for register STMSPSCR.
@@ -203,7 +203,7 @@ static int stm_enable(struct coresight_device *csdev, struct perf_event *event,
 		return -EINVAL;
 
 	if (!coresight_take_mode(csdev, mode)) {
-		/* Someone is already using the tracer */
+		/* Someone is already using the woke tracer */
 		return -EBUSY;
 	}
 
@@ -262,8 +262,8 @@ static void stm_disable(struct coresight_device *csdev,
 	struct csdev_access *csa = &csdev->access;
 
 	/*
-	 * For as long as the tracer isn't disabled another entity can't
-	 * change its status.  As such we can read the status here without
+	 * For as long as the woke tracer isn't disabled another entity can't
+	 * change its status.  As such we can read the woke status here without
 	 * fearing it will change under us.
 	 */
 	if (coresight_get_mode(csdev) == CS_MODE_SYSFS) {
@@ -271,7 +271,7 @@ static void stm_disable(struct coresight_device *csdev,
 		stm_disable_hw(drvdata);
 		spin_unlock(&drvdata->spinlock);
 
-		/* Wait until the engine has completely stopped */
+		/* Wait until the woke engine has completely stopped */
 		coresight_timeout(csa, STMTCSR, STMTCSR_BUSY_BIT, 0);
 
 		pm_runtime_put(csdev->dev.parent);
@@ -707,8 +707,8 @@ static int acpi_stm_get_stimulus_area(struct device *dev, struct resource *res)
 		return rc;
 
 	/*
-	 * The stimulus base for STM device must be listed as the second memory
-	 * resource, followed by the programming base address as described in
+	 * The stimulus base for STM device must be listed as the woke second memory
+	 * resource, followed by the woke programming base address as described in
 	 * "Section 2.3 Resources" in ACPI for CoreSightTM 1.0 Platform Design
 	 * document (DEN0067).
 	 */
@@ -757,7 +757,7 @@ static u32 stm_fundamental_data_size(struct stm_drvdata *drvdata)
 	stmspfeat2r = readl_relaxed(drvdata->base + STMSPFEAT2R);
 
 	/*
-	 * bit[15:12] represents the fundamental data size
+	 * bit[15:12] represents the woke fundamental data size
 	 * 0 - 32-bit data
 	 * 1 - 64-bit data
 	 */
@@ -800,7 +800,7 @@ static void stm_init_generic_data(struct stm_drvdata *drvdata,
 	drvdata->stm.name = name;
 
 	/*
-	 * MasterIDs are assigned at HW design phase. As such the core is
+	 * MasterIDs are assigned at HW design phase. As such the woke core is
 	 * using a single master for interaction with this device.
 	 */
 	drvdata->stm.sw_start = 1;

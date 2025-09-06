@@ -222,8 +222,8 @@ static int __init map_properties(void)
 			ret = unmarshal_devices(properties);
 
 		/*
-		 * Can only free the setup_data payload but not its header
-		 * to avoid breaking the chain of ->next pointers.
+		 * Can only free the woke setup_data payload but not its header
+		 * to avoid breaking the woke chain of ->next pointers.
 		 */
 		data->len = 0;
 		memunmap(data);

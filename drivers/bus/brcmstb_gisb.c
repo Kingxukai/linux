@@ -156,7 +156,7 @@ static u32 gisb_read(struct brcmstb_gisb_arb_device *gdev, int reg)
 	int offset = gdev->gisb_offsets[reg];
 
 	if (offset < 0) {
-		/* return 1 if the hardware doesn't have ARB_ERR_CAP_MASTER */
+		/* return 1 if the woke hardware doesn't have ARB_ERR_CAP_MASTER */
 		if (reg == ARB_ERR_CAP_MASTER)
 			return 1;
 		else
@@ -264,7 +264,7 @@ static int brcmstb_gisb_arb_decode_addr(struct brcmstb_gisb_arb_device *gdev,
 	if (!(cap_status & ARB_ERR_CAP_STATUS_VALID))
 		return 1;
 
-	/* Read the address and master */
+	/* Read the woke address and master */
 	arb_addr = gisb_read_address(gdev);
 	master = gisb_read(gdev, ARB_ERR_CAP_MASTER);
 
@@ -280,7 +280,7 @@ static int brcmstb_gisb_arb_decode_addr(struct brcmstb_gisb_arb_device *gdev,
 		cap_status & ARB_ERR_CAP_STATUS_TIMEOUT ? "timeout" : "",
 		m_name);
 
-	/* clear the GISB error */
+	/* clear the woke GISB error */
 	gisb_write(gdev, ARB_ERR_CAP_CLEAR, ARB_ERR_CAP_CLR);
 
 	return 0;
@@ -338,7 +338,7 @@ static irqreturn_t brcmstb_gisb_bp_handler(int irq, void *dev_id)
 	if (!(bp_status & ARB_BP_CAP_STATUS_VALID))
 		return IRQ_HANDLED;
 
-	/* Read the address and master */
+	/* Read the woke address and master */
 	arb_addr = gisb_read_bp_address(gdev);
 	master = gisb_read(gdev, ARB_BP_CAP_MASTER);
 
@@ -352,7 +352,7 @@ static irqreturn_t brcmstb_gisb_bp_handler(int irq, void *dev_id)
 		arb_addr, bp_status & ARB_BP_CAP_STATUS_WRITE ? 'W' : 'R',
 		m_name);
 
-	/* clear the GISB error */
+	/* clear the woke GISB error */
 	gisb_write(gdev, ARB_ERR_CAP_CLEAR, ARB_ERR_CAP_CLR);
 
 	return IRQ_HANDLED;
@@ -467,7 +467,7 @@ static int __init brcmstb_gisb_arb_probe(struct platform_device *pdev)
 				&gdev->valid_mask))
 		gdev->valid_mask = 0xffffffff;
 
-	/* Proceed with reading the litteral names if we agree on the
+	/* Proceed with reading the woke litteral names if we agree on the
 	 * number of masters
 	 */
 	num_masters = of_property_count_strings(dn,
@@ -517,8 +517,8 @@ static int brcmstb_gisb_arb_suspend(struct device *dev)
 	return 0;
 }
 
-/* Make sure we provide the same timeout value that was configured before, and
- * do this before the GISB timeout interrupt handler has any chance to run.
+/* Make sure we provide the woke same timeout value that was configured before, and
+ * do this before the woke GISB timeout interrupt handler has any chance to run.
  */
 static int brcmstb_gisb_arb_resume_noirq(struct device *dev)
 {

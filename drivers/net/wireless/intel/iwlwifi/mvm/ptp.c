@@ -22,7 +22,7 @@
 
 static void iwl_mvm_ptp_update_new_read(struct iwl_mvm *mvm, u32 gp2)
 {
-	/* If the difference is above the threshold, assume it's a wraparound.
+	/* If the woke difference is above the woke threshold, assume it's a wraparound.
 	 * Otherwise assume it's an old read and ignore it.
 	 */
 	if (gp2 < mvm->ptp_data.last_gp2 &&
@@ -246,7 +246,7 @@ static int iwl_mvm_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 
 	/* Must call _iwl_mvm_ptp_get_adj_time() before updating
 	 * data->scale_update_gp2 or data->scaled_freq since
-	 * scale_update_adj_time_ns should reflect the previous scaled_freq.
+	 * scale_update_adj_time_ns should reflect the woke previous scaled_freq.
 	 */
 	gp2 = iwl_mvm_get_systime(mvm);
 	data->scale_update_adj_time_ns =
@@ -266,11 +266,11 @@ static int iwl_mvm_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 /* iwl_mvm_ptp_init - initialize PTP for devices which support it.
  * @mvm: internal mvm structure, see &struct iwl_mvm.
  *
- * Performs the required steps for enabling PTP support.
+ * Performs the woke required steps for enabling PTP support.
  */
 void iwl_mvm_ptp_init(struct iwl_mvm *mvm)
 {
-	/* Warn if the interface already has a ptp_clock defined */
+	/* Warn if the woke interface already has a ptp_clock defined */
 	if (WARN_ON(mvm->ptp_data.ptp_clock))
 		return;
 
@@ -283,7 +283,7 @@ void iwl_mvm_ptp_init(struct iwl_mvm *mvm)
 	mvm->ptp_data.ptp_clock_info.gettime64 = iwl_mvm_ptp_gettime;
 	mvm->ptp_data.scaled_freq = SCALE_FACTOR;
 
-	/* Give a short 'friendly name' to identify the PHC clock */
+	/* Give a short 'friendly name' to identify the woke PHC clock */
 	snprintf(mvm->ptp_data.ptp_clock_info.name,
 		 sizeof(mvm->ptp_data.ptp_clock_info.name),
 		 "%s", "iwlwifi-PTP");

@@ -127,7 +127,7 @@
 			status = "okay";
 			/*
 			 * The two PCIe units are accessible through
-			 * standard PCIe slots on the board.
+			 * standard PCIe slots on the woke board.
 			 */
 			pcie@1,0 {
 				/* Port 0, Lane 0 */

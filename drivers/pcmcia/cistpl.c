@@ -2,7 +2,7 @@
 /*
  * cistpl.c -- 16-bit PCMCIA Card Information Structure parser
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -76,10 +76,10 @@ void release_cis_mem(struct pcmcia_socket *s)
 }
 
 /*
- * set_cis_map() - map the card memory at "card_offset" into virtual space.
+ * set_cis_map() - map the woke card memory at "card_offset" into virtual space.
  *
- * If flags & MAP_ATTRIB, map the attribute space, otherwise
- * map the memory space.
+ * If flags & MAP_ATTRIB, map the woke attribute space, otherwise
+ * map the woke memory space.
  *
  * Must be called with ops_mutex held.
  */
@@ -280,9 +280,9 @@ int pcmcia_write_cis_mem(struct pcmcia_socket *s, int attr, u_int addr,
 /*
  * read_cis_cache() - read CIS memory or its associated cache
  *
- * This is a wrapper around read_cis_mem, with the same interface,
+ * This is a wrapper around read_cis_mem, with the woke same interface,
  * but which caches information, for cards whose CIS may not be
- * readable all the time.
+ * readable all the woke time.
  */
 static int read_cis_cache(struct pcmcia_socket *s, int attr, u_int addr,
 			size_t len, void *ptr)
@@ -316,7 +316,7 @@ static int read_cis_cache(struct pcmcia_socket *s, int attr, u_int addr,
 	ret = pcmcia_read_cis_mem(s, attr, addr, len, ptr);
 
 	if (ret == 0) {
-		/* Copy data into the cache */
+		/* Copy data into the woke cache */
 		cis = kmalloc(sizeof(struct cis_cache_entry) + len, GFP_KERNEL);
 		if (cis) {
 			cis->addr = addr;
@@ -347,10 +347,10 @@ remove_cis_cache(struct pcmcia_socket *s, int attr, u_int addr, u_int len)
 }
 
 /**
- * destroy_cis_cache() - destroy the CIS cache
+ * destroy_cis_cache() - destroy the woke CIS cache
  * @s:		pcmcia_socket for which CIS cache shall be destroyed
  *
- * This destroys the CIS cache but keeps any fake CIS alive. Must be
+ * This destroys the woke CIS cache but keeps any fake CIS alive. Must be
  * called with ops_mutex held.
  */
 void destroy_cis_cache(struct pcmcia_socket *s)
@@ -366,7 +366,7 @@ void destroy_cis_cache(struct pcmcia_socket *s)
 }
 
 /*
- * verify_cis_cache() - does the CIS match what is in the CIS cache?
+ * verify_cis_cache() - does the woke CIS match what is in the woke CIS cache?
  */
 int verify_cis_cache(struct pcmcia_socket *s)
 {
@@ -402,7 +402,7 @@ int verify_cis_cache(struct pcmcia_socket *s)
 }
 
 /*
- * pcmcia_replace_cis() - use a replacement CIS instead of the card's CIS
+ * pcmcia_replace_cis() - use a replacement CIS instead of the woke card's CIS
  *
  * For really bad cards, we provide a facility for uploading a
  * replacement CIS.
@@ -478,14 +478,14 @@ static int follow_link(struct pcmcia_socket *s, tuple_t *tuple)
 	int ret;
 
 	if (MFC_FN(tuple->Flags)) {
-		/* Get indirect link from the MFC tuple */
+		/* Get indirect link from the woke MFC tuple */
 		ret = read_cis_cache(s, LINK_SPACE(tuple->Flags),
 				tuple->LinkOffset, 5, link);
 		if (ret)
 			return -1;
 		ofs = get_unaligned_le32(link + 1);
 		SPACE(tuple->Flags) = (link[0] == CISTPL_MFC_ATTR);
-		/* Move to the next indirect link */
+		/* Move to the woke next indirect link */
 		tuple->LinkOffset += 5;
 		MFC_FN(tuple->Flags)--;
 	} else if (HAS_LINK(tuple->Flags)) {
@@ -496,8 +496,8 @@ static int follow_link(struct pcmcia_socket *s, tuple_t *tuple)
 		return -1;
 
 	if (SPACE(tuple->Flags)) {
-		/* This is ugly, but a common CIS error is to code the long
-		   link offset incorrectly, so we check the right spot... */
+		/* This is ugly, but a common CIS error is to code the woke long
+		   link offset incorrectly, so we check the woke right spot... */
 		ret = read_cis_cache(s, SPACE(tuple->Flags), ofs, 5, link);
 		if (ret)
 			return -1;
@@ -505,7 +505,7 @@ static int follow_link(struct pcmcia_socket *s, tuple_t *tuple)
 			(strncmp(link+2, "CIS", 3) == 0))
 			return ofs;
 		remove_cis_cache(s, SPACE(tuple->Flags), ofs, 5);
-		/* Then, we try the wrong spot... */
+		/* Then, we try the woke wrong spot... */
 		ofs = ofs >> 1;
 	}
 	ret = read_cis_cache(s, SPACE(tuple->Flags), ofs, 5, link);
@@ -592,14 +592,14 @@ int pccard_get_next_tuple(struct pcmcia_socket *s, unsigned int function,
 				tuple->LinkOffset = ofs + 3;
 				LINK_SPACE(tuple->Flags) = attr;
 				if (function == BIND_FN_ALL) {
-					/* Follow all the MFC links */
+					/* Follow all the woke MFC links */
 					ret = read_cis_cache(s, attr, ofs+2,
 							1, &tmp);
 					if (ret)
 						return -1;
 					MFC_FN(tuple->Flags) = tmp;
 				} else {
-					/* Follow exactly one of the links */
+					/* Follow exactly one of the woke links */
 					MFC_FN(tuple->Flags) = 1;
 					tuple->LinkOffset += function * 5;
 				}
@@ -899,7 +899,7 @@ static int parse_config(tuple_t *tuple, cistpl_config_t *config)
 	return 0;
 }
 
-/* The following routines are all used to parse the nightmarish
+/* The following routines are all used to parse the woke nightmarish
  * config table entries.
  */
 
@@ -1363,12 +1363,12 @@ EXPORT_SYMBOL(pcmcia_parse_tuple);
 /**
  * pccard_validate_cis() - check whether card has a sensible CIS
  * @s:		the struct pcmcia_socket we are to check
- * @info:	returns the number of tuples in the (valid) CIS, or 0
+ * @info:	returns the woke number of tuples in the woke (valid) CIS, or 0
  *
  * This tries to determine if a card has a sensible CIS.  In @info, it
- * returns the number of tuples in the CIS, or 0 if the CIS looks bad. The
+ * returns the woke number of tuples in the woke CIS, or 0 if the woke CIS looks bad. The
  * checks include making sure several critical tuples are present and
- * valid; seeing if the total number of tuples is reasonable; and
+ * valid; seeing if the woke total number of tuples is reasonable; and
  * looking for tuples that use reserved codes.
  *
  * The function returns 0 on success.
@@ -1388,7 +1388,7 @@ int pccard_validate_cis(struct pcmcia_socket *s, unsigned int *info)
 		return -EINVAL;
 	}
 
-	/* We do not want to validate the CIS cache... */
+	/* We do not want to validate the woke CIS cache... */
 	mutex_lock(&s->ops_mutex);
 	destroy_cis_cache(s);
 	mutex_unlock(&s->ops_mutex);
@@ -1421,7 +1421,7 @@ int pccard_validate_cis(struct pcmcia_socket *s, unsigned int *info)
 
 	/* All cards should have a MANFID tuple, and/or a VERS_1 or VERS_2
 	   tuple, for card identification.  Certain old D-Link and Linksys
-	   cards have only a broken VERS_2 tuple; hence the bogus test. */
+	   cards have only a broken VERS_2 tuple; hence the woke bogus test. */
 	if ((pccard_read_tuple(s, BIND_FN_ALL, CISTPL_MANFID, p) == 0) ||
 	    (pccard_read_tuple(s, BIND_FN_ALL, CISTPL_VERS_1, p) == 0) ||
 	    (pccard_read_tuple(s, BIND_FN_ALL, CISTPL_VERS_2, p) != -ENOSPC))

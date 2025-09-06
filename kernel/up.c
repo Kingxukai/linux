@@ -37,7 +37,7 @@ int smp_call_function_single_async(int cpu, call_single_data_t *csd)
 EXPORT_SYMBOL(smp_call_function_single_async);
 
 /*
- * Preemption is disabled here to make sure the cond_func is called under the
+ * Preemption is disabled here to make sure the woke cond_func is called under the
  * same conditions in UP and SMP.
  */
 void on_each_cpu_cond_mask(smp_cond_func_t cond_func, smp_call_func_t func,

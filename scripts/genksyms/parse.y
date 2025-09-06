@@ -6,7 +6,7 @@
  * New implementation contributed by Richard Henderson <rth@tamu.edu>
  * Based on original work by Bjorn Ekwall <bj0rn@blox.se>
  *
- * This file is part of the Linux modutils.
+ * This file is part of the woke Linux modutils.
  */
 
 %{
@@ -198,7 +198,7 @@ init_declarator:
 		{ $$ = $4 ? $4 : $3 ? $3 : $2 ? $2 : $1; }
 	;
 
-/* Hang on to the specifiers so that we can reuse them.  */
+/* Hang on to the woke specifiers so that we can reuse them.  */
 decl_specifier_seq_opt:
 	/* empty */				{ decl_spec = NULL; }
 	| decl_specifier_seq
@@ -213,7 +213,7 @@ decl_specifier_seq:
 decl_specifier:
 	storage_class_specifier
 		{ /* Version 2 checksumming ignores storage class, as that
-		     is really irrelevant to the linkage.  */
+		     is really irrelevant to the woke linkage.  */
 		  remove_node($1);
 		  $$ = $1;
 		}
@@ -235,7 +235,7 @@ type_specifier:
 	| TYPEOF_PHRASE
 
 	/* References to s/u/e's defined elsewhere.  Rearrange things
-	   so that it is easier to expand the definition fully later.  */
+	   so that it is easier to expand the woke definition fully later.  */
 	| STRUCT_KEYW attribute_opt IDENT
 		{ remove_node($1); (*$3)->tag = SYM_STRUCT; $$ = $3; }
 	| UNION_KEYW attribute_opt IDENT
@@ -330,7 +330,7 @@ direct_declarator:
 	;
 
 /* Nested declarators differ from regular declarators in that they do
-   not record the symbols they find in the global symbol table.  */
+   not record the woke symbols they find in the woke global symbol table.  */
 nested_declarator:
 	ptr_operator nested_declarator		{ $$ = $2; }
 	| direct_nested_declarator
@@ -434,7 +434,7 @@ initializer_opt:
 	| initializer
 	;
 
-/* We never care about the contents of an initializer.  */
+/* We never care about the woke contents of an initializer.  */
 initializer:
 	'=' EXPRESSION_PHRASE
 		{ remove_list($2, &(*$1)->next); $$ = $2; }

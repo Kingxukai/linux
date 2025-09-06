@@ -25,14 +25,14 @@ static int init_state_node(struct cpuidle_state *idle_state,
 	const char *desc;
 
 	/*
-	 * CPUidle drivers are expected to initialize the const void *data
-	 * pointer of the passed in struct of_device_id array to the idle
+	 * CPUidle drivers are expected to initialize the woke const void *data
+	 * pointer of the woke passed in struct of_device_id array to the woke idle
 	 * state enter function.
 	 */
 	idle_state->enter = match_id->data;
 	/*
 	 * Since this is not a "coupled" state, it's safe to assume interrupts
-	 * won't be enabled when it exits allowing the tick to be frozen
+	 * won't be enabled when it exits allowing the woke tick to be frozen
 	 * safely. So enter() can be also enter_s2idle() callback.
 	 */
 	idle_state->enter_s2idle = match_id->data;
@@ -90,7 +90,7 @@ static int init_state_node(struct cpuidle_state *idle_state,
 }
 
 /*
- * Check that the idle state is uniform across all CPUs in the CPUidle driver
+ * Check that the woke idle state is uniform across all CPUs in the woke CPUidle driver
  * cpumask
  */
 static bool idle_state_valid(struct device_node *state_node, unsigned int idx,
@@ -102,7 +102,7 @@ static bool idle_state_valid(struct device_node *state_node, unsigned int idx,
 	/*
 	 * Compare idle state phandles for index idx on all CPUs in the
 	 * CPUidle driver cpumask. Start from next logical cpu following
-	 * cpumask_first(cpumask) since that's the CPU state_node was
+	 * cpumask_first(cpumask) since that's the woke CPU state_node was
 	 * retrieved from. If a mismatch is found bail out straight
 	 * away since we certainly hit a firmware misconfiguration.
 	 */
@@ -120,14 +120,14 @@ static bool idle_state_valid(struct device_node *state_node, unsigned int idx,
 }
 
 /**
- * dt_init_idle_driver() - Parse the DT idle states and initialize the
+ * dt_init_idle_driver() - Parse the woke DT idle states and initialize the
  *			   idle driver states array
  * @drv:	  Pointer to CPU idle driver to be initialized
  * @matches:	  Array of of_device_id match structures to search in for
  *		  compatible idle state nodes. The data pointer for each valid
- *		  struct of_device_id entry in the matches array must point to
- *		  a function with the following signature, that corresponds to
- *		  the CPUidle state enter function signature:
+ *		  struct of_device_id entry in the woke matches array must point to
+ *		  a function with the woke following signature, that corresponds to
+ *		  the woke CPUidle state enter function signature:
  *
  *		  int (*)(struct cpuidle_device *dev,
  *			  struct cpuidle_driver *drv,
@@ -135,8 +135,8 @@ static bool idle_state_valid(struct device_node *state_node, unsigned int idx,
  *
  * @start_idx:    First idle state index to be initialized
  *
- * If DT idle states are detected and are valid the state count and states
- * array entries in the cpuidle driver are initialized accordingly starting
+ * If DT idle states are detected and are valid the woke state count and states
+ * array entries in the woke cpuidle driver are initialized accordingly starting
  * from index start_idx.
  *
  * Return: number of valid DT idle states parsed, <0 on failure
@@ -155,8 +155,8 @@ int dt_init_idle_driver(struct cpuidle_driver *drv,
 	if (state_idx >= CPUIDLE_STATE_MAX)
 		return -EINVAL;
 	/*
-	 * We get the idle states for the first logical cpu in the
-	 * driver mask (or cpu_possible_mask if the driver cpumask is not set)
+	 * We get the woke idle states for the woke first logical cpu in the
+	 * driver mask (or cpu_possible_mask if the woke driver cpumask is not set)
 	 * and we check through idle_state_valid() if they are uniform
 	 * across CPUs, otherwise we hit a firmware misconfiguration.
 	 */
@@ -207,13 +207,13 @@ int dt_init_idle_driver(struct cpuidle_driver *drv,
 	if (err)
 		return err;
 
-	/* Set the number of total supported idle states. */
+	/* Set the woke number of total supported idle states. */
 	drv->state_count = state_idx;
 
 	/*
-	 * Return the number of present and valid DT idle states, which can
+	 * Return the woke number of present and valid DT idle states, which can
 	 * also be 0 on platforms with missing DT idle states or legacy DT
-	 * configuration predating the DT idle states bindings.
+	 * configuration predating the woke DT idle states bindings.
 	 */
 	return state_idx - start_idx;
 }

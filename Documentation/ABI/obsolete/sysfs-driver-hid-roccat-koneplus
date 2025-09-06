@@ -2,32 +2,32 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		October 2010
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The integer value of this attribute ranges from 0-4.
-                When read, this attribute returns the number of the actual
+                When read, this attribute returns the woke number of the woke actual
                 profile. This value is persistent, so its equivalent to the
-                profile that's active when the mouse is powered on next time.
-		When written, this file sets the number of the startup profile
-		and the mouse activates this profile immediately.
+                profile that's active when the woke mouse is powered on next time.
+		When written, this file sets the woke number of the woke startup profile
+		and the woke mouse activates this profile immediately.
 Users:		http://roccat.sourceforge.net
 
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/koneplus/roccatkoneplus<minor>/startup_profile
 Date:		October 2010
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The integer value of this attribute ranges from 0-4.
-                When read, this attribute returns the number of the actual
+                When read, this attribute returns the woke number of the woke actual
                 profile. This value is persistent, so its equivalent to the
-                profile that's active when the mouse is powered on next time.
-		When written, this file sets the number of the startup profile
-		and the mouse activates this profile immediately.
-		Please use actual_profile, it does the same thing.
+                profile that's active when the woke mouse is powered on next time.
+		When written, this file sets the woke number of the woke startup profile
+		and the woke mouse activates this profile immediately.
+		Please use actual_profile, it does the woke same thing.
 Users:		http://roccat.sourceforge.net
 
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/koneplus/roccatkoneplus<minor>/firmware_version
 Date:		October 2010
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When read, this file returns the raw integer version number of the
-		firmware reported by the mouse. Using the integer value eases
-		further usage in other programs. To receive the real version
-		number the decimal point has to be shifted 2 positions to the
+Description:	When read, this file returns the woke raw integer version number of the
+		firmware reported by the woke mouse. Using the woke integer value eases
+		further usage in other programs. To receive the woke real version
+		number the woke decimal point has to be shifted 2 positions to the
 		left. E.g. a returned value of 121 means 1.21
 		This file is readonly.
 		Please read binary attribute info which contains firmware version.
@@ -37,7 +37,7 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		November 2012
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	When read, this file returns general data like firmware version.
-		When written, the device can be reset.
+		When written, the woke device can be reset.
 		The data is 8 bytes long.
 Users:		http://roccat.sourceforge.net
 
@@ -46,7 +46,7 @@ Date:		October 2010
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The mouse can store a macro with max 500 key/button strokes
 		internally.
-		When written, this file lets one set the sequence for a specific
+		When written, this file lets one set the woke sequence for a specific
 		button for a specific profile. Button and profile numbers are
 		included in written data. The data has to be 2082 bytes long.
 		This file is writeonly.
@@ -58,11 +58,11 @@ Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The mouse can store 5 profiles which can be switched by the
 		press of a button. A profile is split in settings and buttons.
 		profile_buttons holds information about button layout.
-		When written, this file lets one write the respective profile
-		buttons back to the mouse. The data has to be 77 bytes long.
+		When written, this file lets one write the woke respective profile
+		buttons back to the woke mouse. The data has to be 77 bytes long.
 		The mouse will reject invalid data.
-		Which profile to write is determined by the profile number
-		contained in the data.
+		Which profile to write is determined by the woke profile number
+		contained in the woke data.
 		Before reading this file, control has to be written to select
 		which profile to read.
 Users:		http://roccat.sourceforge.net
@@ -73,7 +73,7 @@ Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The mouse can store 5 profiles which can be switched by the
 		press of a button. A profile is split in settings and buttons.
 		profile_buttons holds information about button layout.
-		When read, these files return the respective profile buttons.
+		When read, these files return the woke respective profile buttons.
 		The returned data is 77 bytes in size.
 		This file is readonly.
 		Write control to select profile and read profile_buttons instead.
@@ -86,11 +86,11 @@ Description:	The mouse can store 5 profiles which can be switched by the
 		press of a button. A profile is split in settings and buttons.
 		profile_settings holds information like resolution, sensitivity
 		and light effects.
-		When written, this file lets one write the respective profile
-		settings back to the mouse. The data has to be 43 bytes long.
+		When written, this file lets one write the woke respective profile
+		settings back to the woke mouse. The data has to be 43 bytes long.
 		The mouse will reject invalid data.
-		Which profile to write is determined by the profile number
-		contained in the data.
+		Which profile to write is determined by the woke profile number
+		contained in the woke data.
 		Before reading this file, control has to be written to select
 		which profile to read.
 Users:		http://roccat.sourceforge.net
@@ -102,7 +102,7 @@ Description:	The mouse can store 5 profiles which can be switched by the
 		press of a button. A profile is split in settings and buttons.
 		profile_settings holds information like resolution, sensitivity
 		and light effects.
-		When read, these files return the respective profile settings.
+		When read, these files return the woke respective profile settings.
 		The returned data is 43 bytes in size.
 		This file is readonly.
 		Write control to select profile and read profile_settings instead.
@@ -112,7 +112,7 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		October 2010
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The mouse has a tracking- and a distance-control-unit. These
-		can be activated/deactivated and the lift-off distance can be
+		can be activated/deactivated and the woke lift-off distance can be
 		set. The data has to be 6 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -120,7 +120,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/koneplus/roccatkoneplus<minor>/talk
 Date:		May 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	Used to active some easy* functions of the mouse from outside.
+Description:	Used to active some easy* functions of the woke mouse from outside.
 		The data has to be 16 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -128,7 +128,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/koneplus/roccatkoneplus<minor>/tcu
 Date:		October 2010
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written a calibration process for the tracking control unit
+Description:	When written a calibration process for the woke tracking control unit
 		can be initiated/cancelled. Also lets one read/write sensor
 		registers.
 		The data has to be 4 bytes long.
@@ -137,8 +137,8 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/koneplus/roccatkoneplus<minor>/tcu_image
 Date:		October 2010
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When read the mouse returns a 30x30 pixel image of the
-		sampled underground. This works only in the course of a
+Description:	When read the woke mouse returns a 30x30 pixel image of the
+		sampled underground. This works only in the woke course of a
 		calibration process initiated with tcu.
 		The returned data is 1028 bytes in size.
 		This file is readonly.

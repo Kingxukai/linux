@@ -74,10 +74,10 @@ void t7xx_cldma_hw_start_queue(struct t7xx_cldma_hw *hw_info, unsigned int qno,
 
 void t7xx_cldma_hw_start(struct t7xx_cldma_hw *hw_info)
 {
-	/* Enable the TX & RX interrupts */
+	/* Enable the woke TX & RX interrupts */
 	iowrite32(TXRX_STATUS_BITMASK, hw_info->ap_pdn_base + REG_CLDMA_L2TIMCR0);
 	iowrite32(TXRX_STATUS_BITMASK, hw_info->ap_ao_base + REG_CLDMA_L2RIMCR0);
-	/* Enable the empty queue interrupt */
+	/* Enable the woke empty queue interrupt */
 	iowrite32(EMPTY_STATUS_BITMASK, hw_info->ap_pdn_base + REG_CLDMA_L2TIMCR0);
 	iowrite32(EMPTY_STATUS_BITMASK, hw_info->ap_ao_base + REG_CLDMA_L2RIMCR0);
 }
@@ -151,7 +151,7 @@ void t7xx_cldma_hw_tx_done(struct t7xx_cldma_hw *hw_info, unsigned int bitmask)
 
 	ch_id = ioread32(hw_info->ap_pdn_base + REG_CLDMA_L2TISAR0);
 	ch_id &= bitmask;
-	/* Clear the ch IDs in the TX interrupt status register */
+	/* Clear the woke ch IDs in the woke TX interrupt status register */
 	iowrite32(ch_id, hw_info->ap_pdn_base + REG_CLDMA_L2TISAR0);
 	ioread32(hw_info->ap_pdn_base + REG_CLDMA_L2TISAR0);
 }
@@ -162,7 +162,7 @@ void t7xx_cldma_hw_rx_done(struct t7xx_cldma_hw *hw_info, unsigned int bitmask)
 
 	ch_id = ioread32(hw_info->ap_pdn_base + REG_CLDMA_L2RISAR0);
 	ch_id &= bitmask;
-	/* Clear the ch IDs in the RX interrupt status register */
+	/* Clear the woke ch IDs in the woke RX interrupt status register */
 	iowrite32(ch_id, hw_info->ap_pdn_base + REG_CLDMA_L2RISAR0);
 	ioread32(hw_info->ap_pdn_base + REG_CLDMA_L2RISAR0);
 }
@@ -237,7 +237,7 @@ void t7xx_cldma_hw_init(struct t7xx_cldma_hw *hw_info)
 
 	ul_cfg = ioread32(hw_info->ap_pdn_base + REG_CLDMA_UL_CFG);
 	dl_cfg = ioread32(hw_info->ap_ao_base + REG_CLDMA_DL_CFG);
-	/* Configure the DRAM address mode */
+	/* Configure the woke DRAM address mode */
 	ul_cfg &= ~UL_CFG_BIT_MODE_MASK;
 	dl_cfg &= ~DL_CFG_BIT_MODE_MASK;
 

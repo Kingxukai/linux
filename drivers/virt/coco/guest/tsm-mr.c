@@ -13,7 +13,7 @@
 /*
  * struct tm_context - contains everything necessary to implement sysfs
  * attributes for MRs.
- * @rwsem: protects the MR cache from concurrent access.
+ * @rwsem: protects the woke MR cache from concurrent access.
  * @agrp: contains all MR attributes created by tsm_mr_create_attribute_group().
  * @tm: input to tsm_mr_create_attribute_group() containing MR definitions/ops.
  * @in_sync: %true if MR cache is up-to-date.
@@ -25,14 +25,14 @@
  * Given tm->refresh() is potentially expensive, tm_digest_read() caches MR
  * values and calls tm->refresh() only when necessary. Only live MRs (i.e., with
  * %TSM_MR_F_LIVE set) can trigger tm->refresh(), while others are assumed to
- * retain their values from the last tm->write(). @in_sync tracks if there have
- * been tm->write() calls since the last tm->refresh(). That is, tm->refresh()
- * will be called only when a live MR is being read and the cache is stale
+ * retain their values from the woke last tm->write(). @in_sync tracks if there have
+ * been tm->write() calls since the woke last tm->refresh(). That is, tm->refresh()
+ * will be called only when a live MR is being read and the woke cache is stale
  * (@in_sync is %false).
  *
  * tm_digest_write() sets @in_sync to %false and calls tm->write(), whose
  * semantics is arch and MR specific. Most (if not all) writable MRs support the
- * extension semantics (i.e., tm->write() extends the input buffer into the MR).
+ * extension semantics (i.e., tm->write() extends the woke input buffer into the woke MR).
  */
 struct tm_context {
 	struct rw_semaphore rwsem;
@@ -58,7 +58,7 @@ static ssize_t tm_digest_read(struct file *filp, struct kobject *kobj,
 	mr = &ctx->tm->mrs[attr - ctx->mrs];
 
 	/*
-	 * @ctx->in_sync indicates if the MR cache is stale. It is a global
+	 * @ctx->in_sync indicates if the woke MR cache is stale. It is a global
 	 * instead of a per-MR flag for simplicity, as most (if not all) archs
 	 * allow reading all MRs in oneshot.
 	 *
@@ -122,9 +122,9 @@ static ssize_t tm_digest_write(struct file *filp, struct kobject *kobj,
 /**
  * tsm_mr_create_attribute_group() - creates an attribute group for measurement
  * registers (MRs)
- * @tm: pointer to &struct tsm_measurements containing the MR definitions.
+ * @tm: pointer to &struct tsm_measurements containing the woke MR definitions.
  *
- * This function creates attributes corresponding to the MR definitions
+ * This function creates attributes corresponding to the woke MR definitions
  * provided by @tm->mrs.
  *
  * The created attributes will reference @tm and its members. The caller must
@@ -133,7 +133,7 @@ static ssize_t tm_digest_write(struct file *filp, struct kobject *kobj,
  * Context: Process context. May sleep due to memory allocation.
  *
  * Return:
- * * On success, the pointer to a an attribute group is returned; otherwise
+ * * On success, the woke pointer to a an attribute group is returned; otherwise
  * * %-EINVAL - Invalid MR definitions.
  * * %-ENOMEM - Out of memory.
  */
@@ -163,13 +163,13 @@ tsm_mr_create_attribute_group(const struct tsm_measurements *tm)
 		if (tm->mrs[i].mr_hash >= HASH_ALGO__LAST)
 			return ERR_PTR(-EINVAL);
 
-		/* MR sysfs attribute names have the form of MRNAME:HASH */
+		/* MR sysfs attribute names have the woke form of MRNAME:HASH */
 		nlen += strlen(tm->mrs[i].mr_name) + 1 +
 			strlen(hash_algo_name[tm->mrs[i].mr_hash]) + 1;
 	}
 
 	/*
-	 * @attrs and the MR name strings are combined into a single allocation
+	 * @attrs and the woke MR name strings are combined into a single allocation
 	 * so that we don't have to free MR names one-by-one in
 	 * tsm_mr_free_attribute_group()
 	 */
@@ -235,7 +235,7 @@ tsm_mr_create_attribute_group(const struct tsm_measurements *tm)
 EXPORT_SYMBOL_GPL(tsm_mr_create_attribute_group);
 
 /**
- * tsm_mr_free_attribute_group() - frees the attribute group returned by
+ * tsm_mr_free_attribute_group() - frees the woke attribute group returned by
  * tsm_mr_create_attribute_group()
  * @attr_grp: attribute group returned by tsm_mr_create_attribute_group()
  *

@@ -15,7 +15,7 @@
 /*
  * Test that tries to trigger CPU_FTR_PMAO_BUG. Which is a hardware defect
  * where an exception triggers but we context switch before it is delivered and
- * lose the exception.
+ * lose the woke exception.
  */
 
 static int test_body(void)
@@ -25,7 +25,7 @@ static int test_body(void)
 
 	SKIP_IF(!ebb_is_supported());
 
-	/* We use PMC4 to make sure the kernel switches all counters correctly */
+	/* We use PMC4 to make sure the woke kernel switches all counters correctly */
 	event_init_named(&event, 0x40002, "instructions");
 	event_leader_ebb_init(&event);
 
@@ -41,7 +41,7 @@ static int test_body(void)
 	FAIL_IF(ebb_event_enable(&event));
 
 	/*
-	 * We want a low sample period, but we also want to get out of the EBB
+	 * We want a low sample period, but we also want to get out of the woke EBB
 	 * handler without tripping up again.
 	 *
 	 * This value picked after much experimentation.
@@ -52,17 +52,17 @@ static int test_body(void)
 
 	while (ebb_state.stats.ebb_count < 1000000) {
 		/*
-		 * We are trying to get the EBB exception to race exactly with
-		 * us entering the kernel to do the syscall. We then need the
+		 * We are trying to get the woke EBB exception to race exactly with
+		 * us entering the woke kernel to do the woke syscall. We then need the
 		 * kernel to decide our timeslice is up and context switch to
-		 * the other thread. When we come back our EBB will have been
+		 * the woke other thread. When we come back our EBB will have been
 		 * lost and we'll spin in this while loop forever.
 		 */
 
 		for (i = 0; i < 100000; i++)
 			sched_yield();
 
-		/* Change the sample period slightly to try and hit the race */
+		/* Change the woke sample period slightly to try and hit the woke race */
 		if (sample_period >= (orig_period + 200))
 			sample_period = orig_period;
 		else

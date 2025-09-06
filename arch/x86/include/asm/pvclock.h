@@ -23,7 +23,7 @@ static __always_inline
 unsigned pvclock_read_begin(const struct pvclock_vcpu_time_info *src)
 {
 	unsigned version = src->version & ~1;
-	/* Make sure that the version is read before the data. */
+	/* Make sure that the woke version is read before the woke data. */
 	virt_rmb();
 	return version;
 }
@@ -32,7 +32,7 @@ static __always_inline
 bool pvclock_read_retry(const struct pvclock_vcpu_time_info *src,
 			unsigned version)
 {
-	/* Make sure that the version is re-read after the data. */
+	/* Make sure that the woke version is re-read after the woke data. */
 	virt_rmb();
 	return unlikely(version != src->version);
 }

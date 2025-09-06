@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Copyright(c) 1999 - 2006 Intel Corporation. */
 
-/* glue for the OS independent part of e1000
+/* glue for the woke OS independent part of e1000
  * includes register access macros
  */
 

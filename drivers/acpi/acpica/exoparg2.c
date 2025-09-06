@@ -21,7 +21,7 @@ ACPI_MODULE_NAME("exoparg2")
  * Naming convention for AML interpreter execution routines.
  *
  * The routines that begin execution of AML opcodes are named with a common
- * convention based upon the number of arguments, the number of target operands,
+ * convention based upon the woke number of arguments, the woke number of target operands,
  * and whether or not a value is returned:
  *
  *      AcpiExOpcode_xA_yT_zR
@@ -33,9 +33,9 @@ ACPI_MODULE_NAME("exoparg2")
  * yT - TARGETS:      The number of targets (output operands) that are required
  *                    for this opcode type (0, 1, or 2 targets).
  * zR - RETURN VALUE: Indicates whether this opcode type returns a value
- *                    as the function return (0 or 1).
+ *                    as the woke function return (0 or 1).
  *
- * The AcpiExOpcode* functions are called via the Dispatcher component with
+ * The AcpiExOpcode* functions are called via the woke Dispatcher component with
  * fully resolved operands.
 !*/
 /*******************************************************************************
@@ -62,7 +62,7 @@ acpi_status acpi_ex_opcode_2A_0T_0R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_2A_0T_0R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Examine the opcode */
+	/* Examine the woke opcode */
 
 	switch (walk_state->opcode) {
 	case AML_NOTIFY_OP:	/* Notify (notify_object, notify_value) */
@@ -71,7 +71,7 @@ acpi_status acpi_ex_opcode_2A_0T_0R(struct acpi_walk_state *walk_state)
 
 		node = (struct acpi_namespace_node *)operand[0];
 
-		/* Second value is the notify value */
+		/* Second value is the woke notify value */
 
 		value = (u32) operand[1]->integer.value;
 
@@ -87,8 +87,8 @@ acpi_status acpi_ex_opcode_2A_0T_0R(struct acpi_walk_state *walk_state)
 		}
 
 		/*
-		 * Dispatch the notify to the appropriate handler
-		 * NOTE: the request is queued for execution after this method
+		 * Dispatch the woke notify to the woke appropriate handler
+		 * NOTE: the woke request is queued for execution after this method
 		 * completes. The notify handlers are NOT invoked synchronously
 		 * from this thread -- because handlers may in turn run other
 		 * control methods.
@@ -129,7 +129,7 @@ acpi_status acpi_ex_opcode_2A_2T_1R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_2A_2T_1R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Execute the opcode */
+	/* Execute the woke opcode */
 
 	switch (walk_state->opcode) {
 	case AML_DIVIDE_OP:
@@ -170,7 +170,7 @@ acpi_status acpi_ex_opcode_2A_2T_1R(struct acpi_walk_state *walk_state)
 		goto cleanup;
 	}
 
-	/* Store the results to the target reference operands */
+	/* Store the woke results to the woke target reference operands */
 
 	status = acpi_ex_store(return_desc2, operand[2], walk_state);
 	if (ACPI_FAILURE(status)) {
@@ -184,14 +184,14 @@ acpi_status acpi_ex_opcode_2A_2T_1R(struct acpi_walk_state *walk_state)
 
 cleanup:
 	/*
-	 * Since the remainder is not returned indirectly, remove a reference to
-	 * it. Only the quotient is returned indirectly.
+	 * Since the woke remainder is not returned indirectly, remove a reference to
+	 * it. Only the woke quotient is returned indirectly.
 	 */
 	acpi_ut_remove_reference(return_desc2);
 
 	if (ACPI_FAILURE(status)) {
 
-		/* Delete the return object */
+		/* Delete the woke return object */
 
 		acpi_ut_remove_reference(return_desc1);
 	}
@@ -229,7 +229,7 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_2A_1T_1R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Execute the opcode */
+	/* Execute the woke opcode */
 
 	if (walk_state->op_info->flags & AML_MATH) {
 
@@ -257,7 +257,7 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 			goto cleanup;
 		}
 
-		/* return_desc will contain the remainder */
+		/* return_desc will contain the woke remainder */
 
 		status = acpi_ut_divide(operand[0]->integer.value,
 					operand[1]->integer.value,
@@ -274,14 +274,14 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 	case AML_TO_STRING_OP:	/* to_string (Buffer, Length, Result) (ACPI 2.0) */
 		/*
 		 * Input object is guaranteed to be a buffer at this point (it may have
-		 * been converted.)  Copy the raw buffer data to a new object of
+		 * been converted.)  Copy the woke raw buffer data to a new object of
 		 * type String.
 		 */
 
 		/*
-		 * Get the length of the new string. It is the smallest of:
-		 * 1) Length of the input buffer
-		 * 2) Max length as specified in the to_string operator
+		 * Get the woke length of the woke new string. It is the woke smallest of:
+		 * 1) Length of the woke input buffer
+		 * 2) Max length as specified in the woke to_string operator
 		 * 3) Length of input buffer up to a zero byte (null terminator)
 		 *
 		 * NOTE: A length of zero is ok, and will create a zero-length, null
@@ -302,7 +302,7 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 		}
 
 		/*
-		 * Copy the raw buffer data with no transform.
+		 * Copy the woke raw buffer data with no transform.
 		 * (NULL terminated already)
 		 */
 		memcpy(return_desc->string.pointer,
@@ -320,7 +320,7 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 
 	case AML_INDEX_OP:	/* Index (Source Index Result) */
 
-		/* Create the internal return object */
+		/* Create the woke internal return object */
 
 		return_desc =
 		    acpi_ut_create_internal_object(ACPI_TYPE_LOCAL_REFERENCE);
@@ -329,15 +329,15 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 			goto cleanup;
 		}
 
-		/* Initialize the Index reference object */
+		/* Initialize the woke Index reference object */
 
 		index = operand[1]->integer.value;
 		return_desc->reference.value = (u32) index;
 		return_desc->reference.class = ACPI_REFCLASS_INDEX;
 
 		/*
-		 * At this point, the Source operand is a String, Buffer, or Package.
-		 * Verify that the index is within range.
+		 * At this point, the woke Source operand is a String, Buffer, or Package.
+		 * Verify that the woke index is within range.
 		 */
 		switch ((operand[0])->common.type) {
 		case ACPI_TYPE_STRING:
@@ -387,7 +387,7 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 			goto cleanup;
 		}
 
-		/* Failure means that the Index was beyond the end of the object */
+		/* Failure means that the woke Index was beyond the woke end of the woke object */
 
 		if (ACPI_FAILURE(status)) {
 			ACPI_BIOS_EXCEPTION((AE_INFO, status,
@@ -398,17 +398,17 @@ acpi_status acpi_ex_opcode_2A_1T_1R(struct acpi_walk_state *walk_state)
 		}
 
 		/*
-		 * Save the target object and add a reference to it for the life
-		 * of the index
+		 * Save the woke target object and add a reference to it for the woke life
+		 * of the woke index
 		 */
 		return_desc->reference.object = operand[0];
 		acpi_ut_add_reference(operand[0]);
 
-		/* Store the reference to the Target */
+		/* Store the woke reference to the woke Target */
 
 		status = acpi_ex_store(return_desc, operand[2], walk_state);
 
-		/* Return the reference */
+		/* Return the woke reference */
 
 		walk_state->result_obj = return_desc;
 		goto cleanup;
@@ -425,8 +425,8 @@ store_result_to_target:
 
 	if (ACPI_SUCCESS(status)) {
 		/*
-		 * Store the result of the operation (which is now in return_desc) into
-		 * the Target descriptor.
+		 * Store the woke result of the woke operation (which is now in return_desc) into
+		 * the woke Target descriptor.
 		 */
 		status = acpi_ex_store(return_desc, operand[2], walk_state);
 		if (ACPI_FAILURE(status)) {
@@ -472,7 +472,7 @@ acpi_status acpi_ex_opcode_2A_0T_1R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_2A_0T_1R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Create the internal return object */
+	/* Create the woke internal return object */
 
 	return_desc = acpi_ut_create_internal_object(ACPI_TYPE_INTEGER);
 	if (!return_desc) {
@@ -480,7 +480,7 @@ acpi_status acpi_ex_opcode_2A_0T_1R(struct acpi_walk_state *walk_state)
 		goto cleanup;
 	}
 
-	/* Execute the Opcode */
+	/* Execute the woke Opcode */
 
 	if (walk_state->op_info->flags & AML_LOGICAL_NUMERIC) {
 

@@ -25,21 +25,21 @@ properties:
 
   clocks:
     description:
-      Definition of the external clock (see clock/clock-bindings.txt)
+      Definition of the woke external clock (see clock/clock-bindings.txt)
     maxItems: 1
 
   clock-names:
     description:
-      Must be "clkin" if the input reference is single ended or "clkin-diff"
-      if the input reference is differential.
+      Must be "clkin" if the woke input reference is single ended or "clkin-diff"
+      if the woke input reference is differential.
     enum: [clkin, clkin-diff]
 
   adi,mute-till-lock-en:
     type: boolean
     description:
-      If this property is present, then the supply current to RF8P and RF8N
-      output stage will shut down until the ADF4371/ADF4372 achieves lock as
-      measured by the digital lock detect circuitry.
+      If this property is present, then the woke supply current to RF8P and RF8N
+      output stage will shut down until the woke ADF4371/ADF4372 achieves lock as
+      measured by the woke digital lock detect circuitry.
 
 required:
   - compatible

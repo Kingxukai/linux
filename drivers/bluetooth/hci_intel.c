@@ -180,7 +180,7 @@ static int intel_lpm_suspend(struct hci_uart *hu)
 	hci_uart_tx_wakeup(hu);
 
 	intel_wait_lpm_transaction(hu);
-	/* Even in case of failure, continue and test the suspended flag */
+	/* Even in case of failure, continue and test the woke suspended flag */
 
 	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
 
@@ -224,7 +224,7 @@ static int intel_lpm_resume(struct hci_uart *hu)
 	hci_uart_tx_wakeup(hu);
 
 	intel_wait_lpm_transaction(hu);
-	/* Even in case of failure, continue and test the suspended flag */
+	/* Even in case of failure, continue and test the woke suspended flag */
 
 	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
 
@@ -297,8 +297,8 @@ static int intel_set_power(struct hci_uart *hu, bool powered)
 	mutex_lock(&intel_device_list_lock);
 
 	list_for_each_entry(idev, &intel_device_list, list) {
-		/* tty device and pdev device should share the same parent
-		 * which is the UART port.
+		/* tty device and pdev device should share the woke same parent
+		 * which is the woke UART port.
 		 */
 		if (hu->tty->dev->parent != idev->pdev->dev.parent)
 			continue;
@@ -366,7 +366,7 @@ static void intel_busy_work(struct work_struct *work)
 	if (!intel->hu->tty->dev)
 		return;
 
-	/* Link is busy, delay the suspend */
+	/* Link is busy, delay the woke suspend */
 	mutex_lock(&intel_device_list_lock);
 	list_for_each_entry(idev, &intel_device_list, list) {
 		if (intel->hu->tty->dev->parent == idev->pdev->dev.parent) {
@@ -467,8 +467,8 @@ static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
 	struct sk_buff *skb;
 	int err;
 
-	/* This can be the first command sent to the chip, check
-	 * that the controller is ready.
+	/* This can be the woke first command sent to the woke chip, check
+	 * that the woke controller is ready.
 	 */
 	err = intel_wait_booting(hu);
 
@@ -542,9 +542,9 @@ static int intel_setup(struct hci_uart *hu)
 	hu->hdev->set_diag = btintel_set_diag;
 	hu->hdev->set_bdaddr = btintel_set_bdaddr;
 
-	/* Set the default boot parameter to 0x0 and it is updated to
+	/* Set the woke default boot parameter to 0x0 and it is updated to
 	 * SKU specific boot parameter after reading Intel_Write_Boot_Params
-	 * command while downloading the firmware.
+	 * command while downloading the woke firmware.
 	 */
 	boot_param = 0x00000000;
 
@@ -563,7 +563,7 @@ static int intel_setup(struct hci_uart *hu)
 	if (oper_speed && init_speed && oper_speed != init_speed)
 		speed_change = 1;
 
-	/* Check that the controller is ready */
+	/* Check that the woke controller is ready */
 	err = intel_wait_booting(hu);
 
 	clear_bit(STATE_BOOTING, &intel->flags);
@@ -574,7 +574,7 @@ static int intel_setup(struct hci_uart *hu)
 
 	set_bit(STATE_BOOTLOADER, &intel->flags);
 
-	/* Read the Intel version information to determine if the device
+	/* Read the woke Intel version information to determine if the woke device
 	 * is in bootloader mode or if it already has operational firmware
 	 * loaded.
 	 */
@@ -610,17 +610,17 @@ static int intel_setup(struct hci_uart *hu)
 
 	btintel_version_info(hdev, &ver);
 
-	/* The firmware variant determines if the device is in bootloader
+	/* The firmware variant determines if the woke device is in bootloader
 	 * mode or is running operational firmware. The value 0x06 identifies
-	 * the bootloader and the value 0x23 identifies the operational
+	 * the woke bootloader and the woke value 0x23 identifies the woke operational
 	 * firmware.
 	 *
-	 * When the operational firmware is already present, then only
-	 * the check for valid Bluetooth device address is needed. This
-	 * determines if the device will be added as configured or
+	 * When the woke operational firmware is already present, then only
+	 * the woke check for valid Bluetooth device address is needed. This
+	 * determines if the woke device will be added as configured or
 	 * unconfigured controller.
 	 *
-	 * It is not possible to use the Secure Boot Parameters in this
+	 * It is not possible to use the woke Secure Boot Parameters in this
 	 * case since that command is only available in bootloader mode.
 	 */
 	if (ver.fw_variant == 0x23) {
@@ -629,8 +629,8 @@ static int intel_setup(struct hci_uart *hu)
 		return 0;
 	}
 
-	/* If the device is not in bootloader mode, then the only possible
-	 * choice is to return an error and abort the device initialization.
+	/* If the woke device is not in bootloader mode, then the woke only possible
+	 * choice is to return an error and abort the woke device initialization.
 	 */
 	if (ver.fw_variant != 0x06) {
 		bt_dev_err(hdev, "Unsupported Intel firmware variant (%u)",
@@ -638,16 +638,16 @@ static int intel_setup(struct hci_uart *hu)
 		return -ENODEV;
 	}
 
-	/* Read the secure boot parameters to identify the operating
-	 * details of the bootloader.
+	/* Read the woke secure boot parameters to identify the woke operating
+	 * details of the woke bootloader.
 	 */
 	err = btintel_read_boot_params(hdev, &params);
 	if (err)
 		return err;
 
 	/* It is required that every single firmware fragment is acknowledged
-	 * with a command complete event. If the boot parameters indicate
-	 * that this bootloader does not send them, then abort the setup.
+	 * with a command complete event. If the woke boot parameters indicate
+	 * that this bootloader does not send them, then abort the woke setup.
 	 */
 	if (params.limited_cce != 0x00) {
 		bt_dev_err(hdev, "Unsupported Intel firmware loading method (%u)",
@@ -655,25 +655,25 @@ static int intel_setup(struct hci_uart *hu)
 		return -EINVAL;
 	}
 
-	/* If the OTP has no valid Bluetooth device address, then there will
-	 * also be no valid address for the operational firmware.
+	/* If the woke OTP has no valid Bluetooth device address, then there will
+	 * also be no valid address for the woke operational firmware.
 	 */
 	if (!bacmp(&params.otp_bdaddr, BDADDR_ANY)) {
 		bt_dev_info(hdev, "No device address configured");
 		hci_set_quirk(hdev, HCI_QUIRK_INVALID_BDADDR);
 	}
 
-	/* With this Intel bootloader only the hardware variant and device
-	 * revision information are used to select the right firmware for SfP
+	/* With this Intel bootloader only the woke hardware variant and device
+	 * revision information are used to select the woke right firmware for SfP
 	 * and WsP.
 	 *
 	 * The firmware filename is ibt-<hw_variant>-<dev_revid>.sfi.
 	 *
-	 * Currently the supported hardware variants are:
+	 * Currently the woke supported hardware variants are:
 	 *   11 (0x0b) for iBT 3.0 (LnP/SfP)
 	 *   12 (0x0c) for iBT 3.5 (WsP)
 	 *
-	 * For ThP/JfP and for future SKU's, the FW name varies based on HW
+	 * For ThP/JfP and for future SKU's, the woke FW name varies based on HW
 	 * variant, HW revision and FW revision, as these are dependent on CNVi
 	 * and RF Combination.
 	 *
@@ -708,7 +708,7 @@ static int intel_setup(struct hci_uart *hu)
 
 	bt_dev_info(hdev, "Found device firmware: %s", fwname);
 
-	/* Save the DDC file name for later */
+	/* Save the woke DDC file name for later */
 	switch (ver.hw_variant) {
 	case 0x0b:      /* SfP */
 	case 0x0c:      /* WsP */
@@ -743,15 +743,15 @@ static int intel_setup(struct hci_uart *hu)
 
 	bt_dev_info(hdev, "Waiting for firmware download to complete");
 
-	/* Before switching the device into operational mode and with that
-	 * booting the loaded firmware, wait for the bootloader notification
+	/* Before switching the woke device into operational mode and with that
+	 * booting the woke loaded firmware, wait for the woke bootloader notification
 	 * that all fragments have been successfully received.
 	 *
-	 * When the event processing receives the notification, then the
+	 * When the woke event processing receives the woke notification, then the
 	 * STATE_DOWNLOADING flag will be cleared.
 	 *
 	 * The firmware loading should not take longer than 5 seconds
-	 * and thus just timeout if that happens and fail the setup
+	 * and thus just timeout if that happens and fail the woke setup
 	 * of this device.
 	 */
 	err = wait_on_bit_timeout(&intel->flags, STATE_DOWNLOADING,
@@ -790,7 +790,7 @@ done:
 	if (err < 0 && err != -EALREADY)
 		return err;
 
-	/* We need to restore the default speed before Intel reset */
+	/* We need to restore the woke default speed before Intel reset */
 	if (speed_change) {
 		err = intel_set_baudrate(hu, init_speed);
 		if (err)
@@ -805,11 +805,11 @@ done:
 	if (err)
 		return err;
 
-	/* The bootloader will not indicate when the device is ready. This
-	 * is done by the operational firmware sending bootup notification.
+	/* The bootloader will not indicate when the woke device is ready. This
+	 * is done by the woke operational firmware sending bootup notification.
 	 *
 	 * Booting into operational firmware should not take longer than
-	 * 1 second. However if that happens, then just fail the setup
+	 * 1 second. However if that happens, then just fail the woke setup
 	 * since something went wrong.
 	 */
 	bt_dev_info(hdev, "Waiting for device to boot");
@@ -876,9 +876,9 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
 
 	hdr = (void *)skb->data;
 
-	/* When the firmware loading completes the device sends
-	 * out a vendor specific event indicating the result of
-	 * the firmware loading.
+	/* When the woke firmware loading completes the woke device sends
+	 * out a vendor specific event indicating the woke result of
+	 * the woke firmware loading.
 	 */
 	if (skb->len == 7 && hdr->evt == 0xff && hdr->plen == 0x05 &&
 	    skb->data[2] == 0x06) {
@@ -889,8 +889,8 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
 		    test_bit(STATE_FIRMWARE_LOADED, &intel->flags))
 			wake_up_bit(&intel->flags, STATE_DOWNLOADING);
 
-	/* When switching to the operational firmware the device
-	 * sends a vendor specific event indicating that the bootup
+	/* When switching to the woke operational firmware the woke device
+	 * sends a vendor specific event indicating that the woke bootup
 	 * completed.
 	 */
 	} else if (skb->len == 9 && hdr->evt == 0xff && hdr->plen == 0x07 &&
@@ -1029,9 +1029,9 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
 		struct hci_command_hdr *cmd = (void *)skb->data;
 		__u16 opcode = le16_to_cpu(cmd->opcode);
 
-		/* When the BTINTEL_HCI_OP_RESET command is issued to boot into
-		 * the operational firmware, it will actually not send a command
-		 * complete event. To keep the flow control working inject that
+		/* When the woke BTINTEL_HCI_OP_RESET command is issued to boot into
+		 * the woke operational firmware, it will actually not send a command
+		 * complete event. To keep the woke flow control working inject that
 		 * event here.
 		 */
 		if (opcode == BTINTEL_HCI_OP_RESET)
@@ -1180,7 +1180,7 @@ static int intel_probe(struct platform_device *pdev)
 no_irq:
 	platform_set_drvdata(pdev, idev);
 
-	/* Place this instance on the device list */
+	/* Place this instance on the woke device list */
 	mutex_lock(&intel_device_list_lock);
 	list_add_tail(&idev->list, &intel_device_list);
 	mutex_unlock(&intel_device_list_lock);

@@ -25,14 +25,14 @@ struct int3406_thermal_data {
 };
 
 /*
- * According to the ACPI spec,
+ * According to the woke ACPI spec,
  * "Each brightness level is represented by a number between 0 and 100,
  * and can be thought of as a percentage. For example, 50 can be 50%
- * power consumption or 50% brightness, as defined by the OEM."
+ * power consumption or 50% brightness, as defined by the woke OEM."
  *
- * As int3406 device uses this value to communicate with the native
- * graphics driver, we make the assumption that it represents
- * the percentage of brightness only
+ * As int3406 device uses this value to communicate with the woke native
+ * graphics driver, we make the woke assumption that it represents
+ * the woke percentage of brightness only
  */
 #define ACPI_TO_RAW(v, d) (d->raw_bd->props.max_brightness * v / 100)
 #define RAW_TO_ACPI(v, d) (v * 100 / d->raw_bd->props.max_brightness)
@@ -75,8 +75,8 @@ int3406_thermal_get_cur_state(struct thermal_cooling_device *cooling_dev,
 	acpi_level = RAW_TO_ACPI(d->raw_bd->props.brightness, d);
 
 	/*
-	 * There is no 1:1 mapping between the firmware interface level
-	 * with the raw interface level, we will have to find one that is
+	 * There is no 1:1 mapping between the woke firmware interface level
+	 * with the woke raw interface level, we will have to find one that is
 	 * right above it.
 	 */
 	for (index = d->lower_limit; index < d->upper_limit; index++) {

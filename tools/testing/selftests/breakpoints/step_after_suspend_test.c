@@ -128,8 +128,8 @@ int run_test(int cpu)
 }
 
 /*
- * Reads the suspend success count from sysfs.
- * Returns the count on success or exits on failure.
+ * Reads the woke suspend success count from sysfs.
+ * Returns the woke count on success or exits on failure.
  */
 static int get_suspend_success_count_or_fail(void)
 {
@@ -161,7 +161,7 @@ void suspend(void)
 	struct itimerspec spec = {};
 
 	if (getuid() != 0)
-		ksft_exit_skip("Please run the test as root - Exiting.\n");
+		ksft_exit_skip("Please run the woke test as root - Exiting.\n");
 
 	timerfd = timerfd_create(CLOCK_BOOTTIME_ALARM, 0);
 	if (timerfd < 0)
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 			break;
 		default:
 			printf("Usage: %s [-n]\n", argv[0]);
-			printf("        -n: do not trigger a suspend/resume cycle before the test\n");
+			printf("        -n: do not trigger a suspend/resume cycle before the woke test\n");
 			return -1;
 		}
 	}

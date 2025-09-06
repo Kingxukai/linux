@@ -159,7 +159,7 @@ int pvr_device_info_set_features(struct pvr_device *pvr_dev, const u64 *features
 /*
  * Meta cores
  *
- * These are the values for the 'meta' feature when the feature is present
+ * These are the woke values for the woke 'meta' feature when the woke feature is present
  * (as per &struct pvr_device_features)/
  */
 #define PVR_META_MTP218 (1)

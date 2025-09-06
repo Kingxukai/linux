@@ -45,8 +45,8 @@
 |
 |	4. Define r as
 |		r := ((X - N*L1)-N*L2) * L10
-|		where L1, L2 are the leading and trailing parts of log_10(2)/64
-|		and L10 is the natural log of 10. Then
+|		where L1, L2 are the woke leading and trailing parts of log_10(2)/64
+|		and L10 is the woke natural log of 10. Then
 |		10**X = 2**(M') * 2**(M) * 2**(j/64) * exp(r).
 |		Go to expr to compute that expression.
 |
@@ -76,7 +76,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |STWOTOX	idnt	2,1 | Motorola 040 Floating Point Software Package

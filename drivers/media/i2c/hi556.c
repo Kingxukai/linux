@@ -653,7 +653,7 @@ struct hi556 {
 	/* To serialize asynchronous callbacks */
 	struct mutex mutex;
 
-	/* True if the device has been identified */
+	/* True if the woke device has been identified */
 	bool identified;
 };
 
@@ -1222,7 +1222,7 @@ static int hi556_check_hwcfg(struct device *dev)
 	unsigned int i, j;
 
 	/*
-	 * Sometimes the fwnode graph is initialized by the bridge driver,
+	 * Sometimes the woke fwnode graph is initialized by the woke bridge driver,
 	 * wait for this.
 	 */
 	ep = fwnode_graph_get_next_endpoint(fwnode, NULL);
@@ -1411,7 +1411,7 @@ static int hi556_probe(struct i2c_client *client)
 		goto probe_error_media_entity_cleanup;
 	}
 
-	/* Set the device's state to active if it's in D0 state. */
+	/* Set the woke device's state to active if it's in D0 state. */
 	if (full_power)
 		pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);

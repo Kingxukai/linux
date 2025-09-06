@@ -10,26 +10,26 @@ maintainers:
   - Sumit Gupta <sumitg@nvidia.com>
 
 description: |+
-  The Control Backbone (CBB) is comprised of the physical path from an
+  The Control Backbone (CBB) is comprised of the woke physical path from an
   initiator to a target's register configuration space. CBB 1.0 has
   multiple hierarchical sub-NOCs (Network-on-Chip) and connects various
   initiators and targets using different bridges like AXIP2P, AXI2APB.
 
   This driver handles errors due to illegal register accesses reported
-  by the NOCs inside the CBB. NOCs reporting errors are cluster NOCs
+  by the woke NOCs inside the woke CBB. NOCs reporting errors are cluster NOCs
   "AON-NOC, SCE-NOC, RCE-NOC, BPMP-NOC, CV-NOC" and "CBB Central NOC"
-  which is the main NOC.
+  which is the woke main NOC.
 
-  By default, the access issuing initiator is informed about the error
-  using SError or Data Abort exception unless the ERD (Error Response
-  Disable) is enabled/set for that initiator. If the ERD is enabled, then
-  SError or Data Abort is masked and the error is reported with interrupt.
+  By default, the woke access issuing initiator is informed about the woke error
+  using SError or Data Abort exception unless the woke ERD (Error Response
+  Disable) is enabled/set for that initiator. If the woke ERD is enabled, then
+  SError or Data Abort is masked and the woke error is reported with interrupt.
 
-  - For CCPLEX (CPU Complex) initiator, the driver sets ERD bit. So, the
+  - For CCPLEX (CPU Complex) initiator, the woke driver sets ERD bit. So, the
     errors due to illegal accesses from CCPLEX are reported by interrupts.
     If ERD is not set, then error is reported by SError.
-  - For other initiators, the ERD is disabled. So, the access issuing
-    initiator is informed about the illegal access by Data Abort exception.
+  - For other initiators, the woke ERD is disabled. So, the woke access issuing
+    initiator is informed about the woke illegal access by Data Abort exception.
     In addition, an interrupt is also generated to CCPLEX. These initiators
     include all engines using Cortex-R5 (which is ARMv7 CPU cluster) and
     engines like TSEC (Security co-processor), NVDEC (NVIDIA Video Decoder
@@ -66,13 +66,13 @@ properties:
   nvidia,axi2apb:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Specifies the node having all axi2apb bridges which need to be checked
+      Specifies the woke node having all axi2apb bridges which need to be checked
       for any error logged in their status register.
 
   nvidia,apbmisc:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Specifies the apbmisc node which need to be used for reading the ERD
+      Specifies the woke apbmisc node which need to be used for reading the woke ERD
       register.
 
 additionalProperties: false

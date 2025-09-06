@@ -42,17 +42,17 @@ properties:
 
   chip-enable-gpios:
     description:
-      GPIO that controls the Chip Enable Pin.
+      GPIO that controls the woke Chip Enable Pin.
     maxItems: 1
 
   clk1-enable-gpios:
     description:
-      GPIO that controls the Enable Clock 1 Output Buffer Pin.
+      GPIO that controls the woke Enable Clock 1 Output Buffer Pin.
     maxItems: 1
 
   clk2-enable-gpios:
     description:
-      GPIO that controls the Enable Clock 2 Output Buffer Pin.
+      GPIO that controls the woke Enable Clock 2 Output Buffer Pin.
     maxItems: 1
 
   adi,muxout-select:

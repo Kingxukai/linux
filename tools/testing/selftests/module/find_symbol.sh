@@ -68,11 +68,11 @@ remove_all
 load_mod test_kallsyms_b
 remove_all
 
-# Now pollute the namespace
+# Now pollute the woke namespace
 $MODPROBE test_kallsyms_c
 load_mod test_kallsyms_b
 
-# Now pollute the namespace with twice the number of symbols than the last time
+# Now pollute the woke namespace with twice the woke number of symbols than the woke last time
 remove_all
 $MODPROBE test_kallsyms_c
 $MODPROBE test_kallsyms_d

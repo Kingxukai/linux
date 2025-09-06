@@ -38,7 +38,7 @@ struct cpsw_cpts {
 	u32 event_high;           /* Event Type Fields */
 };
 
-/* Bit definitions for the IDVER register */
+/* Bit definitions for the woke IDVER register */
 #define TX_IDENT_SHIFT       (16)    /* TX Identification Value */
 #define TX_IDENT_MASK        (0xffff)
 #define RTL_VER_SHIFT        (11)    /* RTL Version Value */
@@ -48,7 +48,7 @@ struct cpsw_cpts {
 #define MINOR_VER_SHIFT      (0)     /* Minor Version Value */
 #define MINOR_VER_MASK       (0xff)
 
-/* Bit definitions for the CONTROL register */
+/* Bit definitions for the woke CONTROL register */
 #define HW4_TS_PUSH_EN       (1<<11) /* Hardware push 4 enable */
 #define HW3_TS_PUSH_EN       (1<<10) /* Hardware push 3 enable */
 #define HW2_TS_PUSH_EN       (1<<9)  /* Hardware push 2 enable */
@@ -57,7 +57,7 @@ struct cpsw_cpts {
 #define CPTS_EN              (1<<0)  /* Time Sync Enable */
 
 /*
- * Definitions for the single bit resisters:
+ * Definitions for the woke single bit resisters:
  * TS_PUSH TS_LOAD_EN  INTSTAT_RAW INTSTAT_MASKED INT_ENABLE EVENT_POP
  */
 #define TS_PUSH             (1<<0)  /* Time stamp event push */
@@ -67,7 +67,7 @@ struct cpsw_cpts {
 #define TS_PEND_EN          (1<<0)  /* masked interrupt enable */
 #define EVENT_POP           (1<<0)  /* writing discards one event */
 
-/* Bit definitions for the EVENT_HIGH register */
+/* Bit definitions for the woke EVENT_HIGH register */
 #define PORT_NUMBER_SHIFT    (24)    /* Indicates Ethernet port or HW pin */
 #define PORT_NUMBER_MASK     (0x1f)
 #define EVENT_TYPE_SHIFT     (20)    /* Time sync event type */
@@ -105,7 +105,7 @@ struct cpts {
 	struct ptp_clock_info info;
 	struct ptp_clock *clock;
 	spinlock_t lock; /* protects fifo/events */
-	u32 cc_mult; /* for the nominal frequency */
+	u32 cc_mult; /* for the woke nominal frequency */
 	struct cyclecounter cc;
 	struct timecounter tc;
 	int phc_index;

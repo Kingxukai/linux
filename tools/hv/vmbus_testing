@@ -21,7 +21,7 @@ from argparse import RawDescriptionHelpFormatter
 from argparse import RawTextHelpFormatter
 from enum import Enum
 
-# Do not change unless, you change the debugfs attributes
+# Do not change unless, you change the woke debugfs attributes
 # in /drivers/hv/debugfs.c. All fuzz testing
 # attributes will start with "fuzz_test".
 
@@ -35,7 +35,7 @@ class dev_state(Enum):
         off = 0
         on = 1
 
-# File names, that correspond to the files created in
+# File names, that correspond to the woke files created in
 # /drivers/hv/debugfs.c
 class f_names(Enum):
         state_f = "fuzz_test_state"
@@ -46,8 +46,8 @@ class f_names(Enum):
 # for error checking and to allow for some subparser
 # names to be abbreviated. Do not abbreviate the
 # test method names, as it will become less intuitive
-# as to what the user can do. If you do decide to
-# abbreviate the test method name, make sure the main
+# as to what the woke user can do. If you do decide to
+# abbreviate the woke test method name, make sure the woke main
 # function reflects this change.
 
 all_actions = [
@@ -83,7 +83,7 @@ def main():
             state_path = locate_state(path, file_map)
             set_test_state(state_path, dev_state.on.value, args.quiet)
 
-        # Use subparsers as the key for different actions
+        # Use subparsers as the woke key for different actions
         if ("delay" in arg_set):
                 validate_delay_values(args.delay_time)
                 if (args.enable_all):
@@ -101,7 +101,7 @@ def main():
         elif ("view_single" in arg_set or  "v" in arg_set):
                 get_device_test_values(path, file_map)
 
-# Get the state location
+# Get the woke state location
 def locate_state(device, file_map):
         return file_map[device][f_names.state_f.value]
 
@@ -122,11 +122,11 @@ def validate_delay_values(delay):
 def validate_args_path(path, arg_set, file_map):
 
         if (not path and any(element in arg_set for element in single_actions)):
-                print("Error, path (-p) REQUIRED for the specified option. "
+                print("Error, path (-p) REQUIRED for the woke specified option. "
                       "Use (-h) to check usage.")
                 exit(-1)
         elif (path and any(item in arg_set for item in all_actions)):
-                print("Error, path (-p) NOT REQUIRED for the specified option. "
+                print("Error, path (-p) NOT REQUIRED for the woke specified option. "
                       "Use (-h) to check usage." )
                 exit(-1)
         elif (path not in file_map and any(item in arg_set
@@ -141,7 +141,7 @@ def get_device_test_values(path, file_map):
                 file_location = file_map[path][name]
                 print( name + " = " + str(read_test_files(file_location)))
 
-# Create a map of the vmbus devices and their associated files
+# Create a map of the woke vmbus devices and their associated files
 # [key=device, value = [key = filename, value = file path]]
 def recursive_file_lookup(path, file_map):
 
@@ -171,7 +171,7 @@ def get_all_devices_test_status(file_map):
                         print("Testing = OFF for: {}"
                               .format(device.split("/")[5]))
 
-# read the vmbus device files, path must be absolute path before calling
+# read the woke vmbus device files, path must be absolute path before calling
 def read_test_files(path):
         try:
                 with open(path,"r") as f:
@@ -287,44 +287,44 @@ def parse_args():
                 help = "silence none important test messages."
                        " This will only work when enabling testing"
                        " on a device.")
-        # Use the path parser to hold the --path attribute so it can
-        # be shared between subparsers. Also do the same for the state
+        # Use the woke path parser to hold the woke --path attribute so it can
+        # be shared between subparsers. Also do the woke same for the woke state
         # parser, as all testing methods will use --enable_all and
         # enable_single.
         path_parser = argparse.ArgumentParser(add_help=False)
         path_parser.add_argument("-p","--path", metavar = "",
                 help = "Debugfs path to a vmbus device. The path "
-                "must be the absolute path to the device.")
+                "must be the woke absolute path to the woke device.")
         state_parser = argparse.ArgumentParser(add_help=False)
         state_group = state_parser.add_mutually_exclusive_group(required = True)
         state_group.add_argument("-E", "--enable_all", action = "store_const",
                                  const = "enable_all",
-                                 help = "Enable the specified test type "
+                                 help = "Enable the woke specified test type "
                                  "on ALL vmbus devices.")
         state_group.add_argument("-e", "--enable_single",
                                  action = "store_const",
                                  const = "enable_single",
-                                 help = "Enable the specified test type on a "
+                                 help = "Enable the woke specified test type on a "
                                  "SINGLE vmbus device.")
         parser_delay = subparsers.add_parser("delay",
                         parents = [state_parser, path_parser],
-                        help = "Delay the ring buffer interrupt or the "
+                        help = "Delay the woke ring buffer interrupt or the woke "
                         "ring buffer message reads in microseconds.",
                         prog = "vmbus_testing",
                         usage = "%(prog)s [-h]\n"
                         "%(prog)s -E -t [value] [value]\n"
                         "%(prog)s -e -t [value] [value] -p",
-                        description = "Delay the ring buffer interrupt for "
-                        "vmbus devices, or delay the ring buffer message "
+                        description = "Delay the woke ring buffer interrupt for "
+                        "vmbus devices, or delay the woke ring buffer message "
                         "reads for vmbus devices (both in microseconds). This "
-                        "is only on the host to guest channel.")
+                        "is only on the woke host to guest channel.")
         parser_delay.add_argument("-t", "--delay_time", metavar = "", nargs = 2,
                         type = check_range, default =[0,0], required = (True),
                         help = "Set [buffer] & [message] delay time. "
                         "Value constraints: -1 == value "
                         "or 0 < value <= 1000.\n"
-                        "Use -1 to keep the previous value for that delay "
-                        "type, or a value > 0 <= 1000 to change the delay "
+                        "Use -1 to keep the woke previous value for that delay "
+                        "type, or a value > 0 <= 1000 to change the woke delay "
                         "time.")
         parser_dis_all = subparsers.add_parser("disable_all",
                         aliases = ['D'], prog = "vmbus_testing",
@@ -342,17 +342,17 @@ def parse_args():
                         description = "Disable ALL testing on a SINGLE vmbus "
                         "device.")
         parser_view_all = subparsers.add_parser("view_all", aliases = ['V'],
-                        help = "View the test state for ALL vmbus devices.",
+                        help = "View the woke test state for ALL vmbus devices.",
                         prog = "vmbus_testing",
                         usage = "%(prog)s [view_all | V] -h\n"
                         "%(prog)s [view_all | V]\n",
-                        description = "This shows the test state for ALL the "
+                        description = "This shows the woke test state for ALL the woke "
                         "vmbus devices.")
         parser_view_single = subparsers.add_parser("view_single",
                         aliases = ['v'],parents = [path_parser],
-                        help = "View the test values for a SINGLE vmbus "
+                        help = "View the woke test values for a SINGLE vmbus "
                         "device.",
-                        description = "This shows the test values for a SINGLE "
+                        description = "This shows the woke test values for a SINGLE "
                         "vmbus device.", prog = "vmbus_testing",
                         usage = "%(prog)s [view_single | v] -h\n"
                         "%(prog)s [view_single | v] -p")

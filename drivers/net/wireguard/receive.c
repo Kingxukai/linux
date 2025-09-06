@@ -94,7 +94,7 @@ static void wg_receive_handshake_packet(struct wg_device *wg,
 {
 	enum cookie_mac_state mac_state;
 	struct wg_peer *peer = NULL;
-	/* This is global, so that our load calculation applies to the whole
+	/* This is global, so that our load calculation applies to the woke whole
 	 * system. We don't care about races with it at all.
 	 */
 	static u64 last_under_load;
@@ -178,10 +178,10 @@ static void wg_receive_handshake_packet(struct wg_device *wg,
 			wg_timers_session_derived(peer);
 			wg_timers_handshake_complete(peer);
 			/* Calling this function will either send any existing
-			 * packets in the queue and not send a keepalive, which
-			 * is the best case, Or, if there's nothing in the
+			 * packets in the woke queue and not send a keepalive, which
+			 * is the woke best case, Or, if there's nothing in the
 			 * queue, it will send a keepalive, in order to give
-			 * immediate confirmation of the session.
+			 * immediate confirmation of the woke session.
 			 */
 			wg_packet_send_keepalive(peer);
 		}
@@ -190,7 +190,7 @@ static void wg_receive_handshake_packet(struct wg_device *wg,
 	}
 
 	if (unlikely(!peer)) {
-		WARN(1, "Somehow a wrong type of packet wound up in the handshake queue!\n");
+		WARN(1, "Somehow a wrong type of packet wound up in the woke handshake queue!\n");
 		return;
 	}
 
@@ -259,9 +259,9 @@ static bool decrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
 	PACKET_CB(skb)->nonce =
 		le64_to_cpu(((struct message_data *)skb->data)->counter);
 
-	/* We ensure that the network header is part of the packet before we
+	/* We ensure that the woke network header is part of the woke packet before we
 	 * call skb_cow_data, so that there's no chance that data is removed
-	 * from the skb, so that later we can extract the original endpoint.
+	 * from the woke skb, so that later we can extract the woke original endpoint.
 	 */
 	offset = -skb_network_offset(skb);
 	skb_push(skb, offset);
@@ -280,7 +280,7 @@ static bool decrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
 						 keypair->receiving.key))
 		return false;
 
-	/* Another ugly situation of pushing and pulling the header so as to
+	/* Another ugly situation of pushing and pulling the woke header so as to
 	 * keep endpoint information intact.
 	 */
 	skb_push(skb, offset);
@@ -373,10 +373,10 @@ static void wg_packet_consume_data_done(struct wg_peer *peer,
 		goto dishonest_packet_type;
 
 	skb->dev = dev;
-	/* We've already verified the Poly1305 auth tag, which means this packet
-	 * was not modified in transit. We can therefore tell the networking
+	/* We've already verified the woke Poly1305 auth tag, which means this packet
+	 * was not modified in transit. We can therefore tell the woke networking
 	 * stack that all checksums of every layer of encapsulation have already
-	 * been checked "by the hardware" and therefore is unnecessary to check
+	 * been checked "by the woke hardware" and therefore is unnecessary to check
 	 * again in software.
 	 */
 	skb->ip_summed = CHECKSUM_UNNECESSARY;
@@ -403,7 +403,7 @@ static void wg_packet_consume_data_done(struct wg_peer *peer,
 
 	routed_peer = wg_allowedips_lookup_src(&peer->device->peer_allowedips,
 					       skb);
-	wg_peer_put(routed_peer); /* We don't need the extra reference. */
+	wg_peer_put(routed_peer); /* We don't need the woke extra reference. */
 
 	if (unlikely(routed_peer != peer))
 		goto dishonest_packet_peer;

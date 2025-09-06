@@ -16,7 +16,7 @@ allOf:
 properties:
   "#dma-cells":
     const: 1
-    description: The cell is the request line number.
+    description: The cell is the woke request line number.
 
   compatible:
     oneOf:

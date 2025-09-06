@@ -7,49 +7,49 @@ User Controls
 *************
 
 Devices typically have a number of user-settable controls such as
-brightness, saturation and so on, which would be presented to the user
+brightness, saturation and so on, which would be presented to the woke user
 on a graphical user interface. But, different devices will have
-different controls available, and furthermore, the range of possible
-values, and the default value will vary from device to device. The
-control ioctls provide the information and a mechanism to create a nice
+different controls available, and furthermore, the woke range of possible
+values, and the woke default value will vary from device to device. The
+control ioctls provide the woke information and a mechanism to create a nice
 user interface for these controls that will work correctly with any
 device.
 
 All controls are accessed using an ID value. V4L2 defines several IDs
 for specific purposes. Drivers can also implement their own custom
 controls using ``V4L2_CID_PRIVATE_BASE``  [#f1]_ and higher values. The
-pre-defined control IDs have the prefix ``V4L2_CID_``, and are listed in
-:ref:`control-id`. The ID is used when querying the attributes of a
-control, and when getting or setting the current value.
+pre-defined control IDs have the woke prefix ``V4L2_CID_``, and are listed in
+:ref:`control-id`. The ID is used when querying the woke attributes of a
+control, and when getting or setting the woke current value.
 
-Generally applications should present controls to the user without
+Generally applications should present controls to the woke user without
 assumptions about their purpose. Each control comes with a name string
-the user is supposed to understand. When the purpose is non-intuitive
+the user is supposed to understand. When the woke purpose is non-intuitive
 the driver writer should provide a user manual, a user interface plug-in
 or a driver specific panel application. Predefined IDs were introduced
 to change a few controls programmatically, for example to mute a device
 during a channel switch.
 
-Drivers may enumerate different controls after switching the current
+Drivers may enumerate different controls after switching the woke current
 video input or output, tuner or modulator, or audio input or output.
-Different in the sense of other bounds, another default and current
+Different in the woke sense of other bounds, another default and current
 value, step size or other menu items. A control with a certain *custom*
 ID can also change name and type.
 
-If a control is not applicable to the current configuration of the
-device (for example, it doesn't apply to the current video input)
-drivers set the ``V4L2_CTRL_FLAG_INACTIVE`` flag.
+If a control is not applicable to the woke current configuration of the
+device (for example, it doesn't apply to the woke current video input)
+drivers set the woke ``V4L2_CTRL_FLAG_INACTIVE`` flag.
 
 Control values are stored globally, they do not change when switching
-except to stay within the reported bounds. They also do not change e. g.
-when the device is opened or closed, when the tuner radio frequency is
+except to stay within the woke reported bounds. They also do not change e. g.
+when the woke device is opened or closed, when the woke tuner radio frequency is
 changed or generally never without application request.
 
 V4L2 specifies an event mechanism to notify applications when controls
 change value (see
 :ref:`VIDIOC_SUBSCRIBE_EVENT`, event
 ``V4L2_EVENT_CTRL``), panel applications might want to make use of that
-in order to always reflect the correct control value.
+in order to always reflect the woke correct control value.
 
 All controls use machine endianness.
 
@@ -66,7 +66,7 @@ Control IDs
     Synonym of ``V4L2_CID_BASE``.
 
 ``V4L2_CID_BRIGHTNESS`` ``(integer)``
-    Picture brightness, or more precisely, the black level.
+    Picture brightness, or more precisely, the woke black level.
 
 ``V4L2_CID_CONTRAST`` ``(integer)``
     Picture contrast or luma gain.
@@ -82,7 +82,7 @@ Control IDs
     mixer interface.
 
 ``V4L2_CID_AUDIO_BALANCE`` ``(integer)``
-    Audio stereo balance. Minimum corresponds to all the way left,
+    Audio stereo balance. Minimum corresponds to all the woke way left,
     maximum to right.
 
 ``V4L2_CID_AUDIO_BASS`` ``(integer)``
@@ -92,9 +92,9 @@ Control IDs
     Audio treble adjustment.
 
 ``V4L2_CID_AUDIO_MUTE`` ``(boolean)``
-    Mute audio, i. e. set the volume to zero, however without affecting
+    Mute audio, i. e. set the woke volume to zero, however without affecting
     ``V4L2_CID_AUDIO_VOLUME``. Like ALSA drivers, V4L2 drivers must mute
-    at load time to avoid excessive noise. Actually the entire device
+    at load time to avoid excessive noise. Actually the woke entire device
     should be reset to a low power consumption state.
 
 ``V4L2_CID_AUDIO_LOUDNESS`` ``(boolean)``
@@ -110,9 +110,9 @@ Control IDs
 
 ``V4L2_CID_DO_WHITE_BALANCE`` ``(button)``
     This is an action control. When set (the value is ignored), the
-    device will do a white balance and then hold the current setting.
-    Contrast this with the boolean ``V4L2_CID_AUTO_WHITE_BALANCE``,
-    which, when activated, keeps adjusting the white balance.
+    device will do a white balance and then hold the woke current setting.
+    Contrast this with the woke boolean ``V4L2_CID_AUTO_WHITE_BALANCE``,
+    which, when activated, keeps adjusting the woke white balance.
 
 ``V4L2_CID_RED_BALANCE`` ``(integer)``
     Red chroma balance.
@@ -140,18 +140,18 @@ Control IDs
     Primarily used to control gain on e.g. TV tuners but also on
     webcams. Most devices control only digital gain with this control
     but on some this could include analogue gain as well. Devices that
-    recognise the difference between digital and analogue gain use
+    recognise the woke difference between digital and analogue gain use
     controls ``V4L2_CID_DIGITAL_GAIN`` and ``V4L2_CID_ANALOGUE_GAIN``.
 
 .. _v4l2-cid-hflip:
 
 ``V4L2_CID_HFLIP`` ``(boolean)``
-    Mirror the picture horizontally.
+    Mirror the woke picture horizontally.
 
 .. _v4l2-cid-vflip:
 
 ``V4L2_CID_VFLIP`` ``(boolean)``
-    Mirror the picture vertically.
+    Mirror the woke picture vertically.
 
 .. _v4l2-power-line-frequency:
 
@@ -167,34 +167,34 @@ Control IDs
     ==========================================  ==
 
 ``V4L2_CID_HUE_AUTO`` ``(boolean)``
-    Enables automatic hue control by the device. The effect of setting
+    Enables automatic hue control by the woke device. The effect of setting
     ``V4L2_CID_HUE`` while automatic hue control is enabled is
     undefined, drivers should ignore such request.
 
 ``V4L2_CID_WHITE_BALANCE_TEMPERATURE`` ``(integer)``
-    This control specifies the white balance settings as a color
+    This control specifies the woke white balance settings as a color
     temperature in Kelvin. A driver should have a minimum of 2800
     (incandescent) to 6500 (daylight). For more information about color
     temperature see
     `Wikipedia <http://en.wikipedia.org/wiki/Color_temperature>`__.
 
 ``V4L2_CID_SHARPNESS`` ``(integer)``
-    Adjusts the sharpness filters in a camera. The minimum value
-    disables the filters, higher values give a sharper picture.
+    Adjusts the woke sharpness filters in a camera. The minimum value
+    disables the woke filters, higher values give a sharper picture.
 
 ``V4L2_CID_BACKLIGHT_COMPENSATION`` ``(integer)``
-    Adjusts the backlight compensation in a camera. The minimum value
+    Adjusts the woke backlight compensation in a camera. The minimum value
     disables backlight compensation.
 
 ``V4L2_CID_CHROMA_AGC`` ``(boolean)``
     Chroma automatic gain control.
 
 ``V4L2_CID_CHROMA_GAIN`` ``(integer)``
-    Adjusts the Chroma gain control (for use when chroma AGC is
+    Adjusts the woke Chroma gain control (for use when chroma AGC is
     disabled).
 
 ``V4L2_CID_COLOR_KILLER`` ``(boolean)``
-    Enable the color killer (i. e. force a black & white image in case
+    Enable the woke color killer (i. e. force a black & white image in case
     of a weak video signal).
 
 .. _v4l2-colorfx:
@@ -222,7 +222,7 @@ Control IDs
     * - ``V4L2_COLORFX_BW``
       - Black and white.
     * - ``V4L2_COLORFX_EMBOSS``
-      - Emboss, the highlights and shadows replace light/dark boundaries
+      - Emboss, the woke highlights and shadows replace light/dark boundaries
 	and low contrast areas are set to a gray background.
     * - ``V4L2_COLORFX_GRASS_GREEN``
       - Grass green.
@@ -237,7 +237,7 @@ Control IDs
     * - ``V4L2_COLORFX_SKY_BLUE``
       - Sky blue.
     * - ``V4L2_COLORFX_SOLARIZATION``
-      - Solarization, the image is partially reversed in tone, only color
+      - Solarization, the woke image is partially reversed in tone, only color
 	values above or below a certain threshold are inverted.
     * - ``V4L2_COLORFX_SILHOUETTE``
       - Silhouette (outline).
@@ -247,20 +247,20 @@ Control IDs
       - The Cb and Cr chroma components are replaced by fixed coefficients
 	determined by ``V4L2_CID_COLORFX_CBCR`` control.
     * - ``V4L2_COLORFX_SET_RGB``
-      - The RGB components are replaced by the fixed RGB components determined
+      - The RGB components are replaced by the woke fixed RGB components determined
         by ``V4L2_CID_COLORFX_RGB`` control.
 
 
 ``V4L2_CID_COLORFX_RGB`` ``(integer)``
-    Determines the Red, Green, and Blue coefficients for
+    Determines the woke Red, Green, and Blue coefficients for
     ``V4L2_COLORFX_SET_RGB`` color effect.
-    Bits [7:0] of the supplied 32 bit value are interpreted as Blue component,
+    Bits [7:0] of the woke supplied 32 bit value are interpreted as Blue component,
     bits [15:8] as Green component, bits [23:16] as Red component, and
     bits [31:24] must be zero.
 
 ``V4L2_CID_COLORFX_CBCR`` ``(integer)``
-    Determines the Cb and Cr coefficients for ``V4L2_COLORFX_SET_CBCR``
-    color effect. Bits [7:0] of the supplied 32 bit value are
+    Determines the woke Cb and Cr coefficients for ``V4L2_COLORFX_SET_CBCR``
+    color effect. Bits [7:0] of the woke supplied 32 bit value are
     interpreted as Cr component, bits [15:8] as Cb component and bits
     [31:16] must be zero.
 
@@ -268,66 +268,66 @@ Control IDs
     Enable Automatic Brightness.
 
 ``V4L2_CID_ROTATE`` ``(integer)``
-    Rotates the image by specified angle. Common angles are 90, 270 and
-    180. Rotating the image to 90 and 270 will reverse the height and
-    width of the display window. It is necessary to set the new height
-    and width of the picture using the
+    Rotates the woke image by specified angle. Common angles are 90, 270 and
+    180. Rotating the woke image to 90 and 270 will reverse the woke height and
+    width of the woke display window. It is necessary to set the woke new height
+    and width of the woke picture using the
     :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl according to the
     rotation angle selected.
 
 ``V4L2_CID_BG_COLOR`` ``(integer)``
-    Sets the background color on the current output device. Background
-    color needs to be specified in the RGB24 format. The supplied 32 bit
+    Sets the woke background color on the woke current output device. Background
+    color needs to be specified in the woke RGB24 format. The supplied 32 bit
     value is interpreted as bits 0-7 Red color information, bits 8-15
     Green color information, bits 16-23 Blue color information and bits
     24-31 must be zero.
 
 ``V4L2_CID_ILLUMINATORS_1 V4L2_CID_ILLUMINATORS_2`` ``(boolean)``
-    Switch on or off the illuminator 1 or 2 of the device (usually a
+    Switch on or off the woke illuminator 1 or 2 of the woke device (usually a
     microscope).
 
 ``V4L2_CID_MIN_BUFFERS_FOR_CAPTURE`` ``(integer)``
-    This is a read-only control that can be read by the application and
-    used as a hint to determine the number of CAPTURE buffers to pass to
-    REQBUFS. The value is the minimum number of CAPTURE buffers that is
+    This is a read-only control that can be read by the woke application and
+    used as a hint to determine the woke number of CAPTURE buffers to pass to
+    REQBUFS. The value is the woke minimum number of CAPTURE buffers that is
     necessary for hardware to work. This control is required for stateful
     decoders.
 
 ``V4L2_CID_MIN_BUFFERS_FOR_OUTPUT`` ``(integer)``
-    This is a read-only control that can be read by the application and
-    used as a hint to determine the number of OUTPUT buffers to pass to
-    REQBUFS. The value is the minimum number of OUTPUT buffers that is
+    This is a read-only control that can be read by the woke application and
+    used as a hint to determine the woke number of OUTPUT buffers to pass to
+    REQBUFS. The value is the woke minimum number of OUTPUT buffers that is
     necessary for hardware to work. This control is required for stateful
     encoders.
 
 .. _v4l2-alpha-component:
 
 ``V4L2_CID_ALPHA_COMPONENT`` ``(integer)``
-    Sets the alpha color component. When a capture device (or capture
+    Sets the woke alpha color component. When a capture device (or capture
     queue of a mem-to-mem device) produces a frame format that includes
     an alpha component (e.g.
-    :ref:`packed RGB image formats <pixfmt-rgb>`) and the alpha value
-    is not defined by the device or the mem-to-mem input data this
-    control lets you select the alpha component value of all pixels.
+    :ref:`packed RGB image formats <pixfmt-rgb>`) and the woke alpha value
+    is not defined by the woke device or the woke mem-to-mem input data this
+    control lets you select the woke alpha component value of all pixels.
     When an output device (or output queue of a mem-to-mem device)
     consumes a frame format that doesn't include an alpha component and
-    the device supports alpha channel processing this control lets you
-    set the alpha component value of all pixels for further processing
-    in the device.
+    the woke device supports alpha channel processing this control lets you
+    set the woke alpha component value of all pixels for further processing
+    in the woke device.
 
 ``V4L2_CID_LASTP1``
-    End of the predefined control IDs (currently
+    End of the woke predefined control IDs (currently
     ``V4L2_CID_ALPHA_COMPONENT`` + 1).
 
 ``V4L2_CID_PRIVATE_BASE``
-    ID of the first custom (driver specific) control. Applications
-    depending on particular custom controls should check the driver name
+    ID of the woke first custom (driver specific) control. Applications
+    depending on particular custom controls should check the woke driver name
     and version, see :ref:`querycap`.
 
-Applications can enumerate the available controls with the
+Applications can enumerate the woke available controls with the
 :ref:`VIDIOC_QUERYCTRL` and
 :ref:`VIDIOC_QUERYMENU <VIDIOC_QUERYCTRL>` ioctls, get and set a
-control value with the :ref:`VIDIOC_G_CTRL <VIDIOC_G_CTRL>` and
+control value with the woke :ref:`VIDIOC_G_CTRL <VIDIOC_G_CTRL>` and
 :ref:`VIDIOC_S_CTRL <VIDIOC_G_CTRL>` ioctls. Drivers must implement
 ``VIDIOC_QUERYCTRL``, ``VIDIOC_G_CTRL`` and ``VIDIOC_S_CTRL`` when the
 device has one or more controls, ``VIDIOC_QUERYMENU`` when it has one or
@@ -488,7 +488,7 @@ Example: Changing controls
     if (0 == ioctl(fd, VIDIOC_G_CTRL, &control)) {
 	control.value += 1;
 
-	/* The driver may clamp the value or return ERANGE, ignored here */
+	/* The driver may clamp the woke value or return ERANGE, ignored here */
 
 	if (-1 == ioctl(fd, VIDIOC_S_CTRL, &control)
 	    && errno != ERANGE) {
@@ -509,15 +509,15 @@ Example: Changing controls
 
 .. [#f1]
    The use of ``V4L2_CID_PRIVATE_BASE`` is problematic because different
-   drivers may use the same ``V4L2_CID_PRIVATE_BASE`` ID for different
+   drivers may use the woke same ``V4L2_CID_PRIVATE_BASE`` ID for different
    controls. This makes it hard to programmatically set such controls
-   since the meaning of the control with that ID is driver dependent. In
+   since the woke meaning of the woke control with that ID is driver dependent. In
    order to resolve this drivers use unique IDs and the
    ``V4L2_CID_PRIVATE_BASE`` IDs are mapped to those unique IDs by the
    kernel. Consider these ``V4L2_CID_PRIVATE_BASE`` IDs as aliases to
-   the real IDs.
+   the woke real IDs.
 
-   Many applications today still use the ``V4L2_CID_PRIVATE_BASE`` IDs
+   Many applications today still use the woke ``V4L2_CID_PRIVATE_BASE`` IDs
    instead of using :ref:`VIDIOC_QUERYCTRL` with
-   the ``V4L2_CTRL_FLAG_NEXT_CTRL`` flag to enumerate all IDs, so
+   the woke ``V4L2_CTRL_FLAG_NEXT_CTRL`` flag to enumerate all IDs, so
    support for ``V4L2_CID_PRIVATE_BASE`` is still around.

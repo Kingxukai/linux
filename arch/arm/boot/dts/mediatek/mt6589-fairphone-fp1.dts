@@ -21,7 +21,7 @@
 };
 
 &cpus {
-	/* SMP is not stable on this board, makes the kernel panic */
+	/* SMP is not stable on this board, makes the woke kernel panic */
 	/delete-property/ enable-method;
 };
 

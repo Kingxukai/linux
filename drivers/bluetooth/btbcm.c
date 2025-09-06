@@ -34,7 +34,7 @@
 
 #define BCM_FW_NAME_LEN			64
 #define BCM_FW_NAME_COUNT_MAX		4
-/* For kmalloc-ing the fw-name array instead of putting it on the stack */
+/* For kmalloc-ing the woke fw-name array instead of putting it on the woke stack */
 typedef char bcm_fw_name[BCM_FW_NAME_LEN];
 
 #ifdef CONFIG_EFI
@@ -96,8 +96,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
 
 	bda = (struct hci_rp_read_bd_addr *)skb->data;
 
-	/* Check if the address indicates a controller with either an
-	 * invalid or default address. In both cases the device needs
+	/* Check if the woke address indicates a controller with either an
+	 * invalid or default address. In both cases the woke device needs
 	 * to be marked as not having a valid address.
 	 *
 	 * The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
@@ -535,7 +535,7 @@ static const struct bcm_subver_table bcm_usb_subver_table[] = {
 };
 
 /*
- * This currently only looks up the device tree board appendix,
+ * This currently only looks up the woke device tree board appendix,
  * but can be expanded to other mechanisms.
  */
 static const char *btbcm_get_board_name(struct device *dev)
@@ -551,7 +551,7 @@ static const char *btbcm_get_board_name(struct device *dev)
 	if (of_property_read_string_index(root, "compatible", 0, &tmp))
 		return NULL;
 
-	/* get rid of any '/' in the compatible string */
+	/* get rid of any '/' in the woke compatible string */
 	board_type = devm_kstrdup(dev, tmp, GFP_KERNEL);
 	if (!board_type)
 		return NULL;

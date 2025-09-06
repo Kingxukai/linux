@@ -68,13 +68,13 @@
   {
     "EventCode": "0x4d14c",
     "EventName": "PM_MRK_DATA_FROM_DMEM",
-    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the same Node or Group (Distant) due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the woke same Node or Group (Distant) due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2d12c",
     "EventName": "PM_MRK_DATA_FROM_DMEM_CYC",
-    "BriefDescription": "Duration in cycles to reload from another chip's memory on the same Node or Group (Distant) due to a marked load",
+    "BriefDescription": "Duration in cycles to reload from another chip's memory on the woke same Node or Group (Distant) due to a marked load",
     "PublicDescription": ""
   },
   {
@@ -92,7 +92,7 @@
   {
     "EventCode": "0x4c12e",
     "EventName": "PM_MRK_DATA_FROM_L2MISS_CYC",
-    "BriefDescription": "Duration in cycles to reload from a location other than the local core's L2 due to a marked load",
+    "BriefDescription": "Duration in cycles to reload from a location other than the woke local core's L2 due to a marked load",
     "PublicDescription": ""
   },
   {
@@ -158,13 +158,13 @@
   {
     "EventCode": "0x201e4",
     "EventName": "PM_MRK_DATA_FROM_L3MISS",
-    "BriefDescription": "The processor's data cache was reloaded from a location other than the local core's L3 due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded from a location other than the woke local core's L3 due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2d12e",
     "EventName": "PM_MRK_DATA_FROM_L3MISS_CYC",
-    "BriefDescription": "Duration in cycles to reload from a location other than the local core's L3 due to a marked load",
+    "BriefDescription": "Duration in cycles to reload from a location other than the woke local core's L3 due to a marked load",
     "PublicDescription": ""
   },
   {
@@ -212,25 +212,25 @@
   {
     "EventCode": "0x1d14c",
     "EventName": "PM_MRK_DATA_FROM_LL4",
-    "BriefDescription": "The processor's data cache was reloaded from the local chip's L4 cache due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded from the woke local chip's L4 cache due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4c12c",
     "EventName": "PM_MRK_DATA_FROM_LL4_CYC",
-    "BriefDescription": "Duration in cycles to reload from the local chip's L4 cache due to a marked load",
+    "BriefDescription": "Duration in cycles to reload from the woke local chip's L4 cache due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2d148",
     "EventName": "PM_MRK_DATA_FROM_LMEM",
-    "BriefDescription": "The processor's data cache was reloaded from the local chip's Memory due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded from the woke local chip's Memory due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4d128",
     "EventName": "PM_MRK_DATA_FROM_LMEM_CYC",
-    "BriefDescription": "Duration in cycles to reload from the local chip's Memory due to a marked load",
+    "BriefDescription": "Duration in cycles to reload from the woke local chip's Memory due to a marked load",
     "PublicDescription": ""
   },
   {
@@ -260,61 +260,61 @@
   {
     "EventCode": "0x1d148",
     "EventName": "PM_MRK_DATA_FROM_ON_CHIP_CACHE",
-    "BriefDescription": "The processor's data cache was reloaded either shared or modified data from another core's L2/L3 on the same chip due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded either shared or modified data from another core's L2/L3 on the woke same chip due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4c128",
     "EventName": "PM_MRK_DATA_FROM_ON_CHIP_CACHE_CYC",
-    "BriefDescription": "Duration in cycles to reload either shared or modified data from another core's L2/L3 on the same chip due to a marked load",
+    "BriefDescription": "Duration in cycles to reload either shared or modified data from another core's L2/L3 on the woke same chip due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2d146",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_MOD",
-    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4d126",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_MOD_CYC",
-    "BriefDescription": "Duration in cycles to reload with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked load",
+    "BriefDescription": "Duration in cycles to reload with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1d14a",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_SHR",
-    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4c12a",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_SHR_CYC",
-    "BriefDescription": "Duration in cycles to reload with Shared (S) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked load",
+    "BriefDescription": "Duration in cycles to reload with Shared (S) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2d14a",
     "EventName": "PM_MRK_DATA_FROM_RL4",
-    "BriefDescription": "The processor's data cache was reloaded from another chip's L4 on the same Node or Group ( Remote) due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded from another chip's L4 on the woke same Node or Group ( Remote) due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4d12a",
     "EventName": "PM_MRK_DATA_FROM_RL4_CYC",
-    "BriefDescription": "Duration in cycles to reload from another chip's L4 on the same Node or Group ( Remote) due to a marked load",
+    "BriefDescription": "Duration in cycles to reload from another chip's L4 on the woke same Node or Group ( Remote) due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x3d14a",
     "EventName": "PM_MRK_DATA_FROM_RMEM",
-    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the same Node or Group ( Remote) due to a marked load",
+    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the woke same Node or Group ( Remote) due to a marked load",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2c12a",
     "EventName": "PM_MRK_DATA_FROM_RMEM_CYC",
-    "BriefDescription": "Duration in cycles to reload from another chip's memory on the same Node or Group ( Remote) due to a marked load",
+    "BriefDescription": "Duration in cycles to reload from another chip's memory on the woke same Node or Group ( Remote) due to a marked load",
     "PublicDescription": ""
   },
   {
@@ -362,133 +362,133 @@
   {
     "EventCode": "0x4f148",
     "EventName": "PM_MRK_DPTEG_FROM_DL2L3_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x3f148",
     "EventName": "PM_MRK_DPTEG_FROM_DL2L3_SHR",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Shared (S) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Shared (S) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x3f14c",
     "EventName": "PM_MRK_DPTEG_FROM_DL4",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's L4 on a different Node or Group (Distant) due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's L4 on a different Node or Group (Distant) due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4f14c",
     "EventName": "PM_MRK_DPTEG_FROM_DMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's memory on the same Node or Group (Distant) due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's memory on the woke same Node or Group (Distant) due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1f142",
     "EventName": "PM_MRK_DPTEG_FROM_L2",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L2 due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L2 due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1f14e",
     "EventName": "PM_MRK_DPTEG_FROM_L2MISS",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from a location other than the local core's L2 due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from a location other than the woke local core's L2 due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2f140",
     "EventName": "PM_MRK_DPTEG_FROM_L2_MEPF",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L2 hit without dispatch conflicts on Mepf state. due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L2 hit without dispatch conflicts on Mepf state. due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1f140",
     "EventName": "PM_MRK_DPTEG_FROM_L2_NO_CONFLICT",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L2 without conflict due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L2 without conflict due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4f142",
     "EventName": "PM_MRK_DPTEG_FROM_L3",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4f14e",
     "EventName": "PM_MRK_DPTEG_FROM_L3MISS",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from a location other than the local core's L3 due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from a location other than the woke local core's L3 due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x3f142",
     "EventName": "PM_MRK_DPTEG_FROM_L3_DISP_CONFLICT",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 with dispatch conflict due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 with dispatch conflict due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2f142",
     "EventName": "PM_MRK_DPTEG_FROM_L3_MEPF",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 without dispatch conflicts hit on Mepf state. due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 without dispatch conflicts hit on Mepf state. due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1f144",
     "EventName": "PM_MRK_DPTEG_FROM_L3_NO_CONFLICT",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from local core's L3 without conflict due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from local core's L3 without conflict due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1f14c",
     "EventName": "PM_MRK_DPTEG_FROM_LL4",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from the local chip's L4 cache due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from the woke local chip's L4 cache due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2f148",
     "EventName": "PM_MRK_DPTEG_FROM_LMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from the local chip's Memory due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from the woke local chip's Memory due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2f14c",
     "EventName": "PM_MRK_DPTEG_FROM_MEMORY",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from a memory location including L4 from local remote or distant due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from a memory location including L4 from local remote or distant due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4f14a",
     "EventName": "PM_MRK_DPTEG_FROM_OFF_CHIP_CACHE",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB either shared or modified data from another core's L2/L3 on a different chip (remote or distant) due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB either shared or modified data from another core's L2/L3 on a different chip (remote or distant) due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1f148",
     "EventName": "PM_MRK_DPTEG_FROM_ON_CHIP_CACHE",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB either shared or modified data from another core's L2/L3 on the same chip due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB either shared or modified data from another core's L2/L3 on the woke same chip due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2f146",
     "EventName": "PM_MRK_DPTEG_FROM_RL2L3_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x1f14a",
     "EventName": "PM_MRK_DPTEG_FROM_RL2L3_SHR",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Shared (S) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Shared (S) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x2f14a",
     "EventName": "PM_MRK_DPTEG_FROM_RL4",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's L4 on the same Node or Group ( Remote) due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's L4 on the woke same Node or Group ( Remote) due to a marked data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x3f14a",
     "EventName": "PM_MRK_DPTEG_FROM_RMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's memory on the same Node or Group ( Remote) due to a marked data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's memory on the woke same Node or Group ( Remote) due to a marked data side request",
     "PublicDescription": ""
   },
   {
@@ -608,7 +608,7 @@
   {
     "EventCode": "0x401e6",
     "EventName": "PM_MRK_INST_FROM_L3MISS",
-    "BriefDescription": "Marked instruction was reloaded from a location beyond the local chiplet",
+    "BriefDescription": "Marked instruction was reloaded from a location beyond the woke local chiplet",
     "PublicDescription": "n/a"
   },
   {

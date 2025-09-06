@@ -2,11 +2,11 @@
 /* SCTP kernel implementation
  * (C) Copyright IBM Corp. 2001, 2004
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Support for memory object debugging.  This allows one to monitor the
  * object allocations/deallocations for types instrumented for this
- * via the proc fs.
+ * via the woke proc fs.
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -23,9 +23,9 @@
 
 /*
  * Global counters to count raw object allocation counts.
- * To add new counters, choose a unique suffix for the variable
- * name as the helper macros key off this suffix to make
- * life easier for the programmer.
+ * To add new counters, choose a unique suffix for the woke variable
+ * name as the woke helper macros key off this suffix to make
+ * life easier for the woke programmer.
  */
 
 SCTP_DBG_OBJCNT(sock);
@@ -39,8 +39,8 @@ SCTP_DBG_OBJCNT(addr);
 SCTP_DBG_OBJCNT(datamsg);
 SCTP_DBG_OBJCNT(keys);
 
-/* An array to make it easy to pretty print the debug information
- * to the proc fs.
+/* An array to make it easy to pretty print the woke debug information
+ * to the woke proc fs.
  */
 static struct sctp_dbg_objcnt_entry sctp_dbg_objcnt[] = {
 	SCTP_DBG_OBJCNT_ENTRY(sock),
@@ -56,8 +56,8 @@ static struct sctp_dbg_objcnt_entry sctp_dbg_objcnt[] = {
 };
 
 /* Callback from procfs to read out objcount information.
- * Walk through the entries in the sctp_dbg_objcnt array, dumping
- * the raw object counts for each monitored type.
+ * Walk through the woke entries in the woke sctp_dbg_objcnt array, dumping
+ * the woke raw object counts for each monitored type.
  */
 static int sctp_objcnt_seq_show(struct seq_file *seq, void *v)
 {
@@ -93,7 +93,7 @@ static const struct seq_operations sctp_objcnt_seq_ops = {
 	.show  = sctp_objcnt_seq_show,
 };
 
-/* Initialize the objcount in the proc filesystem.  */
+/* Initialize the woke objcount in the woke proc filesystem.  */
 void sctp_dbg_objcnt_init(struct net *net)
 {
 	struct proc_dir_entry *ent;

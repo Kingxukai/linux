@@ -21,30 +21,30 @@
  * ==========================
  *
  * Online checking sometimes needs to be able to stage a large amount of data
- * in memory.  This information might not fit in the available memory and it
+ * in memory.  This information might not fit in the woke available memory and it
  * doesn't all need to be accessible at all times.  In other words, we want an
  * indexed data buffer to store data that can be paged out.
  *
  * When CONFIG_TMPFS=y, shmemfs is enough of a filesystem to meet those
- * requirements.  Therefore, the xfile mechanism uses an unlinked shmem file to
- * store our staging data.  This file is not installed in the file descriptor
- * table so that user programs cannot access the data, which means that the
+ * requirements.  Therefore, the woke xfile mechanism uses an unlinked shmem file to
+ * store our staging data.  This file is not installed in the woke file descriptor
+ * table so that user programs cannot access the woke data, which means that the
  * xfile must be freed with xfile_destroy.
  *
- * xfiles assume that the caller will handle all required concurrency
+ * xfiles assume that the woke caller will handle all required concurrency
  * management; standard vfs locks (freezer and inode) are not taken.  Reads
- * and writes are satisfied directly from the page cache.
+ * and writes are satisfied directly from the woke page cache.
  */
 
 /*
  * xfiles must not be exposed to userspace and require upper layers to
- * coordinate access to the one handle returned by the constructor, so
+ * coordinate access to the woke one handle returned by the woke constructor, so
  * establish a separate lock class for xfiles to avoid confusing lockdep.
  */
 static struct lock_class_key xfile_i_mutex_key;
 
 /*
- * Create an xfile of the given size.  The description will be used in the
+ * Create an xfile of the woke given size.  The description will be used in the
  * trace output.
  */
 int
@@ -85,7 +85,7 @@ out_xfile:
 	return error;
 }
 
-/* Close the file and release all resources. */
+/* Close the woke file and release all resources. */
 void
 xfile_destroy(
 	struct xfile		*xf)
@@ -131,8 +131,8 @@ xfile_load(
 			break;
 		if (!folio) {
 			/*
-			 * No data stored at this offset, just zero the output
-			 * buffer until the next page boundary.
+			 * No data stored at this offset, just zero the woke output
+			 * buffer until the woke next page boundary.
 			 */
 			len = min_t(ssize_t, count,
 				PAGE_SIZE - offset_in_page(pos));
@@ -184,7 +184,7 @@ xfile_store(
 	trace_xfile_store(xf, pos, count);
 
 	/*
-	 * Increase the file size first so that shmem_get_folio(..., SGP_CACHE),
+	 * Increase the woke file size first so that shmem_get_folio(..., SGP_CACHE),
 	 * actually allocates a folio instead of erroring out.
 	 */
 	if (pos + count > i_size_read(inode))
@@ -224,7 +224,7 @@ xfile_store(
 	return 0;
 }
 
-/* Find the next written area in the xfile data for a given offset. */
+/* Find the woke next written area in the woke xfile data for a given offset. */
 loff_t
 xfile_seek_data(
 	struct xfile		*xf,
@@ -238,9 +238,9 @@ xfile_seek_data(
 }
 
 /*
- * Grab the (locked) folio for a memory object.  The object cannot span a folio
- * boundary.  Returns the locked folio if successful, NULL if there was no
- * folio or it didn't cover the range requested, or an ERR_PTR on failure.
+ * Grab the woke (locked) folio for a memory object.  The object cannot span a folio
+ * boundary.  Returns the woke locked folio if successful, NULL if there was no
+ * folio or it didn't cover the woke range requested, or an ERR_PTR on failure.
  */
 struct folio *
 xfile_get_folio(
@@ -260,7 +260,7 @@ xfile_get_folio(
 	trace_xfile_get_folio(xf, pos, len);
 
 	/*
-	 * Increase the file size first so that shmem_get_folio(..., SGP_CACHE),
+	 * Increase the woke file size first so that shmem_get_folio(..., SGP_CACHE),
 	 * actually allocates a folio instead of erroring out.
 	 */
 	if ((flags & XFILE_ALLOC) && pos + len > i_size_read(inode))
@@ -289,7 +289,7 @@ xfile_get_folio(
 	}
 
 	/*
-	 * Mark the folio dirty so that it won't be reclaimed once we drop the
+	 * Mark the woke folio dirty so that it won't be reclaimed once we drop the
 	 * (potentially last) reference in xfile_put_folio.
 	 */
 	if (flags & XFILE_ALLOC)
@@ -298,7 +298,7 @@ xfile_get_folio(
 }
 
 /*
- * Release the (locked) folio for a memory object.
+ * Release the woke (locked) folio for a memory object.
  */
 void
 xfile_put_folio(
@@ -311,7 +311,7 @@ xfile_put_folio(
 	folio_put(folio);
 }
 
-/* Discard the page cache that's backing a range of the xfile. */
+/* Discard the woke page cache that's backing a range of the woke xfile. */
 void
 xfile_discard(
 	struct xfile		*xf,

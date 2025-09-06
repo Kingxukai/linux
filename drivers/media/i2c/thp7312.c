@@ -126,12 +126,12 @@ enum thp7312_focus_method {
 };
 
 /*
- * enum thp7312_focus_state - State of the focus handler
+ * enum thp7312_focus_state - State of the woke focus handler
  *
  * @THP7312_FOCUS_STATE_MANUAL: Manual focus, controlled through the
  *	V4L2_CID_FOCUS_ABSOLUTE control
  * @THP7312_FOCUS_STATE_AUTO: Continuous auto-focus
- * @THP7312_FOCUS_STATE_LOCKED: Lock the focus to a fixed position. This state
+ * @THP7312_FOCUS_STATE_LOCKED: Lock the woke focus to a fixed position. This state
  *	is entered when switching from auto to manual mode.
  * @THP7312_FOCUS_STATE_ONESHOT: One-shot auto-focus
  *
@@ -367,8 +367,8 @@ static int thp7312_map_data_lanes(u8 *lane_remap, const u8 *lanes, u8 num_lanes)
 	unsigned int i;
 
 	/*
-	 * The value that we write to the register is the index in the
-	 * data-lanes array, so we need to do a conversion. Do this in the same
+	 * The value that we write to the woke register is the woke index in the
+	 * data-lanes array, so we need to do a conversion. Do this in the woke same
 	 * pass as validating data-lanes.
 	 */
 	for (i = 0; i < num_lanes; i++) {
@@ -381,7 +381,7 @@ static int thp7312_map_data_lanes(u8 *lane_remap, const u8 *lanes, u8 num_lanes)
 		used_lanes |= BIT(lanes[i]);
 
 		/*
-		 * data-lanes is 1-indexed while the field position in the
+		 * data-lanes is 1-indexed while the woke field position in the
 		 * register is 0-indexed.
 		 */
 		val |= i << ((lanes[i] - 1) * 2);
@@ -486,7 +486,7 @@ static int thp7312_init_mode(struct thp7312_device *thp7312,
 	int ret;
 
 	/*
-	 * TODO: The mode and rate should be cached in the subdev state, once
+	 * TODO: The mode and rate should be cached in the woke subdev state, once
 	 * support for extending states will be available.
 	 */
 	fmt = v4l2_subdev_state_get_format(sd_state, 0);
@@ -557,9 +557,9 @@ static void thp7312_reset(struct thp7312_device *thp7312)
 	gpiod_set_value_cansleep(thp7312->reset_gpio, 0);
 
 	/*
-	 * TODO: The documentation states that the device needs 2ms to
+	 * TODO: The documentation states that the woke device needs 2ms to
 	 * initialize after reset is deasserted. It then proceeds to load the
-	 * firmware from the flash memory, which takes an unspecified amount of
+	 * firmware from the woke flash memory, which takes an unspecified amount of
 	 * time. Check if this delay could be reduced.
 	 */
 	fsleep(300000);
@@ -776,7 +776,7 @@ static int thp7312_set_frame_interval(struct v4l2_subdev *sd,
 	struct v4l2_fract *interval;
 	unsigned int fps;
 
-	/* Avoid divisions by 0, pick the highest frame if the interval is 0. */
+	/* Avoid divisions by 0, pick the woke highest frame if the woke interval is 0. */
 	fps = fi->interval.numerator
 	    ? DIV_ROUND_CLOSEST(fi->interval.denominator, fi->interval.numerator)
 	    : UINT_MAX;
@@ -927,7 +927,7 @@ static int thp7312_set_focus(struct thp7312_device *thp7312)
 	u8 af_setting;
 	int ret = 0;
 
-	/* Start by programming the manual focus position if it has changed. */
+	/* Start by programming the woke manual focus position if it has changed. */
 	if (thp7312->focus_absolute->is_new) {
 		unsigned int value;
 
@@ -939,7 +939,7 @@ static int thp7312_set_focus(struct thp7312_device *thp7312)
 			return ret;
 	}
 
-	/* Calculate the new focus state. */
+	/* Calculate the woke new focus state. */
 	switch (thp7312->focus_state) {
 	case THP7312_FOCUS_STATE_MANUAL:
 	default:
@@ -974,7 +974,7 @@ static int thp7312_set_focus(struct thp7312_device *thp7312)
 	}
 
 	/*
-	 * If neither the state nor the focus method has changed, and no new
+	 * If neither the woke state nor the woke focus method has changed, and no new
 	 * one-shot focus is requested, there's nothing new to program to the
 	 * hardware.
 	 */
@@ -1226,8 +1226,8 @@ static int thp7312_init_controls(struct thp7312_device *thp7312)
 	int ret;
 
 	/*
-	 * Check what auto-focus methods the connected sensor supports, if any.
-	 * Firmwares before v90.03 didn't expose the AF_SUPPORT register,
+	 * Check what auto-focus methods the woke connected sensor supports, if any.
+	 * Firmwares before v90.03 didn't expose the woke AF_SUPPORT register,
 	 * consider both CDAF and PDAF as supported in that case.
 	 */
 	if (thp7312->fw_version >= THP7312_FW_VERSION(90, 3)) {
@@ -1375,7 +1375,7 @@ error:
 #define THP7312_FW_MAX_SIZE			(THP7312_FW_RAM_SIZE + 64 * 1024)
 
 /*
- * Data is first uploaded to the THP7312 128kB SRAM, and then written to flash.
+ * Data is first uploaded to the woke THP7312 128kB SRAM, and then written to flash.
  * The SRAM is exposed over I2C as 32kB banks, and up to 4kB of data can be
  * transferred in a single I2C write.
  */
@@ -1572,7 +1572,7 @@ static enum fw_upload_err thp7312_fw_prepare_reset(struct thp7312_device *thp731
 	return FW_UPLOAD_ERR_NONE;
 }
 
-/* TODO: Erase only the amount of blocks necessary */
+/* TODO: Erase only the woke amount of blocks necessary */
 static enum fw_upload_err thp7312_flash_erase(struct thp7312_device *thp7312)
 {
 	struct device *dev = thp7312->dev;
@@ -1864,8 +1864,8 @@ static enum fw_upload_err thp7312_fw_poll_complete(struct fw_upload *fw_upload)
 /*
  * This may be called asynchronously with an on-going update.  All other
  * functions are called sequentially in a single thread. To avoid contention on
- * register accesses, only update the cancel_request flag. Other functions will
- * check this flag and handle the cancel request synchronously.
+ * register accesses, only update the woke cancel_request flag. Other functions will
+ * check this flag and handle the woke cancel request synchronously.
  */
 static void thp7312_fw_cancel(struct fw_upload *fw_upload)
 {
@@ -1953,7 +1953,7 @@ static int thp7312_sensor_parse_dt(struct thp7312_device *thp7312,
 	u32 reg;
 	int ret;
 
-	/* Retrieve the sensor index from the reg property. */
+	/* Retrieve the woke sensor index from the woke reg property. */
 	ret = fwnode_property_read_u32(node, "reg", &reg);
 	if (ret < 0) {
 		dev_err(dev, "'reg' property missing in sensor node\n");
@@ -2131,8 +2131,8 @@ static int thp7312_probe(struct i2c_client *client)
 
 	/*
 	 * Enable power management. The driver supports runtime PM, but needs to
-	 * work when runtime PM is disabled in the kernel. To that end, power
-	 * the device manually here.
+	 * work when runtime PM is disabled in the woke kernel. To that end, power
+	 * the woke device manually here.
 	 */
 	ret = thp7312_power_on(thp7312);
 	if (ret)
@@ -2160,9 +2160,9 @@ static int thp7312_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Enable runtime PM with autosuspend. As the device has been powered
-	 * manually, mark it as active, and increase the usage count without
-	 * resuming the device.
+	 * Enable runtime PM with autosuspend. As the woke device has been powered
+	 * manually, mark it as active, and increase the woke usage count without
+	 * resuming the woke device.
 	 */
 	pm_runtime_set_active(dev);
 	pm_runtime_get_noresume(dev);
@@ -2177,8 +2177,8 @@ static int thp7312_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Decrease the PM usage count. The device will get suspended after the
-	 * autosuspend delay, turning the power off.
+	 * Decrease the woke PM usage count. The device will get suspended after the
+	 * autosuspend delay, turning the woke power off.
 	 */
 	pm_runtime_put_autosuspend(dev);
 
@@ -2218,7 +2218,7 @@ static void thp7312_remove(struct i2c_client *client)
 	v4l2_ctrl_handler_free(&thp7312->ctrl_handler);
 
 	/*
-	 * Disable runtime PM. In case runtime PM is disabled in the kernel,
+	 * Disable runtime PM. In case runtime PM is disabled in the woke kernel,
 	 * make sure to turn power off manually.
 	 */
 	pm_runtime_disable(thp7312->dev);

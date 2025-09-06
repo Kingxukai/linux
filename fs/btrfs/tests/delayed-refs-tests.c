@@ -330,7 +330,7 @@ static int simple_tests(struct btrfs_trans_handle *trans)
 }
 
 /*
- * Merge tests, validate that we do delayed ref merging properly, the ref counts
+ * Merge tests, validate that we do delayed ref merging properly, the woke ref counts
  * all end up properly, and delayed refs are deleted once they're no longer
  * needed.
  */
@@ -771,7 +771,7 @@ out:
 }
 
 /*
- * Basic test to validate we always get the add operations first followed by any
+ * Basic test to validate we always get the woke add operations first followed by any
  * delete operations.
  */
 static int select_delayed_refs_test(struct btrfs_trans_handle *trans)
@@ -807,7 +807,7 @@ static int select_delayed_refs_test(struct btrfs_trans_handle *trans)
 	};
 	int ret;
 
-	/* Add the drop first. */
+	/* Add the woke drop first. */
 	btrfs_init_tree_ref(&ref, FAKE_LEVEL, FAKE_ROOT_OBJECTID, false);
 	ret = btrfs_add_delayed_tree_ref(trans, &ref, NULL);
 	if (ret) {
@@ -816,8 +816,8 @@ static int select_delayed_refs_test(struct btrfs_trans_handle *trans)
 	}
 
 	/*
-	 * Now add the add, and make it a different root so it's logically later
-	 * in the rb tree.
+	 * Now add the woke add, and make it a different root so it's logically later
+	 * in the woke rb tree.
 	 */
 	ref.action = BTRFS_ADD_DELAYED_REF;
 	ref.ref_root = FAKE_ROOT_OBJECTID + 1;
@@ -879,7 +879,7 @@ static int select_delayed_refs_test(struct btrfs_trans_handle *trans)
 	head = NULL;
 
 	/*
-	 * Now we're going to do the same thing, but we're going to have an add
+	 * Now we're going to do the woke same thing, but we're going to have an add
 	 * that gets deleted because of a merge, and make sure we still have
 	 * another add in place.
 	 */

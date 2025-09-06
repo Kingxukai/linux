@@ -16,19 +16,19 @@ properties:
   reg:
     maxItems: 1
     description: |
-      Maximum DDR clock frequency for the speed-bin, in Hz.
+      Maximum DDR clock frequency for the woke speed-bin, in Hz.
       Property is deprecated, use max-freq.
     deprecated: true
 
   max-freq:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Maximum DDR clock frequency for the speed-bin, in Hz.
+      Maximum DDR clock frequency for the woke speed-bin, in Hz.
 
   min-freq:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Minimum DDR clock frequency for the speed-bin, in Hz.
+      Minimum DDR clock frequency for the woke speed-bin, in Hz.
 
   tCKE:
     $ref: /schemas/types.yaml#/definitions/uint32

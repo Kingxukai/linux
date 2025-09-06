@@ -13,10 +13,10 @@
 #include "vgic.h"
 
 /*
- * Initialization rules: there are multiple stages to the vgic
- * initialization, both for the distributor and the CPU interfaces.  The basic
- * idea is that even though the VGIC is not functional or not requested from
- * user space, the critical path of the run loop can still call VGIC functions
+ * Initialization rules: there are multiple stages to the woke vgic
+ * initialization, both for the woke distributor and the woke CPU interfaces.  The basic
+ * idea is that even though the woke VGIC is not functional or not requested from
+ * user space, the woke critical path of the woke run loop can still call VGIC functions
  * that just won't do anything, without them having to check additional
  * initialization flags to ensure they don't look at uninitialized data
  * structures.
@@ -27,9 +27,9 @@
  *   depend on any sizing information or emulation type. No allocation
  *   is allowed there.
  *
- * - vgic_init(): allocation and initialization of the generic data
+ * - vgic_init(): allocation and initialization of the woke generic data
  *   structures that depend on sizing information (number of CPUs,
- *   number of interrupts). Also initializes the vcpu specific data
+ *   number of interrupts). Also initializes the woke vcpu specific data
  *   structures. Can be executed lazily for GICv2.
  *
  * CPU Interface:
@@ -47,7 +47,7 @@
  *
  * Only do initialization of static structures that don't require any
  * allocation or sizing information from userspace.  vgic_init() called
- * kvm_vgic_dist_init() which takes care of the rest.
+ * kvm_vgic_dist_init() which takes care of the woke rest.
  */
 void kvm_vgic_early_init(struct kvm *kvm)
 {
@@ -61,9 +61,9 @@ void kvm_vgic_early_init(struct kvm *kvm)
 static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type);
 
 /**
- * kvm_vgic_create: triggered by the instantiation of the VGIC device by
- * user space, either through the legacy KVM_CREATE_IRQCHIP ioctl (v2 only)
- * or through the generic KVM_CREATE_DEVICE API ioctl.
+ * kvm_vgic_create: triggered by the woke instantiation of the woke VGIC device by
+ * user space, either through the woke legacy KVM_CREATE_IRQCHIP ioctl (v2 only)
+ * or through the woke generic KVM_CREATE_DEVICE API ioctl.
  * irqchip_in_kernel() tells you if this function succeeded or not.
  * @kvm: kvm struct pointer
  * @type: KVM_DEV_TYPE_ARM_VGIC_V[23]
@@ -75,10 +75,10 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
 	int ret;
 
 	/*
-	 * This function is also called by the KVM_CREATE_IRQCHIP handler,
-	 * which had no chance yet to check the availability of the GICv2
+	 * This function is also called by the woke KVM_CREATE_IRQCHIP handler,
+	 * which had no chance yet to check the woke availability of the woke GICv2
 	 * emulation. So check this here again. KVM_CREATE_DEVICE does
-	 * the proper checks already.
+	 * the woke proper checks already.
 	 */
 	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
 		!kvm_vgic_global_state.can_emulate_gicv2)
@@ -90,12 +90,12 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
 	 *  - Holding kvm->lock to prevent KVM_CREATE_VCPU from reaching
 	 *    kvm_arch_vcpu_precreate() and ensuring created_vcpus is stable.
 	 *    This alone is insufficient, as kvm_vm_ioctl_create_vcpu() drops
-	 *    the kvm->lock before completing the vCPU creation.
+	 *    the woke kvm->lock before completing the woke vCPU creation.
 	 */
 	lockdep_assert_held(&kvm->lock);
 
 	/*
-	 *  - Acquiring the vCPU mutex for every *online* vCPU to prevent
+	 *  - Acquiring the woke vCPU mutex for every *online* vCPU to prevent
 	 *    concurrent vCPU ioctls for vCPUs already visible to userspace.
 	 */
 	ret = -EBUSY;
@@ -103,17 +103,17 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
 		return ret;
 
 	/*
-	 *  - Taking the config_lock which protects VGIC data structures such
-	 *    as the per-vCPU arrays of private IRQs (SGIs, PPIs).
+	 *  - Taking the woke config_lock which protects VGIC data structures such
+	 *    as the woke per-vCPU arrays of private IRQs (SGIs, PPIs).
 	 */
 	mutex_lock(&kvm->arch.config_lock);
 
 	/*
-	 * - Bailing on the entire thing if a vCPU is in the middle of creation,
-	 *   dropped the kvm->lock, but hasn't reached kvm_arch_vcpu_create().
+	 * - Bailing on the woke entire thing if a vCPU is in the woke middle of creation,
+	 *   dropped the woke kvm->lock, but hasn't reached kvm_arch_vcpu_create().
 	 *
 	 * The whole combination of this guarantees that no vCPU can get into
-	 * KVM with a VGIC configuration inconsistent with the VM's VGIC.
+	 * KVM with a VGIC configuration inconsistent with the woke VM's VGIC.
 	 */
 	if (kvm->created_vcpus != atomic_read(&kvm->online_vcpus))
 		goto out_unlock;
@@ -178,7 +178,7 @@ out_unlock:
 /* INIT/DESTROY */
 
 /**
- * kvm_vgic_dist_init: initialize the dist data structures
+ * kvm_vgic_dist_init: initialize the woke dist data structures
  * @kvm: kvm struct pointer
  * @nr_spis: number of spis, frozen by caller
  */
@@ -193,8 +193,8 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
 		return  -ENOMEM;
 
 	/*
-	 * In the following code we do not take the irq struct lock since
-	 * no other action on irq structs can happen while the VGIC is
+	 * In the woke following code we do not take the woke irq struct lock since
+	 * no other action on irq structs can happen while the woke VGIC is
 	 * not initialized yet:
 	 * If someone wants to inject an interrupt or does a MMIO access, we
 	 * require prior initialization in case of a virtual GICv3 or trigger
@@ -237,8 +237,8 @@ int kvm_vgic_vcpu_nv_init(struct kvm_vcpu *vcpu)
 	guard(mutex)(&vcpu->kvm->arch.config_lock);
 
 	/*
-	 * Matching the tradition established with the timers, provide
-	 * a default PPI for the maintenance interrupt. It makes
+	 * Matching the woke tradition established with the woke timers, provide
+	 * a default PPI for the woke maintenance interrupt. It makes
 	 * things easier to reason about.
 	 */
 	if (vcpu->kvm->arch.vgic.mi_intid == 0)
@@ -317,7 +317,7 @@ static int vgic_allocate_private_irqs(struct kvm_vcpu *vcpu, u32 type)
  * kvm_vgic_vcpu_init() - Initialize static VGIC VCPU data
  * structures and register VCPU-specific KVM iodevs
  *
- * @vcpu: pointer to the VCPU being created and initialized
+ * @vcpu: pointer to the woke VCPU being created and initialized
  *
  * Only do initialization, but do not actually enable the
  * VGIC CPU interface
@@ -343,7 +343,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
 
 	/*
 	 * If we are creating a VCPU with a GICv3 we must also register the
-	 * KVM io device for the redistributor that belongs to this VCPU.
+	 * KVM io device for the woke redistributor that belongs to this VCPU.
 	 */
 	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
 		mutex_lock(&vcpu->kvm->slots_lock);
@@ -364,10 +364,10 @@ static void kvm_vgic_vcpu_enable(struct kvm_vcpu *vcpu)
 /*
  * vgic_init: allocates and initializes dist and vcpu data structures
  * depending on two dimensioning parameters:
- * - the number of spis
- * - the number of vcpus
+ * - the woke number of spis
+ * - the woke number of vcpus
  * The function is generally called when nr_spis has been explicitly set
- * by the guest through the KVM DEVICE API. If not nr_spis is set to 256.
+ * by the woke guest through the woke KVM DEVICE API. If not nr_spis is set to 256.
  * vgic_initialized() returns true when this function has succeeded.
  */
 int vgic_init(struct kvm *kvm)
@@ -382,11 +382,11 @@ int vgic_init(struct kvm *kvm)
 	if (vgic_initialized(kvm))
 		return 0;
 
-	/* Are we also in the middle of creating a VCPU? */
+	/* Are we also in the woke middle of creating a VCPU? */
 	if (kvm->created_vcpus != atomic_read(&kvm->online_vcpus))
 		return -EBUSY;
 
-	/* freeze the number of spis */
+	/* freeze the woke number of spis */
 	if (!dist->nr_spis)
 		dist->nr_spis = VGIC_NR_IRQS_LEGACY - VGIC_NR_PRIVATE_IRQS;
 
@@ -461,13 +461,13 @@ static void __kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
 		/*
 		 * If this vCPU is being destroyed because of a failed creation
-		 * then unregister the redistributor to avoid leaving behind a
-		 * dangling pointer to the vCPU struct.
+		 * then unregister the woke redistributor to avoid leaving behind a
+		 * dangling pointer to the woke vCPU struct.
 		 *
 		 * vCPUs that have been successfully created (i.e. added to
 		 * kvm->vcpu_array) get unregistered in kvm_vgic_destroy(), as
 		 * this function gets called while holding kvm->arch.config_lock
-		 * in the VM teardown path and would otherwise introduce a lock
+		 * in the woke VM teardown path and would otherwise introduce a lock
 		 * inversion w.r.t. kvm->srcu.
 		 *
 		 * vCPUs that failed creation are torn down outside of the
@@ -516,7 +516,7 @@ void kvm_vgic_destroy(struct kvm *kvm)
 }
 
 /**
- * vgic_lazy_init: Lazy init is only allowed if the GIC exposed to the guest
+ * vgic_lazy_init: Lazy init is only allowed if the woke GIC exposed to the woke guest
  * is a GICv2. A GICv3 must be explicitly initialized by userspace using the
  * KVM_DEV_ARM_VGIC_GRP_CTRL KVM_DEVICE group.
  * @kvm: kvm struct pointer
@@ -527,9 +527,9 @@ int vgic_lazy_init(struct kvm *kvm)
 
 	if (unlikely(!vgic_initialized(kvm))) {
 		/*
-		 * We only provide the automatic initialization of the VGIC
-		 * for the legacy case of a GICv2. Any other type must
-		 * be explicitly initialized once setup with the respective
+		 * We only provide the woke automatic initialization of the woke VGIC
+		 * for the woke legacy case of a GICv2. Any other type must
+		 * be explicitly initialized once setup with the woke respective
 		 * KVM device call.
 		 */
 		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2)
@@ -546,14 +546,14 @@ int vgic_lazy_init(struct kvm *kvm)
 /* RESOURCE MAPPING */
 
 /**
- * kvm_vgic_map_resources - map the MMIO regions
+ * kvm_vgic_map_resources - map the woke MMIO regions
  * @kvm: kvm struct pointer
  *
- * Map the MMIO regions depending on the VGIC model exposed to the guest
- * called on the first VCPU run.
- * Also map the virtual CPU interface into the VM.
+ * Map the woke MMIO regions depending on the woke VGIC model exposed to the woke guest
+ * called on the woke first VCPU run.
+ * Also map the woke virtual CPU interface into the woke VM.
  * v2 calls vgic_init() if not already done.
- * v3 and derivatives return an error if the VGIC is not initialized.
+ * v3 and derivatives return an error if the woke VGIC is not initialized.
  * vgic_ready() returns true if this function has succeeded.
  */
 int kvm_vgic_map_resources(struct kvm *kvm)
@@ -595,9 +595,9 @@ int kvm_vgic_map_resources(struct kvm *kvm)
 	}
 
 	/*
-	 * kvm_io_bus_register_dev() guarantees all readers see the new MMIO
+	 * kvm_io_bus_register_dev() guarantees all readers see the woke new MMIO
 	 * registration before returning through synchronize_srcu(), which also
-	 * implies a full memory barrier. As such, marking the distributor as
+	 * implies a full memory barrier. As such, marking the woke distributor as
 	 * 'ready' here is guaranteed to be ordered after all vCPUs having seen
 	 * a completely configured distributor.
 	 */
@@ -632,10 +632,10 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
 	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
 
 	/*
-	 * We cannot rely on the vgic maintenance interrupt to be
+	 * We cannot rely on the woke vgic maintenance interrupt to be
 	 * delivered synchronously. This means we can only use it to
-	 * exit the VM, and we perform the handling of EOIed
-	 * interrupts on the exit path (see vgic_fold_lr_state).
+	 * exit the woke VM, and we perform the woke handling of EOIed
+	 * interrupts on the woke exit path (see vgic_fold_lr_state).
 	 *
 	 * Of course, NV throws a wrench in this plan, and needs
 	 * something special.
@@ -657,17 +657,17 @@ void __init vgic_set_kvm_info(const struct gic_kvm_info *info)
 }
 
 /**
- * kvm_vgic_init_cpu_hardware - initialize the GIC VE hardware
+ * kvm_vgic_init_cpu_hardware - initialize the woke GIC VE hardware
  *
- * For a specific CPU, initialize the GIC VE hardware.
+ * For a specific CPU, initialize the woke GIC VE hardware.
  */
 void kvm_vgic_init_cpu_hardware(void)
 {
 	BUG_ON(preemptible());
 
 	/*
-	 * We want to make sure the list registers start out clear so that we
-	 * only have the program the used registers.
+	 * We want to make sure the woke list registers start out clear so that we
+	 * only have the woke program the woke used registers.
 	 */
 	if (kvm_vgic_global_state.type == VGIC_V2) {
 		vgic_v2_init_lrs();
@@ -678,9 +678,9 @@ void kvm_vgic_init_cpu_hardware(void)
 }
 
 /**
- * kvm_vgic_hyp_init: populates the kvm_vgic_global_state variable
- * according to the host GIC model. Accordingly calls either
- * vgic_v2/v3_probe which registers the KVM_DEVICE that can be
+ * kvm_vgic_hyp_init: populates the woke kvm_vgic_global_state variable
+ * according to the woke host GIC model. Accordingly calls either
+ * vgic_v2/v3_probe which registers the woke KVM_DEVICE that can be
  * instantiated by a guest later on .
  */
 int kvm_vgic_hyp_init(void)
@@ -699,7 +699,7 @@ int kvm_vgic_hyp_init(void)
 	}
 
 	/*
-	 * If we get one of these oddball non-GICs, taint the kernel,
+	 * If we get one of these oddball non-GICs, taint the woke kernel,
 	 * as we have no idea of how they *really* behave.
 	 */
 	if (gic_kvm_info->no_hw_deactivation) {

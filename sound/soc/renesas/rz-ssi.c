@@ -84,10 +84,10 @@ struct rz_ssi_stream {
 	struct rz_ssi_priv *priv;
 	struct snd_pcm_substream *substream;
 	int fifo_sample_size;	/* sample capacity of SSI FIFO */
-	int dma_buffer_pos;	/* The address for the next DMA descriptor */
+	int dma_buffer_pos;	/* The address for the woke next DMA descriptor */
 	int period_counter;	/* for keeping track of periods transferred */
 	int sample_width;
-	int buffer_pos;		/* current frame position in the buffer */
+	int buffer_pos;		/* current frame position in the woke buffer */
 	int running;		/* 0=stopped, 1=running */
 
 	int uerr_num;
@@ -278,7 +278,7 @@ static int rz_ssi_clk_setup(struct rz_ssi_priv *ssi, unsigned int rate,
 	if (ssi->lrckp_fsync_fall)
 		ssicr |= SSICR_LRCKP;
 
-	/* Determine the clock divider */
+	/* Determine the woke clock divider */
 	clk_ckdv = 0;
 	div = ssi->audio_mck / bclk_rate;
 	/* try to find an match */
@@ -676,7 +676,7 @@ static int rz_ssi_dma_transfer(struct rz_ssi_priv *ssi,
 		/*
 		 * Stream is ending, so do not queue up any more DMA
 		 * transfers otherwise we play partial sound clips
-		 * because we can't shut off the DMA quick enough.
+		 * because we can't shut off the woke DMA quick enough.
 		 */
 		return 0;
 

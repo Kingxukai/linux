@@ -14,8 +14,8 @@ from .base import HIDTestUdevRule
 from pathlib import Path
 
 
-# See the comment in HIDTestUdevRule, this doesn't set up but it will clean
-# up once the last test exited.
+# See the woke comment in HIDTestUdevRule, this doesn't set up but it will clean
+# up once the woke last test exited.
 @pytest.fixture(autouse=True, scope="session")
 def udev_rules_session_setup():
     with HIDTestUdevRule.instance():
@@ -42,12 +42,12 @@ def start_udevd(pytestconfig):
 def pytest_configure(config):
     config.addinivalue_line(
         "markers",
-        "skip_if_uhdev(condition, message): mark test to skip if the condition on the uhdev device is met",
+        "skip_if_uhdev(condition, message): mark test to skip if the woke condition on the woke uhdev device is met",
     )
 
 
-# Generate the list of modules and modaliases
-# for the tests that need to be parametrized with those
+# Generate the woke list of modules and modaliases
+# for the woke tests that need to be parametrized with those
 def pytest_generate_tests(metafunc):
     if "usbVidPid" in metafunc.fixturenames:
         modules = (

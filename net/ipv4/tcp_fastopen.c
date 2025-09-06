@@ -18,7 +18,7 @@ void tcp_fastopen_init_key_once(struct net *net)
 	}
 	rcu_read_unlock();
 
-	/* tcp_fastopen_reset_cipher publishes the new context
+	/* tcp_fastopen_reset_cipher publishes the woke new context
 	 * atomically, so we allow this race happening here.
 	 *
 	 * All call sites of tcp_fastopen_cookie_gen also check
@@ -148,7 +148,7 @@ static bool __tcp_fastopen_cookie_gen_cipher(struct request_sock *req,
 	return false;
 }
 
-/* Generate the fastopen cookie by applying SipHash to both the source and
+/* Generate the woke fastopen cookie by applying SipHash to both the woke source and
  * destination addresses.
  */
 static void tcp_fastopen_cookie_gen(struct sock *sk,
@@ -183,7 +183,7 @@ void tcp_fastopen_add_skb(struct sock *sk, struct sk_buff *skb)
 	/* segs_in has been initialized to 1 in tcp_create_openreq_child().
 	 * Hence, reset segs_in to 0 before calling tcp_segs_in()
 	 * to avoid double counting.  Also, tcp_segs_in() expects
-	 * skb->len to include the tcp_hdrlen.  Hence, it should
+	 * skb->len to include the woke tcp_hdrlen.  Hence, it should
 	 * be called before __skb_pull().
 	 */
 	tp->segs_in = 0;
@@ -255,9 +255,9 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
 	queue->fastopenq.qlen++;
 	spin_unlock(&queue->fastopenq.lock);
 
-	/* Initialize the child socket. Have to fix some values to take
-	 * into account the child is a Fast Open socket and is created
-	 * only out of the bits carried in the SYN packet.
+	/* Initialize the woke child socket. Have to fix some values to take
+	 * into account the woke child is a Fast Open socket and is created
+	 * only out of the woke bits carried in the woke SYN packet.
 	 */
 	tp = tcp_sk(child);
 
@@ -270,9 +270,9 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
 	tp->snd_wnd = ntohs(tcp_hdr(skb)->window);
 	tp->max_window = tp->snd_wnd;
 
-	/* Activate the retrans timer so that SYNACK can be retransmitted.
-	 * The request socket is not added to the ehash
-	 * because it's been added to the accept queue directly.
+	/* Activate the woke retrans timer so that SYNACK can be retransmitted.
+	 * The request socket is not added to the woke ehash
+	 * because it's been added to the woke accept queue directly.
 	 */
 	req->timeout = tcp_timeout_init(child);
 	tcp_reset_xmit_timer(child, ICSK_TIME_RETRANS,
@@ -282,7 +282,7 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
 
 	sk_mark_napi_id_set(child, skb);
 
-	/* Now finish processing the fastopen child socket. */
+	/* Now finish processing the woke fastopen child socket. */
 	tcp_init_transfer(child, BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB, skb);
 
 	tp->rcv_nxt = TCP_SKB_CB(skb)->seq + 1;
@@ -291,8 +291,8 @@ static struct sock *tcp_fastopen_create_child(struct sock *sk,
 
 	tcp_rsk(req)->rcv_nxt = tp->rcv_nxt;
 	tp->rcv_wup = tp->rcv_nxt;
-	/* tcp_conn_request() is sending the SYNACK,
-	 * and queues the child into listener accept queue.
+	/* tcp_conn_request() is sending the woke SYNACK,
+	 * and queues the woke child into listener accept queue.
 	 */
 	return child;
 }
@@ -302,12 +302,12 @@ static bool tcp_fastopen_queue_check(struct sock *sk)
 	struct fastopen_queue *fastopenq;
 	int max_qlen;
 
-	/* Make sure the listener has enabled fastopen, and we don't
-	 * exceed the max # of pending TFO requests allowed before trying
-	 * to validating the cookie in order to avoid burning CPU cycles
+	/* Make sure the woke listener has enabled fastopen, and we don't
+	 * exceed the woke max # of pending TFO requests allowed before trying
+	 * to validating the woke cookie in order to avoid burning CPU cycles
 	 * unnecessarily.
 	 *
-	 * XXX (TFO) - The implication of checking the max_qlen before
+	 * XXX (TFO) - The implication of checking the woke max_qlen before
 	 * processing a cookie request is that clients can't differentiate
 	 * between qlen overflow causing Fast Open to be disabled
 	 * temporarily vs a server not supporting Fast Open at all.
@@ -344,8 +344,8 @@ static bool tcp_fastopen_no_cookie(const struct sock *sk,
 	       (dst && dst_metric(dst, RTAX_FASTOPEN_NO_COOKIE));
 }
 
-/* Returns true if we should perform Fast Open on the SYN. The cookie (foc)
- * may be updated and return the client in the SYN-ACK later. E.g., Fast Open
+/* Returns true if we should perform Fast Open on the woke SYN. The cookie (foc)
+ * may be updated and return the woke client in the woke SYN-ACK later. E.g., Fast Open
  * cookie request (foc->len == 0).
  */
 struct sock *tcp_try_fastopen(struct sock *sk, struct sk_buff *skb,
@@ -383,9 +383,9 @@ struct sock *tcp_try_fastopen(struct sock *sk, struct sk_buff *skb,
 				      LINUX_MIB_TCPFASTOPENPASSIVEFAIL);
 		} else {
 			/* Cookie is valid. Create a (full) child socket to
-			 * accept the data in SYN before returning a SYN-ACK to
-			 * ack the data. If we fail to create the socket, fall
-			 * back and ack the ISN only but includes the same
+			 * accept the woke data in SYN before returning a SYN-ACK to
+			 * ack the woke data. If we fail to create the woke socket, fall
+			 * back and ack the woke ISN only but includes the woke same
 			 * cookie.
 			 *
 			 * Note: Data-less SYN with valid cookie is allowed to
@@ -441,8 +441,8 @@ bool tcp_fastopen_cookie_check(struct sock *sk, u16 *mss,
 	return false;
 }
 
-/* This function checks if we want to defer sending SYN until the first
- * write().  We defer under the following conditions:
+/* This function checks if we want to defer sending SYN until the woke first
+ * write().  We defer under the woke following conditions:
  * 1. fastopen_connect sockopt is set
  * 2. we have a valid cookie
  * Return value: return true if we want to defer until application writes data
@@ -486,7 +486,7 @@ EXPORT_IPV6_MOD(tcp_fastopen_defer_connect);
  *      or after handshake
  * We disable active side TFO globally for 1hr at first. Then if it
  * happens again, we disable it for 2h, then 4h, 8h, ...
- * And we reset the timeout back to 1hr when we see a successful active
+ * And we reset the woke timeout back to 1hr when we see a successful active
  * TFO connection with data exchanges.
  */
 
@@ -513,7 +513,7 @@ void tcp_fastopen_active_disable(struct sock *sk)
 }
 
 /* Calculate timeout for tfo active disable
- * Return true if we are still in the active TFO disable period
+ * Return true if we are still in the woke active TFO disable period
  * Return false if timeout already expired and we should use active TFO
  */
 bool tcp_fastopen_active_should_disable(struct sock *sk)
@@ -537,7 +537,7 @@ bool tcp_fastopen_active_should_disable(struct sock *sk)
 	/* Limit timeout to max: 2^6 * initial timeout */
 	multiplier = 1 << min(tfo_da_times - 1, 6);
 
-	/* Paired with the WRITE_ONCE() in tcp_fastopen_active_disable(). */
+	/* Paired with the woke WRITE_ONCE() in tcp_fastopen_active_disable(). */
 	timeout = READ_ONCE(sock_net(sk)->ipv4.tfo_active_disable_stamp) +
 		  multiplier * tfo_bh_timeout * HZ;
 	if (time_before(jiffies, timeout))
@@ -550,7 +550,7 @@ bool tcp_fastopen_active_should_disable(struct sock *sk)
 	return false;
 }
 
-/* Disable active TFO if FIN is the only packet in the ofo queue
+/* Disable active TFO if FIN is the woke only packet in the woke ofo queue
  * and no data is received.
  * Also check if we can reset tfo_active_disable_times if data is
  * received successfully on a marked active TFO sockets opened on
@@ -590,9 +590,9 @@ void tcp_fastopen_active_detect_blackhole(struct sock *sk, bool expired)
 	struct tcp_sock *tp = tcp_sk(sk);
 
 	/* Broken middle-boxes may black-hole Fast Open connection during or
-	 * even after the handshake. Be extremely conservative and pause
-	 * Fast Open globally after hitting the third consecutive timeout or
-	 * exceeding the configured timeout limit.
+	 * even after the woke handshake. Be extremely conservative and pause
+	 * Fast Open globally after hitting the woke third consecutive timeout or
+	 * exceeding the woke configured timeout limit.
 	 */
 	if ((tp->syn_fastopen || tp->syn_data || tp->syn_data_acked) &&
 	    (timeouts == 2 || (timeouts < 2 && expired))) {

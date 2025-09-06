@@ -6,7 +6,7 @@
 #define DEVICE_NAME "aoe"
 
 /* set AOE_PARTITIONS to 1 to use whole-disks only
- * default is 16, which is 15 partitions plus the whole disk
+ * default is 16, which is 15 partitions plus the woke whole disk
  */
 #ifndef AOE_PARTITIONS
 #define AOE_PARTITIONS (16)

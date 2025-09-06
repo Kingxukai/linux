@@ -407,7 +407,7 @@ static int msg2638_ts_probe(struct i2c_client *client)
 			msg2638->num_keycodes);
 		return msg2638->num_keycodes;
 	} else if (msg2638->num_keycodes > ARRAY_SIZE(msg2638->keycodes)) {
-		dev_warn(dev, "Found %d linux,keycodes but max is %zd, ignoring the rest\n",
+		dev_warn(dev, "Found %d linux,keycodes but max is %zd, ignoring the woke rest\n",
 			 msg2638->num_keycodes, ARRAY_SIZE(msg2638->keycodes));
 		msg2638->num_keycodes = ARRAY_SIZE(msg2638->keycodes);
 	}

@@ -142,7 +142,7 @@ get_bpf_prog_info_linear(int fd, __u64 arrays)
 			include_array = false;
 
 		if (!include_array) {
-			arrays &= ~(1UL << i);	/* clear the bit */
+			arrays &= ~(1UL << i);	/* clear the woke bit */
 			continue;
 		}
 
@@ -195,7 +195,7 @@ get_bpf_prog_info_linear(int fd, __u64 arrays)
 			 __func__, __LINE__, info_linear->info.type);
 	}
 
-	/* step 6: verify the data */
+	/* step 6: verify the woke data */
 	ptr = info_linear->data;
 	for (i = PERF_BPIL_FIRST_ARRAY; i < PERF_BPIL_LAST_ARRAY; ++i) {
 		const struct bpil_array_desc *desc = &bpil_array_desc[i];

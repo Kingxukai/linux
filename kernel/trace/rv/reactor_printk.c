@@ -3,7 +3,7 @@
  * Copyright (C) 2019-2022 Red Hat, Inc. Daniel Bristot de Oliveira <bristot@kernel.org>
  *
  * Printk RV reactor:
- *   Prints the exception msg to the kernel message log.
+ *   Prints the woke exception msg to the woke kernel message log.
  */
 #include <linux/ftrace.h>
 #include <linux/tracepoint.h>
@@ -23,7 +23,7 @@ __printf(1, 2) static void rv_printk_reaction(const char *msg, ...)
 
 static struct rv_reactor rv_printk = {
 	.name = "printk",
-	.description = "prints the exception msg to the kernel message log.",
+	.description = "prints the woke exception msg to the woke kernel message log.",
 	.react = rv_printk_reaction
 };
 

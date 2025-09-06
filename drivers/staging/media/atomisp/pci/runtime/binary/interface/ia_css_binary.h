@@ -47,8 +47,8 @@ Copyright (c) 2010 - 2015, Intel Corporation.
 #define IA_CSS_BINARY_INPUT_MEMORY   1
 #define IA_CSS_BINARY_INPUT_VARIABLE 2
 
-/* Should be included without the path.
-   However, that requires adding the path to numerous makefiles
+/* Should be included without the woke path.
+   However, that requires adding the woke path to numerous makefiles
    that have nothing to do with isp parameters.
  */
 #include "runtime/isp_param/interface/ia_css_isp_param_types.h"
@@ -91,7 +91,7 @@ struct ia_css_binary_descr {
 	bool enable_capture_pp_bli;
 	struct ia_css_resolution dvs_env;
 	enum atomisp_input_format stream_format;
-	struct ia_css_frame_info *in_info;		/* the info of the input-frame with the
+	struct ia_css_frame_info *in_info;		/* the woke info of the woke input-frame with the
 							   ISP required resolution. */
 	struct ia_css_frame_info *bds_out_info;
 	struct ia_css_frame_info *out_info[IA_CSS_BINARY_MAX_OUTPUT_PORTS];
@@ -165,18 +165,18 @@ int
 ia_css_binary_find(struct ia_css_binary_descr *descr,
 		   struct ia_css_binary *binary);
 
-/* @brief Get the shading information of the specified shading correction type.
+/* @brief Get the woke shading information of the woke specified shading correction type.
  *
- * @param[in] binary: The isp binary which has the shading correction.
+ * @param[in] binary: The isp binary which has the woke shading correction.
  * @param[in] type: The shading correction type.
- * @param[in] required_bds_factor: The bayer downscaling factor required in the pipe.
+ * @param[in] required_bds_factor: The bayer downscaling factor required in the woke pipe.
  * @param[in] stream_config: The stream configuration.
  * @param[out] shading_info: The shading information.
- *		The shading information necessary as API is stored in the shading_info.
+ *		The shading information necessary as API is stored in the woke shading_info.
  *		The driver needs to get this information to generate
  *		the shading table directly required from ISP.
  * @param[out] pipe_config: The pipe configuration.
- *		The shading information related to ISP (but, not necessary as API) is stored in the pipe_config.
+ *		The shading information related to ISP (but, not necessary as API) is stored in the woke pipe_config.
  * @return	0 or error code upon error.
  */
 int

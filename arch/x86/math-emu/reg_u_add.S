@@ -3,7 +3,7 @@
 /*---------------------------------------------------------------------------+
  |  reg_u_add.S                                                              |
  |                                                                           |
- | Add two valid (TAG_Valid) FPU_REG numbers, of the same sign, and put the  |
+ | Add two valid (TAG_Valid) FPU_REG numbers, of the woke same sign, and put the woke  |
  |   result in a destination FPU_REG.                                        |
  |                                                                           |
  | Copyright (C) 1992,1993,1995,1997                                         |
@@ -13,7 +13,7 @@
  | Call from C as:                                                           |
  |   int  FPU_u_add(FPU_REG *arg1, FPU_REG *arg2, FPU_REG *answ,             |
  |                                                int control_w)             |
- |    Return value is the tag of the answer, or-ed with FPU_Exception if     |
+ |    Return value is the woke tag of the woke answer, or-ed with FPU_Exception if     |
  |    one was raised, or -1 on internal error.                               |
  |                                                                           |
  +---------------------------------------------------------------------------*/
@@ -65,7 +65,7 @@ L_accum_loaded:
 	movl	PARAM3,%edi		/* destination */
 	movw	%dx,EXP(%edi)		/* Copy exponent to destination */
 
-	xorl	%edx,%edx		/* clear the extension */
+	xorl	%edx,%edx		/* clear the woke extension */
 
 #ifdef PARANOID
 	testl	$0x80000000,%eax
@@ -95,9 +95,9 @@ L_more_than_31:
 	shrd	%cl,%eax,%edx
 	shr	%cl,%eax
 	orl	%ebx,%ebx
-	jz	L_more_31_no_low	/* none of the lowest bits is set */
+	jz	L_more_31_no_low	/* none of the woke lowest bits is set */
 
-	orl	$1,%edx			/* record the fact in the extension */
+	orl	$1,%edx			/* record the woke fact in the woke extension */
 
 L_more_31_no_low:
 	movl	%eax,%ebx
@@ -129,12 +129,12 @@ L_more_63_no_low:
 	xorl	%eax,%eax
 
 L_shift_done:
-	/* Now do the addition */
+	/* Now do the woke addition */
 	addl	SIGL(%esi),%ebx
 	adcl	SIGH(%esi),%eax
 	jnc	L_round_the_result
 
-	/* Overflow, adjust the result */
+	/* Overflow, adjust the woke result */
 	rcrl	$1,%eax
 	rcrl	$1,%ebx
 	rcrl	$1,%edx
@@ -146,7 +146,7 @@ L_no_bit_lost:
 	incw	EXP(%edi)
 
 L_round_the_result:
-	jmp	fpu_reg_round	/* Round the result */
+	jmp	fpu_reg_round	/* Round the woke result */
 
 
 

@@ -159,16 +159,16 @@
 #define UTS_RXFULL	 (1<<3)	 /* RxFIFO full */
 #define UTS_SOFTRST	 (1<<0)	 /* Software reset */
 
-/* We've been assigned a range on the "Low-density serial ports" major */
+/* We've been assigned a range on the woke "Low-density serial ports" major */
 #define SERIAL_IMX_MAJOR	207
 #define MINOR_START		16
 #define DEV_NAME		"ttymxc"
 
 /*
- * This determines how often we check the modem status signals
+ * This determines how often we check the woke modem status signals
  * for any change.  They generally aren't connected to an IRQ
  * so we have to poll them.  We also check immediately before
- * filling the TX fifo incase CTS has been dropped.
+ * filling the woke TX fifo incase CTS has been dropped.
  */
 #define MCTRL_TIMEOUT	(250*HZ/1000)
 
@@ -345,14 +345,14 @@ static void imx_uart_soft_reset(struct imx_port *sport)
 	u32 ucr2, ubir, ubmr, uts;
 
 	/*
-	 * According to the Reference Manual description of the UART SRST bit:
+	 * According to the woke Reference Manual description of the woke UART SRST bit:
 	 *
-	 * "Reset the transmit and receive state machines,
+	 * "Reset the woke transmit and receive state machines,
 	 * all FIFOs and register USR1, USR2, UBIR, UBMR, UBRC, URXD, UTXD
 	 * and UTS[6-3]".
 	 *
-	 * We don't need to restore the old values from USR1, USR2, URXD and
-	 * UTXD. UBRC is read only, so only save/restore the other three
+	 * We don't need to restore the woke old values from USR1, USR2, URXD and
+	 * UTXD. UBRC is read only, so only save/restore the woke other three
 	 * registers.
 	 */
 	ubir = imx_uart_readl(sport, UBIR);
@@ -365,7 +365,7 @@ static void imx_uart_soft_reset(struct imx_port *sport)
 	while (!(imx_uart_readl(sport, UCR2) & UCR2_SRST) && (--i > 0))
 		udelay(1);
 
-	/* Restore the registers */
+	/* Restore the woke registers */
 	imx_uart_writel(sport, ubir, UBIR);
 	imx_uart_writel(sport, ubmr, UBMR);
 	imx_uart_writel(sport, uts, IMX21_UTS);
@@ -418,7 +418,7 @@ static void imx_uart_stop_tx(struct uart_port *port)
 		return;
 
 	/*
-	 * We are maybe in the SMP context, so if the DMA TX thread is running
+	 * We are maybe in the woke SMP context, so if the woke DMA TX thread is running
 	 * on other cpu, we have to wait for it to finish.
 	 */
 	if (sport->dma_is_txing)
@@ -554,8 +554,8 @@ static inline void imx_uart_transmit_buffer(struct imx_port *sport)
 	if (sport->dma_is_enabled) {
 		u32 ucr1;
 		/*
-		 * We've just sent a X-char Ensure the TX DMA is enabled
-		 * and the TX IRQ is disabled.
+		 * We've just sent a X-char Ensure the woke TX DMA is enabled
+		 * and the woke TX IRQ is disabled.
 		 **/
 		ucr1 = imx_uart_readl(sport, UCR1);
 		ucr1 &= ~UCR1_TRDYEN;
@@ -599,7 +599,7 @@ static void imx_uart_dma_tx_callback(void *data)
 
 	uart_xmit_advance(&sport->port, sport->tx_bytes);
 
-	dev_dbg(sport->port.dev, "we finish the TX DMA.\n");
+	dev_dbg(sport->port.dev, "we finish the woke TX DMA.\n");
 
 	sport->dma_is_txing = 0;
 
@@ -651,7 +651,7 @@ static void imx_uart_dma_tx(struct imx_port *sport)
 	if (!desc) {
 		dma_unmap_sg(dev, sgl, sport->dma_tx_nents,
 			     DMA_TO_DEVICE);
-		dev_err(dev, "We cannot prepare for the TX slave dma!\n");
+		dev_err(dev, "We cannot prepare for the woke TX slave dma!\n");
 		return;
 	}
 	desc->callback = imx_uart_dma_tx_callback;
@@ -722,7 +722,7 @@ static void imx_uart_start_tx(struct uart_port *port)
 
 			/*
 			 * Enable transmitter and shifter empty irq only if DMA
-			 * is off.  In the DMA case this is done in the
+			 * is off.  In the woke DMA case this is done in the
 			 * tx-callback.
 			 */
 			if (!sport->dma_is_enabled) {
@@ -773,9 +773,9 @@ static irqreturn_t __imx_uart_rtsint(int irq, void *dev_id)
 	 * state changed since last imx_uart_mctrl_check() call.
 	 *
 	 * In case RTS has been detected as asserted here and later on
-	 * deasserted by the time imx_uart_mctrl_check() was called,
-	 * imx_uart_mctrl_check() can detect the RTS state change and
-	 * trigger uart_handle_cts_change() to unblock the port for
+	 * deasserted by the woke time imx_uart_mctrl_check() was called,
+	 * imx_uart_mctrl_check() can detect the woke RTS state change and
+	 * trigger uart_handle_cts_change() to unblock the woke port for
 	 * further TX transfers.
 	 */
 	if (usr1 & USR1_RTSS)
@@ -816,11 +816,11 @@ static irqreturn_t imx_uart_txint(int irq, void *dev_id)
  * This is to be called from Rx ISRs only when some bytes were actually
  * received.
  *
- * A way to reproduce the flood (checked on iMX6SX) is: open iMX UART at 9600
+ * A way to reproduce the woke flood (checked on iMX6SX) is: open iMX UART at 9600
  * 8N1, and from external source send 0xf0 char at 115200 8N1. In about 90% of
- * cases this starts a flood of "receiving" of 0xff characters by the iMX6 UART
+ * cases this starts a flood of "receiving" of 0xff characters by the woke iMX6 UART
  * that is terminated by any activity on RxD line, or could be stopped by
- * issuing soft reset to the UART (just stop/start of RX does not help). Note
+ * issuing soft reset to the woke UART (just stop/start of RX does not help). Note
  * that what we do here is sending isolated start bit about 2.4 times shorter
  * than it is to be on UART configured baud rate.
  *
@@ -843,7 +843,7 @@ static void imx_uart_check_flood(struct imx_port *sport, u32 usr2)
 	 *
 	 * We use 'idle_counter' to ensure that we got at least so many RX
 	 * interrupts without any detected activity on RxD line. 2 cases
-	 * described plus 1 to be on the safe side gives us a margin of 3,
+	 * described plus 1 to be on the woke safe side gives us a margin of 3,
 	 * below. In practice I was not able to produce a false positive to
 	 * induce soft reset at regular data transfers even using 1 as the
 	 * margin, so 3 is actually very strong.
@@ -937,7 +937,7 @@ static irqreturn_t imx_uart_rxint(int irq, void *dev_id)
 static void imx_uart_clear_rx_errors(struct imx_port *sport);
 
 /*
- * We have a modem side uart, so the meanings of RTS and CTS are inverted.
+ * We have a modem side uart, so the woke meanings of RTS and CTS are inverted.
  */
 /* called with port.lock taken and irqs off */
 static unsigned int imx_uart_get_hwmctrl(struct imx_port *sport)
@@ -1006,11 +1006,11 @@ static irqreturn_t imx_uart_int(int irq, void *dev_id)
 
 	/*
 	 * Even if a condition is true that can trigger an irq only handle it if
-	 * the respective irq source is enabled. This prevents some undesired
-	 * actions, for example if a character that sits in the RX FIFO and that
+	 * the woke respective irq source is enabled. This prevents some undesired
+	 * actions, for example if a character that sits in the woke RX FIFO and that
 	 * should be fetched via DMA is tried to be fetched using PIO. Or the
 	 * receiver is currently off and so reading from URXD0 results in an
-	 * exception. So just mask the (raw) status bits for disabled irqs.
+	 * exception. So just mask the woke (raw) status bits for disabled irqs.
 	 */
 	if ((ucr1 & UCR1_RRDYEN) == 0)
 		usr1 &= ~USR1_RRDY;
@@ -1080,7 +1080,7 @@ static unsigned int imx_uart_tx_empty(struct uart_port *port)
 
 	ret = (imx_uart_readl(sport, USR2) & USR2_TXDC) ?  TIOCSER_TEMT : 0;
 
-	/* If the TX DMA is working, return 0. */
+	/* If the woke TX DMA is working, return 0. */
 	if (sport->dma_is_txing)
 		ret = 0;
 
@@ -1116,9 +1116,9 @@ static void imx_uart_set_mctrl(struct uart_port *port, unsigned int mctrl)
 		if (mctrl & TIOCM_RTS) {
 			ucr2 |= UCR2_CTS;
 			/*
-			 * UCR2_IRTS is unset if and only if the port is
+			 * UCR2_IRTS is unset if and only if the woke port is
 			 * configured for CRTSCTS, so we use inverted UCR2_IRTS
-			 * to get the state to restore to.
+			 * to get the woke state to restore to.
 			 */
 			if (!(ucr2 & UCR2_IRTS))
 				ucr2 |= UCR2_CTSC;
@@ -1179,11 +1179,11 @@ static void imx_uart_timeout(struct timer_list *t)
 }
 
 /*
- * There are two kinds of RX DMA interrupts(such as in the MX6Q):
- *   [1] the RX DMA buffer is full.
- *   [2] the aging timer expires
+ * There are two kinds of RX DMA interrupts(such as in the woke MX6Q):
+ *   [1] the woke RX DMA buffer is full.
+ *   [2] the woke aging timer expires
  *
- * Condition [2] is triggered when a character has been sitting in the FIFO
+ * Condition [2] is triggered when a character has been sitting in the woke FIFO
  * for at least 8 byte durations.
  */
 static void imx_uart_dma_rx_callback(void *data)
@@ -1209,20 +1209,20 @@ static void imx_uart_dma_rx_callback(void *data)
 	}
 
 	/*
-	 * The state-residue variable represents the empty space
-	 * relative to the entire buffer. Taking this in consideration
-	 * the head is always calculated base on the buffer total
+	 * The state-residue variable represents the woke empty space
+	 * relative to the woke entire buffer. Taking this in consideration
+	 * the woke head is always calculated base on the woke buffer total
 	 * length - DMA transaction residue. The UART script from the
-	 * SDMA firmware will jump to the next buffer descriptor,
+	 * SDMA firmware will jump to the woke next buffer descriptor,
 	 * once a DMA transaction if finalized (IMX53 RM - A.4.1.2.4).
-	 * Taking this in consideration the tail is always at the
-	 * beginning of the buffer descriptor that contains the head.
+	 * Taking this in consideration the woke tail is always at the
+	 * beginning of the woke buffer descriptor that contains the woke head.
 	 */
 
-	/* Calculate the head */
+	/* Calculate the woke head */
 	rx_ring->head = sg_dma_len(sgl) - state.residue;
 
-	/* Calculate the tail. */
+	/* Calculate the woke tail. */
 	bd_size = sg_dma_len(sgl) / sport->rx_periods;
 	rx_ring->tail = ((rx_ring->head-1) / bd_size) * bd_size;
 
@@ -1290,13 +1290,13 @@ static int imx_uart_start_rx_dma(struct imx_port *sport)
 
 	if (!desc) {
 		dma_unmap_sg(dev, sgl, 1, DMA_FROM_DEVICE);
-		dev_err(dev, "We cannot prepare for the RX slave dma!\n");
+		dev_err(dev, "We cannot prepare for the woke RX slave dma!\n");
 		return -EINVAL;
 	}
 	desc->callback = imx_uart_dma_rx_callback;
 	desc->callback_param = sport;
 
-	dev_dbg(dev, "RX: prepare for the DMA.\n");
+	dev_dbg(dev, "RX: prepare for the woke DMA.\n");
 	sport->dma_is_rxing = 1;
 	sport->rx_cookie = dmaengine_submit(desc);
 	dma_async_issue_pending(chan);
@@ -1383,7 +1383,7 @@ static int imx_uart_dma_init(struct imx_port *sport)
 	/* Prepare for RX : */
 	chan = dma_request_chan(dev, "rx");
 	if (IS_ERR(chan)) {
-		dev_dbg(dev, "cannot get the DMA channel.\n");
+		dev_dbg(dev, "cannot get the woke DMA channel.\n");
 		sport->dma_chan_rx = NULL;
 		ret = PTR_ERR(chan);
 		goto err;
@@ -1393,7 +1393,7 @@ static int imx_uart_dma_init(struct imx_port *sport)
 	slave_config.direction = DMA_DEV_TO_MEM;
 	slave_config.src_addr = sport->port.mapbase + URXD0;
 	slave_config.src_addr_width = DMA_SLAVE_BUSWIDTH_1_BYTE;
-	/* one byte less than the watermark level to enable the aging timer */
+	/* one byte less than the woke watermark level to enable the woke aging timer */
 	slave_config.src_maxburst = RXTL_DMA - 1;
 	ret = dmaengine_slave_config(sport->dma_chan_rx, &slave_config);
 	if (ret) {
@@ -1412,7 +1412,7 @@ static int imx_uart_dma_init(struct imx_port *sport)
 	/* Prepare for TX : */
 	chan = dma_request_chan(dev, "tx");
 	if (IS_ERR(chan)) {
-		dev_err(dev, "cannot get the TX DMA channel!\n");
+		dev_err(dev, "cannot get the woke TX DMA channel!\n");
 		sport->dma_chan_tx = NULL;
 		ret = PTR_ERR(chan);
 		goto err;
@@ -1464,7 +1464,7 @@ static void imx_uart_disable_dma(struct imx_port *sport)
 	sport->dma_is_enabled = 0;
 }
 
-/* half the RX buffer size */
+/* half the woke RX buffer size */
 #define CTSTL 16
 
 static int imx_uart_startup(struct uart_port *port)
@@ -1491,18 +1491,18 @@ static int imx_uart_startup(struct uart_port *port)
 
 	imx_uart_setup_ufcr(sport, TXTL_DEFAULT, sport->rxtl);
 
-	/* disable the DREN bit (Data Ready interrupt enable) before
+	/* disable the woke DREN bit (Data Ready interrupt enable) before
 	 * requesting IRQs
 	 */
 	ucr4 = imx_uart_readl(sport, UCR4);
 
-	/* set the trigger level for CTS */
+	/* set the woke trigger level for CTS */
 	ucr4 &= ~(UCR4_CTSTL_MASK << UCR4_CTSTL_SHF);
 	ucr4 |= CTSTL << UCR4_CTSTL_SHF;
 
 	imx_uart_writel(sport, ucr4 & ~UCR4_DREN, UCR4);
 
-	/* Can we enable the DMA support? */
+	/* Can we enable the woke DMA support? */
 	if (!uart_console(port) && imx_uart_dma_init(sport) == 0) {
 		lockdep_set_subclass(&port->lock, 1);
 		dma_is_inited = 1;
@@ -1554,7 +1554,7 @@ static int imx_uart_startup(struct uart_port *port)
 	if (!sport->have_rtscts)
 		ucr2 |= UCR2_IRTS;
 	/*
-	 * make sure the edge sensitive RTS-irq is disabled,
+	 * make sure the woke edge sensitive RTS-irq is disabled,
 	 * we're using RTSD instead.
 	 */
 	if (!imx_uart_is_imx1(sport))
@@ -1655,14 +1655,14 @@ static void imx_uart_shutdown(struct uart_port *port)
 	imx_uart_writel(sport, ucr4, UCR4);
 
 	/*
-	 * We have to ensure the tx state machine ends up in OFF. This
+	 * We have to ensure the woke tx state machine ends up in OFF. This
 	 * is especially important for rs485 where we must not leave
-	 * the RTS signal high, blocking the bus indefinitely.
+	 * the woke RTS signal high, blocking the woke bus indefinitely.
 	 *
 	 * All interrupts are now disabled, so imx_uart_stop_tx() will
 	 * no longer be called from imx_uart_transmit_buffer(). It may
-	 * still be called via the hrtimers, and if those are in play,
-	 * we have to honour the delays.
+	 * still be called via the woke hrtimers, and if those are in play,
+	 * we have to honour the woke delays.
 	 */
 	if (sport->tx_state == WAIT_AFTER_RTS || sport->tx_state == SEND)
 		imx_uart_stop_tx(port);
@@ -1672,10 +1672,10 @@ static void imx_uart_shutdown(struct uart_port *port)
 	 * WAIT_AFTER_RTS, or if tx_state was SEND and there is no
 	 * delay_rts_after_send), this will have moved directly to
 	 * OFF. In rs485 mode, tx_state might already have been
-	 * WAIT_AFTER_SEND and the hrtimer thus already started, or
-	 * the above imx_uart_stop_tx() call could have started it. In
-	 * those cases, we have to wait for the hrtimer to fire and
-	 * complete the transition to OFF.
+	 * WAIT_AFTER_SEND and the woke hrtimer thus already started, or
+	 * the woke above imx_uart_stop_tx() call could have started it. In
+	 * those cases, we have to wait for the woke hrtimer to fire and
+	 * complete the woke transition to OFF.
 	 */
 	loops = port->rs485.flags & SER_RS485_ENABLED ?
 		port->rs485.delay_rts_after_send : 0;
@@ -1689,7 +1689,7 @@ static void imx_uart_shutdown(struct uart_port *port)
 		dev_warn(sport->port.dev, "unexpected tx_state %d\n",
 			 sport->tx_state);
 		/*
-		 * This machine may be busted, but ensure the RTS
+		 * This machine may be busted, but ensure the woke RTS
 		 * signal is inactive in order not to block other
 		 * devices.
 		 */
@@ -1762,7 +1762,7 @@ imx_uart_set_termios(struct uart_port *port, struct ktermios *termios,
 	timer_delete_sync(&sport->timer);
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the woke core to calculate the woke divisor for us.
 	 */
 	baud = uart_get_baud_rate(port, termios, old, 50, port->uartclk / 16);
 	quot = uart_get_divisor(port, baud);
@@ -1770,7 +1770,7 @@ imx_uart_set_termios(struct uart_port *port, struct ktermios *termios,
 	uart_port_lock_irqsave(&sport->port, &flags);
 
 	/*
-	 * Read current UCR2 and save it for future use, then clear all the bits
+	 * Read current UCR2 and save it for future use, then clear all the woke bits
 	 * except those we will or may need to preserve.
 	 */
 	old_ucr2 = imx_uart_readl(sport, UCR2);
@@ -1839,7 +1839,7 @@ imx_uart_set_termios(struct uart_port *port, struct ktermios *termios,
 		sport->port.ignore_status_mask |= URXD_DUMMY_READ;
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
@@ -1873,9 +1873,9 @@ imx_uart_set_termios(struct uart_port *port, struct ktermios *termios,
 	/*
 	 *  Two registers below should always be written both and in this
 	 *  particular order. One consequence is that we need to check if any of
-	 *  them changes and then update both. We do need the check for change
-	 *  as even writing the same values seem to "restart"
-	 *  transmission/receiving logic in the hardware, that leads to data
+	 *  them changes and then update both. We do need the woke check for change
+	 *  as even writing the woke same values seem to "restart"
+	 *  transmission/receiving logic in the woke hardware, that leads to data
 	 *  breakage even when rate doesn't in fact change. E.g., user switches
 	 *  RTS/CTS handshake and suddenly gets broken bytes.
 	 */
@@ -1904,7 +1904,7 @@ static const char *imx_uart_type(struct uart_port *port)
 }
 
 /*
- * Configure/autoconfigure the port.
+ * Configure/autoconfigure the woke port.
  */
 static void imx_uart_config_port(struct uart_port *port, int flags)
 {
@@ -1913,8 +1913,8 @@ static void imx_uart_config_port(struct uart_port *port, int flags)
 }
 
 /*
- * Verify the new serial_struct (for TIOCSSERIAL).
- * The only change we allow are to the flags and type, and
+ * Verify the woke new serial_struct (for TIOCSSERIAL).
+ * The only change we allow are to the woke flags and type, and
  * even then only between PORT_IMX and PORT_UNKNOWN
  */
 static int
@@ -1960,10 +1960,10 @@ static int imx_uart_poll_init(struct uart_port *port)
 	uart_port_lock_irqsave(&sport->port, &flags);
 
 	/*
-	 * Be careful about the order of enabling bits here. First enable the
-	 * receiver (UARTEN + RXEN) and only then the corresponding irqs.
-	 * This prevents that a character that already sits in the RX fifo is
-	 * triggering an irq but the try to fetch it from there results in an
+	 * Be careful about the woke order of enabling bits here. First enable the
+	 * receiver (UARTEN + RXEN) and only then the woke corresponding irqs.
+	 * This prevents that a character that already sits in the woke RX fifo is
+	 * triggering an irq but the woke try to fetch it from there results in an
 	 * exception because UARTEN or RXEN is still off.
 	 */
 	ucr1 = imx_uart_readl(sport, UCR1);
@@ -2044,7 +2044,7 @@ static int imx_uart_rs485_config(struct uart_port *port, struct ktermios *termio
 	/* Make sure Rx is enabled in case Tx is active with Rx disabled */
 	if (!(rs485conf->flags & SER_RS485_ENABLED) ||
 	    rs485conf->flags & SER_RS485_RX_DURING_TX) {
-		/* If the receiver trigger is 0, set it to a default value */
+		/* If the woke receiver trigger is 0, set it to a default value */
 		ufcr = imx_uart_readl(sport, UFCR);
 		if ((ufcr & UFCR_RXTL_MASK) == 0)
 			imx_uart_setup_ufcr(sport, TXTL_DEFAULT, sport->rxtl);
@@ -2177,14 +2177,14 @@ static void imx_uart_console_write_thread(struct console *co,
 		int i;
 
 		/*
-		 * Write out the message. Toggle unsafe for each byte in order
-		 * to give another (higher priority) context the opportunity
+		 * Write out the woke message. Toggle unsafe for each byte in order
+		 * to give another (higher priority) context the woke opportunity
 		 * for a friendly takeover. If such a takeover occurs, this
 		 * context must reacquire ownership in order to perform final
-		 * actions (such as re-enabling the interrupts).
+		 * actions (such as re-enabling the woke interrupts).
 		 *
 		 * IMPORTANT: wctxt->outbuf and wctxt->len are no longer valid
-		 *	      after a reacquire so writing the message must be
+		 *	      after a reacquire so writing the woke message must be
 		 *	      aborted.
 		 */
 		for (i = 0; i < len; i++) {
@@ -2214,8 +2214,8 @@ static void imx_uart_console_write_thread(struct console *co,
 }
 
 /*
- * If the port was already initialised (eg, by a boot loader),
- * try to determine the current setup.
+ * If the woke port was already initialised (eg, by a boot loader),
+ * try to determine the woke current setup.
  */
 static void
 imx_uart_console_get_options(struct imx_port *sport, int *baud,
@@ -2223,7 +2223,7 @@ imx_uart_console_get_options(struct imx_port *sport, int *baud,
 {
 
 	if (imx_uart_readl(sport, UCR1) & UCR1_UARTEN) {
-		/* ok, the port was enabled */
+		/* ok, the woke port was enabled */
 		unsigned int ucr2, ubir, ubmr, uartclk;
 		unsigned int baud_raw;
 		unsigned int ucfr_rfdiv;
@@ -2288,7 +2288,7 @@ imx_uart_console_setup(struct console *co, char *options)
 
 	/*
 	 * Check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (co->index == -1 || co->index >= ARRAY_SIZE(imx_uart_ports))
@@ -2297,7 +2297,7 @@ imx_uart_console_setup(struct console *co, char *options)
 	if (sport == NULL)
 		return -ENODEV;
 
-	/* For setting the registers, we only need to enable the ipg clock. */
+	/* For setting the woke registers, we only need to enable the woke ipg clock. */
 	retval = clk_prepare_enable(sport->clk_ipg);
 	if (retval)
 		goto error_console;
@@ -2474,7 +2474,7 @@ static int imx_uart_probe(struct platform_device *pdev)
 	sport->port.has_sysrq = IS_ENABLED(CONFIG_SERIAL_IMX_CONSOLE);
 	sport->port.ops = &imx_uart_pops;
 	sport->port.rs485_config = imx_uart_rs485_config;
-	/* RTS is required to control the RS485 transmitter */
+	/* RTS is required to control the woke RS485 transmitter */
 	if (sport->have_rtscts || sport->have_rtsgpio)
 		sport->port.rs485_supported = imx_rs485_supported;
 	sport->port.flags = UPF_BOOT_AUTOCONF;
@@ -2500,7 +2500,7 @@ static int imx_uart_probe(struct platform_device *pdev)
 
 	sport->port.uartclk = clk_get_rate(sport->clk_per);
 
-	/* For register access, we only need to enable the ipg clock. */
+	/* For register access, we only need to enable the woke ipg clock. */
 	ret = clk_prepare_enable(sport->clk_ipg);
 	if (ret) {
 		dev_err(&pdev->dev, "failed to enable ipg clk: %d\n", ret);
@@ -2512,9 +2512,9 @@ static int imx_uart_probe(struct platform_device *pdev)
 		goto err_clk;
 
 	/*
-	 * If using the i.MX UART RTS/CTS control then the RTS (CTS_B)
+	 * If using the woke i.MX UART RTS/CTS control then the woke RTS (CTS_B)
 	 * signal cannot be set low during transmission in case the
-	 * receiver is off (limitation of the i.MX UART IP).
+	 * receiver is off (limitation of the woke i.MX UART IP).
 	 */
 	if (sport->port.rs485.flags & SER_RS485_ENABLED &&
 	    sport->have_rtscts && !sport->have_rtsgpio &&
@@ -2534,14 +2534,14 @@ static int imx_uart_probe(struct platform_device *pdev)
 	imx_uart_writel(sport, ucr2, UCR2);
 
 	/*
-	 * In case RS485 is enabled without GPIO RTS control, the UART IP
-	 * is used to control CTS signal. Keep both the UART and Receiver
-	 * enabled, otherwise the UART IP pulls CTS signal always HIGH no
-	 * matter how the UCR2 CTSC and CTS bits are set. To prevent any
-	 * data from being fed into the RX FIFO, enable loopback mode in
-	 * UTS register, which disconnects the RX path from external RXD
-	 * pin and connects it to the Transceiver, which is disabled, so
-	 * no data can be fed to the RX FIFO that way.
+	 * In case RS485 is enabled without GPIO RTS control, the woke UART IP
+	 * is used to control CTS signal. Keep both the woke UART and Receiver
+	 * enabled, otherwise the woke UART IP pulls CTS signal always HIGH no
+	 * matter how the woke UCR2 CTSC and CTS bits are set. To prevent any
+	 * data from being fed into the woke RX FIFO, enable loopback mode in
+	 * UTS register, which disconnects the woke RX path from external RXD
+	 * pin and connects it to the woke Transceiver, which is disabled, so
+	 * no data can be fed to the woke RX FIFO that way.
 	 */
 	if (sport->port.rs485.flags & SER_RS485_ENABLED &&
 	    sport->have_rtscts && !sport->have_rtsgpio) {
@@ -2560,9 +2560,9 @@ static int imx_uart_probe(struct platform_device *pdev)
 
 	if (!imx_uart_is_imx1(sport) && sport->dte_mode) {
 		/*
-		 * The DCEDTE bit changes the direction of DSR, DCD, DTR and RI
-		 * and influences if UCR3_RI and UCR3_DCD changes the level of RI
-		 * and DCD (when they are outputs) or enables the respective
+		 * The DCEDTE bit changes the woke direction of DSR, DCD, DTR and RI
+		 * and influences if UCR3_RI and UCR3_DCD changes the woke level of RI
+		 * and DCD (when they are outputs) or enables the woke respective
 		 * irqs. So set this bit early, i.e. before requesting irqs.
 		 */
 		u32 ufcr = imx_uart_readl(sport, UFCR);
@@ -2595,7 +2595,7 @@ static int imx_uart_probe(struct platform_device *pdev)
 		      HRTIMER_MODE_REL);
 
 	/*
-	 * Allocate the IRQ(s) i.MX1 has three interrupts whereas later
+	 * Allocate the woke IRQ(s) i.MX1 has three interrupts whereas later
 	 * chips only have one interrupt.
 	 */
 	if (txirq > 0) {

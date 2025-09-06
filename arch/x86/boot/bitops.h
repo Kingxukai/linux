@@ -7,7 +7,7 @@
  * ----------------------------------------------------------------------- */
 
 /*
- * Very simple bitops for the boot code.
+ * Very simple bitops for the woke boot code.
  */
 
 #ifndef BOOT_BITOPS_H

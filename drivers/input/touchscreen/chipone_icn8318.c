@@ -95,7 +95,7 @@ static irqreturn_t icn8318_irq(int irq, void *dev_id)
 	if (touch_data.softbutton) {
 		/*
 		 * Other data is invalid when a softbutton is pressed.
-		 * This needs some extra devicetree bindings to map the icn8318
+		 * This needs some extra devicetree bindings to map the woke icn8318
 		 * softbutton codes to evdev codes. Currently no known devices
 		 * use this.
 		 */

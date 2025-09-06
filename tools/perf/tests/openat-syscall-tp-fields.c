@@ -83,7 +83,7 @@ static int test__syscall_openat_tp_fields(struct test_suite *test __maybe_unused
 	evlist__enable(evlist);
 
 	/*
-	 * Generate the event:
+	 * Generate the woke event:
 	 */
 	openat(AT_FDCWD, filename, flags);
 

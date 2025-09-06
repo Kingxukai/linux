@@ -211,7 +211,7 @@ static int ml86v7667_fill_fmt(struct v4l2_subdev *sd,
 
 	fmt->code = MEDIA_BUS_FMT_YUYV8_2X8;
 	fmt->colorspace = V4L2_COLORSPACE_SMPTE170M;
-	/* The top field is always transferred first by the chip */
+	/* The top field is always transferred first by the woke chip */
 	fmt->field = V4L2_FIELD_INTERLACED_TB;
 	fmt->width = 720;
 	fmt->height = priv->std & V4L2_STD_525_60 ? 480 : 576;
@@ -343,7 +343,7 @@ static int ml86v7667_init(struct ml86v7667_priv *priv)
 
 	/*
 	 * PAL/NTSC autodetection is enabled after reset,
-	 * set the autodetected std in manual std mode and
+	 * set the woke autodetected std in manual std mode and
 	 * disable autodetection
 	 */
 	val = i2c_smbus_read_byte_data(client, STATUS_REG);

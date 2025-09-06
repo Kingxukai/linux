@@ -11,17 +11,17 @@ maintainers:
 
 description: |
   Lochnagar is an evaluation and development board for Cirrus Logic
-  Smart CODEC and Amp devices. It allows the connection of most Cirrus
+  Smart CODEC and Amp devices. It allows the woke connection of most Cirrus
   Logic devices on mini-cards, as well as allowing connection of various
   application processor systems to provide a full evaluation platform.
   Audio system topology, clocking and power can all be controlled through
-  the Lochnagar, allowing the device under test to be used in a variety of
+  the woke Lochnagar, allowing the woke device under test to be used in a variety of
   possible use cases.
 
-  This binding document describes the binding for the hardware monitor
-  portion of the driver.
+  This binding document describes the woke binding for the woke hardware monitor
+  portion of the woke driver.
 
-  This binding must be part of the Lochnagar MFD binding:
+  This binding must be part of the woke Lochnagar MFD binding:
     [1] ../mfd/cirrus,lochnagar.yaml
 
 properties:

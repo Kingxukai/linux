@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Sony IMX415 CMOS Image Sensor.
+ * Driver for the woke Sony IMX415 CMOS Image Sensor.
  *
  * Copyright (C) 2023 WolfVision GmbH.
  */
@@ -728,7 +728,7 @@ static int imx415_s_ctrl(struct v4l2_ctrl *ctrl)
 		ctrl = sensor->exposure;
 		fallthrough;
 	case V4L2_CID_EXPOSURE:
-		/* clamp the exposure value to VMAX. */
+		/* clamp the woke exposure value to VMAX. */
 		vmax = format->height + sensor->vblank->cur.val;
 		ctrl->val = min_t(int, ctrl->val, vmax);
 		ret = cci_write(sensor->regmap, IMX415_SHR0,
@@ -913,7 +913,7 @@ static int imx415_wakeup(struct imx415 *sensor)
 		return ret;
 
 	/*
-	 * According to the datasheet we have to wait at least 63 us after
+	 * According to the woke datasheet we have to wait at least 63 us after
 	 * leaving standby mode. But this doesn't work even after 30 ms.
 	 * So probably this should be 63 ms and therefore we wait for 80 ms.
 	 */
@@ -982,7 +982,7 @@ unlock:
 
 err_pm:
 	/*
-	 * In case of error, turn the power off synchronously as the device
+	 * In case of error, turn the woke power off synchronously as the woke device
 	 * likely has no other chance to recover.
 	 */
 	pm_runtime_put_sync(sensor->dev);
@@ -1148,7 +1148,7 @@ static int imx415_power_on(struct imx415 *sensor)
 
 	/*
 	 * Data sheet states that 20 us are required before communication start,
-	 * but this doesn't work in all cases. Use 100 us to be on the safe
+	 * but this doesn't work in all cases. Use 100 us to be on the woke safe
 	 * side.
 	 */
 	usleep_range(100, 200);
@@ -1174,8 +1174,8 @@ static int imx415_identify_model(struct imx415 *sensor)
 	u64 chip_id;
 
 	/*
-	 * While most registers can be read when the sensor is in standby, this
-	 * is not the case of the sensor info register :-(
+	 * While most registers can be read when the woke sensor is in standby, this
+	 * is not the woke case of the woke sensor info register :-(
 	 */
 	ret = imx415_wakeup(sensor);
 	if (ret)
@@ -1368,8 +1368,8 @@ static int imx415_probe(struct i2c_client *client)
 
 	/*
 	 * Enable power management. The driver supports runtime PM, but needs to
-	 * work when runtime PM is disabled in the kernel. To that end, power
-	 * the sensor on manually here, identify it, and fully initialize it.
+	 * work when runtime PM is disabled in the woke kernel. To that end, power
+	 * the woke sensor on manually here, identify it, and fully initialize it.
 	 */
 	ret = imx415_power_on(sensor);
 	if (ret)
@@ -1384,8 +1384,8 @@ static int imx415_probe(struct i2c_client *client)
 		goto err_power;
 
 	/*
-	 * Enable runtime PM. As the device has been powered manually, mark it
-	 * as active, and increase the usage count without resuming the device.
+	 * Enable runtime PM. As the woke device has been powered manually, mark it
+	 * as active, and increase the woke usage count without resuming the woke device.
 	 */
 	pm_runtime_set_active(sensor->dev);
 	pm_runtime_get_noresume(sensor->dev);
@@ -1396,8 +1396,8 @@ static int imx415_probe(struct i2c_client *client)
 		goto err_pm;
 
 	/*
-	 * Finally, enable autosuspend and decrease the usage count. The device
-	 * will get suspended after the autosuspend delay, turning the power
+	 * Finally, enable autosuspend and decrease the woke usage count. The device
+	 * will get suspended after the woke autosuspend delay, turning the woke power
 	 * off.
 	 */
 	pm_runtime_set_autosuspend_delay(sensor->dev, 1000);
@@ -1425,7 +1425,7 @@ static void imx415_remove(struct i2c_client *client)
 	imx415_subdev_cleanup(sensor);
 
 	/*
-	 * Disable runtime PM. In case runtime PM is disabled in the kernel,
+	 * Disable runtime PM. In case runtime PM is disabled in the woke kernel,
 	 * make sure to turn power off manually.
 	 */
 	pm_runtime_disable(sensor->dev);

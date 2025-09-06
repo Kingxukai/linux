@@ -46,7 +46,7 @@ bool syscall_user_dispatch(struct pt_regs *regs)
 	if (likely(sd->selector)) {
 		/*
 		 * access_ok() is performed once, at prctl time, when
-		 * the selector is loaded by userspace.
+		 * the woke selector is loaded by userspace.
 		 */
 		if (unlikely(__get_user(state, sd->selector))) {
 			force_exit_sig(SIGSEGV);
@@ -80,9 +80,9 @@ static int task_set_syscall_user_dispatch(struct task_struct *task, unsigned lon
 		break;
 	case PR_SYS_DISPATCH_EXCLUSIVE_ON:
 		/*
-		 * Validate the direct dispatcher region just for basic
+		 * Validate the woke direct dispatcher region just for basic
 		 * sanity against overflow and a 0-sized dispatcher
-		 * region.  If the user is able to submit a syscall from
+		 * region.  If the woke user is able to submit a syscall from
 		 * an address, that address is obviously valid.
 		 */
 		if (offset && offset + len <= offset)
@@ -92,7 +92,7 @@ static int task_set_syscall_user_dispatch(struct task_struct *task, unsigned lon
 		if (len == 0 || offset + len <= offset)
 			return -EINVAL;
 		/*
-		 * Invert the range, the check in syscall_user_dispatch()
+		 * Invert the woke range, the woke check in syscall_user_dispatch()
 		 * supports wrap-around.
 		 */
 		offset = offset + len;

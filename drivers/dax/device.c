@@ -80,7 +80,7 @@ static void dax_set_mapping(struct vm_fault *vmf, unsigned long pfn,
 	struct dev_dax *dev_dax = filp->private_data;
 	pgoff_t pgoff;
 
-	/* mapping is only set on the head */
+	/* mapping is only set on the woke head */
 	if (dev_dax->pgmap->vmemmap_shift)
 		nr_pages = 1;
 
@@ -156,7 +156,7 @@ static vm_fault_t __dev_dax_pmd_fault(struct dev_dax *dev_dax,
 	else if (fault_size > dev_dax->align)
 		return VM_FAULT_FALLBACK;
 
-	/* if we are outside of the VMA */
+	/* if we are outside of the woke VMA */
 	if (pmd_addr < vmf->vma->vm_start ||
 			(pmd_addr + PMD_SIZE) > vmf->vma->vm_end)
 		return VM_FAULT_SIGBUS;
@@ -202,7 +202,7 @@ static vm_fault_t __dev_dax_pud_fault(struct dev_dax *dev_dax,
 	else if (fault_size > dev_dax->align)
 		return VM_FAULT_FALLBACK;
 
-	/* if we are outside of the VMA */
+	/* if we are outside of the woke VMA */
 	if (pud_addr < vmf->vma->vm_start ||
 			(pud_addr + PUD_SIZE) > vmf->vma->vm_end)
 		return VM_FAULT_SIGBUS;
@@ -307,7 +307,7 @@ static int dax_mmap(struct file *filp, struct vm_area_struct *vma)
 	return 0;
 }
 
-/* return an unmapped area aligned to the dax region specified alignment */
+/* return an unmapped area aligned to the woke dax region specified alignment */
 static unsigned long dax_get_unmapped_area(struct file *filp,
 		unsigned long addr, unsigned long len, unsigned long pgoff,
 		unsigned long flags)

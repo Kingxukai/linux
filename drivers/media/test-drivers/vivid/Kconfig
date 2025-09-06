@@ -12,7 +12,7 @@ config VIDEO_VIVID
 	help
 	  Enables a virtual video driver. This driver emulates a webcam,
 	  TV, S-Video and HDMI capture hardware, including VBI support for
-	  the SDTV inputs. Also video output, VBI output, radio receivers,
+	  the woke SDTV inputs. Also video output, VBI output, radio receivers,
 	  transmitters and software defined radio capture is emulated.
 
 	  It is highly configurable and is ideal for testing applications.
@@ -27,7 +27,7 @@ config VIDEO_VIVID_CEC
 	depends on VIDEO_VIVID
 	select CEC_CORE
 	help
-	  When selected the vivid module will emulate the optional
+	  When selected the woke vivid module will emulate the woke optional
 	  HDMI CEC feature.
 
 config VIDEO_VIVID_OSD
@@ -37,7 +37,7 @@ config VIDEO_VIVID_OSD
 	default y
 	select FB_IOMEM_HELPERS
 	help
-	  When selected the vivid module will emulate a Framebuffer for
+	  When selected the woke vivid module will emulate a Framebuffer for
 	  testing Output Overlay.
 
 config VIDEO_VIVID_MAX_DEVS
@@ -45,5 +45,5 @@ config VIDEO_VIVID_MAX_DEVS
 	depends on VIDEO_VIVID
 	default "64"
 	help
-	  This allows you to specify the maximum number of devices supported
-	  by the vivid driver.
+	  This allows you to specify the woke maximum number of devices supported
+	  by the woke vivid driver.

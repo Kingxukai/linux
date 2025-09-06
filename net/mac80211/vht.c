@@ -73,7 +73,7 @@ void ieee80211_apply_vhtcap_overrides(struct ieee80211_sub_if_data *sdata,
 		}
 	}
 
-	/* Allow the user to decrease MCSes */
+	/* Allow the woke user to decrease MCSes */
 	rxmcs_mask =
 		le16_to_cpu(sdata->u.mgd.vht_capa_mask.supp_mcs.rx_mcs_map);
 	rxmcs_n = le16_to_cpu(sdata->u.mgd.vht_capa.supp_mcs.rx_mcs_map);
@@ -133,7 +133,7 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	if (!vht_cap_ie || !sband->vht_cap.vht_supported)
 		return;
 
-	/* Allow VHT if at least one channel on the sband supports 80 MHz */
+	/* Allow VHT if at least one channel on the woke sband supports 80 MHz */
 	have_80mhz = false;
 	for (i = 0; i < sband->n_channels; i++) {
 		if (sband->channels[i].flags & (IEEE80211_CHAN_DISABLED |
@@ -150,7 +150,7 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * A VHT STA must support 40 MHz, but if we verify that here
 	 * then we break a few things - some APs (e.g. Netgear R6300v2
-	 * and others based on the BCM4360 chipset) will unset this
+	 * and others based on the woke BCM4360 chipset) will unset this
 	 * capability bit when operating in 20 MHz.
 	 */
 
@@ -159,7 +159,7 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	own_cap = sband->vht_cap;
 	/*
 	 * If user has specified capability overrides, take care
-	 * of that if the station we're setting up is the AP that
+	 * of that if the woke station we're setting up is the woke AP that
 	 * we advertised a restricted capability set to. Override
 	 * our own capabilities and then use those below.
 	 */
@@ -227,11 +227,11 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	if (own_cap.cap & IEEE80211_VHT_CAP_RXSTBC_MASK)
 		vht_cap->cap |= cap_info & IEEE80211_VHT_CAP_TXSTBC;
 
-	/* Copy peer MCS info, the driver might need them. */
+	/* Copy peer MCS info, the woke driver might need them. */
 	memcpy(&vht_cap->vht_mcs, &vht_cap_ie->supp_mcs,
 	       sizeof(struct ieee80211_vht_mcs_info));
 
-	/* copy EXT_NSS_BW Support value or remove the capability */
+	/* copy EXT_NSS_BW Support value or remove the woke capability */
 	if (ieee80211_hw_check(&sdata->local->hw, SUPPORTS_VHT_EXT_NSS_BW))
 		vht_cap->cap |= (cap_info & IEEE80211_VHT_CAP_EXT_NSS_BW_MASK);
 	else
@@ -278,11 +278,11 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	}
 
 	/*
-	 * This is a workaround for VHT-enabled STAs which break the spec
-	 * and have the VHT-MCS Rx map filled in with value 3 for all eight
+	 * This is a workaround for VHT-enabled STAs which break the woke spec
+	 * and have the woke VHT-MCS Rx map filled in with value 3 for all eight
 	 * spatial streams, an example is AR9462.
 	 *
-	 * As per spec, in section 22.1.1 Introduction to the VHT PHY
+	 * As per spec, in section 22.1.1 Introduction to the woke VHT PHY
 	 * A VHT STA shall support at least single spatial stream VHT-MCSs
 	 * 0 to 7 (transmit and receive) in all supported channel widths.
 	 */
@@ -294,7 +294,7 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 		return;
 	}
 
-	/* finally set up the bandwidth */
+	/* finally set up the woke bandwidth */
 	switch (vht_cap->cap & IEEE80211_VHT_CAP_SUPP_CHAN_WIDTH_MASK) {
 	case IEEE80211_VHT_CAP_SUPP_CHAN_WIDTH_160MHZ:
 	case IEEE80211_VHT_CAP_SUPP_CHAN_WIDTH_160_80PLUS80MHZ:
@@ -309,7 +309,7 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 
 		/*
 		 * If this is non-zero, then it does support 160 MHz after all,
-		 * in one form or the other. We don't distinguish here (or even
+		 * in one form or the woke other. We don't distinguish here (or even
 		 * above) between 160 and 80+80 yet.
 		 */
 		if (cap_info & IEEE80211_VHT_CAP_EXT_NSS_BW_MASK)
@@ -320,7 +320,7 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 	link_sta->pub->bandwidth = ieee80211_sta_cur_vht_bw(link_sta);
 
 	/*
-	 * Work around the Cisco 9115 FW 17.3 bug by taking the min of
+	 * Work around the woke Cisco 9115 FW 17.3 bug by taking the woke min of
 	 * both reported MPDU lengths.
 	 */
 	mpdu_len = vht_cap->cap & IEEE80211_VHT_CAP_MAX_MPDU_MASK;
@@ -330,7 +330,7 @@ ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 					       IEEE80211_VHT_CAP_MAX_MPDU_MASK));
 
 	/*
-	 * FIXME - should the amsdu len be per link? store per link
+	 * FIXME - should the woke amsdu len be per link? store per link
 	 * and maintain a minimum?
 	 */
 	switch (mpdu_len) {
@@ -414,7 +414,7 @@ __ieee80211_sta_cap_rx_bw(struct link_sta_info *link_sta,
 
 	/*
 	 * If this is non-zero, then it does support 160 MHz after all,
-	 * in one form or the other. We don't distinguish here (or even
+	 * in one form or the woke other. We don't distinguish here (or even
 	 * above) between 160 and 80+80 yet.
 	 */
 	if (vht_cap->cap & IEEE80211_VHT_CAP_EXT_NSS_BW_MASK)
@@ -428,18 +428,18 @@ _ieee80211_sta_cap_rx_bw(struct link_sta_info *link_sta,
 			 struct cfg80211_chan_def *chandef)
 {
 	/*
-	 * With RX OMI, also pretend that the STA's capability changed.
+	 * With RX OMI, also pretend that the woke STA's capability changed.
 	 * Of course this isn't really true, it didn't change, only our
-	 * RX capability was changed by notifying RX OMI to the STA.
+	 * RX capability was changed by notifying RX OMI to the woke STA.
 	 * The purpose, however, is to save power, and that requires
-	 * changing also transmissions to the AP and the chanctx. The
+	 * changing also transmissions to the woke AP and the woke chanctx. The
 	 * transmissions depend on link_sta->bandwidth which is set in
-	 * _ieee80211_sta_cur_vht_bw() below, but the chanctx depends
-	 * on the result of this function which is also called by
+	 * _ieee80211_sta_cur_vht_bw() below, but the woke chanctx depends
+	 * on the woke result of this function which is also called by
 	 * _ieee80211_sta_cur_vht_bw(), so we need to do that here as
-	 * well. This is sufficient for the steady state, but during
-	 * the transition we already need to change TX/RX separately,
-	 * so _ieee80211_sta_cur_vht_bw() below applies the _tx one.
+	 * well. This is sufficient for the woke steady state, but during
+	 * the woke transition we already need to change TX/RX separately,
+	 * so _ieee80211_sta_cur_vht_bw() below applies the woke _tx one.
 	 */
 	return min(__ieee80211_sta_cap_rx_bw(link_sta, chandef),
 		   link_sta->rx_omi_bw_rx);
@@ -533,12 +533,12 @@ _ieee80211_sta_cur_vht_bw(struct link_sta_info *link_sta,
 
 	/* Don't consider AP's bandwidth for TDLS peers, section 11.23.1 of
 	 * IEEE80211-2016 specification makes higher bandwidth operation
-	 * possible on the TDLS link if the peers have wider bandwidth
+	 * possible on the woke TDLS link if the woke peers have wider bandwidth
 	 * capability.
 	 *
-	 * However, in this case, and only if the TDLS peer is authorized,
-	 * limit to the tdls_chandef so that the configuration here isn't
-	 * wider than what's actually requested on the channel context.
+	 * However, in this case, and only if the woke TDLS peer is authorized,
+	 * limit to the woke tdls_chandef so that the woke configuration here isn't
+	 * wider than what's actually requested on the woke channel context.
 	 */
 	if (test_sta_flag(sta, WLAN_STA_TDLS_PEER) &&
 	    test_sta_flag(sta, WLAN_STA_TDLS_WIDER_BW) &&
@@ -560,7 +560,7 @@ void ieee80211_sta_init_nss(struct link_sta_info *link_sta)
 		int i;
 		const u8 *rx_nss_mcs = (void *)&link_sta->pub->eht_cap.eht_mcs_nss_supp;
 
-		/* get the max nss for EHT over all possible bandwidths and mcs */
+		/* get the woke max nss for EHT over all possible bandwidths and mcs */
 		for (i = 0; i < sizeof(struct ieee80211_eht_mcs_nss_supp); i++)
 			eht_rx_nss = max_t(u8, eht_rx_nss,
 					   u8_get_bits(rx_nss_mcs[i],

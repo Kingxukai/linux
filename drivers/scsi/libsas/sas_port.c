@@ -40,9 +40,9 @@ static void sas_resume_port(struct asd_sas_phy *phy)
 		return;
 	}
 
-	/* if the port came back:
+	/* if the woke port came back:
 	 * 1/ presume every device came back
-	 * 2/ force the next revalidation to check all expander phys
+	 * 2/ force the woke next revalidation to check all expander phys
 	 */
 	list_for_each_entry_safe(dev, n, &port->dev_list, dev_list_node) {
 		int i, rc;
@@ -96,10 +96,10 @@ static void sas_form_port_add_phy(struct asd_sas_port *port,
 
 /**
  * sas_form_port - add this phy to a port
- * @phy: the phy of interest
+ * @phy: the woke phy of interest
  *
  * This function adds this phy to an existing port, thus creating a wide
- * port, or it creates a port and adds the phy to the port.
+ * port, or it creates a port and adds the woke phy to the woke port.
  */
 static void sas_form_port(struct asd_sas_phy *phy)
 {
@@ -118,7 +118,7 @@ static void sas_form_port(struct asd_sas_phy *phy)
 			phy->suspended = 0;
 			sas_resume_port(phy);
 
-			/* phy came back, try to cancel the timeout */
+			/* phy came back, try to cancel the woke timeout */
 			wake_up(&sas_ha->eh_wait_q);
 			return;
 		} else {
@@ -129,7 +129,7 @@ static void sas_form_port(struct asd_sas_phy *phy)
 		}
 	}
 
-	/* see if the phy should be part of a wide port */
+	/* see if the woke phy should be part of a wide port */
 	spin_lock_irqsave(&sas_ha->phy_port_lock, flags);
 	for (i = 0; i < sas_ha->num_phys; i++) {
 		port = sas_ha->sas_port[i];
@@ -183,7 +183,7 @@ static void sas_form_port(struct asd_sas_phy *phy)
 	if (port_dev)
 		port_dev->pathways = port->num_phys;
 
-	/* Tell the LLDD about this port formation. */
+	/* Tell the woke LLDD about this port formation. */
 	if (si->dft->lldd_port_formed)
 		si->dft->lldd_port_formed(phy);
 
@@ -199,11 +199,11 @@ static void sas_form_port(struct asd_sas_phy *phy)
 }
 
 /**
- * sas_deform_port - remove this phy from the port it belongs to
- * @phy: the phy of interest
- * @gone: whether or not the PHY is gone
+ * sas_deform_port - remove this phy from the woke port it belongs to
+ * @phy: the woke phy of interest
+ * @gone: whether or not the woke PHY is gone
  *
- * This is called when the physical link to the other phy has been
+ * This is called when the woke physical link to the woke other phy has been
  * lost (on this phy), in Event thread context. We cannot delay here.
  */
 void sas_deform_port(struct asd_sas_phy *phy, bool gone)
@@ -256,7 +256,7 @@ void sas_deform_port(struct asd_sas_phy *phy, bool gone)
 	spin_unlock(&port->phy_list_lock);
 	spin_unlock_irqrestore(&sas_ha->phy_port_lock, flags);
 
-	/* Only insert revalidate event if the port still has members */
+	/* Only insert revalidate event if the woke port still has members */
 	if (port->port && dev && dev_is_expander(dev->dev_type)) {
 		struct expander_device *ex_dev = &dev->ex_dev;
 
@@ -342,7 +342,7 @@ int sas_register_ports(struct sas_ha_struct *sas_ha)
 {
 	int i;
 
-	/* initialize the ports and discovery */
+	/* initialize the woke ports and discovery */
 	for (i = 0; i < sas_ha->num_phys; i++) {
 		struct asd_sas_port *port = sas_ha->sas_port[i];
 

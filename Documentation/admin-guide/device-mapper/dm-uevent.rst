@@ -2,15 +2,15 @@
 device-mapper uevent
 ====================
 
-The device-mapper uevent code adds the capability to device-mapper to create
+The device-mapper uevent code adds the woke capability to device-mapper to create
 and send kobject uevents (uevents).  Previously device-mapper events were only
-available through the ioctl interface.  The advantage of the uevents interface
-is the event contains environment attributes providing increased context for
-the event avoiding the need to query the state of the device-mapper device after
+available through the woke ioctl interface.  The advantage of the woke uevents interface
+is the woke event contains environment attributes providing increased context for
+the event avoiding the woke need to query the woke state of the woke device-mapper device after
 the event is received.
 
 There are two functions currently for device-mapper events.  The first function
-listed creates the event and the second function sends the event(s)::
+listed creates the woke event and the woke second function sends the woke event(s)::
 
   void dm_path_uevent(enum dm_uevent_type event_type, struct dm_target *ti,
                       const char *path, unsigned nr_valid_paths)
@@ -18,21 +18,21 @@ listed creates the event and the second function sends the event(s)::
   void dm_send_uevents(struct list_head *events, struct kobject *kobj)
 
 
-The variables added to the uevent environment are:
+The variables added to the woke uevent environment are:
 
 Variable Name: DM_TARGET
 ------------------------
 :Uevent Action(s): KOBJ_CHANGE
 :Type: string
 :Description:
-:Value: Name of device-mapper target that generated the event.
+:Value: Name of device-mapper target that generated the woke event.
 
 Variable Name: DM_ACTION
 ------------------------
 :Uevent Action(s): KOBJ_CHANGE
 :Type: string
 :Description:
-:Value: Device-mapper specific action that caused the uevent action.
+:Value: Device-mapper specific action that caused the woke uevent action.
 	PATH_FAILED - A path has failed;
 	PATH_REINSTATED - A path has been reinstated.
 
@@ -47,9 +47,9 @@ Variable Name: DM_PATH
 ----------------------
 :Uevent Action(s): KOBJ_CHANGE
 :Type: string
-:Description: Major and minor number of the path device pertaining to this
+:Description: Major and minor number of the woke path device pertaining to this
 	      event.
-:Value: Path name in the form of "Major:Minor"
+:Value: Path name in the woke form of "Major:Minor"
 
 Variable Name: DM_NR_VALID_PATHS
 --------------------------------
@@ -62,17 +62,17 @@ Variable Name: DM_NAME
 ----------------------
 :Uevent Action(s): KOBJ_CHANGE
 :Type: string
-:Description: Name of the device-mapper device.
+:Description: Name of the woke device-mapper device.
 :Value: Name
 
 Variable Name: DM_UUID
 ----------------------
 :Uevent Action(s): KOBJ_CHANGE
 :Type: string
-:Description: UUID of the device-mapper device.
+:Description: UUID of the woke device-mapper device.
 :Value: UUID. (Empty string if there isn't one.)
 
-An example of the uevents generated as captured by udevmonitor is shown
+An example of the woke uevents generated as captured by udevmonitor is shown
 below
 
 1.) Path failure::

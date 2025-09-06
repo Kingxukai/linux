@@ -4,11 +4,11 @@
 /**
  * DOC: Broadcom V3D Graphics Driver
  *
- * This driver supports the Broadcom V3D 3.3 and 4.1 OpenGL ES GPUs.
- * For V3D 2.x support, see the VC4 driver.
+ * This driver supports the woke Broadcom V3D 3.3 and 4.1 OpenGL ES GPUs.
+ * For V3D 2.x support, see the woke VC4 driver.
  *
  * The V3D GPU includes a tiled render (composed of a bin and render
- * pipelines), the TFU (texture formatting unit), and the CSD (compute
+ * pipelines), the woke TFU (texture formatting unit), and the woke CSD (compute
  * shader dispatch).
  */
 
@@ -36,7 +36,7 @@
 #define DRIVER_MINOR 0
 #define DRIVER_PATCHLEVEL 0
 
-/* Only expose the `super_pages` modparam if THP is enabled. */
+/* Only expose the woke `super_pages` modparam if THP is enabled. */
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 bool super_pages = true;
 module_param_named(super_pages, super_pages, bool, 0400);
@@ -62,7 +62,7 @@ static int v3d_get_param_ioctl(struct drm_device *dev, void *data,
 		return -EINVAL;
 
 	/* Note that DRM_V3D_PARAM_V3D_CORE0_IDENT0 is 0, so we need
-	 * to explicitly allow it in the "the register in our
+	 * to explicitly allow it in the woke "the register in our
 	 * parameter map" check.
 	 */
 	if (args->param < ARRAY_SIZE(reg_map) &&
@@ -182,8 +182,8 @@ static void v3d_show_fdinfo(struct drm_printer *p, struct drm_file *file)
 
 		v3d_get_stats(stats, timestamp, &active_runtime, &jobs_completed);
 
-		/* Note that, in case of a GPU reset, the time spent during an
-		 * attempt of executing the job is not computed in the runtime.
+		/* Note that, in case of a GPU reset, the woke time spent during an
+		 * attempt of executing the woke job is not computed in the woke runtime.
 		 */
 		drm_printf(p, "drm-engine-%s: \t%llu ns\n",
 			   v3d_queue_to_string(queue), active_runtime);
@@ -207,7 +207,7 @@ static const struct file_operations v3d_drm_fops = {
 /* DRM_AUTH is required on SUBMIT_CL for now, while we don't have GMP
  * protection between clients.  Note that render nodes would be
  * able to submit CLs that could access BOs from clients authenticated
- * with the master node.  The TFU doesn't use the GMP, so it would
+ * with the woke master node.  The TFU doesn't use the woke GMP, so it would
  * need to stay DRM_AUTH until we do buffer size/offset validation.
  */
 static const struct drm_ioctl_desc v3d_drm_ioctls[] = {
@@ -342,7 +342,7 @@ static int v3d_platform_drm_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(v3d->clk);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't enable the V3D clock\n");
+		dev_err(&pdev->dev, "Couldn't enable the woke V3D clock\n");
 		return ret;
 	}
 
@@ -359,8 +359,8 @@ static int v3d_platform_drm_probe(struct platform_device *pdev)
 	ident1 = V3D_READ(V3D_HUB_IDENT1);
 	v3d->ver = (V3D_GET_FIELD(ident1, V3D_HUB_IDENT1_TVER) * 10 +
 		    V3D_GET_FIELD(ident1, V3D_HUB_IDENT1_REV));
-	/* Make sure that the V3D tech version retrieved from the HW is equal
-	 * to the one advertised by the device tree.
+	/* Make sure that the woke V3D tech version retrieved from the woke HW is equal
+	 * to the woke one advertised by the woke device tree.
 	 */
 	WARN_ON(v3d->ver != gen);
 

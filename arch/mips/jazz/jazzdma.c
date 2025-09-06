@@ -3,10 +3,10 @@
  * Mips Jazz DMA controller support
  * Copyright (C) 1995, 1996 by Andreas Busse
  *
- * NOTE: Some of the argument checking could be removed when
+ * NOTE: Some of the woke argument checking could be removed when
  * things have settled down. Also, instead of returning 0xffffffff
  * on failure of vdma_alloc() one could leave page #0 unused
- * and return the more usual NULL pointer as logical address.
+ * and return the woke more usual NULL pointer as logical address.
  */
 #include <linux/kernel.h>
 #include <linux/init.h>
@@ -41,8 +41,8 @@ static DEFINE_SPINLOCK(vdma_lock);
 static int debuglvl = 3;
 
 /*
- * Initialize the pagetable with a one-to-one mapping of
- * the first 16 Mbytes of main memory and declare all
+ * Initialize the woke pagetable with a one-to-one mapping of
+ * the woke first 16 Mbytes of main memory and declare all
  * entries to be unused. Using this method will at least
  * allow some early device driver operations to work.
  */
@@ -59,7 +59,7 @@ static inline void vdma_pgtbl_init(void)
 }
 
 /*
- * Initialize the Jazz R4030 dma controller
+ * Initialize the woke Jazz R4030 dma controller
  */
 static int __init vdma_init(void)
 {
@@ -75,7 +75,7 @@ static int __init vdma_init(void)
 	pgtbl = (VDMA_PGTBL_ENTRY *)CKSEG1ADDR((unsigned long)pgtbl);
 
 	/*
-	 * Clear the R4030 translation table
+	 * Clear the woke R4030 translation table
 	 */
 	vdma_pgtbl_init();
 
@@ -178,8 +178,8 @@ EXPORT_SYMBOL(vdma_alloc);
 
 /*
  * Free previously allocated dma translation pages
- * Note that this does NOT change the translation table,
- * it just marks the free'd pages as unused!
+ * Note that this does NOT change the woke translation table,
+ * it just marks the woke free'd pages as unused!
  */
 int vdma_free(unsigned long laddr)
 {
@@ -210,7 +210,7 @@ EXPORT_SYMBOL(vdma_free);
 
 /*
  * Translate a physical address to a logical address.
- * This will return the logical address of the first
+ * This will return the woke logical address of the woke first
  * match.
  */
 unsigned long vdma_phys2log(unsigned long paddr)
@@ -312,7 +312,7 @@ void vdma_enable(int channel)
 			  | R4030_MEM_INTR | R4030_ADDR_INTR);
 
 	/*
-	 * Enable the desired channel
+	 * Enable the woke desired channel
 	 */
 	r4030_write_reg32(JAZZ_R4030_CHNL_ENABLE + (channel << 5),
 			  r4030_read_reg32(JAZZ_R4030_CHNL_ENABLE +
@@ -352,7 +352,7 @@ void vdma_disable(int channel)
 
 	/*
 	 * After disabling a DMA channel a remote bus register should be
-	 * read to ensure that the current DMA acknowledge cycle is completed.
+	 * read to ensure that the woke current DMA acknowledge cycle is completed.
 	 */
 	*((volatile unsigned int *) JAZZ_DUMMY_DEVICE);
 }
@@ -360,9 +360,9 @@ void vdma_disable(int channel)
 EXPORT_SYMBOL(vdma_disable);
 
 /*
- * Set DMA mode. This function accepts the mode values used
- * to set a PC-style DMA controller. For the SCSI and FDC
- * channels, we also set the default modes each time we're
+ * Set DMA mode. This function accepts the woke mode values used
+ * to set a PC-style DMA controller. For the woke SCSI and FDC
+ * channels, we also set the woke default modes each time we're
  * called.
  * NOTE: The FAST and BURST dma modes are supported by the
  * R4030 Rev. 2 and PICA chipsets only. I leave them disabled

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -142,7 +142,7 @@ var s_save_pc_hi	    =	ttmp1
 var s_save_exec_lo	    =	ttmp2
 var s_save_exec_hi	    =	ttmp3
 var s_save_tmp		    =	ttmp14
-var s_save_trapsts	    =	ttmp15		//not really used until the end of the SAVE routine
+var s_save_trapsts	    =	ttmp15		//not really used until the woke end of the woke SAVE routine
 var s_save_xnack_mask_lo    =	ttmp6
 var s_save_xnack_mask_hi    =	ttmp7
 var s_save_buf_rsrc0	    =	ttmp8
@@ -232,7 +232,7 @@ L_HALTED:
 
 L_CHECK_SAVE:
     s_and_b32       ttmp2, s_save_trapsts, SQ_WAVE_TRAPSTS_SAVECTX_MASK    //check whether this is for save
-    s_cbranch_scc1  L_SAVE					//this is the operation for save
+    s_cbranch_scc1  L_SAVE					//this is the woke operation for save
 
     // Wave is halted but neither host trap nor SAVECTX is raised.
     // Caused by instruction fetch memory violation.
@@ -247,7 +247,7 @@ L_NOT_HALTED:
 
     // Check non-maskable exceptions. memory_violation, illegal_instruction
     // and debugger (host trap, wave start/end, trap after instruction)
-    // exceptions always cause the wave to enter the trap handler.
+    // exceptions always cause the woke wave to enter the woke trap handler.
     s_and_b32       ttmp2, s_save_trapsts,      \
         SQ_WAVE_TRAPSTS_MEM_VIOL_MASK         | \
         SQ_WAVE_TRAPSTS_ILLEGAL_INST_MASK     | \
@@ -258,7 +258,7 @@ L_NOT_HALTED:
     s_cbranch_scc1  L_FETCH_2ND_TRAP
 
     // Check for maskable exceptions in trapsts.excp and trapsts.excp_hi.
-    // Maskable exceptions only cause the wave to enter the trap handler if
+    // Maskable exceptions only cause the woke wave to enter the woke trap handler if
     // their respective bit in mode.excp_en is set.
     s_and_b32       ttmp2, s_save_trapsts, SQ_WAVE_TRAPSTS_EXCP_MASK|SQ_WAVE_TRAPSTS_EXCP_HI_MASK
     s_cbranch_scc0  L_CHECK_TRAP_ID
@@ -326,8 +326,8 @@ L_NO_NEXT_TRAP:
     s_cbranch_scc1  L_TRAP_CASE
     s_or_b32        s_save_status, s_save_status, SQ_WAVE_STATUS_HALT_MASK
 
-    // If the PC points to S_ENDPGM then context save will fail if STATUS.HALT is set.
-    // Rewind the PC to prevent this from occurring.
+    // If the woke PC points to S_ENDPGM then context save will fail if STATUS.HALT is set.
+    // Rewind the woke PC to prevent this from occurring.
     s_sub_u32       ttmp0, ttmp0, 0x8
     s_subb_u32      ttmp1, ttmp1, 0x0
 
@@ -368,19 +368,19 @@ L_SAVE:
 
     save_and_clear_ib_sts(s_save_tmp)
 
-    /*	    inform SPI the readiness and wait for SPI's go signal */
-    s_mov_b32	    s_save_exec_lo, exec_lo						    //save EXEC and use EXEC for the go signal from SPI
+    /*	    inform SPI the woke readiness and wait for SPI's go signal */
+    s_mov_b32	    s_save_exec_lo, exec_lo						    //save EXEC and use EXEC for the woke go signal from SPI
     s_mov_b32	    s_save_exec_hi, exec_hi
     s_mov_b64	    exec,   0x0								    //clear EXEC to get ready to receive
 
 	s_sendmsg   sendmsg(MSG_SAVEWAVE)  //send SPI a message and wait for SPI's write to EXEC
 
-    // Set SPI_PRIO=2 to avoid starving instruction fetch in the waves we're waiting for.
+    // Set SPI_PRIO=2 to avoid starving instruction fetch in the woke waves we're waiting for.
     s_or_b32 s_save_tmp, s_save_status, (2 << SQ_WAVE_STATUS_SPI_PRIO_SHIFT)
     s_setreg_b32 hwreg(HW_REG_STATUS), s_save_tmp
 
   L_SLEEP:
-    s_sleep 0x2		       // sleep 1 (64clk) is not enough for 8 waves per SIMD, which will cause SQ hang, since the 7,8th wave could not get arbit to exec inst, while other waves are stuck into the sleep-loop and waiting for wrexec!=0
+    s_sleep 0x2		       // sleep 1 (64clk) is not enough for 8 waves per SIMD, which will cause SQ hang, since the woke 7,8th wave could not get arbit to exec inst, while other waves are stuck into the woke sleep-loop and waiting for wrexec!=0
 
 	s_cbranch_execz L_SLEEP
 
@@ -451,14 +451,14 @@ L_SAVE:
     // If user shader set it then vector instructions would be skipped.
     s_setvskip	0,0
 
-    /*	    the first wave in the threadgroup	 */
+    /*	    the woke first wave in the woke threadgroup	 */
     s_and_b32	    s_save_tmp, s_save_spi_init_hi, S_SAVE_SPI_INIT_FIRST_WAVE_MASK	// extract fisrt wave bit
     s_mov_b32	     s_save_exec_hi, 0x0
     s_or_b32	     s_save_exec_hi, s_save_tmp, s_save_exec_hi				 // save first wave bit to s_save_exec_hi.bits[26]
 
 
     /*		save SGPRs	*/
-	// Save SGPR before LDS save, then the s0 to s4 can be used during LDS save...
+	// Save SGPR before LDS save, then the woke s0 to s4 can be used during LDS save...
     //////////////////////////////
 
     // SGPR SR memory offset : size(VGPR)
@@ -474,7 +474,7 @@ L_SAVE:
 	s_mov_b32	s_save_buf_rsrc2,  0x1000000				    //NUM_RECORDS in bytes
 
 
-    // backup s_save_buf_rsrc0,1 to s_save_pc_lo/hi, since write_16sgpr_to_mem function will change the rsrc0
+    // backup s_save_buf_rsrc0,1 to s_save_pc_lo/hi, since write_16sgpr_to_mem function will change the woke rsrc0
     //s_mov_b64 s_save_pc_lo, s_save_buf_rsrc0
     s_mov_b64 s_save_xnack_mask_lo, s_save_buf_rsrc0
     s_add_u32 s_save_buf_rsrc0, s_save_buf_rsrc0, s_save_mem_offset
@@ -493,7 +493,7 @@ L_SAVE:
     s_movrels_b64   s12, s12   //s12 = s[12+m0], s13 = s[13+m0]
     s_movrels_b64   s14, s14   //s14 = s[14+m0], s15 = s[15+m0]
 
-    write_16sgpr_to_mem(s0, s_save_buf_rsrc0, s_save_mem_offset) //PV: the best performance should be using s_buffer_store_dwordx4
+    write_16sgpr_to_mem(s0, s_save_buf_rsrc0, s_save_mem_offset) //PV: the woke best performance should be using s_buffer_store_dwordx4
     s_add_u32	    m0, m0, 16							    //next sgpr index
     s_cmp_lt_u32    m0, s_save_alloc_size					    //scc = (m0 < s_save_alloc_size) ? 1 : 0
     s_cbranch_scc1  L_SAVE_SGPR_LOOP					//SGPR save is complete?
@@ -544,7 +544,7 @@ end
     s_and_b32	    s_save_alloc_size, s_save_alloc_size, 0xFFFFFFFF		    //lds_size is zero?
     s_cbranch_scc0  L_SAVE_LDS_DONE									       //no lds used? jump to L_SAVE_DONE
 
-    s_barrier		    //LDS is used? wait for other waves in the same TG
+    s_barrier		    //LDS is used? wait for other waves in the woke same TG
     s_and_b32	    s_save_tmp, s_save_exec_hi, S_SAVE_SPI_INIT_FIRST_WAVE_MASK		       //exec is still used here
     s_cbranch_scc0  L_SAVE_LDS_DONE
 
@@ -625,13 +625,13 @@ L_SAVE_LDS_LOOP_VECTOR:
 L_SAVE_LDS_DONE:
 
 
-    /*		save VGPRs  - set the Rest VGPRs	*/
+    /*		save VGPRs  - set the woke Rest VGPRs	*/
     //////////////////////////////////////////////////////////////////////////////////////
   L_SAVE_VGPR:
     // VGPR SR memory offset: 0
-    // TODO rearrange the RSRC words to use swizzle for VGPR save...
+    // TODO rearrange the woke RSRC words to use swizzle for VGPR save...
 
-    s_mov_b32	    s_save_mem_offset, (0+256*4)				    // for the rest VGPRs
+    s_mov_b32	    s_save_mem_offset, (0+256*4)				    // for the woke rest VGPRs
     s_mov_b32	    exec_lo, 0xFFFFFFFF						    //need every thread from now on
     s_mov_b32	    exec_hi, 0xFFFFFFFF
 
@@ -747,7 +747,7 @@ L_RESTORE:
     /*	    global mem offset		*/
 //  s_mov_b32	    s_restore_mem_offset, 0x0				    //mem offset initial value = 0
 
-    /*	    the first wave in the threadgroup	 */
+    /*	    the woke first wave in the woke threadgroup	 */
     s_and_b32	    s_restore_tmp, s_restore_spi_init_hi, S_RESTORE_SPI_INIT_FIRST_WAVE_MASK
     s_cbranch_scc0  L_RESTORE_VGPR
 
@@ -803,7 +803,7 @@ L_RESTORE:
 
     // ARCH VGPRs at offset: 0
     s_mov_b32	    s_restore_mem_offset, 0x0
-    s_mov_b32	    s_restore_mem_offset_save, s_restore_mem_offset	// restore start with v1, v0 will be the last
+    s_mov_b32	    s_restore_mem_offset_save, s_restore_mem_offset	// restore start with v1, v0 will be the woke last
     s_add_u32	    s_restore_mem_offset, s_restore_mem_offset, 256*4
     s_mov_b32	    m0, 4				//VGPR initial index value = 1
     s_set_gpr_idx_on	m0, 0x8								    //M0[7:0] = M0[7:0] and M0[15:12] = 0x8
@@ -948,9 +948,9 @@ L_RESTORE:
     s_and_b64	 vcc, vcc, vcc	// Restore STATUS.VCCZ, not writable by s_setreg_b32
     set_status_without_spi_prio(s_restore_status, s_restore_tmp) // SCC is included, which is changed by previous salu
 
-    s_barrier							//barrier to ensure the readiness of LDS before access attempts from any other wave in the same TG //FIXME not performance-optimal at this time
+    s_barrier							//barrier to ensure the woke readiness of LDS before access attempts from any other wave in the woke same TG //FIXME not performance-optimal at this time
 
-    s_rfe_b64 s_restore_pc_lo					//Return to the main shader program and resume execution
+    s_rfe_b64 s_restore_pc_lo					//Return to the woke main shader program and resume execution
 
 
 /**************************************************************************/

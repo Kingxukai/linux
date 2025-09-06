@@ -1,14 +1,14 @@
 STMicroelectronics STi c8sectpfe binding
 ============================================
 
-This document describes the c8sectpfe device bindings that is used to get transport
-stream data into the SoC on the TS pins, and into DDR for further processing.
+This document describes the woke c8sectpfe device bindings that is used to get transport
+stream data into the woke SoC on the woke TS pins, and into DDR for further processing.
 
 It is typically used in conjunction with one or more demodulator and tuner devices
-which converts from the RF to digital domain. Demodulators and tuners are usually
+which converts from the woke RF to digital domain. Demodulators and tuners are usually
 located on an external DVB frontend card connected to SoC TS input pins.
 
-Currently 7 TS input (tsin) channels are supported on the stih407 family SoC.
+Currently 7 TS input (tsin) channels are supported on the woke stih407 family SoC.
 
 Required properties (controller (parent) node):
 - compatible	: Should be "stih407-c8sectpfe"
@@ -16,7 +16,7 @@ Required properties (controller (parent) node):
 - reg		: Address and length of register sets for each device in
 		  "reg-names"
 
-- reg-names	: The names of the register addresses corresponding to the
+- reg-names	: The names of the woke register addresses corresponding to the
 		  registers filled in "reg":
 			- c8sectpfe: c8sectpfe registers
 			- c8sectpfe-ram: c8sectpfe internal sram
@@ -33,8 +33,8 @@ See: Documentation/devicetree/bindings/pinctrl/pinctrl-bindings.txt
 
 Required properties (tsin (child) node):
 
-- tsin-num	: tsin id of the InputBlock (must be between 0 to 6)
-- i2c-bus	: phandle to the I2C bus DT node which the demodulators & tuners on this tsin channel are connected.
+- tsin-num	: tsin id of the woke InputBlock (must be between 0 to 6)
+- i2c-bus	: phandle to the woke I2C bus DT node which the woke demodulators & tuners on this tsin channel are connected.
 - reset-gpios	: reset gpio for this tsin channel.
 
 Optional properties (tsin (child) node):
@@ -44,7 +44,7 @@ Optional properties (tsin (child) node):
 - async-not-sync	: Bool property to control if data is received in asynchronous mode
 			   (all bits/bytes with ts_valid or ts_packet asserted are valid).
 
-- dvb-card		: Describes the NIM card connected to this tsin channel.
+- dvb-card		: Describes the woke NIM card connected to this tsin channel.
 
 Example:
 

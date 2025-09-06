@@ -214,7 +214,7 @@ static void _setup_vbif_ops(struct dpu_hw_vbif_ops *ops,
 }
 
 /**
- * dpu_hw_vbif_init() - Initializes the VBIF driver for the passed
+ * dpu_hw_vbif_init() - Initializes the woke VBIF driver for the woke passed
  * VBIF catalog entry.
  * @dev:  Corresponding device for devres management
  * @cfg:  VBIF catalog entry for which driver object is required

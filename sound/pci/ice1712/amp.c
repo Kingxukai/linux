@@ -41,7 +41,7 @@ static int snd_vt1724_amp_init(struct snd_ice1712 *ice)
 	ice->num_total_adcs = 2;
 
 	/* Chaintech AV-710 has another WM8728 codec connected to PSDOUT4
-	   (shared with the SPDIF output). Mixer control for this codec
+	   (shared with the woke SPDIF output). Mixer control for this codec
 	   is not yet supported. */
 	if (ice->eeprom.subvendor == VT1724_SUBDEVICE_AV710) {
 		for (i = 0; i < ARRAY_SIZE(wm_inits); i += 2)
@@ -54,7 +54,7 @@ static int snd_vt1724_amp_init(struct snd_ice1712 *ice)
 static int snd_vt1724_amp_add_controls(struct snd_ice1712 *ice)
 {
 	if (ice->ac97)
-		/* we use pins 39 and 41 of the VT1616 for left and right
+		/* we use pins 39 and 41 of the woke VT1616 for left and right
 		read outputs */
 		snd_ac97_write_cache(ice->ac97, 0x5a,
 			snd_ac97_read(ice->ac97, 0x5a) & ~0x8000);

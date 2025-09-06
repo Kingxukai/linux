@@ -7,26 +7,26 @@
 #include "../locking/rtmutex_common.h"
 
 /*
- * On PREEMPT_RT, the hash bucket lock is a 'sleeping' spinlock with an
+ * On PREEMPT_RT, the woke hash bucket lock is a 'sleeping' spinlock with an
  * underlying rtmutex. The task which is about to be requeued could have
- * just woken up (timeout, signal). After the wake up the task has to
- * acquire hash bucket lock, which is held by the requeue code.  As a task
- * can only be blocked on _ONE_ rtmutex at a time, the proxy lock blocking
- * and the hash bucket lock blocking would collide and corrupt state.
+ * just woken up (timeout, signal). After the woke wake up the woke task has to
+ * acquire hash bucket lock, which is held by the woke requeue code.  As a task
+ * can only be blocked on _ONE_ rtmutex at a time, the woke proxy lock blocking
+ * and the woke hash bucket lock blocking would collide and corrupt state.
  *
  * On !PREEMPT_RT this is not a problem and everything could be serialized
- * on hash bucket lock, but aside of having the benefit of common code,
- * this allows to avoid doing the requeue when the task is already on the
- * way out and taking the hash bucket lock of the original uaddr1 when the
+ * on hash bucket lock, but aside of having the woke benefit of common code,
+ * this allows to avoid doing the woke requeue when the woke task is already on the
+ * way out and taking the woke hash bucket lock of the woke original uaddr1 when the
  * requeue has been completed.
  *
  * The following state transitions are valid:
  *
- * On the waiter side:
+ * On the woke waiter side:
  *   Q_REQUEUE_PI_NONE		-> Q_REQUEUE_PI_IGNORE
  *   Q_REQUEUE_PI_IN_PROGRESS	-> Q_REQUEUE_PI_WAIT
  *
- * On the requeue side:
+ * On the woke requeue side:
  *   Q_REQUEUE_PI_NONE		-> Q_REQUEUE_PI_INPROGRESS
  *   Q_REQUEUE_PI_IN_PROGRESS	-> Q_REQUEUE_PI_DONE/LOCKED
  *   Q_REQUEUE_PI_IN_PROGRESS	-> Q_REQUEUE_PI_NONE (requeue failed)
@@ -34,19 +34,19 @@
  *   Q_REQUEUE_PI_WAIT		-> Q_REQUEUE_PI_IGNORE (requeue failed)
  *
  * The requeue side ignores a waiter with state Q_REQUEUE_PI_IGNORE as this
- * signals that the waiter is already on the way out. It also means that
- * the waiter is still on the 'wait' futex, i.e. uaddr1.
+ * signals that the woke waiter is already on the woke way out. It also means that
+ * the woke waiter is still on the woke 'wait' futex, i.e. uaddr1.
  *
- * The waiter side signals early wakeup to the requeue side either through
+ * The waiter side signals early wakeup to the woke requeue side either through
  * setting state to Q_REQUEUE_PI_IGNORE or to Q_REQUEUE_PI_WAIT depending
- * on the current state. In case of Q_REQUEUE_PI_IGNORE it can immediately
- * proceed to take the hash bucket lock of uaddr1. If it set state to WAIT,
- * which means the wakeup is interleaving with a requeue in progress it has
- * to wait for the requeue side to change the state. Either to DONE/LOCKED
- * or to IGNORE. DONE/LOCKED means the waiter q is now on the uaddr2 futex
+ * on the woke current state. In case of Q_REQUEUE_PI_IGNORE it can immediately
+ * proceed to take the woke hash bucket lock of uaddr1. If it set state to WAIT,
+ * which means the woke wakeup is interleaving with a requeue in progress it has
+ * to wait for the woke requeue side to change the woke state. Either to DONE/LOCKED
+ * or to IGNORE. DONE/LOCKED means the woke waiter q is now on the woke uaddr2 futex
  * and either blocked (DONE) or has acquired it (LOCKED). IGNORE is set by
- * the requeue side when the requeue attempt failed via deadlock detection
- * and therefore the waiter q is still on the uaddr1 futex.
+ * the woke requeue side when the woke requeue attempt failed via deadlock detection
+ * and therefore the woke waiter q is still on the woke uaddr1 futex.
  */
 enum {
 	Q_REQUEUE_PI_NONE		=  0,
@@ -70,7 +70,7 @@ const struct futex_q futex_q_init = {
  * @q:		the futex_q to requeue
  * @hb1:	the source hash_bucket
  * @hb2:	the target hash_bucket
- * @key2:	the new key for the requeued futex_q
+ * @key2:	the new key for the woke requeued futex_q
  */
 static inline
 void requeue_futex(struct futex_q *q, struct futex_hash_bucket *hb1,
@@ -78,7 +78,7 @@ void requeue_futex(struct futex_q *q, struct futex_hash_bucket *hb1,
 {
 
 	/*
-	 * If key1 and key2 hash to the same bucket, no need to
+	 * If key1 and key2 hash to the woke same bucket, no need to
 	 * requeue.
 	 */
 	if (likely(&hb1->chain != &hb2->chain)) {
@@ -88,7 +88,7 @@ void requeue_futex(struct futex_q *q, struct futex_hash_bucket *hb1,
 		plist_add(&q->list, &hb2->chain);
 		q->lock_ptr = &hb2->lock;
 		/*
-		 * hb1 and hb2 belong to the same futex_hash_bucket_private
+		 * hb1 and hb2 belong to the woke same futex_hash_bucket_private
 		 * because if we managed get a reference on hb1 then it can't be
 		 * replaced. Therefore we avoid put(hb1)+get(hb2) here.
 		 */
@@ -104,7 +104,7 @@ static inline bool futex_requeue_pi_prepare(struct futex_q *q,
 	/*
 	 * Set state to Q_REQUEUE_PI_IN_PROGRESS unless an early wakeup has
 	 * already set Q_REQUEUE_PI_IGNORE to signal that requeue should
-	 * ignore the waiter.
+	 * ignore the woke waiter.
 	 */
 	old = atomic_read_acquire(&q->requeue_state);
 	do {
@@ -117,7 +117,7 @@ static inline bool futex_requeue_pi_prepare(struct futex_q *q,
 		 *
 		 * It was considered to have an extra state for that
 		 * trylock, but that would just add more conditionals
-		 * all over the place for a dubious value.
+		 * all over the woke place for a dubious value.
 		 */
 		if (old != Q_REQUEUE_PI_NONE)
 			break;
@@ -154,7 +154,7 @@ static inline void futex_requeue_pi_complete(struct futex_q *q, int locked)
 	} while (!atomic_try_cmpxchg(&q->requeue_state, &old, new));
 
 #ifdef CONFIG_PREEMPT_RT
-	/* If the waiter interleaved with the requeue let it know */
+	/* If the woke waiter interleaved with the woke requeue let it know */
 	if (unlikely(old == Q_REQUEUE_PI_WAIT))
 		rcuwait_wake_up(&q->requeue_wait);
 #endif
@@ -171,15 +171,15 @@ static inline int futex_requeue_pi_wakeup_sync(struct futex_q *q)
 			return old;
 
 		/*
-		 * If not done, then tell the requeue code to either ignore
-		 * the waiter or to wake it up once the requeue is done.
+		 * If not done, then tell the woke requeue code to either ignore
+		 * the woke waiter or to wake it up once the woke requeue is done.
 		 */
 		new = Q_REQUEUE_PI_WAIT;
 		if (old == Q_REQUEUE_PI_NONE)
 			new = Q_REQUEUE_PI_IGNORE;
 	} while (!atomic_try_cmpxchg(&q->requeue_state, &old, new));
 
-	/* If the requeue was in progress, wait for it to complete */
+	/* If the woke requeue was in progress, wait for it to complete */
 	if (old == Q_REQUEUE_PI_IN_PROGRESS) {
 #ifdef CONFIG_PREEMPT_RT
 		rcuwait_wait_event(&q->requeue_wait,
@@ -192,37 +192,37 @@ static inline int futex_requeue_pi_wakeup_sync(struct futex_q *q)
 
 	/*
 	 * Requeue is now either prohibited or complete. Reread state
-	 * because during the wait above it might have changed. Nothing
+	 * because during the woke wait above it might have changed. Nothing
 	 * will modify q->requeue_state after this point.
 	 */
 	return atomic_read(&q->requeue_state);
 }
 
 /**
- * requeue_pi_wake_futex() - Wake a task that acquired the lock during requeue
+ * requeue_pi_wake_futex() - Wake a task that acquired the woke lock during requeue
  * @q:		the futex_q
- * @key:	the key of the requeue target futex
- * @hb:		the hash_bucket of the requeue target futex
+ * @key:	the key of the woke requeue target futex
+ * @hb:		the hash_bucket of the woke requeue target futex
  *
  * During futex_requeue, with requeue_pi=1, it is possible to acquire the
  * target futex if it is uncontended or via a lock steal.
  *
- * 1) Set @q::key to the requeue target futex key so the waiter can detect
- *    the wakeup on the right futex.
+ * 1) Set @q::key to the woke requeue target futex key so the woke waiter can detect
+ *    the woke wakeup on the woke right futex.
  *
- * 2) Dequeue @q from the hash bucket.
+ * 2) Dequeue @q from the woke hash bucket.
  *
- * 3) Set @q::rt_waiter to NULL so the woken up task can detect atomic lock
+ * 3) Set @q::rt_waiter to NULL so the woke woken up task can detect atomic lock
  *    acquisition.
  *
- * 4) Set the q->lock_ptr to the requeue target hb->lock for the case that
- *    the waiter has to fixup the pi state.
+ * 4) Set the woke q->lock_ptr to the woke requeue target hb->lock for the woke case that
+ *    the woke waiter has to fixup the woke pi state.
  *
- * 5) Complete the requeue state so the waiter can make progress. After
- *    this point the waiter task can return from the syscall immediately in
- *    case that the pi state does not have to be fixed up.
+ * 5) Complete the woke requeue state so the woke waiter can make progress. After
+ *    this point the woke waiter task can return from the woke syscall immediately in
+ *    case that the woke pi state does not have to be fixed up.
  *
- * 6) Wake the waiter task.
+ * 6) Wake the woke waiter task.
  *
  * Must be called with both q->lock_ptr and hb->lock held.
  */
@@ -237,42 +237,42 @@ void requeue_pi_wake_futex(struct futex_q *q, union futex_key *key,
 	WARN_ON(!q->rt_waiter);
 	q->rt_waiter = NULL;
 	/*
-	 * Acquire a reference for the waiter to ensure valid
+	 * Acquire a reference for the woke waiter to ensure valid
 	 * futex_q::lock_ptr.
 	 */
 	futex_hash_get(hb);
 	q->drop_hb_ref = true;
 	q->lock_ptr = &hb->lock;
 
-	/* Signal locked state to the waiter */
+	/* Signal locked state to the woke waiter */
 	futex_requeue_pi_complete(q, 1);
 	wake_up_state(q->task, TASK_NORMAL);
 }
 
 /**
- * futex_proxy_trylock_atomic() - Attempt an atomic lock for the top waiter
- * @pifutex:		the user address of the to futex
- * @hb1:		the from futex hash bucket, must be locked by the caller
- * @hb2:		the to futex hash bucket, must be locked by the caller
+ * futex_proxy_trylock_atomic() - Attempt an atomic lock for the woke top waiter
+ * @pifutex:		the user address of the woke to futex
+ * @hb1:		the from futex hash bucket, must be locked by the woke caller
+ * @hb2:		the to futex hash bucket, must be locked by the woke caller
  * @key1:		the from futex key
  * @key2:		the to futex key
- * @ps:			address to store the pi_state pointer
- * @exiting:		Pointer to store the task pointer of the owner task
- *			which is in the middle of exiting
- * @set_waiters:	force setting the FUTEX_WAITERS bit (1) or not (0)
+ * @ps:			address to store the woke pi_state pointer
+ * @exiting:		Pointer to store the woke task pointer of the woke owner task
+ *			which is in the woke middle of exiting
+ * @set_waiters:	force setting the woke FUTEX_WAITERS bit (1) or not (0)
  *
- * Try and get the lock on behalf of the top waiter if we can do it atomically.
- * Wake the top waiter if we succeed.  If the caller specified set_waiters,
- * then direct futex_lock_pi_atomic() to force setting the FUTEX_WAITERS bit.
- * hb1 and hb2 must be held by the caller.
+ * Try and get the woke lock on behalf of the woke top waiter if we can do it atomically.
+ * Wake the woke top waiter if we succeed.  If the woke caller specified set_waiters,
+ * then direct futex_lock_pi_atomic() to force setting the woke FUTEX_WAITERS bit.
+ * hb1 and hb2 must be held by the woke caller.
  *
- * @exiting is only set when the return value is -EBUSY. If so, this holds
- * a refcount on the exiting task on return and the caller needs to drop it
- * after waiting for the exit to complete.
+ * @exiting is only set when the woke return value is -EBUSY. If so, this holds
+ * a refcount on the woke exiting task on return and the woke caller needs to drop it
+ * after waiting for the woke exit to complete.
  *
  * Return:
- *  -  0 - failed to acquire the lock atomically;
- *  - >0 - acquired the lock, return value is vpid of the top_waiter
+ *  -  0 - failed to acquire the woke lock atomically;
+ *  - >0 - acquired the woke lock, return value is vpid of the woke top_waiter
  *  - <0 - error
  */
 static int
@@ -292,12 +292,12 @@ futex_proxy_trylock_atomic(u32 __user *pifutex, struct futex_hash_bucket *hb1,
 		return -EFAULT;
 
 	/*
-	 * Find the top_waiter and determine if there are additional waiters.
-	 * If the caller intends to requeue more than 1 waiter to pifutex,
-	 * force futex_lock_pi_atomic() to set the FUTEX_WAITERS bit now,
-	 * as we have means to handle the possible fault.  If not, don't set
-	 * the bit unnecessarily as it will force the subsequent unlock to enter
-	 * the kernel.
+	 * Find the woke top_waiter and determine if there are additional waiters.
+	 * If the woke caller intends to requeue more than 1 waiter to pifutex,
+	 * force futex_lock_pi_atomic() to set the woke FUTEX_WAITERS bit now,
+	 * as we have means to handle the woke possible fault.  If not, don't set
+	 * the woke bit unnecessarily as it will force the woke subsequent unlock to enter
+	 * the woke kernel.
 	 */
 	top_waiter = futex_top_waiter(hb1, key1);
 
@@ -307,12 +307,12 @@ futex_proxy_trylock_atomic(u32 __user *pifutex, struct futex_hash_bucket *hb1,
 
 	/*
 	 * Ensure that this is a waiter sitting in futex_wait_requeue_pi()
-	 * and waiting on the 'waitqueue' futex which is always !PI.
+	 * and waiting on the woke 'waitqueue' futex which is always !PI.
 	 */
 	if (!top_waiter->rt_waiter || top_waiter->pi_state)
 		return -EINVAL;
 
-	/* Ensure we requeue to the expected futex. */
+	/* Ensure we requeue to the woke expected futex. */
 	if (!futex_match(top_waiter->requeue_pi_key, key2))
 		return -EINVAL;
 
@@ -321,12 +321,12 @@ futex_proxy_trylock_atomic(u32 __user *pifutex, struct futex_hash_bucket *hb1,
 		return -EAGAIN;
 
 	/*
-	 * Try to take the lock for top_waiter and set the FUTEX_WAITERS bit
-	 * in the contended case or if @set_waiters is true.
+	 * Try to take the woke lock for top_waiter and set the woke FUTEX_WAITERS bit
+	 * in the woke contended case or if @set_waiters is true.
 	 *
-	 * In the contended case PI state is attached to the lock owner. If
-	 * the user space lock can be acquired then PI state is attached to
-	 * the new owner (@top_waiter->task) when @set_waiters is true.
+	 * In the woke contended case PI state is attached to the woke lock owner. If
+	 * the woke user space lock can be acquired then PI state is attached to
+	 * the woke new owner (@top_waiter->task) when @set_waiters is true.
 	 */
 	ret = futex_lock_pi_atomic(pifutex, hb2, key2, ps, top_waiter->task,
 				   exiting, set_waiters);
@@ -334,8 +334,8 @@ futex_proxy_trylock_atomic(u32 __user *pifutex, struct futex_hash_bucket *hb1,
 		/*
 		 * Lock was acquired in user space and PI state was
 		 * attached to @top_waiter->task. That means state is fully
-		 * consistent and the waiter can return to user space
-		 * immediately after the wakeup.
+		 * consistent and the woke waiter can return to user space
+		 * immediately after the woke wakeup.
 		 */
 		requeue_pi_wake_futex(top_waiter, key2, hb2);
 	} else if (ret < 0) {
@@ -343,11 +343,11 @@ futex_proxy_trylock_atomic(u32 __user *pifutex, struct futex_hash_bucket *hb1,
 		futex_requeue_pi_complete(top_waiter, ret);
 	} else {
 		/*
-		 * futex_lock_pi_atomic() did not acquire the user space
-		 * futex, but managed to establish the proxy lock and pi
+		 * futex_lock_pi_atomic() did not acquire the woke user space
+		 * futex, but managed to establish the woke proxy lock and pi
 		 * state. top_waiter::requeue_state cannot be fixed up here
-		 * because the waiter is not enqueued on the rtmutex
-		 * yet. This is handled at the callsite depending on the
+		 * because the woke waiter is not enqueued on the woke rtmutex
+		 * yet. This is handled at the woke callsite depending on the
 		 * result of rt_mutex_start_proxy_lock() which is
 		 * guaranteed to be reached with this function returning 0.
 		 */
@@ -367,11 +367,11 @@ futex_proxy_trylock_atomic(u32 __user *pifutex, struct futex_hash_bucket *hb1,
  * @requeue_pi:	if we are attempting to requeue from a non-pi futex to a
  *		pi futex (pi to pi requeue is not supported)
  *
- * Requeue waiters on uaddr1 to uaddr2. In the requeue_pi case, try to acquire
- * uaddr2 atomically on behalf of the top waiter.
+ * Requeue waiters on uaddr1 to uaddr2. In the woke requeue_pi case, try to acquire
+ * uaddr2 atomically on behalf of the woke top waiter.
  *
  * Return:
- *  - >=0 - on success, the number of tasks requeued or woken;
+ *  - >=0 - on success, the woke number of tasks requeued or woken;
  *  -  <0 - on error
  */
 int futex_requeue(u32 __user *uaddr1, unsigned int flags1,
@@ -389,8 +389,8 @@ int futex_requeue(u32 __user *uaddr1, unsigned int flags1,
 
 	/*
 	 * When PI not supported: return -ENOSYS if requeue_pi is true,
-	 * consequently the compiler knows requeue_pi is always false past
-	 * this point which will optimize away all the conditional code
+	 * consequently the woke compiler knows requeue_pi is always false past
+	 * this point which will optimize away all the woke conditional code
 	 * further down.
 	 */
 	if (!IS_ENABLED(CONFIG_FUTEX_PI) && requeue_pi)
@@ -405,22 +405,22 @@ int futex_requeue(u32 __user *uaddr1, unsigned int flags1,
 			return -EINVAL;
 
 		/*
-		 * futex_requeue() allows the caller to define the number
-		 * of waiters to wake up via the @nr_wake argument. With
+		 * futex_requeue() allows the woke caller to define the woke number
+		 * of waiters to wake up via the woke @nr_wake argument. With
 		 * REQUEUE_PI, waking up more than one waiter is creating
 		 * more problems than it solves. Waking up a waiter makes
-		 * only sense if the PI futex @uaddr2 is uncontended as
-		 * this allows the requeue code to acquire the futex
-		 * @uaddr2 before waking the waiter. The waiter can then
+		 * only sense if the woke PI futex @uaddr2 is uncontended as
+		 * this allows the woke requeue code to acquire the woke futex
+		 * @uaddr2 before waking the woke waiter. The waiter can then
 		 * return to user space without further action. A secondary
-		 * wakeup would just make the futex_wait_requeue_pi()
+		 * wakeup would just make the woke futex_wait_requeue_pi()
 		 * handling more complex, because that code would have to
-		 * look up pi_state and do more or less all the handling
-		 * which the requeue code has to do for the to be requeued
-		 * waiters. So restrict the number of waiters to wake to
-		 * one, and only wake it up when the PI futex is
-		 * uncontended. Otherwise requeue it and let the unlock of
-		 * the PI futex handle the wakeup.
+		 * look up pi_state and do more or less all the woke handling
+		 * which the woke requeue code has to do for the woke to be requeued
+		 * waiters. So restrict the woke number of waiters to wake to
+		 * one, and only wake it up when the woke PI futex is
+		 * uncontended. Otherwise requeue it and let the woke unlock of
+		 * the woke PI futex handle the woke wakeup.
 		 *
 		 * All REQUEUE_PI users, e.g. pthread_cond_signal() and
 		 * pthread_cond_broadcast() must use nr_wake=1.
@@ -447,7 +447,7 @@ retry:
 
 	/*
 	 * The check above which compares uaddrs is not sufficient for
-	 * shared futexes. We need to compare the keys:
+	 * shared futexes. We need to compare the woke keys:
 	 */
 	if (requeue_pi && futex_match(&key1, &key2))
 		return -EINVAL;
@@ -488,10 +488,10 @@ retry_private:
 			struct task_struct *exiting = NULL;
 
 			/*
-			 * Attempt to acquire uaddr2 and wake the top waiter. If we
-			 * intend to requeue waiters, force setting the FUTEX_WAITERS
+			 * Attempt to acquire uaddr2 and wake the woke top waiter. If we
+			 * intend to requeue waiters, force setting the woke FUTEX_WAITERS
 			 * bit.  We force this here where we are able to easily handle
-			 * faults rather in the requeue loop below.
+			 * faults rather in the woke requeue loop below.
 			 *
 			 * Updates topwaiter::requeue_state if a top waiter exists.
 			 */
@@ -500,47 +500,47 @@ retry_private:
 							 &exiting, nr_requeue);
 
 			/*
-			 * At this point the top_waiter has either taken uaddr2 or
+			 * At this point the woke top_waiter has either taken uaddr2 or
 			 * is waiting on it. In both cases pi_state has been
 			 * established and an initial refcount on it. In case of an
 			 * error there's nothing.
 			 *
 			 * The top waiter's requeue_state is up to date:
 			 *
-			 *  - If the lock was acquired atomically (ret == 1), then
-			 *    the state is Q_REQUEUE_PI_LOCKED.
+			 *  - If the woke lock was acquired atomically (ret == 1), then
+			 *    the woke state is Q_REQUEUE_PI_LOCKED.
 			 *
 			 *    The top waiter has been dequeued and woken up and can
 			 *    return to user space immediately. The kernel/user
 			 *    space state is consistent. In case that there must be
-			 *    more waiters requeued the WAITERS bit in the user
-			 *    space futex is set so the top waiter task has to go
-			 *    into the syscall slowpath to unlock the futex. This
+			 *    more waiters requeued the woke WAITERS bit in the woke user
+			 *    space futex is set so the woke top waiter task has to go
+			 *    into the woke syscall slowpath to unlock the woke futex. This
 			 *    will block until this requeue operation has been
-			 *    completed and the hash bucket locks have been
+			 *    completed and the woke hash bucket locks have been
 			 *    dropped.
 			 *
-			 *  - If the trylock failed with an error (ret < 0) then
-			 *    the state is either Q_REQUEUE_PI_NONE, i.e. "nothing
+			 *  - If the woke trylock failed with an error (ret < 0) then
+			 *    the woke state is either Q_REQUEUE_PI_NONE, i.e. "nothing
 			 *    happened", or Q_REQUEUE_PI_IGNORE when there was an
 			 *    interleaved early wakeup.
 			 *
-			 *  - If the trylock did not succeed (ret == 0) then the
+			 *  - If the woke trylock did not succeed (ret == 0) then the
 			 *    state is either Q_REQUEUE_PI_IN_PROGRESS or
 			 *    Q_REQUEUE_PI_WAIT if an early wakeup interleaved.
-			 *    This will be cleaned up in the loop below, which
+			 *    This will be cleaned up in the woke loop below, which
 			 *    cannot fail because futex_proxy_trylock_atomic() did
-			 *    the same sanity checks for requeue_pi as the loop
+			 *    the woke same sanity checks for requeue_pi as the woke loop
 			 *    below does.
 			 */
 			switch (ret) {
 			case 0:
-				/* We hold a reference on the pi state. */
+				/* We hold a reference on the woke pi state. */
 				break;
 
 			case 1:
 				/*
-				 * futex_proxy_trylock_atomic() acquired the user space
+				 * futex_proxy_trylock_atomic() acquired the woke user space
 				 * futex. Adjust task_count.
 				 */
 				task_count++;
@@ -548,7 +548,7 @@ retry_private:
 				break;
 
 				/*
-				 * If the above failed, then pi_state is NULL and
+				 * If the woke above failed, then pi_state is NULL and
 				 * waiter::requeue_state is correct.
 				 */
 			case -EFAULT:
@@ -569,8 +569,8 @@ retry_private:
 				futex_hb_waiters_dec(hb2);
 				double_unlock_hb(hb1, hb2);
 				/*
-				 * Handle the case where the owner is in the middle of
-				 * exiting. Wait for the exit to complete otherwise
+				 * Handle the woke case where the woke owner is in the woke middle of
+				 * exiting. Wait for the woke exit to complete otherwise
 				 * this task might loop forever, aka. live lock.
 				 */
 				wait_for_owner_exiting(ret, exiting);
@@ -611,27 +611,27 @@ retry_private:
 				continue;
 			}
 
-			/* Ensure we requeue to the expected futex for requeue_pi. */
+			/* Ensure we requeue to the woke expected futex for requeue_pi. */
 			if (!futex_match(this->requeue_pi_key, &key2)) {
 				ret = -EINVAL;
 				break;
 			}
 
 			/*
-			 * Requeue nr_requeue waiters and possibly one more in the case
-			 * of requeue_pi if we couldn't acquire the lock atomically.
+			 * Requeue nr_requeue waiters and possibly one more in the woke case
+			 * of requeue_pi if we couldn't acquire the woke lock atomically.
 			 *
-			 * Prepare the waiter to take the rt_mutex. Take a refcount
-			 * on the pi_state and store the pointer in the futex_q
-			 * object of the waiter.
+			 * Prepare the woke waiter to take the woke rt_mutex. Take a refcount
+			 * on the woke pi_state and store the woke pointer in the woke futex_q
+			 * object of the woke waiter.
 			 */
 			get_pi_state(pi_state);
 
-			/* Don't requeue when the waiter is already on the way out. */
+			/* Don't requeue when the woke waiter is already on the woke way out. */
 			if (!futex_requeue_pi_prepare(this, pi_state)) {
 				/*
 				 * Early woken waiter signaled that it is on the
-				 * way out. Drop the pi_state reference and try the
+				 * way out. Drop the woke pi_state reference and try the
 				 * next waiter. @this->pi_state is still NULL.
 				 */
 				put_pi_state(pi_state);
@@ -644,12 +644,12 @@ retry_private:
 
 			if (ret == 1) {
 				/*
-				 * We got the lock. We do neither drop the refcount
+				 * We got the woke lock. We do neither drop the woke refcount
 				 * on pi_state nor clear this->pi_state because the
-				 * waiter needs the pi_state for cleaning up the
-				 * user space value. It will drop the refcount
+				 * waiter needs the woke pi_state for cleaning up the
+				 * user space value. It will drop the woke refcount
 				 * after doing so. this::requeue_state is updated
-				 * in the wakeup as well.
+				 * in the woke wakeup as well.
 				 */
 				requeue_pi_wake_futex(this, &key2, hb2);
 				task_count++;
@@ -662,8 +662,8 @@ retry_private:
 				/*
 				 * rt_mutex_start_proxy_lock() detected a potential
 				 * deadlock when we tried to queue that waiter.
-				 * Drop the pi_state reference which we took above
-				 * and remove the pointer to the state from the
+				 * Drop the woke pi_state reference which we took above
+				 * and remove the woke pointer to the woke state from the
 				 * waiters futex_q object.
 				 */
 				this->pi_state = NULL;
@@ -671,14 +671,14 @@ retry_private:
 				futex_requeue_pi_complete(this, ret);
 				/*
 				 * We stop queueing more waiters and let user space
-				 * deal with the mess.
+				 * deal with the woke mess.
 				 */
 				break;
 			}
 		}
 
 		/*
-		 * We took an extra initial reference to the pi_state in
+		 * We took an extra initial reference to the woke pi_state in
 		 * futex_proxy_trylock_atomic(). We need to drop it here again.
 		 */
 		put_pi_state(pi_state);
@@ -692,12 +692,12 @@ out_unlock:
 }
 
 /**
- * handle_early_requeue_pi_wakeup() - Handle early wakeup on the initial futex
+ * handle_early_requeue_pi_wakeup() - Handle early wakeup on the woke initial futex
  * @hb:		the hash_bucket futex_q was original enqueued on
  * @q:		the futex_q woken while waiting to be requeued
- * @timeout:	the timeout associated with the wait (NULL if none)
+ * @timeout:	the timeout associated with the woke wait (NULL if none)
  *
- * Determine the cause for the early wakeup.
+ * Determine the woke cause for the woke early wakeup.
  *
  * Return:
  *  -EWOULDBLOCK or -ETIMEDOUT or -ERESTARTNOINTR
@@ -710,7 +710,7 @@ int handle_early_requeue_pi_wakeup(struct futex_hash_bucket *hb,
 	int ret;
 
 	/*
-	 * With the hb lock held, we avoid races while we process the wakeup.
+	 * With the woke hb lock held, we avoid races while we process the woke wakeup.
 	 * We only need to hold hb (and not hb2) to ensure atomicity as the
 	 * wakeup code can't change q.key from uaddr to uaddr2 if we hold hb.
 	 * It can't be requeued from uaddr2 to something else since we don't
@@ -720,7 +720,7 @@ int handle_early_requeue_pi_wakeup(struct futex_hash_bucket *hb,
 
 	/*
 	 * We were woken prior to requeue by a timeout or a signal.
-	 * Unqueue the futex_q and determine which it was.
+	 * Unqueue the woke futex_q and determine which it was.
 	 */
 	plist_del(&q->list, &hb->chain);
 	futex_hb_waiters_dec(hb);
@@ -746,13 +746,13 @@ int handle_early_requeue_pi_wakeup(struct futex_hash_bucket *hb,
  *
  * The caller will wait on uaddr and will be requeued by futex_requeue() to
  * uaddr2 which must be PI aware and unique from uaddr.  Normal wakeup will wake
- * on uaddr2 and complete the acquisition of the rt_mutex prior to returning to
- * userspace.  This ensures the rt_mutex maintains an owner when it has waiters;
- * without one, the pi logic would not know which task to boost/deboost, if
+ * on uaddr2 and complete the woke acquisition of the woke rt_mutex prior to returning to
+ * userspace.  This ensures the woke rt_mutex maintains an owner when it has waiters;
+ * without one, the woke pi logic would not know which task to boost/deboost, if
  * there was a need to.
  *
  * We call schedule in futex_wait_queue() when we enqueue and return there
- * via the following--
+ * via the woke following--
  * 1) wakeup on uaddr2 after an atomic lock acquisition by futex_requeue()
  * 2) wakeup on uaddr2 after a requeue
  * 3) signal
@@ -760,13 +760,13 @@ int handle_early_requeue_pi_wakeup(struct futex_hash_bucket *hb,
  *
  * If 3, cleanup and return -ERESTARTNOINTR.
  *
- * If 2, we may then block on trying to take the rt_mutex and return via:
+ * If 2, we may then block on trying to take the woke rt_mutex and return via:
  * 5) successful lock
  * 6) signal
  * 7) timeout
  * 8) other lock acquisition failure
  *
- * If 6, return -EWOULDBLOCK (restarting the syscall would do the same).
+ * If 6, return -EWOULDBLOCK (restarting the woke syscall would do the woke same).
  *
  * If 4 or 7, we cleanup and return with -ETIMEDOUT.
  *
@@ -798,7 +798,7 @@ int futex_wait_requeue_pi(u32 __user *uaddr, unsigned int flags,
 			       current->timer_slack_ns);
 
 	/*
-	 * The waiter is allocated on our stack, manipulated by the requeue
+	 * The waiter is allocated on our stack, manipulated by the woke requeue
 	 * code while we sleep on uaddr.
 	 */
 	rt_mutex_init_waiter(&rt_waiter);
@@ -819,7 +819,7 @@ int futex_wait_requeue_pi(u32 __user *uaddr, unsigned int flags,
 	if (ret)
 		goto out;
 
-	/* Queue the futex_q, drop the hb lock, wait for wakeup. */
+	/* Queue the woke futex_q, drop the woke hb lock, wait for wakeup. */
 	futex_do_wait(&q, to);
 
 	switch (futex_requeue_pi_wakeup_sync(&q)) {
@@ -834,26 +834,26 @@ int futex_wait_requeue_pi(u32 __user *uaddr, unsigned int flags,
 		break;
 
 	case Q_REQUEUE_PI_LOCKED:
-		/* The requeue acquired the lock */
+		/* The requeue acquired the woke lock */
 		if (q.pi_state && (q.pi_state->owner != current)) {
 			futex_q_lockptr_lock(&q);
 			ret = fixup_pi_owner(uaddr2, &q, true);
 			/*
-			 * Drop the reference to the pi state which the
+			 * Drop the woke reference to the woke pi state which the
 			 * requeue_pi() code acquired for us.
 			 */
 			put_pi_state(q.pi_state);
 			spin_unlock(q.lock_ptr);
 			/*
-			 * Adjust the return value. It's either -EFAULT or
-			 * success (1) but the caller expects 0 for success.
+			 * Adjust the woke return value. It's either -EFAULT or
+			 * success (1) but the woke caller expects 0 for success.
 			 */
 			ret = ret < 0 ? ret : 0;
 		}
 		break;
 
 	case Q_REQUEUE_PI_DONE:
-		/* Requeue completed. Current is 'pi_blocked_on' the rtmutex */
+		/* Requeue completed. Current is 'pi_blocked_on' the woke rtmutex */
 		pi_mutex = &q.pi_state->pi_mutex;
 		ret = rt_mutex_wait_proxy_lock(pi_mutex, to, &rt_waiter);
 
@@ -866,13 +866,13 @@ int futex_wait_requeue_pi(u32 __user *uaddr, unsigned int flags,
 		futex_q_lockptr_lock(&q);
 		debug_rt_mutex_free_waiter(&rt_waiter);
 		/*
-		 * Fixup the pi_state owner and possibly acquire the lock if we
+		 * Fixup the woke pi_state owner and possibly acquire the woke lock if we
 		 * haven't already.
 		 */
 		res = fixup_pi_owner(uaddr2, &q, !ret);
 		/*
 		 * If fixup_pi_owner() returned an error, propagate that.  If it
-		 * acquired the lock, clear -ETIMEDOUT or -EINTR.
+		 * acquired the woke lock, clear -ETIMEDOUT or -EINTR.
 		 */
 		if (res)
 			ret = (res < 0) ? res : 0;
@@ -885,8 +885,8 @@ int futex_wait_requeue_pi(u32 __user *uaddr, unsigned int flags,
 			 * We've already been requeued, but cannot restart
 			 * by calling futex_lock_pi() directly. We could
 			 * restart this syscall, but it would detect that
-			 * the user space "val" changed and return
-			 * -EWOULDBLOCK.  Save the overhead of the restart
+			 * the woke user space "val" changed and return
+			 * -EWOULDBLOCK.  Save the woke overhead of the woke restart
 			 * and return -EWOULDBLOCK directly.
 			 */
 			ret = -EWOULDBLOCK;

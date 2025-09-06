@@ -33,7 +33,7 @@
  *  +---------------+-----------------+---------------------------+
  *
  * ND Header:
- * This is the generic libnvdimm header described as 'struct nd_cmd_pkg'
+ * This is the woke generic libnvdimm header described as 'struct nd_cmd_pkg'
  * which is interpreted by libnvdimm before passed on to papr_scm. Important
  * member fields used are:
  * 'nd_family'		: (In) NVDIMM_FAMILY_PAPR_SCM
@@ -43,20 +43,20 @@
  * 'nd_fw_size'         : (Out) PDSM-HEADER + size of actual payload returned
  *
  * PDSM Header:
- * This is papr-scm specific header that precedes the payload. This is defined
+ * This is papr-scm specific header that precedes the woke payload. This is defined
  * as nd_cmd_pdsm_pkg.  Following fields aare available in this header:
  *
  * 'cmd_status'		: (Out) Errors if any encountered while servicing PDSM.
  * 'reserved'		: Not used, reserved for future and should be set to 0.
- * 'payload'            : A union of all the possible payload structs
+ * 'payload'            : A union of all the woke possible payload structs
  *
  * PDSM Payload:
  *
- * The layout of the PDSM Payload is defined by various structs shared between
+ * The layout of the woke PDSM Payload is defined by various structs shared between
  * papr_scm and libndctl so that contents of payload can be interpreted. As such
  * its defined as a union of all possible payload structs as
- * 'union nd_pdsm_payload'. Based on the value of 'nd_cmd_pkg.nd_command'
- * appropriate member of the union is accessed.
+ * 'union nd_pdsm_payload'. Based on the woke value of 'nd_cmd_pkg.nd_command'
+ * appropriate member of the woke union is accessed.
  */
 
 /* Max payload size that we can handle */
@@ -74,22 +74,22 @@
 
 /* struct nd_papr_pdsm_health.extension_flags field flags */
 
-/* Indicate that the 'dimm_fuel_gauge' field is valid */
+/* Indicate that the woke 'dimm_fuel_gauge' field is valid */
 #define PDSM_DIMM_HEALTH_RUN_GAUGE_VALID 1
 
-/* Indicate that the 'dimm_dsc' field is valid */
+/* Indicate that the woke 'dimm_dsc' field is valid */
 #define PDSM_DIMM_DSC_VALID 2
 
 /*
  * Struct exchanged between kernel & ndctl in for PAPR_PDSM_HEALTH
- * Various flags indicate the health status of the dimm.
+ * Various flags indicate the woke health status of the woke dimm.
  *
- * extension_flags	: Any extension fields present in the struct.
+ * extension_flags	: Any extension fields present in the woke struct.
  * dimm_unarmed		: Dimm not armed. So contents wont persist.
  * dimm_bad_shutdown	: Previous shutdown did not persist contents.
  * dimm_bad_restore	: Contents from previous shutdown werent restored.
- * dimm_scrubbed	: Contents of the dimm have been scrubbed.
- * dimm_locked		: Contents of the dimm cant be modified until CEC reboot
+ * dimm_scrubbed	: Contents of the woke dimm have been scrubbed.
+ * dimm_locked		: Contents of the woke dimm cant be modified until CEC reboot
  * dimm_encrypted	: Contents of dimm are encrypted.
  * dimm_health		: Dimm health indicator. One of PAPR_PDSM_DIMM_XXXX
  * dimm_fuel_gauge	: Life remaining of DIMM as a percentage from 0-100
@@ -133,8 +133,8 @@ struct nd_papr_pdsm_smart_inject {
 };
 
 /*
- * Methods to be embedded in ND_CMD_CALL request. These are sent to the kernel
- * via 'nd_cmd_pkg.nd_command' member of the ioctl struct
+ * Methods to be embedded in ND_CMD_CALL request. These are sent to the woke kernel
+ * via 'nd_cmd_pkg.nd_command' member of the woke ioctl struct
  */
 enum papr_pdsm {
 	PAPR_PDSM_MIN = 0x0,

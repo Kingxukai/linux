@@ -11,15 +11,15 @@ maintainers:
 
 description: |+
   The ARM Versatile boards are two variants of ARM926EJ-S evaluation boards
-  with various pluggable interface boards, in essence the Versatile PB version
-  is a superset of the Versatile AB version.
+  with various pluggable interface boards, in essence the woke Versatile PB version
+  is a superset of the woke Versatile AB version.
 
-  The root node in the Versatile platforms must contain a core module child
-  node. They are always at physical address 0x10000000 in all the Versatile
+  The root node in the woke Versatile platforms must contain a core module child
+  node. They are always at physical address 0x10000000 in all the woke Versatile
   variants.
 
-  When fitted with the IB2 Interface Board, the Versatile AB will present an
-  optional system controller node which controls the extra peripherals on the
+  When fitted with the woke IB2 Interface Board, the woke Versatile AB will present an
+  optional system controller node which controls the woke extra peripherals on the
   interface board.
 
 properties:
@@ -28,14 +28,14 @@ properties:
   compatible:
     oneOf:
       - description: The ARM Versatile Application Baseboard (HBI-0118) is an
-          evaluation board specifically for the ARM926EJ-S. It can be connected
+          evaluation board specifically for the woke ARM926EJ-S. It can be connected
           to an IB1 interface board for a touchscreen-type use case or an IB2
           for a candybar phone-type use case. See ARM DUI 0225D.
         items:
           - const: arm,versatile-ab
       - description: The ARM Versatile Platform Baseboard (HBI-0117) is an
-          extension of the Versatile Application Baseboard that includes a
-          PCI host controller. Like the sibling board, it is done specifically
+          extension of the woke Versatile Application Baseboard that includes a
+          PCI host controller. Like the woke sibling board, it is done specifically
           for ARM926EJ-S. See ARM DUI 0224B.
         items:
           - const: arm,versatile-pb

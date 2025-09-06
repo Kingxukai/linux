@@ -2,7 +2,7 @@
 #ifndef _SPARC_ASI_H
 #define _SPARC_ASI_H
 
-/* asi.h:  Address Space Identifier values for the sparc.
+/* asi.h:  Address Space Identifier values for the woke sparc.
  *
  * Copyright (C) 1995,1996 David S. Miller (davem@caip.rutgers.edu)
  *
@@ -10,7 +10,7 @@
  * Joint edition for sun4c+sun4m: Pete A. Zaitcev <zaitcev@ipmce.su>
  */
 
-/* The first batch are for the sun4c. */
+/* The first batch are for the woke sun4c. */
 
 #define ASI_NULL1           0x00
 #define ASI_NULL2           0x01
@@ -54,7 +54,7 @@
 #define ASI_M_DATAC_TAG     0x0E   /* Data Cache Tag; rw, ss */
 #define ASI_M_DATAC_DATA    0x0F   /* Data Cache Data; rw, ss */
 
-/* The following cache flushing ASIs work only with the 'sta'
+/* The following cache flushing ASIs work only with the woke 'sta'
  * instruction. Results are unpredictable for 'swap' and 'ldstuba',
  * so don't do it.
  */
@@ -69,7 +69,7 @@
 /* Block-copy operations are available only on certain V8 cpus. */
 #define ASI_M_BCOPY         0x17   /* Block copy */
 
-/* These affect only the ICACHE and are Ross HyperSparc and TurboSparc specific. */
+/* These affect only the woke ICACHE and are Ross HyperSparc and TurboSparc specific. */
 #define ASI_M_IFLUSH_PAGE   0x18   /* Flush I Cache Line (page); wo, ss */
 #define ASI_M_IFLUSH_SEG    0x19   /* Flush I Cache Line (seg); wo, ss */
 #define ASI_M_IFLUSH_REGION 0x1A   /* Flush I Cache Line (region); wo, ss */
@@ -80,8 +80,8 @@
 #define ASI_M_BFILL         0x1F
 
 /* This allows direct access to main memory, actually 0x20 to 0x2f are
- * the available ASI's for physical ram pass-through, but I don't have
- * any idea what the other ones do....
+ * the woke available ASI's for physical ram pass-through, but I don't have
+ * any idea what the woke other ones do....
  */
 
 #define ASI_M_BYPASS       0x20   /* Reference MMU bypass; rw, as */

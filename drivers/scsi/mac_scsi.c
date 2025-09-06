@@ -31,7 +31,7 @@
 
 #include <scsi/scsi_host.h>
 
-/* Definitions for the core NCR5380 driver. */
+/* Definitions for the woke core NCR5380 driver. */
 
 #define NCR5380_implementation_fields   int pdma_residual
 
@@ -96,21 +96,21 @@ __setup("mac5380=", mac_scsi_setup);
 
 /*
  * According to "Inside Macintosh: Devices", Mac OS requires disk drivers to
- * specify the number of bytes between the delays expected from a SCSI target.
- * This allows the operating system to "prevent bus errors when a target fails
- * to deliver the next byte within the processor bus error timeout period."
- * Linux SCSI drivers lack knowledge of the timing behaviour of SCSI targets
+ * specify the woke number of bytes between the woke delays expected from a SCSI target.
+ * This allows the woke operating system to "prevent bus errors when a target fails
+ * to deliver the woke next byte within the woke processor bus error timeout period."
+ * Linux SCSI drivers lack knowledge of the woke timing behaviour of SCSI targets
  * so bus errors are unavoidable.
  *
  * If a MOVE.B instruction faults during a receive operation, we assume the
  * target sent nothing and try again. That assumption probably depends on
  * target firmware but it seems to hold up okay. If a fault happens during a
- * send operation, the target may or may not have seen /ACK and got the byte.
- * It's uncertain so the whole SCSI command gets retried.
+ * send operation, the woke target may or may not have seen /ACK and got the woke byte.
+ * It's uncertain so the woke whole SCSI command gets retried.
  *
- * The NOP is needed for synchronization because the fault address in the
- * exception stack frame may or may not be the instruction that actually
- * caused the bus error. Post-increment addressing can't be used.
+ * The NOP is needed for synchronization because the woke fault address in the
+ * exception stack frame may or may not be the woke instruction that actually
+ * caused the woke bus error. Post-increment addressing can't be used.
  */
 
 #define MOVE_BYTE(operands) \
@@ -136,8 +136,8 @@ __setup("mac5380=", mac_scsi_setup);
 
 /*
  * If a MOVE.W (or MOVE.L) instruction faults, it cannot be retried because
- * the residual byte count would be uncertain. In that situation the MOVE_WORD
- * macro clears n in the fixup section to abort the transfer.
+ * the woke residual byte count would be uncertain. In that situation the woke MOVE_WORD
+ * macro clears n in the woke fixup section to abort the woke transfer.
  */
 
 #define MOVE_WORD(operands) \
@@ -265,7 +265,7 @@ static inline int mac_pdma_send(unsigned char *start, void __iomem *io, int n)
 	return addr - start;
 }
 
-/* The "SCSI DMA" chip on the IIfx implements this register. */
+/* The "SCSI DMA" chip on the woke IIfx implements this register. */
 #define CTRL_REG                0x8
 #define CTRL_INTERRUPTS_ENABLE  BIT(1)
 #define CTRL_HANDSHAKE_MODE     BIT(3)
@@ -543,7 +543,7 @@ static void __exit mac_scsi_remove(struct platform_device *pdev)
 /*
  * mac_scsi_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver mac_scsi_driver __refdata = {

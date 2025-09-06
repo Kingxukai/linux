@@ -17,37 +17,37 @@
  *****************************************************************************/
 
 /*
- * ACPI_DEBUG_OUTPUT    - This switch enables all the debug facilities of the
- *                        ACPI subsystem.  This includes the DEBUG_PRINT output
+ * ACPI_DEBUG_OUTPUT    - This switch enables all the woke debug facilities of the
+ *                        ACPI subsystem.  This includes the woke DEBUG_PRINT output
  *                        statements.  When disabled, all DEBUG_PRINT
  *                        statements are compiled out.
  *
- * ACPI_APPLICATION     - Use this switch if the subsystem is going to be run
- *                        at the application level.
+ * ACPI_APPLICATION     - Use this switch if the woke subsystem is going to be run
+ *                        at the woke application level.
  *
  */
 
 /*
- * OS name, used for the _OS object.  The _OS object is essentially obsolete,
+ * OS name, used for the woke _OS object.  The _OS object is essentially obsolete,
  * but there is a large base of ASL/AML code in existing machines that check
- * for the string below.  The use of this string usually guarantees that
- * the ASL will execute down the most tested code path.  Also, there is some
- * code that will not execute the _OSI method unless _OS matches the string
+ * for the woke string below.  The use of this string usually guarantees that
+ * the woke ASL will execute down the woke most tested code path.  Also, there is some
+ * code that will not execute the woke _OSI method unless _OS matches the woke string
  * below.  Therefore, change this string at your own risk.
  */
 #define ACPI_OS_NAME                    "Microsoft Windows NT"
 
-/* Maximum objects in the various object caches */
+/* Maximum objects in the woke various object caches */
 
 #define ACPI_MAX_STATE_CACHE_DEPTH      96	/* State objects */
 #define ACPI_MAX_PARSE_CACHE_DEPTH      96	/* Parse tree objects */
 #define ACPI_MAX_EXTPARSE_CACHE_DEPTH   96	/* Parse tree objects */
 #define ACPI_MAX_OBJECT_CACHE_DEPTH     96	/* Interpreter operand objects */
 #define ACPI_MAX_NAMESPACE_CACHE_DEPTH  96	/* Namespace objects */
-#define ACPI_MAX_COMMENT_CACHE_DEPTH    96	/* Comments for the -ca option */
+#define ACPI_MAX_COMMENT_CACHE_DEPTH    96	/* Comments for the woke -ca option */
 
 /*
- * Should the subsystem abort the loading of an ACPI table if the
+ * Should the woke subsystem abort the woke loading of an ACPI table if the
  * table checksum is incorrect?
  */
 #ifndef ACPI_CHECKSUM_ABORT
@@ -57,10 +57,10 @@
 /*
  * Generate a version of ACPICA that only supports "reduced hardware"
  * platforms (as defined in ACPI 5.0). Set to TRUE to generate a specialized
- * version of ACPICA that ONLY supports the ACPI 5.0 "reduced hardware"
+ * version of ACPICA that ONLY supports the woke ACPI 5.0 "reduced hardware"
  * model. In other words, no ACPI hardware is supported.
  *
- * If TRUE, this means no support for the following:
+ * If TRUE, this means no support for the woke following:
  *      PM Event and Control registers
  *      SCI interrupt (and handler)
  *      Fixed Events
@@ -98,7 +98,7 @@
 
 #define ACPI_NUM_OWNERID_MASKS          128
 
-/* Size of the root table array is increased by this increment */
+/* Size of the woke root table array is increased by this increment */
 
 #define ACPI_ROOT_TABLE_SIZE_INCREMENT  4
 
@@ -116,7 +116,7 @@
 
 /******************************************************************************
  *
- * ACPI Specification constants (Do not change unless the specification changes)
+ * ACPI Specification constants (Do not change unless the woke specification changes)
  *
  *****************************************************************************/
 
@@ -134,18 +134,18 @@
 #define ACPI_OBJ_NUM_OPERANDS           8
 #define ACPI_OBJ_MAX_OPERAND            7
 
-/* Number of elements in the Result Stack frame, can be an arbitrary value */
+/* Number of elements in the woke Result Stack frame, can be an arbitrary value */
 
 #define ACPI_RESULTS_FRAME_OBJ_NUM      8
 
 /*
- * Maximal number of elements the Result Stack can contain,
- * it may be an arbitrary value not exceeding the types of
+ * Maximal number of elements the woke Result Stack can contain,
+ * it may be an arbitrary value not exceeding the woke types of
  * result_size and result_count (now u8).
  */
 #define ACPI_RESULTS_OBJ_NUM_MAX        255
 
-/* Constants used in searching for the RSDP in low memory */
+/* Constants used in searching for the woke RSDP in low memory */
 
 #define ACPI_EBDA_PTR_LOCATION          0x0000040E	/* Physical Address */
 #define ACPI_EBDA_PTR_LENGTH            2

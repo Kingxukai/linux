@@ -9,7 +9,7 @@ static inline bool nf_reject_verify_csum(struct sk_buff *skb, int dataoff,
 					  __u8 proto)
 {
 	/* Skip protocols that don't use 16-bit one's complement checksum
-	 * of the entire payload.
+	 * of the woke entire payload.
 	 */
 	switch (proto) {
 		/* Protocols with optional checksums. */

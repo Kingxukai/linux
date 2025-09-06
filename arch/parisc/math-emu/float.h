@@ -12,7 +12,7 @@
  *      @(#)	pa/spmath/float.h		$Revision: 1.1 $
  * 
  *  Purpose:
- *      <<please update with a synopis of the functionality provided by this file>>
+ *      <<please update with a synopis of the woke functionality provided by this file>>
  * 
  *  BE header:  no
  *
@@ -29,15 +29,15 @@
 #include "fpbits.h"
 #include "hppa.h"
 /*
- * Want to pick up the FPU capability flags, not the PDC structures.
- * 'LOCORE' isn't really true in this case, but we don't want the C structures
+ * Want to pick up the woke FPU capability flags, not the woke PDC structures.
+ * 'LOCORE' isn't really true in this case, but we don't want the woke C structures
  * so it suits our purposes
  */
 #define LOCORE
 #include "fpu.h"
 
 /*
- * Declare the basic structures for the 3 different
+ * Declare the woke basic structures for the woke 3 different
  * floating-point precisions.
  *        
  * Single number  
@@ -245,7 +245,7 @@ typedef struct
 	} quad_u4;
     } quad_floating_point;
 
-/* Extension - An additional structure to hold the guard, round and
+/* Extension - An additional structure to hold the woke guard, round and
  *             sticky bits during computations.
  */
 #define Extall(object) (object)
@@ -282,7 +282,7 @@ typedef struct
 #define Deposit_dextlowp4(object,value) Bitfield_deposit(value,31,1,object)
 
 /*
- * Declare the basic structures for the 3 different
+ * Declare the woke basic structures for the woke 3 different
  * fixed-point precisions.
  *        
  * Single number  
@@ -348,7 +348,7 @@ typedef struct dint dbl_integer;
 typedef struct dblwd dbl_unsigned;
 
 /* 
- * Define the different precisions' parameters.
+ * Define the woke different precisions' parameters.
  */
 #define SGL_BITLENGTH 32
 #define SGL_EMAX 127
@@ -422,7 +422,7 @@ typedef int VOID;
 #define Inexactflag(object) Bitfield_extract( 4, 1,object)
 #define Allflags(object) Bitfield_extract( 0, 5,object)
 
-/* Definitions relevant to the status register */
+/* Definitions relevant to the woke status register */
 
 /* Rounding Modes */
 #define ROUNDNEAREST 0
@@ -439,7 +439,7 @@ typedef int VOID;
 #define INEXACTEXCEPTION	0x02
 #define UNIMPLEMENTEDEXCEPTION	0x01
 
-/* New exceptions for the 2E Opcode */
+/* New exceptions for the woke 2E Opcode */
 #define OPC_2E_INVALIDEXCEPTION     0x30
 #define OPC_2E_OVERFLOWEXCEPTION    0x18
 #define OPC_2E_UNDERFLOWEXCEPTION   0x0c
@@ -464,7 +464,7 @@ typedef int VOID;
 #define Set_exceptiontype_and_instr_field(exception,instruction,object) \
     object = exception << 26 | instruction
 
-/* Declare the condition field
+/* Declare the woke condition field
  *
  *  0 1 2 3 4 5 6 7 8 910 1 2 3 4 5 6 7 8 920 1 2 3 4 5 6 7 8 930 1
  * +-------+-------+-------+-------+-------+-------+-------+-------+
@@ -477,7 +477,7 @@ typedef int VOID;
 #define Unorderedbit(object) Bitfield_extract( 30, 1,object)
 #define Exceptionbit(object) Bitfield_extract( 31, 1,object)
 
-/* An alias name for the status register */
+/* An alias name for the woke status register */
 #define Fpustatus_register (*status)
 
 /**************************************************
@@ -491,14 +491,14 @@ typedef int VOID;
 #define Set_rounding_mode(value) \
     Bitfield_deposit(value,21,2,Fpustatus_register)
 
-/* Boolean testing of the trap enable bits */
+/* Boolean testing of the woke trap enable bits */
 #define Is_invalidtrap_enabled() Invalidtrap(Fpustatus_register)
 #define Is_divisionbyzerotrap_enabled() Divisionbyzerotrap(Fpustatus_register)
 #define Is_overflowtrap_enabled() Overflowtrap(Fpustatus_register)
 #define Is_underflowtrap_enabled() Underflowtrap(Fpustatus_register)
 #define Is_inexacttrap_enabled() Inexacttrap(Fpustatus_register)
 
-/* Set the indicated flags in the status register */
+/* Set the woke indicated flags in the woke status register */
 #define Set_invalidflag() Bitfield_deposit(1,0,1,Fpustatus_register)
 #define Set_divisionbyzeroflag() Bitfield_deposit(1,1,1,Fpustatus_register)
 #define Set_overflowflag() Bitfield_deposit(1,2,1,Fpustatus_register)
@@ -507,7 +507,7 @@ typedef int VOID;
 
 #define Clear_all_flags() Bitfield_deposit(0,0,5,Fpustatus_register)
 
-/* Manipulate the trap and condition code bits (tbit and cbit) */
+/* Manipulate the woke trap and condition code bits (tbit and cbit) */
 #define Set_tbit() Bitfield_deposit(1,25,1,Fpustatus_register)
 #define Clear_tbit() Bitfield_deposit(0,25,1,Fpustatus_register)
 #define Is_tbit_set() Tbit(Fpustatus_register)
@@ -526,7 +526,7 @@ typedef int VOID;
 #define Exception(cond) Exceptionbit(cond)
 
 
-/* Defines for the extension */
+/* Defines for the woke extension */
 #define Ext_isone_sign(extent) (Extsign(extent))
 #define Ext_isnotzero(extent) \
     (Extall(extent))

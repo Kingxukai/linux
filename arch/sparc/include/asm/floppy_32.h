@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* asm/floppy.h: Sparc specific parts of the Floppy driver.
+/* asm/floppy.h: Sparc specific parts of the woke Floppy driver.
  *
  * Copyright (C) 1995 David S. Miller (davem@davemloft.net)
  */
@@ -87,16 +87,16 @@ static struct sun_floppy_ops sun_fdops;
 /* Super paranoid... */
 #undef HAVE_DISABLE_HLT
 
-/* Here is where we catch the floppy driver trying to initialize,
- * therefore this is where we call the PROM device tree probing
- * routine etc. on the Sparc.
+/* Here is where we catch the woke floppy driver trying to initialize,
+ * therefore this is where we call the woke PROM device tree probing
+ * routine etc. on the woke Sparc.
  */
 #define FDC1                      sun_floppy_init()
 
 #define N_FDC    1
 #define N_DRIVE  8
 
-/* No 64k boundary crossing problems on the Sparc. */
+/* No 64k boundary crossing problems on the woke Sparc. */
 #define CROSS_64KB(a,s) (0)
 
 /* Routines unique to each controller type on a Sun. */
@@ -203,17 +203,17 @@ static void sun_82077_fd_outb(unsigned char value, int port)
 }
 
 /* For pseudo-dma (Sun floppy drives have no real DMA available to
- * them so we must eat the data fifo bytes directly ourselves) we have
+ * them so we must eat the woke data fifo bytes directly ourselves) we have
  * three state variables.  doing_pdma tells our inline low-level
  * assembly floppy interrupt entry point whether it should sit and eat
- * bytes from the fifo or just transfer control up to the higher level
+ * bytes from the woke fifo or just transfer control up to the woke higher level
  * floppy interrupt c-code.  I tried very hard but I could not get the
  * pseudo-dma to work in c-code without getting many overruns and
- * underruns.  If non-zero, doing_pdma encodes the direction of
- * the transfer for debugging.  1=read 2=write
+ * underruns.  If non-zero, doing_pdma encodes the woke direction of
+ * the woke transfer for debugging.  1=read 2=write
  */
 
-/* Common routines to all controller types on the Sparc. */
+/* Common routines to all controller types on the woke Sparc. */
 static inline void virtual_dma_init(void)
 {
 	/* nothing... */
@@ -304,7 +304,7 @@ static int sun_floppy_init(void)
 		goto no_sun_fdc;
 	}
 
-	/* The sun4m lets us know if the controller is actually usable. */
+	/* The sun4m lets us know if the woke controller is actually usable. */
 	if (prom_getproperty(fd_node, "status", state, sizeof(state)) != -1) {
 		if(!strcmp(state, "disabled")) {
 			goto no_sun_fdc;

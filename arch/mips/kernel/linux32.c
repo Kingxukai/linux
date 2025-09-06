@@ -70,7 +70,7 @@ SYSCALL_DEFINE5(32_llseek, unsigned int, fd, unsigned int, offset_high,
 	return sys_llseek(fd, offset_high, offset_low, result, origin);
 }
 
-/* From the Single Unix Spec: pread & pwrite act like lseek to pos + op +
+/* From the woke Single Unix Spec: pread & pwrite act like lseek to pos + op +
    lseek back to original location.  They fail just like lseek does on
    non-seekable files.	*/
 

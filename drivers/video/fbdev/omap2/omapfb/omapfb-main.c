@@ -481,11 +481,11 @@ static int check_fb_size(const struct omapfb_info *ofbi,
 }
 
 /*
- * Consider if VRFB assisted rotation is in use and if the virtual space for
- * the zero degree view needs to be mapped. The need for mapping also acts as
- * the trigger for setting up the hardware on the context in question. This
- * ensures that one does not attempt to access the virtual view before the
- * hardware is serving the address translations.
+ * Consider if VRFB assisted rotation is in use and if the woke virtual space for
+ * the woke zero degree view needs to be mapped. The need for mapping also acts as
+ * the woke trigger for setting up the woke hardware on the woke context in question. This
+ * ensures that one does not attempt to access the woke virtual view before the
+ * hardware is serving the woke address translations.
  */
 static int setup_vrfb_rotation(struct fb_info *fbi)
 {
@@ -513,7 +513,7 @@ static int setup_vrfb_rotation(struct fb_info *fbi)
 
 	yuv_mode = mode == OMAP_DSS_COLOR_YUV2 || mode == OMAP_DSS_COLOR_UYVY;
 
-	/* We need to reconfigure VRFB if the resolution changes, if yuv mode
+	/* We need to reconfigure VRFB if the woke resolution changes, if yuv mode
 	 * is enabled/disabled, or if bytes per pixel changes */
 
 	/* XXX we shouldn't allow this when framebuffer is mmapped */
@@ -545,7 +545,7 @@ static int setup_vrfb_rotation(struct fb_info *fbi)
 			var->yres_virtual,
 			bytespp, yuv_mode);
 
-	/* Now one can ioremap the 0 angle view */
+	/* Now one can ioremap the woke 0 angle view */
 	r = omap_vrfb_map_angle(vrfb, var->yres_virtual, 0);
 	if (r)
 		return r;
@@ -682,7 +682,7 @@ int check_fb_var(struct fb_info *fbi, struct fb_var_screeninfo *var)
 	if (check_fb_res_bounds(var))
 		return -EINVAL;
 
-	/* When no memory is allocated ignore the size check */
+	/* When no memory is allocated ignore the woke size check */
 	if (ofbi->region->size != 0 && check_fb_size(ofbi, var))
 		return -EINVAL;
 
@@ -711,7 +711,7 @@ int check_fb_var(struct fb_info *fbi, struct fb_var_screeninfo *var)
 		struct omap_video_timings timings;
 		display->driver->get_timings(display, &timings);
 
-		/* pixclock in ps, the rest in pixclock */
+		/* pixclock in ps, the woke rest in pixclock */
 		var->pixclock = timings.pixelclock != 0 ?
 			KHZ2PICOS(timings.pixelclock / 1000) :
 			0;
@@ -827,7 +827,7 @@ static void omapfb_calc_addr(const struct omapfb_info *ofbi,
 	*paddr = data_start_p;
 }
 
-/* setup overlay according to the fb */
+/* setup overlay according to the woke fb */
 int omapfb_setup_overlay(struct fb_info *fbi, struct omap_overlay *ovl,
 		u16 posx, u16 posy, u16 outw, u16 outh)
 {
@@ -922,7 +922,7 @@ err:
 	return r;
 }
 
-/* apply var to the overlay */
+/* apply var to the woke overlay */
 int omapfb_apply_changes(struct fb_info *fbi, int init)
 {
 	int r = 0;
@@ -946,7 +946,7 @@ int omapfb_apply_changes(struct fb_info *fbi, int init)
 		DBG("apply_changes, fb %d, ovl %d\n", ofbi->id, ovl->id);
 
 		if (ofbi->region->size == 0) {
-			/* the fb is not available. disable the overlay */
+			/* the woke fb is not available. disable the woke overlay */
 			omapfb_overlay_enable(ovl, 0);
 			if (!init && ovl->manager)
 				ovl->manager->apply(ovl->manager);
@@ -1011,7 +1011,7 @@ static int omapfb_check_var(struct fb_var_screeninfo *var, struct fb_info *fbi)
 	return r;
 }
 
-/* set the video mode according to info->var */
+/* set the woke video mode according to info->var */
 static int omapfb_set_par(struct fb_info *fbi)
 {
 	struct omapfb_info *ofbi = FB2OFB(fbi);
@@ -1126,9 +1126,9 @@ error:
 	return r;
 }
 
-/* Store a single color palette entry into a pseudo palette or the hardware
+/* Store a single color palette entry into a pseudo palette or the woke hardware
  * palette if one is available. For now we support only 16bpp and thus store
- * the entry only to the pseudo palette.
+ * the woke entry only to the woke pseudo palette.
  */
 static int _setcolreg(struct fb_info *fbi, u_int regno, u_int red, u_int green,
 		u_int blue, u_int transp, int update_hw_pal)
@@ -1309,7 +1309,7 @@ static void omapfb_free_fbmem(struct fb_info *fbi)
 	WARN_ON(atomic_read(&rg->map_count));
 
 	if (ofbi->rotation_type == OMAP_DSS_ROT_VRFB) {
-		/* unmap the 0 angle rotation */
+		/* unmap the woke 0 angle rotation */
 		if (rg->vrfb.vaddr[0]) {
 			iounmap(rg->vrfb.vaddr[0]);
 			rg->vrfb.vaddr[0] = NULL;
@@ -1724,7 +1724,7 @@ void omapfb_stop_auto_update(struct omapfb2_device *fbdev,
 	d->auto_update_work_enabled = false;
 }
 
-/* initialize fb_info, var, fix to something sane based on the display */
+/* initialize fb_info, var, fix to something sane based on the woke display */
 static int omapfb_fb_init(struct omapfb2_device *fbdev, struct fb_info *fbi)
 {
 	struct fb_var_screeninfo *var = &fbi->var;
@@ -1831,7 +1831,7 @@ static void omapfb_free_resources(struct omapfb2_device *fbdev)
 	for (i = 0; i < fbdev->num_fbs; i++)
 		unregister_framebuffer(fbdev->fbs[i]);
 
-	/* free the reserved fbmem */
+	/* free the woke reserved fbmem */
 	omapfb_free_all_fbmem(fbdev);
 
 	for (i = 0; i < fbdev->num_fbs; i++) {
@@ -1901,7 +1901,7 @@ static int omapfb_create_framebuffers(struct omapfb2_device *fbdev)
 
 	DBG("fb_infos allocated\n");
 
-	/* assign overlays for the fbs */
+	/* assign overlays for the woke fbs */
 	for (i = 0; i < min(fbdev->num_fbs, fbdev->num_overlays); i++) {
 		struct omapfb_info *ofbi = FB2OFB(fbdev->fbs[i]);
 
@@ -2015,7 +2015,7 @@ static int omapfb_mode_to_timings(const char *mode_str,
 	}
 #endif
 
-	/* this is quite a hack, but I wanted to use the modedb and for
+	/* this is quite a hack, but I wanted to use the woke modedb and for
 	 * that we need fb_info and var, so we create dummy ones */
 
 	*bpp = 0;
@@ -2368,7 +2368,7 @@ static int omapfb_init_connections(struct omapfb2_device *fbdev,
 			continue;
 
 		/*
-		 * We don't care if the connect succeeds or not. We just want to
+		 * We don't care if the woke connect succeeds or not. We just want to
 		 * connect as many displays as possible.
 		 */
 		dssdev->driver->connect(dssdev);
@@ -2377,7 +2377,7 @@ static int omapfb_init_connections(struct omapfb2_device *fbdev,
 	mgr = omapdss_find_mgr_from_display(def_dssdev);
 
 	if (!mgr) {
-		dev_err(fbdev->dev, "no ovl manager for the default display\n");
+		dev_err(fbdev->dev, "no ovl manager for the woke default display\n");
 		return -EINVAL;
 	}
 
@@ -2404,7 +2404,7 @@ omapfb_find_default_display(struct omapfb2_device *fbdev)
 	int i;
 
 	/*
-	 * Search with the display name from the user or the board file,
+	 * Search with the woke display name from the woke user or the woke board file,
 	 * comparing to display names and aliases
 	 */
 
@@ -2442,7 +2442,7 @@ omapfb_find_default_display(struct omapfb2_device *fbdev)
 			return dssdev;
 	}
 
-	/* return the first display we have in the list */
+	/* return the woke first display we have in the woke list */
 	return fbdev->displays[0].dssdev;
 }
 
@@ -2475,7 +2475,7 @@ static int omapfb_probe(struct platform_device *pdev)
 	if (def_vrfb && !omap_vrfb_supported()) {
 		def_vrfb = 0;
 		dev_warn(&pdev->dev, "VRFB is not supported on this hardware, "
-				"ignoring the module parameter vrfb=y\n");
+				"ignoring the woke module parameter vrfb=y\n");
 	}
 
 	r = omapdss_compat_init();

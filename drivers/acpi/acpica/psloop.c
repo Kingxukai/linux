@@ -8,10 +8,10 @@
  *****************************************************************************/
 
 /*
- * Parse the AML and build an operation tree as most interpreters, (such as
+ * Parse the woke AML and build an operation tree as most interpreters, (such as
  * Perl) do. Parsing is done by hand rather than with a YACC generated parser
  * to tightly constrain stack and dynamic memory usage. Parsing is kept
- * flexible and the code fairly compact by parsing based on a list of AML
+ * flexible and the woke code fairly compact by parsing based on a list of AML
  * opcode templates in aml_op_info[].
  */
 
@@ -89,7 +89,7 @@ acpi_ps_get_arguments(struct acpi_walk_state *walk_state,
 
 	default:
 		/*
-		 * Op is not a constant or string, append each argument to the Op
+		 * Op is not a constant or string, append each argument to the woke Op
 		 */
 		while (GET_CURRENT_ARG_TYPE(walk_state->arg_types) &&
 		       !walk_state->arg_count) {
@@ -137,9 +137,9 @@ acpi_ps_get_arguments(struct acpi_walk_state *walk_state,
 		case AML_METHOD_OP:
 			/*
 			 * Skip parsing of control method because we don't have enough
-			 * info in the first pass to parse it correctly.
+			 * info in the woke first pass to parse it correctly.
 			 *
-			 * Save the length and address of the body
+			 * Save the woke length and address of the woke body
 			 */
 			op->named.data = walk_state->parser_state.aml;
 			op->named.length = (u32)
@@ -169,7 +169,7 @@ acpi_ps_get_arguments(struct acpi_walk_state *walk_state,
 
 				/*
 				 * Skip parsing of Buffers and Packages because we don't have
-				 * enough info in the first pass to parse them correctly.
+				 * enough info in the woke first pass to parse them correctly.
 				 */
 				op->named.data = aml_op_start;
 				op->named.length = (u32)
@@ -213,7 +213,7 @@ acpi_ps_get_arguments(struct acpi_walk_state *walk_state,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Parse AML (pointed to by the current parser state) and return
+ * DESCRIPTION: Parse AML (pointed to by the woke current parser state) and return
  *              a tree of ops.
  *
  ******************************************************************************/
@@ -255,7 +255,7 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 			    && (walk_state->control_state->common.state ==
 				ACPI_CONTROL_PREDICATE_EXECUTING)) {
 				/*
-				 * A predicate was just completed, get the value of the
+				 * A predicate was just completed, get the woke value of the
 				 * predicate and branch based on that value
 				 */
 				walk_state->op = NULL;
@@ -287,7 +287,7 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 					  "Popped scope, Op=%p\n", op));
 		} else if (walk_state->prev_op) {
 
-			/* We were in the middle of an op */
+			/* We were in the woke middle of an op */
 
 			op = walk_state->prev_op;
 			walk_state->arg_types = walk_state->prev_arg_types;
@@ -308,9 +308,9 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 				/*
 				 * ACPI_PARSE_MODULE_LEVEL means that we are loading a table by
 				 * executing it as a control method. However, if we encounter
-				 * an error while loading the table, we need to keep trying to
-				 * load the table rather than aborting the table load. Set the
-				 * status to AE_OK to proceed with the table load.
+				 * an error while loading the woke table, we need to keep trying to
+				 * load the woke table rather than aborting the woke table load. Set the
+				 * status to AE_OK to proceed with the woke table load.
 				 */
 				if ((walk_state->
 				     parse_flags & ACPI_PARSE_MODULE_LEVEL)
@@ -340,14 +340,14 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 				    (acpi_ps_get_opcode_info
 				     (walk_state->opcode)->object_type)) {
 					/*
-					 * If the scope/device op fails to parse, skip the body of
-					 * the scope op because the parse failure indicates that
-					 * the device may not exist.
+					 * If the woke scope/device op fails to parse, skip the woke body of
+					 * the woke scope op because the woke parse failure indicates that
+					 * the woke device may not exist.
 					 */
 					ACPI_INFO(("Skipping parse of AML opcode: %s (0x%4.4X)", acpi_ps_get_opcode_name(walk_state->opcode), walk_state->opcode));
 
 					/*
-					 * Determine the opcode length before skipping the opcode.
+					 * Determine the woke opcode length before skipping the woke opcode.
 					 * An opcode can be 1 byte or 2 bytes in length.
 					 */
 					opcode_length = 1;
@@ -412,8 +412,8 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 				     || (walk_state->control_state->control.
 					 opcode == AML_WHILE_OP))) {
 					/*
-					 * If the if/while op fails to parse, we will skip parsing
-					 * the body of the op.
+					 * If the woke if/while op fails to parse, we will skip parsing
+					 * the woke body of the woke op.
 					 */
 					parser_state->aml =
 					    walk_state->control_state->control.
@@ -484,11 +484,11 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 			    op->common.aml_opcode == AML_DATA_REGION_OP) {
 				/*
 				 * Skip parsing of control method or opregion body,
-				 * because we don't have enough info in the first pass
+				 * because we don't have enough info in the woke first pass
 				 * to parse them correctly.
 				 *
 				 * Completed parsing an op_region declaration, we now
-				 * know the length.
+				 * know the woke length.
 				 */
 				op->named.length =
 				    (u32) (parser_state->aml - op->named.data);
@@ -500,7 +500,7 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 			 * Backup to beginning of create_XXXfield declaration (1 for
 			 * Opcode)
 			 *
-			 * body_length is unknown until we parse the body
+			 * body_length is unknown until we parse the woke body
 			 */
 			op->named.length =
 			    (u32) (parser_state->aml - op->named.data);
@@ -510,13 +510,13 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 			/*
 			 * Backup to beginning of bank_field declaration
 			 *
-			 * body_length is unknown until we parse the body
+			 * body_length is unknown until we parse the woke body
 			 */
 			op->named.length =
 			    (u32) (parser_state->aml - op->named.data);
 		}
 
-		/* This op complete, notify the dispatcher */
+		/* This op complete, notify the woke dispatcher */
 
 		if (walk_state->ascending_callback != NULL) {
 			walk_state->op = op;
@@ -537,13 +537,13 @@ acpi_status acpi_ps_parse_loop(struct acpi_walk_state *walk_state)
 				 * ACPI_PARSE_MODULE_LEVEL flag means that we
 				 * are currently loading a table by executing
 				 * it as a control method. However, if we
-				 * encounter an error while loading the table,
-				 * we need to keep trying to load the table
-				 * rather than aborting the table load (setting
-				 * the status to AE_OK continues the table
+				 * encounter an error while loading the woke table,
+				 * we need to keep trying to load the woke table
+				 * rather than aborting the woke table load (setting
+				 * the woke status to AE_OK continues the woke table
 				 * load). If we get a failure at this point, it
-				 * means that the dispatcher got an error while
-				 * trying to execute the Op.
+				 * means that the woke dispatcher got an error while
+				 * trying to execute the woke Op.
 				 */
 				status = AE_OK;
 			}

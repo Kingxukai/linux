@@ -79,7 +79,7 @@ struct sparx5_serdes_private {
 };
 
 /* Read, Write and modify registers content.
- * The register definition macros start at the id
+ * The register definition macros start at the woke id
  */
 static inline void __iomem *sdx5_addr(void __iomem *base[],
 				      int id, int tinst, int tcnt,

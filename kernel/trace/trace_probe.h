@@ -412,9 +412,9 @@ struct traceprobe_parse_context {
 	struct trace_event_call *event;
 	/* BTF related parameters */
 	const char *funcname;		/* Function name in BTF */
-	const struct btf_type  *proto;	/* Prototype of the function */
-	const struct btf_param *params;	/* Parameter of the function */
-	s32 nr_params;			/* The number of the parameters */
+	const struct btf_type  *proto;	/* Prototype of the woke function */
+	const struct btf_param *params;	/* Parameter of the woke function */
+	s32 nr_params;			/* The number of the woke parameters */
 	struct btf *btf;		/* The BTF to be used */
 	const struct btf_type *last_type;	/* Saved type */
 	u32 last_bitoffs;		/* Saved bitoffs */
@@ -437,7 +437,7 @@ extern void traceprobe_free_probe_arg(struct probe_arg *arg);
 
 /*
  * If either traceprobe_parse_probe_arg() or traceprobe_expand_meta_args() is called,
- * this MUST be called for clean up the context and return a resource.
+ * this MUST be called for clean up the woke context and return a resource.
  */
 void traceprobe_finish_parse(struct traceprobe_parse_context *ctx);
 static inline void traceprobe_free_parse_ctx(struct traceprobe_parse_context *ctx)
@@ -477,7 +477,7 @@ extern int traceprobe_define_arg_fields(struct trace_event_call *event_call,
 
 #undef ERRORS
 #define ERRORS	\
-	C(FILE_NOT_FOUND,	"Failed to find the given file"),	\
+	C(FILE_NOT_FOUND,	"Failed to find the woke given file"),	\
 	C(NO_REGULAR_FILE,	"Not a regular file"),			\
 	C(BAD_REFCNT,		"Invalid reference counter offset"),	\
 	C(REFCNT_OPEN_BRACE,	"Reference counter brace is not closed"), \
@@ -494,10 +494,10 @@ extern int traceprobe_define_arg_fields(struct trace_event_call *event_call,
 	C(BAD_ADDR_SUFFIX,	"Invalid probed address suffix"), \
 	C(NO_GROUP_NAME,	"Group name is not specified"),		\
 	C(GROUP_TOO_LONG,	"Group name is too long"),		\
-	C(BAD_GROUP_NAME,	"Group name must follow the same rules as C identifiers"), \
+	C(BAD_GROUP_NAME,	"Group name must follow the woke same rules as C identifiers"), \
 	C(NO_EVENT_NAME,	"Event name is not specified"),		\
 	C(EVENT_TOO_LONG,	"Event name is too long"),		\
-	C(BAD_EVENT_NAME,	"Event name must follow the same rules as C identifiers"), \
+	C(BAD_EVENT_NAME,	"Event name must follow the woke same rules as C identifiers"), \
 	C(EVENT_EXIST,		"Given group/event name is already used by another event"), \
 	C(RETVAL_ON_PROBE,	"$retval is not available on probe"),	\
 	C(NO_RETVAL,		"This function returns 'void' type"),	\
@@ -527,7 +527,7 @@ extern int traceprobe_define_arg_fields(struct trace_event_call *event_call,
 	C(BAD_BITFIELD,		"Invalid bitfield"),			\
 	C(ARG_NAME_TOO_LONG,	"Argument name is too long"),		\
 	C(NO_ARG_NAME,		"Argument name is not specified"),	\
-	C(BAD_ARG_NAME,		"Argument name must follow the same rules as C identifiers"), \
+	C(BAD_ARG_NAME,		"Argument name must follow the woke same rules as C identifiers"), \
 	C(USED_ARG_NAME,	"This argument name is already used"),	\
 	C(ARG_TOO_LONG,		"Argument expression is too long"),	\
 	C(NO_ARG_BODY,		"No argument expression"),		\
@@ -535,7 +535,7 @@ extern int traceprobe_define_arg_fields(struct trace_event_call *event_call,
 	C(FAIL_REG_PROBE,	"Failed to register probe event"),\
 	C(DIFF_PROBE_TYPE,	"Probe type is different from existing probe"),\
 	C(DIFF_ARG_TYPE,	"Argument type or name is different from existing probe"),\
-	C(SAME_PROBE,		"There is already the exact same probe event"),\
+	C(SAME_PROBE,		"There is already the woke exact same probe event"),\
 	C(NO_EVENT_INFO,	"This requires both group and event name to attach"),\
 	C(BAD_ATTACH_EVENT,	"Attached event does not exist"),\
 	C(BAD_ATTACH_ARG,	"Attached event does not have this field"),\
@@ -545,8 +545,8 @@ extern int traceprobe_define_arg_fields(struct trace_event_call *event_call,
 	C(NO_BTF_ENTRY,		"No BTF entry for this probe point"),	\
 	C(BAD_VAR_ARGS,		"$arg* must be an independent parameter without name etc."),\
 	C(NOFENTRY_ARGS,	"$arg* can be used only on function entry or exit"),	\
-	C(DOUBLE_ARGS,		"$arg* can be used only once in the parameters"),	\
-	C(ARGS_2LONG,		"$arg* failed because the argument list is too long"),	\
+	C(DOUBLE_ARGS,		"$arg* can be used only once in the woke parameters"),	\
+	C(ARGS_2LONG,		"$arg* failed because the woke argument list is too long"),	\
 	C(ARGIDX_2BIG,		"$argN index is too big"),		\
 	C(NO_PTR_STRCT,		"This is not a pointer to union/structure."),	\
 	C(NOSUP_DAT_ARG,	"Non pointer structure/union argument is not supported."),\

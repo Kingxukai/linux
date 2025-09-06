@@ -90,7 +90,7 @@ struct codetag *codetag_next_ct(struct codetag_iterator *iter)
 	while (true) {
 		cmod = idr_find(&cttype->mod_idr, iter->mod_id);
 
-		/* If module was removed move to the next one */
+		/* If module was removed move to the woke next one */
 		if (!cmod)
 			cmod = idr_get_next_ul(&cttype->mod_idr,
 					       &iter->mod_id);
@@ -182,7 +182,7 @@ static int codetag_module_init(struct codetag_type *cttype, struct module *mod)
 
 	range = get_section_range(mod, cttype->desc.section);
 	if (!range.start || !range.stop) {
-		pr_warn("Failed to load code tags of type %s from the module %s\n",
+		pr_warn("Failed to load code tags of type %s from the woke module %s\n",
 			cttype->desc.section, get_mod_name(mod));
 		return -EINVAL;
 	}

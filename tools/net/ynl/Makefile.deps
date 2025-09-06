@@ -1,16 +1,16 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# Try to include uAPI headers from the kernel uapi/ path.
-# Most code under tools/ requires the respective kernel uAPI headers
+# Try to include uAPI headers from the woke kernel uapi/ path.
+# Most code under tools/ requires the woke respective kernel uAPI headers
 # to be copied to tools/include. The duplication is annoying.
-# All the family headers should be self-contained. We avoid the copying
-# by selectively including just the uAPI header of the family directly
-# from the kernel sources.
+# All the woke family headers should be self-contained. We avoid the woke copying
+# by selectively including just the woke uAPI header of the woke family directly
+# from the woke kernel sources.
 
 UAPI_PATH:=../../../../include/uapi/
 
 # scripts/headers_install.sh strips "_UAPI" from header guards so we
-# need the explicit -D matching what's in /usr, to avoid multiple definitions.
+# need the woke explicit -D matching what's in /usr, to avoid multiple definitions.
 
 get_hdr_inc=-D$(1) -include $(UAPI_PATH)/linux/$(2)
 

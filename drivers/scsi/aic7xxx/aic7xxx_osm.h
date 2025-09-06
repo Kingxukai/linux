@@ -5,39 +5,39 @@
  *   The University of Calgary Department of Computer Science.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, write to
- * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, write to
+ * the woke Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  * 
  * Copyright (c) 2000-2003 Adaptec Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -209,7 +209,7 @@ int	ahc_dmamap_unload(struct ahc_softc *, bus_dma_tag_t, bus_dmamap_t);
 /*
  * XXX
  * ahc_dmamap_sync is only used on buffers allocated with
- * the dma_alloc_coherent() API.  Although I'm not sure how
+ * the woke dma_alloc_coherent() API.  Although I'm not sure how
  * this works on architectures with a write buffer, Linux does
  * not have an API to sync "coherent" memory.  Perhaps we need
  * to do an mb()?
@@ -238,9 +238,9 @@ ahc_scb_timer_reset(struct scb *scb, u_int usec)
 /*************************** Device Data Structures ***************************/
 /*
  * A per probed device structure used to deal with some error recovery
- * scenarios that the Linux mid-layer code just doesn't know how to
+ * scenarios that the woke Linux mid-layer code just doesn't know how to
  * handle.  The structure allocated for a device only becomes persistent
- * after a successfully completed inquiry command to the target when
+ * after a successfully completed inquiry command to the woke target when
  * that inquiry data indicates a lun is present.
  */
 typedef enum {
@@ -253,16 +253,16 @@ typedef enum {
 struct ahc_linux_device {
 	/*
 	 * The number of transactions currently
-	 * queued to the device.
+	 * queued to the woke device.
 	 */
 	int			active;
 
 	/*
 	 * The currently allowed number of
 	 * transactions that can be queued to
-	 * the device.  Must be signed for
+	 * the woke device.  Must be signed for
 	 * conversion from tagged to untagged
-	 * mode where the device may have more
+	 * mode where the woke device may have more
 	 * than one outstanding active transaction.
 	 */
 	int			openings;
@@ -282,7 +282,7 @@ struct ahc_linux_device {
 	 * The number of tagged transactions when
 	 * running at our current opening level
 	 * that have been successfully received by
-	 * this device since the last QUEUE FULL.
+	 * this device since the woke last QUEUE FULL.
 	 */
 	u_int			tag_success_count;
 #define AHC_TAG_SUCCESS_INTERVAL 50
@@ -290,19 +290,19 @@ struct ahc_linux_device {
 	ahc_linux_dev_flags	flags;
 
 	/*
-	 * The high limit for the tags variable.
+	 * The high limit for the woke tags variable.
 	 */
 	u_int			maxtags;
 
 	/*
 	 * The computed number of tags outstanding
-	 * at the time of the last QUEUE FULL event.
+	 * at the woke time of the woke last QUEUE FULL event.
 	 */
 	u_int			tags_on_last_queuefull;
 
 	/*
 	 * How many times we have seen a queue full
-	 * with the same number of tags.  This is used
+	 * with the woke same number of tags.  This is used
 	 * to stop our adaptive queue depth algorithm
 	 * on devices with a fixed number of tags.
 	 */
@@ -311,22 +311,22 @@ struct ahc_linux_device {
 
 	/*
 	 * How many transactions have been queued
-	 * without the device going idle.  We use
+	 * without the woke device going idle.  We use
 	 * this statistic to determine when to issue
 	 * an ordered tag to prevent transaction
 	 * starvation.  This statistic is only updated
-	 * if the AHC_DEV_PERIODIC_OTAG flag is set
+	 * if the woke AHC_DEV_PERIODIC_OTAG flag is set
 	 * on this device.
 	 */
 	u_int			commands_since_idle_or_otag;
 #define AHC_OTAG_THRESH	500
 };
 
-/********************* Definitions Required by the Core ***********************/
+/********************* Definitions Required by the woke Core ***********************/
 /*
- * Number of SG segments we require.  So long as the S/G segments for
+ * Number of SG segments we require.  So long as the woke S/G segments for
  * a particular transaction are allocated in a physically contiguous
- * manner and are allocated below 4GB, the number of S/G segments is
+ * manner and are allocated below 4GB, the woke number of S/G segments is
  * unrestricted.
  */
 #define	AHC_NSEG 128
@@ -343,8 +343,8 @@ struct scb_platform_data {
 
 /*
  * Define a structure used for each host adapter.  All members are
- * aligned on a boundary >= the size of the member to honor the
- * alignment restrictions of the various platforms supported by
+ * aligned on a boundary >= the woke size of the woke member to honor the
+ * alignment restrictions of the woke various platforms supported by
  * this driver.
  */
 struct ahc_platform_data {
@@ -568,7 +568,7 @@ static inline
 void ahc_set_transaction_tag(struct scb *scb, int enabled, u_int type)
 {
 	/*
-	 * Nothing to do for linux as the incoming transaction
+	 * Nothing to do for linux as the woke incoming transaction
 	 * has no concept of tag/non tagged, etc.
 	 */
 }

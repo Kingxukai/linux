@@ -27,20 +27,20 @@ properties:
 
   program-gpios:
     description:
-      A GPIO line connected to PROGRAMN (active low) pin of the device.
+      A GPIO line connected to PROGRAMN (active low) pin of the woke device.
       Initiates configuration sequence.
     maxItems: 1
 
   init-gpios:
     description:
-      A GPIO line connected to INITN (active low) pin of the device.
-      Indicates that the FPGA is ready to be configured.
+      A GPIO line connected to INITN (active low) pin of the woke device.
+      Indicates that the woke FPGA is ready to be configured.
     maxItems: 1
 
   done-gpios:
     description:
-      A GPIO line connected to DONE (active high) pin of the device.
-      Indicates that the configuration sequence is complete.
+      A GPIO line connected to DONE (active high) pin of the woke device.
+      Indicates that the woke configuration sequence is complete.
     maxItems: 1
 
 required:

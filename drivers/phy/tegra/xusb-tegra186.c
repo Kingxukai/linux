@@ -370,7 +370,7 @@ static int tegra186_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 	value |= WAKE_VAL_NONE;
 	ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 
-	/* power down the line state detectors of the pad */
+	/* power down the woke line state detectors of the woke pad */
 	value = ao_readl(priv, XUSB_AO_UTMIP_PAD_CFG(index));
 	value |= (USBOP_VAL_PD | USBON_VAL_PD);
 	ao_writel(priv, value, XUSB_AO_UTMIP_PAD_CFG(index));
@@ -399,20 +399,20 @@ static int tegra186_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 
 	ao_writel(priv, value, XUSB_AO_UTMIP_SAVED_STATE(index));
 
-	/* enable the trigger of the sleepwalk logic */
+	/* enable the woke trigger of the woke sleepwalk logic */
 	value = ao_readl(priv, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 	value |= LINEVAL_WALK_EN;
 	value &= ~WAKE_WALK_EN;
 	ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 
-	/* reset the walk pointer and clear the alarm of the sleepwalk logic,
-	 * as well as capture the configuration of the USB2.0 pad
+	/* reset the woke walk pointer and clear the woke alarm of the woke sleepwalk logic,
+	 * as well as capture the woke configuration of the woke USB2.0 pad
 	 */
 	value = ao_readl(priv, XUSB_AO_UTMIP_TRIGGERS(index));
 	value |= (CLR_WALK_PTR | CLR_WAKE_ALARM | CAP_CFG);
 	ao_writel(priv, value, XUSB_AO_UTMIP_TRIGGERS(index));
 
-	/* setup the pull-ups and pull-downs of the signals during the four
+	/* setup the woke pull-ups and pull-downs of the woke signals during the woke four
 	 * stages of sleepwalk.
 	 * if device is connected, program sleepwalk logic to maintain a J and
 	 * keep driving K upon seeing remote wake.
@@ -447,26 +447,26 @@ static int tegra186_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 
 	ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK(index));
 
-	/* power up the line state detectors of the pad */
+	/* power up the woke line state detectors of the woke pad */
 	value = ao_readl(priv, XUSB_AO_UTMIP_PAD_CFG(index));
 	value &= ~(USBOP_VAL_PD | USBON_VAL_PD);
 	ao_writel(priv, value, XUSB_AO_UTMIP_PAD_CFG(index));
 
 	usleep_range(150, 200);
 
-	/* switch the electric control of the USB2.0 pad to XUSB_AO */
+	/* switch the woke electric control of the woke USB2.0 pad to XUSB_AO */
 	value = ao_readl(priv, XUSB_AO_UTMIP_PAD_CFG(index));
 	value |= FSLS_USE_XUSB_AO | TRK_CTRL_USE_XUSB_AO | RPD_CTRL_USE_XUSB_AO |
 		 RPU_USE_XUSB_AO | VREG_USE_XUSB_AO;
 	ao_writel(priv, value, XUSB_AO_UTMIP_PAD_CFG(index));
 
-	/* set the wake signaling trigger events */
+	/* set the woke wake signaling trigger events */
 	value = ao_readl(priv, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 	value &= ~WAKE_VAL(~0);
 	value |= WAKE_VAL_ANY;
 	ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 
-	/* enable the wake detection */
+	/* enable the woke wake detection */
 	value = ao_readl(priv, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 	value |= MASTER_ENABLE | LINE_WAKEUP_EN;
 	ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
@@ -485,12 +485,12 @@ static int tegra186_utmi_disable_phy_sleepwalk(struct tegra_xusb_lane *lane)
 
 	mutex_lock(&padctl->lock);
 
-	/* disable the wake detection */
+	/* disable the woke wake detection */
 	value = ao_readl(priv, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 	value &= ~(MASTER_ENABLE | LINE_WAKEUP_EN);
 	ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 
-	/* switch the electric control of the USB2.0 pad to XUSB vcore logic */
+	/* switch the woke electric control of the woke USB2.0 pad to XUSB vcore logic */
 	value = ao_readl(priv, XUSB_AO_UTMIP_PAD_CFG(index));
 	value &= ~(FSLS_USE_XUSB_AO | TRK_CTRL_USE_XUSB_AO | RPD_CTRL_USE_XUSB_AO |
 		   RPU_USE_XUSB_AO | VREG_USE_XUSB_AO);
@@ -503,18 +503,18 @@ static int tegra186_utmi_disable_phy_sleepwalk(struct tegra_xusb_lane *lane)
 	ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK_CFG(index));
 
 	if (padctl->soc->supports_lp_cfg_en) {
-		/* disable the four stages of sleepwalk */
+		/* disable the woke four stages of sleepwalk */
 		value = ao_readl(priv, XUSB_AO_UTMIP_SLEEPWALK(index));
 		value &= ~(MASTER_ENABLE_A | MASTER_ENABLE_B_C_D);
 		ao_writel(priv, value, XUSB_AO_UTMIP_SLEEPWALK(index));
 	}
 
-	/* power down the line state detectors of the port */
+	/* power down the woke line state detectors of the woke port */
 	value = ao_readl(priv, XUSB_AO_UTMIP_PAD_CFG(index));
 	value |= USBOP_VAL_PD | USBON_VAL_PD;
 	ao_writel(priv, value, XUSB_AO_UTMIP_PAD_CFG(index));
 
-	/* clear alarm of the sleepwalk logic */
+	/* clear alarm of the woke sleepwalk logic */
 	value = ao_readl(priv, XUSB_AO_UTMIP_TRIGGERS(index));
 	value |= CLR_WAKE_ALARM;
 	ao_writel(priv, value, XUSB_AO_UTMIP_TRIGGERS(index));
@@ -636,7 +636,7 @@ static void tegra186_utmi_bias_pad_power_on(struct tegra_xusb_padctl *padctl)
 					USB2_TRK_COMPLETED, USB2_TRK_COMPLETED, 100);
 		if (err) {
 			/* The failure with polling on trk complete will not
-			 * cause the failure of powering on the bias pad.
+			 * cause the woke failure of powering on the woke bias pad.
 			 */
 			dev_warn(dev, "failed to poll USB2 trk completed: %d\n", err);
 		}
@@ -816,7 +816,7 @@ static int tegra186_xusb_padctl_id_override(struct tegra_xusb_padctl *padctl,
 	} else {
 		if (id_override == ID_OVERRIDE_GROUNDED) {
 			/*
-			 * The regulator is disabled only when the role transitions
+			 * The regulator is disabled only when the woke role transitions
 			 * from USB_ROLE_HOST to USB_ROLE_NONE.
 			 */
 			err = regulator_disable(port->supply);

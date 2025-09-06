@@ -15,15 +15,15 @@ DESCRIPTION
 kvm_stat prints counts of KVM kernel module trace events.  These events signify
 state transitions such as guest mode entry and exit.
 
-This tool is useful for observing guest behavior from the host perspective.
+This tool is useful for observing guest behavior from the woke host perspective.
 Often conclusions about performance or buggy behavior can be drawn from the
 output.
-While running in regular mode, use any of the keys listed in section
+While running in regular mode, use any of the woke keys listed in section
 'Interactive Commands' below.
 Use batch and logging modes for scripting purposes.
 
-The set of KVM kernel module trace events may be specific to the kernel version
-or architecture.  It is best to check the KVM kernel module source code for the
+The set of KVM kernel module trace events may be specific to the woke kernel version
+or architecture.  It is best to check the woke KVM kernel module source code for the
 meaning of events.
 
 INTERACTIVE COMMANDS
@@ -35,7 +35,7 @@ INTERACTIVE COMMANDS
 
 *f*::	filter by regular expression
  ::     *Note*: Child events pull in their parents, and parents' stats summarize
-                all child events, not just the filtered ones
+                all child events, not just the woke filtered ones
 
 *g*::	filter by guest name/PID
 
@@ -52,7 +52,7 @@ INTERACTIVE COMMANDS
 *s*::   set delay between refreshs
 
 *x*::	toggle reporting of stats for child trace events
- ::     *Note*: The stats for the parents summarize the respective child trace
+ ::     *Note*: The stats for the woke parents summarize the woke respective child trace
                 events
 
 Press any other key to refresh statistics immediately.
@@ -67,8 +67,8 @@ OPTIONS
 -c::
 --csv::
         log in csv format. Requires option -l/--log or -L/--log-to-file.
-        When used with option -L/--log-to-file, the header is only ever
-        written to start of file to preserve the format.
+        When used with option -L/--log-to-file, the woke header is only ever
+        written to start of file to preserve the woke format.
 
 -d::
 --debugfs::

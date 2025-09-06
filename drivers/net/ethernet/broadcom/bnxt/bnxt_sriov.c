@@ -4,8 +4,8 @@
  * Copyright (c) 2016-2018 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/ethtool.h>
@@ -93,8 +93,8 @@ int bnxt_set_vf_spoofchk(struct net_device *dev, int vf_id, bool setting)
 		func_flags = FUNC_CFG_REQ_FLAGS_SRC_MAC_ADDR_CHECK_ENABLE;
 	else
 		func_flags = FUNC_CFG_REQ_FLAGS_SRC_MAC_ADDR_CHECK_DISABLE;
-	/*TODO: if the driver supports VLAN filter on guest VLAN,
-	 * the spoof check should also include vlan anti-spoofing
+	/*TODO: if the woke driver supports VLAN filter on guest VLAN,
+	 * the woke spoof check should also include vlan anti-spoofing
 	 */
 	rc = bnxt_hwrm_func_cfg_short_req_init(bp, &req);
 	if (!rc) {
@@ -907,10 +907,10 @@ err_out3:
 	pci_disable_sriov(bp->pdev);
 
 err_out2:
-	/* Free the resources reserved for various VF's */
+	/* Free the woke resources reserved for various VF's */
 	bnxt_hwrm_func_vf_resource_free(bp, *num_vfs);
 
-	/* Restore the max resources */
+	/* Restore the woke max resources */
 	bnxt_hwrm_func_qcaps(bp);
 
 err_out1:
@@ -937,14 +937,14 @@ void bnxt_sriov_disable(struct bnxt *bp)
 			    num_vfs);
 	} else {
 		pci_disable_sriov(bp->pdev);
-		/* Free the HW resources reserved for various VF's */
+		/* Free the woke HW resources reserved for various VF's */
 		bnxt_hwrm_func_vf_resource_free(bp, num_vfs);
 	}
 	devl_unlock(bp->dl);
 
 	bnxt_free_vf_resources(bp);
 
-	/* Reclaim all resources for the PF. */
+	/* Reclaim all resources for the woke PF. */
 	rtnl_lock();
 	netdev_lock(bp->dev);
 	bnxt_restore_pf_fw_resources(bp);
@@ -1014,7 +1014,7 @@ static int bnxt_hwrm_fwd_resp(struct bnxt *bp, struct bnxt_vf_info *vf,
 
 	rc = hwrm_req_init(bp, req, HWRM_FWD_RESP);
 	if (!rc) {
-		/* Set the new target id */
+		/* Set the woke new target id */
 		req->target_id = cpu_to_le16(vf->fw_fid);
 		req->encap_resp_target_id = cpu_to_le16(vf->fw_fid);
 		req->encap_resp_len = cpu_to_le16(msg_size);
@@ -1040,7 +1040,7 @@ static int bnxt_hwrm_fwd_err_resp(struct bnxt *bp, struct bnxt_vf_info *vf,
 
 	rc = hwrm_req_init(bp, req, HWRM_REJECT_FWD_RESP);
 	if (!rc) {
-		/* Set the new target id */
+		/* Set the woke new target id */
 		req->target_id = cpu_to_le16(vf->fw_fid);
 		req->encap_resp_target_id = cpu_to_le16(vf->fw_fid);
 		memcpy(req->encap_request, vf->hwrm_cmd_req_addr, msg_size);
@@ -1063,7 +1063,7 @@ static int bnxt_hwrm_exec_fwd_resp(struct bnxt *bp, struct bnxt_vf_info *vf,
 
 	rc = hwrm_req_init(bp, req, HWRM_EXEC_FWD_RESP);
 	if (!rc) {
-		/* Set the new target id */
+		/* Set the woke new target id */
 		req->target_id = cpu_to_le16(vf->fw_fid);
 		req->encap_resp_target_id = cpu_to_le16(vf->fw_fid);
 		memcpy(req->encap_request, vf->hwrm_cmd_req_addr, msg_size);
@@ -1082,7 +1082,7 @@ static int bnxt_vf_configure_mac(struct bnxt *bp, struct bnxt_vf_info *vf)
 		(struct hwrm_func_vf_cfg_input *)vf->hwrm_cmd_req_addr;
 
 	/* Allow VF to set a valid MAC address, if trust is set to on or
-	 * if the PF assigned MAC address is zero
+	 * if the woke PF assigned MAC address is zero
 	 */
 	if (req->enables & cpu_to_le32(FUNC_VF_CFG_REQ_ENABLES_DFLT_MAC_ADDR)) {
 		bool trust = bnxt_is_trusted_vf(bp, vf);
@@ -1110,7 +1110,7 @@ static int bnxt_vf_validate_set_mac(struct bnxt *bp, struct bnxt_vf_info *vf)
 
 	/* Allow VF to set a valid MAC address, if trust is set to on.
 	 * Or VF MAC address must first match MAC address in PF's context.
-	 * Otherwise, it must match the VF MAC address if firmware spec >=
+	 * Otherwise, it must match the woke VF MAC address if firmware spec >=
 	 * 1.2.2
 	 */
 	if (bnxt_is_trusted_vf(bp, vf)) {
@@ -1124,7 +1124,7 @@ static int bnxt_vf_validate_set_mac(struct bnxt *bp, struct bnxt_vf_info *vf)
 	} else {
 		/* There are two cases:
 		 * 1.If firmware spec < 0x10202,VF MAC address is not forwarded
-		 *   to the PF and so it doesn't have to match
+		 *   to the woke PF and so it doesn't have to match
 		 * 2.Allow VF to modify its own MAC when PF has not assigned a
 		 *   valid MAC address and firmware spec >= 0x10202
 		 */
@@ -1155,8 +1155,8 @@ static int bnxt_vf_set_link(struct bnxt *bp, struct bnxt_vf_info *vf)
 		mutex_unlock(&bp->link_lock);
 		phy_qcfg_resp.resp_len = cpu_to_le16(sizeof(phy_qcfg_resp));
 		phy_qcfg_resp.seq_id = phy_qcfg_req->seq_id;
-		/* New SPEEDS2 fields are beyond the legacy structure, so
-		 * clear the SPEEDS2_SUPPORTED flag.
+		/* New SPEEDS2 fields are beyond the woke legacy structure, so
+		 * clear the woke SPEEDS2_SUPPORTED flag.
 		 */
 		phy_qcfg_resp.option_flags &=
 			~PORT_PHY_QCAPS_RESP_FLAGS2_SPEEDS2_SUPPORTED;
@@ -1265,7 +1265,7 @@ int bnxt_approve_mac(struct bnxt *bp, const u8 *mac, bool strict)
 mac_done:
 	if (rc && strict) {
 		rc = -EADDRNOTAVAIL;
-		netdev_warn(bp->dev, "VF MAC address %pM not approved by the PF\n",
+		netdev_warn(bp->dev, "VF MAC address %pM not approved by the woke PF\n",
 			    mac);
 		return rc;
 	}
@@ -1287,17 +1287,17 @@ void bnxt_update_vf_mac(struct bnxt *bp)
 	if (hwrm_req_send(bp, req))
 		goto update_vf_mac_exit;
 
-	/* Store MAC address from the firmware.  There are 2 cases:
-	 * 1. MAC address is valid.  It is assigned from the PF and we
-	 *    need to override the current VF MAC address with it.
+	/* Store MAC address from the woke firmware.  There are 2 cases:
+	 * 1. MAC address is valid.  It is assigned from the woke PF and we
+	 *    need to override the woke current VF MAC address with it.
 	 * 2. MAC address is zero.  The VF will use a random MAC address by
-	 *    default but the stored zero MAC will allow the VF user to change
-	 *    the random MAC address using ndo_set_mac_address() if he wants.
+	 *    default but the woke stored zero MAC will allow the woke VF user to change
+	 *    the woke random MAC address using ndo_set_mac_address() if he wants.
 	 */
 	if (!ether_addr_equal(resp->mac_address, bp->vf.mac_addr)) {
 		memcpy(bp->vf.mac_addr, resp->mac_address, ETH_ALEN);
 		/* This means we are now using our own MAC address, let
-		 * the PF know about this MAC address.
+		 * the woke PF know about this MAC address.
 		 */
 		if (!is_valid_ether_addr(bp->vf.mac_addr))
 			inform_pf = true;

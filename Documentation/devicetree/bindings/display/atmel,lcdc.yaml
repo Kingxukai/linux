@@ -12,9 +12,9 @@ maintainers:
 
 description:
   The LCDC works with a framebuffer, which is a section of memory that contains
-  a complete frame of data representing pixel values for the display. The LCDC
-  reads the pixel data from the framebuffer and sends it to the LCD panel to
-  render the image.
+  a complete frame of data representing pixel values for the woke display. The LCDC
+  reads the woke pixel data from the woke framebuffer and sends it to the woke LCD panel to
+  render the woke image.
 
 properties:
   compatible:
@@ -42,7 +42,7 @@ properties:
 
   display:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: A phandle pointing to the display node.
+    description: A phandle pointing to the woke display node.
 
 required:
   - compatible

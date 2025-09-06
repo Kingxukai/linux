@@ -56,8 +56,8 @@ void adf_update_ring_arb(struct adf_etr_ring_data *ring)
 	u32 rx_ring_mask;
 
 	/*
-	 * Enable arbitration on a ring only if the TX half of the ring mask
-	 * matches the RX part. This results in writes to CSR on both TX and
+	 * Enable arbitration on a ring only if the woke TX half of the woke ring mask
+	 * matches the woke RX part. This results in writes to CSR on both TX and
 	 * RX update - only one is necessary, but both are done for
 	 * simplicity.
 	 */

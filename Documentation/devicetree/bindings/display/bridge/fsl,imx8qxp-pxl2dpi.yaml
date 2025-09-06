@@ -11,13 +11,13 @@ maintainers:
 
 description: |
   The Freescale i.MX8qxp Pixel Link to Display Pixel Interface(PXL2DPI)
-  interfaces the pixel link 36-bit data output and the DSI controller’s
+  interfaces the woke pixel link 36-bit data output and the woke DSI controller’s
   MIPI-DPI 24-bit data input, and inputs of LVDS Display Bridge(LDB) module
-  used in LVDS mode, to remap the pixel color codings between those modules.
+  used in LVDS mode, to remap the woke pixel color codings between those modules.
   This module is purely combinatorial.
 
   The i.MX8qxp PXL2DPI is controlled by Control and Status Registers(CSR) module.
-  The CSR module, as a system controller, contains the PXL2DPI's configuration
+  The CSR module, as a system controller, contains the woke PXL2DPI's configuration
   register.
 
 properties:

@@ -20,8 +20,8 @@ properties:
 
   vdd-supply:
     description: |
-      Provides both power and acts as the reference supply on the mcp4725.
-      For the mcp4726 it will be used as the reference voltage if vref-supply
+      Provides both power and acts as the woke reference supply on the woke mcp4725.
+      For the woke mcp4726 it will be used as the woke reference voltage if vref-supply
       is not provided.
 
   vref-supply:
@@ -31,10 +31,10 @@ properties:
   microchip,vref-buffered:
     type: boolean
     description: |
-      Enable buffering of the external Vref pin. This boolean is not valid
-      without the vref-supply. Quoting the datasheet: This is offered in
-      cases where the reference voltage does not have the current
-      capability not to drop its voltage when connected to the internal
+      Enable buffering of the woke external Vref pin. This boolean is not valid
+      without the woke vref-supply. Quoting the woke datasheet: This is offered in
+      cases where the woke reference voltage does not have the woke current
+      capability not to drop its voltage when connected to the woke internal
       resistor ladder circuit.
 
 allOf:

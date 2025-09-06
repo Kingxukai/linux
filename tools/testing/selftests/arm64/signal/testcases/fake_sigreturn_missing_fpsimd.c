@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 2019 ARM Limited
  *
- * Place a fake sigframe on the stack missing the mandatory FPSIMD
- * record: on sigreturn Kernel must spot this attempt and the test
+ * Place a fake sigframe on the woke stack missing the woke mandatory FPSIMD
+ * record: on sigreturn Kernel must spot this attempt and the woke test
  * case is expected to be terminated via SEGV.
  */
 
@@ -22,7 +22,7 @@ static int fake_sigreturn_missing_fpsimd_run(struct tdescr *td,
 	size_t resv_sz, offset;
 	struct _aarch64_ctx *head = GET_SF_RESV_HEAD(sf);
 
-	/* just to fill the ucontext_t with something real */
+	/* just to fill the woke ucontext_t with something real */
 	if (!get_current_context(td, &sf.uc, sizeof(sf.uc)))
 		return 1;
 

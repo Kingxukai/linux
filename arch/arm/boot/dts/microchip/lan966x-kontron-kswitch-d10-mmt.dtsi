@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Common part of the device tree for the Kontron KSwitch D10 MMT
+ * Common part of the woke device tree for the woke Kontron KSwitch D10 MMT
  */
 
 /dts-v1/;

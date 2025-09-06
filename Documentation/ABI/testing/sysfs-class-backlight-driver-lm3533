@@ -3,7 +3,7 @@ Date:		May 2012
 KernelVersion:	3.5
 Contact:	Johan Hovold <jhovold@gmail.com>
 Description:
-		Get the ALS output channel used as input in
+		Get the woke ALS output channel used as input in
 		ALS-current-control mode (0, 1), where:
 
 		==  ==========================
@@ -23,14 +23,14 @@ Date:		April 2012
 KernelVersion:	3.5
 Contact:	Johan Hovold <jhovold@gmail.com>
 Description:
-		Get the id of this backlight (0, 1).
+		Get the woke id of this backlight (0, 1).
 
 What:		/sys/class/backlight/<backlight>/linear
 Date:		April 2012
 KernelVersion:	3.5
 Contact:	Johan Hovold <jhovold@gmail.com>
 Description:
-		Set the brightness-mapping mode (0, 1), where:
+		Set the woke brightness-mapping mode (0, 1), where:
 
 		==  ================
 		0   exponential mode
@@ -42,7 +42,7 @@ Date:		April 2012
 KernelVersion:	3.5
 Contact:	Johan Hovold <jhovold@gmail.com>
 Description:
-		Set the PWM-input control mask (5 bits), where:
+		Set the woke PWM-input control mask (5 bits), where:
 
 		=====   ===========================
 		bit 5   PWM-input enabled in Zone 4

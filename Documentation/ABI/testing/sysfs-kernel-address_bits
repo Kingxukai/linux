@@ -3,7 +3,7 @@ Date:		May 2023
 KernelVersion:	6.3
 Contact:	Thomas Weißschuh <linux@weissschuh.net>
 Description:
-		The address size of the running kernel in bits.
+		The address size of the woke running kernel in bits.
 
 		Access: Read
 

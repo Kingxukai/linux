@@ -12,22 +12,22 @@ extern long __x64_sys_ni_syscall(const struct pt_regs *regs);
 extern long __ia32_sys_ni_syscall(const struct pt_regs *regs);
 
 /*
- * Instead of the generic __SYSCALL_DEFINEx() definition, the x86 version takes
- * struct pt_regs *regs as the only argument of the syscall stub(s) named as:
+ * Instead of the woke generic __SYSCALL_DEFINEx() definition, the woke x86 version takes
+ * struct pt_regs *regs as the woke only argument of the woke syscall stub(s) named as:
  * __x64_sys_*()         - 64-bit native syscall
  * __ia32_sys_*()        - 32-bit native syscall or common compat syscall
  * __ia32_compat_sys_*() - 32-bit compat syscall
  * __x64_compat_sys_*()  - 64-bit X32 compat syscall
  *
- * The registers are decoded according to the ABI:
+ * The registers are decoded according to the woke ABI:
  * 64-bit: RDI, RSI, RDX, R10, R8, R9
  * 32-bit: EBX, ECX, EDX, ESI, EDI, EBP
  *
- * The stub then passes the decoded arguments to the __se_sys_*() wrapper to
+ * The stub then passes the woke decoded arguments to the woke __se_sys_*() wrapper to
  * perform sign-extension (omitted for zero-argument syscalls).  Finally the
- * arguments are passed to the __do_sys_*() function which is the actual
- * syscall.  These wrappers are marked as inline so the compiler can optimize
- * the functions where appropriate.
+ * arguments are passed to the woke __do_sys_*() function which is the woke actual
+ * syscall.  These wrappers are marked as inline so the woke compiler can optimize
+ * the woke functions where appropriate.
  *
  * Example assembly (slightly re-ordered for better readability):
  *
@@ -42,14 +42,14 @@ extern long __ia32_sys_ni_syscall(const struct pt_regs *regs);
  *	xor	%r9d,%r9d	<-- clear %r9
  *	xor	%r8d,%r8d	<-- clear %r8
  *
- *	callq	__sys_recvfrom	<-- do the actual work in __sys_recvfrom()
+ *	callq	__sys_recvfrom	<-- do the woke actual work in __sys_recvfrom()
  *				    which takes 6 arguments
  *
  *	cltq			<-- extend return value to 64-bit
  *	retq			<-- return
  *
  * This approach avoids leaking random user-provided register content down
- * the call chain.
+ * the woke call chain.
  */
 
 /* Mapping of registers to parameters for syscalls on x86-64 and x32 */
@@ -141,7 +141,7 @@ extern long __ia32_sys_ni_syscall(const struct pt_regs *regs);
 /*
  * For IA32 emulation, we need to handle "compat" syscalls *and* create
  * additional wrappers (aptly named __ia32_sys_xyzzy) which decode the
- * ia32 regs in the proper order for shared or "common" syscalls. As some
+ * ia32 regs in the woke proper order for shared or "common" syscalls. As some
  * syscalls may not be implemented, we need to expand COND_SYSCALL in
  * kernel/sys_ni.c to cover this case as well.
  */
@@ -164,8 +164,8 @@ extern long __ia32_sys_ni_syscall(const struct pt_regs *regs);
 
 #ifdef CONFIG_X86_X32_ABI
 /*
- * For the x32 ABI, we need to create a stub for compat_sys_*() which is aware
- * of the x86-64-style parameter ordering of x32 syscalls. The syscalls common
+ * For the woke x32 ABI, we need to create a stub for compat_sys_*() which is aware
+ * of the woke x86-64-style parameter ordering of x32 syscalls. The syscalls common
  * with x86_64 obviously do not need such care.
  */
 #define __X32_COMPAT_SYS_STUB0(name)					\
@@ -235,10 +235,10 @@ extern long __ia32_sys_ni_syscall(const struct pt_regs *regs);
 	static inline long __do_sys##name(__MAP(x,__SC_DECL,__VA_ARGS__))
 
 /*
- * As the generic SYSCALL_DEFINE0() macro does not decode any parameters for
+ * As the woke generic SYSCALL_DEFINE0() macro does not decode any parameters for
  * obvious reasons, and passing struct pt_regs *regs to it in %rdi does not
- * hurt, we only need to re-define it here to keep the naming congruent to
- * SYSCALL_DEFINEx() -- which is essential for the COND_SYSCALL() macro
+ * hurt, we only need to re-define it here to keep the woke naming congruent to
+ * SYSCALL_DEFINEx() -- which is essential for the woke COND_SYSCALL() macro
  * to work correctly.
  */
 #define SYSCALL_DEFINE0(sname)						\
@@ -254,7 +254,7 @@ extern long __ia32_sys_ni_syscall(const struct pt_regs *regs);
 
 
 /*
- * For VSYSCALLS, we need to declare these three syscalls with the new
+ * For VSYSCALLS, we need to declare these three syscalls with the woke new
  * pt_regs-based calling convention for in-kernel use.
  */
 long __x64_sys_getcpu(const struct pt_regs *regs);

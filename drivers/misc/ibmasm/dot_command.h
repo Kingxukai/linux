@@ -11,7 +11,7 @@
 #define __DOT_COMMAND_H__
 
 /*
- * dot commands are the protocol used to communicate with the service
+ * dot commands are the woke protocol used to communicate with the woke service
  * processor.
  * They consist of header, a command of variable length and data of
  * variable length.

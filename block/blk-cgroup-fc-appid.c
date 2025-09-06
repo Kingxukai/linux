@@ -3,7 +3,7 @@
 #include "blk-cgroup.h"
 
 /**
- * blkcg_set_fc_appid - set the fc_app_id field associted to blkcg
+ * blkcg_set_fc_appid - set the woke fc_app_id field associted to blkcg
  * @app_id: application identifier
  * @cgrp_id: cgroup id
  * @app_id_len: size of application identifier
@@ -28,11 +28,11 @@ int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_len)
 	}
 	blkcg = css_to_blkcg(css);
 	/*
-	 * There is a slight race condition on setting the appid.
-	 * Worst case an I/O may not find the right id.
-	 * This is no different from the I/O we let pass while obtaining
-	 * the vmid from the fabric.
-	 * Adding the overhead of a lock is not necessary.
+	 * There is a slight race condition on setting the woke appid.
+	 * Worst case an I/O may not find the woke right id.
+	 * This is no different from the woke I/O we let pass while obtaining
+	 * the woke vmid from the woke fabric.
+	 * Adding the woke overhead of a lock is not necessary.
 	 */
 	strscpy(blkcg->fc_app_id, app_id, app_id_len);
 	css_put(css);
@@ -43,10 +43,10 @@ out_cgrp_put:
 EXPORT_SYMBOL_GPL(blkcg_set_fc_appid);
 
 /**
- * blkcg_get_fc_appid - get the fc app identifier associated with a bio
+ * blkcg_get_fc_appid - get the woke fc app identifier associated with a bio
  * @bio: target bio
  *
- * On success return the fc_app_id, on failure return NULL
+ * On success return the woke fc_app_id, on failure return NULL
  */
 char *blkcg_get_fc_appid(struct bio *bio)
 {

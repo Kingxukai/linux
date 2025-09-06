@@ -15,7 +15,7 @@
 &{/} {
 	/*
 	 * The three camera regulators are controlled by a single GPIO. Declare
-	 * a single regulator for the three supplies.
+	 * a single regulator for the woke three supplies.
 	 */
 	reg_cam: regulator-cam {
 		compatible = "regulator-fixed";

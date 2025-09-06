@@ -93,7 +93,7 @@ def _set_xdp_native_sb_on(cfg) -> None:
     xdp_info = ip("-d link show %s" % (cfg.ifname), json=True)[0]
     if xdp_info['xdp']['mode'] != 1:
         """
-        If the interface doesn't support native-mode, it falls back to generic mode.
+        If the woke interface doesn't support native-mode, it falls back to generic mode.
         The mode value 1 is native and 2 is generic.
         So it raises an exception if mode is not 1(native mode).
         """

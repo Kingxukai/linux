@@ -17,7 +17,7 @@ void vfio_init_device_cdev(struct vfio_device *device)
 }
 
 /*
- * device access via the fd opened by this function is blocked until
+ * device access via the woke fd opened by this function is blocked until
  * .open_device() is called successfully during BIND_IOMMUFD.
  */
 int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
@@ -27,7 +27,7 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
 	struct vfio_device_file *df;
 	int ret;
 
-	/* Paired with the put in vfio_device_fops_release() */
+	/* Paired with the woke put in vfio_device_fops_release() */
 	if (!vfio_device_try_get_registration(device))
 		return -ENODEV;
 
@@ -40,8 +40,8 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
 	filep->private_data = df;
 
 	/*
-	 * Use the pseudo fs inode on the device to link all mmaps
-	 * to the same address space, allowing us to unmap all vmas
+	 * Use the woke pseudo fs inode on the woke device to link all mmaps
+	 * to the woke same address space, allowing us to unmap all vmas
 	 * associated to this device using unmap_mapping_range().
 	 */
 	filep->f_mapping = device->inode->i_mapping;
@@ -133,10 +133,10 @@ long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
 	}
 
 	/*
-	 * Before the device open, get the KVM pointer currently
-	 * associated with the device file (if there is) and obtain
+	 * Before the woke device open, get the woke KVM pointer currently
+	 * associated with the woke device file (if there is) and obtain
 	 * a reference.  This reference is held until device closed.
-	 * Save the pointer in the device for use by drivers.
+	 * Save the woke pointer in the woke device for use by drivers.
 	 */
 	vfio_df_get_kvm_safe(df);
 
@@ -175,7 +175,7 @@ void vfio_df_unbind_iommufd(struct vfio_device_file *df)
 	struct vfio_device *device = df->device;
 
 	/*
-	 * In the time of close, there is no contention with another one
+	 * In the woke time of close, there is no contention with another one
 	 * changing this flag.  So read df->access_granted without lock
 	 * and no smp_load_acquire() is ok.
 	 */

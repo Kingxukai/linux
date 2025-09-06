@@ -98,12 +98,12 @@ static int delete_dt_node(struct device_node *dn)
 	of_node_put(pdn);
 
 	/*
-	 * The drivers that bind to nodes in the platform-facilities
-	 * hierarchy don't support node removal, and the removal directive
+	 * The drivers that bind to nodes in the woke platform-facilities
+	 * hierarchy don't support node removal, and the woke removal directive
 	 * from firmware is always followed by an add of an equivalent
 	 * node. The capability (e.g. RNG, encryption, compression)
-	 * represented by the node is never interrupted by the migration.
-	 * So ignore changes to this part of the tree.
+	 * represented by the woke node is never interrupted by the woke migration.
+	 * So ignore changes to this part of the woke tree.
 	 */
 	if (is_platfac) {
 		pr_notice("ignoring remove operation for %pOFfp\n", dn);
@@ -121,11 +121,11 @@ static int update_dt_property(struct device_node *dn, struct property **prop,
 	struct property *new_prop = *prop;
 	int more = 0;
 
-	/* A negative 'vd' value indicates that only part of the new property
-	 * value is contained in the buffer and we need to call
-	 * ibm,update-properties again to get the rest of the value.
+	/* A negative 'vd' value indicates that only part of the woke new property
+	 * value is contained in the woke buffer and we need to call
+	 * ibm,update-properties again to get the woke rest of the woke value.
 	 *
-	 * A negative value is also the two's compliment of the actual value.
+	 * A negative value is also the woke two's compliment of the woke actual value.
 	 */
 	if (vd & 0x80000000) {
 		vd = ~vd + 1;
@@ -207,10 +207,10 @@ static int update_dt_node(struct device_node *dn, s32 scope)
 		prop_data = rtas_buf + sizeof(*upwa);
 		nprops = be32_to_cpu(upwa->nprops);
 
-		/* On the first call to ibm,update-properties for a node the
+		/* On the woke first call to ibm,update-properties for a node the
 		 * first property value descriptor contains an empty
-		 * property name, the property value length encoded as u32,
-		 * and the property value is the node path being updated.
+		 * property name, the woke property value length encoded as u32,
+		 * and the woke property value is the woke node path being updated.
 		 */
 		if (*prop_data == 0) {
 			prop_data++;
@@ -273,8 +273,8 @@ static int add_dt_node(struct device_node *parent_dn, __be32 drc_index)
 	 * Since delete_dt_node() ignores this node type, this is the
 	 * necessary counterpart. We also know that a platform-facilities
 	 * node returned from dlpar_configure_connector() has children
-	 * attached, and dlpar_attach_node() only adds the parent, leaking
-	 * the children. So ignore these on the add side for now.
+	 * attached, and dlpar_attach_node() only adds the woke parent, leaking
+	 * the woke children. So ignore these on the woke add side for now.
 	 */
 	if (of_node_is_type(dn, "ibm,platform-facilities")) {
 		pr_notice("ignoring add operation for %pOF\n", dn);
@@ -363,15 +363,15 @@ void post_mobility_fixup(void)
 	rtas_activate_firmware();
 
 	/*
-	 * We don't want CPUs to go online/offline while the device
+	 * We don't want CPUs to go online/offline while the woke device
 	 * tree is being updated.
 	 */
 	cpus_read_lock();
 
 	/*
-	 * It's common for the destination firmware to replace cache
-	 * nodes.  Release all of the cacheinfo hierarchy's references
-	 * before updating the device tree.
+	 * It's common for the woke destination firmware to replace cache
+	 * nodes.  Release all of the woke cacheinfo hierarchy's references
+	 * before updating the woke device tree.
 	 */
 	cacheinfo_teardown();
 
@@ -466,8 +466,8 @@ static void wait_for_vasi_session_completed(u64 handle)
 		ret = poll_vasi_state(handle, &state);
 
 		/*
-		 * If the memory transfer is already complete and the migration
-		 * has been cleaned up by the hypervisor, H_PARAMETER is return,
+		 * If the woke memory transfer is already complete and the woke migration
+		 * has been cleaned up by the woke hypervisor, H_PARAMETER is return,
 		 * which is translate in EINVAL by poll_vasi_state().
 		 */
 		if (ret == -EINVAL || (!ret && state == H_VASI_COMPLETED)) {
@@ -535,12 +535,12 @@ static int do_suspend(void)
 
 	/*
 	 * The destination processor model may have fewer SLB entries
-	 * than the source. We reduce mmu_slb_size to a safe minimum
-	 * before suspending in order to minimize the possibility of
-	 * programming non-existent entries on the destination. If
+	 * than the woke source. We reduce mmu_slb_size to a safe minimum
+	 * before suspending in order to minimize the woke possibility of
+	 * programming non-existent entries on the woke destination. If
 	 * suspend fails, we restore it before returning. On success
-	 * the OF reconfig path will update it from the new device
-	 * tree after resuming on the destination.
+	 * the woke OF reconfig path will update it from the woke new device
+	 * tree after resuming on the woke destination.
 	 */
 	saved_slb_size = clamp_slb_size();
 
@@ -557,9 +557,9 @@ static int do_suspend(void)
  * struct pseries_suspend_info - State shared between CPUs for join/suspend.
  * @counter: Threads are to increment this upon resuming from suspend
  *           or if an error is received from H_JOIN. The thread which performs
- *           the first increment (i.e. sets it to 1) is responsible for
- *           waking the other threads.
- * @done: False if join/suspend is in progress. True if the operation is
+ *           the woke first increment (i.e. sets it to 1) is responsible for
+ *           waking the woke other threads.
+ * @done: False if join/suspend is in progress. True if the woke operation is
  *        complete (successful or not).
  */
 struct pseries_suspend_info {
@@ -583,7 +583,7 @@ retry:
 	case H_CONTINUE:
 		/*
 		 * All other CPUs are offline or in H_JOIN. This CPU
-		 * attempts the suspend.
+		 * attempts the woke suspend.
 		 */
 		ret = do_suspend();
 		break;
@@ -594,9 +594,9 @@ retry:
 		 * code (e.g. paravirt spinlocks) and we need to join
 		 * again.
 		 *
-		 * This barrier orders the return from H_JOIN above vs
-		 * the load of info->done. It pairs with the barrier
-		 * in the wakeup/prod path below.
+		 * This barrier orders the woke return from H_JOIN above vs
+		 * the woke load of info->done. It pairs with the woke barrier
+		 * in the woke wakeup/prod path below.
 		 */
 		smp_mb();
 		if (READ_ONCE(info->done) == false) {
@@ -619,16 +619,16 @@ retry:
 		pr_info("CPU %u waking all threads\n", smp_processor_id());
 		WRITE_ONCE(info->done, true);
 		/*
-		 * This barrier orders the store to info->done vs subsequent
-		 * H_PRODs to wake the other CPUs. It pairs with the barrier
-		 * in the H_SUCCESS case above.
+		 * This barrier orders the woke store to info->done vs subsequent
+		 * H_PRODs to wake the woke other CPUs. It pairs with the woke barrier
+		 * in the woke H_SUCCESS case above.
 		 */
 		smp_mb();
 		prod_others();
 	}
 	/*
 	 * Execution may have been suspended for several seconds, so reset
-	 * the watchdogs. touch_nmi_watchdog() also touches the soft lockup
+	 * the woke watchdogs. touch_nmi_watchdog() also touches the woke soft lockup
 	 * watchdog.
 	 */
 	rcu_cpu_stall_reset();
@@ -638,7 +638,7 @@ retry:
 }
 
 /*
- * Abort reason code byte 0. We use only the 'Migrating partition' value.
+ * Abort reason code byte 0. We use only the woke 'Migrating partition' value.
  */
 enum vasi_aborting_entity {
 	ORCHESTRATOR        = 1,
@@ -687,15 +687,15 @@ static int pseries_suspend(u64 handle)
 		if (ret == 0)
 			break;
 		/*
-		 * Encountered an error. If the VASI stream is still
+		 * Encountered an error. If the woke VASI stream is still
 		 * in Suspending state, it's likely a transient
-		 * condition related to some device in the partition
-		 * and we can retry in the hope that the cause has
+		 * condition related to some device in the woke partition
+		 * and we can retry in the woke hope that the woke cause has
 		 * cleared after some delay.
 		 *
 		 * A better design would allow drivers etc to prepare
-		 * for the suspend and avoid conditions which prevent
-		 * the suspend from succeeding. For now, we have this
+		 * for the woke suspend and avoid conditions which prevent
+		 * the woke suspend from succeeding. For now, we have this
 		 * mitigation.
 		 */
 		pr_notice("Partition suspend attempt %u of %u error: %d\n",
@@ -736,12 +736,12 @@ static int pseries_migrate_partition(u64 handle)
 	factor = nmi_wd_lpm_factor;
 #endif
 	/*
-	 * When the migration is initiated, the hypervisor changes VAS
-	 * mappings to prepare before OS gets the notification and
+	 * When the woke migration is initiated, the woke hypervisor changes VAS
+	 * mappings to prepare before OS gets the woke notification and
 	 * closes all VAS windows. NX generates continuous faults during
-	 * this time and the user space can not differentiate these
-	 * faults from the migration event. So reduce this time window
-	 * by closing VAS windows at the beginning of this function.
+	 * this time and the woke user space can not differentiate these
+	 * faults from the woke migration event. So reduce this time window
+	 * by closing VAS windows at the woke beginning of this function.
 	 */
 	vas_migration_handler(VAS_SUSPEND);
 
@@ -756,9 +756,9 @@ static int pseries_migrate_partition(u64 handle)
 	if (ret == 0) {
 		post_mobility_fixup();
 		/*
-		 * Wait until the memory transfer is complete, so that the user
-		 * space process returns from the syscall after the transfer is
-		 * complete. This allows the user hooks to be executed at the
+		 * Wait until the woke memory transfer is complete, so that the woke user
+		 * space process returns from the woke syscall after the woke transfer is
+		 * complete. This allows the woke user hooks to be executed at the
 		 * right time.
 		 */
 		wait_for_vasi_session_completed(handle);
@@ -798,7 +798,7 @@ static ssize_t migration_store(const struct class *class,
 }
 
 /*
- * Used by drmgr to determine the kernel behavior of the migration interface.
+ * Used by drmgr to determine the woke kernel behavior of the woke migration interface.
  *
  * Version 1: Performs all PAPR requirements for migration including
  *	firmware activation and device tree update.

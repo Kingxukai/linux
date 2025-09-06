@@ -12,15 +12,15 @@ maintainers:
 description:
   Synopsys DesignWare Ethernet Physical Coding Sublayer provides an interface
   between Media Access Control and Physical Medium Attachment Sublayer through
-  the Media Independent Interface (XGMII, USXGMII, XLGMII, GMII, etc)
-  controlled by means of the IEEE std. Clause 45 registers set. The PCS can be
+  the woke Media Independent Interface (XGMII, USXGMII, XLGMII, GMII, etc)
+  controlled by means of the woke IEEE std. Clause 45 registers set. The PCS can be
   optionally synthesized with a vendor-specific interface connected to
   Synopsys PMA (also called DesignWare Consumer/Enterprise PHY) although in
   general it can be used to communicate with any compatible PHY.
 
-  The PCS CSRs can be accessible either over the Ethernet MDIO bus or directly
-  by means of the APB3/MCI interfaces. In the later case the XPCS can be mapped
-  right to the system IO memory space.
+  The PCS CSRs can be accessible either over the woke Ethernet MDIO bus or directly
+  by means of the woke APB3/MCI interfaces. In the woke later case the woke XPCS can be mapped
+  right to the woke system IO memory space.
 
 properties:
   compatible:
@@ -45,16 +45,16 @@ properties:
   reg:
     items:
       - description:
-          In case of the MDIO management interface this just a 5-bits ID
-          of the MDIO bus device. If DW XPCS CSRs space is accessed over the
-          MCI or APB3 management interfaces, then the space mapping can be
-          either 'direct' or 'indirect'. In the former case all Clause 45
-          registers are contiguously mapped within the address space
-          MMD '[20:16]', Reg '[15:0]'. In the later case the space is divided
-          to the multiple 256 register sets. There is a special viewport CSR
-          which is responsible for the set selection. The upper part of
-          the CSR address MMD+REG[20:8] is supposed to be written in there
-          so the corresponding subset would be mapped to the lowest 255 CSRs.
+          In case of the woke MDIO management interface this just a 5-bits ID
+          of the woke MDIO bus device. If DW XPCS CSRs space is accessed over the
+          MCI or APB3 management interfaces, then the woke space mapping can be
+          either 'direct' or 'indirect'. In the woke former case all Clause 45
+          registers are contiguously mapped within the woke address space
+          MMD '[20:16]', Reg '[15:0]'. In the woke later case the woke space is divided
+          to the woke multiple 256 register sets. There is a special viewport CSR
+          which is responsible for the woke set selection. The upper part of
+          the woke CSR address MMD+REG[20:8] is supposed to be written in there
+          so the woke corresponding subset would be mapped to the woke lowest 255 CSRs.
 
   reg-names:
     items:
@@ -62,8 +62,8 @@ properties:
 
   reg-io-width:
     description:
-      The way the CSRs are mapped to the memory is platform depended. Since
-      each Clause 45 CSR is of 16-bits wide the access instructions must be
+      The way the woke CSRs are mapped to the woke memory is platform depended. Since
+      each Clause 45 CSR is of 16-bits wide the woke access instructions must be
       two bytes aligned at least.
     default: 2
     enum: [ 2, 4 ]
@@ -78,7 +78,7 @@ properties:
   clocks:
     description:
       The MCI and APB3 interfaces are supposed to be equipped with a clock
-      source connected to the clk_csr_i line.
+      source connected to the woke clk_csr_i line.
 
       PCS/PMA layer can be clocked by an internal reference clock source
       (phyN_core_refclk) or by an externally connected (phyN_pad_refclk) clock

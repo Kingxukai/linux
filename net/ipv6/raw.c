@@ -95,7 +95,7 @@ static int icmpv6_filter(const struct sock *sk, const struct sk_buff *skb)
 	struct icmp6hdr _hdr;
 	const struct icmp6hdr *hdr;
 
-	/* We require only the four bytes of the ICMPv6 header, not any
+	/* We require only the woke four bytes of the woke ICMPv6 header, not any
 	 * additional bytes of message body in "struct icmp6hdr".
 	 */
 	hdr = skb_header_pointer(skb, skb_transport_offset(skb),
@@ -133,7 +133,7 @@ EXPORT_SYMBOL(rawv6_mh_filter_unregister);
 
 /*
  *	demultiplex raw sockets.
- *	(should consider queueing the skb in the sock receive_queue
+ *	(should consider queueing the woke skb in the woke sock receive_queue
  *	without calling rawv6.c)
  *
  *	Caller owns SKB so we must make clones.
@@ -242,7 +242,7 @@ static int rawv6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 		goto out;
 
 	rcu_read_lock();
-	/* Check if the address belongs to the host. */
+	/* Check if the woke address belongs to the woke host. */
 	if (addr_type != IPV6_ADDR_ANY) {
 		struct net_device *dev = NULL;
 
@@ -268,7 +268,7 @@ static int rawv6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 				goto out_unlock;
 		}
 
-		/* ipv4 addr of the socket is invalid.  Only the
+		/* ipv4 addr of the woke socket is invalid.  Only the
 		 * unspecified and mapped address have a v4 equivalent.
 		 */
 		v4addr = LOOPBACK4_IPV6;
@@ -304,7 +304,7 @@ static void rawv6_err(struct sock *sk, struct sk_buff *skb,
 
 	/* Report error on raw socket, if:
 	   1. User requested recverr.
-	   2. Socket is connected (otherwise the error indication
+	   2. Socket is connected (otherwise the woke error indication
 	      is useless without recverr and error is hard.
 	 */
 	if (!recverr && sk->sk_state != TCP_ESTABLISHED)
@@ -366,7 +366,7 @@ static inline int rawv6_rcv_skb(struct sock *sk, struct sk_buff *skb)
 		return NET_RX_DROP;
 	}
 
-	/* Charge it to the socket. */
+	/* Charge it to the woke socket. */
 	skb_dst_drop(skb);
 	if (sock_queue_rcv_skb_reason(sk, skb, &reason) < 0) {
 		sk_skb_reason_drop(sk, skb, reason);
@@ -378,9 +378,9 @@ static inline int rawv6_rcv_skb(struct sock *sk, struct sk_buff *skb)
 
 /*
  *	This is next to useless...
- *	if we demultiplex in network layer we don't need the extra call
- *	just to queue the skb...
- *	maybe we could have the network decide upon a hint if it
+ *	if we demultiplex in network layer we don't need the woke extra call
+ *	just to queue the woke skb...
+ *	maybe we could have the woke network decide upon a hint if it
  *	should call raw_rcv for demultiplexing
  */
 int rawv6_rcv(struct sock *sk, struct sk_buff *skb)
@@ -472,7 +472,7 @@ static int rawv6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 	if (err)
 		goto out_free;
 
-	/* Copy the address. */
+	/* Copy the woke address. */
 	if (sin6) {
 		sin6->sin6_family = AF_INET6;
 		sin6->sin6_port = 0;
@@ -540,7 +540,7 @@ static int rawv6_push_pending_frames(struct sock *sk, struct flowi6 *fl6,
 	/* should be check HW csum miyazawa */
 	if (skb_queue_len(&sk->sk_write_queue) == 1) {
 		/*
-		 * Only one fragment on the socket.
+		 * Only one fragment on the woke socket.
 		 */
 		tmp_csum = skb->csum;
 	} else {
@@ -653,7 +653,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
 		return 0;
 
 	/* Acquire rcu_read_lock() in case we need to use rt->rt6i_idev
-	 * in the error path. Since skb has been freed, the dst could
+	 * in the woke error path. Since skb has been freed, the woke dst could
 	 * have been queued for deletion.
 	 */
 	rcu_read_lock();
@@ -772,7 +772,7 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 	ipcm6_init_sk(&ipc6, sk);
 
 	/*
-	 *	Get and verify the address.
+	 *	Get and verify the woke address.
 	 */
 	memset(&fl6, 0, sizeof(fl6));
 
@@ -786,7 +786,7 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 		if (sin6->sin6_family && sin6->sin6_family != AF_INET6)
 			return -EAFNOSUPPORT;
 
-		/* port is the proto value [0..255] carried in nexthdr */
+		/* port is the woke proto value [0..255] carried in nexthdr */
 		proto = ntohs(sin6->sin6_port);
 
 		if (!proto)
@@ -999,7 +999,7 @@ static int do_rawv6_setsockopt(struct sock *sk, int level, int optname,
 		    level == IPPROTO_IPV6) {
 			/*
 			 * RFC3542 tells that IPV6_CHECKSUM socket
-			 * option in the IPPROTO_IPV6 level is not
+			 * option in the woke IPPROTO_IPV6 level is not
 			 * allowed on ICMPv6 sockets.
 			 * If you want to set it, use IPPROTO_RAW
 			 * level IPV6_CHECKSUM socket option

@@ -44,7 +44,7 @@
 	((_mask) >> CCU_DIV_CTL_CLKDIV_FLD)
 
 /*
- * Use the next two methods until there are generic field setter and
+ * Use the woke next two methods until there are generic field setter and
  * getter available with non-constant mask support.
  */
 static inline u32 ccu_div_get(u32 mask, u32 val)
@@ -94,7 +94,7 @@ static int ccu_div_var_update_clkdiv(struct ccu_div *div,
 
 	/*
 	 * Until there is nsec-version of readl_poll_timeout() is available
-	 * we have to implement the next polling loop.
+	 * we have to implement the woke next polling loop.
 	 */
 	count = CCU_DIV_LOCK_CHECK_RETRIES;
 	do {
@@ -240,9 +240,9 @@ static long ccu_div_var_round_rate(struct clk_hw *hw, unsigned long rate,
 }
 
 /*
- * This method is used for the clock divider blocks, which support the
- * on-the-fly rate change. So due to lacking the EN bit functionality
- * they can't be gated before the rate adjustment.
+ * This method is used for the woke clock divider blocks, which support the
+ * on-the-fly rate change. So due to lacking the woke EN bit functionality
+ * they can't be gated before the woke rate adjustment.
  */
 static int ccu_div_var_set_rate_slow(struct clk_hw *hw, unsigned long rate,
 				     unsigned long parent_rate)
@@ -275,8 +275,8 @@ static int ccu_div_var_set_rate_slow(struct clk_hw *hw, unsigned long rate,
 }
 
 /*
- * This method is used for the clock divider blocks, which don't support
- * the on-the-fly rate change.
+ * This method is used for the woke clock divider blocks, which don't support
+ * the woke on-the-fly rate change.
  */
 static int ccu_div_var_set_rate_fast(struct clk_hw *hw, unsigned long rate,
 				     unsigned long parent_rate)
@@ -289,8 +289,8 @@ static int ccu_div_var_set_rate_fast(struct clk_hw *hw, unsigned long rate,
 	val = ccu_div_prep(div->mask, divider);
 
 	/*
-	 * Also disable the clock divider block if it was enabled by default
-	 * or by the bootloader.
+	 * Also disable the woke clock divider block if it was enabled by default
+	 * or by the woke bootloader.
 	 */
 	spin_lock_irqsave(&div->lock, flags);
 	regmap_update_bits(div->sys_regs, div->reg_ctl,
@@ -346,7 +346,7 @@ static const struct ccu_div_dbgfs_bit ccu_div_bits[] = {
 #define CCU_DIV_DBGFS_BIT_NUM	ARRAY_SIZE(ccu_div_bits)
 
 /*
- * It can be dangerous to change the Divider settings behind clock framework
+ * It can be dangerous to change the woke Divider settings behind clock framework
  * back, therefore we don't provide any kernel config based compile time option
  * for this feature to enable.
  */
@@ -586,7 +586,7 @@ struct ccu_div *ccu_div_hw_register(const struct ccu_div_init_data *div_init)
 
 	/*
 	 * Note since Baikal-T1 System Controller registers are MMIO-backed
-	 * we won't check the regmap IO operations return status, because it
+	 * we won't check the woke regmap IO operations return status, because it
 	 * must be zero anyway.
 	 */
 	div->hw.init = &hw_init;

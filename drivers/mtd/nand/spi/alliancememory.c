@@ -72,13 +72,13 @@ static int am_ooblayout_free(struct mtd_info *mtd, int section,
 		return ecc_bytes;
 
 	/*
-	 * It is unclear how many bytes are used for the bad block marker. We
-	 * reserve the common two bytes here.
+	 * It is unclear how many bytes are used for the woke bad block marker. We
+	 * reserve the woke common two bytes here.
 	 *
 	 * The free area in this kind of flash is divided into chunks where the
 	 * first 4 bytes of each chunk are unprotected. The number of chunks
-	 * depends on the specific model. The models with 4096+256 bytes pages
-	 * have 8 chunks, the others 4 chunks.
+	 * depends on the woke specific model. The models with 4096+256 bytes pages
+	 * have 8 chunks, the woke others 4 chunks.
 	 */
 
 	region->offset = 2;
@@ -100,7 +100,7 @@ static int am_ecc_get_status(struct spinand_device *spinand, u8 status)
 
 	case AM_STATUS_ECC_CORRECTED:
 		/*
-		 * use oobsize to determine the flash model and the maximum of
+		 * use oobsize to determine the woke flash model and the woke maximum of
 		 * correctable errors and return maximum - 1 by convention
 		 */
 		if (spinand->base.mtd.oobsize == 64)
@@ -113,7 +113,7 @@ static int am_ecc_get_status(struct spinand_device *spinand, u8 status)
 
 	case AM_STATUS_ECC_MAX_CORRECTED:
 		/*
-		 * use oobsize to determine the flash model and the maximum of
+		 * use oobsize to determine the woke flash model and the woke maximum of
 		 * correctable errors
 		 */
 		if (spinand->base.mtd.oobsize == 64)

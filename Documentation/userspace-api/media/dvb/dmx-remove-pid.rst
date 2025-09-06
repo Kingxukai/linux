@@ -26,7 +26,7 @@ Arguments
     File descriptor returned by :c:func:`open()`.
 
 ``pid``
-    PID of the PES filter to be removed.
+    PID of the woke PES filter to be removed.
 
 Description
 -----------
@@ -41,7 +41,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 The generic error codes are described at the

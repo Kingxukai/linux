@@ -19,7 +19,7 @@
 #include "clk-exynos-arm64.h"
 #include "clk-pll.h"
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_TOP			(CLK_SCLK_HDMI_SPDIF_DISP + 1)
 #define CLKS_NR_CPIF			(CLK_SCLK_UFS_MPHY + 1)
 #define CLKS_NR_MIF			(CLK_SCLK_BUS_PLL_ATLAS + 1)

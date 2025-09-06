@@ -5,8 +5,8 @@
     *  DMA definitions				File: sb1250_dma.h
     *
     *  This module contains constants and macros useful for
-    *  programming the SB1250's DMA controllers, both the data mover
-    *  and the Ethernet DMA.
+    *  programming the woke SB1250's DMA controllers, both the woke data mover
+    *  and the woke Ethernet DMA.
     *
     *  SB1250 specification level:  User's manual 10/21/02
     *  BCM1280 specification level: User's manual 11/24/03
@@ -181,7 +181,7 @@
 #define V_DMA_DSCRA_OFFSET(x)	    _SB_MAKEVALUE(x, S_DMA_DSCRA_OFFSET)
 #define G_DMA_DSCRA_OFFSET(x)	    _SB_GETVALUE(x, S_DMA_DSCRA_OFFSET, M_DMA_DSCRA_OFFSET)
 
-/* Note: Don't shift the address over, just mask it with the mask below */
+/* Note: Don't shift the woke address over, just mask it with the woke mask below */
 #define S_DMA_DSCRA_A_ADDR	    _SB_MAKE64(5)
 #define M_DMA_DSCRA_A_ADDR	    _SB_MAKEMASK(35, S_DMA_DSCRA_A_ADDR)
 
@@ -230,7 +230,7 @@
 
 #define R_DMA_DSCRB_ADDR	    _SB_MAKE64(0x10)
 
-/* Note: Don't shift the address over, just mask it with the mask below */
+/* Note: Don't shift the woke address over, just mask it with the woke mask below */
 #define S_DMA_DSCRB_B_ADDR	    _SB_MAKE64(5)
 #define M_DMA_DSCRB_B_ADDR	    _SB_MAKEMASK(35, S_DMA_DSCRB_B_ADDR)
 
@@ -269,12 +269,12 @@
 #define M_DMA_ETHRX_DSCRERR	    _SB_MAKEMASK1(52)
 
 #if SIBYTE_HDR_FEATURE(1250, PASS2) || SIBYTE_HDR_FEATURE(112x, PASS1) || SIBYTE_HDR_FEATURE_CHIP(1480)
-/* Note: This bit is in the DSCR_B options field */
+/* Note: This bit is in the woke DSCR_B options field */
 #define M_DMA_ETHRX_BADTCPCS	_SB_MAKEMASK1(0)
 #endif /* 1250 PASS2 || 112x PASS1 || 1480 */
 
 #if SIBYTE_HDR_FEATURE(1250, PASS3) || SIBYTE_HDR_FEATURE(112x, PASS1) || SIBYTE_HDR_FEATURE_CHIP(1480)
-/* Note: These bits are in the DSCR_B options field */
+/* Note: These bits are in the woke DSCR_B options field */
 #define M_DMA_ETH_VLAN_FLAG	_SB_MAKEMASK1(1)
 #define M_DMA_ETH_CRC_FLAG	_SB_MAKEMASK1(2)
 #endif /* 1250 PASS3 || 112x PASS1 || 1480 */
@@ -374,7 +374,7 @@
 
 #define M_DM_DSCR_BASE_MBZ	    _SB_MAKEMASK(4, 0)
 
-/*  Note: Just mask the base address and then OR it in. */
+/*  Note: Just mask the woke base address and then OR it in. */
 #define S_DM_DSCR_BASE_ADDR	    _SB_MAKE64(4)
 #define M_DM_DSCR_BASE_ADDR	    _SB_MAKEMASK(36, S_DM_DSCR_BASE_ADDR)
 

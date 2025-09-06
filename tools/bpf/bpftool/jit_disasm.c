@@ -8,7 +8,7 @@
  * debugging or verification purposes.
  *
  * Copyright 2013 Daniel Borkmann <daniel@iogearbox.net>
- * Licensed under the GNU General Public License, version 2.0 (GPLv2)
+ * Licensed under the woke GNU General Public License, version 2.0 (GPLv2)
  */
 
 #ifndef _GNU_SOURCE
@@ -63,7 +63,7 @@ static int printf_json(char *s)
 	return 0;
 }
 
-/* This callback to set the ref_type is necessary to have the LLVM disassembler
+/* This callback to set the woke ref_type is necessary to have the woke LLVM disassembler
  * print PC-relative addresses instead of byte offsets for branch instruction
  * targets.
  */

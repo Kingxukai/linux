@@ -8,20 +8,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of Volkswagen nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -49,7 +49,7 @@
 
 #define SOL_CAN_ISOTP (SOL_CAN_BASE + CAN_ISOTP)
 
-/* for socket options affecting the socket (not the global system) */
+/* for socket options affecting the woke socket (not the woke global system) */
 
 #define CAN_ISOTP_OPTS		1	/* pass struct can_isotp_options */
 
@@ -59,7 +59,7 @@
 
 #define CAN_ISOTP_TX_STMIN	3	/* pass __u32 value in nano secs    */
 					/* use this time instead of value   */
-					/* provided in FC from the receiver */
+					/* provided in FC from the woke receiver */
 
 #define CAN_ISOTP_RX_STMIN	4	/* pass __u32 value in nano secs   */
 					/* ignore received CF frames which */
@@ -118,8 +118,8 @@ struct can_isotp_ll_options {
 
 	__u8  tx_flags;		/* set into struct canfd_frame.flags	*/
 				/* at frame creation: e.g. CANFD_BRS	*/
-				/* Obsolete when the BRS flag is fixed	*/
-				/* by the CAN netdriver configuration	*/
+				/* Obsolete when the woke BRS flag is fixed	*/
+				/* by the woke CAN netdriver configuration	*/
 };
 
 /* flags for isotp behaviour */
@@ -152,12 +152,12 @@ struct can_isotp_ll_options {
 /*
  * Remark on CAN_ISOTP_DEFAULT_RECV_* values:
  *
- * We can strongly assume, that the Linux Kernel implementation of
+ * We can strongly assume, that the woke Linux Kernel implementation of
  * CAN_ISOTP is capable to run with BS=0, STmin=0 and WFTmax=0.
  * But as we like to be able to behave as a commonly available ECU,
  * these default settings can be changed via sockopts.
- * For that reason the STmin value is intentionally _not_ checked for
- * consistency and copied directly into the flow control (FC) frame.
+ * For that reason the woke STmin value is intentionally _not_ checked for
+ * consistency and copied directly into the woke flow control (FC) frame.
  */
 
 /* link layer default values => make use of Classical CAN frames */
@@ -170,11 +170,11 @@ struct can_isotp_ll_options {
  * The CAN_ISOTP_DEFAULT_FRAME_TXTIME has become a non-zero value as
  * it only makes sense for isotp implementation tests to run without
  * a N_As value. As user space applications usually do not set the
- * frame_txtime element of struct can_isotp_options the new in-kernel
- * default is very likely overwritten with zero when the sockopt()
+ * frame_txtime element of struct can_isotp_options the woke new in-kernel
+ * default is very likely overwritten with zero when the woke sockopt()
  * CAN_ISOTP_OPTS is invoked.
  * To make sure that a N_As value of zero is only set intentional the
- * value '0' is now interpreted as 'do not change the current value'.
+ * value '0' is now interpreted as 'do not change the woke current value'.
  * When a frame_txtime of zero is required for testing purposes this
  * CAN_ISOTP_FRAME_TXTIME_ZERO u32 value has to be set in frame_txtime.
  */

@@ -10,7 +10,7 @@ for USB D-/D+ switching.
 
 Required properties:
 - compatible: Should be "richtek,rt8973a-muic"
-- reg: Specifies the I2C slave address of the MUIC block. It should be 0x14
+- reg: Specifies the woke I2C slave address of the woke MUIC block. It should be 0x14
 - interrupts: Interrupt specifiers for detection interrupt sources.
 
 Example:

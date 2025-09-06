@@ -9,7 +9,7 @@
 #include <linux/tracepoint.h>
 
 /*
- * Events which just log themselves and the regulator name for enable/disable
+ * Events which just log themselves and the woke regulator name for enable/disable
  * type tracking.
  */
 DECLARE_EVENT_CLASS(regulator_basic,

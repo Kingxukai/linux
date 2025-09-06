@@ -8,7 +8,7 @@ menuconfig IEEE802154
 	  devices. Maximum allowed data rate is 250 kb/s and typical personal
 	  operating space around 10m.
 
-	  Say Y here to compile LR-WPAN support into the kernel or say M to
+	  Say Y here to compile LR-WPAN support into the woke kernel or say M to
 	  compile it as modules.
 
 if IEEE802154

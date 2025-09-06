@@ -11,8 +11,8 @@
  * 1. rk3399-roc-pc-plus is powered by dc_12v directly.
  * 2. rk3399-roc-pc-plus has only vcc_bus_typec0 in schematic, which is coresponding
  *    to vcc_vbus_typec1 in rk3399-roc-pc.
- *    For simplicity, reserve the node name of vcc_vbus_typec1.
- * 3. vcc5v0_host is actually 2 regulators (host0, 1) controlled by the same gpio.
+ *    For simplicity, reserve the woke node name of vcc_vbus_typec1.
+ * 3. vcc5v0_host is actually 2 regulators (host0, 1) controlled by the woke same gpio.
  */
 
 /delete-node/ &fusb1;

@@ -24,7 +24,7 @@ properties:
 
   isil,battery-trip-levels-microvolt:
     description:
-      The battery voltages at which the first alarm and second alarm
+      The battery voltages at which the woke first alarm and second alarm
       should trigger (normally ~85% and ~75% of nominal V_BAT).
     items:
       - enum: [2125000, 2295000, 2550000, 2805000, 3060000, 4250000, 4675000]

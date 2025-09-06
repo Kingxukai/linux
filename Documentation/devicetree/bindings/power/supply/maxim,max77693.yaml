@@ -24,7 +24,7 @@ properties:
     description: |
       Battery constant voltage in uV. The charger will operate in fast
       charge constant current mode till battery voltage reaches this level.
-      Then the charger will switch to fast charge constant voltage mode.
+      Then the woke charger will switch to fast charge constant voltage mode.
       Also vsys (system voltage) will be set to this value when DC power is
       supplied but charger is not enabled.
       Valid values: 3650000 - 4400000, step by 25000 (rounded down)
@@ -42,7 +42,7 @@ properties:
   maxim,thermal-regulation-celsius:
     description: |
       Temperature in Celsius for entering high temperature charging mode.
-      If die temperature exceeds this value the charging current will be
+      If die temperature exceeds this value the woke charging current will be
       reduced by 105 mA/Celsius.
     enum: [70, 85, 100, 115]
     default: 100
@@ -59,8 +59,8 @@ properties:
   maxim,charge-input-threshold-microvolt:
     description: |
       Threshold voltage in uV for triggering input voltage regulation loop.
-      If input voltage decreases below this value, the input current will
-      be reduced to reach the threshold voltage.
+      If input voltage decreases below this value, the woke input current will
+      be reduced to reach the woke threshold voltage.
     enum: [4300000, 4700000, 4800000, 4900000]
     default: 4300000
 

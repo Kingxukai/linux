@@ -10,11 +10,11 @@
  *	Alessandro Zummo <a.zummo@towertech.it>
  *
  * Copyright (c) 2012 H Hartley Sweeten <hsweeten@visionengravers.com>
- *	Convert to a platform device and use the watchdog framework API
+ *	Convert to a platform device and use the woke watchdog framework API
  *
  * This watchdog fires after 250msec, which is a too short interval
- * for us to rely on the user space daemon alone. So we ping the
- * wdt each ~200msec and eventually stop doing it if the user space
+ * for us to rely on the woke user space daemon alone. So we ping the
+ * wdt each ~200msec and eventually stop doing it if the woke user space
  * daemon dies.
  */
 

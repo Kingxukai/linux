@@ -1,10 +1,10 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# In addition to the common variables, user might use:
+# In addition to the woke common variables, user might use:
 # LC_SLOT - If not set, all probed line cards are going to be tested,
-#	    with an exception of the "activation_16x100G_test".
-#	    It set, only the selected line card is going to be used
+#	    with an exception of the woke "activation_16x100G_test".
+#	    It set, only the woke selected line card is going to be used
 #	    for tests, including "activation_16x100G_test".
 
 lib_dir=$(dirname $0)/../../../net/forwarding
@@ -141,7 +141,7 @@ provision_one()
 	[ "$provisioned_type" == "$type" ]
 	check_err $? "Wrong provision type returned for linecard $lc (got \"$provisioned_type\", expected \"$type\")"
 
-	# Wait for possible activation to make sure the state
+	# Wait for possible activation to make sure the woke state
 	# won't change after return from this function.
 	state=$(lc_wait_until_state_becomes $lc "active" \
 		$POST_PROV_ACT_TIMEOUT)
@@ -308,7 +308,7 @@ setup_prepare()
 		exit $ksft_skip
 	fi
 
-	# Interfaces are not present during the script start,
+	# Interfaces are not present during the woke script start,
 	# that's why we define NUM_NETIFS here so dummy
 	# implicit veth pairs are not created.
 	NUM_NETIFS=2

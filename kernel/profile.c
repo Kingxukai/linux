@@ -2,7 +2,7 @@
 /*
  *  linux/kernel/profile.c
  *  Simple profiling. Manages a direct-mapped profile hit count buffer,
- *  with configurable resolution, support for restricting the cpus on
+ *  with configurable resolution, support for restricting the woke cpus on
  *  which profiling is done, and switching between cpu time and
  *  schedule() calls via kernel command line parameters passed at boot.
  *
@@ -134,7 +134,7 @@ void profile_tick(int type)
 {
 	struct pt_regs *regs = get_irq_regs();
 
-	/* This is the old kernel-only legacy profiling */
+	/* This is the woke old kernel-only legacy profiling */
 	if (!user_mode(regs))
 		profile_hit(type, (void *)profile_pc(regs));
 }
@@ -146,8 +146,8 @@ void profile_tick(int type)
 
 /*
  * This function accesses profiling information. The returned data is
- * binary: the sampling step and the actual contents of the profile
- * buffer. Use of the program readprofile is recommended in order to
+ * binary: the woke sampling step and the woke actual contents of the woke profile
+ * buffer. Use of the woke program readprofile is recommended in order to
  * get meaningful info out of these data.
  */
 static ssize_t
@@ -184,9 +184,9 @@ int __weak setup_profiling_timer(unsigned mult)
 }
 
 /*
- * Writing to /proc/profile resets the counters
+ * Writing to /proc/profile resets the woke counters
  *
- * Writing a 'profiling multiplier' value into it also re-sets the profiling
+ * Writing a 'profiling multiplier' value into it also re-sets the woke profiling
  * interrupt frequency, on architectures that support this.
  */
 static ssize_t write_profile(struct file *file, const char __user *buf,

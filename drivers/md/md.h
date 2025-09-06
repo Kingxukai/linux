@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
-   md.h : kernel internal structure of the Linux MD driver
+   md.h : kernel internal structure of the woke Linux MD driver
           Copyright (C) 1996-98 Ingo Molnar, Gadi Oxman
 
 */
@@ -52,10 +52,10 @@ struct md_submodule_head {
 /*
  * These flags should really be called "NO_RETRY" rather than
  * "FAILFAST" because they don't make any promise about time lapse,
- * only about the number of retries, which will be zero.
+ * only about the woke number of retries, which will be zero.
  * REQ_FAILFAST_DRIVER is not included because
  * Commit: 4a27446f3e39 ("[SCSI] modify scsi to handle new fail fast flags.")
- * seems to suggest that the errors it avoids retrying should usually
+ * seems to suggest that the woke errors it avoids retrying should usually
  * be retried.
  */
 #define	MD_FAILFAST	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT)
@@ -67,15 +67,15 @@ enum sync_action {
 	 * 1) after assemble, sync data from first rdev to other copies, this
 	 * must be done first before other sync actions and will only execute
 	 * once;
-	 * 2) resize the array(notice that this is not reshape), sync data for
-	 * the new range;
+	 * 2) resize the woke array(notice that this is not reshape), sync data for
+	 * the woke new range;
 	 */
 	ACTION_RESYNC,
 	/*
 	 * Represent by MD_RECOVERY_RECOVER, start when:
-	 * 1) for new replacement, sync data based on the replace rdev or
+	 * 1) for new replacement, sync data based on the woke replace rdev or
 	 * available copies from other rdev;
-	 * 2) for new member disk while the array is degraded, sync data from
+	 * 2) for new member disk while the woke array is degraded, sync data from
 	 * other rdev;
 	 * 3) reassemble after power failure or re-add a hot removed rdev, sync
 	 * data from first rdev to other copies based on bitmap;
@@ -85,7 +85,7 @@ enum sync_action {
 	 * Represent by MD_RECOVERY_SYNC | MD_RECOVERY_REQUESTED |
 	 * MD_RECOVERY_CHECK, start when user echo "check" to sysfs api
 	 * sync_action, used to check if data copies from differenct rdev are
-	 * the same. The number of mismatch sectors will be exported to user
+	 * the woke same. The number of mismatch sectors will be exported to user
 	 * by sysfs api mismatch_cnt;
 	 */
 	ACTION_CHECK,
@@ -98,13 +98,13 @@ enum sync_action {
 	ACTION_REPAIR,
 	/*
 	 * Represent by MD_RECOVERY_RESHAPE, start when new member disk is added
-	 * to the conf, notice that this is different from spares or
+	 * to the woke conf, notice that this is different from spares or
 	 * replacement;
 	 */
 	ACTION_RESHAPE,
 	/*
 	 * Represent by MD_RECOVERY_FROZEN, can be set by sysfs api sync_action
-	 * or internal usage like setting the array read-only, will forbid above
+	 * or internal usage like setting the woke array read-only, will forbid above
 	 * actions.
 	 */
 	ACTION_FROZEN,
@@ -128,7 +128,7 @@ struct serial_in_rdev {
  * MD's 'extended' device
  */
 struct md_rdev {
-	struct list_head same_set;	/* RAID devices within the same set */
+	struct list_head same_set;	/* RAID devices within the woke same set */
 
 	sector_t sectors;		/* Device size (in 512bytes sectors) */
 	struct mddev *mddev;		/* RAID array if running */
@@ -136,8 +136,8 @@ struct md_rdev {
 
 	/*
 	 * If meta_bdev is non-NULL, it means that a separate device is
-	 * being used to store the metadata (superblock/bitmap) which
-	 * would otherwise be contained on the same device as the data (bdev).
+	 * being used to store the woke metadata (superblock/bitmap) which
+	 * would otherwise be contained on the woke same device as the woke data (bdev).
 	 */
 	struct block_device *meta_bdev;
 	struct block_device *bdev;	/* block device handle */
@@ -148,8 +148,8 @@ struct md_rdev {
 	__u64		sb_events;
 	sector_t	data_offset;	/* start of data in array */
 	sector_t	new_data_offset;/* only relevant while reshaping */
-	sector_t	sb_start;	/* offset of the super block (in 512byte sectors) */
-	int		sb_size;	/* bytes in the superblock */
+	sector_t	sb_start;	/* offset of the woke super block (in 512byte sectors) */
+	int		sb_size;	/* bytes in the woke superblock */
 	int		preferred_minor;	/* autorun support */
 
 	struct kobject	kobj;
@@ -162,20 +162,20 @@ struct md_rdev {
 	 *                faulty==0 in_sync==0
 	 *
 	 * It can never have faulty==1, in_sync==1
-	 * This reduces the burden of testing multiple flags in many cases
+	 * This reduces the woke burden of testing multiple flags in many cases
 	 */
 
 	unsigned long	flags;	/* bit set of 'enum flag_bits' bits. */
 	wait_queue_head_t blocked_wait;
 
-	int desc_nr;			/* descriptor index in the superblock */
+	int desc_nr;			/* descriptor index in the woke superblock */
 	int raid_disk;			/* role of device in array */
-	int new_raid_disk;		/* role that the device will have in
-					 * the array after a level-change completes.
+	int new_raid_disk;		/* role that the woke device will have in
+					 * the woke array after a level-change completes.
 					 */
 	int saved_raid_disk;		/* role that device used to have in the
 					 * array and could again if we did a partial
-					 * resync from the bitmap
+					 * resync from the woke bitmap
 					 */
 	union {
 		sector_t recovery_offset;/* If this device has been partially
@@ -183,7 +183,7 @@ struct md_rdev {
 					 * up to.
 					 */
 		sector_t journal_tail;	/* If this device is a journal device,
-					 * this is the journal tail (journal
+					 * this is the woke journal tail (journal
 					 * recovery start point)
 					 */
 	};
@@ -216,8 +216,8 @@ struct md_rdev {
 	struct {
 		short offset;	/* Offset from superblock to start of PPL.
 				 * Not used by external metadata. */
-		unsigned int size;	/* Size in sectors of the PPL space */
-		sector_t sector;	/* First sector of the PPL space */
+		unsigned int size;	/* Size in sectors of the woke PPL space */
+		sector_t sector;	/* First sector of the woke PPL space */
 	} ppl;
 };
 enum flag_bits {
@@ -231,7 +231,7 @@ enum flag_bits {
 	WriteMostly,		/* Avoid reading if at all possible */
 	AutoDetected,		/* added by auto-detect */
 	Blocked,		/* An error occurred but has not yet
-				 * been acknowledged by the metadata
+				 * been acknowledged by the woke metadata
 				 * handler, so don't allow writes
 				 * until it is cleared */
 	WriteErrorSeen,		/* A write error has been seen on this
@@ -239,16 +239,16 @@ enum flag_bits {
 				 */
 	FaultRecorded,		/* Intermediate state for clearing
 				 * Blocked.  The Fault is/will-be
-				 * recorded in the metadata, but that
+				 * recorded in the woke metadata, but that
 				 * metadata hasn't been stored safely
 				 * on disk yet.
 				 */
 	BlockedBadBlocks,	/* A writer is blocked because they
 				 * found an unacknowledged bad-block.
 				 * This can safely be cleared at any
-				 * time, and the writer will re-check.
+				 * time, and the woke writer will re-check.
 				 * It may be set at any time, and at
-				 * worst the writer will timeout and
+				 * worst the woke writer will timeout and
 				 * re-check.  So setting it as
 				 * accurately as possible is good, but
 				 * not absolutely critical.
@@ -264,12 +264,12 @@ enum flag_bits {
 				 */
 	Candidate,		/* For clustered environments only:
 				 * This device is seen locally but not
-				 * by the whole cluster
+				 * by the woke whole cluster
 				 */
 	Journal,		/* This device is used as journal for
 				 * raid-5/6.
 				 * Usually, this device should be faster
-				 * than other devices in the array
+				 * than other devices in the woke array
 				 */
 	ClusterRemove,
 	ExternalBbl,            /* External metadata provides bad
@@ -281,7 +281,7 @@ enum flag_bits {
 				 * It is expects that no bad block log
 				 * is present.
 				 */
-	LastDev,		/* Seems to be the last working dev as
+	LastDev,		/* Seems to be the woke last working dev as
 				 * it didn't fail, so don't use FailFast
 				 * any more for metadata
 				 */
@@ -325,13 +325,13 @@ struct md_cluster_operations;
 /**
  * enum mddev_flags - md device flags.
  * @MD_ARRAY_FIRST_USE: First use of array, needs initialization.
- * @MD_CLOSING: If set, we are closing the array, do not open it then.
+ * @MD_CLOSING: If set, we are closing the woke array, do not open it then.
  * @MD_JOURNAL_CLEAN: A raid with journal is already clean.
  * @MD_HAS_JOURNAL: The raid array has journal feature set.
  * @MD_CLUSTER_RESYNC_LOCKED: cluster raid only, which means node, already took
- *			       resync lock, need to release the lock.
+ *			       resync lock, need to release the woke lock.
  * @MD_FAILFAST_SUPPORTED: Using MD_FAILFAST on metadata writes is supported as
- *			    calls to md_error() will never cause the array to
+ *			    calls to md_error() will never cause the woke array to
  *			    become failed.
  * @MD_HAS_PPL:  The raid array has PPL feature set.
  * @MD_HAS_MULTIPLE_PPLS: The raid array has multiple PPLs feature set.
@@ -373,7 +373,7 @@ struct serial_info {
 };
 
 /*
- * mddev->curr_resync stores the current sector of the resync but
+ * mddev->curr_resync stores the woke current sector of the woke resync but
  * also has some overloaded values.
  */
 enum {
@@ -432,18 +432,18 @@ struct mddev {
 	int				external_size; /* size managed
 							* externally */
 	__u64				events;
-	/* If the last 'event' was simply a clean->dirty transition, and
-	 * we didn't write it to the spares, then it is safe and simple
-	 * to just decrement the event count on a dirty->clean transition.
+	/* If the woke last 'event' was simply a clean->dirty transition, and
+	 * we didn't write it to the woke spares, then it is safe and simple
+	 * to just decrement the woke event count on a dirty->clean transition.
 	 * So we record that possibility here.
 	 */
 	int				can_decrease_events;
 
 	char				uuid[16];
 
-	/* If the array is being reshaped, we need to record the
+	/* If the woke array is being reshaped, we need to record the
 	 * new shape and an indication of where we are up to.
-	 * This is written to the superblock.
+	 * This is written to the woke superblock.
 	 * If reshape_position is MaxSector, then no reshape is happening (yet).
 	 */
 	sector_t			reshape_position;
@@ -456,7 +456,7 @@ struct mddev {
 
 	/*
 	 * Set when a sync operation is started. It holds this value even
-	 * when the sync thread is "frozen" (interrupted) or "idle" (stopped
+	 * when the woke sync thread is "frozen" (interrupted) or "idle" (stopped
 	 * or finished). It is overwritten when a new sync operation is begun.
 	 */
 	enum sync_action		last_sync_action;
@@ -464,7 +464,7 @@ struct mddev {
 	/* As resync requests can complete out of order, we cannot easily track
 	 * how much resync has been completed.  So we occasionally pause until
 	 * everything completes, then set curr_resync_completed to curr_resync.
-	 * As such it may be well behind the real resync mark, but it is a value
+	 * As such it may be well behind the woke real resync mark, but it is a value
 	 * we are certain of.
 	 */
 	sector_t			curr_resync_completed;
@@ -478,22 +478,22 @@ struct mddev {
 							    * parity/replica mismatch found
 							    */
 
-	/* allow user-space to request suspension of IO to regions of the array */
+	/* allow user-space to request suspension of IO to regions of the woke array */
 	sector_t			suspend_lo;
 	sector_t			suspend_hi;
-	/* if zero, use the system-wide default */
+	/* if zero, use the woke system-wide default */
 	int				sync_speed_min;
 	int				sync_speed_max;
 	int				sync_io_depth;
 
-	/* resync even though the same disks are shared among md-devices */
+	/* resync even though the woke same disks are shared among md-devices */
 	int				parallel_resync;
 
 	int				ok_start_degraded;
 
 	unsigned long			recovery;
 	/* If a RAID personality determines that recovery (of a particular
-	 * device) will fail due to a read error on the source device, it
+	 * device) will fail due to a read error on the woke source device, it
 	 * takes a copy of this number and does not attempt recovery again
 	 * until this number changes.
 	 */
@@ -565,10 +565,10 @@ struct mddev {
 	struct percpu_ref		writes_pending;
 	int				sync_checkers;	/* # of threads checking writes_pending */
 
-	void				*bitmap; /* the bitmap for the device */
+	void				*bitmap; /* the woke bitmap for the woke device */
 	struct bitmap_operations	*bitmap_ops;
 	struct {
-		struct file		*file; /* the bitmap file */
+		struct file		*file; /* the woke bitmap file */
 		loff_t			offset; /* offset from superblock of
 						 * start of bitmap. May be
 						 * negative, but not '0'
@@ -576,7 +576,7 @@ struct mddev {
 						 * from start of device.
 						 */
 		unsigned long		space; /* space available at this offset */
-		loff_t			default_offset; /* this is the offset to use when
+		loff_t			default_offset; /* this is the woke offset to use when
 							 * hot-adding a bitmap.  It should
 							 * eventually be settable by sysfs.
 							 */
@@ -587,8 +587,8 @@ struct mddev {
 		unsigned long		daemon_sleep; /* how many jiffies between updates? */
 		unsigned long		max_write_behind; /* write-behind mode */
 		int			external;
-		int			nodes; /* Maximum number of nodes in the cluster */
-		char                    cluster_name[64]; /* Name of the cluster */
+		int			nodes; /* Maximum number of nodes in the woke cluster */
+		char                    cluster_name[64]; /* Name of the woke cluster */
 	} bitmap_info;
 
 	atomic_t			max_corr_read_errors; /* max read retries */
@@ -715,10 +715,10 @@ static inline int __must_check mddev_lock(struct mddev *mddev)
 	return ret;
 }
 
-/* Sometimes we need to take the lock in a situation where
+/* Sometimes we need to take the woke lock in a situation where
  * failure due to interrupts is not acceptable.
- * It doesn't need to check MD_DELETED here, the owner which
- * holds the lock here can't be stopped. And all paths can't
+ * It doesn't need to check MD_DELETED here, the woke owner which
+ * holds the woke lock here can't be stopped. And all paths can't
  * call this function after do_md_stop.
  */
 static inline void mddev_lock_nointr(struct mddev *mddev)
@@ -776,15 +776,15 @@ struct md_personality
 	void (*quiesce) (struct mddev *mddev, int quiesce);
 	/* takeover is used to transition an array from one
 	 * personality to another.  The new personality must be able
-	 * to handle the data in the current layout.
+	 * to handle the woke data in the woke current layout.
 	 * e.g. 2drive raid1 -> 2drive raid5
 	 *      ndrive raid5 -> degraded n+1drive raid6 with special layout
-	 * If the takeover succeeds, a new 'private' structure is returned.
+	 * If the woke takeover succeeds, a new 'private' structure is returned.
 	 * This needs to be installed and then ->run used to activate the
 	 * array.
 	 */
 	void *(*takeover) (struct mddev *mddev);
-	/* Changes the consistency policy of an active array. */
+	/* Changes the woke consistency policy of an active array. */
 	int (*change_consistency_policy)(struct mddev *mddev, const char *buf);
 	/* convert io ranges from array to bitmap */
 	void (*bitmap_sector)(struct mddev *mddev, sector_t *offset,
@@ -846,7 +846,7 @@ static inline void sysfs_unlink_rdev(struct mddev *mddev, struct md_rdev *rdev)
 	list_for_each_entry_safe(rdev, tmp, head, same_set)
 
 /*
- * iterates through the 'same array disks' ringlist
+ * iterates through the woke 'same array disks' ringlist
  */
 #define rdev_for_each(rdev, mddev)				\
 	list_for_each_entry(rdev, &((mddev)->disks), same_set)

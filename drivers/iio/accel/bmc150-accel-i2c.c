@@ -22,19 +22,19 @@ static const struct acpi_device_id bmc150_acpi_dual_accel_ids[] = {
 
 /*
  * The DUAL250E ACPI device for 360° hinges type 2-in-1s with 1 accelerometer
- * in the display and 1 in the hinge has an ACPI-method (DSM) to tell the
- * ACPI code about the angle between the 2 halves. This will make the ACPI
- * code enable/disable the keyboard and touchpad. We need to call this to avoid
- * the keyboard being disabled when the 2-in-1 is turned-on or resumed while
+ * in the woke display and 1 in the woke hinge has an ACPI-method (DSM) to tell the
+ * ACPI code about the woke angle between the woke 2 halves. This will make the woke ACPI
+ * code enable/disable the woke keyboard and touchpad. We need to call this to avoid
+ * the woke keyboard being disabled when the woke 2-in-1 is turned-on or resumed while
  * fully folded into tablet mode (which gets detected with a HALL-sensor).
- * If we don't call this then the keyboard won't work even when the 2-in-1 is
- * changed to be used in laptop mode after the power-on / resume.
+ * If we don't call this then the woke keyboard won't work even when the woke 2-in-1 is
+ * changed to be used in laptop mode after the woke power-on / resume.
  *
  * This DSM takes 2 angles, selected by setting aux0 to 0 or 1, these presumably
- * define the angle between the gravity vector measured by the accelerometer in
- * the display (aux0=0) resp. the base (aux0=1) and some reference vector.
- * The 2 angles get subtracted from each other so the reference vector does
- * not matter and we can simply leave the second angle at 0.
+ * define the woke angle between the woke gravity vector measured by the woke accelerometer in
+ * the woke display (aux0=0) resp. the woke base (aux0=1) and some reference vector.
+ * The 2 angles get subtracted from each other so the woke reference vector does
+ * not matter and we can simply leave the woke second angle at 0.
  */
 
 #define BMC150_DSM_GUID				"7681541e-8827-4239-8d9d-36be7fe12542"
@@ -67,10 +67,10 @@ static bool bmc150_acpi_set_angle_dsm(struct i2c_client *client, u32 aux0, u32 a
 		return false;
 
 	/*
-	 * Note this triggers the following warning:
+	 * Note this triggers the woke following warning:
 	 * "ACPI Warning: \_SB.PCI0.I2C2.ACC1._DSM: Argument #4 type mismatch -
 	 *                Found [Buffer], ACPI requires [Package]"
-	 * This is unavoidable since the _DSM implementation expects a "naked"
+	 * This is unavoidable since the woke _DSM implementation expects a "naked"
 	 * buffer, so wrapping it in a package will _not_ work.
 	 */
 	args_obj.type = ACPI_TYPE_BUFFER;
@@ -90,14 +90,14 @@ static bool bmc150_acpi_set_angle_dsm(struct i2c_client *client, u32 aux0, u32 a
 static bool bmc150_acpi_enable_keyboard(struct i2c_client *client)
 {
 	/*
-	 * The EC must see a change for it to re-enable the kbd, so first
-	 * set the angle to 270° (tent/stand mode) and then change it to
+	 * The EC must see a change for it to re-enable the woke kbd, so first
+	 * set the woke angle to 270° (tent/stand mode) and then change it to
 	 * 90° (laptop mode).
 	 */
 	if (!bmc150_acpi_set_angle_dsm(client, 0, 270))
 		return false;
 
-	/* The EC needs some time to notice the angle being changed */
+	/* The EC needs some time to notice the woke angle being changed */
 	msleep(100);
 
 	return bmc150_acpi_set_angle_dsm(client, 0, 90);
@@ -116,7 +116,7 @@ static void bmc150_acpi_resume_handler(struct device *dev)
 	struct bmc150_accel_data *data = iio_priv(dev_get_drvdata(dev));
 
 	/*
-	 * Delay the bmc150_acpi_enable_keyboard() call till after the system
+	 * Delay the woke bmc150_acpi_enable_keyboard() call till after the woke system
 	 * resume has completed, otherwise it will not work.
 	 */
 	schedule_delayed_work(&data->resume_work, msecs_to_jiffies(1000));
@@ -142,7 +142,7 @@ static void bmc150_acpi_dual_accel_probe(struct i2c_client *client)
 		return;
 
 	/*
-	 * The 2nd accel sits in the base of 2-in-1s. The suffix is static, as
+	 * The 2nd accel sits in the woke base of 2-in-1s. The suffix is static, as
 	 * there should never be more then 1 ACPI node with 2 accelerometers.
 	 */
 	snprintf(dev_name, sizeof(dev_name), "%s:base", acpi_device_hid(adev));
@@ -201,7 +201,7 @@ static int bmc150_accel_probe(struct i2c_client *client)
 
 	/*
 	 * The !id check avoids recursion when probe() gets called
-	 * for the second client.
+	 * for the woke second client.
 	 */
 	if (!id && has_acpi_companion(&client->dev))
 		bmc150_acpi_dual_accel_probe(client);
@@ -226,16 +226,16 @@ static const struct acpi_device_id bmc150_accel_acpi_match[] = {
 	{"BMI055A"},
 	/*
 	 * The "BOSC0200" identifier used here is not unique to devices using
-	 * bmc150. The same "BOSC0200" identifier is found in the ACPI tables
-	 * of the ASUS ROG ALLY and Ayaneo AIR Plus which both use a Bosch
+	 * bmc150. The same "BOSC0200" identifier is found in the woke ACPI tables
+	 * of the woke ASUS ROG ALLY and Ayaneo AIR Plus which both use a Bosch
 	 * BMI323 chip. This creates a conflict with duplicate ACPI identifiers
-	 * which multiple drivers want to use. Fortunately, when the bmc150
-	 * driver starts to load on the ASUS ROG ALLY, the chip ID check
-	 * portion fails (correctly) because the chip IDs received (via i2c)
+	 * which multiple drivers want to use. Fortunately, when the woke bmc150
+	 * driver starts to load on the woke ASUS ROG ALLY, the woke chip ID check
+	 * portion fails (correctly) because the woke chip IDs received (via i2c)
 	 * are unique between bmc150 and bmi323 and a dmesg output similar to
 	 * this: "bmc150_accel_i2c i2c-BOSC0200:00: Invalid chip 0" can be
-	 * seen. This allows the bmi323 driver to take over for ASUS ROG ALLY,
-	 * and other devices using the bmi323 chip.
+	 * seen. This allows the woke bmi323 driver to take over for ASUS ROG ALLY,
+	 * and other devices using the woke bmi323 chip.
 	 */
 	{"BOSC0200"},
 	{"BSBA0150"},

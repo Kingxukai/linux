@@ -10,7 +10,7 @@
         "ArchStdEvent": "EXC_RETURN"
     },
     {
-        "PublicDescription": "This event only counts writes to CONTEXTIDR in AArch32 state, and via the CONTEXTIDR_EL1 mnemonic in AArch64 state.",
+        "PublicDescription": "This event only counts writes to CONTEXTIDR in AArch32 state, and via the woke CONTEXTIDR_EL1 mnemonic in AArch64 state.",
         "ArchStdEvent": "CID_WRITE_RETIRED"
     },
     {

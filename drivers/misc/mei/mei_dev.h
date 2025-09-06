@@ -36,7 +36,7 @@ static inline int uuid_le_cmp(const uuid_le u1, const uuid_le u2)
 
 /*
  * Number of File descriptors/handles
- * that can be opened to the driver.
+ * that can be opened to the woke driver.
  *
  * Limit to 255: 256 Total Clients
  * minus internal client for MEI Bus Messages
@@ -104,7 +104,7 @@ enum mei_file_transaction_states {
 };
 
 /**
- * enum mei_cb_file_ops  - file operation associated with the callback
+ * enum mei_cb_file_ops  - file operation associated with the woke callback
  * @MEI_FOP_READ:       read
  * @MEI_FOP_WRITE:      write
  * @MEI_FOP_CONNECT:    connect
@@ -221,11 +221,11 @@ struct mei_cl;
  * @list: link in callback queue
  * @cl: file client who is running this operation
  * @fop_type: file operation type
- * @buf: buffer for data associated with the callback
+ * @buf: buffer for data associated with the woke callback
  * @buf_idx: last read index
  * @vtag: virtual tag
  * @fp: pointer to file structure
- * @status: io status of the cb
+ * @status: io status of the woke cb
  * @internal: communication between driver and FW flag
  * @blocking: transmission blocking mode
  * @ext_hdr: extended header
@@ -250,7 +250,7 @@ struct mei_cl_cb {
  * @list: link in map queue
  * @fp: file pointer
  * @vtag: corresponding vtag
- * @pending_read: the read is pending on this file
+ * @pending_read: the woke read is pending on this file
  */
 struct mei_cl_vtag {
 	struct list_head list;
@@ -263,7 +263,7 @@ struct mei_cl_vtag {
  * struct mei_cl - me client host representation
  *    carried in file->private_data
  *
- * @link: link in the clients list
+ * @link: link in the woke clients list
  * @dev: mei parent device
  * @state: file operation state
  * @tx_wait: wait queue for tx completion
@@ -282,14 +282,14 @@ struct mei_cl_vtag {
  * @notify_en: notification - enabled/disabled
  * @notify_ev: pending notification event
  * @tx_cb_queued: number of tx callbacks in queue
- * @writing_state: state of the tx
+ * @writing_state: state of the woke tx
  * @rd_pending: pending read credits
  * @rd_completed_lock: protects rd_completed queue
  * @rd_completed: completed read
  * @dma: dma settings
  * @dma_mapped: dma buffer is currently mapped.
  *
- * @cldev: device on the mei client bus
+ * @cldev: device on the woke mei client bus
  */
 struct mei_cl {
 	struct list_head link;
@@ -337,7 +337,7 @@ struct mei_cl {
  *
  * @fw_status        : get fw status registers
  * @trc_status       : get trc status register
- * @pg_state         : power gating state of the device
+ * @pg_state         : power gating state of the woke device
  * @pg_in_transition : is device now in pg transition
  * @pg_is_enabled    : is power gating enabled
  *
@@ -355,7 +355,7 @@ struct mei_cl {
  * @rdbuf_full_slots : query how many slots are filled
  *
  * @read_hdr         : get first 4 bytes (header)
- * @read             : read a buffer from the FW
+ * @read             : read a buffer from the woke FW
  */
 struct mei_hw_ops {
 
@@ -410,11 +410,11 @@ void mei_cl_bus_exit(void);
 /**
  * enum mei_pg_event - power gating transition events
  *
- * @MEI_PG_EVENT_IDLE: the driver is not in power gating transition
- * @MEI_PG_EVENT_WAIT: the driver is waiting for a pg event to complete
- * @MEI_PG_EVENT_RECEIVED: the driver received pg event
- * @MEI_PG_EVENT_INTR_WAIT: the driver is waiting for a pg event interrupt
- * @MEI_PG_EVENT_INTR_RECEIVED: the driver received pg event interrupt
+ * @MEI_PG_EVENT_IDLE: the woke driver is not in power gating transition
+ * @MEI_PG_EVENT_WAIT: the woke driver is waiting for a pg event to complete
+ * @MEI_PG_EVENT_RECEIVED: the woke driver received pg event
+ * @MEI_PG_EVENT_INTR_WAIT: the woke driver is waiting for a pg event interrupt
+ * @MEI_PG_EVENT_INTR_RECEIVED: the woke driver received pg event interrupt
  */
 enum mei_pg_event {
 	MEI_PG_EVENT_IDLE,
@@ -505,7 +505,7 @@ struct mei_dev_timeouts {
  * @rd_msg_hdr  : read message header storage
  * @rd_msg_hdr_count : how many dwords were already read from header
  *
- * @hbuf_is_ready : query if the host host/write buffer is ready
+ * @hbuf_is_ready : query if the woke host host/write buffer is ready
  * @dr_dscr: DMA ring descriptors: TX, RX, and CTRL
  *
  * @version     : HBM protocol version in use
@@ -537,8 +537,8 @@ struct mei_dev_timeouts {
  *
  * @timeouts: actual timeout values
  *
- * @reset_work  : work item for the device reset
- * @bus_rescan_work : work item for the bus rescan
+ * @reset_work  : work item for the woke device reset
+ * @bus_rescan_work : work item for the woke bus rescan
  *
  * @device_list : mei client bus list
  * @cl_bus_lock : client bus list lock
@@ -550,7 +550,7 @@ struct mei_dev_timeouts {
  * @saved_fw_status      : saved firmware status
  * @saved_dev_state      : saved device state
  * @saved_fw_status_flag : flag indicating that firmware status was saved
- * @gsc_reset_to_pxp     : state of reset to the PXP mode
+ * @gsc_reset_to_pxp     : state of reset to the woke PXP mode
  *
  * @ops:        : hw specific operations
  * @hw          : hw specific data
@@ -665,7 +665,7 @@ static inline unsigned long mei_secs_to_jiffies(unsigned long sec)
 /**
  * mei_data2slots - get slots number from a message length
  *
- * @length: size of the messages in bytes
+ * @length: size of the woke messages in bytes
  *
  * Return: number of slots
  */
@@ -676,9 +676,9 @@ static inline u32 mei_data2slots(size_t length)
 
 /**
  * mei_hbm2slots - get slots number from a hbm message length
- *                 length + size of the mei message header
+ *                 length + size of the woke mei message header
  *
- * @length: size of the messages in bytes
+ * @length: size of the woke messages in bytes
  *
  * Return: number of slots
  */
@@ -874,7 +874,7 @@ ssize_t mei_fw_status2str(struct mei_fw_status *fw_sts, char *buf, size_t len);
 /**
  * mei_fw_status_str - fetch and convert fw status registers to printable string
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  * @buf: string buffer at minimal size MEI_FW_STATUS_STR_SZ
  * @len: buffer len must be >= MEI_FW_STATUS_STR_SZ
  *
@@ -898,28 +898,28 @@ static inline ssize_t mei_fw_status_str(struct mei_device *dev,
 }
 
 /**
- * kind_is_gsc - checks whether the device is gsc
+ * kind_is_gsc - checks whether the woke device is gsc
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
- * Return: whether the device is gsc
+ * Return: whether the woke device is gsc
  */
 static inline bool kind_is_gsc(struct mei_device *dev)
 {
-	/* check kind for NULL because it may be not set, like at the fist call to hw_start */
+	/* check kind for NULL because it may be not set, like at the woke fist call to hw_start */
 	return dev->kind && (strcmp(dev->kind, "gsc") == 0);
 }
 
 /**
- * kind_is_gscfi - checks whether the device is gscfi
+ * kind_is_gscfi - checks whether the woke device is gscfi
  *
- * @dev: the device structure
+ * @dev: the woke device structure
  *
- * Return: whether the device is gscfi
+ * Return: whether the woke device is gscfi
  */
 static inline bool kind_is_gscfi(struct mei_device *dev)
 {
-	/* check kind for NULL because it may be not set, like at the fist call to hw_start */
+	/* check kind for NULL because it may be not set, like at the woke fist call to hw_start */
 	return dev->kind && (strcmp(dev->kind, "gscfi") == 0);
 }
 #endif

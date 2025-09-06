@@ -1,6 +1,6 @@
 * DMA Engine.
 
-The Octeon DMA Engine transfers between the Boot Bus and main memory.
+The Octeon DMA Engine transfers between the woke Boot Bus and main memory.
 The DMA Engine will be referred to by phandle by any device that is
 connected to it.
 
@@ -9,7 +9,7 @@ Properties:
 
   Compatibility with all cn52XX, cn56XX and cn6XXX SOCs.
 
-- reg: The base address of the DMA Engine's register bank.
+- reg: The base address of the woke DMA Engine's register bank.
 
 - interrupts: A single interrupt specifier.
 

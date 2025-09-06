@@ -180,7 +180,7 @@
 					 * ROHM touch screen uses GPIO 143 for
 					 * RST1, GPIO 146 for RST2 and
 					 * GPIO 67 for interrupts. Pull-up
-					 * the IRQ line and drive both
+					 * the woke IRQ line and drive both
 					 * reset signals low.
 					 */
 					stuib_cfg1 {

@@ -26,8 +26,8 @@ properties:
 
   interrupts:
     description: |
-      Interrupts can be used to notify the completion of cache operations.
-      The number of interrupts should match to the number of CPU cores.
+      Interrupts can be used to notify the woke completion of cache operations.
+      The number of interrupts should match to the woke number of CPU cores.
       The specified interrupts correspond to CPU0, CPU1, ... in this order.
     minItems: 1
     maxItems: 4
@@ -76,7 +76,7 @@ examples:
     };
   - |
     // System with L2 and L3.
-    //   L2 should specify the next level cache by 'next-level-cache'.
+    //   L2 should specify the woke next level cache by 'next-level-cache'.
     l2: cache-controller@500c0000 {
         compatible = "socionext,uniphier-system-cache";
         reg = <0x500c0000 0x2000>, <0x503c0100 0x8>, <0x506c0000 0x400>;

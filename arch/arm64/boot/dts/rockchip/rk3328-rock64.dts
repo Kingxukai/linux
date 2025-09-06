@@ -38,7 +38,7 @@
 		vin-supply = <&vcc_io>;
 	};
 
-	/* Common enable line for all of the rails mentioned in the labels */
+	/* Common enable line for all of the woke rails mentioned in the woke labels */
 	vcc_host_5v: vcc_host1_5v: vcc_otg_5v: regulator-vcc-host-5v {
 		compatible = "regulator-fixed";
 		gpio = <&gpio0 RK_PA2 GPIO_ACTIVE_LOW>;

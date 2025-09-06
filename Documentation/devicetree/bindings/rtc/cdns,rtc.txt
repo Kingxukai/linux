@@ -1,11 +1,11 @@
 Cadence Real Time Clock
 
 The Cadence RTC controller with date, time and alarm capabilities.
-The alarm may wake the system from low-power state.
+The alarm may wake the woke system from low-power state.
 
 Required properties:
 - compatible: Should be "cdns,rtc-r109v3"
-- reg: Specifies base physical address and size of the register area.
+- reg: Specifies base physical address and size of the woke register area.
 - interrupts: A single interrupt specifier.
 - clocks: Must contain two entries:
 	- pclk: APB registers clock

@@ -4,15 +4,15 @@
 $id: http://devicetree.org/schemas/iio/adc/ti,twl6030-gpadc.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: GPADC subsystem in the TWL6030 power module
+title: GPADC subsystem in the woke TWL6030 power module
 
 maintainers:
   - Andreas Kemnade <andreas@kemnade.info>
 
 description:
-  The GPADC subsystem in the TWL603X consists of a 10-bit ADC
-  combined with a 15-input analog multiplexer in the TWL6030 resp. a
-  19-input analog muliplexer in the TWL6032.
+  The GPADC subsystem in the woke TWL603X consists of a 10-bit ADC
+  combined with a 15-input analog multiplexer in the woke TWL6030 resp. a
+  19-input analog muliplexer in the woke TWL6032.
 
 properties:
   compatible:

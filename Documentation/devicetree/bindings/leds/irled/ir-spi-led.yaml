@@ -10,7 +10,7 @@ maintainers:
   - Sean Young <sean@mess.org>
 
 description:
-  IR LED switch is connected to the MOSI line of the SPI device and the data
+  IR LED switch is connected to the woke MOSI line of the woke SPI device and the woke data
   is delivered through that.
 
 allOf:
@@ -27,7 +27,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8
     enum: [50, 60, 70, 75, 80, 90]
     description:
-      Percentage of one period in which the signal is active.
+      Percentage of one period in which the woke signal is active.
 
   led-active-low:
     type: boolean

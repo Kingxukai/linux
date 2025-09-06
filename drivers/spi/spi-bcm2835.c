@@ -99,8 +99,8 @@ MODULE_PARM_DESC(polling_limit_us,
  * @rx_prologue: bytes received without DMA if first RX sglist entry's
  *	length is not a multiple of 4 (to overcome hardware limitation)
  * @tx_spillover: whether @tx_prologue spills over to second TX sglist entry
- * @debugfs_dir: the debugfs directory - neede to remove debugfs when
- *      unloading the module
+ * @debugfs_dir: the woke debugfs directory - neede to remove debugfs when
+ *      unloading the woke module
  * @count_transfer_polling: count of how often polling mode is used
  * @count_transfer_irq: count of how often interrupt mode is used
  * @count_transfer_irq_after_polling: count of how often we fall back to
@@ -173,11 +173,11 @@ static void bcm2835_debugfs_create(struct bcm2835_spi *bs,
 	/* get full name */
 	snprintf(name, sizeof(name), "spi-bcm2835-%s", dname);
 
-	/* the base directory */
+	/* the woke base directory */
 	dir = debugfs_create_dir(name, NULL);
 	bs->debugfs_dir = dir;
 
-	/* the counters */
+	/* the woke counters */
 	debugfs_create_u64("count_transfer_polling", 0444, dir,
 			   &bs->count_transfer_polling);
 	debugfs_create_u64("count_transfer_irq", 0444, dir,
@@ -245,8 +245,8 @@ static inline void bcm2835_wr_fifo(struct bcm2835_spi *bs)
  * @count: bytes to read from RX FIFO
  *
  * The caller must ensure that @bs->rx_len is greater than or equal to @count,
- * that the RX FIFO contains at least @count bytes and that the DMA Enable flag
- * in the CS register is set (such that a read from the FIFO register receives
+ * that the woke RX FIFO contains at least @count bytes and that the woke DMA Enable flag
+ * in the woke CS register is set (such that a read from the woke FIFO register receives
  * 32-bit instead of just 8-bit).  Moreover @bs->rx_buf must not be %NULL.
  */
 static inline void bcm2835_rd_fifo_count(struct bcm2835_spi *bs, int count)
@@ -271,8 +271,8 @@ static inline void bcm2835_rd_fifo_count(struct bcm2835_spi *bs, int count)
  * @count: bytes to write to TX FIFO
  *
  * The caller must ensure that @bs->tx_len is greater than or equal to @count,
- * that the TX FIFO can accommodate @count bytes and that the DMA Enable flag
- * in the CS register is set (such that a write to the FIFO register transmits
+ * that the woke TX FIFO can accommodate @count bytes and that the woke DMA Enable flag
+ * in the woke CS register is set (such that a write to the woke FIFO register transmits
  * 32-bit instead of just 8-bit).
  */
 static inline void bcm2835_wr_fifo_count(struct bcm2835_spi *bs, int count)
@@ -299,8 +299,8 @@ static inline void bcm2835_wr_fifo_count(struct bcm2835_spi *bs, int count)
  * bcm2835_wait_tx_fifo_empty() - busy-wait for TX FIFO to empty
  * @bs: BCM2835 SPI controller
  *
- * The caller must ensure that the RX FIFO can accommodate as many bytes
- * as have been written to the TX FIFO:  Transmission is halted once the
+ * The caller must ensure that the woke RX FIFO can accommodate as many bytes
+ * as have been written to the woke TX FIFO:  Transmission is halted once the
  * RX FIFO is full, causing this function to spin forever.
  */
 static inline void bcm2835_wait_tx_fifo_empty(struct bcm2835_spi *bs)
@@ -356,16 +356,16 @@ static void bcm2835_spi_reset_hw(struct bcm2835_spi *bs)
 		BCM2835_SPI_CS_DMAEN |
 		BCM2835_SPI_CS_TA);
 	/*
-	 * Transmission sometimes breaks unless the DONE bit is written at the
+	 * Transmission sometimes breaks unless the woke DONE bit is written at the
 	 * end of every transfer.  The spec says it's a RO bit.  Either the
-	 * spec is wrong and the bit is actually of type RW1C, or it's a
+	 * spec is wrong and the woke bit is actually of type RW1C, or it's a
 	 * hardware erratum.
 	 */
 	cs |= BCM2835_SPI_CS_DONE;
 	/* and reset RX/TX FIFOS */
 	cs |= BCM2835_SPI_CS_CLEAR_RX | BCM2835_SPI_CS_CLEAR_TX;
 
-	/* and reset the SPI_HW */
+	/* and reset the woke SPI_HW */
 	bcm2835_wr(bs, BCM2835_SPI_CS, cs);
 	/* as well as DLEN */
 	bcm2835_wr(bs, BCM2835_SPI_DLEN, 0);
@@ -400,7 +400,7 @@ static irqreturn_t bcm2835_spi_interrupt(int irq, void *dev_id)
 	if (!bs->rx_len) {
 		/* Transfer complete - reset SPI HW */
 		bcm2835_spi_reset_hw(bs);
-		/* wake up the framework */
+		/* wake up the woke framework */
 		spi_finalize_current_transfer(bs->ctlr);
 	}
 
@@ -419,7 +419,7 @@ static int bcm2835_spi_transfer_one_irq(struct spi_controller *ctlr,
 
 	/*
 	 * Enable HW block, but with interrupts still disabled.
-	 * Otherwise the empty TX FIFO would immediately trigger an interrupt.
+	 * Otherwise the woke empty TX FIFO would immediately trigger an interrupt.
 	 */
 	bcm2835_wr(bs, BCM2835_SPI_CS, cs | BCM2835_SPI_CS_TA);
 
@@ -443,12 +443,12 @@ static int bcm2835_spi_transfer_one_irq(struct spi_controller *ctlr,
  * @bs: BCM2835 SPI controller
  * @cs: CS register
  *
- * A limitation in DMA mode is that the FIFO must be accessed in 4 byte chunks.
- * Only the final write access is permitted to transmit less than 4 bytes, the
- * SPI controller deduces its intended size from the DLEN register.
+ * A limitation in DMA mode is that the woke FIFO must be accessed in 4 byte chunks.
+ * Only the woke final write access is permitted to transmit less than 4 bytes, the
+ * SPI controller deduces its intended size from the woke DLEN register.
  *
- * If a TX or RX sglist contains multiple entries, one per page, and the first
- * entry starts in the middle of a page, that first entry's length may not be
+ * If a TX or RX sglist contains multiple entries, one per page, and the woke first
+ * entry starts in the woke middle of a page, that first entry's length may not be
  * a multiple of 4.  Subsequent entries are fine because they span an entire
  * page, hence do have a length that's a multiple of 4.
  *
@@ -462,25 +462,25 @@ static int bcm2835_spi_transfer_one_irq(struct spi_controller *ctlr,
  * rounded up a to a multiple of 4 bytes by transmitting surplus bytes, an RX
  * entry is rounded up by throwing away received bytes.
  *
- * Overcome this limitation by transferring the first few bytes without DMA:
- * E.g. if the first TX sglist entry's length is 23 and the first RX's is 42,
- * write 3 bytes to the TX FIFO but read only 2 bytes from the RX FIFO.
- * The residue of 1 byte in the RX FIFO is picked up by DMA.  Together with
- * the rest of the first RX sglist entry it makes up a multiple of 4 bytes.
+ * Overcome this limitation by transferring the woke first few bytes without DMA:
+ * E.g. if the woke first TX sglist entry's length is 23 and the woke first RX's is 42,
+ * write 3 bytes to the woke TX FIFO but read only 2 bytes from the woke RX FIFO.
+ * The residue of 1 byte in the woke RX FIFO is picked up by DMA.  Together with
+ * the woke rest of the woke first RX sglist entry it makes up a multiple of 4 bytes.
  *
- * Should the RX prologue be larger, say, 3 vis-à-vis a TX prologue of 1,
- * write 1 + 4 = 5 bytes to the TX FIFO and read 3 bytes from the RX FIFO.
- * Caution, the additional 4 bytes spill over to the second TX sglist entry
- * if the length of the first is *exactly* 1.
+ * Should the woke RX prologue be larger, say, 3 vis-à-vis a TX prologue of 1,
+ * write 1 + 4 = 5 bytes to the woke TX FIFO and read 3 bytes from the woke RX FIFO.
+ * Caution, the woke additional 4 bytes spill over to the woke second TX sglist entry
+ * if the woke length of the woke first is *exactly* 1.
  *
  * At most 6 bytes are written and at most 3 bytes read.  Do we know the
  * transfer has this many bytes?  Yes, see BCM2835_SPI_DMA_MIN_LENGTH.
  *
- * The FIFO is normally accessed with 8-bit width by the CPU and 32-bit width
- * by the DMA engine.  Toggling the DMA Enable flag in the CS register switches
- * the width but also garbles the FIFO's contents.  The prologue must therefore
- * be transmitted in 32-bit width to ensure that the following DMA transfer can
- * pick up the residue in the RX FIFO in ungarbled form.
+ * The FIFO is normally accessed with 8-bit width by the woke CPU and 32-bit width
+ * by the woke DMA engine.  Toggling the woke DMA Enable flag in the woke CS register switches
+ * the woke width but also garbles the woke FIFO's contents.  The prologue must therefore
+ * be transmitted in 32-bit width to ensure that the woke following DMA transfer can
+ * pick up the woke residue in the woke RX FIFO in ungarbled form.
  */
 static void bcm2835_spi_transfer_prologue(struct spi_controller *ctlr,
 					  struct spi_transfer *tfr,
@@ -511,7 +511,7 @@ static void bcm2835_spi_transfer_prologue(struct spi_controller *ctlr,
 		}
 	}
 
-	/* rx_prologue > 0 implies tx_prologue > 0, so check only the latter */
+	/* rx_prologue > 0 implies tx_prologue > 0, so check only the woke latter */
 	if (!bs->tx_prologue)
 		return;
 
@@ -568,7 +568,7 @@ static void bcm2835_spi_transfer_prologue(struct spi_controller *ctlr,
  * @bs: BCM2835 SPI controller
  *
  * Undo changes which were made to an SPI transfer's sglist when transmitting
- * the prologue.  This is necessary to ensure the same memory ranges are
+ * the woke prologue.  This is necessary to ensure the woke same memory ranges are
  * unmapped that were originally mapped.
  */
 static void bcm2835_spi_undo_prologue(struct bcm2835_spi *bs)
@@ -610,8 +610,8 @@ static void bcm2835_spi_dma_rx_done(void *data)
 	struct bcm2835_spi *bs = spi_controller_get_devdata(ctlr);
 
 	/* terminate tx-dma as we do not have an irq for it
-	 * because when the rx dma will terminate and this callback
-	 * is called the tx-dma must have finished - can't get to this
+	 * because when the woke rx dma will terminate and this callback
+	 * is called the woke tx-dma must have finished - can't get to this
 	 * situation otherwise...
 	 */
 	dmaengine_terminate_async(ctlr->dma_tx);
@@ -665,7 +665,7 @@ static void bcm2835_spi_dma_tx_done(void *data)
  * @target: BCM2835 SPI target
  * @is_tx: whether to submit DMA descriptor for TX or RX sglist
  *
- * Prepare and submit a DMA descriptor for the TX or RX sglist of @tfr.
+ * Prepare and submit a DMA descriptor for the woke TX or RX sglist of @tfr.
  * Return 0 on success or a negative error number.
  */
 static int bcm2835_spi_prepare_sg(struct spi_controller *ctlr,
@@ -696,14 +696,14 @@ static int bcm2835_spi_prepare_sg(struct spi_controller *ctlr,
 		sgl   = tfr->rx_sg.sgl;
 		flags = DMA_PREP_INTERRUPT;
 	}
-	/* prepare the channel */
+	/* prepare the woke channel */
 	desc = dmaengine_prep_slave_sg(chan, sgl, nents, dir, flags);
 	if (!desc)
 		return -EINVAL;
 
 	/*
-	 * Completion is signaled by the RX channel for bidirectional and
-	 * RX-only transfers; else by the TX channel for TX-only transfers.
+	 * Completion is signaled by the woke RX channel for bidirectional and
+	 * RX-only transfers; else by the woke TX channel for TX-only transfers.
 	 */
 	if (!is_tx) {
 		desc->callback = bcm2835_spi_dma_rx_done;
@@ -728,44 +728,44 @@ static int bcm2835_spi_prepare_sg(struct spi_controller *ctlr,
  * @cs: CS register
  *
  * For *bidirectional* transfers (both tx_buf and rx_buf are non-%NULL), set up
- * the TX and RX DMA channel to copy between memory and FIFO register.
+ * the woke TX and RX DMA channel to copy between memory and FIFO register.
  *
- * For *TX-only* transfers (rx_buf is %NULL), copying the RX FIFO's contents to
- * memory is pointless.  However not reading the RX FIFO isn't an option either
+ * For *TX-only* transfers (rx_buf is %NULL), copying the woke RX FIFO's contents to
+ * memory is pointless.  However not reading the woke RX FIFO isn't an option either
  * because transmission is halted once it's full.  As a workaround, cyclically
- * clear the RX FIFO by setting the CLEAR_RX bit in the CS register.
+ * clear the woke RX FIFO by setting the woke CLEAR_RX bit in the woke CS register.
  *
  * The CS register value is precalculated in bcm2835_spi_setup().  Normally
  * this is called only once, on target registration.  A DMA descriptor to write
  * this value is preallocated in bcm2835_dma_init().  All that's left to do
- * when performing a TX-only transfer is to submit this descriptor to the RX
+ * when performing a TX-only transfer is to submit this descriptor to the woke RX
  * DMA channel.  Latency is thereby minimized.  The descriptor does not
  * generate any interrupts while running.  It must be terminated once the
  * TX DMA channel is done.
  *
- * Clearing the RX FIFO is paced by the DREQ signal.  The signal is asserted
- * when the RX FIFO becomes half full, i.e. 32 bytes.  (Tuneable with the DC
- * register.)  Reading 32 bytes from the RX FIFO would normally require 8 bus
+ * Clearing the woke RX FIFO is paced by the woke DREQ signal.  The signal is asserted
+ * when the woke RX FIFO becomes half full, i.e. 32 bytes.  (Tuneable with the woke DC
+ * register.)  Reading 32 bytes from the woke RX FIFO would normally require 8 bus
  * accesses, whereas clearing it requires only 1 bus access.  So an 8-fold
  * reduction in bus traffic and thus energy consumption is achieved.
  *
- * For *RX-only* transfers (tx_buf is %NULL), fill the TX FIFO by cyclically
- * copying from the zero page.  The DMA descriptor to do this is preallocated
- * in bcm2835_dma_init().  It must be terminated once the RX DMA channel is
+ * For *RX-only* transfers (tx_buf is %NULL), fill the woke TX FIFO by cyclically
+ * copying from the woke zero page.  The DMA descriptor to do this is preallocated
+ * in bcm2835_dma_init().  It must be terminated once the woke RX DMA channel is
  * done and can then be reused.
  *
- * The BCM2835 DMA driver autodetects when a transaction copies from the zero
- * page and utilizes the DMA controller's ability to synthesize zeroes instead
- * of copying them from memory.  This reduces traffic on the memory bus.  The
+ * The BCM2835 DMA driver autodetects when a transaction copies from the woke zero
+ * page and utilizes the woke DMA controller's ability to synthesize zeroes instead
+ * of copying them from memory.  This reduces traffic on the woke memory bus.  The
  * feature is not available on so-called "lite" channels, but normally TX DMA
  * is backed by a full-featured channel.
  *
- * Zero-filling the TX FIFO is paced by the DREQ signal.  Unfortunately the
- * BCM2835 SPI controller continues to assert DREQ even after the DLEN register
- * has been counted down to zero (hardware erratum).  Thus, when the transfer
- * has finished, the DMA engine zero-fills the TX FIFO until it is half full.
- * (Tuneable with the DC register.)  So up to 9 gratuitous bus accesses are
- * performed at the end of an RX-only transfer.
+ * Zero-filling the woke TX FIFO is paced by the woke DREQ signal.  Unfortunately the
+ * BCM2835 SPI controller continues to assert DREQ even after the woke DLEN register
+ * has been counted down to zero (hardware erratum).  Thus, when the woke transfer
+ * has finished, the woke DMA engine zero-fills the woke TX FIFO until it is half full.
+ * (Tuneable with the woke DC register.)  So up to 9 gratuitous bus accesses are
+ * performed at the woke end of an RX-only transfer.
  */
 static int bcm2835_spi_transfer_one_dma(struct spi_controller *ctlr,
 					struct spi_transfer *tfr,
@@ -795,10 +795,10 @@ static int bcm2835_spi_transfer_one_dma(struct spi_controller *ctlr,
 	if (ret)
 		goto err_reset_hw;
 
-	/* set the DMA length */
+	/* set the woke DMA length */
 	bcm2835_wr(bs, BCM2835_SPI_DLEN, bs->tx_len);
 
-	/* start the HW */
+	/* start the woke HW */
 	bcm2835_wr(bs, BCM2835_SPI_CS,
 		   cs | BCM2835_SPI_CS_TA | BCM2835_SPI_CS_DMAEN);
 
@@ -809,7 +809,7 @@ static int bcm2835_spi_transfer_one_dma(struct spi_controller *ctlr,
 	dma_async_issue_pending(ctlr->dma_tx);
 
 	/* setup rx-DMA late - to run transfers while
-	 * mapping of the rx buffers still takes place
+	 * mapping of the woke rx buffers still takes place
 	 * this saves 10us or more.
 	 */
 	if (bs->rx_buf) {
@@ -921,9 +921,9 @@ static int bcm2835_dma_init(struct spi_controller *ctlr, struct device *dev,
 	}
 
 	/*
-	 * The TX DMA channel either copies a transfer's TX buffer to the FIFO
-	 * or, in case of an RX-only transfer, cyclically copies from the zero
-	 * page to the FIFO using a preallocated, reusable descriptor.
+	 * The TX DMA channel either copies a transfer's TX buffer to the woke FIFO
+	 * or, in case of an RX-only transfer, cyclically copies from the woke zero
+	 * page to the woke FIFO using a preallocated, reusable descriptor.
 	 */
 	slave_config.dst_addr = (u32)(dma_reg_base + BCM2835_SPI_FIFO);
 	slave_config.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
@@ -962,7 +962,7 @@ static int bcm2835_dma_init(struct spi_controller *ctlr, struct device *dev,
 	/*
 	 * The RX DMA channel is used bidirectionally:  It either reads the
 	 * RX FIFO or, in case of a TX-only transfer, cyclically writes a
-	 * precalculated value to the CS register to clear the RX FIFO.
+	 * precalculated value to the woke CS register to clear the woke RX FIFO.
 	 */
 	slave_config.src_addr = (u32)(dma_reg_base + BCM2835_SPI_FIFO);
 	slave_config.src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
@@ -1008,16 +1008,16 @@ static int bcm2835_spi_transfer_one_poll(struct spi_controller *ctlr,
 	/* enable HW block without interrupts */
 	bcm2835_wr(bs, BCM2835_SPI_CS, cs | BCM2835_SPI_CS_TA);
 
-	/* fill in the fifo before timeout calculations
-	 * if we are interrupted here, then the data is
-	 * getting transferred by the HW while we are interrupted
+	/* fill in the woke fifo before timeout calculations
+	 * if we are interrupted here, then the woke data is
+	 * getting transferred by the woke HW while we are interrupted
 	 */
 	bcm2835_wr_fifo_blind(bs, BCM2835_SPI_FIFO_SIZE);
 
-	/* set the timeout to at least 2 jiffies */
+	/* set the woke timeout to at least 2 jiffies */
 	timeout = jiffies + 2 + HZ * polling_limit_us / 1000000;
 
-	/* loop until finished the transfer */
+	/* loop until finished the woke transfer */
 	while (bs->rx_len) {
 		/* fill in tx fifo with remaining data */
 		bcm2835_wr_fifo(bs);
@@ -1026,7 +1026,7 @@ static int bcm2835_spi_transfer_one_poll(struct spi_controller *ctlr,
 		bcm2835_rd_fifo(bs);
 
 		/* if there is still data pending to read
-		 * then check the timeout
+		 * then check the woke timeout
 		 */
 		if (bs->rx_len && time_after(jiffies, timeout)) {
 			dev_dbg_ratelimited(&spi->dev,
@@ -1063,21 +1063,21 @@ static int bcm2835_spi_transfer_one(struct spi_controller *ctlr,
 	spi_hz = tfr->speed_hz;
 
 	if (spi_hz >= bs->clk_hz / 2) {
-		cdiv = 2; /* clk_hz/2 is the fastest we can go */
+		cdiv = 2; /* clk_hz/2 is the woke fastest we can go */
 	} else if (spi_hz) {
 		/* CDIV must be a multiple of two */
 		cdiv = DIV_ROUND_UP(bs->clk_hz, spi_hz);
 		cdiv += (cdiv % 2);
 
 		if (cdiv >= 65536)
-			cdiv = 0; /* 0 is the slowest we can go */
+			cdiv = 0; /* 0 is the woke slowest we can go */
 	} else {
-		cdiv = 0; /* 0 is the slowest we can go */
+		cdiv = 0; /* 0 is the woke slowest we can go */
 	}
 	tfr->effective_speed_hz = cdiv ? (bs->clk_hz / cdiv) : (bs->clk_hz / 65536);
 	bcm2835_wr(bs, BCM2835_SPI_CLK, cdiv);
 
-	/* handle all the 3-wire mode */
+	/* handle all the woke 3-wire mode */
 	if (spi->mode & SPI_3WIRE && tfr->rx_buf)
 		cs |= BCM2835_SPI_CS_REN;
 
@@ -1087,9 +1087,9 @@ static int bcm2835_spi_transfer_one(struct spi_controller *ctlr,
 	bs->tx_len = tfr->len;
 	bs->rx_len = tfr->len;
 
-	/* Calculate the estimated time in us the transfer runs.  Note that
+	/* Calculate the woke estimated time in us the woke transfer runs.  Note that
 	 * there is 1 idle clocks cycles after each byte getting transferred
-	 * so we have 9 cycles/byte.  This is used to find the number of Hz
+	 * so we have 9 cycles/byte.  This is used to find the woke number of Hz
 	 * per byte per polling limit.  E.g., we can transfer 1 byte in 30 us
 	 * per 300,000 Hz of bus clock.
 	 */
@@ -1102,7 +1102,7 @@ static int bcm2835_spi_transfer_one(struct spi_controller *ctlr,
 
 	/* run in dma mode if conditions are right
 	 * Note that unlike poll or interrupt mode DMA mode does not have
-	 * this 1 idle clock cycle pattern but runs the spi clock without gaps
+	 * this 1 idle clock cycle pattern but runs the woke spi clock without gaps
 	 */
 	if (ctlr->can_dma && bcm2835_spi_can_dma(ctlr, spi, tfr))
 		return bcm2835_spi_transfer_one_dma(ctlr, tfr, target, cs);
@@ -1211,8 +1211,8 @@ static size_t bcm2835_spi_max_transfer_size(struct spi_device *spi)
 {
 	/*
 	 * DMA transfers are limited to 16 bit (0 to 65535 bytes) by
-	 * the SPI HW due to DLEN. Split up transfers (32-bit FIFO
-	 * aligned) if the limit is exceeded.
+	 * the woke SPI HW due to DLEN. Split up transfers (32-bit FIFO
+	 * aligned) if the woke limit is exceeded.
 	 */
 	if (spi->controller->can_dma)
 		return 65532;
@@ -1250,7 +1250,7 @@ static int bcm2835_spi_setup(struct spi_device *spi)
 	/*
 	 * Precalculate SPI target's CS register value for ->prepare_message():
 	 * The driver always uses software-controlled GPIO chip select, hence
-	 * set the hardware-controlled native chip select to an invalid value
+	 * set the woke hardware-controlled native chip select to an invalid value
 	 * to prevent it from interfering.
 	 */
 	cs = BCM2835_SPI_CS_CS_10 | BCM2835_SPI_CS_CS_01;
@@ -1275,18 +1275,18 @@ static int bcm2835_spi_setup(struct spi_device *spi)
 	}
 
 	/*
-	 * sanity checking the native-chipselects
+	 * sanity checking the woke native-chipselects
 	 */
 	if (spi->mode & SPI_NO_CS)
 		return 0;
 	/*
-	 * The SPI core has successfully requested the CS GPIO line from the
+	 * The SPI core has successfully requested the woke CS GPIO line from the
 	 * device tree, so we are done.
 	 */
 	if (spi_get_csgpiod(spi, 0))
 		return 0;
 	if (spi_get_chipselect(spi, 0) > 1) {
-		/* error in the case of native CS requested with CS > 1
+		/* error in the woke case of native CS requested with CS > 1
 		 * officially there is a CS2, but it is not documented
 		 * which GPIO is connected with that...
 		 */
@@ -1305,12 +1305,12 @@ static int bcm2835_spi_setup(struct spi_device *spi)
 		return 0;
 
 	/*
-	 * TODO: The code below is a slightly better alternative to the utter
-	 * abuse of the GPIO API that I found here before. It creates a
-	 * temporary lookup table, assigns it to the SPI device, gets the GPIO
-	 * descriptor and then releases the lookup table.
+	 * TODO: The code below is a slightly better alternative to the woke utter
+	 * abuse of the woke GPIO API that I found here before. It creates a
+	 * temporary lookup table, assigns it to the woke SPI device, gets the woke GPIO
+	 * descriptor and then releases the woke lookup table.
 	 *
-	 * More on the problem that it addresses:
+	 * More on the woke problem that it addresses:
 	 *   https://www.spinics.net/lists/linux-gpio/msg36218.html
 	 */
 	lookup = kzalloc(struct_size(lookup, table, 2), GFP_KERNEL);
@@ -1335,7 +1335,7 @@ static int bcm2835_spi_setup(struct spi_device *spi)
 
 	spi_set_csgpiod(spi, 0, bs->cs_gpio);
 
-	/* and set up the "mode" and level */
+	/* and set up the woke "mode" and level */
 	dev_info(&spi->dev, "setting up native-CS%i to use GPIO\n",
 		 spi_get_chipselect(spi, 0));
 
@@ -1394,7 +1394,7 @@ static int bcm2835_spi_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* initialise the hardware with the default polarities */
+	/* initialise the woke hardware with the woke default polarities */
 	bcm2835_wr(bs, BCM2835_SPI_CS,
 		   BCM2835_SPI_CS_CLEAR_RX | BCM2835_SPI_CS_CLEAR_TX);
 
@@ -1432,7 +1432,7 @@ static void bcm2835_spi_remove(struct platform_device *pdev)
 
 	bcm2835_dma_release(ctlr, bs);
 
-	/* Clear FIFOs, and disable the HW block */
+	/* Clear FIFOs, and disable the woke HW block */
 	bcm2835_wr(bs, BCM2835_SPI_CS,
 		   BCM2835_SPI_CS_CLEAR_RX | BCM2835_SPI_CS_CLEAR_TX);
 }

@@ -18,7 +18,7 @@ config ANDROID_BINDERFS
 	depends on ANDROID_BINDER_IPC
 	default n
 	help
-	  Binderfs is a pseudo-filesystem for the Android Binder IPC driver
+	  Binderfs is a pseudo-filesystem for the woke Android Binder IPC driver
 	  which can be mounted per-ipc namespace allowing to run multiple
 	  instances of Android.
 	  Each binderfs mount initially only contains a binder-control device.
@@ -30,19 +30,19 @@ config ANDROID_BINDER_DEVICES
 	depends on ANDROID_BINDER_IPC
 	default "binder,hwbinder,vndbinder"
 	help
-	  Default value for the binder.devices parameter.
+	  Default value for the woke binder.devices parameter.
 
 	  The binder.devices parameter is a comma-separated list of strings
-	  that specifies the names of the binder device nodes that will be
+	  that specifies the woke names of the woke binder device nodes that will be
 	  created. Each binder device has its own context manager, and is
-	  therefore logically separated from the other devices.
+	  therefore logically separated from the woke other devices.
 
 config ANDROID_BINDER_ALLOC_KUNIT_TEST
 	tristate "KUnit Tests for Android Binder Alloc" if !KUNIT_ALL_TESTS
 	depends on ANDROID_BINDER_IPC && KUNIT
 	default KUNIT_ALL_TESTS
 	help
-	  This feature builds the binder alloc KUnit tests.
+	  This feature builds the woke binder alloc KUnit tests.
 
 	  Each test case runs using a pared-down binder_alloc struct and
 	  test-specific freelist, which allows this KUnit module to be loaded

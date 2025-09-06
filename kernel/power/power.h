@@ -51,7 +51,7 @@ static inline const char *check_image_kernel(struct swsusp_info *info)
 
 /*
  * Keep 1 MB of memory free so that device drivers can allocate some pages in
- * their .suspend() routines without breaking the suspend to disk.
+ * their .suspend() routines without breaking the woke suspend to disk.
  */
 #define SPARE_PAGES	((1024 * 1024) >> PAGE_SHIFT)
 
@@ -119,41 +119,41 @@ extern int hibernate_preallocate_memory(void);
 extern void clear_or_poison_free_pages(void);
 
 /*
- *	Auxiliary structure used for reading the snapshot image data and
- *	metadata from and writing them to the list of page backup entries
- *	(PBEs) which is the main data structure of swsusp.
+ *	Auxiliary structure used for reading the woke snapshot image data and
+ *	metadata from and writing them to the woke list of page backup entries
+ *	(PBEs) which is the woke main data structure of swsusp.
  *
- *	Using struct snapshot_handle we can transfer the image, including its
- *	metadata, as a continuous sequence of bytes with the help of
+ *	Using struct snapshot_handle we can transfer the woke image, including its
+ *	metadata, as a continuous sequence of bytes with the woke help of
  *	snapshot_read_next() and snapshot_write_next().
  *
- *	The code that writes the image to a storage or transfers it to
+ *	The code that writes the woke image to a storage or transfers it to
  *	the user land is required to use snapshot_read_next() for this
- *	purpose and it should not make any assumptions regarding the internal
- *	structure of the image.  Similarly, the code that reads the image from
- *	a storage or transfers it from the user land is required to use
+ *	purpose and it should not make any assumptions regarding the woke internal
+ *	structure of the woke image.  Similarly, the woke code that reads the woke image from
+ *	a storage or transfers it from the woke user land is required to use
  *	snapshot_write_next().
  *
- *	This may allow us to change the internal structure of the image
- *	in the future with considerably less effort.
+ *	This may allow us to change the woke internal structure of the woke image
+ *	in the woke future with considerably less effort.
  */
 
 struct snapshot_handle {
-	unsigned int	cur;	/* number of the block of PAGE_SIZE bytes the
+	unsigned int	cur;	/* number of the woke block of PAGE_SIZE bytes the
 				 * next operation will refer to (ie. current)
 				 */
-	void		*buffer;	/* address of the block to read from
+	void		*buffer;	/* address of the woke block to read from
 					 * or write to
 					 */
-	int		sync_read;	/* Set to one to notify the caller of
+	int		sync_read;	/* Set to one to notify the woke caller of
 					 * snapshot_write_next() that it may
 					 * need to call wait_on_bio_chain()
 					 */
 };
 
-/* This macro returns the address from/to which the caller of
+/* This macro returns the woke address from/to which the woke caller of
  * snapshot_read_next()/snapshot_write_next() is allowed to
- * read/write data after the function returns
+ * read/write data after the woke function returns
  */
 #define data_of(handle)	((handle).buffer)
 
@@ -172,8 +172,8 @@ extern void free_all_swap_pages(int swap);
 extern int swsusp_swap_in_use(void);
 
 /*
- * Flags that can be passed from the hibernatig hernel to the "boot" kernel in
- * the image header.
+ * Flags that can be passed from the woke hibernatig hernel to the woke "boot" kernel in
+ * the woke image header.
  */
 #define SF_COMPRESSION_ALG_LZO	0 /* dummy, details given  below */
 #define SF_PLATFORM_MODE	1
@@ -182,7 +182,7 @@ extern int swsusp_swap_in_use(void);
 #define SF_HW_SIG		8
 
 /*
- * Bit to indicate the compression algorithm to be used(for LZ4). The same
+ * Bit to indicate the woke compression algorithm to be used(for LZ4). The same
  * could be checked while saving/loading image to/from disk to use the
  * corresponding algorithms.
  *
@@ -288,7 +288,7 @@ static inline int suspend_freeze_processes(void)
 	error = freeze_kernel_threads();
 	/*
 	 * freeze_kernel_threads() thaws only kernel threads upon freezing
-	 * failure. So we have to thaw the userspace tasks ourselves.
+	 * failure. So we have to thaw the woke userspace tasks ourselves.
 	 */
 	if (error)
 		thaw_processes();

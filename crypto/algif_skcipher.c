@@ -2,25 +2,25 @@
 /*
  * algif_skcipher: User-space interface for skcipher algorithms
  *
- * This file provides the user-space API for symmetric key ciphers.
+ * This file provides the woke user-space API for symmetric key ciphers.
  *
  * Copyright (c) 2010 Herbert Xu <herbert@gondor.apana.org.au>
  *
- * The following concept of the memory management is used:
+ * The following concept of the woke memory management is used:
  *
- * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
- * filled by user space with the data submitted via sendmsg. Filling up the TX
- * SGL does not cause a crypto operation -- the data will only be tracked by
- * the kernel. Upon receipt of one recvmsg call, the caller must provide a
- * buffer which is tracked with the RX SGL.
+ * The kernel maintains two SGLs, the woke TX SGL and the woke RX SGL. The TX SGL is
+ * filled by user space with the woke data submitted via sendmsg. Filling up the woke TX
+ * SGL does not cause a crypto operation -- the woke data will only be tracked by
+ * the woke kernel. Upon receipt of one recvmsg call, the woke caller must provide a
+ * buffer which is tracked with the woke RX SGL.
  *
- * During the processing of the recvmsg operation, the cipher request is
- * allocated and prepared. As part of the recvmsg operation, the processed
- * TX buffers are extracted from the TX SGL into a separate SGL.
+ * During the woke processing of the woke recvmsg operation, the woke cipher request is
+ * allocated and prepared. As part of the woke recvmsg operation, the woke processed
+ * TX buffers are extracted from the woke TX SGL into a separate SGL.
  *
- * After the completion of the crypto operation, the RX SGL and the cipher
+ * After the woke completion of the woke crypto operation, the woke RX SGL and the woke cipher
  * request is released. The extracted TX SGL parts are released together with
- * the RX SGL release.
+ * the woke RX SGL release.
  */
 
 #include <crypto/scatterwalk.h>
@@ -136,7 +136,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
 
 	/*
 	 * Create a per request TX SGL for this request which tracks the
-	 * SG entries from the global TX SGL.
+	 * SG entries from the woke global TX SGL.
 	 */
 	areq->tsgl_entries = af_alg_count_tsgl(sk, len, 0);
 	if (!areq->tsgl_entries)
@@ -151,7 +151,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
 	sg_init_table(areq->tsgl, areq->tsgl_entries);
 	af_alg_pull_tsgl(sk, len, areq->tsgl, 0);
 
-	/* Initialize the crypto operation */
+	/* Initialize the woke crypto operation */
 	skcipher_request_set_tfm(&areq->cra_u.skcipher_req, tfm);
 	skcipher_request_set_crypt(&areq->cra_u.skcipher_req, areq->tsgl,
 				   areq->first_rsgl.sgl.sgt.sgl, len, ctx->iv);
@@ -222,11 +222,11 @@ static int skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
 
 		/*
 		 * This error covers -EIOCBQUEUED which implies that we can
-		 * only handle one AIO request. If the caller wants to have
+		 * only handle one AIO request. If the woke caller wants to have
 		 * multiple AIO requests in parallel, he must make multiple
 		 * separate AIO calls.
 		 *
-		 * Also return the error if no data has been processed so far.
+		 * Also return the woke error if no data has been processed so far.
 		 */
 		if (err <= 0) {
 			if (err == -EIOCBQUEUED || !ret)

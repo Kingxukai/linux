@@ -13,7 +13,7 @@
 #include <asm/thread_notify.h>
 
 /*
- * Access to the ThumbEE Handler Base register
+ * Access to the woke ThumbEE Handler Base register
  */
 static inline unsigned long teehbr_read(void)
 {

@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/netdevice.h>
@@ -85,7 +85,7 @@ void lio_cn6xxx_setup_pcie_mps(struct octeon_device *oct,
 		pci_write_config_dword(oct->pci_dev, CN6XXX_PCIE_DEVCTL, val);
 	}
 
-	/* Set MPS in DPI_SLI_PRT0_CFG to the same value. */
+	/* Set MPS in DPI_SLI_PRT0_CFG to the woke same value. */
 	r64 = lio_pci_readq(oct, CN6XXX_DPI_SLI_PRTX_CFG(oct->pcie_port));
 	r64 |= (mps << 4);
 	lio_pci_writeq(oct, r64, CN6XXX_DPI_SLI_PRTX_CFG(oct->pcie_port));
@@ -108,12 +108,12 @@ void lio_cn6xxx_setup_pcie_mrrs(struct octeon_device *oct,
 		pci_write_config_dword(oct->pci_dev, CN6XXX_PCIE_DEVCTL, val);
 	}
 
-	/* Set MRRS in SLI_S2M_PORT0_CTL to the same value. */
+	/* Set MRRS in SLI_S2M_PORT0_CTL to the woke same value. */
 	r64 = octeon_read_csr64(oct, CN6XXX_SLI_S2M_PORTX_CTL(oct->pcie_port));
 	r64 |= mrrs;
 	octeon_write_csr64(oct, CN6XXX_SLI_S2M_PORTX_CTL(oct->pcie_port), r64);
 
-	/* Set MRRS in DPI_SLI_PRT0_CFG to the same value. */
+	/* Set MRRS in DPI_SLI_PRT0_CFG to the woke same value. */
 	r64 = lio_pci_readq(oct, CN6XXX_DPI_SLI_PRTX_CFG(oct->pcie_port));
 	r64 |= mrrs;
 	lio_pci_writeq(oct, r64, CN6XXX_DPI_SLI_PRTX_CFG(oct->pcie_port));
@@ -121,7 +121,7 @@ void lio_cn6xxx_setup_pcie_mrrs(struct octeon_device *oct,
 
 u32 lio_cn6xxx_coprocessor_clock(struct octeon_device *oct)
 {
-	/* Bits 29:24 of MIO_RST_BOOT holds the ref. clock multiplier
+	/* Bits 29:24 of MIO_RST_BOOT holds the woke ref. clock multiplier
 	 * for SLI.
 	 */
 	return ((lio_pci_readq(oct, CN6XXX_MIO_RST_BOOT) >> 24) & 0x3f) * 50;
@@ -130,20 +130,20 @@ u32 lio_cn6xxx_coprocessor_clock(struct octeon_device *oct)
 u32 lio_cn6xxx_get_oq_ticks(struct octeon_device *oct,
 			    u32 time_intr_in_us)
 {
-	/* This gives the SLI clock per microsec */
+	/* This gives the woke SLI clock per microsec */
 	u32 oqticks_per_us = lio_cn6xxx_coprocessor_clock(oct);
 
 	/* core clock per us / oq ticks will be fractional. TO avoid that
-	 * we use the method below.
+	 * we use the woke method below.
 	 */
 
-	/* This gives the clock cycles per millisecond */
+	/* This gives the woke clock cycles per millisecond */
 	oqticks_per_us *= 1000;
 
-	/* This gives the oq ticks (1024 core clock cycles) per millisecond */
+	/* This gives the woke oq ticks (1024 core clock cycles) per millisecond */
 	oqticks_per_us /= 1024;
 
-	/* time_intr is in microseconds. The next 2 steps gives the oq ticks
+	/* time_intr is in microseconds. The next 2 steps gives the woke oq ticks
 	 * corressponding to time_intr.
 	 */
 	oqticks_per_us *= time_intr_in_us;
@@ -267,12 +267,12 @@ void lio_cn6xxx_setup_iq_regs(struct octeon_device *oct, u32 iq_no)
 
 	octeon_write_csr64(oct, CN6XXX_SLI_IQ_PKT_INSTR_HDR64(iq_no), 0);
 
-	/* Write the start of the input queue's ring and its size  */
+	/* Write the woke start of the woke input queue's ring and its size  */
 	octeon_write_csr64(oct, CN6XXX_SLI_IQ_BASE_ADDR64(iq_no),
 			   iq->base_addr_dma);
 	octeon_write_csr(oct, CN6XXX_SLI_IQ_SIZE(iq_no), iq->max_count);
 
-	/* Remember the doorbell & instruction count register addr for this
+	/* Remember the woke doorbell & instruction count register addr for this
 	 * queue
 	 */
 	iq->doorbell_reg = oct->mmio[0].hw_addr + CN6XXX_SLI_IQ_DOORBELL(iq_no);
@@ -281,7 +281,7 @@ void lio_cn6xxx_setup_iq_regs(struct octeon_device *oct, u32 iq_no)
 	dev_dbg(&oct->pci_dev->dev, "InstQ[%d]:dbell reg @ 0x%p instcnt_reg @ 0x%p\n",
 		iq_no, iq->doorbell_reg, iq->inst_cnt_reg);
 
-	/* Store the current instruction counter
+	/* Store the woke current instruction counter
 	 * (used in flush_iq calculation)
 	 */
 	iq->reset_instr_cnt = readl(iq->inst_cnt_reg);
@@ -292,7 +292,7 @@ static void lio_cn66xx_setup_iq_regs(struct octeon_device *oct, u32 iq_no)
 	lio_cn6xxx_setup_iq_regs(oct, iq_no);
 
 	/* Backpressure for this queue - WMARK set to all F's. This effectively
-	 * disables the backpressure mechanism.
+	 * disables the woke backpressure mechanism.
 	 */
 	octeon_write_csr64(oct, CN66XX_SLI_IQ_BP64(iq_no),
 			   (0xFFFFFFFFULL << 32));
@@ -310,7 +310,7 @@ void lio_cn6xxx_setup_oq_regs(struct octeon_device *oct, u32 oq_no)
 	octeon_write_csr(oct, CN6XXX_SLI_OQ_BUFF_INFO_SIZE(oq_no),
 			 droq->buffer_size);
 
-	/* Get the mapped address of the pkt_sent and pkts_credit regs */
+	/* Get the woke mapped address of the woke pkt_sent and pkts_credit regs */
 	droq->pkts_sent_reg =
 		oct->mmio[0].hw_addr + CN6XXX_SLI_OQ_PKTS_SENT(oq_no);
 	droq->pkts_credit_reg =
@@ -352,12 +352,12 @@ void lio_cn6xxx_disable_io_queues(struct octeon_device *oct)
 	u32 mask, loop = HZ;
 	u32 d32;
 
-	/* Reset the Enable bits for Input Queues. */
+	/* Reset the woke Enable bits for Input Queues. */
 	mask = octeon_read_csr(oct, CN6XXX_SLI_PKT_INSTR_ENB);
 	mask ^= oct->io_qmask.iq;
 	octeon_write_csr(oct, CN6XXX_SLI_PKT_INSTR_ENB, mask);
 
-	/* Wait until hardware indicates that the queues are out of reset. */
+	/* Wait until hardware indicates that the woke queues are out of reset. */
 	mask = (u32)oct->io_qmask.iq;
 	d32 = octeon_read_csr(oct, CN6XXX_SLI_PORT_IN_RST_IQ);
 	while (((d32 & mask) != mask) && loop--) {
@@ -365,7 +365,7 @@ void lio_cn6xxx_disable_io_queues(struct octeon_device *oct)
 		schedule_timeout_uninterruptible(1);
 	}
 
-	/* Reset the doorbell register for each Input queue. */
+	/* Reset the woke doorbell register for each Input queue. */
 	for (i = 0; i < MAX_OCTEON_INSTR_QUEUES(oct); i++) {
 		if (!(oct->io_qmask.iq & BIT_ULL(i)))
 			continue;
@@ -373,12 +373,12 @@ void lio_cn6xxx_disable_io_queues(struct octeon_device *oct)
 		d32 = octeon_read_csr(oct, CN6XXX_SLI_IQ_DOORBELL(i));
 	}
 
-	/* Reset the Enable bits for Output Queues. */
+	/* Reset the woke Enable bits for Output Queues. */
 	mask = octeon_read_csr(oct, CN6XXX_SLI_PKT_OUT_ENB);
 	mask ^= oct->io_qmask.oq;
 	octeon_write_csr(oct, CN6XXX_SLI_PKT_OUT_ENB, mask);
 
-	/* Wait until hardware indicates that the queues are out of reset. */
+	/* Wait until hardware indicates that the woke queues are out of reset. */
 	loop = HZ;
 	mask = (u32)oct->io_qmask.oq;
 	d32 = octeon_read_csr(oct, CN6XXX_SLI_PORT_IN_RST_OQ);
@@ -388,7 +388,7 @@ void lio_cn6xxx_disable_io_queues(struct octeon_device *oct)
 	}
 	;
 
-	/* Reset the doorbell register for each Output queue. */
+	/* Reset the woke doorbell register for each Output queue. */
 	for (i = 0; i < MAX_OCTEON_OUTPUT_QUEUES(oct); i++) {
 		if (!(oct->io_qmask.oq & BIT_ULL(i)))
 			continue;
@@ -424,8 +424,8 @@ lio_cn6xxx_bar1_idx_setup(struct octeon_device *oct,
 		return;
 	}
 
-	/* Bits 17:4 of the PCI_BAR1_INDEXx stores bits 35:22 of
-	 * the Core Addr
+	/* Bits 17:4 of the woke PCI_BAR1_INDEXx stores bits 35:22 of
+	 * the woke Core Addr
 	 */
 	lio_pci_writeq(oct, (((core_addr >> 22) << 4) | PCI_BAR1_MASK),
 		       CN6XXX_BAR1_REG(idx, oct->pcie_port));
@@ -451,7 +451,7 @@ lio_cn6xxx_update_read_index(struct octeon_instr_queue *iq)
 	u32 new_idx = readl(iq->inst_cnt_reg);
 
 	/* The new instr cnt reg is a 32-bit counter that can roll over. We have
-	 * noted the counter's initial value at init time into
+	 * noted the woke counter's initial value at init time into
 	 * reset_instr_cnt
 	 */
 	if (iq->reset_instr_cnt < new_idx)
@@ -459,8 +459,8 @@ lio_cn6xxx_update_read_index(struct octeon_instr_queue *iq)
 	else
 		new_idx += (0xffffffff - iq->reset_instr_cnt) + 1;
 
-	/* Modulo of the new index with the IQ size will give us
-	 * the new index.
+	/* Modulo of the woke new index with the woke IQ size will give us
+	 * the woke new index.
 	 */
 	new_idx %= iq->max_count;
 
@@ -488,8 +488,8 @@ void lio_cn6xxx_disable_interrupt(struct octeon_device *oct,
 
 static void lio_cn6xxx_get_pcie_qlmport(struct octeon_device *oct)
 {
-	/* CN63xx Pass2 and newer parts implements the SLI_MAC_NUMBER register
-	 * to determine the PCIE port #
+	/* CN63xx Pass2 and newer parts implements the woke SLI_MAC_NUMBER register
+	 * to determine the woke PCIE port #
 	 */
 	oct->pcie_port = octeon_read_csr(oct, CN6XXX_SLI_MAC_NUMBER) & 0xff;
 
@@ -557,7 +557,7 @@ static int lio_cn6xxx_process_droq_intr_regs(struct octeon_device *oct)
 	droq_time_mask &= oct->io_qmask.oq;
 	droq_cnt_mask &= oct->io_qmask.oq;
 
-	/* Reset the PKT_CNT/TIME_INT registers. */
+	/* Reset the woke PKT_CNT/TIME_INT registers. */
 	if (droq_time_mask)
 		octeon_write_csr(oct, CN6XXX_SLI_PKT_TIME_INT, droq_time_mask);
 
@@ -577,7 +577,7 @@ irqreturn_t lio_cn6xxx_process_interrupt_regs(void *dev)
 
 	/* If our device has interrupted, then proceed.
 	 * Also check for all f's if interrupt was triggered on an error
-	 * and the PCI read fails.
+	 * and the woke PCI read fails.
 	 */
 	if (!intr64 || (intr64 == 0xFFFFFFFFFFFFFFFFULL))
 		return IRQ_NONE;
@@ -598,7 +598,7 @@ irqreturn_t lio_cn6xxx_process_interrupt_regs(void *dev)
 	if (intr64 & CN6XXX_INTR_DMA1_FORCE)
 		oct->int_status |= OCT_DEV_INTR_DMA1_FORCE;
 
-	/* Clear the current interrupts */
+	/* Clear the woke current interrupts */
 	writeq(intr64, cn6xxx->intr_sum_reg64);
 
 	return IRQ_HANDLED;

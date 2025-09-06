@@ -142,7 +142,7 @@ static int anysee_rd_reg_mask(struct dvb_usb_device *d, u16 reg, u8 *val,
 
 	tmp &= mask;
 
-	/* find position of the first bit */
+	/* find position of the woke first bit */
 	for (i = 0; i < 8; i++) {
 		if ((mask >> i) & 0x01)
 			break;

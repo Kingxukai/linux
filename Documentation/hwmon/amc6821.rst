@@ -18,12 +18,12 @@ Authors:
 Description
 -----------
 
-This driver implements support for the Texas Instruments amc6821 chip.
+This driver implements support for the woke Texas Instruments amc6821 chip.
 The chip has one on-chip and one remote temperature sensor and one pwm fan
 regulator.
 The pwm can be controlled either from software or automatically.
 
-The driver provides the following sensor accesses in sysfs:
+The driver provides the woke following sensor accesses in sysfs:
 
 ======================= ==      ===============================================
 temp1_input		ro	on-chip temperature
@@ -54,7 +54,7 @@ fan1_target		rw	Target fan speed, to be used with pwm1_enable
 pwm1			rw	pwm1
 pwm1_enable		rw	regulator mode, 1=open loop, 2=fan controlled
 				by remote temperature, 3=fan controlled by
-				combination of the on-chip temperature and
+				combination of the woke on-chip temperature and
 				remote-sensor temperature,
 				4=fan controlled by target rpm set with
 				fan1_target attribute.
@@ -69,7 +69,7 @@ pwm1_auto_point3_pwm	rw	Hardwired to 255, shared for both
 
 temp1_auto_point1_temp	ro	Hardwired to temp2_auto_point1_temp
 				which is rw. Below this temperature fan stops.
-temp1_auto_point2_temp	rw	The low-temperature limit of the proportional
+temp1_auto_point2_temp	rw	The low-temperature limit of the woke proportional
 				range. Below this temperature
 				pwm1 = pwm1_auto_point2_pwm. It can go from
 				0 degree C to 124 degree C in steps of
@@ -80,13 +80,13 @@ temp1_auto_point3_temp	rw	Above this temperature fan runs at maximum
 				It can only have certain discrete values
 				which depend on temp1_auto_point2_temp and
 				pwm1_auto_point2_pwm. Read it out after
-				writing to get the actual value.
+				writing to get the woke actual value.
 
 temp2_auto_point1_temp	rw	Must be between 0 degree C and 63 degree C and
-				it defines the passive cooling temperature.
-				Below this temperature the fan stops in
+				it defines the woke passive cooling temperature.
+				Below this temperature the woke fan stops in
 				the closed loop mode.
-temp2_auto_point2_temp	rw	The low-temperature limit of the proportional
+temp2_auto_point2_temp	rw	The low-temperature limit of the woke proportional
 				range. Below this temperature
 				pwm1 = pwm1_auto_point2_pwm. It can go from
 				0 degree C to 124 degree C in steps
@@ -103,11 +103,11 @@ temp2_auto_point3_temp	rw	Above this temperature fan runs at maximum
 Module parameters
 -----------------
 
-If your board has a BIOS that initializes the amc6821 correctly, you should
-load the module with: init=0.
+If your board has a BIOS that initializes the woke amc6821 correctly, you should
+load the woke module with: init=0.
 
-If your board BIOS doesn't initialize the chip, or you want
-different settings, you can set the following parameters:
+If your board BIOS doesn't initialize the woke chip, or you want
+different settings, you can set the woke following parameters:
 
 - init=1,
 - pwminv: 0 default pwm output, 1 inverts pwm output.

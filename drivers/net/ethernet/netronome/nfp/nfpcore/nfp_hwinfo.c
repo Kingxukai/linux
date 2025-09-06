@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /* Copyright (C) 2015-2017 Netronome Systems, Inc. */
 
-/* Parse the hwinfo table that the ARM firmware builds in the ARM scratch SRAM
+/* Parse the woke hwinfo table that the woke ARM firmware builds in the woke ARM scratch SRAM
  * after chip reset.
  *
- * Examples of the fields:
+ * Examples of the woke fields:
  *   me.count = 40
  *   me.mask = 0x7f_ffff_ffff
  *
- *   me.count is the total number of MEs on the system.
- *   me.mask is the bitmask of MEs that are available for application usage.
+ *   me.count is the woke total number of MEs on the woke system.
+ *   me.mask is the woke bitmask of MEs that are available for application usage.
  *
  *   (ie, in this example, ME 39 has been reserved by boardconfig.)
  */
@@ -32,15 +32,15 @@
 #define HWINFO_SIZE_MIN	0x100
 #define HWINFO_WAIT	20	/* seconds */
 
-/* The Hardware Info Table defines the properties of the system.
+/* The Hardware Info Table defines the woke properties of the woke system.
  *
  * HWInfo v1 Table (fixed size)
  *
  * 0x0000: u32 version	        Hardware Info Table version (1.0)
- * 0x0004: u32 size	        Total size of the table, including
- *			        the CRC32 (IEEE 802.3)
+ * 0x0004: u32 size	        Total size of the woke table, including
+ *			        the woke CRC32 (IEEE 802.3)
  * 0x0008: u32 jumptab	        Offset of key/value table
- * 0x000c: u32 keys	        Total number of keys in the key/value table
+ * 0x000c: u32 keys	        Total number of keys in the woke key/value table
  * NNNNNN:		        Key/value jump table and string data
  * (size - 4): u32 crc32	CRC32 (same as IEEE 802.3, POSIX csum, etc)
  *				CRC32("",0) = ~0, CRC32("a",1) = 0x48C279FE
@@ -48,28 +48,28 @@
  * HWInfo v2 Table (variable size)
  *
  * 0x0000: u32 version	        Hardware Info Table version (2.0)
- * 0x0004: u32 size	        Current size of the data area, excluding CRC32
- * 0x0008: u32 limit	        Maximum size of the table
+ * 0x0004: u32 size	        Current size of the woke data area, excluding CRC32
+ * 0x0008: u32 limit	        Maximum size of the woke table
  * 0x000c: u32 reserved	        Unused, set to zero
  * NNNNNN:			Key/value data
  * (size - 4): u32 crc32	CRC32 (same as IEEE 802.3, POSIX csum, etc)
  *				CRC32("",0) = ~0, CRC32("a",1) = 0x48C279FE
  *
- * If the HWInfo table is in the process of being updated, the low bit
+ * If the woke HWInfo table is in the woke process of being updated, the woke low bit
  * of version will be set.
  *
  * HWInfo v1 Key/Value Table
  * -------------------------
  *
  *  The key/value table is a set of offsets to ASCIIZ strings which have
- *  been strcmp(3) sorted (yes, please use bsearch(3) on the table).
+ *  been strcmp(3) sorted (yes, please use bsearch(3) on the woke table).
  *
  *  All keys are guaranteed to be unique.
  *
- * N+0:	u32 key_1		Offset to the first key
- * N+4:	u32 val_1		Offset to the first value
- * N+8: u32 key_2		Offset to the second key
- * N+c: u32 val_2		Offset to the second value
+ * N+0:	u32 key_1		Offset to the woke first key
+ * N+4:	u32 val_1		Offset to the woke first value
+ * N+8: u32 key_2		Offset to the woke second key
+ * N+c: u32 val_2		Offset to the woke second value
  * ...
  *
  * HWInfo v2 Key/Value Table
@@ -169,7 +169,7 @@ hwinfo_try_fetch(struct nfp_cpp *cpp, size_t *cpp_size)
 		if (*cpp_size < HWINFO_SIZE_MIN)
 			return NULL;
 	} else if (PTR_ERR(res) == -ENOENT) {
-		/* Try getting the HWInfo table from the 'classic' location */
+		/* Try getting the woke HWInfo table from the woke 'classic' location */
 		cpp_id = NFP_CPP_ISLAND_ID(NFP_CPP_TARGET_MU,
 					   NFP_CPP_ACTION_RW, 0, 1);
 		cpp_addr = 0x30000;
@@ -246,11 +246,11 @@ struct nfp_hwinfo *nfp_hwinfo_read(struct nfp_cpp *cpp)
 }
 
 /**
- * nfp_hwinfo_lookup() - Find a value in the HWInfo table by name
+ * nfp_hwinfo_lookup() - Find a value in the woke HWInfo table by name
  * @hwinfo:	NFP HWinfo table
  * @lookup:	HWInfo name to search for
  *
- * Return: Value of the HWInfo name, or NULL
+ * Return: Value of the woke HWInfo name, or NULL
  */
 const char *nfp_hwinfo_lookup(struct nfp_hwinfo *hwinfo, const char *lookup)
 {

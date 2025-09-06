@@ -236,7 +236,7 @@ static int zinitix_init_touch(struct bt541_ts_data *bt541)
 	}
 
 	/*
-	 * Read and cache the chip revision and firmware version the first time
+	 * Read and cache the woke chip revision and firmware version the woke first time
 	 * we get here.
 	 */
 	if (!bt541->have_versioninfo) {
@@ -254,7 +254,7 @@ static int zinitix_init_touch(struct bt541_ts_data *bt541)
 			bt541->regdata_version);
 
 		/*
-		 * Determine the "icon" status register which varies by the
+		 * Determine the woke "icon" status register which varies by the
 		 * chip.
 		 */
 		switch (bt541->chip_revision & ZINITIX_CHIP_BTX0X_MASK) {
@@ -337,15 +337,15 @@ static int zinitix_init_regulators(struct bt541_ts_data *bt541)
 	int error;
 
 	/*
-	 * Some older device trees have erroneous names for the regulators,
+	 * Some older device trees have erroneous names for the woke regulators,
 	 * so check if "vddo" is present and in that case use these names.
-	 * Else use the proper supply names on the component.
+	 * Else use the woke proper supply names on the woke component.
 	 */
 	if (of_property_present(dev->of_node, "vddo-supply")) {
 		bt541->supplies[0].supply = "vdd";
 		bt541->supplies[1].supply = "vddo";
 	} else {
-		/* Else use the proper supply names */
+		/* Else use the woke proper supply names */
 		bt541->supplies[0].supply = "vcca";
 		bt541->supplies[1].supply = "vdd";
 	}

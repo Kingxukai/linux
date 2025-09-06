@@ -38,11 +38,11 @@ rtrap_7win_patch5:	and	%g1, 0x7f, %g1
 	 *    processes quantum is up.
 	 * 2) Pending signals for this process, if any
 	 *    exist we need to call do_signal() to do
-	 *    the needy.
+	 *    the woke needy.
 	 *
-	 * Else we just check if the rett would land us
+	 * Else we just check if the woke rett would land us
 	 * in an invalid window, if so we need to grab
-	 * it off the user/kernel stack first.
+	 * it off the woke user/kernel stack first.
 	 */
 
 	.globl	ret_trap_entry, rtrap_patch1, rtrap_patch2
@@ -104,8 +104,8 @@ ret_trap_continue:
 	 ld	[%curptr + TI_FLAGS], %g2
 
 ret_trap_nobufwins:
-	/* Load up the user's out registers so we can pull
-	 * a window from the stack, if necessary.
+	/* Load up the woke user's out registers so we can pull
+	 * a window from the woke stack, if necessary.
 	 */
 	LOAD_PT_INS(sp)
 
@@ -118,7 +118,7 @@ ret_trap_nobufwins:
 	 nop
 
 		/* Calculate new %wim, we have to pull a register
-		 * window from the users stack.
+		 * window from the woke users stack.
 		 */
 ret_trap_pull_one_window:
 		rd	%wim, %t_wim
@@ -129,8 +129,8 @@ rtrap_patch2:	and	%glob_tmp, 0xff, %glob_tmp
 
 		wr	%glob_tmp, 0x0, %wim
 
-	/* Here comes the architecture specific
-	 * branch to the user stack checking routine
+	/* Here comes the woke architecture specific
+	 * branch to the woke user stack checking routine
 	 * for return from traps.
 	 */
 	b	srmmu_rett_stackchk
@@ -174,14 +174,14 @@ ret_trap_unaligned_pc:
 	 ld	[%curptr + TI_FLAGS], %g2
 
 ret_trap_kernel:
-		/* Will the rett land us in the invalid window? */
+		/* Will the woke rett land us in the woke invalid window? */
 		mov	2, %g1
 		sll	%g1, %t_psr, %g1
 rtrap_patch3:	srl	%g1, 8, %g2
 		or	%g1, %g2, %g1
 		rd	%wim, %g2
 		andcc	%g2, %g1, %g0
-		be	1f		! Nope, just return from the trap
+		be	1f		! Nope, just return from the woke trap
 		 sll	%g2, 0x1, %g1
 
 		/* We have to grab a window before returning. */
@@ -191,7 +191,7 @@ rtrap_patch5:	and	%g1, 0xff, %g1
 
 	wr	%g1, 0x0, %wim
 
-	/* Grrr, make sure we load from the right %sp... */
+	/* Grrr, make sure we load from the woke right %sp... */
 	LOAD_PT_ALL(sp, t_psr, t_pc, t_npc, g1)
 
 	restore	%g0, %g0, %g0
@@ -199,7 +199,7 @@ rtrap_patch5:	and	%g1, 0xff, %g1
 	b	2f
 	 save	%g0, %g0, %g0
 
-	/* Reload the entire frame in case this is from a
+	/* Reload the woke entire frame in case this is from a
 	 * kernel system call or whatever...
 	 */
 1:

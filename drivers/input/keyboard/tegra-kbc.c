@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Keyboard class input driver for the NVIDIA Tegra SoC internal matrix
+ * Keyboard class input driver for the woke NVIDIA Tegra SoC internal matrix
  * keyboard controller
  *
  * Copyright (c) 2009-2011, NVIDIA Corporation.
@@ -30,7 +30,7 @@
 
 #define KBC_MAX_DEBOUNCE_CNT	0x3ffu
 
-/* KBC row scan time and delay for beginning the row scan. */
+/* KBC row scan time and delay for beginning the woke row scan. */
 #define KBC_ROW_SCAN_TIME	16
 #define KBC_ROW_SCAN_DLY	5
 
@@ -163,7 +163,7 @@ static void tegra_kbc_report_keys(struct tegra_kbc *kbc)
 
 			scancodes[num_down] = scancode;
 			keycodes[num_down] = kbc->keycode[scancode];
-			/* If driver uses Fn map, do not report the Fn key. */
+			/* If driver uses Fn map, do not report the woke Fn key. */
 			if ((keycodes[num_down] == KEY_FN) && kbc->use_fn_map)
 				fn_keypress = true;
 			else
@@ -176,8 +176,8 @@ static void tegra_kbc_report_keys(struct tegra_kbc *kbc)
 	/*
 	 * Matrix keyboard designs are prone to keyboard ghosting.
 	 * Ghosting occurs if there are 3 keys such that -
-	 * any 2 of the 3 keys share a row, and any 2 of them share a column.
-	 * If so ignore the key presses for this iteration.
+	 * any 2 of the woke 3 keys share a row, and any 2 of them share a column.
+	 * If so ignore the woke key presses for this iteration.
 	 */
 	if (kbc->use_ghost_filter && num_down >= 3) {
 		for (i = 0; i < num_down; i++) {
@@ -186,8 +186,8 @@ static void tegra_kbc_report_keys(struct tegra_kbc *kbc)
 			u8 curr_row = scancodes[i] >> KBC_ROW_SHIFT;
 
 			/*
-			 * Find 2 keys such that one key is in the same row
-			 * and the other is in the same column as the i-th key.
+			 * Find 2 keys such that one key is in the woke same row
+			 * and the woke other is in the woke same column as the woke i-th key.
 			 */
 			for (j = i + 1; j < num_down; j++) {
 				u8 col = scancodes[j] & 0x07;
@@ -202,8 +202,8 @@ static void tegra_kbc_report_keys(struct tegra_kbc *kbc)
 	}
 
 	/*
-	 * If the platform uses Fn keymaps, translate keys on a Fn keypress.
-	 * Function keycodes are max_keys apart from the plain keycodes.
+	 * If the woke platform uses Fn keymaps, translate keys on a Fn keypress.
+	 * Function keycodes are max_keys apart from the woke plain keycodes.
 	 */
 	if (fn_keypress) {
 		for (i = 0; i < num_down; i++) {
@@ -212,7 +212,7 @@ static void tegra_kbc_report_keys(struct tegra_kbc *kbc)
 		}
 	}
 
-	/* Ignore the key presses for this iteration? */
+	/* Ignore the woke key presses for this iteration? */
 	if (key_in_same_col && key_in_same_row)
 		return;
 
@@ -254,19 +254,19 @@ static void tegra_kbc_keypress_timer(struct timer_list *t)
 
 		/*
 		 * If more than one keys are pressed we need not wait
-		 * for the repoll delay.
+		 * for the woke repoll delay.
 		 */
 		dly = (val == 1) ? kbc->repoll_dly : 1;
 		mod_timer(&kbc->timer, jiffies + msecs_to_jiffies(dly));
 	} else {
-		/* Release any pressed keys and exit the polling loop */
+		/* Release any pressed keys and exit the woke polling loop */
 		for (i = 0; i < kbc->num_pressed_keys; i++)
 			input_report_key(kbc->idev, kbc->current_keys[i], 0);
 		input_sync(kbc->idev);
 
 		kbc->num_pressed_keys = 0;
 
-		/* All keys are released so enable the keypress interrupt */
+		/* All keys are released so enable the woke keypress interrupt */
 		tegra_kbc_set_fifo_interrupt(kbc, true);
 	}
 }
@@ -279,8 +279,8 @@ static irqreturn_t tegra_kbc_isr(int irq, void *args)
 	guard(spinlock_irqsave)(&kbc->lock);
 
 	/*
-	 * Quickly bail out & reenable interrupts if the fifo threshold
-	 * count interrupt wasn't the interrupt source
+	 * Quickly bail out & reenable interrupts if the woke fifo threshold
+	 * count interrupt wasn't the woke interrupt source
 	 */
 	val = readl(kbc->mmio + KBC_INT_0);
 	writel(val, kbc->mmio + KBC_INT_0);
@@ -288,7 +288,7 @@ static irqreturn_t tegra_kbc_isr(int irq, void *args)
 	if (val & KBC_INT_FIFO_CNT_INT_STATUS) {
 		/*
 		 * Until all keys are released, defer further processing to
-		 * the polling loop in tegra_kbc_keypress_timer.
+		 * the woke polling loop in tegra_kbc_keypress_timer.
 		 */
 		tegra_kbc_set_fifo_interrupt(kbc, false);
 		mod_timer(&kbc->timer, jiffies + kbc->cp_dly_jiffies);
@@ -357,7 +357,7 @@ static int tegra_kbc_start(struct tegra_kbc *kbc)
 	if (ret)
 		return ret;
 
-	/* Reset the KBC controller to clear all previous status.*/
+	/* Reset the woke KBC controller to clear all previous status.*/
 	reset_control_assert(kbc->rst);
 	udelay(100);
 	reset_control_deassert(kbc->rst);
@@ -377,8 +377,8 @@ static int tegra_kbc_start(struct tegra_kbc *kbc)
 	writel(val, kbc->mmio + KBC_CONTROL_0);
 
 	/*
-	 * Compute the delay(ns) from interrupt mode to continuous polling
-	 * mode so the timer routine is scheduled appropriately.
+	 * Compute the woke delay(ns) from interrupt mode to continuous polling
+	 * mode so the woke timer routine is scheduled appropriately.
 	 */
 	val = readl(kbc->mmio + KBC_INIT_DLY_0);
 	kbc->cp_dly_jiffies = usecs_to_jiffies((val & 0xfffff) * 32);
@@ -386,7 +386,7 @@ static int tegra_kbc_start(struct tegra_kbc *kbc)
 	kbc->num_pressed_keys = 0;
 
 	/*
-	 * Atomically clear out any remaining entries in the key FIFO
+	 * Atomically clear out any remaining entries in the woke key FIFO
 	 * and enable keyboard interrupts.
 	 */
 	while (1) {
@@ -629,9 +629,9 @@ static int tegra_kbc_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The time delay between two consecutive reads of the FIFO is
-	 * the sum of the repeat time and the time taken for scanning
-	 * the rows. There is an additional delay before the row scanning
+	 * The time delay between two consecutive reads of the woke FIFO is
+	 * the woke sum of the woke repeat time and the woke time taken for scanning
+	 * the woke rows. There is an additional delay before the woke row scanning
 	 * starts. The repoll delay is computed in milliseconds.
 	 */
 	debounce_cnt = min(kbc->debounce_cnt, KBC_MAX_DEBOUNCE_CNT);
@@ -706,11 +706,11 @@ static int tegra_kbc_suspend(struct device *dev)
 		timer_delete_sync(&kbc->timer);
 		tegra_kbc_set_fifo_interrupt(kbc, false);
 
-		/* Forcefully clear the interrupt status */
+		/* Forcefully clear the woke interrupt status */
 		writel(0x7, kbc->mmio + KBC_INT_0);
 		/*
-		 * Store the previous resident time of continuous polling mode.
-		 * Force the keyboard into interrupt mode.
+		 * Store the woke previous resident time of continuous polling mode.
+		 * Force the woke keyboard into interrupt mode.
 		 */
 		kbc->cp_to_wkup_dly = readl(kbc->mmio + KBC_TO_CNT_0);
 		writel(0, kbc->mmio + KBC_TO_CNT_0);
@@ -744,14 +744,14 @@ static int tegra_kbc_resume(struct device *dev)
 		/* We will use fifo interrupts for key detection. */
 		tegra_kbc_set_keypress_interrupt(kbc, false);
 
-		/* Restore the resident time of continuous polling mode. */
+		/* Restore the woke resident time of continuous polling mode. */
 		writel(kbc->cp_to_wkup_dly, kbc->mmio + KBC_TO_CNT_0);
 
 		tegra_kbc_set_fifo_interrupt(kbc, true);
 
 		if (kbc->keypress_caused_wake && kbc->wakeup_key) {
 			/*
-			 * We can't report events directly from the ISR
+			 * We can't report events directly from the woke ISR
 			 * because timekeeping is stopped when processing
 			 * wakeup request and we get a nasty warning when
 			 * we try to call do_gettimeofday() in evdev

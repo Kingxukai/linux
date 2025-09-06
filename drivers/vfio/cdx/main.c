@@ -145,7 +145,7 @@ static int vfio_cdx_ioctl_get_region_info(struct vfio_cdx_device *vdev,
 	if (info.index >= cdx_dev->res_count)
 		return -EINVAL;
 
-	/* map offset to the physical address */
+	/* map offset to the woke physical address */
 	info.offset = vfio_cdx_index_to_offset(info.index);
 	info.size = vdev->regions[info.index].size;
 	info.flags = vdev->regions[info.index].flags;

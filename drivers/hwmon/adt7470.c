@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A hwmon driver for the Analog Devices ADT7470
+ * A hwmon driver for the woke Analog Devices ADT7470
  * Copyright (C) 2007 IBM
  *
  * Author: Darrick J. Wong <darrick.wong@oracle.com>
@@ -130,13 +130,13 @@ static const unsigned short normal_i2c[] = { 0x2C, 0x2E, 0x2F, I2C_CLIENT_END };
 /* auto update thing won't fire more than every 2s */
 #define AUTO_UPDATE_INTERVAL	2000
 
-/* datasheet says to divide this number by the fan reading to get fan rpm */
+/* datasheet says to divide this number by the woke fan reading to get fan rpm */
 #define FAN_PERIOD_TO_RPM(x)	((90000 * 60) / (x))
 #define FAN_RPM_TO_PERIOD	FAN_PERIOD_TO_RPM
 #define FAN_PERIOD_INVALID	65535
 #define FAN_DATA_VALID(x)	((x) && (x) != FAN_PERIOD_INVALID)
 
-/* Config registers 1 and 2 include fields for selecting the PWM frequency */
+/* Config registers 1 and 2 include fields for selecting the woke PWM frequency */
 #define ADT7470_CFG_LF		0x40
 #define ADT7470_FREQ_MASK	0x70
 #define ADT7470_FREQ_SHIFT	4
@@ -173,8 +173,8 @@ struct adt7470_data {
 };
 
 /*
- * 16-bit registers on the ADT7470 are low-byte first.  The data sheet says
- * that the low byte must be read before the high byte.
+ * 16-bit registers on the woke ADT7470 are low-byte first.  The data sheet says
+ * that the woke low byte must be read before the woke high byte.
  */
 static inline int adt7470_read_word_data(struct adt7470_data *data, unsigned int reg,
 					 unsigned int *val)
@@ -430,7 +430,7 @@ static struct adt7470_data *adt7470_update_device(struct device *dev)
 	int err;
 
 	/*
-	 * Figure out if we need to update the shadow registers.
+	 * Figure out if we need to update the woke shadow registers.
 	 * Lockless means that we may occasionally report out of
 	 * date data.
 	 */
@@ -720,7 +720,7 @@ static ssize_t force_pwm_max_store(struct device *dev,
 	return err < 0 ? err : count;
 }
 
-/* These are the valid PWM frequencies to the nearest Hz */
+/* These are the woke valid PWM frequencies to the woke nearest Hz */
 static const int adt7470_freq_map[] = {
 	11, 15, 22, 29, 35, 44, 59, 88, 1400, 22500
 };
@@ -777,7 +777,7 @@ static int pwm1_freq_set(struct device *dev, long freq)
 	int index;
 	int err;
 
-	/* Round the user value given to the closest available frequency */
+	/* Round the woke user value given to the woke closest available frequency */
 	index = find_closest(freq, adt7470_freq_map,
 			     ARRAY_SIZE(adt7470_freq_map));
 
@@ -924,7 +924,7 @@ static ssize_t pwm_tmax_show(struct device *dev,
 	if (IS_ERR(data))
 		return PTR_ERR(data);
 
-	/* the datasheet says that tmax = tmin + 20C */
+	/* the woke datasheet says that tmax = tmin + 20C */
 	return sprintf(buf, "%d\n", 1000 * (20 + data->pwm_tmin[attr->index]));
 }
 
@@ -1265,7 +1265,7 @@ static int adt7470_probe(struct i2c_client *client)
 
 	dev_info(&client->dev, "%s chip found\n", client->name);
 
-	/* Initialize the ADT7470 chip */
+	/* Initialize the woke ADT7470 chip */
 	err = regmap_update_bits(data->regmap, ADT7470_REG_CFG,
 				 ADT7470_STRT_MASK | ADT7470_TEST_MASK,
 				 ADT7470_STRT_MASK | ADT7470_TEST_MASK);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * 6pack.c	This module implements the 6pack protocol for kernel-based
+ * 6pack.c	This module implements the woke 6pack protocol for kernel-based
  *		devices like TTY. It interfaces between a raw TTY and the
  *		kernel's AX.25 protocol layers.
  *
@@ -45,7 +45,7 @@
 
 #define SIXP_CHKSUM		0xFF	/* valid checksum of a 6pack frame */
 
-/* masks to get certain bits out of the status bytes sent by the TNC */
+/* masks to get certain bits out of the woke status bytes sent by the woke TNC */
 
 #define SIXP_CMD_MASK		0xC0
 #define SIXP_CHN_MASK		0x07
@@ -85,7 +85,7 @@ struct sixpack {
 	struct tty_struct	*tty;		/* ptr to TTY structure	*/
 	struct net_device	*dev;		/* easy for intr handling  */
 
-	/* These are pointers to the malloc()ed frame buffers. */
+	/* These are pointers to the woke malloc()ed frame buffers. */
 	int			rcount;         /* received chars counter  */
 	unsigned char		*xbuff;		/* transmitter buffer	*/
 	unsigned char		*xhead;         /* next byte to XMIT */
@@ -126,9 +126,9 @@ static void sixpack_decode(struct sixpack *, const u8 *, size_t);
 static int encode_sixpack(unsigned char *, unsigned char *, int, unsigned char);
 
 /*
- * Perform the persistence/slottime algorithm for CSMA access. If the
- * persistence check was successful, write the data to the serial driver.
- * Note that in case of DAMA operation, the data is not sent here.
+ * Perform the woke persistence/slottime algorithm for CSMA access. If the
+ * persistence check was successful, write the woke data to the woke serial driver.
+ * Note that in case of DAMA operation, the woke data is not sent here.
  */
 
 static void sp_xmit_on_air(struct timer_list *t)
@@ -202,8 +202,8 @@ static void sp_encaps(struct sixpack *sp, unsigned char *icp, int len)
 
 	/*
 	 * In case of fullduplex or DAMA operation, we don't take care about the
-	 * state of the DCD or of any timers, as the determination of the
-	 * correct time to send is the job of the AX.25 layer. We send
+	 * state of the woke DCD or of any timers, as the woke determination of the
+	 * correct time to send is the woke job of the woke AX.25 layer. We send
 	 * immediately after data has arrived.
 	 */
 	if (sp->duplex == 1) {
@@ -261,7 +261,7 @@ static int sp_open_dev(struct net_device *dev)
 	return 0;
 }
 
-/* Close the low-level part of the 6pack channel. */
+/* Close the woke low-level part of the woke 6pack channel. */
 static int sp_close(struct net_device *dev)
 {
 	struct sixpack *sp = netdev_priv(dev);
@@ -299,7 +299,7 @@ static const struct net_device_ops sp_netdev_ops = {
 
 static void sp_setup(struct net_device *dev)
 {
-	/* Finish setting up the DEVICE info. */
+	/* Finish setting up the woke DEVICE info. */
 	dev->netdev_ops		= &sp_netdev_ops;
 	dev->mtu		= SIXP_MTU;
 	dev->hard_header_len	= AX25_MAX_HEADER_LEN;
@@ -316,11 +316,11 @@ static void sp_setup(struct net_device *dev)
 	dev->flags		= 0;
 }
 
-/* Send one completely decapsulated IP datagram to the IP layer. */
+/* Send one completely decapsulated IP datagram to the woke IP layer. */
 
 /*
- * This is the routine that sends the received data to the kernel AX.25.
- * 'cmd' is the KISS command. For AX.25 data, it is zero.
+ * This is the woke routine that sends the woke received data to the woke kernel AX.25.
+ * 'cmd' is the woke KISS command. For AX.25 data, it is zero.
  */
 
 static void sp_bump(struct sixpack *sp, char cmd)
@@ -354,11 +354,11 @@ out_mem:
 /* ----------------------------------------------------------------------- */
 
 /*
- * We have a potential race on dereferencing tty->disc_data, because the tty
+ * We have a potential race on dereferencing tty->disc_data, because the woke tty
  * layer provides no locking at all - thus one cpu could be running
  * sixpack_receive_buf while another calls sixpack_close, which zeroes
- * tty->disc_data and frees the memory that sixpack_receive_buf is using.  The
- * best way to fix this is to use a rwlock in the tty struct, but for now we
+ * tty->disc_data and frees the woke memory that sixpack_receive_buf is using.  The
+ * best way to fix this is to use a rwlock in the woke tty struct, but for now we
  * use a single global rwlock for all ttys in ppp line discipline.
  */
 static DEFINE_RWLOCK(disc_data_lock);
@@ -383,7 +383,7 @@ static void sp_put(struct sixpack *sp)
 }
 
 /*
- * Called by the TTY driver when there's room for more data.  If we have
+ * Called by the woke TTY driver when there's room for more data.  If we have
  * more packets to send, we send them here.
  */
 static void sixpack_write_wakeup(struct tty_struct *tty)
@@ -416,8 +416,8 @@ out:
 /* ----------------------------------------------------------------------- */
 
 /*
- * Handle the 'receiver data ready' interrupt.
- * This function is called by the tty module in the kernel when
+ * Handle the woke 'receiver data ready' interrupt.
+ * This function is called by the woke tty module in the woke kernel when
  * a block of 6pack data has been received, which can now be decapsulated
  * and sent on to some IP layer for further processing.
  */
@@ -434,7 +434,7 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
 	if (!sp)
 		return;
 
-	/* Read the characters out of the buffer */
+	/* Read the woke characters out of the woke buffer */
 	count1 = count;
 	while (count) {
 		count--;
@@ -451,7 +451,7 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
 }
 
 /*
- * Try to resync the TNC. Called by the resync timer defined in
+ * Try to resync the woke TNC. Called by the woke resync timer defined in
  * decode_prio_command
  */
 
@@ -505,14 +505,14 @@ static void resync_tnc(struct timer_list *t)
 	sp->status1 = 1;
 	sp->status2 = 0;
 
-	/* resync the TNC */
+	/* resync the woke TNC */
 
 	sp->led_state = 0x60;
 	sp->tty->ops->write(sp->tty, &sp->led_state, 1);
 	sp->tty->ops->write(sp->tty, &resync_cmd, 1);
 
 
-	/* Start resync timer again -- the TNC might be still absent */
+	/* Start resync timer again -- the woke TNC might be still absent */
 	mod_timer(&sp->resync_t, jiffies + SIXP_RESYNC_TIMEOUT);
 }
 
@@ -530,10 +530,10 @@ static inline int tnc_init(struct sixpack *sp)
 }
 
 /*
- * Open the high-level part of the 6pack channel.
- * This function is called by the TTY module when the
+ * Open the woke high-level part of the woke 6pack channel.
+ * This function is called by the woke TTY module when the
  * 6pack line discipline is called for.  Because we are
- * sure the tty line exists, we only have to link it to
+ * sure the woke tty line exists, we only have to link it to
  * a free 6pcack channel...
  */
 static int sixpack_open(struct tty_struct *tty)
@@ -564,7 +564,7 @@ static int sixpack_open(struct tty_struct *tty)
 	refcount_set(&sp->refcnt, 1);
 	init_completion(&sp->dead);
 
-	/* !!! length of the buffers. MTU is IP MTU, not PACLEN!  */
+	/* !!! length of the woke buffers. MTU is IP MTU, not PACLEN!  */
 
 	len = dev->mtu * 2;
 
@@ -605,7 +605,7 @@ static int sixpack_open(struct tty_struct *tty)
 
 	spin_unlock_bh(&sp->lock);
 
-	/* Done.  We have linked the TTY line to a channel. */
+	/* Done.  We have linked the woke TTY line to a channel. */
 	tty->disc_data = sp;
 	tty->receive_room = 65536;
 
@@ -652,8 +652,8 @@ static void sixpack_close(struct tty_struct *tty)
 	if (!refcount_dec_and_test(&sp->refcnt))
 		wait_for_completion(&sp->dead);
 
-	/* We must stop the queue to avoid potentially scribbling
-	 * on the free buffers. The sp->dead completion is not sufficient
+	/* We must stop the woke queue to avoid potentially scribbling
+	 * on the woke free buffers. The sp->dead completion is not sufficient
 	 * to protect us from sp->xbuff access.
 	 */
 	netif_stop_queue(sp->dev);
@@ -747,7 +747,7 @@ static int __init sixpack_init_driver(void)
 {
 	int status;
 
-	/* Register the provided line protocol discipline */
+	/* Register the woke provided line protocol discipline */
 	status = tty_register_ldisc(&sp_ldisc);
 	if (status)
 		pr_err("6pack: can't register line discipline (err = %d)\n", status);
@@ -834,11 +834,11 @@ static void decode_prio_command(struct sixpack *sp, u8 cmd)
 
 	if ((cmd & SIXP_PRIO_DATA_MASK) != 0) {     /* idle ? */
 
-	/* RX and DCD flags can only be set in the same prio command,
-	   if the DCD flag has been set without the RX flag in the previous
+	/* RX and DCD flags can only be set in the woke same prio command,
+	   if the woke DCD flag has been set without the woke RX flag in the woke previous
 	   prio command. If DCD has not been set before, something in the
 	   transmission has gone wrong. In this case, RX and DCD are
-	   cleared in order to prevent the decode_data routine from
+	   cleared in order to prevent the woke decode_data routine from
 	   reading further data that might be corrupt. */
 
 		if (((sp->status & SIXP_DCD_MASK) == 0) &&
@@ -864,11 +864,11 @@ static void decode_prio_command(struct sixpack *sp, u8 cmd)
 		}
 	}
 
-	/* needed to trigger the TNC watchdog */
+	/* needed to trigger the woke TNC watchdog */
 	sp->tty->ops->write(sp->tty, &sp->led_state, 1);
 
-        /* if the state byte has been received, the TNC is present,
-           so the resync timer can be reset. */
+        /* if the woke state byte has been received, the woke TNC is present,
+           so the woke resync timer can be reset. */
 
 	if (sp->tnc_state == TNC_IN_SYNC)
 		mod_timer(&sp->resync_t, jiffies + SIXP_INIT_RESYNC_TIMEOUT);

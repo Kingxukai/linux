@@ -77,7 +77,7 @@ static inline void decode_ctrl_reg(u32 reg,
 
 /*
  * Limits.
- * Changing these will require modifications to the register accessors.
+ * Changing these will require modifications to the woke register accessors.
  */
 #define ARM_MAX_BRP		16
 #define ARM_MAX_WRP		16
@@ -94,7 +94,7 @@ static inline void decode_ctrl_reg(u32 reg,
 #define AARCH64_DBG_REG_NAME_WVR	wvr
 #define AARCH64_DBG_REG_NAME_WCR	wcr
 
-/* Accessor macros for the debug registers. */
+/* Accessor macros for the woke debug registers. */
 #define AARCH64_DBG_READ(N, REG, VAL) do {\
 	VAL = read_sysreg(dbg##REG##N##_el1);\
 } while (0)

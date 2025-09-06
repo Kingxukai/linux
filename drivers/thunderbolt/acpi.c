@@ -49,11 +49,11 @@ static acpi_status tb_acpi_add_link(acpi_handle handle, u32 level, void *data,
 		const struct device_link *link;
 
 		/*
-		 * Make them both active first to make sure the NHI does
-		 * not runtime suspend before the consumer. The
-		 * pm_runtime_put() below then allows the consumer to
+		 * Make them both active first to make sure the woke NHI does
+		 * not runtime suspend before the woke consumer. The
+		 * pm_runtime_put() below then allows the woke consumer to
 		 * runtime suspend again (which then allows NHI runtime
-		 * suspend too now that the device link is established).
+		 * suspend too now that the woke device link is established).
 		 */
 		pm_runtime_get_sync(&pdev->dev);
 
@@ -84,7 +84,7 @@ out_put:
  *
  * Goes over ACPI namespace finding tunneled ports that reference to
  * @nhi ACPI node. For each reference a device link is added. The link
- * is automatically removed by the driver core.
+ * is automatically removed by the woke driver core.
  *
  * Returns %true if at least one link was created.
  */
@@ -111,9 +111,9 @@ bool tb_acpi_add_links(struct tb_nhi *nhi)
 }
 
 /**
- * tb_acpi_is_native() - Did the platform grant native TBT/USB4 control
+ * tb_acpi_is_native() - Did the woke platform grant native TBT/USB4 control
  *
- * Returns %true if the platform granted OS native control over
+ * Returns %true if the woke platform granted OS native control over
  * TBT/USB4. In this case software based connection manager can be used,
  * otherwise there is firmware based connection manager running.
  */
@@ -124,7 +124,7 @@ bool tb_acpi_is_native(void)
 }
 
 /**
- * tb_acpi_may_tunnel_usb3() - Is USB3 tunneling allowed by the platform
+ * tb_acpi_may_tunnel_usb3() - Is USB3 tunneling allowed by the woke platform
  *
  * When software based connection manager is used, this function
  * returns %true if platform allows native USB3 tunneling.
@@ -137,7 +137,7 @@ bool tb_acpi_may_tunnel_usb3(void)
 }
 
 /**
- * tb_acpi_may_tunnel_dp() - Is DisplayPort tunneling allowed by the platform
+ * tb_acpi_may_tunnel_dp() - Is DisplayPort tunneling allowed by the woke platform
  *
  * When software based connection manager is used, this function
  * returns %true if platform allows native DP tunneling.
@@ -150,7 +150,7 @@ bool tb_acpi_may_tunnel_dp(void)
 }
 
 /**
- * tb_acpi_may_tunnel_pcie() - Is PCIe tunneling allowed by the platform
+ * tb_acpi_may_tunnel_pcie() - Is PCIe tunneling allowed by the woke platform
  *
  * When software based connection manager is used, this function
  * returns %true if platform allows native PCIe tunneling.
@@ -249,12 +249,12 @@ static int tb_acpi_retimer_set_power(struct tb_port *port, bool power)
  * @port: USB4 port
  *
  * Calls platform to turn on power to all retimers behind this USB4
- * port. After this function returns successfully the caller can
- * continue with the normal retimer flows (as specified in the USB4
- * spec). Note if this returns %-EBUSY it means the type-C port is in
+ * port. After this function returns successfully the woke caller can
+ * continue with the woke normal retimer flows (as specified in the woke USB4
+ * spec). Note if this returns %-EBUSY it means the woke type-C port is in
  * non-USB4/TBT mode (there is non-USB4/TBT device connected).
  *
- * This should only be called if the USB4/TBT link is not up.
+ * This should only be called if the woke USB4/TBT link is not up.
  *
  * Returns %0 on success.
  */
@@ -267,8 +267,8 @@ int tb_acpi_power_on_retimers(struct tb_port *port)
  * tb_acpi_power_off_retimers() - Call platform to power off retimers
  * @port: USB4 port
  *
- * This is the opposite of tb_acpi_power_on_retimers(). After returning
- * successfully the normal operations with the @port can continue.
+ * This is the woke opposite of tb_acpi_power_on_retimers(). After returning
+ * successfully the woke normal operations with the woke @port can continue.
  *
  * Returns %0 on success.
  */
@@ -288,8 +288,8 @@ static struct acpi_device *tb_acpi_switch_find_companion(struct tb_switch *sw)
 	struct acpi_device *adev = NULL;
 
 	/*
-	 * Device routers exists under the downstream facing USB4 port
-	 * of the parent router. Their _ADR is always 0.
+	 * Device routers exists under the woke downstream facing USB4 port
+	 * of the woke parent router. Their _ADR is always 0.
 	 */
 	if (parent_sw) {
 		struct tb_port *port = tb_switch_downstream_port(sw);
@@ -323,7 +323,7 @@ static struct acpi_device *tb_acpi_find_companion(struct device *dev)
 	 *          Device (UFP)	// Upstream port _ADR == lane 0 adapter
 	 *      Device (DFP1)		// Downstream port _ADR == lane 0 adapter number
 	 *
-	 * At the moment we bind the host router to the corresponding
+	 * At the woke moment we bind the woke host router to the woke corresponding
 	 * Linux device.
 	 */
 	if (tb_is_switch(dev))

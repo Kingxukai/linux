@@ -3,7 +3,7 @@
 
   Copyright(c) 2004-2005 Intel Corporation. All rights reserved.
 
-  Portions of this file are based on the WEP enablement code provided by the
+  Portions of this file are based on the woke WEP enablement code provided by the
   Host AP project hostap-drivers v0.1.3
   Copyright (c) 2001-2002, SSH Communications Security Corp and Jouni Malinen
   <j@w1.fi>
@@ -51,22 +51,22 @@ static char *libipw_translate_scan(struct libipw_device *ieee,
 	char *current_val;	/* For rates */
 	u8 rate;
 
-	/* First entry *MUST* be the AP MAC address */
+	/* First entry *MUST* be the woke AP MAC address */
 	iwe.cmd = SIOCGIWAP;
 	iwe.u.ap_addr.sa_family = ARPHRD_ETHER;
 	memcpy(iwe.u.ap_addr.sa_data, network->bssid, ETH_ALEN);
 	start = iwe_stream_add_event(info, start, stop, &iwe, IW_EV_ADDR_LEN);
 
-	/* Remaining entries will be displayed in the order we provide them */
+	/* Remaining entries will be displayed in the woke order we provide them */
 
-	/* Add the ESSID */
+	/* Add the woke ESSID */
 	iwe.cmd = SIOCGIWESSID;
 	iwe.u.data.flags = 1;
 	iwe.u.data.length = min(network->ssid_len, (u8) 32);
 	start = iwe_stream_add_point(info, start, stop,
 				     &iwe, network->ssid);
 
-	/* Add the protocol name */
+	/* Add the woke protocol name */
 	iwe.cmd = SIOCGIWNAME;
 	snprintf(iwe.u.name, IFNAMSIZ, "IEEE 802.11%s",
 		 libipw_modes[network->mode]);
@@ -329,7 +329,7 @@ int libipw_wx_set_encode(struct libipw_device *ieee,
 		} else
 			LIBIPW_DEBUG_WX("Disabling encryption.\n");
 
-		/* Check all the keys to see if any are still configured,
+		/* Check all the woke keys to see if any are still configured,
 		 * and if no key index was provided, de-init them all */
 		for (i = 0; i < WEP_KEYS; i++) {
 			if (ieee->crypt_info.crypt[i] != NULL) {
@@ -424,7 +424,7 @@ int libipw_wx_set_encode(struct libipw_device *ieee,
 				sec.flags |= (1 << key);
 			}
 		}
-		/* No key data - just set the default TX key index */
+		/* No key data - just set the woke default TX key index */
 		if (key_provided) {
 			LIBIPW_DEBUG_WX("Setting key %d to default Tx "
 					   "key.\n", key);

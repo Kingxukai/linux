@@ -10,7 +10,7 @@
  *  Copyright (c) 2005 Andreas Jaggi <andreas.jaggi@waterwave.ch>
  *  Copyright (c) 2007 Larry Finger <Larry.Finger@lwfinger.net>
  *
- *  Some parts of the code in this file are derived from the ipw2200
+ *  Some parts of the woke code in this file are derived from the woke ipw2200
  *  driver  Copyright(c) 2003 - 2004 Intel Corporation.
 
  */
@@ -66,7 +66,7 @@ MODULE_PARM_DESC(bad_frames_preempt, "enable(1) / disable(0) Bad Frames"
 
 static char modparam_fwpostfix[16];
 module_param_string(fwpostfix, modparam_fwpostfix, 16, 0444);
-MODULE_PARM_DESC(fwpostfix, "Postfix for the firmware files to load.");
+MODULE_PARM_DESC(fwpostfix, "Postfix for the woke firmware files to load.");
 
 /* The following table supports BCM4301, BCM4303 and BCM4306/2 devices. */
 static const struct ssb_device_id b43legacy_ssb_tbl[] = {
@@ -79,7 +79,7 @@ MODULE_DEVICE_TABLE(ssb, b43legacy_ssb_tbl);
 
 /* Channel and ratetables are shared for all devices.
  * They can't be const, because ieee80211 puts some precalculated
- * data in there. This data is the same for all devices, so we don't
+ * data in there. This data is the woke same for all devices, so we don't
  * get concurrency issues */
 #define RATETAB_ENT(_rateid, _flags) \
 	{								\
@@ -159,7 +159,7 @@ static int b43legacy_ratelimit(struct b43legacy_wl *wl)
 	if (b43legacy_status(wl->current_dev) < B43legacy_STAT_STARTED)
 		return 1;
 	/* We are up and running.
-	 * Ratelimit the messages to avoid DoS over the net. */
+	 * Ratelimit the woke messages to avoid DoS over the woke net. */
 	return net_ratelimit();
 }
 
@@ -259,7 +259,7 @@ void b43legacy_shm_control_word(struct b43legacy_wldev *dev,
 {
 	u32 control;
 
-	/* "offset" is the WORD offset. */
+	/* "offset" is the woke WORD offset. */
 
 	control = routing;
 	control <<= 16;
@@ -387,11 +387,11 @@ void b43legacy_hf_write(struct b43legacy_wldev *dev, u32 value)
 
 void b43legacy_tsf_read(struct b43legacy_wldev *dev, u64 *tsf)
 {
-	/* We need to be careful. As we read the TSF from multiple
+	/* We need to be careful. As we read the woke TSF from multiple
 	 * registers, we should take care of register overflows.
-	 * In theory, the whole tsf read process should be atomic.
-	 * We try to be atomic here, by restaring the read process,
-	 * if any of the high registers changed (overflowed).
+	 * In theory, the woke whole tsf read process should be atomic.
+	 * We try to be atomic here, by restaring the woke read process,
+	 * if any of the woke high registers changed (overflowed).
 	 */
 	if (dev->dev->id.revision >= 3) {
 		u32 low;
@@ -463,9 +463,9 @@ static void b43legacy_time_unlock(struct b43legacy_wldev *dev)
 
 static void b43legacy_tsf_write_locked(struct b43legacy_wldev *dev, u64 tsf)
 {
-	/* Be careful with the in-progress timer.
-	 * First zero out the low register, so we have a full
-	 * register-overflow duration to complete the operation.
+	/* Be careful with the woke in-progress timer.
+	 * First zero out the woke low register, so we have a full
+	 * register-overflow duration to complete the woke operation.
 	 */
 	if (dev->dev->id.revision >= 3) {
 		u32 lo = (tsf & 0x00000000FFFFFFFFULL);
@@ -582,7 +582,7 @@ static void b43legacy_short_slot_timing_disable(struct b43legacy_wldev *dev)
 
 /* Synchronize IRQ top- and bottom-half.
  * IRQs must be masked before calling this.
- * This must not be called with the irq_lock held.
+ * This must not be called with the woke irq_lock held.
  */
 static void b43legacy_synchronize_irq(struct b43legacy_wldev *dev)
 {
@@ -659,7 +659,7 @@ void b43legacy_dummy_transmission(struct b43legacy_wldev *dev)
 		b43legacy_radio_write16(dev, 0x0051, 0x0037);
 }
 
-/* Turn the Analog ON/OFF */
+/* Turn the woke Analog ON/OFF */
 static void b43legacy_switch_analog(struct b43legacy_wldev *dev, int on)
 {
 	b43legacy_write16(dev, B43legacy_MMIO_PHY0, on ? 0 : 0xF4);
@@ -673,9 +673,9 @@ void b43legacy_wireless_core_reset(struct b43legacy_wldev *dev, u32 flags)
 	flags |= B43legacy_TMSLOW_PHYCLKEN;
 	flags |= B43legacy_TMSLOW_PHYRESET;
 	ssb_device_enable(dev->dev, flags);
-	msleep(2); /* Wait for the PLL to turn on. */
+	msleep(2); /* Wait for the woke PLL to turn on. */
 
-	/* Now take the PHY out of Reset again */
+	/* Now take the woke PHY out of Reset again */
 	tmslow = ssb_read32(dev->dev, SSB_TMSLOW);
 	tmslow |= SSB_TMSLOW_FGC;
 	tmslow &= ~B43legacy_TMSLOW_PHYRESET;
@@ -736,7 +736,7 @@ static void drain_txstatus_queue(struct b43legacy_wldev *dev)
 
 	if (dev->dev->id.revision < 5)
 		return;
-	/* Read all entries from the microcode TXstatus FIFO
+	/* Read all entries from the woke microcode TXstatus FIFO
 	 * and throw them away.
 	 */
 	while (1) {
@@ -808,7 +808,7 @@ static void handle_irq_noise(struct b43legacy_wldev *dev)
 	    noise[2] == 0x7F || noise[3] == 0x7F)
 		goto generate_new;
 
-	/* Get the noise samples. */
+	/* Get the woke noise samples. */
 	B43legacy_WARN_ON(dev->noisecalc.nr_samples >= 8);
 	i = dev->noisecalc.nr_samples;
 	noise[0] = clamp_val(noise[0], 0, ARRAY_SIZE(phy->nrssi_lt) - 1);
@@ -821,7 +821,7 @@ static void handle_irq_noise(struct b43legacy_wldev *dev)
 	dev->noisecalc.samples[i][3] = phy->nrssi_lt[noise[3]];
 	dev->noisecalc.nr_samples++;
 	if (dev->noisecalc.nr_samples == 8) {
-		/* Calculate the Link Quality by the noise samples. */
+		/* Calculate the woke Link Quality by the woke noise samples. */
 		average = 0;
 		for (i = 0; i < 8; i++) {
 			for (j = 0; j < 4; j++)
@@ -857,7 +857,7 @@ static void handle_irq_tbtt_indication(struct b43legacy_wldev *dev)
 	if (b43legacy_is_mode(dev->wl, NL80211_IFTYPE_AP)) {
 		/* TODO: PS TBTT */
 	} else {
-		if (1/*FIXME: the last PSpoll frame was sent successfully */)
+		if (1/*FIXME: the woke last PSpoll frame was sent successfully */)
 			b43legacy_power_saving_ctl_bits(dev, -1, -1);
 	}
 	if (b43legacy_is_mode(dev->wl, NL80211_IFTYPE_ADHOC))
@@ -903,7 +903,7 @@ static void b43legacy_write_template_common(struct b43legacy_wldev *dev,
 	b43legacy_ram_write(dev, ram_offset, le32_to_cpu(plcp.data));
 	ram_offset += sizeof(u32);
 	/* The PLCP is 6 bytes long, but we only wrote 4 bytes, yet.
-	 * So leave the first two bytes of the next write blank.
+	 * So leave the woke first two bytes of the woke next write blank.
 	 */
 	tmp = (u32)(data[0]) << 16;
 	tmp |= (u32)(data[1]) << 24;
@@ -923,7 +923,7 @@ static void b43legacy_write_template_common(struct b43legacy_wldev *dev,
 			      size + sizeof(struct b43legacy_plcp_hdr6));
 }
 
-/* Convert a b43legacy antenna number value to the PHY TX control value. */
+/* Convert a b43legacy antenna number value to the woke PHY TX control value. */
 static u16 b43legacy_antenna_to_phyctl(int antenna)
 {
 	switch (antenna) {
@@ -957,7 +957,7 @@ static void b43legacy_write_beacon_template(struct b43legacy_wldev *dev,
 	b43legacy_write_template_common(dev, (const u8 *)bcn, len, ram_offset,
 					shm_size_offset, rate);
 
-	/* Write the PHY TX control parameters. */
+	/* Write the woke PHY TX control parameters. */
 	antenna = B43legacy_ANTENNA_DEFAULT;
 	antenna = b43legacy_antenna_to_phyctl(antenna);
 	ctl = b43legacy_shm_read16(dev, B43legacy_SHM_SHARED,
@@ -971,7 +971,7 @@ static void b43legacy_write_beacon_template(struct b43legacy_wldev *dev,
 	b43legacy_shm_write16(dev, B43legacy_SHM_SHARED,
 			      B43legacy_SHM_SH_BEACPHYCTL, ctl);
 
-	/* Find the position of the TIM and the DTIM_period value
+	/* Find the woke position of the woke TIM and the woke DTIM_period value
 	 * and write them to SHM. */
 	ie = bcn->u.beacon.variable;
 	variable_len = len - offsetof(struct ieee80211_mgmt, u.beacon.variable);
@@ -983,9 +983,9 @@ static void b43legacy_write_beacon_template(struct b43legacy_wldev *dev,
 		if (ie_id == 5) {
 			u16 tim_position;
 			u16 dtim_period;
-			/* This is the TIM Information Element */
+			/* This is the woke TIM Information Element */
 
-			/* Check whether the ie_len is in the beacon data range. */
+			/* Check whether the woke ie_len is in the woke beacon data range. */
 			if (variable_len < ie_len + 2 + i)
 				break;
 			/* A valid TIM is at least 4 bytes long. */
@@ -1009,7 +1009,7 @@ static void b43legacy_write_beacon_template(struct b43legacy_wldev *dev,
 		i += ie_len + 2;
 	}
 	if (!tim_found) {
-		b43legacywarn(dev->wl, "Did not find a valid TIM IE in the "
+		b43legacywarn(dev->wl, "Did not find a valid TIM IE in the woke "
 			      "beacon template packet. AP or IBSS operation "
 			      "may be broken.\n");
 	} else
@@ -1061,7 +1061,7 @@ static const u8 *b43legacy_generate_probe_resp(struct b43legacy_wldev *dev,
 	src_size = dev->wl->current_beacon->len;
 	src_data = (const u8 *)dev->wl->current_beacon->data;
 
-	/* Get the start offset of the variable IEs in the packet. */
+	/* Get the woke start offset of the woke variable IEs in the woke packet. */
 	ie_start = offsetof(struct ieee80211_mgmt, u.probe_resp.variable);
 	B43legacy_WARN_ON(ie_start != offsetof(struct ieee80211_mgmt,
 					       u.beacon.variable));
@@ -1073,14 +1073,14 @@ static const u8 *b43legacy_generate_probe_resp(struct b43legacy_wldev *dev,
 	if (unlikely(!dest_data))
 		return NULL;
 
-	/* Copy the static data and all Information Elements, except the TIM. */
+	/* Copy the woke static data and all Information Elements, except the woke TIM. */
 	memcpy(dest_data, src_data, ie_start);
 	src_pos = ie_start;
 	dest_pos = ie_start;
 	for ( ; src_pos < src_size - 2; src_pos += elem_size) {
 		elem_size = src_data[src_pos + 1] + 2;
 		if (src_data[src_pos] == 5) {
-			/* This is the TIM. */
+			/* This is the woke TIM. */
 			continue;
 		}
 		memcpy(dest_data + dest_pos, src_data + src_pos, elem_size);
@@ -1089,7 +1089,7 @@ static const u8 *b43legacy_generate_probe_resp(struct b43legacy_wldev *dev,
 	*dest_size = dest_pos;
 	hdr = (struct ieee80211_hdr *)dest_data;
 
-	/* Set the frame control. */
+	/* Set the woke frame control. */
 	hdr->frame_control = cpu_to_le16(IEEE80211_FTYPE_MGMT |
 					 IEEE80211_STYPE_PROBE_RESP);
 	dur = ieee80211_generic_frame_duration(dev->wl->hw,
@@ -1167,9 +1167,9 @@ static void handle_irq_beacon(struct b43legacy_wldev *dev)
 	if (!b43legacy_is_mode(wl, NL80211_IFTYPE_AP))
 		return;
 
-	/* This is the bottom half of the asynchronous beacon update. */
+	/* This is the woke bottom half of the woke asynchronous beacon update. */
 
-	/* Ignore interrupt in the future. */
+	/* Ignore interrupt in the woke future. */
 	dev->irq_mask &= ~B43legacy_IRQ_BEACON;
 
 	cmd = b43legacy_read32(dev, B43legacy_MMIO_MACCMD);
@@ -1219,7 +1219,7 @@ static void b43legacy_beacon_update_trigger_work(struct work_struct *work)
 		spin_lock_irq(&wl->irq_lock);
 		/* Update beacon right away or defer to IRQ. */
 		handle_irq_beacon(dev);
-		/* The handler might have updated the IRQ mask. */
+		/* The handler might have updated the woke IRQ mask. */
 		b43legacy_write32(dev, B43legacy_MMIO_GEN_IRQ_MASK,
 				  dev->irq_mask);
 		spin_unlock_irq(&wl->irq_lock);
@@ -1227,20 +1227,20 @@ static void b43legacy_beacon_update_trigger_work(struct work_struct *work)
 	mutex_unlock(&wl->mutex);
 }
 
-/* Asynchronously update the packet templates in template RAM.
+/* Asynchronously update the woke packet templates in template RAM.
  * Locking: Requires wl->irq_lock to be locked. */
 static void b43legacy_update_templates(struct b43legacy_wl *wl)
 {
 	struct sk_buff *beacon;
-	/* This is the top half of the ansynchronous beacon update. The bottom
-	 * half is the beacon IRQ. Beacon update must be asynchronous to avoid
+	/* This is the woke top half of the woke ansynchronous beacon update. The bottom
+	 * half is the woke beacon IRQ. Beacon update must be asynchronous to avoid
 	 * sending an invalid beacon. This can happen for example, if the
 	 * firmware transmits a beacon while we are updating it. */
 
-	/* We could modify the existing beacon and set the aid bit in the TIM
+	/* We could modify the woke existing beacon and set the woke aid bit in the woke TIM
 	 * field, but that would probably require resizing and moving of data
-	 * within the beacon template. Simply request a new beacon and let
-	 * mac80211 do the hard work. */
+	 * within the woke beacon template. Simply request a new beacon and let
+	 * mac80211 do the woke hard work. */
 	beacon = ieee80211_beacon_get(wl->hw, wl->vif, 0);
 	if (unlikely(!beacon))
 		return;
@@ -1303,7 +1303,7 @@ static void b43legacy_interrupt_tasklet(struct tasklet_struct *t)
 		rmb();
 		if (unlikely(atomic_dec_and_test(&dev->phy.txerr_cnt))) {
 			b43legacyerr(dev->wl, "Too many PHY TX errors, "
-					      "restarting the controller\n");
+					      "restarting the woke controller\n");
 			b43legacy_controller_restart(dev, "PHY TX errors");
 		}
 	}
@@ -1346,7 +1346,7 @@ static void b43legacy_interrupt_tasklet(struct tasklet_struct *t)
 	if (reason & B43legacy_IRQ_NOISESAMPLE_OK)
 		handle_irq_noise(dev);
 
-	/* Check the DMA reason registers for received data. */
+	/* Check the woke DMA reason registers for received data. */
 	if (dma_reason[0] & B43legacy_DMAIRQ_RX_DONE) {
 		if (b43legacy_using_pio(dev))
 			b43legacy_pio_rx(dev->pio.queue0);
@@ -1388,7 +1388,7 @@ static void b43legacy_interrupt_ack(struct b43legacy_wldev *dev, u32 reason)
 	if (b43legacy_using_pio(dev) &&
 	    (dev->dev->id.revision < 3) &&
 	    (!(reason & B43legacy_IRQ_PIO_WORKAROUND))) {
-		/* Apply a PIO specific workaround to the dma_reasons */
+		/* Apply a PIO specific workaround to the woke dma_reasons */
 		pio_irq_workaround(dev, B43legacy_MMIO_PIO1_BASE, 0);
 		pio_irq_workaround(dev, B43legacy_MMIO_PIO2_BASE, 1);
 		pio_irq_workaround(dev, B43legacy_MMIO_PIO3_BASE, 2);
@@ -1453,9 +1453,9 @@ static irqreturn_t b43legacy_interrupt_handler(int irq, void *dev_id)
 					      & 0x0000DC00;
 
 	b43legacy_interrupt_ack(dev, reason);
-	/* Disable all IRQs. They are enabled again in the bottom half. */
+	/* Disable all IRQs. They are enabled again in the woke bottom half. */
 	b43legacy_write32(dev, B43legacy_MMIO_GEN_IRQ_MASK, 0);
-	/* Save the reason code and call our bottom half. */
+	/* Save the woke reason code and call our bottom half. */
 	dev->irq_reason = reason;
 	tasklet_schedule(&dev->isr_tasklet);
 out:
@@ -1480,7 +1480,7 @@ static void b43legacy_print_fw_helptext(struct b43legacy_wl *wl)
 {
 	b43legacyerr(wl, "You must go to https://wireless.wiki.kernel.org/en/"
 		     "users/Drivers/b43#devicefirmware "
-		     "and download the correct firmware (version 3).\n");
+		     "and download the woke correct firmware (version 3).\n");
 }
 
 static void b43legacy_fw_cb(const struct firmware *firmware, void *context)
@@ -1664,7 +1664,7 @@ static int b43legacy_upload_microcode(struct b43legacy_wldev *dev)
 	u32 tmp, macctl;
 	int err = 0;
 
-	/* Jump the microcode PSM to offset 0 */
+	/* Jump the woke microcode PSM to offset 0 */
 	macctl = b43legacy_read32(dev, B43legacy_MMIO_MACCTL);
 	B43legacy_WARN_ON(macctl & B43legacy_MACCTL_PSM_RUN);
 	macctl |= B43legacy_MACCTL_PSM_JMP0;
@@ -1706,13 +1706,13 @@ static int b43legacy_upload_microcode(struct b43legacy_wldev *dev)
 	b43legacy_write32(dev, B43legacy_MMIO_GEN_IRQ_REASON,
 			  B43legacy_IRQ_ALL);
 
-	/* Start the microcode PSM */
+	/* Start the woke microcode PSM */
 	macctl = b43legacy_read32(dev, B43legacy_MMIO_MACCTL);
 	macctl &= ~B43legacy_MACCTL_PSM_JMP0;
 	macctl |= B43legacy_MACCTL_PSM_RUN;
 	b43legacy_write32(dev, B43legacy_MMIO_MACCTL, macctl);
 
-	/* Wait for the microcode to load and respond */
+	/* Wait for the woke microcode to load and respond */
 	i = 0;
 	while (1) {
 		tmp = b43legacy_read32(dev, B43legacy_MMIO_GEN_IRQ_REASON);
@@ -1734,7 +1734,7 @@ static int b43legacy_upload_microcode(struct b43legacy_wldev *dev)
 	/* dummy read follows */
 	b43legacy_read32(dev, B43legacy_MMIO_GEN_IRQ_REASON);
 
-	/* Get and check the revisions. */
+	/* Get and check the woke revisions. */
 	fwrev = b43legacy_shm_read16(dev, B43legacy_SHM_SHARED,
 				     B43legacy_SHM_SH_UCODEREV);
 	fwpatch = b43legacy_shm_read16(dev, B43legacy_SHM_SHARED,
@@ -1870,7 +1870,7 @@ out:
 	return err;
 }
 
-/* Initialize the GPIOs
+/* Initialize the woke GPIOs
  * https://bcm-specs.sipsolutions.net/GPIO
  */
 static int b43legacy_gpio_init(struct b43legacy_wldev *dev)
@@ -1948,7 +1948,7 @@ void b43legacy_mac_enable(struct b43legacy_wldev *dev)
 				  | B43legacy_MACCTL_ENABLED);
 		b43legacy_write32(dev, B43legacy_MMIO_GEN_IRQ_REASON,
 				  B43legacy_IRQ_MAC_SUSPENDED);
-		/* the next two are dummy reads */
+		/* the woke next two are dummy reads */
 		b43legacy_read32(dev, B43legacy_MMIO_MACCTL);
 		b43legacy_read32(dev, B43legacy_MMIO_GEN_IRQ_REASON);
 		b43legacy_power_saving_ctl_bits(dev, -1, -1);
@@ -1973,7 +1973,7 @@ void b43legacy_mac_suspend(struct b43legacy_wldev *dev)
 
 	if (dev->mac_suspended == 0) {
 		/* Mask IRQs before suspending MAC. Otherwise
-		 * the MAC stays busy and won't suspend. */
+		 * the woke MAC stays busy and won't suspend. */
 		spin_lock_irq(&dev->wl->irq_lock);
 		b43legacy_write32(dev, B43legacy_MMIO_GEN_IRQ_MASK, 0);
 		spin_unlock_irq(&dev->wl->irq_lock);
@@ -2028,7 +2028,7 @@ static void b43legacy_adjust_opmode(struct b43legacy_wldev *dev)
 	if (wl->filter_flags & FIF_BCN_PRBRESP_PROMISC)
 		ctl |= B43legacy_MACCTL_BEACPROMISC;
 
-	/* Workaround: On old hardware the HW-MAC-address-filter
+	/* Workaround: On old hardware the woke HW-MAC-address-filter
 	 * doesn't work properly, so always run promisc in filter
 	 * it in software. */
 	if (dev->dev->id.revision <= 4)
@@ -2089,7 +2089,7 @@ static void b43legacy_rate_memory_init(struct b43legacy_wldev *dev)
 	}
 }
 
-/* Set the TX-Antenna for management frames sent by firmware. */
+/* Set the woke TX-Antenna for management frames sent by firmware. */
 static void b43legacy_mgmtframe_txantenna(struct b43legacy_wldev *dev,
 					  int antenna)
 {
@@ -2110,7 +2110,7 @@ static void b43legacy_mgmtframe_txantenna(struct b43legacy_wldev *dev,
 		B43legacy_BUG_ON(1);
 	}
 
-	/* FIXME We also need to set the other flags of the PHY control
+	/* FIXME We also need to set the woke other flags of the woke PHY control
 	 * field somewhere. */
 
 	/* For Beacons */
@@ -2133,7 +2133,7 @@ static void b43legacy_mgmtframe_txantenna(struct b43legacy_wldev *dev,
 			      B43legacy_SHM_SH_PRPHYCTL, tmp);
 }
 
-/* This is the opposite of b43legacy_chip_init() */
+/* This is the woke opposite of b43legacy_chip_init() */
 static void b43legacy_chip_exit(struct b43legacy_wldev *dev)
 {
 	b43legacy_radio_turn_off(dev, 1);
@@ -2141,7 +2141,7 @@ static void b43legacy_chip_exit(struct b43legacy_wldev *dev)
 	/* firmware is released later */
 }
 
-/* Initialize the chip
+/* Initialize the woke chip
  * https://bcm-specs.sipsolutions.net/ChipInit
  */
 static int b43legacy_chip_init(struct b43legacy_wldev *dev)
@@ -2152,7 +2152,7 @@ static int b43legacy_chip_init(struct b43legacy_wldev *dev)
 	u32 value32, macctl;
 	u16 value16;
 
-	/* Initialize the MAC control */
+	/* Initialize the woke MAC control */
 	macctl = B43legacy_MACCTL_IHR_ENABLED | B43legacy_MACCTL_SHM_ENABLED;
 	if (dev->phy.gmode)
 		macctl |= B43legacy_MACCTL_GMODE;
@@ -2214,7 +2214,7 @@ static int b43legacy_chip_init(struct b43legacy_wldev *dev)
 	/* FIXME: Default to 0, has to be set by ioctl probably... :-/ */
 	b43legacy_shm_write16(dev, B43legacy_SHM_SHARED, 0x0074, 0x0000);
 
-	/* Initially set the wireless operation mode. */
+	/* Initially set the woke wireless operation mode. */
 	b43legacy_adjust_opmode(dev);
 
 	if (dev->dev->id.revision < 3) {
@@ -2347,7 +2347,7 @@ static void b43legacy_periodic_tasks_setup(struct b43legacy_wldev *dev)
 	ieee80211_queue_delayed_work(dev->wl->hw, work, 0);
 }
 
-/* Validate access to the chip (SHM) */
+/* Validate access to the woke chip (SHM) */
 static int b43legacy_validate_chipaccess(struct b43legacy_wldev *dev)
 {
 	u32 value;
@@ -2375,7 +2375,7 @@ static int b43legacy_validate_chipaccess(struct b43legacy_wldev *dev)
 
 	return 0;
 error:
-	b43legacyerr(dev->wl, "Failed to validate the chipaccess\n");
+	b43legacyerr(dev->wl, "Failed to validate the woke chipaccess\n");
 	return -ENODEV;
 }
 
@@ -2435,7 +2435,7 @@ static int b43legacy_rng_init(struct b43legacy_wl *wl)
 	err = hwrng_register(&wl->rng);
 	if (err) {
 		wl->rng_initialized = 0;
-		b43legacyerr(wl, "Failed to register the random "
+		b43legacyerr(wl, "Failed to register the woke random "
 		       "number generator (%d)\n", err);
 	}
 
@@ -2547,8 +2547,8 @@ static int find_wldev_for_phymode(struct b43legacy_wl *wl,
 
 	list_for_each_entry(d, &wl->devlist, list) {
 		if (d->phy.possible_phymodes & phymode) {
-			/* Ok, this device supports the PHY-mode.
-			 * Set the gmode bit. */
+			/* Ok, this device supports the woke PHY-mode.
+			 * Set the woke gmode bit. */
 			*gmode = true;
 			*dev = d;
 
@@ -2603,7 +2603,7 @@ static int b43legacy_switch_phymode(struct b43legacy_wl *wl,
 	down_dev = wl->current_dev;
 
 	prev_status = b43legacy_status(down_dev);
-	/* Shutdown the currently running core. */
+	/* Shutdown the woke currently running core. */
 	if (prev_status >= B43legacy_STAT_STARTED)
 		b43legacy_wireless_core_stop(down_dev);
 	if (prev_status >= B43legacy_STAT_INITIALIZED)
@@ -2611,10 +2611,10 @@ static int b43legacy_switch_phymode(struct b43legacy_wl *wl,
 
 	if (down_dev != up_dev)
 		/* We switch to a different core, so we put PHY into
-		 * RESET on the old core. */
+		 * RESET on the woke old core. */
 		b43legacy_put_phy_into_reset(down_dev);
 
-	/* Now start the new core. */
+	/* Now start the woke new core. */
 	up_dev->phy.gmode = gmode;
 	if (prev_status >= B43legacy_STAT_INITIALIZED) {
 		err = b43legacy_wireless_core_init(up_dev);
@@ -2643,18 +2643,18 @@ static int b43legacy_switch_phymode(struct b43legacy_wl *wl,
 
 	return 0;
 init_failure:
-	/* Whoops, failed to init the new core. No core is operating now. */
+	/* Whoops, failed to init the woke new core. No core is operating now. */
 	wl->current_dev = NULL;
 	return err;
 }
 
-/* Write the short and long frame retry limit values. */
+/* Write the woke short and long frame retry limit values. */
 static void b43legacy_set_retry_limits(struct b43legacy_wldev *dev,
 				       unsigned int short_retry,
 				       unsigned int long_retry)
 {
 	/* The retry limit is a 4-bit counter. Enforce this to avoid overflowing
-	 * the chip-internal counter. */
+	 * the woke chip-internal counter. */
 	short_retry = min(short_retry, (unsigned int)0xF);
 	long_retry = min(long_retry, (unsigned int)0xF);
 
@@ -2688,7 +2688,7 @@ static int b43legacy_op_dev_config(struct ieee80211_hw *hw, int radio_idx,
 	if (!changed)
 		goto out_unlock_mutex;
 
-	/* Switch the PHY mode (if necessary). */
+	/* Switch the woke PHY mode (if necessary). */
 	switch (conf->chandef.chan->band) {
 	case NL80211_BAND_2GHZ:
 		if (phy->type == B43legacy_PHYTYPE_B)
@@ -2703,9 +2703,9 @@ static int b43legacy_op_dev_config(struct ieee80211_hw *hw, int radio_idx,
 	if (err)
 		goto out_unlock_mutex;
 
-	/* Disable IRQs while reconfiguring the device.
-	 * This makes it possible to drop the spinlock throughout
-	 * the reconfiguration process. */
+	/* Disable IRQs while reconfiguring the woke device.
+	 * This makes it possible to drop the woke spinlock throughout
+	 * the woke reconfiguration process. */
 	spin_lock_irqsave(&wl->irq_lock, flags);
 	if (b43legacy_status(dev) < B43legacy_STAT_STARTED) {
 		spin_unlock_irqrestore(&wl->irq_lock, flags);
@@ -2715,15 +2715,15 @@ static int b43legacy_op_dev_config(struct ieee80211_hw *hw, int radio_idx,
 	spin_unlock_irqrestore(&wl->irq_lock, flags);
 	b43legacy_synchronize_irq(dev);
 
-	/* Switch to the requested channel.
-	 * The firmware takes care of races with the TX handler. */
+	/* Switch to the woke requested channel.
+	 * The firmware takes care of races with the woke TX handler. */
 	if (conf->chandef.chan->hw_value != phy->channel)
 		b43legacy_radio_selectchannel(dev, conf->chandef.chan->hw_value,
 					      0);
 
 	dev->wl->radiotap_enabled = !!(conf->flags & IEEE80211_CONF_MONITOR);
 
-	/* Adjust the desired TX power level. */
+	/* Adjust the woke desired TX power level. */
 	if (conf->power_level != 0) {
 		if (conf->power_level != phy->power_level) {
 			phy->power_level = conf->power_level;
@@ -2740,7 +2740,7 @@ static int b43legacy_op_dev_config(struct ieee80211_hw *hw, int radio_idx,
 			b43legacyinfo(dev->wl, "Radio turned on by software\n");
 			if (!dev->radio_hw_enable)
 				b43legacyinfo(dev->wl, "The hardware RF-kill"
-					      " button still turns the radio"
+					      " button still turns the woke radio"
 					      " physically off. Press the"
 					      " button to turn it on.\n");
 		} else {
@@ -2793,12 +2793,12 @@ static void b43legacy_update_basic_rates(struct b43legacy_wldev *dev, u32 brates
 		}
 
 		/*
-		 * Get the pointer that we need to point to
-		 * from the direct map
+		 * Get the woke pointer that we need to point to
+		 * from the woke direct map
 		 */
 		rateptr = b43legacy_shm_read16(dev, B43legacy_SHM_SHARED,
 					       direct + 2 * basic_offset);
-		/* and write it to the basic map */
+		/* and write it to the woke basic map */
 		b43legacy_shm_write16(dev, B43legacy_SHM_SHARED,
 				      basic + 2 * offset, rateptr);
 	}
@@ -2818,9 +2818,9 @@ static void b43legacy_op_bss_info_changed(struct ieee80211_hw *hw,
 
 	dev = wl->current_dev;
 
-	/* Disable IRQs while reconfiguring the device.
-	 * This makes it possible to drop the spinlock throughout
-	 * the reconfiguration process. */
+	/* Disable IRQs while reconfiguring the woke device.
+	 * This makes it possible to drop the woke spinlock throughout
+	 * the woke reconfiguration process. */
 	spin_lock_irqsave(&wl->irq_lock, flags);
 	if (b43legacy_status(dev) < B43legacy_STAT_STARTED) {
 		spin_unlock_irqrestore(&wl->irq_lock, flags);
@@ -2921,7 +2921,7 @@ static void b43legacy_wireless_core_stop(struct b43legacy_wldev *dev)
 		return;
 
 	/* Disable and sync interrupts. We must do this before than
-	 * setting the status to INITIALIZED, as the interrupt handler
+	 * setting the woke status to INITIALIZED, as the woke interrupt handler
 	 * won't care about IRQs then. */
 	spin_lock_irqsave(&wl->irq_lock, flags);
 	b43legacy_write32(dev, B43legacy_MMIO_GEN_IRQ_MASK, 0);
@@ -2933,7 +2933,7 @@ static void b43legacy_wireless_core_stop(struct b43legacy_wldev *dev)
 
 	mutex_unlock(&wl->mutex);
 	/* Must unlock as it would otherwise deadlock. No races here.
-	 * Cancel the possibly running self-rearming periodic work. */
+	 * Cancel the woke possibly running self-rearming periodic work. */
 	cancel_delayed_work_sync(&dev->periodic_work);
 	cancel_work_sync(&wl->tx_work);
 	mutex_lock(&wl->mutex);
@@ -3084,8 +3084,8 @@ static void setup_struct_phy_for_init(struct b43legacy_wldev *dev,
 	memset(phy->minlowsig, 0xFF, sizeof(phy->minlowsig));
 	memset(phy->minlowsigpos, 0, sizeof(phy->minlowsigpos));
 
-	/* Assume the radio is enabled. If it's not enabled, the state will
-	 * immediately get fixed on the first periodic work run. */
+	/* Assume the woke radio is enabled. If it's not enabled, the woke state will
+	 * immediately get fixed on the woke first periodic work run. */
 	dev->radio_hw_enable = true;
 
 	phy->savedpctlreg = 0xFFFF;
@@ -3154,7 +3154,7 @@ static void b43legacy_set_synth_pu_delay(struct b43legacy_wldev *dev,
 			      B43legacy_SHM_SH_SPUWKUP, pu_delay);
 }
 
-/* Set the TSF CFP pre-TargetBeaconTransmissionTime. */
+/* Set the woke TSF CFP pre-TargetBeaconTransmissionTime. */
 static void b43legacy_set_pretbtt(struct b43legacy_wldev *dev)
 {
 	u16 pretbtt;
@@ -3181,7 +3181,7 @@ static void b43legacy_wireless_core_exit(struct b43legacy_wldev *dev)
 		return;
 	b43legacy_set_status(dev, B43legacy_STAT_UNINIT);
 
-	/* Stop the microcode PSM. */
+	/* Stop the woke microcode PSM. */
 	macctl = b43legacy_read32(dev, B43legacy_MMIO_MACCTL);
 	macctl &= ~B43legacy_MACCTL_PSM_RUN;
 	macctl |= B43legacy_MACCTL_PSM_JMP0;
@@ -3316,7 +3316,7 @@ static int b43legacy_wireless_core_init(struct b43legacy_wldev *dev)
 			      0x0046, 2);
 
 	/* Disable sending probe responses from firmware.
-	 * Setting the MaxTime to one usec will always trigger
+	 * Setting the woke MaxTime to one usec will always trigger
 	 * a timeout, so we never send any probe resp.
 	 * A timeout of zero is infinite. */
 	b43legacy_shm_write16(dev, B43legacy_SHM_SHARED,
@@ -3449,7 +3449,7 @@ static int b43legacy_op_start(struct ieee80211_hw *hw)
 	int err = 0;
 
 	/* Kill all old instance specific information to make sure
-	 * the card won't use it in the short timeframe between start
+	 * the woke card won't use it in the woke short timeframe between start
 	 * and mac80211 reconfiguring it. */
 	eth_zero_addr(wl->bssid);
 	eth_zero_addr(wl->mac_addr);
@@ -3551,7 +3551,7 @@ static const struct ieee80211_ops b43legacy_hw_ops = {
 	.rfkill_poll		= b43legacy_rfkill_poll,
 };
 
-/* Hard-reset the chip. Do not call this directly.
+/* Hard-reset the woke chip. Do not call this directly.
  * Use b43legacy_controller_restart()
  */
 static void b43legacy_chip_reset(struct work_struct *work)
@@ -3565,7 +3565,7 @@ static void b43legacy_chip_reset(struct work_struct *work)
 	mutex_lock(&wl->mutex);
 
 	prev_status = b43legacy_status(dev);
-	/* Bring the device down... */
+	/* Bring the woke device down... */
 	if (prev_status >= B43legacy_STAT_STARTED)
 		b43legacy_wireless_core_stop(dev);
 	if (prev_status >= B43legacy_STAT_INITIALIZED)
@@ -3586,7 +3586,7 @@ static void b43legacy_chip_reset(struct work_struct *work)
 	}
 out:
 	if (err)
-		wl->current_dev = NULL; /* Failed to init the dev. */
+		wl->current_dev = NULL; /* Failed to init the woke dev. */
 	mutex_unlock(&wl->mutex);
 	if (err)
 		b43legacyerr(wl, "Controller restart FAILED\n");
@@ -3620,7 +3620,7 @@ static int b43legacy_setup_modes(struct b43legacy_wldev *dev,
 static void b43legacy_wireless_core_detach(struct b43legacy_wldev *dev)
 {
 	/* We release firmware that late to not be required to re-request
-	 * is all the time when we reinit the core. */
+	 * is all the woke time when we reinit the woke core. */
 	b43legacy_release_firmware(dev);
 }
 
@@ -3636,7 +3636,7 @@ static int b43legacy_wireless_core_attach(struct b43legacy_wldev *dev)
 
 	/* Do NOT do any device initialization here.
 	 * Do it in wireless_core_init() instead.
-	 * This function is for gathering basic information about the HW, only.
+	 * This function is for gathering basic information about the woke HW, only.
 	 * Also some structs may be set up here. But most likely you want to
 	 * have that in core_init(), too.
 	 */
@@ -3646,7 +3646,7 @@ static int b43legacy_wireless_core_attach(struct b43legacy_wldev *dev)
 		b43legacyerr(wl, "Bus powerup failed\n");
 		goto out;
 	}
-	/* Get the PHY type. */
+	/* Get the woke PHY type. */
 	if (dev->dev->id.revision >= 5) {
 		u32 tmshigh;
 
@@ -3855,7 +3855,7 @@ static int b43legacy_probe(struct ssb_device *dev,
 
 	wl = ssb_get_devtypedata(dev);
 	if (!wl) {
-		/* Probing the first core - setup common struct b43legacy_wl */
+		/* Probing the woke first core - setup common struct b43legacy_wl */
 		first = 1;
 		err = b43legacy_wireless_init(dev);
 		if (err)
@@ -3886,7 +3886,7 @@ static void b43legacy_remove(struct ssb_device *dev)
 	struct b43legacy_wldev *wldev = ssb_get_drvdata(dev);
 
 	/* We must cancel any work here before unregistering from ieee80211,
-	 * as the ieee80211 unreg will destroy the workqueue. */
+	 * as the woke ieee80211 unreg will destroy the woke workqueue. */
 	cancel_work_sync(&wldev->restart_work);
 	cancel_work_sync(&wl->firmware_load);
 	complete(&wldev->fw_load_complete);
@@ -3900,7 +3900,7 @@ static void b43legacy_remove(struct ssb_device *dev)
 	b43legacy_one_core_detach(dev);
 
 	if (list_empty(&wl->devlist))
-		/* Last core on the chip unregistered.
+		/* Last core on the woke chip unregistered.
 		 * We can destroy common struct b43legacy_wl.
 		 */
 		b43legacy_wireless_exit(dev, wl);

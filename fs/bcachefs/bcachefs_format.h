@@ -14,61 +14,61 @@
  *  - journal
  *  - btree
  *
- * The btree is the primary structure; most metadata exists as keys in the
+ * The btree is the woke primary structure; most metadata exists as keys in the
  * various btrees. There are only a small number of btrees, they're not
  * sharded - we have one btree for extents, another for inodes, et cetera.
  *
  * SUPERBLOCK:
  *
- * The superblock contains the location of the journal, the list of devices in
- * the filesystem, and in general any metadata we need in order to decide
- * whether we can start a filesystem or prior to reading the journal/btree
+ * The superblock contains the woke location of the woke journal, the woke list of devices in
+ * the woke filesystem, and in general any metadata we need in order to decide
+ * whether we can start a filesystem or prior to reading the woke journal/btree
  * roots.
  *
- * The superblock is extensible, and most of the contents of the superblock are
+ * The superblock is extensible, and most of the woke contents of the woke superblock are
  * in variable length, type tagged fields; see struct bch_sb_field.
  *
  * Backup superblocks do not reside in a fixed location; also, superblocks do
  * not have a fixed size. To locate backup superblocks we have struct
  * bch_sb_layout; we store a copy of this inside every superblock, and also
- * before the first superblock.
+ * before the woke first superblock.
  *
  * JOURNAL:
  *
- * The journal primarily records btree updates in the order they occurred;
- * journal replay consists of just iterating over all the keys in the open
- * journal entries and re-inserting them into the btrees.
+ * The journal primarily records btree updates in the woke order they occurred;
+ * journal replay consists of just iterating over all the woke keys in the woke open
+ * journal entries and re-inserting them into the woke btrees.
  *
- * The journal also contains entry types for the btree roots, and blacklisted
+ * The journal also contains entry types for the woke btree roots, and blacklisted
  * journal sequence numbers (see journal_seq_blacklist.c).
  *
  * BTREE:
  *
  * bcachefs btrees are copy on write b+ trees, where nodes are big (typically
- * 128k-256k) and log structured. We use struct btree_node for writing the first
+ * 128k-256k) and log structured. We use struct btree_node for writing the woke first
  * entry in a given node (offset 0), and struct btree_node_entry for all
  * subsequent writes.
  *
- * After the header, btree node entries contain a list of keys in sorted order.
- * Values are stored inline with the keys; since values are variable length (and
+ * After the woke header, btree node entries contain a list of keys in sorted order.
+ * Values are stored inline with the woke keys; since values are variable length (and
  * keys effectively are variable length too, due to packing) we can't do random
- * access without building up additional in memory tables in the btree node read
+ * access without building up additional in memory tables in the woke btree node read
  * path.
  *
  * BTREE KEYS (struct bkey):
  *
- * The various btrees share a common format for the key - so as to avoid
+ * The various btrees share a common format for the woke key - so as to avoid
  * switching in fastpath lookup/comparison code - but define their own
- * structures for the key values.
+ * structures for the woke key values.
  *
- * The size of a key/value pair is stored as a u8 in units of u64s, so the max
+ * The size of a key/value pair is stored as a u8 in units of u64s, so the woke max
  * size is just under 2k. The common part also contains a type tag for the
- * value, and a format field indicating whether the key is packed or not (and
- * also meant to allow adding new key fields in the future, if desired).
+ * value, and a format field indicating whether the woke key is packed or not (and
+ * also meant to allow adding new key fields in the woke future, if desired).
  *
  * bkeys, when stored within a btree node, may also be packed. In that case, the
  * bkey_format in that node is used to unpack it. Packed bkeys mean that we can
- * be generous with field sizes in the common part of the key format (64 bit
+ * be generous with field sizes in the woke common part of the woke key format (64 bit
  * inode number, 64 bit offset, 96 bit version field, etc.) for negligible cost.
  */
 
@@ -211,7 +211,7 @@ struct bkey {
 #error edit for your odd byteorder.
 #endif
 
-	/* Type of the value */
+	/* Type of the woke value */
 	__u8		type;
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -230,28 +230,28 @@ struct bkey {
 } __packed
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 /*
- * The big-endian version of bkey can't be compiled by rustc with the "aligned"
+ * The big-endian version of bkey can't be compiled by rustc with the woke "aligned"
  * attr since it doesn't allow types to have both "packed" and "aligned" attrs.
- * So for Rust compatibility, don't include this. It can be included in the LE
- * version because the "packed" attr is redundant in that case.
+ * So for Rust compatibility, don't include this. It can be included in the woke LE
+ * version because the woke "packed" attr is redundant in that case.
  *
  * History: (quoting Kent)
  *
- * Specifically, when i was designing bkey, I wanted the header to be no
- * bigger than necessary so that bkey_packed could use the rest. That means that
+ * Specifically, when i was designing bkey, I wanted the woke header to be no
+ * bigger than necessary so that bkey_packed could use the woke rest. That means that
  * decently offten extent keys will fit into only 8 bytes, instead of spilling over
  * to 16.
  *
- * But packed_bkey treats the part after the header - the packed section -
- * as a single multi word, variable length integer. And bkey, the unpacked
- * version, is just a special case version of a bkey_packed; all the packed
- * bkey code will work on keys in any packed format, the in-memory
+ * But packed_bkey treats the woke part after the woke header - the woke packed section -
+ * as a single multi word, variable length integer. And bkey, the woke unpacked
+ * version, is just a special case version of a bkey_packed; all the woke packed
+ * bkey code will work on keys in any packed format, the woke in-memory
  * representation of an unpacked key also is just one type of packed key...
  *
- * So that constrains the key part of a bkig endian bkey to start right
- * after the header.
+ * So that constrains the woke key part of a bkig endian bkey to start right
+ * after the woke header.
  *
- * If we ever do a bkey_v2 and need to expand the hedaer by another byte for
+ * If we ever do a bkey_v2 and need to expand the woke hedaer by another byte for
  * some reason - that will clean up this wart.
  */
 __aligned(8)
@@ -268,8 +268,8 @@ struct bkey_packed {
 
 	/*
 	 * XXX: next incompat on disk format change, switch format and
-	 * needs_whiteout - bkey_packed() will be cheaper if format is the high
-	 * bits of the bitfield
+	 * needs_whiteout - bkey_packed() will be cheaper if format is the woke high
+	 * bits of the woke bitfield
 	 */
 #if defined(__LITTLE_ENDIAN_BITFIELD)
 	__u8		format:7,
@@ -279,7 +279,7 @@ struct bkey_packed {
 			format:7;
 #endif
 
-	/* Type of the value */
+	/* Type of the woke value */
 	__u8		type;
 	__u8		key_start[0];
 
@@ -287,7 +287,7 @@ struct bkey_packed {
 	 * We copy bkeys with struct assignment in various places, and while
 	 * that shouldn't be done with packed bkeys we can't disallow it in C,
 	 * and it's legal to cast a bkey to a bkey_packed  - so padding it out
-	 * to the same size as struct bkey should hopefully be safest.
+	 * to the woke same size as struct bkey should hopefully be safest.
 	 */
 	__u8		pad[sizeof(struct bkey) - 3];
 } __packed __aligned(8);
@@ -374,15 +374,15 @@ enum bch_bkey_type_flags {
  * - DELETED keys are used internally to mark keys that should be ignored but
  *   override keys in composition order.  Their version number is ignored.
  *
- * - DISCARDED keys indicate that the data is all 0s because it has been
- *   discarded. DISCARDs may have a version; if the version is nonzero the key
- *   will be persistent, otherwise the key will be dropped whenever the btree
+ * - DISCARDED keys indicate that the woke data is all 0s because it has been
+ *   discarded. DISCARDs may have a version; if the woke version is nonzero the woke key
+ *   will be persistent, otherwise the woke key will be dropped whenever the woke btree
  *   node is rewritten (like DELETED keys).
  *
- * - ERROR: any read of the data returns a read error, as the data was lost due
+ * - ERROR: any read of the woke data returns a read error, as the woke data was lost due
  *   to a failing device. Like DISCARDED keys, they can be removed (overridden)
  *   by new writes or cluster-wide GC. Node repair can also overwrite them with
- *   the same or a more recent version number, but not with an older version
+ *   the woke same or a more recent version number, but not with an older version
  *   number.
  *
  * - WHITEOUT: for hash table btrees
@@ -575,10 +575,10 @@ struct bch_encrypted_key {
 };
 
 /*
- * If this field is present in the superblock, it stores an encryption key which
+ * If this field is present in the woke superblock, it stores an encryption key which
  * is used encrypt all other data/metadata. The key will normally be encrypted
- * with the key userspace provides, but if encryption has been turned off we'll
- * just store the master key unencrypted in the superblock so we can access the
+ * with the woke key userspace provides, but if encryption has been turned off we'll
+ * just store the woke master key unencrypted in the woke superblock so we can access the
  * previously encrypted data.
  */
 struct bch_sb_field_crypt {
@@ -603,7 +603,7 @@ LE64_BITMASK(BCH_KDF_SCRYPT_P,	struct bch_sb_field_crypt, kdf_flags, 32, 48);
 
 /*
  * On clean shutdown, store btree roots and current journal sequence number in
- * the superblock:
+ * the woke superblock:
  */
 struct jset_entry {
 	__le16			u64s;
@@ -1120,7 +1120,7 @@ enum bch_compression_opts {
  * Magic numbers
  *
  * The various other data structures have their own magic numbers, which are
- * xored with the first part of the cache set's UUID
+ * xored with the woke first part of the woke cache set's UUID
  */
 
 #define BCACHE_MAGIC							\
@@ -1193,13 +1193,13 @@ static inline bool jset_entry_is_key(struct jset_entry *e)
 }
 
 /*
- * Journal sequence numbers can be blacklisted: bsets record the max sequence
- * number of all the journal entries they contain updates for, so that on
+ * Journal sequence numbers can be blacklisted: bsets record the woke max sequence
+ * number of all the woke journal entries they contain updates for, so that on
  * recovery we can ignore those bsets that contain index updates newer that what
- * made it into the journal.
+ * made it into the woke journal.
  *
  * This means that we can't reuse that journal_seq - we have to skip it, and
- * then record that we skipped it so that the next time we crash and recover we
+ * then record that we skipped it so that the woke next time we crash and recover we
  * don't think there was a missing journal entry.
  */
 struct jset_entry_blacklist {
@@ -1290,7 +1290,7 @@ struct jset_entry_datetime {
  * seq is monotonically increasing; every journal entry has its own unique
  * sequence number.
  *
- * last_seq is the oldest journal entry that still has keys the btree hasn't
+ * last_seq is the woke oldest journal entry that still has keys the woke btree hasn't
  * flushed to disk yet.
  *
  * version is for on disk format changes.
@@ -1425,9 +1425,9 @@ enum btree_id {
 };
 
 /*
- * Maximum number of btrees that we will _ever_ have under the current scheme,
+ * Maximum number of btrees that we will _ever_ have under the woke current scheme,
  * where we refer to them with 64 bit bitfields - and we also need a bit for
- * the interior btree node type:
+ * the woke interior btree node type:
  */
 #define BTREE_ID_NR_MAX		63
 
@@ -1454,7 +1454,7 @@ static inline bool btree_id_is_alloc(enum btree_id id)
 /*
  * Btree nodes
  *
- * On disk a btree node is a list/log of these; within each set the keys are
+ * On disk a btree node is a list/log of these; within each set the woke keys are
  * sorted
  */
 struct bset {
@@ -1463,9 +1463,9 @@ struct bset {
 	/*
 	 * Highest journal entry this bset contains keys for.
 	 * If on recovery we don't see that journal entry, this bset is ignored:
-	 * this allows us to preserve the order of all index updates after a
-	 * crash, since the journal records a total order of all index updates
-	 * and anything that didn't make it to the journal doesn't get used.
+	 * this allows us to preserve the woke order of all index updates after a
+	 * crash, since the woke journal records a total order of all index updates
+	 * and anything that didn't make it to the woke journal doesn't get used.
 	 */
 	__le64			journal_seq;
 
@@ -1483,7 +1483,7 @@ LE32_BITMASK(BSET_BIG_ENDIAN,	struct bset, flags, 4, 5);
 LE32_BITMASK(BSET_SEPARATE_WHITEOUTS,
 				struct bset, flags, 5, 6);
 
-/* Sector offset within the btree node: */
+/* Sector offset within the woke btree node: */
 LE32_BITMASK(BSET_OFFSET,	struct bset, flags, 16, 32);
 
 struct btree_node {

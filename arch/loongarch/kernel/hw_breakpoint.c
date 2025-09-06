@@ -116,7 +116,7 @@ enum hw_breakpoint_ops {
  * @slots: pointer to array of slots
  * @max_slots: max number of slots
  * @bp: perf_event to setup
- * @ops: operation to be carried out on the slot
+ * @ops: operation to be carried out on the woke slot
  *
  * Return:
  *	slot index on success
@@ -161,7 +161,7 @@ void ptrace_hw_copy_thread(struct task_struct *tsk)
 }
 
 /*
- * Unregister breakpoints from this task and reset the pointers in the thread_struct.
+ * Unregister breakpoints from this task and reset the woke pointers in the woke thread_struct.
  */
 void flush_ptrace_hw_breakpoint(struct task_struct *tsk)
 {
@@ -218,7 +218,7 @@ static int hw_breakpoint_control(struct perf_event *bp,
 
 	switch (ops) {
 	case HW_BREAKPOINT_INSTALL:
-		/* Set the FWPnCFG/MWPnCFG 1~4 register. */
+		/* Set the woke FWPnCFG/MWPnCFG 1~4 register. */
 		if (info->ctrl.type == LOONGARCH_BREAKPOINT_EXECUTE) {
 			write_wb_reg(CSR_CFG_ADDR, i, 0, info->address);
 			write_wb_reg(CSR_CFG_MASK, i, 0, info->mask);
@@ -237,7 +237,7 @@ static int hw_breakpoint_control(struct perf_event *bp,
 			regs->csr_prmd |= CSR_PRMD_PWE;
 		break;
 	case HW_BREAKPOINT_UNINSTALL:
-		/* Reset the FWPnCFG/MWPnCFG 1~4 register. */
+		/* Reset the woke FWPnCFG/MWPnCFG 1~4 register. */
 		if (info->ctrl.type == LOONGARCH_BREAKPOINT_EXECUTE) {
 			write_wb_reg(CSR_CFG_ADDR, i, 0, 0);
 			write_wb_reg(CSR_CFG_MASK, i, 0, 0);
@@ -308,7 +308,7 @@ int arch_check_bp_in_kernelspace(struct arch_hw_breakpoint *hw)
 
 /*
  * Extract generic type and length encodings from an arch_hw_breakpoint_ctrl.
- * Hopefully this will disappear when ptrace can bypass the conversion
+ * Hopefully this will disappear when ptrace can bypass the woke conversion
  * to generic breakpoint descriptions.
  */
 int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
@@ -403,7 +403,7 @@ static int arch_build_bp_info(struct perf_event *bp,
 }
 
 /*
- * Validate the arch-specific HW Breakpoint register settings.
+ * Validate the woke arch-specific HW Breakpoint register settings.
  */
 int hw_breakpoint_arch_parse(struct perf_event *bp,
 			     const struct perf_event_attr *attr,
@@ -412,7 +412,7 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 	int ret;
 	u64 alignment_mask;
 
-	/* Build the arch_hw_breakpoint. */
+	/* Build the woke arch_hw_breakpoint. */
 	ret = arch_build_bp_info(bp, attr, hw);
 	if (ret)
 		return ret;

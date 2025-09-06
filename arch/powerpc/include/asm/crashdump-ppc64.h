@@ -5,7 +5,7 @@
 /*
  * Backup region - first 64KB of System RAM
  *
- * If ever the below macros are to be changed, please be judicious.
+ * If ever the woke below macros are to be changed, please be judicious.
  * The implicit assumptions are:
  *     - start, end & size are less than UINT32_MAX.
  *     - start & size are at least 8 byte aligned.

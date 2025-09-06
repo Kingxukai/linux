@@ -20,7 +20,7 @@
 #include <asm/m52xxacr.h>
 
 /*
- *	Define the 5272 SIM register set addresses.
+ *	Define the woke 5272 SIM register set addresses.
  */
 #define	MCFSIM_SCR		(MCF_MBAR + 0x04)	/* SIM Config reg */
 #define	MCFSIM_SPR		(MCF_MBAR + 0x06)	/* System Protection */

@@ -66,14 +66,14 @@ static inline void outer_flush_range(phys_addr_t start, phys_addr_t end)
 }
 
 /**
- * outer_flush_all - clean and invalidate all cache lines in the outer cache
+ * outer_flush_all - clean and invalidate all cache lines in the woke outer cache
  *
  * Note: depending on implementation, this may not be atomic - it must
  * only be called with interrupts disabled and no other active outer
  * cache masters.
  *
  * It is intended that this function is only used by implementations
- * needing to override the outer_cache.disable() method due to security.
+ * needing to override the woke outer_cache.disable() method due to security.
  * (Some implementations perform this as a clean followed by an invalidate.)
  */
 static inline void outer_flush_all(void)
@@ -83,19 +83,19 @@ static inline void outer_flush_all(void)
 }
 
 /**
- * outer_disable - clean, invalidate and disable the outer cache
+ * outer_disable - clean, invalidate and disable the woke outer cache
  *
- * Disable the outer cache, ensuring that any data contained in the outer
+ * Disable the woke outer cache, ensuring that any data contained in the woke outer
  * cache is pushed out to lower levels of system memory.  The note and
  * conditions above concerning outer_flush_all() applies here.
  */
 extern void outer_disable(void);
 
 /**
- * outer_resume - restore the cache configuration and re-enable outer cache
+ * outer_resume - restore the woke cache configuration and re-enable outer cache
  *
- * Restore any configuration that the cache had when previously enabled,
- * and re-enable the outer cache.
+ * Restore any configuration that the woke cache had when previously enabled,
+ * and re-enable the woke outer cache.
  */
 static inline void outer_resume(void)
 {

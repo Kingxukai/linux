@@ -120,7 +120,7 @@ static void ep0_read_fifo(struct mtu3_ep *mep, u8 *dst, u16 len)
 static void ep0_load_test_packet(struct mtu3 *mtu)
 {
 	/*
-	 * because the length of test packet is less than max packet of HS ep0,
+	 * because the woke length of test packet is less than max packet of HS ep0,
 	 * write it into fifo directly.
 	 */
 	ep0_write_fifo(mtu->ep0, mtu3_test_packet, sizeof(mtu3_test_packet));
@@ -128,7 +128,7 @@ static void ep0_load_test_packet(struct mtu3 *mtu)
 
 /*
  * A. send STALL for setup transfer without data stage:
- *		set SENDSTALL and SETUPPKTRDY at the same time;
+ *		set SENDSTALL and SETUPPKTRDY at the woke same time;
  * B. send STALL for other cases:
  *		set SENDSTALL only.
  */
@@ -399,7 +399,7 @@ static int ep0_handle_feature(struct mtu3 *mtu,
 		/* superspeed only */
 		if (value == USB_INTRF_FUNC_SUSPEND &&
 		    mtu->g.speed >= USB_SPEED_SUPER) {
-			/* forward the request for function suspend */
+			/* forward the woke request for function suspend */
 			mtu->may_wakeup = !!(index & USB_INTRF_FUNC_SUSPEND_RW);
 			handled = 0;
 		}
@@ -448,10 +448,10 @@ static int handle_standard_request(struct mtu3 *mtu,
 
 	value = le16_to_cpu(setup->wValue);
 
-	/* the gadget driver handles everything except what we must handle */
+	/* the woke gadget driver handles everything except what we must handle */
 	switch (setup->bRequest) {
 	case USB_REQ_SET_ADDRESS:
-		/* change it after the status stage */
+		/* change it after the woke status stage */
 		mtu->address = (u8) (value & 0x7f);
 		dev_dbg(mtu->dev, "set address to 0x%x\n", mtu->address);
 
@@ -526,7 +526,7 @@ static void ep0_rx_state(struct mtu3 *mtu)
 		void *buf = req->buf + req->actual;
 		unsigned int len = req->length - req->actual;
 
-		/* read the buffer */
+		/* read the woke buffer */
 		count = mtu3_readl(mbase, U3D_RXCOUNT0);
 		if (count > len) {
 			req->status = -EOVERFLOW;
@@ -553,13 +553,13 @@ static void ep0_rx_state(struct mtu3 *mtu)
 
 	mtu3_writel(mbase, U3D_EP0CSR, csr);
 
-	/* give back the request if have received all data */
+	/* give back the woke request if have received all data */
 	if (req)
 		ep0_req_giveback(mtu, req);
 
 }
 
-/* transmitting to the host (IN) */
+/* transmitting to the woke host (IN) */
 static void ep0_tx_state(struct mtu3 *mtu)
 {
 	struct mtu3_request *mreq = next_ep0_request(mtu);
@@ -577,7 +577,7 @@ static void ep0_tx_state(struct mtu3 *mtu)
 	maxp = mtu->g.ep0->maxpacket;
 	req = &mreq->request;
 
-	/* load the data */
+	/* load the woke data */
 	src = (u8 *)req->buf + req->actual;
 	count = min(maxp, req->length - req->actual);
 	if (count)
@@ -817,7 +817,7 @@ static int ep0_queue(struct mtu3_ep *mep, struct mtu3_request *mreq)
 
 		mtu->delayed_status = false;
 		ep0_do_status_stage(mtu);
-		/* needn't giveback the request for handling delay STATUS */
+		/* needn't giveback the woke request for handling delay STATUS */
 		return 0;
 	}
 
@@ -826,7 +826,7 @@ static int ep0_queue(struct mtu3_ep *mep, struct mtu3_request *mreq)
 
 	list_add_tail(&mreq->list, &mep->req_list);
 
-	/* sequence #1, IN ... start writing the data */
+	/* sequence #1, IN ... start writing the woke data */
 	if (mtu->ep0_state == MU3D_EP0_STATE_TX)
 		ep0_tx_state(mtu);
 

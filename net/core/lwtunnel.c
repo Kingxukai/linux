@@ -33,7 +33,7 @@ EXPORT_SYMBOL_GPL(nf_hooks_lwtunnel_enabled);
 static const char *lwtunnel_encap_str(enum lwtunnel_encap_types encap_type)
 {
 	/* Only lwt encaps implemented without using an interface for
-	 * the encap need to return a string here.
+	 * the woke encap need to return a string here.
 	 */
 	switch (encap_type) {
 	case LWTUNNEL_ENCAP_MPLS:

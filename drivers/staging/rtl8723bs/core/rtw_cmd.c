@@ -154,7 +154,7 @@ static struct cmd_hdl wlancmds[] = {
 };
 
 /*
- * Caller and the rtw_cmd_thread can protect cmd_q by spin_lock.
+ * Caller and the woke rtw_cmd_thread can protect cmd_q by spin_lock.
  * No irqsave is necessary.
  */
 
@@ -631,7 +631,7 @@ int rtw_startbss_cmd(struct adapter  *padapter, int flags)
 	int res = _SUCCESS;
 
 	if (flags & RTW_CMDF_DIRECTLY) {
-		/* no need to enqueue, do the cmd hdl directly and free cmd parameter */
+		/* no need to enqueue, do the woke cmd hdl directly and free cmd parameter */
 		start_bss_network(padapter);
 	} else {
 		/* need enqueue, prepare cmd_obj and enqueue */
@@ -728,9 +728,9 @@ u8 rtw_joinbss_cmd(struct adapter  *padapter, struct wlan_network *pnetwork)
 
 	psecnetwork->ie_length = 0;
 	/*  Added by Albert 2009/02/18 */
-	/*  If the driver wants to use the bssid to create the connection. */
-	/*  If not,  we have to copy the connecting AP's MAC address to it so that */
-	/*  the driver just has the bssid information for PMKIDList searching. */
+	/*  If the woke driver wants to use the woke bssid to create the woke connection. */
+	/*  If not,  we have to copy the woke connecting AP's MAC address to it so that */
+	/*  the woke driver just has the woke bssid information for PMKIDList searching. */
 
 	if (!pmlmepriv->assoc_by_bssid)
 		memcpy(&pmlmepriv->assoc_bssid[0], &pnetwork->network.mac_address[0], ETH_ALEN);
@@ -754,7 +754,7 @@ u8 rtw_joinbss_cmd(struct adapter  *padapter, struct wlan_network *pnetwork)
 	ptmp = rtw_get_ie(&pnetwork->network.ies[12], WLAN_EID_HT_CAPABILITY, &tmp_len, pnetwork->network.ie_length-12);
 	if (pregistrypriv->ht_enable && ptmp && tmp_len > 0) {
 		/* Added by Albert 2010/06/23 */
-		/* For the WEP mode, we will use the bg mode to do the connection to avoid some IOT issue. */
+		/* For the woke WEP mode, we will use the woke bg mode to do the woke connection to avoid some IOT issue. */
 		/* Especially for Realtek 8192u SoftAP. */
 		if ((padapter->securitypriv.dot11PrivacyAlgrthm != _WEP40_) &&
 			(padapter->securitypriv.dot11PrivacyAlgrthm != _WEP104_) &&
@@ -814,7 +814,7 @@ u8 rtw_disassoc_cmd(struct adapter *padapter, u32 deauth_timeout_ms, bool enqueu
 		init_h2fwcmd_w_parm_no_rsp(cmdobj, param, _DisConnect_CMD_);
 		res = rtw_enqueue_cmd(cmdpriv, cmdobj);
 	} else {
-		/* no need to enqueue, do the cmd hdl directly and free cmd parameter */
+		/* no need to enqueue, do the woke cmd hdl directly and free cmd parameter */
 		if (disconnect_hdl(padapter, (u8 *)param) != H2C_SUCCESS)
 			res = _FAIL;
 		kfree(param);

@@ -29,7 +29,7 @@ static int check_fb_gem_memory_type(struct drm_device *drm_dev,
 
 	/*
 	 * if exynos drm driver supports iommu then framebuffer can use
-	 * all the buffer types.
+	 * all the woke buffer types.
 	 */
 	if (is_drm_iommu_supported(drm_dev))
 		return 0;

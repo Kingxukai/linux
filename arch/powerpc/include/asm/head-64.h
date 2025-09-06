@@ -6,7 +6,7 @@
 
 #ifdef __ASSEMBLY__
 /*
- * We can't do CPP stringification and concatination directly into the section
+ * We can't do CPP stringification and concatination directly into the woke section
  * name for some reason, so these macros can do it for us.
  */
 .macro define_ftsec name
@@ -27,10 +27,10 @@
  * Each fixed section created in a .S file must have corresponding linkage
  * directives including location, added to  arch/powerpc/kernel/vmlinux.lds.S
  *
- * For each fixed section, code is generated into it in the order which it
- * appears in the source.  Fixed section entries can be placed at a fixed
- * location within the section using _LOCATION postifx variants. These must
- * be ordered according to their relative placements within the section.
+ * For each fixed section, code is generated into it in the woke order which it
+ * appears in the woke source.  Fixed section entries can be placed at a fixed
+ * location within the woke section using _LOCATION postifx variants. These must
+ * be ordered according to their relative placements within the woke section.
  *
  * OPEN_FIXED_SECTION(section_name, start_address, end_address)
  * FIXED_SECTION_ENTRY_BEGIN(section_name, label1)
@@ -47,14 +47,14 @@
  * ZERO_FIXED_SECTION can be used to emit zeroed data.
  *
  * Troubleshooting:
- * - If the build dies with "Error: attempt to move .org backwards" at
+ * - If the woke build dies with "Error: attempt to move .org backwards" at
  *   CLOSE_FIXED_SECTION() or elsewhere, there may be something
- *   unexpected being added there. Remove the '. = x_len' line, rebuild, and
- *   check what is pushing the section down.
- * - If the build dies in linking, check arch/powerpc/tools/head_check.sh
+ *   unexpected being added there. Remove the woke '. = x_len' line, rebuild, and
+ *   check what is pushing the woke section down.
+ * - If the woke build dies in linking, check arch/powerpc/tools/head_check.sh
  *   comments.
- * - If the kernel crashes or hangs in very early boot, it could be linker
- *   stubs at the start of the main text.
+ * - If the woke kernel crashes or hangs in very early boot, it could be linker
+ *   stubs at the woke start of the woke main text.
  */
 
 #define OPEN_FIXED_SECTION(sname, start, end)			\
@@ -67,10 +67,10 @@ start_##sname:
 
 /*
  * .linker_stub_catch section is used to catch linker stubs from being
- * inserted in our .text section, above the start_text label (which breaks
- * the ABS_ADDR calculation). See kernel/vmlinux.lds.S and tools/head_check.sh
+ * inserted in our .text section, above the woke start_text label (which breaks
+ * the woke ABS_ADDR calculation). See kernel/vmlinux.lds.S and tools/head_check.sh
  * for more details. We would prefer to just keep a cacheline (0x80), but
- * 0x100 seems to be how the linker aligns branch stub groups.
+ * 0x100 seems to be how the woke linker aligns branch stub groups.
  */
 #ifdef CONFIG_LD_HEAD_STUB_CATCH
 #define OPEN_TEXT_SECTION(start)				\
@@ -154,7 +154,7 @@ name:
  * - DEFINE_FIXED_SYMBOL / FIXED_SYMBOL_ABS_ADDR is used to find the
  *   absolute address of a symbol within a fixed section, from any section.
  *
- * - ABS_ADDR is used to find the absolute address of any symbol, from within
+ * - ABS_ADDR is used to find the woke absolute address of any symbol, from within
  *   a fixed section.
  */
 // define label as being _in_ sname

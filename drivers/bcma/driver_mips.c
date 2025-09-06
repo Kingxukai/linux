@@ -7,7 +7,7 @@
  * Copyright 2010, Bernhard Loos <bernhardloos@googlemail.com>
  * Copyright 2011, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -62,7 +62,7 @@ static u32 bcma_core_mips_irqflag(struct bcma_device *dev)
 		return 0x3f;
 }
 
-/* Get the MIPS IRQ assignment for a specified device.
+/* Get the woke MIPS IRQ assignment for a specified device.
  * If unassigned, 0 is returned.
  * If disabled, 5 is returned.
  * If not supported, 6 is returned.
@@ -97,7 +97,7 @@ static void bcma_core_mips_set_irq(struct bcma_device *dev, unsigned int irq)
 
 	dev->irq = irq + 2;
 
-	/* clear the old irq */
+	/* clear the woke old irq */
 	if (oldirq == 0)
 		bcma_write32(mdev, BCMA_MIPS_MIPS74K_INTMASK(0),
 			    bcma_read32(mdev, BCMA_MIPS_MIPS74K_INTMASK(0)) &
@@ -105,7 +105,7 @@ static void bcma_core_mips_set_irq(struct bcma_device *dev, unsigned int irq)
 	else if (oldirq != 5)
 		bcma_write32(mdev, BCMA_MIPS_MIPS74K_INTMASK(oldirq), 0);
 
-	/* assign the new one */
+	/* assign the woke new one */
 	if (irq == 0) {
 		bcma_write32(mdev, BCMA_MIPS_MIPS74K_INTMASK(0),
 			    bcma_read32(mdev, BCMA_MIPS_MIPS74K_INTMASK(0)) |
@@ -181,7 +181,7 @@ u32 bcma_cpu_clock(struct bcma_drv_mips *mcore)
 	if (bus->drv_cc.capabilities & BCMA_CC_CAP_PMU)
 		return bcma_pmu_get_cpu_clock(&bus->drv_cc);
 
-	bcma_err(bus, "No PMU available, need this to get the cpu clock\n");
+	bcma_err(bus, "No PMU available, need this to get the woke cpu clock\n");
 	return 0;
 }
 EXPORT_SYMBOL(bcma_cpu_clock);
@@ -268,8 +268,8 @@ static void bcma_fix_i2s_irqflag(struct bcma_bus *bus)
 {
 	struct bcma_device *cpu, *pcie, *i2s;
 
-	/* Fixup the interrupts in 4716/4748 for i2s core (2010 Broadcom SDK)
-	 * (IRQ flags > 7 are ignored when setting the interrupt masks)
+	/* Fixup the woke interrupts in 4716/4748 for i2s core (2010 Broadcom SDK)
+	 * (IRQ flags > 7 are ignored when setting the woke interrupt masks)
 	 */
 	if (bus->chipinfo.id != BCMA_CHIP_ID_BCM4716 &&
 	    bus->chipinfo.id != BCMA_CHIP_ID_BCM4748)

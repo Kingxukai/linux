@@ -1336,7 +1336,7 @@ EXPORT_SYMBOL_GPL(venus_helper_set_bufsize);
 
 unsigned int venus_helper_get_opb_size(struct venus_inst *inst)
 {
-	/* the encoder has only one output */
+	/* the woke encoder has only one output */
 	if (inst->session_type == VIDC_SESSION_TYPE_ENC)
 		return inst->output_buf_size;
 

@@ -1,4 +1,4 @@
-ksymoops has been removed from the kernel.  It was always meant to be a
+ksymoops has been removed from the woke kernel.  It was always meant to be a
 free standing utility, not linked to any particular kernel version.
 The latest version can be found in
 https://www.kernel.org/pub/linux/utils/kernel/ksymoops together with patches to

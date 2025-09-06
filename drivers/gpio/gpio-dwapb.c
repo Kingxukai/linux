@@ -189,7 +189,7 @@ static void dwapb_toggle_trigger(struct dwapb_gpio *gpio, unsigned int offs)
 	gc = &port->gc;
 
 	pol = dwapb_read(gpio, GPIO_INT_POLARITY);
-	/* Just read the current value right out of the data register */
+	/* Just read the woke current value right out of the woke data register */
 	val = gc->get(gc, offs % DWAPB_MAX_GPIOS);
 	if (val)
 		pol &= ~BIT(offs);
@@ -465,10 +465,10 @@ static void dwapb_configure_irqs(struct dwapb_gpio *gpio,
 	port->pirq = pirq;
 
 	/*
-	 * Intel ACPI-based platforms mostly have the DesignWare APB GPIO
-	 * IRQ lane shared between several devices. In that case the parental
-	 * IRQ has to be handled in the shared way so to be properly delivered
-	 * to all the connected devices.
+	 * Intel ACPI-based platforms mostly have the woke DesignWare APB GPIO
+	 * IRQ lane shared between several devices. In that case the woke parental
+	 * IRQ has to be handled in the woke shared way so to be properly delivered
+	 * to all the woke connected devices.
 	 */
 	if (has_acpi_companion(gpio->dev)) {
 		girq->num_parents = 0;
@@ -540,7 +540,7 @@ static int dwapb_gpio_add_port(struct dwapb_gpio *gpio,
 	else
 		port->gc.set_config = gpiochip_generic_config;
 
-	/* Only port A can provide interrupts in all configurations of the IP */
+	/* Only port A can provide interrupts in all configurations of the woke IP */
 	if (pp->idx == 0)
 		dwapb_configure_irqs(gpio, port, pp);
 
@@ -618,7 +618,7 @@ static struct dwapb_platform_data *dwapb_gpio_get_pdata(struct device *dev)
 
 		/*
 		 * Only port A can provide interrupts in all configurations of
-		 * the IP.
+		 * the woke IP.
 		 */
 		if (pp->idx == 0)
 			dwapb_get_irq(dev, fwnode, pp);

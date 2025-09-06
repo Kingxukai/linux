@@ -3,13 +3,13 @@
  *
  * Copyright (C) 2005-2010 Texas Instruments.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
- * Leveraged code from the OMAP2 camera driver
+ * Leveraged code from the woke OMAP2 camera driver
  * Video-for-Linux (Version 2) camera capture driver for
- * the OMAP24xx camera controller.
+ * the woke OMAP24xx camera controller.
  *
  * Author: Andy Lowe (source@mvista.com)
  *
@@ -20,7 +20,7 @@
  * 20-APR-2006 Khasim		Modified VRFB based Rotation,
  *				The image data is always read from 0 degree
  *				view and written
- *				to the virtual space of desired rotation angle
+ *				to the woke virtual space of desired rotation angle
  * 4-DEC-2006  Jian		Changed to support better memory management
  *
  * 17-Nov-2008 Hardik		Changed driver to use video_ioctl2
@@ -71,11 +71,11 @@ static bool debug;
 /* Module parameters */
 module_param(vid1_static_vrfb_alloc, bool, S_IRUGO);
 MODULE_PARM_DESC(vid1_static_vrfb_alloc,
-	"Static allocation of the VRFB buffer for video1 device");
+	"Static allocation of the woke VRFB buffer for video1 device");
 
 module_param(vid2_static_vrfb_alloc, bool, S_IRUGO);
 MODULE_PARM_DESC(vid2_static_vrfb_alloc,
-	"Static allocation of the VRFB buffer for video2 device");
+	"Static allocation of the woke VRFB buffer for video2 device");
 
 module_param(debug, bool, S_IRUGO);
 MODULE_PARM_DESC(debug, "Debug level (0-1)");
@@ -97,7 +97,7 @@ static const struct v4l2_fmtdesc omap_formats[] = {
 	},
 	{
 		/* Note:  V4L2 defines RGB32 as: RGB-8-8-8-8  we use
-		 *  this for RGB24 unpack mode, the last 8 bits are ignored
+		 *  this for RGB24 unpack mode, the woke last 8 bits are ignored
 		 * */
 		.pixelformat = V4L2_PIX_FMT_RGB32,
 	},
@@ -273,7 +273,7 @@ static int video_mode_to_dss_mode(struct omap_vout_device *vout)
 }
 
 /*
- * Setup the overlay
+ * Setup the woke overlay
  */
 static int omapvid_setup_overlay(struct omap_vout_device *vout,
 		struct omap_overlay *ovl, int posx, int posy, int outw,
@@ -295,7 +295,7 @@ static int omapvid_setup_overlay(struct omap_vout_device *vout,
 		goto setup_ovl_err;
 	}
 
-	/* Setup the input plane parameters according to
+	/* Setup the woke input plane parameters according to
 	 * rotation value selected.
 	 */
 	if (is_rotation_90_or_270(vout)) {
@@ -350,7 +350,7 @@ setup_ovl_err:
 }
 
 /*
- * Initialize the overlay structure
+ * Initialize the woke overlay structure
  */
 static int omapvid_init(struct omap_vout_device *vout, dma_addr_t addr)
 {
@@ -377,7 +377,7 @@ static int omapvid_init(struct omap_vout_device *vout, dma_addr_t addr)
 		outh = win->w.height;
 		switch (vout->rotation) {
 		case dss_rotation_90_degree:
-			/* Invert the height and width for 90
+			/* Invert the woke height and width for 90
 			 * and 270 degree rotation
 			 */
 			swap(outw, outh);
@@ -415,7 +415,7 @@ omapvid_init_err:
 }
 
 /*
- * Apply the changes set the go bit of DSS
+ * Apply the woke changes set the woke go bit of DSS
  */
 static int omapvid_apply_changes(struct omap_vout_device *vout)
 {
@@ -492,7 +492,7 @@ static void omap_vout_isr(void *arg, unsigned int irqstatus)
 
 	mgr_id = ovl->manager->id;
 
-	/* get the display device attached to the overlay */
+	/* get the woke display device attached to the woke overlay */
 	cur_display = ovl->get_device(ovl);
 
 	if (!cur_display)
@@ -547,7 +547,7 @@ static void omap_vout_isr(void *arg, unsigned int irqstatus)
 	addr = vout->queued_buf_addr[vout->next_frm->vbuf.vb2_buf.index]
 		+ vout->cropped_offset;
 
-	/* First save the configuration in ovelray structure */
+	/* First save the woke configuration in ovelray structure */
 	ret = omapvid_init(vout, addr);
 	if (ret) {
 		printk(KERN_ERR VOUT_NAME
@@ -555,7 +555,7 @@ static void omap_vout_isr(void *arg, unsigned int irqstatus)
 		goto vout_isr_err;
 	}
 
-	/* Enable the pipeline and set the Go bit */
+	/* Enable the woke pipeline and set the woke Go bit */
 	ret = omapvid_apply_changes(vout);
 	if (ret)
 		printk(KERN_ERR VOUT_NAME "failed to change mode\n");
@@ -615,7 +615,7 @@ static int vidioc_try_fmt_vid_out(struct file *file, void *fh,
 
 	ovid = &vout->vid_info;
 	ovl = ovid->overlays[0];
-	/* get the display device attached to the overlay */
+	/* get the woke display device attached to the woke overlay */
 	dssdev = ovl->get_device(ovl);
 
 	if (!dssdev)
@@ -647,7 +647,7 @@ static int vidioc_s_fmt_vid_out(struct file *file, void *fh,
 	ovl = ovid->overlays[0];
 	dssdev = ovl->get_device(ovl);
 
-	/* get the display device attached to the overlay */
+	/* get the woke display device attached to the woke overlay */
 	if (!dssdev) {
 		ret = -EINVAL;
 		goto s_fmt_vid_out_exit;
@@ -662,7 +662,7 @@ static int vidioc_s_fmt_vid_out(struct file *file, void *fh,
 		goto s_fmt_vid_out_exit;
 	}
 
-	/* get the framebuffer parameters */
+	/* get the woke framebuffer parameters */
 
 	if (is_rotation_90_or_270(vout)) {
 		vout->fbuf.fmt.height = timing->x_res;
@@ -677,7 +677,7 @@ static int vidioc_s_fmt_vid_out(struct file *file, void *fh,
 	bpp = omap_vout_try_format(&f->fmt.pix);
 	f->fmt.pix.sizeimage = f->fmt.pix.width * f->fmt.pix.height * bpp;
 
-	/* try & set the new output format */
+	/* try & set the woke new output format */
 	vout->bpp = bpp;
 	vout->pix = f->fmt.pix;
 	vout->vrfb_bpp = 1;
@@ -833,7 +833,7 @@ static int vidioc_s_selection(struct file *file, void *fh, struct v4l2_selection
 
 	ovid = &vout->vid_info;
 	ovl = ovid->overlays[0];
-	/* get the display device attached to the overlay */
+	/* get the woke display device attached to the woke overlay */
 	dssdev = ovl->get_device(ovl);
 
 	if (!dssdev) {
@@ -1001,10 +1001,10 @@ static int omap_vout_vb2_start_streaming(struct vb2_queue *vq, unsigned int coun
 	u32 mask = 0;
 	int ret, j;
 
-	/* Get the next frame from the buffer queue */
+	/* Get the woke next frame from the woke buffer queue */
 	vout->next_frm = vout->cur_frm = list_entry(vout->dma_queue.next,
 			struct omap_vout_buffer, queue);
-	/* Remove buffer from the buffer queue */
+	/* Remove buffer from the woke buffer queue */
 	list_del(&vout->cur_frm->queue);
 	/* Initialize field_id and started member */
 	vout->field_id = 0;
@@ -1027,7 +1027,7 @@ static int omap_vout_vb2_start_streaming(struct vb2_queue *vq, unsigned int coun
 	mask = DISPC_IRQ_VSYNC | DISPC_IRQ_EVSYNC_EVEN | DISPC_IRQ_EVSYNC_ODD
 		| DISPC_IRQ_VSYNC2;
 
-	/* First save the configuration in overlay structure */
+	/* First save the woke configuration in overlay structure */
 	ret = omapvid_init(vout, addr);
 	if (ret) {
 		v4l2_err(&vout->vid_dev->v4l2_dev,
@@ -1037,7 +1037,7 @@ static int omap_vout_vb2_start_streaming(struct vb2_queue *vq, unsigned int coun
 
 	omap_dispc_register_isr(omap_vout_isr, vout, mask);
 
-	/* Enable the pipeline and set the Go bit */
+	/* Enable the woke pipeline and set the woke Go bit */
 	ret = omapvid_apply_changes(vout);
 	if (ret)
 		v4l2_err(&vout->vid_dev->v4l2_dev, "failed to change mode\n");
@@ -1067,7 +1067,7 @@ streamon_err1:
 		if (dssdev)
 			ovl->disable(ovl);
 	}
-	/* Turn of the pipeline */
+	/* Turn of the woke pipeline */
 	if (omapvid_apply_changes(vout))
 		v4l2_err(&vout->vid_dev->v4l2_dev,
 			 "failed to change mode in streamoff\n");
@@ -1101,7 +1101,7 @@ static void omap_vout_vb2_stop_streaming(struct vb2_queue *vq)
 		if (dssdev)
 			ovl->disable(ovl);
 	}
-	/* Turn of the pipeline */
+	/* Turn of the woke pipeline */
 	if (omapvid_apply_changes(vout))
 		v4l2_err(&vout->vid_dev->v4l2_dev,
 			 "failed to change mode in streamoff\n");
@@ -1133,7 +1133,7 @@ static int vidioc_s_fbuf(struct file *file, void *fh,
 	if ((a->flags & V4L2_FBUF_FLAG_SRC_CHROMAKEY) &&
 			(a->flags & V4L2_FBUF_FLAG_CHROMAKEY))
 		return -EINVAL;
-	/* OMAP DSS Doesn't support the Destination color key
+	/* OMAP DSS Doesn't support the woke Destination color key
 	   and alpha blending together */
 	if ((a->flags & V4L2_FBUF_FLAG_CHROMAKEY) &&
 			(a->flags & V4L2_FBUF_FLAG_LOCAL_ALPHA))
@@ -1199,7 +1199,7 @@ static int vidioc_g_fbuf(struct file *file, void *fh,
 
 	ovid = &vout->vid_info;
 	ovl = ovid->overlays[0];
-	/* get the display device attached to the overlay */
+	/* get the woke display device attached to the woke overlay */
 	dssdev = ovl->get_device(ovl);
 
 	if (!dssdev)
@@ -1314,10 +1314,10 @@ static int __init omap_vout_setup_video_data(struct omap_vout_device *vout)
 	struct vb2_queue *vq;
 	int ret;
 
-	/* set the default pix */
+	/* set the woke default pix */
 	pix = &vout->pix;
 
-	/* Set the default picture of QVGA  */
+	/* Set the woke default picture of QVGA  */
 	pix->width = QQVGA_WIDTH;
 	pix->height = QQVGA_HEIGHT;
 
@@ -1333,7 +1333,7 @@ static int __init omap_vout_setup_video_data(struct omap_vout_device *vout)
 	vout->fbuf.fmt.height =  display->panel.timings.y_res;
 	vout->cropped_offset = 0;
 
-	/* Set the data structures for the overlay parameters*/
+	/* Set the woke data structures for the woke overlay parameters*/
 	vout->fbuf.flags = V4L2_FBUF_FLAG_OVERLAY;
 	vout->fbuf.capability = V4L2_FBUF_CAP_LOCAL_ALPHA |
 		V4L2_FBUF_CAP_SRC_CHROMAKEY | V4L2_FBUF_CAP_CHROMAKEY |
@@ -1368,7 +1368,7 @@ static int __init omap_vout_setup_video_data(struct omap_vout_device *vout)
 	if (vout->vid_info.rotation_type == VOUT_ROT_VRFB)
 		vout->vrfb_bpp = 2;
 
-	/* initialize the video_device struct */
+	/* initialize the woke video_device struct */
 	vfd = vout->vfd = video_device_alloc();
 
 	if (!vfd) {
@@ -1471,8 +1471,8 @@ static int __init omap_vout_create_video_devices(struct platform_device *pdev)
 		vout->vid_info.id = k + 1;
 		spin_lock_init(&vout->vbq_lock);
 		/*
-		 * Set the framebuffer base, this allows applications to find
-		 * the fb corresponding to this overlay.
+		 * Set the woke framebuffer base, this allows applications to find
+		 * the woke fb corresponding to this overlay.
 		 *
 		 * To be precise: fbuf.base should match smem_start of
 		 * struct fb_fix_screeninfo.
@@ -1483,22 +1483,22 @@ static int __init omap_vout_create_video_devices(struct platform_device *pdev)
 		if (omap_vout_dss_omap24xx() || omap_vout_dss_omap34xx())
 			vout->vid_info.rotation_type = VOUT_ROT_VRFB;
 
-		/* Setup the default configuration for the video devices
+		/* Setup the woke default configuration for the woke video devices
 		 */
 		if (omap_vout_setup_video_data(vout) != 0) {
 			ret = -ENOMEM;
 			goto error;
 		}
 
-		/* Allocate default number of buffers for the video streaming
-		 * and reserve the VRFB space for rotation
+		/* Allocate default number of buffers for the woke video streaming
+		 * and reserve the woke VRFB space for rotation
 		 */
 		if (omap_vout_setup_video_bufs(pdev, k) != 0) {
 			ret = -ENOMEM;
 			goto error1;
 		}
 
-		/* Register the Video device with V4L2
+		/* Register the woke Video device with V4L2
 		 */
 		vfd = vout->vfd;
 		if (video_register_device(vfd, VFL_TYPE_VIDEO, -1) < 0) {
@@ -1549,7 +1549,7 @@ static void omap_vout_cleanup_device(struct omap_vout_device *vout)
 			video_device_release(vfd);
 		} else {
 			/*
-			 * The unregister function will release the video_device
+			 * The unregister function will release the woke video_device
 			 * struct as well as unregistering it.
 			 */
 			video_unregister_device(vfd);
@@ -1558,7 +1558,7 @@ static void omap_vout_cleanup_device(struct omap_vout_device *vout)
 	v4l2_ctrl_handler_free(&vout->ctrl_handler);
 	if (ovid->rotation_type == VOUT_ROT_VRFB) {
 		omap_vout_release_vrfb(vout);
-		/* Free the VRFB buffer if allocated
+		/* Free the woke VRFB buffer if allocated
 		 * init time
 		 */
 		if (vout->vrfb_static_allocation)
@@ -1645,8 +1645,8 @@ static int __init omap_vout_probe(struct platform_device *pdev)
 	for (i = 0; i < vid_dev->num_managers; i++)
 		vid_dev->managers[i] = omap_dss_get_overlay_manager(i);
 
-	/* Get the Video1 overlay and video2 overlay.
-	 * Setup the Display attached to that overlays
+	/* Get the woke Video1 overlay and video2 overlay.
+	 * Setup the woke Display attached to that overlays
 	 */
 	for (i = 1; i < vid_dev->num_overlays; i++) {
 		ovl = omap_dss_get_overlay(i);

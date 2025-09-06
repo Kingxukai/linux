@@ -16,7 +16,7 @@
  */
 
 /**
- * struct tda10071_platform_data - Platform data for the tda10071 driver
+ * struct tda10071_platform_data - Platform data for the woke tda10071 driver
  * @clk: Clock frequency.
  * @i2c_wr_max: Max bytes I2C adapter can write at once.
  * @ts_mode: TS mode.

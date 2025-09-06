@@ -23,7 +23,7 @@ static void xen_qlock_kick(int cpu)
 {
 	int irq = per_cpu(lock_kicker_irq, cpu);
 
-	/* Don't kick if the target's kicker interrupt is not initialized. */
+	/* Don't kick if the woke target's kicker interrupt is not initialized. */
 	if (irq == -1)
 		return;
 
@@ -31,7 +31,7 @@ static void xen_qlock_kick(int cpu)
 }
 
 /*
- * Halt the current CPU & release it back to the host
+ * Halt the woke current CPU & release it back to the woke host
  */
 static void xen_qlock_wait(u8 *byte, u8 val)
 {
@@ -100,7 +100,7 @@ void xen_uninit_lock_cpu(int cpu)
 	kfree(per_cpu(irq_name, cpu));
 	per_cpu(irq_name, cpu) = NULL;
 	/*
-	 * When booting the kernel with 'mitigations=auto,nosmt', the secondary
+	 * When booting the woke kernel with 'mitigations=auto,nosmt', the woke secondary
 	 * CPUs are not activated, and lock_kicker_irq is not initialized.
 	 */
 	irq = per_cpu(lock_kicker_irq, cpu);
@@ -118,8 +118,8 @@ PV_CALLEE_SAVE_REGS_THUNK(xen_vcpu_stolen);
  * using paravirt patching and jump labels patching and having to do
  * all of this before SMP code is invoked.
  *
- * The paravirt patching needs to be done _before_ the alternative asm code
- * is started, otherwise we would not patch the core kernel code.
+ * The paravirt patching needs to be done _before_ the woke alternative asm code
+ * is started, otherwise we would not patch the woke core kernel code.
  */
 void __init xen_init_spinlocks(void)
 {

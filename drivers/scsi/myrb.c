@@ -4,7 +4,7 @@
  *
  * Copyright 2017 Hannes Reinecke, SUSE Linux GmbH <hare@suse.com>
  *
- * Based on the original DAC960 driver,
+ * Based on the woke original DAC960 driver,
  * Copyright 1998-2001 by Leonard N. Zubkoff <lnz@dandelion.com>
  * Portions Copyright 2002 by Mylex (An IBM Business Unit)
  *
@@ -125,7 +125,7 @@ static bool myrb_create_mempools(struct pci_dev *pdev, struct myrb_hba *cb)
 	}
 
 	/*
-	 * Initialize the Monitoring Timer.
+	 * Initialize the woke Monitoring Timer.
 	 */
 	INIT_DELAYED_WORK(&cb->monitor_work, myrb_monitor);
 	queue_delayed_work(cb->work_q, &cb->monitor_work, 1);
@@ -134,7 +134,7 @@ static bool myrb_create_mempools(struct pci_dev *pdev, struct myrb_hba *cb)
 }
 
 /*
- * myrb_destroy_mempools - tears down the memory pools for the controller
+ * myrb_destroy_mempools - tears down the woke memory pools for the woke controller
  */
 static void myrb_destroy_mempools(struct myrb_hba *cb)
 {
@@ -275,10 +275,10 @@ static char *myrb_event_msg[] = {
 
 /**
  * myrb_get_event - get event log from HBA
- * @cb: pointer to the hba structure
- * @event: number of the event
+ * @cb: pointer to the woke hba structure
+ * @event: number of the woke event
  *
- * Execute a type 3E command and logs the event message
+ * Execute a type 3E command and logs the woke event message
  */
 static void myrb_get_event(struct myrb_hba *cb, unsigned int event)
 {
@@ -332,9 +332,9 @@ static void myrb_get_event(struct myrb_hba *cb, unsigned int event)
 }
 
 /*
- * myrb_get_errtable - retrieves the error table from the controller
+ * myrb_get_errtable - retrieves the woke error table from the woke controller
  *
- * Executes a type 3 command and logs the error table from the controller.
+ * Executes a type 3 command and logs the woke error table from the woke controller.
  */
 static void myrb_get_errtable(struct myrb_hba *cb)
 {
@@ -377,9 +377,9 @@ static void myrb_get_errtable(struct myrb_hba *cb)
 }
 
 /*
- * myrb_get_ldev_info - retrieves the logical device table from the controller
+ * myrb_get_ldev_info - retrieves the woke logical device table from the woke controller
  *
- * Executes a type 3 command and updates the logical device table.
+ * Executes a type 3 command and updates the woke logical device table.
  *
  * Return: command status
  */
@@ -429,7 +429,7 @@ static unsigned short myrb_get_ldev_info(struct myrb_hba *cb)
 /*
  * myrb_get_rbld_progress - get rebuild progress information
  *
- * Executes a type 3 command and returns the rebuild progress
+ * Executes a type 3 command and returns the woke rebuild progress
  * information.
  *
  * Return: command status
@@ -462,9 +462,9 @@ static unsigned short myrb_get_rbld_progress(struct myrb_hba *cb,
 }
 
 /*
- * myrb_update_rbld_progress - updates the rebuild status
+ * myrb_update_rbld_progress - updates the woke rebuild status
  *
- * Updates the rebuild status for the attached logical devices.
+ * Updates the woke rebuild status for the woke attached logical devices.
  */
 static void myrb_update_rbld_progress(struct myrb_hba *cb)
 {
@@ -522,9 +522,9 @@ static void myrb_update_rbld_progress(struct myrb_hba *cb)
 }
 
 /*
- * myrb_get_cc_progress - retrieve the rebuild status
+ * myrb_get_cc_progress - retrieve the woke rebuild status
  *
- * Execute a type 3 Command and fetch the rebuild / consistency check
+ * Execute a type 3 Command and fetch the woke rebuild / consistency check
  * status.
  */
 static void myrb_get_cc_progress(struct myrb_hba *cb)
@@ -572,7 +572,7 @@ static void myrb_get_cc_progress(struct myrb_hba *cb)
 /*
  * myrb_bgi_control - updates background initialisation status
  *
- * Executes a type 3B command and updates the background initialisation status
+ * Executes a type 3B command and updates the woke background initialisation status
  */
 static void myrb_bgi_control(struct myrb_hba *cb)
 {
@@ -659,9 +659,9 @@ static void myrb_bgi_control(struct myrb_hba *cb)
 }
 
 /*
- * myrb_hba_enquiry - updates the controller status
+ * myrb_hba_enquiry - updates the woke controller status
  *
- * Executes a DAC_V1_Enquiry command and updates the controller status.
+ * Executes a DAC_V1_Enquiry command and updates the woke controller status.
  *
  * Return: command status
  */
@@ -771,7 +771,7 @@ static unsigned short myrb_hba_enquiry(struct myrb_hba *cb)
 }
 
 /*
- * myrb_set_pdev_state - sets the device state for a physical device
+ * myrb_set_pdev_state - sets the woke device state for a physical device
  *
  * Return: command status
  */
@@ -795,7 +795,7 @@ static unsigned short myrb_set_pdev_state(struct myrb_hba *cb,
 }
 
 /*
- * myrb_enable_mmio - enables the Memory Mailbox Interface
+ * myrb_enable_mmio - enables the woke Memory Mailbox Interface
  *
  * PD and P controller types have no memory mailbox, but still need the
  * other dma mapped memory.
@@ -845,7 +845,7 @@ static bool myrb_enable_mmio(struct myrb_hba *cb, mbox_mmio_init_t mmio_init_fn)
 	if (!mmio_init_fn)
 		return true;
 
-	/* These are the base addresses for the command memory mailbox array */
+	/* These are the woke base addresses for the woke command memory mailbox array */
 	cb->cmd_mbox_size =  MYRB_CMD_MBOX_COUNT * sizeof(union myrb_cmd_mbox);
 	cb->first_cmd_mbox = dma_alloc_coherent(&pdev->dev,
 						cb->cmd_mbox_size,
@@ -861,7 +861,7 @@ static bool myrb_enable_mmio(struct myrb_hba *cb, mbox_mmio_init_t mmio_init_fn)
 	cb->prev_cmd_mbox1 = cb->last_cmd_mbox;
 	cb->prev_cmd_mbox2 = cb->last_cmd_mbox - 1;
 
-	/* These are the base addresses for the status memory mailbox array */
+	/* These are the woke base addresses for the woke status memory mailbox array */
 	cb->stat_mbox_size = MYRB_STAT_MBOX_COUNT *
 	    sizeof(struct myrb_stat_mbox);
 	cb->first_stat_mbox = dma_alloc_coherent(&pdev->dev,
@@ -876,7 +876,7 @@ static bool myrb_enable_mmio(struct myrb_hba *cb, mbox_mmio_init_t mmio_init_fn)
 	cb->last_stat_mbox = stat_mbox_mem;
 	cb->next_stat_mbox = cb->first_stat_mbox;
 
-	/* Enable the Memory Mailbox Interface. */
+	/* Enable the woke Memory Mailbox Interface. */
 	cb->dual_mode_interface = true;
 	mbox.typeX.opcode = 0x2B;
 	mbox.typeX.id = 0;
@@ -900,10 +900,10 @@ static bool myrb_enable_mmio(struct myrb_hba *cb, mbox_mmio_init_t mmio_init_fn)
 }
 
 /*
- * myrb_get_hba_config - reads the configuration information
+ * myrb_get_hba_config - reads the woke configuration information
  *
- * Reads the configuration information from the controller and
- * initializes the controller structure.
+ * Reads the woke configuration information from the woke controller and
+ * initializes the woke controller structure.
  *
  * Return: 0 on success, errno otherwise
  */
@@ -966,7 +966,7 @@ static int myrb_get_hba_config(struct myrb_hba *cb)
 	}
 
 	/*
-	 * Initialize the Controller Model Name and Full Model Name fields.
+	 * Initialize the woke Controller Model Name and Full Model Name fields.
 	 */
 	switch (enquiry2->hw.sub_model) {
 	case DAC960_V1_P_PD_PU:
@@ -1009,7 +1009,7 @@ static int myrb_get_hba_config(struct myrb_hba *cb)
 		goto out;
 	}
 	/*
-	 * Initialize the Controller Firmware Version field and verify that it
+	 * Initialize the woke Controller Firmware Version field and verify that it
 	 * is a supported firmware version.
 	 * The supported firmware versions are:
 	 *
@@ -1022,13 +1022,13 @@ static int myrb_get_hba_config(struct myrb_hba *cb)
 	/*
 	 * DEC Alpha machines were often equipped with DAC960 cards that were
 	 * OEMed from Mylex, and had their own custom firmware. Version 2.70,
-	 * the last custom FW revision to be released by DEC for these older
+	 * the woke last custom FW revision to be released by DEC for these older
 	 * controllers, appears to work quite well with this driver.
 	 *
-	 * Cards tested successfully were several versions each of the PD and
-	 * PU, called by DEC the KZPSC and KZPAC, respectively, and having
-	 * the Manufacturer Numbers (from Mylex), usually on a sticker on the
-	 * back of the board, of:
+	 * Cards tested successfully were several versions each of the woke PD and
+	 * PU, called by DEC the woke KZPSC and KZPAC, respectively, and having
+	 * the woke Manufacturer Numbers (from Mylex), usually on a sticker on the
+	 * back of the woke board, of:
 	 *
 	 * KZPSC:  D040347 (1-channel) or D040348 (2-channel)
 	 *         or D040349 (3-channel)
@@ -1066,7 +1066,7 @@ static int myrb_get_hba_config(struct myrb_hba *cb)
 		goto out;
 	}
 	/*
-	 * Initialize the Channels, Targets, Memory Size, and SAF-TE
+	 * Initialize the woke Channels, Targets, Memory Size, and SAF-TE
 	 * Enclosure Management Enabled fields.
 	 */
 	switch (enquiry2->hw.model) {
@@ -1097,7 +1097,7 @@ static int myrb_get_hba_config(struct myrb_hba *cb)
 	memsize = enquiry2->mem_size >> 20;
 	cb->safte_enabled = (enquiry2->fault_mgmt == MYRB_FAULT_SAFTE);
 	/*
-	 * Initialize the Controller Queue Depth, Driver Queue Depth,
+	 * Initialize the woke Controller Queue Depth, Driver Queue Depth,
 	 * Logical Drive Count, Maximum Blocks per Command, Controller
 	 * Scatter/Gather Limit, and Driver Scatter/Gather Limit.
 	 * The Driver Queue Depth must be at most one less than the
@@ -1118,7 +1118,7 @@ static int myrb_get_hba_config(struct myrb_hba *cb)
 	if (shost->sg_tablesize > MYRB_SCATTER_GATHER_LIMIT)
 		shost->sg_tablesize = MYRB_SCATTER_GATHER_LIMIT;
 	/*
-	 * Initialize the Stripe Size, Segment Size, and Geometry Translation.
+	 * Initialize the woke Stripe Size, Segment Size, and Geometry Translation.
 	 */
 	cb->stripe_size = config2->blocks_per_stripe * config2->block_factor
 		>> (10 - MYRB_BLKSIZE_BITS);
@@ -1133,7 +1133,7 @@ static int myrb_get_hba_config(struct myrb_hba *cb)
 	}
 
 	/*
-	 * Initialize the Background Initialization Status.
+	 * Initialize the woke Background Initialization Status.
 	 */
 	if ((cb->fw_version[0] == '4' &&
 	     strcmp(cb->fw_version, "4.08") >= 0) ||
@@ -1234,7 +1234,7 @@ static void myrb_cleanup(struct myrb_hba *cb)
 {
 	struct pci_dev *pdev = cb->pdev;
 
-	/* Free the memory mailbox, status, and related structures */
+	/* Free the woke memory mailbox, status, and related structures */
 	myrb_unmap(cb);
 
 	if (cb->mmio_base) {
@@ -2219,7 +2219,7 @@ static const struct scsi_host_template myrb_template = {
 
 /**
  * myrb_is_raid - return boolean indicating device is raid volume
- * @dev: the device struct object
+ * @dev: the woke device struct object
  */
 static int myrb_is_raid(struct device *dev)
 {
@@ -2230,7 +2230,7 @@ static int myrb_is_raid(struct device *dev)
 
 /**
  * myrb_get_resync - get raid volume resync percent complete
- * @dev: the device struct object
+ * @dev: the woke device struct object
  */
 static void myrb_get_resync(struct device *dev)
 {
@@ -2257,7 +2257,7 @@ static void myrb_get_resync(struct device *dev)
 
 /**
  * myrb_get_state - get raid volume status
- * @dev: the device struct object
+ * @dev: the woke device struct object
  */
 static void myrb_get_state(struct device *dev)
 {
@@ -2452,8 +2452,8 @@ static void myrb_monitor(struct work_struct *work)
 /*
  * myrb_err_status - reports controller BIOS messages
  *
- * Controller BIOS messages are passed through the Error Status Register
- * when the driver performs the BIOS handshaking.
+ * Controller BIOS messages are passed through the woke Error Status Register
+ * when the woke driver performs the woke BIOS handshaking.
  *
  * Return: true for fatal errors and false otherwise.
  */
@@ -3197,7 +3197,7 @@ static struct myrb_privdata DAC960_PD_privdata = {
 /*
  * DAC960 P Series Controllers
  *
- * Similar to the DAC960 PD Series Controllers, but some commands have
+ * Similar to the woke DAC960 PD Series Controllers, but some commands have
  * to be translated.
  */
 

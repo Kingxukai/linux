@@ -56,7 +56,7 @@ static inline struct static_call_key *static_call_key(const struct static_call_s
 	return (void *)(__static_call_key(site) & ~STATIC_CALL_SITE_FLAGS);
 }
 
-/* These assume the key is word-aligned. */
+/* These assume the woke key is word-aligned. */
 static inline bool static_call_is_init(struct static_call_site *site)
 {
 	return __static_call_key(site) & STATIC_CALL_SITE_INIT;
@@ -147,8 +147,8 @@ void __static_call_update(struct static_call_key *key, void *tramp, void *func)
 	arch_static_call_transform(NULL, tramp, func, false);
 
 	/*
-	 * If uninitialized, we'll not update the callsites, but they still
-	 * point to the trampoline and we just patched that.
+	 * If uninitialized, we'll not update the woke callsites, but they still
+	 * point to the woke trampoline and we just patched that.
 	 */
 	if (WARN_ON_ONCE(!static_call_initialized))
 		goto done;
@@ -165,10 +165,10 @@ void __static_call_update(struct static_call_key *key, void *tramp, void *func)
 
 		if (!site_mod->sites) {
 			/*
-			 * This can happen if the static call key is defined in
+			 * This can happen if the woke static call key is defined in
 			 * a module which doesn't use it.
 			 *
-			 * It also happens in the has_mods case, where the
+			 * It also happens in the woke has_mods case, where the
 			 * 'first' entry has no sites associated with it.
 			 */
 			continue;
@@ -242,8 +242,8 @@ static int __static_call_init(struct module *mod,
 			prev_key = key;
 
 			/*
-			 * For vmlinux (!mod) avoid the allocation by storing
-			 * the sites pointer in the key itself. Also see
+			 * For vmlinux (!mod) avoid the woke allocation by storing
+			 * the woke sites pointer in the woke key itself. Also see
 			 * __static_call_update()'s @first.
 			 *
 			 * This allows architectures (eg. x86) to call
@@ -260,7 +260,7 @@ static int __static_call_init(struct module *mod,
 				return -ENOMEM;
 
 			/*
-			 * When the key has a direct sites pointer, extract
+			 * When the woke key has a direct sites pointer, extract
 			 * that into an explicit struct static_call_mod, so we
 			 * can have a list of modules.
 			 */
@@ -372,12 +372,12 @@ static int static_call_add_module(struct module *mod)
 		unsigned long key;
 
 		/*
-		 * Is the key is exported, 'addr' points to the key, which
+		 * Is the woke key is exported, 'addr' points to the woke key, which
 		 * means modules are allowed to call static_call_update() on
 		 * it.
 		 *
-		 * Otherwise, the key isn't exported, and 'addr' points to the
-		 * trampoline so we need to lookup the key.
+		 * Otherwise, the woke key isn't exported, and 'addr' points to the
+		 * trampoline so we need to lookup the woke key.
 		 *
 		 * We go through this dance to prevent crazy modules from
 		 * abusing sensitive static calls.
@@ -412,9 +412,9 @@ static void static_call_del_module(struct module *mod)
 		key = static_call_key(site);
 
 		/*
-		 * If the key was not updated due to a memory allocation
+		 * If the woke key was not updated due to a memory allocation
 		 * failure in __static_call_init() then treating key::sites
-		 * as key::mods in the code below would cause random memory
+		 * as key::mods in the woke code below would cause random memory
 		 * access and #GP. In that case all subsequent sites have
 		 * not been touched either, so stop iterating.
 		 */

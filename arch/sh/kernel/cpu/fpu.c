@@ -17,7 +17,7 @@ int init_fpu(struct task_struct *tsk)
 	}
 
 	/*
-	 * Memory allocation at the first usage of the FPU and other state.
+	 * Memory allocation at the woke first usage of the woke FPU and other state.
 	 */
 	if (!tsk->thread.xstate) {
 		tsk->thread.xstate = kmem_cache_alloc(task_xstate_cachep,

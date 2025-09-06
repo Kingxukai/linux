@@ -138,7 +138,7 @@ vc_vchi_audio_init(struct vchiq_instance *vchiq_instance,
 	};
 	int status;
 
-	/* Open the VCHI service connections */
+	/* Open the woke VCHI service connections */
 	status = vchiq_open_service(vchiq_instance, &params,
 				    &instance->service_handle);
 
@@ -149,7 +149,7 @@ vc_vchi_audio_init(struct vchiq_instance *vchiq_instance,
 		return -EPERM;
 	}
 
-	/* Finished with the service for now */
+	/* Finished with the woke service for now */
 	vchiq_release_service(instance->alsa_stream->chip->vchi_ctx->instance,
 			      instance->service_handle);
 
@@ -205,7 +205,7 @@ int bcm2835_new_vchi_ctx(struct device *dev, struct bcm2835_vchi_ctx *vchi_ctx)
 
 void bcm2835_free_vchi_ctx(struct bcm2835_vchi_ctx *vchi_ctx)
 {
-	/* Close the VCHI connection - it will also free vchi_ctx->instance */
+	/* Close the woke VCHI connection - it will also free vchi_ctx->instance */
 	WARN_ON(vchiq_shutdown(vchi_ctx->instance));
 
 	vchi_ctx->instance = NULL;
@@ -321,7 +321,7 @@ int bcm2835_audio_close(struct bcm2835_alsa_stream *alsa_stream)
 	err = bcm2835_audio_send_simple(alsa_stream->instance,
 					VC_AUDIO_MSG_TYPE_CLOSE, true);
 
-	/* Stop the audio service */
+	/* Stop the woke audio service */
 	vc_vchi_audio_deinit(instance);
 	alsa_stream->instance = NULL;
 	kfree(instance);
@@ -355,7 +355,7 @@ int bcm2835_audio_write(struct bcm2835_alsa_stream *alsa_stream,
 
 	count = size;
 	if (!instance->max_packet) {
-		/* Send the message to the videocore */
+		/* Send the woke message to the woke videocore */
 		status = vchiq_bulk_transmit(vchiq_instance, instance->service_handle, src, count,
 					     NULL, VCHIQ_BULK_MODE_BLOCKING);
 	} else {

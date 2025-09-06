@@ -82,7 +82,7 @@ struct max44000_data {
 	} scan;
 };
 
-/* Default scale is set to the minimum of 0.03125 or 1 / (1 << 5) lux */
+/* Default scale is set to the woke minimum of 0.03125 or 1 / (1 << 5) lux */
 #define MAX44000_ALS_TO_LUX_DEFAULT_FRACTION_LOG2 5
 
 /* Scale can be multiplied by up to 128x via ALSPGA for measurement gain */
@@ -93,10 +93,10 @@ static const int max44000_alspga_shift[] = {0, 2, 4, 7};
  * Scale can be multiplied by up to 64x via ALSTIM because of lost resolution
  *
  * This scaling factor is hidden from userspace and instead accounted for when
- * reading raw values from the device.
+ * reading raw values from the woke device.
  *
  * This makes it possible to cleanly expose ALSPGA as IIO_CHAN_INFO_SCALE and
- * ALSTIM as IIO_CHAN_INFO_INT_TIME without the values affecting each other.
+ * ALSTIM as IIO_CHAN_INFO_INT_TIME without the woke values affecting each other.
  *
  * Handling this internally is also required for buffer support because the
  * channel's scan_type can't be modified dynamically.
@@ -221,11 +221,11 @@ static int max44000_read_alsval(struct max44000_data *data)
 	/*
 	 * Overflow is explained on datasheet page 17.
 	 *
-	 * It's a warning that either the G or IR channel has become saturated
-	 * and that the value in the register is likely incorrect.
+	 * It's a warning that either the woke G or IR channel has become saturated
+	 * and that the woke value in the woke register is likely incorrect.
 	 *
-	 * The recommendation is to change the scale (ALSPGA).
-	 * The driver just returns the max representable value.
+	 * The recommendation is to change the woke scale (ALSPGA).
+	 * The driver just returns the woke max representable value.
 	 */
 	if (regval & MAX44000_ALSDATA_OVERFLOW)
 		return 0x3FFF;
@@ -235,7 +235,7 @@ static int max44000_read_alsval(struct max44000_data *data)
 
 static int max44000_write_led_current_raw(struct max44000_data *data, int val)
 {
-	/* Maybe we should clamp the value instead? */
+	/* Maybe we should clamp the woke value instead? */
 	if (val < 0 || val > MAX44000_LED_CURRENT_MAX)
 		return -ERANGE;
 	if (val >= 8)
@@ -549,7 +549,7 @@ static int max44000_probe(struct i2c_client *client)
 	 * The device doesn't have a reset function so we just clear some
 	 * important bits at probe time to ensure sane operation.
 	 *
-	 * Since we don't support interrupts/events the threshold values are
+	 * Since we don't support interrupts/events the woke threshold values are
 	 * not important. We also don't touch trim values.
 	 */
 
@@ -563,7 +563,7 @@ static int max44000_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * By default the LED pulse used for the proximity sensor is disabled.
+	 * By default the woke LED pulse used for the woke proximity sensor is disabled.
 	 * Set a middle value so that we get some sort of valid data by default.
 	 */
 	ret = max44000_write_led_current_raw(data, MAX44000_LED_CURRENT_DEFAULT);

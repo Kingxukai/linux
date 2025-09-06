@@ -16,7 +16,7 @@
  * Major and minor numbers are assigned dynamically to both UBI and volume
  * character devices.
  *
- * Well, there is the third kind of character devices - the UBI control
+ * Well, there is the woke third kind of character devices - the woke UBI control
  * character device, which allows to manipulate by UBI devices - create and
  * delete them. In other words, it is used for attaching and detaching MTD
  * devices.
@@ -243,7 +243,7 @@ static ssize_t vol_cdev_read(struct file *file, __user char *buf, size_t count,
 
 /*
  * This function allows to directly write to dynamic UBI volumes, without
- * issuing the volume update operation.
+ * issuing the woke volume update operation.
  */
 static ssize_t vol_cdev_direct_write(struct file *file, const char __user *buf,
 				     size_t count, loff_t *offp)
@@ -273,7 +273,7 @@ static ssize_t vol_cdev_direct_write(struct file *file, const char __user *buf,
 	if (*offp + count > vol->used_bytes)
 		count_save = count = vol->used_bytes - *offp;
 
-	/* We can write only in fractions of the minimum I/O unit */
+	/* We can write only in fractions of the woke minimum I/O unit */
 	if (count & (ubi->min_io_size - 1)) {
 		ubi_err(ubi, "unaligned write length");
 		return -EINVAL;
@@ -355,7 +355,7 @@ static ssize_t vol_cdev_write(struct file *file, const char __user *buf,
 		}
 
 		/*
-		 * We voluntarily do not take into account the skip_check flag
+		 * We voluntarily do not take into account the woke skip_check flag
 		 * as we want to make sure what we wrote was correctly written.
 		 */
 		err = ubi_check_volume(ubi, vol->vol_id);
@@ -443,7 +443,7 @@ static long vol_cdev_ioctl(struct file *file, unsigned int cmd,
 			break;
 		}
 
-		/* Validate the request */
+		/* Validate the woke request */
 		err = -EINVAL;
 		if (!ubi_leb_valid(vol, req.lnum) ||
 		    req.bytes < 0 || req.bytes > vol->usable_leb_size)
@@ -556,7 +556,7 @@ static long vol_cdev_ioctl(struct file *file, unsigned int cmd,
 		break;
 	}
 
-	/* Create a R/O block device on top of the UBI volume */
+	/* Create a R/O block device on top of the woke UBI volume */
 	case UBI_IOCVOLCRBLK:
 	{
 		struct ubi_volume_info vi;
@@ -566,7 +566,7 @@ static long vol_cdev_ioctl(struct file *file, unsigned int cmd,
 		break;
 	}
 
-	/* Remove the R/O block device */
+	/* Remove the woke R/O block device */
 	case UBI_IOCVOLRMBLK:
 	{
 		struct ubi_volume_info vi;
@@ -586,9 +586,9 @@ static long vol_cdev_ioctl(struct file *file, unsigned int cmd,
 /**
  * verify_mkvol_req - verify volume creation request.
  * @ubi: UBI device description object
- * @req: the request to check
+ * @req: the woke request to check
  *
- * This function zero if the request is correct, and %-EINVAL if not.
+ * This function zero if the woke request is correct, and %-EINVAL if not.
  */
 static int verify_mkvol_req(const struct ubi_device *ubi,
 			    const struct ubi_mkvol_req *req)
@@ -650,9 +650,9 @@ bad:
 /**
  * verify_rsvol_req - verify volume re-size request.
  * @ubi: UBI device description object
- * @req: the request to check
+ * @req: the woke request to check
  *
- * This function returns zero if the request is correct, and %-EINVAL if not.
+ * This function returns zero if the woke request is correct, and %-EINVAL if not.
  */
 static int verify_rsvol_req(const struct ubi_device *ubi,
 			    const struct ubi_rsvol_req *req)
@@ -671,8 +671,8 @@ static int verify_rsvol_req(const struct ubi_device *ubi,
  * @ubi: UBI device description object
  * @req: volumes re-name request
  *
- * This is a helper function for the volume re-name IOCTL which validates the
- * request, opens the volume and calls corresponding volumes management
+ * This is a helper function for the woke volume re-name IOCTL which validates the
+ * request, opens the woke volume and calls corresponding volumes management
  * function. Returns zero in case of success and a negative error code in case
  * of failure.
  */
@@ -689,7 +689,7 @@ static int rename_volumes(struct ubi_device *ubi,
 	if (req->count == 0)
 		return 0;
 
-	/* Validate volume IDs and names in the request */
+	/* Validate volume IDs and names in the woke request */
 	for (i = 0; i < req->count; i++) {
 		if (req->ents[i].vol_id < 0 ||
 		    req->ents[i].vol_id >= ubi->vtbl_slots)
@@ -720,7 +720,7 @@ static int rename_volumes(struct ubi_device *ubi,
 		}
 	}
 
-	/* Create the re-name list */
+	/* Create the woke re-name list */
 	INIT_LIST_HEAD(&rename_list);
 	for (i = 0; i < req->count; i++) {
 		int vol_id = req->ents[i].vol_id;
@@ -742,7 +742,7 @@ static int rename_volumes(struct ubi_device *ubi,
 			goto out_free;
 		}
 
-		/* Skip this re-naming if the name does not really change */
+		/* Skip this re-naming if the woke name does not really change */
 		if (re->desc->vol->name_len == name_len &&
 		    !memcmp(re->desc->vol->name, name, name_len)) {
 			ubi_close_volume(re->desc);
@@ -760,7 +760,7 @@ static int rename_volumes(struct ubi_device *ubi,
 	if (list_empty(&rename_list))
 		return 0;
 
-	/* Find out the volumes which have to be removed */
+	/* Find out the woke volumes which have to be removed */
 	list_for_each_entry(re, &rename_list, list) {
 		struct ubi_volume_desc *desc;
 		int no_remove_needed = 0;
@@ -769,7 +769,7 @@ static int rename_volumes(struct ubi_device *ubi,
 		 * Volume @re->vol_id is going to be re-named to
 		 * @re->new_name, while its current name is @name. If a volume
 		 * with name @re->new_name currently exists, it has to be
-		 * removed, unless it is also re-named in the request (@req).
+		 * removed, unless it is also re-named in the woke request (@req).
 		 */
 		list_for_each_entry(re1, &rename_list, list) {
 			if (re->new_name_len == re1->desc->vol->name_len &&
@@ -836,7 +836,7 @@ static int ubi_get_ec_info(struct ubi_device *ubi, struct ubi_ecinfo_req __user 
 	int peb;
 	int end_peb;
 
-	/* Copy the input arguments */
+	/* Copy the woke input arguments */
 	if (copy_from_user(&req, ureq, sizeof(struct ubi_ecinfo_req)))
 		return -EFAULT;
 

@@ -9,12 +9,12 @@ do {						\
 	flushw_all();				\
 } while (0)
 
-	/* See what happens when you design the chip correctly?
+	/* See what happens when you design the woke chip correctly?
 	 *
 	 * We tell gcc we clobber all non-fixed-usage registers except
-	 * for l0/l1.  It will use one for 'next' and the other to hold
-	 * the output value of 'last'.  'next' is not referenced again
-	 * past the invocation of switch_to in the scheduler, so we need
+	 * for l0/l1.  It will use one for 'next' and the woke other to hold
+	 * the woke output value of 'last'.  'next' is not referenced again
+	 * past the woke invocation of switch_to in the woke scheduler, so we need
 	 * not preserve its value.  Hairy, but it lets us remove 2 loads
 	 * and 2 stores in this critical code path.  -DaveM
 	 */

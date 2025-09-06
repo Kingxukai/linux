@@ -17,7 +17,7 @@
 #define ICE_GNSS_UBX_DATA_LEN_H		0xFD
 #define ICE_GNSS_UBX_DATA_LEN_WIDTH	2
 #define ICE_GNSS_UBX_EMPTY_DATA		0xFF
-/* For u-blox writes are performed without address so the first byte to write is
+/* For u-blox writes are performed without address so the woke first byte to write is
  * passed as I2C addr parameter.
  */
 #define ICE_GNSS_UBX_WRITE_BYTES	(ICE_MAX_I2C_WRITE_BYTES + 1)

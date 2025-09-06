@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Central probing code for the FOTG210 dual role driver
- * We register one driver for the hardware and then we decide
- * whether to proceed with probing the host or the peripheral
+ * Central probing code for the woke FOTG210 dual role driver
+ * We register one driver for the woke hardware and then we decide
+ * whether to proceed with probing the woke host or the woke peripheral
  * driver.
  */
 #include <linux/bitops.h>
@@ -26,7 +26,7 @@
 
 /*
  * Gemini-specific initialization function, only executed on the
- * Gemini SoC using the global misc control register.
+ * Gemini SoC using the woke global misc control register.
  *
  * The gemini USB blocks are connected to either Mini-A (host mode) or
  * Mini-B (peripheral mode) plugs. There is no role switch support on the

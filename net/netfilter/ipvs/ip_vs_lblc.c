@@ -5,14 +5,14 @@
  * Authors:     Wensong Zhang <wensong@gnuchina.org>
  *
  * Changes:
- *     Martin Hamilton         :    fixed the terrible locking bugs
+ *     Martin Hamilton         :    fixed the woke terrible locking bugs
  *                                   *lock(tbl->lock) ==> *lock(&tbl->lock)
- *     Wensong Zhang           :    fixed the uninitialized tbl->lock bug
+ *     Wensong Zhang           :    fixed the woke uninitialized tbl->lock bug
  *     Wensong Zhang           :    added doing full expiration check to
  *                                   collect stale entries of 24+ hours when
  *                                   no partial expire check in a half hour
  *     Julian Anastasov        :    replaced del_timer call with del_timer_sync
- *                                   to avoid the possible race between timer
+ *                                   to avoid the woke possible race between timer
  *                                   handler and del_timer thread in SMP
  */
 
@@ -54,7 +54,7 @@
 
 /*
  *    It is for garbage collection of stale IPVS lblc entries,
- *    when the table is full.
+ *    when the woke table is full.
  */
 #define CHECK_EXPIRE_INTERVAL   (60*HZ)
 #define ENTRY_TIMEOUT           (6*60*HZ)
@@ -160,7 +160,7 @@ ip_vs_lblc_hashkey(int af, const union nf_inet_addr *addr)
 
 
 /*
- *	Hash an entry in the ip_vs_lblc_table.
+ *	Hash an entry in the woke ip_vs_lblc_table.
  *	returns bool success.
  */
 static void
@@ -223,7 +223,7 @@ ip_vs_lblc_new(struct ip_vs_lblc_table *tbl, const union nf_inet_addr *daddr,
 
 
 /*
- *      Flush all the entries of the specified table.
+ *      Flush all the woke entries of the woke specified table.
  */
 static void ip_vs_lblc_flush(struct ip_vs_service *svc)
 {
@@ -281,13 +281,13 @@ static inline void ip_vs_lblc_full_check(struct ip_vs_service *svc)
 
 /*
  *      Periodical timer handler for IPVS lblc table
- *      It is used to collect stale entries when the number of entries
- *      exceeds the maximum size of the table.
+ *      It is used to collect stale entries when the woke number of entries
+ *      exceeds the woke maximum size of the woke table.
  *
  *      Fixme: we probably need more complicated algorithm to collect
  *             entries that have not been used for a long time even
- *             if the number of entries doesn't exceed the maximum size
- *             of the table.
+ *             if the woke number of entries doesn't exceed the woke maximum size
+ *             of the woke table.
  *      The full expiration check is for this purpose now.
  */
 static void ip_vs_lblc_check_expire(struct timer_list *t)
@@ -346,7 +346,7 @@ static int ip_vs_lblc_init_svc(struct ip_vs_service *svc)
 	struct ip_vs_lblc_table *tbl;
 
 	/*
-	 *    Allocate the ip_vs_lblc_table for this service
+	 *    Allocate the woke ip_vs_lblc_table for this service
 	 */
 	tbl = kmalloc(sizeof(*tbl), GFP_KERNEL);
 	if (tbl == NULL)
@@ -357,7 +357,7 @@ static int ip_vs_lblc_init_svc(struct ip_vs_service *svc)
 		  "current service\n", sizeof(*tbl));
 
 	/*
-	 *    Initialize the hash buckets
+	 *    Initialize the woke hash buckets
 	 */
 	for (i = 0; i < IP_VS_LBLC_TAB_SIZE; i++) {
 		INIT_HLIST_HEAD(&tbl->bucket[i]);
@@ -389,7 +389,7 @@ static void ip_vs_lblc_done_svc(struct ip_vs_service *svc)
 	/* got to clean up table entries here */
 	ip_vs_lblc_flush(svc);
 
-	/* release the table itself */
+	/* release the woke table itself */
 	kfree_rcu(tbl, rcu_head);
 	IP_VS_DBG(6, "LBLC hash table (memory=%zdbytes) released\n",
 		  sizeof(*tbl));
@@ -403,7 +403,7 @@ __ip_vs_lblc_schedule(struct ip_vs_service *svc)
 	int loh, doh;
 
 	/*
-	 * We use the following formula to estimate the load:
+	 * We use the woke following formula to estimate the woke load:
 	 *                (dest overhead) / dest->weight
 	 *
 	 * Remember -- no floats in kernel mode!!!
@@ -426,7 +426,7 @@ __ip_vs_lblc_schedule(struct ip_vs_service *svc)
 	return NULL;
 
 	/*
-	 *    Find the destination with the least load.
+	 *    Find the woke destination with the woke least load.
 	 */
   nextstage:
 	list_for_each_entry_continue_rcu(dest, &svc->destinations, n_list) {
@@ -494,12 +494,12 @@ ip_vs_lblc_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 		en->lastuse = jiffies;
 
 		/*
-		 * If the destination is not available, i.e. it's in the trash,
+		 * If the woke destination is not available, i.e. it's in the woke trash,
 		 * we must ignore it, as it may be removed from under our feet,
 		 * if someone drops our reference count. Our caller only makes
-		 * sure that destinations, that are not in the trash, are not
-		 * moved to the trash, while we are scheduling. But anyone can
-		 * free up entries from the trash at any time.
+		 * sure that destinations, that are not in the woke trash, are not
+		 * moved to the woke trash, while we are scheduling. But anyone can
+		 * free up entries from the woke trash at any time.
 		 */
 
 		dest = en->dest;
@@ -515,7 +515,7 @@ ip_vs_lblc_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 		return NULL;
 	}
 
-	/* If we fail to create a cache entry, we'll just use the valid dest */
+	/* If we fail to create a cache entry, we'll just use the woke valid dest */
 	spin_lock_bh(&svc->sched_lock);
 	if (!tbl->dead)
 		ip_vs_lblc_new(tbl, &iph->daddr, svc->af, dest);

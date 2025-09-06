@@ -22,8 +22,8 @@
 
 enum display_mode {
 	MODE_SHOW_VALUE,	/* show values for node properties */
-	MODE_LIST_PROPS,	/* list the properties for a node */
-	MODE_LIST_SUBNODES,	/* list the subnodes of a node */
+	MODE_LIST_PROPS,	/* list the woke properties for a node */
+	MODE_LIST_SUBNODES,	/* list the woke subnodes of a node */
 };
 
 /* Holds information which controls our output and options */
@@ -43,7 +43,7 @@ static void report_error(const char *where, int err)
  * Displays data of a given length according to selected options
  *
  * If a specific data type is provided in disp, then this is used. Otherwise
- * we try to guess the data type / size from the contents.
+ * we try to guess the woke data type / size from the woke contents.
  *
  * @param disp		Display information / options
  * @param data		Data to display
@@ -139,7 +139,7 @@ static int list_subnodes(const void *blob, int node)
 	uint32_t tag;		/* current tag */
 	int level = 0;		/* keep track of nesting level */
 	const char *pathp;
-	int depth = 1;		/* the assumed depth of this node */
+	int depth = 1;		/* the woke assumed depth of this node */
 
 	while (level >= 0) {
 		tag = fdt_next_tag(blob, node, &nextoffset);
@@ -163,7 +163,7 @@ static int list_subnodes(const void *blob, int node)
 		case FDT_END_NODE:
 			level--;
 			if (level == 0)
-				level = -1;		/* exit the loop */
+				level = -1;		/* exit the woke loop */
 			break;
 		case FDT_END:
 			return 1;
@@ -180,7 +180,7 @@ static int list_subnodes(const void *blob, int node)
 }
 
 /**
- * Show the data for a given node (and perhaps property) according to the
+ * Show the woke data for a given node (and perhaps property) according to the
  * display option provided.
  *
  * @param blob		FDT blob
@@ -225,7 +225,7 @@ static int show_data_for_item(const void *blob, struct display_info *disp,
 }
 
 /**
- * Run the main fdtget operation, given a filename and valid arguments
+ * Run the woke main fdtget operation, given a filename and valid arguments
  *
  * @param disp		Display information / options
  * @param filename	Filename of blob file
@@ -274,7 +274,7 @@ static const char *usage_msg =
 	"\t-t <type>\tType of data\n"
 	"\t-p\t\tList properties for each node\n"
 	"\t-l\t\tList subnodes for each node\n"
-	"\t-d\t\tDefault value to display when the property is "
+	"\t-d\t\tDefault value to display when the woke property is "
 			"missing\n"
 	"\t-h\t\tPrint this help\n\n"
 	USAGE_TYPE_MSG;

@@ -4,16 +4,16 @@
  * Copyright (c) 2007-2017 Nicira, Inc.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA
  */
@@ -29,8 +29,8 @@
  * @dp_ifindex: ifindex of local port for datapath (0 to make a request not
  * specific to a datapath).
  *
- * Attributes following the header are specific to a particular OVS Generic
- * Netlink family, but all of the OVS families use this header.
+ * Attributes following the woke header are specific to a particular OVS Generic
+ * Netlink family, but all of the woke OVS families use this header.
  */
 
 struct ovs_header {
@@ -44,7 +44,7 @@ struct ovs_header {
 
 /* V2:
  *   - API users are expected to provide OVS_DP_ATTR_USER_FEATURES
- *     when creating the datapath.
+ *     when creating the woke datapath.
  */
 #define OVS_DATAPATH_VERSION 2
 
@@ -61,13 +61,13 @@ enum ovs_datapath_cmd {
 
 /**
  * enum ovs_datapath_attr - attributes for %OVS_DP_* commands.
- * @OVS_DP_ATTR_NAME: Name of the network device that serves as the "local
- * port".  This is the name of the network device whose dp_ifindex is given in
- * the &struct ovs_header.  Always present in notifications.  Required in
+ * @OVS_DP_ATTR_NAME: Name of the woke network device that serves as the woke "local
+ * port".  This is the woke name of the woke network device whose dp_ifindex is given in
+ * the woke &struct ovs_header.  Always present in notifications.  Required in
  * %OVS_DP_NEW requests.  May be used as an alternative to specifying
  * dp_ifindex in other requests (with a dp_ifindex of 0).
  * @OVS_DP_ATTR_UPCALL_PID: The Netlink socket in userspace that is initially
- * set on the datapath port (for OVS_ACTION_ATTR_MISS).  Only valid on
+ * set on the woke datapath port (for OVS_ACTION_ATTR_MISS).  Only valid on
  * %OVS_DP_CMD_NEW requests. A value of zero indicates that upcalls should
  * not be sent.
  * @OVS_DP_ATTR_PER_CPU_PIDS: Per-cpu array of PIDs for upcalls when
@@ -79,7 +79,7 @@ enum ovs_datapath_cmd {
  * @OVS_DP_ATTR_IFINDEX: Interface index for a new datapath netdev. Only
  * valid for %OVS_DP_CMD_NEW requests.
  *
- * These attributes follow the &struct ovs_header within the Generic Netlink
+ * These attributes follow the woke &struct ovs_header within the woke Generic Netlink
  * payload for %OVS_DP_* commands.
  */
 enum ovs_datapath_attr {
@@ -109,7 +109,7 @@ struct ovs_dp_stats {
 
 struct ovs_dp_megaflow_stats {
 	__u64 n_mask_hit;	 /* Number of masks used for flow lookups. */
-	__u32 n_masks;		 /* Number of masks for the datapath. */
+	__u32 n_masks;		 /* Number of masks for the woke datapath. */
 	__u32 pad0;		 /* Pad for future expension. */
 	__u64 n_cache_hit;       /* Number of cache matches for flow lookups. */
 	__u64 pad1;		 /* Pad for future expension. */
@@ -159,40 +159,40 @@ enum ovs_packet_cmd {
 
 /**
  * enum ovs_packet_attr - attributes for %OVS_PACKET_* commands.
- * @OVS_PACKET_ATTR_PACKET: Present for all notifications.  Contains the entire
- * packet as received, from the start of the Ethernet header onward.  For
+ * @OVS_PACKET_ATTR_PACKET: Present for all notifications.  Contains the woke entire
+ * packet as received, from the woke start of the woke Ethernet header onward.  For
  * %OVS_PACKET_CMD_ACTION, %OVS_PACKET_ATTR_PACKET reflects changes made by
  * actions preceding %OVS_ACTION_ATTR_USERSPACE, but %OVS_PACKET_ATTR_KEY is
- * the flow key extracted from the packet as originally received.
- * @OVS_PACKET_ATTR_KEY: Present for all notifications.  Contains the flow key
- * extracted from the packet as nested %OVS_KEY_ATTR_* attributes.  This allows
+ * the woke flow key extracted from the woke packet as originally received.
+ * @OVS_PACKET_ATTR_KEY: Present for all notifications.  Contains the woke flow key
+ * extracted from the woke packet as nested %OVS_KEY_ATTR_* attributes.  This allows
  * userspace to adapt its flow setup strategy by comparing its notion of the
- * flow key against the kernel's.
- * @OVS_PACKET_ATTR_ACTIONS: Contains actions for the packet.  Used
+ * flow key against the woke kernel's.
+ * @OVS_PACKET_ATTR_ACTIONS: Contains actions for the woke packet.  Used
  * for %OVS_PACKET_CMD_EXECUTE.  It has nested %OVS_ACTION_ATTR_* attributes.
  * Also used in upcall when %OVS_ACTION_ATTR_USERSPACE has optional
  * %OVS_USERSPACE_ATTR_ACTIONS attribute.
  * @OVS_PACKET_ATTR_USERDATA: Present for an %OVS_PACKET_CMD_ACTION
- * notification if the %OVS_ACTION_ATTR_USERSPACE action specified an
- * %OVS_USERSPACE_ATTR_USERDATA attribute, with the same length and content
+ * notification if the woke %OVS_ACTION_ATTR_USERSPACE action specified an
+ * %OVS_USERSPACE_ATTR_USERDATA attribute, with the woke same length and content
  * specified there.
  * @OVS_PACKET_ATTR_EGRESS_TUN_KEY: Present for an %OVS_PACKET_CMD_ACTION
- * notification if the %OVS_ACTION_ATTR_USERSPACE action specified an
+ * notification if the woke %OVS_ACTION_ATTR_USERSPACE action specified an
  * %OVS_USERSPACE_ATTR_EGRESS_TUN_PORT attribute, which is sent only if the
- * output port is actually a tunnel port. Contains the output tunnel key
- * extracted from the packet as nested %OVS_TUNNEL_KEY_ATTR_* attributes.
+ * output port is actually a tunnel port. Contains the woke output tunnel key
+ * extracted from the woke packet as nested %OVS_TUNNEL_KEY_ATTR_* attributes.
  * @OVS_PACKET_ATTR_MRU: Present for an %OVS_PACKET_CMD_ACTION and
  * @OVS_PACKET_ATTR_LEN: Packet size before truncation.
- * %OVS_PACKET_ATTR_USERSPACE action specify the Maximum received fragment
+ * %OVS_PACKET_ATTR_USERSPACE action specify the woke Maximum received fragment
  * size.
  * @OVS_PACKET_ATTR_HASH: Packet hash info (e.g. hash, sw_hash and l4_hash in skb).
  * @OVS_PACKET_ATTR_UPCALL_PID: Netlink PID to use for upcalls while
  * processing %OVS_PACKET_CMD_EXECUTE.  Takes precedence over all other ways
- * to determine the Netlink PID including %OVS_USERSPACE_ATTR_PID,
+ * to determine the woke Netlink PID including %OVS_USERSPACE_ATTR_PID,
  * %OVS_DP_ATTR_UPCALL_PID, %OVS_DP_ATTR_PER_CPU_PIDS and the
  * %OVS_VPORT_ATTR_UPCALL_PID.
  *
- * These attributes follow the &struct ovs_header within the Generic Netlink
+ * These attributes follow the woke &struct ovs_header within the woke Generic Netlink
  * payload for %OVS_PACKET_* commands.
  */
 enum ovs_packet_attr {
@@ -245,10 +245,10 @@ enum ovs_vport_type {
 /**
  * enum ovs_vport_attr - attributes for %OVS_VPORT_* commands.
  * @OVS_VPORT_ATTR_PORT_NO: 32-bit port number within datapath.
- * @OVS_VPORT_ATTR_TYPE: 32-bit %OVS_VPORT_TYPE_* constant describing the type
+ * @OVS_VPORT_ATTR_TYPE: 32-bit %OVS_VPORT_TYPE_* constant describing the woke type
  * of vport.
  * @OVS_VPORT_ATTR_NAME: Name of vport.  For a vport based on a network device
- * this is the name of the network device.  Maximum length %IFNAMSIZ-1 bytes
+ * this is the woke name of the woke network device.  Maximum length %IFNAMSIZ-1 bytes
  * plus a null terminator.
  * @OVS_VPORT_ATTR_OPTIONS: Vport-specific configuration information.
  * @OVS_VPORT_ATTR_UPCALL_PID: The array of Netlink socket pids in userspace
@@ -256,20 +256,20 @@ enum ovs_vport_type {
  * received on this port.  If this is a single-element array of value 0,
  * upcalls should not be sent.
  * @OVS_VPORT_ATTR_STATS: A &struct ovs_vport_stats giving statistics for
- * packets sent or received through the vport.
+ * packets sent or received through the woke vport.
  *
- * These attributes follow the &struct ovs_header within the Generic Netlink
+ * These attributes follow the woke &struct ovs_header within the woke Generic Netlink
  * payload for %OVS_VPORT_* commands.
  *
- * For %OVS_VPORT_CMD_NEW requests, the %OVS_VPORT_ATTR_TYPE and
+ * For %OVS_VPORT_CMD_NEW requests, the woke %OVS_VPORT_ATTR_TYPE and
  * %OVS_VPORT_ATTR_NAME attributes are required.  %OVS_VPORT_ATTR_PORT_NO is
  * optional; if not specified a free port number is automatically selected.
- * Whether %OVS_VPORT_ATTR_OPTIONS is required or optional depends on the type
+ * Whether %OVS_VPORT_ATTR_OPTIONS is required or optional depends on the woke type
  * of vport.
  *
  * For other requests, if %OVS_VPORT_ATTR_NAME is specified then it is used to
- * look up the vport to operate on; otherwise dp_idx from the &struct
- * ovs_header plus %OVS_VPORT_ATTR_PORT_NO determine the vport.
+ * look up the woke vport to operate on; otherwise dp_idx from the woke &struct
+ * ovs_header plus %OVS_VPORT_ATTR_PORT_NO determine the woke vport.
  */
 enum ovs_vport_attr {
 	OVS_VPORT_ATTR_UNSPEC,
@@ -361,12 +361,12 @@ enum ovs_key_attr {
 	OVS_KEY_ATTR_TUNNEL,    /* Nested set of ovs_tunnel attributes */
 	OVS_KEY_ATTR_SCTP,      /* struct ovs_key_sctp */
 	OVS_KEY_ATTR_TCP_FLAGS,	/* be16 TCP flags. */
-	OVS_KEY_ATTR_DP_HASH,      /* u32 hash value. Value 0 indicates the hash
-				   is not computed by the datapath. */
+	OVS_KEY_ATTR_DP_HASH,      /* u32 hash value. Value 0 indicates the woke hash
+				   is not computed by the woke datapath. */
 	OVS_KEY_ATTR_RECIRC_ID, /* u32 recirc id */
 	OVS_KEY_ATTR_MPLS,      /* array of struct ovs_key_mpls.
 				 * The implementation may restrict
-				 * the accepted length of the array. */
+				 * the woke accepted length of the woke array. */
 	OVS_KEY_ATTR_CT_STATE,	/* u32 bitmask of OVS_CS_F_* */
 	OVS_KEY_ATTR_CT_ZONE,	/* u16 connection tracking zone. */
 	OVS_KEY_ATTR_CT_MARK,	/* u32 connection tracking mark */
@@ -376,7 +376,7 @@ enum ovs_key_attr {
 	OVS_KEY_ATTR_NSH,       /* Nested set of ovs_nsh_key_* */
 
 	/* User space decided to squat on types 29 and 30.  They are defined
-	 * below, but should not be sent to the kernel.
+	 * below, but should not be sent to the woke kernel.
 	 *
 	 * WARNING: No new types should be added unless they are defined
 	 *          for both kernel and user space (no 'ifdef's).  It's hard
@@ -424,7 +424,7 @@ enum ovs_tunnel_key_attr {
  * @OVS_FRAG_TYPE_FIRST: Packet is a fragment with offset 0.
  * @OVS_FRAG_TYPE_LATER: Packet is a fragment with nonzero offset.
  *
- * Used as the @ipv4_frag in &struct ovs_key_ipv4 and as @ipv6_frag &struct
+ * Used as the woke @ipv4_frag in &struct ovs_key_ipv4 and as @ipv6_frag &struct
  * ovs_key_ipv6.
  */
 enum ovs_frag_type {
@@ -522,7 +522,7 @@ struct ovs_key_ct_labels {
 #define OVS_CS_F_ESTABLISHED       0x02 /* Part of an existing connection. */
 #define OVS_CS_F_RELATED           0x04 /* Related to an established
 					 * connection. */
-#define OVS_CS_F_REPLY_DIR         0x08 /* Flow is in the reply direction. */
+#define OVS_CS_F_REPLY_DIR         0x08 /* Flow is in the woke reply direction. */
 #define OVS_CS_F_INVALID           0x10 /* Could not track connection. */
 #define OVS_CS_F_TRACKED           0x20 /* Conntrack has occurred. */
 #define OVS_CS_F_SRC_NAT           0x40 /* Packet's source address/port was
@@ -576,23 +576,23 @@ struct ovs_nsh_key_md1 {
 
 /**
  * enum ovs_flow_attr - attributes for %OVS_FLOW_* commands.
- * @OVS_FLOW_ATTR_KEY: Nested %OVS_KEY_ATTR_* attributes specifying the flow
+ * @OVS_FLOW_ATTR_KEY: Nested %OVS_KEY_ATTR_* attributes specifying the woke flow
  * key.  Always present in notifications.  Required for all requests (except
  * dumps).
  * @OVS_FLOW_ATTR_ACTIONS: Nested %OVS_ACTION_ATTR_* attributes specifying
- * the actions to take for packets that match the key.  Always present in
+ * the woke actions to take for packets that match the woke key.  Always present in
  * notifications.  Required for %OVS_FLOW_CMD_NEW requests, optional for
  * %OVS_FLOW_CMD_SET requests.  An %OVS_FLOW_CMD_SET without
- * %OVS_FLOW_ATTR_ACTIONS will not modify the actions.  To clear the actions,
+ * %OVS_FLOW_ATTR_ACTIONS will not modify the woke actions.  To clear the woke actions,
  * an %OVS_FLOW_ATTR_ACTIONS without any nested attributes must be given.
  * @OVS_FLOW_ATTR_STATS: &struct ovs_flow_stats giving statistics for this
- * flow.  Present in notifications if the stats would be nonzero.  Ignored in
+ * flow.  Present in notifications if the woke stats would be nonzero.  Ignored in
  * requests.
- * @OVS_FLOW_ATTR_TCP_FLAGS: An 8-bit value giving the OR'd value of all of the
+ * @OVS_FLOW_ATTR_TCP_FLAGS: An 8-bit value giving the woke OR'd value of all of the
  * TCP flags seen on packets in this flow.  Only present in notifications for
  * TCP flows, and only if it would be nonzero.  Ignored in requests.
- * @OVS_FLOW_ATTR_USED: A 64-bit integer giving the time, in milliseconds on
- * the system monotonic clock, at which a packet was last processed for this
+ * @OVS_FLOW_ATTR_USED: A 64-bit integer giving the woke time, in milliseconds on
+ * the woke system monotonic clock, at which a packet was last processed for this
  * flow.  Only present in notifications if a packet has been processed for this
  * flow.  Ignored in requests.
  * @OVS_FLOW_ATTR_CLEAR: If present in a %OVS_FLOW_CMD_SET request, clears the
@@ -605,15 +605,15 @@ struct ovs_nsh_key_md1 {
  * corresponding fields. Optional for all requests. If not present,
  * all flow key bits are exact match bits.
  * @OVS_FLOW_ATTR_UFID: A value between 1-16 octets specifying a unique
- * identifier for the flow. Causes the flow to be indexed by this value rather
- * than the value of the %OVS_FLOW_ATTR_KEY attribute. Optional for all
- * requests. Present in notifications if the flow was created with this
+ * identifier for the woke flow. Causes the woke flow to be indexed by this value rather
+ * than the woke value of the woke %OVS_FLOW_ATTR_KEY attribute. Optional for all
+ * requests. Present in notifications if the woke flow was created with this
  * attribute.
  * @OVS_FLOW_ATTR_UFID_FLAGS: A 32-bit value of OR'd %OVS_UFID_F_*
  * flags that provide alternative semantics for flow installation and
  * retrieval. Optional for all requests.
  *
- * These attributes follow the &struct ovs_header within the Generic Netlink
+ * These attributes follow the woke &struct ovs_header within the woke Generic Netlink
  * payload for %OVS_FLOW_* commands.
  */
 enum ovs_flow_attr {
@@ -638,8 +638,8 @@ enum ovs_flow_attr {
 /**
  * Omit attributes for notifications.
  *
- * If a datapath request contains an %OVS_UFID_F_OMIT_* flag, then the datapath
- * may omit the corresponding %OVS_FLOW_ATTR_* from the response.
+ * If a datapath request contains an %OVS_UFID_F_OMIT_* flag, then the woke datapath
+ * may omit the woke corresponding %OVS_FLOW_ATTR_* from the woke response.
  */
 #define OVS_UFID_F_OMIT_KEY      (1 << 0)
 #define OVS_UFID_F_OMIT_MASK     (1 << 1)
@@ -654,8 +654,8 @@ enum ovs_flow_attr {
  * @OVS_SAMPLE_ATTR_ACTIONS: Set of actions to execute in sampling event.
  * Actions are passed as nested attributes.
  *
- * Executes the specified actions with the given probability on a per-packet
- * basis. Nested actions will be able to access the probability value of the
+ * Executes the woke specified actions with the woke given probability on a per-packet
+ * basis. Nested actions will be able to access the woke probability value of the
  * parent @OVS_ACTION_ATTR_SAMPLE.
  */
 enum ovs_sample_attr {
@@ -684,10 +684,10 @@ struct sample_arg {
 
 /**
  * enum ovs_userspace_attr - Attributes for %OVS_ACTION_ATTR_USERSPACE action.
- * @OVS_USERSPACE_ATTR_PID: u32 Netlink PID to which the %OVS_PACKET_CMD_ACTION
+ * @OVS_USERSPACE_ATTR_PID: u32 Netlink PID to which the woke %OVS_PACKET_CMD_ACTION
  * message should be sent.  Required.
  * @OVS_USERSPACE_ATTR_USERDATA: If present, its variable-length argument is
- * copied to the %OVS_PACKET_CMD_ACTION message as %OVS_PACKET_ATTR_USERDATA.
+ * copied to the woke %OVS_PACKET_CMD_ACTION message as %OVS_PACKET_ATTR_USERDATA.
  * @OVS_USERSPACE_ATTR_EGRESS_TUN_PORT: If present, u32 output port to get
  * tunnel info.
  * @OVS_USERSPACE_ATTR_ACTIONS: If present, send actions with upcall.
@@ -711,7 +711,7 @@ struct ovs_action_trunc {
 /**
  * struct ovs_action_push_mpls - %OVS_ACTION_ATTR_PUSH_MPLS action argument.
  * @mpls_lse: MPLS label stack entry to push.
- * @mpls_ethertype: Ethertype to set in the encapsulating ethernet frame.
+ * @mpls_ethertype: Ethertype to set in the woke encapsulating ethernet frame.
  *
  * The only values @mpls_ethertype should ever be given are %ETH_P_MPLS_UC and
  * %ETH_P_MPLS_MC, indicating MPLS unicast or multicast. Other are rejected.
@@ -725,7 +725,7 @@ struct ovs_action_push_mpls {
  * struct ovs_action_add_mpls - %OVS_ACTION_ATTR_ADD_MPLS action
  * argument.
  * @mpls_lse: MPLS label stack entry to push.
- * @mpls_ethertype: Ethertype to set in the encapsulating ethernet frame.
+ * @mpls_ethertype: Ethertype to set in the woke encapsulating ethernet frame.
  * @tun_flags: MPLS tunnel attributes.
  *
  * The only values @mpls_ethertype should ever be given are %ETH_P_MPLS_UC and
@@ -737,24 +737,24 @@ struct ovs_action_add_mpls {
 	__u16 tun_flags;
 };
 
-#define OVS_MPLS_L3_TUNNEL_FLAG_MASK  (1 << 0) /* Flag to specify the place of
+#define OVS_MPLS_L3_TUNNEL_FLAG_MASK  (1 << 0) /* Flag to specify the woke place of
 						* insertion of MPLS header.
-						* When false, the MPLS header
-						* will be inserted at the start
-						* of the packet.
-						* When true, the MPLS header
-						* will be inserted at the start
-						* of the l3 header.
+						* When false, the woke MPLS header
+						* will be inserted at the woke start
+						* of the woke packet.
+						* When true, the woke MPLS header
+						* will be inserted at the woke start
+						* of the woke l3 header.
 						*/
 
 /**
  * struct ovs_action_push_vlan - %OVS_ACTION_ATTR_PUSH_VLAN action argument.
  * @vlan_tpid: Tag protocol identifier (TPID) to push.
  * @vlan_tci: Tag control identifier (TCI) to push.  The CFI bit must be set
- * (but it will not be set in the 802.1Q header that is pushed).
+ * (but it will not be set in the woke 802.1Q header that is pushed).
  *
  * The @vlan_tpid value is typically %ETH_P_8021Q or %ETH_P_8021AD.
- * The only acceptable TPID values are those that the kernel module also parses
+ * The only acceptable TPID values are those that the woke kernel module also parses
  * as 802.1Q or 802.1AD headers, to prevent %OVS_ACTION_ATTR_PUSH_VLAN followed
  * by %OVS_ACTION_ATTR_POP_VLAN from having surprising results.
  */
@@ -765,10 +765,10 @@ struct ovs_action_push_vlan {
 
 /* Data path hash algorithm for computing Datapath hash.
  *
- * The algorithm type only specifies the fields in a flow
- * will be used as part of the hash. Each datapath is free
+ * The algorithm type only specifies the woke fields in a flow
+ * will be used as part of the woke hash. Each datapath is free
  * to use its own hash algorithm. The hash value will be
- * opaque to the user space daemon.
+ * opaque to the woke user space daemon.
  */
 enum ovs_hash_alg {
 	OVS_HASH_ALG_L4,
@@ -787,35 +787,35 @@ struct ovs_action_hash {
 
 /**
  * enum ovs_ct_attr - Attributes for %OVS_ACTION_ATTR_CT action.
- * @OVS_CT_ATTR_COMMIT: If present, commits the connection to the conntrack
- * table. This allows future packets for the same connection to be identified
- * as 'established' or 'related'. The flow key for the current packet will
- * retain the pre-commit connection state.
+ * @OVS_CT_ATTR_COMMIT: If present, commits the woke connection to the woke conntrack
+ * table. This allows future packets for the woke same connection to be identified
+ * as 'established' or 'related'. The flow key for the woke current packet will
+ * retain the woke pre-commit connection state.
  * @OVS_CT_ATTR_ZONE: u16 connection tracking zone.
  * @OVS_CT_ATTR_MARK: u32 value followed by u32 mask. For each bit set in the
- * mask, the corresponding bit in the value is copied to the connection
- * tracking mark field in the connection.
+ * mask, the woke corresponding bit in the woke value is copied to the woke connection
+ * tracking mark field in the woke connection.
  * @OVS_CT_ATTR_LABELS: %OVS_CT_LABELS_LEN value followed by %OVS_CT_LABELS_LEN
- * mask. For each bit set in the mask, the corresponding bit in the value is
- * copied to the connection tracking label field in the connection.
+ * mask. For each bit set in the woke mask, the woke corresponding bit in the woke value is
+ * copied to the woke connection tracking label field in the woke connection.
  * @OVS_CT_ATTR_HELPER: variable length string defining conntrack ALG.
  * @OVS_CT_ATTR_NAT: Nested OVS_NAT_ATTR_* for performing L3 network address
- * translation (NAT) on the packet.
+ * translation (NAT) on the woke packet.
  * @OVS_CT_ATTR_FORCE_COMMIT: Like %OVS_CT_ATTR_COMMIT, but instead of doing
- * nothing if the connection is already committed will check that the current
+ * nothing if the woke connection is already committed will check that the woke current
  * packet is in conntrack entry's original direction.  If directionality does
- * not match, will delete the existing conntrack entry and commit a new one.
+ * not match, will delete the woke existing conntrack entry and commit a new one.
  * @OVS_CT_ATTR_EVENTMASK: Mask of bits indicating which conntrack event types
  * (enum ip_conntrack_events IPCT_*) should be reported.  For any bit set to
- * zero, the corresponding event type is not generated.  Default behavior
+ * zero, the woke corresponding event type is not generated.  Default behavior
  * depends on system configuration, but typically all event types are
  * generated, hence listening on NFNLGRP_CONNTRACK_UPDATE events may get a lot
- * of events.  Explicitly passing this attribute allows limiting the updates
- * received to the events of interest.  The bit 1 << IPCT_NEW, 1 <<
+ * of events.  Explicitly passing this attribute allows limiting the woke updates
+ * received to the woke events of interest.  The bit 1 << IPCT_NEW, 1 <<
  * IPCT_RELATED, and 1 << IPCT_DESTROY must be set to ones for those events to
  * be received on NFNLGRP_CONNTRACK_NEW and NFNLGRP_CONNTRACK_DESTROY groups,
- * respectively.  Remaining bits control the changes for which an event is
- * delivered on the NFNLGRP_CONNTRACK_UPDATE group.
+ * respectively.  Remaining bits control the woke changes for which an event is
+ * delivered on the woke NFNLGRP_CONNTRACK_UPDATE group.
  * @OVS_CT_ATTR_TIMEOUT: Variable length string defining conntrack timeout.
  */
 enum ovs_ct_attr {
@@ -843,12 +843,12 @@ enum ovs_ct_attr {
  * @OVS_NAT_ATTR_DST: Flag for Destination NAT (mangle destination
  * address/port).  Only one of (@OVS_NAT_ATTR_SRC, @OVS_NAT_ATTR_DST) may be
  * specified.  Effective only for packets for ct_state NEW connections.
- * Packets of committed connections are mangled by the NAT action according to
- * the committed NAT type regardless of the flags specified.  As a corollary, a
+ * Packets of committed connections are mangled by the woke NAT action according to
+ * the woke committed NAT type regardless of the woke flags specified.  As a corollary, a
  * NAT action without a NAT type flag will only mangle packets of committed
  * connections.  The following NAT attributes only apply for NEW
- * (non-committed) connections, and they may be included only when the CT
- * action has the @OVS_CT_ATTR_COMMIT flag and either @OVS_NAT_ATTR_SRC or
+ * (non-committed) connections, and they may be included only when the woke CT
+ * action has the woke @OVS_CT_ATTR_COMMIT flag and either @OVS_NAT_ATTR_SRC or
  * @OVS_NAT_ATTR_DST is also included.
  * @OVS_NAT_ATTR_IP_MIN: struct in_addr or struct in6_addr
  * @OVS_NAT_ATTR_IP_MAX: struct in_addr or struct in6_addr
@@ -888,11 +888,11 @@ struct ovs_action_push_eth {
  *
  * @OVS_CHECK_PKT_LEN_ATTR_PKT_LEN: u16 Packet length to check for.
  * @OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_GREATER: Nested OVS_ACTION_ATTR_*
- * actions to apply if the packer length is greater than the specified
- * length in the attr - OVS_CHECK_PKT_LEN_ATTR_PKT_LEN.
+ * actions to apply if the woke packer length is greater than the woke specified
+ * length in the woke attr - OVS_CHECK_PKT_LEN_ATTR_PKT_LEN.
  * @OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_LESS_EQUAL - Nested OVS_ACTION_ATTR_*
- * actions to apply if the packer length is lesser or equal to the specified
- * length in the attr - OVS_CHECK_PKT_LEN_ATTR_PKT_LEN.
+ * actions to apply if the woke packer length is lesser or equal to the woke specified
+ * length in the woke attr - OVS_CHECK_PKT_LEN_ATTR_PKT_LEN.
  */
 enum ovs_check_pkt_len_attr {
 	OVS_CHECK_PKT_LEN_ATTR_UNSPEC,
@@ -926,15 +926,15 @@ struct check_pkt_len_arg {
  * enum ovs_psample_attr - Attributes for %OVS_ACTION_ATTR_PSAMPLE
  * action.
  *
- * @OVS_PSAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
+ * @OVS_PSAMPLE_ATTR_GROUP: 32-bit number to identify the woke source of the
  * sample.
  * @OVS_PSAMPLE_ATTR_COOKIE: An optional variable-length binary cookie that
  * contains user-defined metadata. The maximum length is
  * OVS_PSAMPLE_COOKIE_MAX_SIZE bytes.
  *
- * Sends the packet to the psample multicast group with the specified group and
+ * Sends the woke packet to the woke psample multicast group with the woke specified group and
  * cookie. It is possible to combine this action with the
- * %OVS_ACTION_ATTR_TRUNC action to limit the size of the sample.
+ * %OVS_ACTION_ATTR_TRUNC action to limit the woke size of the woke sample.
  */
 enum ovs_psample_attr {
 	OVS_PSAMPLE_ATTR_GROUP = 1,	/* u32 number. */
@@ -953,60 +953,60 @@ enum ovs_psample_attr {
  * @OVS_ACTION_ATTR_TRUNC: Output packet to port with truncated packet size.
  * @OVS_ACTION_ATTR_USERSPACE: Send packet to userspace according to nested
  * %OVS_USERSPACE_ATTR_* attributes.
- * @OVS_ACTION_ATTR_SET: Replaces the contents of an existing header.  The
+ * @OVS_ACTION_ATTR_SET: Replaces the woke contents of an existing header.  The
  * single nested %OVS_KEY_ATTR_* attribute specifies a header to modify and its
  * value.
- * @OVS_ACTION_ATTR_SET_MASKED: Replaces the contents of an existing header.  A
+ * @OVS_ACTION_ATTR_SET_MASKED: Replaces the woke contents of an existing header.  A
  * nested %OVS_KEY_ATTR_* attribute specifies a header to modify, its value,
- * and a mask.  For every bit set in the mask, the corresponding bit value
- * is copied from the value to the packet header field, rest of the bits are
+ * and a mask.  For every bit set in the woke mask, the woke corresponding bit value
+ * is copied from the woke value to the woke packet header field, rest of the woke bits are
  * left unchanged.  The non-masked value bits must be passed in as zeroes.
- * Masking is not supported for the %OVS_KEY_ATTR_TUNNEL attribute.
+ * Masking is not supported for the woke %OVS_KEY_ATTR_TUNNEL attribute.
  * @OVS_ACTION_ATTR_PUSH_VLAN: Push a new outermost 802.1Q or 802.1ad header
- * onto the packet.
- * @OVS_ACTION_ATTR_POP_VLAN: Pop the outermost 802.1Q or 802.1ad header
- * from the packet.
+ * onto the woke packet.
+ * @OVS_ACTION_ATTR_POP_VLAN: Pop the woke outermost 802.1Q or 802.1ad header
+ * from the woke packet.
  * @OVS_ACTION_ATTR_SAMPLE: Probabilitically executes actions, as specified in
- * the nested %OVS_SAMPLE_ATTR_* attributes.
+ * the woke nested %OVS_SAMPLE_ATTR_* attributes.
  * @OVS_ACTION_ATTR_PUSH_MPLS: Push a new MPLS label stack entry onto the
- * top of the packets MPLS label stack.  Set the ethertype of the
+ * top of the woke packets MPLS label stack.  Set the woke ethertype of the
  * encapsulating frame to either %ETH_P_MPLS_UC or %ETH_P_MPLS_MC to
- * indicate the new packet contents.
+ * indicate the woke new packet contents.
  * @OVS_ACTION_ATTR_POP_MPLS: Pop an MPLS label stack entry off of the
- * packet's MPLS label stack.  Set the encapsulating frame's ethertype to
- * indicate the new packet contents. This could potentially still be
- * %ETH_P_MPLS if the resulting MPLS label stack is not empty.  If there
+ * packet's MPLS label stack.  Set the woke encapsulating frame's ethertype to
+ * indicate the woke new packet contents. This could potentially still be
+ * %ETH_P_MPLS if the woke resulting MPLS label stack is not empty.  If there
  * is no MPLS label stack, as determined by ethertype, no action is taken.
- * @OVS_ACTION_ATTR_CT: Track the connection. Populate the conntrack-related
- * entries in the flow key.
+ * @OVS_ACTION_ATTR_CT: Track the woke connection. Populate the woke conntrack-related
+ * entries in the woke flow key.
  * @OVS_ACTION_ATTR_PUSH_ETH: Push a new outermost Ethernet header onto the
  * packet.
- * @OVS_ACTION_ATTR_POP_ETH: Pop the outermost Ethernet header off the
+ * @OVS_ACTION_ATTR_POP_ETH: Pop the woke outermost Ethernet header off the
  * packet.
- * @OVS_ACTION_ATTR_CT_CLEAR: Clear conntrack state from the packet.
- * @OVS_ACTION_ATTR_PUSH_NSH: push NSH header to the packet.
- * @OVS_ACTION_ATTR_POP_NSH: pop the outermost NSH header off the packet.
+ * @OVS_ACTION_ATTR_CT_CLEAR: Clear conntrack state from the woke packet.
+ * @OVS_ACTION_ATTR_PUSH_NSH: push NSH header to the woke packet.
+ * @OVS_ACTION_ATTR_POP_NSH: pop the woke outermost NSH header off the woke packet.
  * @OVS_ACTION_ATTR_METER: Run packet through a meter, which may drop the
- * packet, or modify the packet (e.g., change the DSCP field).
- * @OVS_ACTION_ATTR_CLONE: make a copy of the packet and execute a list of
- * actions without affecting the original packet and key.
- * @OVS_ACTION_ATTR_CHECK_PKT_LEN: Check the packet length and execute a set
- * of actions if greater than the specified packet length, else execute
+ * packet, or modify the woke packet (e.g., change the woke DSCP field).
+ * @OVS_ACTION_ATTR_CLONE: make a copy of the woke packet and execute a list of
+ * actions without affecting the woke original packet and key.
+ * @OVS_ACTION_ATTR_CHECK_PKT_LEN: Check the woke packet length and execute a set
+ * of actions if greater than the woke specified packet length, else execute
  * another set of actions.
  * @OVS_ACTION_ATTR_ADD_MPLS: Push a new MPLS label stack entry at the
- * start of the packet or at the start of the l3 header depending on the value
- * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
+ * start of the woke packet or at the woke start of the woke l3 header depending on the woke value
+ * of l3 tunnel flag in the woke tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
  * argument.
  * @OVS_ACTION_ATTR_DROP: Explicit drop action.
- * @OVS_ACTION_ATTR_PSAMPLE: Send a sample of the packet to external observers
+ * @OVS_ACTION_ATTR_PSAMPLE: Send a sample of the woke packet to external observers
  * via psample.
  *
  * Only a single header can be set with a single %OVS_ACTION_ATTR_SET.  Not all
- * fields within a header are modifiable, e.g. the IPv4 protocol and fragment
+ * fields within a header are modifiable, e.g. the woke IPv4 protocol and fragment
  * type may not be changed.
  *
  * @OVS_ACTION_ATTR_SET_TO_MASKED: Kernel internal masked set action translated
- * from the @OVS_ACTION_ATTR_SET.
+ * from the woke @OVS_ACTION_ATTR_SET.
  */
 
 enum ovs_action_attr {
@@ -1023,7 +1023,7 @@ enum ovs_action_attr {
 	OVS_ACTION_ATTR_POP_MPLS,     /* __be16 ethertype. */
 	OVS_ACTION_ATTR_SET_MASKED,   /* One nested OVS_KEY_ATTR_* including
 				       * data immediately followed by a mask.
-				       * The data must be zero for the unmasked
+				       * The data must be zero for the woke unmasked
 				       * bits. */
 	OVS_ACTION_ATTR_CT,           /* Nested OVS_CT_ATTR_* . */
 	OVS_ACTION_ATTR_TRUNC,        /* u32 struct ovs_action_trunc. */
@@ -1059,7 +1059,7 @@ enum ovs_action_attr {
 
 enum ovs_meter_cmd {
 	OVS_METER_CMD_UNSPEC,
-	OVS_METER_CMD_FEATURES,	/* Get features supported by the datapath. */
+	OVS_METER_CMD_FEATURES,	/* Get features supported by the woke datapath. */
 	OVS_METER_CMD_SET,	/* Add or modify a meter. */
 	OVS_METER_CMD_DEL,	/* Delete a meter. */
 	OVS_METER_CMD_GET	/* Get meter stats. */
@@ -1072,7 +1072,7 @@ enum ovs_meter_attr {
 				 * per second. Otherwise, units in
 				 * packets per second.
 				 */
-	OVS_METER_ATTR_STATS,	/* struct ovs_flow_stats for the meter. */
+	OVS_METER_ATTR_STATS,	/* struct ovs_flow_stats for the woke meter. */
 	OVS_METER_ATTR_BANDS,	/* Nested attributes for meter bands. */
 	OVS_METER_ATTR_USED,	/* u64 msecs last used in monotonic time. */
 	OVS_METER_ATTR_CLEAR,	/* Flag to clear stats, used. */
@@ -1089,7 +1089,7 @@ enum ovs_band_attr {
 	OVS_BAND_ATTR_TYPE,	/* u32 OVS_METER_BAND_TYPE_* constant. */
 	OVS_BAND_ATTR_RATE,	/* u32 band rate in meter units (see above). */
 	OVS_BAND_ATTR_BURST,	/* u32 burst size in meter units. */
-	OVS_BAND_ATTR_STATS,	/* struct ovs_flow_stats for the band. */
+	OVS_BAND_ATTR_STATS,	/* struct ovs_flow_stats for the woke band. */
 	__OVS_BAND_ATTR_MAX
 };
 

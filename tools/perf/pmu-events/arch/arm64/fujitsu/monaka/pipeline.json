@@ -67,12 +67,12 @@
     {
         "EventCode": "0x01B0",
         "EventName": "FLA_VAL_PRD_CNT",
-        "BriefDescription": "This event counts the number of 1's in the predicate bits of request in FLA pipeline, where it is corrected so that it becomes 32 when all bits are 1."
+        "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in FLA pipeline, where it is corrected so that it becomes 32 when all bits are 1."
     },
     {
         "EventCode": "0x01B1",
         "EventName": "FLB_VAL_PRD_CNT",
-        "BriefDescription": "This event counts the number of 1's in the predicate bits of request in FLB pipeline, where it is corrected so that it becomes 32 when all bits are 1."
+        "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in FLB pipeline, where it is corrected so that it becomes 32 when all bits are 1."
     },
     {
         "EventCode": "0x01B2",
@@ -147,32 +147,32 @@
     {
         "EventCode": "0x02B0",
         "EventName": "L1_PIPE_COMP_GATHER_2FLOW",
-        "BriefDescription": "This event counts the number of times where 2 elements of the gather instructions became 2-flows because 2 elements could not be combined."
+        "BriefDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 2-flows because 2 elements could not be combined."
     },
     {
         "EventCode": "0x02B1",
         "EventName": "L1_PIPE_COMP_GATHER_1FLOW",
-        "BriefDescription": "This event counts the number of times where 2 elements of the gather instructions became 1-flow because 2 elements could be combined."
+        "BriefDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 1-flow because 2 elements could be combined."
     },
     {
         "EventCode": "0x02B2",
         "EventName": "L1_PIPE_COMP_GATHER_0FLOW",
-        "BriefDescription": "This event counts the number of times where 2 elements of the gather instructions became 0-flow because both predicate values are 0."
+        "BriefDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 0-flow because both predicate values are 0."
     },
     {
         "EventCode": "0x02B3",
         "EventName": "L1_PIPE_COMP_SCATTER_1FLOW",
-        "BriefDescription": "This event counts the number of flows of the scatter instructions."
+        "BriefDescription": "This event counts the woke number of flows of the woke scatter instructions."
     },
     {
         "EventCode": "0x02B8",
         "EventName": "L1_PIPE0_COMP_PRD_CNT",
-        "BriefDescription": "This event counts the number of 1's in the predicate bits of request in L1D cache pipeline#0, where it is corrected so that it becomes 64 when all bits are 1."
+        "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in L1D cache pipeline#0, where it is corrected so that it becomes 64 when all bits are 1."
     },
     {
         "EventCode": "0x02B9",
         "EventName": "L1_PIPE1_COMP_PRD_CNT",
-        "BriefDescription": "This event counts the number of 1's in the predicate bits of request in L1D cache pipeline#1, where it is corrected so that it becomes 64 when all bits are 1."
+        "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in L1D cache pipeline#1, where it is corrected so that it becomes 64 when all bits are 1."
     },
     {
         "EventCode": "0x0330",
@@ -191,18 +191,18 @@
     },
     {
         "ArchStdEvent": "STALL_FRONTEND_TLB",
-        "BriefDescription": "This event counts every cycle counted by STALL_FRONTEND_MEMBOUND when there is a demand instruction miss in the instruction TLB."
+        "BriefDescription": "This event counts every cycle counted by STALL_FRONTEND_MEMBOUND when there is a demand instruction miss in the woke instruction TLB."
     },
     {
         "ArchStdEvent": "STALL_BACKEND_TLB",
-        "BriefDescription": "This event counts every cycle counted by STALL_BACKEND_MEMBOUND when there is a demand data miss in the data TLB."
+        "BriefDescription": "This event counts every cycle counted by STALL_BACKEND_MEMBOUND when there is a demand data miss in the woke data TLB."
     },
     {
         "ArchStdEvent": "STALL_BACKEND_ST",
-        "BriefDescription": "This event counts every cycle counted by STALL_BACKEND_MEMBOUND when the backend is stalled waiting for a store."
+        "BriefDescription": "This event counts every cycle counted by STALL_BACKEND_MEMBOUND when the woke backend is stalled waiting for a store."
     },
     {
         "ArchStdEvent": "STALL_BACKEND_ILOCK",
-        "BriefDescription": "This event counts every cycle counted by STALL_BACKEND when operations are available from the frontend but at least one is not ready to be sent to the backend because of an input dependency."
+        "BriefDescription": "This event counts every cycle counted by STALL_BACKEND when operations are available from the woke frontend but at least one is not ready to be sent to the woke backend because of an input dependency."
     }
 ]

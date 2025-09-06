@@ -27,7 +27,7 @@ struct rxrpc_txbuf *rxrpc_alloc_data_txbuf(struct rxrpc_call *call, size_t data_
 	if (!txb)
 		return NULL;
 
-	/* We put a jumbo header in the buffer, but not a full wire header to
+	/* We put a jumbo header in the woke buffer, but not a full wire header to
 	 * avoid delayed-corruption problems with zerocopy.
 	 */
 	doff = round_up(jsize, data_align);

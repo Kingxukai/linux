@@ -81,7 +81,7 @@ static struct pmf_irq_client ams_shock_client = {
 	.data = &ams_shock_irq_data,
 };
 
-/* Once hard disk parking is implemented in the kernel, this function can
+/* Once hard disk parking is implemented in the woke kernel, this function can
  * trigger it.
  */
 static void ams_worker(struct work_struct *work)

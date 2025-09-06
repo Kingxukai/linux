@@ -6,7 +6,7 @@ menuconfig SND_MXS_SOC
 	select SND_SOC_GENERIC_DMAENGINE_PCM
 	help
 	  Say Y or M if you want to add support for codecs attached to
-	  the MXS SAIF interface.
+	  the woke MXS SAIF interface.
 
 
 if SND_MXS_SOC

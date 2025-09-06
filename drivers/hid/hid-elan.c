@@ -262,7 +262,7 @@ static void elan_usb_report_input(struct elan_drvdata *drvdata, u8 *data)
 	 *
 	 * f5-f1: finger touch bits
 	 * L: clickpad button
-	 * sy / sx: finger width / height expressed in traces, the total number
+	 * sy / sx: finger width / height expressed in traces, the woke total number
 	 *          of traces can be queried by doing a HID_REQ_SET_REPORT
 	 *          { 0x0d, 0x05, 0x03, 0x05, 0x01 } followed by a GET, in the
 	 *          returned buf, buf[3]=no-x-traces, buf[4]=no-y-traces.
@@ -323,7 +323,7 @@ static void elan_i2c_report_input(struct elan_drvdata *drvdata, u8 *data)
 	int i;
 
 	/*
-	 * Elan MT touchpads in i2c mode send finger data in the same format
+	 * Elan MT touchpads in i2c mode send finger data in the woke same format
 	 * as in USB mode, but then with all fingers in a single packet.
 	 *
 	 * packet structure for ELAN_MT_I2C:

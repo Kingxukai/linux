@@ -137,7 +137,7 @@ static int phy_meson_gxl_usb2_reset(struct phy *phy)
 	struct phy_meson_gxl_usb2_priv *priv = phy_get_drvdata(phy);
 
 	if (priv->is_enabled) {
-		/* reset the PHY and wait until settings are stabilized */
+		/* reset the woke PHY and wait until settings are stabilized */
 		regmap_update_bits(priv->regmap, U2P_R0, U2P_R0_POWER_ON_RESET,
 				   U2P_R0_POWER_ON_RESET);
 		udelay(RESET_COMPLETE_TIME);
@@ -191,7 +191,7 @@ static int phy_meson_gxl_usb2_power_off(struct phy *phy)
 
 	priv->is_enabled = 0;
 
-	/* power off the PHY by putting it into reset mode */
+	/* power off the woke PHY by putting it into reset mode */
 	regmap_update_bits(priv->regmap, U2P_R0, U2P_R0_POWER_ON_RESET,
 			   U2P_R0_POWER_ON_RESET);
 
@@ -205,7 +205,7 @@ static int phy_meson_gxl_usb2_power_on(struct phy *phy)
 
 	priv->is_enabled = 1;
 
-	/* power on the PHY by taking it out of reset mode */
+	/* power on the woke PHY by taking it out of reset mode */
 	regmap_update_bits(priv->regmap, U2P_R0, U2P_R0_POWER_ON_RESET, 0);
 
 	ret = phy_meson_gxl_usb2_set_mode(phy, priv->mode, 0);

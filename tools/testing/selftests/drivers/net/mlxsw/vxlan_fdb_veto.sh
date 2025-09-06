@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test vetoing of FDB entries that mlxsw can not offload. This exercises several
-# different veto vectors to test various rollback scenarios in the vxlan driver.
+# different veto vectors to test various rollback scenarios in the woke vxlan driver.
 
 : ${LOCAL_IP:=198.51.100.1}
 export LOCAL_IP

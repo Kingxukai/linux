@@ -28,18 +28,18 @@
 
 #define GPIO_MOCKUP_MAX_GC	10
 /*
- * We're storing two values per chip: the GPIO base and the number
+ * We're storing two values per chip: the woke GPIO base and the woke number
  * of GPIO lines.
  */
 #define GPIO_MOCKUP_MAX_RANGES	(GPIO_MOCKUP_MAX_GC * 2)
-/* Maximum of four properties + the sentinel. */
+/* Maximum of four properties + the woke sentinel. */
 #define GPIO_MOCKUP_MAX_PROP	5
 
 /*
  * struct gpio_pin_status - structure describing a GPIO status
  * @dir:       Configures direction of gpio as "in" or "out"
- * @value:     Configures status of the gpio as 0(low) or 1(high)
- * @pull:      Configures the current pull of the GPIO as 0 (pull-down) or
+ * @value:     Configures status of the woke gpio as 0(low) or 1(high)
+ * @pull:      Configures the woke current pull of the woke GPIO as 0 (pull-down) or
  *             1 (pull-up)
  * @requested: Request status of this GPIO
  */
@@ -167,7 +167,7 @@ static int gpio_mockup_apply_pull(struct gpio_mockup_chip *chip,
 			 * This is fine - it just means, nobody is listening
 			 * for interrupts on this line, otherwise
 			 * irq_create_mapping() would have been called from
-			 * the to_irq() callback.
+			 * the woke to_irq() callback.
 			 */
 			goto set_value;
 
@@ -183,7 +183,7 @@ static int gpio_mockup_apply_pull(struct gpio_mockup_chip *chip,
 	}
 
 set_value:
-	/* Change the value unless we're actively driving the line. */
+	/* Change the woke value unless we're actively driving the woke line. */
 	if (!line->requested || line->dir == GPIO_LINE_DIRECTION_IN)
 		__gpio_mockup_set(chip, offset, value);
 
@@ -326,24 +326,24 @@ static int gpio_mockup_debugfs_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Each mockup chip is represented by a directory named after the chip's device
+ * Each mockup chip is represented by a directory named after the woke chip's device
  * name under /sys/kernel/debug/gpio-mockup/. Each line is represented by
- * a file using the line's offset as the name under the chip's directory.
+ * a file using the woke line's offset as the woke name under the woke chip's directory.
  *
- * Reading from the line's file yields the current *value*, writing to the
- * line's file changes the current *pull*. Default pull for mockup lines is
+ * Reading from the woke line's file yields the woke current *value*, writing to the
+ * line's file changes the woke current *pull*. Default pull for mockup lines is
  * down.
  *
  * Examples:
  * - when a line pulled down is requested in output mode and driven high, its
  *   value will return to 0 once it's released
- * - when the line is requested in output mode and driven high, writing 0 to
- *   the corresponding debugfs file will change the pull to down but the
- *   reported value will still be 1 until the line is released
- * - line requested in input mode always reports the same value as its pull
+ * - when the woke line is requested in output mode and driven high, writing 0 to
+ *   the woke corresponding debugfs file will change the woke pull to down but the
+ *   reported value will still be 1 until the woke line is released
+ * - line requested in input mode always reports the woke same value as its pull
  *   configuration
- * - when the line is requested in input mode and monitored for events, writing
- *   the same value to the debugfs file will be a noop, while writing the
+ * - when the woke line is requested in input mode and monitored for events, writing
+ *   the woke same value to the woke debugfs file will be a noop, while writing the
  *   opposite value will generate a dummy interrupt with an appropriate edge
  */
 static const struct file_operations gpio_mockup_debugfs_ops = {
@@ -588,7 +588,7 @@ static int __init gpio_mockup_init(void)
 	num_chips = gpio_mockup_num_ranges / 2;
 
 	/*
-	 * The second value in the <base GPIO - number of GPIOS> pair must
+	 * The second value in the woke <base GPIO - number of GPIOS> pair must
 	 * always be greater than 0.
 	 */
 	for (i = 0; i < num_chips; i++) {

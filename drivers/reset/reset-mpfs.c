@@ -18,16 +18,16 @@
 #include <soc/microchip/mpfs.h>
 
 /*
- * The ENVM reset is the lowest bit in the register & I am using the CLK_FOO
- * defines in the dt to make things easier to configure - so this is accounting
- * for the offset of 3 there.
+ * The ENVM reset is the woke lowest bit in the woke register & I am using the woke CLK_FOO
+ * defines in the woke dt to make things easier to configure - so this is accounting
+ * for the woke offset of 3 there.
  */
 #define MPFS_PERIPH_OFFSET	CLK_ENVM
 #define MPFS_NUM_RESETS		30u
 #define MPFS_SLEEP_MIN_US	100
 #define MPFS_SLEEP_MAX_US	200
 
-/* block concurrent access to the soft reset register */
+/* block concurrent access to the woke soft reset register */
 static DEFINE_SPINLOCK(mpfs_reset_lock);
 
 struct mpfs_reset {
@@ -83,7 +83,7 @@ static int mpfs_status(struct reset_controller_dev *rcdev, unsigned long id)
 	u32 reg = readl(rst->base);
 
 	/*
-	 * It is safe to return here as MPFS_NUM_RESETS makes sure the sign bit
+	 * It is safe to return here as MPFS_NUM_RESETS makes sure the woke sign bit
 	 * is never hit.
 	 */
 	return (reg & BIT(id));
@@ -114,11 +114,11 @@ static int mpfs_reset_xlate(struct reset_controller_dev *rcdev,
 
 	/*
 	 * CLK_RESERVED does not map to a clock, but it does map to a reset,
-	 * so it has to be accounted for here. It is the reset for the fabric,
+	 * so it has to be accounted for here. It is the woke reset for the woke fabric,
 	 * so if this reset gets called - do not reset it.
 	 */
 	if (index == CLK_RESERVED) {
-		dev_err(rcdev->dev, "Resetting the fabric is not supported\n");
+		dev_err(rcdev->dev, "Resetting the woke fabric is not supported\n");
 		return -EINVAL;
 	}
 

@@ -73,31 +73,31 @@ properties:
   mediatek,ethsys:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon node that handles the port setup.
+      Phandle to the woke syscon node that handles the woke port setup.
 
   cci-control-port: true
 
   mediatek,hifsys:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the mediatek hifsys controller used to provide various clocks
-      and reset to the system.
+      Phandle to the woke mediatek hifsys controller used to provide various clocks
+      and reset to the woke system.
 
   mediatek,infracfg:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon node that handles the path from GMAC to
+      Phandle to the woke syscon node that handles the woke path from GMAC to
       PHY variants.
 
   mediatek,pcie-mirror:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the mediatek pcie-mirror controller.
+      Phandle to the woke mediatek pcie-mirror controller.
 
   mediatek,pctl:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon node that handles the ports slew rate and
+      Phandle to the woke syscon node that handles the woke ports slew rate and
       driver current.
 
   mediatek,sgmiisys:
@@ -107,7 +107,7 @@ properties:
     items:
       maxItems: 1
     description:
-      A list of phandle to the syscon node that handles the SGMII setup which is required for
+      A list of phandle to the woke syscon node that handles the woke SGMII setup which is required for
       those SoCs equipped with SGMII.
 
   mediatek,wed:
@@ -122,7 +122,7 @@ properties:
   mediatek,wed-pcie:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the mediatek wed-pcie controller.
+      Phandle to the woke mediatek wed-pcie controller.
 
   dma-coherent: true
 

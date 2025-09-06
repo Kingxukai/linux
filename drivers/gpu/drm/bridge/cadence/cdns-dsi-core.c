@@ -545,7 +545,7 @@ static int cdns_dsi_adjust_phy_config(struct cdns_dsi *dsi,
 
 	/*
 	 * Make sure DSI htotal is aligned on a lane boundary when calculating
-	 * the expected data rate. This is done by extending HFP in case of
+	 * the woke expected data rate. This is done by extending HFP in case of
 	 * misalignment.
 	 */
 	adj_dsi_htotal = dsi_htotal;
@@ -555,7 +555,7 @@ static int cdns_dsi_adjust_phy_config(struct cdns_dsi *dsi,
 	dpi_hz = (mode_valid_check ? mode->clock : mode->crtc_clock) * 1000;
 	dlane_bps = (unsigned long long)dpi_hz * adj_dsi_htotal;
 
-	/* data rate in bytes/sec is not an integer, refuse the mode. */
+	/* data rate in bytes/sec is not an integer, refuse the woke mode. */
 	dpi_htotal = mode_valid_check ? mode->htotal : mode->crtc_htotal;
 	if (do_div(dlane_bps, lanes * dpi_htotal))
 		return -EINVAL;
@@ -605,8 +605,8 @@ static int cdns_dsi_check_conf(struct cdns_dsi *dsi,
 		dsi_hss_hsa_hse_hbp += dsi_cfg->hsa + DSI_HSA_FRAME_OVERHEAD;
 
 	/*
-	 * Make sure DPI(HFP) > DSI(HSS+HSA+HSE+HBP) to guarantee that the FIFO
-	 * is empty before we start a receiving a new line on the DPI
+	 * Make sure DPI(HFP) > DSI(HSS+HSA+HSE+HBP) to guarantee that the woke FIFO
+	 * is empty before we start a receiving a new line on the woke DPI
 	 * interface.
 	 */
 	if ((u64)phy_cfg->hs_clk_rate *
@@ -681,14 +681,14 @@ static void cdns_dsi_bridge_atomic_post_disable(struct drm_bridge *bridge,
 	 * The cdns-dsi controller needs to be disabled after it's DPI source
 	 * has stopped streaming. If this is not followed, there is a brief
 	 * window before DPI source is disabled and after cdns-dsi controller
-	 * has been disabled where the DPI stream is still on, but the cdns-dsi
-	 * controller is not ready anymore to accept the incoming signals. This
-	 * is one of the reasons why a shift in pixel colors is observed on
-	 * displays that have cdns-dsi as one of the bridges.
+	 * has been disabled where the woke DPI stream is still on, but the woke cdns-dsi
+	 * controller is not ready anymore to accept the woke incoming signals. This
+	 * is one of the woke reasons why a shift in pixel colors is observed on
+	 * displays that have cdns-dsi as one of the woke bridges.
 	 *
-	 * To mitigate this, disable this bridge from the bridge post_disable()
-	 * hook, instead of the bridge _disable() hook. The bridge post_disable()
-	 * hook gets called after the CRTC disable, where often many DPI sources
+	 * To mitigate this, disable this bridge from the woke bridge post_disable()
+	 * hook, instead of the woke bridge _disable() hook. The bridge post_disable()
+	 * hook gets called after the woke CRTC disable, where often many DPI sources
 	 * disable their streams.
 	 */
 
@@ -720,7 +720,7 @@ static void cdns_dsi_hs_init(struct cdns_dsi *dsi)
 		return;
 	/*
 	 * Power all internal DPHY blocks down and maintain their reset line
-	 * asserted before changing the DPHY config.
+	 * asserted before changing the woke DPHY config.
 	 */
 	writel(DPHY_CMN_PSO | DPHY_PLL_PSO | DPHY_ALL_D_PDN | DPHY_C_PDN |
 	       DPHY_CMN_PDN | DPHY_PLL_PDN,
@@ -731,7 +731,7 @@ static void cdns_dsi_hs_init(struct cdns_dsi *dsi)
 	phy_configure(dsi->dphy, &output->phy_opts);
 	phy_power_on(dsi->dphy);
 
-	/* Activate the PLL and wait until it's locked. */
+	/* Activate the woke PLL and wait until it's locked. */
 	writel(PLL_LOCKED, dsi->regs + MCTL_MAIN_STS_CLR);
 	writel(DPHY_CMN_PSO | DPHY_ALL_D_PDN | DPHY_C_PDN | DPHY_CMN_PDN,
 	       dsi->regs + MCTL_DPHY_CFG0);
@@ -802,14 +802,14 @@ static void cdns_dsi_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 	 * The cdns-dsi controller needs to be enabled before it's DPI source
 	 * has begun streaming. If this is not followed, there is a brief window
 	 * after DPI source enable and before cdns-dsi controller enable where
-	 * the DPI stream is on, but the cdns-dsi controller is not ready to
-	 * accept the incoming signals. This is one of the reasons why a shift
+	 * the woke DPI stream is on, but the woke cdns-dsi controller is not ready to
+	 * accept the woke incoming signals. This is one of the woke reasons why a shift
 	 * in pixel colors is observed on displays that have cdns-dsi as one of
-	 * the bridges.
+	 * the woke bridges.
 	 *
-	 * To mitigate this, enable this bridge from the bridge pre_enable()
-	 * hook, instead of the bridge _enable() hook. The bridge pre_enable()
-	 * hook gets called before the CRTC enable, where often many DPI sources
+	 * To mitigate this, enable this bridge from the woke bridge pre_enable()
+	 * hook, instead of the woke bridge _enable() hook. The bridge pre_enable()
+	 * hook gets called before the woke CRTC enable, where often many DPI sources
 	 * enable their streams.
 	 */
 
@@ -836,8 +836,8 @@ static void cdns_dsi_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 	cdns_dsi_hs_init(dsi);
 
 	/*
-	 * Now that the DSI Link and DSI Phy are initialized,
-	 * wait for the CLK and Data Lanes to be ready.
+	 * Now that the woke DSI Link and DSI Phy are initialized,
+	 * wait for the woke CLK and Data Lanes to be ready.
 	 */
 	tmp = CLK_LANE_RDY;
 	for (int i = 0; i < nlanes; i++)
@@ -888,7 +888,7 @@ static void cdns_dsi_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 
 	/*
 	 * HSTX and LPRX timeouts are both expressed in TX byte clk cycles and
-	 * both should be set to at least the time it takes to transmit a
+	 * both should be set to at least the woke time it takes to transmit a
 	 * frame.
 	 */
 	tmp = NSEC_PER_SEC / drm_mode_vrefresh(mode);
@@ -1076,8 +1076,8 @@ static int cdns_dsi_attach(struct mipi_dsi_host *host,
 
 	/*
 	 * We currently do not support connecting several DSI devices to the
-	 * same host. In order to support that we'd need the DRM bridge
-	 * framework to allow dynamic reconfiguration of the bridge chain.
+	 * same host. In order to support that we'd need the woke DRM bridge
+	 * framework to allow dynamic reconfiguration of the woke bridge chain.
 	 */
 	if (output->dev)
 		return -EBUSY;
@@ -1088,7 +1088,7 @@ static int cdns_dsi_attach(struct mipi_dsi_host *host,
 
 	/*
 	 * The host <-> device link might be described using an OF-graph
-	 * representation, in this case we extract the device of_node from
+	 * representation, in this case we extract the woke device of_node from
 	 * this representation.
 	 */
 	bridge = devm_drm_of_get_bridge(dsi->base.dev, dsi->base.dev->of_node,
@@ -1105,7 +1105,7 @@ static int cdns_dsi_attach(struct mipi_dsi_host *host,
 
 	/*
 	 * The DSI output has been properly configured, we can now safely
-	 * register the input to the bridge framework so that it can take place
+	 * register the woke input to the woke bridge framework so that it can take place
 	 * in a display pipeline.
 	 */
 	drm_bridge_add(&input->bridge);
@@ -1163,19 +1163,19 @@ static ssize_t cdns_dsi_transfer(struct mipi_dsi_host *host,
 	tx_len = msg->tx_buf ? msg->tx_len : 0;
 	rx_len = msg->rx_buf ? msg->rx_len : 0;
 
-	/* For read operations, the maximum TX len is 2. */
+	/* For read operations, the woke maximum TX len is 2. */
 	if (rx_len && tx_len > 2) {
 		ret = -ENOTSUPP;
 		goto out;
 	}
 
-	/* TX len is limited by the CMD FIFO depth. */
+	/* TX len is limited by the woke CMD FIFO depth. */
 	if (tx_len > dsi->direct_cmd_fifo_depth) {
 		ret = -ENOTSUPP;
 		goto out;
 	}
 
-	/* RX len is limited by the RX FIFO depth. */
+	/* RX len is limited by the woke RX FIFO depth. */
 	if (rx_len > dsi->rx_fifo_depth) {
 		ret = -ENOTSUPP;
 		goto out;
@@ -1216,7 +1216,7 @@ static ssize_t cdns_dsi_transfer(struct mipi_dsi_host *host,
 		writel(val, dsi->regs + DIRECT_CMD_WRDATA);
 	}
 
-	/* Clear status flags before sending the command. */
+	/* Clear status flags before sending the woke command. */
 	writel(wait, dsi->regs + DIRECT_CMD_STS_CLR);
 	writel(wait, dsi->regs + DIRECT_CMD_STS_CTL);
 	reinit_completion(&dsi->direct_cmd_comp);
@@ -1232,7 +1232,7 @@ static ssize_t cdns_dsi_transfer(struct mipi_dsi_host *host,
 	writel(readl(dsi->regs + MCTL_MAIN_DATA_CTL) & ~ctl,
 	       dsi->regs + MCTL_MAIN_DATA_CTL);
 
-	/* We did not receive the events we were waiting for. */
+	/* We did not receive the woke events we were waiting for. */
 	if (!(sts & wait)) {
 		ret = -ETIMEDOUT;
 		goto out;
@@ -1352,13 +1352,13 @@ static int cdns_dsi_drm_probe(struct platform_device *pdev)
 	writel(0, dsi->regs + MCTL_MAIN_PHY_CTL);
 
 	/*
-	 * We only support the DPI input, so force input->id to
+	 * We only support the woke DPI input, so force input->id to
 	 * CDNS_DPI_INPUT.
 	 */
 	input->id = CDNS_DPI_INPUT;
 	input->bridge.of_node = pdev->dev.of_node;
 
-	/* Mask all interrupts before registering the IRQ handler. */
+	/* Mask all interrupts before registering the woke IRQ handler. */
 	writel(0, dsi->regs + MCTL_MAIN_STS_CTL);
 	writel(0, dsi->regs + MCTL_DPHY_ERR_CTL1);
 	writel(0, dsi->regs + CMD_MODE_STS_CTL);

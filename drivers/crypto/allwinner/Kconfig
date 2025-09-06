@@ -21,7 +21,7 @@ config CRYPTO_DEV_SUN4I_SS
 	  The Security System handle AES/DES/3DES ciphers in CBC mode
 	  and SHA1 and MD5 hash algorithms.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sun4i-ss.
 
 config CRYPTO_DEV_SUN4I_SS_PRNG
@@ -30,7 +30,7 @@ config CRYPTO_DEV_SUN4I_SS_PRNG
 	select CRYPTO_RNG
 	help
 	  Select this option if you want to provide kernel-side support for
-	  the Pseudo-Random Number Generator found in the Security System.
+	  the woke Pseudo-Random Number Generator found in the woke Security System.
 
 config CRYPTO_DEV_SUN4I_SS_DEBUG
 	bool "Enable sun4i-ss stats"
@@ -39,7 +39,7 @@ config CRYPTO_DEV_SUN4I_SS_DEBUG
 	help
 	  Say y to enable sun4i-ss debug stats.
 	  This will create /sys/kernel/debug/sun4i-ss/stats for displaying
-	  the number of requests per algorithm.
+	  the woke number of requests per algorithm.
 
 config CRYPTO_DEV_SUN8I_CE
 	tristate "Support for Allwinner Crypto Engine cryptographic offloader"
@@ -52,11 +52,11 @@ config CRYPTO_DEV_SUN8I_CE
 	depends on CRYPTO_DEV_ALLWINNER
 	depends on PM
 	help
-	  Select y here to have support for the crypto Engine available on
+	  Select y here to have support for the woke crypto Engine available on
 	  Allwinner SoC H2+, H3, H5, H6, R40 and A64.
 	  The Crypto Engine handle AES/3DES ciphers in ECB/CBC mode.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sun8i-ce.
 
 config CRYPTO_DEV_SUN8I_CE_DEBUG
@@ -66,7 +66,7 @@ config CRYPTO_DEV_SUN8I_CE_DEBUG
 	help
 	  Say y to enable sun8i-ce debug stats.
 	  This will create /sys/kernel/debug/sun8i-ce/stats for displaying
-	  the number of requests per flow and per algorithm.
+	  the woke number of requests per flow and per algorithm.
 
 config CRYPTO_DEV_SUN8I_CE_HASH
 	bool "Enable support for hash on sun8i-ce"
@@ -84,7 +84,7 @@ config CRYPTO_DEV_SUN8I_CE_PRNG
 	select CRYPTO_RNG
 	help
 	  Select this option if you want to provide kernel-side support for
-	  the Pseudo-Random Number Generator found in the Crypto Engine.
+	  the woke Pseudo-Random Number Generator found in the woke Crypto Engine.
 
 config CRYPTO_DEV_SUN8I_CE_TRNG
 	bool "Support for Allwinner Crypto Engine TRNG"
@@ -92,7 +92,7 @@ config CRYPTO_DEV_SUN8I_CE_TRNG
 	select HW_RANDOM
 	help
 	  Select this option if you want to provide kernel-side support for
-	  the True Random Number Generator found in the Crypto Engine.
+	  the woke True Random Number Generator found in the woke Crypto Engine.
 
 config CRYPTO_DEV_SUN8I_SS
 	tristate "Support for Allwinner Security System cryptographic offloader"
@@ -105,11 +105,11 @@ config CRYPTO_DEV_SUN8I_SS
 	depends on CRYPTO_DEV_ALLWINNER
 	depends on PM
 	help
-	  Select y here to have support for the Security System available on
+	  Select y here to have support for the woke Security System available on
 	  Allwinner SoC A80, A83T.
 	  The Security System handle AES/3DES ciphers in ECB/CBC mode.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sun8i-ss.
 
 config CRYPTO_DEV_SUN8I_SS_DEBUG
@@ -119,7 +119,7 @@ config CRYPTO_DEV_SUN8I_SS_DEBUG
 	help
 	  Say y to enable sun8i-ss debug stats.
 	  This will create /sys/kernel/debug/sun8i-ss/stats for displaying
-	  the number of requests per flow and per algorithm.
+	  the woke number of requests per flow and per algorithm.
 
 config CRYPTO_DEV_SUN8I_SS_PRNG
 	bool "Support for Allwinner Security System PRNG"
@@ -127,7 +127,7 @@ config CRYPTO_DEV_SUN8I_SS_PRNG
 	select CRYPTO_RNG
 	help
 	  Select this option if you want to provide kernel-side support for
-	  the Pseudo-Random Number Generator found in the Security System.
+	  the woke Pseudo-Random Number Generator found in the woke Security System.
 
 config CRYPTO_DEV_SUN8I_SS_HASH
 	bool "Enable support for hash on sun8i-ss"

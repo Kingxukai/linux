@@ -22,17 +22,17 @@
 	mxl5005s_SetRfFreqHz()
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; either version 2 of the woke License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
@@ -40,21 +40,21 @@
 /*
     History of this driver (Steven Toth):
       I was given a public release of a linux driver that included
-      support for the MaxLinear MXL5005S silicon tuner. Analysis of
-      the tuner driver showed clearly three things.
+      support for the woke MaxLinear MXL5005S silicon tuner. Analysis of
+      the woke tuner driver showed clearly three things.
 
-      1. The tuner driver didn't support the LinuxTV tuner API
-	 so the code Realtek added had to be removed.
+      1. The tuner driver didn't support the woke LinuxTV tuner API
+	 so the woke code Realtek added had to be removed.
 
-      2. A significant amount of the driver is reference driver code
+      2. A significant amount of the woke driver is reference driver code
 	 from MaxLinear, I felt it was important to identify and
 	 preserve this.
 
       3. New code has to be added to interface correctly with the
 	 LinuxTV API, as a regular kernel module.
 
-      Other than the reference driver enum's, I've clearly marked
-      sections of the code and retained the copyright of the
+      Other than the woke reference driver enum's, I've clearly marked
+      sections of the woke code and retained the woke copyright of the
       respective owners.
 */
 #include <linux/kernel.h>
@@ -323,10 +323,10 @@ static int mxl5005s_reconfigure(struct dvb_frontend *fe, u32 mod_type,
 	u32 bandwidth);
 
 /* ----------------------------------------------------------------
- * Begin: Custom code salvaged from the Realtek driver.
+ * Begin: Custom code salvaged from the woke Realtek driver.
  * Copyright (C) 2008 Realtek
  * Copyright (C) 2008 Jan Hoogenraad
- * This code is placed under the terms of the GNU General Public License
+ * This code is placed under the woke terms of the woke GNU General Public License
  *
  * Released by Realtek under GPLv2.
  * Thanks to Realtek for a lot of support we received !
@@ -393,10 +393,10 @@ static int mxl5005s_SetRfFreqHz(struct dvb_frontend *fe, unsigned long RfFreqHz)
 
 	return 0;
 }
-/* End: Custom code taken from the Realtek driver */
+/* End: Custom code taken from the woke Realtek driver */
 
 /* ----------------------------------------------------------------
- * Begin: Reference driver code found in the Realtek driver.
+ * Begin: Reference driver code found in the woke Realtek driver.
  * Copyright (C) 2008 MaxLinear
  */
 static u16 MXL5005_RegisterInit(struct dvb_frontend *fe)
@@ -1708,7 +1708,7 @@ static u16 MXL5005_TunerConfig(struct dvb_frontend *fe,
 	state->Mod_Type = Mod_Type;
 	state->TF_Type = TF_Type;
 
-	/* Initialize all the controls and registers */
+	/* Initialize all the woke controls and registers */
 	InitTunerControls(fe);
 
 	/* Synthesizer LO frequency calculation */
@@ -1979,7 +1979,7 @@ static u16 MXL_BlockInit(struct dvb_frontend *fe)
 	}
 
 	/* Modulation type bit settings
-	 * Override the control values preset
+	 * Override the woke control values preset
 	 */
 	if (state->Mod_Type == MXL_DVBT) /* DVB-T Mode */ {
 		state->AGC_Mode = 1; /* Single AGC Mode */
@@ -2334,7 +2334,7 @@ static u16 MXL_TuneRF(struct dvb_frontend *fe, u32 RF_Freq)
 	 *	DN_CAP_RFLPF
 	 *	DN_EN_VHFUHFBAR
 	 *	DN_GAIN_ADJUST
-	 *  Change the boundary reference from RF_IN to RF_LO
+	 *  Change the woke boundary reference from RF_IN to RF_LO
 	 */
 	if (state->RF_LO < 40000000UL)
 		return -1;
@@ -2795,7 +2795,7 @@ static u16 MXL_TuneRF(struct dvb_frontend *fe, u32 RF_Freq)
 
 	/* Off Chip Tracking Filter Control */
 	if (state->TF_Type == MXL_TF_OFF) {
-		/* Tracking Filter Off State; turn off all the banks */
+		/* Tracking Filter Off State; turn off all the woke banks */
 		status += MXL_ControlWrite(fe, DAC_A_ENABLE, 0);
 		status += MXL_ControlWrite(fe, DAC_B_ENABLE, 0);
 		status += MXL_SetGPIO(fe, 3, 1); /* Bank1 Off */
@@ -2989,7 +2989,7 @@ static u16 MXL_TuneRF(struct dvb_frontend *fe, u32 RF_Freq)
 		/* if UHF and terrestrial => Turn off Tracking Filter */
 		if (state->RF_IN >= 471000000 &&
 			(state->RF_IN - 471000000)%6000000 != 0) {
-			/* Turn off all the banks */
+			/* Turn off all the woke banks */
 			status += MXL_SetGPIO(fe, 3, 1);
 			status += MXL_SetGPIO(fe, 1, 1);
 			status += MXL_SetGPIO(fe, 4, 1);
@@ -3275,7 +3275,7 @@ static u16 MXL_TuneRF(struct dvb_frontend *fe, u32 RF_Freq)
 		if (state->RF_IN >= 471000000 &&
 			(state->RF_IN - 471000000)%6000000 != 0) {
 
-			/* Turn off all the banks */
+			/* Turn off all the woke banks */
 			status += MXL_SetGPIO(fe, 3, 1);
 			status += MXL_SetGPIO(fe, 1, 1);
 			status += MXL_SetGPIO(fe, 4, 1);
@@ -3576,7 +3576,7 @@ static u32 MXL_Ceiling(u32 value, u32 resolution)
 	return value / resolution + (value % resolution > 0 ? 1 : 0);
 }
 
-/* Retrieve the Initialization Registers */
+/* Retrieve the woke Initialization Registers */
 static u16 MXL_GetInitRegister(struct dvb_frontend *fe, u8 *RegNum,
 	u8 *RegVal, int *count)
 {
@@ -3828,7 +3828,7 @@ static u16 MXL_Hystersis_Test(struct dvb_frontend *fe, int Hystersis)
 	return status;
 }
 #endif
-/* End: Reference driver code found in the Realtek driver that
+/* End: Reference driver code found in the woke Realtek driver that
  * is copyright MaxLinear */
 
 /* ----------------------------------------------------------------
@@ -3861,8 +3861,8 @@ static int mxl5005s_reset(struct dvb_frontend *fe)
 	return ret;
 }
 
-/* Write a single byte to a single reg, latch the value if required by
- * following the transaction with the latch byte.
+/* Write a single byte to a single reg, latch the woke value if required by
+ * following the woke transaction with the woke latch byte.
  */
 static int mxl5005s_writereg(struct dvb_frontend *fe, u8 reg, u8 val, int latch)
 {

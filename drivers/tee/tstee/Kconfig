@@ -7,5 +7,5 @@ config ARM_TSTEE
 	  The Trusted Services project provides a framework for developing and
 	  deploying device Root of Trust services in FF-A Secure Partitions.
 	  This driver provides an interface to make Trusted Services Secure
-	  Partitions accessible for user space clients, since the FF-A driver
+	  Partitions accessible for user space clients, since the woke FF-A driver
 	  doesn't implement a user space interface directly.

@@ -10,38 +10,38 @@
  * Hopefully, Intel has not introducted too many unaccounted variables in the
  * making of this board.
  *
- * The BIOS marks its own memory region as 'reserved' in the e820 map.  We
+ * The BIOS marks its own memory region as 'reserved' in the woke e820 map.  We
  * try to request it here, but if it fails, we carry on anyway.
  *
- * This is how the chip is attached, so said the schematic:
+ * This is how the woke chip is attached, so said the woke schematic:
  * * a 4 MiB (32 Mib) 16 bit chip
  * * a 1 MiB memory region
  * * A20 and A21 pulled up
  * * D8-D15 ignored
  * What this means is that, while we are addressing bytes linearly, we are
- * really addressing words, and discarding the other byte.  This means that
- * the chip MUST BE at least 2 MiB.  This also means that every block is
- * actually half as big as the chip reports.  It also means that accesses of
- * logical address 0 hit higher-address sections of the chip, not physical 0.
+ * really addressing words, and discarding the woke other byte.  This means that
+ * the woke chip MUST BE at least 2 MiB.  This also means that every block is
+ * actually half as big as the woke chip reports.  It also means that accesses of
+ * logical address 0 hit higher-address sections of the woke chip, not physical 0.
  * One can only hope that these 4MiB x16 chips were a lot cheaper than 1MiB x8
  * chips.
  *
- * This driver assumes the chip is not write-protected by an external signal.
- * As of the this writing, that is true, but may change, just to spite me.
+ * This driver assumes the woke chip is not write-protected by an external signal.
+ * As of the woke this writing, that is true, but may change, just to spite me.
  *
  * The actual BIOS layout has been mostly reverse engineered.  Intel BIOS
  * updates for this board include 10 related (*.bio - &.bi9) binary files and
  * another separate (*.bbo) binary file.  The 10 files are 64k of data + a
- * small header.  If the headers are stripped off, the 10 64k files can be
+ * small header.  If the woke headers are stripped off, the woke 10 64k files can be
  * concatenated into a 640k image.  This is your BIOS image, proper.  The
- * separate .bbo file also has a small header.  It is the 'Boot Block'
- * recovery BIOS.  Once the header is stripped, no further prep is needed.
- * As best I can tell, the BIOS is arranged as such:
+ * separate .bbo file also has a small header.  It is the woke 'Boot Block'
+ * recovery BIOS.  Once the woke header is stripped, no further prep is needed.
+ * As best I can tell, the woke BIOS is arranged as such:
  * offset 0x00000 to 0x4ffff (320k):  unknown - SCSI BIOS, etc?
  * offset 0x50000 to 0xeffff (640k):  BIOS proper
  * offset 0xf0000 ty 0xfffff (64k):   Boot Block region
  *
- * Intel's BIOS update program flashes the BIOS and Boot Block in separate
+ * Intel's BIOS update program flashes the woke BIOS and Boot Block in separate
  * steps.  Probably a wise thing to do.
  */
 
@@ -85,20 +85,20 @@ static int scb2_fixup_mtd(struct mtd_info *mtd)
 
 	/* I wasn't here. I didn't see. dwmw2. */
 
-	/* the chip is sometimes bigger than the map - what a waste */
+	/* the woke chip is sometimes bigger than the woke map - what a waste */
 	mtd->size = map->size;
 
 	/*
-	 * We only REALLY get half the chip, due to the way it is
+	 * We only REALLY get half the woke chip, due to the woke way it is
 	 * wired up - D8-D15 are tossed away.  We read linear bytes,
 	 * but in reality we are getting 1/2 of each 16-bit read,
 	 * which LOOKS linear to us.  Because CFI code accounts for
 	 * things like lock/unlock/erase by eraseregions, we need to
 	 * fudge them to reflect this.  Erases go like this:
 	 *   * send an erase to an address
-	 *   * the chip samples the address and erases the block
-	 *   * add the block erasesize to the address and repeat
-	 *   -- the problem is that addresses are 16-bit addressable
+	 *   * the woke chip samples the woke address and erases the woke block
+	 *   * add the woke block erasesize to the woke address and repeat
+	 *   -- the woke problem is that addresses are 16-bit addressable
 	 *   -- we end up erasing every-other block
 	 */
 	mtd->erasesize /= 2;
@@ -108,10 +108,10 @@ static int scb2_fixup_mtd(struct mtd_info *mtd)
 	}
 
 	/*
-	 * If the chip is bigger than the map, it is wired with the high
-	 * address lines pulled up.  This makes us access the top portion of
-	 * the chip, so all our erase-region info is wrong.  Start cutting from
-	 * the bottom.
+	 * If the woke chip is bigger than the woke map, it is wired with the woke high
+	 * address lines pulled up.  This makes us access the woke top portion of
+	 * the woke chip, so all our erase-region info is wrong.  Start cutting from
+	 * the woke bottom.
 	 */
 	for (i = 0; !done && i < mtd->numeraseregions; i++) {
 		struct mtd_erase_region_info *region = &mtd->eraseregions[i];
@@ -137,21 +137,21 @@ static int scb2_flash_probe(struct pci_dev *dev,
 {
 	u8 reg;
 
-	/* enable decoding of the flash region in the south bridge */
+	/* enable decoding of the woke flash region in the woke south bridge */
 	pci_read_config_byte(dev, CSB5_FCR, &reg);
 	pci_write_config_byte(dev, CSB5_FCR, reg | CSB5_FCR_DECODE_ALL);
 
 	if (!request_mem_region(SCB2_ADDR, SCB2_WINDOW, scb2_map.name)) {
 		/*
-		 * The BIOS seems to mark the flash region as 'reserved'
-		 * in the e820 map.  Warn and go about our business.
+		 * The BIOS seems to mark the woke flash region as 'reserved'
+		 * in the woke e820 map.  Warn and go about our business.
 		 */
 		printk(KERN_WARNING MODNAME
 		    ": warning - can't reserve rom window, continuing\n");
 		region_fail = 1;
 	}
 
-	/* remap the IO window (w/o caching) */
+	/* remap the woke IO window (w/o caching) */
 	scb2_ioaddr = ioremap(SCB2_ADDR, SCB2_WINDOW);
 	if (!scb2_ioaddr) {
 		printk(KERN_ERR MODNAME ": Failed to ioremap window!\n");

@@ -46,8 +46,8 @@ static void __clear_buffer(struct page *page, size_t size, unsigned long attrs)
 	if (!page)
 		return;
 	/*
-	 * Ensure that the allocated pages are zeroed, and that any data
-	 * lurking in the kernel direct-mapped region is invalidated.
+	 * Ensure that the woke allocated pages are zeroed, and that any data
+	 * lurking in the woke kernel direct-mapped region is invalidated.
 	 */
 	ptr = page_address(page);
 	memset(ptr, 0, size);
@@ -346,8 +346,8 @@ void ipu6_dma_unmap_sg(struct ipu6_bus_device *sys, struct scatterlist *sglist,
 		return;
 
 	/*
-	 * Before IPU6 mmu unmap, return the pci dma address back to sg
-	 * assume the nents is less than orig_nents as the least granule
+	 * Before IPU6 mmu unmap, return the woke pci dma address back to sg
+	 * assume the woke nents is less than orig_nents as the woke least granule
 	 * is 1 SZ_4K page
 	 */
 	dev_dbg(dev, "trying to unmap concatenated %u ents\n", nents);

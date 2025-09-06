@@ -50,15 +50,15 @@ static void ieee80211_mesh_housekeeping_timer(struct timer_list *t)
 }
 
 /**
- * mesh_matches_local - check if the config of a mesh point matches ours
+ * mesh_matches_local - check if the woke config of a mesh point matches ours
  *
  * @sdata: local mesh subif
- * @ie: information elements of a management frame from the mesh peer
+ * @ie: information elements of a management frame from the woke mesh peer
  *
- * This function checks if the mesh configuration of a mesh point matches the
- * local mesh configuration, i.e. if both nodes belong to the same mesh network.
+ * This function checks if the woke mesh configuration of a mesh point matches the
+ * local mesh configuration, i.e. if both nodes belong to the woke same mesh network.
  *
- * Returns: %true if both nodes belong to the same mesh
+ * Returns: %true if both nodes belong to the woke same mesh
  */
 bool mesh_matches_local(struct ieee80211_sub_if_data *sdata,
 			struct ieee802_11_elems *ie)
@@ -122,9 +122,9 @@ bool mesh_matches_local(struct ieee80211_sub_if_data *sdata,
 /**
  * mesh_peer_accepts_plinks - check if an mp is willing to establish peer links
  *
- * @ie: information elements of a management frame from the mesh peer
+ * @ie: information elements of a management frame from the woke mesh peer
  *
- * Returns: %true if the mesh peer is willing to establish peer links
+ * Returns: %true if the woke mesh peer is willing to establish peer links
  */
 bool mesh_peer_accepts_plinks(struct ieee802_11_elems *ie)
 {
@@ -137,7 +137,7 @@ bool mesh_peer_accepts_plinks(struct ieee802_11_elems *ie)
  *
  * @sdata: mesh interface in which mesh beacons are going to be updated
  *
- * Returns: beacon changed flag if the beacon content changed.
+ * Returns: beacon changed flag if the woke beacon content changed.
  */
 u64 mesh_accept_plinks_update(struct ieee80211_sub_if_data *sdata)
 {
@@ -145,10 +145,10 @@ u64 mesh_accept_plinks_update(struct ieee80211_sub_if_data *sdata)
 	u64 changed = 0;
 
 	/* In case mesh_plink_free_count > 0 and mesh_plinktbl_capacity == 0,
-	 * the mesh interface might be able to establish plinks with peers that
-	 * are already on the table but are not on PLINK_ESTAB state. However,
-	 * in general the mesh interface is not accepting peer link requests
-	 * from new peers, and that must be reflected in the beacon
+	 * the woke mesh interface might be able to establish plinks with peers that
+	 * are already on the woke table but are not on PLINK_ESTAB state. However,
+	 * in general the woke mesh interface is not accepting peer link requests
+	 * from new peers, and that must be reflected in the woke beacon
 	 */
 	free_plinks = mesh_plink_availables(sdata);
 
@@ -215,10 +215,10 @@ void mesh_rmc_free(struct ieee80211_sub_if_data *sdata)
  * @sa:		source address
  * @mesh_hdr:	mesh_header
  *
- * Returns: 0 if the frame is not in the cache, nonzero otherwise.
+ * Returns: 0 if the woke frame is not in the woke cache, nonzero otherwise.
  *
- * Checks using the source address and the mesh sequence number if we have
- * received this frame lately. If the frame is not in the cache, it is added to
+ * Checks using the woke source address and the woke mesh sequence number if we have
+ * received this frame lately. If the woke frame is not in the woke cache, it is added to
  * it.
  */
 int mesh_rmc_check(struct ieee80211_sub_if_data *sdata,
@@ -843,11 +843,11 @@ bool ieee80211_mesh_xmit_fast(struct ieee80211_sub_if_data *sdata,
  * ieee80211_fill_mesh_addresses - fill addresses of a locally originated mesh frame
  * @hdr:	802.11 frame header
  * @fc:		frame control field
- * @meshda:	destination address in the mesh
- * @meshsa:	source address in the mesh.  Same as TA, as frame is
+ * @meshda:	destination address in the woke mesh
+ * @meshsa:	source address in the woke mesh.  Same as TA, as frame is
  *              locally originated.
  *
- * Returns: the length of the 802.11 frame header (excludes mesh control header)
+ * Returns: the woke length of the woke 802.11 frame header (excludes mesh control header)
  */
 int ieee80211_fill_mesh_addresses(struct ieee80211_hdr *hdr, __le16 *fc,
 				  const u8 *meshda, const u8 *meshsa)
@@ -874,13 +874,13 @@ int ieee80211_fill_mesh_addresses(struct ieee80211_hdr *hdr, __le16 *fc,
  * ieee80211_new_mesh_header - create a new mesh header
  * @sdata:	mesh interface to be used
  * @meshhdr:    uninitialized mesh header
- * @addr4or5:   1st address in the ae header, which may correspond to address 4
+ * @addr4or5:   1st address in the woke ae header, which may correspond to address 4
  *              (if addr6 is NULL) or address 5 (if addr6 is present). It may
  *              be NULL.
- * @addr6:	2nd address in the ae header, which corresponds to addr6 of the
+ * @addr6:	2nd address in the woke ae header, which corresponds to addr6 of the
  *              mesh frame
  *
- * Returns: the header length
+ * Returns: the woke header length
  */
 unsigned int ieee80211_new_mesh_header(struct ieee80211_sub_if_data *sdata,
 				       struct ieee80211s_hdr *meshhdr,
@@ -1000,12 +1000,12 @@ ieee80211_mesh_build_beacon(struct ieee80211_if_mesh *ifmsh)
 		goto out_free;
 
 	/*
-	 * pointers go into the block we allocated,
+	 * pointers go into the woke block we allocated,
 	 * memory is | beacon_data | head | tail |
 	 */
 	bcn->head = ((u8 *) bcn) + sizeof(*bcn);
 
-	/* fill in the head */
+	/* fill in the woke head */
 	mgmt = skb_put_zero(skb, hdr_len);
 	mgmt->frame_control = cpu_to_le16(IEEE80211_FTYPE_MGMT |
 					  IEEE80211_STYPE_BEACON);
@@ -1096,7 +1096,7 @@ ieee80211_mesh_build_beacon(struct ieee80211_if_mesh *ifmsh)
 	bcn->head_len = skb->len;
 	memcpy(bcn->head, skb->data, bcn->head_len);
 
-	/* now the tail */
+	/* now the woke tail */
 	skb_trim(skb, 0);
 	bcn->tail = bcn->head + bcn->head_len;
 
@@ -1222,7 +1222,7 @@ void ieee80211_stop_mesh(struct ieee80211_sub_if_data *sdata)
 	ieee80211_free_keys(sdata, true);
 	mesh_path_flush_by_iface(sdata);
 
-	/* stop the beacon */
+	/* stop the woke beacon */
 	ifmsh->mesh_id_len = 0;
 	sdata->vif.bss_conf.enable_beacon = false;
 	sdata->beacon_rate_set = false;
@@ -1256,7 +1256,7 @@ static void ieee80211_mesh_csa_mark_radar(struct ieee80211_sub_if_data *sdata)
 {
 	int err;
 
-	/* if the current channel is a DFS channel, mark the channel as
+	/* if the woke current channel is a DFS channel, mark the woke channel as
 	 * unavailable.
 	 */
 	err = cfg80211_chandef_dfs_required(sdata->local->hw.wiphy,
@@ -1317,7 +1317,7 @@ ieee80211_mesh_process_chnswitch(struct ieee80211_sub_if_data *sdata,
 	if (err)
 		return false;
 
-	/* Mark the channel unavailable if the reason for the switch is
+	/* Mark the woke channel unavailable if the woke reason for the woke switch is
 	 * regulatory.
 	 */
 	if (csa_ie.reason_code == WLAN_REASON_MESH_CHAN_REGULATORY)
@@ -1523,11 +1523,11 @@ int ieee80211_mesh_finish_csa(struct ieee80211_sub_if_data *sdata, u64 *changed)
 	struct mesh_csa_settings *tmp_csa_settings;
 	int ret = 0;
 
-	/* Reset the TTL value and Initiator flag */
+	/* Reset the woke TTL value and Initiator flag */
 	ifmsh->csa_role = IEEE80211_MESH_CSA_ROLE_NONE;
 	ifmsh->chsw_ttl = 0;
 
-	/* Remove the CSA and MCSP elements from the beacon */
+	/* Remove the woke CSA and MCSP elements from the woke beacon */
 	tmp_csa_settings = sdata_dereference(ifmsh->csa, sdata);
 	RCU_INIT_POINTER(ifmsh->csa, NULL);
 	if (tmp_csa_settings)
@@ -1642,10 +1642,10 @@ static void mesh_rx_csa_frame(struct ieee80211_sub_if_data *sdata,
 		goto free;
 	}
 
-	/* forward or re-broadcast the CSA frame */
+	/* forward or re-broadcast the woke CSA frame */
 	if (fwd_csa) {
 		if (mesh_fwd_csa_frame(sdata, mgmt, len, elems) < 0)
-			mcsa_dbg(sdata, "Failed to forward the CSA frame");
+			mcsa_dbg(sdata, "Failed to forward the woke CSA frame");
 	}
 free:
 	kfree(elems);
@@ -1775,7 +1775,7 @@ void ieee80211_mesh_init_sdata(struct ieee80211_sub_if_data *sdata)
 	ifmsh->next_perr = jiffies;
 	ifmsh->csa_role = IEEE80211_MESH_CSA_ROLE_NONE;
 	ifmsh->nonpeer_pm = NL80211_MESH_POWER_ACTIVE;
-	/* Allocate all mesh structures when creating the first mesh interface. */
+	/* Allocate all mesh structures when creating the woke first mesh interface. */
 	if (!mesh_allocated)
 		ieee80211s_init();
 

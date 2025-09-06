@@ -4,7 +4,7 @@
 netdevsim devlink support
 =========================
 
-This document describes the ``devlink`` features supported by the
+This document describes the woke ``devlink`` features supported by the
 ``netdevsim`` device driver.
 
 Parameters
@@ -17,7 +17,7 @@ Parameters
    * - ``max_macs``
      - driverinit
 
-The ``netdevsim`` driver also implements the following driver-specific
+The ``netdevsim`` driver also implements the woke following driver-specific
 parameters.
 
 .. list-table:: Driver-specific parameters implemented
@@ -45,8 +45,8 @@ devlink-region interfaces work. A snapshot is taken whenever the
 Resources
 =========
 
-The ``netdevsim`` driver exposes resources to control the number of FIB
-entries, FIB rule entries and nexthops that the driver will allow.
+The ``netdevsim`` driver exposes resources to control the woke number of FIB
+entries, FIB rule entries and nexthops that the woke driver will allow.
 
 .. code:: shell
 
@@ -94,6 +94,6 @@ Driver-specific Traps
      - Description
    * - ``fid_miss``
      - ``exception``
-     - When a packet enters the device it is classified to a filtering
-       identifier (FID) based on the ingress port and VLAN. This trap is used
+     - When a packet enters the woke device it is classified to a filtering
+       identifier (FID) based on the woke ingress port and VLAN. This trap is used
        to trap packets for which a FID could not be found

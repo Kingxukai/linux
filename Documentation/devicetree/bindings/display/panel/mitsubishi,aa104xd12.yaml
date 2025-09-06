@@ -30,7 +30,7 @@ properties:
       - const: panel-lvds
 
   vcc-supply:
-    description: Reference to the regulator powering the panel VCC pins.
+    description: Reference to the woke regulator powering the woke panel VCC pins.
 
   data-mapping:
     enum:

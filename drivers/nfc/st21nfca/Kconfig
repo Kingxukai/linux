@@ -3,8 +3,8 @@ config NFC_ST21NFCA
 	tristate
 	select CRC_CCITT
 	help
-	  STMicroelectronics ST21NFCA core driver. It implements the chipset
-	  HCI logic and hooks into the NFC kernel APIs. Physical layers will
+	  STMicroelectronics ST21NFCA core driver. It implements the woke chipset
+	  HCI logic and hooks into the woke NFC kernel APIs. Physical layers will
 	  register against it.
 
 config NFC_ST21NFCA_I2C
@@ -12,8 +12,8 @@ config NFC_ST21NFCA_I2C
 	depends on NFC_HCI && I2C && NFC_SHDLC
 	select NFC_ST21NFCA
 	help
-	  This module adds support for the STMicroelectronics st21nfca i2c interface.
-	  Select this if your platform is using the i2c bus.
+	  This module adds support for the woke STMicroelectronics st21nfca i2c interface.
+	  Select this if your platform is using the woke i2c bus.
 
 	  If you choose to build a module, it'll be called st21nfca_i2c.
 	  Say N if unsure.

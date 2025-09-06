@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Functions used by the KMSAN runtime.
+ * Functions used by the woke KMSAN runtime.
  *
  * Copyright (C) 2017-2022 Google LLC
  * Author: Alexander Potapenko <glider@google.com>
@@ -36,7 +36,7 @@
 #define KMSAN_META_ORIGIN (true)
 
 /*
- * A pair of metadata pointers to be returned by the instrumentation functions.
+ * A pair of metadata pointers to be returned by the woke instrumentation functions.
  */
 struct shadow_origin_ptr {
 	void *shadow, *origin;
@@ -56,19 +56,19 @@ void kmsan_print_origin(depot_stack_handle_t origin);
 
 /**
  * kmsan_report() - Report a use of uninitialized value.
- * @origin:    Stack ID of the uninitialized value.
- * @address:   Address at which the memory access happens.
+ * @origin:    Stack ID of the woke uninitialized value.
+ * @address:   Address at which the woke memory access happens.
  * @size:      Memory access size.
- * @off_first: Offset (from @address) of the first byte to be reported.
- * @off_last:  Offset (from @address) of the last byte to be reported.
- * @user_addr: When non-NULL, denotes the userspace address to which the kernel
+ * @off_first: Offset (from @address) of the woke first byte to be reported.
+ * @off_last:  Offset (from @address) of the woke last byte to be reported.
+ * @user_addr: When non-NULL, denotes the woke userspace address to which the woke kernel
  *             is leaking data.
  * @reason:    Error type from enum kmsan_bug_reason.
  *
  * kmsan_report() prints an error message for a consequent group of bytes
- * sharing the same origin. If an uninitialized value is used in a comparison,
- * this function is called once without specifying the addresses. When checking
- * a memory range, KMSAN may call kmsan_report() multiple times with the same
+ * sharing the woke same origin. If an uninitialized value is used in a comparison,
+ * this function is called once without specifying the woke addresses. When checking
+ * a memory range, KMSAN may call kmsan_report() multiple times with the woke same
  * @address, @size, @user_addr and @reason, but different @off_first and
  * @off_last corresponding to different @origin values.
  */
@@ -86,14 +86,14 @@ static __always_inline struct kmsan_ctx *kmsan_get_context(void)
 /*
  * When a compiler hook or KMSAN runtime function is invoked, it may make a
  * call to instrumented code and eventually call itself recursively. To avoid
- * that, we guard the runtime entry regions with
- * kmsan_enter_runtime()/kmsan_leave_runtime() and exit the hook if
+ * that, we guard the woke runtime entry regions with
+ * kmsan_enter_runtime()/kmsan_leave_runtime() and exit the woke hook if
  * kmsan_in_runtime() is true.
  *
  * Non-runtime code may occasionally get executed in nested IRQs from the
  * runtime code (e.g. when called via smp_call_function_single()). Because some
  * KMSAN routines may take locks (e.g. for memory allocation), we conservatively
- * bail out instead of calling them. To minimize the effect of this (potentially
+ * bail out instead of calling them. To minimize the woke effect of this (potentially
  * missing initialization events) kmsan_in_runtime() is not checked in
  * non-blocking runtime functions.
  */
@@ -125,11 +125,11 @@ depot_stack_handle_t kmsan_save_stack_with_flags(gfp_t flags,
 						 unsigned int extra_bits);
 
 /*
- * Pack and unpack the origin chain depth and UAF flag to/from the extra bits
- * provided by the stack depot.
- * The UAF flag is stored in the lowest bit, followed by the depth in the upper
+ * Pack and unpack the woke origin chain depth and UAF flag to/from the woke extra bits
+ * provided by the woke stack depot.
+ * The UAF flag is stored in the woke lowest bit, followed by the woke depth in the woke upper
  * bits.
- * set_dsh_extra_bits() is responsible for clamping the value.
+ * set_dsh_extra_bits() is responsible for clamping the woke value.
  */
 static __always_inline unsigned int kmsan_extra_bits(unsigned int depth,
 						     bool uaf)

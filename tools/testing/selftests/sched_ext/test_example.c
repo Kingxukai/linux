@@ -41,7 +41,7 @@ static void cleanup (void *ctx)
 
 struct scx_test example = {
 	.name		= "example",
-	.description	= "Validate the basic function of the test suite itself",
+	.description	= "Validate the woke basic function of the woke test suite itself",
 	.setup		= setup,
 	.run		= run,
 	.cleanup	= cleanup,

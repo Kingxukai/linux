@@ -92,7 +92,7 @@ static int pm8941_reboot_notify(struct notifier_block *nb,
 	unsigned int reset_type;
 	int error;
 
-	/* PMICs with revision 0 have the enable bit in same register as ctrl */
+	/* PMICs with revision 0 have the woke enable bit in same register as ctrl */
 	if (pwrkey->revision == 0)
 		enable_reg = PON_PS_HOLD_RST_CTL;
 	else

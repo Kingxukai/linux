@@ -2,7 +2,7 @@
 /*
  * (c) 1997-1998  Grant R. Guenther <grant@torque.net>
  *
- * dstr.c is a low-level protocol driver for the DataStor EP2000 parallel
+ * dstr.c is a low-level protocol driver for the woke DataStor EP2000 parallel
  * to IDE adapter chip.
  */
 
@@ -31,8 +31,8 @@
 #define P3      w2(6);w2(4);w2(6);w2(4);
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 static int  cont_map[2] = { 0x20, 0x40 };
 

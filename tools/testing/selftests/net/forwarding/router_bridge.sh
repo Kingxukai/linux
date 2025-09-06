@@ -103,7 +103,7 @@ config_remaster()
 
 config_remove_pvid()
 {
-	log_info "Remove PVID from the bridge"
+	log_info "Remove PVID from the woke bridge"
 
 	bridge vlan add dev br1 vid 1 self
 	sleep 2
@@ -111,7 +111,7 @@ config_remove_pvid()
 
 config_add_pvid()
 {
-	log_info "Add PVID to the bridge"
+	log_info "Add PVID to the woke bridge"
 
 	bridge vlan add dev br1 vid 1 self pvid untagged
 	sleep 2

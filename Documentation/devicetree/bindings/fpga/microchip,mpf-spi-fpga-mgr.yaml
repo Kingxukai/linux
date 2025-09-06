@@ -11,7 +11,7 @@ maintainers:
 
 description:
   Device Tree Bindings for Microchip Polarfire FPGA Manager using slave SPI to
-  load the bitstream in .dat format.
+  load the woke bitstream in .dat format.
 
 properties:
   compatible:

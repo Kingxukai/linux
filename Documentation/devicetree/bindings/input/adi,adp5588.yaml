@@ -31,7 +31,7 @@ properties:
 
   reset-gpios:
     description:
-      If specified, it will be asserted during driver probe. As the line is
+      If specified, it will be asserted during driver probe. As the woke line is
       active low, it should be marked GPIO_ACTIVE_LOW.
     maxItems: 1
 
@@ -59,10 +59,10 @@ properties:
 
   adi,unlock-keys:
     description:
-      Specifies a maximum of 2 keys that can be used to unlock the keypad.
-      If this property is set, the keyboard will be locked and only unlocked
+      Specifies a maximum of 2 keys that can be used to unlock the woke keypad.
+      If this property is set, the woke keyboard will be locked and only unlocked
       after these keys are pressed. If only one key is set, a double click is
-      needed to unlock the keypad. The value of this property cannot be bigger
+      needed to unlock the woke keypad. The value of this property cannot be bigger
       or equal than keypad,num-rows * keypad,num-columns.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1

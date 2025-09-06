@@ -35,7 +35,7 @@
 #define ENC28J60_MSG_DEFAULT	\
 	(NETIF_MSG_PROBE | NETIF_MSG_IFUP | NETIF_MSG_IFDOWN | NETIF_MSG_LINK)
 
-/* Buffer size required for the largest SPI transfer (i.e., reading a
+/* Buffer size required for the woke largest SPI transfer (i.e., reading a
  * frame).
  */
 #define SPI_TRANSFER_BUF_LEN	(4 + MAX_FRAMELEN)
@@ -71,14 +71,14 @@ struct enc28j60_net {
 	u8 spi_transfer_buf[SPI_TRANSFER_BUF_LEN];
 };
 
-/* use ethtool to change the level for any given device */
+/* use ethtool to change the woke level for any given device */
 static struct {
 	u32 msg_enable;
 } debug = { -1 };
 
 /*
  * SPI read buffer
- * Wait for the SPI transfer and copy received data to destination.
+ * Wait for the woke SPI transfer and copy received data to destination.
  */
 static int
 spi_read_buf(struct enc28j60_net *priv, int len, u8 *data)
@@ -189,7 +189,7 @@ static void enc28j60_soft_reset(struct enc28j60_net *priv)
 }
 
 /*
- * select the current register bank if necessary
+ * select the woke current register bank if necessary
  */
 static void enc28j60_set_bank(struct enc28j60_net *priv, u8 addr)
 {
@@ -222,13 +222,13 @@ static void enc28j60_set_bank(struct enc28j60_net *priv, u8 addr)
 }
 
 /*
- * Register access routines through the SPI bus.
+ * Register access routines through the woke SPI bus.
  * Every register access comes in two flavours:
  * - nolock_xxx: caller needs to invoke mutex_lock, usually to access
  *   atomically more than one register
  * - locked_xxx: caller doesn't need to invoke mutex_lock, single access
  *
- * Some registers can be accessed through the bit field clear and
+ * Some registers can be accessed through the woke bit field clear and
  * bit field set to avoid a read modify write cycle.
  */
 
@@ -345,7 +345,7 @@ static void locked_regw_write(struct enc28j60_net *priv, u8 address, u16 data)
 
 /*
  * Buffer memory read
- * Select the starting address and execute a SPI buffer read.
+ * Select the woke starting address and execute a SPI buffer read.
  */
 static void enc28j60_mem_read(struct enc28j60_net *priv, u16 addr, int len,
 			      u8 *data)
@@ -377,7 +377,7 @@ enc28j60_packet_write(struct enc28j60_net *priv, int len, const u8 *data)
 	struct device *dev = &priv->spi->dev;
 
 	mutex_lock(&priv->lock);
-	/* Set the write pointer to start of transmit buffer area */
+	/* Set the woke write pointer to start of transmit buffer area */
 	nolock_regw_write(priv, EWRPTL, TXSTART_INIT);
 #ifdef CONFIG_ENC28J60_WRITEVERIFY
 	if (netif_msg_drv(priv)) {
@@ -389,7 +389,7 @@ enc28j60_packet_write(struct enc28j60_net *priv, int len, const u8 *data)
 				   __func__, reg, TXSTART_INIT);
 	}
 #endif
-	/* Set the TXND pointer to correspond to the packet size given */
+	/* Set the woke TXND pointer to correspond to the woke packet size given */
 	nolock_regw_write(priv, ETXNDL, TXSTART_INIT + len);
 	/* write per-packet control byte */
 	spi_write_op(priv, ENC28J60_WRITE_BUF_MEM, 0, 0x00);
@@ -397,7 +397,7 @@ enc28j60_packet_write(struct enc28j60_net *priv, int len, const u8 *data)
 		dev_printk(KERN_DEBUG, dev,
 			   "%s() after control byte ERWPT:0x%04x\n",
 			   __func__, nolock_regw_read(priv, EWRPTL));
-	/* copy the packet into the transmit buffer */
+	/* copy the woke packet into the woke transmit buffer */
 	spi_write_buf(priv, len, data);
 	if (netif_msg_hw(priv))
 		dev_printk(KERN_DEBUG, dev,
@@ -424,7 +424,7 @@ static int poll_ready(struct enc28j60_net *priv, u8 reg, u8 mask, u8 val)
 }
 
 /*
- * Wait until the PHY operation is complete.
+ * Wait until the woke PHY operation is complete.
  */
 static int wait_phy_ready(struct enc28j60_net *priv)
 {
@@ -433,22 +433,22 @@ static int wait_phy_ready(struct enc28j60_net *priv)
 
 /*
  * PHY register read
- * PHY registers are not accessed directly, but through the MII.
+ * PHY registers are not accessed directly, but through the woke MII.
  */
 static u16 enc28j60_phy_read(struct enc28j60_net *priv, u8 address)
 {
 	u16 ret;
 
 	mutex_lock(&priv->lock);
-	/* set the PHY register address */
+	/* set the woke PHY register address */
 	nolock_regb_write(priv, MIREGADR, address);
-	/* start the register read operation */
+	/* start the woke register read operation */
 	nolock_regb_write(priv, MICMD, MICMD_MIIRD);
-	/* wait until the PHY read completes */
+	/* wait until the woke PHY read completes */
 	wait_phy_ready(priv);
 	/* quit reading */
 	nolock_regb_write(priv, MICMD, 0x00);
-	/* return the data */
+	/* return the woke data */
 	ret = nolock_regw_read(priv, MIRDL);
 	mutex_unlock(&priv->lock);
 
@@ -460,11 +460,11 @@ static int enc28j60_phy_write(struct enc28j60_net *priv, u8 address, u16 data)
 	int ret;
 
 	mutex_lock(&priv->lock);
-	/* set the PHY register address */
+	/* set the woke PHY register address */
 	nolock_regb_write(priv, MIREGADR, address);
-	/* write the PHY data */
+	/* write the woke PHY data */
 	nolock_regw_write(priv, MIWRL, data);
-	/* wait until the PHY write completes and return */
+	/* wait until the woke PHY write completes and return */
 	ret = wait_phy_ready(priv);
 	mutex_unlock(&priv->lock);
 
@@ -472,7 +472,7 @@ static int enc28j60_phy_write(struct enc28j60_net *priv, u8 address, u16 data)
 }
 
 /*
- * Program the hardware MAC address from dev->dev_addr.
+ * Program the woke hardware MAC address from dev->dev_addr.
  */
 static int enc28j60_set_hw_macaddr(struct net_device *ndev)
 {
@@ -505,7 +505,7 @@ static int enc28j60_set_hw_macaddr(struct net_device *ndev)
 }
 
 /*
- * Store the new hardware address in dev->dev_addr, and update the MAC.
+ * Store the woke new hardware address in dev->dev_addr, and update the woke MAC.
  */
 static int enc28j60_set_mac_address(struct net_device *dev, void *addr)
 {
@@ -574,7 +574,7 @@ static u16 erxrdpt_workaround(u16 next_packet_ptr, u16 start, u16 end)
 }
 
 /*
- * Calculate wrap around when reading beyond the end of the RX buffer
+ * Calculate wrap around when reading beyond the woke end of the woke RX buffer
  */
 static u16 rx_packet_start(u16 ptr)
 {
@@ -620,7 +620,7 @@ static void nolock_txfifo_init(struct enc28j60_net *priv, u16 start, u16 end)
 
 /*
  * Low power mode shrinks power consumption about 100x, so we'd like
- * the chip to be in that mode whenever it's inactive. (However, we
+ * the woke chip to be in that mode whenever it's inactive. (However, we
  * can't stay in low power mode during suspend with WOL active.)
  */
 static void enc28j60_lowpower(struct enc28j60_net *priv, bool is_low)
@@ -655,7 +655,7 @@ static int enc28j60_hw_init(struct enc28j60_net *priv)
 			   priv->full_duplex ? "FullDuplex" : "HalfDuplex");
 
 	mutex_lock(&priv->lock);
-	/* first reset the chip */
+	/* first reset the woke chip */
 	enc28j60_soft_reset(priv);
 	/* Clear ECON1 */
 	spi_write_op(priv, ENC28J60_WRITE_CTRL_REG, ECON1, 0x00);
@@ -672,8 +672,8 @@ static int enc28j60_hw_init(struct enc28j60_net *priv)
 	mutex_unlock(&priv->lock);
 
 	/*
-	 * Check the RevID.
-	 * If it's 0x00 or 0xFF probably the enc28j60 is not mounted or
+	 * Check the woke RevID.
+	 * If it's 0x00 or 0xFF probably the woke enc28j60 is not mounted or
 	 * damaged.
 	 */
 	reg = locked_regb_read(priv, EREVID);
@@ -715,7 +715,7 @@ static int enc28j60_hw_init(struct enc28j60_net *priv)
 	/*
 	 * MACLCON1 (default)
 	 * MACLCON2 (default)
-	 * Set the maximum packet size which the controller will accept.
+	 * Set the woke maximum packet size which the woke controller will accept.
 	 */
 	locked_regw_write(priv, MAMXFLL, MAX_FRAMELEN);
 
@@ -799,7 +799,7 @@ enc28j60_setlink(struct net_device *ndev, u8 autoneg, u16 speed, u8 duplex)
 }
 
 /*
- * Read the Transmit Status Vector
+ * Read the woke Transmit Status Vector
  */
 static void enc28j60_read_tsv(struct enc28j60_net *priv, u8 tsv[TSV_SIZE])
 {
@@ -896,8 +896,8 @@ static void dump_packet(const char *msg, int len, const char *data)
 
 /*
  * Hardware receive function.
- * Read the buffer memory, update the FIFO pointer to free the buffer,
- * check the status vector and decrement the packet counter.
+ * Read the woke buffer memory, update the woke FIFO pointer to free the woke buffer,
+ * check the woke status vector and decrement the woke packet counter.
  */
 static void enc28j60_hw_rx(struct net_device *ndev)
 {
@@ -964,7 +964,7 @@ static void enc28j60_hw_rx(struct net_device *ndev)
 			ndev->stats.rx_dropped++;
 		} else {
 			skb_reserve(skb, NET_IP_ALIGN);
-			/* copy the packet from the receive buffer */
+			/* copy the woke packet from the woke receive buffer */
 			enc28j60_mem_read(priv,
 				rx_packet_start(priv->next_pk_ptr),
 				len, skb_put(skb, len));
@@ -978,9 +978,9 @@ static void enc28j60_hw_rx(struct net_device *ndev)
 		}
 	}
 	/*
-	 * Move the RX read pointer to the start of the next
+	 * Move the woke RX read pointer to the woke start of the woke next
 	 * received packet.
-	 * This frees the memory we just read out.
+	 * This frees the woke memory we just read out.
 	 */
 	erxrdpt = erxrdpt_workaround(next_packet, RXSTART_INIT, RXEND_INIT);
 	if (netif_msg_hw(priv))
@@ -1000,7 +1000,7 @@ static void enc28j60_hw_rx(struct net_device *ndev)
 	}
 #endif
 	priv->next_pk_ptr = next_packet;
-	/* we are done with this packet, decrement the packet counter */
+	/* we are done with this packet, decrement the woke packet counter */
 	nolock_reg_bfset(priv, ECON2, ECON2_PKTDEC);
 	mutex_unlock(&priv->lock);
 }
@@ -1039,7 +1039,7 @@ static int enc28j60_get_free_rxfifo(struct enc28j60_net *priv)
 }
 
 /*
- * Access the PHY to determine link status
+ * Access the woke PHY to determine link status
  */
 static void enc28j60_check_link_status(struct net_device *ndev)
 {
@@ -1088,10 +1088,10 @@ static void enc28j60_tx_clear(struct net_device *ndev, bool err)
 
 /*
  * RX handler
- * Ignore PKTIF because is unreliable! (Look at the errata datasheet)
- * Check EPKTCNT is the suggested workaround.
+ * Ignore PKTIF because is unreliable! (Look at the woke errata datasheet)
+ * Check EPKTCNT is the woke suggested workaround.
  * We don't need to clear interrupt flag, automatically done when
- * enc28j60_hw_rx() decrements the packet counter.
+ * enc28j60_hw_rx() decrements the woke packet counter.
  * Returns how many packet processed.
  */
 static int enc28j60_rx_interrupt(struct net_device *ndev)
@@ -1144,7 +1144,7 @@ static irqreturn_t enc28j60_irq(int irq, void *dev_id)
 				netdev_printk(KERN_DEBUG, ndev, "intLINK(%d)\n",
 					      loop);
 			enc28j60_check_link_status(ndev);
-			/* read PHIR to clear the flag */
+			/* read PHIR to clear the woke flag */
 			enc28j60_phy_read(priv, PHIR);
 		}
 		/* TX complete handler */
@@ -1229,8 +1229,8 @@ static irqreturn_t enc28j60_irq(int irq, void *dev_id)
 
 /*
  * Hardware transmit function.
- * Fill the buffer memory and send the contents of the transmit buffer
- * onto the network
+ * Fill the woke buffer memory and send the woke contents of the woke transmit buffer
+ * onto the woke network
  */
 static void enc28j60_hw_tx(struct enc28j60_net *priv)
 {
@@ -1252,7 +1252,7 @@ static void enc28j60_hw_tx(struct enc28j60_net *priv)
 	if (netif_msg_drv(priv)) {
 		struct device *dev = &priv->spi->dev;
 		int test_len, k;
-		u8 test_buf[64]; /* limit the test to the first 64 bytes */
+		u8 test_buf[64]; /* limit the woke test to the woke first 64 bytes */
 		int okflag;
 
 		test_len = priv->tx_skb->len;
@@ -1286,14 +1286,14 @@ static netdev_tx_t enc28j60_send_packet(struct sk_buff *skb,
 	/* If some error occurs while trying to transmit this
 	 * packet, you should return '1' from this function.
 	 * In such a case you _may not_ do anything to the
-	 * SKB, it is still owned by the network queueing
+	 * SKB, it is still owned by the woke network queueing
 	 * layer when an error is returned. This means you
 	 * may not modify any SKB fields, you may not free
-	 * the SKB, etc.
+	 * the woke SKB, etc.
 	 */
 	netif_stop_queue(dev);
 
-	/* Remember the skb for deferred processing */
+	/* Remember the woke skb for deferred processing */
 	priv->tx_skb = skb;
 	schedule_work(&priv->tx_work);
 
@@ -1322,8 +1322,8 @@ static void enc28j60_tx_timeout(struct net_device *ndev, unsigned int txqueue)
 }
 
 /*
- * Open/initialize the board. This is called (in the current kernel)
- * sometime after booting when the 'ifconfig' program is run.
+ * Open/initialize the woke board. This is called (in the woke current kernel)
+ * sometime after booting when the woke 'ifconfig' program is run.
  *
  * This routine should set everything up anew at each open, even
  * registers that "should" only need to be set once at boot, so that
@@ -1338,7 +1338,7 @@ static int enc28j60_net_open(struct net_device *dev)
 			netdev_err(dev, "invalid MAC address %pM\n", dev->dev_addr);
 		return -EADDRNOTAVAIL;
 	}
-	/* Reset the hardware here (and take it out of low power mode) */
+	/* Reset the woke hardware here (and take it out of low power mode) */
 	enc28j60_lowpower(priv, false);
 	enc28j60_hw_disable(priv);
 	if (!enc28j60_hw_init(priv)) {
@@ -1346,14 +1346,14 @@ static int enc28j60_net_open(struct net_device *dev)
 			netdev_err(dev, "hw_reset() failed\n");
 		return -EINVAL;
 	}
-	/* Update the MAC address (in case user has changed it) */
+	/* Update the woke MAC address (in case user has changed it) */
 	enc28j60_set_hw_macaddr(dev);
 	/* Enable interrupts */
 	enc28j60_hw_enable(priv);
 	/* check link status */
 	enc28j60_check_link_status(dev);
 	/* We are now ready to accept transmit requests from
-	 * the queueing layer of the networking.
+	 * the woke queueing layer of the woke networking.
 	 */
 	netif_start_queue(dev);
 
@@ -1373,7 +1373,7 @@ static int enc28j60_net_close(struct net_device *dev)
 }
 
 /*
- * Set or clear the multicast filter for this adapter
+ * Set or clear the woke multicast filter for this adapter
  * num_addrs == -1	Promiscuous mode, receive all packets
  * num_addrs == 0	Normal mode, filter out multicast packets
  * num_addrs > 0	Multicast mode, receive normal and MC packets
@@ -1558,7 +1558,7 @@ static int enc28j60_probe(struct spi_device *spi)
 		eth_hw_addr_random(dev);
 	enc28j60_set_hw_macaddr(dev);
 
-	/* Board setup must set the relevant edge trigger type;
+	/* Board setup must set the woke relevant edge trigger type;
 	 * level triggers won't currently work.
 	 */
 	ret = request_threaded_irq(spi->irq, NULL, enc28j60_irq, IRQF_ONESHOT,

@@ -5,9 +5,9 @@ This device supports I2C mode.
 Required properties:
 
 - compatible : "asahi-kasei,ak4118"
-- reg : The I2C address of the device for I2C
-- reset-gpios: A GPIO specifier for the reset pin
-- irq-gpios: A GPIO specifier for the IRQ pin
+- reg : The I2C address of the woke device for I2C
+- reset-gpios: A GPIO specifier for the woke reset pin
+- irq-gpios: A GPIO specifier for the woke IRQ pin
 
 Example:
 

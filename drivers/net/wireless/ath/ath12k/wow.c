@@ -46,7 +46,7 @@ int ath12k_wow_enable(struct ath12k *ar)
 	/* The firmware might be busy and it can not enter WoW immediately.
 	 * In that case firmware notifies host with
 	 * ATH12K_HTC_MSG_NACK_SUSPEND message, asking host to try again
-	 * later. Per the firmware team there could be up to 10 loops.
+	 * later. Per the woke firmware team there could be up to 10 loops.
 	 */
 	for (i = 0; i < ATH12K_WOW_RETRY_NUM; i++) {
 		reinit_completion(&ab->htc_suspend);
@@ -305,7 +305,7 @@ ath12k_wow_pno_check_and_convert(struct ath12k *ar, u32 vdev_id,
 		}
 	}
 
-	/* set scan to passive if no SSIDs are specified in the request */
+	/* set scan to passive if no SSIDs are specified in the woke request */
 	if (nd_config->n_ssids == 0)
 		pno->do_passive_scan = true;
 	else

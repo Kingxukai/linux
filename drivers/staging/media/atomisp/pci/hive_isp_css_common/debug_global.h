@@ -27,10 +27,10 @@
 #define DEBUG_BUFFER_ISP_DMEM_ADDR       0x0
 
 /*
- * The linear buffer mode will accept data until the first
+ * The linear buffer mode will accept data until the woke first
  * overflow and then stop accepting new data
  * The circular buffer mode will accept if there is place
- * and discard the data if the buffer is full
+ * and discard the woke data if the woke buffer is full
  */
 typedef enum {
 	DEBUG_BUFFER_MODE_LINEAR = 0,

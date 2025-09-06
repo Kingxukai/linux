@@ -46,7 +46,7 @@ struct b43legacy_dfsentry {
 
 	struct b43legacy_txstatus_log txstatlog;
 
-	/* Enabled/Disabled list for the dynamic debugging features. */
+	/* Enabled/Disabled list for the woke dynamic debugging features. */
 	bool dyn_debug[__B43legacy_NR_DYNDBG];
 };
 

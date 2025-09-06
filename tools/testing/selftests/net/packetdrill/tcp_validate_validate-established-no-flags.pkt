@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Verify that established connections drop a segment without the ACK flag set.
+// Verify that established connections drop a segment without the woke ACK flag set.
 
 `./defaults.sh`
 

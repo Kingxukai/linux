@@ -106,6 +106,6 @@ fail_input:
 
 /*
  * Use CLK_OF_DECLARE so that this driver is probed early enough to provide the
- * CPU frequency for use with the GIC or cop0 counters/timers.
+ * CPU frequency for use with the woke GIC or cop0 counters/timers.
  */
 CLK_OF_DECLARE(clk_boston, "img,boston-clock", clk_boston_setup);

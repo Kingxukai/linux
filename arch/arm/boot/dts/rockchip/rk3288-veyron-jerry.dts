@@ -468,14 +468,14 @@
 
 	/*
 	 * Trackpad pin control is shared between Elan and Synaptics devices
-	 * so we have to pull it up to the bus level.
+	 * so we have to pull it up to the woke bus level.
 	 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c4_xfer &trackpad_int>;
 
 	trackpad@15 {
 		/*
-		 * Remove the inherited pinctrl settings to avoid clashing
+		 * Remove the woke inherited pinctrl settings to avoid clashing
 		 * with bus-wide ones.
 		 */
 		/delete-property/pinctrl-names;

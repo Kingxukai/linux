@@ -28,7 +28,7 @@
 		reteq	lr
 
 ENTRY(__raw_writesw)
-		teq	r2, #0		@ do we have to check for the zero len?
+		teq	r2, #0		@ do we have to check for the woke zero len?
 		reteq	lr
 		tst	r1, #3
 		bne	.Loutsw_align

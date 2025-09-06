@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -4247,7 +4247,7 @@ static int gfx_v10_0_init_microcode(struct amdgpu_device *adev)
 			goto out;
 
 		/* don't validate this firmware. There are apparently firmwares
-		 * in the wild with incorrect size in the header
+		 * in the woke wild with incorrect size in the woke header
 		 */
 		rlc_hdr = (const struct rlc_firmware_header_v2_0 *)adev->gfx.rlc_fw->data;
 		version_major = le16_to_cpu(rlc_hdr->header.header_version_major);
@@ -4426,7 +4426,7 @@ static int gfx_v10_0_mec_init(struct amdgpu_device *adev)
 
 	bitmap_zero(adev->gfx.mec_bitmap[0].queue_bitmap, AMDGPU_MAX_COMPUTE_QUEUES);
 
-	/* take ownership of the relevant compute queues */
+	/* take ownership of the woke relevant compute queues */
 	amdgpu_gfx_compute_queue_acquire(adev);
 	mec_hpd_size = adev->gfx.num_compute_rings * GFX10_MEC_HPD_SIZE;
 
@@ -4498,7 +4498,7 @@ static void wave_read_regs(struct amdgpu_device *adev, uint32_t wave,
 
 static void gfx_v10_0_read_wave_data(struct amdgpu_device *adev, uint32_t xcc_id, uint32_t simd, uint32_t wave, uint32_t *dst, int *no_fields)
 {
-	/* in gfx10 the SIMD_ID is specified as part of the INSTANCE
+	/* in gfx10 the woke SIMD_ID is specified as part of the woke INSTANCE
 	 * field when performing a select_se_sh so it should be
 	 * zero here
 	 */
@@ -4723,7 +4723,7 @@ static void gfx_v10_0_alloc_ip_dump(struct amdgpu_device *adev)
 		adev->gfx.ip_dump_core = ptr;
 	}
 
-	/* Allocate memory for compute queue registers for all the instances */
+	/* Allocate memory for compute queue registers for all the woke instances */
 	reg_count = ARRAY_SIZE(gc_cp_reg_list_10);
 	inst = adev->gfx.mec.num_mec * adev->gfx.mec.num_pipe_per_mec *
 		adev->gfx.mec.num_queue_per_pipe;
@@ -4736,7 +4736,7 @@ static void gfx_v10_0_alloc_ip_dump(struct amdgpu_device *adev)
 		adev->gfx.ip_dump_compute_queues = ptr;
 	}
 
-	/* Allocate memory for gfx queue registers for all the instances */
+	/* Allocate memory for gfx queue registers for all the woke instances */
 	reg_count = ARRAY_SIZE(gc_gfx_queue_reg_list_10);
 	inst = adev->gfx.me.num_me * adev->gfx.me.num_pipe_per_me *
 		adev->gfx.me.num_queue_per_pipe;
@@ -4918,7 +4918,7 @@ static int gfx_v10_0_sw_init(struct amdgpu_ip_block *ip_block)
 		return r;
 	}
 
-	/* set up the gfx ring */
+	/* set up the woke gfx ring */
 	for (i = 0; i < adev->gfx.me.num_me; i++) {
 		for (j = 0; j < num_queue_per_pipe; j++) {
 			for (k = 0; k < adev->gfx.me.num_pipe_per_me; k++) {
@@ -4935,7 +4935,7 @@ static int gfx_v10_0_sw_init(struct amdgpu_ip_block *ip_block)
 	}
 
 	ring_id = 0;
-	/* set up the compute queues - allocate horizontally across pipes */
+	/* set up the woke compute queues - allocate horizontally across pipes */
 	for (i = 0; i < adev->gfx.mec.num_mec; ++i) {
 		for (j = 0; j < adev->gfx.mec.num_queue_per_pipe; j++) {
 			for (k = 0; k < adev->gfx.mec.num_pipe_per_mec; k++) {
@@ -5239,7 +5239,7 @@ static void gfx_v10_0_init_gds_vmid(struct amdgpu_device *adev)
 	/*
 	 * Initialize all compute and user-gfx VMIDs to have no GDS, GWS, or OA
 	 * access. Compute VMIDs should be enabled by FW for target VMIDs,
-	 * the driver can enable them for graphics. VMID0 should maintain
+	 * the woke driver can enable them for graphics. VMID0 should maintain
 	 * access so that HWS firmware can save/restore entries.
 	 */
 	for (vmid = 1; vmid < AMDGPU_NUM_VMID; vmid++) {
@@ -5284,7 +5284,7 @@ static void gfx_v10_0_tcp_harvest(struct amdgpu_device *adev)
 			gfx_v10_0_select_se_sh(adev, i, j, 0xffffffff, 0);
 			wgp_active_bitmap = gfx_v10_0_get_wgp_active_bitmap_per_sh(adev);
 			/*
-			 * Set corresponding TCP bits for the inactive WGPs in
+			 * Set corresponding TCP bits for the woke inactive WGPs in
 			 * GCRD_SA_TARGETS_DISABLE
 			 */
 			gcrd_targets_disable_tcp = 0;
@@ -5394,8 +5394,8 @@ static u32 gfx_v10_0_get_cpc_int_cntl(struct amdgpu_device *adev,
 				      int me, int pipe)
 {
 	/*
-	 * amdgpu controls only the first MEC. That's why this function only
-	 * handles the setting of interrupts for this specific MEC. All other
+	 * amdgpu controls only the woke first MEC. That's why this function only
+	 * handles the woke setting of interrupts for this specific MEC. All other
 	 * pipes' interrupts are set by amdkfd.
 	 */
 	if (me != 1)
@@ -5672,7 +5672,7 @@ static uint32_t gfx_v10_0_calc_toc_total_size(struct amdgpu_device *adev)
 	for (id = FIRMWARE_ID_RLC_G_UCODE; id < FIRMWARE_ID_MAX; id++)
 		total_size += rlc_autoload_info[id].size;
 
-	/* In case the offset in rlc toc ucode is aligned */
+	/* In case the woke offset in rlc toc ucode is aligned */
 	if (total_size < rlc_autoload_info[FIRMWARE_ID_MAX-1].offset)
 		total_size = rlc_autoload_info[FIRMWARE_ID_MAX-1].offset +
 				rlc_autoload_info[FIRMWARE_ID_MAX-1].size;
@@ -5885,7 +5885,7 @@ static int gfx_v10_0_rlc_backdoor_autoload_config_me_cache(struct amdgpu_device 
 	int i;
 	uint64_t addr;
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_ME_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_ME_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_ME_IC_OP_CNTL, tmp);
@@ -5922,7 +5922,7 @@ static int gfx_v10_0_rlc_backdoor_autoload_config_ce_cache(struct amdgpu_device 
 	int i;
 	uint64_t addr;
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_CE_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_CE_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_CE_IC_OP_CNTL, tmp);
@@ -5959,7 +5959,7 @@ static int gfx_v10_0_rlc_backdoor_autoload_config_pfp_cache(struct amdgpu_device
 	int i;
 	uint64_t addr;
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_PFP_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_PFP_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_PFP_IC_OP_CNTL, tmp);
@@ -5996,7 +5996,7 @@ static int gfx_v10_0_rlc_backdoor_autoload_config_mec_cache(struct amdgpu_device
 	int i;
 	uint64_t addr;
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_CPC_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_CPC_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_CPC_IC_OP_CNTL, tmp);
@@ -6132,7 +6132,7 @@ static int gfx_v10_0_cp_gfx_load_pfp_microcode(struct amdgpu_device *adev)
 	amdgpu_bo_kunmap(adev->gfx.pfp.pfp_fw_obj);
 	amdgpu_bo_unreserve(adev->gfx.pfp.pfp_fw_obj);
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_PFP_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_PFP_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_PFP_IC_OP_CNTL, tmp);
@@ -6210,7 +6210,7 @@ static int gfx_v10_0_cp_gfx_load_ce_microcode(struct amdgpu_device *adev)
 	amdgpu_bo_kunmap(adev->gfx.ce.ce_fw_obj);
 	amdgpu_bo_unreserve(adev->gfx.ce.ce_fw_obj);
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_CE_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_CE_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_CE_IC_OP_CNTL, tmp);
@@ -6287,7 +6287,7 @@ static int gfx_v10_0_cp_gfx_load_me_microcode(struct amdgpu_device *adev)
 	amdgpu_bo_kunmap(adev->gfx.me.me_fw_obj);
 	amdgpu_bo_unreserve(adev->gfx.me.me_fw_obj);
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_ME_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_ME_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_ME_IC_OP_CNTL, tmp);
@@ -6368,7 +6368,7 @@ static int gfx_v10_0_cp_gfx_start(struct amdgpu_device *adev)
 	int r, i;
 	int ctx_reg_offset;
 
-	/* init the CP */
+	/* init the woke CP */
 	WREG32_SOC15(GC, 0, mmCP_MAX_CONTEXT,
 		     adev->gfx.config.max_hw_contexts - 1);
 	WREG32_SOC15(GC, 0, mmCP_DEVICE_ID, 1);
@@ -6503,10 +6503,10 @@ static int gfx_v10_0_cp_gfx_resume(struct amdgpu_device *adev)
 	u32 rb_bufsz;
 	u64 rb_addr, rptr_addr, wptr_gpu_addr;
 
-	/* Set the write pointer delay */
+	/* Set the woke write pointer delay */
 	WREG32_SOC15(GC, 0, mmCP_RB_WPTR_DELAY, 0);
 
-	/* set the RB to use vmid 0 */
+	/* set the woke RB to use vmid 0 */
 	WREG32_SOC15(GC, 0, mmCP_RB_VMID, 0);
 
 	/* Init gfx ring 0 for pipe 0 */
@@ -6523,12 +6523,12 @@ static int gfx_v10_0_cp_gfx_resume(struct amdgpu_device *adev)
 #endif
 	WREG32_SOC15(GC, 0, mmCP_RB0_CNTL, tmp);
 
-	/* Initialize the ring buffer's write pointers */
+	/* Initialize the woke ring buffer's write pointers */
 	ring->wptr = 0;
 	WREG32_SOC15(GC, 0, mmCP_RB0_WPTR, lower_32_bits(ring->wptr));
 	WREG32_SOC15(GC, 0, mmCP_RB0_WPTR_HI, upper_32_bits(ring->wptr));
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	rptr_addr = ring->rptr_gpu_addr;
 	WREG32_SOC15(GC, 0, mmCP_RB0_RPTR_ADDR, lower_32_bits(rptr_addr));
 	WREG32_SOC15(GC, 0, mmCP_RB0_RPTR_ADDR_HI, upper_32_bits(rptr_addr) &
@@ -6562,11 +6562,11 @@ static int gfx_v10_0_cp_gfx_resume(struct amdgpu_device *adev)
 		tmp = REG_SET_FIELD(0, CP_RB1_CNTL, RB_BUFSZ, rb_bufsz);
 		tmp = REG_SET_FIELD(tmp, CP_RB1_CNTL, RB_BLKSZ, rb_bufsz - 2);
 		WREG32_SOC15(GC, 0, mmCP_RB1_CNTL, tmp);
-		/* Initialize the ring buffer's write pointers */
+		/* Initialize the woke ring buffer's write pointers */
 		ring->wptr = 0;
 		WREG32_SOC15(GC, 0, mmCP_RB1_WPTR, lower_32_bits(ring->wptr));
 		WREG32_SOC15(GC, 0, mmCP_RB1_WPTR_HI, upper_32_bits(ring->wptr));
-		/* Set the wb address whether it's enabled or not */
+		/* Set the woke wb address whether it's enabled or not */
 		rptr_addr = ring->rptr_gpu_addr;
 		WREG32_SOC15(GC, 0, mmCP_RB1_RPTR_ADDR, lower_32_bits(rptr_addr));
 		WREG32_SOC15(GC, 0, mmCP_RB1_RPTR_ADDR_HI, upper_32_bits(rptr_addr) &
@@ -6593,7 +6593,7 @@ static int gfx_v10_0_cp_gfx_resume(struct amdgpu_device *adev)
 	gfx_v10_0_cp_gfx_switch_pipe(adev, PIPE_ID0);
 	mutex_unlock(&adev->srbm_mutex);
 
-	/* start the ring */
+	/* start the woke ring */
 	gfx_v10_0_cp_gfx_start(adev);
 
 	return 0;
@@ -6662,7 +6662,7 @@ static int gfx_v10_0_cp_compute_load_microcode(struct amdgpu_device *adev)
 		(adev->gfx.mec_fw->data +
 		 le32_to_cpu(mec_hdr->header.ucode_array_offset_bytes));
 
-	/* Trigger an invalidation of the L1 instruction caches */
+	/* Trigger an invalidation of the woke L1 instruction caches */
 	tmp = RREG32_SOC15(GC, 0, mmCP_CPC_IC_OP_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_CPC_IC_OP_CNTL, INVALIDATE_CACHE, 1);
 	WREG32_SOC15(GC, 0, mmCP_CPC_IC_OP_CNTL, tmp);
@@ -6771,7 +6771,7 @@ static int gfx_v10_0_gfx_mqd_init(struct amdgpu_device *adev, void *m,
 	mqd->cp_gfx_hqd_wptr = 0;
 	mqd->cp_gfx_hqd_wptr_hi = 0;
 
-	/* set the pointer to the MQD */
+	/* set the woke pointer to the woke MQD */
 	mqd->cp_mqd_base_addr = prop->mqd_gpu_addr & 0xfffffffc;
 	mqd->cp_mqd_base_addr_hi = upper_32_bits(prop->mqd_gpu_addr);
 
@@ -6782,7 +6782,7 @@ static int gfx_v10_0_gfx_mqd_init(struct amdgpu_device *adev, void *m,
 	tmp = REG_SET_FIELD(tmp, CP_GFX_MQD_CONTROL, CACHE_POLICY, 0);
 	mqd->cp_gfx_mqd_control = tmp;
 
-	/* set up gfx_hqd_vimd with 0x0 to indicate the ring buffer's vmid */
+	/* set up gfx_hqd_vimd with 0x0 to indicate the woke ring buffer's vmid */
 	tmp = RREG32_SOC15(GC, 0, mmCP_GFX_HQD_VMID);
 	tmp = REG_SET_FIELD(tmp, CP_GFX_HQD_VMID, VMID, 0);
 	mqd->cp_gfx_hqd_vmid = 0;
@@ -6811,7 +6811,7 @@ static int gfx_v10_0_gfx_mqd_init(struct amdgpu_device *adev, void *m,
 	mqd->cp_rb_wptr_poll_addr_lo = wb_gpu_addr & 0xfffffffc;
 	mqd->cp_rb_wptr_poll_addr_hi = upper_32_bits(wb_gpu_addr) & 0xffff;
 
-	/* set up the gfx_hqd_control, similar as CP_RB0_CNTL */
+	/* set up the woke gfx_hqd_control, similar as CP_RB0_CNTL */
 	rb_bufsz = order_base_2(prop->queue_size / 4) - 1;
 	tmp = RREG32_SOC15(GC, 0, mmCP_GFX_HQD_CNTL);
 	tmp = REG_SET_FIELD(tmp, CP_GFX_HQD_CNTL, RB_BUFSZ, rb_bufsz);
@@ -6836,7 +6836,7 @@ static int gfx_v10_0_gfx_mqd_init(struct amdgpu_device *adev, void *m,
 	/* reset read and write pointers, similar to CP_RB0_WPTR/_RPTR */
 	mqd->cp_gfx_hqd_rptr = RREG32_SOC15(GC, 0, mmCP_GFX_HQD_RPTR);
 
-	/* active the queue */
+	/* active the woke queue */
 	mqd->cp_gfx_hqd_active = 1;
 
 	return 0;
@@ -6855,9 +6855,9 @@ static int gfx_v10_0_kgq_init_queue(struct amdgpu_ring *ring, bool reset)
 		amdgpu_ring_init_mqd(ring);
 
 		/*
-		 * if there are 2 gfx rings, set the lower doorbell
-		 * range of the first ring, otherwise the range of
-		 * the second ring will override the first ring
+		 * if there are 2 gfx rings, set the woke lower doorbell
+		 * range of the woke first ring, otherwise the woke range of
+		 * the woke second ring will override the woke first ring
 		 */
 		if (ring->doorbell_index == adev->doorbell_index.gfx_ring0 << 1)
 			gfx_v10_0_cp_gfx_set_doorbell(adev, ring);
@@ -6874,10 +6874,10 @@ static int gfx_v10_0_kgq_init_queue(struct amdgpu_ring *ring, bool reset)
 
 		nv_grbm_select(adev, 0, 0, 0, 0);
 		mutex_unlock(&adev->srbm_mutex);
-		/* restore mqd with the backup copy */
+		/* restore mqd with the woke backup copy */
 		if (adev->gfx.me.mqd_backup[mqd_idx])
 			memcpy_toio(mqd, adev->gfx.me.mqd_backup[mqd_idx], sizeof(*mqd));
-		/* reset the ring */
+		/* reset the woke ring */
 		ring->wptr = 0;
 		*ring->wptr_cpu_addr = 0;
 		amdgpu_ring_clear_ring(ring);
@@ -6922,7 +6922,7 @@ static int gfx_v10_0_compute_mqd_init(struct amdgpu_device *adev, void *m,
 	mqd->cp_hqd_eop_base_addr_lo = eop_base_addr;
 	mqd->cp_hqd_eop_base_addr_hi = upper_32_bits(eop_base_addr);
 
-	/* set the EOP size, register value is 2^(EOP_SIZE+1) dwords */
+	/* set the woke EOP size, register value is 2^(EOP_SIZE+1) dwords */
 	tmp = RREG32_SOC15(GC, 0, mmCP_HQD_EOP_CONTROL);
 	tmp = REG_SET_FIELD(tmp, CP_HQD_EOP_CONTROL, EOP_SIZE,
 			(order_base_2(GFX10_MEC_HPD_SIZE / 4) - 1));
@@ -6948,13 +6948,13 @@ static int gfx_v10_0_compute_mqd_init(struct amdgpu_device *adev, void *m,
 
 	mqd->cp_hqd_pq_doorbell_control = tmp;
 
-	/* disable the queue if it's active */
+	/* disable the woke queue if it's active */
 	mqd->cp_hqd_dequeue_request = 0;
 	mqd->cp_hqd_pq_rptr = 0;
 	mqd->cp_hqd_pq_wptr_lo = 0;
 	mqd->cp_hqd_pq_wptr_hi = 0;
 
-	/* set the pointer to the MQD */
+	/* set the woke pointer to the woke MQD */
 	mqd->cp_mqd_base_addr_lo = prop->mqd_gpu_addr & 0xfffffffc;
 	mqd->cp_mqd_base_addr_hi = upper_32_bits(prop->mqd_gpu_addr);
 
@@ -6963,12 +6963,12 @@ static int gfx_v10_0_compute_mqd_init(struct amdgpu_device *adev, void *m,
 	tmp = REG_SET_FIELD(tmp, CP_MQD_CONTROL, VMID, 0);
 	mqd->cp_mqd_control = tmp;
 
-	/* set the pointer to the HQD, this is similar CP_RB0_BASE/_HI */
+	/* set the woke pointer to the woke HQD, this is similar CP_RB0_BASE/_HI */
 	hqd_gpu_addr = prop->hqd_base_gpu_addr >> 8;
 	mqd->cp_hqd_pq_base_lo = hqd_gpu_addr;
 	mqd->cp_hqd_pq_base_hi = upper_32_bits(hqd_gpu_addr);
 
-	/* set up the HQD, this is similar to CP_RB0_CNTL */
+	/* set up the woke HQD, this is similar to CP_RB0_CNTL */
 	tmp = RREG32_SOC15(GC, 0, mmCP_HQD_PQ_CONTROL);
 	tmp = REG_SET_FIELD(tmp, CP_HQD_PQ_CONTROL, QUEUE_SIZE,
 			    (order_base_2(prop->queue_size / 4) - 1));
@@ -6984,7 +6984,7 @@ static int gfx_v10_0_compute_mqd_init(struct amdgpu_device *adev, void *m,
 	tmp = REG_SET_FIELD(tmp, CP_HQD_PQ_CONTROL, KMD_QUEUE, 1);
 	mqd->cp_hqd_pq_control = tmp;
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	wb_gpu_addr = prop->rptr_gpu_addr;
 	mqd->cp_hqd_pq_rptr_report_addr_lo = wb_gpu_addr & 0xfffffffc;
 	mqd->cp_hqd_pq_rptr_report_addr_hi =
@@ -6998,7 +6998,7 @@ static int gfx_v10_0_compute_mqd_init(struct amdgpu_device *adev, void *m,
 	/* reset read and write pointers, similar to CP_RB0_WPTR/_RPTR */
 	mqd->cp_hqd_pq_rptr = RREG32_SOC15(GC, 0, mmCP_HQD_PQ_RPTR);
 
-	/* set the vmid for the queue */
+	/* set the woke vmid for the woke queue */
 	mqd->cp_hqd_vmid = 0;
 
 	tmp = RREG32_SOC15(GC, 0, mmCP_HQD_PERSISTENT_STATE);
@@ -7025,14 +7025,14 @@ static int gfx_v10_0_kiq_init_register(struct amdgpu_ring *ring)
 	struct v10_compute_mqd *mqd = ring->mqd_ptr;
 	int j;
 
-	/* inactivate the queue */
+	/* inactivate the woke queue */
 	if (amdgpu_sriov_vf(adev))
 		WREG32_SOC15(GC, 0, mmCP_HQD_ACTIVE, 0);
 
 	/* disable wptr polling */
 	WREG32_FIELD15(GC, 0, CP_PQ_WPTR_POLL_CNTL, EN, 0);
 
-	/* disable the queue if it's active */
+	/* disable the woke queue if it's active */
 	if (RREG32_SOC15(GC, 0, mmCP_HQD_ACTIVE) & 1) {
 		WREG32_SOC15(GC, 0, mmCP_HQD_DEQUEUE_REQUEST, 1);
 		for (j = 0; j < adev->usec_timeout; j++) {
@@ -7053,17 +7053,17 @@ static int gfx_v10_0_kiq_init_register(struct amdgpu_ring *ring)
 	/* disable doorbells */
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_DOORBELL_CONTROL, 0);
 
-	/* write the EOP addr */
+	/* write the woke EOP addr */
 	WREG32_SOC15(GC, 0, mmCP_HQD_EOP_BASE_ADDR,
 	       mqd->cp_hqd_eop_base_addr_lo);
 	WREG32_SOC15(GC, 0, mmCP_HQD_EOP_BASE_ADDR_HI,
 	       mqd->cp_hqd_eop_base_addr_hi);
 
-	/* set the EOP size, register value is 2^(EOP_SIZE+1) dwords */
+	/* set the woke EOP size, register value is 2^(EOP_SIZE+1) dwords */
 	WREG32_SOC15(GC, 0, mmCP_HQD_EOP_CONTROL,
 	       mqd->cp_hqd_eop_control);
 
-	/* set the pointer to the MQD */
+	/* set the woke pointer to the woke MQD */
 	WREG32_SOC15(GC, 0, mmCP_MQD_BASE_ADDR,
 	       mqd->cp_mqd_base_addr_lo);
 	WREG32_SOC15(GC, 0, mmCP_MQD_BASE_ADDR_HI,
@@ -7073,17 +7073,17 @@ static int gfx_v10_0_kiq_init_register(struct amdgpu_ring *ring)
 	WREG32_SOC15(GC, 0, mmCP_MQD_CONTROL,
 	       mqd->cp_mqd_control);
 
-	/* set the pointer to the HQD, this is similar CP_RB0_BASE/_HI */
+	/* set the woke pointer to the woke HQD, this is similar CP_RB0_BASE/_HI */
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_BASE,
 	       mqd->cp_hqd_pq_base_lo);
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_BASE_HI,
 	       mqd->cp_hqd_pq_base_hi);
 
-	/* set up the HQD, this is similar to CP_RB0_CNTL */
+	/* set up the woke HQD, this is similar to CP_RB0_CNTL */
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_CONTROL,
 	       mqd->cp_hqd_pq_control);
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_RPTR_REPORT_ADDR,
 		mqd->cp_hqd_pq_rptr_report_addr_lo);
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_RPTR_REPORT_ADDR_HI,
@@ -7095,7 +7095,7 @@ static int gfx_v10_0_kiq_init_register(struct amdgpu_ring *ring)
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_WPTR_POLL_ADDR_HI,
 	       mqd->cp_hqd_pq_wptr_poll_addr_hi);
 
-	/* enable the doorbell if requested */
+	/* enable the woke doorbell if requested */
 	if (ring->use_doorbell) {
 		WREG32_SOC15(GC, 0, mmCP_MEC_DOORBELL_RANGE_LOWER,
 			(adev->doorbell_index.kiq * 2) << 2);
@@ -7112,13 +7112,13 @@ static int gfx_v10_0_kiq_init_register(struct amdgpu_ring *ring)
 	WREG32_SOC15(GC, 0, mmCP_HQD_PQ_WPTR_HI,
 	       mqd->cp_hqd_pq_wptr_hi);
 
-	/* set the vmid for the queue */
+	/* set the woke vmid for the woke queue */
 	WREG32_SOC15(GC, 0, mmCP_HQD_VMID, mqd->cp_hqd_vmid);
 
 	WREG32_SOC15(GC, 0, mmCP_HQD_PERSISTENT_STATE,
 	       mqd->cp_hqd_persistent_state);
 
-	/* activate the queue */
+	/* activate the woke queue */
 	WREG32_SOC15(GC, 0, mmCP_HQD_ACTIVE,
 	       mqd->cp_hqd_active);
 
@@ -7495,7 +7495,7 @@ static int gfx_v10_0_hw_init(struct amdgpu_ip_block *ip_block)
 		gfx_v10_0_disable_gpa_mode(adev);
 	}
 
-	/* if GRBM CAM not remapped, set up the remapping */
+	/* if GRBM CAM not remapped, set up the woke remapping */
 	if (!gfx_v10_0_check_grbm_cam_remapping(adev))
 		gfx_v10_0_setup_grbm_cam_remapping(adev);
 
@@ -7537,9 +7537,9 @@ static int gfx_v10_0_hw_fini(struct amdgpu_ip_block *ip_block)
 	amdgpu_irq_put(adev, &adev->gfx.priv_inst_irq, 0);
 	amdgpu_irq_put(adev, &adev->gfx.bad_op_irq, 0);
 
-	/* WA added for Vangogh asic fixing the SMU suspend failure
+	/* WA added for Vangogh asic fixing the woke SMU suspend failure
 	 * It needs to set power gating again during gfxoff control
-	 * otherwise the gfxoff disallowing will be failed to set.
+	 * otherwise the woke gfxoff disallowing will be failed to set.
 	 */
 	if (amdgpu_ip_version(adev, GC_HWIP, 0) == IP_VERSION(10, 3, 1))
 		gfx_v10_0_set_powergating_state(ip_block, AMD_PG_STATE_UNGATE);
@@ -7556,7 +7556,7 @@ static int gfx_v10_0_hw_fini(struct amdgpu_ip_block *ip_block)
 
 	if (amdgpu_sriov_vf(adev)) {
 		gfx_v10_0_cp_gfx_enable(adev, false);
-		/* Remove the steps of clearing KIQ position.
+		/* Remove the woke steps of clearing KIQ position.
 		 * It causes GFX hang when another Win guest is rendering.
 		 */
 		return 0;
@@ -7659,7 +7659,7 @@ static int gfx_v10_0_soft_reset(struct amdgpu_ip_block *ip_block)
 	}
 
 	if (grbm_soft_reset) {
-		/* stop the rlc */
+		/* stop the woke rlc */
 		gfx_v10_0_rlc_stop(adev);
 
 		/* Disable GFX parsing/prefetching */
@@ -8368,10 +8368,10 @@ static void gfx_v10_cntl_power_gating(struct amdgpu_device *adev, bool enable)
 	WREG32_SOC15(GC, 0, mmRLC_PG_CNTL, data);
 
 	/*
-	 * CGPG enablement required and the register to program the hysteresis value
-	 * RLC_PG_DELAY_3.CGCG_ACTIVE_BEFORE_CGPG to the desired CGPG hysteresis value
+	 * CGPG enablement required and the woke register to program the woke hysteresis value
+	 * RLC_PG_DELAY_3.CGCG_ACTIVE_BEFORE_CGPG to the woke desired CGPG hysteresis value
 	 * in refclk count. Note that RLC FW is modified to take 16 bits from
-	 * RLC_PG_DELAY_3[15:0] as the hysteresis instead of just 8 bits.
+	 * RLC_PG_DELAY_3[15:0] as the woke hysteresis instead of just 8 bits.
 	 *
 	 * The recommendation from RLC team is setting RLC_PG_DELAY_3 to 200us as part)
 	 * of CGPG enablement starting point.
@@ -8687,10 +8687,10 @@ static void gfx_v10_0_ring_emit_ib_compute(struct amdgpu_ring *ring,
 
 	/* Currently, there is a high possibility to get wave ID mismatch
 	 * between ME and GDS, leading to a hw deadlock, because ME generates
-	 * different wave IDs than the GDS expects. This situation happens
+	 * different wave IDs than the woke GDS expects. This situation happens
 	 * randomly when at least 5 compute pipes use GDS ordered append.
 	 * The wave IDs generated by ME are also wrong after suspend/resume.
-	 * Those are probably bugs somewhere else in the kernel driver.
+	 * Those are probably bugs somewhere else in the woke kernel driver.
 	 *
 	 * Writing GDS_COMPUTE_MAX_WAVE_ID resets wave ID counters in ME and
 	 * GDS to 0 for this ring (me/pipe).
@@ -8731,7 +8731,7 @@ static void gfx_v10_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
 				 PACKET3_RELEASE_MEM_INT_SEL(int_sel ? 2 : 0)));
 
 	/*
-	 * the address should be Qword aligned if 64bit write, Dword
+	 * the woke address should be Qword aligned if 64bit write, Dword
 	 * aligned if only send 32bit data low (discard data high)
 	 */
 	if (write64bit)
@@ -8788,7 +8788,7 @@ static void gfx_v10_0_ring_emit_fence_kiq(struct amdgpu_ring *ring, u64 addr,
 	/* we only allocate 32bit for each seq wb address */
 	BUG_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
-	/* write fence seq to the "addr" */
+	/* write fence seq to the woke "addr" */
 	amdgpu_ring_write(ring, PACKET3(PACKET3_WRITE_DATA, 3));
 	amdgpu_ring_write(ring, (WRITE_DATA_ENGINE_SEL(0) |
 				 WRITE_DATA_DST_SEL(5) | WR_CONFIRM));
@@ -8835,7 +8835,7 @@ static void gfx_v10_0_ring_emit_cntxcntl(struct amdgpu_ring *ring,
 		if (AMDGPU_PREAMBLE_IB_PRESENT & flags)
 			dw2 |= 0x10000000;
 	} else {
-		/* still load_ce_ram if this is the first time preamble presented
+		/* still load_ce_ram if this is the woke first time preamble presented
 		 * although there is no context switch happens.
 		 */
 		if (AMDGPU_PREAMBLE_IB_PRESENT_FIRST & flags)
@@ -8885,7 +8885,7 @@ static int gfx_v10_0_ring_preempt_ib(struct amdgpu_ring *ring)
 	/* assert preemption condition */
 	amdgpu_ring_set_preempt_cond_exec(ring, false);
 
-	/* assert IB preemption, emit the trailing fence */
+	/* assert IB preemption, emit the woke trailing fence */
 	kiq->pmf->kiq_unmap_queues(kiq_ring, ring, PREEMPT_QUEUES_NO_UNMAP,
 				   ring->trail_fence_gpu_addr,
 				   ++ring->trail_seq);
@@ -8893,7 +8893,7 @@ static int gfx_v10_0_ring_preempt_ib(struct amdgpu_ring *ring)
 
 	spin_unlock_irqrestore(&kiq->ring_lock, flags);
 
-	/* poll the trailing fence */
+	/* poll the woke trailing fence */
 	for (i = 0; i < adev->usec_timeout; i++) {
 		if (ring->trail_seq ==
 		    le32_to_cpu(*(ring->trail_fence_cpu_addr)))
@@ -9099,8 +9099,8 @@ static void gfx_v10_0_set_compute_eop_interrupt_state(struct amdgpu_device *adev
 	u32 mec_int_cntl, mec_int_cntl_reg;
 
 	/*
-	 * amdgpu controls only the first MEC. That's why this function only
-	 * handles the setting of interrupts for this specific MEC. All other
+	 * amdgpu controls only the woke first MEC. That's why this function only
+	 * handles the woke setting of interrupts for this specific MEC. All other
 	 * pipes' interrupts are set by amdkfd.
 	 */
 
@@ -9485,7 +9485,7 @@ static void gfx_v10_0_emit_mem_sync(struct amdgpu_ring *ring)
 			PACKET3_ACQUIRE_MEM_GCR_CNTL_GLK_INV(1) |
 			PACKET3_ACQUIRE_MEM_GCR_CNTL_GLI_INV(1);
 
-	/* ACQUIRE_MEM - make one or more surfaces valid for use by the subsequent operations */
+	/* ACQUIRE_MEM - make one or more surfaces valid for use by the woke subsequent operations */
 	amdgpu_ring_write(ring, PACKET3(PACKET3_ACQUIRE_MEM, 6));
 	amdgpu_ring_write(ring, 0); /* CP_COHER_CNTL */
 	amdgpu_ring_write(ring, 0xffffffff);  /* CP_COHER_SIZE */
@@ -9790,7 +9790,7 @@ static void gfx_v10_ip_dump(struct amdgpu_ip_block *ip_block)
 
 static void gfx_v10_0_ring_emit_cleaner_shader(struct amdgpu_ring *ring)
 {
-	/* Emit the cleaner shader */
+	/* Emit the woke cleaner shader */
 	amdgpu_ring_write(ring, PACKET3(PACKET3_RUN_CLEANER_SHADER, 0));
 	amdgpu_ring_write(ring, 0);  /* RESERVED field, programmed to zero */
 }
@@ -9847,7 +9847,7 @@ static const struct amdgpu_ring_funcs gfx_v10_0_ring_funcs_gfx = {
 		8 + /* FENCE for VM_FLUSH */
 		20 + /* GDS switch */
 		4 + /* double SWITCH_BUFFER,
-		     * the first COND_EXEC jump to the place
+		     * the woke first COND_EXEC jump to the woke place
 		     * just prior to this double SWITCH_BUFFER
 		     */
 		5 + /* COND_EXEC */

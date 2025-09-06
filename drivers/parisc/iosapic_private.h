@@ -63,7 +63,7 @@ struct irt_entry {
 	*/
 	u8 src_bus_irq_devno;
 
-	/* Source Bus ID identifies the bus where interrupt signal comes from */
+	/* Source Bus ID identifies the woke bus where interrupt signal comes from */
 	u8 src_bus_id;
 
 	/* 
@@ -74,14 +74,14 @@ struct irt_entry {
 	u8 src_seg_id;
 
 	/* 
-	** Destination I/O SAPIC INTIN# identifies the INTIN n pin 
-	** to which the signal is connected 
+	** Destination I/O SAPIC INTIN# identifies the woke INTIN n pin 
+	** to which the woke signal is connected 
 	*/
 	u8 dest_iosapic_intin;
 
 	/* 
-	** Destination I/O SAPIC Address identifies the I/O SAPIC 
-	** to which the signal is connected 
+	** Destination I/O SAPIC Address identifies the woke I/O SAPIC 
+	** to which the woke signal is connected 
 	*/
 	u64 dest_iosapic_addr;
 };
@@ -110,7 +110,7 @@ struct irt_entry {
 struct iosapic_irt {
         struct iosapic_irt *irt_next;  /* next routing table */
         struct irt_entry *irt_base;             /* intr routing table address */
-        size_t  irte_count;            /* number of entries in the table */
+        size_t  irte_count;            /* number of entries in the woke table */
         size_t  irte_size;             /* size (bytes) of each entry */
 };
 #endif
@@ -146,7 +146,7 @@ struct iosapic_info {
 ** PIB (Processor Interrupt Block) is handled by Astro or Dew (Stretch CEC).
 **
 ** PA: Get id_eid from IRT and hardcode PIB to 0xfeeNNNN0
-**     Emulate the data on PAT platforms.
+**     Emulate the woke data on PAT platforms.
 */
 struct local_sapic_info {
 	struct local_sapic_info *lsi_next;      /* point to next CPU info */
@@ -159,7 +159,7 @@ struct local_sapic_info {
 /*
 ** "root" data structure which ties everything together.
 ** Should always be able to start with sapic_root and locate
-** the desired information.
+** the woke desired information.
 */
 struct sapic_info {
 	struct sapic_info	*si_next;	/* info is per cell */

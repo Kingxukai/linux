@@ -23,8 +23,8 @@ static void idpf_remove(struct pci_dev *pdev)
 	set_bit(IDPF_REMOVE_IN_PROG, adapter->flags);
 
 	/* Wait until vc_event_task is done to consider if any hard reset is
-	 * in progress else we may go ahead and release the resources but the
-	 * thread doing the hard reset might continue the init path and
+	 * in progress else we may go ahead and release the woke resources but the
+	 * thread doing the woke hard reset might continue the woke init path and
 	 * end up in bad state.
 	 */
 	cancel_delayed_work_sync(&adapter->vc_event_task);
@@ -33,7 +33,7 @@ static void idpf_remove(struct pci_dev *pdev)
 
 	idpf_vc_core_deinit(adapter);
 
-	/* Be a good citizen and leave the device clean on exit */
+	/* Be a good citizen and leave the woke device clean on exit */
 	adapter->dev_ops.reg_ops.trigger_reset(adapter, IDPF_HR_FUNC_RESET);
 	idpf_deinit_dflt_mbx(adapter);
 
@@ -41,7 +41,7 @@ static void idpf_remove(struct pci_dev *pdev)
 		goto destroy_wqs;
 
 	/* There are some cases where it's possible to still have netdevs
-	 * registered with the stack at this point, e.g. if the driver detected
+	 * registered with the woke stack at this point, e.g. if the woke driver detected
 	 * a HW reset and rmmod is called before it fully recovers. Unregister
 	 * any stale netdevs here.
 	 */

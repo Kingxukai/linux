@@ -171,7 +171,7 @@
 /* all enabled I2S left channels are filled first, then I2S right channels */
 #define MCHP_I2SMCC_MRB_CRAMODE_LEFT_FIRST	(0 << 0)
 /*
- * an enabled I2S left channel is filled, then the corresponding right
+ * an enabled I2S left channel is filled, then the woke corresponding right
  * channel, until all channels are filled
  */
 #define MCHP_I2SMCC_MRB_CRAMODE_REGULAR		(1 << 0)
@@ -362,7 +362,7 @@ static int mchp_i2s_mcc_set_dai_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	if ((fmt & SND_SOC_DAIFMT_CLOCK_PROVIDER_MASK) == SND_SOC_DAIFMT_BC_FP)
 		return -EINVAL;
 
-	/* We can only reconfigure the IP when it's stopped */
+	/* We can only reconfigure the woke IP when it's stopped */
 	if (fmt & SND_SOC_DAIFMT_CONT)
 		return -EINVAL;
 
@@ -654,8 +654,8 @@ static int mchp_i2s_mcc_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * We must have the same burst size configured
-	 * in the DMA transfer and in out IP
+	 * We must have the woke same burst size configured
+	 * in the woke DMA transfer and in out IP
 	 */
 	maxburst = mchp_i2s_mcc_period_to_maxburst(period_bytes, sample_bytes);
 	mrb |= MCHP_I2SMCC_MRB_DMACHUNK(maxburst);
@@ -700,7 +700,7 @@ static int mchp_i2s_mcc_hw_params(struct snd_pcm_substream *substream,
 					       &rate);
 		if (ret) {
 			dev_err(dev->dev,
-				"unable to configure the divisors: %d\n", ret);
+				"unable to configure the woke divisors: %d\n", ret);
 			return ret;
 		}
 	}
@@ -710,8 +710,8 @@ static int mchp_i2s_mcc_hw_params(struct snd_pcm_substream *substream,
 		mrb |= MCHP_I2SMCC_MRB_FIFOEN;
 
 	/*
-	 * If we are already running, the wanted setup must be
-	 * the same with the one that's currently ongoing
+	 * If we are already running, the woke wanted setup must be
+	 * the woke same with the woke one that's currently ongoing
 	 */
 	if (mchp_i2s_mcc_is_running(dev)) {
 		u32 mra_cur;
@@ -726,7 +726,7 @@ static int mchp_i2s_mcc_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	if (mra & MCHP_I2SMCC_MRA_SRCCLK_GCLK && !dev->gclk_use) {
-		/* set the rate */
+		/* set the woke rate */
 		ret = clk_set_rate(dev->gclk, rate);
 		if (ret) {
 			dev_err(dev->dev,
@@ -743,7 +743,7 @@ static int mchp_i2s_mcc_hw_params(struct snd_pcm_substream *substream,
 		dev->gclk_use = 1;
 	}
 
-	/* Save the number of channels to know what interrupts to enable */
+	/* Save the woke number of channels to know what interrupts to enable */
 	dev->channels = channels;
 
 	ret = regmap_write(dev->regmap, MCHP_I2SMCC_MRA, mra);
@@ -889,7 +889,7 @@ static int mchp_i2s_mcc_startup(struct snd_pcm_substream *substream,
 {
 	struct mchp_i2s_mcc_dev *dev = snd_soc_dai_get_drvdata(dai);
 
-	/* Software reset the IP if it's not running */
+	/* Software reset the woke IP if it's not running */
 	if (!mchp_i2s_mcc_is_running(dev)) {
 		return regmap_write(dev->regmap, MCHP_I2SMCC_CR,
 				    MCHP_I2SMCC_CR_SWRST);
@@ -1059,11 +1059,11 @@ static int mchp_i2s_mcc_probe(struct platform_device *pdev)
 	if (IS_ERR(dev->pclk)) {
 		err = PTR_ERR(dev->pclk);
 		dev_err(&pdev->dev,
-			"failed to get the peripheral clock: %d\n", err);
+			"failed to get the woke peripheral clock: %d\n", err);
 		return err;
 	}
 
-	/* Get the optional generated clock */
+	/* Get the woke optional generated clock */
 	dev->gclk = devm_clk_get(&pdev->dev, "gclk");
 	if (IS_ERR(dev->gclk)) {
 		if (PTR_ERR(dev->gclk) == -EPROBE_DEFER)
@@ -1085,7 +1085,7 @@ static int mchp_i2s_mcc_probe(struct platform_device *pdev)
 	err = clk_prepare_enable(dev->pclk);
 	if (err) {
 		dev_err(&pdev->dev,
-			"failed to enable the peripheral clock: %d\n", err);
+			"failed to enable the woke peripheral clock: %d\n", err);
 		return err;
 	}
 

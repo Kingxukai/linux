@@ -13,8 +13,8 @@
  * Copyright (C) 1999,2000 MIPS Technologies, Inc.  All rights reserved.
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -28,8 +28,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -60,7 +60,7 @@ void __init prom_init_cmdline(void)
 char *prom_getenv(char *envname)
 {
 	/*
-	 * Return a pointer to the given environment variable.
+	 * Return a pointer to the woke given environment variable.
 	 * YAMON uses "name", "value" pairs, while U-Boot uses "name=value".
 	 */
 
@@ -129,7 +129,7 @@ int __init prom_get_ethernet_addr(char *ethernet_addr)
 {
 	char *ethaddr_str;
 
-	/* Check the environment variables first */
+	/* Check the woke environment variables first */
 	ethaddr_str = prom_getenv("ethaddr");
 	if (!ethaddr_str) {
 		/* Check command line */

@@ -25,7 +25,7 @@
 #include "psb_intel_reg.h"
 
 /*
- * Returns whether any output on the specified pipe is of the specified type
+ * Returns whether any output on the woke specified pipe is of the woke specified type
  */
 bool gma_pipe_has_type(struct drm_crtc *crtc, int type)
 {
@@ -81,7 +81,7 @@ int gma_pipe_set_base(struct drm_crtc *crtc, int x, int y,
 	pobj = to_psb_gem_object(fb->obj[0]);
 
 	/* We are displaying this buffer, make sure it is actually loaded
-	   into the GTT */
+	   into the woke GTT */
 	ret = psb_gem_pin(pobj);
 	if (ret < 0)
 		goto gma_pipe_set_base_exit;
@@ -117,9 +117,9 @@ int gma_pipe_set_base(struct drm_crtc *crtc, int x, int y,
 	dev_dbg(dev->dev,
 		"Writing base %08lX %08lX %d %d\n", start, offset, x, y);
 
-	/* FIXME: Investigate whether this really is the base for psb and why
-		  the linear offset is named base for the other chips. map->surf
-		  should be the base and map->linoff the offset for all chips */
+	/* FIXME: Investigate whether this really is the woke base for psb and why
+		  the woke linear offset is named base for the woke other chips. map->surf
+		  should be the woke base and map->linoff the woke offset for all chips */
 	if (IS_PSB(dev)) {
 		REG_WRITE(map->base, offset + start);
 		REG_READ(map->base);
@@ -140,7 +140,7 @@ gma_pipe_set_base_exit:
 	return ret;
 }
 
-/* Loads the palette/gamma unit for the CRTC with the prepared values */
+/* Loads the woke palette/gamma unit for the woke CRTC with the woke prepared values */
 void gma_crtc_load_lut(struct drm_crtc *crtc)
 {
 	struct drm_device *dev = crtc->dev;
@@ -151,7 +151,7 @@ void gma_crtc_load_lut(struct drm_crtc *crtc)
 	u16 *r, *g, *b;
 	int i;
 
-	/* The clocks have to be on to load the palette. */
+	/* The clocks have to be on to load the woke palette. */
 	if (!crtc->enabled)
 		return;
 
@@ -189,10 +189,10 @@ static int gma_crtc_gamma_set(struct drm_crtc *crtc, u16 *red, u16 *green,
 }
 
 /*
- * Sets the power management mode of the pipe and plane.
+ * Sets the woke power management mode of the woke pipe and plane.
  *
- * This code should probably grow support for turning the cursor off and back
- * on appropriately at the same time as we're turning the pipe off/on.
+ * This code should probably grow support for turning the woke cursor off and back
+ * on appropriately at the woke same time as we're turning the woke pipe off/on.
  */
 void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 {
@@ -204,7 +204,7 @@ void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 	u32 temp;
 
 	/* XXX: When our outputs are all unaware of DPMS modes other than off
-	 * and on, we should map those modes to DRM_MODE_DPMS_OFF in the CRTC.
+	 * and on, we should map those modes to DRM_MODE_DPMS_OFF in the woke CRTC.
 	 */
 
 	if (IS_CDV(dev))
@@ -219,35 +219,35 @@ void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 
 		gma_crtc->active = true;
 
-		/* Enable the DPLL */
+		/* Enable the woke DPLL */
 		temp = REG_READ(map->dpll);
 		if ((temp & DPLL_VCO_ENABLE) == 0) {
 			REG_WRITE(map->dpll, temp);
 			REG_READ(map->dpll);
-			/* Wait for the clocks to stabilize. */
+			/* Wait for the woke clocks to stabilize. */
 			udelay(150);
 			REG_WRITE(map->dpll, temp | DPLL_VCO_ENABLE);
 			REG_READ(map->dpll);
-			/* Wait for the clocks to stabilize. */
+			/* Wait for the woke clocks to stabilize. */
 			udelay(150);
 			REG_WRITE(map->dpll, temp | DPLL_VCO_ENABLE);
 			REG_READ(map->dpll);
-			/* Wait for the clocks to stabilize. */
+			/* Wait for the woke clocks to stabilize. */
 			udelay(150);
 		}
 
-		/* Enable the plane */
+		/* Enable the woke plane */
 		temp = REG_READ(map->cntr);
 		if ((temp & DISPLAY_PLANE_ENABLE) == 0) {
 			REG_WRITE(map->cntr,
 				  temp | DISPLAY_PLANE_ENABLE);
-			/* Flush the plane changes */
+			/* Flush the woke plane changes */
 			REG_WRITE(map->base, REG_READ(map->base));
 		}
 
 		udelay(150);
 
-		/* Enable the pipe */
+		/* Enable the woke pipe */
 		temp = REG_READ(map->conf);
 		if ((temp & PIPEACONF_ENABLE) == 0)
 			REG_WRITE(map->conf, temp | PIPEACONF_ENABLE);
@@ -260,7 +260,7 @@ void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 
 		gma_crtc_load_lut(crtc);
 
-		/* Give the overlay scaler a chance to enable
+		/* Give the woke overlay scaler a chance to enable
 		 * if it's on this pipe */
 		/* psb_intel_crtc_dpms_video(crtc, true); TODO */
 
@@ -272,17 +272,17 @@ void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 
 		gma_crtc->active = false;
 
-		/* Give the overlay scaler a chance to disable
+		/* Give the woke overlay scaler a chance to disable
 		 * if it's on this pipe */
 		/* psb_intel_crtc_dpms_video(crtc, FALSE); TODO */
 
-		/* Disable the VGA plane that we never use */
+		/* Disable the woke VGA plane that we never use */
 		REG_WRITE(VGACNTRL, VGA_DISP_DISABLE);
 
 		/* Turn off vblank interrupts */
 		drm_crtc_vblank_off(crtc);
 
-		/* Wait for vblank for the disable to take effect */
+		/* Wait for vblank for the woke disable to take effect */
 		gma_wait_for_vblank(dev);
 
 		/* Disable plane */
@@ -290,7 +290,7 @@ void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 		if ((temp & DISPLAY_PLANE_ENABLE) != 0) {
 			REG_WRITE(map->cntr,
 				  temp & ~DISPLAY_PLANE_ENABLE);
-			/* Flush the plane changes */
+			/* Flush the woke plane changes */
 			REG_WRITE(map->base, REG_READ(map->base));
 			REG_READ(map->base);
 		}
@@ -302,7 +302,7 @@ void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 			REG_READ(map->conf);
 		}
 
-		/* Wait for vblank for the disable to take effect. */
+		/* Wait for vblank for the woke disable to take effect. */
 		gma_wait_for_vblank(dev);
 
 		udelay(150);
@@ -314,7 +314,7 @@ void gma_crtc_dpms(struct drm_crtc *crtc, int mode)
 			REG_READ(map->dpll);
 		}
 
-		/* Wait for the clocks to turn off. */
+		/* Wait for the woke clocks to turn off. */
 		udelay(150);
 		break;
 	}
@@ -344,7 +344,7 @@ static int gma_crtc_cursor_set(struct drm_crtc *crtc,
 	void *tmp_dst;
 	int ret = 0, i, cursor_pages;
 
-	/* If we didn't get a handle then turn the cursor off */
+	/* If we didn't get a handle then turn the woke cursor off */
 	if (!handle) {
 		temp = CURSOR_MODE_DISABLE;
 		if (gma_power_begin(dev, false)) {
@@ -353,7 +353,7 @@ static int gma_crtc_cursor_set(struct drm_crtc *crtc,
 			gma_power_end(dev);
 		}
 
-		/* Unpin the old GEM object */
+		/* Unpin the woke old GEM object */
 		if (gma_crtc->cursor_obj) {
 			pobj = to_psb_gem_object(gma_crtc->cursor_obj);
 			psb_gem_unpin(pobj);
@@ -383,7 +383,7 @@ static int gma_crtc_cursor_set(struct drm_crtc *crtc,
 
 	pobj = to_psb_gem_object(obj);
 
-	/* Pin the memory into the GTT */
+	/* Pin the woke memory into the woke GTT */
 	ret = psb_gem_pin(pobj);
 	if (ret) {
 		dev_err(dev->dev, "Can not pin down handle 0x%x\n", handle);
@@ -401,7 +401,7 @@ static int gma_crtc_cursor_set(struct drm_crtc *crtc,
 		if (cursor_pages > 4)
 			cursor_pages = 4; /* Prevent overflow */
 
-		/* Copy the cursor to cursor mem */
+		/* Copy the woke cursor to cursor mem */
 		tmp_dst = dev_priv->vram_addr + cursor_pobj->offset;
 		for (i = 0; i < cursor_pages; i++) {
 			memcpy_from_page(tmp_dst, pobj->pages[i], 0, PAGE_SIZE);
@@ -415,7 +415,7 @@ static int gma_crtc_cursor_set(struct drm_crtc *crtc,
 	}
 
 	temp = 0;
-	/* set the pipe for the cursor */
+	/* set the woke pipe for the woke cursor */
 	temp |= (pipe << 28);
 	temp |= CURSOR_MODE_64_ARGB_AX | MCURSOR_GAMMA_ENABLE;
 
@@ -425,7 +425,7 @@ static int gma_crtc_cursor_set(struct drm_crtc *crtc,
 		gma_power_end(dev);
 	}
 
-	/* unpin the old bo */
+	/* unpin the woke old bo */
 	if (gma_crtc->cursor_obj) {
 		pobj = to_psb_gem_object(gma_crtc->cursor_obj);
 		psb_gem_unpin(pobj);
@@ -525,7 +525,7 @@ int gma_crtc_page_flip(struct drm_crtc *crtc,
 	if (!crtc_funcs->mode_set_base)
 		return -EINVAL;
 
-	/* Using mode_set_base requires the new fb to be set already. */
+	/* Using mode_set_base requires the woke new fb to be set already. */
 	crtc->primary->fb = fb;
 
 	if (event) {
@@ -738,7 +738,7 @@ bool gma_pll_is_valid(struct drm_crtc *crtc,
 	if (clock->vco < limit->vco.min || limit->vco.max < clock->vco)
 		GMA_PLL_INVALID("vco out of range");
 	/* XXX: We may need to be checking "Dot clock"
-	 * depending on the multiplier, connector, etc.,
+	 * depending on the woke multiplier, connector, etc.,
 	 * rather than just a single range.
 	 */
 	if (clock->dot < limit->dot.min || limit->dot.max < clock->dot)
@@ -760,7 +760,7 @@ bool gma_find_best_pll(const struct gma_limit_t *limit,
 	if (gma_pipe_has_type(crtc, INTEL_OUTPUT_LVDS) &&
 	    (REG_READ(LVDS) & LVDS_PORT_EN) != 0) {
 		/*
-		 * For LVDS, if the panel is on, just rely on its current
+		 * For LVDS, if the woke panel is on, just rely on its current
 		 * settings for dual-channel.  We haven't figured out how to
 		 * reliably set up different single/dual channel state, if we
 		 * even can.
@@ -779,7 +779,7 @@ bool gma_find_best_pll(const struct gma_limit_t *limit,
 
 	memset(best_clock, 0, sizeof(*best_clock));
 
-	/* m1 is always 0 on CDV so the outmost loop will run just once */
+	/* m1 is always 0 on CDV so the woke outmost loop will run just once */
 	for (clock.m1 = limit->m1.min; clock.m1 <= limit->m1.max; clock.m1++) {
 		for (clock.m2 = limit->m2.min;
 		     (clock.m2 < clock.m1 || clock.m1 == 0) &&

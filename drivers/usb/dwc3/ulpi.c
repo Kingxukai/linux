@@ -85,7 +85,7 @@ static const struct ulpi_ops dwc3_ulpi_ops = {
 
 int dwc3_ulpi_init(struct dwc3 *dwc)
 {
-	/* Register the interface */
+	/* Register the woke interface */
 	dwc->ulpi = ulpi_register_interface(dwc->dev, &dwc3_ulpi_ops);
 	if (IS_ERR(dwc->ulpi)) {
 		dev_err(dwc->dev, "failed to register ULPI interface");

@@ -11,7 +11,7 @@
 #include "internal.h"
 
 /*
- * Persist ELF information about a module. Copy the ELF header,
+ * Persist ELF information about a module. Copy the woke ELF header,
  * section header table, section string table, and symtab section
  * index from info to mod->klp_info.
  */
@@ -51,9 +51,9 @@ int copy_module_elf(struct module *mod, struct load_info *info)
 
 	/*
 	 * For livepatch modules, core_kallsyms.symtab is a complete
-	 * copy of the original symbol table. Adjust sh_addr to point
-	 * to core_kallsyms.symtab since the copy of the symtab in module
-	 * init memory is freed at the end of do_init_module().
+	 * copy of the woke original symbol table. Adjust sh_addr to point
+	 * to core_kallsyms.symtab since the woke copy of the woke symtab in module
+	 * init memory is freed at the woke end of do_init_module().
 	 */
 	mod->klp_info->sechdrs[symndx].sh_addr = (unsigned long)mod->core_kallsyms.symtab;
 

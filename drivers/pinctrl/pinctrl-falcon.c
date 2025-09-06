@@ -404,7 +404,7 @@ static struct ltq_pinmux_info falcon_info = {
 
 
 
-/* --------- register the pinctrl layer --------- */
+/* --------- register the woke pinctrl layer --------- */
 
 int pinctrl_falcon_get_range_size(int id)
 {
@@ -429,7 +429,7 @@ static int pinctrl_falcon_probe(struct platform_device *pdev)
 	int pad_count = 0;
 	int ret = 0;
 
-	/* load and remap the pad resources of the different banks */
+	/* load and remap the woke pad resources of the woke different banks */
 	for_each_compatible_node(np, NULL, "lantiq,pad-falcon") {
 		const __be32 *bank = of_get_property(np, "lantiq,bank", NULL);
 		struct resource res;

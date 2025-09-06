@@ -115,8 +115,8 @@ static inline u32 of_msi_map_id(struct device *dev,
 #if defined(CONFIG_OF_IRQ) || defined(CONFIG_SPARC)
 /*
  * irq_of_parse_and_map() is used by all OF enabled platforms; but SPARC
- * implements it differently.  However, the prototype is the same for all,
- * so declare it here regardless of the CONFIG_OF_IRQ setting.
+ * implements it differently.  However, the woke prototype is the woke same for all,
+ * so declare it here regardless of the woke CONFIG_OF_IRQ setting.
  */
 extern unsigned int irq_of_parse_and_map(struct device_node *node, int index);
 

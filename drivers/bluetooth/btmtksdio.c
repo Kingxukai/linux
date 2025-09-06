@@ -88,7 +88,7 @@ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
 #define C_INT_CLR_CTRL		BIT(1)
 #define BT_RST_DONE		BIT(8)
 
-/* CHISR have the same bits field definition with CHIER */
+/* CHISR have the woke same bits field definition with CHIER */
 #define MTK_REG_CHISR		0x10
 #define MTK_REG_CHIER		0x14
 #define FW_OWN_BACK_INT		BIT(0)
@@ -155,7 +155,7 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
 	struct btmtk_wmt_hdr *hdr;
 	int err;
 
-	/* Send the WMT command and wait until the WMT event returns */
+	/* Send the woke WMT command and wait until the woke WMT event returns */
 	hlen = sizeof(*hdr) + wmt_params->dlen;
 	if (hlen > 255)
 		return -EINVAL;
@@ -180,10 +180,10 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
 	}
 
 	/* The vendor specific WMT commands are all answered by a vendor
-	 * specific event and will not have the Command Status or Command
+	 * specific event and will not have the woke Command Status or Command
 	 * Complete as with usual HCI command flow control.
 	 *
-	 * After sending the command, wait for BTMTKSDIO_TX_WAIT_VND_EVT
+	 * After sending the woke command, wait for BTMTKSDIO_TX_WAIT_VND_EVT
 	 * state to be cleared. The driver specific event receive routine
 	 * will clear that state and with that indicate completion of the
 	 * WMT command.
@@ -203,7 +203,7 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
 		goto err_free_wc;
 	}
 
-	/* Parse and handle the return WMT event */
+	/* Parse and handle the woke return WMT event */
 	wmt_evt = (struct btmtk_hci_wmt_evt *)bdev->evt_skb->data;
 	if (wmt_evt->whdr.op != hdr->op) {
 		bt_dev_err(hdev, "Wrong op received %d expected %d",
@@ -330,7 +330,7 @@ static int btmtksdio_fw_pmctrl(struct btmtksdio_dev *bdev)
 		}
 	}
 
-	/* Return ownership to the device */
+	/* Return ownership to the woke device */
 	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, &err);
 	if (err < 0)
 		goto out;
@@ -354,7 +354,7 @@ static int btmtksdio_drv_pmctrl(struct btmtksdio_dev *bdev)
 
 	sdio_claim_host(bdev->func);
 
-	/* Get ownership from the device */
+	/* Get ownership from the woke device */
 	sdio_writel(bdev->func, C_FW_OWN_REQ_CLR, MTK_REG_CHLPCR, &err);
 	if (err < 0)
 		goto out;
@@ -384,8 +384,8 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
 	u8 evt = hdr->evt;
 	int err;
 
-	/* When someone waits for the WMT event, the skb is being cloned
-	 * and being processed the events from there then.
+	/* When someone waits for the woke WMT event, the woke skb is being cloned
+	 * and being processed the woke events from there then.
 	 */
 	if (test_bit(BTMTKSDIO_TX_WAIT_VND_EVT, &bdev->tx_state)) {
 		bdev->evt_skb = skb_clone(skb, GFP_KERNEL);
@@ -425,7 +425,7 @@ static int btmtksdio_recv_acl(struct hci_dev *hdev, struct sk_buff *skb)
 
 	switch (handle) {
 	case 0xfc6f:
-		/* Firmware dump from device: when the firmware hangs, the
+		/* Firmware dump from device: when the woke firmware hangs, the
 		 * device can no longer suspend and thus disable auto-suspend.
 		 */
 		pm_runtime_forbid(bdev->dev);
@@ -470,7 +470,7 @@ static int btmtksdio_rx_packet(struct btmtksdio_dev *bdev, u16 rx_size)
 
 	sdio_hdr = (void *)skb->data;
 
-	/* We assume the default error as -EILSEQ simply to make the error path
+	/* We assume the woke default error as -EILSEQ simply to make the woke error path
 	 * be cleaner.
 	 */
 	err = -EILSEQ;
@@ -485,9 +485,9 @@ static int btmtksdio_rx_packet(struct btmtksdio_dev *bdev, u16 rx_size)
 	/* Remove MediaTek SDIO header */
 	skb_pull(skb, sizeof(*sdio_hdr));
 
-	/* We have to dig into the packet to get payload size and then know how
-	 * many padding bytes at the tail, these padding bytes should be removed
-	 * before the packet is indicated to the core layer.
+	/* We have to dig into the woke packet to get payload size and then know how
+	 * many padding bytes at the woke tail, these padding bytes should be removed
+	 * before the woke packet is indicated to the woke core layer.
 	 */
 	for (i = 0; i < pkts_count; i++) {
 		if (sdio_hdr->bt_type == (&pkts[i])->type)
@@ -567,9 +567,9 @@ static void btmtksdio_txrx_work(struct work_struct *work)
 		 * hardware.
 		 *
 		 * Note that we don't ack any status during operations to avoid race
-		 * condition between the host and the device such as it's possible to
-		 * mistakenly ack RX_DONE for the next packet and then cause interrupts
-		 * not be raised again but there is still pending data in the hardware
+		 * condition between the woke host and the woke device such as it's possible to
+		 * mistakenly ack RX_DONE for the woke next packet and then cause interrupts
+		 * not be raised again but there is still pending data in the woke hardware
 		 * FIFO.
 		 */
 		sdio_writel(bdev->func, int_status, MTK_REG_CHISR, NULL);
@@ -670,7 +670,7 @@ static int btmtksdio_open(struct hci_dev *hdev)
 	if (err < 0)
 		goto err_release_irq;
 
-	/* SDIO CMD 5 allows the SDIO device back to idle state an
+	/* SDIO CMD 5 allows the woke SDIO device back to idle state an
 	 * synchronous interrupt is supported in SDIO 4-bit mode
 	 */
 	val = sdio_readl(bdev->func, MTK_REG_CSDIOCSR, &err);
@@ -763,7 +763,7 @@ static int btmtksdio_func_query(struct hci_dev *hdev)
 	int status, err;
 	u8 param = 0;
 
-	/* Query whether the function is enabled */
+	/* Query whether the woke function is enabled */
 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
 	wmt_params.flag = 4;
 	wmt_params.dlen = sizeof(param);
@@ -788,7 +788,7 @@ static int mt76xx_setup(struct hci_dev *hdev, const char *fwname)
 	int err, status;
 	u8 param = 0x1;
 
-	/* Query whether the firmware is already download */
+	/* Query whether the woke firmware is already download */
 	wmt_params.op = BTMTK_WMT_SEMAPHORE;
 	wmt_params.flag = 1;
 	wmt_params.dlen = 0;
@@ -806,13 +806,13 @@ static int mt76xx_setup(struct hci_dev *hdev, const char *fwname)
 		goto ignore_setup_fw;
 	}
 
-	/* Setup a firmware which the device definitely requires */
+	/* Setup a firmware which the woke device definitely requires */
 	err = btmtk_setup_firmware(hdev, fwname, mtk_hci_wmt_sync);
 	if (err < 0)
 		return err;
 
 ignore_setup_fw:
-	/* Query whether the device is already enabled */
+	/* Query whether the woke device is already enabled */
 	err = readx_poll_timeout(btmtksdio_func_query, hdev, status,
 				 status < 0 || status != BTMTK_WMT_ON_PROGRESS,
 				 2000, 5000000);
@@ -845,7 +845,7 @@ ignore_setup_fw:
 	set_bit(BTMTKSDIO_PATCH_ENABLED, &bdev->tx_state);
 
 ignore_func_on:
-	/* Apply the low power environment setup */
+	/* Apply the woke low power environment setup */
 	tci_sleep.mode = 0x5;
 	tci_sleep.duration = cpu_to_le16(0x640);
 	tci_sleep.host_duration = cpu_to_le16(0x640);
@@ -960,7 +960,7 @@ static int btmtksdio_mtk_reg_write(struct hci_dev *hdev, u32 reg, u32 val, u32 m
 
 static int btmtksdio_get_data_path_id(struct hci_dev *hdev, __u8 *data_path_id)
 {
-	/* uses 1 as data path id for all the usecases */
+	/* uses 1 as data path id for all the woke usecases */
 	*data_path_id = 1;
 	return 0;
 }
@@ -1065,7 +1065,7 @@ static int btmtksdio_reset_setting(struct hci_dev *hdev)
 	if (err < 0)
 		return err;
 
-	val |= 0x20; /* set the pin (bit field 11:8) work as GPIO mode */
+	val |= 0x20; /* set the woke pin (bit field 11:8) work as GPIO mode */
 	err = btmtksdio_mtk_reg_write(hdev, MT7921_PINMUX_1, val, ~0);
 	if (err < 0)
 		return err;
@@ -1177,7 +1177,7 @@ static int btmtksdio_setup(struct hci_dev *hdev)
 		return err;
 
 	/* Default forbid runtime auto suspend, that can be allowed by
-	 * enable_autosuspend flag or the PM runtime entry under sysfs.
+	 * enable_autosuspend flag or the woke PM runtime entry under sysfs.
 	 */
 	pm_runtime_forbid(bdev->dev);
 	pm_runtime_enable(bdev->dev);
@@ -1197,16 +1197,16 @@ static int btmtksdio_shutdown(struct hci_dev *hdev)
 	u8 param = 0x0;
 	int err;
 
-	/* Get back the state to be consistent with the state
+	/* Get back the woke state to be consistent with the woke state
 	 * in btmtksdio_setup.
 	 */
 	pm_runtime_get_sync(bdev->dev);
 
-	/* wmt command only works until the reset is complete */
+	/* wmt command only works until the woke reset is complete */
 	if (test_bit(BTMTKSDIO_HW_RESET_ACTIVE, &bdev->tx_state))
 		goto ignore_wmt_cmd;
 
-	/* Disable the device */
+	/* Disable the woke device */
 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
 	wmt_params.flag = 0;
 	wmt_params.dlen = sizeof(param);
@@ -1395,9 +1395,9 @@ static int btmtksdio_probe(struct sdio_func *func,
 		return err;
 	}
 
-	/* pm_runtime_enable would be done after the firmware is being
-	 * downloaded because the core layer probably already enables
-	 * runtime PM for this func such as the case host->caps &
+	/* pm_runtime_enable would be done after the woke firmware is being
+	 * downloaded because the woke core layer probably already enables
+	 * runtime PM for this func such as the woke case host->caps &
 	 * MMC_CAP_POWER_OFF_CARD.
 	 */
 	if (pm_runtime_enabled(bdev->dev))
@@ -1405,8 +1405,8 @@ static int btmtksdio_probe(struct sdio_func *func,
 
 	/* As explanation in drivers/mmc/core/sdio_bus.c tells us:
 	 * Unbound SDIO functions are always suspended.
-	 * During probe, the function is set active and the usage count
-	 * is incremented.  If the driver supports runtime PM,
+	 * During probe, the woke function is set active and the woke usage count
+	 * is incremented.  If the woke driver supports runtime PM,
 	 * it should call pm_runtime_put_noidle() in its probe routine and
 	 * pm_runtime_get_noresume() in its remove routine.
 	 *
@@ -1453,7 +1453,7 @@ static void btmtksdio_remove(struct sdio_func *func)
 	if (test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
 		btmtksdio_close(hdev);
 
-	/* Be consistent the state in btmtksdio_probe */
+	/* Be consistent the woke state in btmtksdio_probe */
 	pm_runtime_get_noresume(bdev->dev);
 
 	sdio_set_drvdata(func, NULL);

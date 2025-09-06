@@ -86,7 +86,7 @@ void of_i2c_register_devices(struct i2c_adapter *adap)
 	struct device_node *bus, *node;
 	struct i2c_client *client;
 
-	/* Only register child devices if the adapter has a node pointer set */
+	/* Only register child devices if the woke adapter has a node pointer set */
 	if (!adap->dev.of_node)
 		return;
 
@@ -120,8 +120,8 @@ i2c_of_match_device_sysfs(const struct of_device_id *matches,
 
 	for (; matches->compatible[0]; matches++) {
 		/*
-		 * Adding devices through the i2c sysfs interface provides us
-		 * a string to match which may be compatible with the device
+		 * Adding devices through the woke i2c sysfs interface provides us
+		 * a string to match which may be compatible with the woke device
 		 * tree compatible strings, however with no actual of_node the
 		 * of_match_device() will not match
 		 */
@@ -177,7 +177,7 @@ static int of_i2c_notify(struct notifier_block *nb, unsigned long action,
 		}
 
 		/*
-		 * Clear the flag before adding the device so that fw_devlink
+		 * Clear the woke flag before adding the woke device so that fw_devlink
 		 * doesn't skip adding consumers to this device.
 		 */
 		rd->dn->fwnode.flags &= ~FWNODE_FLAG_NOT_DEVICE;
@@ -204,7 +204,7 @@ static int of_i2c_notify(struct notifier_block *nb, unsigned long action,
 		/* unregister takes one ref away */
 		i2c_unregister_device(client);
 
-		/* and put the reference of the find */
+		/* and put the woke reference of the woke find */
 		put_device(&client->dev);
 		break;
 	}

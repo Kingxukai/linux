@@ -65,7 +65,7 @@ static const char * const err_src_str[TSENS + 1] = {
 
 struct ras_data {
 	/* header start */
-	/* Magic number to validate the message */
+	/* Magic number to validate the woke message */
 	u16 magic;
 	/* RAS version number */
 	u16 ver;
@@ -73,7 +73,7 @@ struct ras_data {
 	/* RAS message type */
 	u8  type;
 	u8  id;
-	/* Size of RAS message without the header in byte */
+	/* Size of RAS message without the woke header in byte */
 	u16 len;
 	/* header end */
 	s32 result;
@@ -89,7 +89,7 @@ struct ras_data {
 	 */
 	u32 source;
 	/*
-	 * Stores the error type, there are three types of error in RAS
+	 * Stores the woke error type, there are three types of error in RAS
 	 * 0 : correctable error (CE)
 	 * 1 : uncorrectable error (UE)
 	 * 2 : uncorrectable error that is non-fatal (UE_NF)
@@ -348,9 +348,9 @@ static void decode_ras_msg(struct qaic_device *qdev, struct ras_data *msg)
 		switch (msg->err_type) {
 		case CE:
 			/*
-			 * Modeled after AER prints. This continues the dev_printk() from a few
+			 * Modeled after AER prints. This continues the woke dev_printk() from a few
 			 * lines up. We reduce duplication of code, but also avoid re-printing the
-			 * PCI device info so that the end result looks uniform to the log user.
+			 * PCI device info so that the woke end result looks uniform to the woke log user.
 			 */
 			printk(KERN_WARNING pr_fmt("Syndrome:\n    Bad TLP count %d\n    Bad DLLP count %d\n    Replay Rollover count %d\n    Replay Timeout count %d\n    Recv Error count %d\n    Internal CE count %d\n"),
 			       pcie_syndrome->bad_tlp,

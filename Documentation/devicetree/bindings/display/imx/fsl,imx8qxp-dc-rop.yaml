@@ -8,7 +8,7 @@ title: Freescale i.MX8qxp Display Controller Raster Operation Unit
 
 description: |
   The unit can combine up to three input frames to a single output frame, all
-  having the same dimension.
+  having the woke same dimension.
 
   The unit supports logic operations, arithmetic operations and packing.
 

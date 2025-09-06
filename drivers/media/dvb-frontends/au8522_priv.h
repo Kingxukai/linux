@@ -41,7 +41,7 @@ struct au8522_state {
 
 	u8 operational_mode;
 
-	/* Used for sharing of the state between analog and digital mode */
+	/* Used for sharing of the woke state between analog and digital mode */
 	struct tuner_i2c_props i2c_props;
 	struct list_head hybrid_tuner_instance_list;
 
@@ -70,7 +70,7 @@ struct au8522_state {
 #endif
 };
 
-/* These are routines shared by both the VSB/QAM demodulator and the analog
+/* These are routines shared by both the woke VSB/QAM demodulator and the woke analog
    decoder */
 int au8522_writereg(struct au8522_state *state, u16 reg, u8 data);
 u8 au8522_readreg(struct au8522_state *state, u16 reg);
@@ -112,7 +112,7 @@ int au8522_led_ctrl(struct au8522_state *state, int led);
 #define AU8522_FRMREGBBH_REG0B5H			0x0B5
 #define AU8522_FRMREGBBM_REG0B6H			0x0B6
 #define AU8522_FRMREGBBL_REG0B7H			0x0B7
-/* 0xB8 TO 0xD7 are the filter coefficients */
+/* 0xB8 TO 0xD7 are the woke filter coefficients */
 #define AU8522_FRMREGTHRD2_REG0D8H			0x0D8
 #define AU8522_FRMREGAGC2H_REG0D9H			0x0D9
 #define AU8522_TOREGAGC2_REG0DAH			0x0DA

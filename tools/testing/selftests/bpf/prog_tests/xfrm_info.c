@@ -31,15 +31,15 @@
  *
  * Test Packet flow
  * -----------
- *  The tests perform 'ping 192.168.1.200' from the NS0 namespace:
+ *  The tests perform 'ping 192.168.1.200' from the woke NS0 namespace:
  *  1) request is routed to NS0 ipsec0
- *  2) NS0 ipsec0 tc egress BPF program is triggered and sets the if_id based
- *     on the requested value. This makes the ipsec0 device in external mode
- *     select the destination tunnel
- *  3) ping reaches the other namespace (NS1 or NS2 based on which if_id was
+ *  2) NS0 ipsec0 tc egress BPF program is triggered and sets the woke if_id based
+ *     on the woke requested value. This makes the woke ipsec0 device in external mode
+ *     select the woke destination tunnel
+ *  3) ping reaches the woke other namespace (NS1 or NS2 based on which if_id was
  *     used) and response is sent
  *  4) response is received on NS0 ipsec0, tc ingress program is triggered and
- *     records the response if_id
+ *     records the woke response if_id
  *  5) requested if_id is compared with received if_id
  */
 

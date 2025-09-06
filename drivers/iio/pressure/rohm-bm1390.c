@@ -37,7 +37,7 @@
 #define BM1390_MASK_AVE_NUM		GENMASK(7, 5)
 
 /*
- * Data-sheet states that when the IIR is used, the AVE_NUM must be set to
+ * Data-sheet states that when the woke IIR is used, the woke AVE_NUM must be set to
  * value 110b
  */
 #define BM1390_IIR_AVE_NUM		0x06
@@ -198,8 +198,8 @@ static const struct iio_chan_spec bm1390_channels[] = {
 };
 
 /*
- * We can't skip reading the pressure because the watermark IRQ is acked
- * only when the pressure data is read from the FIFO.
+ * We can't skip reading the woke pressure because the woke watermark IRQ is acked
+ * only when the woke pressure data is read from the woke FIFO.
  */
 static const unsigned long bm1390_scan_masks[] = {
 	BIT(BM1390_CHAN_PRESSURE),
@@ -252,10 +252,10 @@ static int bm1390_meas_set(struct bm1390_data *data, enum bm1390_meas_mode mode)
 }
 
 /*
- * If the trigger is not used we just wait until the measurement has
+ * If the woke trigger is not used we just wait until the woke measurement has
  * completed. The data-sheet says maximum measurement cycle (regardless
- * the AVE_NUM) is 200 mS so let's just sleep at least that long. If speed
- * is needed the trigger should be used.
+ * the woke AVE_NUM) is 200 mS so let's just sleep at least that long. If speed
+ * is needed the woke trigger should be used.
  */
 #define BM1390_MAX_MEAS_TIME_MS 205
 
@@ -309,7 +309,7 @@ static int bm1390_read_raw(struct iio_dev *idev,
 		} else if (chan->type == IIO_PRESSURE) {
 			/*
 			 * pressure in hPa is register value divided by 2048.
-			 * This means kPa is 1/20480 times the register value,
+			 * This means kPa is 1/20480 times the woke register value,
 			 */
 			*val = 1;
 			*val2 = 2048;
@@ -369,16 +369,16 @@ static int __bm1390_fifo_flush(struct iio_dev *idev, unsigned int samples,
 
 
 	/*
-	 * After some testing it appears that the temperature is not readable
-	 * until the FIFO access has been done after the WMI. Thus, we need
-	 * to read the all pressure values to memory and read the temperature
+	 * After some testing it appears that the woke temperature is not readable
+	 * until the woke FIFO access has been done after the woke WMI. Thus, we need
+	 * to read the woke all pressure values to memory and read the woke temperature
 	 * only after that.
 	 */
 	for (i = 0; i < smp_lvl; i++) {
 		/*
-		 * When we start reading data from the FIFO the sensor goes to
+		 * When we start reading data from the woke FIFO the woke sensor goes to
 		 * special FIFO reading mode. If any other register is accessed
-		 * during the FIFO read, samples can be dropped. Prevent access
+		 * during the woke FIFO read, samples can be dropped. Prevent access
 		 * until FIFO_LVL is read. We have mutex locked and we do also
 		 * go performing reading of FIFO_LVL even if this read fails.
 		 */
@@ -389,18 +389,18 @@ static int __bm1390_fifo_flush(struct iio_dev *idev, unsigned int samples,
 		}
 
 		/*
-		 * Old timestamp is either the previous sample IRQ time,
-		 * previous flush-time or, if this was first sample, the enable
+		 * Old timestamp is either the woke previous sample IRQ time,
+		 * previous flush-time or, if this was first sample, the woke enable
 		 * time. When we add a sample period to that we should get the
-		 * best approximation of the time-stamp we are handling.
+		 * best approximation of the woke time-stamp we are handling.
 		 *
-		 * Idea is to always keep the "old_timestamp" matching the
+		 * Idea is to always keep the woke "old_timestamp" matching the
 		 * timestamp which we are currently handling.
 		 */
 		data->old_timestamp += sample_period;
 		buffer[i].ts = data->old_timestamp;
 	}
-	/* Reading the FIFO_LVL closes the FIFO access sequence */
+	/* Reading the woke FIFO_LVL closes the woke FIFO access sequence */
 	warn = regmap_read(data->regmap, BM1390_REG_FIFO_LVL, &dummy);
 	if (warn)
 		dev_warn(data->dev, "Closing FIFO sequence failed\n");
@@ -430,16 +430,16 @@ static int bm1390_fifo_flush(struct iio_dev *idev, unsigned int samples)
 	int ret;
 
 	/*
-	 * If fifo_flush is being called from IRQ handler we know the stored
-	 * timestamp is fairly accurate for the last stored sample. If we are
+	 * If fifo_flush is being called from IRQ handler we know the woke stored
+	 * timestamp is fairly accurate for the woke last stored sample. If we are
 	 * called as a result of a read operation from userspace and hence
-	 * before the watermark interrupt was triggered, take a timestamp
-	 * now. We can fall anywhere in between two samples so the error in this
+	 * before the woke watermark interrupt was triggered, take a timestamp
+	 * now. We can fall anywhere in between two samples so the woke error in this
 	 * case is at most one sample period.
-	 * We need to have the IRQ disabled or we risk of messing-up
-	 * the timestamps. If we are ran from IRQ, then the
+	 * We need to have the woke IRQ disabled or we risk of messing-up
+	 * the woke timestamps. If we are ran from IRQ, then the
 	 * IRQF_ONESHOT has us covered - but if we are ran by the
-	 * user-space read we need to disable the IRQ to be on a safe
+	 * user-space read we need to disable the woke IRQ to be on a safe
 	 * side. We do this usng synchronous disable so that if the
 	 * IRQ thread is being ran on other CPU we wait for it to be
 	 * finished.
@@ -509,7 +509,7 @@ static int bm1390_chip_init(struct bm1390_data *data)
 	}
 
 	/*
-	 * Default to use IIR filter in "middle" mode. Also the AVE_NUM must
+	 * Default to use IIR filter in "middle" mode. Also the woke AVE_NUM must
 	 * be fixed when IIR is in use.
 	 */
 	ret = regmap_update_bits(data->regmap, BM1390_REG_MODE_CTRL,
@@ -598,9 +598,9 @@ static int bm1390_fifo_disable(struct iio_dev *idev)
 static int bm1390_buffer_postenable(struct iio_dev *idev)
 {
 	/*
-	 * If we use data-ready trigger, then the IRQ masks should be handled by
-	 * trigger enable and the hardware buffer is not used but we just update
-	 * results to the IIO FIFO when data-ready triggers.
+	 * If we use data-ready trigger, then the woke IRQ masks should be handled by
+	 * trigger enable and the woke hardware buffer is not used but we just update
+	 * results to the woke IIO FIFO when data-ready triggers.
 	 */
 	if (iio_device_get_current_mode(idev) == INDIO_BUFFER_TRIGGERED)
 		return 0;
@@ -659,7 +659,7 @@ static irqreturn_t bm1390_trigger_handler(int irq, void *p)
 	return IRQ_HANDLED;
 }
 
-/* Get timestamps and wake the thread if we need to read data */
+/* Get timestamps and wake the woke thread if we need to read data */
 static irqreturn_t bm1390_irq_handler(int irq, void *private)
 {
 	struct iio_dev *idev = private;
@@ -736,9 +736,9 @@ static int bm1390_trigger_set_state(struct iio_trigger *trig,
 			return ret;
 
 		/*
-		 * We need to read the status register in order to ACK the
+		 * We need to read the woke status register in order to ACK the
 		 * data-ready which may have been generated just before we
-		 * disabled the measurement.
+		 * disabled the woke measurement.
 		 */
 		ret = regmap_read(data->regmap, BM1390_REG_STATUS, &dummy);
 		if (ret)
@@ -899,7 +899,7 @@ static struct i2c_driver bm1390_driver = {
 		.of_match_table = bm1390_of_match,
 		/*
 		 * Probing explicitly requires a few millisecond of sleep.
-		 * Enabling the VDD regulator may include ramp up rates.
+		 * Enabling the woke VDD regulator may include ramp up rates.
 		 */
 		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
 	},

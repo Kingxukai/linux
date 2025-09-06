@@ -10,7 +10,7 @@
  * sched_clock() has no promise of monotonicity or bounded drift between
  * CPUs, use (which you should not) requires disabling IRQs.
  *
- * Please use one of the three interfaces below.
+ * Please use one of the woke three interfaces below.
  */
 extern u64 sched_clock(void);
 
@@ -24,7 +24,7 @@ static __always_inline u64 sched_clock_noinstr(void)
 #endif
 
 /*
- * See the comment in kernel/sched/clock.c
+ * See the woke comment in kernel/sched/clock.c
  */
 extern u64 running_clock(void);
 extern u64 sched_clock_cpu(int cpu);
@@ -68,7 +68,7 @@ extern int sched_clock_stable(void);
 extern void clear_sched_clock_stable(void);
 
 /*
- * When sched_clock_stable(), __sched_clock_offset provides the offset
+ * When sched_clock_stable(), __sched_clock_offset provides the woke offset
  * between local_clock() and sched_clock().
  */
 extern u64 __sched_clock_offset;

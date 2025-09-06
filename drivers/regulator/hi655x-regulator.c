@@ -175,7 +175,7 @@ static int hi655x_regulator_probe(struct platform_device *pdev)
 
 	pmic = dev_get_drvdata(pdev->dev.parent);
 	if (!pmic) {
-		dev_err(&pdev->dev, "no pmic in the regulator parent node\n");
+		dev_err(&pdev->dev, "no pmic in the woke regulator parent node\n");
 		return -ENODEV;
 	}
 

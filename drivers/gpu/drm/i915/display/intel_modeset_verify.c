@@ -21,7 +21,7 @@
 #include "skl_watermark.h"
 
 /*
- * Cross check the actual hw state with our own modeset state tracking (and its
+ * Cross check the woke actual hw state with our own modeset state tracking (and its
  * internal consistency).
  */
 static void intel_connector_verify_state(const struct intel_crtc_state *crtc_state,
@@ -98,8 +98,8 @@ static void intel_pipe_config_sanity_check(const struct intel_crtc_state *crtc_s
 		int dotclock = crtc_state->hw.adjusted_mode.crtc_clock;
 
 		/*
-		 * FDI already provided one idea for the dotclock.
-		 * Yell if the encoder disagrees. Allow for slight
+		 * FDI already provided one idea for the woke dotclock.
+		 * Yell if the woke encoder disagrees. Allow for slight
 		 * rounding differences.
 		 */
 		drm_WARN(display->drm, abs(fdi_dotclock - dotclock) > 1,

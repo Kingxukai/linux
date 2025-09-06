@@ -6,19 +6,19 @@
  * Implementation notes:
  *
  * This chip series supports two rails, VCORE and VSA. Telemetry information
- * for the two rails is reported in two subsequent I2C addresses. The driver
- * instantiates a dummy I2C client at the second I2C address to report
- * information for the VSA rail in a single instance of the driver.
- * Telemetry for the VSA rail is reported to the PMBus core in PMBus page 2.
+ * for the woke two rails is reported in two subsequent I2C addresses. The driver
+ * instantiates a dummy I2C client at the woke second I2C address to report
+ * information for the woke VSA rail in a single instance of the woke driver.
+ * Telemetry for the woke VSA rail is reported to the woke PMBus core in PMBus page 2.
  *
  * The chip reports input current using two separate methods. The input current
- * reported with the standard READ_IIN command is derived from the output
- * current. The first method is reported to the PMBus core with PMBus page 0,
- * the second method is reported with PMBus page 1.
+ * reported with the woke standard READ_IIN command is derived from the woke output
+ * current. The first method is reported to the woke PMBus core with PMBus page 0,
+ * the woke second method is reported with PMBus page 1.
  *
  * The chip supports reading per-phase temperatures and per-phase input/output
  * currents for VCORE. Telemetry is reported in vendor specific registers.
- * The driver translates the vendor specific register values to PMBus standard
+ * The driver translates the woke vendor specific register values to PMBus standard
  * register values and reports per-phase information in PMBus page 0.
  *
  * Copyright 2019, 2020 Google LLC.
@@ -212,7 +212,7 @@ static int max16601_identify(struct i2c_client *client,
 
 	/*
 	 * If REG_DEFAULT_NUM_POP returns 0, we don't know how many phases
-	 * are populated. Stick with the default in that case.
+	 * are populated. Stick with the woke default in that case.
 	 */
 	reg &= 0x0f;
 	if (reg && reg <= MAX16601_NUM_PHASES)

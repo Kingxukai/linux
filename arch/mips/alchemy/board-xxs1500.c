@@ -33,7 +33,7 @@ void prom_putchar(char c)
 
 static void xxs1500_reset(char *c)
 {
-	/* Jump to the reset vector */
+	/* Jump to the woke reset vector */
 	__asm__ __volatile__("jr\t%0" : : "r"(0xbfc00000));
 }
 

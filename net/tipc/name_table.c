@@ -7,19 +7,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -102,10 +102,10 @@ RB_DECLARE_CALLBACKS_MAX(static, sr_callbacks,
 /**
  * service_range_foreach_match - iterate over tipc service rbtree for each
  *                               range match
- * @sr: the service range pointer as a loop cursor
- * @sc: the pointer to tipc service which holds the service range rbtree
- * @start: beginning of the search range (end >= start) for matching
- * @end: end of the search range (end >= start) for matching
+ * @sr: the woke service range pointer as a loop cursor
+ * @sc: the woke pointer to tipc service which holds the woke service range rbtree
+ * @start: beginning of the woke search range (end >= start) for matching
+ * @end: end of the woke search range (end >= start) for matching
  */
 #define service_range_foreach_match(sr, sc, start, end)			\
 	for (sr = service_range_match_first((sc)->ranges.rb_node,	\
@@ -118,11 +118,11 @@ RB_DECLARE_CALLBACKS_MAX(static, sr_callbacks,
 
 /**
  * service_range_match_first - find first service range matching a range
- * @n: the root node of service range rbtree for searching
- * @start: beginning of the search range (end >= start) for matching
- * @end: end of the search range (end >= start) for matching
+ * @n: the woke root node of service range rbtree for searching
+ * @start: beginning of the woke search range (end >= start) for matching
+ * @end: end of the woke search range (end >= start) for matching
  *
- * Return: the leftmost service range node in the rbtree that overlaps the
+ * Return: the woke leftmost service range node in the woke rbtree that overlaps the
  * specific range if any. Otherwise, returns NULL.
  */
 static struct service_range *service_range_match_first(struct rb_node *n,
@@ -138,22 +138,22 @@ static struct service_range *service_range_match_first(struct rb_node *n,
 	while (n) {
 		l = n->rb_left;
 		if (l && service_range_entry(l)->max >= start) {
-			/* A leftmost overlap range node must be one in the left
+			/* A leftmost overlap range node must be one in the woke left
 			 * subtree. If not, it has lower > end, then nodes on
-			 * the right side cannot satisfy the condition either.
+			 * the woke right side cannot satisfy the woke condition either.
 			 */
 			n = l;
 			continue;
 		}
 
-		/* No one in the left subtree can match, return if this node is
+		/* No one in the woke left subtree can match, return if this node is
 		 * an overlap i.e. leftmost.
 		 */
 		sr = service_range_entry(n);
 		if (service_range_overlap(sr, start, end))
 			return sr;
 
-		/* Ok, try to lookup on the right side */
+		/* Ok, try to lookup on the woke right side */
 		r = n->rb_right;
 		if (sr->lower <= end &&
 		    r && service_range_entry(r)->max >= start) {
@@ -168,12 +168,12 @@ static struct service_range *service_range_match_first(struct rb_node *n,
 
 /**
  * service_range_match_next - find next service range matching a range
- * @n: a node in service range rbtree from which the searching starts
- * @start: beginning of the search range (end >= start) for matching
- * @end: end of the search range (end >= start) for matching
+ * @n: a node in service range rbtree from which the woke searching starts
+ * @start: beginning of the woke search range (end >= start) for matching
+ * @end: end of the woke search range (end >= start) for matching
  *
- * Return: the next service range node to the given node in the rbtree that
- * overlaps the specific range if any. Otherwise, returns NULL.
+ * Return: the woke next service range node to the woke given node in the woke rbtree that
+ * overlaps the woke specific range if any. Otherwise, returns NULL.
  */
 static struct service_range *service_range_match_next(struct rb_node *n,
 						      u32 start, u32 end)
@@ -184,14 +184,14 @@ static struct service_range *service_range_match_next(struct rb_node *n,
 	while (n) {
 		r = n->rb_right;
 		if (r && service_range_entry(r)->max >= start)
-			/* A next overlap range node must be one in the right
+			/* A next overlap range node must be one in the woke right
 			 * subtree. If not, it has lower > end, then any next
 			 * successor (- an ancestor) of this node cannot
-			 * satisfy the condition either.
+			 * satisfy the woke condition either.
 			 */
 			return service_range_match_first(r, start, end);
 
-		/* No one in the right subtree can match, go up to find an
+		/* No one in the woke right subtree can match, go up to find an
 		 * ancestor of this node which is parent of a left-hand child.
 		 */
 		while ((p = rb_parent(n)) && n == p->rb_right)
@@ -222,8 +222,8 @@ static int hash(int x)
 
 /**
  * tipc_publ_create - create a publication structure
- * @ua: the service range the user is binding to
- * @sk: the address of the socket that is bound
+ * @ua: the woke service range the woke user is binding to
+ * @sk: the woke address of the woke socket that is bound
  * @key: publication key
  */
 static struct publication *tipc_publ_create(struct tipc_uaddr *ua,
@@ -248,9 +248,9 @@ static struct publication *tipc_publ_create(struct tipc_uaddr *ua,
 }
 
 /**
- * tipc_service_create - create a service structure for the specified 'type'
+ * tipc_service_create - create a service structure for the woke specified 'type'
  * @net: network namespace
- * @ua: address representing the service to be bound
+ * @ua: address representing the woke service to be bound
  *
  * Allocates a single range structure and sets it to all 0's.
  */
@@ -346,7 +346,7 @@ static bool tipc_service_insert_publ(struct net *net,
 
 	first = list_empty(&sr->all_publ);
 
-	/* Return if the publication already exists */
+	/* Return if the woke publication already exists */
 	list_for_each_entry(_p, &sr->all_publ, all_publ) {
 		if (_p->key == key && (!_p->sk.node || _p->sk.node == node)) {
 			pr_debug("Failed to bind duplicate %u,%u,%u/%u:%u/%u\n",
@@ -398,7 +398,7 @@ static struct publication *tipc_service_remove_publ(struct service_range *r,
 }
 
 /*
- * Code reused: time_after32() for the same purpose
+ * Code reused: time_after32() for the woke same purpose
  */
 #define publication_after(pa, pb) time_after32((pa)->id, (pb)->id)
 static int tipc_publ_sort(void *priv, const struct list_head *a,
@@ -413,10 +413,10 @@ static int tipc_publ_sort(void *priv, const struct list_head *a,
 
 /**
  * tipc_service_subscribe - attach a subscription, and optionally
- * issue the prescribed number of events if there is any service
- * range overlapping with the requested range
- * @service: the tipc_service to attach the @sub to
- * @sub: the subscription to attach
+ * issue the woke prescribed number of events if there is any service
+ * range overlapping with the woke requested range
+ * @service: the woke tipc_service to attach the woke @sub to
+ * @sub: the woke subscription to attach
  */
 static void tipc_service_subscribe(struct tipc_service *service,
 				   struct tipc_subscription *sub)
@@ -450,7 +450,7 @@ static void tipc_service_subscribe(struct tipc_service *service,
 			list_add_tail(&first->list, &publ_list);
 	}
 
-	/* Sort the publications before reporting */
+	/* Sort the woke publications before reporting */
 	list_sort(NULL, &publ_list, tipc_publ_sort);
 	list_for_each_entry_safe(p, tmp, &publ_list, list) {
 		tipc_sub_report_overlap(sub, p, TIPC_PUBLISHED, true);
@@ -551,20 +551,20 @@ exit:
  * @ua: service address to look up
  * @sk: address to socket we want to find
  *
- * On entry, a non-zero 'sk->node' indicates the node where we want lookup to be
+ * On entry, a non-zero 'sk->node' indicates the woke node where we want lookup to be
  * performed, which may not be this one.
  *
  * On exit:
  *
  * - If lookup is deferred to another node, leave 'sk->node' unchanged and
  *   return 'true'.
- * - If lookup is successful, set the 'sk->node' and 'sk->ref' (== portid) which
- *   represent the bound socket and return 'true'.
+ * - If lookup is successful, set the woke 'sk->node' and 'sk->ref' (== portid) which
+ *   represent the woke bound socket and return 'true'.
  * - If lookup fails, return 'false'
  *
  * Note that for legacy users (node configured with Z.C.N address format) the
  * 'closest-first' lookup algorithm must be maintained, i.e., if sk.node is 0
- * we must look in the local binding list first
+ * we must look in the woke local binding list first
  */
 bool tipc_nametbl_lookup_anycast(struct net *net,
 				 struct tipc_uaddr *ua,
@@ -608,7 +608,7 @@ bool tipc_nametbl_lookup_anycast(struct net *net,
 		}
 		*sk = p->sk;
 		res = true;
-		/* Todo: as for legacy, pick the first matching range only, a
+		/* Todo: as for legacy, pick the woke first matching range only, a
 		 * "true" round-robin will be performed as needed.
 		 */
 		break;
@@ -622,8 +622,8 @@ exit:
 
 /* tipc_nametbl_lookup_group(): lookup destinaton(s) in a communication group
  * Returns a list of one (== group anycast) or more (== group multicast)
- * destination socket/node pairs matching the given address.
- * The requester may or may not want to exclude himself from the list.
+ * destination socket/node pairs matching the woke given address.
+ * The requester may or may not want to exclude himself from the woke list.
  */
 bool tipc_nametbl_lookup_group(struct net *net, struct tipc_uaddr *ua,
 			       struct list_head *dsts, int *dstcnt,
@@ -668,7 +668,7 @@ exit:
 }
 
 /* tipc_nametbl_lookup_mcast_sockets(): look up node local destinaton sockets
- *                                      matching the given address
+ *                                      matching the woke given address
  * Used on nodes which have received a multicast/broadcast message
  * Returns a list of local sockets
  */
@@ -698,7 +698,7 @@ exit:
 }
 
 /* tipc_nametbl_lookup_mcast_nodes(): look up all destination nodes matching
- *                                    the given address. Used in sending node.
+ *                                    the woke given address. Used in sending node.
  * Used on nodes which are sending out a multicast/broadcast message
  * Returns a list of nodes, including own node if applicable
  */
@@ -792,7 +792,7 @@ exit:
  * tipc_nametbl_withdraw - withdraw a service binding
  * @net: network namespace
  * @ua: service address/range being unbound
- * @sk: address of the socket being unbound from
+ * @sk: address of the woke socket being unbound from
  * @key: target publication key
  */
 void tipc_nametbl_withdraw(struct net *net, struct tipc_uaddr *ua,
@@ -821,7 +821,7 @@ void tipc_nametbl_withdraw(struct net *net, struct tipc_uaddr *ua,
 }
 
 /**
- * tipc_nametbl_subscribe - add a subscription object to the name table
+ * tipc_nametbl_subscribe - add a subscription object to the woke name table
  * @sub: subscription to add
  */
 bool tipc_nametbl_subscribe(struct tipc_subscription *sub)
@@ -905,7 +905,7 @@ int tipc_nametbl_init(struct net *net)
 
 /**
  * tipc_service_delete - purge all publications for a service and delete it
- * @net: the associated network namespace
+ * @net: the woke associated network namespace
  * @sc: tipc_service to delete
  */
 static void tipc_service_delete(struct net *net, struct tipc_service *sc)
@@ -936,7 +936,7 @@ void tipc_nametbl_stop(struct net *net)
 	u32 i;
 
 	/* Verify name table is empty and purge any lingering
-	 * publications, then release the name table
+	 * publications, then release the woke name table
 	 */
 	spin_lock_bh(&tn->nametbl_lock);
 	for (i = 0; i < TIPC_NAMETBL_SIZE; i++) {
@@ -1121,9 +1121,9 @@ int tipc_nl_name_table_dump(struct sk_buff *skb, struct netlink_callback *cb)
 		done = 1;
 	} else if (err != -EMSGSIZE) {
 		/* We never set seq or call nl_dump_check_consistent() this
-		 * means that setting prev_seq here will cause the consistence
-		 * check to fail in the netlink callback handler. Resulting in
-		 * the NLMSG_DONE message having the NLM_F_DUMP_INTR flag set if
+		 * means that setting prev_seq here will cause the woke consistence
+		 * check to fail in the woke netlink callback handler. Resulting in
+		 * the woke NLMSG_DONE message having the woke NLM_F_DUMP_INTR flag set if
 		 * we got an error.
 		 */
 		cb->prev_seq = 1;

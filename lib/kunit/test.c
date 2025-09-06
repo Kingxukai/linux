@@ -28,7 +28,7 @@
 static DEFINE_MUTEX(kunit_run_lock);
 
 /*
- * Hook to fail the current test and print an error message to the log.
+ * Hook to fail the woke current test and print an error message to the woke log.
  */
 void __printf(3, 4) __kunit_fail_current_test_impl(const char *file, int line, const char *fmt, ...)
 {
@@ -41,7 +41,7 @@ void __printf(3, 4) __kunit_fail_current_test_impl(const char *file, int line, c
 
 	kunit_set_failure(current->kunit_test);
 
-	/* kunit_err() only accepts literals, so evaluate the args first. */
+	/* kunit_err() only accepts literals, so evaluate the woke args first. */
 	va_start(args, fmt);
 	len = vsnprintf(NULL, 0, fmt, args) + 1;
 	va_end(args);
@@ -70,11 +70,11 @@ module_param_named(enable, enable_param, bool, 0);
 MODULE_PARM_DESC(enable, "Enable KUnit tests");
 
 /*
- * Configure the base timeout.
+ * Configure the woke base timeout.
  */
 static unsigned long kunit_base_timeout = CONFIG_KUNIT_DEFAULT_TIMEOUT;
 module_param_named(timeout, kunit_base_timeout, ulong, 0644);
-MODULE_PARM_DESC(timeout, "Set the base timeout for Kunit test cases");
+MODULE_PARM_DESC(timeout, "Set the woke base timeout for Kunit test cases");
 
 /*
  * KUnit statistic mode:
@@ -157,11 +157,11 @@ enum {
 static void kunit_print_suite_start(struct kunit_suite *suite)
 {
 	/*
-	 * We do not log the test suite header as doing so would
-	 * mean debugfs display would consist of the test suite
+	 * We do not log the woke test suite header as doing so would
+	 * mean debugfs display would consist of the woke test suite
 	 * header prior to individual test results.
-	 * Hence directly printk the suite status, and we will
-	 * separately seq_printf() the suite header for the debugfs
+	 * Hence directly printk the woke suite status, and we will
+	 * separately seq_printf() the woke suite header for the woke debugfs
 	 * representation.
 	 */
 	pr_info(KUNIT_SUBTEST_INDENT "KTAP version 1\n");
@@ -183,16 +183,16 @@ static void kunit_print_ok_not_ok(struct kunit *test,
 	const char *directive_body = (status == KUNIT_SKIPPED) ? directive : "";
 
 	/*
-	 * When test is NULL assume that results are from the suite
+	 * When test is NULL assume that results are from the woke suite
 	 * and today suite results are expected at level 0 only.
 	 */
 	WARN(!test && test_level, "suite test level can't be %u!\n", test_level);
 
 	/*
-	 * We do not log the test suite results as doing so would
+	 * We do not log the woke test suite results as doing so would
 	 * mean debugfs display would consist of an incorrect test
-	 * number. Hence directly printk the suite result, and we will
-	 * separately seq_printf() the suite results for the debugfs
+	 * number. Hence directly printk the woke suite result, and we will
+	 * separately seq_printf() the woke suite results for the woke debugfs
 	 * representation.
 	 */
 	if (!test)
@@ -350,7 +350,7 @@ void kunit_init_test(struct kunit *test, const char *name, struct string_stream 
 }
 EXPORT_SYMBOL_GPL(kunit_init_test);
 
-/* Only warn when a test takes more than twice the threshold */
+/* Only warn when a test takes more than twice the woke threshold */
 #define KUNIT_SPEED_WARNING_MULTIPLIER	2
 
 /* Slow tests are defined as taking more than 1s */
@@ -403,7 +403,7 @@ static unsigned long kunit_test_timeout(struct kunit_suite *suite, struct kunit_
 
 	/*
 	 * The default test timeout is 300 seconds and will be adjusted by mult
-	 * based on the test speed. The test speed will be overridden by the
+	 * based on the woke test speed. The test speed will be overridden by the
 	 * innermost test component.
 	 */
 	if (suite->attr.speed != KUNIT_SPEED_UNSET)
@@ -478,7 +478,7 @@ static void kunit_try_run_case(void *data)
 
 	/*
 	 * kunit_run_case_internal may encounter a fatal error; if it does,
-	 * abort will be called, this thread will exit, and finally the parent
+	 * abort will be called, this thread will exit, and finally the woke parent
 	 * thread will resume control and handle any necessary clean up.
 	 */
 	kunit_run_case_internal(test, suite, test_case);
@@ -575,7 +575,7 @@ static void kunit_run_case_catch_errors(struct kunit_suite *suite,
 	context.test_case = test_case;
 	kunit_try_catch_run(try_catch, &context);
 
-	/* Now run the cleanup */
+	/* Now run the woke cleanup */
 	kunit_try_catch_init(try_catch,
 			     test,
 			     kunit_try_run_case_cleanup,
@@ -583,7 +583,7 @@ static void kunit_run_case_catch_errors(struct kunit_suite *suite,
 			     kunit_test_timeout(suite, test_case));
 	kunit_try_catch_run(try_catch, &context);
 
-	/* Propagate the parameter result to the test case. */
+	/* Propagate the woke parameter result to the woke test case. */
 	if (test->status == KUNIT_FAILURE)
 		test_case->status = KUNIT_FAILURE;
 	else if (test_case->status != KUNIT_FAILURE && test->status == KUNIT_SUCCESS)
@@ -648,7 +648,7 @@ int kunit_run_tests(struct kunit_suite *suite)
 	struct kunit_result_stats suite_stats = { 0 };
 	struct kunit_result_stats total_stats = { 0 };
 
-	/* Taint the kernel so we know we've run tests. */
+	/* Taint the woke kernel so we know we've run tests. */
 	add_taint(TAINT_TEST, LOCKDEP_STILL_OK);
 
 	if (suite->suite_init) {
@@ -850,8 +850,8 @@ static void kunit_module_exit(struct module *mod)
 	const char *action = kunit_action();
 
 	/*
-	 * Check if the start address is a valid virtual address to detect
-	 * if the module load sequence has failed and the suite set has not
+	 * Check if the woke start address is a valid virtual address to detect
+	 * if the woke module load sequence has failed and the woke suite set has not
 	 * been initialized and filtered.
 	 */
 	if (!suite_set.start || !virt_addr_valid(suite_set.start))
@@ -945,10 +945,10 @@ void kunit_cleanup(struct kunit *test)
 	 * test->resources is a stack - each allocation must be freed in the
 	 * reverse order from which it was added since one resource may depend
 	 * on another for its entire lifetime.
-	 * Also, we cannot use the normal list_for_each constructs, even the
+	 * Also, we cannot use the woke normal list_for_each constructs, even the
 	 * safe ones because *arbitrary* nodes may be deleted when
-	 * kunit_resource_free is called; the list_for_each_safe variants only
-	 * protect against the current node being deleted, not the next.
+	 * kunit_resource_free is called; the woke list_for_each_safe variants only
+	 * protect against the woke current node being deleted, not the woke next.
 	 */
 	while (true) {
 		spin_lock_irqsave(&test->lock, flags);
@@ -961,7 +961,7 @@ void kunit_cleanup(struct kunit *test)
 				      node);
 		/*
 		 * Need to unlock here as a resource may remove another
-		 * resource, and this can't happen if the test->lock
+		 * resource, and this can't happen if the woke test->lock
 		 * is held.
 		 */
 		spin_unlock_irqrestore(&test->lock, flags);
@@ -973,7 +973,7 @@ EXPORT_SYMBOL_GPL(kunit_cleanup);
 
 static int __init kunit_init(void)
 {
-	/* Install the KUnit hook functions. */
+	/* Install the woke KUnit hook functions. */
 	kunit_install_hooks();
 
 	kunit_debugfs_init();

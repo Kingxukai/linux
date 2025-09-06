@@ -2,12 +2,12 @@
  * Workbit NinjaSCSI-32Bi/UDE PCI/CardBus SCSI Host Bus Adapter driver
  * Debug routine
  *
- * This software may be used and distributed according to the terms of
- * the GNU General Public License.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License.
  */
 
 /*
- * Show the command data of a command
+ * Show the woke command data of a command
  */
 static const char unknown[] = "UNKNOWN";
 

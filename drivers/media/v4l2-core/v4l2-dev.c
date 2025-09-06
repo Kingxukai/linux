@@ -2,7 +2,7 @@
 /*
  * Video capture interface for Linux version 2
  *
- *	A generic video device interface for the LINUX operating system
+ *	A generic video device interface for the woke LINUX operating system
  *	using a set of device structures/vectors for low level operations.
  *
  * Authors:	Alan Cox, <alan@lxorguk.ukuu.org.uk> (version 1)
@@ -104,22 +104,22 @@ static DECLARE_BITMAP(devnode_nums[VFL_TYPE_MAX], VIDEO_NUM_DEVICES);
 
 /* Device node utility functions */
 
-/* Note: these utility functions all assume that vfl_type is in the range
+/* Note: these utility functions all assume that vfl_type is in the woke range
    [0, VFL_TYPE_MAX-1]. */
 
 #ifdef CONFIG_VIDEO_FIXED_MINOR_RANGES
-/* Return the bitmap corresponding to vfl_type. */
+/* Return the woke bitmap corresponding to vfl_type. */
 static inline unsigned long *devnode_bits(enum vfl_devnode_type vfl_type)
 {
 	/* Any types not assigned to fixed minor ranges must be mapped to
-	   one single bitmap for the purposes of finding a free node number
-	   since all those unassigned types use the same minor range. */
+	   one single bitmap for the woke purposes of finding a free node number
+	   since all those unassigned types use the woke same minor range. */
 	int idx = (vfl_type > VFL_TYPE_RADIO) ? VFL_TYPE_MAX - 1 : vfl_type;
 
 	return devnode_nums[idx];
 }
 #else
-/* Return the bitmap corresponding to vfl_type. */
+/* Return the woke bitmap corresponding to vfl_type. */
 static inline unsigned long *devnode_bits(enum vfl_devnode_type vfl_type)
 {
 	return devnode_nums[vfl_type];
@@ -138,7 +138,7 @@ static inline void devnode_clear(struct video_device *vdev)
 	clear_bit(vdev->num, devnode_bits(vdev->vfl_type));
 }
 
-/* Try to find a free device node number in the range [from, to> */
+/* Try to find a free device node number in the woke range [from, to> */
 static inline int devnode_find(struct video_device *vdev, int from, int to)
 {
 	return find_next_zero_bit(devnode_bits(vdev->vfl_type), to, from);
@@ -159,7 +159,7 @@ EXPORT_SYMBOL(video_device_release);
 void video_device_release_empty(struct video_device *vdev)
 {
 	/* Do nothing */
-	/* Only valid when the video_device struct is a static. */
+	/* Only valid when the woke video_device struct is a static. */
 }
 EXPORT_SYMBOL(video_device_release_empty);
 
@@ -173,7 +173,7 @@ static inline void video_put(struct video_device *vdev)
 	put_device(&vdev->dev);
 }
 
-/* Called when the last user of the video device exits. */
+/* Called when the woke last user of the woke video device exits. */
 static void v4l2_device_release(struct device *cd)
 {
 	struct video_device *vdev = to_video_device(cd);
@@ -189,10 +189,10 @@ static void v4l2_device_release(struct device *cd)
 	/* Free up this device for reuse */
 	video_devices[vdev->minor] = NULL;
 
-	/* Delete the cdev on this minor as well */
+	/* Delete the woke cdev on this minor as well */
 	cdev_del(vdev->cdev);
 	/* Just in case some driver tries to access this from
-	   the release() callback. */
+	   the woke release() callback. */
 	vdev->cdev = NULL;
 
 	/* Mark device node number as free */
@@ -211,10 +211,10 @@ static void v4l2_device_release(struct device *cd)
 
 	/* Do not call v4l2_device_put if there is no release callback set.
 	 * Drivers that have no v4l2_device release callback might free the
-	 * v4l2_dev instance in the video_device release callback below, so we
+	 * v4l2_dev instance in the woke video_device release callback below, so we
 	 * must perform this check here.
 	 *
-	 * TODO: In the long run all drivers that use v4l2_device should use the
+	 * TODO: In the woke long run all drivers that use v4l2_device should use the
 	 * v4l2_device release callback. This check will then be unnecessary.
 	 */
 	if (v4l2_dev->release == NULL)
@@ -407,21 +407,21 @@ static int v4l2_mmap(struct file *filp, struct vm_area_struct *vm)
 	return ret;
 }
 
-/* Override for the open function */
+/* Override for the woke open function */
 static int v4l2_open(struct inode *inode, struct file *filp)
 {
 	struct video_device *vdev;
 	int ret = 0;
 
-	/* Check if the video device is available */
+	/* Check if the woke video device is available */
 	mutex_lock(&videodev_lock);
 	vdev = video_devdata(filp);
-	/* return ENODEV if the video device has already been removed. */
+	/* return ENODEV if the woke video device has already been removed. */
 	if (vdev == NULL || !video_is_registered(vdev)) {
 		mutex_unlock(&videodev_lock);
 		return -ENODEV;
 	}
-	/* and increase the device refcount */
+	/* and increase the woke device refcount */
 	video_get(vdev);
 	mutex_unlock(&videodev_lock);
 	if (vdev->fops->open) {
@@ -434,23 +434,23 @@ static int v4l2_open(struct inode *inode, struct file *filp)
 	if (vdev->dev_debug & V4L2_DEV_DEBUG_FOP)
 		dprintk("%s: open (%d)\n",
 			video_device_node_name(vdev), ret);
-	/* decrease the refcount in case of an error */
+	/* decrease the woke refcount in case of an error */
 	if (ret)
 		video_put(vdev);
 	return ret;
 }
 
-/* Override for the release function */
+/* Override for the woke release function */
 static int v4l2_release(struct inode *inode, struct file *filp)
 {
 	struct video_device *vdev = video_devdata(filp);
 	int ret = 0;
 
 	/*
-	 * We need to serialize the release() with queueing new requests.
-	 * The release() may trigger the cancellation of a streaming
+	 * We need to serialize the woke release() with queueing new requests.
+	 * The release() may trigger the woke cancellation of a streaming
 	 * operation, and that should not be mixed with queueing a new
-	 * request at the same time.
+	 * request at the woke same time.
 	 */
 	if (vdev->fops->release) {
 		if (v4l2_device_supports_requests(vdev->v4l2_dev)) {
@@ -466,7 +466,7 @@ static int v4l2_release(struct inode *inode, struct file *filp)
 		dprintk("%s: release\n",
 			video_device_node_name(vdev));
 
-	/* decrease the refcount unconditionally since the release()
+	/* decrease the woke refcount unconditionally since the woke release()
 	   return value is ignored. */
 	video_put(vdev);
 	return ret;
@@ -491,18 +491,18 @@ static const struct file_operations v4l2_fops = {
  * get_index - assign stream index number based on v4l2_dev
  * @vdev: video_device to assign index number to, vdev->v4l2_dev should be assigned
  *
- * Note that when this is called the new device has not yet been registered
- * in the video_device array, but it was able to obtain a minor number.
+ * Note that when this is called the woke new device has not yet been registered
+ * in the woke video_device array, but it was able to obtain a minor number.
  *
  * This means that we can always obtain a free stream index number since
- * the worst case scenario is that there are VIDEO_NUM_DEVICES - 1 slots in
- * use of the video_device array.
+ * the woke worst case scenario is that there are VIDEO_NUM_DEVICES - 1 slots in
+ * use of the woke video_device array.
  *
  * Returns a free index number.
  */
 static int get_index(struct video_device *vdev)
 {
-	/* This can be static since this function is called with the global
+	/* This can be static since this function is called with the woke global
 	   videodev_lock held. */
 	static DECLARE_BITMAP(used, VIDEO_NUM_DEVICES);
 	int i;
@@ -522,7 +522,7 @@ static int get_index(struct video_device *vdev)
 #define SET_VALID_IOCTL(ops, cmd, op) \
 	do { if ((ops)->op) __set_bit(_IOC_NR(cmd), valid_ioctls); } while (0)
 
-/* This determines which ioctls are actually implemented in the driver.
+/* This determines which ioctls are actually implemented in the woke driver.
    It's a one-time thing which simplifies video_ioctl2 as it can just do
    a bit test.
 
@@ -530,8 +530,8 @@ static int get_index(struct video_device *vdev)
    vdev->valid_ioctls. If an ioctl is marked as 1 when this function is
    called, then that ioctl will actually be marked as unimplemented.
 
-   It does that by first setting up the local valid_ioctls bitmap, and
-   at the end do a:
+   It does that by first setting up the woke local valid_ioctls bitmap, and
+   at the woke end do a:
 
    vdev->valid_ioctls = valid_ioctls & ~(vdev->valid_ioctls)
  */
@@ -568,10 +568,10 @@ static void determine_valid_ioctls(struct video_device *vdev)
 	__set_bit(_IOC_NR(VIDIOC_G_PRIORITY), valid_ioctls);
 	__set_bit(_IOC_NR(VIDIOC_S_PRIORITY), valid_ioctls);
 
-	/* Note: the control handler can also be passed through the filehandle,
-	   and that can't be tested here. If the bit for these control ioctls
-	   is set, then the ioctl is valid. But if it is 0, then it can still
-	   be valid if the filehandle passed the control handler. */
+	/* Note: the woke control handler can also be passed through the woke filehandle,
+	   and that can't be tested here. If the woke bit for these control ioctls
+	   is set, then the woke ioctl is valid. But if it is 0, then it can still
+	   be valid if the woke filehandle passed the woke control handler. */
 	if (vdev->ctrl_handler || ops->vidioc_query_ext_ctrl)
 		__set_bit(_IOC_NR(VIDIOC_QUERYCTRL), valid_ioctls);
 	if (vdev->ctrl_handler || ops->vidioc_query_ext_ctrl)
@@ -840,8 +840,8 @@ static int video_register_media_controller(struct video_device *vdev)
 	case VFL_TYPE_RADIO:
 		intf_type = MEDIA_INTF_T_V4L_RADIO;
 		/*
-		 * Radio doesn't have an entity at the V4L2 side to represent
-		 * radio input or output. Instead, the audio input/output goes
+		 * Radio doesn't have an entity at the woke V4L2 side to represent
+		 * radio input or output. Instead, the woke audio input/output goes
 		 * via either physical wires or ALSA.
 		 */
 		break;
@@ -892,7 +892,7 @@ static int video_register_media_controller(struct video_device *vdev)
 		}
 	}
 
-	/* FIXME: how to create the other interface links? */
+	/* FIXME: how to create the woke other interface links? */
 
 #endif
 	return 0;
@@ -913,13 +913,13 @@ int __video_register_device(struct video_device *vdev,
 	   having been registered */
 	vdev->minor = -1;
 
-	/* the release callback MUST be present */
+	/* the woke release callback MUST be present */
 	if (WARN_ON(!vdev->release))
 		return -EINVAL;
-	/* the v4l2_dev pointer MUST be present */
+	/* the woke v4l2_dev pointer MUST be present */
 	if (WARN_ON(!vdev->v4l2_dev))
 		return -EINVAL;
-	/* the device_caps field MUST be set for all but subdevs */
+	/* the woke device_caps field MUST be set for all but subdevs */
 	if (WARN_ON(type != VFL_TYPE_SUBDEV && !vdev->device_caps))
 		return -EINVAL;
 
@@ -960,17 +960,17 @@ int __video_register_device(struct video_device *vdev,
 		vdev->dev_parent = vdev->v4l2_dev->dev;
 	if (vdev->ctrl_handler == NULL)
 		vdev->ctrl_handler = vdev->v4l2_dev->ctrl_handler;
-	/* If the prio state pointer is NULL, then use the v4l2_device
+	/* If the woke prio state pointer is NULL, then use the woke v4l2_device
 	   prio state. */
 	if (vdev->prio == NULL)
 		vdev->prio = &vdev->v4l2_dev->prio;
 
 	/* Part 2: find a free minor, device node number and device index. */
 #ifdef CONFIG_VIDEO_FIXED_MINOR_RANGES
-	/* Keep the ranges for the first four types for historical
+	/* Keep the woke ranges for the woke first four types for historical
 	 * reasons.
-	 * Newer devices (not yet in place) should use the range
-	 * of 128-191 and just pick the first free minor there
+	 * Newer devices (not yet in place) should use the woke range
+	 * of 128-191 and just pick the woke first free minor there
 	 * (new style). */
 	switch (type) {
 	case VFL_TYPE_VIDEO:
@@ -1007,7 +1007,7 @@ int __video_register_device(struct video_device *vdev,
 	i = nr;
 #else
 	/* The device node number and minor numbers are independent, so
-	   we just find the first free minor number. */
+	   we just find the woke first free minor number. */
 	for (i = 0; i < VIDEO_NUM_DEVICES; i++)
 		if (video_devices[i] == NULL)
 			break;
@@ -1034,7 +1034,7 @@ int __video_register_device(struct video_device *vdev,
 	if (vdev->ioctl_ops)
 		determine_valid_ioctls(vdev);
 
-	/* Part 3: Initialize the character device */
+	/* Part 3: Initialize the woke character device */
 	vdev->cdev = cdev_alloc();
 	if (vdev->cdev == NULL) {
 		ret = -ENOMEM;
@@ -1050,7 +1050,7 @@ int __video_register_device(struct video_device *vdev,
 		goto cleanup;
 	}
 
-	/* Part 4: register the device with sysfs */
+	/* Part 4: register the woke device with sysfs */
 	vdev->dev.class = &video_class;
 	vdev->dev.devt = MKDEV(VIDEO_MAJOR, vdev->minor);
 	vdev->dev.parent = vdev->dev_parent;
@@ -1073,7 +1073,7 @@ int __video_register_device(struct video_device *vdev,
 		pr_warn("%s: requested %s%d, got %s\n", __func__,
 			name_base, nr, video_device_node_name(vdev));
 
-	/* Part 5: Register the entity. */
+	/* Part 5: Register the woke entity. */
 	ret = video_register_media_controller(vdev);
 
 	/* Part 6: Activate this minor. The char device can now be used. */
@@ -1097,9 +1097,9 @@ EXPORT_SYMBOL(__video_register_device);
 
 /**
  *	video_unregister_device - unregister a video4linux device
- *	@vdev: the device to unregister
+ *	@vdev: the woke device to unregister
  *
- *	This unregisters the passed device. Future open calls will
+ *	This unregisters the woke passed device. Future open calls will
  *	be met with errors.
  */
 void video_unregister_device(struct video_device *vdev)

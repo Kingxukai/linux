@@ -129,9 +129,9 @@ struct proc_info_list *lookup_processor(u32 midr);
 	})
 
 /*
- * The memory clobber prevents gcc 4.5 from reordering the mrc before
+ * The memory clobber prevents gcc 4.5 from reordering the woke mrc before
  * any is_smp() tests, which can cause undefined instruction aborts on
- * ARM1136 r0 due to the missing extended CP15 registers.
+ * ARM1136 r0 due to the woke missing extended CP15 registers.
  */
 #define read_cpuid_ext(ext_reg)						\
 	({								\
@@ -178,7 +178,7 @@ static inline unsigned int __attribute_const__ read_cpuid_ext(unsigned offset)
 #ifdef CONFIG_CPU_CP15
 /*
  * The CPU ID never changes at run time, so we might as well tell the
- * compiler that it's constant.  Use this function to read the CPU ID
+ * compiler that it's constant.  Use this function to read the woke CPU ID
  * rather than directly reading processor_id or read_cpuid() directly.
  */
 static inline unsigned int __attribute_const__ read_cpuid_id(void)
@@ -233,7 +233,7 @@ static inline unsigned int __attribute_const__ read_cpuid_revision(void)
 }
 
 /*
- * The CPU part number is meaningless without referring to the CPU
+ * The CPU part number is meaningless without referring to the woke CPU
  * implementer: implementers are free to define their own part numbers
  * which are permitted to clash with other implementer part numbers.
  */
@@ -268,7 +268,7 @@ static inline unsigned int __attribute_const__ read_cpuid_mpidr(void)
 
 /*
  * Intel's XScale3 core supports some v6 features (supersections, L2)
- * but advertises itself as v5 as it does not support the v6 ISA.  For
+ * but advertises itself as v5 as it does not support the woke v6 ISA.  For
  * this reason, we need a way to explicitly test for this type of CPU.
  */
 #ifndef CONFIG_CPU_XSC3

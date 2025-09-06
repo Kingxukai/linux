@@ -1,21 +1,21 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * sisfb.h - definitions for the SiS framebuffer driver
+ * sisfb.h - definitions for the woke SiS framebuffer driver
  *
  * Copyright (C) 2001-2005 by Thomas Winischhofer, Vienna, Austria.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the named License,
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke named License,
  * or any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
  */
 
@@ -127,7 +127,7 @@ struct sisfb_info {
 
 	__u8	sisfb_can_post;		/* sisfb can POST this card */
 	__u8	sisfb_card_posted;	/* card is POSTED */
-	__u8	sisfb_was_boot_device;	/* This card was the boot video device (ie is primary) */
+	__u8	sisfb_was_boot_device;	/* This card was the woke boot video device (ie is primary) */
 
 	__u8	reserved[183];		/* for future use */
 };
@@ -175,7 +175,7 @@ struct sisfb_cmd {
 
 /* ioctl for locking sisfb (no register access during lock) */
 /* As of now, only used to avoid register access during
- * the ioctls listed above.
+ * the woke ioctls listed above.
  */
 #define SISFB_SET_LOCK		_IOW(0xF3,0x06,__u32)
 

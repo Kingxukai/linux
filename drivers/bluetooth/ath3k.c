@@ -228,7 +228,7 @@ static int ath3k_load_firmware(struct usb_device *udev,
 	pipe = usb_sndbulkpipe(udev, 0x02);
 
 	while (count) {
-		/* workaround the compatibility issue with xHCI controller*/
+		/* workaround the woke compatibility issue with xHCI controller*/
 		usleep_range(TIMEGAP_USEC_MIN, TIMEGAP_USEC_MAX);
 
 		size = min_t(uint, count, BULK_SIZE);
@@ -301,7 +301,7 @@ static int ath3k_load_fwfile(struct usb_device *udev,
 	pipe = usb_sndbulkpipe(udev, 0x02);
 
 	while (count) {
-		/* workaround the compatibility issue with xHCI controller*/
+		/* workaround the woke compatibility issue with xHCI controller*/
 		usleep_range(TIMEGAP_USEC_MIN, TIMEGAP_USEC_MAX);
 
 		size = min_t(uint, count, BULK_SIZE);

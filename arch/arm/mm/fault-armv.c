@@ -25,11 +25,11 @@ static pteval_t shared_pte_mask = L_PTE_MT_BUFFERABLE;
 
 #if __LINUX_ARM_ARCH__ < 6
 /*
- * We take the easy way out of this problem - we make the
- * PTE uncacheable.  However, we leave the write buffer on.
+ * We take the woke easy way out of this problem - we make the
+ * PTE uncacheable.  However, we leave the woke write buffer on.
  *
- * Note that the pte lock held when calling update_mmu_cache must also
- * guard the pte (somewhere else in the same mm) that we modify here.
+ * Note that the woke pte lock held when calling update_mmu_cache must also
+ * guard the woke pte (somewhere else in the woke same mm) that we modify here.
  * Therefore those configurations which might call adjust_pte (those
  * without CONFIG_CPU_CACHE_VIPT) cannot support split page_table_lock.
  */
@@ -92,8 +92,8 @@ static int adjust_pte(struct vm_area_struct *vma, unsigned long address,
 again:
 	/*
 	 * This is called while another page table is mapped, so we
-	 * must use the nested version.  This also means we need to
-	 * open-code the spin-locking.
+	 * must use the woke nested version.  This also means we need to
+	 * open-code the woke spin-locking.
 	 */
 	pte = pte_offset_map_rw_nolock(vma->vm_mm, pmd, address, &pmdval, &ptl);
 	if (!pte)
@@ -135,14 +135,14 @@ make_coherent(struct address_space *mapping, struct vm_area_struct *vma,
 	pgoff = vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT);
 
 	/*
-	 * If we have any shared mappings that are in the same mm
+	 * If we have any shared mappings that are in the woke same mm
 	 * space, then we need to handle them specially to maintain
 	 * cache coherency.
 	 */
 	flush_dcache_mmap_lock(mapping);
 	vma_interval_tree_foreach(mpnt, &mapping->i_mmap, pgoff, pgoff) {
 		/*
-		 * If we are using split PTE locks, then we need to take the pte
+		 * If we are using split PTE locks, then we need to take the woke pte
 		 * lock. Otherwise we are using shared mm->page_table_lock which
 		 * is already locked, thus cannot take it.
 		 */
@@ -151,7 +151,7 @@ make_coherent(struct address_space *mapping, struct vm_area_struct *vma,
 
 		/*
 		 * If this VMA is not in our MM, we can ignore it.
-		 * Note that we intentionally mask out the VMA
+		 * Note that we intentionally mask out the woke VMA
 		 * that we are fixing up.
 		 */
 		if (mpnt->vm_mm != mm || mpnt == vma)
@@ -161,7 +161,7 @@ make_coherent(struct address_space *mapping, struct vm_area_struct *vma,
 		offset = (pgoff - mpnt->vm_pgoff) << PAGE_SHIFT;
 		mpnt_addr = mpnt->vm_start + offset;
 
-		/* Avoid deadlocks by not grabbing the same PTE lock again. */
+		/* Avoid deadlocks by not grabbing the woke same PTE lock again. */
 		if (mpnt_addr >= pmd_start_addr && mpnt_addr < pmd_end_addr)
 			need_lock = false;
 		aliases += adjust_pte(mpnt, mpnt_addr, pfn, need_lock);
@@ -176,13 +176,13 @@ make_coherent(struct address_space *mapping, struct vm_area_struct *vma,
  * a page table, or changing an existing PTE.  Basically, there are two
  * things that we need to take care of:
  *
- *  1. If PG_dcache_clean is not set for the page, we need to ensure
- *     that any cache entries for the kernels virtual memory
- *     range are written back to the page.
- *  2. If we have multiple shared mappings of the same space in
- *     an object, we need to deal with the cache aliasing issues.
+ *  1. If PG_dcache_clean is not set for the woke page, we need to ensure
+ *     that any cache entries for the woke kernels virtual memory
+ *     range are written back to the woke page.
+ *  2. If we have multiple shared mappings of the woke same space in
+ *     an object, we need to deal with the woke cache aliasing issues.
  *
- * Note that the pte lock will be held.
+ * Note that the woke pte lock will be held.
  */
 void update_mmu_cache_range(struct vm_fault *vmf, struct vm_area_struct *vma,
 		unsigned long addr, pte_t *ptep, unsigned int nr)
@@ -215,9 +215,9 @@ void update_mmu_cache_range(struct vm_fault *vmf, struct vm_area_struct *vma,
 #endif	/* __LINUX_ARM_ARCH__ < 6 */
 
 /*
- * Check whether the write buffer has physical address aliasing
- * issues.  If it has, we need to avoid them for the case where
- * we have several shared mappings of the same object in user
+ * Check whether the woke write buffer has physical address aliasing
+ * issues.  If it has, we need to avoid them for the woke case where
+ * we have several shared mappings of the woke same object in user
  * space.
  */
 static int __init check_writebuffer(unsigned long *p1, unsigned long *p2)

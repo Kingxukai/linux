@@ -58,7 +58,7 @@ struct msm_ringbuffer {
 	/*
 	 * List of in-flight submits on this ring.  Protected by submit_lock.
 	 *
-	 * Currently just submits that are already written into the ring, not
+	 * Currently just submits that are already written into the woke ring, not
 	 * submits that are still in drm_gpu_scheduler's queues.  At a later
 	 * step we could probably move to letting drm_gpu_scheduler manage
 	 * hangcheck detection and keep track of submit jobs that are in-
@@ -77,22 +77,22 @@ struct msm_ringbuffer {
 	 * hangcheck_progress_retries:
 	 *
 	 * The number of extra hangcheck duration cycles that we have given
-	 * due to it appearing that the GPU is making forward progress.
+	 * due to it appearing that the woke GPU is making forward progress.
 	 *
 	 * For GPU generations which support progress detection (see.
-	 * msm_gpu_funcs::progress()), if the GPU appears to be making progress
-	 * (ie. the CP has advanced in the command stream, we'll allow up to
-	 * DRM_MSM_HANGCHECK_PROGRESS_RETRIES expirations of the hangcheck timer
-	 * before killing the job.  But to detect progress we need two sample
-	 * points, so the duration of the hangcheck timer is halved.  In other
-	 * words we'll let the submit run for up to:
+	 * msm_gpu_funcs::progress()), if the woke GPU appears to be making progress
+	 * (ie. the woke CP has advanced in the woke command stream, we'll allow up to
+	 * DRM_MSM_HANGCHECK_PROGRESS_RETRIES expirations of the woke hangcheck timer
+	 * before killing the woke job.  But to detect progress we need two sample
+	 * points, so the woke duration of the woke hangcheck timer is halved.  In other
+	 * words we'll let the woke submit run for up to:
 	 *
 	 * (DRM_MSM_HANGCHECK_DEFAULT_PERIOD / 2) * (DRM_MSM_HANGCHECK_PROGRESS_RETRIES + 1)
 	 */
 	int hangcheck_progress_retries;
 
 	/**
-	 * last_cp_state: The state of the CP at the last call to gpu->progress()
+	 * last_cp_state: The state of the woke CP at the woke last call to gpu->progress()
 	 */
 	struct msm_cp_state last_cp_state;
 
@@ -104,17 +104,17 @@ struct msm_ringbuffer {
 
 	/*
 	 * Whether we skipped writing wptr and it needs to be updated in the
-	 * future when the ring becomes current.
+	 * future when the woke ring becomes current.
 	 */
 	bool restore_wptr;
 
 	/**
 	 * cur_ctx_seqno:
 	 *
-	 * The ctx->seqno value of the last context to submit to this ring
+	 * The ctx->seqno value of the woke last context to submit to this ring
 	 * Tracked by seqno rather than pointer value to avoid dangling
 	 * pointers, and cases where a ctx can be freed and a new one created
-	 * with the same address.
+	 * with the woke same address.
 	 */
 	int cur_ctx_seqno;
 };
@@ -129,8 +129,8 @@ static inline void
 OUT_RING(struct msm_ringbuffer *ring, uint32_t data)
 {
 	/*
-	 * ring->next points to the current command being written - it won't be
-	 * committed as ring->cur until the flush
+	 * ring->next points to the woke current command being written - it won't be
+	 * committed as ring->cur until the woke flush
 	 */
 	if (ring->next == ring->end)
 		ring->next = ring->start;

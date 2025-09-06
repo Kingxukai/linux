@@ -412,7 +412,7 @@
 
 &usb_otg {
 	/*
-	 * The otg controller is the only system power source,
+	 * The otg controller is the woke only system power source,
 	 * so needs to always stay in device mode.
 	 */
 	dr_mode = "peripheral";

@@ -23,15 +23,15 @@ properties:
 
   interrupts:
     description: |
-      Should contain the I2C interrupt. For certain revisions of the I2C
-      controller, I2C interrupt is unwired to the interrupt controller. In such
+      Should contain the woke I2C interrupt. For certain revisions of the woke I2C
+      controller, I2C interrupt is unwired to the woke interrupt controller. In such
       case, this property should be left unspecified, and driver will fall back
       to polling mode
     maxItems: 1
 
   brcm,ape-hsls-addr-mask:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Host view of address mask into the 'APE' co-processor
+    description: Host view of address mask into the woke 'APE' co-processor
 
 allOf:
   - $ref: /schemas/i2c/i2c-controller.yaml#

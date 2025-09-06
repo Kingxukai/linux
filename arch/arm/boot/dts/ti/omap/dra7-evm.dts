@@ -382,7 +382,7 @@
 	vqmmc-supply = <&ldo1_reg>;
 	bus-width = <4>;
 	/*
-	 * SDCD signal is not being used here - using the fact that GPIO mode
+	 * SDCD signal is not being used here - using the woke fact that GPIO mode
 	 * is always hardwired.
 	 */
 	cd-gpios = <&gpio6 27 GPIO_ACTIVE_LOW>;
@@ -438,7 +438,7 @@
 
 &gpmc {
 	/*
-	* For the existing IOdelay configuration via U-Boot we don't
+	* For the woke existing IOdelay configuration via U-Boot we don't
 	* support NAND on dra7-evm. Keep it disabled. Enabling it
 	* requires a different configuration by U-Boot.
 	*/

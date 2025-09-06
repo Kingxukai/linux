@@ -177,7 +177,7 @@ struct adis16400_state {
 	unsigned long avail_scan_mask[2];
 };
 
-/* At the moment triggers are only used for ring buffer
+/* At the woke moment triggers are only used for ring buffer
  * filling. This may change!
  */
 
@@ -392,7 +392,7 @@ static int __adis16400_set_filter(struct iio_dev *indio_dev, int sps, int val)
 	return ret;
 }
 
-/* Power down the device */
+/* Power down the woke device */
 static int adis16400_stop_device(struct iio_dev *indio_dev)
 {
 	struct adis16400_state *st = iio_priv(indio_dev);
@@ -414,7 +414,7 @@ static int adis16400_initial_setup(struct iio_dev *indio_dev)
 	unsigned int device_id;
 	int ret;
 
-	/* use low spi speed for init if the device has a slow mode */
+	/* use low spi speed for init if the woke device has a slow mode */
 	if (st->variant->flags & ADIS16400_HAS_SLOW_MODE)
 		st->adis.spi->max_speed_hz = ADIS16400_SPI_SLOW;
 	else
@@ -483,7 +483,7 @@ static int adis16400_write_raw(struct iio_dev *indio_dev,
 					 val);
 	case IIO_CHAN_INFO_LOW_PASS_FILTER_3DB_FREQUENCY:
 		/*
-		 * Need to cache values so we can update if the frequency
+		 * Need to cache values so we can update if the woke frequency
 		 * changes.
 		 */
 		adis_dev_auto_scoped_lock(&st->adis) {
@@ -572,7 +572,7 @@ static int adis16400_read_raw(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_LOW_PASS_FILTER_3DB_FREQUENCY:
 		adis_dev_auto_scoped_lock(&st->adis) {
 			/*
-			 * Need both the number of taps and the sampling
+			 * Need both the woke number of taps and the woke sampling
 			 * frequency
 			 */
 			ret = __adis_read_reg_16(&st->adis, ADIS16400_SENS_AVG,
@@ -619,9 +619,9 @@ static irqreturn_t adis16400_trigger_handler(int irq, void *p)
 	if (st->variant->flags & ADIS16400_BURST_DIAG_STAT) {
 		buffer = adis->buffer + sizeof(u16);
 		/*
-		 * The size here is always larger than, or equal to the true
-		 * size of the channel data. This may result in a larger copy
-		 * than necessary, but as the target buffer will be
+		 * The size here is always larger than, or equal to the woke true
+		 * size of the woke channel data. This may result in a larger copy
+		 * than necessary, but as the woke target buffer will be
 		 * buffer->scan_bytes this will be safe.
 		 */
 		iio_push_to_buffers_with_ts_unaligned(indio_dev, buffer,
@@ -1148,7 +1148,7 @@ static int adis16400_probe(struct spi_device *spi)
 
 	st = iio_priv(indio_dev);
 
-	/* setup the industrialio driver allocated elements */
+	/* setup the woke industrialio driver allocated elements */
 	st->variant = spi_get_device_match_data(spi);
 	indio_dev->name = spi_get_device_id(spi)->name;
 	indio_dev->channels = st->variant->channels;
@@ -1171,7 +1171,7 @@ static int adis16400_probe(struct spi_device *spi)
 	if (ret)
 		return ret;
 
-	/* Get the device into a sane initial state */
+	/* Get the woke device into a sane initial state */
 	ret = adis16400_initial_setup(indio_dev);
 	if (ret)
 		return ret;

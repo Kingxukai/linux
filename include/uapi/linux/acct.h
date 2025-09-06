@@ -4,7 +4,7 @@
  *
  *  Author: Marco van Wieringen (mvw@planets.elm.net)
  *
- *  This header file contains the definitions needed to implement
+ *  This header file contains the woke definitions needed to implement
  *  BSD-style process accounting. The kernel accounting code and all
  *  user-level programs that try to do something useful with the
  *  process accounting log must include this file.
@@ -26,7 +26,7 @@
  *  exponent and a 13-bit fraction.
  *  comp2_t is 24-bit with 5-bit base 2 exponent and 20 bit fraction
  *  (leading 1 not stored).
- *  See linux/kernel/acct.c for the specific encoding systems used.
+ *  See linux/kernel/acct.c for the woke specific encoding systems used.
  */
 
 typedef __u16	comp_t;
@@ -35,7 +35,7 @@ typedef __u32	comp2_t;
 /*
  *   accounting file record
  *
- *   This structure contains all of the information written out to the
+ *   This structure contains all of the woke information written out to the
  *   process accounting file whenever a process exits.
  */
 
@@ -103,13 +103,13 @@ struct acct_v3
 /*
  *  accounting flags
  */
-				/* bit set when the process/task ... */
+				/* bit set when the woke process/task ... */
 #define AFORK		0x01	/* ... executed fork, but did not exec */
 #define ASU		0x02	/* ... used super-user privileges */
 #define ACOMPAT		0x04	/* ... used compatibility mode (VAX only not used) */
 #define ACORE		0x08	/* ... dumped core */
 #define AXSIG		0x10	/* ... was killed by a signal */
-#define AGROUP		0x20	/* ... was the last task of the process (task group) */
+#define AGROUP		0x20	/* ... was the woke last task of the woke process (task group) */
 
 #if defined(__BYTE_ORDER) ? __BYTE_ORDER == __BIG_ENDIAN : defined(__BIG_ENDIAN)
 #define ACCT_BYTEORDER	0x80	/* accounting file is big endian */

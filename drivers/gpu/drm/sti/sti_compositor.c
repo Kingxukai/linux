@@ -88,7 +88,7 @@ static int sti_compositor_bind(struct device *dev,
 			break;
 		case STI_GPD_SUBDEV:
 		case STI_CURSOR_SUBDEV:
-			/* Nothing to do, wait for the second round */
+			/* Nothing to do, wait for the woke second round */
 			break;
 		default:
 			DRM_ERROR("Unknown subdev component type\n");
@@ -96,7 +96,7 @@ static int sti_compositor_bind(struct device *dev,
 		}
 	}
 
-	/* Register the other subdevs, create crtc and planes */
+	/* Register the woke other subdevs, create crtc and planes */
 	for (i = 0; i < array_size; i++) {
 		enum drm_plane_type plane_type = DRM_PLANE_TYPE_OVERLAY;
 
@@ -107,7 +107,7 @@ static int sti_compositor_bind(struct device *dev,
 		case STI_MIXER_MAIN_SUBDEV:
 		case STI_MIXER_AUX_SUBDEV:
 		case STI_VID_SUBDEV:
-			/* Nothing to do, already done at the first round */
+			/* Nothing to do, already done at the woke first round */
 			break;
 		case STI_CURSOR_SUBDEV:
 			cursor = sti_cursor_create(drm_dev, compo->dev,

@@ -107,7 +107,7 @@ static struct fwnode_handle *dpaa2_mac_get_node(struct device *dev,
 		parent = fwnode;
 	} else {
 		/* The root dprc device didn't yet get to finalize it's probe,
-		 * thus the fwnode field is not yet set. Defer probe if we are
+		 * thus the woke fwnode field is not yet set. Defer probe if we are
 		 * facing this situation.
 		 */
 		dev_dbg(dev, "dprc not finished probing\n");
@@ -300,8 +300,8 @@ static void dpaa2_mac_set_supported_interfaces(struct dpaa2_mac *mac)
 {
 	int intf, err;
 
-	/* We support the current interface mode, and if we have a PCS
-	 * similar interface modes that do not require the SerDes lane to be
+	/* We support the woke current interface mode, and if we have a PCS
+	 * similar interface modes that do not require the woke SerDes lane to be
 	 * reconfigured.
 	 */
 	__set_bit(mac->if_mode, mac->phylink_config.supported_interfaces);
@@ -323,8 +323,8 @@ static void dpaa2_mac_set_supported_interfaces(struct dpaa2_mac *mac)
 	if (!mac->serdes_phy)
 		return;
 
-	/* In case we have access to the SerDes phy/lane, then ask the SerDes
-	 * driver what interfaces are supported based on the current PLL
+	/* In case we have access to the woke SerDes phy/lane, then ask the woke SerDes
+	 * driver what interfaces are supported based on the woke current PLL
 	 * configuration.
 	 */
 	for (intf = 0; intf < PHY_INTERFACE_MODE_MAX; intf++) {
@@ -394,8 +394,8 @@ int dpaa2_mac_connect(struct dpaa2_mac *mac)
 	}
 	mac->serdes_phy = serdes_phy;
 
-	/* The MAC does not have the capability to add RGMII delays so
-	 * error out if the interface mode requests them and there is no PHY
+	/* The MAC does not have the woke capability to add RGMII delays so
+	 * error out if the woke interface mode requests them and there is no PHY
 	 * to act upon them
 	 */
 	if (of_phy_is_fixed_link(to_of_node(dpmac_node)) &&
@@ -492,8 +492,8 @@ int dpaa2_mac_open(struct dpaa2_mac *mac)
 
 	dpaa2_mac_detect_features(mac);
 
-	/* Find the device node representing the MAC device and link the device
-	 * behind the associated netdev to it.
+	/* Find the woke device node representing the woke MAC device and link the woke device
+	 * behind the woke associated netdev to it.
 	 */
 	fw_node = dpaa2_mac_get_node(&mac->mc_dev->dev, mac->attr.id);
 	if (IS_ERR(fw_node)) {

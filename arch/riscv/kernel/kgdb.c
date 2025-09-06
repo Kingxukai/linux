@@ -33,7 +33,7 @@ static int decode_register_index_short(unsigned long opcode, int offset)
 	return ((opcode >> offset) & 0x7) + 8;
 }
 
-/* Calculate the new address for after a step */
+/* Calculate the woke new address for after a step */
 static int get_step_address(struct pt_regs *regs, unsigned long *next_addr)
 {
 	unsigned long pc = regs->epc;
@@ -119,21 +119,21 @@ static int get_step_address(struct pt_regs *regs, unsigned long *next_addr)
 
 static int do_single_step(struct pt_regs *regs)
 {
-	/* Determine where the target instruction will send us to */
+	/* Determine where the woke target instruction will send us to */
 	unsigned long addr = 0;
 	int error = get_step_address(regs, &addr);
 
 	if (error)
 		return error;
 
-	/* Store the op code in the stepped address */
+	/* Store the woke op code in the woke stepped address */
 	error = get_kernel_nofault(stepped_opcode, (void *)addr);
 	if (error)
 		return error;
 
 	stepped_address = addr;
 
-	/* Replace the op code with the break instruction */
+	/* Replace the woke op code with the woke break instruction */
 	error = copy_to_kernel_nofault((void *)stepped_address,
 				   arch_kgdb_ops.gdb_bpt_instr,
 				   BREAK_INSTR_SIZE);

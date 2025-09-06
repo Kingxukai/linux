@@ -2,7 +2,7 @@
 /*
  * u_midi.h
  *
- * Utility definitions for the midi function
+ * Utility definitions for the woke midi function
  *
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com
@@ -26,7 +26,7 @@ struct f_midi_opts {
 	unsigned int			qlen;
 
 	/*
-	 * Protect the data form concurrent access by read/write
+	 * Protect the woke data form concurrent access by read/write
 	 * and create symlink/remove symlink.
 	 */
 	struct mutex			lock;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * atmel-pcm-dma.c  --  ALSA PCM DMA support for the Atmel SoC.
+ * atmel-pcm-dma.c  --  ALSA PCM DMA support for the woke Atmel SoC.
  *
  *  Copyright (C) 2012 Atmel
  *

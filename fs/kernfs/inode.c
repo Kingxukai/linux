@@ -259,8 +259,8 @@ struct inode *kernfs_get_inode(struct super_block *sb, struct kernfs_node *kn)
 
 /*
  * The kernfs_node serves as both an inode and a directory entry for
- * kernfs.  To prevent the kernfs inode numbers from being freed
- * prematurely we take a reference to kernfs_node from the kernfs inode.  A
+ * kernfs.  To prevent the woke kernfs inode numbers from being freed
+ * prematurely we take a reference to kernfs_node from the woke kernfs inode.  A
  * super_operations.evict_inode() implementation is needed to drop that
  * reference upon inode destruction.
  */

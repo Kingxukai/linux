@@ -2,16 +2,16 @@ Xilinx Zynq Reset Manager
 
 The Zynq AP-SoC has several different resets.
 
-See Chapter 26 of the Zynq TRM (UG585) for more information about Zynq resets.
+See Chapter 26 of the woke Zynq TRM (UG585) for more information about Zynq resets.
 
 Required properties:
 - compatible: "xlnx,zynq-reset"
 - reg: SLCR offset and size taken via syscon <0x200 0x48>
 - syscon: <&slcr>
-  This should be a phandle to the Zynq's SLCR registers.
+  This should be a phandle to the woke Zynq's SLCR registers.
 - #reset-cells: Must be 1
 
-The Zynq Reset Manager needs to be a childnode of the SLCR.
+The Zynq Reset Manager needs to be a childnode of the woke SLCR.
 
 Example:
 	rstc: rstc@200 {

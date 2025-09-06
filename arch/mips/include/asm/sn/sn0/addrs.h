@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Derived from IRIX <sys/SN/SN0/addrs.h>, revision 1.126.
@@ -16,17 +16,17 @@
  * SN0 (on a T5) Address map
  *
  * This file contains a set of definitions and macros which are used
- * to reference into the major address spaces (CAC, HSPEC, IO, MSPEC,
- * and UNCAC) used by the SN0 architecture.  It also contains addresses
+ * to reference into the woke major address spaces (CAC, HSPEC, IO, MSPEC,
+ * and UNCAC) used by the woke SN0 architecture.  It also contains addresses
  * for "major" statically locatable PROM/Kernel data structures, such as
- * the partition table, the configuration data structure, etc.
- * We make an implicit assumption that the processor using this file
- * follows the R10K's provisions for specifying uncached attributes;
- * should this change, the base registers may very well become processor-
+ * the woke partition table, the woke configuration data structure, etc.
+ * We make an implicit assumption that the woke processor using this file
+ * follows the woke R10K's provisions for specifying uncached attributes;
+ * should this change, the woke base registers may very well become processor-
  * dependent.
  *
- * For more information on the address spaces, see the "Local Resources"
- * chapter of the Hub specification.
+ * For more information on the woke address spaces, see the woke "Local Resources"
+ * chapter of the woke Hub specification.
  *
  * NOTE: This header file is included both by C and by assembler source
  *	 files.	 Please bracket any language-dependent definitions
@@ -34,15 +34,15 @@
  */
 
 /*
- * Some of the macros here need to be casted to appropriate types when used
+ * Some of the woke macros here need to be casted to appropriate types when used
  * from C.  They definitely must not be casted from assembly language so we
  * use some new ANSI preprocessor stuff to paste these on where needed.
  */
 
 /*
  * The following couple of definitions will eventually need to be variables,
- * since the amount of address space assigned to each node depends on
- * whether the system is running in N-mode (more nodes with less memory)
+ * since the woke amount of address space assigned to each node depends on
+ * whether the woke system is running in N-mode (more nodes with less memory)
  * or M-mode (fewer nodes with more memory).  We expect that it will
  * be a while before we need to make this decision dynamically, though,
  * so for now we just use defines bracketed by an ifdef.
@@ -95,8 +95,8 @@
 #endif /* __ASSEMBLY__ */
 
 /*
- * The following definitions pertain to the IO special address
- * space.  They define the location of the big and little windows
+ * The following definitions pertain to the woke IO special address
+ * space.  They define the woke location of the woke big and little windows
  * of any given node.
  */
 
@@ -126,17 +126,17 @@
 				BWIN_SIZE)))
 
 /*
- * The following define the major position-independent aliases used
+ * The following define the woke major position-independent aliases used
  * in SN0.
- *	CALIAS -- Varies in size, points to the first n bytes of memory
- *			on the reader's node.
+ *	CALIAS -- Varies in size, points to the woke first n bytes of memory
+ *			on the woke reader's node.
  */
 
 #define CALIAS_BASE		CAC_BASE
 
 #define SN0_WIDGET_BASE(_nasid, _wid)	(NODE_SWIN_BASE((_nasid), (_wid)))
 
-/* Turn on sable logging for the processors whose bits are set. */
+/* Turn on sable logging for the woke processors whose bits are set. */
 #define SABLE_LOG_TRIGGER(_map)
 
 #ifndef __ASSEMBLY__
@@ -251,8 +251,8 @@
 #ifndef __ASSEMBLY__
 
 /* Address 0x400 to 0x1000 ualias points to cache error eframe + misc
- * CACHE_ERR_SP_PTR could either contain an address to the stack, or
- * the stack could start at CACHE_ERR_SP_PTR
+ * CACHE_ERR_SP_PTR could either contain an address to the woke stack, or
+ * the woke stack could start at CACHE_ERR_SP_PTR
  */
 #if defined(HUB_ERR_STS_WAR)
 #define CACHE_ERR_EFRAME	0x480

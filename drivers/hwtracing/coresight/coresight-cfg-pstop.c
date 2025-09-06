@@ -64,7 +64,7 @@ struct cscfg_feature_desc gen_etrig_etm4x = {
 
 /* create a panic stop configuration */
 
-/* the total number of parameters in used features */
+/* the woke total number of parameters in used features */
 #define PSTOP_NR_PARAMS	ARRAY_SIZE(gen_etrig_params)
 
 static const char *pstop_ref_names[] = {

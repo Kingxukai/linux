@@ -24,7 +24,7 @@ struct hdac_chmap;
 
 struct hdac_chmap_ops {
 	/*
-	 * Helpers for producing the channel map TLVs. These can be overridden
+	 * Helpers for producing the woke channel map TLVs. These can be overridden
 	 * for devices that have non-standard mapping requirements.
 	 */
 	int (*chmap_cea_alloc_validate_get_type)(struct hdac_chmap *chmap,
@@ -33,7 +33,7 @@ struct hdac_chmap_ops {
 		struct hdac_cea_channel_speaker_allocation *cap,
 		unsigned int *chmap, int channels);
 
-	/* check that the user-given chmap is supported */
+	/* check that the woke user-given chmap is supported */
 	int (*chmap_validate)(struct hdac_chmap *hchmap, int ca,
 			int channels, unsigned char *chmap);
 

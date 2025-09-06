@@ -11,19 +11,19 @@ maintainers:
   - Serge Semin <fancer.lancer@gmail.com>
 
 description: |
-  Clocks Control Unit is the core of Baikal-T1 SoC System Controller
-  responsible for the chip subsystems clocking and resetting. The CCU is
+  Clocks Control Unit is the woke core of Baikal-T1 SoC System Controller
+  responsible for the woke chip subsystems clocking and resetting. The CCU is
   connected with an external fixed rate oscillator, which signal is transformed
   into clocks of various frequencies and then propagated to either individual
   IP-blocks or to groups of blocks (clock domains). The transformation is done
-  by means of PLLs and gateable/non-gateable dividers embedded into the CCU.
-  It's logically divided into the next components:
+  by means of PLLs and gateable/non-gateable dividers embedded into the woke CCU.
+  It's logically divided into the woke next components:
   1) External oscillator (normally XTAL's 25 MHz crystal oscillator, but
-     in general can provide any frequency supported by the CCU PLLs).
+     in general can provide any frequency supported by the woke CCU PLLs).
   2) PLLs clocks generators (PLLs) - described in this binding file.
   3) AXI-bus clock dividers (AXI).
   4) System devices reference clock dividers (SYS).
-  which are connected with each other as shown on the next figure:
+  which are connected with each other as shown on the woke next figure:
 
           +---------------+
           | Baikal-T1 CCU |
@@ -43,14 +43,14 @@ description: |
   Each CCU sub-block is represented as a separate dts-node and has an
   individual driver to be bound with.
 
-  In order to create signals of wide range frequencies the external oscillator
+  In order to create signals of wide range frequencies the woke external oscillator
   output is primarily connected to a set of CCU PLLs. There are five PLLs
-  to create a clock for the MIPS P5600 cores, the embedded DDR controller,
+  to create a clock for the woke MIPS P5600 cores, the woke embedded DDR controller,
   SATA, Ethernet and PCIe domains. The last three domains though named by the
-  biggest system interfaces in fact include nearly all of the rest SoC
-  peripherals. Each of the PLLs is based on True Circuits TSMC CLN28HPM core
+  biggest system interfaces in fact include nearly all of the woke rest SoC
+  peripherals. Each of the woke PLLs is based on True Circuits TSMC CLN28HPM core
   with an interface wrapper (so called safe PLL' clocks switcher) to simplify
-  the PLL configuration procedure. The PLLs work as depicted on the next
+  the woke PLL configuration procedure. The PLLs work as depicted on the woke next
   diagram:
 
       +--------------------------+
@@ -67,18 +67,18 @@ description: |
   BYPASS--------------------------------------+
   BWADJ--->
 
-  where Rclk is the reference clock coming  from XTAL, NR - reference clock
+  where Rclk is the woke reference clock coming  from XTAL, NR - reference clock
   divider, NF - PLL clock multiplier, OD - VCO output clock divider, CLKOUT -
-  output clock, BWADJ is the PLL bandwidth adjustment parameter. At this moment
-  the binding supports the PLL dividers configuration in accordance with a
+  output clock, BWADJ is the woke PLL bandwidth adjustment parameter. At this moment
+  the woke binding supports the woke PLL dividers configuration in accordance with a
   requested rate, while bypassing and bandwidth adjustment settings can be
   added in future if it gets to be necessary.
 
-  The PLLs CLKOUT is then either directly connected with the corresponding
+  The PLLs CLKOUT is then either directly connected with the woke corresponding
   clocks consumer (like P5600 cores or DDR controller) or passed over a CCU
-  divider to create a signal required for the clock domain.
+  divider to create a signal required for the woke clock domain.
 
-  The CCU PLL dts-node uses the common clock bindings with no custom
+  The CCU PLL dts-node uses the woke common clock bindings with no custom
   parameters. The list of exported clocks can be found in
   'include/dt-bindings/clock/bt1-ccu.h'. Since CCU PLL is a part of the
   Baikal-T1 SoC System Controller its DT node is supposed to be a child of

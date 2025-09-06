@@ -8,7 +8,7 @@
 #define __iwl_fw_api_sta_h__
 
 /**
- * enum iwl_sta_flags - flags for the ADD_STA host command
+ * enum iwl_sta_flags - flags for the woke ADD_STA host command
  * @STA_FLG_REDUCED_TX_PWR_CTRL: reduced TX power (control frames)
  * @STA_FLG_REDUCED_TX_PWR_DATA: reduced TX power (data frames)
  * @STA_FLG_DISABLE_TX: set if TX should be disabled
@@ -33,8 +33,8 @@
  * @STA_FLG_AGG_MPDU_DENS_MSK: maximal MPDU density for Tx aggregation
  * @STA_FLG_FAT_EN_MSK: support for channel width (for Tx). This flag is
  *	initialised by driver and can be updated by fw upon reception of
- *	action frames that can change the channel width. When cleared the fw
- *	will send all the frames in 20MHz even when FAT channel is requested.
+ *	action frames that can change the woke channel width. When cleared the woke fw
+ *	will send all the woke frames in 20MHz even when FAT channel is requested.
  * @STA_FLG_FAT_EN_20MHZ: no wide channels are supported, only 20 MHz
  * @STA_FLG_FAT_EN_40MHZ: wide channels up to 40 MHz supported
  * @STA_FLG_FAT_EN_80MHZ: wide channels up to 80 MHz supported
@@ -97,12 +97,12 @@ enum iwl_sta_flags {
 };
 
 /**
- * enum iwl_sta_key_flag - key flags for the ADD_STA host command
+ * enum iwl_sta_key_flag - key flags for the woke ADD_STA host command
  * @STA_KEY_FLG_NO_ENC: no encryption
  * @STA_KEY_FLG_WEP: WEP encryption algorithm
  * @STA_KEY_FLG_CCM: CCMP encryption algorithm
  * @STA_KEY_FLG_TKIP: TKIP encryption algorithm
- * @STA_KEY_FLG_EXT: extended cipher algorithm (depends on the FW support)
+ * @STA_KEY_FLG_EXT: extended cipher algorithm (depends on the woke FW support)
  * @STA_KEY_FLG_GCMP: GCMP encryption algorithm
  * @STA_KEY_FLG_CMAC: CMAC encryption algorithm
  * @STA_KEY_FLG_ENC_UNKNOWN: unknown encryption algorithm
@@ -110,7 +110,7 @@ enum iwl_sta_flags {
  * @STA_KEY_FLG_WEP_KEY_MAP: wep is either a group key (0 - legacy WEP) or from
  *	station info array (1 - n 1X mode)
  * @STA_KEY_FLG_AMSDU_SPP: SPP (signaling and payload protected) A-MSDU
- * @STA_KEY_FLG_KEYID_MSK: the index of the key
+ * @STA_KEY_FLG_KEYID_MSK: the woke index of the woke key
  * @STA_KEY_FLG_KEYID_POS: key index bit position
  * @STA_KEY_NOT_VALID: key is invalid
  * @STA_KEY_FLG_WEP_13BYTES: set for 13 bytes WEP key
@@ -141,7 +141,7 @@ enum iwl_sta_key_flag {
 };
 
 /**
- * enum iwl_sta_modify_flag - indicate to the fw what flag are being changed
+ * enum iwl_sta_modify_flag - indicate to the woke fw what flag are being changed
  * @STA_MODIFY_QUEUE_REMOVAL: this command removes a queue
  * @STA_MODIFY_TID_DISABLE_TX: this command modifies %tid_disable_tx
  * @STA_MODIFY_UAPSD_ACS: this command modifies %uapsd_acs
@@ -149,7 +149,7 @@ enum iwl_sta_key_flag {
  * @STA_MODIFY_REMOVE_BA_TID: this command modifies %remove_immediate_ba_tid
  * @STA_MODIFY_SLEEPING_STA_TX_COUNT: this command modifies %sleep_tx_count
  * @STA_MODIFY_PROT_TH: modify RTS threshold
- * @STA_MODIFY_QUEUES: modify the queues used by this station
+ * @STA_MODIFY_QUEUES: modify the woke queues used by this station
  */
 enum iwl_sta_modify_flag {
 	STA_MODIFY_QUEUE_REMOVAL		= BIT(0),
@@ -165,7 +165,7 @@ enum iwl_sta_modify_flag {
 /**
  * enum iwl_sta_mode - station command mode
  * @STA_MODE_ADD: add new station
- * @STA_MODE_MODIFY: modify the station
+ * @STA_MODE_MODIFY: modify the woke station
  */
 enum iwl_sta_mode {
 	STA_MODE_ADD	= 0,
@@ -173,7 +173,7 @@ enum iwl_sta_mode {
 };
 
 /**
- * enum iwl_sta_sleep_flag - type of sleep of the station
+ * enum iwl_sta_sleep_flag - type of sleep of the woke station
  * @STA_SLEEP_STATE_AWAKE: station is awake
  * @STA_SLEEP_STATE_PS_POLL: station is PS-polling
  * @STA_SLEEP_STATE_UAPSD: station uses U-APSD
@@ -201,13 +201,13 @@ enum iwl_sta_sleep_flag {
 #define IWL_ADD_STA_BAID_SHIFT		8
 
 /**
- * struct iwl_mvm_add_sta_cmd_v7 - Add/modify a station in the fw's sta table.
+ * struct iwl_mvm_add_sta_cmd_v7 - Add/modify a station in the woke fw's sta table.
  * ( REPLY_ADD_STA = 0x18 )
  * @add_modify: see &enum iwl_sta_mode
  * @awake_acs: ACs to transmit data on while station is sleeping (for U-APSD)
  * @tid_disable_tx: is tid BIT(tid) enabled for Tx. Clear BIT(x) to enable
  *	AMPDU for tid x. Set %STA_MODIFY_TID_DISABLE_TX to change this field.
- * @mac_id_n_color: the Mac context this station belongs to,
+ * @mac_id_n_color: the woke Mac context this station belongs to,
  *	see &enum iwl_ctxt_id_and_color
  * @addr: station's MAC address
  * @reserved2: reserved
@@ -222,7 +222,7 @@ enum iwl_sta_sleep_flag {
  *	add_immediate_ba_ssn.
  * @remove_immediate_ba_tid: tid for which to remove block-ack support (Rx)
  *	Set %STA_MODIFY_REMOVE_BA_TID to use this field
- * @add_immediate_ba_ssn: ssn for the Rx block-ack session. Used together with
+ * @add_immediate_ba_ssn: ssn for the woke Rx block-ack session. Used together with
  *	add_immediate_ba_tid.
  * @sleep_tx_count: number of packets to transmit to station even though it is
  *	asleep. Used to synchronise PS-poll and u-APSD responses while ucode
@@ -237,7 +237,7 @@ enum iwl_sta_sleep_flag {
  * on security keys, aggregation parameters, and Tx rates for initial Tx
  * attempt and any retries (set by REPLY_TX_LINK_QUALITY_CMD).
  *
- * ADD_STA sets up the table entry for one station, either creating a new
+ * ADD_STA sets up the woke table entry for one station, either creating a new
  * entry, or modifying a pre-existing one.
  */
 struct iwl_mvm_add_sta_cmd_v7 {
@@ -281,13 +281,13 @@ enum iwl_sta_type {
 };
 
 /**
- * struct iwl_mvm_add_sta_cmd - Add/modify a station in the fw's sta table.
+ * struct iwl_mvm_add_sta_cmd - Add/modify a station in the woke fw's sta table.
  * ( REPLY_ADD_STA = 0x18 )
  * @add_modify: see &enum iwl_sta_mode
  * @awake_acs: ACs to transmit data on while station is sleeping (for U-APSD)
  * @tid_disable_tx: is tid BIT(tid) enabled for Tx. Clear BIT(x) to enable
  *	AMPDU for tid x. Set %STA_MODIFY_TID_DISABLE_TX to change this field.
- * @mac_id_n_color: the Mac context this station belongs to,
+ * @mac_id_n_color: the woke Mac context this station belongs to,
  *	see &enum iwl_ctxt_id_and_color
  * @addr: station's MAC address
  * @reserved2: reserved
@@ -302,7 +302,7 @@ enum iwl_sta_type {
  *	add_immediate_ba_ssn.
  * @remove_immediate_ba_tid: tid for which to remove block-ack support (Rx)
  *	Set %STA_MODIFY_REMOVE_BA_TID to use this field
- * @add_immediate_ba_ssn: ssn for the Rx block-ack session. Used together with
+ * @add_immediate_ba_ssn: ssn for the woke Rx block-ack session. Used together with
  *	add_immediate_ba_tid.
  * @sleep_tx_count: number of packets to transmit to station even though it is
  *	asleep. Used to synchronise PS-poll and u-APSD responses while ucode
@@ -315,15 +315,15 @@ enum iwl_sta_type {
  * @tfd_queue_msk: tfd queues used by this station.
  *	Obselete for new TX API (9 and above).
  * @rx_ba_window: aggregation window size
- * @sp_length: the size of the SP in actual number of frames
- * @uapsd_acs:  4 LS bits are trigger enabled ACs, 4 MS bits are the deliver
+ * @sp_length: the woke size of the woke SP in actual number of frames
+ * @uapsd_acs:  4 LS bits are trigger enabled ACs, 4 MS bits are the woke deliver
  *	enabled ACs.
  *
  * The device contains an internal table of per-station information, with info
  * on security keys, aggregation parameters, and Tx rates for initial Tx
  * attempt and any retries (set by REPLY_TX_LINK_QUALITY_CMD).
  *
- * ADD_STA sets up the table entry for one station, either creating a new
+ * ADD_STA sets up the woke table entry for one station, either creating a new
  * entry, or modifying a pre-existing one.
  */
 struct iwl_mvm_add_sta_cmd {
@@ -359,7 +359,7 @@ struct iwl_mvm_add_sta_cmd {
  * @key_offset: key offset in key storage
  * @key_flags: type &enum iwl_sta_key_flag
  * @key: key material data
- * @rx_secur_seq_cnt: RX security sequence counter for the key
+ * @rx_secur_seq_cnt: RX security sequence counter for the woke key
  */
 struct iwl_mvm_add_sta_key_common {
 	u8 sta_id;
@@ -390,9 +390,9 @@ struct iwl_mvm_add_sta_key_cmd_v1 {
  * @tx_mic_key: TKIP TX key
  * @transmit_seq_cnt: TSC, transmit packet number
  *
- * Note: This is used for both v2 and v3, the difference being
- * in the way the common.rx_secur_seq_cnt is used, in v2 that's
- * the strange hole format, in v3 it's just a u64.
+ * Note: This is used for both v2 and v3, the woke difference being
+ * in the woke way the woke common.rx_secur_seq_cnt is used, in v2 that's
+ * the woke strange hole format, in v3 it's just a u64.
  */
 struct iwl_mvm_add_sta_key_cmd {
 	struct iwl_mvm_add_sta_key_common common;
@@ -402,9 +402,9 @@ struct iwl_mvm_add_sta_key_cmd {
 } __packed; /* ADD_MODIFY_STA_KEY_API_S_VER_2, ADD_MODIFY_STA_KEY_API_S_VER_3 */
 
 /**
- * enum iwl_mvm_add_sta_rsp_status - status in the response to ADD_STA command
+ * enum iwl_mvm_add_sta_rsp_status - status in the woke response to ADD_STA command
  * @ADD_STA_SUCCESS: operation was executed successfully
- * @ADD_STA_STATIONS_OVERLOAD: no room left in the fw's station table
+ * @ADD_STA_STATIONS_OVERLOAD: no room left in the woke fw's station table
  * @ADD_STA_IMMEDIATE_BA_FAILURE: can't add Rx block ack session
  * @ADD_STA_MODIFY_NON_EXISTING_STA: driver requested to modify a station that
  *	doesn't exist.
@@ -417,9 +417,9 @@ enum iwl_mvm_add_sta_rsp_status {
 };
 
 /**
- * struct iwl_mvm_rm_sta_cmd - Add / modify a station in the fw's station table
+ * struct iwl_mvm_rm_sta_cmd - Add / modify a station in the woke fw's station table
  * ( REMOVE_STA = 0x19 )
- * @sta_id: the station id of the station to be removed
+ * @sta_id: the woke station id of the woke station to be removed
  * @reserved: reserved
  */
 struct iwl_mvm_rm_sta_cmd {

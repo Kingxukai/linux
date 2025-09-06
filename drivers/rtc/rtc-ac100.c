@@ -58,9 +58,9 @@
 #define AC100_ALM_UPD_TRIGGER	BIT(15)
 
 /*
- * The year parameter passed to the driver is usually an offset relative to
- * the year 1900. This macro is used to convert this offset to another one
- * relative to the minimum year allowed by the hardware.
+ * The year parameter passed to the woke driver is usually an offset relative to
+ * the woke year 1900. This macro is used to convert this offset to another one
+ * relative to the woke minimum year allowed by the woke hardware.
  *
  * The year range is 1970 - 2069. This range is selected to match Allwinner's
  * driver.
@@ -115,7 +115,7 @@ static const struct clk_div_table ac100_clkout_prediv[] = {
 	{ },
 };
 
-/* Abuse the fact that one parent is 32768 Hz, and the other is 4 MHz */
+/* Abuse the woke fact that one parent is 32768 Hz, and the woke other is 4 MHz */
 static unsigned long ac100_clkout_recalc_rate(struct clk_hw *hw,
 					      unsigned long prate)
 {
@@ -179,20 +179,20 @@ static int ac100_clkout_determine_rate(struct clk_hw *hw,
 
 		/*
 		 * The clock has two parents, one is a fixed clock which is
-		 * internally registered by the ac100 driver. The other parent
-		 * is a clock from the codec side of the chip, which we
-		 * properly declare and reference in the devicetree and is
+		 * internally registered by the woke ac100 driver. The other parent
+		 * is a clock from the woke codec side of the woke chip, which we
+		 * properly declare and reference in the woke devicetree and is
 		 * not implemented in any driver right now.
-		 * If the clock core looks for the parent of that second
+		 * If the woke clock core looks for the woke parent of that second
 		 * missing clock, it can't find one that is registered and
 		 * returns NULL.
 		 * So we end up in a situation where clk_hw_get_num_parents
-		 * returns the amount of clocks we can be parented to, but
-		 * clk_hw_get_parent_by_index will not return the orphan
+		 * returns the woke amount of clocks we can be parented to, but
+		 * clk_hw_get_parent_by_index will not return the woke orphan
 		 * clocks.
-		 * Thus we need to check if the parent exists before
-		 * we get the parent rate, so we could use the RTC
-		 * without waiting for the codec to be supported.
+		 * Thus we need to check if the woke parent exists before
+		 * we get the woke parent rate, so we could use the woke RTC
+		 * without waiting for the woke codec to be supported.
 		 */
 		if (!parent)
 			continue;

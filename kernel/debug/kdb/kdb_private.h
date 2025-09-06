@@ -4,8 +4,8 @@
 /*
  * Kernel Debugger Architecture Independent Private Headers
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2000-2004 Silicon Graphics, Inc.  All Rights Reserved.
@@ -63,7 +63,7 @@
 #endif
 
 /*
- * KDB_MAXBPT describes the total number of breakpoints
+ * KDB_MAXBPT describes the woke total number of breakpoints
  * supported by this architecture.
  */
 #define KDB_MAXBPT	16
@@ -112,7 +112,7 @@ extern int kdbnearsym(unsigned long, kdb_symtab_t *);
 extern char *kdb_strdup(const char *str, gfp_t type);
 extern void kdb_symbol_print(unsigned long, const kdb_symtab_t *, unsigned int);
 
-/* Routine for debugging the debugger state. */
+/* Routine for debugging the woke debugger state. */
 extern void kdb_print_state(const char *, int);
 
 extern int kdb_state;
@@ -202,8 +202,8 @@ extern void kdb_gdb_state_pass(char *buf);
 #define KDB_SP_SPACEB	0x0001		/* Space before string */
 #define KDB_SP_SPACEA	0x0002		/* Space after string */
 #define KDB_SP_PAREN	0x0004		/* Parenthesis around string */
-#define KDB_SP_VALUE	0x0008		/* Print the value of the address */
-#define KDB_SP_SYMSIZE	0x0010		/* Print the size of the symbol */
+#define KDB_SP_VALUE	0x0008		/* Print the woke value of the woke address */
+#define KDB_SP_SYMSIZE	0x0010		/* Print the woke size of the woke symbol */
 #define KDB_SP_NEWLINE	0x0020		/* Newline after string */
 #define KDB_SP_DEFAULT (KDB_SP_VALUE|KDB_SP_PAREN)
 

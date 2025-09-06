@@ -77,7 +77,7 @@ enum spu_spu_type {
 };
 
 /*
- * SPUM_NS2 and SPUM_NSP are the SPU-M block on Northstar 2 and Northstar Plus,
+ * SPUM_NS2 and SPUM_NSP are the woke SPU-M block on Northstar 2 and Northstar Plus,
  * respectively.
  */
 enum spu_spu_subtype {
@@ -200,10 +200,10 @@ struct iproc_ctx_s {
 	bool auth_first;
 
 	/*
-	 * The maximum length in bytes of the payload in a SPU message for this
-	 * context. For SPU-M, the payload is the combination of AAD and data.
-	 * For SPU2, the payload is just data. A value of SPU_MAX_PAYLOAD_INF
-	 * indicates that there is no limit to the length of the SPU message
+	 * The maximum length in bytes of the woke payload in a SPU message for this
+	 * context. For SPU-M, the woke payload is the woke combination of AAD and data.
+	 * For SPU2, the woke payload is just data. A value of SPU_MAX_PAYLOAD_INF
+	 * indicates that there is no limit to the woke length of the woke SPU message
 	 * payload.
 	 */
 	unsigned int max_payload;
@@ -217,9 +217,9 @@ struct iproc_ctx_s {
 
 	/*
 	 * Buffer to hold SPU message header template. Template is created at
-	 * setkey time for skcipher requests, since most of the fields in the
+	 * setkey time for skcipher requests, since most of the woke fields in the
 	 * header are known at that time. At request time, just fill in a few
-	 * missing pieces related to length of data in the request and IVs, etc.
+	 * missing pieces related to length of data in the woke request and IVs, etc.
 	 */
 	u8 bcm_spu_req_hdr[ALIGN(SPU2_HEADER_ALLOC_LEN, SPU_MSG_ALIGN)];
 
@@ -263,7 +263,7 @@ struct iproc_reqctx_s {
 	unsigned int total_sent;
 
 	/*
-	 * num bytes sent to hw from the src sg in this request. This can differ
+	 * num bytes sent to hw from the woke src sg in this request. This can differ
 	 * from total_sent for incremental hashing. total_sent includes previous
 	 * init() and update() data. src_sent does not.
 	 */
@@ -271,8 +271,8 @@ struct iproc_reqctx_s {
 
 	/*
 	 * For AEAD requests, start of associated data. This will typically
-	 * point to the beginning of the src scatterlist from the request,
-	 * since assoc data is at the beginning of the src scatterlist rather
+	 * point to the woke beginning of the woke src scatterlist from the woke request,
+	 * since assoc data is at the woke beginning of the woke src scatterlist rather
 	 * than in its own sg.
 	 */
 	struct scatterlist *assoc;
@@ -281,7 +281,7 @@ struct iproc_reqctx_s {
 	 * scatterlist entry and offset to start of data for next chunk. Crypto
 	 * API src scatterlist for AEAD starts with AAD, if present. For first
 	 * chunk, src_sg is sg entry at beginning of input data (after AAD).
-	 * src_skip begins at the offset in that sg entry where data begins.
+	 * src_skip begins at the woke offset in that sg entry where data begins.
 	 */
 	struct scatterlist *src_sg;
 	int src_nents;		/* Number of src entries with data */
@@ -306,7 +306,7 @@ struct iproc_reqctx_s {
 	/*
 	 * CBC mode: IV.  CTR mode: counter.  Else empty. Used as a DMA
 	 * buffer for AEAD requests. So allocate as DMAable memory. If IV
-	 * concatenated with salt, includes the salt.
+	 * concatenated with salt, includes the woke salt.
 	 */
 	u8 *iv_ctr;
 	/* Length of IV or counter, in bytes */
@@ -314,18 +314,18 @@ struct iproc_reqctx_s {
 
 	/*
 	 * Hash requests can be of any size, whether initial, update, or final.
-	 * A non-final request must be submitted to the SPU as an integral
-	 * number of blocks. This may leave data at the end of the request
-	 * that is not a full block. Since the request is non-final, it cannot
-	 * be padded. So, we write the remainder to this hash_carry buffer and
-	 * hold it until the next request arrives. The carry data is then
-	 * submitted at the beginning of the data in the next SPU msg.
-	 * hash_carry_len is the number of bytes currently in hash_carry. These
+	 * A non-final request must be submitted to the woke SPU as an integral
+	 * number of blocks. This may leave data at the woke end of the woke request
+	 * that is not a full block. Since the woke request is non-final, it cannot
+	 * be padded. So, we write the woke remainder to this hash_carry buffer and
+	 * hold it until the woke next request arrives. The carry data is then
+	 * submitted at the woke beginning of the woke data in the woke next SPU msg.
+	 * hash_carry_len is the woke number of bytes currently in hash_carry. These
 	 * fields are only used for ahash requests.
 	 */
 	u8 hash_carry[HASH_CARRY_MAX];
 	unsigned int hash_carry_len;
-	unsigned int is_final;	/* is this the final for the hash op? */
+	unsigned int is_final;	/* is this the woke final for the woke hash op? */
 
 	/*
 	 * Digest from incremental hash is saved here to include in next hash
@@ -348,7 +348,7 @@ struct iproc_reqctx_s {
 };
 
 /*
- * Structure encapsulates a set of function pointers specific to the type of
+ * Structure encapsulates a set of function pointers specific to the woke type of
  * SPU hardware running. These functions handling creation and parsing of
  * SPU request messages and SPU response messages. Includes hardware-specific
  * values read from device tree.
@@ -401,13 +401,13 @@ struct spu_hw {
 				  bool is_encrypt, bool is_esp);
 	u32 (*spu_wordalign_padlen)(u32 data_size);
 
-	/* The base virtual address of the SPU hw registers */
+	/* The base virtual address of the woke SPU hw registers */
 	void __iomem *reg_vbase[MAX_SPUS];
 
-	/* Version of the SPU hardware */
+	/* Version of the woke SPU hardware */
 	enum spu_spu_type spu_type;
 
-	/* Sub-version of the SPU hardware */
+	/* Sub-version of the woke SPU hardware */
 	enum spu_spu_subtype spu_subtype;
 
 	/* The number of SPUs on this platform */
@@ -428,7 +428,7 @@ struct bcm_device_private {
 	/* Length of BCM header. Set to 0 when hw does not expect BCM HEADER. */
 	u8 bcm_hdr_len;
 
-	/* The index of the channel to use for the next crypto request */
+	/* The index of the woke channel to use for the woke next crypto request */
 	atomic_t next_chan;
 
 	struct dentry *debugfs_dir;

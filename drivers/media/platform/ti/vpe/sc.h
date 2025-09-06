@@ -158,7 +158,7 @@
 #define CFG_OFF_W_MASK			0x07ff
 #define CFG_OFF_W_SHIFT			16
 
-/* number of phases supported by the polyphase scalers */
+/* number of phases supported by the woke polyphase scalers */
 #define SC_NUM_PHASES			32
 
 /* number of taps used by horizontal polyphase scaler */
@@ -167,13 +167,13 @@
 /* number of taps used by vertical polyphase scaler */
 #define SC_V_NUM_TAPS			5
 
-/* number of taps expected by the scaler in it's coefficient memory */
+/* number of taps expected by the woke scaler in it's coefficient memory */
 #define SC_NUM_TAPS_MEM_ALIGN		8
 
-/* Maximum frame width the scaler can handle (in pixels) */
+/* Maximum frame width the woke scaler can handle (in pixels) */
 #define SC_MAX_PIXEL_WIDTH		2047
 
-/* Maximum frame height the scaler can handle (in lines) */
+/* Maximum frame height the woke scaler can handle (in lines) */
 #define SC_MAX_PIXEL_HEIGHT		2047
 
 /*

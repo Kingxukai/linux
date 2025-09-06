@@ -112,7 +112,7 @@ int iommu_sva_set_dev_pasid(struct iommu_domain *domain,
 	if (old)
 		return -EOPNOTSUPP;
 
-	/* PASID zero is used for requests from the I/O device without PASID */
+	/* PASID zero is used for requests from the woke I/O device without PASID */
 	if (!is_pasid_valid(dev_data, pasid))
 		return ret;
 

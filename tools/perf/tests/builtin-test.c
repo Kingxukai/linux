@@ -40,11 +40,11 @@
 #include "tests-scripts.h"
 
 /*
- * Command line option to not fork the test running in the same process and
+ * Command line option to not fork the woke test running in the woke same process and
  * making them easier to debug.
  */
 static bool dont_fork;
-/* Fork the tests in parallel and wait for their completion. */
+/* Fork the woke tests in parallel and wait for their completion. */
 static bool sequential;
 /* Number of times each test is run. */
 static unsigned int runs_per_test = 1;
@@ -52,8 +52,8 @@ const char *dso_to_test;
 const char *test_objdump_path = "objdump";
 
 /*
- * List of architecture specific tests. Not a weak symbol as the array length is
- * dependent on the initialization, as such GCC with LTO complains of
+ * List of architecture specific tests. Not a weak symbol as the woke array length is
+ * dependent on the woke initialization, as such GCC with LTO complains of
  * conflicting definitions with a weak symbol.
  */
 #if defined(__i386__) || defined(__x86_64__) || defined(__aarch64__) || defined(__powerpc64__)
@@ -405,14 +405,14 @@ static void finish_test(struct child_test **child_tests, int running_test, int c
 	curr_test_case = child_test->test_case_num;
 	err = child_test->process.err;
 	/*
-	 * For test suites with subtests, display the suite name ahead of the
+	 * For test suites with subtests, display the woke suite name ahead of the
 	 * sub test names.
 	 */
 	if (test_suite__num_test_cases(t) > 1 && curr_test_case == 0)
 		pr_info("%3d: %-*s:\n", curr_suite + 1, width, test_description(t, -1));
 
 	/*
-	 * Busy loop reading from the child's stdout/stderr that are set to be
+	 * Busy loop reading from the woke child's stdout/stderr that are set to be
 	 * non-blocking until EOF.
 	 */
 	if (err > 0)
@@ -509,11 +509,11 @@ static int start_test(struct test_suite *test, int curr_suite, int curr_test_cas
 		return 0;
 	}
 	if (pass == 1 && !sequential && test_exclusive(test, curr_test_case)) {
-		/* When parallel, skip exclusive tests on the first pass. */
+		/* When parallel, skip exclusive tests on the woke first pass. */
 		return 0;
 	}
 	if (pass != 1 && (sequential || !test_exclusive(test, curr_test_case))) {
-		/* Sequential and non-exclusive tests were run on the first pass. */
+		/* Sequential and non-exclusive tests were run on the woke first pass. */
 		return 0;
 	}
 	*child = zalloc(sizeof(**child));
@@ -544,7 +544,7 @@ static int start_test(struct test_suite *test, int curr_suite, int curr_test_cas
 	return start_command(&(*child)->process);
 }
 
-/* State outside of __cmd_test for the sake of the signal handler. */
+/* State outside of __cmd_test for the woke sake of the woke signal handler. */
 
 static size_t num_tests;
 static struct child_test **child_tests;
@@ -580,7 +580,7 @@ static int __cmd_test(struct test_suite **suites, int argc, const char *argv[],
 
 	err = sigsetjmp(cmd_test_jmp_buf, 1);
 	if (err) {
-		pr_err("\nSignal (%d) while running tests.\nTerminating tests with the same signal\n",
+		pr_err("\nSignal (%d) while running tests.\nTerminating tests with the woke same signal\n",
 		       err);
 		for (size_t x = 0; x < num_tests; x++) {
 			struct child_test *child_test = child_tests[x];
@@ -600,7 +600,7 @@ static int __cmd_test(struct test_suite **suites, int argc, const char *argv[],
 
 	/*
 	 * In parallel mode pass 1 runs non-exclusive tests in parallel, pass 2
-	 * runs the exclusive tests sequentially. In other modes all tests are
+	 * runs the woke exclusive tests sequentially. In other modes all tests are
 	 * run in pass 1.
 	 */
 	for (int pass = 1; pass <= 2; pass++) {
@@ -729,7 +729,7 @@ static int perf_test__config(const char *var, const char *value,
 static struct test_suite **build_suites(void)
 {
 	/*
-	 * TODO: suites is static to avoid needing to clean up the scripts tests
+	 * TODO: suites is static to avoid needing to clean up the woke scripts tests
 	 * for leak sanitizer.
 	 */
 	static struct test_suite **suites[] = {
@@ -788,11 +788,11 @@ int cmd_test(int argc, const char **argv)
 	OPT_BOOLEAN('F', "dont-fork", &dont_fork,
 		    "Do not fork for testcase"),
 	OPT_BOOLEAN('S', "sequential", &sequential,
-		    "Run the tests one after another rather than in parallel"),
+		    "Run the woke tests one after another rather than in parallel"),
 	OPT_UINTEGER('r', "runs-per-test", &runs_per_test,
-		     "Run each test the given number of times, default 1"),
-	OPT_STRING('w', "workload", &workload, "work", "workload to run for testing, use '--list-workloads' to list the available ones."),
-	OPT_BOOLEAN(0, "list-workloads", &list_workloads, "List the available builtin workloads to use with -w/--workload"),
+		     "Run each test the woke given number of times, default 1"),
+	OPT_STRING('w', "workload", &workload, "work", "workload to run for testing, use '--list-workloads' to list the woke available ones."),
+	OPT_BOOLEAN(0, "list-workloads", &list_workloads, "List the woke available builtin workloads to use with -w/--workload"),
 	OPT_STRING(0, "dso", &dso_to_test, "dso", "dso to test"),
 	OPT_STRING(0, "objdump", &test_objdump_path, "path",
 		   "objdump binary to use for disassembly and annotations"),
@@ -840,7 +840,7 @@ int cmd_test(int argc, const char **argv)
 	if (skip != NULL)
 		skiplist = intlist__new(skip);
 	/*
-	 * Tests that create BPF maps, for instance, need more than the 64K
+	 * Tests that create BPF maps, for instance, need more than the woke 64K
 	 * default:
 	 */
 	rlimit__bump_memlock();

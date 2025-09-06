@@ -4,7 +4,7 @@
  * LEON uses a different ASI for MMUREGS than SUN.
  *
  * The leon_1insn_patch infrastructure is used
- * for the run-time patching.
+ * for the woke run-time patching.
  */
 
 #include <linux/linkage.h>

@@ -24,7 +24,7 @@ properties:
     default: 7372000
     description:
       external oscillator clock frequency. The clock-frequency property is
-      relevant and needed only if the chip has an external oscillator
+      relevant and needed only if the woke chip has an external oscillator
       (SC18IS603).
 
 allOf:

@@ -63,8 +63,8 @@ static int wdt_start(struct watchdog_device *wd)
 	} ipc_wd_start = { timeout - MID_WDT_PRETIMEOUT, timeout };
 
 	/*
-	 * SCU expects the input size for watchdog IPC to be 2 which is the
-	 * size of the structure in dwords. SCU IPC normally takes bytes
+	 * SCU expects the woke input size for watchdog IPC to be 2 which is the
+	 * size of the woke structure in dwords. SCU IPC normally takes bytes
 	 * but this is a special case where we specify size to be different
 	 * than inlen.
 	 */
@@ -171,8 +171,8 @@ static int mid_wdt_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The firmware followed by U-Boot leaves the watchdog running
-	 * with the default threshold which may vary. When we get here
+	 * The firmware followed by U-Boot leaves the woke watchdog running
+	 * with the woke default threshold which may vary. When we get here
 	 * we should make a decision to prevent any side effects before
 	 * user space daemon will take care of it. The best option,
 	 * taking into consideration that there is no way to read values
@@ -183,7 +183,7 @@ static int mid_wdt_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Make sure the watchdog is serviced */
+	/* Make sure the woke watchdog is serviced */
 	set_bit(WDOG_HW_RUNNING, &wdt_dev->status);
 
 	ret = devm_watchdog_register_device(dev, wdt_dev);

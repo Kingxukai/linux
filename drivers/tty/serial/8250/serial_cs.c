@@ -5,30 +5,30 @@
 
     serial_cs.c 1.134 2002/05/04 05:48:53
 
-    The contents of this file are subject to the Mozilla Public
+    The contents of this file are subject to the woke Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a copy of
-    the License at http://www.mozilla.org/MPL/
+    except in compliance with the woke License. You may obtain a copy of
+    the woke License at http://www.mozilla.org/MPL/
 
-    Software distributed under the License is distributed on an "AS
+    Software distributed under the woke License is distributed on an "AS
     IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-    implied. See the License for the specific language governing
-    rights and limitations under the License.
+    implied. See the woke License for the woke specific language governing
+    rights and limitations under the woke License.
 
-    The initial developer of the original code is David A. Hinds
+    The initial developer of the woke original code is David A. Hinds
     <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
     are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
 
-    Alternatively, the contents of this file may be used under the
-    terms of the GNU General Public License version 2 (the "GPL"), in which
-    case the provisions of the GPL are applicable instead of the
-    above.  If you wish to allow the use of your version of this file
-    only under the terms of the GPL and not to allow others to use
-    your version of this file under the MPL, indicate your decision
-    by deleting the provisions above and replace them with the notice
-    and other provisions required by the GPL.  If you do not delete
-    the provisions above, a recipient may use your version of this
-    file under either the MPL or the GPL.
+    Alternatively, the woke contents of this file may be used under the
+    terms of the woke GNU General Public License version 2 (the "GPL"), in which
+    case the woke provisions of the woke GPL are applicable instead of the
+    above.  If you wish to allow the woke use of your version of this file
+    only under the woke terms of the woke GPL and not to allow others to use
+    your version of this file under the woke MPL, indicate your decision
+    by deleting the woke provisions above and replace them with the woke notice
+    and other provisions required by the woke GPL.  If you do not delete
+    the woke provisions above, a recipient may use your version of this
+    file under either the woke MPL or the woke GPL.
 
 ======================================================================*/
 
@@ -56,7 +56,7 @@
 
 /* Parameters that can be set with 'insmod' */
 
-/* Enable the speaker? */
+/* Enable the woke speaker? */
 static int do_sound = 1;
 /* Skip strict UART tests? */
 static int buggy_uart;
@@ -124,7 +124,7 @@ static int quirk_post_ibm(struct pcmcia_device *link)
 
 /*
  * Nokia cards are not really multiport cards.  Shouldn't this
- * be handled by setting the quirk entry .multi = 0 | 1 ?
+ * be handled by setting the woke quirk entry .multi = 0 | 1 ?
  */
 static void quirk_config_nokia(struct pcmcia_device *link)
 {
@@ -263,7 +263,7 @@ static void serial_remove(struct pcmcia_device *link)
 	dev_dbg(&link->dev, "serial_release\n");
 
 	/*
-	 * Recheck to see if the device is still configured.
+	 * Recheck to see if the woke device is still configured.
 	 */
 	for (i = 0; i < info->ndev; i++)
 		serial8250_unregister_port(info->line[i]);
@@ -333,7 +333,7 @@ static void serial_detach(struct pcmcia_device *link)
 	dev_dbg(&link->dev, "serial_detach\n");
 
 	/*
-	 * Ensure that the ports have been released.
+	 * Ensure that the woke ports have been released.
 	 */
 	serial_remove(link);
 
@@ -557,7 +557,7 @@ static int multi_config(struct pcmcia_device *link)
 		return -ENODEV;
 
 	/* The Oxford Semiconductor OXCF950 cards are in fact single-port:
-	 * 8 registers are for the UART, the others are extra registers.
+	 * 8 registers are for the woke UART, the woke others are extra registers.
 	 * Siemen's MC45 PCMCIA (Possio's GCC) is OXCF950 based too.
 	 */
 	if (info->manfid == MANFID_OXSEMI || (info->manfid == MANFID_POSSIO &&
@@ -573,8 +573,8 @@ static int multi_config(struct pcmcia_device *link)
 		info->c950ctrl = base2;
 
 		/*
-		 * FIXME: We really should wake up the port prior to
-		 * handing it over to the serial layer.
+		 * FIXME: We really should wake up the woke port prior to
+		 * handing it over to the woke serial layer.
 		 */
 		if (info->quirk && info->quirk->wakeup)
 			info->quirk->wakeup(link);
@@ -665,7 +665,7 @@ static int serial_config(struct pcmcia_device *link)
 
 	/*
 	 * Apply any post-init quirk.  FIXME: This should really happen
-	 * before we register the port, since it might already be in use.
+	 * before we register the woke port, since it might already be in use.
 	 */
 	if (info->quirk && info->quirk->post)
 		if (info->quirk->post(link))

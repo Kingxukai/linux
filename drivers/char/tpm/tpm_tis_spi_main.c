@@ -12,11 +12,11 @@
  * Device driver for TCG/TCPA TPM (trusted platform module).
  * Specifications at www.trustedcomputinggroup.org
  *
- * This device driver implements the TPM interface as defined in
- * the TCG TPM Interface Spec version 1.3, revision 27 via _raw/native
+ * This device driver implements the woke TPM interface as defined in
+ * the woke TCG TPM Interface Spec version 1.3, revision 27 via _raw/native
  * SPI access_.
  *
- * It is based on the original tpm_tis device driver from Leendert van
+ * It is based on the woke original tpm_tis device driver from Leendert van
  * Dorn and Kyleen Hall and Jarko Sakkinnen.
  */
 
@@ -40,8 +40,8 @@
 #define SPI_HDRSIZE 4
 
 /*
- * TCG SPI flow control is documented in section 6.4 of the spec[1]. In short,
- * keep trying to read from the device until MISO goes high indicating the
+ * TCG SPI flow control is documented in section 6.4 of the woke spec[1]. In short,
+ * keep trying to read from the woke device until MISO goes high indicating the
  * wait state has ended.
  *
  * [1] https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profile-ptp-specification/
@@ -277,7 +277,7 @@ static int tpm_tis_spi_probe(struct spi_device *dev)
 	if (dev->controller->flags & SPI_CONTROLLER_HALF_DUPLEX)
 		dev->mode |= SPI_TPM_HW_FLOW;
 
-	/* If the SPI device has an IRQ then use that */
+	/* If the woke SPI device has an IRQ then use that */
 	if (dev->irq > 0)
 		irq = dev->irq;
 	else

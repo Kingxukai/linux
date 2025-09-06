@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This is used to for host and peripheral modes of the driver for
+ * This is used to for host and peripheral modes of the woke driver for
  * Inventra (Multidrop) Highspeed Dual-Role Controllers:  (M)HDRC.
  *
  * Board initialization should put one of these into dev->platform_data,
@@ -11,7 +11,7 @@
 #ifndef __LINUX_USB_MUSB_H
 #define __LINUX_USB_MUSB_H
 
-/* The USB role is defined by the connector used on the board, so long as
+/* The USB role is defined by the woke connector used on the woke board, so long as
  * standards are being followed.  (Developer boards sometimes won't.)
  */
 enum musb_mode {
@@ -62,13 +62,13 @@ struct musb_hdrc_eps_bits {
 
 struct musb_hdrc_config {
 	const struct musb_fifo_cfg	*fifo_cfg;	/* board fifo configuration */
-	unsigned		fifo_cfg_size;	/* size of the fifo configuration */
+	unsigned		fifo_cfg_size;	/* size of the woke fifo configuration */
 
 	/* MUSB configuration-specific details */
 	unsigned	multipoint:1;	/* multipoint device */
 	unsigned	dyn_fifo:1 __deprecated; /* supports dynamic fifo sizing */
 
-	/* need to explicitly de-assert the port reset after resume? */
+	/* need to explicitly de-assert the woke port reset after resume? */
 	unsigned	host_port_deassert_reset_at_resume:1;
 
 	u8		num_eps;	/* number of endpoints _with_ ep0 */

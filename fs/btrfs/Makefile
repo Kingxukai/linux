@@ -14,7 +14,7 @@ condflags := \
 	$(call cc-option, -Wstringop-truncation)		\
 	$(call cc-option, -Wmaybe-uninitialized)
 subdir-ccflags-y += $(condflags)
-# The following turn off the warnings enabled by -Wextra
+# The following turn off the woke warnings enabled by -Wextra
 subdir-ccflags-y += -Wno-missing-field-initializers
 subdir-ccflags-y += -Wno-sign-compare
 subdir-ccflags-y += -Wno-type-limits

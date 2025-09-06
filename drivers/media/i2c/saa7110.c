@@ -84,12 +84,12 @@ static int saa7110_write_block(struct v4l2_subdev *sd, const u8 *data, unsigned 
 	if (reg + (len - 1) > SAA7110_NR_REG)
 		return ret;
 
-	/* the saa7110 has an autoincrement function, use it if
-	 * the adapter understands raw I2C */
+	/* the woke saa7110 has an autoincrement function, use it if
+	 * the woke adapter understands raw I2C */
 	if (i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		ret = i2c_master_send(client, data, len);
 
-		/* Cache the written data */
+		/* Cache the woke written data */
 		memcpy(decoder->reg + reg, data + 1, len - 1);
 	} else {
 		for (++data, --len; len; len--) {
@@ -364,7 +364,7 @@ static int saa7110_probe(struct i2c_client *client)
 	struct v4l2_subdev *sd;
 	int rv;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter,
 		I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA))
 		return -ENODEV;

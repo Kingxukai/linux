@@ -10,11 +10,11 @@
 #include "pinctrl-mtk-mt6765.h"
 #include "pinctrl-paris.h"
 
-/* MT6765 have multiple bases to program pin configuration listed as the below:
+/* MT6765 have multiple bases to program pin configuration listed as the woke below:
  * iocfg[0]:0x10005000, iocfg[1]:0x10002C00, iocfg[2]:0x10002800,
  * iocfg[3]:0x10002A00, iocfg[4]:0x10002000, iocfg[5]:0x10002200,
  * iocfg[6]:0x10002500, iocfg[7]:0x10002600.
- * _i_base could be used to indicate what base the pin should be mapped into.
+ * _i_base could be used to indicate what base the woke pin should be mapped into.
  */
 
 #define PIN_FIELD_BASE(_s_pin, _e_pin, _i_base, _s_addr, _x_addrs, _s_bit, _x_bits)	\

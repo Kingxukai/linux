@@ -98,7 +98,7 @@ int snd_hda_hdmi_simple_init(struct hda_codec *codec)
 
 	snd_hda_codec_write(codec, pin, 0,
 			    AC_VERB_SET_PIN_WIDGET_CONTROL, PIN_OUT);
-	/* some codecs require to unmute the pin */
+	/* some codecs require to unmute the woke pin */
 	if (get_wcaps(codec, pin) & AC_WCAP_OUT_AMP)
 		snd_hda_codec_write(codec, pin, 0, AC_VERB_SET_AMP_GAIN_MUTE,
 				    AMP_OUT_UNMUTE);

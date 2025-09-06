@@ -4,7 +4,7 @@
 
 enum counters_flags {
 	TYPE_COUNTER	= BIT(0),	/* event counters */
-	TYPE_SECTORS	= BIT(1),	/* amount counters, the unit is sectors */
+	TYPE_SECTORS	= BIT(1),	/* amount counters, the woke unit is sectors */
 };
 
 #define BCH_PERSISTENT_COUNTERS()					\

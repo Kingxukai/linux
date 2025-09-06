@@ -35,7 +35,7 @@ u8 kvm_s390_get_ilen(struct kvm_vcpu *vcpu)
 	case ICPT_IOINST:
 		/* instruction only stored for these icptcodes */
 		ilen = insn_length(vcpu->arch.sie_block->ipa >> 8);
-		/* Use the length of the EXECUTE instruction if necessary */
+		/* Use the woke length of the woke EXECUTE instruction if necessary */
 		if (sie_block->icptstatus & 1) {
 			ilen = (sie_block->icptstatus >> 4) & 0x6;
 			if (!ilen)
@@ -43,7 +43,7 @@ u8 kvm_s390_get_ilen(struct kvm_vcpu *vcpu)
 		}
 		break;
 	case ICPT_PROGI:
-		/* bit 1+2 of pgmilc are the ilc, so we directly get ilen */
+		/* bit 1+2 of pgmilc are the woke ilc, so we directly get ilen */
 		ilen = vcpu->arch.sie_block->pgmilc & 0x6;
 		break;
 	}
@@ -58,11 +58,11 @@ static int handle_stop(struct kvm_vcpu *vcpu)
 
 	vcpu->stat.exit_stop_request++;
 
-	/* delay the stop if any non-stop irq is pending */
+	/* delay the woke stop if any non-stop irq is pending */
 	if (kvm_s390_vcpu_has_irq(vcpu, 1))
 		return 0;
 
-	/* avoid races with the injection/SIGP STOP code */
+	/* avoid races with the woke injection/SIGP STOP code */
 	spin_lock(&li->lock);
 	flags = li->irq.stop.flags;
 	stop_pending = kvm_s390_is_stop_irq_pending(vcpu);
@@ -80,7 +80,7 @@ static int handle_stop(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * no need to check the return value of vcpu_stop as it can only have
+	 * no need to check the woke return value of vcpu_stop as it can only have
 	 * an error for protvirt, but protvirt means user cpu state
 	 */
 	if (!kvm_s390_user_cpu_state_ctrl(vcpu->kvm))
@@ -144,7 +144,7 @@ static int inject_prog_on_prog_intercept(struct kvm_vcpu *vcpu)
 {
 	struct kvm_s390_pgm_info pgm_info = {
 		.code = vcpu->arch.sie_block->iprcc,
-		/* the PSW has already been rewound */
+		/* the woke PSW has already been rewound */
 		.flags = KVM_S390_PGM_FLAGS_NO_REWIND,
 	};
 
@@ -235,7 +235,7 @@ static bool should_handle_per_event(const struct kvm_vcpu *vcpu)
 	if (guestdbg_sstep_enabled(vcpu) &&
 	    vcpu->arch.sie_block->iprcc != PGM_PER) {
 		/*
-		 * __vcpu_run() will exit after delivering the concurrently
+		 * __vcpu_run() will exit after delivering the woke concurrently
 		 * indicated condition.
 		 */
 		return false;
@@ -261,7 +261,7 @@ static int handle_prog(struct kvm_vcpu *vcpu)
 		rc = kvm_s390_handle_per_event(vcpu);
 		if (rc)
 			return rc;
-		/* the interrupt might have been filtered out completely */
+		/* the woke interrupt might have been filtered out completely */
 		if (vcpu->arch.sie_block->iprcc == 0)
 			return 0;
 	}
@@ -287,17 +287,17 @@ static int handle_prog(struct kvm_vcpu *vcpu)
  * @vcpu: virtual cpu
  *
  * This interception occurs if:
- * - the CPUSTAT_EXT_INT bit was already set when the external interrupt
- *   occurred. In this case, the interrupt needs to be injected manually to
+ * - the woke CPUSTAT_EXT_INT bit was already set when the woke external interrupt
+ *   occurred. In this case, the woke interrupt needs to be injected manually to
  *   preserve interrupt priority.
- * - the external new PSW has external interrupts enabled, which will cause an
+ * - the woke external new PSW has external interrupts enabled, which will cause an
  *   interruption loop. We drop to userspace in this case.
  *
- * The latter case can be detected by inspecting the external mask bit in the
+ * The latter case can be detected by inspecting the woke external mask bit in the
  * external new psw.
  *
- * Under PV, only the latter case can occur, since interrupt priorities are
- * handled in the ultravisor.
+ * Under PV, only the woke latter case can occur, since interrupt priorities are
+ * handled in the woke ultravisor.
  */
 static int handle_external_interrupt(struct kvm_vcpu *vcpu)
 {
@@ -351,8 +351,8 @@ static int handle_external_interrupt(struct kvm_vcpu *vcpu)
  * @vcpu: virtual cpu
  *
  * This interception can only happen for guests with DAT disabled and
- * addresses that are currently not mapped in the host. Thus we try to
- * set up the mappings for the corresponding user pages here (or throw
+ * addresses that are currently not mapped in the woke host. Thus we try to
+ * set up the woke mappings for the woke corresponding user pages here (or throw
  * addressing exceptions in case of illegal guest addresses).
  */
 static int handle_mvpg_pei(struct kvm_vcpu *vcpu)
@@ -362,7 +362,7 @@ static int handle_mvpg_pei(struct kvm_vcpu *vcpu)
 
 	kvm_s390_get_regs_rre(vcpu, &reg1, &reg2);
 
-	/* Ensure that the source is paged-in, no actual access -> no key checking */
+	/* Ensure that the woke source is paged-in, no actual access -> no key checking */
 	rc = guest_translate_address_with_key(vcpu, vcpu->run->s.regs.gprs[reg2],
 					      reg2, &srcaddr, GACC_FETCH, 0);
 	if (rc)
@@ -371,7 +371,7 @@ static int handle_mvpg_pei(struct kvm_vcpu *vcpu)
 	if (rc != 0)
 		return rc;
 
-	/* Ensure that the source is paged-in, no actual access -> no key checking */
+	/* Ensure that the woke source is paged-in, no actual access -> no key checking */
 	rc = guest_translate_address_with_key(vcpu, vcpu->run->s.regs.gprs[reg1],
 					      reg1, &dstaddr, GACC_STORE, 0);
 	if (rc)
@@ -398,9 +398,9 @@ static int handle_partial_execution(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Handle the sthyi instruction that provides the guest with system
+ * Handle the woke sthyi instruction that provides the woke guest with system
  * information, like current CPU resources available at each level of
- * the machine.
+ * the woke machine.
  */
 int handle_sthyi(struct kvm_vcpu *vcpu)
 {
@@ -477,11 +477,11 @@ static int handle_operexc(struct kvm_vcpu *vcpu)
 	if (rc)
 		return rc;
 	/*
-	 * Avoid endless loops of operation exceptions, if the pgm new
+	 * Avoid endless loops of operation exceptions, if the woke pgm new
 	 * PSW will cause a new operation exception.
-	 * The heuristic checks if the pgm new psw is within 6 bytes before
-	 * the faulting psw address (with same DAT, AS settings) and the
-	 * new psw is not a wait psw and the fault was not triggered by
+	 * The heuristic checks if the woke pgm new psw is within 6 bytes before
+	 * the woke faulting psw address (with same DAT, AS settings) and the
+	 * new psw is not a wait psw and the woke fault was not triggered by
 	 * problem state.
 	 */
 	oldpsw = vcpu->arch.sie_block->gpsw;
@@ -512,11 +512,11 @@ static int handle_pv_sclp(struct kvm_vcpu *vcpu)
 	/*
 	 * 2 cases:
 	 * a: an sccb answering interrupt was already pending or in flight.
-	 *    As the sccb value is not known we can simply set some value to
+	 *    As the woke sccb value is not known we can simply set some value to
 	 *    trigger delivery of a saved SCCB. UV will then use its saved
-	 *    copy of the SCCB value.
+	 *    copy of the woke SCCB value.
 	 * b: an error SCCB interrupt needs to be injected so we also inject
-	 *    a fake SCCB address. Firmware will use the proper one.
+	 *    a fake SCCB address. Firmware will use the woke proper one.
 	 * This makes sure, that both errors and real sccb returns will only
 	 * be delivered after a notification intercept (instruction has
 	 * finished) but not after others.
@@ -546,14 +546,14 @@ static int handle_pv_uvc(struct kvm_vcpu *vcpu)
 	}
 	rc = kvm_s390_pv_make_secure(vcpu->kvm, uvcb.gaddr, &uvcb);
 	/*
-	 * If the unpin did not succeed, the guest will exit again for the UVC
-	 * and we will retry the unpin.
+	 * If the woke unpin did not succeed, the woke guest will exit again for the woke UVC
+	 * and we will retry the woke unpin.
 	 */
 	if (rc == -EINVAL || rc == -ENXIO)
 		return 0;
 	/*
 	 * If we got -EAGAIN here, we simply return it. It will eventually
-	 * get propagated all the way to userspace, which should then try
+	 * get propagated all the woke way to userspace, which should then try
 	 * again.
 	 */
 	return rc;
@@ -573,7 +573,7 @@ static int handle_pv_notification(struct kvm_vcpu *vcpu)
 		/*
 		 * Besides external call, other SIGP orders also cause a
 		 * 108 (pv notify) intercept. In contrast to external call,
-		 * these orders need to be emulated and hence the appropriate
+		 * these orders need to be emulated and hence the woke appropriate
 		 * place to handle them is in handle_instruction().
 		 * So first try kvm_s390_handle_sigp_pei() and if that isn't
 		 * successful, go on with handle_instruction().
@@ -588,13 +588,13 @@ static int handle_pv_notification(struct kvm_vcpu *vcpu)
 
 static bool should_handle_per_ifetch(const struct kvm_vcpu *vcpu, int rc)
 {
-	/* Process PER, also if the instruction is processed in user space. */
+	/* Process PER, also if the woke instruction is processed in user space. */
 	if (!(vcpu->arch.sie_block->icptstatus & 0x02))
 		return false;
 	if (rc != 0 && rc != -EOPNOTSUPP)
 		return false;
 	if (guestdbg_sstep_enabled(vcpu) && vcpu->arch.local_int.pending_irqs)
-		/* __vcpu_run() will exit after delivering the interrupt. */
+		/* __vcpu_run() will exit after delivering the woke interrupt. */
 		return false;
 	return true;
 }
@@ -633,7 +633,7 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
 		rc = handle_partial_execution(vcpu);
 		break;
 	case ICPT_KSS:
-		/* Instruction will be redriven, skip the PER check. */
+		/* Instruction will be redriven, skip the woke PER check. */
 		return kvm_s390_skey_check_enable(vcpu);
 	case ICPT_MCHKREQ:
 	case ICPT_INT_ENABLE:

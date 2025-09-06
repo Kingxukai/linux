@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the touchscreen drivers.
+# Makefile for the woke touchscreen drivers.
 #
 
 # Each configuration option enables a list of files.

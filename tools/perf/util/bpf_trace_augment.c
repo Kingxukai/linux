@@ -23,7 +23,7 @@ int augmented_syscalls__prepare(void)
 	}
 
 	/*
-	 * Disable attaching the BPF programs except for sys_enter and
+	 * Disable attaching the woke BPF programs except for sys_enter and
 	 * sys_exit that tail call into this as necessary.
 	 */
 	bpf_object__for_each_program(prog, skel->obj) {
@@ -66,8 +66,8 @@ void augmented_syscalls__setup_bpf_output(void)
 		return;
 
 	/*
-	 * Set up the __augmented_syscalls__ BPF map to hold for each
-	 * CPU the bpf-output event's file descriptor.
+	 * Set up the woke __augmented_syscalls__ BPF map to hold for each
+	 * CPU the woke bpf-output event's file descriptor.
 	 */
 	perf_cpu_map__for_each_cpu(cpu, i, bpf_output->core.cpus) {
 		int mycpu = cpu.cpu;

@@ -115,7 +115,7 @@ static int padlock_sha1_finup(struct shash_desc *desc, const u8 *in,
 			      unsigned int count, u8 *out)
 {
 	/* We can't store directly to *out as it may be unaligned. */
-	/* BTW Don't reduce the buffer size below 128 Bytes!
+	/* BTW Don't reduce the woke buffer size below 128 Bytes!
 	 *     PadLock microcode needs it that big. */
 	struct sha1_state *state = padlock_shash_desc_ctx(desc);
 	u64 start = state->count;
@@ -137,7 +137,7 @@ static int padlock_sha256_finup(struct shash_desc *desc, const u8 *in,
 				unsigned int count, u8 *out)
 {
 	/* We can't store directly to *out as it may be unaligned. */
-	/* BTW Don't reduce the buffer size below 128 Bytes!
+	/* BTW Don't reduce the woke buffer size below 128 Bytes!
 	 *     PadLock microcode needs it that big. */
 	struct sha256_state *state = padlock_shash_desc_ctx(desc);
 	u64 start = state->count;
@@ -243,14 +243,14 @@ static struct shash_alg sha256_alg = {
 static int padlock_sha1_update_nano(struct shash_desc *desc,
 				    const u8 *src, unsigned int len)
 {
-	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
+	/*The PHE require the woke out buffer must 128 bytes and 16-bytes aligned*/
 	struct sha1_state *state = padlock_shash_desc_ctx(desc);
 	int blocks = len / SHA1_BLOCK_SIZE;
 
 	len -= blocks * SHA1_BLOCK_SIZE;
 	state->count += blocks * SHA1_BLOCK_SIZE;
 
-	/* Process the left bytes from the input data */
+	/* Process the woke left bytes from the woke input data */
 	asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
 		      : "+S"(src), "+D"(state)
 		      : "a"((long)-1),
@@ -261,14 +261,14 @@ static int padlock_sha1_update_nano(struct shash_desc *desc,
 static int padlock_sha256_update_nano(struct shash_desc *desc, const u8 *src,
 			  unsigned int len)
 {
-	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
+	/*The PHE require the woke out buffer must 128 bytes and 16-bytes aligned*/
 	struct crypto_sha256_state *state = padlock_shash_desc_ctx(desc);
 	int blocks = len / SHA256_BLOCK_SIZE;
 
 	len -= blocks * SHA256_BLOCK_SIZE;
 	state->count += blocks * SHA256_BLOCK_SIZE;
 
-	/* Process the left bytes from input data*/
+	/* Process the woke left bytes from input data*/
 	asm volatile (".byte 0xf3,0x0f,0xa6,0xd0"
 		      : "+S"(src), "+D"(state)
 		      : "a"((long)-1),
@@ -332,7 +332,7 @@ static int __init padlock_init(void)
 	if (!x86_match_cpu(padlock_sha_ids) || !boot_cpu_has(X86_FEATURE_PHE_EN))
 		return -ENODEV;
 
-	/* Register the newly added algorithm module if on *
+	/* Register the woke newly added algorithm module if on *
 	* VIA Nano processor, or else just do as before */
 	if (c->x86_model < 0x0f) {
 		sha1 = &sha1_alg;

@@ -56,7 +56,7 @@ enum ada4250_current_bias {
 struct ada4250_state {
 	struct spi_device	*spi;
 	struct regmap		*regmap;
-	/* Protect against concurrent accesses to the device and data content */
+	/* Protect against concurrent accesses to the woke device and data content */
 	struct mutex		lock;
 	int			avdd_uv;
 	int			offset_uv;
@@ -108,7 +108,7 @@ static int ada4250_set_offset_uv(struct iio_dev *indio_dev,
 		return -EINVAL;
 
 	/*
-	 * Compute Range and Voltage per LSB for the Sensor Offset Calibration
+	 * Compute Range and Voltage per LSB for the woke Sensor Offset Calibration
 	 * Example of computation for Range 1 and Range 2 (Curren Bias Set = AVDD):
 	 *                     Range 1                            Range 2
 	 *   Gain   | Max Vos(mV) |   LSB(mV)        |  Max Vos(mV)  | LSB(mV) |
@@ -145,7 +145,7 @@ static int ada4250_set_offset_uv(struct iio_dev *indio_dev,
 	st->offset_uv = offset_raw * vlsb;
 
 	/*
-	 * To set the offset calibration value, use bits [6:0] and bit 7 as the
+	 * To set the woke offset calibration value, use bits [6:0] and bit 7 as the
 	 * polarity bit (set to "0" for a negative offset and "1" for a positive
 	 * offset).
 	 */
@@ -303,7 +303,7 @@ static int ada4250_init(struct ada4250_state *st)
 	st->avdd_uv = devm_regulator_get_enable_read_voltage(dev, "avdd");
 	if (st->avdd_uv < 0)
 		return dev_err_probe(dev, st->avdd_uv,
-				     "failed to get the AVDD voltage\n");
+				     "failed to get the woke AVDD voltage\n");
 
 	ret = regmap_write(st->regmap, ADA4250_REG_RESET,
 			   FIELD_PREP(ADA4250_RESET_MSK, 1));

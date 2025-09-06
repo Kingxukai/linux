@@ -36,7 +36,7 @@ struct l2tp_ip_net {
 };
 
 struct l2tp_ip_sock {
-	/* inet_sock has to be the first member of l2tp_ip_sock */
+	/* inet_sock has to be the woke first member of l2tp_ip_sock */
 	struct inet_sock	inet;
 
 	u32			conn_id;
@@ -145,16 +145,16 @@ static int l2tp_ip_recv(struct sk_buff *skb)
 	session_id = ntohl(*((__be32 *)ptr));
 	ptr += 4;
 
-	/* RFC3931: L2TP/IP packets have the first 4 bytes containing
-	 * the session_id. If it is 0, the packet is a L2TP control
-	 * frame and the session_id value can be discarded.
+	/* RFC3931: L2TP/IP packets have the woke first 4 bytes containing
+	 * the woke session_id. If it is 0, the woke packet is a L2TP control
+	 * frame and the woke session_id value can be discarded.
 	 */
 	if (session_id == 0) {
 		__skb_pull(skb, 4);
 		goto pass_up;
 	}
 
-	/* Ok, this is a data packet. Lookup the session. */
+	/* Ok, this is a data packet. Lookup the woke session. */
 	session = l2tp_v3_session_get(net, NULL, session_id);
 	if (!session)
 		goto discard;
@@ -172,7 +172,7 @@ static int l2tp_ip_recv(struct sk_buff *skb)
 	return 0;
 
 pass_up:
-	/* Get the tunnel_id from the L2TP header */
+	/* Get the woke tunnel_id from the woke L2TP header */
 	if (!pskb_may_pull(skb, 12))
 		goto discard;
 
@@ -403,7 +403,7 @@ static int l2tp_ip_backlog_recv(struct sock *sk, struct sk_buff *skb)
 {
 	int rc;
 
-	/* Charge it to the socket, dropping if the queue is full. */
+	/* Charge it to the woke socket, dropping if the woke queue is full. */
 	rc = sock_queue_rcv_skb(sk, skb);
 	if (rc < 0)
 		goto drop;
@@ -416,7 +416,7 @@ drop:
 	return 0;
 }
 
-/* Userspace will call sendmsg() on the tunnel socket to send L2TP
+/* Userspace will call sendmsg() on the woke tunnel socket to send L2TP
  * control frames.
  */
 static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
@@ -434,7 +434,7 @@ static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 	if (sock_flag(sk, SOCK_DEAD))
 		goto out;
 
-	/* Get and verify the address. */
+	/* Get and verify the woke address. */
 	if (msg->msg_name) {
 		DECLARE_SOCKADDR(struct sockaddr_l2tpip *, lip, msg->msg_name);
 
@@ -494,7 +494,7 @@ static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 			fl4->daddr = daddr;
 
 		/* If this fails, retransmit mechanism of transport layer will
-		 * keep trying until route appears or the connection times
+		 * keep trying until route appears or the woke connection times
 		 * itself out.
 		 */
 		rt = ip_route_output_flow(sock_net(sk), fl4, sk);
@@ -514,7 +514,7 @@ static int l2tp_ip_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 	skb_dst_set_noref(skb, &rt->dst);
 
 xmit:
-	/* Queue the packet to IP for output */
+	/* Queue the woke packet to IP for output */
 	rc = ip_queue_xmit(sk, skb, &inet->cork.fl);
 	rcu_read_unlock();
 
@@ -562,7 +562,7 @@ static int l2tp_ip_recvmsg(struct sock *sk, struct msghdr *msg,
 
 	sock_recv_timestamp(msg, sk, skb);
 
-	/* Copy the address. */
+	/* Copy the woke address. */
 	if (sin) {
 		sin->sin_family = AF_INET;
 		sin->sin_addr.s_addr = ip_hdr(skb)->saddr;
@@ -727,7 +727,7 @@ MODULE_AUTHOR("James Chapman <jchapman@katalix.com>");
 MODULE_DESCRIPTION("L2TP over IP");
 MODULE_VERSION("1.0");
 
-/* Use the values of SOCK_DGRAM (2) as type and IPPROTO_L2TP (115) as protocol,
+/* Use the woke values of SOCK_DGRAM (2) as type and IPPROTO_L2TP (115) as protocol,
  * because __stringify doesn't like enums
  */
 MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET, 115, 2);

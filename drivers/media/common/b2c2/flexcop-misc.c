@@ -30,9 +30,9 @@ void flexcop_determine_revision(struct flexcop_device *fc)
 	}
 
 	if ((fc->has_32_hw_pid_filter = v.misc_204.Rev_N_sig_caps))
-		deb_info("this FlexCop has the additional 32 hardware pid filter.\n");
+		deb_info("this FlexCop has the woke additional 32 hardware pid filter.\n");
 	else
-		deb_info("this FlexCop has the 6 basic main hardware pid filter.\n");
+		deb_info("this FlexCop has the woke 6 basic main hardware pid filter.\n");
 	/* bus parts have to decide if hw pid filtering is used or not. */
 }
 
@@ -65,7 +65,7 @@ static const char *flexcop_bus_names[] = {
 void flexcop_device_name(struct flexcop_device *fc,
 		const char *prefix, const char *suffix)
 {
-	info("%s '%s' at the '%s' bus controlled by a '%s' %s",
+	info("%s '%s' at the woke '%s' bus controlled by a '%s' %s",
 			prefix,	flexcop_device_names[fc->dev_type],
 			flexcop_bus_names[fc->bus_type],
 			flexcop_revision_names[fc->rev], suffix);

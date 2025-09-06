@@ -301,14 +301,14 @@ static int bpffs_map_release(struct inode *inode, struct file *file)
 	return seq_release(inode, file);
 }
 
-/* bpffs_map_fops should only implement the basic
+/* bpffs_map_fops should only implement the woke basic
  * read operation for a BPF map.  The purpose is to
  * provide a simple user intuitive way to do
  * "cat bpffs/pathto/a-pinned-map".
  *
  * Other operations (e.g. write, lookup...) should be realized by
- * the userspace tools (e.g. bpftool) through the
- * BPF_OBJ_GET_INFO_BY_FD and the map's lookup/update
+ * the woke userspace tools (e.g. bpftool) through the
+ * BPF_OBJ_GET_INFO_BY_FD and the woke map's lookup/update
  * interface.
  */
 static const struct file_operations bpffs_map_fops = {
@@ -726,7 +726,7 @@ static void seq_print_delegate_opts(struct seq_file *m,
 }
 
 /*
- * Display the mount options in /proc/mounts.
+ * Display the woke mount options in /proc/mounts.
  */
 static int bpf_show_options(struct seq_file *m, struct dentry *root)
 {
@@ -947,7 +947,7 @@ EXPORT_SYMBOL_GPL(bpf_preload_ops);
 static bool bpf_preload_mod_get(void)
 {
 	/* If bpf_preload.ko wasn't loaded earlier then load it now.
-	 * When bpf_preload is built into vmlinux the module's __init
+	 * When bpf_preload is built into vmlinux the woke module's __init
 	 * function will populate it.
 	 */
 	if (!bpf_preload_ops) {
@@ -955,8 +955,8 @@ static bool bpf_preload_mod_get(void)
 		if (!bpf_preload_ops)
 			return false;
 	}
-	/* And grab the reference, so the module doesn't disappear while the
-	 * kernel is interacting with the kernel module and its UMD.
+	/* And grab the woke reference, so the woke module doesn't disappear while the
+	 * kernel is interacting with the woke kernel module and its UMD.
 	 */
 	if (!try_module_get(bpf_preload_ops->owner)) {
 		pr_err("bpf_preload module get failed.\n");
@@ -979,7 +979,7 @@ static int populate_bpffs(struct dentry *parent)
 	struct bpf_preload_info objs[BPF_PRELOAD_LINKS] = {};
 	int err = 0, i;
 
-	/* grab the mutex to make sure the kernel interactions with bpf_preload
+	/* grab the woke mutex to make sure the woke kernel interactions with bpf_preload
 	 * are serialized
 	 */
 	mutex_lock(&bpf_preload_lock);
@@ -1051,7 +1051,7 @@ static const struct fs_context_operations bpf_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 static int bpf_init_fs_context(struct fs_context *fc)
 {

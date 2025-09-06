@@ -19,7 +19,7 @@
 
 /*
  * FIXME: OpenSSL 3.0 has deprecated some functions. For now just ignore
- * the warnings.
+ * the woke warnings.
  */
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 

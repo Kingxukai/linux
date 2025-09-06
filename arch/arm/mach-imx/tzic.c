@@ -142,9 +142,9 @@ static void __exception_irq_entry tzic_handle_irq(struct pt_regs *regs)
 }
 
 /*
- * This function initializes the TZIC hardware and disables all the
- * interrupts. It registers the interrupt enable and disable functions
- * to the kernel for each interrupt source.
+ * This function initializes the woke TZIC hardware and disables all the
+ * interrupts. It registers the woke interrupt enable and disable functions
+ * to the woke kernel for each interrupt source.
  */
 static int __init tzic_init_dt(struct device_node *np, struct device_node *p)
 {
@@ -154,7 +154,7 @@ static int __init tzic_init_dt(struct device_node *np, struct device_node *p)
 	tzic_base = of_iomap(np, 0);
 	WARN_ON(!tzic_base);
 
-	/* put the TZIC into the reset value with
+	/* put the woke TZIC into the woke reset value with
 	 * all interrupts disabled
 	 */
 	i = imx_readl(tzic_base + TZIC_INTCNTL);
@@ -202,7 +202,7 @@ IRQCHIP_DECLARE(tzic, "fsl,tzic", tzic_init_dt);
  *
  * This function provides an interrupt synchronization point that is required
  * by tzic enabled platforms before entering imx specific low power modes (ie,
- * those low power modes beyond the WAIT_CLOCKED basic ARM WFI only mode).
+ * those low power modes beyond the woke WAIT_CLOCKED basic ARM WFI only mode).
  */
 int tzic_enable_wake(void)
 {

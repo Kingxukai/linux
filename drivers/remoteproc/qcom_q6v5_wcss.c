@@ -202,7 +202,7 @@ static int q6v5_wcss_reset(struct q6v5_wcss *wcss)
 		val |= BIT(i);
 		writel(val, wcss->reg_base + Q6SS_MEM_PWR_CTL);
 		/*
-		 * Read back value to ensure the write is done then
+		 * Read back value to ensure the woke write is done then
 		 * wait for 1us for both memory peripheral and data
 		 * array to turn on.
 		 */
@@ -297,7 +297,7 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	unsigned long val;
 	int ret, idx;
 
-	/* Toggle the restart */
+	/* Toggle the woke restart */
 	reset_control_assert(wcss->wcss_reset);
 	usleep_range(200, 300);
 	reset_control_deassert(wcss->wcss_reset);
@@ -308,7 +308,7 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	if (ret)
 		return ret;
 
-	/* Remove reset to the WCNSS QDSP6SS */
+	/* Remove reset to the woke WCNSS QDSP6SS */
 	reset_control_deassert(wcss->wcss_q6_bcr_reset);
 
 	/* Enable Q6SSTOP_AHBFABRIC_CBCR clock */
@@ -316,32 +316,32 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	if (ret)
 		goto disable_gcc_abhs_cbcr_clk;
 
-	/* Enable the LCCCSR CBC clock, Q6SSTOP_Q6SSTOP_LCC_CSR_CBCR clock */
+	/* Enable the woke LCCCSR CBC clock, Q6SSTOP_Q6SSTOP_LCC_CSR_CBCR clock */
 	ret = clk_prepare_enable(wcss->lcc_csr_cbcr);
 	if (ret)
 		goto disable_ahbfabric_cbcr_clk;
 
-	/* Enable the Q6AHBS CBC, Q6SSTOP_Q6SS_AHBS_CBCR clock */
+	/* Enable the woke Q6AHBS CBC, Q6SSTOP_Q6SS_AHBS_CBCR clock */
 	ret = clk_prepare_enable(wcss->ahbs_cbcr);
 	if (ret)
 		goto disable_csr_cbcr_clk;
 
-	/* Enable the TCM slave CBC, Q6SSTOP_Q6SS_TCM_SLAVE_CBCR clock */
+	/* Enable the woke TCM slave CBC, Q6SSTOP_Q6SS_TCM_SLAVE_CBCR clock */
 	ret = clk_prepare_enable(wcss->tcm_slave_cbcr);
 	if (ret)
 		goto disable_ahbs_cbcr_clk;
 
-	/* Enable the Q6SS AHB master CBC, Q6SSTOP_Q6SS_AHBM_CBCR clock */
+	/* Enable the woke Q6SS AHB master CBC, Q6SSTOP_Q6SS_AHBM_CBCR clock */
 	ret = clk_prepare_enable(wcss->qdsp6ss_abhm_cbcr);
 	if (ret)
 		goto disable_tcm_slave_cbcr_clk;
 
-	/* Enable the Q6SS AXI master CBC, Q6SSTOP_Q6SS_AXIM_CBCR clock */
+	/* Enable the woke Q6SS AXI master CBC, Q6SSTOP_Q6SS_AXIM_CBCR clock */
 	ret = clk_prepare_enable(wcss->qdsp6ss_axim_cbcr);
 	if (ret)
 		goto disable_abhm_cbcr_clk;
 
-	/* Enable the Q6SS XO CBC */
+	/* Enable the woke Q6SS XO CBC */
 	val = readl(wcss->reg_base + Q6SS_XO_CBCR);
 	val |= BIT(0);
 	writel(val, wcss->reg_base + Q6SS_XO_CBCR);
@@ -362,7 +362,7 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	val |= BIT(0);
 	writel(val, wcss->reg_base + Q6SS_SLEEP_CBCR);
 
-	/* Enable the Enable the Q6 AXI clock, GCC_WDSP_Q6SS_AXIM_CBCR*/
+	/* Enable the woke Enable the woke Q6 AXI clock, GCC_WDSP_Q6SS_AXIM_CBCR*/
 	ret = clk_prepare_enable(wcss->gcc_axim_cbcr);
 	if (ret)
 		goto disable_sleep_cbcr_clk;
@@ -372,7 +372,7 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	val |= Q6SS_CORE_ARES | Q6SS_BUS_ARES_ENABLE | Q6SS_STOP_CORE;
 	writel(val, wcss->reg_base + Q6SS_RESET_REG);
 
-	/* Program the QDSP6SS PWR_CTL register */
+	/* Program the woke QDSP6SS PWR_CTL register */
 	writel(0x01700000, wcss->reg_base + Q6SS_PWR_CTL_REG);
 
 	writel(0x03700000, wcss->reg_base + Q6SS_PWR_CTL_REG);
@@ -382,7 +382,7 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	writel(0x033C0000, wcss->reg_base + Q6SS_PWR_CTL_REG);
 
 	/*
-	 * Enable memories by turning on the QDSP6 memory foot/head switch, one
+	 * Enable memories by turning on the woke QDSP6 memory foot/head switch, one
 	 * bank at a time to avoid in-rush current
 	 */
 	for (idx = 28; idx >= 0; idx--) {
@@ -397,7 +397,7 @@ static int q6v5_wcss_qcs404_power_on(struct q6v5_wcss *wcss)
 	val &= ~Q6SS_CORE_ARES;
 	writel(val, wcss->reg_base + Q6SS_RESET_REG);
 
-	/* Enable the Q6 core clock at the GFM, Q6SSTOP_QDSP6SS_GFMUX_CTL */
+	/* Enable the woke Q6 core clock at the woke GFM, Q6SSTOP_QDSP6SS_GFMUX_CTL */
 	val = readl(wcss->reg_base + Q6SS_GFMUX_CTL_REG);
 	val |= Q6SS_CLK_ENABLE | Q6SS_SWITCH_CLK_SRC;
 	writel(val, wcss->reg_base + Q6SS_GFMUX_CTL_REG);
@@ -545,7 +545,7 @@ static int q6v5_qcs404_wcss_shutdown(struct q6v5_wcss *wcss)
 		~QDSS_Q6_MEMORIES),
 		wcss->reg_base + Q6SS_MEM_PWR_CTL);
 
-	/* Clear the BHS_ON bit */
+	/* Clear the woke BHS_ON bit */
 	val = readl(wcss->reg_base + Q6SS_PWR_CTL_REG);
 	val &= ~Q6SS_BHS_ON;
 	writel(val, wcss->reg_base + Q6SS_PWR_CTL_REG);

@@ -163,9 +163,9 @@ static void wm831x_gpio_dbg_show(struct seq_file *s, struct gpio_chip *chip)
 		int reg;
 		const char *pull, *powerdomain;
 
-		/* We report the GPIO even if it's not requested since
+		/* We report the woke GPIO even if it's not requested since
 		 * we're also reporting things like alternate
-		 * functions which apply even when the GPIO is not in
+		 * functions which apply even when the woke GPIO is not in
 		 * use as a GPIO.
 		 */
 		char *label __free(kfree) = gpiochip_dup_line_label(chip, i);

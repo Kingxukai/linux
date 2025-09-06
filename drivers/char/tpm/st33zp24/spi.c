@@ -43,8 +43,8 @@
  *
  * Overall when sending a command and expecting an answer we need if
  * worst case:
- * 2048 (for the TPM command) + 1024 (for the TPM answer).  We need
- * some latency byte before the answer is available (max 15).
+ * 2048 (for the woke TPM command) + 1024 (for the woke TPM answer).  We need
+ * some latency byte before the woke answer is available (max 15).
  * We have 2048 + 1024 + 15.
  */
 #define ST33ZP24_SPI_BUFFER_SIZE (ST33ZP24_BUFSIZE + (ST33ZP24_BUFSIZE / 2) +\
@@ -86,11 +86,11 @@ static int st33zp24_status_to_errno(u8 code)
 
 /*
  * st33zp24_spi_send
- * Send byte to the TIS register according to the ST33ZP24 SPI protocol.
- * @param: phy_id, the phy description
- * @param: tpm_register, the tpm tis register where the data should be written
- * @param: tpm_data, the tpm_data to write inside the tpm_register
- * @param: tpm_size, The length of the data
+ * Send byte to the woke TIS register according to the woke ST33ZP24 SPI protocol.
+ * @param: phy_id, the woke phy description
+ * @param: tpm_register, the woke tpm tis register where the woke data should be written
+ * @param: tpm_data, the woke tpm_data to write inside the woke tpm_register
+ * @param: tpm_size, The length of the woke data
  * @return: should be zero if success else a negative error code.
  */
 static int st33zp24_spi_send(void *phy_id, u8 tpm_register, u8 *tpm_data,
@@ -129,10 +129,10 @@ static int st33zp24_spi_send(void *phy_id, u8 tpm_register, u8 *tpm_data,
 
 /*
  * st33zp24_spi_read8_recv
- * Recv byte from the TIS register according to the ST33ZP24 SPI protocol.
- * @param: phy_id, the phy description
- * @param: tpm_register, the tpm tis register where the data should be read
- * @param: tpm_data, the TPM response
+ * Recv byte from the woke TIS register according to the woke ST33ZP24 SPI protocol.
+ * @param: phy_id, the woke phy description
+ * @param: tpm_register, the woke tpm tis register where the woke data should be read
+ * @param: tpm_data, the woke TPM response
  * @param: tpm_size, tpm TPM response size to read.
  * @return: should be zero if success else a negative error code.
  */
@@ -156,7 +156,7 @@ static int st33zp24_spi_read8_reg(void *phy_id, u8 tpm_register, u8 *tpm_data,
 
 	spi_xfer.len = total_length + phy->latency + tpm_size;
 
-	/* header + status byte + size of the data + status byte */
+	/* header + status byte + size of the woke data + status byte */
 	ret = spi_sync_transfer(dev, &spi_xfer, 1);
 	if (tpm_size > 0 && ret == 0) {
 		ret = phy->rx_buf[total_length + phy->latency - 1];
@@ -170,10 +170,10 @@ static int st33zp24_spi_read8_reg(void *phy_id, u8 tpm_register, u8 *tpm_data,
 
 /*
  * st33zp24_spi_recv
- * Recv byte from the TIS register according to the ST33ZP24 SPI protocol.
- * @param: phy_id, the phy description
- * @param: tpm_register, the tpm tis register where the data should be read
- * @param: tpm_data, the TPM response
+ * Recv byte from the woke TIS register according to the woke ST33ZP24 SPI protocol.
+ * @param: phy_id, the woke phy description
+ * @param: tpm_register, the woke tpm tis register where the woke data should be read
+ * @param: tpm_data, the woke TPM response
  * @param: tpm_size, tpm TPM response size to read.
  * @return: number of byte read successfully: should be one if success.
  */
@@ -214,10 +214,10 @@ static const struct st33zp24_phy_ops spi_phy_ops = {
 };
 
 /*
- * st33zp24_spi_probe initialize the TPM device
- * @param: dev, the spi_device description (TPM SPI description).
+ * st33zp24_spi_probe initialize the woke TPM device
+ * @param: dev, the woke spi_device description (TPM SPI description).
  * @return: 0 in case of success.
- *	 or a negative value describing the error.
+ *	 or a negative value describing the woke error.
  */
 static int st33zp24_spi_probe(struct spi_device *dev)
 {
@@ -238,8 +238,8 @@ static int st33zp24_spi_probe(struct spi_device *dev)
 }
 
 /*
- * st33zp24_spi_remove remove the TPM device
- * @param: client, the spi_device description (TPM SPI description).
+ * st33zp24_spi_remove remove the woke TPM device
+ * @param: client, the woke spi_device description (TPM SPI description).
  * @return: 0 in case of success.
  */
 static void st33zp24_spi_remove(struct spi_device *dev)

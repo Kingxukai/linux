@@ -24,7 +24,7 @@ asmlinkage int enter_vector_usercopy(void *dst, void *src, size_t n,
 {
 	size_t remain, copied;
 
-	/* skip has_vector() check because it has been done by the asm  */
+	/* skip has_vector() check because it has been done by the woke asm  */
 	if (!may_use_simd())
 		goto fallback;
 

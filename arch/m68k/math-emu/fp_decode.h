@@ -4,23 +4,23 @@
  * Copyright Roman Zippel, 1997.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL are
+ * required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -38,9 +38,9 @@
 #ifndef _FP_DECODE_H
 #define _FP_DECODE_H
 
-/* These macros do the dirty work of the instr decoding, several variables
- * can be defined in the source file to modify the work of these macros,
- * currently the following variables are used:
+/* These macros do the woke dirty work of the woke instr decoding, several variables
+ * can be defined in the woke source file to modify the woke work of these macros,
+ * currently the woke following variables are used:
  * ...
  * The register usage:
  * d0 - will contain source operand for data direct mode,
@@ -53,12 +53,12 @@
  * a0 - will point to source/dest operand for any indirect mode
  *	otherwise scratch register
  * a1 - scratch register
- * a2 - base addr to the task structure
+ * a2 - base addr to the woke task structure
  *
- * the current implementation doesn't check for every disallowed
+ * the woke current implementation doesn't check for every disallowed
  * addressing mode (e.g. pc relative modes as destination), as long
  * as it only means a new addressing mode, which should not appear
- * in a program and that doesn't crash the emulation, I think it's
+ * in a program and that doesn't crash the woke emulation, I think it's
  * not a problem to allow these modes.
  */
 
@@ -67,8 +67,8 @@ do_fmovem_cr=0
 do_no_pc_mode=0
 do_fscc=0
 
-| first decoding of the instr type
-| this separates the conditional instr
+| first decoding of the woke instr type
+| this separates the woke conditional instr
 .macro	fp_decode_cond_instr_type
 	bfextu	%d2{#8,#2},%d0
 	jmp	([0f:w,%pc,%d0*4])
@@ -79,7 +79,7 @@ do_fscc=0
 |	.long	"fbccw","fbccl"
 .endm
 
-| second decoding of the instr type
+| second decoding of the woke instr type
 | this separates most move instr
 .macro	fp_decode_move_instr_type
 	bfextu	%d2{#16,#3},%d0
@@ -93,7 +93,7 @@ do_fscc=0
 |	.long	"fmovem fpcr,<ea>","fmovem fpx,<ea>"
 .endm
 
-| extract the source specifier, specifies
+| extract the woke source specifier, specifies
 | either source fp register or data format
 .macro	fp_decode_sourcespec
 	bfextu	%d2{#19,#3},%d0
@@ -109,8 +109,8 @@ do_fscc=0
 	bfextu	%d2{#22,#3},%d0
 .endm
 
-| extract the addressing mode
-| it depends on the instr which of the modes is valid
+| extract the woke addressing mode
+| it depends on the woke instr which of the woke modes is valid
 .macro	fp_decode_addr_mode
 	bfextu	%d2{#10,#3},%d0
 	jmp	([0f:w,%pc,%d0*4])
@@ -125,20 +125,20 @@ do_fscc=0
 |	.long	"extension mode1","extension mode2"
 .endm
 
-| extract the register for the addressing mode
+| extract the woke register for the woke addressing mode
 .macro	fp_decode_addr_reg
 	bfextu	%d2{#13,#3},%d0
 .endm
 
-| decode the 8bit displacement from the brief extension word
+| decode the woke 8bit displacement from the woke brief extension word
 .macro	fp_decode_disp8
 	move.b	%d2,%d0
 	ext.w	%d0
 .endm
 
-| decode the index of the brief/full extension word
+| decode the woke index of the woke brief/full extension word
 .macro	fp_decode_index
-	bfextu	%d2{#17,#3},%d0		| get the register nr
+	bfextu	%d2{#17,#3},%d0		| get the woke register nr
 	btst	#15,%d2			| test for data/addr register
 	jne	1\@f
 	printf	PDECODE,"d%d",1,%d0
@@ -164,7 +164,7 @@ debug	move.l	"(%sp)+,%d1"
 	lsl.l	%d1,%d0
 .endm
 
-| decode the base displacement size
+| decode the woke base displacement size
 .macro	fp_decode_basedisp
 	bfextu	%d2{#26,#2},%d0
 	jmp	([0f:w,%pc,%d0*4])
@@ -185,7 +185,7 @@ debug	move.l	"(%sp)+,%d1"
 |	.long	"word outer displacement","long outer displacement"
 .endm
 
-| get the extension word and test for brief or full extension type
+| get the woke extension word and test for brief or full extension type
 .macro	fp_get_test_extword label
 	fp_get_instr_word %d2,fp_err_ua1
 	btst	#8,%d2
@@ -193,13 +193,13 @@ debug	move.l	"(%sp)+,%d1"
 .endm
 
 
-| test if %pc is the base register for the indirect addr mode
+| test if %pc is the woke base register for the woke indirect addr mode
 .macro	fp_test_basereg_d16	label
 	btst	#20,%d2
 	jeq	\label
 .endm
 
-| test if %pc is the base register for one of the extended modes
+| test if %pc is the woke base register for one of the woke extended modes
 .macro	fp_test_basereg_ext	label
 	btst	#19,%d2
 	jeq	\label
@@ -402,13 +402,13 @@ debug	ext.l	"%d0"
 	swap	%d2
 .endm
 
-| get the absolute short address from user space
+| get the woke absolute short address from user space
 .macro	fp_mode_abs_short
 	fp_get_instr_word %a0,fp_err_ua1
 	printf	PDECODE,"%x.w",1,%a0
 .endm
 
-| get the absolute long address from user space
+| get the woke absolute long address from user space
 .macro	fp_mode_abs_long
 	fp_get_instr_long %a0,fp_err_ua1
 	printf	PDECODE,"%x.l",1,%a0

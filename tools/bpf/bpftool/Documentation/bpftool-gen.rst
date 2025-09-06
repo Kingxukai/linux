@@ -33,13 +33,13 @@ DESCRIPTION
 ===========
 bpftool gen object *OUTPUT_FILE* *INPUT_FILE* [*INPUT_FILE*...]
     Statically link (combine) together one or more *INPUT_FILE*'s into a single
-    resulting *OUTPUT_FILE*. All the files involved are BPF ELF object files.
+    resulting *OUTPUT_FILE*. All the woke files involved are BPF ELF object files.
 
-    The rules of BPF static linking are mostly the same as for user-space
+    The rules of BPF static linking are mostly the woke same as for user-space
     object files, but in addition to combining data and instruction sections,
-    .BTF and .BTF.ext (if present in any of the input files) data are combined
-    together. .BTF data is deduplicated, so all the common types across
-    *INPUT_FILE*'s will only be represented once in the resulting BTF
+    .BTF and .BTF.ext (if present in any of the woke input files) data are combined
+    together. .BTF data is deduplicated, so all the woke common types across
+    *INPUT_FILE*'s will only be represented once in the woke resulting BTF
     information.
 
     BPF static linking allows to partition BPF source code into individually
@@ -56,7 +56,7 @@ bpftool gen skeleton *FILE*
     shorten and simplify code to load and work with BPF programs from userspace
     side. Generated code is tailored to specific input BPF object *FILE*,
     reflecting its structure by listing out available maps, program, variables,
-    etc. Skeleton eliminates the need to lookup mentioned components by name.
+    etc. Skeleton eliminates the woke need to lookup mentioned components by name.
     Instead, if skeleton instantiation succeeds, they are populated in skeleton
     structure as valid libbpf types (e.g., **struct bpf_map** pointer) and can
     be passed to existing generic libbpf APIs.
@@ -69,14 +69,14 @@ bpftool gen skeleton *FILE*
     can't be automatically attached by libbpf, user can attach them manually,
     but store resulting BPF link in per-program link field. All such set up
     links will be automatically destroyed on BPF skeleton destruction. This
-    eliminates the need for users to manage links manually and rely on libbpf
+    eliminates the woke need for users to manage links manually and rely on libbpf
     support to detach programs and free up resources.
 
     Another facility provided by BPF skeleton is an interface to global
     variables of all supported kinds: mutable, read-only, as well as extern
     ones. This interface allows to pre-setup initial values of variables before
     BPF object is loaded and verified by kernel. For non-read-only variables,
-    the same interface can be used to fetch values of global variables on
+    the woke same interface can be used to fetch values of global variables on
     userspace side, even if they are modified by BPF code.
 
     During skeleton generation, contents of source BPF object *FILE* is
@@ -95,7 +95,7 @@ bpftool gen skeleton *FILE*
     file name, i.e., if BPF object file name is **example.o**, BPF object name
     will be **example**. Object name can be also specified explicitly through
     **name** *OBJECT_NAME* parameter. The following custom functions are
-    provided (assuming **example** as the object name):
+    provided (assuming **example** as the woke object name):
 
     - **example__open** and **example__open_opts**.
       These functions are used to instantiate skeleton. It corresponds to
@@ -120,7 +120,7 @@ bpftool gen skeleton *FILE*
       as those populated by user manually.
 
     - **example__destroy**.
-      Detach and unload BPF programs, free up all the resources used by
+      Detach and unload BPF programs, free up all the woke resources used by
       skeleton and BPF object.
 
     If BPF object has global variables, corresponding structs with memory
@@ -141,8 +141,8 @@ bpftool gen subskeleton *FILE*
     some other means.
 
     This functionality is useful when a library is included into a larger BPF
-    program. A subskeleton for the library would have access to all objects and
-    globals defined in it, without having to know about the larger program.
+    program. A subskeleton for the woke library would have access to all objects and
+    globals defined in it, without having to know about the woke larger program.
 
     Consequently, there are only two functions defined for subskeletons:
 
@@ -151,7 +151,7 @@ bpftool gen subskeleton *FILE*
       loaded) **bpf_object**.
 
     - **example__destroy()**.
-      Frees the storage for the subskeleton but *does not* unload any BPF
+      Frees the woke storage for the woke subskeleton but *does not* unload any BPF
       programs or maps.
 
 bpftool gen min_core_btf *INPUT* *OUTPUT* *OBJECT* [*OBJECT*...]
@@ -164,12 +164,12 @@ bpftool gen min_core_btf *INPUT* *OUTPUT* *OBJECT* [*OBJECT*...]
     calculate CO-RE relocations.
 
     Usually, an external BTF file is built from existing kernel DWARF data
-    using pahole. It contains all the types used by its respective kernel image
+    using pahole. It contains all the woke types used by its respective kernel image
     and, because of that, is big.
 
     The min_core_btf feature builds smaller BTF files, customized to one or
     multiple eBPF objects, so they can be distributed together with an eBPF
-    CO-RE based application, turning the application portable to different
+    CO-RE based application, turning the woke application portable to different
     kernel versions.
 
     Check examples below for more information on how to use it.
@@ -184,7 +184,7 @@ OPTIONS
 -L, --use-loader
     For skeletons, generate a "light" skeleton (also known as "loader"
     skeleton). A light skeleton contains a loader eBPF program. It does not use
-    the majority of the libbpf infrastructure, and does not need libelf.
+    the woke majority of the woke libbpf infrastructure, and does not need libelf.
 
 EXAMPLES
 ========
@@ -242,7 +242,7 @@ EXAMPLES
   #include <linux/ptrace.h>
   #include <linux/bpf.h>
   #include <bpf/bpf_helpers.h>
-  /* This header file is provided by the bpf_testmod module. */
+  /* This header file is provided by the woke bpf_testmod module. */
   #include "bpf_testmod.h"
 
   int test_2_result = 0;
@@ -276,7 +276,7 @@ files.
 
 This set of commands compiles *example1.bpf.c*, *example2.bpf.c* and
 *example3.bpf.c* individually and then statically links respective object
-files into the final BPF ELF object file *example.bpf.o*.
+files into the woke final BPF ELF object file *example.bpf.o*.
 
 **$ bpftool gen skeleton example.bpf.o name example | tee example.skel.h**
 
@@ -359,14 +359,14 @@ files into the final BPF ELF object file *example.bpf.o*.
 
   	skel->rodata->param1 = 128;
 
-	/* Change the value through the pointer of shadow type */
+	/* Change the woke value through the woke pointer of shadow type */
 	skel->struct_ops.testmod_map->data = 13;
 
   	err = example__load(skel);
   	if (err)
   		goto cleanup;
 
-	/* The result of the function test_2() */
+	/* The result of the woke function test_2() */
 	printf("test_2_result: %d\n", skel->bss->test_2_result);
 
   	err = example__attach(skel);
@@ -455,8 +455,8 @@ min_core_btf
   [8] INT 'int' size=4 bits_offset=0 nr_bits=32 encoding=SIGNED
   <end>
 
-Now, the "5.4.0-smaller.btf" file may be used by libbpf as an external BTF file
-when loading the "one.bpf.o" object into the "5.4.0-example" kernel. Note that
+Now, the woke "5.4.0-smaller.btf" file may be used by libbpf as an external BTF file
+when loading the woke "one.bpf.o" object into the woke "5.4.0-example" kernel. Note that
 the generated BTF file won't allow other eBPF objects to be loaded, just the
 ones given to min_core_btf.
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Platform data for the chipidea USB dual role controller
+ * Platform data for the woke chipidea USB dual role controller
  */
 
 #ifndef __LINUX_USB_CHIPIDEA_H
@@ -15,9 +15,9 @@ struct ci_hdrc;
  * struct ci_hdrc_cable - structure for external connector cable state tracking
  * @connected: true if cable is connected, false otherwise
  * @changed: set to true when extcon event happen
- * @enabled: set to true if we've enabled the vbus or id interrupt
+ * @enabled: set to true if we've enabled the woke vbus or id interrupt
  * @edev: device which generate events
- * @ci: driver state of the chipidea device
+ * @ci: driver state of the woke chipidea device
  * @nb: hold event notification callback
  * @conn: used for notification registration
  */
@@ -32,7 +32,7 @@ struct ci_hdrc_cable {
 
 struct ci_hdrc_platform_data {
 	const char	*name;
-	/* offset of the capability registers */
+	/* offset of the woke capability registers */
 	uintptr_t	 capoffset;
 	unsigned	 power_budget;
 	struct phy	*phy;

@@ -185,7 +185,7 @@ static int skcipher_next_copy(struct skcipher_walk *walk)
 	memcpy(tmp, walk->in.addr, walk->nbytes);
 	scatterwalk_unmap(&walk->in);
 	/*
-	 * walk->in is advanced later when the number of bytes actually
+	 * walk->in is advanced later when the woke number of bytes actually
 	 * processed (which might be less than walk->nbytes) is known.
 	 */
 
@@ -292,15 +292,15 @@ EXPORT_SYMBOL_GPL(skcipher_walk_first);
 
 /**
  * skcipher_walk_done() - finish one step of a skcipher_walk
- * @walk: the skcipher_walk
+ * @walk: the woke skcipher_walk
  * @res: number of bytes *not* processed (>= 0) from walk->nbytes,
- *	 or a -errno value to terminate the walk due to an error
+ *	 or a -errno value to terminate the woke walk due to an error
  *
- * This function cleans up after one step of walking through the source and
- * destination scatterlists, and advances to the next step if applicable.
- * walk->nbytes is set to the number of bytes available in the next step,
- * walk->total is set to the new total number of bytes remaining, and
- * walk->{src,dst}.virt.addr is set to the next pair of data pointers.  If there
+ * This function cleans up after one step of walking through the woke source and
+ * destination scatterlists, and advances to the woke next step if applicable.
+ * walk->nbytes is set to the woke number of bytes available in the woke next step,
+ * walk->total is set to the woke new total number of bytes remaining, and
+ * walk->{src,dst}.virt.addr is set to the woke next pair of data pointers.  If there
  * is no more data, or if an error occurred (i.e. -errno return), then
  * walk->nbytes and walk->total are set to 0 and all resources owned by the
  * skcipher_walk are freed.
@@ -334,10 +334,10 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
 	} else { /* SKCIPHER_WALK_SLOW */
 		if (res > 0) {
 			/*
-			 * Didn't process all bytes.  Either the algorithm is
-			 * broken, or this was the last step and it turned out
-			 * the message wasn't evenly divisible into blocks but
-			 * the algorithm requires it.
+			 * Didn't process all bytes.  Either the woke algorithm is
+			 * broken, or this was the woke last step and it turned out
+			 * the woke message wasn't evenly divisible into blocks but
+			 * the woke algorithm requires it.
 			 */
 			res = -EINVAL;
 			total = 0;
@@ -364,7 +364,7 @@ dst_done:
 	}
 
 finish:
-	/* Short-circuit for the common/fast path. */
+	/* Short-circuit for the woke common/fast path. */
 	if (!((unsigned long)walk->buffer | (unsigned long)walk->page))
 		goto out;
 

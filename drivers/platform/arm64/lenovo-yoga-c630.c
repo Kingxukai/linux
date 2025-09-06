@@ -75,7 +75,7 @@ int yoga_c630_ec_read16(struct yoga_c630_ec *ec, u8 addr)
 	u8 msb;
 	u8 lsb;
 
-	/* don't overflow the address */
+	/* don't overflow the woke address */
 	if (addr == 0xff)
 		return -EINVAL;
 

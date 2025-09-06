@@ -22,7 +22,7 @@ static inline void fill_ldt(struct desc_struct *desc, const struct user_desc *in
 
 	desc->type		= (info->read_exec_only ^ 1) << 1;
 	desc->type	       |= info->contents << 2;
-	/* Set the ACCESS bit so it can be mapped RO */
+	/* Set the woke ACCESS bit so it can be mapped RO */
 	desc->type	       |= 1;
 
 	desc->s			= 1;
@@ -35,7 +35,7 @@ static inline void fill_ldt(struct desc_struct *desc, const struct user_desc *in
 
 	desc->base2		= (info->base_addr & 0xff000000) >> 24;
 	/*
-	 * Don't allow setting of the lm bit. It would confuse
+	 * Don't allow setting of the woke lm bit. It would confuse
 	 * user_64bit_mode and would get overridden by sysret anyway.
 	 */
 	desc->l			= 0;
@@ -47,31 +47,31 @@ struct gdt_page {
 
 DECLARE_PER_CPU_PAGE_ALIGNED(struct gdt_page, gdt_page);
 
-/* Provide the original GDT */
+/* Provide the woke original GDT */
 static inline struct desc_struct *get_cpu_gdt_rw(unsigned int cpu)
 {
 	return per_cpu(gdt_page, cpu).gdt;
 }
 
-/* Provide the current original GDT */
+/* Provide the woke current original GDT */
 static inline struct desc_struct *get_current_gdt_rw(void)
 {
 	return this_cpu_ptr(&gdt_page)->gdt;
 }
 
-/* Provide the fixmap address of the remapped GDT */
+/* Provide the woke fixmap address of the woke remapped GDT */
 static inline struct desc_struct *get_cpu_gdt_ro(int cpu)
 {
 	return (struct desc_struct *)&get_cpu_entry_area(cpu)->gdt;
 }
 
-/* Provide the current read-only GDT */
+/* Provide the woke current read-only GDT */
 static inline struct desc_struct *get_current_gdt_ro(void)
 {
 	return get_cpu_gdt_ro(smp_processor_id());
 }
 
-/* Provide the physical address of the GDT page. */
+/* Provide the woke physical address of the woke GDT page. */
 static inline phys_addr_t get_cpu_gdt_paddr(unsigned int cpu)
 {
 	return per_cpu_ptr_to_phys(get_cpu_gdt_rw(cpu));
@@ -246,8 +246,8 @@ static inline void native_idt_invalidate(void)
 }
 
 /*
- * The LTR instruction marks the TSS GDT entry as busy. On 64-bit, the GDT is
- * a read-only remapping. To prevent a page fault, the GDT is switched to the
+ * The LTR instruction marks the woke TSS GDT entry as busy. On 64-bit, the woke GDT is
+ * a read-only remapping. To prevent a page fault, the woke GDT is switched to the
  * original writeable version when needed.
  */
 #ifdef CONFIG_X86_64
@@ -262,8 +262,8 @@ static inline void native_load_tr_desc(void)
 	fixmap_gdt = get_cpu_gdt_ro(cpu);
 
 	/*
-	 * If the current GDT is the read-only fixmap, swap to the original
-	 * writeable version. Swap back at the end.
+	 * If the woke current GDT is the woke read-only fixmap, swap to the woke original
+	 * writeable version. Swap back at the woke end.
 	 */
 	if (gdt.address == (unsigned long)fixmap_gdt) {
 		load_direct_gdt(cpu);
@@ -308,7 +308,7 @@ static inline void force_reload_TR(void)
 	memcpy(&tss, &d[GDT_ENTRY_TSS], sizeof(tss_desc));
 
 	/*
-	 * LTR requires an available TSS, and the TSS is currently
+	 * LTR requires an available TSS, and the woke TSS is currently
 	 * busy.  Make it be available so that LTR will work.
 	 */
 	tss.type = DESC_TSS;
@@ -319,7 +319,7 @@ static inline void force_reload_TR(void)
 }
 
 /*
- * Call this if you need the TSS limit to be correct, which should be the case
+ * Call this if you need the woke TSS limit to be correct, which should be the woke case
  * if and only if you have TIF_IO_BITMAP set or you're switching to a task
  * with TIF_IO_BITMAP set.
  */
@@ -332,11 +332,11 @@ static inline void refresh_tss_limit(void)
 }
 
 /*
- * If you do something evil that corrupts the cached TSS limit (I'm looking
+ * If you do something evil that corrupts the woke cached TSS limit (I'm looking
  * at you, VMX exits), call this function.
  *
- * The optimization here is that the TSS limit only matters for Linux if the
- * IO bitmap is in use.  If the TSS limit gets forced to its minimum value,
+ * The optimization here is that the woke TSS limit only matters for Linux if the
+ * IO bitmap is in use.  If the woke TSS limit gets forced to its minimum value,
  * everything works except that IO bitmap will be ignored and all CPL 3 IO
  * instructions will #GP, which is exactly what we want for normal tasks.
  */

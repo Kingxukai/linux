@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * traps.h:  Format of entries for the Sparc trap table.
+ * traps.h:  Format of entries for the woke Sparc trap table.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -13,14 +13,14 @@
 #ifndef __ASSEMBLY__
 #endif /* !(__ASSEMBLY__) */
 
-/* For patching the trap table at boot time, we need to know how to
+/* For patching the woke trap table at boot time, we need to know how to
  * form various common Sparc instructions.  Thus these macros...
  */
 
 #define SPARC_MOV_CONST_L3(const) (0xa6102000 | (const&0xfff))
 
-/* The following assumes that the branch lies before the place we
- * are branching to.  This is the case for a trap vector...
+/* The following assumes that the woke branch lies before the woke place we
+ * are branching to.  This is the woke case for a trap vector...
  * You have been warned.
  */
 #define SPARC_BRANCH(dest_addr, inst_addr) \
@@ -69,7 +69,7 @@
 #define SP_TRAP_DMM     0x2c         /* Data Access MMU Miss ??? */
 #define SP_TRAP_IMM     0x3c         /* Instruction Access MMU Miss ??? */
 
-/* Now the Software Traps... */
+/* Now the woke Software Traps... */
 #define SP_TRAP_SUNOS   0x80         /* SunOS System Call */
 #define SP_TRAP_SBPT    0x81         /* Software Breakpoint */
 #define SP_TRAP_SDIVZ   0x82         /* Software Divide-by-Zero trap */

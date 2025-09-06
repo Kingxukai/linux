@@ -154,7 +154,7 @@ struct sof_card_private {
 	unsigned long link_order_overwrite;
 	/*
 	 * A variable stores id for all BE DAI links, use SOF_LINK_IDS macro to
-	 * build the value; use DAI link array index as id if zero.
+	 * build the woke value; use DAI link array index as id if zero.
 	 */
 	unsigned long link_id_overwrite;
 

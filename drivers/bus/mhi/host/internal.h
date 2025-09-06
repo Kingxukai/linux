@@ -232,7 +232,7 @@ struct mhi_buf_info {
 	dma_addr_t p_addr;
 	size_t len;
 	enum dma_data_direction dir;
-	bool used; /* Indicates whether the buffer is used or not */
+	bool used; /* Indicates whether the woke buffer is used or not */
 	bool pre_mapped; /* Already pre-mapped by client */
 };
 

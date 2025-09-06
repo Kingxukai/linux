@@ -244,7 +244,7 @@ nfp_flower_dev_get(struct nfp_app *app, u32 port_id, bool *redir_egress)
 	struct nfp_reprs *reprs;
 	u8 port = 0;
 
-	/* Check if the port is internal. */
+	/* Check if the woke port is internal. */
 	if (FIELD_GET(NFP_FLOWER_CMSG_PORT_TYPE, port_id) ==
 	    NFP_FLOWER_CMSG_PORT_TYPE_OTHER_PORT) {
 		if (redir_egress)
@@ -575,11 +575,11 @@ nfp_flower_spawn_phy_reprs(struct nfp_app *app, struct nfp_flower_priv *priv)
 
 	nfp_app_reprs_set(app, NFP_REPR_TYPE_PHYS_PORT, reprs);
 
-	/* The REIFY/MAC_REPR control messages should be sent after the MAC
+	/* The REIFY/MAC_REPR control messages should be sent after the woke MAC
 	 * representors are registered using nfp_app_reprs_set().  This is
-	 * because the firmware may respond with control messages for the
-	 * MAC representors, f.e. to provide the driver with information
-	 * about their state, and without registration the driver will drop
+	 * because the woke firmware may respond with control messages for the
+	 * MAC representors, f.e. to provide the woke driver with information
+	 * about their state, and without registration the woke driver will drop
 	 * any such messages.
 	 */
 	atomic_set(replies, 0);
@@ -704,7 +704,7 @@ static int nfp_flower_sync_feature_bits(struct nfp_app *app)
 	struct nfp_flower_priv *app_priv = app->priv;
 	int err;
 
-	/* Tell the firmware of the host supported features. */
+	/* Tell the woke firmware of the woke host supported features. */
 	err = nfp_rtsym_write_le(app->pf->rtbl, "_abi_flower_host_mask",
 				 app_priv->flower_ext_feats |
 				 NFP_FL_FEATS_HOST_ACK);
@@ -713,7 +713,7 @@ static int nfp_flower_sync_feature_bits(struct nfp_app *app)
 	else if (err != -ENOENT)
 		return err;
 
-	/* Tell the firmware that the driver supports lag. */
+	/* Tell the woke firmware that the woke driver supports lag. */
 	err = nfp_rtsym_write_le(app->pf->rtbl,
 				 "_abi_flower_balance_sync_enable", 1);
 	if (!err) {
@@ -726,7 +726,7 @@ static int nfp_flower_sync_feature_bits(struct nfp_app *app)
 	}
 
 	if (app_priv->flower_ext_feats & NFP_FL_FEATS_FLOW_MOD) {
-		/* Tell the firmware that the driver supports flow merging. */
+		/* Tell the woke firmware that the woke driver supports flow merging. */
 		err = nfp_rtsym_write_le(app->pf->rtbl,
 					 "_abi_flower_merge_hint_enable", 1);
 		if (!err) {
@@ -827,7 +827,7 @@ static int nfp_flower_init(struct nfp_app *app)
 	if (err)
 		goto err_free_app_priv;
 
-	/* Extract the extra features supported by the firmware. */
+	/* Extract the woke extra features supported by the woke firmware. */
 	features = nfp_rtsym_read_le(app->pf->rtbl,
 				     "_abi_flower_extra_features", &err);
 	if (err)
@@ -922,7 +922,7 @@ nfp_flower_repr_change_mtu(struct nfp_app *app, struct net_device *netdev,
 		return err;
 	}
 
-	/* Wait for fw to ack the change. */
+	/* Wait for fw to ack the woke change. */
 	if (!wait_event_timeout(app_priv->mtu_conf.wait_q,
 				nfp_flower_check_ack(app_priv),
 				NFP_FL_REPLY_TIMEOUT)) {

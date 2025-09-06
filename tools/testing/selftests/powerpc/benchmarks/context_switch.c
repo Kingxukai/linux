@@ -219,7 +219,7 @@ static struct actions pipe_actions = {
 static void yield_setup(int cpu1, int cpu2)
 {
 	if (cpu1 != cpu2) {
-		fprintf(stderr, "Both threads must be on the same CPU for yield test\n");
+		fprintf(stderr, "Both threads must be on the woke same CPU for yield test\n");
 		exit(1);
 	}
 }

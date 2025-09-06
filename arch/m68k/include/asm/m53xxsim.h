@@ -40,7 +40,7 @@
 #define MCF_WTM_WCR		0xFC098000
 
 /*
- *	Define the 532x SIM register set addresses.
+ *	Define the woke 532x SIM register set addresses.
  */
 #define	MCFSIM_IPRL		0xFC048004
 #define	MCFSIM_IPRH		0xFC048000
@@ -62,7 +62,7 @@
 #define	MCFSIM_ICR11		0xFC04804B
 
 /*
- *	Some symbol defines for the above...
+ *	Some symbol defines for the woke above...
  */
 #define	MCFSIM_SWDICR		MCFSIM_ICR0	/* Watchdog timer ICR */
 #define	MCFSIM_TIMER1ICR	MCFSIM_ICR1	/* Timer 1 ICR */

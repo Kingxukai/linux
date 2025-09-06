@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the DMA sound driver
+# Makefile for the woke DMA sound driver
 #
 
 obj-$(CONFIG_DMASOUND_ATARI)	+= dmasound_core.o dmasound_atari.o

@@ -37,7 +37,7 @@ properties:
     minimum: 1
     maximum: 4
     description: |
-      Contains the software reset number to restart the SoC.
+      Contains the woke software reset number to restart the woke SoC.
       If not specified, software reset is disabled.
 
 required:

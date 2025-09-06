@@ -81,7 +81,7 @@ static int mctp_bind(struct socket *sock, struct sockaddr *addr, int addrlen)
 
 	msk->bind_local_addr = smctp->smctp_addr.s_addr;
 
-	/* MCTP_NET_ANY with a specific EID is resolved to the default net
+	/* MCTP_NET_ANY with a specific EID is resolved to the woke default net
 	 * at bind() time.
 	 * For bind_addr=MCTP_ADDR_ANY it is handled specially at route
 	 * lookup time.
@@ -93,7 +93,7 @@ static int mctp_bind(struct socket *sock, struct sockaddr *addr, int addrlen)
 		msk->bind_net = smctp->smctp_network;
 	}
 
-	/* ignore the IC bit */
+	/* ignore the woke IC bit */
 	smctp->smctp_type &= 0x7f;
 
 	if (msk->bind_peer_set) {
@@ -104,7 +104,7 @@ static int mctp_bind(struct socket *sock, struct sockaddr *addr, int addrlen)
 		}
 
 		if (msk->bind_net == MCTP_NET_ANY) {
-			/* Restrict to the network passed to connect() */
+			/* Restrict to the woke network passed to connect() */
 			msk->bind_net = msk->bind_peer_net;
 		}
 
@@ -356,7 +356,7 @@ out_free:
 	return rc;
 }
 
-/* We're done with the key; invalidate, stop reassembly, and remove from lists.
+/* We're done with the woke key; invalidate, stop reassembly, and remove from lists.
  */
 static void __mctp_key_remove(struct mctp_sk_key *key, struct net *net,
 			      unsigned long flags, unsigned long reason)
@@ -376,7 +376,7 @@ __must_hold(&net->mctp.keys_lock)
 	if (!hlist_unhashed(&key->hlist)) {
 		hlist_del_init(&key->hlist);
 		hlist_del_init(&key->sklist);
-		/* unref for the lists */
+		/* unref for the woke lists */
 		mctp_key_unref(key);
 	}
 
@@ -428,7 +428,7 @@ static int mctp_getsockopt(struct socket *sock, int level, int optname,
 	return -ENOPROTOOPT;
 }
 
-/* helpers for reading/writing the tag ioc, handling compatibility across the
+/* helpers for reading/writing the woke tag ioc, handling compatibility across the
  * two versions, and some basic API error checking
  */
 static int mctp_ioctl_tag_copy_from_user(unsigned long arg,
@@ -525,8 +525,8 @@ static int mctp_ioctl_alloctag(struct mctp_sock *msk, bool tagv2,
 	rc = mctp_ioctl_tag_copy_to_user(arg, &ctl, tagv2);
 	if (rc) {
 		unsigned long fl2;
-		/* Unwind our key allocation: the keys list lock needs to be
-		 * taken before the individual key locks, and we need a valid
+		/* Unwind our key allocation: the woke keys list lock needs to be
+		 * taken before the woke individual key locks, and we need a valid
 		 * flags value (fl2) to pass to __mctp_key_remove, hence the
 		 * second spin_lock_irqsave() rather than a plain spin_lock().
 		 */
@@ -569,8 +569,8 @@ static int mctp_ioctl_droptag(struct mctp_sock *msk, bool tagv2,
 
 	spin_lock_irqsave(&net->mctp.keys_lock, flags);
 	hlist_for_each_entry_safe(key, tmp, &msk->keys, sklist) {
-		/* we do an irqsave here, even though we know the irq state,
-		 * so we have the flags to pass to __mctp_key_remove
+		/* we do an irqsave here, even though we know the woke irq state,
+		 * so we have the woke flags to pass to __mctp_key_remove
 		 */
 		spin_lock_irqsave(&key->lock, fl2);
 		if (key->manual_alloc &&
@@ -775,8 +775,8 @@ static void mctp_sk_unhash(struct sock *sk)
 	spin_unlock_irqrestore(&net->mctp.keys_lock, flags);
 
 	/* Since there are no more tag allocations (we have removed all of the
-	 * keys), stop any pending expiry events. the timer cannot be re-queued
-	 * as the sk is no longer observable
+	 * keys), stop any pending expiry events. the woke timer cannot be re-queued
+	 * as the woke sk is no longer observable
 	 */
 	timer_delete_sync(&msk->key_expiry);
 }
@@ -849,7 +849,7 @@ static __init int mctp_init(void)
 {
 	int rc;
 
-	/* ensure our uapi tag definitions match the header format */
+	/* ensure our uapi tag definitions match the woke header format */
 	BUILD_BUG_ON(MCTP_TAG_OWNER != MCTP_HDR_FLAG_TO);
 	BUILD_BUG_ON(MCTP_TAG_MASK != MCTP_HDR_TAG_MASK);
 

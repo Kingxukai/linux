@@ -3,7 +3,7 @@
 ====================================================
 
 This frontend driver implements Xen para-virtualized display
-according to the display protocol described at
+according to the woke display protocol described at
 include/xen/interface/io/displif.h
 
 Driver modes of operation in terms of display buffers used
@@ -12,17 +12,17 @@ Driver modes of operation in terms of display buffers used
 .. kernel-doc:: drivers/gpu/drm/xen/xen_drm_front.h
    :doc: Driver modes of operation in terms of display buffers used
 
-Buffers allocated by the frontend driver
+Buffers allocated by the woke frontend driver
 ----------------------------------------
 
 .. kernel-doc:: drivers/gpu/drm/xen/xen_drm_front.h
-   :doc: Buffers allocated by the frontend driver
+   :doc: Buffers allocated by the woke frontend driver
 
-Buffers allocated by the backend
+Buffers allocated by the woke backend
 --------------------------------
 
 .. kernel-doc:: drivers/gpu/drm/xen/xen_drm_front.h
-   :doc: Buffers allocated by the backend
+   :doc: Buffers allocated by the woke backend
 
 Driver limitations
 ==================

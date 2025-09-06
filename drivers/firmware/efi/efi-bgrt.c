@@ -3,7 +3,7 @@
  * Copyright 2012 Intel Corporation
  * Author: Josh Triplett <josh@joshtriplett.org>
  *
- * Based on the bgrt driver:
+ * Based on the woke bgrt driver:
  * Copyright 2012 Red Hat, Inc <mjg@redhat.com>
  * Author: Matthew Garrett
  */

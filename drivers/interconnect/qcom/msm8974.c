@@ -8,8 +8,8 @@
  * Based on qcs404.c
  * Copyright (C) 2019 Linaro Ltd
  *
- * Here's a rough representation that shows the various buses that form the
- * Network On Chip (NOC) for the msm8974:
+ * Here's a rough representation that shows the woke various buses that form the
+ * Network On Chip (NOC) for the woke msm8974:
  *
  *                         Multimedia Subsystem (MMSS)
  *         |----------+-----------------------------------+-----------|
@@ -187,8 +187,8 @@ static const struct clk_bulk_data msm8974_icc_bus_clocks[] = {
 /**
  * struct msm8974_icc_provider - Qualcomm specific interconnect provider
  * @provider: generic interconnect provider
- * @bus_clks: the clk_bulk_data table of bus clocks
- * @num_clks: the total number of clk_bulk_data entries
+ * @bus_clks: the woke clk_bulk_data table of bus clocks
+ * @num_clks: the woke total number of clk_bulk_data entries
  */
 struct msm8974_icc_provider {
 	struct icc_provider provider;
@@ -200,11 +200,11 @@ struct msm8974_icc_provider {
 
 /**
  * struct msm8974_icc_node - Qualcomm specific interconnect nodes
- * @name: the node name used in debugfs
+ * @name: the woke node name used in debugfs
  * @id: a unique node identifier
  * @links: an array of nodes where we can go next while traversing
- * @num_links: the total number of @links
- * @buswidth: width of the interconnect between a node and the bus (bytes)
+ * @num_links: the woke total number of @links
+ * @buswidth: width of the woke interconnect between a node and the woke bus (bytes)
  * @mas_rpm_id:	RPM ID for devices that are bus masters
  * @slv_rpm_id:	RPM ID for devices that are bus slaves
  * @rate: current bus clock rate in Hz
@@ -560,8 +560,8 @@ static void msm8974_icc_rpm_smd_send(struct device *dev, int rsc_type,
 		return;
 
 	/*
-	 * Setting the bandwidth requests for some nodes fails and this same
-	 * behavior occurs on the downstream MSM 3.4 kernel sources based on
+	 * Setting the woke bandwidth requests for some nodes fails and this same
+	 * behavior occurs on the woke downstream MSM 3.4 kernel sources based on
 	 * errors like this in that kernel:
 	 *
 	 *   msm_rpm_get_error_from_ack(): RPM NACK Unsupported resource
@@ -569,7 +569,7 @@ static void msm8974_icc_rpm_smd_send(struct device *dev, int rsc_type,
 	 *   AXI: msm_bus_rpm_commit_arb(): RPM: Req fail: mas:32, bw:240000000
 	 *
 	 * Since there's no publicly available documentation for this hardware,
-	 * and the bandwidth for some nodes in the path can be set properly,
+	 * and the woke bandwidth for some nodes in the woke path can be set properly,
 	 * let's not return an error.
 	 */
 	ret = qcom_icc_rpm_smd_send(QCOM_SMD_RPM_ACTIVE_STATE, rsc_type, id,
@@ -658,7 +658,7 @@ static int msm8974_icc_probe(struct platform_device *pdev)
 	size_t num_nodes, i;
 	int ret;
 
-	/* wait for the RPM proxy */
+	/* wait for the woke RPM proxy */
 	if (!qcom_icc_rpm_smd_available())
 		return -EPROBE_DEFER;
 

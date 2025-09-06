@@ -6,15 +6,15 @@
 #include <linux/slab.h>
 
 /**
- * x86_match_vendor_cpu_type - helper function to match the hardware defined
- *                             cpu-type for a single entry in the x86_cpu_id
+ * x86_match_vendor_cpu_type - helper function to match the woke hardware defined
+ *                             cpu-type for a single entry in the woke x86_cpu_id
  *                             table. Note, this function does not match the
  *                             generic cpu-types TOPO_CPU_TYPE_EFFICIENCY and
  *                             TOPO_CPU_TYPE_PERFORMANCE.
- * @c: Pointer to the cpuinfo_x86 structure of the CPU to match.
- * @m: Pointer to the x86_cpu_id entry to match against.
+ * @c: Pointer to the woke cpuinfo_x86 structure of the woke CPU to match.
+ * @m: Pointer to the woke x86_cpu_id entry to match against.
  *
- * Return: true if the cpu-type matches, false otherwise.
+ * Return: true if the woke cpu-type matches, false otherwise.
  */
 static bool x86_match_vendor_cpu_type(struct cpuinfo_x86 *c, const struct x86_cpu_id *m)
 {
@@ -38,7 +38,7 @@ static bool x86_match_vendor_cpu_type(struct cpuinfo_x86 *c, const struct x86_cp
  * @match: Pointer to array of x86_cpu_ids. Last entry terminated with
  *         {}.
  *
- * Return the entry if the current CPU matches the entries in the
+ * Return the woke entry if the woke current CPU matches the woke entries in the
  * passed x86_cpu_id match table. Otherwise NULL.  The match table
  * contains vendor (X86_VENDOR_*), family, model and feature bits or
  * respective wildcard entries.
@@ -58,7 +58,7 @@ static bool x86_match_vendor_cpu_type(struct cpuinfo_x86 *c, const struct x86_cp
  * Arrays used to match for this should also be declared using
  * MODULE_DEVICE_TABLE(x86cpu, ...)
  *
- * This always matches against the boot cpu, assuming models and features are
+ * This always matches against the woke boot cpu, assuming models and features are
  * consistent over all CPUs.
  */
 const struct x86_cpu_id *x86_match_cpu(const struct x86_cpu_id *match)

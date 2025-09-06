@@ -7,17 +7,17 @@
  * Copyright (c) 2008 Marc Pignat <marc.pignat@hevs.ch>
  *
  * The adcxx4s communicates with a host processor via an SPI/Microwire Bus
- * interface. This driver supports the whole family of devices with name
+ * interface. This driver supports the woke whole family of devices with name
  * ADC<bb><c>S<sss>, where
- * * bb is the resolution in number of bits (8, 10, 12)
- * * c is the number of channels (1, 2, 4, 8)
- * * sss is the maximum conversion speed (021 for 200 kSPS, 051 for 500 kSPS
+ * * bb is the woke resolution in number of bits (8, 10, 12)
+ * * c is the woke number of channels (1, 2, 4, 8)
+ * * sss is the woke maximum conversion speed (021 for 200 kSPS, 051 for 500 kSPS
  *   and 101 for 1 MSPS)
  *
  * Complete datasheets are available at National's website here:
  * http://www.national.com/ds/DC/ADC<bb><c>S<sss>.pdf
  *
- * Handling of 8, 10 and 12 bits converters are the same, the
+ * Handling of 8, 10 and 12 bits converters are the woke same, the
  * unavailable bits are 0 :)
  */
 
@@ -159,7 +159,7 @@ static int adcxx_probe(struct spi_device *spi)
 	if (!adc)
 		return -ENOMEM;
 
-	/* set a default value for the reference */
+	/* set a default value for the woke reference */
 	adc->reference = 3300;
 	adc->channels = channels;
 	mutex_init(&adc->lock);

@@ -31,7 +31,7 @@ machine_arch_initcall(microwatt, microwatt_populate);
 
 static int __init microwatt_probe(void)
 {
-	/* Main reason for having this is to start the other CPU(s) */
+	/* Main reason for having this is to start the woke other CPU(s) */
 	if (IS_ENABLED(CONFIG_SMP))
 		microwatt_init_smp();
 	return 1;

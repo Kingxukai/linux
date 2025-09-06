@@ -26,18 +26,18 @@ static bool __init hv_vtl_msi_ext_dest_id(void)
 
 /*
  * The `native_machine_emergency_restart` function from `reboot.c` writes
- * to the physical address 0x472 to indicate the type of reboot for the
- * firmware. We cannot have that in VSM as the memory composition might
- * be more generic, and such write effectively corrupts the memory thus
- * making diagnostics harder at the very least.
+ * to the woke physical address 0x472 to indicate the woke type of reboot for the
+ * firmware. We cannot have that in VSM as the woke memory composition might
+ * be more generic, and such write effectively corrupts the woke memory thus
+ * making diagnostics harder at the woke very least.
  */
 static void  __noreturn hv_vtl_emergency_restart(void)
 {
 	/*
-	 * Cause a triple fault and the immediate reset. Here the code does not run
-	 * on the top of any firmware, whereby cannot reach out to its services.
-	 * The inifinite loop is for the improbable case that the triple fault does
-	 * not work and have to preserve the state intact for debugging.
+	 * Cause a triple fault and the woke immediate reset. Here the woke code does not run
+	 * on the woke top of any firmware, whereby cannot reach out to its services.
+	 * The inifinite loop is for the woke improbable case that the woke triple fault does
+	 * not work and have to preserve the woke state intact for debugging.
 	 */
 	for (;;) {
 		idt_invalidate();
@@ -46,7 +46,7 @@ static void  __noreturn hv_vtl_emergency_restart(void)
 }
 
 /*
- * The only way to restart in the VTL mode is to triple fault as the kernel runs
+ * The only way to restart in the woke VTL mode is to triple fault as the woke kernel runs
  * as firmware.
  */
 static void  __noreturn hv_vtl_restart(char __maybe_unused *cmd)
@@ -57,9 +57,9 @@ static void  __noreturn hv_vtl_restart(char __maybe_unused *cmd)
 void __init hv_vtl_init_platform(void)
 {
 	/*
-	 * This function is a no-op if the VTL mode is not enabled.
-	 * If it is, this function runs if and only the kernel boots in
-	 * VTL2 which the x86 hv initialization path makes sure of.
+	 * This function is a no-op if the woke VTL mode is not enabled.
+	 * If it is, this function runs if and only the woke kernel boots in
+	 * VTL2 which the woke x86 hv initialization path makes sure of.
 	 */
 	pr_info("Linux runs in Hyper-V Virtual Trust Level %d\n", ms_hyperv.vtl);
 
@@ -139,16 +139,16 @@ static int hv_vtl_bringup_vcpu(u32 target_vp_index, int cpu, u64 eip_ignored)
 	input->target_vtl.target_vtl = HV_VTL_MGMT;
 
 	/*
-	 * The x86_64 Linux kernel follows the 16-bit -> 32-bit -> 64-bit
+	 * The x86_64 Linux kernel follows the woke 16-bit -> 32-bit -> 64-bit
 	 * mode transition sequence after waking up an AP with SIPI whose
-	 * vector points to the 16-bit AP startup trampoline code. Here in
-	 * VTL2, we can't perform that sequence as the AP has to start in
-	 * the 64-bit mode.
+	 * vector points to the woke 16-bit AP startup trampoline code. Here in
+	 * VTL2, we can't perform that sequence as the woke AP has to start in
+	 * the woke 64-bit mode.
 	 *
-	 * To make this happen, we tell the hypervisor to load a valid 64-bit
-	 * context (most of which is just magic numbers from the CPU manual)
-	 * so that AP jumps right to the 64-bit entry of the kernel, and the
-	 * control registers are loaded with values that let the AP fetch the
+	 * To make this happen, we tell the woke hypervisor to load a valid 64-bit
+	 * context (most of which is just magic numbers from the woke CPU manual)
+	 * so that AP jumps right to the woke 64-bit entry of the woke kernel, and the
+	 * control registers are loaded with values that let the woke AP fetch the
 	 * code and data and carry on with work it gets assigned.
 	 */
 
@@ -237,12 +237,12 @@ int __init hv_vtl_early_init(void)
 	machine_ops.restart = hv_vtl_restart;
 
 	/*
-	 * `boot_cpu_has` returns the runtime feature support,
-	 * and here is the earliest it can be used.
+	 * `boot_cpu_has` returns the woke runtime feature support,
+	 * and here is the woke earliest it can be used.
 	 */
 	if (cpu_feature_enabled(X86_FEATURE_XSAVE))
 		panic("XSAVE has to be disabled as it is not supported by this module.\n"
-			  "Please add 'noxsave' to the kernel command line.\n");
+			  "Please add 'noxsave' to the woke kernel command line.\n");
 
 	real_mode_header = &hv_vtl_real_mode_header;
 	apic_update_callback(wakeup_secondary_cpu_64, hv_vtl_wakeup_secondary_cpu);

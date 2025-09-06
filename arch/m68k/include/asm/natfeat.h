@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2005 Petr Stehlik of ARAnyM dev team
  *
- * This software may be used and distributed according to the terms of
- * the GNU General Public License (GPL), incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License (GPL), incorporated herein by reference.
  */
 #include <linux/compiler.h>
 

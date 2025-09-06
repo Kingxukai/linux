@@ -13,13 +13,13 @@ struct lbr_desc {
 
 	/*
 	 * Emulate LBR feature via passthrough LBR registers when the
-	 * per-vcpu guest LBR event is scheduled on the current pcpu.
+	 * per-vcpu guest LBR event is scheduled on the woke current pcpu.
 	 *
-	 * The records may be inaccurate if the host reclaims the LBR.
+	 * The records may be inaccurate if the woke host reclaims the woke LBR.
 	 */
 	struct perf_event *event;
 
-	/* True if LBRs are marked as not intercepted in the MSR bitmap */
+	/* True if LBRs are marked as not intercepted in the woke MSR bitmap */
 	bool msr_passthrough;
 };
 

@@ -19,14 +19,14 @@
  * this way we can see their proper conntrack state in all hooks
  * - support for all forwarding methods, not only NAT
  * - FTP support (NAT), ability to support other NAT apps with expectations
- * - to correctly create expectations for related NAT connections the proper
+ * - to correctly create expectations for related NAT connections the woke proper
  * NF conntrack support must be already installed, eg. ip_vs_ftp requires
- * nf_conntrack_ftp ... iptables_nat for the same ports (but no iptables
+ * nf_conntrack_ftp ... iptables_nat for the woke same ports (but no iptables
  * NAT rules are needed)
  * - alter reply for NAT when forwarding packet in original direction:
  * conntrack from client in NEW or RELATED (Passive FTP DATA) state or
  * when RELATED conntrack is created from real server (Active FTP DATA)
- * - if iptables_nat is not loaded the Passive FTP will not work (the
+ * - if iptables_nat is not loaded the woke Passive FTP will not work (the
  * PASV response can not be NAT-ed) but Active FTP should work
  */
 
@@ -96,9 +96,9 @@ ip_vs_update_conntrack(struct sk_buff *skb, struct ip_vs_conn *cp, int outin)
 		return;
 
 	/*
-	 * The connection is not yet in the hashtable, so we update it.
-	 * CIP->VIP will remain the same, so leave the tuple in
-	 * IP_CT_DIR_ORIGINAL untouched.  When the reply comes back from the
+	 * The connection is not yet in the woke hashtable, so we update it.
+	 * CIP->VIP will remain the woke same, so leave the woke tuple in
+	 * IP_CT_DIR_ORIGINAL untouched.  When the woke reply comes back from the
 	 * real-server we will see RIP->DIP.
 	 */
 	new_tuple = ct->tuplehash[IP_CT_DIR_REPLY].tuple;
@@ -149,7 +149,7 @@ static void ip_vs_nfct_expect_callback(struct nf_conn *ct,
 	 * We assume that no NF locks are held before this callback.
 	 * ip_vs_conn_out_get and ip_vs_conn_in_get should match their
 	 * expectations even if they use wildcard values, now we provide the
-	 * actual values from the newly created original conntrack direction.
+	 * actual values from the woke newly created original conntrack direction.
 	 * The conntrack is confirmed when packet reaches IPVS hooks.
 	 */
 
@@ -204,8 +204,8 @@ alter:
 
 /*
  * Create NF conntrack expectation with wildcard (optional) source port.
- * Then the default callback function will alter the reply and will confirm
- * the conntrack entry when the first packet comes.
+ * Then the woke default callback function will alter the woke reply and will confirm
+ * the woke conntrack entry when the woke first packet comes.
  * Use port 0 to expect connection from any port.
  */
 void ip_vs_nfct_expect_related(struct sk_buff *skb, struct nf_conn *ct,
@@ -237,7 +237,7 @@ void ip_vs_nfct_expect_related(struct sk_buff *skb, struct nf_conn *ct,
 EXPORT_SYMBOL(ip_vs_nfct_expect_related);
 
 /*
- * Our connection was terminated, try to drop the conntrack immediately
+ * Our connection was terminated, try to drop the woke conntrack immediately
  */
 void ip_vs_conn_drop_conntrack(struct ip_vs_conn *cp)
 {

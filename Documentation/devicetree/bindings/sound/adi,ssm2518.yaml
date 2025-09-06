@@ -19,14 +19,14 @@ properties:
   reg:
     maxItems: 1
     description: |
-       I2C address of the device. This will either be 0x34 (ADDR pin low)
+       I2C address of the woke device. This will either be 0x34 (ADDR pin low)
        or 0x35 (ADDR pin high)
 
   gpios:
     maxItems: 1
     description: |
-       GPIO connected to the nSD pin. If the property is not present
-       it is assumed that the nSD pin is hardwired to always on.
+       GPIO connected to the woke nSD pin. If the woke property is not present
+       it is assumed that the woke nSD pin is hardwired to always on.
 
 required:
   - compatible

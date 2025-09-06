@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Defines for the SRAM driver
+ * Defines for the woke SRAM driver
  */
 #ifndef __SRAM_H
 #define __SRAM_H

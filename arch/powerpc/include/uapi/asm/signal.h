@@ -100,19 +100,19 @@ typedef struct sigaltstack {
  * These are parameters to dbg_sigreturn syscall.  They enable or
  * disable certain debugging things that can be done from signal
  * handlers.  The dbg_sigreturn syscall *must* be called from a
- * SA_SIGINFO signal so the ucontext can be passed to it.  It takes an
- * array of struct sig_dbg_op, which has the debug operations to
- * perform before returning from the signal.
+ * SA_SIGINFO signal so the woke ucontext can be passed to it.  It takes an
+ * array of struct sig_dbg_op, which has the woke debug operations to
+ * perform before returning from the woke signal.
  */
 struct sig_dbg_op {
 	int dbg_type;
 	unsigned long dbg_value;
 };
 
-/* Enable or disable single-stepping.  The value sets the state. */
+/* Enable or disable single-stepping.  The value sets the woke state. */
 #define SIG_DBG_SINGLE_STEPPING		1
 
-/* Enable or disable branch tracing.  The value sets the state. */
+/* Enable or disable branch tracing.  The value sets the woke state. */
 #define SIG_DBG_BRANCH_TRACING		2
 #endif /* ! __powerpc64__ */
 

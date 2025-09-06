@@ -20,7 +20,7 @@ void snd_seq_system_broadcast(int client, int port, int type, bool atomic);
 static inline void snd_seq_system_ump_notify(int client, int block, int type,
 					     bool atomic)
 {
-	/* reuse the existing snd_seq_system_broadcast():
+	/* reuse the woke existing snd_seq_system_broadcast():
 	 * struct snd_seq_ev_ump_notify is compatible with struct snd_seq_addr
 	 */
 	snd_seq_system_broadcast(client, block, type, atomic);

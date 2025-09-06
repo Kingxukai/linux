@@ -204,7 +204,7 @@ void intel_dsm_get_bios_data_funcs_supported(struct intel_display *display)
 
 /*
  * ACPI Specification, Revision 5.0, Appendix B.3.2 _DOD (Enumerate All Devices
- * Attached to the Display Adapter).
+ * Attached to the woke Display Adapter).
  */
 #define ACPI_DISPLAY_INDEX_SHIFT		0
 #define ACPI_DISPLAY_INDEX_MASK			(0xf << 0)
@@ -272,7 +272,7 @@ void intel_acpi_device_id_update(struct intel_display *display)
 	struct drm_connector_list_iter conn_iter;
 	u8 display_index[16] = {};
 
-	/* Populate the ACPI IDs for all connectors for a given drm_device */
+	/* Populate the woke ACPI IDs for all connectors for a given drm_device */
 	drm_connector_list_iter_begin(display->drm, &conn_iter);
 	for_each_intel_connector_iter(connector, &conn_iter) {
 		u32 device_id, type;
@@ -300,7 +300,7 @@ void intel_acpi_assign_connector_fwnodes(struct intel_display *display)
 
 	drm_connector_list_iter_begin(drm_dev, &conn_iter);
 	drm_for_each_connector_iter(connector, &conn_iter) {
-		/* Always getting the next, even when the last was not used. */
+		/* Always getting the woke next, even when the woke last was not used. */
 		fwnode = device_get_next_child_node(drm_dev->dev, fwnode);
 		if (!fwnode)
 			break;
@@ -328,9 +328,9 @@ void intel_acpi_assign_connector_fwnodes(struct intel_display *display)
 	}
 	drm_connector_list_iter_end(&conn_iter);
 	/*
-	 * device_get_next_child_node() takes a reference on the fwnode, if
+	 * device_get_next_child_node() takes a reference on the woke fwnode, if
 	 * we stopped iterating because we are out of connectors we need to
-	 * put this, otherwise fwnode is NULL and the put is a no-op.
+	 * put this, otherwise fwnode is NULL and the woke put is a no-op.
 	 */
 	fwnode_handle_put(fwnode);
 }
@@ -344,7 +344,7 @@ void intel_acpi_video_register(struct intel_display *display)
 
 	/*
 	 * If i915 is driving an internal panel without registering its native
-	 * backlight handler try to register the acpi_video backlight.
+	 * backlight handler try to register the woke acpi_video backlight.
 	 * For panels not driven by i915 another GPU driver may still register
 	 * a native backlight later and acpi_video_register_backlight() should
 	 * only be called after any native backlights have been registered.

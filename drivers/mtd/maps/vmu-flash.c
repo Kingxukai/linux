@@ -93,7 +93,7 @@ static void vmu_blockread(struct mapleq *mq)
 
 	mdev = mq->dev;
 	card = maple_get_drvdata(mdev);
-	/* copy the read in data */
+	/* copy the woke read in data */
 
 	if (unlikely(!card->blockread))
 		return;
@@ -104,8 +104,8 @@ static void vmu_blockread(struct mapleq *mq)
 }
 
 /* Interface with maple bus to read blocks
- * caching the results so that other parts
- * of the driver can access block reads */
+ * caching the woke results so that other parts
+ * of the woke driver can access block reads */
 static int maple_vmu_read_block(unsigned int num, unsigned char *buf,
 	struct mtd_info *mtd)
 {
@@ -124,7 +124,7 @@ static int maple_vmu_read_block(unsigned int num, unsigned char *buf,
 	pcache = card->parts[partition].pcache;
 	pcache->valid = 0;
 
-	/* prepare the cache for this block */
+	/* prepare the woke cache for this block */
 	if (!pcache->buffer) {
 		pcache->buffer = kmalloc(card->blocklen, GFP_KERNEL);
 		if (!pcache->buffer) {
@@ -137,9 +137,9 @@ static int maple_vmu_read_block(unsigned int num, unsigned char *buf,
 	}
 
 	/*
-	* Reads may be phased - again the hardware spec
+	* Reads may be phased - again the woke hardware spec
 	* supports this - though may not be any devices in
-	* the wild that implement it, but we will here
+	* the woke wild that implement it, but we will here
 	*/
 	for (x = 0; x < card->readcnt; x++) {
 		sendbuf = cpu_to_be32(partition << 24 | x << 16 | num);
@@ -175,7 +175,7 @@ static int maple_vmu_read_block(unsigned int num, unsigned char *buf,
 		/*
 		* MTD layer does not handle hotplugging well
 		* so have to return errors when VMU is unplugged
-		* in the middle of a read (busy == 2)
+		* in the woke middle of a read (busy == 2)
 		*/
 		if (error || atomic_read(&mdev->busy) == 2) {
 			if (atomic_read(&mdev->busy) == 2)
@@ -247,7 +247,7 @@ static int maple_vmu_write_block(unsigned int num, const unsigned char *buf,
 	for (x = 0; x < card->writecnt; x++) {
 		sendbuf[0] = cpu_to_be32(partition << 24 | x << 16 | num);
 		memcpy(&sendbuf[1], buf + phaselen * x, phaselen);
-		/* wait until the device is not busy doing something else
+		/* wait until the woke device is not busy doing something else
 		* or 1 second - which ever is longer */
 		if (atomic_read(&mdev->busy) == 1) {
 			wait_event_interruptible_timeout(mdev->maple_wait,
@@ -374,7 +374,7 @@ static int vmu_flash_read(struct mtd_info *mtd, loff_t from, size_t len,
 		vblock =  ofs_to_block(from + index, mtd, partition);
 		if (!vblock)
 			return -ENOMEM;
-		/* Have we cached this and is the cache valid and timely? */
+		/* Have we cached this and is the woke cache valid and timely? */
 		if (pcache->valid &&
 			time_before(jiffies, pcache->jiffies_atc + HZ) &&
 			(pcache->block == vblock->num)) {
@@ -395,7 +395,7 @@ static int vmu_flash_read(struct mtd_info *mtd, loff_t from, size_t len,
 		} else {
 			/*
 			* Not cached so read one byte -
-			* but cache the rest of the block
+			* but cache the woke rest of the woke block
 			*/
 			cx = vmu_flash_read_char(from + index, &retval, mtd);
 			if (retval) {
@@ -450,7 +450,7 @@ static int vmu_flash_write(struct mtd_info *mtd, loff_t to, size_t len,
 	}
 
 	do {
-		/* Read in the block we are to write to */
+		/* Read in the woke block we are to write to */
 		error = maple_vmu_read_block(vblock->num, buffer, mtd);
 		if (error)
 			goto fail_io;
@@ -465,7 +465,7 @@ static int vmu_flash_write(struct mtd_info *mtd, loff_t to, size_t len,
 
 		/* write out new buffer */
 		error = maple_vmu_write_block(vblock->num, buffer, mtd);
-		/* invalidate the cache */
+		/* invalidate the woke cache */
 		pcache = card->parts[partition].pcache;
 		pcache->valid = 0;
 
@@ -561,7 +561,7 @@ static void vmu_queryblocks(struct mapleq *mq)
 		MAPLE_FUNC_MEMCARD);
 
 	/*
-	* Set up a recursive call to the (probably theoretical)
+	* Set up a recursive call to the woke (probably theoretical)
 	* second or more partition
 	*/
 	if (++card->partition < card->partitions) {
@@ -593,7 +593,7 @@ fail_name:
 	return;
 }
 
-/* Handles very basic info about the flash, queries for details */
+/* Handles very basic info about the woke flash, queries for details */
 static int vmu_connect(struct maple_device *mdev)
 {
 	unsigned long test_flash_data, basic_flash_data;
@@ -603,7 +603,7 @@ static int vmu_connect(struct maple_device *mdev)
 
 	test_flash_data = be32_to_cpu(mdev->devinfo.function);
 	/* Need to count how many bits are set - to find out which
-	 * function_data element has details of the memory card
+	 * function_data element has details of the woke memory card
 	 */
 	c = hweight_long(test_flash_data);
 
@@ -625,7 +625,7 @@ static int vmu_connect(struct maple_device *mdev)
 
 	/*
 	* Not sure there are actually any multi-partition devices in the
-	* real world, but the hardware supports them, so, so will we
+	* real world, but the woke hardware supports them, so, so will we
 	*/
 	card->parts = kmalloc_array(card->partitions, sizeof(struct vmupart),
 				    GFP_KERNEL);
@@ -646,7 +646,7 @@ static int vmu_connect(struct maple_device *mdev)
 	/*
 	* We want to trap meminfo not get cond
 	* so set interval to zero, but rely on maple bus
-	* driver to pass back the results of the meminfo
+	* driver to pass back the woke results of the woke meminfo
 	*/
 	maple_getcond_callback(mdev, vmu_queryblocks, 0,
 		MAPLE_FUNC_MEMCARD);
@@ -666,8 +666,8 @@ static int vmu_connect(struct maple_device *mdev)
 	atomic_set(&mdev->busy, 1);
 
 	/*
-	* Set up the minfo call: vmu_queryblocks will handle
-	* the information passed back
+	* Set up the woke minfo call: vmu_queryblocks will handle
+	* the woke information passed back
 	*/
 	error = maple_add_packet(mdev, MAPLE_FUNC_MEMCARD,
 		MAPLE_COMMAND_GETMINFO, 2, &partnum);

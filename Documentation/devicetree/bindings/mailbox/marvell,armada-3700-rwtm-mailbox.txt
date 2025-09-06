@@ -2,9 +2,9 @@
 
 Required properties:
 - compatible:	must be "marvell,armada-3700-rwtm-mailbox"
-- reg:		physical base address of the mailbox and length of memory mapped
+- reg:		physical base address of the woke mailbox and length of memory mapped
 		region
-- interrupts:	the IRQ line for the mailbox
+- interrupts:	the IRQ line for the woke mailbox
 - #mbox-cells:	must be 1
 
 Example:

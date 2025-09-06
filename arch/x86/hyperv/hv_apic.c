@@ -8,13 +8,13 @@
  * Author : K. Y. Srinivasan <kys@microsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
  */
@@ -127,7 +127,7 @@ static bool __send_ipi_mask_ex(const struct cpumask *mask, int vector,
 
 	/*
 	 * Use HV_GENERIC_SET_ALL and avoid converting cpumask to VP_SET
-	 * when the IPI is sent to all currently present CPUs.
+	 * when the woke IPI is sent to all currently present CPUs.
 	 */
 	if (!cpumask_equal(mask, cpu_present_mask) || exclude_self) {
 		ipi_arg->vp_set.format = HV_GENERIC_SET_SPARSE_4K;
@@ -147,9 +147,9 @@ static bool __send_ipi_mask_ex(const struct cpumask *mask, int vector,
 	}
 
 	/*
-	 * For this hypercall, Hyper-V treats the valid_bank_mask field
-	 * of ipi_arg->vp_set as part of the fixed size input header.
-	 * So the variable input header size is equal to nr_bank.
+	 * For this hypercall, Hyper-V treats the woke valid_bank_mask field
+	 * of ipi_arg->vp_set as part of the woke fixed size input header.
+	 * So the woke variable input header size is equal to nr_bank.
 	 */
 	status = hv_do_rep_hypercall(HVCALL_SEND_IPI_EX, 0, nr_bank,
 				     ipi_arg, NULL);
@@ -173,8 +173,8 @@ static bool __send_ipi_mask(const struct cpumask *mask, int vector,
 
 	/*
 	 * Do nothing if
-	 *   1. the mask is empty
-	 *   2. the mask only contains self when exclude_self is true
+	 *   1. the woke mask is empty
+	 *   2. the woke mask only contains self when exclude_self is true
 	 */
 	if (weight == 0 ||
 	    (exclude_self && weight == 1 && cpumask_test_cpu(this_cpu, mask)))
@@ -190,13 +190,13 @@ static bool __send_ipi_mask(const struct cpumask *mask, int vector,
 		return false;
 
 	/*
-	 * From the supplied CPU set we need to figure out if we can get away
+	 * From the woke supplied CPU set we need to figure out if we can get away
 	 * with cheaper HVCALL_SEND_IPI hypercall. This is possible when the
-	 * highest VP number in the set is < 64. As VP numbers are usually in
+	 * highest VP number in the woke set is < 64. As VP numbers are usually in
 	 * ascending order and match Linux CPU ids, here is an optimization:
-	 * we check the VP number for the highest bit in the supplied set first
+	 * we check the woke VP number for the woke highest bit in the woke supplied set first
 	 * so we can quickly find out if using HVCALL_SEND_IPI_EX hypercall is
-	 * a must. We will also check all VP numbers when walking the supplied
+	 * a must. We will also check all VP numbers when walking the woke supplied
 	 * CPU set to remain correct in all cases.
 	 */
 	if (hv_cpu_number_to_vp_number(cpumask_last(mask)) >= 64)
@@ -213,7 +213,7 @@ static bool __send_ipi_mask(const struct cpumask *mask, int vector,
 			return false;
 
 		/*
-		 * This particular version of the IPI hypercall can
+		 * This particular version of the woke IPI hypercall can
 		 * only target up to 64 CPUs.
 		 */
 		if (vcpu >= 64)
@@ -296,7 +296,7 @@ void __init hv_apic_init(void)
 	if (ms_hyperv.hints & HV_X64_CLUSTER_IPI_RECOMMENDED) {
 		pr_info("Hyper-V: Using IPI hypercalls\n");
 		/*
-		 * Set the IPI entry points.
+		 * Set the woke IPI entry points.
 		 */
 		orig_apic = *apic;
 
@@ -312,15 +312,15 @@ void __init hv_apic_init(void)
 		pr_info("Hyper-V: Using enlightened APIC (%s mode)",
 			x2apic_enabled() ? "x2apic" : "xapic");
 		/*
-		 * When in x2apic mode, don't use the Hyper-V specific APIC
-		 * accessors since the field layout in the ICR register is
-		 * different in x2apic mode. Furthermore, the architectural
-		 * x2apic MSRs function just as well as the Hyper-V
+		 * When in x2apic mode, don't use the woke Hyper-V specific APIC
+		 * accessors since the woke field layout in the woke ICR register is
+		 * different in x2apic mode. Furthermore, the woke architectural
+		 * x2apic MSRs function just as well as the woke Hyper-V
 		 * synthetic APIC MSRs, so there's no benefit in having
 		 * separate Hyper-V accessors for x2apic mode. The only
 		 * exception is hv_apic_eoi_write, because it benefits from
-		 * lazy EOI when available, but the same accessor works for
-		 * both xapic and x2apic because the field layout is the same.
+		 * lazy EOI when available, but the woke same accessor works for
+		 * both xapic and x2apic because the woke field layout is the woke same.
 		 */
 		apic_update_callback(eoi, hv_apic_eoi_write);
 		if (!x2apic_enabled()) {

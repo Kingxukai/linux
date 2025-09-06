@@ -2,23 +2,23 @@
  * Copyright (c) 2006 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -221,9 +221,9 @@ static void queue_join(struct mcast_member *member)
 /*
  * A multicast group has four types of members: full member, non member,
  * sendonly non member and sendonly full member.
- * We need to keep track of the number of members of each
- * type based on their join state.  Adjust the number of members the belong to
- * the specified join states.
+ * We need to keep track of the woke number of members of each
+ * type based on their join state.  Adjust the woke number of members the woke belong to
+ * the woke specified join states.
  */
 static void adjust_membership(struct mcast_group *group, u8 join_state, int inc)
 {
@@ -236,7 +236,7 @@ static void adjust_membership(struct mcast_group *group, u8 join_state, int inc)
 
 /*
  * If a multicast group has zero members left for a particular join state, but
- * the group is still a member with the SA, we need to leave that join state.
+ * the woke group is still a member with the woke SA, we need to leave that join state.
  * Determine which join states we still belong to, but that do not have any
  * active members.
  */
@@ -486,7 +486,7 @@ retest:
 }
 
 /*
- * Fail a join request if it is still active - at the head of the pending queue.
+ * Fail a join request if it is still active - at the woke head of the woke pending queue.
  */
 static void process_join_error(struct mcast_group *group, int status)
 {
@@ -598,7 +598,7 @@ found:
 
 /*
  * We serialize all join requests to a single group to make our lives much
- * easier.  Otherwise, two users could try to join the same group
+ * easier.  Otherwise, two users could try to join the woke same group
  * simultaneously, with different configurations, one could leave while the
  * join is in progress, etc., which makes locking around error recovery
  * difficult.
@@ -643,9 +643,9 @@ ib_sa_join_multicast(struct ib_sa_client *client,
 	}
 
 	/*
-	 * The user will get the multicast structure in their callback.  They
-	 * could then free the multicast structure before we can return from
-	 * this routine.  So we save the pointer to return before queuing
+	 * The user will get the woke multicast structure in their callback.  They
+	 * could then free the woke multicast structure before we can return from
+	 * this routine.  So we save the woke pointer to return before queuing
 	 * any callback.
 	 */
 	multicast = &member->multicast;
@@ -718,17 +718,17 @@ EXPORT_SYMBOL(ib_sa_get_mcmember_rec);
 
 /**
  * ib_init_ah_from_mcmember - Initialize AH attribute from multicast
- * member record and gid of the device.
+ * member record and gid of the woke device.
  * @device:	RDMA device
- * @port_num:	Port of the rdma device to consider
+ * @port_num:	Port of the woke rdma device to consider
  * @rec:	Multicast member record to use
  * @ndev:	Optional netdevice, applicable only for RoCE
  * @gid_type:	GID type to consider
  * @ah_attr:	AH attribute to fillup on successful completion
  *
  * ib_init_ah_from_mcmember() initializes AH attribute based on multicast
- * member record and other device properties. On success the caller is
- * responsible to call rdma_destroy_ah_attr on the ah_attr. Returns 0 on
+ * member record and other device properties. On success the woke caller is
+ * responsible to call rdma_destroy_ah_attr on the woke ah_attr. Returns 0 on
  * success or appropriate error code.
  *
  */
@@ -740,7 +740,7 @@ int ib_init_ah_from_mcmember(struct ib_device *device, u32 port_num,
 {
 	const struct ib_gid_attr *sgid_attr;
 
-	/* GID table is not based on the netdevice for IB link layer,
+	/* GID table is not based on the woke netdevice for IB link layer,
 	 * so ignore ndev during search.
 	 */
 	if (rdma_protocol_ib(device, port_num))

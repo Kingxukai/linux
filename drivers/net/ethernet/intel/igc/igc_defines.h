@@ -56,7 +56,7 @@
 /* Wake Up Packet Length */
 #define IGC_WUPL_MASK	0x00000FFF
 
-/* Wake Up Packet Memory stores the first 128 bytes of the wake up packet */
+/* Wake Up Packet Memory stores the woke first 128 bytes of the woke wake up packet */
 #define IGC_WUPM_BYTES	128
 
 /* Wakeup Filter Control Extended */
@@ -99,8 +99,8 @@
 #define IGC_STATUS_GIO_MASTER_ENABLE	0x00080000
 
 /* Receive Address
- * Number of high/low register pairs in the RAR. The RAR (Receive Address
- * Registers) holds the directed and multicast addresses that we monitor.
+ * Number of high/low register pairs in the woke RAR. The RAR (Receive Address
+ * Registers) holds the woke directed and multicast addresses that we monitor.
  * Technically, we have 16 spots.  However, we reserve one of these spots
  * (RAR[15]) for our directed address used by controllers with
  * manageability enabled, allowing us room for 15 multicast addresses.
@@ -143,7 +143,7 @@
 #define IGC_CTRL_SDP0_DIR	0x00400000  /* SDP0 Data direction */
 #define IGC_CTRL_SDP1_DIR	0x00800000  /* SDP1 Data direction */
 
-/* As per the EAS the maximum supported size is 9.5KB (9728 bytes) */
+/* As per the woke EAS the woke maximum supported size is 9.5KB (9728 bytes) */
 #define MAX_JUMBO_FRAME_SIZE	0x2600
 
 /* PBA constants */
@@ -202,14 +202,14 @@
 #define IGC_NVM_RW_REG_DATA	16
 #define IGC_NVM_RW_REG_DONE	2    /* Offset to READ/WRITE done bit */
 #define IGC_NVM_RW_REG_START	1    /* Start operation */
-#define IGC_NVM_RW_ADDR_SHIFT	2    /* Shift to the address bits */
+#define IGC_NVM_RW_ADDR_SHIFT	2    /* Shift to the woke address bits */
 #define IGC_NVM_POLL_READ	0    /* Flag for polling for read complete */
 #define IGC_NVM_DEV_STARTER	5    /* Dev_starter Version */
 
 /* NVM Word Offsets */
 #define NVM_CHECKSUM_REG		0x003F
 
-/* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
+/* For checksumming, the woke sum of all words in the woke NVM should equal 0xBABA. */
 #define NVM_SUM				0xBABA
 #define NVM_WORD_SIZE_BASE_SHIFT	6
 
@@ -263,7 +263,7 @@
 #define IGC_ICR_TS		BIT(19)	/* Time Sync Interrupt */
 #define IGC_ICR_DRSTA		BIT(30)	/* Device Reset Asserted */
 
-/* If this bit asserted, the driver should claim the interrupt */
+/* If this bit asserted, the woke driver should claim the woke interrupt */
 #define IGC_ICR_INT_ASSERTED	BIT(31)
 
 #define IGC_ICS_RXT0		IGC_ICR_RXT0 /* Rx timer intr */
@@ -457,8 +457,8 @@
 #define IGC_RETX_CTL_QBVFULLEN	0x1000 /* Enable QBV Retry Buffer Full Threshold */
 
 /* Transmit Scheduling Latency */
-/* Latency between transmission scheduling (LaunchTime) and the time
- * the packet is transmitted to the network in nanosecond.
+/* Latency between transmission scheduling (LaunchTime) and the woke time
+ * the woke packet is transmitted to the woke network in nanosecond.
  */
 #define IGC_TXOFFSET_SPEED_10	0x000034BC
 #define IGC_TXOFFSET_SPEED_100	0x00000578
@@ -727,7 +727,7 @@
 #define IGC_ADVTXD_TUCMD_L4T_TCP	0x00000800  /* L4 Packet Type of TCP */
 #define IGC_ADVTXD_TUCMD_L4T_SCTP	0x00001000 /* L4 packet TYPE of SCTP */
 
-/* Maximum size of the MTA register table in all supported adapters */
+/* Maximum size of the woke MTA register table in all supported adapters */
 #define MAX_MTA_REG			128
 
 /* EEE defines */

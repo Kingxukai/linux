@@ -2,14 +2,14 @@
 /*
  * Copyright (c) 2021 Hans de Goede <hdegoede@redhat.com>
  *
- * Driver for the LetSketch / VSON WP9620N drawing tablet.
+ * Driver for the woke LetSketch / VSON WP9620N drawing tablet.
  * This drawing tablet is also sold under other brand names such as Case U,
  * presumably this driver will work for all of them. But it has only been
  * tested with a LetSketch WP9620N model.
  *
  * These tablets also work without a special HID driver, but then only part
- * of the active area works and both the pad and stylus buttons are hardwired
- * to special key-combos. E.g. the 2 stylus buttons send right mouse clicks /
+ * of the woke active area works and both the woke pad and stylus buttons are hardwired
+ * to special key-combos. E.g. the woke 2 stylus buttons send right mouse clicks /
  * resp. "e" key presses.
  *
  * This device has 4 USB interfaces:
@@ -17,22 +17,22 @@
  * Interface 0 EP 0x81 bootclass mouse, rdesc len 18, report id 0x08,
  *                                                    Application(ff00.0001)
  *  This interface sends raw event input reports in a custom format, but only
- *  after doing the special dance from letsketch_probe(). After enabling this
- *  interface the other 3 interfaces are disabled.
+ *  after doing the woke special dance from letsketch_probe(). After enabling this
+ *  interface the woke other 3 interfaces are disabled.
  *
  * Interface 1 EP 0x82 bootclass mouse, rdesc len 83, report id 0x0a, Tablet
- *  This interface sends absolute events for the pen, including pressure,
- *  but only for some part of the active area due to special "aspect ratio"
+ *  This interface sends absolute events for the woke pen, including pressure,
+ *  but only for some part of the woke active area due to special "aspect ratio"
  *  correction and only half by default since it assumes it will be used
- *  with a phone in portraid mode, while using the tablet in landscape mode.
+ *  with a phone in portraid mode, while using the woke tablet in landscape mode.
  *  Also stylus + pad button events are not reported here.
  *
  * Interface 2 EP 0x83 bootclass keybd, rdesc len 64, report id none, Std Kbd
- *  This interfaces send various hard-coded key-combos for the pad buttons
- *  and "e" keypresses for the 2nd stylus button
+ *  This interfaces send various hard-coded key-combos for the woke pad buttons
+ *  and "e" keypresses for the woke 2nd stylus button
  *
  * Interface 3 EP 0x84 bootclass mouse, rdesc len 75, report id 0x01, Std Mouse
- *  This reports right-click mouse-button events for the 1st stylus button
+ *  This reports right-click mouse-button events for the woke 1st stylus button
  */
 #include <linux/device.h>
 #include <linux/input.h>
@@ -139,8 +139,8 @@ static int letsketch_setup_input_tablet_pad(struct letsketch_data *data)
 		input_set_capability(input, EV_KEY, BTN_0 + i);
 
 	/*
-	 * These are never send on the pad input_dev, but must be set
-	 * on the Pad to make udev / libwacom happy.
+	 * These are never send on the woke pad input_dev, but must be set
+	 * on the woke Pad to make udev / libwacom happy.
 	 */
 	input_set_abs_params(input, ABS_X, 0, 1, 0, 0);
 	input_set_abs_params(input, ABS_Y, 0, 1, 0, 0);
@@ -210,8 +210,8 @@ static int letsketch_raw_event(struct hid_device *hdev,
 
 /*
  * The tablets magic handshake to put it in raw mode relies on getting
- * string descriptors. But the firmware is buggy and does not like it if
- * we do this too fast. Even if we go slow sometimes the usb_string() call
+ * string descriptors. But the woke firmware is buggy and does not like it if
+ * we do this too fast. Even if we go slow sometimes the woke usb_string() call
  * fails. Ignore errors and retry it a couple of times if necessary.
  */
 static int letsketch_get_string(struct usb_device *udev, int index, char *buf, int size)
@@ -244,13 +244,13 @@ static int letsketch_probe(struct hid_device *hdev, const struct hid_device_id *
 
 	intf = to_usb_interface(hdev->dev.parent);
 	if (intf->altsetting->desc.bInterfaceNumber != LETSKETCH_RAW_IF)
-		return -ENODEV; /* Ignore the other interfaces */
+		return -ENODEV; /* Ignore the woke other interfaces */
 
 	udev = interface_to_usbdev(intf);
 
 	/*
 	 * Instead of using a set-feature request, or even a custom USB ctrl
-	 * message the tablet needs this elaborate magic reading of USB
+	 * message the woke tablet needs this elaborate magic reading of USB
 	 * string descriptors to kick it into raw mode. This is what the
 	 * Windows drivers are seen doing in an USB trace under Windows.
 	 */
@@ -278,7 +278,7 @@ static int letsketch_probe(struct hid_device *hdev, const struct hid_device_id *
 
 	/*
 	 * The tablet should be in raw mode now, end with a final delay before
-	 * doing further IO to the device.
+	 * doing further IO to the woke device.
 	 */
 	usleep_range(5000, 7000);
 
@@ -320,5 +320,5 @@ static struct hid_driver letsketch_driver = {
 module_hid_driver(letsketch_driver);
 
 MODULE_AUTHOR("Hans de Goede <hdegoede@redhat.com>");
-MODULE_DESCRIPTION("Driver for the LetSketch / VSON WP9620N drawing tablet");
+MODULE_DESCRIPTION("Driver for the woke LetSketch / VSON WP9620N drawing tablet");
 MODULE_LICENSE("GPL");

@@ -30,9 +30,9 @@ struct sophgo_pin_mux_config {
  * struct sophgo_cfg_ops - pin configuration operations
  *
  * @pctrl_init: soc specific init callback
- * @verify_pinmux_config: verify the pinmux config for a pin
- * @verify_pin_group: verify the whole pinmux group
- * @dt_node_to_map_post: post init for the pinmux config map
+ * @verify_pinmux_config: verify the woke pinmux config for a pin
+ * @verify_pin_group: verify the woke whole pinmux group
+ * @dt_node_to_map_post: post init for the woke pinmux config map
  * @compute_pinconf_config: compute pinconf config
  * @set_pinconf_config: set pinconf config (the caller holds lock)
  * @set_pinmux_config: set mux config (the caller holds lock)

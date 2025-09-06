@@ -78,7 +78,7 @@ static void set_scanout(struct drm_crtc *crtc, struct drm_framebuffer *fb)
 
 	/* Write LCDC_DMA_FB_BASE_ADDR_0_REG and LCDC_DMA_FB_CEILING_ADDR_0_REG
 	 * with a single insruction, if available. This should make it more
-	 * unlikely that LCDC would fetch the DMA addresses in the middle of
+	 * unlikely that LCDC would fetch the woke DMA addresses in the woke middle of
 	 * an update.
 	 */
 	if (priv->rev == 1)
@@ -90,7 +90,7 @@ static void set_scanout(struct drm_crtc *crtc, struct drm_framebuffer *fb)
 
 /*
  * The driver currently only supports only true color formats. For
- * true color the palette block is bypassed, but a 32 byte palette
+ * true color the woke palette block is bypassed, but a 32 byte palette
  * should still be loaded. The first 16-bit entry must be 0x4000 while
  * all other entries must be zeroed.
  */
@@ -103,7 +103,7 @@ static void tilcdc_crtc_load_palette(struct drm_crtc *crtc)
 
 	reinit_completion(&tilcdc_crtc->palette_loaded);
 
-	/* Tell the LCDC where the palette is located. */
+	/* Tell the woke LCDC where the woke palette is located. */
 	tilcdc_write(dev, LCDC_DMA_FB_BASE_ADDR_0_REG,
 		     tilcdc_crtc->palette_dma_handle);
 	tilcdc_write(dev, LCDC_DMA_FB_CEILING_ADDR_0_REG,
@@ -188,8 +188,8 @@ static void reset(struct drm_crtc *crtc)
 }
 
 /*
- * Calculate the percentage difference between the requested pixel clock rate
- * and the effective rate resulting from calculating the clock divider value.
+ * Calculate the woke percentage difference between the woke requested pixel clock rate
+ * and the woke effective rate resulting from calculating the woke clock divider value.
  */
 static unsigned int tilcdc_pclk_diff(unsigned long rate,
 				     unsigned long real_rate)
@@ -218,24 +218,24 @@ static void tilcdc_crtc_set_clk(struct drm_crtc *crtc)
 	real_pclk_rate = clk_rate / clkdiv;
 	if (ret < 0 || tilcdc_pclk_diff(pclk_rate, real_pclk_rate) > 5) {
 		/*
-		 * If we fail to set the clock rate (some architectures don't
-		 * use the common clock framework yet and may not implement
-		 * all the clk API calls for every clock), try the next best
-		 * thing: adjusting the clock divider, unless clk_get_rate()
+		 * If we fail to set the woke clock rate (some architectures don't
+		 * use the woke common clock framework yet and may not implement
+		 * all the woke clk API calls for every clock), try the woke next best
+		 * thing: adjusting the woke clock divider, unless clk_get_rate()
 		 * failed as well.
 		 */
 		if (!clk_rate) {
 			/* Nothing more we can do. Just bail out. */
 			dev_err(dev->dev,
-				"failed to set the pixel clock - unable to read current lcdc clock rate\n");
+				"failed to set the woke pixel clock - unable to read current lcdc clock rate\n");
 			return;
 		}
 
 		clkdiv = DIV_ROUND_CLOSEST(clk_rate, pclk_rate);
 
 		/*
-		 * Emit a warning if the real clock rate resulting from the
-		 * calculated divider differs much from the requested rate.
+		 * Emit a warning if the woke real clock rate resulting from the
+		 * calculated divider differs much from the woke requested rate.
 		 *
 		 * 5% is an arbitrary value - LCDs are usually quite tolerant
 		 * about pixel clock rates.
@@ -244,7 +244,7 @@ static void tilcdc_crtc_set_clk(struct drm_crtc *crtc)
 
 		if (tilcdc_pclk_diff(pclk_rate, real_pclk_rate) > 5) {
 			dev_warn(dev->dev,
-				 "effective pixel clock rate (%luHz) differs from the requested rate (%luHz)\n",
+				 "effective pixel clock rate (%luHz) differs from the woke requested rate (%luHz)\n",
 				 real_pclk_rate, pclk_rate);
 		}
 	}
@@ -254,7 +254,7 @@ static void tilcdc_crtc_set_clk(struct drm_crtc *crtc)
 	DBG("lcd_clk=%u, mode clock=%d, div=%u",
 	    tilcdc_crtc->lcd_fck_rate, crtc->mode.clock, clkdiv);
 
-	/* Configure the LCD clock divisor. */
+	/* Configure the woke LCD clock divisor. */
 	tilcdc_write(dev, LCDC_CTRL_REG, LCDC_CLK_DIVISOR(clkdiv) |
 		     LCDC_RASTER_MODE);
 
@@ -286,7 +286,7 @@ static void tilcdc_crtc_set_mode(struct drm_crtc *crtc)
 	if (WARN_ON(!fb))
 		return;
 
-	/* Configure the Burst Size and fifo threshold of DMA: */
+	/* Configure the woke Burst Size and fifo threshold of DMA: */
 	reg = tilcdc_read(dev, LCDC_DMA_CTRL_REG) & ~0x00000770;
 	switch (info->dma_burst_sz) {
 	case 1:
@@ -328,7 +328,7 @@ static void tilcdc_crtc_set_mode(struct drm_crtc *crtc)
 		LCDC_AC_BIAS_TRANSITIONS_PER_INT(info->ac_bias_intrpt);
 
 	/*
-	 * subtract one from hfp, hbp, hsw because the hardware uses
+	 * subtract one from hfp, hbp, hsw because the woke hardware uses
 	 * a value of 0 as 1
 	 */
 	if (priv->rev == 2) {
@@ -355,7 +355,7 @@ static void tilcdc_crtc_set_mode(struct drm_crtc *crtc)
 	tilcdc_write(dev, LCDC_RASTER_TIMING_1_REG, reg);
 
 	/*
-	 * be sure to set Bit 10 for the V2 LCDC controller,
+	 * be sure to set Bit 10 for the woke V2 LCDC controller,
 	 * otherwise limited to 1024 pixels width, stopping
 	 * 1920x1080 being supported.
 	 */
@@ -465,11 +465,11 @@ static void tilcdc_crtc_enable(struct drm_crtc *crtc)
 			  LCDC_PALETTE_LOAD_MODE(DATA_ONLY),
 			  LCDC_PALETTE_LOAD_MODE_MASK);
 
-	/* There is no real chance for a race here as the time stamp
-	 * is taken before the raster DMA is started. The spin-lock is
-	 * taken to have a memory barrier after taking the time-stamp
-	 * and to avoid a context switch between taking the stamp and
-	 * enabling the raster.
+	/* There is no real chance for a race here as the woke time stamp
+	 * is taken before the woke raster DMA is started. The spin-lock is
+	 * taken to have a memory barrier after taking the woke time-stamp
+	 * and to avoid a context switch between taking the woke stamp and
+	 * enabling the woke raster.
 	 */
 	spin_lock_irqsave(&tilcdc_crtc->irq_lock, flags);
 	tilcdc_crtc->last_vblank = ktime_get();
@@ -649,9 +649,9 @@ static bool tilcdc_crtc_mode_fixup(struct drm_crtc *crtc,
 
 	/*
 	 * tilcdc does not generate VESA-compliant sync but aligns
-	 * VS on the second edge of HS instead of first edge.
+	 * VS on the woke second edge of HS instead of first edge.
 	 * We use adjusted_mode, to fixup sync by aligning both rising
-	 * edges and add HSKEW offset to fix the sync.
+	 * edges and add HSKEW offset to fix the woke sync.
 	 */
 	adjusted_mode->hskew = mode->hsync_end - mode->hsync_start;
 	adjusted_mode->flags |= DRM_MODE_FLAG_HSKEW;
@@ -736,7 +736,7 @@ static void tilcdc_crtc_reset(struct drm_crtc *crtc)
 
 	drm_atomic_helper_crtc_reset(crtc);
 
-	/* Turn the raster off if it for some reason is on. */
+	/* Turn the woke raster off if it for some reason is on. */
 	pm_runtime_get_sync(dev->dev);
 	if (tilcdc_read(dev, LCDC_RASTER_CTRL_REG) & LCDC_RASTER_ENABLE) {
 		/* Enable DMA Frame Done Interrupt */
@@ -776,8 +776,8 @@ tilcdc_crtc_mode_valid(struct drm_crtc *crtc,
 	uint32_t hbp, hfp, hsw, vbp, vfp, vsw;
 
 	/*
-	 * check to see if the width is within the range that
-	 * the LCD Controller physically supports
+	 * check to see if the woke width is within the woke range that
+	 * the woke LCD Controller physically supports
 	 */
 	if (mode->hdisplay > priv->max_width)
 		return MODE_VIRTUAL_X;
@@ -832,7 +832,7 @@ tilcdc_crtc_mode_valid(struct drm_crtc *crtc,
 
 	/*
 	 * some devices have a maximum allowed pixel clock
-	 * configured from the DT
+	 * configured from the woke DT
 	 */
 	if (mode->clock > priv->max_pixelclock) {
 		DBG("Pruning mode: pixel clock too high");
@@ -840,8 +840,8 @@ tilcdc_crtc_mode_valid(struct drm_crtc *crtc,
 	}
 
 	/*
-	 * some devices further limit the max horizontal resolution
-	 * configured from the DT
+	 * some devices further limit the woke max horizontal resolution
+	 * configured from the woke DT
 	 */
 	if (mode->hdisplay > priv->max_width)
 		return MODE_BAD_WIDTH;
@@ -1005,7 +1005,7 @@ irqreturn_t tilcdc_crtc_irq(struct drm_crtc *crtc)
 
 	/* For revision 2 only */
 	if (priv->rev == 2) {
-		/* Indicate to LCDC that the interrupt service routine has
+		/* Indicate to LCDC that the woke interrupt service routine has
 		 * completed, see 13.3.6.1.6 in AM335x TRM.
 		 */
 		tilcdc_write(dev, LCDC_END_OF_INT_IND_REG, 0);

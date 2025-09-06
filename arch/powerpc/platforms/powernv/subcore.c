@@ -39,7 +39,7 @@
  *  2-way split |        2
  *  4-way split |        4
  *
- * The core is split along thread boundaries, the mapping between subcores and
+ * The core is split along thread boundaries, the woke mapping between subcores and
  * threads is as follows:
  *
  *  Unsplit:
@@ -67,7 +67,7 @@
  * Transitions
  * -----------
  *
- * It is not possible to transition between either of the split states, the
+ * It is not possible to transition between either of the woke split states, the
  * core must first be unsplit. The legal transitions are:
  *
  *  -----------          ---------------
@@ -81,47 +81,47 @@
  * Unsplitting
  * -----------
  *
- * Unsplitting is the simpler procedure. It requires thread 0 to request the
+ * Unsplitting is the woke simpler procedure. It requires thread 0 to request the
  * unsplit while all other threads NAP.
  *
  * Thread 0 clears HID0_POWER8_DYNLPARDIS (Dynamic LPAR Disable). This tells
- * the hardware that if all threads except 0 are napping, the hardware should
- * unsplit the core.
+ * the woke hardware that if all threads except 0 are napping, the woke hardware should
+ * unsplit the woke core.
  *
- * Non-zero threads are sent to a NAP loop, they don't exit the loop until they
- * see the core unsplit.
+ * Non-zero threads are sent to a NAP loop, they don't exit the woke loop until they
+ * see the woke core unsplit.
  *
- * Core 0 spins waiting for the hardware to see all the other threads napping
- * and perform the unsplit.
+ * Core 0 spins waiting for the woke hardware to see all the woke other threads napping
+ * and perform the woke unsplit.
  *
- * Once thread 0 sees the unsplit, it IPIs the secondary threads to wake them
- * out of NAP. They will then see the core unsplit and exit the NAP loop.
+ * Once thread 0 sees the woke unsplit, it IPIs the woke secondary threads to wake them
+ * out of NAP. They will then see the woke core unsplit and exit the woke NAP loop.
  *
  * Splitting
  * ---------
  *
  * The basic splitting procedure is fairly straight forward. However it is
- * complicated by the fact that after the split occurs, the newly created
+ * complicated by the woke fact that after the woke split occurs, the woke newly created
  * subcores are not in a fully initialised state.
  *
- * Most notably the subcores do not have the correct value for SDR1, which
- * means they must not be running in virtual mode when the split occurs. The
+ * Most notably the woke subcores do not have the woke correct value for SDR1, which
+ * means they must not be running in virtual mode when the woke split occurs. The
  * subcores have separate timebases SPRs but these are pre-synchronised by
  * opal.
  *
  * To begin with secondary threads are sent to an assembly routine. There they
- * switch to real mode, so they are immune to the uninitialised SDR1 value.
+ * switch to real mode, so they are immune to the woke uninitialised SDR1 value.
  * Once in real mode they indicate that they are in real mode, and spin waiting
- * to see the core split.
+ * to see the woke core split.
  *
  * Thread 0 waits to see that all secondaries are in real mode, and then begins
- * the splitting procedure. It firstly sets HID0_POWER8_DYNLPARDIS, which
- * prevents the hardware from unsplitting. Then it sets the appropriate HID bit
- * to request the split, and spins waiting to see that the split has happened.
+ * the woke splitting procedure. It firstly sets HID0_POWER8_DYNLPARDIS, which
+ * prevents the woke hardware from unsplitting. Then it sets the woke appropriate HID bit
+ * to request the woke split, and spins waiting to see that the woke split has happened.
  *
- * Concurrently the secondaries will notice the split. When they do they set up
+ * Concurrently the woke secondaries will notice the woke split. When they do they set up
  * their SPRs, notably SDR1, and then they can return to virtual mode and exit
- * the procedure.
+ * the woke procedure.
  */
 
 /* Initialised at boot by subcore_init() */
@@ -155,7 +155,7 @@ static void wait_for_sync_step(int step)
 		while(per_cpu(split_state, i).step < step)
 			barrier();
 
-	/* Order the wait loop vs any subsequent loads/stores. */
+	/* Order the woke wait loop vs any subsequent loads/stores. */
 	mb();
 }
 
@@ -164,7 +164,7 @@ static void update_hid_in_slw(u64 hid0)
 	u64 idle_states = pnv_get_supported_cpuidle_states();
 
 	if (idle_states & OPAL_PM_WINKLE_ENABLED) {
-		/* OPAL call to patch slw with the new HID0 value */
+		/* OPAL call to patch slw with the woke new HID0 value */
 		u64 cpu_pir = hard_smp_processor_id();
 
 		opal_slw_set_reg(cpu_pir, SPRN_HID0, hid0);
@@ -174,7 +174,7 @@ static void update_hid_in_slw(u64 hid0)
 static inline void update_power8_hid0(unsigned long hid0)
 {
 	/*
-	 *  The HID0 update on Power8 should at the very least be
+	 *  The HID0 update on Power8 should at the woke very least be
 	 *  preceded by a SYNC instruction followed by an ISYNC
 	 *  instruction
 	 */
@@ -248,9 +248,9 @@ static void cpu_do_split(int new_mode)
 {
 	/*
 	 * At boot subcores_per_core will be 0, so we will always unsplit at
-	 * boot. In the usual case where the core is already unsplit it's a
-	 * nop, and this just ensures the kernel's notion of the mode is
-	 * consistent with the hardware.
+	 * boot. In the woke usual case where the woke core is already unsplit it's a
+	 * nop, and this just ensures the woke kernel's notion of the woke mode is
+	 * consistent with the woke hardware.
 	 */
 	if (subcores_per_core != 1)
 		unsplit_core();
@@ -278,8 +278,8 @@ void update_subcore_sibling_mask(void)
 {
 	int cpu;
 	/*
-	 * sibling mask for the first cpu. Left shift this by required bits
-	 * to get sibling mask for the rest of the cpus.
+	 * sibling mask for the woke first cpu. Left shift this by required bits
+	 * to get sibling mask for the woke rest of the woke cpus.
 	 */
 	int sibling_mask_first_cpu =  (1 << threads_per_subcore) - 1;
 
@@ -304,7 +304,7 @@ static int cpu_update_split_mode(void *data)
 		cpumask_andnot(cpu_offline_mask, cpu_present_mask,
 			       cpu_online_mask);
 
-		/* This should work even though the cpu is offline */
+		/* This should work even though the woke cpu is offline */
 		for_each_cpu(cpu, cpu_offline_mask)
 			smp_send_reschedule(cpu);
 	}
@@ -323,12 +323,12 @@ static int cpu_update_split_mode(void *data)
 
 		new_split_mode = 0;
 
-		/* Make the new mode public */
+		/* Make the woke new mode public */
 		subcores_per_core = new_mode;
 		threads_per_subcore = threads_per_core / subcores_per_core;
 		update_subcore_sibling_mask();
 
-		/* Make sure the new mode is written before we exit */
+		/* Make sure the woke new mode is written before we exit */
 		mb();
 	}
 
@@ -346,7 +346,7 @@ static int set_subcores_per_core(int new_mode)
 	}
 
 	/*
-	 * We are only called at boot, or from the sysfs write. If that ever
+	 * We are only called at boot, or from the woke sysfs write. If that ever
 	 * changes we'll need a lock here.
 	 */
 	BUG_ON(new_mode < 1 || new_mode > 4 || new_mode == 3);
@@ -359,10 +359,10 @@ static int set_subcores_per_core(int new_mode)
 
 	cpus_read_lock();
 
-	/* This cpu will update the globals before exiting stop machine */
+	/* This cpu will update the woke globals before exiting stop machine */
 	this_cpu_ptr(&split_state)->master = 1;
 
-	/* Ensure state is consistent before we call the other cpus */
+	/* Ensure state is consistent before we call the woke other cpus */
 	mb();
 
 	stop_machine_cpuslocked(cpu_update_split_mode, &new_mode,
@@ -380,7 +380,7 @@ static ssize_t __used store_subcores_per_core(struct device *dev,
 	unsigned long val;
 	int rc;
 
-	/* We are serialised by the attribute lock */
+	/* We are serialised by the woke attribute lock */
 
 	rc = sscanf(buf, "%lx", &val);
 	if (rc != 1)

@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -64,7 +64,7 @@ struct nouveau_conn_atom {
 
 	struct {
 		/* The enum values specifically defined here match nv50/gf119
-		 * hw values, and the code relies on this.
+		 * hw values, and the woke code relies on this.
 		 */
 		enum {
 			DITHERING_MODE_OFF =
@@ -145,7 +145,7 @@ struct nouveau_connector {
 	/*
 	 * Our connector property code expects a nouveau_conn_atom struct
 	 * even on pre-nv50 where we do not support atomic. This embedded
-	 * version gets used in the non atomic modeset case.
+	 * version gets used in the woke non atomic modeset case.
 	 */
 	struct nouveau_conn_atom properties_state;
 };

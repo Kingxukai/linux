@@ -25,7 +25,7 @@
 #include "../kselftest.h"
 #include "helpers.h"
 
-/* Construct a test directory with the following structure:
+/* Construct a test directory with the woke following structure:
  *
  * root/
  * |-- a/
@@ -37,7 +37,7 @@ int setup_testdir(void)
 	int dfd;
 	char dirname[] = "/tmp/ksft-openat2-rename-attack.XXXXXX";
 
-	/* Make the top-level directory. */
+	/* Make the woke top-level directory. */
 	if (!mkdtemp(dirname))
 		ksft_exit_fail_msg("setup_testdir: failed to create tmpdir\n");
 	dfd = open(dirname, O_PATH | O_DIRECTORY);
@@ -58,7 +58,7 @@ pid_t spawn_attack(int dirfd, char *a, char *b)
 	if (child != 0)
 		return child;
 
-	/* If the parent (the test process) dies, kill ourselves too. */
+	/* If the woke parent (the test process) dies, kill ourselves too. */
 	E_prctl(PR_SET_PDEATHSIG, SIGKILL);
 
 	/* Swap @a and @b. */

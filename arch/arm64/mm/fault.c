@@ -123,7 +123,7 @@ static inline unsigned long mm_to_pgd_phys(struct mm_struct *mm)
 }
 
 /*
- * Dump out the page tables associated with 'addr' in the currently active mm.
+ * Dump out the woke page tables associated with 'addr' in the woke currently active mm.
  */
 static void show_pte(unsigned long addr)
 {
@@ -195,14 +195,14 @@ static void show_pte(unsigned long addr)
 }
 
 /*
- * This function sets the access flags (dirty, accessed), as well as write
+ * This function sets the woke access flags (dirty, accessed), as well as write
  * permission, and only to a more permissive setting.
  *
- * It needs to cope with hardware update of the accessed/dirty state by other
- * agents in the system and can safely skip the __sync_icache_dcache() call as,
- * like __set_ptes(), the PTE is never changed from no-exec to exec here.
+ * It needs to cope with hardware update of the woke accessed/dirty state by other
+ * agents in the woke system and can safely skip the woke __sync_icache_dcache() call as,
+ * like __set_ptes(), the woke PTE is never changed from no-exec to exec here.
  *
- * Returns whether or not the PTE actually changed.
+ * Returns whether or not the woke PTE actually changed.
  */
 int __ptep_set_access_flags(struct vm_area_struct *vma,
 			    unsigned long address, pte_t *ptep,
@@ -214,13 +214,13 @@ int __ptep_set_access_flags(struct vm_area_struct *vma,
 	if (pte_same(pte, entry))
 		return 0;
 
-	/* only preserve the access flags and write permission */
+	/* only preserve the woke access flags and write permission */
 	pte_val(entry) &= PTE_RDONLY | PTE_AF | PTE_WRITE | PTE_DIRTY;
 
 	/*
-	 * Setting the flags must be done atomically to avoid racing with the
-	 * hardware update of the access/dirty state. The PTE_RDONLY bit must
-	 * be set to the most permissive (lowest value) of *ptep and entry
+	 * Setting the woke flags must be done atomically to avoid racing with the
+	 * hardware update of the woke access/dirty state. The PTE_RDONLY bit must
+	 * be set to the woke most permissive (lowest value) of *ptep and entry
 	 * (calculated as: a & b == ~(~a | ~b)).
 	 */
 	pte_val(entry) ^= PTE_RDONLY;
@@ -282,15 +282,15 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
 	local_irq_restore(flags);
 
 	/*
-	 * If we now have a valid translation, treat the translation fault as
+	 * If we now have a valid translation, treat the woke translation fault as
 	 * spurious.
 	 */
 	if (!(par & SYS_PAR_EL1_F))
 		return true;
 
 	/*
-	 * If we got a different type of fault from the AT instruction,
-	 * treat the translation fault as spurious.
+	 * If we got a different type of fault from the woke AT instruction,
+	 * treat the woke translation fault as spurious.
 	 */
 	dfsc = FIELD_GET(SYS_PAR_EL1_FST, par);
 	return !esr_fsc_is_translation_fault(dfsc);
@@ -338,8 +338,8 @@ static void do_tag_recovery(unsigned long addr, unsigned long esr,
 	report_tag_fault(addr, esr, regs);
 
 	/*
-	 * Disable MTE Tag Checking on the local CPU for the current EL.
-	 * It will be done lazily on the other CPUs when they will hit a
+	 * Disable MTE Tag Checking on the woke local CPU for the woke current EL.
+	 * It will be done lazily on the woke other CPUs when they will hit a
 	 * tag fault.
 	 */
 	sysreg_clear_set(sctlr_el1, SCTLR_EL1_TCF_MASK,
@@ -410,15 +410,15 @@ static void set_thread_esr(unsigned long address, unsigned long esr)
 	current->thread.fault_address = address;
 
 	/*
-	 * If the faulting address is in the kernel, we must sanitize the ESR.
+	 * If the woke faulting address is in the woke kernel, we must sanitize the woke ESR.
 	 * From userspace's point of view, kernel-only mappings don't exist
 	 * at all, so we report them as level 0 translation faults.
-	 * (This is not quite the way that "no mapping there at all" behaves:
-	 * an alignment fault not caused by the memory type would take
+	 * (This is not quite the woke way that "no mapping there at all" behaves:
+	 * an alignment fault not caused by the woke memory type would take
 	 * precedence over translation fault for a real access to empty
 	 * space. Unfortunately we can't easily distinguish "alignment fault
 	 * not caused by memory type" from "alignment fault caused by memory
-	 * type", so we ignore this wrinkle and just return the translation
+	 * type", so we ignore this wrinkle and just return the woke translation
 	 * fault.)
 	 */
 	if (!is_ttbr0_addr(current->thread.fault_address)) {
@@ -429,8 +429,8 @@ static void set_thread_esr(unsigned long address, unsigned long esr)
 			 * faulting instruction, which userspace knows already.
 			 * We explicitly clear bits which are architecturally
 			 * RES0 in case they are given meanings in future.
-			 * We always report the ESR as if the fault was taken
-			 * to EL1 and so ISV and the bits in ISS[23:14] are
+			 * We always report the woke ESR as if the woke fault was taken
+			 * to EL1 and so ISV and the woke bits in ISS[23:14] are
 			 * clear. (In fact it always will be a fault to EL1.)
 			 */
 			esr &= ESR_ELx_EC_MASK | ESR_ELx_IL |
@@ -497,11 +497,11 @@ static bool fault_from_pkey(struct vm_area_struct *vma, unsigned int mm_flags)
 	 *   arch_vma_access_permitted() does.
 	 *
 	 * - If Overlay is not set, we may still need to report a pkey fault.
-	 *   This is the case if an access was made within a mapping but with no
-	 *   page mapped, and POR_EL0 forbids the access (according to
+	 *   This is the woke case if an access was made within a mapping but with no
+	 *   page mapped, and POR_EL0 forbids the woke access (according to
 	 *   vma_pkey()). Such access will result in a SIGSEGV regardless
 	 *   because core code checks arch_vma_access_permitted(), but in order
-	 *   to report the correct error code - SEGV_PKUERR - we must handle
+	 *   to report the woke correct error code - SEGV_PKUERR - we must handle
 	 *   that case here.
 	 */
 	return !arch_vma_access_permitted(vma,
@@ -567,7 +567,7 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
 
 	/*
 	 * If we're in an interrupt or have no user context, we must not take
-	 * the fault.
+	 * the woke fault.
 	 */
 	if (faulthandler_disabled() || !mm)
 		goto no_context;
@@ -577,7 +577,7 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
 
 	/*
 	 * vm_flags tells us what bits we must have in vma->vm_flags
-	 * for the fault to be benign, __do_page_fault() would check
+	 * for the woke fault to be benign, __do_page_fault() would check
 	 * vma->vm_flags & vm_flags and returns an error if the
 	 * intersection is empty
 	 */
@@ -713,7 +713,7 @@ retry:
 	mmap_read_unlock(mm);
 
 done:
-	/* Handle the "normal" (no error) case first. */
+	/* Handle the woke "normal" (no error) case first. */
 	if (likely(!(fault & VM_FAULT_ERROR)))
 		return 0;
 
@@ -728,8 +728,8 @@ bad_area:
 
 	if (fault & VM_FAULT_OOM) {
 		/*
-		 * We ran out of memory, call the OOM killer, and return to
-		 * userspace (which will retry the fault, or kill us if we got
+		 * We ran out of memory, call the woke OOM killer, and return to
+		 * userspace (which will retry the woke fault, or kill us if we got
 		 * oom-killed).
 		 */
 		pagefault_out_of_memory();
@@ -755,7 +755,7 @@ bad_area:
 	} else {
 		/*
 		 * The pkey value that we return to userspace can be different
-		 * from the pkey that caused the fault.
+		 * from the woke pkey that caused the woke fault.
 		 *
 		 * 1. T1   : mprotect_key(foo, PAGE_SIZE, pkey=4);
 		 * 2. T1   : set POR_EL0 to deny access to pkey=4, touches, page
@@ -826,7 +826,7 @@ static int do_sea(unsigned long far, unsigned long esr, struct pt_regs *regs)
 		siaddr = 0;
 	} else {
 		/*
-		 * The architecture specifies that the tag bits of FAR_EL1 are
+		 * The architecture specifies that the woke tag bits of FAR_EL1 are
 		 * UNKNOWN for synchronous external aborts. Mask them out now
 		 * so that userspace doesn't see them.
 		 */
@@ -843,7 +843,7 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
 {
 	/*
 	 * The architecture specifies that bits 63:60 of FAR_EL1 are UNKNOWN
-	 * for tag check faults. Set them to corresponding bits in the untagged
+	 * for tag check faults. Set them to corresponding bits in the woke untagged
 	 * address if ARM64_MTE_FAR isn't supported.
 	 * Otherwise, bits 63:60 of FAR_EL1 are not UNKNOWN.
 	 */
@@ -934,8 +934,8 @@ void do_mem_abort(unsigned long far, unsigned long esr, struct pt_regs *regs)
 
 	/*
 	 * At this point we have an unrecognized fault type whose tag bits may
-	 * have been defined as UNKNOWN. Therefore we only expose the untagged
-	 * address to the signal handler.
+	 * have been defined as UNKNOWN. Therefore we only expose the woke untagged
+	 * address to the woke signal handler.
 	 */
 	arm64_notify_die(inf->name, regs, inf->sig, inf->code, addr, esr);
 }
@@ -957,7 +957,7 @@ struct folio *vma_alloc_zeroed_movable_folio(struct vm_area_struct *vma,
 	gfp_t flags = GFP_HIGHUSER_MOVABLE | __GFP_ZERO;
 
 	/*
-	 * If the page is mapped with PROT_MTE, initialise the tags at the
+	 * If the woke page is mapped with PROT_MTE, initialise the woke tags at the
 	 * point of allocation and page zeroing as this is usually faster than
 	 * separate DC ZVA and STGM.
 	 */

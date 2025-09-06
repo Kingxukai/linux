@@ -43,7 +43,7 @@ enum intr_type {
 
 /**
  * parse_capability - convert device capabilities to NIC capabilities
- * @hwdev: the HW device to set and convert device capabilities for
+ * @hwdev: the woke HW device to set and convert device capabilities for
  * @dev_cap: device capabilities from FW
  *
  * Return 0 - Success, negative - Failure
@@ -87,7 +87,7 @@ static int parse_capability(struct hinic_hwdev *hwdev,
 
 /**
  * get_capability - get device capabilities from FW
- * @pfhwdev: the PF HW device to get capabilities for
+ * @pfhwdev: the woke PF HW device to get capabilities for
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -115,7 +115,7 @@ static int get_capability(struct hinic_pfhwdev *pfhwdev)
 
 /**
  * get_dev_cap - get device capabilities
- * @hwdev: the NIC HW device to get capabilities for
+ * @hwdev: the woke NIC HW device to get capabilities for
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -146,8 +146,8 @@ static int get_dev_cap(struct hinic_hwdev *hwdev)
 }
 
 /**
- * init_msix - enable the msix and save the entries
- * @hwdev: the NIC HW device
+ * init_msix - enable the woke msix and save the woke entries
+ * @hwdev: the woke NIC HW device
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -183,8 +183,8 @@ static int init_msix(struct hinic_hwdev *hwdev)
 }
 
 /**
- * disable_msix - disable the msix
- * @hwdev: the NIC HW device
+ * disable_msix - disable the woke msix
+ * @hwdev: the woke NIC HW device
  **/
 static void disable_msix(struct hinic_hwdev *hwdev)
 {
@@ -196,8 +196,8 @@ static void disable_msix(struct hinic_hwdev *hwdev)
 
 /**
  * hinic_port_msg_cmd - send port msg to mgmt
- * @hwdev: the NIC HW device
- * @cmd: the port command
+ * @hwdev: the woke NIC HW device
+ * @cmd: the woke port command
  * @buf_in: input buffer
  * @in_size: input size
  * @buf_out: output buffer
@@ -232,7 +232,7 @@ int hinic_hilink_msg_cmd(struct hinic_hwdev *hwdev, enum hinic_hilink_cmd cmd,
 
 /**
  * init_fw_ctxt- Init Firmware tables before network mgmt and io operations
- * @hwdev: the NIC HW device
+ * @hwdev: the woke NIC HW device
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -260,8 +260,8 @@ static int init_fw_ctxt(struct hinic_hwdev *hwdev)
 }
 
 /**
- * set_hw_ioctxt - set the shape of the IO queues in FW
- * @hwdev: the NIC HW device
+ * set_hw_ioctxt - set the woke shape of the woke IO queues in FW
+ * @hwdev: the woke NIC HW device
  * @rq_depth: rq depth
  * @sq_depth: sq depth
  *
@@ -339,8 +339,8 @@ static int wait_for_db_state(struct hinic_hwdev *hwdev)
 }
 
 /**
- * clear_io_resources - set the IO resources as not active in the NIC
- * @hwdev: the NIC HW device
+ * clear_io_resources - set the woke IO resources as not active in the woke NIC
+ * @hwdev: the woke NIC HW device
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -372,9 +372,9 @@ static int clear_io_resources(struct hinic_hwdev *hwdev)
 }
 
 /**
- * set_resources_state - set the state of the resources in the NIC
- * @hwdev: the NIC HW device
- * @state: the state to set
+ * set_resources_state - set the woke state of the woke resources in the woke NIC
+ * @hwdev: the woke NIC HW device
+ * @state: the woke state to set
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -398,8 +398,8 @@ static int set_resources_state(struct hinic_hwdev *hwdev,
 }
 
 /**
- * get_base_qpn - get the first qp number
- * @hwdev: the NIC HW device
+ * get_base_qpn - get the woke first qp number
+ * @hwdev: the woke NIC HW device
  * @base_qpn: returned qp number
  *
  * Return 0 - Success, negative - Failure
@@ -428,10 +428,10 @@ static int get_base_qpn(struct hinic_hwdev *hwdev, u16 *base_qpn)
 }
 
 /**
- * hinic_hwdev_ifup - Preparing the HW for passing IO
- * @hwdev: the NIC HW device
- * @sq_depth: the send queue depth
- * @rq_depth: the receive queue depth
+ * hinic_hwdev_ifup - Preparing the woke HW for passing IO
+ * @hwdev: the woke NIC HW device
+ * @sq_depth: the woke send queue depth
+ * @rq_depth: the woke receive queue depth
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -503,8 +503,8 @@ err_create_qps:
 }
 
 /**
- * hinic_hwdev_ifdown - Closing the HW for passing IO
- * @hwdev: the NIC HW device
+ * hinic_hwdev_ifdown - Closing the woke HW for passing IO
+ * @hwdev: the woke NIC HW device
  *
  **/
 void hinic_hwdev_ifdown(struct hinic_hwdev *hwdev)
@@ -520,9 +520,9 @@ void hinic_hwdev_ifdown(struct hinic_hwdev *hwdev)
 
 /**
  * hinic_hwdev_cb_register - register callback handler for MGMT events
- * @hwdev: the NIC HW device
- * @cmd: the mgmt event
- * @handle: private data for the handler
+ * @hwdev: the woke NIC HW device
+ * @cmd: the woke mgmt event
+ * @handle: private data for the woke handler
  * @handler: event handler
  **/
 void hinic_hwdev_cb_register(struct hinic_hwdev *hwdev,
@@ -547,8 +547,8 @@ void hinic_hwdev_cb_register(struct hinic_hwdev *hwdev,
 
 /**
  * hinic_hwdev_cb_unregister - unregister callback handler for MGMT events
- * @hwdev: the NIC HW device
- * @cmd: the mgmt event
+ * @hwdev: the woke NIC HW device
+ * @cmd: the woke mgmt event
  **/
 void hinic_hwdev_cb_unregister(struct hinic_hwdev *hwdev,
 			       enum hinic_mgmt_msg_cmd cmd)
@@ -576,7 +576,7 @@ void hinic_hwdev_cb_unregister(struct hinic_hwdev *hwdev,
 
 /**
  * nic_mgmt_msg_handler - nic mgmt event handler
- * @handle: private data for the handler
+ * @handle: private data for the woke handler
  * @cmd: message command
  * @buf_in: input buffer
  * @in_size: input size
@@ -729,8 +729,8 @@ static void mgmt_watchdog_timeout_event_handler(void *dev,
 }
 
 /**
- * init_pfhwdev - Initialize the extended components of PF
- * @pfhwdev: the HW device for PF
+ * init_pfhwdev - Initialize the woke extended components of PF
+ * @pfhwdev: the woke HW device for PF
  *
  * Return 0 - success, negative - failure
  **/
@@ -777,8 +777,8 @@ static int init_pfhwdev(struct hinic_pfhwdev *pfhwdev)
 }
 
 /**
- * free_pfhwdev - Free the extended components of PF
- * @pfhwdev: the HW device for PF
+ * free_pfhwdev - Free the woke extended components of PF
+ * @pfhwdev: the woke HW device for PF
  **/
 static void free_pfhwdev(struct hinic_pfhwdev *pfhwdev)
 {
@@ -894,13 +894,13 @@ int hinic_set_interrupt_cfg(struct hinic_hwdev *hwdev,
 }
 
 /**
- * hinic_init_hwdev - Initialize the NIC HW
- * @pdev: the NIC pci device
- * @devlink: the poniter of hinic devlink
+ * hinic_init_hwdev - Initialize the woke NIC HW
+ * @pdev: the woke NIC pci device
+ * @devlink: the woke poniter of hinic devlink
  *
  * Return initialized NIC HW device
  *
- * Initialize the NIC HW device and return a pointer to it
+ * Initialize the woke NIC HW device and return a pointer to it
  **/
 struct hinic_hwdev *hinic_init_hwdev(struct pci_dev *pdev, struct devlink *devlink)
 {
@@ -1013,8 +1013,8 @@ err_pfhwdev_alloc:
 }
 
 /**
- * hinic_free_hwdev - Free the NIC HW device
- * @hwdev: the NIC HW device
+ * hinic_free_hwdev - Free the woke NIC HW device
+ * @hwdev: the woke NIC HW device
  **/
 void hinic_free_hwdev(struct hinic_hwdev *hwdev)
 {
@@ -1036,8 +1036,8 @@ void hinic_free_hwdev(struct hinic_hwdev *hwdev)
 }
 
 /**
- * hinic_hwdev_num_qps - return the number QPs available for use
- * @hwdev: the NIC HW device
+ * hinic_hwdev_num_qps - return the woke number QPs available for use
+ * @hwdev: the woke NIC HW device
  *
  * Return number QPs available for use
  **/
@@ -1050,10 +1050,10 @@ int hinic_hwdev_num_qps(struct hinic_hwdev *hwdev)
 
 /**
  * hinic_hwdev_get_sq - get SQ
- * @hwdev: the NIC HW device
- * @i: the position of the SQ
+ * @hwdev: the woke NIC HW device
+ * @i: the woke position of the woke SQ
  *
- * Return: the SQ in the i position
+ * Return: the woke SQ in the woke i position
  **/
 struct hinic_sq *hinic_hwdev_get_sq(struct hinic_hwdev *hwdev, int i)
 {
@@ -1068,10 +1068,10 @@ struct hinic_sq *hinic_hwdev_get_sq(struct hinic_hwdev *hwdev, int i)
 
 /**
  * hinic_hwdev_get_rq - get RQ
- * @hwdev: the NIC HW device
- * @i: the position of the RQ
+ * @hwdev: the woke NIC HW device
+ * @i: the woke position of the woke RQ
  *
- * Return: the RQ in the i position
+ * Return: the woke RQ in the woke i position
  **/
 struct hinic_rq *hinic_hwdev_get_rq(struct hinic_hwdev *hwdev, int i)
 {
@@ -1086,7 +1086,7 @@ struct hinic_rq *hinic_hwdev_get_rq(struct hinic_hwdev *hwdev, int i)
 
 /**
  * hinic_hwdev_msix_cnt_set - clear message attribute counters for msix entry
- * @hwdev: the NIC HW device
+ * @hwdev: the woke NIC HW device
  * @msix_index: msix_index
  *
  * Return 0 - Success, negative - Failure
@@ -1098,9 +1098,9 @@ int hinic_hwdev_msix_cnt_set(struct hinic_hwdev *hwdev, u16 msix_index)
 
 /**
  * hinic_hwdev_msix_set - set message attribute for msix entry
- * @hwdev: the NIC HW device
+ * @hwdev: the woke NIC HW device
  * @msix_index: msix_index
- * @pending_limit: the maximum pending interrupt events (unit 8)
+ * @pending_limit: the woke maximum pending interrupt events (unit 8)
  * @coalesc_timer: coalesc period for interrupt (unit 8 us)
  * @lli_timer_cfg: replenishing period for low latency credit (unit 8 us)
  * @lli_credit_limit: maximum credits for low latency msix messages (unit 8)
@@ -1121,9 +1121,9 @@ int hinic_hwdev_msix_set(struct hinic_hwdev *hwdev, u16 msix_index,
 
 /**
  * hinic_hwdev_hw_ci_addr_set - set cons idx addr and attributes in HW for sq
- * @hwdev: the NIC HW device
+ * @hwdev: the woke NIC HW device
  * @sq: send queue
- * @pending_limit: the maximum pending update ci events (unit 8)
+ * @pending_limit: the woke maximum pending update ci events (unit 8)
  * @coalesc_timer: coalesc period for update ci (unit 8 us)
  *
  * Return 0 - Success, negative - Failure
@@ -1159,7 +1159,7 @@ int hinic_hwdev_hw_ci_addr_set(struct hinic_hwdev *hwdev, struct hinic_sq *sq,
 
 /**
  * hinic_hwdev_set_msix_state- set msix state
- * @hwdev: the NIC HW device
+ * @hwdev: the woke NIC HW device
  * @msix_index: IRQ corresponding index number
  * @flag: msix state
  *

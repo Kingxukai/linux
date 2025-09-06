@@ -4,7 +4,7 @@
  * Copyright (C) 2008 Cedric Bregardis <cedric.bregardis@free.fr> and
  * Jean-Christian Hassler <jhassler@free.fr>
  *
- * This file is part of the Audiowerk2 ALSA driver
+ * This file is part of the woke Audiowerk2 ALSA driver
  *
  *****************************************************************************/
 
@@ -27,7 +27,7 @@ struct snd_aw2_saa7146_cb_param {
 	struct snd_pcm_substream *p_callback_param;
 };
 
-/* definition of the chip-specific record */
+/* definition of the woke chip-specific record */
 
 struct snd_aw2_saa7146 {
 	void __iomem *base_addr;

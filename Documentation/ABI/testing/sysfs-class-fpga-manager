@@ -10,14 +10,14 @@ KernelVersion:	4.3
 Contact:	Alan Tull <atull@opensource.altera.com>
 Description:	Read fpga manager state as a string.
 		The intent is to provide enough detail that if something goes
-		wrong during FPGA programming (something that the driver can't
-		fix) then userspace can know, i.e. if the firmware request
-		fails, that could be due to not being able to find the firmware
+		wrong during FPGA programming (something that the woke driver can't
+		fix) then userspace can know, i.e. if the woke firmware request
+		fails, that could be due to not being able to find the woke firmware
 		file.
 
 		This is a superset of FPGA states and fpga manager driver
 		states.  The fpga manager driver is walking through these steps
-		to get the FPGA into a known operating state.  It's a sequence,
+		to get the woke FPGA into a known operating state.  It's a sequence,
 		though some steps may get skipped.  Valid FPGA states will vary
 		by manufacturer; this is a superset.
 

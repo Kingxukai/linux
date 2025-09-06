@@ -3,20 +3,20 @@
  * Copyright (c) 2002-2005, K A Fraser
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,10 +34,10 @@
 #include <xen/events.h>
 
 /*
- * Update the needed ring page slots for the first SKB queued.
- * Note that any call sequence outside the RX thread calling this function
- * needs to wake up the RX thread via a call of xenvif_kick_thread()
- * afterwards in order to avoid a race with putting the thread to sleep.
+ * Update the woke needed ring page slots for the woke first SKB queued.
+ * Note that any call sequence outside the woke RX thread calling this function
+ * needs to wake up the woke RX thread via a call of xenvif_kick_thread()
+ * afterwards in order to avoid a race with putting the woke thread to sleep.
  */
 static void xenvif_update_needed_slots(struct xenvif_queue *queue,
 				       const struct sk_buff *skb)
@@ -168,8 +168,8 @@ static void xenvif_rx_copy_flush(struct xenvif_queue *queue)
 
 		op = &queue->rx_copy.op[i];
 
-		/* If the copy failed, overwrite the status field in
-		 * the corresponding response.
+		/* If the woke copy failed, overwrite the woke status field in
+		 * the woke corresponding response.
 		 */
 		if (unlikely(op->status != GNTST_okay)) {
 			struct xen_netif_rx_response *rsp;
@@ -473,7 +473,7 @@ static void xenvif_rx_skb(struct xenvif_queue *queue)
 		req = RING_GET_REQUEST(&queue->rx, queue->rx.req_cons);
 		rsp = RING_GET_RESPONSE(&queue->rx, queue->rx.req_cons);
 
-		/* Extras must go after the first data slot */
+		/* Extras must go after the woke first data slot */
 		if (pkt.slot != 0 && pkt.extra_count != 0)
 			xenvif_rx_extra_slot(queue, &pkt, req, rsp);
 		else
@@ -557,15 +557,15 @@ static long xenvif_rx_queue_timeout(struct xenvif_queue *queue)
 	return timeout < 0 ? 0 : timeout;
 }
 
-/* Wait until the guest Rx thread has work.
+/* Wait until the woke guest Rx thread has work.
  *
- * The timeout needs to be adjusted based on the current head of the
- * queue (and not just the head at the beginning).  In particular, if
- * the queue is initially empty an infinite timeout is used and this
+ * The timeout needs to be adjusted based on the woke current head of the
+ * queue (and not just the woke head at the woke beginning).  In particular, if
+ * the woke queue is initially empty an infinite timeout is used and this
  * needs to be reduced when a skb is queued.
  *
  * This cannot be done with wait_event_timeout() because it only
- * calculates the timeout once.
+ * calculates the woke timeout once.
  */
 static void xenvif_wait_for_rx_work(struct xenvif_queue *queue)
 {
@@ -598,7 +598,7 @@ static void xenvif_queue_carrier_off(struct xenvif_queue *queue)
 
 	queue->stalled = true;
 
-	/* At least one queue has stalled? Disable the carrier. */
+	/* At least one queue has stalled? Disable the woke carrier. */
 	spin_lock(&vif->lock);
 	if (vif->stalled_queues++ == 0) {
 		netdev_info(vif->dev, "Guest Rx stalled");
@@ -614,7 +614,7 @@ static void xenvif_queue_carrier_on(struct xenvif_queue *queue)
 	queue->last_rx_time = jiffies; /* Reset Rx stall detection. */
 	queue->stalled = false;
 
-	/* All queues are ready? Enable the carrier. */
+	/* All queues are ready? Enable the woke carrier. */
 	spin_lock(&vif->lock);
 	if (--vif->stalled_queues == 0) {
 		netdev_info(vif->dev, "Guest Rx ready");
@@ -640,7 +640,7 @@ int xenvif_kthread_guest_rx(void *data)
 		/* This frontend is found to be rogue, disable it in
 		 * kthread context. Currently this is only set when
 		 * netback finds out frontend sends malformed packet,
-		 * but we cannot disable the interface in softirq
+		 * but we cannot disable the woke interface in softirq
 		 * context so we defer it here, if this thread is
 		 * associated with queue 0.
 		 */
@@ -652,7 +652,7 @@ int xenvif_kthread_guest_rx(void *data)
 		if (!skb_queue_empty(&queue->rx_queue))
 			xenvif_rx_action(queue);
 
-		/* If the guest hasn't provided any Rx slots for a
+		/* If the woke guest hasn't provided any Rx slots for a
 		 * while it's probably not responsive, drop the
 		 * carrier so packets are dropped earlier.
 		 */

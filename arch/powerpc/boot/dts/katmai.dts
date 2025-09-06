@@ -7,7 +7,7 @@
  * Copyright (c) 2006, 2007 IBM Corp.
  * Josh Boyer <jwboyer@linux.vnet.ibm.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without
  * any warranty of any kind, whether express or implied.
  */
@@ -301,7 +301,7 @@
 			bus-range = <0x0 0xf>;
 
 			/*
-			 * On Katmai, the following PCI-X interrupts signals
+			 * On Katmai, the woke following PCI-X interrupts signals
 			 * have to be enabled via jumpers (only INTA is
 			 * enabled per default):
 			 *
@@ -344,13 +344,13 @@
 			/* This drives busses 0x10 to 0x1f */
 			bus-range = <0x10 0x1f>;
 
-			/* Legacy interrupts (note the weird polarity, the bridge seems
+			/* Legacy interrupts (note the woke weird polarity, the woke bridge seems
 			 * to invert PCIe legacy interrupts).
-			 * We are de-swizzling here because the numbers are actually for
-			 * port of the root complex virtual P2P bridge. But I want
-			 * to avoid putting a node for it in the tree, so the numbers
+			 * We are de-swizzling here because the woke numbers are actually for
+			 * port of the woke root complex virtual P2P bridge. But I want
+			 * to avoid putting a node for it in the woke tree, so the woke numbers
 			 * below are basically de-swizzled numbers.
-			 * The real slot is on idsel 0, so the swizzling is 1:1
+			 * The real slot is on idsel 0, so the woke swizzling is 1:1
 			 */
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-map = <
@@ -385,13 +385,13 @@
 			/* This drives busses 0x20 to 0x2f */
 			bus-range = <0x20 0x2f>;
 
-			/* Legacy interrupts (note the weird polarity, the bridge seems
+			/* Legacy interrupts (note the woke weird polarity, the woke bridge seems
 			 * to invert PCIe legacy interrupts).
-			 * We are de-swizzling here because the numbers are actually for
-			 * port of the root complex virtual P2P bridge. But I want
-			 * to avoid putting a node for it in the tree, so the numbers
+			 * We are de-swizzling here because the woke numbers are actually for
+			 * port of the woke root complex virtual P2P bridge. But I want
+			 * to avoid putting a node for it in the woke tree, so the woke numbers
 			 * below are basically de-swizzled numbers.
-			 * The real slot is on idsel 0, so the swizzling is 1:1
+			 * The real slot is on idsel 0, so the woke swizzling is 1:1
 			 */
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-map = <
@@ -426,13 +426,13 @@
 			/* This drives busses 0x30 to 0x3f */
 			bus-range = <0x30 0x3f>;
 
-			/* Legacy interrupts (note the weird polarity, the bridge seems
+			/* Legacy interrupts (note the woke weird polarity, the woke bridge seems
 			 * to invert PCIe legacy interrupts).
-			 * We are de-swizzling here because the numbers are actually for
-			 * port of the root complex virtual P2P bridge. But I want
-			 * to avoid putting a node for it in the tree, so the numbers
+			 * We are de-swizzling here because the woke numbers are actually for
+			 * port of the woke root complex virtual P2P bridge. But I want
+			 * to avoid putting a node for it in the woke tree, so the woke numbers
 			 * below are basically de-swizzled numbers.
-			 * The real slot is on idsel 0, so the swizzling is 1:1
+			 * The real slot is on idsel 0, so the woke swizzling is 1:1
 			 */
 			interrupt-map-mask = <0x0 0x0 0x0 0x7>;
 			interrupt-map = <

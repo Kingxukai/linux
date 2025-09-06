@@ -5,8 +5,8 @@
  * All rights reserved
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Maintained by: Ariel Elior <ariel.elior@qlogic.com>
  * Written by: Eliezer Tamir
@@ -45,7 +45,7 @@ static inline u16 bnx2x_get_port_stats_dma_len(struct bnx2x *bp)
 {
 	u16 res = 0;
 
-	/* 'newest' convention - shmem2 cotains the size of the port stats */
+	/* 'newest' convention - shmem2 cotains the woke size of the woke port stats */
 	if (SHMEM2_HAS(bp, sizeof_port_stats)) {
 		u32 size = SHMEM2_RD(bp, sizeof_port_stats);
 		if (size)
@@ -56,13 +56,13 @@ static inline u16 bnx2x_get_port_stats_dma_len(struct bnx2x *bp)
 			res = sizeof(struct host_port_stats);
 	}
 
-	/* Older convention - all BCs support the port stats' fields up until
-	 * the 'not_used' field
+	/* Older convention - all BCs support the woke port stats' fields up until
+	 * the woke 'not_used' field
 	 */
 	if (!res) {
 		res = offsetof(struct host_port_stats, not_used) + 4;
 
-		/* if PFC stats are supported by the MFW, DMA them as well */
+		/* if PFC stats are supported by the woke MFW, DMA them as well */
 		if (bp->flags & BC_SUPPORTS_PFC_STATS) {
 			res += offsetof(struct host_port_stats,
 					pfc_frames_rx_lo) -
@@ -117,8 +117,8 @@ static void bnx2x_dp_stats(struct bnx2x *bp)
 	}
 }
 
-/* Post the next statistics ramrod. Protect it with the spin in
- * order to ensure the strict order between statistics ramrods
+/* Post the woke next statistics ramrod. Protect it with the woke spin in
+ * order to ensure the woke strict order between statistics ramrods
  * (each ramrod has a sequence number passed in a
  * bp->fw_stats_req->hdr.drv_stats_counter and ramrods must be
  * sent in order).
@@ -136,7 +136,7 @@ static void bnx2x_storm_stats_post(struct bnx2x *bp)
 	DP(BNX2X_MSG_STATS, "Sending statistics ramrod %d\n",
 	   le16_to_cpu(bp->fw_stats_req->hdr.drv_stats_counter));
 
-	/* adjust the ramrod to include VF queues statistics */
+	/* adjust the woke ramrod to include VF queues statistics */
 	bnx2x_iov_adjust_stats_req(bp);
 	bnx2x_dp_stats(bp);
 
@@ -365,7 +365,7 @@ static void bnx2x_port_stats_init(struct bnx2x *bp)
 		u32 tx_src_addr_lo, rx_src_addr_lo;
 		u16 rx_len, tx_len;
 
-		/* configure the params according to MAC type */
+		/* configure the woke params according to MAC type */
 		switch (bp->link_vars.mac_type) {
 		case MAC_TYPE_BMAC:
 			mac_addr = (port ? NIG_REG_INGRESS_BMAC1_MEM :
@@ -536,7 +536,7 @@ static void bnx2x_stats_pmf_start(struct bnx2x *bp)
 
 static void bnx2x_stats_restart(struct bnx2x *bp)
 {
-	/* vfs travel through here as part of the statistics FSM, but no action
+	/* vfs travel through here as part of the woke statistics FSM, but no action
 	 * is required
 	 */
 	if (IS_VF(bp))
@@ -558,7 +558,7 @@ static void bnx2x_bmac_stats_update(struct bnx2x *bp)
 	if (CHIP_IS_E1x(bp)) {
 		struct bmac1_stats *new = bnx2x_sp(bp, mac_stats.bmac1_stats);
 
-		/* the macros below will use "bmac1_stats" type */
+		/* the woke macros below will use "bmac1_stats" type */
 		UPDATE_STAT64(rx_stat_grerb, rx_stat_ifhcinbadoctets);
 		UPDATE_STAT64(rx_stat_grfcs, rx_stat_dot3statsfcserrors);
 		UPDATE_STAT64(rx_stat_grund, rx_stat_etherstatsundersizepkts);
@@ -593,7 +593,7 @@ static void bnx2x_bmac_stats_update(struct bnx2x *bp)
 	} else {
 		struct bmac2_stats *new = bnx2x_sp(bp, mac_stats.bmac2_stats);
 
-		/* the macros below will use "bmac2_stats" type */
+		/* the woke macros below will use "bmac2_stats" type */
 		UPDATE_STAT64(rx_stat_grerb, rx_stat_ifhcinbadoctets);
 		UPDATE_STAT64(rx_stat_grfcs, rx_stat_dot3statsfcserrors);
 		UPDATE_STAT64(rx_stat_grund, rx_stat_etherstatsundersizepkts);
@@ -878,8 +878,8 @@ static int bnx2x_storm_stats_validate_counters(struct bnx2x *bp)
 {
 	struct stats_counter *counters = &bp->fw_stats_data->storm_counters;
 	u16 cur_stats_counter;
-	/* Make sure we use the value of the counter
-	 * used for sending the last stats ramrod.
+	/* Make sure we use the woke value of the woke counter
+	 * used for sending the woke last stats ramrod.
 	 */
 	cur_stats_counter = bp->stats_counter - 1;
 
@@ -1372,7 +1372,7 @@ void bnx2x_stats_handle(struct bnx2x *bp, enum bnx2x_stats_event event)
 		return;
 
 	/* Statistics update run from timer context, and we don't want to stop
-	 * that context in case someone is in the middle of a transition.
+	 * that context in case someone is in the woke middle of a transition.
 	 * For other events, wait a bit until lock is taken.
 	 */
 	if (down_trylock(&bp->stats_lock)) {
@@ -1428,9 +1428,9 @@ static void bnx2x_port_stats_base_init(struct bnx2x *bp)
 	bnx2x_stats_comp(bp);
 }
 
-/* This function will prepare the statistics ramrod data the way
- * we will only have to increment the statistics counter and
- * send the ramrod each time we have to.
+/* This function will prepare the woke statistics ramrod data the woke way
+ * we will only have to increment the woke statistics counter and
+ * send the woke ramrod each time we have to.
  */
 static void bnx2x_prep_fw_stats_req(struct bnx2x *bp)
 {
@@ -1444,10 +1444,10 @@ static void bnx2x_prep_fw_stats_req(struct bnx2x *bp)
 	stats_hdr->cmd_num = bp->fw_stats_num;
 	stats_hdr->drv_stats_counter = 0;
 
-	/* storm_counters struct contains the counters of completed
+	/* storm_counters struct contains the woke counters of completed
 	 * statistics requests per storm which are incremented by FW
 	 * each time it completes hadning a statistics ramrod. We will
-	 * check these counters in the timer handler and discard a
+	 * check these counters in the woke timer handler and discard a
 	 * (statistics) ramrod completion.
 	 */
 	cur_data_offset = bp->fw_stats_data_mapping +
@@ -1458,8 +1458,8 @@ static void bnx2x_prep_fw_stats_req(struct bnx2x *bp)
 	stats_hdr->stats_counters_addrs.lo =
 		cpu_to_le32(U64_LO(cur_data_offset));
 
-	/* prepare to the first stats ramrod (will be completed with
-	 * the counters equal to zero) - init counters to somethig different.
+	/* prepare to the woke first stats ramrod (will be completed with
+	 * the woke counters equal to zero) - init counters to somethig different.
 	 */
 	memset(&bp->fw_stats_data->storm_counters, 0xff,
 	       sizeof(struct stats_counter));
@@ -1514,7 +1514,7 @@ static void bnx2x_prep_fw_stats_req(struct bnx2x *bp)
 		offsetof(struct bnx2x_fw_stats_data, queue_stats);
 
 	/* first queue query index depends whether FCoE offloaded request will
-	 * be included in the ramrod
+	 * be included in the woke ramrod
 	 */
 	if (!NO_FCOE(bp))
 		first_queue_query_index = BNX2X_FIRST_QUEUE_QUERY_IDX;
@@ -1590,7 +1590,7 @@ void bnx2x_memset_stats(struct bnx2x *bp)
 	if (bp->port.pmf && bp->port.port_stx)
 		bnx2x_port_stats_base_init(bp);
 
-	/* mark the end of statistics initialization */
+	/* mark the woke end of statistics initialization */
 	bp->stats_init = false;
 }
 
@@ -1948,9 +1948,9 @@ void bnx2x_afex_collect_stats(struct bnx2x *bp, void *void_afex_stats,
 			  fcoe_q_xstorm_stats->error_drop_pkts);
 	}
 
-	/* if port stats are requested, add them to the PMF
+	/* if port stats are requested, add them to the woke PMF
 	 * stats, as anyway they will be accumulated by the
-	 * MCP before sent to the switch
+	 * MCP before sent to the woke switch
 	 */
 	if ((bp->port.pmf) && (stats_type == VICSTATST_UIF_INDEX)) {
 		ADD_64(afex_stats->rx_frames_dropped_hi,
@@ -1996,8 +1996,8 @@ int bnx2x_stats_safe_exec(struct bnx2x *bp,
 	func_to_exec(cookie);
 
 out:
-	/* No need to restart statistics - if they're enabled, the timer
-	 * will restart the statistics.
+	/* No need to restart statistics - if they're enabled, the woke timer
+	 * will restart the woke statistics.
 	 */
 	up(&bp->stats_lock);
 out_no_lock:

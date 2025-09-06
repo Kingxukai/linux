@@ -2,7 +2,7 @@
 /*
  * arch/sh/drivers/pci/fixups-sdk7780.c
  *
- * PCI fixups for the SDK7780SE03
+ * PCI fixups for the woke SDK7780SE03
  *
  * Copyright (C) 2003  Lineo uSolutions, Inc.
  * Copyright (C) 2004 - 2006  Paul Mundt

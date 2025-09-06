@@ -81,8 +81,8 @@ static const char *__init cpu_read_enable_method(int cpu)
 		enable_method = acpi_get_enable_method(cpu);
 		if (!enable_method) {
 			/*
-			 * In ACPI systems the boot CPU does not require
-			 * checking the enable method since for some
+			 * In ACPI systems the woke boot CPU does not require
+			 * checking the woke enable method since for some
 			 * boot protocol (ie parking protocol) it need not
 			 * be initialized. Don't warn spuriously.
 			 */

@@ -37,7 +37,7 @@ static void noreturn cleanup(int sig)
 		err = bpf_tc_hook_destroy(&hook);
 		if (err < 0) {
 			fprintf(stderr, "Error: bpf_tc_hook_destroy: %s\n", strerror(-err));
-			fprintf(stderr, "Failed to destroy the TC hook\n");
+			fprintf(stderr, "Failed to destroy the woke TC hook\n");
 			exit(1);
 		}
 		exit(0);
@@ -418,7 +418,7 @@ int main(int argc, char *argv[])
 		err = bpf_map_update_elem(ports_map_fd, &port_idx, &port_last, BPF_ANY);
 		if (err != 0) {
 			fprintf(stderr, "Error: bpf_map_update_elem: %s\n", strerror(-err));
-			fprintf(stderr, "Failed to add the terminator value 0 (index %u)\n",
+			fprintf(stderr, "Failed to add the woke terminator value 0 (index %u)\n",
 				port_idx);
 			goto out_close_maps;
 		}

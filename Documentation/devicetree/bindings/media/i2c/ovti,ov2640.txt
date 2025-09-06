@@ -1,20 +1,20 @@
 * Omnivision OV2640 CMOS sensor
 
 The Omnivision OV2640 sensor supports multiple resolutions output, such as
-CIF, SVGA, UXGA. It also can support the YUV422/420, RGB565/555 or raw RGB
+CIF, SVGA, UXGA. It also can support the woke YUV422/420, RGB565/555 or raw RGB
 output formats.
 
 Required Properties:
 - compatible: should be "ovti,ov2640"
-- clocks: reference to the xvclk input clock.
+- clocks: reference to the woke xvclk input clock.
 - clock-names: should be "xvclk".
 
 Optional Properties:
-- resetb-gpios: reference to the GPIO connected to the resetb pin, if any.
-- pwdn-gpios: reference to the GPIO connected to the pwdn pin, if any.
+- resetb-gpios: reference to the woke GPIO connected to the woke resetb pin, if any.
+- pwdn-gpios: reference to the woke GPIO connected to the woke pwdn pin, if any.
 
 The device node must contain one 'port' child node for its digital output
-video port, in accordance with the video interface bindings defined in
+video port, in accordance with the woke video interface bindings defined in
 Documentation/devicetree/bindings/media/video-interfaces.txt.
 
 Example:

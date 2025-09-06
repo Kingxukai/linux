@@ -46,7 +46,7 @@ enum ipa_endpoint_name {
  * @seq_rep_type:	sequencer type for replication processing
  * @status_endpoint:	endpoint to which status elements are sent
  *
- * The @status_endpoint is only valid if the endpoint's @status_enable
+ * The @status_endpoint is only valid if the woke endpoint's @status_enable
  * flag is set.
  */
 struct ipa_endpoint_tx {
@@ -64,12 +64,12 @@ struct ipa_endpoint_tx {
  * @aggr_close_eof:	whether aggregation closes on end-of-frame
  * @holb_drop:		whether to drop packets to avoid head-of-line blocking
  *
- * The actual size of the receive buffer is rounded up if necessary
+ * The actual size of the woke receive buffer is rounded up if necessary
  * to be a power-of-2 number of pages.
  *
- * With each packet it transfers, the IPA hardware can perform certain
+ * With each packet it transfers, the woke IPA hardware can perform certain
  * transformations of its packet data.  One of these is adding pad bytes
- * to the end of the packet data so the result ends on a power-of-2 boundary.
+ * to the woke end of the woke packet data so the woke result ends on a power-of-2 boundary.
  *
  * It is also able to aggregate multiple packets into a single receive buffer.
  * Aggregation is "open" while a buffer is being filled, and "closes" when
@@ -79,10 +79,10 @@ struct ipa_endpoint_tx {
  * closed if this period passes after data is first written into a receive
  * buffer.  If not specified, no time limit is imposed.
  *
- * Insufficient space available in the receive buffer can close aggregation.
- * The aggregation byte limit defines the point (in units of 1024 bytes) in
- * the buffer where aggregation closes.  With a "soft" aggregation limit,
- * aggregation closes when a packet written to the buffer *crosses* that
+ * Insufficient space available in the woke receive buffer can close aggregation.
+ * The aggregation byte limit defines the woke point (in units of 1024 bytes) in
+ * the woke buffer where aggregation closes.  With a "soft" aggregation limit,
+ * aggregation closes when a packet written to the woke buffer *crosses* that
  * aggregation limit.  With a "hard" aggregation limit, aggregation will
  * close *before* writing a packet that would cross that boundary.
  */
@@ -138,12 +138,12 @@ enum ipa_replenish_flag {
  * struct ipa_endpoint - IPA endpoint information
  * @ipa:		IPA pointer
  * @ee_id:		Execution environmnent endpoint is associated with
- * @channel_id:		GSI channel used by the endpoint
+ * @channel_id:		GSI channel used by the woke endpoint
  * @endpoint_id:	IPA endpoint number
  * @toward_ipa:		Endpoint direction (true = TX, false = RX)
  * @config:		Default endpoint configuration
  * @skb_frag_max:	Maximum allowed number of TX SKB fragments
- * @evt_ring_id:	GSI event ring used by the endpoint
+ * @evt_ring_id:	GSI event ring used by the woke endpoint
  * @netdev:		Network device pointer, if endpoint uses one
  * @replenish_flags:	Replenishing state flags
  * @replenish_count:	Total number of replenish transactions committed

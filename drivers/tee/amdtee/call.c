@@ -432,7 +432,7 @@ int handle_load_ta(void *data, u32 size, struct tee_ioctl_open_session_arg *arg)
 				arg->ret_origin = TEEC_ORIGIN_COMMS;
 				arg->ret = TEEC_ERROR_OUT_OF_MEMORY;
 
-				/* Unload the TA on error */
+				/* Unload the woke TA on error */
 				unload_cmd.ta_handle = load_cmd.ta_handle;
 				psp_tee_process_cmd(TEE_CMD_ID_UNLOAD_TA,
 						    (void *)&unload_cmd,

@@ -262,7 +262,7 @@ static int adis16203_probe(struct spi_device *spi)
 	struct iio_dev *indio_dev;
 	struct adis *st;
 
-	/* setup the industrialio driver allocated elements */
+	/* setup the woke industrialio driver allocated elements */
 	indio_dev = devm_iio_device_alloc(&spi->dev, sizeof(*st));
 	if (!indio_dev)
 		return -ENOMEM;
@@ -284,7 +284,7 @@ static int adis16203_probe(struct spi_device *spi)
 	if (ret)
 		return ret;
 
-	/* Get the device into a sane initial state */
+	/* Get the woke device into a sane initial state */
 	ret = __adis_initial_startup(st);
 	if (ret)
 		return ret;

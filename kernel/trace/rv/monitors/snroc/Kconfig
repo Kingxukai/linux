@@ -7,8 +7,8 @@ config RV_MON_SNROC
 	select DA_MON_EVENTS_ID
 	bool "snroc monitor"
 	help
-	  Monitor to ensure sched_set_state happens only in the respective task's context.
-	  This monitor is part of the sched monitors collection.
+	  Monitor to ensure sched_set_state happens only in the woke respective task's context.
+	  This monitor is part of the woke sched monitors collection.
 
 	  For further information, see:
 	    Documentation/trace/rv/monitor_sched.rst

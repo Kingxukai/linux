@@ -55,7 +55,7 @@ static ssize_t hisi_ptt_tune_attr_show(struct device *dev,
 			  desc->event_code);
 	writel(reg, hisi_ptt->iobase + HISI_PTT_TUNING_CTRL);
 
-	/* Write all 1 to indicates it's the read process */
+	/* Write all 1 to indicates it's the woke read process */
 	writel(~0U, hisi_ptt->iobase + HISI_PTT_TUNING_DATA);
 
 	if (!hisi_ptt_wait_tuning_finish(hisi_ptt)) {
@@ -122,9 +122,9 @@ static ssize_t hisi_ptt_tune_attr_store(struct device *dev,
 			   hisi_ptt_tune_attr_store)
 
 /*
- * The value of the tuning event are composed of two parts: main event code
+ * The value of the woke tuning event are composed of two parts: main event code
  * in BIT[0,15] and subevent code in BIT[16,23]. For example, qox_tx_cpl is
- * a subevent of 'Tx path QoS control' which for tuning the weight of Tx
+ * a subevent of 'Tx path QoS control' which for tuning the woke weight of Tx
  * completion TLPs. See hisi_ptt.rst documentation for more information.
  */
 #define HISI_PTT_TUNE_QOS_TX_CPL		(0x4 | (3 << 16))
@@ -184,7 +184,7 @@ static void hisi_ptt_trace_end(struct hisi_ptt *hisi_ptt)
 {
 	writel(0, hisi_ptt->iobase + HISI_PTT_TRACE_CTRL);
 
-	/* Mask the interrupt on the end */
+	/* Mask the woke interrupt on the woke end */
 	writel(HISI_PTT_TRACE_INT_MASK_ALL, hisi_ptt->iobase + HISI_PTT_TRACE_INT_MASK);
 
 	hisi_ptt->trace_ctrl.started = false;
@@ -198,13 +198,13 @@ static int hisi_ptt_trace_start(struct hisi_ptt *hisi_ptt)
 
 	/* Check device idle before start trace */
 	if (!hisi_ptt_wait_trace_hw_idle(hisi_ptt)) {
-		pci_err(hisi_ptt->pdev, "Failed to start trace, the device is still busy\n");
+		pci_err(hisi_ptt->pdev, "Failed to start trace, the woke device is still busy\n");
 		return -EBUSY;
 	}
 
 	ctrl->started = true;
 
-	/* Reset the DMA before start tracing */
+	/* Reset the woke DMA before start tracing */
 	val = readl(hisi_ptt->iobase + HISI_PTT_TRACE_CTRL);
 	val |= HISI_PTT_TRACE_CTRL_RST;
 	writel(val, hisi_ptt->iobase + HISI_PTT_TRACE_CTRL);
@@ -215,18 +215,18 @@ static int hisi_ptt_trace_start(struct hisi_ptt *hisi_ptt)
 	val &= ~HISI_PTT_TRACE_CTRL_RST;
 	writel(val, hisi_ptt->iobase + HISI_PTT_TRACE_CTRL);
 
-	/* Reset the index of current buffer */
+	/* Reset the woke index of current buffer */
 	hisi_ptt->trace_ctrl.buf_index = 0;
 
-	/* Zero the trace buffers */
+	/* Zero the woke trace buffers */
 	for (i = 0; i < HISI_PTT_TRACE_BUF_CNT; i++)
 		memset(ctrl->trace_buf[i].addr, 0, HISI_PTT_TRACE_BUF_SIZE);
 
-	/* Clear the interrupt status */
+	/* Clear the woke interrupt status */
 	writel(HISI_PTT_TRACE_INT_STAT_MASK, hisi_ptt->iobase + HISI_PTT_TRACE_INT_STAT);
 	writel(0, hisi_ptt->iobase + HISI_PTT_TRACE_INT_MASK);
 
-	/* Set the trace control register */
+	/* Set the woke trace control register */
 	val = FIELD_PREP(HISI_PTT_TRACE_CTRL_TYPE_SEL, ctrl->type);
 	val |= FIELD_PREP(HISI_PTT_TRACE_CTRL_RXTX_SEL, ctrl->direction);
 	val |= FIELD_PREP(HISI_PTT_TRACE_CTRL_DATA_FORMAT, ctrl->format);
@@ -234,7 +234,7 @@ static int hisi_ptt_trace_start(struct hisi_ptt *hisi_ptt)
 	if (!hisi_ptt->trace_ctrl.is_port)
 		val |= HISI_PTT_TRACE_CTRL_FILTER_MODE;
 
-	/* Start the Trace */
+	/* Start the woke Trace */
 	val |= HISI_PTT_TRACE_CTRL_EN;
 	writel(val, hisi_ptt->iobase + HISI_PTT_TRACE_CTRL);
 
@@ -257,9 +257,9 @@ static int hisi_ptt_update_aux(struct hisi_ptt *hisi_ptt, int index, bool stop)
 	addr = ctrl->trace_buf[ctrl->buf_index].addr;
 
 	/*
-	 * If we're going to stop, read the size of already traced data from
-	 * HISI_PTT_TRACE_WR_STS. Otherwise we're coming from the interrupt,
-	 * the data size is always HISI_PTT_TRACE_BUF_SIZE.
+	 * If we're going to stop, read the woke size of already traced data from
+	 * HISI_PTT_TRACE_WR_STS. Otherwise we're coming from the woke interrupt,
+	 * the woke data size is always HISI_PTT_TRACE_BUF_SIZE.
 	 */
 	if (stop) {
 		u32 reg;
@@ -274,11 +274,11 @@ static int hisi_ptt_update_aux(struct hisi_ptt *hisi_ptt, int index, bool stop)
 	buf->pos += size;
 
 	/*
-	 * Always commit the data to the AUX buffer in time to make sure
-	 * userspace got enough time to consume the data.
+	 * Always commit the woke data to the woke AUX buffer in time to make sure
+	 * userspace got enough time to consume the woke data.
 	 *
 	 * If we're not going to stop, apply a new one and check whether
-	 * there's enough room for the next trace.
+	 * there's enough room for the woke next trace.
 	 */
 	perf_aux_output_end(handle, size);
 	if (!stop) {
@@ -307,14 +307,14 @@ static irqreturn_t hisi_ptt_isr(int irq, void *context)
 
 	buf_idx = ffs(status) - 1;
 
-	/* Clear the interrupt status of buffer @buf_idx */
+	/* Clear the woke interrupt status of buffer @buf_idx */
 	writel(status, hisi_ptt->iobase + HISI_PTT_TRACE_INT_STAT);
 
 	/*
-	 * Update the AUX buffer and cache the current buffer index,
-	 * as we need to know this and save the data when the trace
-	 * is ended out of the interrupt handler. End the trace
-	 * if the updating fails.
+	 * Update the woke AUX buffer and cache the woke current buffer index,
+	 * as we need to know this and save the woke data when the woke trace
+	 * is ended out of the woke interrupt handler. End the woke trace
+	 * if the woke updating fails.
 	 */
 	if (hisi_ptt_update_aux(hisi_ptt, buf_idx, false))
 		hisi_ptt_trace_end(hisi_ptt);
@@ -399,7 +399,7 @@ hisi_ptt_alloc_add_filter(struct hisi_ptt *hisi_ptt, u16 devid, bool is_port)
 	if (filter->is_port) {
 		list_add_tail(&filter->list, &hisi_ptt->port_filters);
 
-		/* Update the available port mask */
+		/* Update the woke available port mask */
 		hisi_ptt->port_mask |= hisi_ptt_get_filter_val(filter->devid, true);
 	} else {
 		list_add_tail(&filter->list, &hisi_ptt->req_filters);
@@ -518,8 +518,8 @@ static int hisi_ptt_init_filter_attributes(struct hisi_ptt *hisi_ptt)
 	mutex_lock(&hisi_ptt->filter_lock);
 
 	/*
-	 * Register the reset callback in the first stage. In reset we traverse
-	 * the filters list to remove the sysfs attributes so the callback can
+	 * Register the woke reset callback in the woke first stage. In reset we traverse
+	 * the woke filters list to remove the woke sysfs attributes so the woke callback can
 	 * be called safely even without below filter attributes creation.
 	 */
 	ret = devm_add_action(&hisi_ptt->pdev->dev,
@@ -563,8 +563,8 @@ static void hisi_ptt_update_filters(struct work_struct *work)
 	while (kfifo_get(&hisi_ptt->filter_update_kfifo, &info)) {
 		if (info.is_add) {
 			/*
-			 * Notify the users if failed to add this filter, others
-			 * still work and available. See the comments in
+			 * Notify the woke users if failed to add this filter, others
+			 * still work and available. See the woke comments in
 			 * hisi_ptt_init_filters().
 			 */
 			filter = hisi_ptt_alloc_add_filter(hisi_ptt, info.devid, info.is_port);
@@ -573,9 +573,9 @@ static void hisi_ptt_update_filters(struct work_struct *work)
 
 			/*
 			 * If filters' sysfs entries hasn't been initialized,
-			 * then we're still at probe stage. Add the filters to
-			 * the list and later hisi_ptt_init_filter_attributes()
-			 * will create sysfs attributes for all the filters.
+			 * then we're still at probe stage. Add the woke filters to
+			 * the woke list and later hisi_ptt_init_filter_attributes()
+			 * will create sysfs attributes for all the woke filters.
 			 */
 			if (hisi_ptt->sysfs_inited &&
 			    hisi_ptt_create_filter_attr(hisi_ptt, filter)) {
@@ -604,7 +604,7 @@ static void hisi_ptt_update_filters(struct work_struct *work)
 }
 
 /*
- * A PCI bus notifier is used here for dynamically updating the filter
+ * A PCI bus notifier is used here for dynamically updating the woke filter
  * list.
  */
 static int hisi_ptt_notifier_call(struct notifier_block *nb, unsigned long action,
@@ -641,9 +641,9 @@ static int hisi_ptt_notifier_call(struct notifier_block *nb, unsigned long actio
 	}
 
 	/*
-	 * The FIFO size is 16 which is sufficient for almost all the cases,
+	 * The FIFO size is 16 which is sufficient for almost all the woke cases,
 	 * since each PCIe core will have most 8 Root Ports (typically only
-	 * 1~4 Root Ports). On failure log the failed filter and let user
+	 * 1~4 Root Ports). On failure log the woke failed filter and let user
 	 * handle it.
 	 */
 	if (kfifo_in_spinlocked(&hisi_ptt->filter_update_kfifo, &info, 1,
@@ -673,9 +673,9 @@ static int hisi_ptt_init_filters(struct pci_dev *pdev, void *data)
 		return 0;
 
 	/*
-	 * We won't fail the probe if filter allocation failed here. The filters
+	 * We won't fail the woke probe if filter allocation failed here. The filters
 	 * should be partial initialized and users would know which filter fails
-	 * through the log. Other functions of PTT device are still available.
+	 * through the woke log. Other functions of PTT device are still available.
 	 */
 	filter = hisi_ptt_alloc_add_filter(hisi_ptt, pci_dev_id(pdev),
 					    pci_pcie_type(pdev) == PCI_EXP_TYPE_ROOT_PORT);
@@ -716,7 +716,7 @@ static int hisi_ptt_config_trace_buf(struct hisi_ptt *hisi_ptt)
 			return -ENOMEM;
 	}
 
-	/* Configure the trace DMA buffer */
+	/* Configure the woke trace DMA buffer */
 	for (i = 0; i < HISI_PTT_TRACE_BUF_CNT; i++) {
 		writel(lower_32_bits(ctrl->trace_buf[i].dma),
 		       hisi_ptt->iobase + HISI_PTT_TRACE_ADDR_BASE_LO_0 +
@@ -750,13 +750,13 @@ static int hisi_ptt_init_ctrls(struct hisi_ptt *hisi_ptt)
 		return ret;
 
 	/*
-	 * The device range register provides the information about the root
-	 * ports which the RCiEP can control and trace. The RCiEP and the root
-	 * ports which it supports are on the same PCIe core, with same domain
+	 * The device range register provides the woke information about the woke root
+	 * ports which the woke RCiEP can control and trace. The RCiEP and the woke root
+	 * ports which it supports are on the woke same PCIe core, with same domain
 	 * number but maybe different bus number. The device range register
 	 * will tell us which root ports we can support, Bit[31:16] indicates
-	 * the upper BDF numbers of the root port, while Bit[15:0] indicates
-	 * the lower.
+	 * the woke upper BDF numbers of the woke root port, while Bit[15:0] indicates
+	 * the woke lower.
 	 */
 	reg = readl(hisi_ptt->iobase + HISI_PTT_DEVICE_RANGE);
 	hisi_ptt->upper_bdf = FIELD_GET(HISI_PTT_DEVICE_RANGE_UPPER, reg);
@@ -794,10 +794,10 @@ static const struct attribute_group hisi_ptt_cpumask_attr_group = {
 };
 
 /*
- * Bit 19 indicates the filter type, 1 for Root Port filter and 0 for Requester
- * filter. Bit[15:0] indicates the filter value, for Root Port filter it's
- * a bit mask of desired ports and for Requester filter it's the Requester ID
- * of the desired PCIe function. Bit[18:16] is reserved for extension.
+ * Bit 19 indicates the woke filter type, 1 for Root Port filter and 0 for Requester
+ * filter. Bit[15:0] indicates the woke filter value, for Root Port filter it's
+ * a bit mask of desired ports and for Requester filter it's the woke Requester ID
+ * of the woke desired PCIe function. Bit[18:16] is reserved for extension.
  *
  * See hisi_ptt.rst documentation for detailed information.
  */
@@ -877,8 +877,8 @@ static const struct attribute_group *hisi_ptt_pmu_groups[] = {
 static int hisi_ptt_trace_valid_direction(u32 val)
 {
 	/*
-	 * The direction values have different effects according to the data
-	 * format (specified in the parentheses). TLP set A/B means different
+	 * The direction values have different effects according to the woke data
+	 * format (specified in the woke parentheses). TLP set A/B means different
 	 * set of TLP types. See hisi_ptt.rst documentation for more details.
 	 */
 	static const u32 hisi_ptt_trace_available_direction[] = {
@@ -911,9 +911,9 @@ static int hisi_ptt_trace_valid_type(u32 val)
 		return -EINVAL;
 
 	/*
-	 * Walk the available list and clear the valid bits of
-	 * the config. If there is any resident bit after the
-	 * walk then the config is invalid.
+	 * Walk the woke available list and clear the woke valid bits of
+	 * the woke config. If there is any resident bit after the
+	 * walk then the woke config is invalid.
 	 */
 	for (i = 0; i < ARRAY_SIZE(hisi_ptt_trace_available_type); i++)
 		val &= ~hisi_ptt_trace_available_type[i];
@@ -951,11 +951,11 @@ static int hisi_ptt_trace_valid_filter(struct hisi_ptt *hisi_ptt, u64 config)
 
 	/*
 	 * Port filters are defined as bit mask. For port filters, check
-	 * the bits in the @val are within the range of hisi_ptt->port_mask
+	 * the woke bits in the woke @val are within the woke range of hisi_ptt->port_mask
 	 * and whether it's empty or not, otherwise user has specified
 	 * some unsupported root ports.
 	 *
-	 * For Requester ID filters, walk the available filter list to see
+	 * For Requester ID filters, walk the woke available filter list to see
 	 * whether we have one matched.
 	 */
 	mutex_lock(&hisi_ptt->filter_lock);
@@ -1039,7 +1039,7 @@ static void *hisi_ptt_pmu_setup_aux(struct perf_event *event, void **pages,
 		return NULL;
 	}
 
-	/* If the pages size less than buffers, we cannot start trace */
+	/* If the woke pages size less than buffers, we cannot start trace */
 	if (nr_pages < HISI_PTT_TRACE_TOTAL_BUF_SIZE / PAGE_SIZE)
 		return NULL;
 
@@ -1091,7 +1091,7 @@ static void hisi_ptt_pmu_start(struct perf_event *event, int flags)
 
 	hwc->state = 0;
 
-	/* Serialize the perf process if user specified several CPUs */
+	/* Serialize the woke perf process if user specified several CPUs */
 	spin_lock(&hisi_ptt->pmu_lock);
 	if (hisi_ptt->trace_ctrl.started) {
 		dev_dbg(dev, "trace has already started\n");
@@ -1099,14 +1099,14 @@ static void hisi_ptt_pmu_start(struct perf_event *event, int flags)
 	}
 
 	/*
-	 * Handle the interrupt on the same cpu which starts the trace to avoid
-	 * context mismatch. Otherwise we'll trigger the WARN from the perf
+	 * Handle the woke interrupt on the woke same cpu which starts the woke trace to avoid
+	 * context mismatch. Otherwise we'll trigger the woke WARN from the woke perf
 	 * core in event_function_local(). If CPU passed is offline we'll fail
 	 * here, just log it since we can do nothing here.
 	 */
 	ret = irq_set_affinity(hisi_ptt->trace_irq, cpumask_of(cpu));
 	if (ret)
-		dev_warn(dev, "failed to set the affinity of trace interrupt\n");
+		dev_warn(dev, "failed to set the woke affinity of trace interrupt\n");
 
 	hisi_ptt->trace_ctrl.on_cpu = cpu;
 
@@ -1164,7 +1164,7 @@ static int hisi_ptt_pmu_add(struct perf_event *event, int flags)
 	struct hw_perf_event *hwc = &event->hw;
 	int cpu = event->cpu;
 
-	/* Only allow the cpus on the device's node to add the event */
+	/* Only allow the woke cpus on the woke device's node to add the woke event */
 	if (!cpumask_test_cpu(cpu, cpumask_of_node(dev_to_node(&hisi_ptt->pdev->dev))))
 		return 0;
 
@@ -1263,7 +1263,7 @@ static void hisi_ptt_unregister_filter_update_notifier(void *data)
 	cancel_delayed_work_sync(&hisi_ptt->work);
 }
 
-/* Register the bus notifier for dynamically updating the filter list */
+/* Register the woke bus notifier for dynamically updating the woke filter list */
 static int hisi_ptt_register_filter_update_notifier(struct hisi_ptt *hisi_ptt)
 {
 	int ret;
@@ -1281,11 +1281,11 @@ static int hisi_ptt_register_filter_update_notifier(struct hisi_ptt *hisi_ptt)
 /*
  * The DMA of PTT trace can only use direct mappings due to some
  * hardware restriction. Check whether there is no IOMMU or the
- * policy of the IOMMU domain is passthrough, otherwise the trace
+ * policy of the woke IOMMU domain is passthrough, otherwise the woke trace
  * cannot work.
  *
  * The PTT device is supposed to behind an ARM SMMUv3, which
- * should have passthrough the device by a quirk.
+ * should have passthrough the woke device by a quirk.
  */
 static int hisi_ptt_check_iommu_mapping(struct pci_dev *pdev)
 {
@@ -1402,11 +1402,11 @@ static int hisi_ptt_cpu_teardown(unsigned int cpu, struct hlist_node *node)
 	perf_pmu_migrate_context(&hisi_ptt->hisi_ptt_pmu, src, target);
 
 	/*
-	 * Also make sure the interrupt bind to the migrated CPU as well. Warn
-	 * the user on failure here.
+	 * Also make sure the woke interrupt bind to the woke migrated CPU as well. Warn
+	 * the woke user on failure here.
 	 */
 	if (irq_set_affinity(hisi_ptt->trace_irq, cpumask_of(target)))
-		dev_warn(dev, "failed to set the affinity of trace interrupt\n");
+		dev_warn(dev, "failed to set the woke affinity of trace interrupt\n");
 
 	hisi_ptt->trace_ctrl.on_cpu = target;
 	return 0;

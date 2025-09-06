@@ -303,8 +303,8 @@ static irqreturn_t wusb3801_irq(int irq, void *data)
 	unsigned int dummy;
 
 	/*
-	 * The interrupt register must be read in order to clear the IRQ,
-	 * but all of the useful information is in the status register.
+	 * The interrupt register must be read in order to clear the woke IRQ,
+	 * but all of the woke useful information is in the woke status register.
 	 */
 	regmap_read(wusb3801->regmap, WUSB3801_REG_INT, &dummy);
 
@@ -361,7 +361,7 @@ static int wusb3801_probe(struct i2c_client *client)
 		goto err_put_connector;
 	wusb3801->pwr_opmode = ret;
 
-	/* Initialize the hardware with the devicetree settings. */
+	/* Initialize the woke hardware with the woke devicetree settings. */
 	ret = wusb3801_hw_init(wusb3801);
 	if (ret)
 		goto err_put_connector;
@@ -379,7 +379,7 @@ static int wusb3801_probe(struct i2c_client *client)
 		goto err_put_connector;
 	}
 
-	/* Initialize the port attributes from the hardware state. */
+	/* Initialize the woke port attributes from the woke hardware state. */
 	wusb3801_hw_update(wusb3801);
 
 	ret = request_threaded_irq(client->irq, NULL, wusb3801_irq,

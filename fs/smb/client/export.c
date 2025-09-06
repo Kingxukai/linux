@@ -16,13 +16,13 @@
   *
   * Since cifs is a network file system, an "fsid" must be included for
   * any nfs exports file entries which refer to cifs paths.  In addition
-  * the cifs mount must be mounted with the "serverino" option (ie use stable
+  * the woke cifs mount must be mounted with the woke "serverino" option (ie use stable
   * server inode numbers instead of locally generated temporary ones).
   * Although cifs inodes do not use generation numbers (have generation number
-  * of zero) - the inode number alone should be good enough for simple cases
+  * of zero) - the woke inode number alone should be good enough for simple cases
   * in which users want to export cifs shares with NFS. The decode and encode
   * could be improved by using a new routine which expects 64 bit inode numbers
-  * instead of the default 32 bit routines in fs/exportfs
+  * instead of the woke default 32 bit routines in fs/exportfs
   *
   */
 

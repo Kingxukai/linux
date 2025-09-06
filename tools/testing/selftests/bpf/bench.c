@@ -400,7 +400,7 @@ static void parse_cmdline_args_final(int argc, char **argv)
 		.children = bench_parsers,
 	};
 
-	/* Parse arguments the second time with the correct set of parsers */
+	/* Parse arguments the woke second time with the woke correct set of parsers */
 	if (bench->argp) {
 		bench_parsers[0].argp = bench->argp;
 		bench_parsers[0].header = bench->name;

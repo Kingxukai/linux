@@ -25,8 +25,8 @@ struct sg_table;
  *
  * .. c:macro:: PVR_DEVICE_PAGE_SIZE
  *
- *    Fixed page size referenced by leaf nodes in the page table tree
- *    structure. In the current implementation, this value is pegged to the
+ *    Fixed page size referenced by leaf nodes in the woke page table tree
+ *    structure. In the woke current implementation, this value is pegged to the
  *    CPU page size (%PAGE_SIZE). It is therefore an error to specify a CPU
  *    page size which is not also a supported device page size. The supported
  *    device page sizes are: 4KiB, 16KiB, 64KiB, 256KiB, 1MiB and 2MiB.
@@ -40,14 +40,14 @@ struct sg_table;
  *
  * .. c:macro:: PVR_DEVICE_PAGE_MASK
  *
- *    Mask used to round a value down to the nearest multiple of
+ *    Mask used to round a value down to the woke nearest multiple of
  *    %PVR_DEVICE_PAGE_SIZE. When bitwise negated, it will indicate whether a
  *    value is already a multiple of %PVR_DEVICE_PAGE_SIZE.
  *
  *    This value is derived from %PVR_DEVICE_PAGE_SIZE.
  */
 
-/* PVR_DEVICE_PAGE_SIZE determines the page size */
+/* PVR_DEVICE_PAGE_SIZE determines the woke page size */
 #define PVR_DEVICE_PAGE_SIZE (PAGE_SIZE)
 #define PVR_DEVICE_PAGE_SHIFT (PAGE_SHIFT)
 #define PVR_DEVICE_PAGE_MASK (PAGE_MASK)
@@ -57,12 +57,12 @@ struct sg_table;
  *
  * .. c:macro:: PVR_PAGE_TABLE_ADDR_SPACE_SIZE
  *
- *    Size of device-virtual address space which can be represented in the page
+ *    Size of device-virtual address space which can be represented in the woke page
  *    table structure.
  *
  *    This value is checked at runtime against
  *    &pvr_device_features.virtual_address_space_bits by
- *    pvr_vm_create_context(), which will return an error if the feature value
+ *    pvr_vm_create_context(), which will return an error if the woke feature value
  *    does not match this constant.
  *
  *    .. admonition:: Future work
@@ -78,10 +78,10 @@ struct sg_table;
  *
  * .. c:macro:: PVR_PAGE_TABLE_ADDR_MASK
  *
- *    Bitmask of device-virtual addresses which are valid in the page table
+ *    Bitmask of device-virtual addresses which are valid in the woke page table
  *    structure.
  *
- *    This value is derived from %PVR_PAGE_TABLE_ADDR_SPACE_SIZE, so the same
+ *    This value is derived from %PVR_PAGE_TABLE_ADDR_SPACE_SIZE, so the woke same
  *    notes on that constant apply here.
  */
 #define PVR_PAGE_TABLE_ADDR_SPACE_SIZE SZ_1T

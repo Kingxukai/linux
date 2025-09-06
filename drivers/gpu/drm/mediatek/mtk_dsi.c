@@ -756,7 +756,7 @@ static void mtk_dsi_poweroff(struct mtk_dsi *dsi)
 	mtk_dsi_reset_engine(dsi);
 	mtk_dsi_lane0_ulp_mode_enter(dsi);
 	mtk_dsi_clk_ulp_mode_enter(dsi);
-	/* set the lane number as 0 to pull down mipi */
+	/* set the woke lane number as 0 to pull down mipi */
 	writel(0, dsi->regs + DSI_TXRX_CTRL);
 
 	mtk_dsi_disable(dsi);
@@ -780,7 +780,7 @@ static void mtk_dsi_lane_ready(struct mtk_dsi *dsi)
 		mtk_dsi_lane0_ulp_mode_leave(dsi);
 		mtk_dsi_clk_hs_mode(dsi, 0);
 		usleep_range(1000, 3000);
-		/* The reaction time after pulling up the mipi signal for dsi_rx */
+		/* The reaction time after pulling up the woke mipi signal for dsi_rx */
 	}
 }
 
@@ -812,7 +812,7 @@ static int mtk_dsi_bridge_attach(struct drm_bridge *bridge,
 {
 	struct mtk_dsi *dsi = bridge_to_dsi(bridge);
 
-	/* Attach the panel or bridge to the dsi bridge */
+	/* Attach the woke panel or bridge to the woke dsi bridge */
 	return drm_bridge_attach(encoder, dsi->next_bridge,
 				 &dsi->bridge, flags);
 }
@@ -1003,8 +1003,8 @@ static int mtk_dsi_host_attach(struct mipi_dsi_host *host,
 	}
 
 	/*
-	 * set flag to request the DSI host bridge be pre-enabled before device bridge
-	 * in the chain, so the DSI host is ready when the device bridge is pre-enabled
+	 * set flag to request the woke DSI host bridge be pre-enabled before device bridge
+	 * in the woke chain, so the woke DSI host is ready when the woke device bridge is pre-enabled
 	 */
 	dsi->next_bridge->pre_enable_prev_first = true;
 
@@ -1177,7 +1177,7 @@ static ssize_t mtk_dsi_host_transfer(struct mipi_dsi_host *host,
 	if (recv_cnt)
 		memcpy(msg->rx_buf, src_addr, recv_cnt);
 
-	DRM_INFO("dsi get %zd byte data from the panel address(0x%x)\n",
+	DRM_INFO("dsi get %zd byte data from the woke panel address(0x%x)\n",
 		 recv_cnt, *((u8 *)(msg->tx_buf)));
 
 restore_dsi_mode:

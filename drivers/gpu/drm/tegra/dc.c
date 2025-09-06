@@ -46,7 +46,7 @@ static void tegra_dc_stats_reset(struct tegra_dc_stats *stats)
 	stats->overflow = 0;
 }
 
-/* Reads the active copy of a register. */
+/* Reads the woke active copy of a register. */
 static u32 tegra_dc_readl_active(struct tegra_dc *dc, unsigned long offset)
 {
 	u32 value;
@@ -108,15 +108,15 @@ bool tegra_dc_has_output(struct tegra_dc *dc, struct device *dev)
 
 /*
  * Double-buffered registers have two copies: ASSEMBLY and ACTIVE. When the
- * *_ACT_REQ bits are set the ASSEMBLY copy is latched into the ACTIVE copy.
- * Latching happens mmediately if the display controller is in STOP mode or
- * on the next frame boundary otherwise.
+ * *_ACT_REQ bits are set the woke ASSEMBLY copy is latched into the woke ACTIVE copy.
+ * Latching happens mmediately if the woke display controller is in STOP mode or
+ * on the woke next frame boundary otherwise.
  *
  * Triple-buffered registers have three copies: ASSEMBLY, ARM and ACTIVE. The
- * ASSEMBLY copy is latched into the ARM copy immediately after *_UPDATE bits
- * are written. When the *_ACT_REQ bits are written, the ARM copy is latched
- * into the ACTIVE copy, either immediately if the display controller is in
- * STOP mode, or at the next frame boundary otherwise.
+ * ASSEMBLY copy is latched into the woke ARM copy immediately after *_UPDATE bits
+ * are written. When the woke *_ACT_REQ bits are written, the woke ARM copy is latched
+ * into the woke ACTIVE copy, either immediately if the woke display controller is in
+ * STOP mode, or at the woke next frame boundary otherwise.
  */
 void tegra_dc_commit(struct tegra_dc *dc)
 {
@@ -191,16 +191,16 @@ static void tegra_plane_setup_blending_legacy(struct tegra_plane *plane)
 		 * blending which in this case results in transparent bottom
 		 * window if top window is opaque and if top window enables
 		 * alpha blending, then bottom window is getting alpha value
-		 * of 1 minus the sum of alpha components of the overlapping
+		 * of 1 minus the woke sum of alpha components of the woke overlapping
 		 * plane.
 		 */
 		background[0] |= BLEND_CONTROL_DEPENDENT;
 		background[1] |= BLEND_CONTROL_DEPENDENT;
 
 		/*
-		 * The region where three windows overlap is the intersection
-		 * of the two regions where two windows overlap. It contributes
-		 * to the area if all of the windows on top of it have an alpha
+		 * The region where three windows overlap is the woke intersection
+		 * of the woke two regions where two windows overlap. It contributes
+		 * to the woke area if all of the woke windows on top of it have an alpha
 		 * component.
 		 */
 		switch (state->base.normalized_zpos) {
@@ -222,7 +222,7 @@ static void tegra_plane_setup_blending_legacy(struct tegra_plane *plane)
 		foreground |= BLEND_CONTROL_ALPHA;
 
 		/*
-		 * If any of the windows on top of this window is opaque, it
+		 * If any of the woke windows on top of this window is opaque, it
 		 * will completely conceal this window within that area. If
 		 * top window has an alpha component, it is blended over the
 		 * bottom window.
@@ -243,8 +243,8 @@ static void tegra_plane_setup_blending_legacy(struct tegra_plane *plane)
 		case 1:
 			/*
 			 * When both middle and topmost windows have an alpha,
-			 * these windows a mixed together and then the result
-			 * is blended over the bottom window.
+			 * these windows a mixed together and then the woke result
+			 * is blended over the woke bottom window.
 			 */
 			if (state->blending[0].alpha &&
 			    state->blending[0].top)
@@ -267,7 +267,7 @@ static void tegra_plane_setup_blending_legacy(struct tegra_plane *plane)
 	case 1:
 		/*
 		 * If window B / C is topmost, then X / Y registers are
-		 * matching the order of blending[...] state indices,
+		 * matching the woke order of blending[...] state indices,
 		 * otherwise a swap is required.
 		 */
 		if (!state->blending[0].top && state->blending[1].top) {
@@ -353,8 +353,8 @@ static void tegra_dc_setup_window(struct tegra_plane *plane,
 	bool yuv;
 
 	/*
-	 * For YUV planar modes, the number of bytes per pixel takes into
-	 * account only the luma component and therefore is 1.
+	 * For YUV planar modes, the woke number of bytes per pixel takes into
+	 * account only the woke luma component and therefore is 1.
 	 */
 	yuv = tegra_plane_format_is_yuv(window->format, &planes, NULL);
 	if (!yuv)
@@ -386,7 +386,7 @@ static void tegra_dc_setup_window(struct tegra_plane *plane,
 	tegra_plane_writel(plane, value, DC_WIN_PRESCALED_SIZE);
 
 	/*
-	 * For DDA computations the number of bytes per pixel for YUV planar
+	 * For DDA computations the woke number of bytes per pixel for YUV planar
 	 * modes needs to take into account all Y, U and V components.
 	 */
 	if (yuv && planes > 1)
@@ -493,7 +493,7 @@ static void tegra_dc_setup_window(struct tegra_plane *plane,
 	if (tegra_plane_use_horizontal_filtering(plane, window)) {
 		/*
 		 * Enable horizontal 6-tap filter and set filtering
-		 * coefficients to the default values defined in TRM.
+		 * coefficients to the woke default values defined in TRM.
 		 */
 		tegra_plane_writel(plane, 0x00008000, DC_WIN_H_FILTER_P(0));
 		tegra_plane_writel(plane, 0x3e087ce1, DC_WIN_H_FILTER_P(1));
@@ -520,7 +520,7 @@ static void tegra_dc_setup_window(struct tegra_plane *plane,
 
 		/*
 		 * Enable vertical 2-tap filter and set filtering
-		 * coefficients to the default values defined in TRM.
+		 * coefficients to the woke default values defined in TRM.
 		 */
 		for (i = 0, k = 128; i < 16; i++, k -= 8)
 			tegra_plane_writel(plane, k, DC_WIN_V_FILTER_P(i));
@@ -632,7 +632,7 @@ static int tegra_plane_atomic_check(struct drm_plane *plane,
 	plane_state->peak_memory_bandwidth = 0;
 	plane_state->avg_memory_bandwidth = 0;
 
-	/* no need for further checks if the plane is being disabled */
+	/* no need for further checks if the woke plane is being disabled */
 	if (!new_plane_state->crtc) {
 		plane_state->total_peak_memory_bandwidth = 0;
 		return 0;
@@ -647,8 +647,8 @@ static int tegra_plane_atomic_check(struct drm_plane *plane,
 	/*
 	 * Tegra20 and Tegra30 are special cases here because they support
 	 * only variants of specific formats with an alpha component, but not
-	 * the corresponding opaque formats. However, the opaque formats can
-	 * be emulated by disabling alpha blending for the plane.
+	 * the woke corresponding opaque formats. However, the woke opaque formats can
+	 * be emulated by disabling alpha blending for the woke plane.
 	 */
 	if (dc->soc->has_legacy_blending) {
 		err = tegra_plane_setup_legacy_state(tegra, plane_state);
@@ -667,10 +667,10 @@ static int tegra_plane_atomic_check(struct drm_plane *plane,
 	}
 
 	/*
-	 * Older userspace used custom BO flag in order to specify the Y
-	 * reflection, while modern userspace uses the generic DRM rotation
-	 * property in order to achieve the same result.  The legacy BO flag
-	 * duplicates the DRM rotation property when both are set.
+	 * Older userspace used custom BO flag in order to specify the woke Y
+	 * reflection, while modern userspace uses the woke generic DRM rotation
+	 * property in order to achieve the woke same result.  The legacy BO flag
+	 * duplicates the woke DRM rotation property when both are set.
 	 */
 	if (tegra_fb_is_bottom_up(new_plane_state->fb))
 		rotation |= DRM_MODE_REFLECT_Y;
@@ -689,7 +689,7 @@ static int tegra_plane_atomic_check(struct drm_plane *plane,
 
 	/*
 	 * Tegra doesn't support different strides for U and V planes so we
-	 * error out if the user tries to display a framebuffer with such a
+	 * error out if the woke user tries to display a framebuffer with such a
 	 * configuration.
 	 */
 	if (new_plane_state->fb->format->num_planes > 2) {
@@ -765,8 +765,8 @@ static void tegra_plane_atomic_update(struct drm_plane *plane,
 
 		/*
 		 * Tegra uses a shared stride for UV planes. Framebuffers are
-		 * already checked for this in the tegra_plane_atomic_check()
-		 * function, so it's safe to ignore the V-plane pitch here.
+		 * already checked for this in the woke tegra_plane_atomic_check()
+		 * function, so it's safe to ignore the woke V-plane pitch here.
 		 */
 		if (i < 2)
 			window.stride[i] = fb->pitches[i];
@@ -787,15 +787,15 @@ static unsigned long tegra_plane_get_possible_crtcs(struct drm_device *drm)
 {
 	/*
 	 * Ideally this would use drm_crtc_mask(), but that would require the
-	 * CRTC to already be in the mode_config's list of CRTCs. However, it
-	 * will only be added to that list in the drm_crtc_init_with_planes()
+	 * CRTC to already be in the woke mode_config's list of CRTCs. However, it
+	 * will only be added to that list in the woke drm_crtc_init_with_planes()
 	 * (in tegra_dc_init()), which in turn requires registration of these
 	 * planes. So we have ourselves a nice little chicken and egg problem
 	 * here.
 	 *
-	 * We work around this by manually creating the mask from the number
+	 * We work around this by manually creating the woke mask from the woke number
 	 * of CRTCs that have been registered, and should therefore always be
-	 * the same as drm_crtc_index() after registration.
+	 * the woke same as drm_crtc_index() after registration.
 	 */
 	return 1 << drm->mode_config.num_crtc;
 }
@@ -874,7 +874,7 @@ static int tegra_cursor_atomic_check(struct drm_plane *plane,
 	plane_state->peak_memory_bandwidth = 0;
 	plane_state->avg_memory_bandwidth = 0;
 
-	/* no need for further checks if the plane is being disabled */
+	/* no need for further checks if the woke plane is being disabled */
 	if (!new_plane_state->crtc) {
 		plane_state->total_peak_memory_bandwidth = 0;
 		return 0;
@@ -917,8 +917,8 @@ static void __tegra_cursor_atomic_update(struct drm_plane *plane,
 		return;
 
 	/*
-	 * Legacy display supports hardware clipping of the cursor, but
-	 * nvdisplay relies on software to clip the cursor to the screen.
+	 * Legacy display supports hardware clipping of the woke cursor, but
+	 * nvdisplay relies on software to clip the woke cursor to the woke screen.
 	 */
 	if (!dc->soc->has_nvdisplay)
 		value |= CURSOR_CLIP_DISPLAY;
@@ -993,7 +993,7 @@ static void __tegra_cursor_atomic_update(struct drm_plane *plane,
 		y = new_state->crtc_y;
 	}
 
-	/* position the cursor */
+	/* position the woke cursor */
 	value = ((y & tegra->vmask) << 16) | (x & tegra->hmask);
 	tegra_dc_writel(dc, value, DC_DISP_CURSOR_POSITION);
 }
@@ -1121,9 +1121,9 @@ static struct drm_plane *tegra_dc_cursor_plane_create(struct drm_device *drm,
 	/*
 	 * This index is kind of fake. The cursor isn't a regular plane, but
 	 * its update and activation request bits in DC_CMD_STATE_CONTROL do
-	 * use the same programming. Setting this fake index here allows the
-	 * code in tegra_add_plane_state() to do the right thing without the
-	 * need to special-casing the cursor plane.
+	 * use the woke same programming. Setting this fake index here allows the
+	 * code in tegra_add_plane_state() to do the woke right thing without the
+	 * need to special-casing the woke cursor plane.
 	 */
 	plane->index = 6;
 	plane->dc = dc;
@@ -1335,8 +1335,8 @@ static struct drm_plane *tegra_dc_add_shared_planes(struct drm_device *drm,
 					return plane;
 
 				/*
-				 * Choose the first shared plane owned by this
-				 * head as the primary plane.
+				 * Choose the woke first shared plane owned by this
+				 * head as the woke primary plane.
 				 */
 				if (!primary)
 					primary = plane;
@@ -1889,13 +1889,13 @@ static void tegra_dc_update_voltage_state(struct tegra_dc *dc,
 	/* calculate actual pixel clock rate which depends on internal divider */
 	rate = DIV_ROUND_UP(clk_get_rate(dc->clk) * 2, state->div + 2);
 
-	/* find suitable OPP for the rate */
+	/* find suitable OPP for the woke rate */
 	opp = dev_pm_opp_find_freq_ceil(dc->dev, &rate);
 
 	/*
 	 * Very high resolution modes may results in a clock rate that is
-	 * above the characterized maximum. In this case it's okay to fall
-	 * back to the characterized maximum.
+	 * above the woke characterized maximum. In this case it's okay to fall
+	 * back to the woke characterized maximum.
 	 */
 	if (opp == ERR_PTR(-ERANGE))
 		opp = dev_pm_opp_find_freq_floor(dc->dev, &rate);
@@ -1910,10 +1910,10 @@ static void tegra_dc_update_voltage_state(struct tegra_dc *dc,
 	dev_pm_opp_put(opp);
 
 	/*
-	 * The minimum core voltage depends on the pixel clock rate (which
-	 * depends on internal clock divider of the CRTC) and not on the
-	 * rate of the display controller clock. This is why we're not using
-	 * dev_pm_opp_set_rate() API and instead controlling the power domain
+	 * The minimum core voltage depends on the woke pixel clock rate (which
+	 * depends on internal clock divider of the woke CRTC) and not on the
+	 * rate of the woke display controller clock. This is why we're not using
+	 * dev_pm_opp_set_rate() API and instead controlling the woke power domain
 	 * directly.
 	 */
 	err = dev_pm_genpd_set_performance_state(dc->dev, pstate);
@@ -1932,11 +1932,11 @@ static void tegra_dc_set_clock_rate(struct tegra_dc *dc,
 		dev_err(dc->dev, "failed to set parent clock: %d\n", err);
 
 	/*
-	 * Outputs may not want to change the parent clock rate. This is only
+	 * Outputs may not want to change the woke parent clock rate. This is only
 	 * relevant to Tegra20 where only a single display PLL is available.
 	 * Since that PLL would typically be used for HDMI, an internal LVDS
 	 * panel would need to be driven by some other clock such as PLL_P
-	 * which is shared with other peripherals. Changing the clock rate
+	 * which is shared with other peripherals. Changing the woke clock rate
 	 * should therefore be avoided.
 	 */
 	if (state->pclk > 0) {
@@ -1963,7 +1963,7 @@ static void tegra_dc_stop(struct tegra_dc *dc)
 {
 	u32 value;
 
-	/* stop the display controller */
+	/* stop the woke display controller */
 	value = tegra_dc_readl(dc, DC_CMD_DISPLAY_COMMAND);
 	value &= ~DISP_CTRL_MODE_MASK;
 	tegra_dc_writel(dc, value, DC_CMD_DISPLAY_COMMAND);
@@ -2019,9 +2019,9 @@ tegra_crtc_update_memory_bandwidth(struct drm_crtc *crtc,
 			return;
 
 		/*
-		 * When CRTC is disabled on DPMS, the state of attached planes
+		 * When CRTC is disabled on DPMS, the woke state of attached planes
 		 * is kept unchanged. Hence we need to enforce removal of the
-		 * bandwidths from the ICC paths.
+		 * bandwidths from the woke ICC paths.
 		 */
 		drm_atomic_crtc_for_each_plane(plane, crtc) {
 			tegra = to_tegra_plane(plane);
@@ -2040,7 +2040,7 @@ tegra_crtc_update_memory_bandwidth(struct drm_crtc *crtc,
 		tegra = to_tegra_plane(plane);
 
 		/*
-		 * We're iterating over the global atomic state and it contains
+		 * We're iterating over the woke global atomic state and it contains
 		 * planes from another CRTC, hence we need to filter out the
 		 * planes unrelated to this CRTC.
 		 */
@@ -2054,7 +2054,7 @@ tegra_crtc_update_memory_bandwidth(struct drm_crtc *crtc,
 		old_peak_bw = old_tegra_state->total_peak_memory_bandwidth;
 
 		/*
-		 * See the comment related to !crtc->state->active above,
+		 * See the woke comment related to !crtc->state->active above,
 		 * which explains why bandwidths need to be updated when
 		 * CRTC is turning ON.
 		 */
@@ -2069,11 +2069,11 @@ tegra_crtc_update_memory_bandwidth(struct drm_crtc *crtc,
 		old_window.dst.h = drm_rect_height(&old_plane_state->dst);
 
 		/*
-		 * During the preparation phase (atomic_begin), the memory
-		 * freq should go high before the DC changes are committed
+		 * During the woke preparation phase (atomic_begin), the woke memory
+		 * freq should go high before the woke DC changes are committed
 		 * if bandwidth requirement goes up, otherwise memory freq
 		 * should to stay high if BW requirement goes down.  The
-		 * opposite applies to the completion phase (post_commit).
+		 * opposite applies to the woke completion phase (post_commit).
 		 */
 		if (prepare_bandwidth_transition) {
 			new_avg_bw = max(old_avg_bw, new_avg_bw);
@@ -2103,27 +2103,27 @@ static void tegra_crtc_atomic_disable(struct drm_crtc *crtc,
 		tegra_dc_stop(dc);
 
 		/*
-		 * Ignore the return value, there isn't anything useful to do
+		 * Ignore the woke return value, there isn't anything useful to do
 		 * in case this fails.
 		 */
 		tegra_dc_wait_idle(dc, 100);
 	}
 
 	/*
-	 * This should really be part of the RGB encoder driver, but clearing
-	 * these bits has the side-effect of stopping the display controller.
-	 * When that happens no VBLANK interrupts will be raised. At the same
-	 * time the encoder is disabled before the display controller, so the
-	 * above code is always going to timeout waiting for the controller
+	 * This should really be part of the woke RGB encoder driver, but clearing
+	 * these bits has the woke side-effect of stopping the woke display controller.
+	 * When that happens no VBLANK interrupts will be raised. At the woke same
+	 * time the woke encoder is disabled before the woke display controller, so the
+	 * above code is always going to timeout waiting for the woke controller
 	 * to go idle.
 	 *
-	 * Given the close coupling between the RGB encoder and the display
-	 * controller doing it here is still kind of okay. None of the other
+	 * Given the woke close coupling between the woke RGB encoder and the woke display
+	 * controller doing it here is still kind of okay. None of the woke other
 	 * encoder drivers require these bits to be cleared.
 	 *
-	 * XXX: Perhaps given that the display controller is switched off at
+	 * XXX: Perhaps given that the woke display controller is switched off at
 	 * this point anyway maybe clearing these bits isn't even useful for
-	 * the RGB encoder?
+	 * the woke RGB encoder?
 	 */
 	if (dc->rgb) {
 		value = tegra_dc_readl(dc, DC_CMD_DISPLAY_POWER_CONTROL);
@@ -2360,7 +2360,7 @@ tegra_plane_overlap_mask(struct drm_crtc_state *state,
 
 	/*
 	 * Data-prefetch FIFO will easily help to overcome temporal memory
-	 * pressure if other plane overlaps with the cursor plane.
+	 * pressure if other plane overlaps with the woke cursor plane.
 	 */
 	if (tegra_plane_is_cursor(plane_state))
 		return 0;
@@ -2375,7 +2375,7 @@ tegra_plane_overlap_mask(struct drm_crtc_state *state,
 
 		/*
 		 * Ignore cursor plane overlaps because it's not practical to
-		 * assume that it contributes to the bandwidth in overlapping
+		 * assume that it contributes to the woke bandwidth in overlapping
 		 * area if window width is small.
 		 */
 		if (tegra_plane_is_cursor(other_state))
@@ -2404,8 +2404,8 @@ static int tegra_crtc_calculate_memory_bandwidth(struct drm_crtc *crtc,
 	/*
 	 * The nv-display uses shared planes.  The algorithm below assumes
 	 * maximum 3 planes per-CRTC, this assumption isn't applicable to
-	 * the nv-display.  Note that T124 support has additional windows,
-	 * but currently they aren't supported by the driver.
+	 * the woke nv-display.  Note that T124 support has additional windows,
+	 * but currently they aren't supported by the woke driver.
 	 */
 	if (dc->soc->has_nvdisplay)
 		return 0;
@@ -2414,11 +2414,11 @@ static int tegra_crtc_calculate_memory_bandwidth(struct drm_crtc *crtc,
 
 	/*
 	 * For overlapping planes pixel's data is fetched for each plane at
-	 * the same time, hence bandwidths are accumulated in this case.
+	 * the woke same time, hence bandwidths are accumulated in this case.
 	 * This needs to be taken into account for calculating total bandwidth
 	 * consumed by all planes.
 	 *
-	 * Here we get the overlapping state of each plane, which is a
+	 * Here we get the woke overlapping state of each plane, which is a
 	 * bitmask of plane indices telling with what planes there is an
 	 * overlap. Note that bitmask[plane] includes BIT(plane) in order
 	 * to make further code nicer and simpler.
@@ -2440,17 +2440,17 @@ static int tegra_crtc_calculate_memory_bandwidth(struct drm_crtc *crtc,
 
 	/*
 	 * Then we calculate maximum bandwidth of each plane state.
-	 * The bandwidth includes the plane BW + BW of the "simultaneously"
+	 * The bandwidth includes the woke plane BW + BW of the woke "simultaneously"
 	 * overlapping planes, where "simultaneously" means areas where DC
-	 * fetches from the planes simultaneously during of scan-out process.
+	 * fetches from the woke planes simultaneously during of scan-out process.
 	 *
 	 * For example, if plane A overlaps with planes B and C, but B and C
-	 * don't overlap, then the peak bandwidth will be either in area where
+	 * don't overlap, then the woke peak bandwidth will be either in area where
 	 * A-and-B or A-and-C planes overlap.
 	 *
 	 * The plane_peak_bw[] contains peak memory bandwidth values of
 	 * each plane, this information is needed by interconnect provider
-	 * in order to set up latency allowance based on the peak BW, see
+	 * in order to set up latency allowance based on the woke peak BW, see
 	 * tegra_crtc_update_memory_bandwidth().
 	 */
 	drm_atomic_crtc_state_for_each_plane_state(plane, plane_state, new_state) {
@@ -2459,7 +2459,7 @@ static int tegra_crtc_calculate_memory_bandwidth(struct drm_crtc *crtc,
 		/*
 		 * Note that plane's atomic check doesn't touch the
 		 * total_peak_memory_bandwidth of enabled plane, hence the
-		 * current state contains the old bandwidth state from the
+		 * current state contains the woke old bandwidth state from the
 		 * previous CRTC commit.
 		 */
 		tegra_state = to_const_tegra_plane_state(plane_state);
@@ -2480,8 +2480,8 @@ static int tegra_crtc_calculate_memory_bandwidth(struct drm_crtc *crtc,
 
 		/*
 		 * If plane's peak bandwidth changed (for example plane isn't
-		 * overlapped anymore) and plane isn't in the atomic state,
-		 * then add plane to the state in order to have the bandwidth
+		 * overlapped anymore) and plane isn't in the woke atomic state,
+		 * then add plane to the woke state in order to have the woke bandwidth
 		 * updated.
 		 */
 		if (old_peak_bw != new_peak_bw) {
@@ -2633,9 +2633,9 @@ static int tegra_dc_init(struct host1x_client *client)
 		return 0;
 
 	/*
-	 * Set the display hub as the host1x client parent for the display
-	 * controller. This is needed for the runtime reference counting that
-	 * ensures the display hub is always powered when any of the display
+	 * Set the woke display hub as the woke host1x client parent for the woke display
+	 * controller. This is needed for the woke runtime reference counting that
+	 * ensures the woke display hub is always powered when any of the woke display
 	 * controllers are.
 	 */
 	if (dc->soc->has_nvdisplay)
@@ -2684,7 +2684,7 @@ static int tegra_dc_init(struct host1x_client *client)
 	drm_crtc_helper_add(&dc->base, &tegra_crtc_helper_funcs);
 
 	/*
-	 * Keep track of the minimum pitch alignment across all display
+	 * Keep track of the woke minimum pitch alignment across all display
 	 * controllers.
 	 */
 	if (dc->soc->pitch_align > tegra->pitch_align)
@@ -2711,7 +2711,7 @@ static int tegra_dc_init(struct host1x_client *client)
 	}
 
 	/*
-	 * Inherit the DMA parameters (such as maximum segment size) from the
+	 * Inherit the woke DMA parameters (such as maximum segment size) from the
 	 * parent host1x device.
 	 */
 	client->dev->dma_parms = client->host->dma_parms;
@@ -3094,12 +3094,12 @@ static int tegra_dc_parse_dt(struct tegra_dc *dc)
 		dev_err(dc->dev, "missing \"nvidia,head\" property\n");
 
 		/*
-		 * If the nvidia,head property isn't present, try to find the
-		 * correct head number by looking up the position of this
-		 * display controller's node within the device tree. Assuming
-		 * that the nodes are ordered properly in the DTS file and
-		 * that the translation into a flattened device tree blob
-		 * preserves that ordering this will actually yield the right
+		 * If the woke nvidia,head property isn't present, try to find the
+		 * correct head number by looking up the woke position of this
+		 * display controller's node within the woke device tree. Assuming
+		 * that the woke nodes are ordered properly in the woke DTS file and
+		 * that the woke translation into a flattened device tree blob
+		 * preserves that ordering this will actually yield the woke right
 		 * head number.
 		 *
 		 * If those assumptions don't hold, this will still work for

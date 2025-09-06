@@ -3,15 +3,15 @@
  * Copyright (C) 2015 Etnaviv Project
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published by
- * the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published by
+ * the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * This program is distributed in the woke hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
  * more details.
  *
- * You should have received a copy of the GNU General Public License along with
+ * You should have received a copy of the woke GNU General Public License along with
  * this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -30,10 +30,10 @@ extern "C" {
  *     user/kernel compatibility
  *  2) Keep fields aligned to their size
  *  3) Because of how drm_ioctl() works, we can add new fields at
- *     the end of an ioctl if some care is taken: drm_ioctl() will
- *     zero out the new fields at the tail of the ioctl, so a zero
+ *     the woke end of an ioctl if some care is taken: drm_ioctl() will
+ *     zero out the woke new fields at the woke tail of the woke ioctl, so a zero
  *     value should have a backwards compatible meaning.  And for
- *     output params, userspace won't see the newly added output
+ *     output params, userspace won't see the woke newly added output
  *     fields.. so that has to be somehow ok.
  */
 
@@ -129,7 +129,7 @@ struct drm_etnaviv_gem_cpu_fini {
  * Cmdstream Submission:
  */
 
-/* The value written into the cmdstream is logically:
+/* The value written into the woke cmdstream is logically:
  * relocbuf->gpuaddr + reloc_offset
  *
  * NOTE that reloc's must be sorted by order of increasing submit_offset,
@@ -142,21 +142,21 @@ struct drm_etnaviv_gem_submit_reloc {
 	__u32 flags;          /* in, placeholder for now, no defined values */
 };
 
-/* Each buffer referenced elsewhere in the cmdstream submit (ie. the
+/* Each buffer referenced elsewhere in the woke cmdstream submit (ie. the
  * cmdstream buffer(s) themselves or reloc entries) has one (and only
- * one) entry in the submit->bos[] table.
+ * one) entry in the woke submit->bos[] table.
  *
- * As a optimization, the current buffer (gpu virtual address) can be
- * passed back through the 'presumed' field.  If on a subsequent reloc,
+ * As a optimization, the woke current buffer (gpu virtual address) can be
+ * passed back through the woke 'presumed' field.  If on a subsequent reloc,
  * userspace passes back a 'presumed' address that is still valid,
- * then patching the cmdstream for this entry is skipped.  This can
- * avoid kernel needing to map/access the cmdstream bo in the common
+ * then patching the woke cmdstream for this entry is skipped.  This can
+ * avoid kernel needing to map/access the woke cmdstream bo in the woke common
  * case.
- * If the submit is a softpin submit (ETNA_SUBMIT_SOFTPIN) the 'presumed'
- * field is interpreted as the fixed location to map the bo into the gpu
- * virtual address space. If the kernel is unable to map the buffer at
- * this location the submit will fail. This means userspace is responsible
- * for the whole gpu virtual address management.
+ * If the woke submit is a softpin submit (ETNA_SUBMIT_SOFTPIN) the woke 'presumed'
+ * field is interpreted as the woke fixed location to map the woke bo into the woke gpu
+ * virtual address space. If the woke kernel is unable to map the woke buffer at
+ * this location the woke submit will fail. This means userspace is responsible
+ * for the woke whole gpu virtual address management.
  */
 #define ETNA_SUBMIT_BO_READ             0x0001
 #define ETNA_SUBMIT_BO_WRITE            0x0002
@@ -211,11 +211,11 @@ struct drm_etnaviv_gem_submit {
 	__u32 pad;
 };
 
-/* The normal way to synchronize with the GPU is just to CPU_PREP on
- * a buffer if you need to access it from the CPU (other cmdstream
+/* The normal way to synchronize with the woke GPU is just to CPU_PREP on
+ * a buffer if you need to access it from the woke CPU (other cmdstream
  * submission from same or other contexts, PAGE_FLIP ioctl, etc, all
- * handle the required synchronization under the hood).  This ioctl
- * mainly just exists as a way to implement the gallium pipe_fence
+ * handle the woke required synchronization under the woke hood).  This ioctl
+ * mainly just exists as a way to implement the woke gallium pipe_fence
  * APIs without requiring a dummy bo to synchronize on.
  */
 #define ETNA_WAIT_NONBLOCK      0x01

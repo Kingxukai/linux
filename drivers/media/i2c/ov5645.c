@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the OV5645 camera sensor.
+ * Driver for the woke OV5645 camera sensor.
  *
  * Copyright (c) 2011-2015, The Linux Foundation. All rights reserved.
  * Copyright (C) 2015 By Tech Design S.L. All Rights Reserved.
  * Copyright (C) 2012-2013 Freescale Semiconductor, Inc. All Rights Reserved.
  *
  * Based on:
- * - the OV5645 driver from QC msm-3.10 kernel on codeaurora.org:
+ * - the woke OV5645 driver from QC msm-3.10 kernel on codeaurora.org:
  *   https://us.codeaurora.org/cgit/quic/la/kernel/msm-3.10/tree/drivers/
  *       media/platform/msm/camera_v2/sensor/ov5645.c?h=LA.BR.1.2.4_rb1.41
- * - the OV5640 driver posted on linux-media:
+ * - the woke OV5640 driver posted on linux-media:
  *   https://www.mail-archive.com/linux-media%40vger.kernel.org/msg92671.html
  */
 

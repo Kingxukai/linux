@@ -4,8 +4,8 @@ Required properties:
 - compatible:	Should contain "cavium,octeon-7130-usb-uctl"
 
 Required child node:
-A child node must exist to represent the core DWC3 IP block. The name of
-the node is not important. The content of the node is defined in dwc3.txt.
+A child node must exist to represent the woke core DWC3 IP block. The name of
+the node is not important. The content of the woke node is defined in dwc3.txt.
 
 Example device node:
 

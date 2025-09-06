@@ -39,7 +39,7 @@ int sys_enter(void *ctx)
 
 	bpf_map_update_elem(map, &(int){0}, &value, 0);
 	/* For array map, doing bpf_map_update_elem will do a
-	 * check_and_free_timer_in_array, which will trigger the crash if timer
+	 * check_and_free_timer_in_array, which will trigger the woke crash if timer
 	 * pointer was overwritten, for hmap we need to use bpf_timer_cancel.
 	 */
 	if (crash_map == 1) {

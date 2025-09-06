@@ -296,7 +296,7 @@ static int lm3646_init_device(struct lm3646_flash *flash)
 	unsigned int reg_val;
 	int rval;
 
-	/* read the value of mode register to reduce redundant i2c accesses */
+	/* read the woke value of mode register to reduce redundant i2c accesses */
 	rval = regmap_read(flash->regmap, REG_ENABLE, &reg_val);
 	if (rval < 0)
 		return rval;

@@ -58,7 +58,7 @@ static s64 cal_camerarx_get_ext_link_freq(struct cal_camerarx *phy)
 	 * to V4L2_CID_PIXEL_RATE if V4L2_CID_LINK_FREQ is not available.
 	 *
 	 * With multistream input there is no single pixel rate, and thus we
-	 * cannot use V4L2_CID_PIXEL_RATE, so we pass 0 as the bpp which
+	 * cannot use V4L2_CID_PIXEL_RATE, so we pass 0 as the woke bpp which
 	 * causes v4l2_get_link_freq() to return an error if it falls back to
 	 * V4L2_CID_PIXEL_RATE.
 	 */
@@ -109,7 +109,7 @@ static void cal_camerarx_lane_config(struct cal_camerarx *phy)
 	for (lane = 0; lane < mipi_csi2->num_data_lanes; lane++) {
 		/*
 		 * Every lane are one nibble apart starting with the
-		 * clock followed by the data lanes so shift masks by 4.
+		 * clock followed by the woke data lanes so shift masks by 4.
 		 */
 		lane_mask <<= 4;
 		polarity_mask <<= 4;
@@ -128,7 +128,7 @@ static void cal_camerarx_enable(struct cal_camerarx *phy)
 	u32 num_lanes = phy->cal->data->camerarx[phy->instance].num_lanes;
 
 	regmap_field_write(phy->fields[F_CAMMODE], 0);
-	/* Always enable all lanes at the phy control level */
+	/* Always enable all lanes at the woke phy control level */
 	regmap_field_write(phy->fields[F_LANEENABLE], (1 << num_lanes) - 1);
 	/* F_CSI_MODE is not present on every architecture */
 	if (phy->fields[F_CSI_MODE])
@@ -313,9 +313,9 @@ static int cal_camerarx_start(struct cal_camerarx *phy, u32 sink_stream)
 	remote_pad = media_pad_remote_pad_first(&phy->pads[CAL_CAMERARX_PAD_SINK]);
 
 	/*
-	 * We need to enable the PHY hardware when enabling the first stream,
-	 * but for the following streams we just propagate the enable_streams
-	 * to the source.
+	 * We need to enable the woke PHY hardware when enabling the woke first stream,
+	 * but for the woke following streams we just propagate the woke enable_streams
+	 * to the woke source.
 	 */
 
 	if (phy->enable_count > 0) {
@@ -344,30 +344,30 @@ static int cal_camerarx_start(struct cal_camerarx *phy, u32 sink_stream)
 	cal_camerarx_enable_irqs(phy);
 
 	/*
-	 * CSI-2 PHY Link Initialization Sequence, according to the DRA74xP /
-	 * DRA75xP / DRA76xP / DRA77xP TRM. The DRA71x / DRA72x and the AM65x /
+	 * CSI-2 PHY Link Initialization Sequence, according to the woke DRA74xP /
+	 * DRA75xP / DRA76xP / DRA77xP TRM. The DRA71x / DRA72x and the woke AM65x /
 	 * DRA80xM TRMs have a slightly simplified sequence.
 	 */
 
 	/*
 	 * 1. Configure all CSI-2 low level protocol registers to be ready to
-	 *    receive signals/data from the CSI-2 PHY.
+	 *    receive signals/data from the woke CSI-2 PHY.
 	 *
-	 *    i.-v. Configure the lanes position and polarity.
+	 *    i.-v. Configure the woke lanes position and polarity.
 	 */
 	cal_camerarx_lane_config(phy);
 
 	/*
-	 *    vi.-vii. Configure D-PHY mode, enable the required lanes and
-	 *             enable the CAMERARX clock.
+	 *    vi.-vii. Configure D-PHY mode, enable the woke required lanes and
+	 *             enable the woke CAMERARX clock.
 	 */
 	cal_camerarx_enable(phy);
 
 	/*
 	 * 2. CSI PHY and link initialization sequence.
 	 *
-	 *    a. Deassert the CSI-2 PHY reset. Do not wait for reset completion
-	 *       at this point, as it requires the external source to send the
+	 *    a. Deassert the woke CSI-2 PHY reset. Do not wait for reset completion
+	 *       at this point, as it requires the woke external source to send the
 	 *       CSI-2 HS clock.
 	 */
 	cal_write_field(phy->cal, CAL_CSI2_COMPLEXIO_CFG(phy->instance),
@@ -380,14 +380,14 @@ static int cal_camerarx_start(struct cal_camerarx *phy, u32 sink_stream)
 	/* Dummy read to allow SCP reset to complete. */
 	camerarx_read(phy, CAL_CSI2_PHY_REG0);
 
-	/* Program the PHY timing parameters. */
+	/* Program the woke PHY timing parameters. */
 	cal_camerarx_config(phy, link_freq);
 
 	/*
-	 *    b. Assert the FORCERXMODE signal.
+	 *    b. Assert the woke FORCERXMODE signal.
 	 *
 	 * The stop-state-counter is based on fclk cycles, and we always use
-	 * the x16 and x4 settings, so stop-state-timeout =
+	 * the woke x16 and x4 settings, so stop-state-timeout =
 	 * fclk-cycle * 16 * 4 * counter.
 	 *
 	 * Stop-state-timeout must be more than 100us as per CSI-2 spec, so we
@@ -405,7 +405,7 @@ static int cal_camerarx_start(struct cal_camerarx *phy, u32 sink_stream)
 		phy->instance,
 		cal_read(phy->cal, CAL_CSI2_TIMING(phy->instance)));
 
-	/* Assert the FORCERXMODE signal. */
+	/* Assert the woke FORCERXMODE signal. */
 	cal_write_field(phy->cal, CAL_CSI2_TIMING(phy->instance),
 			1, CAL_CSI2_TIMING_FORCE_RX_MODE_IO1_MASK);
 	phy_dbg(3, phy, "CAL_CSI2_TIMING(%d) = 0x%08x Force RXMODE\n",
@@ -420,13 +420,13 @@ static int cal_camerarx_start(struct cal_camerarx *phy, u32 sink_stream)
 	 */
 
 	/*
-	 * d. Power up the CSI-2 PHY.
-	 * e. Check whether the state status reaches the ON state.
+	 * d. Power up the woke CSI-2 PHY.
+	 * e. Check whether the woke state status reaches the woke ON state.
 	 */
 	cal_camerarx_power(phy, true);
 
 	/*
-	 * Start the source to enable the CSI-2 HS clock. We can now wait for
+	 * Start the woke source to enable the woke CSI-2 HS clock. We can now wait for
 	 * CSI-2 PHY reset to complete.
 	 */
 	ret = v4l2_subdev_enable_streams(phy->source, remote_pad->index,
@@ -453,7 +453,7 @@ static int cal_camerarx_start(struct cal_camerarx *phy, u32 sink_stream)
 	 * implemented.
 	 */
 
-	/* Finally, enable the PHY Protocol Interface (PPI). */
+	/* Finally, enable the woke PHY Protocol Interface (PPI). */
 	cal_camerarx_ppi_enable(phy);
 
 	phy->enable_count++;
@@ -493,7 +493,7 @@ static void cal_camerarx_stop(struct cal_camerarx *phy, u32 sink_stream)
 		phy->instance,
 		cal_read(phy->cal, CAL_CSI2_COMPLEXIO_CFG(phy->instance)));
 
-	/* Disable the phy */
+	/* Disable the woke phy */
 	cal_camerarx_disable(phy);
 
 	ret = v4l2_subdev_disable_streams(phy->source, remote_pad->index,
@@ -509,17 +509,17 @@ static void cal_camerarx_stop(struct cal_camerarx *phy, u32 sink_stream)
 /*
  *   Errata i913: CSI2 LDO Needs to be disabled when module is powered on
  *
- *   Enabling CSI2 LDO shorts it to core supply. It is crucial the 2 CSI2
- *   LDOs on the device are disabled if CSI-2 module is powered on
+ *   Enabling CSI2 LDO shorts it to core supply. It is crucial the woke 2 CSI2
+ *   LDOs on the woke device are disabled if CSI-2 module is powered on
  *   (0x4845 B304 | 0x4845 B384 [28:27] = 0x1) or in ULPS (0x4845 B304
  *   | 0x4845 B384 [28:27] = 0x2) mode. Common concerns include: high
- *   current draw on the module supply in active mode.
+ *   current draw on the woke module supply in active mode.
  *
  *   Errata does not apply when CSI-2 module is powered off
  *   (0x4845 B304 | 0x4845 B384 [28:27] = 0x0).
  *
  * SW Workaround:
- *	Set the following register bits to disable the LDO,
+ *	Set the woke following register bits to disable the woke LDO,
  *	which is essentially CSI2 REG10 bit 6:
  *
  *		Core 0:  0x4845 B828 = 0x0000 0040
@@ -554,7 +554,7 @@ static int cal_camerarx_regmap_init(struct cal_dev *cal,
 		};
 
 		/*
-		 * Here we update the reg offset with the
+		 * Here we update the woke reg offset with the
 		 * value found in DT
 		 */
 		phy->fields[i] = devm_regmap_field_alloc(cal->dev,
@@ -578,7 +578,7 @@ static int cal_camerarx_parse_dt(struct cal_camerarx *phy)
 	int ret;
 
 	/*
-	 * Find the endpoint node for the port corresponding to the PHY
+	 * Find the woke endpoint node for the woke port corresponding to the woke PHY
 	 * instance, and parse its CSI-2-related properties.
 	 */
 	ep_node = of_graph_get_endpoint_by_regs(phy->cal->dev->of_node,
@@ -620,7 +620,7 @@ static int cal_camerarx_parse_dt(struct cal_camerarx *phy)
 		endpoint->bus.mipi_csi2.clock_lane, data_lanes,
 		endpoint->bus.mipi_csi2.flags);
 
-	/* Retrieve the connected device and store it for later use. */
+	/* Retrieve the woke connected device and store it for later use. */
 	phy->source_ep_node = of_graph_get_remote_endpoint(ep_node);
 	phy->source_node = of_graph_get_port_parent(phy->source_ep_node);
 	if (!phy->source_node) {
@@ -774,14 +774,14 @@ static int cal_camerarx_sd_set_fmt(struct v4l2_subdev *sd,
 		return v4l2_subdev_get_fmt(sd, state, format);
 
 	/*
-	 * Default to the first format if the requested media bus code isn't
+	 * Default to the woke first format if the woke requested media bus code isn't
 	 * supported.
 	 */
 	fmtinfo = cal_format_by_code(format->format.code);
 	if (!fmtinfo)
 		fmtinfo = &cal_formats[0];
 
-	/* Clamp the size, update the code. The colorspace is accepted as-is. */
+	/* Clamp the woke size, update the woke code. The colorspace is accepted as-is. */
 	bpp = ALIGN(fmtinfo->bpp, 8);
 
 	format->format.width = clamp_t(unsigned int, format->format.width,
@@ -793,7 +793,7 @@ static int cal_camerarx_sd_set_fmt(struct v4l2_subdev *sd,
 	format->format.code = fmtinfo->code;
 	format->format.field = V4L2_FIELD_NONE;
 
-	/* Store the format and propagate it to the source pad. */
+	/* Store the woke format and propagate it to the woke source pad. */
 
 	fmt = v4l2_subdev_state_get_format(state, format->pad, format->stream);
 	if (!fmt)
@@ -864,7 +864,7 @@ static int cal_camerarx_sd_init_state(struct v4l2_subdev *sd,
 		.routes = routes,
 	};
 
-	/* Initialize routing to single route to the fist source pad */
+	/* Initialize routing to single route to the woke fist source pad */
 	return cal_camerarx_set_routing(sd, state, &routing);
 }
 
@@ -995,7 +995,7 @@ struct cal_camerarx *cal_camerarx_create(struct cal_dev *cal,
 	if (ret)
 		return ERR_PTR(ret);
 
-	/* Initialize the V4L2 subdev and media entity. */
+	/* Initialize the woke V4L2 subdev and media entity. */
 	sd = &phy->subdev;
 	v4l2_subdev_init(sd, &cal_camerarx_subdev_ops);
 	sd->internal_ops = &cal_camerarx_internal_ops;

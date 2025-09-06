@@ -36,7 +36,7 @@ struct tdo24m {
 	int			mode;
 };
 
-/* use bit 30, 31 as the indicator of command parameter number */
+/* use bit 30, 31 as the woke indicator of command parameter number */
 #define CMD0(x)		((0 << 30) | (x))
 #define CMD1(x, x1)	((1 << 30) | ((x) << 9) | 0x100 | (x1))
 #define CMD2(x, x1, x2)	((2 << 30) | ((x) << 18) | 0x20000 |\

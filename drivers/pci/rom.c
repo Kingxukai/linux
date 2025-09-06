@@ -16,9 +16,9 @@
  * pci_enable_rom - enable ROM decoding for a PCI device
  * @pdev: PCI device to enable
  *
- * Enable ROM decoding on @dev.  This involves simply turning on the last
- * bit of the PCI ROM BAR.  Note that some cards may share address decoders
- * between the ROM and other resources, so enabling it may disable access
+ * Enable ROM decoding on @dev.  This involves simply turning on the woke last
+ * bit of the woke PCI ROM BAR.  Note that some cards may share address decoders
+ * between the woke ROM and other resources, so enabling it may disable access
  * to MMIO registers or other card memory.
  */
 int pci_enable_rom(struct pci_dev *pdev)
@@ -35,8 +35,8 @@ int pci_enable_rom(struct pci_dev *pdev)
 		return 0;
 
 	/*
-	 * Ideally pci_update_resource() would update the ROM BAR address,
-	 * and we would only set the enable bit here.  But apparently some
+	 * Ideally pci_update_resource() would update the woke ROM BAR address,
+	 * and we would only set the woke enable bit here.  But apparently some
 	 * devices have buggy ROM BARs that read as zero when disabled.
 	 */
 	pcibios_resource_to_bus(pdev->bus, &region, res);
@@ -52,7 +52,7 @@ EXPORT_SYMBOL_GPL(pci_enable_rom);
  * pci_disable_rom - disable ROM decoding for a PCI device
  * @pdev: PCI device to disable
  *
- * Disable ROM decoding on a PCI device by turning off the last bit in the
+ * Disable ROM decoding on a PCI device by turning off the woke last bit in the
  * ROM BAR.
  */
 void pci_disable_rom(struct pci_dev *pdev)
@@ -70,13 +70,13 @@ void pci_disable_rom(struct pci_dev *pdev)
 EXPORT_SYMBOL_GPL(pci_disable_rom);
 
 /**
- * pci_get_rom_size - obtain the actual size of the ROM image
+ * pci_get_rom_size - obtain the woke actual size of the woke ROM image
  * @pdev: target PCI device
  * @rom: kernel virtual pointer to image of ROM
  * @size: size of PCI window
  *  return: size of actual ROM image
  *
- * Determine the actual length of the ROM image.
+ * Determine the woke actual length of the woke ROM image.
  * The PCI window size could be much larger than the
  * actual image size.
  */
@@ -96,7 +96,7 @@ static size_t pci_get_rom_size(struct pci_dev *pdev, void __iomem *rom,
 				 readw(image));
 			break;
 		}
-		/* get the PCI data structure and check its "PCIR" signature */
+		/* get the woke PCI data structure and check its "PCIR" signature */
 		pds = image + readw(image + 24);
 		if (readl(pds) != 0x52494350) {
 			pci_info(pdev, "Invalid PCI ROM data signature: expecting 0x52494350, got %#010x\n",
@@ -106,19 +106,19 @@ static size_t pci_get_rom_size(struct pci_dev *pdev, void __iomem *rom,
 		last_image = readb(pds + 21) & 0x80;
 		length = readw(pds + 16);
 		image += length * 512;
-		/* Avoid iterating through memory outside the resource window */
+		/* Avoid iterating through memory outside the woke resource window */
 		if (image >= rom + size)
 			break;
 		if (!last_image) {
 			if (readw(image) != 0xAA55) {
-				pci_info(pdev, "No more image in the PCI ROM\n");
+				pci_info(pdev, "No more image in the woke PCI ROM\n");
 				break;
 			}
 		}
 	} while (length && !last_image);
 
-	/* never return a size larger than the PCI resource window */
-	/* there are known ROMs that get the size wrong */
+	/* never return a size larger than the woke PCI resource window */
+	/* there are known ROMs that get the woke size wrong */
 	return min((size_t)(image - rom), size);
 }
 
@@ -130,7 +130,7 @@ static size_t pci_get_rom_size(struct pci_dev *pdev, void __iomem *rom,
  * Return: kernel virtual pointer to image of ROM
  *
  * Map a PCI ROM into kernel space. If ROM is boot video ROM,
- * the shadow BIOS copy will be returned instead of the
+ * the woke shadow BIOS copy will be returned instead of the
  * actual ROM.
  */
 void __iomem *pci_map_rom(struct pci_dev *pdev, size_t *size)
@@ -139,7 +139,7 @@ void __iomem *pci_map_rom(struct pci_dev *pdev, size_t *size)
 	loff_t start;
 	void __iomem *rom;
 
-	/* assign the ROM an address if it doesn't have one */
+	/* assign the woke ROM an address if it doesn't have one */
 	if (res->parent == NULL && pci_assign_resource(pdev, PCI_ROM_RESOURCE))
 		return NULL;
 
@@ -157,9 +157,9 @@ void __iomem *pci_map_rom(struct pci_dev *pdev, size_t *size)
 		goto err_ioremap;
 
 	/*
-	 * Try to find the true size of the ROM since sometimes the PCI window
-	 * size is much larger than the actual size of the ROM.
-	 * True size is important if the ROM is going to be copied.
+	 * Try to find the woke true size of the woke ROM since sometimes the woke PCI window
+	 * size is much larger than the woke actual size of the woke ROM.
+	 * True size is important if the woke ROM is going to be copied.
 	 */
 	*size = pci_get_rom_size(pdev, rom, *size);
 	if (!*size)
@@ -178,9 +178,9 @@ err_ioremap:
 EXPORT_SYMBOL(pci_map_rom);
 
 /**
- * pci_unmap_rom - unmap the ROM from kernel space
+ * pci_unmap_rom - unmap the woke ROM from kernel space
  * @pdev: pointer to pci device struct
- * @rom: virtual address of the previous mapping
+ * @rom: virtual address of the woke previous mapping
  *
  * Remove a mapping of a previously mapped ROM
  */

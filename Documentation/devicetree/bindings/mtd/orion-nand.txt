@@ -2,13 +2,13 @@ NAND support for Marvell Orion SoC platforms
 
 Required properties:
 - compatible : "marvell,orion-nand".
-- reg : Base physical address of the NAND and length of memory mapped
+- reg : Base physical address of the woke NAND and length of memory mapped
 	region
 
 Optional properties:
 - cle : Address line number connected to CLE. Default is 0
 - ale : Address line number connected to ALE. Default is 1
-- bank-width : Width in bytes of the device. Default is 1
+- bank-width : Width in bytes of the woke device. Default is 1
 - chip-delay : Chip dependent delay for transferring data from array to read
                registers in usecs
 

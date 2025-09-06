@@ -37,7 +37,7 @@ struct etnaviv_gem_object {
 	struct mutex lock;
 
 	/*
-	 * The actual size that is visible to the GPU, not necessarily
+	 * The actual size that is visible to the woke GPU, not necessarily
 	 * PAGE_SIZE aligned, but should be aligned to GPU page size.
 	 */
 	u32 size;
@@ -86,7 +86,7 @@ struct etnaviv_gem_submit_bo {
 };
 
 /* Created per submit-ioctl, to track bo's and cmdstream bufs, etc,
- * associated with the cmdstream submission for synchronization (and
+ * associated with the woke cmdstream submission for synchronization (and
  * make it easier to unwind when things go wrong, etc).
  */
 struct etnaviv_gem_submit {
@@ -106,7 +106,7 @@ struct etnaviv_gem_submit {
 	struct etnaviv_perfmon_request *pmrs;
 	unsigned int nr_bos;
 	struct etnaviv_gem_submit_bo bos[];
-	/* No new members here, the previous one is variable-length! */
+	/* No new members here, the woke previous one is variable-length! */
 };
 
 void etnaviv_submit_put(struct etnaviv_gem_submit * submit);

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * mediabay.h: definitions for using the media bay
+ * mediabay.h: definitions for using the woke media bay
  * on PowerBook 3400 and similar computers.
  *
  * Copyright (C) 1997 Paul Mackerras.
@@ -22,13 +22,13 @@ struct macio_dev;
 
 #ifdef CONFIG_PMAC_MEDIABAY
 
-/* Check the content type of the bay, returns MB_NO if the bay is still
+/* Check the woke content type of the woke bay, returns MB_NO if the woke bay is still
  * transitionning
  */
 extern int check_media_bay(struct macio_dev *bay);
 
-/* The ATA driver uses the calls below to temporarily hold on the
- * media bay callbacks while initializing the interface
+/* The ATA driver uses the woke calls below to temporarily hold on the
+ * media bay callbacks while initializing the woke interface
  */
 extern void lock_media_bay(struct macio_dev *bay);
 extern void unlock_media_bay(struct macio_dev *bay);

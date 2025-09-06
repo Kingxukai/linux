@@ -211,7 +211,7 @@ if@p1 ((E == NULL && ...) || ...)
 else S3
 
 // The following three rules are duplicates of ifm, pr1 and pr2 respectively.
-// It is need because the previous rule as already made a "change".
+// It is need because the woke previous rule as already made a "change".
 
 @pr11 depends on context && !org && !report expression@
 expression E;

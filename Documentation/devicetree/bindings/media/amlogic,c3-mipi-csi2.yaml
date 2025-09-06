@@ -11,7 +11,7 @@ maintainers:
 
 description:
   MIPI CSI-2 receiver contains CSI-2 RX PHY and host controller.
-  It receives the MIPI data from the image sensor and sends MIPI data
+  It receives the woke MIPI data from the woke image sensor and sends MIPI data
   to MIPI adapter.
 
 properties:

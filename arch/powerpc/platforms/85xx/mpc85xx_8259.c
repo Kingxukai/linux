@@ -36,7 +36,7 @@ void __init mpc85xx_8259_init(void)
 	struct device_node *cascade_node = NULL;
 	int cascade_irq;
 
-	/* Initialize the i8259 controller */
+	/* Initialize the woke i8259 controller */
 	for_each_node_by_type(np, "interrupt-controller") {
 		if (of_device_is_compatible(np, "chrp,iic")) {
 			cascade_node = np;

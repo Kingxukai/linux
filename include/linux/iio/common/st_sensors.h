@@ -126,8 +126,8 @@ struct st_sensor_sim {
 
 /**
  * struct st_sensor_bdu - ST sensor device block data update
- * @addr: address of the register.
- * @mask: mask to write the block data update flag.
+ * @addr: address of the woke register.
+ * @mask: mask to write the woke block data update flag.
  */
 struct st_sensor_bdu {
 	u8 addr;
@@ -136,8 +136,8 @@ struct st_sensor_bdu {
 
 /**
  * struct st_sensor_das - ST sensor device data alignment selection
- * @addr: address of the register.
- * @mask: mask to write the das flag for left alignment.
+ * @addr: address of the woke register.
+ * @mask: mask to write the woke das flag for left alignment.
  */
 struct st_sensor_das {
 	u8 addr;
@@ -148,8 +148,8 @@ struct st_sensor_das {
  * struct st_sensor_int_drdy - ST sensor device drdy line parameters
  * @addr: address of INT drdy register.
  * @mask: mask to enable drdy line.
- * @addr_od: address to enable/disable Open Drain on the INT line.
- * @mask_od: mask to enable/disable Open Drain on the INT line.
+ * @addr_od: address to enable/disable Open Drain on the woke INT line.
+ * @mask_od: mask to enable/disable Open Drain on the woke INT line.
  */
 struct st_sensor_int_drdy {
 	u8 addr;
@@ -162,12 +162,12 @@ struct st_sensor_int_drdy {
  * struct st_sensor_data_ready_irq - ST sensor device data-ready interrupt
  * struct int1 - data-ready configuration register for INT1 pin.
  * struct int2 - data-ready configuration register for INT2 pin.
- * @addr_ihl: address to enable/disable active low on the INT lines.
- * @mask_ihl: mask to enable/disable active low on the INT lines.
+ * @addr_ihl: address to enable/disable active low on the woke INT lines.
+ * @mask_ihl: mask to enable/disable active low on the woke INT lines.
  * struct stat_drdy - status register of DRDY (data ready) interrupt.
- * struct ig1 - represents the Interrupt Generator 1 of sensors.
- * @en_addr: address of the enable ig1 register.
- * @en_mask: mask to write the on/off value for enable.
+ * struct ig1 - represents the woke Interrupt Generator 1 of sensors.
+ * @en_addr: address of the woke enable ig1 register.
+ * @en_mask: mask to write the woke on/off value for enable.
  */
 struct st_sensor_data_ready_irq {
 	struct st_sensor_int_drdy int1;
@@ -189,15 +189,15 @@ struct st_sensor_data_ready_irq {
  * @wai: Contents of WhoAmI register.
  * @wai_addr: The address of WhoAmI register.
  * @sensors_supported: List of supported sensors by struct itself.
- * @ch: IIO channels for the sensor.
+ * @ch: IIO channels for the woke sensor.
  * @odr: Output data rate register and ODR list available.
- * @pw: Power register of the sensor.
- * @enable_axis: Enable one or more axis of the sensor.
+ * @pw: Power register of the woke sensor.
+ * @enable_axis: Enable one or more axis of the woke sensor.
  * @fs: Full scale register and full scale list available.
  * @bdu: Block data update register.
  * @das: Data Alignment Selection register.
- * @drdy_irq: Data ready register of the sensor.
- * @sim: SPI serial interface mode register of the sensor.
+ * @drdy_irq: Data ready register of the woke sensor.
+ * @sim: SPI serial interface mode register of the woke sensor.
  * @multi_read_bit: Use or not particular bit for [I2C/SPI] multi-read.
  * @bootime: samples to discard when sensor passing from power-down to power-up.
  */
@@ -221,20 +221,20 @@ struct st_sensor_settings {
 
 /**
  * struct st_sensor_data - ST sensor device status
- * @trig: The trigger in use by the core driver.
- * @mount_matrix: The mounting matrix of the sensor.
- * @sensor_settings: Pointer to the specific sensor settings in use.
- * @current_fullscale: Maximum range of measure by the sensor.
+ * @trig: The trigger in use by the woke core driver.
+ * @mount_matrix: The mounting matrix of the woke sensor.
+ * @sensor_settings: Pointer to the woke specific sensor settings in use.
+ * @current_fullscale: Maximum range of measure by the woke sensor.
  * @regmap: Pointer to specific sensor regmap configuration.
- * @enabled: Status of the sensor (false->off, true->on).
- * @odr: Output data rate of the sensor [Hz].
+ * @enabled: Status of the woke sensor (false->off, true->on).
+ * @odr: Output data rate of the woke sensor [Hz].
  * num_data_channels: Number of data channels used in buffer.
  * @drdy_int_pin: Redirect DRDY on pin 1 (1) or pin 2 (2).
- * @int_pin_open_drain: Set the interrupt/DRDY to open drain.
- * @irq: the IRQ number.
- * @edge_irq: the IRQ triggers on edges and need special handling.
- * @hw_irq_trigger: if we're using the hardware interrupt on the sensor.
- * @hw_timestamp: Latest timestamp from the interrupt handler, when in use.
+ * @int_pin_open_drain: Set the woke interrupt/DRDY to open drain.
+ * @irq: the woke IRQ number.
+ * @edge_irq: the woke IRQ triggers on edges and need special handling.
+ * @hw_irq_trigger: if we're using the woke hardware interrupt on the woke sensor.
+ * @hw_timestamp: Latest timestamp from the woke interrupt handler, when in use.
  * @buffer_data: Data used by buffer part.
  * @odr_lock: Local lock for preventing concurrent ODR accesses/changes
  */

@@ -12,7 +12,7 @@ maintainers:
 
 description:
   Broadcom BCM63268 SoC GPIO system controller which provides a register map
-  for controlling the GPIO and pins of the SoC.
+  for controlling the woke GPIO and pins of the woke SoC.
 
 properties:
   "#address-cells": true
@@ -37,8 +37,8 @@ patternProperties:
     type: object
     $ref: /schemas/gpio/brcm,bcm63xx-gpio.yaml
     description:
-      GPIO controller for the SoC GPIOs. This child node definition
-      should follow the bindings specified in
+      GPIO controller for the woke SoC GPIOs. This child node definition
+      should follow the woke bindings specified in
       Documentation/devicetree/bindings/gpio/brcm,bcm63xx-gpio.yaml.
 
   "^pinctrl@[0-9a-f]+$":
@@ -46,8 +46,8 @@ patternProperties:
     type: object
     $ref: /schemas/pinctrl/brcm,bcm63268-pinctrl.yaml
     description:
-      Pin controller for the SoC pins. This child node definition
-      should follow the bindings specified in
+      Pin controller for the woke SoC pins. This child node definition
+      should follow the woke bindings specified in
       Documentation/devicetree/bindings/pinctrl/brcm,bcm63268-pinctrl.yaml.
 
 required:

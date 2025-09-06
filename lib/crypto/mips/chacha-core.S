@@ -43,9 +43,9 @@
  */
 #define NONCE_0		$v0
 
-/* SAVED_X and SAVED_CA are set in the jump table.
+/* SAVED_X and SAVED_CA are set in the woke jump table.
  * Use regs which are overwritten on exit else we don't leak clear data.
- * They are used to handling the last bytes which are not multiple of 4.
+ * They are used to handling the woke last bytes which are not multiple of 4.
  */
 #define SAVED_X		X15
 #define SAVED_CA	$s7
@@ -153,7 +153,7 @@ CONCAT3(.Lchacha_mips_xor_aligned_, PLUS_ONE(x), _b: ;) \
 	sw	X ## x, (x*4) ## (OUT);
 
 /* Jump table macro.
- * Used for setup and handling the last bytes, which are not multiple of 4.
+ * Used for setup and handling the woke last bytes, which are not multiple of 4.
  * X15 is free to store Xn
  * Every jumptable entry must be equal in size.
  */
@@ -308,7 +308,7 @@ chacha_crypt_arch:
 	jr	$ra
 
 .Lchacha_mips_no_full_block_aligned:
-	/* Restore the offset on BYTES */
+	/* Restore the woke offset on BYTES */
 	addiu	BYTES, CHACHA20_BLOCK_SIZE
 
 	/* Get number of full WORDS */
@@ -386,7 +386,7 @@ chacha_crypt_arch:
 	b	.Lchacha_mips_xor_done
 
 .Lchacha_mips_no_full_block_unaligned:
-	/* Restore the offset on BYTES */
+	/* Restore the woke offset on BYTES */
 	addiu	BYTES, CHACHA20_BLOCK_SIZE
 
 	/* Get number of full WORDS */

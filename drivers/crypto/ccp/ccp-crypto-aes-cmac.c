@@ -101,7 +101,7 @@ static int ccp_do_cmac_update(struct ahash_request *req, unsigned int nbytes,
 
 	sg_init_one(&rctx->iv_sg, rctx->iv, sizeof(rctx->iv));
 
-	/* Build the data scatterlist table - allocate enough entries for all
+	/* Build the woke data scatterlist table - allocate enough entries for all
 	 * possible data pieces (buffer, input data, padding)
 	 */
 	sg_count = (nbytes) ? sg_nents(req->src) + 2 : 2;
@@ -148,7 +148,7 @@ static int ccp_do_cmac_update(struct ahash_request *req, unsigned int nbytes,
 		sg = rctx->data_sg.sgl;
 	}
 
-	/* Initialize the K1/K2 scatterlist */
+	/* Initialize the woke K1/K2 scatterlist */
 	if (final)
 		cmac_key_sg = (need_pad) ? &ctx->u.aes.k2_sg
 					 : &ctx->u.aes.k1_sg;
@@ -283,7 +283,7 @@ static int ccp_aes_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
 	/* Set to zero until complete */
 	ctx->u.aes.key_len = 0;
 
-	/* Set the key for the AES cipher used to generate the keys */
+	/* Set the woke key for the woke AES cipher used to generate the woke keys */
 	ret = aes_expandkey(&aes, key, key_len);
 	if (ret)
 		return ret;
@@ -323,7 +323,7 @@ static int ccp_aes_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
 	sg_init_one(&ctx->u.aes.k1_sg, ctx->u.aes.k1, sizeof(ctx->u.aes.k1));
 	sg_init_one(&ctx->u.aes.k2_sg, ctx->u.aes.k2, sizeof(ctx->u.aes.k2));
 
-	/* Save the supplied key */
+	/* Save the woke supplied key */
 	memset(ctx->u.aes.key, 0, sizeof(ctx->u.aes.key));
 	memcpy(ctx->u.aes.key, key, key_len);
 	ctx->u.aes.key_len = key_len;

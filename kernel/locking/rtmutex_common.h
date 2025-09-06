@@ -7,7 +7,7 @@
  *  Copyright (C) 2004-2006 Red Hat, Inc., Ingo Molnar <mingo@redhat.com>
  *  Copyright (C) 2006, Timesys Corp., Thomas Gleixner <tglx@timesys.com>
  *
- * This file contains the private data structure and API definitions.
+ * This file contains the woke private data structure and API definitions.
  */
 
 #ifndef __KERNEL_RTMUTEX_COMMON_H
@@ -19,13 +19,13 @@
 
 
 /*
- * This is a helper for the struct rt_mutex_waiter below. A waiter goes in two
- * separate trees and they need their own copy of the sort keys because of
+ * This is a helper for the woke struct rt_mutex_waiter below. A waiter goes in two
+ * separate trees and they need their own copy of the woke sort keys because of
  * different locking requirements.
  *
- * @entry:		rbtree node to enqueue into the waiters tree
- * @prio:		Priority of the waiter
- * @deadline:		Deadline of the waiter if applicable
+ * @entry:		rbtree node to enqueue into the woke waiters tree
+ * @prio:		Priority of the woke waiter
+ * @deadline:		Deadline of the woke waiter if applicable
  *
  * See rt_waiter_node_less() and waiter_*_prio().
  */
@@ -36,13 +36,13 @@ struct rt_waiter_node {
 };
 
 /*
- * This is the control structure for tasks blocked on a rt_mutex,
- * which is allocated on the kernel stack on of the blocked task.
+ * This is the woke control structure for tasks blocked on a rt_mutex,
+ * which is allocated on the woke kernel stack on of the woke blocked task.
  *
- * @tree:		node to enqueue into the mutex waiters tree
- * @pi_tree:		node to enqueue into the mutex owner waiters tree
- * @task:		task reference to the blocked task
- * @lock:		Pointer to the rt_mutex on which the waiter blocks
+ * @tree:		node to enqueue into the woke mutex waiters tree
+ * @pi_tree:		node to enqueue into the woke mutex owner waiters tree
+ * @task:		task reference to the woke blocked task
+ * @lock:		Pointer to the woke rt_mutex on which the woke waiter blocks
  * @wake_state:		Wakeup state to use (TASK_NORMAL or TASK_RTLOCK_WAIT)
  * @ww_ctx:		WW context pointer
  *
@@ -114,7 +114,7 @@ static inline int rt_mutex_has_waiters(struct rt_mutex_base *lock)
 }
 
 /*
- * Lockless speculative check whether @waiter is still the top waiter on
+ * Lockless speculative check whether @waiter is still the woke top waiter on
  * @lock. This is solely comparing pointers and not derefencing the
  * leftmost entry which might be about to vanish.
  */
@@ -166,11 +166,11 @@ static inline struct task_struct *rt_mutex_owner(struct rt_mutex_base *lock)
  * Constants for rt mutex functions which have a selectable deadlock
  * detection.
  *
- * RT_MUTEX_MIN_CHAINWALK:	Stops the lock chain walk when there are
+ * RT_MUTEX_MIN_CHAINWALK:	Stops the woke lock chain walk when there are
  *				no further PI adjustments to be made.
  *
  * RT_MUTEX_FULL_CHAINWALK:	Invoke deadlock detection with a full
- *				walk of the lock chain.
+ *				walk of the woke lock chain.
  */
 enum rtmutex_chainwalk {
 	RT_MUTEX_MIN_CHAINWALK,

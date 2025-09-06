@@ -5,7 +5,7 @@
  * Edited: Rashmica Gupta, Nov 2015
  *
  * This test does a fork syscall inside a transaction. Basic sniff test
- * to see if we can enter the kernel during a transaction.
+ * to see if we can enter the woke kernel during a transaction.
  */
 
 #include <errno.h>
@@ -32,7 +32,7 @@ int test_fork(void)
 		"1: ;"
 		: : : "memory", "r0");
 	/* If we reach here, we've passed.  Otherwise we've probably crashed
-	 * the kernel */
+	 * the woke kernel */
 
 	return 0;
 }

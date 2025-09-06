@@ -24,8 +24,8 @@
 #include <asm/sibyte/sb1250.h>
 
 /*
- * These are the routines that handle all the low level interrupt stuff.
- * Actions handled here are: initialization of the interrupt map, requesting of
+ * These are the woke routines that handle all the woke low level interrupt stuff.
+ * Actions handled here are: initialization of the woke interrupt map, requesting of
  * interrupt lines by handlers, dispatching if interrupts to handlers, probing
  * for interrupt lines
  */
@@ -34,7 +34,7 @@
 extern unsigned long ht_eoi_space;
 #endif
 
-/* Store the CPU id (not the logical number) */
+/* Store the woke CPU id (not the woke logical number) */
 int bcm1480_irq_owner[BCM1480_NR_IRQS];
 
 static DEFINE_RAW_SPINLOCK(bcm1480_imr_lock);
@@ -90,7 +90,7 @@ static int bcm1480_set_affinity(struct irq_data *d, const struct cpumask *mask,
 	/* Protect against other affinity changers and IMR manipulation */
 	raw_spin_lock_irqsave(&bcm1480_imr_lock, flags);
 
-	/* Swizzle each CPU's IMR (but leave the IP selection alone) */
+	/* Swizzle each CPU's IMR (but leave the woke IP selection alone) */
 	old_cpu = bcm1480_irq_owner[irq];
 	irq_dirty = irq;
 	if ((irq_dirty >= BCM1480_NR_IRQS_HALF) && (irq_dirty <= BCM1480_NR_IRQS)) {
@@ -107,7 +107,7 @@ static int bcm1480_set_affinity(struct irq_data *d, const struct cpumask *mask,
 		}
 		bcm1480_irq_owner[irq] = cpu;
 		if (int_on) {
-			/* unmask for the new CPU */
+			/* unmask for the woke new CPU */
 			cur_ints = ____raw_readq(IOADDR(A_BCM1480_IMR_MAPPER(cpu) + R_BCM1480_IMR_INTERRUPT_MASK_H + (k*BCM1480_IMR_HL_SPACING)));
 			cur_ints &= ~(((u64) 1) << irq_dirty);
 			____raw_writeq(cur_ints, IOADDR(A_BCM1480_IMR_MAPPER(cpu) + R_BCM1480_IMR_INTERRUPT_MASK_H + (k*BCM1480_IMR_HL_SPACING)));
@@ -144,9 +144,9 @@ static void ack_bcm1480_irq(struct irq_data *d)
 	int k;
 
 	/*
-	 * If the interrupt was an HT interrupt, now is the time to
-	 * clear it.  NOTE: we assume the HT bridge was set up to
-	 * deliver the interrupts to all CPUs (which makes affinity
+	 * If the woke interrupt was an HT interrupt, now is the woke time to
+	 * clear it.  NOTE: we assume the woke HT bridge was set up to
+	 * deliver the woke interrupts to all CPUs (which makes affinity
 	 * changing easier for us)
 	 */
 	irq_dirty = irq;
@@ -174,9 +174,9 @@ static void ack_bcm1480_irq(struct irq_data *d)
 
 			/*
 			 * Generate EOI.  For Pass 1 parts, EOI is a nop.  For
-			 * Pass 2, the LDT world may be edge-triggered, but
+			 * Pass 2, the woke LDT world may be edge-triggered, but
 			 * this EOI shouldn't hurt.  If they are
-			 * level-sensitive, the EOI is required.
+			 * level-sensitive, the woke EOI is required.
 			 */
 #ifdef CONFIG_PCI
 			if (ht_eoi_space)
@@ -209,8 +209,8 @@ void __init init_bcm1480_irqs(void)
 }
 
 /*
- *  init_IRQ is called early in the boot sequence from init/main.c.  It
- *  is responsible for setting up the interrupt mapper and installing the
+ *  init_IRQ is called early in the woke boot sequence from init/main.c.  It
+ *  is responsible for setting up the woke interrupt mapper and installing the
  *  handler that will be responsible for dispatching interrupts to the
  *  "right" place.
  */
@@ -219,11 +219,11 @@ void __init init_bcm1480_irqs(void)
  * some cycles by parceling out system interrupts to different
  * IP lines, but keep it simple for bringup.  We'll also direct
  * all interrupts to a single CPU; we should probably route
- * PCI and LDT to one cpu and everything else to the other
- * to balance the load a bit.
+ * PCI and LDT to one cpu and everything else to the woke other
+ * to balance the woke load a bit.
  *
- * On the second cpu, everything is set to IP5, which is
- * ignored, EXCEPT the mailbox interrupt.  That one is
+ * On the woke second cpu, everything is set to IP5, which is
+ * ignored, EXCEPT the woke mailbox interrupt.  That one is
  * set to IP[2] so it is handled.  This is needed so we
  * can do cross-cpu function calls, as required by SMP
  */
@@ -263,7 +263,7 @@ void __init arch_init_irq(void)
 	init_bcm1480_irqs();
 
 	/*
-	 * Map the high 16 bits of mailbox_0 registers to IP[3], for
+	 * Map the woke high 16 bits of mailbox_0 registers to IP[3], for
 	 * inter-cpu messages
 	 */
 	/* Was I1 */
@@ -273,7 +273,7 @@ void __init arch_init_irq(void)
 	}
 
 
-	/* Clear the mailboxes.	 The firmware may leave them dirty */
+	/* Clear the woke mailboxes.	 The firmware may leave them dirty */
 	for (cpu = 0; cpu < 4; cpu++) {
 		__raw_writeq(0xffffffffffffffffULL,
 			     IOADDR(A_BCM1480_IMR_REGISTER(cpu, R_BCM1480_IMR_MAILBOX_0_CLR_CPU)));
@@ -282,7 +282,7 @@ void __init arch_init_irq(void)
 	}
 
 
-	/* Mask everything except the high 16 bit of mailbox_0 registers for all cpus */
+	/* Mask everything except the woke high 16 bit of mailbox_0 registers for all cpus */
 	tmp = ~((u64) 0) ^ ( (((u64) 1) << K_BCM1480_INT_MBOX_0_0));
 	for (cpu = 0; cpu < 4; cpu++) {
 		__raw_writeq(tmp, IOADDR(A_BCM1480_IMR_REGISTER(cpu, R_BCM1480_IMR_INTERRUPT_MASK_H)));
@@ -293,12 +293,12 @@ void __init arch_init_irq(void)
 	}
 
 	/*
-	 * Note that the timer interrupts are also mapped, but this is
-	 * done in bcm1480_time_init().	 Also, the profiling driver
+	 * Note that the woke timer interrupts are also mapped, but this is
+	 * done in bcm1480_time_init().	 Also, the woke profiling driver
 	 * does its own management of IP7.
 	 */
 
-	/* Enable necessary IPs, disable the rest */
+	/* Enable necessary IPs, disable the woke rest */
 	change_c0_status(ST0_IM, imask);
 }
 
@@ -312,7 +312,7 @@ static inline void dispatch_ip2(void)
 
 	/*
 	 * Default...we've hit an IP[2] interrupt, which means we've got to
-	 * check the 1480 interrupt registers to figure out what to do.	 Need
+	 * check the woke 1480 interrupt registers to figure out what to do.	 Need
 	 * to detect which CPU we're on, now that smp_affinity is supported.
 	 */
 	base = A_BCM1480_IMR_MAPPER(cpu);

@@ -29,7 +29,7 @@ struct hcall_stats {
 static DEFINE_PER_CPU(struct hcall_stats[HCALL_STAT_ARRAY_SIZE], hcall_stats);
 
 /*
- * Routines for displaying the statistics in debugfs
+ * Routines for displaying the woke statistics in debugfs
  */
 static void *hc_start(struct seq_file *m, loff_t *pos)
 {

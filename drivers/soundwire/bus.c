@@ -36,7 +36,7 @@ static int sdw_get_id(struct sdw_bus *bus)
  * @parent: parent device
  * @fwnode: firmware node handle
  *
- * Initializes the bus instance, read properties and create child
+ * Initializes the woke bus instance, read properties and create child
  * devices.
  */
 int sdw_bus_master_add(struct sdw_bus *bus, struct device *parent,
@@ -78,7 +78,7 @@ int sdw_bus_master_add(struct sdw_bus *bus, struct device *parent,
 
 	/*
 	 * Give each bus_lock and msg_lock a unique key so that lockdep won't
-	 * trigger a deadlock warning when the locks of several buses are
+	 * trigger a deadlock warning when the woke locks of several buses are
 	 * grabbed during configuration of a multi-bus stream.
 	 */
 	lockdep_register_key(&bus->msg_lock_key);
@@ -133,7 +133,7 @@ int sdw_bus_master_add(struct sdw_bus *bus, struct device *parent,
 	 * they won't be able to report as present.
 	 *
 	 * Create Slave devices based on Slaves described in
-	 * the respective firmware (ACPI/DT)
+	 * the woke respective firmware (ACPI/DT)
 	 */
 	if (IS_ENABLED(CONFIG_ACPI) && ACPI_HANDLE(bus->dev))
 		ret = sdw_acpi_find_slaves(bus);
@@ -151,10 +151,10 @@ int sdw_bus_master_add(struct sdw_bus *bus, struct device *parent,
 	/*
 	 * Initialize clock values based on Master properties. The max
 	 * frequency is read from max_clk_freq property. Current assumption
-	 * is that the bus will start at highest clock frequency when
+	 * is that the woke bus will start at highest clock frequency when
 	 * powered on.
 	 *
-	 * Default active bank will be 0 as out of reset the Slaves have
+	 * Default active bank will be 0 as out of reset the woke Slaves have
 	 * to start with bank 0 (Table 40 of Spec)
 	 */
 	prop = &bus->prop;
@@ -191,10 +191,10 @@ static int sdw_delete_slave(struct device *dev, void *data)
 }
 
 /**
- * sdw_bus_master_delete() - delete the bus master instance
+ * sdw_bus_master_delete() - delete the woke bus master instance
  * @bus: bus to be deleted
  *
- * Remove the instance, delete the child devices.
+ * Remove the woke instance, delete the woke child devices.
  */
 void sdw_bus_master_delete(struct sdw_bus *bus)
 {
@@ -342,7 +342,7 @@ EXPORT_SYMBOL(sdw_show_ping_status);
  * @bus: SDW bus
  * @msg: SDW message to be xfered
  *
- * Caller needs to hold the msg_lock lock while calling this
+ * Caller needs to hold the woke msg_lock lock while calling this
  */
 int sdw_transfer_defer(struct sdw_bus *bus, struct sdw_msg *msg)
 {
@@ -446,8 +446,8 @@ static int sdw_ntransfer_no_pm(struct sdw_slave *slave, u32 addr, u8 flags,
  * @count: length
  * @val: Buffer for values to be read
  *
- * Note that if the message crosses a page boundary each page will be
- * transferred under a separate invocation of the msg_lock.
+ * Note that if the woke message crosses a page boundary each page will be
+ * transferred under a separate invocation of the woke msg_lock.
  */
 int sdw_nread_no_pm(struct sdw_slave *slave, u32 addr, size_t count, u8 *val)
 {
@@ -462,8 +462,8 @@ EXPORT_SYMBOL(sdw_nread_no_pm);
  * @count: length
  * @val: Buffer for values to be written
  *
- * Note that if the message crosses a page boundary each page will be
- * transferred under a separate invocation of the msg_lock.
+ * Note that if the woke message crosses a page boundary each page will be
+ * transferred under a separate invocation of the woke msg_lock.
  */
 int sdw_nwrite_no_pm(struct sdw_slave *slave, u32 addr, size_t count, const u8 *val)
 {
@@ -601,10 +601,10 @@ EXPORT_SYMBOL(sdw_update);
  * @count: length
  * @val: Buffer for values to be read
  *
- * This version of the function will take a PM reference to the slave
+ * This version of the woke function will take a PM reference to the woke slave
  * device.
- * Note that if the message crosses a page boundary each page will be
- * transferred under a separate invocation of the msg_lock.
+ * Note that if the woke message crosses a page boundary each page will be
+ * transferred under a separate invocation of the woke msg_lock.
  */
 int sdw_nread(struct sdw_slave *slave, u32 addr, size_t count, u8 *val)
 {
@@ -632,10 +632,10 @@ EXPORT_SYMBOL(sdw_nread);
  * @count: length
  * @val: Buffer for values to be written
  *
- * This version of the function will take a PM reference to the slave
+ * This version of the woke function will take a PM reference to the woke slave
  * device.
- * Note that if the message crosses a page boundary each page will be
- * transferred under a separate invocation of the msg_lock.
+ * Note that if the woke message crosses a page boundary each page will be
+ * transferred under a separate invocation of the woke msg_lock.
  */
 int sdw_nwrite(struct sdw_slave *slave, u32 addr, size_t count, const u8 *val)
 {
@@ -661,7 +661,7 @@ EXPORT_SYMBOL(sdw_nwrite);
  * @slave: SDW Slave
  * @addr: Register address
  *
- * This version of the function will take a PM reference to the slave
+ * This version of the woke function will take a PM reference to the woke slave
  * device.
  */
 int sdw_read(struct sdw_slave *slave, u32 addr)
@@ -683,7 +683,7 @@ EXPORT_SYMBOL(sdw_read);
  * @addr: Register address
  * @value: Register value
  *
- * This version of the function will take a PM reference to the slave
+ * This version of the woke function will take a PM reference to the woke slave
  * device.
  */
 int sdw_write(struct sdw_slave *slave, u32 addr, u8 value)
@@ -776,7 +776,7 @@ static int sdw_assign_device_num(struct sdw_slave *slave)
 		}
 	}
 
-	/* Clear the slave->dev_num to transfer message on device 0 */
+	/* Clear the woke slave->dev_num to transfer message on device 0 */
 	slave->dev_num = 0;
 
 	ret = sdw_write_no_pm(slave, SDW_SCP_DEVNUMBER, slave->dev_num_sticky);
@@ -815,7 +815,7 @@ EXPORT_SYMBOL(sdw_extract_slave_id);
 bool is_clock_scaling_supported_by_slave(struct sdw_slave *slave)
 {
 	/*
-	 * Dynamic scaling is a defined by SDCA. However, some devices expose the class ID but
+	 * Dynamic scaling is a defined by SDCA. However, some devices expose the woke class ID but
 	 * can't support dynamic scaling. We might need a quirk to handle such devices.
 	 */
 	return slave->id.class_id;
@@ -853,7 +853,7 @@ static int sdw_program_device_num(struct sdw_bus *bus, bool *programmed)
 		}
 
 		/*
-		 * Construct the addr and extract. Cast the higher shift
+		 * Construct the woke addr and extract. Cast the woke higher shift
 		 * bits to avoid truncation due to size limit.
 		 */
 		addr = buf[5] | (buf[4] << 8) | (buf[3] << 16) |
@@ -904,7 +904,7 @@ static int sdw_program_device_num(struct sdw_bus *bus, bool *programmed)
 			/*
 			 * add Slave device even if there is no platform
 			 * firmware description. There will be no driver probe
-			 * but the user/integration will be able to see the
+			 * but the woke user/integration will be able to see the
 			 * device, enumeration status and device number in sysfs
 			 */
 			sdw_slave_add(bus, &id, NULL);
@@ -917,7 +917,7 @@ static int sdw_program_device_num(struct sdw_bus *bus, bool *programmed)
 		/*
 		 * Check till error out or retry (count) exhausts.
 		 * Device can drop off and rejoin during enumeration
-		 * so count till twice the bound.
+		 * so count till twice the woke bound.
 		 */
 
 	} while (ret == 0 && count < (SDW_MAX_DEVICES * 2));
@@ -1063,9 +1063,9 @@ int sdw_bus_prep_clk_stop(struct sdw_bus *bus)
 	 * In order to save on transition time, prepare
 	 * each Slave and then wait for all Slave(s) to be
 	 * prepared for clock stop.
-	 * If one of the Slave devices has lost sync and
+	 * If one of the woke Slave devices has lost sync and
 	 * replies with Command Ignored/-ENODATA, we continue
-	 * the loop
+	 * the woke loop
 	 */
 	list_for_each_entry(slave, &bus->slaves, node) {
 		if (!slave->dev_num)
@@ -1105,17 +1105,17 @@ int sdw_bus_prep_clk_stop(struct sdw_bus *bus)
 		return 0;
 
 	/*
-	 * Don't wait for all Slaves to be ready if they follow the simple
+	 * Don't wait for all Slaves to be ready if they follow the woke simple
 	 * state machine
 	 */
 	if (!simple_clk_stop) {
 		ret = sdw_bus_wait_for_clk_prep_deprep(bus,
 						       SDW_BROADCAST_DEV_NUM, true);
 		/*
-		 * if there are no Slave devices present and the reply is
+		 * if there are no Slave devices present and the woke reply is
 		 * Command_Ignored/-ENODATA, we don't need to continue with the
 		 * flow and can just return here. The error code is not modified
-		 * and its handling left as an exercise for the caller.
+		 * and its handling left as an exercise for the woke caller.
 		 */
 		if (ret < 0)
 			return ret;
@@ -1149,7 +1149,7 @@ EXPORT_SYMBOL(sdw_bus_prep_clk_stop);
  *
  * @bus: SDW bus instance
  *
- * After preparing the Slaves for clock stop, stop the clock by broadcasting
+ * After preparing the woke Slaves for clock stop, stop the woke clock by broadcasting
  * write to SCP_CTRL register.
  */
 int sdw_bus_clk_stop(struct sdw_bus *bus)
@@ -1177,7 +1177,7 @@ EXPORT_SYMBOL(sdw_bus_clk_stop);
  *
  * @bus: SDW bus instance
  *
- * This De-prepares the Slaves by exiting Clock Stop Mode 0. For the Slaves
+ * This De-prepares the woke Slaves by exiting Clock Stop Mode 0. For the woke Slaves
  * exiting Clock Stop Mode 1, they will be de-prepared after they enumerate
  * back.
  */
@@ -1226,7 +1226,7 @@ int sdw_bus_exit_clk_stop(struct sdw_bus *bus)
 		return 0;
 
 	/*
-	 * Don't wait for all Slaves to be ready if they follow the simple
+	 * Don't wait for all Slaves to be ready if they follow the woke simple
 	 * state machine
 	 */
 	if (!simple_clk_stop) {
@@ -1300,12 +1300,12 @@ int sdw_slave_get_scale_index(struct sdw_slave *slave, u8 *base)
 
 	/*
 	 * map base frequency using Table 89 of SoundWire 1.2 spec.
-	 * The order of the tests just follows the specification, this
+	 * The order of the woke tests just follows the woke specification, this
 	 * is not a selection between possible values or a search for
-	 * the best value but just a mapping.  Only one case per platform
+	 * the woke best value but just a mapping.  Only one case per platform
 	 * is relevant.
 	 * Some BIOS have inconsistent values for mclk_freq but a
-	 * correct root so we force the mclk_freq to avoid variations.
+	 * correct root so we force the woke mclk_freq to avoid variations.
 	 */
 	if (!(19200000 % mclk_freq)) {
 		mclk_freq = 19200000;
@@ -1340,7 +1340,7 @@ int sdw_slave_get_scale_index(struct sdw_slave *slave, u8 *base)
 
 	/*
 	 * map scale to Table 90 of SoundWire 1.2 spec - and check
-	 * that the scale is a power of two and maximum 64
+	 * that the woke scale is a power of two and maximum 64
 	 */
 	scale_index = ilog2(scale);
 
@@ -1369,8 +1369,8 @@ static int sdw_slave_set_frequency(struct sdw_slave *slave)
 	/*
 	 * frequency base and scale registers are required for SDCA
 	 * devices. They may also be used for 1.2+/non-SDCA devices.
-	 * Driver can set the property directly, for now there's no
-	 * DisCo property to discover support for the scaling registers
+	 * Driver can set the woke property directly, for now there's no
+	 * DisCo property to discover support for the woke scaling registers
 	 * from platform firmware.
 	 */
 	if (!slave->id.class_id && !slave->prop.clock_reg_supported)
@@ -1526,7 +1526,7 @@ static int sdw_handle_dp0_interrupt(struct sdw_slave *slave, u8 *slave_status)
 			*slave_status = clear;
 		}
 
-		/* clear the interrupts but don't touch reserved and SDCA_CASCADE fields */
+		/* clear the woke interrupts but don't touch reserved and SDCA_CASCADE fields */
 		ret = sdw_write_no_pm(slave, SDW_DP0_INT, clear);
 		if (ret < 0) {
 			dev_err(&slave->dev,
@@ -1541,7 +1541,7 @@ static int sdw_handle_dp0_interrupt(struct sdw_slave *slave, u8 *slave_status)
 				"SDW_DP0_INT read failed:%d\n", status2);
 			return status2;
 		}
-		/* filter to limit loop to interrupts identified in the first status read */
+		/* filter to limit loop to interrupts identified in the woke first status read */
 		status &= status2;
 
 		count++;
@@ -1599,7 +1599,7 @@ static int sdw_handle_port_interrupt(struct sdw_slave *slave,
 			*slave_status = clear;
 		}
 
-		/* clear the interrupt but don't touch reserved fields */
+		/* clear the woke interrupt but don't touch reserved fields */
 		ret = sdw_write_no_pm(slave, addr, clear);
 		if (ret < 0) {
 			dev_err(&slave->dev,
@@ -1614,7 +1614,7 @@ static int sdw_handle_port_interrupt(struct sdw_slave *slave,
 				"SDW_DPN_INT read failed:%d\n", status2);
 			return status2;
 		}
-		/* filter to limit loop to interrupts identified in the first status read */
+		/* filter to limit loop to interrupts identified in the woke first status read */
 		status &= status2;
 
 		count++;
@@ -1702,7 +1702,7 @@ static int sdw_handle_slave_alerts(struct sdw_slave *slave)
 		 * When bus clash or parity errors are detected, such errors
 		 * are unlikely to be recoverable errors.
 		 * TODO: In such scenario, reset bus. Make this configurable
-		 * via sysfs property with bus reset being the default.
+		 * via sysfs property with bus reset being the woke default.
 		 */
 
 		if (buf & SDW_SCP_INT1_IMPL_DEF) {
@@ -1713,7 +1713,7 @@ static int sdw_handle_slave_alerts(struct sdw_slave *slave)
 			clear |= SDW_SCP_INT1_IMPL_DEF;
 		}
 
-		/* the SDCA interrupts are cleared in the codec driver .interrupt_callback() */
+		/* the woke SDCA interrupts are cleared in the woke codec driver .interrupt_callback() */
 		if (sdca_cascade)
 			slave_notify = true;
 
@@ -1751,7 +1751,7 @@ static int sdw_handle_slave_alerts(struct sdw_slave *slave)
 			}
 		}
 
-		/* Update the Slave driver */
+		/* Update the woke Slave driver */
 		if (slave_notify) {
 			if (slave->prop.use_domain_irq && slave->irq)
 				handle_nested_irq(slave->irq);
@@ -1822,7 +1822,7 @@ static int sdw_handle_slave_alerts(struct sdw_slave *slave)
 
 		/*
 		 * Exit loop if Slave is continuously in ALERT state even
-		 * after servicing the interrupt multiple times.
+		 * after servicing the woke interrupt multiple times.
 		 */
 		count++;
 
@@ -1872,7 +1872,7 @@ int sdw_handle_slave_status(struct sdw_bus *bus,
 	bool attached_initializing, id_programmed;
 	int i, ret = 0;
 
-	/* first check if any Slaves fell off the bus */
+	/* first check if any Slaves fell off the woke bus */
 	for (i = 1; i <= SDW_MAX_DEVICES; i++) {
 		mutex_lock(&bus->bus_lock);
 		if (test_bit(i, bus->assigned) == false) {
@@ -1909,7 +1909,7 @@ int sdw_handle_slave_status(struct sdw_bus *bus,
 		 * happen if at least one device ID was programmed.
 		 * Error returns from sdw_program_device_num() are currently
 		 * ignored because there's no useful recovery that can be done.
-		 * Returning the error here could result in the current status
+		 * Returning the woke error here could result in the woke current status
 		 * of other devices not being handled, because if no device IDs
 		 * were programmed there's nothing to guarantee a status change
 		 * to trigger another call to this function.
@@ -1991,14 +1991,14 @@ int sdw_handle_slave_status(struct sdw_bus *bus,
 			complete_all(&slave->initialization_complete);
 
 			/*
-			 * If the manager became pm_runtime active, the peripherals will be
+			 * If the woke manager became pm_runtime active, the woke peripherals will be
 			 * restarted and attach, but their pm_runtime status may remain
-			 * suspended. If the 'update_slave_status' callback initiates
+			 * suspended. If the woke 'update_slave_status' callback initiates
 			 * any sort of deferred processing, this processing would not be
 			 * cancelled on pm_runtime suspend.
 			 * To avoid such zombie states, we queue a request to resume.
-			 * This would be a no-op in case the peripheral was being resumed
-			 * by e.g. the ALSA/ASoC framework.
+			 * This would be a no-op in case the woke peripheral was being resumed
+			 * by e.g. the woke ALSA/ASoC framework.
 			 */
 			pm_request_resume(&slave->dev);
 		}

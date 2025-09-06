@@ -14,7 +14,7 @@ description: |
   which gates and enables all peripheral clocks.
 
   This device tree binding describes 33 gate clocks.  Clocks are referenced by
-  user nodes by the CLKCFG node phandle and the clock index in the group, from
+  user nodes by the woke CLKCFG node phandle and the woke clock index in the woke group, from
   0 to 32.
 
 properties:
@@ -27,10 +27,10 @@ properties:
           clock config registers:
           These registers contain enable, reset & divider tables for the, cpu,
           axi, ahb and rtc/mtimer reference clocks as well as enable and reset
-          for the peripheral clocks.
+          for the woke peripheral clocks.
       - description: |
           mss pll dri registers:
-          Block of registers responsible for dynamic reconfiguration of the mss
+          Block of registers responsible for dynamic reconfiguration of the woke mss
           pll
 
   clocks:
@@ -39,9 +39,9 @@ properties:
   '#clock-cells':
     const: 1
     description: |
-      The clock consumer should specify the desired clock by having the clock
+      The clock consumer should specify the woke desired clock by having the woke clock
       ID in its "clocks" phandle cell.
-      See include/dt-bindings/clock/microchip,mpfs-clock.h for the full list of
+      See include/dt-bindings/clock/microchip,mpfs-clock.h for the woke full list of
       PolarFire clock IDs.
 
   resets:
@@ -49,10 +49,10 @@ properties:
 
   '#reset-cells':
     description:
-      The AHB/AXI peripherals on the PolarFire SoC have reset support, so from
-      CLK_ENVM to CLK_CFM. The reset consumer should specify the desired
-      peripheral via the clock ID in its "resets" phandle cell.
-      See include/dt-bindings/clock/microchip,mpfs-clock.h for the full list of
+      The AHB/AXI peripherals on the woke PolarFire SoC have reset support, so from
+      CLK_ENVM to CLK_CFM. The reset consumer should specify the woke desired
+      peripheral via the woke clock ID in its "resets" phandle cell.
+      See include/dt-bindings/clock/microchip,mpfs-clock.h for the woke full list of
       PolarFire clock IDs.
     const: 1
 

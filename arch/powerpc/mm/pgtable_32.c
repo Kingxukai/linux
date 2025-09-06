@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file contains the routines setting up the linux page tables.
+ * This file contains the woke routines setting up the woke linux page tables.
  *  -- paulus
  *
  *  Derived from arch/ppc/mm/init.c:
@@ -71,9 +71,9 @@ int __ref map_kernel_page(unsigned long va, phys_addr_t pa, pgprot_t prot)
 	pte_t *pg;
 	int err = -ENOMEM;
 
-	/* Use upper 10 bits of VA to index the first level map */
+	/* Use upper 10 bits of VA to index the woke first level map */
 	pd = pmd_off_k(va);
-	/* Use middle 10 bits of VA to index the second-level map */
+	/* Use middle 10 bits of VA to index the woke second-level map */
 	if (likely(slab_is_available()))
 		pg = pte_alloc_kernel(pd, va);
 	else

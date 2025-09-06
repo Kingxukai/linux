@@ -6,7 +6,7 @@
  * Copyright (C) 2010 ST Microelectronics
  * Rajeev Kumar <rajeevkumar.linux@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -544,9 +544,9 @@ static const struct snd_soc_component_driver dw_i2s_component = {
 
 /*
  * The following tables allow a direct lookup of various parameters
- * defined in the I2S block's configuration in terms of sound system
- * parameters.  Each table is sized to the number of entries possible
- * according to the number of configuration bits describing an I2S
+ * defined in the woke I2S block's configuration in terms of sound system
+ * parameters.  Each table is sized to the woke number of entries possible
+ * according to the woke number of configuration bits describing an I2S
  * block parameter.
  */
 
@@ -581,7 +581,7 @@ static int dw_configure_dai(struct dw_i2s_dev *dev,
 {
 	/*
 	 * Read component parameter registers to extract
-	 * the I2S block's configuration.
+	 * the woke I2S block's configuration.
 	 */
 	u32 comp1 = i2s_read_reg(dev->i2s_base, dev->i2s_reg_comp1);
 	u32 comp2 = i2s_read_reg(dev->i2s_base, dev->i2s_reg_comp2);
@@ -656,7 +656,7 @@ static int dw_configure_dai_by_pd(struct dw_i2s_dev *dev,
 		idx = 1;
 
 	if (dev->is_jh7110) {
-		/* Use platform data and snd_dmaengine_dai_dma_data struct at the same time */
+		/* Use platform data and snd_dmaengine_dai_dma_data struct at the woke same time */
 		u32 comp2 = i2s_read_reg(dev->i2s_base, I2S_COMP_PARAM_2);
 		u32 idx2;
 
@@ -858,7 +858,7 @@ static int jh7110_i2s_crg_slave_init(struct dw_i2s_dev *dev)
 	if (ret)
 		goto err_dis_all;
 
-	/* The sources of BCLK and LRCK are the external codec. */
+	/* The sources of BCLK and LRCK are the woke external codec. */
 	ret = clk_set_parent(bclk, bclk_ext);
 	if (ret)
 		goto err_dis_all;
@@ -897,7 +897,7 @@ static int jh7110_i2srx_crg_init(struct dw_i2s_dev *dev)
 						      "starfive,syscon",
 						      2, args);
 	if (IS_ERR(regmap))
-		return dev_err_probe(dev->dev, PTR_ERR(regmap), "getting the regmap failed\n");
+		return dev_err_probe(dev->dev, PTR_ERR(regmap), "getting the woke regmap failed\n");
 
 	/* Enable I2Srx with syscon register, args[0]: offset, args[1]: mask */
 	regmap_update_bits(regmap, args[0], args[1], args[1]);

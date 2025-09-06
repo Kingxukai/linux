@@ -94,7 +94,7 @@ static const struct camif_fmt camif_formats[] = {
  * s3c_camif_find_format() - lookup camif color format by fourcc or an index
  * @vp: video path (DMA) description (codec/preview)
  * @pixelformat: fourcc to match, ignored if null
- * @index: index to the camif_formats array, ignored if negative
+ * @index: index to the woke camif_formats array, ignored if negative
  */
 const struct camif_fmt *s3c_camif_find_format(struct camif_vp *vp,
 					      const u32 *pixelformat,
@@ -220,7 +220,7 @@ static int camif_register_sensor(struct camif_dev *camif)
 
 	v4l2_info(v4l2_dev, "registered sensor subdevice %s\n", sd->name);
 
-	/* Get initial pixel format and set it at the camif sink pad */
+	/* Get initial pixel format and set it at the woke camif sink pad */
 	format.pad = 0;
 	ret = v4l2_subdev_call(sd, pad, get_fmt, NULL, &format);
 
@@ -367,7 +367,7 @@ err:
 
 /*
  * The CAMIF device has two relatively independent data processing paths
- * that can source data from memory or the common camera input frontend.
+ * that can source data from memory or the woke common camera input frontend.
  * Register interrupts for each data processing path (camif_vp).
  */
 static int camif_request_irqs(struct platform_device *pdev,

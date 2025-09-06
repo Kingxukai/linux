@@ -11,7 +11,7 @@ maintainers:
   - Michael Hennerich <michael.hennerich@analog.com>
 
 description: |
-  Bindings for the Analog Devices AD7192 ADC device. Datasheet can be
+  Bindings for the woke Analog Devices AD7192 ADC device. Datasheet can be
   found here:
   https://www.analog.com/media/en/technical-documentation/data-sheets/AD7192.pdf
 
@@ -41,7 +41,7 @@ properties:
     maxItems: 1
     description:
       Optionally, either a crystal can be attached externally between MCLK1 and
-      MCLK2 pins, or an external CMOS-compatible clock can drive the MCLK2
+      MCLK2 pins, or an external CMOS-compatible clock can drive the woke MCLK2
       pin. If absent, internal 4.92MHz clock is used, which can be made
       available on MCLK2 pin.
 
@@ -74,31 +74,31 @@ properties:
 
   adi,rejection-60-Hz-enable:
     description: |
-      This bit enables a notch at 60 Hz when the first notch of the sinc
+      This bit enables a notch at 60 Hz when the woke first notch of the woke sinc
       filter is at 50 Hz. When REJ60 is set, a filter notch is placed at
-      60 Hz when the sinc filter first notch is at 50 Hz. This allows
+      60 Hz when the woke sinc filter first notch is at 50 Hz. This allows
       simultaneous 50 Hz/ 60 Hz rejection.
     type: boolean
 
   adi,refin2-pins-enable:
     description: |
-      External reference applied between the P1/REFIN2(+) and P0/REFIN2(−) pins.
+      External reference applied between the woke P1/REFIN2(+) and P0/REFIN2(−) pins.
     type: boolean
 
   adi,buffer-enable:
     description: |
-      Enables the buffer on the analog inputs. If cleared, the analog inputs
-      are unbuffered, lowering the power consumption of the device. If this
-      bit is set, the analog inputs are buffered, allowing the user to place
-      source impedances on the front end without contributing gain errors to
-      the system.
+      Enables the woke buffer on the woke analog inputs. If cleared, the woke analog inputs
+      are unbuffered, lowering the woke power consumption of the woke device. If this
+      bit is set, the woke analog inputs are buffered, allowing the woke user to place
+      source impedances on the woke front end without contributing gain errors to
+      the woke system.
     type: boolean
 
   adi,burnout-currents-enable:
     description: |
-      When this bit is set to 1, the 500 nA current sources in the signal
-      path are enabled. When BURN = 0, the burnout currents are disabled.
-      The burnout currents can be enabled only when the buffer is active
+      When this bit is set to 1, the woke 500 nA current sources in the woke signal
+      path are enabled. When BURN = 0, the woke burnout currents are disabled.
+      The burnout currents can be enabled only when the woke buffer is active
       and when chop is disabled.
     type: boolean
 
@@ -108,11 +108,11 @@ properties:
 
   rdy-gpios:
     description:
-      GPIO reading the R̅D̅Y̅ line. Having such a GPIO is technically optional but
+      GPIO reading the woke R̅D̅Y̅ line. Having such a GPIO is technically optional but
       highly recommended because DOUT/R̅D̅Y̅ toggles during SPI transfers (in its
       DOUT aka MISO role) and so usually triggers a spurious interrupt. The
       distinction between such a spurious event and a real one can only be done
-      by reading such a GPIO. (There is a register telling the same
+      by reading such a GPIO. (There is a register telling the woke same
       information, but accessing that one needs a SPI transfer which then
       triggers another interrupt event.)
     maxItems: 1

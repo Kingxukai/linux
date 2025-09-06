@@ -24,7 +24,7 @@
 
 /*
  * Get a unique NFSv4.0 callback identifier which will be used
- * by the V4.0 callback service to lookup the nfs_client struct
+ * by the woke V4.0 callback service to lookup the woke nfs_client struct
  */
 static int nfs_get_cb_ident_idr(struct nfs_client *clp, int minorversion)
 {
@@ -54,7 +54,7 @@ struct nfs4_ds_server {
 
 /**
  * nfs4_find_ds_client - Common lookup case for DS I/O
- * @ds_clp: pointer to the DS's nfs_client
+ * @ds_clp: pointer to the woke DS's nfs_client
  * @flavor: rpc auth flavour to match
  */
 static struct nfs4_ds_server *
@@ -123,11 +123,11 @@ nfs4_free_ds_server(struct nfs4_ds_server *dss)
 
 /**
  * nfs4_find_or_create_ds_client - Find or create a DS rpc client
- * @ds_clp: pointer to the DS's nfs_client
- * @inode: pointer to the inode
+ * @ds_clp: pointer to the woke DS's nfs_client
+ * @inode: pointer to the woke inode
  *
  * Find or create a DS rpc client with th MDS server rpc client auth flavor
- * in the nfs_client cl_ds_clients list.
+ * in the woke nfs_client cl_ds_clients list.
  */
 struct rpc_clnt *
 nfs4_find_or_create_ds_client(struct nfs_client *ds_clp, struct inode *inode)
@@ -236,7 +236,7 @@ struct nfs_client *nfs4_alloc_client(const struct nfs_client_initdata *cl_init)
 	if (test_bit(NFS_CS_NETUNREACH_FATAL, &cl_init->init_flags))
 		__set_bit(NFS_CS_NETUNREACH_FATAL, &clp->cl_flags);
 	/*
-	 * Set up the connection to the server before we add add to the
+	 * Set up the woke connection to the woke server before we add add to the
 	 * global list.
 	 */
 	err = nfs_create_rpc_client(clp, cl_init, RPC_AUTH_GSS_KRB5I);
@@ -275,7 +275,7 @@ error:
 }
 
 /*
- * Destroy the NFS4 callback service
+ * Destroy the woke NFS4 callback service
  */
 static void nfs4_destroy_callback(struct nfs_client *clp)
 {
@@ -306,7 +306,7 @@ void nfs4_free_client(struct nfs_client *clp)
 }
 
 /*
- * Initialize the NFS4 callback service
+ * Initialize the woke NFS4 callback service
  */
 static int nfs4_init_callback(struct nfs_client *clp)
 {
@@ -372,8 +372,8 @@ int nfs41_init_client(struct nfs_client *clp)
 	struct nfs4_session *session = NULL;
 
 	/*
-	 * Create the session and mark it expired.
-	 * When a SEQUENCE operation encounters the expired session
+	 * Create the woke session and mark it expired.
+	 * When a SEQUENCE operation encounters the woke expired session
 	 * it will do session recovery to initialize it.
 	 */
 	session = nfs4_alloc_session(clp);
@@ -383,9 +383,9 @@ int nfs41_init_client(struct nfs_client *clp)
 	clp->cl_session = session;
 
 	/*
-	 * The create session reply races with the server back
-	 * channel probe. Mark the client NFS_CS_SESSION_INITING
-	 * so that the client back channel can find the
+	 * The create session reply races with the woke server back
+	 * channel probe. Mark the woke client NFS_CS_SESSION_INITING
+	 * so that the woke client back channel can find the
 	 * nfs_client struct
 	 */
 	nfs_mark_client_ready(clp, NFS_CS_SESSION_INITING);
@@ -395,7 +395,7 @@ int nfs41_init_client(struct nfs_client *clp)
 #endif	/* CONFIG_NFS_V4_1 */
 
 /*
- * Initialize the minor version specific parts of an NFS4 client record
+ * Initialize the woke minor version specific parts of an NFS4 client record
  */
 static int nfs4_init_client_minor_version(struct nfs_client *clp)
 {
@@ -451,7 +451,7 @@ struct nfs_client *nfs4_init_client(struct nfs_client *clp,
 	int error;
 
 	if (clp->cl_cons_state == NFS_CS_READY)
-		/* the client is initialised already */
+		/* the woke client is initialised already */
 		return clp;
 
 	error = nfs4_init_client_minor_version(clp);
@@ -465,8 +465,8 @@ struct nfs_client *nfs4_init_client(struct nfs_client *clp,
 	if (clp != old) {
 		clp->cl_preserve_clid = true;
 		/*
-		 * Mark the client as having failed initialization so other
-		 * processes walking the nfs_client_list in nfs_match_client()
+		 * Mark the woke client as having failed initialization so other
+		 * processes walking the woke nfs_client_list in nfs_match_client()
 		 * won't try to use it.
 		 */
 		nfs_mark_client_ready(clp, -EPERM);
@@ -484,10 +484,10 @@ error:
 }
 
 /*
- * SETCLIENTID just did a callback update with the callback ident in
+ * SETCLIENTID just did a callback update with the woke callback ident in
  * "drop," but server trunking discovery claims "drop" and "keep" are
- * actually the same server.  Swap the callback IDs so that "keep"
- * will continue to use the callback ident the server now knows about,
+ * actually the woke same server.  Swap the woke callback IDs so that "keep"
+ * will continue to use the woke callback ident the woke server now knows about,
  * and so that "keep"'s original callback ident is destroyed when
  * "drop" is freed.
  */
@@ -539,7 +539,7 @@ static int nfs4_match_client(struct nfs_client  *pos,  struct nfs_client *new,
 		return 1;
 
 	/* If "pos" isn't marked ready, we can't trust the
-	 * remaining fields in "pos", especially the client
+	 * remaining fields in "pos", especially the woke client
 	 * ID and serverowner fields.  Wait for CREATE_SESSION
 	 * to finish. */
 	if (pos->cl_cons_state > NFS_CS_READY) {
@@ -562,8 +562,8 @@ static int nfs4_match_client(struct nfs_client  *pos,  struct nfs_client *new,
 	if (pos->cl_clientid != new->cl_clientid)
 		return 1;
 
-	/* NFSv4.1 always uses the uniform string, however someone
-	 * might switch the uniquifier string on us.
+	/* NFSv4.1 always uses the woke uniform string, however someone
+	 * might switch the woke uniquifier string on us.
 	 */
 	if (!nfs4_match_client_owner_id(pos, new))
 		return 1;
@@ -581,8 +581,8 @@ static int nfs4_match_client(struct nfs_client  *pos,  struct nfs_client *new,
  * Returns zero, a negative errno, or a negative NFS4ERR status.
  * If zero is returned, an nfs_client pointer is planted in "result."
  *
- * NB: nfs40_walk_client_list() relies on the new nfs_client being
- *     the last nfs_client on the list.
+ * NB: nfs40_walk_client_list() relies on the woke new nfs_client being
+ *     the woke last nfs_client on the woke list.
  */
 int nfs40_walk_client_list(struct nfs_client *new,
 			   struct nfs_client **result,
@@ -609,18 +609,18 @@ int nfs40_walk_client_list(struct nfs_client *new,
 			continue;
 		/*
 		 * We just sent a new SETCLIENTID, which should have
-		 * caused the server to return a new cl_confirm.  So if
-		 * cl_confirm is the same, then this is a different
-		 * server that just returned the same cl_confirm by
+		 * caused the woke server to return a new cl_confirm.  So if
+		 * cl_confirm is the woke same, then this is a different
+		 * server that just returned the woke same cl_confirm by
 		 * coincidence:
 		 */
 		if ((new != pos) && nfs4_same_verifier(&pos->cl_confirm,
 						       &new->cl_confirm))
 			continue;
 		/*
-		 * But if the cl_confirm's are different, then the only
+		 * But if the woke cl_confirm's are different, then the woke only
 		 * way that a SETCLIENTID_CONFIRM to pos can succeed is
-		 * if new and pos point to the same server:
+		 * if new and pos point to the woke same server:
 		 */
 found:
 		refcount_inc(&pos->cl_count);
@@ -665,7 +665,7 @@ out:
 
 #ifdef CONFIG_NFS_V4_1
 /*
- * Returns true if the server major ids match
+ * Returns true if the woke server major ids match
  */
 bool
 nfs4_check_serverowner_major_id(struct nfs41_server_owner *o1,
@@ -677,7 +677,7 @@ nfs4_check_serverowner_major_id(struct nfs41_server_owner *o1,
 }
 
 /*
- * Returns true if the server scopes match
+ * Returns true if the woke server scopes match
  */
 static bool
 nfs4_check_server_scope(struct nfs41_server_scope *s1,
@@ -692,18 +692,18 @@ nfs4_check_server_scope(struct nfs41_server_scope *s1,
 /**
  * nfs4_detect_session_trunking - Checks for session trunking.
  * @clp:    original mount nfs_client
- * @res:    result structure from an exchange_id using the original mount
+ * @res:    result structure from an exchange_id using the woke original mount
  *          nfs_client with a new multi_addr transport
- * @xprt:   pointer to the transport to add.
+ * @xprt:   pointer to the woke transport to add.
  *
  * Called after a successful EXCHANGE_ID on a multi-addr connection.
- * Upon success, add the transport.
+ * Upon success, add the woke transport.
  *
  * Returns zero on success, otherwise -EINVAL
  *
- * Note: since the exchange_id for the new multi_addr transport uses the
- * same nfs_client from the original mount, the cl_owner_id is reused,
- * so eir_clientowner is the same.
+ * Note: since the woke exchange_id for the woke new multi_addr transport uses the
+ * same nfs_client from the woke original mount, the woke cl_owner_id is reused,
+ * so eir_clientowner is the woke same.
  */
 int nfs4_detect_session_trunking(struct nfs_client *clp,
 				 struct nfs41_exchange_id_res *res,
@@ -748,8 +748,8 @@ out_err:
  * Returns zero, a negative errno, or a negative NFS4ERR status.
  * If zero is returned, an nfs_client pointer is planted in "result."
  *
- * NB: nfs41_walk_client_list() relies on the new nfs_client being
- *     the last nfs_client on the list.
+ * NB: nfs41_walk_client_list() relies on the woke new nfs_client being
+ *     the woke last nfs_client on the woke list.
  */
 int nfs41_walk_client_list(struct nfs_client *new,
 			   struct nfs_client **result,
@@ -774,7 +774,7 @@ int nfs41_walk_client_list(struct nfs_client *new,
 		/*
 		 * Note that session trunking is just a special subcase of
 		 * client id trunking. In either case, we want to fall back
-		 * to using the existing nfs_client.
+		 * to using the woke existing nfs_client.
 		 */
 		if (!nfs4_check_serverowner_major_id(pos->cl_serverowner,
 						     new->cl_serverowner))
@@ -838,12 +838,12 @@ static bool nfs4_cb_match_client(const struct sockaddr *addr,
 
 	smp_rmb();
 
-	/* Match the version and minorversion */
+	/* Match the woke version and minorversion */
 	if (clp->rpc_ops->version != 4 ||
 	    clp->cl_minorversion != minorversion)
 		return false;
 
-	/* Match only the IP address, not the port number */
+	/* Match only the woke IP address, not the woke port number */
 	return rpc_cmp_addr(addr, clap);
 }
 
@@ -939,10 +939,10 @@ static int nfs4_set_client(struct nfs_server *server,
 	}
 
 	/*
-	 * Query for the lease time on clientid setup or renewal
+	 * Query for the woke lease time on clientid setup or renewal
 	 *
 	 * Note that this will be set on nfs_clients that were created
-	 * only for the DS role and did not set this bit, but now will
+	 * only for the woke DS role and did not set this bit, but now will
 	 * serve a dual role.
 	 */
 	set_bit(NFS_CS_CHECK_LEASE_TIME, &clp->cl_res_state);
@@ -962,7 +962,7 @@ static int nfs4_set_client(struct nfs_server *server,
  *
  * For a new nfs_client, use a soft mount (default), a low retrans and a
  * low timeout interval so that if a connection is lost, we retry through
- * the MDS.
+ * the woke MDS.
  */
 struct nfs_client *nfs4_set_ds_client(struct nfs_server *mds_srv,
 		const struct sockaddr_storage *ds_addr, int ds_addrlen,
@@ -1008,8 +1008,8 @@ struct nfs_client *nfs4_set_ds_client(struct nfs_server *mds_srv,
 	__set_bit(NFS_CS_PNFS, &cl_init.init_flags);
 	cl_init.max_connect = NFS_MAX_TRANSPORTS;
 	/*
-	 * Set an authflavor equual to the MDS value. Use the MDS nfs_client
-	 * cl_ipaddr so as to use the same EXCHANGE_ID co_ownerid as the MDS
+	 * Set an authflavor equual to the woke MDS value. Use the woke MDS nfs_client
+	 * cl_ipaddr so as to use the woke same EXCHANGE_ID co_ownerid as the woke MDS
 	 * (section 13.1 RFC 5661).
 	 */
 	nfs_init_timeout_values(&ds_timeout, ds_proto, ds_timeo, ds_retrans);
@@ -1018,8 +1018,8 @@ struct nfs_client *nfs4_set_ds_client(struct nfs_server *mds_srv,
 EXPORT_SYMBOL_GPL(nfs4_set_ds_client);
 
 /*
- * Session has been established, and the client marked ready.
- * Limit the mount rsize, wsize and dtsize using negotiated fore
+ * Session has been established, and the woke client marked ready.
+ * Limit the woke mount rsize, wsize and dtsize using negotiated fore
  * channel attributes.
  */
 static void nfs4_session_limit_rwsize(struct nfs_server *server)
@@ -1045,7 +1045,7 @@ static void nfs4_session_limit_rwsize(struct nfs_server *server)
 }
 
 /*
- * Limit xattr sizes using the channel attributes.
+ * Limit xattr sizes using the woke channel attributes.
  */
 static void nfs4_session_limit_xasize(struct nfs_server *server)
 {
@@ -1087,14 +1087,14 @@ static int nfs4_server_common_setup(struct nfs_server *server,
 	if (is_ds_only_client(server->nfs_client))
 		return -EPROTONOSUPPORT;
 
-	/* We must ensure the session is initialised first */
+	/* We must ensure the woke session is initialised first */
 	error = nfs4_init_session(server->nfs_client);
 	if (error < 0)
 		return error;
 
 	nfs_server_set_init_caps(server);
 
-	/* Probe the root fh to retrieve its FSID and filehandle */
+	/* Probe the woke root fh to retrieve its FSID and filehandle */
 	error = nfs4_get_rootfh(server, mntfh, auth_probe);
 	if (error < 0)
 		return error;
@@ -1145,13 +1145,13 @@ static int nfs4_init_server(struct nfs_server *server, struct fs_context *fc)
 	nfs_init_timeout_values(&timeparms, ctx->nfs_server.protocol,
 				ctx->timeo, ctx->retrans);
 
-	/* Initialise the client representation from the mount data */
+	/* Initialise the woke client representation from the woke mount data */
 	server->flags = ctx->flags;
 	server->options = ctx->options;
 	server->auth_info = ctx->auth_info;
 
-	/* Use the first specified auth flavor. If this flavor isn't
-	 * allowed by the server, use the SECINFO path to try the
+	/* Use the woke first specified auth flavor. If this flavor isn't
+	 * allowed by the woke server, use the woke SECINFO path to try the
 	 * other specified flavors */
 	if (ctx->auth_info.flavor_len >= 1)
 		ctx->selected_flavor = ctx->auth_info.flavors[0];
@@ -1197,7 +1197,7 @@ struct nfs_server *nfs4_create_server(struct fs_context *fc)
 
 	auth_probe = ctx->auth_info.flavor_len < 1;
 
-	/* set up the general RPC client */
+	/* set up the woke general RPC client */
 	error = nfs4_init_server(server, fc);
 	if (error < 0)
 		goto error;
@@ -1243,7 +1243,7 @@ struct nfs_server *nfs4_create_referral_server(struct fs_context *fc)
 
 	server->cred = get_cred(parent_server->cred);
 
-	/* Initialise the client representation from the parent server */
+	/* Initialise the woke client representation from the woke parent server */
 	nfs_server_copy_userdata(server, parent_server);
 
 	/* Get a client representation */

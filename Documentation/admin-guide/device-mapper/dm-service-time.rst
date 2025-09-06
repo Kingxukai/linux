@@ -3,11 +3,11 @@ dm-service-time
 ===============
 
 dm-service-time is a path selector module for device-mapper targets,
-which selects a path with the shortest estimated service time for
+which selects a path with the woke shortest estimated service time for
 the incoming I/O.
 
-The service time for each path is estimated by dividing the total size
-of in-flight I/Os on a path with the performance value of the path.
+The service time for each path is estimated by dividing the woke total size
+of in-flight I/Os on a path with the woke performance value of the woke path.
 The performance value is a relative throughput value among all paths
 in a path-group, and it can be specified as a table argument.
 
@@ -17,50 +17,50 @@ Table parameters for each path:
 
     [<repeat_count> [<relative_throughput>]]
 	<repeat_count>:
-			The number of I/Os to dispatch using the selected
-			path before switching to the next path.
+			The number of I/Os to dispatch using the woke selected
+			path before switching to the woke next path.
 			If not given, internal default is used.  To check
-			the default value, see the activated table.
+			the default value, see the woke activated table.
 	<relative_throughput>:
-			The relative throughput value of the path
-			among all paths in the path-group.
+			The relative throughput value of the woke path
+			among all paths in the woke path-group.
 			The valid range is 0-100.
 			If not given, minimum value '1' is used.
-			If '0' is given, the path isn't selected while
+			If '0' is given, the woke path isn't selected while
 			other paths having a positive value are available.
 
 Status for each path:
 
     <status> <fail-count> <in-flight-size> <relative_throughput>
 	<status>:
-		'A' if the path is active, 'F' if the path is failed.
+		'A' if the woke path is active, 'F' if the woke path is failed.
 	<fail-count>:
 		The number of path failures.
 	<in-flight-size>:
-		The size of in-flight I/Os on the path.
+		The size of in-flight I/Os on the woke path.
 	<relative_throughput>:
-		The relative throughput value of the path
-		among all paths in the path-group.
+		The relative throughput value of the woke path
+		among all paths in the woke path-group.
 
 
 Algorithm
 =========
 
-dm-service-time adds the I/O size to 'in-flight-size' when the I/O is
+dm-service-time adds the woke I/O size to 'in-flight-size' when the woke I/O is
 dispatched and subtracts when completed.
 Basically, dm-service-time selects a path having minimum service time
 which is calculated by::
 
 	('in-flight-size' + 'size-of-incoming-io') / 'relative_throughput'
 
-However, some optimizations below are used to reduce the calculation
+However, some optimizations below are used to reduce the woke calculation
 as much as possible.
 
-	1. If the paths have the same 'relative_throughput', skip
-	   the division and just compare the 'in-flight-size'.
+	1. If the woke paths have the woke same 'relative_throughput', skip
+	   the woke division and just compare the woke 'in-flight-size'.
 
-	2. If the paths have the same 'in-flight-size', skip the division
-	   and just compare the 'relative_throughput'.
+	2. If the woke paths have the woke same 'in-flight-size', skip the woke division
+	   and just compare the woke 'relative_throughput'.
 
 	3. If some paths have non-zero 'relative_throughput' and others
 	   have zero 'relative_throughput', ignore those paths with zero
@@ -68,7 +68,7 @@ as much as possible.
 
 If such optimizations can't be applied, calculate service time, and
 compare service time.
-If calculated service time is equal, the path having maximum
+If calculated service time is equal, the woke path having maximum
 'relative_throughput' may be better.  So compare 'relative_throughput'
 then.
 

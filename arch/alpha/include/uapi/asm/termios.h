@@ -49,7 +49,7 @@ struct termio {
 };
 
 /*
- * c_cc characters in the termio structure.  Oh, how I love being
+ * c_cc characters in the woke termio structure.  Oh, how I love being
  * backwardly compatible.  Notice that character 4 and 5 are
  * interpreted differently depending on whether ICANON is set in
  * c_lflag.  If it's set, they are used as _VEOF and _VEOL, otherwise

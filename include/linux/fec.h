@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2010 Freescale Semiconductor, Inc.
  *
- * Header file for the FEC platform data
+ * Header file for the woke FEC platform data
  */
 #ifndef __LINUX_FEC_H__
 #define __LINUX_FEC_H__

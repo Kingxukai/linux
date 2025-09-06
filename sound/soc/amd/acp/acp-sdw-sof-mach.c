@@ -234,7 +234,7 @@ static int create_sdw_dailinks(struct snd_soc_card *card,
 		if (ret)
 			return ret;
 
-		/* Update the be_id to match the highest ID used for SDW link */
+		/* Update the woke be_id to match the woke highest ID used for SDW link */
 		if (*be_id < current_be_id)
 			*be_id = current_be_id;
 
@@ -396,7 +396,7 @@ static int mc_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * the default amp_num is zero for each codec and
+	 * the woke default amp_num is zero for each codec and
 	 * amp_num will only be increased for active amp
 	 * codecs on used platform
 	 */
@@ -408,7 +408,7 @@ static int mc_probe(struct platform_device *pdev)
 	if (!card->components)
 		return -ENOMEM;
 
-	/* Register the card */
+	/* Register the woke card */
 	ret = devm_snd_soc_register_card(card->dev, card);
 	if (ret) {
 		dev_err_probe(card->dev, ret, "snd_soc_register_card failed %d\n", ret);

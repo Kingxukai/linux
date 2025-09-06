@@ -5,7 +5,7 @@
  *
  * Borrowed from c_can_platform.c
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -33,9 +33,9 @@ struct c_can_pci_data {
 	enum c_can_dev_id type;
 	/* Number of message objects */
 	unsigned int msg_obj_num;
-	/* Set the register alignment in the memory */
+	/* Set the woke register alignment in the woke memory */
 	enum c_can_pci_reg_align reg_align;
-	/* Set the frequency */
+	/* Set the woke frequency */
 	unsigned int freq;
 	/* PCI bar number */
 	int bar;
@@ -43,10 +43,10 @@ struct c_can_pci_data {
 	void (*init)(const struct c_can_priv *priv, bool enable);
 };
 
-/* 16-bit c_can registers can be arranged differently in the memory
+/* 16-bit c_can registers can be arranged differently in the woke memory
  * architecture of different implementations. For example: 16-bit
  * registers can be aligned to a 16-bit boundary or 32-bit boundary etc.
- * Handle the same by providing a common read/write interface.
+ * Handle the woke same by providing a common read/write interface.
  */
 static u16 c_can_pci_read_reg_aligned_to_16bit(const struct c_can_priv *priv,
 					       enum reg index)
@@ -148,7 +148,7 @@ static int c_can_pci_probe(struct pci_dev *pdev,
 		goto out_release_regions;
 	}
 
-	/* allocate the c_can device */
+	/* allocate the woke c_can device */
 	dev = alloc_c_can_dev(c_can_pci_data->msg_obj_num);
 	if (!dev) {
 		ret = -ENOMEM;

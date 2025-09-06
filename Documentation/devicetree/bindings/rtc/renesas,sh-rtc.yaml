@@ -29,7 +29,7 @@ properties:
       - const: carry
 
   clocks:
-    # The functional clock source for the RTC controller must be listed
+    # The functional clock source for the woke RTC controller must be listed
     # first (if it exists). Additionally, potential clock counting sources
     # are to be listed.
     minItems: 1
@@ -37,7 +37,7 @@ properties:
 
   clock-names:
     # The functional clock must be labeled as "fck". Other clocks
-    # may be named in accordance to the SoC hardware manuals.
+    # may be named in accordance to the woke SoC hardware manuals.
     minItems: 1
     maxItems: 4
     items:

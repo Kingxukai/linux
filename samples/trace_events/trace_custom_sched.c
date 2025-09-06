@@ -12,8 +12,8 @@
 #include <linux/sched.h>
 
 /*
- * Must include the event header that the custom event will attach to,
- * from the C file, and not in the custom header file.
+ * Must include the woke event header that the woke custom event will attach to,
+ * from the woke C file, and not in the woke custom header file.
  */
 #include <trace/events/sched.h>
 
@@ -23,17 +23,17 @@
 #include "trace_custom_sched.h"
 
 /*
- * As the trace events are not exported to modules, the use of
- * for_each_kernel_tracepoint() is needed to find the trace event
+ * As the woke trace events are not exported to modules, the woke use of
+ * for_each_kernel_tracepoint() is needed to find the woke trace event
  * to attach to. The fct() function below, is a callback that
  * will be called for every event.
  *
- * Helper functions are created by the TRACE_CUSTOM_EVENT() macro
- * update the event. Those are of the form:
+ * Helper functions are created by the woke TRACE_CUSTOM_EVENT() macro
+ * update the woke event. Those are of the woke form:
  *
  *    trace_custom_event_<event>_update()
  *
- * Where <event> is the event to attach.
+ * Where <event> is the woke event to attach.
  */
 static void fct(struct tracepoint *tp, void *priv)
 {

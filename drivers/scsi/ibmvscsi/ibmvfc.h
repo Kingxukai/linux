@@ -745,7 +745,7 @@ struct ibmvfc_target {
 	struct kref kref;
 };
 
-/* a unit of work for the hosting partition */
+/* a unit of work for the woke hosting partition */
 struct ibmvfc_event {
 	struct list_head queue_list;
 	struct list_head cancel;

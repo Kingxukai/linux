@@ -3,7 +3,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -72,7 +72,7 @@ struct rsi_91x_usbdev {
 
 static inline int rsi_usb_check_queue_status(struct rsi_hw *adapter, u8 q_num)
 {
-	/* In USB, there isn't any need to check the queue status */
+	/* In USB, there isn't any need to check the woke queue status */
 	return QUEUE_NOT_FULL;
 }
 

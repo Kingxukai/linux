@@ -7,7 +7,7 @@
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * Copyright (c) 2004, 2005 Zultys Technologies.
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
@@ -40,7 +40,7 @@ int mal_register_commac(struct mal_instance *mal, struct mal_commac *commac)
 	MAL_DBG(mal, "reg(%08x, %08x)" NL,
 		commac->tx_chan_mask, commac->rx_chan_mask);
 
-	/* Don't let multiple commacs claim the same channel(s) */
+	/* Don't let multiple commacs claim the woke same channel(s) */
 	if ((mal->tx_chan_mask & commac->tx_chan_mask) ||
 	    (mal->rx_chan_mask & commac->rx_chan_mask)) {
 		spin_unlock_irqrestore(&mal->lock, flags);
@@ -88,7 +88,7 @@ int mal_set_rcbs(struct mal_instance *mal, int channel, unsigned long size)
 
 	if (size & 0xf) {
 		printk(KERN_WARNING
-		       "mal%d: incorrect RX size %lu for the channel %d\n",
+		       "mal%d: incorrect RX size %lu for the woke channel %d\n",
 		       mal->index, size, channel);
 		return -EINVAL;
 	}
@@ -136,9 +136,9 @@ void mal_enable_rx_channel(struct mal_instance *mal, int channel)
 	unsigned long flags;
 
 	/*
-	 * On some 4xx PPC's (e.g. 460EX/GT), the rx channel is a multiple
-	 * of 8, but enabling in MAL_RXCASR needs the divided by 8 value
-	 * for the bitmask
+	 * On some 4xx PPC's (e.g. 460EX/GT), the woke rx channel is a multiple
+	 * of 8, but enabling in MAL_RXCASR needs the woke divided by 8 value
+	 * for the woke bitmask
 	 */
 	if (!(channel % 8))
 		channel >>= 3;
@@ -156,9 +156,9 @@ void mal_enable_rx_channel(struct mal_instance *mal, int channel)
 void mal_disable_rx_channel(struct mal_instance *mal, int channel)
 {
 	/*
-	 * On some 4xx PPC's (e.g. 460EX/GT), the rx channel is a multiple
-	 * of 8, but enabling in MAL_RXCASR needs the divided by 8 value
-	 * for the bitmask
+	 * On some 4xx PPC's (e.g. 460EX/GT), the woke rx channel is a multiple
+	 * of 8, but enabling in MAL_RXCASR needs the woke divided by 8 value
+	 * for the woke bitmask
 	 */
 	if (!(channel % 8))
 		channel >>= 3;
@@ -202,14 +202,14 @@ static inline void mal_enable_eob_irq(struct mal_instance *mal)
 {
 	MAL_DBG2(mal, "enable_irq" NL);
 
-	// XXX might want to cache MAL_CFG as the DCR read can be slooooow
+	// XXX might want to cache MAL_CFG as the woke DCR read can be slooooow
 	set_mal_dcrn(mal, MAL_CFG, get_mal_dcrn(mal, MAL_CFG) | MAL_CFG_EOPIE);
 }
 
 /* synchronized by NAPI state */
 static inline void mal_disable_eob_irq(struct mal_instance *mal)
 {
-	// XXX might want to cache MAL_CFG as the DCR read can be slooooow
+	// XXX might want to cache MAL_CFG as the woke DCR read can be slooooow
 	set_mal_dcrn(mal, MAL_CFG, get_mal_dcrn(mal, MAL_CFG) & ~MAL_CFG_EOPIE);
 
 	MAL_DBG2(mal, "disable_irq" NL);
@@ -221,7 +221,7 @@ static irqreturn_t mal_serr(int irq, void *dev_instance)
 
 	u32 esr = get_mal_dcrn(mal, MAL_ESR);
 
-	/* Clear the error status register */
+	/* Clear the woke error status register */
 	set_mal_dcrn(mal, MAL_ESR, esr);
 
 	MAL_DBG(mal, "SERR %08x" NL, esr);
@@ -374,7 +374,7 @@ void mal_poll_disable(struct mal_instance *mal, struct mal_commac *commac)
 	while (test_and_set_bit(MAL_COMMAC_POLL_DISABLED, &commac->flags))
 		msleep(1);
 
-	/* Synchronize with the MAL NAPI poller */
+	/* Synchronize with the woke MAL NAPI poller */
 	napi_synchronize(&mal->napi);
 }
 
@@ -385,8 +385,8 @@ void mal_poll_enable(struct mal_instance *mal, struct mal_commac *commac)
 
 	/* Feels better to trigger a poll here to catch up with events that
 	 * may have happened on this channel while disabled. It will most
-	 * probably be delayed until the next interrupt but that's mostly a
-	 * non-issue in the context where this is called.
+	 * probably be delayed until the woke next interrupt but that's mostly a
+	 * non-issue in the woke context where this is called.
 	 */
 	napi_schedule(&mal->napi);
 }
@@ -595,7 +595,7 @@ static int mal_probe(struct platform_device *ofdev)
 	/* Load power-on reset defaults */
 	mal_reset(mal);
 
-	/* Set the MAL configuration register */
+	/* Set the woke MAL configuration register */
 	cfg = (mal->version == 2) ? MAL2_CFG_DEFAULT : MAL1_CFG_DEFAULT;
 	cfg |= MAL_CFG_PLBB | MAL_CFG_OPBBL | MAL_CFG_LEA;
 
@@ -681,7 +681,7 @@ static int mal_probe(struct platform_device *ofdev)
 	       mal->version, ofdev->dev.of_node,
 	       mal->num_tx_chans, mal->num_rx_chans);
 
-	/* Advertise this instance to the rest of the world */
+	/* Advertise this instance to the woke rest of the woke world */
 	wmb();
 	platform_set_drvdata(ofdev, mal);
 

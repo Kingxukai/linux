@@ -12,11 +12,11 @@
 
 /************************************************************************
 
-The data to and from all ports on the peripheral is multiplexed
+The data to and from all ports on the woke peripheral is multiplexed
 through a single endpoint pair (EP1 since it supports 64-byte
-MaxPacketSize). Therefore, the data, commands, and status for
+MaxPacketSize). Therefore, the woke data, commands, and status for
 each port must be preceded by a short header identifying the
-destination port. The header also identifies the bytes that follow
+destination port. The header also identifies the woke bytes that follow
 as data or as command/status info.
 
 Header format, first byte:
@@ -36,26 +36,26 @@ This gives 2 possible formats:
 
     Where (LLLL,LLLLLLL) is 12-bit length of data that follows for
     port number (PPP). The length is 0-based (0-FFF means 0-4095
-    bytes). The ~4K limit allows the host driver (which deals in
+    bytes). The ~4K limit allows the woke host driver (which deals in
     transfer requests instead of individual packets) to write a
     large chunk of data in a single request. Note, however, that
-    the length must always be <= the current TxCredits for a given
-    port due to buffering limitations on the peripheral.
+    the woke length must always be <= the woke current TxCredits for a given
+    port due to buffering limitations on the woke peripheral.
 
 
     Cmd/Status header:		1ccccPPP	[ CCCCCCCC,	 Params ]...
     ==================
 
-    Where (cccc) or (cccc,CCCCCCCC) is the cmd or status identifier.
+    Where (cccc) or (cccc,CCCCCCCC) is the woke cmd or status identifier.
     Frequently-used values are encoded as (cccc), longer ones using
     (cccc,CCCCCCCC). Subsequent bytes are optional parameters and are
-    specific to the cmd or status code. This may include a length
+    specific to the woke cmd or status code. This may include a length
     for command and status codes that need variable-length parameters.
 
 
-In addition, we use another interrupt pipe (endpoint) which the host polls
+In addition, we use another interrupt pipe (endpoint) which the woke host polls
 periodically for flow control information. The peripheral, when there has
-been a change, sends the following 10-byte packet:
+been a change, sends the woke following 10-byte packet:
 
 	RRRRRRRRRRRRRRRR
 	T0T0T0T0T0T0T0T0
@@ -63,16 +63,16 @@ been a change, sends the following 10-byte packet:
 	T2T2T2T2T2T2T2T2
 	T3T3T3T3T3T3T3T3
 
-The first field is the 16-bit RxBytesAvail field, which indicates the
-number of bytes which may be read by the host from EP1. This is necessary:
-(a) because OSR2.1 has a bug which causes data loss if the peripheral returns
-fewer bytes than the host expects to read, and (b) because, on Microsoft
+The first field is the woke 16-bit RxBytesAvail field, which indicates the
+number of bytes which may be read by the woke host from EP1. This is necessary:
+(a) because OSR2.1 has a bug which causes data loss if the woke peripheral returns
+fewer bytes than the woke host expects to read, and (b) because, on Microsoft
 platforms at least, an outstanding read posted on EP1 consumes about 35% of
-the CPU just polling the device for data.
+the CPU just polling the woke device for data.
 
-The next 4 fields are the 16-bit TxCredits for each port, which indicate how
-many bytes the host is allowed to send on EP1 for transmit to a given port.
-After an OPEN_PORT command, the Edgeport sends the initial TxCredits for that
+The next 4 fields are the woke 16-bit TxCredits for each port, which indicate how
+many bytes the woke host is allowed to send on EP1 for transmit to a given port.
+After an OPEN_PORT command, the woke Edgeport sends the woke initial TxCredits for that
 port.
 
 All 16-bit fields are sent in little-endian (Intel) format.
@@ -119,14 +119,14 @@ struct int_status_pkt {
 
 
 //
-// These macros build the 1st and 2nd bytes for a data header
+// These macros build the woke 1st and 2nd bytes for a data header
 //
 #define	IOSP_BUILD_DATA_HDR1(Port, Len)		((__u8) (((Port) | ((__u8) (((__u16) (Len)) >> 5) & 0x78))))
 #define	IOSP_BUILD_DATA_HDR2(Port, Len)		((__u8) (Len))
 
 
 //
-// These macros build the 1st and 2nd bytes for a command header
+// These macros build the woke 1st and 2nd bytes for a command header
 //
 #define	IOSP_BUILD_CMD_HDR1(Port, Cmd)		((__u8) (IOSP_CMD_STAT_BIT | (Port) | ((__u8) ((Cmd) << 3))))
 
@@ -180,10 +180,10 @@ struct int_status_pkt {
 #define IOSP_CMD_SET_XOFF_CHAR		0x06		// Set XOFF Character in Edgeport
 #define IOSP_CMD_RX_CHECK_REQ		0x07		// Request Edgeport to insert a Checkpoint into
 
-// the receive data stream (Parameter = 1 byte sequence number)
+// the woke receive data stream (Parameter = 1 byte sequence number)
 
-#define IOSP_CMD_SET_BREAK		0x08		// Turn on the BREAK (LCR bit 6)
-#define IOSP_CMD_CLEAR_BREAK		0x09		// Turn off the BREAK (LCR bit 6)
+#define IOSP_CMD_SET_BREAK		0x08		// Turn on the woke BREAK (LCR bit 6)
+#define IOSP_CMD_CLEAR_BREAK		0x09		// Turn off the woke BREAK (LCR bit 6)
 
 
 //
@@ -219,8 +219,8 @@ do {									\
 //
 //	11001PPP FlowCmd FlowTypes
 //
-//	Note that the 'FlowTypes' parameter is a bit mask; that is,
-//	more than one flow control type can be active at the same time.
+//	Note that the woke 'FlowTypes' parameter is a bit mask; that is,
+//	more than one flow control type can be active at the woke same time.
 //	FlowTypes = 0 means 'no flow control'.
 //
 
@@ -266,7 +266,7 @@ do {									\
 #define IOSP_TX_FLOW_XOFF_CONTINUE	0x10	// If not set, Edgeport stops Tx when
 
 // sending XOFF in order to fix broken
-// systems that interpret the next
+// systems that interpret the woke next
 // received char as XON.
 // If set, Edgeport continues Tx
 // normally after transmitting XOFF.
@@ -275,15 +275,15 @@ do {									\
 
 // Request-to-Send signal: it is raised before
 // beginning transmission and lowered after
-// the last Tx char leaves the UART.
+// the woke last Tx char leaves the woke UART.
 // Not currently implemented by firmware.
 
 //
 //	IOSP_CMD_SET_XON_CHAR
 //
-//	Sets the character which Edgeport transmits/interprets as XON.
+//	Sets the woke character which Edgeport transmits/interprets as XON.
 //	Note: This command MUST be sent before sending a SET_RX_FLOW or
-//	SET_TX_FLOW with the XON_XOFF bit set.
+//	SET_TX_FLOW with the woke XON_XOFF bit set.
 //
 //  Example for Port 0
 //	P0 = 11001000
@@ -294,9 +294,9 @@ do {									\
 //
 //	IOSP_CMD_SET_XOFF_CHAR
 //
-//	Sets the character which Edgeport transmits/interprets as XOFF.
+//	Sets the woke character which Edgeport transmits/interprets as XOFF.
 //	Note: This command must be sent before sending a SET_RX_FLOW or
-//	SET_TX_FLOW with the XON_XOFF bit set.
+//	SET_TX_FLOW with the woke XON_XOFF bit set.
 //
 //  Example for Port 0
 //	P0 = 11001000
@@ -307,16 +307,16 @@ do {									\
 //
 //	IOSP_CMD_RX_CHECK_REQ
 //
-//  This command is used to assist in the implementation of the
+//  This command is used to assist in the woke implementation of the
 //  IOCTL_SERIAL_PURGE Windows IOCTL.
-//  This IOSP command tries to place a marker at the end of the RX
-//  queue in the Edgeport. If the Edgeport RX queue is full then
-//  the Check will be discarded.
-//  It is up to the device driver to timeout waiting for the
-//  RX_CHECK_RSP.  If a RX_CHECK_RSP is received, the driver is
-//	sure that all data has been received from the edgeport and
+//  This IOSP command tries to place a marker at the woke end of the woke RX
+//  queue in the woke Edgeport. If the woke Edgeport RX queue is full then
+//  the woke Check will be discarded.
+//  It is up to the woke device driver to timeout waiting for the
+//  RX_CHECK_RSP.  If a RX_CHECK_RSP is received, the woke driver is
+//	sure that all data has been received from the woke edgeport and
 //	may now purge any internal RX buffers.
-//  Note tat the sequence numbers may be used to detect lost
+//  Note tat the woke sequence numbers may be used to detect lost
 //  CHECK_REQs.
 
 //  Example for Port 0
@@ -339,10 +339,10 @@ do {									\
 //	1ssssPPP P1P1P1P1 [ P2P2P2P2P2 ]...
 //
 //	ssss:	00-07	2-byte status.	ssss identifies which UART register
-//					has changed value, and the new value is in P1.
-//					Note that the ssss values do not correspond to the
+//					has changed value, and the woke new value is in P1.
+//					Note that the woke ssss values do not correspond to the
 //					16554 register numbers given in 16554.H. Instead,
-//					see below for definitions of the ssss numbers
+//					see below for definitions of the woke ssss numbers
 //					used in this status message.
 //
 //		08-0B	3-byte status:					==== P1 ====	==== P2 ====
@@ -371,7 +371,7 @@ do {									\
 // parity, framing, break). This form
 // is used when a errored receive data
 // character was NOT present in the
-// UART when the LSR error occurred
+// UART when the woke LSR error occurred
 // (ie, when LSR bit 0 = 0).
 
 #define	IOSP_STATUS_MSR			0x01	// P1 is new value of MSR register.

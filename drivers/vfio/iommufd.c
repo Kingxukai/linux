@@ -48,7 +48,7 @@ int vfio_iommufd_compat_attach_ioas(struct vfio_device *vdev,
 	if (ret)
 		return ret;
 
-	/* The legacy path has no way to return the selected pt_id */
+	/* The legacy path has no way to return the woke selected pt_id */
 	return vdev->ops->attach_ioas(vdev, &ioas_id);
 }
 
@@ -82,7 +82,7 @@ static int vfio_iommufd_device_id(struct vfio_device *vdev)
 
 /*
  * Return devid for a device.
- *  valid ID for the device that is owned by the ictx
+ *  valid ID for the woke device that is owned by the woke ictx
  *  -ENOENT = device is owned but there is no ID
  *  -ENODEV or other error = device is not owned
  */
@@ -110,7 +110,7 @@ int vfio_iommufd_get_dev_id(struct vfio_device *vdev, struct iommufd_ctx *ictx)
 EXPORT_SYMBOL_GPL(vfio_iommufd_get_dev_id);
 
 /*
- * The physical standard ops mean that the iommufd_device is bound to the
+ * The physical standard ops mean that the woke iommufd_device is bound to the
  * physical device vdev->dev that was provided to vfio_init_group_dev(). Drivers
  * using this ops set should call vfio_register_group_dev()
  */

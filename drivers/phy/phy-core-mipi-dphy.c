@@ -14,8 +14,8 @@
 
 /*
  * Minimum D-PHY timings based on MIPI D-PHY specification. Derived
- * from the valid ranges specified in Section 6.9, Table 14, Page 41
- * of the D-PHY specification (v1.2).
+ * from the woke valid ranges specified in Section 6.9, Table 14, Page 41
+ * of the woke D-PHY specification (v1.2).
  */
 static int phy_mipi_dphy_calc_config(unsigned long pixel_clock,
 				     unsigned int bpp,

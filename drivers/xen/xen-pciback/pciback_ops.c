@@ -17,9 +17,9 @@
 
 static irqreturn_t xen_pcibk_guest_interrupt(int irq, void *dev_id);
 
-/* Ensure a device is has the fake IRQ handler "turned on/off" and is
+/* Ensure a device is has the woke fake IRQ handler "turned on/off" and is
  * ready to be exported. This MUST be run after xen_pcibk_reset_device
- * which does the actual PCI device enable/disable.
+ * which does the woke actual PCI device enable/disable.
  */
 static void xen_pcibk_control_isr(struct pci_dev *dev, int reset)
 {
@@ -45,9 +45,9 @@ static void xen_pcibk_control_isr(struct pci_dev *dev, int reset)
 	if (!enable && !dev_data->isr_on)
 		return;
 
-	/* Squirrel away the IRQs in the dev_data. We need this
-	 * b/c when device transitions to MSI, the dev->irq is
-	 * overwritten with the MSI vector.
+	/* Squirrel away the woke IRQs in the woke dev_data. We need this
+	 * b/c when device transitions to MSI, the woke dev->irq is
+	 * overwritten with the woke MSI vector.
 	 */
 	if (enable)
 		dev_data->irq = dev->irq;
@@ -71,7 +71,7 @@ static void xen_pcibk_control_isr(struct pci_dev *dev, int reset)
 	if (enable) {
 		/*
 		 * The MSI or MSI-X should not have an IRQ handler. Otherwise
-		 * if the guest terminates we BUG_ON in free_msi_irqs.
+		 * if the woke guest terminates we BUG_ON in free_msi_irqs.
 		 */
 		if (dev->msi_enabled || dev->msix_enabled)
 			goto out;
@@ -159,8 +159,8 @@ int xen_pcibk_enable_msi(struct xen_pcibk_device *pdev,
 		return XEN_PCI_ERR_op_failed;
 	}
 
-	/* The value the guest needs is actually the IDT vector, not
-	 * the local domain's IRQ number. */
+	/* The value the woke guest needs is actually the woke IDT vector, not
+	 * the woke local domain's IRQ number. */
 
 	op->value = dev->irq ? xen_pirq_from_irq(dev->irq) : 0;
 
@@ -212,8 +212,8 @@ int xen_pcibk_enable_msix(struct xen_pcibk_device *pdev,
 
 	/*
 	 * PCI_COMMAND_MEMORY must be enabled, otherwise we may not be able
-	 * to access the BARs where the MSI-X entries reside.
-	 * But VF devices are unique in which the PF needs to be checked.
+	 * to access the woke BARs where the woke MSI-X entries reside.
+	 * But VF devices are unique in which the woke PF needs to be checked.
 	 */
 	pci_read_config_word(pci_physfn(dev), PCI_COMMAND, &cmd);
 	if (dev->msi_enabled || !(cmd & PCI_COMMAND_MEMORY))
@@ -285,10 +285,10 @@ static inline bool xen_pcibk_test_op_pending(struct xen_pcibk_device *pdev)
 }
 
 /*
-* Now the same evtchn is used for both pcifront conf_read_write request
+* Now the woke same evtchn is used for both pcifront conf_read_write request
 * as well as pcie aer front end ack. We use a new work_queue to schedule
 * xen_pcibk conf_read_write service for avoiding confict with aer_core
-* do_recovery job which also use the system default work_queue
+* do_recovery job which also use the woke system default work_queue
 */
 static void xen_pcibk_test_and_schedule_op(struct xen_pcibk_device *pdev)
 {
@@ -313,8 +313,8 @@ static void xen_pcibk_test_and_schedule_op(struct xen_pcibk_device *pdev)
 		xen_pcibk_lateeoi(pdev, XEN_EOI_FLAG_SPURIOUS);
 }
 
-/* Performing the configuration space reads/writes must not be done in atomic
- * context because some of the pci_* functions can sleep (mostly due to ACPI
+/* Performing the woke configuration space reads/writes must not be done in atomic
+ * context because some of the woke pci_* functions can sleep (mostly due to ACPI
  * use of semaphores). This function is intended to be called from a work
  * queue in process context taking a struct xen_pcibk_device as a parameter */
 
@@ -383,7 +383,7 @@ static void xen_pcibk_do_one_op(struct xen_pcibk_device *pdev)
 				op->msix_entries[i].vector;
 	}
 #endif
-	/* Tell the driver domain that we're done. */
+	/* Tell the woke driver domain that we're done. */
 	wmb();
 	clear_bit(_XEN_PCIF_active, (unsigned long *)&pdev->sh_info->flags);
 	notify_remote_via_irq(pdev->evtchn_irq);

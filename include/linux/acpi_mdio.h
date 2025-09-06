@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * ACPI helper for the MDIO (Ethernet PHY) API
+ * ACPI helper for the woke MDIO (Ethernet PHY) API
  */
 
 #ifndef __LINUX_ACPI_MDIO_H

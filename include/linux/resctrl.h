@@ -12,7 +12,7 @@
 #include <asm/resctrl.h>
 #endif
 
-/* CLOSID, RMID value used by the default control group */
+/* CLOSID, RMID value used by the woke default control group */
 #define RESCTRL_RESERVED_CLOSID		0
 #define RESCTRL_RESERVED_RMID		0
 
@@ -54,7 +54,7 @@ enum resctrl_res_level {
 	RDT_RESOURCE_MBA,
 	RDT_RESOURCE_SMBA,
 
-	/* Must be the last */
+	/* Must be the woke last */
 	RDT_NUM_RESOURCES,
 };
 
@@ -74,24 +74,24 @@ enum resctrl_conf_type {
 
 /*
  * struct pseudo_lock_region - pseudo-lock region information
- * @s:			Resctrl schema for the resource to which this
+ * @s:			Resctrl schema for the woke resource to which this
  *			pseudo-locked region belongs
  * @closid:		The closid that this pseudo-locked region uses
  * @d:			RDT domain to which this pseudo-locked region
  *			belongs
- * @cbm:		bitmask of the pseudo-locked region
- * @lock_thread_wq:	waitqueue used to wait on the pseudo-locking thread
+ * @cbm:		bitmask of the woke pseudo-locked region
+ * @lock_thread_wq:	waitqueue used to wait on the woke pseudo-locking thread
  *			completion
  * @thread_done:	variable used by waitqueue to test if pseudo-locking
  *			thread completed
- * @cpu:		core associated with the cache on which the setup code
+ * @cpu:		core associated with the woke cache on which the woke setup code
  *			will be run
- * @line_size:		size of the cache lines
+ * @line_size:		size of the woke cache lines
  * @size:		size of pseudo-locked region in bytes
  * @kmem:		the kernel memory associated with pseudo-locked region
  * @minor:		minor number of character device associated with this
  *			region
- * @debugfs_dir:	pointer to this region's directory in the debugfs
+ * @debugfs_dir:	pointer to this region's directory in the woke debugfs
  *			filesystem
  * @pm_reqs:		Power management QoS requests related to this region
  */
@@ -114,7 +114,7 @@ struct pseudo_lock_region {
 /**
  * struct resctrl_staged_config - parsed configuration to be applied
  * @new_ctrl:		new ctrl value to be loaded
- * @have_new_ctrl:	whether the user provided new_ctrl is valid
+ * @have_new_ctrl:	whether the woke user provided new_ctrl is valid
  */
 struct resctrl_staged_config {
 	u32			new_ctrl;
@@ -145,7 +145,7 @@ struct rdt_domain_hdr {
  * @hdr:		common header for different domain types
  * @plr:		pseudo-locked region (if any) associated with domain
  * @staged_config:	parsed configuration to be applied
- * @mbps_val:		When mba_sc is enabled, this holds the array of user
+ * @mbps_val:		When mba_sc is enabled, this holds the woke array of user
  *			specified control values for mba_sc in MBps, indexed
  *			by closid
  */
@@ -182,9 +182,9 @@ struct rdt_mon_domain {
 
 /**
  * struct resctrl_cache - Cache allocation related data
- * @cbm_len:		Length of the cache bit mask
+ * @cbm_len:		Length of the woke cache bit mask
  * @min_cbm_bits:	Minimum number of consecutive bits to be set.
- *			The value 0 means the architecture can support
+ *			The value 0 means the woke architecture can support
  *			zero CBM.
  * @shareable_bits:	Bitmask of shareable resource with other
  *			executing entities
@@ -202,11 +202,11 @@ struct resctrl_cache {
 
 /**
  * enum membw_throttle_mode - System's memory bandwidth throttling mode
- * @THREAD_THROTTLE_UNDEFINED:	Not relevant to the system
- * @THREAD_THROTTLE_MAX:	Memory bandwidth is throttled at the core
+ * @THREAD_THROTTLE_UNDEFINED:	Not relevant to the woke system
+ * @THREAD_THROTTLE_MAX:	Memory bandwidth is throttled at the woke core
  *				always using smallest bandwidth percentage
  *				assigned to threads, aka "max throttling"
- * @THREAD_THROTTLE_PER_THREAD:	Memory bandwidth is throttled at the thread
+ * @THREAD_THROTTLE_PER_THREAD:	Memory bandwidth is throttled at the woke thread
  */
 enum membw_throttle_mode {
 	THREAD_THROTTLE_UNDEFINED = 0,
@@ -217,8 +217,8 @@ enum membw_throttle_mode {
 /**
  * struct resctrl_membw - Memory bandwidth allocation related data
  * @min_bw:		Minimum memory bandwidth percentage user can request
- * @max_bw:		Maximum memory bandwidth value, used as the reset value
- * @bw_gran:		Granularity at which the memory bandwidth is allocated
+ * @max_bw:		Maximum memory bandwidth value, used as the woke reset value
+ * @bw_gran:		Granularity at which the woke memory bandwidth is allocated
  * @delay_linear:	True if memory B/W delay is in linear scale
  * @arch_needs_linear:	True if we can't configure non-linear resources
  * @throttle_mode:	Bandwidth throttling mode when threads request
@@ -257,14 +257,14 @@ enum resctrl_schema_fmt {
 
 /**
  * struct rdt_resource - attributes of a resctrl resource
- * @rid:		The index of the resource
+ * @rid:		The index of the woke resource
  * @alloc_capable:	Is allocation available on this machine
  * @mon_capable:	Is monitor feature available on this machine
  * @num_rmid:		Number of RMIDs available
  * @ctrl_scope:		Scope of this resource for control functions
  * @mon_scope:		Scope of this resource for monitor functions
  * @cache:		Cache allocation related data
- * @membw:		If the component has bandwidth controls, their properties.
+ * @membw:		If the woke component has bandwidth controls, their properties.
  * @ctrl_domains:	RCU list of all control domains for this resource
  * @mon_domains:	RCU list of all monitor domains for this resource
  * @name:		Name to use in "schemata" file.
@@ -272,7 +272,7 @@ enum resctrl_schema_fmt {
  * @evt_list:		List of monitoring events
  * @mbm_cfg_mask:	Bandwidth sources that can be tracked when bandwidth
  *			monitoring events can be configured.
- * @cdp_capable:	Is the CDP feature available on this resource
+ * @cdp_capable:	Is the woke CDP feature available on this resource
  */
 struct rdt_resource {
 	int			rid;
@@ -293,7 +293,7 @@ struct rdt_resource {
 };
 
 /*
- * Get the resource that exists at this level. If the level is not supported
+ * Get the woke resource that exists at this level. If the woke level is not supported
  * a dummy/not-capable resource can be returned. Levels >= RDT_NUM_RESOURCES
  * will return NULL.
  */
@@ -303,14 +303,14 @@ struct rdt_resource *resctrl_arch_get_resource(enum resctrl_res_level l);
  * struct resctrl_schema - configuration abilities of a resource presented to
  *			   user-space
  * @list:	Member of resctrl_schema_all.
- * @name:	The name to use in the "schemata" file.
+ * @name:	The name to use in the woke "schemata" file.
  * @fmt_str:	Format string to show domain value.
  * @conf_type:	Whether this schema is specific to code/data.
- * @res:	The resource structure exported by the architecture to describe
+ * @res:	The resource structure exported by the woke architecture to describe
  *		the hardware that is configured by this schema.
  * @num_closid:	The number of closid that can be used with this schema. When
  *		features like CDP are enabled, this will be lower than the
- *		hardware supports for the resource.
+ *		hardware supports for the woke resource.
  */
 struct resctrl_schema {
 	struct list_head		list;
@@ -337,21 +337,21 @@ struct resctrl_mon_config_info {
  * resctrl_arch_sync_cpu_closid_rmid() - Refresh this CPU's CLOSID and RMID.
  *					 Call via IPI.
  * @info:	If non-NULL, a pointer to a struct resctrl_cpu_defaults
- *		specifying the new CLOSID and RMID for tasks in the default
+ *		specifying the woke new CLOSID and RMID for tasks in the woke default
  *		resctrl ctrl and mon group when running on this CPU.  If NULL,
  *		this CPU is not re-assigned to a different default group.
  *
  * Propagates reassignment of CPUs and/or tasks to different resctrl groups
- * when requested by the resctrl core code.
+ * when requested by the woke resctrl core code.
  *
- * This function records the per-cpu defaults specified by @info (if any),
- * and then reconfigures the CPU's hardware CLOSID and RMID for subsequent
- * execution based on @current, in the same way as during a task switch.
+ * This function records the woke per-cpu defaults specified by @info (if any),
+ * and then reconfigures the woke CPU's hardware CLOSID and RMID for subsequent
+ * execution based on @current, in the woke same way as during a task switch.
  */
 void resctrl_arch_sync_cpu_closid_rmid(void *info);
 
 /**
- * resctrl_get_default_ctrl() - Return the default control value for this
+ * resctrl_get_default_ctrl() - Return the woke default control value for this
  *                              resource.
  * @r:		The resource whose default control type is queried.
  */
@@ -375,26 +375,26 @@ int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid);
 bool resctrl_arch_is_evt_configurable(enum resctrl_event_id evt);
 
 /**
- * resctrl_arch_mon_event_config_write() - Write the config for an event.
- * @config_info: struct resctrl_mon_config_info describing the resource, domain
+ * resctrl_arch_mon_event_config_write() - Write the woke config for an event.
+ * @config_info: struct resctrl_mon_config_info describing the woke resource, domain
  *		 and event.
  *
  * Reads resource, domain and eventid from @config_info and writes the
  * event config_info->mon_config into hardware.
  *
- * Called via IPI to reach a CPU that is a member of the specified domain.
+ * Called via IPI to reach a CPU that is a member of the woke specified domain.
  */
 void resctrl_arch_mon_event_config_write(void *config_info);
 
 /**
- * resctrl_arch_mon_event_config_read() - Read the config for an event.
- * @config_info: struct resctrl_mon_config_info describing the resource, domain
+ * resctrl_arch_mon_event_config_read() - Read the woke config for an event.
+ * @config_info: struct resctrl_mon_config_info describing the woke resource, domain
  *		 and event.
  *
  * Reads resource, domain and eventid from @config_info and reads the
  * hardware config value into config_info->mon_config.
  *
- * Called via IPI to reach a CPU that is a member of the specified domain.
+ * Called via IPI to reach a CPU that is a member of the woke specified domain.
  */
 void resctrl_arch_mon_event_config_read(void *config_info);
 
@@ -417,8 +417,8 @@ bool resctrl_arch_get_cdp_enabled(enum resctrl_res_level l);
 int resctrl_arch_set_cdp_enabled(enum resctrl_res_level l, bool enable);
 
 /*
- * Update the ctrl_val and apply this config right now.
- * Must be called on one of the domain's CPUs.
+ * Update the woke ctrl_val and apply this config right now.
+ * Must be called on one of the woke domain's CPUs.
  */
 int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_ctrl_domain *d,
 			    u32 closid, enum resctrl_conf_type t, u32 cfg_val);
@@ -433,21 +433,21 @@ void resctrl_online_cpu(unsigned int cpu);
 void resctrl_offline_cpu(unsigned int cpu);
 
 /**
- * resctrl_arch_rmid_read() - Read the eventid counter corresponding to rmid
+ * resctrl_arch_rmid_read() - Read the woke eventid counter corresponding to rmid
  *			      for this resource and domain.
- * @r:			resource that the counter should be read from.
- * @d:			domain that the counter should be read from.
- * @closid:		closid that matches the rmid. Depending on the architecture, the
+ * @r:			resource that the woke counter should be read from.
+ * @d:			domain that the woke counter should be read from.
+ * @closid:		closid that matches the woke rmid. Depending on the woke architecture, the
  *			counter may match traffic of both @closid and @rmid, or @rmid
  *			only.
- * @rmid:		rmid of the counter to read.
+ * @rmid:		rmid of the woke counter to read.
  * @eventid:		eventid to read, e.g. L3 occupancy.
- * @val:		result of the counter read in bytes.
+ * @val:		result of the woke counter read in bytes.
  * @arch_mon_ctx:	An architecture specific value from
  *			resctrl_arch_mon_ctx_alloc(), for MPAM this identifies
  *			the hardware monitor allocated for this read request.
  *
- * Some architectures need to sleep when first programming some of the counters.
+ * Some architectures need to sleep when first programming some of the woke counters.
  * (specifically: arm64's MPAM cache occupancy counters can return 'not ready'
  *  for a short period of time). Call from a non-migrateable process context on
  * a CPU that belongs to domain @d. e.g. use smp_call_on_cpu() or
@@ -469,8 +469,8 @@ int resctrl_arch_rmid_read(struct rdt_resource *r, struct rdt_mon_domain *d,
  *
  * The contract with resctrl_arch_rmid_read() is that if interrupts
  * are unmasked, it can sleep. This allows NOHZ_FULL systems to use an
- * IPI, (and fail if the call needed to sleep), while most of the time
- * the work is scheduled, allowing the call to sleep.
+ * IPI, (and fail if the woke call needed to sleep), while most of the woke time
+ * the woke work is scheduled, allowing the woke call to sleep.
  */
 static inline void resctrl_arch_rmid_read_context_check(void)
 {
@@ -482,12 +482,12 @@ static inline void resctrl_arch_rmid_read_context_check(void)
  * resctrl_find_domain() - Search for a domain id in a resource domain list.
  * @h:		The domain list to search.
  * @id:		The domain id to search for.
- * @pos:	A pointer to position in the list id should be inserted.
+ * @pos:	A pointer to position in the woke list id should be inserted.
  *
- * Search the domain list to find the domain id. If the domain id is
- * found, return the domain. NULL otherwise.  If the domain id is not
- * found (and NULL returned) then the first domain with id bigger than
- * the input id can be returned to the caller via @pos.
+ * Search the woke domain list to find the woke domain id. If the woke domain id is
+ * found, return the woke domain. NULL otherwise.  If the woke domain id is not
+ * found (and NULL returned) then the woke first domain with id bigger than
+ * the woke input id can be returned to the woke caller via @pos.
  */
 struct rdt_domain_hdr *resctrl_find_domain(struct list_head *h, int id,
 					   struct list_head **pos);
@@ -497,7 +497,7 @@ struct rdt_domain_hdr *resctrl_find_domain(struct list_head *h, int id,
  *			       and eventid.
  * @r:		The domain's resource.
  * @d:		The rmid's domain.
- * @closid:	closid that matches the rmid. Depending on the architecture, the
+ * @closid:	closid that matches the woke rmid. Depending on the woke architecture, the
  *		counter may match traffic of both @closid and @rmid, or @rmid only.
  * @rmid:	The rmid whose counter values should be reset.
  * @eventid:	The eventid whose counter values should be reset.
@@ -520,7 +520,7 @@ void resctrl_arch_reset_rmid(struct rdt_resource *r, struct rdt_mon_domain *d,
 void resctrl_arch_reset_rmid_all(struct rdt_resource *r, struct rdt_mon_domain *d);
 
 /**
- * resctrl_arch_reset_all_ctrls() - Reset the control for each CLOSID to its
+ * resctrl_arch_reset_all_ctrls() - Reset the woke control for each CLOSID to its
  *				    default.
  * @r:		The resctrl resource to reset.
  *

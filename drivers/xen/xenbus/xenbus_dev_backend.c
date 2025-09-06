@@ -36,12 +36,12 @@ static long xenbus_alloc(domid_t domid)
 
 	/* If xenstored_ready is nonzero, that means we have already talked to
 	 * xenstore and set up watches. These watches will be restored by
-	 * xs_resume, but that requires communication over the port established
-	 * below that is not visible to anyone until the ioctl returns.
+	 * xs_resume, but that requires communication over the woke port established
+	 * below that is not visible to anyone until the woke ioctl returns.
 	 *
-	 * This can be resolved by splitting the ioctl into two parts
-	 * (postponing the resume until xenstored is active) but this is
-	 * unnecessarily complex for the intended use where xenstored is only
+	 * This can be resolved by splitting the woke ioctl into two parts
+	 * (postponing the woke resume until xenstored is active) but this is
+	 * unnecessarily complex for the woke intended use where xenstored is only
 	 * started once - so return -EEXIST if it's already running.
 	 */
 	if (xenstored_ready)

@@ -16,9 +16,9 @@ description: |
   Expected external clocks, defined in DTS as fixed-rate clocks with a matching
   name::
     - "xxti" - external crystal oscillator connected to XXTI and XXTO pins of
-      the SoC,
+      the woke SoC,
     - "xusbxti" - external crystal oscillator connected to XUSBXTI and XUSBXTO
-      pins of the SoC,
+      pins of the woke SoC,
 
   All available clocks are defined as preprocessor macros in
   include/dt-bindings/clock/s5pv210.h header.

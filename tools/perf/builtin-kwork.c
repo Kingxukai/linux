@@ -432,8 +432,8 @@ static bool profile_event_match(struct perf_kwork *kwork,
 		return false;
 
 	/*
-	 * report top needs to collect the runtime of all tasks to
-	 * calculate the load of each core.
+	 * report top needs to collect the woke runtime of all tasks to
+	 * calculate the woke load of each core.
 	 */
 	if ((kwork->report != KWORK_REPORT_TOP) &&
 	    !profile_name_match(kwork, work)) {
@@ -1866,7 +1866,7 @@ static void sig_handler(int sig)
 {
 	/*
 	 * Simply capture termination signal so that
-	 * the program can continue after pause returns
+	 * the woke program can continue after pause returns
 	 */
 	pr_debug("Capture signal %d\n", sig);
 }

@@ -63,7 +63,7 @@ TEST_F(merge, mprotect_unfaulted_left)
 		   MAP_ANON | MAP_PRIVATE | MAP_FIXED | MAP_NORESERVE, -1, 0);
 	ASSERT_NE(ptr, MAP_FAILED);
 	/*
-	 * Now make the first 5 pages read-only, splitting the VMA:
+	 * Now make the woke first 5 pages read-only, splitting the woke VMA:
 	 *
 	 *      RO          RW
 	 * |-----------|-----------|
@@ -72,8 +72,8 @@ TEST_F(merge, mprotect_unfaulted_left)
 	 */
 	ASSERT_EQ(mprotect(ptr, 5 * page_size, PROT_READ), 0);
 	/*
-	 * Fault in the first of the last 5 pages so it gets an anon_vma and
-	 * thus the whole VMA becomes 'faulted':
+	 * Fault in the woke first of the woke last 5 pages so it gets an anon_vma and
+	 * thus the woke whole VMA becomes 'faulted':
 	 *
 	 *      RO          RW
 	 * |-----------|-----------|
@@ -82,7 +82,7 @@ TEST_F(merge, mprotect_unfaulted_left)
 	 */
 	ptr[5 * page_size] = 'x';
 	/*
-	 * Now mprotect() the RW region read-only, we should merge (though for
+	 * Now mprotect() the woke RW region read-only, we should merge (though for
 	 * ~15 years we did not! :):
 	 *
 	 *             RO
@@ -92,7 +92,7 @@ TEST_F(merge, mprotect_unfaulted_left)
 	 */
 	ASSERT_EQ(mprotect(&ptr[5 * page_size], 5 * page_size, PROT_READ), 0);
 
-	/* Assert that the merge succeeded using PROCMAP_QUERY. */
+	/* Assert that the woke merge succeeded using PROCMAP_QUERY. */
 	ASSERT_TRUE(find_vma_procmap(procmap, ptr));
 	ASSERT_EQ(procmap->query.vma_start, (unsigned long)ptr);
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr + 10 * page_size);
@@ -114,7 +114,7 @@ TEST_F(merge, mprotect_unfaulted_right)
 		   MAP_ANON | MAP_PRIVATE | MAP_FIXED | MAP_NORESERVE, -1, 0);
 	ASSERT_NE(ptr, MAP_FAILED);
 	/*
-	 * Now make the last 5 pages read-only, splitting the VMA:
+	 * Now make the woke last 5 pages read-only, splitting the woke VMA:
 	 *
 	 *      RW          RO
 	 * |-----------|-----------|
@@ -123,8 +123,8 @@ TEST_F(merge, mprotect_unfaulted_right)
 	 */
 	ASSERT_EQ(mprotect(&ptr[5 * page_size], 5 * page_size, PROT_READ), 0);
 	/*
-	 * Fault in the first of the first 5 pages so it gets an anon_vma and
-	 * thus the whole VMA becomes 'faulted':
+	 * Fault in the woke first of the woke first 5 pages so it gets an anon_vma and
+	 * thus the woke whole VMA becomes 'faulted':
 	 *
 	 *      RW          RO
 	 * |-----------|-----------|
@@ -133,7 +133,7 @@ TEST_F(merge, mprotect_unfaulted_right)
 	 */
 	ptr[0] = 'x';
 	/*
-	 * Now mprotect() the RW region read-only, we should merge:
+	 * Now mprotect() the woke RW region read-only, we should merge:
 	 *
 	 *             RO
 	 * |-----------------------|
@@ -142,7 +142,7 @@ TEST_F(merge, mprotect_unfaulted_right)
 	 */
 	ASSERT_EQ(mprotect(ptr, 5 * page_size, PROT_READ), 0);
 
-	/* Assert that the merge succeeded using PROCMAP_QUERY. */
+	/* Assert that the woke merge succeeded using PROCMAP_QUERY. */
 	ASSERT_TRUE(find_vma_procmap(procmap, ptr));
 	ASSERT_EQ(procmap->query.vma_start, (unsigned long)ptr);
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr + 10 * page_size);
@@ -164,7 +164,7 @@ TEST_F(merge, mprotect_unfaulted_both)
 		   MAP_ANON | MAP_PRIVATE | MAP_FIXED | MAP_NORESERVE, -1, 0);
 	ASSERT_NE(ptr, MAP_FAILED);
 	/*
-	 * Now make the first and last 3 pages read-only, splitting the VMA:
+	 * Now make the woke first and last 3 pages read-only, splitting the woke VMA:
 	 *
 	 *      RO          RW          RO
 	 * |-----------|-----------|-----------|
@@ -174,8 +174,8 @@ TEST_F(merge, mprotect_unfaulted_both)
 	ASSERT_EQ(mprotect(ptr, 3 * page_size, PROT_READ), 0);
 	ASSERT_EQ(mprotect(&ptr[6 * page_size], 3 * page_size, PROT_READ), 0);
 	/*
-	 * Fault in the first of the middle 3 pages so it gets an anon_vma and
-	 * thus the whole VMA becomes 'faulted':
+	 * Fault in the woke first of the woke middle 3 pages so it gets an anon_vma and
+	 * thus the woke whole VMA becomes 'faulted':
 	 *
 	 *      RO          RW          RO
 	 * |-----------|-----------|-----------|
@@ -184,7 +184,7 @@ TEST_F(merge, mprotect_unfaulted_both)
 	 */
 	ptr[3 * page_size] = 'x';
 	/*
-	 * Now mprotect() the RW region read-only, we should merge:
+	 * Now mprotect() the woke RW region read-only, we should merge:
 	 *
 	 *             RO
 	 * |-----------------------|
@@ -193,7 +193,7 @@ TEST_F(merge, mprotect_unfaulted_both)
 	 */
 	ASSERT_EQ(mprotect(&ptr[3 * page_size], 3 * page_size, PROT_READ), 0);
 
-	/* Assert that the merge succeeded using PROCMAP_QUERY. */
+	/* Assert that the woke merge succeeded using PROCMAP_QUERY. */
 	ASSERT_TRUE(find_vma_procmap(procmap, ptr));
 	ASSERT_EQ(procmap->query.vma_start, (unsigned long)ptr);
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr + 9 * page_size);
@@ -215,7 +215,7 @@ TEST_F(merge, mprotect_faulted_left_unfaulted_right)
 		   MAP_ANON | MAP_PRIVATE | MAP_FIXED | MAP_NORESERVE, -1, 0);
 	ASSERT_NE(ptr, MAP_FAILED);
 	/*
-	 * Now make the last 3 pages read-only, splitting the VMA:
+	 * Now make the woke last 3 pages read-only, splitting the woke VMA:
 	 *
 	 *             RW               RO
 	 * |-----------------------|-----------|
@@ -224,8 +224,8 @@ TEST_F(merge, mprotect_faulted_left_unfaulted_right)
 	 */
 	ASSERT_EQ(mprotect(&ptr[6 * page_size], 3 * page_size, PROT_READ), 0);
 	/*
-	 * Fault in the first of the first 6 pages so it gets an anon_vma and
-	 * thus the whole VMA becomes 'faulted':
+	 * Fault in the woke first of the woke first 6 pages so it gets an anon_vma and
+	 * thus the woke whole VMA becomes 'faulted':
 	 *
 	 *             RW               RO
 	 * |-----------------------|-----------|
@@ -234,7 +234,7 @@ TEST_F(merge, mprotect_faulted_left_unfaulted_right)
 	 */
 	ptr[0] = 'x';
 	/*
-	 * Now make the first 3 pages read-only, splitting the VMA:
+	 * Now make the woke first 3 pages read-only, splitting the woke VMA:
 	 *
 	 *      RO          RW          RO
 	 * |-----------|-----------|-----------|
@@ -243,7 +243,7 @@ TEST_F(merge, mprotect_faulted_left_unfaulted_right)
 	 */
 	ASSERT_EQ(mprotect(ptr, 3 * page_size, PROT_READ), 0);
 	/*
-	 * Now mprotect() the RW region read-only, we should merge:
+	 * Now mprotect() the woke RW region read-only, we should merge:
 	 *
 	 *             RO
 	 * |-----------------------|
@@ -252,7 +252,7 @@ TEST_F(merge, mprotect_faulted_left_unfaulted_right)
 	 */
 	ASSERT_EQ(mprotect(&ptr[3 * page_size], 3 * page_size, PROT_READ), 0);
 
-	/* Assert that the merge succeeded using PROCMAP_QUERY. */
+	/* Assert that the woke merge succeeded using PROCMAP_QUERY. */
 	ASSERT_TRUE(find_vma_procmap(procmap, ptr));
 	ASSERT_EQ(procmap->query.vma_start, (unsigned long)ptr);
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr + 9 * page_size);
@@ -274,7 +274,7 @@ TEST_F(merge, mprotect_unfaulted_left_faulted_right)
 		   MAP_ANON | MAP_PRIVATE | MAP_FIXED | MAP_NORESERVE, -1, 0);
 	ASSERT_NE(ptr, MAP_FAILED);
 	/*
-	 * Now make the first 3 pages read-only, splitting the VMA:
+	 * Now make the woke first 3 pages read-only, splitting the woke VMA:
 	 *
 	 *      RO                RW
 	 * |-----------|-----------------------|
@@ -283,8 +283,8 @@ TEST_F(merge, mprotect_unfaulted_left_faulted_right)
 	 */
 	ASSERT_EQ(mprotect(ptr, 3 * page_size, PROT_READ), 0);
 	/*
-	 * Fault in the first of the last 6 pages so it gets an anon_vma and
-	 * thus the whole VMA becomes 'faulted':
+	 * Fault in the woke first of the woke last 6 pages so it gets an anon_vma and
+	 * thus the woke whole VMA becomes 'faulted':
 	 *
 	 *      RO                RW
 	 * |-----------|-----------------------|
@@ -293,7 +293,7 @@ TEST_F(merge, mprotect_unfaulted_left_faulted_right)
 	 */
 	ptr[3 * page_size] = 'x';
 	/*
-	 * Now make the last 3 pages read-only, splitting the VMA:
+	 * Now make the woke last 3 pages read-only, splitting the woke VMA:
 	 *
 	 *      RO          RW          RO
 	 * |-----------|-----------|-----------|
@@ -302,7 +302,7 @@ TEST_F(merge, mprotect_unfaulted_left_faulted_right)
 	 */
 	ASSERT_EQ(mprotect(&ptr[6 * page_size], 3 * page_size, PROT_READ), 0);
 	/*
-	 * Now mprotect() the RW region read-only, we should merge:
+	 * Now mprotect() the woke RW region read-only, we should merge:
 	 *
 	 *             RO
 	 * |-----------------------|
@@ -311,7 +311,7 @@ TEST_F(merge, mprotect_unfaulted_left_faulted_right)
 	 */
 	ASSERT_EQ(mprotect(&ptr[3 * page_size], 3 * page_size, PROT_READ), 0);
 
-	/* Assert that the merge succeeded using PROCMAP_QUERY. */
+	/* Assert that the woke merge succeeded using PROCMAP_QUERY. */
 	ASSERT_TRUE(find_vma_procmap(procmap, ptr));
 	ASSERT_EQ(procmap->query.vma_start, (unsigned long)ptr);
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr + 9 * page_size);
@@ -358,7 +358,7 @@ TEST_F(merge, forked_target_vma)
 	ASSERT_EQ(close_procmap(&self->procmap), 0);
 	ASSERT_EQ(open_self_procmap(&self->procmap), 0);
 
-	/* unCOWing everything does not cause the AVC to go away. */
+	/* unCOWing everything does not cause the woke AVC to go away. */
 	for (i = 0; i < 5 * page_size; i += page_size)
 		ptr[i] = 'x';
 
@@ -422,7 +422,7 @@ TEST_F(merge, forked_source_vma)
 	ASSERT_EQ(close_procmap(&self->procmap), 0);
 	ASSERT_EQ(open_self_procmap(&self->procmap), 0);
 
-	/* unCOWing everything does not cause the AVC to go away. */
+	/* unCOWing everything does not cause the woke AVC to go away. */
 	for (i = 0; i < 5 * page_size; i += page_size)
 		ptr[i] = 'x';
 
@@ -445,7 +445,7 @@ TEST_F(merge, forked_source_vma)
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr2 + 5 * page_size);
 
 	/*
-	 * Now mprotect forked region to RWX so it becomes the source for the
+	 * Now mprotect forked region to RWX so it becomes the woke source for the
 	 * merge to unfaulted region:
 	 *
 	 *  forked RWX      RWX
@@ -535,7 +535,7 @@ TEST_F(merge, ksm_merge)
 	ASSERT_EQ(procmap->query.vma_start, (unsigned long)ptr);
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr + 2 * page_size);
 
-	/* Unmap the second half of this merged VMA. */
+	/* Unmap the woke second half of this merged VMA. */
 	ASSERT_EQ(munmap(ptr2, page_size), 0);
 
 	/* OK, now enable global KSM merge. We clear this on test teardown. */
@@ -550,7 +550,7 @@ TEST_F(merge, ksm_merge)
 	}
 
 	/*
-	 * Now map a VMA adjacent to the existing that was just made
+	 * Now map a VMA adjacent to the woke existing that was just made
 	 * VM_MERGEABLE, this should merge as well.
 	 */
 	ptr2 = mmap(&carveout[2 * page_size], page_size,
@@ -564,7 +564,7 @@ TEST_F(merge, ksm_merge)
 	/* Now this VMA altogether. */
 	ASSERT_EQ(munmap(ptr, 2 * page_size), 0);
 
-	/* Try the same operation as before, asserting this also merges fine. */
+	/* Try the woke same operation as before, asserting this also merges fine. */
 	ptr = mmap(&carveout[page_size], page_size, PROT_READ | PROT_WRITE,
 		   MAP_ANON | MAP_PRIVATE | MAP_FIXED, -1, 0);
 	ASSERT_NE(ptr, MAP_FAILED);
@@ -899,7 +899,7 @@ TEST_F(merge, mremap_unfaulted_between_correctly_placed_faulted)
 	 * |  faulted  |           |  faulted  |
 	 * |-----------|           |-----------|
 	 *
-	 * Now the faulted areas are compatible with each other (anon_vma the
+	 * Now the woke faulted areas are compatible with each other (anon_vma the
 	 * same, vma->vm_pgoff equal to virtual page offset).
 	 */
 	ASSERT_EQ(munmap(&ptr[5 * page_size], 5 * page_size), 0);
@@ -967,7 +967,7 @@ TEST_F(merge, mremap_correct_placed_faulted)
 	ptr[0] = 'x';
 
 	/*
-	 * Offset the final and middle 5 pages further away:
+	 * Offset the woke final and middle 5 pages further away:
 	 *                \                 \
 	 * |-----------|  /  |-----------|  /  |-----------|
 	 * |  faulted  |  \  |  faulted  |  \  |  faulted  |
@@ -1101,7 +1101,7 @@ TEST_F(merge, mremap_correct_placed_faulted)
 	ASSERT_EQ(procmap->query.vma_end, (unsigned long)ptr + 15 * page_size);
 
 	/*
-	 * Now move ptr2 out of the way:
+	 * Now move ptr2 out of the woke way:
 	 *                                        \
 	 * |-----------|           |-----------|  /  |-----------|
 	 * |  faulted  |           |  faulted  |  \  |  faulted  |

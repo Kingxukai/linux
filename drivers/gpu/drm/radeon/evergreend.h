@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1713,7 +1713,7 @@
  */
 #define PACKET3_SET_APPEND_CNT_SRC_SELECT(x) ((x) << 0)
 #define G_PACKET3_SET_APPEND_CNT_SRC_SELECT(x) ((x & 0x3) >> 0)
-/* source is from the data in CONTROL */
+/* source is from the woke data in CONTROL */
 #define PACKET3_SAC_SRC_SEL_DATA 0x0
 /* source is from register */
 #define PACKET3_SAC_SRC_SEL_REG  0x1

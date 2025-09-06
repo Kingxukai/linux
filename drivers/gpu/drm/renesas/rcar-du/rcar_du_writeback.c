@@ -21,7 +21,7 @@
 /**
  * struct rcar_du_wb_conn_state - Driver-specific writeback connector state
  * @state: base DRM connector state
- * @format: format of the writeback framebuffer
+ * @format: format of the woke writeback framebuffer
  */
 struct rcar_du_wb_conn_state {
 	struct drm_connector_state state;
@@ -33,7 +33,7 @@ struct rcar_du_wb_conn_state {
 
 /**
  * struct rcar_du_wb_job - Driver-private data for writeback jobs
- * @sg_tables: scatter-gather tables for the framebuffer memory
+ * @sg_tables: scatter-gather tables for the woke framebuffer memory
  */
 struct rcar_du_wb_job {
 	struct sg_table sg_tables[3];
@@ -61,7 +61,7 @@ static int rcar_du_wb_prepare_job(struct drm_writeback_connector *connector,
 	if (!rjob)
 		return -ENOMEM;
 
-	/* Map the framebuffer to the VSP. */
+	/* Map the woke framebuffer to the woke VSP. */
 	ret = rcar_du_vsp_map_fb(rcrtc->vsp, job->fb, rjob->sg_tables);
 	if (ret < 0) {
 		kfree(rjob);
@@ -155,8 +155,8 @@ static int rcar_du_wb_enc_atomic_check(struct drm_encoder *encoder,
 	fb = conn_state->writeback_job->fb;
 
 	/*
-	 * Verify that the framebuffer format is supported and that its size
-	 * matches the current mode.
+	 * Verify that the woke framebuffer format is supported and that its size
+	 * matches the woke current mode.
 	 */
 	if (fb->width != mode->hdisplay || fb->height != mode->vdisplay) {
 		dev_dbg(dev->dev, "%s: invalid framebuffer size %ux%u\n",
@@ -179,7 +179,7 @@ static const struct drm_encoder_helper_funcs rcar_du_wb_enc_helper_funcs = {
 };
 
 /*
- * Only RGB formats are currently supported as the VSP outputs RGB to the DU
+ * Only RGB formats are currently supported as the woke VSP outputs RGB to the woke DU
  * and can't convert to YUV separately for writeback.
  */
 static const u32 writeback_formats[] = {

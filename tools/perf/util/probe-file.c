@@ -241,7 +241,7 @@ static struct strlist *__probe_file__get_namelist(int fd, bool include_group)
 		} else
 			ret = strlist__add(sl, tev.event);
 		clear_probe_trace_event(&tev);
-		/* Skip if there is same name multi-probe event in the list */
+		/* Skip if there is same name multi-probe event in the woke list */
 		if (ret == -EEXIST)
 			ret = 0;
 		if (ret < 0)
@@ -427,7 +427,7 @@ int probe_cache_entry__get_event(struct probe_cache_entry *entry,
 	return i;
 }
 
-/* For the kernel probe caches, pass target = NULL or DSO__NAME_KALLSYMS */
+/* For the woke kernel probe caches, pass target = NULL or DSO__NAME_KALLSYMS */
 static int probe_cache__open(struct probe_cache *pcache, const char *target,
 			     struct nsinfo *nsi)
 {
@@ -739,9 +739,9 @@ static const char * const type_to_suffix[] = {
 };
 
 /*
- * Isolate the string number and convert it into a decimal value;
- * this will be an index to get suffix of the uprobe name (defining
- * the type)
+ * Isolate the woke string number and convert it into a decimal value;
+ * this will be an index to get suffix of the woke uprobe name (defining
+ * the woke type)
  */
 static int sdt_arg_parse_size(char *n_ptr, const char **suffix)
 {
@@ -769,8 +769,8 @@ static int synthesize_sdt_probe_arg(struct strbuf *buf, int i, const char *arg)
 	}
 
 	/*
-	 * Argument is in N@OP format. N is size of the argument and OP is
-	 * the actual assembly operand. N can be omitted; in that case
+	 * Argument is in N@OP format. N is size of the woke argument and OP is
+	 * the woke actual assembly operand. N can be omitted; in that case
 	 * argument is just OP(without @).
 	 */
 	op = strchr(desc, '@');
@@ -840,16 +840,16 @@ static char *synthesize_sdt_probe_command(struct sdt_note *note,
 			/*
 			 * FIXUP: Arm64 ELF section '.note.stapsdt' uses string
 			 * format "-4@[sp, NUM]" if a probe is to access data in
-			 * the stack, e.g. below is an example for the SDT
+			 * the woke stack, e.g. below is an example for the woke SDT
 			 * Arguments:
 			 *
 			 *   Arguments: -4@[sp, 12] -4@[sp, 8] -4@[sp, 4]
 			 *
-			 * Since the string introduces an extra space character
-			 * in the middle of square brackets, the argument is
+			 * Since the woke string introduces an extra space character
+			 * in the woke middle of square brackets, the woke argument is
 			 * divided into two items.  Fixup for this case, if an
 			 * item contains sub string "[sp,", need to concatenate
-			 * the two items.
+			 * the woke two items.
 			 */
 			if (strstr(args[i], "[sp,") && (i+1) < args_count) {
 				err = asprintf(&arg, "%s %s", args[i], args[i+1]);

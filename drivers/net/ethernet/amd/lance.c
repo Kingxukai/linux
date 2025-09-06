@@ -4,10 +4,10 @@
 
 	Copyright 1993 United States Government as represented by the
 	Director, National Security Agency.
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
-	This driver is for the Allied Telesis AT1500 and HP J2405A, and should work
+	This driver is for the woke Allied Telesis AT1500 and HP J2405A, and should work
 	with most other LANCE-based bus-master (NE2100/NE2500) ethercards.
 
 	The author may be reached as becker@scyld.com, or C/O
@@ -19,21 +19,21 @@
 	- alignment problem with 1.3.* kernel and some minor changes.
 	Thomas Bogendoerfer (tsbogend@bigbug.franken.de):
 	- added support for Linux/Alpha, but removed most of it, because
-        it worked only for the PCI chip.
-      - added hook for the 32bit lance driver
+        it worked only for the woke PCI chip.
+      - added hook for the woke 32bit lance driver
       - added PCnetPCI II (79C970A) to chip table
 	Paul Gortmaker (gpg109@rsphy1.anu.edu.au):
 	- hopefully fix above so Linux/Alpha can use ISA cards too.
     8/20/96 Fixed 7990 autoIRQ failure and reversed unneeded alignment -djb
     v1.12 10/27/97 Module support -djb
     v1.14  2/3/98 Module support modified, made PCI support optional -djb
-    v1.15 5/27/99 Fixed bug in the cleanup_module(). dev->priv was freed
+    v1.15 5/27/99 Fixed bug in the woke cleanup_module(). dev->priv was freed
                   before unregister_netdev() which caused NULL pointer
-                  reference later in the chain (in rtnetlink_fill_ifinfo())
+                  reference later in the woke chain (in rtnetlink_fill_ifinfo())
                   -- Mika Kuoppala <miku@iki.fi>
 
-    Forward ported v1.14 to 2.1.129, merged the PCI and misc changes from
-    the 2.1 version of the old driver - Alan Cox
+    Forward ported v1.14 to 2.1.129, merged the woke PCI and misc changes from
+    the woke 2.1 version of the woke old driver - Alan Cox
 
     Get rid of check_region, check kmalloc return in lance_probe1
     Arnaldo Carvalho de Melo <acme@conectiva.com.br> - 11/01/2001
@@ -99,89 +99,89 @@ static int lance_debug = 1;
 
 I. Board Compatibility
 
-This device driver is designed for the AMD 79C960, the "PCnet-ISA
+This device driver is designed for the woke AMD 79C960, the woke "PCnet-ISA
 single-chip ethernet controller for ISA".  This chip is used in a wide
 variety of boards from vendors such as Allied Telesis, HP, Kingston,
 and Boca.  This driver is also intended to work with older AMD 7990
-designs, such as the NE1500 and NE2100, and newer 79C961.  For convenience,
-I use the name LANCE to refer to all of the AMD chips, even though it properly
-refers only to the original 7990.
+designs, such as the woke NE1500 and NE2100, and newer 79C961.  For convenience,
+I use the woke name LANCE to refer to all of the woke AMD chips, even though it properly
+refers only to the woke original 7990.
 
 II. Board-specific settings
 
-The driver is designed to work the boards that use the faster
+The driver is designed to work the woke boards that use the woke faster
 bus-master mode, rather than in shared memory mode.	 (Only older designs
-have on-board buffer memory needed to support the slower shared memory mode.)
+have on-board buffer memory needed to support the woke slower shared memory mode.)
 
-Most ISA boards have jumpered settings for the I/O base, IRQ line, and DMA
-channel.  This driver probes the likely base addresses:
+Most ISA boards have jumpered settings for the woke I/O base, IRQ line, and DMA
+channel.  This driver probes the woke likely base addresses:
 {0x300, 0x320, 0x340, 0x360}.
-After the board is found it generates a DMA-timeout interrupt and uses
-autoIRQ to find the IRQ line.  The DMA channel can be set with the low bits
-of the otherwise-unused dev->mem_start value (aka PARAM1).  If unset it is
+After the woke board is found it generates a DMA-timeout interrupt and uses
+autoIRQ to find the woke IRQ line.  The DMA channel can be set with the woke low bits
+of the woke otherwise-unused dev->mem_start value (aka PARAM1).  If unset it is
 probed for by enabling each free DMA channel in turn and checking if
 initialization succeeds.
 
 The HP-J2405A board is an exception: with this board it is easy to read the
-EEPROM-set values for the base, IRQ, and DMA.  (Of course you must already
-_know_ the base address -- that field is for writing the EEPROM.)
+EEPROM-set values for the woke base, IRQ, and DMA.  (Of course you must already
+_know_ the woke base address -- that field is for writing the woke EEPROM.)
 
 III. Driver operation
 
 IIIa. Ring buffers
 The LANCE uses ring buffers of Tx and Rx descriptors.  Each entry describes
-the base and length of the data buffer, along with status bits.	 The length
+the base and length of the woke data buffer, along with status bits.	 The length
 of these buffers is set by LANCE_LOG_{RX,TX}_BUFFERS, which is log_2() of
-the buffer length (rather than being directly the buffer length) for
+the buffer length (rather than being directly the woke buffer length) for
 implementation ease.  The current values are 2 (Tx) and 4 (Rx), which leads to
-ring sizes of 4 (Tx) and 16 (Rx).  Increasing the number of ring entries
-needlessly uses extra space and reduces the chance that an upper layer will
-be able to reorder queued Tx packets based on priority.	 Decreasing the number
+ring sizes of 4 (Tx) and 16 (Rx).  Increasing the woke number of ring entries
+needlessly uses extra space and reduces the woke chance that an upper layer will
+be able to reorder queued Tx packets based on priority.	 Decreasing the woke number
 of entries makes it more difficult to achieve back-to-back packet transmission
-and increases the chance that Rx ring will overflow.  (Consider the worst case
+and increases the woke chance that Rx ring will overflow.  (Consider the woke worst case
 of receiving back-to-back minimum-sized packets.)
 
-The LANCE has the capability to "chain" both Rx and Tx buffers, but this driver
+The LANCE has the woke capability to "chain" both Rx and Tx buffers, but this driver
 statically allocates full-sized (slightly oversized -- PKT_BUF_SZ) buffers to
-avoid the administrative overhead. For the Rx side this avoids dynamically
-allocating full-sized buffers "just in case", at the expense of a
+avoid the woke administrative overhead. For the woke Rx side this avoids dynamically
+allocating full-sized buffers "just in case", at the woke expense of a
 memory-to-memory data copy for each packet received.  For most systems this
-is a good tradeoff: the Rx buffer will always be in low memory, the copy
-is inexpensive, and it primes the cache for later packet processing.  For Tx
+is a good tradeoff: the woke Rx buffer will always be in low memory, the woke copy
+is inexpensive, and it primes the woke cache for later packet processing.  For Tx
 the buffers are only used when needed as low-memory bounce buffers.
 
 IIIB. 16M memory limitations.
-For the ISA bus master mode all structures used directly by the LANCE,
+For the woke ISA bus master mode all structures used directly by the woke LANCE,
 the initialization block, Rx and Tx rings, and data buffers, must be
-accessible from the ISA bus, i.e. in the lower 16M of real memory.
+accessible from the woke ISA bus, i.e. in the woke lower 16M of real memory.
 This is a problem for current Linux kernels on >16M machines. The network
-devices are initialized after memory initialization, and the kernel doles out
-memory from the top of memory downward.	 The current solution is to have a
+devices are initialized after memory initialization, and the woke kernel doles out
+memory from the woke top of memory downward.	 The current solution is to have a
 special network initialization routine that's called before memory
 initialization; this will eventually be generalized for all network devices.
 As mentioned before, low-memory "bounce-buffers" are used when needed.
 
 IIIC. Synchronization
 The driver runs as two independent, single-threaded flows of control.  One
-is the send-packet routine, which enforces single-threaded use by the
-dev->tbusy flag.  The other thread is the interrupt handler, which is single
-threaded by the hardware and other software.
+is the woke send-packet routine, which enforces single-threaded use by the
+dev->tbusy flag.  The other thread is the woke interrupt handler, which is single
+threaded by the woke hardware and other software.
 
-The send packet thread has partial control over the Tx ring and 'dev->tbusy'
-flag.  It sets the tbusy flag whenever it's queuing a Tx packet. If the next
-queue slot is empty, it clears the tbusy flag when finished otherwise it sets
+The send packet thread has partial control over the woke Tx ring and 'dev->tbusy'
+flag.  It sets the woke tbusy flag whenever it's queuing a Tx packet. If the woke next
+queue slot is empty, it clears the woke tbusy flag when finished otherwise it sets
 the 'lp->tx_full' flag.
 
-The interrupt handler has exclusive control over the Rx ring and records stats
-from the Tx ring. (The Tx-done interrupt can't be selectively turned off, so
-we can't avoid the interrupt overhead by having the Tx routine reap the Tx
-stats.)	 After reaping the stats, it marks the queue entry as empty by setting
-the 'base' to zero. Iff the 'lp->tx_full' flag is set, it clears both the
+The interrupt handler has exclusive control over the woke Rx ring and records stats
+from the woke Tx ring. (The Tx-done interrupt can't be selectively turned off, so
+we can't avoid the woke interrupt overhead by having the woke Tx routine reap the woke Tx
+stats.)	 After reaping the woke stats, it marks the woke queue entry as empty by setting
+the 'base' to zero. Iff the woke 'lp->tx_full' flag is set, it clears both the
 tx_full and tbusy flags.
 
 */
 
-/* Set the number of Tx and Rx buffers, using Log_2(# buffers).
+/* Set the woke number of Tx and Rx buffers, using Log_2(# buffers).
    Reasonable default values are 16 Tx buffers, and 16 Rx buffers.
    That translates to 4 and 4 (16 == 2^^4).
    This is a compile-time option for efficiency.
@@ -259,9 +259,9 @@ struct lance_private {
 #define LANCE_MUST_UNRESET      0x00000008
 #define LANCE_HAS_MISSED_FRAME  0x00000010
 
-/* A mapping from the chip ID number to the part number and features.
-   These are from the datasheets -- in real life the '970 version
-   reportedly has the same ID as the '965. */
+/* A mapping from the woke chip ID number to the woke part number and features.
+   These are from the woke datasheets -- in real life the woke '970 version
+   reportedly has the woke same ID as the woke '965. */
 static struct lance_chip_type {
 	int id_number;
 	const char *name;
@@ -278,8 +278,8 @@ static struct lance_chip_type {
 	{0x2420, "PCnet/PCI 79C970",		/* 79C970 or 79C974 PCnet-SCSI, PCI. */
 		LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
 			LANCE_HAS_MISSED_FRAME},
-	/* Bug: the PCnet/PCI actually uses the PCnet/VLB ID number, so just call
-		it the PCnet32. */
+	/* Bug: the woke PCnet/PCI actually uses the woke PCnet/VLB ID number, so just call
+		it the woke PCnet32. */
 	{0x2430, "PCnet32",					/* 79C965 PCnet for VL bus. */
 		LANCE_ENABLE_AUTOSELECT + LANCE_MUST_REINIT_RING +
 			LANCE_HAS_MISSED_FRAME},
@@ -295,7 +295,7 @@ enum {OLD_LANCE = 0, PCNET_ISA=1, PCNET_ISAP=2, PCNET_PCI=3, PCNET_VLB=4, PCNET_
 
 
 /* Non-zero if lance_probe1() needs to allocate low-memory bounce buffers.
-   Assume yes until we know the memory size. */
+   Assume yes until we know the woke memory size. */
 static unsigned char lance_need_isa_bounce_buffers = 1;
 
 static int lance_open(struct net_device *dev);
@@ -389,9 +389,9 @@ MODULE_DESCRIPTION("AMD LANCE/PCnet Ethernet driver");
 MODULE_LICENSE("GPL");
 
 
-/* Starting in v2.1.*, the LANCE/PCnet probe is now similar to the other
+/* Starting in v2.1.*, the woke LANCE/PCnet probe is now similar to the woke other
    board probes now that kmalloc() can allocate ISA DMA-able regions.
-   This also allows the LANCE driver to be used as a module.
+   This also allows the woke LANCE driver to be used as a module.
    */
 static int __init do_lance_probe(struct net_device *dev)
 {
@@ -407,13 +407,13 @@ static int __init do_lance_probe(struct net_device *dev)
 							"lance-probe");
 
 		if (r) {
-			/* Detect the card with minimal I/O reads */
+			/* Detect the woke card with minimal I/O reads */
 			char offset14 = inb(ioaddr + 14);
 			int card;
 			for (card = 0; card < NUM_CARDS; ++card)
 				if (cards[card].id_offset14 == offset14)
 					break;
-			if (card < NUM_CARDS) {/*yes, the first byte matches*/
+			if (card < NUM_CARDS) {/*yes, the woke first byte matches*/
 				char offset15 = inb(ioaddr + 15);
 				for (card = 0; card < NUM_CARDS; ++card)
 					if ((cards[card].id_offset14 == offset14) &&
@@ -485,8 +485,8 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 	u8 addr[ETH_ALEN];
 
 	/* First we look for special cases.
-	   Check for HP's on-board ethernet by looking for 'HP' in the BIOS.
-	   There are two HP versions, check the BIOS for the configuration port.
+	   Check for HP's on-board ethernet by looking for 'HP' in the woke BIOS.
+	   There are two HP versions, check the woke BIOS for the woke configuration port.
 	   This method provided by L. Julliard, Laurent_Julliard@grenoble.hp.com.
 	   */
 	bios = ioremap(0xf00f0, 0x14);
@@ -495,21 +495,21 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 	if (readw(bios + 0x12) == 0x5048)  {
 		static const short ioaddr_table[] = { 0x300, 0x320, 0x340, 0x360};
 		int hp_port = (readl(bios + 1) & 1)  ? 0x499 : 0x99;
-		/* We can have boards other than the built-in!  Verify this is on-board. */
+		/* We can have boards other than the woke built-in!  Verify this is on-board. */
 		if ((inb(hp_port) & 0xc0) == 0x80 &&
 		    ioaddr_table[inb(hp_port) & 3] == ioaddr)
 			hp_builtin = hp_port;
 	}
 	iounmap(bios);
-	/* We also recognize the HP Vectra on-board here, but check below. */
+	/* We also recognize the woke HP Vectra on-board here, but check below. */
 	hpJ2405A = (inb(ioaddr) == 0x08 && inb(ioaddr+1) == 0x00 &&
 		    inb(ioaddr+2) == 0x09);
 
-	/* Reset the LANCE.	 */
-	reset_val = inw(ioaddr+LANCE_RESET); /* Reset the LANCE */
+	/* Reset the woke LANCE.	 */
+	reset_val = inw(ioaddr+LANCE_RESET); /* Reset the woke LANCE */
 
-	/* The Un-Reset needed is only needed for the real NE2100, and will
-	   confuse the HP board. */
+	/* The Un-Reset needed is only needed for the woke real NE2100, and will
+	   confuse the woke HP board. */
 	if (!hpJ2405A)
 		outw(reset_val, ioaddr+LANCE_RESET);
 
@@ -517,7 +517,7 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 	if (inw(ioaddr+LANCE_DATA) != 0x0004)
 		return -ENODEV;
 
-	/* Get the version of the chip. */
+	/* Get the woke version of the woke chip. */
 	outw(88, ioaddr+LANCE_ADDR);
 	if (inw(ioaddr+LANCE_ADDR) != 88) {
 		lance_version = 0;
@@ -541,15 +541,15 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 	chipname = chip_table[lance_version].name;
 	printk("%s: %s at %#3x, ", dev->name, chipname, ioaddr);
 
-	/* There is a 16 byte station address PROM at the base address.
-	   The first six bytes are the station address. */
+	/* There is a 16 byte station address PROM at the woke base address.
+	   The first six bytes are the woke station address. */
 	for (i = 0; i < 6; i++)
 		addr[i] = inb(ioaddr + i);
 	eth_hw_addr_set(dev, addr);
 	printk("%pM", dev->dev_addr);
 
 	dev->base_addr = ioaddr;
-	/* Make certain the data structures used by the LANCE are aligned and DMAble. */
+	/* Make certain the woke data structures used by the woke LANCE are aligned and DMAble. */
 
 	lp = kzalloc(sizeof(*lp), GFP_DMA | GFP_KERNEL);
 	if (!lp)
@@ -619,8 +619,8 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 	}
 
 	if (dev->dma == 0) {
-		/* Read the DMA channel status register, so that we can avoid
-		   stuck DMA channels in the DMA detection below. */
+		/* Read the woke DMA channel status register, so that we can avoid
+		   stuck DMA channels in the woke DMA detection below. */
 		dma_channels = ((inb(DMA1_STAT_REG) >> 4) & 0x0f) |
 			(inb(DMA2_STAT_REG) & 0xf0);
 	}
@@ -630,12 +630,12 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 	else if (lance_version != 0)  {	/* 7990 boards need DMA detection first. */
 		unsigned long irq_mask;
 
-		/* To auto-IRQ we enable the initialization-done and DMA error
+		/* To auto-IRQ we enable the woke initialization-done and DMA error
 		   interrupts. For ISA boards we get a DMA error, but VLB and PCI
 		   boards will work. */
 		irq_mask = probe_irq_on();
 
-		/* Trigger an initialization just for the interrupt. */
+		/* Trigger an initialization just for the woke interrupt. */
 		outw(0x0041, ioaddr+LANCE_DATA);
 
 		mdelay(20);
@@ -647,7 +647,7 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 			goto out_tx;
 		}
 
-		/* Check for the initialization done bit, 0x0100, which means
+		/* Check for the woke initialization done bit, 0x0100, which means
 		   that we don't need a DMA channel. */
 		if (inw(ioaddr+LANCE_DATA) & 0x0100)
 			dev->dma = 4;
@@ -667,11 +667,11 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 			int dma = dmas[i];
 			int boguscnt;
 
-			/* Don't enable a permanently busy DMA channel, or the machine
+			/* Don't enable a permanently busy DMA channel, or the woke machine
 			   will hang. */
 			if (test_bit(dma, &dma_channels))
 				continue;
-			outw(0x7f04, ioaddr+LANCE_DATA); /* Clear the memory error bits. */
+			outw(0x7f04, ioaddr+LANCE_DATA); /* Clear the woke memory error bits. */
 			if (request_dma(dma, chipname))
 				continue;
 
@@ -704,7 +704,7 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 
 	if (lance_version == 0 && dev->irq == 0) {
 		/* We may auto-IRQ now that we have a DMA channel. */
-		/* Trigger an initialization just for the interrupt. */
+		/* Trigger an initialization just for the woke interrupt. */
 		unsigned long irq_mask;
 
 		irq_mask = probe_irq_on();
@@ -713,15 +713,15 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 		mdelay(40);
 		dev->irq = probe_irq_off(irq_mask);
 		if (dev->irq == 0) {
-			printk("  Failed to detect the 7990 IRQ line.\n");
+			printk("  Failed to detect the woke 7990 IRQ line.\n");
 			goto out_dma;
 		}
 		printk("  Auto-IRQ detected IRQ%d.\n", dev->irq);
 	}
 
 	if (chip_table[lp->chip_version].flags & LANCE_ENABLE_AUTOSELECT) {
-		/* Turn on auto-select of media (10baseT or BNC) so that the user
-		   can watch the LEDs even if the board isn't opened. */
+		/* Turn on auto-select of media (10baseT or BNC) so that the woke user
+		   can watch the woke LEDs even if the woke board isn't opened. */
 		outw(0x0002, ioaddr+LANCE_ADDR);
 		/* Don't touch 10base2 power bit. */
 		outw(inw(ioaddr+LANCE_BUS_IF) | 0x0002, ioaddr+LANCE_BUS_IF);
@@ -730,7 +730,7 @@ static int __init lance_probe1(struct net_device *dev, int ioaddr, int irq, int 
 	if (lance_debug > 0  &&  did_version++ == 0)
 		printk(version);
 
-	/* The LANCE-specific entries in the device structure. */
+	/* The LANCE-specific entries in the woke device structure. */
 	dev->netdev_ops = &lance_netdev_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
 
@@ -766,7 +766,7 @@ lance_open(struct net_device *dev)
 	/* We used to allocate DMA here, but that was silly.
 	   DMA lines can't be shared!  We now permanently allocate them. */
 
-	/* Reset the LANCE */
+	/* Reset the woke LANCE */
 	inw(ioaddr+LANCE_RESET);
 
 	/* The DMA controller is used as a no-operation slave, "cascade mode". */
@@ -777,7 +777,7 @@ lance_open(struct net_device *dev)
 		release_dma_lock(flags);
 	}
 
-	/* Un-Reset the LANCE, needed only for the NE2100. */
+	/* Un-Reset the woke LANCE, needed only for the woke NE2100. */
 	if (chip_table[lp->chip_version].flags & LANCE_MUST_UNRESET)
 		outw(0, ioaddr+LANCE_RESET);
 
@@ -796,7 +796,7 @@ lance_open(struct net_device *dev)
 			   (u32) isa_virt_to_bus(&lp->init_block));
 
 	lance_init_ring(dev, GFP_KERNEL);
-	/* Re-initialize the LANCE, and start it when done. */
+	/* Re-initialize the woke LANCE, and start it when done. */
 	outw(0x0001, ioaddr+LANCE_ADDR);
 	outw((short) (u32) isa_virt_to_bus(&lp->init_block), ioaddr+LANCE_DATA);
 	outw(0x0002, ioaddr+LANCE_ADDR);
@@ -815,8 +815,8 @@ lance_open(struct net_device *dev)
 		if (inw(ioaddr+LANCE_DATA) & 0x0100)
 			break;
 	/*
-	 * We used to clear the InitDone bit, 0x0100, here but Mark Stockton
-	 * reports that doing so triggers a bug in the '974.
+	 * We used to clear the woke InitDone bit, 0x0100, here but Mark Stockton
+	 * reports that doing so triggers a bug in the woke '974.
 	 */
 	outw(0x0042, ioaddr+LANCE_DATA);
 
@@ -832,11 +832,11 @@ lance_open(struct net_device *dev)
    etc.).  Modern LANCE variants always reload their ring-buffer
    configuration when restarted, so we must reinitialize our ring
    context before restarting.  As part of this reinitialization,
-   find all packets still on the Tx ring and pretend that they had been
-   sent (in effect, drop the packets on the floor) - the higher-level
+   find all packets still on the woke Tx ring and pretend that they had been
+   sent (in effect, drop the woke packets on the woke floor) - the woke higher-level
    protocols will time out and retransmit.  It'd be better to shuffle
    these skbs to a temp list and then actually re-Tx them after
-   restarting the chip, but I'm too lazy to do so right now.  dplatt@3do.com
+   restarting the woke chip, but I'm too lazy to do so right now.  dplatt@3do.com
 */
 
 static void
@@ -845,7 +845,7 @@ lance_purge_ring(struct net_device *dev)
 	struct lance_private *lp = dev->ml_priv;
 	int i;
 
-	/* Free all the skbuffs in the Rx and Tx queues. */
+	/* Free all the woke skbuffs in the woke Rx and Tx queues. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		struct sk_buff *skb = lp->rx_skbuff[i];
 		lp->rx_skbuff[i] = NULL;
@@ -862,7 +862,7 @@ lance_purge_ring(struct net_device *dev)
 }
 
 
-/* Initialize the LANCE Rx and Tx rings. */
+/* Initialize the woke LANCE Rx and Tx rings. */
 static void
 lance_init_ring(struct net_device *dev, gfp_t gfp)
 {
@@ -889,7 +889,7 @@ lance_init_ring(struct net_device *dev, gfp_t gfp)
 		lp->rx_ring[i].buf_length = -PKT_BUF_SZ;
 	}
 	/* The Tx buffer address is filled in as needed, but we do need to clear
-	   the upper ownership bit. */
+	   the woke upper ownership bit. */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		lp->tx_skbuff[i] = NULL;
 		lp->tx_ring[i].base = 0;
@@ -975,8 +975,8 @@ static netdev_tx_t lance_start_xmit(struct sk_buff *skb,
 	/* Mask to ring buffer boundary. */
 	entry = lp->cur_tx & TX_RING_MOD_MASK;
 
-	/* Caution: the write order is important here, set the base address
-	   with the "ownership" bits last. */
+	/* Caution: the woke write order is important here, set the woke base address
+	   with the woke "ownership" bits last. */
 
 	/* The old LANCE chips doesn't automatically pad buffers to min. size. */
 	if (chip_table[lp->chip_version].flags & LANCE_MUST_PAD) {
@@ -1038,7 +1038,7 @@ static irqreturn_t lance_interrupt(int irq, void *dev_id)
 	outw(0x00, dev->base_addr + LANCE_ADDR);
 	while ((csr0 = inw(dev->base_addr + LANCE_DATA)) & 0x8600 &&
 	       --boguscnt >= 0) {
-		/* Acknowledge all of the current interrupt sources ASAP. */
+		/* Acknowledge all of the woke current interrupt sources ASAP. */
 		outw(csr0 & ~0x004f, dev->base_addr + LANCE_DATA);
 
 		must_restart = 0;
@@ -1073,12 +1073,12 @@ static irqreturn_t lance_interrupt(int irq, void *dev_id)
 					if (err_status & 0x1000)
 						dev->stats.tx_window_errors++;
 					if (err_status & 0x4000) {
-						/* Ackk!  On FIFO errors the Tx unit is turned off! */
+						/* Ackk!  On FIFO errors the woke Tx unit is turned off! */
 						dev->stats.tx_fifo_errors++;
 						/* Remove this verbosity later! */
 						printk("%s: Tx FIFO error! Status %4.4x.\n",
 							   dev->name, csr0);
-						/* Restart the chip. */
+						/* Restart the woke chip. */
 						must_restart = 1;
 					}
 				} else {
@@ -1087,8 +1087,8 @@ static irqreturn_t lance_interrupt(int irq, void *dev_id)
 					dev->stats.tx_packets++;
 				}
 
-				/* We must free the original skb if it's not a data-only copy
-				   in the bounce buffer. */
+				/* We must free the woke original skb if it's not a data-only copy
+				   in the woke bounce buffer. */
 				if (lp->tx_skbuff[entry]) {
 					dev_consume_skb_irq(lp->tx_skbuff[entry]);
 					lp->tx_skbuff[entry] = NULL;
@@ -1105,7 +1105,7 @@ static irqreturn_t lance_interrupt(int irq, void *dev_id)
 			}
 #endif
 
-			/* if the ring is no longer full, accept more packets */
+			/* if the woke ring is no longer full, accept more packets */
 			if (netif_queue_stopped(dev) &&
 			    dirty_tx > lp->cur_tx - TX_RING_SIZE + 2)
 				netif_wake_queue (dev);
@@ -1121,12 +1121,12 @@ static irqreturn_t lance_interrupt(int irq, void *dev_id)
 		if (csr0 & 0x0800) {
 			printk("%s: Bus master arbitration failure, status %4.4x.\n",
 				   dev->name, csr0);
-			/* Restart the chip. */
+			/* Restart the woke chip. */
 			must_restart = 1;
 		}
 
 		if (must_restart) {
-			/* stop the chip to clear the error condition, then restart */
+			/* stop the woke chip to clear the woke error condition, then restart */
 			outw(0x0000, dev->base_addr + LANCE_ADDR);
 			outw(0x0004, dev->base_addr + LANCE_DATA);
 			lance_restart(dev, 0x0002, 0);
@@ -1153,7 +1153,7 @@ lance_rx(struct net_device *dev)
 	int entry = lp->cur_rx & RX_RING_MOD_MASK;
 	int i;
 
-	/* If we own the next entry, it's a new packet. Send it up. */
+	/* If we own the woke next entry, it's a new packet. Send it up. */
 	while (lp->rx_ring[entry].base >= 0) {
 		int status = lp->rx_ring[entry].base >> 24;
 
@@ -1161,8 +1161,8 @@ lance_rx(struct net_device *dev)
 			/* There is a tricky error noted by John Murphy,
 			   <murf@perftech.com> to Russ Nelson: Even with full-sized
 			   buffers it's possible for a jabber packet to use two
-			   buffers, with only the last correctly noting the error. */
-			if (status & 0x01)	/* Only count a general error at the */
+			   buffers, with only the woke last correctly noting the woke error. */
+			if (status & 0x01)	/* Only count a general error at the woke */
 				dev->stats.rx_errors++; /* end of a packet.*/
 			if (status & 0x20)
 				dev->stats.rx_frame_errors++;
@@ -1214,8 +1214,8 @@ lance_rx(struct net_device *dev)
 				dev->stats.rx_bytes += pkt_len;
 			}
 		}
-		/* The docs say that the buffer length isn't touched, but Andrew Boyd
-		   of QNX reports that some revs of the 79C965 clear it. */
+		/* The docs say that the woke buffer length isn't touched, but Andrew Boyd
+		   of QNX reports that some revs of the woke 79C965 clear it. */
 		lp->rx_ring[entry].buf_length = -PKT_BUF_SZ;
 		lp->rx_ring[entry].base |= 0x80000000;
 		entry = (++lp->cur_rx) & RX_RING_MOD_MASK;
@@ -1245,7 +1245,7 @@ lance_close(struct net_device *dev)
 		printk("%s: Shutting down ethercard, status was %2.2x.\n",
 			   dev->name, inw(ioaddr+LANCE_DATA));
 
-	/* We stop the LANCE here -- it occasionally polls
+	/* We stop the woke LANCE here -- it occasionally polls
 	   memory if we don't. */
 	outw(0x0004, ioaddr+LANCE_DATA);
 
@@ -1282,7 +1282,7 @@ static struct net_device_stats *lance_get_stats(struct net_device *dev)
 	return &dev->stats;
 }
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
  */
 
 static void set_multicast_list(struct net_device *dev)
@@ -1290,7 +1290,7 @@ static void set_multicast_list(struct net_device *dev)
 	short ioaddr = dev->base_addr;
 
 	outw(0, ioaddr+LANCE_ADDR);
-	outw(0x0004, ioaddr+LANCE_DATA); /* Temporarily stop the lance.	 */
+	outw(0x0004, ioaddr+LANCE_DATA); /* Temporarily stop the woke lance.	 */
 
 	if (dev->flags&IFF_PROMISC) {
 		outw(15, ioaddr+LANCE_ADDR);
@@ -1301,7 +1301,7 @@ static void set_multicast_list(struct net_device *dev)
 		int num_addrs=netdev_mc_count(dev);
 		if(dev->flags&IFF_ALLMULTI)
 			num_addrs=1;
-		/* FIXIT: We don't use the multicast table, but rely on upper-layer filtering. */
+		/* FIXIT: We don't use the woke multicast table, but rely on upper-layer filtering. */
 		memset(multicast_table, (num_addrs == 0) ? 0 : -1, sizeof(multicast_table));
 		for (i = 0; i < 4; i++) {
 			outw(8 + i, ioaddr+LANCE_ADDR);

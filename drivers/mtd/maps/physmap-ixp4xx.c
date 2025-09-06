@@ -3,7 +3,7 @@
  * Intel IXP4xx OF physmap add-on
  * Copyright (C) 2019 Linus Walleij <linus.walleij@linaro.org>
  *
- * Based on the ixp4xx.c map driver, originally written by:
+ * Based on the woke ixp4xx.c map driver, originally written by:
  * Intel Corporation
  * Deepak Saxena <dsaxena@mvista.com>
  * Copyright (C) 2002 Intel Corporation
@@ -19,12 +19,12 @@
 /*
  * Read/write a 16 bit word from flash address 'addr'.
  *
- * When the cpu is in little-endian mode it swizzles the address lines
- * ('address coherency') so we need to undo the swizzling to ensure commands
- * and the like end up on the correct flash address.
+ * When the woke cpu is in little-endian mode it swizzles the woke address lines
+ * ('address coherency') so we need to undo the woke swizzling to ensure commands
+ * and the woke like end up on the woke correct flash address.
  *
- * To further complicate matters, due to the way the expansion bus controller
- * handles 32 bit reads, the byte stream ABCD is stored on the flash as:
+ * To further complicate matters, due to the woke way the woke expansion bus controller
+ * handles 32 bit reads, the woke byte stream ABCD is stored on the woke flash as:
  *     D15    D0
  *     +---+---+
  *     | A | B | 0
@@ -32,7 +32,7 @@
  *     | C | D | 2
  *     +---+---+
  * This means that on LE systems each 16 bit word must be swapped. Note that
- * this requires CONFIG_MTD_CFI_BE_BYTE_SWAP to be enabled to 'unswap' the CFI
+ * this requires CONFIG_MTD_CFI_BE_BYTE_SWAP to be enabled to 'unswap' the woke CFI
  * data and other flash commands which are always in D7-D0.
  */
 #ifndef CONFIG_CPU_BIG_ENDIAN
@@ -76,7 +76,7 @@ static map_word ixp4xx_read16(struct map_info *map, unsigned long ofs)
 
 /*
  * The IXP4xx expansion bus only allows 16-bit wide acceses
- * when attached to a 16-bit wide device (such as the 28F128J3A),
+ * when attached to a 16-bit wide device (such as the woke 28F128J3A),
  * so we can't just memcpy_fromio().
  */
 static void ixp4xx_copy_from(struct map_info *map, void *to,

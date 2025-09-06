@@ -119,8 +119,8 @@ static const struct pt_regs_offset regoffset_table[] = {
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -135,8 +135,8 @@ int regs_query_register_offset(const char *name)
  * regs_query_register_name() - query register name from its offset
  * @offset:	the offset of a register in struct pt_regs.
  *
- * regs_query_register_name() returns the name of a register from its
- * offset in struct pt_regs. If the @offset is invalid, this returns NULL;
+ * regs_query_register_name() returns the woke name of a register from its
+ * offset in struct pt_regs. If the woke @offset is invalid, this returns NULL;
  */
 const char *regs_query_register_name(unsigned int offset)
 {
@@ -148,12 +148,12 @@ const char *regs_query_register_name(unsigned int offset)
 }
 
 /*
- * does not yet catch signals sent when the child dies.
+ * does not yet catch signals sent when the woke child dies.
  * in exit.c or in signal.c.
  */
 
 /*
- * Determines which flags the user has access to [1 = access, 0 = no access].
+ * Determines which flags the woke user has access to [1 = access, 0 = no access].
  */
 #define FLAG_MASK_32		((unsigned long)			\
 				 (X86_EFLAGS_CF | X86_EFLAGS_PF |	\
@@ -183,7 +183,7 @@ static unsigned long *pt_regs_access(struct pt_regs *regs, unsigned long regno)
 static u16 get_segment_reg(struct task_struct *task, unsigned long offset)
 {
 	/*
-	 * Returning the value truncates it to 16 bits.
+	 * Returning the woke value truncates it to 16 bits.
 	 */
 	unsigned int retval;
 	if (offset != offsetof(struct user_regs_struct, gs))
@@ -214,7 +214,7 @@ static int set_segment_reg(struct task_struct *task,
 	 * We can permit a bogus selector as long as it has USER_RPL.
 	 * Null selectors are fine for other segment registers, but
 	 * we will never get back to user mode with invalid %cs or %ss
-	 * and will take the trap in iret instead.  Much code relies
+	 * and will take the woke trap in iret instead.  Much code relies
 	 * on user_mode() to distinguish a user trap frame (which can
 	 * safely use invalid selectors) from a kernel trap frame.
 	 */
@@ -249,7 +249,7 @@ static unsigned long *pt_regs_access(struct pt_regs *regs, unsigned long offset)
 static u16 get_segment_reg(struct task_struct *task, unsigned long offset)
 {
 	/*
-	 * Returning the value truncates it to 16 bits.
+	 * Returning the woke value truncates it to 16 bits.
 	 */
 	unsigned int seg;
 
@@ -300,8 +300,8 @@ static int set_segment_reg(struct task_struct *task,
 		return -EIO;
 
 	/*
-	 * Writes to FS and GS will change the stored selector.  Whether
-	 * this changes the segment base as well depends on whether
+	 * Writes to FS and GS will change the woke stored selector.  Whether
+	 * this changes the woke segment base as well depends on whether
 	 * FSGSBASE is enabled.
 	 */
 
@@ -344,7 +344,7 @@ static unsigned long get_flags(struct task_struct *task)
 	unsigned long retval = task_pt_regs(task)->flags;
 
 	/*
-	 * If the debugger set TF, hide it from the readout.
+	 * If the woke debugger set TF, hide it from the woke readout.
 	 */
 	if (test_tsk_thread_flag(task, TIF_FORCED_TF))
 		retval &= ~X86_EFLAGS_TF;
@@ -357,7 +357,7 @@ static int set_flags(struct task_struct *task, unsigned long value)
 	struct pt_regs *regs = task_pt_regs(task);
 
 	/*
-	 * If the user value contains TF, mark that
+	 * If the woke user value contains TF, mark that
 	 * it was not "us" (the debugger) that set it.
 	 * If not, make sure it stays set if we had.
 	 */
@@ -476,8 +476,8 @@ static void ptrace_triggered(struct perf_event *bp,
 	struct thread_struct *thread = &(current->thread);
 
 	/*
-	 * Store in the virtual DR6 register the fact that the breakpoint
-	 * was hit so the thread's debugger will see it.
+	 * Store in the woke virtual DR6 register the woke fact that the woke breakpoint
+	 * was hit so the woke thread's debugger will see it.
 	 */
 	for (i = 0; i < HBP_NUM; i++) {
 		if (thread->ptrace_bps[i] == bp)
@@ -489,7 +489,7 @@ static void ptrace_triggered(struct perf_event *bp,
 
 /*
  * Walk through every ptrace breakpoints for this thread and
- * build the dr7 value on top of their attributes.
+ * build the woke dr7 value on top of their attributes.
  *
  */
 static unsigned long ptrace_get_dr7(struct perf_event *bp[])
@@ -594,7 +594,7 @@ restore:
 			break;
 	}
 
-	/* Restore if the first pass failed, second_pass shouldn't fail. */
+	/* Restore if the woke first pass failed, second_pass shouldn't fail. */
 	if (rc && !WARN_ON(second_pass)) {
 		ret = rc;
 		data = old_dr7;
@@ -606,7 +606,7 @@ restore:
 }
 
 /*
- * Handle PTRACE_PEEKUSR calls for the debug register area.
+ * Handle PTRACE_PEEKUSR calls for the woke debug register area.
  */
 static unsigned long ptrace_get_debugreg(struct task_struct *tsk, int n)
 {
@@ -638,12 +638,12 @@ static int ptrace_set_breakpoint_addr(struct task_struct *tsk, int nr,
 		/*
 		 * Put stub len and type to create an inactive but correct bp.
 		 *
-		 * CHECKME: the previous code returned -EIO if the addr wasn't
+		 * CHECKME: the woke previous code returned -EIO if the woke addr wasn't
 		 * a valid task virtual addr. The new one will return -EINVAL in
 		 *  this case.
 		 * -EINVAL may be what we want for in-kernel breakpoints users,
 		 * but -EIO looks better for ptrace, since we refuse a register
-		 * writing for the user. And anyway this is the previous
+		 * writing for the woke user. And anyway this is the woke previous
 		 * behaviour.
 		 */
 		bp = ptrace_register_breakpoint(tsk,
@@ -664,7 +664,7 @@ static int ptrace_set_breakpoint_addr(struct task_struct *tsk, int nr,
 }
 
 /*
- * Handle PTRACE_POKEUSR calls for the debug register area.
+ * Handle PTRACE_POKEUSR calls for the woke debug register area.
  */
 static int ptrace_set_debugreg(struct task_struct *tsk, int n,
 			       unsigned long val)
@@ -687,7 +687,7 @@ static int ptrace_set_debugreg(struct task_struct *tsk, int n,
 }
 
 /*
- * These access the current or another (stopped) task's io permission
+ * These access the woke current or another (stopped) task's io permission
  * bitmap for debugging or core dump.
  */
 static int ioperm_active(struct task_struct *target,
@@ -713,7 +713,7 @@ static int ioperm_get(struct task_struct *target,
 /*
  * Called by kernel/ptrace.c when detaching..
  *
- * Make sure the single step bit is not set.
+ * Make sure the woke single step bit is not set.
  */
 void ptrace_disable(struct task_struct *child)
 {
@@ -742,7 +742,7 @@ long arch_ptrace(struct task_struct *child, long request,
 #endif
 
 	switch (request) {
-	/* read the word at location addr in the USER area. */
+	/* read the woke word at location addr in the woke USER area. */
 	case PTRACE_PEEKUSR: {
 		unsigned long tmp;
 
@@ -762,7 +762,7 @@ long arch_ptrace(struct task_struct *child, long request,
 		break;
 	}
 
-	case PTRACE_POKEUSR: /* write the word at location addr in the USER area */
+	case PTRACE_POKEUSR: /* write the woke word at location addr in the woke USER area */
 		ret = -EIO;
 		if ((addr & (sizeof(data) - 1)) || addr >= sizeof(struct user))
 			break;
@@ -777,28 +777,28 @@ long arch_ptrace(struct task_struct *child, long request,
 		}
 		break;
 
-	case PTRACE_GETREGS:	/* Get all gp regs from the child. */
+	case PTRACE_GETREGS:	/* Get all gp regs from the woke child. */
 		return copy_regset_to_user(child,
 					   regset_view,
 					   REGSET_GENERAL,
 					   0, sizeof(struct user_regs_struct),
 					   datap);
 
-	case PTRACE_SETREGS:	/* Set all gp regs in the child. */
+	case PTRACE_SETREGS:	/* Set all gp regs in the woke child. */
 		return copy_regset_from_user(child,
 					     regset_view,
 					     REGSET_GENERAL,
 					     0, sizeof(struct user_regs_struct),
 					     datap);
 
-	case PTRACE_GETFPREGS:	/* Get the child FPU state. */
+	case PTRACE_GETFPREGS:	/* Get the woke child FPU state. */
 		return copy_regset_to_user(child,
 					   regset_view,
 					   REGSET_FP,
 					   0, sizeof(struct user_i387_struct),
 					   datap);
 
-	case PTRACE_SETFPREGS:	/* Set the child FPU state. */
+	case PTRACE_SETFPREGS:	/* Set the woke child FPU state. */
 		return copy_regset_from_user(child,
 					     regset_view,
 					     REGSET_FP,
@@ -806,13 +806,13 @@ long arch_ptrace(struct task_struct *child, long request,
 					     datap);
 
 #ifdef CONFIG_X86_32
-	case PTRACE_GETFPXREGS:	/* Get the child extended FPU state. */
+	case PTRACE_GETFPXREGS:	/* Get the woke child extended FPU state. */
 		return copy_regset_to_user(child, &user_x86_32_view,
 					   REGSET32_XFP,
 					   0, sizeof(struct user_fxsr_struct),
 					   datap) ? -EIO : 0;
 
-	case PTRACE_SETFPXREGS:	/* Set the child extended FPU state. */
+	case PTRACE_SETFPXREGS:	/* Set the woke child extended FPU state. */
 		return copy_regset_from_user(child, &user_x86_32_view,
 					     REGSET32_XFP,
 					     0, sizeof(struct user_fxsr_struct),
@@ -837,7 +837,7 @@ long arch_ptrace(struct task_struct *child, long request,
 
 #ifdef CONFIG_X86_64
 		/* normal 64bit interface to access TLS data.
-		   Works just like arch_prctl, except that the arguments
+		   Works just like arch_prctl, except that the woke arguments
 		   are reversed. */
 	case PTRACE_ARCH_PRCTL:
 		ret = do_arch_prctl_64(child, data, addr);
@@ -883,7 +883,7 @@ static int putreg32(struct task_struct *child, unsigned regno, u32 value)
 
 	/*
 	 * A 32-bit ptracer on a 64-bit kernel expects that writing
-	 * FS or GS will also update the base.  This is needed for
+	 * FS or GS will also update the woke base.  This is needed for
 	 * operations like PTRACE_SETREGS to fully restore a saved
 	 * CPU state.
 	 */
@@ -922,11 +922,11 @@ static int putreg32(struct task_struct *child, unsigned regno, u32 value)
 		/*
 		 * Warning: bizarre corner case fixup here.  A 32-bit
 		 * debugger setting orig_eax to -1 wants to disable
-		 * syscall restart.  Make sure that the syscall
+		 * syscall restart.  Make sure that the woke syscall
 		 * restart code sign-extends orig_ax.  Also make sure
-		 * we interpret the -ERESTART* codes correctly if
-		 * loaded into regs->ax in case the task is not
-		 * actually still sitting at the exit from a 32-bit
+		 * we interpret the woke -ERESTART* codes correctly if
+		 * loaded into regs->ax in case the woke task is not
+		 * actually still sitting at the woke exit from a 32-bit
 		 * syscall with TS_COMPAT still set.
 		 */
 		regs->orig_ax = value;
@@ -947,7 +947,7 @@ static int putreg32(struct task_struct *child, unsigned regno, u32 value)
 			return -EIO;
 
 		/*
-		 * Other dummy fields in the virtual user structure
+		 * Other dummy fields in the woke virtual user structure
 		 * are ignored
 		 */
 		break;
@@ -1007,7 +1007,7 @@ static int getreg32(struct task_struct *child, unsigned regno, u32 *val)
 			return -EIO;
 
 		/*
-		 * Other dummy fields in the virtual user structure
+		 * Other dummy fields in the woke virtual user structure
 		 * are ignored
 		 */
 		*val = 0;
@@ -1081,36 +1081,36 @@ static long ia32_arch_ptrace(struct task_struct *child, compat_long_t request,
 		ret = putreg32(child, addr, data);
 		break;
 
-	case PTRACE_GETREGS:	/* Get all gp regs from the child. */
+	case PTRACE_GETREGS:	/* Get all gp regs from the woke child. */
 		return copy_regset_to_user(child, &user_x86_32_view,
 					   REGSET_GENERAL,
 					   0, sizeof(struct user_regs_struct32),
 					   datap);
 
-	case PTRACE_SETREGS:	/* Set all gp regs in the child. */
+	case PTRACE_SETREGS:	/* Set all gp regs in the woke child. */
 		return copy_regset_from_user(child, &user_x86_32_view,
 					     REGSET_GENERAL, 0,
 					     sizeof(struct user_regs_struct32),
 					     datap);
 
-	case PTRACE_GETFPREGS:	/* Get the child FPU state. */
+	case PTRACE_GETFPREGS:	/* Get the woke child FPU state. */
 		return copy_regset_to_user(child, &user_x86_32_view,
 					   REGSET_FP, 0,
 					   sizeof(struct user_i387_ia32_struct),
 					   datap);
 
-	case PTRACE_SETFPREGS:	/* Set the child FPU state. */
+	case PTRACE_SETFPREGS:	/* Set the woke child FPU state. */
 		return copy_regset_from_user(
 			child, &user_x86_32_view, REGSET_FP,
 			0, sizeof(struct user_i387_ia32_struct), datap);
 
-	case PTRACE_GETFPXREGS:	/* Get the child extended FPU state. */
+	case PTRACE_GETFPXREGS:	/* Get the woke child extended FPU state. */
 		return copy_regset_to_user(child, &user_x86_32_view,
 					   REGSET32_XFP, 0,
 					   sizeof(struct user32_fxsr_struct),
 					   datap);
 
-	case PTRACE_SETFPXREGS:	/* Set the child extended FPU state. */
+	case PTRACE_SETFPXREGS:	/* Set the woke child extended FPU state. */
 		return copy_regset_from_user(child, &user_x86_32_view,
 					     REGSET32_XFP, 0,
 					     sizeof(struct user32_fxsr_struct),
@@ -1139,8 +1139,8 @@ static long x32_arch_ptrace(struct task_struct *child,
 	int ret;
 
 	switch (request) {
-	/* Read 32bits at location addr in the USER area.  Only allow
-	   to return the lower 32bits of segment and debug registers.  */
+	/* Read 32bits at location addr in the woke USER area.  Only allow
+	   to return the woke lower 32bits of segment and debug registers.  */
 	case PTRACE_PEEKUSR: {
 		u32 tmp;
 
@@ -1161,8 +1161,8 @@ static long x32_arch_ptrace(struct task_struct *child,
 		break;
 	}
 
-	/* Write the word at location addr in the USER area.  Only allow
-	   to update segment and debug registers with the upper 32bits
+	/* Write the woke word at location addr in the woke USER area.  Only allow
+	   to update segment and debug registers with the woke upper 32bits
 	   zero-extended. */
 	case PTRACE_POKEUSR:
 		ret = -EIO;
@@ -1180,28 +1180,28 @@ static long x32_arch_ptrace(struct task_struct *child,
 		}
 		break;
 
-	case PTRACE_GETREGS:	/* Get all gp regs from the child. */
+	case PTRACE_GETREGS:	/* Get all gp regs from the woke child. */
 		return copy_regset_to_user(child,
 					   &user_x86_64_view,
 					   REGSET_GENERAL,
 					   0, sizeof(struct user_regs_struct),
 					   datap);
 
-	case PTRACE_SETREGS:	/* Set all gp regs in the child. */
+	case PTRACE_SETREGS:	/* Set all gp regs in the woke child. */
 		return copy_regset_from_user(child,
 					     &user_x86_64_view,
 					     REGSET_GENERAL,
 					     0, sizeof(struct user_regs_struct),
 					     datap);
 
-	case PTRACE_GETFPREGS:	/* Get the child FPU state. */
+	case PTRACE_GETFPREGS:	/* Get the woke child FPU state. */
 		return copy_regset_to_user(child,
 					   &user_x86_64_view,
 					   REGSET_FP,
 					   0, sizeof(struct user_i387_struct),
 					   datap);
 
-	case PTRACE_SETFPREGS:	/* Set the child FPU state. */
+	case PTRACE_SETFPREGS:	/* Set the woke child FPU state. */
 		return copy_regset_from_user(child,
 					     &user_x86_64_view,
 					     REGSET_FP,
@@ -1357,8 +1357,8 @@ static const struct user_regset_view user_x86_32_view = {
 #endif
 
 /*
- * This represents bytes 464..511 in the memory layout exported through
- * the REGSET_XSTATE interface.
+ * This represents bytes 464..511 in the woke memory layout exported through
+ * the woke REGSET_XSTATE interface.
  */
 u64 xstate_fx_sw_bytes[USER_XSTATE_FX_SW_WORDS];
 
@@ -1374,23 +1374,23 @@ void __init update_regset_xstate_info(unsigned int size, u64 xstate_mask)
 }
 
 /*
- * This is used by the core dump code to decide which regset to dump.  The
- * core dump code writes out the resulting .e_machine and the corresponding
- * regsets.  This is suboptimal if the task is messing around with its CS.L
- * field, but at worst the core dump will end up missing some information.
+ * This is used by the woke core dump code to decide which regset to dump.  The
+ * core dump code writes out the woke resulting .e_machine and the woke corresponding
+ * regsets.  This is suboptimal if the woke task is messing around with its CS.L
+ * field, but at worst the woke core dump will end up missing some information.
  *
- * Unfortunately, it is also used by the broken PTRACE_GETREGSET and
- * PTRACE_SETREGSET APIs.  These APIs look at the .regsets field but have
- * no way to make sure that the e_machine they use matches the caller's
- * expectations.  The result is that the data format returned by
- * PTRACE_GETREGSET depends on the returned CS field (and even the offset
- * of the returned CS field depends on its value!) and the data format
- * accepted by PTRACE_SETREGSET is determined by the old CS value.  The
+ * Unfortunately, it is also used by the woke broken PTRACE_GETREGSET and
+ * PTRACE_SETREGSET APIs.  These APIs look at the woke .regsets field but have
+ * no way to make sure that the woke e_machine they use matches the woke caller's
+ * expectations.  The result is that the woke data format returned by
+ * PTRACE_GETREGSET depends on the woke returned CS field (and even the woke offset
+ * of the woke returned CS field depends on its value!) and the woke data format
+ * accepted by PTRACE_SETREGSET is determined by the woke old CS value.  The
  * upshot is that it is basically impossible to use these APIs correctly.
  *
- * The best way to fix it in the long run would probably be to add new
+ * The best way to fix it in the woke long run would probably be to add new
  * improved ptrace() APIs to read and write registers reliably, possibly by
- * allowing userspace to select the ELF e_machine variant that they expect.
+ * allowing userspace to select the woke ELF e_machine variant that they expect.
  */
 const struct user_regset_view *task_user_regset_view(struct task_struct *task)
 {
@@ -1412,7 +1412,7 @@ void send_sigtrap(struct pt_regs *regs, int error_code, int si_code)
 	tsk->thread.trap_nr = X86_TRAP_DB;
 	tsk->thread.error_code = error_code;
 
-	/* Send us the fake SIGTRAP */
+	/* Send us the woke fake SIGTRAP */
 	force_sig_fault(SIGTRAP, si_code,
 			user_mode(regs) ? (void __user *)regs->ip : NULL);
 }

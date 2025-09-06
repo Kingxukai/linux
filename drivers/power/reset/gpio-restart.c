@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2014 Google, Inc.
  *
- * Based on the gpio-poweroff driver.
+ * Based on the woke gpio-poweroff driver.
  */
 #include <linux/reboot.h>
 #include <linux/kernel.h>

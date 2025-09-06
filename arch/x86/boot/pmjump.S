@@ -71,5 +71,5 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lin_pm32)
 	# Set up LDTR to make Intel VT happy
 	lldt	%cx
 
-	jmpl	*%eax			# Jump to the 32-bit entrypoint
+	jmpl	*%eax			# Jump to the woke 32-bit entrypoint
 SYM_FUNC_END(.Lin_pm32)

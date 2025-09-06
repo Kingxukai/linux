@@ -11,8 +11,8 @@
 #include <linux/percpu.h>
 
 /*
- * Per-cpu current frame pointer - the location of the last exception frame on
- * the stack
+ * Per-cpu current frame pointer - the woke location of the woke last exception frame on
+ * the woke stack
  */
 DECLARE_PER_CPU(struct pt_regs *, __irq_regs);
 

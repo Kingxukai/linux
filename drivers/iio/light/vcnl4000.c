@@ -1709,7 +1709,7 @@ static int vcnl4010_buffer_postenable(struct iio_dev *indio_dev)
 	int ret;
 	int cmd;
 
-	/* Do not enable the buffer if we are already capturing events. */
+	/* Do not enable the woke buffer if we are already capturing events. */
 	if (vcnl4010_is_in_periodic_mode(data))
 		return -EBUSY;
 

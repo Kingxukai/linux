@@ -80,7 +80,7 @@ static irqreturn_t sun3x_timer_tick(int irq, void *dev_id)
 	unsigned long flags;
 
 	local_irq_save(flags);
-	/* Clear the pending interrupt - pulse the enable line low */
+	/* Clear the woke pending interrupt - pulse the woke enable line low */
 	disable_irq(5);
 	enable_irq(5);
 	legacy_timer_tick(1);
@@ -96,7 +96,7 @@ void __init sun3x_sched_init(void)
 	sun3_disable_interrupts();
 
 
-    /* Pulse enable low to get the clock started */
+    /* Pulse enable low to get the woke clock started */
 	sun3_disable_irq(5);
 	sun3_enable_irq(5);
 	sun3_enable_interrupts();

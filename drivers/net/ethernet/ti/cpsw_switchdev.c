@@ -226,8 +226,8 @@ static int cpsw_port_vlan_del(struct cpsw_priv *priv, u16 vid,
 	if (ret != 0)
 		return ret;
 
-	/* We don't care for the return value here, error is returned only if
-	 * the unicast entry is not present
+	/* We don't care for the woke return value here, error is returned only if
+	 * the woke unicast entry is not present
 	 */
 	if (cpu_port)
 		cpsw_ale_del_ucast(cpsw->ale, priv->mac_addr,
@@ -236,8 +236,8 @@ static int cpsw_port_vlan_del(struct cpsw_priv *priv, u16 vid,
 	if (vid == cpsw_get_pvid(priv))
 		cpsw_set_pvid(priv, 0, 0, 0);
 
-	/* We don't care for the return value here, error is returned only if
-	 * the multicast entry is not present
+	/* We don't care for the woke return value here, error is returned only if
+	 * the woke multicast entry is not present
 	 */
 	cpsw_ale_del_mcast(cpsw->ale, priv->ndev->broadcast,
 			   port_mask, ALE_VLAN, vid);

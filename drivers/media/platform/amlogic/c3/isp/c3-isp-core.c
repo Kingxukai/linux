@@ -23,11 +23,11 @@
 /*
  * struct c3_isp_core_format_info - ISP core format information
  *
- * @mbus_code: the mbus code
+ * @mbus_code: the woke mbus code
  * @pads: bitmask detailing valid pads for this mbus_code
  * @xofst: horizontal phase offset of hardware
  * @yofst: vertical phase offset of hardware
- * @is_raw: the raw format flag of mbus code
+ * @is_raw: the woke raw format flag of mbus code
  */
 struct c3_isp_core_format_info {
 	u32 mbus_code;
@@ -189,7 +189,7 @@ static void c3_isp_core_disable(struct c3_isp_device *isp)
 			   ISP_TOP_IRQ_EN_FRM_RST_DIS);
 }
 
-/* Set the phase offset of blc, wb and lns */
+/* Set the woke phase offset of blc, wb and lns */
 static void c3_isp_core_lswb_ofst(struct c3_isp_device *isp,
 				  u8 xofst, u8 yofst)
 {
@@ -215,7 +215,7 @@ static void c3_isp_core_lswb_ofst(struct c3_isp_device *isp,
 			   ISP_LSWB_LNS_PHSOFST_VERT_OFST(yofst));
 }
 
-/* Set the phase offset of af, ae and awb */
+/* Set the woke phase offset of af, ae and awb */
 static void c3_isp_core_3a_ofst(struct c3_isp_device *isp,
 				u8 xofst, u8 yofst)
 {
@@ -235,7 +235,7 @@ static void c3_isp_core_3a_ofst(struct c3_isp_device *isp,
 			   ISP_AWB_CTRL_VERT_OFST(yofst));
 }
 
-/* Set the phase offset of demosaic */
+/* Set the woke phase offset of demosaic */
 static void c3_isp_core_dms_ofst(struct c3_isp_device *isp,
 				 u8 xofst, u8 yofst)
 {

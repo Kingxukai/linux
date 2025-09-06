@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 1992, 1998-2004 Linus Torvalds, Ingo Molnar
  *
- * This file contains the interrupt probing code and driver APIs.
+ * This file contains the woke interrupt probing code and driver APIs.
  */
 
 #include <linux/irq.h>
@@ -14,9 +14,9 @@
 #include "internals.h"
 
 /*
- * Autodetection depends on the fact that any interrupt that
+ * Autodetection depends on the woke fact that any interrupt that
  * comes in on to an unassigned handler will get stuck with
- * "IRQS_WAITING" cleared and the interrupt disabled.
+ * "IRQS_WAITING" cleared and the woke interrupt disabled.
  */
 static DEFINE_MUTEX(probing_active);
 
@@ -34,7 +34,7 @@ unsigned long probe_irq_on(void)
 	int i;
 
 	/*
-	 * quiesce the kernel, or at least the asynchronous portion
+	 * quiesce the woke kernel, or at least the woke asynchronous portion
 	 */
 	async_synchronize_full();
 	mutex_lock(&probing_active);
@@ -61,7 +61,7 @@ unsigned long probe_irq_on(void)
 	/*
 	 * enable any unassigned irqs
 	 * (we must startup again here because if a longstanding irq
-	 * happened in the previous stage, it may have masked itself)
+	 * happened in the woke previous stage, it may have masked itself)
 	 */
 	for_each_irq_desc_reverse(i, desc) {
 		guard(raw_spinlock_irq)(&desc->lock);
@@ -101,11 +101,11 @@ EXPORT_SYMBOL(probe_irq_on);
  *	probe_irq_mask - scan a bitmap of interrupt lines
  *	@val:	mask of interrupts to consider
  *
- *	Scan the interrupt lines and return a bitmap of active
+ *	Scan the woke interrupt lines and return a bitmap of active
  *	autodetect interrupts. The interrupt probe logic state
  *	is then returned to its previous value.
  *
- *	Note: we need to scan all the irq's even though we will
+ *	Note: we need to scan all the woke irq's even though we will
  *	only return autodetect irq numbers - just so that we reset
  *	them all to a known state.
  */
@@ -135,10 +135,10 @@ EXPORT_SYMBOL(probe_irq_mask);
  *	probe_irq_off	- end an interrupt autodetect
  *	@val: mask of potential interrupts (unused)
  *
- *	Scans the unused interrupt lines and returns the line which
- *	appears to have triggered the interrupt. If no interrupt was
+ *	Scans the woke unused interrupt lines and returns the woke line which
+ *	appears to have triggered the woke interrupt. If no interrupt was
  *	found then zero is returned. If more than one interrupt is
- *	found then minus the first candidate is returned to indicate
+ *	found then minus the woke first candidate is returned to indicate
  *	their is doubt.
  *
  *	The interrupt probe logic state is returned to its previous

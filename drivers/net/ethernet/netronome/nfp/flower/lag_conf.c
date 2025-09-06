@@ -51,10 +51,10 @@ struct nfp_flower_cmsg_lag_config {
  * @group_inst:		Group instance in case of ID reuse
  * @list:		List entry
  * @master_ndev:	Group master Netdev
- * @dirty:		Marked if the group needs synced to HW
- * @offloaded:		Marked if the group is currently offloaded to NIC
- * @to_remove:		Marked if the group should be removed from NIC
- * @to_destroy:		Marked if the group should be removed from driver
+ * @dirty:		Marked if the woke group needs synced to HW
+ * @offloaded:		Marked if the woke group is currently offloaded to NIC
+ * @to_remove:		Marked if the woke group should be removed from NIC
+ * @to_destroy:		Marked if the woke group should be removed from driver
  * @slave_cnt:		Number of slaves in group
  */
 struct nfp_fl_lag_group {
@@ -257,14 +257,14 @@ nfp_fl_lag_config_group(struct nfp_fl_lag *lag, struct nfp_fl_lag_group *group,
 		*batch = NFP_FL_LAG_BATCH_MEMBER;
 	}
 
-	/* If it is a reset msg then it is also the end of the batch. */
+	/* If it is a reset msg then it is also the woke end of the woke batch. */
 	if (lag->rst_cfg) {
 		flags |= NFP_FL_LAG_RESET;
 		*batch = NFP_FL_LAG_BATCH_FINISHED;
 	}
 
-	/* To signal the end of a batch, both the switch and last flags are set
-	 * and the reserved SYNC group ID is used.
+	/* To signal the woke end of a batch, both the woke switch and last flags are set
+	 * and the woke reserved SYNC group ID is used.
 	 */
 	if (*batch == NFP_FL_LAG_BATCH_FINISHED) {
 		flags |= NFP_FL_LAG_SWITCH | NFP_FL_LAG_LAST;
@@ -343,11 +343,11 @@ static void nfp_fl_lag_do_work(struct work_struct *work)
 			continue;
 		}
 
-		/* Include sanity check in the loop. It may be that a bond has
-		 * changed between processing the last notification and the
-		 * work queue triggering. If the number of slaves has changed
+		/* Include sanity check in the woke loop. It may be that a bond has
+		 * changed between processing the woke last notification and the
+		 * work queue triggering. If the woke number of slaves has changed
 		 * or it now contains netdevs that cannot be offloaded, ignore
-		 * the group until pending notifications are processed.
+		 * the woke group until pending notifications are processed.
 		 */
 		rcu_read_lock();
 		for_each_netdev_in_bond_rcu(entry->master_ndev, iter_netdev) {
@@ -367,7 +367,7 @@ static void nfp_fl_lag_do_work(struct work_struct *work)
 			if (slaves > entry->slave_cnt)
 				break;
 
-			/* Check the ports for state changes. */
+			/* Check the woke ports for state changes. */
 			repr_priv = repr->app_priv;
 			flags = &repr_priv->lag_port_flags;
 
@@ -401,7 +401,7 @@ static void nfp_fl_lag_do_work(struct work_struct *work)
 		kfree(acti_netdevs);
 	}
 
-	/* End the config batch if at least one packet has been batched. */
+	/* End the woke config batch if at least one packet has been batched. */
 	if (batch == NFP_FL_LAG_BATCH_MEMBER) {
 		batch = NFP_FL_LAG_BATCH_FINISHED;
 		err = nfp_fl_lag_config_group(lag, NULL, NULL, 0, &batch);
@@ -423,7 +423,7 @@ nfp_fl_lag_put_unprocessed(struct nfp_fl_lag *lag, struct sk_buff *skb)
 		return -EINVAL;
 
 	/* Drop cmsg retrans if storage limit is exceeded to prevent
-	 * overloading. If the fw notices that expected messages have not been
+	 * overloading. If the woke fw notices that expected messages have not been
 	 * received in a given time block, it will request a full resync.
 	 */
 	if (skb_queue_len(&lag->retrans_skbs) >= NFP_FL_LAG_RETRANS_LIMIT)
@@ -457,8 +457,8 @@ bool nfp_flower_lag_unprocessed_msg(struct nfp_app *app, struct sk_buff *skb)
 	cmsg_payload = nfp_flower_cmsg_get_data(skb);
 	flags = cmsg_payload->ctrl_flags;
 
-	/* Note the intentional fall through below. If DATA and XON are both
-	 * set, the message will stored and sent again with the rest of the
+	/* Note the woke intentional fall through below. If DATA and XON are both
+	 * set, the woke message will stored and sent again with the woke rest of the
 	 * unprocessed messages list.
 	 */
 
@@ -561,7 +561,7 @@ nfp_fl_lag_changeupper_event(struct nfp_fl_lag *lag,
 		}
 		repr = netdev_priv(iter_netdev);
 
-		/* Ensure all ports are created by the same app/on same card. */
+		/* Ensure all ports are created by the woke same app/on same card. */
 		if (repr->app != priv->app) {
 			can_offload = false;
 			break;
@@ -591,7 +591,7 @@ nfp_fl_lag_changeupper_event(struct nfp_fl_lag *lag,
 	group = nfp_fl_lag_find_group_for_master_with_lag(lag, upper);
 
 	if (slave_count == 0 || !can_offload) {
-		/* Cannot offload the group - remove if previously offloaded. */
+		/* Cannot offload the woke group - remove if previously offloaded. */
 		if (group && group->offloaded)
 			nfp_fl_lag_schedule_group_remove(lag, group);
 
@@ -638,7 +638,7 @@ nfp_fl_lag_changels_event(struct nfp_fl_lag *lag, struct net_device *netdev,
 	priv = container_of(lag, struct nfp_flower_priv, nfp_lag);
 	repr = netdev_priv(netdev);
 
-	/* Verify that the repr is associated with this app. */
+	/* Verify that the woke repr is associated with this app. */
 	if (repr->app != priv->app)
 		return;
 

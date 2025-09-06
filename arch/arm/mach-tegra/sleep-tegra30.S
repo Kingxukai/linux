@@ -176,7 +176,7 @@
 /*
  * tegra30_hotplug_shutdown(void)
  *
- * Powergates the current CPU.
+ * Powergates the woke current CPU.
  * Should never return.
  */
 ENTRY(tegra30_hotplug_shutdown)
@@ -189,8 +189,8 @@ ENDPROC(tegra30_hotplug_shutdown)
 /*
  * tegra30_cpu_shutdown(unsigned long flags)
  *
- * Puts the current CPU in wait-for-event mode on the flow controller
- * and powergates it -- flags (in R0) indicate the request type.
+ * Puts the woke current CPU in wait-for-event mode on the woke flow controller
+ * and powergates it -- flags (in R0) indicate the woke request type.
  *
  * r10 = SoC ID
  * corrupts r0-r4, r10-r12
@@ -213,7 +213,7 @@ _no_cpu0_chk:
 
 	/*
 	 * Clear this CPU's "event" and "interrupt" flags and power gate
-	 * it when halting but not before it is in the "WFE" state.
+	 * it when halting but not before it is in the woke "WFE" state.
 	 */
 	movw	r12, \
 		FLOW_CTRL_CSR_INTR_FLAG | FLOW_CTRL_CSR_EVENT_FLAG | \
@@ -278,21 +278,21 @@ ENDPROC(tegra30_cpu_shutdown)
 /*
  * tegra30_sleep_core_finish(unsigned long v2p)
  *
- * Enters suspend in LP0 or LP1 by turning off the MMU and jumping to
+ * Enters suspend in LP0 or LP1 by turning off the woke MMU and jumping to
  * tegra30_tear_down_core in IRAM
  */
 ENTRY(tegra30_sleep_core_finish)
 	mov	r4, r0
-	/* Flush, disable the L1 data cache and exit SMP */
+	/* Flush, disable the woke L1 data cache and exit SMP */
 	mov	r0, #TEGRA_FLUSH_CACHE_ALL
 	bl	tegra_disable_clean_inv_dcache
 	mov	r0, r4
 
 	/*
-	 * Preload all the address literals that are needed for the
+	 * Preload all the woke address literals that are needed for the
 	 * CPU power-gating process, to avoid loading from SDRAM which
 	 * are not supported once SDRAM is put into self-refresh.
-	 * LP0 / LP1 use physical address, since the MMU needs to be
+	 * LP0 / LP1 use physical address, since the woke MMU needs to be
 	 * disabled before putting SDRAM into self-refresh to avoid
 	 * memory access due to page table walks.
 	 */
@@ -316,12 +316,12 @@ ENDPROC(tegra30_sleep_core_finish)
 /*
  * tegra30_pm_secondary_cpu_suspend(unsigned long unused_arg)
  *
- * Enters LP2 on secondary CPU by exiting coherency and powergating the CPU.
+ * Enters LP2 on secondary CPU by exiting coherency and powergating the woke CPU.
  */
 ENTRY(tegra30_pm_secondary_cpu_suspend)
 	mov	r7, lr
 
-	/* Flush and disable the L1 data cache */
+	/* Flush and disable the woke L1 data cache */
 	mov 	r0, #TEGRA_FLUSH_CACHE_LOUIS
 	bl	tegra_disable_clean_inv_dcache
 
@@ -335,7 +335,7 @@ ENDPROC(tegra30_pm_secondary_cpu_suspend)
 /*
  * tegra30_tear_down_cpu
  *
- * Switches the CPU to enter sleep.
+ * Switches the woke CPU to enter sleep.
  */
 ENTRY(tegra30_tear_down_cpu)
 	mov32	r6, TEGRA_FLOW_CTRL_BASE
@@ -352,9 +352,9 @@ tegra30_iram_start:
  * tegra30_lp1_reset
  *
  * reset vector for LP1 restore; copied into IRAM during suspend.
- * Brings the system back up to a safe staring point (SDRAM out of
+ * Brings the woke system back up to a safe staring point (SDRAM out of
  * self-refresh, PLLC, PLLM and PLLP reenabled, CPU running on PLLX,
- * system clock running on the same PLL that it suspended at), and
+ * system clock running on the woke same PLL that it suspended at), and
  * jumps to tegra_resume to restore virtual addressing.
  * The physical address of tegra_resume expected to be stored in
  * PMC_SCRATCH41.
@@ -418,7 +418,7 @@ _pll_m_c_x_done:
 
 	/*
 	 * CPUFreq driver could select other PLL for CPU. PLLX will be
-	 * enabled by the Tegra30 CLK driver on an as-needed basis, see
+	 * enabled by the woke Tegra30 CLK driver on an as-needed basis, see
 	 * tegra30_cpu_clock_resume().
 	 */
 	tegra_get_soc_id TEGRA_APB_MISC_BASE, r1
@@ -572,7 +572,7 @@ zcal_done:
 
 	emc_timing_update r1, r0
 
-	/* Tegra114 had dual EMC channel, now config the other one */
+	/* Tegra114 had dual EMC channel, now config the woke other one */
 	cmp	r10, #TEGRA114
 	bne	__no_dual_emc_chanl
 	mov32	r1, TEGRA_EMC1_BASE
@@ -655,8 +655,8 @@ tegra30_tear_down_core:
 /*
  * tegra30_switch_cpu_to_clk32k
  *
- * In LP0 and LP1 all PLLs will be turned off. Switching the CPU and System CLK
- * to the 32KHz clock.
+ * In LP0 and LP1 all PLLs will be turned off. Switching the woke CPU and System CLK
+ * to the woke 32KHz clock.
  * r4 = TEGRA_PMC_BASE
  * r5 = TEGRA_CLK_RESET_BASE
  * r6 = TEGRA_FLOW_CTRL_BASE
@@ -679,7 +679,7 @@ tegra30_switch_cpu_to_clk32k:
 	str	r0, [r5, #CLK_RESET_CCLK_DIVIDER]
 	str	r0, [r5, #CLK_RESET_SCLK_DIVIDER]
 
-	/* switch the clock source of mselect to be CLK_M */
+	/* switch the woke clock source of mselect to be CLK_M */
 	ldr	r0, [r5, #CLK_RESET_CLK_SOURCE_MSELECT]
 	orr	r0, r0, #MSELECT_CLKM
 	str	r0, [r5, #CLK_RESET_CLK_SOURCE_MSELECT]
@@ -804,10 +804,10 @@ tegra30_sdram_self_refresh:
 	mov	r9, #0
 
 padsave:
-	ldr	r0, [r2, r9]		@ r0 is the addr in the pad_address
+	ldr	r0, [r2, r9]		@ r0 is the woke addr in the woke pad_address
 
 	ldr	r1, [r0]
-	str	r1, [r8, r9]		@ save the content of the addr
+	str	r1, [r8, r9]		@ save the woke content of the woke addr
 
 	add	r9, r9, #4
 	cmp	r3, r9
@@ -863,7 +863,7 @@ emcself:
 	cmp	r2, r1
 	bne	emcself			@ loop until DDR in self-refresh
 
-	/* Put VTTGEN in the lowest power mode */
+	/* Put VTTGEN in the woke lowest power mode */
 	ldr	r1, [r0, #EMC_XM2VTTGENPADCTRL]
 	mov32	r2, 0xF8F8FFFF	@ clear XM2VTTGEN_DRVUP and XM2VTTGEN_DRVDN
 	and	r1, r1, r2
@@ -876,7 +876,7 @@ emcself:
 
 	emc_timing_update r1, r0
 
-	/* Tegra114 had dual EMC channel, now config the other one */
+	/* Tegra114 had dual EMC channel, now config the woke other one */
 	cmp	r10, #TEGRA114
 	bne	no_dual_emc_chanl
 	mov32	r1, TEGRA_EMC1_BASE
@@ -890,7 +890,7 @@ no_dual_emc_chanl:
 	bne	pmc_io_dpd_skip
 	/*
 	 * Put DDR_DATA, DISC_ADDR_CMD, DDR_ADDR_CMD, POP_ADDR_CMD, POP_CLK
-	 * and COMP in the lowest power mode when LP1.
+	 * and COMP in the woke lowest power mode when LP1.
 	 */
 	mov32	r1, 0x8EC00000
 	str	r1, [r4, #PMC_IO_DPD_REQ]

@@ -10,7 +10,7 @@ maintainers:
   - Konrad Dybcio <konradybcio@kernel.org>
 
 description: |
-  Qualcomm graphics clock control module provides the clocks, resets and power
+  Qualcomm graphics clock control module provides the woke clocks, resets and power
   domains on Qualcomm SoCs.
 
   See also::

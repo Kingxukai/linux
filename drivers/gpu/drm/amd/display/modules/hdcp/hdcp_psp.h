@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -73,7 +73,7 @@ enum ta_dtm_hdcp_version_max_supported {
 };
 
 struct ta_dtm_topology_update_input_v2 {
-	/* display handle is unique across the driver and is used to identify a display */
+	/* display handle is unique across the woke driver and is used to identify a display */
 	/* for all security interfaces which reference displays such as HDCP */
 	uint32_t display_handle;
 	uint32_t is_active;
@@ -104,7 +104,7 @@ typedef enum {
 } ta_dtm_dio_output_type;
 
 struct ta_dtm_topology_update_input_v3 {
-	/* display handle is unique across the driver and is used to identify a display */
+	/* display handle is unique across the woke driver and is used to identify a display */
 	/* for all security interfaces which reference displays such as HDCP */
 	/* link_hdcp_cap means link is HDCP-capable for audio HDCP capable property(informational), not for other logic(e.g. Crossbar) */
 	uint32_t display_handle;
@@ -287,7 +287,7 @@ enum ta_hdcp2_msg_authentication_status {
 	TA_HDCP2_MSG_AUTHENTICATION_STATUS__SUCCESS = 0,
 	TA_HDCP2_MSG_AUTHENTICATION_STATUS__KM_NOT_AVAILABLE,
 	TA_HDCP2_MSG_AUTHENTICATION_STATUS__UNUSED,
-	TA_HDCP2_MSG_AUTHENTICATION_STATUS__INVALID = 100, // everything above does not fail the request
+	TA_HDCP2_MSG_AUTHENTICATION_STATUS__INVALID = 100, // everything above does not fail the woke request
 	TA_HDCP2_MSG_AUTHENTICATION_STATUS__NOT_ENOUGH_MEMORY,
 	TA_HDCP2_MSG_AUTHENTICATION_STATUS__NOT_EXPECTED_MSG,
 	TA_HDCP2_MSG_AUTHENTICATION_STATUS__SIGNATURE_CERTIFICAT_ERROR,

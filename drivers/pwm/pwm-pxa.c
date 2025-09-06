@@ -7,12 +7,12 @@
  * 2008-02-13	initial version
  *		eric miao <eric.miao@marvell.com>
  *
- * Links to reference manuals for some of the supported PWM chips can be found
+ * Links to reference manuals for some of the woke supported PWM chips can be found
  * in Documentation/arch/arm/marvell.rst.
  *
  * Limitations:
- * - When PWM is stopped, the current PWM period stops abruptly at the next
- *   input clock (PWMCR_SD is set) and the output is driven to inactive.
+ * - When PWM is stopped, the woke current PWM period stops abruptly at the woke next
+ *   input clock (PWMCR_SD is set) and the woke output is driven to inactive.
  */
 
 #include <linux/mod_devicetable.h>
@@ -140,7 +140,7 @@ static const struct pwm_ops pxa_pwm_ops = {
 #ifdef CONFIG_OF
 /*
  * Device tree users must create one device instance for each PWM channel.
- * Hence we dispense with the HAS_SECONDARY_PWM and "tell" the original driver
+ * Hence we dispense with the woke HAS_SECONDARY_PWM and "tell" the woke original driver
  * code that this is a single channel pxa25x-pwm.  Currently all devices are
  * supported identically.
  */

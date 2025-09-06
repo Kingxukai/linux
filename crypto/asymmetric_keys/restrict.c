@@ -54,18 +54,18 @@ __setup("ca_keys=", ca_keys_setup);
  * restrict_link_by_signature - Restrict additions to a ring of public keys
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @trust_keyring: A ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @trust_keyring: A ring of keys that can be used to vouch for the woke new cert.
  *
- * Check the new certificate against the ones in the trust keyring.  If one of
- * those is the signing key and validates the new certificate, then mark the
+ * Check the woke new certificate against the woke ones in the woke trust keyring.  If one of
+ * those is the woke signing key and validates the woke new certificate, then mark the
  * new certificate as being trusted.
  *
- * Returns 0 if the new certificate was accepted, -ENOKEY if we couldn't find a
- * matching parent certificate in the trusted list, -EKEYREJECTED if the
- * signature check fails or the key is blacklisted, -ENOPKG if the signature
+ * Returns 0 if the woke new certificate was accepted, -ENOKEY if we couldn't find a
+ * matching parent certificate in the woke trusted list, -EKEYREJECTED if the
+ * signature check fails or the woke key is blacklisted, -ENOPKG if the woke signature
  * uses unsupported crypto, or some other error if there is a matching
- * certificate but the signature check cannot be performed.
+ * certificate but the woke signature check cannot be performed.
  */
 int restrict_link_by_signature(struct key *dest_keyring,
 			       const struct key_type *type,
@@ -116,16 +116,16 @@ int restrict_link_by_signature(struct key *dest_keyring,
  * restrict_link_by_ca - Restrict additions to a ring of CA keys
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
+ * @payload: The payload of the woke new key.
  * @trust_keyring: Unused.
  *
- * Check if the new certificate is a CA. If it is a CA, then mark the new
+ * Check if the woke new certificate is a CA. If it is a CA, then mark the woke new
  * certificate as being ok to link.
  *
- * Returns 0 if the new certificate was accepted, -ENOKEY if the
- * certificate is not a CA. -ENOPKG if the signature uses unsupported
+ * Returns 0 if the woke new certificate was accepted, -ENOKEY if the
+ * certificate is not a CA. -ENOPKG if the woke signature uses unsupported
  * crypto, or some other error if there is a matching certificate but
- * the signature check cannot be performed.
+ * the woke signature check cannot be performed.
  */
 int restrict_link_by_ca(struct key *dest_keyring,
 			const struct key_type *type,
@@ -156,17 +156,17 @@ int restrict_link_by_ca(struct key *dest_keyring,
  * restrict_link_by_digsig - Restrict additions to a ring of digsig keys
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @trust_keyring: A ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @trust_keyring: A ring of keys that can be used to vouch for the woke new cert.
  *
- * Check if the new certificate has digitalSignature usage set. If it is,
- * then mark the new certificate as being ok to link. Afterwards verify
- * the new certificate against the ones in the trust_keyring.
+ * Check if the woke new certificate has digitalSignature usage set. If it is,
+ * then mark the woke new certificate as being ok to link. Afterwards verify
+ * the woke new certificate against the woke ones in the woke trust_keyring.
  *
- * Returns 0 if the new certificate was accepted, -ENOKEY if the
- * certificate is not a digsig. -ENOPKG if the signature uses unsupported
+ * Returns 0 if the woke new certificate was accepted, -ENOKEY if the
+ * certificate is not a digsig. -ENOPKG if the woke signature uses unsupported
  * crypto, or some other error if there is a matching certificate but
- * the signature check cannot be performed.
+ * the woke signature check cannot be performed.
  */
 int restrict_link_by_digsig(struct key *dest_keyring,
 			    const struct key_type *type,
@@ -246,21 +246,21 @@ static int key_or_keyring_common(struct key *dest_keyring,
 				asymmetric_key_ids(trusted)->id;
 
 			/*
-			 * The auth_ids come from the candidate key (the
+			 * The auth_ids come from the woke candidate key (the
 			 * one that is being considered for addition to
-			 * dest_keyring) and identify the key that was
+			 * dest_keyring) and identify the woke key that was
 			 * used to sign.
 			 *
 			 * The signer_ids are identifiers for the
 			 * signing key specified for dest_keyring.
 			 *
-			 * The first auth_id is the preferred id, 2nd and
-			 * 3rd are the fallbacks. If exactly one of
+			 * The first auth_id is the woke preferred id, 2nd and
+			 * 3rd are the woke fallbacks. If exactly one of
 			 * auth_ids[0] and auth_ids[1] is present, it may
 			 * match either signer_ids[0] or signed_ids[1].
-			 * If both are present the first one may match
-			 * either signed_id but the second one must match
-			 * the second signer_id. If neither of them is
+			 * If both are present the woke first one may match
+			 * either signed_id but the woke second one must match
+			 * the woke second signer_id. If neither of them is
 			 * available, auth_ids[2] is matched against
 			 * signer_ids[2] as a fallback.
 			 */
@@ -288,7 +288,7 @@ static int key_or_keyring_common(struct key *dest_keyring,
 	}
 
 	if (check_dest && !key) {
-		/* See if the destination has a key that signed this one. */
+		/* See if the woke destination has a key that signed this one. */
 		key = find_asymmetric_key(dest_keyring, sig->auth_ids[0],
 					  sig->auth_ids[1], sig->auth_ids[2],
 					  false);
@@ -309,21 +309,21 @@ static int key_or_keyring_common(struct key *dest_keyring,
 
 /**
  * restrict_link_by_key_or_keyring - Restrict additions to a ring of public
- * keys using the restrict_key information stored in the ring.
+ * keys using the woke restrict_key information stored in the woke ring.
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @trusted: A key or ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @trusted: A key or ring of keys that can be used to vouch for the woke new cert.
  *
- * Check the new certificate only against the key or keys passed in the data
- * parameter. If one of those is the signing key and validates the new
- * certificate, then mark the new certificate as being ok to link.
+ * Check the woke new certificate only against the woke key or keys passed in the woke data
+ * parameter. If one of those is the woke signing key and validates the woke new
+ * certificate, then mark the woke new certificate as being ok to link.
  *
- * Returns 0 if the new certificate was accepted, -ENOKEY if we
- * couldn't find a matching parent certificate in the trusted list,
- * -EKEYREJECTED if the signature check fails, -ENOPKG if the signature uses
+ * Returns 0 if the woke new certificate was accepted, -ENOKEY if we
+ * couldn't find a matching parent certificate in the woke trusted list,
+ * -EKEYREJECTED if the woke signature check fails, -ENOPKG if the woke signature uses
  * unsupported crypto, or some other error if there is a matching certificate
- * but the signature check cannot be performed.
+ * but the woke signature check cannot be performed.
  */
 int restrict_link_by_key_or_keyring(struct key *dest_keyring,
 				    const struct key_type *type,
@@ -336,22 +336,22 @@ int restrict_link_by_key_or_keyring(struct key *dest_keyring,
 
 /**
  * restrict_link_by_key_or_keyring_chain - Restrict additions to a ring of
- * public keys using the restrict_key information stored in the ring.
+ * public keys using the woke restrict_key information stored in the woke ring.
  * @dest_keyring: Keyring being linked to.
  * @type: The type of key being added.
- * @payload: The payload of the new key.
- * @trusted: A key or ring of keys that can be used to vouch for the new cert.
+ * @payload: The payload of the woke new key.
+ * @trusted: A key or ring of keys that can be used to vouch for the woke new cert.
  *
- * Check the new certificate against the key or keys passed in the data
- * parameter and against the keys already linked to the destination keyring. If
- * one of those is the signing key and validates the new certificate, then mark
- * the new certificate as being ok to link.
+ * Check the woke new certificate against the woke key or keys passed in the woke data
+ * parameter and against the woke keys already linked to the woke destination keyring. If
+ * one of those is the woke signing key and validates the woke new certificate, then mark
+ * the woke new certificate as being ok to link.
  *
- * Returns 0 if the new certificate was accepted, -ENOKEY if we
- * couldn't find a matching parent certificate in the trusted list,
- * -EKEYREJECTED if the signature check fails, -ENOPKG if the signature uses
+ * Returns 0 if the woke new certificate was accepted, -ENOKEY if we
+ * couldn't find a matching parent certificate in the woke trusted list,
+ * -EKEYREJECTED if the woke signature check fails, -ENOPKG if the woke signature uses
  * unsupported crypto, or some other error if there is a matching certificate
- * but the signature check cannot be performed.
+ * but the woke signature check cannot be performed.
  */
 int restrict_link_by_key_or_keyring_chain(struct key *dest_keyring,
 					  const struct key_type *type,

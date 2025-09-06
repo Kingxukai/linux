@@ -43,11 +43,11 @@ patternProperties:
     properties:
 
       rb-gpios:
-        description: GPIO specifier for the busy pin.
+        description: GPIO specifier for the woke busy pin.
         maxItems: 1
 
       wp-gpios:
-        description: GPIO specifier for the write-protect pin.
+        description: GPIO specifier for the woke write-protect pin.
         maxItems: 1
 
     unevaluatedProperties: false

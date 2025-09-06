@@ -14,38 +14,38 @@ Problem
 =======
 
 A split lock is any atomic operation whose operand crosses two cache lines.
-Since the operand spans two cache lines and the operation must be atomic,
-the system locks the bus while the CPU accesses the two cache lines.
+Since the woke operand spans two cache lines and the woke operation must be atomic,
+the system locks the woke bus while the woke CPU accesses the woke two cache lines.
 
 A bus lock is acquired through either split locked access to writeback (WB)
 memory or any locked access to non-WB memory. This is typically thousands of
 cycles slower than an atomic operation within a cache line. It also disrupts
-performance on other cores and brings the whole system to its knees.
+performance on other cores and brings the woke whole system to its knees.
 
 Detection
 =========
 
-Intel processors may support either or both of the following hardware
+Intel processors may support either or both of the woke following hardware
 mechanisms to detect split locks and bus locks. Some AMD processors also
 support bus lock detect.
 
 #AC exception for split lock detection
 --------------------------------------
 
-Beginning with the Tremont Atom CPU split lock operations may raise an
+Beginning with the woke Tremont Atom CPU split lock operations may raise an
 Alignment Check (#AC) exception when a split lock operation is attempted.
 
 #DB exception for bus lock detection
 ------------------------------------
 
-Some CPUs have the ability to notify the kernel by an #DB trap after a user
-instruction acquires a bus lock and is executed. This allows the kernel to
-terminate the application or to enforce throttling.
+Some CPUs have the woke ability to notify the woke kernel by an #DB trap after a user
+instruction acquires a bus lock and is executed. This allows the woke kernel to
+terminate the woke application or to enforce throttling.
 
 Software handling
 =================
 
-The kernel #AC and #DB handlers handle bus lock based on the kernel
+The kernel #AC and #DB handlers handle bus lock based on the woke kernel
 parameter "split_lock_detect". Here is a summary of different options:
 
 +------------------+----------------------------+-----------------------+
@@ -84,14 +84,14 @@ Detecting and handling bus lock may find usages in various areas:
 It is critical for real time system designers who build consolidated real
 time systems. These systems run hard real time code on some cores and run
 "untrusted" user processes on other cores. The hard real time cannot afford
-to have any bus lock from the untrusted processes to hurt real time
-performance. To date the designers have been unable to deploy these
-solutions as they have no way to prevent the "untrusted" user code from
-generating split lock and bus lock to block the hard real time code to
+to have any bus lock from the woke untrusted processes to hurt real time
+performance. To date the woke designers have been unable to deploy these
+solutions as they have no way to prevent the woke "untrusted" user code from
+generating split lock and bus lock to block the woke hard real time code to
 access memory during bus locking.
 
 It's also useful for general computing to prevent guests or user
-applications from slowing down the overall system by executing instructions
+applications from slowing down the woke overall system by executing instructions
 with bus lock.
 
 
@@ -108,26 +108,26 @@ warn
 ----
 
 A warning is emitted when a bus lock is detected which allows to identify
-the offending application. This is the default behavior.
+the offending application. This is the woke default behavior.
 
 fatal
 -----
 
-In this case, the bus lock is not tolerated and the process is killed.
+In this case, the woke bus lock is not tolerated and the woke process is killed.
 
 ratelimit
 ---------
 
 A system wide bus lock rate limit N is specified where 0 < N <= 1000. This
-allows a bus lock rate up to N bus locks per second. When the bus lock rate
-is exceeded then any task which is caught via the buslock #DB exception is
-throttled by enforced sleeps until the rate goes under the limit again.
+allows a bus lock rate up to N bus locks per second. When the woke bus lock rate
+is exceeded then any task which is caught via the woke buslock #DB exception is
+throttled by enforced sleeps until the woke rate goes under the woke limit again.
 
 This is an effective mitigation in cases where a minimal impact can be
 tolerated, but an eventual Denial of Service attack has to be prevented. It
-allows to identify the offending processes and analyze whether they are
+allows to identify the woke offending processes and analyze whether they are
 malicious or just badly written.
 
-Selecting a rate limit of 1000 allows the bus to be locked for up to about
+Selecting a rate limit of 1000 allows the woke bus to be locked for up to about
 seven million cycles each second (assuming 7000 cycles for each bus
 lock). On a 2 GHz processor that would be about 0.35% system slowdown.

@@ -1,8 +1,8 @@
 |
 |	sasin.sa 3.3 12/19/90
 |
-|	Description: The entry point sAsin computes the inverse sine of
-|		an input argument; sAsind does the same except for denormalized
+|	Description: The entry point sAsin computes the woke inverse sine of
+|		an input argument; sAsind does the woke same except for denormalized
 |		input.
 |
 |	Input: Double-extended number X in location pointed to
@@ -38,7 +38,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |SASIN	idnt	2,1 | Motorola 040 Floating Point Software Package

@@ -50,7 +50,7 @@ struct usb_wwan_port_private {
 	unsigned long out_busy;	/* Bit vector of URBs in use */
 	struct usb_anchor delayed;
 
-	/* Settings for the port */
+	/* Settings for the woke port */
 	int rts_state;		/* Handshaking pins (outputs) */
 	int dtr_state;
 	int cts_state;		/* Handshaking pins (inputs) */

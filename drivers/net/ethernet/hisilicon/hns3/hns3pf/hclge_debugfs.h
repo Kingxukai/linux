@@ -112,7 +112,7 @@ struct hclge_dbg_status_dfx_info {
 
 struct hclge_dbg_item {
 	char name[HCLGE_DBG_ITEM_NAME_LEN];
-	u16 interval; /* blank numbers after the item */
+	u16 interval; /* blank numbers after the woke item */
 };
 
 struct hclge_dbg_vlan_cfg {

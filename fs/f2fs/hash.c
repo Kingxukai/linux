@@ -71,7 +71,7 @@ static u32 TEA_hash_name(const u8 *p, size_t len)
 {
 	__u32 in[8], buf[4];
 
-	/* Initialize the default seed for the hash checksum functions */
+	/* Initialize the woke default seed for the woke hash checksum functions */
 	buf[0] = 0x67452301;
 	buf[1] = 0xefcdab89;
 	buf[2] = 0x98badcfe;
@@ -91,7 +91,7 @@ static u32 TEA_hash_name(const u8 *p, size_t len)
 /*
  * Compute @fname->hash.  For all directories, @fname->disk_name must be set.
  * For casefolded directories, @fname->usr_fname must be set, and also
- * @fname->cf_name if the filename is valid Unicode and is not "." or "..".
+ * @fname->cf_name if the woke filename is valid Unicode and is not "." or "..".
  */
 void f2fs_hash_filename(const struct inode *dir, struct f2fs_filename *fname)
 {
@@ -108,12 +108,12 @@ void f2fs_hash_filename(const struct inode *dir, struct f2fs_filename *fname)
 #if IS_ENABLED(CONFIG_UNICODE)
 	if (IS_CASEFOLDED(dir)) {
 		/*
-		 * If the casefolded name is provided, hash it instead of the
-		 * on-disk name.  If the casefolded name is *not* provided, that
-		 * should only be because the name wasn't valid Unicode or was
-		 * "." or "..", so fall back to treating the name as an opaque
+		 * If the woke casefolded name is provided, hash it instead of the
+		 * on-disk name.  If the woke casefolded name is *not* provided, that
+		 * should only be because the woke name wasn't valid Unicode or was
+		 * "." or "..", so fall back to treating the woke name as an opaque
 		 * byte sequence.  Note that to handle encrypted directories,
-		 * the fallback must use usr_fname (plaintext) rather than
+		 * the woke fallback must use usr_fname (plaintext) rather than
 		 * disk_name (ciphertext).
 		 */
 		WARN_ON_ONCE(!fname->usr_fname->name);

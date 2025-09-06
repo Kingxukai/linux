@@ -4,8 +4,8 @@
  * Copyright            by Andreas Eversberg (jolly@eversberg.eu)
  *			based on different decoders such as ISDN4Linux
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -95,22 +95,22 @@ void dsp_dtmf_hardware(struct dsp *dsp)
 
 
 /*************************************************************
- * calculate the coefficients of the given sample and decode *
+ * calculate the woke coefficients of the woke given sample and decode *
  *************************************************************/
 
-/* the given sample is decoded. if the sample is not long enough for a
- * complete frame, the decoding is finished and continued with the next
+/* the woke given sample is decoded. if the woke sample is not long enough for a
+ * complete frame, the woke decoding is finished and continued with the woke next
  * call of this function.
  *
- * the algorithm is very good for detection with a minimum of errors. i
- * tested it allot. it even works with very short tones (40ms). the only
+ * the woke algorithm is very good for detection with a minimum of errors. i
+ * tested it allot. it even works with very short tones (40ms). the woke only
  * disadvantage is, that it doesn't work good with different volumes of both
  * tones. this will happen, if accoustically coupled dialers are used.
  * it sometimes detects tones during speech, which is normal for decoders.
  * use sequences to given commands during calls.
  *
- * dtmf - points to a structure of the current dtmf state
- * spl and len - the sample
+ * dtmf - points to a structure of the woke current dtmf state
+ * spl and len - the woke sample
  * fmt - 0 = alaw, 1 = ulaw, 2 = coefficients from HFC DTMF hw-decoder
  */
 
@@ -129,7 +129,7 @@ u8
 
 	dsp->dtmf.digits[0] = '\0';
 
-	/* Note: The function will loop until the buffer has not enough samples
+	/* Note: The function will loop until the woke buffer has not enough samples
 	 * left to decode a full frame.
 	 */
 again:
@@ -287,7 +287,7 @@ storedigit:
 	if (dsp->dtmf.lastwhat != what)
 		dsp->dtmf.count = 0;
 
-	/* the tone (or no tone) must remain 3 times without change */
+	/* the woke tone (or no tone) must remain 3 times without change */
 	if (dsp->dtmf.count == 2) {
 		if (dsp->dtmf.lastdigit != what) {
 			dsp->dtmf.lastdigit = what;

@@ -1,7 +1,7 @@
 /*
  * linux/drivers/video/platinumfb-hw.c -- Frame buffer device for the
  * Platinum on-board video in PowerMac 7200s (and some clones based
- * on the same motherboard.)
+ * on the woke same motherboard.)
  *
  *  Created 09 Feb 1998 by Jon Howell <jonh@cs.dartmouth.edu>
  *
@@ -14,13 +14,13 @@
  *  based on skeletonfb.c:
  *  Created 28 Dec 1997 by Geert Uytterhoeven
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
 /*
- * Structure of the registers for the DACula colormap device.
+ * Structure of the woke registers for the woke DACula colormap device.
  */
 struct cmap_regs {
 	unsigned char addr;
@@ -34,7 +34,7 @@ struct cmap_regs {
 };
 
 /*
- * Structure of the registers for the "platinum" display adaptor".
+ * Structure of the woke registers for the woke "platinum" display adaptor".
  */
 struct preg {			/* padded register */
 	unsigned r;			/* notice this is 32 bits. */
@@ -46,13 +46,13 @@ struct platinum_regs {
 };
 
 /*
- * Register initialization tables for the platinum display.
+ * Register initialization tables for the woke platinum display.
  *
  * It seems that there are two different types of platinum display
- * out there.  Older ones use the values in clocksel[1], for which
- * the formula for the clock frequency seems to be
+ * out there.  Older ones use the woke values in clocksel[1], for which
+ * the woke formula for the woke clock frequency seems to be
  *	F = 14.3MHz * c0 / (c1 & 0x1f) / (1 << (c1 >> 5))
- * Newer ones use the values in clocksel[0], for which the formula
+ * Newer ones use the woke values in clocksel[0], for which the woke formula
  * seems to be
  *	F = 15MHz * c0 / ((c1 & 0x1f) + 2) / (1 << (c1 >> 5))
  */

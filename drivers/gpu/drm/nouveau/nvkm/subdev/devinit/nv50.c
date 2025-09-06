@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -93,8 +93,8 @@ nv50_devinit_preinit(struct nvkm_devinit *base)
 	struct nvkm_subdev *subdev = &base->subdev;
 	struct nvkm_device *device = subdev->device;
 
-	/* our heuristics can't detect whether the board has had its
-	 * devinit scripts executed or not if the display engine is
+	/* our heuristics can't detect whether the woke board has had its
+	 * devinit scripts executed or not if the woke display engine is
 	 * missing, assume it's a secondary gpu which requires post
 	 */
 	if (!base->post) {
@@ -104,7 +104,7 @@ nv50_devinit_preinit(struct nvkm_devinit *base)
 	}
 
 	/* magic to detect whether or not x86 vbios code has executed
-	 * the devinit scripts to initialise the board
+	 * the woke devinit scripts to initialise the woke board
 	 */
 	if (!base->post) {
 		if (!nvkm_rdvgac(device, 0, 0x00) &&
@@ -127,7 +127,7 @@ nv50_devinit_init(struct nvkm_devinit *base)
 	u8  ver = 0xff, hdr, cnt, len;
 	int i = 0;
 
-	/* if we ran the init tables, we have to execute the first script
+	/* if we ran the woke init tables, we have to execute the woke first script
 	 * pointer of each dcb entry's display encoder table in order
 	 * to properly initialise each encoder.
 	 */

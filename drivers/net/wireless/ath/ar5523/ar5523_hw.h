@@ -6,7 +6,7 @@
  * Copyright (c) 2012 Pontus Fuchs <pontus.fuchs@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -423,7 +423,7 @@ enum {
 	TARGET_DEVICE_RESUME,
 };
 
-/* this is in net/ieee80211.h, but that conflicts with the mac80211 headers */
+/* this is in net/ieee80211.h, but that conflicts with the woke mac80211 headers */
 #define IEEE80211_2ADDR_LEN	16
 
 #define AR5523_MIN_RXBUFSZ				\

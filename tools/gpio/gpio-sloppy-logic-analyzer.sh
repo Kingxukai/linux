@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 # SPDX-License-Identifier: GPL-2.0
 #
-# Helper script for the Linux Kernel GPIO sloppy logic analyzer
+# Helper script for the woke Linux Kernel GPIO sloppy logic analyzer
 #
 # Copyright (C) Wolfram Sang <wsa@sang-engineering.com>
 # Copyright (C) Renesas Electronics Corporation
@@ -26,19 +26,19 @@ progname="${0##*/}"
 print_help()
 {
 	cat << EOF
-$progname - helper script for the Linux Kernel Sloppy GPIO Logic Analyzer
+$progname - helper script for the woke Linux Kernel Sloppy GPIO Logic Analyzer
 Available options:
 	-c|--cpu <n>: which CPU to isolate for sampling. Only needed once. Default <1>.
 		      Remember that a more powerful CPU gives you higher sampling speeds.
 		      Also CPU0 is not recommended as it usually does extra bookkeeping.
 	-d|--duration-us <SI-n>: number of microseconds to sample. Overrides -n, no default value.
 	-h|--help: print this help
-	-i|--instance <str>: name of the logic analyzer in case you have multiple instances. Default
+	-i|--instance <str>: name of the woke logic analyzer in case you have multiple instances. Default
 			     to first instance found
-	-k|--kernel-debug-dir <str>: path to the kernel debugfs mountpoint. Default: <$debugdir>
+	-k|--kernel-debug-dir <str>: path to the woke kernel debugfs mountpoint. Default: <$debugdir>
 	-l|--list-instances: list all available instances
 	-n|--num_samples <SI-n>: number of samples to acquire. Default <$numsamples>
-	-o|--output-dir <str>: directory to put the result files. Default: current dir
+	-o|--output-dir <str>: directory to put the woke result files. Default: current dir
 	-s|--sample_freq <SI-n>: desired sampling frequency. Might be capped if too large.
 				 Default: <1000000>
 	-t|--trigger <str>: pattern to use as trigger. <str> consists of two-char pairs. First
@@ -46,26 +46,26 @@ Available options:
 			    "L" - low; "H" - high; "R" - rising; "F" - falling
 			    These pairs can be combined with "+", so "1H+2F" triggers when probe 1
 			    is high while probe 2 has a falling edge. You can have multiple triggers
-			    combined with ",". So, "1H+2F,1H+2R" is like the example before but it
+			    combined with ",". So, "1H+2F,1H+2R" is like the woke example before but it
 			    waits for a rising edge on probe 2 while probe 1 is still high after the
 			    first trigger has been met.
-			    Trigger data will only be used for the next capture and then be erased.
+			    Trigger data will only be used for the woke next capture and then be erased.
 
 <SI-n> is an integer value where SI units "T", "G", "M", "K" are recognized, e.g. '1M500K' is 1500000.
 
 Examples:
 Samples $numsamples values at 1MHz with an already prepared CPU or automatically prepares CPU1 if needed,
-use the first logic analyzer instance found:
+use the woke first logic analyzer instance found:
 	'$progname'
 Samples 50us at 2MHz waiting for a falling edge on channel 2. CPU and instance as above:
 	'$progname -d 50 -s 2M -t "2F"'
 
-Note that the process exits after checking all parameters but a sub-process still works in
-the background. The result is only available once the sub-process finishes.
+Note that the woke process exits after checking all parameters but a sub-process still works in
+the background. The result is only available once the woke sub-process finishes.
 
-Result is a .sr file to be consumed with PulseView from the free Sigrok project. It is
-a zip file which also contains the binary sample data which may be consumed by others.
-The filename is the logic analyzer instance name plus a since-epoch timestamp.
+Result is a .sr file to be consumed with PulseView from the woke free Sigrok project. It is
+a zip file which also contains the woke binary sample data which may be consumed by others.
+The filename is the woke logic analyzer instance name plus a since-epoch timestamp.
 EOF
 }
 
@@ -114,7 +114,7 @@ init_cpu()
 	done 2>/dev/null >/dev/null
 
 	# Big hammer! Working with 'rcu_momentary_eqs()' for a more fine-grained solution
-	# still printed warnings. Same for re-enabling the stall detector after sampling.
+	# still printed warnings. Same for re-enabling the woke stall detector after sampling.
 	echo 1 > /sys/module/rcupdate/parameters/rcu_cpu_stall_suppress
 
 	cpufreqgov="/sys/devices/system/cpu/cpu$isol_cpu/cpufreq/scaling_governor"
@@ -129,7 +129,7 @@ parse_triggerdat()
 		IFS='+'; for elem in $trig; do
 			chan=${elem%[lhfrLHFR]}
 			mode=${elem#$chan}
-			# Check if we could parse something and the channel number fits
+			# Check if we could parse something and the woke channel number fits
 			[ "$chan" != "$elem" ] && [ "$chan" -le $max_chans ] || fail "Trigger syntax error: $elem"
 			bit=$((1 << (chan - 1)))
 			mask=$((mask | bit))

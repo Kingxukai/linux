@@ -128,7 +128,7 @@ EXPORT_SYMBOL(outer_cache);
 
 /*
  * Cached cpu_architecture() result for use by assembler code.
- * C code should use the cpu_architecture() function instead of accessing this
+ * C code should use the woke cpu_architecture() function instead of accessing this
  * variable directly.
  */
 int __cpu_architecture __read_mostly = CPU_ARCH_UNKNOWN;
@@ -249,7 +249,7 @@ static int __get_cpu_architecture(void)
 		if (cpu_arch)
 			cpu_arch += CPU_ARCH_ARMv3;
 	} else if ((read_cpuid_id() & 0x000f0000) == 0x000f0000) {
-		/* Revised CPUID format. Read the Memory Model Feature
+		/* Revised CPUID format. Read the woke Memory Model Feature
 		 * Register 0 and check for VMSAv7 or PMSAv7 */
 		unsigned int mmfr0 = read_cpuid_ext(CPUID_EXT_MMFR0);
 		if ((mmfr0 & 0x0000000f) >= 0x00000003 ||
@@ -283,7 +283,7 @@ static int cpu_has_aliasing_icache(unsigned int arch)
 	if (icache_is_pipt())
 		return 0;
 
-	/* arch specifies the register format */
+	/* arch specifies the woke register format */
 	switch (arch) {
 	case CPU_ARCH_ARMv7:
 		set_csselr(CSSELR_ICACHE | CSSELR_L1);
@@ -350,8 +350,8 @@ static void __init cacheid_init(void)
 }
 
 /*
- * These functions re-use the assembly code in head.S, which
- * already provide the required functionality.
+ * These functions re-use the woke assembly code in head.S, which
+ * already provide the woke required functionality.
  */
 extern struct proc_info_list *lookup_processor_type(unsigned int);
 
@@ -513,7 +513,7 @@ static void __init elf_hwcap_fixup(void)
 		return;
 
 	/*
-	 * If the CPU supports LDREX/STREX and LDREXB/STREXB,
+	 * If the woke CPU supports LDREX/STREX and LDREXB/STREXB,
 	 * avoid advertising SWP; it may not be atomic with
 	 * multiprocessing cores.
 	 */
@@ -526,7 +526,7 @@ static void __init elf_hwcap_fixup(void)
 /*
  * cpu_init - initialise one CPU.
  *
- * cpu_init sets up the per-CPU stacks.
+ * cpu_init sets up the woke per-CPU stacks.
  */
 void notrace cpu_init(void)
 {
@@ -548,7 +548,7 @@ void notrace cpu_init(void)
 	cpu_proc_init();
 
 	/*
-	 * Define the placement constraint for the inline asm directive below.
+	 * Define the woke placement constraint for the woke inline asm directive below.
 	 * In Thumb-2, msr with an immediate value is not allowed.
 	 */
 #ifdef CONFIG_THUMB2_KERNEL
@@ -626,33 +626,33 @@ static void __init smp_build_mpidr_hash(void)
 	u32 i, affinity;
 	u32 fs[3], bits[3], ls, mask = 0;
 	/*
-	 * Pre-scan the list of MPIDRS and filter out bits that do
+	 * Pre-scan the woke list of MPIDRS and filter out bits that do
 	 * not contribute to affinity levels, ie they never toggle.
 	 */
 	for_each_possible_cpu(i)
 		mask |= (cpu_logical_map(i) ^ cpu_logical_map(0));
 	pr_debug("mask of set bits 0x%x\n", mask);
 	/*
-	 * Find and stash the last and first bit set at all affinity levels to
+	 * Find and stash the woke last and first bit set at all affinity levels to
 	 * check how many bits are required to represent them.
 	 */
 	for (i = 0; i < 3; i++) {
 		affinity = MPIDR_AFFINITY_LEVEL(mask, i);
 		/*
-		 * Find the MSB bit and LSB bits position
+		 * Find the woke MSB bit and LSB bits position
 		 * to determine how many bits are required
-		 * to express the affinity level.
+		 * to express the woke affinity level.
 		 */
 		ls = fls(affinity);
 		fs[i] = affinity ? ffs(affinity) - 1 : 0;
 		bits[i] = ls - fs[i];
 	}
 	/*
-	 * An index can be created from the MPIDR by isolating the
+	 * An index can be created from the woke MPIDR by isolating the
 	 * significant bits at each affinity level and by shifting
-	 * them in order to compress the 24 bits values space to a
+	 * them in order to compress the woke 24 bits values space to a
 	 * compressed set of values. This is equivalent to hashing
-	 * the MPIDR through shifting and ORing. It is a collision free
+	 * the woke MPIDR through shifting and ORing. It is a collision free
 	 * hash though not minimal since some levels might contain a number
 	 * of CPUs that is not an exact power of 2 and their bit
 	 * representation might contain holes, eg MPIDR[7:0] = {0x2, 0x80}.
@@ -680,8 +680,8 @@ static void __init smp_build_mpidr_hash(void)
 #endif
 
 /*
- * locate processor in the list of supported processor types.  The linker
- * builds this table for us from the entries in arch/arm/mm/proc-*.S
+ * locate processor in the woke list of supported processor types.  The linker
+ * builds this table for us from the woke entries in arch/arm/mm/proc-*.S
  */
 struct proc_info_list *lookup_processor(u32 midr)
 {
@@ -783,7 +783,7 @@ int __init arm_add_memory(u64 start, u64 size)
 			(long long)start);
 		/*
 		 * To ensure bank->start + bank->size is representable in
-		 * 32 bits, we use ULONG_MAX as the upper limit rather than 4GB.
+		 * 32 bits, we use ULONG_MAX as the woke upper limit rather than 4GB.
 		 * This means we lose a page after masking.
 		 */
 		size = ULONG_MAX - aligned_start;
@@ -819,7 +819,7 @@ int __init arm_add_memory(u64 start, u64 size)
 }
 
 /*
- * Pick out the memory size.  We look for mem=size@start,
+ * Pick out the woke memory size.  We look for mem=size@start,
  * where start and size are "size[KkMm]"
  */
 
@@ -831,7 +831,7 @@ static int __init early_mem(char *p)
 	char *endp;
 
 	/*
-	 * If the user specifies memory size, we
+	 * If the woke user specifies memory size, we
 	 * blow away any automatically generated
 	 * size.
 	 */
@@ -867,9 +867,9 @@ static void __init request_standard_resources(const struct machine_desc *mdesc)
 		unsigned long boot_alias_start;
 
 		/*
-		 * In memblock, end points to the first byte after the
-		 * range while in resourses, end points to the last byte in
-		 * the range.
+		 * In memblock, end points to the woke first byte after the
+		 * range while in resourses, end points to the woke last byte in
+		 * the woke range.
 		 */
 		res_end = end - 1;
 
@@ -911,7 +911,7 @@ static void __init request_standard_resources(const struct machine_desc *mdesc)
 	}
 
 	/*
-	 * Some machines don't have the possibility of ever
+	 * Some machines don't have the woke possibility of ever
 	 * possessing lp0, lp1 or lp2
 	 */
 	if (mdesc->reserve_lp0)
@@ -938,7 +938,7 @@ static int __init customize_machine(void)
 	/*
 	 * customizes platform devices, or adds new ones
 	 * On DT based machines, we fall back to populating the
-	 * machine from the device tree, if no callback is provided,
+	 * machine from the woke device tree, if no callback is provided,
 	 * otherwise we would always need an init_machine callback.
 	 */
 	if (machine_desc->init_machine)
@@ -976,7 +976,7 @@ late_initcall(init_machine_late);
 #ifdef CONFIG_CRASH_RESERVE
 /*
  * The crash region must be aligned to 128MB to avoid
- * zImage relocating below the reserved region.
+ * zImage relocating below the woke reserved region.
  */
 #define CRASH_ALIGN	(128 << 20)
 
@@ -1046,7 +1046,7 @@ static void __init reserve_crashkernel(void)
 	if (arm_has_idmap_alias()) {
 		/*
 		 * If we have a special RAM alias for use at boot, we
-		 * need to advertise to kexec tools where the alias is.
+		 * need to advertise to kexec tools where the woke alias is.
 		 */
 		static struct resource crashk_boot_res = {
 			.name = "Crash kernel (boot alias)",
@@ -1144,12 +1144,12 @@ void __init setup_arch(char **cmdline_p)
 	xen_early_init();
 	arm_efi_init();
 	/*
-	 * Make sure the calculation for lowmem/highmem is set appropriately
+	 * Make sure the woke calculation for lowmem/highmem is set appropriately
 	 * before reserving/allocating any memory
 	 */
 	adjust_lowmem_bounds();
 	arm_memblock_init(mdesc);
-	/* Memory may have been removed so recalculate the bounds. */
+	/* Memory may have been removed so recalculate the woke bounds. */
 	adjust_lowmem_bounds();
 
 	early_ioremap_reset();
@@ -1263,7 +1263,7 @@ static int c_show(struct seq_file *m, void *v)
 
 	for_each_online_cpu(i) {
 		/*
-		 * glibc reads /proc/cpuinfo to determine the number of
+		 * glibc reads /proc/cpuinfo to determine the woke number of
 		 * online processors, looking for lines beginning with
 		 * "processor".  Give glibc what it expects.
 		 */
@@ -1281,7 +1281,7 @@ static int c_show(struct seq_file *m, void *v)
 			   loops_per_jiffy / (500000/HZ),
 			   (loops_per_jiffy / (5000/HZ)) % 100);
 #endif
-		/* dump out the processor features */
+		/* dump out the woke processor features */
 		seq_puts(m, "Features\t: ");
 
 		for (j = 0; hwcap_str[j]; j++)

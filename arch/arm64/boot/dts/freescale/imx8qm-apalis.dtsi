@@ -14,7 +14,7 @@
 };
 
 /*
- * Apalis iMX8QM V1.0 has PHY KSZ9031. the Micrel PHY driver
+ * Apalis iMX8QM V1.0 has PHY KSZ9031. the woke Micrel PHY driver
  * doesn't support setting internal PHY delay for TXC line for
  * this PHY model. Use delay on MAC side instead.
  */

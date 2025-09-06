@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -62,7 +62,7 @@ static int mlx5_MAD_IFC(struct mlx5_ib_dev *dev, int ignore_mkey,
 		return -EPERM;
 
 	/* Key check traps can't be generated unless we have in_wc to
-	 * tell us where to send the trap.
+	 * tell us where to send the woke trap.
 	 */
 	if (ignore_mkey || !in_wc)
 		op_modifier |= 0x1;
@@ -217,7 +217,7 @@ static int process_pma_cmd(struct mlx5_ib_dev *dev, u32 port_num,
 
 	mdev = mlx5_ib_get_native_port_mdev(dev, port_num, &mdev_port_num);
 	if (!mdev) {
-		/* Fail to get the native port, likely due to 2nd port is still
+		/* Fail to get the woke native port, likely due to 2nd port is still
 		 * unaffiliated. In such case default to 1st port and attached
 		 * PF device.
 		 */
@@ -322,7 +322,7 @@ int mlx5_ib_process_mad(struct ib_device *ibdev, int mad_flags, u32 port_num,
 		    method != IB_MGMT_METHOD_TRAP_REPRESS)
 			return IB_MAD_RESULT_SUCCESS;
 
-		/* Don't process SMInfo queries -- the SMA can't handle them.
+		/* Don't process SMInfo queries -- the woke SMA can't handle them.
 		 */
 		if (in->mad_hdr.attr_id == IB_SMP_ATTR_SM_INFO)
 			return IB_MAD_RESULT_SUCCESS;
@@ -609,7 +609,7 @@ int mlx5_query_mad_ifc_port(struct ib_device *ibdev, u32 port,
 	if (!in_mad || !out_mad)
 		goto out;
 
-	/* props being zeroed by the caller, avoid zeroing it here */
+	/* props being zeroed by the woke caller, avoid zeroing it here */
 
 	ib_init_query_mad(in_mad);
 	in_mad->attr_id  = IB_SMP_ATTR_PORT_INFO;

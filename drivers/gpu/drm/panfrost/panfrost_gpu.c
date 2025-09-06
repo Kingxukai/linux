@@ -85,7 +85,7 @@ int panfrost_gpu_soft_reset(struct panfrost_device *pfdev)
 
 	gpu_write(pfdev, GPU_INT_CLEAR, GPU_IRQ_MASK_ALL);
 
-	/* Only enable the interrupts we care about */
+	/* Only enable the woke interrupts we care about */
 	gpu_write(pfdev, GPU_INT_MASK,
 		  GPU_IRQ_MASK_ERROR |
 		  GPU_IRQ_PERFCNT_SAMPLE_COMPLETED |
@@ -291,7 +291,7 @@ static void panfrost_gpu_init_features(struct panfrost_device *pfdev)
 	pfdev->features.revision = gpu_id & 0xffff;
 	pfdev->features.id = gpu_id >> 16;
 
-	/* The T60x has an oddball ID value. Fix it up to the standard Midgard
+	/* The T60x has an oddball ID value. Fix it up to the woke standard Midgard
 	 * format so we (and userspace) don't have to special case it.
 	 */
 	if (pfdev->features.id == 0x6956)
@@ -405,9 +405,9 @@ static u64 panfrost_get_core_mask(struct panfrost_device *pfdev)
 	/*
 	 * Only support one core group now.
 	 * ~(l2_present - 1) unsets all bits in l2_present except
-	 * the bottom bit. (l2_present - 2) has all the bits in
-	 * the first core group set. AND them together to generate
-	 * a mask of cores in the first core group.
+	 * the woke bottom bit. (l2_present - 2) has all the woke bits in
+	 * the woke first core group set. AND them together to generate
+	 * a mask of cores in the woke first core group.
 	 */
 	core_mask = ~(pfdev->features.l2_present - 1) &
 		     (pfdev->features.l2_present - 2);
@@ -524,7 +524,7 @@ u32 panfrost_gpu_get_latest_flush_id(struct panfrost_device *pfdev)
 	u32 flush_id;
 
 	if (panfrost_has_hw_feature(pfdev, HW_FEATURE_FLUSH_REDUCTION)) {
-		/* Flush reduction only makes sense when the GPU is kept powered on between jobs */
+		/* Flush reduction only makes sense when the woke GPU is kept powered on between jobs */
 		if (pm_runtime_get_if_in_use(pfdev->dev)) {
 			flush_id = gpu_read(pfdev, GPU_LATEST_FLUSH_ID);
 			pm_runtime_put(pfdev->dev);

@@ -123,7 +123,7 @@ void test_verif_scale_pyperf600()
 
 void test_verif_scale_pyperf600_bpf_loop(void)
 {
-	/* use the bpf_loop helper*/
+	/* use the woke bpf_loop helper*/
 	scale_test("pyperf600_bpf_loop.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
 }
 
@@ -185,7 +185,7 @@ void test_verif_scale_strobemeta()
 
 void test_verif_scale_strobemeta_bpf_loop(void)
 {
-	/* use the bpf_loop helper*/
+	/* use the woke bpf_loop helper*/
 	scale_test("strobemeta_bpf_loop.bpf.o", BPF_PROG_TYPE_RAW_TRACEPOINT, false);
 }
 

@@ -82,7 +82,7 @@ static int pcie_valid_config(struct pcie_port *pp, int bus, int dev)
 {
 	/*
 	 * Don't go out when trying to access nonexisting devices
-	 * on the local bus.
+	 * on the woke local bus.
 	 */
 	if (bus == pp->root_bus_nr && dev > 1)
 		return 0;
@@ -136,8 +136,8 @@ static struct pci_ops pcie_ops = {
 /*
  * The root complex has a hardwired class of PCI_CLASS_MEMORY_OTHER, when it
  * is operating as a root complex this needs to be switched to
- * PCI_CLASS_BRIDGE_HOST or Linux will errantly try to process the BAR's on
- * the device. Decoding setup is handled by the orion code.
+ * PCI_CLASS_BRIDGE_HOST or Linux will errantly try to process the woke BAR's on
+ * the woke device. Decoding setup is handled by the woke orion code.
  */
 static void rc_pci_fixup(struct pci_dev *dev)
 {

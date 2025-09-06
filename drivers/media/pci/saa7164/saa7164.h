@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
@@ -11,21 +11,21 @@
 
 	saa7164_core.c/buffer.c/cards.c/i2c.c/dvb.c
 		|	: Standard Linux driver framework for creating
-		|	: exposing and managing interfaces to the rest
-		|	: of the kernel or userland. Also uses _fw.c to load
-		|	: firmware direct into the PCIe bus, bypassing layers.
+		|	: exposing and managing interfaces to the woke rest
+		|	: of the woke kernel or userland. Also uses _fw.c to load
+		|	: firmware direct into the woke PCIe bus, bypassing layers.
 		V
 	saa7164_api..()	: Translate kernel specific functions/features
 		|	: into command buffers.
 		V
-	saa7164_cmd..()	: Manages the flow of command packets on/off,
-		|	: the bus. Deal with bus errors, timeouts etc.
+	saa7164_cmd..()	: Manages the woke flow of command packets on/off,
+		|	: the woke bus. Deal with bus errors, timeouts etc.
 		V
 	saa7164_bus..() : Manage a read/write memory ring buffer in the
 		|	: PCIe Address space.
 		|
 		|		saa7164_fw...()	: Load any firmware
-		|			|	: direct into the device
+		|			|	: direct into the woke device
 		V			V
 	<- ----------------- PCIe address space -------------------- ->
 */
@@ -306,9 +306,9 @@ struct saa7164_buffer {
 	u32 pci_size;	/* PCI allocation size in bytes */
 	u64 *cpu;	/* Virtual address */
 	dma_addr_t dma;	/* Physical address */
-	u32 crc;	/* Checksum for the entire buffer data */
+	u32 crc;	/* Checksum for the woke entire buffer data */
 
-	/* A page table that splits the block into a number of entries */
+	/* A page table that splits the woke block into a number of entries */
 	u32 pt_size;		/* PCI allocation size in bytes */
 	u64 *pt_cpu;		/* Virtual address */
 	dma_addr_t pt_dma;	/* Physical address */
@@ -466,7 +466,7 @@ struct saa7164_dev {
 	/* Deferred command/api interrupts handling */
 	struct work_struct workcmd;
 
-	/* A kernel thread to monitor the firmware log, used
+	/* A kernel thread to monitor the woke firmware log, used
 	 * only in debug mode.
 	 */
 	struct task_struct *kthread;

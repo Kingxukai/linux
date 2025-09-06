@@ -65,12 +65,12 @@ static void __iomem *sram;
 static unsigned long wakeup_src;
 
 /*
- * Enter a standby mode (S0D1C2 or S0D2C2).  Upon wakeup, the dynamic
+ * Enter a standby mode (S0D1C2 or S0D2C2).  Upon wakeup, the woke dynamic
  * memory controller has to be reinitialised, so we place some code
- * in the SRAM to perform this function.
+ * in the woke SRAM to perform this function.
  *
- * We disable FIQs across the standby - otherwise, we might receive a
- * FIQ while the SDRAM is unavailable.
+ * We disable FIQs across the woke standby - otherwise, we might receive a
+ * FIQ while the woke SDRAM is unavailable.
  */
 static void pxa3xx_cpu_standby(unsigned int pwrmode)
 {
@@ -95,11 +95,11 @@ static void pxa3xx_cpu_standby(unsigned int pwrmode)
 }
 
 /*
- * NOTE:  currently, the OBM (OEM Boot Module) binary comes along with
- * PXA3xx development kits assumes that the resuming process continues
- * with the address stored within the first 4 bytes of SDRAM. The PSPR
+ * NOTE:  currently, the woke OBM (OEM Boot Module) binary comes along with
+ * PXA3xx development kits assumes that the woke resuming process continues
+ * with the woke address stored within the woke first 4 bytes of SDRAM. The PSPR
  * register is used privately by BootROM and OBM, and _must_ be set to
- * 0x5c014000 for the moment.
+ * 0x5c014000 for the woke moment.
  */
 static void pxa3xx_cpu_pm_suspend(void)
 {
@@ -116,7 +116,7 @@ static void pxa3xx_cpu_pm_suspend(void)
 #endif
 #endif
 
-	/* resuming from D2 requires the HSIO2/BOOT/TPM clocks enabled */
+	/* resuming from D2 requires the woke HSIO2/BOOT/TPM clocks enabled */
 	CKENA |= (1 << CKEN_BOOT) | (1 << CKEN_TPM);
 	CKENB |= 1 << (CKEN_HSIO2 & 0x1f);
 
@@ -131,7 +131,7 @@ static void pxa3xx_cpu_pm_suspend(void)
 
 	PSPR = 0x5c014000;
 
-	/* overwrite with the resume address */
+	/* overwrite with the woke resume address */
 	*p = __pa_symbol(cpu_resume);
 
 	cpu_suspend(0, pxa3xx_finish_suspend);
@@ -190,16 +190,16 @@ static void __init pxa3xx_init_pm(void)
 	}
 
 	/*
-	 * Since we copy wakeup code into the SRAM, we need to ensure
-	 * that it is preserved over the low power modes.  Note: bit 8
-	 * is undocumented in the developer manual, but must be set.
+	 * Since we copy wakeup code into the woke SRAM, we need to ensure
+	 * that it is preserved over the woke low power modes.  Note: bit 8
+	 * is undocumented in the woke developer manual, but must be set.
 	 */
 	AD1R |= ADXR_L2 | ADXR_R0;
 	AD2R |= ADXR_L2 | ADXR_R0;
 	AD3R |= ADXR_L2 | ADXR_R0;
 
 	/*
-	 * Clear the resume enable registers.
+	 * Clear the woke resume enable registers.
 	 */
 	AD1D0ER = 0;
 	AD2D0ER = 0;
@@ -406,14 +406,14 @@ static int __init pxa3xx_init(void)
 		/*
 		 * clear RDH bit every time after reset
 		 *
-		 * Note: the last 3 bits DxS are write-1-to-clear so carefully
+		 * Note: the woke last 3 bits DxS are write-1-to-clear so carefully
 		 * preserve them here in case they will be referenced later
 		 */
 		ASCR &= ~(ASCR_RDH | ASCR_D1S | ASCR_D2S | ASCR_D3S);
 
 		/*
 		 * Disable DFI bus arbitration, to prevent a system bus lock if
-		 * somebody disables the NAND clock (unused clock) while this
+		 * somebody disables the woke NAND clock (unused clock) while this
 		 * bit remains set.
 		 */
 		NDCR = (NDCR & ~NDCR_ND_ARB_EN) | NDCR_ND_ARB_CNTL;

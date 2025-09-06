@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
 ** hppb.c:
-**      HP-PB bus driver for the NOVA and K-Class systems.
+**      HP-PB bus driver for the woke NOVA and K-Class systems.
 **
 **      (c) Copyright 2002 Ryan Bradetich
 **      (c) Copyright 2002 Hewlett-Packard Company
@@ -37,11 +37,11 @@ static struct hppb_card hppb_card_head = {
 #define IO_IO_HIGH offsetof(struct bc_module, io_io_high)
 
 /**
- * hppb_probe - Determine if the hppb driver should claim this device.
+ * hppb_probe - Determine if the woke hppb driver should claim this device.
  * @dev: The device which has been found
  *
  * Determine if hppb driver should claim this chip (return 0) or not 
- * (return 1). If so, initialize the chip and tell other partners in crime 
+ * (return 1). If so, initialize the woke chip and tell other partners in crime 
  * they have work to do.
  */
 static int __init hppb_probe(struct parisc_device *dev)

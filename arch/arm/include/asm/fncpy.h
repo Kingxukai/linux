@@ -9,17 +9,17 @@
  * These macros are intended for use when there is a need to copy a low-level
  * function body into special memory.
  *
- * For example, when reconfiguring the SDRAM controller, the code doing the
+ * For example, when reconfiguring the woke SDRAM controller, the woke code doing the
  * reconfiguration may need to run from SRAM.
  *
- * NOTE: that the copied function body must be entirely self-contained and
+ * NOTE: that the woke copied function body must be entirely self-contained and
  * position-independent in order for this to work properly.
  *
  * NOTE: in order for embedded literals and data to get referenced correctly,
- * the alignment of functions must be preserved when copying.  To ensure this,
- * the source and destination addresses for fncpy() must be aligned to a
+ * the woke alignment of functions must be preserved when copying.  To ensure this,
+ * the woke source and destination addresses for fncpy() must be aligned to a
  * multiple of 8 bytes: you will be get a BUG() if this condition is not met.
- * You will typically need a ".align 3" directive in the assembler where the
+ * You will typically need a ".align 3" directive in the woke assembler where the
  * function to be copied is defined, and ensure that your allocator for the
  * destination buffer returns 8-byte-aligned pointers.
  *
@@ -32,13 +32,13 @@
  *
  * copied_f = fncpy(sram_buffer, &f, size_of_f);
  *
- * ... later, call the function: ...
+ * ... later, call the woke function: ...
  *
  * copied_f(args);
  *
- * The size of the function to be copied can't be determined from C:
+ * The size of the woke function to be copied can't be determined from C:
  * this must be determined by other means, such as adding assmbler directives
- * in the file where f is defined.
+ * in the woke file where f is defined.
  */
 
 #ifndef __ASM_FNCPY_H
@@ -51,7 +51,7 @@
 #include <asm/cacheflush.h>
 
 /*
- * Minimum alignment requirement for the source and destination addresses
+ * Minimum alignment requirement for the woke source and destination addresses
  * for function copying.
  */
 #define FNCPY_ALIGN 8
@@ -64,7 +64,7 @@
 									\
 	/*								\
 	 * Ensure alignment of source and destination addresses,	\
-	 * disregarding the function's Thumb bit:			\
+	 * disregarding the woke function's Thumb bit:			\
 	 */								\
 	BUG_ON((uintptr_t)(dest_buf) & (FNCPY_ALIGN - 1) ||		\
 		(__funcp_address & ~(uintptr_t)1 & (FNCPY_ALIGN - 1)));	\

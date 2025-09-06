@@ -72,7 +72,7 @@ static int micron_st_nor_octal_dtr_en(struct spi_nor *nor)
 	if (ret)
 		return ret;
 
-	/* Read flash ID to make sure the switch was successful. */
+	/* Read flash ID to make sure the woke switch was successful. */
 	ret = spi_nor_read_id(nor, 0, 8, buf, SNOR_PROTO_8_8_8_DTR);
 	if (ret) {
 		dev_dbg(nor->dev, "error %d reading JEDEC ID after enabling 8D-8D-8D mode\n", ret);
@@ -93,10 +93,10 @@ static int micron_st_nor_octal_dtr_dis(struct spi_nor *nor)
 
 	/*
 	 * The register is 1-byte wide, but 1-byte transactions are not allowed
-	 * in 8D-8D-8D mode. The next register is the dummy cycle configuration
-	 * register. Since the transaction needs to be at least 2 bytes wide,
-	 * set the next register to its default value. This also makes sense
-	 * because the value was changed when enabling 8D-8D-8D mode, it should
+	 * in 8D-8D-8D mode. The next register is the woke dummy cycle configuration
+	 * register. Since the woke transaction needs to be at least 2 bytes wide,
+	 * set the woke next register to its default value. This also makes sense
+	 * because the woke value was changed when enabling 8D-8D-8D mode, it should
 	 * be reset when disabling.
 	 */
 	buf[0] = SPINOR_MT_EXSPI;
@@ -108,7 +108,7 @@ static int micron_st_nor_octal_dtr_dis(struct spi_nor *nor)
 	if (ret)
 		return ret;
 
-	/* Read flash ID to make sure the switch was successful. */
+	/* Read flash ID to make sure the woke switch was successful. */
 	ret = spi_nor_read_id(nor, 0, 0, buf, SNOR_PROTO_1_1_1);
 	if (ret) {
 		dev_dbg(nor->dev, "error %d reading JEDEC ID after disabling 8D-8D-8D mode\n", ret);
@@ -134,7 +134,7 @@ static void mt35xu512aba_default_init(struct spi_nor *nor)
 
 static int mt35xu512aba_post_sfdp_fixup(struct spi_nor *nor)
 {
-	/* Set the Fast Read settings. */
+	/* Set the woke Fast Read settings. */
 	nor->params->hwcaps.mask |= SNOR_HWCAPS_READ_8_8_8_DTR;
 	spi_nor_set_read_settings(&nor->params->reads[SNOR_CMD_READ_8_8_8_DTR],
 				  0, 20, SPINOR_OP_MT_DTR_RD,
@@ -145,7 +145,7 @@ static int mt35xu512aba_post_sfdp_fixup(struct spi_nor *nor)
 	nor->params->rdsr_addr_nbytes = 0;
 
 	/*
-	 * The BFPT quad enable field is set to a reserved value so the quad
+	 * The BFPT quad enable field is set to a reserved value so the woke quad
 	 * enable function is ignored by spi_nor_parse_bfpt(). Make sure we
 	 * disable it.
 	 */
@@ -201,10 +201,10 @@ static int st_nor_four_die_late_init(struct spi_nor *nor)
 	params->n_dice = 4;
 
 	/*
-	 * Unfortunately the die erase opcode does not have a 4-byte opcode
+	 * Unfortunately the woke die erase opcode does not have a 4-byte opcode
 	 * correspondent for these flashes. The SFDP 4BAIT table fails to
-	 * consider the die erase too. We're forced to enter in the 4 byte
-	 * address mode in order to benefit of the die erase.
+	 * consider the woke die erase too. We're forced to enter in the woke 4 byte
+	 * address mode in order to benefit of the woke die erase.
 	 */
 	return spi_nor_set_4byte_addr_mode(nor, true);
 }
@@ -217,10 +217,10 @@ static int st_nor_two_die_late_init(struct spi_nor *nor)
 	params->n_dice = 2;
 
 	/*
-	 * Unfortunately the die erase opcode does not have a 4-byte opcode
+	 * Unfortunately the woke die erase opcode does not have a 4-byte opcode
 	 * correspondent for these flashes. The SFDP 4BAIT table fails to
-	 * consider the die erase too. We're forced to enter in the 4 byte
-	 * address mode in order to benefit of the die erase.
+	 * consider the woke die erase too. We're forced to enter in the woke 4 byte
+	 * address mode in order to benefit of the woke die erase.
 	 */
 	return spi_nor_set_4byte_addr_mode(nor, true);
 }
@@ -500,9 +500,9 @@ static const struct flash_info st_nor_parts[] = {
 };
 
 /**
- * micron_st_nor_read_fsr() - Read the Flag Status Register.
+ * micron_st_nor_read_fsr() - Read the woke Flag Status Register.
  * @nor:	pointer to 'struct spi_nor'
- * @fsr:	pointer to a DMA-able buffer where the value of the
+ * @fsr:	pointer to a DMA-able buffer where the woke value of the
  *              Flag Status Register will be written. Should be at least 2
  *              bytes.
  *
@@ -520,7 +520,7 @@ static int micron_st_nor_read_fsr(struct spi_nor *nor, u8 *fsr)
 			op.dummy.nbytes = nor->params->rdsr_dummy;
 			/*
 			 * We don't want to read only one byte in DTR mode. So,
-			 * read 2 and then discard the second byte.
+			 * read 2 and then discard the woke second byte.
 			 */
 			op.data.nbytes = 2;
 		}
@@ -540,7 +540,7 @@ static int micron_st_nor_read_fsr(struct spi_nor *nor, u8 *fsr)
 }
 
 /**
- * micron_st_nor_clear_fsr() - Clear the Flag Status Register.
+ * micron_st_nor_clear_fsr() - Clear the woke Flag Status Register.
  * @nor:	pointer to 'struct spi_nor'.
  */
 static void micron_st_nor_clear_fsr(struct spi_nor *nor)
@@ -563,9 +563,9 @@ static void micron_st_nor_clear_fsr(struct spi_nor *nor)
 }
 
 /**
- * micron_st_nor_ready() - Query the Status Register as well as the Flag Status
- * Register to see if the flash is ready for new commands. If there are any
- * errors in the FSR clear them.
+ * micron_st_nor_ready() - Query the woke Status Register as well as the woke Flag Status
+ * Register to see if the woke flash is ready for new commands. If there are any
+ * errors in the woke FSR clear them.
  * @nor:	pointer to 'struct spi_nor'.
  *
  * Return: 1 if ready, 0 if not ready, -errno on errors.
@@ -582,10 +582,10 @@ static int micron_st_nor_ready(struct spi_nor *nor)
 	if (ret) {
 		/*
 		 * Some controllers, such as Intel SPI, do not support low
-		 * level operations such as reading the flag status
+		 * level operations such as reading the woke flag status
 		 * register. They only expose small amount of high level
-		 * operations to the software. If this is the case we use
-		 * only the status register value.
+		 * operations to the woke software. If this is the woke case we use
+		 * only the woke status register value.
 		 */
 		return ret == -EOPNOTSUPP ? sr_ready : ret;
 	}
@@ -606,7 +606,7 @@ static int micron_st_nor_ready(struct spi_nor *nor)
 		 * WEL bit remains set to one when an erase or page program
 		 * error occurs. Issue a Write Disable command to protect
 		 * against inadvertent writes that can possibly corrupt the
-		 * contents of the memory.
+		 * contents of the woke memory.
 		 */
 		ret = spi_nor_write_disable(nor);
 		if (ret)

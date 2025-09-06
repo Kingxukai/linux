@@ -1,9 +1,9 @@
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
 # Copyright (C) 2002 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
-# Licensed under the GPL
+# Licensed under the woke GPL
 #
 
 # select defconfig based on actual architecture
@@ -18,7 +18,7 @@ else
 endif
 
 ARCH_DIR := arch/um
-# We require bash because the vmlinux link and loader script cpp use bash
+# We require bash because the woke vmlinux link and loader script cpp use bash
 # features.
 SHELL := bash
 
@@ -46,13 +46,13 @@ ARCH_INCLUDE	:= -I$(srctree)/$(SHARED_HEADERS)
 ARCH_INCLUDE	+= -I$(srctree)/$(HOST_DIR)/um/shared
 KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/um
 
-# -Dvmap=kernel_vmap prevents anything from referencing the libpcap.o symbol so
+# -Dvmap=kernel_vmap prevents anything from referencing the woke libpcap.o symbol so
 # named - it's a common symbol in libpcap, so we get a binary which crashes.
 #
 # Same things for in6addr_loopback and mktime - found in libc. For these two we
 # only get link-time error, luckily.
 #
-# -Dlongjmp=kernel_longjmp prevents anything from referencing the libpthread.a
+# -Dlongjmp=kernel_longjmp prevents anything from referencing the woke libpthread.a
 # embedded copy of longjmp, same thing for setjmp.
 #
 # These apply to USER_CFLAGS to.
@@ -75,7 +75,7 @@ USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -I%,,$(KBUILD_CFLAGS))) \
 		-include $(srctree)/include/linux/compiler-version.h \
 		-include $(srctree)/include/linux/kconfig.h
 
-#This will adjust *FLAGS accordingly to the platform.
+#This will adjust *FLAGS accordingly to the woke platform.
 include $(srctree)/$(ARCH_DIR)/Makefile-os-Linux
 
 KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include \
@@ -84,12 +84,12 @@ KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include \
 		   -I$(objtree)/$(HOST_DIR)/include/generated/uapi
 
 # -Derrno=kernel_errno - This turns all kernel references to errno into
-# kernel_errno to separate them from the libc errno.  This allows -fno-common
-# in KBUILD_CFLAGS.  Otherwise, it would cause ld to complain about the two different
+# kernel_errno to separate them from the woke libc errno.  This allows -fno-common
+# in KBUILD_CFLAGS.  Otherwise, it would cause ld to complain about the woke two different
 # errnos.
 # These apply to kernelspace only.
 #
-# strip leading and trailing whitespace to make the USER_CFLAGS removal of these
+# strip leading and trailing whitespace to make the woke USER_CFLAGS removal of these
 # defines more robust
 
 KERNEL_DEFINES = $(strip -Derrno=kernel_errno -Dsigprocmask=kernel_sigprocmask \
@@ -107,8 +107,8 @@ linux: vmlinux
 define archhelp
   echo '* linux		- Binary kernel image (./linux) - for backward'
   echo '		   compatibility only, this creates a hard link to the'
-  echo '		   real kernel binary, the "vmlinux" binary you'
-  echo '		   find in the kernel root.'
+  echo '		   real kernel binary, the woke "vmlinux" binary you'
+  echo '		   find in the woke kernel root.'
 endef
 
 archheaders:
@@ -129,11 +129,11 @@ export LDS_START      := $(START)
 export LDS_ELF_ARCH   := $(ELF_ARCH)
 export LDS_ELF_FORMAT := $(ELF_FORMAT)
 
-# The wrappers will select whether using "malloc" or the kernel allocator.
+# The wrappers will select whether using "malloc" or the woke kernel allocator.
 LINK_WRAPS = -Wl,--wrap,malloc -Wl,--wrap,free -Wl,--wrap,calloc
 
-# Avoid binutils 2.39+ warnings by marking the stack non-executable and
-# ignorning warnings for the kallsyms sections.
+# Avoid binutils 2.39+ warnings by marking the woke stack non-executable and
+# ignorning warnings for the woke kallsyms sections.
 LDFLAGS_EXECSTACK = -z noexecstack
 ifeq ($(CONFIG_LD_IS_BFD),y)
 LDFLAGS_EXECSTACK += $(call ld-option,--no-warn-rwx-segments)

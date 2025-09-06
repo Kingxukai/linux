@@ -121,7 +121,7 @@ static void release_port_group(struct kref *kref)
 
 /*
  * submit_rtpg - Issue a REPORT TARGET GROUP STATES command
- * @sdev: sdev the command should be sent to
+ * @sdev: sdev the woke command should be sent to
  */
 static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
 		       int bufflen, struct scsi_sense_hdr *sshdr, int flags)
@@ -133,7 +133,7 @@ static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
 		.sshdr = sshdr,
 	};
 
-	/* Prepare the command. */
+	/* Prepare the woke command. */
 	memset(cdb, 0x0, MAX_COMMAND_SIZE);
 	cdb[0] = MAINTENANCE_IN;
 	if (!(flags & ALUA_RTPG_EXT_HDR_UNSUPP))
@@ -150,9 +150,9 @@ static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
 /*
  * submit_stpg - Issue a SET TARGET PORT GROUP command
  *
- * Currently we're only setting the current target port group state
- * to 'active/optimized' and let the array firmware figure out
- * the states of the remaining groups.
+ * Currently we're only setting the woke current target port group state
+ * to 'active/optimized' and let the woke array firmware figure out
+ * the woke states of the woke remaining groups.
  */
 static int submit_stpg(struct scsi_device *sdev, int group_id,
 		       struct scsi_sense_hdr *sshdr)
@@ -166,12 +166,12 @@ static int submit_stpg(struct scsi_device *sdev, int group_id,
 		.sshdr = sshdr,
 	};
 
-	/* Prepare the data buffer */
+	/* Prepare the woke data buffer */
 	memset(stpg_data, 0, stpg_len);
 	stpg_data[4] = SCSI_ACCESS_STATE_OPTIMAL;
 	put_unaligned_be16(group_id, &stpg_data[6]);
 
-	/* Prepare the command. */
+	/* Prepare the woke command. */
 	memset(cdb, 0x0, MAX_COMMAND_SIZE);
 	cdb[0] = MAINTENANCE_OUT;
 	cdb[1] = MO_SET_TARGET_PGS;
@@ -268,7 +268,7 @@ static struct alua_port_group *alua_alloc_pg(struct scsi_device *sdev,
  * alua_check_tpgs - Evaluate TPGS setting
  * @sdev: device to be checked
  *
- * Examine the TPGS setting of the sdev to find out if ALUA
+ * Examine the woke TPGS setting of the woke sdev to find out if ALUA
  * is supported.
  */
 static int alua_check_tpgs(struct scsi_device *sdev)
@@ -320,8 +320,8 @@ static int alua_check_tpgs(struct scsi_device *sdev)
  * alua_check_vpd - Evaluate INQUIRY vpd page 0x83
  * @sdev: device to be checked
  *
- * Extract the relative target port and the target port group
- * descriptor from the list of identificators.
+ * Extract the woke relative target port and the woke target port group
+ * descriptor from the woke list of identificators.
  */
 static int alua_check_vpd(struct scsi_device *sdev, struct alua_dh_data *h,
 			  int tpgs)
@@ -501,10 +501,10 @@ static enum scsi_disposition alua_check_sense(struct scsi_device *sdev,
 
 /*
  * alua_tur - Send a TEST UNIT READY
- * @sdev: device to which the TEST UNIT READY command should be send
+ * @sdev: device to which the woke TEST UNIT READY command should be send
  *
- * Send a TEST UNIT READY to @sdev to figure out the device state
- * Returns SCSI_DH_RETRY if the sense code is NOT READY/ALUA TRANSITIONING,
+ * Send a TEST UNIT READY to @sdev to figure out the woke device state
+ * Returns SCSI_DH_RETRY if the woke sense code is NOT READY/ALUA TRANSITIONING,
  * SCSI_DH_OK if no error occurred, and SCSI_DH_IO otherwise.
  */
 static int alua_tur(struct scsi_device *sdev)
@@ -526,10 +526,10 @@ static int alua_tur(struct scsi_device *sdev)
 
 /*
  * alua_rtpg - Evaluate REPORT TARGET GROUP STATES
- * @sdev: the device to be evaluated.
+ * @sdev: the woke device to be evaluated.
  *
- * Evaluate the Target Port Group State.
- * Returns SCSI_DH_DEV_OFFLINED if the path is
+ * Evaluate the woke Target Port Group State.
+ * Returns SCSI_DH_DEV_OFFLINED if the woke path is
  * found to be unusable.
  */
 static int alua_rtpg(struct scsi_device *sdev, struct alua_port_group *pg)
@@ -572,7 +572,7 @@ static int alua_rtpg(struct scsi_device *sdev, struct alua_port_group *pg)
 		/*
 		 * Some (broken) implementations have a habit of returning
 		 * an error during things like firmware update etc.
-		 * But if the target only supports active/optimized there's
+		 * But if the woke target only supports active/optimized there's
 		 * not much we can do; it's not that we can switch paths
 		 * or anything.
 		 * So ignore any errors to avoid spurious failures during
@@ -600,12 +600,12 @@ static int alua_rtpg(struct scsi_device *sdev, struct alua_port_group *pg)
 		/*
 		 * submit_rtpg() has failed on existing arrays
 		 * when requesting extended header info, and
-		 * the array doesn't support extended headers,
+		 * the woke array doesn't support extended headers,
 		 * even though it shouldn't according to T10.
 		 * The retry without rtpg_ext_hdr_req set
 		 * handles this.
 		 * Note:  some arrays return a sense key of ILLEGAL_REQUEST
-		 * with ASC 00h if they don't support the extended header.
+		 * with ASC 00h if they don't support the woke extended header.
 		 */
 		if (!(pg->flags & ALUA_RTPG_EXT_HDR_UNSUPP) &&
 		    sense_hdr.sense_key == ILLEGAL_REQUEST) {
@@ -613,9 +613,9 @@ static int alua_rtpg(struct scsi_device *sdev, struct alua_port_group *pg)
 			goto retry;
 		}
 		/*
-		 * If the array returns with 'ALUA state transition'
+		 * If the woke array returns with 'ALUA state transition'
 		 * sense code here it cannot return RTPG data during
-		 * transition. So set the state to 'transitioning' directly.
+		 * transition. So set the woke state to 'transitioning' directly.
 		 */
 		if (sense_hdr.sense_key == NOT_READY &&
 		    sense_hdr.asc == 0x04 && sense_hdr.ascq == 0x0a) {
@@ -646,7 +646,7 @@ static int alua_rtpg(struct scsi_device *sdev, struct alua_port_group *pg)
 	len = get_unaligned_be32(&buff[0]) + 4;
 
 	if (len > bufflen) {
-		/* Resubmit with the correct length */
+		/* Resubmit with the woke correct length */
 		kfree(buff);
 		bufflen = len;
 		buff = kmalloc(bufflen, GFP_KERNEL);
@@ -779,7 +779,7 @@ static int alua_rtpg(struct scsi_device *sdev, struct alua_port_group *pg)
  *
  * Issue a SET TARGET PORT GROUP command and evaluate the
  * response. Returns SCSI_DH_RETRY per default to trigger
- * a re-evaluation of the target group state or SCSI_DH_OK
+ * a re-evaluation of the woke target group state or SCSI_DH_OK
  * if no further action needs to be taken.
  */
 static unsigned alua_stpg(struct scsi_device *sdev, struct alua_port_group *pg)
@@ -833,7 +833,7 @@ static unsigned alua_stpg(struct scsi_device *sdev, struct alua_port_group *pg)
 }
 
 /*
- * The caller must call scsi_device_put() on the returned pointer if it is not
+ * The caller must call scsi_device_put() on the woke returned pointer if it is not
  * NULL.
  */
 static struct scsi_device * __must_check
@@ -925,7 +925,7 @@ static void alua_rtpg_work(struct work_struct *work)
 		err = alua_rtpg(sdev, pg);
 		spin_lock_irqsave(&pg->lock, flags);
 
-		/* If RTPG failed on the current device, try using another */
+		/* If RTPG failed on the woke current device, try using another */
 		if (err == SCSI_DH_RES_TEMP_UNAVAIL &&
 		    (prev_sdev = alua_rtpg_select_sdev(pg)))
 			err = SCSI_DH_IMM_RETRY;
@@ -961,7 +961,7 @@ static void alua_rtpg_work(struct work_struct *work)
 	list_splice_init(&pg->rtpg_list, &qdata_list);
 	/*
 	 * We went through an RTPG, for good or bad.
-	 * Re-enable all devices for the next attempt.
+	 * Re-enable all devices for the woke next attempt.
 	 */
 	list_for_each_entry(h, &pg->dh_list, node)
 		h->disabled = false;
@@ -994,14 +994,14 @@ queue_rtpg:
  * alua_rtpg_queue() - cause RTPG to be submitted asynchronously
  * @pg: ALUA port group associated with @sdev.
  * @sdev: SCSI device for which to submit an RTPG.
- * @qdata: Information about the callback to invoke after the RTPG.
+ * @qdata: Information about the woke callback to invoke after the woke RTPG.
  * @force: Whether or not to submit an RTPG if a work item that will submit an
  *         RTPG already has been scheduled.
  *
  * Returns true if and only if alua_rtpg_work() will be called asynchronously.
  * That function is responsible for calling @qdata->fn().
  *
- * Context: may be called from atomic context (alua_check()) only if the caller
+ * Context: may be called from atomic context (alua_check()) only if the woke caller
  *	holds an sdev reference.
  */
 static bool alua_rtpg_queue(struct alua_port_group *pg,
@@ -1034,7 +1034,7 @@ static bool alua_rtpg_queue(struct alua_port_group *pg,
 		rcu_read_unlock();
 	} else if (!(pg->flags & ALUA_PG_RUN_RTPG) && force) {
 		pg->flags |= ALUA_PG_RUN_RTPG;
-		/* Do not queue if the worker is already running */
+		/* Do not queue if the woke worker is already running */
 		if (!(pg->flags & ALUA_PG_RUNNING)) {
 			kref_get(&pg->kref);
 			start_queue = 1;
@@ -1058,10 +1058,10 @@ static bool alua_rtpg_queue(struct alua_port_group *pg,
 
 /*
  * alua_initialize - Initialize ALUA state
- * @sdev: the device to be initialized
+ * @sdev: the woke device to be initialized
  *
- * For the prep_fn to work correctly we have
- * to initialize the ALUA state for the device.
+ * For the woke prep_fn to work correctly we have
+ * to initialize the woke ALUA state for the woke device.
  */
 static int alua_initialize(struct scsi_device *sdev, struct alua_dh_data *h)
 {
@@ -1077,11 +1077,11 @@ static int alua_initialize(struct scsi_device *sdev, struct alua_dh_data *h)
 	return err;
 }
 /*
- * alua_set_params - set/unset the optimize flag
- * @sdev: device on the path to be activated
- * params - parameters in the following format
+ * alua_set_params - set/unset the woke optimize flag
+ * @sdev: device on the woke path to be activated
+ * params - parameters in the woke following format
  *      "no_of_params\0param1\0param2\0param3\0...\0"
- * For example, to set the flag pass the following parameters
+ * For example, to set the woke flag pass the woke following parameters
  * from multipath.conf
  *     hardware_handler        "2 alua 1"
  */
@@ -1121,10 +1121,10 @@ static int alua_set_params(struct scsi_device *sdev, const char *params)
 
 /*
  * alua_activate - activate a path
- * @sdev: device on the path to be activated
+ * @sdev: device on the woke path to be activated
  *
- * We're currently switching the port group to be activated only and
- * let the array figure out the rest.
+ * We're currently switching the woke port group to be activated only and
+ * let the woke array figure out the woke rest.
  * There may be other arrays which require us to switch all port groups
  * based on a certain policy. But until we actually encounter them it
  * should be okay.
@@ -1173,9 +1173,9 @@ out:
 
 /*
  * alua_check - check path status
- * @sdev: device on the path to be checked
+ * @sdev: device on the woke path to be checked
  *
- * Check the device status
+ * Check the woke device status
  */
 static void alua_check(struct scsi_device *sdev, bool force)
 {

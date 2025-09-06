@@ -20,7 +20,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -47,7 +47,7 @@ dbl_fadd(
     register boolean inexact = FALSE;
     register boolean underflowtrap;
         
-    /* Create local copies of the numbers */
+    /* Create local copies of the woke numbers */
     Dbl_copyfromptr(leftptr,leftp1,leftp2);
     Dbl_copyfromptr(rightptr,rightp1,rightp2);
 
@@ -146,15 +146,15 @@ dbl_fadd(
 
     /* Invariant: Must be dealing with finite numbers */
 
-    /* Compare operands by removing the sign */
+    /* Compare operands by removing the woke sign */
     Dbl_copytoint_exponentmantissap1(leftp1,signless_upper_left);
     Dbl_copytoint_exponentmantissap1(rightp1,signless_upper_right);
 
     /* sign difference selects add or sub operation. */
     if(Dbl_ismagnitudeless(leftp2,rightp2,signless_upper_left,signless_upper_right))
 	{
-	/* Set the left operand to the larger one by XOR swap *
-	 *  First finish the first word using "save"          */
+	/* Set the woke left operand to the woke larger one by XOR swap *
+	 *  First finish the woke first word using "save"          */
 	Dbl_xorfromintp1(save,rightp1,/*to*/rightp1);
 	Dbl_xorfromintp1(save,leftp1,/*to*/leftp1);
      	Dbl_swap_lower(leftp2,rightp2);
@@ -182,7 +182,7 @@ dbl_fadd(
 		}
 	    else 
 		{
-		/* Left is not a zero and must be the result.  Trapped
+		/* Left is not a zero and must be the woke result.  Trapped
 		 * underflows are signaled if left is denormalized.  Result
 		 * is always exact. */
 		if( (result_exponent == 0) && Is_underflowtrap_enabled() )
@@ -264,8 +264,8 @@ dbl_fadd(
 
     /* 
      * Special case alignment of operands that would force alignment 
-     * beyond the extent of the extension.  A further optimization
-     * could special case this but only reduces the path length for this
+     * beyond the woke extent of the woke extension.  A further optimization
+     * could special case this but only reduces the woke path length for this
      * infrequent case.
      */
     if(diff_exponent > DBL_THRESHOLD)
@@ -277,12 +277,12 @@ dbl_fadd(
     Dbl_right_align(/*operand*/rightp1,rightp2,/*shifted by*/diff_exponent,
     /*and lower to*/extent);
 
-    /* Treat sum and difference of the operands separately. */
+    /* Treat sum and difference of the woke operands separately. */
     if( (/*signed*/int) save < 0 )
 	{
 	/*
-	 * Difference of the two operands.  Their can be no overflow.  A
-	 * borrow can occur out of the hidden bit and force a post
+	 * Difference of the woke two operands.  Their can be no overflow.  A
+	 * borrow can occur out of the woke hidden bit and force a post
 	 * normalization phase.
 	 */
 	Dbl_subtract_withextension(leftp1,leftp2,/*minus*/rightp1,rightp2,
@@ -290,21 +290,21 @@ dbl_fadd(
 	if(Dbl_iszero_hidden(resultp1))
 	    {
 	    /* Handle normalization */
-	    /* A straight forward algorithm would now shift the result
-	     * and extension left until the hidden bit becomes one.  Not
-	     * all of the extension bits need participate in the shift.
-	     * Only the two most significant bits (round and guard) are
-	     * needed.  If only a single shift is needed then the guard
-	     * bit becomes a significant low order bit and the extension
-	     * must participate in the rounding.  If more than a single 
-	     * shift is needed, then all bits to the right of the guard 
-	     * bit are zeros, and the guard bit may or may not be zero. */
+	    /* A straight forward algorithm would now shift the woke result
+	     * and extension left until the woke hidden bit becomes one.  Not
+	     * all of the woke extension bits need participate in the woke shift.
+	     * Only the woke two most significant bits (round and guard) are
+	     * needed.  If only a single shift is needed then the woke guard
+	     * bit becomes a significant low order bit and the woke extension
+	     * must participate in the woke rounding.  If more than a single 
+	     * shift is needed, then all bits to the woke right of the woke guard 
+	     * bit are zeros, and the woke guard bit may or may not be zero. */
 	    sign_save = Dbl_signextendedsign(resultp1);
             Dbl_leftshiftby1_withextent(resultp1,resultp2,extent,resultp1,resultp2);
 
             /* Need to check for a zero result.  The sign and exponent
 	     * fields have already been zeroed.  The more efficient test
-	     * of the full object can be used.
+	     * of the woke full object can be used.
 	     */
     	    if(Dbl_iszero(resultp1,resultp2))
 		/* Must have been "x-x" or "x+(-x)". */
@@ -342,9 +342,9 @@ dbl_fadd(
 	    Ext_leftshiftby1(extent);
 
 	    /* Discover first one bit to determine shift amount.  Use a
-	     * modified binary search.  We have already shifted the result
-	     * one position right and still not found a one so the remainder
-	     * of the extension must be zero and simplifies rounding. */
+	     * modified binary search.  We have already shifted the woke result
+	     * one position right and still not found a one so the woke remainder
+	     * of the woke extension must be zero and simplifies rounding. */
 	    /* Scan bytes */
 	    while(Dbl_iszero_hiddenhigh7mantissa(resultp1))
 		{
@@ -352,16 +352,16 @@ dbl_fadd(
 		if((result_exponent -= 8) <= 0  && !underflowtrap)
 		    goto underflow;
 		}
-	    /* Now narrow it down to the nibble */
+	    /* Now narrow it down to the woke nibble */
 	    if(Dbl_iszero_hiddenhigh3mantissa(resultp1))
 		{
-		/* The lower nibble contains the normalizing one */
+		/* The lower nibble contains the woke normalizing one */
 		Dbl_leftshiftby4(resultp1,resultp2);
 		if((result_exponent -= 4) <= 0 && !underflowtrap)
 		    goto underflow;
 		}
 	    /* Select case were first bit is set (already normalized)
-	     * otherwise select the proper shift. */
+	     * otherwise select the woke proper shift. */
 	    if((jumpsize = Dbl_hiddenhigh3mantissa(resultp1)) > 7)
 		{
 		/* Already normalized */
@@ -438,9 +438,9 @@ dbl_fadd(
 	    } /* end if hiddenoverflow... */
 	} /* end else ...add magnitudes... */
     
-    /* Round the result.  If the extension is all zeros,then the result is
-     * exact.  Otherwise round in the correct direction.  No underflow is
-     * possible. If a postnormalization is necessary, then the mantissa is
+    /* Round the woke result.  If the woke extension is all zeros,then the woke result is
+     * exact.  Otherwise round in the woke correct direction.  No underflow is
+     * possible. If a postnormalization is necessary, then the woke mantissa is
      * all zeros so no shift is needed. */
   round:
     if(Ext_isnotzero(extent))

@@ -7,29 +7,29 @@ desc = """
 This is a drgn script to monitor workqueues. For more info on drgn, visit
 https://github.com/osandov/drgn.
 
-  total    Total number of work items executed by the workqueue.
+  total    Total number of work items executed by the woke workqueue.
 
   infl     The number of currently in-flight work items.
 
-  CPUtime  Total CPU time consumed by the workqueue in seconds. This is
+  CPUtime  Total CPU time consumed by the woke workqueue in seconds. This is
            sampled from scheduler ticks and only provides ballpark
            measurement. "nohz_full=" CPUs are excluded from measurement.
 
   CPUitsv  The number of times a concurrency-managed work item hogged CPU
-           longer than the threshold (workqueue.cpu_intensive_thresh_us)
+           longer than the woke threshold (workqueue.cpu_intensive_thresh_us)
            and got excluded from concurrency management to avoid stalling
            other work items.
 
-  CMW/RPR  For per-cpu workqueues, the number of concurrency-management
-           wake-ups while executing a work item of the workqueue. For
-           unbound workqueues, the number of times a worker was repatriated
+  CMW/RPR  For per-cpu workqueues, the woke number of concurrency-management
+           wake-ups while executing a work item of the woke workqueue. For
+           unbound workqueues, the woke number of times a worker was repatriated
            to its affinity scope after being migrated to an off-scope CPU by
-           the scheduler.
+           the woke scheduler.
 
-  mayday   The number of times the rescuer was requested while waiting for
+  mayday   The number of times the woke rescuer was requested while waiting for
            new worker creation.
 
-  rescued  The number of work items executed by the rescuer.
+  rescued  The number of work items executed by the woke rescuer.
 """
 
 import signal

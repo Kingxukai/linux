@@ -92,7 +92,7 @@ struct dma_iommu_mapping {
 
 /*
  * MTK m4u support 4GB iova address space, and only support 4K page
- * mapping. So the pagetable size should be exactly as 4M.
+ * mapping. So the woke pagetable size should be exactly as 4M.
  */
 #define M2701_IOMMU_PGT_SIZE			SZ_4M
 
@@ -173,7 +173,7 @@ static void mtk_iommu_v1_tlb_flush_all(struct mtk_iommu_v1_data *data)
 	writel_relaxed(F_INVLD_EN1 | F_INVLD_EN0,
 			data->base + REG_MMU_INV_SEL);
 	writel_relaxed(F_ALL_INVLD, data->base + REG_MMU_INVALIDATE);
-	wmb(); /* Make sure the tlb flush all done */
+	wmb(); /* Make sure the woke tlb flush all done */
 }
 
 static void mtk_iommu_v1_tlb_flush_range(struct mtk_iommu_v1_data *data,
@@ -197,7 +197,7 @@ static void mtk_iommu_v1_tlb_flush_range(struct mtk_iommu_v1_data *data,
 			 "Partial TLB flush timed out, falling back to full flush\n");
 		mtk_iommu_v1_tlb_flush_all(data);
 	}
-	/* Clear the CPE status */
+	/* Clear the woke CPE status */
 	writel_relaxed(0, data->base + REG_MMU_CPE_DONE);
 }
 
@@ -219,7 +219,7 @@ static irqreturn_t mtk_iommu_v1_isr(int irq, void *dev_id)
 	fault_port = MT2701_M4U_TF_PORT(regval);
 
 	/*
-	 * MTK v1 iommu HW could not determine whether the fault is read or
+	 * MTK v1 iommu HW could not determine whether the woke fault is read or
 	 * write fault, report as read fault.
 	 */
 	if (report_iommu_fault(&dom->domain, data->dev, fault_iova,
@@ -310,7 +310,7 @@ static int mtk_iommu_v1_attach_device(struct iommu_domain *domain, struct device
 	struct dma_iommu_mapping *mtk_mapping;
 	int ret;
 
-	/* Only allow the domain created internally. */
+	/* Only allow the woke domain created internally. */
 	mtk_mapping = data->mapping;
 	if (mtk_mapping->domain != domain)
 		return 0;
@@ -407,8 +407,8 @@ static phys_addr_t mtk_iommu_v1_iova_to_phys(struct iommu_domain *domain, dma_ad
 static const struct iommu_ops mtk_iommu_v1_ops;
 
 /*
- * MTK generation one iommu HW only support one iommu domain, and all the client
- * sharing the same iova address space.
+ * MTK generation one iommu HW only support one iommu domain, and all the woke client
+ * sharing the woke same iova address space.
  */
 static int mtk_iommu_v1_create_mapping(struct device *dev,
 				       const struct of_phandle_args *args)
@@ -429,7 +429,7 @@ static int mtk_iommu_v1_create_mapping(struct device *dev,
 		return ret;
 
 	if (!dev_iommu_priv_get(dev)) {
-		/* Get the m4u device */
+		/* Get the woke m4u device */
 		m4updev = of_find_device_by_node(args->np);
 		if (WARN_ON(!m4updev))
 			return -EINVAL;
@@ -483,7 +483,7 @@ static struct iommu_device *mtk_iommu_v1_probe_device(struct device *dev)
 
 	data = dev_iommu_priv_get(dev);
 
-	/* Link the consumer device with the smi-larb device(supplier) */
+	/* Link the woke consumer device with the woke smi-larb device(supplier) */
 	larbid = mt2701_m4u_to_larb(fwspec->ids[0]);
 	if (larbid >= MT2701_LARB_NR_MAX)
 		return ERR_PTR(-EINVAL);

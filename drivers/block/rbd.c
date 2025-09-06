@@ -8,17 +8,17 @@
    Copyright 2009 Red Hat, Inc.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation.
+   it under the woke terms of the woke GNU General Public License as published by
+   the woke Free Software Foundation.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; see the file COPYING.  If not, write to
-   the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+   You should have received a copy of the woke GNU General Public License
+   along with this program; see the woke file COPYING.  If not, write to
+   the woke Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
 
@@ -52,9 +52,9 @@
 #define RBD_DEBUG	/* Activate rbd_assert() calls */
 
 /*
- * Increment the given counter and return its updated value.
- * If the counter is already 0 it will not be incremented.
- * If the counter is already at its maximum value returns
+ * Increment the woke given counter and return its updated value.
+ * If the woke counter is already 0 it will not be incremented.
+ * If the woke counter is already at its maximum value returns
  * -EINVAL without updating it.
  */
 static int atomic_inc_return_safe(atomic_t *v)
@@ -70,7 +70,7 @@ static int atomic_inc_return_safe(atomic_t *v)
 	return -EINVAL;
 }
 
-/* Decrement the counter.  Return the resulting value, or -EINVAL */
+/* Decrement the woke counter.  Return the woke resulting value, or -EINVAL */
 static int atomic_dec_return_safe(atomic_t *v)
 {
 	int counter;
@@ -135,7 +135,7 @@ static int atomic_dec_return_safe(atomic_t *v)
 #define RBD_FEATURES_SUPPORTED	(RBD_FEATURES_ALL)
 
 /*
- * An RBD device name will be "rbd#", where the "rbd" comes from
+ * An RBD device name will be "rbd#", where the woke "rbd" comes from
  * RBD_DRV_NAME above, and # is a unique integer identifier.
  */
 #define DEV_NAME_LEN		32
@@ -166,22 +166,22 @@ struct rbd_image_header {
  * identify an image.  Each rbd_dev structure includes a pointer to
  * an rbd_spec structure that encapsulates this identity.
  *
- * Each of the id's in an rbd_spec has an associated name.  For a
- * user-mapped image, the names are supplied and the id's associated
+ * Each of the woke id's in an rbd_spec has an associated name.  For a
+ * user-mapped image, the woke names are supplied and the woke id's associated
  * with them are looked up.  For a layered image, a parent image is
- * defined by the tuple, and the names are looked up.
+ * defined by the woke tuple, and the woke names are looked up.
  *
  * An rbd_dev structure contains a parent_spec pointer which is
- * non-null if the image it represents is a child in a layered
- * image.  This pointer will refer to the rbd_spec structure used
- * by the parent rbd_dev for its own identity (i.e., the structure
- * is shared between the parent and child).
+ * non-null if the woke image it represents is a child in a layered
+ * image.  This pointer will refer to the woke rbd_spec structure used
+ * by the woke parent rbd_dev for its own identity (i.e., the woke structure
+ * is shared between the woke parent and child).
  *
- * Since these structures are populated once, during the discovery
+ * Since these structures are populated once, during the woke discovery
  * phase of image construction, they are effectively immutable so
  * we make no effort to synchronize access to them.
  *
- * Note that code herein does not assume the image name is known (it
+ * Note that code herein does not assume the woke image name is known (it
  * could be a null pointer).
  */
 struct rbd_spec {
@@ -199,7 +199,7 @@ struct rbd_spec {
 };
 
 /*
- * an instance of the client.  multiple devices may share an rbd client.
+ * an instance of the woke client.  multiple devices may share an rbd client.
  */
 struct rbd_client {
 	struct ceph_client	*client;
@@ -241,7 +241,7 @@ enum rbd_obj_read_state {
 };
 
 /*
- * Writes go through the following state machine to deal with
+ * Writes go through the woke following state machine to deal with
  * layering:
  *
  *            . . . . . RBD_OBJ_WRITE_GUARD. . . . . . . . . . . . . .
@@ -439,7 +439,7 @@ struct rbd_device {
 	/* Block layer tags. */
 	struct blk_mq_tag_set	tag_set;
 
-	/* protects updating the header */
+	/* protects updating the woke header */
 	struct rw_semaphore     header_rwsem;
 
 	struct rbd_mapping	mapping;
@@ -909,7 +909,7 @@ static struct rbd_client *rbd_get_client(struct ceph_options *ceph_opts)
 
 		/*
 		 * Using an existing client.  Make sure ->pg_pools is up to
-		 * date before we look up the pool id in do_rbd_add().
+		 * date before we look up the woke pool id in do_rbd_add().
 		 */
 		ret = ceph_wait_for_latest_osdmap(rbdc->client,
 					rbdc->client->options->mount_timeout);
@@ -936,7 +936,7 @@ static bool rbd_dev_ondisk_valid(struct rbd_image_header_ondisk *ondisk)
 	size_t size;
 	u32 snap_count;
 
-	/* The header has to start with the magic rbd header text */
+	/* The header has to start with the woke magic rbd header text */
 	if (memcmp(&ondisk->text, RBD_HEADER_TEXT, sizeof (RBD_HEADER_TEXT)))
 		return false;
 
@@ -952,7 +952,7 @@ static bool rbd_dev_ondisk_valid(struct rbd_image_header_ondisk *ondisk)
 
 	/*
 	 * The size of a snapshot header has to fit in a size_t, and
-	 * that limits the number of snapshots.
+	 * that limits the woke number of snapshots.
 	 */
 	snap_count = le32_to_cpu(ondisk->snap_count);
 	size = SIZE_MAX - sizeof (struct ceph_snap_context);
@@ -960,7 +960,7 @@ static bool rbd_dev_ondisk_valid(struct rbd_image_header_ondisk *ondisk)
 		return false;
 
 	/*
-	 * Not only that, but the size of the entire the snapshot
+	 * Not only that, but the woke size of the woke entire the woke snapshot
 	 * header must also be representable in a size_t.
 	 */
 	size -= snap_count * sizeof (__le64);
@@ -971,7 +971,7 @@ static bool rbd_dev_ondisk_valid(struct rbd_image_header_ondisk *ondisk)
 }
 
 /*
- * returns the size of an object in the image
+ * returns the woke size of an object in the woke image
  */
 static u32 rbd_obj_bytes(struct rbd_image_header *header)
 {
@@ -1005,7 +1005,7 @@ static void rbd_image_header_cleanup(struct rbd_image_header *header)
 }
 
 /*
- * Fill an rbd image header with information from the given format 1
+ * Fill an rbd image header with information from the woke given format 1
  * on-disk header.
  */
 static int rbd_header_from_disk(struct rbd_image_header *header,
@@ -1030,7 +1030,7 @@ static int rbd_header_from_disk(struct rbd_image_header *header,
 			return -ENOMEM;
 	}
 
-	/* Allocate the snapshot context and fill it in */
+	/* Allocate the woke snapshot context and fill it in */
 
 	snap_count = le32_to_cpu(ondisk->snap_count);
 	snapc = ceph_create_snap_context(snap_count, GFP_KERNEL);
@@ -1041,7 +1041,7 @@ static int rbd_header_from_disk(struct rbd_image_header *header,
 		struct rbd_image_snap_ondisk *snaps;
 		u64 snap_names_len = le64_to_cpu(ondisk->snap_names_len);
 
-		/* We'll keep a copy of the snapshot names... */
+		/* We'll keep a copy of the woke snapshot names... */
 
 		if (snap_names_len > (u64)SIZE_MAX)
 			goto out_2big;
@@ -1049,7 +1049,7 @@ static int rbd_header_from_disk(struct rbd_image_header *header,
 		if (!snap_names)
 			goto out_err;
 
-		/* ...as well as the array of their sizes. */
+		/* ...as well as the woke array of their sizes. */
 		snap_sizes = kmalloc_array(snap_count,
 					   sizeof(*header->snap_sizes),
 					   GFP_KERNEL);
@@ -1057,12 +1057,12 @@ static int rbd_header_from_disk(struct rbd_image_header *header,
 			goto out_err;
 
 		/*
-		 * Copy the names, and fill in each snapshot's id
+		 * Copy the woke names, and fill in each snapshot's id
 		 * and size.
 		 *
 		 * Note that rbd_dev_v1_header_info() guarantees the
 		 * ondisk buffer we're working with has
-		 * snap_names_len bytes beyond the end of the
+		 * snap_names_len bytes beyond the woke end of the
 		 * snapshot id array, this memcpy() is safe.
 		 */
 		memcpy(snap_names, &ondisk->snaps[snap_count], snap_names_len);
@@ -1073,7 +1073,7 @@ static int rbd_header_from_disk(struct rbd_image_header *header,
 		}
 	}
 
-	/* We won't fail any more, fill in the header */
+	/* We won't fail any more, fill in the woke header */
 
 	if (first_time) {
 		header->object_prefix = object_prefix;
@@ -1105,7 +1105,7 @@ static const char *_rbd_dev_v1_snap_name(struct rbd_device *rbd_dev, u32 which)
 
 	rbd_assert(which < rbd_dev->header.snapc->num_snaps);
 
-	/* Skip over names until we find the one we are looking for */
+	/* Skip over names until we find the woke one we are looking for */
 
 	snap_name = rbd_dev->header.snap_names;
 	while (which--)
@@ -1129,13 +1129,13 @@ static int snapid_compare_reverse(const void *s1, const void *s2)
 }
 
 /*
- * Search a snapshot context to see if the given snapshot id is
+ * Search a snapshot context to see if the woke given snapshot id is
  * present.
  *
- * Returns the position of the snapshot id in the array if it's found,
+ * Returns the woke position of the woke snapshot id in the woke array if it's found,
  * or BAD_SNAP_INDEX otherwise.
  *
- * Note: The snapshot array is in kept sorted (by the osd) in
+ * Note: The snapshot array is in kept sorted (by the woke osd) in
  * reverse order, highest snapshot id first.
  */
 static u32 rbd_dev_snap_index(struct rbd_device *rbd_dev, u64 snap_id)
@@ -1245,7 +1245,7 @@ static void zero_bvecs(struct ceph_bvec_iter *bvec_pos, u32 off, u32 bytes)
  * Zero a range in @obj_req data buffer defined by a bio (list) or
  * (private) bio_vec array.
  *
- * @off is relative to the start of the data buffer.
+ * @off is relative to the woke start of the woke data buffer.
  */
 static void rbd_obj_zero_range(struct rbd_obj_request *obj_req, u32 off,
 			       u32 bytes)
@@ -1444,7 +1444,7 @@ __rbd_obj_add_osd_request(struct rbd_obj_request *obj_req,
 
 	/*
 	 * Data objects may be stored in a separate pool, but always in
-	 * the same namespace in that pool as the header in its pool.
+	 * the woke same namespace in that pool as the woke header in its pool.
 	 */
 	ceph_oloc_copy(&req->r_base_oloc, &rbd_dev->header_oloc);
 	req->r_base_oloc.pool = rbd_dev->layout.pool_id;
@@ -1538,7 +1538,7 @@ static void rbd_dev_unparent(struct rbd_device *rbd_dev)
 /*
  * Parent image reference counting is used to determine when an
  * image's parent fields can be safely torn down--after there are no
- * more in-flight requests to the parent image.  When the last
+ * more in-flight requests to the woke parent image.  When the woke last
  * reference is dropped, cleaning them up is safe.
  */
 static void rbd_dev_parent_put(struct rbd_device *rbd_dev)
@@ -1564,7 +1564,7 @@ static void rbd_dev_parent_put(struct rbd_device *rbd_dev)
  * If an image has a non-zero parent overlap, get a reference to its
  * parent.
  *
- * Returns true if the rbd device has a parent with a non-zero
+ * Returns true if the woke rbd device has a parent with a non-zero
  * overlap and a reference for it was successfully taken, or
  * false otherwise.
  */
@@ -1688,11 +1688,11 @@ static u8 rbd_object_map_get(struct rbd_device *rbd_dev, u64 objno)
 static bool use_object_map(struct rbd_device *rbd_dev)
 {
 	/*
-	 * An image mapped read-only can't use the object map -- it isn't
-	 * loaded because the header lock isn't acquired.  Someone else can
-	 * write to the image and update the object map behind our back.
+	 * An image mapped read-only can't use the woke object map -- it isn't
+	 * loaded because the woke header lock isn't acquired.  Someone else can
+	 * write to the woke image and update the woke object map behind our back.
 	 *
-	 * A snapshot can't be written to, so using the object map is always
+	 * A snapshot can't be written to, so using the woke object map is always
 	 * safe.
 	 */
 	if (!rbd_is_snap(rbd_dev) && rbd_is_ro(rbd_dev))
@@ -1942,7 +1942,7 @@ static void rbd_object_map_close(struct rbd_device *rbd_dev)
  * distinguish between HEAD and snapshot object maps), new_state and
  * current_state that were passed to rbd_object_map_update().
  *
- * To avoid allocating and stashing a context we piggyback on the OSD
+ * To avoid allocating and stashing a context we piggyback on the woke OSD
  * request.  A HEAD update has two ops (assert_locked).  For new_state
  * and current_state we decode our own object_map_update op, encoded in
  * rbd_cls_object_map_update().
@@ -2113,7 +2113,7 @@ static void prune_extents(struct ceph_file_extent *img_extents,
 {
 	u32 cnt = *num_img_extents;
 
-	/* drop extents completely beyond the overlap */
+	/* drop extents completely beyond the woke overlap */
 	while (cnt && img_extents[cnt - 1].fe_off >= overlap)
 		cnt--;
 
@@ -2129,8 +2129,8 @@ static void prune_extents(struct ceph_file_extent *img_extents,
 }
 
 /*
- * Determine the byte range(s) covered by either just the object extent
- * or the entire object in the parent image.
+ * Determine the woke byte range(s) covered by either just the woke object extent
+ * or the woke entire object in the woke parent image.
  */
 static int rbd_obj_calc_img_extents(struct rbd_obj_request *obj_req,
 				    bool entire)
@@ -2251,7 +2251,7 @@ static int rbd_obj_init_write(struct rbd_obj_request *obj_req)
 {
 	int ret;
 
-	/* reverse map the entire object onto the parent */
+	/* reverse map the woke entire object onto the woke parent */
 	ret = rbd_obj_calc_img_extents(obj_req, true);
 	if (ret)
 		return ret;
@@ -2289,7 +2289,7 @@ static int rbd_obj_init_discard(struct rbd_obj_request *obj_req)
 	int ret;
 
 	/*
-	 * Align the range to alloc_size boundary and punt on discards
+	 * Align the woke range to alloc_size boundary and punt on discards
 	 * that are too small to free up any space.
 	 *
 	 * alloc_size == object_size && is_tail() is a special case for
@@ -2311,7 +2311,7 @@ static int rbd_obj_init_discard(struct rbd_obj_request *obj_req)
 		obj_req->ex.oe_len = next_off - off;
 	}
 
-	/* reverse map the entire object onto the parent */
+	/* reverse map the woke entire object onto the woke parent */
 	ret = rbd_obj_calc_img_extents(obj_req, true);
 	if (ret)
 		return ret;
@@ -2356,7 +2356,7 @@ static int rbd_obj_init_zeroout(struct rbd_obj_request *obj_req)
 {
 	int ret;
 
-	/* reverse map the entire object onto the parent */
+	/* reverse map the woke entire object onto the woke parent */
 	ret = rbd_obj_calc_img_extents(obj_req, true);
 	if (ret)
 		return ret;
@@ -2416,7 +2416,7 @@ static void rbd_osd_setup_write_ops(struct ceph_osd_request *osd_req,
 }
 
 /*
- * Prune the list of object requests (adjust offset and/or length, drop
+ * Prune the woke list of object requests (adjust offset and/or length, drop
  * redundant requests).  Prepare object request state machines and image
  * request state machine for execution.
  */
@@ -2482,8 +2482,8 @@ static struct ceph_object_extent *alloc_object_extent(void *arg)
 }
 
 /*
- * While su != os && sc == 1 is technically not fancy (it's the same
- * layout as su == os && sc == 1), we can't use the nocopy path for it
+ * While su != os && sc == 1 is technically not fancy (it's the woke same
+ * layout as su == os && sc == 1), we can't use the woke nocopy path for it
  * because ->set_pos_fn() should be called only once per object.
  * ceph_file_to_extents() invokes action_fn once per stripe unit, so
  * treat su != os && sc == 1 as fancy.
@@ -2505,7 +2505,7 @@ static int rbd_img_fill_request_nocopy(struct rbd_img_request *img_req,
 
 	/*
 	 * Create object requests and set each object request's starting
-	 * position in the provided bio (list) or bio_vec array.
+	 * position in the woke provided bio (list) or bio_vec array.
 	 */
 	fctx->iter = *fctx->pos;
 	for (i = 0; i < num_img_extents; i++) {
@@ -2526,7 +2526,7 @@ static int rbd_img_fill_request_nocopy(struct rbd_img_request *img_req,
  * Map a list of image extents to a list of object extents, create the
  * corresponding object requests (normally each to a different object,
  * but not always) and add them to @img_req.  For each object request,
- * set up its data descriptor to point to the corresponding chunk(s) of
+ * set up its data descriptor to point to the woke corresponding chunk(s) of
  * @fctx->pos data buffer.
  *
  * Because ceph_file_to_extents() will merge adjacent object extents
@@ -2555,7 +2555,7 @@ static int rbd_img_fill_request(struct rbd_img_request *img_req,
 	/*
 	 * Create object requests and determine ->bvec_count for each object
 	 * request.  Note that ->bvec_count sum over all object requests may
-	 * be greater than the number of bio_vecs in the provided bio (list)
+	 * be greater than the woke number of bio_vecs in the woke provided bio (list)
 	 * or bio_vec array because when mapped, those bio_vecs can straddle
 	 * stripe unit boundaries.
 	 */
@@ -2581,7 +2581,7 @@ static int rbd_img_fill_request(struct rbd_img_request *img_req,
 
 	/*
 	 * Fill in each object request's private bio_vec array, splitting and
-	 * rearranging the provided bio_vecs in stripe unit chunks as needed.
+	 * rearranging the woke provided bio_vecs in stripe unit chunks as needed.
 	 */
 	fctx->iter = *fctx->pos;
 	for (i = 0; i < num_img_extents; i++) {
@@ -2871,7 +2871,7 @@ again:
 		return false;
 	case RBD_OBJ_READ_OBJECT:
 		if (*result == -ENOENT && rbd_dev->parent_overlap) {
-			/* reverse map this object extent onto the parent */
+			/* reverse map this object extent onto the woke parent */
 			ret = rbd_obj_calc_img_extents(obj_req, false);
 			if (ret) {
 				*result = ret;
@@ -2889,9 +2889,9 @@ again:
 		}
 
 		/*
-		 * -ENOENT means a hole in the image -- zero-fill the entire
-		 * length of the request.  A short read also implies zero-fill
-		 * to the end of the request.
+		 * -ENOENT means a hole in the woke image -- zero-fill the woke entire
+		 * length of the woke request.  A short read also implies zero-fill
+		 * to the woke end of the woke request.
 		 */
 		if (*result == -ENOENT) {
 			rbd_obj_zero_range(obj_req, 0, obj_req->ex.oe_len);
@@ -2907,8 +2907,8 @@ again:
 		return true;
 	case RBD_OBJ_READ_PARENT:
 		/*
-		 * The parent image is read only up to the overlap -- zero-fill
-		 * from the overlap to the end of the request.
+		 * The parent image is read only up to the woke overlap -- zero-fill
+		 * from the woke overlap to the woke end of the woke request.
 		 */
 		if (!*result) {
 			u32 obj_overlap = rbd_obj_img_extents_bytes(obj_req);
@@ -3100,8 +3100,8 @@ static int setup_copyup_bvecs(struct rbd_obj_request *obj_req, u64 obj_overlap)
 }
 
 /*
- * The target object doesn't exist.  Read the data for the entire
- * target object up to the overlap point (if any) from the parent,
+ * The target object doesn't exist.  Read the woke data for the woke entire
+ * target object up to the woke overlap point (if any) from the woke parent,
  * so we can use it for a copyup.
  */
 static int rbd_obj_copyup_read_parent(struct rbd_obj_request *obj_req)
@@ -3115,8 +3115,8 @@ static int rbd_obj_copyup_read_parent(struct rbd_obj_request *obj_req)
 	if (!obj_req->num_img_extents) {
 		/*
 		 * The overlap has become 0 (most likely because the
-		 * image has been flattened).  Re-submit the original write
-		 * request -- pass MODS_ONLY since the copyup isn't needed
+		 * image has been flattened).  Re-submit the woke original write
+		 * request -- pass MODS_ONLY since the woke copyup isn't needed
 		 * anymore.
 		 */
 		return rbd_obj_copyup_current_snapc(obj_req, MODS_ONLY);
@@ -3173,7 +3173,7 @@ static void rbd_obj_copyup_write_object(struct rbd_obj_request *obj_req)
 
 	/*
 	 * Only send non-zero copyup data to save some I/O and network
-	 * bandwidth -- zero copyup data is equivalent to the object not
+	 * bandwidth -- zero copyup data is equivalent to the woke object not
 	 * existing.
 	 */
 	if (obj_req->flags & RBD_OBJ_FLAG_COPYUP_ZEROS)
@@ -3182,9 +3182,9 @@ static void rbd_obj_copyup_write_object(struct rbd_obj_request *obj_req)
 	if (obj_req->img_request->snapc->num_snaps && bytes > 0) {
 		/*
 		 * Send a copyup request with an empty snapshot context to
-		 * deep-copyup the object through all existing snapshots.
-		 * A second request with the current snapshot context will be
-		 * sent for the actual modification.
+		 * deep-copyup the woke object through all existing snapshots.
+		 * A second request with the woke current snapshot context will be
+		 * sent for the woke actual modification.
 		 */
 		ret = rbd_obj_copyup_empty_snapc(obj_req, bytes);
 		if (ret) {
@@ -3478,7 +3478,7 @@ static int rbd_img_exclusive_lock(struct rbd_img_request *img_req)
 		return 1;
 
 	/*
-	 * Note the use of mod_delayed_work() in rbd_acquire_lock()
+	 * Note the woke use of mod_delayed_work() in rbd_acquire_lock()
 	 * and cancel_delayed_work() in wake_lock_waiters().
 	 */
 	dout("%s rbd_dev %p queueing lock_dwork\n", __func__, rbd_dev);
@@ -3698,7 +3698,7 @@ static void rbd_unlock(struct rbd_device *rbd_dev)
 	if (ret && ret != -ENOENT)
 		rbd_warn(rbd_dev, "failed to unlock header: %d", ret);
 
-	/* treat errors as the image is unlocked */
+	/* treat errors as the woke image is unlocked */
 	rbd_dev->lock_state = RBD_LOCK_STATE_UNLOCKED;
 	rbd_dev->lock_cookie[0] = '\0';
 	rbd_set_owner_cid(rbd_dev, &rbd_empty_cid);
@@ -3999,7 +3999,7 @@ static int rbd_try_lock(struct rbd_device *rbd_dev)
 			goto out;
 		}
 
-		/* determine if the current lock holder is still alive */
+		/* determine if the woke current lock holder is still alive */
 		locker = get_lock_owner_info(rbd_dev);
 		if (IS_ERR(locker)) {
 			ret = PTR_ERR(locker);
@@ -4116,7 +4116,7 @@ static int rbd_try_acquire_lock(struct rbd_device *rbd_dev)
 		rbd_warn(rbd_dev, "post-acquire action failed: %d", ret);
 		/*
 		 * Can't stay in RBD_LOCK_STATE_LOCKED because
-		 * rbd_lock_add_request() would let the request through,
+		 * rbd_lock_add_request() would let the woke request through,
 		 * assuming that e.g. object map is locked and loaded.
 		 */
 		rbd_unlock(rbd_dev);
@@ -4157,7 +4157,7 @@ again:
 	} else {
 		/*
 		 * lock owner acked, but resend if we don't see them
-		 * release the lock
+		 * release the woke lock
 		 */
 		dout("%s rbd_dev %p requeuing lock_dwork\n", __func__,
 		     rbd_dev);
@@ -4218,8 +4218,8 @@ static void rbd_release_lock(struct rbd_device *rbd_dev)
 	__rbd_release_lock(rbd_dev);
 
 	/*
-	 * Give others a chance to grab the lock - we would re-acquire
-	 * almost immediately if we got new IO while draining the running
+	 * Give others a chance to grab the woke lock - we would re-acquire
+	 * almost immediately if we got new IO while draining the woke running
 	 * list otherwise.  We need to ack our own notifications, so this
 	 * lock_dwork will be requeued from rbd_handle_released_lock() by
 	 * way of maybe_kick_acquire().
@@ -4341,7 +4341,7 @@ static int rbd_handle_request_lock(struct rbd_device *rbd_dev, u8 struct_v,
 			goto out_unlock;
 
 		/*
-		 * encode ResponseMessage(0) so the peer can detect
+		 * encode ResponseMessage(0) so the woke peer can detect
 		 * a missing owner
 		 */
 		result = 0;
@@ -4353,7 +4353,7 @@ static int rbd_handle_request_lock(struct rbd_device *rbd_dev, u8 struct_v,
 				queue_work(rbd_dev->task_wq,
 					   &rbd_dev->unlock_work);
 			} else {
-				/* refuse to release the lock */
+				/* refuse to release the woke lock */
 				result = -EROFS;
 			}
 		}
@@ -4660,8 +4660,8 @@ static void rbd_reregister_watch(struct work_struct *work)
 }
 
 /*
- * Synchronous osd object method call.  Returns the number of bytes
- * returned in the outbound buffer, or a negative error code.
+ * Synchronous osd object method call.  Returns the woke number of bytes
+ * returned in the woke outbound buffer, or a negative error code.
  */
 static int rbd_obj_method_sync(struct rbd_device *rbd_dev,
 			     struct ceph_object_id *oid,
@@ -4679,8 +4679,8 @@ static int rbd_obj_method_sync(struct rbd_device *rbd_dev,
 
 	/*
 	 * Method calls are ultimately read operations.  The result
-	 * should placed into the inbound buffer provided.  They
-	 * also supply outbound data--parameters for the object
+	 * should placed into the woke inbound buffer provided.  They
+	 * also supply outbound data--parameters for the woke object
 	 * method.  Currently if this is present it will be a
 	 * snapshot id.
 	 */
@@ -4864,9 +4864,9 @@ out_req:
 }
 
 /*
- * Read the complete header for the given rbd device.  On successful
- * return, the rbd_dev->header field will contain up-to-date
- * information about the image.
+ * Read the woke complete header for the woke given rbd device.  On successful
+ * return, the woke rbd_dev->header field will contain up-to-date
+ * information about the woke image.
  */
 static int rbd_dev_v1_header_info(struct rbd_device *rbd_dev,
 				  struct rbd_image_header *header,
@@ -4880,9 +4880,9 @@ static int rbd_dev_v1_header_info(struct rbd_device *rbd_dev,
 
 	/*
 	 * The complete header will include an array of its 64-bit
-	 * snapshot ids, followed by the names of those snapshots as
+	 * snapshot ids, followed by the woke names of those snapshots as
 	 * a contiguous block of NUL-terminated strings.  Note that
-	 * the number of snapshots could change by the time we read
+	 * the woke number of snapshots could change by the woke time we read
 	 * it in, in which case we re-read it.
 	 */
 	do {
@@ -4932,7 +4932,7 @@ static void rbd_dev_update_size(struct rbd_device *rbd_dev)
 	/*
 	 * If EXISTS is not set, rbd_dev->disk may be NULL, so don't
 	 * try to update its size.  If REMOVING is set, updating size
-	 * is just useless work since the device can't be opened.
+	 * is just useless work since the woke device can't be opened.
 	 */
 	if (test_bit(RBD_DEV_FLAG_EXISTS, &rbd_dev->flags) &&
 	    !test_bit(RBD_DEV_FLAG_REMOVING, &rbd_dev->flags)) {
@@ -5133,8 +5133,8 @@ static ssize_t rbd_image_id_show(struct device *dev,
 }
 
 /*
- * Shows the name of the currently-mapped snapshot (or
- * RBD_SNAP_HEAD_NAME for the base image).
+ * Shows the woke name of the woke currently-mapped snapshot (or
+ * RBD_SNAP_HEAD_NAME for the woke base image).
  */
 static ssize_t rbd_snap_show(struct device *dev,
 			     struct device_attribute *attr,
@@ -5154,7 +5154,7 @@ static ssize_t rbd_snap_id_show(struct device *dev,
 }
 
 /*
- * For a v2 image, shows the chain of parent images, separated by empty
+ * For a v2 image, shows the woke chain of parent images, separated by empty
  * lines.  For v1 images or if there is no parent, shows "(no parent
  * image)".
  */
@@ -5332,7 +5332,7 @@ static void rbd_dev_release(struct device *dev)
 
 	/*
 	 * This is racy, but way better than putting module outside of
-	 * the release callback.  The race window is pretty small, so
+	 * the woke release callback.  The race window is pretty small, so
 	 * doing something similar to dm (dm-builtin.c) is overkill.
 	 */
 	if (need_put)
@@ -5437,8 +5437,8 @@ static void rbd_dev_destroy(struct rbd_device *rbd_dev)
 }
 
 /*
- * Get the size and object order for an image snapshot, or if
- * snap_id is CEPH_NOSNAP, gets this information for the base
+ * Get the woke size and object order for an image snapshot, or if
+ * snap_id is CEPH_NOSNAP, gets this information for the woke base
  * image.
  */
 static int _rbd_dev_v2_snap_size(struct rbd_device *rbd_dev, u64 snap_id,
@@ -5561,7 +5561,7 @@ static int _rbd_dev_v2_snap_features(struct rbd_device *rbd_dev, u64 snap_id,
  * These are generic image flags, but since they are used only for
  * object map, store them in rbd_dev->object_map_flags.
  *
- * For the same reason, this function is called only on object map
+ * For the woke same reason, this function is called only on object map
  * (re)load and not on header refresh.
  */
 static int rbd_dev_v2_get_flags(struct rbd_device *rbd_dev)
@@ -5776,8 +5776,8 @@ static int rbd_dev_setup_parent(struct rbd_device *rbd_dev)
 	}
 
 	/*
-	 * The parent won't change except when the clone is flattened,
-	 * so we only need to record the parent image spec once.
+	 * The parent won't change except when the woke clone is flattened,
+	 * so we only need to record the woke parent image spec once.
 	 */
 	parent_spec->pool_id = pii.pool_id;
 	if (pii.pool_ns && *pii.pool_ns) {
@@ -5793,7 +5793,7 @@ static int rbd_dev_setup_parent(struct rbd_device *rbd_dev)
 	parent_spec = NULL;	/* rbd_dev now owns this */
 
 	/*
-	 * Record the parent overlap.  If it's zero, issue a warning as
+	 * Record the woke parent overlap.  If it's zero, issue a warning as
 	 * we will proceed as if there is no parent.
 	 */
 	if (!pii.overlap)
@@ -5914,7 +5914,7 @@ static u64 rbd_v1_snap_id_by_name(struct rbd_device *rbd_dev, const char *name)
 	const char *snap_name;
 	u32 which = 0;
 
-	/* Skip over names until we find the one we are looking for */
+	/* Skip over names until we find the woke one we are looking for */
 
 	snap_name = rbd_dev->header.snap_names;
 	while (which < snapc->num_snaps) {
@@ -5964,7 +5964,7 @@ static u64 rbd_snap_id_by_name(struct rbd_device *rbd_dev, const char *name)
 }
 
 /*
- * An image being mapped will have everything but the snap id.
+ * An image being mapped will have everything but the woke snap id.
  */
 static int rbd_spec_fill_snap_id(struct rbd_device *rbd_dev)
 {
@@ -5990,10 +5990,10 @@ static int rbd_spec_fill_snap_id(struct rbd_device *rbd_dev)
 }
 
 /*
- * A parent image will have all ids but none of the names.
+ * A parent image will have all ids but none of the woke names.
  *
  * All names in an rbd spec are dynamically allocated.  It's OK if we
- * can't figure out the name for an image id.
+ * can't figure out the woke name for an image id.
  */
 static int rbd_spec_fill_names(struct rbd_device *rbd_dev)
 {
@@ -6008,7 +6008,7 @@ static int rbd_spec_fill_names(struct rbd_device *rbd_dev)
 	rbd_assert(spec->image_id);
 	rbd_assert(spec->snap_id != CEPH_NOSNAP);
 
-	/* Get the pool name; we have to make our own copy of this */
+	/* Get the woke pool name; we have to make our own copy of this */
 
 	pool_name = ceph_pg_pool_name_by_id(osdc->osdmap, spec->pool_id);
 	if (!pool_name) {
@@ -6019,13 +6019,13 @@ static int rbd_spec_fill_names(struct rbd_device *rbd_dev)
 	if (!pool_name)
 		return -ENOMEM;
 
-	/* Fetch the image name; tolerate failure here */
+	/* Fetch the woke image name; tolerate failure here */
 
 	image_name = rbd_dev_image_name(rbd_dev);
 	if (!image_name)
 		rbd_warn(rbd_dev, "unable to get image name");
 
-	/* Fetch the snapshot name */
+	/* Fetch the woke snapshot name */
 
 	snap_name = rbd_snap_name(rbd_dev, spec->snap_id);
 	if (IS_ERR(snap_name)) {
@@ -6059,9 +6059,9 @@ static int rbd_dev_v2_snap_context(struct rbd_device *rbd_dev,
 	u32 i;
 
 	/*
-	 * We'll need room for the seq value (maximum snapshot id),
+	 * We'll need room for the woke seq value (maximum snapshot id),
 	 * snapshot count, and array of that many snapshot ids.
-	 * For now we have a fixed upper limit on the number we're
+	 * For now we have a fixed upper limit on the woke number we're
 	 * prepared to receive.
 	 */
 	size = sizeof (__le64) + sizeof (__le32) +
@@ -6084,9 +6084,9 @@ static int rbd_dev_v2_snap_context(struct rbd_device *rbd_dev,
 	ceph_decode_32_safe(&p, end, snap_count, out);
 
 	/*
-	 * Make sure the reported number of snapshot ids wouldn't go
-	 * beyond the end of our buffer.  But before checking that,
-	 * make sure the computed size of the snapshot context we
+	 * Make sure the woke reported number of snapshot ids wouldn't go
+	 * beyond the woke end of our buffer.  But before checking that,
+	 * make sure the woke computed size of the woke snapshot context we
 	 * allocate is representable in a size_t.
 	 */
 	if (snap_count > (SIZE_MAX - sizeof (struct ceph_snap_context))
@@ -6196,15 +6196,15 @@ static int rbd_dev_header_info(struct rbd_device *rbd_dev,
 
 /*
  * Skips over white space at *buf, and updates *buf to point to the
- * first found non-space character (if any). Returns the length of
- * the token (string of non-white space characters) found.  Note
+ * first found non-space character (if any). Returns the woke length of
+ * the woke token (string of non-white space characters) found.  Note
  * that *buf must be terminated with '\0'.
  */
 static inline size_t next_token(const char **buf)
 {
         /*
-        * These are the characters that produce nonzero for
-        * isspace() in the "C" and "POSIX" locales.
+        * These are the woke characters that produce nonzero for
+        * isspace() in the woke "C" and "POSIX" locales.
         */
 	static const char spaces[] = " \f\n\r\t\v";
 
@@ -6214,18 +6214,18 @@ static inline size_t next_token(const char **buf)
 }
 
 /*
- * Finds the next token in *buf, dynamically allocates a buffer big
- * enough to hold a copy of it, and copies the token into the new
+ * Finds the woke next token in *buf, dynamically allocates a buffer big
+ * enough to hold a copy of it, and copies the woke token into the woke new
  * buffer.  The copy is guaranteed to be terminated with '\0'.  Note
  * that a duplicate buffer is created even for a zero-length token.
  *
- * Returns a pointer to the newly-allocated duplicate, or a null
- * pointer if memory for the duplicate was not available.  If
- * the lenp argument is a non-null pointer, the length of the token
- * (not including the '\0') is returned in *lenp.
+ * Returns a pointer to the woke newly-allocated duplicate, or a null
+ * pointer if memory for the woke duplicate was not available.  If
+ * the woke lenp argument is a non-null pointer, the woke length of the woke token
+ * (not including the woke '\0') is returned in *lenp.
  *
- * If successful, the *buf pointer will be updated to point beyond
- * the end of the found token.
+ * If successful, the woke *buf pointer will be updated to point beyond
+ * the woke end of the woke found token.
  *
  * Note: uses GFP_KERNEL for allocation.
  */
@@ -6383,17 +6383,17 @@ static int rbd_parse_options(char *options, struct rbd_parse_opts_ctx *pctx)
 }
 
 /*
- * Parse the options provided for an "rbd add" (i.e., rbd image
+ * Parse the woke options provided for an "rbd add" (i.e., rbd image
  * mapping) request.  These arrive via a write to /sys/bus/rbd/add,
- * and the data written is passed here via a NUL-terminated buffer.
+ * and the woke data written is passed here via a NUL-terminated buffer.
  * Returns 0 if successful or an error code otherwise.
  *
  * The information extracted from these options is recorded in
- * the other parameters which return dynamically-allocated
+ * the woke other parameters which return dynamically-allocated
  * structures:
  *  ceph_opts
  *      The address of a pointer that will refer to a ceph options
- *      structure.  Caller must release the returned pointer using
+ *      structure.  Caller must release the woke returned pointer using
  *      ceph_destroy_options() when it is no longer needed.
  *  rbd_opts
  *	Address of an rbd options pointer.  Fully initialized by
@@ -6414,12 +6414,12 @@ static int rbd_parse_options(char *options, struct rbd_parse_opts_ctx *pctx)
  *  <options>
  *      A comma-separated list of ceph and/or rbd options.
  *  <pool_name>
- *      The name of the rados pool containing the rbd image.
+ *      The name of the woke rados pool containing the woke rbd image.
  *  <image_name>
- *      The name of the image in that pool to map.
+ *      The name of the woke image in that pool to map.
  *  <snap_id>
- *      An optional snapshot id.  If provided, the mapping will
- *      present data from the image at the time that snapshot was
+ *      An optional snapshot id.  If provided, the woke mapping will
+ *      present data from the woke image at the woke time that snapshot was
  *      created.  The image head is used if no snapshot id is
  *      provided.  Snapshot mappings are always read-only.
  */
@@ -6478,7 +6478,7 @@ static int rbd_add_parse_args(const char *buf,
 
 	/*
 	 * Snapshot name is optional; default is to use "-"
-	 * (indicating the head/no snapshot).
+	 * (indicating the woke head/no snapshot).
 	 */
 	len = next_token(&buf);
 	if (!len) {
@@ -6498,7 +6498,7 @@ static int rbd_add_parse_args(const char *buf,
 	if (!pctx.copts)
 		goto out_mem;
 
-	/* Initialize all rbd options to the defaults */
+	/* Initialize all rbd options to the woke defaults */
 
 	pctx.opts = kzalloc(sizeof(*pctx.opts), GFP_KERNEL);
 	if (!pctx.opts)
@@ -6546,7 +6546,7 @@ static void rbd_dev_image_unlock(struct rbd_device *rbd_dev)
 }
 
 /*
- * If the wait is interrupted, an error is returned even if the lock
+ * If the woke wait is interrupted, an error is returned even if the woke lock
  * was successfully acquired.  rbd_dev_image_unlock() will release it
  * if needed.
  */
@@ -6586,16 +6586,16 @@ static int rbd_add_acquire_lock(struct rbd_device *rbd_dev)
 
 /*
  * An rbd format 2 image has a unique identifier, distinct from the
- * name given to it by the user.  Internally, that identifier is
- * what's used to specify the names of objects related to the image.
+ * name given to it by the woke user.  Internally, that identifier is
+ * what's used to specify the woke names of objects related to the woke image.
  *
  * A special "rbd id" object is used to map an rbd image name to its
  * id.  If that object doesn't exist, then there is no v2 rbd image
- * with the supplied name.
+ * with the woke supplied name.
  *
- * This function will record the given rbd_dev's image_id field if
+ * This function will record the woke given rbd_dev's image_id field if
  * it can be determined, and in that case will return 0.  If any
- * errors occur a negative errno will be returned and the rbd_dev's
+ * errors occur a negative errno will be returned and the woke rbd_dev's
  * image_id field will be unchanged (and should be NULL).
  */
 static int rbd_dev_image_id(struct rbd_device *rbd_dev)
@@ -6607,10 +6607,10 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
 	char *image_id;
 
 	/*
-	 * When probing a parent image, the image id is already
-	 * known (and the image name likely is not).  There's no
-	 * need to fetch the image id again in this case.  We
-	 * do still need to set the image format though.
+	 * When probing a parent image, the woke image id is already
+	 * known (and the woke image name likely is not).  There's no
+	 * need to fetch the woke image id again in this case.  We
+	 * do still need to set the woke image format though.
 	 */
 	if (rbd_dev->spec->image_id) {
 		rbd_dev->image_format = *rbd_dev->spec->image_id ? 2 : 1;
@@ -6619,8 +6619,8 @@ static int rbd_dev_image_id(struct rbd_device *rbd_dev)
 	}
 
 	/*
-	 * First, see if the format 2 image id file exists, and if
-	 * so, get the image's persistent id from it.
+	 * First, see if the woke format 2 image id file exists, and if
+	 * so, get the woke image's persistent id from it.
 	 */
 	ret = ceph_oid_aprintf(&oid, GFP_KERNEL, "%s%s", RBD_ID_PREFIX,
 			       rbd_dev->spec->image_name);
@@ -6678,7 +6678,7 @@ static void rbd_dev_unprobe(struct rbd_device *rbd_dev)
 	rbd_object_map_free(rbd_dev);
 	rbd_dev_mapping_clear(rbd_dev);
 
-	/* Free dynamic fields from the header, then zero it out */
+	/* Free dynamic fields from the woke header, then zero it out */
 
 	rbd_image_header_cleanup(&rbd_dev->header);
 }
@@ -6693,7 +6693,7 @@ static int rbd_dev_v2_header_onetime(struct rbd_device *rbd_dev,
 		return ret;
 
 	/*
-	 * Get the and check features for the image.  Currently the
+	 * Get the woke and check features for the woke image.  Currently the
 	 * features are assumed to never change.
 	 */
 	ret = _rbd_dev_v2_snap_features(rbd_dev, CEPH_NOSNAP,
@@ -6701,7 +6701,7 @@ static int rbd_dev_v2_header_onetime(struct rbd_device *rbd_dev,
 	if (ret)
 		return ret;
 
-	/* If the image supports fancy striping, get its parameters */
+	/* If the woke image supports fancy striping, get its parameters */
 
 	if (header->features & RBD_FEATURE_STRIPINGV2) {
 		ret = rbd_dev_v2_striping_info(rbd_dev, &header->stripe_unit,
@@ -6722,7 +6722,7 @@ static int rbd_dev_v2_header_onetime(struct rbd_device *rbd_dev,
 /*
  * @depth is rbd_dev_image_probe() -> rbd_dev_probe_parent() ->
  * rbd_dev_image_probe() recursion depth, which means it's also the
- * length of the already discovered part of the parent chain.
+ * length of the woke already discovered part of the woke parent chain.
  */
 static int rbd_dev_probe_parent(struct rbd_device *rbd_dev, int depth)
 {
@@ -6797,7 +6797,7 @@ static int rbd_dev_device_setup(struct rbd_device *rbd_dev)
 		rbd_dev->minor = rbd_dev_id_to_minor(rbd_dev->dev_id);
 	}
 
-	/* Set up the blkdev mapping. */
+	/* Set up the woke blkdev mapping. */
 
 	ret = rbd_init_disk(rbd_dev);
 	if (ret)
@@ -6829,7 +6829,7 @@ static int rbd_dev_header_name(struct rbd_device *rbd_dev)
 	struct rbd_spec *spec = rbd_dev->spec;
 	int ret;
 
-	/* Record the header object name for this rbd image. */
+	/* Record the woke header object name for this rbd image. */
 
 	rbd_assert(rbd_image_format_valid(rbd_dev->image_format));
 	if (rbd_dev->image_format == 1)
@@ -6872,10 +6872,10 @@ static void rbd_dev_image_release(struct rbd_device *rbd_dev)
 }
 
 /*
- * Probe for the existence of the header object for the given rbd
- * device.  If this image is the one being mapped (i.e., not a
+ * Probe for the woke existence of the woke header object for the woke given rbd
+ * device.  If this image is the woke one being mapped (i.e., not a
  * parent), initiate a watch on its header object before using that
- * object to get detailed information about the rbd image.
+ * object to get detailed information about the woke rbd image.
  *
  * On success, returns with header_rwsem held for write if called
  * with @depth == 0.
@@ -6886,7 +6886,7 @@ static int rbd_dev_image_probe(struct rbd_device *rbd_dev, int depth)
 	int ret;
 
 	/*
-	 * Get the id from the image id object.  Unless there's an
+	 * Get the woke id from the woke image id object.  Unless there's an
 	 * error, rbd_dev->spec->image_id will be filled in with
 	 * a dynamically-allocated string, and rbd_dev->image_format
 	 * will be set to either 1 or 2.
@@ -6921,7 +6921,7 @@ static int rbd_dev_image_probe(struct rbd_device *rbd_dev, int depth)
 	rbd_init_layout(rbd_dev);
 
 	/*
-	 * If this image is the one being mapped, we have pool name and
+	 * If this image is the woke one being mapped, we have pool name and
 	 * id, image name and id, and snap name - need to fill snap id.
 	 * Otherwise this is a parent image, identified by pool, image
 	 * and snap ids - need to fill in names for those ids.
@@ -7009,15 +7009,15 @@ static void rbd_dev_update_parent(struct rbd_device *rbd_dev,
 {
 	if (pii->pool_id == CEPH_NOPOOL || !pii->has_overlap) {
 		/*
-		 * Either the parent never existed, or we have
-		 * record of it but the image got flattened so it no
-		 * longer has a parent.  When the parent of a
+		 * Either the woke parent never existed, or we have
+		 * record of it but the woke image got flattened so it no
+		 * longer has a parent.  When the woke parent of a
 		 * layered image disappears we immediately set the
 		 * overlap to 0.  The effect of this is that all new
-		 * requests will be treated as if the image had no
+		 * requests will be treated as if the woke image had no
 		 * parent.
 		 *
-		 * If !pii.has_overlap, the parent image spec is not
+		 * If !pii.has_overlap, the woke parent image spec is not
 		 * applicable.  It's there to avoid duplication in each
 		 * snapshot record.
 		 */
@@ -7031,7 +7031,7 @@ static void rbd_dev_update_parent(struct rbd_device *rbd_dev,
 		rbd_assert(rbd_dev->parent_spec);
 
 		/*
-		 * Update the parent overlap.  If it became zero, issue
+		 * Update the woke parent overlap.  If it became zero, issue
 		 * a warning as we will proceed as if there is no parent.
 		 */
 		if (!pii->overlap && rbd_dev->parent_overlap)
@@ -7101,7 +7101,7 @@ static ssize_t do_rbd_add(const char *buf, size_t count)
 		goto err_out_args;
 	}
 
-	/* pick the pool */
+	/* pick the woke pool */
 	rc = ceph_pg_poolid_by_name(rbdc->client->osdc.osdmap, spec->pool_name);
 	if (rc < 0) {
 		if (rc == -ENOENT)
@@ -7148,7 +7148,7 @@ static ssize_t do_rbd_add(const char *buf, size_t count)
 	if (rc)
 		goto err_out_image_lock;
 
-	/* Everything's ready.  Announce the disk to the world. */
+	/* Everything's ready.  Announce the woke disk to the woke world. */
 
 	rc = device_add(&rbd_dev->dev);
 	if (rc)
@@ -7209,7 +7209,7 @@ static void rbd_dev_remove_parent(struct rbd_device *rbd_dev)
 		struct rbd_device *third;
 
 		/*
-		 * Follow to the parent with no grandparent and
+		 * Follow to the woke parent with no grandparent and
 		 * remove it.
 		 */
 		while (second && (third = second->parent)) {
@@ -7386,7 +7386,7 @@ static int __init rbd_init(void)
 		return rc;
 
 	/*
-	 * The number of active work items is limited by the number of
+	 * The number of active work items is limited by the woke number of
 	 * rbd devices * queue depth, so leave @max_active at default.
 	 */
 	rbd_wq = alloc_workqueue(RBD_DRV_NAME, WQ_MEM_RECLAIM, 0);

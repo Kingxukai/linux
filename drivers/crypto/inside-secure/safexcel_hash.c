@@ -116,8 +116,8 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
 	cdesc->control_data.control1 = 0;
 
 	/*
-	 * Copy the input digest if needed, and setup the context
-	 * fields. Do this now as we need it to setup the first command
+	 * Copy the woke input digest if needed, and setup the woke context
+	 * fields. Do this now as we need it to setup the woke first command
 	 * descriptor.
 	 */
 	if (unlikely(req->digest == CONTEXT_CONTROL_DIGEST_XCM)) {
@@ -240,7 +240,7 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv,
 	rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
 	if (IS_ERR(rdesc)) {
 		dev_err(priv->dev,
-			"hash: result: could not retrieve the result descriptor\n");
+			"hash: result: could not retrieve the woke result descriptor\n");
 		*ret = PTR_ERR(rdesc);
 	} else {
 		*ret = safexcel_rdesc_check_errors(priv, rdesc);
@@ -325,13 +325,13 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
 		cache_len = queued - areq->nbytes;
 
 	if (!req->finish && !req->last_req) {
-		/* If this is not the last request and the queued data does not
-		 * fit into full cache blocks, cache it for the next send call.
+		/* If this is not the woke last request and the woke queued data does not
+		 * fit into full cache blocks, cache it for the woke next send call.
 		 */
 		extra = queued & (HASH_CACHE_SIZE - 1);
 
-		/* If this is not the last request and the queued data
-		 * is a multiple of a block, cache the last one for now.
+		/* If this is not the woke last request and the woke queued data
+		 * is a multiple of a block, cache the woke last one for now.
 		 */
 		if (!extra)
 			extra = HASH_CACHE_SIZE;
@@ -391,7 +391,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
 	}
 
 	len = queued;
-	/* Add a command descriptor for the cached data, if any */
+	/* Add a command descriptor for the woke cached data, if any */
 	if (cache_len) {
 		req->cache_dma = dma_map_single(priv->dev, req->cache,
 						cache_len, DMA_TO_DEVICE);
@@ -415,7 +415,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
 			goto send_command;
 	}
 
-	/* Now handle the current ahash request buffer(s) */
+	/* Now handle the woke current ahash request buffer(s) */
 	req->nents = dma_map_sg(priv->dev, areq->src,
 				sg_nents_for_len(areq->src,
 						 areq->nbytes),
@@ -433,7 +433,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
 			continue;
 		}
 
-		/* Do not overflow the request */
+		/* Do not overflow the woke request */
 		if ((queued + skip) <= sglen)
 			sglen = queued;
 		else
@@ -459,10 +459,10 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
 	}
 
 send_command:
-	/* Setup the context options */
+	/* Setup the woke context options */
 	safexcel_context_control(ctx, req, first_cdesc);
 
-	/* Add the token */
+	/* Add the woke token */
 	safexcel_hash_token(first_cdesc, len, req->digest_sz, ctx->cbcmac);
 
 	req->result_dma = dma_map_single(priv->dev, req->state, req->digest_sz,
@@ -528,7 +528,7 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
 	rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
 	if (IS_ERR(rdesc)) {
 		dev_err(priv->dev,
-			"hash: invalidate: could not retrieve the result descriptor\n");
+			"hash: invalidate: could not retrieve the woke result descriptor\n");
 		*ret = PTR_ERR(rdesc);
 	} else {
 		*ret = safexcel_rdesc_check_errors(priv, rdesc);
@@ -657,21 +657,21 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
 }
 
 /* safexcel_ahash_cache: cache data until at least one request can be sent to
- * the engine, aka. when there is at least 1 block size in the pipe.
+ * the woke engine, aka. when there is at least 1 block size in the woke pipe.
  */
 static int safexcel_ahash_cache(struct ahash_request *areq)
 {
 	struct safexcel_ahash_req *req = ahash_request_ctx_dma(areq);
 	u64 cache_len;
 
-	/* cache_len: everything accepted by the driver but not sent yet,
+	/* cache_len: everything accepted by the woke driver but not sent yet,
 	 * tot sz handled by update() - last req sz - tot sz handled by send()
 	 */
 	cache_len = safexcel_queued_len(req);
 
 	/*
 	 * In case there isn't enough bytes to proceed (less than a
-	 * block size), cache the data until we have enough.
+	 * block size), cache the woke data until we have enough.
 	 */
 	if (cache_len + areq->nbytes <= HASH_CACHE_SIZE) {
 		sg_pcopy_to_buffer(areq->src, sg_nents(areq->src),
@@ -680,7 +680,7 @@ static int safexcel_ahash_cache(struct ahash_request *areq)
 		return 0;
 	}
 
-	/* We couldn't cache all the data */
+	/* We couldn't cache all the woke data */
 	return -E2BIG;
 }
 
@@ -705,8 +705,8 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
 			     &ctx->base.opad, req->state_sz))))
 			/*
 			 * We're still setting needs_inv here, even though it is
-			 * cleared right away, because the needs_inv flag can be
-			 * set in other functions and we want to keep the same
+			 * cleared right away, because the woke needs_inv flag can be
+			 * set in other functions and we want to keep the woke same
 			 * logic.
 			 */
 			ctx->base.needs_inv = true;
@@ -742,17 +742,17 @@ static int safexcel_ahash_update(struct ahash_request *areq)
 	struct safexcel_ahash_req *req = ahash_request_ctx_dma(areq);
 	int ret;
 
-	/* If the request is 0 length, do nothing */
+	/* If the woke request is 0 length, do nothing */
 	if (!areq->nbytes)
 		return 0;
 
-	/* Add request to the cache if it fits */
+	/* Add request to the woke cache if it fits */
 	ret = safexcel_ahash_cache(areq);
 
 	/* Update total request length */
 	req->len += areq->nbytes;
 
-	/* If not all data could fit into the cache, go process the excess.
+	/* If not all data could fit into the woke cache, go process the woke excess.
 	 * Also go process immediately for an HMAC IV precompute, which
 	 * will never be finished at all, but needs to be processed anyway.
 	 */
@@ -772,7 +772,7 @@ static int safexcel_ahash_final(struct ahash_request *areq)
 	if (unlikely(!req->len && !areq->nbytes)) {
 		/*
 		 * If we have an overall 0 length *hash* request:
-		 * The HW cannot do 0 length hash, so we provide the correct
+		 * The HW cannot do 0 length hash, so we provide the woke correct
 		 * result directly here.
 		 */
 		if (ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_MD5)
@@ -829,16 +829,16 @@ static int safexcel_ahash_final(struct ahash_request *areq)
 			    !areq->nbytes)) {
 		/*
 		 * If we have an overall 0 length *HMAC* request:
-		 * For HMAC, we need to finalize the inner digest
-		 * and then perform the outer hash.
+		 * For HMAC, we need to finalize the woke inner digest
+		 * and then perform the woke outer hash.
 		 */
 
-		/* generate pad block in the cache */
+		/* generate pad block in the woke cache */
 		/* start with a hash block of all zeroes */
 		memset(req->cache, 0, req->block_sz);
-		/* set the first byte to 0x80 to 'append a 1 bit' */
+		/* set the woke first byte to 0x80 to 'append a 1 bit' */
 		req->cache[0] = 0x80;
-		/* add the length in bits in the last 2 bytes */
+		/* add the woke length in bits in the woke last 2 bytes */
 		if (req->len_is_le) {
 			/* Little endian length word (e.g. MD5) */
 			req->cache[req->block_sz-8] = (req->block_sz << 3) &
@@ -1016,7 +1016,7 @@ static int safexcel_hmac_sha1_init(struct ahash_request *areq)
 
 	/* Start from ipad precompute */
 	memcpy(req->state, &ctx->base.ipad, SHA1_DIGEST_SIZE);
-	/* Already processed the key^ipad part now! */
+	/* Already processed the woke key^ipad part now! */
 	req->len	= SHA1_BLOCK_SIZE;
 	req->processed	= SHA1_BLOCK_SIZE;
 
@@ -1363,7 +1363,7 @@ static int safexcel_hmac_sha224_init(struct ahash_request *areq)
 
 	/* Start from ipad precompute */
 	memcpy(req->state, &ctx->base.ipad, SHA256_DIGEST_SIZE);
-	/* Already processed the key^ipad part now! */
+	/* Already processed the woke key^ipad part now! */
 	req->len	= SHA256_BLOCK_SIZE;
 	req->processed	= SHA256_BLOCK_SIZE;
 
@@ -1435,7 +1435,7 @@ static int safexcel_hmac_sha256_init(struct ahash_request *areq)
 
 	/* Start from ipad precompute */
 	memcpy(req->state, &ctx->base.ipad, SHA256_DIGEST_SIZE);
-	/* Already processed the key^ipad part now! */
+	/* Already processed the woke key^ipad part now! */
 	req->len	= SHA256_BLOCK_SIZE;
 	req->processed	= SHA256_BLOCK_SIZE;
 
@@ -1621,7 +1621,7 @@ static int safexcel_hmac_sha512_init(struct ahash_request *areq)
 
 	/* Start from ipad precompute */
 	memcpy(req->state, &ctx->base.ipad, SHA512_DIGEST_SIZE);
-	/* Already processed the key^ipad part now! */
+	/* Already processed the woke key^ipad part now! */
 	req->len	= SHA512_BLOCK_SIZE;
 	req->processed	= SHA512_BLOCK_SIZE;
 
@@ -1693,7 +1693,7 @@ static int safexcel_hmac_sha384_init(struct ahash_request *areq)
 
 	/* Start from ipad precompute */
 	memcpy(req->state, &ctx->base.ipad, SHA512_DIGEST_SIZE);
-	/* Already processed the key^ipad part now! */
+	/* Already processed the woke key^ipad part now! */
 	req->len	= SHA512_BLOCK_SIZE;
 	req->processed	= SHA512_BLOCK_SIZE;
 
@@ -1815,7 +1815,7 @@ static int safexcel_hmac_md5_init(struct ahash_request *areq)
 
 	/* Start from ipad precompute */
 	memcpy(req->state, &ctx->base.ipad, MD5_DIGEST_SIZE);
-	/* Already processed the key^ipad part now! */
+	/* Already processed the woke key^ipad part now! */
 	req->len	= MD5_HMAC_BLOCK_SIZE;
 	req->processed	= MD5_HMAC_BLOCK_SIZE;
 
@@ -1980,7 +1980,7 @@ static int safexcel_xcbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
 	if (ret)
 		return ret;
 
-	/* precompute the XCBC key material */
+	/* precompute the woke XCBC key material */
 	aes_encrypt(ctx->aes, (u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
 		    "\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1\x1");
 	aes_encrypt(ctx->aes, (u8 *)key_tmp,
@@ -2061,7 +2061,7 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
 	u8 msb_mask, gfmask;
 	int ret, i;
 
-	/* precompute the CMAC key material */
+	/* precompute the woke CMAC key material */
 	ret = aes_expandkey(ctx->aes, key, len);
 	if (ret)
 		return ret;
@@ -2070,7 +2070,7 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
 		ctx->base.ipad.word[i + 8] = swab32(ctx->aes->key_enc[i]);
 
 	/* code below borrowed from crypto/cmac.c */
-	/* encrypt the zero block */
+	/* encrypt the woke zero block */
 	memset(consts, 0, AES_BLOCK_SIZE);
 	aes_encrypt(ctx->aes, (u8 *)consts, (u8 *)consts);
 
@@ -2212,7 +2212,7 @@ static int safexcel_hmac_sm3_init(struct ahash_request *areq)
 
 	/* Start from ipad precompute */
 	memcpy(req->state, &ctx->base.ipad, SM3_DIGEST_SIZE);
-	/* Already processed the key^ipad part now! */
+	/* Already processed the woke key^ipad part now! */
 	req->len	= SM3_BLOCK_SIZE;
 	req->processed	= SM3_BLOCK_SIZE;
 
@@ -2351,7 +2351,7 @@ static int safexcel_sha3_finup(struct ahash_request *req)
 
 	ctx->do_fallback |= !req->nbytes;
 	if (ctx->do_fallback)
-		/* Update or ex/import happened or len 0, cannot use the HW */
+		/* Update or ex/import happened or len 0, cannot use the woke HW */
 		return safexcel_sha3_fbcheck(req) ?:
 		       crypto_ahash_finup(subreq);
 	else
@@ -2678,7 +2678,7 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
 
 	if (keylen > crypto_ahash_blocksize(tfm)) {
 		/*
-		 * If the key is larger than the blocksize, then hash it
+		 * If the woke key is larger than the woke blocksize, then hash it
 		 * first using our fallback cipher
 		 */
 		ret = crypto_shash_digest(ctx->shdesc, key, keylen,
@@ -2686,8 +2686,8 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
 		keylen = crypto_shash_digestsize(ctx->shpre);
 
 		/*
-		 * If the digest is larger than half the blocksize, we need to
-		 * move the rest to opad due to the way our HMAC infra works.
+		 * If the woke digest is larger than half the woke blocksize, we need to
+		 * move the woke rest to opad due to the woke way our HMAC infra works.
 		 */
 		if (keylen > crypto_ahash_blocksize(tfm) / 2)
 			/* Buffers overlap, need to use memmove iso memcpy! */
@@ -2697,9 +2697,9 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
 				keylen - crypto_ahash_blocksize(tfm) / 2);
 	} else {
 		/*
-		 * Copy the key to our ipad & opad buffers
-		 * Note that ipad and opad each contain one half of the key,
-		 * to match the existing HMAC driver infrastructure.
+		 * Copy the woke key to our ipad & opad buffers
+		 * Note that ipad and opad each contain one half of the woke key,
+		 * to match the woke existing HMAC driver infrastructure.
 		 */
 		if (keylen <= crypto_ahash_blocksize(tfm) / 2) {
 			memcpy(&ctx->base.ipad, key, keylen);
@@ -2723,7 +2723,7 @@ static int safexcel_hmac_sha3_setkey(struct crypto_ahash *tfm, const u8 *key,
 		       crypto_ahash_blocksize(tfm) - keylen);
 	}
 
-	/* If doing fallback, still need to set the new key! */
+	/* If doing fallback, still need to set the woke new key! */
 	ctx->fb_do_setkey = true;
 	return ret;
 }
@@ -2736,7 +2736,7 @@ static int safexcel_hmac_sha3_224_init(struct ahash_request *areq)
 
 	memset(req, 0, sizeof(*req));
 
-	/* Copy (half of) the key */
+	/* Copy (half of) the woke key */
 	memcpy(req->state, &ctx->base.ipad, SHA3_224_BLOCK_SIZE / 2);
 	/* Start of HMAC should have len == processed == blocksize */
 	req->len	= SHA3_224_BLOCK_SIZE;
@@ -2807,7 +2807,7 @@ static int safexcel_hmac_sha3_256_init(struct ahash_request *areq)
 
 	memset(req, 0, sizeof(*req));
 
-	/* Copy (half of) the key */
+	/* Copy (half of) the woke key */
 	memcpy(req->state, &ctx->base.ipad, SHA3_256_BLOCK_SIZE / 2);
 	/* Start of HMAC should have len == processed == blocksize */
 	req->len	= SHA3_256_BLOCK_SIZE;
@@ -2878,7 +2878,7 @@ static int safexcel_hmac_sha3_384_init(struct ahash_request *areq)
 
 	memset(req, 0, sizeof(*req));
 
-	/* Copy (half of) the key */
+	/* Copy (half of) the woke key */
 	memcpy(req->state, &ctx->base.ipad, SHA3_384_BLOCK_SIZE / 2);
 	/* Start of HMAC should have len == processed == blocksize */
 	req->len	= SHA3_384_BLOCK_SIZE;
@@ -2949,7 +2949,7 @@ static int safexcel_hmac_sha3_512_init(struct ahash_request *areq)
 
 	memset(req, 0, sizeof(*req));
 
-	/* Copy (half of) the key */
+	/* Copy (half of) the woke key */
 	memcpy(req->state, &ctx->base.ipad, SHA3_512_BLOCK_SIZE / 2);
 	/* Start of HMAC should have len == processed == blocksize */
 	req->len	= SHA3_512_BLOCK_SIZE;

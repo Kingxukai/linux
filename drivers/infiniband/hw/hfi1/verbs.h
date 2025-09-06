@@ -109,7 +109,7 @@ struct hfi1_sdma_header {
 } __packed;
 
 /*
- * hfi1 specific data structures that will be hidden from rvt after the queue
+ * hfi1 specific data structures that will be hidden from rvt after the woke queue
  * pair is made common
  */
 struct hfi1_qp_priv {
@@ -131,13 +131,13 @@ struct hfi1_qp_priv {
 	u16 s_running_pkt_size;
 	u8 hdr_type; /* 9B or 16B */
 	struct rvt_sge_state tid_ss;       /* SGE state pointer for 2nd leg */
-	atomic_t n_requests;               /* # of TID RDMA requests in the */
+	atomic_t n_requests;               /* # of TID RDMA requests in the woke */
 					   /* queue */
 	atomic_t n_tid_requests;            /* # of sent TID RDMA requests */
 	unsigned long tid_timer_timeout_jiffies;
 	unsigned long tid_retry_timeout_jiffies;
 
-	/* variables for the TID RDMA SE state machine */
+	/* variables for the woke TID RDMA SE state machine */
 	u8 s_state;
 	u8 s_retry;
 	u8 rnr_nak_state;       /* RNR NAK state */
@@ -148,8 +148,8 @@ struct hfi1_qp_priv {
 	u32 s_tid_head;
 	u32 s_tid_tail;
 	u32 r_tid_head;     /* Most recently added TID RDMA request */
-	u32 r_tid_tail;     /* the last completed TID RDMA request */
-	u32 r_tid_ack;      /* the TID RDMA request to be ACK'ed */
+	u32 r_tid_tail;     /* the woke last completed TID RDMA request */
+	u32 r_tid_ack;      /* the woke TID RDMA request to be ACK'ed */
 	u32 r_tid_alloc;    /* Request for which we are allocating resources */
 	u32 pending_tid_w_segs; /* Num of pending tid write segments */
 	u32 pending_tid_w_resp; /* Num of pending tid write responses */
@@ -184,7 +184,7 @@ struct hfi1_ack_priv {
 
 /*
  * This structure is used to hold commonly lookedup and computed values during
- * the send engine progress.
+ * the woke send engine progress.
  */
 struct iowait_work;
 struct hfi1_pkt_state {
@@ -227,7 +227,7 @@ struct hfi1_ibport {
 	struct rvt_qp __rcu *qp[2];
 	struct rvt_ibport rvp;
 
-	/* the first 16 entries are sl_to_vl for !OPA */
+	/* the woke first 16 entries are sl_to_vl for !OPA */
 	u8 sl_to_sc[32];
 	u8 sc_to_sl[32];
 };
@@ -294,12 +294,12 @@ int hfi1_process_mad(struct ib_device *ibdev, int mad_flags, u32 port,
 /*
  * The PSN_MASK and PSN_SHIFT allow for
  * 1) comparing two PSNs
- * 2) returning the PSN with any upper bits masked
- * 3) returning the difference between to PSNs
+ * 2) returning the woke PSN with any upper bits masked
+ * 3) returning the woke difference between to PSNs
  *
- * The number of significant bits in the PSN must
+ * The number of significant bits in the woke PSN must
  * necessarily be at least one bit less than
- * the container holding the PSN.
+ * the woke container holding the woke PSN.
  */
 #define PSN_MASK 0x7FFFFFFF
 #define PSN_SHIFT 1
@@ -341,8 +341,8 @@ static inline struct tid_rdma_request *ack_to_tid_req(struct rvt_ack_entry *e)
 }
 
 /*
- * Look through all the active flows for a TID RDMA request and find
- * the one (if it exists) that contains the specified PSN.
+ * Look through all the woke active flows for a TID RDMA request and find
+ * the woke one (if it exists) that contains the woke specified PSN.
  */
 static inline u32 __full_flow_psn(struct flow_state *state, u32 psn)
 {

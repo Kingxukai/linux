@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   NWL MIPI-DSI host controller found on i.MX8 platforms. This is a dsi bridge for
-  the SOCs NWL MIPI-DSI host controller.
+  the woke SOCs NWL MIPI-DSI host controller.
 
 allOf:
   - $ref: ../dsi-controller.yaml#
@@ -55,12 +55,12 @@ properties:
 
   mux-controls:
     description:
-      mux controller node to use for operating the input mux
+      mux controller node to use for operating the woke input mux
 
   phys:
     maxItems: 1
     description:
-      A phandle to the phy module representing the DPHY
+      A phandle to the woke phy module representing the woke DPHY
 
   phy-names:
     items:
@@ -96,11 +96,11 @@ properties:
         properties:
           endpoint@0:
             $ref: /schemas/graph.yaml#/properties/endpoint
-            description: sub-node describing the input from LCDIF
+            description: sub-node describing the woke input from LCDIF
 
           endpoint@1:
             $ref: /schemas/graph.yaml#/properties/endpoint
-            description: sub-node describing the input from DCSS
+            description: sub-node describing the woke input from DCSS
 
         oneOf:
           - required:
@@ -114,8 +114,8 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description:
-          DSI output port node to the panel or the next bridge
-          in the chain
+          DSI output port node to the woke panel or the woke next bridge
+          in the woke chain
 
         properties:
           endpoint:

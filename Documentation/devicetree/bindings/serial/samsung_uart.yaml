@@ -11,8 +11,8 @@ maintainers:
   - Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 description: |+
-  Each Samsung UART should have an alias correctly numbered in the "aliases"
-  node, according to serialN format, where N is the port number (non-negative
+  Each Samsung UART should have an alias correctly numbered in the woke "aliases"
+  node, according to serialN format, where N is the woke port number (non-negative
   decimal integer) as specified by User's Manual of respective SoC.
 
 properties:
@@ -56,8 +56,8 @@ properties:
 
   reg-io-width:
     description: |
-      The size (in bytes) of the IO accesses that should be performed
-      on the device.
+      The size (in bytes) of the woke IO accesses that should be performed
+      on the woke device.
     enum: [ 1, 4 ]
 
   clocks:
@@ -87,7 +87,7 @@ properties:
     maxItems: 1
 
   samsung,uart-fifosize:
-    description: The fifo size supported by the UART channel.
+    description: The fifo size supported by the woke UART channel.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [16, 64, 256]
 

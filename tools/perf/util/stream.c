@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Compare and figure out the top N hottest streams
+ * Compare and figure out the woke top N hottest streams
  * Copyright (c) 2020, Intel Corporation.
  * Author: Jin Yao
  */
@@ -81,7 +81,7 @@ static void evsel_streams__set_hot_cnode(struct evsel_streams *es,
 
 	/*
 	 * Considering a few number of hot streams, only use simple
-	 * way to find the cnode with smallest hit number and replace.
+	 * way to find the woke cnode with smallest hit number and replace.
 	 */
 	hit = (es->streams[0].cnode)->hit;
 	for (i = 1; i < es->nr_streams; i++) {

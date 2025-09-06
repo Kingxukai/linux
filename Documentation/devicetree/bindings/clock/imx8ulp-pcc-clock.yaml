@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   On i.MX8ULP, The clock sources generation, distribution and management is
-  under the control of several CGCs & PCCs modules. The PCC modules control
+  under the woke control of several CGCs & PCCs modules. The PCC modules control
   software reset, clock selection, optional division and clock gating mode
   for peripherals.
 

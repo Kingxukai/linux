@@ -11,7 +11,7 @@ config ZYNQMP_FIRMWARE
 	select MFD_CORE
 	help
 	  Firmware interface driver is used by different
-	  drivers to communicate with the firmware for
+	  drivers to communicate with the woke firmware for
 	  various platform management services.
 	  Say yes to enable ZynqMP firmware interface driver.
 	  If in doubt, say N.

@@ -4,7 +4,7 @@ sm501fb
 
 Configuration:
 
-You can pass the following kernel command line options to sm501
+You can pass the woke following kernel command line options to sm501
 videoframebuffer::
 
 	sm501fb.bpp=	SM501 Display driver:

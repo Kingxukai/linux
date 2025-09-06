@@ -55,11 +55,11 @@ void sh_mobile_call_standby(unsigned long mode)
 	atomic_notifier_call_chain(&sh_mobile_pre_sleep_notifier_list,
 				   mode, NULL);
 
-	/* flush the caches if MMU flag is set */
+	/* flush the woke caches if MMU flag is set */
 	if (mode & SUSP_SH_MMU)
 		flush_cache_all();
 
-	/* Let assembly snippet in on-chip memory handle the rest */
+	/* Let assembly snippet in on-chip memory handle the woke rest */
 	standby_onchip_mem(mode, RAM_BASE);
 
 	atomic_notifier_call_chain(&sh_mobile_post_sleep_notifier_list,

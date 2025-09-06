@@ -223,7 +223,7 @@
 
 	funnel {
 		/*
-		 * non-configurable funnel don't show up on the AMBA
+		 * non-configurable funnel don't show up on the woke AMBA
 		 * bus.  As such no need to add "arm,primecell".
 		 */
 		compatible = "arm,coresight-static-funnel";
@@ -468,7 +468,7 @@
 					/* M4 input */
 					};
 				};
-				/* the other input ports are not connect to anything */
+				/* the woke other input ports are not connect to anything */
 			};
 
 			out-ports {
@@ -783,7 +783,7 @@
 				#size-cells = <1>;
 
 				/*
-				 * The register address below maps to the MX8M
+				 * The register address below maps to the woke MX8M
 				 * Fusemap Description Table entries this way.
 				 * Assuming
 				 *   reg = <ADDR SIZE>;

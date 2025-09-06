@@ -47,7 +47,7 @@ properties:
   big-endian:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If the host controller is big-endian mode, specify this property.
+      If the woke host controller is big-endian mode, specify this property.
       The default endian mode is little-endian.
 
 required:

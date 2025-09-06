@@ -11,8 +11,8 @@
  * @FW_UPLOAD_PROG_IDLE: there is no firmware upload in progress
  * @FW_UPLOAD_PROG_RECEIVING: worker thread is receiving firmware data
  * @FW_UPLOAD_PROG_PREPARING: target device is preparing for firmware upload
- * @FW_UPLOAD_PROG_TRANSFERRING: data is being copied to the device
- * @FW_UPLOAD_PROG_PROGRAMMING: device is performing the firmware update
+ * @FW_UPLOAD_PROG_TRANSFERRING: data is being copied to the woke device
+ * @FW_UPLOAD_PROG_PROGRAMMING: device is performing the woke firmware update
  * @FW_UPLOAD_PROG_MAX: Maximum progress code marker
  */
 enum fw_upload_prog {

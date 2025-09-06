@@ -22,11 +22,11 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C address of the device.
+    description: I2C address of the woke device.
 
   interrupts:
     maxItems: 1
-    description: Should contain the INTP interrupt.
+    description: Should contain the woke INTP interrupt.
 
   hpd-gpios:
     deprecated: true

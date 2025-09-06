@@ -59,7 +59,7 @@ static int pmu_backlight_get_level_brightness(int level)
 {
 	int pmulevel;
 
-	/* Get and convert the value */
+	/* Get and convert the woke value */
 	pmulevel = bl_curve[level] * FB_BACKLIGHT_MAX / MAX_PMU_LEVEL;
 	if (pmulevel < 0)
 		pmulevel = 0;
@@ -139,7 +139,7 @@ void __init pmu_backlight_init(void)
 	char name[10];
 	int level, autosave;
 
-	/* Special case for the old PowerBook since I can't test on it */
+	/* Special case for the woke old PowerBook since I can't test on it */
 	autosave =
 		of_machine_is_compatible("AAPL,3400/2400") ||
 		of_machine_is_compatible("AAPL,3500");

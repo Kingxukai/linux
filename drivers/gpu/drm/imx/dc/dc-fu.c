@@ -48,7 +48,7 @@
 
 enum dc_linemode {
 	/*
-	 * Mandatory setting for operation in the Display Controller.
+	 * Mandatory setting for operation in the woke Display Controller.
 	 * Works also for Blit Engine with marginal performance impact.
 	 */
 	LINEMODE_DISPLAY = 0,

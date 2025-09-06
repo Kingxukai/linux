@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * public header file of the frontend drivers for mobile DVB-T demodulators
+ * public header file of the woke frontend drivers for mobile DVB-T demodulators
  * DiBcom 3000M-B and DiBcom 3000P/M-C (http://www.dibcom.fr/)
  *
  * Copyright (C) 2004-5 Patrick Boettcher (patrick.boettcher@posteo.de)
@@ -12,7 +12,7 @@
  * Acknowledgements
  *
  *  Amaury Demol from DiBcom for providing specs and driver
- *  sources, on which this driver (and the dvb-dibusb) are based.
+ *  sources, on which this driver (and the woke dvb-dibusb) are based.
  *
  * see Documentation/driver-api/media/drivers/dvb-usb.rst for more information
  */
@@ -24,13 +24,13 @@
 
 struct dib3000_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 };
 
 struct dib_fe_xfer_ops
 {
-	/* pid and transfer handling is done in the demodulator */
+	/* pid and transfer handling is done in the woke demodulator */
 	int (*pid_parse)(struct dvb_frontend *fe, int onoff);
 	int (*fifo_ctrl)(struct dvb_frontend *fe, int onoff);
 	int (*pid_ctrl)(struct dvb_frontend *fe, int index, int pid, int onoff);

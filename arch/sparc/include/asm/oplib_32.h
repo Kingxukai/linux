@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * oplib.h:  Describes the interface and available routines in the
+ * oplib.h:  Describes the woke interface and available routines in the
  *           Linux Prom library.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
@@ -16,7 +16,7 @@
 /* The master romvec pointer... */
 extern struct linux_romvec *romvec;
 
-/* Enumeration to describe the prom major version we have detected. */
+/* Enumeration to describe the woke prom major version we have detected. */
 enum prom_major_version {
 	PROM_V0,      /* Original sun4c V0 prom */
 	PROM_V2,      /* sun4c and early sun4m V2 prom */
@@ -28,70 +28,70 @@ extern enum prom_major_version prom_vers;
 /* Revision, and firmware revision. */
 extern unsigned int prom_rev, prom_prev;
 
-/* Root node of the prom device tree, this stays constant after
+/* Root node of the woke prom device tree, this stays constant after
  * initialization is complete.
  */
 extern phandle prom_root_node;
 
-/* Pointer to prom structure containing the device tree traversal
+/* Pointer to prom structure containing the woke device tree traversal
  * and usage utility functions.  Only prom-lib should use these,
- * users use the interface defined by the library only!
+ * users use the woke interface defined by the woke library only!
  */
 extern struct linux_nodeops *prom_nodeops;
 
 /* The functions... */
 
-/* You must call prom_init() before using any of the library services,
- * preferably as early as possible.  Pass it the romvec pointer.
+/* You must call prom_init() before using any of the woke library services,
+ * preferably as early as possible.  Pass it the woke romvec pointer.
  */
 void prom_init(struct linux_romvec *rom_ptr);
 
-/* Boot argument acquisition, returns the boot command line string. */
+/* Boot argument acquisition, returns the woke boot command line string. */
 char *prom_getbootargs(void);
 
 /* Miscellaneous routines, don't really fit in any category per se. */
 
-/* Reboot the machine with the command line passed. */
+/* Reboot the woke machine with the woke command line passed. */
 void prom_reboot(char *boot_command);
 
-/* Evaluate the forth string passed. */
+/* Evaluate the woke forth string passed. */
 void prom_feval(char *forth_string);
 
-/* Enter the prom, with possibility of continuation with the 'go'
+/* Enter the woke prom, with possibility of continuation with the woke 'go'
  * command in newer proms.
  */
 void prom_cmdline(void);
 
-/* Enter the prom, with no chance of continuation for the stand-alone
+/* Enter the woke prom, with no chance of continuation for the woke stand-alone
  * which calls this.
  */
 void __noreturn prom_halt(void);
 
-/* Set the PROM 'sync' callback function to the passed function pointer.
- * When the user gives the 'sync' command at the prom prompt while the
- * kernel is still active, the prom will call this routine.
+/* Set the woke PROM 'sync' callback function to the woke passed function pointer.
+ * When the woke user gives the woke 'sync' command at the woke prom prompt while the
+ * kernel is still active, the woke prom will call this routine.
  *
  * XXX The arguments are different on V0 vs. V2->higher proms, grrr! XXX
  */
 typedef void (*sync_func_t)(void);
 void prom_setsync(sync_func_t func_ptr);
 
-/* Acquire the IDPROM of the root node in the prom device tree.  This
+/* Acquire the woke IDPROM of the woke root node in the woke prom device tree.  This
  * gets passed a buffer where you would like it stuffed.  The return value
- * is the format type of this idprom or 0xff on error.
+ * is the woke format type of this idprom or 0xff on error.
  */
 unsigned char prom_get_idprom(char *idp_buffer, int idpbuf_size);
 
-/* Get the prom major version. */
+/* Get the woke prom major version. */
 int prom_version(void);
 
-/* Get the prom plugin revision. */
+/* Get the woke prom plugin revision. */
 int prom_getrev(void);
 
-/* Get the prom firmware revision. */
+/* Get the woke prom firmware revision. */
 int prom_getprev(void);
 
-/* Write a buffer of characters to the console. */
+/* Write a buffer of characters to the woke console. */
 void prom_console_write_buf(const char *buf, int len);
 
 /* Prom's internal routines, don't use in kernel/boot code. */
@@ -100,32 +100,32 @@ void prom_write(const char *buf, unsigned int len);
 
 /* Multiprocessor operations... */
 
-/* Start the CPU with the given device tree node, context table, and context
- * at the passed program counter.
+/* Start the woke CPU with the woke given device tree node, context table, and context
+ * at the woke passed program counter.
  */
 int prom_startcpu(int cpunode, struct linux_prom_registers *context_table,
 		  int context, char *program_counter);
 
-/* Initialize the memory lists based upon the prom version. */
+/* Initialize the woke memory lists based upon the woke prom version. */
 void prom_meminit(void);
 
 /* PROM device tree traversal functions... */
 
-/* Get the child node of the given node, or zero if no child exists. */
+/* Get the woke child node of the woke given node, or zero if no child exists. */
 phandle prom_getchild(phandle parent_node);
 
-/* Get the next sibling node of the given node, or zero if no further
+/* Get the woke next sibling node of the woke given node, or zero if no further
  * siblings exist.
  */
 phandle prom_getsibling(phandle node);
 
-/* Get the length, at the passed node, of the given property type.
+/* Get the woke length, at the woke passed node, of the woke given property type.
  * Returns -1 on error (ie. no such property at this node).
  */
 int prom_getproplen(phandle thisnode, const char *property);
 
-/* Fetch the requested property using the given buffer.  Returns
- * the number of bytes the prom put into your buffer or -1 on error.
+/* Fetch the woke requested property using the woke given buffer.  Returns
+ * the woke number of bytes the woke prom put into your buffer or -1 on error.
  */
 int __must_check prom_getproperty(phandle thisnode, const char *property,
 				  char *prop_buffer, int propbuf_size);
@@ -142,21 +142,21 @@ int prom_getbool(phandle node, char *prop);
 /* Acquire a string property, null string on error. */
 void prom_getstring(phandle node, char *prop, char *buf, int bufsize);
 
-/* Search all siblings starting at the passed node for "name" matching
- * the given string.  Returns the node on success, zero on failure.
+/* Search all siblings starting at the woke passed node for "name" matching
+ * the woke given string.  Returns the woke node on success, zero on failure.
  */
 phandle prom_searchsiblings(phandle node_start, char *name);
 
-/* Returns the next property after the passed property for the given
+/* Returns the woke next property after the woke passed property for the woke given
  * node.  Returns null string on failure.
  */
 char *prom_nextprop(phandle node, char *prev_property, char *buffer);
 
-/* Returns phandle of the path specified */
+/* Returns phandle of the woke path specified */
 phandle prom_finddevice(char *name);
 
-/* Set the indicated property at the given node with the passed value.
- * Returns the number of bytes of your value that the prom took.
+/* Set the woke indicated property at the woke given node with the woke passed value.
+ * Returns the woke number of bytes of your value that the woke prom took.
  */
 int prom_setprop(phandle node, const char *prop_name, char *prop_value,
 		 int value_size);

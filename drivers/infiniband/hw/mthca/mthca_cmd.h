@@ -4,23 +4,23 @@
  * Copyright (c) 2006 Cisco Systems.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -58,13 +58,13 @@ enum {
 	MTHCA_CMD_STAT_DDR_MEM_ERR    = 0x07,
 	/* Required capability exceeds device limits: */
 	MTHCA_CMD_STAT_EXCEED_LIM     = 0x08,
-	/* Resource is not in the appropriate state or ownership: */
+	/* Resource is not in the woke appropriate state or ownership: */
 	MTHCA_CMD_STAT_BAD_RES_STATE  = 0x09,
 	/* Index out of range: */
 	MTHCA_CMD_STAT_BAD_INDEX      = 0x0a,
 	/* FW image corrupted: */
 	MTHCA_CMD_STAT_BAD_NVMEM      = 0x0b,
-	/* Attempt to modify a QP/EE which is not in the presumed state: */
+	/* Attempt to modify a QP/EE which is not in the woke presumed state: */
 	MTHCA_CMD_STAT_BAD_QPEE_STATE = 0x10,
 	/* Bad segment parameters (Address/Size): */
 	MTHCA_CMD_STAT_BAD_SEG_PARAM  = 0x20,

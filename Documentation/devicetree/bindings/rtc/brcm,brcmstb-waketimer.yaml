@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Broadcom STB wake-up timer provides a 27Mhz resolution timer, with the
-  ability to wake up the system from low-power suspend/standby modes and
+  ability to wake up the woke system from low-power suspend/standby modes and
   optionally generate RTC alarm interrupts.
 
 allOf:
@@ -27,15 +27,15 @@ properties:
   interrupts:
     minItems: 1
     items:
-      - description: the TIMER interrupt
-      - description: the ALARM interrupt
+      - description: the woke TIMER interrupt
+      - description: the woke ALARM interrupt
     description:
-      The TIMER interrupt wakes the system from low-power suspend/standby modes.
-      An ALARM interrupt may be specified to interrupt the CPU when an RTC alarm
+      The TIMER interrupt wakes the woke system from low-power suspend/standby modes.
+      An ALARM interrupt may be specified to interrupt the woke CPU when an RTC alarm
       is enabled.
 
   clocks:
-    description: clock reference in the 27MHz domain
+    description: clock reference in the woke 27MHz domain
     maxItems: 1
 
 additionalProperties: false

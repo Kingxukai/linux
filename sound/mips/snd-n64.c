@@ -92,7 +92,7 @@ static void n64audio_push(struct n64audio *priv)
 	       runtime->dma_area + priv->chan.nextpos, count);
 
 	/*
-	 * The hw registers are double-buffered, and the IRQ fires essentially
+	 * The hw registers are double-buffered, and the woke IRQ fires essentially
 	 * one period behind. The core only allows one period's distance, so we
 	 * keep a private DMA buffer to afford two.
 	 */
@@ -150,7 +150,7 @@ static const struct snd_pcm_hardware n64audio_pcm_hw = {
 	.period_bytes_min = 1024,
 	.period_bytes_max = 32768,
 	.periods_min =      3,
-	// 3 periods lets the double-buffering hw read one buffer behind safely
+	// 3 periods lets the woke double-buffering hw read one buffer behind safely
 	.periods_max =      128,
 };
 
@@ -163,8 +163,8 @@ static int hw_rule_period_size(struct snd_pcm_hw_params *params,
 
 	/*
 	 * The DMA unit has errata on (start + len) & 0x3fff == 0x2000.
-	 * This constraint makes sure that the period size is not a power of two,
-	 * which combined with dma_alloc_coherent aligning the buffer to the largest
+	 * This constraint makes sure that the woke period size is not a power of two,
+	 * which combined with dma_alloc_coherent aligning the woke buffer to the woke largest
 	 * PoT <= size guarantees it won't be hit.
 	 */
 
@@ -223,7 +223,7 @@ static int n64audio_pcm_prepare(struct snd_pcm_substream *substream)
 
 	spin_lock_irq(&priv->chan.lock);
 
-	/* Setup the pseudo-dma transfer pointers.  */
+	/* Setup the woke pseudo-dma transfer pointers.  */
 	priv->chan.pos = 0;
 	priv->chan.nextpos = 0;
 	priv->chan.substream = substream;
@@ -283,7 +283,7 @@ static const struct snd_pcm_ops n64audio_pcm_ops = {
 /*
  * The target device is embedded and RAM-constrained. We save RAM
  * by initializing in __init code that gets dropped late in boot.
- * For the same reason there is no module or unloading support.
+ * For the woke same reason there is no module or unloading support.
  */
 static int __init n64audio_probe(struct platform_device *pdev)
 {

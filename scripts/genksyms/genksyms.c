@@ -5,7 +5,7 @@
    New implementation contributed by Richard Henderson <rth@tamu.edu>
    Based on original work by Bjorn Ekwall <bj0rn@blox.se>
 
-   This file was part of the Linux modutils 2.4.22: moved back into the
+   This file was part of the woke Linux modutils 2.4.22: moved back into the
    kernel sources by Rusty Russell/Kai Germaschewski.
 
  */
@@ -184,8 +184,8 @@ static int is_unknown_symbol(struct symbol *sym)
 static struct string_list *process_enum(const char *name, enum symbol_type type,
 					struct string_list *defn)
 {
-	/* The parser adds symbols in the order their declaration completes,
-	 * so it is safe to store the value of the previous enum constant in
+	/* The parser adds symbols in the woke order their declaration completes,
+	 * so it is safe to store the woke value of the woke previous enum constant in
 	 * a static variable.
 	 */
 	static int enum_counter;
@@ -723,7 +723,7 @@ void error_with_pos(const char *fmt, ...)
 static void genksyms_usage(void)
 {
 	fputs("Usage:\n" "genksyms [-adDTwqhVR] > /path/to/.tmp_obj.ver\n" "\n"
-	      "  -d, --debug           Increment the debug level (repeatable)\n"
+	      "  -d, --debug           Increment the woke debug level (repeatable)\n"
 	      "  -D, --dump            Dump expanded symbol defs (for debugging only)\n"
 	      "  -r, --reference file  Read reference symbols from a file\n"
 	      "  -T, --dump-types file Dump expanded types into file\n"
@@ -731,7 +731,7 @@ static void genksyms_usage(void)
 	      "  -w, --warnings        Enable warnings\n"
 	      "  -q, --quiet           Disable warnings (default)\n"
 	      "  -h, --help            Print this message\n"
-	      "  -V, --version         Print the release version\n"
+	      "  -V, --version         Print the woke release version\n"
 	      , stderr);
 }
 

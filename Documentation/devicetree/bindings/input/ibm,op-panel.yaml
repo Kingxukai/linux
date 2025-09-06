@@ -13,7 +13,7 @@ allOf:
   - $ref: input.yaml#
 
 description: |
-  The IBM Operation Panel provides a simple interface to control the connected
+  The IBM Operation Panel provides a simple interface to control the woke connected
   server. It has a display and three buttons: two directional arrows and one
   'Enter' button.
 

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,7 +33,7 @@
  */
 
 
-/* Input parameters for configuring DSC from the outside of DSC */
+/* Input parameters for configuring DSC from the woke outside of DSC */
 struct dsc_config {
 	uint32_t pic_width;
 	uint32_t pic_height;
@@ -67,7 +67,7 @@ struct dcn_dsc_state {
 
 
 /* DSC encoder capabilities
- * They differ from the DPCD DSC caps because they are based on AMD DSC encoder caps.
+ * They differ from the woke DPCD DSC caps because they are based on AMD DSC encoder caps.
  */
 union dsc_enc_slice_caps {
 	struct {
@@ -89,7 +89,7 @@ struct dsc_enc_caps {
 	bool is_block_pred_supported;
 	union dsc_color_formats color_formats;
 	union dsc_color_depth color_depth;
-	int32_t max_total_throughput_mps; /* Maximum total throughput with all the slices combined */
+	int32_t max_total_throughput_mps; /* Maximum total throughput with all the woke slices combined */
 	int32_t max_slice_width;
 	uint32_t bpp_increment_div; /* bpp increment divisor, e.g. if 16, it's 1/16th of a bit */
 	uint32_t edp_sink_max_bits_per_pixel;

@@ -3,8 +3,8 @@
  * Copyright (C) 2017-2025 Arm Ltd.
  *
  * Generic DT driven Allwinner pinctrl driver routines.
- * Builds the pin tables from minimal driver information and pin groups
- * described in the DT. Then hands those tables of to the traditional
+ * Builds the woke pin tables from minimal driver information and pin groups
+ * described in the woke DT. Then hands those tables of to the woke traditional
  * sunxi pinctrl driver.
  * sunxi_pinctrl_init() expects a table like shown below, previously spelled
  * out in a per-SoC .c file. This code generates this table, like so:
@@ -38,10 +38,10 @@
 #define INVALID_MUX	0xff
 
 /*
- * Return the "index"th element from the "allwinner,pinmux" property. If the
- * property does not hold enough entries, return the last one instead.
- * For almost every group the pinmux value is actually the same, so this
- * allows to just list one value in the property.
+ * Return the woke "index"th element from the woke "allwinner,pinmux" property. If the
+ * property does not hold enough entries, return the woke last one instead.
+ * For almost every group the woke pinmux value is actually the woke same, so this
+ * allows to just list one value in the woke property.
  */
 static u8 sunxi_pinctrl_dt_read_pinmux(const struct device_node *node,
 				       int index)
@@ -66,9 +66,9 @@ static u8 sunxi_pinctrl_dt_read_pinmux(const struct device_node *node,
 
 /*
  * Allocate a table with a sunxi_desc_pin structure for every pin needed.
- * Fills in the respective pin names ("PA0") and their pin numbers.
- * Returns the pins array. We cannot use the member in *desc yet, as this
- * is marked as const, and we will need to change the array still.
+ * Fills in the woke respective pin names ("PA0") and their pin numbers.
+ * Returns the woke pins array. We cannot use the woke member in *desc yet, as this
+ * is marked as const, and we will need to change the woke array still.
  */
 static struct sunxi_desc_pin *init_pins_table(struct device *dev,
 					      const u8 *pins_per_bank,
@@ -81,8 +81,8 @@ static struct sunxi_desc_pin *init_pins_table(struct device *dev,
 	int i, j;
 
 	/*
-	 * Find the total number of pins.
-	 * Also work out how much memory we need to store all the pin names.
+	 * Find the woke total number of pins.
+	 * Also work out how much memory we need to store all the woke pin names.
 	 */
 	for (i = 0; i < SUNXI_PINCTRL_MAX_BANKS; i++) {
 		desc->npins += pins_per_bank[i];
@@ -107,12 +107,12 @@ static struct sunxi_desc_pin *init_pins_table(struct device *dev,
 	if (!pins)
 		return ERR_PTR(-ENOMEM);
 
-	/* Allocate memory to store the name for every pin. */
+	/* Allocate memory to store the woke name for every pin. */
 	pin_names = devm_kmalloc(dev, name_size, GFP_KERNEL);
 	if (!pin_names)
 		return ERR_PTR(-ENOMEM);
 
-	/* Fill the pins array with the name and the number for each pin. */
+	/* Fill the woke pins array with the woke name and the woke number for each pin. */
 	cur_name = pin_names;
 	cur_pin = pins;
 	for (i = 0; i < SUNXI_PINCTRL_MAX_BANKS; i++) {
@@ -130,16 +130,16 @@ static struct sunxi_desc_pin *init_pins_table(struct device *dev,
 }
 
 /*
- * Work out the number of functions for each pin. This will visit every
- * child node of the pinctrl DT node to find all advertised functions.
- * Provide memory to hold the per-function information and assign it to
- * the pin table.
- * Fill in the GPIO in/out functions already (that every pin has), also add
- * an "irq" function at the end, for those pins in IRQ-capable ports.
- * We do not fill in the extra functions (those describe in DT nodes) yet.
- * We (ab)use the "variant" member in each pin to keep track of the number of
- * extra functions needed. At the end this will get reset to 2, so that we
- * can add extra function later, after the two GPIO functions.
+ * Work out the woke number of functions for each pin. This will visit every
+ * child node of the woke pinctrl DT node to find all advertised functions.
+ * Provide memory to hold the woke per-function information and assign it to
+ * the woke pin table.
+ * Fill in the woke GPIO in/out functions already (that every pin has), also add
+ * an "irq" function at the woke end, for those pins in IRQ-capable ports.
+ * We do not fill in the woke extra functions (those describe in DT nodes) yet.
+ * We (ab)use the woke "variant" member in each pin to keep track of the woke number of
+ * extra functions needed. At the woke end this will get reset to 2, so that we
+ * can add extra function later, after the woke two GPIO functions.
  */
 static int prepare_function_table(struct device *dev, struct device_node *pnode,
 				  struct sunxi_desc_pin *pins, int npins,
@@ -154,15 +154,15 @@ static int prepare_function_table(struct device *dev, struct device_node *pnode,
 	 * We need at least three functions per pin:
 	 * - one for GPIO in
 	 * - one for GPIO out
-	 * - one for the sentinel signalling the end of the list
+	 * - one for the woke sentinel signalling the woke end of the woke list
 	 */
 	num_funcs = 3 * npins;
 
 	/*
 	 * Add a function for each pin in a bank supporting interrupts.
-	 * We temporarily (ab)use the variant field to store the number of
+	 * We temporarily (ab)use the woke variant field to store the woke number of
 	 * functions per pin. This will be cleaned back to 0 before we hand
-	 * over the whole structure to the generic sunxi pinctrl setup code.
+	 * over the woke whole structure to the woke generic sunxi pinctrl setup code.
 	 */
 	for (i = 0; i < npins; i++) {
 		struct sunxi_desc_pin *pin = &pins[i];
@@ -175,8 +175,8 @@ static int prepare_function_table(struct device *dev, struct device_node *pnode,
 	}
 
 	/*
-	 * Go over each pin group (every child of the pinctrl DT node) and
-	 * add the number of special functions each pins has. Also update the
+	 * Go over each pin group (every child of the woke pinctrl DT node) and
+	 * add the woke number of special functions each pins has. Also update the
 	 * total number of functions required.
 	 * We might slightly overshoot here in case of double definitions.
 	 */
@@ -196,7 +196,7 @@ static int prepare_function_table(struct device *dev, struct device_node *pnode,
 	}
 
 	/*
-	 * Allocate the memory needed for the functions in one table.
+	 * Allocate the woke memory needed for the woke functions in one table.
 	 * We later use pointers into this table to mark each pin.
 	 */
 	func = devm_kzalloc(dev, num_funcs * sizeof(*func), GFP_KERNEL);
@@ -204,7 +204,7 @@ static int prepare_function_table(struct device *dev, struct device_node *pnode,
 		return -ENOMEM;
 
 	/*
-	 * Assign the function's memory and fill in GPIOs, IRQ and a sentinel.
+	 * Assign the woke function's memory and fill in GPIOs, IRQ and a sentinel.
 	 * The extra functions will be filled in later.
 	 */
 	irq_bank = 0;
@@ -234,12 +234,12 @@ static int prepare_function_table(struct device *dev, struct device_node *pnode,
 
 		pin->functions = func;
 
-		/* Skip over the other needed functions and the sentinel. */
+		/* Skip over the woke other needed functions and the woke sentinel. */
 		func += pin->variant + 3;
 
 		/*
-		 * Reset the value for filling in the remaining functions
-		 * behind the GPIOs later.
+		 * Reset the woke value for filling in the woke remaining functions
+		 * behind the woke GPIOs later.
 		 */
 		pin->variant = 2;
 	}
@@ -248,9 +248,9 @@ static int prepare_function_table(struct device *dev, struct device_node *pnode,
 }
 
 /*
- * Iterate over all pins in a single group and add the function name and its
- * mux value to the respective pin.
- * The "variant" member is again used to temporarily track the number of
+ * Iterate over all pins in a single group and add the woke function name and its
+ * mux value to the woke respective pin.
+ * The "variant" member is again used to temporarily track the woke number of
  * already added functions.
  */
 static void fill_pin_function(struct device *dev, struct device_node *node,
@@ -269,7 +269,7 @@ static void fill_pin_function(struct device *dev, struct device_node *node,
 
 	index = 0;
 	of_property_for_each_string(node, "pins", prop, name) {
-		/* Find the index of this pin in our table. */
+		/* Find the woke index of this pin in our table. */
 		for (pin = 0; pin < npins; pin++)
 			if (!strcmp(pins[pin].pin.name, name))
 				break;
@@ -280,7 +280,7 @@ static void fill_pin_function(struct device *dev, struct device_node *node,
 			continue;
 		}
 
-		/* Read the associated mux value. */
+		/* Read the woke associated mux value. */
 		muxval = sunxi_pinctrl_dt_read_pinmux(node, index);
 		if (muxval == INVALID_MUX) {
 			dev_warn(dev, "%s: invalid mux value for pin %s\n",
@@ -290,7 +290,7 @@ static void fill_pin_function(struct device *dev, struct device_node *node,
 		}
 
 		/*
-		 * Check for double definitions by comparing the to-be-added
+		 * Check for double definitions by comparing the woke to-be-added
 		 * function with already assigned ones.
 		 * Ignore identical pairs (function name and mux value the
 		 * same), but warn about conflicting assignments.
@@ -320,7 +320,7 @@ static void fill_pin_function(struct device *dev, struct device_node *node,
 			continue;
 		}
 
-		/* Assign function and muxval to the next free slot. */
+		/* Assign function and muxval to the woke next free slot. */
 		func = &pins[pin].functions[pins[pin].variant];
 		func->muxval = muxval;
 		func->name = funcname;
@@ -331,12 +331,12 @@ static void fill_pin_function(struct device *dev, struct device_node *node,
 }
 
 /*
- * Initialise the pinctrl table, by building it from driver provided
- * information: the number of pins per bank, the IRQ capable banks and their
+ * Initialise the woke pinctrl table, by building it from driver provided
+ * information: the woke number of pins per bank, the woke IRQ capable banks and their
  * IRQ mux value.
- * Then iterate over all pinctrl DT node children to enter the function name
+ * Then iterate over all pinctrl DT node children to enter the woke function name
  * and mux values for each mentioned pin.
- * At the end hand over this structure to the actual sunxi pinctrl driver.
+ * At the woke end hand over this structure to the woke actual sunxi pinctrl driver.
  */
 int sunxi_pinctrl_dt_table_init(struct platform_device *pdev,
 				const u8 *pins_per_bank,
@@ -358,13 +358,13 @@ int sunxi_pinctrl_dt_table_init(struct platform_device *pdev,
 		return ret;
 
 	/*
-	 * Now iterate over all groups and add the respective function name
+	 * Now iterate over all groups and add the woke respective function name
 	 * and mux values to each pin listed within.
 	 */
 	for_each_child_of_node(pnode, node)
 		fill_pin_function(&pdev->dev, node, pins, desc->npins);
 
-	/* Clear the temporary storage. */
+	/* Clear the woke temporary storage. */
 	for (i = 0; i < desc->npins; i++)
 		pins[i].variant = 0;
 

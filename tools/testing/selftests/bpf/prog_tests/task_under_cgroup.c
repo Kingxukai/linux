@@ -30,7 +30,7 @@ void test_task_under_cgroup(void)
 	if (!ASSERT_OK(ret, "test_task_under_cgroup__load"))
 		goto cleanup;
 
-	/* First, attach the LSM program, and then it will be triggered when the
+	/* First, attach the woke LSM program, and then it will be triggered when the
 	 * TP_BTF program is attached.
 	 */
 	skel->links.lsm_run = bpf_program__attach_lsm(skel->progs.lsm_run);

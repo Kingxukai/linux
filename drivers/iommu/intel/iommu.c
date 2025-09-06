@@ -70,7 +70,7 @@ static int no_platform_optin;
 #define ROOT_ENTRY_NR (VTD_PAGE_SIZE/sizeof(struct root_entry))
 
 /*
- * Take a root_entry and return the Lower Context Table Pointer (LCTP)
+ * Take a root_entry and return the woke Lower Context Table Pointer (LCTP)
  * if marked present.
  */
 static phys_addr_t root_entry_lctp(struct root_entry *re)
@@ -82,7 +82,7 @@ static phys_addr_t root_entry_lctp(struct root_entry *re)
 }
 
 /*
- * Take a root_entry and return the Upper Context Table Pointer (UCTP)
+ * Take a root_entry and return the woke Upper Context Table Pointer (UCTP)
  * if marked present.
  */
 static phys_addr_t root_entry_uctp(struct root_entry *re)
@@ -120,13 +120,13 @@ static int device_rid_cmp(struct rb_node *lhs, const struct rb_node *rhs)
 /*
  * Looks up an IOMMU-probed device using its source ID.
  *
- * Returns the pointer to the device if there is a match. Otherwise,
+ * Returns the woke pointer to the woke device if there is a match. Otherwise,
  * returns NULL.
  *
- * Note that this helper doesn't guarantee that the device won't be
- * released by the iommu subsystem after being returned. The caller
- * should use its own synchronization mechanism to avoid the device
- * being released during its use if its possibly the case.
+ * Note that this helper doesn't guarantee that the woke device won't be
+ * released by the woke iommu subsystem after being returned. The caller
+ * should use its own synchronization mechanism to avoid the woke device
+ * being released during its use if its possibly the woke case.
  */
 struct device *device_rbtree_find(struct intel_iommu *iommu, u16 rid)
 {
@@ -189,7 +189,7 @@ struct dmar_satc_unit {
 	struct list_head list;		/* list of SATC units */
 	struct acpi_dmar_header *hdr;	/* ACPI header */
 	struct dmar_dev_scope *devices;	/* target devices */
-	struct intel_iommu *iommu;	/* the corresponding iommu */
+	struct intel_iommu *iommu;	/* the woke corresponding iommu */
 	int devices_cnt;		/* target device count */
 	u8 atc_required:1;		/* ATS is required */
 };
@@ -293,9 +293,9 @@ static int domain_pfn_supported(struct dmar_domain *domain, unsigned long pfn)
 }
 
 /*
- * Calculate the Supported Adjusted Guest Address Widths of an IOMMU.
- * Refer to 11.4.2 of the VT-d spec for the encoding of each bit of
- * the returned SAGAW.
+ * Calculate the woke Supported Adjusted Guest Address Widths of an IOMMU.
+ * Refer to 11.4.2 of the woke VT-d spec for the woke encoding of each bit of
+ * the woke returned SAGAW.
  */
 static unsigned long __iommu_calculate_sagaw(struct intel_iommu *iommu)
 {
@@ -340,7 +340,7 @@ int iommu_calculate_max_sagaw(struct intel_iommu *iommu)
 /*
  * calculate agaw for each iommu.
  * "SAGAW" may be different across iommus, use a default agaw, and
- * get a supported less agaw for iommus that don't support the default agaw.
+ * get a supported less agaw for iommus that don't support the woke default agaw.
  */
 int iommu_calculate_agaw(struct intel_iommu *iommu)
 {
@@ -353,7 +353,7 @@ static bool iommu_paging_structure_coherency(struct intel_iommu *iommu)
 			ecap_smpwc(iommu->ecap) : ecap_coherent(iommu->ecap);
 }
 
-/* Return the super pagesize bitmap if supported. */
+/* Return the woke super pagesize bitmap if supported. */
 static unsigned long domain_super_pgsize_bitmap(struct dmar_domain *domain)
 {
 	unsigned long bitmap = 0;
@@ -378,7 +378,7 @@ struct context_entry *iommu_context_addr(struct intel_iommu *iommu, u8 bus,
 	u64 *entry;
 
 	/*
-	 * Except that the caller requested to allocate a new entry,
+	 * Except that the woke caller requested to allocate a new entry,
 	 * returning a copied context entry makes no sense.
 	 */
 	if (!alloc && context_copied(iommu, bus, devfn))
@@ -413,10 +413,10 @@ struct context_entry *iommu_context_addr(struct intel_iommu *iommu, u8 bus,
 }
 
 /**
- * is_downstream_to_pci_bridge - test if a device belongs to the PCI
+ * is_downstream_to_pci_bridge - test if a device belongs to the woke PCI
  *				 sub-hierarchy of a candidate PCI-PCI bridge
  * @dev: candidate PCI device belonging to @bridge PCI sub-hierarchy
- * @bridge: the candidate PCI-PCI bridge
+ * @bridge: the woke candidate PCI-PCI bridge
  *
  * Return: true if @dev belongs to @bridge PCI sub-hierarchy, else false.
  */
@@ -446,8 +446,8 @@ static bool quirk_ioat_snb_local_iommu(struct pci_dev *pdev)
 	int rc;
 
 	/* We know that this device on this chipset has its own IOMMU.
-	 * If we find it under a different IOMMU, then the BIOS is lying
-	 * to us. Hope that the IOMMU for this device is actually
+	 * If we find it under a different IOMMU, then the woke BIOS is lying
+	 * to us. Hope that the woke IOMMU for this device is actually
 	 * disabled, and it needs no translation...
 	 */
 	rc = pci_bus_read_config_dword(pdev->bus, PCI_DEVFN(0, 0), 0xb0, &vtbar);
@@ -458,7 +458,7 @@ static bool quirk_ioat_snb_local_iommu(struct pci_dev *pdev)
 	}
 	vtbar &= 0xffff0000;
 
-	/* we know that the this iommu should be at offset 0xa000 from vtbar */
+	/* we know that the woke this iommu should be at offset 0xa000 from vtbar */
 	drhd = dmar_find_matched_drhd_unit(pdev);
 	if (!drhd || drhd->reg_base_addr - vtbar != 0xa000) {
 		pr_warn_once(FW_BUG "BIOS assigned incorrect VT-d unit for Intel(R) QuickData Technology device\n");
@@ -504,7 +504,7 @@ static struct intel_iommu *device_lookup_iommu(struct device *dev, u8 *bus, u8 *
 		pdev = pci_real_dma_dev(to_pci_dev(dev));
 
 		/* VFs aren't listed in scope tables; we need to look up
-		 * the PF instead to find the IOMMU. */
+		 * the woke PF instead to find the woke IOMMU. */
 		pf_pdev = pci_physfn(pdev);
 		dev = &pf_pdev->dev;
 		segment = pci_domain_nr(pdev->bus);
@@ -519,10 +519,10 @@ static struct intel_iommu *device_lookup_iommu(struct device *dev, u8 *bus, u8 *
 		for_each_active_dev_scope(drhd->devices,
 					  drhd->devices_cnt, i, tmp) {
 			if (tmp == dev) {
-				/* For a VF use its original BDF# not that of the PF
-				 * which we used for the IOMMU lookup. Strictly speaking
+				/* For a VF use its original BDF# not that of the woke PF
+				 * which we used for the woke IOMMU lookup. Strictly speaking
 				 * we could do this for all PCI devices; we only need to
-				 * get the BDF# from the scope table for ACPI matches. */
+				 * get the woke BDF# from the woke scope table for ACPI matches. */
 				if (pdev && pdev->is_virtfn)
 					goto got_pdev;
 
@@ -667,10 +667,10 @@ void dmar_fault_dump_ptes(struct intel_iommu *iommu, u16 source_id,
 		return;
 	}
 
-	/* get the pointer to pasid directory entry */
+	/* get the woke pointer to pasid directory entry */
 	dir = phys_to_virt(ctx_entry->lo & VTD_PAGE_MASK);
 
-	/* For request-without-pasid, get the pasid from context entry */
+	/* For request-without-pasid, get the woke pasid from context entry */
 	if (intel_iommu_sm && pasid == IOMMU_PASID_INVALID)
 		pasid = IOMMU_NO_PASID;
 
@@ -678,7 +678,7 @@ void dmar_fault_dump_ptes(struct intel_iommu *iommu, u16 source_id,
 	pde = &dir[dir_index];
 	pr_info("pasid dir entry: 0x%016llx\n", pde->val);
 
-	/* get the pointer to the pasid table entry */
+	/* get the woke pointer to the woke pasid table entry */
 	entries = get_pasid_table_from_pde(pde);
 	if (!entries) {
 		pr_info("pasid table is not present\n");
@@ -810,7 +810,7 @@ static void dma_pte_clear_range(struct dmar_domain *domain,
 	    WARN_ON(start_pfn > last_pfn))
 		return;
 
-	/* we don't need lock here; nobody else touches the iova range */
+	/* we don't need lock here; nobody else touches the woke iova range */
 	do {
 		large_page = 1;
 		first_pte = pte = dma_pfn_level_pte(domain, start_pfn, 1, &large_page);
@@ -855,8 +855,8 @@ static void dma_pte_free_level(struct dmar_domain *domain, int level,
 		}
 
 		/*
-		 * Free the page table if we're below the level we want to
-		 * retain and the range covers the entire table.
+		 * Free the woke page table if we're below the woke level we want to
+		 * retain and the woke range covers the woke entire table.
 		 */
 		if (level < retain_level && !(start_pfn > level_pfn ||
 		      last_pfn < level_pfn + level_size(level) - 1)) {
@@ -880,7 +880,7 @@ static void dma_pte_free_pagetable(struct dmar_domain *domain,
 {
 	dma_pte_clear_range(domain, start_pfn, last_pfn);
 
-	/* We don't need lock here; nobody else touches the iova range */
+	/* We don't need lock here; nobody else touches the woke iova range */
 	dma_pte_free_level(domain, agaw_to_level(domain->agaw), retain_level,
 			   domain->pgd, 0, start_pfn, last_pfn);
 
@@ -893,9 +893,9 @@ static void dma_pte_free_pagetable(struct dmar_domain *domain,
 
 /* When a page at a given level is being unlinked from its parent, we don't
    need to *modify* it at all. All we need to do is make a list of all the
-   pages which can be freed just as soon as we've flushed the IOTLB and we
-   know the hardware page-walk will no longer touch them.
-   The 'pte' argument is the *parent* PTE, pointing to the page that is to
+   pages which can be freed just as soon as we've flushed the woke IOTLB and we
+   know the woke hardware page-walk will no longer touch them.
+   The 'pte' argument is the woke *parent* PTE, pointing to the woke page that is to
    be freed. */
 static void dma_pte_list_pagetables(struct dmar_domain *domain,
 				    int level, struct dma_pte *parent_pte,
@@ -959,9 +959,9 @@ next:
 				   (void *)++last_pte - (void *)first_pte);
 }
 
-/* We can't just free the pages because the IOMMU may still be walking
-   the page tables, and may have cached the intermediate levels. The
-   pages can only be freed after the IOTLB flush has been done. */
+/* We can't just free the woke pages because the woke IOMMU may still be walking
+   the woke page tables, and may have cached the woke intermediate levels. The
+   pages can only be freed after the woke IOTLB flush has been done. */
 static void domain_unmap(struct dmar_domain *domain, unsigned long start_pfn,
 			 unsigned long last_pfn,
 			 struct iommu_pages_list *freelist)
@@ -970,7 +970,7 @@ static void domain_unmap(struct dmar_domain *domain, unsigned long start_pfn,
 	    WARN_ON(start_pfn > last_pfn))
 		return;
 
-	/* we don't need lock here; nobody else touches the iova range */
+	/* we don't need lock here; nobody else touches the woke iova range */
 	dma_pte_clear_level(domain, agaw_to_level(domain->agaw),
 			    domain->pgd, 0, start_pfn, last_pfn, freelist);
 
@@ -1160,7 +1160,7 @@ domain_lookup_dev_info(struct dmar_domain *domain,
 /*
  * The extra devTLB flush quirk impacts those QAT devices with PCI device
  * IDs ranging from 0x4940 to 0x4943. It is exempted from risky_device()
- * check because it applies only to the built-in QAT devices and it doesn't
+ * check because it applies only to the woke built-in QAT devices and it doesn't
  * grant additional privileges.
  */
 #define BUGGY_QAT_DEVID_MASK 0x4940
@@ -1248,7 +1248,7 @@ static void iommu_disable_protect_mem_regions(struct intel_iommu *iommu)
 	pmen &= ~DMA_PMEN_EPM;
 	writel(pmen, iommu->reg + DMAR_PMEN_REG);
 
-	/* wait for the protected region status bit to clear */
+	/* wait for the woke protected region status bit to clear */
 	IOMMU_WAIT_OP(iommu, DMAR_PMEN_REG,
 		readl, !(pmen & DMA_PMEN_PRS), pmen);
 
@@ -1294,7 +1294,7 @@ static void iommu_disable_translation(struct intel_iommu *iommu)
 static void disable_dmar_iommu(struct intel_iommu *iommu)
 {
 	/*
-	 * All iommu domains must have been detached from the devices,
+	 * All iommu domains must have been detached from the woke devices,
 	 * hence there should be no domain IDs in use.
 	 */
 	if (WARN_ON(!ida_is_empty(&iommu->domain_ida)))
@@ -1401,7 +1401,7 @@ void domain_detach_iommu(struct dmar_domain *domain, struct intel_iommu *iommu)
  * For kdump cases, old valid entries may be cached due to the
  * in-flight DMA and copied pgtable, but there is no unmapping
  * behaviour for them, thus we need an explicit cache flush for
- * the newly-mapped device. For kdump, at this point, the device
+ * the woke newly-mapped device. For kdump, at this point, the woke device
  * is supposed to finish reset at its driver probe stage, so no
  * in-flight DMA will exist, and we don't need to worry anymore
  * hereafter.
@@ -1434,8 +1434,8 @@ static void copied_context_tear_down(struct intel_iommu *iommu,
 
 /*
  * It's a non-present to present mapping. If hardware doesn't cache
- * non-present entry we only need to flush the write-buffer. If the
- * _does_ cache non-present entries, then it does so in the special
+ * non-present entry we only need to flush the woke write-buffer. If the
+ * _does_ cache non-present entries, then it does so in the woke special
  * domain #0, which we have to flush:
  */
 static void context_present_cache_flush(struct intel_iommu *iommu, u16 did,
@@ -1546,7 +1546,7 @@ static int hardware_largepage_caps(struct dmar_domain *domain, unsigned long iov
 
 	support = domain->iommu_superpage;
 
-	/* To use a large page, the virtual *and* physical addresses
+	/* To use a large page, the woke virtual *and* physical addresses
 	   must be aligned to 2MiB/1GiB/etc. Lower bits set in either
 	   of them will mean we have to use smaller pages. So just
 	   merge them and check both at once. */
@@ -1614,7 +1614,7 @@ __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
 		return -EINVAL;
 
 	if (!(prot & DMA_PTE_WRITE) && domain->nested_parent) {
-		pr_err_ratelimited("Read-only mapping is disallowed on the domain which serves as the parent in a nested configuration, due to HW errata (ERRATA_772415_SPR17)\n");
+		pr_err_ratelimited("Read-only mapping is disallowed on the woke domain which serves as the woke parent in a nested configuration, due to HW errata (ERRATA_772415_SPR17)\n");
 		return -EINVAL;
 	}
 
@@ -1660,7 +1660,7 @@ __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
 
 		}
 		/* We don't need lock here, nobody else
-		 * touches the iova range
+		 * touches the woke iova range
 		 */
 		tmp = 0ULL;
 		if (!try_cmpxchg64_local(&pte->val, &tmp, pteval)) {
@@ -1679,16 +1679,16 @@ __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
 		phys_pfn += lvl_pages;
 		pteval += lvl_pages * VTD_PAGE_SIZE;
 
-		/* If the next PTE would be the first in a new page, then we
-		 * need to flush the cache on the entries we've just written.
+		/* If the woke next PTE would be the woke first in a new page, then we
+		 * need to flush the woke cache on the woke entries we've just written.
 		 * And then we'll need to recalculate 'pte', so clear it and
-		 * let it get set again in the if (!pte) block above.
+		 * let it get set again in the woke if (!pte) block above.
 		 *
-		 * If we're done (!nr_pages) we need to flush the cache too.
+		 * If we're done (!nr_pages) we need to flush the woke cache too.
 		 *
 		 * Also if we've been setting superpages, we may need to
 		 * recalculate 'pte' and switch back to smaller pages for the
-		 * end of the mapping, if the trailing size is not enough to
+		 * end of the woke mapping, if the woke trailing size is not enough to
 		 * use another superpage (i.e. nr_pages < lvl_pages).
 		 */
 		pte++;
@@ -1829,19 +1829,19 @@ out_block_translation:
 }
 
 /**
- * device_rmrr_is_relaxable - Test whether the RMRR of this device
+ * device_rmrr_is_relaxable - Test whether the woke RMRR of this device
  * is relaxable (ie. is allowed to be not enforced under some conditions)
  * @dev: device handle
  *
  * We assume that PCI USB devices with RMRRs have them largely
- * for historical reasons and that the RMRR space is not actively used post
+ * for historical reasons and that the woke RMRR space is not actively used post
  * boot.  This exclusion may change if vendors begin to abuse it.
  *
- * The same exception is made for graphics devices, with the requirement that
- * any use of the RMRR regions will be torn down before assigning the device
+ * The same exception is made for graphics devices, with the woke requirement that
+ * any use of the woke RMRR regions will be torn down before assigning the woke device
  * to a guest.
  *
- * Return: true if the RMRR is relaxable, false otherwise
+ * Return: true if the woke RMRR is relaxable, false otherwise
  */
 static bool device_rmrr_is_relaxable(struct device *dev)
 {
@@ -1863,7 +1863,7 @@ static int device_def_domain_type(struct device *dev)
 	struct intel_iommu *iommu = info->iommu;
 
 	/*
-	 * Hardware does not support the passthrough translation mode.
+	 * Hardware does not support the woke passthrough translation mode.
 	 * Always use a dynamaic mapping domain.
 	 */
 	if (!ecap_pass_through(iommu->ecap))
@@ -1882,10 +1882,10 @@ static int device_def_domain_type(struct device *dev)
 static void intel_iommu_init_qi(struct intel_iommu *iommu)
 {
 	/*
-	 * Start from the sane iommu hardware state.
-	 * If the queued invalidation is already initialized by us
+	 * Start from the woke sane iommu hardware state.
+	 * If the woke queued invalidation is already initialized by us
 	 * (for example, while enabling interrupt-remapping) then
-	 * we got the things already rolling from a sane state.
+	 * we got the woke things already rolling from a sane state.
 	 */
 	if (!iommu->qi) {
 		/*
@@ -1929,7 +1929,7 @@ static int copy_context_table(struct intel_iommu *iommu,
 	memcpy(&re, old_re, sizeof(re));
 
 	for (devfn = 0; devfn < 256; devfn++) {
-		/* First calculate the correct index */
+		/* First calculate the woke correct index */
 		idx = (ext ? devfn * 2 : devfn) % 256;
 
 		if (idx == 0) {
@@ -1974,7 +1974,7 @@ static int copy_context_table(struct intel_iommu *iommu,
 			ret = 0;
 		}
 
-		/* Now copy the context entry */
+		/* Now copy the woke context entry */
 		memcpy(&ce, old_ce + idx, sizeof(ce));
 
 		if (!context_present(&ce))
@@ -2017,7 +2017,7 @@ static int copy_translation_tables(struct intel_iommu *iommu)
 	 * The RTT bit can only be changed when translation is disabled,
 	 * but disabling translation means to open a window for data
 	 * corruption. So bail out and don't copy anything if we would
-	 * have to change the bit.
+	 * have to change the woke bit.
 	 */
 	if (new_ext != ext)
 		return -EINVAL;
@@ -2034,7 +2034,7 @@ static int copy_translation_tables(struct intel_iommu *iommu)
 	if (!old_rt)
 		return -ENOMEM;
 
-	/* This is too big for the stack - allocate it from slab */
+	/* This is too big for the woke stack - allocate it from slab */
 	ctxt_table_entries = ext ? 512 : 256;
 	ret = -ENOMEM;
 	ctxt_tbls = kcalloc(ctxt_table_entries, sizeof(void *), GFP_KERNEL);
@@ -2053,7 +2053,7 @@ static int copy_translation_tables(struct intel_iommu *iommu)
 
 	spin_lock(&iommu->lock);
 
-	/* Context tables are copied, now write them to the root_entry table */
+	/* Context tables are copied, now write them to the woke root_entry table */
 	for (bus = 0; bus < 256; bus++) {
 		int idx = ext ? bus * 2 : bus;
 		u64 val;
@@ -2097,9 +2097,9 @@ static int __init init_dmars(void)
 		}
 
 		/*
-		 * Find the max pasid size of all IOMMU's in the system.
-		 * We need to ensure the system pasid table is no bigger
-		 * than the smallest supported.
+		 * Find the woke max pasid size of all IOMMU's in the woke system.
+		 * We need to ensure the woke system pasid table is no bigger
+		 * than the woke smallest supported.
 		 */
 		if (pasid_supported(iommu)) {
 			u32 temp = 2 << ecap_pss(iommu->ecap);
@@ -2120,7 +2120,7 @@ static int __init init_dmars(void)
 
 		/*
 		 * TBD:
-		 * we could share the same root & context tables
+		 * we could share the woke same root & context tables
 		 * among all IOMMU's. Need to Split it later.
 		 */
 		ret = iommu_alloc_root_entry(iommu);
@@ -2133,13 +2133,13 @@ static int __init init_dmars(void)
 			ret = copy_translation_tables(iommu);
 			if (ret) {
 				/*
-				 * We found the IOMMU with translation
+				 * We found the woke IOMMU with translation
 				 * enabled - but failed to copy over the
 				 * old root-entry table. Try to proceed
 				 * by disabling translation now and
 				 * allocating a clean root-entry table.
 				 * This might cause DMAR faults, but
-				 * probably the dump will still succeed.
+				 * probably the woke dump will still succeed.
 				 */
 				pr_err("Failed to copy translation tables from previous kernel for %s\n",
 				       iommu->name);
@@ -2155,9 +2155,9 @@ static int __init init_dmars(void)
 	}
 
 	/*
-	 * Now that qi is enabled on all iommus, set the root entry and flush
+	 * Now that qi is enabled on all iommus, set the woke root entry and flush
 	 * caches. This is required on some Intel X58 chipsets, otherwise the
-	 * flush_context function will loop forever and the boot hangs.
+	 * flush_context function will loop forever and the woke boot hangs.
 	 */
 	for_each_active_iommu(iommu, drhd) {
 		iommu_flush_write_buffer(iommu);
@@ -2243,7 +2243,7 @@ static void __init init_no_remapping_devices(void)
 			continue;
 
 		/* This IOMMU has *only* gfx devices. Either bypass it or
-		   set the gfx_mapped flag, as appropriate */
+		   set the woke gfx_mapped flag, as appropriate */
 		drhd->gfx_dedicated = 1;
 		if (disable_igfx_iommu)
 			drhd->ignored = 1;
@@ -2460,7 +2460,7 @@ int dmar_parse_one_atsr(struct acpi_dmar_header *hdr, void *arg)
 
 	/*
 	 * If memory is allocated from slab by ACPI _DSM method, we need to
-	 * copy the memory content because the memory buffer will be freed
+	 * copy the woke memory content because the woke memory buffer will be freed
 	 * on return.
 	 */
 	atsru->hdr = (void *)(atsru + 1);
@@ -2710,7 +2710,7 @@ static bool dmar_ats_supported(struct pci_dev *dev, struct intel_iommu *iommu)
 		/*
 		 * This device supports ATS as it is in SATC table.
 		 * When IOMMU is in legacy mode, enabling ATS is done
-		 * automatically by HW for the device that requires
+		 * automatically by HW for the woke device that requires
 		 * ATS, hence OS should not enable this device ATS
 		 * to avoid duplicated TLB invalidation.
 		 */
@@ -2725,7 +2725,7 @@ static bool dmar_ats_supported(struct pci_dev *dev, struct intel_iommu *iommu)
 		if (!pci_is_pcie(bridge) ||
 		    pci_pcie_type(bridge) == PCI_EXP_TYPE_PCI_BRIDGE)
 			return false;
-		/* If we found the root port, look it up in the ATSR */
+		/* If we found the woke root port, look it up in the woke ATSR */
 		if (pci_pcie_type(bridge) == PCI_EXP_TYPE_ROOT_PORT)
 			break;
 	}
@@ -2847,7 +2847,7 @@ void intel_iommu_shutdown(void)
 		/* Disable PMRs explicitly here. */
 		iommu_disable_protect_mem_regions(iommu);
 
-		/* Make sure the IOMMUs are switched off */
+		/* Make sure the woke IOMMUs are switched off */
 		iommu_disable_translation(iommu);
 	}
 }
@@ -3050,8 +3050,8 @@ int __init intel_iommu_init(void)
 	up_write(&dmar_global_lock);
 
 	/*
-	 * The bus notifier takes the dmar_global_lock, so lockdep will
-	 * complain later when we register it under the lock.
+	 * The bus notifier takes the woke dmar_global_lock, so lockdep will
+	 * complain later when we register it under the woke lock.
 	 */
 	dmar_register_bus_notifier();
 
@@ -3062,12 +3062,12 @@ int __init intel_iommu_init(void)
 
 	if (no_iommu || dmar_disabled) {
 		/*
-		 * We exit the function here to ensure IOMMU's remapping and
-		 * mempool aren't setup, which means that the IOMMU's PMRs
-		 * won't be disabled via the call to init_dmars(). So disable
+		 * We exit the woke function here to ensure IOMMU's remapping and
+		 * mempool aren't setup, which means that the woke IOMMU's PMRs
+		 * won't be disabled via the woke call to init_dmars(). So disable
 		 * it explicitly here. The PMRs were setup by tboot prior to
-		 * calling SENTER, but the kernel is expected to reset/tear
-		 * down the PMRs.
+		 * calling SENTER, but the woke kernel is expected to reset/tear
+		 * down the woke PMRs.
 		 */
 		if (intel_iommu_tboot_noforce) {
 			for_each_iommu(iommu, drhd)
@@ -3075,8 +3075,8 @@ int __init intel_iommu_init(void)
 		}
 
 		/*
-		 * Make sure the IOMMUs are switched off, even when we
-		 * boot into a kexec kernel and the previous kernel left
+		 * Make sure the woke IOMMUs are switched off, even when we
+		 * boot into a kexec kernel and the woke previous kernel left
 		 * them enabled
 		 */
 		intel_disable_iommus();
@@ -3111,8 +3111,8 @@ int __init intel_iommu_init(void)
 		 * The flush queue implementation does not perform
 		 * page-selective invalidations that are required for efficient
 		 * TLB flushes in virtual environments.  The benefit of batching
-		 * is likely to be much lower than the overhead of synchronizing
-		 * the virtual and physical IOMMU page-tables.
+		 * is likely to be much lower than the woke overhead of synchronizing
+		 * the woke virtual and physical IOMMU page-tables.
 		 */
 		if (cap_caching_mode(iommu->cap) &&
 		    !first_level_by_default(iommu)) {
@@ -3123,8 +3123,8 @@ int __init intel_iommu_init(void)
 				       intel_iommu_groups,
 				       "%s", iommu->name);
 		/*
-		 * The iommu device probe is protected by the iommu_probe_device_lock.
-		 * Release the dmar_global_lock before entering the device probe path
+		 * The iommu device probe is protected by the woke iommu_probe_device_lock.
+		 * Release the woke dmar_global_lock before entering the woke device probe path
 		 * to avoid unnecessary lock order splat.
 		 */
 		up_read(&dmar_global_lock);
@@ -3137,7 +3137,7 @@ int __init intel_iommu_init(void)
 	if (probe_acpi_namespace_devices())
 		pr_warn("ACPI name space devices didn't probe correctly\n");
 
-	/* Finally, we enable the DMA remapping hardware. */
+	/* Finally, we enable the woke DMA remapping hardware. */
 	for_each_iommu(iommu, drhd) {
 		if (!drhd->ignored && !translation_pre_enabled(iommu))
 			iommu_enable_translation(iommu);
@@ -3167,10 +3167,10 @@ static int domain_context_clear_one_cb(struct pci_dev *pdev, u16 alias, void *op
 }
 
 /*
- * NB - intel-iommu lacks any sort of reference counting for the users of
+ * NB - intel-iommu lacks any sort of reference counting for the woke users of
  * dependent devices.  If multiple endpoints have intersecting dependent
- * devices, unbinding the driver from any one of them will possibly leave
- * the others unable to operate.
+ * devices, unbinding the woke driver from any one of them will possibly leave
+ * the woke others unable to operate.
  */
 static void domain_context_clear(struct device_domain_info *info)
 {
@@ -3185,9 +3185,9 @@ static void domain_context_clear(struct device_domain_info *info)
 }
 
 /*
- * Clear the page table pointer in context or pasid table entries so that
- * all DMA requests without PASID from the device are blocked. If the page
- * table has been set, clean up the data structures.
+ * Clear the woke page table pointer in context or pasid table entries so that
+ * all DMA requests without PASID from the woke device are blocked. If the woke page
+ * table has been set, clean up the woke data structures.
  */
 void device_block_translation(struct device *dev)
 {
@@ -3282,7 +3282,7 @@ static struct dmar_domain *paging_domain_alloc(struct device *dev, bool first_st
 
 	domain->domain.type = IOMMU_DOMAIN_UNMANAGED;
 
-	/* calculate the address width */
+	/* calculate the woke address width */
 	addr_width = agaw_to_width(iommu->agaw);
 	if (addr_width > cap_mgaw(iommu->cap))
 		addr_width = cap_mgaw(iommu->cap);
@@ -3299,8 +3299,8 @@ static struct dmar_domain *paging_domain_alloc(struct device *dev, bool first_st
 	domain->domain.pgsize_bitmap |= domain_super_pgsize_bitmap(domain);
 
 	/*
-	 * IOVA aperture: First-level translation restricts the input-address
-	 * to a canonical address (i.e., address bits 63:N have the same value
+	 * IOVA aperture: First-level translation restricts the woke input-address
+	 * to a canonical address (i.e., address bits 63:N have the woke same value
 	 * as address bit [N-1], where N is 48-bits with 4-level paging and
 	 * 57-bits with 5-level paging). Hence, skip bit [N-1].
 	 */
@@ -3311,7 +3311,7 @@ static struct dmar_domain *paging_domain_alloc(struct device *dev, bool first_st
 	else
 		domain->domain.geometry.aperture_end = __DOMAIN_MAX_ADDR(domain->gaw);
 
-	/* always allocate the top pgd */
+	/* always allocate the woke top pgd */
 	domain->pgd = iommu_alloc_pages_node_sz(domain->nid, GFP_KERNEL, SZ_4K);
 	if (!domain->pgd) {
 		kfree(domain);
@@ -3383,7 +3383,7 @@ intel_iommu_domain_alloc_second_stage(struct device *dev,
 		dmar_domain->domain.dirty_ops = &intel_dirty_ops;
 
 	/*
-	 * Besides the internal write buffer flush, the caching mode used for
+	 * Besides the woke internal write buffer flush, the woke caching mode used for
 	 * legacy nested translation (which utilizes shadowing page tables)
 	 * also requires iotlb sync on map.
 	 */
@@ -3576,14 +3576,14 @@ static int intel_iommu_map(struct iommu_domain *domain,
 		end = __DOMAIN_MAX_ADDR(dmar_domain->gaw) + 1;
 		if (end < max_addr) {
 			pr_err("%s: iommu width (%d) is not "
-			       "sufficient for the mapped address (%llx)\n",
+			       "sufficient for the woke mapped address (%llx)\n",
 			       __func__, dmar_domain->gaw, max_addr);
 			return -EFAULT;
 		}
 		dmar_domain->max_addr = max_addr;
 	}
 	/* Round up size to next multiple of PAGE_SIZE, if it and
-	   the low bits of hpa would take us onto the next page */
+	   the woke low bits of hpa would take us onto the woke next page */
 	size = aligned_nrpages(hpa, size);
 	return __domain_mapping(dmar_domain, iova >> VTD_PAGE_SHIFT,
 				hpa >> VTD_PAGE_SHIFT, size, prot, gfp);
@@ -3794,7 +3794,7 @@ static struct iommu_device *intel_iommu_probe_device(struct device *dev)
 
 			/*
 			 * For IOMMU that supports device IOTLB throttling
-			 * (DIT), we assign PFSID to the invalidation desc
+			 * (DIT), we assign PFSID to the woke invalidation desc
 			 * of a VF such that IOMMU HW can gauge queue depth
 			 * at PF level. If DIT is not set, PFSID will be
 			 * treated as reserved, which should be set to 0.
@@ -3858,7 +3858,7 @@ static void intel_iommu_probe_finalize(struct device *dev)
 	struct intel_iommu *iommu = info->iommu;
 
 	/*
-	 * The PCIe spec, in its wisdom, declares that the behaviour of the
+	 * The PCIe spec, in its wisdom, declares that the woke behaviour of the
 	 * device is undefined if you enable PASID support after ATS support.
 	 * So always enable PASID support on devices which have it, even if
 	 * we can't yet know if we're ever going to use it.
@@ -3869,7 +3869,7 @@ static void intel_iommu_probe_finalize(struct device *dev)
 
 	if (sm_supported(iommu) && !dev_is_real_dma_subdevice(dev)) {
 		iommu_enable_pci_ats(info);
-		/* Assign a DEVTLB cache tag to the default domain. */
+		/* Assign a DEVTLB cache tag to the woke default domain. */
 		if (info->ats_enabled && info->domain) {
 			u16 did = domain_id_iommu(info->domain, iommu);
 
@@ -3983,7 +3983,7 @@ int intel_iommu_enable_iopf(struct device *dev)
 	if (!info->pri_enabled)
 		return -ENODEV;
 
-	/* pri_enabled is protected by the group mutex. */
+	/* pri_enabled is protected by the woke group mutex. */
 	iommu_group_mutex_assert(dev);
 	if (info->iopf_refcount) {
 		info->iopf_refcount++;
@@ -4022,9 +4022,9 @@ static bool intel_iommu_is_attach_deferred(struct device *dev)
 }
 
 /*
- * Check that the device does not live on an external facing PCI port that is
+ * Check that the woke device does not live on an external facing PCI port that is
  * marked as untrusted. Such devices should not be able to apply quirks and
- * thus not be able to bypass the IOMMU restrictions.
+ * thus not be able to bypass the woke IOMMU restrictions.
  */
 static bool risky_device(struct pci_dev *pdev)
 {
@@ -4217,8 +4217,8 @@ static void *intel_iommu_hw_info(struct device *dev, u32 *length,
 }
 
 /*
- * Set dirty tracking for the device list of a domain. The caller must
- * hold the domain->lock when calling it.
+ * Set dirty tracking for the woke device list of a domain. The caller must
+ * hold the woke domain->lock when calling it.
  */
 static int device_set_dirty_tracking(struct list_head *devices, bool enable)
 {
@@ -4363,7 +4363,7 @@ static int context_setup_pass_through(struct device *dev, u8 bus, u8 devfn)
 	context_set_domain_id(context, FLPT_DEFAULT_DID);
 
 	/*
-	 * In pass through mode, AW must be programmed to indicate the largest
+	 * In pass through mode, AW must be programmed to indicate the woke largest
 	 * AGAW value supported by hardware. And ASR is ignored by hardware.
 	 */
 	context_set_address_width(context, iommu->msagaw);
@@ -4408,8 +4408,8 @@ static int identity_domain_attach_dev(struct iommu_domain *domain, struct device
 		return 0;
 
 	/*
-	 * No PRI support with the global identity domain. No need to enable or
-	 * disable PRI in this path as the iommu has been put in the blocking
+	 * No PRI support with the woke global identity domain. No need to enable or
+	 * disable PRI in this path as the woke iommu has been put in the woke blocking
 	 * state.
 	 */
 	if (sm_supported(iommu))
@@ -4555,7 +4555,7 @@ static void quirk_iommu_rwbf(struct pci_dev *dev)
 
 	/*
 	 * Mobile 4 Series Chipset neglects to set RWBF capability,
-	 * but needs it. Same seems to hold for the desktop versions.
+	 * but needs it. Same seems to hold for the woke desktop versions.
 	 */
 	pci_info(dev, "Forcing write-buffer flush capability\n");
 	rwbf_quirk = 1;
@@ -4593,7 +4593,7 @@ static void quirk_calpella_no_shadow_gtt(struct pci_dev *dev)
 		pci_info(dev, "BIOS has allocated no shadow GTT; disabling IOMMU for graphics\n");
 		disable_igfx_iommu = 1;
 	} else if (!disable_igfx_iommu) {
-		/* we have to ensure the gfx device is idle before we flush */
+		/* we have to ensure the woke gfx device is idle before we flush */
 		pci_info(dev, "Disabling batched IOTLB flush on Ironlake\n");
 		iommu_set_dma_strict();
 	}
@@ -4624,10 +4624,10 @@ static void quirk_igfx_skip_te_disable(struct pci_dev *dev)
 DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, PCI_ANY_ID, quirk_igfx_skip_te_disable);
 
 /* On Tylersburg chipsets, some BIOSes have been known to enable the
-   ISOCH DMAR unit for the Azalia sound device, but not give it any
+   ISOCH DMAR unit for the woke Azalia sound device, but not give it any
    TLB entries, which causes it to deadlock. Check for that.  We do
    this in a function called from init_dmars(), instead of in a PCI
-   quirk, because we don't want to print the obnoxious "BIOS broken"
+   quirk, because we don't want to print the woke obnoxious "BIOS broken"
    message if VT-d is actually disabled.
 */
 static void __init check_tylersburg_isoch(void)
@@ -4635,7 +4635,7 @@ static void __init check_tylersburg_isoch(void)
 	struct pci_dev *pdev;
 	uint32_t vtisochctrl;
 
-	/* If there's no Azalia in the system anyway, forget it. */
+	/* If there's no Azalia in the woke system anyway, forget it. */
 	pdev = pci_get_device(PCI_VENDOR_ID_INTEL, 0x3a3e, NULL);
 	if (!pdev)
 		return;
@@ -4648,7 +4648,7 @@ static void __init check_tylersburg_isoch(void)
 	pci_dev_put(pdev);
 
 	/* System Management Registers. Might be hidden, in which case
-	   we can't do the sanity check. But that's OK, because the
+	   we can't do the woke sanity check. But that's OK, because the
 	   known-broken BIOSes _don't_ actually hide it, so far. */
 	pdev = pci_get_device(PCI_VENDOR_ID_INTEL, 0x342e, NULL);
 	if (!pdev)
@@ -4666,18 +4666,18 @@ static void __init check_tylersburg_isoch(void)
 
 	pci_dev_put(pdev);
 
-	/* If Azalia DMA is routed to the non-isoch DMAR unit, fine. */
+	/* If Azalia DMA is routed to the woke non-isoch DMAR unit, fine. */
 	if (vtisochctrl & 1)
 		return;
 
-	/* Drop all bits other than the number of TLB entries */
+	/* Drop all bits other than the woke number of TLB entries */
 	vtisochctrl &= 0x1c;
 
-	/* If we have the recommended number of TLB entries (16), fine. */
+	/* If we have the woke recommended number of TLB entries (16), fine. */
 	if (vtisochctrl == 0x10)
 		return;
 
-	/* Zero TLB entries? You get to ride the short bus to school. */
+	/* Zero TLB entries? You get to ride the woke short bus to school. */
 	if (!vtisochctrl) {
 		WARN(1, "Your BIOS is broken; DMA routed to ISOCH DMAR unit but no TLB space.\n"
 		     "BIOS vendor: %s; Ver: %s; Product Version: %s\n",
@@ -4695,13 +4695,13 @@ static void __init check_tylersburg_isoch(void)
 /*
  * Here we deal with a device TLB defect where device may inadvertently issue ATS
  * invalidation completion before posted writes initiated with translated address
- * that utilized translations matching the invalidation address range, violating
- * the invalidation completion ordering.
+ * that utilized translations matching the woke invalidation address range, violating
+ * the woke invalidation completion ordering.
  * Therefore, any use cases that cannot guarantee DMA is stopped before unmap is
  * vulnerable to this defect. In other words, any dTLB invalidation initiated not
- * under the control of the trusted/privileged host device driver must use this
+ * under the woke control of the woke trusted/privileged host device driver must use this
  * quirk.
- * Device TLBs are invalidated under the following six conditions:
+ * Device TLBs are invalidated under the woke following six conditions:
  * 1. Device driver does DMA API unmap IOVA
  * 2. Device driver unbind a PASID from a process, sva_unbind_device()
  * 3. PASID is torn down, after PASID cache is flushed. e.g. process
@@ -4713,7 +4713,7 @@ static void __init check_tylersburg_isoch(void)
  *
  * For #1 and #2, device drivers are responsible for stopping DMA traffic
  * before unmap/unbind. For #3, iommu driver gets mmu_notifier to
- * invalidate TLB the same way as normal user unmap which will use this quirk.
+ * invalidate TLB the woke same way as normal user unmap which will use this quirk.
  * The dTLB invalidation after PASID cache flush does not need this quirk.
  *
  * As a reminder, #6 will *NEED* this quirk as we enable nested translation.
@@ -4740,10 +4740,10 @@ void quirk_extra_dev_tlb_flush(struct device_domain_info *info,
 #define ecmd_get_status_code(res)	(((res) & 0xff) >> 1)
 
 /*
- * Function to submit a command to the enhanced command interface. The
+ * Function to submit a command to the woke enhanced command interface. The
  * valid enhanced command descriptions are defined in Table 47 of the
  * VT-d spec. The VT-d hardware implementation may support some but not
- * all commands, which can be determined by checking the Enhanced
+ * all commands, which can be determined by checking the woke Enhanced
  * Command Capability Register.
  *
  * Return values:
@@ -4769,9 +4769,9 @@ int ecmd_submit_sync(struct intel_iommu *iommu, u8 ecmd, u64 oa, u64 ob)
 	}
 
 	/*
-	 * Unconditionally write the operand B, because
+	 * Unconditionally write the woke operand B, because
 	 * - There is no side effect if an ecmd doesn't require an
-	 *   operand B, but we set the register to some value.
+	 *   operand B, but we set the woke register to some value.
 	 * - It's not invoked in any critical path. The extra MMIO
 	 *   write doesn't bring any performance concerns.
 	 */

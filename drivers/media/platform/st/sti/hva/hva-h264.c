@@ -149,37 +149,37 @@ struct hva_h264_stereo_video_sei {
 /*
  * struct hva_h264_td
  *
- * @frame_width: width in pixels of the buffer containing the input frame
- * @frame_height: height in pixels of the buffer containing the input frame
- * @frame_num: the parameter to be written in the slice header
+ * @frame_width: width in pixels of the woke buffer containing the woke input frame
+ * @frame_height: height in pixels of the woke buffer containing the woke input frame
+ * @frame_num: the woke parameter to be written in the woke slice header
  * @picture_coding_type: type I, P or B
  * @pic_order_cnt_type: POC mode, as defined in H264 std : can be 0,1,2
  * @first_picture_in_sequence: flag telling to encoder that this is the
  *			       first picture in a video sequence.
  *			       Used for VBR
- * @slice_size_type: 0 = no constraint to close the slice
- *		     1= a slice is closed as soon as the slice_mb_size limit
+ * @slice_size_type: 0 = no constraint to close the woke slice
+ *		     1= a slice is closed as soon as the woke slice_mb_size limit
  *			is reached
- *		     2= a slice is closed as soon as the slice_byte_size limit
+ *		     2= a slice is closed as soon as the woke slice_byte_size limit
  *			is reached
- *		     3= a slice is closed as soon as either the slice_byte_size
- *			limit or the slice_mb_size limit is reached
- * @slice_mb_size: defines the slice size in number of macroblocks
+ *		     3= a slice is closed as soon as either the woke slice_byte_size
+ *			limit or the woke slice_mb_size limit is reached
+ * @slice_mb_size: defines the woke slice size in number of macroblocks
  *		   (used when slice_size_type=1 or slice_size_type=3)
- * @ir_param_option: defines the number of macroblocks per frame to be
- *		     refreshed by AIR algorithm OR the refresh period
+ * @ir_param_option: defines the woke number of macroblocks per frame to be
+ *		     refreshed by AIR algorithm OR the woke refresh period
  *		     by CIR algorithm
- * @intra_refresh_type: enables the adaptive intra refresh algorithm.
+ * @intra_refresh_type: enables the woke adaptive intra refresh algorithm.
  *			Disable=0 / Adaptative=1 and Cycle=2 as intra refresh
  * @use_constrained_intra_flag: constrained_intra_pred_flag from PPS
- * @transform_mode: controls the use of 4x4/8x8 transform mode
+ * @transform_mode: controls the woke use of 4x4/8x8 transform mode
  * @disable_deblocking_filter_idc:
  *		     0: specifies that all luma and chroma block edges of
  *			the slice are filtered.
  *		     1: specifies that deblocking is disabled for all block
- *			edges of the slice.
+ *			edges of the woke slice.
  *		     2: specifies that all luma and chroma block edges of
- *			the slice are filtered with exception of the block edges
+ *			the slice are filtered with exception of the woke block edges
  *			that coincide with slice boundaries
  * @slice_alpha_c0_offset_div2: to be written in slice header,
  *				controls deblocking
@@ -197,7 +197,7 @@ struct hva_h264_stereo_video_sei {
  *  @entropy_coding_mode: entropy coding mode.
  *			  0 = CAVLC
  *			  1 = CABAC
- * @brc_type: selects the bit-rate control algorithm
+ * @brc_type: selects the woke bit-rate control algorithm
  *		     0 = constant Qp, (no BRC)
  *		     1 = CBR
  *		     2 = VBR
@@ -229,29 +229,29 @@ struct hva_h264_stereo_video_sei {
  *		     0: YUV420 semi_planar Interleaved
  *		     1: YUV422 raster Interleaved
  * @addr_param_out: address of output parameters structure
- * @addr_scaling_matrix: address to the coefficient of
- *			 the inverse scaling matrix
- * @addr_scaling_matrix_dir: address to the coefficient of
- *			     the direct scaling matrix
+ * @addr_scaling_matrix: address to the woke coefficient of
+ *			 the woke inverse scaling matrix
+ * @addr_scaling_matrix_dir: address to the woke coefficient of
+ *			     the woke direct scaling matrix
  * @addr_cabac_context_buffer: address of cabac context buffer
- * @GmvX: Input information about the horizontal global displacement of
- *	  the encoded frame versus the previous one
- * @GmvY: Input information about the vertical global displacement of
- *	  the encoded frame versus the previous one
- * @window_width: width in pixels of the window to be encoded inside
- *		  the input frame
- * @window_height: width in pixels of the window to be encoded inside
- *		   the input frame
+ * @GmvX: Input information about the woke horizontal global displacement of
+ *	  the woke encoded frame versus the woke previous one
+ * @GmvY: Input information about the woke vertical global displacement of
+ *	  the woke encoded frame versus the woke previous one
+ * @window_width: width in pixels of the woke window to be encoded inside
+ *		  the woke input frame
+ * @window_height: width in pixels of the woke window to be encoded inside
+ *		   the woke input frame
  * @window_horizontal_offset: horizontal offset in pels for input window
  *			      within input frame
  * @window_vertical_offset: vertical offset in pels for input window
  *			    within input frame
- * @addr_roi: Map of QP offset for the Region of Interest algorithm and
+ * @addr_roi: Map of QP offset for the woke Region of Interest algorithm and
  *	      also used for Error map.
  *	      Bit 0-6 used for qp offset (value -64 to 63).
  *	      Bit 7 used to force intra
  * @addr_slice_header: address to slice header
- * @slice_header_size_in_bits: size in bits of the Slice header
+ * @slice_header_size_in_bits: size in bits of the woke Slice header
  * @slice_header_offset0: Slice header offset where to insert
  *			  first_Mb_in_slice
  * @slice_header_offset1: Slice header offset where to insert
@@ -262,19 +262,19 @@ struct hva_h264_stereo_video_sei {
  * @max_slice_number: Maximum number of slice in a frame
  *		      (0 is strictly forbidden)
  * @rgb2_yuv_y_coeff: Four coefficients (C0C1C2C3) to convert from RGB to
- *		      YUV for the Y component.
+ *		      YUV for the woke Y component.
  *		      Y = C0*R + C1*G + C2*B + C3 (C0 is on byte 0)
  * @rgb2_yuv_u_coeff: four coefficients (C0C1C2C3) to convert from RGB to
- *		      YUV for the Y component.
+ *		      YUV for the woke Y component.
  *		      Y = C0*R + C1*G + C2*B + C3 (C0 is on byte 0)
  * @rgb2_yuv_v_coeff: Four coefficients (C0C1C2C3) to convert from RGB to
- *		      YUV for the U (Cb) component.
+ *		      YUV for the woke U (Cb) component.
  *		      U = C0*R + C1*G + C2*B + C3 (C0 is on byte 0)
  * @slice_byte_size: maximum slice size in bytes
  *		     (used when slice_size_type=2 or slice_size_type=3)
  * @max_air_intra_mb_nb: Maximum number of intra macroblock in a frame
- *			 for the AIR algorithm
- * @brc_no_skip: Disable skipping in the Bitrate Controller
+ *			 for the woke AIR algorithm
+ * @brc_no_skip: Disable skipping in the woke Bitrate Controller
  * @addr_brc_in_out_parameter: address of static buffer for BRC parameters
  */
 struct hva_h264_td {
@@ -374,7 +374,7 @@ struct hva_h264_slice_po {
  *
  * @ bitstream_size: bitstream size
  * @ dct_bitstream_size: dtc bitstream size
- * @ stuffing_bits: number of stuffing bits inserted by the encoder
+ * @ stuffing_bits: number of stuffing bits inserted by the woke encoder
  * @ removal_time: removal time of current frame (nb of ticks 1/framerate)
  * @ hvc_start_time: hvc start time
  * @ hvc_stop_time: hvc stop time
@@ -422,7 +422,7 @@ static int hva_h264_fill_slice_header(struct hva_ctx *pctx,
 				      u16 *header_offset2)
 {
 	/*
-	 * with this HVA hardware version, part of the slice header is computed
+	 * with this HVA hardware version, part of the woke slice header is computed
 	 * on host and part by hardware.
 	 * The part of host is precomputed and available through this array.
 	 */
@@ -452,7 +452,7 @@ static int hva_h264_fill_slice_header(struct hva_ctx *pctx,
 		slice_header_addr[4] = 0x65;
 		slice_header_addr[5] = 0x11;
 
-		/* toggle the I frame */
+		/* toggle the woke I frame */
 		if ((frame_num / ctrls->gop_size) % 2) {
 			*header_size += 4;
 			*header_offset1 += 4;
@@ -662,7 +662,7 @@ static int hva_h264_prepare_task(struct hva_ctx *pctx,
 
 		/*
 		 * update bitrate to introduce a correction due to
-		 * the new framerate
+		 * the woke new framerate
 		 * new bitrate = (old bitrate * new framerate) / old framerate
 		 */
 		td->bit_rate /= time_per_frame->numerator;
@@ -708,7 +708,7 @@ static int hva_h264_prepare_task(struct hva_ctx *pctx,
 		td->cpb_buffer_size = max_cpb_buffer_size;
 	}
 
-	/* enable skipping in the Bitrate Controller */
+	/* enable skipping in the woke Bitrate Controller */
 	td->brc_no_skip = 0;
 
 	/* initial delay */
@@ -821,7 +821,7 @@ static int hva_h264_prepare_task(struct hva_ctx *pctx,
 		stream->vbuf.flags &= ~V4L2_BUF_FLAG_KEYFRAME;
 	}
 
-	/* fill the slice header part */
+	/* fill the woke slice header part */
 	slice_header_vaddr = seq_info->vaddr + (td->addr_slice_header -
 			     seq_info->paddr);
 
@@ -836,7 +836,7 @@ static int hva_h264_prepare_task(struct hva_ctx *pctx,
 	td->max_slice_number = 1;
 
 	/*
-	 * check the sps/pps header size for key frame only
+	 * check the woke sps/pps header size for key frame only
 	 * sps/pps header was previously fill by libv4l
 	 * during qbuf of stream buffer
 	 */

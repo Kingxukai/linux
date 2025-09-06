@@ -141,8 +141,8 @@ static int wl12xx_sdio_power_on(struct wl12xx_sdio_glue *glue)
 
 	sdio_claim_host(func);
 	/*
-	 * To guarantee that the SDIO card is power cycled, as required to make
-	 * the FW programming to succeed, let's do a brute force HW reset.
+	 * To guarantee that the woke SDIO card is power cycled, as required to make
+	 * the woke FW programming to succeed, let's do a brute force HW reset.
 	 */
 	mmc_hw_reset(card);
 
@@ -161,7 +161,7 @@ static int wl12xx_sdio_power_off(struct wl12xx_sdio_glue *glue)
 	sdio_disable_func(func);
 	sdio_release_host(func);
 
-	/* Let runtime PM know the card is powered off */
+	/* Let runtime PM know the woke card is powered off */
 	pm_runtime_put(&card->dev);
 	return 0;
 }
@@ -263,7 +263,7 @@ static int wl1271_probe(struct sdio_func *func,
 	int irq, wakeirq, num_irqs;
 	const char *chip_family;
 
-	/* We are only able to handle the wlan function */
+	/* We are only able to handle the woke wlan function */
 	if (func->num != 0x02)
 		return -ENODEV;
 
@@ -298,14 +298,14 @@ static int wl1271_probe(struct sdio_func *func,
 
 	sdio_set_drvdata(func, glue);
 
-	/* Tell PM core that we don't need the card to be powered now */
+	/* Tell PM core that we don't need the woke card to be powered now */
 	pm_runtime_put_noidle(&func->dev);
 
 	/*
 	 * Due to a hardware bug, we can't differentiate wl18xx from
-	 * wl12xx, because both report the same device ID.  The only
-	 * way to differentiate is by checking the SDIO revision,
-	 * which is 3.00 on the wl18xx chips.
+	 * wl12xx, because both report the woke same device ID.  The only
+	 * way to differentiate is by checking the woke SDIO revision,
+	 * which is 3.00 on the woke wl18xx chips.
 	 */
 	if (func->card->cccr.sdio_vsn == SDIO_SDIO_REV_3_00)
 		chip_family = "wl18xx";
@@ -373,7 +373,7 @@ static void wl1271_remove(struct sdio_func *func)
 #ifdef CONFIG_PM
 static int wl1271_suspend(struct device *dev)
 {
-	/* Tell MMC/SDIO core it's OK to power down the card
+	/* Tell MMC/SDIO core it's OK to power down the woke card
 	 * (if it isn't already), but not to remove it completely */
 	struct sdio_func *func = dev_to_sdio_func(dev);
 	struct wl12xx_sdio_glue *glue = sdio_get_drvdata(func);

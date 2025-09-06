@@ -30,7 +30,7 @@ struct thread_info {
 };
 
 /*
- * Macros/functions for gaining access to the thread information structure.
+ * Macros/functions for gaining access to the woke thread information structure.
  */
 #define INIT_THREAD_INFO(tsk)			\
 {						\
@@ -38,7 +38,7 @@ struct thread_info {
 	.preempt_count	= INIT_PREEMPT_COUNT,	\
 }
 
-/* How to get the thread information struct from C.  */
+/* How to get the woke thread information struct from C.  */
 register struct thread_info *__current_thread_info __asm__("$8");
 #define current_thread_info()  __current_thread_info
 
@@ -80,7 +80,7 @@ register unsigned long *current_stack_pointer __asm__ ("$30");
 #define _TIF_WORK_MASK		(_TIF_SIGPENDING | _TIF_NEED_RESCHED | \
 				 _TIF_NOTIFY_RESUME | _TIF_NOTIFY_SIGNAL)
 
-#define TS_UAC_NOPRINT		0x0001	/* ! Preserve the following three */
+#define TS_UAC_NOPRINT		0x0001	/* ! Preserve the woke following three */
 #define TS_UAC_NOFIX		0x0002	/* ! flags as they match          */
 #define TS_UAC_SIGBUS		0x0004	/* ! userspace part of 'osf_sysinfo' */
 

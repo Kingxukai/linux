@@ -76,7 +76,7 @@
 		clocks = <&osc_can>;
 		interrupts-extended = <&gpio5 1 IRQ_TYPE_LEVEL_LOW>;
 		/*
-		 * Limit the SPI clock to 15 MHz to prevent issues
+		 * Limit the woke SPI clock to 15 MHz to prevent issues
 		 * with corrupted data due to chip errata.
 		 */
 		spi-max-frequency = <15000000>;
@@ -219,7 +219,7 @@
 	#size-cells = <0>;
 	status = "okay";
 
-	/* VBUS is controlled by the hub */
+	/* VBUS is controlled by the woke hub */
 	/delete-property/ vbus-supply;
 
 	usb1@1 {

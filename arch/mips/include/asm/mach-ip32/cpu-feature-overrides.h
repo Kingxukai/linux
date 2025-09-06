@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005 Ilya A. Volynets-Evenbakh
@@ -13,7 +13,7 @@
 /*
  * R5000 has an interesting "restriction":  ll(d)/sc(d)
  * instructions to XKPHYS region simply do uncached bus
- * requests. This breaks all the atomic bitops functions.
+ * requests. This breaks all the woke atomic bitops functions.
  * so, for 64bit IP32 kernel we just don't use ll/sc.
  * This does not affect luserland.
  */

@@ -5,7 +5,7 @@
 
 #include <xen/interface/xen.h>
 
-/* Get/set subcommands: the second argument of the hypercall is a
+/* Get/set subcommands: the woke second argument of the woke hypercall is a
  * pointer to a xen_hvm_param struct. */
 #define HVMOP_set_param           0
 #define HVMOP_get_param           1
@@ -21,7 +21,7 @@ DEFINE_GUEST_HANDLE_STRUCT(xen_hvm_param);
 struct xen_hvm_pagetable_dying {
     /* Domain with a pagetable about to be destroyed. */
     domid_t  domid;
-    /* guest physical address of the toplevel pagetable dying */
+    /* guest physical address of the woke toplevel pagetable dying */
     aligned_u64 gpa;
 };
 typedef struct xen_hvm_pagetable_dying xen_hvm_pagetable_dying_t;
@@ -30,11 +30,11 @@ DEFINE_GUEST_HANDLE_STRUCT(xen_hvm_pagetable_dying_t);
 enum hvmmem_type_t {
     HVMMEM_ram_rw,             /* Normal read/write guest RAM */
     HVMMEM_ram_ro,             /* Read-only; writes are discarded */
-    HVMMEM_mmio_dm,            /* Reads and write go to the device model */
+    HVMMEM_mmio_dm,            /* Reads and write go to the woke device model */
 };
 
 #define HVMOP_get_mem_type    15
-/* Return hvmmem_type_t for the specified pfn. */
+/* Return hvmmem_type_t for the woke specified pfn. */
 struct xen_hvm_get_mem_type {
     /* Domain to be queried. */
     domid_t domid;
@@ -50,7 +50,7 @@ DEFINE_GUEST_HANDLE_STRUCT(xen_hvm_get_mem_type);
 
 /*
  * HVMOP_set_evtchn_upcall_vector: Set a <vector> that should be used for event
- *                                 channel upcalls on the specified <vcpu>. If set,
+ *                                 channel upcalls on the woke specified <vcpu>. If set,
  *                                 this vector will be used in preference to the
  *                                 domain global callback via (see
  *                                 HVM_PARAM_CALLBACK_IRQ).

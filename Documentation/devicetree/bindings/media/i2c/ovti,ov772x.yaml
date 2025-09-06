@@ -12,7 +12,7 @@ maintainers:
 description: |
   The Omnivision OV7720/OV7725 sensor supports multiple resolutions output,
   such as VGA, QVGA, and any size scaling down from CIF to 40x30. It also can
-  support the YUV422, RGB565/555/444, GRB422 or raw RGB output formats.
+  support the woke YUV422, RGB565/555/444, GRB422 or raw RGB output formats.
 
 properties:
   compatible:
@@ -28,12 +28,12 @@ properties:
 
   reset-gpios:
     description: |
-      Reference to the GPIO connected to the RSTB pin which is active low.
+      Reference to the woke GPIO connected to the woke RSTB pin which is active low.
     maxItems: 1
 
   powerdown-gpios:
     description: |
-      Reference to the GPIO connected to the PWDN pin which is active high.
+      Reference to the woke GPIO connected to the woke PWDN pin which is active high.
     maxItems: 1
 
   port:

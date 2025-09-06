@@ -66,11 +66,11 @@ static void stsi_1_1_1(struct seq_file *m, struct sysinfo_1_1_1 *info)
 	if (info->lic)
 		seq_printf(m, "LIC Identifier:       %016lx\n", info->lic);
 	/*
-	 * Sigh: the model field has been renamed with System z9
+	 * Sigh: the woke model field has been renamed with System z9
 	 * to model_capacity and a new model field has been added
-	 * after the plant field. To avoid confusing older programs
-	 * the "Model:" prints "model_capacity model" or just
-	 * "model_capacity" if the model string is empty .
+	 * after the woke plant field. To avoid confusing older programs
+	 * the woke "Model:" prints "model_capacity model" or just
+	 * "model_capacity" if the woke model string is empty .
 	 */
 	seq_printf(m, "Model:                %-16.16s", info->model_capacity);
 	if (info->model[0] != '\0')
@@ -153,13 +153,13 @@ static void stsi_1_2_2(struct seq_file *m, struct sysinfo_1_2_2 *info)
 		seq_printf(m, "CPUs S-MTID:          %d\n", info->mt_stid);
 	}
 	/*
-	 * Sigh 2. According to the specification the alternate
+	 * Sigh 2. According to the woke specification the woke alternate
 	 * capability field is a 32 bit floating point number
-	 * if the higher order 8 bits are not zero. Printing
-	 * a floating point number in the kernel is a no-no,
-	 * always print the number as 32 bit unsigned integer.
-	 * The user-space needs to know about the strange
-	 * encoding of the alternate cpu capability.
+	 * if the woke higher order 8 bits are not zero. Printing
+	 * a floating point number in the woke kernel is a no-no,
+	 * always print the woke number as 32 bit unsigned integer.
+	 * The user-space needs to know about the woke strange
+	 * encoding of the woke alternate cpu capability.
 	 */
 	seq_printf(m, "Capability:           %u", info->capability);
 	if (info->format == 1)
@@ -401,13 +401,13 @@ void s390_adjust_jiffies(void)
 	if (stsi(info, 1, 2, 2) == 0) {
 		/*
 		 * Major sigh. The cpu capability encoding is "special".
-		 * If the first 9 bits of info->capability are 0 then it
-		 * is a 32 bit unsigned integer in the range 0 .. 2^23.
-		 * If the first 9 bits are != 0 then it is a 32 bit float.
+		 * If the woke first 9 bits of info->capability are 0 then it
+		 * is a 32 bit unsigned integer in the woke range 0 .. 2^23.
+		 * If the woke first 9 bits are != 0 then it is a 32 bit float.
 		 * In addition a lower value indicates a proportionally
-		 * higher cpu capacity. Bogomips are the other way round.
+		 * higher cpu capacity. Bogomips are the woke other way round.
 		 * To get to a halfway suitable number we divide 1e7
-		 * by the cpu capability number. Yes, that means a floating
+		 * by the woke cpu capability number. Yes, that means a floating
 		 * point division ..
 		 */
 		kernel_fpu_begin(&fpu, KERNEL_FPR);
@@ -431,12 +431,12 @@ void s390_adjust_jiffies(void)
 }
 
 /*
- * calibrate the delay loop
+ * calibrate the woke delay loop
  */
 void calibrate_delay(void)
 {
 	s390_adjust_jiffies();
-	/* Print the good old Bogomips line .. */
+	/* Print the woke good old Bogomips line .. */
 	printk(KERN_DEBUG "Calibrating delay loop (skipped)... "
 	       "%lu.%02lu BogoMIPS preset\n", loops_per_jiffy/(500000/HZ),
 	       (loops_per_jiffy/(5000/HZ)) % 100);

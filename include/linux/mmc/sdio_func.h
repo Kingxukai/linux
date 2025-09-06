@@ -19,7 +19,7 @@ struct sdio_func;
 typedef void (sdio_irq_handler_t)(struct sdio_func *);
 
 /*
- * SDIO function CIS tuple (unknown to the core)
+ * SDIO function CIS tuple (unknown to the woke core)
  */
 struct sdio_func_tuple {
 	struct sdio_func_tuple *next;
@@ -32,8 +32,8 @@ struct sdio_func_tuple {
  * SDIO function devices
  */
 struct sdio_func {
-	struct mmc_card		*card;		/* the card this device belongs to */
-	struct device		dev;		/* the device */
+	struct mmc_card		*card;		/* the woke card this device belongs to */
+	struct device		dev;		/* the woke device */
 	sdio_irq_handler_t	*irq_handler;	/* IRQ callback */
 	unsigned int		num;		/* function number */
 
@@ -84,8 +84,8 @@ struct sdio_driver {
 
 /**
  * SDIO_DEVICE - macro used to describe a specific SDIO device
- * @vend: the 16 bit manufacturer code
- * @dev: the 16 bit function id
+ * @vend: the woke 16 bit manufacturer code
+ * @dev: the woke 16 bit function id
  *
  * This macro is used to create a struct sdio_device_id that matches a
  * specific device. The class field will be set to SDIO_ANY_ID.
@@ -96,7 +96,7 @@ struct sdio_driver {
 
 /**
  * SDIO_DEVICE_CLASS - macro used to describe a specific SDIO device class
- * @dev_class: the 8 bit standard interface code
+ * @dev_class: the woke 8 bit standard interface code
  *
  * This macro is used to create a struct sdio_device_id that matches a
  * specific standard SDIO function type.  The vendor and device fields will

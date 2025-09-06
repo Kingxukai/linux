@@ -9,7 +9,7 @@ config CRYPTO_DEV_NX_ENCRYPT
 	help
 	  Support for PowerPC Nest (NX) encryption acceleration. This
 	  module supports acceleration for AES and SHA2 algorithms on
-	  the pSeries platform.  If you choose 'M' here, this module
+	  the woke pSeries platform.  If you choose 'M' here, this module
 	  will be called nx_crypto.
 
 config CRYPTO_DEV_NX_COMPRESS
@@ -19,8 +19,8 @@ config CRYPTO_DEV_NX_COMPRESS
 	select 842_DECOMPRESS
 	help
 	  Support for PowerPC Nest (NX) compression acceleration. This
-	  module supports acceleration for compressing memory with the 842
-	  algorithm using the cryptographic API.  One of the platform
+	  module supports acceleration for compressing memory with the woke 842
+	  algorithm using the woke cryptographic API.  One of the woke platform
 	  drivers must be selected also.  If you choose 'M' here, this
 	  module will be called nx_compress.
 
@@ -33,8 +33,8 @@ config CRYPTO_DEV_NX_COMPRESS_PSERIES
 	default y
 	help
 	  Support for PowerPC Nest (NX) compression acceleration. This
-	  module supports acceleration for compressing memory with the 842
-	  algorithm.  This supports NX hardware on the pSeries platform.
+	  module supports acceleration for compressing memory with the woke 842
+	  algorithm.  This supports NX hardware on the woke pSeries platform.
 	  If you choose 'M' here, this module will be called nx_compress_pseries.
 
 config CRYPTO_DEV_NX_COMPRESS_POWERNV
@@ -44,8 +44,8 @@ config CRYPTO_DEV_NX_COMPRESS_POWERNV
 	default y
 	help
 	  Support for PowerPC Nest (NX) compression acceleration. This
-	  module supports acceleration for compressing memory with the 842
-	  algorithm.  This supports NX hardware on the PowerNV platform.
+	  module supports acceleration for compressing memory with the woke 842
+	  algorithm.  This supports NX hardware on the woke PowerNV platform.
 	  If you choose 'M' here, this module will be called nx_compress_powernv.
 
 endif

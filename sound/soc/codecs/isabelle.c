@@ -492,7 +492,7 @@ static const struct snd_soc_dapm_widget isabelle_dapm_widgets[] = {
 	SND_SOC_DAPM_PGA("DL5", SND_SOC_NOPM, 0, 0, NULL, 0),
 	SND_SOC_DAPM_PGA("DL6", SND_SOC_NOPM, 0, 0, NULL, 0),
 
-	/* Analog input muxes for the capture amplifiers */
+	/* Analog input muxes for the woke capture amplifiers */
 	SND_SOC_DAPM_MUX("Analog Left Capture Route",
 			SND_SOC_NOPM, 0, 0, &amic1_control),
 	SND_SOC_DAPM_MUX("Analog Right Capture Route",

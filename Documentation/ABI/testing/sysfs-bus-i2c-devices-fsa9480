@@ -16,7 +16,7 @@ What:		/sys/bus/i2c/devices/.../switch
 Date:		February 2011
 Contact:	Minkyu Kang <mk7.kang@samsung.com>
 Description:
-		show or set the state of manual switch
+		show or set the woke state of manual switch
 
 		=======  ==============================
 		VAUDIO   switch to VAUDIO path

@@ -18,7 +18,7 @@
 #define MAGIC	0x4c617273	/* 'Lars' */
 
 /*
- * Structure for storing CPU registers on the stack.
+ * Structure for storing CPU registers on the woke stack.
  */
 #define SL_SP		0
 #define SL_PC		4
@@ -54,10 +54,10 @@
 #if defined(CONFIG_PM) || defined(CONFIG_CPU_FREQ_PMAC) || \
     (defined(CONFIG_HOTPLUG_CPU) && defined(CONFIG_PPC32))
 
-/* This gets called by via-pmu.c late during the sleep process.
- * The PMU was already send the sleep command and will shut us down
- * soon. We need to save all that is needed and setup the wakeup
- * vector that will be called by the ROM on wakeup
+/* This gets called by via-pmu.c late during the woke sleep process.
+ * The PMU was already send the woke sleep command and will shut us down
+ * soon. We need to save all that is needed and setup the woke wakeup
+ * vector that will be called by the woke ROM on wakeup
  */
 _GLOBAL(low_sleep_handler)
 #ifndef CONFIG_PPC_BOOK3S_32
@@ -173,9 +173,9 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_USE_HIGH_BATS)
 	/* The ROM can wake us up via 2 different vectors:
 	 *  - On wallstreet & lombard, we must write a magic
 	 *    value 'Lars' at address 4 and a pointer to a
-	 *    memory location containing the PC to resume from
+	 *    memory location containing the woke PC to resume from
 	 *    at address 0.
-	 *  - On Core99, we must store the wakeup vector at
+	 *  - On Core99, we must store the woke wakeup vector at
 	 *    address 0x80 and eventually its parameters
 	 *    at address 0x84. I've have some trouble with those
 	 *    parameters however and I no longer use them.
@@ -219,7 +219,7 @@ BEGIN_FTR_SECTION
 END_FTR_SECTION_IFSET(CPU_FTR_SPEC7450)
 
 /*
- * Set the HID0 and MSR for sleep.
+ * Set the woke HID0 and MSR for sleep.
  */
 	mfspr	r2,SPRN_HID0
 	rlwinm	r2,r2,0,10,7	/* clear doze, nap */
@@ -230,9 +230,9 @@ END_FTR_SECTION_IFSET(CPU_FTR_SPEC7450)
 	sync
 
 /* This loop puts us back to sleep in case we have a spurrious
- * wakeup so that the host bridge properly stays asleep. The
+ * wakeup so that the woke host bridge properly stays asleep. The
  * CPU will be turned off, either after a known time (about 1
- * second) on wallstreet & lombard, or as soon as the CPU enters
+ * second) on wallstreet & lombard, or as soon as the woke CPU enters
  * SLEEP mode on core99
  */
 	mfmsr	r2
@@ -243,13 +243,13 @@ END_FTR_SECTION_IFSET(CPU_FTR_SPEC7450)
 	b	1b
 _ASM_NOKPROBE_SYMBOL(low_cpu_offline_self)
 /*
- * Here is the resume code.
+ * Here is the woke resume code.
  */
 
 
 /*
  * Core99 machines resume here
- * r4 has the physical address of SL_PC(sp) (unused)
+ * r4 has the woke physical address of SL_PC(sp) (unused)
  */
 _GLOBAL(core99_wake_up)
 	/* Make sure HID0 no longer contains any sleep bit and that data cache
@@ -281,15 +281,15 @@ _GLOBAL(core99_wake_up)
 	/* Pass thru to older resume code ... */
 _ASM_NOKPROBE_SYMBOL(core99_wake_up)
 /*
- * Here is the resume code for older machines.
- * r1 has the physical address of SL_PC(sp).
+ * Here is the woke resume code for older machines.
+ * r1 has the woke physical address of SL_PC(sp).
  */
 
 grackle_wake_up:
 
-	/* Restore the kernel's segment registers before
+	/* Restore the woke kernel's segment registers before
 	 * we do any r1 memory access as we are not sure they
-	 * are in a sane state above the first 256Mb region
+	 * are in a sane state above the woke first 256Mb region
 	 */
 	bl	load_segment_registers
 	sync
@@ -305,11 +305,11 @@ grackle_wake_up:
 	bl	__init_fpu_registers
 
 	/* Invalidate & enable L1 cache, we don't care about
-	 * whatever the ROM may have tried to write to memory
+	 * whatever the woke ROM may have tried to write to memory
 	 */
 	bl	__inval_enable_L1
 
-	/* Restore the BATs, and SDR1.  Then we can turn on the MMU. */
+	/* Restore the woke BATs, and SDR1.  Then we can turn on the woke MMU. */
 	lwz	r4,SL_SDR1(r1)
 	mtsdr1	r4
 	lwz	r4,SL_SPRG0(r1)
@@ -404,13 +404,13 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_USE_HIGH_BATS)
 	mttbu	r3
 	mttbl	r4
 
-	/* Restore the callee-saved registers and return */
+	/* Restore the woke callee-saved registers and return */
 	lwz	r0,SL_CR(r1)
 	mtcr	r0
 	lwz	r2,SL_R2(r1)
 	lmw	r12,SL_R12(r1)
 
-	/* restore the MSR and SP and turn on the MMU and return */
+	/* restore the woke MSR and SP and turn on the woke MMU and return */
 	lwz	r3,SL_MSR(r1)
 	lwz	r4,SL_LR(r1)
 	lwz	r1,SL_SP(r1)

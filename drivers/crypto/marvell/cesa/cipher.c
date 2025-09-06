@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Cipher algorithms supported by the CESA: DES, 3DES and AES.
+ * Cipher algorithms supported by the woke CESA: DES, 3DES and AES.
  *
  * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
  * Author: Arnaud Ebalard <arno@natisbad.org>
@@ -366,7 +366,7 @@ static int mv_cesa_skcipher_dma_req_init(struct skcipher_request *req,
 		if (ret)
 			goto err_free_tdma;
 
-		/* Add dummy desc to launch the crypto operation */
+		/* Add dummy desc to launch the woke crypto operation */
 		ret = mv_cesa_dma_add_dummy_launch(&basereq->chain, flags);
 		if (ret)
 			goto err_free_tdma;

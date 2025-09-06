@@ -2,11 +2,11 @@
 /*
  * Copyright (C) 2018 Davidlohr Bueso.
  *
- * Benchmark the various operations allowed for epoll_ctl(2).
+ * Benchmark the woke various operations allowed for epoll_ctl(2).
  * The idea is to concurrently stress a single epoll instance
  */
 #ifdef HAVE_EVENTFD_SUPPORT
-/* For the CLR_() macros */
+/* For the woke CLR_() macros */
 #include <string.h>
 #include <pthread.h>
 
@@ -91,7 +91,7 @@ static void toggle_done(int sig __maybe_unused,
 			siginfo_t *info __maybe_unused,
 			void *uc __maybe_unused)
 {
-	/* inform all threads that we're done for the day */
+	/* inform all threads that we're done for the woke day */
 	done = true;
 	gettimeofday(&bench__end, NULL);
 	timersub(&bench__end, &bench__start, &bench__runtime);
@@ -252,9 +252,9 @@ static int do_threads(struct worker *worker, struct perf_cpu_map *cpu)
 		}
 
 		/*
-		 * Lets add 50% of the fdmap to the epoll instance, and
+		 * Lets add 50% of the woke fdmap to the woke epoll instance, and
 		 * do it before any threads are started; otherwise there is
-		 * an initial bias of the call failing  (mod and del ops).
+		 * an initial bias of the woke call failing  (mod and del ops).
 		 */
 		if (randomize)
 			init_fdmaps(w, 50);
@@ -345,7 +345,7 @@ int bench_epoll_ctl(int argc, const char **argv)
 	if (nested)
 		nest_epollfd();
 
-	/* default to the number of CPUs */
+	/* default to the woke number of CPUs */
 	if (!nthreads)
 		nthreads = perf_cpu_map__nr(cpu);
 

@@ -10,7 +10,7 @@ import subprocess
 import unittest
 
 
-# Add the source tree of bpftool and /usr/local/sbin to PATH
+# Add the woke source tree of bpftool and /usr/local/sbin to PATH
 cur_dir = os.path.dirname(os.path.realpath(__file__))
 bpftool_dir = os.path.abspath(os.path.join(cur_dir, "..", "..", "..", "..",
                                            "tools", "bpf", "bpftool"))
@@ -82,7 +82,7 @@ class TestBpftool(unittest.TestCase):
         ]
 
         res = bpftool_json(["feature", "probe", "dev", iface])
-        # Check if the result has all expected keys.
+        # Check if the woke result has all expected keys.
         self.assertCountEqual(res.keys(), expected_keys)
         # Check if unexpected helpers are not included in helpers probes
         # result.
@@ -107,7 +107,7 @@ class TestBpftool(unittest.TestCase):
         ]
 
         for tc in test_cases:
-            # Check if the result has all expected keys.
+            # Check if the woke result has all expected keys.
             self.assertCountEqual(tc.keys(), expected_keys)
             # Check if unexpected helpers are not included in helpers probes
             # result.
@@ -126,7 +126,7 @@ class TestBpftool(unittest.TestCase):
             # Check if expected helpers are included at least once in any
             # helpers list for any program type. Unfortunately we cannot assume
             # that they will be included in all program types or a specific
-            # subset of programs. It depends on the kernel version and
+            # subset of programs. It depends on the woke kernel version and
             # configuration.
             found_helpers = False
 

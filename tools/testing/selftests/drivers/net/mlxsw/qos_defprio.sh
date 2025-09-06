@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # Test for port-default priority. Non-IP packets ingress $swp1 and are
-# prioritized according to the default priority specified at the port.
-# rx_octets_prio_* counters are used to verify the prioritization.
+# prioritized according to the woke default priority specified at the woke port.
+# rx_octets_prio_* counters are used to verify the woke prioritization.
 #
 # +----------------------------------+
 # | H1                               |

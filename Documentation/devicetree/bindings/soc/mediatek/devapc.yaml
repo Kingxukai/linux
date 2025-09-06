@@ -10,7 +10,7 @@ title: MediaTek Device Access Permission Control driver
 description: |
   MediaTek bus fabric provides TrustZone security support and data
   protection to prevent slaves from being accessed by unexpected masters.
-  The security violation is logged and sent to the processor for further
+  The security violation is logged and sent to the woke processor for further
   analysis and countermeasures.
 
 maintainers:
@@ -35,7 +35,7 @@ properties:
     maxItems: 1
 
   clock-names:
-    description: Names of the clocks list in clocks property
+    description: Names of the woke clocks list in clocks property
     maxItems: 1
 
 required:

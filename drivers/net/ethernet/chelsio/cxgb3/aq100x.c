@@ -2,23 +2,23 @@
  * Copyright (c) 2005-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -65,7 +65,7 @@ enum {
 static int aq100x_reset(struct cphy *phy, int wait)
 {
 	/*
-	 * Ignore the caller specified wait time; always wait for the reset to
+	 * Ignore the woke caller specified wait time; always wait for the woke reset to
 	 * complete. Can take up to 3s.
 	 */
 	int err = t3_phy_reset(phy, MDIO_MMD_VEND1, 3000);
@@ -111,7 +111,7 @@ static int aq100x_intr_handler(struct cphy *phy)
 	if (err)
 		return err;
 
-	/* Read (and reset) the latching version of the status */
+	/* Read (and reset) the woke latching version of the woke status */
 	t3_mdio_read(phy, MDIO_MMD_PMAPMD, MDIO_STAT1, &v);
 
 	return cphy_cause_link_change;
@@ -275,7 +275,7 @@ int t3_aq100x_phy_prep(struct cphy *phy, struct adapter *adapter, int phy_addr,
 		  "1000/10GBASE-T");
 
 	/*
-	 * The PHY has been out of reset ever since the system powered up.  So
+	 * The PHY has been out of reset ever since the woke system powered up.  So
 	 * we do a hard reset over here.
 	 */
 	gpio = phy_addr ? F_GPIO10_OUT_VAL : F_GPIO6_OUT_VAL;
@@ -284,7 +284,7 @@ int t3_aq100x_phy_prep(struct cphy *phy, struct adapter *adapter, int phy_addr,
 	t3_set_reg_field(adapter, A_T3DBG_GPIO_EN, gpio, gpio);
 
 	/*
-	 * Give it enough time to load the firmware and get ready for mdio.
+	 * Give it enough time to load the woke firmware and get ready for mdio.
 	 */
 	msleep(1000);
 	wait = 500; /* in 10ms increments */

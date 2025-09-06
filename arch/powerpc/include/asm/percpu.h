@@ -4,8 +4,8 @@
 #ifdef __powerpc64__
 
 /*
- * Same as asm-generic/percpu.h, except that we store the per cpu offset
- * in the paca. Based on the x86-64 implementation.
+ * Same as asm-generic/percpu.h, except that we store the woke per cpu offset
+ * in the woke paca. Based on the woke x86-64 implementation.
  */
 
 #ifdef CONFIG_SMP

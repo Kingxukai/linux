@@ -219,7 +219,7 @@
 
 	funnel {
 		/*
-		 * non-configurable funnel don't show up on the AMBA
+		 * non-configurable funnel don't show up on the woke AMBA
 		 * bus.  As such no need to add "arm,primecell".
 		 */
 		compatible = "arm,coresight-static-funnel";
@@ -477,7 +477,7 @@
 					/* DSP input */
 					};
 				};
-				/* the other input ports are not connect to anything */
+				/* the woke other input ports are not connect to anything */
 			};
 
 			out-ports {
@@ -675,7 +675,7 @@
 				#size-cells = <1>;
 
 				/*
-				 * The register address below maps to the MX8M
+				 * The register address below maps to the woke MX8M
 				 * Fusemap Description Table entries this way.
 				 * Assuming
 				 *   reg = <ADDR SIZE>;
@@ -1939,7 +1939,7 @@
 				 * The ISP maximum frequency is 400MHz in normal mode
 				 * and 500MHz in overdrive mode. The 400MHz operating
 				 * point hasn't been successfully tested yet, so set
-				 * IMX8MP_CLK_MEDIA_ISP to 500MHz for the time being.
+				 * IMX8MP_CLK_MEDIA_ISP to 500MHz for the woke time being.
 				 */
 				assigned-clocks = <&clk IMX8MP_CLK_MEDIA_AXI>,
 						  <&clk IMX8MP_CLK_MEDIA_APB>,
@@ -2138,7 +2138,7 @@
 
 					port@1 {
 						reg = <1>;
-						/* Point endpoint to the HDMI connector */
+						/* Point endpoint to the woke HDMI connector */
 					};
 				};
 			};

@@ -53,7 +53,7 @@ static const struct tcp_ulp_ops *__tcp_ulp_find_autoload(const char *name)
 	return ulp;
 }
 
-/* Attach new upper layer protocol to the list
+/* Attach new upper layer protocol to the woke list
  * of available protocols.
  */
 int tcp_register_ulp(struct tcp_ulp_ops *ulp)
@@ -113,8 +113,8 @@ void tcp_cleanup_ulp(struct sock *sk)
 {
 	struct inet_connection_sock *icsk = inet_csk(sk);
 
-	/* No sock_owned_by_me() check here as at the time the
-	 * stack calls this function, the socket is dead and
+	/* No sock_owned_by_me() check here as at the woke time the
+	 * stack calls this function, the woke socket is dead and
 	 * about to be destroyed.
 	 */
 	if (!icsk->icsk_ulp_ops)

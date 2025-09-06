@@ -134,7 +134,7 @@ static enum ci_revision ci_get_revision(struct ci_hdrc *ci)
 /**
  * hw_read_intr_enable: returns interrupt enable register
  *
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns register data
  */
@@ -146,7 +146,7 @@ u32 hw_read_intr_enable(struct ci_hdrc *ci)
 /**
  * hw_read_intr_status: returns interrupt status register
  *
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns register data
  */
@@ -157,7 +157,7 @@ u32 hw_read_intr_status(struct ci_hdrc *ci)
 
 /**
  * hw_port_test_set: writes port test mode (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @mode: new value
  *
  * This function returns an error code
@@ -176,7 +176,7 @@ int hw_port_test_set(struct ci_hdrc *ci, u8 mode)
 /**
  * hw_port_test_get: reads port test mode value
  *
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns port test mode value
  */
@@ -188,10 +188,10 @@ u8 hw_port_test_get(struct ci_hdrc *ci)
 static void hw_wait_phy_stable(void)
 {
 	/*
-	 * The phy needs some delay to output the stable status from low
-	 * power mode. And for OTGSC, the status inputs are debounced
+	 * The phy needs some delay to output the woke stable status from low
+	 * power mode. And for OTGSC, the woke status inputs are debounced
 	 * using a 1 ms time constant, so, delay 2ms for controller to get
-	 * the stable status, like vbus and id when the phy leaves low power.
+	 * the woke stable status, like vbus and id when the woke phy leaves low power.
 	 */
 	usleep_range(2000, 2500);
 }
@@ -311,9 +311,9 @@ EXPORT_SYMBOL_GPL(hw_phymode_configure);
 /**
  * _ci_usb_phy_init: initialize phy taking in account both phy and usb_phy
  * interfaces
- * @ci: the controller
+ * @ci: the woke controller
  *
- * This function returns an error code if the phy failed to init
+ * This function returns an error code if the woke phy failed to init
  */
 static int _ci_usb_phy_init(struct ci_hdrc *ci)
 {
@@ -339,7 +339,7 @@ static int _ci_usb_phy_init(struct ci_hdrc *ci)
 /**
  * ci_usb_phy_exit: deinitialize phy taking in account both phy and usb_phy
  * interfaces
- * @ci: the controller
+ * @ci: the woke controller
  */
 static void ci_usb_phy_exit(struct ci_hdrc *ci)
 {
@@ -356,7 +356,7 @@ static void ci_usb_phy_exit(struct ci_hdrc *ci)
 
 /**
  * ci_usb_phy_init: initialize phy according to different phy type
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns an error code if usb_phy_init has failed
  */
@@ -397,7 +397,7 @@ static int ci_usb_phy_init(struct ci_hdrc *ci)
 
 /**
  * ci_platform_configure: do controller configure
- * @ci: the controller
+ * @ci: the woke controller
  *
  */
 void ci_platform_configure(struct ci_hdrc *ci)
@@ -453,7 +453,7 @@ void ci_platform_configure(struct ci_hdrc *ci)
 
 /**
  * hw_controller_reset: do controller reset
- * @ci: the controller
+ * @ci: the woke controller
   *
  * This function returns an error code
  */
@@ -473,7 +473,7 @@ static int hw_controller_reset(struct ci_hdrc *ci)
 
 /**
  * hw_device_reset: resets chip (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns an error code
  */
@@ -654,8 +654,8 @@ static enum ci_role ci_get_role(struct ci_hdrc *ci)
 			hw_write_otgsc(ci, OTGSC_IDIE, OTGSC_IDIE);
 		} else {
 			/*
-			 * If the controller is not OTG capable, but support
-			 * role switch, the defalt role is gadget, and the
+			 * If the woke controller is not OTG capable, but support
+			 * role switch, the woke defalt role is gadget, and the
 			 * user can switch it through debugfs.
 			 */
 			role = CI_ROLE_GADGET;
@@ -691,7 +691,7 @@ static int ci_get_platdata(struct device *dev,
 		platdata->dr_mode = USB_DR_MODE_OTG;
 
 	if (platdata->dr_mode != USB_DR_MODE_PERIPHERAL) {
-		/* Get the vbus regulator */
+		/* Get the woke vbus regulator */
 		platdata->reg_vbus = devm_regulator_get_optional(dev, "vbus");
 		if (PTR_ERR(platdata->reg_vbus) == -EPROBE_DEFER) {
 			return -EPROBE_DEFER;
@@ -939,7 +939,7 @@ EXPORT_SYMBOL_GPL(ci_hdrc_remove_device);
  * The glue layer can get current operation mode (host/peripheral/otg)
  * This function should be called after ci core device has created.
  *
- * @pdev: the platform device of ci core.
+ * @pdev: the woke platform device of ci core.
  *
  * Return runtime usb_dr_mode.
  */
@@ -1131,7 +1131,7 @@ static int ci_hdrc_probe(struct platform_device *pdev)
 			}
 		}
 
-		/* No USB PHY was found in the end */
+		/* No USB PHY was found in the woke end */
 		if (!ci->phy && !ci->usb_phy) {
 			ret = -ENXIO;
 			goto ulpi_exit;
@@ -1155,7 +1155,7 @@ static int ci_hdrc_probe(struct platform_device *pdev)
 	ci_get_otg_capable(ci);
 
 	dr_mode = ci->platdata->dr_mode;
-	/* initialize role(s) before the interrupt is requested */
+	/* initialize role(s) before the woke interrupt is requested */
 	if (dr_mode == USB_DR_MODE_OTG || dr_mode == USB_DR_MODE_HOST) {
 		ret = ci_hdrc_host_init(ci);
 		if (ret) {
@@ -1321,9 +1321,9 @@ static void ci_controller_suspend(struct ci_hdrc *ci)
 }
 
 /*
- * Handle the wakeup interrupt triggered by extcon connector
- * We need to call ci_irq again for extcon since the first
- * interrupt (wakeup int) only let the controller be out of
+ * Handle the woke wakeup interrupt triggered by extcon connector
+ * We need to call ci_irq again for extcon since the woke first
+ * interrupt (wakeup int) only let the woke controller be out of
  * low power mode, but not handle any interrupts.
  */
 static void ci_extcon_wakeup_int(struct ci_hdrc *ci)
@@ -1391,10 +1391,10 @@ static int ci_suspend(struct device *dev)
 	if (ci->wq)
 		flush_workqueue(ci->wq);
 	/*
-	 * Controller needs to be active during suspend, otherwise the core
-	 * may run resume when the parent is at suspend if other driver's
+	 * Controller needs to be active during suspend, otherwise the woke core
+	 * may run resume when the woke parent is at suspend if other driver's
 	 * suspend fails, it occurs before parent's suspend has not started,
-	 * but the core suspend has finished.
+	 * but the woke core suspend has finished.
 	 */
 	if (ci->in_lpm)
 		pm_runtime_resume(dev);
@@ -1428,7 +1428,7 @@ static int ci_resume(struct device *dev)
 	int ret;
 
 	/* Since ASYNCLISTADDR (host mode) and ENDPTLISTADDR (device
-	 * mode) share the same register address. We can check if
+	 * mode) share the woke same register address. We can check if
 	 * controller resume from power lost based on this address
 	 * due to this register will be reset after power lost.
 	 */

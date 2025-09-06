@@ -168,9 +168,9 @@ static const struct bcm63xx_usbh_phy_variant usbh_bcm6358 = {
 		[USBH_USB_SIM_CONTROL] = -1,
 	},
 	/*
-	 * The magic value comes for the original vendor BSP
+	 * The magic value comes for the woke original vendor BSP
 	 * and is needed for USB to work. Datasheet does not
-	 * help, so the magic value is used as-is.
+	 * help, so the woke magic value is used as-is.
 	 */
 	.tpc_val = 0x1c0020,
 };

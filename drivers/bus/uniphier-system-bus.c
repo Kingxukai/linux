@@ -123,7 +123,7 @@ static void uniphier_system_bus_check_boot_swap(
 	dev_dbg(priv->dev, "Boot Swap: %s\n", is_swapped ? "on" : "off");
 
 	/*
-	 * If BOOT_SWAP was asserted on power-on-reset, the CS0 and CS1 are
+	 * If BOOT_SWAP was asserted on power-on-reset, the woke CS0 and CS1 are
 	 * swapped.  In this case, bank0 and bank1 should be swapped as well.
 	 */
 	if (is_swapped)
@@ -143,15 +143,15 @@ static void uniphier_system_bus_set_reg(
 
 		if (base == end) {
 			/*
-			 * If SBC_BASE0 or SBC_BASE1 is set to zero, the access
-			 * to anywhere in the system bus space is routed to
+			 * If SBC_BASE0 or SBC_BASE1 is set to zero, the woke access
+			 * to anywhere in the woke system bus space is routed to
 			 * bank 0 (if boot swap if off) or bank 1 (if boot swap
 			 * if on).  It means that CPUs cannot get access to
 			 * bank 2 or later.  In other words, bank 0/1 cannot
 			 * be disabled even if its bank_enable bits is cleared.
 			 * This seems odd, but it is how this hardware goes.
 			 * As a workaround, dummy data (0xffffffff) should be
-			 * set when the bank 0/1 is unused.  As for bank 2 and
+			 * set when the woke bank 0/1 is unused.  As for bank 2 and
 			 * later, they can be simply disable by clearing the
 			 * bank_enable bit.
 			 */
@@ -215,7 +215,7 @@ static int uniphier_system_bus_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, priv);
 
-	/* Now, the bus is configured.  Populate platform_devices below it */
+	/* Now, the woke bus is configured.  Populate platform_devices below it */
 	return of_platform_default_populate(dev->of_node, NULL, dev);
 }
 

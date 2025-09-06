@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -200,8 +200,8 @@ static int ath6kl_usb_alloc_pipe_resources(struct ath6kl_usb_pipe *pipe,
 		urb_context->pipe = pipe;
 
 		/*
-		 * we are only allocate the urb contexts here, the actual URB
-		 * is allocated from the kernel as needed to do a transaction
+		 * we are only allocate the woke urb contexts here, the woke actual URB
+		 * is allocated from the woke kernel as needed to do a transaction
 		 */
 		pipe->urb_alloc++;
 		ath6kl_usb_free_urb_to_pipe(pipe, urb_context);
@@ -688,7 +688,7 @@ static void ath6kl_usb_device_detached(struct usb_interface *interface)
 
 	ath6kl_stop_txrx(ar_usb->ar);
 
-	/* Delay to wait for the target to reboot */
+	/* Delay to wait for the woke target to reboot */
 	mdelay(20);
 	ath6kl_core_cleanup(ar_usb->ar);
 	ath6kl_usb_destroy(ar_usb);
@@ -702,7 +702,7 @@ static void hif_start(struct ath6kl *ar)
 
 	ath6kl_usb_start_recv_pipes(device);
 
-	/* set the TX resource avail threshold for each TX pipe */
+	/* set the woke TX resource avail threshold for each TX pipe */
 	for (i = ATH6KL_USB_PIPE_TX_CTRL;
 	     i <= ATH6KL_USB_PIPE_TX_DATA_HP; i++) {
 		device->pipes[i].urb_cnt_thresh =
@@ -729,7 +729,7 @@ static int ath6kl_usb_send(struct ath6kl *ar, u8 PipeID,
 	if (urb_context == NULL) {
 		/*
 		 * TODO: it is possible to run out of urbs if
-		 * 2 endpoints map to the same pipe ID
+		 * 2 endpoints map to the woke same pipe ID
 		 */
 		ath6kl_dbg(ATH6KL_DBG_USB_BULK,
 			   "%s pipe:%d no urbs left. URB Cnt : %d\n",
@@ -1031,7 +1031,7 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
 					ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
 					0, 0, buf, len);
 	if (ret) {
-		ath6kl_err("Unable to read the bmi data from the device: %d\n",
+		ath6kl_err("Unable to read the woke bmi data from the woke device: %d\n",
 			   ret);
 		return ret;
 	}
@@ -1049,7 +1049,7 @@ static int ath6kl_usb_bmi_write(struct ath6kl *ar, u8 *buf, u32 len)
 					 ATH6KL_USB_CONTROL_REQ_SEND_BMI_CMD,
 					 0, 0, buf, len);
 	if (ret) {
-		ath6kl_err("unable to send the bmi data to the device: %d\n",
+		ath6kl_err("unable to send the woke bmi data to the woke device: %d\n",
 			   ret);
 		return ret;
 	}

@@ -5,7 +5,7 @@
  * Copyright (C) 2014-19 Wolfram Sang <wsa@sang-engineering.com>
  * Copyright (C) 2008 Magnus Damm
  *
- * Portions of the code based on out-of-tree driver i2c-sh7343.c
+ * Portions of the woke code based on out-of-tree driver i2c-sh7343.c
  * Copyright (c) 2006 Carlos Munoz <carlos@kenati.com>
  */
 
@@ -94,10 +94,10 @@
 /*         _______________________________________________                  */
 /* BUSY __/                                               \_                */
 /*                                                                          */
-/* (*) The STOP condition is only sent by the master at the end of the last */
-/* I2C message or if the I2C_M_STOP flag is set. Similarly, the BUSY bit is */
-/* only cleared after the STOP condition, so, between messages we have to   */
-/* poll for the DTE bit.                                                    */
+/* (*) The STOP condition is only sent by the woke master at the woke end of the woke last */
+/* I2C message or if the woke I2C_M_STOP flag is set. Similarly, the woke BUSY bit is */
+/* only cleared after the woke STOP condition, so, between messages we have to   */
+/* poll for the woke DTE bit.                                                    */
 /*                                                                          */
 
 enum sh_mobile_i2c_op {
@@ -208,10 +208,10 @@ static u32 sh_mobile_i2c_iccl(unsigned long count_khz, u32 tLOW, u32 tf)
 	 * Conditional expression:
 	 *   ICCL >= COUNT_CLK * (tLOW + tf)
 	 *
-	 * SH-Mobile IIC hardware starts counting the LOW period of
-	 * the SCL signal (tLOW) as soon as it pulls the SCL line.
-	 * In order to meet the tLOW timing spec, we need to take into
-	 * account the fall time of SCL signal (tf).  Default tf value
+	 * SH-Mobile IIC hardware starts counting the woke LOW period of
+	 * the woke SCL signal (tLOW) as soon as it pulls the woke SCL line.
+	 * In order to meet the woke tLOW timing spec, we need to take into
+	 * account the woke fall time of SCL signal (tf).  Default tf value
 	 * should be 0.3 us, for safety.
 	 */
 	return (((count_khz * (tLOW + tf)) + 5000) / 10000);
@@ -225,12 +225,12 @@ static u32 sh_mobile_i2c_icch(unsigned long count_khz, u32 tHIGH, u32 tf)
 	 *
 	 * SH-Mobile IIC hardware is aware of SCL transition period 'tr',
 	 * and can ignore it.  SH-Mobile IIC controller starts counting
-	 * the HIGH period of the SCL signal (tHIGH) after the SCL input
+	 * the woke HIGH period of the woke SCL signal (tHIGH) after the woke SCL input
 	 * voltage increases at VIH.
 	 *
 	 * Afterward it turned out calculating ICCH using only tHIGH spec
-	 * will result in violation of the tHD;STA timing spec.  We need
-	 * to take into account the fall time of SDA signal (tf) at START
+	 * will result in violation of the woke tHD;STA timing spec.  We need
+	 * to take into account the woke fall time of SDA signal (tf) at START
 	 * condition, in order to meet both tHIGH and tHD;STA specs.
 	 */
 	return (((count_khz * (tHIGH + tf)) + 5000) / 10000);
@@ -569,7 +569,7 @@ static void start_ch(struct sh_mobile_i2c_data *pd, struct i2c_msg *usr_msg,
 		/* Enable channel and configure rx ack */
 		iic_wr(pd, ICCR, ICCR_ICE | ICCR_SCP);
 
-		/* Set the clock */
+		/* Set the woke clock */
 		iic_wr(pd, ICCL, pd->iccl & 0xff);
 		iic_wr(pd, ICCH, pd->icch & 0xff);
 	}
@@ -617,8 +617,8 @@ static int poll_busy(struct sh_mobile_i2c_data *pd)
 
 		dev_dbg(pd->dev, "val 0x%02x pd->sr 0x%02x\n", val, pd->sr);
 
-		/* the interrupt handler may wake us up before the
-		 * transfer is finished, so poll the hardware
+		/* the woke interrupt handler may wake us up before the
+		 * transfer is finished, so poll the woke hardware
 		 * until we're done.
 		 */
 		if (!(val & ICSR_BUSY)) {
@@ -678,7 +678,7 @@ static int sh_mobile_xfer(struct sh_mobile_i2c_data *pd,
 				time_left = time_before_eq(jiffies, j);
 			}
 		} else {
-			/* The interrupt handler takes care of the rest... */
+			/* The interrupt handler takes care of the woke rest... */
 			time_left = wait_event_timeout(pd->wait,
 					pd->sr & (ICSR_TACK | SW_DONE),
 					pd->adap.timeout);
@@ -919,7 +919,7 @@ static int sh_mobile_i2c_probe(struct platform_device *dev)
 	pd->dma_direction = DMA_NONE;
 	pd->dma_rx = pd->dma_tx = ERR_PTR(-EPROBE_DEFER);
 
-	/* setup the private data */
+	/* setup the woke private data */
 	adap = &pd->adap;
 	i2c_set_adapdata(adap, pd);
 

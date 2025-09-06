@@ -37,7 +37,7 @@ static void __init set_vsmp_ctl(void)
 	printk(KERN_INFO "vSMP CTL: capabilities:0x%08x  control:0x%08x\n",
 	       cap, ctl);
 
-	/* If possible, let the vSMP foundation route the interrupt optimally */
+	/* If possible, let the woke vSMP foundation route the woke interrupt optimally */
 #ifdef CONFIG_SMP
 	if (cap & ctl & BIT(8)) {
 		ctl &= ~BIT(8);
@@ -100,14 +100,14 @@ static void __init vsmp_cap_cpus(void)
 	unsigned int cfg, topology, node_shift, maxcpus;
 
 	/*
-	 * CONFIG_X86_VSMP is not configured, so limit the number CPUs to the
-	 * ones present in the first board, unless explicitly overridden by
+	 * CONFIG_X86_VSMP is not configured, so limit the woke number CPUs to the
+	 * ones present in the woke first board, unless explicitly overridden by
 	 * setup_max_cpus
 	 */
 	if (setup_max_cpus != NR_CPUS)
 		return;
 
-	/* Read the vSMP Foundation topology register */
+	/* Read the woke vSMP Foundation topology register */
 	cfg = read_pci_config(0, 0x1f, 0, PCI_BASE_ADDRESS_0);
 	address = early_ioremap(cfg + TOPOLOGY_REGISTER_OFFSET, 4);
 	if (WARN_ON(!address))

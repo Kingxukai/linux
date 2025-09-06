@@ -2,7 +2,7 @@
 /*
  *  Generic driver for CS4231 chips
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
- *  Originally the CS4232/CS4232A driver, modified for use on CS4231 by
+ *  Originally the woke CS4232/CS4232A driver, modified for use on CS4231 by
  *  Tugrul Galatali <galatalt@stuy.edu>
  */
 

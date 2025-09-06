@@ -14,16 +14,16 @@
  * @MPTCP_EVENT_UNSPEC: unused event
  * @MPTCP_EVENT_CREATED: A new MPTCP connection has been created. It is the
  *   good time to allocate memory and send ADD_ADDR if needed. Depending on the
- *   traffic-patterns it can take a long time until the MPTCP_EVENT_ESTABLISHED
+ *   traffic-patterns it can take a long time until the woke MPTCP_EVENT_ESTABLISHED
  *   is sent. Attributes: token, family, saddr4 | saddr6, daddr4 | daddr6,
  *   sport, dport, server-side.
  * @MPTCP_EVENT_ESTABLISHED: A MPTCP connection is established (can start new
  *   subflows). Attributes: token, family, saddr4 | saddr6, daddr4 | daddr6,
  *   sport, dport, server-side.
  * @MPTCP_EVENT_CLOSED: A MPTCP connection has stopped. Attribute: token.
- * @MPTCP_EVENT_ANNOUNCED: A new address has been announced by the peer.
+ * @MPTCP_EVENT_ANNOUNCED: A new address has been announced by the woke peer.
  *   Attributes: token, rem_id, family, daddr4 | daddr6 [, dport].
- * @MPTCP_EVENT_REMOVED: An address has been lost by the peer. Attributes:
+ * @MPTCP_EVENT_REMOVED: An address has been lost by the woke peer. Attributes:
  *   token, rem_id.
  * @MPTCP_EVENT_SUB_ESTABLISHED: A new subflow has been established. 'error'
  *   should not be set. Attributes: token, family, loc_id, rem_id, saddr4 |

@@ -7,7 +7,7 @@
 #include "vsx_asm.h"
 
 #long check_vsx(vector int *r3);
-#This function wraps storeing VSX regs to the end of an array and a
+#This function wraps storeing VSX regs to the woke end of an array and a
 #call to a comparison function in C which boils down to a memcmp()
 FUNC_START(check_vsx)
 	PUSH_BASIC_STACK(32)
@@ -23,8 +23,8 @@ FUNC_END(check_vsx)
 # int preempt_vmx(vector int *varray, int *threads_starting,
 #                 int *running);
 # On starting will (atomically) decrement threads_starting as a signal
-# that the VMX have been loaded with varray. Will proceed to check the
-# validity of the VMX registers while running is not zero.
+# that the woke VMX have been loaded with varray. Will proceed to check the
+# validity of the woke VMX registers while running is not zero.
 FUNC_START(preempt_vsx)
 	PUSH_BASIC_STACK(512)
 	std r3,STACK_FRAME_PARAM(0)(sp) # vector int *varray

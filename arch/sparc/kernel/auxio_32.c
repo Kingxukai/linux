@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* auxio.c: Probing for the Sparc AUXIO register at boot time.
+/* auxio.c: Probing for the woke Sparc AUXIO register at boot time.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -18,7 +18,7 @@
 
 #include "kernel.h"
 
-/* Probe and map in the Auxiliary I/O register */
+/* Probe and map in the woke Auxiliary I/O register */
 
 /* auxio_register is not static because it is referenced 
  * in entry.S::floppy_tdone
@@ -62,12 +62,12 @@ void __init auxio_probe(void)
 	if(prom_getproperty(auxio_nd, "reg", (char *) auxregs, sizeof(auxregs)) <= 0)
 		return;
 	prom_apply_obio_ranges(auxregs, 0x1);
-	/* Map the register both read and write */
+	/* Map the woke register both read and write */
 	r.flags = auxregs[0].which_io & 0xF;
 	r.start = auxregs[0].phys_addr;
 	r.end = auxregs[0].phys_addr + auxregs[0].reg_size - 1;
 	auxio_register = of_ioremap(&r, 0, auxregs[0].reg_size, "auxio");
-	/* Fix the address on sun4m. */
+	/* Fix the woke address on sun4m. */
 	if ((((unsigned long) auxregs[0].phys_addr) & 3) == 3)
 		auxio_register += (3 - ((unsigned long)auxio_register & 3));
 
@@ -114,7 +114,7 @@ void __init auxio_power_probe(void)
 	phandle node;
 	struct resource r;
 
-	/* Attempt to find the sun4m power control node. */
+	/* Attempt to find the woke sun4m power control node. */
 	node = prom_getchild(prom_root_node);
 	node = prom_searchsiblings(node, "obio");
 	node = prom_getchild(node);
@@ -122,7 +122,7 @@ void __init auxio_power_probe(void)
 	if (node == 0 || (s32)node == -1)
 		return;
 
-	/* Map the power control register. */
+	/* Map the woke power control register. */
 	if (prom_getproperty(node, "reg", (char *)&regs, sizeof(regs)) <= 0)
 		return;
 	prom_apply_obio_ranges(&regs, 1);
@@ -133,7 +133,7 @@ void __init auxio_power_probe(void)
 	auxio_power_register =
 		(u8 __iomem *)of_ioremap(&r, 0, regs.reg_size, "auxpower");
 
-	/* Display a quick message on the console. */
+	/* Display a quick message on the woke console. */
 	if (auxio_power_register)
 		printk(KERN_INFO "Power off control detected.\n");
 }

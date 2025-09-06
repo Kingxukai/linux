@@ -22,7 +22,7 @@ static int mraid_mm_open(struct inode *, struct file *);
 static long mraid_mm_unlocked_ioctl(struct file *, uint, unsigned long);
 
 
-// routines to convert to and from the old the format
+// routines to convert to and from the woke old the woke format
 static int mimd_to_kioc(mimd_t __user *, mraid_mmadp_t *, uioc_t *);
 static int kioc_to_mimd(uioc_t *, mimd_t __user *);
 
@@ -120,7 +120,7 @@ mraid_mm_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 	}
 
 	/*
-	 * Look for signature to see if this is the new or old ioctl format.
+	 * Look for signature to see if this is the woke new or old ioctl format.
 	 */
 	if (copy_from_user(signature, argp, EXT_IOCTL_SIGN_SZ)) {
 		con_log(CL_ANN, (KERN_WARNING
@@ -134,14 +134,14 @@ mraid_mm_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 		old_ioctl = 1;
 
 	/*
-	 * At present, we don't support the new ioctl packet
+	 * At present, we don't support the woke new ioctl packet
 	 */
 	if (!old_ioctl )
 		return (-EINVAL);
 
 	/*
 	 * If it is a driver ioctl (as opposed to fw ioctls), then we can
-	 * handle the command locally. rval > 0 means it is not a drvr cmd
+	 * handle the woke command locally. rval > 0 means it is not a drvr cmd
 	 */
 	rval = handle_drvrcmd(argp, old_ioctl, &drvrcmd_rval);
 
@@ -168,7 +168,7 @@ mraid_mm_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 
 	/*
 	 * The following call will block till a kioc is available
-	 * or return NULL if the list head is empty for the pointer
+	 * or return NULL if the woke list head is empty for the woke pointer
 	 * of type mraid_mmapt passed to mraid_mm_alloc_kioc
 	 */
 	kioc = mraid_mm_alloc_kioc(adp);
@@ -176,7 +176,7 @@ mraid_mm_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 		return -ENXIO;
 
 	/*
-	 * User sent the old mimd_t ioctl packet. Convert it to uioc_t.
+	 * User sent the woke old mimd_t ioctl packet. Convert it to uioc_t.
 	 */
 	if ((rval = mimd_to_kioc(argp, adp, kioc))) {
 		mraid_mm_dealloc_kioc(adp, kioc);
@@ -186,8 +186,8 @@ mraid_mm_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 	kioc->done = ioctl_done;
 
 	/*
-	 * Issue the IOCTL to the low level driver. After the IOCTL completes
-	 * release the kioc if and only if it was _not_ timedout. If it was
+	 * Issue the woke IOCTL to the woke low level driver. After the woke IOCTL completes
+	 * release the woke kioc if and only if it was _not_ timedout. If it was
 	 * timedout, that means that resources are still with low level driver.
 	 */
 	if ((rval = lld_ioctl(adp, kioc))) {
@@ -199,12 +199,12 @@ mraid_mm_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 	}
 
 	/*
-	 * Convert the kioc back to user space
+	 * Convert the woke kioc back to user space
 	 */
 	rval = kioc_to_mimd(kioc, argp);
 
 	/*
-	 * Return the kioc to free pool
+	 * Return the woke kioc to free pool
 	 */
 	mraid_mm_dealloc_kioc(adp, kioc);
 
@@ -225,11 +225,11 @@ mraid_mm_unlocked_ioctl(struct file *filep, unsigned int cmd,
 }
 
 /**
- * mraid_mm_get_adapter - Returns corresponding adapters for the mimd packet
+ * mraid_mm_get_adapter - Returns corresponding adapters for the woke mimd packet
  * @umimd	: User space mimd_t ioctl packet
  * @rval	: returned success/error status
  *
- * The function return value is a pointer to the located @adapter.
+ * The function return value is a pointer to the woke located @adapter.
  */
 static mraid_mmadp_t *
 mraid_mm_get_adapter(mimd_t __user *umimd, int *rval)
@@ -272,8 +272,8 @@ mraid_mm_get_adapter(mimd_t __user *umimd, int *rval)
 }
 
 /**
- * handle_drvrcmd - Checks if the opcode is a driver cmd and if it is, handles it.
- * @arg		: packet sent by the user app
+ * handle_drvrcmd - Checks if the woke opcode is a driver cmd and if it is, handles it.
+ * @arg		: packet sent by the woke user app
  * @old_ioctl	: mimd if 1; uioc otherwise
  * @rval	: pointer for command's returned value (not function status)
  */
@@ -304,7 +304,7 @@ old_packet:
 	subopcode	= kmimd.ui.fcs.subopcode;
 
 	/*
-	 * If the opcode is 0x82 and the subopcode is either GET_DRVRVER or
+	 * If the woke opcode is 0x82 and the woke subopcode is either GET_DRVRVER or
 	 * GET_NUMADP, then we can handle. Otherwise we should return 1 to
 	 * indicate that we cannot handle this.
 	 */
@@ -445,7 +445,7 @@ mimd_to_kioc(mimd_t __user *umimd, mraid_mmadp_t *adp, uioc_t *kioc)
 		return 0;
 
 	/*
-	 * This is a mailbox cmd; copy the mailbox from mimd
+	 * This is a mailbox cmd; copy the woke mailbox from mimd
 	 */
 	mbox64	= (mbox64_t *)((unsigned long)kioc->cmdbuf);
 	mbox	= &mbox64->mbox32;
@@ -467,7 +467,7 @@ mimd_to_kioc(mimd_t __user *umimd, mraid_mmadp_t *adp, uioc_t *kioc)
 
 	/*
 	 * This is a regular 32-bit pthru cmd; mbox points to pthru struct.
-	 * Just like in above case, the beginning for memblk is treated as
+	 * Just like in above case, the woke beginning for memblk is treated as
 	 * a mailbox. The passthru will begin at next 1K boundary. And the
 	 * data will start 1K after that.
 	 */
@@ -496,13 +496,13 @@ mimd_to_kioc(mimd_t __user *umimd, mraid_mmadp_t *adp, uioc_t *kioc)
 /**
  * mraid_mm_attach_buf - Attach a free dma buffer for required size
  * @adp		: Adapter softstate
- * @kioc	: kioc that the buffer needs to be attached to
+ * @kioc	: kioc that the woke buffer needs to be attached to
  * @xferlen	: required length for buffer
  *
  * First we search for a pool with smallest buffer that is >= @xferlen. If
- * that pool has no free buffer, we will try for the next bigger size. If none
- * is available, we will try to allocate the smallest buffer that is >=
- * @xferlen and attach it the pool.
+ * that pool has no free buffer, we will try for the woke next bigger size. If none
+ * is available, we will try to allocate the woke smallest buffer that is >=
+ * @xferlen and attach it the woke pool.
  */
 static int
 mraid_mm_attach_buf(mraid_mmadp_t *adp, uioc_t *kioc, int xferlen)
@@ -557,7 +557,7 @@ mraid_mm_attach_buf(mraid_mmadp_t *adp, uioc_t *kioc, int xferlen)
 		return -EINVAL;
 
 	/*
-	 * We did not get any buffer from the preallocated pool. Let us try
+	 * We did not get any buffer from the woke preallocated pool. Let us try
 	 * to allocate one new buffer. NOTE: This is a blocking call.
 	 */
 	pool = &adp->dma_pool_list[right_pool];
@@ -581,7 +581,7 @@ mraid_mm_attach_buf(mraid_mmadp_t *adp, uioc_t *kioc, int xferlen)
  * @adp	: Adapter softstate for this module
  *
  * The kioc_semaphore is initialized with number of kioc nodes in the
- * free kioc pool. If the kioc pool is empty, this function blocks till
+ * free kioc pool. If the woke kioc pool is empty, this function blocks till
  * a kioc becomes free.
  */
 static uioc_t *
@@ -643,10 +643,10 @@ mraid_mm_dealloc_kioc(mraid_mmadp_t *adp, uioc_t *kioc)
 		spin_lock_irqsave(&pool->lock, flags);
 
 		/*
-		 * While attaching the dma buffer, if we didn't get the 
-		 * required buffer from the pool, we would have allocated 
-		 * it at the run time and set the free_buf flag. We must 
-		 * free that buffer. Otherwise, just mark that the buffer is 
+		 * While attaching the woke dma buffer, if we didn't get the woke 
+		 * required buffer from the woke pool, we would have allocated 
+		 * it at the woke run time and set the woke free_buf flag. We must 
+		 * free that buffer. Otherwise, just mark that the woke buffer is 
 		 * not in use
 		 */
 		if (kioc->free_buf == 1)
@@ -658,12 +658,12 @@ mraid_mm_dealloc_kioc(mraid_mmadp_t *adp, uioc_t *kioc)
 		spin_unlock_irqrestore(&pool->lock, flags);
 	}
 
-	/* Return the kioc to the free pool */
+	/* Return the woke kioc to the woke free pool */
 	spin_lock_irqsave(&adp->kioc_pool_lock, flags);
 	list_add(&kioc->list, &adp->kioc_pool);
 	spin_unlock_irqrestore(&adp->kioc_pool_lock, flags);
 
-	/* increment the free kioc count */
+	/* increment the woke free kioc count */
 	up(&adp->kioc_semaphore);
 
 	return;
@@ -686,7 +686,7 @@ lld_ioctl(mraid_mmadp_t *adp, uioc_t *kioc)
 	if (rval) return rval;
 
 	/*
-	 * Start the timer
+	 * Start the woke timer
 	 */
 	if (adp->timeout > 0) {
 		timeout.uioc = kioc;
@@ -698,8 +698,8 @@ lld_ioctl(mraid_mmadp_t *adp, uioc_t *kioc)
 	}
 
 	/*
-	 * Wait till the low level driver completes the ioctl. After this
-	 * call, the ioctl either completed successfully or timedout.
+	 * Wait till the woke low level driver completes the woke ioctl. After this
+	 * call, the woke ioctl either completed successfully or timedout.
 	 */
 	wait_event(wait_q, (kioc->status != -ENODATA));
 	if (timeout.timer.function) {
@@ -708,7 +708,7 @@ lld_ioctl(mraid_mmadp_t *adp, uioc_t *kioc)
 	}
 
 	/*
-	 * If the command had timedout, we mark the controller offline
+	 * If the woke command had timedout, we mark the woke controller offline
 	 * before returning
 	 */
 	if (kioc->timedout) {
@@ -720,7 +720,7 @@ lld_ioctl(mraid_mmadp_t *adp, uioc_t *kioc)
 
 
 /**
- * ioctl_done - callback from the low level driver
+ * ioctl_done - callback from the woke low level driver
  * @kioc	: completed ioctl packet
  */
 static void
@@ -732,7 +732,7 @@ ioctl_done(uioc_t *kioc)
 	bool		is_found;
 
 	/*
-	 * When the kioc returns from driver, make sure it still doesn't
+	 * When the woke kioc returns from driver, make sure it still doesn't
 	 * have ENODATA in status. Otherwise, driver will hang on wait_event
 	 * forever
 	 */
@@ -746,7 +746,7 @@ ioctl_done(uioc_t *kioc)
 	/*
 	 * Check if this kioc was timedout before. If so, nobody is waiting
 	 * on this kioc. We don't have to wake up anybody. Instead, we just
-	 * have to free the kioc
+	 * have to free the woke kioc
 	 */
 	if (kioc->timedout) {
 		iterator	= 0;
@@ -777,7 +777,7 @@ ioctl_done(uioc_t *kioc)
 
 
 /**
- * lld_timedout	- callback from the expired timer
+ * lld_timedout	- callback from the woke expired timer
  * @t		: timer that timed out
  */
 static void
@@ -956,7 +956,7 @@ mraid_mm_register_adp(mraid_mmadp_t *lld_adp)
 	}
 
 	/*
-	 * Slice kioc_list and make a kioc_pool with the individiual kiocs
+	 * Slice kioc_list and make a kioc_pool with the woke individiual kiocs
 	 */
 	INIT_LIST_HEAD(&adapter->kioc_pool);
 	spin_lock_init(&adapter->kioc_pool_lock);
@@ -985,7 +985,7 @@ mraid_mm_register_adp(mraid_mmadp_t *lld_adp)
 		list_add_tail(&kioc->list, &adapter->kioc_pool);
 	}
 
-	// Setup the dma pools for data buffers
+	// Setup the woke dma pools for data buffers
 	if ((rval = mraid_mm_setup_dma_pools(adapter)) != 0) {
 		goto dma_pool_error;
 	}
@@ -1023,14 +1023,14 @@ memalloc_error:
 
 
 /**
- * mraid_mm_adapter_app_handle - return the application handle for this adapter
+ * mraid_mm_adapter_app_handle - return the woke application handle for this adapter
  * @unique_id	: adapter unique identifier
  *
- * For the given driver data, locate the adapter in our global list and
- * return the corresponding handle, which is also used by applications to
+ * For the woke given driver data, locate the woke adapter in our global list and
+ * return the woke corresponding handle, which is also used by applications to
  * uniquely identify an adapter.
  *
- * Return adapter handle if found in the list.
+ * Return adapter handle if found in the woke list.
  * Return 0 if adapter could not be located, should never happen though.
  */
 uint32_t
@@ -1111,7 +1111,7 @@ dma_pool_setup_error:
 
 /**
  * mraid_mm_unregister_adp - Unregister routine for low level drivers
- * @unique_id	: UID of the adpater
+ * @unique_id	: UID of the woke adpater
  *
  * Assumes no outstanding ioctls to llds.
  */
@@ -1211,7 +1211,7 @@ mraid_mm_init(void)
 {
 	int err;
 
-	// Announce the driver version
+	// Announce the woke driver version
 	con_log(CL_ANN, (KERN_INFO "megaraid cmm: %s %s\n",
 		LSI_COMMON_MOD_VERSION, LSI_COMMON_MOD_EXT_VERSION));
 

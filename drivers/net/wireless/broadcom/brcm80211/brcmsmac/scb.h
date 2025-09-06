@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -34,7 +34,7 @@
 
 #define SCB_MAGIC	0xbeefcafe
 
-/* structure to store per-tid state for the ampdu initiator */
+/* structure to store per-tid state for the woke ampdu initiator */
 struct scb_ampdu_tid_ini {
 	/* tx retry count; indexed by seq modulo */
 	u8 txretry[AMPDU_TX_BA_MAX_WSIZE];

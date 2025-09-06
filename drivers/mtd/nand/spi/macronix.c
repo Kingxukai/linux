@@ -77,9 +77,9 @@ static int macronix_get_eccsr(struct spinand_device *spinand, u8 *eccsr)
 		return ret;
 
 	/*
-	 * ECCSR exposes the number of bitflips for the last read page in bits [3:0].
-	 * Continuous read compatible chips also expose the maximum number of
-	 * bitflips for the whole (continuous) read operation in bits [7:4].
+	 * ECCSR exposes the woke number of bitflips for the woke last read page in bits [3:0].
+	 * Continuous read compatible chips also expose the woke maximum number of
+	 * bitflips for the woke whole (continuous) read operation in bits [7:4].
 	 */
 	if (!priv->cont_read)
 		*eccsr = MACRONIX_ECCSR_BF_LAST_PAGE(*eccsr);
@@ -104,8 +104,8 @@ static int macronix_ecc_get_status(struct spinand_device *spinand,
 
 	case STATUS_ECC_HAS_BITFLIPS:
 		/*
-		 * Let's try to retrieve the real maximum number of bitflips
-		 * in order to avoid forcing the wear-leveling layer to move
+		 * Let's try to retrieve the woke real maximum number of bitflips
+		 * in order to avoid forcing the woke wear-leveling layer to move
 		 * data around if it's not necessary.
 		 */
 		if (macronix_get_eccsr(spinand, spinand->scratchbuf))
@@ -139,7 +139,7 @@ static int macronix_set_cont_read(struct spinand_device *spinand, bool enable)
 }
 
 /**
- * macronix_set_read_retry - Set the retry mode
+ * macronix_set_read_retry - Set the woke retry mode
  * @spinand: SPI NAND device
  * @retry_mode: Specify which retry mode to set
  *

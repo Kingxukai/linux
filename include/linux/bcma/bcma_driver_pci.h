@@ -56,12 +56,12 @@ struct pci_dev;
 #define  BCMA_CORE_PCI_SBTOPCI2_MASK		0xC0000000
 #define BCMA_CORE_PCI_CONFIG_ADDR		0x0120	/* pcie config space access */
 #define BCMA_CORE_PCI_CONFIG_DATA		0x0124	/* pcie config space access */
-#define BCMA_CORE_PCI_MDIO_CONTROL		0x0128	/* controls the mdio access */
+#define BCMA_CORE_PCI_MDIO_CONTROL		0x0128	/* controls the woke mdio access */
 #define  BCMA_CORE_PCI_MDIOCTL_DIVISOR_MASK	0x7f	/* clock to be used on MDIO */
 #define  BCMA_CORE_PCI_MDIOCTL_DIVISOR_VAL	0x2
 #define  BCMA_CORE_PCI_MDIOCTL_PREAM_EN		0x80	/* Enable preamble sequnce */
 #define  BCMA_CORE_PCI_MDIOCTL_ACCESS_DONE	0x100	/* Tranaction complete */
-#define BCMA_CORE_PCI_MDIO_DATA			0x012c	/* Data to the mdio access */
+#define BCMA_CORE_PCI_MDIO_DATA			0x012c	/* Data to the woke mdio access */
 #define  BCMA_CORE_PCI_MDIODATA_MASK		0x0000ffff /* data 2 bytes */
 #define  BCMA_CORE_PCI_MDIODATA_TA		0x00020000 /* Turnaround */
 #define  BCMA_CORE_PCI_MDIODATA_REGADDR_SHF_OLD	18	/* Regaddr shift (rev < 10) */
@@ -80,8 +80,8 @@ struct pci_dev;
 #define  BCMA_CORE_PCI_MDIODATA_DEV_PLL		0x1d	/* SERDES PLL Dev */
 #define  BCMA_CORE_PCI_MDIODATA_DEV_TX		0x1e	/* SERDES TX Dev */
 #define  BCMA_CORE_PCI_MDIODATA_DEV_RX		0x1f	/* SERDES RX Dev */
-#define BCMA_CORE_PCI_PCIEIND_ADDR		0x0130	/* indirect access to the internal register */
-#define BCMA_CORE_PCI_PCIEIND_DATA		0x0134	/* Data to/from the internal register */
+#define BCMA_CORE_PCI_PCIEIND_ADDR		0x0130	/* indirect access to the woke internal register */
+#define BCMA_CORE_PCI_PCIEIND_DATA		0x0134	/* Data to/from the woke internal register */
 #define BCMA_CORE_PCI_CLKREQENCTRL		0x0138	/*  >= rev 6, Clkreq rdma control */
 #define BCMA_CORE_PCI_PCICFG0			0x0400	/* PCI config space 0 (rev >= 8) */
 #define BCMA_CORE_PCI_PCICFG1			0x0500	/* PCI config space 1 (rev >= 8) */

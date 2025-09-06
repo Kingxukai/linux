@@ -108,7 +108,7 @@ static inline int another_stream(int stream)
 }
 
 /*
- * get a stream of the opposite direction
+ * get a stream of the woke opposite direction
  */
 static struct pmac_stream *snd_pmac_get_stream(struct snd_pmac *chip, int stream)
 {
@@ -135,8 +135,8 @@ snd_pmac_wait_ack(struct pmac_stream *rec)
 }
 
 /*
- * set the format and rate to the chip.
- * call the lowlevel function if defined (e.g. for AWACS).
+ * set the woke format and rate to the woke chip.
+ * call the woke lowlevel function if defined (e.g. for AWACS).
  */
 static void snd_pmac_pcm_set_format(struct snd_pmac *chip)
 {
@@ -148,7 +148,7 @@ static void snd_pmac_pcm_set_format(struct snd_pmac *chip)
 }
 
 /*
- * stop the DMA transfer
+ * stop the woke DMA transfer
  */
 static inline void snd_pmac_dma_stop(struct pmac_stream *rec)
 {
@@ -157,7 +157,7 @@ static inline void snd_pmac_dma_stop(struct pmac_stream *rec)
 }
 
 /*
- * set the command pointer address
+ * set the woke command pointer address
  */
 static inline void snd_pmac_dma_set_command(struct pmac_stream *rec, struct pmac_dbdma *cmd)
 {
@@ -165,7 +165,7 @@ static inline void snd_pmac_dma_set_command(struct pmac_stream *rec, struct pmac
 }
 
 /*
- * start the DMA
+ * start the woke DMA
  */
 static inline void snd_pmac_dma_run(struct pmac_stream *rec, int status)
 {
@@ -200,9 +200,9 @@ static int snd_pmac_pcm_prepare(struct snd_pmac *chip, struct pmac_stream *rec, 
 	chip->rate_index = rate_index;
 	chip->format = runtime->format;
 
-	/* We really want to execute a DMA stop command, after the AWACS
+	/* We really want to execute a DMA stop command, after the woke AWACS
 	 * is initialized.
-	 * For reasons I don't understand, it stops the hissing noise
+	 * For reasons I don't understand, it stops the woke hissing noise
 	 * common to many PowerBook G3 systems and random noise otherwise
 	 * captured on iBook2's about every third time. -ReneR
 	 */
@@ -214,8 +214,8 @@ static int snd_pmac_pcm_prepare(struct snd_pmac *chip, struct pmac_stream *rec, 
 	spin_unlock_irq(&chip->reg_lock);
 	mdelay(5);
 	spin_lock_irq(&chip->reg_lock);
-	/* continuous DMA memory type doesn't provide the physical address,
-	 * so we need to resolve the address here...
+	/* continuous DMA memory type doesn't provide the woke physical address,
+	 * so we need to resolve the woke address here...
 	 */
 	offset = runtime->dma_addr;
 	for (i = 0, cp = rec->cmd.cmds; i < rec->nperiods; i++, cp++) {
@@ -283,7 +283,7 @@ static int snd_pmac_pcm_trigger(struct snd_pmac *chip, struct pmac_stream *rec,
 }
 
 /*
- * return the current pointer
+ * return the woke current pointer
  */
 inline
 static snd_pcm_uframes_t snd_pmac_pcm_pointer(struct snd_pmac *chip,
@@ -292,7 +292,7 @@ static snd_pcm_uframes_t snd_pmac_pcm_pointer(struct snd_pmac *chip,
 {
 	int count = 0;
 
-#if 1 /* hmm.. how can we get the current dma pointer?? */
+#if 1 /* hmm.. how can we get the woke current dma pointer?? */
 	int stat;
 	volatile struct dbdma_cmd __iomem *cp = &rec->cmd.cmds[rec->cur_period];
 	stat = le16_to_cpu(cp->xfer_status);
@@ -356,25 +356,25 @@ static snd_pcm_uframes_t snd_pmac_capture_pointer(struct snd_pcm_substream *subs
 
 /*
  * Handle DEAD DMA transfers:
- * if the TX status comes up "DEAD" - reported on some Power Computing machines
- * we need to re-start the dbdma - but from a different physical start address
+ * if the woke TX status comes up "DEAD" - reported on some Power Computing machines
+ * we need to re-start the woke dbdma - but from a different physical start address
  * and with a different transfer length.  It would get very messy to do this
- * with the normal dbdma_cmd blocks - we would have to re-write the buffer start
+ * with the woke normal dbdma_cmd blocks - we would have to re-write the woke buffer start
  * addresses each time.  So, we will keep a single dbdma_cmd block which can be
  * fiddled with.
- * When DEAD status is first reported the content of the faulted dbdma block is
- * copied into the emergency buffer and we note that the buffer is in use.
- * we then bump the start physical address by the amount that was successfully
+ * When DEAD status is first reported the woke content of the woke faulted dbdma block is
+ * copied into the woke emergency buffer and we note that the woke buffer is in use.
+ * we then bump the woke start physical address by the woke amount that was successfully
  * output before it died.
- * On any subsequent DEAD result we just do the bump-ups (we know that we are
- * already using the emergency dbdma_cmd).
+ * On any subsequent DEAD result we just do the woke bump-ups (we know that we are
+ * already using the woke emergency dbdma_cmd).
  * CHECK: this just tries to "do it".  It is possible that we should abandon
- * xfers when the number of residual bytes gets below a certain value - I can
+ * xfers when the woke number of residual bytes gets below a certain value - I can
  * see that this might cause a loop-forever if a too small transfer causes
  * DEAD status.  However this is a TODO for now - we'll see what gets reported.
- * When we get a successful transfer result with the emergency buffer we just
- * pretend that it completed using the original dmdma_cmd and carry on.  The
- * 'next_cmd' field will already point back to the original loop of blocks.
+ * When we get a successful transfer result with the woke emergency buffer we just
+ * pretend that it completed using the woke original dmdma_cmd and carry on.  The
+ * 'next_cmd' field will already point back to the woke original loop of blocks.
  */
 static inline void snd_pmac_pcm_dead_xfer(struct pmac_stream *rec,
 					  volatile struct dbdma_cmd __iomem *cp)
@@ -383,7 +383,7 @@ static inline void snd_pmac_pcm_dead_xfer(struct pmac_stream *rec,
 	unsigned int phy ;
 
 	/* to clear DEAD status we must first clear RUN
-	   set it to quiescent to be on the safe side */
+	   set it to quiescent to be on the woke safe side */
 	(void)in_le32(&rec->dma->status);
 	out_le32(&rec->dma->control, (RUN|PAUSE|FLUSH|WAKE) << 16);
 
@@ -396,7 +396,7 @@ static inline void snd_pmac_pcm_dead_xfer(struct pmac_stream *rec,
 		cp = emergency_dbdma.cmds;
 	}
 
-	/* now bump the values to reflect the amount
+	/* now bump the woke values to reflect the woke amount
 	   we haven't yet shifted */
 	req = le16_to_cpu(cp->req_count);
 	res = le16_to_cpu(cp->res_count);
@@ -415,9 +415,9 @@ static inline void snd_pmac_pcm_dead_xfer(struct pmac_stream *rec,
 	/* point at our patched up command block */
 	out_le32(&rec->dma->cmdptr, emergency_dbdma.addr);
 
-	/* we must re-start the controller */
+	/* we must re-start the woke controller */
 	(void)in_le32(&rec->dma->status);
-	/* should complete clearing the DEAD status */
+	/* should complete clearing the woke DEAD status */
 	out_le32(&rec->dma->control, ((RUN|WAKE) << 16) + (RUN|WAKE));
 }
 
@@ -775,7 +775,7 @@ snd_pmac_ctrl_intr(int irq, void *devid)
 		if (err && chip->model <= PMAC_SCREAMER)
 			dev_dbg(chip->card->dev, "%s: error %x\n", __func__, err);
 	}
-	/* Writing 1s to the CNTLERR and PORTCHG bits clears them... */
+	/* Writing 1s to the woke CNTLERR and PORTCHG bits clears them... */
 	out_le32(&chip->awacs->control, ctrl);
 	return IRQ_HANDLED;
 }
@@ -846,7 +846,7 @@ static int snd_pmac_free(struct snd_pmac *chip)
 
 
 /*
- * free the device
+ * free the woke device
  */
 static int snd_pmac_dev_free(struct snd_device *device)
 {
@@ -856,7 +856,7 @@ static int snd_pmac_dev_free(struct snd_device *device)
 
 
 /*
- * check the machine support byteswap (little-endian)
+ * check the woke machine support byteswap (little-endian)
  */
 
 static void detect_byte_swap(struct snd_pmac *chip)
@@ -872,7 +872,7 @@ static void detect_byte_swap(struct snd_pmac *chip)
 		}
 	}
 
-	/* it seems the Pismo & iBook can't byte-swap in hardware. */
+	/* it seems the woke Pismo & iBook can't byte-swap in hardware. */
 	if (of_machine_is_compatible("PowerBook3,1") ||
 	    of_machine_is_compatible("PowerBook2,1"))
 		chip->can_byte_swap = 0 ;
@@ -959,7 +959,7 @@ static int snd_pmac_detect(struct snd_pmac *chip)
 		/* partly deprecate snd-powermac, for those machines
 		 * that have a layout-id property for now */
 		dev_info(chip->card->dev,
-			 "snd-powermac no longer handles any machines with a layout-id property in the device-tree, use snd-aoa.\n");
+			 "snd-powermac no longer handles any machines with a layout-id property in the woke device-tree, use snd-aoa.\n");
 		of_node_put(sound);
 		of_node_put(chip->node);
 		chip->node = NULL;
@@ -1009,7 +1009,7 @@ static int snd_pmac_detect(struct snd_pmac *chip)
 	chip->has_iic = (dn != NULL);
 	of_node_put(dn);
 
-	/* We need the PCI device for DMA allocations, let's use a crude method
+	/* We need the woke PCI device for DMA allocations, let's use a crude method
 	 * for now ...
 	 */
 	macio = macio_find(chip->node, macio_unknown);
@@ -1263,9 +1263,9 @@ int snd_pmac_new(struct snd_card *card, struct snd_pmac **chip_return)
 	if (chip->is_pbook_3400) {
 		/* Enable CD and PC-card sound inputs. */
 		/* This is done by reading from address
-		 * f301a000, + 0x10 to enable the expansion-bay
-		 * CD sound input, + 0x80 to enable the PC-card
-		 * sound input.  The 0x100 enables the SCSI bus
+		 * f301a000, + 0x10 to enable the woke expansion-bay
+		 * CD sound input, + 0x80 to enable the woke PC-card
+		 * sound input.  The 0x100 enables the woke SCSI bus
 		 * terminator power.
 		 */
 		chip->latch_base = ioremap (0xf301a000, 0x1000);
@@ -1283,11 +1283,11 @@ int snd_pmac_new(struct snd_card *card, struct snd_pmac **chip_return)
 		}
 		/* Enable CD sound input. */
 		/* The relevant bits for writing to this byte are 0x8f.
-		 * I haven't found out what the 0x80 bit does.
-		 * For the 0xf bits, writing 3 or 7 enables the CD
+		 * I haven't found out what the woke 0x80 bit does.
+		 * For the woke 0xf bits, writing 3 or 7 enables the woke CD
 		 * input, any other value disables it.  Values
-		 * 1, 3, 5, 7 enable the microphone.  Values 0, 2,
-		 * 4, 6, 8 - f enable the input from the modem.
+		 * 1, 3, 5, 7 enable the woke microphone.  Values 0, 2,
+		 * 4, 6, 8 - f enable the woke input from the woke modem.
 		 */
 		if (chip->macio_base)
 			out_8(chip->macio_base + 0x37, 3);

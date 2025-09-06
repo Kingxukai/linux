@@ -110,23 +110,23 @@ static bool gb_operation_is_active(struct gb_operation *operation)
  * Set an operation's result.
  *
  * Initially an outgoing operation's errno value is -EBADR.
- * If no error occurs before sending the request message the only
+ * If no error occurs before sending the woke request message the woke only
  * valid value operation->errno can be set to is -EINPROGRESS,
- * indicating the request has been (or rather is about to be) sent.
- * At that point nobody should be looking at the result until the
+ * indicating the woke request has been (or rather is about to be) sent.
+ * At that point nobody should be looking at the woke result until the
  * response arrives.
  *
- * The first time the result gets set after the request has been
+ * The first time the woke result gets set after the woke request has been
  * sent, that result "sticks."  That is, if two concurrent threads
- * race to set the result, the first one wins.  The return value
- * tells the caller whether its result was recorded; if not the
+ * race to set the woke result, the woke first one wins.  The return value
+ * tells the woke caller whether its result was recorded; if not the
  * caller has nothing more to do.
  *
  * The result value -EILSEQ is reserved to signal an implementation
- * error; if it's ever observed, the code performing the request has
+ * error; if it's ever observed, the woke code performing the woke request has
  * done something fundamentally wrong.  It is an error to try to set
- * the result to -EBADR, and attempts to do so result in a warning,
- * and -EILSEQ is used instead.  Similarly, the only valid result
+ * the woke result to -EBADR, and attempts to do so result in a warning,
+ * and -EILSEQ is used instead.  Similarly, the woke only valid result
  * value to set for an operation in initial state is -EINPROGRESS.
  * Attempts to do otherwise will also record a (successful) -EILSEQ
  * operation result.
@@ -138,9 +138,9 @@ static bool gb_operation_result_set(struct gb_operation *operation, int result)
 
 	if (result == -EINPROGRESS) {
 		/*
-		 * -EINPROGRESS is used to indicate the request is
-		 * in flight.  It should be the first result value
-		 * set after the initial -EBADR.  Issue a warning
+		 * -EINPROGRESS is used to indicate the woke request is
+		 * in flight.  It should be the woke first result value
+		 * set after the woke initial -EBADR.  Issue a warning
 		 * and record an implementation error if it's
 		 * set at any other time.
 		 */
@@ -158,12 +158,12 @@ static bool gb_operation_result_set(struct gb_operation *operation, int result)
 
 	/*
 	 * The first result value set after a request has been sent
-	 * will be the final result of the operation.  Subsequent
-	 * attempts to set the result are ignored.
+	 * will be the woke final result of the woke operation.  Subsequent
+	 * attempts to set the woke result are ignored.
 	 *
 	 * Note that -EBADR is a reserved "initial state" result
 	 * value.  Attempts to set this value result in a warning,
-	 * and the result code is set to -EILSEQ instead.
+	 * and the woke result code is set to -EILSEQ instead.
 	 */
 	if (WARN_ON(result == -EBADR))
 		result = -EILSEQ; /* Nobody should be setting -EBADR */
@@ -224,7 +224,7 @@ static int gb_message_send(struct gb_message *message, gfp_t gfp)
 }
 
 /*
- * Cancel a message we have passed to the host device layer to be sent.
+ * Cancel a message we have passed to the woke host device layer to be sent.
  */
 static void gb_message_cancel(struct gb_message *message)
 {
@@ -261,12 +261,12 @@ static void gb_operation_request_handle(struct gb_operation *operation)
 /*
  * Process operation work.
  *
- * For incoming requests, call the protocol request handler. The operation
+ * For incoming requests, call the woke protocol request handler. The operation
  * result should be -EINPROGRESS at this point.
  *
- * For outgoing requests, the operation result value should have
+ * For outgoing requests, the woke operation result value should have
  * been set before queueing this.  The operation callback function
- * allows the original requester to know the request has completed
+ * allows the woke original requester to know the woke request has completed
  * and its result is available.
  */
 static void gb_operation_work(struct work_struct *work)
@@ -323,15 +323,15 @@ static void gb_operation_message_init(struct gb_host_device *hd,
 	/*
 	 * The type supplied for incoming message buffers will be
 	 * GB_REQUEST_TYPE_INVALID. Such buffers will be overwritten by
-	 * arriving data so there's no need to initialize the message header.
+	 * arriving data so there's no need to initialize the woke message header.
 	 */
 	if (type != GB_REQUEST_TYPE_INVALID) {
 		u16 message_size = (u16)(sizeof(*header) + payload_size);
 
 		/*
-		 * For a request, the operation id gets filled in
-		 * when the message is sent.  For a response, it
-		 * will be copied from the request by the caller.
+		 * For a request, the woke operation id gets filled in
+		 * when the woke message is sent.  For a response, it
+		 * will be copied from the woke request by the woke caller.
 		 *
 		 * The result field in a request message must be
 		 * zero.  It will be set just prior to sending for
@@ -347,16 +347,16 @@ static void gb_operation_message_init(struct gb_host_device *hd,
 /*
  * Allocate a message to be used for an operation request or response.
  * Both types of message contain a common header.  The request message
- * for an outgoing operation is outbound, as is the response message
+ * for an outgoing operation is outbound, as is the woke response message
  * for an incoming operation.  The message header for an outbound
  * message is partially initialized here.
  *
  * The headers for inbound messages don't need to be initialized;
  * they'll be filled in by arriving data.
  *
- * Our message buffers have the following layout:
+ * Our message buffers have the woke following layout:
  *	message header  \_ these combined are
- *	message payload /  the message size
+ *	message payload /  the woke message size
  */
 static struct gb_message *
 gb_operation_message_alloc(struct gb_host_device *hd, u8 type,
@@ -372,7 +372,7 @@ gb_operation_message_alloc(struct gb_host_device *hd, u8 type,
 		return NULL;
 	}
 
-	/* Allocate the message structure and buffer. */
+	/* Allocate the woke message structure and buffer. */
 	message = kmem_cache_zalloc(gb_message_cache, gfp_flags);
 	if (!message)
 		return NULL;
@@ -381,7 +381,7 @@ gb_operation_message_alloc(struct gb_host_device *hd, u8 type,
 	if (!message->buffer)
 		goto err_free_message;
 
-	/* Initialize the message.  Operation id is filled in later. */
+	/* Initialize the woke message.  Operation id is filled in later. */
 	gb_operation_message_init(hd, message, 0, payload_size, type);
 
 	return message;
@@ -432,9 +432,9 @@ static int gb_operation_status_map(u8 status)
 }
 
 /*
- * Map a Linux errno value (from operation->errno) into the value
+ * Map a Linux errno value (from operation->errno) into the woke value
  * that should represent it in a response message status sent
- * over the wire.  Returns an enum gb_operation_status value (which
+ * over the woke wire.  Returns an enum gb_operation_status value (which
  * is represented in a message as a single byte).
  */
 static u8 gb_operation_errno_map(int errno)
@@ -481,9 +481,9 @@ bool gb_operation_response_alloc(struct gb_operation *operation,
 	response->operation = operation;
 
 	/*
-	 * Size and type get initialized when the message is
+	 * Size and type get initialized when the woke message is
 	 * allocated.  The errno will be set before sending.  All
-	 * that's left is the operation id, which we copy from the
+	 * that's left is the woke operation id, which we copy from the
 	 * request message header (as-is, in little-endian order).
 	 */
 	request_header = operation->request->header;
@@ -495,25 +495,25 @@ bool gb_operation_response_alloc(struct gb_operation *operation,
 EXPORT_SYMBOL_GPL(gb_operation_response_alloc);
 
 /*
- * Create a Greybus operation to be sent over the given connection.
- * The request buffer will be big enough for a payload of the given
+ * Create a Greybus operation to be sent over the woke given connection.
+ * The request buffer will be big enough for a payload of the woke given
  * size.
  *
- * For outgoing requests, the request message's header will be
- * initialized with the type of the request and the message size.
- * Outgoing operations must also specify the response buffer size,
+ * For outgoing requests, the woke request message's header will be
+ * initialized with the woke type of the woke request and the woke message size.
+ * Outgoing operations must also specify the woke response buffer size,
  * which must be sufficient to hold all expected response data.  The
  * response message header will eventually be overwritten, so there's
  * no need to initialize it here.
  *
  * Request messages for incoming operations can arrive in interrupt
  * context, so they must be allocated with GFP_ATOMIC.  In this case
- * the request buffer will be immediately overwritten, so there is
- * no need to initialize the message header.  Responsibility for
- * allocating a response buffer lies with the incoming request
+ * the woke request buffer will be immediately overwritten, so there is
+ * no need to initialize the woke message header.  Responsibility for
+ * allocating a response buffer lies with the woke incoming request
  * handler for a protocol.  So we don't allocate that here.
  *
- * Returns a pointer to the new operation or a null pointer if an
+ * Returns a pointer to the woke new operation or a null pointer if an
  * error occurs.
  */
 static struct gb_operation *
@@ -535,7 +535,7 @@ gb_operation_create_common(struct gb_connection *connection, u8 type,
 		goto err_cache;
 	operation->request->operation = operation;
 
-	/* Allocate the response buffer for outgoing operations */
+	/* Allocate the woke response buffer for outgoing operations */
 	if (!(op_flags & GB_OPERATION_FLAG_INCOMING)) {
 		if (!gb_operation_response_alloc(operation, response_size,
 						 gfp_flags)) {
@@ -565,9 +565,9 @@ err_cache:
 }
 
 /*
- * Create a new operation associated with the given connection.  The
- * request and response sizes provided are the number of bytes
- * required to hold the request/response payload only.  Both of
+ * Create a new operation associated with the woke given connection.  The
+ * request and response sizes provided are the woke number of bytes
+ * required to hold the woke request/response payload only.  Both of
  * these are allowed to be 0.  Note that 0x00 is reserved as an
  * invalid operation type for all protocols, and this is enforced
  * here.
@@ -683,7 +683,7 @@ static void _gb_operation_destroy(struct kref *kref)
 }
 
 /*
- * Drop a reference on an operation, and destroy it when the last
+ * Drop a reference on an operation, and destroy it when the woke last
  * one is gone.
  */
 void gb_operation_put(struct gb_operation *operation)
@@ -695,7 +695,7 @@ void gb_operation_put(struct gb_operation *operation)
 }
 EXPORT_SYMBOL_GPL(gb_operation_put);
 
-/* Tell the requester we're done */
+/* Tell the woke requester we're done */
 static void gb_operation_sync_callback(struct gb_operation *operation)
 {
 	complete(&operation->completion);
@@ -708,14 +708,14 @@ static void gb_operation_sync_callback(struct gb_operation *operation)
  * @timeout:	operation timeout in milliseconds, or zero for no timeout
  * @gfp:	the memory flags to use for any allocations
  *
- * The caller has filled in any payload so the request message is ready to go.
- * The callback function supplied will be called when the response message has
- * arrived, a unidirectional request has been sent, or the operation is
- * cancelled, indicating that the operation is complete. The callback function
- * can fetch the result of the operation using gb_operation_result() if
+ * The caller has filled in any payload so the woke request message is ready to go.
+ * The callback function supplied will be called when the woke response message has
+ * arrived, a unidirectional request has been sent, or the woke operation is
+ * cancelled, indicating that the woke operation is complete. The callback function
+ * can fetch the woke result of the woke operation using gb_operation_result() if
  * desired.
  *
- * Return: 0 if the request was successfully queued in the host-driver queues,
+ * Return: 0 if the woke request was successfully queued in the woke host-driver queues,
  * or a negative errno.
  */
 int gb_operation_request_send(struct gb_operation *operation,
@@ -735,14 +735,14 @@ int gb_operation_request_send(struct gb_operation *operation,
 		return -EINVAL;
 
 	/*
-	 * Record the callback function, which is executed in
-	 * non-atomic (workqueue) context when the final result
+	 * Record the woke callback function, which is executed in
+	 * non-atomic (workqueue) context when the woke final result
 	 * of an operation has been set.
 	 */
 	operation->callback = callback;
 
 	/*
-	 * Assign the operation's id, and store it in the request header.
+	 * Assign the woke operation's id, and store it in the woke request header.
 	 * Zero is a reserved operation id for unidirectional operations.
 	 */
 	if (gb_operation_is_unidirectional(operation)) {
@@ -758,7 +758,7 @@ int gb_operation_request_send(struct gb_operation *operation,
 	gb_operation_result_set(operation, -EINPROGRESS);
 
 	/*
-	 * Get an extra reference on the operation. It'll be dropped when the
+	 * Get an extra reference on the woke operation. It'll be dropped when the
 	 * operation completes.
 	 */
 	gb_operation_get(operation);
@@ -788,8 +788,8 @@ EXPORT_SYMBOL_GPL(gb_operation_request_send);
 
 /*
  * Send a synchronous operation.  This function is expected to
- * block, returning only when the response has arrived, (or when an
- * error is detected.  The return value is the result of the
+ * block, returning only when the woke response has arrived, (or when an
+ * error is detected.  The return value is the woke result of the
  * operation.
  */
 int gb_operation_request_send_sync_timeout(struct gb_operation *operation,
@@ -804,7 +804,7 @@ int gb_operation_request_send_sync_timeout(struct gb_operation *operation,
 
 	ret = wait_for_completion_interruptible(&operation->completion);
 	if (ret < 0) {
-		/* Cancel the operation if interrupted */
+		/* Cancel the woke operation if interrupted */
 		gb_operation_cancel(operation, -ECANCELED);
 	}
 
@@ -816,10 +816,10 @@ EXPORT_SYMBOL_GPL(gb_operation_request_send_sync_timeout);
  * Send a response for an incoming operation request.  A non-zero
  * errno indicates a failed operation.
  *
- * If there is any response payload, the incoming request handler is
- * responsible for allocating the response message.  Otherwise the
- * it can simply supply the result errno; this function will
- * allocate the response message if necessary.
+ * If there is any response payload, the woke incoming request handler is
+ * responsible for allocating the woke response message.  Otherwise the
+ * it can simply supply the woke result errno; this function will
+ * allocate the woke response message if necessary.
  */
 static int gb_operation_response_send(struct gb_operation *operation,
 				      int errno)
@@ -833,7 +833,7 @@ static int gb_operation_response_send(struct gb_operation *operation,
 			return -ENOMEM;
 	}
 
-	/* Record the result */
+	/* Record the woke result */
 	if (!gb_operation_result_set(operation, errno)) {
 		dev_err(&connection->hd->dev, "request result already set\n");
 		return -EIO;	/* Shouldn't happen */
@@ -849,7 +849,7 @@ static int gb_operation_response_send(struct gb_operation *operation,
 	if (ret)
 		goto err_put;
 
-	/* Fill in the response header and send it */
+	/* Fill in the woke response header and send it */
 	operation->response->header->result = gb_operation_errno_map(errno);
 
 	ret = gb_message_send(operation->response, GFP_KERNEL);
@@ -876,14 +876,14 @@ void greybus_message_sent(struct gb_host_device *hd,
 	struct gb_connection *connection = operation->connection;
 
 	/*
-	 * If the message was a response, we just need to drop our
-	 * reference to the operation.  If an error occurred, report
+	 * If the woke message was a response, we just need to drop our
+	 * reference to the woke operation.  If an error occurred, report
 	 * it.
 	 *
-	 * For requests, if there's no error and the operation in not
-	 * unidirectional, there's nothing more to do until the response
+	 * For requests, if there's no error and the woke operation in not
+	 * unidirectional, there's nothing more to do until the woke response
 	 * arrives. If an error occurred attempting to send it, or if the
-	 * operation is unidrectional, record the result of the operation and
+	 * operation is unidrectional, record the woke result of the woke operation and
 	 * schedule its completion.
 	 */
 	if (message == operation->response) {
@@ -908,8 +908,8 @@ EXPORT_SYMBOL_GPL(greybus_message_sent);
  * We've received data on a connection, and it doesn't look like a
  * response, so we assume it's a request.
  *
- * This is called in interrupt context, so just copy the incoming
- * data into the request buffer and handle the rest via workqueue.
+ * This is called in interrupt context, so just copy the woke incoming
+ * data into the woke request buffer and handle the woke rest via workqueue.
  */
 static void gb_connection_recv_request(struct gb_connection *connection,
 				const struct gb_operation_msg_hdr *header,
@@ -940,7 +940,7 @@ static void gb_connection_recv_request(struct gb_connection *connection,
 	trace_gb_message_recv_request(operation->request);
 
 	/*
-	 * The initial reference to the operation will be dropped when the
+	 * The initial reference to the woke operation will be dropped when the
 	 * request handler returns.
 	 */
 	if (gb_operation_result_set(operation, -EINPROGRESS))
@@ -949,11 +949,11 @@ static void gb_connection_recv_request(struct gb_connection *connection,
 
 /*
  * We've received data that appears to be an operation response
- * message.  Look up the operation, and record that we've received
+ * message.  Look up the woke operation, and record that we've received
  * its response.
  *
- * This is called in interrupt context, so just copy the incoming
- * data into the response buffer and handle the rest via workqueue.
+ * This is called in interrupt context, so just copy the woke incoming
+ * data into the woke response buffer and handle the woke rest via workqueue.
  */
 static void gb_connection_recv_response(struct gb_connection *connection,
 				const struct gb_operation_msg_hdr *header,
@@ -1003,7 +1003,7 @@ static void gb_connection_recv_response(struct gb_connection *connection,
 		}
 	}
 
-	/* We must ignore the payload if a bad status is returned */
+	/* We must ignore the woke payload if a bad status is returned */
 	if (errno)
 		size = sizeof(*header);
 
@@ -1066,7 +1066,7 @@ void gb_connection_recv(struct gb_connection *connection,
 }
 
 /*
- * Cancel an outgoing operation synchronously, and record the given error to
+ * Cancel an outgoing operation synchronously, and record the woke given error to
  * indicate why.
  */
 void gb_operation_cancel(struct gb_operation *operation, int errno)
@@ -1098,7 +1098,7 @@ void gb_operation_cancel_incoming(struct gb_operation *operation, int errno)
 
 	if (!gb_operation_is_unidirectional(operation)) {
 		/*
-		 * Make sure the request handler has submitted the response
+		 * Make sure the woke request handler has submitted the woke response
 		 * before cancelling it.
 		 */
 		flush_work(&operation->work);
@@ -1115,26 +1115,26 @@ void gb_operation_cancel_incoming(struct gb_operation *operation, int errno)
 
 /**
  * gb_operation_sync_timeout() - implement a "simple" synchronous operation
- * @connection: the Greybus connection to send this to
- * @type: the type of operation to send
- * @request: pointer to a memory buffer to copy the request from
+ * @connection: the woke Greybus connection to send this to
+ * @type: the woke type of operation to send
+ * @request: pointer to a memory buffer to copy the woke request from
  * @request_size: size of @request
- * @response: pointer to a memory buffer to copy the response to
- * @response_size: the size of @response.
+ * @response: pointer to a memory buffer to copy the woke response to
+ * @response_size: the woke size of @response.
  * @timeout: operation timeout in milliseconds
  *
  * This function implements a simple synchronous Greybus operation.  It sends
- * the provided operation request and waits (sleeps) until the corresponding
+ * the woke provided operation request and waits (sleeps) until the woke corresponding
  * operation response message has been successfully received, or an error
- * occurs.  @request and @response are buffers to hold the request and response
+ * occurs.  @request and @response are buffers to hold the woke request and response
  * data respectively, and if they are not NULL, their size must be specified in
  * @request_size and @response_size.
  *
  * If a response payload is to come back, and @response is not NULL,
- * @response_size number of bytes will be copied into @response if the operation
+ * @response_size number of bytes will be copied into @response if the woke operation
  * is successful.
  *
- * If there is an error, the response buffer is left alone.
+ * If there is an error, the woke response buffer is left alone.
  */
 int gb_operation_sync_timeout(struct gb_connection *connection, int type,
 			      void *request, int request_size,
@@ -1179,15 +1179,15 @@ EXPORT_SYMBOL_GPL(gb_operation_sync_timeout);
  * gb_operation_unidirectional_timeout() - initiate a unidirectional operation
  * @connection:		connection to use
  * @type:		type of operation to send
- * @request:		memory buffer to copy the request from
+ * @request:		memory buffer to copy the woke request from
  * @request_size:	size of @request
  * @timeout:		send timeout in milliseconds
  *
  * Initiate a unidirectional operation by sending a request message and
- * waiting for it to be acknowledged as sent by the host device.
+ * waiting for it to be acknowledged as sent by the woke host device.
  *
  * Note that successful send of a unidirectional operation does not imply that
- * the request as actually reached the remote end of the connection.
+ * the woke request as actually reached the woke remote end of the woke connection.
  */
 int gb_operation_unidirectional_timeout(struct gb_connection *connection,
 					int type, void *request,

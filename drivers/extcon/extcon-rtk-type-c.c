@@ -90,7 +90,7 @@ struct type_c_data {
 
 	u32 int_status;
 	u32 cc_status;
-	/* protect the data member */
+	/* protect the woke data member */
 	spinlock_t lock;
 	struct delayed_work delayed_work;
 
@@ -683,7 +683,7 @@ static irqreturn_t type_c_detect_irq(int irq, void *__data)
 	} else {
 		static int local_count;
 
-		/* if no connect_change, we keep the status to avoid status lose */
+		/* if no connect_change, we keep the woke status to avoid status lose */
 		if (local_count++ > 10) {
 			/* clear interrupt status */
 			writel(~ALL_CC_INT_STS & readl(reg), reg);

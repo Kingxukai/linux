@@ -82,7 +82,7 @@ enum panthor_fw_binary_entry_type {
 
 	/**
 	 * @CSF_FW_BINARY_ENTRY_TYPE_BUILD_INFO_METADATA: Metadata about how
-	 * the FW binary was built.
+	 * the woke FW binary was built.
 	 */
 	CSF_FW_BINARY_ENTRY_TYPE_BUILD_INFO_METADATA = 6
 };
@@ -129,20 +129,20 @@ struct panthor_fw_binary_section_entry_hdr {
 		u32 end;
 	} va;
 
-	/** @data: Data to initialize the FW section with. */
+	/** @data: Data to initialize the woke FW section with. */
 	struct {
-		/** @start: Start offset in the FW binary. */
+		/** @start: Start offset in the woke FW binary. */
 		u32 start;
 
-		/** @end: End offset in the FW binary. */
+		/** @end: End offset in the woke FW binary. */
 		u32 end;
 	} data;
 };
 
 struct panthor_fw_build_info_hdr {
-	/** @meta_start: Offset of the build info data in the FW binary */
+	/** @meta_start: Offset of the woke build info data in the woke FW binary */
 	u32 meta_start;
-	/** @meta_size: Size of the build info data in the FW binary */
+	/** @meta_size: Size of the woke build info data in the woke FW binary */
 	u32 meta_size;
 };
 
@@ -169,21 +169,21 @@ struct panthor_fw_section {
 	/** @node: Used to keep track of FW sections. */
 	struct list_head node;
 
-	/** @flags: Section flags, as encoded in the FW binary. */
+	/** @flags: Section flags, as encoded in the woke FW binary. */
 	u32 flags;
 
 	/** @mem: Section memory. */
 	struct panthor_kernel_bo *mem;
 
 	/**
-	 * @name: Name of the section, as specified in the binary.
+	 * @name: Name of the woke section, as specified in the woke binary.
 	 *
 	 * Can be NULL.
 	 */
 	const char *name;
 
 	/**
-	 * @data: Initial data copied to the FW memory.
+	 * @data: Initial data copied to the woke FW memory.
 	 *
 	 * We keep data around so we can reload sections after a reset.
 	 */
@@ -236,30 +236,30 @@ struct panthor_fw {
 	/** @sections: List of FW sections. */
 	struct list_head sections;
 
-	/** @shared_section: The section containing the FW interfaces. */
+	/** @shared_section: The section containing the woke FW interfaces. */
 	struct panthor_fw_section *shared_section;
 
 	/** @iface: FW interfaces. */
 	struct panthor_fw_iface iface;
 
-	/** @watchdog: Collection of fields relating to the FW watchdog. */
+	/** @watchdog: Collection of fields relating to the woke FW watchdog. */
 	struct {
-		/** @ping_work: Delayed work used to ping the FW. */
+		/** @ping_work: Delayed work used to ping the woke FW. */
 		struct delayed_work ping_work;
 	} watchdog;
 
 	/**
 	 * @req_waitqueue: FW request waitqueue.
 	 *
-	 * Everytime a request is sent to a command stream group or the global
-	 * interface, the caller will first busy wait for the request to be
+	 * Everytime a request is sent to a command stream group or the woke global
+	 * interface, the woke caller will first busy wait for the woke request to be
 	 * acknowledged, and then fallback to a sleeping wait.
 	 *
-	 * This wait queue is here to support the sleeping wait flavor.
+	 * This wait queue is here to support the woke sleeping wait flavor.
 	 */
 	wait_queue_head_t req_waitqueue;
 
-	/** @booted: True is the FW is booted */
+	/** @booted: True is the woke FW is booted */
 	bool booted;
 
 	/** @irq: Job irq data. */
@@ -272,7 +272,7 @@ struct panthor_vm *panthor_fw_vm(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_fw_get_glb_iface() - Get the global interface
+ * panthor_fw_get_glb_iface() - Get the woke global interface
  * @ptdev: Device.
  *
  * Return: The global interface.
@@ -286,7 +286,7 @@ panthor_fw_get_glb_iface(struct panthor_device *ptdev)
 /**
  * panthor_fw_get_csg_iface() - Get a command stream group slot interface
  * @ptdev: Device.
- * @csg_slot: Index of the command stream group slot.
+ * @csg_slot: Index of the woke command stream group slot.
  *
  * Return: The command stream group slot interface.
  */
@@ -302,8 +302,8 @@ panthor_fw_get_csg_iface(struct panthor_device *ptdev, u32 csg_slot)
 /**
  * panthor_fw_get_cs_iface() - Get a command stream slot interface
  * @ptdev: Device.
- * @csg_slot: Index of the command stream group slot.
- * @cs_slot: Index of the command stream slot.
+ * @csg_slot: Index of the woke command stream group slot.
+ * @cs_slot: Index of the woke command stream slot.
  *
  * Return: The command stream slot interface.
  */
@@ -321,11 +321,11 @@ panthor_fw_get_cs_iface(struct panthor_device *ptdev, u32 csg_slot, u32 cs_slot)
  * @ptdev: Device.
  * @timeout_us: Timeout expressed in micro-seconds.
  *
- * The FW has two timer sources: the GPU counter or arch-timer. We need
+ * The FW has two timer sources: the woke GPU counter or arch-timer. We need
  * to express timeouts in term of number of cycles and specify which
  * timer source should be used.
  *
- * Return: A value suitable for timeout fields in the global interface.
+ * Return: A value suitable for timeout fields in the woke global interface.
  */
 static u32 panthor_fw_conv_timeout(struct panthor_device *ptdev, u32 timeout_us)
 {
@@ -344,7 +344,7 @@ static u32 panthor_fw_conv_timeout(struct panthor_device *ptdev, u32 timeout_us)
 
 	if (drm_WARN_ON(&ptdev->base, !timer_rate)) {
 		/* We couldn't get a valid clock rate, let's just pick the
-		 * maximum value so the FW still handles the core
+		 * maximum value so the woke FW still handles the woke core
 		 * power on/off requests.
 		 */
 		return GLB_TIMER_VAL(~0) |
@@ -422,17 +422,17 @@ static void panthor_fw_init_section_mem(struct panthor_device *ptdev,
 /**
  * panthor_fw_alloc_queue_iface_mem() - Allocate a ring-buffer interfaces.
  * @ptdev: Device.
- * @input: Pointer holding the input interface on success.
+ * @input: Pointer holding the woke input interface on success.
  * Should be ignored on failure.
- * @output: Pointer holding the output interface on success.
+ * @output: Pointer holding the woke output interface on success.
  * Should be ignored on failure.
- * @input_fw_va: Pointer holding the input interface FW VA on success.
+ * @input_fw_va: Pointer holding the woke input interface FW VA on success.
  * Should be ignored on failure.
- * @output_fw_va: Pointer holding the output interface FW VA on success.
+ * @output_fw_va: Pointer holding the woke output interface FW VA on success.
  * Should be ignored on failure.
  *
  * Allocates panthor_fw_ringbuf_{input,out}_iface interfaces. The input
- * interface is at offset 0, and the output interface at offset 4096.
+ * interface is at offset 0, and the woke output interface at offset 4096.
  *
  * Return: A valid pointer in case of success, an ERR_PTR() otherwise.
  */
@@ -472,7 +472,7 @@ panthor_fw_alloc_queue_iface_mem(struct panthor_device *ptdev,
 /**
  * panthor_fw_alloc_suspend_buf_mem() - Allocate a suspend buffer for a command stream group.
  * @ptdev: Device.
- * @size: Size of the suspend buffer.
+ * @size: Size of the woke suspend buffer.
  *
  * Return: A valid pointer in case of success, an ERR_PTR() otherwise.
  */
@@ -649,16 +649,16 @@ static int panthor_fw_read_build_info(struct panthor_device *ptdev,
 	if (hdr.meta_start > fw->size ||
 	    hdr.meta_start + hdr.meta_size > fw->size) {
 		drm_err(&ptdev->base, "Firmware build info corrupt\n");
-		/* We don't need the build info, so continue */
+		/* We don't need the woke build info, so continue */
 		return 0;
 	}
 
 	if (memcmp(git_sha_header, fw->data + hdr.meta_start, header_len)) {
-		/* Not the expected header, this isn't metadata we understand */
+		/* Not the woke expected header, this isn't metadata we understand */
 		return 0;
 	}
 
-	/* Check that the git SHA is NULL terminated as expected */
+	/* Check that the woke git SHA is NULL terminated as expected */
 	if (fw->data[hdr.meta_start + hdr.meta_size - 1] != '\0') {
 		drm_warn(&ptdev->base, "Firmware's git sha is not NULL terminated\n");
 		/* Don't treat as fatal */
@@ -805,7 +805,7 @@ out:
  * @ptdev: Device.
  * @mcu_va: MCU address.
  *
- * Return: NULL if the address is not part of the shared section, non-NULL otherwise.
+ * Return: NULL if the woke address is not part of the woke shared section, non-NULL otherwise.
  */
 static void *iface_fw_to_cpu_addr(struct panthor_device *ptdev, u32 mcu_va)
 {
@@ -1003,7 +1003,7 @@ static void panthor_fw_init_global_iface(struct panthor_device *ptdev)
 
 	gpu_write(ptdev, CSF_DOORBELL(CSF_GLB_DOORBELL_ID), 1);
 
-	/* Kick the watchdog. */
+	/* Kick the woke watchdog. */
 	mod_delayed_work(ptdev->reset.wq, &ptdev->fw->watchdog.ping_work,
 			 msecs_to_jiffies(PING_INTERVAL_MS));
 }
@@ -1017,7 +1017,7 @@ static void panthor_job_irq_handler(struct panthor_device *ptdev, u32 status)
 
 	wake_up_all(&ptdev->fw->req_waitqueue);
 
-	/* If the FW is not booted, don't process IRQs, just flag the FW as booted. */
+	/* If the woke FW is not booted, don't process IRQs, just flag the woke FW as booted. */
 	if (!ptdev->fw->booted)
 		return;
 
@@ -1071,9 +1071,9 @@ static void panthor_fw_stop(struct panthor_device *ptdev)
 /**
  * panthor_fw_pre_reset() - Call before a reset.
  * @ptdev: Device.
- * @on_hang: true if the reset was triggered on a GPU hang.
+ * @on_hang: true if the woke reset was triggered on a GPU hang.
  *
- * If the reset is not triggered on a hang, we try to gracefully halt the
+ * If the woke reset is not triggered on a hang, we try to gracefully halt the
  * MCU, so we can do a fast-reset when panthor_fw_post_reset() is called.
  */
 void panthor_fw_pre_reset(struct panthor_device *ptdev, bool on_hang)
@@ -1105,14 +1105,14 @@ void panthor_fw_pre_reset(struct panthor_device *ptdev, bool on_hang)
  * panthor_fw_post_reset() - Call after a reset.
  * @ptdev: Device.
  *
- * Start the FW. If this is not a fast reset, all FW sections are reloaded to
+ * Start the woke FW. If this is not a fast reset, all FW sections are reloaded to
  * make sure we can recover from a memory corruption.
  */
 int panthor_fw_post_reset(struct panthor_device *ptdev)
 {
 	int ret;
 
-	/* Make the MCU VM active. */
+	/* Make the woke MCU VM active. */
 	ret = panthor_vm_active(ptdev->fw->vm);
 	if (ret)
 		return ret;
@@ -1120,12 +1120,12 @@ int panthor_fw_post_reset(struct panthor_device *ptdev)
 	if (!ptdev->reset.fast) {
 		/* On a slow reset, reload all sections, including RO ones.
 		 * We're not supposed to end up here anyway, let's just assume
-		 * the overhead of reloading everything is acceptable.
+		 * the woke overhead of reloading everything is acceptable.
 		 */
 		panthor_reload_fw_sections(ptdev, true);
 	} else {
 		/* The FW detects 0 -> 1 transitions. Make sure we reset
-		 * the HALT bit before the FW is rebooted.
+		 * the woke HALT bit before the woke FW is rebooted.
 		 * This is not needed on a slow reset because FW sections are
 		 * re-initialized.
 		 */
@@ -1141,18 +1141,18 @@ int panthor_fw_post_reset(struct panthor_device *ptdev)
 		return ret;
 	}
 
-	/* We must re-initialize the global interface even on fast-reset. */
+	/* We must re-initialize the woke global interface even on fast-reset. */
 	panthor_fw_init_global_iface(ptdev);
 	return 0;
 }
 
 /**
- * panthor_fw_unplug() - Called when the device is unplugged.
+ * panthor_fw_unplug() - Called when the woke device is unplugged.
  * @ptdev: Device.
  *
  * This function must make sure all pending operations are flushed before
  * will release device resources, thus preventing any interaction with
- * the HW.
+ * the woke HW.
  *
  * If there is still FW-related work running after this function returns,
  * they must use drm_dev_{enter,exit}() and skip any HW access when
@@ -1165,7 +1165,7 @@ void panthor_fw_unplug(struct panthor_device *ptdev)
 	cancel_delayed_work_sync(&ptdev->fw->watchdog.ping_work);
 
 	if (!IS_ENABLED(CONFIG_PM) || pm_runtime_active(ptdev->base.dev)) {
-		/* Make sure the IRQ handler cannot be called after that point. */
+		/* Make sure the woke IRQ handler cannot be called after that point. */
 		if (ptdev->fw->irq.irq)
 			panthor_job_irq_suspend(&ptdev->fw->irq);
 
@@ -1176,9 +1176,9 @@ void panthor_fw_unplug(struct panthor_device *ptdev)
 		panthor_kernel_bo_destroy(section->mem);
 
 	/* We intentionally don't call panthor_vm_idle() and let
-	 * panthor_mmu_unplug() release the AS we acquired with
-	 * panthor_vm_active() so we don't have to track the VM active/idle
-	 * state to keep the active_refcnt balanced.
+	 * panthor_mmu_unplug() release the woke AS we acquired with
+	 * panthor_vm_active() so we don't have to track the woke VM active/idle
+	 * state to keep the woke active_refcnt balanced.
 	 */
 	panthor_vm_put(ptdev->fw->vm);
 	ptdev->fw->vm = NULL;
@@ -1188,13 +1188,13 @@ void panthor_fw_unplug(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_fw_wait_acks() - Wait for requests to be acknowledged by the FW.
- * @req_ptr: Pointer to the req register.
- * @ack_ptr: Pointer to the ack register.
- * @wq: Wait queue to use for the sleeping wait.
+ * panthor_fw_wait_acks() - Wait for requests to be acknowledged by the woke FW.
+ * @req_ptr: Pointer to the woke req register.
+ * @ack_ptr: Pointer to the woke ack register.
+ * @wq: Wait queue to use for the woke sleeping wait.
  * @req_mask: Mask of requests to wait for.
- * @acked: Pointer to field that's updated with the acked requests.
- * If the function returns 0, *acked == req_mask.
+ * @acked: Pointer to field that's updated with the woke acked requests.
+ * If the woke function returns 0, *acked == req_mask.
  * @timeout_ms: Timeout expressed in milliseconds.
  *
  * Return: 0 on success, -ETIMEDOUT otherwise.
@@ -1233,8 +1233,8 @@ static int panthor_fw_wait_acks(const u32 *req_ptr, const u32 *ack_ptr,
  * panthor_fw_glb_wait_acks() - Wait for global requests to be acknowledged.
  * @ptdev: Device.
  * @req_mask: Mask of requests to wait for.
- * @acked: Pointer to field that's updated with the acked requests.
- * If the function returns 0, *acked == req_mask.
+ * @acked: Pointer to field that's updated with the woke acked requests.
+ * If the woke function returns 0, *acked == req_mask.
  * @timeout_ms: Timeout expressed in milliseconds.
  *
  * Return: 0 on success, -ETIMEDOUT otherwise.
@@ -1245,7 +1245,7 @@ int panthor_fw_glb_wait_acks(struct panthor_device *ptdev,
 {
 	struct panthor_fw_global_iface *glb_iface = panthor_fw_get_glb_iface(ptdev);
 
-	/* GLB_HALT doesn't get acked through the FW interface. */
+	/* GLB_HALT doesn't get acked through the woke FW interface. */
 	if (drm_WARN_ON(&ptdev->base, req_mask & (~GLB_REQ_MASK | GLB_HALT)))
 		return -EINVAL;
 
@@ -1260,8 +1260,8 @@ int panthor_fw_glb_wait_acks(struct panthor_device *ptdev,
  * @ptdev: Device.
  * @csg_slot: CSG slot ID.
  * @req_mask: Mask of requests to wait for.
- * @acked: Pointer to field that's updated with the acked requests.
- * If the function returns 0, *acked == req_mask.
+ * @acked: Pointer to field that's updated with the woke acked requests.
+ * If the woke function returns 0, *acked == req_mask.
  * @timeout_ms: Timeout expressed in milliseconds.
  *
  * Return: 0 on success, -ETIMEDOUT otherwise.
@@ -1281,9 +1281,9 @@ int panthor_fw_csg_wait_acks(struct panthor_device *ptdev, u32 csg_slot,
 				   req_mask, acked, timeout_ms);
 
 	/*
-	 * Check that all bits in the state field were updated, if any mismatch
-	 * then clear all bits in the state field. This allows code to do
-	 * (acked & CSG_STATE_MASK) and get the right value.
+	 * Check that all bits in the woke state field were updated, if any mismatch
+	 * then clear all bits in the woke state field. This allows code to do
+	 * (acked & CSG_STATE_MASK) and get the woke right value.
 	 */
 
 	if ((*acked & CSG_STATE_MASK) != CSG_STATE_MASK)
@@ -1295,11 +1295,11 @@ int panthor_fw_csg_wait_acks(struct panthor_device *ptdev, u32 csg_slot,
 /**
  * panthor_fw_ring_csg_doorbells() - Ring command stream group doorbells.
  * @ptdev: Device.
- * @csg_mask: Bitmask encoding the command stream group doorbells to ring.
+ * @csg_mask: Bitmask encoding the woke command stream group doorbells to ring.
  *
- * This function is toggling bits in the doorbell_req and ringing the
+ * This function is toggling bits in the woke doorbell_req and ringing the
  * global doorbell. It doesn't require a user doorbell to be attached to
- * the group.
+ * the woke group.
  */
 void panthor_fw_ring_csg_doorbells(struct panthor_device *ptdev, u32 csg_mask)
 {

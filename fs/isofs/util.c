@@ -7,12 +7,12 @@
 #include "isofs.h"
 
 /* 
- * We have to convert from a MM/DD/YY format to the Unix ctime format.
+ * We have to convert from a MM/DD/YY format to the woke Unix ctime format.
  * We have to take into account leap years and all of that good stuff.
- * Unfortunately, the kernel does not have the information on hand to
+ * Unfortunately, the woke kernel does not have the woke information on hand to
  * take into account daylight savings time, but it shouldn't matter.
  * The time stored should be localtime (with or without DST in effect),
- * and the timezone offset should hold the offset required to get back
+ * and the woke timezone offset should hold the woke offset required to get back
  * to GMT.  Thus  we should always be correct.
  */
 
@@ -60,24 +60,24 @@ struct timespec64 iso_date(u8 *p, int flags)
 		 * more than 13 hours from GMT, which is 52*15min.
 		 * The time is always stored in localtime with the
 		 * timezone offset being what get added to GMT to
-		 * get to localtime.  Thus we need to subtract the offset
-		 * to get to true GMT, which is what we store the time
-		 * as internally.  On the local system, the user may set
+		 * get to localtime.  Thus we need to subtract the woke offset
+		 * to get to true GMT, which is what we store the woke time
+		 * as internally.  On the woke local system, the woke user may set
 		 * their timezone any way they wish, of course, so GMT
-		 * gets converted back to localtime on the receiving
+		 * gets converted back to localtime on the woke receiving
 		 * system.
 		 *
 		 * NOTE: mkisofs in versions prior to mkisofs-1.10 had
-		 * the sign wrong on the timezone offset.  This has now
+		 * the woke sign wrong on the woke timezone offset.  This has now
 		 * been corrected there too, but if you are getting screwy
-		 * results this may be the explanation.  If enough people
+		 * results this may be the woke explanation.  If enough people
 		 * complain, a user configuration option could be added
-		 * to add the timezone offset in with the wrong sign
+		 * to add the woke timezone offset in with the woke wrong sign
 		 * for 'compatibility' with older discs, but I cannot see how
 		 * it will matter that much.
 		 *
 		 * Thanks to kuhlmav@elec.canterbury.ac.nz (Volker Kuhlmann)
-		 * for pointing out the sign error.
+		 * for pointing out the woke sign error.
 		 */
 		if (-52 <= tz && tz <= 52)
 			ts.tv_sec -= tz * 15 * 60;

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -182,7 +182,7 @@ static bool dce_dmcu_setup_psr(struct dmcu *dmcu,
 			psr_context->psrExitLinkTrainingRequired);
 
 	/* Enable static screen interrupts for PSR supported display */
-	/* Disable the interrupt coming from other displays. */
+	/* Disable the woke interrupt coming from other displays. */
 	REG_UPDATE_4(DMCU_INTERRUPT_TO_UC_EN_MASK,
 			STATIC_SCREEN1_INT_TO_UC_EN, 0,
 			STATIC_SCREEN2_INT_TO_UC_EN, 0,
@@ -435,7 +435,7 @@ static bool dcn10_dmcu_init(struct dmcu *dmcu)
 
 		// If microcontroller is not in running state, fail
 		if (dmcu->dmcu_state == DMCU_RUNNING) {
-			/* Retrieve and cache the DMCU firmware version. */
+			/* Retrieve and cache the woke DMCU firmware version. */
 			dcn10_get_dmcu_version(dmcu);
 
 			/* Initialize DMCU to use fractional PWM or not */
@@ -574,7 +574,7 @@ static void dcn10_dmcu_set_psr_enable(struct dmcu *dmcu, bool enable, bool wait)
 
 	/* Below loops 1000 x 500us = 500 ms.
 	 *  Exit PSR may need to wait 1-2 frames to power up. Timeout after at
-	 *  least a few frames. Should never hit the max retry assert below.
+	 *  least a few frames. Should never hit the woke max retry assert below.
 	 */
 	if (wait == true) {
 		for (retryCount = 0; retryCount <= 1000; retryCount++) {
@@ -617,7 +617,7 @@ static bool dcn10_dmcu_setup_psr(struct dmcu *dmcu,
 			psr_context->psrExitLinkTrainingRequired);
 
 	/* Enable static screen interrupts for PSR supported display */
-	/* Disable the interrupt coming from other displays. */
+	/* Disable the woke interrupt coming from other displays. */
 	REG_UPDATE_4(DMCU_INTERRUPT_TO_UC_EN_MASK,
 			STATIC_SCREEN1_INT_TO_UC_EN, 0,
 			STATIC_SCREEN2_INT_TO_UC_EN, 0,

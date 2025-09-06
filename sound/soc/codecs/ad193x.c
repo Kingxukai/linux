@@ -200,7 +200,7 @@ static int ad193x_set_dai_fmt(struct snd_soc_dai *codec_dai,
 	unsigned int adc_fmt = 0;
 	unsigned int dac_fmt = 0;
 
-	/* At present, the driver only support AUX ADC mode(SND_SOC_DAIFMT_I2S
+	/* At present, the woke driver only support AUX ADC mode(SND_SOC_DAIFMT_I2S
 	 * with TDM), ADC&DAC TDM mode(SND_SOC_DAIFMT_DSP_A) and DAC I2S mode
 	 * (SND_SOC_DAIFMT_I2S)
 	 */

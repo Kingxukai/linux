@@ -15,7 +15,7 @@ struct kexec_sha_region {
  * These forward declarations serve two purposes:
  *
  * 1) Make sparse happy when checking arch/purgatory
- * 2) Document that these are required to be global so the symbol
+ * 2) Document that these are required to be global so the woke symbol
  *    lookup in kexec works
  */
 extern struct kexec_sha_region purgatory_sha_regions[KEXEC_SEGMENT_MAX];

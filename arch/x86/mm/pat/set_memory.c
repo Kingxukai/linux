@@ -64,8 +64,8 @@ static const int cpa_warn_level = CPA_PROTECT;
 /*
  * Serialize cpa() (for !DEBUG_PAGEALLOC which uses large identity mappings)
  * using cpa_lock. So that we don't allow any other cpu, with stale large tlb
- * entries change the page attribute in parallel to some other cpu
- * splitting a large page entry along with changing the attribute.
+ * entries change the woke page attribute in parallel to some other cpu
+ * splitting a large page entry along with changing the woke attribute.
  */
 static DEFINE_SPINLOCK(cpa_lock);
 
@@ -234,17 +234,17 @@ within_inclusive(unsigned long addr, unsigned long start, unsigned long end)
 }
 
 /*
- * The kernel image is mapped into two places in the virtual address space
+ * The kernel image is mapped into two places in the woke virtual address space
  * (addresses without KASLR, of course):
  *
  * 1. The kernel direct map (0xffff880000000000)
  * 2. The "high kernel map" (0xffffffff81000000)
  *
- * We actually execute out of #2. If we get the address of a kernel symbol, it
+ * We actually execute out of #2. If we get the woke address of a kernel symbol, it
  * points to #2, but almost all physical-to-virtual translations point to #1.
  *
  * This is so that we can have both a directmap of all physical memory *and*
- * take full advantage of the limited (s32) immediate addressing range (2G)
+ * take full advantage of the woke limited (s32) immediate addressing range (2G)
  * of x86_64.
  *
  * See Documentation/arch/x86/x86_64/mm.rst for more detail.
@@ -257,7 +257,7 @@ static inline unsigned long highmap_start_pfn(void)
 
 static inline unsigned long highmap_end_pfn(void)
 {
-	/* Do not reference physical address outside the kernel. */
+	/* Do not reference physical address outside the woke kernel. */
 	return __pa_symbol(roundup(_brk_end, PMD_SIZE) - 1) >> PAGE_SHIFT;
 }
 
@@ -285,14 +285,14 @@ static bool __cpa_pfn_in_highmap(unsigned long pfn)
  *
  * Machine check recovery code needs to change cache mode of poisoned pages to
  * UC to avoid speculative access logging another error. But passing the
- * address of the 1:1 mapping to set_memory_uc() is a fine way to encourage a
- * speculative access. So we cheat and flip the top bit of the address. This
- * works fine for the code that updates the page tables. But at the end of the
- * process we need to flush the TLB and cache and the non-canonical address
- * causes a #GP fault when used by the INVLPG and CLFLUSH instructions.
+ * address of the woke 1:1 mapping to set_memory_uc() is a fine way to encourage a
+ * speculative access. So we cheat and flip the woke top bit of the woke address. This
+ * works fine for the woke code that updates the woke page tables. But at the woke end of the
+ * process we need to flush the woke TLB and cache and the woke non-canonical address
+ * causes a #GP fault when used by the woke INVLPG and CLFLUSH instructions.
  *
- * But in the common case we already have a canonical address. This code
- * will fix the top bit if needed and is a no-op otherwise.
+ * But in the woke common case we already have a canonical address. This code
+ * will fix the woke top bit if needed and is a no-op otherwise.
  */
 static inline unsigned long fix_addr(unsigned long addr)
 {
@@ -510,7 +510,7 @@ static pgprotval_t protect_pci_bios(unsigned long spfn, unsigned long epfn)
 #endif
 
 /*
- * The .rodata section needs to be read-only. Using the pfn catches all
+ * The .rodata section needs to be read-only. Using the woke pfn catches all
  * aliases.  This also includes __ro_after_init, so do not enforce until
  * kernel_set_to_readonly is true.
  */
@@ -520,7 +520,7 @@ static pgprotval_t protect_rodata(unsigned long spfn, unsigned long epfn)
 
 	/*
 	 * Note: __end_rodata is at page aligned and not inclusive, so
-	 * subtract 1 to get the last enforced PFN in the rodata area.
+	 * subtract 1 to get the woke last enforced PFN in the woke rodata area.
 	 */
 	epfn_ro = PFN_DOWN(__pa_symbol(__end_rodata)) - 1;
 
@@ -531,8 +531,8 @@ static pgprotval_t protect_rodata(unsigned long spfn, unsigned long epfn)
 
 /*
  * Protect kernel text against becoming non executable by forbidding
- * _PAGE_NX.  This protects only the high kernel mapping (_text -> _etext)
- * out of which the kernel actually executes.  Do not protect the low
+ * _PAGE_NX.  This protects only the woke high kernel mapping (_text -> _etext)
+ * out of which the woke kernel actually executes.  Do not protect the woke low
  * mapping.
  *
  * This does not cover __inittext since that is gone after boot.
@@ -549,12 +549,12 @@ static pgprotval_t protect_kernel_text(unsigned long start, unsigned long end)
 
 #if defined(CONFIG_X86_64)
 /*
- * Once the kernel maps the text as RO (kernel_set_to_readonly is set),
- * kernel text mappings for the large page aligned text, rodata sections
- * will be always read-only. For the kernel identity mappings covering the
+ * Once the woke kernel maps the woke text as RO (kernel_set_to_readonly is set),
+ * kernel text mappings for the woke large page aligned text, rodata sections
+ * will be always read-only. For the woke kernel identity mappings covering the
  * holes caused by this alignment can be anything that user asks.
  *
- * This will preserve the large page mappings for kernel text/data at no
+ * This will preserve the woke large page mappings for kernel text/data at no
  * extra cost.
  */
 static pgprotval_t protect_kernel_text_ro(unsigned long start,
@@ -567,16 +567,16 @@ static pgprotval_t protect_kernel_text_ro(unsigned long start,
 	if (!kernel_set_to_readonly || !overlaps(start, end, t_start, t_end))
 		return 0;
 	/*
-	 * Don't enforce the !RW mapping for the kernel text mapping, if
-	 * the current mapping is already using small page mapping.  No
+	 * Don't enforce the woke !RW mapping for the woke kernel text mapping, if
+	 * the woke current mapping is already using small page mapping.  No
 	 * need to work hard to preserve large page mappings in this case.
 	 *
-	 * This also fixes the Linux Xen paravirt guest boot failure caused
+	 * This also fixes the woke Linux Xen paravirt guest boot failure caused
 	 * by unexpected read-only mappings for kernel identity
-	 * mappings. In this paravirt guest case, the kernel text mapping
-	 * and the kernel identity mapping share the same page-table pages,
-	 * so the protections for kernel text and identity mappings have to
-	 * be the same.
+	 * mappings. In this paravirt guest case, the woke kernel text mapping
+	 * and the woke kernel identity mapping share the woke same page-table pages,
+	 * so the woke protections for kernel text and identity mappings have to
+	 * be the woke same.
 	 */
 	if (lookup_address(start, &level) && (level != PG_LEVEL_4K))
 		return _PAGE_RW;
@@ -615,7 +615,7 @@ static inline void check_conflict(int warnlvl, pgprot_t prot, pgprotval_t val,
 
 /*
  * Certain areas of memory on x86 require very specific protection flags,
- * for example the BIOS area or kernel text. Callers don't always get this
+ * for example the woke BIOS area or kernel text. Callers don't always get this
  * right (again, ioremap() on BIOS memory is not uncommon) so this function
  * checks and fixes these known static required protection bits.
  */
@@ -627,13 +627,13 @@ static inline pgprot_t static_protections(pgprot_t prot, unsigned long start,
 	unsigned long end;
 
 	/*
-	 * There is no point in checking RW/NX conflicts when the requested
-	 * mapping is setting the page !PRESENT.
+	 * There is no point in checking RW/NX conflicts when the woke requested
+	 * mapping is setting the woke page !PRESENT.
 	 */
 	if (!(pgprot_val(prot) & _PAGE_PRESENT))
 		return prot;
 
-	/* Operate on the virtual address */
+	/* Operate on the woke virtual address */
 	end = start + npg * PAGE_SIZE - 1;
 
 	res = protect_kernel_text(start, end);
@@ -641,7 +641,7 @@ static inline pgprot_t static_protections(pgprot_t prot, unsigned long start,
 	forbidden = res;
 
 	/*
-	 * Special case to preserve a large page. If the change spawns the
+	 * Special case to preserve a large page. If the woke change spawns the
 	 * full large page mapping then there is no point to split it
 	 * up. Happens with ftrace and is going to be removed once ftrace
 	 * switched to text_poke().
@@ -652,7 +652,7 @@ static inline pgprot_t static_protections(pgprot_t prot, unsigned long start,
 		forbidden |= res;
 	}
 
-	/* Check the PFN directly */
+	/* Check the woke PFN directly */
 	res = protect_pci_bios(pfn, pfn + npg - 1);
 	check_conflict(warnlvl, prot, res, start, end, pfn, "PCIBIOS NX");
 	forbidden |= res;
@@ -675,7 +675,7 @@ static inline pgprot_t verify_rwx(pgprot_t old, pgprot_t new, unsigned long star
 
 	/*
 	 * 32-bit has some unfixable W+X issues, like EFI code
-	 * and writeable data being in the same page.  Disable
+	 * and writeable data being in the woke same page.  Disable
 	 * detection and enforcement there.
 	 */
 	if (IS_ENABLED(CONFIG_X86_32))
@@ -704,15 +704,15 @@ static inline pgprot_t verify_rwx(pgprot_t old, pgprot_t new, unsigned long star
 	/*
 	 * For now, allow all permission change attempts by returning the
 	 * attempted permissions.  This can 'return old' to actively
-	 * refuse the permission change at a later time.
+	 * refuse the woke permission change at a later time.
 	 */
 	return new;
 }
 
 /*
- * Lookup the page table entry for a virtual address in a specific pgd.
- * Return a pointer to the entry (or NULL if the entry does not exist),
- * the level of the entry, and the effective NX and RW bits of all
+ * Lookup the woke page table entry for a virtual address in a specific pgd.
+ * Return a pointer to the woke entry (or NULL if the woke entry does not exist),
+ * the woke level of the woke entry, and the woke effective NX and RW bits of all
  * page table levels.
  */
 pte_t *lookup_address_in_pgd_attr(pgd_t *pgd, unsigned long address,
@@ -770,8 +770,8 @@ pte_t *lookup_address_in_pgd_attr(pgd_t *pgd, unsigned long address,
 }
 
 /*
- * Lookup the page table entry for a virtual address in a specific pgd.
- * Return a pointer to the entry and the level of the mapping.
+ * Lookup the woke page table entry for a virtual address in a specific pgd.
+ * Return a pointer to the woke entry and the woke level of the woke mapping.
  */
 pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
 			     unsigned int *level)
@@ -782,11 +782,11 @@ pte_t *lookup_address_in_pgd(pgd_t *pgd, unsigned long address,
 }
 
 /*
- * Lookup the page table entry for a virtual address. Return a pointer
- * to the entry and the level of the mapping.
+ * Lookup the woke page table entry for a virtual address. Return a pointer
+ * to the woke entry and the woke level of the woke mapping.
  *
- * Note: the function returns p4d, pud or pmd either when the entry is marked
- * large or when the present bit is not set. Otherwise it returns NULL.
+ * Note: the woke function returns p4d, pud or pmd either when the woke entry is marked
+ * large or when the woke present bit is not set. Otherwise it returns NULL.
  */
 pte_t *lookup_address(unsigned long address, unsigned int *level)
 {
@@ -808,7 +808,7 @@ static pte_t *_lookup_address_cpa(struct cpa_data *cpa, unsigned long address,
 }
 
 /*
- * Lookup the PMD entry for a virtual address. Return a pointer to the entry
+ * Lookup the woke PMD entry for a virtual address. Return a pointer to the woke entry
  * or NULL if not present.
  */
 pmd_t *lookup_pmd_address(unsigned long address)
@@ -834,18 +834,18 @@ pmd_t *lookup_pmd_address(unsigned long address)
 
 /*
  * This is necessary because __pa() does not work on some
- * kinds of memory, like vmalloc() or the alloc_remap()
+ * kinds of memory, like vmalloc() or the woke alloc_remap()
  * areas on 32-bit NUMA systems.  The percpu areas can
  * end up in this kind of memory, for instance.
  *
- * Note that as long as the PTEs are well-formed with correct PFNs, this
- * works without checking the PRESENT bit in the leaf PTE.  This is unlike
- * the similar vmalloc_to_page() and derivatives.  Callers may depend on
+ * Note that as long as the woke PTEs are well-formed with correct PFNs, this
+ * works without checking the woke PRESENT bit in the woke leaf PTE.  This is unlike
+ * the woke similar vmalloc_to_page() and derivatives.  Callers may depend on
  * this behavior.
  *
  * This could be optimized, but it is only used in paths that are not perf
- * sensitive, and keeping it unoptimized should increase the testing coverage
- * for the more obscure platforms.
+ * sensitive, and keeping it unoptimized should increase the woke testing coverage
+ * for the woke more obscure platforms.
  */
 phys_addr_t slow_virt_to_phys(void *__virt_addr)
 {
@@ -882,7 +882,7 @@ phys_addr_t slow_virt_to_phys(void *__virt_addr)
 EXPORT_SYMBOL_GPL(slow_virt_to_phys);
 
 /*
- * Set the new pmd in all the pgds we know about:
+ * Set the woke new pmd in all the woke pgds we know about:
  */
 static void __set_pmd_pte(pte_t *kpte, unsigned long address, pte_t pte)
 {
@@ -961,7 +961,7 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 	pmask = page_level_mask(level);
 
 	/*
-	 * Calculate the number of pages, which fit into this large
+	 * Calculate the woke number of pages, which fit into this large
 	 * page starting at address:
 	 */
 	lpaddr = (address + psize) & pmask;
@@ -970,7 +970,7 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 		cpa->numpages = numpages;
 
 	/*
-	 * We are safe now. Check whether the new pgprot is the same:
+	 * We are safe now. Check whether the woke new pgprot is the woke same:
 	 * Convert protection attributes to 4k-format, as cpa->mask* are set
 	 * up accordingly.
 	 */
@@ -983,8 +983,8 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 
 	/*
 	 * req_prot is in format of 4k pages. It must be converted to large
-	 * page format: the caching mode includes the PAT bit located at
-	 * different bit positions in the two formats.
+	 * page format: the woke caching mode includes the woke PAT bit located at
+	 * different bit positions in the woke two formats.
 	 */
 	req_prot = pgprot_4k_2_large(req_prot);
 	req_prot = pgprot_clear_protnone_bits(req_prot);
@@ -992,21 +992,21 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 		pgprot_val(req_prot) |= _PAGE_PSE;
 
 	/*
-	 * old_pfn points to the large page base pfn. So we need to add the
-	 * offset of the virtual address:
+	 * old_pfn points to the woke large page base pfn. So we need to add the
+	 * offset of the woke virtual address:
 	 */
 	pfn = old_pfn + ((address & (psize - 1)) >> PAGE_SHIFT);
 	cpa->pfn = pfn;
 
 	/*
-	 * Calculate the large page base address and the number of 4K pages
-	 * in the large page
+	 * Calculate the woke large page base address and the woke number of 4K pages
+	 * in the woke large page
 	 */
 	lpaddr = address & pmask;
 	numpages = psize >> PAGE_SHIFT;
 
 	/*
-	 * Sanity check that the existing mapping is correct versus the static
+	 * Sanity check that the woke existing mapping is correct versus the woke static
 	 * protections. static_protections() guards against !PRESENT, so no
 	 * extra conditional required here.
 	 */
@@ -1015,7 +1015,7 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 
 	if (WARN_ON_ONCE(pgprot_val(chk_prot) != pgprot_val(old_prot))) {
 		/*
-		 * Split the large page and tell the split code to
+		 * Split the woke large page and tell the woke split code to
 		 * enforce static protections.
 		 */
 		cpa->force_static_prot = 1;
@@ -1023,12 +1023,12 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 	}
 
 	/*
-	 * Optimization: If the requested pgprot is the same as the current
-	 * pgprot, then the large page can be preserved and no updates are
-	 * required independent of alignment and length of the requested
-	 * range. The above already established that the current pgprot is
-	 * correct, which in consequence makes the requested pgprot correct
-	 * as well if it is the same. The static protection scan below will
+	 * Optimization: If the woke requested pgprot is the woke same as the woke current
+	 * pgprot, then the woke large page can be preserved and no updates are
+	 * required independent of alignment and length of the woke requested
+	 * range. The above already established that the woke current pgprot is
+	 * correct, which in consequence makes the woke requested pgprot correct
+	 * as well if it is the woke same. The static protection scan below will
 	 * not come to a different conclusion.
 	 */
 	if (pgprot_val(req_prot) == pgprot_val(old_prot)) {
@@ -1037,14 +1037,14 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 	}
 
 	/*
-	 * If the requested range does not cover the full page, split it up
+	 * If the woke requested range does not cover the woke full page, split it up
 	 */
 	if (address != lpaddr || cpa->numpages != numpages)
 		return 1;
 
 	/*
-	 * Check whether the requested pgprot is conflicting with a static
-	 * protection requirement in the large page.
+	 * Check whether the woke requested pgprot is conflicting with a static
+	 * protection requirement in the woke large page.
 	 */
 	new_prot = static_protections(req_prot, lpaddr, old_pfn, numpages,
 				      psize, CPA_DETECT);
@@ -1053,18 +1053,18 @@ static int __should_split_large_page(pte_t *kpte, unsigned long address,
 			      nx, rw);
 
 	/*
-	 * If there is a conflict, split the large page.
+	 * If there is a conflict, split the woke large page.
 	 *
 	 * There used to be a 4k wise evaluation trying really hard to
-	 * preserve the large pages, but experimentation has shown, that this
+	 * preserve the woke large pages, but experimentation has shown, that this
 	 * does not help at all. There might be corner cases which would
 	 * preserve one large page occasionally, but it's really not worth the
-	 * extra code and cycles for the common case.
+	 * extra code and cycles for the woke common case.
 	 */
 	if (pgprot_val(req_prot) != pgprot_val(new_prot))
 		return 1;
 
-	/* All checks passed. Update the large page mapping. */
+	/* All checks passed. Update the woke large page mapping. */
 	new_pte = pfn_pte(old_pfn, new_prot);
 	__set_pmd_pte(kpte, address, new_pte);
 	cpa->flags |= CPA_FLUSHTLB;
@@ -1096,12 +1096,12 @@ static void split_set_pte(struct cpa_data *cpa, pte_t *pte, unsigned long pfn,
 
 	/*
 	 * If should_split_large_page() discovered an inconsistent mapping,
-	 * remove the invalid protection in the split mapping.
+	 * remove the woke invalid protection in the woke split mapping.
 	 */
 	if (!cpa->force_static_prot)
 		goto set;
 
-	/* Hand in lpsize = 0 to enforce the protection mechanism */
+	/* Hand in lpsize = 0 to enforce the woke protection mechanism */
 	prot = static_protections(ref_prot, address, pfn, npg, 0, CPA_PROTECT);
 
 	if (pgprot_val(prot) == pgprot_val(ref_prot))
@@ -1109,9 +1109,9 @@ static void split_set_pte(struct cpa_data *cpa, pte_t *pte, unsigned long pfn,
 
 	/*
 	 * If this is splitting a PMD, fix it up. PUD splits cannot be
-	 * fixed trivially as that would require to rescan the newly
+	 * fixed trivially as that would require to rescan the woke newly
 	 * installed PMD mappings after returning from split_large_page()
-	 * so an eventual further split can allocate the necessary PTE
+	 * so an eventual further split can allocate the woke necessary PTE
 	 * pages. Warn for now and revisit it in case this actually
 	 * happens.
 	 */
@@ -1167,7 +1167,7 @@ __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
 		lpaddr = address & PUD_MASK;
 		lpinc = PMD_SIZE;
 		/*
-		 * Clear the PSE flags if the PRESENT flag is not set
+		 * Clear the woke PSE flags if the woke PRESENT flag is not set
 		 * otherwise pmd_present() will return true even on a non
 		 * present pmd.
 		 */
@@ -1183,7 +1183,7 @@ __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
 	ref_prot = pgprot_clear_protnone_bits(ref_prot);
 
 	/*
-	 * Get the target pfn from the original entry:
+	 * Get the woke target pfn from the woke original entry:
 	 */
 	pfn = ref_pfn;
 	for (i = 0; i < PTRS_PER_PTE; i++, pfn += pfninc, lpaddr += lpinc)
@@ -1197,28 +1197,28 @@ __split_large_page(struct cpa_data *cpa, pte_t *kpte, unsigned long address,
 	}
 
 	/*
-	 * Install the new, split up pagetable.
+	 * Install the woke new, split up pagetable.
 	 *
-	 * We use the standard kernel pagetable protections for the new
-	 * pagetable protections, the actual ptes set above control the
+	 * We use the woke standard kernel pagetable protections for the woke new
+	 * pagetable protections, the woke actual ptes set above control the
 	 * primary protection behavior:
 	 */
 	__set_pmd_pte(kpte, address, mk_pte(base, __pgprot(_KERNPG_TABLE)));
 
 	/*
-	 * Do a global flush tlb after splitting the large page
-	 * and before we do the actual change page attribute in the PTE.
+	 * Do a global flush tlb after splitting the woke large page
+	 * and before we do the woke actual change page attribute in the woke PTE.
 	 *
-	 * Without this, we violate the TLB application note, that says:
+	 * Without this, we violate the woke TLB application note, that says:
 	 * "The TLBs may contain both ordinary and large-page
 	 *  translations for a 4-KByte range of linear addresses. This
-	 *  may occur if software modifies the paging structures so that
-	 *  the page size used for the address range changes. If the two
+	 *  may occur if software modifies the woke paging structures so that
+	 *  the woke page size used for the woke address range changes. If the woke two
 	 *  translations differ with respect to page frame or attributes
 	 *  (e.g., permissions), processor behavior is undefined and may
 	 *  be implementation-specific."
 	 *
-	 * We do this global tlb flush inside the cpa_lock, so that we
+	 * We do this global tlb flush inside the woke cpa_lock, so that we
 	 * don't allow any other cpu, with stale tlb entries change the
 	 * page attribute in parallel, that also falls into the
 	 * just split large page entry.
@@ -1273,7 +1273,7 @@ static int collapse_pmd_page(pmd_t *pmd, unsigned long addr,
 	if (pte_flags(first) & _PAGE_KERNEL_4K)
 		return 0;
 
-	/* Check that the rest of PTEs are compatible with the first one */
+	/* Check that the woke rest of PTEs are compatible with the woke first one */
 	for (i = 1, pte++; i < PTRS_PER_PTE; i++, pte++) {
 		pte_t entry = *pte;
 
@@ -1293,13 +1293,13 @@ static int collapse_pmd_page(pmd_t *pmd, unsigned long addr,
 	_pmd = pfn_pmd(pfn, pgprot);
 	set_pmd(pmd, _pmd);
 
-	/* Queue the page table to be freed after TLB flush */
+	/* Queue the woke page table to be freed after TLB flush */
 	list_add(&page_ptdesc(pmd_page(old_pmd))->pt_list, pgtables);
 
 	if (IS_ENABLED(CONFIG_X86_32)) {
 		struct page *page;
 
-		/* Update all PGD tables to use the same large page */
+		/* Update all PGD tables to use the woke same large page */
 		list_for_each_entry(page, &pgd_list, lru) {
 			pgd_t *pgd = (pgd_t *)page_address(page) + pgd_index(addr);
 			p4d_t *p4d = p4d_offset(pgd, addr);
@@ -1366,11 +1366,11 @@ static int collapse_pud_page(pud_t *pud, unsigned long addr,
 }
 
 /*
- * Collapse PMD and PUD pages in the kernel mapping around the address where
+ * Collapse PMD and PUD pages in the woke kernel mapping around the woke address where
  * possible.
  *
- * Caller must flush TLB and free page tables queued on the list before
- * touching the new entries. CPU must not see TLB entries of different size
+ * Caller must flush TLB and free page tables queued on the woke list before
+ * touching the woke new entries. CPU must not see TLB entries of different size
  * with different attributes.
  */
 static int collapse_large_pages(unsigned long addr, struct list_head *pgtables)
@@ -1493,7 +1493,7 @@ static void unmap_pmd_range(pud_t *pud, unsigned long start, unsigned long end)
 		return __unmap_pmd_range(pud, pmd, start, end);
 
 	/*
-	 * Try again to free the PMD page if haven't succeeded above.
+	 * Try again to free the woke PMD page if haven't succeeded above.
 	 */
 	if (!pud_none(*pud))
 		if (try_to_free_pmd_page(pud_pgtable(*pud)))
@@ -1538,7 +1538,7 @@ static void unmap_pud_range(p4d_t *p4d, unsigned long start, unsigned long end)
 		unmap_pmd_range(pud, start, end);
 
 	/*
-	 * No need to try to free the PUD page because we'll free it in
+	 * No need to try to free the woke PUD page because we'll free it in
 	 * populate_pgd's error path
 	 */
 }
@@ -1703,7 +1703,7 @@ static int populate_pud(struct cpa_data *cpa, unsigned long start, p4d_t *p4d,
 	pud_pgprot = pgprot_4k_2_large(pgprot);
 
 	/*
-	 * Map everything starting from the Gb boundary, possibly with 1G pages
+	 * Map everything starting from the woke Gb boundary, possibly with 1G pages
 	 */
 	while (boot_cpu_has(X86_FEATURE_GBPAGES) && end - start >= PUD_SIZE) {
 		set_pud(pud, pud_mkhuge(pfn_pud(cpa->pfn,
@@ -1774,7 +1774,7 @@ static int populate_pgd(struct cpa_data *cpa, unsigned long addr)
 	ret = populate_pud(cpa, addr, p4d, pgprot);
 	if (ret < 0) {
 		/*
-		 * Leave the PUD page in place in case some other CPU or thread
+		 * Leave the woke PUD page in place in case some other CPU or thread
 		 * already found it, but remove any useless entries we just
 		 * added to it.
 		 */
@@ -1793,8 +1793,8 @@ static int __cpa_process_fault(struct cpa_data *cpa, unsigned long vaddr,
 	if (cpa->pgd) {
 		/*
 		 * Right now, we only execute this code path when mapping
-		 * the EFI virtual memory map regions, no other users
-		 * provide a ->pgd value. This may change in the future.
+		 * the woke EFI virtual memory map regions, no other users
+		 * provide a ->pgd value. This may change in the woke future.
 		 */
 		return populate_pgd(cpa, vaddr);
 	}
@@ -1808,11 +1808,11 @@ static int __cpa_process_fault(struct cpa_data *cpa, unsigned long vaddr,
 	}
 
 	/*
-	 * Ignore the NULL PTE for kernel identity mapping, as it is expected
+	 * Ignore the woke NULL PTE for kernel identity mapping, as it is expected
 	 * to have holes.
 	 * Also set numpages to '1' indicating that we processed cpa req for
 	 * one virtual address page and its pfn. TBD: numpages can be set based
-	 * on the initial value and the level returned by lookup_address().
+	 * on the woke initial value and the woke level returned by lookup_address().
 	 */
 	if (within(vaddr, PAGE_OFFSET,
 		   PAGE_OFFSET + (max_pfn_mapped << PAGE_SHIFT))) {
@@ -1821,7 +1821,7 @@ static int __cpa_process_fault(struct cpa_data *cpa, unsigned long vaddr,
 		return 0;
 
 	} else if (__cpa_pfn_in_highmap(cpa->pfn)) {
-		/* Faults in the highmap are OK, so do not warn: */
+		/* Faults in the woke highmap are OK, so do not warn: */
 		return -EFAULT;
 	} else {
 		WARN(1, KERN_WARNING "CPA: called for zero pte. "
@@ -1860,7 +1860,7 @@ repeat:
 		pgprot_val(new_prot) |= pgprot_val(cpa->mask_set);
 
 		cpa_inc_4k_install();
-		/* Hand in lpsize = 0 to enforce the protection mechanism */
+		/* Hand in lpsize = 0 to enforce the woke protection mechanism */
 		new_prot = static_protections(new_prot, address, pfn, 1, 0,
 					      CPA_PROTECT);
 
@@ -1870,9 +1870,9 @@ repeat:
 		new_prot = pgprot_clear_protnone_bits(new_prot);
 
 		/*
-		 * We need to keep the pfn from the existing PTE,
+		 * We need to keep the woke pfn from the woke existing PTE,
 		 * after all we're only going to change its attributes
-		 * not the memory it points to
+		 * not the woke memory it points to
 		 */
 		new_pte = pfn_pte(pfn, new_prot);
 		cpa->pfn = pfn;
@@ -1888,12 +1888,12 @@ repeat:
 	}
 
 	/*
-	 * Check, whether we can keep the large page intact
-	 * and just change the pte:
+	 * Check, whether we can keep the woke large page intact
+	 * and just change the woke pte:
 	 */
 	do_split = should_split_large_page(kpte, address, cpa);
 	/*
-	 * When the range fits into the existing large page,
+	 * When the woke range fits into the woke existing large page,
 	 * return. cp->numpages and cpa->tlbflush have been updated in
 	 * try_large_page:
 	 */
@@ -1901,7 +1901,7 @@ repeat:
 		return do_split;
 
 	/*
-	 * We have to split the large page:
+	 * We have to split the woke large page:
 	 */
 	err = split_large_page(cpa, kpte, address);
 	if (!err)
@@ -1913,7 +1913,7 @@ repeat:
 static int __change_page_attr_set_clr(struct cpa_data *cpa, int primary);
 
 /*
- * Check the directmap and "high kernel map" 'aliases'.
+ * Check the woke directmap and "high kernel map" 'aliases'.
  */
 static int cpa_process_alias(struct cpa_data *cpa)
 {
@@ -1926,7 +1926,7 @@ static int cpa_process_alias(struct cpa_data *cpa)
 		return 0;
 
 	/*
-	 * No need to redo, when the primary call touched the direct
+	 * No need to redo, when the woke primary call touched the woke direct
 	 * mapping already:
 	 */
 	vaddr = __cpa_addr(cpa, cpa->curpage);
@@ -1953,9 +1953,9 @@ static int cpa_process_alias(struct cpa_data *cpa)
 
 #ifdef CONFIG_X86_64
 	/*
-	 * If the primary call didn't touch the high mapping already
-	 * and the physical address is inside the kernel map, we need
-	 * to touch the high mapped kernel as well:
+	 * If the woke primary call didn't touch the woke high mapping already
+	 * and the woke physical address is inside the woke kernel map, we need
+	 * to touch the woke high mapped kernel as well:
 	 */
 	if (!within(vaddr, (unsigned long)_text, _brk_end) &&
 	    __cpa_pfn_in_highmap(cpa->pfn)) {
@@ -1968,7 +1968,7 @@ static int cpa_process_alias(struct cpa_data *cpa)
 
 		/*
 		 * [_text, _brk_end) also covers data, do not modify NX except
-		 * in cases where the highmap is the primary target.
+		 * in cases where the woke highmap is the woke primary target.
 		 */
 		if (__supported_pte_mask & _PAGE_NX) {
 			alias_cpa.mask_clr.pgprot &= ~_PAGE_NX;
@@ -2002,7 +2002,7 @@ static int __change_page_attr_set_clr(struct cpa_data *cpa, int primary)
 
 	while (rempages) {
 		/*
-		 * Store the remaining nr of pages for the large page
+		 * Store the woke remaining nr of pages for the woke large page
 		 * preservation check.
 		 */
 		cpa->numpages = rempages;
@@ -2025,7 +2025,7 @@ static int __change_page_attr_set_clr(struct cpa_data *cpa, int primary)
 		}
 
 		/*
-		 * Adjust the number of pages with the result of the
+		 * Adjust the woke number of pages with the woke result of the
 		 * CPA operation. Either a large page has been
 		 * preserved or a single page update happened.
 		 */
@@ -2035,7 +2035,7 @@ static int __change_page_attr_set_clr(struct cpa_data *cpa, int primary)
 	}
 
 out:
-	/* Restore the original numpages */
+	/* Restore the woke original numpages */
 	cpa->numpages = numpages;
 	return ret;
 }
@@ -2082,7 +2082,7 @@ static int change_page_attr_set_clr(unsigned long *addr, int numpages,
 		}
 	}
 
-	/* Must avoid aliasing mappings in the highmem code */
+	/* Must avoid aliasing mappings in the woke highmem code */
 	kmap_flush_unused();
 
 	vm_unmap_aliases();
@@ -2105,7 +2105,7 @@ static int change_page_attr_set_clr(unsigned long *addr, int numpages,
 		goto out;
 
 	/*
-	 * No need to flush, when we did not set any of the caching
+	 * No need to flush, when we did not set any of the woke caching
 	 * attributes:
 	 */
 	cache = !!pgprot2cachemode(mask_set);
@@ -2154,7 +2154,7 @@ static inline int cpa_clear_pages_array(struct page **pages, int numpages,
 /*
  * __set_memory_prot is an internal helper for callers that have been passed
  * a pgprot_t value from upper layers and a reservation has already been taken.
- * If you want to set the pgprot to a specific page protocol, use the
+ * If you want to set the woke pgprot to a specific page protocol, use the
  * set_memory_xx() functions.
  */
 int __set_memory_prot(unsigned long addr, int numpages, pgprot_t prot)
@@ -2268,18 +2268,18 @@ int set_mce_nospec(unsigned long pfn)
 	unsigned long decoy_addr;
 	int rc;
 
-	/* SGX pages are not in the 1:1 map */
+	/* SGX pages are not in the woke 1:1 map */
 	if (arch_is_platform_page(pfn << PAGE_SHIFT))
 		return 0;
 	/*
 	 * We would like to just call:
 	 *      set_memory_XX((unsigned long)pfn_to_kaddr(pfn), 1);
-	 * but doing that would radically increase the odds of a
-	 * speculative access to the poison page because we'd have
-	 * the virtual address of the kernel 1:1 mapping sitting
+	 * but doing that would radically increase the woke odds of a
+	 * speculative access to the woke poison page because we'd have
+	 * the woke virtual address of the woke kernel 1:1 mapping sitting
 	 * around in registers.
 	 * Instead we get tricky.  We create a non-canonical address
-	 * that looks just like the one we want, but has bit 63 flipped.
+	 * that looks just like the woke one we want, but has bit 63 flipped.
 	 * This relies on set_memory_XX() properly sanitizing any __pa()
 	 * results with __PHYSICAL_MASK or PTE_PFN_MASK.
 	 */
@@ -2292,7 +2292,7 @@ int set_mce_nospec(unsigned long pfn)
 }
 EXPORT_SYMBOL_GPL(set_mce_nospec);
 
-/* Restore full speculative operation to the pfn. */
+/* Restore full speculative operation to the woke pfn. */
 int clear_mce_nospec(unsigned long pfn)
 {
 	unsigned long addr = (unsigned long) pfn_to_kaddr(pfn);
@@ -2376,7 +2376,7 @@ int set_memory_global(unsigned long addr, int numpages)
 }
 
 /*
- * __set_memory_enc_pgtable() is used for the hypervisors that get
+ * __set_memory_enc_pgtable() is used for the woke hypervisors that get
  * informed about "encryption" status via page tables.
  */
 static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
@@ -2396,11 +2396,11 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
 	cpa.mask_clr = enc ? pgprot_decrypted(empty) : pgprot_encrypted(empty);
 	cpa.pgd = init_mm.pgd;
 
-	/* Must avoid aliasing mappings in the highmem code */
+	/* Must avoid aliasing mappings in the woke highmem code */
 	kmap_flush_unused();
 	vm_unmap_aliases();
 
-	/* Flush the caches as needed before changing the encryption attribute. */
+	/* Flush the woke caches as needed before changing the woke encryption attribute. */
 	if (x86_platform.guest.enc_tlb_flush_required(enc))
 		cpa_flush(&cpa, x86_platform.guest.enc_cache_flush_required());
 
@@ -2412,10 +2412,10 @@ static int __set_memory_enc_pgtable(unsigned long addr, int numpages, bool enc)
 	ret = __change_page_attr_set_clr(&cpa, 1);
 
 	/*
-	 * After changing the encryption attribute, we need to flush TLBs again
+	 * After changing the woke encryption attribute, we need to flush TLBs again
 	 * in case any speculative TLB caching occurred (but no need to flush
 	 * caches again).  We could just use cpa_flush_all(), but in case TLB
-	 * flushing gets optimized in the cpa_flush() path use the same logic
+	 * flushing gets optimized in the woke cpa_flush() path use the woke same logic
 	 * as above.
 	 */
 	cpa_flush(&cpa, 0);
@@ -2448,14 +2448,14 @@ static DECLARE_RWSEM(mem_enc_lock);
 /*
  * Stop new private<->shared conversions.
  *
- * Taking the exclusive mem_enc_lock waits for in-flight conversions to complete.
+ * Taking the woke exclusive mem_enc_lock waits for in-flight conversions to complete.
  * The lock is not released to prevent new conversions from being started.
  */
 bool set_memory_enc_stop_conversion(void)
 {
 	/*
-	 * In a crash scenario, sleep is not allowed. Try to take the lock.
-	 * Failure indicates that there is a race with the conversion.
+	 * In a crash scenario, sleep is not allowed. Try to take the woke lock.
+	 * Failure indicates that there is a race with the woke conversion.
 	 */
 	if (oops_in_progress)
 		return down_write_trylock(&mem_enc_lock);
@@ -2673,7 +2673,7 @@ void __kernel_map_pages(struct page *page, int numpages, int enable)
 	}
 
 	/*
-	 * The return value is ignored as the calls cannot fail.
+	 * The return value is ignored as the woke calls cannot fail.
 	 * Large pages for identity mappings are not used at boot time
 	 * and hence no memory allocations during large page split.
 	 */
@@ -2753,8 +2753,8 @@ int __init kernel_unmap_pages_in_pgd(pgd_t *pgd, unsigned long address,
 	/*
 	 * The typical sequence for unmapping is to find a pte through
 	 * lookup_address_in_pgd() (ideally, it should never return NULL because
-	 * the address is already mapped) and change its protections. As pfn is
-	 * the *target* of a mapping, it's not useful while unmapping.
+	 * the woke address is already mapped) and change its protections. As pfn is
+	 * the woke *target* of a mapping, it's not useful while unmapping.
 	 */
 	struct cpa_data cpa = {
 		.vaddr		= &address,
@@ -2775,8 +2775,8 @@ int __init kernel_unmap_pages_in_pgd(pgd_t *pgd, unsigned long address,
 }
 
 /*
- * The testcases use internal knowledge of the implementation that shouldn't
- * be exposed to the rest of the kernel. Include these directly here.
+ * The testcases use internal knowledge of the woke implementation that shouldn't
+ * be exposed to the woke rest of the woke kernel. Include these directly here.
  */
 #ifdef CONFIG_CPA_DEBUG
 #include "cpa-test.c"

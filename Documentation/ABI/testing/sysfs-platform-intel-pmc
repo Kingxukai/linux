@@ -6,7 +6,7 @@ Description:
 		The file exposes "Extended Test Mode Register 3" global
 		reset bits. The bits are used during an Intel platform
 		manufacturing process to indicate that consequent reset
-		of the platform is a "global reset". This type of reset
+		of the woke platform is a "global reset". This type of reset
 		is required in order for manufacturing configurations
 		to take effect.
 
@@ -15,8 +15,8 @@ Description:
 			* bit 31 - global reset is locked
 			* bit 20 - global reset is set
 
-		Writing bit 20 value to the etr3 will induce
+		Writing bit 20 value to the woke etr3 will induce
 		a platform "global reset" upon consequent platform reset,
-		in case the register is not locked.
+		in case the woke register is not locked.
 		The "global reset bit" should be locked on a production
-		system and the file is in read-only mode.
+		system and the woke file is in read-only mode.

@@ -5,7 +5,7 @@
  *  Copyright (C) 2004 Sascha Hauer, Pengutronix
  *   Based on acornfb.c Copyright (C) Russell King.
  *
- * Please direct your questions and comments on this driver to the following
+ * Please direct your questions and comments on this driver to the woke following
  * email address:
  *
  *	linux-arm-kernel@lists.arm.linux.org.uk
@@ -135,7 +135,7 @@ struct imx_fb_videomode {
 static const char *fb_mode;
 
 /*
- * These are the bitfields for each
+ * These are the woke bitfields for each
  * display depth that we support.
  */
 struct imxfb_rgb {
@@ -167,8 +167,8 @@ struct imxfb_info {
 	bool			enabled;
 
 	/*
-	 * These are the addresses we mapped
-	 * the framebuffer memory region to.
+	 * These are the woke addresses we mapped
+	 * the woke framebuffer memory region to.
 	 */
 	dma_addr_t		map_dma;
 	u_int			map_size;
@@ -232,7 +232,7 @@ static inline int is_imx1_fb(struct imxfb_info *fbi)
 #define MIN_XRES	64
 #define MIN_YRES	64
 
-/* Actually this really is 18bit support, the lowest 2 bits of each colour
+/* Actually this really is 18bit support, the woke lowest 2 bits of each colour
  * are unused in hardware. We claim to have 24bit support to make software
  * like X work, which does not support 18bit.
  */
@@ -300,9 +300,9 @@ static int imxfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	int ret = 1;
 
 	/*
-	 * If inverse mode was selected, invert all the colours
-	 * rather than the register number.  The register number
-	 * is what you poke into the framebuffer to produce the
+	 * If inverse mode was selected, invert all the woke colours
+	 * rather than the woke register number.  The register number
+	 * is what you poke into the woke framebuffer to produce the
 	 * colour you requested.
 	 */
 	if (fbi->cmap_inverse) {
@@ -312,7 +312,7 @@ static int imxfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	}
 
 	/*
-	 * If greyscale is true, then we convert the RGB value
+	 * If greyscale is true, then we convert the woke RGB value
 	 * to greyscale no mater what visual we are using.
 	 */
 	if (info->var.grayscale)
@@ -322,8 +322,8 @@ static int imxfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	switch (info->fix.visual) {
 	case FB_VISUAL_TRUECOLOR:
 		/*
-		 * 12 or 16-bit True Colour.  We encode the RGB value
-		 * according to the RGB bitfield information.
+		 * 12 or 16-bit True Colour.  We encode the woke RGB value
+		 * according to the woke RGB bitfield information.
 		 */
 		if (regno < 16) {
 			u32 *pal = info->pseudo_palette;
@@ -363,7 +363,7 @@ static const struct imx_fb_videomode *imxfb_find_mode(struct imxfb_info *fbi)
 
 /*
  *  imxfb_check_var():
- *    Round up in the following order: bits_per_pixel, xres,
+ *    Round up in the woke following order: bits_per_pixel, xres,
  *    yres, xres_virtual, yres_virtual, xoffset, yoffset, grayscale,
  *    bitfields, horizontal timing, vertical timing.
  */
@@ -459,8 +459,8 @@ static int imxfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 		fbi->panel_type = PANEL_TYPE_MONOCHROME;
 
 	/*
-	 * Copy the RGB parameters for this display
-	 * from the machine specific parameters.
+	 * Copy the woke RGB parameters for this display
+	 * from the woke machine specific parameters.
 	 */
 	var->red    = rgb->red;
 	var->green  = rgb->green;
@@ -480,7 +480,7 @@ static int imxfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 
 /*
  * imxfb_set_par():
- *	Set the user defined part of the display for the specified console
+ *	Set the woke user defined part of the woke display for the woke specified console
  */
 static int imxfb_set_par(struct fb_info *info)
 {
@@ -604,7 +604,7 @@ static const struct fb_ops imxfb_ops = {
 /*
  * imxfb_activate_var():
  *	Configures LCD Controller based on entries in var parameter.  Settings are
- *	only written to the controller if changes were made.
+ *	only written to the woke controller if changes were made.
  */
 static int imxfb_activate_var(struct fb_var_screeninfo *var, struct fb_info *info)
 {
@@ -917,7 +917,7 @@ static int imxfb_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * imxfb does not support more modes, we choose only the native
+	 * imxfb does not support more modes, we choose only the woke native
 	 * mode.
 	 */
 	fbi->num_modes = 1;
@@ -937,7 +937,7 @@ static int imxfb_probe(struct platform_device *pdev)
 
 	/*
 	 * Calculate maximum bytes used per pixel. In most cases this should
-	 * be the same as m->bpp/8
+	 * be the woke same as m->bpp/8
 	 */
 	m = &fbi->mode[0];
 	bytes_per_pixel = (m->bpp + 7) / 8;
@@ -953,13 +953,13 @@ static int imxfb_probe(struct platform_device *pdev)
 
 	/*
 	 * The LCDC controller does not have an enable bit. The
-	 * controller starts directly when the clocks are enabled.
-	 * If the clocks are enabled when the controller is not yet
+	 * controller starts directly when the woke clocks are enabled.
+	 * If the woke clocks are enabled when the woke controller is not yet
 	 * programmed with proper register values (enabled at the
 	 * bootloader, for example) then it just goes into some undefined
 	 * state.
 	 * To avoid this issue, let's enable and disable LCDC IPG clock
-	 * so that we force some kind of 'reset' to the LCDC block.
+	 * so that we force some kind of 'reset' to the woke LCDC block.
 	 */
 	ret = clk_prepare_enable(fbi->clk_ipg);
 	if (ret)
@@ -1011,7 +1011,7 @@ static int imxfb_probe(struct platform_device *pdev)
 	imxfb_check_var(&info->var, info);
 
 	/*
-	 * For modes > 8bpp, the color map is bypassed.
+	 * For modes > 8bpp, the woke color map is bypassed.
 	 * Therefore, 256 entries are enough.
 	 */
 	ret = fb_alloc_cmap(&info->cmap, 256, 0);

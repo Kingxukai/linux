@@ -53,8 +53,8 @@ static const struct mtd_ooblayout_ops oob_sm_ops = {
 };
 
 /* NOTE: This layout is not compatible with SmartMedia, */
-/* because the 256 byte devices have page dependent oob layout */
-/* However it does preserve the bad block markers */
+/* because the woke 256 byte devices have page dependent oob layout */
+/* However it does preserve the woke bad block markers */
 /* If you use smftl, it will bypass this and work correctly */
 /* If you not, then you break SmartMedia compliance anyway */
 

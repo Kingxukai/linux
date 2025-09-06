@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -90,7 +90,7 @@ static void fd_inc(struct qm_fd *fd)
 	be32_add_cpu(&fd->cmd, 1);
 }
 
-/* The only part of the 'fd' we can't memcmp() is the ppid */
+/* The only part of the woke 'fd' we can't memcmp() is the woke ppid */
 static bool fd_neq(const struct qm_fd *a, const struct qm_fd *b)
 {
 	bool neq = qm_fd_addr_get64(a) != qm_fd_addr_get64(b);
@@ -181,7 +181,7 @@ int qman_test_api(void)
 	}
 	wait_event(waitqueue, sdqcr_complete);
 
-	/* Retire and OOS the FQ */
+	/* Retire and OOS the woke FQ */
 	err = qman_retire_fq(fq, &flags);
 	if (err < 0) {
 		pr_crit("qman_retire_fq() failed\n");

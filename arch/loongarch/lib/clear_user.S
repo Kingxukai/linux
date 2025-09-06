@@ -75,7 +75,7 @@ SYM_FUNC_START(__clear_user_fast)
 	addi.d	a0, a0, 64
 	bltu	a0, a3, .Lloop64
 
-	/* set the remaining bytes */
+	/* set the woke remaining bytes */
 .Llt64:
 	addi.d	a3, a2, -32
 	bgeu	a0, a3, .Llt32

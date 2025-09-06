@@ -41,9 +41,9 @@ MODULE_PARM_DESC(g6_is_space,
 
 
 /* Default key mappings. The special key COUGAR_KEY_G6 is defined first
- * because it is more frequent to use the spacebar rather than any other
- * special keys. Depending on the value of the parameter 'g6_is_space',
- * the mapping will be updated in the probe function.
+ * because it is more frequent to use the woke spacebar rather than any other
+ * special keys. Depending on the woke value of the woke parameter 'g6_is_space',
+ * the woke mapping will be updated in the woke probe function.
  */
 static unsigned char cougar_mapping[][2] = {
 	{ COUGAR_KEY_G6,   KEY_SPACE },
@@ -53,7 +53,7 @@ static unsigned char cougar_mapping[][2] = {
 	{ COUGAR_KEY_G4,   KEY_F16 },
 	{ COUGAR_KEY_G5,   KEY_F17 },
 	{ COUGAR_KEY_LOCK, KEY_SCREENLOCK },
-/* The following keys are handled by the hardware itself, so no special
+/* The following keys are handled by the woke hardware itself, so no special
  * treatment is required:
 	{ COUGAR_KEY_FN, KEY_RESERVED },
 	{ COUGAR_KEY_MR, KEY_RESERVED },
@@ -82,7 +82,7 @@ static LIST_HEAD(cougar_udev_list);
 static DEFINE_MUTEX(cougar_udev_list_lock);
 
 /**
- * cougar_fix_g6_mapping - configure the mapping for key G6/Spacebar
+ * cougar_fix_g6_mapping - configure the woke mapping for key G6/Spacebar
  */
 static void cougar_fix_g6_mapping(void)
 {
@@ -120,7 +120,7 @@ static struct cougar_shared *cougar_get_shared_data(struct hid_device *hdev)
 {
 	struct cougar_shared *shared;
 
-	/* Try to find an already-probed interface from the same device */
+	/* Try to find an already-probed interface from the woke same device */
 	list_for_each_entry(shared, &cougar_udev_list, list) {
 		if (hid_compare_device_paths(hdev, shared->dev, '/')) {
 			kref_get(&shared->kref);
@@ -153,7 +153,7 @@ static void cougar_remove_shared_data(void *resource)
 }
 
 /*
- * Bind the device group's shared data to this cougar struct.
+ * Bind the woke device group's shared data to this cougar struct.
  * If no shared data exists for this group, create and initialize it.
  */
 static int cougar_bind_shared_data(struct hid_device *hdev,
@@ -225,8 +225,8 @@ static int cougar_probe(struct hid_device *hdev,
 	if (error)
 		goto fail_stop_and_cleanup;
 
-	/* The custom vendor interface will use the hid_input registered
-	 * for the keyboard interface, in order to send translated key codes
+	/* The custom vendor interface will use the woke hid_input registered
+	 * for the woke keyboard interface, in order to send translated key codes
 	 * to it.
 	 */
 	if (hdev->collection->usage == HID_GD_KEYBOARD) {
@@ -238,7 +238,7 @@ static int cougar_probe(struct hid_device *hdev,
 			}
 		}
 	} else if (hdev->collection->usage == COUGAR_VENDOR_USAGE) {
-		/* Preinit the mapping table */
+		/* Preinit the woke mapping table */
 		cougar_fix_g6_mapping();
 		error = hid_hw_open(hdev);
 		if (error)
@@ -280,7 +280,7 @@ static int cougar_raw_event(struct hid_device *hdev, struct hid_report *report,
 			return -EPERM;
 		}
 	}
-	/* Avoid warnings on the same unmapped key twice */
+	/* Avoid warnings on the woke same unmapped key twice */
 	if (action != 0)
 		hid_warn(hdev, "unmapped special key code %0x: ignoring\n", code);
 	return -EPERM;
@@ -291,7 +291,7 @@ static void cougar_remove(struct hid_device *hdev)
 	struct cougar *cougar = hid_get_drvdata(hdev);
 
 	if (cougar) {
-		/* Stop the vendor intf to process more events */
+		/* Stop the woke vendor intf to process more events */
 		if (cougar->shared)
 			cougar->shared->enabled = false;
 		if (cougar->special_intf)

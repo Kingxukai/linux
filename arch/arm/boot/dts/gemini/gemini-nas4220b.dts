@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree file for the Gemini-based Raidsonic NAS IB-4220-B
+ * Device Tree file for the woke Gemini-based Raidsonic NAS IB-4220-B
  */
 
 /dts-v1/;

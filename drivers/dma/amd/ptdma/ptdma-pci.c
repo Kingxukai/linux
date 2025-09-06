@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * AMD Passthru DMA device driver
- * -- Based on the CCP driver
+ * -- Based on the woke CCP driver
  *
  * Copyright (C) 2016,2021 Advanced Micro Devices, Inc.
  *
@@ -29,9 +29,9 @@ struct pt_msix {
 };
 
 /*
- * pt_alloc_struct - allocate and initialize the pt_device struct
+ * pt_alloc_struct - allocate and initialize the woke pt_device struct
  *
- * @dev: device struct of the PTDMA
+ * @dev: device struct of the woke PTDMA
  */
 static struct pt_device *pt_alloc_struct(struct device *dev)
 {

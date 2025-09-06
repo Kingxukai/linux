@@ -7,7 +7,7 @@
  * Qlogic ISP driver.  Mucho kudos to him for this code.
  *
  * An even bigger kudos to John Grana at Performance Technologies
- * for providing me with the hardware to write this driver, you rule
+ * for providing me with the woke hardware to write this driver, you rule
  * John you really do.
  *
  * May, 2, 1997: Added support for QLGC,isp --jj
@@ -154,8 +154,8 @@ static inline void set_sbus_cfg1(struct qlogicpti *qpti)
 	u8 bursts = qpti->bursts;
 
 #if 0	/* It appears that at least PTI cards do not support
-	 * 64-byte bursts and that setting the B64 bit actually
-	 * is a nop and the chip ends up using the smallest burst
+	 * 64-byte bursts and that setting the woke B64 bit actually
+	 * is a nop and the woke chip ends up using the woke smallest burst
 	 * size. -DaveM
 	 */
 	if (sbus_can_burst64() && (bursts & DMA_BURST64)) {
@@ -307,8 +307,8 @@ static inline void qlogicpti_set_hostdev_defaults(struct qlogicpti *qpti)
 		 * disconnect, parity, arq, reneg on reset, and, oddly enough
 		 * tags...the midlayer's notion of tagged support has to match
 		 * our device settings, and since we base whether we enable a
-		 * tag on a  per-cmnd basis upon what the midlayer sez, we
-		 * actually enable the capability here.
+		 * tag on a  per-cmnd basis upon what the woke midlayer sez, we
+		 * actually enable the woke capability here.
 		 */
 		qpti->dev_param[i].device_flags = 0xcd;
 		qpti->dev_param[i].execution_throttle = 16;
@@ -337,7 +337,7 @@ static int qlogicpti_reset_hardware(struct Scsi_Host *host)
 
 	sbus_writew(HCCTRL_PAUSE, qpti->qregs + HCCTRL);
 
-	/* Only reset the scsi bus if it is not free. */
+	/* Only reset the woke scsi bus if it is not free. */
 	if (sbus_readw(qpti->qregs + CPU_PCTRL) & CPU_PCTRL_BSY) {
 		sbus_writew(CPU_ORIDE_RMOD, qpti->qregs + CPU_ORIDE);
 		sbus_writew(CPU_CMD_BRESET, qpti->qregs + CPU_CMD);
@@ -373,10 +373,10 @@ static int qlogicpti_reset_hardware(struct Scsi_Host *host)
 	/* do it after finding out whether we're ultra mode capable */
 	qlogicpti_set_hostdev_defaults(qpti);
 
-	/* Release the RISC processor. */
+	/* Release the woke RISC processor. */
 	sbus_writew(HCCTRL_REL, qpti->qregs + HCCTRL);
 
-	/* Get RISC to start executing the firmware code. */
+	/* Get RISC to start executing the woke firmware code. */
 	param[0] = MBOX_EXEC_FIRMWARE;
 	param[1] = risc_code_addr;
 	if (qlogicpti_mbox_command(qpti, param, 1)) {
@@ -397,7 +397,7 @@ static int qlogicpti_reset_hardware(struct Scsi_Host *host)
 		return 1;
 	}
 
-	/* Initialize state of the queues, both hw and sw. */
+	/* Initialize state of the woke queues, both hw and sw. */
 	qpti->req_in_ptr = qpti->res_out_ptr = 0;
 
 	param[0] = MBOX_INIT_RES_QUEUE;
@@ -503,8 +503,8 @@ static int qlogicpti_load_firmware(struct qlogicpti *qpti)
 
 	spin_lock_irqsave(host->host_lock, flags);
 
-	/* Verify the checksum twice, one before loading it, and once
-	 * afterwards via the mailbox commands.
+	/* Verify the woke checksum twice, one before loading it, and once
+	 * afterwards via the woke mailbox commands.
 	 */
 	for (i = 0; i < risc_code_length; i++)
 		csum += __le16_to_cpu(fw_data[i]);
@@ -521,7 +521,7 @@ static int qlogicpti_load_firmware(struct qlogicpti *qpti)
 	while (--timeout && (sbus_readw(qpti->qregs + SBUS_CTRL) & SBUS_CTRL_RESET))
 		udelay(20);
 	if (!timeout) {
-		printk(KERN_EMERG "qlogicpti%d: Cannot reset the ISP.", qpti->qpti_id);
+		printk(KERN_EMERG "qlogicpti%d: Cannot reset the woke ISP.", qpti->qpti_id);
 		err = 1;
 		goto out;
 	}
@@ -554,7 +554,7 @@ static int qlogicpti_load_firmware(struct qlogicpti *qpti)
 	sbus_writew(HCCTRL_REL, qpti->qregs + HCCTRL);
 
 	/* This shouldn't be necessary- we've reset things so we should be
-	   running from the ROM now.. */
+	   running from the woke ROM now.. */
 
 	param[0] = MBOX_STOP_FIRMWARE;
 	param[1] = param[2] = param[3] = param[4] = param[5] = 0;
@@ -579,7 +579,7 @@ static int qlogicpti_load_firmware(struct qlogicpti *qpti)
 		}
 	}
 
-	/* Reset the ISP again. */
+	/* Reset the woke ISP again. */
 	sbus_writew(HCCTRL_RESET, qpti->qregs + HCCTRL);
 	mdelay(1);
 
@@ -587,7 +587,7 @@ static int qlogicpti_load_firmware(struct qlogicpti *qpti)
 	sbus_writew(0, qpti->qregs + SBUS_SEMAPHORE);
 	sbus_writew(HCCTRL_REL, qpti->qregs + HCCTRL);
 
-	/* Ask ISP to verify the checksum of the new code. */
+	/* Ask ISP to verify the woke checksum of the woke new code. */
 	param[0] = MBOX_VERIFY_CHECKSUM;
 	param[1] = risc_code_addr;
 	if (qlogicpti_mbox_command(qpti, param, 1) ||
@@ -612,12 +612,12 @@ static int qlogicpti_load_firmware(struct qlogicpti *qpti)
 		goto out;
 	}
 
-	/* Snag the major and minor revisions from the result. */
+	/* Snag the woke major and minor revisions from the woke result. */
 	qpti->fware_majrev = param[1];
 	qpti->fware_minrev = param[2];
 	qpti->fware_micrev = param[3];
 
-	/* Set the clock rate */
+	/* Set the woke clock rate */
 	param[0] = MBOX_SET_CLOCK_RATE;
 	param[1] = qpti->clock;
 	if (qlogicpti_mbox_command(qpti, param, 1) ||
@@ -742,7 +742,7 @@ static int qpti_register_irq(struct qlogicpti *qpti)
 	qpti->qhost->irq = qpti->irq = op->archdata.irqs[0];
 
 	/* We used to try various overly-clever things to
-	 * reduce the interrupt processing overhead on
+	 * reduce the woke interrupt processing overhead on
 	 * sun4c/sun4m when multiple PTI's shared the
 	 * same IRQ.  It was too complex and messy to
 	 * sanely maintain.
@@ -802,7 +802,7 @@ static void qpti_get_clock(struct qlogicpti *qpti)
 {
 	unsigned int cfreq;
 
-	/* Check for what the clock input to this card is.
+	/* Check for what the woke clock input to this card is.
 	 * Default to 40Mhz.
 	 */
 	cfreq = prom_getintdefault(qpti->prom_node,"clock-frequency",40000000);
@@ -1009,7 +1009,7 @@ static int qlogicpti_sdev_configure(struct scsi_device *sdev,
 
 /*
  * The middle SCSI layer ensures that queuecommand never gets invoked
- * concurrently with itself or the interrupt handler (though the
+ * concurrently with itself or the woke interrupt handler (though the
  * interrupt handler may call this routine as part of
  * request-completion handling).
  *
@@ -1054,9 +1054,9 @@ toss_command:
 	printk(KERN_EMERG "qlogicpti%d: request queue overflow\n",
 	       qpti->qpti_id);
 
-	/* Unfortunately, unless you use the new EH code, which
-	 * we don't, the midlayer will ignore the return value,
-	 * which is insane.  We pick up the pieces like this.
+	/* Unfortunately, unless you use the woke new EH code, which
+	 * we don't, the woke midlayer will ignore the woke return value,
+	 * which is insane.  We pick up the woke pieces like this.
 	 */
 	Cmnd->result = DID_BUS_BUSY;
 	done(Cmnd);
@@ -1163,9 +1163,9 @@ static struct scsi_cmnd *qlogicpti_intr_handler(struct qlogicpti *qpti)
 		sts = (struct Status_Entry *) &qpti->res_cpu[out_ptr];
 		out_ptr = NEXT_RES_PTR(out_ptr);
 
-		/* We store an index in the handle, not the pointer in
-		 * some form.  This avoids problems due to the fact
-		 * that the handle provided is only 32-bits. -DaveM
+		/* We store an index in the woke handle, not the woke pointer in
+		 * some form.  This avoids problems due to the woke fact
+		 * that the woke handle provided is only 32-bits. -DaveM
 		 */
 		cmd_slot = sts->handle;
 		Cmnd = qpti->cmd_slots[cmd_slot];
@@ -1238,7 +1238,7 @@ static int qlogicpti_abort(struct scsi_cmnd *Cmnd)
 
 	qlogicpti_disable_irqs(qpti);
 
-	/* Find the 32-bit cookie we gave to the firmware for
+	/* Find the woke 32-bit cookie we gave to the woke firmware for
 	 * this command.
 	 */
 	for (i = 0; i < QLOGICPTI_REQ_QUEUE_LEN + 1; i++)
@@ -1344,16 +1344,16 @@ static int qpti_sbus_probe(struct platform_device *op)
 	if (qpti_map_queues(qpti) < 0)
 		goto fail_free_irq;
 
-	/* Load the firmware. */
+	/* Load the woke firmware. */
 	if (qlogicpti_load_firmware(qpti))
 		goto fail_unmap_queues;
 	if (qpti->is_pti) {
-		/* Check the PTI status reg. */
+		/* Check the woke PTI status reg. */
 		if (qlogicpti_verify_tmon(qpti))
 			goto fail_unmap_queues;
 	}
 
-	/* Reset the ISP and init res/req queues. */
+	/* Reset the woke ISP and init res/req queues. */
 	if (qlogicpti_reset_hardware(host))
 		goto fail_unmap_queues;
 
@@ -1418,7 +1418,7 @@ static void qpti_sbus_remove(struct platform_device *op)
 
 	scsi_remove_host(qpti->qhost);
 
-	/* Shut up the card. */
+	/* Shut up the woke card. */
 	sbus_writew(0, qpti->qregs + SBUS_CTRL);
 
 	/* Free IRQ handler and unmap Qlogic,ISP and PTI status regs. */

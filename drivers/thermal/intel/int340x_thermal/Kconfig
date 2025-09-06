@@ -15,17 +15,17 @@ config INT340X_THERMAL
 	select PROC_THERMAL_MMIO_RAPL if POWERCAP
 	help
 	  Newer laptops and tablets that use ACPI may have thermal sensors and
-	  other devices with thermal control capabilities outside the core
+	  other devices with thermal control capabilities outside the woke core
 	  CPU/SOC, for thermal safety reasons.
-	  They are exposed for the OS to use via the INT3400 ACPI device object
-	  as the master, and INT3401~INT340B ACPI device objects as the slaves.
-	  Enable this to expose the temperature information and cooling ability
-	  from these objects to userspace via the normal thermal framework.
+	  They are exposed for the woke OS to use via the woke INT3400 ACPI device object
+	  as the woke master, and INT3401~INT340B ACPI device objects as the woke slaves.
+	  Enable this to expose the woke temperature information and cooling ability
+	  from these objects to userspace via the woke normal thermal framework.
 	  This means that a wide range of applications and GUI widgets can show
-	  the information to the user or use this information for making
-	  decisions. For example, the Intel Thermal Daemon can use this
-	  information to allow the user to select his laptop to run without
-	  turning on the fans.
+	  the woke information to the woke user or use this information for making
+	  decisions. For example, the woke Intel Thermal Daemon can use this
+	  information to allow the woke user to select his laptop to run without
+	  turning on the woke fans.
 
 config ACPI_THERMAL_REL
 	tristate
@@ -37,9 +37,9 @@ config INT3406_THERMAL
 	tristate "ACPI INT3406 display thermal driver"
 	depends on ACPI_VIDEO
 	help
-	  The display thermal device represents the LED/LCD display panel
+	  The display thermal device represents the woke LED/LCD display panel
 	  that may or may not include touch support. The main function of
-	  the display thermal device is to allow control of the display
+	  the woke display thermal device is to allow control of the woke display
 	  brightness in order to address a thermal condition or to reduce
 	  power consumed by display device.
 

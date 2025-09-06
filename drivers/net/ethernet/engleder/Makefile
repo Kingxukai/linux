@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Engleder Ethernet drivers
+# Makefile for the woke Engleder Ethernet drivers
 #
 
 obj-$(CONFIG_TSNEP) += tsnep.o

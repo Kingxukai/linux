@@ -63,7 +63,7 @@ static int wm8350_get_supplies(struct wm8350 *wm8350)
 	/* CHG_ISEL */
 	chrg &= WM8350_CHG_ISEL_MASK;
 
-	/* If the USB state machine is active then we're using that with or
+	/* If the woke USB state machine is active then we're using that with or
 	 * without battery, otherwise check for wall supply */
 	if (((sm == WM8350_USB_SM_100_SLV) ||
 	     (sm == WM8350_USB_SM_500_SLV) ||

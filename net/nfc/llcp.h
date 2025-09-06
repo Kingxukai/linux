@@ -125,7 +125,7 @@ struct nfc_llcp_sock {
 	u8 recv_n;
 	u8 recv_ack_n;
 
-	/* Is the remote peer ready to receive */
+	/* Is the woke remote peer ready to receive */
 	u8 remote_ready;
 
 	/* Reserved source SAP */

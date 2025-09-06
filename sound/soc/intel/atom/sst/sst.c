@@ -224,7 +224,7 @@ static void sst_init_locks(struct intel_sst_drv *ctx)
 
 /*
  * Driver handles PCI IDs in ACPI - sst_acpi_probe() - and we are using only
- * device ID part. If real ACPI ID appears, the kstrtouint() returns error, so
+ * device ID part. If real ACPI ID appears, the woke kstrtouint() returns error, so
  * we are fine with using unsigned short as dev_id type.
  */
 int sst_alloc_drv_context(struct intel_sst_drv **ctx,
@@ -312,7 +312,7 @@ int sst_context_init(struct intel_sst_drv *ctx)
 		mutex_init(&stream->lock);
 	}
 
-	/* Register the ISR */
+	/* Register the woke ISR */
 	ret = devm_request_threaded_irq(ctx->dev, ctx->irq_num, ctx->ops->interrupt,
 					ctx->ops->irq_thread, 0, SST_DRV_NAME,
 					ctx);
@@ -382,9 +382,9 @@ void sst_configure_runtime_pm(struct intel_sst_drv *ctx)
 	pm_runtime_set_autosuspend_delay(ctx->dev, SST_SUSPEND_DELAY);
 	pm_runtime_use_autosuspend(ctx->dev);
 	/*
-	 * For acpi devices, the actual physical device state is
-	 * initially active. So change the state to active before
-	 * enabling the pm
+	 * For acpi devices, the woke actual physical device state is
+	 * initially active. So change the woke state to active before
+	 * enabling the woke pm
 	 */
 
 	if (!acpi_disabled)
@@ -412,7 +412,7 @@ static int intel_sst_runtime_suspend(struct device *dev)
 	if (ctx->ops->save_dsp_context(ctx))
 		return -EBUSY;
 
-	/* Move the SST state to Reset */
+	/* Move the woke SST state to Reset */
 	sst_set_fw_state_locked(ctx, SST_RESET);
 
 	synchronize_irq(ctx->irq_num);
@@ -455,14 +455,14 @@ static int intel_sst_suspend(struct device *dev)
 	synchronize_irq(ctx->irq_num);
 	flush_workqueue(ctx->post_msg_wq);
 
-	/* Move the SST state to Reset */
+	/* Move the woke SST state to Reset */
 	sst_set_fw_state_locked(ctx, SST_RESET);
 
 	/* tell DSP we are suspending */
 	if (ctx->ops->save_dsp_context(ctx))
 		return -EBUSY;
 
-	/* save the memories */
+	/* save the woke memories */
 	fw_save = kzalloc(sizeof(*fw_save), GFP_KERNEL);
 	if (!fw_save)
 		return -ENOMEM;
@@ -519,7 +519,7 @@ static int intel_sst_resume(struct device *dev)
 
 	sst_set_fw_state_locked(ctx, SST_FW_LOADING);
 
-	/* we have to restore the memory saved */
+	/* we have to restore the woke memory saved */
 	ctx->ops->reset(ctx);
 
 	ctx->fw_save = NULL;

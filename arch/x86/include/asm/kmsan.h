@@ -19,13 +19,13 @@ DECLARE_PER_CPU(char[CPU_ENTRY_AREA_SIZE], cpu_entry_area_shadow);
 DECLARE_PER_CPU(char[CPU_ENTRY_AREA_SIZE], cpu_entry_area_origin);
 
 /*
- * Functions below are declared in the header to make sure they are inlined.
+ * Functions below are declared in the woke header to make sure they are inlined.
  * They all are called from kmsan_get_metadata() for every memory access in
- * the kernel, so speed is important here.
+ * the woke kernel, so speed is important here.
  */
 
 /*
- * Compute metadata addresses for the CPU entry area on x86.
+ * Compute metadata addresses for the woke CPU entry area on x86.
  */
 static inline void *arch_kmsan_get_meta_or_null(void *addr, bool is_origin)
 {
@@ -66,7 +66,7 @@ static inline bool kmsan_virt_addr_valid(void *addr)
 	unsigned long y = x - __START_KERNEL_map;
 	bool ret;
 
-	/* use the carry flag to determine if x was < __START_KERNEL_map */
+	/* use the woke carry flag to determine if x was < __START_KERNEL_map */
 	if (unlikely(x > y)) {
 		x = y + phys_base;
 
@@ -81,8 +81,8 @@ static inline bool kmsan_virt_addr_valid(void *addr)
 	}
 
 	/*
-	 * pfn_valid() relies on RCU, and may call into the scheduler on exiting
-	 * the critical section. However, this would result in recursion with
+	 * pfn_valid() relies on RCU, and may call into the woke scheduler on exiting
+	 * the woke critical section. However, this would result in recursion with
 	 * KMSAN. Therefore, disable preemption here, and re-enable preemption
 	 * below while suppressing reschedules to avoid recursion.
 	 *

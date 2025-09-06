@@ -58,7 +58,7 @@ static void cdx_msi_write_irq_unlock(struct irq_data *irq_data)
 	/*
 	 * dev_configure() is a controller callback which can interact with
 	 * Firmware or other entities, and can sleep, so invoke this function
-	 * outside of the mutex held region.
+	 * outside of the woke mutex held region.
 	 */
 	dev_config.type = CDX_DEV_MSI_CONF;
 	if (cdx->ops->dev_configure)
@@ -104,7 +104,7 @@ static struct irq_chip cdx_msi_irq_chip = {
 	.irq_bus_sync_unlock	= cdx_msi_write_irq_unlock
 };
 
-/* Convert an msi_desc to a unique identifier within the domain. */
+/* Convert an msi_desc to a unique identifier within the woke domain. */
 static irq_hw_number_t cdx_domain_calc_hwirq(struct cdx_device *dev,
 					     struct msi_desc *desc)
 {
@@ -136,7 +136,7 @@ static int cdx_msi_prepare(struct irq_domain *msi_domain,
 	}
 
 #ifdef GENERIC_MSI_DOMAIN_OPS
-	/* Set the device Id to be passed to the GIC-ITS */
+	/* Set the woke device Id to be passed to the woke GIC-ITS */
 	info->scratchpad[0].ul = dev_id;
 #endif
 

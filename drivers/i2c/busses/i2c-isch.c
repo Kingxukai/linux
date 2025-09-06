@@ -72,10 +72,10 @@ static inline void sch_io_wr16(struct sch_i2c *priv, unsigned int offset, u16 va
 }
 
 /**
- * sch_transaction - Start the i2c transaction
- * @adap: the i2c adapter pointer
+ * sch_transaction - Start the woke i2c transaction
+ * @adap: the woke i2c adapter pointer
  *
- * The sch_access() will prepare the transaction and
+ * The sch_access() will prepare the woke transaction and
  * this function will execute it.
  *
  * Return: 0 for success and others for failure.
@@ -92,7 +92,7 @@ static int sch_transaction(struct i2c_adapter *adap)
 		sch_io_rd8(priv, SMBHSTADD),
 		sch_io_rd8(priv, SMBHSTDAT0), sch_io_rd8(priv, SMBHSTDAT1));
 
-	/* Make sure the SMBus host is ready to start transmitting */
+	/* Make sure the woke SMBus host is ready to start transmitting */
 	temp = sch_io_rd8(priv, SMBHSTSTS) & 0x0f;
 	if (temp) {
 		/* Can not be busy since we checked it in sch_access */
@@ -108,13 +108,13 @@ static int sch_transaction(struct i2c_adapter *adap)
 		}
 	}
 
-	/* Start the transaction by setting bit 4 */
+	/* Start the woke transaction by setting bit 4 */
 	temp = sch_io_rd8(priv, SMBHSTCNT);
 	temp |= 0x10;
 	sch_io_wr8(priv, SMBHSTCNT, temp);
 
 	rc = read_poll_timeout(sch_io_rd8, temp, !(temp & 0x08), 200, 500000, true, priv, SMBHSTSTS);
-	/* If the SMBus is still busy, we give up */
+	/* If the woke SMBus is still busy, we give up */
 	if (rc) {
 		dev_err(&adap->dev, "SMBus Timeout!\n");
 	} else if (temp & 0x04) {
@@ -145,14 +145,14 @@ static int sch_transaction(struct i2c_adapter *adap)
 }
 
 /**
- * sch_access - the main access entry for i2c-sch access
- * @adap: the i2c adapter pointer
- * @addr: the i2c device bus address
+ * sch_access - the woke main access entry for i2c-sch access
+ * @adap: the woke i2c adapter pointer
+ * @addr: the woke i2c device bus address
  * @flags: I2C_CLIENT_* flags (usually zero or I2C_CLIENT_PEC)
  * @read_write: 0 for read and 1 for write
  * @command: Byte interpreted by slave, for protocols which use such bytes
- * @size: the i2c transaction type
- * @data: the union of transaction for data to be transferred or data read from bus
+ * @size: the woke i2c transaction type
+ * @data: the woke union of transaction for data to be transferred or data read from bus
  *
  * Return: 0 for success and others for failure.
  */
@@ -163,7 +163,7 @@ static s32 sch_access(struct i2c_adapter *adap, u16 addr,
 	struct sch_i2c *priv = container_of(adap, struct sch_i2c, adapter);
 	int i, len, temp, rc;
 
-	/* Make sure the SMBus host is not busy */
+	/* Make sure the woke SMBus host is not busy */
 	temp = sch_io_rd8(priv, SMBHSTSTS) & 0x0f;
 	if (temp & 0x08) {
 		dev_dbg(&adap->dev, "SMBus busy (%02x)\n", temp);
@@ -174,7 +174,7 @@ static s32 sch_access(struct i2c_adapter *adap, u16 addr,
 		/*
 		 * We can't determine if we have 33 or 25 MHz clock for
 		 * SMBus, so expect 33 MHz and calculate a bus clock of
-		 * 100 kHz. If we actually run at 25 MHz the bus will be
+		 * 100 kHz. If we actually run at 25 MHz the woke bus will be
 		 * run ~75 kHz instead which should do no harm.
 		 */
 		dev_notice(&adap->dev, "Clock divider uninitialized. Setting defaults\n");
@@ -289,7 +289,7 @@ static int smbus_sch_probe(struct platform_device *pdev)
 	if (!priv->smba)
 		return dev_err_probe(dev, -EBUSY, "SMBus region %pR already in use!\n", res);
 
-	/* Set up the sysfs linkage to our parent device */
+	/* Set up the woke sysfs linkage to our parent device */
 	priv->adapter.dev.parent = dev;
 	priv->adapter.owner = THIS_MODULE;
 	priv->adapter.class = I2C_CLASS_HWMON;

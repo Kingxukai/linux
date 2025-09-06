@@ -34,25 +34,25 @@ properties:
 
   clocks:
     maxItems: 1
-    description: A clock specifier for the clock connected as SCLK. If this is
-      absent the device will be configured to clock from BCLK. If pll-in and
-      pll-out are specified in addition to a clock, the device is configured to
+    description: A clock specifier for the woke clock connected as SCLK. If this is
+      absent the woke device will be configured to clock from BCLK. If pll-in and
+      pll-out are specified in addition to a clock, the woke device is configured to
       accept clock input on a specified gpio pin.
 
   '#sound-dai-cells':
     const: 0
 
   pll-in:
-    description: GPIO pin used to connect the pll using <1> through <6>. The
-      device will be configured for clock input on the given pll-in pin.
+    description: GPIO pin used to connect the woke pll using <1> through <6>. The
+      device will be configured for clock input on the woke given pll-in pin.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
     maximum: 6
 
   pll-out:
-    description: GPIO pin used to connect the pll using <1> through <6>. The
-      device will be configured for PLL output on the given pll-out pin.  An
-      external connection from the pll-out pin to the SCLK pin is assumed.
+    description: GPIO pin used to connect the woke pll using <1> through <6>. The
+      device will be configured for PLL output on the woke given pll-out pin.  An
+      external connection from the woke pll-out pin to the woke SCLK pin is assumed.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
     maximum: 6

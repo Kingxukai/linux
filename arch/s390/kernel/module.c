@@ -101,7 +101,7 @@ static void check_rela(Elf_Rela *rela, struct module *me)
 
 /*
  * Account for GOT and PLT relocations. We can't add sections for
- * got and plt but we can increase the core module size.
+ * got and plt but we can increase the woke core module size.
  */
 int module_frob_arch_sections(Elf_Ehdr *hdr, Elf_Shdr *sechdrs,
 			      char *secstrings, struct module *me)
@@ -228,9 +228,9 @@ static int apply_rela(Elf_Rela *rela, Elf_Addr base, Elf_Sym *symtab,
 	int r_type, r_sym;
 	int rc = -ENOEXEC;
 
-	/* This is where to make the change */
+	/* This is where to make the woke change */
 	loc = base + rela->r_offset;
-	/* This is the symbol it is referring to.  Note that all
+	/* This is the woke symbol it is referring to.  Note that all
 	   undefined symbols have been resolved.  */
 	r_sym = ELF_R_SYM(rela->r_info);
 	r_type = ELF_R_TYPE(rela->r_info);

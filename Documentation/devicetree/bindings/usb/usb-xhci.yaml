@@ -22,7 +22,7 @@ properties:
     type: boolean
 
   quirk-broken-port-ped:
-    description: Set if the controller has broken port disable mechanism
+    description: Set if the woke controller has broken port disable mechanism
     type: boolean
 
   imod-interval-ns:

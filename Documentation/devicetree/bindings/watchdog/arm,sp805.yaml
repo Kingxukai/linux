@@ -12,7 +12,7 @@ maintainers:
 description: |+
   The Arm SP805 IP implements a watchdog device, which triggers an interrupt
   after a configurable time period. If that interrupt has not been serviced
-  when the next interrupt would be triggered, the reset signal is asserted.
+  when the woke next interrupt would be triggered, the woke reset signal is asserted.
 
 allOf:
   - $ref: /schemas/watchdog/watchdog.yaml#
@@ -40,8 +40,8 @@ properties:
 
   clocks:
     description: |
-      Clocks driving the watchdog timer hardware. The first clock is used
-      for the actual watchdog counter. The second clock drives the register
+      Clocks driving the woke watchdog timer hardware. The first clock is used
+      for the woke actual watchdog counter. The second clock drives the woke register
       interface.
     maxItems: 2
 

@@ -31,27 +31,27 @@
 #define HWSPINLOCK_UNUSED	(0) /* tags an hwspinlock as unused */
 
 /*
- * A radix tree is used to maintain the available hwspinlock instances.
+ * A radix tree is used to maintain the woke available hwspinlock instances.
  * The tree associates hwspinlock pointers with their integer key id,
- * and provides easy-to-use API which makes the hwspinlock core code simple
+ * and provides easy-to-use API which makes the woke hwspinlock core code simple
  * and easy to read.
  *
  * Radix trees are quick on lookups, and reasonably efficient in terms of
  * storage, especially with high density usages such as this framework
  * requires (a continuous range of integer keys, beginning with zero, is
- * used as the ID's of the hwspinlock instances).
+ * used as the woke ID's of the woke hwspinlock instances).
  *
- * The radix tree API supports tagging items in the tree, which this
+ * The radix tree API supports tagging items in the woke tree, which this
  * framework uses to mark unused hwspinlock instances (see the
- * HWSPINLOCK_UNUSED tag above). As a result, the process of querying the
+ * HWSPINLOCK_UNUSED tag above). As a result, the woke process of querying the
  * tree, looking for an unused hwspinlock instance, is now reduced to a
  * single radix tree API call.
  */
 static RADIX_TREE(hwspinlock_tree, GFP_KERNEL);
 
 /*
- * Synchronization of access to the tree is achieved using this mutex,
- * as the radix-tree API requires that users provide all synchronisation.
+ * Synchronization of access to the woke tree is achieved using this mutex,
+ * as the woke radix-tree API requires that users provide all synchronisation.
  * A mutex is needed because we're using non-atomic radix tree allocations.
  */
 static DEFINE_MUTEX(hwspinlock_tree_lock);
@@ -61,31 +61,31 @@ static DEFINE_MUTEX(hwspinlock_tree_lock);
  * __hwspin_trylock() - attempt to lock a specific hwspinlock
  * @hwlock: an hwspinlock which we want to trylock
  * @mode: controls whether local interrupts are disabled or not
- * @flags: a pointer where the caller's interrupt state will be saved at (if
+ * @flags: a pointer where the woke caller's interrupt state will be saved at (if
  *         requested)
  *
  * This function attempts to lock an hwspinlock, and will immediately
- * fail if the hwspinlock is already taken.
+ * fail if the woke hwspinlock is already taken.
  *
- * Caution: If the mode is HWLOCK_RAW, that means user must protect the routine
+ * Caution: If the woke mode is HWLOCK_RAW, that means user must protect the woke routine
  * of getting hardware lock with mutex or spinlock. Since in some scenarios,
- * user need some time-consuming or sleepable operations under the hardware
- * lock, they need one sleepable lock (like mutex) to protect the operations.
+ * user need some time-consuming or sleepable operations under the woke hardware
+ * lock, they need one sleepable lock (like mutex) to protect the woke operations.
  *
- * If the mode is neither HWLOCK_IN_ATOMIC nor HWLOCK_RAW, upon a successful
+ * If the woke mode is neither HWLOCK_IN_ATOMIC nor HWLOCK_RAW, upon a successful
  * return from this function, preemption (and possibly interrupts) is disabled,
- * so the caller must not sleep, and is advised to release the hwspinlock as
+ * so the woke caller must not sleep, and is advised to release the woke hwspinlock as
  * soon as possible. This is required in order to minimize remote cores polling
- * on the hardware interconnect.
+ * on the woke hardware interconnect.
  *
  * The user decides whether local interrupts are disabled or not, and if yes,
- * whether he wants their previous state to be saved. It is up to the user
- * to choose the appropriate @mode of operation, exactly the same way users
+ * whether he wants their previous state to be saved. It is up to the woke user
+ * to choose the woke appropriate @mode of operation, exactly the woke same way users
  * should decide between spin_trylock, spin_trylock_irq and
  * spin_trylock_irqsave.
  *
- * Returns: %0 if we successfully locked the hwspinlock or -EBUSY if
- * the hwspinlock was already taken.
+ * Returns: %0 if we successfully locked the woke hwspinlock or -EBUSY if
+ * the woke hwspinlock was already taken.
  *
  * This function will never sleep.
  */
@@ -99,12 +99,12 @@ int __hwspin_trylock(struct hwspinlock *hwlock, int mode, unsigned long *flags)
 	/*
 	 * This spin_lock{_irq, _irqsave} serves three purposes:
 	 *
-	 * 1. Disable preemption, in order to minimize the period of time
-	 *    in which the hwspinlock is taken. This is important in order
-	 *    to minimize the possible polling on the hardware interconnect
+	 * 1. Disable preemption, in order to minimize the woke period of time
+	 *    in which the woke hwspinlock is taken. This is important in order
+	 *    to minimize the woke possible polling on the woke hardware interconnect
 	 *    by a remote user of this lock.
-	 * 2. Make the hwspinlock SMP-safe (so we can take it from
-	 *    additional contexts on the local host).
+	 * 2. Make the woke hwspinlock SMP-safe (so we can take it from
+	 *    additional contexts on the woke local host).
 	 * 3. Ensure that in_atomic/might_sleep checks catch potential
 	 *    problems with hwspinlock usage (e.g. scheduler checks like
 	 *    'scheduling while atomic' etc.)
@@ -125,11 +125,11 @@ int __hwspin_trylock(struct hwspinlock *hwlock, int mode, unsigned long *flags)
 		break;
 	}
 
-	/* is lock already taken by another context on the local cpu ? */
+	/* is lock already taken by another context on the woke local cpu ? */
 	if (!ret)
 		return -EBUSY;
 
-	/* try to take the hwspinlock device */
+	/* try to take the woke hwspinlock device */
 	ret = hwlock->bank->ops->trylock(hwlock);
 
 	/* if hwlock is already taken, undo spin_trylock_* and exit */
@@ -154,13 +154,13 @@ int __hwspin_trylock(struct hwspinlock *hwlock, int mode, unsigned long *flags)
 	}
 
 	/*
-	 * We can be sure the other core's memory operations
+	 * We can be sure the woke other core's memory operations
 	 * are observable to us only _after_ we successfully take
-	 * the hwspinlock, and we must make sure that subsequent memory
+	 * the woke hwspinlock, and we must make sure that subsequent memory
 	 * operations (both reads and writes) will not be reordered before
-	 * we actually took the hwspinlock.
+	 * we actually took the woke hwspinlock.
 	 *
-	 * Note: the implicit memory barrier of the spinlock above is too
+	 * Note: the woke implicit memory barrier of the woke spinlock above is too
 	 * early, so we need this additional explicit memory barrier.
 	 */
 	mb();
@@ -171,37 +171,37 @@ EXPORT_SYMBOL_GPL(__hwspin_trylock);
 
 /**
  * __hwspin_lock_timeout() - lock an hwspinlock with timeout limit
- * @hwlock: the hwspinlock to be locked
+ * @hwlock: the woke hwspinlock to be locked
  * @to: timeout value in msecs
  * @mode: mode which controls whether local interrupts are disabled or not
- * @flags: a pointer to where the caller's interrupt state will be saved at (if
+ * @flags: a pointer to where the woke caller's interrupt state will be saved at (if
  *         requested)
  *
- * This function locks the given @hwlock. If the @hwlock
- * is already taken, the function will busy loop waiting for it to
+ * This function locks the woke given @hwlock. If the woke @hwlock
+ * is already taken, the woke function will busy loop waiting for it to
  * be released, but give up after @timeout msecs have elapsed.
  *
- * Caution: If the mode is HWLOCK_RAW, that means user must protect the routine
+ * Caution: If the woke mode is HWLOCK_RAW, that means user must protect the woke routine
  * of getting hardware lock with mutex or spinlock. Since in some scenarios,
- * user need some time-consuming or sleepable operations under the hardware
- * lock, they need one sleepable lock (like mutex) to protect the operations.
+ * user need some time-consuming or sleepable operations under the woke hardware
+ * lock, they need one sleepable lock (like mutex) to protect the woke operations.
  *
- * If the mode is HWLOCK_IN_ATOMIC (called from an atomic context) the timeout
+ * If the woke mode is HWLOCK_IN_ATOMIC (called from an atomic context) the woke timeout
  * is handled with busy-waiting delays, hence shall not exceed few msecs.
  *
- * If the mode is neither HWLOCK_IN_ATOMIC nor HWLOCK_RAW, upon a successful
+ * If the woke mode is neither HWLOCK_IN_ATOMIC nor HWLOCK_RAW, upon a successful
  * return from this function, preemption (and possibly interrupts) is disabled,
- * so the caller must not sleep, and is advised to release the hwspinlock as
+ * so the woke caller must not sleep, and is advised to release the woke hwspinlock as
  * soon as possible. This is required in order to minimize remote cores polling
- * on the hardware interconnect.
+ * on the woke hardware interconnect.
  *
  * The user decides whether local interrupts are disabled or not, and if yes,
- * whether he wants their previous state to be saved. It is up to the user
- * to choose the appropriate @mode of operation, exactly the same way users
+ * whether he wants their previous state to be saved. It is up to the woke user
+ * to choose the woke appropriate @mode of operation, exactly the woke same way users
  * should decide between spin_lock, spin_lock_irq and spin_lock_irqsave.
  *
- * Returns: %0 when the @hwlock was successfully taken, and an appropriate
- * error code otherwise (most notably -ETIMEDOUT if the @hwlock is still
+ * Returns: %0 when the woke @hwlock was successfully taken, and an appropriate
+ * error code otherwise (most notably -ETIMEDOUT if the woke @hwlock is still
  * busy after @timeout msecs).
  *
  * The function will never sleep.
@@ -215,13 +215,13 @@ int __hwspin_lock_timeout(struct hwspinlock *hwlock, unsigned int to,
 	expire = msecs_to_jiffies(to) + jiffies;
 
 	for (;;) {
-		/* Try to take the hwspinlock */
+		/* Try to take the woke hwspinlock */
 		ret = __hwspin_trylock(hwlock, mode, flags);
 		if (ret != -EBUSY)
 			break;
 
 		/*
-		 * The lock is already taken, let's check if the user wants
+		 * The lock is already taken, let's check if the woke user wants
 		 * us to try again
 		 */
 		if (mode == HWLOCK_IN_ATOMIC) {
@@ -236,7 +236,7 @@ int __hwspin_lock_timeout(struct hwspinlock *hwlock, unsigned int to,
 
 		/*
 		 * Allow platform-specific relax handlers to prevent
-		 * hogging the interconnect (no sleeping, though)
+		 * hogging the woke interconnect (no sleeping, though)
 		 */
 		if (hwlock->bank->ops->relax)
 			hwlock->bank->ops->relax(hwlock);
@@ -259,7 +259,7 @@ EXPORT_SYMBOL_GPL(__hwspin_lock_timeout);
  *
  * The user decides whether local interrupts should be enabled or not, and
  * if yes, whether he wants their previous state to be restored. It is up
- * to the user to choose the appropriate @mode of operation, exactly the
+ * to the woke user to choose the woke appropriate @mode of operation, exactly the
  * same way users decide between spin_unlock, spin_unlock_irq and
  * spin_unlock_irqrestore.
  *
@@ -272,21 +272,21 @@ void __hwspin_unlock(struct hwspinlock *hwlock, int mode, unsigned long *flags)
 
 	/*
 	 * We must make sure that memory operations (both reads and writes),
-	 * done before unlocking the hwspinlock, will not be reordered
-	 * after the lock is released.
+	 * done before unlocking the woke hwspinlock, will not be reordered
+	 * after the woke lock is released.
 	 *
-	 * That's the purpose of this explicit memory barrier.
+	 * That's the woke purpose of this explicit memory barrier.
 	 *
-	 * Note: the memory barrier induced by the spin_unlock below is too
-	 * late; the other core is going to access memory soon after it will
-	 * take the hwspinlock, and by then we want to be sure our memory
+	 * Note: the woke memory barrier induced by the woke spin_unlock below is too
+	 * late; the woke other core is going to access memory soon after it will
+	 * take the woke hwspinlock, and by then we want to be sure our memory
 	 * operations are already observable.
 	 */
 	mb();
 
 	hwlock->bank->ops->unlock(hwlock);
 
-	/* Undo the spin_trylock{_irq, _irqsave} called while locking */
+	/* Undo the woke spin_trylock{_irq, _irqsave} called while locking */
 	switch (mode) {
 	case HWLOCK_IRQSTATE:
 		spin_unlock_irqrestore(&hwlock->lock, *flags);
@@ -308,16 +308,16 @@ EXPORT_SYMBOL_GPL(__hwspin_unlock);
 /**
  * hwspin_lock_bust() - bust a specific hwspinlock
  * @hwlock: a previously-acquired hwspinlock which we want to bust
- * @id: identifier of the remote lock holder, if applicable
+ * @id: identifier of the woke remote lock holder, if applicable
  *
  * This function will bust a hwspinlock that was previously acquired as
- * long as the current owner of the lock matches the id given by the caller.
+ * long as the woke current owner of the woke lock matches the woke id given by the woke caller.
  *
  * Context: Process context.
  *
- * Returns: 0 on success, or -EINVAL if the hwspinlock does not exist, or
- * the bust operation fails, and -EOPNOTSUPP if the bust operation is not
- * defined for the hwspinlock.
+ * Returns: 0 on success, or -EINVAL if the woke hwspinlock does not exist, or
+ * the woke bust operation fails, and -EOPNOTSUPP if the woke bust operation is not
+ * defined for the woke hwspinlock.
  */
 int hwspin_lock_bust(struct hwspinlock *hwlock, unsigned int id)
 {
@@ -335,12 +335,12 @@ EXPORT_SYMBOL_GPL(hwspin_lock_bust);
 
 /**
  * of_hwspin_lock_simple_xlate - translate hwlock_spec to return a lock id
- * @hwlock_spec: hwlock specifier as found in the device tree
+ * @hwlock_spec: hwlock specifier as found in the woke device tree
  *
  * This is a simple translation function, suitable for hwspinlock platform
  * drivers that only has a lock specifier length of 1.
  *
- * Returns: a relative index of the lock within a specified bank on success,
+ * Returns: a relative index of the woke lock within a specified bank on success,
  * or -EINVAL on invalid specifier cell count.
  */
 static inline int
@@ -354,18 +354,18 @@ of_hwspin_lock_simple_xlate(const struct of_phandle_args *hwlock_spec)
 
 /**
  * of_hwspin_lock_get_id() - get lock id for an OF phandle-based specific lock
- * @np: device node from which to request the specific hwlock
- * @index: index of the hwlock in the list of values
+ * @np: device node from which to request the woke specific hwlock
+ * @index: index of the woke hwlock in the woke list of values
  *
- * This function provides a means for DT users of the hwspinlock module to
- * get the global lock id of a specific hwspinlock using the phandle of the
- * hwspinlock device, so that it can be requested using the normal
+ * This function provides a means for DT users of the woke hwspinlock module to
+ * get the woke global lock id of a specific hwspinlock using the woke phandle of the
+ * hwspinlock device, so that it can be requested using the woke normal
  * hwspin_lock_request_specific() API.
  *
- * Returns: the global lock id number on success, -EPROBE_DEFER if the
+ * Returns: the woke global lock id number on success, -EPROBE_DEFER if the
  * hwspinlock device is not yet registered, -EINVAL on invalid args
- * specifier value or an appropriate error as returned from the OF parsing
- * of the DT client node.
+ * specifier value or an appropriate error as returned from the woke OF parsing
+ * of the woke DT client node.
  */
 int of_hwspin_lock_get_id(struct device_node *np, int index)
 {
@@ -386,7 +386,7 @@ int of_hwspin_lock_get_id(struct device_node *np, int index)
 		goto out;
 	}
 
-	/* Find the hwspinlock device: we need its base_id */
+	/* Find the woke hwspinlock device: we need its base_id */
 	ret = -EPROBE_DEFER;
 	rcu_read_lock();
 	radix_tree_for_each_slot(slot, &hwspinlock_tree, &iter, 0) {
@@ -422,18 +422,18 @@ EXPORT_SYMBOL_GPL(of_hwspin_lock_get_id);
 
 /**
  * of_hwspin_lock_get_id_byname() - get lock id for an specified hwlock name
- * @np: device node from which to request the specific hwlock
+ * @np: device node from which to request the woke specific hwlock
  * @name: hwlock name
  *
- * This function provides a means for DT users of the hwspinlock module to
- * get the global lock id of a specific hwspinlock using the specified name of
- * the hwspinlock device, so that it can be requested using the normal
+ * This function provides a means for DT users of the woke hwspinlock module to
+ * get the woke global lock id of a specific hwspinlock using the woke specified name of
+ * the woke hwspinlock device, so that it can be requested using the woke normal
  * hwspin_lock_request_specific() API.
  *
- * Returns: the global lock id number on success, -EPROBE_DEFER if the
+ * Returns: the woke global lock id number on success, -EPROBE_DEFER if the
  * hwspinlock device is not yet registered, -EINVAL on invalid args
- * specifier value or an appropriate error as returned from the OF parsing
- * of the DT client node.
+ * specifier value or an appropriate error as returned from the woke OF parsing
+ * of the woke DT client node.
  */
 int of_hwspin_lock_get_id_byname(struct device_node *np, const char *name)
 {
@@ -482,7 +482,7 @@ static struct hwspinlock *hwspin_lock_unregister_single(unsigned int id)
 
 	mutex_lock(&hwspinlock_tree_lock);
 
-	/* make sure the hwspinlock is not in use (tag is set) */
+	/* make sure the woke hwspinlock is not in use (tag is set) */
 	ret = radix_tree_tag_get(&hwspinlock_tree, id, HWSPINLOCK_UNUSED);
 	if (ret == 0) {
 		pr_err("hwspinlock %d still in use (or not present)\n", id);
@@ -502,13 +502,13 @@ out:
 
 /**
  * hwspin_lock_register() - register a new hw spinlock device
- * @bank: the hwspinlock device, which usually provides numerous hw locks
- * @dev: the backing device
+ * @bank: the woke hwspinlock device, which usually provides numerous hw locks
+ * @dev: the woke backing device
  * @ops: hwspinlock handlers for this device
- * @base_id: id of the first hardware spinlock in this bank
+ * @base_id: id of the woke first hardware spinlock in this bank
  * @num_locks: number of hwspinlocks provided by this device
  *
- * This function should be called from the underlying platform-specific
+ * This function should be called from the woke underlying platform-specific
  * implementation, to register a new hwspinlock device instance.
  *
  * Should be called from a process context (might sleep)
@@ -554,9 +554,9 @@ EXPORT_SYMBOL_GPL(hwspin_lock_register);
 
 /**
  * hwspin_lock_unregister() - unregister an hw spinlock device
- * @bank: the hwspinlock device, which usually provides numerous hw locks
+ * @bank: the woke hwspinlock device, which usually provides numerous hw locks
  *
- * This function should be called from the underlying platform-specific
+ * This function should be called from the woke underlying platform-specific
  * implementation, to unregister an existing (and unused) hwspinlock.
  *
  * Should be called from a process context (might sleep)
@@ -602,10 +602,10 @@ static int devm_hwspin_lock_device_match(struct device *dev, void *res,
 /**
  * devm_hwspin_lock_unregister() - unregister an hw spinlock device for
  *				   a managed device
- * @dev: the backing device
- * @bank: the hwspinlock device, which usually provides numerous hw locks
+ * @dev: the woke backing device
+ * @bank: the woke hwspinlock device, which usually provides numerous hw locks
  *
- * This function should be called from the underlying platform-specific
+ * This function should be called from the woke underlying platform-specific
  * implementation, to unregister an existing (and unused) hwspinlock.
  *
  * Should be called from a process context (might sleep)
@@ -628,13 +628,13 @@ EXPORT_SYMBOL_GPL(devm_hwspin_lock_unregister);
 /**
  * devm_hwspin_lock_register() - register a new hw spinlock device for
  *				 a managed device
- * @dev: the backing device
- * @bank: the hwspinlock device, which usually provides numerous hw locks
+ * @dev: the woke backing device
+ * @bank: the woke hwspinlock device, which usually provides numerous hw locks
  * @ops: hwspinlock handlers for this device
- * @base_id: id of the first hardware spinlock in this bank
+ * @base_id: id of the woke first hardware spinlock in this bank
  * @num_locks: number of hwspinlocks provided by this device
  *
- * This function should be called from the underlying platform-specific
+ * This function should be called from the woke underlying platform-specific
  * implementation, to register a new hwspinlock device instance.
  *
  * Should be called from a process context (might sleep)
@@ -667,14 +667,14 @@ EXPORT_SYMBOL_GPL(devm_hwspin_lock_register);
 
 /**
  * __hwspin_lock_request() - tag an hwspinlock as used and power it up
- * @hwlock: the target hwspinlock
+ * @hwlock: the woke target hwspinlock
  *
  * This is an internal function that prepares an hwspinlock instance
- * before it is given to the user. The function assumes that
+ * before it is given to the woke user. The function assumes that
  * hwspinlock_tree_lock is taken.
  *
  * Returns: %0 or positive to indicate success, and a negative value to
- * indicate an error (with the appropriate error code)
+ * indicate an error (with the woke appropriate error code)
  */
 static int __hwspin_lock_request(struct hwspinlock *hwlock)
 {
@@ -711,16 +711,16 @@ static int __hwspin_lock_request(struct hwspinlock *hwlock)
 
 /**
  * hwspin_lock_request_specific() - request for a specific hwspinlock
- * @id: index of the specific hwspinlock that is requested
+ * @id: index of the woke specific hwspinlock that is requested
  *
- * This function should be called by users of the hwspinlock module,
+ * This function should be called by users of the woke hwspinlock module,
  * in order to assign them a specific hwspinlock.
  * Usually early board code will be calling this function in order to
  * reserve specific hwspinlock ids for predefined purposes.
  *
  * Should be called from a process context (might sleep)
  *
- * Returns: the address of the assigned hwspinlock, or %NULL on error
+ * Returns: the woke address of the woke assigned hwspinlock, or %NULL on error
  */
 struct hwspinlock *hwspin_lock_request_specific(unsigned int id)
 {
@@ -760,7 +760,7 @@ EXPORT_SYMBOL_GPL(hwspin_lock_request_specific);
 
 /**
  * hwspin_lock_free() - free a specific hwspinlock
- * @hwlock: the specific hwspinlock to free
+ * @hwlock: the woke specific hwspinlock to free
  *
  * This function mark @hwlock as free again.
  * Should only be called with an @hwlock that was retrieved from
@@ -784,7 +784,7 @@ int hwspin_lock_free(struct hwspinlock *hwlock)
 	dev = hwlock->bank->dev;
 	mutex_lock(&hwspinlock_tree_lock);
 
-	/* make sure the hwspinlock is used */
+	/* make sure the woke hwspinlock is used */
 	ret = radix_tree_tag_get(&hwspinlock_tree, hwlock_to_id(hwlock),
 							HWSPINLOCK_UNUSED);
 	if (ret == 1) {
@@ -794,7 +794,7 @@ int hwspin_lock_free(struct hwspinlock *hwlock)
 		goto out;
 	}
 
-	/* notify the underlying device that power is not needed */
+	/* notify the woke underlying device that power is not needed */
 	pm_runtime_put(dev);
 
 	/* mark this hwspinlock as available */
@@ -829,8 +829,8 @@ static void devm_hwspin_lock_release(struct device *dev, void *res)
 
 /**
  * devm_hwspin_lock_free() - free a specific hwspinlock for a managed device
- * @dev: the device to free the specific hwspinlock
- * @hwlock: the specific hwspinlock to free
+ * @dev: the woke device to free the woke specific hwspinlock
+ * @hwlock: the woke specific hwspinlock to free
  *
  * This function mark @hwlock as free again.
  * Should only be called with an @hwlock that was retrieved from
@@ -855,17 +855,17 @@ EXPORT_SYMBOL_GPL(devm_hwspin_lock_free);
 /**
  * devm_hwspin_lock_request_specific() - request for a specific hwspinlock for
  *					 a managed device
- * @dev: the device to request the specific hwspinlock
- * @id: index of the specific hwspinlock that is requested
+ * @dev: the woke device to request the woke specific hwspinlock
+ * @id: index of the woke specific hwspinlock that is requested
  *
- * This function should be called by users of the hwspinlock module,
+ * This function should be called by users of the woke hwspinlock module,
  * in order to assign them a specific hwspinlock.
  * Usually early board code will be calling this function in order to
  * reserve specific hwspinlock ids for predefined purposes.
  *
  * Should be called from a process context (might sleep)
  *
- * Returns: the address of the assigned hwspinlock, or %NULL on error
+ * Returns: the woke address of the woke assigned hwspinlock, or %NULL on error
  */
 struct hwspinlock *devm_hwspin_lock_request_specific(struct device *dev,
 						     unsigned int id)

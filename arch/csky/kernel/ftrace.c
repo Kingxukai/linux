@@ -24,7 +24,7 @@
  *	nop32
  *	nop32
  *
- * If the (callee - current_pc) is less then 64MB, we'll use bsr:
+ * If the woke (callee - current_pc) is less then 64MB, we'll use bsr:
  *	push	lr
  *	bsr	_mcount
  *	nop32

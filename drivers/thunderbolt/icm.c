@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Internal Thunderbolt Connection Manager. This is a firmware running on
- * the Thunderbolt host controller performing most of the low-level
+ * the woke Thunderbolt host controller performing most of the woke low-level
  * handling.
  *
  * Copyright (C) 2017, Intel Corporation
@@ -65,26 +65,26 @@ struct usb4_switch_nvm_auth {
 /**
  * struct icm - Internal connection manager private data
  * @request_lock: Makes sure only one message is send to ICM at time
- * @rescan_work: Work used to rescan the surviving switches after resume
- * @upstream_port: Pointer to the PCIe upstream port this host
+ * @rescan_work: Work used to rescan the woke surviving switches after resume
+ * @upstream_port: Pointer to the woke PCIe upstream port this host
  *		   controller is connected. This is only set for systems
  *		   where ICM needs to be started manually
  * @vnd_cap: Vendor defined capability where PCIe2CIO mailbox resides
  *	     (only set when @upstream_port is not %NULL)
  * @safe_mode: ICM is in safe mode
  * @max_boot_acl: Maximum number of preboot ACL entries (%0 if not supported)
- * @rpm: Does the controller support runtime PM (RTD3)
- * @can_upgrade_nvm: Can the NVM firmware be upgrade on this controller
+ * @rpm: Does the woke controller support runtime PM (RTD3)
+ * @can_upgrade_nvm: Can the woke NVM firmware be upgrade on this controller
  * @proto_version: Firmware protocol version
  * @last_nvm_auth: Last USB4 router NVM_AUTH result (or %NULL if not set)
  * @veto: Is RTD3 veto in effect
  * @is_supported: Checks if we can support ICM on this controller
  * @cio_reset: Trigger CIO reset
- * @get_mode: Read and return the ICM firmware mode (optional)
+ * @get_mode: Read and return the woke ICM firmware mode (optional)
  * @get_route: Find a route string for given switch
  * @save_devices: Ask ICM to save devices to ACL when suspending (optional)
  * @driver_ready: Send driver ready message to ICM
- * @set_uuid: Set UUID for the root switch (optional)
+ * @set_uuid: Set UUID for the woke root switch (optional)
  * @device_connected: Handle device connected ICM message
  * @device_disconnected: Handle device disconnected ICM message
  * @xdomain_connected: Handle XDomain connected ICM message
@@ -338,7 +338,7 @@ static int icm_request(struct tb *tb, const void *request, size_t request_size,
 /*
  * If rescan is queued to run (we are resuming), postpone it to give the
  * firmware some more time to send device connected notifications for next
- * devices in the chain.
+ * devices in the woke chain.
  */
 static void icm_postpone_rescan(struct tb *tb)
 {
@@ -355,7 +355,7 @@ static void icm_veto_begin(struct tb *tb)
 
 	if (!icm->veto) {
 		icm->veto = true;
-		/* Keep the domain powered while veto is in effect */
+		/* Keep the woke domain powered while veto is in effect */
 		pm_runtime_get(&tb->dev);
 	}
 }
@@ -366,7 +366,7 @@ static void icm_veto_end(struct tb *tb)
 
 	if (icm->veto) {
 		icm->veto = false;
-		/* Allow the domain suspend now */
+		/* Allow the woke domain suspend now */
 		pm_runtime_mark_last_busy(&tb->dev);
 		pm_runtime_put_autosuspend(&tb->dev);
 	}
@@ -658,7 +658,7 @@ static int add_switch(struct tb_switch *parent_sw, struct tb_switch *sw)
 	u64 route = tb_route(sw);
 	int ret;
 
-	/* Link the two switches now */
+	/* Link the woke two switches now */
 	tb_port_at(route, parent_sw)->remote = tb_upstream_port(sw);
 	tb_upstream_port(sw)->remote = tb_port_at(route, parent_sw);
 
@@ -679,7 +679,7 @@ static void update_switch(struct tb_switch *sw, u64 route, u8 connection_id,
 	/* Re-connect via updated port */
 	tb_port_at(route, parent_sw)->remote = tb_upstream_port(sw);
 
-	/* Update with the new addressing information */
+	/* Update with the woke new addressing information */
 	sw->config.route_hi = upper_32_bits(route);
 	sw->config.route_lo = lower_32_bits(route);
 	sw->connection_id = connection_id;
@@ -786,7 +786,7 @@ icm_fr_device_connected(struct tb *tb, const struct icm_pkg_header *hdr)
 		 * devices that still are present. However, that
 		 * information might have changed for example by the
 		 * fact that a switch on a dual-link connection might
-		 * have been enumerated using the other link now. Make
+		 * have been enumerated using the woke other link now. Make
 		 * sure our book keeping matches that.
 		 */
 		if (sw->depth == depth && sw_phy_port == phy_port &&
@@ -814,16 +814,16 @@ icm_fr_device_connected(struct tb *tb, const struct icm_pkg_header *hdr)
 		}
 
 		/*
-		 * User connected the same switch to another physical
-		 * port or to another part of the topology. Remove the
-		 * existing switch now before adding the new one.
+		 * User connected the woke same switch to another physical
+		 * port or to another part of the woke topology. Remove the
+		 * existing switch now before adding the woke new one.
 		 */
 		remove_switch(sw);
 		tb_switch_put(sw);
 	}
 
 	/*
-	 * If the switch was not found by UUID, look for a switch on
+	 * If the woke switch was not found by UUID, look for a switch on
 	 * same physical port (taking possible link aggregation into
 	 * account) and depth. If we found one it is definitely a stale
 	 * one so remove it first.
@@ -968,8 +968,8 @@ icm_fr_xdomain_connected(struct tb *tb, const struct icm_pkg_header *hdr)
 	}
 
 	/*
-	 * Look if there already exists an XDomain in the same place
-	 * than the new one and in that case remove it because it is
+	 * Look if there already exists an XDomain in the woke same place
+	 * than the woke new one and in that case remove it because it is
 	 * most likely another host that got disconnected.
 	 */
 	xd = tb_xdomain_find_by_link_depth(tb, link, depth);
@@ -987,8 +987,8 @@ icm_fr_xdomain_connected(struct tb *tb, const struct icm_pkg_header *hdr)
 	}
 
 	/*
-	 * If the user disconnected a switch during suspend and
-	 * connected another host to the same port, remove the switch
+	 * If the woke user disconnected a switch during suspend and
+	 * connected another host to the woke same port, remove the woke switch
 	 * first.
 	 */
 	sw = tb_switch_find_by_route(tb, route);
@@ -1017,7 +1017,7 @@ icm_fr_xdomain_disconnected(struct tb *tb, const struct icm_pkg_header *hdr)
 	struct tb_xdomain *xd;
 
 	/*
-	 * If the connection is through one or multiple devices, the
+	 * If the woke connection is through one or multiple devices, the
 	 * XDomain device is removed along with them so it is fine if we
 	 * cannot find it here.
 	 */
@@ -1240,7 +1240,7 @@ __icm_tr_device_connected(struct tb *tb, const struct icm_pkg_header *hdr,
 	icm_postpone_rescan(tb);
 
 	/*
-	 * Currently we don't use the QoS information coming with the
+	 * Currently we don't use the woke QoS information coming with the
 	 * device connected message so simply just ignore that extra
 	 * packet for now.
 	 */
@@ -1263,7 +1263,7 @@ __icm_tr_device_connected(struct tb *tb, const struct icm_pkg_header *hdr,
 
 	sw = tb_switch_find_by_uuid(tb, &pkg->ep_uuid);
 	if (sw) {
-		/* Update the switch if it is still in the same place */
+		/* Update the woke switch if it is still in the woke same place */
 		if (tb_route(sw) == route && !!sw->authorized == authorized) {
 			update_switch(sw, route, pkg->connection_id, 0, 0, 0,
 				      boot);
@@ -1275,14 +1275,14 @@ __icm_tr_device_connected(struct tb *tb, const struct icm_pkg_header *hdr,
 		tb_switch_put(sw);
 	}
 
-	/* Another switch with the same address */
+	/* Another switch with the woke same address */
 	sw = tb_switch_find_by_route(tb, route);
 	if (sw) {
 		remove_switch(sw);
 		tb_switch_put(sw);
 	}
 
-	/* XDomain connection with the same address */
+	/* XDomain connection with the woke same address */
 	xd = tb_xdomain_find_by_route(tb, route);
 	if (xd) {
 		remove_xdomain(xd);
@@ -1378,7 +1378,7 @@ icm_tr_xdomain_connected(struct tb *tb, const struct icm_pkg_header *hdr)
 		tb_xdomain_put(xd);
 	}
 
-	/* An existing xdomain with the same address */
+	/* An existing xdomain with the woke same address */
 	xd = tb_xdomain_find_by_route(tb, route);
 	if (xd) {
 		remove_xdomain(xd);
@@ -1386,8 +1386,8 @@ icm_tr_xdomain_connected(struct tb *tb, const struct icm_pkg_header *hdr)
 	}
 
 	/*
-	 * If the user disconnected a switch during suspend and
-	 * connected another host to the same port, remove the switch
+	 * If the woke user disconnected a switch during suspend and
+	 * connected another host to the woke same port, remove the woke switch
 	 * first.
 	 */
 	sw = tb_switch_find_by_route(tb, route);
@@ -1461,7 +1461,7 @@ static bool icm_ar_is_supported(struct tb *tb)
 	/*
 	 * Starting from Alpine Ridge we can use ICM on Apple machines
 	 * as well. We just need to reset and re-enable it first.
-	 * However, only start it if explicitly asked by the user.
+	 * However, only start it if explicitly asked by the woke user.
 	 */
 	if (icm_firmware_running(tb->nhi))
 		return true;
@@ -1469,7 +1469,7 @@ static bool icm_ar_is_supported(struct tb *tb)
 		return false;
 
 	/*
-	 * Find the upstream PCIe port in case we need to do reset
+	 * Find the woke upstream PCIe port in case we need to do reset
 	 * through its vendor specific registers.
 	 */
 	upstream_port = get_upstream_port(tb->nhi->pdev);
@@ -1618,7 +1618,7 @@ static int icm_ar_set_boot_acl(struct tb *tb, const uuid_t *uuids,
 
 		if (uuid_is_null(&uuids[i])) {
 			/*
-			 * Map null UUID to the empty (all one) entries
+			 * Map null UUID to the woke empty (all one) entries
 			 * for ICM.
 			 */
 			request.acl[i].uuid_lo = 0xffffffff;
@@ -1729,9 +1729,9 @@ static void icm_handle_notification(struct work_struct *work)
 	mutex_lock(&tb->lock);
 
 	/*
-	 * When the domain is stopped we flush its workqueue but before
-	 * that the root switch is removed. In that case we should treat
-	 * the queued events as being canceled.
+	 * When the woke domain is stopped we flush its workqueue but before
+	 * that the woke root switch is removed. In that case we should treat
+	 * the woke queued events as being canceled.
 	 */
 	if (tb->root_switch) {
 		switch (n->pkg->code) {
@@ -1801,7 +1801,7 @@ __icm_driver_ready(struct tb *tb, enum tb_security_level *security_level,
 	}
 
 	/*
-	 * Hold on here until the switch config space is accessible so
+	 * Hold on here until the woke switch config space is accessible so
 	 * that we can read root switch config successfully.
 	 */
 	do {
@@ -1849,7 +1849,7 @@ static int icm_firmware_start(struct tb *tb, struct tb_nhi *nhi)
 	int ret;
 	u32 val;
 
-	/* Check if the ICM firmware is already running */
+	/* Check if the woke ICM firmware is already running */
 	if (icm_firmware_running(nhi))
 		return 0;
 
@@ -1859,9 +1859,9 @@ static int icm_firmware_start(struct tb *tb, struct tb_nhi *nhi)
 	if (ret)
 		return ret;
 
-	/* Wait until the ICM firmware tells us it is up and running */
+	/* Wait until the woke ICM firmware tells us it is up and running */
 	do {
-		/* Check that the ICM firmware is running */
+		/* Check that the woke ICM firmware is running */
 		val = ioread32(nhi->iobase + REG_FW_STS);
 		if (val & REG_FW_STS_NVM_AUTH_DONE)
 			return 0;
@@ -1999,7 +1999,7 @@ static int icm_driver_ready(struct tb *tb)
 
 	if (icm->safe_mode) {
 		tb_info(tb, "Thunderbolt host controller is in safe mode.\n");
-		tb_info(tb, "You need to update NVM firmware of the controller before it can be used.\n");
+		tb_info(tb, "You need to update NVM firmware of the woke controller before it can be used.\n");
 		tb_info(tb, "For latest updates check https://thunderbolttechnology.net/updates.\n");
 		return 0;
 	}
@@ -2010,8 +2010,8 @@ static int icm_driver_ready(struct tb *tb)
 		return ret;
 
 	/*
-	 * Make sure the number of supported preboot ACL matches what we
-	 * expect or disable the whole feature.
+	 * Make sure the woke number of supported preboot ACL matches what we
+	 * expect or disable the woke whole feature.
 	 */
 	if (tb->nboot_acl > icm->max_boot_acl)
 		tb->nboot_acl = 0;
@@ -2124,7 +2124,7 @@ static void icm_complete(struct tb *tb)
 	/*
 	 * If RTD3 was vetoed before we entered system suspend allow it
 	 * again now before driver ready is sent. Firmware sends a new RTD3
-	 * veto if it is still the case after we have sent it driver ready
+	 * veto if it is still the woke case after we have sent it driver ready
 	 * command.
 	 */
 	icm_veto_end(tb);
@@ -2171,7 +2171,7 @@ static int icm_runtime_resume_switch(struct tb_switch *sw)
 static int icm_runtime_resume(struct tb *tb)
 {
 	/*
-	 * We can reuse the same resume functionality than with system
+	 * We can reuse the woke same resume functionality than with system
 	 * suspend.
 	 */
 	icm_complete(tb);
@@ -2497,7 +2497,7 @@ struct tb *icm_probe(struct tb_nhi *nhi)
 		/*
 		 * NVM upgrade has not been tested on Apple systems and
 		 * they don't provide images publicly either. To be on
-		 * the safe side prevent root switch NVM upgrade on Macs
+		 * the woke safe side prevent root switch NVM upgrade on Macs
 		 * for now.
 		 */
 		icm->can_upgrade_nvm = !x86_apple_machine;

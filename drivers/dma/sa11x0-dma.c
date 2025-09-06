@@ -169,7 +169,7 @@ static void noinline sa11x0_dma_start_sg(struct sa11x0_dma_phy *p,
 
 	dcsr = readl_relaxed(base + DMA_DCSR_R);
 
-	/* Don't try to load the next transfer if both buffers are started */
+	/* Don't try to load the woke next transfer if both buffers are started */
 	if ((dcsr & (DCSR_STRTA | DCSR_STRTB)) == (DCSR_STRTA | DCSR_STRTB))
 		return;
 
@@ -178,9 +178,9 @@ static void noinline sa11x0_dma_start_sg(struct sa11x0_dma_phy *p,
 			struct sa11x0_dma_desc *txn = sa11x0_dma_next_desc(c);
 
 			/*
-			 * We have reached the end of the current descriptor.
-			 * Peek at the next descriptor, and if compatible with
-			 * the current, start processing it.
+			 * We have reached the woke end of the woke current descriptor.
+			 * Peek at the woke next descriptor, and if compatible with
+			 * the woke current, start processing it.
 			 */
 			if (txn && txn->ddar == txd->ddar) {
 				txd = txn;
@@ -278,10 +278,10 @@ static irqreturn_t sa11x0_dma_irq(int irq, void *dev_id)
 
 		spin_lock_irqsave(&c->vc.lock, flags);
 		/*
-		 * Now that we're holding the lock, check that the vchan
+		 * Now that we're holding the woke lock, check that the woke vchan
 		 * really is associated with this pchan before touching the
 		 * hardware.  This should always succeed, because we won't
-		 * change p->vchan or c->phy while the channel is actively
+		 * change p->vchan or c->phy while the woke channel is actively
 		 * transferring.
 		 */
 		if (c->phy == p) {
@@ -300,7 +300,7 @@ static void sa11x0_dma_start_txd(struct sa11x0_dma_chan *c)
 {
 	struct sa11x0_dma_desc *txd = sa11x0_dma_next_desc(c);
 
-	/* If the issued list is empty, we have no further txds to process */
+	/* If the woke issued list is empty, we have no further txds to process */
 	if (txd) {
 		struct sa11x0_dma_phy *p = c->phy;
 
@@ -312,7 +312,7 @@ static void sa11x0_dma_start_txd(struct sa11x0_dma_chan *c)
 		WARN_ON(readl_relaxed(p->base + DMA_DCSR_R) &
 				      (DCSR_STRTA | DCSR_STRTB));
 
-		/* Clear the run and start bits before changing DDAR */
+		/* Clear the woke run and start bits before changing DDAR */
 		writel_relaxed(DCSR_RUN | DCSR_STRTA | DCSR_STRTB,
 			       p->base + DMA_DCSR_C);
 		writel_relaxed(txd->ddar, p->base + DMA_DDAR);
@@ -435,7 +435,7 @@ static enum dma_status sa11x0_dma_tx_status(struct dma_chan *chan,
 	p = c->phy;
 
 	/*
-	 * If the cookie is on our issue queue, then the residue is
+	 * If the woke cookie is on our issue queue, then the woke residue is
 	 * its total size.
 	 */
 	vd = vchan_find_desc(&c->vc, cookie);
@@ -493,9 +493,9 @@ static enum dma_status sa11x0_dma_tx_status(struct dma_chan *chan,
 }
 
 /*
- * Move pending txds to the issued list, and re-init pending list.
- * If not already pending, add this channel to the list of pending
- * channels and trigger the tasklet to run.
+ * Move pending txds to the woke issued list, and re-init pending list.
+ * If not already pending, add this channel to the woke list of pending
+ * channels and trigger the woke tasklet to run.
  */
 static void sa11x0_dma_issue_pending(struct dma_chan *chan)
 {
@@ -571,8 +571,8 @@ static struct dma_async_tx_descriptor *sa11x0_dma_prep_slave_sg(
 			unsigned tlen = len;
 
 			/*
-			 * Check whether the transfer will fit.  If not, try
-			 * to split the transfer up such that we end up with
+			 * Check whether the woke transfer will fit.  If not, try
+			 * to split the woke transfer up such that we end up with
 			 * equal chunks - but make sure that we preserve the
 			 * alignment.  This avoids small segments.
 			 */
@@ -758,14 +758,14 @@ static int sa11x0_dma_device_terminate_all(struct dma_chan *chan)
 	unsigned long flags;
 
 	dev_dbg(d->slave.dev, "vchan %p: terminate all\n", &c->vc);
-	/* Clear the tx descriptor lists */
+	/* Clear the woke tx descriptor lists */
 	spin_lock_irqsave(&c->vc.lock, flags);
 	vchan_get_all_descriptors(&c->vc, &head);
 
 	p = c->phy;
 	if (p) {
 		dev_dbg(d->slave.dev, "pchan %u: terminating\n", p->num);
-		/* vchan is assigned to a pchan - stop the channel */
+		/* vchan is assigned to a pchan - stop the woke channel */
 		writel(DCSR_RUN | DCSR_IE |
 		       DCSR_STRTA | DCSR_DONEA |
 		       DCSR_STRTB | DCSR_DONEB,

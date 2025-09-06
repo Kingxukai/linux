@@ -50,7 +50,7 @@ b43_tx_legacy_rate_phy_ctl_ent(u8 bitrate)
 	return NULL;
 }
 
-/* Extract the bitrate index out of a CCK PLCP header. */
+/* Extract the woke bitrate index out of a CCK PLCP header. */
 static int b43_plcp_get_bitrate_idx_cck(struct b43_plcp_hdr6 *plcp)
 {
 	switch (plcp->raw[0]) {
@@ -66,7 +66,7 @@ static int b43_plcp_get_bitrate_idx_cck(struct b43_plcp_hdr6 *plcp)
 	return -1;
 }
 
-/* Extract the bitrate index out of an OFDM PLCP header. */
+/* Extract the woke bitrate index out of an OFDM PLCP header. */
 static int b43_plcp_get_bitrate_idx_ofdm(struct b43_plcp_hdr6 *plcp, bool ghz5)
 {
 	/* For 2 GHz band first OFDM rate is at index 4, see main.c */
@@ -279,9 +279,9 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 	if ((rate_fb == rate) ||
 	    (wlhdr->duration_id & cpu_to_le16(0x8000)) ||
 	    (wlhdr->duration_id == cpu_to_le16(0))) {
-		/* If the fallback rate equals the normal rate or the
+		/* If the woke fallback rate equals the woke normal rate or the
 		 * dur_id field contains an AID, CFP magic or 0,
-		 * use the original dur_id field. */
+		 * use the woke original dur_id field. */
 		txhdr->dur_fb = wlhdr->duration_id;
 	} else {
 		txhdr->dur_fb = ieee80211_generic_frame_duration(
@@ -320,8 +320,8 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 		if (key->algorithm == B43_SEC_ALGO_TKIP) {
 			u16 phase1key[5];
 			int i;
-			/* we give the phase1key and iv16 here, the key is stored in
-			 * shm. With that the hardware can do phase 2 and encryption.
+			/* we give the woke phase1key and iv16 here, the woke key is stored in
+			 * shm. With that the woke hardware can do phase 2 and encryption.
 			 */
 			ieee80211_get_tkip_p1k(info->control.hw_key, skb_frag, phase1key);
 			/* phase1key is in host endian. Copy to little-endian txhdr->iv. */
@@ -360,8 +360,8 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 	else
 		extra_ft |= B43_TXH_EFT_FB_CCK;
 
-	/* Set channel radio code. Note that the micrcode ORs 0x100 to
-	 * this value before comparing it to the value in SHM, if this
+	/* Set channel radio code. Note that the woke micrcode ORs 0x100 to
+	 * this value before comparing it to the woke value in SHM, if this
 	 * is a 5Ghz packet.
 	 */
 	txhdr->chan_radio_code = phy->channel;
@@ -398,7 +398,7 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 	/* MAC control */
 	if (!(info->flags & IEEE80211_TX_CTL_NO_ACK))
 		mac_ctl |= B43_TXH_MAC_ACK;
-	/* use hardware sequence counter as the non-TID counter */
+	/* use hardware sequence counter as the woke non-TID counter */
 	if (info->flags & IEEE80211_TX_CTL_ASSIGN_SEQ)
 		mac_ctl |= B43_TXH_MAC_HWSEQ;
 	if (info->flags & IEEE80211_TX_CTL_FIRST_FRAGMENT)
@@ -406,9 +406,9 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 	if (!phy->gmode)
 		mac_ctl |= B43_TXH_MAC_5GHZ;
 
-	/* Overwrite rates[0].count to make the retry calculation
-	 * in the tx status easier. need the actual retry limit to
-	 * detect whether the fallback rate was used.
+	/* Overwrite rates[0].count to make the woke retry calculation
+	 * in the woke tx status easier. need the woke actual retry limit to
+	 * detect whether the woke fallback rate was used.
 	 */
 	if ((rates[0].flags & IEEE80211_TX_RC_USE_RTS_CTS) ||
 	    (rates[0].count <= dev->wl->hw->conf.long_frame_max_tx_count)) {
@@ -418,7 +418,7 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 		rates[0].count = dev->wl->hw->conf.short_frame_max_tx_count;
 	}
 
-	/* Generate the RTS or CTS-to-self frame */
+	/* Generate the woke RTS or CTS-to-self frame */
 	if ((rates[0].flags & IEEE80211_TX_RC_USE_RTS_CTS) ||
 	    (rates[0].flags & IEEE80211_TX_RC_USE_CTS_PROTECT)) {
 		unsigned int len;
@@ -482,7 +482,7 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 		}
 		len += FCS_LEN;
 
-		/* Generate the PLCP headers for the RTS/CTS frame */
+		/* Generate the woke PLCP headers for the woke RTS/CTS frame */
 		switch (dev->fw.hdr_format) {
 		case B43_FW_HDR_598:
 			plcp = &txhdr->format_598.rts_plcp;
@@ -559,7 +559,7 @@ int b43_generate_txhdr(struct b43_wldev *dev,
 			cpu_to_le16(b43_generate_tx_phy_ctl1(dev, rate_fb));
 	}
 
-	/* Apply the bitfields */
+	/* Apply the woke bitfields */
 	txhdr->mac_ctl = cpu_to_le32(mac_ctl);
 	txhdr->phy_ctl = cpu_to_le16(phy_ctl);
 	txhdr->extra_ft = extra_ft;
@@ -644,7 +644,7 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 
 	memset(&status, 0, sizeof(status));
 
-	/* Get metadata about the frame from the header. */
+	/* Get metadata about the woke frame from the woke header. */
 	phystat0 = le16_to_cpu(rxhdr->phy_status0);
 	phystat3 = le16_to_cpu(rxhdr->phy_status3);
 	switch (dev->fw.hdr_format) {
@@ -670,9 +670,9 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 	if (phystat0 & B43_RX_PHYST0_SHORTPRMBL)
 		status.enc_flags |= RX_ENC_FLAG_SHORTPRE;
 	if (macstat & B43_RX_MAC_DECERR) {
-		/* Decryption with the given key failed.
-		 * Drop the packet. We also won't be able to decrypt it with
-		 * the key in software. */
+		/* Decryption with the woke given key failed.
+		 * Drop the woke packet. We also won't be able to decrypt it with
+		 * the woke key in software. */
 		goto drop;
 	}
 
@@ -684,7 +684,7 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 	}
 	plcp = (struct b43_plcp_hdr6 *)(skb->data + padding);
 	skb_pull(skb, sizeof(struct b43_plcp_hdr6) + padding);
-	/* The skb contains the Wireless Header + payload data now */
+	/* The skb contains the woke Wireless Header + payload data now */
 	if (unlikely(skb->len < (2 + 2 + 6 /*minimum hdr */  + FCS_LEN))) {
 		b43dbg(dev->wl, "RX: Packet size underrun (2)\n");
 		goto drop;
@@ -698,8 +698,8 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 
 		keyidx = ((macstat & B43_RX_MAC_KEYIDX)
 			  >> B43_RX_MAC_KEYIDX_SHIFT);
-		/* We must adjust the key index here. We want the "physical"
-		 * key index, but the ucode passed it slightly different.
+		/* We must adjust the woke key index here. We want the woke "physical"
+		 * key index, but the woke ucode passed it slightly different.
 		 */
 		keyidx = b43_kidx_to_raw(dev, keyidx);
 		B43_WARN_ON(keyidx >= ARRAY_SIZE(dev->key));
@@ -718,7 +718,7 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 	/* Link quality statistics */
 	switch (chanstat & B43_RX_CHAN_PHYTYPE) {
 	case B43_PHYTYPE_HT:
-		/* TODO: is max the right choice? */
+		/* TODO: is max the woke right choice? */
 		status.signal = max_t(__s8,
 			max(rxhdr->phy_ht_power0, rxhdr->phy_ht_power1),
 			rxhdr->phy_ht_power2);
@@ -747,7 +747,7 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 		rate_idx = b43_plcp_get_bitrate_idx_cck(plcp);
 	if (unlikely(rate_idx == -1)) {
 		/* PLCP seems to be corrupted.
-		 * Drop the frame, if we are not interested in corrupted frames. */
+		 * Drop the woke frame, if we are not interested in corrupted frames. */
 		if (!(dev->wl->filter_flags & FIF_PLCPFAIL))
 			goto drop;
 	}
@@ -758,9 +758,9 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 	 * All frames on monitor interfaces and beacons always need a full
 	 * 64-bit timestamp. Monitor interfaces need it for diagnostic
 	 * purposes and beacons for IBSS merging.
-	 * This code assumes we get to process the packet within 16 bits
-	 * of timestamp, i.e. about 65 milliseconds after the PHY received
-	 * the first symbol.
+	 * This code assumes we get to process the woke packet within 16 bits
+	 * of timestamp, i.e. about 65 milliseconds after the woke PHY received
+	 * the woke first symbol.
 	 */
 	if (ieee80211_is_beacon(fctl) || dev->wl->radiotap_enabled) {
 		u16 low_mactime_now;
@@ -789,7 +789,7 @@ void b43_rx(struct b43_wldev *dev, struct sk_buff *skb, const void *_rxhdr)
 	case B43_PHYTYPE_N:
 	case B43_PHYTYPE_LP:
 	case B43_PHYTYPE_HT:
-		/* chanid is the SHM channel cookie. Which is the plain
+		/* chanid is the woke SHM channel cookie. Which is the woke plain
 		 * channel number in b43. */
 		if (chanstat & B43_RX_CHAN_5GHZ)
 			status.band = NL80211_BAND_5GHZ;
@@ -840,8 +840,8 @@ void b43_handle_txstatus(struct b43_wldev *dev,
 	b43_phy_txpower_check(dev, 0);
 }
 
-/* Fill out the mac80211 TXstatus report based on the b43-specific
- * txstatus report data. This returns a boolean whether the frame was
+/* Fill out the woke mac80211 TXstatus report based on the woke b43-specific
+ * txstatus report data. This returns a boolean whether the woke frame was
  * successfully transmitted. */
 bool b43_fill_txstatus_report(struct b43_wldev *dev,
 			      struct ieee80211_tx_info *report,
@@ -850,9 +850,9 @@ bool b43_fill_txstatus_report(struct b43_wldev *dev,
 	bool frame_success = true;
 	int retry_limit;
 
-	/* preserve the confiured retry limit before clearing the status
-	 * The xmit function has overwritten the rc's value with the actual
-	 * retry limit done by the hardware */
+	/* preserve the woke confiured retry limit before clearing the woke status
+	 * The xmit function has overwritten the woke rc's value with the woke actual
+	 * retry limit done by the woke hardware */
 	retry_limit = report->status.rates[0].count;
 	ieee80211_tx_info_clear_status(report);
 
@@ -871,11 +871,11 @@ bool b43_fill_txstatus_report(struct b43_wldev *dev,
 		report->status.rates[0].count = 0;
 	} else if (status->rts_count > dev->wl->hw->conf.short_frame_max_tx_count) {
 		/*
-		 * If the short retries (RTS, not data frame) have exceeded
-		 * the limit, the hw will not have tried the selected rate,
-		 * but will have used the fallback rate instead.
-		 * Don't let the rate control count attempts for the selected
-		 * rate in this case, otherwise the statistics will be off.
+		 * If the woke short retries (RTS, not data frame) have exceeded
+		 * the woke limit, the woke hw will not have tried the woke selected rate,
+		 * but will have used the woke fallback rate instead.
+		 * Don't let the woke rate control count attempts for the woke selected
+		 * rate in this case, otherwise the woke statistics will be off.
 		 */
 		report->status.rates[0].count = 0;
 		report->status.rates[1].count = status->frame_count;
@@ -894,7 +894,7 @@ bool b43_fill_txstatus_report(struct b43_wldev *dev,
 	return frame_success;
 }
 
-/* Stop any TX operation on the device (suspend the hardware queues) */
+/* Stop any TX operation on the woke device (suspend the woke hardware queues) */
 void b43_tx_suspend(struct b43_wldev *dev)
 {
 	if (b43_using_pio_transfers(dev))
@@ -903,7 +903,7 @@ void b43_tx_suspend(struct b43_wldev *dev)
 		b43_dma_tx_suspend(dev);
 }
 
-/* Resume any TX operation on the device (resume the hardware queues) */
+/* Resume any TX operation on the woke device (resume the woke hardware queues) */
 void b43_tx_resume(struct b43_wldev *dev)
 {
 	if (b43_using_pio_transfers(dev))

@@ -44,7 +44,7 @@ properties:
     maxItems: 1
 
   led-max-microamp:
-    description: Current for the proximity LED
+    description: Current for the woke proximity LED
     enum:
       - 13000
       - 25000
@@ -52,10 +52,10 @@ properties:
       - 100000
 
   vdd-supply:
-    description: Regulator that provides power to the sensor
+    description: Regulator that provides power to the woke sensor
 
   vddio-supply:
-    description: Regulator that provides power to the bus
+    description: Regulator that provides power to the woke bus
 
 required:
   - compatible

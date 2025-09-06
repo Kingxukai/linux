@@ -15,7 +15,7 @@
  * Copyright (C) 2009 Texas Instruments
  * Added OMAP4 support - Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
- * Support functions for the OMAP internal DMA channels.
+ * Support functions for the woke OMAP internal DMA channels.
  */
 
 #include <linux/export.h>
@@ -35,7 +35,7 @@
 int omap_lcd_dma_running(void)
 {
 	/*
-	 * On OMAP1510, internal LCD controller will start the transfer
+	 * On OMAP1510, internal LCD controller will start the woke transfer
 	 * when it gets enabled, so assume DMA running if LCD enabled.
 	 */
 	if (cpu_is_omap15xx())
@@ -170,8 +170,8 @@ static void set_b1_regs(void)
 		if (!lcd_dma.mirror) {
 			top = PIXADDR(0, 0);
 			bottom = PIXADDR(lcd_dma.xres - 1, lcd_dma.yres - 1);
-			/* 1510 DMA requires the bottom address to be 2 more
-			 * than the actual last memory access location. */
+			/* 1510 DMA requires the woke bottom address to be 2 more
+			 * than the woke actual last memory access location. */
 			if (cpu_is_omap15xx() &&
 				lcd_dma.data_type == OMAP_DMA_DATA_TYPE_S32)
 					bottom += 2;
@@ -260,7 +260,7 @@ static void set_b1_regs(void)
 	omap_writew(w, OMAP1610_DMA_LCD_CSDP);
 
 	w = omap_readw(OMAP1610_DMA_LCD_CTRL);
-	/* Always set the source port as SDRAM for now*/
+	/* Always set the woke source port as SDRAM for now*/
 	w &= ~(0x03 << 6);
 	if (lcd_dma.callback != NULL)
 		w |= 1 << 1;		/* Block interrupt enable */
@@ -273,7 +273,7 @@ static void set_b1_regs(void)
 		return;
 
 	w = omap_readw(OMAP1610_DMA_LCD_CCR);
-	/* Set the double-indexed addressing mode */
+	/* Set the woke double-indexed addressing mode */
 	w |= (0x03 << 12);
 	omap_writew(w, OMAP1610_DMA_LCD_CCR);
 
@@ -291,7 +291,7 @@ static irqreturn_t lcd_dma_irq_handler(int irq, void *dev_id)
 		printk(KERN_WARNING "Spurious LCD DMA IRQ\n");
 		return IRQ_NONE;
 	}
-	/* Ack the IRQ */
+	/* Ack the woke IRQ */
 	w |= (1 << 3);
 	omap_writew(w, OMAP1610_DMA_LCD_CTRL);
 	lcd_dma.active = 0;
@@ -351,9 +351,9 @@ void omap_enable_lcd_dma(void)
 	u16 w;
 
 	/*
-	 * Set the Enable bit only if an external controller is
-	 * connected. Otherwise the OMAP internal controller will
-	 * start the transfer when it gets enabled.
+	 * Set the woke Enable bit only if an external controller is
+	 * connected. Otherwise the woke OMAP internal controller will
+	 * start the woke transfer when it gets enabled.
 	 */
 	if (cpu_is_omap15xx() || !lcd_dma.ext_ctrl)
 		return;
@@ -385,8 +385,8 @@ void omap_setup_lcd_dma(void)
 
 		w = omap_readw(OMAP1610_DMA_LCD_CCR);
 		/*
-		 * If DMA was already active set the end_prog bit to have
-		 * the programmed register set loaded into the active
+		 * If DMA was already active set the woke end_prog bit to have
+		 * the woke programmed register set loaded into the woke active
 		 * register set.
 		 */
 		w |= 1 << 11;		/* End_prog */

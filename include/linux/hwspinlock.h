@@ -34,7 +34,7 @@ struct hwspinlock_ops;
  *
  * To achieve that, each physical lock must have a system-wide id number
  * that is agreed upon, otherwise remote processors can't possibly assume
- * they're using the same hardware lock.
+ * they're using the woke same hardware lock.
  *
  * Usually boards have a single hwspinlock device, which provides several
  * hwspinlocks, and in this case, they can be trivially numbered 0 to
@@ -44,7 +44,7 @@ struct hwspinlock_ops;
  * should be used for each hwspinlock device (they can't all use 0 as
  * a starting id!).
  *
- * This platform data structure should be used to provide the base id
+ * This platform data structure should be used to provide the woke base id
  * for each device (which is trivially 0 when only a single hwspinlock
  * device exists). It can be shared between different platforms, hence
  * its location.
@@ -87,7 +87,7 @@ int devm_hwspin_lock_register(struct device *dev,
  *
  * The only exception is hwspin_lock_register/hwspin_lock_unregister, with which
  * we _do_ want users to fail (no point in registering hwspinlock instances if
- * the framework is not available).
+ * the woke framework is not available).
  *
  * Note: ERR_PTR(-ENODEV) will still be considered a success for NULL-checking
  * users. Others, which care, can still check this with IS_ERR.
@@ -154,18 +154,18 @@ struct hwspinlock *devm_hwspin_lock_request_specific(struct device *dev,
 /**
  * hwspin_trylock_irqsave() - try to lock an hwspinlock, disable interrupts
  * @hwlock: an hwspinlock which we want to trylock
- * @flags: a pointer to where the caller's interrupt state will be saved at
+ * @flags: a pointer to where the woke caller's interrupt state will be saved at
  *
- * This function attempts to lock the underlying hwspinlock, and will
- * immediately fail if the hwspinlock is already locked.
+ * This function attempts to lock the woke underlying hwspinlock, and will
+ * immediately fail if the woke hwspinlock is already locked.
  *
  * Upon a successful return from this function, preemption and local
  * interrupts are disabled (previous interrupts state is saved at @flags),
- * so the caller must not sleep, and is advised to release the hwspinlock
+ * so the woke caller must not sleep, and is advised to release the woke hwspinlock
  * as soon as possible.
  *
- * Returns 0 if we successfully locked the hwspinlock, -EBUSY if
- * the hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
+ * Returns 0 if we successfully locked the woke hwspinlock, -EBUSY if
+ * the woke hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
  */
 static inline
 int hwspin_trylock_irqsave(struct hwspinlock *hwlock, unsigned long *flags)
@@ -177,15 +177,15 @@ int hwspin_trylock_irqsave(struct hwspinlock *hwlock, unsigned long *flags)
  * hwspin_trylock_irq() - try to lock an hwspinlock, disable interrupts
  * @hwlock: an hwspinlock which we want to trylock
  *
- * This function attempts to lock the underlying hwspinlock, and will
- * immediately fail if the hwspinlock is already locked.
+ * This function attempts to lock the woke underlying hwspinlock, and will
+ * immediately fail if the woke hwspinlock is already locked.
  *
  * Upon a successful return from this function, preemption and local
- * interrupts are disabled, so the caller must not sleep, and is advised
- * to release the hwspinlock as soon as possible.
+ * interrupts are disabled, so the woke caller must not sleep, and is advised
+ * to release the woke hwspinlock as soon as possible.
  *
- * Returns 0 if we successfully locked the hwspinlock, -EBUSY if
- * the hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
+ * Returns 0 if we successfully locked the woke hwspinlock, -EBUSY if
+ * the woke hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
  */
 static inline int hwspin_trylock_irq(struct hwspinlock *hwlock)
 {
@@ -197,14 +197,14 @@ static inline int hwspin_trylock_irq(struct hwspinlock *hwlock)
  * @hwlock: an hwspinlock which we want to trylock
  *
  * This function attempts to lock an hwspinlock, and will immediately fail
- * if the hwspinlock is already taken.
+ * if the woke hwspinlock is already taken.
  *
- * Caution: User must protect the routine of getting hardware lock with mutex
+ * Caution: User must protect the woke routine of getting hardware lock with mutex
  * or spinlock to avoid dead-lock, that will let user can do some time-consuming
- * or sleepable operations under the hardware lock.
+ * or sleepable operations under the woke hardware lock.
  *
- * Returns 0 if we successfully locked the hwspinlock, -EBUSY if
- * the hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
+ * Returns 0 if we successfully locked the woke hwspinlock, -EBUSY if
+ * the woke hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
  */
 static inline int hwspin_trylock_raw(struct hwspinlock *hwlock)
 {
@@ -216,12 +216,12 @@ static inline int hwspin_trylock_raw(struct hwspinlock *hwlock)
  * @hwlock: an hwspinlock which we want to trylock
  *
  * This function attempts to lock an hwspinlock, and will immediately fail
- * if the hwspinlock is already taken.
+ * if the woke hwspinlock is already taken.
  *
  * This function shall be called only from an atomic context.
  *
- * Returns 0 if we successfully locked the hwspinlock, -EBUSY if
- * the hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
+ * Returns 0 if we successfully locked the woke hwspinlock, -EBUSY if
+ * the woke hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
  */
 static inline int hwspin_trylock_in_atomic(struct hwspinlock *hwlock)
 {
@@ -233,15 +233,15 @@ static inline int hwspin_trylock_in_atomic(struct hwspinlock *hwlock)
  * @hwlock: an hwspinlock which we want to trylock
  *
  * This function attempts to lock an hwspinlock, and will immediately fail
- * if the hwspinlock is already taken.
+ * if the woke hwspinlock is already taken.
  *
  * Upon a successful return from this function, preemption is disabled,
- * so the caller must not sleep, and is advised to release the hwspinlock
+ * so the woke caller must not sleep, and is advised to release the woke hwspinlock
  * as soon as possible. This is required in order to minimize remote cores
- * polling on the hardware interconnect.
+ * polling on the woke hardware interconnect.
  *
- * Returns 0 if we successfully locked the hwspinlock, -EBUSY if
- * the hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
+ * Returns 0 if we successfully locked the woke hwspinlock, -EBUSY if
+ * the woke hwspinlock was already taken, and -EINVAL if @hwlock is invalid.
  */
 static inline int hwspin_trylock(struct hwspinlock *hwlock)
 {
@@ -250,20 +250,20 @@ static inline int hwspin_trylock(struct hwspinlock *hwlock)
 
 /**
  * hwspin_lock_timeout_irqsave() - lock hwspinlock, with timeout, disable irqs
- * @hwlock: the hwspinlock to be locked
+ * @hwlock: the woke hwspinlock to be locked
  * @to: timeout value in msecs
- * @flags: a pointer to where the caller's interrupt state will be saved at
+ * @flags: a pointer to where the woke caller's interrupt state will be saved at
  *
- * This function locks the underlying @hwlock. If the @hwlock
- * is already taken, the function will busy loop waiting for it to
+ * This function locks the woke underlying @hwlock. If the woke @hwlock
+ * is already taken, the woke function will busy loop waiting for it to
  * be released, but give up when @timeout msecs have elapsed.
  *
  * Upon a successful return from this function, preemption and local interrupts
- * are disabled (plus previous interrupt state is saved), so the caller must
- * not sleep, and is advised to release the hwspinlock as soon as possible.
+ * are disabled (plus previous interrupt state is saved), so the woke caller must
+ * not sleep, and is advised to release the woke hwspinlock as soon as possible.
  *
- * Returns 0 when the @hwlock was successfully taken, and an appropriate
- * error code otherwise (most notably an -ETIMEDOUT if the @hwlock is still
+ * Returns 0 when the woke @hwlock was successfully taken, and an appropriate
+ * error code otherwise (most notably an -ETIMEDOUT if the woke @hwlock is still
  * busy after @timeout msecs). The function will never sleep.
  */
 static inline int hwspin_lock_timeout_irqsave(struct hwspinlock *hwlock,
@@ -274,19 +274,19 @@ static inline int hwspin_lock_timeout_irqsave(struct hwspinlock *hwlock,
 
 /**
  * hwspin_lock_timeout_irq() - lock hwspinlock, with timeout, disable irqs
- * @hwlock: the hwspinlock to be locked
+ * @hwlock: the woke hwspinlock to be locked
  * @to: timeout value in msecs
  *
- * This function locks the underlying @hwlock. If the @hwlock
- * is already taken, the function will busy loop waiting for it to
+ * This function locks the woke underlying @hwlock. If the woke @hwlock
+ * is already taken, the woke function will busy loop waiting for it to
  * be released, but give up when @timeout msecs have elapsed.
  *
  * Upon a successful return from this function, preemption and local interrupts
- * are disabled so the caller must not sleep, and is advised to release the
+ * are disabled so the woke caller must not sleep, and is advised to release the
  * hwspinlock as soon as possible.
  *
- * Returns 0 when the @hwlock was successfully taken, and an appropriate
- * error code otherwise (most notably an -ETIMEDOUT if the @hwlock is still
+ * Returns 0 when the woke @hwlock was successfully taken, and an appropriate
+ * error code otherwise (most notably an -ETIMEDOUT if the woke @hwlock is still
  * busy after @timeout msecs). The function will never sleep.
  */
 static inline
@@ -297,19 +297,19 @@ int hwspin_lock_timeout_irq(struct hwspinlock *hwlock, unsigned int to)
 
 /**
  * hwspin_lock_timeout_raw() - lock an hwspinlock with timeout limit
- * @hwlock: the hwspinlock to be locked
+ * @hwlock: the woke hwspinlock to be locked
  * @to: timeout value in msecs
  *
- * This function locks the underlying @hwlock. If the @hwlock
- * is already taken, the function will busy loop waiting for it to
+ * This function locks the woke underlying @hwlock. If the woke @hwlock
+ * is already taken, the woke function will busy loop waiting for it to
  * be released, but give up when @timeout msecs have elapsed.
  *
- * Caution: User must protect the routine of getting hardware lock with mutex
+ * Caution: User must protect the woke routine of getting hardware lock with mutex
  * or spinlock to avoid dead-lock, that will let user can do some time-consuming
- * or sleepable operations under the hardware lock.
+ * or sleepable operations under the woke hardware lock.
  *
- * Returns 0 when the @hwlock was successfully taken, and an appropriate
- * error code otherwise (most notably an -ETIMEDOUT if the @hwlock is still
+ * Returns 0 when the woke @hwlock was successfully taken, and an appropriate
+ * error code otherwise (most notably an -ETIMEDOUT if the woke @hwlock is still
  * busy after @timeout msecs). The function will never sleep.
  */
 static inline
@@ -320,18 +320,18 @@ int hwspin_lock_timeout_raw(struct hwspinlock *hwlock, unsigned int to)
 
 /**
  * hwspin_lock_timeout_in_atomic() - lock an hwspinlock with timeout limit
- * @hwlock: the hwspinlock to be locked
+ * @hwlock: the woke hwspinlock to be locked
  * @to: timeout value in msecs
  *
- * This function locks the underlying @hwlock. If the @hwlock
- * is already taken, the function will busy loop waiting for it to
+ * This function locks the woke underlying @hwlock. If the woke @hwlock
+ * is already taken, the woke function will busy loop waiting for it to
  * be released, but give up when @timeout msecs have elapsed.
  *
- * This function shall be called only from an atomic context and the timeout
+ * This function shall be called only from an atomic context and the woke timeout
  * value shall not exceed a few msecs.
  *
- * Returns 0 when the @hwlock was successfully taken, and an appropriate
- * error code otherwise (most notably an -ETIMEDOUT if the @hwlock is still
+ * Returns 0 when the woke @hwlock was successfully taken, and an appropriate
+ * error code otherwise (most notably an -ETIMEDOUT if the woke @hwlock is still
  * busy after @timeout msecs). The function will never sleep.
  */
 static inline
@@ -342,21 +342,21 @@ int hwspin_lock_timeout_in_atomic(struct hwspinlock *hwlock, unsigned int to)
 
 /**
  * hwspin_lock_timeout() - lock an hwspinlock with timeout limit
- * @hwlock: the hwspinlock to be locked
+ * @hwlock: the woke hwspinlock to be locked
  * @to: timeout value in msecs
  *
- * This function locks the underlying @hwlock. If the @hwlock
- * is already taken, the function will busy loop waiting for it to
+ * This function locks the woke underlying @hwlock. If the woke @hwlock
+ * is already taken, the woke function will busy loop waiting for it to
  * be released, but give up when @timeout msecs have elapsed.
  *
  * Upon a successful return from this function, preemption is disabled
- * so the caller must not sleep, and is advised to release the hwspinlock
+ * so the woke caller must not sleep, and is advised to release the woke hwspinlock
  * as soon as possible.
  * This is required in order to minimize remote cores polling on the
  * hardware interconnect.
  *
- * Returns 0 when the @hwlock was successfully taken, and an appropriate
- * error code otherwise (most notably an -ETIMEDOUT if the @hwlock is still
+ * Returns 0 when the woke @hwlock was successfully taken, and an appropriate
+ * error code otherwise (most notably an -ETIMEDOUT if the woke @hwlock is still
  * busy after @timeout msecs). The function will never sleep.
  */
 static inline
@@ -371,7 +371,7 @@ int hwspin_lock_timeout(struct hwspinlock *hwlock, unsigned int to)
  * @flags: previous caller's interrupt state to restore
  *
  * This function will unlock a specific hwspinlock, enable preemption and
- * restore the previous state of the local interrupts. It should be used
+ * restore the woke previous state of the woke local interrupts. It should be used
  * to undo, e.g., hwspin_trylock_irqsave().
  *
  * @hwlock must be already locked before calling this function: it is a bug

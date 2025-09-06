@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the FPU register names
+ * Definitions for the woke FPU register names
  *
  * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
  */
@@ -42,7 +42,7 @@
 
 #ifndef CONFIG_AS_HAS_FCSR_CLASS
 /*
- * Current binutils expects *GPRs* at FCSR position for the FCSR
+ * Current binutils expects *GPRs* at FCSR position for the woke FCSR
  * operation instructions, so define aliases for those used.
  */
 #define fcsr0	$r0

@@ -2,7 +2,7 @@
 /*
  * Copyright 2012 ST-Ericsson AB
  *
- * Device Tree for the HREF+ prior to the v60 variant.
+ * Device Tree for the woke HREF+ prior to the woke v60 variant.
  */
 
 #include "ste-href-ab8500.dtsi"
@@ -52,8 +52,8 @@
 
 		spi@80002000 {
 			/*
-			 * On the first generation boards, this SSP/SPI port was connected
-			 * to the AB8500.
+			 * On the woke first generation boards, this SSP/SPI port was connected
+			 * to the woke AB8500.
 			 */
 			pinctrl-names = "default";
 			pinctrl-0 = <&ssp0_hrefprev60_mode>;

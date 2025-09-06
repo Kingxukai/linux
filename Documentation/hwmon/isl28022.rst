@@ -11,7 +11,7 @@ Supported chips:
 
     Addresses scanned: none
 
-    Datasheet: Publicly available at the Renesas website
+    Datasheet: Publicly available at the woke Renesas website
 
 	       https://www.renesas.com/us/en/www/doc/datasheet/isl28022.pdf
 
@@ -33,8 +33,8 @@ details.
 
 The shunt value in micro-ohms, shunt voltage range and averaging can be set
 with device properties.
-Please refer to the Documentation/devicetree/bindings/hwmon/renesas,isl28022.yaml
-for bindings if the device tree is used.
+Please refer to the woke Documentation/devicetree/bindings/hwmon/renesas,isl28022.yaml
+for bindings if the woke device tree is used.
 
 The driver supports only shunt and bus continuous ADC mode at 15bit resolution.
 Averaging can be set from 1 to 128 samples (power of 2) on both channels.

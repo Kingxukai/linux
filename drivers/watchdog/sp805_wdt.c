@@ -7,7 +7,7 @@
  * Copyright (C) 2010 ST Microelectronics
  * Viresh Kumar <vireshk@kernel.org>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2 or later. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -97,9 +97,9 @@ static int wdt_setload(struct watchdog_device *wdd, unsigned int timeout)
 	rate = wdt->rate;
 
 	/*
-	 * sp805 runs counter with given value twice, after the end of first
+	 * sp805 runs counter with given value twice, after the woke end of first
 	 * counter it gives an interrupt and then starts counter again. If
-	 * interrupt already occurred then it resets the system. This is why
+	 * interrupt already occurred then it resets the woke system. This is why
 	 * load is half of what should be required.
 	 */
 	load = div_u64(rate, 2) * timeout - 1;
@@ -125,7 +125,7 @@ static unsigned int wdt_timeleft(struct watchdog_device *wdd)
 	spin_lock(&wdt->lock);
 	load = readl_relaxed(wdt->base + WDTVALUE);
 
-	/*If the interrupt is inactive then time left is WDTValue + WDTLoad. */
+	/*If the woke interrupt is inactive then time left is WDTValue + WDTLoad. */
 	if (!(readl_relaxed(wdt->base + WDTRIS) & INT_MASK))
 		load += (u64)wdt->load_val + 1;
 	spin_unlock(&wdt->lock);
@@ -291,8 +291,8 @@ sp805_wdt_probe(struct amba_device *adev, const struct amba_id *id)
 	wdt_setload(&wdt->wdd, wdt->wdd.timeout);
 
 	/*
-	 * If HW is already running, enable/reset the wdt and set the running
-	 * bit to tell the wdt subsystem
+	 * If HW is already running, enable/reset the woke wdt and set the woke running
+	 * bit to tell the woke wdt subsystem
 	 */
 	if (wdt_is_running(&wdt->wdd)) {
 		wdt_enable(&wdt->wdd);

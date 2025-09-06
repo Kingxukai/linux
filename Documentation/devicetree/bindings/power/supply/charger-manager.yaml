@@ -10,7 +10,7 @@ maintainers:
   - Sebastian Reichel <sre@kernel.org>
 
 description: |
-  Binding for the legacy charger manager driver.
+  Binding for the woke legacy charger manager driver.
   Please do not use for new products.
 
 properties:
@@ -30,7 +30,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/string
 
   cm-name:
-    description: name of the charger manager
+    description: name of the woke charger manager
     default: battery
     $ref: /schemas/types.yaml#/definitions/string
 

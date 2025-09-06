@@ -5,7 +5,7 @@
         "EventCode": "0x1",
         "EventName": "UNC_R2_CLOCKTICKS",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of uclks in the R2PCIe uclk domain.  This could be slightly different than the count in the Ubox because of enable/freeze delays.  However, because the R2PCIe is close to the Ubox, they generally should not diverge by more than a handful of cycles.",
+        "PublicDescription": "Counts the woke number of uclks in the woke R2PCIe uclk domain.  This could be slightly different than the woke count in the woke Ubox because of enable/freeze delays.  However, because the woke R2PCIe is close to the woke Ubox, they generally should not diverge by more than a handful of cycles.",
         "Unit": "R2PCIe"
     },
     {
@@ -50,7 +50,7 @@
         "EventCode": "0x33",
         "EventName": "UNC_R2_IIO_CREDITS_ACQUIRED.DRS",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of credits that are acquired in the R2PCIe agent for sending transactions into the IIO on either NCB or NCS are in use.  Transactions from the BL ring going into the IIO Agent must first acquire a credit.  These credits are for either the NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the IIO for the DRS message class.",
+        "PublicDescription": "Counts the woke number of credits that are acquired in the woke R2PCIe agent for sending transactions into the woke IIO on either NCB or NCS are in use.  Transactions from the woke BL ring going into the woke IIO Agent must first acquire a credit.  These credits are for either the woke NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the woke IIO for the woke DRS message class.",
         "UMask": "0x8",
         "Unit": "R2PCIe"
     },
@@ -60,7 +60,7 @@
         "EventCode": "0x33",
         "EventName": "UNC_R2_IIO_CREDITS_ACQUIRED.NCB",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of credits that are acquired in the R2PCIe agent for sending transactions into the IIO on either NCB or NCS are in use.  Transactions from the BL ring going into the IIO Agent must first acquire a credit.  These credits are for either the NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the IIO for the NCB message class.",
+        "PublicDescription": "Counts the woke number of credits that are acquired in the woke R2PCIe agent for sending transactions into the woke IIO on either NCB or NCS are in use.  Transactions from the woke BL ring going into the woke IIO Agent must first acquire a credit.  These credits are for either the woke NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the woke IIO for the woke NCB message class.",
         "UMask": "0x10",
         "Unit": "R2PCIe"
     },
@@ -70,7 +70,7 @@
         "EventCode": "0x33",
         "EventName": "UNC_R2_IIO_CREDITS_ACQUIRED.NCS",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of credits that are acquired in the R2PCIe agent for sending transactions into the IIO on either NCB or NCS are in use.  Transactions from the BL ring going into the IIO Agent must first acquire a credit.  These credits are for either the NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the IIO for the NCS message class.",
+        "PublicDescription": "Counts the woke number of credits that are acquired in the woke R2PCIe agent for sending transactions into the woke IIO on either NCB or NCS are in use.  Transactions from the woke BL ring going into the woke IIO Agent must first acquire a credit.  These credits are for either the woke NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the woke IIO for the woke NCS message class.",
         "UMask": "0x20",
         "Unit": "R2PCIe"
     },
@@ -80,7 +80,7 @@
         "EventCode": "0x32",
         "EventName": "UNC_R2_IIO_CREDITS_USED.DRS",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when one or more credits in the R2PCIe agent for sending transactions into the IIO on either NCB or NCS are in use.  Transactions from the BL ring going into the IIO Agent must first acquire a credit.  These credits are for either the NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the IIO for the DRS message class.",
+        "PublicDescription": "Counts the woke number of cycles when one or more credits in the woke R2PCIe agent for sending transactions into the woke IIO on either NCB or NCS are in use.  Transactions from the woke BL ring going into the woke IIO Agent must first acquire a credit.  These credits are for either the woke NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the woke IIO for the woke DRS message class.",
         "UMask": "0x8",
         "Unit": "R2PCIe"
     },
@@ -90,7 +90,7 @@
         "EventCode": "0x32",
         "EventName": "UNC_R2_IIO_CREDITS_USED.NCB",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when one or more credits in the R2PCIe agent for sending transactions into the IIO on either NCB or NCS are in use.  Transactions from the BL ring going into the IIO Agent must first acquire a credit.  These credits are for either the NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the IIO for the NCB message class.",
+        "PublicDescription": "Counts the woke number of cycles when one or more credits in the woke R2PCIe agent for sending transactions into the woke IIO on either NCB or NCS are in use.  Transactions from the woke BL ring going into the woke IIO Agent must first acquire a credit.  These credits are for either the woke NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the woke IIO for the woke NCB message class.",
         "UMask": "0x10",
         "Unit": "R2PCIe"
     },
@@ -100,7 +100,7 @@
         "EventCode": "0x32",
         "EventName": "UNC_R2_IIO_CREDITS_USED.NCS",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when one or more credits in the R2PCIe agent for sending transactions into the IIO on either NCB or NCS are in use.  Transactions from the BL ring going into the IIO Agent must first acquire a credit.  These credits are for either the NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the IIO for the NCS message class.",
+        "PublicDescription": "Counts the woke number of cycles when one or more credits in the woke R2PCIe agent for sending transactions into the woke IIO on either NCB or NCS are in use.  Transactions from the woke BL ring going into the woke IIO Agent must first acquire a credit.  These credits are for either the woke NCB or NCS message classes.  NCB, or non-coherent bypass messages are used to transmit data without coherency (and are common).  NCS is used for reads to PCIe (and should be used sparingly).; Credits to the woke IIO for the woke NCS message class.",
         "UMask": "0x20",
         "Unit": "R2PCIe"
     },
@@ -110,7 +110,7 @@
         "EventCode": "0x7",
         "EventName": "UNC_R2_RING_AD_USED.ALL",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0xf",
         "Unit": "R2PCIe"
     },
@@ -120,7 +120,7 @@
         "EventCode": "0x7",
         "EventName": "UNC_R2_RING_AD_USED.CCW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0xc",
         "Unit": "R2PCIe"
     },
@@ -130,7 +130,7 @@
         "EventCode": "0x7",
         "EventName": "UNC_R2_RING_AD_USED.CCW_EVEN",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Counterclockwise and Even ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Counterclockwise and Even ring polarity.",
         "UMask": "0x4",
         "Unit": "R2PCIe"
     },
@@ -140,7 +140,7 @@
         "EventCode": "0x7",
         "EventName": "UNC_R2_RING_AD_USED.CCW_ODD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Counterclockwise and Odd ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Counterclockwise and Odd ring polarity.",
         "UMask": "0x8",
         "Unit": "R2PCIe"
     },
@@ -150,7 +150,7 @@
         "EventCode": "0x7",
         "EventName": "UNC_R2_RING_AD_USED.CW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0x3",
         "Unit": "R2PCIe"
     },
@@ -160,7 +160,7 @@
         "EventCode": "0x7",
         "EventName": "UNC_R2_RING_AD_USED.CW_EVEN",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Clockwise and Even ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Clockwise and Even ring polarity.",
         "UMask": "0x1",
         "Unit": "R2PCIe"
     },
@@ -170,7 +170,7 @@
         "EventCode": "0x7",
         "EventName": "UNC_R2_RING_AD_USED.CW_ODD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Clockwise and Odd ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AD ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Clockwise and Odd ring polarity.",
         "UMask": "0x2",
         "Unit": "R2PCIe"
     },
@@ -180,7 +180,7 @@
         "EventCode": "0x12",
         "EventName": "UNC_R2_RING_AK_BOUNCES.DN",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of times when a request destined for the AK ingress bounced.",
+        "PublicDescription": "Counts the woke number of times when a request destined for the woke AK ingress bounced.",
         "UMask": "0x2",
         "Unit": "R2PCIe"
     },
@@ -190,7 +190,7 @@
         "EventCode": "0x12",
         "EventName": "UNC_R2_RING_AK_BOUNCES.UP",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of times when a request destined for the AK ingress bounced.",
+        "PublicDescription": "Counts the woke number of times when a request destined for the woke AK ingress bounced.",
         "UMask": "0x1",
         "Unit": "R2PCIe"
     },
@@ -200,7 +200,7 @@
         "EventCode": "0x8",
         "EventName": "UNC_R2_RING_AK_USED.ALL",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0xf",
         "Unit": "R2PCIe"
     },
@@ -210,7 +210,7 @@
         "EventCode": "0x8",
         "EventName": "UNC_R2_RING_AK_USED.CCW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0xc",
         "Unit": "R2PCIe"
     },
@@ -220,7 +220,7 @@
         "EventCode": "0x8",
         "EventName": "UNC_R2_RING_AK_USED.CCW_EVEN",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Counterclockwise and Even ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Counterclockwise and Even ring polarity.",
         "UMask": "0x4",
         "Unit": "R2PCIe"
     },
@@ -230,7 +230,7 @@
         "EventCode": "0x8",
         "EventName": "UNC_R2_RING_AK_USED.CCW_ODD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Counterclockwise and Odd ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Counterclockwise and Odd ring polarity.",
         "UMask": "0x8",
         "Unit": "R2PCIe"
     },
@@ -240,7 +240,7 @@
         "EventCode": "0x8",
         "EventName": "UNC_R2_RING_AK_USED.CW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0x3",
         "Unit": "R2PCIe"
     },
@@ -250,7 +250,7 @@
         "EventCode": "0x8",
         "EventName": "UNC_R2_RING_AK_USED.CW_EVEN",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Clockwise and Even ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Clockwise and Even ring polarity.",
         "UMask": "0x1",
         "Unit": "R2PCIe"
     },
@@ -260,7 +260,7 @@
         "EventCode": "0x8",
         "EventName": "UNC_R2_RING_AK_USED.CW_ODD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Clockwise and Odd ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke AK ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Clockwise and Odd ring polarity.",
         "UMask": "0x2",
         "Unit": "R2PCIe"
     },
@@ -270,7 +270,7 @@
         "EventCode": "0x9",
         "EventName": "UNC_R2_RING_BL_USED.ALL",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0xf",
         "Unit": "R2PCIe"
     },
@@ -280,7 +280,7 @@
         "EventCode": "0x9",
         "EventName": "UNC_R2_RING_BL_USED.CCW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0xc",
         "Unit": "R2PCIe"
     },
@@ -290,7 +290,7 @@
         "EventCode": "0x9",
         "EventName": "UNC_R2_RING_BL_USED.CCW_EVEN",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Counterclockwise and Even ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Counterclockwise and Even ring polarity.",
         "UMask": "0x4",
         "Unit": "R2PCIe"
     },
@@ -300,7 +300,7 @@
         "EventCode": "0x9",
         "EventName": "UNC_R2_RING_BL_USED.CCW_ODD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Counterclockwise and Odd ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Counterclockwise and Odd ring polarity.",
         "UMask": "0x8",
         "Unit": "R2PCIe"
     },
@@ -310,7 +310,7 @@
         "EventCode": "0x9",
         "EventName": "UNC_R2_RING_BL_USED.CW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.",
         "UMask": "0x3",
         "Unit": "R2PCIe"
     },
@@ -320,7 +320,7 @@
         "EventCode": "0x9",
         "EventName": "UNC_R2_RING_BL_USED.CW_EVEN",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Clockwise and Even ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Clockwise and Even ring polarity.",
         "UMask": "0x1",
         "Unit": "R2PCIe"
     },
@@ -330,7 +330,7 @@
         "EventCode": "0x9",
         "EventName": "UNC_R2_RING_BL_USED.CW_ODD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the ring stop.; Filters for the Clockwise and Odd ring polarity.",
+        "PublicDescription": "Counts the woke number of cycles that the woke BL ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sunk, but does not include when packets are being sent from the woke ring stop.; Filters for the woke Clockwise and Odd ring polarity.",
         "UMask": "0x2",
         "Unit": "R2PCIe"
     },
@@ -340,7 +340,7 @@
         "EventCode": "0xA",
         "EventName": "UNC_R2_RING_IV_USED.ANY",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the IV ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sent, but does not include when packets are being sunk into the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke IV ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sent, but does not include when packets are being sunk into the woke ring stop.",
         "UMask": "0xf",
         "Unit": "R2PCIe"
     },
@@ -350,7 +350,7 @@
         "EventCode": "0xA",
         "EventName": "UNC_R2_RING_IV_USED.CCW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the IV ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sent, but does not include when packets are being sunk into the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke IV ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sent, but does not include when packets are being sunk into the woke ring stop.",
         "UMask": "0xc",
         "Unit": "R2PCIe"
     },
@@ -360,7 +360,7 @@
         "EventCode": "0xA",
         "EventName": "UNC_R2_RING_IV_USED.CW",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles that the IV ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sent, but does not include when packets are being sunk into the ring stop.",
+        "PublicDescription": "Counts the woke number of cycles that the woke IV ring is being used at this ring stop.  This includes when packets are passing by and when packets are being sent, but does not include when packets are being sunk into the woke ring stop.",
         "UMask": "0x3",
         "Unit": "R2PCIe"
     },
@@ -370,7 +370,7 @@
         "EventCode": "0x10",
         "EventName": "UNC_R2_RxR_CYCLES_NE.NCB",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Ingress is not empty.  This tracks one of the three rings that are used by the R2PCIe agent.  This can be used in conjunction with the R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue occupancy.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCB Ingress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Ingress is not empty.  This tracks one of the woke three rings that are used by the woke R2PCIe agent.  This can be used in conjunction with the woke R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue occupancy.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCB Ingress Queue",
         "UMask": "0x10",
         "Unit": "R2PCIe"
     },
@@ -380,7 +380,7 @@
         "EventCode": "0x10",
         "EventName": "UNC_R2_RxR_CYCLES_NE.NCS",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Ingress is not empty.  This tracks one of the three rings that are used by the R2PCIe agent.  This can be used in conjunction with the R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue occupancy.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCS Ingress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Ingress is not empty.  This tracks one of the woke three rings that are used by the woke R2PCIe agent.  This can be used in conjunction with the woke R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue occupancy.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCS Ingress Queue",
         "UMask": "0x20",
         "Unit": "R2PCIe"
     },
@@ -390,7 +390,7 @@
         "EventCode": "0x11",
         "EventName": "UNC_R2_RxR_INSERTS.NCB",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of allocations into the R2PCIe Ingress.  This tracks one of the three rings that are used by the R2PCIe agent.  This can be used in conjunction with the R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue latency.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCB Ingress Queue",
+        "PublicDescription": "Counts the woke number of allocations into the woke R2PCIe Ingress.  This tracks one of the woke three rings that are used by the woke R2PCIe agent.  This can be used in conjunction with the woke R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue latency.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCB Ingress Queue",
         "UMask": "0x10",
         "Unit": "R2PCIe"
     },
@@ -400,7 +400,7 @@
         "EventCode": "0x11",
         "EventName": "UNC_R2_RxR_INSERTS.NCS",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of allocations into the R2PCIe Ingress.  This tracks one of the three rings that are used by the R2PCIe agent.  This can be used in conjunction with the R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue latency.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCS Ingress Queue",
+        "PublicDescription": "Counts the woke number of allocations into the woke R2PCIe Ingress.  This tracks one of the woke three rings that are used by the woke R2PCIe agent.  This can be used in conjunction with the woke R2PCIe Ingress Occupancy Accumulator event in order to calculate average queue latency.  Multiple ingress buffers can be tracked at a given time using multiple counters.; NCS Ingress Queue",
         "UMask": "0x20",
         "Unit": "R2PCIe"
     },
@@ -410,7 +410,7 @@
         "EventCode": "0x13",
         "EventName": "UNC_R2_RxR_OCCUPANCY.DRS",
         "PerPkg": "1",
-        "PublicDescription": "Accumulates the occupancy of a given R2PCIe Ingress queue in each cycles.  This tracks one of the three ring Ingress buffers.  This can be used with the R2PCIe Ingress Not Empty event to calculate average occupancy or the R2PCIe Ingress Allocations event in order to calculate average queuing latency.; DRS Ingress Queue",
+        "PublicDescription": "Accumulates the woke occupancy of a given R2PCIe Ingress queue in each cycles.  This tracks one of the woke three ring Ingress buffers.  This can be used with the woke R2PCIe Ingress Not Empty event to calculate average occupancy or the woke R2PCIe Ingress Allocations event in order to calculate average queuing latency.; DRS Ingress Queue",
         "UMask": "0x8",
         "Unit": "R2PCIe"
     },
@@ -500,7 +500,7 @@
         "EventCode": "0x25",
         "EventName": "UNC_R2_TxR_CYCLES_FULL.AD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Egress buffer is full.; AD Egress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Egress buffer is full.; AD Egress Queue",
         "UMask": "0x1",
         "Unit": "R2PCIe"
     },
@@ -510,7 +510,7 @@
         "EventCode": "0x25",
         "EventName": "UNC_R2_TxR_CYCLES_FULL.AK",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Egress buffer is full.; AK Egress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Egress buffer is full.; AK Egress Queue",
         "UMask": "0x2",
         "Unit": "R2PCIe"
     },
@@ -520,7 +520,7 @@
         "EventCode": "0x25",
         "EventName": "UNC_R2_TxR_CYCLES_FULL.BL",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Egress buffer is full.; BL Egress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Egress buffer is full.; BL Egress Queue",
         "UMask": "0x4",
         "Unit": "R2PCIe"
     },
@@ -530,7 +530,7 @@
         "EventCode": "0x23",
         "EventName": "UNC_R2_TxR_CYCLES_NE.AD",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Egress is not empty.  This tracks one of the three rings that are used by the R2PCIe agent.  This can be used in conjunction with the R2PCIe Egress Occupancy Accumulator event in order to calculate average queue occupancy.  Only a single Egress queue can be tracked at any given time.  It is not possible to filter based on direction or polarity.; AD Egress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Egress is not empty.  This tracks one of the woke three rings that are used by the woke R2PCIe agent.  This can be used in conjunction with the woke R2PCIe Egress Occupancy Accumulator event in order to calculate average queue occupancy.  Only a single Egress queue can be tracked at any given time.  It is not possible to filter based on direction or polarity.; AD Egress Queue",
         "UMask": "0x1",
         "Unit": "R2PCIe"
     },
@@ -540,7 +540,7 @@
         "EventCode": "0x23",
         "EventName": "UNC_R2_TxR_CYCLES_NE.AK",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Egress is not empty.  This tracks one of the three rings that are used by the R2PCIe agent.  This can be used in conjunction with the R2PCIe Egress Occupancy Accumulator event in order to calculate average queue occupancy.  Only a single Egress queue can be tracked at any given time.  It is not possible to filter based on direction or polarity.; AK Egress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Egress is not empty.  This tracks one of the woke three rings that are used by the woke R2PCIe agent.  This can be used in conjunction with the woke R2PCIe Egress Occupancy Accumulator event in order to calculate average queue occupancy.  Only a single Egress queue can be tracked at any given time.  It is not possible to filter based on direction or polarity.; AK Egress Queue",
         "UMask": "0x2",
         "Unit": "R2PCIe"
     },
@@ -550,7 +550,7 @@
         "EventCode": "0x23",
         "EventName": "UNC_R2_TxR_CYCLES_NE.BL",
         "PerPkg": "1",
-        "PublicDescription": "Counts the number of cycles when the R2PCIe Egress is not empty.  This tracks one of the three rings that are used by the R2PCIe agent.  This can be used in conjunction with the R2PCIe Egress Occupancy Accumulator event in order to calculate average queue occupancy.  Only a single Egress queue can be tracked at any given time.  It is not possible to filter based on direction or polarity.; BL Egress Queue",
+        "PublicDescription": "Counts the woke number of cycles when the woke R2PCIe Egress is not empty.  This tracks one of the woke three rings that are used by the woke R2PCIe agent.  This can be used in conjunction with the woke R2PCIe Egress Occupancy Accumulator event in order to calculate average queue occupancy.  Only a single Egress queue can be tracked at any given time.  It is not possible to filter based on direction or polarity.; BL Egress Queue",
         "UMask": "0x4",
         "Unit": "R2PCIe"
     },

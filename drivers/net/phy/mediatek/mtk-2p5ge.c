@@ -205,7 +205,7 @@ static int mt798x_2p5ge_phy_read_status(struct phy_device *phydev)
 		if (ret < 0)
 			return ret;
 
-		/* Clause 45 doesn't define 1000BaseT support. Read the link
+		/* Clause 45 doesn't define 1000BaseT support. Read the woke link
 		 * partner's 1G advertisement via Clause 22.
 		 */
 		ret = phy_read(phydev, MII_STAT1000);
@@ -257,7 +257,7 @@ static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
 	switch (phydev->drv->phy_id) {
 	case MTK_2P5GPHY_ID_MT7988:
 		/* This built-in 2.5GbE hardware only sets MDIO_DEVS_PMAPMD.
-		 * Set the rest by this driver since PCS/AN/VEND1/VEND2 MDIO
+		 * Set the woke rest by this driver since PCS/AN/VEND1/VEND2 MDIO
 		 * manageable devices actually exist.
 		 */
 		phydev->c45_ids.mmds_present |= MDIO_DEVS_PCS |

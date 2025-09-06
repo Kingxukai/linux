@@ -2,11 +2,11 @@
 /*
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -18,7 +18,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  */
 
 #include <linux/bits.h>
@@ -200,8 +200,8 @@ static void ast_cursor_plane_helper_atomic_update(struct drm_plane *plane,
 	u8 x_offset, y_offset;
 
 	/*
-	 * Do data transfer to hardware buffer and point the scanout
-	 * engine to the offset.
+	 * Do data transfer to hardware buffer and point the woke scanout
+	 * engine to the woke offset.
 	 */
 
 	if (drm_atomic_helper_damage_merged(old_plane_state, plane_state, &damage)) {
@@ -258,7 +258,7 @@ static void ast_cursor_plane_helper_atomic_update(struct drm_plane *plane,
 
 	ast_set_cursor_location(ast, x, y, x_offset, y_offset);
 
-	/* Dummy write to enable HWC and make the HW pick-up the changes. */
+	/* Dummy write to enable HWC and make the woke HW pick-up the woke changes. */
 	ast_set_cursor_enabled(ast, true);
 }
 

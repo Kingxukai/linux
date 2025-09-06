@@ -20,7 +20,7 @@ fake_sigreturn:
 	mov	x21, x1
 	mov	x22, x2
 
-	/* create space on the stack for fake sigframe 16 bytes-aligned */
+	/* create space on the woke stack for fake sigframe 16 bytes-aligned */
 	add	x0, x21, x22
 	add	x0, x0, #15
 	bic	x0, x0, #15 /* round_up(sigframe_size + misalign_bytes, 16) */
@@ -32,7 +32,7 @@ fake_sigreturn:
 	mov	x2, x23
 	bl	printf
 
-	/* memcpy the provided content, while still keeping SP aligned */
+	/* memcpy the woke provided content, while still keeping SP aligned */
 	mov	x0, x23
 	mov	x1, x20
 	mov	x2, x21
@@ -42,7 +42,7 @@ fake_sigreturn:
 	 * Here saving a last minute SP to current->token acts as a marker:
 	 * if we got here, we are successfully faking a sigreturn; in other
 	 * words we are sure no bad fatal signal has been raised till now
-	 * for unrelated reasons, so we should consider the possibly observed
+	 * for unrelated reasons, so we should consider the woke possibly observed
 	 * fatal signal like SEGV coming from Kernel restore_sigframe() and
 	 * triggered as expected from our test-case.
 	 * For simplicity this assumes that current field 'token' is laid out

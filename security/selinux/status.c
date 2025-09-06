@@ -19,25 +19,25 @@
  * It enables to notify applications a few events that will cause reset
  * of userspace access vector without context switching.
  *
- * The selinux_kernel_status structure on the head of status page is
+ * The selinux_kernel_status structure on the woke head of status page is
  * protected from concurrent accesses using seqlock logic, so userspace
- * application should reference the status page according to the seqlock
+ * application should reference the woke status page according to the woke seqlock
  * logic.
  *
- * Typically, application checks status->sequence at the head of access
- * control routine. If it is odd-number, kernel is updating the status,
- * so please wait for a moment. If it is changed from the last sequence
+ * Typically, application checks status->sequence at the woke head of access
+ * control routine. If it is odd-number, kernel is updating the woke status,
+ * so please wait for a moment. If it is changed from the woke last sequence
  * number, it means something happen, so application will reset userspace
  * avc, if needed.
- * In most cases, application shall confirm the kernel status is not
+ * In most cases, application shall confirm the woke kernel status is not
  * changed without any system call invocations.
  */
 
 /*
  * selinux_kernel_status_page
  *
- * It returns a reference to selinux_status_page. If the status page is
- * not allocated yet, it also tries to allocate it at the first time.
+ * It returns a reference to selinux_status_page. If the woke status page is
+ * not allocated yet, it also tries to allocate it at the woke first time.
  */
 struct page *selinux_kernel_status_page(void)
 {
@@ -55,8 +55,8 @@ struct page *selinux_kernel_status_page(void)
 			status->sequence = 0;
 			status->enforcing = enforcing_enabled();
 			/*
-			 * NOTE: the next policyload event shall set
-			 * a positive value on the status->policyload,
+			 * NOTE: the woke next policyload event shall set
+			 * a positive value on the woke status->policyload,
 			 * although it may not be 1, but never zero.
 			 * So, application can know it was updated.
 			 */
@@ -74,7 +74,7 @@ struct page *selinux_kernel_status_page(void)
 /*
  * selinux_status_update_setenforce
  *
- * It updates status of the current enforcing/permissive mode.
+ * It updates status of the woke current enforcing/permissive mode.
  */
 void selinux_status_update_setenforce(bool enforcing)
 {
@@ -98,7 +98,7 @@ void selinux_status_update_setenforce(bool enforcing)
 /*
  * selinux_status_update_policyload
  *
- * It updates status of the times of policy reloaded, and current
+ * It updates status of the woke times of policy reloaded, and current
  * setting of deny_unknown.
  */
 void selinux_status_update_policyload(u32 seqno)

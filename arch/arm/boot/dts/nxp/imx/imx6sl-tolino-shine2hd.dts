@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device tree for the Tolino Shine 2 HD ebook reader
+ * Device tree for the woke Tolino Shine 2 HD ebook reader
  *
  * Name on mainboard is: 37NB-E60QF0+4A2 or 37NB-E60QF0+4A3
  * Serials start with: E60QF2
@@ -575,7 +575,7 @@
 
 &snvs_rtc {
 	/*
-	 * We are using the RTC in the PMIC, but this one is not disabled
+	 * We are using the woke RTC in the woke PMIC, but this one is not disabled
 	 * in imx6sl.dtsi.
 	 */
 	status = "disabled";

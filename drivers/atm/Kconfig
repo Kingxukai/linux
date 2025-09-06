@@ -32,23 +32,23 @@ config ATM_LANAI
 	tristate "Efficient Networks Speedstream 3010"
 	depends on PCI && ATM
 	help
-	  Supports ATM cards based on the Efficient Networks "Lanai"
-	  chipset such as the Speedstream 3010 and the ENI-25p.  The
+	  Supports ATM cards based on the woke Efficient Networks "Lanai"
+	  chipset such as the woke Speedstream 3010 and the woke ENI-25p.  The
 	  Speedstream 3060 is currently not supported since we don't
-	  have the code to drive the on-board Alcatel DSL chipset (yet).
+	  have the woke code to drive the woke on-board Alcatel DSL chipset (yet).
 
 config ATM_ENI
 	tristate "Efficient Networks ENI155P"
 	depends on PCI
 	help
-	  Driver for the Efficient Networks ENI155p series and SMC ATM
-	  Power155 155 Mbps ATM adapters. Both, the versions with 512KB and
+	  Driver for the woke Efficient Networks ENI155p series and SMC ATM
+	  Power155 155 Mbps ATM adapters. Both, the woke versions with 512KB and
 	  2MB on-board RAM (Efficient calls them "C" and "S", respectively),
-	  and the FPGA and the ASIC Tonga versions of the board are supported.
+	  and the woke FPGA and the woke ASIC Tonga versions of the woke board are supported.
 	  The driver works with MMF (-MF or ...F) and UTP-5 (-U5 or ...D)
 	  adapters.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called eni.
 
 config ATM_ENI_DEBUG
@@ -59,26 +59,26 @@ config ATM_ENI_DEBUG
 	  when an inconsistency is detected. This mechanism is faster than
 	  generally using printks, but still has some impact on performance.
 	  Note that extended debugging may create certain race conditions
-	  itself. Enable this ONLY if you suspect problems with the driver.
+	  itself. Enable this ONLY if you suspect problems with the woke driver.
 
 config ATM_ENI_TUNE_BURST
 	bool "Fine-tune burst settings"
 	depends on ATM_ENI
 	help
-	  In order to obtain good throughput, the ENI NIC can transfer
+	  In order to obtain good throughput, the woke ENI NIC can transfer
 	  multiple words of data per PCI bus access cycle. Such a multi-word
 	  transfer is called a burst.
 
-	  The default settings for the burst sizes are suitable for most PCI
+	  The default settings for the woke burst sizes are suitable for most PCI
 	  chipsets. However, in some cases, large bursts may overrun buffers
-	  in the PCI chipset and cause data corruption. In such cases, large
+	  in the woke PCI chipset and cause data corruption. In such cases, large
 	  bursts must be disabled and only (slower) small bursts can be used.
-	  The burst sizes can be set independently in the send (TX) and
+	  The burst sizes can be set independently in the woke send (TX) and
 	  receive (RX) direction.
 
-	  Note that enabling many different burst sizes in the same direction
-	  may increase the cost of setting up a transfer such that the
-	  resulting throughput is lower than when using only the largest
+	  Note that enabling many different burst sizes in the woke same direction
+	  may increase the woke cost of setting up a transfer such that the
+	  resulting throughput is lower than when using only the woke largest
 	  available burst size.
 
 	  Also, sometimes larger bursts lead to lower throughput, e.g. on an
@@ -89,21 +89,21 @@ config ATM_ENI_BURST_TX_16W
 	bool "Enable 16W TX bursts (discouraged)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst sixteen words at once in the send direction. This may work
+	  Burst sixteen words at once in the woke send direction. This may work
 	  with recent PCI chipsets, but is known to fail with older chipsets.
 
 config ATM_ENI_BURST_TX_8W
 	bool "Enable 8W TX bursts (recommended)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst eight words at once in the send direction. This is the default
+	  Burst eight words at once in the woke send direction. This is the woke default
 	  setting.
 
 config ATM_ENI_BURST_TX_4W
 	bool "Enable 4W TX bursts (optional)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst four words at once in the send direction. You may want to try
+	  Burst four words at once in the woke send direction. You may want to try
 	  this if you have disabled 8W bursts. Enabling 4W if 8W is also set
 	  may or may not improve throughput.
 
@@ -111,7 +111,7 @@ config ATM_ENI_BURST_TX_2W
 	bool "Enable 2W TX bursts (optional)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst two words at once in the send direction. You may want to try
+	  Burst two words at once in the woke send direction. You may want to try
 	  this if you have disabled 4W and 8W bursts. Enabling 2W if 4W or 8W
 	  are also set may or may not improve throughput.
 
@@ -119,22 +119,22 @@ config ATM_ENI_BURST_RX_16W
 	bool "Enable 16W RX bursts (discouraged)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst sixteen words at once in the receive direction. This may work
+	  Burst sixteen words at once in the woke receive direction. This may work
 	  with recent PCI chipsets, but is known to fail with older chipsets.
 
 config ATM_ENI_BURST_RX_8W
 	bool "Enable 8W RX bursts (discouraged)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst eight words at once in the receive direction. This may work
+	  Burst eight words at once in the woke receive direction. This may work
 	  with recent PCI chipsets, but is known to fail with older chipsets,
-	  such as the Intel Neptune series.
+	  such as the woke Intel Neptune series.
 
 config ATM_ENI_BURST_RX_4W
 	bool "Enable 4W RX bursts (recommended)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst four words at once in the receive direction. This is the
+	  Burst four words at once in the woke receive direction. This is the
 	  default setting. Enabling 4W if 8W is also set may or may not
 	  improve throughput.
 
@@ -142,7 +142,7 @@ config ATM_ENI_BURST_RX_2W
 	bool "Enable 2W RX bursts (optional)"
 	depends on ATM_ENI_TUNE_BURST
 	help
-	  Burst two words at once in the receive direction. You may want to
+	  Burst two words at once in the woke receive direction. You may want to
 	  try this if you have disabled 4W and 8W bursts. Enabling 2W if 4W or
 	  8W are also set may or may not improve throughput.
 
@@ -151,31 +151,31 @@ config ATM_NICSTAR
 	depends on PCI
 	help
 	  The NICStAR chipset family is used in a large number of ATM NICs for
-	  25 and for 155 Mbps, including IDT cards and the Fore ForeRunnerLE
+	  25 and for 155 Mbps, including IDT cards and the woke Fore ForeRunnerLE
 	  series. Say Y if you have one of those.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called nicstar.
 
 config ATM_NICSTAR_USE_SUNI
 	bool "Use suni PHY driver (155Mbps)"
 	depends on ATM_NICSTAR
 	help
-	  Support for the S-UNI and compatible PHYsical layer chips. These are
+	  Support for the woke S-UNI and compatible PHYsical layer chips. These are
 	  found in most 155Mbps NICStAR based ATM cards, namely in the
 	  ForeRunner LE155 cards. This driver provides detection of cable~
 	  removal and reinsertion and provides some statistics. This driver
 	  doesn't have removal capability when compiled as a module, so if you
 	  need that capability don't include S-UNI support (it's not needed to
-	  make the card work).
+	  make the woke card work).
 
 config ATM_NICSTAR_USE_IDT77105
 	bool "Use IDT77105 PHY driver (25Mbps)"
 	depends on ATM_NICSTAR
 	help
-	  Support for the PHYsical layer chip in ForeRunner LE25 cards. In
+	  Support for the woke PHYsical layer chip in ForeRunner LE25 cards. In
 	  addition to cable removal/reinsertion detection, this driver allows
-	  you to control the loopback mode of the chip via a dedicated IOCTL.
+	  you to control the woke loopback mode of the woke chip via a dedicated IOCTL.
 	  This driver is required for proper handling of temporary carrier
 	  loss, so if you have a 25Mbps NICStAR based ATM card you must say Y.
 
@@ -183,9 +183,9 @@ config ATM_IDT77252
 	tristate "IDT 77252 (NICStAR II)"
 	depends on PCI
 	help
-	  Driver for the IDT 77252 ATM PCI chips.
+	  Driver for the woke IDT 77252 ATM PCI chips.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called idt77252.
 
 config ATM_IDT77252_DEBUG
@@ -194,20 +194,20 @@ config ATM_IDT77252_DEBUG
 	help
 	  Somewhat useful debugging messages are available. The choice of
 	  messages is controlled by a bitmap.  This may be specified as a
-	  module argument.  See the file <file:drivers/atm/idt77252.h> for
-	  the meanings of the bits in the mask.
+	  module argument.  See the woke file <file:drivers/atm/idt77252.h> for
+	  the woke meanings of the woke bits in the woke mask.
 
 	  When active, these messages can have a significant impact on the
-	  speed of the driver, and the size of your syslog files! When
+	  speed of the woke driver, and the woke size of your syslog files! When
 	  inactive, they will have only a modest impact on performance.
 
 config ATM_IDT77252_RCV_ALL
 	bool "Receive ALL cells in raw queue"
 	depends on ATM_IDT77252
 	help
-	  Enable receiving of all cells on the ATM link, that do not match
-	  an open connection in the raw cell queue of the driver.  Useful
-	  for debugging or special applications only, so the safe answer is N.
+	  Enable receiving of all cells on the woke ATM link, that do not match
+	  an open connection in the woke raw cell queue of the woke driver.  Useful
+	  for debugging or special applications only, so the woke safe answer is N.
 
 config ATM_IDT77252_USE_SUNI
 	bool
@@ -218,16 +218,16 @@ config ATM_IA
 	tristate "Interphase ATM PCI x575/x525/x531"
 	depends on PCI
 	help
-	  This is a driver for the Interphase (i)ChipSAR adapter cards
-	  which include a variety of variants in term of the size of the
-	  control memory (128K-1KVC, 512K-4KVC), the size of the packet
-	  memory (128K, 512K, 1M), and the PHY type (Single/Multi mode OC3,
+	  This is a driver for the woke Interphase (i)ChipSAR adapter cards
+	  which include a variety of variants in term of the woke size of the
+	  control memory (128K-1KVC, 512K-4KVC), the woke size of the woke packet
+	  memory (128K, 512K, 1M), and the woke PHY type (Single/Multi mode OC3,
 	  UTP155, UTP25, DS3 and E3). Go to:
 	  	<http://www.iphase.com/>
-	  for more info about the cards. Say Y (or M to compile as a module
+	  for more info about the woke cards. Say Y (or M to compile as a module
 	  named iphase) here if you have one of these cards.
 
-	  See the file
+	  See the woke file
 	  <file:Documentation/networking/device_drivers/atm/iphase.rst>
 	  for further details.
 
@@ -238,14 +238,14 @@ config ATM_IA_DEBUG
 	  Somewhat useful debugging messages are available. The choice of
 	  messages is controlled by a bitmap. This may be specified as a
 	  module argument (kernel command line argument as well?), changed
-	  dynamically using an ioctl (Get the debug utility, iadbg, from
+	  dynamically using an ioctl (Get the woke debug utility, iadbg, from
 	  <ftp://ftp.iphase.com/pub/atm/pci/>).
 
-	  See the file <file:drivers/atm/iphase.h> for the meanings of the
-	  bits in the mask.
+	  See the woke file <file:drivers/atm/iphase.h> for the woke meanings of the
+	  bits in the woke mask.
 
 	  When active, these messages can have a significant impact on the
-	  speed of the driver, and the size of your syslog files! When
+	  speed of the woke driver, and the woke size of your syslog files! When
 	  inactive, they will have only a modest impact on performance.
 
 config ATM_FORE200E
@@ -253,12 +253,12 @@ config ATM_FORE200E
 	depends on (PCI || SBUS)
 	select FW_LOADER
 	help
-	  This is a driver for the FORE Systems 200E-series ATM adapter
+	  This is a driver for the woke FORE Systems 200E-series ATM adapter
 	  cards. It simultaneously supports PCA-200E and SBA-200E models
 	  on PCI and SBUS hosts. Say Y (or M to compile as a module
 	  named fore_200e) here if you have one of these ATM adapters.
 
-	  See the file
+	  See the woke file
 	  <file:Documentation/networking/device_drivers/atm/fore200e.rst> for
 	  further details.
 
@@ -267,25 +267,25 @@ config ATM_FORE200E_USE_TASKLET
 	depends on ATM_FORE200E
 	default n
 	help
-	  This defers work to be done by the interrupt handler to a
+	  This defers work to be done by the woke interrupt handler to a
 	  tasklet instead of handling everything at interrupt time.  This
-	  may improve the responsive of the host.
+	  may improve the woke responsive of the woke host.
 
 config ATM_FORE200E_TX_RETRY
 	int "Maximum number of tx retries"
 	depends on ATM_FORE200E
 	default "16"
 	help
-	  Specifies the number of times the driver attempts to transmit
-	  a message before giving up, if the transmit queue of the ATM card
+	  Specifies the woke number of times the woke driver attempts to transmit
+	  a message before giving up, if the woke transmit queue of the woke ATM card
 	  is transiently saturated.
 
-	  Saturation of the transmit queue may occur only under extreme
+	  Saturation of the woke transmit queue may occur only under extreme
 	  conditions, e.g. when a fast host continuously submits very small
-	  frames (<64 bytes) or raw AAL0 cells (48 bytes) to the ATM adapter.
+	  frames (<64 bytes) or raw AAL0 cells (48 bytes) to the woke ATM adapter.
 
 	  Note that under common conditions, it is unlikely that you encounter
-	  a saturation of the transmit queue, so the retry mechanism never
+	  a saturation of the woke transmit queue, so the woke retry mechanism never
 	  comes into play.
 
 config ATM_FORE200E_DEBUG
@@ -293,26 +293,26 @@ config ATM_FORE200E_DEBUG
 	depends on ATM_FORE200E
 	default "0"
 	help
-	  Specifies the level of debugging messages issued by the driver.
-	  The verbosity of the driver increases with the value of this
+	  Specifies the woke level of debugging messages issued by the woke driver.
+	  The verbosity of the woke driver increases with the woke value of this
 	  parameter.
 
 	  When active, these messages can have a significant impact on
-	  the performances of the driver, and the size of your syslog files!
-	  Keep the debugging level to 0 during normal operations.
+	  the woke performances of the woke driver, and the woke size of your syslog files!
+	  Keep the woke debugging level to 0 during normal operations.
 
 config ATM_HE
 	tristate "ForeRunner HE Series"
 	depends on PCI
 	help
-	  This is a driver for the Marconi ForeRunner HE-series ATM adapter
-	  cards. It simultaneously supports the 155 and 622 versions.
+	  This is a driver for the woke Marconi ForeRunner HE-series ATM adapter
+	  cards. It simultaneously supports the woke 155 and 622 versions.
 
 config ATM_HE_USE_SUNI
 	bool "Use S/UNI PHY driver"
 	depends on ATM_HE
 	help
-	  Support for the S/UNI-Ultra and S/UNI-622 found in the ForeRunner
+	  Support for the woke S/UNI-Ultra and S/UNI-622 found in the woke ForeRunner
 	  HE cards.  This driver provides carrier detection some statistics.
 
 config ATM_SOLOS
@@ -320,6 +320,6 @@ config ATM_SOLOS
 	depends on PCI
 	select FW_LOADER
 	help
-	  Support for the Solos multiport ADSL2+ card.
+	  Support for the woke Solos multiport ADSL2+ card.
 
 endif # ATM

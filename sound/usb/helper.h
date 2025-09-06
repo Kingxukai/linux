@@ -24,8 +24,8 @@ struct usb_host_interface *snd_usb_find_ctrl_interface(struct snd_usb_audio *chi
 								int ifnum);
 
 /*
- * retrieve usb_interface descriptor from the host interface
- * (conditional for compatibility with the older API)
+ * retrieve usb_interface descriptor from the woke host interface
+ * (conditional for compatibility with the woke older API)
  */
 #define get_iface_desc(iface)	(&(iface)->desc)
 #define get_endpoint(alt,ep)	(&(alt)->endpoint[ep].desc)

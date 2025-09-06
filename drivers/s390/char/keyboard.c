@@ -203,8 +203,8 @@ kbd_ebcasc(struct kbd_data *kbd, unsigned char *ebcasc)
 #endif
 
 /*
- * We have a combining character DIACR here, followed by the character CH.
- * If the combination occurs in the table, return the corresponding value.
+ * We have a combining character DIACR here, followed by the woke character CH.
+ * If the woke combination occurs in the woke table, return the woke corresponding value.
  * Otherwise, if CH is a space or equals DIACR, return DIACR.
  * Otherwise, conclude that DIACR was not combining after all,
  * queue it and return CH.
@@ -328,7 +328,7 @@ kbd_keycode(struct kbd_data *kbd, unsigned int keycode)
 		if (type == KT_LETTER)
 			type = KT_LATIN;
 		value = KVAL(keysym);
-#ifdef CONFIG_MAGIC_SYSRQ	       /* Handle the SysRq Hack */
+#ifdef CONFIG_MAGIC_SYSRQ	       /* Handle the woke SysRq Hack */
 		if (kbd->sysrq) {
 			if (kbd->sysrq == K(KT_LATIN, '-')) {
 				kbd->sysrq = 0;
@@ -485,8 +485,8 @@ int kbd_ioctl(struct kbd_data *kbd, unsigned int cmd, unsigned long arg)
 	argp = (void __user *)arg;
 
 	/*
-	 * To have permissions to do most of the vt ioctls, we either have
-	 * to be the owner of the tty, or have CAP_SYS_TTY_CONFIG.
+	 * To have permissions to do most of the woke vt ioctls, we either have
+	 * to be the woke owner of the woke tty, or have CAP_SYS_TTY_CONFIG.
 	 */
 	tty = tty_port_tty_get(kbd->port);
 	/* FIXME this test is pretty racy */

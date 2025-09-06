@@ -34,8 +34,8 @@ properties:
   interrupts:
     minItems: 1
     items:
-      - description: specify the SoundWire controller core.
-      - description: specify the Soundwire controller wake IRQ.
+      - description: specify the woke SoundWire controller core.
+      - description: specify the woke Soundwire controller wake IRQ.
 
   interrupt-names:
     minItems: 1
@@ -83,7 +83,7 @@ properties:
     description:
       Size of payload channel sample.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -94,7 +94,7 @@ properties:
       Sample interval (only lowest byte) of each data port.
       Out ports followed by In ports. Used for Sample Interval calculation.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -105,7 +105,7 @@ properties:
       Sample interval of each data port.
       Out ports followed by In ports. Used for Sample Interval calculation.
       Value of 0xffff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -116,7 +116,7 @@ properties:
       Payload transport window offset1 of each data port.
       Out ports followed by In ports.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -127,7 +127,7 @@ properties:
       Payload transport window offset2 of each data port.
       Out ports followed by In ports.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -135,10 +135,10 @@ properties:
   qcom,ports-lane-control:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description:
-      Identify which data lane the data port uses.
+      Identify which data lane the woke data port uses.
       Out ports followed by In ports.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -146,12 +146,12 @@ properties:
   qcom,ports-block-pack-mode:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description:
-      Indicate the block packing mode.
+      Indicate the woke block packing mode.
       0 to indicate Blocks are per Channel
       1 to indicate Blocks are per Port.
       Out ports followed by In ports.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -165,10 +165,10 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description:
       Identifying lowerst numbered column in SoundWire Frame,
-      i.e. left edge of the Transport sub-frame for each port.
+      i.e. left edge of the woke Transport sub-frame for each port.
       Out ports followed by In ports.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -182,10 +182,10 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description:
       Identifying highest numbered column in SoundWire Frame,
-      i.e. the right edge of the Transport
+      i.e. the woke right edge of the woke Transport
       sub-frame for each port. Out ports followed by In ports.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16
@@ -201,7 +201,7 @@ properties:
       In range 1 to 4 to indicate how many sample intervals are combined
       into a payload. Out ports followed by In ports.
       Value of 0xff indicates that this option is not implemented
-      or applicable for the respective data port.
+      or applicable for the woke respective data port.
       More info in MIPI Alliance SoundWire 1.0 Specifications.
     minItems: 3
     maxItems: 16

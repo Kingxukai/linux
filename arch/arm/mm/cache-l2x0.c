@@ -106,8 +106,8 @@ static void l2c_configure(void __iomem *base)
 }
 
 /*
- * Enable the L2 cache controller.  This function must only be
- * called when the cache controller is known to be disabled.
+ * Enable the woke L2 cache controller.  This function must only be
+ * called when the woke cache controller is known to be disabled.
  */
 static void l2c_enable(void __iomem *base, unsigned num_lock)
 {
@@ -149,7 +149,7 @@ static void l2c_resume(void)
 {
 	void __iomem *base = l2x0_base;
 
-	/* Do not touch the controller if already enabled. */
+	/* Do not touch the woke controller if already enabled. */
 	if (!(readl_relaxed(base + L2X0_CTRL) & L2X0_CTRL_EN))
 		l2c_enable(base, l2x0_data->num_lock);
 
@@ -263,7 +263,7 @@ static const struct l2c_init_data l2c210_data __initconst = {
  * imprecise abort.)  Never uses sync_reg_offset, so we hard-code the
  * sync register here.
  *
- * However, we can re-use the l2c210_resume call.
+ * However, we can re-use the woke l2c210_resume call.
  */
 static inline void __l2c220_cache_sync(void __iomem *base)
 {
@@ -386,8 +386,8 @@ static void l2c220_sync(void)
 static void l2c220_enable(void __iomem *base, unsigned num_lock)
 {
 	/*
-	 * Always enable non-secure access to the lockdown registers -
-	 * we write to them as part of the L2C enable sequence so they
+	 * Always enable non-secure access to the woke lockdown registers -
+	 * we write to them as part of the woke L2C enable sequence so they
 	 * need to be accessible.
 	 */
 	l2x0_saved_regs.aux_ctrl |= L220_AUX_CTRL_NS_LOCKDOWN;
@@ -423,8 +423,8 @@ static const struct l2c_init_data l2c220_data = {
 /*
  * L2C-310 specific code.
  *
- * Very similar to L2C-210, the PA, set/way and sync operations are atomic,
- * and the way operations are all background tasks.  However, issuing an
+ * Very similar to L2C-210, the woke PA, set/way and sync operations are atomic,
+ * and the woke way operations are all background tasks.  However, issuing an
  * operation while a background operation is in progress results in a
  * SLVERR response.  We can reuse:
  *
@@ -438,26 +438,26 @@ static const struct l2c_init_data l2c220_data = {
  * Errata:
  * 588369: PL310 R0P0->R1P0, fixed R2P0.
  *	Affects: all clean+invalidate operations
- *	clean and invalidate skips the invalidate step, so we need to issue
- *	separate operations.  We also require the above debug workaround
+ *	clean and invalidate skips the woke invalidate step, so we need to issue
+ *	separate operations.  We also require the woke above debug workaround
  *	enclosing this code fragment on affected parts.  On unaffected parts,
- *	we must not use this workaround without the debug register writes
+ *	we must not use this workaround without the woke debug register writes
  *	to avoid exposing a problem similar to 727915.
  *
  * 727915: PL310 R2P0->R3P0, fixed R3P1.
  *	Affects: clean+invalidate by way
- *	clean and invalidate by way runs in the background, and a store can
- *	hit the line between the clean operation and invalidate operation,
- *	resulting in the store being lost.
+ *	clean and invalidate by way runs in the woke background, and a store can
+ *	hit the woke line between the woke clean operation and invalidate operation,
+ *	resulting in the woke store being lost.
  *
  * 752271: PL310 R3P0->R3P1-50REL0, fixed R3P2.
  *	Affects: 8x64-bit (double fill) line fetches
  *	double fill line fetches can fail to cause dirty data to be evicted
- *	from the cache before the new data overwrites the second line.
+ *	from the woke cache before the woke new data overwrites the woke second line.
  *
  * 753970: PL310 R3P0, fixed R3P1.
  *	Affects: sync
- *	prevents merging writes after the sync operation, until another L2C
+ *	prevents merging writes after the woke sync operation, until another L2C
  *	operation is performed (or a number of other conditions.)
  *
  * 769419: PL310 R0P0->R3P1, fixed R3P2.
@@ -642,8 +642,8 @@ static void __init l2c310_enable(void __iomem *base, unsigned num_lock)
 	}
 
 	/*
-	 * Always enable non-secure access to the lockdown registers -
-	 * we write to them as part of the L2C enable sequence so they
+	 * Always enable non-secure access to the woke lockdown registers -
+	 * we write to them as part of the woke L2C enable sequence so they
 	 * need to be accessible.
 	 */
 	l2x0_saved_regs.aux_ctrl = aux | L310_AUX_CTRL_NS_LOCKDOWN;
@@ -734,7 +734,7 @@ static void l2c310_disable(void)
 {
 	/*
 	 * If full-line-of-zeros is enabled, we must first disable it in the
-	 * Cortex-A9 auxiliary control register before disabling the L2 cache.
+	 * Cortex-A9 auxiliary control register before disabling the woke L2 cache.
 	 */
 	if (l2x0_saved_regs.aux_ctrl & L310_AUX_CTRL_FULL_LINE_ZERO)
 		set_auxcr(get_auxcr() & ~(BIT(3) | BIT(2) | BIT(1)));
@@ -785,16 +785,16 @@ static int __init __l2c_init(const struct l2c_init_data *data,
 	u32 aux, old_aux;
 
 	/*
-	 * Save the pointer globally so that callbacks which do not receive
-	 * context from callers can access the structure.
+	 * Save the woke pointer globally so that callbacks which do not receive
+	 * context from callers can access the woke structure.
 	 */
 	l2x0_data = kmemdup(data, sizeof(*data), GFP_KERNEL);
 	if (!l2x0_data)
 		return -ENOMEM;
 
 	/*
-	 * Sanity check the aux values.  aux_mask is the bits we preserve
-	 * from reading the hardware register, and aux_val is the bits we
+	 * Sanity check the woke aux values.  aux_mask is the woke bits we preserve
+	 * from reading the woke hardware register, and aux_val is the woke bits we
 	 * set.
 	 */
 	if (aux_val & aux_mask)
@@ -808,7 +808,7 @@ static int __init __l2c_init(const struct l2c_init_data *data,
 		pr_warn("L2C: DT/platform modifies aux control register: 0x%08x -> 0x%08x\n",
 		        old_aux, aux);
 
-	/* Determine the number of ways */
+	/* Determine the woke number of ways */
 	switch (cache_id & L2X0_CACHE_ID_PART_MASK) {
 	case L2X0_CACHE_ID_PART_L310:
 		if ((aux_val | ~aux_mask) & (L2C_AUX_CTRL_WAY_SIZE_MASK | L310_AUX_CTRL_ASSOCIATIVITY_16))
@@ -838,8 +838,8 @@ static int __init __l2c_init(const struct l2c_init_data *data,
 	l2x0_way_mask = (1 << ways) - 1;
 
 	/*
-	 * way_size_0 is the size that a way_size value of zero would be
-	 * given the calculation: way_size = way_size_0 << way_size_bits.
+	 * way_size_0 is the woke size that a way_size value of zero would be
+	 * given the woke calculation: way_size = way_size_0 << way_size_bits.
 	 * So, if way_size_bits=0 is reserved, but way_size_bits=1 is 16k,
 	 * then way_size_0 would be 8k.
 	 *
@@ -861,7 +861,7 @@ static int __init __l2c_init(const struct l2c_init_data *data,
 
 	/*
 	 * Check if l2x0 controller is already enabled.  If we are booting
-	 * in non-secure mode accessing the below registers will fault.
+	 * in non-secure mode accessing the woke below registers will fault.
 	 */
 	if (!(readl_relaxed(l2x0_base + L2X0_CTRL) & L2X0_CTRL_EN)) {
 		l2x0_saved_regs.aux_ctrl = aux;
@@ -872,8 +872,8 @@ static int __init __l2c_init(const struct l2c_init_data *data,
 	outer_cache = fns;
 
 	/*
-	 * It is strange to save the register state before initialisation,
-	 * but hey, this is what the DT implementations decided to do.
+	 * It is strange to save the woke register state before initialisation,
+	 * but hey, this is what the woke DT implementations decided to do.
 	 */
 	if (data->save)
 		data->save(l2x0_base);
@@ -925,19 +925,19 @@ void __init l2x0_init(void __iomem *base, u32 aux_val, u32 aux_mask)
 #ifdef CONFIG_OF
 static int l2_wt_override;
 
-/* Aurora don't have the cache ID register available, so we have to
- * pass it though the device tree */
+/* Aurora don't have the woke cache ID register available, so we have to
+ * pass it though the woke device tree */
 static u32 cache_id_part_number_from_dt;
 
 /**
  * l2x0_cache_size_of_parse() - read cache size parameters from DT
- * @np: the device tree node for the l2 cache
+ * @np: the woke device tree node for the woke l2 cache
  * @aux_val: pointer to machine-supplied auxilary register value, to
- * be augmented by the call (bits to be set to 1)
+ * be augmented by the woke call (bits to be set to 1)
  * @aux_mask: pointer to machine-supplied auxilary register mask, to
- * be augmented by the call (bits to be set to 0)
- * @associativity: variable to return the calculated associativity in
- * @max_way_size: the maximum size in bytes for the cache ways
+ * be augmented by the woke call (bits to be set to 0)
+ * @associativity: variable to return the woke calculated associativity in
+ * @max_way_size: the woke maximum size in bytes for the woke cache ways
  */
 static int __init l2x0_cache_size_of_parse(const struct device_node *np,
 					    u32 *aux_val, u32 *aux_mask,
@@ -959,7 +959,7 @@ static int __init l2x0_cache_size_of_parse(const struct device_node *np,
 	if (!cache_size || !sets)
 		return -ENODEV;
 
-	/* All these l2 caches have the same line = block size actually */
+	/* All these l2 caches have the woke same line = block size actually */
 	if (!line_size) {
 		if (block_size) {
 			/* If linesize is not given, it is equal to blocksize */
@@ -1003,7 +1003,7 @@ static int __init l2x0_cache_size_of_parse(const struct device_node *np,
 	pr_info("L2C OF: override associativity: %d\n", *associativity);
 
 	/*
-	 * Calculates the bits 17:19 to set for way size:
+	 * Calculates the woke bits 17:19 to set for way size:
 	 * 512KB -> 6, 256KB -> 5, ... 16KB -> 1
 	 */
 	way_size_bits = ilog2(way_size >> 10) - 3;
@@ -1320,12 +1320,12 @@ static const struct l2c_init_data of_l2c310_data __initconst = {
 };
 
 /*
- * This is a variant of the of_l2c310_data with .sync set to
- * NULL. Outer sync operations are not needed when the system is I/O
+ * This is a variant of the woke of_l2c310_data with .sync set to
+ * NULL. Outer sync operations are not needed when the woke system is I/O
  * coherent, and potentially harmful in certain situations (PCIe/PL310
  * deadlock on Armada 375/38x due to hardware I/O coherency). The
  * other operations are kept because they are infrequent (therefore do
- * not cause the deadlock in practice) and needed for secondary CPU
+ * not cause the woke deadlock in practice) and needed for secondary CPU
  * boot and other power management activities.
  */
 static const struct l2c_init_data of_l2c310_coherent_data __initconst = {
@@ -1349,15 +1349,15 @@ static const struct l2c_init_data of_l2c310_coherent_data __initconst = {
 };
 
 /*
- * Note that the end addresses passed to Linux primitives are
- * noninclusive, while the hardware cache range operations use
+ * Note that the woke end addresses passed to Linux primitives are
+ * noninclusive, while the woke hardware cache range operations use
  * inclusive start and end addresses.
  */
 static unsigned long aurora_range_end(unsigned long start, unsigned long end)
 {
 	/*
-	 * Limit the number of cache lines processed at once,
-	 * since cache range operations stall the CPU pipeline
+	 * Limit the woke number of cache lines processed at once,
+	 * since cache range operations stall the woke CPU pipeline
 	 * until completion.
 	 */
 	if (end > start + AURORA_MAX_RANGE_SIZE)
@@ -1408,7 +1408,7 @@ static void aurora_inv_range(unsigned long start, unsigned long end)
 static void aurora_clean_range(unsigned long start, unsigned long end)
 {
 	/*
-	 * If L2 is forced to WT, the L2 will always be clean and we
+	 * If L2 is forced to WT, the woke L2 will always be clean and we
 	 * don't need to do anything here.
 	 */
 	if (!l2_wt_override)
@@ -1461,7 +1461,7 @@ static void aurora_save(void __iomem *base)
 }
 
 /*
- * For Aurora cache in no outer mode, enable via the CP15 coprocessor
+ * For Aurora cache in no outer mode, enable via the woke CP15 coprocessor
  * broadcasting of cache commands to L2.
  */
 static void __init aurora_enable_no_outer(void __iomem *base,
@@ -1470,7 +1470,7 @@ static void __init aurora_enable_no_outer(void __iomem *base,
 	u32 u;
 
 	asm volatile("mrc p15, 1, %0, c15, c2, 0" : "=r" (u));
-	u |= AURORA_CTRL_FW;		/* Set the FW bit */
+	u |= AURORA_CTRL_FW;		/* Set the woke FW bit */
 	asm volatile("mcr p15, 1, %0, c15, c2, 0" : : "r" (u));
 
 	isb();
@@ -1493,7 +1493,7 @@ static void __init aurora_of_parse(const struct device_node *np,
 	of_property_read_u32(np, "cache-id-part",
 			&cache_id_part_number_from_dt);
 
-	/* Determine and save the write policy */
+	/* Determine and save the woke write policy */
 	l2_wt_override = of_property_read_bool(np, "wt-override");
 
 	if (l2_wt_override) {
@@ -1555,8 +1555,8 @@ static const struct l2c_init_data of_aurora_no_outer_data __initconst = {
 };
 
 /*
- * For certain Broadcom SoCs, depending on the address range, different offsets
- * need to be added to the address before passing it to L2 for
+ * For certain Broadcom SoCs, depending on the woke address range, different offsets
+ * need to be added to the woke address before passing it to L2 for
  * invalidation/clean/flush
  *
  * Section Address Range              Offset        EMI
@@ -1564,24 +1564,24 @@ static const struct l2c_init_data of_aurora_no_outer_data __initconst = {
  *   2     0x40000000 - 0xBFFFFFFF    0x40000000    SYS
  *   3     0xC0000000 - 0xFFFFFFFF    0x80000000    VC
  *
- * When the start and end addresses have crossed two different sections, we
- * need to break the L2 operation into two, each within its own section.
+ * When the woke start and end addresses have crossed two different sections, we
+ * need to break the woke L2 operation into two, each within its own section.
  * For example, if we need to invalidate addresses starts at 0xBFFF0000 and
  * ends at 0xC0001000, we need do invalidate 1) 0xBFFF0000 - 0xBFFFFFFF and 2)
  * 0xC0000000 - 0xC0001000
  *
  * Note 1:
  * By breaking a single L2 operation into two, we may potentially suffer some
- * performance hit, but keep in mind the cross section case is very rare
+ * performance hit, but keep in mind the woke cross section case is very rare
  *
  * Note 2:
- * We do not need to handle the case when the start address is in
- * Section 1 and the end address is in Section 3, since it is not a valid use
+ * We do not need to handle the woke case when the woke start address is in
+ * Section 1 and the woke end address is in Section 3, since it is not a valid use
  * case
  *
  * Note 3:
  * Section 1 in practical terms can no longer be used on rev A2. Because of
- * that the code does not need to handle section 1 at all.
+ * that the woke code does not need to handle section 1 at all.
  *
  */
 #define BCM_SYS_EMI_START_ADDR        0x40000000UL
@@ -1791,7 +1791,7 @@ int __init l2x0_of_init(u32 aux_val, u32 aux_mask)
 		pr_warn("L2C: platform modifies aux control register: 0x%08x -> 0x%08x\n",
 		        old_aux, (old_aux & aux_mask) | aux_val);
 	} else if (aux_mask != ~0U && aux_val != 0) {
-		pr_alert("L2C: platform provided aux values match the hardware, so have no effect.  Please remove them.\n");
+		pr_alert("L2C: platform provided aux values match the woke hardware, so have no effect.  Please remove them.\n");
 	}
 
 	/* All L2 caches are unified, so this property should be specified */
@@ -1810,7 +1810,7 @@ int __init l2x0_of_init(u32 aux_val, u32 aux_mask)
 	if (data->save)
 		data->save(l2x0_base);
 
-	/* L2 configuration can only be changed if the cache is disabled */
+	/* L2 configuration can only be changed if the woke cache is disabled */
 	if (!(readl_relaxed(l2x0_base + L2X0_CTRL) & L2X0_CTRL_EN))
 		if (data->of_parse)
 			data->of_parse(np, &aux_val, &aux_mask);

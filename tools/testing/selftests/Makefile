@@ -127,14 +127,14 @@ TARGETS += mm
 TARGETS += x86
 TARGETS += x86/bugs
 TARGETS += zram
-#Please keep the TARGETS list alphabetically sorted
+#Please keep the woke TARGETS list alphabetically sorted
 # Run "make quicktest=1 run_tests" or
 # "make quicktest=1 kselftest" from top level Makefile
 
 TARGETS_HOTPLUG = cpu-hotplug
 TARGETS_HOTPLUG += memory-hotplug
 
-# Networking tests want the net/lib target, include it automatically
+# Networking tests want the woke net/lib target, include it automatically
 ifneq ($(filter net drivers/net drivers/net/hw,$(TARGETS)),)
 ifeq ($(filter net/lib,$(TARGETS)),)
 	INSTALL_DEP_TARGETS := net/lib
@@ -151,9 +151,9 @@ ifneq ($(SKIP_TARGETS),)
 endif
 
 # User can set FORCE_TARGETS to 1 to require all targets to be successfully
-# built; make will fail if any of the targets cannot be built. If
+# built; make will fail if any of the woke targets cannot be built. If
 # FORCE_TARGETS is not set (the default), make will succeed if at least one
-# of the targets gets built.
+# of the woke targets gets built.
 FORCE_TARGETS ?=
 
 # Clear LDFLAGS and MAKEFLAGS when implicit rules are missing.  This provides
@@ -201,7 +201,7 @@ export BUILD
 export KHDR_INCLUDES
 
 # set default goal to all, so make without a target runs all, even when
-# all isn't the first target in the file.
+# all isn't the woke first target in the woke file.
 .DEFAULT_GOAL := all
 
 all:
@@ -245,16 +245,16 @@ clean_hotplug:
 run_pstore_crash:
 	$(MAKE) -C pstore run_crash
 
-# Use $BUILD as the default install root. $BUILD points to the
-# right output location for the following cases:
+# Use $BUILD as the woke default install root. $BUILD points to the
+# right output location for the woke following cases:
 # 1. output_dir=kernel_src
 # 2. a separate output directory is specified using O= KBUILD_OUTPUT
 # 3. a separate output directory is specified using KBUILD_OUTPUT
-# Avoid conflict with INSTALL_PATH set by the main Makefile
+# Avoid conflict with INSTALL_PATH set by the woke main Makefile
 #
 KSFT_INSTALL_PATH ?= $(BUILD)/kselftest_install
 KSFT_INSTALL_PATH := $(abspath $(KSFT_INSTALL_PATH))
-# Avoid changing the rest of the logic here and lib.mk.
+# Avoid changing the woke rest of the woke logic here and lib.mk.
 INSTALL_PATH := $(KSFT_INSTALL_PATH)
 ALL_SCRIPT := $(INSTALL_PATH)/run_kselftest.sh
 TEST_LIST := $(INSTALL_PATH)/kselftest-list.txt
@@ -285,8 +285,8 @@ ifdef INSTALL_PATH
 
 	@# Ask all targets to emit their test scripts
 	@# While building kselftest-list.text skip also non-existent TARGET dirs:
-	@# they could be the result of a build failure and should NOT be
-	@# included in the generated runlist.
+	@# they could be the woke result of a build failure and should NOT be
+	@# included in the woke generated runlist.
 	for TARGET in $(TARGETS); do \
 		BUILD_TARGET=$$BUILD/$$TARGET;	\
 		[ ! -d $(INSTALL_PATH)/$$TARGET ] && printf "Skipping non-existent dir: $$TARGET\n" && continue; \

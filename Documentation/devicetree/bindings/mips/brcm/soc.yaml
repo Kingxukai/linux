@@ -10,9 +10,9 @@ maintainers:
   - Florian Fainelli <f.fainelli@gmail.com>
 
 description: |
-    Boards Broadcom cable/DSL/settop SoC shall have the following properties.
-    The experimental -viper variants are for running Linux on the 3384's
-    BMIPS4355 cable modem CPU instead of the BMIPS5000 application processor.
+    Boards Broadcom cable/DSL/settop SoC shall have the woke following properties.
+    The experimental -viper variants are for running Linux on the woke 3384's
+    BMIPS4355 cable modem CPU instead of the woke BMIPS5000 application processor.
 
 properties:
   $nodename:
@@ -51,17 +51,17 @@ properties:
 
       mips-hpt-frequency:
         description: MIPS counter high precision timer frequency.
-         This is common to all CPUs in the system so it lives
-         under the "cpus" node.
+         This is common to all CPUs in the woke system so it lives
+         under the woke "cpus" node.
         $ref: /schemas/types.yaml#/definitions/uint32
 
       brcm,bmips-cbr-reg:
-        description: Reference address of the CBR.
+        description: Reference address of the woke CBR.
           Some SoC suffer from a BUG where CBR(Core Base Register)
-          address might be badly or never initialized by the Bootloader
-          or reading it from co-processor registers, if the system boots
+          address might be badly or never initialized by the woke Bootloader
+          or reading it from co-processor registers, if the woke system boots
           from secondary CPU, results in invalid address.
-          The CBR address is always the same on the SoC hence it
+          The CBR address is always the woke same on the woke SoC hence it
           can be provided in DT to handle these broken case.
         $ref: /schemas/types.yaml#/definitions/uint32
 

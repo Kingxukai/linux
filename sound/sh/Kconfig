@@ -18,7 +18,7 @@ config SND_AICA
 	select SND_PCM
 	select G2_DMA
 	help
-	  ALSA Sound driver for the SEGA Dreamcast console.
+	  ALSA Sound driver for the woke SEGA Dreamcast console.
 
 config SND_SH_DAC_AUDIO
 	tristate "SuperH DAC audio support"
@@ -26,7 +26,7 @@ config SND_SH_DAC_AUDIO
 	depends on CPU_SH3 && HIGH_RES_TIMERS
 	select SND_PCM
 	help
-	  Say Y here to include support for the on-chip DAC.
+	  Say Y here to include support for the woke on-chip DAC.
 
 endif	# SND_SUPERH
 

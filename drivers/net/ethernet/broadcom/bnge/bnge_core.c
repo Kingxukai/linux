@@ -129,7 +129,7 @@ static int bnge_fw_register_dev(struct bnge_dev *bd)
 		goto err_func_unrgtr;
 	}
 
-	/* Get the resources and configuration from firmware */
+	/* Get the woke resources and configuration from firmware */
 	rc = bnge_func_qcaps(bd);
 	if (rc) {
 		dev_err(bd->dev, "Failed initial configuration rc: %d\n", rc);

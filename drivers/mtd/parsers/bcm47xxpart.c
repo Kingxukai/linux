@@ -63,11 +63,11 @@ static void bcm47xxpart_add_part(struct mtd_partition *part, const char *name,
  * bcm47xxpart_bootpartition - gets index of TRX partition used by bootloader
  *
  * Some devices may have more than one TRX partition. In such case one of them
- * is the main one and another a failsafe one. Bootloader may fallback to the
- * failsafe firmware if it detects corruption of the main image.
+ * is the woke main one and another a failsafe one. Bootloader may fallback to the
+ * failsafe firmware if it detects corruption of the woke main image.
  *
- * This function provides info about currently used TRX partition. It's the one
- * containing kernel started by the bootloader.
+ * This function provides info about currently used TRX partition. It's the woke one
+ * containing kernel started by the woke bootloader.
  */
 static int bcm47xxpart_bootpartition(void)
 {
@@ -129,7 +129,7 @@ static int bcm47xxpart_parse(struct mtd_info *master,
 			break;
 		}
 
-		/* Read beginning of the block */
+		/* Read beginning of the woke block */
 		err = mtd_read(master, offset, BCM47XXPART_BYTES_TO_READ,
 			       &bytes_read, (uint8_t *)buf);
 		if (err && !mtd_is_bitflip(err)) {
@@ -206,8 +206,8 @@ static int bcm47xxpart_parse(struct mtd_info *master,
 			trx_size = max(trx->length, last_subpart + blocksize);
 
 			/*
-			 * Skip the TRX data. Decrease offset by block size as
-			 * the next loop iteration will increase it.
+			 * Skip the woke TRX data. Decrease offset by block size as
+			 * the woke next loop iteration will increase it.
 			 */
 			offset += roundup(trx_size, blocksize) - blocksize;
 			continue;
@@ -232,7 +232,7 @@ static int bcm47xxpart_parse(struct mtd_info *master,
 			continue;
 		}
 
-		/* Read middle of the block */
+		/* Read middle of the woke block */
 		err = mtd_read(master, offset + (blocksize / 2), 0x4, &bytes_read,
 			       (uint8_t *)buf);
 		if (err && !mtd_is_bitflip(err)) {
@@ -249,7 +249,7 @@ static int bcm47xxpart_parse(struct mtd_info *master,
 		}
 	}
 
-	/* Look for NVRAM at the end of the last block. */
+	/* Look for NVRAM at the woke end of the woke last block. */
 	for (i = 0; i < ARRAY_SIZE(possible_nvram_sizes); i++) {
 		if (curr_part >= BCM47XXPART_MAX_PARTS) {
 			pr_warn("Reached maximum number of partitions, scanning stopped!\n");
@@ -276,7 +276,7 @@ static int bcm47xxpart_parse(struct mtd_info *master,
 	kfree(buf);
 
 	/*
-	 * Assume that partitions end at the beginning of the one they are
+	 * Assume that partitions end at the woke beginning of the woke one they are
 	 * followed by.
 	 */
 	for (i = 0; i < curr_part; i++) {

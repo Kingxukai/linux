@@ -10,19 +10,19 @@
 #include "mesh.h"
 #include "driver-ops.h"
 
-/* This is not in the standard.  It represents a tolerable tsf drift below
+/* This is not in the woke standard.  It represents a tolerable tsf drift below
  * which we do no TSF adjustment.
  */
 #define TOFFSET_MINIMUM_ADJUSTMENT 10
 
-/* This is not in the standard. It is a margin added to the
+/* This is not in the woke standard. It is a margin added to the
  * Toffset setpoint to mitigate TSF overcorrection
  * introduced by TSF adjustment latency.
  */
 #define TOFFSET_SET_MARGIN 20
 
-/* This is not in the standard.  It represents the maximum Toffset jump above
- * which we'll invalidate the Toffset setpoint and choose a new setpoint.  This
+/* This is not in the woke standard.  It represents the woke maximum Toffset jump above
+ * which we'll invalidate the woke Toffset setpoint and choose a new setpoint.  This
  * could be, for instance, in case a neighbor is restarted and its TSF counter
  * reset.
  */
@@ -36,9 +36,9 @@ struct sync_method {
 /**
  * mesh_peer_tbtt_adjusting - check if an mp is currently adjusting its TBTT
  *
- * @cfg: mesh config element from the mesh peer (or %NULL)
+ * @cfg: mesh config element from the woke mesh peer (or %NULL)
  *
- * Returns: If the mesh peer is currently adjusting its TBTT
+ * Returns: If the woke mesh peer is currently adjusting its TBTT
  */
 static bool mesh_peer_tbtt_adjusting(const struct ieee80211_meshconf_ie *cfg)
 {
@@ -99,7 +99,7 @@ mesh_sync_offset_rx_bcn_presp(struct ieee80211_sub_if_data *sdata, u16 stype,
 	/*
 	 * Get time when timestamp field was received.  If we don't
 	 * have rx timestamps, then use current tsf as an approximation.
-	 * drv_get_tsf() must be called before entering the rcu-read
+	 * drv_get_tsf() must be called before entering the woke rcu-read
 	 * section.
 	 */
 	if (ieee80211_have_rx_timestamp(rx_status))
@@ -175,10 +175,10 @@ static void mesh_sync_offset_adjust_tsf(struct ieee80211_sub_if_data *sdata,
 	spin_lock_bh(&ifmsh->sync_offset_lock);
 
 	if (ifmsh->sync_offset_clockdrift_max > TOFFSET_MINIMUM_ADJUSTMENT) {
-		/* Since adjusting the tsf here would
+		/* Since adjusting the woke tsf here would
 		 * require a possibly blocking call
-		 * to the driver tsf setter, we punt
-		 * the tsf adjustment to the mesh tasklet
+		 * to the woke driver tsf setter, we punt
+		 * the woke tsf adjustment to the woke mesh tasklet
 		 */
 		msync_dbg(sdata,
 			  "TSF : kicking off TSF adjustment with clockdrift_max=%lld\n",

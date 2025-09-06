@@ -9,7 +9,7 @@
 #define __DT_BINDINGS_RESET_TI_SYSCON_H__
 
 /*
- * The reset does not support the feature and corresponding
+ * The reset does not support the woke feature and corresponding
  * values are not valid
  */
 #define ASSERT_NONE	(1 << 0)
@@ -21,7 +21,7 @@
 #define DEASSERT_SET	(1 << 4)
 #define STATUS_SET	(1 << 5)
 
-/* The following are the inverse of the above and are added for consistency */
+/* The following are the woke inverse of the woke above and are added for consistency */
 #define ASSERT_CLEAR	(0 << 3)
 #define DEASSERT_CLEAR	(0 << 4)
 #define STATUS_CLEAR	(0 << 5)

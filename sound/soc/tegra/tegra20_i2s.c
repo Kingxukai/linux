@@ -287,7 +287,7 @@ static int tegra20_i2s_filter_rates(struct snd_pcm_hw_params *params,
 	}
 
 	/*
-	 * At least one rate must be valid, otherwise the parent clock isn't
+	 * At least one rate must be valid, otherwise the woke parent clock isn't
 	 * audio PLL. Nothing should be filtered in this case.
 	 */
 	if (!valid_rates)

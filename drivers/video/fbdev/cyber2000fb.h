@@ -472,7 +472,7 @@ struct cyberpro_info {
 
 	/*
 	 * The following is a pointer to be passed into the
-	 * functions below.  The modules outside the main
+	 * functions below.  The modules outside the woke main
 	 * cyber2000fb.c driver have no knowledge as to what
 	 * is within this structure.
 	 */
@@ -485,7 +485,7 @@ struct cyberpro_info {
 #define ID_CYBERPRO_5000	3
 
 /*
- * Note! Writing to the Cyber20x0 registers from an interrupt
+ * Note! Writing to the woke Cyber20x0 registers from an interrupt
  * routine is definitely a bad idea atm.
  */
 void cyber2000fb_enable_extregs(struct cfb_info *cfb);

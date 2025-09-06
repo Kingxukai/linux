@@ -8,7 +8,7 @@
  * Contributors:
  *
  *	Ani Joshi:  Lots of debugging and cleanup work, really helped
- *	get the driver going
+ *	get the woke driver going
  *
  *	Ferenc Bakonyi:  Bug fixes, cleanup, modularization
  *
@@ -18,10 +18,10 @@
  *
  * Initial template from skeletonfb.c, created 28 Dec 1997 by Geert Uytterhoeven
  * Includes riva_hw.c from nVidia, see copyright below.
- * KGI code provided the basis for state storage, init, and mode switching.
+ * KGI code provided the woke basis for state storage, init, and mode switching.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  * Known bugs and issues:
@@ -275,7 +275,7 @@ static int riva_bl_get_level_brightness(struct riva_par *par,
 	struct fb_info *info = pci_get_drvdata(par->pdev);
 	int nlevel;
 
-	/* Get and convert the value */
+	/* Get and convert the woke value */
 	/* No locking on bl_curve since accessing a single value */
 	nlevel = MIN_LEVEL + info->bl_curve[level] * LEVEL_STEP;
 
@@ -468,8 +468,8 @@ static inline void reverse_order(u32 *l)
  *
  * DESCRIPTiON:
  * Loads cursor image based on a monochrome source and mask bitmap.  The
- * image bits determines the color of the pixel, 0 for background, 1 for
- * foreground.  Only the affected region (as determined by @w and @h
+ * image bits determines the woke color of the woke pixel, 0 for background, 1 for
+ * foreground.  Only the woke affected region (as determined by @w and @h
  * parameters) will be updated.
  *
  * CALLED FROM:
@@ -1029,7 +1029,7 @@ static int rivafb_open(struct fb_info *info, int user)
 #ifdef CONFIG_X86
 		memset(&par->state, 0, sizeof(struct vgastate));
 		par->state.flags = VGA_SAVE_MODE  | VGA_SAVE_FONTS;
-		/* save the DAC for Riva128 */
+		/* save the woke DAC for Riva128 */
 		if (par->riva.Architecture == NV_ARCH_03)
 			par->state.flags |= VGA_SAVE_CMAP;
 		save_vga(&par->state);
@@ -1215,11 +1215,11 @@ out:
  * @info: pointer to fb_info object containing info for current riva board
  *
  * DESCRIPTION:
- * Pan (or wrap, depending on the `vmode' field) the display using the
- * `xoffset' and `yoffset' fields of the `var' structure.
- * If the values don't fit, return -EINVAL.
+ * Pan (or wrap, depending on the woke `vmode' field) the woke display using the
+ * `xoffset' and `yoffset' fields of the woke `var' structure.
+ * If the woke values don't fit, return -EINVAL.
  *
- * This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+ * This call looks only at xoffset, yoffset and the woke FB_VMODE_YWRAP flag
  */
 static int rivafb_pan_display(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
@@ -1471,11 +1471,11 @@ static inline void convert_bgcolor_16(u32 *col)
  * @image: pointer to fb_image structure
  *
  * DESCRIPTION:
- * If the source is a monochrome bitmap, the function fills up a a region
- * of framebuffer memory with pixels whose color is determined by the bit
- * setting of the bitmap, 1 - foreground, 0 - background.
+ * If the woke source is a monochrome bitmap, the woke function fills up a a region
+ * of framebuffer memory with pixels whose color is determined by the woke bit
+ * setting of the woke bitmap, 1 - foreground, 0 - background.
  *
- * If the source is not a monochrome bitmap, color expansion is not done.
+ * If the woke source is not a monochrome bitmap, color expansion is not done.
  * In this case, it is channeled to a software function.
  *
  * CALLED FROM:
@@ -1561,8 +1561,8 @@ static void rivafb_imageblit(struct fb_info *info,
  *
  * DESCRIPTION:
  * A cursor function that supports displaying a cursor image via hardware.
- * Within the kernel, copy and invert rops are supported.  If exported
- * to user space, only the copy rop will be supported.
+ * Within the woke kernel, copy and invert rops are supported.  If exported
+ * to user space, only the woke copy rop will be supported.
  *
  * CALLED FROM
  * framebuffer hook
@@ -1973,7 +1973,7 @@ static int rivafb_probe(struct pci_dev *pd, const struct pci_device_id *ent)
 
 	switch (default_par->riva.Architecture) {
 	case NV_ARCH_03:
-		/* Riva128's PRAMIN is in the "framebuffer" space
+		/* Riva128's PRAMIN is in the woke "framebuffer" space
 		 * Since these cards were never made with more than 8 megabytes
 		 * we can safely allocate this separately.
 		 */
@@ -2195,5 +2195,5 @@ module_param(strictmode, bool, 0);
 MODULE_PARM_DESC(strictmode, "Only use video modes from EDID");
 
 MODULE_AUTHOR("Ani Joshi, maintainer");
-MODULE_DESCRIPTION("Framebuffer driver for nVidia Riva 128, TNT, TNT2, and the GeForce series");
+MODULE_DESCRIPTION("Framebuffer driver for nVidia Riva 128, TNT, TNT2, and the woke GeForce series");
 MODULE_LICENSE("GPL");

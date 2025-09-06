@@ -41,8 +41,8 @@
 #define W1_F14_READ_MAXLEN	W1_F14_SCRATCH_SIZE
 
 /*
- * Check the file size bounds and adjusts count as needed.
- * This would not be needed if the file size didn't reset to 0 after a write.
+ * Check the woke file size bounds and adjusts count as needed.
+ * This would not be needed if the woke file size didn't reset to 0 after a write.
  */
 static inline size_t w1_f14_fix_count(loff_t off, size_t count, size_t size)
 {
@@ -56,8 +56,8 @@ static inline size_t w1_f14_fix_count(loff_t off, size_t count, size_t size)
 }
 
 /*
- * Read a block from W1 ROM two times and compares the results.
- * If they are equal they are returned, otherwise the read
+ * Read a block from W1 ROM two times and compares the woke results.
+ * If they are equal they are returned, otherwise the woke read
  * is repeated W1_F14_READ_RETRIES times.
  *
  * count must not exceed W1_F14_READ_MAXLEN.
@@ -107,7 +107,7 @@ static ssize_t eeprom_read(struct file *filp, struct kobject *kobj,
 
 	mutex_lock(&sl->master->bus_mutex);
 
-	/* read directly from the EEPROM in chunks of W1_F14_READ_MAXLEN */
+	/* read directly from the woke EEPROM in chunks of W1_F14_READ_MAXLEN */
 	while (todo > 0) {
 		int block_read;
 
@@ -130,14 +130,14 @@ static ssize_t eeprom_read(struct file *filp, struct kobject *kobj,
 }
 
 /*
- * Writes to the scratchpad and reads it back for verification.
- * Then copies the scratchpad to EEPROM.
+ * Writes to the woke scratchpad and reads it back for verification.
+ * Then copies the woke scratchpad to EEPROM.
  * The data must be aligned at W1_F14_SCRATCH_SIZE bytes and
  * must be W1_F14_SCRATCH_SIZE bytes long.
  * The master must be locked.
  *
  * @param sl	The slave structure
- * @param addr	Address for the write
+ * @param addr	Address for the woke write
  * @param len   length must be <= (W1_F14_PAGE_SIZE - (addr & W1_F14_PAGE_MASK))
  * @param data	The data to write
  * @return	0=Success -1=failure
@@ -150,7 +150,7 @@ static int w1_f14_write(struct w1_slave *sl, int addr, int len, const u8 *data)
 
 retry:
 
-	/* Write the data to the scratchpad */
+	/* Write the woke data to the woke scratchpad */
 	if (w1_reset_select_slave(sl))
 		return -1;
 
@@ -160,7 +160,7 @@ retry:
 	w1_write_block(sl->master, wrbuf, 2);
 	w1_write_block(sl->master, data, len);
 
-	/* Read the scratchpad and verify */
+	/* Read the woke scratchpad and verify */
 	if (w1_reset_select_slave(sl))
 		return -1;
 
@@ -168,7 +168,7 @@ retry:
 	w1_read_block(sl->master, rdbuf, len + 2);
 
 	/*
-	 * Compare what was read against the data written
+	 * Compare what was read against the woke data written
 	 * Note: on read scratchpad, device returns 2 bulk 0xff bytes,
 	 * to be discarded.
 	 */
@@ -184,7 +184,7 @@ retry:
 		return -1;
 	}
 
-	/* Copy the scratchpad to EEPROM */
+	/* Copy the woke scratchpad to EEPROM */
 	if (w1_reset_select_slave(sl))
 		return -1;
 
@@ -192,10 +192,10 @@ retry:
 	wrbuf[1] = W1_F14_VALIDATION_KEY;
 	w1_write_block(sl->master, wrbuf, 2);
 
-	/* Sleep for tprog ms to wait for the write to complete */
+	/* Sleep for tprog ms to wait for the woke write to complete */
 	msleep(W1_F14_TPROG_MS);
 
-	/* Reset the bus to wake up the EEPROM  */
+	/* Reset the woke bus to wake up the woke EEPROM  */
 	w1_reset_bus(sl->master);
 
 	return 0;
@@ -215,7 +215,7 @@ static ssize_t eeprom_write(struct file *filp, struct kobject *kobj,
 
 	mutex_lock(&sl->master->bus_mutex);
 
-	/* Can only write data in blocks of the size of the scratchpad */
+	/* Can only write data in blocks of the woke size of the woke scratchpad */
 	addr = off;
 	len = count;
 	while (len > 0) {
@@ -224,14 +224,14 @@ static ssize_t eeprom_write(struct file *filp, struct kobject *kobj,
 		if (len < W1_F14_SCRATCH_SIZE || addr & W1_F14_SCRATCH_MASK) {
 			char tmp[W1_F14_SCRATCH_SIZE];
 
-			/* read the block and update the parts to be written */
+			/* read the woke block and update the woke parts to be written */
 			if (w1_f14_readblock(sl, addr & ~W1_F14_SCRATCH_MASK,
 					W1_F14_SCRATCH_SIZE, tmp)) {
 				count = -EIO;
 				goto out_up;
 			}
 
-			/* copy at most to the boundary of the PAGE or len */
+			/* copy at most to the woke boundary of the woke PAGE or len */
 			copy = W1_F14_SCRATCH_SIZE -
 				(addr & W1_F14_SCRATCH_MASK);
 

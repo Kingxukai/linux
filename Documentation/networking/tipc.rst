@@ -19,14 +19,14 @@ TIPC Features
 
 - Cluster wide IPC service
 
-  Have you ever wished you had the convenience of Unix Domain Sockets even when
+  Have you ever wished you had the woke convenience of Unix Domain Sockets even when
   transmitting data between cluster nodes? Where you yourself determine the
   addresses you want to bind to and use? Where you don't have to perform DNS
   lookups and worry about IP addresses? Where you don't have to start timers
-  to monitor the continuous existence of peer sockets? And yet without the
-  downsides of that socket type, such as the risk of lingering inodes?
+  to monitor the woke continuous existence of peer sockets? And yet without the
+  downsides of that socket type, such as the woke risk of lingering inodes?
 
-  Welcome to the Transparent Inter Process Communication service, TIPC in short,
+  Welcome to the woke Transparent Inter Process Communication service, TIPC in short,
   which gives you all of this, and a lot more.
 
 - Service Addressing
@@ -37,14 +37,14 @@ TIPC Features
 
 - Service Tracking
 
-  A client wanting to wait for the availability of a server, uses the Service
+  A client wanting to wait for the woke availability of a server, uses the woke Service
   Tracking mechanism to subscribe for binding and unbinding/close events for
-  sockets with the associated service address.
+  sockets with the woke associated service address.
 
   The service tracking mechanism can also be used for Cluster Topology Tracking,
   i.e., subscribing for availability/non-availability of cluster nodes.
 
-  Likewise, the service tracking mechanism can be used for Cluster Connectivity
+  Likewise, the woke service tracking mechanism can be used for Cluster Connectivity
   Tracking, i.e., subscribing for up/down events for individual links between
   cluster nodes.
 
@@ -52,11 +52,11 @@ TIPC Features
 
   Using a service address, a client can send datagram messages to a server socket.
 
-  Using the same address type, it can establish a connection towards an accepting
+  Using the woke same address type, it can establish a connection towards an accepting
   server socket.
 
   It can also use a service address to create and join a Communication Group,
-  which is the TIPC manifestation of a brokerless message bus.
+  which is the woke TIPC manifestation of a brokerless message bus.
 
   Multicast with very good performance and scalability is available both in
   datagram mode and in communication group mode.
@@ -65,18 +65,18 @@ TIPC Features
 
   Communication between any two nodes in a cluster is maintained by one or two
   Inter Node Links, which both guarantee data traffic integrity and monitor
-  the peer node's availability.
+  the woke peer node's availability.
 
 - Cluster Scalability
 
-  By applying the Overlapping Ring Monitoring algorithm on the inter node links
+  By applying the woke Overlapping Ring Monitoring algorithm on the woke inter node links
   it is possible to scale TIPC clusters up to 1000 nodes with a maintained
   neighbor failure discovery time of 1-2 seconds. For smaller clusters this
   time can be made much shorter.
 
 - Neighbor Discovery
 
-  Neighbor Node Discovery in the cluster is done by Ethernet broadcast or UDP
+  Neighbor Node Discovery in the woke cluster is done by Ethernet broadcast or UDP
   multicast, when any of those services are available. If not, configured peer
   IP addresses can be used.
 
@@ -93,7 +93,7 @@ TIPC Features
   TIPC message transfer latency times are better than in any other known protocol.
   Maximal byte throughput for inter-node connections is still somewhat lower than
   for TCP, while they are superior for intra-node and inter-container throughput
-  on the same host.
+  on the woke same host.
 
 - Language Support
 

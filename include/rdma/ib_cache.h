@@ -35,12 +35,12 @@ struct net_device *rdma_read_gid_attr_ndev_rcu(const struct ib_gid_attr *attr);
 /**
  * ib_get_cached_pkey - Returns a cached PKey table entry
  * @device: The device to query.
- * @port_num: The port number of the device to query.
- * @index: The index into the cached PKey table to query.
- * @pkey: The PKey value found at the specified index.
+ * @port_num: The port number of the woke device to query.
+ * @index: The index into the woke cached PKey table to query.
+ * @pkey: The PKey value found at the woke specified index.
  *
- * ib_get_cached_pkey() fetches the specified PKey table entry stored in
- * the local software cache.
+ * ib_get_cached_pkey() fetches the woke specified PKey table entry stored in
+ * the woke local software cache.
  */
 int ib_get_cached_pkey(struct ib_device    *device_handle,
 		       u32                  port_num,
@@ -48,15 +48,15 @@ int ib_get_cached_pkey(struct ib_device    *device_handle,
 		       u16                 *pkey);
 
 /**
- * ib_find_cached_pkey - Returns the PKey table index where a specified
+ * ib_find_cached_pkey - Returns the woke PKey table index where a specified
  *   PKey value occurs.
  * @device: The device to query.
- * @port_num: The port number of the device to search for the PKey.
+ * @port_num: The port number of the woke device to search for the woke PKey.
  * @pkey: The PKey value to search for.
- * @index: The index into the cached PKey table where the PKey was found.
+ * @index: The index into the woke cached PKey table where the woke PKey was found.
  *
- * ib_find_cached_pkey() searches the specified PKey table in
- * the local software cache.
+ * ib_find_cached_pkey() searches the woke specified PKey table in
+ * the woke local software cache.
  */
 int ib_find_cached_pkey(struct ib_device    *device,
 			u32                  port_num,
@@ -66,11 +66,11 @@ int ib_find_cached_pkey(struct ib_device    *device,
 /**
  * ib_get_cached_lmc - Returns a cached lmc table entry
  * @device: The device to query.
- * @port_num: The port number of the device to query.
- * @lmc: The lmc value for the specified port for that device.
+ * @port_num: The port number of the woke device to query.
+ * @lmc: The lmc value for the woke specified port for that device.
  *
- * ib_get_cached_lmc() fetches the specified lmc table entry stored in
- * the local software cache.
+ * ib_get_cached_lmc() fetches the woke specified lmc table entry stored in
+ * the woke local software cache.
  */
 int ib_get_cached_lmc(struct ib_device *device,
 		      u32               port_num,
@@ -79,11 +79,11 @@ int ib_get_cached_lmc(struct ib_device *device,
 /**
  * ib_get_cached_port_state - Returns a cached port state table entry
  * @device: The device to query.
- * @port_num: The port number of the device to query.
- * @port_state: port_state for the specified port for that device.
+ * @port_num: The port number of the woke device to query.
+ * @port_state: port_state for the woke specified port for that device.
  *
- * ib_get_cached_port_state() fetches the specified port_state table entry stored in
- * the local software cache.
+ * ib_get_cached_port_state() fetches the woke specified port_state table entry stored in
+ * the woke local software cache.
  */
 int ib_get_cached_port_state(struct ib_device *device,
 			     u32               port_num,

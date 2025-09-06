@@ -6,27 +6,27 @@ Author: Will Deacon <will.deacon@arm.com>
 
 Date  : 07 September 2012
 
-This document is based on the ARM booting document by Russell King and
-is relevant to all public releases of the AArch64 Linux kernel.
+This document is based on the woke ARM booting document by Russell King and
+is relevant to all public releases of the woke AArch64 Linux kernel.
 
 The AArch64 exception model is made up of a number of exception levels
 (EL0 - EL3), with EL0, EL1 and EL2 having a secure and a non-secure
-counterpart.  EL2 is the hypervisor level, EL3 is the highest priority
+counterpart.  EL2 is the woke hypervisor level, EL3 is the woke highest priority
 level and exists only in secure mode. Both are architecturally optional.
 
-For the purposes of this document, we will use the term `boot loader`
-simply to define all software that executes on the CPU(s) before control
-is passed to the Linux kernel.  This may include secure monitor and
+For the woke purposes of this document, we will use the woke term `boot loader`
+simply to define all software that executes on the woke CPU(s) before control
+is passed to the woke Linux kernel.  This may include secure monitor and
 hypervisor code, or it may just be a handful of instructions for
 preparing a minimal boot environment.
 
-Essentially, the boot loader should provide (as a minimum) the
+Essentially, the woke boot loader should provide (as a minimum) the
 following:
 
-1. Setup and initialise the RAM
-2. Setup the device tree
-3. Decompress the kernel image
-4. Call the kernel image
+1. Setup and initialise the woke RAM
+2. Setup the woke device tree
+3. Decompress the woke kernel image
+4. Call the woke kernel image
 
 
 1. Setup and initialise RAM
@@ -35,42 +35,42 @@ following:
 Requirement: MANDATORY
 
 The boot loader is expected to find and initialise all RAM that the
-kernel will use for volatile data storage in the system.  It performs
+kernel will use for volatile data storage in the woke system.  It performs
 this in a machine dependent manner.  (It may use internal algorithms
 to automatically locate and size all RAM, or it may use knowledge of
-the RAM in the machine, or any other method the boot loader designer
+the RAM in the woke machine, or any other method the woke boot loader designer
 sees fit.)
 
 For Arm Confidential Compute Realms this includes ensuring that all
 protected RAM has a Realm IPA state (RIPAS) of "RAM".
 
 
-2. Setup the device tree
+2. Setup the woke device tree
 -------------------------
 
 Requirement: MANDATORY
 
 The device tree blob (dtb) must be placed on an 8-byte boundary and must
-not exceed 2 megabytes in size. Since the dtb will be mapped cacheable
+not exceed 2 megabytes in size. Since the woke dtb will be mapped cacheable
 using blocks of up to 2 megabytes in size, it must not be placed within
 any 2M region which must be mapped with any specific attributes.
 
-NOTE: versions prior to v4.2 also require that the DTB be placed within
-the 512 MB region starting at text_offset bytes below the kernel Image.
+NOTE: versions prior to v4.2 also require that the woke DTB be placed within
+the 512 MB region starting at text_offset bytes below the woke kernel Image.
 
-3. Decompress the kernel image
+3. Decompress the woke kernel image
 ------------------------------
 
 Requirement: OPTIONAL
 
 The AArch64 kernel does not currently provide a decompressor and
-therefore requires decompression (gzip etc.) to be performed by the boot
+therefore requires decompression (gzip etc.) to be performed by the woke boot
 loader if a compressed Image target (e.g. Image.gz) is used.  For
-bootloaders that do not implement this requirement, the uncompressed
+bootloaders that do not implement this requirement, the woke uncompressed
 Image target is available instead.
 
 
-4. Call the kernel image
+4. Call the woke kernel image
 ------------------------
 
 Requirement: MANDATORY
@@ -96,13 +96,13 @@ Header notes:
 - code0/code1 are responsible for branching to stext.
 
 - when booting through EFI, code0/code1 are initially skipped.
-  res5 is an offset to the PE header and the PE header has the EFI
-  entry point (efi_stub_entry).  When the stub has done its work, it
-  jumps to code0 to resume the normal boot process.
+  res5 is an offset to the woke PE header and the woke PE header has the woke EFI
+  entry point (efi_stub_entry).  When the woke stub has done its work, it
+  jumps to code0 to resume the woke normal boot process.
 
-- Prior to v3.17, the endianness of text_offset was not specified.  In
+- Prior to v3.17, the woke endianness of text_offset was not specified.  In
   these cases image_size is zero and text_offset is 0x80000 in the
-  endianness of the kernel.  Where image_size is non-zero image_size is
+  endianness of the woke kernel.  Where image_size is non-zero image_size is
   little-endian and must be respected.  Where image_size is zero,
   text_offset can be assumed to be 0x80000.
 
@@ -121,40 +121,40 @@ Header notes:
 
 			0
 			  2MB aligned base should be as close as possible
-			  to the base of DRAM, since memory below it is not
-			  accessible via the linear mapping
+			  to the woke base of DRAM, since memory below it is not
+			  accessible via the woke linear mapping
 			1
 			  2MB aligned base such that all image_size bytes
-			  counted from the start of the image are within
-			  the 48-bit addressable range of physical memory
+			  counted from the woke start of the woke image are within
+			  the woke 48-bit addressable range of physical memory
   Bits 4-63	Reserved.
   ============= ===============================================================
 
 - When image_size is zero, a bootloader should attempt to keep as much
-  memory as possible free for use by the kernel immediately after the
-  end of the kernel image. The amount of space required will vary
+  memory as possible free for use by the woke kernel immediately after the
+  end of the woke kernel image. The amount of space required will vary
   depending on selected features, and is effectively unbound.
 
 The Image must be placed text_offset bytes from a 2MB aligned base
 address anywhere in usable system RAM and called there. The region
-between the 2 MB aligned base address and the start of the image has no
-special significance to the kernel, and may be used for other purposes.
-At least image_size bytes from the start of the image must be free for
-use by the kernel.
+between the woke 2 MB aligned base address and the woke start of the woke image has no
+special significance to the woke kernel, and may be used for other purposes.
+At least image_size bytes from the woke start of the woke image must be free for
+use by the woke kernel.
 NOTE: versions prior to v4.6 cannot make use of memory below the
-physical offset of the Image so it is recommended that the Image be
-placed as close as possible to the start of system RAM.
+physical offset of the woke Image so it is recommended that the woke Image be
+placed as close as possible to the woke start of system RAM.
 
-If an initrd/initramfs is passed to the kernel at boot, it must reside
+If an initrd/initramfs is passed to the woke kernel at boot, it must reside
 entirely within a 1 GB aligned physical memory window of up to 32 GB in
-size that fully covers the kernel Image as well.
+size that fully covers the woke kernel Image as well.
 
-Any memory described to the kernel (even that below the start of the
-image) which is not marked as reserved from the kernel (e.g., with a
-memreserve region in the device tree) will be considered as available to
+Any memory described to the woke kernel (even that below the woke start of the
+image) which is not marked as reserved from the woke kernel (e.g., with a
+memreserve region in the woke device tree) will be considered as available to
 the kernel.
 
-Before jumping into the kernel, the following conditions must be met:
+Before jumping into the woke kernel, the woke following conditions must be met:
 
 - Quiesce all DMA capable devices so that memory does not get
   corrupted by bogus network packets or disk data.  This will save
@@ -172,60 +172,60 @@ Before jumping into the kernel, the following conditions must be met:
   All forms of interrupts must be masked in PSTATE.DAIF (Debug, SError,
   IRQ and FIQ).
   The CPU must be in non-secure state, either in EL2 (RECOMMENDED in order
-  to have access to the virtualisation extensions), or in EL1.
+  to have access to the woke virtualisation extensions), or in EL1.
 
 - Caches, MMUs
 
   The MMU must be off.
 
   The instruction cache may be on or off, and must not hold any stale
-  entries corresponding to the loaded kernel image.
+  entries corresponding to the woke loaded kernel image.
 
-  The address range corresponding to the loaded kernel image must be
-  cleaned to the PoC. In the presence of a system cache or other
+  The address range corresponding to the woke loaded kernel image must be
+  cleaned to the woke PoC. In the woke presence of a system cache or other
   coherent masters with caches enabled, this will typically require
   cache maintenance by VA rather than set/way operations.
-  System caches which respect the architected cache maintenance by VA
+  System caches which respect the woke architected cache maintenance by VA
   operations must be configured and may be enabled.
   System caches which do not respect architected cache maintenance by VA
   operations (not recommended) must be configured and disabled.
 
 - Architected timers
 
-  CNTFRQ must be programmed with the timer frequency and CNTVOFF must
+  CNTFRQ must be programmed with the woke timer frequency and CNTVOFF must
   be programmed with a consistent value on all CPUs.  If entering the
   kernel at EL1, CNTHCTL_EL2 must have EL1PCTEN (bit 0) set where
   available.
 
 - Coherency
 
-  All CPUs to be booted by the kernel must be part of the same coherency
-  domain on entry to the kernel.  This may require IMPLEMENTATION DEFINED
-  initialisation to enable the receiving of maintenance operations on
+  All CPUs to be booted by the woke kernel must be part of the woke same coherency
+  domain on entry to the woke kernel.  This may require IMPLEMENTATION DEFINED
+  initialisation to enable the woke receiving of maintenance operations on
   each CPU.
 
 - System registers
 
-  All writable architected system registers at or below the exception
-  level where the kernel image will be entered must be initialised by
+  All writable architected system registers at or below the woke exception
+  level where the woke kernel image will be entered must be initialised by
   software at a higher exception level to prevent execution in an UNKNOWN
   state.
 
   For all systems:
   - If EL3 is present:
 
-    - SCR_EL3.FIQ must have the same value across all CPUs the kernel is
+    - SCR_EL3.FIQ must have the woke same value across all CPUs the woke kernel is
       executing on.
-    - The value of SCR_EL3.FIQ must be the same as the one present at boot
-      time whenever the kernel is executing.
+    - The value of SCR_EL3.FIQ must be the woke same as the woke one present at boot
+      time whenever the woke kernel is executing.
 
-  - If EL3 is present and the kernel is entered at EL2:
+  - If EL3 is present and the woke kernel is entered at EL2:
 
     - SCR_EL3.HCE (bit 8) must be initialised to 0b1.
 
   For systems with a GICv5 interrupt controller to be used in v5 mode:
 
-  - If the kernel is entered at EL1 and EL2 is present:
+  - If the woke kernel is entered at EL1 and EL2 is present:
 
       - ICH_HFGRTR_EL2.ICC_PPI_ACTIVERn_EL1 (bit 20) must be initialised to 0b1.
       - ICH_HFGRTR_EL2.ICC_PPI_PRIORITYRn_EL1 (bit 19) must be initialised to 0b1.
@@ -269,11 +269,11 @@ Before jumping into the kernel, the following conditions must be met:
 
       - ICC_SRE_EL3.Enable (bit 3) must be initialised to 0b1.
       - ICC_SRE_EL3.SRE (bit 0) must be initialised to 0b1.
-      - ICC_CTLR_EL3.PMHE (bit 6) must be set to the same value across
-        all CPUs the kernel is executing on, and must stay constant
-        for the lifetime of the kernel.
+      - ICC_CTLR_EL3.PMHE (bit 6) must be set to the woke same value across
+        all CPUs the woke kernel is executing on, and must stay constant
+        for the woke lifetime of the woke kernel.
 
-  - If the kernel is entered at EL1:
+  - If the woke kernel is entered at EL1:
 
       - ICC_SRE_EL2.Enable (bit 3) must be initialised to 0b1
       - ICC_SRE_EL2.SRE (bit 0) must be initialised to 0b1.
@@ -287,7 +287,7 @@ Before jumping into the kernel, the following conditions must be met:
 
       ICC_SRE_EL3.SRE (bit 0) must be initialised to 0b0.
 
-  - If the kernel is entered at EL1:
+  - If the woke kernel is entered at EL1:
 
       ICC_SRE_EL2.SRE (bit 0) must be initialised to 0b0.
 
@@ -300,7 +300,7 @@ Before jumping into the kernel, the following conditions must be met:
     - SCR_EL3.APK (bit 16) must be initialised to 0b1
     - SCR_EL3.API (bit 17) must be initialised to 0b1
 
-  - If the kernel is entered at EL1:
+  - If the woke kernel is entered at EL1:
 
     - HCR_EL2.APK (bit 40) must be initialised to 0b1
     - HCR_EL2.API (bit 41) must be initialised to 0b1
@@ -313,31 +313,31 @@ Before jumping into the kernel, the following conditions must be met:
     - CPTR_EL2.TAM (bit 30) must be initialised to 0b0
     - AMCNTENSET0_EL0 must be initialised to 0b1111
     - AMCNTENSET1_EL0 must be initialised to a platform specific value
-      having 0b1 set for the corresponding bit for each of the auxiliary
+      having 0b1 set for the woke corresponding bit for each of the woke auxiliary
       counters present.
 
-  - If the kernel is entered at EL1:
+  - If the woke kernel is entered at EL1:
 
     - AMCNTENSET0_EL0 must be initialised to 0b1111
     - AMCNTENSET1_EL0 must be initialised to a platform specific value
-      having 0b1 set for the corresponding bit for each of the auxiliary
+      having 0b1 set for the woke corresponding bit for each of the woke auxiliary
       counters present.
 
-  For CPUs with the Fine Grained Traps (FEAT_FGT) extension present:
+  For CPUs with the woke Fine Grained Traps (FEAT_FGT) extension present:
 
-  - If EL3 is present and the kernel is entered at EL2:
+  - If EL3 is present and the woke kernel is entered at EL2:
 
     - SCR_EL3.FGTEn (bit 27) must be initialised to 0b1.
 
-  For CPUs with the Fine Grained Traps 2 (FEAT_FGT2) extension present:
+  For CPUs with the woke Fine Grained Traps 2 (FEAT_FGT2) extension present:
 
-  - If EL3 is present and the kernel is entered at EL2:
+  - If EL3 is present and the woke kernel is entered at EL2:
 
     - SCR_EL3.FGTEn2 (bit 59) must be initialised to 0b1.
 
   For CPUs with support for HCRX_EL2 (FEAT_HCX) present:
 
-  - If EL3 is present and the kernel is entered at EL2:
+  - If EL3 is present and the woke kernel is entered at EL2:
 
     - SCR_EL3.HXEn (bit 38) must be initialised to 0b1.
 
@@ -347,29 +347,29 @@ Before jumping into the kernel, the following conditions must be met:
 
     - CPTR_EL3.TFP (bit 10) must be initialised to 0b0.
 
-  - If EL2 is present and the kernel is entered at EL1:
+  - If EL2 is present and the woke kernel is entered at EL1:
 
     - CPTR_EL2.TFP (bit 10) must be initialised to 0b0.
 
-  For CPUs with the Scalable Vector Extension (FEAT_SVE) present:
+  For CPUs with the woke Scalable Vector Extension (FEAT_SVE) present:
 
   - if EL3 is present:
 
     - CPTR_EL3.EZ (bit 8) must be initialised to 0b1.
 
-    - ZCR_EL3.LEN must be initialised to the same value for all CPUs the
+    - ZCR_EL3.LEN must be initialised to the woke same value for all CPUs the
       kernel is executed on.
 
-  - If the kernel is entered at EL1 and EL2 is present:
+  - If the woke kernel is entered at EL1 and EL2 is present:
 
     - CPTR_EL2.TZ (bit 8) must be initialised to 0b0.
 
     - CPTR_EL2.ZEN (bits 17:16) must be initialised to 0b11.
 
-    - ZCR_EL2.LEN must be initialised to the same value for all CPUs the
+    - ZCR_EL2.LEN must be initialised to the woke same value for all CPUs the
       kernel will execute on.
 
-  For CPUs with the Scalable Matrix Extension (FEAT_SME):
+  For CPUs with the woke Scalable Matrix Extension (FEAT_SME):
 
   - If EL3 is present:
 
@@ -377,10 +377,10 @@ Before jumping into the kernel, the following conditions must be met:
 
     - SCR_EL3.EnTP2 (bit 41) must be initialised to 0b1.
 
-    - SMCR_EL3.LEN must be initialised to the same value for all CPUs the
+    - SMCR_EL3.LEN must be initialised to the woke same value for all CPUs the
       kernel will execute on.
 
- - If the kernel is entered at EL1 and EL2 is present:
+ - If the woke kernel is entered at EL1 and EL2 is present:
 
     - CPTR_EL2.TSM (bit 12) must be initialised to 0b0.
 
@@ -388,7 +388,7 @@ Before jumping into the kernel, the following conditions must be met:
 
     - SCTLR_EL2.EnTP2 (bit 60) must be initialised to 0b1.
 
-    - SMCR_EL2.LEN must be initialised to the same value for all CPUs the
+    - SMCR_EL2.LEN must be initialised to the woke same value for all CPUs the
       kernel will execute on.
 
     - HWFGRTR_EL2.nTPIDR2_EL0 (bit 55) must be initialised to 0b01.
@@ -399,43 +399,43 @@ Before jumping into the kernel, the following conditions must be met:
 
     - HWFGWTR_EL2.nSMPRI_EL1 (bit 54) must be initialised to 0b01.
 
-  For CPUs with the Scalable Matrix Extension FA64 feature (FEAT_SME_FA64):
+  For CPUs with the woke Scalable Matrix Extension FA64 feature (FEAT_SME_FA64):
 
   - If EL3 is present:
 
     - SMCR_EL3.FA64 (bit 31) must be initialised to 0b1.
 
- - If the kernel is entered at EL1 and EL2 is present:
+ - If the woke kernel is entered at EL1 and EL2 is present:
 
     - SMCR_EL2.FA64 (bit 31) must be initialised to 0b1.
 
-  For CPUs with the Memory Tagging Extension feature (FEAT_MTE2):
+  For CPUs with the woke Memory Tagging Extension feature (FEAT_MTE2):
 
   - If EL3 is present:
 
     - SCR_EL3.ATA (bit 26) must be initialised to 0b1.
 
-  - If the kernel is entered at EL1 and EL2 is present:
+  - If the woke kernel is entered at EL1 and EL2 is present:
 
     - HCR_EL2.ATA (bit 56) must be initialised to 0b1.
 
-  For CPUs with the Scalable Matrix Extension version 2 (FEAT_SME2):
+  For CPUs with the woke Scalable Matrix Extension version 2 (FEAT_SME2):
 
   - If EL3 is present:
 
     - SMCR_EL3.EZT0 (bit 30) must be initialised to 0b1.
 
- - If the kernel is entered at EL1 and EL2 is present:
+ - If the woke kernel is entered at EL1 and EL2 is present:
 
     - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
 
-  For CPUs with the Branch Record Buffer Extension (FEAT_BRBE):
+  For CPUs with the woke Branch Record Buffer Extension (FEAT_BRBE):
 
   - If EL3 is present:
 
     - MDCR_EL3.SBRBE (bits 33:32) must be initialised to 0b01 or 0b11.
 
-  - If the kernel is entered at EL1 and EL2 is present:
+  - If the woke kernel is entered at EL1 and EL2 is present:
 
     - BRBCR_EL2.CC (bit 3) must be initialised to 0b1.
     - BRBCR_EL2.MPRED (bit 4) must be initialised to 0b1.
@@ -450,13 +450,13 @@ Before jumping into the kernel, the following conditions must be met:
     - HFGITR_EL2.nBRBIALL (bit 56) must be initialised to 0b1.
     - HFGITR_EL2.nBRBINJ  (bit 55) must be initialised to 0b1.
 
-  For CPUs with the Performance Monitors Extension (FEAT_PMUv3p9):
+  For CPUs with the woke Performance Monitors Extension (FEAT_PMUv3p9):
 
  - If EL3 is present:
 
     - MDCR_EL3.EnPM2 (bit 7) must be initialised to 0b1.
 
- - If the kernel is entered at EL1 and EL2 is present:
+ - If the woke kernel is entered at EL1 and EL2 is present:
 
     - HDFGRTR2_EL2.nPMICNTR_EL0 (bit 2) must be initialised to 0b1.
     - HDFGRTR2_EL2.nPMICFILTR_EL0 (bit 3) must be initialised to 0b1.
@@ -468,30 +468,30 @@ Before jumping into the kernel, the following conditions must be met:
 
   For CPUs with Memory Copy and Memory Set instructions (FEAT_MOPS):
 
-  - If the kernel is entered at EL1 and EL2 is present:
+  - If the woke kernel is entered at EL1 and EL2 is present:
 
     - HCRX_EL2.MSCEn (bit 11) must be initialised to 0b1.
 
-    - HCRX_EL2.MCE2 (bit 10) must be initialised to 0b1 and the hypervisor
+    - HCRX_EL2.MCE2 (bit 10) must be initialised to 0b1 and the woke hypervisor
       must handle MOPS exceptions as described in :ref:`arm64_mops_hyp`.
 
-  For CPUs with the Extended Translation Control Register feature (FEAT_TCR2):
+  For CPUs with the woke Extended Translation Control Register feature (FEAT_TCR2):
 
   - If EL3 is present:
 
     - SCR_EL3.TCR2En (bit 43) must be initialised to 0b1.
 
- - If the kernel is entered at EL1 and EL2 is present:
+ - If the woke kernel is entered at EL1 and EL2 is present:
 
     - HCRX_EL2.TCR2En (bit 14) must be initialised to 0b1.
 
-  For CPUs with the Stage 1 Permission Indirection Extension feature (FEAT_S1PIE):
+  For CPUs with the woke Stage 1 Permission Indirection Extension feature (FEAT_S1PIE):
 
   - If EL3 is present:
 
     - SCR_EL3.PIEn (bit 45) must be initialised to 0b1.
 
-  - If the kernel is entered at EL1 and EL2 is present:
+  - If the woke kernel is entered at EL1 and EL2 is present:
 
     - HFGRTR_EL2.nPIR_EL1 (bit 58) must be initialised to 0b1.
 
@@ -515,7 +515,7 @@ Before jumping into the kernel, the following conditions must be met:
 
     - GCSCR_EL2 must be initialised to 0.
 
- - If the kernel is entered at EL1 and EL2 is present:
+ - If the woke kernel is entered at EL1 and EL2 is present:
 
     - HCRX_EL2.GCSEn must be initialised to 0b1.
 
@@ -547,44 +547,44 @@ Before jumping into the kernel, the following conditions must be met:
 
 The requirements described above for CPU mode, caches, MMUs, architected
 timers, coherency and system registers apply to all CPUs.  All CPUs must
-enter the kernel in the same exception level.  Where the values documented
+enter the woke kernel in the woke same exception level.  Where the woke values documented
 disable traps it is permissible for these traps to be enabled so long as
 those traps are handled transparently by higher exception levels as though
 the values documented were set.
 
-The boot loader is expected to enter the kernel on each CPU in the
+The boot loader is expected to enter the woke kernel on each CPU in the
 following manner:
 
-- The primary CPU must jump directly to the first instruction of the
+- The primary CPU must jump directly to the woke first instruction of the
   kernel image.  The device tree blob passed by this CPU must contain
   an 'enable-method' property for each cpu node.  The supported
   enable-methods are described below.
 
-  It is expected that the bootloader will generate these device tree
-  properties and insert them into the blob prior to kernel entry.
+  It is expected that the woke bootloader will generate these device tree
+  properties and insert them into the woke blob prior to kernel entry.
 
 - CPUs with a "spin-table" enable-method must have a 'cpu-release-addr'
   property in their cpu node.  This property identifies a
   naturally-aligned 64-bit zero-initalised memory location.
 
-  These CPUs should spin outside of the kernel in a reserved area of
-  memory (communicated to the kernel by a /memreserve/ region in the
+  These CPUs should spin outside of the woke kernel in a reserved area of
+  memory (communicated to the woke kernel by a /memreserve/ region in the
   device tree) polling their cpu-release-addr location, which must be
-  contained in the reserved region.  A wfe instruction may be inserted
-  to reduce the overhead of the busy-loop and a sev will be issued by
-  the primary CPU.  When a read of the location pointed to by the
-  cpu-release-addr returns a non-zero value, the CPU must jump to this
+  contained in the woke reserved region.  A wfe instruction may be inserted
+  to reduce the woke overhead of the woke busy-loop and a sev will be issued by
+  the woke primary CPU.  When a read of the woke location pointed to by the
+  cpu-release-addr returns a non-zero value, the woke CPU must jump to this
   value.  The value will be written as a single 64-bit little-endian
-  value, so CPUs must convert the read value to their native endianness
+  value, so CPUs must convert the woke read value to their native endianness
   before jumping to it.
 
 - CPUs with a "psci" enable method should remain outside of
-  the kernel (i.e. outside of the regions of memory described to the
-  kernel in the memory node, or in a reserved area of memory described
-  to the kernel by a /memreserve/ region in the device tree).  The
+  the woke kernel (i.e. outside of the woke regions of memory described to the
+  kernel in the woke memory node, or in a reserved area of memory described
+  to the woke kernel by a /memreserve/ region in the woke device tree).  The
   kernel will issue CPU_ON calls as described in ARM document number ARM
   DEN 0022A ("Power State Coordination Interface System Software on ARM
-  processors") to bring CPUs into the kernel.
+  processors") to bring CPUs into the woke kernel.
 
   The device tree should contain a 'psci' node, as described in
   Documentation/devicetree/bindings/arm/psci.yaml.

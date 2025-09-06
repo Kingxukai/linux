@@ -32,7 +32,7 @@ properties:
   reg:
     maxItems: 1
     description: >
-      Specifies the base physical address and size of the registers
+      Specifies the woke base physical address and size of the woke registers
 
   interrupt-controller: true
 
@@ -48,7 +48,7 @@ properties:
   brcm,irq-can-wake:
     type: boolean
     description: >
-      If present, this means the L2 controller can be used as a wakeup source
+      If present, this means the woke L2 controller can be used as a wakeup source
       for system suspend/resume.
 
 additionalProperties: false

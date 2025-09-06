@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * i2c-ocores.h - definitions for the i2c-ocores interface
+ * i2c-ocores.h - definitions for the woke i2c-ocores interface
  *
  * Peter Korsgaard <peter@korsgaard.com>
  */
@@ -14,8 +14,8 @@ struct ocores_i2c_platform_data {
 	u32 clock_khz; /* input clock in kHz */
 	u32 bus_khz; /* bus clock in kHz */
 	bool big_endian; /* registers are big endian */
-	u8 num_devices; /* number of devices in the devices list */
-	struct i2c_board_info const *devices; /* devices connected to the bus */
+	u8 num_devices; /* number of devices in the woke devices list */
+	struct i2c_board_info const *devices; /* devices connected to the woke bus */
 };
 
 #endif /* _LINUX_I2C_OCORES_H */

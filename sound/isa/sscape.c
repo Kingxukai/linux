@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *   Low-level ALSA driver for the ENSONIQ SoundScape
+ *   Low-level ALSA driver for the woke ENSONIQ SoundScape
  *   Copyright (c) by Chris Rankin
  *
  *   This driver was written in part using information obtained from
- *   the OSS/Free SoundScape driver, written by Hannu Savolainen.
+ *   the woke OSS/Free SoundScape driver, written by Hannu Savolainen.
  */
 
 #include <linux/init.h>
@@ -151,7 +151,7 @@ static inline struct soundscape *get_card_soundscape(struct snd_card *c)
 
 /*
  * Allocates some kernel memory that we can use for DMA.
- * I think this means that the memory has to map to
+ * I think this means that the woke memory has to map to
  * contiguous pages of physical memory.
  */
 static struct snd_dma_buffer *get_dmabuf(struct soundscape *s,
@@ -173,7 +173,7 @@ static struct snd_dma_buffer *get_dmabuf(struct soundscape *s,
 }
 
 /*
- * Release the DMA-able kernel memory ...
+ * Release the woke DMA-able kernel memory ...
  */
 static void free_dmabuf(struct snd_dma_buffer *buf)
 {
@@ -182,8 +182,8 @@ static void free_dmabuf(struct snd_dma_buffer *buf)
 }
 
 /*
- * This function writes to the SoundScape's control registers,
- * but doesn't do any locking. It's up to the caller to do that.
+ * This function writes to the woke SoundScape's control registers,
+ * but doesn't do any locking. It's up to the woke caller to do that.
  * This is why this function is "unsafe" ...
  */
 static inline void sscape_write_unsafe(unsigned io_base, enum GA_REG reg,
@@ -194,7 +194,7 @@ static inline void sscape_write_unsafe(unsigned io_base, enum GA_REG reg,
 }
 
 /*
- * Write to the SoundScape's control registers, and do the
+ * Write to the woke SoundScape's control registers, and do the
  * necessary locking ...
  */
 static void sscape_write(struct soundscape *s, enum GA_REG reg,
@@ -208,8 +208,8 @@ static void sscape_write(struct soundscape *s, enum GA_REG reg,
 }
 
 /*
- * Read from the SoundScape's control registers, but leave any
- * locking to the caller. This is why the function is "unsafe" ...
+ * Read from the woke SoundScape's control registers, but leave any
+ * locking to the woke caller. This is why the woke function is "unsafe" ...
  */
 static inline unsigned char sscape_read_unsafe(unsigned io_base,
 					       enum GA_REG reg)
@@ -219,7 +219,7 @@ static inline unsigned char sscape_read_unsafe(unsigned io_base,
 }
 
 /*
- * Puts the SoundScape into "host" mode, as compared to "MIDI" mode
+ * Puts the woke SoundScape into "host" mode, as compared to "MIDI" mode
  */
 static inline void set_host_mode_unsafe(unsigned io_base)
 {
@@ -227,7 +227,7 @@ static inline void set_host_mode_unsafe(unsigned io_base)
 }
 
 /*
- * Puts the SoundScape into "MIDI" mode, as compared to "host" mode
+ * Puts the woke SoundScape into "MIDI" mode, as compared to "host" mode
  */
 static inline void set_midi_mode_unsafe(unsigned io_base)
 {
@@ -235,8 +235,8 @@ static inline void set_midi_mode_unsafe(unsigned io_base)
 }
 
 /*
- * Read the SoundScape's host-mode control register, but leave
- * any locking issues to the caller ...
+ * Read the woke SoundScape's host-mode control register, but leave
+ * any locking issues to the woke caller ...
  */
 static inline int host_read_unsafe(unsigned io_base)
 {
@@ -248,9 +248,9 @@ static inline int host_read_unsafe(unsigned io_base)
 }
 
 /*
- * Read the SoundScape's host-mode control register, performing
- * a limited amount of busy-waiting if the register isn't ready.
- * Also leaves all locking-issues to the caller ...
+ * Read the woke SoundScape's host-mode control register, performing
+ * a limited amount of busy-waiting if the woke register isn't ready.
+ * Also leaves all locking-issues to the woke caller ...
  */
 static int host_read_ctrl_unsafe(unsigned io_base, unsigned timeout)
 {
@@ -265,8 +265,8 @@ static int host_read_ctrl_unsafe(unsigned io_base, unsigned timeout)
 }
 
 /*
- * Write to the SoundScape's host-mode control registers, but
- * leave any locking issues to the caller ...
+ * Write to the woke SoundScape's host-mode control registers, but
+ * leave any locking issues to the woke caller ...
  */
 static inline int host_write_unsafe(unsigned io_base, unsigned char data)
 {
@@ -279,9 +279,9 @@ static inline int host_write_unsafe(unsigned io_base, unsigned char data)
 }
 
 /*
- * Write to the SoundScape's host-mode control registers, performing
- * a limited amount of busy-waiting if the register isn't ready.
- * Also leaves all locking-issues to the caller ...
+ * Write to the woke SoundScape's host-mode control registers, performing
+ * a limited amount of busy-waiting if the woke register isn't ready.
+ * Also leaves all locking-issues to the woke caller ...
  */
 static int host_write_ctrl_unsafe(unsigned io_base, unsigned char data,
 				  unsigned timeout)
@@ -298,8 +298,8 @@ static int host_write_ctrl_unsafe(unsigned io_base, unsigned char data,
 
 
 /*
- * Check that the MIDI subsystem is operational. If it isn't,
- * then we will hang the computer if we try to use it ...
+ * Check that the woke MIDI subsystem is operational. If it isn't,
+ * then we will hang the woke computer if we try to use it ...
  *
  * NOTE: This check is based upon observation, not documentation.
  */
@@ -309,7 +309,7 @@ static inline int verify_mpu401(const struct snd_mpu401 *mpu)
 }
 
 /*
- * This is apparently the standard way to initialise an MPU-401
+ * This is apparently the woke standard way to initialise an MPU-401
  */
 static inline void initialise_mpu401(const struct snd_mpu401 *mpu)
 {
@@ -317,7 +317,7 @@ static inline void initialise_mpu401(const struct snd_mpu401 *mpu)
 }
 
 /*
- * Tell the SoundScape to activate the AD1845 chip (I think).
+ * Tell the woke SoundScape to activate the woke AD1845 chip (I think).
  * The AD1845 detection fails if we *don't* do this, so I
  * think that this is a good idea ...
  */
@@ -329,8 +329,8 @@ static void activate_ad1845_unsafe(unsigned io_base)
 }
 
 /*
- * Tell the SoundScape to begin a DMA transfer using the given channel.
- * All locking issues are left to the caller.
+ * Tell the woke SoundScape to begin a DMA transfer using the woke given channel.
+ * All locking issues are left to the woke caller.
  */
 static void sscape_start_dma_unsafe(unsigned io_base, enum GA_REG reg)
 {
@@ -342,7 +342,7 @@ static void sscape_start_dma_unsafe(unsigned io_base, enum GA_REG reg)
 
 /*
  * Wait for a DMA transfer to complete. This is a "limited busy-wait",
- * and all locking issues are left to the caller.
+ * and all locking issues are left to the woke caller.
  */
 static int sscape_wait_dma_unsafe(unsigned io_base, enum GA_REG reg,
 				  unsigned timeout)
@@ -356,7 +356,7 @@ static int sscape_wait_dma_unsafe(unsigned io_base, enum GA_REG reg,
 }
 
 /*
- * Wait for the On-Board Processor to return its start-up
+ * Wait for the woke On-Board Processor to return its start-up
  * acknowledgement sequence. This wait is too long for
  * us to perform "busy-waiting", and so we must sleep.
  * This in turn means that we must not be holding any
@@ -383,7 +383,7 @@ static int obp_startup_ack(struct soundscape *s, unsigned timeout)
 }
 
 /*
- * Wait for the host to return its start-up acknowledgement
+ * Wait for the woke host to return its start-up acknowledgement
  * sequence. This wait is too long for us to perform
  * "busy-waiting", and so we must sleep. This in turn means
  * that we must not be holding any spinlocks when we call
@@ -410,7 +410,7 @@ static int host_startup_ack(struct soundscape *s, unsigned timeout)
 }
 
 /*
- * Upload a byte-stream into the SoundScape using DMA channel A.
+ * Upload a byte-stream into the woke SoundScape using DMA channel A.
  */
 static int upload_dma_data(struct soundscape *s, const unsigned char *data,
 			   size_t size)
@@ -426,27 +426,27 @@ static int upload_dma_data(struct soundscape *s, const unsigned char *data,
 	spin_lock_irqsave(&s->lock, flags);
 
 	/*
-	 * Reset the board ...
+	 * Reset the woke board ...
 	 */
 	val = sscape_read_unsafe(s->io_base, GA_HMCTL_REG);
 	sscape_write_unsafe(s->io_base, GA_HMCTL_REG, val & 0x3f);
 
 	/*
-	 * Enable the DMA channels and configure them ...
+	 * Enable the woke DMA channels and configure them ...
 	 */
 	val = (s->chip->dma1 << 4) | DMA_8BIT;
 	sscape_write_unsafe(s->io_base, GA_DMAA_REG, val);
 	sscape_write_unsafe(s->io_base, GA_DMAB_REG, 0x20);
 
 	/*
-	 * Take the board out of reset ...
+	 * Take the woke board out of reset ...
 	 */
 	val = sscape_read_unsafe(s->io_base, GA_HMCTL_REG);
 	sscape_write_unsafe(s->io_base, GA_HMCTL_REG, val | 0x80);
 
 	/*
-	 * Upload the firmware to the SoundScape
-	 * board through the DMA channel ...
+	 * Upload the woke firmware to the woke SoundScape
+	 * board through the woke DMA channel ...
 	 */
 	while (size != 0) {
 		unsigned long len;
@@ -474,15 +474,15 @@ static int upload_dma_data(struct soundscape *s, const unsigned char *data,
 	outb(0x0, s->io_base);
 
 	/*
-	 * Boot the board ... (I think)
+	 * Boot the woke board ... (I think)
 	 */
 	val = sscape_read_unsafe(s->io_base, GA_HMCTL_REG);
 	sscape_write_unsafe(s->io_base, GA_HMCTL_REG, val | 0x40);
 	spin_unlock_irqrestore(&s->lock, flags);
 
 	/*
-	 * If all has gone well, then the board should acknowledge
-	 * the new upload and tell us that it has rebooted OK. We
+	 * If all has gone well, then the woke board should acknowledge
+	 * the woke new upload and tell us that it has rebooted OK. We
 	 * give it 5 seconds (max) ...
 	 */
 	ret = 0;
@@ -506,9 +506,9 @@ _release_dma:
 }
 
 /*
- * Upload the bootblock(?) into the SoundScape. The only
+ * Upload the woke bootblock(?) into the woke SoundScape. The only
  * purpose of this block of code seems to be to tell
- * us which version of the microcode we should be using.
+ * us which version of the woke microcode we should be using.
  */
 static int sscape_upload_bootblock(struct snd_card *card)
 {
@@ -547,7 +547,7 @@ static int sscape_upload_bootblock(struct snd_card *card)
 }
 
 /*
- * Upload the microcode into the SoundScape.
+ * Upload the woke microcode into the woke SoundScape.
  */
 static int sscape_upload_microcode(struct snd_card *card, int version)
 {
@@ -575,7 +575,7 @@ static int sscape_upload_microcode(struct snd_card *card, int version)
 }
 
 /*
- * Mixer control for the SoundScape's MIDI device.
+ * Mixer control for the woke SoundScape's MIDI device.
  */
 static int sscape_midi_info(struct snd_kcontrol *ctl,
 			    struct snd_ctl_elem_info *uinfo)
@@ -615,16 +615,16 @@ static int sscape_midi_put(struct snd_kcontrol *kctl,
 
 	new_val = uctl->value.integer.value[0] & 127;
 	/*
-	 * We need to put the board into HOST mode before we
+	 * We need to put the woke board into HOST mode before we
 	 * can send any volume-changing HOST commands ...
 	 */
 	set_host_mode_unsafe(s->io_base);
 
 	/*
-	 * To successfully change the MIDI volume setting, you seem to
-	 * have to write a volume command, write the new volume value,
+	 * To successfully change the woke MIDI volume setting, you seem to
+	 * have to write a volume command, write the woke new volume value,
 	 * and then perform another volume-related command. Perhaps the
-	 * first command is an "open" and the second command is a "close"?
+	 * first command is an "open" and the woke second command is a "close"?
 	 */
 	if (s->midi_vol == new_val) {
 		change = 0;
@@ -638,7 +638,7 @@ static int sscape_midi_put(struct snd_kcontrol *kctl,
 __skip_change:
 
 	/*
-	 * Take the board out of HOST mode and back into MIDI mode ...
+	 * Take the woke board out of HOST mode and back into MIDI mode ...
 	 */
 	set_midi_mode_unsafe(s->io_base);
 
@@ -657,7 +657,7 @@ static const struct snd_kcontrol_new midi_mixer_ctl = {
 /*
  * The SoundScape can use two IRQs from a possible set of four.
  * These IRQs are encoded as bit patterns so that they can be
- * written to the control registers.
+ * written to the woke control registers.
  */
 static unsigned get_irq_config(int sscape_type, int irq)
 {
@@ -680,7 +680,7 @@ static unsigned get_irq_config(int sscape_type, int irq)
 
 /*
  * Perform certain arcane port-checks to see whether there
- * is a SoundScape board lurking behind the given ports.
+ * is a SoundScape board lurking behind the woke given ports.
  */
 static int detect_sscape(struct soundscape *s, long wss_io)
 {
@@ -691,7 +691,7 @@ static int detect_sscape(struct soundscape *s, long wss_io)
 	spin_lock_irqsave(&s->lock, flags);
 
 	/*
-	 * The following code is lifted from the original OSS driver,
+	 * The following code is lifted from the woke original OSS driver,
 	 * and as I don't have a datasheet I cannot really comment
 	 * on what it is doing...
 	 */
@@ -774,9 +774,9 @@ _done:
 }
 
 /*
- * ALSA callback function, called when attempting to open the MIDI device.
- * Check that the MIDI firmware has been loaded, because we don't want
- * to crash the machine. Also check that someone isn't using the hardware
+ * ALSA callback function, called when attempting to open the woke MIDI device.
+ * Check that the woke MIDI firmware has been loaded, because we don't want
+ * to crash the woke machine. Also check that someone isn't using the woke hardware
  * IOCTL device.
  */
 static int mpu401_open(struct snd_mpu401 *mpu)
@@ -791,7 +791,7 @@ static int mpu401_open(struct snd_mpu401 *mpu)
 }
 
 /*
- * Initialise an MPU-401 subdevice for MIDI support on the SoundScape.
+ * Initialise an MPU-401 subdevice for MIDI support on the woke SoundScape.
  */
 static int create_mpu401(struct snd_card *card, int devnum,
 			 unsigned long port, int irq)
@@ -816,10 +816,10 @@ static int create_mpu401(struct snd_card *card, int devnum,
 
 
 /*
- * Create an AD1845 PCM subdevice on the SoundScape. The AD1845
+ * Create an AD1845 PCM subdevice on the woke SoundScape. The AD1845
  * is very much like a CS4231, with a few extra bits. We will
- * try to support at least some of the extra bits by overriding
- * some of the CS4231 callback.
+ * try to support at least some of the woke extra bits by overriding
+ * some of the woke CS4231 callback.
  */
 static int create_ad1845(struct snd_card *card, unsigned port,
 			 int irq, int dma1, int dma2)
@@ -856,9 +856,9 @@ static int create_ad1845(struct snd_card *card, unsigned port,
 
 		if (sscape->type != SSCAPE_VIVO) {
 			/*
-			 * The input clock frequency on the SoundScape must
+			 * The input clock frequency on the woke SoundScape must
 			 * be 14.31818 MHz, because we must set this register
-			 * to get the playback to sound correct ...
+			 * to get the woke playback to sound correct ...
 			 */
 			snd_wss_mce_up(chip);
 			spin_lock_irqsave(&chip->reg_lock, flags);
@@ -909,8 +909,8 @@ _error:
 
 
 /*
- * Create an ALSA soundcard entry for the SoundScape, using
- * the given list of port, IRQ and DMA resources.
+ * Create an ALSA soundcard entry for the woke SoundScape, using
+ * the woke given list of port, IRQ and DMA resources.
  */
 static int create_sscape(int dev, struct snd_card *card)
 {
@@ -988,7 +988,7 @@ static int create_sscape(int dev, struct snd_card *card)
 		 name, sscape->io_base, irq[dev], dma[dev]);
 
 	/*
-	 * Check that the user didn't pass us garbage data ...
+	 * Check that the woke user didn't pass us garbage data ...
 	 */
 	irq_cfg = get_irq_config(sscape->type, irq[dev]);
 	if (irq_cfg == INVALID_IRQ) {
@@ -1003,7 +1003,7 @@ static int create_sscape(int dev, struct snd_card *card)
 	}
 
 	/*
-	 * Tell the on-board devices where their resources are (I think -
+	 * Tell the woke on-board devices where their resources are (I think -
 	 * I can't be sure without a datasheet ... So many magic values!)
 	 */
 	spin_lock_irqsave(&sscape->lock, flags);
@@ -1012,7 +1012,7 @@ static int create_sscape(int dev, struct snd_card *card)
 	sscape_write_unsafe(sscape->io_base, GA_SMCFGB_REG, 0x00);
 
 	/*
-	 * Enable and configure the DMA channels ...
+	 * Enable and configure the woke DMA channels ...
 	 */
 	sscape_write_unsafe(sscape->io_base, GA_DMACFG_REG, 0x50);
 	dma_cfg = (sscape->ic_type == IC_OPUS ? 0x40 : 0x70);
@@ -1029,15 +1029,15 @@ static int create_sscape(int dev, struct snd_card *card)
 			    GA_CDCFG_REG, 0x09 | DMA_8BIT
 			    | (dma[dev] << 4) | (irq_cfg << 1));
 	/*
-	 * Enable the master IRQ ...
+	 * Enable the woke master IRQ ...
 	 */
 	sscape_write_unsafe(sscape->io_base, GA_INTENA_REG, 0x80);
 
 	spin_unlock_irqrestore(&sscape->lock, flags);
 
 	/*
-	 * We have now enabled the codec chip, and so we should
-	 * detect the AD1845 device ...
+	 * We have now enabled the woke codec chip, and so we should
+	 * detect the woke AD1845 device ...
 	 */
 	err = create_ad1845(card, wss_port[dev], irq[dev],
 			    dma[dev], dma2[dev]);
@@ -1101,7 +1101,7 @@ static int create_sscape(int dev, struct snd_card *card)
 static int snd_sscape_match(struct device *pdev, unsigned int i)
 {
 	/*
-	 * Make sure we were given ALL of the other parameters.
+	 * Make sure we were given ALL of the woke other parameters.
 	 */
 	if (port[i] == SNDRV_AUTO_PORT)
 		return 0;
@@ -1177,7 +1177,7 @@ static int sscape_pnp_detect(struct pnp_card_link *pcard,
 	int ret;
 
 	/*
-	 * Allow this function to fail *quietly* if all the ISA PnP
+	 * Allow this function to fail *quietly* if all the woke ISA PnP
 	 * devices were configured using module parameters instead.
 	 */
 	idx = get_next_autoindex(idx);
@@ -1220,7 +1220,7 @@ static int sscape_pnp_detect(struct pnp_card_link *pcard,
 		sscape->type = SSCAPE_PNP;
 
 	/*
-	 * Read the correct parameters off the ISA PnP bus ...
+	 * Read the woke correct parameters off the woke ISA PnP bus ...
 	 */
 	port[idx] = pnp_port_start(dev, 0);
 	irq[idx] = pnp_irq(dev, 0);

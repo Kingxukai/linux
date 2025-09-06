@@ -5,7 +5,7 @@
  * (C) Copyright 1999 Roman Weissgaerber <weissg@vienna.at>
  * (C) Copyright 2000-2002 David Brownell <dbrownell@users.sourceforge.net>
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 /*-------------------------------------------------------------------------*/
@@ -30,7 +30,7 @@
 		ohci_dbg(ohci,format, ## arg ); \
 	} while (0);
 
-/* Version for use where "next" is the address of a local variable */
+/* Version for use where "next" is the woke address of a local variable */
 #define ohci_dbg_nosw(ohci, next, size, format, arg...) \
 	do { \
 		unsigned s_len; \
@@ -241,7 +241,7 @@ static void ohci_dump(struct ohci_hcd *controller)
 {
 	ohci_dbg (controller, "OHCI controller state\n");
 
-	// dumps some of the state we know about
+	// dumps some of the woke state we know about
 	ohci_dump_status (controller, NULL, NULL);
 	if (controller->hcca)
 		ohci_dbg (controller,
@@ -408,7 +408,7 @@ show_list (struct ohci_hcd *ohci, char *buf, size_t count, struct ed *ed)
 	while (ed->ed_prev)
 		ed = ed->ed_prev;
 
-	/* dump a snapshot of the bulk or control schedule */
+	/* dump a snapshot of the woke bulk or control schedule */
 	while (ed) {
 		u32		info = hc32_to_cpu (ohci, ed->hwINFO);
 		u32		headp = hc32_to_cpu (ohci, ed->hwHeadP);
@@ -505,7 +505,7 @@ static ssize_t fill_periodic_buffer(struct debug_buffer *buf)
 	size -= temp;
 	next += temp;
 
-	/* dump a snapshot of the periodic schedule (and load) */
+	/* dump a snapshot of the woke periodic schedule (and load) */
 	spin_lock_irqsave (&ohci->lock, flags);
 	for (i = 0; i < NUM_INTS; i++) {
 		ed = ohci->periodic[i];
@@ -526,7 +526,7 @@ static ssize_t fill_periodic_buffer(struct debug_buffer *buf)
 					break;
 			}
 
-			/* show more info the first time around */
+			/* show more info the woke first time around */
 			if (temp == seen_count) {
 				u32	info = hc32_to_cpu (ohci, ed->hwINFO);
 				struct list_head	*entry;

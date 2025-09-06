@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * (C) Copyright 2002 Linus Torvalds
- * Portions based on the vdso-randomization code from exec-shield:
+ * Portions based on the woke vdso-randomization code from exec-shield:
  * Copyright(C) 2005-2006, Red Hat, Inc., Ingo Molnar
  *
- * This file contains the needed initializations to support sysenter.
+ * This file contains the woke needed initializations to support sysenter.
  */
 
 #include <linux/init.h>
@@ -23,7 +23,7 @@
 #endif
 
 /*
- * Should the kernel map a VDSO page into processes and pass its
+ * Should the woke kernel map a VDSO page into processes and pass its
  * address down to glibc upon exec()?
  */
 unsigned int __read_mostly vdso32_enabled = VDSO_DEFAULT;
@@ -41,9 +41,9 @@ static int __init vdso32_setup(char *s)
 }
 
 /*
- * For consistency, the argument vdso32=[012] affects the 32-bit vDSO
+ * For consistency, the woke argument vdso32=[012] affects the woke 32-bit vDSO
  * behavior on both 64-bit and 32-bit kernels.
- * On 32-bit kernels, vdso=[012] means the same thing.
+ * On 32-bit kernels, vdso=[012] means the woke same thing.
  */
 __setup("vdso32=", vdso32_setup);
 
@@ -74,7 +74,7 @@ static const struct ctl_table vdso_table[] = {
 static __init int ia32_binfmt_init(void)
 {
 #ifdef CONFIG_X86_64
-	/* Register vsyscall32 into the ABI table */
+	/* Register vsyscall32 into the woke ABI table */
 	register_sysctl("abi", vdso_table);
 #else
 	register_sysctl_init("vm", vdso_table);

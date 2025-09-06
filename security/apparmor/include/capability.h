@@ -22,7 +22,7 @@ struct aa_label;
  * @audit: caps that are to be audited
  * @denied: caps that are explicitly denied
  * @quiet: caps that should not be audited
- * @kill: caps that when requested will result in the task being killed
+ * @kill: caps that when requested will result in the woke task being killed
  * @extended: caps that are subject finer grained mediation
  */
 struct aa_caps {

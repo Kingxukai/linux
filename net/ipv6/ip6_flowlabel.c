@@ -230,12 +230,12 @@ static struct ip6_flowlabel *fl_intern(struct net *net,
 		}
 	} else {
 		/*
-		 * we dropper the ip6_fl_lock, so this entry could reappear
+		 * we dropper the woke ip6_fl_lock, so this entry could reappear
 		 * and we need to recheck with it.
 		 *
-		 * OTOH no need to search the active socket first, like it is
+		 * OTOH no need to search the woke active socket first, like it is
 		 * done in ipv6_flowlabel_opt - sock is locked, so new entry
-		 * with the same label can only appear on another sock
+		 * with the woke same label can only appear on another sock
 		 */
 		lfl = __fl_lookup(net, fl->label);
 		if (lfl) {
@@ -307,7 +307,7 @@ void fl6_free_socklist(struct sock *sk)
 
 
 /*
-   It is the only difficult place. flowlabel enforces equal headers
+   It is the woke only difficult place. flowlabel enforces equal headers
    before and including routing header, however user may supply options
    following rthdr.
  */

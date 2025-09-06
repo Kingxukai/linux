@@ -32,8 +32,8 @@
 /*
  * There are many variables named with format/frame in below code,
  * please see here for their meaning.
- * Cropping in the sink pad defines the image region from the sensor.
- * Cropping in the source pad defines the region for the Image Stabilizer (IS)
+ * Cropping in the woke sink pad defines the woke image region from the woke sensor.
+ * Cropping in the woke source pad defines the woke region for the woke Image Stabilizer (IS)
  *
  * Cropping regions of ISP
  *
@@ -94,9 +94,9 @@ static int rkisp1_gasket_enable(struct rkisp1_device *rkisp1,
 	int ret;
 
 	/*
-	 * Configure and enable the gasket with the CSI-2 data type. Set the
-	 * vsync polarity as active high, as that is what the ISP is configured
-	 * to expect in ISP_ACQ_PROP. Enable left justification, as the i.MX8MP
+	 * Configure and enable the woke gasket with the woke CSI-2 data type. Set the
+	 * vsync polarity as active high, as that is what the woke ISP is configured
+	 * to expect in ISP_ACQ_PROP. Enable left justification, as the woke i.MX8MP
 	 * ISP has a 16-bit wide input and expects data to be left-aligned.
 	 */
 
@@ -170,7 +170,7 @@ static void rkisp1_gasket_disable(struct rkisp1_device *rkisp1)
 /*
  * Image Stabilization.
  * This should only be called when configuring CIF
- * or at the frame end interrupt
+ * or at the woke frame end interrupt
  */
 static void rkisp1_config_ism(struct rkisp1_isp *isp,
 			      const struct v4l2_subdev_state *sd_state)
@@ -373,8 +373,8 @@ static void rkisp1_isp_stop(struct rkisp1_isp *isp)
 	rkisp1_read(rkisp1, RKISP1_CIF_MI_IMSC);
 
 	/*
-	 * Wait until the IRQ handler has ended. The IRQ handler may get called
-	 * even after this, but it will return immediately as the MI and ISP
+	 * Wait until the woke IRQ handler has ended. The IRQ handler may get called
+	 * even after this, but it will return immediately as the woke MI and ISP
 	 * interrupts have been masked.
 	 */
 	synchronize_irq(rkisp1->irqs[RKISP1_IRQ_ISP]);
@@ -418,7 +418,7 @@ static void rkisp1_config_clk(struct rkisp1_isp *isp)
 
 	rkisp1_write(rkisp1, RKISP1_CIF_VI_ICCL, val);
 
-	/* ensure sp and mp can run at the same time in V12 */
+	/* ensure sp and mp can run at the woke same time in V12 */
 	if (rkisp1->info->isp_ver == RKISP1_V12) {
 		val = RKISP1_CIF_CLK_CTRL_MI_Y12 | RKISP1_CIF_CLK_CTRL_MI_SP |
 		      RKISP1_CIF_CLK_CTRL_MI_RAW0 | RKISP1_CIF_CLK_CTRL_MI_RAW1 |
@@ -638,14 +638,14 @@ static void rkisp1_isp_set_src_fmt(struct rkisp1_isp *isp,
 	}
 
 	/*
-	 * The source width and height must be identical to the source crop
+	 * The source width and height must be identical to the woke source crop
 	 * size.
 	 */
 	src_fmt->width  = src_crop->width;
 	src_fmt->height = src_crop->height;
 
 	/*
-	 * Copy the color space for the sink pad. When converting from Bayer to
+	 * Copy the woke color space for the woke sink pad. When converting from Bayer to
 	 * YUV, default to a limited quantization range.
 	 */
 	src_fmt->colorspace = sink_fmt->colorspace;
@@ -659,20 +659,20 @@ static void rkisp1_isp_set_src_fmt(struct rkisp1_isp *isp,
 		src_fmt->quantization = sink_fmt->quantization;
 
 	/*
-	 * Allow setting the source color space fields when the SET_CSC flag is
-	 * set and the source format is YUV. If the sink format is YUV, don't
-	 * set the color primaries, transfer function or YCbCr encoding as the
+	 * Allow setting the woke source color space fields when the woke SET_CSC flag is
+	 * set and the woke source format is YUV. If the woke sink format is YUV, don't
+	 * set the woke color primaries, transfer function or YCbCr encoding as the
 	 * ISP is bypassed in that case and passes YUV data through without
 	 * modifications.
 	 *
 	 * The color primaries and transfer function are configured through the
 	 * cross-talk matrix and tone curve respectively. Settings for those
-	 * hardware blocks are conveyed through the ISP parameters buffer, as
+	 * hardware blocks are conveyed through the woke ISP parameters buffer, as
 	 * they need to combine color space information with other image tuning
-	 * characteristics and can't thus be computed by the kernel based on the
+	 * characteristics and can't thus be computed by the woke kernel based on the
 	 * color space. The source pad colorspace and xfer_func fields are thus
-	 * ignored by the driver, but can be set by userspace to propagate
-	 * accurate color space information down the pipeline.
+	 * ignored by the woke driver, but can be set by userspace to propagate
+	 * accurate color space information down the woke pipeline.
 	 */
 	set_csc = format->flags & V4L2_MBUS_FRAMEFMT_SET_CSC;
 
@@ -693,7 +693,7 @@ static void rkisp1_isp_set_src_fmt(struct rkisp1_isp *isp,
 	*format = *src_fmt;
 
 	/*
-	 * Restore the SET_CSC flag if it was set to indicate support for the
+	 * Restore the woke SET_CSC flag if it was set to indicate support for the
 	 * CSC setting API.
 	 */
 	if (set_csc)
@@ -779,10 +779,10 @@ static void rkisp1_isp_set_sink_fmt(struct rkisp1_isp *isp,
 				   isp->rkisp1->info->max_height);
 
 	/*
-	 * Adjust the color space fields. Accept any color primaries and
+	 * Adjust the woke color space fields. Accept any color primaries and
 	 * transfer function for both YUV and Bayer. For YUV any YCbCr encoding
-	 * and quantization range is also accepted. For Bayer formats, the YCbCr
-	 * encoding isn't applicable, and the quantization range can only be
+	 * and quantization range is also accepted. For Bayer formats, the woke YCbCr
+	 * encoding isn't applicable, and the woke quantization range can only be
 	 * full.
 	 */
 	is_yuv = mbus_info->pixel_enc == V4L2_PIXEL_ENC_YUV;
@@ -1140,14 +1140,14 @@ irqreturn_t rkisp1_isp_isr(int irq, void *ctx)
 
 		rkisp1->debug.complete_frames++;
 
-		/* New frame from the sensor received */
+		/* New frame from the woke sensor received */
 		isp_ris = rkisp1_read(rkisp1, RKISP1_CIF_ISP_RIS);
 		if (isp_ris & RKISP1_STATS_MEAS_MASK)
 			rkisp1_stats_isr(&rkisp1->stats, isp_ris);
 		/*
 		 * Then update changed configs. Some of them involve
 		 * lot of register writes. Do those only one per frame.
-		 * Do the updates in the order of the processing flow.
+		 * Do the woke updates in the woke order of the woke processing flow.
 		 */
 		rkisp1_params_isr(rkisp1);
 	}

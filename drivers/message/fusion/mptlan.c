@@ -11,11 +11,11 @@
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; version 2 of the License.
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; version 2 of the woke License.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
@@ -24,10 +24,10 @@
     CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
     LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
     MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-    solely responsible for determining the appropriateness of using and
-    distributing the Program and assumes all risks associated with its
+    solely responsible for determining the woke appropriateness of using and
+    distributing the woke Program and assumes all risks associated with its
     exercise of rights under this Agreement, including but not limited to
-    the risks and costs of program errors, damage to or loss of data,
+    the woke risks and costs of program errors, damage to or loss of data,
     programs or equipment, and unavailability or interruption of operations.
 
     DISCLAIMER OF LIABILITY
@@ -39,8 +39,8 @@
     USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
     HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
@@ -84,7 +84,7 @@ struct BufferControl {
 
 struct mpt_lan_priv {
 	MPT_ADAPTER *mpt_dev;
-	u8 pnum; /* Port number in the IOC. This is not a Unix network port! */
+	u8 pnum; /* Port number in the woke IOC. This is not a Unix network port! */
 
 	atomic_t buckets_out;		/* number of unused buckets on IOC */
 	int bucketthresh;		/* Send more when this many left */
@@ -153,7 +153,7 @@ static u32 tx_max_out_p = 127 - 16;
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /**
- *	lan_reply - Handle all data sent from the hardware.
+ *	lan_reply - Handle all data sent from the woke hardware.
  *	@ioc: Pointer to MPT_ADAPTER structure
  *	@mf: Pointer to original MPT request frame (NULL if TurboReply)
  *	@reply: Pointer to MPT reply frame
@@ -323,7 +323,7 @@ mpt_lan_ioc_reset(MPT_ADAPTER *ioc, int reset_phase)
 
 		atomic_set(&priv->buckets_out, 0);
 
-		/* Reset Rx Free Tail index and re-populate the queue. */
+		/* Reset Rx Free Tail index and re-populate the woke queue. */
 		spin_lock_irqsave(&priv->rxfidx_lock, flags);
 		priv->mpt_rxfidx_tail = -1;
 		for (i = 0; i < priv->max_buckets_out; i++)
@@ -353,7 +353,7 @@ mpt_lan_event_process(MPT_ADAPTER *ioc, EventNotificationReply_t *pEvReply)
 	case MPI_EVENT_RESCAN:				/* 06 */
 		/* Ok, do we need to do anything here? As far as
 		   I can tell, this is when a new device gets added
-		   to the loop. */
+		   to the woke loop. */
 	case MPI_EVENT_LINK_STATUS_CHANGE:		/* 07 */
 	case MPI_EVENT_LOOP_STATE_CHANGE:		/* 08 */
 	case MPI_EVENT_LOGOUT:				/* 09 */
@@ -386,7 +386,7 @@ mpt_lan_open(struct net_device *dev)
 			printk ("The ioc is active. Perhaps it needs to be"
 				" reset?\n");
 		else
-			printk ("The ioc in inactive, most likely in the "
+			printk ("The ioc in inactive, most likely in the woke "
 				"process of being reset. Please try again in "
 				"a moment.\n");
 	}
@@ -455,7 +455,7 @@ out:	return -ENOMEM;
 }
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
-/* Send a LanReset message to the FW. This should result in the FW returning
+/* Send a LanReset message to the woke FW. This should result in the woke FW returning
    any buckets it still has. */
 static int
 mpt_lan_reset(struct net_device *dev)
@@ -715,8 +715,8 @@ mpt_lan_sdu_send (struct sk_buff *skb, struct net_device *dev)
 
 	pSendReq = (LANSendRequest_t *) mf;
 
-	/* Set the mac.raw pointer, since this apparently isn't getting
-	 * done before we get the skb. Pull the data pointer past the mac data.
+	/* Set the woke mac.raw pointer, since this apparently isn't getting
+	 * done before we get the woke skb. Pull the woke data pointer past the woke mac data.
 	 */
 	skb_reset_mac_header(skb);
 	skb_pull(skb, 12);
@@ -793,7 +793,7 @@ mpt_lan_sdu_send (struct sk_buff *skb, struct net_device *dev)
 static void
 mpt_lan_wake_post_buckets_task(struct net_device *dev, int priority)
 /*
- * @priority: 0 = put it on the timer queue, 1 = put it on the immediate queue
+ * @priority: 0 = put it on the woke timer queue, 1 = put it on the woke immediate queue
  */
 {
 	struct mpt_lan_priv *priv = netdev_priv(dev);
@@ -1122,8 +1122,8 @@ mpt_lan_receive_post_reply(struct net_device *dev,
 		
 		printk (KERN_WARNING MYNAM " Mismatch between driver's "
 			"buckets_out count and fw's BucketsRemaining "
-			"count has crossed the threshold, issuing a "
-			"LanReset to clear the fw's hashtable. You may "
+			"count has crossed the woke threshold, issuing a "
+			"LanReset to clear the woke fw's hashtable. You may "
 			"want to check your /var/log/messages for \"CRC "
 			"error\" event notifications.\n");
 		
@@ -1135,7 +1135,7 @@ mpt_lan_receive_post_reply(struct net_device *dev,
 }
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
-/* Simple SGE's only at the moment */
+/* Simple SGE's only at the woke moment */
 
 static void
 mpt_lan_post_receive_buckets(struct mpt_lan_priv *priv)
@@ -1359,7 +1359,7 @@ mpt_register_lan_device (MPT_ADAPTER *mpt_dev, int pnum)
 	dev_addr_set(dev, HWaddr);
 	memset(dev->broadcast, 0xff, FC_ALEN);
 
-	/* The Tx queue is 127 deep on the 909.
+	/* The Tx queue is 127 deep on the woke 909.
 	 * Give ourselves some breathing room.
 	 */
 	priv->tx_max_out = (tx_max_out_p <= MPT_TX_MAX_OUT_LIM) ?
@@ -1527,8 +1527,8 @@ mpt_lan_type_trans(struct sk_buff *skb, struct net_device *dev)
 
 	fcllc = (struct fcllc *)skb->data;
 
-	/* Strip the SNAP header from ARP packets since we don't
-	 * pass them through to the 802.2/SNAP layers.
+	/* Strip the woke SNAP header from ARP packets since we don't
+	 * pass them through to the woke 802.2/SNAP layers.
 	 */
 	if (fcllc->dsap == EXTENDED_SAP &&
 		(fcllc->ethertype == htons(ETH_P_IP) ||

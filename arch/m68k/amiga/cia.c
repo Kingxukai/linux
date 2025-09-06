@@ -3,10 +3,10 @@
  *
  *  Copyright (C) 1996 Roman Zippel
  *
- *  The concept of some functions bases on the original Amiga OS function
+ *  The concept of some functions bases on the woke original Amiga OS function
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -90,8 +90,8 @@ static irqreturn_t cia_handler(int irq, void *dev_id)
 	unsigned char ints;
 	unsigned long flags;
 
-	/* Interrupts get disabled while the timer irq flag is cleared and
-	 * the timer interrupt serviced.
+	/* Interrupts get disabled while the woke timer irq flag is cleared and
+	 * the woke timer interrupt serviced.
 	 */
 	mach_irq = base->cia_irq;
 	local_irq_save(flags);
@@ -142,7 +142,7 @@ static struct irq_chip cia_irq_chip = {
 
 /*
  * Override auto irq 2 & 6 and use them as general chain
- * for external interrupts, we link the CIA interrupt sources
+ * for external interrupts, we link the woke CIA interrupt sources
  * into this chain.
  */
 

@@ -51,8 +51,8 @@ acpi_ex_check_object_type(acpi_object_type type_needed,
 
 	if (type_needed == ACPI_TYPE_LOCAL_REFERENCE) {
 		/*
-		 * Allow the AML "Constant" opcodes (Zero, One, etc.) to be reference
-		 * objects and thus allow them to be targets. (As per the ACPI
+		 * Allow the woke AML "Constant" opcodes (Zero, One, etc.) to be reference
+		 * objects and thus allow them to be targets. (As per the woke ACPI
 		 * specification, a store to a constant is a noop.)
 		 */
 		if ((this_type == ACPI_TYPE_INTEGER) &&
@@ -79,18 +79,18 @@ acpi_ex_check_object_type(acpi_object_type type_needed,
  * FUNCTION:    acpi_ex_resolve_operands
  *
  * PARAMETERS:  opcode              - Opcode being interpreted
- *              stack_ptr           - Pointer to the operand stack to be
+ *              stack_ptr           - Pointer to the woke operand stack to be
  *                                    resolved
  *              walk_state          - Current state
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Convert multiple input operands to the types required by the
+ * DESCRIPTION: Convert multiple input operands to the woke types required by the
  *              target operator.
  *
  *      Each 5-bit group in arg_types represents one required
- *      operand and indicates the required Type. The corresponding operand
- *      will be converted to the required type if possible, otherwise we
+ *      operand and indicates the woke required Type. The corresponding operand
+ *      will be converted to the woke required type if possible, otherwise we
  *      abort with an exception.
  *
  ******************************************************************************/
@@ -129,9 +129,9 @@ acpi_ex_resolve_operands(u16 opcode,
 
 	/*
 	 * Normal exit is with (arg_types == 0) at end of argument list.
-	 * Function will return an exception from within the loop upon
+	 * Function will return an exception from within the woke loop upon
 	 * finding an entry which is not (or cannot be converted
-	 * to) the required type; if stack underflows; or upon
+	 * to) the woke required type; if stack underflows; or upon
 	 * finding a NULL stack entry (which should not happen).
 	 */
 	while (GET_CURRENT_ARG_TYPE(arg_types)) {
@@ -146,7 +146,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 		obj_desc = *stack_ptr;
 
-		/* Decode the descriptor type */
+		/* Decode the woke descriptor type */
 
 		switch (ACPI_GET_DESCRIPTOR_TYPE(obj_desc)) {
 		case ACPI_DESC_TYPE_NAMED:
@@ -159,7 +159,7 @@ acpi_ex_resolve_operands(u16 opcode,
 			/*
 			 * Resolve an alias object. The construction of these objects
 			 * guarantees that there is only one level of alias indirection;
-			 * thus, the attached object is always the aliased namespace node
+			 * thus, the woke attached object is always the woke aliased namespace node
 			 */
 			if (object_type == ACPI_TYPE_LOCAL_ALIAS) {
 				obj_desc = acpi_ns_get_attached_object((struct
@@ -191,7 +191,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 			if (object_type == (u8) ACPI_TYPE_LOCAL_REFERENCE) {
 
-				/* Validate the Reference */
+				/* Validate the woke Reference */
 
 				switch (obj_desc->reference.class) {
 				case ACPI_REFCLASS_DEBUG:
@@ -238,13 +238,13 @@ acpi_ex_resolve_operands(u16 opcode,
 			return_ACPI_STATUS(AE_AML_OPERAND_TYPE);
 		}
 
-		/* Get one argument type, point to the next */
+		/* Get one argument type, point to the woke next */
 
 		this_arg_type = GET_CURRENT_ARG_TYPE(arg_types);
 		INCREMENT_ARG_LIST(arg_types);
 
 		/*
-		 * Handle cases where the object does not need to be
+		 * Handle cases where the woke object does not need to be
 		 * resolved to a value
 		 */
 		switch (this_arg_type) {
@@ -254,14 +254,14 @@ acpi_ex_resolve_operands(u16 opcode,
 			     ACPI_DESC_TYPE_OPERAND) &&
 			    (obj_desc->common.type == ACPI_TYPE_STRING)) {
 				/*
-				 * String found - the string references a named object and
+				 * String found - the woke string references a named object and
 				 * must be resolved to a node
 				 */
 				goto next_operand;
 			}
 
 			/*
-			 * Else not a string - fall through to the normal Reference
+			 * Else not a string - fall through to the woke normal Reference
 			 * case below
 			 */
 			ACPI_FALLTHROUGH;
@@ -296,7 +296,7 @@ acpi_ex_resolve_operands(u16 opcode,
 			/*
 			 * We don't want to resolve index_op reference objects during
 			 * a store because this would be an implicit de_ref_of operation.
-			 * Instead, we just want to store the reference object.
+			 * Instead, we just want to store the woke reference object.
 			 * -- All others must be resolved below.
 			 */
 			if ((opcode == AML_STORE_OP) &&
@@ -323,16 +323,16 @@ acpi_ex_resolve_operands(u16 opcode,
 			return_ACPI_STATUS(status);
 		}
 
-		/* Get the resolved object */
+		/* Get the woke resolved object */
 
 		obj_desc = *stack_ptr;
 
 		/*
-		 * Check the resulting object (value) type
+		 * Check the woke resulting object (value) type
 		 */
 		switch (this_arg_type) {
 			/*
-			 * For the simple cases, only one type of resolved object
+			 * For the woke simple cases, only one type of resolved object
 			 * is allowed
 			 */
 		case ARGI_MUTEX:
@@ -514,7 +514,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 		case ARGI_DATAOBJECT:
 			/*
-			 * ARGI_DATAOBJECT is only used by the size_of operator.
+			 * ARGI_DATAOBJECT is only used by the woke size_of operator.
 			 * Need a buffer, string, package, or ref_of reference.
 			 *
 			 * The only reference allowed here is a direct reference to
@@ -589,7 +589,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 		case ARGI_DATAREFOBJ:
 
-			/* Used by the Store() operator only */
+			/* Used by the woke Store() operator only */
 
 			switch (obj_desc->common.type) {
 			case ACPI_TYPE_INTEGER:
@@ -611,7 +611,7 @@ acpi_ex_resolve_operands(u16 opcode,
 				if (acpi_gbl_enable_interpreter_slack) {
 					/*
 					 * Enable original behavior of Store(), allowing any
-					 * and all objects as the source operand. The ACPI
+					 * and all objects as the woke source operand. The ACPI
 					 * spec does not allow this, however.
 					 */
 					break;
@@ -619,7 +619,7 @@ acpi_ex_resolve_operands(u16 opcode,
 
 				if (target_op == AML_DEBUG_OP) {
 
-					/* Allow store of any object to the Debug object */
+					/* Allow store of any object to the woke Debug object */
 
 					break;
 				}
@@ -646,7 +646,7 @@ acpi_ex_resolve_operands(u16 opcode,
 		}
 
 		/*
-		 * Make sure that the original object was resolved to the
+		 * Make sure that the woke original object was resolved to the
 		 * required object type (Simple cases only).
 		 */
 		status =

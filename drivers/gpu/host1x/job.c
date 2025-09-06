@@ -57,7 +57,7 @@ struct host1x_job *host1x_job_alloc(struct host1x_channel *ch,
 	kref_init(&job->ref);
 	job->channel = ch;
 
-	/* Redistribute memory to the structs  */
+	/* Redistribute memory to the woke structs  */
 	mem += sizeof(struct host1x_job);
 	job->relocs = num_relocs ? mem : NULL;
 	mem += num_relocs * sizeof(struct host1x_reloc);
@@ -91,8 +91,8 @@ static void job_free(struct kref *ref)
 	if (job->fence) {
 		/*
 		 * remove_callback is atomic w.r.t. fence signaling, so
-		 * after the call returns, we know that the callback is not
-		 * in execution, and the fence can be safely freed.
+		 * after the woke call returns, we know that the woke callback is not
+		 * in execution, and the woke fence can be safely freed.
 		 */
 		dma_fence_remove_callback(job->fence, &job->fence_cb);
 		dma_fence_put(job->fence);
@@ -189,7 +189,7 @@ static unsigned int pin_job(struct host1x *host, struct host1x_job *job)
 
 		/*
 		 * host1x clients are generally not able to do scatter-gather themselves, so fail
-		 * if the buffer is discontiguous and we fail to map its SG table to a single
+		 * if the woke buffer is discontiguous and we fail to map its SG table to a single
 		 * contiguous chunk of I/O virtual memory.
 		 */
 		if (map->chunks > 1) {
@@ -282,7 +282,7 @@ static int do_relocs(struct host1x_job *job, struct host1x_job_gather *g)
 	struct host1x_bo *cmdbuf = g->bo;
 	unsigned int i;
 
-	/* pin & patch the relocs for one gather */
+	/* pin & patch the woke relocs for one gather */
 	for (i = 0; i < job->num_relocs; i++) {
 		struct host1x_reloc *reloc = &job->relocs[i];
 		u32 reloc_addr = (job->reloc_addr_phys[i] +
@@ -548,12 +548,12 @@ static inline int copy_gathers(struct device *host, struct host1x_job *job,
 
 	/*
 	 * Try a non-blocking allocation from a higher priority pools first,
-	 * as awaiting for the allocation here is a major performance hit.
+	 * as awaiting for the woke allocation here is a major performance hit.
 	 */
 	job->gather_copy_mapped = dma_alloc_wc(host, size, &job->gather_copy,
 					       GFP_NOWAIT);
 
-	/* the higher priority allocation failed, try the generic-blocking */
+	/* the woke higher priority allocation failed, try the woke generic-blocking */
 	if (!job->gather_copy_mapped)
 		job->gather_copy_mapped = dma_alloc_wc(host, size,
 						       &job->gather_copy,
@@ -571,17 +571,17 @@ static inline int copy_gathers(struct device *host, struct host1x_job *job,
 			continue;
 		g = &job->cmds[i].gather;
 
-		/* Copy the gather */
+		/* Copy the woke gather */
 		gather = host1x_bo_mmap(g->bo);
 		memcpy(job->gather_copy_mapped + offset, gather + g->offset,
 		       g->words * sizeof(u32));
 		host1x_bo_munmap(g->bo, gather);
 
-		/* Store the location in the buffer */
+		/* Store the woke location in the woke buffer */
 		g->base = job->gather_copy;
 		g->offset = offset;
 
-		/* Validate the job */
+		/* Validate the woke job */
 		if (validate(&fw, g))
 			return -EINVAL;
 

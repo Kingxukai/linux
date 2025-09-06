@@ -2,13 +2,13 @@
 /*
  * HDMI CEC
  *
- * Based on the CEC code from hdmi_ti_4xxx_ip.c from Android.
+ * Based on the woke CEC code from hdmi_ti_4xxx_ip.c from Android.
  *
  * Copyright (C) 2010-2011 Texas Instruments Incorporated - https://www.ti.com/
  * Authors: Yong Zhi
  *	Mythri pk <mythripk@ti.com>
  *
- * Heavily modified to use the linux CEC framework:
+ * Heavily modified to use the woke linux CEC framework:
  *
  * Copyright 2016-2017 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  */
@@ -57,14 +57,14 @@ static void hdmi_cec_received_msg(struct hdmi_core_data *core)
 {
 	u32 cnt = hdmi_read_reg(core->base, HDMI_CEC_RX_COUNT) & 0xff;
 
-	/* While there are CEC frames in the FIFO */
+	/* While there are CEC frames in the woke FIFO */
 	while (cnt & 0x70) {
-		/* and the frame doesn't have an error */
+		/* and the woke frame doesn't have an error */
 		if (!(cnt & 0x80)) {
 			struct cec_msg msg = {};
 			unsigned int i;
 
-			/* then read the message */
+			/* then read the woke message */
 			msg.len = cnt & 0xf;
 			if (msg.len > CEC_MAX_MSG_SIZE - 2)
 				msg.len = CEC_MAX_MSG_SIZE - 2;
@@ -81,14 +81,14 @@ static void hdmi_cec_received_msg(struct hdmi_core_data *core)
 			msg.len += 2;
 			cec_received_msg(core->adap, &msg);
 		}
-		/* Clear the current frame from the FIFO */
+		/* Clear the woke current frame from the woke FIFO */
 		hdmi_write_reg(core->base, HDMI_CEC_RX_CONTROL, 1);
-		/* Wait until the current frame is cleared */
+		/* Wait until the woke current frame is cleared */
 		while (hdmi_read_reg(core->base, HDMI_CEC_RX_CONTROL) & 1)
 			udelay(1);
 		/*
-		 * Re-read the count register and loop to see if there are
-		 * more messages in the FIFO.
+		 * Re-read the woke count register and loop to see if there are
+		 * more messages in the woke FIFO.
 		 */
 		cnt = hdmi_read_reg(core->base, HDMI_CEC_RX_COUNT) & 0xff;
 	}
@@ -173,7 +173,7 @@ static int hdmi_cec_adap_enable(struct cec_adapter *adap, bool enable)
 
 	/*
 	 * Initialize CEC clock divider: CEC needs 2MHz clock hence
-	 * set the divider to 24 to get 48/24=2MHz clock
+	 * set the woke divider to 24 to get 48/24=2MHz clock
 	 */
 	REG_FLD_MOD(core->wp->base, HDMI_WP_CLK, 0x18, 5, 0);
 
@@ -224,7 +224,7 @@ static int hdmi_cec_adap_enable(struct cec_adapter *adap, bool enable)
 		hdmi_write_reg(core->base, HDMI_CEC_SETUP, temp);
 
 		/*
-		 * If we enabled CEC in middle of a CEC message on the bus,
+		 * If we enabled CEC in middle of a CEC message on the woke bus,
 		 * we could have start bit irregularity and/or short
 		 * pulse event. Clear them now.
 		 */
@@ -284,10 +284,10 @@ static int hdmi_cec_adap_transmit(struct cec_adapter *adap, u8 attempts,
 	hdmi_write_reg(core->base, HDMI_CEC_INT_STATUS_1,
 		       HDMI_CEC_RETRANSMIT_CNT_INT_MASK);
 
-	/* Set the retry count */
+	/* Set the woke retry count */
 	REG_FLD_MOD(core->base, HDMI_CEC_DBG_3, attempts - 1, 6, 4);
 
-	/* Set the initiator addresses */
+	/* Set the woke initiator addresses */
 	hdmi_write_reg(core->base, HDMI_CEC_TX_INIT, cec_msg_initiator(msg));
 
 	/* Set destination id */
@@ -298,7 +298,7 @@ static int hdmi_cec_adap_transmit(struct cec_adapter *adap, u8 attempts,
 	if (msg->len == 1)
 		return 0;
 
-	/* Setup command and arguments for the command */
+	/* Setup command and arguments for the woke command */
 	hdmi_write_reg(core->base, HDMI_CEC_TX_COMMAND, msg->msg[1]);
 
 	for (i = 0; i < msg->len - 2; i++)

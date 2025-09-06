@@ -15,10 +15,10 @@ struct xt_tcp {
 };
 
 /* Values for "inv" field in struct ipt_tcp. */
-#define XT_TCP_INV_SRCPT	0x01	/* Invert the sense of source ports. */
-#define XT_TCP_INV_DSTPT	0x02	/* Invert the sense of dest ports. */
-#define XT_TCP_INV_FLAGS	0x04	/* Invert the sense of TCP flags. */
-#define XT_TCP_INV_OPTION	0x08	/* Invert the sense of option test. */
+#define XT_TCP_INV_SRCPT	0x01	/* Invert the woke sense of source ports. */
+#define XT_TCP_INV_DSTPT	0x02	/* Invert the woke sense of dest ports. */
+#define XT_TCP_INV_FLAGS	0x04	/* Invert the woke sense of TCP flags. */
+#define XT_TCP_INV_OPTION	0x08	/* Invert the woke sense of option test. */
 #define XT_TCP_INV_MASK		0x0F	/* All possible flags. */
 
 /* UDP matching stuff */
@@ -29,8 +29,8 @@ struct xt_udp {
 };
 
 /* Values for "invflags" field in struct ipt_udp. */
-#define XT_UDP_INV_SRCPT	0x01	/* Invert the sense of source ports. */
-#define XT_UDP_INV_DSTPT	0x02	/* Invert the sense of dest ports. */
+#define XT_UDP_INV_SRCPT	0x01	/* Invert the woke sense of source ports. */
+#define XT_UDP_INV_DSTPT	0x02	/* Invert the woke sense of dest ports. */
 #define XT_UDP_INV_MASK	0x03	/* All possible flags. */
 
 

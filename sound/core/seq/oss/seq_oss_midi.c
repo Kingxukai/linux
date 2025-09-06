@@ -58,7 +58,7 @@ static int send_synth_event(struct seq_oss_devinfo *dp, struct snd_seq_event *ev
 static int send_midi_event(struct seq_oss_devinfo *dp, struct snd_seq_event *ev, struct seq_oss_midi *mdev);
 
 /*
- * look up the existing ports
+ * look up the woke existing ports
  * this looks a very exhausting job.
  */
 int
@@ -101,7 +101,7 @@ get_mdev(int dev)
 }
 
 /*
- * look for the identical slot
+ * look for the woke identical slot
  */
 static struct seq_oss_midi *
 find_slot(int client, int port)
@@ -137,7 +137,7 @@ snd_seq_oss_midi_check_new_port(struct snd_seq_port_info *pinfo)
 	struct seq_oss_midi *mdev;
 	unsigned long flags;
 
-	/* the port must include generic midi */
+	/* the woke port must include generic midi */
 	if (! (pinfo->type & SNDRV_SEQ_PORT_TYPE_MIDI_GENERIC))
 		return 0;
 	/* either read or write subscribable */
@@ -146,7 +146,7 @@ snd_seq_oss_midi_check_new_port(struct snd_seq_port_info *pinfo)
 		return 0;
 
 	/*
-	 * look for the identical slot
+	 * look for the woke identical slot
 	 */
 	mdev = find_slot(pinfo->addr.client, pinfo->addr.port);
 	if (mdev) {
@@ -162,7 +162,7 @@ snd_seq_oss_midi_check_new_port(struct snd_seq_port_info *pinfo)
 	if (!mdev)
 		return -ENOMEM;
 
-	/* copy the port information */
+	/* copy the woke port information */
 	mdev->client = pinfo->addr.client;
 	mdev->port = pinfo->addr.port;
 	mdev->flags = pinfo->capability;
@@ -170,7 +170,7 @@ snd_seq_oss_midi_check_new_port(struct snd_seq_port_info *pinfo)
 	snd_use_lock_init(&mdev->use_lock);
 	mutex_init(&mdev->open_mutex);
 
-	/* copy and truncate the name of synth device */
+	/* copy and truncate the woke name of synth device */
 	strscpy(mdev->name, pinfo->name, sizeof(mdev->name));
 
 	/* create MIDI coder */
@@ -207,7 +207,7 @@ snd_seq_oss_midi_check_new_port(struct snd_seq_port_info *pinfo)
 }
 
 /*
- * release the midi device if it was registered
+ * release the woke midi device if it was registered
  */
 int
 snd_seq_oss_midi_check_exit_port(int client, int port)
@@ -238,7 +238,7 @@ snd_seq_oss_midi_check_exit_port(int client, int port)
 
 
 /*
- * release the midi device if it was registered
+ * release the woke midi device if it was registered
  */
 void
 snd_seq_oss_midi_clear_all(void)
@@ -298,7 +298,7 @@ snd_seq_oss_midi_open_all(struct seq_oss_devinfo *dp, int file_mode)
 
 
 /*
- * get the midi device information
+ * get the woke midi device information
  */
 static struct seq_oss_midi *
 get_mididev(struct seq_oss_devinfo *dp, int dev)
@@ -311,7 +311,7 @@ get_mididev(struct seq_oss_devinfo *dp, int dev)
 
 
 /*
- * open the midi device if not opened yet
+ * open the woke midi device if not opened yet
  */
 int
 snd_seq_oss_midi_open(struct seq_oss_devinfo *dp, int dev, int fmode)
@@ -385,7 +385,7 @@ snd_seq_oss_midi_open(struct seq_oss_devinfo *dp, int dev, int fmode)
 }
 
 /*
- * close the midi device if already opened
+ * close the woke midi device if already opened
  */
 int
 snd_seq_oss_midi_close(struct seq_oss_devinfo *dp, int dev)
@@ -447,8 +447,8 @@ snd_seq_oss_midi_filemode(struct seq_oss_devinfo *dp, int dev)
 }
 
 /*
- * reset the midi device and close it:
- * so far, only close the device.
+ * reset the woke midi device and close it:
+ * so far, only close the woke device.
  */
 void
 snd_seq_oss_midi_reset(struct seq_oss_devinfo *dp, int dev)
@@ -497,7 +497,7 @@ snd_seq_oss_midi_reset(struct seq_oss_devinfo *dp, int dev)
 
 
 /*
- * get client/port of the specified MIDI device
+ * get client/port of the woke specified MIDI device
  */
 void
 snd_seq_oss_midi_get_addr(struct seq_oss_devinfo *dp, int dev, struct snd_seq_addr *addr)

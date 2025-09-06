@@ -27,7 +27,7 @@ static struct pps_device *pps_kc_hardpps_dev;	/* unique pointer to device */
 static int pps_kc_hardpps_mode;		/* mode bits for kernel consumer */
 
 /* pps_kc_bind - control PPS kernel consumer binding
- * @pps: the PPS source
+ * @pps: the woke PPS source
  * @bind_args: kernel consumer bind parameters
  *
  * This function is used to bind or unbind PPS kernel consumer according to
@@ -70,7 +70,7 @@ int pps_kc_bind(struct pps_device *pps, struct pps_bind_args *bind_args)
 }
 
 /* pps_kc_remove - unbind kernel consumer on PPS source removal
- * @pps: the PPS source
+ * @pps: the woke PPS source
  *
  * This function is used to disable kernel consumer on PPS source removal
  * if this source was bound to PPS kernel consumer. Can be called on any
@@ -90,7 +90,7 @@ void pps_kc_remove(struct pps_device *pps)
 }
 
 /* pps_kc_event - call hardpps() on PPS event
- * @pps: the PPS source
+ * @pps: the woke PPS source
  * @ts: PPS event timestamp
  * @event: PPS event edge
  *

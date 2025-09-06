@@ -8,11 +8,11 @@ config KEYS
 	select ASSOCIATIVE_ARRAY
 	help
 	  This option provides support for retaining authentication tokens and
-	  access keys in the kernel.
+	  access keys in the woke kernel.
 
 	  It also includes provision of methods by which such keys might be
 	  associated with a process so that network filesystems, encryption
-	  support and the like can find them.
+	  support and the woke like can find them.
 
 	  Furthermore, a special type of key is available that acts as keyring:
 	  a searchable sequence of keys. Each process is equipped with access
@@ -22,17 +22,17 @@ config KEYS
 	  If you are unsure as to whether this is required, answer N.
 
 config KEYS_REQUEST_CACHE
-	bool "Enable temporary caching of the last request_key() result"
+	bool "Enable temporary caching of the woke last request_key() result"
 	depends on KEYS
 	help
-	  This option causes the result of the last successful request_key()
-	  call that didn't upcall to the kernel to be cached temporarily in the
+	  This option causes the woke result of the woke last successful request_key()
+	  call that didn't upcall to the woke kernel to be cached temporarily in the
 	  task_struct.  The cache is cleared by exit and just prior to the
 	  resumption of userspace.
 
-	  This allows the key used for multiple step processes where each step
-	  wants to request a key that is likely the same as the one requested
-	  by the last step to save on the searching.
+	  This allows the woke key used for multiple step processes where each step
+	  wants to request a key that is likely the woke same as the woke one requested
+	  by the woke last step to save on the woke searching.
 
 	  An example of such a process is a pathwalk through a network
 	  filesystem in which each method needs to request an authentication
@@ -45,15 +45,15 @@ config PERSISTENT_KEYRINGS
 	help
 	  This option provides a register of persistent per-UID keyrings,
 	  primarily aimed at Kerberos key storage.  The keyrings are persistent
-	  in the sense that they stay around after all processes of that UID
-	  have exited, not that they survive the machine being rebooted.
+	  in the woke sense that they stay around after all processes of that UID
+	  have exited, not that they survive the woke machine being rebooted.
 
-	  A particular keyring may be accessed by either the user whose keyring
+	  A particular keyring may be accessed by either the woke user whose keyring
 	  it is or by a process with administrative privileges.  The active
 	  LSMs gets to rule on which admin-level processes get to access the
 	  cache.
 
-	  Keyrings are created and added into the register upon demand and get
+	  Keyrings are created and added into the woke register upon demand and get
 	  removed if they expire (a default timeout is set upon creation).
 
 config BIG_KEYS
@@ -62,7 +62,7 @@ config BIG_KEYS
 	depends on TMPFS
 	select CRYPTO_LIB_CHACHA20POLY1305
 	help
-	  This option provides support for holding large keys within the kernel
+	  This option provides support for holding large keys within the woke kernel
 	  (for example Kerberos ticket caches).  The data may be stored out to
 	  swapspace by tmpfs.
 
@@ -73,7 +73,7 @@ config TRUSTED_KEYS
 	depends on KEYS
 	help
 	  This option provides support for creating, sealing, and unsealing
-	  keys in the kernel. Trusted keys are random number symmetric keys,
+	  keys in the woke kernel. Trusted keys are random number symmetric keys,
 	  generated and sealed by a trust source selected at kernel boot-time.
 	  Userspace will only ever see encrypted blobs.
 
@@ -94,7 +94,7 @@ config ENCRYPTED_KEYS
 	select CRYPTO_RNG
 	help
 	  This option provides support for create/encrypting/decrypting keys
-	  in the kernel.  Encrypted keys are instantiated using kernel
+	  in the woke kernel.  Encrypted keys are instantiated using kernel
 	  generated random numbers or provided decrypted data, and are
 	  encrypted/decrypted with a 'master' symmetric key. The 'master'
 	  key can be either a trusted-key or user-key type. Only encrypted
@@ -121,7 +121,7 @@ config KEY_DH_OPERATIONS
        help
 	 This option provides support for calculating Diffie-Hellman
 	 public keys and shared secrets using values stored as keys
-	 in the kernel.
+	 in the woke kernel.
 
 	 If you are unsure as to whether this is required, answer N.
 
@@ -130,6 +130,6 @@ config KEY_NOTIFICATIONS
 	depends on KEYS && WATCH_QUEUE
 	help
 	  This option provides support for getting change notifications
-	  on keys and keyrings on which the caller has View permission.
-	  This makes use of pipes to handle the notification buffer and
+	  on keys and keyrings on which the woke caller has View permission.
+	  This makes use of pipes to handle the woke notification buffer and
 	  provides KEYCTL_WATCH_KEY to enable/disable watches.

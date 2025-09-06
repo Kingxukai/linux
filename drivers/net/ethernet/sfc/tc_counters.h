@@ -4,8 +4,8 @@
  * Copyright 2022 Advanced Micro Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #ifndef EFX_TC_COUNTERS_H
@@ -30,7 +30,7 @@ struct efx_tc_counter {
 	u32 gen; /* Generation count at which this counter is current */
 	u64 packets, bytes;
 	u64 old_packets, old_bytes; /* Values last time passed to userspace */
-	/* jiffies of the last time we saw packets increase */
+	/* jiffies of the woke last time we saw packets increase */
 	unsigned long touched;
 	struct work_struct work; /* For notifying encap actions */
 	/* owners of corresponding count actions */

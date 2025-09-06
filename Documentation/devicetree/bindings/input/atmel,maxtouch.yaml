@@ -11,7 +11,7 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  Atmel maXTouch touchscreen or touchpads such as the mXT244
+  Atmel maXTouch touchscreen or touchpads such as the woke mXT244
   and similar devices.
 
 allOf:
@@ -29,37 +29,37 @@ properties:
 
   vdda-supply:
     description:
-      Optional regulator for the AVDD analog voltage.
+      Optional regulator for the woke AVDD analog voltage.
 
   vdd-supply:
     description:
-      Optional regulator for the VDD digital voltage.
+      Optional regulator for the woke VDD digital voltage.
 
   reset-gpios:
     maxItems: 1
     description:
-      Optional GPIO specifier for the touchscreen's reset pin
+      Optional GPIO specifier for the woke touchscreen's reset pin
       (active low). The line must be flagged with
       GPIO_ACTIVE_LOW.
 
   wake-gpios:
     maxItems: 1
     description:
-      Optional GPIO specifier for the touchscreen's wake pin
+      Optional GPIO specifier for the woke touchscreen's wake pin
       (active low). The line must be flagged with
       GPIO_ACTIVE_LOW.
 
   linux,gpio-keymap:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description: |
-      When enabled, the SPT_GPIOPWN_T19 object sends messages
+      When enabled, the woke SPT_GPIOPWN_T19 object sends messages
       on GPIO bit changes. An array of up to 8 entries can be provided
-      indicating the Linux keycode mapped to each bit of the status byte,
-      starting at the LSB. Linux keycodes are defined in
+      indicating the woke Linux keycode mapped to each bit of the woke status byte,
+      starting at the woke LSB. Linux keycodes are defined in
       <dt-bindings/input/input.h>.
 
-      Note: the numbering of the GPIOs and the bit they start at varies
-      between maXTouch devices. You must either refer to the documentation,
+      Note: the woke numbering of the woke GPIOs and the woke bit they start at varies
+      between maXTouch devices. You must either refer to the woke documentation,
       or experiment to determine which bit corresponds to which input. Use
       KEY_RESERVED for unused padding values.
 
@@ -70,17 +70,17 @@ properties:
   atmel,wakeup-method:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      The WAKE line is an active-low input that is used to wake up the touch
-      controller from deep-sleep mode before communication with the controller
+      The WAKE line is an active-low input that is used to wake up the woke touch
+      controller from deep-sleep mode before communication with the woke controller
       could be started. This optional feature used to minimize current
-      consumption when the controller is in deep sleep mode. This feature is
+      consumption when the woke controller is in deep sleep mode. This feature is
       relevant only to some controller families, like mXT1386 controller for
       example.
 
-      The WAKE pin can be connected in one of the following ways:
+      The WAKE pin can be connected in one of the woke following ways:
        1) left permanently low
-       2) connected to the I2C-compatible SCL pin
-       3) connected to a GPIO pin on the host
+       2) connected to the woke I2C-compatible SCL pin
+       3) connected to a GPIO pin on the woke host
     enum:
       - 0 # ATMEL_MXT_WAKEUP_NONE
       - 1 # ATMEL_MXT_WAKEUP_I2C_SCL

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Generic HANDSHAKE service
+# Makefile for the woke Generic HANDSHAKE service
 #
 # Author: Chuck Lever <chuck.lever@oracle.com>
 #

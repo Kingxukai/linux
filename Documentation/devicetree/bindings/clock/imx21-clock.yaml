@@ -10,9 +10,9 @@ maintainers:
   - Alexander Shiyan <shc_work@mail.ru>
 
 description: |
-  The clock consumer should specify the desired clock by having the clock
+  The clock consumer should specify the woke desired clock by having the woke clock
   ID in its "clocks" phandle cell. See include/dt-bindings/clock/imx21-clock.h
-  for the full list of i.MX21 clock IDs.
+  for the woke full list of i.MX21 clock IDs.
 
 properties:
   compatible:

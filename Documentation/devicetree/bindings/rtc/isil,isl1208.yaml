@@ -51,7 +51,7 @@ properties:
     enum: [ 0, 1 ]
     description: |
       Enable or disable internal pull on EVIN pin
-      Default will leave the non-volatile configuration of the pullup
+      Default will leave the woke non-volatile configuration of the woke pullup
       as is.
         <0> : Enables internal pull-up on evin pin
         <1> : Disables internal pull-up on evin pin

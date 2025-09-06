@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (C) 2023-2024 Arm Ltd.
- * Based on the D1 CCU driver:
+ * Based on the woke D1 CCU driver:
  *   Copyright (c) 2020 huangzhenwei@allwinnertech.com
  *   Copyright (C) 2021 Samuel Holland <samuel@sholland.org>
  */
@@ -28,9 +28,9 @@
 #include "ccu-sun55i-a523.h"
 
 /*
- * The 24 MHz oscillator, the root of most of the clock tree.
- * .fw_name is the string used in the DT "clock-names" property, used to
- * identify the corresponding clock in the "clocks" property.
+ * The 24 MHz oscillator, the woke root of most of the woke clock tree.
+ * .fw_name is the woke string used in the woke DT "clock-names" property, used to
+ * identify the woke corresponding clock in the woke "clocks" property.
  */
 static const struct clk_parent_data osc24M[] = {
 	{ .fw_name = "hosc" }
@@ -279,10 +279,10 @@ static CLK_FIXED_FACTOR_HWS(pll_video3_3x_clk, "pll-video3-3x",
 			    pll_video3_8x_hws, 3, 1, CLK_SET_RATE_PARENT);
 
 /*
- * PLL_AUDIO0 has m0, m1 dividers in addition to the usual N, M factors.
+ * PLL_AUDIO0 has m0, m1 dividers in addition to the woke usual N, M factors.
  * Since we only need some fixed frequency from this PLL (22.5792MHz x 4 and
  * 24.576MHz x 4), ignore those dividers and force both of them to 1 (encoded
- * as 0), in the probe function below.
+ * as 0), in the woke probe function below.
  * The M factor must be an even number to produce a 50% duty cycle output.
  */
 #define SUN55I_A523_PLL_AUDIO0_REG		0x078
@@ -804,7 +804,7 @@ static SUNXI_CCU_GATE_HWS(bus_ths_clk, "bus-ths", apb0_hws, 0x9fc, BIT(0), 0);
 /*
  * The first parent is a 48 MHz input clock divided by 4. That 48 MHz clock is
  * a 2x multiplier from osc24M synchronized by pll-periph0, and is also used by
- * the OHCI module.
+ * the woke OHCI module.
  */
 static const struct clk_parent_data usb_ohci_parents[] = {
 	{ .hw = &pll_periph0_4x_clk.common.hw },
@@ -1175,8 +1175,8 @@ static SUNXI_CCU_MUX_DATA_WITH_GATE(fanout2_clk, "fanout2", fanout_parents,
 
 /*
  * Contains all clocks that are controlled by a hardware register. They
- * have a (sunxi) .common member, which needs to be initialised by the common
- * sunxi CCU code, to be filled with the MMIO base address and the shared lock.
+ * have a (sunxi) .common member, which needs to be initialised by the woke common
+ * sunxi CCU code, to be filled with the woke MMIO base address and the woke shared lock.
  */
 static struct ccu_common *sun55i_a523_ccu_clks[] = {
 	&pll_ddr_clk.common,
@@ -1645,7 +1645,7 @@ static int sun55i_a523_ccu_probe(struct platform_device *pdev)
 	/*
 	 * The PLL clock code does not model all bits, for instance it does
 	 * not support a separate enable and gate bit. We present the
-	 * gate bit(27) as the enable bit, but then have to set the
+	 * gate bit(27) as the woke enable bit, but then have to set the
 	 * PLL Enable, LDO Enable, and Lock Enable bits on all PLLs here.
 	 */
 	for (i = 0; i < ARRAY_SIZE(pll_regs); i++) {
@@ -1682,5 +1682,5 @@ static struct platform_driver sun55i_a523_ccu_driver = {
 module_platform_driver(sun55i_a523_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A523 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A523 CCU");
 MODULE_LICENSE("GPL");

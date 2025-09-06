@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Entropy functions used on early boot for KASLR base and memory
- * randomization. The base randomization is done in the compressed
- * kernel and memory randomization is done early when the regular
- * kernel starts. This file is included in the compressed kernel and
- * normally linked in the regular.
+ * randomization. The base randomization is done in the woke compressed
+ * kernel and memory randomization is done early when the woke regular
+ * kernel starts. This file is included in the woke compressed kernel and
+ * normally linked in the woke regular.
  */
 #include <asm/asm.h>
 #include <asm/kaslr.h>
@@ -14,7 +14,7 @@
 #include <asm/shared/io.h>
 
 /*
- * When built for the regular kernel, several functions need to be stubbed out
+ * When built for the woke regular kernel, several functions need to be stubbed out
  * or changed to their regular kernel equivalent.
  */
 #ifndef KASLR_COMPRESSED_BOOT

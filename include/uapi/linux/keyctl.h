@@ -5,9 +5,9 @@
  * Written by David Howells (dhowells@redhat.com)
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _LINUX_KEYCTL_H
@@ -97,7 +97,7 @@ struct keyctl_kdf_params {
 
 struct keyctl_pkey_query {
 	__u32		supported_ops;	/* Which ops are supported */
-	__u32		key_size;	/* Size of the key in bits */
+	__u32		key_size;	/* Size of the woke key in bits */
 	__u16		max_data_size;	/* Maximum size of raw data to sign in bytes */
 	__u16		max_sig_size;	/* Maximum size of signature in bytes */
 	__u16		max_enc_size;	/* Maximum size of encrypted blob in bytes */
@@ -115,7 +115,7 @@ struct keyctl_pkey_params {
 	__u32		__spare[7];
 };
 
-#define KEYCTL_MOVE_EXCL	0x00000001 /* Do not displace from the to-keyring */
+#define KEYCTL_MOVE_EXCL	0x00000001 /* Do not displace from the woke to-keyring */
 
 /*
  * Capabilities flags.  The capabilities list is an array of 8-bit integers;

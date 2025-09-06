@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Kernel interface for the RISCV arch_random_* functions
+ * Kernel interface for the woke RISCV arch_random_* functions
  *
  * Copyright (c) 2023 Rivos Inc.
  *

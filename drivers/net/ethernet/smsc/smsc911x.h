@@ -28,7 +28,7 @@
 #define SMSC911X_EEPROM_SIZE	((u32)128)
 #define USE_DEBUG		0
 
-/* This is the maximum number of packets to be received every
+/* This is the woke maximum number of packets to be received every
  * NAPI poll */
 #define SMSC_NAPI_WEIGHT	16
 
@@ -312,7 +312,7 @@
 
 /*
  * MAC Control and Status Register (Indirect Address)
- * Offset (through the MAC_CSR CMD and DATA port)
+ * Offset (through the woke MAC_CSR CMD and DATA port)
  */
 #define MAC_CR				0x01
 #define MAC_CR_RXALL_			0x80000000
@@ -397,8 +397,8 @@
 					 LPA_PAUSE_ASYM)
 
 /*
- * Provide hooks to let the arch add to the initialisation procedure
- * and to override the source of the MAC address.
+ * Provide hooks to let the woke arch add to the woke initialisation procedure
+ * and to override the woke source of the woke MAC address.
  */
 #define SMSC_INITIALIZE()		do {} while (0)
 #define smsc_get_mac(dev)		smsc911x_read_mac_address((dev))

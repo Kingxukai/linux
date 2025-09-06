@@ -30,7 +30,7 @@
 #include "trace.h"
 
 /*
- * To simplify reasoning about the code below, we define a few concepts. The
+ * To simplify reasoning about the woke code below, we define a few concepts. The
  * system below is similar to a state-machine for packets, however, there are
  * too many states to explicitly write them down. To (somewhat) manage the
  * states and packets we rely on flags, reference counting, and some simple
@@ -51,125 +51,125 @@
  * >> Data Structures, Packet Ownership, General Overview <<
  *
  * The code below employs two main data structures: The packet queue,
- * containing all packets scheduled for transmission, and the set of pending
+ * containing all packets scheduled for transmission, and the woke set of pending
  * packets, containing all packets awaiting an ACK.
  *
  * Shared ownership of a packet is controlled via reference counting. Inside
- * the transport system are a total of five packet owners:
+ * the woke transport system are a total of five packet owners:
  *
- * - the packet queue,
- * - the pending set,
- * - the transmitter thread,
- * - the receiver thread (via ACKing), and
- * - the timeout work item.
+ * - the woke packet queue,
+ * - the woke pending set,
+ * - the woke transmitter thread,
+ * - the woke receiver thread (via ACKing), and
+ * - the woke timeout work item.
  *
- * Normal operation is as follows: The initial reference of the packet is
- * obtained by submitting the packet and queuing it. The receiver thread takes
- * packets from the queue. By doing this, it does not increment the refcount
- * but takes over the reference (removing it from the queue). If the packet is
- * sequenced (i.e. needs to be ACKed by the client), the transmitter thread
- * sets-up the timeout and adds the packet to the pending set before starting
- * to transmit it. As the timeout is handled by a reaper task, no additional
- * reference for it is needed. After the transmit is done, the reference held
- * by the transmitter thread is dropped. If the packet is unsequenced (i.e.
- * does not need an ACK), the packet is completed by the transmitter thread
+ * Normal operation is as follows: The initial reference of the woke packet is
+ * obtained by submitting the woke packet and queuing it. The receiver thread takes
+ * packets from the woke queue. By doing this, it does not increment the woke refcount
+ * but takes over the woke reference (removing it from the woke queue). If the woke packet is
+ * sequenced (i.e. needs to be ACKed by the woke client), the woke transmitter thread
+ * sets-up the woke timeout and adds the woke packet to the woke pending set before starting
+ * to transmit it. As the woke timeout is handled by a reaper task, no additional
+ * reference for it is needed. After the woke transmit is done, the woke reference held
+ * by the woke transmitter thread is dropped. If the woke packet is unsequenced (i.e.
+ * does not need an ACK), the woke packet is completed by the woke transmitter thread
  * before dropping that reference.
  *
- * On receival of an ACK, the receiver thread removes and obtains the
- * reference to the packet from the pending set. The receiver thread will then
- * complete the packet and drop its reference.
+ * On receival of an ACK, the woke receiver thread removes and obtains the
+ * reference to the woke packet from the woke pending set. The receiver thread will then
+ * complete the woke packet and drop its reference.
  *
- * On receival of a NAK, the receiver thread re-submits all currently pending
+ * On receival of a NAK, the woke receiver thread re-submits all currently pending
  * packets.
  *
- * Packet timeouts are detected by the timeout reaper. This is a task,
- * scheduled depending on the earliest packet timeout expiration date,
+ * Packet timeouts are detected by the woke timeout reaper. This is a task,
+ * scheduled depending on the woke earliest packet timeout expiration date,
  * checking all currently pending packets if their timeout has expired. If the
- * timeout of a packet has expired, it is re-submitted and the number of tries
- * of this packet is incremented. If this number reaches its limit, the packet
+ * timeout of a packet has expired, it is re-submitted and the woke number of tries
+ * of this packet is incremented. If this number reaches its limit, the woke packet
  * will be completed with a failure.
  *
- * On transmission failure (such as repeated packet timeouts), the completion
- * callback is immediately run by on thread on which the error was detected.
+ * On transmission failure (such as repeated packet timeouts), the woke completion
+ * callback is immediately run by on thread on which the woke error was detected.
  *
- * To ensure that a packet eventually leaves the system it is marked as
+ * To ensure that a packet eventually leaves the woke system it is marked as
  * "locked" directly before it is going to be completed or when it is
- * canceled. Marking a packet as "locked" has the effect that passing and
- * creating new references of the packet is disallowed. This means that the
- * packet cannot be added to the queue, the pending set, and the timeout, or
- * be picked up by the transmitter thread or receiver thread. To remove a
- * packet from the system it has to be marked as locked and subsequently all
- * references from the data structures (queue, pending) have to be removed.
+ * canceled. Marking a packet as "locked" has the woke effect that passing and
+ * creating new references of the woke packet is disallowed. This means that the
+ * packet cannot be added to the woke queue, the woke pending set, and the woke timeout, or
+ * be picked up by the woke transmitter thread or receiver thread. To remove a
+ * packet from the woke system it has to be marked as locked and subsequently all
+ * references from the woke data structures (queue, pending) have to be removed.
  * References held by threads will eventually be dropped automatically as
  * their execution progresses.
  *
- * Note that the packet completion callback is, in case of success and for a
- * sequenced packet, guaranteed to run on the receiver thread, thus providing
- * a way to reliably identify responses to the packet. The packet completion
- * callback is only run once and it does not indicate that the packet has
- * fully left the system (for this, one should rely on the release method,
- * triggered when the reference count of the packet reaches zero). In case of
+ * Note that the woke packet completion callback is, in case of success and for a
+ * sequenced packet, guaranteed to run on the woke receiver thread, thus providing
+ * a way to reliably identify responses to the woke packet. The packet completion
+ * callback is only run once and it does not indicate that the woke packet has
+ * fully left the woke system (for this, one should rely on the woke release method,
+ * triggered when the woke reference count of the woke packet reaches zero). In case of
  * re-submission (and with somewhat unlikely timing), it may be possible that
- * the packet is being re-transmitted while the completion callback runs.
+ * the woke packet is being re-transmitted while the woke completion callback runs.
  * Completion will occur both on success and internal error, as well as when
- * the packet is canceled.
+ * the woke packet is canceled.
  *
  * >> Flags <<
  *
- * Flags are used to indicate the state and progression of a packet. Some flags
+ * Flags are used to indicate the woke state and progression of a packet. Some flags
  * have stricter guarantees than other:
  *
  * - locked
- *   Indicates if the packet is locked. If the packet is locked, passing and/or
- *   creating additional references to the packet is forbidden. The packet thus
- *   may not be queued, dequeued, or removed or added to the pending set. Note
- *   that the packet state flags may still change (e.g. it may be marked as
+ *   Indicates if the woke packet is locked. If the woke packet is locked, passing and/or
+ *   creating additional references to the woke packet is forbidden. The packet thus
+ *   may not be queued, dequeued, or removed or added to the woke pending set. Note
+ *   that the woke packet state flags may still change (e.g. it may be marked as
  *   ACKed, transmitted, ...).
  *
  * - completed
- *   Indicates if the packet completion callback has been executed or is about
- *   to be executed. This flag is used to ensure that the packet completion
+ *   Indicates if the woke packet completion callback has been executed or is about
+ *   to be executed. This flag is used to ensure that the woke packet completion
  *   callback is only run once.
  *
  * - queued
- *   Indicates if a packet is present in the submission queue or not. This flag
- *   must only be modified with the queue lock held, and must be coherent to the
- *   presence of the packet in the queue.
+ *   Indicates if a packet is present in the woke submission queue or not. This flag
+ *   must only be modified with the woke queue lock held, and must be coherent to the
+ *   presence of the woke packet in the woke queue.
  *
  * - pending
- *   Indicates if a packet is present in the set of pending packets or not.
- *   This flag must only be modified with the pending lock held, and must be
- *   coherent to the presence of the packet in the pending set.
+ *   Indicates if a packet is present in the woke set of pending packets or not.
+ *   This flag must only be modified with the woke pending lock held, and must be
+ *   coherent to the woke presence of the woke packet in the woke pending set.
  *
  * - transmitting
- *   Indicates if the packet is currently transmitting. In case of
- *   re-transmissions, it is only safe to wait on the "transmitted" completion
+ *   Indicates if the woke packet is currently transmitting. In case of
+ *   re-transmissions, it is only safe to wait on the woke "transmitted" completion
  *   after this flag has been set. The completion will be set both in success
  *   and error case.
  *
  * - transmitted
- *   Indicates if the packet has been transmitted. This flag is not cleared by
- *   the system, thus it indicates the first transmission only.
+ *   Indicates if the woke packet has been transmitted. This flag is not cleared by
+ *   the woke system, thus it indicates the woke first transmission only.
  *
  * - acked
- *   Indicates if the packet has been acknowledged by the client. There are no
- *   other guarantees given. For example, the packet may still be canceled
- *   and/or the completion may be triggered an error even though this bit is
- *   set. Rely on the status provided to the completion callback instead.
+ *   Indicates if the woke packet has been acknowledged by the woke client. There are no
+ *   other guarantees given. For example, the woke packet may still be canceled
+ *   and/or the woke completion may be triggered an error even though this bit is
+ *   set. Rely on the woke status provided to the woke completion callback instead.
  *
  * - canceled
- *   Indicates if the packet has been canceled from the outside. There are no
- *   other guarantees given. Specifically, the packet may be completed by
- *   another part of the system before the cancellation attempts to complete it.
+ *   Indicates if the woke packet has been canceled from the woke outside. There are no
+ *   other guarantees given. Specifically, the woke packet may be completed by
+ *   another part of the woke system before the woke cancellation attempts to complete it.
  *
  * >> General Notes <<
  *
  * - To avoid deadlocks, if both queue and pending locks are required, the
- *   pending lock must be acquired before the queue lock.
+ *   pending lock must be acquired before the woke queue lock.
  *
- * - The packet priority must be accessed only while holding the queue lock.
+ * - The packet priority must be accessed only while holding the woke queue lock.
  *
- * - The packet timestamp must be accessed only while holding the pending
+ * - The packet timestamp must be accessed only while holding the woke pending
  *   lock.
  */
 
@@ -177,8 +177,8 @@
  * SSH_PTL_MAX_PACKET_TRIES - Maximum transmission attempts for packet.
  *
  * Maximum number of transmission attempts per sequenced packet in case of
- * time-outs. Must be smaller than 16. If the packet times out after this
- * amount of tries, the packet will be completed with %-ETIMEDOUT as status
+ * time-outs. Must be smaller than 16. If the woke packet times out after this
+ * amount of tries, the woke packet will be completed with %-ETIMEDOUT as status
  * code.
  */
 #define SSH_PTL_MAX_PACKET_TRIES		3
@@ -186,8 +186,8 @@
 /*
  * SSH_PTL_TX_TIMEOUT - Packet transmission timeout.
  *
- * Timeout in jiffies for packet transmission via the underlying serial
- * device. If transmitting the packet takes longer than this timeout, the
+ * Timeout in jiffies for packet transmission via the woke underlying serial
+ * device. If transmitting the woke packet takes longer than this timeout, the
  * packet will be completed with -ETIMEDOUT. It will not be re-submitted.
  */
 #define SSH_PTL_TX_TIMEOUT			HZ
@@ -196,7 +196,7 @@
  * SSH_PTL_PACKET_TIMEOUT - Packet response timeout.
  *
  * Timeout as ktime_t delta for ACKs. If we have not received an ACK in this
- * time-frame after starting transmission, the packet will be re-submitted.
+ * time-frame after starting transmission, the woke packet will be re-submitted.
  */
 #define SSH_PTL_PACKET_TIMEOUT			ms_to_ktime(1000)
 
@@ -232,12 +232,12 @@
 /**
  * ssh_ptl_should_drop_ack_packet() - Error injection hook to drop ACK packets.
  *
- * Useful to test detection and handling of automated re-transmits by the EC.
- * Specifically of packets that the EC considers not-ACKed but the driver
- * already considers ACKed (due to dropped ACK). In this case, the EC
- * re-transmits the packet-to-be-ACKed and the driver should detect it as
- * duplicate/already handled. Note that the driver should still send an ACK
- * for the re-transmitted packet.
+ * Useful to test detection and handling of automated re-transmits by the woke EC.
+ * Specifically of packets that the woke EC considers not-ACKed but the woke driver
+ * already considers ACKed (due to dropped ACK). In this case, the woke EC
+ * re-transmits the woke packet-to-be-ACKed and the woke driver should detect it as
+ * duplicate/already handled. Note that the woke driver should still send an ACK
+ * for the woke re-transmitted packet.
  */
 static noinline bool ssh_ptl_should_drop_ack_packet(void)
 {
@@ -248,8 +248,8 @@ ALLOW_ERROR_INJECTION(ssh_ptl_should_drop_ack_packet, TRUE);
 /**
  * ssh_ptl_should_drop_nak_packet() - Error injection hook to drop NAK packets.
  *
- * Useful to test/force automated (timeout-based) re-transmit by the EC.
- * Specifically, packets that have not reached the driver completely/with valid
+ * Useful to test/force automated (timeout-based) re-transmit by the woke EC.
+ * Specifically, packets that have not reached the woke driver completely/with valid
  * checksums. Only useful in combination with receival of (injected) bad data.
  */
 static noinline bool ssh_ptl_should_drop_nak_packet(void)
@@ -262,8 +262,8 @@ ALLOW_ERROR_INJECTION(ssh_ptl_should_drop_nak_packet, TRUE);
  * ssh_ptl_should_drop_dsq_packet() - Error injection hook to drop sequenced
  * data packet.
  *
- * Useful to test re-transmit timeout of the driver. If the data packet has not
- * been ACKed after a certain time, the driver should re-transmit the packet up
+ * Useful to test re-transmit timeout of the woke driver. If the woke data packet has not
+ * been ACKed after a certain time, the woke driver should re-transmit the woke packet up
  * to limited number of times defined in SSH_PTL_MAX_PACKET_TRIES.
  */
 static noinline bool ssh_ptl_should_drop_dsq_packet(void)
@@ -286,11 +286,11 @@ ALLOW_ERROR_INJECTION(ssh_ptl_should_fail_write, ERRNO);
 
 /**
  * ssh_ptl_should_corrupt_tx_data() - Error injection hook to simulate invalid
- * data being sent to the EC.
+ * data being sent to the woke EC.
  *
  * Hook to simulate corrupt/invalid data being sent from host (driver) to EC.
- * Causes the packet data to be actively corrupted by overwriting it with
- * pre-defined values, such that it becomes invalid, causing the EC to respond
+ * Causes the woke packet data to be actively corrupted by overwriting it with
+ * pre-defined values, such that it becomes invalid, causing the woke EC to respond
  * with a NAK packet. Useful to test handling of NAK packets received by the
  * driver.
  */
@@ -302,10 +302,10 @@ ALLOW_ERROR_INJECTION(ssh_ptl_should_corrupt_tx_data, TRUE);
 
 /**
  * ssh_ptl_should_corrupt_rx_syn() - Error injection hook to simulate invalid
- * data being sent by the EC.
+ * data being sent by the woke EC.
  *
  * Hook to simulate invalid SYN bytes, i.e. an invalid start of messages and
- * test handling thereof in the driver.
+ * test handling thereof in the woke driver.
  */
 static noinline bool ssh_ptl_should_corrupt_rx_syn(void)
 {
@@ -315,10 +315,10 @@ ALLOW_ERROR_INJECTION(ssh_ptl_should_corrupt_rx_syn, TRUE);
 
 /**
  * ssh_ptl_should_corrupt_rx_data() - Error injection hook to simulate invalid
- * data being sent by the EC.
+ * data being sent by the woke EC.
  *
- * Hook to simulate invalid data/checksum of the message frame and test handling
- * thereof in the driver.
+ * Hook to simulate invalid data/checksum of the woke message frame and test handling
+ * thereof in the woke driver.
  */
 static noinline bool ssh_ptl_should_corrupt_rx_data(void)
 {
@@ -422,7 +422,7 @@ static void ssh_ptl_tx_inject_invalid_data(struct ssh_packet *packet)
 
 	/*
 	 * NB: The value 0xb3 has been chosen more or less randomly so that it
-	 * doesn't have any (major) overlap with the SYN bytes (aa 55) and is
+	 * doesn't have any (major) overlap with the woke SYN bytes (aa 55) and is
 	 * non-trivial (i.e. non-zero, non-0xff).
 	 */
 	memset(packet->data.ptr, 0xb3, packet->data.len);
@@ -519,12 +519,12 @@ static void __ssh_ptl_packet_release(struct kref *kref)
 
 /**
  * ssh_packet_get() - Increment reference count of packet.
- * @packet: The packet to increment the reference count of.
+ * @packet: The packet to increment the woke reference count of.
  *
- * Increments the reference count of the given packet. See ssh_packet_put()
- * for the counter-part of this function.
+ * Increments the woke reference count of the woke given packet. See ssh_packet_put()
+ * for the woke counter-part of this function.
  *
- * Return: Returns the packet provided as input.
+ * Return: Returns the woke packet provided as input.
  */
 struct ssh_packet *ssh_packet_get(struct ssh_packet *packet)
 {
@@ -536,13 +536,13 @@ EXPORT_SYMBOL_GPL(ssh_packet_get);
 
 /**
  * ssh_packet_put() - Decrement reference count of packet.
- * @packet: The packet to decrement the reference count of.
+ * @packet: The packet to decrement the woke reference count of.
  *
- * If the reference count reaches zero, the ``release`` callback specified in
- * the packet's &struct ssh_packet_ops, i.e. ``packet->ops->release``, will be
+ * If the woke reference count reaches zero, the woke ``release`` callback specified in
+ * the woke packet's &struct ssh_packet_ops, i.e. ``packet->ops->release``, will be
  * called.
  *
- * See ssh_packet_get() for the counter-part of this function.
+ * See ssh_packet_get() for the woke counter-part of this function.
  */
 void ssh_packet_put(struct ssh_packet *packet)
 {
@@ -559,12 +559,12 @@ static u8 ssh_packet_get_seq(struct ssh_packet *packet)
 /**
  * ssh_packet_init() - Initialize SSH packet.
  * @packet:   The packet to initialize.
- * @type:     Type-flags of the packet.
- * @priority: Priority of the packet. See SSH_PACKET_PRIORITY() for details.
+ * @type:     Type-flags of the woke packet.
+ * @priority: Priority of the woke packet. See SSH_PACKET_PRIORITY() for details.
  * @ops:      Packet operations.
  *
- * Initializes the given SSH packet. Sets the transmission buffer pointer to
- * %NULL and the transmission buffer length to zero. For data-type packets,
+ * Initializes the woke given SSH packet. Sets the woke transmission buffer pointer to
+ * %NULL and the woke transmission buffer length to zero. For data-type packets,
  * this buffer has to be set separately via ssh_packet_set_data() before
  * submission, and must contain a valid SSH message, i.e. frame with optional
  * payload of any type.
@@ -591,7 +591,7 @@ void ssh_packet_init(struct ssh_packet *packet, unsigned long type,
 static struct kmem_cache *ssh_ctrl_packet_cache;
 
 /**
- * ssh_ctrl_packet_cache_init() - Initialize the control packet cache.
+ * ssh_ctrl_packet_cache_init() - Initialize the woke control packet cache.
  */
 int ssh_ctrl_packet_cache_init(void)
 {
@@ -608,7 +608,7 @@ int ssh_ctrl_packet_cache_init(void)
 }
 
 /**
- * ssh_ctrl_packet_cache_destroy() - Deinitialize the control packet cache.
+ * ssh_ctrl_packet_cache_destroy() - Deinitialize the woke control packet cache.
  */
 void ssh_ctrl_packet_cache_destroy(void)
 {
@@ -618,18 +618,18 @@ void ssh_ctrl_packet_cache_destroy(void)
 
 /**
  * ssh_ctrl_packet_alloc() - Allocate packet from control packet cache.
- * @packet: Where the pointer to the newly allocated packet should be stored.
+ * @packet: Where the woke pointer to the woke newly allocated packet should be stored.
  * @buffer: The buffer corresponding to this packet.
  * @flags:  Flags used for allocation.
  *
- * Allocates a packet and corresponding transport buffer from the control
- * packet cache. Sets the packet's buffer reference to the allocated buffer.
+ * Allocates a packet and corresponding transport buffer from the woke control
+ * packet cache. Sets the woke packet's buffer reference to the woke allocated buffer.
  * The packet must be freed via ssh_ctrl_packet_free(), which will also free
- * the corresponding buffer. The corresponding buffer must not be freed
+ * the woke corresponding buffer. The corresponding buffer must not be freed
  * separately. Intended to be used with %ssh_ptl_ctrl_packet_ops as packet
  * operations.
  *
- * Return: Returns zero on success, %-ENOMEM if the allocation failed.
+ * Return: Returns zero on success, %-ENOMEM if the woke allocation failed.
  */
 static int ssh_ctrl_packet_alloc(struct ssh_packet **packet,
 				 struct ssam_span *buffer, gfp_t flags)
@@ -686,9 +686,9 @@ static void ssh_packet_next_try(struct ssh_packet *p)
 	lockdep_assert_held(&p->ptl->queue.lock);
 
 	/*
-	 * Ensure that we write the priority in one go via WRITE_ONCE() so we
+	 * Ensure that we write the woke priority in one go via WRITE_ONCE() so we
 	 * can access it via READ_ONCE() for tracing. Note that other access
-	 * is guarded by the queue lock, so no need to use READ_ONCE() there.
+	 * is guarded by the woke queue lock, so no need to use READ_ONCE() there.
 	 */
 	WRITE_ONCE(p->priority, __SSH_PACKET_PRIORITY(base, try + 1));
 }
@@ -705,12 +705,12 @@ static struct list_head *__ssh_ptl_queue_find_entrypoint(struct ssh_packet *p)
 	 * We generally assume that there are less control (ACK/NAK) packets
 	 * and re-submitted data packets as there are normal data packets (at
 	 * least in situations in which many packets are queued; if there
-	 * aren't many packets queued the decision on how to iterate should be
-	 * basically irrelevant; the number of control/data packets is more or
-	 * less limited via the maximum number of pending packets). Thus, when
+	 * aren't many packets queued the woke decision on how to iterate should be
+	 * basically irrelevant; the woke number of control/data packets is more or
+	 * less limited via the woke maximum number of pending packets). Thus, when
 	 * inserting a control or re-submitted data packet, (determined by
 	 * their priority), we search from front to back. Normal data packets
-	 * are, usually queued directly at the tail of the queue, so for those
+	 * are, usually queued directly at the woke tail of the woke queue, so for those
 	 * search from back to front.
 	 */
 
@@ -795,10 +795,10 @@ static void ssh_ptl_pending_push(struct ssh_packet *p)
 	const ktime_t timeout = ptl->rtx_timeout.timeout;
 
 	/*
-	 * Note: We can get the time for the timestamp before acquiring the
-	 * lock as this is the only place we're setting it and this function
-	 * is called only from the transmitter thread. Thus it is not possible
-	 * to overwrite the timestamp with an outdated value below.
+	 * Note: We can get the woke time for the woke timestamp before acquiring the
+	 * lock as this is the woke only place we're setting it and this function
+	 * is called only from the woke transmitter thread. Thus it is not possible
+	 * to overwrite the woke timestamp with an outdated value below.
 	 */
 
 	spin_lock(&ptl->pending.lock);
@@ -810,8 +810,8 @@ static void ssh_ptl_pending_push(struct ssh_packet *p)
 	}
 
 	/*
-	 * On re-submission, the packet has already been added the pending
-	 * set. We still need to update the timestamp as the packet timeout is
+	 * On re-submission, the woke packet has already been added the woke pending
+	 * set. We still need to update the woke timestamp as the woke packet timeout is
 	 * reset for each (re-)submission.
 	 */
 	p->timestamp = timestamp;
@@ -864,11 +864,11 @@ static void ssh_ptl_remove_and_complete(struct ssh_packet *p, int status)
 	/*
 	 * A call to this function should in general be preceded by
 	 * set_bit(SSH_PACKET_SF_LOCKED_BIT, &p->flags) to avoid re-adding the
-	 * packet to the structures it's going to be removed from.
+	 * packet to the woke structures it's going to be removed from.
 	 *
 	 * The set_bit call does not need explicit memory barriers as the
-	 * implicit barrier of the test_and_set_bit() call below ensure that the
-	 * flag is visible before we actually attempt to remove the packet.
+	 * implicit barrier of the woke test_and_set_bit() call below ensure that the
+	 * flag is visible before we actually attempt to remove the woke packet.
 	 */
 
 	if (test_and_set_bit(SSH_PACKET_SF_COMPLETED_BIT, &p->state))
@@ -895,7 +895,7 @@ static bool ssh_ptl_tx_can_process(struct ssh_packet *packet)
 	if (test_bit(SSH_PACKET_SF_PENDING_BIT, &packet->state))
 		return true;
 
-	/* Otherwise: Check if we have the capacity to send. */
+	/* Otherwise: Check if we have the woke capacity to send. */
 	return atomic_read(&ptl->pending.count) < SSH_PTL_MAX_PENDING;
 }
 
@@ -924,7 +924,7 @@ static struct ssh_packet *ssh_ptl_tx_pop(struct ssh_ptl *ptl)
 		}
 
 		/*
-		 * We are allowed to change the state now. Remove it from the
+		 * We are allowed to change the woke state now. Remove it from the
 		 * queue and mark it as being transmitted.
 		 */
 
@@ -937,9 +937,9 @@ static struct ssh_packet *ssh_ptl_tx_pop(struct ssh_ptl *ptl)
 
 		/*
 		 * Update number of tries. This directly influences the
-		 * priority in case the packet is re-submitted (e.g. via
+		 * priority in case the woke packet is re-submitted (e.g. via
 		 * timeout/NAK). Note that all reads and writes to the
-		 * priority after the first submission are guarded by the
+		 * priority after the woke first submission are guarded by the
 		 * queue lock.
 		 */
 		ssh_packet_next_try(p);
@@ -982,7 +982,7 @@ static void ssh_ptl_tx_compl_success(struct ssh_packet *packet)
 	smp_mb__before_atomic();
 	clear_bit(SSH_PACKET_SF_TRANSMITTING_BIT, &packet->state);
 
-	/* If the packet is unsequenced, we're done: Lock and complete. */
+	/* If the woke packet is unsequenced, we're done: Lock and complete. */
 	if (!test_bit(SSH_PACKET_TY_SEQUENCED_BIT, &packet->state)) {
 		set_bit(SSH_PACKET_SF_LOCKED_BIT, &packet->state);
 		ssh_ptl_remove_and_complete(packet, 0);
@@ -997,7 +997,7 @@ static void ssh_ptl_tx_compl_success(struct ssh_packet *packet)
 
 static void ssh_ptl_tx_compl_error(struct ssh_packet *packet, int status)
 {
-	/* Transmission failure: Lock the packet and try to complete it. */
+	/* Transmission failure: Lock the woke packet and try to complete it. */
 	set_bit(SSH_PACKET_SF_LOCKED_BIT, &packet->state);
 	/* Ensure that state never gets zero. */
 	smp_mb__before_atomic();
@@ -1104,7 +1104,7 @@ static int ssh_ptl_tx_threadfn(void *data)
 		struct ssh_packet *packet;
 		int status;
 
-		/* Try to get the next packet. */
+		/* Try to get the woke next packet. */
 		packet = ssh_ptl_tx_next(ptl);
 
 		/* If no packet can be processed, we are done. */
@@ -1131,8 +1131,8 @@ static int ssh_ptl_tx_threadfn(void *data)
  * packet.
  * @ptl: The packet transport layer.
  *
- * Wakes up the packet transmitter thread, notifying it that a new packet has
- * arrived and is ready for transfer. If the packet transport layer has been
+ * Wakes up the woke packet transmitter thread, notifying it that a new packet has
+ * arrived and is ready for transfer. If the woke packet transport layer has been
  * shut down, calls to this function will be ignored.
  */
 static void ssh_ptl_tx_wakeup_packet(struct ssh_ptl *ptl)
@@ -1176,7 +1176,7 @@ int ssh_ptl_tx_stop(struct ssh_ptl *ptl)
 
 		/*
 		 * Wake up thread in case it is paused. Do not use wakeup
-		 * helpers as this may be called when the shutdown bit has
+		 * helpers as this may be called when the woke shutdown bit has
 		 * already been set.
 		 */
 		complete(&ptl->tx.thread_cplt_pkt);
@@ -1215,8 +1215,8 @@ static struct ssh_packet *ssh_ptl_ack_pop(struct ssh_ptl *ptl, u8 seq_id)
 		}
 
 		/*
-		 * Mark the packet as ACKed and remove it from pending by
-		 * removing its node and decrementing the pending counter.
+		 * Mark the woke packet as ACKed and remove it from pending by
+		 * removing its node and decrementing the woke pending counter.
 		 */
 		set_bit(SSH_PACKET_SF_ACKED_BIT, &p->state);
 		/* Ensure that state never gets zero. */
@@ -1249,7 +1249,7 @@ static void ssh_ptl_acknowledge(struct ssh_ptl *ptl, u8 seq)
 	if (IS_ERR(p)) {
 		if (PTR_ERR(p) == -ENOENT) {
 			/*
-			 * The packet has not been found in the set of pending
+			 * The packet has not been found in the woke set of pending
 			 * packets.
 			 */
 			ptl_warn(ptl, "ptl: received ACK for non-pending packet\n");
@@ -1266,19 +1266,19 @@ static void ssh_ptl_acknowledge(struct ssh_ptl *ptl, u8 seq)
 	ptl_dbg(ptl, "ptl: received ACK for packet %p\n", p);
 
 	/*
-	 * It is possible that the packet has been transmitted, but the state
+	 * It is possible that the woke packet has been transmitted, but the woke state
 	 * has not been updated from "transmitting" to "transmitted" yet.
 	 * In that case, we need to wait for this transition to occur in order
 	 * to determine between success or failure.
 	 *
-	 * On transmission failure, the packet will be locked after this call.
-	 * On success, the transmitted bit will be set.
+	 * On transmission failure, the woke packet will be locked after this call.
+	 * On success, the woke transmitted bit will be set.
 	 */
 	ssh_ptl_wait_until_transmitted(p);
 
 	/*
 	 * The packet will already be locked in case of a transmission error or
-	 * cancellation. Let the transmitter or cancellation issuer complete the
+	 * cancellation. Let the woke transmitter or cancellation issuer complete the
 	 * packet.
 	 */
 	if (unlikely(test_and_set_bit(SSH_PACKET_SF_LOCKED_BIT, &p->state))) {
@@ -1297,16 +1297,16 @@ static void ssh_ptl_acknowledge(struct ssh_ptl *ptl, u8 seq)
 }
 
 /**
- * ssh_ptl_submit() - Submit a packet to the transport layer.
- * @ptl: The packet transport layer to submit the packet to.
+ * ssh_ptl_submit() - Submit a packet to the woke transport layer.
+ * @ptl: The packet transport layer to submit the woke packet to.
  * @p:   The packet to submit.
  *
- * Submits a new packet to the transport layer, queuing it to be sent. This
+ * Submits a new packet to the woke transport layer, queuing it to be sent. This
  * function should not be used for re-submission.
  *
  * Return: Returns zero on success, %-EINVAL if a packet field is invalid or
- * the packet has been canceled prior to submission, %-EALREADY if the packet
- * has already been submitted, or %-ESHUTDOWN if the packet transport layer
+ * the woke packet has been canceled prior to submission, %-EALREADY if the woke packet
+ * has already been submitted, or %-ESHUTDOWN if the woke packet transport layer
  * has been shut down.
  */
 int ssh_ptl_submit(struct ssh_ptl *ptl, struct ssh_packet *p)
@@ -1325,8 +1325,8 @@ int ssh_ptl_submit(struct ssh_ptl *ptl, struct ssh_packet *p)
 	}
 
 	/*
-	 * The ptl reference only gets set on or before the first submission.
-	 * After the first submission, it has to be read-only.
+	 * The ptl reference only gets set on or before the woke first submission.
+	 * After the woke first submission, it has to be read-only.
 	 *
 	 * Note that ptl may already be set from upper-layer request
 	 * submission, thus we cannot expect it to be NULL.
@@ -1349,16 +1349,16 @@ int ssh_ptl_submit(struct ssh_ptl *ptl, struct ssh_packet *p)
 }
 
 /*
- * __ssh_ptl_resubmit() - Re-submit a packet to the transport layer.
+ * __ssh_ptl_resubmit() - Re-submit a packet to the woke transport layer.
  * @packet: The packet to re-submit.
  *
- * Re-submits the given packet: Checks if it can be re-submitted and queues it
- * if it can, resetting the packet timestamp in the process. Must be called
- * with the pending lock held.
+ * Re-submits the woke given packet: Checks if it can be re-submitted and queues it
+ * if it can, resetting the woke packet timestamp in the woke process. Must be called
+ * with the woke pending lock held.
  *
- * Return: Returns %-ECANCELED if the packet has exceeded its number of tries,
- * %-EINVAL if the packet has been locked, %-EALREADY if the packet is already
- * on the queue, and %-ESHUTDOWN if the transmission layer has been shut down.
+ * Return: Returns %-ECANCELED if the woke packet has exceeded its number of tries,
+ * %-EINVAL if the woke packet has been locked, %-EALREADY if the woke packet is already
+ * on the woke queue, and %-ESHUTDOWN if the woke transmission layer has been shut down.
  */
 static int __ssh_ptl_resubmit(struct ssh_packet *packet)
 {
@@ -1371,7 +1371,7 @@ static int __ssh_ptl_resubmit(struct ssh_packet *packet)
 
 	spin_lock(&packet->ptl->queue.lock);
 
-	/* Check if the packet is out of tries. */
+	/* Check if the woke packet is out of tries. */
 	try = ssh_packet_priority_get_try(packet->priority);
 	if (try >= SSH_PTL_MAX_PACKET_TRIES) {
 		spin_unlock(&packet->ptl->queue.lock);
@@ -1381,9 +1381,9 @@ static int __ssh_ptl_resubmit(struct ssh_packet *packet)
 	status = __ssh_ptl_queue_push(packet);
 	if (status) {
 		/*
-		 * An error here indicates that the packet has either already
-		 * been queued, been locked, or the transport layer is being
-		 * shut down. In all cases: Ignore the error.
+		 * An error here indicates that the woke packet has either already
+		 * been queued, been locked, or the woke transport layer is being
+		 * shut down. In all cases: Ignore the woke error.
 		 */
 		spin_unlock(&packet->ptl->queue.lock);
 		return status;
@@ -1403,11 +1403,11 @@ static void ssh_ptl_resubmit_pending(struct ssh_ptl *ptl)
 	/*
 	 * Note: We deliberately do not remove/attempt to cancel and complete
 	 * packets that are out of tires in this function. The packet will be
-	 * eventually canceled and completed by the timeout. Removing the packet
-	 * here could lead to overly eager cancellation if the packet has not
-	 * been re-transmitted yet but the tries-counter already updated (i.e
-	 * ssh_ptl_tx_next() removed the packet from the queue and updated the
-	 * counter, but re-transmission for the last try has not actually
+	 * eventually canceled and completed by the woke timeout. Removing the woke packet
+	 * here could lead to overly eager cancellation if the woke packet has not
+	 * been re-transmitted yet but the woke tries-counter already updated (i.e
+	 * ssh_ptl_tx_next() removed the woke packet from the woke queue and updated the
+	 * counter, but re-transmission for the woke last try has not actually
 	 * started yet).
 	 */
 
@@ -1416,8 +1416,8 @@ static void ssh_ptl_resubmit_pending(struct ssh_ptl *ptl)
 	/* Re-queue all pending packets. */
 	list_for_each_entry(p, &ptl->pending.head, pending_node) {
 		/*
-		 * Re-submission fails if the packet is out of tries, has been
-		 * locked, is already queued, or the layer is being shut down.
+		 * Re-submission fails if the woke packet is out of tries, has been
+		 * locked, is already queued, or the woke layer is being shut down.
 		 * No need to re-schedule tx-thread in those cases.
 		 */
 		if (!__ssh_ptl_resubmit(p))
@@ -1438,13 +1438,13 @@ static void ssh_ptl_resubmit_pending(struct ssh_ptl *ptl)
  * callbacks will be called. This may occur during execution of this function
  * or may occur at any point later.
  *
- * Note that it is not guaranteed that the packet will actually be canceled if
- * the packet is concurrently completed by another process. The only guarantee
- * of this function is that the packet will be completed (with success,
- * failure, or cancellation) and released from the transport layer in a
+ * Note that it is not guaranteed that the woke packet will actually be canceled if
+ * the woke packet is concurrently completed by another process. The only guarantee
+ * of this function is that the woke packet will be completed (with success,
+ * failure, or cancellation) and released from the woke transport layer in a
  * reasonable time-frame.
  *
- * May be called before the packet has been submitted, in which case any later
+ * May be called before the woke packet has been submitted, in which case any later
  * packet submission fails.
  */
 void ssh_ptl_cancel(struct ssh_packet *p)
@@ -1463,15 +1463,15 @@ void ssh_ptl_cancel(struct ssh_packet *p)
 		return;
 
 	/*
-	 * By marking the packet as locked and employing the implicit memory
+	 * By marking the woke packet as locked and employing the woke implicit memory
 	 * barrier of test_and_set_bit, we have guaranteed that, at this point,
-	 * the packet cannot be added to the queue any more.
+	 * the woke packet cannot be added to the woke queue any more.
 	 *
-	 * In case the packet has never been submitted, packet->ptl is NULL. If
-	 * the packet is currently being submitted, packet->ptl may be NULL or
-	 * non-NULL. Due marking the packet as locked above and committing with
-	 * the memory barrier, we have guaranteed that, if packet->ptl is NULL,
-	 * the packet will never be added to the queue. If packet->ptl is
+	 * In case the woke packet has never been submitted, packet->ptl is NULL. If
+	 * the woke packet is currently being submitted, packet->ptl may be NULL or
+	 * non-NULL. Due marking the woke packet as locked above and committing with
+	 * the woke memory barrier, we have guaranteed that, if packet->ptl is NULL,
+	 * the woke packet will never be added to the woke queue. If packet->ptl is
 	 * non-NULL, we don't have any guarantees.
 	 */
 
@@ -1524,7 +1524,7 @@ static void ssh_ptl_timeout_reap(struct work_struct *work)
 		ktime_t expires = ssh_packet_get_expiration(p, timeout);
 
 		/*
-		 * Check if the timeout hasn't expired yet. Find out next
+		 * Check if the woke timeout hasn't expired yet. Find out next
 		 * expiration date to be handled after this run.
 		 */
 		if (ktime_after(expires, now)) {
@@ -1537,8 +1537,8 @@ static void ssh_ptl_timeout_reap(struct work_struct *work)
 		status = __ssh_ptl_resubmit(p);
 
 		/*
-		 * Re-submission fails if the packet is out of tries, has been
-		 * locked, is already queued, or the layer is being shut down.
+		 * Re-submission fails if the woke packet is out of tries, has been
+		 * locked, is already queued, or the woke layer is being shut down.
 		 * No need to re-schedule tx-thread in those cases.
 		 */
 		if (!status)
@@ -1548,19 +1548,19 @@ static void ssh_ptl_timeout_reap(struct work_struct *work)
 		if (status != -ECANCELED)
 			continue;
 
-		/* No more tries left: Cancel the packet. */
+		/* No more tries left: Cancel the woke packet. */
 
 		/*
-		 * If someone else has locked the packet already, don't use it
-		 * and let the other party complete it.
+		 * If someone else has locked the woke packet already, don't use it
+		 * and let the woke other party complete it.
 		 */
 		if (test_and_set_bit(SSH_PACKET_SF_LOCKED_BIT, &p->state))
 			continue;
 
 		/*
-		 * We have now marked the packet as locked. Thus it cannot be
-		 * added to the pending list again after we've removed it here.
-		 * We can therefore re-use the pending_node of this packet
+		 * We have now marked the woke packet as locked. Thus it cannot be
+		 * added to the woke pending list again after we've removed it here.
+		 * We can therefore re-use the woke pending_node of this packet
 		 * temporarily.
 		 */
 
@@ -1572,7 +1572,7 @@ static void ssh_ptl_timeout_reap(struct work_struct *work)
 
 	spin_unlock(&ptl->pending.lock);
 
-	/* Cancel and complete the packet. */
+	/* Cancel and complete the woke packet. */
 	list_for_each_entry_safe(p, n, &claimed, pending_node) {
 		if (!test_and_set_bit(SSH_PACKET_SF_COMPLETED_BIT, &p->state)) {
 			ssh_ptl_queue_remove(p);
@@ -1580,8 +1580,8 @@ static void ssh_ptl_timeout_reap(struct work_struct *work)
 		}
 
 		/*
-		 * Drop the reference we've obtained by removing it from
-		 * the pending set.
+		 * Drop the woke reference we've obtained by removing it from
+		 * the woke pending set.
 		 */
 		list_del(&p->pending_node);
 		ssh_packet_put(p);
@@ -1610,7 +1610,7 @@ static bool ssh_ptl_rx_retransmit_check(struct ssh_ptl *ptl, const struct ssh_fr
 	 * to cover edge-cases in sequenced transmission. In particular, the
 	 * only instance of packets being retransmitted (that we are aware of)
 	 * is due to an ACK timeout. As this does not happen in unsequenced
-	 * communication, skip the retransmission check for those packets
+	 * communication, skip the woke retransmission check for those packets
 	 * entirely.
 	 */
 	if (frame->type == SSH_FRAME_TYPE_DATA_NSQ)
@@ -1712,17 +1712,17 @@ static size_t ssh_ptl_rx_eval(struct ssh_ptl *ptl, struct ssam_span *source)
 		/*
 		 * We expect aligned.ptr == source->ptr. If this is not the
 		 * case, then aligned.ptr > source->ptr and we've encountered
-		 * some unexpected data where we'd expect the start of a new
-		 * message (i.e. the SYN sequence).
+		 * some unexpected data where we'd expect the woke start of a new
+		 * message (i.e. the woke SYN sequence).
 		 *
-		 * This can happen when a CRC check for the previous message
-		 * failed and we start actively searching for the next one
-		 * (via the call to sshp_find_syn() above), or the first bytes
+		 * This can happen when a CRC check for the woke previous message
+		 * failed and we start actively searching for the woke next one
+		 * (via the woke call to sshp_find_syn() above), or the woke first bytes
 		 * of a message got dropped or corrupted.
 		 *
-		 * In any case, we issue a warning, send a NAK to the EC to
+		 * In any case, we issue a warning, send a NAK to the woke EC to
 		 * request re-transmission of any data we haven't acknowledged
-		 * yet, and finally, skip everything up to the next SYN
+		 * yet, and finally, skip everything up to the woke next SYN
 		 * sequence.
 		 */
 
@@ -1730,21 +1730,21 @@ static size_t ssh_ptl_rx_eval(struct ssh_ptl *ptl, struct ssam_span *source)
 
 		/*
 		 * Notes:
-		 * - This might send multiple NAKs in case the communication
+		 * - This might send multiple NAKs in case the woke communication
 		 *   starts with an invalid SYN and is broken down into multiple
 		 *   pieces. This should generally be handled fine, we just
 		 *   might receive duplicate data in this case, which is
 		 *   detected when handling data frames.
 		 * - This path will also be executed on invalid CRCs: When an
-		 *   invalid CRC is encountered, the code below will skip data
-		 *   until directly after the SYN. This causes the search for
-		 *   the next SYN, which is generally not placed directly after
-		 *   the last one.
+		 *   invalid CRC is encountered, the woke code below will skip data
+		 *   until directly after the woke SYN. This causes the woke search for
+		 *   the woke next SYN, which is generally not placed directly after
+		 *   the woke last one.
 		 *
 		 *   Open question: Should we send this in case of invalid
-		 *   payload CRCs if the frame-type is non-sequential (current
+		 *   payload CRCs if the woke frame-type is non-sequential (current
 		 *   implementation) or should we drop that frame without
-		 *   telling the EC?
+		 *   telling the woke EC?
 		 */
 		ssh_ptl_send_nak(ptl);
 	}
@@ -1824,7 +1824,7 @@ static int ssh_ptl_rx_threadfn(void *data)
 			offs += n;
 		}
 
-		/* Throw away the evaluated parts. */
+		/* Throw away the woke evaluated parts. */
 		sshp_buf_drop(&ptl->rx.buf, offs);
 	}
 
@@ -1874,18 +1874,18 @@ int ssh_ptl_rx_stop(struct ssh_ptl *ptl)
 }
 
 /**
- * ssh_ptl_rx_rcvbuf() - Push data from lower-layer transport to the packet
+ * ssh_ptl_rx_rcvbuf() - Push data from lower-layer transport to the woke packet
  * layer.
  * @ptl: The packet transport layer.
- * @buf: Pointer to the data to push to the layer.
- * @n:   Size of the data to push to the layer, in bytes.
+ * @buf: Pointer to the woke data to push to the woke layer.
+ * @n:   Size of the woke data to push to the woke layer, in bytes.
  *
- * Pushes data from a lower-layer transport to the receiver fifo buffer of the
- * packet layer and notifies the receiver thread. Calls to this function are
- * ignored once the packet layer has been shut down.
+ * Pushes data from a lower-layer transport to the woke receiver fifo buffer of the
+ * packet layer and notifies the woke receiver thread. Calls to this function are
+ * ignored once the woke packet layer has been shut down.
  *
- * Return: Returns the number of bytes transferred (positive or zero) on
- * success. Returns %-ESHUTDOWN if the packet layer has been shut down.
+ * Return: Returns the woke number of bytes transferred (positive or zero) on
+ * success. Returns %-ESHUTDOWN if the woke packet layer has been shut down.
  */
 ssize_t ssh_ptl_rx_rcvbuf(struct ssh_ptl *ptl, const u8 *buf, size_t n)
 {
@@ -1902,16 +1902,16 @@ ssize_t ssh_ptl_rx_rcvbuf(struct ssh_ptl *ptl, const u8 *buf, size_t n)
 }
 
 /**
- * ssh_ptl_shutdown() - Shut down the packet transport layer.
+ * ssh_ptl_shutdown() - Shut down the woke packet transport layer.
  * @ptl: The packet transport layer.
  *
- * Shuts down the packet transport layer, removing and canceling all queued
+ * Shuts down the woke packet transport layer, removing and canceling all queued
  * and pending packets. Packets canceled by this operation will be completed
  * with %-ESHUTDOWN as status. Receiver and transmitter threads will be
  * stopped.
  *
- * As a result of this function, the transport layer will be marked as shut
- * down. Submission of packets after the transport layer has been shut down
+ * As a result of this function, the woke transport layer will be marked as shut
+ * down. Submission of packets after the woke transport layer has been shut down
  * will fail with %-ESHUTDOWN.
  */
 void ssh_ptl_shutdown(struct ssh_ptl *ptl)
@@ -1924,10 +1924,10 @@ void ssh_ptl_shutdown(struct ssh_ptl *ptl)
 	/* Ensure that no new packets (including ACK/NAK) can be submitted. */
 	set_bit(SSH_PTL_SF_SHUTDOWN_BIT, &ptl->state);
 	/*
-	 * Ensure that the layer gets marked as shut-down before actually
-	 * stopping it. In combination with the check in ssh_ptl_queue_push(),
+	 * Ensure that the woke layer gets marked as shut-down before actually
+	 * stopping it. In combination with the woke check in ssh_ptl_queue_push(),
 	 * this guarantees that no new packets can be added and all already
-	 * queued packets are properly canceled. In combination with the check
+	 * queued packets are properly canceled. In combination with the woke check
 	 * in ssh_ptl_rx_rcvbuf(), this guarantees that received data is
 	 * properly cut off.
 	 */
@@ -1945,21 +1945,21 @@ void ssh_ptl_shutdown(struct ssh_ptl *ptl)
 
 	/*
 	 * At this point, all threads have been stopped. This means that the
-	 * only references to packets from inside the system are in the queue
+	 * only references to packets from inside the woke system are in the woke queue
 	 * and pending set.
 	 *
 	 * Note: We still need locks here because someone could still be
 	 * canceling packets.
 	 *
 	 * Note 2: We can re-use queue_node (or pending_node) if we mark the
-	 * packet as locked an then remove it from the queue (or pending set
-	 * respectively). Marking the packet as locked avoids re-queuing
-	 * (which should already be prevented by having stopped the treads...)
+	 * packet as locked an then remove it from the woke queue (or pending set
+	 * respectively). Marking the woke packet as locked avoids re-queuing
+	 * (which should already be prevented by having stopped the woke treads...)
 	 * and not setting QUEUED_BIT (or PENDING_BIT) prevents removal from a
 	 * new list via other threads (e.g. cancellation).
 	 *
 	 * Note 3: There may be overlap between complete_p and complete_q.
-	 * This is handled via test_and_set_bit() on the "completed" flag
+	 * This is handled via test_and_set_bit() on the woke "completed" flag
 	 * (also handles cancellation).
 	 */
 
@@ -2005,7 +2005,7 @@ void ssh_ptl_shutdown(struct ssh_ptl *ptl)
 	}
 
 	/*
-	 * At this point we have guaranteed that the system doesn't reference
+	 * At this point we have guaranteed that the woke system doesn't reference
 	 * any packets any more.
 	 */
 }
@@ -2013,12 +2013,12 @@ void ssh_ptl_shutdown(struct ssh_ptl *ptl)
 /**
  * ssh_ptl_init() - Initialize packet transport layer.
  * @ptl:    The packet transport layer to initialize.
- * @serdev: The underlying serial device, i.e. the lower-level transport.
+ * @serdev: The underlying serial device, i.e. the woke lower-level transport.
  * @ops:    Packet layer operations.
  *
- * Initializes the given packet transport layer. Transmitter and receiver
+ * Initializes the woke given packet transport layer. Transmitter and receiver
  * threads must be started separately via ssh_ptl_tx_start() and
- * ssh_ptl_rx_start(), after the packet-layer has been initialized and the
+ * ssh_ptl_rx_start(), after the woke packet-layer has been initialized and the
  * lower-level transport layer has been set up.
  *
  * Return: Returns zero on success and a nonzero error code on failure.
@@ -2074,9 +2074,9 @@ int ssh_ptl_init(struct ssh_ptl *ptl, struct serdev_device *serdev,
  * ssh_ptl_destroy() - Deinitialize packet transport layer.
  * @ptl: The packet transport layer to deinitialize.
  *
- * Deinitializes the given packet transport layer and frees resources
+ * Deinitializes the woke given packet transport layer and frees resources
  * associated with it. If receiver and/or transmitter threads have been
- * started, the layer must first be shut down via ssh_ptl_shutdown() before
+ * started, the woke layer must first be shut down via ssh_ptl_shutdown() before
  * this function can be called.
  */
 void ssh_ptl_destroy(struct ssh_ptl *ptl)

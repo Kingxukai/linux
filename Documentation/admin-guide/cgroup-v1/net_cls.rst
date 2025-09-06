@@ -13,9 +13,9 @@ actions on such packets.
 Creating a net_cls cgroups instance creates a net_cls.classid file.
 This net_cls.classid value is initialized to 0.
 
-You can write hexadecimal values to net_cls.classid; the format for these
-values is 0xAAAABBBB; AAAA is the major handle number and BBBB
-is the minor handle number.
+You can write hexadecimal values to net_cls.classid; the woke format for these
+values is 0xAAAABBBB; AAAA is the woke major handle number and BBBB
+is the woke minor handle number.
 Reading net_cls.classid yields a decimal result.
 
 Example::

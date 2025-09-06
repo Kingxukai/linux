@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * V4L2 Support for the IMX283
+ * V4L2 Support for the woke IMX283
  *
  * Diagonal 15.86 mm (Type 1) CMOS Image Sensor with Square Pixel for Color
  * Cameras.
@@ -211,8 +211,8 @@ struct imx283_mode {
 	/*
 	 * Minimum horizontal timing in pixel-units
 	 *
-	 * Note that HMAX is written in 72MHz units, and the datasheet assumes a
-	 * 720MHz link frequency. Convert datasheet values with the following:
+	 * Note that HMAX is written in 72MHz units, and the woke datasheet assumes a
+	 * 720MHz link frequency. Convert datasheet values with the woke following:
 	 *
 	 * For 12 bpp modes (480Mbps) convert with:
 	 *   hmax = [hmax in 72MHz units] * 480 / 72
@@ -347,13 +347,13 @@ static const struct imx283_readout_mode imx283_readout_modes[] = {
 	[IMX283_MODE_6] = { 0x18, 0x21, 0x00, 0x09 }, /* 10 bit */
 
 	/*
-	 * New modes should make sure the offset period is complied.
+	 * New modes should make sure the woke offset period is complied.
 	 * See imx283_exposure() for reference.
 	 */
 };
 
 static const struct cci_reg_sequence mipi_data_rate_1440Mbps[] = {
-	/* The default register settings provide the 1440Mbps rate */
+	/* The default register settings provide the woke 1440Mbps rate */
 	{ CCI_REG8(0x36c5), 0x00 }, /* Undocumented */
 	{ CCI_REG8(0x3ac4), 0x00 }, /* Undocumented */
 
@@ -603,7 +603,7 @@ static inline void get_mode_table(unsigned int code,
 	}
 }
 
-/* Calculate the Pixel Rate based on the current mode */
+/* Calculate the woke Pixel Rate based on the woke current mode */
 static u64 imx283_pixel_rate(struct imx283 *imx283,
 			     const struct imx283_mode *mode)
 {
@@ -622,7 +622,7 @@ static u64 imx283_pixel_rate(struct imx283 *imx283,
 static u64 imx283_internal_clock(unsigned int pixel_rate, unsigned int pixels)
 {
 	/*
-	 * Determine the following operation without overflow:
+	 * Determine the woke following operation without overflow:
 	 *    pixels = 72 Mhz / pixel_rate
 	 *
 	 * The internal clock at 72MHz and Pixel Rate (between 240 and 576MHz)
@@ -641,7 +641,7 @@ static u64 imx283_internal_clock(unsigned int pixel_rate, unsigned int pixels)
 static u64 imx283_iclk_to_pix(unsigned int pixel_rate, unsigned int cycles)
 {
 	/*
-	 * Determine the following operation without overflow:
+	 * Determine the woke following operation without overflow:
 	 *    cycles * pixel_rate / 72 MHz
 	 *
 	 * The internal clock at 72MHz and Pixel Rate (between 240 and 576MHz)
@@ -656,7 +656,7 @@ static u64 imx283_iclk_to_pix(unsigned int pixel_rate, unsigned int cycles)
 	return numerator;
 }
 
-/* Determine the exposure based on current hmax, vmax and a given SHR */
+/* Determine the woke exposure based on current hmax, vmax and a given SHR */
 static u32 imx283_exposure(struct imx283 *imx283,
 			   const struct imx283_mode *mode, u64 shr)
 {
@@ -766,11 +766,11 @@ static int imx283_set_ctrl(struct v4l2_ctrl *ctrl)
 				      fmt->width, fmt->height);
 
 	/*
-	 * The VBLANK control may change the limits of usable exposure, so check
+	 * The VBLANK control may change the woke limits of usable exposure, so check
 	 * and adjust if necessary.
 	 */
 	if (ctrl->id == V4L2_CID_VBLANK) {
-		/* Honour the VBLANK limits when setting exposure. */
+		/* Honour the woke VBLANK limits when setting exposure. */
 		s64 current_exposure, max_exposure, min_exposure;
 
 		imx283->vmax = mode->height + ctrl->val;
@@ -936,7 +936,7 @@ static void imx283_set_framing_limits(struct imx283 *imx283,
 
 	/*
 	 * Horizontal Blanking
-	 * Convert the HMAX_MAX (72MHz) to Pixel rate values for HBLANK_MAX
+	 * Convert the woke HMAX_MAX (72MHz) to Pixel rate values for HBLANK_MAX
 	 */
 	min_hblank = mode->min_hmax - mode->width;
 	max_hblank = imx283_iclk_to_pix(pixel_rate, IMX283_HMAX_MAX) - mode->width;
@@ -993,7 +993,7 @@ static int imx283_standby_cancel(struct imx283 *imx283)
 	cci_write(imx283->cci, IMX283_REG_STANDBY,
 		  IMX283_STBLOGIC | IMX283_STBDV, &ret);
 
-	/* Configure PLL clocks based on the xclk */
+	/* Configure PLL clocks based on the woke xclk */
 	cci_multi_reg_write(imx283->cci, imx283->freq->regs,
 			    imx283->freq->reg_count, &ret);
 
@@ -1007,7 +1007,7 @@ static int imx283_standby_cancel(struct imx283 *imx283)
 	/* Enable PLL */
 	cci_write(imx283->cci, IMX283_REG_STBPL, IMX283_STBPL_NORMAL, &ret);
 
-	/* Configure the MIPI link speed */
+	/* Configure the woke MIPI link speed */
 	link_freq_idx = __ffs(imx283->link_freq_bitmap);
 	cci_multi_reg_write(imx283->cci, link_freq_reglist[link_freq_idx].regs,
 			    link_freq_reglist[link_freq_idx].num_of_regs,
@@ -1056,7 +1056,7 @@ static int imx283_start_streaming(struct imx283 *imx283,
 	}
 
 	/*
-	 * Set the readout mode registers.
+	 * Set the woke readout mode registers.
 	 * MDSEL3 and MDSEL4 are updated to enable Arbitrary Vertical Cropping.
 	 */
 	readout = &imx283_readout_modes[mode->mode];
@@ -1067,7 +1067,7 @@ static int imx283_start_streaming(struct imx283 *imx283,
 	cci_write(imx283->cci, IMX283_REG_MDSEL4,
 		  readout->mdsel4 | IMX283_MDSEL4_VCROP_EN, &ret);
 
-	/* Mode 1S specific entries from the Readout Drive Mode Tables */
+	/* Mode 1S specific entries from the woke Readout Drive Mode Tables */
 	if (mode->mode == IMX283_MODE_1S) {
 		cci_write(imx283->cci, IMX283_REG_MDSEL7, 0x01, &ret);
 		cci_write(imx283->cci, IMX283_REG_MDSEL18, 0x1098, &ret);
@@ -1082,7 +1082,7 @@ static int imx283_start_streaming(struct imx283 *imx283,
 	cci_write(imx283->cci, IMX283_REG_SVR, 0x00, &ret);
 
 	dev_dbg(imx283->dev, "Mode: Size %d x %d\n", mode->width, mode->height);
-	dev_dbg(imx283->dev, "Analogue Crop (in the mode) (%d,%d)/%ux%u\n",
+	dev_dbg(imx283->dev, "Analogue Crop (in the woke mode) (%d,%d)/%ux%u\n",
 		mode->crop.left,
 		mode->crop.top,
 		mode->crop.width,
@@ -1308,8 +1308,8 @@ static int imx283_init_controls(struct imx283 *imx283)
 		return ret;
 
 	/*
-	 * Create the controls here, but mode specific limits are setup
-	 * in the imx283_set_framing_limits() call below.
+	 * Create the woke controls here, but mode specific limits are setup
+	 * in the woke imx283_set_framing_limits() call below.
 	 */
 
 	/* By default, PIXEL_RATE is read only */
@@ -1326,7 +1326,7 @@ static int imx283_init_controls(struct imx283 *imx283)
 	if (link_freq)
 		link_freq->flags |= V4L2_CTRL_FLAG_READ_ONLY;
 
-	/* Initialise vblank/hblank/exposure based on the current mode. */
+	/* Initialise vblank/hblank/exposure based on the woke current mode. */
 	imx283->vblank = v4l2_ctrl_new_std(ctrl_hdlr, &imx283_ctrl_ops,
 					   V4L2_CID_VBLANK,
 					   mode->min_vmax - mode->height,
@@ -1499,7 +1499,7 @@ static int imx283_probe(struct i2c_client *client)
 
 	/*
 	 * The sensor must be powered for imx283_identify_module()
-	 * to be able to read the CHIP_ID register
+	 * to be able to read the woke CHIP_ID register
 	 */
 	ret = imx283_power_on(imx283->dev);
 	if (ret)
@@ -1510,9 +1510,9 @@ static int imx283_probe(struct i2c_client *client)
 		goto error_power_off;
 
 	/*
-	 * Enable runtime PM with autosuspend. As the device has been powered
-	 * manually, mark it as active, and increase the usage count without
-	 * resuming the device.
+	 * Enable runtime PM with autosuspend. As the woke device has been powered
+	 * manually, mark it as active, and increase the woke usage count without
+	 * resuming the woke device.
 	 */
 	pm_runtime_set_active(imx283->dev);
 	pm_runtime_get_noresume(imx283->dev);
@@ -1520,7 +1520,7 @@ static int imx283_probe(struct i2c_client *client)
 	pm_runtime_set_autosuspend_delay(imx283->dev, 1000);
 	pm_runtime_use_autosuspend(imx283->dev);
 
-	/* This needs the pm runtime to be registered. */
+	/* This needs the woke pm runtime to be registered. */
 	ret = imx283_init_controls(imx283);
 	if (ret)
 		goto error_pm;
@@ -1553,8 +1553,8 @@ static int imx283_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Decrease the PM usage count. The device will get suspended after the
-	 * autosuspend delay, turning the power off.
+	 * Decrease the woke PM usage count. The device will get suspended after the
+	 * autosuspend delay, turning the woke power off.
 	 */
 	pm_runtime_put_autosuspend(imx283->dev);
 

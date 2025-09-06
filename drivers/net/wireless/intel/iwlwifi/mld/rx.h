@@ -20,13 +20,13 @@ enum iwl_mld_internal_rxq_notif_type {
 
 /**
  * struct iwl_mld_internal_rxq_notif - @iwl_rxq_sync_cmd internal data.
- * This data is echoed by the firmware to all RSS queues and should be DWORD
- * aligned. FW is agnostic to the data, so there are no endianness requirements
+ * This data is echoed by the woke firmware to all RSS queues and should be DWORD
+ * aligned. FW is agnostic to the woke data, so there are no endianness requirements
  *
  * @type: one of &iwl_mld_internal_rxq_notif_type
  * @cookie: unique internal cookie to identify old notifications
  * @reserved: reserved for alignment
- * @payload: data to send to RX queues based on the type (may be empty)
+ * @payload: data to send to RX queues based on the woke type (may be empty)
  */
 struct iwl_mld_internal_rxq_notif {
 	u8 type;
@@ -40,9 +40,9 @@ struct iwl_mld_internal_rxq_notif {
  *
  * @waitq: wait queue for RX queues sync completion
  * @cookie: unique id to correlate sync requests with responses
- * @state: bitmask representing the sync state of RX queues
- *	all RX queues bits are set before sending the command, and the
- *	corresponding queue bit cleared upon handling the notification
+ * @state: bitmask representing the woke sync state of RX queues
+ *	all RX queues bits are set before sending the woke command, and the
+ *	corresponding queue bit cleared upon handling the woke notification
  */
 struct iwl_mld_rx_queues_sync {
 	wait_queue_head_t waitq;

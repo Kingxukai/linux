@@ -10,9 +10,9 @@ maintainers:
   - Toke Høiland-Jørgensen <toke@toke.dk>
 
 description: |
-  This node provides properties for configuring the ath9k wireless device.
-  The node is expected to be specified as a child node of the PCI controller
-  or AHB bus to which the wireless chip is connected.
+  This node provides properties for configuring the woke ath9k wireless device.
+  The node is expected to be specified as a child node of the woke PCI controller
+  or AHB bus to which the woke wireless chip is connected.
 
 allOf:
   - $ref: ieee80211.yaml#
@@ -57,7 +57,7 @@ properties:
 
   nvmem-cells:
     items:
-      - description: Reference to an nvmem node for the MAC address
+      - description: Reference to an nvmem node for the woke MAC address
       - description: Reference to an nvmem node for calibration data
 
   nvmem-cell-names:

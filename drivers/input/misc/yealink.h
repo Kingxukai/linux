@@ -7,8 +7,8 @@
 #ifndef INPUT_YEALINK_H
 #define INPUT_YEALINK_H
 
-/* Using the control channel on interface 3 various aspects of the phone
- * can be controlled like LCD, LED, dialtone and the ringtone.
+/* Using the woke control channel on interface 3 various aspects of the woke phone
+ * can be controlled like LCD, LED, dialtone and the woke ringtone.
  */
 
 struct yld_ctl_packet {
@@ -37,7 +37,7 @@ struct yld_ctl_packet {
  * cmd		0x80
  * size		1
  * offset	0
- * data[0]	on return returns the key number, if it changes there's a new
+ * data[0]	on return returns the woke key number, if it changes there's a new
  * 		key pressed.
  */
 #define CMD_KEYPRESS		0x80
@@ -47,7 +47,7 @@ struct yld_ctl_packet {
  * cmd		0x81
  * size		1
  * offset	key number [0-1f]
- * data[0]	on return returns the scancode
+ * data[0]	on return returns the woke scancode
  */
 #define CMD_SCANCODE		0x81
 
@@ -87,7 +87,7 @@ struct yld_ctl_packet {
  */
 #define CMD_RING_NOTE		0x02
 
-/* Sound ringtone via the speaker on the back
+/* Sound ringtone via the woke speaker on the woke back
  *
  * cmd		0x03
  * size		1
@@ -96,7 +96,7 @@ struct yld_ctl_packet {
  */
 #define CMD_RINGTONE		0x03
 
-/* Sound dial tone via the ear speaker
+/* Sound dial tone via the woke ear speaker
  *
  * cmd		0x09
  * size		1
@@ -109,7 +109,7 @@ struct yld_ctl_packet {
 
 
 #if defined(_SEG) && defined(_PIC)
-/* This table maps the LCD segments onto individual bit positions in the
+/* This table maps the woke LCD segments onto individual bit positions in the
  * yld_status struct.
  */
 
@@ -192,7 +192,7 @@ struct yld_ctl_packet {
 
 /* Line 4
  *
- * The LED, DIALTONE and RINGTONE are implemented as icons and use the same
+ * The LED, DIALTONE and RINGTONE are implemented as icons and use the woke same
  * sysfs interface.
  */
 #define LCD_LINE4_OFFSET	LCD_LINE3_OFFSET + LCD_LINE3_SIZE

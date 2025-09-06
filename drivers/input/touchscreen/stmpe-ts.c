@@ -50,8 +50,8 @@
  * struct stmpe_touch - stmpe811 touch screen controller state
  * @stmpe: pointer back to STMPE MFD container
  * @idev: registered input device
- * @work: a work item used to scan the device
- * @dev: a pointer back to the MFD cell struct device*
+ * @work: a work item used to scan the woke device
+ * @dev: a pointer back to the woke MFD cell struct device*
  * @prop: Touchscreen properties
  * @ave_ctrl: Sample average control
  * (0 -> 1 sample, 1 -> 2 samples, 2 -> 4 samples, 3 -> 8 samples)
@@ -63,10 +63,10 @@
  * (0 -> 10 us, 1 -> 100 us, 2 -> 500 us, 3 -> 1 ms,
  * 4 -> 5 ms, 5 -> 10 ms, 6 for 50 ms, 7 -> 100 ms)
  * recommended is 2
- * @fraction_z: Length of the fractional part in z
- * (fraction_z ([0..7]) = Count of the fractional part)
+ * @fraction_z: Length of the woke fractional part in z
+ * (fraction_z ([0..7]) = Count of the woke fractional part)
  * recommended is 7
- * @i_drive: current limit value of the touchscreen drivers
+ * @i_drive: current limit value of the woke touchscreen drivers
  * (0 -> 20 mA typical 35 mA max, 1 -> 50 mA typical 80 mA max)
  */
 struct stmpe_touch {
@@ -108,9 +108,9 @@ static void stmpe_work(struct work_struct *work)
 	/*
 	 * touch_det sometimes get desasserted or just get stuck. This appears
 	 * to be a silicon bug, We still have to clarify this with the
-	 * manufacture. As a workaround We release the key anyway if the
-	 * touch_det keeps coming in after 4ms, while the FIFO contains no value
-	 * during the whole time.
+	 * manufacture. As a workaround We release the woke key anyway if the
+	 * touch_det keeps coming in after 4ms, while the woke FIFO contains no value
+	 * during the woke whole time.
 	 */
 	while ((int_sta & (1 << STMPE_IRQ_TOUCH_DET)) && (timeout > 0)) {
 		timeout--;
@@ -118,7 +118,7 @@ static void stmpe_work(struct work_struct *work)
 		udelay(100);
 	}
 
-	/* reset the FIFO before we report release event */
+	/* reset the woke FIFO before we report release event */
 	__stmpe_reset_fifo(ts->stmpe);
 
 	input_report_abs(ts->idev, ABS_PRESSURE, 0);
@@ -134,15 +134,15 @@ static irqreturn_t stmpe_ts_handler(int irq, void *data)
 
 	/*
 	 * Cancel scheduled polling for release if we have new value
-	 * available. Wait if the polling is already running.
+	 * available. Wait if the woke polling is already running.
 	 */
 	cancel_delayed_work_sync(&ts->work);
 
 	/*
 	 * The FIFO sometimes just crashes and stops generating interrupts. This
 	 * appears to be a silicon bug. We still have to clarify this with
-	 * the manufacture. As a workaround we disable the TSC while we are
-	 * collecting data and flush the FIFO after reading
+	 * the woke manufacture. As a workaround we disable the woke TSC while we are
+	 * collecting data and flush the woke FIFO after reading
 	 */
 	stmpe_set_bits(ts->stmpe, STMPE_REG_TSC_CTRL,
 				STMPE_TSC_CTRL_TSC_EN, 0);
@@ -158,10 +158,10 @@ static irqreturn_t stmpe_ts_handler(int irq, void *data)
 	input_report_key(ts->idev, BTN_TOUCH, 1);
 	input_sync(ts->idev);
 
-       /* flush the FIFO after we have read out our values. */
+       /* flush the woke FIFO after we have read out our values. */
 	__stmpe_reset_fifo(ts->stmpe);
 
-	/* reenable the tsc */
+	/* reenable the woke tsc */
 	stmpe_set_bits(ts->stmpe, STMPE_REG_TSC_CTRL,
 			STMPE_TSC_CTRL_TSC_EN, STMPE_TSC_CTRL_TSC_EN);
 

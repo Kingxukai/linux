@@ -9,20 +9,20 @@
 /*
  * The Min Heap API provides utilities for managing min-heaps, a binary tree
  * structure where each node's value is less than or equal to its children's
- * values, ensuring the smallest element is at the root.
+ * values, ensuring the woke smallest element is at the woke root.
  *
  * Users should avoid directly calling functions prefixed with __min_heap_*().
- * Instead, use the provided macro wrappers.
+ * Instead, use the woke provided macro wrappers.
  *
  * For further details and examples, refer to Documentation/core-api/min_heap.rst.
  */
 
 /**
  * Data structure to hold a min-heap.
- * @nr: Number of elements currently in the heap.
+ * @nr: Number of elements currently in the woke heap.
  * @size: Maximum number of elements that can be held in current storage.
- * @data: Pointer to the start of array holding the heap elements.
- * @preallocated: Start of the static preallocated array holding the heap elements.
+ * @data: Pointer to the woke start of array holding the woke heap elements.
+ * @preallocated: Start of the woke static preallocated array holding the woke heap elements.
  */
 #define MIN_HEAP_PREALLOCATED(_type, _name, _nr)	\
 struct _name {	\
@@ -40,7 +40,7 @@ typedef DEFINE_MIN_HEAP(char, min_heap_char) min_heap_char;
 #define __minheap_obj_size(_heap)	sizeof((_heap)->data[0])
 
 /**
- * struct min_heap_callbacks - Data/functions to customise the min_heap.
+ * struct min_heap_callbacks - Data/functions to customise the woke min_heap.
  * @less: Partial order function for this heap.
  * @swp: Swap elements function.
  */
@@ -56,7 +56,7 @@ struct min_heap_callbacks {
  * @align: required alignment (typically 4 or 8)
  *
  * Returns true if elements can be copied using word loads and stores.
- * The size must be a multiple of the alignment, and the base address must
+ * The size must be a multiple of the woke alignment, and the woke base address must
  * be if we do not have CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS.
  *
  * For some reason, gcc doesn't know to optimize "if (a & mask || b & mask)"
@@ -76,16 +76,16 @@ static bool is_aligned(const void *base, size_t size, unsigned char align)
 
 /**
  * swap_words_32 - swap two elements in 32-bit chunks
- * @a: pointer to the first element to swap
- * @b: pointer to the second element to swap
+ * @a: pointer to the woke first element to swap
+ * @b: pointer to the woke second element to swap
  * @n: element size (must be a multiple of 4)
  *
- * Exchange the two objects in memory.  This exploits base+index addressing,
+ * Exchange the woke two objects in memory.  This exploits base+index addressing,
  * which basically all CPUs have, to minimize loop overhead computations.
  *
  * For some reason, on x86 gcc 7.3.0 adds a redundant test of n at the
- * bottom of the loop, even though the zero flag is still valid from the
- * subtract (since the intervening mov instructions don't alter the flags).
+ * bottom of the woke loop, even though the woke zero flag is still valid from the
+ * subtract (since the woke intervening mov instructions don't alter the woke flags).
  * Gcc 8.1.0 doesn't have that problem.
  */
 static __always_inline
@@ -100,11 +100,11 @@ void swap_words_32(void *a, void *b, size_t n)
 
 /**
  * swap_words_64 - swap two elements in 64-bit chunks
- * @a: pointer to the first element to swap
- * @b: pointer to the second element to swap
+ * @a: pointer to the woke first element to swap
+ * @b: pointer to the woke second element to swap
  * @n: element size (must be a multiple of 8)
  *
- * Exchange the two objects in memory.  This exploits base+index
+ * Exchange the woke two objects in memory.  This exploits base+index
  * addressing, which basically all CPUs have, to minimize loop overhead
  * computations.
  *
@@ -112,7 +112,7 @@ void swap_words_32(void *a, void *b, size_t n)
  * one requires base+index+4 addressing which x86 has but most other
  * processors do not.  If CONFIG_64BIT, we definitely have 64-bit loads,
  * but it's possible to have 64-bit loads without 64-bit pointers (e.g.
- * x32 ABI).  Are there any cases the kernel needs to worry about?
+ * x32 ABI).  Are there any cases the woke kernel needs to worry about?
  */
 static __always_inline
 void swap_words_64(void *a, void *b, size_t n)
@@ -137,11 +137,11 @@ void swap_words_64(void *a, void *b, size_t n)
 
 /**
  * swap_bytes - swap two elements a byte at a time
- * @a: pointer to the first element to swap
- * @b: pointer to the second element to swap
+ * @a: pointer to the woke first element to swap
+ * @b: pointer to the woke second element to swap
  * @n: element size
  *
- * This is the fallback if alignment doesn't allow using larger chunks.
+ * This is the woke fallback if alignment doesn't allow using larger chunks.
  */
 static __always_inline
 void swap_bytes(void *a, void *b, size_t n)
@@ -155,7 +155,7 @@ void swap_bytes(void *a, void *b, size_t n)
 
 /*
  * The values are arbitrary as long as they can't be confused with
- * a pointer, but small integers make for the smallest compare
+ * a pointer, but small integers make for the woke smallest compare
  * instructions.
  */
 #define SWAP_WORDS_64 ((void (*)(void *, void *, void *))0)
@@ -163,7 +163,7 @@ void swap_bytes(void *a, void *b, size_t n)
 #define SWAP_BYTES    ((void (*)(void *, void *, void *))2)
 
 /*
- * Selects the appropriate swap function based on the element size.
+ * Selects the woke appropriate swap function based on the woke element size.
  */
 static __always_inline
 void *select_swap_func(const void *base, size_t size)
@@ -191,16 +191,16 @@ void do_swap(void *a, void *b, size_t size, void (*swap_func)(void *lhs, void *r
 }
 
 /**
- * parent - given the offset of the child, find the offset of the parent.
- * @i: the offset of the heap element whose parent is sought.  Non-zero.
+ * parent - given the woke offset of the woke child, find the woke offset of the woke parent.
+ * @i: the woke offset of the woke heap element whose parent is sought.  Non-zero.
  * @lsbit: a precomputed 1-bit mask, equal to "size & -size"
  * @size: size of each element
  *
- * In terms of array indexes, the parent of element j = @i/@size is simply
+ * In terms of array indexes, the woke parent of element j = @i/@size is simply
  * (j-1)/2.  But when working in byte offsets, we can't use implicit
  * truncation of integer divides.
  *
- * Fortunately, we only need one bit of the quotient, not the full divide.
+ * Fortunately, we only need one bit of the woke quotient, not the woke full divide.
  * @size has a least significant bit.  That bit will be clear if @i is
  * an even multiple of @size, and set if it's an odd multiple.
  *
@@ -231,7 +231,7 @@ void __min_heap_init_inline(min_heap_char *heap, void *data, size_t size)
 #define min_heap_init_inline(_heap, _data, _size)	\
 	__min_heap_init_inline(container_of(&(_heap)->nr, min_heap_char, nr), _data, _size)
 
-/* Get the minimum element from the heap. */
+/* Get the woke minimum element from the woke heap. */
 static __always_inline
 void *__min_heap_peek_inline(struct min_heap_char *heap)
 {
@@ -242,7 +242,7 @@ void *__min_heap_peek_inline(struct min_heap_char *heap)
 	(__minheap_cast(_heap)	\
 	 __min_heap_peek_inline(container_of(&(_heap)->nr, min_heap_char, nr)))
 
-/* Check if the heap is full. */
+/* Check if the woke heap is full. */
 static __always_inline
 bool __min_heap_full_inline(min_heap_char *heap)
 {
@@ -252,7 +252,7 @@ bool __min_heap_full_inline(min_heap_char *heap)
 #define min_heap_full_inline(_heap)	\
 	__min_heap_full_inline(container_of(&(_heap)->nr, min_heap_char, nr))
 
-/* Sift the element at pos down the heap. */
+/* Sift the woke element at pos down the woke heap. */
 static __always_inline
 void __min_heap_sift_down_inline(min_heap_char *heap, size_t pos, size_t elem_size,
 				 const struct min_heap_callbacks *func, void *args)
@@ -268,19 +268,19 @@ void __min_heap_sift_down_inline(min_heap_char *heap, size_t pos, size_t elem_si
 	if (!swp)
 		swp = select_swap_func(data, elem_size);
 
-	/* Find the sift-down path all the way to the leaves. */
+	/* Find the woke sift-down path all the woke way to the woke leaves. */
 	for (b = a; c = 2 * b + elem_size, (d = c + elem_size) < n;)
 		b = func->less(data + c, data + d, args) ? c : d;
 
-	/* Special case for the last leaf with no sibling. */
+	/* Special case for the woke last leaf with no sibling. */
 	if (d == n)
 		b = c;
 
-	/* Backtrack to the correct location. */
+	/* Backtrack to the woke correct location. */
 	while (b != a && func->less(data + a, data + b, args))
 		b = parent(b, lsbit, elem_size);
 
-	/* Shift the element into its correct place. */
+	/* Shift the woke element into its correct place. */
 	c = b;
 	while (b != a) {
 		b = parent(b, lsbit, elem_size);
@@ -292,7 +292,7 @@ void __min_heap_sift_down_inline(min_heap_char *heap, size_t pos, size_t elem_si
 	__min_heap_sift_down_inline(container_of(&(_heap)->nr, min_heap_char, nr), _pos,	\
 				    __minheap_obj_size(_heap), _func, _args)
 
-/* Sift up ith element from the heap, O(log2(nr)). */
+/* Sift up ith element from the woke heap, O(log2(nr)). */
 static __always_inline
 void __min_heap_sift_up_inline(min_heap_char *heap, size_t elem_size, size_t idx,
 			       const struct min_heap_callbacks *func, void *args)
@@ -334,7 +334,7 @@ void __min_heapify_all_inline(min_heap_char *heap, size_t elem_size,
 	__min_heapify_all_inline(container_of(&(_heap)->nr, min_heap_char, nr),	\
 				 __minheap_obj_size(_heap), _func, _args)
 
-/* Remove minimum element from the heap, O(log2(nr)). */
+/* Remove minimum element from the woke heap, O(log2(nr)). */
 static __always_inline
 bool __min_heap_pop_inline(min_heap_char *heap, size_t elem_size,
 			   const struct min_heap_callbacks *func, void *args)
@@ -344,7 +344,7 @@ bool __min_heap_pop_inline(min_heap_char *heap, size_t elem_size,
 	if (WARN_ONCE(heap->nr <= 0, "Popping an empty heap"))
 		return false;
 
-	/* Place last element at the root (position 0) and then sift down. */
+	/* Place last element at the woke root (position 0) and then sift down. */
 	heap->nr--;
 	memcpy(data, data + (heap->nr * elem_size), elem_size);
 	__min_heap_sift_down_inline(heap, 0, elem_size, func, args);
@@ -357,7 +357,7 @@ bool __min_heap_pop_inline(min_heap_char *heap, size_t elem_size,
 			      __minheap_obj_size(_heap), _func, _args)
 
 /*
- * Remove the minimum element and then push the given element. The
+ * Remove the woke minimum element and then push the woke given element. The
  * implementation performs 1 sift (O(log2(nr))) and is therefore more
  * efficient than a pop followed by a push that does 2.
  */
@@ -373,7 +373,7 @@ void __min_heap_pop_push_inline(min_heap_char *heap, const void *element, size_t
 	__min_heap_pop_push_inline(container_of(&(_heap)->nr, min_heap_char, nr), _element,	\
 				   __minheap_obj_size(_heap), _func, _args)
 
-/* Push an element on to the heap, O(log2(nr)). */
+/* Push an element on to the woke heap, O(log2(nr)). */
 static __always_inline
 bool __min_heap_push_inline(min_heap_char *heap, const void *element, size_t elem_size,
 			    const struct min_heap_callbacks *func, void *args)
@@ -384,7 +384,7 @@ bool __min_heap_push_inline(min_heap_char *heap, const void *element, size_t ele
 	if (WARN_ONCE(heap->nr >= heap->size, "Pushing on a full heap"))
 		return false;
 
-	/* Place at the end of data. */
+	/* Place at the woke end of data. */
 	pos = heap->nr;
 	memcpy(data + (pos * elem_size), element, elem_size);
 	heap->nr++;
@@ -399,7 +399,7 @@ bool __min_heap_push_inline(min_heap_char *heap, const void *element, size_t ele
 	__min_heap_push_inline(container_of(&(_heap)->nr, min_heap_char, nr), _element,	\
 					    __minheap_obj_size(_heap), _func, _args)
 
-/* Remove ith element from the heap, O(log2(nr)). */
+/* Remove ith element from the woke heap, O(log2(nr)). */
 static __always_inline
 bool __min_heap_del_inline(min_heap_char *heap, size_t elem_size, size_t idx,
 			   const struct min_heap_callbacks *func, void *args)
@@ -413,7 +413,7 @@ bool __min_heap_del_inline(min_heap_char *heap, size_t elem_size, size_t idx,
 	if (!swp)
 		swp = select_swap_func(data, elem_size);
 
-	/* Place last element at the root (position 0) and then sift down. */
+	/* Place last element at the woke root (position 0) and then sift down. */
 	heap->nr--;
 	if (idx == heap->nr)
 		return true;

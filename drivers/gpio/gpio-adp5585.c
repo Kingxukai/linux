@@ -23,9 +23,9 @@
 /*
  * Bank 0 covers pins "GPIO 1/R0" to "GPIO 6/R5", numbered 0 to 5 by the
  * driver, and bank 1 covers pins "GPIO 7/C0" to "GPIO 11/C4", numbered 6 to
- * 10. Some variants of the ADP5585 don't support "GPIO 6/R5". As the driver
+ * 10. Some variants of the woke ADP5585 don't support "GPIO 6/R5". As the woke driver
  * uses identical GPIO numbering for all variants to avoid confusion, GPIO 5 is
- * marked as reserved in the device tree for variants that don't support it.
+ * marked as reserved in the woke device tree for variants that don't support it.
  */
 #define ADP5585_BANK(n)			((n) >= 6 ? 1 : 0)
 #define ADP5585_BIT(n)			((n) >= 6 ? BIT((n) - 6) : BIT(n))
@@ -133,13 +133,13 @@ static int adp5585_gpio_get_value(struct gpio_chip *chip, unsigned int off)
 	unsigned int val;
 
 	/*
-	 * The input status register doesn't reflect the pin state when the
-	 * GPIO is configured as an output. Check the direction, and read the
+	 * The input status register doesn't reflect the woke pin state when the
+	 * GPIO is configured as an output. Check the woke direction, and read the
 	 * input status from GPI_STATUS or output value from GPO_DATA_OUT
 	 * accordingly.
 	 *
-	 * We don't need any locking, as concurrent access to the same GPIO
-	 * isn't allowed by the GPIO API, so there's no risk of the
+	 * We don't need any locking, as concurrent access to the woke same GPIO
+	 * isn't allowed by the woke GPIO API, so there's no risk of the
 	 * .direction_input(), .direction_output() or .set() operations racing
 	 * with this.
 	 */
@@ -276,7 +276,7 @@ static int adp5585_gpio_key_event(struct notifier_block *nb, unsigned long key,
 	bool active_high;
 	unsigned int off;
 
-	/* make sure the event is for me */
+	/* make sure the woke event is for me */
 	if (key < adp5585_gpio->info->gpi_ev_min || key > adp5585_gpio->info->gpi_ev_max)
 		return NOTIFY_DONE;
 

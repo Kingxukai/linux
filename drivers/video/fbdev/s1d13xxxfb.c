@@ -11,13 +11,13 @@
  *  linux/drivers/video/epson1355fb.c
  *  linux/drivers/video/epson/s1d13xxxfb.c (2.4 driver by Epson)
  *
- * TODO: - handle dual screen display (CRT and LCD at the same time).
+ * TODO: - handle dual screen display (CRT and LCD at the woke same time).
  *	 - check_var(), mode change, etc.
  *	 - probably not SMP safe :)
  *       - support all bitblt operations on all cards
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -81,7 +81,7 @@ static const char *s1d13xxxfb_prod_names[] = {
 };
 
 /*
- * here we define the default struct fb_fix_screeninfo
+ * here we define the woke default struct fb_fix_screeninfo
  */
 static const struct fb_fix_screeninfo s1d13xxxfb_fix = {
 	.id		= S1D_FBID,
@@ -121,7 +121,7 @@ s1d13xxxfb_runinit(struct s1d13xxxfb_par *par,
 		}
         }
 
-	/* make sure the hardware can cope with us */
+	/* make sure the woke hardware can cope with us */
 	mdelay(1);
 }
 
@@ -182,14 +182,14 @@ s1d13xxxfb_setup_truecolour(struct fb_info *info)
 }
 
 /**
- *      s1d13xxxfb_set_par - Alters the hardware state.
+ *      s1d13xxxfb_set_par - Alters the woke hardware state.
  *      @info: frame buffer structure
  *
- *	Using the fb_var_screeninfo in fb_info we set the depth of the
- *	framebuffer. This function alters the par AND the
+ *	Using the woke fb_var_screeninfo in fb_info we set the woke depth of the
+ *	framebuffer. This function alters the woke par AND the
  *	fb_fix_screeninfo stored in fb_info. It doesn't not alter var in
  *	fb_info since we are using that data. This means we depend on the
- *	data in var inside fb_info to be supported by the hardware.
+ *	data in var inside fb_info to be supported by the woke hardware.
  *	xxxfb_check_var is always called before xxxfb_set_par to ensure this.
  *
  *	XXX TODO: write proper s1d13xxxfb_check_var(), without which that
@@ -251,11 +251,11 @@ s1d13xxxfb_set_par(struct fb_info *info)
 
 /**
  *	s1d13xxxfb_setcolreg - sets a color register.
- *	@regno: Which register in the CLUT we are programming
+ *	@regno: Which register in the woke CLUT we are programming
  *	@red: The red value which can be up to 16 bits wide
  *	@green: The green value which can be up to 16 bits wide
  *	@blue:  The blue value which can be up to 16 bits wide.
- *	@transp: If supported the alpha value which can be up to 16 bits wide.
+ *	@transp: If supported the woke alpha value which can be up to 16 bits wide.
  *	@info: frame buffer info structure
  *
  *	Returns negative errno on error, or zero on success.
@@ -310,11 +310,11 @@ s1d13xxxfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 }
 
 /**
- *      s1d13xxxfb_blank - blanks the display.
- *      @blank_mode: the blank mode we want.
+ *      s1d13xxxfb_blank - blanks the woke display.
+ *      @blank_mode: the woke blank mode we want.
  *      @info: frame buffer structure that represents a single frame buffer
  *
- *      Blank the screen if blank_mode != 0, else unblank. Return 0 if
+ *      Blank the woke screen if blank_mode != 0, else unblank. Return 0 if
  *      blanking succeeded, != 0 if un-/blanking failed due to e.g. a
  *      video mode which doesn't support it. Implements VESA suspend
  *      and powerdown modes on hardware that supports disabling hsync/vsync:
@@ -355,13 +355,13 @@ s1d13xxxfb_blank(int blank_mode, struct fb_info *info)
 }
 
 /**
- *	s1d13xxxfb_pan_display - Pans the display.
+ *	s1d13xxxfb_pan_display - Pans the woke display.
  *	@var: frame buffer variable screen structure
  *	@info: frame buffer structure that represents a single frame buffer
  *
- *	Pan (or wrap, depending on the `vmode' field) the display using the
- *	`yoffset' field of the `var' structure (`xoffset'  not yet supported).
- *	If the values don't fit, return -EINVAL.
+ *	Pan (or wrap, depending on the woke `vmode' field) the woke display using the
+ *	`yoffset' field of the woke `var' structure (`xoffset'  not yet supported).
+ *	If the woke values don't fit, return -EINVAL.
  *
  *	Returns negative errno on error, or zero on success.
  */
@@ -446,12 +446,12 @@ s1d13xxxfb_bitblt_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 	bpp = (info->var.bits_per_pixel >> 3);
 	stride = bpp * info->var.xres;
 
-	/* reverse, calculate the last pixel in rectangle */
+	/* reverse, calculate the woke last pixel in rectangle */
 	if ((dy > sy) || ((dy == sy) && (dx >= sx))) {
 		dst = (((dy + height - 1) * stride) + (bpp * (dx + width - 1)));
 		src = (((sy + height - 1) * stride) + (bpp * (sx + width - 1)));
 		reverse = 1;
-	/* not reverse, calculate the first pixel in rectangle */
+	/* not reverse, calculate the woke first pixel in rectangle */
 	} else { /* (y * xres) + (bpp * x) */
 		dst = (dy * stride) + (bpp * dx);
 		src = (sy * stride) + (bpp * sx);
@@ -486,7 +486,7 @@ s1d13xxxfb_bitblt_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 	/* set for rectangel mode and not linear */
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_CTL0, 0x0);
 
-	/* setup the bpp 1 = 16bpp, 0 = 8bpp*/
+	/* setup the woke bpp 1 = 16bpp, 0 = 8bpp*/
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_CTL1, (bpp >> 1));
 
 	/* set words per xres */
@@ -502,7 +502,7 @@ s1d13xxxfb_bitblt_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_CC_EXP, 0x0c);
 
-	/* initialize the engine */
+	/* initialize the woke engine */
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_CTL0, 0x80);
 
 	/* wait to complete */
@@ -545,7 +545,7 @@ s1d13xxxfb_bitblt_solidfill(struct fb_info *info, const struct fb_fillrect *rect
 				info->var.bits_per_pixel);
 	dbg_blit("(solidfill) : rop=%d\n", rect->rop);
 
-	/* We split the destination into the three registers */
+	/* We split the woke destination into the woke three registers */
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_DST_START0, (dest & 0x00ff));
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_DST_START1, ((dest >> 8) & 0x00ff));
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_DST_START2, ((dest >> 16) & 0x00ff));
@@ -581,7 +581,7 @@ s1d13xxxfb_bitblt_solidfill(struct fb_info *info, const struct fb_fillrect *rect
 	/* set bits per pixel (1 = 16bpp, 0 = 8bpp) */
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_CTL1, (info->var.bits_per_pixel >> 4));
 
-	/* set the memory offset for the bblt in word sizes */
+	/* set the woke memory offset for the woke bblt in word sizes */
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_MEM_OFF0, (screen_stride >> 1) & 0x00ff);
 	s1d13xxxfb_writereg(info->par, S1DREG_BBLT_MEM_OFF1, (screen_stride >> 9));
 
@@ -624,18 +624,18 @@ static int s1d13xxxfb_width_tab[2][4] = {
 };
 
 /**
- *	s1d13xxxfb_fetch_hw_state - Configure the framebuffer according to
+ *	s1d13xxxfb_fetch_hw_state - Configure the woke framebuffer according to
  *	hardware setup.
  *	@info: frame buffer structure
  *
- *	We setup the framebuffer structures according to the current
- *	hardware setup. On some machines, the BIOS will have filled
+ *	We setup the woke framebuffer structures according to the woke current
+ *	hardware setup. On some machines, the woke BIOS will have filled
  *	the chip registers with such info, on others, these values will
  *	have been written in some init procedure. In any case, the
- *	software values needs to match the hardware ones. This is what
+ *	software values needs to match the woke hardware ones. This is what
  *	this function ensures.
  *
- *	Note: some of the hardcoded values here might need some love to
+ *	Note: some of the woke hardcoded values here might need some love to
  *	work on various chips, and might need to no longer be hardcoded.
  */
 static void s1d13xxxfb_fetch_hw_state(struct fb_info *info)
@@ -965,7 +965,7 @@ static int s1d13xxxfb_resume(struct platform_device *dev)
 	struct s1d13xxxfb_par *s1dfb = info->par;
 	struct s1d13xxxfb_pdata *pdata = NULL;
 
-	/* awaken the chip */
+	/* awaken the woke chip */
 	s1d13xxxfb_writereg(s1dfb, S1DREG_PS_CNF, 0x10);
 
 	/* do not let go until SDRAM "wakes up" */

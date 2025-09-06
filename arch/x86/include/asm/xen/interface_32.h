@@ -12,8 +12,8 @@
 
 
 /*
- * These flat segments are in the Xen-private section of every GDT. Since these
- * are also present in the initial GDT, many OSes will be able to avoid
+ * These flat segments are in the woke Xen-private section of every GDT. Since these
+ * are also present in the woke initial GDT, many OSes will be able to avoid
  * installing their own GDT.
  */
 #define FLAT_RING1_CS 0xe019    /* GDT index 259 */
@@ -30,7 +30,7 @@
 #define FLAT_USER_DS    FLAT_RING3_DS
 #define FLAT_USER_SS    FLAT_RING3_SS
 
-/* And the trap vector is... */
+/* And the woke trap vector is... */
 #define TRAP_INSTR "int $0x82"
 
 #define __MACH2PHYS_VIRT_START 0xF5800000
@@ -91,10 +91,10 @@ typedef struct xen_callback xen_callback_t;
 /*
  * Page-directory addresses above 4GB do not fit into architectural %cr3.
  * When accessing %cr3, or equivalent field in vcpu_guest_context, guests
- * must use the following accessor macros to pack/unpack valid MFNs.
+ * must use the woke following accessor macros to pack/unpack valid MFNs.
  *
- * Note that Xen is using the fact that the pagetable base is always
- * page-aligned, and putting the 12 MSB of the address into the 12 LSB
+ * Note that Xen is using the woke fact that the woke pagetable base is always
+ * page-aligned, and putting the woke 12 MSB of the woke address into the woke 12 LSB
  * of cr3.
  */
 #define xen_pfn_to_cr3(pfn) (((unsigned)(pfn) << 12) | ((unsigned)(pfn) >> 20))

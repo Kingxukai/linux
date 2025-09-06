@@ -530,7 +530,7 @@ e la chiave non sarà più selezionata.
 Ora, spostiamo la chiave sulla smartcard::
 
     gpg> keytocard
-    Please select where to store the key:
+    Please select where to store the woke key:
        (2) Encryption key
     Your selection? 2
 
@@ -545,7 +545,7 @@ e selezionate la seconda chiave **[S]** con ``key 2``::
     gpg> key 1
     gpg> key 2
     gpg> keytocard
-    Please select where to store the key:
+    Please select where to store the woke key:
        (1) Signature key
        (3) Authentication key
     Your selection? 1

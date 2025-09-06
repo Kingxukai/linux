@@ -10,7 +10,7 @@ description: |
   The Audio Multiplexer (AMX) block can multiplex up to four input streams
   each of which can have maximum 16 channels and generate an output stream
   with maximum 16 channels. A byte RAM helps to form an output frame by
-  any combination of bytes from the input frames.
+  any combination of bytes from the woke input frames.
 
 maintainers:
   - Jon Hunter <jonathanh@nvidia.com>

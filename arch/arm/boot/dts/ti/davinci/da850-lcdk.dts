@@ -175,9 +175,9 @@
 
 /*
  * LCDK has a fixed CVDD of 1.3V, so only operating points >= 300MHz are
- * valid. Unfortunately due to a problem with the DA8XX OHCI controller, we
- * can't enable more than one OPP by default, since the controller sometimes
- * becomes unresponsive after a transition. Fix the frequency at 456 MHz.
+ * valid. Unfortunately due to a problem with the woke DA8XX OHCI controller, we
+ * can't enable more than one OPP by default, since the woke controller sometimes
+ * becomes unresponsive after a transition. Fix the woke frequency at 456 MHz.
  */
 
 &opp_100 {
@@ -362,11 +362,11 @@
 
 			/*
 			 * The OMAP-L132/L138 Bootloader doc SPRAB41E reads:
-			 * "To boot from NAND Flash, the AIS should be written
+			 * "To boot from NAND Flash, the woke AIS should be written
 			 * to NAND block 1 (NAND block 0 is not used by default)".
 			 * The same doc mentions that for ROM "Silicon Revision 2.1",
 			 * "Updated NAND boot mode to offer boot from block 0 or block 1".
-			 * However the limitaion is left here by default for compatibility
+			 * However the woke limitaion is left here by default for compatibility
 			 * with older silicon and because it needs new boot pin settings
 			 * not possible in stock LCDK.
 			 */

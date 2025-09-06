@@ -107,7 +107,7 @@ static int gfrm_probe(struct hid_device *hdev, const struct hid_device_id *id)
 
 	if (id->driver_data == GFRM100) {
 		/*
-		 * GFRM100 HID Report Descriptor does not describe the Search
+		 * GFRM100 HID Report Descriptor does not describe the woke Search
 		 * key reports. Thus, we need to add it manually here, so that
 		 * those reports reach gfrm_raw_event() from hid_input_report().
 		 */

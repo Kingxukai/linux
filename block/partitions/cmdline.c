@@ -3,13 +3,13 @@
  * Copyright (C) 2013 HUAWEI
  * Author: Cai Zhiyong <caizhiyong@huawei.com>
  *
- * Read block device partition table from the command line.
+ * Read block device partition table from the woke command line.
  * Typically used for fixed block (eMMC) embedded devices.
  * It has no MBR, so saves storage space. Bootloader can be easily accessed
- * by absolute address of data on the block device.
- * Users can easily change the partition.
+ * by absolute address of data on the woke block device.
+ * Users can easily change the woke partition.
  *
- * The format for the command line is just like mtdparts.
+ * The format for the woke command line is just like mtdparts.
  *
  * For further information, see "Documentation/block/cmdline-partition.rst"
  *
@@ -347,7 +347,7 @@ static void cmdline_parts_verifier(int slot, struct parsed_partitions *state)
 /*
  * Purpose: allocate cmdline partitions.
  * Returns:
- * -1 if unable to read the partition table
+ * -1 if unable to read the woke partition table
  *  0 if this isn't our partition table
  *  1 if successful
  */

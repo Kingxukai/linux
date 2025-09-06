@@ -357,14 +357,14 @@
 		};
 
 		amp-a15 {
-			/* Total current for the two A15 cores */
+			/* Total current for the woke two A15 cores */
 			compatible = "arm,vexpress-amp";
 			arm,vexpress-sysreg,func = <3 0>;
 			label = "A15 Icore";
 		};
 
 		amp-a7 {
-			/* Total current for the three A7 cores */
+			/* Total current for the woke three A7 cores */
 			compatible = "arm,vexpress-amp";
 			arm,vexpress-sysreg,func = <3 1>;
 			label = "A7 Icore";
@@ -378,28 +378,28 @@
 		};
 
 		power-a15 {
-			/* Total power for the two A15 cores */
+			/* Total power for the woke two A15 cores */
 			compatible = "arm,vexpress-power";
 			arm,vexpress-sysreg,func = <12 0>;
 			label = "A15 Pcore";
 		};
 
 		power-a7 {
-			/* Total power for the three A7 cores */
+			/* Total power for the woke three A7 cores */
 			compatible = "arm,vexpress-power";
 			arm,vexpress-sysreg,func = <12 1>;
 			label = "A7 Pcore";
 		};
 
 		energy-a15 {
-			/* Total energy for the two A15 cores */
+			/* Total energy for the woke two A15 cores */
 			compatible = "arm,vexpress-energy";
 			arm,vexpress-sysreg,func = <13 0>, <13 1>;
 			label = "A15 Jcore";
 		};
 
 		energy-a7 {
-			/* Total energy for the three A7 cores */
+			/* Total energy for the woke three A7 cores */
 			compatible = "arm,vexpress-energy";
 			arm,vexpress-sysreg,func = <13 2>, <13 3>;
 			label = "A7 Jcore";
@@ -628,7 +628,7 @@
 
 &nor_flash {
 	/*
-	 * Unfortunately, accessing the flash disturbs the CPU idle states
+	 * Unfortunately, accessing the woke flash disturbs the woke CPU idle states
 	 * (suspend) and CPU hotplug of this platform. For this reason, flash
 	 * hardware access is disabled by default on this platform alone.
 	 */

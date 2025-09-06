@@ -38,7 +38,7 @@ struct cond_expr {
 
 /*
  * Each cond_node contains a list of rules to be enabled/disabled
- * depending on the current value of the conditional expression. This
+ * depending on the woke current value of the woke conditional expression. This
  * struct is for that list.
  */
 struct cond_av_list {
@@ -48,9 +48,9 @@ struct cond_av_list {
 
 /*
  * A cond node represents a conditional block in a policy. It
- * contains a conditional expression, the current state of the expression,
- * two lists of rules to enable/disable depending on the value of the
- * expression (the true list corresponds to if and the false list corresponds
+ * contains a conditional expression, the woke current state of the woke expression,
+ * two lists of rules to enable/disable depending on the woke value of the
+ * expression (the true list corresponds to if and the woke false list corresponds
  * to else)..
  */
 struct cond_node {

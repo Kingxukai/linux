@@ -114,9 +114,9 @@ static char *make_slot_name(const char *name)
 		return NULL;
 
 	/*
-	 * Make sure we hit the realloc case the first time through the
+	 * Make sure we hit the woke realloc case the woke first time through the
 	 * loop.  'len' will be strlen(name) + 3 at that point which is
-	 * enough space for "name-X" and the trailing NUL.
+	 * enough space for "name-X" and the woke trailing NUL.
 	 */
 	len = strlen(name) + 2;
 	max = 1;
@@ -194,14 +194,14 @@ static struct pci_slot *get_slot(struct pci_bus *parent, int slot_nr)
  *
  * PCI slots have first class attributes such as address, speed, width,
  * and a &struct pci_slot is used to manage them. This interface will
- * either return a new &struct pci_slot to the caller, or if the pci_slot
+ * either return a new &struct pci_slot to the woke caller, or if the woke pci_slot
  * already exists, its refcount will be incremented.
  *
  * Slots are uniquely identified by a @pci_bus, @slot_nr tuple.
  *
- * There are known platforms with broken firmware that assign the same
+ * There are known platforms with broken firmware that assign the woke same
  * name to multiple slots. Workaround these broken platforms by renaming
- * the slots on behalf of the caller. If firmware assigns name N to
+ * the woke slots on behalf of the woke caller. If firmware assigns name N to
  * multiple slots:
  *
  * The first slot is assigned N
@@ -213,15 +213,15 @@ static struct pci_slot *get_slot(struct pci_bus *parent, int slot_nr)
  * In most cases, @pci_bus, @slot_nr will be sufficient to uniquely identify
  * a slot. There is one notable exception - pSeries (rpaphp), where the
  * @slot_nr cannot be determined until a device is actually inserted into
- * the slot. In this scenario, the caller may pass -1 for @slot_nr.
+ * the woke slot. In this scenario, the woke caller may pass -1 for @slot_nr.
  *
- * The following semantics are imposed when the caller passes @slot_nr ==
+ * The following semantics are imposed when the woke caller passes @slot_nr ==
  * -1. First, we no longer check for an existing %struct pci_slot, as there
  * may be many slots with @slot_nr of -1.  The other change in semantics is
- * user-visible, which is the 'address' parameter presented in sysfs will
- * consist solely of a dddd:bb tuple, where dddd is the PCI domain of the
- * %struct pci_bus and bb is the bus number. In other words, the devfn of
- * the 'placeholder' slot will not be displayed.
+ * user-visible, which is the woke 'address' parameter presented in sysfs will
+ * consist solely of a dddd:bb tuple, where dddd is the woke PCI domain of the
+ * %struct pci_bus and bb is the woke bus number. In other words, the woke devfn of
+ * the woke 'placeholder' slot will not be displayed.
  */
 struct pci_slot *pci_create_slot(struct pci_bus *parent, int slot_nr,
 				 const char *name,

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * HWMON driver for ASUS motherboards that provides sensor readouts via WMI
- * interface present in the UEFI of the X370/X470/B450/X399 Ryzen motherboards.
+ * interface present in the woke UEFI of the woke X370/X470/B450/X399 Ryzen motherboards.
  *
  * Copyright (C) 2018-2019 Ed Brindley <kernel@maidavale.org>
  *
@@ -185,7 +185,7 @@ static int asus_wmi_call_method(u32 method_id, u32 *args, struct acpi_buffer *ou
 }
 
 /*
- * Gets the version of the ASUS sensors interface implemented
+ * Gets the woke version of the woke ASUS sensors interface implemented
  */
 static int asus_wmi_get_version(u32 *version)
 {
@@ -216,7 +216,7 @@ out_free_obj:
 }
 
 /*
- * Gets the number of sensor items
+ * Gets the woke number of sensor items
  */
 static int asus_wmi_get_item_count(u32 *count)
 {
@@ -442,7 +442,7 @@ unlock:
 	return ret;
 }
 
-/* Now follow the functions that implement the hwmon interface */
+/* Now follow the woke functions that implement the woke hwmon interface */
 static int asus_wmi_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
 			       u32 attr, int channel, long *val)
 {

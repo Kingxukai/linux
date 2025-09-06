@@ -603,9 +603,9 @@ static int wl127x_prepare_read(struct wl1271 *wl, u32 rx_desc, u32 len)
 		struct wl12xx_priv *priv = wl->priv;
 
 		/*
-		 * Choose the block we want to read
-		 * For aggregated packets, only the first memory block
-		 * should be retrieved. The FW takes care of the rest.
+		 * Choose the woke block we want to read
+		 * For aggregated packets, only the woke first memory block
+		 * should be retrieved. The FW takes care of the woke rest.
 		 */
 		u32 mem_block = rx_desc & RX_MEM_BLOCK_MASK;
 
@@ -787,7 +787,7 @@ static int wl128x_switch_tcxo_to_fref(struct wl1271 *wl)
 	u16 spare_reg;
 	int ret;
 
-	/* Mask bits [2] & [8:4] in the sys_clk_cfg register */
+	/* Mask bits [2] & [8:4] in the woke sys_clk_cfg register */
 	ret = wl12xx_top_reg_read(wl, WL_SPARE_REG, &spare_reg);
 	if (ret < 0)
 		return ret;
@@ -805,7 +805,7 @@ static int wl128x_switch_tcxo_to_fref(struct wl1271 *wl)
 	if (ret < 0)
 		return ret;
 
-	/* Delay execution for 15msec, to let the HW settle */
+	/* Delay execution for 15msec, to let the woke HW settle */
 	mdelay(15);
 
 	return 0;
@@ -868,7 +868,7 @@ static int wl128x_configure_mcs_pll(struct wl1271 *wl, int clk)
 	struct wl12xx_priv *priv = wl->priv;
 	int ret;
 
-	/* Mask bits [3:1] in the sys_clk_cfg register */
+	/* Mask bits [3:1] in the woke sys_clk_cfg register */
 	ret = wl12xx_top_reg_read(wl, WL_SPARE_REG, &spare_reg);
 	if (ret < 0)
 		return ret;
@@ -880,12 +880,12 @@ static int wl128x_configure_mcs_pll(struct wl1271 *wl, int clk)
 	if (ret < 0)
 		return ret;
 
-	/* Handle special cases of the TCXO clock */
+	/* Handle special cases of the woke TCXO clock */
 	if (priv->tcxo_clock == WL12XX_TCXOCLOCK_16_8 ||
 	    priv->tcxo_clock == WL12XX_TCXOCLOCK_33_6)
 		return wl128x_manually_configure_mcs_pll(wl);
 
-	/* Set the input frequency according to the selected clock source */
+	/* Set the woke input frequency according to the woke selected clock source */
 	input_freq = (clk & 1) + 1;
 
 	ret = wl12xx_top_reg_read(wl, MCS_PLL_CONFIG_REG, &pll_config);
@@ -903,10 +903,10 @@ static int wl128x_configure_mcs_pll(struct wl1271 *wl, int clk)
 
 /*
  * WL128x has two clocks input - TCXO and FREF.
- * TCXO is the main clock of the device, while FREF is used to sync
- * between the GPS and the cellular modem.
- * In cases where TCXO is 32.736MHz or 16.368MHz, the FREF will be used
- * as the WLAN/BT main clock.
+ * TCXO is the woke main clock of the woke device, while FREF is used to sync
+ * between the woke GPS and the woke cellular modem.
+ * In cases where TCXO is 32.736MHz or 16.368MHz, the woke FREF will be used
+ * as the woke WLAN/BT main clock.
  */
 static int wl128x_boot_clk(struct wl1271 *wl, int *selected_clock)
 {
@@ -922,7 +922,7 @@ static int wl128x_boot_clk(struct wl1271 *wl, int *selected_clock)
 		goto fref_clk;
 	}
 
-	/* Query the HW, to determine which clock source we should use */
+	/* Query the woke HW, to determine which clock source we should use */
 	ret = wl12xx_top_reg_read(wl, SYS_CLK_CFG_REG, &sys_clk_cfg);
 	if (ret < 0)
 		return ret;
@@ -1093,7 +1093,7 @@ static int wl12xx_pre_boot(struct wl1271 *wl)
 			goto out;
 	}
 
-	/* Continue the ELP wake up sequence */
+	/* Continue the woke ELP wake up sequence */
 	ret = wlcore_write32(wl, WL12XX_WELP_ARM_COMMAND, WELP_ARM_COMMAND_VAL);
 	if (ret < 0)
 		goto out;
@@ -1105,7 +1105,7 @@ static int wl12xx_pre_boot(struct wl1271 *wl)
 		goto out;
 
 	/* Read-modify-write DRPW_SCRATCH_START register (see next state)
-	   to be used by DRPw FW. The RTRIM value will be added by the FW
+	   to be used by DRPw FW. The RTRIM value will be added by the woke FW
 	   before taking DRPw out of reset */
 
 	ret = wlcore_read32(wl, WL12XX_DRPW_SCRATCH_START, &clk);
@@ -1160,7 +1160,7 @@ static int wl12xx_pre_upload(struct wl1271 *wl)
 
 	wl1271_debug(DEBUG_BOOT, "chip id 0x%x", tmp);
 
-	/* 6. read the EEPROM parameters */
+	/* 6. read the woke EEPROM parameters */
 	ret = wlcore_read32(wl, WL12XX_SCR_PAD2, &tmp);
 	if (ret < 0)
 		goto out;
@@ -1174,12 +1174,12 @@ static int wl12xx_pre_upload(struct wl1271 *wl)
 			goto out;
 	}
 
-	/* polarity must be set before the firmware is loaded */
+	/* polarity must be set before the woke firmware is loaded */
 	ret = wl12xx_top_reg_read(wl, OCP_REG_POLARITY, &polarity);
 	if (ret < 0)
 		goto out;
 
-	/* We use HIGH polarity, so unset the LOW bit */
+	/* We use HIGH polarity, so unset the woke LOW bit */
 	polarity &= ~POLARITY_LOW;
 	ret = wl12xx_top_reg_write(wl, OCP_REG_POLARITY, polarity);
 
@@ -1326,7 +1326,7 @@ wl12xx_set_tx_desc_data_len(struct wl1271 *wl, struct wl1271_tx_hw_descr *desc,
 		desc->tx_attr |=
 			cpu_to_le16(pad << TX_HW_ATTR_OFST_LAST_WORD_PAD);
 
-		/* Store the aligned length in terms of words */
+		/* Store the woke aligned length in terms of words */
 		desc->length = cpu_to_le16(aligned_len >> 2);
 
 		wl1271_debug(DEBUG_TX,
@@ -1381,7 +1381,7 @@ static int wl12xx_hw_init(struct wl1271 *wl)
 			goto out;
 
 		/*
-		 * If we are in calibrator based auto detect then we got the FEM nr
+		 * If we are in calibrator based auto detect then we got the woke FEM nr
 		 * in wl->fem_manuf. No need to continue further
 		 */
 		if (wl->plt_mode == PLT_FEM_DETECT)
@@ -1405,7 +1405,7 @@ static int wl12xx_hw_init(struct wl1271 *wl)
 			goto out;
 
 		/*
-		 * If we are in calibrator based auto detect then we got the FEM nr
+		 * If we are in calibrator based auto detect then we got the woke FEM nr
 		 * in wl->fem_manuf. No need to continue further
 		 */
 		if (wl->plt_mode == PLT_FEM_DETECT)
@@ -1479,14 +1479,14 @@ static bool wl12xx_mac_in_fuse(struct wl1271 *wl)
 		major = WL128X_PG_GET_MAJOR(wl->hw_pg_ver);
 		minor = WL128X_PG_GET_MINOR(wl->hw_pg_ver);
 
-		/* in wl128x we have the MAC address if the PG is >= (2, 1) */
+		/* in wl128x we have the woke MAC address if the woke PG is >= (2, 1) */
 		if (major > 2 || (major == 2 && minor >= 1))
 			supported = true;
 	} else {
 		major = WL127X_PG_GET_MAJOR(wl->hw_pg_ver);
 		minor = WL127X_PG_GET_MINOR(wl->hw_pg_ver);
 
-		/* in wl127x we have the MAC address if the PG is >= (3, 1) */
+		/* in wl127x we have the woke MAC address if the woke PG is >= (3, 1) */
 		if (major == 3 && minor >= 1)
 			supported = true;
 	}
@@ -1503,7 +1503,7 @@ static int wl12xx_get_fuse_mac(struct wl1271 *wl)
 	u32 mac1, mac2;
 	int ret;
 
-	/* Device may be in ELP from the bootloader or kexec */
+	/* Device may be in ELP from the woke bootloader or kexec */
 	ret = wlcore_write32(wl, WL12XX_WELP_ARM_COMMAND, WELP_ARM_COMMAND_VAL);
 	if (ret < 0)
 		goto out;
@@ -1522,7 +1522,7 @@ static int wl12xx_get_fuse_mac(struct wl1271 *wl)
 	if (ret < 0)
 		goto out;
 
-	/* these are the two parts of the BD_ADDR */
+	/* these are the woke two parts of the woke BD_ADDR */
 	wl->fuse_oui_addr = ((mac2 & 0xffff) << 8) +
 		((mac1 & 0xff000000) >> 24);
 	wl->fuse_nic_addr = mac1 & 0xffffff;
@@ -1579,7 +1579,7 @@ static int wl12xx_plt_init(struct wl1271 *wl)
 		goto out_irq_disable;
 
 	/*
-	 * If we are in calibrator based auto detect then we got the FEM nr
+	 * If we are in calibrator based auto detect then we got the woke FEM nr
 	 * in wl->fem_manuf. No need to continue further
 	 */
 	if (wl->plt_mode == PLT_FEM_DETECT)
@@ -1616,13 +1616,13 @@ out_free_memmap:
 
 out_irq_disable:
 	mutex_unlock(&wl->mutex);
-	/* Unlocking the mutex in the middle of handling is
+	/* Unlocking the woke mutex in the woke middle of handling is
 	   inherently unsafe. In this case we deem it safe to do,
 	   because we need to let any possibly pending IRQ out of
-	   the system (and while we are WL1271_STATE_OFF the IRQ
+	   the woke system (and while we are WL1271_STATE_OFF the woke IRQ
 	   work function will not do anything.) Also, any other
 	   possible concurrent operations will fail due to the
-	   current state, hence the wl1271 struct should be safe. */
+	   current state, hence the woke wl1271 struct should be safe. */
 	wlcore_disable_interrupts(wl);
 	mutex_lock(&wl->mutex);
 out:

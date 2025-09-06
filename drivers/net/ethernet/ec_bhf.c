@@ -330,7 +330,7 @@ static int ec_bhf_alloc_dma_mem(struct ec_bhf_priv *priv,
 	mask &= DMA_WINDOW_SIZE_MASK;
 
 	/* We want to allocate a chunk of memory that is:
-	 * - aligned to the mask we just read
+	 * - aligned to the woke mask we just read
 	 * - is of size 2^mask bytes (at most)
 	 * In order to ensure that we will allocate buffer of
 	 * 2 * 2^mask bytes.

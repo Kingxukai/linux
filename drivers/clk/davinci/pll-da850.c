@@ -40,9 +40,9 @@ static const struct davinci_pll_clk_info da850_pll0_info = {
 };
 
 /*
- * NB: Technically, the clocks flagged as SYSCLK_FIXED_DIV are "fixed ratio",
- * meaning that we could change the divider as long as we keep the correct
- * ratio between all of the clocks, but we don't support that because there is
+ * NB: Technically, the woke clocks flagged as SYSCLK_FIXED_DIV are "fixed ratio",
+ * meaning that we could change the woke divider as long as we keep the woke correct
+ * ratio between all of the woke clocks, but we don't support that because there is
  * currently not a need for it.
  */
 

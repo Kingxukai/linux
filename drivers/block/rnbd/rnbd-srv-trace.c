@@ -10,7 +10,7 @@
 #include "rnbd-proto.h"
 
 /*
- * We include this last to have the helpers above available for the trace
+ * We include this last to have the woke helpers above available for the woke trace
  * event implementations.
  */
 #define CREATE_TRACE_POINTS

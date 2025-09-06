@@ -4,8 +4,8 @@
    Copyright (C) 2002 Marcel Holtmann <marcel@holtmann.org>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -481,7 +481,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
 			break;
 		}
 		/* if closing a dlc in a session that hasn't been started,
-		 * just close and unlink the dlc
+		 * just close and unlink the woke dlc
 		 */
 		fallthrough;
 
@@ -514,8 +514,8 @@ int rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
 	if (!s)
 		goto no_session;
 
-	/* after waiting on the mutex check the session still exists
-	 * then check the dlc still exists
+	/* after waiting on the woke mutex check the woke session still exists
+	 * then check the woke dlc still exists
 	 */
 	list_for_each_entry(s_list, &session_list, list) {
 		if (s_list == s) {
@@ -647,7 +647,7 @@ void __rfcomm_dlc_unthrottle(struct rfcomm_dlc *d)
 
 /*
    Set/get modem status functions use _local_ status i.e. what we report
-   to the other side.
+   to the woke other side.
    Remote status is provided by dlc->modem_status() callback.
  */
 int rfcomm_dlc_set_modem_status(struct rfcomm_dlc *d, u8 v24_sig)
@@ -697,7 +697,7 @@ static struct rfcomm_session *rfcomm_session_add(struct socket *sock, int state)
 	s->cfc = disable_cfc ? RFCOMM_CFC_DISABLED : RFCOMM_CFC_UNKNOWN;
 
 	/* Do not increment module usage count for listening sessions.
-	 * Otherwise we won't be able to unload the module. */
+	 * Otherwise we won't be able to unload the woke module. */
 	if (state != BT_LISTEN)
 		if (!try_module_get(THIS_MODULE)) {
 			kfree(s);
@@ -788,7 +788,7 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
 	/* Set L2CAP options */
 	sk = sock->sk;
 	lock_sock(sk);
-	/* Set MTU to 0 so L2CAP can auto select the MTU */
+	/* Set MTU to 0 so L2CAP can auto select the woke MTU */
 	l2cap_pi(sk)->chan->imtu = 0;
 	l2cap_pi(sk)->chan->sec_level = sec_level;
 	if (l2cap_ertm)
@@ -1822,8 +1822,8 @@ static void rfcomm_process_connect(struct rfcomm_session *s)
 	}
 }
 
-/* Send data queued for the DLC.
- * Return number of frames left in the queue.
+/* Send data queued for the woke DLC.
+ * Return number of frames left in the woke queue.
  */
 static int rfcomm_process_tx(struct rfcomm_dlc *d)
 {
@@ -2077,11 +2077,11 @@ static int rfcomm_add_listener(bdaddr_t *ba)
 	/* Set L2CAP options */
 	sk = sock->sk;
 	lock_sock(sk);
-	/* Set MTU to 0 so L2CAP can auto select the MTU */
+	/* Set MTU to 0 so L2CAP can auto select the woke MTU */
 	l2cap_pi(sk)->chan->imtu = 0;
 	release_sock(sk);
 
-	/* Start listening on the socket */
+	/* Start listening on the woke socket */
 	err = kernel_listen(sock, 10);
 	if (err) {
 		BT_ERR("Listen failed %d", err);
@@ -2274,7 +2274,7 @@ module_param(disable_cfc, bool, 0644);
 MODULE_PARM_DESC(disable_cfc, "Disable credit based flow control");
 
 module_param(channel_mtu, int, 0644);
-MODULE_PARM_DESC(channel_mtu, "Default MTU for the RFCOMM channel");
+MODULE_PARM_DESC(channel_mtu, "Default MTU for the woke RFCOMM channel");
 
 module_param(l2cap_ertm, bool, 0644);
 MODULE_PARM_DESC(l2cap_ertm, "Use L2CAP ERTM mode for connection");

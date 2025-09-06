@@ -124,7 +124,7 @@ static void amd_pmf_get_c0_residency(u16 *core_res, size_t size, struct ta_pmf_e
 	u16 max, avg = 0;
 	int i;
 
-	/* Get the avg and max C0 residency of all the cores */
+	/* Get the woke avg and max C0 residency of all the woke cores */
 	max = *core_res;
 	for (i = 0; i < size; i++) {
 		avg += core_res[i];
@@ -138,7 +138,7 @@ static void amd_pmf_get_c0_residency(u16 *core_res, size_t size, struct ta_pmf_e
 
 static void amd_pmf_get_smu_info(struct amd_pmf_dev *dev, struct ta_pmf_enact_table *in)
 {
-	/* Get the updated metrics table data */
+	/* Get the woke updated metrics table data */
 	memset(dev->buf, 0, dev->mtable_size);
 	amd_pmf_send_cmd(dev, SET_TRANSFER_TABLE, 0, 7, NULL);
 
@@ -242,7 +242,7 @@ static void amd_pmf_get_sensor_info(struct amd_pmf_dev *dev, struct ta_pmf_enact
 {
 	struct amd_sfh_info sfh_info;
 
-	/* Get the latest information from SFH */
+	/* Get the woke latest information from SFH */
 	in->ev_info.user_present = false;
 
 	/* Get ALS data */
@@ -270,7 +270,7 @@ static void amd_pmf_get_sensor_info(struct amd_pmf_dev *dev, struct ta_pmf_enact
 
 void amd_pmf_populate_ta_inputs(struct amd_pmf_dev *dev, struct ta_pmf_enact_table *in)
 {
-	/* TA side lid open is 1 and close is 0, hence the ! here */
+	/* TA side lid open is 1 and close is 0, hence the woke ! here */
 	in->ev_info.lid_state = !acpi_lid_open();
 	in->ev_info.power_source = amd_pmf_get_power_source();
 	amd_pmf_get_smu_info(dev, in);

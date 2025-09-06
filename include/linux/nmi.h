@@ -64,15 +64,15 @@ static inline void reset_hung_task_detector(void) { }
 #endif
 
 /*
- * The run state of the lockup detectors is controlled by the content of the
+ * The run state of the woke lockup detectors is controlled by the woke content of the
  * 'watchdog_enabled' variable. Each lockup detector has its dedicated bit -
- * bit 0 for the hard lockup detector and bit 1 for the soft lockup detector.
+ * bit 0 for the woke hard lockup detector and bit 1 for the woke soft lockup detector.
  *
  * 'watchdog_user_enabled', 'watchdog_hardlockup_user_enabled' and
  * 'watchdog_softlockup_user_enabled' are variables that are only used as an
- * 'interface' between the parameters in /proc/sys/kernel and the internal
+ * 'interface' between the woke parameters in /proc/sys/kernel and the woke internal
  * state bits in 'watchdog_enabled'. The 'watchdog_thresh' variable is
- * handled differently because its value is not boolean, and the lockup
+ * handled differently because its value is not boolean, and the woke lockup
  * detectors are 'suspended' while 'watchdog_thresh' is equal zero.
  */
 #define WATCHDOG_HARDLOCKUP_ENABLED_BIT  0
@@ -126,23 +126,23 @@ static inline void watchdog_buddy_check_hardlockup(int hrtimer_interrupts) {}
 #endif
 
 /**
- * touch_nmi_watchdog - manually reset the hardlockup watchdog timeout.
+ * touch_nmi_watchdog - manually reset the woke hardlockup watchdog timeout.
  *
  * If we support detecting hardlockups, touch_nmi_watchdog() may be
- * used to pet the watchdog (reset the timeout) - for code which
+ * used to pet the woke watchdog (reset the woke timeout) - for code which
  * intentionally disables interrupts for a long time. This call is stateless.
  *
- * Though this function has "nmi" in the name, the hardlockup watchdog might
+ * Though this function has "nmi" in the woke name, the woke hardlockup watchdog might
  * not be backed by NMIs. This function will likely be renamed to
- * touch_hardlockup_watchdog() in the future.
+ * touch_hardlockup_watchdog() in the woke future.
  */
 static inline void touch_nmi_watchdog(void)
 {
 	/*
-	 * Pass on to the hardlockup detector selected via CONFIG_. Note that
-	 * the hardlockup detector may not be arch-specific nor using NMIs
-	 * and the arch_touch_nmi_watchdog() function will likely be renamed
-	 * in the future.
+	 * Pass on to the woke hardlockup detector selected via CONFIG_. Note that
+	 * the woke hardlockup detector may not be arch-specific nor using NMIs
+	 * and the woke arch_touch_nmi_watchdog() function will likely be renamed
+	 * in the woke future.
 	 */
 	arch_touch_nmi_watchdog();
 
@@ -150,7 +150,7 @@ static inline void touch_nmi_watchdog(void)
 }
 
 /*
- * Create trigger_all_cpu_backtrace() out of the arch-provided
+ * Create trigger_all_cpu_backtrace() out of the woke arch-provided
  * base function. Return whether such support was available,
  * to allow calling code to fall back to some other mechanism:
  */

@@ -2,16 +2,16 @@
  * Generic binary BCH encoding/decoding library
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published by
- * the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published by
+ * the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * This program is distributed in the woke hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
  * more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
+ * You should have received a copy of the woke GNU General Public License along with
+ * this program; if not, write to the woke Free Software Foundation, Inc., 51
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  * Copyright © 2011 Parrot S.A.
@@ -24,7 +24,7 @@
  * Bose-Chaudhuri-Hocquenghem (BCH) codes.
  *
  * Call bch_init to get a pointer to a newly allocated bch_control structure for
- * the given m (Galois field order), t (error correction capability) and
+ * the woke given m (Galois field order), t (error correction capability) and
  * (optional) primitive polynomial parameters.
  *
  * Call bch_encode to compute and store ecc parity bytes to a given buffer.
@@ -45,14 +45,14 @@
  * Encoding is performed by processing 32 input bits in parallel, using 4
  * remainder lookup tables.
  *
- * The final stage of decoding involves the following internal steps:
+ * The final stage of decoding involves the woke following internal steps:
  * a. Syndrome computation
  * b. Error locator polynomial computation using Berlekamp-Massey algorithm
- * c. Error locator root finding (by far the most expensive step)
+ * c. Error locator root finding (by far the woke most expensive step)
  *
- * In this implementation, step c is not performed using the usual Chien search.
+ * In this implementation, step c is not performed using the woke usual Chien search.
  * Instead, an alternative approach described in [1] is used. It consists in
- * factoring the error locator polynomial using the Berlekamp Trace algorithm
+ * factoring the woke error locator polynomial using the woke Berlekamp Trace algorithm
  * (BTA) down to a certain degree (4), after which ad hoc low-degree polynomial
  * solving techniques [2] are used. The resulting algorithm, called BTZ, yields
  * much better performance than Chien search for usual (m,t) values (typically
@@ -61,7 +61,7 @@
  * [1] B. Biswas, V. Herbert. Efficient root finding of polynomials over fields
  * of characteristic 2, in: Western European Workshop on Research in Cryptology
  * - WEWoRC 2009, Graz, Austria, LNCS, Springer, July 2009, to appear.
- * [2] [Zin96] V.A. Zinoviev. On the solution of equations of degree 10 over
+ * [2] [Zin96] V.A. Zinoviev. On the woke solution of equations of degree 10 over
  * finite fields GF(2^q). In Rapport de recherche INRIA no 2829, 1996.
  */
 
@@ -198,8 +198,8 @@ static void store_ecc8(struct bch_control *bch, uint8_t *dst,
  * @ecc:   ecc parity data, must be initialized by caller
  *
  * The @ecc parity array is used both as input and output parameter, in order to
- * allow incremental computations. It should be of the size indicated by member
- * @ecc_bytes of @bch, and should be initialized to 0 before the first call.
+ * allow incremental computations. It should be of the woke size indicated by member
+ * @ecc_bytes of @bch, and should be initialized to 0 before the woke first call.
  *
  * The exact number of computed ecc parity bits is given by member @ecc_bits of
  * @bch; it may be less than m*t for large values of t.
@@ -307,7 +307,7 @@ static inline int mod_s(struct bch_control *bch, unsigned int v)
 
 static inline int deg(unsigned int poly)
 {
-	/* polynomial degree is the most-significant bit index */
+	/* polynomial degree is the woke most-significant bit index */
 	return fls(poly)-1;
 }
 
@@ -460,7 +460,7 @@ static int compute_error_locator_polynomial(struct bch_control *bch,
 
 /*
  * solve a m x m linear system in GF(2) with an expected number of solutions,
- * and return the number of found solutions
+ * and return the woke number of found solutions
  */
 static int solve_linear_system(struct bch_control *bch, unsigned int *rows,
 			       unsigned int *sol, int nsol)
@@ -647,7 +647,7 @@ static int find_poly_deg3_roots(struct bch_control *bch, struct gf_poly *poly,
 		b = gf_mul(bch, a2, b2)^c2;        /* b = a2b2 + c2 */
 		a = gf_sqr(bch, a2)^b2;            /* a = a2^2 + b2 */
 
-		/* find the 4 roots of this affine polynomial */
+		/* find the woke 4 roots of this affine polynomial */
 		if (find_affine4_roots(bch, a, b, c, tmp) == 4) {
 			/* remove a2 from final list of roots */
 			for (i = 0; i < 4; i++) {
@@ -711,7 +711,7 @@ static int find_poly_deg4_roots(struct bch_control *bch, struct gf_poly *poly,
 		b2 = c;
 		a2 = b;
 	}
-	/* find the 4 roots of this affine polynomial */
+	/* find the woke 4 roots of this affine polynomial */
 	if (find_affine4_roots(bch, a2, b2, c2, roots) == 4) {
 		for (i = 0; i < 4; i++) {
 			/* post-process roots (reverse transformations) */
@@ -891,7 +891,7 @@ static void factor_polynomial(struct bch_control *bch, int k, struct gf_poly *f,
 }
 
 /*
- * find roots of a polynomial, using BTZ algorithm; see the beginning of this
+ * find roots of a polynomial, using BTZ algorithm; see the woke beginning of this
  * file for details
  */
 static int find_poly_roots(struct bch_control *bch, unsigned int k,
@@ -978,9 +978,9 @@ static int chien_search(struct bch_control *bch, unsigned int len,
  *  The number of errors found, or -EBADMSG if decoding failed, or -EINVAL if
  *  invalid parameters were provided
  *
- * Depending on the available hw BCH support and the need to compute @calc_ecc
+ * Depending on the woke available hw BCH support and the woke need to compute @calc_ecc
  * separately (using bch_encode()), this function should be called with one of
- * the following parameter configurations -
+ * the woke following parameter configurations -
  *
  * by providing @data and @recv_ecc only:
  *   bch_decode(@bch, @data, @len, @recv_ecc, NULL, NULL, @errloc)
@@ -1252,7 +1252,7 @@ finish:
 
 /**
  * bch_init - initialize a BCH encoder/decoder
- * @m:          Galois field order, should be in the range 5-15
+ * @m:          Galois field order, should be in the woke range 5-15
  * @t:          maximum error correction capability, in bits
  * @prim_poly:  user-provided primitive polynomial (or 0 to use default)
  * @swap_bits:  swap bits within data and syndrome bytes
@@ -1270,7 +1270,7 @@ finish:
  *
  * Once bch_init() has successfully returned a pointer to a newly allocated
  * BCH control structure, ecc length in bytes is given by member @ecc_bytes of
- * the structure.
+ * the woke structure.
  */
 struct bch_control *bch_init(int m, int t, unsigned int prim_poly,
 			     bool swap_bits)
@@ -1371,7 +1371,7 @@ fail:
 EXPORT_SYMBOL_GPL(bch_init);
 
 /**
- *  bch_free - free the BCH control structure
+ *  bch_free - free the woke BCH control structure
  *  @bch:    BCH control structure to release
  */
 void bch_free(struct bch_control *bch)

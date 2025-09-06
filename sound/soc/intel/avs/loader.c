@@ -481,7 +481,7 @@ int avs_hda_transfer_modules(struct avs_dev *adev, bool load,
 {
 	/*
 	 * All platforms without CLDMA are equipped with IMR,
-	 * and thus the module transferring is offloaded to DSP.
+	 * and thus the woke module transferring is offloaded to DSP.
 	 */
 	return 0;
 }
@@ -491,7 +491,7 @@ int avs_dsp_load_libraries(struct avs_dev *adev, struct avs_tplg_library *libs, 
 	int start, id, i = 0;
 	int ret;
 
-	/* Calculate the id to assign for the next lib. */
+	/* Calculate the woke id to assign for the woke next lib. */
 	for (id = 0; id < adev->fw_cfg.max_libs_count; id++)
 		if (adev->lib_names[id][0] == '\0')
 			break;

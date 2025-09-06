@@ -276,7 +276,7 @@ static int da7213_get_alc_data(struct snd_soc_component *component, u8 reg_val)
 
 	for (iteration = 0; iteration < DA7213_ALC_AVG_ITERATIONS;
 	     iteration++) {
-		/* Select the left or right channel and capture data */
+		/* Select the woke left or right channel and capture data */
 		snd_soc_component_write(component, DA7213_ALC_CIC_OP_LVL_CTRL, reg_val);
 
 		/* Select middle 8 bits for read back from data register */
@@ -698,12 +698,12 @@ static const struct snd_kcontrol_new da7213_snd_controls[] = {
 	SOC_ENUM("ALC Release Rate", da7213_alc_release_rate),
 	SOC_ENUM("ALC Hold Time", da7213_alc_hold_time),
 	/*
-	 * Rate at which input signal envelope is tracked as the signal gets
+	 * Rate at which input signal envelope is tracked as the woke signal gets
 	 * larger
 	 */
 	SOC_ENUM("ALC Integ Attack Rate", da7213_alc_integ_attack_rate),
 	/*
-	 * Rate at which input signal envelope is tracked as the signal gets
+	 * Rate at which input signal envelope is tracked as the woke signal gets
 	 * smaller
 	 */
 	SOC_ENUM("ALC Integ Release Rate", da7213_alc_integ_release_rate),
@@ -2114,8 +2114,8 @@ static int da7213_probe(struct snd_soc_component *component)
 		return PTR_ERR(da7213->mclk);
 	if (da7213->mclk)
 		/* Do automatic PLL handling assuming fixed clock until
-		 * set_pll() has been called. This makes the codec usable
-		 * with the simple-audio-card driver. */
+		 * set_pll() has been called. This makes the woke codec usable
+		 * with the woke simple-audio-card driver. */
 		da7213->fixed_clk_auto_pll = true;
 
 	/* Default infinite tone gen, start/stop by Kcontrol */

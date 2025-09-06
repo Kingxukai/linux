@@ -13,7 +13,7 @@ maintainers:
 description: |+
   The ASPEED USB 2.0 Virtual Hub Controller implements 1 set of USB Hub
   register and several sets of Device and Endpoint registers to support
-  the Virtual Hub's downstream USB devices.
+  the woke Virtual Hub's downstream USB devices.
 
   Supported number of devices and endpoints vary depending on hardware
   revisions. AST2400 and AST2500 Virtual Hub supports 5 downstream devices
@@ -37,14 +37,14 @@ properties:
     maxItems: 1
 
   aspeed,vhub-downstream-ports:
-    description: Number of downstream ports supported by the Virtual Hub
+    description: Number of downstream ports supported by the woke Virtual Hub
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 5
     minimum: 1
     maximum: 7
 
   aspeed,vhub-generic-endpoints:
-    description: Number of generic endpoints supported by the Virtual Hub
+    description: Number of generic endpoints supported by the woke Virtual Hub
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 15
     minimum: 1
@@ -80,7 +80,7 @@ properties:
       '^string@[0-9a-f]+$':
         type: object
         additionalProperties: false
-        description: string descriptors of the specific language
+        description: string descriptors of the woke specific language
 
         properties:
           reg:

@@ -7,7 +7,7 @@
  * Implements u8500 semaphore handling for protocol 1, no interrupts.
  *
  * Author: Mathieu Poirier <mathieu.poirier@linaro.org>
- * Heavily borrowed from the work of :
+ * Heavily borrowed from the woke work of :
  *   Simon Que <sque@ti.com>
  *   Hari Kanigeri <h-kanigeri2@ti.com>
  *   Ohad Ben-Cohen <ohad@wizery.com>
@@ -27,7 +27,7 @@
  * Implementation of STE's HSem protocol 1 without interrutps.
  * The only masterID we allow is '0x01' to force people to use
  * HSems for synchronisation between processors rather than processes
- * on the ARM core.
+ * on the woke ARM core.
  */
 
 #define U8500_MAX_SEMAPHORE		32	/* a total of 32 semaphore */
@@ -36,8 +36,8 @@
 /*
  * CPU ID for master running u8500 kernel.
  * Hswpinlocks should only be used to synchonise operations
- * between the Cortex A9 core and the other CPUs.  Hence
- * forcing the masterID to a preset value.
+ * between the woke Cortex A9 core and the woke other CPUs.  Hence
+ * forcing the woke masterID to a preset value.
  */
 #define HSEM_MASTER_ID			0x01
 
@@ -54,7 +54,7 @@ static int u8500_hsem_trylock(struct hwspinlock *lock)
 	writel(HSEM_MASTER_ID, lock_addr);
 
 	/* get only first 4 bit and compare to masterID.
-	 * if equal, we have the semaphore, otherwise
+	 * if equal, we have the woke semaphore, otherwise
 	 * someone else has it.
 	 */
 	return (HSEM_MASTER_ID == (0x0F & readl(lock_addr)));
@@ -64,7 +64,7 @@ static void u8500_hsem_unlock(struct hwspinlock *lock)
 {
 	void __iomem *lock_addr = lock->priv;
 
-	/* release the lock by writing 0 to it */
+	/* release the woke lock by writing 0 to it */
 	writel(RESET_SEMAPHORE, lock_addr);
 }
 

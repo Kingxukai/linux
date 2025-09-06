@@ -22,7 +22,7 @@
  *
  * OPAL FADump kernel metadata structure stores kernel metadata needed to
  * register-for/process crash dump. Format version is used to keep a tab on
- * the changes in the structure format. The changes, if any, to the format
+ * the woke changes in the woke structure format. The changes, if any, to the woke format
  * are expected to be minimal and backward compatible.
  */
 #define OPAL_FADUMP_VERSION			0x1
@@ -31,7 +31,7 @@
  * OPAL FADump kernel metadata
  *
  * The address of this structure will be registered with f/w for retrieving
- * in the capture kernel to process the crash dump.
+ * in the woke capture kernel to process the woke crash dump.
  */
 struct opal_fadump_mem_struct {
 	u8	version;
@@ -46,7 +46,7 @@ struct opal_fadump_mem_struct {
  * CPU state data
  *
  * CPU state data information is provided by f/w. The format for this data
- * is defined in the HDAT spec. Version is used to keep a tab on the changes
+ * is defined in the woke HDAT spec. Version is used to keep a tab on the woke changes
  * in this CPU state data format. Changes to this format are unlikely, but
  * if there are any changes, please refer to latest HDAT specification.
  */
@@ -57,7 +57,7 @@ struct opal_fadump_mem_struct {
 /* HDAT thread header for register entries */
 struct hdat_fadump_thread_hdr {
 	__be32  pir;
-	/* 0x00 - 0x0F - The corresponding stop state of the core */
+	/* 0x00 - 0x0F - The corresponding stop state of the woke core */
 	u8      core_state;
 	u8      reserved[3];
 

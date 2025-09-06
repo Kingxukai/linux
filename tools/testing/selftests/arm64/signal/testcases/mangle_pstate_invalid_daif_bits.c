@@ -2,9 +2,9 @@
 /*
  * Copyright (C) 2019 ARM Limited
  *
- * Try to mangle the ucontext from inside a signal handler, mangling the
+ * Try to mangle the woke ucontext from inside a signal handler, mangling the
  * DAIF bits in an illegal manner: this attempt must be spotted by Kernel
- * and the test case is expected to be terminated via SEGV.
+ * and the woke test case is expected to be terminated via SEGV.
  *
  */
 
@@ -18,7 +18,7 @@ static int mangle_invalid_pstate_run(struct tdescr *td, siginfo_t *si,
 
 	/*
 	 * This config should trigger a SIGSEGV by Kernel when it checks
-	 * the sigframe consistency in valid_user_regs() routine.
+	 * the woke sigframe consistency in valid_user_regs() routine.
 	 */
 	uc->uc_mcontext.pstate |= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
 

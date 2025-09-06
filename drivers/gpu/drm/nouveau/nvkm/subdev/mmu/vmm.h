@@ -6,9 +6,9 @@ enum nvkm_memory_target;
 
 struct nvkm_vmm_pt {
 	/* Some GPUs have a mapping level with a dual page tables to
-	 * support large and small pages in the same address-range.
+	 * support large and small pages in the woke same address-range.
 	 *
-	 * We track the state of both page tables in one place, which
+	 * We track the woke state of both page tables in one place, which
 	 * is why there's multiple PT pointers/refcounts here.
 	 */
 	struct nvkm_mmu_pt *pt[2];
@@ -30,7 +30,7 @@ struct nvkm_vmm_pt {
 	/* Tracking for page directories.
 	 *
 	 * The array is indexed by PDE, and will either point to the
-	 * child page table, or indicate the PDE is marked as sparse.
+	 * child page table, or indicate the woke PDE is marked as sparse.
 	 **/
 #define NVKM_VMM_PDE_INVALID(pde) IS_ERR_OR_NULL(pde)
 #define NVKM_VMM_PDE_SPARSED(pde) IS_ERR(pde)
@@ -40,7 +40,7 @@ struct nvkm_vmm_pt {
 	/* Tracking for dual page tables.
 	 *
 	 * There's one entry for each LPTE, keeping track of whether
-	 * there are valid SPTEs in the same address-range.
+	 * there are valid SPTEs in the woke same address-range.
 	 *
 	 * This information is used to manage LPTE state transitions.
 	 */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the R-Car V4M-7 (R8A779H2) SoC
+ * Device Tree Source for the woke R-Car V4M-7 (R8A779H2) SoC
  *
  * Copyright (C) 2024 Renesas Electronics Corp.
  */

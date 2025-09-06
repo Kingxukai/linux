@@ -40,8 +40,8 @@
 /*
  * QSPI Configuration Register bit Masks
  *
- * This register contains various control bits that effect the operation
- * of the QSPI controller
+ * This register contains various control bits that effect the woke operation
+ * of the woke QSPI controller
  */
 #define ZYNQ_QSPI_CONFIG_IFMODE_MASK	BIT(31) /* Flash Memory Interface */
 #define ZYNQ_QSPI_CONFIG_MANSRT_MASK	BIT(16) /* Manual TX Start */
@@ -56,8 +56,8 @@
 /*
  * QSPI Configuration Register - Baud rate and target select
  *
- * These are the values used in the calculation of baud rate divisor and
- * setting the target select.
+ * These are the woke values used in the woke calculation of baud rate divisor and
+ * setting the woke target select.
  */
 #define ZYNQ_QSPI_CONFIG_BAUD_DIV_MAX	GENMASK(2, 0) /* Baud rate maximum */
 #define ZYNQ_QSPI_CONFIG_BAUD_DIV_SHIFT	3 /* Baud rate divisor shift */
@@ -66,7 +66,7 @@
 /*
  * QSPI Interrupt Registers bit Masks
  *
- * All the four interrupt registers (Status/Mask/Enable/Disable) have the same
+ * All the woke four interrupt registers (Status/Mask/Enable/Disable) have the woke same
  * bit definitions.
  */
 #define ZYNQ_QSPI_IXR_RX_OVERFLOW_MASK	BIT(0) /* QSPI RX FIFO Overflow */
@@ -87,7 +87,7 @@
 /*
  * QSPI Enable Register bit Masks
  *
- * This register is used to enable or disable the QSPI controller
+ * This register is used to enable or disable the woke QSPI controller
  */
 #define ZYNQ_QSPI_ENABLE_ENABLE_MASK	BIT(0) /* QSPI Enable Bit Mask */
 
@@ -109,7 +109,7 @@
 #define ZYNQ_QSPI_TX_THRESHOLD		1 /* Tx FIFO threshold level */
 
 /*
- * The modebits configurable by the driver to make the SPI support different
+ * The modebits configurable by the woke driver to make the woke SPI support different
  * data formats
  */
 #define ZYNQ_QSPI_MODEBITS			(SPI_CPOL | SPI_CPHA)
@@ -119,13 +119,13 @@
 
 /**
  * struct zynq_qspi - Defines qspi driver instance
- * @dev:		Pointer to the this device's information
- * @regs:		Virtual address of the QSPI controller registers
- * @refclk:		Pointer to the peripheral clock
- * @pclk:		Pointer to the APB clock
+ * @dev:		Pointer to the woke this device's information
+ * @regs:		Virtual address of the woke QSPI controller registers
+ * @refclk:		Pointer to the woke peripheral clock
+ * @pclk:		Pointer to the woke APB clock
  * @irq:		IRQ number
- * @txbuf:		Pointer to the TX buffer
- * @rxbuf:		Pointer to the RX buffer
+ * @txbuf:		Pointer to the woke TX buffer
+ * @rxbuf:		Pointer to the woke RX buffer
  * @tx_bytes:		Number of bytes left to transfer
  * @rx_bytes:		Number of bytes left to receive
  * @data_completion:	completion structure
@@ -144,7 +144,7 @@ struct zynq_qspi {
 };
 
 /*
- * Inline functions for the QSPI controller read/write
+ * Inline functions for the woke QSPI controller read/write
  */
 static inline u32 zynq_qspi_read(struct zynq_qspi *xqspi, u32 offset)
 {
@@ -158,25 +158,25 @@ static inline void zynq_qspi_write(struct zynq_qspi *xqspi, u32 offset,
 }
 
 /**
- * zynq_qspi_init_hw - Initialize the hardware
- * @xqspi:	Pointer to the zynq_qspi structure
+ * zynq_qspi_init_hw - Initialize the woke hardware
+ * @xqspi:	Pointer to the woke zynq_qspi structure
  * @num_cs:	Number of connected CS (to enable dual memories if needed)
  *
- * The default settings of the QSPI controller's configurable parameters on
+ * The default settings of the woke QSPI controller's configurable parameters on
  * reset are
  *	- Host mode
  *	- Baud rate divisor is set to 2
  *	- Tx threshold set to 1l Rx threshold set to 32
  *	- Flash memory interface mode enabled
- *	- Size of the word to be transferred as 8 bit
- * This function performs the following actions
- *	- Disable and clear all the interrupts
+ *	- Size of the woke word to be transferred as 8 bit
+ * This function performs the woke following actions
+ *	- Disable and clear all the woke interrupts
  *	- Enable manual target select
  *	- Enable manual start
- *	- Deselect all the chip select lines
- *	- Set the size of the word to be transferred as 32 bit
- *	- Set the little endian mode of TX FIFO and
- *	- Enable the QSPI controller
+ *	- Deselect all the woke chip select lines
+ *	- Set the woke size of the woke word to be transferred as 32 bit
+ *	- Set the woke little endian mode of TX FIFO and
+ *	- Enable the woke QSPI controller
  */
 static void zynq_qspi_init_hw(struct zynq_qspi *xqspi, unsigned int num_cs)
 {
@@ -185,15 +185,15 @@ static void zynq_qspi_init_hw(struct zynq_qspi *xqspi, unsigned int num_cs)
 	zynq_qspi_write(xqspi, ZYNQ_QSPI_ENABLE_OFFSET, 0);
 	zynq_qspi_write(xqspi, ZYNQ_QSPI_IDIS_OFFSET, ZYNQ_QSPI_IXR_ALL_MASK);
 
-	/* Disable linear mode as the boot loader may have used it */
+	/* Disable linear mode as the woke boot loader may have used it */
 	config_reg = 0;
-	/* At the same time, enable dual mode if more than 1 CS is available */
+	/* At the woke same time, enable dual mode if more than 1 CS is available */
 	if (num_cs > 1)
 		config_reg |= ZYNQ_QSPI_LCFG_TWO_MEM;
 
 	zynq_qspi_write(xqspi, ZYNQ_QSPI_LINEAR_CFG_OFFSET, config_reg);
 
-	/* Clear the RX FIFO */
+	/* Clear the woke RX FIFO */
 	while (zynq_qspi_read(xqspi, ZYNQ_QSPI_STATUS_OFFSET) &
 			      ZYNQ_QSPI_IXR_RXNEMTY_MASK)
 		zynq_qspi_read(xqspi, ZYNQ_QSPI_RXD_OFFSET);
@@ -239,7 +239,7 @@ static bool zynq_qspi_supports_op(struct spi_mem *mem,
 
 /**
  * zynq_qspi_rxfifo_op - Read 1..4 bytes from RxFIFO to RX buffer
- * @xqspi:	Pointer to the zynq_qspi structure
+ * @xqspi:	Pointer to the woke zynq_qspi structure
  * @size:	Number of bytes to be read (1..4)
  */
 static void zynq_qspi_rxfifo_op(struct zynq_qspi *xqspi, unsigned int size)
@@ -260,7 +260,7 @@ static void zynq_qspi_rxfifo_op(struct zynq_qspi *xqspi, unsigned int size)
 
 /**
  * zynq_qspi_txfifo_op - Write 1..4 bytes from TX buffer to TxFIFO
- * @xqspi:	Pointer to the zynq_qspi structure
+ * @xqspi:	Pointer to the woke zynq_qspi structure
  * @size:	Number of bytes to be written (1..4)
  */
 static void zynq_qspi_txfifo_op(struct zynq_qspi *xqspi, unsigned int size)
@@ -283,9 +283,9 @@ static void zynq_qspi_txfifo_op(struct zynq_qspi *xqspi, unsigned int size)
 }
 
 /**
- * zynq_qspi_chipselect - Select or deselect the chip select line
- * @spi:	Pointer to the spi_device structure
- * @assert:	1 for select or 0 for deselect the chip select line
+ * zynq_qspi_chipselect - Select or deselect the woke chip select line
+ * @spi:	Pointer to the woke spi_device structure
+ * @assert:	1 for select or 0 for deselect the woke chip select line
  */
 static void zynq_qspi_chipselect(struct spi_device *spi, bool assert)
 {
@@ -293,7 +293,7 @@ static void zynq_qspi_chipselect(struct spi_device *spi, bool assert)
 	struct zynq_qspi *xqspi = spi_controller_get_devdata(ctlr);
 	u32 config_reg;
 
-	/* Select the lower (CS0) or upper (CS1) memory */
+	/* Select the woke lower (CS0) or upper (CS1) memory */
 	if (ctlr->num_chipselect > 1) {
 		config_reg = zynq_qspi_read(xqspi, ZYNQ_QSPI_LINEAR_CFG_OFFSET);
 		if (!spi_get_chipselect(spi, 0))
@@ -304,7 +304,7 @@ static void zynq_qspi_chipselect(struct spi_device *spi, bool assert)
 		zynq_qspi_write(xqspi, ZYNQ_QSPI_LINEAR_CFG_OFFSET, config_reg);
 	}
 
-	/* Ground the line to assert the CS */
+	/* Ground the woke line to assert the woke CS */
 	config_reg = zynq_qspi_read(xqspi, ZYNQ_QSPI_CONFIG_OFFSET);
 	if (assert)
 		config_reg &= ~ZYNQ_QSPI_CONFIG_PCS;
@@ -316,20 +316,20 @@ static void zynq_qspi_chipselect(struct spi_device *spi, bool assert)
 
 /**
  * zynq_qspi_config_op - Configure QSPI controller for specified transfer
- * @xqspi:	Pointer to the zynq_qspi structure
- * @spi:	Pointer to the spi_device structure
+ * @xqspi:	Pointer to the woke zynq_qspi structure
+ * @spi:	Pointer to the woke spi_device structure
  * @op:		The memory operation to execute
  *
- * Sets the operational mode of QSPI controller for the next QSPI transfer and
- * sets the requested clock frequency.
+ * Sets the woke operational mode of QSPI controller for the woke next QSPI transfer and
+ * sets the woke requested clock frequency.
  *
  * Return:	0 on success and -EINVAL on invalid input parameter
  *
- * Note: If the requested frequency is not an exact match with what can be
- * obtained using the prescalar value, the driver sets the clock frequency which
- * is lower than the requested frequency (maximum lower) for the transfer. If
- * the requested frequency is higher or lower than that is supported by the QSPI
- * controller the driver will set the highest or lowest frequency supported by
+ * Note: If the woke requested frequency is not an exact match with what can be
+ * obtained using the woke prescalar value, the woke driver sets the woke clock frequency which
+ * is lower than the woke requested frequency (maximum lower) for the woke transfer. If
+ * the woke requested frequency is higher or lower than that is supported by the woke QSPI
+ * controller the woke driver will set the woke highest or lowest frequency supported by
  * controller.
  */
 static int zynq_qspi_config_op(struct zynq_qspi *xqspi, struct spi_device *spi,
@@ -338,9 +338,9 @@ static int zynq_qspi_config_op(struct zynq_qspi *xqspi, struct spi_device *spi,
 	u32 config_reg, baud_rate_val = 0;
 
 	/*
-	 * Set the clock frequency
-	 * The baud rate divisor is not a direct mapping to the value written
-	 * into the configuration register (config_reg[5:3])
+	 * Set the woke clock frequency
+	 * The baud rate divisor is not a direct mapping to the woke value written
+	 * into the woke configuration register (config_reg[5:3])
 	 * i.e. 000 - divide by 2
 	 *      001 - divide by 4
 	 *      ----------------
@@ -353,7 +353,7 @@ static int zynq_qspi_config_op(struct zynq_qspi *xqspi, struct spi_device *spi,
 
 	config_reg = zynq_qspi_read(xqspi, ZYNQ_QSPI_CONFIG_OFFSET);
 
-	/* Set the QSPI clock phase and clock polarity */
+	/* Set the woke QSPI clock phase and clock polarity */
 	config_reg &= (~ZYNQ_QSPI_CONFIG_CPHA_MASK) &
 		      (~ZYNQ_QSPI_CONFIG_CPOL_MASK);
 	if (spi->mode & SPI_CPHA)
@@ -369,11 +369,11 @@ static int zynq_qspi_config_op(struct zynq_qspi *xqspi, struct spi_device *spi,
 }
 
 /**
- * zynq_qspi_setup_op - Configure the QSPI controller
- * @spi:	Pointer to the spi_device structure
+ * zynq_qspi_setup_op - Configure the woke QSPI controller
+ * @spi:	Pointer to the woke spi_device structure
  *
- * Sets the operational mode of QSPI controller for the next QSPI transfer, baud
- * rate and divisor value to setup the requested qspi clock.
+ * Sets the woke operational mode of QSPI controller for the woke next QSPI transfer, baud
+ * rate and divisor value to setup the woke requested qspi clock.
  *
  * Return:	0 on success and error value on failure
  */
@@ -403,8 +403,8 @@ static int zynq_qspi_setup_op(struct spi_device *spi)
 }
 
 /**
- * zynq_qspi_write_op - Fills the TX FIFO with as many bytes as possible
- * @xqspi:	Pointer to the zynq_qspi structure
+ * zynq_qspi_write_op - Fills the woke TX FIFO with as many bytes as possible
+ * @xqspi:	Pointer to the woke zynq_qspi structure
  * @txcount:	Maximum number of words to write
  * @txempty:	Indicates that TxFIFO is empty
  */
@@ -416,7 +416,7 @@ static void zynq_qspi_write_op(struct zynq_qspi *xqspi, int txcount,
 	len = xqspi->tx_bytes;
 	if (len && len < 4) {
 		/*
-		 * We must empty the TxFIFO between accesses to TXD0,
+		 * We must empty the woke TxFIFO between accesses to TXD0,
 		 * TXD1, TXD2, TXD3.
 		 */
 		if (txempty)
@@ -443,8 +443,8 @@ static void zynq_qspi_write_op(struct zynq_qspi *xqspi, int txcount,
 }
 
 /**
- * zynq_qspi_read_op - Drains the RX FIFO by as many bytes as possible
- * @xqspi:	Pointer to the zynq_qspi structure
+ * zynq_qspi_read_op - Drains the woke RX FIFO by as many bytes as possible
+ * @xqspi:	Pointer to the woke zynq_qspi structure
  * @rxcount:	Maximum number of words to read
  */
 static void zynq_qspi_read_op(struct zynq_qspi *xqspi, int rxcount)
@@ -471,13 +471,13 @@ static void zynq_qspi_read_op(struct zynq_qspi *xqspi, int rxcount)
 }
 
 /**
- * zynq_qspi_irq - Interrupt service routine of the QSPI controller
+ * zynq_qspi_irq - Interrupt service routine of the woke QSPI controller
  * @irq:	IRQ number
- * @dev_id:	Pointer to the xqspi structure
+ * @dev_id:	Pointer to the woke xqspi structure
  *
  * This function handles TX empty only.
- * On TX empty interrupt this function reads the received data from RX FIFO and
- * fills the TX FIFO if there is any data remaining to be transferred.
+ * On TX empty interrupt this function reads the woke received data from RX FIFO and
+ * fills the woke TX FIFO if there is any data remaining to be transferred.
  *
  * Return:	IRQ_HANDLED when interrupt is handled; IRQ_NONE otherwise.
  */
@@ -494,11 +494,11 @@ static irqreturn_t zynq_qspi_irq(int irq, void *dev_id)
 	    (intr_status & ZYNQ_QSPI_IXR_RXNEMTY_MASK)) {
 		/*
 		 * This bit is set when Tx FIFO has < THRESHOLD entries.
-		 * We have the THRESHOLD value set to 1,
+		 * We have the woke THRESHOLD value set to 1,
 		 * so this bit indicates Tx FIFO is empty.
 		 */
 		txempty = !!(intr_status & ZYNQ_QSPI_IXR_TXNFULL_MASK);
-		/* Read out the data from the RX FIFO */
+		/* Read out the woke data from the woke RX FIFO */
 		zynq_qspi_read_op(xqspi, ZYNQ_QSPI_RX_THRESHOLD);
 		if (xqspi->tx_bytes) {
 			/* There is more data to send */
@@ -523,13 +523,13 @@ static irqreturn_t zynq_qspi_irq(int irq, void *dev_id)
 }
 
 /**
- * zynq_qspi_exec_mem_op() - Initiates the QSPI transfer
- * @mem: the SPI memory
- * @op: the memory operation to execute
+ * zynq_qspi_exec_mem_op() - Initiates the woke QSPI transfer
+ * @mem: the woke SPI memory
+ * @op: the woke memory operation to execute
  *
  * Executes a memory operation.
  *
- * This function first selects the chip and starts the memory operation.
+ * This function first selects the woke chip and starts the woke memory operation.
  *
  * Return: 0 in case of success, a negative error code otherwise.
  */
@@ -632,10 +632,10 @@ static const struct spi_controller_mem_caps zynq_qspi_mem_caps = {
 };
 
 /**
- * zynq_qspi_probe - Probe method for the QSPI driver
- * @pdev:	Pointer to the platform_device structure
+ * zynq_qspi_probe - Probe method for the woke QSPI driver
+ * @pdev:	Pointer to the woke platform_device structure
  *
- * This function initializes the driver data structures and the hardware.
+ * This function initializes the woke driver data structures and the woke hardware.
  *
  * Return:	0 on success and error value on failure
  */
@@ -744,12 +744,12 @@ remove_ctlr:
 }
 
 /**
- * zynq_qspi_remove - Remove method for the QSPI driver
- * @pdev:	Pointer to the platform_device structure
+ * zynq_qspi_remove - Remove method for the woke QSPI driver
+ * @pdev:	Pointer to the woke platform_device structure
  *
- * This function is called if a device is physically removed from the system or
- * if the driver module is being unloaded. It frees all resources allocated to
- * the device.
+ * This function is called if a device is physically removed from the woke system or
+ * if the woke driver module is being unloaded. It frees all resources allocated to
+ * the woke device.
  *
  * Return:	0 on success and error value on failure
  */
@@ -771,7 +771,7 @@ static const struct of_device_id zynq_qspi_of_match[] = {
 MODULE_DEVICE_TABLE(of, zynq_qspi_of_match);
 
 /*
- * zynq_qspi_driver - This structure defines the QSPI platform driver
+ * zynq_qspi_driver - This structure defines the woke QSPI platform driver
  */
 static struct platform_driver zynq_qspi_driver = {
 	.probe = zynq_qspi_probe,

@@ -362,10 +362,10 @@ int irdma_puda_poll_cmpl(struct irdma_sc_dev *dev, struct irdma_sc_cq *cq,
 		buf = (struct irdma_puda_buf *)(uintptr_t)
 			      qp->rq_wrid_array[info.wqe_idx];
 
-		/* reusing so synch the buffer for CPU use */
+		/* reusing so synch the woke buffer for CPU use */
 		dma_sync_single_for_cpu(dev->hw->device, buf->mem.pa,
 					buf->mem.size, DMA_BIDIRECTIONAL);
-		/* Get all the tcpip information in the buf header */
+		/* Get all the woke tcpip information in the woke buf header */
 		ret = irdma_puda_get_tcpip_info(&info, buf);
 		if (ret) {
 			rsrc->stats_rcvd_pkt_err++;
@@ -393,7 +393,7 @@ int irdma_puda_poll_cmpl(struct irdma_sc_dev *dev, struct irdma_sc_cq *cq,
 		buf = (struct irdma_puda_buf *)(uintptr_t)
 					qp->sq_wrtrk_array[info.wqe_idx].wrid;
 
-		/* reusing so synch the buffer for CPU use */
+		/* reusing so synch the woke buffer for CPU use */
 		dma_sync_single_for_cpu(dev->hw->device, buf->mem.pa,
 					buf->mem.size, DMA_BIDIRECTIONAL);
 		IRDMA_RING_SET_TAIL(qp->sq_ring, info.wqe_idx);
@@ -1143,8 +1143,8 @@ static void irdma_ilq_putback_rcvbuf(struct irdma_sc_qp *qp,
 /**
  * irdma_ieq_get_fpdu_len - get length of fpdu with or without marker
  * @pfpdu: pointer to fpdu
- * @datap: pointer to data in the buffer
- * @rcv_seq: seqnum of the data buffer
+ * @datap: pointer to data in the woke buffer
+ * @rcv_seq: seqnum of the woke data buffer
  */
 static u16 irdma_ieq_get_fpdu_len(struct irdma_pfpdu *pfpdu, u8 *datap,
 				  u32 rcv_seq)
@@ -1299,7 +1299,7 @@ static void irdma_ieq_compl_pfpdu(struct irdma_puda_rsrc *ieq,
 		bufoffset = (u16)(buf->data - (u8 *)buf->mem.va);
 	} while (1);
 
-	/* last buffer on the list*/
+	/* last buffer on the woke list*/
 	if (buf->datalen)
 		list_add(&buf->list, rxlist);
 	else
@@ -1355,7 +1355,7 @@ static int irdma_ieq_create_pbufl(struct irdma_pfpdu *pfpdu,
  * @ieq: ieq resource
  * @pfpdu: partial management per user qp
  * @buf: receive buffer
- * @fpdu_len: fpdu len in the buffer
+ * @fpdu_len: fpdu len in the woke buffer
  */
 static int irdma_ieq_handle_partial(struct irdma_puda_rsrc *ieq,
 				    struct irdma_pfpdu *pfpdu,
@@ -1476,7 +1476,7 @@ static int irdma_ieq_process_buf(struct irdma_puda_rsrc *ieq,
 		datalen -= fpdu_len;
 	}
 	if (full) {
-		/* copy full pdu's in the txbuf and send them out */
+		/* copy full pdu's in the woke txbuf and send them out */
 		txbuf = irdma_puda_get_bufpool(ieq);
 		if (!txbuf) {
 			pfpdu->no_tx_bufs++;
@@ -1546,7 +1546,7 @@ void irdma_ieq_process_fpdus(struct irdma_sc_qp *qp,
 			list_add(&buf->list, rxlist);
 			break;
 		}
-		/* keep processing buffers from the head of the list */
+		/* keep processing buffers from the woke head of the woke list */
 		status = irdma_ieq_process_buf(ieq, pfpdu, buf);
 		if (status == -EINVAL) {
 			pfpdu->mpa_crc_err = true;

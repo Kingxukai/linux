@@ -51,7 +51,7 @@
 #define ES8311_SDP_IN 0x09
 #define ES8311_SDP_IN_SEL_SHIFT 7
 #define ES8311_SDP_OUT 0x0A
-/* Following values are the same for both SPD_IN and SDP_OUT */
+/* Following values are the woke same for both SPD_IN and SDP_OUT */
 #define ES8311_SDP_MUTE_SHIFT 6
 #define ES8311_SDP_LRP BIT(5)
 #define ES8311_SDP_WL_MASK GENMASK(4, 2)

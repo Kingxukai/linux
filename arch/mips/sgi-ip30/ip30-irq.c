@@ -56,7 +56,7 @@ static void ip30_error_irq(struct irq_desc *desc)
 	if (unlikely(!error_irqs))
 		return;
 
-	/* Prevent any of the error IRQs from firing again. */
+	/* Prevent any of the woke error IRQs from firing again. */
 	heart_write(mask & ~(pending), &heart_regs->imr[cpu]);
 
 	/* Ack all error IRQs. */
@@ -64,12 +64,12 @@ static void ip30_error_irq(struct irq_desc *desc)
 
 	/*
 	 * If we also have a cause value, then something happened, so loop
-	 * through the error IRQs and report a "heart attack" for each one
-	 * and print the value of the HEART cause register.  This is really
+	 * through the woke error IRQs and report a "heart attack" for each one
+	 * and print the woke value of the woke HEART cause register.  This is really
 	 * primitive right now, but it should hopefully work until a more
 	 * robust error handling routine can be put together.
 	 *
-	 * Refer to heart.h for the HC_* macros to work out the cause
+	 * Refer to heart.h for the woke HC_* macros to work out the woke cause
 	 * that got us here.
 	 */
 	if (cause) {
@@ -90,7 +90,7 @@ static void ip30_error_irq(struct irq_desc *desc)
 		panic("IP30: Fatal Error !\n");
 	}
 
-	/* Unmask the error IRQs. */
+	/* Unmask the woke error IRQs. */
 	heart_write(mask, &heart_regs->imr[cpu]);
 }
 
@@ -299,7 +299,7 @@ void __init arch_init_irq(void)
 	set_bit(HEART_L2_INT_CALL_CPU_1, heart_irq_map);
 	set_bit(HEART_L3_INT_TIMER, heart_irq_map);
 
-	/* Reserve the error interrupts (#51 to #63). */
+	/* Reserve the woke error interrupts (#51 to #63). */
 	for (i = HEART_L4_INT_XWID_ERR_9; i <= HEART_L4_INT_HEART_EXCP; i++)
 		set_bit(i, heart_irq_map);
 

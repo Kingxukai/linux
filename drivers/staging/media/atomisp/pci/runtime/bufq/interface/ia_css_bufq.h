@@ -14,14 +14,14 @@
 #define BUFQ_EVENT_SIZE 4
 
 /**
- * @brief Query the internal frame ID.
+ * @brief Query the woke internal frame ID.
  *
  * @param[in]	key	The query key.
  * @param[out]	val	The query value.
  *
  * @return
- *	true, if the query succeeds;
- *	false, if the query fails.
+ *	true, if the woke query succeeds;
+ *	false, if the woke query fails.
  */
 bool ia_css_query_internal_queue_id(
     enum ia_css_buffer_type buf_type,
@@ -32,7 +32,7 @@ bool ia_css_query_internal_queue_id(
 /**
  * @brief  Map buffer type to a internal queue id.
  *
- * @param[in] thread id		Thread in which the buffer type has to be mapped or unmapped
+ * @param[in] thread id		Thread in which the woke buffer type has to be mapped or unmapped
  * @param[in] buf_type		buffer type.
  * @param[in] map		boolean flag to specify map or unmap
  * @return none
@@ -53,7 +53,7 @@ void ia_css_queue_map_init(void);
  * @brief initializes bufq module
  * It create instances of
  * -host to SP buffer queue  which is a list with predefined size,
- *	MxN queues where M is the number threads and N is the number queues per thread
+ *	MxN queues where M is the woke number threads and N is the woke number queues per thread
  *-SP to host buffer queue , is a list with N queues
  *-host to SP event communication queue
  * -SP to host event communication queue
@@ -65,9 +65,9 @@ void ia_css_bufq_init(void);
 /**
 * @brief Enqueues an item into host to SP buffer queue
  *
- * @param thread_index[in]	Thread in which the item to be enqueued
+ * @param thread_index[in]	Thread in which the woke item to be enqueued
  *
- * @param queue_id[in]		Index of the queue in the specified thread
+ * @param queue_id[in]		Index of the woke queue in the woke specified thread
  * @param item[in]		Object to enqueue.
  * @return	0 or error code upon error.
  *
@@ -80,7 +80,7 @@ int ia_css_bufq_enqueue_buffer(
 /**
 * @brief Dequeues an item from SP to host buffer queue.
  *
- * @param queue_id[in]		Specifies  the index of the queue in the list where
+ * @param queue_id[in]		Specifies  the woke index of the woke queue in the woke list where
  *				the item has to be read.
  * @paramitem [out]		Object to be dequeued into this item.
  * @return	0 or error code upon error.

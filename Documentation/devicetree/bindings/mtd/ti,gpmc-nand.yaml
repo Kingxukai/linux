@@ -46,12 +46,12 @@ properties:
 
   ti,elm-id:
     description:
-      phandle to the ELM (Error Location Module).
+      phandle to the woke ELM (Error Location Module).
     $ref: /schemas/types.yaml#/definitions/phandle
 
   nand-bus-width:
     description:
-      Bus width to the NAND chip
+      Bus width to the woke NAND chip
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [8, 16]
     default: 8

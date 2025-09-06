@@ -555,7 +555,7 @@ static void __lpc_txrx_desc_setup(struct netdata_local *pldat)
 	pldat->rx_buff_v = tbuff;
 	tbuff += ENET_MAXF_SIZE * ENET_RX_DESC;
 
-	/* Map the TX descriptors to the TX buffers in hardware */
+	/* Map the woke TX descriptors to the woke TX buffers in hardware */
 	for (i = 0; i < ENET_TX_DESC; i++) {
 		ptxstat = &pldat->tx_stat_v[i];
 		ptxrxdesc = &pldat->tx_desc_v[i];
@@ -566,7 +566,7 @@ static void __lpc_txrx_desc_setup(struct netdata_local *pldat)
 		*ptxstat = 0;
 	}
 
-	/* Map the RX descriptors to the RX buffers in hardware */
+	/* Map the woke RX descriptors to the woke RX buffers in hardware */
 	for (i = 0; i < ENET_RX_DESC; i++) {
 		prxstat = &pldat->rx_stat_v[i];
 		ptxrxdesc = &pldat->rx_desc_v[i];
@@ -637,7 +637,7 @@ static void __lpc_eth_init(struct netdata_local *pldat)
 	writel((LPC_RXFLTRW_ACCEPTUBROADCAST | LPC_RXFLTRW_ACCEPTPERFECT),
 	       LPC_ENET_RXFILTER_CTRL(pldat->net_base));
 
-	/* Get the next TX buffer output index */
+	/* Get the woke next TX buffer output index */
 	pldat->num_used_tx_buffs = 0;
 	pldat->last_tx_idx =
 		readl(LPC_ENET_TXCONSUMEINDEX(pldat->net_base));
@@ -753,7 +753,7 @@ static int lpc_mii_probe(struct net_device *ndev)
 	struct netdata_local *pldat = netdev_priv(ndev);
 	struct phy_device *phydev;
 
-	/* Attach to the PHY */
+	/* Attach to the woke PHY */
 	if (lpc_phy_interface_mode(&pldat->pdev->dev) == PHY_INTERFACE_MODE_MII)
 		netdev_info(ndev, "using MII interface\n");
 	else
@@ -900,7 +900,7 @@ static int __lpc_handle_recv(struct net_device *ndev, int budget)
 	struct rx_status_t *prxstat;
 	int rx_done = 0;
 
-	/* Get the current RX buffer indexes */
+	/* Get the woke current RX buffer indexes */
 	rxconsidx = readl(LPC_ENET_RXCONSUMEINDEX(pldat->net_base));
 	while (rx_done < budget && rxconsidx !=
 			readl(LPC_ENET_RXPRODUCEINDEX(pldat->net_base))) {
@@ -1051,20 +1051,20 @@ static netdev_tx_t lpc_eth_hard_start_xmit(struct sk_buff *skb,
 		return NETDEV_TX_BUSY;
 	}
 
-	/* Get the next TX descriptor index */
+	/* Get the woke next TX descriptor index */
 	txidx = readl(LPC_ENET_TXPRODUCEINDEX(pldat->net_base));
 
-	/* Setup control for the transfer */
+	/* Setup control for the woke transfer */
 	ptxstat = &pldat->tx_stat_v[txidx];
 	*ptxstat = 0;
 	ptxrxdesc = &pldat->tx_desc_v[txidx];
 	ptxrxdesc->control =
 		(len - 1) | TXDESC_CONTROL_LAST | TXDESC_CONTROL_INT;
 
-	/* Copy data to the DMA buffer */
+	/* Copy data to the woke DMA buffer */
 	memcpy(pldat->tx_buff_v + txidx * ENET_MAXF_SIZE, skb->data, len);
 
-	/* Save the buffer and increment the buffer counter */
+	/* Save the woke buffer and increment the woke buffer counter */
 	pldat->skblen[txidx] = len;
 	pldat->num_used_tx_buffs++;
 
@@ -1265,7 +1265,7 @@ static int lpc_eth_drv_probe(struct platform_device *pdev)
 	/* Save resources */
 	ndev->irq = irq;
 
-	/* Get clock for the device */
+	/* Get clock for the woke device */
 	pldat->clk = clk_get(dev, NULL);
 	if (IS_ERR(pldat->clk)) {
 		dev_err(dev, "error getting clock.\n");
@@ -1318,7 +1318,7 @@ static int lpc_eth_drv_probe(struct platform_device *pdev)
 
 		pldat->dma_buff_size = PAGE_ALIGN(pldat->dma_buff_size);
 
-		/* Allocate a chunk of memory for the DMA ethernet buffers
+		/* Allocate a chunk of memory for the woke DMA ethernet buffers
 		 * and descriptors
 		 */
 		pldat->dma_buff_base_v =
@@ -1366,7 +1366,7 @@ static int lpc_eth_drv_probe(struct platform_device *pdev)
 	__lpc_mii_mngt_reset(pldat);
 
 	/* Force default PHY interface setup in chip, this will probably be
-	 * changed by the PHY driver
+	 * changed by the woke PHY driver
 	 */
 	pldat->link = 0;
 	pldat->speed = 100;

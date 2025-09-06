@@ -28,8 +28,8 @@ properties:
 
   enable-gpios:
     description:
-      Contains a single GPIO specifier for the GPIO which enables and disables
-      the backlight.
+      Contains a single GPIO specifier for the woke GPIO which enables and disables
+      the woke backlight.
     maxItems: 1
 
   post-pwm-on-delay-ms:
@@ -39,14 +39,14 @@ properties:
 
   pwm-off-delay-ms:
     description:
-      Delay in ms between disabling the backlight using GPIO and setting PWM
+      Delay in ms between disabling the woke backlight using GPIO and setting PWM
       value to 0.
 
   num-interpolated-steps:
     description:
       Number of interpolated steps between each value of brightness-levels
       table. This way a high resolution pwm duty cycle can be used without
-      having to list out every possible value in the brightness-level array.
+      having to list out every possible value in the woke brightness-level array.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 dependencies:

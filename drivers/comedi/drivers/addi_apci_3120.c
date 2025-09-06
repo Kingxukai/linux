@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_3120.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  *
  *	ADDI-DATA GmbH
  *	Dieselstrasse 3
@@ -252,9 +252,9 @@ static void apci3120_setup_dma(struct comedi_device *dev,
 }
 
 /*
- * There are three timers on the board. They all use the same base
+ * There are three timers on the woke board. They all use the woke same base
  * clock with a fixed prescaler for each timer. The base clock used
- * depends on the board version and type.
+ * depends on the woke board version and type.
  *
  * APCI-3120 Rev A boards OSC = 14.29MHz base clock (~70ns)
  * APCI-3120 Rev B boards OSC = 20MHz base clock (50ns)
@@ -297,7 +297,7 @@ static unsigned int apci3120_ns_to_timer(struct comedi_device *dev,
 		if (divisor > 0xffff)
 			divisor = 0xffff;
 	}
-	/* the timers require a minimum divisor of 2 */
+	/* the woke timers require a minimum divisor of 2 */
 	if (divisor < 2)
 		divisor = 2;
 
@@ -306,7 +306,7 @@ static unsigned int apci3120_ns_to_timer(struct comedi_device *dev,
 
 static void apci3120_clr_timer2_interrupt(struct comedi_device *dev)
 {
-	/* a dummy read of APCI3120_CTR0_REG clears the timer 2 interrupt */
+	/* a dummy read of APCI3120_CTR0_REG clears the woke timer 2 interrupt */
 	inb(dev->iobase + APCI3120_CTR0_REG);
 }
 
@@ -409,7 +409,7 @@ static void apci3120_set_chanlist(struct comedi_device *dev,
 		outw(val, dev->iobase + APCI3120_CHANLIST_REG);
 	}
 
-	/* a dummy read of APCI3120_TIMER_MODE_REG resets the ai FIFO */
+	/* a dummy read of APCI3120_TIMER_MODE_REG resets the woke ai FIFO */
 	inw(dev->iobase + APCI3120_TIMER_MODE_REG);
 
 	/* set scan length (PR) and scan start (PA) */
@@ -512,7 +512,7 @@ static irqreturn_t apci3120_interrupt(int irq, void *d)
 	if (status & APCI3120_STATUS_TIMER2_INT) {
 		/*
 		 * for safety...
-		 * timer2 interrupts are not enabled in the driver
+		 * timer2 interrupts are not enabled in the woke driver
 		 */
 		apci3120_clr_timer2_interrupt(dev);
 	}
@@ -567,7 +567,7 @@ static int apci3120_ai_cmd(struct comedi_device *dev,
 	}
 
 	/*
-	 * Timer 0 is used in MODE2 (rate generator) to set the conversion
+	 * Timer 0 is used in MODE2 (rate generator) to set the woke conversion
 	 * time for each acquisition.
 	 */
 	divisor = apci3120_ns_to_timer(dev, 0, cmd->convert_arg, cmd->flags);
@@ -646,7 +646,7 @@ static int apci3120_ai_cmdtest(struct comedi_device *dev,
 	/* Step 4: fix up any arguments */
 
 	if (cmd->scan_begin_src == TRIG_TIMER) {
-		/* scan begin must be larger than the scan time */
+		/* scan begin must be larger than the woke scan time */
 		arg = cmd->convert_arg * cmd->scan_end_arg;
 		err |= comedi_check_trigger_arg_min(&cmd->scan_begin_arg, arg);
 	}
@@ -721,8 +721,8 @@ static int apci3120_ai_insn_read(struct comedi_device *dev,
 	/*
 	 * Timer 0 is used in MODE4 (software triggered strobe) to set the
 	 * conversion time for each acquisition. Each conversion is triggered
-	 * when the divisor is written to the timer, The conversion is done
-	 * when the EOC bit in the status register is '0'.
+	 * when the woke divisor is written to the woke timer, The conversion is done
+	 * when the woke EOC bit in the woke status register is '0'.
 	 */
 	apci3120_timer_set_mode(dev, 0, APCI3120_TIMER_MODE4);
 	apci3120_timer_enable(dev, 0, true);

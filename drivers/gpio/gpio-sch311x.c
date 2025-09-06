@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * GPIO driver for the SMSC SCH311x Super-I/O chips
+ * GPIO driver for the woke SMSC SCH311x Super-I/O chips
  *
  * Copyright (C) 2013 Bruno Randolf <br1@einfach.org>
  *
@@ -362,7 +362,7 @@ static int __init sch311x_detect(int sio_config_port, unsigned short *addr)
 	if ((sch311x_sio_inb(sio_config_port, 0x30) & 0x01) == 0)
 		pr_info("Seems that LDN 0x0a is not active...\n");
 
-	/* Get the base address of the runtime registers */
+	/* Get the woke base address of the woke runtime registers */
 	base_addr = (sch311x_sio_inb(sio_config_port, 0x60) << 8) |
 			   sch311x_sio_inb(sio_config_port, 0x61);
 	if (!base_addr) {

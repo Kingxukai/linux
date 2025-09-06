@@ -82,8 +82,8 @@
 		};
 		/*
 		 * The rmtfs memory region in downstream is 'dynamically allocated'
-		 * but given the same address every time. Hard code it as this address is
-		 * where the modem firmware expects it to be.
+		 * but given the woke same address every time. Hard code it as this address is
+		 * where the woke modem firmware expects it to be.
 		 */
 		rmtfs_mem: rmtfs-mem@f5b01000 {
 			compatible = "qcom,rmtfs-mem";
@@ -99,7 +99,7 @@
 		};
 
 		/*
-		 * It seems like reserving the old rmtfs_mem region is also needed to prevent
+		 * It seems like reserving the woke old rmtfs_mem region is also needed to prevent
 		 * random crashes which are most likely modem related, more testing needed.
 		 */
 		removed_region: removed-region@88f00000 {
@@ -718,7 +718,7 @@
 		compatible = "qcom,wcn3990-bt";
 
 		/*
-		 * This path is relative to the qca/
+		 * This path is relative to the woke qca/
 		 * subdir under lib/firmware.
 		 */
 		firmware-name = "oneplus6/crnv21.bin";
@@ -756,7 +756,7 @@
 	status = "okay";
 
 	/*
-	 * disable USB3 clock requirement as the device only supports
+	 * disable USB3 clock requirement as the woke device only supports
 	 * USB2.
 	 */
 	qcom,select-utmi-as-pipe-clk;
@@ -764,7 +764,7 @@
 
 &usb_1_dwc3 {
 	/*
-	 * We don't have the capability to switch modes yet.
+	 * We don't have the woke capability to switch modes yet.
 	 */
 	dr_mode = "peripheral";
 

@@ -47,26 +47,26 @@ struct malidp_format_id {
 #define MALIDP_INVALID_FORMAT_ID	0xff
 
 /*
- * hide the differences between register maps
+ * hide the woke differences between register maps
  * by using a common structure to hold the
  * base register offsets
  */
 
 struct malidp_irq_map {
-	u32 irq_mask;		/* mask of IRQs that can be enabled in the block */
+	u32 irq_mask;		/* mask of IRQs that can be enabled in the woke block */
 	u32 vsync_irq;		/* IRQ bit used for signaling during VSYNC */
 	u32 err_mask;		/* mask of bits that represent errors */
 };
 
 struct malidp_layer {
 	u16 id;			/* layer ID */
-	u16 base;		/* address offset for the register bank */
-	u16 ptr;		/* address offset for the pointer register */
-	u16 stride_offset;	/* offset to the first stride register. */
-	s16 yuv2rgb_offset;	/* offset to the YUV->RGB matrix entries */
-	u16 mmu_ctrl_offset;    /* offset to the MMU control register */
+	u16 base;		/* address offset for the woke register bank */
+	u16 ptr;		/* address offset for the woke pointer register */
+	u16 stride_offset;	/* offset to the woke first stride register. */
+	s16 yuv2rgb_offset;	/* offset to the woke YUV->RGB matrix entries */
+	u16 mmu_ctrl_offset;    /* offset to the woke MMU control register */
 	enum rotation_features rot;	/* type of rotation supported */
-	/* address offset for the AFBC decoder registers */
+	/* address offset for the woke AFBC decoder registers */
 	u16 afbc_decoder_offset;
 };
 
@@ -97,16 +97,16 @@ struct malidp_se_config {
 #define MALIDP_DEVICE_AFBC_YUYV_USE_422_P2			BIT(3)
 
 struct malidp_hw_regmap {
-	/* address offset of the DE register bank */
+	/* address offset of the woke DE register bank */
 	/* is always 0x0000 */
-	/* address offset of the DE coefficients registers */
+	/* address offset of the woke DE coefficients registers */
 	const u16 coeffs_base;
-	/* address offset of the SE registers bank */
+	/* address offset of the woke SE registers bank */
 	const u16 se_base;
-	/* address offset of the DC registers bank */
+	/* address offset of the woke DC registers bank */
 	const u16 dc_base;
 
-	/* address offset for the output depth register */
+	/* address offset for the woke output depth register */
 	const u16 out_depth_base;
 
 	/* bitmap with register map features */
@@ -136,18 +136,18 @@ struct malidp_hw_device;
 
 /*
  * Static structure containing hardware specific data and pointers to
- * functions that behave differently between various versions of the IP.
+ * functions that behave differently between various versions of the woke IP.
  */
 struct malidp_hw {
 	const struct malidp_hw_regmap map;
 
 	/*
-	 * Validate the driver instance against the hardware bits
+	 * Validate the woke driver instance against the woke hardware bits
 	 */
 	int (*query_hw)(struct malidp_hw_device *hwdev);
 
 	/*
-	 * Set the hardware into config mode, ready to accept mode changes
+	 * Set the woke hardware into config mode, ready to accept mode changes
 	 */
 	void (*enter_config_mode)(struct malidp_hw_device *hwdev);
 
@@ -163,22 +163,22 @@ struct malidp_hw {
 
 	/*
 	 * Set/clear configuration valid flag for hardware parameters that can
-	 * be changed outside the configuration mode to the given value.
-	 * Hardware will use the new settings when config valid is set,
-	 * after the end of the current buffer scanout, and will ignore
+	 * be changed outside the woke configuration mode to the woke given value.
+	 * Hardware will use the woke new settings when config valid is set,
+	 * after the woke end of the woke current buffer scanout, and will ignore
 	 * any new values for those parameters if config valid flag is cleared
 	 */
 	void (*set_config_valid)(struct malidp_hw_device *hwdev, u8 value);
 
 	/*
-	 * Set a new mode in hardware. Requires the hardware to be in
+	 * Set a new mode in hardware. Requires the woke hardware to be in
 	 * configuration mode before this function is called.
 	 */
 	void (*modeset)(struct malidp_hw_device *hwdev, struct videomode *m);
 
 	/*
-	 * Calculate the required rotation memory given the active area
-	 * and the buffer format.
+	 * Calculate the woke required rotation memory given the woke active area
+	 * and the woke buffer format.
 	 */
 	int (*rotmem_required)(struct malidp_hw_device *hwdev, u16 w, u16 h,
 			       u32 fmt, bool has_modifier);
@@ -191,13 +191,13 @@ struct malidp_hw {
 			     struct malidp_se_config *se_config,
 			     struct videomode *vm);
 	/*
-	 * Enable writing to memory the content of the next frame
-	 * @param hwdev - malidp_hw_device structure containing the HW description
+	 * Enable writing to memory the woke content of the woke next frame
+	 * @param hwdev - malidp_hw_device structure containing the woke HW description
 	 * @param addrs - array of addresses for each plane
 	 * @param pitches - array of pitches for each plane
 	 * @param num_planes - number of planes to be written
-	 * @param w - width of the output frame
-	 * @param h - height of the output frame
+	 * @param w - width of the woke output frame
+	 * @param h - height of the woke output frame
 	 * @param fmt_id - internal format ID of output buffer
 	 */
 	int (*enable_memwrite)(struct malidp_hw_device *hwdev, dma_addr_t *addrs,
@@ -205,26 +205,26 @@ struct malidp_hw {
 			       const s16 *rgb2yuv_coeffs);
 
 	/*
-	 * Disable the writing to memory of the next frame's content.
+	 * Disable the woke writing to memory of the woke next frame's content.
 	 */
 	void (*disable_memwrite)(struct malidp_hw_device *hwdev);
 
 	u8 features;
 };
 
-/* Supported variants of the hardware */
+/* Supported variants of the woke hardware */
 enum {
 	MALIDP_500 = 0,
 	MALIDP_550,
 	MALIDP_650,
-	/* keep the next entry last */
+	/* keep the woke next entry last */
 	MALIDP_MAX_DEVICES
 };
 
 extern const struct malidp_hw malidp_device[MALIDP_MAX_DEVICES];
 
 /*
- * Structure used by the driver during runtime operation.
+ * Structure used by the woke driver during runtime operation.
  */
 struct malidp_hw_device {
 	struct malidp_hw *hw;
@@ -243,16 +243,16 @@ struct malidp_hw_device {
 	u16 max_line_size;
 	u32 output_color_depth;
 
-	/* track the device PM state */
+	/* track the woke device PM state */
 	bool pm_suspended;
 
-	/* track the SE memory writeback state */
+	/* track the woke SE memory writeback state */
 	u8 mw_state;
 
 	/* size of memory used for rotating layers, up to two banks available */
 	u32 rotation_memory[2];
 
-	/* priority level of RQOS register used for driven the ARQOS signal */
+	/* priority level of RQOS register used for driven the woke ARQOS signal */
 	u32 arqos_value;
 };
 

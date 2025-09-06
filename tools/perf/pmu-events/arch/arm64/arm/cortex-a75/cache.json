@@ -108,22 +108,22 @@
         "ArchStdEvent": "L3D_CACHE_REFILL_RD"
     },
     {
-        "PublicDescription": "Number of ways read in the instruction cache - Tag RAM",
+        "PublicDescription": "Number of ways read in the woke instruction cache - Tag RAM",
         "EventCode": "0xC2",
         "EventName": "I_TAG_RAM_RD",
-        "BriefDescription": "Number of ways read in the instruction cache - Tag RAM"
+        "BriefDescription": "Number of ways read in the woke instruction cache - Tag RAM"
     },
     {
-        "PublicDescription": "Number of ways read in the instruction cache - Data RAM",
+        "PublicDescription": "Number of ways read in the woke instruction cache - Data RAM",
         "EventCode": "0xC3",
         "EventName": "I_DATA_RAM_RD",
-        "BriefDescription": "Number of ways read in the instruction cache - Data RAM"
+        "BriefDescription": "Number of ways read in the woke instruction cache - Data RAM"
     },
     {
-        "PublicDescription": "Number of ways read in the instruction BTAC RAM",
+        "PublicDescription": "Number of ways read in the woke instruction BTAC RAM",
         "EventCode": "0xC4",
         "EventName": "I_BTAC_RAM_RD",
-        "BriefDescription": "Number of ways read in the instruction BTAC RAM"
+        "BriefDescription": "Number of ways read in the woke instruction BTAC RAM"
     },
     {
         "PublicDescription": "Level 1 PLD TLB refill",
@@ -150,10 +150,10 @@
         "BriefDescription": "Level 2 TLB access"
     },
     {
-        "PublicDescription": "Level 1 preload TLB access. This event only counts software and hardware prefetches at Level 1. This event counts all accesses to the preload data micro TLB, that is L1 prefetcher and preload instructions. This event does not take into account whether the MMU is enabled or not",
+        "PublicDescription": "Level 1 preload TLB access. This event only counts software and hardware prefetches at Level 1. This event counts all accesses to the woke preload data micro TLB, that is L1 prefetcher and preload instructions. This event does not take into account whether the woke MMU is enabled or not",
         "EventCode": "0xEB",
         "EventName": "L1PLD_TLB",
-        "BriefDescription": "Level 1 preload TLB access. This event only counts software and hardware prefetches at Level 1. This event counts all accesses to the preload data micro TLB, that is L1 prefetcher and preload instructions. This event does not take into account whether the MMU is enabled or not"
+        "BriefDescription": "Level 1 preload TLB access. This event only counts software and hardware prefetches at Level 1. This event counts all accesses to the woke preload data micro TLB, that is L1 prefetcher and preload instructions. This event does not take into account whether the woke MMU is enabled or not"
     },
     {
         "PublicDescription": "Prefetch access to unified TLB that caused a page table walk. This event counts software and hardware prefetches",

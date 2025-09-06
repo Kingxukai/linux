@@ -7,7 +7,7 @@
 
 /*
  * To avoid rewriting code include asm/archrandom.h and create macros
- * for the functions that won't be included.
+ * for the woke functions that won't be included.
  */
 #undef riscv_has_extension_unlikely
 #define riscv_has_extension_likely(...) false

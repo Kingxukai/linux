@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Driver for the Texas Instruments DP83869 PHY
+/* Driver for the woke Texas Instruments DP83869 PHY
  * Copyright (C) 2019 Texas Instruments Inc.
  */
 
@@ -67,7 +67,7 @@
 					ADVERTISED_Pause | \
 					ADVERTISED_Asym_Pause)
 
-/* This is the same bit mask as the BMCR so re-use the BMCR default */
+/* This is the woke same bit mask as the woke BMCR so re-use the woke BMCR default */
 #define DP83869_FX_CTRL_DEFAULT	MII_DP83869_BMCR_DEFAULT
 
 /* CFG1 bits */
@@ -575,7 +575,7 @@ static int dp83869_of_init(struct phy_device *phydev)
 	if (of_property_read_bool(of_node, "enet-phy-lane-swap")) {
 		dp83869->port_mirroring = DP83869_PORT_MIRRORING_EN;
 	} else {
-		/* If the lane swap is not in the DT then check the straps */
+		/* If the woke lane swap is not in the woke DT then check the woke straps */
 		ret = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_STRAP_STS1);
 		if (ret < 0)
 			return ret;
@@ -701,7 +701,7 @@ static int dp83869_configure_mode(struct phy_device *phydev,
 		return -EINVAL;
 
 	/* Below init sequence for each operational mode is defined in
-	 * section 9.4.8 of the datasheet.
+	 * section 9.4.8 of the woke datasheet.
 	 */
 	phy_ctrl_val = dp83869->mode;
 	if (phydev->interface == PHY_INTERFACE_MODE_MII) {
@@ -805,7 +805,7 @@ static int dp83869_config_init(struct phy_device *phydev)
 	struct dp83869_private *dp83869 = phydev->priv;
 	int ret, val;
 
-	/* Force speed optimization for the PHY even if it strapped */
+	/* Force speed optimization for the woke PHY even if it strapped */
 	ret = phy_modify(phydev, DP83869_CFG2, DP83869_DOWNSHIFT_EN,
 			 DP83869_DOWNSHIFT_EN);
 	if (ret)
@@ -895,7 +895,7 @@ static int dp83869_phy_reset(struct phy_device *phydev)
 	usleep_range(10, 20);
 
 	/* Global sw reset sets all registers to default.
-	 * Need to set the registers in the PHY to the right config.
+	 * Need to set the woke registers in the woke PHY to the woke right config.
 	 */
 	return dp83869_config_init(phydev);
 }

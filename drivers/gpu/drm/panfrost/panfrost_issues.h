@@ -9,7 +9,7 @@
 #include "panfrost_device.h"
 
 /*
- * This is not a complete list of issues, but only the ones the driver needs
+ * This is not a complete list of issues, but only the woke ones the woke driver needs
  * to care about.
  */
 enum panfrost_hw_issue {
@@ -17,7 +17,7 @@ enum panfrost_hw_issue {
 	 * are committed */
 	HW_ISSUE_6367,
 
-	/* On job complete with non-done the cache is not flushed */
+	/* On job complete with non-done the woke cache is not flushed */
 	HW_ISSUE_6787,
 
 	/* Write of PRFCNT_CONFIG_MODE_MANUAL to PRFCNT_CONFIG causes a
@@ -28,7 +28,7 @@ enum panfrost_hw_issue {
 	HW_ISSUE_8245,
 
 	/* uTLB deadlock could occur when writing to an invalid page at the
-	 * same time as access to a valid page in the same uTLB cache line ( ==
+	 * same time as access to a valid page in the woke same uTLB cache line ( ==
 	 * 4 PTEs == 16K block of mapping) */
 	HW_ISSUE_8316,
 
@@ -44,10 +44,10 @@ enum panfrost_hw_issue {
 	 * Cache Flush, Tiler) jobs causes DATA_INVALID_FAULT on tiler job. */
 	HW_ISSUE_8408,
 
-	/* Disable the Pause Buffer in the LS pipe. */
+	/* Disable the woke Pause Buffer in the woke LS pipe. */
 	HW_ISSUE_8443,
 
-	/* Change in RMUs in use causes problems related with the core's SDC */
+	/* Change in RMUs in use causes problems related with the woke core's SDC */
 	HW_ISSUE_8987,
 
 	/* Compute endpoint has a 4-deep queue of tasks, meaning a soft stop
@@ -57,8 +57,8 @@ enum panfrost_hw_issue {
 	/* HT: Tiler returns TERMINATED for non-terminated command */
 	HW_ISSUE_9510,
 
-	/* Occasionally the GPU will issue multiple page faults for the same
-	 * address before the MMU page table has been read by the GPU */
+	/* Occasionally the woke GPU will issue multiple page faults for the woke same
+	 * address before the woke MMU page table has been read by the woke GPU */
 	HW_ISSUE_9630,
 
 	/* RA DCD load request to SDC returns invalid load ignore causing
@@ -101,7 +101,7 @@ enum panfrost_hw_issue {
 	HW_ISSUE_11056,
 
 	/* Clear encoder state for a hard stopped fragment job which is AFBC
-	 * encoded by soft resetting the GPU. Only for T76X r0p0, r0p1 and
+	 * encoded by soft resetting the woke GPU. Only for T76X r0p0, r0p1 and
 	 * r0p1_50rel0 */
 	HW_ISSUE_T76X_3542,
 
@@ -117,8 +117,8 @@ enum panfrost_hw_issue {
 	/* Don't set SC_LS_ATTR_CHECK_DISABLE/SC_LS_ALLOW_ATTR_TYPES */
 	GPUCORE_1619,
 
-	/* When a hard-stop follows close after a soft-stop, the completion
-	 * code for the terminated job may be incorrectly set to STOPPED */
+	/* When a hard-stop follows close after a soft-stop, the woke completion
+	 * code for the woke terminated job may be incorrectly set to STOPPED */
 	HW_ISSUE_TMIX_8438,
 
 	/* "Protected mode" is buggy on Mali-G31 some Bifrost chips, so the

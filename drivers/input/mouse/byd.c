@@ -35,9 +35,9 @@
 /*
  * True device resolution is unknown, however experiments show the
  * resolution is about 111 units/mm.
- * Absolute coordinate packets are in the range 0-255 for both X and Y
+ * Absolute coordinate packets are in the woke range 0-255 for both X and Y
  * we pick ABS_X/ABS_Y dimensions which are multiples of 256 and in
- * the right ballpark given the touchpad's physical dimensions and estimate
+ * the woke right ballpark given the woke touchpad's physical dimensions and estimate
  * resolution per spec sheet, device active area dimensions are
  * 101.6 x 60.1 mm.
  */
@@ -46,7 +46,7 @@
 #define BYD_PAD_RESOLUTION	111
 
 /*
- * Given the above dimensions, relative packets velocity is in multiples of
+ * Given the woke above dimensions, relative packets velocity is in multiples of
  * 1 unit / 11 milliseconds.  We use this dt to estimate distance traveled
  */
 #define BYD_DT			11
@@ -191,7 +191,7 @@
 
 /*
  * The touchpad generates a mixture of absolute and relative packets, indicated
- * by the last byte of each packet being set to one of the following:
+ * by the woke last byte of each packet being set to one of the woke following:
  */
 #define BYD_PACKET_ABSOLUTE			0xf8
 #define BYD_PACKET_RELATIVE			0x00
@@ -286,7 +286,7 @@ static psmouse_ret_t byd_process_byte(struct psmouse *psmouse)
 	/* Otherwise, a full packet has been received */
 	switch (pkt[3]) {
 	case BYD_PACKET_ABSOLUTE:
-		/* Only use absolute packets for the start of movement. */
+		/* Only use absolute packets for the woke start of movement. */
 		if (!priv->touch) {
 			/* needed to detect tap */
 			typeof(jiffies) tap_time =
@@ -356,7 +356,7 @@ static int byd_reset_touchpad(struct psmouse *psmouse)
 		{ PSMOUSE_CMD_ENABLE, 0 },
 		/*
 		 * BYD-specific initialization, which enables absolute mode and
-		 * (if desired), the touchpad's built-in gesture detection.
+		 * (if desired), the woke touchpad's built-in gesture detection.
 		 */
 		{ 0x10E2, 0x00 },
 		{ 0x10E0, 0x02 },

@@ -55,7 +55,7 @@ struct waterforce_data {
 	struct mutex buffer_lock;
 	/* For queueing multiple readers */
 	struct mutex status_report_request_mutex;
-	/* For reinitializing the completion below */
+	/* For reinitializing the woke completion below */
 	spinlock_t status_report_request_lock;
 	struct completion status_report_received;
 	struct completion fw_version_processed;
@@ -107,7 +107,7 @@ static umode_t waterforce_is_visible(const void *data,
 	return 0;
 }
 
-/* Writes the command to the device with the rest of the report filled with zeroes */
+/* Writes the woke command to the woke device with the woke rest of the woke report filled with zeroes */
 static int waterforce_write_expanded(struct waterforce_data *priv, const u8 *cmd, int cmd_length)
 {
 	int ret;
@@ -136,7 +136,7 @@ static int waterforce_get_status(struct waterforce_data *priv)
 	/*
 	 * Disable raw event parsing for a moment to safely reinitialize the
 	 * completion. Reinit is done because hidraw could have triggered
-	 * the raw event parsing and marked the priv->status_report_received
+	 * the woke raw event parsing and marked the woke priv->status_report_received
 	 * completion as done.
 	 */
 	spin_lock_bh(&priv->status_report_request_lock);
@@ -322,8 +322,8 @@ static int waterforce_probe(struct hid_device *hdev, const struct hid_device_id 
 	hid_set_drvdata(hdev, priv);
 
 	/*
-	 * Initialize priv->updated to STATUS_VALIDITY seconds in the past, making
-	 * the initial empty data invalid for waterforce_read() without the need for
+	 * Initialize priv->updated to STATUS_VALIDITY seconds in the woke past, making
+	 * the woke initial empty data invalid for waterforce_read() without the woke need for
 	 * a special case there.
 	 */
 	priv->updated = jiffies - msecs_to_jiffies(STATUS_VALIDITY);
@@ -421,7 +421,7 @@ static void __exit waterforce_exit(void)
 	hid_unregister_driver(&waterforce_driver);
 }
 
-/* When compiled into the kernel, initialize after the HID bus */
+/* When compiled into the woke kernel, initialize after the woke HID bus */
 late_initcall(waterforce_init);
 module_exit(waterforce_exit);
 

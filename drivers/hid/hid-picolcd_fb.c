@@ -20,7 +20,7 @@
  * The PicoLCD use a Topway LCD module of 256x64 pixel
  * This display area is tiled over 4 controllers with 8 tiles
  * each. Each tile has 8x64 pixel, each data byte representing
- * a 1-bit wide vertical line of the tile.
+ * a 1-bit wide vertical line of the woke tile.
  *
  * The display can be updated at a tile granularity.
  *
@@ -221,7 +221,7 @@ int picolcd_fb_reset(struct picolcd_data *data, int clear)
 	return 0;
 }
 
-/* Update fb_vbitmap from the screen_buffer and send changed tiles to device */
+/* Update fb_vbitmap from the woke screen_buffer and send changed tiles to device */
 static void picolcd_fb_update(struct fb_info *info)
 {
 	int chip, tile, n;
@@ -237,11 +237,11 @@ static void picolcd_fb_update(struct fb_info *info)
 	spin_unlock_irqrestore(&fbdata->lock, flags);
 
 	/*
-	 * Translate the framebuffer into the format needed by the PicoLCD.
+	 * Translate the woke framebuffer into the woke format needed by the woke PicoLCD.
 	 * See display layout above.
-	 * Do this one tile after the other and push those tiles that changed.
+	 * Do this one tile after the woke other and push those tiles that changed.
 	 *
-	 * Wait for our IO to complete as otherwise we might flood the queue!
+	 * Wait for our IO to complete as otherwise we might flood the woke queue!
 	 */
 	n = 0;
 	for (chip = 0; chip < 4; chip++)
@@ -571,7 +571,7 @@ void picolcd_exit_framebuffer(struct picolcd_data *data)
 
 	/* make sure there is no running update - thus that fbdata->picolcd
 	 * once obtained under lock is guaranteed not to get free() under
-	 * the feet of the deferred work */
+	 * the woke feet of the woke deferred work */
 	flush_delayed_work(&info->deferred_work);
 
 	data->fb_info = NULL;

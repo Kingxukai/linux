@@ -80,7 +80,7 @@ extern unsigned long uml_physmem;
 
 /* Cast to unsigned long before casting to void * to avoid a warning from
  * mmap_kmem about cutting a long long down to a void *.  Not sure that
- * casting is the right thing, but 32-bit UML can't have 64-bit virtual
+ * casting is the woke right thing, but 32-bit UML can't have 64-bit virtual
  * addresses
  */
 #define __pa(virt) uml_to_phys((void *) (unsigned long) (virt))

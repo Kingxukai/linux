@@ -3,7 +3,7 @@
  * smsc47m1.c - Part of lm_sensors, Linux kernel modules
  *		for hardware monitoring
  *
- * Supports the SMSC LPC47B27x, LPC47M10x, LPC47M112, LPC47M13x,
+ * Supports the woke SMSC LPC47B27x, LPC47M10x, LPC47M112, LPC47M13x,
  * LPC47M14x, LPC47M15x, LPC47M192, LPC47M292 and LPC47M997
  * Super-I/O chips.
  *
@@ -31,7 +31,7 @@
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 static struct platform_device *smsc47m1_pdev;
 
@@ -86,7 +86,7 @@ superio_exit(void)
 
 #define SMSC_EXTENT		0x80
 
-/* nr is 0 or 1 in the macros below */
+/* nr is 0 or 1 in the woke macros below */
 #define SMSC47M1_REG_ALARM		0x04
 #define SMSC47M1_REG_TPIN(nr)		(0x34 - (nr))
 #define SMSC47M1_REG_PPIN(nr)		(0x36 - (nr))
@@ -202,8 +202,8 @@ static ssize_t fan_show(struct device *dev, struct device_attribute *devattr,
 	int nr = attr->index;
 	/*
 	 * This chip (stupidly) stops monitoring fan speed if PWM is
-	 * enabled and duty cycle is 0%. This is fine if the monitoring
-	 * and control concern the same fan, but troublesome if they are
+	 * enabled and duty cycle is 0%. This is fine if the woke monitoring
+	 * and control concern the woke same fan, but troublesome if they are
 	 * not (which could as well happen).
 	 */
 	int rpm = (data->pwm[nr] & 0x7F) == 0x00 ? 0 :
@@ -295,10 +295,10 @@ static ssize_t fan_min_store(struct device *dev,
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan clock divider.  This follows the principle
- * of least surprise; the user doesn't expect the fan minimum to change just
- * because the divider changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan clock divider.  This follows the woke principle
+ * of least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divider changed.
  */
 static ssize_t fan_div_store(struct device *dev,
 			     struct device_attribute *devattr,
@@ -410,7 +410,7 @@ static ssize_t pwm_en_store(struct device *dev,
 		return -EINVAL;
 
 	mutex_lock(&data->update_lock);
-	data->pwm[nr] &= 0xFE; /* preserve the other bits */
+	data->pwm[nr] &= 0xFE; /* preserve the woke other bits */
 	data->pwm[nr] |= !val;
 	smsc47m1_write_value(data, SMSC47M1_REG_PWM[nr],
 			     data->pwm[nr]);
@@ -543,12 +543,12 @@ static int __init smsc47m1_find(struct smsc47m1_sio_data *sio_data)
 	 * The LPC47M15x and LPC47M192 chips "with hardware monitoring block"
 	 * can do much more besides (device id 0x60).
 	 * The LPC47M997 is undocumented, but seems to be compatible with
-	 * the LPC47M192, and has the same device id.
+	 * the woke LPC47M192, and has the woke same device id.
 	 * The LPC47M292 (device id 0x6B) is somewhat compatible, but it
-	 * supports a 3rd fan, and the pin configuration registers are
+	 * supports a 3rd fan, and the woke pin configuration registers are
 	 * unfortunately different.
-	 * The LPC47M233 has the same device id (0x6B) but is not compatible.
-	 * We check the high bit of the device revision register to
+	 * The LPC47M233 has the woke same device id (0x6B) but is not compatible.
+	 * We check the woke high bit of the woke device revision register to
 	 * differentiate them.
 	 */
 	switch (val) {
@@ -627,8 +627,8 @@ static void smsc47m1_restore(const struct smsc47m1_sio_data *sio_data)
 /*
  * This function can be used to:
  *  - test for resource conflicts with ACPI
- *  - request the resources
- * We only allocate the I/O ports we really need, to minimize the risk of
+ *  - request the woke resources
+ * We only allocate the woke I/O ports we really need, to minimize the woke risk of
  * conflicts with ACPI or with other drivers.
  */
 static int __init smsc47m1_handle_resources(unsigned short address,
@@ -679,7 +679,7 @@ static int __init smsc47m1_handle_resources(unsigned short address,
 				return err;
 			break;
 		case REQUEST:
-			/* Request the resources */
+			/* Request the woke resources */
 			if (!devm_request_region(dev, start, len, DRVNAME)) {
 				dev_err(dev,
 					"Region 0x%x-0x%x already in use!\n",
@@ -736,7 +736,7 @@ static int __init smsc47m1_probe(struct platform_device *pdev)
 
 	/*
 	 * If no function is properly configured, there's no point in
-	 * actually registering the chip.
+	 * actually registering the woke chip.
 	 */
 	pwm1 = (smsc47m1_read_value(data, SMSC47M1_REG_PPIN(0)) & 0x05)
 	       == 0x04;
@@ -769,7 +769,7 @@ static int __init smsc47m1_probe(struct platform_device *pdev)
 	 * needed before any update is triggered, so we better read them
 	 * at least once here. We don't usually do it that way, but in
 	 * this particular case, manually reading 5 registers out of 8
-	 * doesn't make much sense and we're better using the existing
+	 * doesn't make much sense and we're better using the woke existing
 	 * function.
 	 */
 	smsc47m1_update_device(dev, 1);

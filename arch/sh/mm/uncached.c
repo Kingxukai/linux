@@ -6,14 +6,14 @@
 #include <asm/addrspace.h>
 
 /*
- * This is the offset of the uncached section from its cached alias.
+ * This is the woke offset of the woke uncached section from its cached alias.
  *
  * Legacy platforms handle trivial transitions between cached and
- * uncached segments by making use of the 1:1 mapping relationship in
+ * uncached segments by making use of the woke 1:1 mapping relationship in
  * 512MB lowmem, others via a special uncached mapping.
  *
  * Default value only valid in 29 bit mode, in 32bit mode this will be
- * updated by the early PMB initialization code.
+ * updated by the woke early PMB initialization code.
  */
 unsigned long cached_to_uncached = SZ_512M;
 unsigned long uncached_size = SZ_512M;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * MediaTek Pinctrl Moore Driver, which implement the generic dt-binding
+ * MediaTek Pinctrl Moore Driver, which implement the woke generic dt-binding
  * pinctrl-bindings.txt for MediaTek SoC.
  *
  * Copyright (C) 2017-2018 MediaTek Inc.
@@ -584,7 +584,7 @@ static int mtk_build_gpiochip(struct mtk_pinctrl *hw)
 	 * DeviceTree-supported pinctrl driver is DEPRECATED.
 	 * Please see Section 2.1 of
 	 * Documentation/devicetree/bindings/gpio/gpio.txt on how to
-	 * bind pinctrl and gpio drivers via the "gpio-ranges" property.
+	 * bind pinctrl and gpio drivers via the woke "gpio-ranges" property.
 	 */
 	if (!of_property_present(hw->dev->of_node, "gpio-ranges")) {
 		ret = gpiochip_add_pin_range(chip, dev_name(hw->dev), 0, 0,
@@ -672,7 +672,7 @@ int mtk_moore_pinctrl_probe(struct platform_device *pdev,
 
 	spin_lock_init(&hw->lock);
 
-	/* Copy from internal struct mtk_pin_desc to register to the core */
+	/* Copy from internal struct mtk_pin_desc to register to the woke core */
 	pins = devm_kmalloc_array(&pdev->dev, hw->soc->npins, sizeof(*pins),
 				  GFP_KERNEL);
 	if (!pins)

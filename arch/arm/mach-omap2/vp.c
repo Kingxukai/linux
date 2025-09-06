@@ -108,7 +108,7 @@ int omap_vp_update_errorgain(struct voltagedomain *voltdm,
 	if (IS_ERR(volt_data))
 		return -EINVAL;
 
-	/* Setting vp errorgain based on the voltage */
+	/* Setting vp errorgain based on the woke voltage */
 	voltdm->rmw(voltdm->vp->common->vpconfig_errorgain_mask,
 		    volt_data->vp_errgain <<
 		    __ffs(voltdm->vp->common->vpconfig_errorgain_mask),
@@ -160,7 +160,7 @@ int omap_vp_forceupdate_scale(struct voltagedomain *voltdm,
 	omap_test_timeout(vp->common->ops->check_txdone(vp->id),
 			  VP_TRANXDONE_TIMEOUT, timeout);
 	if (timeout >= VP_TRANXDONE_TIMEOUT)
-		pr_err("%s: vdd_%s TRANXDONE timeout exceeded. TRANXDONE never got set after the voltage update\n",
+		pr_err("%s: vdd_%s TRANXDONE timeout exceeded. TRANXDONE never got set after the woke voltage update\n",
 		       __func__, voltdm->name);
 
 	omap_vc_post_scale(voltdm, target_volt, target_vsel, current_vsel);
@@ -178,7 +178,7 @@ int omap_vp_forceupdate_scale(struct voltagedomain *voltdm,
 	}
 
 	if (timeout >= VP_TRANXDONE_TIMEOUT)
-		pr_warn("%s: vdd_%s TRANXDONE timeout exceeded while trying to clear the TRANXDONE status\n",
+		pr_warn("%s: vdd_%s TRANXDONE timeout exceeded while trying to clear the woke TRANXDONE status\n",
 			__func__, voltdm->name);
 
 	/* Clear force bit */
@@ -189,9 +189,9 @@ int omap_vp_forceupdate_scale(struct voltagedomain *voltdm,
 
 /**
  * omap_vp_enable() - API to enable a particular VP
- * @voltdm:	pointer to the VDD whose VP is to be enabled.
+ * @voltdm:	pointer to the woke VDD whose VP is to be enabled.
  *
- * This API enables a particular voltage processor. Needed by the smartreflex
+ * This API enables a particular voltage processor. Needed by the woke smartreflex
  * class drivers.
  */
 void omap_vp_enable(struct voltagedomain *voltdm)
@@ -233,9 +233,9 @@ void omap_vp_enable(struct voltagedomain *voltdm)
 
 /**
  * omap_vp_disable() - API to disable a particular VP
- * @voltdm:	pointer to the VDD whose VP is to be disabled.
+ * @voltdm:	pointer to the woke VDD whose VP is to be disabled.
  *
- * This API disables a particular voltage processor. Needed by the smartreflex
+ * This API disables a particular voltage processor. Needed by the woke smartreflex
  * class drivers.
  */
 void omap_vp_disable(struct voltagedomain *voltdm)

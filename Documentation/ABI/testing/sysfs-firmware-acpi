@@ -5,63 +5,63 @@ Description:
 		ACPI Firmware Performance Data Table (FPDT) provides
 		information for firmware performance data for system boot,
 		S3 suspend and S3 resume. This sysfs entry contains the
-		performance data retrieved from the FPDT.
+		performance data retrieved from the woke FPDT.
 
 		boot:
-			firmware_start_ns: Timer value logged at the beginning
+			firmware_start_ns: Timer value logged at the woke beginning
 				of firmware image execution. In nanoseconds.
 			bootloader_load_ns: Timer value logged just prior to
-				loading the OS boot loader into memory.
+				loading the woke OS boot loader into memory.
 				In nanoseconds.
 			bootloader_launch_ns: Timer value logged just prior to
-				launching the currently loaded OS boot loader
+				launching the woke currently loaded OS boot loader
 				image. In nanoseconds.
 			exitbootservice_start_ns: Timer value logged at the
-				point when the OS loader calls the
+				point when the woke OS loader calls the
 				ExitBootServices function for UEFI compatible
 				firmware. In nanoseconds.
-			exitbootservice_end_ns: Timer value logged at the point
-				just prior to the OS loader gaining control
-				back from the ExitBootServices function for
+			exitbootservice_end_ns: Timer value logged at the woke point
+				just prior to the woke OS loader gaining control
+				back from the woke ExitBootServices function for
 				UEFI compatible firmware. In nanoseconds.
 		suspend:
-			suspend_start_ns: Timer value recorded at the previous
+			suspend_start_ns: Timer value recorded at the woke previous
 				OS write to SLP_TYP upon entry to S3. In
 				nanoseconds.
-			suspend_end_ns: Timer value recorded at the previous
+			suspend_end_ns: Timer value recorded at the woke previous
 				firmware write to SLP_TYP used to trigger
 				hardware entry to S3. In nanoseconds.
 		resume:
-			resume_count: A count of the number of S3 resume cycles
-				since the last full boot sequence.
+			resume_count: A count of the woke number of S3 resume cycles
+				since the woke last full boot sequence.
 			resume_avg_ns: Average timer value of all resume cycles
-				logged since the last full boot sequence,
-				including the most recent resume. In nanoseconds.
-			resume_prev_ns: Timer recorded at the end of the previous
+				logged since the woke last full boot sequence,
+				including the woke most recent resume. In nanoseconds.
+			resume_prev_ns: Timer recorded at the woke end of the woke previous
 				platform runtime firmware S3 resume, just prior to
-				handoff to the OS waking vector. In nanoseconds.
+				handoff to the woke OS waking vector. In nanoseconds.
 
 What:		/sys/firmware/acpi/bgrt/
 Date:		January 2012
 Contact:	Matthew Garrett <mjg@redhat.com>
 Description:
-		The BGRT is an ACPI 5.0 feature that allows the OS
-		to obtain a copy of the firmware boot splash and
+		The BGRT is an ACPI 5.0 feature that allows the woke OS
+		to obtain a copy of the woke firmware boot splash and
 		some associated metadata. This is intended to be used
 		by boot splash applications in order to interact with
 		the firmware boot splash in order to avoid jarring
 		transitions.
 
 		image: The image bitmap. Currently a 32-bit BMP.
-		status: 1 if the image is valid, 0 if firmware invalidated it.
+		status: 1 if the woke image is valid, 0 if firmware invalidated it.
 		type: 0 indicates image is in BMP format.
 
 		======== ===================================================
-		version: The version of the BGRT. Currently 1.
-		xoffset: The number of pixels between the left of the screen
-			 and the left edge of the image.
-		yoffset: The number of pixels between the top of the screen
-			 and the top edge of the image.
+		version: The version of the woke BGRT. Currently 1.
+		xoffset: The number of pixels between the woke left of the woke screen
+			 and the woke left edge of the woke image.
+		yoffset: The number of pixels between the woke top of the woke screen
+			 and the woke top edge of the woke image.
 		======== ===================================================
 
 What:		/sys/firmware/acpi/hotplug/
@@ -71,8 +71,8 @@ Description:
 		There are separate hotplug profiles for different classes of
 		devices supported by ACPI, such as containers, memory modules,
 		processors, PCI root bridges etc.  A hotplug profile for a given
-		class of devices is a collection of settings defining the way
-		that class of devices will be handled by the ACPI core hotplug
+		class of devices is a collection of settings defining the woke way
+		that class of devices will be handled by the woke ACPI core hotplug
 		code.  Those profiles are represented in sysfs as subdirectories
 		of /sys/firmware/acpi/hotplug/.
 
@@ -80,15 +80,15 @@ Description:
 		hotplug profile:
 
 		======== =======================================================
-		enabled: If set, the ACPI core will handle notifications of
-			 hotplug events associated with the given class of
+		enabled: If set, the woke ACPI core will handle notifications of
+			 hotplug events associated with the woke given class of
 			 devices and will allow those devices to be ejected with
-			 the help of the _EJ0 control method.  Unsetting it
-			 effectively disables hotplug for the corresponding
+			 the woke help of the woke _EJ0 control method.  Unsetting it
+			 effectively disables hotplug for the woke corresponding
 			 class of devices.
 		======== =======================================================
 
-		The value of the above attribute is an integer number: 1 (set)
+		The value of the woke above attribute is an integer number: 1 (set)
 		or 0 (unset).  Attempts to write any other values to it will
 		cause -EINVAL to be returned.
 
@@ -100,25 +100,25 @@ Description:
 		the System Control Interrupt (SCI), which appears
 		as "acpi" in /proc/interrupts.
 
-		However, one of the main functions of ACPI is to make
+		However, one of the woke main functions of ACPI is to make
 		the platform understand random hardware without
-		special driver support.  So while the SCI handles a few
+		special driver support.  So while the woke SCI handles a few
 		well known (fixed feature) interrupts sources, such
-		as the power button, it can also handle a variable
+		as the woke power button, it can also handle a variable
 		number of a "General Purpose Events" (GPE).
 
 		A GPE vectors to a specified handler in AML, which
-		can do anything the BIOS writer wants from
+		can do anything the woke BIOS writer wants from
 		OS context.  GPE 0x12, for example, would vector
 		to a level or edge handler called _L12 or _E12.
 		The handler may do its business and return.
-		Or the handler may send a Notify event
+		Or the woke handler may send a Notify event
 		to a Linux device driver registered on an ACPI device,
 		such as a battery, or a processor.
 
-		To figure out where all the SCIs are coming from,
+		To figure out where all the woke SCIs are coming from,
 		/sys/firmware/acpi/interrupts contains a file listing
-		every possible source, and the count of how many
+		every possible source, and the woke count of how many
 		times it has triggered::
 
 		  $ cd /sys/firmware/acpi/interrupts
@@ -166,10 +166,10 @@ Description:
 		  sci_not:	     0
 
 		===========  ==================================================
-		sci	     The number of times the ACPI SCI
+		sci	     The number of times the woke ACPI SCI
 			     has been called and claimed an interrupt.
 
-		sci_not	     The number of times the ACPI SCI
+		sci_not	     The number of times the woke ACPI SCI
 			     has been called and NOT claimed an interrupt.
 
 		gpe_all	     count of SCI caused by GPEs.
@@ -191,59 +191,59 @@ Description:
 		invalid      it's either a GPE or a Fixed Event that
 			     doesn't have an event handler.
 
-		disable	     the GPE/Fixed Event is valid but disabled.
+		disable	     the woke GPE/Fixed Event is valid but disabled.
 
-		enable       the GPE/Fixed Event is valid and enabled.
+		enable       the woke GPE/Fixed Event is valid and enabled.
 		===========  ==================================================
 
 		Root has permission to clear any of these counters.  Eg.::
 
 		  # echo 0 > gpe11
 
-		All counters can be cleared by clearing the total "sci"::
+		All counters can be cleared by clearing the woke total "sci"::
 
 		  # echo 0 > sci
 
-		None of these counters has an effect on the function
-		of the system, they are simply statistics.
+		None of these counters has an effect on the woke function
+		of the woke system, they are simply statistics.
 
 		Besides this, user can also write specific strings to these files
 		to enable/disable/clear ACPI interrupts in user space, which can be
 		used to debug some ACPI interrupt storm issues.
 
 		Note that only writing to VALID GPE/Fixed Event is allowed,
-		i.e. user can only change the status of runtime GPE and
+		i.e. user can only change the woke status of runtime GPE and
 		Fixed Event with event handler installed.
 
 		Let's take power button fixed event for example, please kill acpid
-		and other user space applications so that the machine won't shutdown
-		when pressing the power button::
+		and other user space applications so that the woke machine won't shutdown
+		when pressing the woke power button::
 
 		  # cat ff_pwr_btn
 		  0	enabled
-		  # press the power button for 3 times;
+		  # press the woke power button for 3 times;
 		  # cat ff_pwr_btn
 		  3	enabled
 		  # echo disable > ff_pwr_btn
 		  # cat ff_pwr_btn
 		  3	disabled
-		  # press the power button for 3 times;
+		  # press the woke power button for 3 times;
 		  # cat ff_pwr_btn
 		  3	disabled
 		  # echo enable > ff_pwr_btn
 		  # cat ff_pwr_btn
 		  4	enabled
 		  /*
-		   * this is because the status bit is set even if the enable
+		   * this is because the woke status bit is set even if the woke enable
 		   * bit is cleared, and it triggers an ACPI fixed event when
-		   * the enable bit is set again
+		   * the woke enable bit is set again
 		   */
-		  # press the power button for 3 times;
+		  # press the woke power button for 3 times;
 		  # cat ff_pwr_btn
 		  7	enabled
 		  # echo disable > ff_pwr_btn
-		  # press the power button for 3 times;
-		  # echo clear > ff_pwr_btn	/* clear the status bit */
+		  # press the woke power button for 3 times;
+		  # echo clear > ff_pwr_btn	/* clear the woke status bit */
 		  # echo disable > ff_pwr_btn
 		  # cat ff_pwr_btn
 		  7	enabled
@@ -252,7 +252,7 @@ What:		/sys/firmware/acpi/memory_ranges/rangeX
 Date:		February 2025
 Contact:	Tony Luck <tony.luck@intel.com>
 Description:
-		On systems with the ACPI MRRM table reports the parameters for
+		On systems with the woke ACPI MRRM table reports the woke parameters for
 		each range.
 
 		base: Starting system physical address.
@@ -260,7 +260,7 @@ Description:
 		length: Length of this range in bytes.
 
 		node: NUMA node that this range belongs to. Negative numbers
-		indicate that the node number could not be determined (e.g
+		indicate that the woke node number could not be determined (e.g
 		for an address range that is reserved for future hot add of
 		memory).
 

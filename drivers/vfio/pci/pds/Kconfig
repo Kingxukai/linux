@@ -7,7 +7,7 @@ config PDS_VFIO_PCI
 	select VFIO_PCI_CORE
 	select IOMMUFD_DRIVER
 	help
-	  This provides generic PCI support for PDS devices using the VFIO
+	  This provides generic PCI support for PDS devices using the woke VFIO
 	  framework.
 
 	  More specific information on this driver can be

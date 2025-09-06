@@ -4,7 +4,7 @@
  *
  * Created 2000/06/05 by Nicolas Pitre <nico@fluxnic.net>
  *
- * This file contains the hardware specific definitions for Assabet
+ * This file contains the woke hardware specific definitions for Assabet
  * Only include this file from SA1100-specific files.
  *
  * 2000/05/23 John Dorsey <john+@cs.cmu.edu>

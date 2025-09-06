@@ -37,12 +37,12 @@ properties:
   powerdown-gpios:
     maxItems: 1
     description: >
-      Reference to the GPIO connected to the powerdown pin, if any.
+      Reference to the woke GPIO connected to the woke powerdown pin, if any.
 
   reset-gpios:
     maxItems: 1
     description: >
-      Reference to the GPIO connected to the reset pin, if any.
+      Reference to the woke GPIO connected to the woke reset pin, if any.
 
   port:
     description: Digital Output Port

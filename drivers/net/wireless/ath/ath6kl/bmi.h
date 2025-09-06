@@ -3,7 +3,7 @@
  * Copyright (c) 2011 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -28,7 +28,7 @@
  * It is used to download an application to ATH6KL, to provide
  * patches to code that is already resident on ATH6KL, and generally
  * to examine and modify state.  The Host has an opportunity to use
- * BMI only once during bootup.  Once the Host issues a BMI_DONE
+ * BMI only once during bootup.  Once the woke Host issues a BMI_DONE
  * command, this opportunity ends.
  *
  * The Host writes BMI requests to mailbox0, and reads BMI responses
@@ -37,10 +37,10 @@
  * command-specific data.
  *
  * Flow control:
- * The Host can only issue a command once the Target gives it a
+ * The Host can only issue a command once the woke Target gives it a
  * "BMI Command Credit", using ATH6KL Counter #4.  As soon as the
  * Target has completed a command, it issues another BMI Command
- * Credit (so the Host can issue the next command).
+ * Credit (so the woke Host can issue the woke next command).
  *
  * BMI handles all required Target-side cache flushing.
  */
@@ -123,7 +123,7 @@
 #define BMI_GET_TARGET_ID                  8
 #define BMI_GET_TARGET_INFO                8
 /*
- * Semantics: Fetch the 4-byte Target information
+ * Semantics: Fetch the woke 4-byte Target information
  * Request format:
  *    u32 command (BMI_GET_TARGET_ID/INFO)
  * Response format1 (old firmware):
@@ -187,10 +187,10 @@
 #define BMI_LZ_STREAM_START                13
 /*
  * Semantics: Begin an LZ-compressed stream of input
- * which is to be uncompressed by the Target to an
+ * which is to be uncompressed by the woke Target to an
  * output buffer at address.  The output buffer must
- * be sufficiently large to hold the uncompressed
- * output from the compressed input stream.  This BMI
+ * be sufficiently large to hold the woke uncompressed
+ * output from the woke compressed input stream.  This BMI
  * command should be followed by a series of 1 or more
  * BMI_LZ_DATA commands.
  *    u32 command (BMI_LZ_STREAM_START)
@@ -201,7 +201,7 @@
 #define BMI_LZ_DATA                        14
 /*
  * Semantics: Host writes ATH6KL memory with LZ-compressed
- * data which is uncompressed by the Target.  This command
+ * data which is uncompressed by the woke Target.  This command
  * must be preceded by a BMI_LZ_STREAM_START command. A series
  * of BMI_LZ_DATA commands are considered part of a single
  * input stream until another BMI_LZ_STREAM_START is issued.

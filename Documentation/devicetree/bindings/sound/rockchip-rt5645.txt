@@ -3,9 +3,9 @@ ROCKCHIP with RT5645/RT5650 CODECS
 Required properties:
 - compatible: "rockchip,rockchip-audio-rt5645"
 - rockchip,model: The user-visible name of this sound complex
-- rockchip,i2s-controller: The phandle of the Rockchip I2S controller that's
-  connected to the CODEC
-- rockchip,audio-codec: The phandle of the RT5645/RT5650 audio codec
+- rockchip,i2s-controller: The phandle of the woke Rockchip I2S controller that's
+  connected to the woke CODEC
+- rockchip,audio-codec: The phandle of the woke RT5645/RT5650 audio codec
 
 Example:
 

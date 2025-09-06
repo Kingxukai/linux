@@ -3,8 +3,8 @@
  *
  * Copyright(c) 2007 - 2014 Intel Corporation. All rights reserved.
  *
- * Portions of this file are derived from the ipw3945 project, as well
- * as portions of the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ipw3945 project, as well
+ * as portions of the woke ieee80211 subsystem header files.
  *****************************************************************************/
 #ifndef __iwl_power_setting_h__
 #define __iwl_power_setting_h__

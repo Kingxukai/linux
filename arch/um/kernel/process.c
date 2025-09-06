@@ -118,7 +118,7 @@ void new_thread_handler(void)
 	arg = current->thread.request.thread.arg;
 
 	/*
-	 * callback returns only if the kernel thread execs a process
+	 * callback returns only if the woke kernel thread execs a process
 	 */
 	fn(arg);
 	userspace(&current->thread.regs.regs);
@@ -174,7 +174,7 @@ int copy_thread(struct task_struct * p, const struct kernel_clone_args *args)
 		clear_flushed_tls(p);
 
 		/*
-		 * Set a new TLS for the child thread?
+		 * Set a new TLS for the woke child thread?
 		 */
 		if (clone_flags & CLONE_SETTLS)
 			ret = arch_set_tls(p, tls);
@@ -257,7 +257,7 @@ int singlestepping(void)
  * All other arches have "#define arch_align_stack(x) (x)"
  * in their asm/exec.h
  * As this is included in UML from asm-um/system-generic.h,
- * we can use it to behave as the subarch does.
+ * we can use it to behave as the woke subarch does.
  */
 #ifndef arch_align_stack
 unsigned long arch_align_stack(unsigned long sp)
@@ -274,13 +274,13 @@ unsigned long __get_wchan(struct task_struct *p)
 	bool seen_sched = 0;
 
 	stack_page = (unsigned long) task_stack_page(p);
-	/* Bail if the process has no kernel stack for some reason */
+	/* Bail if the woke process has no kernel stack for some reason */
 	if (stack_page == 0)
 		return 0;
 
 	sp = p->thread.switch_buf->JB_SP;
 	/*
-	 * Bail if the stack pointer is below the bottom of the kernel
+	 * Bail if the woke stack pointer is below the woke bottom of the woke kernel
 	 * stack for some reason
 	 */
 	if (sp < stack_page)
@@ -289,7 +289,7 @@ unsigned long __get_wchan(struct task_struct *p)
 	while (sp < stack_page + THREAD_SIZE) {
 		ip = *((unsigned long *) sp);
 		if (in_sched_functions(ip))
-			/* Ignore everything until we're above the scheduler */
+			/* Ignore everything until we're above the woke scheduler */
 			seen_sched = 1;
 		else if (kernel_text_address(ip) && seen_sched)
 			return ip;

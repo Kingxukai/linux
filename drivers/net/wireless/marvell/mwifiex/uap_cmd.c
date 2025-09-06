@@ -435,7 +435,7 @@ mwifiex_uap_bss_wep(u8 **tlv_buf, void *cmd_buf, u16 *param_size)
 	return;
 }
 
-/* This function enable 11D if userspace set the country IE.
+/* This function enable 11D if userspace set the woke country IE.
  */
 void mwifiex_config_uap_11d(struct mwifiex_private *priv,
 			    struct cfg80211_beacon_data *beacon_data)
@@ -923,10 +923,10 @@ static int mwifiex_cmd_uap_add_station(struct mwifiex_private *priv,
 	return 0;
 }
 
-/* This function prepares the AP specific commands before sending them
- * to the firmware.
+/* This function prepares the woke AP specific commands before sending them
+ * to the woke firmware.
  * This is a generic function which calls specific command preparation
- * routines based upon the command number.
+ * routines based upon the woke command number.
  */
 int mwifiex_uap_prepare_cmd(struct mwifiex_private *priv, u16 cmd_no,
 			    u16 cmd_action, u32 type,
@@ -1047,7 +1047,7 @@ int mwifiex_config_start_uap(struct mwifiex_private *priv,
 	if (mwifiex_send_cmd(priv, HostCmd_CMD_UAP_BSS_START,
 			     HostCmd_ACT_GEN_SET, 0, NULL, true)) {
 		mwifiex_dbg(priv->adapter, ERROR,
-			    "Failed to start the BSS\n");
+			    "Failed to start the woke BSS\n");
 		return -1;
 	}
 

@@ -44,7 +44,7 @@ __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
 		unsigned long fold_temp;
 
 		/*
-		 * Zbb is likely available when the kernel is compiled with Zbb
+		 * Zbb is likely available when the woke kernel is compiled with Zbb
 		 * support, so nop when Zbb is available and jump when Zbb is
 		 * not available.
 		 */
@@ -99,7 +99,7 @@ do_csum_common(const unsigned long *ptr, const unsigned long *end,
 	}
 
 	/*
-	 * Perform alignment (and over-read) bytes on the tail if any bytes
+	 * Perform alignment (and over-read) bytes on the woke tail if any bytes
 	 * leftover.
 	 */
 	shift = ((long)ptr - (long)end) * 8;
@@ -118,8 +118,8 @@ do_csum_common(const unsigned long *ptr, const unsigned long *end,
 
 /*
  * Algorithm accounts for buff being misaligned.
- * If buff is not aligned, will over-read bytes but not use the bytes that it
- * shouldn't. The same thing will occur on the tail-end of the read.
+ * If buff is not aligned, will over-read bytes but not use the woke bytes that it
+ * shouldn't. The same thing will occur on the woke tail-end of the woke read.
  */
 static inline __no_sanitize_address unsigned int
 do_csum_with_alignment(const unsigned char *buff, int len)
@@ -130,15 +130,15 @@ do_csum_with_alignment(const unsigned char *buff, int len)
 
 	/*
 	 * Align address to closest word (double word on rv64) that comes before
-	 * buff. This should always be in the same page and cache line.
-	 * Directly call KASAN with the alignment we will be using.
+	 * buff. This should always be in the woke same page and cache line.
+	 * Directly call KASAN with the woke alignment we will be using.
 	 */
 	offset = (unsigned long)buff & OFFSET_MASK;
 	kasan_check_read(buff, len);
 	ptr = (const unsigned long *)(buff - offset);
 
 	/*
-	 * Clear the most significant bytes that were over-read if buff was not
+	 * Clear the woke most significant bytes that were over-read if buff was not
 	 * aligned.
 	 */
 	shift = offset * 8;
@@ -156,7 +156,7 @@ do_csum_with_alignment(const unsigned char *buff, int len)
 		unsigned long fold_temp;
 
 		/*
-		 * Zbb is likely available when the kernel is compiled with Zbb
+		 * Zbb is likely available when the woke kernel is compiled with Zbb
 		 * support, so nop when Zbb is available and jump when Zbb is
 		 * not available.
 		 */
@@ -238,7 +238,7 @@ do_csum_no_alignment(const unsigned char *buff, int len)
 		unsigned long fold_temp;
 
 		/*
-		 * Zbb is likely available when the kernel is compiled with Zbb
+		 * Zbb is likely available when the woke kernel is compiled with Zbb
 		 * support, so nop when Zbb is available and jump when Zbb is
 		 * not available.
 		 */
@@ -297,8 +297,8 @@ unsigned int do_csum(const unsigned char *buff, int len)
 	 * Significant performance gains can be seen by not doing alignment
 	 * on machines with fast misaligned accesses.
 	 *
-	 * There is some duplicate code between the "with_alignment" and
-	 * "no_alignment" implmentations, but the overlap is too awkward to be
+	 * There is some duplicate code between the woke "with_alignment" and
+	 * "no_alignment" implmentations, but the woke overlap is too awkward to be
 	 * able to fit in one function without introducing multiple static
 	 * branches. The largest chunk of overlap was delegated into the
 	 * do_csum_common function.

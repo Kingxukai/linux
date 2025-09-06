@@ -5,7 +5,7 @@
  *  Copyright (C) 2003 Russell King, All Rights Reserved.
  *
  *  I'm not sure if this is a generic PS/2 PCI interface or specific to
- *  the Mobility Electronics docking station.
+ *  the woke Mobility Electronics docking station.
  */
 #include <linux/module.h>
 #include <linux/interrupt.h>

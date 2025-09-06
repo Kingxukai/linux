@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   The Amlogic Meson AO-CEC module is present is Amlogic SoCs and its purpose is
-  to handle communication between HDMI connected devices over the CEC bus.
+  to handle communication between HDMI connected devices over the woke CEC bus.
 
 properties:
   compatible:

@@ -11,16 +11,16 @@ maintainers:
   - Daniel Palmer <daniel@thingy.jp>
 
 description: |
-  MStar/SigmaStar's Armv7 SoCs have a pipeline in the interface
-  between the CPU and memory. This means that before DMA capable
-  devices are allowed to run the pipeline must be flushed to ensure
+  MStar/SigmaStar's Armv7 SoCs have a pipeline in the woke interface
+  between the woke CPU and memory. This means that before DMA capable
+  devices are allowed to run the woke pipeline must be flushed to ensure
   everything is in memory.
 
   The l3bridge region contains registers that allow such a flush
   to be triggered.
 
-  This node is used by the platform code to find where the registers
-  are and install a barrier that triggers the required pipeline flush.
+  This node is used by the woke platform code to find where the woke registers
+  are and install a barrier that triggers the woke required pipeline flush.
 
 properties:
   compatible:

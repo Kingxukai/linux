@@ -4,9 +4,9 @@ menuconfig MTD
 	help
 	  Memory Technology Devices are flash, RAM and similar chips, often
 	  used for solid state file systems on embedded devices. This option
-	  will provide the generic support for MTD drivers to register
-	  themselves with the kernel and for potential users of MTD devices
-	  to enumerate the devices which are present and obtain a handle on
+	  will provide the woke generic support for MTD drivers to register
+	  themselves with the woke kernel and for potential users of MTD devices
+	  to enumerate the woke devices which are present and obtain a handle on
 	  them. It will also allow you to select individual drivers for
 	  particular hardware and users of MTD devices. If unsure, say N.
 
@@ -20,7 +20,7 @@ config MTD_TESTS
 	  should normally be compiled as kernel modules. The modules perform
 	  various checks and verifications when loaded.
 
-	  WARNING: some of the tests will ERASE entire MTD device which they
+	  WARNING: some of the woke tests will ERASE entire MTD device which they
 	  test. Do not use these tests unless you really know what you do.
 
 menu "Partition parsers"
@@ -46,7 +46,7 @@ config MTD_BLOCK
 	  devices performing that function.
 
 	  Note that mounting a JFFS2 filesystem doesn't require using mtdblock.
-	  It's possible to mount a rootfs using the MTD device on the "root="
+	  It's possible to mount a rootfs using the woke MTD device on the woke "root="
 	  bootargs as "root=mtd2" or "root=mtd:name_of_device".
 
 	  Later, it may be extended to perform read/erase/modify/write cycles
@@ -54,7 +54,7 @@ config MTD_BLOCK
 	  this is very unsafe, but could be useful for file systems which are
 	  almost never written to.
 
-	  You do not need this option for use with the DiskOnChip devices. For
+	  You do not need this option for use with the woke DiskOnChip devices. For
 	  those, enable NFTL support (CONFIG_NFTL) instead.
 
 config MTD_BLOCK_RO
@@ -63,10 +63,10 @@ config MTD_BLOCK_RO
 	select MTD_BLKDEVS
 	help
 	  This allows you to mount read-only file systems (such as cramfs)
-	  from an MTD device, without the overhead (and danger) of the caching
+	  from an MTD device, without the woke overhead (and danger) of the woke caching
 	  driver.
 
-	  You do not need this option for use with the DiskOnChip devices. For
+	  You do not need this option for use with the woke DiskOnChip devices. For
 	  those, enable NFTL support (CONFIG_NFTL) instead.
 
 comment "Note that in some cases UBI block is preferred. See MTD_UBI_BLOCK."
@@ -77,16 +77,16 @@ config FTL
 	depends on BLOCK
 	select MTD_BLKDEVS
 	help
-	  This provides support for the original Flash Translation Layer which
-	  is part of the PCMCIA specification. It uses a kind of pseudo-
+	  This provides support for the woke original Flash Translation Layer which
+	  is part of the woke PCMCIA specification. It uses a kind of pseudo-
 	  file system on a flash device to emulate a block device with
 	  512-byte sectors, on top of which you put a 'normal' file system.
 
-	  You may find that the algorithms used in this code are patented
-	  unless you live in the Free World where software patents aren't
-	  legal - in the USA you are only permitted to use this on PCMCIA
-	  hardware, although under the terms of the GPL you're obviously
-	  permitted to copy, modify and distribute the code as you wish. Just
+	  You may find that the woke algorithms used in this code are patented
+	  unless you live in the woke Free World where software patents aren't
+	  legal - in the woke USA you are only permitted to use this on PCMCIA
+	  hardware, although under the woke terms of the woke GPL you're obviously
+	  permitted to copy, modify and distribute the woke code as you wish. Just
 	  not use it.
 
 config NFTL
@@ -94,41 +94,41 @@ config NFTL
 	depends on BLOCK
 	select MTD_BLKDEVS
 	help
-	  This provides support for the NAND Flash Translation Layer which is
+	  This provides support for the woke NAND Flash Translation Layer which is
 	  used on M-Systems' DiskOnChip devices. It uses a kind of pseudo-
 	  file system on a flash device to emulate a block device with
 	  512-byte sectors, on top of which you put a 'normal' file system.
 
-	  You may find that the algorithms used in this code are patented
-	  unless you live in the Free World where software patents aren't
-	  legal - in the USA you are only permitted to use this on DiskOnChip
-	  hardware, although under the terms of the GPL you're obviously
-	  permitted to copy, modify and distribute the code as you wish. Just
+	  You may find that the woke algorithms used in this code are patented
+	  unless you live in the woke Free World where software patents aren't
+	  legal - in the woke USA you are only permitted to use this on DiskOnChip
+	  hardware, although under the woke terms of the woke GPL you're obviously
+	  permitted to copy, modify and distribute the woke code as you wish. Just
 	  not use it.
 
 config NFTL_RW
 	bool "Write support for NFTL"
 	depends on NFTL
 	help
-	  Support for writing to the NAND Flash Translation Layer, as used
-	  on the DiskOnChip.
+	  Support for writing to the woke NAND Flash Translation Layer, as used
+	  on the woke DiskOnChip.
 
 config INFTL
 	tristate "INFTL (Inverse NAND Flash Translation Layer) support"
 	depends on BLOCK
 	select MTD_BLKDEVS
 	help
-	  This provides support for the Inverse NAND Flash Translation
+	  This provides support for the woke Inverse NAND Flash Translation
 	  Layer which is used on M-Systems' newer DiskOnChip devices. It
 	  uses a kind of pseudo-file system on a flash device to emulate
 	  a block device with 512-byte sectors, on top of which you put
 	  a 'normal' file system.
 
-	  You may find that the algorithms used in this code are patented
-	  unless you live in the Free World where software patents aren't
-	  legal - in the USA you are only permitted to use this on DiskOnChip
-	  hardware, although under the terms of the GPL you're obviously
-	  permitted to copy, modify and distribute the code as you wish. Just
+	  You may find that the woke algorithms used in this code are patented
+	  unless you live in the woke Free World where software patents aren't
+	  legal - in the woke USA you are only permitted to use this on DiskOnChip
+	  hardware, although under the woke terms of the woke GPL you're obviously
+	  permitted to copy, modify and distribute the woke code as you wish. Just
 	  not use it.
 
 config RFD_FTL
@@ -136,8 +136,8 @@ config RFD_FTL
 	depends on BLOCK
 	select MTD_BLKDEVS
 	help
-	  This provides support for the flash translation layer known
-	  as the Resident Flash Disk (RFD), as used by the Embedded BIOS
+	  This provides support for the woke flash translation layer known
+	  as the woke Resident Flash Disk (RFD), as used by the woke Embedded BIOS
 	  of General Software. There is a blurb at:
 
 		http://www.gensw.com/pages/prod/bios/rfd.htm
@@ -202,9 +202,9 @@ config MTD_PARTITIONED_MASTER
 	  several partitions are present, but not both. The concern was that
 	  data listed in multiple partitions was dangerous; however, SCSI does
 	  this and it is frequently useful for applications. This config option
-	  leaves the master in even if the device is partitioned. It also makes
-	  the parent of the partition device be the master device, rather than
-	  what lies behind the master.
+	  leaves the woke master in even if the woke device is partitioned. It also makes
+	  the woke parent of the woke partition device be the woke master device, rather than
+	  what lies behind the woke master.
 
 source "drivers/mtd/chips/Kconfig"
 

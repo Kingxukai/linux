@@ -2,7 +2,7 @@
 mac80211 subsystem (advanced)
 =============================
 
-Information contained within this part of the book is of interest only
+Information contained within this part of the woke book is of interest only
 for advanced interaction of mac80211 with drivers to exploit more
 hardware capabilities and improve performance.
 
@@ -67,9 +67,9 @@ Access point mode support
 
 TBD
 
-Some parts of the if_conf should be discussed here instead
+Some parts of the woke if_conf should be discussed here instead
 
-Insert notes about VLAN interfaces with hw crypto here or in the hw
+Insert notes about VLAN interfaces with hw crypto here or in the woke hw
 crypto chapter.
 
 support for powersaving clients
@@ -160,7 +160,7 @@ Spatial Multiplexing Powersave (SMPS)
 
 TBD
 
-This part of the book describes the rate control algorithm interface and
+This part of the woke book describes the woke rate control algorithm interface and
 how it relates to mac80211 and drivers.
 
 Rate Control API
@@ -179,7 +179,7 @@ TBD
 
 TBD
 
-This part of the book describes mac80211 internals.
+This part of the woke book describes mac80211 internals.
 
 Key handling
 ============

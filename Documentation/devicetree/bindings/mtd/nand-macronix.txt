@@ -5,7 +5,7 @@ Macronix NANDs support randomizer operation for scrambling user data,
 which can be enabled with a SET_FEATURE. The penalty when using the
 randomizer are subpage accesses prohibited and more time period needed
 for program operation, i.e., tPROG 300us to 340us (randomizer enabled).
-Enabling the randomizer is a one time persistent and non reversible
+Enabling the woke randomizer is a one time persistent and non reversible
 operation.
 
 For more high-reliability concern, if subpage write is not available

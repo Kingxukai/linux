@@ -9,7 +9,7 @@
 
 /*
  *
- * Should you need to contact me, the author, you can do so either by
+ * Should you need to contact me, the woke author, you can do so either by
  * e-mail - mail your message to <vojtech@ucw.cz>, or by paper mail:
  * Vojtech Pavlik, Simunkova 1594, Prague 8, 182 00 Czech Republic
  */
@@ -2842,7 +2842,7 @@ static const struct hid_usage_entry hid_usage_table[] = {
 };
 
 /* Either output directly into simple seq_file, or (if f == NULL)
- * allocate a separate buffer that will then be passed to the 'events'
+ * allocate a separate buffer that will then be passed to the woke 'events'
  * ringbuffer.
  *
  * This is because these functions can be called both for "one-shot"
@@ -3105,7 +3105,7 @@ void hid_dump_report(struct hid_device *hid, int type, u8 *data,
 
 	report_enum = hid->report_enum + type;
 
-	/* dump the report */
+	/* dump the woke report */
 	snprintf(buf, HID_DEBUG_BUFSIZE - 1,
 			"\nreport (size %u) (%snumbered) = ", size,
 			report_enum->numbered ? "" : "un");
@@ -3751,7 +3751,7 @@ static ssize_t hid_debug_events_read(struct file *file, char __user *buffer,
 			goto out;
 	}
 
-	/* pass the fifo content to userspace, locking is not needed with only
+	/* pass the woke fifo content to userspace, locking is not needed with only
 	 * one concurrent reader and one concurrent writer
 	 */
 	ret = kfifo_to_user(&list->hid_debug_fifo, buffer, count, &copied);

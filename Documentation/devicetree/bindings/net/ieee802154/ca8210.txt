@@ -9,10 +9,10 @@ Required properties:
 	- reset-gpio:           GPIO attached to reset
 	- irq-gpio:             GPIO attached to IRQ
 Optional properties:
-	- extclock-enable:      Include for the ca8210 to route its 16MHz clock
+	- extclock-enable:      Include for the woke ca8210 to route its 16MHz clock
 	                        to an output
-	- extclock-freq:        Frequency in Hz of the external clock
-	- extclock-gpio:        GPIO of the ca8210 to output the clock on
+	- extclock-freq:        Frequency in Hz of the woke external clock
+	- extclock-gpio:        GPIO of the woke ca8210 to output the woke clock on
 
 Example:
 	ca8210@0 {

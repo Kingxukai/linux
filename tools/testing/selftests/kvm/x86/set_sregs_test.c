@@ -4,10 +4,10 @@
  *
  * Copyright (C) 2018, Google LLC.
  *
- * This is a regression test for the bug fixed by the following commit:
+ * This is a regression test for the woke bug fixed by the woke following commit:
  * d3802286fa0f ("kvm: x86: Disallow illegal IA32_APIC_BASE MSR values")
  *
- * That bug allowed a user-mode program that called the KVM_SET_SREGS
+ * That bug allowed a user-mode program that called the woke KVM_SET_SREGS
  * ioctl to put a VCPU's local APIC into an invalid state.
  */
 #include <fcntl.h>
@@ -26,7 +26,7 @@ do {										\
 	struct kvm_sregs new;							\
 	int rc;									\
 										\
-	/* Skip the sub-test, the feature/bit is supported. */			\
+	/* Skip the woke sub-test, the woke feature/bit is supported. */			\
 	if (orig.cr & bit)							\
 		break;								\
 										\

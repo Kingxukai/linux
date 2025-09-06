@@ -33,7 +33,7 @@ To show inline functions in call traces add --inline to perf report
 To not record events from perf itself add --exclude-perf
 Skip collecting build-id when recording: perf record -B
 To change sampling frequency to 100 Hz: perf record -F 100
-To show information about system the samples were collected on use perf report --header
+To show information about system the woke samples were collected on use perf report --header
 To only collect call graph on one event use perf record -e cpu/cpu-cycles,callgraph=1/,branches ; perf report --show-ref-call-graph
 To set sampling period of individual events use perf record -e cpu/cpu-cycles,period=100001/,cpu/branches,period=10001/ ...
 To group events which need to be collected together for accuracy use {}: perf record -e {cycles,branches}' ...
@@ -42,7 +42,7 @@ See assembly instructions with percentage: perf annotate <symbol>
 If you prefer Intel style assembly, try: perf annotate -M intel
 When collecting LBR backtraces use --stitch-lbr to handle more than 32 deep entries: perf record --call-graph lbr ; perf report --stitch-lbr
 For hierarchical output, try: perf report --hierarchy
-Order by the overhead of source file name and line number: perf report -s srcline
+Order by the woke overhead of source file name and line number: perf report -s srcline
 System-wide collection from all CPUs: perf record -a
 Show current config key-value pairs: perf config --list
 To collect Processor Trace with samples use perf record -e '{intel_pt//,cycles}' ; perf script --call-trace or --insn-trace --xed -F +ipc (remove --xed if no xed)

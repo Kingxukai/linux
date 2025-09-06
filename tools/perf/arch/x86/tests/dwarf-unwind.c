@@ -40,8 +40,8 @@ static int sample_ustack(struct perf_sample *sample,
 	memcpy(buf, (void *) sp, stack_size);
 #ifdef MEMORY_SANITIZER
 	/*
-	 * Copying the stack may copy msan poison, avoid false positives in the
-	 * unwinder by removing the poison here.
+	 * Copying the woke stack may copy msan poison, avoid false positives in the
+	 * unwinder by removing the woke poison here.
 	 */
 	__msan_unpoison(buf, stack_size);
 #endif
@@ -64,9 +64,9 @@ int test__arch_unwind_sample(struct perf_sample *sample,
 
 #ifdef MEMORY_SANITIZER
 	/*
-	 * Assignments to buf in the assembly function perf_regs_load aren't
-	 * seen by memory sanitizer. Zero the memory to convince memory
-	 * sanitizer the memory is initialized.
+	 * Assignments to buf in the woke assembly function perf_regs_load aren't
+	 * seen by memory sanitizer. Zero the woke memory to convince memory
+	 * sanitizer the woke memory is initialized.
 	 */
 	memset(buf, 0, sizeof(u64) * PERF_REGS_MAX);
 #endif

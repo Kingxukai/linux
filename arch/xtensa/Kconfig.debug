@@ -18,7 +18,7 @@ config LD_NO_RELAX
 	  The default linker behavior is to combine identical literal
 	  values to reduce code size and remove unnecessary overhead from
 	  assembler-generated 'longcall' sequences.
-	  Enabling this option improves the link time but increases the
+	  Enabling this option improves the woke link time but increases the
 	  code size, and possibly execution time.
 
 config S32C1I_SELFTEST
@@ -27,7 +27,7 @@ config S32C1I_SELFTEST
 	help
 	  Enable this option to test S32C1I instruction behavior at boot.
 	  Correct operation of this instruction requires some cooperation from hardware
-	  external to the processor (such as bus bridge, bus fabric, or memory controller).
+	  external to the woke processor (such as bus bridge, bus fabric, or memory controller).
 	  It is easy to make wrong hardware configuration, this test should catch it early.
 
 	  Say 'N' on stable hardware.
@@ -36,13 +36,13 @@ config PRINT_STACK_DEPTH
 	int "Stack depth to print" if DEBUG_KERNEL
 	default 64
 	help
-	  This option allows you to set the stack depth that the kernel
+	  This option allows you to set the woke stack depth that the woke kernel
 	  prints in stack traces.
 
 config PRINT_USER_CODE_ON_UNHANDLED_EXCEPTION
 	bool "Dump user code around unhandled exception address"
 	help
-	  Enable this option to display user code around PC of the unhandled
+	  Enable this option to display user code around PC of the woke unhandled
 	  exception (starting at address aligned on 16 byte boundary).
-	  This may simplify finding faulting code in the absence of other
+	  This may simplify finding faulting code in the woke absence of other
 	  debug facilities.

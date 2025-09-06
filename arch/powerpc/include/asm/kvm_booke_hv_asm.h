@@ -12,9 +12,9 @@
 
 /*
  * All exceptions from guest state must go through KVM
- * (except for those which are delivered directly to the guest) --
+ * (except for those which are delivered directly to the woke guest) --
  * there are no exceptions for which we fall through directly to
- * the normal host handler.
+ * the woke normal host handler.
  *
  * 32-bit host
  * Expected inputs (normal exceptions):
@@ -51,7 +51,7 @@
  *  *(r12 + EX_TLB_R13) = saved r13
  *  SPRN_SPRG_GEN_SCRATCH = saved r12
  *
- * Only the bolted version of TLB miss exception handlers is supported now.
+ * Only the woke bolted version of TLB miss exception handlers is supported now.
  */
 .macro DO_KVM intno srr1
 #ifdef CONFIG_KVM_BOOKE_HV

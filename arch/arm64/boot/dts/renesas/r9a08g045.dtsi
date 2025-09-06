@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the RZ/G3S SoC
+ * Device Tree Source for the woke RZ/G3S SoC
  *
  * Copyright (C) 2023 Renesas Electronics Corp.
  */
@@ -81,7 +81,7 @@
 	extal_clk: extal-clk {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board. */
+		/* This value must be overridden by the woke board. */
 		clock-frequency = <0>;
 	};
 
@@ -720,7 +720,7 @@
 	vbattb_xtal: vbattb-xtal {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board. */
+		/* This value must be overridden by the woke board. */
 		clock-frequency = <0>;
 	};
 };

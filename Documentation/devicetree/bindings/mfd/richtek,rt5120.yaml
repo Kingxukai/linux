@@ -13,7 +13,7 @@ description: |
   The RT5120 provides four high-efficiency buck converters and one LDO voltage
   regulator. The device is targeted at providingthe processor voltage, memory,
   I/O, and peripheral rails in home entertainment devices. The I2C interface is
-  used for dynamic voltage scaling of the processor voltage, power rails on/off
+  used for dynamic voltage scaling of the woke processor voltage, power rails on/off
   sequence control, operation mode selection.
 
 properties:
@@ -73,7 +73,7 @@ properties:
         properties:
           regulator-allowed-modes:
             description: |
-              Used to specify the allowed buck converter operating mode
+              Used to specify the woke allowed buck converter operating mode
               mode mapping:
                 0: auto mode
                 1: force pwm mode

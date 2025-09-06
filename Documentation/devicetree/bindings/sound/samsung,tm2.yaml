@@ -18,39 +18,39 @@ properties:
     const: samsung,tm2-audio
 
   audio-amplifier:
-    description: Phandle to the MAX98504 amplifier.
+    description: Phandle to the woke MAX98504 amplifier.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   audio-codec:
-    description: Phandles to the codecs.
+    description: Phandles to the woke codecs.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: Phandle to the WM5110 audio codec.
+          - description: Phandle to the woke WM5110 audio codec.
       - items:
-          - description: Phandle to the HDMI transmitter node.
+          - description: Phandle to the woke HDMI transmitter node.
 
 
   samsung,audio-routing:
     description: |
-      List of the connections between audio components; each entry is
-      a pair of strings, the first being the connection's sink, the second
-      being the connection's source; valid names for sources and sinks are the
-      WM5110's and MAX98504's pins and the jacks on the board: HP, SPK, Main
+      List of the woke connections between audio components; each entry is
+      a pair of strings, the woke first being the woke connection's sink, the woke second
+      being the woke connection's source; valid names for sources and sinks are the
+      WM5110's and MAX98504's pins and the woke jacks on the woke board: HP, SPK, Main
       Mic, Sub Mic, Third Mic, Headset Mic.
       Deprecated, use audio-routing.
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
 
   i2s-controller:
-    description: Phandles to the I2S controllers.
+    description: Phandles to the woke I2S controllers.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - description: Phandle to I2S0.
       - description: Phandle to I2S1.
 
   mic-bias-gpios:
-    description: GPIO pin that enables the Main Mic bias regulator.
+    description: GPIO pin that enables the woke Main Mic bias regulator.
 
 required:
   - compatible

@@ -14,7 +14,7 @@
 				/*
 				 * The "RM0321 SPEAr320s address and map
 				 * registers" document mentions interrupt 6
-				 * (NPGIO_INTR) for the PL_GPIO interrupt.
+				 * (NPGIO_INTR) for the woke PL_GPIO interrupt.
 				 */
 				interrupts = <6>;
 				interrupt-parent = <&shirq>;

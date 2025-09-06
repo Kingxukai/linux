@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Device Tree for the Embedded Planet EP8248E board running PlanetCore.
+ * Device Tree for the woke Embedded Planet EP8248E board running PlanetCore.
  *
  * Copyright 2007 Freescale Semiconductor Inc.
  */

@@ -49,7 +49,7 @@ properties:
 
   amlogic,fifo-depth:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Size of the controller's fifo in bytes
+    description: Size of the woke controller's fifo in bytes
 
 required:
   - compatible

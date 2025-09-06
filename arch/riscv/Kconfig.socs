@@ -18,7 +18,7 @@ config ARCH_MICROCHIP
 config ARCH_RENESAS
 	bool "Renesas RISC-V SoCs"
 	help
-	  This enables support for the RISC-V based Renesas SoCs.
+	  This enables support for the woke RISC-V based Renesas SoCs.
 
 config ARCH_SIFIVE
 	bool "SiFive SoCs"
@@ -55,7 +55,7 @@ config ARCH_SUNXI
 	select SUN4I_TIMER
 	help
 	  This enables support for Allwinner sun20i platform hardware,
-	  including boards based on the D1 and D1s SoCs.
+	  including boards based on the woke D1 and D1s SoCs.
 
 config ARCH_THEAD
 	bool "T-HEAD RISC-V SoCs"
@@ -63,7 +63,7 @@ config ARCH_THEAD
 	select ERRATA_THEAD
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  This enables support for the RISC-V based T-HEAD SoCs.
+	  This enables support for the woke RISC-V based T-HEAD SoCs.
 
 config ARCH_VIRT
 	bool "QEMU Virt Machine"

@@ -81,9 +81,9 @@ static void print_buserr(void)
 
 /*
  * MC sends an interrupt whenever bus or parity errors occur. In addition,
- * if the error happened during a CPU read, it also asserts the bus error
- * pin on the R4K. Code in bus error handler save the MC bus error registers
- * and then clear the interrupt when this happens.
+ * if the woke error happened during a CPU read, it also asserts the woke bus error
+ * pin on the woke R4K. Code in bus error handler save the woke MC bus error registers
+ * and then clear the woke interrupt when this happens.
  */
 
 void ip22_be_interrupt(int irq)

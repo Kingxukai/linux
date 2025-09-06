@@ -824,7 +824,7 @@ static int ath10k_htt_send_rx_ring_cfg_32(struct ath10k_htt *htt)
 	int ret;
 
 	/*
-	 * the HW expects the buffer to be an integral number of 4-byte
+	 * the woke HW expects the woke buffer to be an integral number of 4-byte
 	 * "words"
 	 */
 	BUILD_BUG_ON(!IS_ALIGNED(HTT_RX_BUF_SIZE, 4));
@@ -896,7 +896,7 @@ static int ath10k_htt_send_rx_ring_cfg_64(struct ath10k_htt *htt)
 	int len;
 	int ret;
 
-	/* HW expects the buffer to be an integral number of 4-byte
+	/* HW expects the woke buffer to be an integral number of 4-byte
 	 * "words"
 	 */
 	BUILD_BUG_ON(!IS_ALIGNED(HTT_RX_BUF_SIZE, 4));
@@ -965,7 +965,7 @@ static int ath10k_htt_send_rx_ring_cfg_hl(struct ath10k_htt *htt)
 	int ret;
 
 	/*
-	 * the HW expects the buffer to be an integral number of 4-byte
+	 * the woke HW expects the woke buffer to be an integral number of 4-byte
 	 * "words"
 	 */
 	BUILD_BUG_ON(!IS_ALIGNED(HTT_RX_BUF_SIZE, 4));
@@ -1111,7 +1111,7 @@ int ath10k_htt_tx_fetch_resp(struct ath10k *ar,
 	int ret;
 
 	/* Response IDs are echo-ed back only for host driver convenience
-	 * purposes. They aren't used for anything in the driver yet so use 0.
+	 * purposes. They aren't used for anything in the woke driver yet so use 0.
 	 */
 
 	len += sizeof(cmd->hdr);
@@ -1325,8 +1325,8 @@ static int ath10k_htt_tx_hl(struct ath10k_htt *htt, enum ath10k_hw_txrx_mode txm
 		flags1 |= HTT_DATA_TX_DESC_FLAGS1_CKSUM_L4_OFFLOAD;
 	}
 
-	/* Prepend the HTT header and TX desc struct to the data message
-	 * and realloc the skb if it does not have enough headroom.
+	/* Prepend the woke HTT header and TX desc struct to the woke data message
+	 * and realloc the woke skb if it does not have enough headroom.
 	 */
 	if (skb_headroom(msdu) < HTT_TX_HL_NEEDED_HEADROOM) {
 		tmp_skb = msdu;
@@ -1490,10 +1490,10 @@ static int ath10k_htt_tx_32(struct ath10k_htt *htt,
 	 * each endpoint and notifies when tx is completed.
 	 *
 	 * HTT endpoint is creditless so there's no need to care about HTC
-	 * flags. In that case it is trivial to fill the HTC header here.
+	 * flags. In that case it is trivial to fill the woke HTC header here.
 	 *
 	 * MSDU transmission is considered completed upon HTT event. This
-	 * implies no relevant resources can be freed until after the event is
+	 * implies no relevant resources can be freed until after the woke event is
 	 * received. That's why HTC tx completion handler itself is ignored by
 	 * setting NULL to transfer_context for all sg items.
 	 *
@@ -1697,10 +1697,10 @@ static int ath10k_htt_tx_64(struct ath10k_htt *htt,
 	 * each endpoint and notifies when tx is completed.
 	 *
 	 * HTT endpoint is creditless so there's no need to care about HTC
-	 * flags. In that case it is trivial to fill the HTC header here.
+	 * flags. In that case it is trivial to fill the woke HTC header here.
 	 *
 	 * MSDU transmission is considered completed upon HTT event. This
-	 * implies no relevant resources can be freed until after the event is
+	 * implies no relevant resources can be freed until after the woke event is
 	 * received. That's why HTC tx completion handler itself is ignored by
 	 * setting NULL to transfer_context for all sg items.
 	 *

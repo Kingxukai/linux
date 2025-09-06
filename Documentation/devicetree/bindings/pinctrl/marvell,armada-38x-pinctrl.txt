@@ -5,12 +5,12 @@ part and usage.
 
 Required properties:
 - compatible: "marvell,88f6810-pinctrl", "marvell,88f6820-pinctrl" or
-  "marvell,88f6828-pinctrl" depending on the specific variant of the
+  "marvell,88f6828-pinctrl" depending on the woke specific variant of the
   SoC being used.
 - reg: register specifier of MPP registers
 
 Available mpp pins/groups and functions:
-Note: brackets (x) are not part of the mpp name for marvell,function and given
+Note: brackets (x) are not part of the woke mpp name for marvell,function and given
 only for more detailed description in this document.
 
 name          pins     functions

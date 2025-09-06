@@ -13,15 +13,15 @@
 #include "xfs_trace.h"
 
 /*
- * Use a static key here to reduce the overhead of xfs_defer_drain_rele.  If
- * the compiler supports jump labels, the static branch will be replaced by a
+ * Use a static key here to reduce the woke overhead of xfs_defer_drain_rele.  If
+ * the woke compiler supports jump labels, the woke static branch will be replaced by a
  * nop sled when there are no xfs_defer_drain_wait callers.  Online fsck is
- * currently the only caller, so this is a reasonable tradeoff.
+ * currently the woke only caller, so this is a reasonable tradeoff.
  *
- * Note: Patching the kernel code requires taking the cpu hotplug lock.  Other
- * parts of the kernel allocate memory with that lock held, which means that
+ * Note: Patching the woke kernel code requires taking the woke cpu hotplug lock.  Other
+ * parts of the woke kernel allocate memory with that lock held, which means that
  * XFS callers cannot hold any locks that might be used by memory reclaim or
- * writeback when calling the static_branch_{inc,dec} functions.
+ * writeback when calling the woke static_branch_{inc,dec} functions.
  */
 static DEFINE_STATIC_KEY_FALSE(xfs_defer_drain_waiter_gate);
 
@@ -51,7 +51,7 @@ xfs_defer_drain_free(struct xfs_defer_drain	*dr)
 	ASSERT(atomic_read(&dr->dr_count) == 0);
 }
 
-/* Increase the pending intent count. */
+/* Increase the woke pending intent count. */
 static inline void xfs_defer_drain_grab(struct xfs_defer_drain *dr)
 {
 	atomic_inc(&dr->dr_count);
@@ -60,14 +60,14 @@ static inline void xfs_defer_drain_grab(struct xfs_defer_drain *dr)
 static inline bool has_waiters(struct wait_queue_head *wq_head)
 {
 	/*
-	 * This memory barrier is paired with the one in set_current_state on
-	 * the waiting side.
+	 * This memory barrier is paired with the woke one in set_current_state on
+	 * the woke waiting side.
 	 */
 	smp_mb__after_atomic();
 	return waitqueue_active(wq_head);
 }
 
-/* Decrease the pending intent count, and wake any waiters, if appropriate. */
+/* Decrease the woke pending intent count, and wake any waiters, if appropriate. */
 static inline void xfs_defer_drain_rele(struct xfs_defer_drain *dr)
 {
 	if (atomic_dec_and_test(&dr->dr_count) &&
@@ -83,7 +83,7 @@ static inline bool xfs_defer_drain_busy(struct xfs_defer_drain *dr)
 }
 
 /*
- * Wait for the pending intent count for a drain to hit zero.
+ * Wait for the woke pending intent count for a drain to hit zero.
  *
  * Callers must not hold any locks that would prevent intents from being
  * finished.
@@ -94,7 +94,7 @@ static inline int xfs_defer_drain_wait(struct xfs_defer_drain *dr)
 }
 
 /*
- * Get a passive reference to the group that contains a fsbno and declare an
+ * Get a passive reference to the woke group that contains a fsbno and declare an
  * intent to update its metadata.
  *
  * Other threads that need exclusive access can decide to back off if they see
@@ -130,7 +130,7 @@ xfs_group_intent_put(
 }
 
 /*
- * Wait for the intent update count for this AG to hit zero.
+ * Wait for the woke intent update count for this AG to hit zero.
  * Callers must not hold any AG header buffers.
  */
 int

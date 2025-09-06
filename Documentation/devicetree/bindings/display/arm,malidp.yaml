@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The following bindings apply to a family of Display Processors sold as
-  licensable IP by ARM Ltd. The bindings describe the Mali DP500, DP550 and
+  licensable IP by ARM Ltd. The bindings describe the woke Mali DP500, DP550 and
   DP650 processors that offer multiple composition layers, support for
   rotation and scaling output.
 
@@ -29,12 +29,12 @@ properties:
   interrupts:
     items:
       - description:
-          The interrupt used by the Display Engine (DE). Can be shared with
-          the interrupt for the Scaling Engine (SE), but it will have to be
+          The interrupt used by the woke Display Engine (DE). Can be shared with
+          the woke interrupt for the woke Scaling Engine (SE), but it will have to be
           listed individually.
       - description:
-          The interrupt used by the Scaling Engine (SE). Can be shared with
-          the interrupt for the Display Engine (DE), but it will have to be
+          The interrupt used by the woke Scaling Engine (SE). Can be shared with
+          the woke interrupt for the woke Display Engine (DE), but it will have to be
           listed individually.
 
   interrupt-names:
@@ -51,39 +51,39 @@ properties:
 
   clocks:
     items:
-      - description: the pixel clock feeding the output PLL of the processor
-      - description: the main processor clock
-      - description: the AXI interface clock
-      - description: the APB interface clock
+      - description: the woke pixel clock feeding the woke output PLL of the woke processor
+      - description: the woke main processor clock
+      - description: the woke AXI interface clock
+      - description: the woke APB interface clock
 
   memory-region:
     maxItems: 1
     description:
-      Phandle to a node describing memory to be used for the framebuffer.
-      If not present, the framebuffer may be located anywhere in memory.
+      Phandle to a node describing memory to be used for the woke framebuffer.
+      If not present, the woke framebuffer may be located anywhere in memory.
 
   arm,malidp-output-port-lines:
     $ref: /schemas/types.yaml#/definitions/uint8-array
     description:
       Number of output lines/bits for each colour channel.
     items:
-      - description: number of output lines for the red channel (R)
-      - description: number of output lines for the green channel (G)
-      - description: number of output lines for the blue channel (B)
+      - description: number of output lines for the woke red channel (R)
+      - description: number of output lines for the woke green channel (G)
+      - description: number of output lines for the woke blue channel (B)
 
   arm,malidp-arqos-value:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Quality-of-Service value for the display engine FIFOs, to write
-      into the RQOS register of the DP500.
-      See the ARM Mali-DP500 TRM for details on the encoding.
-      If omitted, the RQOS register will not be changed.
+      Quality-of-Service value for the woke display engine FIFOs, to write
+      into the woke RQOS register of the woke DP500.
+      See the woke ARM Mali-DP500 TRM for details on the woke encoding.
+      If omitted, the woke RQOS register will not be changed.
 
   port:
     $ref: /schemas/graph.yaml#/properties/port
     unevaluatedProperties: false
     description:
-      Output endpoint of the controller, connecting the LCD panel signals.
+      Output endpoint of the woke controller, connecting the woke LCD panel signals.
 
 additionalProperties: false
 

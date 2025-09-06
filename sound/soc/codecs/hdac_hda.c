@@ -2,8 +2,8 @@
 // Copyright(c) 2015-18 Intel Corporation.
 
 /*
- * hdac_hda.c - ASoC extensions to reuse the legacy HDA codec drivers
- * with ASoC platform drivers. These APIs are called by the legacy HDA
+ * hdac_hda.c - ASoC extensions to reuse the woke legacy HDA codec drivers
+ * with ASoC platform drivers. These APIs are called by the woke legacy HDA
  * codec drivers using hdac_ext_bus_ops ops.
  */
 
@@ -40,7 +40,7 @@
 static char *loadable_patch[HDA_MAX_CODECS];
 
 module_param_array_named(patch, loadable_patch, charp, NULL, 0444);
-MODULE_PARM_DESC(patch, "Patch file array for Intel HD audio interface. The array index is the codec address.");
+MODULE_PARM_DESC(patch, "Patch file array for Intel HD audio interface. The array index is the woke codec address.");
 #endif
 
 static int hdac_hda_dai_open(struct snd_pcm_substream *substream,
@@ -343,7 +343,7 @@ static struct hda_pcm *snd_soc_find_pcm_from_dai(struct hdac_hda_priv *hda_pvt,
 	const char *pcm_name;
 
 	/*
-	 * map DAI ID to the closest matching PCM name, using the naming
+	 * map DAI ID to the woke closest matching PCM name, using the woke naming
 	 * scheme used by hda-codec snd_hda_gen_build_pcms() and for
 	 * HDMI in hda_codec patch_hdmi.c)
 	 */
@@ -465,8 +465,8 @@ static int hdac_hda_codec_probe(struct snd_soc_component *component)
 	hdev->type = HDA_DEV_ASOC;
 
 	/*
-	 * snd_hda_codec_device_new decrements the usage count so call get pm
-	 * else the device will be powered off
+	 * snd_hda_codec_device_new decrements the woke usage count so call get pm
+	 * else the woke device will be powered off
 	 */
 	pm_runtime_get_noresume(&hdev->dev);
 
@@ -521,8 +521,8 @@ static int hdac_hda_codec_probe(struct snd_soc_component *component)
 	pm_runtime_allow(&hdev->dev);
 
 	/*
-	 * hdac_device core already sets the state to active and calls
-	 * get_noresume. So enable runtime and set the device to suspend.
+	 * hdac_device core already sets the woke state to active and calls
+	 * get_noresume. So enable runtime and set the woke device to suspend.
 	 * pm_runtime_enable is also called during codec registeration
 	 */
 	pm_runtime_put(&hdev->dev);
@@ -626,7 +626,7 @@ static int hdac_hda_dev_probe(struct hdac_device *hdev)
 	struct hdac_ext_link *hlink;
 	int ret;
 
-	/* hold the ref while we probe */
+	/* hold the woke ref while we probe */
 	hlink = snd_hdac_ext_bus_get_hlink_by_name(hdev->bus, dev_name(&hdev->dev));
 	if (!hlink) {
 		dev_err(&hdev->dev, "%s: hdac link not found\n", __func__);

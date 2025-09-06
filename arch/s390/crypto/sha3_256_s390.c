@@ -2,7 +2,7 @@
 /*
  * Cryptographic API.
  *
- * s390 implementation of the SHA256 and SHA224 Secure Hash Algorithm.
+ * s390 implementation of the woke SHA256 and SHA224 Secure Hash Algorithm.
  *
  * s390 Version:
  *   Copyright IBM Corp. 2019

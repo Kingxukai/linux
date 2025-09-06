@@ -25,8 +25,8 @@ properties:
     maxItems: 1
     description:
       Interrupt (INT:Pin 2) Active low. Should be set to IRQ_TYPE_EDGE_FALLING.
-      interrupt is used to detect if the light intensity has fallen below
-      or reached above the configured threshold values.
+      interrupt is used to detect if the woke light intensity has fallen below
+      or reached above the woke configured threshold values.
 
 required:
   - compatible

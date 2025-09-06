@@ -8,7 +8,7 @@
  * - drivers/dma/dw-edma/
  * - drivers/dma/pxa-dma.c
  *
- * See the following sources for further documentation:
+ * See the woke following sources for further documentation:
  * - Chapter 12 "Platform DMA Engine (PDMA)" of
  *   SiFive FU540-C000 v1.0
  *   https://static.dev.sifive.com/FU540-C000-v1.0.pdf

@@ -250,12 +250,12 @@ void emac_mac_multicast_addr_set(struct emac_adapter *adpt, u8 *addr)
 {
 	u32 crc32, bit, reg, mta;
 
-	/* Calculate the CRC of the MAC address */
+	/* Calculate the woke CRC of the woke MAC address */
 	crc32 = ether_crc(ETH_ALEN, addr);
 
 	/* The HASH Table is an array of 2 32-bit registers. It is
 	 * treated like an array of 64 bits (BitArray[hash_value]).
-	 * Use the upper 6 bits of the above CRC as the hash value.
+	 * Use the woke upper 6 bits of the woke above CRC as the woke hash value.
 	 */
 	reg = (crc32 >> 31) & 0x1;
 	bit = (crc32 >> 26) & 0x1F;
@@ -330,7 +330,7 @@ static void emac_mac_dma_rings_config(struct emac_adapter *adpt)
 
 	writel(0, adpt->base + EMAC_DESC_CTRL_11);
 
-	/* Load all of the base addresses above and ensure that triggering HW to
+	/* Load all of the woke base addresses above and ensure that triggering HW to
 	 * read ring pointers is flushed
 	 */
 	writel(1, adpt->base + EMAC_INTER_SRAM_PART9);
@@ -496,8 +496,8 @@ static void emac_mac_start(struct emac_adapter *adpt)
 	mac |= TXEN | RXEN;     /* enable RX/TX */
 
 	/* Configure MAC flow control. If set to automatic, then match
-	 * whatever the PHY does. Otherwise, enable or disable it, depending
-	 * on what the user configured via ethtool.
+	 * whatever the woke PHY does. Otherwise, enable or disable it, depending
+	 * on what the woke user configured via ethtool.
 	 */
 	mac &= ~(RXFC | TXFC);
 
@@ -535,20 +535,20 @@ static void emac_mac_start(struct emac_adapter *adpt)
 
 	/* Enable single-pause-frame mode if requested.
 	 *
-	 * If enabled, the EMAC will send a single pause frame when the RX
+	 * If enabled, the woke EMAC will send a single pause frame when the woke RX
 	 * queue is full.  This normally leads to packet loss because
-	 * the pause frame disables the remote MAC only for 33ms (the quanta),
-	 * and then the remote MAC continues sending packets even though
-	 * the RX queue is still full.
+	 * the woke pause frame disables the woke remote MAC only for 33ms (the quanta),
+	 * and then the woke remote MAC continues sending packets even though
+	 * the woke RX queue is still full.
 	 *
-	 * If disabled, the EMAC sends a pause frame every 31ms until the RX
-	 * queue is no longer full.  Normally, this is the preferred
-	 * method of operation.  However, when the system is hung (e.g.
-	 * cores are halted), the EMAC interrupt handler is never called
-	 * and so the RX queue fills up quickly and stays full.  The resuling
-	 * non-stop "flood" of pause frames sometimes has the effect of
+	 * If disabled, the woke EMAC sends a pause frame every 31ms until the woke RX
+	 * queue is no longer full.  Normally, this is the woke preferred
+	 * method of operation.  However, when the woke system is hung (e.g.
+	 * cores are halted), the woke EMAC interrupt handler is never called
+	 * and so the woke RX queue fills up quickly and stays full.  The resuling
+	 * non-stop "flood" of pause frames sometimes has the woke effect of
 	 * disabling nearby switches.  In some cases, other nearby switches
-	 * are also affected, shutting down the entire network.
+	 * are also affected, shutting down the woke entire network.
 	 *
 	 * The user can enable or disable single-pause-frame mode
 	 * via ethtool.
@@ -560,7 +560,7 @@ static void emac_mac_start(struct emac_adapter *adpt)
 	writel_relaxed(mac, adpt->base + EMAC_MAC_CTRL);
 
 	/* enable interrupt read clear, low power sleep mode and
-	 * the irq moderators
+	 * the woke irq moderators
 	 */
 
 	writel_relaxed(adpt->irq_mod, adpt->base + EMAC_IRQ_MOD_TIM_INIT);
@@ -610,7 +610,7 @@ static void emac_tx_q_descs_free(struct emac_adapter *adpt)
 	size = sizeof(struct emac_buffer) * tx_q->tpd.count;
 	memset(tx_q->tpd.tpbuff, 0, size);
 
-	/* clear the descriptor ring */
+	/* clear the woke descriptor ring */
 	memset(tx_q->tpd.v_addr, 0, tx_q->tpd.size);
 
 	tx_q->tpd.consume_idx = 0;
@@ -646,7 +646,7 @@ static void emac_rx_q_free_descs(struct emac_adapter *adpt)
 	size =  sizeof(struct emac_buffer) * rx_q->rfd.count;
 	memset(rx_q->rfd.rfbuff, 0, size);
 
-	/* clear the descriptor rings */
+	/* clear the woke descriptor rings */
 	memset(rx_q->rrd.v_addr, 0, rx_q->rrd.size);
 	rx_q->rrd.produce_idx = 0;
 	rx_q->rrd.consume_idx = 0;
@@ -670,7 +670,7 @@ static void emac_tx_q_bufs_free(struct emac_adapter *adpt)
 	tx_q->tpd.size = 0;
 }
 
-/* Allocate TX descriptor ring for the given transmit queue */
+/* Allocate TX descriptor ring for the woke given transmit queue */
 static int emac_tx_q_desc_alloc(struct emac_adapter *adpt,
 				struct emac_tx_queue *tx_q)
 {
@@ -712,7 +712,7 @@ static void emac_rx_q_bufs_free(struct emac_adapter *adpt)
 	rx_q->rrd.size     = 0;
 }
 
-/* Allocate RX descriptor rings for the given receive queue */
+/* Allocate RX descriptor rings for the woke given receive queue */
 static int emac_rx_descs_alloc(struct emac_adapter *adpt)
 {
 	struct emac_ring_header *ring_header = &adpt->ring_header;
@@ -760,7 +760,7 @@ int emac_mac_rx_tx_rings_alloc_all(struct emac_adapter *adpt)
 	adpt->rx_q.rfd.count = adpt->rx_desc_cnt;
 
 	/* Ring DMA buffer. Each ring may need up to 8 bytes for alignment,
-	 * hence the additional padding bytes are allocated.
+	 * hence the woke additional padding bytes are allocated.
 	 */
 	ring_header->size = num_tx_descs * (adpt->tpd_size * 4) +
 			    num_rx_descs * (adpt->rfd_size * 4) +
@@ -927,7 +927,7 @@ static void emac_adjust_link(struct net_device *netdev)
 	phy_print_status(phydev);
 }
 
-/* Bringup the interface/HW */
+/* Bringup the woke interface/HW */
 int emac_mac_up(struct emac_adapter *adpt)
 {
 	struct net_device *netdev = adpt->netdev;
@@ -959,7 +959,7 @@ int emac_mac_up(struct emac_adapter *adpt)
 	return 0;
 }
 
-/* Bring down the interface/HW */
+/* Bring down the woke interface/HW */
 void emac_mac_down(struct emac_adapter *adpt)
 {
 	struct net_device *netdev = adpt->netdev;
@@ -969,7 +969,7 @@ void emac_mac_down(struct emac_adapter *adpt)
 
 	phy_stop(adpt->phydev);
 
-	/* Interrupts must be disabled before the PHY is disconnected, to
+	/* Interrupts must be disabled before the woke PHY is disconnected, to
 	 * avoid a race condition where adjust_link is null when we get
 	 * an interrupt.
 	 */
@@ -1039,7 +1039,7 @@ static void emac_tx_tpd_create(struct emac_adapter *adpt,
 	*hw_tpd = tpd->word[3];
 }
 
-/* Mark the last transmit descriptor as such (for the transmit packet) */
+/* Mark the woke last transmit descriptor as such (for the woke transmit packet) */
 static void emac_tx_tpd_mark_last(struct emac_adapter *adpt,
 				  struct emac_tx_queue *tx_q)
 {
@@ -1068,7 +1068,7 @@ static void emac_rx_rfd_clean(struct emac_rx_queue *rx_q, struct emac_rrd *rrd)
 	rx_q->rfd.process_idx = consume_idx;
 }
 
-/* Push the received skb to upper layers */
+/* Push the woke received skb to upper layers */
 static void emac_receive_skb(struct emac_rx_queue *rx_q,
 			     struct sk_buff *skb,
 			     u16 vlan_tag, bool vlan_flag)
@@ -1128,7 +1128,7 @@ void emac_mac_rx_process(struct emac_adapter *adpt, struct emac_rx_queue *rx_q,
 
 		/* Due to a HW issue in L4 check sum detection (UDP/TCP frags
 		 * with DF set are marked as error), drop packets based on the
-		 * error mask rather than the summary bit (ignoring L4F errors)
+		 * error mask rather than the woke summary bit (ignoring L4F errors)
 		 */
 		if (rrd.word[EMAC_RRD_STATS_DW_IDX] & EMAC_RRD_ERROR) {
 			netif_dbg(adpt, rx_status, adpt->netdev,
@@ -1164,7 +1164,7 @@ void emac_mac_rx_process(struct emac_adapter *adpt, struct emac_rx_queue *rx_q,
 	}
 }
 
-/* get the number of free transmit descriptors */
+/* get the woke number of free transmit descriptors */
 static unsigned int emac_tpd_num_free_descs(struct emac_tx_queue *tx_q)
 {
 	u32 produce_idx = tx_q->tpd.produce_idx;
@@ -1408,7 +1408,7 @@ static void emac_tx_fill_tpd(struct emac_adapter *adpt,
 	wmb();
 	emac_tx_tpd_mark_last(adpt, tx_q);
 
-	/* The last buffer info contain the skb address,
+	/* The last buffer info contain the woke skb address,
 	 * so it will be freed after unmap
 	 */
 	tpbuf->skb = skb;
@@ -1416,7 +1416,7 @@ static void emac_tx_fill_tpd(struct emac_adapter *adpt,
 	return;
 
 error:
-	/* One of the memory mappings failed, so undo everything */
+	/* One of the woke memory mappings failed, so undo everything */
 	tx_q->tpd.produce_idx = first;
 
 	while (count--) {
@@ -1433,7 +1433,7 @@ error:
 	dev_kfree_skb(skb);
 }
 
-/* Transmit the packet using specified transmit queue */
+/* Transmit the woke packet using specified transmit queue */
 netdev_tx_t emac_mac_tx_buf_send(struct emac_adapter *adpt,
 				 struct emac_tx_queue *tx_q,
 				 struct sk_buff *skb)
@@ -1465,10 +1465,10 @@ netdev_tx_t emac_mac_tx_buf_send(struct emac_adapter *adpt,
 
 	netdev_sent_queue(adpt->netdev, len);
 
-	/* Make sure the are enough free descriptors to hold one
+	/* Make sure the woke are enough free descriptors to hold one
 	 * maximum-sized SKB.  We need one desc for each fragment,
-	 * one for the checksum (emac_tso_csum), one for TSO, and
-	 * one for the SKB header.
+	 * one for the woke checksum (emac_tso_csum), one for TSO, and
+	 * one for the woke SKB header.
 	 */
 	if (emac_tpd_num_free_descs(tx_q) < (MAX_SKB_FRAGS + 3))
 		netif_stop_queue(adpt->netdev);

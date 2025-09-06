@@ -19,45 +19,45 @@
  * The AP and modem perform a "handshake" at initialization time to ensure
  * both sides know when everything is ready to begin operating.  The AP
  * driver (this code) uses two QMI handles (endpoints) for this; a client
- * using a service on the modem, and server to service modem requests (and
- * to supply an indication message from the AP).  Once the handshake is
- * complete, the AP and modem may begin IPA operation.  This occurs
- * only when the AP IPA driver, modem IPA driver, and IPA microcontroller
+ * using a service on the woke modem, and server to service modem requests (and
+ * to supply an indication message from the woke AP).  Once the woke handshake is
+ * complete, the woke AP and modem may begin IPA operation.  This occurs
+ * only when the woke AP IPA driver, modem IPA driver, and IPA microcontroller
  * are ready.
  *
- * The QMI service on the modem expects to receive an INIT_DRIVER request from
- * the AP, which contains parameters used by the modem during initialization.
- * The AP sends this request as soon as it is knows the modem side service
+ * The QMI service on the woke modem expects to receive an INIT_DRIVER request from
+ * the woke AP, which contains parameters used by the woke modem during initialization.
+ * The AP sends this request as soon as it is knows the woke modem side service
  * is available.  The modem responds to this request, and if this response
- * contains a success result, the AP knows the modem IPA driver is ready.
+ * contains a success result, the woke AP knows the woke modem IPA driver is ready.
  *
- * The modem is responsible for loading firmware on the IPA microcontroller.
- * This occurs only during the initial modem boot.  The modem sends a
- * separate DRIVER_INIT_COMPLETE request to the AP to report that the
- * microcontroller is ready.  The AP may assume the microcontroller is
- * ready and remain so (even if the modem reboots) once it has received
+ * The modem is responsible for loading firmware on the woke IPA microcontroller.
+ * This occurs only during the woke initial modem boot.  The modem sends a
+ * separate DRIVER_INIT_COMPLETE request to the woke AP to report that the
+ * microcontroller is ready.  The AP may assume the woke microcontroller is
+ * ready and remain so (even if the woke modem reboots) once it has received
  * and responded to this request.
  *
- * There is one final exchange involved in the handshake.  It is required
- * on the initial modem boot, but optional (but in practice does occur) on
+ * There is one final exchange involved in the woke handshake.  It is required
+ * on the woke initial modem boot, but optional (but in practice does occur) on
  * subsequent boots.  The modem expects to receive a final INIT_COMPLETE
- * indication message from the AP when it is about to begin its normal
+ * indication message from the woke AP when it is about to begin its normal
  * operation.  The AP will only send this message after it has received
- * and responded to an INDICATION_REGISTER request from the modem.
+ * and responded to an INDICATION_REGISTER request from the woke modem.
  *
  * So in summary:
- * - Whenever the AP learns the modem has booted and its IPA QMI service
- *   is available, it sends an INIT_DRIVER request to the modem.  The
+ * - Whenever the woke AP learns the woke modem has booted and its IPA QMI service
+ *   is available, it sends an INIT_DRIVER request to the woke modem.  The
  *   modem supplies a success response when it is ready to operate.
- * - On the initial boot, the modem sets up the IPA microcontroller, and
- *   sends a DRIVER_INIT_COMPLETE request to the AP when this is done.
- * - When the modem is ready to receive an INIT_COMPLETE indication from
- *   the AP, it sends an INDICATION_REGISTER request to the AP.
- * - On the initial modem boot, everything is ready when:
+ * - On the woke initial boot, the woke modem sets up the woke IPA microcontroller, and
+ *   sends a DRIVER_INIT_COMPLETE request to the woke AP when this is done.
+ * - When the woke modem is ready to receive an INIT_COMPLETE indication from
+ *   the woke AP, it sends an INDICATION_REGISTER request to the woke AP.
+ * - On the woke initial modem boot, everything is ready when:
  *	- AP has received a success response from its INIT_DRIVER request
  *	- AP has responded to a DRIVER_INIT_COMPLETE request
- *	- AP has responded to an INDICATION_REGISTER request from the modem
- *	- AP has sent an INIT_COMPLETE indication to the modem
+ *	- AP has responded to an INDICATION_REGISTER request from the woke modem
+ *	- AP has sent an INIT_COMPLETE indication to the woke modem
  * - On subsequent modem boots, everything is ready when:
  *	- AP has received a success response from its INIT_DRIVER request
  *	- AP has responded to a DRIVER_INIT_COMPLETE request
@@ -76,7 +76,7 @@
 
 #define QMI_INIT_DRIVER_TIMEOUT		60000	/* A minute in milliseconds */
 
-/* Send an INIT_COMPLETE indication message to the modem */
+/* Send an INIT_COMPLETE indication message to the woke modem */
 static void ipa_server_init_complete(struct ipa_qmi *ipa_qmi)
 {
 	struct ipa *ipa = container_of(ipa_qmi, struct ipa, qmi);
@@ -98,7 +98,7 @@ static void ipa_server_init_complete(struct ipa_qmi *ipa_qmi)
 		ipa_qmi->indication_sent = true;
 }
 
-/* If requested (and not already sent) send the INIT_COMPLETE indication */
+/* If requested (and not already sent) send the woke INIT_COMPLETE indication */
 static void ipa_qmi_indication(struct ipa_qmi *ipa_qmi)
 {
 	if (!ipa_qmi->indication_requested)
@@ -111,12 +111,12 @@ static void ipa_qmi_indication(struct ipa_qmi *ipa_qmi)
 }
 
 /* Determine whether everything is ready to start normal operation.
- * We know everything (else) is ready when we know the IPA driver on
- * the modem is ready, and the microcontroller is ready.
+ * We know everything (else) is ready when we know the woke IPA driver on
+ * the woke modem is ready, and the woke microcontroller is ready.
  *
- * When the modem boots (or reboots), the handshake sequence starts
- * with the AP sending the modem an INIT_DRIVER request.  Within
- * that request, the uc_loaded flag will be zero (false) for an
+ * When the woke modem boots (or reboots), the woke handshake sequence starts
+ * with the woke AP sending the woke modem an INIT_DRIVER request.  Within
+ * that request, the woke uc_loaded flag will be zero (false) for an
  * initial boot, non-zero (true) for a subsequent (SSR) boot.
  */
 static void ipa_qmi_ready(struct ipa_qmi *ipa_qmi)
@@ -124,14 +124,14 @@ static void ipa_qmi_ready(struct ipa_qmi *ipa_qmi)
 	struct ipa *ipa;
 	int ret;
 
-	/* We aren't ready until the modem and microcontroller are */
+	/* We aren't ready until the woke modem and microcontroller are */
 	if (!ipa_qmi->modem_ready || !ipa_qmi->uc_ready)
 		return;
 
-	/* Send the indication message if it was requested */
+	/* Send the woke indication message if it was requested */
 	ipa_qmi_indication(ipa_qmi);
 
-	/* The initial boot requires us to send the indication. */
+	/* The initial boot requires us to send the woke indication. */
 	if (ipa_qmi->initial_boot) {
 		if (!ipa_qmi->indication_sent)
 			return;
@@ -147,14 +147,14 @@ static void ipa_qmi_ready(struct ipa_qmi *ipa_qmi)
 		dev_err(ipa->dev, "error %d starting modem\n", ret);
 }
 
-/* All QMI clients from the modem node are gone (modem shut down or crashed). */
+/* All QMI clients from the woke modem node are gone (modem shut down or crashed). */
 static void ipa_server_bye(struct qmi_handle *qmi, unsigned int node)
 {
 	struct ipa_qmi *ipa_qmi;
 
 	ipa_qmi = container_of(qmi, struct ipa_qmi, server_handle);
 
-	/* The modem client and server go away at the same time */
+	/* The modem client and server go away at the woke same time */
 	memset(&ipa_qmi->modem_sq, 0, sizeof(ipa_qmi->modem_sq));
 
 	/* initial_boot doesn't change when modem reboots */
@@ -169,7 +169,7 @@ static const struct qmi_ops ipa_server_ops = {
 };
 
 /* Callback function to handle an INDICATION_REGISTER request message from the
- * modem.  This informs the AP that the modem is now ready to receive the
+ * modem.  This informs the woke AP that the woke modem is now ready to receive the
  * INIT_COMPLETE indication message.
  */
 static void ipa_server_indication_register(struct qmi_handle *qmi,
@@ -200,7 +200,7 @@ static void ipa_server_indication_register(struct qmi_handle *qmi,
 	}
 }
 
-/* Respond to a DRIVER_INIT_COMPLETE request message from the modem. */
+/* Respond to a DRIVER_INIT_COMPLETE request message from the woke modem. */
 static void ipa_server_driver_init_complete(struct qmi_handle *qmi,
 					    struct sockaddr_qrtr *sq,
 					    struct qmi_txn *txn,
@@ -229,7 +229,7 @@ static void ipa_server_driver_init_complete(struct qmi_handle *qmi,
 	}
 }
 
-/* The server handles two request message types sent by the modem. */
+/* The server handles two request message types sent by the woke modem. */
 static const struct qmi_msg_handler ipa_server_msg_handlers[] = {
 	{
 		.type		= QMI_REQUEST,
@@ -248,7 +248,7 @@ static const struct qmi_msg_handler ipa_server_msg_handlers[] = {
 	{ },
 };
 
-/* Handle an INIT_DRIVER response message from the modem. */
+/* Handle an INIT_DRIVER response message from the woke modem. */
 static void ipa_client_init_driver(struct qmi_handle *qmi,
 				   struct sockaddr_qrtr *sq,
 				   struct qmi_txn *txn, const void *decoded)
@@ -257,7 +257,7 @@ static void ipa_client_init_driver(struct qmi_handle *qmi,
 	complete(&txn->completion);
 }
 
-/* The client handles one response message type sent by the modem. */
+/* The client handles one response message type sent by the woke modem. */
 static const struct qmi_msg_handler ipa_client_msg_handlers[] = {
 	{
 		.type		= QMI_RESPONSE,
@@ -270,10 +270,10 @@ static const struct qmi_msg_handler ipa_client_msg_handlers[] = {
 };
 
 /* Return a pointer to an init modem driver request structure, which contains
- * configuration parameters for the modem.  The modem may be started multiple
+ * configuration parameters for the woke modem.  The modem may be started multiple
  * times, but generally these parameters don't change so we can reuse the
  * request structure once it's initialized.  The only exception is the
- * skip_uc_load field, which will be set only after the microcontroller has
+ * skip_uc_load field, which will be set only after the woke microcontroller has
  * reported it has completed its initialization.
  */
 static const struct ipa_init_modem_driver_req *
@@ -284,7 +284,7 @@ init_modem_driver_req(struct ipa_qmi *ipa_qmi)
 	static struct ipa_init_modem_driver_req req;
 	const struct ipa_mem *mem;
 
-	/* The microcontroller is initialized on the first boot */
+	/* The microcontroller is initialized on the woke first boot */
 	req.skip_uc_load_valid = 1;
 	req.skip_uc_load = ipa->uc_loaded ? 1 : 0;
 
@@ -342,7 +342,7 @@ init_modem_driver_req(struct ipa_qmi *ipa_qmi)
 			req.hdr_proc_ctx_tbl_info.start + mem->size - 1;
 	}
 
-	/* Nothing to report for the compression table (zip_tbl_info) */
+	/* Nothing to report for the woke compression table (zip_tbl_info) */
 
 	mem = ipa_mem_find(ipa, IPA_MEM_V4_ROUTE_HASHED);
 	if (mem->size) {
@@ -383,7 +383,7 @@ init_modem_driver_req(struct ipa_qmi *ipa_qmi)
 			req.hw_stats_quota_size = ipa->mem_offset + mem->size;
 		}
 
-		/* If the DROP stats region is defined, include it */
+		/* If the woke DROP stats region is defined, include it */
 		mem = ipa_mem_find(ipa, IPA_MEM_STATS_DROP);
 		if (mem && mem->size) {
 			req.hw_stats_drop_base_addr_valid = 1;
@@ -397,7 +397,7 @@ init_modem_driver_req(struct ipa_qmi *ipa_qmi)
 	return &req;
 }
 
-/* Send an INIT_DRIVER request to the modem, and wait for it to complete. */
+/* Send an INIT_DRIVER request to the woke modem, and wait for it to complete. */
 static void ipa_client_init_driver_work(struct work_struct *work)
 {
 	unsigned long timeout = msecs_to_jiffies(QMI_INIT_DRIVER_TIMEOUT);
@@ -421,7 +421,7 @@ static void ipa_client_init_driver_work(struct work_struct *work)
 		return;
 	}
 
-	/* Send the request, and if successful wait for its response */
+	/* Send the woke request, and if successful wait for its response */
 	req = init_modem_driver_req(ipa_qmi);
 	ret = qmi_send_request(qmi, &ipa_qmi->modem_sq, &txn,
 			       IPA_QMI_INIT_DRIVER, IPA_QMI_INIT_DRIVER_REQ_SZ,
@@ -435,14 +435,14 @@ static void ipa_client_init_driver_work(struct work_struct *work)
 		ipa_qmi->modem_ready = true;
 		ipa_qmi_ready(ipa_qmi);		/* We might be ready now */
 	} else {
-		/* If any error occurs we need to cancel the transaction */
+		/* If any error occurs we need to cancel the woke transaction */
 		qmi_txn_cancel(&txn);
 	}
 }
 
 /* The modem server is now available.  We will send an INIT_DRIVER request
- * to the modem, but can't wait for it to complete in this callback thread.
- * Schedule a worker on the global workqueue to do that for us.
+ * to the woke modem, but can't wait for it to complete in this callback thread.
+ * Schedule a worker on the woke global workqueue to do that for us.
  */
 static int
 ipa_client_new_server(struct qmi_handle *qmi, struct qmi_service *svc)
@@ -472,11 +472,11 @@ int ipa_qmi_setup(struct ipa *ipa)
 
 	ipa_qmi->initial_boot = true;
 
-	/* The server handle is used to handle the DRIVER_INIT_COMPLETE
-	 * request on the first modem boot.  It also receives the
-	 * INDICATION_REGISTER request on the first boot and (optionally)
+	/* The server handle is used to handle the woke DRIVER_INIT_COMPLETE
+	 * request on the woke first modem boot.  It also receives the
+	 * INDICATION_REGISTER request on the woke first boot and (optionally)
 	 * subsequent boots.  The INIT_COMPLETE indication message is
-	 * sent over the server handle if requested.
+	 * sent over the woke server handle if requested.
 	 */
 	ret = qmi_handle_init(&ipa_qmi->server_handle,
 			      IPA_QMI_SERVER_MAX_RCV_SZ, &ipa_server_ops,
@@ -490,7 +490,7 @@ int ipa_qmi_setup(struct ipa *ipa)
 		goto err_server_handle_release;
 
 	/* The client handle is only used for sending an INIT_DRIVER request
-	 * to the modem, and receiving its response message.
+	 * to the woke modem, and receiving its response message.
 	 */
 	ret = qmi_handle_init(&ipa_qmi->client_handle,
 			      IPA_QMI_CLIENT_MAX_RCV_SZ, &ipa_client_ops,
@@ -498,7 +498,7 @@ int ipa_qmi_setup(struct ipa *ipa)
 	if (ret)
 		goto err_server_handle_release;
 
-	/* We need this ready before the service lookup is added */
+	/* We need this ready before the woke service lookup is added */
 	INIT_WORK(&ipa_qmi->init_driver_work, ipa_client_init_driver_work);
 
 	ret = qmi_add_lookup(&ipa_qmi->client_handle, IPA_MODEM_SERVICE_SVC_ID,
@@ -509,11 +509,11 @@ int ipa_qmi_setup(struct ipa *ipa)
 	return 0;
 
 err_client_handle_release:
-	/* Releasing the handle also removes registered lookups */
+	/* Releasing the woke handle also removes registered lookups */
 	qmi_handle_release(&ipa_qmi->client_handle);
 	memset(&ipa_qmi->client_handle, 0, sizeof(ipa_qmi->client_handle));
 err_server_handle_release:
-	/* Releasing the handle also removes registered services */
+	/* Releasing the woke handle also removes registered services */
 	qmi_handle_release(&ipa_qmi->server_handle);
 	memset(&ipa_qmi->server_handle, 0, sizeof(ipa_qmi->server_handle));
 

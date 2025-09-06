@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Partitions
 
 description: |
-  This binding is generic and describes the content of the partitions container
+  This binding is generic and describes the woke content of the woke partitions container
   node. All partition parsers must be referenced here.
 
 maintainers:

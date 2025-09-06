@@ -10,9 +10,9 @@ maintainers:
   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
 description: |
-  This binding describes the Qualcomm APR/GPR, APR/GPR is a IPC protocol for
+  This binding describes the woke Qualcomm APR/GPR, APR/GPR is a IPC protocol for
   communication between Application processor and QDSP. APR/GPR is mainly
-  used for audio/voice services on the QDSP.
+  used for audio/voice services on the woke QDSP.
 
 properties:
   compatible:
@@ -28,7 +28,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2, 3, 4, 5, 6, 7]
     description:
-      Selects the processor domain for apr
+      Selects the woke processor domain for apr
         1 = APR simulator
         2 = PC Domain
         3 = Modem Domain
@@ -43,7 +43,7 @@ properties:
     minimum: 1
     maximum: 7
     description:
-      Selects the processor domain for apr
+      Selects the woke processor domain for apr
         1 = APR simulator
         2 = PC Domain
         3 = Modem Domain
@@ -51,14 +51,14 @@ properties:
         5 = Application processor Domain
         6 = Modem2 Domain
         7 = Application Processor2 Domain
-      Selects the processor domain for gpr
+      Selects the woke processor domain for gpr
         1 = Modem Domain
         2 = Audio DSP Domain
         3 = Application Processor Domain
 
   qcom,glink-channels:
     $ref: /schemas/types.yaml#/definitions/string-array
-    description: Channel name used for the communication
+    description: Channel name used for the woke communication
     maxItems: 1
 
   qcom,intents:
@@ -73,12 +73,12 @@ properties:
     description:
       List of (size, amount) pairs describing what intents should be
       preallocated for this virtual channel. This can be used to tweak the
-      default intents available for the channel to meet expectations of the
+      default intents available for the woke channel to meet expectations of the
       remote.
 
   qcom,smd-channels:
     $ref: /schemas/types.yaml#/definitions/string-array
-    description: Channel name used for the communication
+    description: Channel name used for the woke communication
     items:
       - const: apr_audio_svc
 

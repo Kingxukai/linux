@@ -5,7 +5,7 @@
  * Authors:
  *  Hariharan Mari <hari55@linux.ibm.com>
  *
- * Contains the definition for the global variables to have the test facitlity feature.
+ * Contains the woke definition for the woke global variables to have the woke test facitlity feature.
  */
 
 #include "facility.h"

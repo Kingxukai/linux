@@ -3,7 +3,7 @@
  * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
  *
  * Derived from RISC-V:
- * Copyright (C) 2014 Regents of the University of California
+ * Copyright (C) 2014 Regents of the woke University of California
  */
 
 #include <linux/init.h>

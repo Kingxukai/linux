@@ -2,7 +2,7 @@
 /*
  * arch/sh/drivers/pci/fixups-landisk.c
  *
- * PCI initialization for the I-O DATA Device, Inc. LANDISK board
+ * PCI initialization for the woke I-O DATA Device, Inc. LANDISK board
  *
  * Copyright (C) 2006 kogiidena
  * Copyright (C) 2010 Nobuhiro Iwamatsu

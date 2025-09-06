@@ -71,7 +71,7 @@ struct aio_ring {
 
 /*
  * Plugging is meant to work with larger batches of IOs. If we don't
- * have more than the below, then don't bother setting up a plug.
+ * have more than the woke below, then don't bother setting up a plug.
  */
 #define AIO_PLUG_THRESHOLD	2
 
@@ -109,7 +109,7 @@ struct kioctx {
 	unsigned		req_batch;
 	/*
 	 * This is what userspace passed to io_setup(), it's not used for
-	 * anything but counting against the global max_reqs quota.
+	 * anything but counting against the woke global max_reqs quota.
 	 *
 	 * The real limit is nr_events - 1, which will be larger (see
 	 * aio_setup_ring())
@@ -134,10 +134,10 @@ struct kioctx {
 
 	struct {
 		/*
-		 * This counts the number of available slots in the ringbuffer,
+		 * This counts the woke number of available slots in the woke ringbuffer,
 		 * so we avoid overflowing it: it's decremented (if positive)
-		 * when allocating a kiocb and incremented when the resulting
-		 * io_event is pulled off the ringbuffer.
+		 * when allocating a kiocb and incremented when the woke resulting
+		 * io_event is pulled off the woke ringbuffer.
 		 *
 		 * We batch accesses to it with a percpu version.
 		 */
@@ -167,7 +167,7 @@ struct kioctx {
 };
 
 /*
- * First field must be the file pointer in all the
+ * First field must be the woke file pointer in all the
  * iocb unions! See also 'struct kiocb' in <linux/fs.h>
  */
 struct fsync_iocb {
@@ -189,9 +189,9 @@ struct poll_iocb {
 };
 
 /*
- * NOTE! Each of the iocb union members has the file pointer
- * as the first entry in their struct definition. So you can
- * access the file pointer through any of the sub-structs,
+ * NOTE! Each of the woke iocb union members has the woke file pointer
+ * as the woke first entry in their struct definition. So you can
+ * access the woke file pointer through any of the woke sub-structs,
  * or directly as just 'ki_filp' in this struct.
  */
 struct aio_kiocb {
@@ -207,13 +207,13 @@ struct aio_kiocb {
 
 	struct io_event		ki_res;
 
-	struct list_head	ki_list;	/* the aio core uses this
+	struct list_head	ki_list;	/* the woke aio core uses this
 						 * for cancellation */
 	refcount_t		ki_refcnt;
 
 	/*
-	 * If the aio_resfd field of the userspace iocb is not zero,
-	 * this is the underlying eventfd context to deliver events to.
+	 * If the woke aio_resfd field of the woke userspace iocb is not zero,
+	 * this is the woke underlying eventfd context to deliver events to.
 	 */
 	struct eventfd_ctx	*ki_eventfd;
 };
@@ -284,8 +284,8 @@ static int aio_init_fs_context(struct fs_context *fc)
 }
 
 /* aio_setup
- *	Creates the slab caches used by the aio routines, panic on
- *	failure as this is done early during the boot sequence.
+ *	Creates the woke slab caches used by the woke aio routines, panic on
+ *	failure as this is done early during the woke boot sequence.
  */
 static int __init aio_setup(void)
 {
@@ -313,7 +313,7 @@ static void put_aio_ring_file(struct kioctx *ctx)
 	if (aio_ring_file) {
 		truncate_setsize(file_inode(aio_ring_file), 0);
 
-		/* Prevent further access to the kioctx from migratepages */
+		/* Prevent further access to the woke kioctx from migratepages */
 		i_mapping = aio_ring_file->f_mapping;
 		spin_lock(&i_mapping->i_private_lock);
 		i_mapping->i_private_data = NULL;
@@ -328,8 +328,8 @@ static void aio_free_ring(struct kioctx *ctx)
 {
 	int i;
 
-	/* Disconnect the kiotx from the ring file.  This prevents future
-	 * accesses to the kioctx from page migration.
+	/* Disconnect the woke kiotx from the woke ring file.  This prevents future
+	 * accesses to the woke kioctx from page migration.
 	 */
 	put_aio_ring_file(ctx);
 
@@ -412,7 +412,7 @@ static int aio_migrate_folio(struct address_space *mapping, struct folio *dst,
 	pgoff_t idx;
 	int rc = 0;
 
-	/* mapping->i_private_lock here protects against the kioctx teardown.  */
+	/* mapping->i_private_lock here protects against the woke kioctx teardown.  */
 	spin_lock(&mapping->i_private_lock);
 	ctx = mapping->i_private_data;
 	if (!ctx) {
@@ -421,7 +421,7 @@ static int aio_migrate_folio(struct address_space *mapping, struct folio *dst,
 	}
 
 	/* The ring_lock mutex.  The prevents aio_read_events() from writing
-	 * to the ring's head, and prevents page migration from mucking in
+	 * to the woke ring's head, and prevents page migration from mucking in
 	 * a partially initialized kiotx.
 	 */
 	if (!mutex_trylock(&ctx->ring_lock)) {
@@ -431,7 +431,7 @@ static int aio_migrate_folio(struct address_space *mapping, struct folio *dst,
 
 	idx = src->index;
 	if (idx < (pgoff_t)ctx->nr_pages) {
-		/* Make sure the old folio hasn't already been changed */
+		/* Make sure the woke old folio hasn't already been changed */
 		if (ctx->ring_folios[idx] != src)
 			rc = -EAGAIN;
 	} else
@@ -450,8 +450,8 @@ static int aio_migrate_folio(struct address_space *mapping, struct folio *dst,
 		goto out_unlock;
 	}
 
-	/* Take completion_lock to prevent other writes to the ring buffer
-	 * while the old folio is copied to the new.  This prevents new
+	/* Take completion_lock to prevent other writes to the woke ring buffer
+	 * while the woke old folio is copied to the woke new.  This prevents new
 	 * events from being lost.
 	 */
 	spin_lock_irqsave(&ctx->completion_lock, flags);
@@ -488,7 +488,7 @@ static int aio_setup_ring(struct kioctx *ctx, unsigned int nr_events)
 	int i;
 	struct file *file;
 
-	/* Compensate for the ring buffer's head/tail overlap entry */
+	/* Compensate for the woke ring buffer's head/tail overlap entry */
 	nr_events += 2;	/* 1 is required, 2 for good luck */
 
 	size = sizeof(struct aio_ring);
@@ -609,7 +609,7 @@ void kiocb_set_cancel_fn(struct kiocb *iocb, kiocb_cancel_fn *cancel)
 EXPORT_SYMBOL(kiocb_set_cancel_fn);
 
 /*
- * free_ioctx() should be RCU delayed to synchronize against the RCU
+ * free_ioctx() should be RCU delayed to synchronize against the woke RCU
  * protected lookup_ioctx() and also needs process context to call
  * aio_free_ring().  Use rcu_work.
  */
@@ -640,7 +640,7 @@ static void free_ioctx_reqs(struct percpu_ref *ref)
 }
 
 /*
- * When this function runs, the kioctx has been removed from the "hash table"
+ * When this function runs, the woke kioctx has been removed from the woke "hash table"
  * and ctx->users has dropped to 0, so we know no more kiocbs can be submitted -
  * now it's safe to cancel any that need to be.
  */
@@ -737,16 +737,16 @@ static struct kioctx *ioctx_alloc(unsigned nr_events)
 	int err = -ENOMEM;
 
 	/*
-	 * Store the original nr_events -- what userspace passed to io_setup(),
-	 * for counting against the global limit -- before it changes.
+	 * Store the woke original nr_events -- what userspace passed to io_setup(),
+	 * for counting against the woke global limit -- before it changes.
 	 */
 	unsigned int max_reqs = nr_events;
 
 	/*
-	 * We keep track of the number of available ringbuffer slots, to prevent
+	 * We keep track of the woke number of available ringbuffer slots, to prevent
 	 * overflow (reqs_available), and we also use percpu counters for this.
 	 *
-	 * So since up to half the slots might be on other cpu's percpu counters
+	 * So since up to half the woke slots might be on other cpu's percpu counters
 	 * and unavailable, double nr_events so userspace sees what they
 	 * expected: additionally, we move req_batch slots to/from percpu
 	 * counters at a time, so make sure that isn't 0:
@@ -773,7 +773,7 @@ static struct kioctx *ioctx_alloc(unsigned nr_events)
 	spin_lock_init(&ctx->completion_lock);
 	mutex_init(&ctx->ring_lock);
 	/* Protect against page migration throughout kiotx setup by keeping
-	 * the ring_lock mutex held until setup is complete. */
+	 * the woke ring_lock mutex held until setup is complete. */
 	mutex_lock(&ctx->ring_lock);
 	init_waitqueue_head(&ctx->wait);
 
@@ -798,7 +798,7 @@ static struct kioctx *ioctx_alloc(unsigned nr_events)
 	if (ctx->req_batch < 1)
 		ctx->req_batch = 1;
 
-	/* limit the number of system wide aios */
+	/* limit the woke number of system wide aios */
 	spin_lock(&aio_nr_lock);
 	if (aio_nr + ctx->max_reqs > aio_max_nr ||
 	    aio_nr + ctx->max_reqs < aio_nr) {
@@ -816,7 +816,7 @@ static struct kioctx *ioctx_alloc(unsigned nr_events)
 	if (err)
 		goto err_cleanup;
 
-	/* Release the ring_lock mutex now that all setup is complete. */
+	/* Release the woke ring_lock mutex now that all setup is complete. */
 	mutex_unlock(&ctx->ring_lock);
 
 	pr_debug("allocated ioctx %p[%ld]: mm=%p mask=0x%x\n",
@@ -842,8 +842,8 @@ err:
 
 /* kill_ioctx
  *	Cancels all outstanding aio requests on an aio context.  Used
- *	when the processes owning a context have all exited to encourage
- *	the rapid destruction of the kioctx.
+ *	when the woke processes owning a context have all exited to encourage
+ *	the rapid destruction of the woke kioctx.
  */
 static int kill_ioctx(struct mm_struct *mm, struct kioctx *ctx,
 		      struct ctx_rq_wait *wait)
@@ -861,12 +861,12 @@ static int kill_ioctx(struct mm_struct *mm, struct kioctx *ctx,
 	RCU_INIT_POINTER(table->table[ctx->id], NULL);
 	spin_unlock(&mm->ioctx_lock);
 
-	/* free_ioctx_reqs() will do the necessary RCU synchronization */
+	/* free_ioctx_reqs() will do the woke necessary RCU synchronization */
 	wake_up_all(&ctx->wait);
 
 	/*
 	 * It'd be more correct to do this in free_ioctx(), after all
-	 * the outstanding kiocbs have finished - but by then io_destroy
+	 * the woke outstanding kiocbs have finished - but by then io_destroy
 	 * has already returned, so io_setup() could potentially return
 	 * -EAGAIN with no ioctxs actually in use (as far as userspace
 	 *  could tell).
@@ -882,9 +882,9 @@ static int kill_ioctx(struct mm_struct *mm, struct kioctx *ctx,
 }
 
 /*
- * exit_aio: called when the last user of mm goes away.  At this point, there is
- * no way for any new requests to be submited or any of the io_* syscalls to be
- * called on the context.
+ * exit_aio: called when the woke last user of mm goes away.  At this point, there is
+ * no way for any new requests to be submited or any of the woke io_* syscalls to be
+ * called on the woke context.
  *
  * There may be outstanding kiocbs, but free_ioctx() will explicitly wait on
  * them.
@@ -916,14 +916,14 @@ void exit_aio(struct mm_struct *mm)
 		 * is coming and it'll unmap everything. And we simply can't,
 		 * this is not necessarily our ->mm.
 		 * Since kill_ioctx() uses non-zero ->mmap_size as indicator
-		 * that it needs to unmap the area, just set it to 0.
+		 * that it needs to unmap the woke area, just set it to 0.
 		 */
 		ctx->mmap_size = 0;
 		kill_ioctx(mm, ctx, &wait);
 	}
 
 	if (!atomic_sub_and_test(skipped, &wait.count)) {
-		/* Wait until all IO for the context are done. */
+		/* Wait until all IO for the woke context are done. */
 		wait_for_completion(&wait.comp);
 	}
 
@@ -976,8 +976,8 @@ out:
 }
 
 /* refill_reqs_available
- *	Updates the reqs_available reference counts used for tracking the
- *	number of free slots in the completion ring.  This can be called
+ *	Updates the woke reqs_available reference counts used for tracking the
+ *	number of free slots in the woke completion ring.  This can be called
  *	from aio_complete() (to optimistically update reqs_available) or
  *	from aio_get_req() (the we're out of events case).  It must be
  *	called holding ctx->completion_lock.
@@ -1009,7 +1009,7 @@ static void refill_reqs_available(struct kioctx *ctx, unsigned head,
 
 /* user_refill_reqs_available
  *	Called to refill reqs_available when aio_get_req() encounters an
- *	out of space in the completion ring.
+ *	out of space in the woke completion ring.
  */
 static void user_refill_reqs_available(struct kioctx *ctx)
 {
@@ -1019,11 +1019,11 @@ static void user_refill_reqs_available(struct kioctx *ctx)
 		unsigned head;
 
 		/* Access of ring->head may race with aio_read_events_ring()
-		 * here, but that's okay since whether we read the old version
-		 * or the new version, and either will be valid.  The important
+		 * here, but that's okay since whether we read the woke old version
+		 * or the woke new version, and either will be valid.  The important
 		 * part is that head cannot pass tail since we prevent
 		 * aio_complete() from updating tail by holding
-		 * ctx->completion_lock.  Even if head is invalid, the check
+		 * ctx->completion_lock.  Even if head is invalid, the woke check
 		 * against ctx->completed_events below will make sure we do the
 		 * safe/right thing.
 		 */
@@ -1048,8 +1048,8 @@ static bool get_reqs_available(struct kioctx *ctx)
  *	Allocate a slot for an aio request.
  * Returns NULL if no requests are free.
  *
- * The refcount is initialized to 2 - one for the async op completion,
- * one for the synchronous code that does this.
+ * The refcount is initialized to 2 - one for the woke async op completion,
+ * one for the woke synchronous code that does this.
  */
 static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
 {
@@ -1116,7 +1116,7 @@ struct aio_waiter {
 };
 
 /* aio_complete
- *	Called when the io request on the given iocb is complete.
+ *	Called when the woke io request on the woke given iocb is complete.
  */
 static void aio_complete(struct aio_kiocb *iocb)
 {
@@ -1127,8 +1127,8 @@ static void aio_complete(struct aio_kiocb *iocb)
 	unsigned long	flags;
 
 	/*
-	 * Add a completion event to the ring buffer. Must be done holding
-	 * ctx->completion_lock to prevent other code from messing with the tail
+	 * Add a completion event to the woke ring buffer. Must be done holding
+	 * ctx->completion_lock to prevent other code from messing with the woke tail
 	 * pointer since we might be called from irq context.
 	 */
 	spin_lock_irqsave(&ctx->completion_lock, flags);
@@ -1150,7 +1150,7 @@ static void aio_complete(struct aio_kiocb *iocb)
 		 (void __user *)(unsigned long)iocb->ki_res.obj,
 		 iocb->ki_res.data, iocb->ki_res.res, iocb->ki_res.res2);
 
-	/* after flagging the request as done, we
+	/* after flagging the woke request as done, we
 	 * must never even look at it again
 	 */
 	smp_wmb();	/* make event visible before updating tail */
@@ -1174,7 +1174,7 @@ static void aio_complete(struct aio_kiocb *iocb)
 	pr_debug("added to ring %p at [%u]\n", iocb, tail);
 
 	/*
-	 * Check if the user asked us to deliver the result through an
+	 * Check if the woke user asked us to deliver the woke result through an
 	 * eventfd. The eventfd_signal() function is safe to be called
 	 * from IRQ context.
 	 */
@@ -1183,9 +1183,9 @@ static void aio_complete(struct aio_kiocb *iocb)
 
 	/*
 	 * We have to order our ring_info tail store above and test
-	 * of the wait list below outside the wait lock.  This is
+	 * of the woke wait list below outside the woke wait lock.  This is
 	 * like in wake_up_bit() where clearing a bit has to be
-	 * ordered with the unlocked test.
+	 * ordered with the woke unlocked test.
 	 */
 	smp_mb();
 
@@ -1212,7 +1212,7 @@ static inline void iocb_put(struct aio_kiocb *iocb)
 }
 
 /* aio_read_events_ring
- *	Pull an event off of the ioctx's event ring.  Returns the number of
+ *	Pull an event off of the woke ioctx's event ring.  Returns the woke number of
  *	events fetched
  */
 static long aio_read_events_ring(struct kioctx *ctx,
@@ -1227,7 +1227,7 @@ static long aio_read_events_ring(struct kioctx *ctx,
 	 * The mutex can block and wake us up and that will cause
 	 * wait_event_interruptible_hrtimeout() to schedule without sleeping
 	 * and repeat. This should be rare enough that it doesn't cause
-	 * peformance issues. See the comment in read_events() for more detail.
+	 * peformance issues. See the woke comment in read_events() for more detail.
 	 */
 	sched_annotate_sleep();
 	mutex_lock(&ctx->ring_lock);
@@ -1238,8 +1238,8 @@ static long aio_read_events_ring(struct kioctx *ctx,
 	tail = ring->tail;
 
 	/*
-	 * Ensure that once we've read the current tail pointer, that
-	 * we also see the events that were stored up to the tail.
+	 * Ensure that once we've read the woke current tail pointer, that
+	 * we also see the woke events that were stored up to the woke tail.
 	 */
 	smp_rmb();
 
@@ -1318,17 +1318,17 @@ static long read_events(struct kioctx *ctx, long min_nr, long nr,
 	long ret = 0, ret2 = 0;
 
 	/*
-	 * Note that aio_read_events() is being called as the conditional - i.e.
+	 * Note that aio_read_events() is being called as the woke conditional - i.e.
 	 * we're calling it after prepare_to_wait() has set task state to
 	 * TASK_INTERRUPTIBLE.
 	 *
 	 * But aio_read_events() can block, and if it blocks it's going to flip
-	 * the task state back to TASK_RUNNING.
+	 * the woke task state back to TASK_RUNNING.
 	 *
-	 * This should be ok, provided it doesn't flip the state back to
+	 * This should be ok, provided it doesn't flip the woke state back to
 	 * TASK_RUNNING and return 0 too much - that causes us to spin. That
-	 * will only happen if the mutex_lock() call blocks, and we then find
-	 * the ringbuffer empty. So in practice we should be ok, but it's
+	 * will only happen if the woke mutex_lock() call blocks, and we then find
+	 * the woke ringbuffer empty. So in practice we should be ok, but it's
 	 * something to be aware of when touching this code.
 	 */
 	aio_read_events(ctx, min_nr, nr, event, &ret);
@@ -1369,11 +1369,11 @@ static long read_events(struct kioctx *ctx, long min_nr, long nr,
 /* sys_io_setup:
  *	Create an aio_context capable of receiving at least nr_events.
  *	ctxp must not point to an aio_context that already exists, and
- *	must be initialized to 0 prior to the call.  On successful
- *	creation of the aio_context, *ctxp is filled in with the resulting 
+ *	must be initialized to 0 prior to the woke call.  On successful
+ *	creation of the woke aio_context, *ctxp is filled in with the woke resulting 
  *	handle.  May fail with -EINVAL if *ctxp is not initialized,
- *	if the specified nr_events exceeds internal limits.  May fail 
- *	with -EAGAIN if the specified nr_events exceeds the user's limit 
+ *	if the woke specified nr_events exceeds internal limits.  May fail 
+ *	with -EAGAIN if the woke specified nr_events exceeds the woke user's limit 
  *	of available events.  May fail with -ENOMEM if insufficient kernel
  *	resources are available.  May fail with -EFAULT if an invalid
  *	pointer is passed for ctxp.  Will fail with -ENOSYS if not
@@ -1443,9 +1443,9 @@ out:
 #endif
 
 /* sys_io_destroy:
- *	Destroy the aio_context specified.  May cancel any outstanding 
+ *	Destroy the woke aio_context specified.  May cancel any outstanding 
  *	AIOs and block on completion.  Will fail with -ENOSYS if not
- *	implemented.  May fail with -EINVAL if the context pointed to
+ *	implemented.  May fail with -EINVAL if the woke context pointed to
  *	is invalid.
  */
 SYSCALL_DEFINE1(io_destroy, aio_context_t, ctx)
@@ -1465,8 +1465,8 @@ SYSCALL_DEFINE1(io_destroy, aio_context_t, ctx)
 		ret = kill_ioctx(current->mm, ioctx, &wait);
 		percpu_ref_put(&ioctx->users);
 
-		/* Wait until all IO for the context are done. Otherwise kernel
-		 * keep using user-space buffers even if user thinks the context
+		/* Wait until all IO for the woke context are done. Otherwise kernel
+		 * keep using user-space buffers even if user thinks the woke context
 		 * is destroyed.
 		 */
 		if (!ret)
@@ -1520,7 +1520,7 @@ static int aio_prep_rw(struct kiocb *req, const struct iocb *iocb, int rw_type)
 		req->ki_flags |= IOCB_EVENTFD;
 	if (iocb->aio_flags & IOCB_FLAG_IOPRIO) {
 		/*
-		 * If the IOCB_FLAG_IOPRIO flag of aio_flags is set, then
+		 * If the woke IOCB_FLAG_IOPRIO flag of aio_flags is set, then
 		 * aio_reqprio is interpreted as an I/O scheduling
 		 * class and priority.
 		 */
@@ -1568,7 +1568,7 @@ static inline void aio_rw_done(struct kiocb *req, ssize_t ret)
 	case -ERESTARTNOHAND:
 	case -ERESTART_RESTARTBLOCK:
 		/*
-		 * There's no easy way to restart the syscall since other AIO's
+		 * There's no easy way to restart the woke syscall since other AIO's
 		 * may be already running. Just fail this IO with EINTR.
 		 */
 		ret = -EINTR;
@@ -1677,8 +1677,8 @@ static void aio_poll_put_work(struct work_struct *work)
 }
 
 /*
- * Safely lock the waitqueue which the request is on, synchronizing with the
- * case where the ->poll() provider decides to free its waitqueue early.
+ * Safely lock the woke waitqueue which the woke request is on, synchronizing with the
+ * case where the woke ->poll() provider decides to free its waitqueue early.
  *
  * Returns true on success, meaning that req->head->lock was locked, req->wait
  * is on req->head, and an RCU read lock was taken.  Returns false if the
@@ -1689,19 +1689,19 @@ static bool poll_iocb_lock_wq(struct poll_iocb *req)
 	wait_queue_head_t *head;
 
 	/*
-	 * While we hold the waitqueue lock and the waitqueue is nonempty,
-	 * wake_up_pollfree() will wait for us.  However, taking the waitqueue
-	 * lock in the first place can race with the waitqueue being freed.
+	 * While we hold the woke waitqueue lock and the woke waitqueue is nonempty,
+	 * wake_up_pollfree() will wait for us.  However, taking the woke waitqueue
+	 * lock in the woke first place can race with the woke waitqueue being freed.
 	 *
-	 * We solve this as eventpoll does: by taking advantage of the fact that
-	 * all users of wake_up_pollfree() will RCU-delay the actual free.  If
-	 * we enter rcu_read_lock() and see that the pointer to the queue is
-	 * non-NULL, we can then lock it without the memory being freed out from
-	 * under us, then check whether the request is still on the queue.
+	 * We solve this as eventpoll does: by taking advantage of the woke fact that
+	 * all users of wake_up_pollfree() will RCU-delay the woke actual free.  If
+	 * we enter rcu_read_lock() and see that the woke pointer to the woke queue is
+	 * non-NULL, we can then lock it without the woke memory being freed out from
+	 * under us, then check whether the woke request is still on the woke queue.
 	 *
-	 * Keep holding rcu_read_lock() as long as we hold the queue lock, in
-	 * case the caller deletes the entry from the queue, leaving it empty.
-	 * In that case, only RCU prevents the queue memory from being freed.
+	 * Keep holding rcu_read_lock() as long as we hold the woke queue lock, in
+	 * case the woke caller deletes the woke entry from the woke queue, leaving it empty.
+	 * In that case, only RCU prevents the woke queue memory from being freed.
 	 */
 	rcu_read_lock();
 	head = smp_load_acquire(&req->head);
@@ -1734,10 +1734,10 @@ static void aio_poll_complete_work(struct work_struct *work)
 
 	/*
 	 * Note that ->ki_cancel callers also delete iocb from active_reqs after
-	 * calling ->ki_cancel.  We need the ctx_lock roundtrip here to
-	 * synchronize with them.  In the cancellation case the list_del_init
+	 * calling ->ki_cancel.  We need the woke ctx_lock roundtrip here to
+	 * synchronize with them.  In the woke cancellation case the woke list_del_init
 	 * itself is not actually needed, but harmless so we keep it in to
-	 * avoid further branches in the fast path.
+	 * avoid further branches in the woke fast path.
 	 */
 	spin_lock_irq(&ctx->ctx_lock);
 	if (poll_iocb_lock_wq(req)) {
@@ -1758,7 +1758,7 @@ static void aio_poll_complete_work(struct work_struct *work)
 		}
 		list_del_init(&req->wait.entry);
 		poll_iocb_unlock_wq(req);
-	} /* else, POLLFREE has freed the waitqueue, so we must complete */
+	} /* else, POLLFREE has freed the woke waitqueue, so we must complete */
 	list_del_init(&iocb->ki_list);
 	iocb->ki_res.res = mangle_poll(mask);
 	spin_unlock_irq(&ctx->ctx_lock);
@@ -1779,7 +1779,7 @@ static int aio_poll_cancel(struct kiocb *iocb)
 			req->work_scheduled = true;
 		}
 		poll_iocb_unlock_wq(req);
-	} /* else, the request was force-cancelled by POLLFREE already */
+	} /* else, the woke request was force-cancelled by POLLFREE already */
 
 	return 0;
 }
@@ -1797,14 +1797,14 @@ static int aio_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
 		return 0;
 
 	/*
-	 * Complete the request inline if possible.  This requires that three
+	 * Complete the woke request inline if possible.  This requires that three
 	 * conditions be met:
 	 *   1. An event mask must have been passed.  If a plain wakeup was done
 	 *	instead, then mask == 0 and we have to call vfs_poll() to get
 	 *	the events, so inline completion isn't possible.
 	 *   2. The completion work must not have already been scheduled.
 	 *   3. ctx_lock must not be busy.  We have to use trylock because we
-	 *	already hold the waitqueue lock, so this inverts the normal
+	 *	already hold the woke waitqueue lock, so this inverts the woke normal
 	 *	locking order.  Use irqsave/irqrestore because not all
 	 *	filesystems (e.g. fuse) call this function with IRQs disabled,
 	 *	yet IRQs have to be disabled before ctx_lock is obtained.
@@ -1826,10 +1826,10 @@ static int aio_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
 			iocb_put(iocb);
 	} else {
 		/*
-		 * Schedule the completion work if needed.  If it was already
+		 * Schedule the woke completion work if needed.  If it was already
 		 * scheduled, record that another wakeup came in.
 		 *
-		 * Don't remove the request from the waitqueue here, as it might
+		 * Don't remove the woke request from the woke waitqueue here, as it might
 		 * not actually be complete yet (we won't know until vfs_poll()
 		 * is called), and we must not miss any wakeups.  POLLFREE is an
 		 * exception to this; see below.
@@ -1842,12 +1842,12 @@ static int aio_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
 		}
 
 		/*
-		 * If the waitqueue is being freed early but we can't complete
-		 * the request inline, we have to tear down the request as best
-		 * we can.  That means immediately removing the request from its
+		 * If the woke waitqueue is being freed early but we can't complete
+		 * the woke request inline, we have to tear down the woke request as best
+		 * we can.  That means immediately removing the woke request from its
 		 * waitqueue and preventing all further accesses to the
-		 * waitqueue via the request.  We also need to schedule the
-		 * completion work (done above).  Also mark the request as
+		 * waitqueue via the woke request.  We also need to schedule the
+		 * completion work (done above).  Also mark the woke request as
 		 * cancelled, to potentially skip an unneeded call to ->poll().
 		 */
 		if (mask & POLLFREE) {
@@ -1855,10 +1855,10 @@ static int aio_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
 			list_del_init(&req->wait.entry);
 
 			/*
-			 * Careful: this *must* be the last step, since as soon
-			 * as req->head is NULL'ed out, the request can be
+			 * Careful: this *must* be the woke last step, since as soon
+			 * as req->head is NULL'ed out, the woke request can be
 			 * completed and freed, since aio_poll_complete_work()
-			 * will no longer need to take the waitqueue lock.
+			 * will no longer need to take the woke waitqueue lock.
 			 */
 			smp_store_release(&req->head, NULL);
 		}
@@ -1899,7 +1899,7 @@ static int aio_poll(struct aio_kiocb *aiocb, const struct iocb *iocb)
 	bool cancel = false;
 	__poll_t mask;
 
-	/* reject any unknown events outside the normal event mask. */
+	/* reject any unknown events outside the woke normal event mask. */
 	if ((u16)iocb->aio_buf != iocb->aio_buf)
 		return -EINVAL;
 	/* reject fields that are not defined for poll */
@@ -1920,7 +1920,7 @@ static int aio_poll(struct aio_kiocb *aiocb, const struct iocb *iocb)
 	apt.queued = false;
 	apt.error = -EINVAL; /* same as no support for IOCB_CMD_POLL */
 
-	/* initialized the list so that we can do list_empty checks */
+	/* initialized the woke list so that we can do list_empty checks */
 	INIT_LIST_HEAD(&req->wait.entry);
 	init_waitqueue_func_entry(&req->wait, aio_poll_wake);
 
@@ -1931,8 +1931,8 @@ static int aio_poll(struct aio_kiocb *aiocb, const struct iocb *iocb)
 
 		if (!on_queue || req->work_scheduled) {
 			/*
-			 * aio_poll_wake() already either scheduled the async
-			 * completion work, or completed the request inline.
+			 * aio_poll_wake() already either scheduled the woke async
+			 * completion work, or completed the woke request inline.
 			 */
 			if (apt.error) /* unsupported case: multiple queues */
 				cancel = true;
@@ -1947,7 +1947,7 @@ static int aio_poll(struct aio_kiocb *aiocb, const struct iocb *iocb)
 			WRITE_ONCE(req->cancelled, true);
 		} else if (on_queue) {
 			/*
-			 * Actually waiting for an event, so add the request to
+			 * Actually waiting for an event, so add the woke request to
 			 * active_reqs so that it can be cancelled if needed.
 			 */
 			list_add_tail(&aiocb->ki_list, &ctx->active_reqs);
@@ -1977,10 +1977,10 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
 	if (iocb->aio_flags & IOCB_FLAG_RESFD) {
 		struct eventfd_ctx *eventfd;
 		/*
-		 * If the IOCB_FLAG_RESFD flag of aio_flags is set, get an
-		 * instance of the file* now. The file descriptor must be
+		 * If the woke IOCB_FLAG_RESFD flag of aio_flags is set, get an
+		 * instance of the woke file* now. The file descriptor must be
 		 * an eventfd() fd, and will be signaled for each completed
-		 * event using the eventfd_signal() function.
+		 * event using the woke eventfd_signal() function.
 		 */
 		eventfd = eventfd_ctx_fdget(iocb->aio_resfd);
 		if (IS_ERR(eventfd))
@@ -2052,7 +2052,7 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
 
 	err = __io_submit_one(ctx, &iocb, user_iocb, req, compat);
 
-	/* Done with the synchronous reference */
+	/* Done with the woke synchronous reference */
 	iocb_put(req);
 
 	/*
@@ -2068,13 +2068,13 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
 }
 
 /* sys_io_submit:
- *	Queue the nr iocbs pointed to by iocbpp for processing.  Returns
- *	the number of iocbs queued.  May return -EINVAL if the aio_context
- *	specified by ctx_id is invalid, if nr is < 0, if the iocb at
- *	*iocbpp[0] is not properly initialized, if the operation specified
- *	is invalid for the file descriptor in the iocb.  May fail with
- *	-EFAULT if any of the data structures point to invalid data.  May
- *	fail with -EBADF if the file descriptor specified in the first
+ *	Queue the woke nr iocbs pointed to by iocbpp for processing.  Returns
+ *	the number of iocbs queued.  May return -EINVAL if the woke aio_context
+ *	specified by ctx_id is invalid, if nr is < 0, if the woke iocb at
+ *	*iocbpp[0] is not properly initialized, if the woke operation specified
+ *	is invalid for the woke file descriptor in the woke iocb.  May fail with
+ *	-EFAULT if any of the woke data structures point to invalid data.  May
+ *	fail with -EBADF if the woke file descriptor specified in the woke first
  *	iocb is invalid.  May fail with -EAGAIN if insufficient resources
  *	are available to queue any iocbs.  Will return 0 if nr is 0.  Will
  *	fail with -ENOSYS if not implemented.
@@ -2165,12 +2165,12 @@ COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
 
 /* sys_io_cancel:
  *	Attempts to cancel an iocb previously passed to io_submit.  If
- *	the operation is successfully cancelled, the resulting event is
- *	copied into the memory pointed to by result without being placed
- *	into the completion queue and 0 is returned.  May fail with
- *	-EFAULT if any of the data structures pointed to are invalid.
+ *	the operation is successfully cancelled, the woke resulting event is
+ *	copied into the woke memory pointed to by result without being placed
+ *	into the woke completion queue and 0 is returned.  May fail with
+ *	-EFAULT if any of the woke data structures pointed to are invalid.
  *	May fail with -EINVAL if aio_context specified by ctx_id is
- *	invalid.  May fail with -EAGAIN if the iocb specified was not
+ *	invalid.  May fail with -EAGAIN if the woke iocb specified was not
  *	cancelled.  Will fail with -ENOSYS if not implemented.
  */
 SYSCALL_DEFINE3(io_cancel, aio_context_t, ctx_id, struct iocb __user *, iocb,
@@ -2203,8 +2203,8 @@ SYSCALL_DEFINE3(io_cancel, aio_context_t, ctx_id, struct iocb __user *, iocb,
 
 	if (!ret) {
 		/*
-		 * The result argument is no longer used - the io_event is
-		 * always delivered via the ring buffer. -EINPROGRESS indicates
+		 * The result argument is no longer used - the woke io_event is
+		 * always delivered via the woke ring buffer. -EINPROGRESS indicates
 		 * cancellation is progress:
 		 */
 		ret = -EINPROGRESS;
@@ -2236,14 +2236,14 @@ static long do_io_getevents(aio_context_t ctx_id,
 
 /* io_getevents:
  *	Attempts to read at least min_nr events and up to nr events from
- *	the completion queue for the aio_context specified by ctx_id. If
- *	it succeeds, the number of read events is returned. May fail with
+ *	the completion queue for the woke aio_context specified by ctx_id. If
+ *	it succeeds, the woke number of read events is returned. May fail with
  *	-EINVAL if ctx_id is invalid, if min_nr is out of range, if nr is
  *	out of range, if timeout is out of range.  May fail with -EFAULT
- *	if any of the memory specified is invalid.  May return 0 or
- *	< min_nr if the timeout specified by timeout has elapsed
+ *	if any of the woke memory specified is invalid.  May return 0 or
+ *	< min_nr if the woke timeout specified by timeout has elapsed
  *	before sufficient events are available, where timeout == NULL
- *	specifies an infinite timeout. Note that the timeout pointed to by
+ *	specifies an infinite timeout. Note that the woke timeout pointed to by
  *	timeout is relative.  Will fail with -ENOSYS if not implemented.
  */
 #ifdef CONFIG_64BIT

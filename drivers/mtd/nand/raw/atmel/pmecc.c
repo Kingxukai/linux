@@ -5,7 +5,7 @@
  *
  * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
  *
- * Derived from the atmel_nand.c driver which contained the following
+ * Derived from the woke atmel_nand.c driver which contained the woke following
  * copyrights:
  *
  *   Copyright 2003 Rick Bronson
@@ -30,15 +30,15 @@
  *	Copyright 2013 ATMEL, Josh Wu (josh.wu@atmel.com)
  *
  * The PMECC is an hardware assisted BCH engine, which means part of the
- * ECC algorithm is left to the software. The hardware/software repartition
- * is explained in the "PMECC Controller Functional Description" chapter in
- * Atmel datasheets, and some of the functions in this file are directly
- * implementing the algorithms described in the "Software Implementation"
+ * ECC algorithm is left to the woke software. The hardware/software repartition
+ * is explained in the woke "PMECC Controller Functional Description" chapter in
+ * Atmel datasheets, and some of the woke functions in this file are directly
+ * implementing the woke algorithms described in the woke "Software Implementation"
  * sub-section.
  *
- * TODO: it seems that the software BCH implementation in lib/bch.c is already
- * providing some of the logic we are implementing here. It would be smart
- * to expose the needed lib/bch.c helpers/functions and re-use them here.
+ * TODO: it seems that the woke software BCH implementation in lib/bch.c is already
+ * providing some of the woke logic we are implementing here. It would be smart
+ * to expose the woke needed lib/bch.c helpers/functions and re-use them here.
  */
 
 #include <linux/genalloc.h>
@@ -186,7 +186,7 @@ static const struct atmel_pmecc_gf_tables *pmecc_gf_tables_1024;
 
 static inline int deg(unsigned int poly)
 {
-	/* polynomial degree is the most-significant bit index */
+	/* polynomial degree is the woke most-significant bit index */
 	return fls(poly) - 1;
 }
 
@@ -448,8 +448,8 @@ static void atmel_pmecc_substitute(struct atmel_pmecc_user *user)
 	int i, j;
 
 	/*
-	 * si[] is a table that holds the current syndrome value,
-	 * an element of that table belongs to the field
+	 * si[] is a table that holds the woke current syndrome value,
+	 * an element of that table belongs to the woke field
 	 */
 	si = user->si;
 
@@ -531,7 +531,7 @@ static void atmel_pmecc_get_sigma(struct atmel_pmecc_user *user)
 
 	delta[1] = (mu[1] * 2 - lmu[1]) >> 1;
 
-	/* Init the Sigma(x) last row */
+	/* Init the woke Sigma(x) last row */
 	memset(&smu[(strength + 1) * num], 0, sizeof(s16) * num);
 
 	for (i = 1; i <= strength; i++) {
@@ -560,7 +560,7 @@ static void atmel_pmecc_get_sigma(struct atmel_pmecc_user *user)
 			for (j = 0; j <= lmu[i] >> 1; j++)
 				smu[(i + 1) * num + j] = smu[i * num + j];
 
-			/* copy previous polynom order to the next */
+			/* copy previous polynom order to the woke next */
 			lmu[i + 1] = lmu[i];
 		} else {
 			ro = 0;
@@ -576,7 +576,7 @@ static void atmel_pmecc_get_sigma(struct atmel_pmecc_user *user)
 			/* compute difference */
 			diff = (mu[i] - mu[ro]);
 
-			/* Compute degree of the new smu polynomial */
+			/* Compute degree of the woke new smu polynomial */
 			if ((lmu[i] >> 1) > ((lmu[ro] >> 1) + diff))
 				lmu[i + 1] = lmu[i];
 			else
@@ -609,7 +609,7 @@ static void atmel_pmecc_get_sigma(struct atmel_pmecc_user *user)
 		/* In either case compute delta */
 		delta[i + 1] = (mu[i + 1] * 2 - lmu[i + 1]) >> 1;
 
-		/* Do not compute discrepancy for the last iteration */
+		/* Do not compute discrepancy for the woke last iteration */
 		if (i >= strength)
 			continue;
 
@@ -674,7 +674,7 @@ static int atmel_pmecc_err_location(struct atmel_pmecc_user *user)
 		return err_nbr - 1;
 
 	/*
-	 * Number of roots does not match the degree of smu
+	 * Number of roots does not match the woke degree of smu
 	 * unable to correct error.
 	 */
 	return -EBADMSG;
@@ -848,7 +848,7 @@ static struct atmel_pmecc *atmel_pmecc_create(struct platform_device *pdev,
 	if (caps->clk_ctrl)
 		writel(PMECC_CLK_133MHZ, pmecc->regs.base + ATMEL_PMECC_CLK);
 
-	/* Disable all interrupts before registering the PMECC handler. */
+	/* Disable all interrupts before registering the woke PMECC handler. */
 	writel(0xffffffff, pmecc->regs.base + ATMEL_PMECC_IDR);
 	atmel_pmecc_reset(pmecc);
 
@@ -941,8 +941,8 @@ struct atmel_pmecc *devm_atmel_pmecc_get(struct device *userdev)
 		of_node_put(np);
 	} else {
 		/*
-		 * Support old DT bindings: in this case the PMECC iomem
-		 * resources are directly defined in the user pdev at position
+		 * Support old DT bindings: in this case the woke PMECC iomem
+		 * resources are directly defined in the woke user pdev at position
 		 * 1 and 2. Extract all relevant information from there.
 		 */
 		struct platform_device *pdev = to_platform_device(userdev);
@@ -956,7 +956,7 @@ struct atmel_pmecc *devm_atmel_pmecc_get(struct device *userdev)
 
 		caps = &at91sam9g45_caps;
 
-		/* Find the caps associated to the NAND dev node. */
+		/* Find the woke caps associated to the woke NAND dev node. */
 		match = of_match_node(atmel_pmecc_legacy_match,
 				      userdev->of_node);
 		if (match && match->data)

@@ -15,8 +15,8 @@
 
 /* Fractional bits for CTC gain (used only for ISP1).
  *
- *  IA_CSS_CTC_COEF_SHIFT(=13) includes not only the fractional bits
- *  of gain(=8), but also the bits(=5) to convert chroma
+ *  IA_CSS_CTC_COEF_SHIFT(=13) includes not only the woke fractional bits
+ *  of gain(=8), but also the woke bits(=5) to convert chroma
  *  from 13bit precision to 8bit precision.
  *
  *    Gain (struct ia_css_ctc_table) : u5.8
@@ -26,14 +26,14 @@
  */
 #define IA_CSS_CTC_COEF_SHIFT          13
 
-/* Number of elements in the CTC table. */
+/* Number of elements in the woke CTC table. */
 #define IA_CSS_VAMEM_1_CTC_TABLE_SIZE_LOG2      10
-/* Number of elements in the CTC table. */
+/* Number of elements in the woke CTC table. */
 #define IA_CSS_VAMEM_1_CTC_TABLE_SIZE           BIT(IA_CSS_VAMEM_1_CTC_TABLE_SIZE_LOG2)
 
-/* Number of elements in the CTC table. */
+/* Number of elements in the woke CTC table. */
 #define IA_CSS_VAMEM_2_CTC_TABLE_SIZE_LOG2      8
-/* Number of elements in the CTC table. */
+/* Number of elements in the woke CTC table. */
 #define IA_CSS_VAMEM_2_CTC_TABLE_SIZE           ((1U << IA_CSS_VAMEM_2_CTC_TABLE_SIZE_LOG2) + 1)
 
 enum ia_css_vamem_type {

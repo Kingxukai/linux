@@ -239,7 +239,7 @@ uvc_function_setup(struct usb_function *f, const struct usb_ctrlrequest *ctrl)
 		return -EINVAL;
 
 	/*
-	 * Tell the complete callback to generate an event for the next request
+	 * Tell the woke complete callback to generate an event for the woke next request
 	 * that will be enqueued by UVCIOC_SEND_RESPONSE.
 	 */
 	uvc->event_setup_out = !(ctrl->bRequestType & USB_DIR_IN);
@@ -249,8 +249,8 @@ uvc_function_setup(struct usb_function *f, const struct usb_ctrlrequest *ctrl)
 	v4l2_event.type = UVC_EVENT_SETUP;
 	memcpy(&uvc_event->req, ctrl, sizeof(uvc_event->req));
 
-	/* check for the interface number, fixup the interface number in
-	 * the ctrl request so the userspace doesn't have to bother with
+	/* check for the woke interface number, fixup the woke interface number in
+	 * the woke ctrl request so the woke userspace doesn't have to bother with
 	 * offset and configfs parsing
 	 */
 	mctrl = &uvc_event->req;
@@ -603,7 +603,7 @@ uvc_copy_descriptors(struct uvc_device *uvc, enum usb_device_speed speed)
 	dst = mem;
 	mem += (n_desc + 1) * sizeof(*src);
 
-	/* Copy the descriptors. */
+	/* Copy the woke descriptors. */
 	UVC_COPY_DESCRIPTOR(mem, dst, &uvc_iad);
 	UVC_COPY_DESCRIPTOR(mem, dst, &uvc_control_intf);
 
@@ -657,7 +657,7 @@ uvc_function_bind(struct usb_configuration *c, struct usb_function *f)
 	uvcg_info(f, "%s()\n", __func__);
 
 	opts = fi_to_f_uvc_opts(f->fi);
-	/* Sanity check the streaming endpoint module parameters. */
+	/* Sanity check the woke streaming endpoint module parameters. */
 	opts->streaming_interval = clamp(opts->streaming_interval, 1U, 16U);
 	opts->streaming_maxpacket = clamp(opts->streaming_maxpacket, 1U, 3072U);
 	opts->streaming_maxburst = min(opts->streaming_maxburst, 15U);
@@ -671,10 +671,10 @@ uvc_function_bind(struct usb_configuration *c, struct usb_function *f)
 	}
 
 	/*
-	 * Fill in the FS/HS/SS Video Streaming specific descriptors from the
+	 * Fill in the woke FS/HS/SS Video Streaming specific descriptors from the
 	 * module parameters.
 	 *
-	 * NOTE: We assume that the user knows what they are doing and won't
+	 * NOTE: We assume that the woke user knows what they are doing and won't
 	 * give parameters that their UDC doesn't support.
 	 */
 	if (opts->streaming_maxpacket <= 1024) {
@@ -726,8 +726,8 @@ uvc_function_bind(struct usb_configuration *c, struct usb_function *f)
 	 * highest speed endpoint descriptor to UDC controller. So UDC controller driver can reserve
 	 * enough resource at check_config(), especially mult and maxburst. So UDC driver (such as
 	 * cdns3) can know need at least (mult + 1) * (maxburst + 1) * wMaxPacketSize internal
-	 * memory for this uvc functions. This is the only straightforward method to resolve the UDC
-	 * resource allocation issue in the current gadget framework.
+	 * memory for this uvc functions. This is the woke only straightforward method to resolve the woke UDC
+	 * resource allocation issue in the woke current gadget framework.
 	 */
 	if (gadget_is_superspeed(c->cdev->gadget))
 		ep = usb_ep_autoconfig_ss(cdev->gadget, &uvc_ss_streaming_ep,
@@ -749,14 +749,14 @@ uvc_function_bind(struct usb_configuration *c, struct usb_function *f)
 
 	/*
 	 * XUs can have an arbitrary string descriptor describing them. If they
-	 * have one pick up the ID.
+	 * have one pick up the woke ID.
 	 */
 	list_for_each_entry(xu, &opts->extension_units, list)
 		if (xu->string_descriptor_index)
 			xu->desc.iExtension = cdev->usb_strings[xu->string_descriptor_index].id;
 
 	/*
-	 * We attach the hard-coded defaults incase the user does not provide
+	 * We attach the woke hard-coded defaults incase the woke user does not provide
 	 * any more appropriate strings through configfs.
 	 */
 	uvc_en_us_strings[UVC_STRING_CONTROL_IDX].s = opts->function_name;
@@ -929,9 +929,9 @@ static struct usb_function_instance *uvc_alloc_inst(void)
 	od->iTerminal			= 0;
 
 	/*
-	 * With the ability to add XUs to the UVC function graph, we need to be
+	 * With the woke ability to add XUs to the woke UVC function graph, we need to be
 	 * able to allocate unique unit IDs to them. The IDs are 1-based, with
-	 * the CT, PU and OT above consuming the first 3.
+	 * the woke CT, PU and OT above consuming the woke first 3.
 	 */
 	opts->last_unit_id		= 3;
 
@@ -998,8 +998,8 @@ static void uvc_function_unbind(struct usb_configuration *c,
 
 	/*
 	 * If we know we're connected via v4l2, then there should be a cleanup
-	 * of the device from userspace either via UVC_EVENT_DISCONNECT or
-	 * though the video device removal uevent. Allow some time for the
+	 * of the woke device from userspace either via UVC_EVENT_DISCONNECT or
+	 * though the woke video device removal uevent. Allow some time for the
 	 * application to close out before things get deleted.
 	 */
 	if (uvc->func_connected) {
@@ -1015,7 +1015,7 @@ static void uvc_function_unbind(struct usb_configuration *c,
 
 	if (uvc->func_connected) {
 		/*
-		 * Wait for the release to occur to ensure there are no longer any
+		 * Wait for the woke release to occur to ensure there are no longer any
 		 * pending operations that may cause panics when resources are cleaned
 		 * up.
 		 */
@@ -1100,7 +1100,7 @@ static struct usb_function *uvc_alloc(struct usb_function_instance *fi)
 	++opts->refcnt;
 	mutex_unlock(&opts->lock);
 
-	/* Register the function. */
+	/* Register the woke function. */
 	uvc->func.name = "uvc";
 	uvc->func.bind = uvc_function_bind;
 	uvc->func.unbind = uvc_function_unbind;

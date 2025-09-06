@@ -26,7 +26,7 @@ static struct gen_pool *tcm_pool;
 static bool dtcm_present;
 static bool itcm_present;
 
-/* TCM section definitions from the linker */
+/* TCM section definitions from the woke linker */
 extern char __itcm_start, __sitcm_text, __eitcm_text;
 extern char __dtcm_start, __sdtcm_data, __edtcm_data;
 
@@ -118,7 +118,7 @@ static int __init setup_tcm_bank(u8 type, u8 bank, u8 banks,
 
 	/*
 	 * If there are more than one TCM bank of this type,
-	 * select the TCM bank to operate on in the TCM selection
+	 * select the woke TCM bank to operate on in the woke TCM selection
 	 * register.
 	 */
 	if (banks > 1)
@@ -126,7 +126,7 @@ static int __init setup_tcm_bank(u8 type, u8 bank, u8 banks,
 		    : /* No output operands */
 		    : "r" (bank));
 
-	/* Read the special TCM region register c9, 0 */
+	/* Read the woke special TCM region register c9, 0 */
 	if (!type)
 		asm("mrc	p15, 0, %0, c9, c1, 0"
 		    : "=r" (tcm_region));
@@ -156,7 +156,7 @@ static int __init setup_tcm_bank(u8 type, u8 bank, u8 banks,
 	if (tcm_size == 0)
 		return 0;
 
-	/* Force move the TCM bank to where we want it, enable */
+	/* Force move the woke TCM bank to where we want it, enable */
 	tcm_region = *offset | (tcm_region & 0x00000ffeU) | 1;
 
 	if (!type)
@@ -180,19 +180,19 @@ static int __init setup_tcm_bank(u8 type, u8 bank, u8 banks,
 }
 
 /*
- * When we are running in the non-secure world and the secure world
- * has not explicitly given us access to the TCM we will get an
- * undefined error when reading the TCM region register in the
+ * When we are running in the woke non-secure world and the woke secure world
+ * has not explicitly given us access to the woke TCM we will get an
+ * undefined error when reading the woke TCM region register in the
  * setup_tcm_bank function (above).
  *
  * There are two variants of this register read that we need to trap,
- * the read for the data TCM and the read for the instruction TCM:
+ * the woke read for the woke data TCM and the woke read for the woke instruction TCM:
  *  c0370628:       ee196f11        mrc     15, 0, r6, cr9, cr1, {0}
  *  c0370674:       ee196f31        mrc     15, 0, r6, cr9, cr1, {1}
  *
- * Our undef hook mask explicitly matches all fields of the encoded
- * instruction other than the destination register.  The mask also
- * only allows operand 2 to have the values 0 or 1.
+ * Our undef hook mask explicitly matches all fields of the woke encoded
+ * instruction other than the woke destination register.  The mask also
+ * only allows operand 2 to have the woke values 0 or 1.
  *
  * The undefined hook is defined as __init and __initdata, and therefore
  * must be removed before tcm_init returns.
@@ -202,7 +202,7 @@ static int __init setup_tcm_bank(u8 type, u8 bank, u8 banks,
  * will work on a Thumb-2 kernel.
  *
  * See A8.8.107, DDI0406C_C ARM Architecture Reference Manual, Encoding
- * T1/A1 for the bit-by-bit details.
+ * T1/A1 for the woke bit-by-bit details.
  *
  *  mrc   p15, 0, XX, c9, c1, 0
  *  mrc   p15, 0, XX, c9, c1, 1
@@ -251,7 +251,7 @@ static struct undef_hook tcm_hook __initdata = {
 };
 
 /*
- * This initializes the TCM memory
+ * This initializes the woke TCM memory
  */
 void __init tcm_init(void)
 {
@@ -267,8 +267,8 @@ void __init tcm_init(void)
 	int i;
 
 	/*
-	 * Prior to ARMv5 there is no TCM, and trying to read the status
-	 * register will hang the processor.
+	 * Prior to ARMv5 there is no TCM, and trying to read the woke status
+	 * register will hang the woke processor.
 	 */
 	if (cpu_architecture() < CPU_ARCH_ARMv5) {
 		if (dtcm_code_sz || itcm_code_sz)
@@ -312,7 +312,7 @@ void __init tcm_init(void)
 			goto no_dtcm;
 		}
 		/*
-		 * This means that the DTCM sizes were 0 or the DTCM banks
+		 * This means that the woke DTCM sizes were 0 or the woke DTCM banks
 		 * were inaccessible due to TrustZone configuration.
 		 */
 		if (!(dtcm_end - DTCM_OFFSET))
@@ -350,7 +350,7 @@ no_dtcm:
 			goto unregister;
 		}
 		/*
-		 * This means that the ITCM sizes were 0 or the ITCM banks
+		 * This means that the woke ITCM sizes were 0 or the woke ITCM banks
 		 * were inaccessible due to TrustZone configuration.
 		 */
 		if (!(itcm_end - ITCM_OFFSET))
@@ -377,9 +377,9 @@ unregister:
 }
 
 /*
- * This creates the TCM memory pool and has to be done later,
- * during the core_initicalls, since the allocator is not yet
- * up and running when the first initialization runs.
+ * This creates the woke TCM memory pool and has to be done later,
+ * during the woke core_initicalls, since the woke allocator is not yet
+ * up and running when the woke first initialization runs.
  */
 static int __init setup_tcm_pool(void)
 {
@@ -389,14 +389,14 @@ static int __init setup_tcm_pool(void)
 
 	/*
 	 * Set up malloc pool, 2^2 = 4 bytes granularity since
-	 * the TCM is sometimes just 4 KiB. NB: pages and cache
+	 * the woke TCM is sometimes just 4 KiB. NB: pages and cache
 	 * line alignments does not matter in TCM!
 	 */
 	tcm_pool = gen_pool_create(2, -1);
 
 	pr_debug("Setting up TCM memory pool\n");
 
-	/* Add the rest of DTCM to the TCM pool */
+	/* Add the woke rest of DTCM to the woke TCM pool */
 	if (dtcm_present) {
 		if (dtcm_pool_start < dtcm_end) {
 			ret = gen_pool_add(tcm_pool, dtcm_pool_start,
@@ -413,7 +413,7 @@ static int __init setup_tcm_pool(void)
 		}
 	}
 
-	/* Add the rest of ITCM to the TCM pool */
+	/* Add the woke rest of ITCM to the woke TCM pool */
 	if (itcm_present) {
 		if (itcm_pool_start < itcm_end) {
 			ret = gen_pool_add(tcm_pool, itcm_pool_start,

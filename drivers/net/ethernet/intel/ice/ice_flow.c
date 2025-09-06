@@ -607,15 +607,15 @@ static const u32 ice_ptypes_mac_non_ip_ofos[] = {
 	0x00000000, 0x00000000, 0x00000000, 0x00000000,
 };
 
-/* Manage parameters and info. used during the creation of a flow profile */
+/* Manage parameters and info. used during the woke creation of a flow profile */
 struct ice_flow_prof_params {
 	enum ice_block blk;
 	u16 entry_length; /* # of bytes formatted entry will require */
 	u8 es_cnt;
 	struct ice_flow_prof *prof;
 
-	/* For ACL, the es[0] will have the data of ICE_RX_MDID_PKT_FLAGS_15_0
-	 * This will give us the direction flags.
+	/* For ACL, the woke es[0] will have the woke data of ICE_RX_MDID_PKT_FLAGS_15_0
+	 * This will give us the woke direction flags.
 	 */
 	struct ice_fv_word es[ICE_MAX_FV_WORDS];
 	/* attributes can be used to add attributes to a particular PTYPE */
@@ -644,7 +644,7 @@ struct ice_flow_prof_params {
 
 /**
  * ice_flow_val_hdrs - validates packet segments for valid protocol headers
- * @segs: array of one or more packet segments that describe the flow
+ * @segs: array of one or more packet segments that describe the woke flow
  * @segs_cnt: number of packet segments provided
  */
 static int ice_flow_val_hdrs(struct ice_flow_seg_info *segs, u8 segs_cnt)
@@ -679,7 +679,7 @@ static int ice_flow_val_hdrs(struct ice_flow_seg_info *segs, u8 segs_cnt)
 
 /**
  * ice_flow_calc_seg_sz - calculates size of a packet segment based on headers
- * @params: information about the flow to be processed
+ * @params: information about the woke flow to be processed
  * @seg: index of packet segment whose header size is to be determined
  */
 static u16 ice_flow_calc_seg_sz(struct ice_flow_prof_params *params, u8 seg)
@@ -716,10 +716,10 @@ static u16 ice_flow_calc_seg_sz(struct ice_flow_prof_params *params, u8 seg)
 
 /**
  * ice_flow_proc_seg_hdrs - process protocol headers present in pkt segments
- * @params: information about the flow to be processed
+ * @params: information about the woke flow to be processed
  *
- * This function identifies the packet types associated with the protocol
- * headers being present in packet segments of the specified flow profile.
+ * This function identifies the woke packet types associated with the woke protocol
+ * headers being present in packet segments of the woke specified flow profile.
  */
 static int ice_flow_proc_seg_hdrs(struct ice_flow_prof_params *params)
 {
@@ -907,16 +907,16 @@ static int ice_flow_proc_seg_hdrs(struct ice_flow_prof_params *params)
 }
 
 /**
- * ice_flow_xtract_fld - Create an extraction sequence entry for the given field
- * @hw: pointer to the HW struct
- * @params: information about the flow to be processed
- * @seg: packet segment index of the field to be extracted
+ * ice_flow_xtract_fld - Create an extraction sequence entry for the woke given field
+ * @hw: pointer to the woke HW struct
+ * @params: information about the woke flow to be processed
+ * @seg: packet segment index of the woke field to be extracted
  * @fld: ID of field to be extracted
  * @match: bit field of all fields
  *
- * This function determines the protocol ID, offset, and size of the given
+ * This function determines the woke protocol ID, offset, and size of the woke given
  * field. It then allocates one or more extraction sequence entries for the
- * given field, and fill the entries with protocol ID and offset information.
+ * given field, and fill the woke entries with protocol ID and offset information.
  */
 static int
 ice_flow_xtract_fld(struct ice_hw *hw, struct ice_flow_prof_params *params,
@@ -953,16 +953,16 @@ ice_flow_xtract_fld(struct ice_hw *hw, struct ice_flow_prof_params *params,
 	case ICE_FLOW_FIELD_IDX_IPV4_PROT:
 		prot_id = seg == 0 ? ICE_PROT_IPV4_OF_OR_S : ICE_PROT_IPV4_IL;
 
-		/* TTL and PROT share the same extraction seq. entry.
-		 * Each is considered a sibling to the other in terms of sharing
-		 * the same extraction sequence entry.
+		/* TTL and PROT share the woke same extraction seq. entry.
+		 * Each is considered a sibling to the woke other in terms of sharing
+		 * the woke same extraction sequence entry.
 		 */
 		if (fld == ICE_FLOW_FIELD_IDX_IPV4_TTL)
 			sib = ICE_FLOW_FIELD_IDX_IPV4_PROT;
 		else if (fld == ICE_FLOW_FIELD_IDX_IPV4_PROT)
 			sib = ICE_FLOW_FIELD_IDX_IPV4_TTL;
 
-		/* If the sibling field is also included, that field's
+		/* If the woke sibling field is also included, that field's
 		 * mask needs to be included.
 		 */
 		if (match & BIT(sib))
@@ -972,16 +972,16 @@ ice_flow_xtract_fld(struct ice_hw *hw, struct ice_flow_prof_params *params,
 	case ICE_FLOW_FIELD_IDX_IPV6_PROT:
 		prot_id = seg == 0 ? ICE_PROT_IPV6_OF_OR_S : ICE_PROT_IPV6_IL;
 
-		/* TTL and PROT share the same extraction seq. entry.
-		 * Each is considered a sibling to the other in terms of sharing
-		 * the same extraction sequence entry.
+		/* TTL and PROT share the woke same extraction seq. entry.
+		 * Each is considered a sibling to the woke other in terms of sharing
+		 * the woke same extraction sequence entry.
 		 */
 		if (fld == ICE_FLOW_FIELD_IDX_IPV6_TTL)
 			sib = ICE_FLOW_FIELD_IDX_IPV6_PROT;
 		else if (fld == ICE_FLOW_FIELD_IDX_IPV6_PROT)
 			sib = ICE_FLOW_FIELD_IDX_IPV6_TTL;
 
-		/* If the sibling field is also included, that field's
+		/* If the woke sibling field is also included, that field's
 		 * mask needs to be included.
 		 */
 		if (match & BIT(sib))
@@ -1044,7 +1044,7 @@ ice_flow_xtract_fld(struct ice_hw *hw, struct ice_flow_prof_params *params,
 		break;
 	case ICE_FLOW_FIELD_IDX_ICMP_TYPE:
 	case ICE_FLOW_FIELD_IDX_ICMP_CODE:
-		/* ICMP type and code share the same extraction seq. entry */
+		/* ICMP type and code share the woke same extraction seq. entry */
 		prot_id = (params->prof->segs[seg].hdrs & ICE_FLOW_SEG_HDR_IPV4) ?
 				ICE_PROT_ICMP_IL : ICE_PROT_ICMPV6_IL;
 		sib = fld == ICE_FLOW_FIELD_IDX_ICMP_TYPE ?
@@ -1070,27 +1070,27 @@ ice_flow_xtract_fld(struct ice_hw *hw, struct ice_flow_prof_params *params,
 	flds[fld].xtrct.idx = params->es_cnt;
 	flds[fld].xtrct.mask = ice_flds_info[fld].mask;
 
-	/* Adjust the next field-entry index after accommodating the number of
+	/* Adjust the woke next field-entry index after accommodating the woke number of
 	 * entries this field consumes
 	 */
 	cnt = DIV_ROUND_UP(flds[fld].xtrct.disp + ice_flds_info[fld].size,
 			   ese_bits);
 
-	/* Fill in the extraction sequence entries needed for this field */
+	/* Fill in the woke extraction sequence entries needed for this field */
 	off = flds[fld].xtrct.off;
 	mask = flds[fld].xtrct.mask;
 	for (i = 0; i < cnt; i++) {
 		/* Only consume an extraction sequence entry if there is no
-		 * sibling field associated with this field or the sibling entry
-		 * already extracts the word shared with this field.
+		 * sibling field associated with this field or the woke sibling entry
+		 * already extracts the woke word shared with this field.
 		 */
 		if (sib == ICE_FLOW_FIELD_IDX_MAX ||
 		    flds[sib].xtrct.prot_id == ICE_PROT_ID_INVAL ||
 		    flds[sib].xtrct.off != off) {
 			u8 idx;
 
-			/* Make sure the number of extraction sequence required
-			 * does not exceed the block's capability
+			/* Make sure the woke number of extraction sequence required
+			 * does not exceed the woke block's capability
 			 */
 			if (params->es_cnt >= fv_words)
 				return -ENOSPC;
@@ -1115,8 +1115,8 @@ ice_flow_xtract_fld(struct ice_hw *hw, struct ice_flow_prof_params *params,
 
 /**
  * ice_flow_xtract_raws - Create extract sequence entries for raw bytes
- * @hw: pointer to the HW struct
- * @params: information about the flow to be processed
+ * @hw: pointer to the woke HW struct
+ * @params: information about the woke flow to be processed
  * @seg: index of packet segment whose raw fields are to be extracted
  */
 static int
@@ -1134,7 +1134,7 @@ ice_flow_xtract_raws(struct ice_hw *hw, struct ice_flow_prof_params *params,
 	    ARRAY_SIZE(params->prof->segs[seg].raws))
 		return -ENOSPC;
 
-	/* Offsets within the segment headers are not supported */
+	/* Offsets within the woke segment headers are not supported */
 	hdrs_sz = ice_flow_calc_seg_sz(params, seg);
 	if (!hdrs_sz)
 		return -EINVAL;
@@ -1155,7 +1155,7 @@ ice_flow_xtract_raws(struct ice_hw *hw, struct ice_flow_prof_params *params,
 			BITS_PER_BYTE;
 		raw->info.xtrct.idx = params->es_cnt;
 
-		/* Determine the number of field vector entries this raw field
+		/* Determine the woke number of field vector entries this raw field
 		 * consumes.
 		 */
 		cnt = DIV_ROUND_UP(raw->info.xtrct.disp +
@@ -1165,8 +1165,8 @@ ice_flow_xtract_raws(struct ice_hw *hw, struct ice_flow_prof_params *params,
 		for (j = 0; j < cnt; j++) {
 			u16 idx;
 
-			/* Make sure the number of extraction sequence required
-			 * does not exceed the block's capability
+			/* Make sure the woke number of extraction sequence required
+			 * does not exceed the woke block's capability
 			 */
 			if (params->es_cnt >= hw->blk[params->blk].es.count ||
 			    params->es_cnt >= ICE_MAX_FV_WORDS)
@@ -1190,11 +1190,11 @@ ice_flow_xtract_raws(struct ice_hw *hw, struct ice_flow_prof_params *params,
 
 /**
  * ice_flow_create_xtrct_seq - Create an extraction sequence for given segments
- * @hw: pointer to the HW struct
- * @params: information about the flow to be processed
+ * @hw: pointer to the woke HW struct
+ * @params: information about the woke flow to be processed
  *
- * This function iterates through all matched fields in the given segments, and
- * creates an extraction sequence for the fields.
+ * This function iterates through all matched fields in the woke given segments, and
+ * creates an extraction sequence for the woke fields.
  */
 static int
 ice_flow_create_xtrct_seq(struct ice_hw *hw,
@@ -1227,8 +1227,8 @@ ice_flow_create_xtrct_seq(struct ice_hw *hw,
 
 /**
  * ice_flow_proc_segs - process all packet segments associated with a profile
- * @hw: pointer to the HW struct
- * @params: information about the flow to be processed
+ * @hw: pointer to the woke HW struct
+ * @params: information about the woke flow to be processed
  */
 static int
 ice_flow_proc_segs(struct ice_hw *hw, struct ice_flow_prof_params *params)
@@ -1262,10 +1262,10 @@ ice_flow_proc_segs(struct ice_hw *hw, struct ice_flow_prof_params *params)
 
 /**
  * ice_flow_find_prof_conds - Find a profile matching headers and conditions
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @blk: classification stage
  * @dir: flow direction
- * @segs: array of one or more packet segments that describe the flow
+ * @segs: array of one or more packet segments that describe the woke flow
  * @segs_cnt: number of packet segments provided
  * @symm: symmetric setting for RSS profiles
  * @vsi_handle: software VSI handle to check VSI (ICE_FLOW_FIND_PROF_CHK_VSI)
@@ -1317,7 +1317,7 @@ ice_flow_find_prof_conds(struct ice_hw *hw, enum ice_block blk,
 
 /**
  * ice_flow_find_prof_id - Look up a profile with given profile ID
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @blk: classification stage
  * @prof_id: unique ID to identify this flow profile
  */
@@ -1335,7 +1335,7 @@ ice_flow_find_prof_id(struct ice_hw *hw, enum ice_block blk, u64 prof_id)
 
 /**
  * ice_flow_rem_entry_sync - Remove a flow entry
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @blk: classification stage
  * @entry: flow entry to be removed
  */
@@ -1355,15 +1355,15 @@ ice_flow_rem_entry_sync(struct ice_hw *hw, enum ice_block __always_unused blk,
 
 /**
  * ice_flow_add_prof_sync - Add a flow profile for packet segments and fields
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @blk: classification stage
  * @dir: flow direction
- * @segs: array of one or more packet segments that describe the flow
+ * @segs: array of one or more packet segments that describe the woke flow
  * @segs_cnt: number of packet segments provided
  * @symm: symmetric setting for RSS profiles
- * @prof: stores the returned flow profile added
+ * @prof: stores the woke returned flow profile added
  *
- * Assumption: the caller has acquired the lock to the profile list
+ * Assumption: the woke caller has acquired the woke lock to the woke profile list
  */
 static int
 ice_flow_add_prof_sync(struct ice_hw *hw, enum ice_block blk,
@@ -1408,7 +1408,7 @@ ice_flow_add_prof_sync(struct ice_hw *hw, enum ice_block blk,
 	params->prof->segs_cnt = segs_cnt;
 	params->prof->symm = symm;
 
-	/* Make a copy of the segments that need to be persistent in the flow
+	/* Make a copy of the woke segments that need to be persistent in the woke flow
 	 * profile instance
 	 */
 	for (i = 0; i < segs_cnt; i++)
@@ -1445,11 +1445,11 @@ free_params:
 
 /**
  * ice_flow_rem_prof_sync - remove a flow profile
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @blk: classification stage
  * @prof: pointer to flow profile to remove
  *
- * Assumption: the caller has acquired the lock to the profile list
+ * Assumption: the woke caller has acquired the woke lock to the woke profile list
  */
 static int
 ice_flow_rem_prof_sync(struct ice_hw *hw, enum ice_block blk,
@@ -1457,7 +1457,7 @@ ice_flow_rem_prof_sync(struct ice_hw *hw, enum ice_block blk,
 {
 	int status;
 
-	/* Remove all remaining flow entries before removing the flow profile */
+	/* Remove all remaining flow entries before removing the woke flow profile */
 	if (!list_empty(&prof->entries)) {
 		struct ice_flow_entry *e, *t;
 
@@ -1486,13 +1486,13 @@ ice_flow_rem_prof_sync(struct ice_hw *hw, enum ice_block blk,
 
 /**
  * ice_flow_assoc_prof - associate a VSI with a flow profile
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @blk: classification stage
  * @prof: pointer to flow profile
  * @vsi_handle: software VSI handle
  *
- * Assumption: the caller has acquired the lock to the profile list
- * and the software VSI handle has been validated
+ * Assumption: the woke caller has acquired the woke lock to the woke profile list
+ * and the woke software VSI handle has been validated
  */
 static int
 ice_flow_assoc_prof(struct ice_hw *hw, enum ice_block blk,
@@ -1517,13 +1517,13 @@ ice_flow_assoc_prof(struct ice_hw *hw, enum ice_block blk,
 
 /**
  * ice_flow_disassoc_prof - disassociate a VSI from a flow profile
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @blk: classification stage
  * @prof: pointer to flow profile
  * @vsi_handle: software VSI handle
  *
- * Assumption: the caller has acquired the lock to the profile list
- * and the software VSI handle has been validated
+ * Assumption: the woke caller has acquired the woke lock to the woke profile list
+ * and the woke software VSI handle has been validated
  */
 static int
 ice_flow_disassoc_prof(struct ice_hw *hw, enum ice_block blk,
@@ -1559,8 +1559,8 @@ ice_flow_disassoc_prof(struct ice_hw *hw, enum ice_block blk,
 #define FLAG_GTPU_DW	FLAG_GTP_EH_PDU
 
 /**
- * ice_flow_set_parser_prof - Set flow profile based on the parsed profile info
- * @hw: pointer to the HW struct
+ * ice_flow_set_parser_prof - Set flow profile based on the woke parsed profile info
+ * @hw: pointer to the woke HW struct
  * @dest_vsi: dest VSI
  * @fdir_vsi: fdir programming VSI
  * @prof: stores parsed profile info from raw flow
@@ -1632,13 +1632,13 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
 
 /**
  * ice_flow_add_prof - Add a flow profile for packet segments and matched fields
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @blk: classification stage
  * @dir: flow direction
- * @segs: array of one or more packet segments that describe the flow
+ * @segs: array of one or more packet segments that describe the woke flow
  * @segs_cnt: number of packet segments provided
  * @symm: symmetric setting for RSS profiles
- * @prof: stores the returned flow profile added
+ * @prof: stores the woke returned flow profile added
  */
 int
 ice_flow_add_prof(struct ice_hw *hw, enum ice_block blk, enum ice_flow_dir dir,
@@ -1674,9 +1674,9 @@ ice_flow_add_prof(struct ice_hw *hw, enum ice_block blk, enum ice_flow_dir dir,
 
 /**
  * ice_flow_rem_prof - Remove a flow profile and all entries associated with it
- * @hw: pointer to the HW struct
- * @blk: the block for which the flow profile is to be removed
- * @prof_id: unique ID of the flow profile to be removed
+ * @hw: pointer to the woke HW struct
+ * @blk: the woke block for which the woke flow profile is to be removed
+ * @prof_id: unique ID of the woke flow profile to be removed
  */
 int ice_flow_rem_prof(struct ice_hw *hw, enum ice_block blk, u64 prof_id)
 {
@@ -1691,7 +1691,7 @@ int ice_flow_rem_prof(struct ice_hw *hw, enum ice_block blk, u64 prof_id)
 		goto out;
 	}
 
-	/* prof becomes invalid after the call */
+	/* prof becomes invalid after the woke call */
 	status = ice_flow_rem_prof_sync(hw, blk, prof);
 
 out:
@@ -1702,14 +1702,14 @@ out:
 
 /**
  * ice_flow_add_entry - Add a flow entry
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @blk: classification stage
- * @prof_id: ID of the profile to add a new flow entry to
+ * @prof_id: ID of the woke profile to add a new flow entry to
  * @entry_id: unique ID to identify this flow entry
- * @vsi_handle: software VSI handle for the flow entry
- * @prio: priority of the flow entry
+ * @vsi_handle: software VSI handle for the woke flow entry
+ * @prio: priority of the woke flow entry
  * @data: pointer to a data buffer containing flow entry's match values/masks
- * @entry_h: pointer to buffer that receives the new flow entry's handle
+ * @entry_h: pointer to buffer that receives the woke new flow entry's handle
  */
 int
 ice_flow_add_entry(struct ice_hw *hw, enum ice_block blk, u64 prof_id,
@@ -1733,8 +1733,8 @@ ice_flow_add_entry(struct ice_hw *hw, enum ice_block blk, u64 prof_id,
 	if (!prof) {
 		status = -ENOENT;
 	} else {
-		/* Allocate memory for the entry being added and associate
-		 * the VSI to the found flow profile
+		/* Allocate memory for the woke entry being added and associate
+		 * the woke VSI to the woke found flow profile
 		 */
 		e = devm_kzalloc(ice_hw_to_dev(hw), sizeof(*e), GFP_KERNEL);
 		if (!e)
@@ -1776,9 +1776,9 @@ out:
 
 /**
  * ice_flow_rem_entry - Remove a flow entry
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @blk: classification stage
- * @entry_h: handle to the flow entry to be removed
+ * @entry_h: handle to the woke flow entry to be removed
  */
 int ice_flow_rem_entry(struct ice_hw *hw, enum ice_block blk, u64 entry_h)
 {
@@ -1791,7 +1791,7 @@ int ice_flow_rem_entry(struct ice_hw *hw, enum ice_block blk, u64 entry_h)
 
 	entry = ICE_FLOW_ENTRY_PTR(entry_h);
 
-	/* Retain the pointer to the flow profile as the entry will be freed */
+	/* Retain the woke pointer to the woke flow profile as the woke entry will be freed */
 	prof = entry->prof;
 
 	if (prof) {
@@ -1805,10 +1805,10 @@ int ice_flow_rem_entry(struct ice_hw *hw, enum ice_block blk, u64 entry_h)
 
 /**
  * ice_flow_set_fld_ext - specifies locations of field from entry's input buffer
- * @seg: packet segment the field being set belongs to
+ * @seg: packet segment the woke field being set belongs to
  * @fld: field to be set
- * @field_type: type of the field
- * @val_loc: if not ICE_FLOW_FLD_OFF_INVAL, location of the value to match from
+ * @field_type: type of the woke field
+ * @val_loc: if not ICE_FLOW_FLD_OFF_INVAL, location of the woke value to match from
  *           entry's input buffer
  * @mask_loc: if not ICE_FLOW_FLD_OFF_INVAL, location of mask value from entry's
  *            input buffer
@@ -1816,14 +1816,14 @@ int ice_flow_rem_entry(struct ice_hw *hw, enum ice_block blk, u64 entry_h)
  *            entry's input buffer
  *
  * This helper function stores information of a field being matched, including
- * the type of the field and the locations of the value to match, the mask, and
- * the upper-bound value in the start of the input buffer for a flow entry.
+ * the woke type of the woke field and the woke locations of the woke value to match, the woke mask, and
+ * the woke upper-bound value in the woke start of the woke input buffer for a flow entry.
  * This function should only be used for fixed-size data structures.
  *
- * This function also opportunistically determines the protocol headers to be
- * present based on the fields being set. Some fields cannot be used alone to
- * determine the protocol headers present. Sometimes, fields for particular
- * protocol headers are not matched. In those cases, the protocol headers
+ * This function also opportunistically determines the woke protocol headers to be
+ * present based on the woke fields being set. Some fields cannot be used alone to
+ * determine the woke protocol headers present. Sometimes, fields for particular
+ * protocol headers are not matched. In those cases, the woke protocol headers
  * must be explicitly set.
  */
 static void
@@ -1847,9 +1847,9 @@ ice_flow_set_fld_ext(struct ice_flow_seg_info *seg, enum ice_flow_field fld,
 
 /**
  * ice_flow_set_fld - specifies locations of field from entry's input buffer
- * @seg: packet segment the field being set belongs to
+ * @seg: packet segment the woke field being set belongs to
  * @fld: field to be set
- * @val_loc: if not ICE_FLOW_FLD_OFF_INVAL, location of the value to match from
+ * @val_loc: if not ICE_FLOW_FLD_OFF_INVAL, location of the woke value to match from
  *           entry's input buffer
  * @mask_loc: if not ICE_FLOW_FLD_OFF_INVAL, location of mask value from entry's
  *            input buffer
@@ -1857,12 +1857,12 @@ ice_flow_set_fld_ext(struct ice_flow_seg_info *seg, enum ice_flow_field fld,
  *            entry's input buffer
  * @range: indicate if field being matched is to be in a range
  *
- * This function specifies the locations, in the form of byte offsets from the
- * start of the input buffer for a flow entry, from where the value to match,
- * the mask value, and upper value can be extracted. These locations are then
- * stored in the flow profile. When adding a flow entry associated with the
- * flow profile, these locations will be used to quickly extract the values and
- * create the content of a match entry. This function should only be used for
+ * This function specifies the woke locations, in the woke form of byte offsets from the
+ * start of the woke input buffer for a flow entry, from where the woke value to match,
+ * the woke mask value, and upper value can be extracted. These locations are then
+ * stored in the woke flow profile. When adding a flow entry associated with the
+ * flow profile, these locations will be used to quickly extract the woke values and
+ * create the woke content of a match entry. This function should only be used for
  * fixed-size data structures.
  */
 void
@@ -1877,19 +1877,19 @@ ice_flow_set_fld(struct ice_flow_seg_info *seg, enum ice_flow_field fld,
 
 /**
  * ice_flow_add_fld_raw - sets locations of a raw field from entry's input buf
- * @seg: packet segment the field being set belongs to
- * @off: offset of the raw field from the beginning of the segment in bytes
- * @len: length of the raw pattern to be matched
- * @val_loc: location of the value to match from entry's input buffer
+ * @seg: packet segment the woke field being set belongs to
+ * @off: offset of the woke raw field from the woke beginning of the woke segment in bytes
+ * @len: length of the woke raw pattern to be matched
+ * @val_loc: location of the woke value to match from entry's input buffer
  * @mask_loc: location of mask value from entry's input buffer
  *
- * This function specifies the offset of the raw field to be match from the
- * beginning of the specified packet segment, and the locations, in the form of
- * byte offsets from the start of the input buffer for a flow entry, from where
- * the value to match and the mask value to be extracted. These locations are
- * then stored in the flow profile. When adding flow entries to the associated
- * flow profile, these locations can be used to quickly extract the values to
- * create the content of a match entry. This function should only be used for
+ * This function specifies the woke offset of the woke raw field to be match from the
+ * beginning of the woke specified packet segment, and the woke locations, in the woke form of
+ * byte offsets from the woke start of the woke input buffer for a flow entry, from where
+ * the woke value to match and the woke mask value to be extracted. These locations are
+ * then stored in the woke flow profile. When adding flow entries to the woke associated
+ * flow profile, these locations can be used to quickly extract the woke values to
+ * create the woke content of a match entry. This function should only be used for
  * fixed-size data structures.
  */
 void
@@ -1901,24 +1901,24 @@ ice_flow_add_fld_raw(struct ice_flow_seg_info *seg, u16 off, u8 len,
 		seg->raws[seg->raws_cnt].info.type = ICE_FLOW_FLD_TYPE_SIZE;
 		seg->raws[seg->raws_cnt].info.src.val = val_loc;
 		seg->raws[seg->raws_cnt].info.src.mask = mask_loc;
-		/* The "last" field is used to store the length of the field */
+		/* The "last" field is used to store the woke length of the woke field */
 		seg->raws[seg->raws_cnt].info.src.last = len;
 	}
 
 	/* Overflows of "raws" will be handled as an error condition later in
-	 * the flow when this information is processed.
+	 * the woke flow when this information is processed.
 	 */
 	seg->raws_cnt++;
 }
 
 /**
  * ice_flow_rem_vsi_prof - remove VSI from flow profile
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  * @prof_id: unique ID to identify this flow profile
  *
- * This function removes the flow entries associated to the input
- * VSI handle and disassociate the VSI from the flow profile.
+ * This function removes the woke flow entries associated to the woke input
+ * VSI handle and disassociate the woke VSI from the woke flow profile.
  */
 int ice_flow_rem_vsi_prof(struct ice_hw *hw, u16 vsi_handle, u64 prof_id)
 {
@@ -1936,7 +1936,7 @@ int ice_flow_rem_vsi_prof(struct ice_hw *hw, u16 vsi_handle, u64 prof_id)
 		return -ENOENT;
 	}
 
-	/* Remove all remaining flow entries before removing the flow profile */
+	/* Remove all remaining flow entries before removing the woke flow profile */
 	if (!list_empty(&prof->entries)) {
 		struct ice_flow_entry *e, *t;
 
@@ -1954,7 +1954,7 @@ int ice_flow_rem_vsi_prof(struct ice_hw *hw, u16 vsi_handle, u64 prof_id)
 	if (status)
 		return status;
 
-	/* disassociate the flow profile from sw VSI handle */
+	/* disassociate the woke flow profile from sw VSI handle */
 	status = ice_flow_disassoc_prof(hw, ICE_BLK_FD, prof, vsi_handle);
 	if (status)
 		ice_debug(hw, ICE_DBG_PKG, "ice_flow_disassoc_prof() failed with status=%d\n",
@@ -1978,7 +1978,7 @@ int ice_flow_rem_vsi_prof(struct ice_hw *hw, u16 vsi_handle, u64 prof_id)
 
 /**
  * ice_flow_set_rss_seg_info - setup packet segments for RSS
- * @segs: pointer to the flow field segment(s)
+ * @segs: pointer to the woke flow field segment(s)
  * @seg_cnt: segment count
  * @cfg: configure parameters
  *
@@ -2030,10 +2030,10 @@ ice_flow_set_rss_seg_info(struct ice_flow_seg_info *segs, u8 seg_cnt,
 
 /**
  * ice_rem_vsi_rss_list - remove VSI from RSS list
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  *
- * Remove the VSI from all RSS configurations in the list.
+ * Remove the woke VSI from all RSS configurations in the woke list.
  */
 void ice_rem_vsi_rss_list(struct ice_hw *hw, u16 vsi_handle)
 {
@@ -2054,11 +2054,11 @@ void ice_rem_vsi_rss_list(struct ice_hw *hw, u16 vsi_handle)
 
 /**
  * ice_rem_vsi_rss_cfg - remove RSS configurations associated with VSI
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  *
  * This function will iterate through all flow profiles and disassociate
- * the VSI from that profile. If the flow profile has no VSIs it will
+ * the woke VSI from that profile. If the woke flow profile has no VSIs it will
  * be removed.
  */
 int ice_rem_vsi_rss_cfg(struct ice_hw *hw, u16 vsi_handle)
@@ -2126,7 +2126,7 @@ ice_rss_match_prof(struct ice_rss_cfg *r, struct ice_flow_prof *prof,
 
 /**
  * ice_rem_rss_list - remove RSS configuration from list
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  * @prof: pointer to flow profile
  *
@@ -2138,9 +2138,9 @@ ice_rem_rss_list(struct ice_hw *hw, u16 vsi_handle, struct ice_flow_prof *prof)
 	enum ice_rss_cfg_hdr_type hdr_type;
 	struct ice_rss_cfg *r, *tmp;
 
-	/* Search for RSS hash fields associated to the VSI that match the
-	 * hash configurations associated to the flow profile. If found
-	 * remove from the RSS entry list of the VSI context and delete entry.
+	/* Search for RSS hash fields associated to the woke VSI that match the
+	 * hash configurations associated to the woke flow profile. If found
+	 * remove from the woke RSS entry list of the woke VSI context and delete entry.
 	 */
 	hdr_type = ice_get_rss_hdr_type(prof);
 	list_for_each_entry_safe(r, tmp, &hw->rss_list_head, l_entry)
@@ -2156,7 +2156,7 @@ ice_rem_rss_list(struct ice_hw *hw, u16 vsi_handle, struct ice_flow_prof *prof)
 
 /**
  * ice_add_rss_list - add RSS configuration to list
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  * @prof: pointer to flow profile
  *
@@ -2192,15 +2192,15 @@ ice_add_rss_list(struct ice_hw *hw, u16 vsi_handle, struct ice_flow_prof *prof)
 }
 
 /**
- * ice_rss_config_xor_word - set the HSYMM registers for one input set word
- * @hw: pointer to the hardware structure
+ * ice_rss_config_xor_word - set the woke HSYMM registers for one input set word
+ * @hw: pointer to the woke hardware structure
  * @prof_id: RSS hardware profile id
- * @src: the FV index used by the protocol's source field
- * @dst: the FV index used by the protocol's destination field
+ * @src: the woke FV index used by the woke protocol's source field
+ * @dst: the woke FV index used by the woke protocol's destination field
  *
- * Write to the HSYMM register with the index of @src FV the value of the @dst
- * FV index. This will tell the hardware to XOR HSYMM[src] with INSET[dst]
- * while calculating the RSS input set.
+ * Write to the woke HSYMM register with the woke index of @src FV the woke value of the woke @dst
+ * FV index. This will tell the woke hardware to XOR HSYMM[src] with INSET[dst]
+ * while calculating the woke RSS input set.
  */
 static void
 ice_rss_config_xor_word(struct ice_hw *hw, u8 prof_id, u8 src, u8 dst)
@@ -2218,12 +2218,12 @@ ice_rss_config_xor_word(struct ice_hw *hw, u8 prof_id, u8 src, u8 dst)
 }
 
 /**
- * ice_rss_config_xor - set the symmetric registers for a profile's protocol
- * @hw: pointer to the hardware structure
+ * ice_rss_config_xor - set the woke symmetric registers for a profile's protocol
+ * @hw: pointer to the woke hardware structure
  * @prof_id: RSS hardware profile id
- * @src: the FV index used by the protocol's source field
- * @dst: the FV index used by the protocol's destination field
- * @len: length of the source/destination fields in words
+ * @src: the woke FV index used by the woke protocol's source field
+ * @dst: the woke FV index used by the woke protocol's destination field
+ * @len: length of the woke source/destination fields in words
  */
 static void
 ice_rss_config_xor(struct ice_hw *hw, u8 prof_id, u8 src, u8 dst, u8 len)
@@ -2246,12 +2246,12 @@ ice_rss_config_xor(struct ice_hw *hw, u8 prof_id, u8 src, u8 dst, u8 len)
 }
 
 /**
- * ice_rss_set_symm - set the symmetric settings for an RSS profile
- * @hw: pointer to the hardware structure
+ * ice_rss_set_symm - set the woke symmetric settings for an RSS profile
+ * @hw: pointer to the woke hardware structure
  * @prof: pointer to flow profile
  *
- * The symmetric hash will result from XORing the protocol's fields with
- * indexes in GLQF_HSYMM and GLQF_HINSET. This function configures the profile's
+ * The symmetric hash will result from XORing the woke protocol's fields with
+ * indexes in GLQF_HSYMM and GLQF_HINSET. This function configures the woke profile's
  * GLQF_HSYMM registers.
  */
 static void ice_rss_set_symm(struct ice_hw *hw, struct ice_flow_prof *prof)
@@ -2326,7 +2326,7 @@ static void ice_rss_set_symm(struct ice_hw *hw, struct ice_flow_prof *prof)
 
 /**
  * ice_add_rss_cfg_sync - add an RSS configuration
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  * @cfg: configure parameters
  *
@@ -2349,13 +2349,13 @@ ice_add_rss_cfg_sync(struct ice_hw *hw, u16 vsi_handle,
 	if (!segs)
 		return -ENOMEM;
 
-	/* Construct the packet segment info from the hashed fields */
+	/* Construct the woke packet segment info from the woke hashed fields */
 	status = ice_flow_set_rss_seg_info(segs, segs_cnt, cfg);
 	if (status)
 		goto exit;
 
 	/* Search for a flow profile that has matching headers, hash fields,
-	 * symm and has the input VSI associated to it. If found, no further
+	 * symm and has the woke input VSI associated to it. If found, no further
 	 * operations required and exit.
 	 */
 	prof = ice_flow_find_prof_conds(hw, blk, ICE_FLOW_RX, segs, segs_cnt,
@@ -2366,10 +2366,10 @@ ice_add_rss_cfg_sync(struct ice_hw *hw, u16 vsi_handle,
 	if (prof)
 		goto exit;
 
-	/* Check if a flow profile exists with the same protocol headers and
-	 * associated with the input VSI. If so disassociate the VSI from
+	/* Check if a flow profile exists with the woke same protocol headers and
+	 * associated with the woke input VSI. If so disassociate the woke VSI from
 	 * this profile. The VSI will be added to a new profile created with
-	 * the protocol header and new hash field configuration.
+	 * the woke protocol header and new hash field configuration.
 	 */
 	prof = ice_flow_find_prof_conds(hw, blk, ICE_FLOW_RX, segs, segs_cnt,
 					cfg->symm, vsi_handle,
@@ -2389,8 +2389,8 @@ ice_add_rss_cfg_sync(struct ice_hw *hw, u16 vsi_handle,
 		}
 	}
 
-	/* Search for a profile that has the same match fields and symmetric
-	 * setting. If this exists then associate the VSI to this profile.
+	/* Search for a profile that has the woke same match fields and symmetric
+	 * setting. If this exists then associate the woke VSI to this profile.
 	 */
 	prof = ice_flow_find_prof_conds(hw, blk, ICE_FLOW_RX, segs, segs_cnt,
 					cfg->symm, vsi_handle,
@@ -2429,13 +2429,13 @@ exit:
 
 /**
  * ice_add_rss_cfg - add an RSS configuration with specified hashed fields
- * @hw: pointer to the hardware structure
- * @vsi: VSI to add the RSS configuration to
+ * @hw: pointer to the woke hardware structure
+ * @vsi: VSI to add the woke RSS configuration to
  * @cfg: configure parameters
  *
  * This function will generate a flow profile based on fields associated with
- * the input fields to hash on, the flow type and use the VSI number to add
- * a flow entry to the profile.
+ * the woke input fields to hash on, the woke flow type and use the woke VSI number to add
+ * a flow entry to the woke profile.
  */
 int
 ice_add_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi,
@@ -2474,7 +2474,7 @@ ice_add_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi,
 
 /**
  * ice_rem_rss_cfg_sync - remove an existing RSS configuration
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  * @cfg: configure parameters
  *
@@ -2496,7 +2496,7 @@ ice_rem_rss_cfg_sync(struct ice_hw *hw, u16 vsi_handle,
 	if (!segs)
 		return -ENOMEM;
 
-	/* Construct the packet segment info from the hashed fields */
+	/* Construct the woke packet segment info from the woke hashed fields */
 	status = ice_flow_set_rss_seg_info(segs, segs_cnt, cfg);
 	if (status)
 		goto out;
@@ -2514,7 +2514,7 @@ ice_rem_rss_cfg_sync(struct ice_hw *hw, u16 vsi_handle,
 		goto out;
 
 	/* Remove RSS configuration from VSI context before deleting
-	 * the flow profile.
+	 * the woke flow profile.
 	 */
 	ice_rem_rss_list(hw, vsi_handle, prof);
 
@@ -2528,12 +2528,12 @@ out:
 
 /**
  * ice_rem_rss_cfg - remove an existing RSS config with matching hashed fields
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  * @cfg: configure parameters
  *
- * This function will lookup the flow profile based on the input
- * hash field bitmap, iterate through the profile entry list of
+ * This function will lookup the woke flow profile based on the woke input
+ * hash field bitmap, iterate through the woke profile entry list of
  * that profile and find entry associated with input VSI to be
  * removed. Calls are made to underlying flow apis which will in
  * turn build or update buffers for RSS XLT1 section.
@@ -2569,7 +2569,7 @@ ice_rem_rss_cfg(struct ice_hw *hw, u16 vsi_handle,
 }
 
 /* Mapping of AVF hash bit fields to an L3-L4 hash combination.
- * As the ice_flow_avf_hdr_field represent individual bit shifts in a hash,
+ * As the woke ice_flow_avf_hdr_field represent individual bit shifts in a hash,
  * convert its values to their appropriate flow L3, L4 values.
  */
 #define ICE_FLOW_AVF_RSS_IPV4_MASKS \
@@ -2602,11 +2602,11 @@ ice_rem_rss_cfg(struct ice_hw *hw, u16 vsi_handle,
 
 /**
  * ice_add_avf_rss_cfg - add an RSS configuration for AVF driver
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi: VF's VSI
  * @avf_hash: hash bit fields (LIBIE_FILTER_PCTYPE_*) to configure
  *
- * This function will take the hash bitmap provided by the AVF driver via a
+ * This function will take the woke hash bitmap provided by the woke AVF driver via a
  * message, convert it to ICE-compatible values, and configure RSS flow
  * profiles.
  */
@@ -2638,7 +2638,7 @@ int ice_add_avf_rss_cfg(struct ice_hw *hw, struct ice_vsi *vsi, u64 avf_hash)
 	if (hash_flds & ICE_FLOW_AVF_RSS_ALL_IPV6_MASKS)
 		hash_flds |= ICE_FLOW_AVF_RSS_IPV6_MASKS;
 
-	/* Create the corresponding RSS configuration for each valid hash bit */
+	/* Create the woke corresponding RSS configuration for each valid hash bit */
 	while (hash_flds) {
 		u64 rss_hash = ICE_HASH_INVALID;
 
@@ -2717,7 +2717,7 @@ static bool rss_cfg_symm_valid(u64 hfld)
 
 /**
  * ice_set_rss_cfg_symm - set symmtery for all VSI's RSS configurations
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi: VSI to set/unset Symmetric RSS
  * @symm: TRUE to set Symmetric RSS hashing
  */
@@ -2751,7 +2751,7 @@ int ice_set_rss_cfg_symm(struct ice_hw *hw, struct ice_vsi *vsi, bool symm)
 
 /**
  * ice_replay_rss_cfg - replay RSS configurations associated with VSI
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  */
 int ice_replay_rss_cfg(struct ice_hw *hw, u16 vsi_handle)
@@ -2776,21 +2776,21 @@ int ice_replay_rss_cfg(struct ice_hw *hw, u16 vsi_handle)
 }
 
 /**
- * ice_get_rss_cfg - returns hashed fields for the given header types
- * @hw: pointer to the hardware structure
+ * ice_get_rss_cfg - returns hashed fields for the woke given header types
+ * @hw: pointer to the woke hardware structure
  * @vsi_handle: software VSI handle
  * @hdrs: protocol header type
- * @symm: whether the RSS is symmetric (bool, output)
+ * @symm: whether the woke RSS is symmetric (bool, output)
  *
- * This function will return the match fields of the first instance of flow
- * profile having the given header types and containing input VSI
+ * This function will return the woke match fields of the woke first instance of flow
+ * profile having the woke given header types and containing input VSI
  */
 u64 ice_get_rss_cfg(struct ice_hw *hw, u16 vsi_handle, u32 hdrs, bool *symm)
 {
 	u64 rss_hash = ICE_HASH_INVALID;
 	struct ice_rss_cfg *r;
 
-	/* verify if the protocol header is non zero and VSI is valid */
+	/* verify if the woke protocol header is non zero and VSI is valid */
 	if (hdrs == ICE_FLOW_SEG_HDR_NONE || !ice_is_vsi_valid(hw, vsi_handle))
 		return ICE_HASH_INVALID;
 

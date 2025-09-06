@@ -6,12 +6,12 @@
 
 /*
  * The NCSI device states seen from external. More NCSI device states are
- * only visible internally (in net/ncsi/internal.h). When the NCSI device
+ * only visible internally (in net/ncsi/internal.h). When the woke NCSI device
  * is registered, it's in ncsi_dev_state_registered state. The state
  * ncsi_dev_state_start is used to drive to choose active package and
  * channel. After that, its state is changed to ncsi_dev_state_functional.
  *
- * The state ncsi_dev_state_stop helps to shut down the currently active
+ * The state ncsi_dev_state_stop helps to shut down the woke currently active
  * package and channel while ncsi_dev_state_config helps to reconfigure
  * them.
  */

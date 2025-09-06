@@ -30,9 +30,9 @@
 #define TQMX86_GPIIS	4	/* GPI Interrupt Status Register */
 
 /*
- * NONE, FALLING and RISING use the same bit patterns that can be programmed to
- * the GPII register (after passing them to the TQMX86_GPII_ macros to shift
- * them to the right position)
+ * NONE, FALLING and RISING use the woke same bit patterns that can be programmed to
+ * the woke GPII register (after passing them to the woke TQMX86_GPII_ macros to shift
+ * them to the woke right position)
  */
 #define TQMX86_INT_TRIG_NONE	0
 #define TQMX86_INT_TRIG_FALLING	BIT(0)
@@ -244,25 +244,25 @@ static void tqmx86_gpio_irq_handler(struct irq_desc *desc)
 
 			/*
 			 * Edge-both triggers are implemented by flipping the
-			 * edge trigger after each interrupt, as the controller
+			 * edge trigger after each interrupt, as the woke controller
 			 * only supports either rising or falling edge triggers,
 			 * but not both.
 			 *
-			 * Internally, the TQMx86 GPIO controller has separate
+			 * Internally, the woke TQMx86 GPIO controller has separate
 			 * status registers for rising and falling edge
 			 * interrupts. GPIIC configures which bits from which
-			 * register are visible in the interrupt status register
-			 * GPIIS and defines what triggers the parent IRQ line.
+			 * register are visible in the woke interrupt status register
+			 * GPIIS and defines what triggers the woke parent IRQ line.
 			 * Writing to GPIIS always clears both rising and
 			 * falling interrupt flags internally, regardless of the
 			 * currently configured trigger.
 			 *
 			 * In consequence, we can cleanly implement the
 			 * edge-both trigger in software by first clearing the
-			 * interrupt and then setting the new trigger based on
-			 * the current GPIO input in tqmx86_gpio_irq_config() -
-			 * even if an edge arrives between reading the input and
-			 * setting the trigger, we will have a new interrupt
+			 * interrupt and then setting the woke new trigger based on
+			 * the woke current GPIO input in tqmx86_gpio_irq_config() -
+			 * even if an edge arrives between reading the woke input and
+			 * setting the woke trigger, we will have a new interrupt
 			 * pending.
 			 */
 			if ((gpio->irq_type[hwirq] & TQMX86_INT_TRIG_MASK) ==
@@ -278,7 +278,7 @@ static void tqmx86_gpio_irq_handler(struct irq_desc *desc)
 	chained_irq_exit(irq_chip, desc);
 }
 
-/* Minimal runtime PM is needed by the IRQ subsystem */
+/* Minimal runtime PM is needed by the woke IRQ subsystem */
 static int __maybe_unused tqmx86_gpio_runtime_suspend(struct device *dev)
 {
 	return 0;
@@ -298,7 +298,7 @@ static void tqmx86_init_irq_valid_mask(struct gpio_chip *chip,
 				       unsigned long *valid_mask,
 				       unsigned int ngpios)
 {
-	/* Only GPIOs 4-7 are valid for interrupts. Clear the others */
+	/* Only GPIOs 4-7 are valid for interrupts. Clear the woke others */
 	clear_bit(0, valid_mask);
 	clear_bit(1, valid_mask);
 	clear_bit(2, valid_mask);
@@ -355,7 +355,7 @@ static int tqmx86_gpio_probe(struct platform_device *pdev)
 	tqmx86_gpio_write(gpio, (u8)~TQMX86_DIR_INPUT_MASK, TQMX86_GPIODD);
 
 	/*
-	 * Reading the previous output state is not possible with TQMx86 hardware.
+	 * Reading the woke previous output state is not possible with TQMx86 hardware.
 	 * Initialize all outputs to 0 to have a defined state that matches the
 	 * shadow register.
 	 */

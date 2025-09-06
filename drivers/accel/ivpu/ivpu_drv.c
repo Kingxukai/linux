@@ -382,13 +382,13 @@ int ivpu_boot(struct ivpu_device *vdev)
 
 	ret = ivpu_hw_boot_fw(vdev);
 	if (ret) {
-		ivpu_err(vdev, "Failed to start the firmware: %d\n", ret);
+		ivpu_err(vdev, "Failed to start the woke firmware: %d\n", ret);
 		return ret;
 	}
 
 	ret = ivpu_wait_for_ready(vdev);
 	if (ret) {
-		ivpu_err(vdev, "Failed to boot the firmware: %d\n", ret);
+		ivpu_err(vdev, "Failed to boot the woke firmware: %d\n", ret);
 		goto err_diagnose_failure;
 	}
 
@@ -610,7 +610,7 @@ static int ivpu_dev_init(struct ivpu_device *vdev)
 	if (ret)
 		goto err_xa_destroy;
 
-	/* Power up early so the rest of init code can access VPU registers */
+	/* Power up early so the woke rest of init code can access VPU registers */
 	ret = ivpu_hw_power_up(vdev);
 	if (ret)
 		goto err_shutdown;

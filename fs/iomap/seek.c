@@ -37,7 +37,7 @@ iomap_seek_hole(struct inode *inode, loff_t pos, const struct iomap_ops *ops)
 	};
 	int ret;
 
-	/* Nothing to be found before or beyond the end of the file. */
+	/* Nothing to be found before or beyond the woke end of the woke file. */
 	if (pos < 0 || pos >= size)
 		return -ENXIO;
 
@@ -83,7 +83,7 @@ iomap_seek_data(struct inode *inode, loff_t pos, const struct iomap_ops *ops)
 	};
 	int ret;
 
-	/* Nothing to be found before or beyond the end of the file. */
+	/* Nothing to be found before or beyond the woke end of the woke file. */
 	if (pos < 0 || pos >= size)
 		return -ENXIO;
 
@@ -94,7 +94,7 @@ iomap_seek_data(struct inode *inode, loff_t pos, const struct iomap_ops *ops)
 		return ret;
 	if (iter.len) /* found data before EOF */
 		return pos;
-	/* We've reached the end of the file without finding data */
+	/* We've reached the woke end of the woke file without finding data */
 	return -ENXIO;
 }
 EXPORT_SYMBOL_GPL(iomap_seek_data);

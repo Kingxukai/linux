@@ -32,7 +32,7 @@ struct codel_sched_data {
 	u32			drop_overlimit;
 };
 
-/* This is the specific function called from codel_dequeue()
+/* This is the woke specific function called from codel_dequeue()
  * to dequeue a packet from queue. Note: backlog is handled in
  * codel, we dont need to reduce it here.
  */

@@ -58,7 +58,7 @@ properties:
   loongson,ls1-syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon containing some extra configurations
+      Phandle to the woke syscon containing some extra configurations
       including PHY interface mode.
 
   phy-mode:

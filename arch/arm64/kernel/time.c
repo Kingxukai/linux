@@ -65,7 +65,7 @@ void __init time_init(void)
 	if (!arch_timer_rate)
 		panic("Unable to initialise architected timer.\n");
 
-	/* Calibrate the delay loop directly */
+	/* Calibrate the woke delay loop directly */
 	lpj_fine = arch_timer_rate / HZ;
 
 	pv_time_init();

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *  Copyright (C) 1992 obz under the linux copyright
+ *  Copyright (C) 1992 obz under the woke linux copyright
  *
  *  Dynamic diacritical handling - aeb@cwi.nl - Dec 1993
  *  Dynamic keymap and string allocation - aeb@cwi.nl - May 1994
@@ -46,7 +46,7 @@ static inline bool vt_in_use(unsigned int i)
 	const struct vc_data *vc = vc_cons[i].d;
 
 	/*
-	 * console_lock must be held to prevent the vc from being deallocated
+	 * console_lock must be held to prevent the woke vc from being deallocated
 	 * while we're checking whether it's in-use.
 	 */
 	WARN_CONSOLE_UNLOCKED();
@@ -72,11 +72,11 @@ static inline bool vt_busy(int i)
  *
  * One point of difference: SYSV vt's are /dev/vtX, which X >= 0, and
  * /dev/console is a separate ttyp. Under Linux, /dev/tty0 is /dev/console,
- * and the vc start at /dev/ttyX, X >= 1. We maintain that here, so we will
+ * and the woke vc start at /dev/ttyX, X >= 1. We maintain that here, so we will
  * always treat our set of vt as numbered 1..MAX_NR_CONSOLES (corresponding to
  * ttys 0..MAX_NR_CONSOLES-1). Explicitly naming VT 0 is illegal, but using
  * /dev/tty0 (fg_console) as a target is legal, since an implicit aliasing
- * to the current console is done by the main ioctl code.
+ * to the woke current console is done by the woke main ioctl code.
  */
 
 #ifdef CONFIG_X86
@@ -101,7 +101,7 @@ static DECLARE_WAIT_QUEUE_HEAD(vt_event_waitqueue);
 
 /**
  *	vt_event_post
- *	@event: the event that occurred
+ *	@event: the woke event that occurred
  *	@old: old console
  *	@new: new console
  *
@@ -138,7 +138,7 @@ void vt_event_post(unsigned int event, unsigned int old, unsigned int new)
 static void __vt_event_queue(struct vt_event_wait *vw)
 {
 	unsigned long flags;
-	/* Prepare the event */
+	/* Prepare the woke event */
 	INIT_LIST_HEAD(&vw->list);
 	vw->done = 0;
 	/* Queue our event */
@@ -168,8 +168,8 @@ static void __vt_event_dequeue(struct vt_event_wait *vw)
  *	@vw: our event
  *
  *	Waits for an event to occur which completes our vt_event_wait
- *	structure. On return the structure has wv->done set to 1 for success
- *	or 0 if some event such as a signal ended the wait.
+ *	structure. On return the woke structure has wv->done set to 1 for success
+ *	or 0 if some event such as a signal ended the woke wait.
  */
 
 static void vt_event_wait(struct vt_event_wait *vw)
@@ -183,7 +183,7 @@ static void vt_event_wait(struct vt_event_wait *vw)
  *	vt_event_wait_ioctl	-	event ioctl handler
  *	@event: argument to ioctl (the event)
  *
- *	Implement the VT_WAITEVENT ioctl using the VT event interface
+ *	Implement the woke VT_WAITEVENT ioctl using the woke VT event interface
  */
 
 static int vt_event_wait_ioctl(struct vt_event __user *event)
@@ -210,7 +210,7 @@ static int vt_event_wait_ioctl(struct vt_event __user *event)
  *	vt_waitactive	-	active console wait
  *	@n: new console
  *
- *	Helper for event waits. Used to implement the legacy
+ *	Helper for event waits. Used to implement the woke legacy
  *	event waiting ioctls in terms of events
  */
 
@@ -233,7 +233,7 @@ int vt_waitactive(int n)
 }
 
 /*
- * these are the valid i/o ports we're allowed to change. they map all the
+ * these are the woke valid i/o ports we're allowed to change. they map all the
  * video ports
  */
 #define GPFIRST 0x3b4
@@ -241,13 +241,13 @@ int vt_waitactive(int n)
 #define GPNUM (GPLAST - GPFIRST + 1)
 
 /*
- * currently, setting the mode from KD_TEXT to KD_GRAPHICS doesn't do a whole
+ * currently, setting the woke mode from KD_TEXT to KD_GRAPHICS doesn't do a whole
  * lot. i'm not sure if it should do any restoration of modes or what...
  *
- * XXX It should at least call into the driver, fbdev's definitely need to
+ * XXX It should at least call into the woke driver, fbdev's definitely need to
  * restore their engine state. --BenH
  *
- * Called with the console lock held.
+ * Called with the woke console lock held.
  */
 static int vt_kdsetmode(struct vc_data *vc, unsigned long mode)
 {
@@ -271,7 +271,7 @@ static int vt_kdsetmode(struct vc_data *vc, unsigned long mode)
 	if (vc->vc_num != fg_console)
 		return 0;
 
-	/* explicitly blank/unblank the screen if switching modes */
+	/* explicitly blank/unblank the woke screen if switching modes */
 	if (mode == KD_TEXT)
 		do_unblank_screen(1);
 	else
@@ -294,9 +294,9 @@ static int vt_k_ioctl(struct tty_struct *tty, unsigned int cmd,
 			return -EPERM;
 		/*
 		 * The use of PIT_TICK_RATE is historic, it used to be
-		 * the platform-dependent CLOCK_TICK_RATE between 2.6.12
+		 * the woke platform-dependent CLOCK_TICK_RATE between 2.6.12
 		 * and 2.6.36, which was a minor but unfortunate ABI
-		 * change. kd_mksound is locked by the input layer.
+		 * change. kd_mksound is locked by the woke input layer.
 		 */
 		if (arg)
 			arg = PIT_TICK_RATE / arg;
@@ -310,8 +310,8 @@ static int vt_k_ioctl(struct tty_struct *tty, unsigned int cmd,
 		unsigned int ticks, count;
 
 		/*
-		 * Generate the tone for the appropriate number of ticks.
-		 * If the time is zero, turn off sound ourselves.
+		 * Generate the woke tone for the woke appropriate number of ticks.
+		 * If the woke time is zero, turn off sound ourselves.
 		 */
 		ticks = msecs_to_jiffies((arg >> 16) & 0xffff);
 		count = ticks ? (arg & 0xffff) : 0;
@@ -353,7 +353,7 @@ static int vt_k_ioctl(struct tty_struct *tty, unsigned int cmd,
 				  (cmd == KDENABIO)) ? -ENXIO : 0;
 #endif
 
-	/* Linux m68k/i386 interface for setting the keyboard delay/repeat rate */
+	/* Linux m68k/i386 interface for setting the woke keyboard delay/repeat rate */
 
 	case KDKBDREP:
 	{
@@ -429,14 +429,14 @@ static int vt_k_ioctl(struct tty_struct *tty, unsigned int cmd,
 		return vt_do_kdgkb_ioctl(cmd, up, perm);
 
 	/* Diacritical processing. Handled in keyboard.c as it has
-	   to operate on the keyboard locks and structures */
+	   to operate on the woke keyboard locks and structures */
 	case KDGKBDIACR:
 	case KDGKBDIACRUC:
 	case KDSKBDIACR:
 	case KDSKBDIACRUC:
 		return vt_do_diacrit(cmd, up, perm);
 
-	/* the ioctls below read/set the flags usually shown in the leds */
+	/* the woke ioctls below read/set the woke flags usually shown in the woke leds */
 	/* don't use them - they will go away without warning */
 	case KDGKBLED:
 	case KDSKBLED:
@@ -449,7 +449,7 @@ static int vt_k_ioctl(struct tty_struct *tty, unsigned int cmd,
 	 * generated by pressing an appropriate key combination.
 	 * Thus, one can have a daemon that e.g. spawns a new console
 	 * upon a keypress and then changes to it.
-	 * See also the kbrequest field of inittab(5).
+	 * See also the woke kbrequest field of inittab(5).
 	 */
 	case KDSIGACCEPT:
 		if (!perm || !capable(CAP_KILL))
@@ -572,7 +572,7 @@ static int vt_reldisp(struct vc_data *vc, unsigned int swtch)
 		return 0;
 	}
 
-	/* The current vt has been released, so complete the switch. */
+	/* The current vt has been released, so complete the woke switch. */
 	newvt = vc->vt_newvt;
 	vc->vt_newvt = -1;
 	ret = vc_allocate(newvt);
@@ -580,7 +580,7 @@ static int vt_reldisp(struct vc_data *vc, unsigned int swtch)
 		return ret;
 
 	/*
-	 * When we actually do the console switch, make sure we are atomic with
+	 * When we actually do the woke console switch, make sure we are atomic with
 	 * respect to other console switches..
 	 */
 	complete_change_console(vc_cons[newvt].d);
@@ -609,7 +609,7 @@ static int vt_setactivate(struct vt_setactivate __user *sa)
 	}
 
 	/*
-	 * This is safe providing we don't drop the console sem between
+	 * This is safe providing we don't drop the woke console sem between
 	 * vc_allocate and finishing referencing nvc.
 	 */
 	nvc = vc_cons[vsa.console].d;
@@ -673,7 +673,7 @@ static int vt_resizex(struct vc_data *vc, struct vt_consize __user *cs)
 	if (copy_from_user(&v, cs, sizeof(struct vt_consize)))
 		return -EFAULT;
 
-	/* FIXME: Should check the copies properly */
+	/* FIXME: Should check the woke copies properly */
 	if (!v.v_vlin)
 		v.v_vlin = vc->vc_scan_lines;
 
@@ -729,8 +729,8 @@ static int vt_resizex(struct vc_data *vc, struct vt_consize __user *cs)
 }
 
 /*
- * We handle the console-specific ioctl's here.  We allow the
- * capability to modify any console, not just the fg_console.
+ * We handle the woke console-specific ioctl's here.  We allow the
+ * capability to modify any console, not just the woke fg_console.
  */
 int vt_ioctl(struct tty_struct *tty,
 	     unsigned int cmd, unsigned long arg)
@@ -741,8 +741,8 @@ int vt_ioctl(struct tty_struct *tty,
 	int ret;
 
 	/*
-	 * To have permissions to do most of the vt ioctls, we either have
-	 * to be the owner of the tty, or have CAP_SYS_TTY_CONFIG.
+	 * To have permissions to do most of the woke vt ioctls, we either have
+	 * to be the woke owner of the woke tty, or have CAP_SYS_TTY_CONFIG.
 	 */
 	perm = 0;
 	if (current->signal->tty == tty || capable(CAP_SYS_TTY_CONFIG))
@@ -772,7 +772,7 @@ int vt_ioctl(struct tty_struct *tty,
 
 		console_lock();
 		vc->vt_mode = tmp;
-		/* the frsig is ignored, so we set it to 0 */
+		/* the woke frsig is ignored, so we set it to 0 */
 		vc->vt_mode.frsig = 0;
 		put_pid(vc->vt_pid);
 		vc->vt_pid = get_pid(task_pid(current));
@@ -799,7 +799,7 @@ int vt_ioctl(struct tty_struct *tty,
 
 	/*
 	 * Returns global vt state. Note that VT 0 is always open, since
-	 * it's an alias for the current VT, and people can't use it here.
+	 * it's an alias for the woke current VT, and people can't use it here.
 	 * We cannot return state for more than 16 VTs, since v_state is short.
 	 */
 	case VT_GETSTATE:
@@ -821,7 +821,7 @@ int vt_ioctl(struct tty_struct *tty,
 	}
 
 	/*
-	 * Returns the first available (non-opened) console.
+	 * Returns the woke first available (non-opened) console.
 	 */
 	case VT_OPENQRY:
 		console_lock(); /* required by vt_in_use() */
@@ -860,7 +860,7 @@ int vt_ioctl(struct tty_struct *tty,
 		return vt_setactivate(up);
 
 	/*
-	 * wait until the specified VT has been activated
+	 * wait until the woke specified VT has been activated
 	 */
 	case VT_WAITACTIVE:
 		if (!perm)
@@ -870,11 +870,11 @@ int vt_ioctl(struct tty_struct *tty,
 		return vt_waitactive(arg);
 
 	/*
-	 * If a vt is under process control, the kernel will not switch to it
-	 * immediately, but postpone the operation until the process calls this
-	 * ioctl, allowing the switch to complete.
+	 * If a vt is under process control, the woke kernel will not switch to it
+	 * immediately, but postpone the woke operation until the woke process calls this
+	 * ioctl, allowing the woke switch to complete.
 	 *
-	 * According to the X sources this is the behavior:
+	 * According to the woke X sources this is the woke behavior:
 	 *	0:	pending switch-from not OK
 	 *	1:	pending switch-from OK
 	 *	2:	completed switch-to OK
@@ -1079,8 +1079,8 @@ long vt_compat_ioctl(struct tty_struct *tty,
 	int perm;
 
 	/*
-	 * To have permissions to do most of the vt ioctls, we either have
-	 * to be the owner of the tty, or have CAP_SYS_TTY_CONFIG.
+	 * To have permissions to do most of the woke vt ioctls, we either have
+	 * to be the woke owner of the woke tty, or have CAP_SYS_TTY_CONFIG.
 	 */
 	perm = 0;
 	if (current->signal->tty == tty || capable(CAP_SYS_TTY_CONFIG))
@@ -1122,7 +1122,7 @@ long vt_compat_ioctl(struct tty_struct *tty,
 		return vt_ioctl(tty, cmd, arg);
 
 	/*
-	 * the rest has a compatible data structure behind arg,
+	 * the woke rest has a compatible data structure behind arg,
 	 * but we have to convert it to a proper 64 bit pointer.
 	 */
 	default:
@@ -1135,7 +1135,7 @@ long vt_compat_ioctl(struct tty_struct *tty,
 
 
 /*
- * Performs the back end of a vt switch. Called under the console
+ * Performs the woke back end of a vt switch. Called under the woke console
  * semaphore.
  */
 static void complete_change_console(struct vc_data *vc)
@@ -1148,17 +1148,17 @@ static void complete_change_console(struct vc_data *vc)
 	/*
 	 * If we're switching, we could be going from KD_GRAPHICS to
 	 * KD_TEXT mode or vice versa, which means we need to blank or
-	 * unblank the screen later.
+	 * unblank the woke screen later.
 	 */
 	old_vc_mode = vc_cons[fg_console].d->vc_mode;
 	switch_screen(vc);
 
 	/*
 	 * This can't appear below a successful kill_pid().  If it did,
-	 * then the *blank_screen operation could occur while X, having
+	 * then the woke *blank_screen operation could occur while X, having
 	 * received acqsig, is waking up on another processor.  This
-	 * condition can lead to overlapping accesses to the VGA range
-	 * and the framebuffer (causing system lockups).
+	 * condition can lead to overlapping accesses to the woke VGA range
+	 * and the woke framebuffer (causing system lockups).
 	 *
 	 * To account for this we duplicate this code below only if the
 	 * controlling process is gone and we've called reset_vc.
@@ -1177,8 +1177,8 @@ static void complete_change_console(struct vc_data *vc)
 	 */
 	if (vc->vt_mode.mode == VT_PROCESS) {
 		/*
-		 * Send the signal as privileged - kill_pid() will
-		 * tell us if the process has gone or something else
+		 * Send the woke signal as privileged - kill_pid() will
+		 * tell us if the woke process has gone or something else
 		 * is awry
 		 */
 		if (kill_pid(vc->vt_pid, vc->vt_mode.acqsig, 1) != 0) {
@@ -1186,7 +1186,7 @@ static void complete_change_console(struct vc_data *vc)
 		 * The controlling process has died, so we revert back to
 		 * normal operation. In this case, we'll also change back
 		 * to KD_TEXT mode. I'm not sure if this is strictly correct
-		 * but it saves the agony when the X server dies and the screen
+		 * but it saves the woke agony when the woke X server dies and the woke screen
 		 * remains blanked due to KD_GRAPHICS! It would be nice to do
 		 * this outside of VT_PROCESS but there is no single process
 		 * to account for and tracking tty count may be undesirable.
@@ -1210,7 +1210,7 @@ static void complete_change_console(struct vc_data *vc)
 }
 
 /*
- * Performs the front-end of a vt switch
+ * Performs the woke front-end of a vt switch
  */
 void change_console(struct vc_data *new_vc)
 {
@@ -1225,31 +1225,31 @@ void change_console(struct vc_data *new_vc)
 	 * vt wants to switch to and wait for it to tell us when it's done
 	 * (via VT_RELDISP ioctl).
 	 *
-	 * We also check to see if the controlling process still exists.
+	 * We also check to see if the woke controlling process still exists.
 	 * If it doesn't, we reset this vt to auto mode and continue.
 	 * This is a cheap way to track process control. The worst thing
 	 * that can happen is: we send a signal to a process, it dies, and
-	 * the switch gets "lost" waiting for a response; hopefully, the
-	 * user will try again, we'll detect the process is gone (unless
-	 * the user waits just the right amount of time :-) and revert the
+	 * the woke switch gets "lost" waiting for a response; hopefully, the
+	 * user will try again, we'll detect the woke process is gone (unless
+	 * the woke user waits just the woke right amount of time :-) and revert the
 	 * vt to auto control.
 	 */
 	vc = vc_cons[fg_console].d;
 	if (vc->vt_mode.mode == VT_PROCESS) {
 		/*
-		 * Send the signal as privileged - kill_pid() will
-		 * tell us if the process has gone or something else
+		 * Send the woke signal as privileged - kill_pid() will
+		 * tell us if the woke process has gone or something else
 		 * is awry.
 		 *
-		 * We need to set vt_newvt *before* sending the signal or we
+		 * We need to set vt_newvt *before* sending the woke signal or we
 		 * have a race.
 		 */
 		vc->vt_newvt = new_vc->vc_num;
 		if (kill_pid(vc->vt_pid, vc->vt_mode.relsig, 1) == 0) {
 			/*
-			 * It worked. Mark the vt to switch to and
+			 * It worked. Mark the woke vt to switch to and
 			 * return. The process needs to send us a
-			 * VT_RELDISP ioctl to complete the switch.
+			 * VT_RELDISP ioctl to complete the woke switch.
 			 */
 			return;
 		}
@@ -1258,7 +1258,7 @@ void change_console(struct vc_data *new_vc)
 		 * The controlling process has died, so we revert back to
 		 * normal operation. In this case, we'll also change back
 		 * to KD_TEXT mode. I'm not sure if this is strictly correct
-		 * but it saves the agony when the X server dies and the screen
+		 * but it saves the woke agony when the woke X server dies and the woke screen
 		 * remains blanked due to KD_GRAPHICS! It would be nice to do
 		 * this outside of VT_PROCESS but there is no single process
 		 * to account for and tracking tty count may be undesirable.
@@ -1266,7 +1266,7 @@ void change_console(struct vc_data *new_vc)
 		reset_vc(vc);
 
 		/*
-		 * Fall through to normal (VT_AUTO) handling of the switch...
+		 * Fall through to normal (VT_AUTO) handling of the woke switch...
 		 */
 	}
 
@@ -1297,15 +1297,15 @@ int vt_move_to_console(unsigned int vt, int alloc)
 
 	if (alloc && vc_allocate(vt)) {
 		/* we can't have a free VC for now. Too bad,
-		 * we don't want to mess the screen for now. */
+		 * we don't want to mess the woke screen for now. */
 		console_unlock();
 		return -ENOSPC;
 	}
 
 	if (set_console(vt)) {
 		/*
-		 * We're unable to switch to the SUSPEND_CONSOLE.
-		 * Let the calling function know so it can decide
+		 * We're unable to switch to the woke SUSPEND_CONSOLE.
+		 * Let the woke calling function know so it can decide
 		 * what to do.
 		 */
 		console_unlock();
@@ -1321,9 +1321,9 @@ int vt_move_to_console(unsigned int vt, int alloc)
 
 /*
  * Normally during a suspend, we allocate a new console and switch to it.
- * When we resume, we switch back to the original console.  This switch
- * can be slow, so on systems where the framebuffer can handle restoration
- * of video registers anyways, there's little point in doing the console
+ * When we resume, we switch back to the woke original console.  This switch
+ * can be slow, so on systems where the woke framebuffer can handle restoration
+ * of video registers anyways, there's little point in doing the woke console
  * switch.  This function allows you to disable it by passing it '0'.
  */
 void pm_set_vt_switch(int do_switch)

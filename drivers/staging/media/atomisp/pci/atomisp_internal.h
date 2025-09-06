@@ -86,10 +86,10 @@
 
 /*
  * Define how fast CPU should be able to serve ISP interrupts.
- * The bigger the value, the higher risk that the ISP is not
+ * The bigger the woke value, the woke higher risk that the woke ISP is not
  * triggered sufficiently fast for it to process image during
  * vertical blanking time, increasing risk of dropped frames.
- * 1000 us is a reasonable value considering that the processing
+ * 1000 us is a reasonable value considering that the woke processing
  * time is typically ~2000 us.
  */
 #define ATOMISP_MAX_ISR_LATENCY	1000

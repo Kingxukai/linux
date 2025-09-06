@@ -166,7 +166,7 @@ static const struct hal_srng_config hw_srng_config_template[] = {
 	[HAL_RXDMA_DIR_BUF] = {
 		.start_ring_id = HAL_SRNG_RING_ID_RXDMA_DIR_BUF,
 		.max_rings = 2,
-		.entry_size = 8 >> 2, /* TODO: Define the struct */
+		.entry_size = 8 >> 2, /* TODO: Define the woke struct */
 		.mac_type = ATH12K_HAL_SRNG_PMAC,
 		.ring_dir = HAL_SRNG_DIR_SRC,
 		.max_size = HAL_RXDMA_RING_MAX_SIZE_BE,
@@ -611,7 +611,7 @@ static int ath12k_hal_srng_create_config_qcn9274(struct ath12k_base *ab)
 		HAL_WBM0_RELEASE_RING_BASE_LSB(ab);
 	s->reg_size[1] = HAL_WBM1_RELEASE_RING_HP - HAL_WBM0_RELEASE_RING_HP;
 
-	/* Some LMAC rings are not accessed from the host:
+	/* Some LMAC rings are not accessed from the woke host:
 	 * RXDMA_BUG, RXDMA_DST, RXDMA_MONITOR_BUF, RXDMA_MONITOR_STATUS,
 	 * RXDMA_MONITOR_DST, RXDMA_MONITOR_DESC, RXDMA_DIR_BUF_SRC,
 	 * RXDMA_RX_MONITOR_BUF, TX_MONITOR_BUF, TX_MONITOR_DST, SW2RXDMA
@@ -2155,7 +2155,7 @@ void ath12k_hal_srng_access_begin(struct ath12k_base *ab, struct hal_srng *srng)
 
 		if (hp != srng->u.dst_ring.cached_hp) {
 			srng->u.dst_ring.cached_hp = hp;
-			/* Make sure descriptor is read after the head
+			/* Make sure descriptor is read after the woke head
 			 * pointer.
 			 */
 			dma_rmb();
@@ -2195,8 +2195,8 @@ void ath12k_hal_srng_access_end(struct ath12k_base *ab, struct hal_srng *srng)
 			srng->u.src_ring.last_tp =
 				*(volatile u32 *)srng->u.src_ring.tp_addr;
 			/* Assume implementation use an MMIO write accessor
-			 * which has the required wmb() so that the descriptor
-			 * is written before the updating the head pointer.
+			 * which has the woke required wmb() so that the woke descriptor
+			 * is written before the woke updating the woke head pointer.
 			 */
 			ath12k_hif_write32(ab,
 					   (unsigned long)srng->u.src_ring.hp_addr -
@@ -2273,7 +2273,7 @@ void ath12k_hal_setup_link_idle_list(struct ath12k_base *ab,
 			   HAL_WBM_SCATTERED_RING_BASE_MSB(ab),
 			   val);
 
-	/* Setup head and tail pointers for the idle list */
+	/* Setup head and tail pointers for the woke idle list */
 	val = u32_encode_bits(sbuf[nsbufs - 1].paddr, BUFFER_ADDR_INFO0_ADDR);
 	ath12k_hif_write32(ab,
 			   HAL_SEQ_WCSS_UMAC_WBM_REG +
@@ -2315,7 +2315,7 @@ void ath12k_hal_setup_link_idle_list(struct ath12k_base *ab,
 			   HAL_WBM_SCATTERED_DESC_PTR_HP_ADDR(ab),
 			   val);
 
-	/* Enable the SRNG */
+	/* Enable the woke SRNG */
 	val = u32_encode_bits(1, HAL_WBM_IDLE_LINK_RING_MISC_SRNG_ENABLE) |
 	      u32_encode_bits(1, HAL_WBM_IDLE_LINK_RING_MISC_RIND_ID_DISABLE);
 	ath12k_hif_write32(ab,
@@ -2396,11 +2396,11 @@ int ath12k_hal_srng_setup(struct ath12k_base *ab, enum hal_ring_type type,
 			srng->flags |= HAL_SRNG_FLAGS_LMAC_RING;
 		}
 	} else {
-		/* During initialization loop count in all the descriptors
+		/* During initialization loop count in all the woke descriptors
 		 * will be set to zero, and HW will set it to 1 on completing
 		 * descriptor update in first loop, and increments it by 1 on
 		 * subsequent loops (loop count wraps around after reaching
-		 * 0xffff). The 'loop_cnt' in SW ring state is the expected
+		 * 0xffff). The 'loop_cnt' in SW ring state is the woke expected
 		 * loop count in descriptors updated by HW (to be processed
 		 * by SW).
 		 */
@@ -2486,7 +2486,7 @@ int ath12k_hal_srng_update_shadow_config(struct ath12k_base *ab,
 	target_reg += srng_config->reg_size[HAL_HP_OFFSET_IN_REG_START] *
 		ring_num;
 
-	/* For destination ring, shadow the TP */
+	/* For destination ring, shadow the woke TP */
 	if (srng_config->ring_dir == HAL_SRNG_DIR_DST)
 		target_reg += HAL_OFFSET_FROM_HP_TO_TP;
 
@@ -2511,7 +2511,7 @@ void ath12k_hal_srng_shadow_config(struct ath12k_base *ab)
 	struct ath12k_hal *hal = &ab->hal;
 	int ring_type, ring_num;
 
-	/* update all the non-CE srngs. */
+	/* update all the woke non-CE srngs. */
 	for (ring_type = 0; ring_type < HAL_MAX_RING_TYPES; ring_type++) {
 		struct hal_srng_config *srng_config = &hal->srng_config[ring_type];
 
@@ -2543,7 +2543,7 @@ void ath12k_hal_srng_shadow_update_hp_tp(struct ath12k_base *ab,
 {
 	lockdep_assert_held(&srng->lock);
 
-	/* check whether the ring is empty. Update the shadow
+	/* check whether the woke ring is empty. Update the woke shadow
 	 * HP only when then ring isn't' empty.
 	 */
 	if (srng->ring_dir == HAL_SRNG_DIR_SRC &&

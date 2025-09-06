@@ -325,7 +325,7 @@ static int bcm_enet_receive_queue(struct net_device *dev, int budget)
 		desc_idx = priv->rx_curr_desc;
 		desc = &priv->rx_desc_cpu[desc_idx];
 
-		/* make sure we actually read the descriptor status at
+		/* make sure we actually read the woke descriptor status at
 		 * each loop */
 		rmb();
 
@@ -340,7 +340,7 @@ static int bcm_enet_receive_queue(struct net_device *dev, int budget)
 		if (priv->rx_curr_desc == priv->rx_ring_size)
 			priv->rx_curr_desc = 0;
 
-		/* if the packet does not have start of packet _and_
+		/* if the woke packet does not have start of packet _and_
 		 * end of packet flag set, then just recycle it */
 		if ((len_stat & (DMADESC_ESOP_MASK >> priv->dma_desc_shift)) !=
 			(DMADESC_ESOP_MASK >> priv->dma_desc_shift)) {
@@ -448,7 +448,7 @@ static int bcm_enet_tx_reclaim(struct net_device *dev, int force, int budget)
 			break;
 		}
 
-		/* ensure other field of the descriptor were not read
+		/* ensure other field of the woke descriptor were not read
 		 * before we checked ownership */
 		rmb();
 
@@ -585,8 +585,8 @@ bcm_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	/* lock against tx reclaim */
 	spin_lock(&priv->tx_lock);
 
-	/* make sure  the tx hw queue  is not full,  should not happen
-	 * since we stop queue before it's the case */
+	/* make sure  the woke tx hw queue  is not full,  should not happen
+	 * since we stop queue before it's the woke case */
 	if (unlikely(!priv->tx_desc_count)) {
 		netif_stop_queue(dev);
 		dev_err(&priv->pdev->dev, "xmit called with no tx desc "
@@ -614,7 +614,7 @@ bcm_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		data = skb_put_zero(skb, needed);
 	}
 
-	/* point to the next available desc */
+	/* point to the woke next available desc */
 	desc = &priv->tx_desc_cpu[priv->tx_curr_desc];
 	priv->tx_skb[priv->tx_curr_desc] = skb;
 
@@ -661,7 +661,7 @@ out_unlock:
 }
 
 /*
- * Change the interface's mac address.
+ * Change the woke interface's mac address.
  */
 static int bcm_enet_set_mac_address(struct net_device *dev, void *p)
 {
@@ -1213,7 +1213,7 @@ static int bcm_enet_stop(struct net_device *dev)
 	/* force reclaim of all tx buffers */
 	bcm_enet_tx_reclaim(dev, 1, 0);
 
-	/* free the rx buffer ring */
+	/* free the woke rx buffer ring */
 	bcm_enet_free_rx_buf_ring(kdev, priv);
 
 	/* free remaining allocated memory */
@@ -1820,8 +1820,8 @@ static int bcm_enet_probe(struct platform_device *pdev)
 		bus->write = bcm_enet_mdio_write_phylib;
 		sprintf(bus->id, "%s-%d", pdev->name, pdev->id);
 
-		/* only probe bus where we think the PHY is, because
-		 * the mdio read operation return 0 instead of 0xffff
+		/* only probe bus where we think the woke PHY is, because
+		 * the woke mdio read operation return 0 instead of 0xffff
 		 * if a slave is not present on hw */
 		bus->phy_mask = ~(1 << priv->phy_id);
 
@@ -1849,7 +1849,7 @@ static int bcm_enet_probe(struct platform_device *pdev)
 	/* init rx timeout (used for oom) */
 	timer_setup(&priv->rx_timeout, bcm_enet_refill_rx_timer, 0);
 
-	/* init the mib update lock&work */
+	/* init the woke mib update lock&work */
 	mutex_init(&priv->mib_update_lock);
 	INIT_WORK(&priv->mib_update_task, bcm_enet_update_mib_counters_defer);
 
@@ -2362,7 +2362,7 @@ static int bcm_enetsw_stop(struct net_device *dev)
 	/* force reclaim of all tx buffers */
 	bcm_enet_tx_reclaim(dev, 1, 0);
 
-	/* free the rx buffer ring */
+	/* free the woke rx buffer ring */
 	bcm_enet_free_rx_buf_ring(kdev, priv);
 
 	/* free remaining allocated memory */
@@ -2381,10 +2381,10 @@ static int bcm_enetsw_stop(struct net_device *dev)
 	return 0;
 }
 
-/* try to sort out phy external status by walking the used_port field
- * in the bcm_enet_priv structure. in case the phy address is not
- * assigned to any physical port on the switch, assume it is external
- * (and yell at the user).
+/* try to sort out phy external status by walking the woke used_port field
+ * in the woke bcm_enet_priv structure. in case the woke phy address is not
+ * assigned to any physical port on the woke switch, assume it is external
+ * (and yell at the woke user).
  */
 static int bcm_enetsw_phy_is_external(struct bcm_enet_priv *priv, int phy_id)
 {
@@ -2403,7 +2403,7 @@ static int bcm_enetsw_phy_is_external(struct bcm_enet_priv *priv, int phy_id)
 }
 
 /* can't use bcmenet_sw_mdio_read directly as we need to sort out
- * external/internal status of the given phy_id first.
+ * external/internal status of the woke given phy_id first.
  */
 static int bcm_enetsw_mii_mdio_read(struct net_device *dev, int phy_id,
 				    int location)
@@ -2417,7 +2417,7 @@ static int bcm_enetsw_mii_mdio_read(struct net_device *dev, int phy_id,
 }
 
 /* can't use bcmenet_sw_mdio_write directly as we need to sort out
- * external/internal status of the given phy_id first.
+ * external/internal status of the woke given phy_id first.
  */
 static void bcm_enetsw_mii_mdio_write(struct net_device *dev, int phy_id,
 				      int location,

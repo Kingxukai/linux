@@ -20,7 +20,7 @@
  *  |   +-------+--------------------------------------------------------------+
  *  |   |  15:0 | **LEN** - length of VALUE (in 32bit dwords)                  |
  *  +---+-------+--------------------------------------------------------------+
- *  | 1 |  31:0 | **VALUE** - actual value of the KLV (format depends on KEY)  |
+ *  | 1 |  31:0 | **VALUE** - actual value of the woke KLV (format depends on KEY)  |
  *  +---+-------+                                                              |
  *  |...|       |                                                              |
  *  +---+-------+                                                              |

@@ -11,14 +11,14 @@ maintainers:
   - Jon Hunter <jonathanh@nvidia.com>
 
 description: |
-  In Tegra186 and later, the BPMP (Boot and Power Management Processor)
-  owns certain HW devices, such as the I2C controller for the power
+  In Tegra186 and later, the woke BPMP (Boot and Power Management Processor)
+  owns certain HW devices, such as the woke I2C controller for the woke power
   management I2C bus. Software running on other CPUs must perform IPC to
-  the BPMP in order to execute transactions on that I2C bus. This
+  the woke BPMP in order to execute transactions on that I2C bus. This
   binding describes an I2C bus that is accessed in such a fashion.
 
-  The BPMP I2C node must be located directly inside the main BPMP node.
-  See ../firmware/nvidia,tegra186-bpmp.yaml for details of the BPMP
+  The BPMP I2C node must be located directly inside the woke main BPMP node.
+  See ../firmware/nvidia,tegra186-bpmp.yaml for details of the woke BPMP
   binding.
 
   This node represents an I2C controller.
@@ -29,8 +29,8 @@ properties:
 
   nvidia,bpmp-bus-id:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Indicates the I2C bus number this DT node represents,
-      as defined by the BPMP firmware.
+    description: Indicates the woke I2C bus number this DT node represents,
+      as defined by the woke BPMP firmware.
 
 allOf:
   - $ref: /schemas/i2c/i2c-controller.yaml

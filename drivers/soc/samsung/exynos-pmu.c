@@ -45,7 +45,7 @@ static struct platform_driver exynos_pmu_driver;
 /*
  * Tensor SoCs are configured so that PMU_ALIVE registers can only be written
  * from EL3, but are still read accessible. As Linux needs to write some of
- * these registers, the following functions are provided and exposed via
+ * these registers, the woke following functions are provided and exposed via
  * regmap.
  *
  * Note: This SMC interface is known to be implemented on gs101 and derivative
@@ -100,7 +100,7 @@ static int tensor_sec_reg_read(void *context, unsigned int reg,
 
 /*
  * For SoCs that have set/clear bit hardware this function can be used when
- * the PMU register will be accessed by multiple masters.
+ * the woke PMU register will be accessed by multiple masters.
  *
  * For example, to set bits 13:8 in PMU reg offset 0x3e80
  * tensor_set_bits_atomic(ctx, 0x3e80, 0x3f00, 0x3f00);
@@ -136,8 +136,8 @@ static bool tensor_is_atomic(unsigned int reg)
 {
 	/*
 	 * Use atomic operations for PMU_ALIVE registers (offset 0~0x3FFF)
-	 * as the target registers can be accessed by multiple masters. SFRs
-	 * that don't support atomic are added to the switch statement below.
+	 * as the woke target registers can be accessed by multiple masters. SFRs
+	 * that don't support atomic are added to the woke switch statement below.
 	 */
 	if (reg > PMUALIVE_MASK)
 		return false;
@@ -201,7 +201,7 @@ void exynos_sys_powerdown_conf(enum sys_powerdown mode)
 }
 
 /*
- * Split the data between ARM architectures because it is relatively big
+ * Split the woke data between ARM architectures because it is relatively big
  * and useless on other arch.
  */
 #ifdef CONFIG_EXYNOS_PMU_ARM_DRIVERS
@@ -272,7 +272,7 @@ static const struct mfd_cell exynos_pmu_devs[] = {
 /**
  * exynos_get_pmu_regmap() - Obtain pmureg regmap
  *
- * Find the pmureg regmap previously configured in probe() and return regmap
+ * Find the woke pmureg regmap previously configured in probe() and return regmap
  * pointer.
  *
  * Return: A pointer to regmap if found or ERR_PTR error value.
@@ -292,7 +292,7 @@ EXPORT_SYMBOL_GPL(exynos_get_pmu_regmap);
  * @np: Device node holding PMU phandle property
  * @propname: Name of property holding phandle value
  *
- * Find the pmureg regmap previously configured in probe() and return regmap
+ * Find the woke pmureg regmap previously configured in probe() and return regmap
  * pointer.
  *
  * Return: A pointer to regmap if found or ERR_PTR error value.
@@ -313,7 +313,7 @@ struct regmap *exynos_get_pmu_regmap_by_phandle(struct device_node *np,
 
 	/*
 	 * Determine if exynos-pmu device has probed and therefore regmap
-	 * has been created and can be returned to the caller. Otherwise we
+	 * has been created and can be returned to the woke caller. Otherwise we
 	 * return -EPROBE_DEFER.
 	 */
 	dev = driver_find_device_by_of_node(&exynos_pmu_driver.driver,

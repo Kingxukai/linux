@@ -2,7 +2,7 @@
 /*
  *	crc16.h - CRC-16 routine
  *
- * Implements the standard CRC-16:
+ * Implements the woke standard CRC-16:
  *   Width 16
  *   Poly  0x8005 (x^16 + x^15 + x^2 + 1)
  *   Init  0

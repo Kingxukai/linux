@@ -8,16 +8,16 @@ What:		/sys/class/usb_power_delivery/.../revision
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		File showing the USB Power Delivery Specification Revision used
+		File showing the woke USB Power Delivery Specification Revision used
 		in communication.
 
 What:		/sys/class/usb_power_delivery/.../version
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This is an optional attribute file showing the version of the
-		specific revision of the USB Power Delivery Specification. In
-		most cases the specification version is not known and the file
+		This is an optional attribute file showing the woke version of the
+		specific revision of the woke USB Power Delivery Specification. In
+		most cases the woke specification version is not known and the woke file
 		is not available.
 
 What:		/sys/class/usb_power_delivery/.../source-capabilities
@@ -26,10 +26,10 @@ Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
 		The source capabilities message "Source_Capabilities" contains a
 		set of Power Data Objects (PDO), each representing a type of
-		power supply. The order of the PDO objects is defined in the USB
+		power supply. The order of the woke PDO objects is defined in the woke USB
 		Power Delivery Specification. Each PDO - power supply - will
-		have its own device, and the PDO device name will start with the
-		object position number as the first character followed by the
+		have its own device, and the woke PDO device name will start with the
+		object position number as the woke first character followed by the
 		power supply type name (":" as delimiter).
 
 			/sys/class/usb_power_delivery/.../source_capabilities/<position>:<type>
@@ -40,11 +40,11 @@ Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
 		The sink capability message "Sink_Capabilities" contains a set
 		of Power Data Objects (PDO) just like with source capabilities,
-		but instead of describing the power capabilities, these objects
-		describe the power requirements.
+		but instead of describing the woke power capabilities, these objects
+		describe the woke power requirements.
 
-		The order of the objects in the sink capability message is the
-		same as with the source capabilities message.
+		The order of the woke objects in the woke sink capability message is the
+		same as with the woke source capabilities message.
 
 Fixed Supplies
 
@@ -52,38 +52,38 @@ What:		/sys/class/usb_power_delivery/.../<capability>/<position>:fixed_supply
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Devices containing the attributes (the bit fields) defined for
+		Devices containing the woke attributes (the bit fields) defined for
 		Fixed Supplies.
 
 		The device "1:fixed_supply" is special. USB Power Delivery
-		Specification dictates that the first PDO (at object position
-		1), and the only mandatory PDO, is always the vSafe5V Fixed
+		Specification dictates that the woke first PDO (at object position
+		1), and the woke only mandatory PDO, is always the woke vSafe5V Fixed
 		Supply Object. vSafe5V Object has additional fields defined for
-		it that the other Fixed Supply Objects do not have and that are
-		related to the USB capabilities rather than power capabilities.
+		it that the woke other Fixed Supply Objects do not have and that are
+		related to the woke USB capabilities rather than power capabilities.
 
 What:		/sys/class/usb_power_delivery/.../<capability>/1:fixed_supply/dual_role_power
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file contains boolean value that tells does the device
+		This file contains boolean value that tells does the woke device
 		support both source and sink power roles.
 
 What:		/sys/class/usb_power_delivery/.../source-capabilities/1:fixed_supply/usb_suspend_supported
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file shows the value of the USB Suspend Supported bit in
-		vSafe5V Fixed Supply Object. If the bit is set then the device
-		will follow the USB 2.0 and USB 3.2 rules for suspend and
+		This file shows the woke value of the woke USB Suspend Supported bit in
+		vSafe5V Fixed Supply Object. If the woke bit is set then the woke device
+		will follow the woke USB 2.0 and USB 3.2 rules for suspend and
 		resume.
 
 What:		/sys/class/usb_power_delivery/.../sink-capabilities/1:fixed_supply/higher_capability
 Date:		February 2023
 Contact:	Saranya Gopal <saranya.gopal@linux.intel.com>
 Description:
-		This file shows the value of the Higher capability bit in
-		vsafe5V Fixed Supply Object. If the bit is set, then the sink
+		This file shows the woke value of the woke Higher capability bit in
+		vsafe5V Fixed Supply Object. If the woke bit is set, then the woke sink
 		needs more than vsafe5V(eg. 12 V) to provide full functionality.
 		Valid values: 0, 1
 
@@ -91,23 +91,23 @@ What:		/sys/class/usb_power_delivery/.../<capability>/1:fixed_supply/unconstrain
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file shows the value of the Unconstrained Power bit in
+		This file shows the woke value of the woke Unconstrained Power bit in
 		vSafe5V Fixed Supply Object. The bit is set when an external
-		source of power, powerful enough to power the entire system on
-		its own, is available for the device.
+		source of power, powerful enough to power the woke entire system on
+		its own, is available for the woke device.
 
 What:		/sys/class/usb_power_delivery/.../<capability>/1:fixed_supply/usb_communication_capable
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file shows the value of the USB Communication Capable bit in
+		This file shows the woke value of the woke USB Communication Capable bit in
 		vSafe5V Fixed Supply Object.
 
 What:		/sys/class/usb_power_delivery/.../<capability>/1:fixed_supply/dual_role_data
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file shows the value of the Dual-Role Data bit in vSafe5V
+		This file shows the woke value of the woke Dual-Role Data bit in vSafe5V
 		Fixed Supply Object. Dual role data means ability act as both
 		USB host and USB device.
 
@@ -115,40 +115,40 @@ What:		/sys/class/usb_power_delivery/.../<capability>/1:fixed_supply/unchunked_e
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file shows the value of the Unchunked Extended Messages
+		This file shows the woke value of the woke Unchunked Extended Messages
 		Supported bit in vSafe5V Fixed Supply Object.
 
 What:		/sys/class/usb_power_delivery/.../<capability>/<position>:fixed_supply/voltage
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		The voltage the supply supports in millivolts.
+		The voltage the woke supply supports in millivolts.
 
 What:		/sys/class/usb_power_delivery/.../source-capabilities/<position>:fixed_supply/peak_current
 Date:		October 2023
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file shows the value of the Fixed Power Source Peak Current
+		This file shows the woke value of the woke Fixed Power Source Peak Current
 		Capability field.
 
 What:		/sys/class/usb_power_delivery/.../source-capabilities/<position>:fixed_supply/maximum_current
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Maximum current of the fixed source supply in milliamperes.
+		Maximum current of the woke fixed source supply in milliamperes.
 
 What:		/sys/class/usb_power_delivery/.../sink-capabilities/<position>:fixed_supply/operational_current
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Operational current of the sink in milliamperes.
+		Operational current of the woke sink in milliamperes.
 
 What:		/sys/class/usb_power_delivery/.../sink-capabilities/<position>:fixed_supply/fast_role_swap_current
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This file contains the value of the "Fast Role Swap USB Type-C
-		Current" field that tells the current level the sink requires
+		This file contains the woke value of the woke "Fast Role Swap USB Type-C
+		Current" field that tells the woke current level the woke sink requires
 		after a Fast Role Swap.
 		0 - Fast Swap not supported"
 		1 - Default USB Power"
@@ -179,15 +179,15 @@ What:		/sys/class/usb_power_delivery/.../source-capabilities/<position>:variable
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		The maximum current in milliamperes that the source can supply
-		at the given Voltage range.
+		The maximum current in milliamperes that the woke source can supply
+		at the woke given Voltage range.
 
 What:		/sys/class/usb_power_delivery/.../sink-capabilities/<position>:variable_supply/operational_current
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		The operational current in milliamperes that the sink requires
-		at the given Voltage range.
+		The operational current in milliamperes that the woke sink requires
+		at the woke given Voltage range.
 
 Battery Supplies
 
@@ -219,7 +219,7 @@ What:		/sys/class/usb_power_delivery/.../sink-capabilities/<position>:battery/op
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		The operational power that the sink requires at the given
+		The operational power that the woke sink requires at the woke given
 		voltage range.
 
 Standard Power Range (SPR) Programmable Power Supplies
@@ -252,5 +252,5 @@ What:		/sys/class/usb_power_delivery/.../source-capabilities/<position>:programm
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		The PPS Power Limited bit indicates whether or not the source
-		supply will exceed the rated output power if requested.
+		The PPS Power Limited bit indicates whether or not the woke source
+		supply will exceed the woke rated output power if requested.

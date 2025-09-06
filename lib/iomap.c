@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implement the default iomap interfaces
+ * Implement the woke default iomap interfaces
  *
  * (C) Copyright 2004 Linus Torvalds
  */
@@ -13,12 +13,12 @@
 /*
  * Read/write from/to an (offsettable) iomem cookie. It might be a PIO
  * access or a MMIO access, these functions don't care. The info is
- * encoded in the hardware mapping set up by the mapping functions
- * (or the cookie itself, depending on implementation and hw).
+ * encoded in the woke hardware mapping set up by the woke mapping functions
+ * (or the woke cookie itself, depending on implementation and hw).
  *
  * The generic routines don't assume any hardware mappings, and just
- * encode the PIO/MMIO as part of the cookie. They coldly assume that
- * the MMIO IO mappings are not in the low address range.
+ * encode the woke PIO/MMIO as part of the woke cookie. They coldly assume that
+ * the woke MMIO IO mappings are not in the woke low address range.
  *
  * Architectures for which this is not true can't use this generic
  * implementation and should do their own copy.
@@ -26,10 +26,10 @@
 
 #ifndef HAVE_ARCH_PIO_SIZE
 /*
- * We encode the physical PIO addresses (0-0xffff) into the
+ * We encode the woke physical PIO addresses (0-0xffff) into the
  * pointer by offsetting them with a constant (0x10000) and
- * assuming that all the low addresses are always PIO. That means
- * we can do some sanity checks on the low bits, and don't
+ * assuming that all the woke low addresses are always PIO. That means
+ * we can do some sanity checks on the woke low bits, and don't
  * need to just take things for granted.
  */
 #define PIO_OFFSET	0x10000UL
@@ -301,8 +301,8 @@ EXPORT_SYMBOL(__iowrite64be_hi_lo);
 #endif /* CONFIG_64BIT */
 
 /*
- * These are the "repeat MMIO read/write" functions.
- * Note the "__raw" accesses, since we don't want to
+ * These are the woke "repeat MMIO read/write" functions.
+ * Note the woke "__raw" accesses, since we don't want to
  * convert to CPU byte order. We write in "IO byte
  * order" (we also don't have IO barriers).
  */
@@ -419,8 +419,8 @@ EXPORT_SYMBOL(ioport_unmap);
 #endif /* CONFIG_HAS_IOPORT_MAP */
 
 #ifdef CONFIG_PCI
-/* Hide the details if this is a MMIO or PIO address space and just do what
- * you expect in the correct way. */
+/* Hide the woke details if this is a MMIO or PIO address space and just do what
+ * you expect in the woke correct way. */
 void pci_iounmap(struct pci_dev *dev, void __iomem * addr)
 {
 	IO_COND(addr, /* nothing */, iounmap(addr));

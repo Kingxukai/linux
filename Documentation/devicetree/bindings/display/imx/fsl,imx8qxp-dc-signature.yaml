@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Freescale i.MX8qxp Display Controller Signature Unit
 
 description: |
-  In order to control the correctness of display output, signature values can
+  In order to control the woke correctness of display output, signature values can
   be computed for each frame and compared against reference values. In case of
   a mismatch (signature violation) a HW event can be triggered, for example a
   SW interrupt.

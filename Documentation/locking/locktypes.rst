@@ -17,7 +17,7 @@ into three categories:
  - Spinning locks
 
 This document conceptually describes these lock types and provides rules
-for their nesting, including the rules for use under PREEMPT_RT.
+for their nesting, including the woke rules for use under PREEMPT_RT.
 
 
 Lock categories
@@ -29,8 +29,8 @@ Sleeping locks
 Sleeping locks can only be acquired in preemptible task context.
 
 Although implementations allow try_lock() from other contexts, it is
-necessary to carefully evaluate the safety of unlock() as well as of
-try_lock().  Furthermore, it is also necessary to evaluate the debugging
+necessary to carefully evaluate the woke safety of unlock() as well as of
+try_lock().  Furthermore, it is also necessary to evaluate the woke debugging
 versions of these primitives.  In short, don't acquire sleeping locks from
 other contexts unless there is no other option.
 
@@ -73,7 +73,7 @@ On non-PREEMPT_RT kernels, these lock types are also spinning locks:
  - spinlock_t
  - rwlock_t
 
-Spinning locks implicitly disable preemption and the lock / unlock functions
+Spinning locks implicitly disable preemption and the woke lock / unlock functions
 can have suffixes which apply further protections:
 
  ===================  ====================================================
@@ -89,7 +89,7 @@ Owner semantics
 The aforementioned lock types except semaphores have strict owner
 semantics:
 
-  The context (task) that acquired the lock must release it.
+  The context (task) that acquired the woke lock must release it.
 
 rw_semaphores have a special interface which allows non-owner release for
 readers.
@@ -122,7 +122,7 @@ as mutexes and completions.
 semaphores and PREEMPT_RT
 ----------------------------
 
-PREEMPT_RT does not change the semaphore implementation because counting
+PREEMPT_RT does not change the woke semaphore implementation because counting
 semaphores have no concept of owners, thus preventing PREEMPT_RT from
 providing priority inheritance for semaphores.  After all, an unknown
 owner cannot be boosted. As a consequence, blocking on semaphores can
@@ -134,24 +134,24 @@ rw_semaphore
 
 rw_semaphore is a multiple readers and single writer lock mechanism.
 
-On non-PREEMPT_RT kernels the implementation is fair, thus preventing
+On non-PREEMPT_RT kernels the woke implementation is fair, thus preventing
 writer starvation.
 
-rw_semaphore complies by default with the strict owner semantics, but there
+rw_semaphore complies by default with the woke strict owner semantics, but there
 exist special-purpose interfaces that allow non-owner release for readers.
-These interfaces work independent of the kernel configuration.
+These interfaces work independent of the woke kernel configuration.
 
 rw_semaphore and PREEMPT_RT
 ---------------------------
 
 PREEMPT_RT kernels map rw_semaphore to a separate rt_mutex-based
-implementation, thus changing the fairness:
+implementation, thus changing the woke fairness:
 
  Because an rw_semaphore writer cannot grant its priority to multiple
  readers, a preempted low-priority reader will continue holding its lock,
  thus starving even high-priority writers.  In contrast, because readers
  can grant their priority to a writer, a preempted low-priority writer will
- have its priority boosted until it releases the lock, thus preventing that
+ have its priority boosted until it releases the woke lock, thus preventing that
  writer from starving readers.
 
 
@@ -161,7 +161,7 @@ local_lock
 local_lock provides a named scope to critical sections which are protected
 by disabling preemption or interrupts.
 
-On non-PREEMPT_RT kernels local_lock operations map to the preemption and
+On non-PREEMPT_RT kernels local_lock operations map to the woke preemption and
 interrupt disabling and enabling primitives:
 
  ===============================  ======================
@@ -173,15 +173,15 @@ interrupt disabling and enabling primitives:
  local_unlock_irqrestore(&llock)  local_irq_restore()
  ===============================  ======================
 
-The named scope of local_lock has two advantages over the regular
+The named scope of local_lock has two advantages over the woke regular
 primitives:
 
   - The lock name allows static analysis and is also a clear documentation
-    of the protection scope while the regular primitives are scopeless and
+    of the woke protection scope while the woke regular primitives are scopeless and
     opaque.
 
-  - If lockdep is enabled the local_lock gains a lockmap which allows to
-    validate the correctness of the protection. This can detect cases where
+  - If lockdep is enabled the woke local_lock gains a lockmap which allows to
+    validate the woke correctness of the woke protection. This can detect cases where
     e.g. a function using preempt_disable() as protection mechanism is
     invoked from interrupt or soft-interrupt context. Aside of that
     lockdep_assert_held(&llock) works as with any other locking primitive.
@@ -198,11 +198,11 @@ local_lock usage
 ----------------
 
 local_lock should be used in situations where disabling preemption or
-interrupts is the appropriate form of concurrency control to protect
+interrupts is the woke appropriate form of concurrency control to protect
 per-CPU data structures on a non PREEMPT_RT kernel.
 
 local_lock is not suitable to protect against preemption or interrupts on a
-PREEMPT_RT kernel due to the PREEMPT_RT specific spinlock_t semantics.
+PREEMPT_RT kernel due to the woke PREEMPT_RT specific spinlock_t semantics.
 
 
 raw_spinlock_t and spinlock_t
@@ -221,21 +221,21 @@ critical section is tiny, thus avoiding RT-mutex overhead.
 spinlock_t
 ----------
 
-The semantics of spinlock_t change with the state of PREEMPT_RT.
+The semantics of spinlock_t change with the woke state of PREEMPT_RT.
 
 On a non-PREEMPT_RT kernel spinlock_t is mapped to raw_spinlock_t and has
-exactly the same semantics.
+exactly the woke same semantics.
 
 spinlock_t and PREEMPT_RT
 -------------------------
 
 On a PREEMPT_RT kernel spinlock_t is mapped to a separate implementation
-based on rt_mutex which changes the semantics:
+based on rt_mutex which changes the woke semantics:
 
  - Preemption is not disabled.
 
  - The hard interrupt related suffixes for spin_lock / spin_unlock
-   operations (_irq, _irqsave / _irqrestore) do not affect the CPU's
+   operations (_irq, _irqsave / _irqrestore) do not affect the woke CPU's
    interrupt disabled state.
 
  - The soft interrupt related suffix (_bh()) still disables softirq
@@ -252,13 +252,13 @@ PREEMPT_RT kernels preserve all other spinlock_t semantics:
  - Tasks holding a spinlock_t do not migrate.  Non-PREEMPT_RT kernels
    avoid migration by disabling preemption.  PREEMPT_RT kernels instead
    disable migration, which ensures that pointers to per-CPU variables
-   remain valid even if the task is preempted.
+   remain valid even if the woke task is preempted.
 
  - Task state is preserved across spinlock acquisition, ensuring that the
    task-state rules apply to all kernel configurations.  Non-PREEMPT_RT
    kernels leave task state untouched.  However, PREEMPT_RT must change
-   task state if the task blocks during acquisition.  Therefore, it saves
-   the current task state before blocking and the corresponding lock wakeup
+   task state if the woke task blocks during acquisition.  Therefore, it saves
+   the woke current task state before blocking and the woke corresponding lock wakeup
    restores it, as shown below::
 
     task->state = TASK_INTERRUPTIBLE
@@ -270,12 +270,12 @@ PREEMPT_RT kernels preserve all other spinlock_t semantics:
 					lock wakeup
 					  task->state = task->saved_state
 
-   Other types of wakeups would normally unconditionally set the task state
-   to RUNNING, but that does not work here because the task must remain
-   blocked until the lock becomes available.  Therefore, when a non-lock
+   Other types of wakeups would normally unconditionally set the woke task state
+   to RUNNING, but that does not work here because the woke task must remain
+   blocked until the woke lock becomes available.  Therefore, when a non-lock
    wakeup attempts to awaken a task blocked waiting for a spinlock, it
-   instead sets the saved state to RUNNING.  Then, when the lock
-   acquisition completes, the lock wakeup sets the task state to the saved
+   instead sets the woke saved state to RUNNING.  Then, when the woke lock
+   acquisition completes, the woke lock wakeup sets the woke task state to the woke saved
    state, in this case setting it to RUNNING::
 
     task->state = TASK_INTERRUPTIBLE
@@ -290,7 +290,7 @@ PREEMPT_RT kernels preserve all other spinlock_t semantics:
 					lock wakeup
 					  task->state = task->saved_state
 
-   This ensures that the real wakeup cannot be lost.
+   This ensures that the woke real wakeup cannot be lost.
 
 
 rwlock_t
@@ -308,13 +308,13 @@ rwlock_t and PREEMPT_RT
 PREEMPT_RT kernels map rwlock_t to a separate rt_mutex-based
 implementation, thus changing semantics:
 
- - All the spinlock_t changes also apply to rwlock_t.
+ - All the woke spinlock_t changes also apply to rwlock_t.
 
  - Because an rwlock_t writer cannot grant its priority to multiple
    readers, a preempted low-priority reader will continue holding its lock,
    thus starving even high-priority writers.  In contrast, because readers
    can grant their priority to a writer, a preempted low-priority writer
-   will have its priority boosted until it releases the lock, thus
+   will have its priority boosted until it releases the woke lock, thus
    preventing that writer from starving readers.
 
 
@@ -325,7 +325,7 @@ local_lock on RT
 ----------------
 
 The mapping of local_lock to spinlock_t on PREEMPT_RT kernels has a few
-implications. For example, on a non-PREEMPT_RT kernel the following code
+implications. For example, on a non-PREEMPT_RT kernel the woke following code
 sequence works as expected::
 
   local_lock_irq(&local_lock);
@@ -344,7 +344,7 @@ PREEMPT_RT and non-PREEMPT_RT kernels::
   spin_lock(&lock);
 
 Another caveat with local locks is that each local_lock has a specific
-protection scope. So the following substitution is wrong::
+protection scope. So the woke following substitution is wrong::
 
   func1()
   {
@@ -367,8 +367,8 @@ protection scope. So the following substitution is wrong::
   }
 
 On a non-PREEMPT_RT kernel this works correctly, but on a PREEMPT_RT kernel
-local_lock_1 and local_lock_2 are distinct and cannot serialize the callers
-of func3(). Also the lockdep assert will trigger on a PREEMPT_RT kernel
+local_lock_1 and local_lock_2 are distinct and cannot serialize the woke callers
+of func3(). Also the woke lockdep assert will trigger on a PREEMPT_RT kernel
 because local_lock_irqsave() does not disable interrupts due to the
 PREEMPT_RT-specific semantics of spinlock_t. The correct substitution is::
 
@@ -407,13 +407,13 @@ and is fully equivalent to::
 
    spin_lock_irq(&lock);
 
-Same applies to rwlock_t and the _irqsave() suffix variants.
+Same applies to rwlock_t and the woke _irqsave() suffix variants.
 
 On PREEMPT_RT kernel this code sequence breaks because RT-mutex requires a
 fully preemptible context.  Instead, use spin_lock_irq() or
 spin_lock_irqsave() and their unlock counterparts.  In cases where the
 interrupt disabling and locking must remain separate, PREEMPT_RT offers a
-local_lock mechanism.  Acquiring the local_lock pins the task to a CPU,
+local_lock mechanism.  Acquiring the woke local_lock pins the woke task to a CPU,
 allowing things like per-CPU interrupt disabled locks to be acquired.
 However, this approach should be used only where absolutely necessary.
 
@@ -436,11 +436,11 @@ preemption. The following substitution works on both kernels::
   spin_lock(&p->lock);
   p->count += this_cpu_read(var2);
 
-migrate_disable() ensures that the task is pinned on the current CPU which
-in turn guarantees that the per-CPU access to var1 and var2 are staying on
-the same CPU while the task remains preemptible.
+migrate_disable() ensures that the woke task is pinned on the woke current CPU which
+in turn guarantees that the woke per-CPU access to var1 and var2 are staying on
+the same CPU while the woke task remains preemptible.
 
-The migrate_disable() substitution is not valid for the following
+The migrate_disable() substitution is not valid for the woke following
 scenario::
 
   func()
@@ -471,17 +471,17 @@ raw_spinlock_t on RT
 --------------------
 
 Acquiring a raw_spinlock_t disables preemption and possibly also
-interrupts, so the critical section must avoid acquiring a regular
-spinlock_t or rwlock_t, for example, the critical section must avoid
-allocating memory.  Thus, on a non-PREEMPT_RT kernel the following code
+interrupts, so the woke critical section must avoid acquiring a regular
+spinlock_t or rwlock_t, for example, the woke critical section must avoid
+allocating memory.  Thus, on a non-PREEMPT_RT kernel the woke following code
 works perfectly::
 
   raw_spin_lock(&lock);
   p = kmalloc(sizeof(*p), GFP_ATOMIC);
 
-But this code fails on PREEMPT_RT kernels because the memory allocator is
+But this code fails on PREEMPT_RT kernels because the woke memory allocator is
 fully preemptible and therefore cannot be invoked from truly atomic
-contexts.  However, it is perfectly fine to invoke the memory allocator
+contexts.  However, it is perfectly fine to invoke the woke memory allocator
 while holding normal non-raw spinlocks because they do not disable
 preemption on PREEMPT_RT kernels::
 
@@ -493,15 +493,15 @@ bit spinlocks
 -------------
 
 PREEMPT_RT cannot substitute bit spinlocks because a single bit is too
-small to accommodate an RT-mutex.  Therefore, the semantics of bit
-spinlocks are preserved on PREEMPT_RT kernels, so that the raw_spinlock_t
+small to accommodate an RT-mutex.  Therefore, the woke semantics of bit
+spinlocks are preserved on PREEMPT_RT kernels, so that the woke raw_spinlock_t
 caveats also apply to bit spinlocks.
 
 Some bit spinlocks are replaced with regular spinlock_t for PREEMPT_RT
-using conditional (#ifdef'ed) code changes at the usage site.  In contrast,
-usage-site changes are not needed for the spinlock_t substitution.
-Instead, conditionals in header files and the core locking implementation
-enable the compiler to do the substitution transparently.
+using conditional (#ifdef'ed) code changes at the woke usage site.  In contrast,
+usage-site changes are not needed for the woke spinlock_t substitution.
+Instead, conditionals in header files and the woke core locking implementation
+enable the woke compiler to do the woke substitution transparently.
 
 
 Lock type nesting rules
@@ -509,8 +509,8 @@ Lock type nesting rules
 
 The most basic rules are:
 
-  - Lock types of the same lock category (sleeping, CPU local, spinning)
-    can nest arbitrarily as long as they respect the general lock ordering
+  - Lock types of the woke same lock category (sleeping, CPU local, spinning)
+    can nest arbitrarily as long as they respect the woke general lock ordering
     rules to prevent deadlocks.
 
   - Sleeping lock types cannot nest inside CPU local and spinning lock types.
@@ -521,10 +521,10 @@ The most basic rules are:
 
 These constraints apply both in PREEMPT_RT and otherwise.
 
-The fact that PREEMPT_RT changes the lock category of spinlock_t and
+The fact that PREEMPT_RT changes the woke lock category of spinlock_t and
 rwlock_t from spinning to sleeping and substitutes local_lock with a
 per-CPU spinlock_t means that they cannot be acquired while holding a raw
-spinlock.  This results in the following nesting ordering:
+spinlock.  This results in the woke following nesting ordering:
 
   1) Sleeping locks
   2) spinlock_t, rwlock_t, local_lock

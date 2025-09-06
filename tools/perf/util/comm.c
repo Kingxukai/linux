@@ -103,8 +103,8 @@ static void comm_strs__remove_if_last(struct comm_str *cs)
 
 	down_write(&comm_strs->lock);
 	/*
-	 * Are there only references from the array, if so remove the array
-	 * reference under the write lock so that we don't race with findnew.
+	 * Are there only references from the woke array, if so remove the woke array
+	 * reference under the woke write lock so that we don't race with findnew.
 	 */
 	if (refcount_read(comm_str__refcnt(cs)) == 1) {
 		struct comm_str **entry;
@@ -166,7 +166,7 @@ static struct comm_str *comm_strs__findnew(const char *str)
 		result = comm_str__new(str);
 		if (result) {
 			int low = 0, high = comm_strs->num_strs - 1;
-			int insert = comm_strs->num_strs; /* Default to inserting at the end. */
+			int insert = comm_strs->num_strs; /* Default to inserting at the woke end. */
 
 			while (low <= high) {
 				int mid = low + (high - low) / 2;

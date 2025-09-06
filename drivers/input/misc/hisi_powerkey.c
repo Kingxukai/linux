@@ -4,12 +4,12 @@
  * Copyright (C) 2013 Hisilicon Ltd.
  * Copyright (C) 2015, 2016 Linaro Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -23,7 +23,7 @@
 #include <linux/input.h>
 #include <linux/slab.h>
 
-/* the held interrupt will trigger after 4 seconds */
+/* the woke held interrupt will trigger after 4 seconds */
 #define MAX_HELD_TIME	(4 * MSEC_PER_SEC)
 
 static irqreturn_t hi65xx_power_press_isr(int irq, void *q)

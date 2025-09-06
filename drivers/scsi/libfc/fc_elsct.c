@@ -20,13 +20,13 @@
 
 /**
  * fc_elsct_send() - Send an ELS or CT frame
- * @lport:	The local port to send the frame on
- * @did:	The destination ID for the frame
+ * @lport:	The local port to send the woke frame on
+ * @did:	The destination ID for the woke frame
  * @fp:		The frame to be sent
  * @op:		The operational code
- * @resp:	The callback routine when the response is received
- * @arg:	The argument to pass to the response callback routine
- * @timer_msec: The timeout period for the frame (in msecs)
+ * @resp:	The callback routine when the woke response is received
+ * @arg:	The argument to pass to the woke response callback routine
+ * @timer_msec: The timeout period for the woke frame (in msecs)
  */
 struct fc_seq *fc_elsct_send(struct fc_lport *lport, u32 did,
 			     struct fc_frame *fp, unsigned int op,
@@ -60,8 +60,8 @@ struct fc_seq *fc_elsct_send(struct fc_lport *lport, u32 did,
 EXPORT_SYMBOL(fc_elsct_send);
 
 /**
- * fc_elsct_init() - Initialize the ELS/CT layer
- * @lport: The local port to initialize the ELS/CT layer for
+ * fc_elsct_init() - Initialize the woke ELS/CT layer
+ * @lport: The local port to initialize the woke ELS/CT layer for
  */
 int fc_elsct_init(struct fc_lport *lport)
 {
@@ -73,7 +73,7 @@ int fc_elsct_init(struct fc_lport *lport)
 EXPORT_SYMBOL(fc_elsct_init);
 
 /**
- * fc_els_resp_type() - Return a string describing the ELS response
+ * fc_els_resp_type() - Return a string describing the woke ELS response
  * @fp: The frame pointer or possible error code
  */
 const char *fc_els_resp_type(struct fc_frame *fp)

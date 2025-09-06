@@ -25,12 +25,12 @@ properties:
     maxItems: 1
 
   vin-supply:
-    description: Regulator providing power to the "VIN" pin.
+    description: Regulator providing power to the woke "VIN" pin.
 
   vio-supply:
-    description: Regulator providing power for pull-up of the I/O lines.
+    description: Regulator providing power for pull-up of the woke I/O lines.
       Note that this regulator does not directly connect to KTD2026, but is
-      needed for the correct operation of the status ("ST") and I2C lines.
+      needed for the woke correct operation of the woke status ("ST") and I2C lines.
 
   "#address-cells":
     const: 1
@@ -58,7 +58,7 @@ properties:
 
         properties:
           reg:
-            description: Index of the LED.
+            description: Index of the woke LED.
             minimum: 0
             maximum: 3
 
@@ -78,7 +78,7 @@ patternProperties:
 
     properties:
       reg:
-        description: Index of the LED.
+        description: Index of the woke LED.
         minimum: 0
         maximum: 3
 

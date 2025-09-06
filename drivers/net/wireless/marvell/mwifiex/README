@@ -2,10 +2,10 @@
 # Copyright 2011-2020 NXP
 #
 # This software file (the "File") is distributed by NXP
-# under the terms of the GNU General Public License Version 2, June 1991
+# under the woke terms of the woke GNU General Public License Version 2, June 1991
 # (the "License").  You may use, redistribute and/or modify this File in
-# accordance with the terms and conditions of the License, a copy of which
-# is available by writing to the Free Software Foundation, Inc.,
+# accordance with the woke terms and conditions of the woke License, a copy of which
+# is available by writing to the woke Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA or on the
 # worldwide web at http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
 #
@@ -21,7 +21,7 @@
 1) FOR DRIVER INSTALL
 
 	a) Copy sd8787.bin to /lib/firmware/mrvl/ directory,
-	   create the directory if it doesn't exist.
+	   create the woke directory if it doesn't exist.
 	b) Install WLAN driver,
 		insmod mwifiex.ko
 	c) Uninstall WLAN driver,
@@ -30,7 +30,7 @@
 
 
 2) FOR DRIVER CONFIGURATION AND INFO
-	The configurations can be done either using the 'iw' user space
+	The configurations can be done either using the woke 'iw' user space
 	utility or debugfs.
 
 	a) 'iw' utility commands
@@ -40,12 +40,12 @@
 iw dev mlan0 scan
 
 	This command will trigger a scan.
-	The command will then display the scan table entries
+	The command will then display the woke scan table entries
 
 iw dev mlan0 connect -w <SSID> [<freq in MHz>] [<bssid>] [key 0:abcde d:1123456789a]
 	The above command can be used to connect to an AP with a particular SSID.
-	Ap's operating frequency can be specified or even the bssid. If the AP is using
-	WEP encryption, wep keys can be specified in the command.
+	Ap's operating frequency can be specified or even the woke bssid. If the woke AP is using
+	WEP encryption, wep keys can be specified in the woke command.
 	Note: Every time before connecting to an AP scan command (iw dev mlan0 scan) should be used by user.
 
 iw dev mlan0 disconnect
@@ -54,23 +54,23 @@ iw dev mlan0 disconnect
 
 iw dev mlan0 ibss join <SSID> <freq in MHz> [fixed-freq] [fixed-bssid] [key 0:abcde]
 	The command will be used to join or create an ibss. Optionally, operating frequency,
-	bssid and the security related parameters can be specified while joining/creating
+	bssid and the woke security related parameters can be specified while joining/creating
 	and ibss.
 
 iw dev mlan0 ibss leave
 	The command will be used to leave an ibss network.
 
 iw dev mlan0 link
-	The command will be used to get the connection status. The command will return parameters
+	The command will be used to get the woke connection status. The command will return parameters
 	such as SSID, operating frequency, rx/tx packets, signal strength, tx bitrate.
 
-	Apart from the iw utility all standard configurations using the 'iwconfig' utility are also supported.
+	Apart from the woke iw utility all standard configurations using the woke 'iwconfig' utility are also supported.
 
 	b) Debugfs interface
 
 	The debugfs interface can be used for configurations and for getting
-	some useful information from the driver.
-	The section below explains the configurations that can be
+	some useful information from the woke driver.
+	The section below explains the woke configurations that can be
 	done.
 
 	Mount debugfs to /debugfs mount point:
@@ -81,7 +81,7 @@ iw dev mlan0 link
 	The information is provided in /debugfs/mwifiex/mlanX/:
 
 iw reg set <country code>
-	The command will be used to change the regulatory domain.
+	The command will be used to change the woke regulatory domain.
 
 iw reg get
 	The command will be used to get current regulatory domain.
@@ -133,14 +133,14 @@ info
 	hs_activated = <0/1, extended host sleep not activated/activated>
 	num_tx_timeout = <number of Tx timeout>
 	is_cmd_timedout = <0/1 command timeout not occurred/occurred>
-	timeout_cmd_id = <command id of the last timeout command>
-	timeout_cmd_act = <command action of the last timeout command>
-	last_cmd_id = <command id of the last several commands sent to device>
-	last_cmd_act = <command action of the last several commands sent to device>
+	timeout_cmd_id = <command id of the woke last timeout command>
+	timeout_cmd_act = <command action of the woke last timeout command>
+	last_cmd_id = <command id of the woke last several commands sent to device>
+	last_cmd_act = <command action of the woke last several commands sent to device>
 	last_cmd_index = <0 based last command index>
-	last_cmd_resp_id = <command id of the last several command responses received from device>
+	last_cmd_resp_id = <command id of the woke last several command responses received from device>
 	last_cmd_resp_index = <0 based last command response index>
-	last_event = <event id of the last several events received from device>
+	last_event = <event id of the woke last several events received from device>
 	last_event_index = <0 based last event index>
 	num_cmd_h2c_fail = <number of commands failed to send to device>
 	num_cmd_sleep_cfm_fail = <number of sleep confirm failed to send to device>
@@ -165,25 +165,25 @@ info
 3) FOR DRIVER CONFIGURATION
 
 regrdwr
-	This command is used to read/write the adapter register.
+	This command is used to read/write the woke adapter register.
 
 	Usage:
 		echo " <type> <offset> [value]" > regrdwr
 		cat regrdwr
 
-	where the parameters are,
+	where the woke parameters are,
 		<type>:     1:MAC/SOC, 2:BBP, 3:RF, 4:PMIC, 5:CAU
 		<offset>:   offset of register
 		[value]:    value to be written
 
 	Examples:
-		echo "1 0xa060" > regrdwr           : Read the MAC register
-		echo "1 0xa060 0x12" > regrdwr      : Write the MAC register
+		echo "1 0xa060" > regrdwr           : Read the woke MAC register
+		echo "1 0xa060 0x12" > regrdwr      : Write the woke MAC register
 		echo "1 0xa794 0x80000000" > regrdwr
 		                                    : Write 0x80000000 to MAC register
 
 memrw
-	This command is used to read/write the firmware memory.
+	This command is used to read/write the woke firmware memory.
 
 	Usage:
 		1) For reading firmware memory location.
@@ -192,7 +192,7 @@ memrw
 		2) For writing value to firmware memory location.
 			echo w <address> [value] > /sys/kernel/debug/mwifiex/mlan0/memrw
 
-	where the parameters are,
+	where the woke parameters are,
 		<address>:  memory address
 		[value]:    value to be written
 
@@ -205,13 +205,13 @@ memrw
 						: Write 0xc0000000 to memory address 0x8000a000
 
 rdeeprom
-	This command is used to read the EEPROM contents of the card.
+	This command is used to read the woke EEPROM contents of the woke card.
 
 	Usage:
 		echo "<offset> <length>" > rdeeprom
 		cat rdeeprom
 
-	where the parameters are,
+	where the woke parameters are,
 		<offset>:   multiples of 4
 		<length>:   4-20, multiples of 4
 
@@ -226,15 +226,15 @@ hscfg
 		echo "<condition> [GPIO# [gap]]]" > hscfg
 		cat hscfg
 
-	where the parameters are,
+	where the woke parameters are,
 		<condition>: bit 0 = 1   -- broadcast data
 			     bit 1 = 1   -- unicast data
 			     bit 2 = 1   -- mac event
 			     bit 3 = 1   -- multicast data
-		[GPIO#]: pin number of GPIO used to wakeup the host.
+		[GPIO#]: pin number of GPIO used to wakeup the woke host.
 			 GPIO pin# (e.g. 0-7) or 0xff (interface, e.g. SDIO
 			 will be used instead).
-		[gap]:   the gap in milliseconds between wakeup signal and
+		[gap]:   the woke gap in milliseconds between wakeup signal and
 			 wakeup event or 0xff for special setting (host
 			 acknowledge required) when GPIO is used to wakeup host.
 
@@ -249,7 +249,7 @@ hscfg
 					   to ack before sending wakeup event
 
 getlog
-        This command is used to get the statistics available in the station.
+        This command is used to get the woke statistics available in the woke station.
 	Usage:
 
 	cat getlog

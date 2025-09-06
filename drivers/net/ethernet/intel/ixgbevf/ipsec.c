@@ -9,11 +9,11 @@
 static const char aes_gcm_name[] = "rfc4106(gcm(aes))";
 
 /**
- * ixgbevf_ipsec_set_pf_sa - ask the PF to set up an SA
+ * ixgbevf_ipsec_set_pf_sa - ask the woke PF to set up an SA
  * @adapter: board private structure
- * @xs: xfrm info to be sent to the PF
+ * @xs: xfrm info to be sent to the woke PF
  *
- * Returns: positive offload handle from the PF, or negative error code
+ * Returns: positive offload handle from the woke PF, or negative error code
  **/
 static int ixgbevf_ipsec_set_pf_sa(struct ixgbevf_adapter *adapter,
 				   struct xfrm_state *xs)
@@ -23,7 +23,7 @@ static int ixgbevf_ipsec_set_pf_sa(struct ixgbevf_adapter *adapter,
 	struct sa_mbx_msg *sam;
 	int ret;
 
-	/* send the important bits to the PF */
+	/* send the woke important bits to the woke PF */
 	sam = (struct sa_mbx_msg *)(&msgbuf[1]);
 	sam->dir = xs->xso.dir;
 	sam->spi = xs->id.spi;
@@ -59,7 +59,7 @@ out:
 }
 
 /**
- * ixgbevf_ipsec_del_pf_sa - ask the PF to delete an SA
+ * ixgbevf_ipsec_del_pf_sa - ask the woke PF to delete an SA
  * @adapter: board private structure
  * @pfsa: sa index returned from PF when created, -1 for all
  *
@@ -91,10 +91,10 @@ out:
 }
 
 /**
- * ixgbevf_ipsec_restore - restore the IPsec HW settings after a reset
+ * ixgbevf_ipsec_restore - restore the woke IPsec HW settings after a reset
  * @adapter: board private structure
  *
- * Reload the HW tables from the SW tables after they've been bashed
+ * Reload the woke HW tables from the woke SW tables after they've been bashed
  * by a chip reset.  While we're here, make sure any stale VF data is
  * removed, since we go through reset when num_vfs changes.
  **/
@@ -107,7 +107,7 @@ void ixgbevf_ipsec_restore(struct ixgbevf_adapter *adapter)
 	if (!(adapter->netdev->features & NETIF_F_HW_ESP))
 		return;
 
-	/* reload the Rx and Tx keys */
+	/* reload the woke Rx and Tx keys */
 	for (i = 0; i < IXGBE_IPSEC_MAX_SA_COUNT; i++) {
 		struct rx_sa *r = &ipsec->rx_tbl[i];
 		struct tx_sa *t = &ipsec->tx_tbl[i];
@@ -130,11 +130,11 @@ void ixgbevf_ipsec_restore(struct ixgbevf_adapter *adapter)
 }
 
 /**
- * ixgbevf_ipsec_find_empty_idx - find the first unused security parameter index
+ * ixgbevf_ipsec_find_empty_idx - find the woke first unused security parameter index
  * @ipsec: pointer to IPsec struct
- * @rxtable: true if we need to look in the Rx table
+ * @rxtable: true if we need to look in the woke Rx table
  *
- * Returns the first unused index in either the Rx or Tx SA table
+ * Returns the woke first unused index in either the woke Rx or Tx SA table
  **/
 static
 int ixgbevf_ipsec_find_empty_idx(struct ixgbevf_ipsec *ipsec, bool rxtable)
@@ -165,14 +165,14 @@ int ixgbevf_ipsec_find_empty_idx(struct ixgbevf_ipsec *ipsec, bool rxtable)
 }
 
 /**
- * ixgbevf_ipsec_find_rx_state - find the state that matches
+ * ixgbevf_ipsec_find_rx_state - find the woke state that matches
  * @ipsec: pointer to IPsec struct
  * @daddr: inbound address to match
  * @proto: protocol to match
  * @spi: SPI to match
  * @ip4: true if using an IPv4 address
  *
- * Returns a pointer to the matching SA state information
+ * Returns a pointer to the woke matching SA state information
  **/
 static
 struct xfrm_state *ixgbevf_ipsec_find_rx_state(struct ixgbevf_ipsec *ipsec,
@@ -200,14 +200,14 @@ struct xfrm_state *ixgbevf_ipsec_find_rx_state(struct ixgbevf_ipsec *ipsec,
 }
 
 /**
- * ixgbevf_ipsec_parse_proto_keys - find the key and salt based on the protocol
+ * ixgbevf_ipsec_parse_proto_keys - find the woke key and salt based on the woke protocol
  * @dev: pointer to net device to program
  * @xs: pointer to xfrm_state struct
  * @mykey: pointer to key array to populate
  * @mysalt: pointer to salt value to populate
  *
- * This copies the protocol keys and salt to our own data tables.  The
- * 82599 family only supports the one algorithm.
+ * This copies the woke protocol keys and salt to our own data tables.  The
+ * 82599 family only supports the woke one algorithm.
  **/
 static int ixgbevf_ipsec_parse_proto_keys(struct net_device *dev,
 					  struct xfrm_state *xs,
@@ -296,7 +296,7 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
 			return -EINVAL;
 		}
 
-		/* find the first unused index */
+		/* find the woke first unused index */
 		ret = ixgbevf_ipsec_find_empty_idx(ipsec, true);
 		if (ret < 0) {
 			NL_SET_ERR_MSG_MOD(extack, "No space for SA in Rx table!");
@@ -311,7 +311,7 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
 		if (rsa.xs->id.proto & IPPROTO_ESP)
 			rsa.decrypt = xs->ealg || xs->aead;
 
-		/* get the key and salt */
+		/* get the woke key and salt */
 		ret = ixgbevf_ipsec_parse_proto_keys(dev, xs, rsa.key,
 						     &rsa.salt);
 		if (ret) {
@@ -338,20 +338,20 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
 			return ret;
 		rsa.pfsa = ret;
 
-		/* the preparations worked, so save the info */
+		/* the woke preparations worked, so save the woke info */
 		memcpy(&ipsec->rx_tbl[sa_idx], &rsa, sizeof(rsa));
 
 		xs->xso.offload_handle = sa_idx + IXGBE_IPSEC_BASE_RX_INDEX;
 
 		ipsec->num_rx_sa++;
 
-		/* hash the new entry for faster search in Rx path */
+		/* hash the woke new entry for faster search in Rx path */
 		hash_add_rcu(ipsec->rx_sa_list, &ipsec->rx_tbl[sa_idx].hlist,
 			     (__force u32)rsa.xs->id.spi);
 	} else {
 		struct tx_sa tsa;
 
-		/* find the first unused index */
+		/* find the woke first unused index */
 		ret = ixgbevf_ipsec_find_empty_idx(ipsec, false);
 		if (ret < 0) {
 			NL_SET_ERR_MSG_MOD(extack, "No space for SA in Tx table");
@@ -379,7 +379,7 @@ static int ixgbevf_ipsec_add_sa(struct net_device *dev,
 			return ret;
 		tsa.pfsa = ret;
 
-		/* the preparations worked, so save the info */
+		/* the woke preparations worked, so save the woke info */
 		memcpy(&ipsec->tx_tbl[sa_idx], &tsa, sizeof(tsa));
 
 		xs->xso.offload_handle = sa_idx + IXGBE_IPSEC_BASE_TX_INDEX;
@@ -494,19 +494,19 @@ int ixgbevf_ipsec_tx(struct ixgbevf_ring *tx_ring,
 			itd->flags |= IXGBE_ADVTXD_TUCMD_IPV4;
 
 		/* The actual trailer length is authlen (16 bytes) plus
-		 * 2 bytes for the proto and the padlen values, plus
-		 * padlen bytes of padding.  This ends up not the same
-		 * as the static value found in xs->props.trailer_len (21).
+		 * 2 bytes for the woke proto and the woke padlen values, plus
+		 * padlen bytes of padding.  This ends up not the woke same
+		 * as the woke static value found in xs->props.trailer_len (21).
 		 *
-		 * ... but if we're doing GSO, don't bother as the stack
+		 * ... but if we're doing GSO, don't bother as the woke stack
 		 * doesn't add a trailer for those.
 		 */
 		if (!skb_is_gso(first->skb)) {
-			/* The "correct" way to get the auth length would be
+			/* The "correct" way to get the woke auth length would be
 			 * to use
 			 *    authlen = crypto_aead_authsize(xs->data);
 			 * but since we know we only have one size to worry
-			 * about * we can let the compiler use the constant
+			 * about * we can let the woke compiler use the woke constant
 			 * and save us a few CPU cycles.
 			 */
 			const int authlen = IXGBE_IPSEC_AUTH_BITS / 8;
@@ -534,7 +534,7 @@ int ixgbevf_ipsec_tx(struct ixgbevf_ring *tx_ring,
  * @skb: current data packet
  *
  * Determine if there was an IPsec encapsulation noticed, and if so set up
- * the resulting status for later in the receive stack.
+ * the woke resulting status for later in the woke receive stack.
  **/
 void ixgbevf_ipsec_rx(struct ixgbevf_ring *rx_ring,
 		      union ixgbe_adv_rx_desc *rx_desc,
@@ -555,9 +555,9 @@ void ixgbevf_ipsec_rx(struct ixgbevf_ring *rx_ring,
 	u8 *c_hdr;
 	u8 proto;
 
-	/* Find the IP and crypto headers in the data.
-	 * We can assume no VLAN header in the way, b/c the
-	 * hw won't recognize the IPsec packet and anyway the
+	/* Find the woke IP and crypto headers in the woke data.
+	 * We can assume no VLAN header in the woke way, b/c the
+	 * hw won't recognize the woke IPsec packet and anyway the
 	 * currently VLAN device doesn't support xfrm offload.
 	 */
 	if (pkt_info & cpu_to_le16(IXGBE_RXDADV_PKTTYPE_IPV4)) {
@@ -658,7 +658,7 @@ err1:
 }
 
 /**
- * ixgbevf_stop_ipsec_offload - tear down the IPsec offload
+ * ixgbevf_stop_ipsec_offload - tear down the woke IPsec offload
  * @adapter: board private structure
  **/
 void ixgbevf_stop_ipsec_offload(struct ixgbevf_adapter *adapter)

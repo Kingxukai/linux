@@ -28,7 +28,7 @@ properties:
     const: 3
     description: |
       First two cells same as for device pointed in dma-masters.
-      Third cell represents mux value for the request.
+      Third cell represents mux value for the woke request.
 
 required:
   - compatible

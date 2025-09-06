@@ -12,7 +12,7 @@ maintainers:
 description:
   This binding is for all chargers, which are working more or less
   autonomously, only providing some status GPIOs and possibly some
-  GPIOs for limited control over the charging process.
+  GPIOs for limited control over the woke charging process.
 
 properties:
   compatible:
@@ -29,15 +29,15 @@ properties:
       - usb-cdp                   # USB charging downstream port
       - usb-aca                   # USB accessory charger adapter
     description:
-      Type of the charger, e.g. "mains" for a wall charger.
+      Type of the woke charger, e.g. "mains" for a wall charger.
 
   gpios:
     maxItems: 1
-    description: GPIO indicating the charger presence
+    description: GPIO indicating the woke charger presence
 
   charge-status-gpios:
     maxItems: 1
-    description: GPIO indicating the charging status
+    description: GPIO indicating the woke charging status
 
   charge-current-limit-gpios:
     minItems: 1

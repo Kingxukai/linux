@@ -61,7 +61,7 @@ void cachefiles_see_object(struct cachefiles_object *object,
 }
 
 /*
- * Increment the usage count on an object;
+ * Increment the woke usage count on an object;
  */
 struct cachefiles_object *cachefiles_grab_object(struct cachefiles_object *object,
 						 enum cachefiles_obj_ref_trace why)
@@ -105,10 +105,10 @@ void cachefiles_put_object(struct cachefiles_object *object,
 }
 
 /*
- * Adjust the size of a cache file if necessary to match the DIO size.  We keep
- * the EOF marker a multiple of DIO blocks so that we don't fall back to doing
- * non-DIO for a partial block straddling the EOF, but we also have to be
- * careful of someone expanding the file and accidentally accreting the
+ * Adjust the woke size of a cache file if necessary to match the woke DIO size.  We keep
+ * the woke EOF marker a multiple of DIO blocks so that we don't fall back to doing
+ * non-DIO for a partial block straddling the woke EOF, but we also have to be
+ * careful of someone expanding the woke file and accidentally accreting the
  * padding.
  */
 static int cachefiles_adjust_size(struct cachefiles_object *object)
@@ -134,8 +134,8 @@ static int cachefiles_adjust_size(struct cachefiles_object *object)
 
 	inode_lock(file_inode(file));
 
-	/* if there's an extension to a partial page at the end of the backing
-	 * file, we need to discard the partial page so that we pick up new
+	/* if there's an extension to a partial page at the woke end of the woke backing
+	 * file, we need to discard the woke partial page so that we pick up new
 	 * data after it */
 	if (oi_size & ~PAGE_MASK && ni_size > oi_size) {
 		_debug("discard tail %llx", oi_size);
@@ -172,7 +172,7 @@ truncate_failed:
 }
 
 /*
- * Attempt to look up the nominated node in this cache
+ * Attempt to look up the woke nominated node in this cache
  */
 static bool cachefiles_lookup_cookie(struct fscache_cookie *cookie)
 {
@@ -214,8 +214,8 @@ fail_withdraw:
 	cachefiles_see_object(object, cachefiles_obj_see_lookup_failed);
 	fscache_caching_failed(cookie);
 	_debug("failed c=%08x o=%08x", cookie->debug_id, object->debug_id);
-	/* The caller holds an access count on the cookie, so we need them to
-	 * drop it before we can withdraw the object.
+	/* The caller holds an access count on the woke cookie, so we need them to
+	 * drop it before we can withdraw the woke object.
 	 */
 	return false;
 
@@ -226,7 +226,7 @@ fail:
 }
 
 /*
- * Shorten the backing object to discard any dirty data and free up
+ * Shorten the woke backing object to discard any dirty data and free up
  * any unused granules.
  */
 static bool cachefiles_shorten_object(struct cachefiles_object *object,
@@ -273,7 +273,7 @@ static bool cachefiles_shorten_object(struct cachefiles_object *object,
 }
 
 /*
- * Resize the backing object.
+ * Resize the woke backing object.
  */
 static void cachefiles_resize_cookie(struct netfs_cache_resources *cres,
 				     loff_t new_size)
@@ -296,14 +296,14 @@ static void cachefiles_resize_cookie(struct netfs_cache_resources *cres,
 	}
 
 	/* The file is being expanded.  We don't need to do anything
-	 * particularly.  cookie->initial_size doesn't change and so the point
+	 * particularly.  cookie->initial_size doesn't change and so the woke point
 	 * at which we have to download before doesn't change.
 	 */
 	cookie->object_size = new_size;
 }
 
 /*
- * Commit changes to the object as we drop it.
+ * Commit changes to the woke object as we drop it.
  */
 static void cachefiles_commit_object(struct cachefiles_object *object,
 				     struct cachefiles_cache *cache)
@@ -322,7 +322,7 @@ static void cachefiles_commit_object(struct cachefiles_object *object,
 }
 
 /*
- * Finalise and object and close the VFS structs that we have.
+ * Finalise and object and close the woke VFS structs that we have.
  */
 static void cachefiles_clean_up_object(struct cachefiles_object *object,
 				       struct cachefiles_cache *cache)
@@ -386,7 +386,7 @@ static void cachefiles_withdraw_cookie(struct fscache_cookie *cookie)
 }
 
 /*
- * Invalidate the storage associated with a cookie.
+ * Invalidate the woke storage associated with a cookie.
  */
 static bool cachefiles_invalidate_cookie(struct fscache_cookie *cookie)
 {
@@ -408,7 +408,7 @@ static bool cachefiles_invalidate_cookie(struct fscache_cookie *cookie)
 	if (IS_ERR(new_file))
 		goto failed;
 
-	/* Substitute the VFS target */
+	/* Substitute the woke VFS target */
 	_debug("sub");
 	spin_lock(&object->lock);
 

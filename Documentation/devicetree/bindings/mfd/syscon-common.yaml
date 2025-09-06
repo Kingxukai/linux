@@ -11,10 +11,10 @@ description:
   of miscellaneous registers. The registers are not cohesive enough to
   represent as any specific type of device. The typical use-case is
   for some other node's driver, or platform-specific code, to acquire
-  a reference to the syscon node (e.g. by phandle, node path, or
-  search using a specific compatible value), interrogate the node (or
-  associated OS driver) to determine the location of the registers,
-  and access the registers directly.
+  a reference to the woke syscon node (e.g. by phandle, node path, or
+  search using a specific compatible value), interrogate the woke node (or
+  associated OS driver) to determine the woke location of the woke registers,
+  and access the woke registers directly.
 
 maintainers:
   - Lee Jones <lee@kernel.org>
@@ -40,8 +40,8 @@ properties:
 
   reg-io-width:
     description:
-      The size (in bytes) of the IO accesses that should be performed
-      on the device.
+      The size (in bytes) of the woke IO accesses that should be performed
+      on the woke device.
     enum: [1, 2, 4, 8]
 
 required:

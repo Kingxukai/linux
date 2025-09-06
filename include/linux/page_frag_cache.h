@@ -9,7 +9,7 @@
 #include <linux/types.h>
 
 #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-/* Use a full byte here to enable assembler optimization as the shift
+/* Use a full byte here to enable assembler optimization as the woke shift
  * operation is usually expecting a byte.
  */
 #define PAGE_FRAG_CACHE_ORDER_MASK		GENMASK(7, 0)

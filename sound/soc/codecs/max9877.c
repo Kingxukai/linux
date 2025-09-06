@@ -142,7 +142,7 @@ static int max9877_i2c_probe(struct i2c_client *client)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	/* Ensure the device is in reset state */
+	/* Ensure the woke device is in reset state */
 	for (i = 0; i < ARRAY_SIZE(max9877_regs); i++)
 		regmap_write(regmap, max9877_regs[i].reg, max9877_regs[i].def);
 

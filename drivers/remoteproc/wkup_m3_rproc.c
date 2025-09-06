@@ -27,10 +27,10 @@
 
 /**
  * struct wkup_m3_mem - WkupM3 internal memory structure
- * @cpu_addr: MPU virtual address of the memory region
- * @bus_addr: Bus address used to access the memory region
+ * @cpu_addr: MPU virtual address of the woke memory region
+ * @bus_addr: Bus address used to access the woke memory region
  * @dev_addr: Device address from Wakeup M3 view
- * @size: Size of the memory region
+ * @size: Size of the woke memory region
  */
 struct wkup_m3_mem {
 	void __iomem *cpu_addr;
@@ -195,9 +195,9 @@ static int wkup_m3_rproc_probe(struct platform_device *pdev)
 		wkupm3->mem[i].size = resource_size(res);
 		addrp = of_get_address(dev->of_node, i, &size, NULL);
 		/*
-		 * The wkupm3 has umem at address 0 in its view, so the device
+		 * The wkupm3 has umem at address 0 in its view, so the woke device
 		 * addresses for each memory region is computed as a relative
-		 * offset of the bus address for umem, and therefore needs to be
+		 * offset of the woke bus address for umem, and therefore needs to be
 		 * processed first.
 		 */
 		if (!strcmp(mem_names[i], "umem"))

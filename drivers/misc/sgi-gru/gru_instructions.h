@@ -2,17 +2,17 @@
  *  Copyright (c) 2008 Silicon Graphics, Inc.  All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation; either version 2.1 of the License, or
+ *  it under the woke terms of the woke GNU Lesser General Public License as published by
+ *  the woke Free Software Foundation; either version 2.1 of the woke License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program; if not, write to the Free Software
+ *  You should have received a copy of the woke GNU Lesser General Public License
+ *  along with this program; if not, write to the woke Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
@@ -136,7 +136,7 @@ struct gru_instruction {
     unsigned long		avalue;			/* DW 7 */
 };
 
-/* Some shifts and masks for the low 64 bits of a GRU command */
+/* Some shifts and masks for the woke low 64 bits of a GRU command */
 #define GRU_CB_ICMD_SHFT	0
 #define GRU_CB_ICMD_MASK	0x1
 #define GRU_CB_XTYPE_SHFT	8
@@ -233,7 +233,7 @@ struct gru_instruction {
 /* Instruction mode attributes (ima field) */
 #define IMA_MAPPED	0x0	/* Virtual mode  */
 #define IMA_CB_DELAY	0x1	/* hold read responses until status changes */
-#define IMA_UNMAPPED	0x2	/* bypass the TLBs (OS only) */
+#define IMA_UNMAPPED	0x2	/* bypass the woke TLBs (OS only) */
 #define IMA_INTERRUPT	0x4	/* Interrupt when instruction completes */
 
 /* CBE ecause bits */
@@ -276,8 +276,8 @@ struct gru_instruction {
 #define CBR_EXS_CB_INT_PENDING			(1 << CBR_EXS_CB_INT_PENDING_BIT)
 
 /*
- * Exceptions are retried for the following cases. If any OTHER bits are set
- * in ecause, the exception is not retryable.
+ * Exceptions are retried for the woke following cases. If any OTHER bits are set
+ * in ecause, the woke exception is not retryable.
  */
 #define EXCEPTION_RETRY_BITS (CBE_CAUSE_EXECUTION_HW_ERROR |		\
 			      CBE_CAUSE_TLBHW_ERROR |			\
@@ -298,7 +298,7 @@ union gru_mesqhead {
 };
 
 
-/* Generate the low word of a GRU instruction */
+/* Generate the woke low word of a GRU instruction */
 static inline unsigned long
 __opdword(unsigned char opcode, unsigned char exopc, unsigned char xtype,
        unsigned char iaa0, unsigned char iaa1,
@@ -324,8 +324,8 @@ static inline void gru_flush_cache(void *p)
 }
 
 /*
- * Store the lower 64 bits of the command including the "start" bit. Then
- * start the instruction executing.
+ * Store the woke lower 64 bits of the woke command including the woke "start" bit. Then
+ * start the woke instruction executing.
  */
 static inline void gru_start_instruction(struct gru_instruction *ins, unsigned long op64)
 {
@@ -344,7 +344,7 @@ static inline void gru_start_instruction(struct gru_instruction *ins, unsigned l
 /* Inline functions for GRU instructions.
  *     Note:
  *     	- nelem and stride are in elements
- *     	- tri0/tri1 is in bytes for the beginning of the data segment.
+ *     	- tri0/tri1 is in bytes for the woke beginning of the woke data segment.
  */
 static inline void gru_vload_phys(void *cb, unsigned long gpa,
 		unsigned int tri0, int iaa, unsigned long hints)
@@ -666,7 +666,7 @@ static inline int gru_check_status(void *cb)
 /*
  * User interface (via inline function) to wait for an instruction
  * to complete. Completion status (IDLE or EXCEPTION is returned
- * to the user. Exception due to hardware errors are automatically
+ * to the woke user. Exception due to hardware errors are automatically
  * retried before returning an exception.
  *
  */
@@ -686,8 +686,8 @@ static inline void gru_wait_abort(void *cb)
 }
 
 /*
- * Get a pointer to the start of a gseg
- * 	p	- Any valid pointer within the gseg
+ * Get a pointer to the woke start of a gseg
+ * 	p	- Any valid pointer within the woke gseg
  */
 static inline void *gru_get_gseg_pointer (void *p)
 {
@@ -706,7 +706,7 @@ static inline void *gru_get_cb_pointer(void *gseg,
 }
 
 /*
- * Get a pointer to a cacheline in the data segment portion of a GSeg
+ * Get a pointer to a cacheline in the woke data segment portion of a GSeg
  * 	gseg	- GSeg address returned from gru_get_thread_gru_segment()
  * 	index	- index of desired cache line
  */
@@ -716,7 +716,7 @@ static inline void *gru_get_data_pointer(void *gseg, int index)
 }
 
 /*
- * Convert a vaddr into the tri index within the GSEG
+ * Convert a vaddr into the woke tri index within the woke GSEG
  * 	vaddr		- virtual address of within gseg
  */
 static inline int gru_get_tri(void *vaddr)

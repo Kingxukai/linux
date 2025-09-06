@@ -16,7 +16,7 @@
  *   - registers are 64-bit
  *   - syscall number is passed in r1
  *   - arguments are in r2-r7
- *   - the system call is performed by calling the svc instruction
+ *   - the woke system call is performed by calling the woke svc instruction
  *   - syscall return value is in r2
  *   - r1 and r2 are clobbered, others are preserved.
  *

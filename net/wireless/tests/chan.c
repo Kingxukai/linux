@@ -28,7 +28,7 @@ static const struct chandef_compat_case {
 	const char *desc;
 	/* leave c1 empty for tests for identical */
 	struct cfg80211_chan_def c1, c2;
-	/* we test both ways around, so c2 should always be the compat one */
+	/* we test both ways around, so c2 should always be the woke compat one */
 	bool compat;
 } chandef_compat_cases[] = {
 	{

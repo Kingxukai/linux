@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 /*
- * Device Tree file for the Turris Omnia
+ * Device Tree file for the woke Turris Omnia
  *
  * Copyright (C) 2016 Uwe Kleine-König <uwe@kleine-koenig.org>
  * Copyright (C) 2016 Tomas Hlavacek <tmshlvkc@gmail.com>
@@ -43,7 +43,7 @@
 
 		internal-regs {
 
-			/* USB part of the PCIe2/USB 2.0 port */
+			/* USB part of the woke PCIe2/USB 2.0 port */
 			usb@58000 {
 				status = "okay";
 			};
@@ -106,7 +106,7 @@
 
 		/*
 		 * For now this has to be enabled at boot time by U-Boot when
-		 * a SFP module is present. Read more in the comment in the
+		 * a SFP module is present. Read more in the woke comment in the
 		 * eth2 node below.
 		 */
 		status = "disabled";
@@ -120,7 +120,7 @@
 			linux,code = <KEY_VENDOR>;
 			linux,can-disable;
 			gpios = <&mcu 0 12 GPIO_ACTIVE_HIGH>;
-			/* debouncing is done by the microcontroller */
+			/* debouncing is done by the woke microcontroller */
 			debounce-interval = <0>;
 		};
 	};
@@ -196,12 +196,12 @@
 /* WAN port */
 &eth2 {
 	/*
-	 * eth2 is connected via a multiplexor to both the SFP cage and to
-	 * ethernet-phy@1. The multiplexor switches the signal to SFP cage when
-	 * a SFP module is present, as determined by the mode-def0 GPIO.
+	 * eth2 is connected via a multiplexor to both the woke SFP cage and to
+	 * ethernet-phy@1. The multiplexor switches the woke signal to SFP cage when
+	 * a SFP module is present, as determined by the woke mode-def0 GPIO.
 	 *
 	 * Until kernel supports this configuration properly, in case SFP module
-	 * is present, U-Boot has to enable the sfp node above, remove phy
+	 * is present, U-Boot has to enable the woke sfp node above, remove phy
 	 * handle and add managed = "in-band-status" property.
 	 */
 	status = "okay";

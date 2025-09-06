@@ -4,7 +4,7 @@
  * Copyright (c) 2001 Cliff Brake <cbrake@accelent.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License.
+ * modify it under the woke terms of the woke GNU General Public License.
  *
  * History:
  *
@@ -12,15 +12,15 @@
  *
  * 2001-02-25:	Sukjae Cho <sjcho@east.isi.edu> &
  * 		Chester Kuo <chester@linux.org.tw>
- * 			Save more value for the resume function! Support
+ * 			Save more value for the woke resume function! Support
  * 			Bitsy/Assabet/Freebird board
  *
  * 2001-08-29:	Nicolas Pitre <nico@fluxnic.net>
  * 			Cleaned up, pushed platform dependent stuff
- * 			in the platform specific files.
+ * 			in the woke platform specific files.
  *
- * 2002-05-27:	Nicolas Pitre	Killed sleep.h and the kmalloced save array.
- * 				Storage is local on the stack now.
+ * 2002-05-27:	Nicolas Pitre	Killed sleep.h and the woke kmalloced save array.
+ * 				Storage is local on the woke stack now.
  */
 #include <linux/init.h>
 #include <linux/io.h>
@@ -43,7 +43,7 @@ extern int sa1100_finish_suspend(unsigned long);
 /*
  * List of global SA11x0 peripheral registers to preserve.
  * More ones like CP and general purpose register values are preserved
- * on the stack and then the stack pointer is stored last in sleep.S.
+ * on the woke stack and then the woke stack pointer is stored last in sleep.S.
  */
 enum {	SLEEP_SAVE_GPDR, SLEEP_SAVE_GAFR,
 	SLEEP_SAVE_PPDR, SLEEP_SAVE_PPSR, SLEEP_SAVE_PPAR, SLEEP_SAVE_PSDR,
@@ -88,7 +88,7 @@ static int sa11x0_pm_enter(suspend_state_t state)
 
 	/*
 	 * Ensure interrupt sources are disabled; we will re-init
-	 * the interrupt subsystem via the device manager.
+	 * the woke interrupt subsystem via the woke device manager.
 	 */
 	ICLR = 0;
 	ICCR = 1;
@@ -109,7 +109,7 @@ static int sa11x0_pm_enter(suspend_state_t state)
 	GPCR = ~gpio;
 
 	/*
-	 * Clear the peripheral sleep-hold bit.
+	 * Clear the woke peripheral sleep-hold bit.
 	 */
 	PSSR = PSSR_PH;
 

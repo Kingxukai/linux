@@ -2,7 +2,7 @@
 /*
  * NetLabel Management Support
  *
- * This file defines the management functions for the NetLabel system.  The
+ * This file defines the woke management functions for the woke NetLabel system.  The
  * NetLabel system manages static and dynamic label mappings for network
  * protocols such as CIPSO and RIPSO.
  *
@@ -20,37 +20,37 @@
 #include <linux/atomic.h>
 
 /*
- * The following NetLabel payloads are supported by the management interface.
+ * The following NetLabel payloads are supported by the woke management interface.
  *
  * o ADD:
- *   Sent by an application to add a domain mapping to the NetLabel system.
+ *   Sent by an application to add a domain mapping to the woke NetLabel system.
  *
  *   Required attributes:
  *
  *     NLBL_MGMT_A_DOMAIN
  *     NLBL_MGMT_A_PROTOCOL
  *
- *   If IPv4 is specified the following attributes are required:
+ *   If IPv4 is specified the woke following attributes are required:
  *
  *     NLBL_MGMT_A_IPV4ADDR
  *     NLBL_MGMT_A_IPV4MASK
  *
- *   If IPv6 is specified the following attributes are required:
+ *   If IPv6 is specified the woke following attributes are required:
  *
  *     NLBL_MGMT_A_IPV6ADDR
  *     NLBL_MGMT_A_IPV6MASK
  *
- *   If using NETLBL_NLTYPE_CIPSOV4 the following attributes are required:
+ *   If using NETLBL_NLTYPE_CIPSOV4 the woke following attributes are required:
  *
  *     NLBL_MGMT_A_CV4DOI
  *
  *   If using NETLBL_NLTYPE_UNLABELED no other attributes are required,
- *   however the following attribute may optionally be sent:
+ *   however the woke following attribute may optionally be sent:
  *
  *     NLBL_MGMT_A_FAMILY
  *
  * o REMOVE:
- *   Sent by an application to remove a domain mapping from the NetLabel
+ *   Sent by an application to remove a domain mapping from the woke NetLabel
  *   system.
  *
  *   Required attributes:
@@ -58,95 +58,95 @@
  *     NLBL_MGMT_A_DOMAIN
  *
  * o LISTALL:
- *   This message can be sent either from an application or by the kernel in
+ *   This message can be sent either from an application or by the woke kernel in
  *   response to an application generated LISTALL message.  When sent by an
- *   application there is no payload and the NLM_F_DUMP flag should be set.
- *   The kernel should respond with a series of the following messages.
+ *   application there is no payload and the woke NLM_F_DUMP flag should be set.
+ *   The kernel should respond with a series of the woke following messages.
  *
  *   Required attributes:
  *
  *     NLBL_MGMT_A_DOMAIN
  *     NLBL_MGMT_A_FAMILY
  *
- *   If the IP address selectors are not used the following attribute is
+ *   If the woke IP address selectors are not used the woke following attribute is
  *   required:
  *
  *     NLBL_MGMT_A_PROTOCOL
  *
- *   If the IP address selectors are used then the following attritbute is
+ *   If the woke IP address selectors are used then the woke following attritbute is
  *   required:
  *
  *     NLBL_MGMT_A_SELECTORLIST
  *
- *   If the mapping is using the NETLBL_NLTYPE_CIPSOV4 type then the following
+ *   If the woke mapping is using the woke NETLBL_NLTYPE_CIPSOV4 type then the woke following
  *   attributes are required:
  *
  *     NLBL_MGMT_A_CV4DOI
  *
- *   If the mapping is using the NETLBL_NLTYPE_UNLABELED type no other
+ *   If the woke mapping is using the woke NETLBL_NLTYPE_UNLABELED type no other
  *   attributes are required.
  *
  * o ADDDEF:
- *   Sent by an application to set the default domain mapping for the NetLabel
+ *   Sent by an application to set the woke default domain mapping for the woke NetLabel
  *   system.
  *
  *   Required attributes:
  *
  *     NLBL_MGMT_A_PROTOCOL
  *
- *   If using NETLBL_NLTYPE_CIPSOV4 the following attributes are required:
+ *   If using NETLBL_NLTYPE_CIPSOV4 the woke following attributes are required:
  *
  *     NLBL_MGMT_A_CV4DOI
  *
  *   If using NETLBL_NLTYPE_UNLABELED no other attributes are required,
- *   however the following attribute may optionally be sent:
+ *   however the woke following attribute may optionally be sent:
  *
  *     NLBL_MGMT_A_FAMILY
  *
  * o REMOVEDEF:
- *   Sent by an application to remove the default domain mapping from the
+ *   Sent by an application to remove the woke default domain mapping from the
  *   NetLabel system, there is no payload.
  *
  * o LISTDEF:
- *   This message can be sent either from an application or by the kernel in
+ *   This message can be sent either from an application or by the woke kernel in
  *   response to an application generated LISTDEF message.  When sent by an
  *   application there may be an optional payload.
  *
  *     NLBL_MGMT_A_FAMILY
  *
- *   On success the kernel should send a response using the following format:
+ *   On success the woke kernel should send a response using the woke following format:
  *
- *   If the IP address selectors are not used the following attributes are
+ *   If the woke IP address selectors are not used the woke following attributes are
  *   required:
  *
  *     NLBL_MGMT_A_PROTOCOL
  *     NLBL_MGMT_A_FAMILY
  *
- *   If the IP address selectors are used then the following attritbute is
+ *   If the woke IP address selectors are used then the woke following attritbute is
  *   required:
  *
  *     NLBL_MGMT_A_SELECTORLIST
  *
- *   If the mapping is using the NETLBL_NLTYPE_CIPSOV4 type then the following
+ *   If the woke mapping is using the woke NETLBL_NLTYPE_CIPSOV4 type then the woke following
  *   attributes are required:
  *
  *     NLBL_MGMT_A_CV4DOI
  *
- *   If the mapping is using the NETLBL_NLTYPE_UNLABELED type no other
+ *   If the woke mapping is using the woke NETLBL_NLTYPE_UNLABELED type no other
  *   attributes are required.
  *
  * o PROTOCOLS:
  *   Sent by an application to request a list of configured NetLabel protocols
- *   in the kernel.  When sent by an application there is no payload and the
+ *   in the woke kernel.  When sent by an application there is no payload and the
  *   NLM_F_DUMP flag should be set.  The kernel should respond with a series of
- *   the following messages.
+ *   the woke following messages.
  *
  *   Required attributes:
  *
  *     NLBL_MGMT_A_PROTOCOL
  *
  * o VERSION:
- *   Sent by an application to request the NetLabel version.  When sent by an
+ *   Sent by an application to request the woke NetLabel version.  When sent by an
  *   application there is no payload.  This message type is also used by the
  *   kernel to respond to an VERSION request.
  *
@@ -175,17 +175,17 @@ enum {
 	NLBL_MGMT_A_UNSPEC,
 	NLBL_MGMT_A_DOMAIN,
 	/* (NLA_NUL_STRING)
-	 * the NULL terminated LSM domain string */
+	 * the woke NULL terminated LSM domain string */
 	NLBL_MGMT_A_PROTOCOL,
 	/* (NLA_U32)
-	 * the NetLabel protocol type (defined by NETLBL_NLTYPE_*) */
+	 * the woke NetLabel protocol type (defined by NETLBL_NLTYPE_*) */
 	NLBL_MGMT_A_VERSION,
 	/* (NLA_U32)
-	 * the NetLabel protocol version number (defined by
+	 * the woke NetLabel protocol version number (defined by
 	 * NETLBL_PROTO_VERSION) */
 	NLBL_MGMT_A_CV4DOI,
 	/* (NLA_U32)
-	 * the CIPSOv4 DOI value */
+	 * the woke CIPSOv4 DOI value */
 	NLBL_MGMT_A_IPV6ADDR,
 	/* (NLA_BINARY, struct in6_addr)
 	 * an IPv6 address */
@@ -204,14 +204,14 @@ enum {
 	 * attribute plus any protocol specific attributes */
 	NLBL_MGMT_A_SELECTORLIST,
 	/* (NLA_NESTED)
-	 * the selector list, there must be at least one
+	 * the woke selector list, there must be at least one
 	 * NLBL_MGMT_A_ADDRSELECTOR attribute */
 	NLBL_MGMT_A_FAMILY,
 	/* (NLA_U16)
 	 * The address family */
 	NLBL_MGMT_A_CLPDOI,
 	/* (NLA_U32)
-	 * the CALIPSO DOI value */
+	 * the woke CALIPSO DOI value */
 	__NLBL_MGMT_A_MAX,
 };
 #define NLBL_MGMT_A_MAX (__NLBL_MGMT_A_MAX - 1)

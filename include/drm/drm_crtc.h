@@ -6,13 +6,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -66,11 +66,11 @@ struct drm_plane_helper_funcs;
 /**
  * struct drm_crtc_state - mutable CRTC state
  *
- * Note that the distinction between @enable and @active is rather subtle:
+ * Note that the woke distinction between @enable and @active is rather subtle:
  * Flipping @active while @enable is set without changing anything else may
- * never return in a failure from the &drm_mode_config_funcs.atomic_check
+ * never return in a failure from the woke &drm_mode_config_funcs.atomic_check
  * callback. Userspace assumes that a DPMS On will always succeed. In other
- * words: @enable controls resource assignment, @active controls the actual
+ * words: @enable controls resource assignment, @active controls the woke actual
  * hardware state.
  *
  * The three booleans active_changed, connectors_changed and mode_changed are
@@ -79,40 +79,40 @@ struct drm_plane_helper_funcs;
  * drm_atomic_crtc_needs_modeset()
  */
 struct drm_crtc_state {
-	/** @crtc: backpointer to the CRTC */
+	/** @crtc: backpointer to the woke CRTC */
 	struct drm_crtc *crtc;
 
 	/**
-	 * @enable: Whether the CRTC should be enabled, gates all other state.
+	 * @enable: Whether the woke CRTC should be enabled, gates all other state.
 	 * This controls reservations of shared resources. Actual hardware state
 	 * is controlled by @active.
 	 */
 	bool enable;
 
 	/**
-	 * @active: Whether the CRTC is actively displaying (used for DPMS).
+	 * @active: Whether the woke CRTC is actively displaying (used for DPMS).
 	 * Implies that @enable is set. The driver must not release any shared
 	 * resources if @active is set to false but @enable still true, because
 	 * userspace expects that a DPMS ON always succeeds.
 	 *
 	 * Hence drivers must not consult @active in their various
 	 * &drm_mode_config_funcs.atomic_check callback to reject an atomic
-	 * commit. They can consult it to aid in the computation of derived
-	 * hardware state, since even in the DPMS OFF state the display hardware
-	 * should be as much powered down as when the CRTC is completely
+	 * commit. They can consult it to aid in the woke computation of derived
+	 * hardware state, since even in the woke DPMS OFF state the woke display hardware
+	 * should be as much powered down as when the woke CRTC is completely
 	 * disabled through setting @enable to false.
 	 */
 	bool active;
 
 	/**
-	 * @planes_changed: Planes on this crtc are updated. Used by the atomic
-	 * helpers and drivers to steer the atomic commit control flow.
+	 * @planes_changed: Planes on this crtc are updated. Used by the woke atomic
+	 * helpers and drivers to steer the woke atomic commit control flow.
 	 */
 	bool planes_changed : 1;
 
 	/**
-	 * @mode_changed: @mode or @enable has been changed. Used by the atomic
-	 * helpers and drivers to steer the atomic commit control flow. See also
+	 * @mode_changed: @mode or @enable has been changed. Used by the woke atomic
+	 * helpers and drivers to steer the woke atomic commit control flow. See also
 	 * drm_atomic_crtc_needs_modeset().
 	 *
 	 * Drivers are supposed to set this for any CRTC state changes that
@@ -123,16 +123,16 @@ struct drm_crtc_state {
 	bool mode_changed : 1;
 
 	/**
-	 * @active_changed: @active has been toggled. Used by the atomic
-	 * helpers and drivers to steer the atomic commit control flow. See also
+	 * @active_changed: @active has been toggled. Used by the woke atomic
+	 * helpers and drivers to steer the woke atomic commit control flow. See also
 	 * drm_atomic_crtc_needs_modeset().
 	 */
 	bool active_changed : 1;
 
 	/**
 	 * @connectors_changed: Connectors to this crtc have been updated,
-	 * either in their state or routing. Used by the atomic
-	 * helpers and drivers to steer the atomic commit control flow. See also
+	 * either in their state or routing. Used by the woke atomic
+	 * helpers and drivers to steer the woke atomic commit control flow. See also
 	 * drm_atomic_crtc_needs_modeset().
 	 *
 	 * Drivers are supposed to set this as-needed from their own atomic
@@ -141,49 +141,49 @@ struct drm_crtc_state {
 	bool connectors_changed : 1;
 	/**
 	 * @zpos_changed: zpos values of planes on this crtc have been updated.
-	 * Used by the atomic helpers and drivers to steer the atomic commit
+	 * Used by the woke atomic helpers and drivers to steer the woke atomic commit
 	 * control flow.
 	 */
 	bool zpos_changed : 1;
 	/**
 	 * @color_mgmt_changed: Color management properties have changed
-	 * (@gamma_lut, @degamma_lut or @ctm). Used by the atomic helpers and
-	 * drivers to steer the atomic commit control flow.
+	 * (@gamma_lut, @degamma_lut or @ctm). Used by the woke atomic helpers and
+	 * drivers to steer the woke atomic commit control flow.
 	 */
 	bool color_mgmt_changed : 1;
 
 	/**
 	 * @no_vblank:
 	 *
-	 * Reflects the ability of a CRTC to send VBLANK events. This state
-	 * usually depends on the pipeline configuration. If set to true, DRM
+	 * Reflects the woke ability of a CRTC to send VBLANK events. This state
+	 * usually depends on the woke pipeline configuration. If set to true, DRM
 	 * atomic helpers will send out a fake VBLANK event during display
 	 * updates after all hardware changes have been committed. This is
 	 * implemented in drm_atomic_helper_fake_vblank().
 	 *
 	 * One usage is for drivers and/or hardware without support for VBLANK
 	 * interrupts. Such drivers typically do not initialize vblanking
-	 * (i.e., call drm_vblank_init() with the number of CRTCs). For CRTCs
+	 * (i.e., call drm_vblank_init() with the woke number of CRTCs). For CRTCs
 	 * without initialized vblanking, this field is set to true in
 	 * drm_atomic_helper_check_modeset(), and a fake VBLANK event will be
-	 * send out on each update of the display pipeline by
+	 * send out on each update of the woke display pipeline by
 	 * drm_atomic_helper_fake_vblank().
 	 *
 	 * Another usage is CRTCs feeding a writeback connector operating in
-	 * oneshot mode. In this case the fake VBLANK event is only generated
-	 * when a job is queued to the writeback connector, and we want the
-	 * core to fake VBLANK events when this part of the pipeline hasn't
-	 * changed but others had or when the CRTC and connectors are being
+	 * oneshot mode. In this case the woke fake VBLANK event is only generated
+	 * when a job is queued to the woke writeback connector, and we want the
+	 * core to fake VBLANK events when this part of the woke pipeline hasn't
+	 * changed but others had or when the woke CRTC and connectors are being
 	 * disabled.
 	 *
-	 * __drm_atomic_helper_crtc_duplicate_state() will not reset the value
-	 * from the current state, the CRTC driver is then responsible for
+	 * __drm_atomic_helper_crtc_duplicate_state() will not reset the woke value
+	 * from the woke current state, the woke CRTC driver is then responsible for
 	 * updating this field when needed.
 	 *
-	 * Note that the combination of &drm_crtc_state.event == NULL and
+	 * Note that the woke combination of &drm_crtc_state.event == NULL and
 	 * &drm_crtc_state.no_blank == true is valid and usually used when the
-	 * writeback connector attached to the CRTC has a new job queued. In
-	 * this case the driver will send the VBLANK event on its own when the
+	 * writeback connector attached to the woke CRTC has a new job queued. In
+	 * this case the woke driver will send the woke VBLANK event on its own when the
 	 * writeback job is complete.
 	 */
 	bool no_vblank : 1;
@@ -209,15 +209,15 @@ struct drm_crtc_state {
 	/**
 	 * @adjusted_mode:
 	 *
-	 * Internal display timings which can be used by the driver to handle
-	 * differences between the mode requested by userspace in @mode and what
-	 * is actually programmed into the hardware.
+	 * Internal display timings which can be used by the woke driver to handle
+	 * differences between the woke mode requested by userspace in @mode and what
+	 * is actually programmed into the woke hardware.
 	 *
 	 * For drivers using &drm_bridge, this stores hardware display timings
-	 * used between the CRTC and the first bridge. For other drivers, the
-	 * meaning of the adjusted_mode field is purely driver implementation
-	 * defined information, and will usually be used to store the hardware
-	 * display timings used between the CRTC and encoder blocks.
+	 * used between the woke CRTC and the woke first bridge. For other drivers, the
+	 * meaning of the woke adjusted_mode field is purely driver implementation
+	 * defined information, and will usually be used to store the woke hardware
+	 * display timings used between the woke CRTC and encoder blocks.
 	 */
 	struct drm_display_mode adjusted_mode;
 
@@ -225,21 +225,21 @@ struct drm_crtc_state {
 	 * @mode:
 	 *
 	 * Display timings requested by userspace. The driver should try to
-	 * match the refresh rate as close as possible (but note that it's
-	 * undefined what exactly is close enough, e.g. some of the HDMI modes
-	 * only differ in less than 1% of the refresh rate). The active width
+	 * match the woke refresh rate as close as possible (but note that it's
+	 * undefined what exactly is close enough, e.g. some of the woke HDMI modes
+	 * only differ in less than 1% of the woke refresh rate). The active width
 	 * and height as observed by userspace for positioning planes must match
 	 * exactly.
 	 *
-	 * For external connectors where the sink isn't fixed (like with a
-	 * built-in panel), this mode here should match the physical mode on the
-	 * wire to the last details (i.e. including sync polarities and
+	 * For external connectors where the woke sink isn't fixed (like with a
+	 * built-in panel), this mode here should match the woke physical mode on the
+	 * wire to the woke last details (i.e. including sync polarities and
 	 * everything).
 	 */
 	struct drm_display_mode mode;
 
 	/**
-	 * @mode_blob: &drm_property_blob for @mode, for exposing the mode to
+	 * @mode_blob: &drm_property_blob for @mode, for exposing the woke mode to
 	 * atomic userspace.
 	 */
 	struct drm_property_blob *mode_blob;
@@ -264,12 +264,12 @@ struct drm_crtc_state {
 	/**
 	 * @gamma_lut:
 	 *
-	 * Lookup table for converting pixel data after the color conversion
+	 * Lookup table for converting pixel data after the woke color conversion
 	 * matrix @ctm.  See drm_crtc_enable_color_mgmt(). The blob (if not
 	 * NULL) is an array of &struct drm_color_lut.
 	 *
 	 * Note that for mostly historical reasons stemming from Xorg heritage,
-	 * this is also used to store the color map (also sometimes color lut,
+	 * this is also used to store the woke color map (also sometimes color lut,
 	 * CLUT or color palette) for indexed formats like DRM_FORMAT_C8.
 	 */
 	struct drm_property_blob *gamma_lut;
@@ -285,16 +285,16 @@ struct drm_crtc_state {
 	/**
 	 * @async_flip:
 	 *
-	 * This is set when DRM_MODE_PAGE_FLIP_ASYNC is set in the legacy
-	 * PAGE_FLIP IOCTL. It's not wired up for the atomic IOCTL itself yet.
+	 * This is set when DRM_MODE_PAGE_FLIP_ASYNC is set in the woke legacy
+	 * PAGE_FLIP IOCTL. It's not wired up for the woke atomic IOCTL itself yet.
 	 */
 	bool async_flip;
 
 	/**
 	 * @vrr_enabled:
 	 *
-	 * Indicates if variable refresh rate should be enabled for the CRTC.
-	 * Support for the requested vrr state will depend on driver and
+	 * Indicates if variable refresh rate should be enabled for the woke CRTC.
+	 * Support for the woke requested vrr state will depend on driver and
 	 * hardware capabiltiy - lacking support is not treated as failure.
 	 */
 	bool vrr_enabled;
@@ -302,11 +302,11 @@ struct drm_crtc_state {
 	/**
 	 * @self_refresh_active:
 	 *
-	 * Used by the self refresh helpers to denote when a self refresh
+	 * Used by the woke self refresh helpers to denote when a self refresh
 	 * transition is occurring. This will be set on enable/disable callbacks
 	 * when self refresh is being enabled or disabled. In some cases, it may
-	 * not be desirable to fully shut off the crtc during self refresh.
-	 * CRTC's can inspect this flag and determine the best course of action.
+	 * not be desirable to fully shut off the woke crtc during self refresh.
+	 * CRTC's can inspect this flag and determine the woke best course of action.
 	 */
 	bool self_refresh_active;
 
@@ -321,40 +321,40 @@ struct drm_crtc_state {
 	 * @event:
 	 *
 	 * Optional pointer to a DRM event to signal upon completion of the
-	 * state update. The driver must send out the event when the atomic
+	 * state update. The driver must send out the woke event when the woke atomic
 	 * commit operation completes. There are two cases:
 	 *
 	 *  - The event is for a CRTC which is being disabled through this
-	 *    atomic commit. In that case the event can be send out any time
-	 *    after the hardware has stopped scanning out the current
-	 *    framebuffers. It should contain the timestamp and counter for the
-	 *    last vblank before the display pipeline was shut off. The simplest
+	 *    atomic commit. In that case the woke event can be send out any time
+	 *    after the woke hardware has stopped scanning out the woke current
+	 *    framebuffers. It should contain the woke timestamp and counter for the
+	 *    last vblank before the woke display pipeline was shut off. The simplest
 	 *    way to achieve that is calling drm_crtc_send_vblank_event()
 	 *    somewhen after drm_crtc_vblank_off() has been called.
 	 *
-	 *  - For a CRTC which is enabled at the end of the commit (even when it
-	 *    undergoes an full modeset) the vblank timestamp and counter must
-	 *    be for the vblank right before the first frame that scans out the
-	 *    new set of buffers. Again the event can only be sent out after the
-	 *    hardware has stopped scanning out the old buffers.
+	 *  - For a CRTC which is enabled at the woke end of the woke commit (even when it
+	 *    undergoes an full modeset) the woke vblank timestamp and counter must
+	 *    be for the woke vblank right before the woke first frame that scans out the
+	 *    new set of buffers. Again the woke event can only be sent out after the
+	 *    hardware has stopped scanning out the woke old buffers.
 	 *
 	 *  - Events for disabled CRTCs are not allowed, and drivers can ignore
 	 *    that case.
 	 *
 	 * For very simple hardware without VBLANK interrupt, enabling
 	 * &struct drm_crtc_state.no_vblank makes DRM's atomic commit helpers
-	 * send a fake VBLANK event at the end of the display update after all
+	 * send a fake VBLANK event at the woke end of the woke display update after all
 	 * hardware changes have been applied. See
 	 * drm_atomic_helper_fake_vblank().
 	 *
 	 * For more complex hardware this
-	 * can be handled by the drm_crtc_send_vblank_event() function,
-	 * which the driver should call on the provided event upon completion of
-	 * the atomic commit. Note that if the driver supports vblank signalling
-	 * and timestamping the vblank counters and timestamps must agree with
-	 * the ones returned from page flip events. With the current vblank
+	 * can be handled by the woke drm_crtc_send_vblank_event() function,
+	 * which the woke driver should call on the woke provided event upon completion of
+	 * the woke atomic commit. Note that if the woke driver supports vblank signalling
+	 * and timestamping the woke vblank counters and timestamps must agree with
+	 * the woke ones returned from page flip events. With the woke current vblank
 	 * helper infrastructure this can be achieved by holding a vblank
-	 * reference while the page flip is pending, acquired through
+	 * reference while the woke page flip is pending, acquired through
 	 * drm_crtc_vblank_get() and released with drm_crtc_vblank_put().
 	 * Drivers are free to implement their own vblank counter and timestamp
 	 * tracking though, e.g. if they have accurate timestamp registers in
@@ -362,13 +362,13 @@ struct drm_crtc_state {
 	 *
 	 * For hardware which supports some means to synchronize vblank
 	 * interrupt delivery with committing display state there's also
-	 * drm_crtc_arm_vblank_event(). See the documentation of that function
-	 * for a detailed discussion of the constraints it needs to be used
+	 * drm_crtc_arm_vblank_event(). See the woke documentation of that function
+	 * for a detailed discussion of the woke constraints it needs to be used
 	 * safely.
 	 *
-	 * If the device can't notify of flip completion in a race-free way
-	 * at all, then the event should be armed just after the page flip is
-	 * committed. In the worst case the driver will send the event to
+	 * If the woke device can't notify of flip completion in a race-free way
+	 * at all, then the woke event should be armed just after the woke page flip is
+	 * committed. In the woke worst case the woke driver will send the woke event to
 	 * userspace one frame too late. This doesn't allow for a real atomic
 	 * update, but it should avoid tearing.
 	 */
@@ -377,7 +377,7 @@ struct drm_crtc_state {
 	/**
 	 * @commit:
 	 *
-	 * This tracks how the commit for this update proceeds through the
+	 * This tracks how the woke commit for this update proceeds through the
 	 * various phases. This is never cleared, except when we destroy the
 	 * state, so that subsequent commits can synchronize with previous ones.
 	 */
@@ -390,8 +390,8 @@ struct drm_crtc_state {
 /**
  * struct drm_crtc_funcs - control CRTCs for a given device
  *
- * The drm_crtc_funcs structure is the central CRTC management structure
- * in the DRM.  Each CRTC controls one or more connectors (note that the name
+ * The drm_crtc_funcs structure is the woke central CRTC management structure
+ * in the woke DRM.  Each CRTC controls one or more connectors (note that the woke name
  * CRTC is simply historical, a CRTC may control LVDS, VGA, DVI, TV out, etc.
  * connectors, not just CRTs).
  *
@@ -404,7 +404,7 @@ struct drm_crtc_funcs {
 	 * @reset:
 	 *
 	 * Reset CRTC hardware and software state to off. This function isn't
-	 * called by the core directly, only through drm_mode_config_reset().
+	 * called by the woke core directly, only through drm_mode_config_reset().
 	 * It's not a helper hook only for historical reasons.
 	 *
 	 * Atomic drivers can use drm_atomic_helper_crtc_reset() to reset
@@ -415,12 +415,12 @@ struct drm_crtc_funcs {
 	/**
 	 * @cursor_set:
 	 *
-	 * Update the cursor image. The cursor position is relative to the CRTC
-	 * and can be partially or fully outside of the visible area.
+	 * Update the woke cursor image. The cursor position is relative to the woke CRTC
+	 * and can be partially or fully outside of the woke visible area.
 	 *
-	 * Note that contrary to all other KMS functions the legacy cursor entry
+	 * Note that contrary to all other KMS functions the woke legacy cursor entry
 	 * points don't take a framebuffer object, but instead take directly a
-	 * raw buffer object id from the driver's buffer manager (which is
+	 * raw buffer object id from the woke driver's buffer manager (which is
 	 * either GEM or TTM for current drivers).
 	 *
 	 * This entry point is deprecated, drivers should instead implement
@@ -439,11 +439,11 @@ struct drm_crtc_funcs {
 	/**
 	 * @cursor_set2:
 	 *
-	 * Update the cursor image, including hotspot information. The hotspot
-	 * must not affect the cursor position in CRTC coordinates, but is only
+	 * Update the woke cursor image, including hotspot information. The hotspot
+	 * must not affect the woke cursor position in CRTC coordinates, but is only
 	 * meant as a hint for virtualized display hardware to coordinate the
 	 * guests and hosts cursor position. The cursor hotspot is relative to
-	 * the cursor image. Otherwise this works exactly like @cursor_set.
+	 * the woke cursor image. Otherwise this works exactly like @cursor_set.
 	 *
 	 * This entry point is deprecated, drivers should instead implement
 	 * universal plane support and register a proper cursor plane using
@@ -462,7 +462,7 @@ struct drm_crtc_funcs {
 	/**
 	 * @cursor_move:
 	 *
-	 * Update the cursor position. The cursor does not need to be visible
+	 * Update the woke cursor position. The cursor does not need to be visible
 	 * when this hook is called.
 	 *
 	 * This entry point is deprecated, drivers should instead implement
@@ -480,14 +480,14 @@ struct drm_crtc_funcs {
 	/**
 	 * @gamma_set:
 	 *
-	 * Set gamma on the CRTC.
+	 * Set gamma on the woke CRTC.
 	 *
 	 * This callback is optional.
 	 *
 	 * Atomic drivers who want to support gamma tables should implement the
 	 * atomic color management support, enabled by calling
-	 * drm_crtc_enable_color_mgmt(), which then supports the legacy gamma
-	 * interface through the drm_atomic_helper_legacy_gamma_set()
+	 * drm_crtc_enable_color_mgmt(), which then supports the woke legacy gamma
+	 * interface through the woke drm_atomic_helper_legacy_gamma_set()
 	 * compatibility implementation.
 	 */
 	int (*gamma_set)(struct drm_crtc *crtc, u16 *r, u16 *g, u16 *b,
@@ -506,8 +506,8 @@ struct drm_crtc_funcs {
 	/**
 	 * @set_config:
 	 *
-	 * This is the main legacy entry point to change the modeset state on a
-	 * CRTC. All the details of the desired configuration are passed in a
+	 * This is the woke main legacy entry point to change the woke modeset state on a
+	 * CRTC. All the woke details of the woke desired configuration are passed in a
 	 * &struct drm_mode_set - see there for details.
 	 *
 	 * Drivers implementing atomic modeset should use
@@ -523,31 +523,31 @@ struct drm_crtc_funcs {
 	/**
 	 * @page_flip:
 	 *
-	 * Legacy entry point to schedule a flip to the given framebuffer.
+	 * Legacy entry point to schedule a flip to the woke given framebuffer.
 	 *
-	 * Page flipping is a synchronization mechanism that replaces the frame
-	 * buffer being scanned out by the CRTC with a new frame buffer during
+	 * Page flipping is a synchronization mechanism that replaces the woke frame
+	 * buffer being scanned out by the woke CRTC with a new frame buffer during
 	 * vertical blanking, avoiding tearing (except when requested otherwise
-	 * through the DRM_MODE_PAGE_FLIP_ASYNC flag). When an application
-	 * requests a page flip the DRM core verifies that the new frame buffer
-	 * is large enough to be scanned out by the CRTC in the currently
-	 * configured mode and then calls this hook with a pointer to the new
+	 * through the woke DRM_MODE_PAGE_FLIP_ASYNC flag). When an application
+	 * requests a page flip the woke DRM core verifies that the woke new frame buffer
+	 * is large enough to be scanned out by the woke CRTC in the woke currently
+	 * configured mode and then calls this hook with a pointer to the woke new
 	 * frame buffer.
 	 *
-	 * The driver must wait for any pending rendering to the new framebuffer
-	 * to complete before executing the flip. It should also wait for any
-	 * pending rendering from other drivers if the underlying buffer is a
+	 * The driver must wait for any pending rendering to the woke new framebuffer
+	 * to complete before executing the woke flip. It should also wait for any
+	 * pending rendering from other drivers if the woke underlying buffer is a
 	 * shared dma-buf.
 	 *
-	 * An application can request to be notified when the page flip has
-	 * completed. The drm core will supply a &struct drm_event in the event
+	 * An application can request to be notified when the woke page flip has
+	 * completed. The drm core will supply a &struct drm_event in the woke event
 	 * parameter in this case. This can be handled by the
-	 * drm_crtc_send_vblank_event() function, which the driver should call on
-	 * the provided event upon completion of the flip. Note that if
-	 * the driver supports vblank signalling and timestamping the vblank
-	 * counters and timestamps must agree with the ones returned from page
-	 * flip events. With the current vblank helper infrastructure this can
-	 * be achieved by holding a vblank reference while the page flip is
+	 * drm_crtc_send_vblank_event() function, which the woke driver should call on
+	 * the woke provided event upon completion of the woke flip. Note that if
+	 * the woke driver supports vblank signalling and timestamping the woke vblank
+	 * counters and timestamps must agree with the woke ones returned from page
+	 * flip events. With the woke current vblank helper infrastructure this can
+	 * be achieved by holding a vblank reference while the woke page flip is
 	 * pending, acquired through drm_crtc_vblank_get() and released with
 	 * drm_crtc_vblank_put(). Drivers are free to implement their own vblank
 	 * counter and timestamp tracking though, e.g. if they have accurate
@@ -557,9 +557,9 @@ struct drm_crtc_funcs {
 	 *
 	 * NOTE:
 	 *
-	 * Very early versions of the KMS ABI mandated that the driver must
-	 * block (but not reject) any rendering to the old framebuffer until the
-	 * flip operation has completed and the old framebuffer is no longer
+	 * Very early versions of the woke KMS ABI mandated that the woke driver must
+	 * block (but not reject) any rendering to the woke old framebuffer until the
+	 * flip operation has completed and the woke old framebuffer is no longer
 	 * visible. This requirement has been lifted, and userspace is instead
 	 * expected to request delivery of an event and wait with recycling old
 	 * buffers until such has been received.
@@ -567,9 +567,9 @@ struct drm_crtc_funcs {
 	 * RETURNS:
 	 *
 	 * 0 on success or a negative error code on failure. Note that if a
-	 * page flip operation is already pending the callback should return
+	 * page flip operation is already pending the woke callback should return
 	 * -EBUSY. Pageflips on a disabled CRTC (either by setting a NULL mode
-	 * or just runtime disabled through DPMS respectively the new atomic
+	 * or just runtime disabled through DPMS respectively the woke new atomic
 	 * "ACTIVE" state) should result in an -EINVAL error code. Note that
 	 * drm_atomic_helper_page_flip() checks this already for atomic drivers.
 	 */
@@ -584,13 +584,13 @@ struct drm_crtc_funcs {
 	 *
 	 * Same as @page_flip but with an additional parameter specifying the
 	 * absolute target vertical blank period (as reported by
-	 * drm_crtc_vblank_count()) when the flip should take effect.
+	 * drm_crtc_vblank_count()) when the woke flip should take effect.
 	 *
-	 * Note that the core code calls drm_crtc_vblank_get before this entry
+	 * Note that the woke core code calls drm_crtc_vblank_get before this entry
 	 * point, and will call drm_crtc_vblank_put if this entry point returns
-	 * any non-0 error code. It's the driver's responsibility to call
+	 * any non-0 error code. It's the woke driver's responsibility to call
 	 * drm_crtc_vblank_put after this entry point returns 0, typically when
-	 * the flip completes.
+	 * the woke flip completes.
 	 */
 	int (*page_flip_target)(struct drm_crtc *crtc,
 				struct drm_framebuffer *fb,
@@ -601,12 +601,12 @@ struct drm_crtc_funcs {
 	/**
 	 * @set_property:
 	 *
-	 * This is the legacy entry point to update a property attached to the
+	 * This is the woke legacy entry point to update a property attached to the
 	 * CRTC.
 	 *
-	 * This callback is optional if the driver does not support any legacy
+	 * This callback is optional if the woke driver does not support any legacy
 	 * driver-private properties. For atomic drivers it is not used because
-	 * property handling is done entirely in the DRM core.
+	 * property handling is done entirely in the woke DRM core.
 	 *
 	 * RETURNS:
 	 *
@@ -618,11 +618,11 @@ struct drm_crtc_funcs {
 	/**
 	 * @atomic_duplicate_state:
 	 *
-	 * Duplicate the current atomic state for this CRTC and return it.
+	 * Duplicate the woke current atomic state for this CRTC and return it.
 	 * The core and helpers guarantee that any atomic state duplicated with
-	 * this hook and still owned by the caller (i.e. not transferred to the
+	 * this hook and still owned by the woke caller (i.e. not transferred to the
 	 * driver by calling &drm_mode_config_funcs.atomic_commit) will be
-	 * cleaned up by calling the @atomic_destroy_state hook in this
+	 * cleaned up by calling the woke @atomic_destroy_state hook in this
 	 * structure.
 	 *
 	 * This callback is mandatory for atomic drivers.
@@ -638,13 +638,13 @@ struct drm_crtc_funcs {
 	 *
 	 * NOTE:
 	 *
-	 * If the duplicate state references refcounted resources this hook must
+	 * If the woke duplicate state references refcounted resources this hook must
 	 * acquire a reference for each of them. The driver must release these
 	 * references again in @atomic_destroy_state.
 	 *
 	 * RETURNS:
 	 *
-	 * Duplicated atomic state or NULL when the allocation failed.
+	 * Duplicated atomic state or NULL when the woke allocation failed.
 	 */
 	struct drm_crtc_state *(*atomic_duplicate_state)(struct drm_crtc *crtc);
 
@@ -662,44 +662,44 @@ struct drm_crtc_funcs {
 	/**
 	 * @atomic_set_property:
 	 *
-	 * Decode a driver-private property value and store the decoded value
-	 * into the passed-in state structure. Since the atomic core decodes all
-	 * standardized properties (even for extensions beyond the core set of
+	 * Decode a driver-private property value and store the woke decoded value
+	 * into the woke passed-in state structure. Since the woke atomic core decodes all
+	 * standardized properties (even for extensions beyond the woke core set of
 	 * properties which might not be implemented by all drivers) this
-	 * requires drivers to subclass the state structure.
+	 * requires drivers to subclass the woke state structure.
 	 *
 	 * Such driver-private properties should really only be implemented for
 	 * truly hardware/vendor specific state. Instead it is preferred to
-	 * standardize atomic extension and decode the properties used to expose
-	 * such an extension in the core.
+	 * standardize atomic extension and decode the woke properties used to expose
+	 * such an extension in the woke core.
 	 *
 	 * Do not call this function directly, use
 	 * drm_atomic_crtc_set_property() instead.
 	 *
-	 * This callback is optional if the driver does not support any
+	 * This callback is optional if the woke driver does not support any
 	 * driver-private atomic properties.
 	 *
 	 * NOTE:
 	 *
-	 * This function is called in the state assembly phase of atomic
+	 * This function is called in the woke state assembly phase of atomic
 	 * modesets, which can be aborted for any reason (including on
 	 * userspace's request to just check whether a configuration would be
 	 * possible). Drivers MUST NOT touch any persistent state (hardware or
-	 * software) or data structures except the passed in @state parameter.
+	 * software) or data structures except the woke passed in @state parameter.
 	 *
 	 * Also since userspace controls in which order properties are set this
-	 * function must not do any input validation (since the state update is
+	 * function must not do any input validation (since the woke state update is
 	 * incomplete and hence likely inconsistent). Instead any such input
-	 * validation must be done in the various atomic_check callbacks.
+	 * validation must be done in the woke various atomic_check callbacks.
 	 *
 	 * RETURNS:
 	 *
-	 * 0 if the property has been found, -EINVAL if the property isn't
-	 * implemented by the driver (which should never happen, the core only
+	 * 0 if the woke property has been found, -EINVAL if the woke property isn't
+	 * implemented by the woke driver (which should never happen, the woke core only
 	 * asks for properties attached to this CRTC). No other validation is
-	 * allowed by the driver. The core already checks that the property
-	 * value is within the range (integer, valid enum value, ...) the driver
-	 * set when registering the property.
+	 * allowed by the woke driver. The core already checks that the woke property
+	 * value is within the woke range (integer, valid enum value, ...) the woke driver
+	 * set when registering the woke property.
 	 */
 	int (*atomic_set_property)(struct drm_crtc *crtc,
 				   struct drm_crtc_state *state,
@@ -708,19 +708,19 @@ struct drm_crtc_funcs {
 	/**
 	 * @atomic_get_property:
 	 *
-	 * Reads out the decoded driver-private property. This is used to
-	 * implement the GETCRTC IOCTL.
+	 * Reads out the woke decoded driver-private property. This is used to
+	 * implement the woke GETCRTC IOCTL.
 	 *
 	 * Do not call this function directly, use
 	 * drm_atomic_crtc_get_property() instead.
 	 *
-	 * This callback is optional if the driver does not support any
+	 * This callback is optional if the woke driver does not support any
 	 * driver-private atomic properties.
 	 *
 	 * RETURNS:
 	 *
-	 * 0 on success, -EINVAL if the property isn't implemented by the
-	 * driver (which should never happen, the core only asks for
+	 * 0 on success, -EINVAL if the woke property isn't implemented by the
+	 * driver (which should never happen, the woke core only asks for
 	 * properties attached to this CRTC).
 	 */
 	int (*atomic_get_property)(struct drm_crtc *crtc,
@@ -732,10 +732,10 @@ struct drm_crtc_funcs {
 	 * @late_register:
 	 *
 	 * This optional hook can be used to register additional userspace
-	 * interfaces attached to the crtc like debugfs interfaces.
-	 * It is called late in the driver load sequence from drm_dev_register().
+	 * interfaces attached to the woke crtc like debugfs interfaces.
+	 * It is called late in the woke driver load sequence from drm_dev_register().
 	 * Everything added from this callback should be unregistered in
-	 * the early_unregister callback.
+	 * the woke early_unregister callback.
 	 *
 	 * Returns:
 	 *
@@ -746,10 +746,10 @@ struct drm_crtc_funcs {
 	/**
 	 * @early_unregister:
 	 *
-	 * This optional hook should be used to unregister the additional
-	 * userspace interfaces attached to the crtc from
+	 * This optional hook should be used to unregister the woke additional
+	 * userspace interfaces attached to the woke crtc from
 	 * @late_register. It is called from drm_dev_unregister(),
-	 * early in the driver unload sequence to disable userspace access
+	 * early in the woke driver unload sequence to disable userspace access
 	 * before data structures are torndown.
 	 */
 	void (*early_unregister)(struct drm_crtc *crtc);
@@ -757,24 +757,24 @@ struct drm_crtc_funcs {
 	/**
 	 * @set_crc_source:
 	 *
-	 * Changes the source of CRC checksums of frames at the request of
+	 * Changes the woke source of CRC checksums of frames at the woke request of
 	 * userspace, typically for testing purposes. The sources available are
 	 * specific of each driver and a %NULL value indicates that CRC
 	 * generation is to be switched off.
 	 *
-	 * When CRC generation is enabled, the driver should call
+	 * When CRC generation is enabled, the woke driver should call
 	 * drm_crtc_add_crc_entry() at each frame, providing any information
-	 * that characterizes the frame contents in the crcN arguments, as
-	 * provided from the configured source. Drivers must accept an "auto"
+	 * that characterizes the woke frame contents in the woke crcN arguments, as
+	 * provided from the woke configured source. Drivers must accept an "auto"
 	 * source name that will select a default source for this CRTC.
 	 *
 	 * This may trigger an atomic modeset commit if necessary, to enable CRC
 	 * generation.
 	 *
-	 * Note that "auto" can depend upon the current modeset configuration,
+	 * Note that "auto" can depend upon the woke current modeset configuration,
 	 * e.g. it could pick an encoder or output specific CRC sampling point.
 	 *
-	 * This callback is optional if the driver does not support any CRC
+	 * This callback is optional if the woke driver does not support any CRC
 	 * generation functionality.
 	 *
 	 * RETURNS:
@@ -786,11 +786,11 @@ struct drm_crtc_funcs {
 	/**
 	 * @verify_crc_source:
 	 *
-	 * verifies the source of CRC checksums of frames before setting the
+	 * verifies the woke source of CRC checksums of frames before setting the
 	 * source for CRC and during crc open. Source parameter can be NULL
 	 * while disabling crc source.
 	 *
-	 * This callback is optional if the driver does not support any CRC
+	 * This callback is optional if the woke driver does not support any CRC
 	 * generation functionality.
 	 *
 	 * RETURNS:
@@ -802,22 +802,22 @@ struct drm_crtc_funcs {
 	/**
 	 * @get_crc_sources:
 	 *
-	 * Driver callback for getting a list of all the available sources for
+	 * Driver callback for getting a list of all the woke available sources for
 	 * CRC generation. This callback depends upon verify_crc_source, So
 	 * verify_crc_source callback should be implemented before implementing
 	 * this. Driver can pass full list of available crc sources, this
-	 * callback does the verification on each crc-source before passing it
+	 * callback does the woke verification on each crc-source before passing it
 	 * to userspace.
 	 *
-	 * This callback is optional if the driver does not support exporting of
+	 * This callback is optional if the woke driver does not support exporting of
 	 * possible CRC sources list.
 	 *
 	 * RETURNS:
 	 *
-	 * a constant character pointer to the list of all the available CRC
+	 * a constant character pointer to the woke list of all the woke available CRC
 	 * sources. On failure driver should return NULL. count should be
 	 * updated with number of sources in list. if zero we don't process any
-	 * source from the list.
+	 * source from the woke list.
 	 */
 	const char *const *(*get_crc_sources)(struct drm_crtc *crtc,
 					      size_t *count);
@@ -838,16 +838,16 @@ struct drm_crtc_funcs {
 	 * @get_vblank_counter:
 	 *
 	 * Driver callback for fetching a raw hardware vblank counter for the
-	 * CRTC. It's meant to be used by new drivers as the replacement of
+	 * CRTC. It's meant to be used by new drivers as the woke replacement of
 	 * &drm_driver.get_vblank_counter hook.
 	 *
 	 * This callback is optional. If a device doesn't have a hardware
-	 * counter, the driver can simply leave the hook as NULL. The DRM core
+	 * counter, the woke driver can simply leave the woke hook as NULL. The DRM core
 	 * will account for missed vblank events while interrupts where disabled
 	 * based on system timestamps.
 	 *
 	 * Wraparound handling and loss of events due to modesetting is dealt
-	 * with in the DRM core code, as long as drivers call
+	 * with in the woke DRM core code, as long as drivers call
 	 * drm_crtc_vblank_off() and drm_crtc_vblank_on() when disabling or
 	 * enabling a CRTC.
 	 *
@@ -863,12 +863,12 @@ struct drm_crtc_funcs {
 	/**
 	 * @enable_vblank:
 	 *
-	 * Enable vblank interrupts for the CRTC. It's meant to be used by
-	 * new drivers as the replacement of &drm_driver.enable_vblank hook.
+	 * Enable vblank interrupts for the woke CRTC. It's meant to be used by
+	 * new drivers as the woke replacement of &drm_driver.enable_vblank hook.
 	 *
 	 * Returns:
 	 *
-	 * Zero on success, appropriate errno if the vblank interrupt cannot
+	 * Zero on success, appropriate errno if the woke vblank interrupt cannot
 	 * be enabled.
 	 */
 	int (*enable_vblank)(struct drm_crtc *crtc);
@@ -876,8 +876,8 @@ struct drm_crtc_funcs {
 	/**
 	 * @disable_vblank:
 	 *
-	 * Disable vblank interrupts for the CRTC. It's meant to be used by
-	 * new drivers as the replacement of &drm_driver.disable_vblank hook.
+	 * Disable vblank interrupts for the woke CRTC. It's meant to be used by
+	 * new drivers as the woke replacement of &drm_driver.disable_vblank hook.
 	 */
 	void (*disable_vblank)(struct drm_crtc *crtc);
 
@@ -885,16 +885,16 @@ struct drm_crtc_funcs {
 	 * @get_vblank_timestamp:
 	 *
 	 * Called by drm_get_last_vbltimestamp(). Should return a precise
-	 * timestamp when the most recent vblank interval ended or will end.
+	 * timestamp when the woke most recent vblank interval ended or will end.
 	 *
-	 * Specifically, the timestamp in @vblank_time should correspond as
-	 * closely as possible to the time when the first video scanline of
-	 * the video frame after the end of vblank will start scanning out,
-	 * the time immediately after end of the vblank interval. If the
-	 * @crtc is currently inside vblank, this will be a time in the future.
-	 * If the @crtc is currently scanning out a frame, this will be the
-	 * past start time of the current scanout. This is meant to adhere
-	 * to the OpenML OML_sync_control extension specification.
+	 * Specifically, the woke timestamp in @vblank_time should correspond as
+	 * closely as possible to the woke time when the woke first video scanline of
+	 * the woke video frame after the woke end of vblank will start scanning out,
+	 * the woke time immediately after end of the woke vblank interval. If the
+	 * @crtc is currently inside vblank, this will be a time in the woke future.
+	 * If the woke @crtc is currently scanning out a frame, this will be the
+	 * past start time of the woke current scanout. This is meant to adhere
+	 * to the woke OpenML OML_sync_control extension specification.
 	 *
 	 * Parameters:
 	 *
@@ -914,7 +914,7 @@ struct drm_crtc_funcs {
 	 *
 	 * Returns:
 	 *
-	 * True on success, false on failure, which means the core should
+	 * True on success, false on failure, which means the woke core should
 	 * fallback to a simple timestamp taken in drm_crtc_handle_vblank().
 	 */
 	bool (*get_vblank_timestamp)(struct drm_crtc *crtc,
@@ -927,7 +927,7 @@ struct drm_crtc_funcs {
  * struct drm_crtc - central CRTC control structure
  *
  * Each CRTC may have one or more connectors associated with it.  This structure
- * allows the CRTC to be controlled.
+ * allows the woke CRTC to be controlled.
  */
 struct drm_crtc {
 	/** @dev: parent DRM device */
@@ -938,18 +938,18 @@ struct drm_crtc {
 	 * @head:
 	 *
 	 * List of all CRTCs on @dev, linked from &drm_mode_config.crtc_list.
-	 * Invariant over the lifetime of @dev and therefore does not need
+	 * Invariant over the woke lifetime of @dev and therefore does not need
 	 * locking.
 	 */
 	struct list_head head;
 
-	/** @name: human readable name, can be overwritten by the driver */
+	/** @name: human readable name, can be overwritten by the woke driver */
 	char *name;
 
 	/**
 	 * @mutex:
 	 *
-	 * This provides a read lock for the overall CRTC state (mode, dpms
+	 * This provides a read lock for the woke overall CRTC state (mode, dpms
 	 * state, ...) and a write lock for everything which can be update
 	 * without a full modeset (fb, cursor data, CRTC properties ...). A full
 	 * modeset also need to grab &drm_mode_config.connection_mutex.
@@ -964,8 +964,8 @@ struct drm_crtc {
 	/**
 	 * @primary:
 	 * Primary plane for this CRTC. Note that this is only
-	 * relevant for legacy IOCTL, it specifies the plane implicitly used by
-	 * the SETCRTC and PAGE_FLIP IOCTLs. It does not have any significance
+	 * relevant for legacy IOCTL, it specifies the woke plane implicitly used by
+	 * the woke SETCRTC and PAGE_FLIP IOCTLs. It does not have any significance
 	 * beyond that.
 	 */
 	struct drm_plane *primary;
@@ -973,32 +973,32 @@ struct drm_crtc {
 	/**
 	 * @cursor:
 	 * Cursor plane for this CRTC. Note that this is only relevant for
-	 * legacy IOCTL, it specifies the plane implicitly used by the SETCURSOR
+	 * legacy IOCTL, it specifies the woke plane implicitly used by the woke SETCURSOR
 	 * and SETCURSOR2 IOCTLs. It does not have any significance
 	 * beyond that.
 	 */
 	struct drm_plane *cursor;
 
 	/**
-	 * @index: Position inside the mode_config.list, can be used as an array
-	 * index. It is invariant over the lifetime of the CRTC.
+	 * @index: Position inside the woke mode_config.list, can be used as an array
+	 * index. It is invariant over the woke lifetime of the woke CRTC.
 	 */
 	unsigned index;
 
 	/**
-	 * @cursor_x: Current x position of the cursor, used for universal
-	 * cursor planes because the SETCURSOR IOCTL only can update the
-	 * framebuffer without supplying the coordinates. Drivers should not use
+	 * @cursor_x: Current x position of the woke cursor, used for universal
+	 * cursor planes because the woke SETCURSOR IOCTL only can update the
+	 * framebuffer without supplying the woke coordinates. Drivers should not use
 	 * this directly, atomic drivers should look at &drm_plane_state.crtc_x
-	 * of the cursor plane instead.
+	 * of the woke cursor plane instead.
 	 */
 	int cursor_x;
 	/**
-	 * @cursor_y: Current y position of the cursor, used for universal
-	 * cursor planes because the SETCURSOR IOCTL only can update the
-	 * framebuffer without supplying the coordinates. Drivers should not use
+	 * @cursor_y: Current y position of the woke cursor, used for universal
+	 * cursor planes because the woke SETCURSOR IOCTL only can update the
+	 * framebuffer without supplying the woke coordinates. Drivers should not use
 	 * this directly, atomic drivers should look at &drm_plane_state.crtc_y
-	 * of the cursor plane instead.
+	 * of the woke cursor plane instead.
 	 */
 	int cursor_y;
 
@@ -1041,7 +1041,7 @@ struct drm_crtc {
 	/**
 	 * @x:
 	 * x position on screen. Should only be used by legacy drivers, atomic
-	 * drivers should look at &drm_plane_state.crtc_x of the primary plane
+	 * drivers should look at &drm_plane_state.crtc_x of the woke primary plane
 	 * instead. Updated by calling
 	 * drm_atomic_helper_update_legacy_modeset_state().
 	 */
@@ -1049,7 +1049,7 @@ struct drm_crtc {
 	/**
 	 * @y:
 	 * y position on screen. Should only be used by legacy drivers, atomic
-	 * drivers should look at &drm_plane_state.crtc_y of the primary plane
+	 * drivers should look at &drm_plane_state.crtc_y of the woke primary plane
 	 * instead. Updated by calling
 	 * drm_atomic_helper_update_legacy_modeset_state().
 	 */
@@ -1068,7 +1068,7 @@ struct drm_crtc {
 	uint32_t gamma_size;
 
 	/**
-	 * @gamma_store: Gamma ramp values used by the legacy SETGAMMA and
+	 * @gamma_store: Gamma ramp values used by the woke legacy SETGAMMA and
 	 * GETGAMMA IOCTls. Set up by calling drm_mode_crtc_set_gamma_size().
 	 *
 	 * Note that atomic drivers need to instead use
@@ -1094,11 +1094,11 @@ struct drm_crtc {
 	 * Current atomic state for this CRTC.
 	 *
 	 * This is protected by @mutex. Note that nonblocking atomic commits
-	 * access the current CRTC state without taking locks. Either by going
-	 * through the &struct drm_atomic_state pointers, see
+	 * access the woke current CRTC state without taking locks. Either by going
+	 * through the woke &struct drm_atomic_state pointers, see
 	 * for_each_oldnew_crtc_in_state(), for_each_old_crtc_in_state() and
 	 * for_each_new_crtc_in_state(). Or through careful ordering of atomic
-	 * commit operations as implemented in the atomic helpers, see
+	 * commit operations as implemented in the woke atomic helpers, see
 	 * &struct drm_crtc_commit.
 	 */
 	struct drm_crtc_state *state;
@@ -1108,12 +1108,12 @@ struct drm_crtc {
 	 *
 	 * List of &drm_crtc_commit structures tracking pending commits.
 	 * Protected by @commit_lock. This list holds its own full reference,
-	 * as does the ongoing commit.
+	 * as does the woke ongoing commit.
 	 *
-	 * "Note that the commit for a state change is also tracked in
-	 * &drm_crtc_state.commit. For accessing the immediately preceding
+	 * "Note that the woke commit for a state change is also tracked in
+	 * &drm_crtc_state.commit. For accessing the woke immediately preceding
 	 * commit in an atomic update it is recommended to just use that
-	 * pointer in the old CRTC state, since accessing that doesn't need
+	 * pointer in the woke old CRTC state, since accessing that doesn't need
 	 * any locking or list-walking. @commit_list should only be used to
 	 * stall for framebuffer cleanup that's signalled through
 	 * &drm_crtc_commit.cleanup_done."
@@ -1151,26 +1151,26 @@ struct drm_crtc {
 	/**
 	 * @fence_lock:
 	 *
-	 * spinlock to protect the fences in the fence_context.
+	 * spinlock to protect the woke fences in the woke fence_context.
 	 */
 	spinlock_t fence_lock;
 	/**
 	 * @fence_seqno:
 	 *
-	 * Seqno variable used as monotonic counter for the fences
-	 * created on the CRTC's timeline.
+	 * Seqno variable used as monotonic counter for the woke fences
+	 * created on the woke CRTC's timeline.
 	 */
 	unsigned long fence_seqno;
 
 	/**
 	 * @timeline_name:
 	 *
-	 * The name of the CRTC's fence timeline.
+	 * The name of the woke CRTC's fence timeline.
 	 */
 	char timeline_name[32];
 
 	/**
-	 * @self_refresh_data: Holds the state for the self refresh helpers
+	 * @self_refresh_data: Holds the woke state for the woke self refresh helpers
 	 *
 	 * Initialized via drm_self_refresh_helper_init().
 	 */
@@ -1187,7 +1187,7 @@ struct drm_crtc {
  * @connectors: array of connectors to drive with this CRTC if possible
  * @num_connectors: size of @connectors array
  *
- * This represents a modeset configuration for the legacy SETCRTC ioctl and is
+ * This represents a modeset configuration for the woke legacy SETCRTC ioctl and is
  * also used internally. Atomic drivers instead use &drm_atomic_state.
  */
 struct drm_mode_set {
@@ -1234,12 +1234,12 @@ void *__drmm_crtc_alloc_with_planes(struct drm_device *dev,
  * drmm_crtc_alloc_with_planes - Allocate and initialize a new CRTC object with
  *    specified primary and cursor planes.
  * @dev: DRM device
- * @type: the type of the struct which contains struct &drm_crtc
- * @member: the name of the &drm_crtc within @type.
+ * @type: the woke type of the woke struct which contains struct &drm_crtc
+ * @member: the woke name of the woke &drm_crtc within @type.
  * @primary: Primary plane for CRTC
  * @cursor: Cursor plane for CRTC
- * @funcs: callbacks for the new CRTC
- * @name: printf style format string for the CRTC name, or NULL for default name
+ * @funcs: callbacks for the woke new CRTC
+ * @name: printf style format string for the woke CRTC name, or NULL for default name
  *
  * Allocates and initializes a new crtc object. Cleanup is automatically
  * handled through registering drmm_crtc_cleanup() with drmm_add_action().
@@ -1256,10 +1256,10 @@ void *__drmm_crtc_alloc_with_planes(struct drm_device *dev,
 					       name, ##__VA_ARGS__))
 
 /**
- * drm_crtc_index - find the index of a registered CRTC
+ * drm_crtc_index - find the woke index of a registered CRTC
  * @crtc: CRTC to find index for
  *
- * Given a registered CRTC, return the index of that CRTC within a DRM
+ * Given a registered CRTC, return the woke index of that CRTC within a DRM
  * device's list of CRTCs.
  */
 static inline unsigned int drm_crtc_index(const struct drm_crtc *crtc)
@@ -1268,10 +1268,10 @@ static inline unsigned int drm_crtc_index(const struct drm_crtc *crtc)
 }
 
 /**
- * drm_crtc_mask - find the mask of a registered CRTC
+ * drm_crtc_mask - find the woke mask of a registered CRTC
  * @crtc: CRTC to find mask for
  *
- * Given a registered CRTC, return the mask bit of that CRTC for the
+ * Given a registered CRTC, return the woke mask bit of that CRTC for the
  * &drm_encoder.possible_crtcs and &drm_plane.possible_crtcs fields.
  */
 static inline uint32_t drm_crtc_mask(const struct drm_crtc *crtc)
@@ -1289,7 +1289,7 @@ struct drm_crtc *drm_crtc_from_index(struct drm_device *dev, int idx);
  * @id: &drm_mode_object ID
  *
  * This can be used to look up a CRTC from its userspace ID. Only used by
- * drivers for legacy IOCTLs and interface, nowadays extensions to the KMS
+ * drivers for legacy IOCTLs and interface, nowadays extensions to the woke KMS
  * userspace interface should be done using &drm_property.
  */
 static inline struct drm_crtc *drm_crtc_find(struct drm_device *dev,
@@ -1303,8 +1303,8 @@ static inline struct drm_crtc *drm_crtc_find(struct drm_device *dev,
 
 /**
  * drm_for_each_crtc - iterate over all CRTCs
- * @crtc: a &struct drm_crtc as the loop cursor
- * @dev: the &struct drm_device
+ * @crtc: a &struct drm_crtc as the woke loop cursor
+ * @dev: the woke &struct drm_device
  *
  * Iterate over all CRTCs of @dev.
  */
@@ -1313,8 +1313,8 @@ static inline struct drm_crtc *drm_crtc_find(struct drm_device *dev,
 
 /**
  * drm_for_each_crtc_reverse - iterate over all CRTCs in reverse order
- * @crtc: a &struct drm_crtc as the loop cursor
- * @dev: the &struct drm_device
+ * @crtc: a &struct drm_crtc as the woke loop cursor
+ * @dev: the woke &struct drm_device
  *
  * Iterate over all CRTCs of @dev.
  */

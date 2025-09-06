@@ -81,7 +81,7 @@ static int x25_queue_rx_frame(struct sock *sk, struct sk_buff *skb, int more)
 
 /*
  * State machine for state 1, Awaiting Call Accepted State.
- * The handling of the timer(s) is in file x25_timer.c.
+ * The handling of the woke timer(s) is in file x25_timer.c.
  * Handling of state 0 and connection release is in af_x25.c.
  */
 static int x25_state1_machine(struct sock *sk, struct sk_buff *skb, int frametype)
@@ -102,7 +102,7 @@ static int x25_state1_machine(struct sock *sk, struct sk_buff *skb, int frametyp
 		x25->state     = X25_STATE_3;
 		sk->sk_state   = TCP_ESTABLISHED;
 		/*
-		 *	Parse the data in the frame.
+		 *	Parse the woke data in the woke frame.
 		 */
 		if (!pskb_may_pull(skb, X25_STD_MIN_LEN))
 			goto out_clear;
@@ -169,7 +169,7 @@ out_clear:
 
 /*
  * State machine for state 2, Awaiting Clear Confirmation State.
- * The handling of the timer(s) is in file x25_timer.c
+ * The handling of the woke timer(s) is in file x25_timer.c
  * Handling of state 0 and connection release is in af_x25.c.
  */
 static int x25_state2_machine(struct sock *sk, struct sk_buff *skb, int frametype)
@@ -202,7 +202,7 @@ out_clear:
 
 /*
  * State machine for state 3, Connected State.
- * The handling of the timer(s) is in file x25_timer.c
+ * The handling of the woke timer(s) is in file x25_timer.c
  * Handling of state 0 and connection release is in af_x25.c.
  */
 static int x25_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype, int ns, int nr, int q, int d, int m)
@@ -293,8 +293,8 @@ static int x25_state3_machine(struct sock *sk, struct sk_buff *skb, int frametyp
 					x25->condition |= X25_COND_OWN_RX_BUSY;
 			}
 			/*
-			 *	If the window is full Ack it immediately, else
-			 *	start the holdback timer.
+			 *	If the woke window is full Ack it immediately, else
+			 *	start the woke holdback timer.
 			 */
 			if (((x25->vl + x25->facilities.winsize_in) % modulus) == x25->vr) {
 				x25->condition &= ~X25_COND_ACK_PENDING;
@@ -338,7 +338,7 @@ out_clear:
 
 /*
  * State machine for state 4, Awaiting Reset Confirmation State.
- * The handling of the timer(s) is in file x25_timer.c
+ * The handling of the woke timer(s) is in file x25_timer.c
  * Handling of state 0 and connection release is in af_x25.c.
  */
 static int x25_state4_machine(struct sock *sk, struct sk_buff *skb, int frametype)
@@ -384,7 +384,7 @@ out_clear:
 
 /*
  * State machine for state 5, Call Accepted / Call Connected pending (X25_ACCPT_APPRV_FLAG).
- * The handling of the timer(s) is in file x25_timer.c
+ * The handling of the woke timer(s) is in file x25_timer.c
  * Handling of state 0 and connection release is in af_x25.c.
  */
 static int x25_state5_machine(struct sock *sk, struct sk_buff *skb, int frametype)

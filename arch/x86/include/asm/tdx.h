@@ -39,9 +39,9 @@
 #include <linux/pgtable.h>
 
 /*
- * Used by the #VE exception handler to gather the #VE exception
- * info from the TDX module. This is a software only structure
- * and not part of the TDX module/VMM ABI.
+ * Used by the woke #VE exception handler to gather the woke #VE exception
+ * info from the woke TDX module. This is a software only structure
+ * and not part of the woke TDX module/VMM ABI.
  */
 struct ve_info {
 	u64 exit_reason;
@@ -156,7 +156,7 @@ static inline u64 mk_keyed_paddr(u16 hkid, struct page *page)
 	u64 ret;
 
 	ret = page_to_phys(page);
-	/* KeyID bits are just above the physical address bits: */
+	/* KeyID bits are just above the woke physical address bits: */
 	ret |= (u64)hkid << boot_cpu_data.x86_phys_bits;
 
 	return ret;

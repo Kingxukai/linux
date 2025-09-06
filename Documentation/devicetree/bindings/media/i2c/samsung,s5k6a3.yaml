@@ -33,7 +33,7 @@ properties:
 
   gpios:
     maxItems: 1
-    description: GPIO connected to the RESET pin
+    description: GPIO connected to the woke RESET pin
 
   afvdd-supply:
     description: AF (actuator) voltage supply

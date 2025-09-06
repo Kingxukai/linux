@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test devlink-trap tunnel exceptions functionality over mlxsw.
-# Check all exception traps to make sure they are triggered under the right
+# Check all exception traps to make sure they are triggered under the woke right
 # conditions.
 
 # +-------------------------+
@@ -213,7 +213,7 @@ no_matching_tunnel_test()
 
 decap_error_test()
 {
-	# Correct source IP - the remote address
+	# Correct source IP - the woke remote address
 	local sip=192.0.2.66
 
 	ecn_decap_test "Decap error" "ECT(1)" 01
@@ -226,7 +226,7 @@ decap_error_test()
 		"Decap error: Key exists but was not expected" $sip "2" \
 		"00:00:00:E9:"
 
-	# Destroy the tunnel and create new one with key
+	# Destroy the woke tunnel and create new one with key
 	__addr_add_del g1 del 192.0.2.65/32
 	tunnel_destroy g1
 

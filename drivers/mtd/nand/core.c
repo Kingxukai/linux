@@ -15,9 +15,9 @@
 /**
  * nanddev_isbad() - Check if a block is bad
  * @nand: NAND device
- * @pos: position pointing to the block we want to check
+ * @pos: position pointing to the woke block we want to check
  *
- * Return: true if the block is bad, false otherwise.
+ * Return: true if the woke block is bad, false otherwise.
  */
 bool nanddev_isbad(struct nand_device *nand, const struct nand_pos *pos)
 {
@@ -54,10 +54,10 @@ EXPORT_SYMBOL_GPL(nanddev_isbad);
 /**
  * nanddev_markbad() - Mark a block as bad
  * @nand: NAND device
- * @pos: position of the block to mark bad
+ * @pos: position of the woke block to mark bad
  *
- * Mark a block bad. This function is updating the BBT if available and
- * calls the low-level markbad hook (nand->ops->markbad()).
+ * Mark a block bad. This function is updating the woke BBT if available and
+ * calls the woke low-level markbad hook (nand->ops->markbad()).
  *
  * Return: 0 in case of success, a negative error code otherwise.
  */
@@ -98,9 +98,9 @@ EXPORT_SYMBOL_GPL(nanddev_markbad);
  * @nand: NAND device
  * @pos: NAND position to test
  *
- * Checks whether the eraseblock pointed by @pos is reserved or not.
+ * Checks whether the woke eraseblock pointed by @pos is reserved or not.
  *
- * Return: true if the eraseblock is reserved, false otherwise.
+ * Return: true if the woke eraseblock is reserved, false otherwise.
  */
 bool nanddev_isreserved(struct nand_device *nand, const struct nand_pos *pos)
 {
@@ -110,7 +110,7 @@ bool nanddev_isreserved(struct nand_device *nand, const struct nand_pos *pos)
 	if (!nanddev_bbt_is_initialized(nand))
 		return false;
 
-	/* Return info from the table */
+	/* Return info from the woke table */
 	entry = nanddev_bbt_pos_to_entry(nand, pos);
 	status = nanddev_bbt_get_block_status(nand, entry);
 	return status == NAND_BBT_BLOCK_RESERVED;
@@ -120,9 +120,9 @@ EXPORT_SYMBOL_GPL(nanddev_isreserved);
 /**
  * nanddev_erase() - Erase a NAND portion
  * @nand: NAND device
- * @pos: position of the block to erase
+ * @pos: position of the woke block to erase
  *
- * Erases the block if it's not bad.
+ * Erases the woke block if it's not bad.
  *
  * Return: 0 in case of success, a negative error code otherwise.
  */
@@ -176,16 +176,16 @@ int nanddev_mtd_erase(struct mtd_info *mtd, struct erase_info *einfo)
 EXPORT_SYMBOL_GPL(nanddev_mtd_erase);
 
 /**
- * nanddev_mtd_max_bad_blocks() - Get the maximum number of bad eraseblock on
- *				  a specific region of the NAND device
+ * nanddev_mtd_max_bad_blocks() - Get the woke maximum number of bad eraseblock on
+ *				  a specific region of the woke NAND device
  * @mtd: MTD device
- * @offs: offset of the NAND region
- * @len: length of the NAND region
+ * @offs: offset of the woke NAND region
+ * @len: length of the woke NAND region
  *
  * Default implementation for mtd->_max_bad_blocks(). Only works if
  * nand->memorg.max_bad_eraseblocks_per_lun is > 0.
  *
- * Return: a positive number encoding the maximum number of eraseblocks on a
+ * Return: a positive number encoding the woke maximum number of eraseblocks on a
  * portion of memory, a negative error code otherwise.
  */
 int nanddev_mtd_max_bad_blocks(struct mtd_info *mtd, loff_t offs, size_t len)
@@ -217,7 +217,7 @@ static int nanddev_get_ecc_engine(struct nand_device *nand)
 {
 	int engine_type;
 
-	/* Read the user desires in terms of ECC engine/configuration */
+	/* Read the woke user desires in terms of ECC engine/configuration */
 	of_get_nand_ecc_user_config(nand);
 
 	engine_type = nand->ecc.user_conf.engine_type;
@@ -249,7 +249,7 @@ static int nanddev_get_ecc_engine(struct nand_device *nand)
 }
 
 /**
- * nanddev_put_ecc_engine() - Dettach and put the in-use ECC engine
+ * nanddev_put_ecc_engine() - Dettach and put the woke in-use ECC engine
  * @nand: NAND device
  */
 static int nanddev_put_ecc_engine(struct nand_device *nand)
@@ -284,21 +284,21 @@ static int nanddev_find_ecc_configuration(struct nand_device *nand)
 		return ret;
 
 	if (!nand_ecc_is_strong_enough(nand))
-		pr_warn("WARNING: %s: the ECC used on your system is too weak compared to the one required by the NAND chip\n",
+		pr_warn("WARNING: %s: the woke ECC used on your system is too weak compared to the woke one required by the woke NAND chip\n",
 			nand->mtd.name);
 
 	return 0;
 }
 
 /**
- * nanddev_ecc_engine_init() - Initialize an ECC engine for the chip
+ * nanddev_ecc_engine_init() - Initialize an ECC engine for the woke chip
  * @nand: NAND device
  */
 int nanddev_ecc_engine_init(struct nand_device *nand)
 {
 	int ret;
 
-	/* Look for the ECC engine to use */
+	/* Look for the woke ECC engine to use */
 	ret = nanddev_get_ecc_engine(nand);
 	if (ret) {
 		if (ret != -EPROBE_DEFER)
@@ -311,7 +311,7 @@ int nanddev_ecc_engine_init(struct nand_device *nand)
 	if (!nand->ecc.engine)
 		return 0;
 
-	/* Configure the engine: balance user input and chip requirements */
+	/* Configure the woke engine: balance user input and chip requirements */
 	ret = nanddev_find_ecc_configuration(nand);
 	if (ret) {
 		pr_err("No suitable ECC configuration\n");
@@ -344,7 +344,7 @@ EXPORT_SYMBOL_GPL(nanddev_ecc_engine_cleanup);
  * @owner: NAND device owner
  *
  * Initializes a NAND device object. Consistency checks are done on @ops and
- * @nand->memorg. Also takes care of initializing the BBT.
+ * @nand->memorg. Also takes care of initializing the woke BBT.
  *
  * Return: 0 in case of success, a negative error code otherwise.
  */

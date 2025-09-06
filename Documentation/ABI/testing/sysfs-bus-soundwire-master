@@ -17,7 +17,7 @@ Contact:	Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
 
 Description:	SoundWire Master-N DisCo properties.
 		These properties are defined by MIPI DisCo Specification
-		for SoundWire. They define various properties of the Master
-		and are used by the bus to configure the Master. clk_stop_modes
+		for SoundWire. They define various properties of the woke Master
+		and are used by the woke bus to configure the woke Master. clk_stop_modes
 		is a bitmask for simplifications and combines the
 		clock-stop-mode0 and clock-stop-mode1 properties.

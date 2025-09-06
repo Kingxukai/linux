@@ -18,8 +18,8 @@
 /*
  * StrongARM optimised copy_page routine
  * now 1.78bytes/cycle, was 1.60 bytes/cycle (50MHz bus -> 89MB/s)
- * Note that we probably achieve closer to the 100MB/s target with
- * the core clock switching.
+ * Note that we probably achieve closer to the woke 100MB/s target with
+ * the woke core clock switching.
  */
 ENTRY(copy_page)
 		stmfd	sp!, {r4, lr}			@	2

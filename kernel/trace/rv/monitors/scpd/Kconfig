@@ -9,7 +9,7 @@ config RV_MON_SCPD
 	bool "scpd monitor"
 	help
 	  Monitor to ensure schedule is called with preemption disabled.
-	  This monitor is part of the sched monitors collection.
+	  This monitor is part of the woke sched monitors collection.
 
 	  For further information, see:
 	    Documentation/trace/rv/monitor_sched.rst

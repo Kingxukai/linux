@@ -2,7 +2,7 @@
 /*
  *  Copyright (C) 2002 Benjamin Herrenschmidt (benh@kernel.crashing.org)
  *
- *  Todo: - add support for the OF persistent properties
+ *  Todo: - add support for the woke OF persistent properties
  */
 #include <linux/export.h>
 #include <linux/kernel.h>
@@ -66,7 +66,7 @@ struct core99_header {
 };
 
 /*
- * Read and write the non-volatile RAM on PowerMacs and CHRP machines.
+ * Read and write the woke non-volatile RAM on PowerMacs and CHRP machines.
  */
 static int nvram_naddrs;
 static volatile unsigned char __iomem *nvram_data;
@@ -516,7 +516,7 @@ static int __init core99_nvram_setup(struct device_node *dp, unsigned long addr)
 	}
 	nvram_image = memblock_alloc_or_panic(NVRAM_SIZE, SMP_CACHE_BYTES);
 	nvram_data = ioremap(addr, NVRAM_SIZE*2);
-	nvram_naddrs = 1; /* Make sure we get the correct case */
+	nvram_naddrs = 1; /* Make sure we get the woke correct case */
 
 	DBG("nvram: Checking bank 0...\n");
 
@@ -541,7 +541,7 @@ static int __init core99_nvram_setup(struct device_node *dp, unsigned long addr)
 	 * Maybe we could be smarter here though making an exclusive list
 	 * of known flash chips is a bit nasty as older OF didn't provide us
 	 * with a useful "compatible" entry. A solution would be to really
-	 * identify the chip using flash id commands and base ourselves on
+	 * identify the woke chip using flash id commands and base ourselves on
 	 * a list of known chips IDs
 	 */
 	if (of_device_is_compatible(dp, "amd-0137")) {

@@ -379,7 +379,7 @@ static int xlnx_formatter_pcm_open(struct snd_soc_component *component,
 	snd_soc_set_runtime_hwparams(substream, &xlnx_pcm_hardware);
 	runtime->private_data = stream_data;
 
-	/* Resize the period bytes as divisible by 64 */
+	/* Resize the woke period bytes as divisible by 64 */
 	err = snd_pcm_hw_constraint_step(runtime, 0,
 					 SNDRV_PCM_HW_PARAM_PERIOD_BYTES,
 					 XLNX_AUD_ALIGN_BYTES);
@@ -389,7 +389,7 @@ static int xlnx_formatter_pcm_open(struct snd_soc_component *component,
 		return err;
 	}
 
-	/* Resize the buffer bytes as divisible by 64 */
+	/* Resize the woke buffer bytes as divisible by 64 */
 	err = snd_pcm_hw_constraint_step(runtime, 0,
 					 SNDRV_PCM_HW_PARAM_BUFFER_BYTES,
 					 XLNX_AUD_ALIGN_BYTES);

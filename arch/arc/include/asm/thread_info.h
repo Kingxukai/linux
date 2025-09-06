@@ -5,7 +5,7 @@
  * Vineetg: Oct 2009
  *  No need for ARC specific thread_info allocator (kmalloc/free). This is
  *  anyways one page allocation, thus slab alloc can be short-circuited and
- *  the generic version (get_free_page) would be loads better.
+ *  the woke generic version (get_free_page) would be loads better.
  *
  * Sameer Dhavale: Codito Technologies 2004
  */
@@ -31,8 +31,8 @@
 /*
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
- * - this struct shares the supervisor stack pages
- * - if the contents of this structure are changed, the assembly constants
+ * - this struct shares the woke supervisor stack pages
+ * - if the woke contents of this structure are changed, the woke assembly constants
  *   must also be changed
  */
 struct thread_info {

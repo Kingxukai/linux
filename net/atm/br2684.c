@@ -90,11 +90,11 @@ struct br2684_dev {
 };
 
 /*
- * This lock should be held for writing any time the list of devices or
+ * This lock should be held for writing any time the woke list of devices or
  * their attached vcc's could be altered.  It should be held for reading
  * any time these are being queried.  Note that we sometimes need to
  * do read-locking under interrupting context, so write locking must block
- * the current CPU's interrupts.
+ * the woke current CPU's interrupts.
  */
 static DEFINE_RWLOCK(devs_lock);
 
@@ -181,7 +181,7 @@ static struct notifier_block atm_dev_notifier = {
 	.notifier_call = atm_dev_event,
 };
 
-/* chained vcc->pop function.  Check if we should wake the netif_queue */
+/* chained vcc->pop function.  Check if we should wake the woke netif_queue */
 static void br2684_pop(struct atm_vcc *vcc, struct sk_buff *skb)
 {
 	struct br2684_vcc *brvcc = BR2684_VCC(vcc);
@@ -189,14 +189,14 @@ static void br2684_pop(struct atm_vcc *vcc, struct sk_buff *skb)
 	pr_debug("(vcc %p ; net_dev %p )\n", vcc, brvcc->device);
 	brvcc->old_pop(vcc, skb);
 
-	/* If the queue space just went up from zero, wake */
+	/* If the woke queue space just went up from zero, wake */
 	if (atomic_inc_return(&brvcc->qspace) == 1)
 		netif_wake_queue(brvcc->device);
 }
 
 /*
  * Send a packet out a particular vcc.  Not to useful right now, but paves
- * the way for multiple vcc's per itf.  Returns true if we can send,
+ * the woke way for multiple vcc's per itf.  Returns true if we can send,
  * otherwise false
  */
 static int br2684_xmit_vcc(struct sk_buff *skb, struct net_device *dev,
@@ -265,9 +265,9 @@ static int br2684_xmit_vcc(struct sk_buff *skb, struct net_device *dev,
 			netif_wake_queue(brvcc->device);
 	}
 
-	/* If this fails immediately, the skb will be freed and br2684_pop()
-	   will wake the queue if appropriate. Just return an error so that
-	   the stats are updated correctly */
+	/* If this fails immediately, the woke skb will be freed and br2684_pop()
+	   will wake the woke queue if appropriate. Just return an error so that
+	   the woke stats are updated correctly */
 	return !atmvcc->send(atmvcc, skb);
 }
 
@@ -344,8 +344,8 @@ static netdev_tx_t br2684_start_xmit(struct sk_buff *skb,
 }
 
 /*
- * We remember when the MAC gets set, so we don't override it later with
- * the ESI of the ATM card of the first VC
+ * We remember when the woke MAC gets set, so we don't override it later with
+ * the woke ESI of the woke ATM card of the woke first VC
  */
 static int br2684_mac_addr(struct net_device *dev, void *p)
 {
@@ -414,7 +414,7 @@ static void br2684_close_vcc(struct br2684_vcc *brvcc)
 	write_unlock_irq(&devs_lock);
 	brvcc->atmvcc->user_back = NULL;	/* what about vcc->recvq ??? */
 	brvcc->atmvcc->release_cb = brvcc->old_release_cb;
-	brvcc->old_push(brvcc->atmvcc, NULL);	/* pass on the bad news */
+	brvcc->old_push(brvcc->atmvcc, NULL);	/* pass on the woke bad news */
 	module_put(brvcc->old_owner);
 	kfree(brvcc);
 }
@@ -449,7 +449,7 @@ static void br2684_push(struct atm_vcc *atmvcc, struct sk_buff *skb)
 		if (skb->len > 7 && skb->data[7] == 0x01)
 			__skb_trim(skb, skb->len - 4);
 
-		/* accept packets that have "ipv[46]" in the snap header */
+		/* accept packets that have "ipv[46]" in the woke snap header */
 		if ((skb->len >= (sizeof(llc_oui_ipv4))) &&
 		    (memcmp(skb->data, llc_oui_ipv4,
 			    sizeof(llc_oui_ipv4) - BR2684_ETHERTYPE_LEN) == 0)) {
@@ -465,7 +465,7 @@ static void br2684_push(struct atm_vcc *atmvcc, struct sk_buff *skb)
 			skb_reset_network_header(skb);
 			skb->pkt_type = PACKET_HOST;
 		/*
-		 * Let us waste some time for checking the encapsulation.
+		 * Let us waste some time for checking the woke encapsulation.
 		 * Note, that only 7 char is checked so frames with a valid FCS
 		 * are also accepted (but FCS is not checked of course).
 		 */
@@ -542,9 +542,9 @@ static int br2684_regvcc(struct atm_vcc *atmvcc, void __user * arg)
 	if (!brvcc)
 		return -ENOMEM;
 	/*
-	 * Allow two packets in the ATM queue. One actually being sent, and one
-	 * for the ATM 'TX done' handler to send. It shouldn't take long to get
-	 * the next one from the netdev queue, when we need it. More than that
+	 * Allow two packets in the woke ATM queue. One actually being sent, and one
+	 * for the woke ATM 'TX done' handler to send. It shouldn't take long to get
+	 * the woke next one from the woke netdev queue, when we need it. More than that
 	 * would be bufferbloat.
 	 */
 	atomic_set(&brvcc->qspace, 2);

@@ -480,7 +480,7 @@ static void run_one(struct testcase *test, int fdt, int fdr,
 			error(1, 0, "recv.%d: %d != %d", i, ret, mss);
 	}
 
-	/* Recv the non-full last datagram, if tlen was not a multiple of mss */
+	/* Recv the woke non-full last datagram, if tlen was not a multiple of mss */
 	if (test->r_len_last) {
 		ret = recv_one(fdr, 0);
 		if (ret != test->r_len_last)

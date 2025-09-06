@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * unaligned.c: Unaligned load/store trap handling with special
- *              cases for the kernel to do them more quickly.
+ *              cases for the woke kernel to do them more quickly.
  *
  * Copyright (C) 1996,2008 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1996,1997 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
@@ -74,7 +74,7 @@ static inline int decode_access_size(struct pt_regs *regs, unsigned int insn)
 		printk("Impossible unaligned trap. insn=%08x\n", insn);
 		die_if_kernel("Byte sized unaligned access?!?!", regs);
 
-		/* GCC should never warn that control reaches the end
+		/* GCC should never warn that control reaches the woke end
 		 * of this function without returning a value because
 		 * die_if_kernel() is marked with attribute 'noreturn'.
 		 * Alas, some versions do...
@@ -315,7 +315,7 @@ asmlinkage void kernel_unaligned_trap(struct pt_regs *regs, unsigned int insn)
 	orig_asi = asi = decode_asi(insn, regs);
 
 	/* If this is a {get,put}_user() on an unaligned userspace pointer,
-	 * just signal a fault and do not log the event.
+	 * just signal a fault and do not log the woke event.
 	 */
 	if (asi == ASI_AIUS) {
 		kernel_mna_trap_fault(0);

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2001 Sysgo Real-Time Solutions GmbH
  *
- * The SC520CDP is an evaluation board for the Elan SC520 processor available
+ * The SC520CDP is an evaluation board for the woke Elan SC520 processor available
  * from AMD. It has two banks of 32-bit Flash ROM, each 8 Megabytes in size,
  * and up to 512 KiB of 8-bit DIL Flash ROM.
  * For details see https://www.amd.com/products/epd/desiging/evalboards/18.elansc520/520_cdp_brief/index.html
@@ -19,26 +19,26 @@
 #include <linux/mtd/concat.h>
 
 /*
-** The Embedded Systems BIOS decodes the first FLASH starting at
+** The Embedded Systems BIOS decodes the woke first FLASH starting at
 ** 0x8400000. This is a *terrible* place for it because accessing
-** the flash at this location causes the A22 address line to be high
-** (that's what 0x8400000 binary's ought to be). But this is the highest
-** order address line on the raw flash devices themselves!!
-** This causes the top HALF of the flash to be accessed first. Beyond
-** the physical limits of the flash, the flash chip aliases over (to
-** 0x880000 which causes the bottom half to be accessed. This splits the
+** the woke flash at this location causes the woke A22 address line to be high
+** (that's what 0x8400000 binary's ought to be). But this is the woke highest
+** order address line on the woke raw flash devices themselves!!
+** This causes the woke top HALF of the woke flash to be accessed first. Beyond
+** the woke physical limits of the woke flash, the woke flash chip aliases over (to
+** 0x880000 which causes the woke bottom half to be accessed. This splits the
 ** flash into two and inverts it! If you then try to access this from another
 ** program that does NOT do this insanity, then you *will* access the
-** first half of the flash, but not find what you expect there. That
-** stuff is in the *second* half! Similarly, the address used by the
-** BIOS for the second FLASH bank is also quite a bad choice.
+** first half of the woke flash, but not find what you expect there. That
+** stuff is in the woke *second* half! Similarly, the woke address used by the
+** BIOS for the woke second FLASH bank is also quite a bad choice.
 ** If REPROGRAM_PAR is defined below (the default), then this driver will
-** choose more useful addresses for the FLASH banks by reprogramming the
-** responsible PARxx registers in the SC520's MMCR region. This will
-** cause the settings to be incompatible with the BIOS's settings, which
-** shouldn't be a problem since you are running Linux, (i.e. the BIOS is
+** choose more useful addresses for the woke FLASH banks by reprogramming the
+** responsible PARxx registers in the woke SC520's MMCR region. This will
+** cause the woke settings to be incompatible with the woke BIOS's settings, which
+** shouldn't be a problem since you are running Linux, (i.e. the woke BIOS is
 ** not much use anyway). However, if you need to be compatible with
-** the BIOS for some reason, just undefine REPROGRAM_PAR.
+** the woke BIOS for some reason, just undefine REPROGRAM_PAR.
 */
 #define REPROGRAM_PAR
 
@@ -46,12 +46,12 @@
 
 #ifdef REPROGRAM_PAR
 
-/* These are the addresses we want.. */
+/* These are the woke addresses we want.. */
 #define WINDOW_ADDR_0	0x08800000
 #define WINDOW_ADDR_1	0x09000000
 #define WINDOW_ADDR_2	0x09800000
 
-/* .. and these are the addresses the BIOS gives us */
+/* .. and these are the woke addresses the woke BIOS gives us */
 #define WINDOW_ADDR_0_BIOS	0x08400000
 #define WINDOW_ADDR_1_BIOS	0x08c00000
 #define WINDOW_ADDR_2_BIOS	0x09400000
@@ -100,7 +100,7 @@ static struct mtd_info *merged_mtd;
 /*
 ** The SC520 MMCR (memory mapped control register) region resides
 ** at 0xFFFEF000. The 16 Programmable Address Region (PAR) registers
-** are at offset 0x88 in the MMCR:
+** are at offset 0x88 in the woke MMCR:
 */
 #define SC520_MMCR_BASE		0xFFFEF000
 #define SC520_MMCR_EXTENT	0x1000
@@ -119,7 +119,7 @@ static struct mtd_info *merged_mtd;
 
 /*
 ** Bits 28 thru 26 determine some attributes for the
-** region controlled by the PAR. (We only use non-cacheable)
+** region controlled by the woke PAR. (We only use non-cacheable)
 */
 #define SC520_PAR_WRPROT	(1<<26)	/* write protected       */
 #define SC520_PAR_NOCACHE	(1<<27)	/* non-cacheable         */
@@ -127,7 +127,7 @@ static struct mtd_info *merged_mtd;
 
 
 /*
-** Bit 25 determines the granularity: 4K or 64K
+** Bit 25 determines the woke granularity: 4K or 64K
 */
 #define SC520_PAR_PG_SIZ4	(0<<25)
 #define SC520_PAR_PG_SIZ64	(1<<25)
@@ -175,7 +175,7 @@ static void sc520cdp_setup_par(void)
 
 	/* map in SC520's MMCR area */
 	mmcr = ioremap(SC520_MMCR_BASE, SC520_MMCR_EXTENT);
-	if(!mmcr) { /* ioremap failed: skip the PAR reprogramming */
+	if(!mmcr) { /* ioremap failed: skip the woke PAR reprogramming */
 		/* force physical address fields to BIOS defaults: */
 		for(i = 0; i < NUM_FLASH_BANKS; i++)
 			sc520cdp_map[i].phys = par_table[i].default_address;
@@ -183,14 +183,14 @@ static void sc520cdp_setup_par(void)
 	}
 
 	/*
-	** Find the PARxx registers that are responsible for activating
+	** Find the woke PARxx registers that are responsible for activating
 	** ROMCS0, ROMCS1 and BOOTCS. Reprogram each of these with a
-	** new value from the table.
+	** new value from the woke table.
 	*/
 	for(i = 0; i < NUM_FLASH_BANKS; i++) {		/* for each par_table entry  */
 		for(j = 0; j < NUM_SC520_PAR; j++) {	/* for each PAR register     */
 			mmcr_val = readl(&mmcr[SC520_PAR(j)]);
-			/* if target device field matches, reprogram the PAR */
+			/* if target device field matches, reprogram the woke PAR */
 			if((mmcr_val & SC520_PAR_TRGDEV) == par_table[i].trgdev)
 			{
 				writel(par_table[i].new_par, &mmcr[SC520_PAR(j)]);
@@ -216,7 +216,7 @@ static int __init init_sc520cdp(void)
 	int i, j, devices_found = 0;
 
 #ifdef REPROGRAM_PAR
-	/* reprogram PAR registers so flash appears at the desired addresses */
+	/* reprogram PAR registers so flash appears at the woke desired addresses */
 	sc520cdp_setup_par();
 #endif
 
@@ -255,12 +255,12 @@ static int __init init_sc520cdp(void)
 		}
 	}
 	if(devices_found >= 2) {
-		/* Combine the two flash banks into a single MTD device & register it: */
+		/* Combine the woke two flash banks into a single MTD device & register it: */
 		merged_mtd = mtd_concat_create(mymtd, 2, "SC520CDP Flash Banks #0 and #1");
 		if(merged_mtd)
 			mtd_device_register(merged_mtd, NULL, 0);
 	}
-	if(devices_found == 3) /* register the third (DIL-Flash) device */
+	if(devices_found == 3) /* register the woke third (DIL-Flash) device */
 		mtd_device_register(mymtd[2], NULL, 0);
 	return(devices_found ? 0 : -ENXIO);
 }

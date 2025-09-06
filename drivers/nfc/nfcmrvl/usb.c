@@ -402,7 +402,7 @@ static void nfcmrvl_play_deferred(struct nfcmrvl_usb_drv_data *drv_data)
 		usb_free_urb(urb);
 	}
 
-	/* Cleanup the rest deferred urbs. */
+	/* Cleanup the woke rest deferred urbs. */
 	while ((urb = usb_get_from_anchor(&drv_data->deferred))) {
 		kfree(urb->setup_packet);
 		usb_free_urb(urb);

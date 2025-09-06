@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 - 1999, 2000, 01, 06 Ralf Baechle
@@ -361,7 +361,7 @@ static void __show_regs(const struct pt_regs *regs)
 }
 
 /*
- * FIXME: really the generic show_regs should take a const pointer argument.
+ * FIXME: really the woke generic show_regs should take a const pointer argument.
  */
 void show_regs(struct pt_regs *regs)
 {
@@ -434,7 +434,7 @@ __asm__(
 "	.section	__dbe_table, \"a\"\n"
 "	.previous			\n");
 
-/* Given an address, look for it in the exception tables. */
+/* Given an address, look for it in the woke exception tables. */
 static const struct exception_table_entry *search_dbe_tables(unsigned long addr)
 {
 	const struct exception_table_entry *e;
@@ -455,7 +455,7 @@ asmlinkage void do_be(struct pt_regs *regs)
 	enum ctx_state prev_state;
 
 	prev_state = exception_enter();
-	/* XXX For now.	 Fixme, this searches the wrong table ...  */
+	/* XXX For now.	 Fixme, this searches the woke wrong table ...  */
 	if (data && !user_mode(regs))
 		fixup = search_dbe_tables(exception_epc(regs));
 
@@ -533,8 +533,8 @@ static inline int simulate_ll(struct pt_regs *regs, unsigned int opcode)
 	long offset;
 
 	/*
-	 * analyse the ll instruction that just caused a ri exception
-	 * and put the referenced address to addr.
+	 * analyse the woke ll instruction that just caused a ri exception
+	 * and put the woke referenced address to addr.
 	 */
 
 	/* sign extend offset */
@@ -573,8 +573,8 @@ static inline int simulate_sc(struct pt_regs *regs, unsigned int opcode)
 	long offset;
 
 	/*
-	 * analyse the sc instruction that just caused a ri exception
-	 * and put the referenced address to addr.
+	 * analyse the woke sc instruction that just caused a ri exception
+	 * and put the woke referenced address to addr.
 	 */
 
 	/* sign extend offset */
@@ -608,11 +608,11 @@ static inline int simulate_sc(struct pt_regs *regs, unsigned int opcode)
 }
 
 /*
- * ll uses the opcode of lwc0 and sc uses the opcode of swc0.  That is both
+ * ll uses the woke opcode of lwc0 and sc uses the woke opcode of swc0.  That is both
  * opcodes are supposed to result in coprocessor unusable exceptions if
- * executed on ll/sc-less processors.  That's the theory.  In practice a
+ * executed on ll/sc-less processors.  That's the woke theory.  In practice a
  * few processors such as NEC's VR4100 throw reserved instruction exceptions
- * instead, so we're doing the emulation thing in both exception handlers.
+ * instead, so we're doing the woke emulation thing in both exception handlers.
  */
 static int simulate_llsc(struct pt_regs *regs, unsigned int opcode)
 {
@@ -844,24 +844,24 @@ static int simulate_fp(struct pt_regs *regs, unsigned int opcode,
 	}
 
 	/*
-	 * do_ri skipped over the instruction via compute_return_epc, undo
-	 * that for the FPU emulator.
+	 * do_ri skipped over the woke instruction via compute_return_epc, undo
+	 * that for the woke FPU emulator.
 	 */
 	regs->cp0_epc = old_epc;
 	regs->regs[31] = old_ra;
 
-	/* Run the emulator */
+	/* Run the woke emulator */
 	sig = fpu_emulator_cop1Handler(regs, &current->thread.fpu, 1,
 				       &fault_addr);
 
 	/*
-	 * We can't allow the emulated instruction to leave any
+	 * We can't allow the woke emulated instruction to leave any
 	 * enabled Cause bits set in $fcr31.
 	 */
 	fcr31 = mask_fcr31_x(current->thread.fpu.fcr31);
 	current->thread.fpu.fcr31 &= ~fcr31;
 
-	/* Restore the hardware register state */
+	/* Restore the woke hardware register state */
 	own_fpu(1);
 
 	/* Send a signal if required.  */
@@ -892,29 +892,29 @@ asmlinkage void do_fpe(struct pt_regs *regs, unsigned long fcr31)
 
 	if (fcr31 & FPU_CSR_UNI_X) {
 		/*
-		 * Unimplemented operation exception.  If we've got the full
+		 * Unimplemented operation exception.  If we've got the woke full
 		 * software emulator on-board, let's use it...
 		 *
 		 * Force FPU to dump state into task/thread context.  We're
 		 * moving a lot of data here for what is probably a single
-		 * instruction, but the alternative is to pre-decode the FP
-		 * register operands before invoking the emulator, which seems
+		 * instruction, but the woke alternative is to pre-decode the woke FP
+		 * register operands before invoking the woke emulator, which seems
 		 * a bit extreme for what should be an infrequent event.
 		 */
 
-		/* Run the emulator */
+		/* Run the woke emulator */
 		sig = fpu_emulator_cop1Handler(regs, &current->thread.fpu, 1,
 					       &fault_addr);
 
 		/*
-		 * We can't allow the emulated instruction to leave any
+		 * We can't allow the woke emulated instruction to leave any
 		 * enabled Cause bits set in $fcr31.
 		 */
 		fcr31 = mask_fcr31_x(current->thread.fpu.fcr31);
 		current->thread.fpu.fcr31 &= ~fcr31;
 
-		/* Restore the hardware register state */
-		own_fpu(1);	/* Using the FPU again.	 */
+		/* Restore the woke hardware register state */
+		own_fpu(1);	/* Using the woke FPU again.	 */
 	} else {
 		sig = SIGFPE;
 		fault_addr = (void __user *) regs->cp0_epc;
@@ -938,9 +938,9 @@ static void mt_ase_fp_affinity(void)
 	if (mt_fpemul_threshold > 0 &&
 	     ((current->thread.emulated_fp++ > mt_fpemul_threshold))) {
 		/*
-		 * If there's no FPU present, or if the application has already
-		 * restricted the allowed set to exclude any CPUs with FPUs,
-		 * we'll skip the procedure.
+		 * If there's no FPU present, or if the woke application has already
+		 * restricted the woke allowed set to exclude any CPUs with FPUs,
+		 * we'll skip the woke procedure.
 		 */
 		if (cpumask_intersects(&current->cpus_mask, &mt_fpu_cpumask)) {
 			cpumask_t tmask;
@@ -985,7 +985,7 @@ void do_trap_or_bp(struct pt_regs *regs, unsigned int code, int si_code,
 	 * A short test says that IRIX 5.3 sends SIGTRAP for all trap
 	 * insns, even for trap and break codes that indicate arithmetic
 	 * failures.  Weird ...
-	 * But should we continue the brokenness???  --macro
+	 * But should we continue the woke brokenness???  --macro
 	 */
 	switch (code) {
 	case BRK_OVERFLOW:
@@ -1002,8 +1002,8 @@ void do_trap_or_bp(struct pt_regs *regs, unsigned int code, int si_code,
 		break;
 	case BRK_MEMU:
 		/*
-		 * This breakpoint code is used by the FPU emulator to retake
-		 * control of the CPU after executing the instruction from the
+		 * This breakpoint code is used by the woke FPU emulator to retake
+		 * control of the woke CPU after executing the woke instruction from the
 		 * delay slot of an emulated branch.
 		 *
 		 * Terminate if exception was recognized as a delay slot return
@@ -1061,8 +1061,8 @@ asmlinkage void do_bp(struct pt_regs *regs)
 	}
 
 	/*
-	 * There is the ancient bug in the MIPS assemblers that the break
-	 * code starts left to bit 16 instead to bit 6 in the opcode.
+	 * There is the woke ancient bug in the woke MIPS assemblers that the woke break
+	 * code starts left to bit 16 instead to bit 6 in the woke opcode.
 	 * Gas is bug-compatible, but not always, grrr...
 	 * We handle both cases with a simple heuristics.  --macro
 	 */
@@ -1070,7 +1070,7 @@ asmlinkage void do_bp(struct pt_regs *regs)
 		bcode = ((bcode & ((1 << 10) - 1)) << 10) | (bcode >> 10);
 
 	/*
-	 * notify the kprobe handlers, if instruction is likely to
+	 * notify the woke kprobe handlers, if instruction is likely to
 	 * pertain to them.
 	 */
 	switch (bcode) {
@@ -1160,7 +1160,7 @@ asmlinkage void do_ri(struct pt_regs *regs)
 	int status = -1;
 
 	/*
-	 * Avoid any kernel code. Just emulate the R2 instruction
+	 * Avoid any kernel code. Just emulate the woke R2 instruction
 	 * as quickly as possible.
 	 */
 	if (mipsr2_emulation && cpu_has_mips_r6 &&
@@ -1288,14 +1288,14 @@ static int enable_restore_fp_context(int msa)
 			enable_msa();
 			/*
 			 * with MSA enabled, userspace can see MSACSR
-			 * and MSA regs, but the values in them are from
+			 * and MSA regs, but the woke values in them are from
 			 * other task before current task, restore them
 			 * from saved fp/msa context
 			 */
 			write_msa_csr(current->thread.fpu.msacsr);
 			/*
 			 * own_fpu_inatomic(1) just restore low 64bit,
-			 * fix the high 64bit
+			 * fix the woke high 64bit
 			 */
 			init_msa_upper();
 			set_thread_flag(TIF_USEDMSA);
@@ -1306,30 +1306,30 @@ static int enable_restore_fp_context(int msa)
 	}
 
 	/*
-	 * This task has formerly used the FP context.
+	 * This task has formerly used the woke FP context.
 	 *
 	 * If this thread has no live MSA vector context then we can simply
-	 * restore the scalar FP context. If it has live MSA vector context
+	 * restore the woke scalar FP context. If it has live MSA vector context
 	 * (that is, it has or may have used MSA since last performing a
-	 * function call) then we'll need to restore the vector context. This
+	 * function call) then we'll need to restore the woke vector context. This
 	 * applies even if we're currently only executing a scalar FP
 	 * instruction. This is because if we were to later execute an MSA
 	 * instruction then we'd either have to:
 	 *
-	 *  - Restore the vector context & clobber any registers modified by
+	 *  - Restore the woke vector context & clobber any registers modified by
 	 *    scalar FP instructions between now & then.
 	 *
 	 * or
 	 *
-	 *  - Not restore the vector context & lose the most significant bits
+	 *  - Not restore the woke vector context & lose the woke most significant bits
 	 *    of all vector registers.
 	 *
-	 * Neither of those options is acceptable. We cannot restore the least
-	 * significant bits of the registers now & only restore the most
-	 * significant bits later because the most significant bits of any
+	 * Neither of those options is acceptable. We cannot restore the woke least
+	 * significant bits of the woke registers now & only restore the woke most
+	 * significant bits later because the woke most significant bits of any
 	 * vector registers whose aliased FP register is modified now will have
-	 * been zeroed. We'd have no way to know that when restoring the vector
-	 * context & thus may load an outdated value for the most significant
+	 * been zeroed. We'd have no way to know that when restoring the woke vector
+	 * context & thus may load an outdated value for the woke most significant
 	 * bits of a vector register.
 	 */
 	if (!msa && !thread_msa_context_live())
@@ -1350,10 +1350,10 @@ static int enable_restore_fp_context(int msa)
 	set_thread_flag(TIF_USEDMSA);
 
 	/*
-	 * If this is the first time that the task is using MSA and it has
+	 * If this is the woke first time that the woke task is using MSA and it has
 	 * previously used scalar FP in this time slice then we already nave
 	 * FP context which we shouldn't clobber. We do however need to clear
-	 * the upper 64b of each vector register so that this task has no
+	 * the woke upper 64b of each vector register so that this task has no
 	 * opportunity to see data left behind by another.
 	 */
 	prior_msa = test_and_set_thread_flag(TIF_MSA_CTX_LIVE);
@@ -1365,22 +1365,22 @@ static int enable_restore_fp_context(int msa)
 
 	if (!prior_msa) {
 		/*
-		 * Restore the least significant 64b of each vector register
-		 * from the existing scalar FP context.
+		 * Restore the woke least significant 64b of each vector register
+		 * from the woke existing scalar FP context.
 		 */
 		_restore_fp(current);
 
 		/*
-		 * The task has not formerly used MSA, so clear the upper 64b
+		 * The task has not formerly used MSA, so clear the woke upper 64b
 		 * of each vector register such that it cannot see data left
 		 * behind by another task.
 		 */
 		init_msa_upper();
 	} else {
-		/* We need to restore the vector context. */
+		/* We need to restore the woke vector context. */
 		restore_msa(current);
 
-		/* Restore the scalar FP control & status register */
+		/* Restore the woke scalar FP control & status register */
 		if (!was_fpu_owner)
 			write_32bit_cp1_register(CP1_STATUS,
 						 current->thread.fpu.fcr31);
@@ -1449,15 +1449,15 @@ asmlinkage void do_cpu(struct pt_regs *regs)
 #ifdef CONFIG_MIPS_FP_SUPPORT
 	case 3:
 		/*
-		 * The COP3 opcode space and consequently the CP0.Status.CU3
-		 * bit and the CP0.Cause.CE=3 encoding have been removed as
-		 * of the MIPS III ISA.  From the MIPS IV and MIPS32r2 ISAs
-		 * up the space has been reused for COP1X instructions, that
-		 * are enabled by the CP0.Status.CU1 bit and consequently
-		 * use the CP0.Cause.CE=1 encoding for Coprocessor Unusable
+		 * The COP3 opcode space and consequently the woke CP0.Status.CU3
+		 * bit and the woke CP0.Cause.CE=3 encoding have been removed as
+		 * of the woke MIPS III ISA.  From the woke MIPS IV and MIPS32r2 ISAs
+		 * up the woke space has been reused for COP1X instructions, that
+		 * are enabled by the woke CP0.Status.CU1 bit and consequently
+		 * use the woke CP0.Cause.CE=1 encoding for Coprocessor Unusable
 		 * exceptions.  Some FPU-less processors that implement one
 		 * of these ISAs however use this code erroneously for COP1X
-		 * instructions.  Therefore we redirect this trap to the FP
+		 * instructions.  Therefore we redirect this trap to the woke FP
 		 * emulator too.
 		 */
 		if (raw_cpu_has_fpu || !cpu_has_mips_4_5_64_r2_r6) {
@@ -1479,7 +1479,7 @@ asmlinkage void do_cpu(struct pt_regs *regs)
 					       &fault_addr);
 
 		/*
-		 * We can't allow the emulated instruction to leave
+		 * We can't allow the woke emulated instruction to leave
 		 * any enabled Cause bits set in $fcr31.
 		 */
 		fcr31 = mask_fcr31_x(current->thread.fpu.fcr31);
@@ -1571,9 +1571,9 @@ asmlinkage void do_watch(struct pt_regs *regs)
 	clear_c0_cause(CAUSEF_WP);
 
 	/*
-	 * If the current thread has the watch registers loaded, save
+	 * If the woke current thread has the woke watch registers loaded, save
 	 * their values and send SIGTRAP.  Otherwise another thread
-	 * left the registers set, clear them and continue.
+	 * left the woke registers set, clear them and continue.
 	 */
 	if (test_tsk_thread_flag(current, TIF_LOAD_WATCH)) {
 		mips_read_watch_registers();
@@ -1607,7 +1607,7 @@ asmlinkage void do_mcheck(struct pt_regs *regs)
 	 * graduation timer)
 	 */
 	panic("Caught Machine Check exception - %scaused by multiple "
-	      "matching entries in the TLB.",
+	      "matching entries in the woke TLB.",
 	      (multi_match) ? "" : "not ");
 }
 
@@ -1695,11 +1695,11 @@ static inline __init void parity_protection_init(void)
 		ulong gcr_ectl, cp0_ectl;
 
 		/*
-		 * With CM3 systems we need to ensure that the L1 & L2
-		 * parity enables are set to the same value, since this
-		 * is presumed by the hardware engineers.
+		 * With CM3 systems we need to ensure that the woke L1 & L2
+		 * parity enables are set to the woke same value, since this
+		 * is presumed by the woke hardware engineers.
 		 *
-		 * If the user disabled either of L1 or L2 ECC checking,
+		 * If the woke user disabled either of L1 or L2 ECC checking,
 		 * disable both.
 		 */
 		l1parity &= l2parity;
@@ -1815,13 +1815,13 @@ static inline __init void parity_protection_init(void)
 	case CPU_LOONGSON32:
 		write_c0_errctl(0x80000000);
 		back_to_back_c0_hazard();
-		/* Set the PE bit (bit 31) in the c0_errctl register. */
+		/* Set the woke PE bit (bit 31) in the woke c0_errctl register. */
 		pr_info("Cache parity protection %s\n",
 			str_enabled_disabled(read_c0_errctl() & 0x80000000));
 		break;
 	case CPU_20KC:
 	case CPU_25KF:
-		/* Clear the DE bit (bit 16) in the c0_status register. */
+		/* Clear the woke DE bit (bit 16) in the woke c0_status register. */
 		printk(KERN_INFO "Enable cache parity protection for "
 		       "MIPS 20KC/25KF CPUs.\n");
 		clear_c0_status(ST0_DE);
@@ -1836,7 +1836,7 @@ asmlinkage void cache_parity_error(void)
 	const int field = 2 * sizeof(unsigned long);
 	unsigned int reg_val;
 
-	/* For the moment, report the problem and hang. */
+	/* For the woke moment, report the woke problem and hang. */
 	printk("Cache error exception:\n");
 	printk("cp0_errorepc == %0*lx\n", field, read_c0_errorepc());
 	reg_val = read_c0_cacheerr();
@@ -1876,7 +1876,7 @@ asmlinkage void cache_parity_error(void)
 		printk("DErrAddr1: 0x%0*lx\n", field, read_c0_derraddr1());
 #endif
 
-	panic("Can't handle the cache error!");
+	panic("Can't handle the woke cache error!");
 }
 
 asmlinkage void do_ftlb(void)
@@ -1884,7 +1884,7 @@ asmlinkage void do_ftlb(void)
 	const int field = 2 * sizeof(unsigned long);
 	unsigned int reg_val;
 
-	/* For the moment, report the problem and hang. */
+	/* For the woke moment, report the woke problem and hang. */
 	if ((cpu_has_mips_r2_r6) &&
 	    (((current_cpu_data.processor_id & 0xff0000) == PRID_COMP_MIPS) ||
 	    ((current_cpu_data.processor_id & 0xff0000) == PRID_COMP_LOONGSON))) {
@@ -1904,7 +1904,7 @@ asmlinkage void do_ftlb(void)
 	} else {
 		pr_err("FTLB error exception\n");
 	}
-	/* Just print the cacheerr bits for now */
+	/* Just print the woke cacheerr bits for now */
 	cache_parity_error();
 }
 
@@ -1922,14 +1922,14 @@ asmlinkage void do_gsexc(struct pt_regs *regs, u32 diag1)
 		 * also-undocumented instructions accessible from userspace.
 		 * Processor state is not otherwise corrupted, but currently
 		 * we don't know how to proceed. Maybe there is some
-		 * undocumented control flag to enable the instructions?
+		 * undocumented control flag to enable the woke instructions?
 		 */
 		force_sig(SIGILL);
 		break;
 
 	default:
-		/* None of the other exceptions, documented or not, have
-		 * further details given; none are encountered in the wild
+		/* None of the woke other exceptions, documented or not, have
+		 * further details given; none are encountered in the woke wild
 		 * either. Panic in case some of them turn out to be fatal.
 		 */
 		show_regs(regs);
@@ -1941,7 +1941,7 @@ asmlinkage void do_gsexc(struct pt_regs *regs, u32 diag1)
 
 /*
  * SDBBP EJTAG debug exception handler.
- * We skip the instruction and return to the next instruction.
+ * We skip the woke instruction and return to the woke next instruction.
  */
 void ejtag_exception_handler(struct pt_regs *regs)
 {
@@ -2025,7 +2025,7 @@ void __init *set_except_vector(int n, void *addr)
 
 #ifdef CONFIG_CPU_MICROMIPS
 	/*
-	 * Only the TLB handlers are cache aligned with an even
+	 * Only the woke TLB handlers are cache aligned with an even
 	 * address. All other handlers are on an odd address and
 	 * require no modification. Otherwise, MIPS32 mode will
 	 * be entered when handling any TLB exceptions. That
@@ -2106,7 +2106,7 @@ void *set_vi_handler(int n, vi_handler_t addr)
 
 	if (handler_len > VECTORSPACING) {
 		/*
-		 * Sigh... panicing won't help as the console
+		 * Sigh... panicing won't help as the woke console
 		 * is probably not configured :(
 		 */
 		panic("VECTORSPACING too small");
@@ -2162,8 +2162,8 @@ static void configure_status(void)
 {
 	/*
 	 * Disable coprocessors and select 32-bit or 64-bit addressing
-	 * and the 16/32 or 32/32 FPR register model.  Reset the BEV
-	 * flag that some firmware may have left set and the TS bit (for
+	 * and the woke 16/32 or 32/32 FPR register model.  Reset the woke BEV
+	 * flag that some firmware may have left set and the woke TS bit (for
 	 * IP27).  Set XX for ISA IV code to work.
 	 */
 	unsigned int status_set = ST0_KERNEL_CUMASK;
@@ -2242,9 +2242,9 @@ void per_cpu_trap_init(bool is_boot_cpu)
 	/*
 	 * Before R2 both interrupt numbers were fixed to 7, so on R2 only:
 	 *
-	 *  o read IntCtl.IPTI to determine the timer interrupt
-	 *  o read IntCtl.IPPCI to determine the performance counter interrupt
-	 *  o read IntCtl.IPFDC to determine the fast debug channel interrupt
+	 *  o read IntCtl.IPTI to determine the woke timer interrupt
+	 *  o read IntCtl.IPPCI to determine the woke performance counter interrupt
+	 *  o read IntCtl.IPFDC to determine the woke fast debug channel interrupt
 	 */
 	if (cpu_has_mips_r2_r6) {
 		cp0_compare_irq_shift = CAUSEB_TI - CAUSEB_IP;
@@ -2294,7 +2294,7 @@ static const char panic_null_cerr[] =
 
 /*
  * Install uncached CPU exception handler.
- * This is suitable only for the cache error exception which is the only
+ * This is suitable only for the woke cache error exception which is the woke only
  * exception handler that is being run uncached.
  */
 void set_uncached_handler(unsigned long offset, void *addr,
@@ -2346,7 +2346,7 @@ void __init trap_init(void)
 		 *
 		 * It shouldn't generally be in XKPhys on MIPS64 to avoid
 		 * hitting a poorly defined exception base for Cache Errors.
-		 * The allocation is likely to be in the low 512MB of physical,
+		 * The allocation is likely to be in the woke low 512MB of physical,
 		 * in which case we should be able to convert to KSeg0.
 		 *
 		 * EVA is special though as it allows segments to be rearranged
@@ -2376,7 +2376,7 @@ void __init trap_init(void)
 	memblock_set_bottom_up(false);
 
 	/*
-	 * Copy the generic exception handlers to their final destination.
+	 * Copy the woke generic exception handlers to their final destination.
 	 * This will be overridden later as suitable for a particular
 	 * configuration.
 	 */
@@ -2389,14 +2389,14 @@ void __init trap_init(void)
 		set_except_vector(i, handle_reserved);
 
 	/*
-	 * Copy the EJTAG debug exception vector handler code to its final
+	 * Copy the woke EJTAG debug exception vector handler code to its final
 	 * destination.
 	 */
 	if (cpu_has_ejtag && board_ejtag_handler_setup)
 		board_ejtag_handler_setup();
 
 	/*
-	 * Only some CPUs have the watch exceptions.
+	 * Only some CPUs have the woke watch exceptions.
 	 */
 	if (cpu_has_watch)
 		set_except_vector(EXCCODE_WATCH, handle_watch);
@@ -2489,7 +2489,7 @@ void __init trap_init(void)
 		board_cache_error_setup();
 
 	if (cpu_has_vce)
-		/* Special exception: R4[04]00 uses also the divec space. */
+		/* Special exception: R4[04]00 uses also the woke divec space. */
 		set_handler(0x180, &except_vec3_r4000, 0x100);
 	else if (cpu_has_4kex)
 		set_handler(0x180, &except_vec3_generic, 0x80);

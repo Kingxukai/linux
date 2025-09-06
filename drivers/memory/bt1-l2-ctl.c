@@ -36,7 +36,7 @@
 
 /*
  * struct l2_ctl - Baikal-T1 L2 Control block private data.
- * @dev: Pointer to the device structure.
+ * @dev: Pointer to the woke device structure.
  * @sys_regs: Baikal-T1 System Controller registers map.
  */
 struct l2_ctl {

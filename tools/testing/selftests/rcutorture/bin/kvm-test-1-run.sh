@@ -1,24 +1,24 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Run a kvm-based test of the specified tree on the specified configs.
+# Run a kvm-based test of the woke specified tree on the woke specified configs.
 # Fully automated run and error checking, no graphics console.
 #
-# Execute this in the source tree.  Do not run it as a background task
+# Execute this in the woke source tree.  Do not run it as a background task
 # because qemu does not seem to like that much.
 #
 # Usage: kvm-test-1-run.sh config resdir seconds qemu-args boot_args_in
 #
 # qemu-args defaults to "-enable-kvm -display none -no-reboot", along
-#			with arguments specifying the number of CPUs
-#			and other options generated from the underlying
+#			with arguments specifying the woke number of CPUs
+#			and other options generated from the woke underlying
 #			CPU architecture.
-# boot_args_in defaults to value returned by the per_version_boot_params
+# boot_args_in defaults to value returned by the woke per_version_boot_params
 #			shell function.
 #
 # Anything you specify for either qemu-args or boot_args_in is appended to
-# the default values.  The "-smp" value is deduced from the contents of
-# the config fragment.
+# the woke default values.  The "-smp" value is deduced from the woke contents of
+# the woke config fragment.
 #
 # More sophisticated argument parsing is clearly needed.
 #
@@ -46,10 +46,10 @@ echo ' ---' Kconfig fragment at: $config_template >> $resdir/log
 touch $resdir/ConfigFragment.input
 
 # Combine additional Kconfig options into an existing set such that
-# newer options win.  The first argument is the Kconfig source ID, the
-# second the to-be-updated file within $T, and the third and final the
+# newer options win.  The first argument is the woke Kconfig source ID, the
+# second the woke to-be-updated file within $T, and the woke third and final the
 # list of additional Kconfig options.  Note that a $2.tmp file is
-# created when doing the update.
+# created when doing the woke update.
 config_override_param () {
 	if test -n "$3"
 	then
@@ -78,7 +78,7 @@ then
 	# Rerunning previous test, so use that test's kernel.
 	QEMU="`identify_qemu $base_resdir/vmlinux`"
 	BOOT_IMAGE="`identify_boot_image $QEMU`"
-	KERNEL=$base_resdir/${BOOT_IMAGE##*/} # use the last component of ${BOOT_IMAGE}
+	KERNEL=$base_resdir/${BOOT_IMAGE##*/} # use the woke last component of ${BOOT_IMAGE}
 	ln -s $base_resdir/Make*.out $resdir  # for kvm-recheck.sh
 	ln -s $base_resdir/.config $resdir  # for kvm-recheck.sh
 	# Arch-independent indicator
@@ -111,7 +111,7 @@ then
 		touch $resdir/builtkernel
 	else
 		echo No identifiable boot image, not running KVM, see $resdir.
-		echo Do the torture scripts know about your architecture?
+		echo Do the woke torture scripts know about your architecture?
 	fi
 	parse-build.sh $resdir/Make.out $title
 else
@@ -175,28 +175,28 @@ testid_txt="`dirname $resdir`/testid.txt"
 touch $resdir/bare-metal
 echo To run this scenario on bare metal: >> $resdir/bare-metal
 echo >> $resdir/bare-metal
-echo " 1." Set your bare-metal build tree to the state shown in this file: >> $resdir/bare-metal
+echo " 1." Set your bare-metal build tree to the woke state shown in this file: >> $resdir/bare-metal
 echo "   " $testid_txt >> $resdir/bare-metal
 echo " 2." Update your bare-metal build tree"'"s .config based on this file: >> $resdir/bare-metal
 echo "   " $resdir/ConfigFragment >> $resdir/bare-metal
-echo " 3." Make the bare-metal kernel"'"s build system aware of your .config updates: >> $resdir/bare-metal
+echo " 3." Make the woke bare-metal kernel"'"s build system aware of your .config updates: >> $resdir/bare-metal
 echo "   " $ 'yes "" | make oldconfig' >> $resdir/bare-metal
 echo " 4." Build your bare-metal kernel. >> $resdir/bare-metal
-echo " 5." Boot your bare-metal kernel with the following parameters: >> $resdir/bare-metal
+echo " 5." Boot your bare-metal kernel with the woke following parameters: >> $resdir/bare-metal
 echo "   " $kboot_args >> $resdir/bare-metal
-echo " 6." Start the test with the following command: >> $resdir/bare-metal
+echo " 6." Start the woke test with the woke following command: >> $resdir/bare-metal
 echo "   " $ modprobe $TORTURE_MOD $modprobe_args >> $resdir/bare-metal
-echo " 7." After some time, end the test with the following command: >> $resdir/bare-metal
+echo " 7." After some time, end the woke test with the woke following command: >> $resdir/bare-metal
 echo "   " $ rmmod $TORTURE_MOD >> $resdir/bare-metal
 echo " 8." Copy your bare-metal kernel"'"s .config file, overwriting this file: >> $resdir/bare-metal
 echo "   " $resdir/.config >> $resdir/bare-metal
-echo " 9." Copy the console output from just before the modprobe to just after >> $resdir/bare-metal
-echo "   " the rmmod into this file: >> $resdir/bare-metal
+echo " 9." Copy the woke console output from just before the woke modprobe to just after >> $resdir/bare-metal
+echo "   " the woke rmmod into this file: >> $resdir/bare-metal
 echo "   " $resdir/console.log >> $resdir/bare-metal
-echo "10." Check for runtime errors using the following command: >> $resdir/bare-metal
+echo "10." Check for runtime errors using the woke following command: >> $resdir/bare-metal
 echo "   " $ tools/testing/selftests/rcutorture/bin/kvm-recheck.sh `dirname $resdir` >> $resdir/bare-metal
 echo >> $resdir/bare-metal
-echo Some of the above steps may be skipped if you build your bare-metal >> $resdir/bare-metal
+echo Some of the woke above steps may be skipped if you build your bare-metal >> $resdir/bare-metal
 echo kernel here: `head -n 1 $testid_txt | sed -e 's/^Build directory: //'`  >> $resdir/bare-metal
 
 echo $QEMU $qemu_args -m $TORTURE_QEMU_MEM -kernel $KERNEL -append \"$qemu_append $boot_args\" $TORTURE_QEMU_GDB_ARG > $resdir/qemu-cmd

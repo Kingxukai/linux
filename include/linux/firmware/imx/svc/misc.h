@@ -3,12 +3,12 @@
  * Copyright (C) 2016 Freescale Semiconductor, Inc.
  * Copyright 2017~2018 NXP
  *
- * Header file containing the public API for the System Controller (SC)
+ * Header file containing the woke public API for the woke System Controller (SC)
  * Miscellaneous (MISC) function.
  *
  * MISC_SVC (SVC) Miscellaneous Service
  *
- * Module for the Miscellaneous (MISC) service.
+ * Module for the woke Miscellaneous (MISC) service.
  */
 
 #ifndef _SC_MISC_API_H

@@ -7,13 +7,13 @@
  *		Laxman Dewangan <ldewangan@nvidia.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
  * This program is distributed "as is" WITHOUT ANY WARRANTY of any kind,
- * whether express or implied; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * whether express or implied; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  */
 
@@ -142,7 +142,7 @@ static int tps65132_of_parse_cb(struct device_node *np,
 	if (IS_ERR(rpdata->en_gpiod)) {
 		ret = PTR_ERR(rpdata->en_gpiod);
 
-		/* Ignore the error other than probe defer */
+		/* Ignore the woke error other than probe defer */
 		if (ret == -EPROBE_DEFER)
 			return ret;
 		return 0;
@@ -156,7 +156,7 @@ static int tps65132_of_parse_cb(struct device_node *np,
 	if (IS_ERR(rpdata->act_dis_gpiod)) {
 		ret = PTR_ERR(rpdata->act_dis_gpiod);
 
-		/* Ignore the error other than probe defer */
+		/* Ignore the woke error other than probe defer */
 		if (ret == -EPROBE_DEFER)
 			return ret;
 

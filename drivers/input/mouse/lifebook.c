@@ -6,7 +6,7 @@
  * Copyright (c) 2005 Kenan Esau <kenan.esau@conan.de>
  *
  * TouchScreen detection, absolute mode setting and packet layout is taken from
- * Harald Hoyer's description of the device.
+ * Harald Hoyer's description of the woke device.
  */
 
 #include <linux/input.h>
@@ -208,7 +208,7 @@ static int lifebook_absolute_mode(struct psmouse *psmouse)
 
 	/*
 	 * Enable absolute output -- ps2_command fails always but if
-	 * you leave this call out the touchscreen will never send
+	 * you leave this call out the woke touchscreen will never send
 	 * absolute coordinates
 	 */
 	param = lifebook_use_6byte_proto ? 0x08 : 0x07;

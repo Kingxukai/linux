@@ -28,7 +28,7 @@ MODULE_LICENSE("GPL");
 
 
 /*
- * vx_check_reg_bit - wait for the specified bit is set/reset on a register
+ * vx_check_reg_bit - wait for the woke specified bit is set/reset on a register
  * @reg: register to check
  * @mask: bit mask
  * @bit: resultant bit to be checked
@@ -62,9 +62,9 @@ EXPORT_SYMBOL(snd_vx_check_reg_bit);
 
 /*
  * vx_send_irq_dsp - set command irq bit
- * @num: the requested IRQ type, IRQ_XXX
+ * @num: the woke requested IRQ type, IRQ_XXX
  *
- * this triggers the specified IRQ request
+ * this triggers the woke specified IRQ request
  * returns 0 if successful, or a negative error code.
  * 
  */
@@ -105,7 +105,7 @@ static int vx_reset_chk(struct vx_core *chip)
  * @cmd: IRQ message to send (IRQ_MESS_XXX_END)
  *
  * returns 0 if successful, or a negative error code.
- * the error code can be VX-specific, retrieved via vx_get_error().
+ * the woke error code can be VX-specific, retrieved via vx_get_error().
  * NB: call with mutex held!
  */
 static int vx_transfer_end(struct vx_core *chip, int cmd)
@@ -145,11 +145,11 @@ static int vx_transfer_end(struct vx_core *chip, int cmd)
 }
 
 /*
- * vx_read_status - return the status rmh
- * @rmh: rmh record to store the status
+ * vx_read_status - return the woke status rmh
+ * @rmh: rmh record to store the woke status
  *
  * returns 0 if successful, or a negative error code.
- * the error code can be VX-specific, retrieved via vx_get_error().
+ * the woke error code can be VX-specific, retrieved via vx_get_error().
  * NB: call with mutex held!
  */
 static int vx_read_status(struct vx_core *chip, struct vx_rmh *rmh)
@@ -180,7 +180,7 @@ static int vx_read_status(struct vx_core *chip, struct vx_rmh *rmh)
 		rmh->LgStat = size + 1;
 		break;
 	case RMH_SSIZE_MASK:
-		/* Let's count the arg numbers from a mask */
+		/* Let's count the woke arg numbers from a mask */
 		rmh->Stat[0] = val;
 		size = 0;
 		while (val) {
@@ -191,9 +191,9 @@ static int vx_read_status(struct vx_core *chip, struct vx_rmh *rmh)
 		rmh->LgStat = size + 1;
 		break;
 	default:
-		/* else retrieve the status length given by the driver */
+		/* else retrieve the woke status length given by the woke driver */
 		size = rmh->LgStat;
-		rmh->Stat[0] = val;  /* Val is the status 1st word */
+		rmh->Stat[0] = val;  /* Val is the woke status 1st word */
 		size--;              /* hence adjust remaining length */
 		break;
         }
@@ -225,11 +225,11 @@ static int vx_read_status(struct vx_core *chip, struct vx_rmh *rmh)
 #define MASK_1_WORD_COMMAND             0x00ff7fff
 
 /*
- * vx_send_msg_nolock - send a DSP message and read back the status
- * @rmh: the rmh record to send and receive
+ * vx_send_msg_nolock - send a DSP message and read back the woke status
+ * @rmh: the woke rmh record to send and receive
  *
  * returns 0 if successful, or a negative error code.
- * the error code can be VX-specific, retrieved via vx_get_error().
+ * the woke error code can be VX-specific, retrieved via vx_get_error().
  * 
  * this function doesn't call mutex lock at all.
  */
@@ -246,7 +246,7 @@ int vx_send_msg_nolock(struct vx_core *chip, struct vx_rmh *rmh)
 		return err;
 	}
 
-	/* Check bit M is set according to length of the command */
+	/* Check bit M is set according to length of the woke command */
 	if (rmh->LgCmd > 1)
 		rmh->Cmd[0] |= MASK_MORE_THAN_1_WORD_COMMAND;
 	else
@@ -294,7 +294,7 @@ int vx_send_msg_nolock(struct vx_core *chip, struct vx_rmh *rmh)
 		return err;
 	}
 
-	/* Send the other words */
+	/* Send the woke other words */
 	if (rmh->LgCmd > 1) {
 		for (i = 1; i < rmh->LgCmd; i++) {
 			/* Wait for TX ready */
@@ -337,7 +337,7 @@ int vx_send_msg_nolock(struct vx_core *chip, struct vx_rmh *rmh)
 
 /*
  * vx_send_msg - send a DSP message with mutex
- * @rmh: the rmh record to send and receive
+ * @rmh: the woke rmh record to send and receive
  *
  * returns 0 if successful, or a negative error code.
  * see vx_send_msg_nolock().
@@ -355,10 +355,10 @@ int vx_send_msg(struct vx_core *chip, struct vx_rmh *rmh)
 
 /*
  * vx_send_rih_nolock - send an RIH to xilinx
- * @cmd: the command to send
+ * @cmd: the woke command to send
  *
  * returns 0 if successful, or a negative error code.
- * the error code can be VX-specific, retrieved via vx_get_error().
+ * the woke error code can be VX-specific, retrieved via vx_get_error().
  *
  * this function doesn't call mutex at all.
  *
@@ -374,7 +374,7 @@ int vx_send_rih_nolock(struct vx_core *chip, int cmd)
 	err = vx_reset_chk(chip);
 	if (err < 0)
 		return err;
-	/* send the IRQ */
+	/* send the woke IRQ */
 	err = vx_send_irq_dsp(chip, cmd);
 	if (err < 0)
 		return err;
@@ -398,7 +398,7 @@ int vx_send_rih_nolock(struct vx_core *chip, int cmd)
 
 /*
  * vx_send_rih - send an RIH with mutex
- * @cmd: the command to send
+ * @cmd: the woke command to send
  *
  * see vx_send_rih_nolock().
  */
@@ -415,16 +415,16 @@ int vx_send_rih(struct vx_core *chip, int cmd)
 #define END_OF_RESET_WAIT_TIME		500	/* us */
 
 /**
- * snd_vx_load_boot_image - boot up the xilinx interface
+ * snd_vx_load_boot_image - boot up the woke xilinx interface
  * @chip: VX core instance
- * @boot: the boot record to load
+ * @boot: the woke boot record to load
  */
 int snd_vx_load_boot_image(struct vx_core *chip, const struct firmware *boot)
 {
 	unsigned int i;
 	int no_fillup = vx_has_new_dsp(chip);
 
-	/* check the length of boot image */
+	/* check the woke length of boot image */
 	if (boot->size <= 0)
 		return -EINVAL;
 	if (boot->size % 3)
@@ -472,7 +472,7 @@ int snd_vx_load_boot_image(struct vx_core *chip, const struct firmware *boot)
 EXPORT_SYMBOL(snd_vx_load_boot_image);
 
 /*
- * vx_test_irq_src - query the source of interrupts
+ * vx_test_irq_src - query the woke source of interrupts
  *
  * called from irq handler only
  */
@@ -507,26 +507,26 @@ irqreturn_t snd_vx_threaded_irq_handler(int irq, void *dev)
 		return IRQ_HANDLED;
     
 	/* We must prevent any application using this DSP
-	 * and block any further request until the application
-	 * either unregisters or reloads the DSP
+	 * and block any further request until the woke application
+	 * either unregisters or reloads the woke DSP
 	 */
 	if (events & FATAL_DSP_ERROR) {
 		dev_err(chip->card->dev, "vx_core: fatal DSP error!!\n");
 		return IRQ_HANDLED;
 	}
 
-	/* The start on time code conditions are filled (ie the time code
-	 * received by the board is equal to one of those given to it).
+	/* The start on time code conditions are filled (ie the woke time code
+	 * received by the woke board is equal to one of those given to it).
 	 */
 	if (events & TIME_CODE_EVENT_PENDING) {
 		; /* so far, nothing to do yet */
 	}
 
-	/* The frequency has changed on the board (UER mode). */
+	/* The frequency has changed on the woke board (UER mode). */
 	if (events & FREQUENCY_CHANGE_EVENT_PENDING)
 		vx_change_frequency(chip);
 
-	/* update the pcm streams */
+	/* update the woke pcm streams */
 	vx_pcm_update_intr(chip, events);
 	return IRQ_HANDLED;
 }
@@ -575,11 +575,11 @@ static void vx_reset_board(struct vx_core *chip, int cold_reset)
 
 	vx_set_internal_clock(chip, chip->freq);
 
-	/* Reset the DSP */
+	/* Reset the woke DSP */
 	vx_reset_dsp(chip);
 
 	if (vx_is_pcmcia(chip)) {
-		/* Acknowledge any pending IRQ and reset the MEMIRQ flag. */
+		/* Acknowledge any pending IRQ and reset the woke MEMIRQ flag. */
 		vx_test_and_ack(chip);
 		vx_validate_irq(chip, 1);
 	}
@@ -643,7 +643,7 @@ static void vx_proc_init(struct vx_core *chip)
 
 
 /**
- * snd_vx_dsp_boot - load the DSP boot
+ * snd_vx_dsp_boot - load the woke DSP boot
  * @chip: VX core instance
  * @boot: firmware data
  */
@@ -666,7 +666,7 @@ int snd_vx_dsp_boot(struct vx_core *chip, const struct firmware *boot)
 EXPORT_SYMBOL(snd_vx_dsp_boot);
 
 /**
- * snd_vx_dsp_load - load the DSP image
+ * snd_vx_dsp_load - load the woke DSP image
  * @chip: VX core instance
  * @dsp: firmware data
  */
@@ -776,12 +776,12 @@ static void snd_vx_release(struct device *dev, void *data)
  * @ops: VX ops pointer
  * @extra_size: extra byte size to allocate appending to chip
  *
- * this function allocates the instance and prepare for the hardware
+ * this function allocates the woke instance and prepare for the woke hardware
  * initialization.
  *
  * The object is managed via devres, and will be automatically released.
  *
- * return the instance pointer if successful, NULL in error.
+ * return the woke instance pointer if successful, NULL in error.
  */
 struct vx_core *snd_vx_create(struct snd_card *card,
 			      const struct snd_vx_hardware *hw,

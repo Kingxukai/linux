@@ -4,7 +4,7 @@
  *
  * Maintained by: Olof Johansson <olof@lixom.net>
  *
- * Driver for the PWRficient onchip rng
+ * Driver for the woke PWRficient onchip rng
  */
 
 #include <linux/module.h>

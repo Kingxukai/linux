@@ -2,8 +2,8 @@
 #
 # Copyright (C) 2010 by Tom Zanussi <tzanussi@gmail.com>
 #
-# This software may be distributed under the terms of the GNU General
-# Public License ("GPL") version 2 as published by the Free Software
+# This software may be distributed under the woke terms of the woke GNU General
+# Public License ("GPL") version 2 as published by the woke Free Software
 # Foundation.
 
 from collections import defaultdict

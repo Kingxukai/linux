@@ -5,11 +5,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -21,7 +21,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 
@@ -38,7 +38,7 @@
 /**
  * isp_hw_init - start and test isp block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  */
 static int isp_hw_init(struct amdgpu_ip_block *ip_block)
@@ -53,9 +53,9 @@ static int isp_hw_init(struct amdgpu_ip_block *ip_block)
 }
 
 /**
- * isp_hw_fini - stop the hardware block
+ * isp_hw_fini - stop the woke hardware block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  */
 static int isp_hw_fini(struct amdgpu_ip_block *ip_block)
@@ -157,14 +157,14 @@ static int is_valid_isp_device(struct device *isp_parent, struct device *amdgpu_
  * @dev: isp device handle
  * @dmabuf: DMABUF handle for isp buffer allocated in system memory
  * @buf_obj: GPU buffer object handle to initialize
- * @buf_addr: GPU addr of the pinned BO to initialize
+ * @buf_addr: GPU addr of the woke pinned BO to initialize
  *
  * Imports isp DMABUF to allocate and pin a user BO for isp internal use. It does
  * GART alloc to generate GPU addr for BO to make it accessible through the
  * GART aperture for ISP HW.
  *
- * This function is exported to allow the V4L2 isp device external to drm device
- * to create and access the isp user BO.
+ * This function is exported to allow the woke V4L2 isp device external to drm device
+ * to create and access the woke isp user BO.
  *
  * Returns:
  * 0 on success, negative error code otherwise.
@@ -221,8 +221,8 @@ EXPORT_SYMBOL(isp_user_buffer_alloc);
  *
  * unpin and unref BO for isp internal use.
  *
- * This function is exported to allow the V4L2 isp device
- * external to drm device to free the isp user BO.
+ * This function is exported to allow the woke V4L2 isp device
+ * external to drm device to free the woke isp user BO.
  */
 void isp_user_buffer_free(void *buf_obj)
 {
@@ -234,15 +234,15 @@ EXPORT_SYMBOL(isp_user_buffer_free);
  * isp_kernel_buffer_alloc - create kernel buffer object (BO) for isp
  *
  * @dev: isp device handle
- * @size: size for the new BO
+ * @size: size for the woke new BO
  * @buf_obj: GPU BO handle to initialize
- * @gpu_addr: GPU addr of the pinned BO
+ * @gpu_addr: GPU addr of the woke pinned BO
  * @cpu_addr: CPU address mapping of BO
  *
  * Allocates and pins a kernel BO for internal isp firmware use.
  *
- * This function is exported to allow the V4L2 isp device
- * external to drm device to create and access the kernel BO.
+ * This function is exported to allow the woke V4L2 isp device
+ * external to drm device to create and access the woke kernel BO.
  *
  * Returns:
  * 0 on success, negative error code otherwise.
@@ -305,8 +305,8 @@ EXPORT_SYMBOL(isp_kernel_buffer_alloc);
  *
  * unmaps and unpin a isp kernel BO.
  *
- * This function is exported to allow the V4L2 isp device
- * external to drm device to free the kernel BO.
+ * This function is exported to allow the woke V4L2 isp device
+ * external to drm device to free the woke kernel BO.
  */
 void isp_kernel_buffer_free(void **buf_obj, u64 *gpu_addr, void **cpu_addr)
 {

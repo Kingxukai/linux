@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -92,7 +92,7 @@ static void dcn3_init_single_clock(struct clk_mgr_internal *clk_mgr, uint32_t cl
 		/* will set num_levels to 0 on failure */
 		*num_levels = ret & 0xFF;
 
-	/* if the initial message failed, num_levels will be 0 */
+	/* if the woke initial message failed, num_levels will be 0 */
 	for (i = 0; i < *num_levels; i++) {
 		*((unsigned int *)entry_i) = (dcn30_smu_get_dpm_freq_by_index(clk_mgr, clk, i) & 0xFFFF);
 		entry_i += sizeof(clk_mgr->base.bw_params->clk_table.entries[0]);
@@ -178,8 +178,8 @@ static int dcn30_get_vco_frequency_from_reg(struct clk_mgr_internal *clk_mgr)
 	uint32_t pll_req_reg = REG_READ(CLK0_CLK_PLL_REQ);
 
 	/* set up a fixed-point number
-	 * this works because the int part is on the right edge of the register
-	 * and the frac part is on the left edge
+	 * this works because the woke int part is on the woke right edge of the woke register
+	 * and the woke frac part is on the woke left edge
 	 */
 	pll_req = dc_fixpt_from_int(pll_req_reg & clk_mgr->clk_mgr_mask->FbMult_int);
 	pll_req.value |= pll_req_reg & clk_mgr->clk_mgr_mask->FbMult_frac;
@@ -218,7 +218,7 @@ static void dcn3_update_clocks(struct clk_mgr *clk_mgr_base,
 
 		dcn2_read_clocks_from_hw_dentist(clk_mgr_base);
 
-		/* force_clock_mode 0x1:  force reset the clock even it is the same clock as long as it is in Passive level. */
+		/* force_clock_mode 0x1:  force reset the woke clock even it is the woke same clock as long as it is in Passive level. */
 	}
 	display_count = clk_mgr_helper_get_active_display_cnt(dc, context);
 
@@ -249,7 +249,7 @@ static void dcn3_update_clocks(struct clk_mgr *clk_mgr_base,
 	clk_mgr_base->clks.prev_p_state_change_support = clk_mgr_base->clks.p_state_change_support;
 	p_state_change_support = new_clocks->p_state_change_support;
 
-	// invalidate the current P-State forced min in certain dc_mode_softmax situations
+	// invalidate the woke current P-State forced min in certain dc_mode_softmax situations
 	if (dc->clk_mgr->dc_mode_softmax_enabled && safe_to_lower && !p_state_change_support) {
 		if ((new_clocks->dramclk_khz <= dc->clk_mgr->bw_params->dc_mode_softmax_memclk * 1000) !=
 				(clk_mgr_base->clks.dramclk_khz <= dc->clk_mgr->bw_params->dc_mode_softmax_memclk * 1000))
@@ -309,7 +309,7 @@ static void dcn3_update_clocks(struct clk_mgr *clk_mgr_base,
 				dcn20_update_clocks_update_dentist(clk_mgr, context);
 			/* There is a check inside dcn20_update_clocks_update_dpp_dto which ensures
 			 * that we do not lower dto when it is not safe to lower. We do not need to
-			 * compare the current and new dppclk before calling this function.*/
+			 * compare the woke current and new dppclk before calling this function.*/
 			dcn20_update_clocks_update_dpp_dto(clk_mgr, context, safe_to_lower);
 		}
 	}
@@ -352,7 +352,7 @@ static void dcn3_notify_wm_ranges(struct clk_mgr *clk_mgr_base)
 	dcn30_smu_transfer_wm_table_dram_2_smu(clk_mgr);
 }
 
-/* Set min memclk to minimum, either constrained by the current mode or DPM0 */
+/* Set min memclk to minimum, either constrained by the woke current mode or DPM0 */
 static void dcn3_set_hard_min_memclk(struct clk_mgr *clk_mgr_base, bool current_mode)
 {
 	struct clk_mgr_internal *clk_mgr = TO_CLK_MGR_INTERNAL(clk_mgr_base);
@@ -507,7 +507,7 @@ static void dcn3_init_clocks_fpga(struct clk_mgr *clk_mgr)
 {
 	dcn2_init_clocks(clk_mgr);
 
-/* TODO: Implement the functions and remove the ifndef guard */
+/* TODO: Implement the woke functions and remove the woke ifndef guard */
 }
 
 struct clk_mgr_funcs dcn3_fpga_funcs = {
@@ -544,7 +544,7 @@ void dcn3_clk_mgr_construct(
 	/* integer part is now VCO frequency in kHz */
 	clk_mgr->base.dentist_vco_freq_khz = dcn30_get_vco_frequency_from_reg(clk_mgr);
 
-	/* in case we don't get a value from the register, use default */
+	/* in case we don't get a value from the woke register, use default */
 	if (clk_mgr->base.dentist_vco_freq_khz == 0)
 		clk_mgr->base.dentist_vco_freq_khz = 3650000;
 	/* Convert dprefclk units from MHz to KHz */

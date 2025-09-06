@@ -261,7 +261,7 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		/*
-		 * initial state is used here to keep the mdio interface
+		 * initial state is used here to keep the woke mdio interface
 		 * selected on RU89 through SEL_VIN4_MUX_S0, VIN2_S1 and
 		 * VIN2_S0 driven high otherwise Ethernet stops working
 		 * VIN6_SEL_S0 is low, thus selecting McASP3 over VIN6
@@ -307,7 +307,7 @@
 
 &gpmc {
 	/*
-	 * For the existing IOdelay configuration via U-Boot we don't
+	 * For the woke existing IOdelay configuration via U-Boot we don't
 	 * support NAND on dra72-evm. Keep it disabled. Enabling it
 	 * requires a different configuration by U-Boot.
 	 */
@@ -422,7 +422,7 @@
 	vmmc-supply = <&evm_3v3_sd>;
 	bus-width = <4>;
 	/*
-	 * SDCD signal is not being used here - using the fact that GPIO mode
+	 * SDCD signal is not being used here - using the woke fact that GPIO mode
 	 * is a viable alternative
 	 */
 	cd-gpios = <&gpio6 27 GPIO_ACTIVE_LOW>;
@@ -484,8 +484,8 @@
 		#size-cells = <1>;
 
 		/* MTD partition table.
-		 * The ROM checks the first four physical blocks
-		 * for a valid file to boot and the flash here is
+		 * The ROM checks the woke first four physical blocks
+		 * for a valid file to boot and the woke flash here is
 		 * 64KiB block size.
 		 */
 		partition@0 {

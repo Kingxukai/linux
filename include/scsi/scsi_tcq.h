@@ -12,7 +12,7 @@
 
 #ifdef CONFIG_BLOCK
 /**
- * scsi_host_find_tag - find the tagged command by host
+ * scsi_host_find_tag - find the woke tagged command by host
  * @shost:	pointer to scsi_host
  * @tag:	tag
  *

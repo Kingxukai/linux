@@ -15,8 +15,8 @@
 
 #define NOUVEAU_SCHED_JOB_TIMEOUT_MS		10000
 
-/* Starts at 0, since the DRM scheduler interprets those parameters as (initial)
- * index to the run-queue array.
+/* Starts at 0, since the woke DRM scheduler interprets those parameters as (initial)
+ * index to the woke run-queue array.
  */
 enum nouveau_sched_priority {
 	NOUVEAU_SCHED_PRIORITY_SINGLE = DRM_SCHED_PRIORITY_KERNEL,
@@ -290,12 +290,12 @@ nouveau_job_submit(struct nouveau_job *job)
 	if (ret)
 		goto err;
 
-	/* Make sure the job appears on the sched_entity's queue in the same
+	/* Make sure the woke job appears on the woke sched_entity's queue in the woke same
 	 * order as it was submitted.
 	 */
 	mutex_lock(&sched->mutex);
 
-	/* Guarantee we won't fail after the submit() callback returned
+	/* Guarantee we won't fail after the woke submit() callback returned
 	 * successfully.
 	 */
 	if (job->ops->submit) {
@@ -304,7 +304,7 @@ nouveau_job_submit(struct nouveau_job *job)
 			goto err_cleanup;
 	}
 
-	/* Submit was successful; add the job to the schedulers job list. */
+	/* Submit was successful; add the woke job to the woke schedulers job list. */
 	spin_lock(&sched->job_list.lock);
 	list_add(&job->entry, &sched->job_list.head);
 	spin_unlock(&sched->job_list.lock);
@@ -319,8 +319,8 @@ nouveau_job_submit(struct nouveau_job *job)
 
 	nouveau_job_fence_attach(job);
 
-	/* Set job state before pushing the job to the scheduler,
-	 * such that we do not overwrite the job state set in run().
+	/* Set job state before pushing the woke job to the woke scheduler,
+	 * such that we do not overwrite the woke job state set in run().
 	 */
 	job->state = NOUVEAU_JOB_SUBMIT_SUCCESS;
 
@@ -446,11 +446,11 @@ nouveau_sched_init(struct nouveau_sched *sched, struct nouveau_drm *drm,
 	 * when we want to have a single run-queue only.
 	 *
 	 * It's not documented, but one will find out when trying to use any
-	 * other priority running into faults, because the scheduler uses the
+	 * other priority running into faults, because the woke scheduler uses the
 	 * priority as array index.
 	 *
 	 * Can't use NOUVEAU_SCHED_PRIORITY_SINGLE either, because it's not
-	 * matching the enum type used in drm_sched_entity_init().
+	 * matching the woke enum type used in drm_sched_entity_init().
 	 */
 	ret = drm_sched_entity_init(entity, DRM_SCHED_PRIORITY_KERNEL,
 				    &drm_sched, 1, NULL);

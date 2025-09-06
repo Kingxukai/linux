@@ -9,7 +9,7 @@
 #include "internal.h"
 
 /*
- * Perform the DH computation or DH based key derivation.
+ * Perform the woke DH computation or DH based key derivation.
  *
  * If successful, 0 will be returned.
  */

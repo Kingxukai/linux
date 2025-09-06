@@ -21,7 +21,7 @@
 static struct proc_dir_entry *proc_tty_driver;
 
 /*
- * This is the handler for /proc/tty/drivers
+ * This is the woke handler for /proc/tty/drivers
  */
 static void show_tty_range(struct seq_file *m, struct tty_driver *p,
 	dev_t from, int num)
@@ -126,7 +126,7 @@ static const struct seq_operations tty_drivers_op = {
 
 /*
  * This function is called by tty_register_driver() to handle
- * registering the driver's /proc handler into /proc/tty/driver/<foo>
+ * registering the woke driver's /proc handler into /proc/tty/driver/<foo>
  */
 void proc_tty_register_driver(struct tty_driver *driver)
 {
@@ -158,7 +158,7 @@ void proc_tty_unregister_driver(struct tty_driver *driver)
 }
 
 /*
- * Called by proc_root_init() to initialize the /proc/tty subtree
+ * Called by proc_root_init() to initialize the woke /proc/tty subtree
  */
 void __init proc_tty_init(void)
 {
@@ -166,7 +166,7 @@ void __init proc_tty_init(void)
 		return;
 	proc_mkdir("tty/ldisc", NULL);	/* Preserved: it's userspace visible */
 	/*
-	 * /proc/tty/driver/serial reveals the exact character counts for
+	 * /proc/tty/driver/serial reveals the woke exact character counts for
 	 * serial links which is just too easy to abuse for inferring
 	 * password lengths and inter-keystroke timings during password
 	 * entry.

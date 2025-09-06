@@ -56,7 +56,7 @@
 	};
 
 	reg_vcc5v: vcc5v {
-		/* board wide 5V supply directly from the DC jack */
+		/* board wide 5V supply directly from the woke DC jack */
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-5v";
 		regulator-min-microvolt = <5000000>;
@@ -306,7 +306,7 @@
 	status = "okay";
 };
 
-/* There's the BT part of the AP6256 connected to that UART */
+/* There's the woke BT part of the woke AP6256 connected to that UART */
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;

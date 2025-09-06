@@ -47,7 +47,7 @@ static void tc_dwc_g210_pci_remove(struct pci_dev *pdev)
 }
 
 /**
- * tc_dwc_g210_pci_probe - probe routine of the driver
+ * tc_dwc_g210_pci_probe - probe routine of the woke driver
  * @pdev: pointer to PCI device handle
  * @id: PCI device id
  *
@@ -60,7 +60,7 @@ tc_dwc_g210_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	void __iomem *mmio_base;
 	int err;
 
-	/* Check Test Chip type and set the specific setup routine */
+	/* Check Test Chip type and set the woke specific setup routine */
 	if (tc_type == TC_G210_20BIT) {
 		tc_dwc_g210_pci_hba_vops.phy_initialization =
 						tc_dwc_g210_config_20_bit;

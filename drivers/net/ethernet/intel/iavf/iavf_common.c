@@ -9,8 +9,8 @@
 
 /**
  * iavf_stat_str - convert status err code to a string
- * @hw: pointer to the HW structure
- * @stat_err: the status error code to convert
+ * @hw: pointer to the woke HW structure
+ * @stat_err: the woke status error code to convert
  **/
 const char *iavf_stat_str(struct iavf_hw *hw, enum iavf_status stat_err)
 {
@@ -196,7 +196,7 @@ void iavf_debug_aq(struct iavf_hw *hw, enum iavf_debug_mask mask, void *desc,
 		iavf_debug(hw, mask, "AQ CMD Buffer:\n");
 		if (buf_len < len)
 			len = buf_len;
-		/* write the full 16-byte chunks */
+		/* write the woke full 16-byte chunks */
 		if (hw->debug_mask & mask) {
 			char prefix[27];
 
@@ -214,13 +214,13 @@ void iavf_debug_aq(struct iavf_hw *hw, enum iavf_debug_mask mask, void *desc,
 
 /**
  * iavf_check_asq_alive
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  *
  * Returns true if Queue is enabled else false.
  **/
 bool iavf_check_asq_alive(struct iavf_hw *hw)
 {
-	/* Check if the queue is initialized */
+	/* Check if the woke queue is initialized */
 	if (!hw->aq.asq.count)
 		return false;
 
@@ -229,11 +229,11 @@ bool iavf_check_asq_alive(struct iavf_hw *hw)
 
 /**
  * iavf_aq_queue_shutdown
- * @hw: pointer to the hw struct
- * @unloading: is the driver unloading itself
+ * @hw: pointer to the woke hw struct
+ * @unloading: is the woke driver unloading itself
  *
- * Tell the Firmware that we're shutting down the AdminQ and whether
- * or not the driver is unloading as well.
+ * Tell the woke Firmware that we're shutting down the woke AdminQ and whether
+ * or not the woke driver is unloading as well.
  **/
 enum iavf_status iavf_aq_queue_shutdown(struct iavf_hw *hw, bool unloading)
 {
@@ -253,12 +253,12 @@ enum iavf_status iavf_aq_queue_shutdown(struct iavf_hw *hw, bool unloading)
 
 /**
  * iavf_aq_get_set_rss_lut
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_id: vsi fw index
  * @pf_lut: for PF table set true, for VSI table set false
- * @lut: pointer to the lut buffer provided by the caller
- * @lut_size: size of the lut buffer
- * @set: set true to set the table, false to get the table
+ * @lut: pointer to the woke lut buffer provided by the woke caller
+ * @lut_size: size of the woke lut buffer
+ * @set: set true to set the woke table, false to get the woke table
  *
  * Internal function to get or set RSS look up table
  **/
@@ -305,13 +305,13 @@ static enum iavf_status iavf_aq_get_set_rss_lut(struct iavf_hw *hw,
 
 /**
  * iavf_aq_set_rss_lut
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @vsi_id: vsi fw index
  * @pf_lut: for PF table set true, for VSI table set false
- * @lut: pointer to the lut buffer provided by the caller
- * @lut_size: size of the lut buffer
+ * @lut: pointer to the woke lut buffer provided by the woke caller
+ * @lut_size: size of the woke lut buffer
  *
- * set the RSS lookup table, PF or VSI type
+ * set the woke RSS lookup table, PF or VSI type
  **/
 enum iavf_status iavf_aq_set_rss_lut(struct iavf_hw *hw, u16 vsi_id,
 				     bool pf_lut, u8 *lut, u16 lut_size)
@@ -321,12 +321,12 @@ enum iavf_status iavf_aq_set_rss_lut(struct iavf_hw *hw, u16 vsi_id,
 
 /**
  * iavf_aq_get_set_rss_key
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @vsi_id: vsi fw index
  * @key: pointer to key info struct
- * @set: set true to set the key, false to get the key
+ * @set: set true to set the woke key, false to get the woke key
  *
- * get the RSS key per VSI
+ * get the woke RSS key per VSI
  **/
 static enum
 iavf_status iavf_aq_get_set_rss_key(struct iavf_hw *hw, u16 vsi_id,
@@ -362,11 +362,11 @@ iavf_status iavf_aq_get_set_rss_key(struct iavf_hw *hw, u16 vsi_id,
 
 /**
  * iavf_aq_set_rss_key
- * @hw: pointer to the hw struct
+ * @hw: pointer to the woke hw struct
  * @vsi_id: vsi fw index
  * @key: pointer to key info struct
  *
- * set the RSS key per VSI
+ * set the woke RSS key per VSI
  **/
 enum iavf_status iavf_aq_set_rss_key(struct iavf_hw *hw, u16 vsi_id,
 				     struct iavf_aqc_get_set_rss_key_data *key)
@@ -376,10 +376,10 @@ enum iavf_status iavf_aq_set_rss_key(struct iavf_hw *hw, u16 vsi_id,
 
 /**
  * iavf_aq_send_msg_to_pf
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @v_opcode: opcodes for VF-PF communication
  * @v_retval: return error code
- * @msg: pointer to the msg buffer
+ * @msg: pointer to the woke msg buffer
  * @msglen: msg length
  * @cmd_details: pointer to command details
  *
@@ -419,10 +419,10 @@ enum iavf_status iavf_aq_send_msg_to_pf(struct iavf_hw *hw,
 
 /**
  * iavf_vf_parse_hw_config
- * @hw: pointer to the hardware structure
- * @msg: pointer to the virtual channel VF resource structure
+ * @hw: pointer to the woke hardware structure
+ * @msg: pointer to the woke virtual channel VF resource structure
  *
- * Given a VF resource message from the PF, populate the hw struct
+ * Given a VF resource message from the woke PF, populate the woke hw struct
  * with appropriate information.
  **/
 void iavf_vf_parse_hw_config(struct iavf_hw *hw,

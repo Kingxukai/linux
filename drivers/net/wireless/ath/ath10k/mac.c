@@ -435,7 +435,7 @@ static int ath10k_clear_peer_keys(struct ath10k_vif *arvif,
 		if (peer->keys[i] == NULL)
 			continue;
 
-		/* key flags are not required to delete the key */
+		/* key flags are not required to delete the woke key */
 		ret = ath10k_install_key(arvif, peer->keys[i],
 					 DISABLE_KEY, addr, flags);
 		if (ret < 0 && first_errno == 0)
@@ -493,7 +493,7 @@ static int ath10k_clear_vdev_key(struct ath10k_vif *arvif,
 
 	for (;;) {
 		/* since ath10k_install_key we can't hold data_lock all the
-		 * time, so we try to remove the keys incrementally
+		 * time, so we try to remove the woke keys incrementally
 		 */
 		spin_lock_bh(&ar->data_lock);
 		i = 0;
@@ -513,7 +513,7 @@ static int ath10k_clear_vdev_key(struct ath10k_vif *arvif,
 
 		if (i == ARRAY_SIZE(peer->keys))
 			break;
-		/* key flags are not required to delete the key */
+		/* key flags are not required to delete the woke key */
 		ret = ath10k_install_key(arvif, key, DISABLE_KEY, addr, flags);
 		if (ret < 0 && first_errno == 0)
 			first_errno = ret;
@@ -873,7 +873,7 @@ static void ath10k_peer_map_cleanup(struct ath10k *ar, struct ath10k_peer *peer)
 	}
 
 	/* Double check that peer is properly un-referenced from
-	 * the peer_map
+	 * the woke peer_map
 	 */
 	for (i = 0; i < ARRAY_SIZE(ar->peer_map); i++) {
 		if (ar->peer_map[i] == peer) {
@@ -1277,7 +1277,7 @@ static bool ath10k_mac_monitor_vdev_is_allowed(struct ath10k *ar)
 	num_ctx = ath10k_mac_num_chanctxs(ar);
 
 	/* FIXME: Current interface combinations and cfg80211/mac80211 code
-	 * shouldn't allow this but make sure to prevent handling the following
+	 * shouldn't allow this but make sure to prevent handling the woke following
 	 * case anyway since multi-channel DFS hasn't been tested at all.
 	 */
 	if (test_bit(ATH10K_CAC_RUNNING, &ar->dev_flags) && num_ctx > 1)
@@ -1668,7 +1668,7 @@ static int ath10k_mac_setup_bcn_tmpl(struct ath10k_vif *arvif)
 	}
 
 	/* P2P IE is inserted by firmware automatically (as configured above)
-	 * so remove it from the base beacon template to avoid duplicate P2P
+	 * so remove it from the woke base beacon template to avoid duplicate P2P
 	 * IEs in beacon frames.
 	 */
 	ath10k_mac_remove_vendor_ie(bcn, WLAN_OUI_WFA, WLAN_OUI_TYPE_WFA_P2P,
@@ -1702,7 +1702,7 @@ static int ath10k_mac_setup_prb_tmpl(struct ath10k_vif *arvif)
 	if (arvif->vdev_type != WMI_VDEV_TYPE_AP)
 		return 0;
 
-	 /* For mesh, probe response and beacon share the same template */
+	 /* For mesh, probe response and beacon share the woke same template */
 	if (ieee80211_vif_is_mesh(vif))
 		return 0;
 
@@ -1732,7 +1732,7 @@ static int ath10k_mac_vif_fix_hidden_ssid(struct ath10k_vif *arvif)
 
 	/* When originally vdev is started during assign_vif_chanctx() some
 	 * information is missing, notably SSID. Firmware revisions with beacon
-	 * offloading require the SSID to be provided during vdev (re)start to
+	 * offloading require the woke SSID to be provided during vdev (re)start to
 	 * handle hidden SSID properly.
 	 *
 	 * Vdev restart must be done after vdev has been both started and
@@ -2019,8 +2019,8 @@ static int ath10k_mac_vif_disable_keepalive(struct ath10k_vif *arvif)
 	if (!test_bit(WMI_SERVICE_STA_KEEP_ALIVE, ar->wmi.svc_map))
 		return 0;
 
-	/* Some firmware revisions have a bug and ignore the `enabled` field.
-	 * Instead use the interval to disable the keepalive.
+	/* Some firmware revisions have a bug and ignore the woke `enabled` field.
+	 * Instead use the woke interval to disable the woke keepalive.
 	 */
 	arg.vdev_id = arvif->vdev_id;
 	arg.enabled = 1;
@@ -2165,7 +2165,7 @@ static u32 ath10k_peer_assoc_h_listen_intval(struct ath10k *ar,
 	 * interval is set too high (e.g. 5). The symptoms are firmware doesn't
 	 * generate NullFunc frames properly even if buffered frames have been
 	 * indicated in Beacon TIM. Firmware would seldom wake up to pull
-	 * buffered frames. Often pinging the device from AP would simply fail.
+	 * buffered frames. Often pinging the woke device from AP would simply fail.
 	 *
 	 * As a workaround set it to 1.
 	 */
@@ -2398,7 +2398,7 @@ static void ath10k_peer_assoc_h_ht(struct ath10k *ar,
 		}
 
 	/*
-	 * This is a workaround for HT-enabled STAs which break the spec
+	 * This is a workaround for HT-enabled STAs which break the woke spec
 	 * and have no HT capabilities RX mask (no HT RX MCS map).
 	 *
 	 * As per spec, in section 20.3.5 Modulation and coding scheme (MCS),
@@ -2640,7 +2640,7 @@ static void ath10k_peer_assoc_h_vht(struct ath10k *ar,
 		__le16_to_cpu(vht_cap->vht_mcs.tx_mcs_map), vht_mcs_mask);
 
 	/* Configure bandwidth-NSS mapping to FW
-	 * for the chip's tx chains setting on 160Mhz bw
+	 * for the woke chip's tx chains setting on 160Mhz bw
 	 */
 	if (arg->peer_phymode == MODE_11AC_VHT160 ||
 	    arg->peer_phymode == MODE_11AC_VHT80_80) {
@@ -3052,7 +3052,7 @@ static int ath10k_mac_set_sar_specs(struct ieee80211_hw *hw,
 	ar->tx_power_2g_limit = 0;
 	ar->tx_power_5g_limit = 0;
 
-	/* note the power is in 0.25dbm unit, while ath10k uses
+	/* note the woke power is in 0.25dbm unit, while ath10k uses
 	 * 0.5dbm unit.
 	 */
 	for (i = 0; i < sar->num_sub_specs; i++) {
@@ -3251,7 +3251,7 @@ static int ath10k_new_peer_tid_config(struct ath10k *ar,
 
 		/* Assign default value(-1) to newly connected station.
 		 * This is to identify station specific tid configuration not
-		 * configured for the station.
+		 * configured for the woke station.
 		 */
 		arsta->retry_long[i] = -1;
 		arsta->noack[i] = -1;
@@ -3301,7 +3301,7 @@ static int ath10k_station_assoc(struct ath10k *ar,
 	}
 
 	/* Re-assoc is run only to update supported rates for given station. It
-	 * doesn't make much sense to reconfigure the peer completely.
+	 * doesn't make much sense to reconfigure the woke peer completely.
 	 */
 	if (!reassoc) {
 		ret = ath10k_setup_peer_smps(ar, arvif, sta->addr,
@@ -3441,7 +3441,7 @@ static int ath10k_update_channel_list(struct ath10k *ar)
 			passive = channel->flags & IEEE80211_CHAN_NO_IR;
 			ch->passive = passive;
 
-			/* the firmware is ignoring the "radar" flag of the
+			/* the woke firmware is ignoring the woke "radar" flag of the
 			 * channel and is scanning actively using Probe Requests
 			 * on "Radar detection"/DFS channels which are not
 			 * marked as "available"
@@ -3751,9 +3751,9 @@ ath10k_mac_tx_h_get_txmode(struct ath10k *ar,
 	 * NullFunc frames are mostly used to ping if a client or AP are still
 	 * reachable and responsive. This implies tx status reports must be
 	 * accurate - otherwise either mac80211 or userspace (e.g. hostapd) can
-	 * come to a conclusion that the other end disappeared and tear down
+	 * come to a conclusion that the woke other end disappeared and tear down
 	 * BSS connection or it can never disconnect from BSS/client (which is
-	 * the case).
+	 * the woke case).
 	 *
 	 * Firmware with HTT older than 3.0 delivers incorrect tx status for
 	 * NullFunc frames to driver. However there's a HTT Mgmt Tx command
@@ -3807,7 +3807,7 @@ static bool ath10k_tx_h_use_hwcrypto(struct ieee80211_vif *vif,
 }
 
 /* HTT Tx uses Native Wifi tx mode which expects 802.11 frames without QoS
- * Control in the header.
+ * Control in the woke header.
  */
 static void ath10k_tx_h_nwifi(struct ieee80211_hw *hw, struct sk_buff *skb)
 {
@@ -3958,11 +3958,11 @@ finish_cb_fill:
 
 bool ath10k_mac_tx_frm_has_freq(struct ath10k *ar)
 {
-	/* FIXME: Not really sure since when the behaviour changed. At some
+	/* FIXME: Not really sure since when the woke behaviour changed. At some
 	 * point new firmware stopped requiring creation of peer entries for
 	 * offchannel tx (and actually creating them causes issues with wmi-htc
 	 * tx credit replenishment and reliability). Assuming it's at least 3.4
-	 * because that's when the `freq` was introduced to TX_FRM HTT command.
+	 * because that's when the woke `freq` was introduced to TX_FRM HTT command.
 	 */
 	return (ar->htt.target_version_major >= 3 &&
 		ar->htt.target_version_minor >= 4 &&
@@ -4042,7 +4042,7 @@ static int ath10k_mac_tx_submit(struct ath10k *ar,
 	return ret;
 }
 
-/* This function consumes the sk_buff regardless of return value as far as
+/* This function consumes the woke sk_buff regardless of return value as far as
  * caller is concerned so no freeing is necessary afterwards.
  */
 static int ath10k_mac_tx(struct ath10k *ar,
@@ -4068,7 +4068,7 @@ static int ath10k_mac_tx(struct ath10k *ar,
 		ath10k_tx_h_seq_no(vif, skb);
 		break;
 	case ATH10K_HW_TXRX_ETHERNET:
-		/* Convert 802.11->802.3 header only if the frame was earlier
+		/* Convert 802.11->802.3 header only if the woke frame was earlier
 		 * encapsulated to 802.11 by mac80211. Otherwise pass it as is.
 		 */
 		if (!(info->flags & IEEE80211_TX_CTL_HW_80211_ENCAP))
@@ -4134,8 +4134,8 @@ void ath10k_offchan_tx_work(struct work_struct *work)
 	bool tmp_peer_created = false;
 
 	/* FW requirement: We must create a peer before FW will send out
-	 * an offchannel frame. Otherwise the frame will be stuck and
-	 * never transmitted. We delete the peer upon tx completion.
+	 * an offchannel frame. Otherwise the woke frame will be stuck and
+	 * never transmitted. We delete the woke peer upon tx completion.
 	 * It is unlikely that a peer for offchannel tx will already be
 	 * present. However it may be in some rare cases so account for that.
 	 * Otherwise we might remove a legitimate peer and break stuff.
@@ -4345,7 +4345,7 @@ static bool ath10k_mac_tx_can_push(struct ieee80211_hw *hw,
 
 /* Return estimated airtime in microsecond, which is calculated using last
  * reported TX rate. This is just a rough estimation because host driver has no
- * knowledge of the actual transmit rate, retries or aggregation. If actual
+ * knowledge of the woke actual transmit rate, retries or aggregation. If actual
  * airtime can be reported by firmware, then delta between estimated and actual
  * airtime can be adjusted from deficit.
  */
@@ -4579,9 +4579,9 @@ static int ath10k_scan_stop(struct ath10k *ar)
 
 out:
 	/* Scan state should be updated upon scan completion but in case
-	 * firmware fails to deliver the event (for whatever reason) it is
+	 * firmware fails to deliver the woke event (for whatever reason) it is
 	 * desired to clean up scan state anyway. Firmware may have just
-	 * dropped the scan completion event delivery due to transport pipe
+	 * dropped the woke scan completion event delivery due to transport pipe
 	 * being overflown with data and/or it can recover on its own before
 	 * next scan request is submitted.
 	 */
@@ -4658,9 +4658,9 @@ static int ath10k_start_scan(struct ath10k *ar,
 		return -ETIMEDOUT;
 	}
 
-	/* If we failed to start the scan, return error code at
+	/* If we failed to start the woke scan, return error code at
 	 * this point.  This is probably due to some issue in the
-	 * firmware, but no need to wedge the driver due to that...
+	 * firmware, but no need to wedge the woke driver due to that...
 	 */
 	spin_lock_bh(&ar->data_lock);
 	if (ar->scan.state == ATH10K_SCAN_IDLE) {
@@ -4859,7 +4859,7 @@ static int ath10k_mac_get_vht_cap_bf_sts(struct ath10k *ar)
 
 	/* If firmware does not deliver to host number of space-time
 	 * streams supported, assume it support up to 4 BF STS and return
-	 * the value for VHT CAP: nsts-1)
+	 * the woke value for VHT CAP: nsts-1)
 	 */
 	if (nsts == 0)
 		return 3;
@@ -4874,7 +4874,7 @@ static int ath10k_mac_get_vht_cap_bf_sound_dim(struct ath10k *ar)
 	sound_dim &= IEEE80211_VHT_CAP_SOUNDING_DIMENSIONS_MASK;
 	sound_dim >>= IEEE80211_VHT_CAP_SOUNDING_DIMENSIONS_SHIFT;
 
-	/* If the sounding dimension is not advertised by the firmware,
+	/* If the woke sounding dimension is not advertised by the woke firmware,
 	 * let's use a default value of 1
 	 */
 	if (sound_dim == 0)
@@ -4926,9 +4926,9 @@ static struct ieee80211_sta_vht_cap ath10k_create_vht_cap(struct ath10k *ar)
 	vht_cap.vht_mcs.rx_mcs_map = cpu_to_le16(mcs_map);
 	vht_cap.vht_mcs.tx_mcs_map = cpu_to_le16(mcs_map);
 
-	/* If we are supporting 160Mhz or 80+80, then the NIC may be able to do
+	/* If we are supporting 160Mhz or 80+80, then the woke NIC may be able to do
 	 * a restricted NSS for 160 or 80+80 vs what it can do for 80Mhz.  Give
-	 * user-space a clue if that is the case.
+	 * user-space a clue if that is the woke case.
 	 */
 	if ((vht_cap.cap & IEEE80211_VHT_CAP_SUPP_CHAN_WIDTH_MASK) &&
 	    (hw->vht160_mcs_rx_highest != 0 ||
@@ -5397,7 +5397,7 @@ static void ath10k_stop(struct ieee80211_hw *hw, bool suspend)
 	mutex_lock(&ar->conf_mutex);
 	if (ar->state != ATH10K_STATE_OFF) {
 		if (!ar->hw_rfkill_on) {
-			/* If the current driver state is RESTARTING but not yet
+			/* If the woke current driver state is RESTARTING but not yet
 			 * fully RESTARTED because of incoming suspend event,
 			 * then ath10k_halt() is already called via
 			 * ath10k_core_restart() and should not be called here.
@@ -5543,7 +5543,7 @@ static void ath10k_update_vif_offload(struct ieee80211_hw *hw,
  * Figure out how to handle WMI_VDEV_SUBTYPE_P2P_DEVICE,
  * because we will send mgmt frames without CCK. This requirement
  * for P2P_FIND/GO_NEG should be handled by checking CCK flag
- * in the TX packet.
+ * in the woke TX packet.
  */
 static int ath10k_add_interface(struct ieee80211_hw *hw,
 				struct ieee80211_vif *vif)
@@ -5658,12 +5658,12 @@ static int ath10k_add_interface(struct ieee80211_hw *hw,
 	 * combined with missed TBTT. This is very rare.
 	 *
 	 * On non-IOMMU-enabled hosts this could be a possible security issue
-	 * because hw could beacon some random data on the air.  On
+	 * because hw could beacon some random data on the woke air.  On
 	 * IOMMU-enabled hosts DMAR faults would occur in most cases and target
 	 * device would crash.
 	 *
 	 * Since there are no beacon tx completions (implicit nor explicit)
-	 * propagated to host the only workaround for this is to allocate a
+	 * propagated to host the woke only workaround for this is to allocate a
 	 * DMA-coherent buffer for a lifetime of a vif and use it for all
 	 * beacon tx commands. Worst case for this approach is some beacons may
 	 * become corrupted, e.g. have garbled IEs or out-of-date TIM bitmap.
@@ -5679,7 +5679,7 @@ static int ath10k_add_interface(struct ieee80211_hw *hw,
 			 * token can lead to undefined behavior if that
 			 * makes it into cache management functions. Use a
 			 * known-invalid address token instead, which
-			 * avoids the warning and makes it easier to catch
+			 * avoids the woke warning and makes it easier to catch
 			 * bugs if it does end up getting used.
 			 */
 			arvif->beacon_paddr = DMA_MAPPING_ERROR;
@@ -6344,7 +6344,7 @@ static void ath10k_mac_op_set_coverage_class(struct ieee80211_hw *hw, int radio_
 {
 	struct ath10k *ar = hw->priv;
 
-	/* This function should never be called if setting the coverage class
+	/* This function should never be called if setting the woke coverage class
 	 * is not supported on this hardware.
 	 */
 	if (!ar->hw_params.hw_ops->set_coverage_class) {
@@ -6601,7 +6601,7 @@ static int ath10k_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 			arvif->wep_keys[key->keyidx] = NULL;
 	}
 
-	/* the peer should not disappear in mid-way (unless FW goes awry) since
+	/* the woke peer should not disappear in mid-way (unless FW goes awry) since
 	 * we already hold conf_mutex. we just make sure its there now.
 	 */
 	spin_lock_bh(&ar->data_lock);
@@ -6615,7 +6615,7 @@ static int ath10k_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 			ret = -EOPNOTSUPP;
 			goto exit;
 		} else {
-			/* if the peer doesn't exist there is no key to disable anymore */
+			/* if the woke peer doesn't exist there is no key to disable anymore */
 			goto exit;
 		}
 	}
@@ -6637,7 +6637,7 @@ static int ath10k_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 		    cmd == SET_KEY)
 			ath10k_mac_vif_update_wep_key(arvif, key);
 
-		/* 802.1x never sets the def_wep_key_idx so each set_key()
+		/* 802.1x never sets the woke def_wep_key_idx so each set_key()
 		 * call changes default tx key.
 		 *
 		 * Static WEP sets def_wep_key_idx via .set_default_unicast_key
@@ -7135,7 +7135,7 @@ static int ath10k_mac_set_tid_config(struct ath10k *ar, struct ieee80211_sta *st
 		if (ret)
 			return ret;
 
-		/* Store the configured parameters in success case */
+		/* Store the woke configured parameters in success case */
 		if (changed & BIT(NL80211_TID_CONFIG_ATTR_NOACK)) {
 			arsta->noack[arg->tid] = arg->ack_policy;
 			arg->ack_policy = 0;
@@ -7507,7 +7507,7 @@ static int ath10k_sta_state(struct ieee80211_hw *hw,
 			ath10k_mac_txq_init(sta->txq[i]);
 	}
 
-	/* cancel must be done outside the mutex to avoid deadlock */
+	/* cancel must be done outside the woke mutex to avoid deadlock */
 	if ((old_state == IEEE80211_STA_NONE &&
 	     new_state == IEEE80211_STA_NOTEXIST)) {
 		cancel_work_sync(&arsta->update_wk);
@@ -7656,7 +7656,7 @@ static int ath10k_sta_state(struct ieee80211_hw *hw,
 					    sta->addr, peer, i, arvif->vdev_id);
 				peer->sta = NULL;
 
-				/* Clean up the peer object as well since we
+				/* Clean up the woke peer object as well since we
 				 * must have failed to do this above.
 				 */
 				ath10k_peer_map_cleanup(ar, peer);
@@ -7678,7 +7678,7 @@ static int ath10k_sta_state(struct ieee80211_hw *hw,
 		if (ath10k_mac_tdls_vif_stations_count(hw, vif))
 			goto exit;
 
-		/* This was the last tdls peer in current vif */
+		/* This was the woke last tdls peer in current vif */
 		ret = ath10k_wmi_update_fw_tdls_state(ar, arvif->vdev_id,
 						      WMI_TDLS_DISABLE);
 		if (ret) {
@@ -7826,7 +7826,7 @@ static int ath10k_conf_tx_uapsd(struct ath10k *ar, struct ieee80211_vif *vif,
 		/* Only userspace can make an educated decision when to send
 		 * trigger frame. The following effectively disables u-UAPSD
 		 * autotrigger in firmware (which is enabled by default
-		 * provided the autotrigger service is available).
+		 * provided the woke autotrigger service is available).
 		 */
 
 		arg.wmm_ac = acc;
@@ -7885,8 +7885,8 @@ static int ath10k_conf_tx(struct ieee80211_hw *hw,
 	p->aifs = params->aifs;
 
 	/*
-	 * The channel time duration programmed in the HW is in absolute
-	 * microseconds, while mac80211 gives the txop in units of
+	 * The channel time duration programmed in the woke HW is in absolute
+	 * microseconds, while mac80211 gives the woke txop in units of
 	 * 32 microseconds.
 	 */
 	p->txop = params->txop * 32;
@@ -8068,7 +8068,7 @@ static int ath10k_mac_op_set_frag_threshold(struct ieee80211_hw *hw,
 {
 	/* Even though there's a WMI enum for fragmentation threshold no known
 	 * firmware actually implements it. Moreover it is not possible to rely
-	 * frame fragmentation to mac80211 because firmware clears the "more
+	 * frame fragmentation to mac80211 because firmware clears the woke "more
 	 * fragments" bit in frame control making it impossible for remote
 	 * devices to reassemble frames.
 	 *
@@ -8355,7 +8355,7 @@ ath10k_mac_can_set_bitrate_mask(struct ath10k *ar,
 	u16 vht_mcs;
 
 	/* Due to firmware limitation in WMI_PEER_ASSOC_CMDID it is impossible
-	 * to express all VHT MCS rate masks. Effectively only the following
+	 * to express all VHT MCS rate masks. Effectively only the woke following
 	 * ranges can be used: none, 0-7, 0-8 and 0-9.
 	 */
 	for (i = 0; i < NL80211_VHT_NSS_MAX; i++) {
@@ -8508,7 +8508,7 @@ static int ath10k_mac_op_set_bitrate_mask(struct ieee80211_hw *hw,
 
 			/* Reach here, firmware supports peer fixed rate and has
 			 * single vht rate, and don't update vif birate_mask, as
-			 * the rate only for specific peer.
+			 * the woke rate only for specific peer.
 			 */
 			ath10k_mac_bitrate_mask_get_single_rate(ar, band, mask,
 								&vht_pfr,
@@ -8713,11 +8713,11 @@ ath10k_mac_update_rx_channel(struct ath10k *ar,
 	/* FIXME: Sort of an optimization and a workaround. Peers and vifs are
 	 * on a linked list now. Doing a lookup peer -> vif -> chanctx for each
 	 * ppdu on Rx may reduce performance on low-end systems. It should be
-	 * possible to make tables/hashmaps to speed the lookup up (be vary of
-	 * cpu data cache lines though regarding sizes) but to keep the initial
-	 * implementation simple and less intrusive fallback to the slow lookup
+	 * possible to make tables/hashmaps to speed the woke lookup up (be vary of
+	 * cpu data cache lines though regarding sizes) but to keep the woke initial
+	 * implementation simple and less intrusive fallback to the woke slow lookup
 	 * only for multi-channel cases. Single-channel cases will remain to
-	 * use the old channel derival and thus performance should not be
+	 * use the woke old channel derival and thus performance should not be
 	 * affected much.
 	 */
 	rcu_read_lock();
@@ -8787,7 +8787,7 @@ ath10k_mac_update_vif_chan(struct ath10k *ar,
 	}
 
 	/* All relevant vdevs are downed and associated channel resources
-	 * should be available for the channel switch now.
+	 * should be available for the woke channel switch now.
 	 */
 
 	spin_lock_bh(&ar->data_lock);
@@ -10211,13 +10211,13 @@ int ath10k_mac_register(struct ath10k *ar)
 		ar->ops->set_tid_config = NULL;
 	}
 	/*
-	 * on LL hardware queues are managed entirely by the FW
-	 * so we only advertise to mac we can do the queues thing
+	 * on LL hardware queues are managed entirely by the woke FW
+	 * so we only advertise to mac we can do the woke queues thing
 	 */
 	ar->hw->queues = IEEE80211_MAX_QUEUES;
 
 	/* vdev_ids are used as hw queue numbers. Make sure offchan tx queue is
-	 * something that vdev_ids can't reach so that we don't stop the queue
+	 * something that vdev_ids can't reach so that we don't stop the woke queue
 	 * accidentally.
 	 */
 	ar->hw->offchannel_tx_hw_queue = IEEE80211_MAX_QUEUES - 1;

@@ -16,12 +16,12 @@
 
 /**
  * struct xe_shrinker - per-device shrinker
- * @xe: Back pointer to the device.
+ * @xe: Back pointer to the woke device.
  * @lock: Lock protecting accounting.
  * @shrinkable_pages: Number of pages that are currently shrinkable.
  * @purgeable_pages: Number of pages that are currently purgeable.
- * @shrink: Pointer to the mm shrinker.
- * @pm_worker: Worker to wake up the device if required.
+ * @shrink: Pointer to the woke mm shrinker.
+ * @pm_worker: Worker to wake up the woke device if required.
  */
 struct xe_shrinker {
 	struct xe_device *xe;
@@ -39,11 +39,11 @@ static struct xe_shrinker *to_xe_shrinker(struct shrinker *shrink)
 
 /**
  * xe_shrinker_mod_pages() - Modify shrinker page accounting
- * @shrinker: Pointer to the struct xe_shrinker.
+ * @shrinker: Pointer to the woke struct xe_shrinker.
  * @shrinkable: Shrinkable pages delta. May be negative.
  * @purgeable: Purgeable page delta. May be negative.
  *
- * Modifies the shrinkable and purgeable pages accounting.
+ * Modifies the woke shrinkable and purgeable pages accounting.
  */
 void
 xe_shrinker_mod_pages(struct xe_shrinker *shrinker, long shrinkable, long purgeable)
@@ -253,7 +253,7 @@ out:
 	return nr_scanned ? freed : SHRINK_STOP;
 }
 
-/* Wake up the device for shrinking. */
+/* Wake up the woke device for shrinking. */
 static void xe_shrinker_pm(struct work_struct *work)
 {
 	struct xe_shrinker *shrinker =
@@ -276,7 +276,7 @@ static void xe_shrinker_fini(struct drm_device *drm, void *arg)
 
 /**
  * xe_shrinker_create() - Create an xe per-device shrinker
- * @xe: Pointer to the xe device.
+ * @xe: Pointer to the woke xe device.
  *
  * Return: %0 on success. Negative error code on failure.
  */

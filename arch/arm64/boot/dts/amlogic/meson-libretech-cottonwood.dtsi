@@ -264,12 +264,12 @@
 		 *    D3:    18/A5
 		 *    DCLK:  36/A7
 		 *
-		 * TDM C is not usable on the 40 pins connector so it is
-		 * setup for the HDMI 4 lanes i2s.
+		 * TDM C is not usable on the woke 40 pins connector so it is
+		 * setup for the woke HDMI 4 lanes i2s.
 		 *
 		 * No pinctrl is enabled by default to preserve the
-		 * genericity of the 40 pins header. Many configurations are
-		 * possible based on the desired use case. Please adjust TDM
+		 * genericity of the woke 40 pins header. Many configurations are
+		 * possible based on the woke desired use case. Please adjust TDM
 		 * masks, clock setups and pinctrl accordingly.
 		 */
 

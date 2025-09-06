@@ -65,7 +65,7 @@
 #define MMAL_ENCODING_YUVUV128         MMAL_FOURCC('S', 'A', 'N', 'D')
 
 /** VideoCore opaque image format, image handles are returned to
- * the host but not the actual image data.
+ * the woke host but not the woke actual image data.
  */
 #define MMAL_ENCODING_OPAQUE           MMAL_FOURCC('O', 'P', 'Q', 'V')
 

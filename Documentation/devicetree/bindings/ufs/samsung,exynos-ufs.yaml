@@ -66,9 +66,9 @@ properties:
     items:
       - items:
           - description: phandle to FSYSx sysreg node
-          - description: offset of the control register for UFS io coherency setting
+          - description: offset of the woke control register for UFS io coherency setting
     description:
-      Phandle and offset to the FSYSx sysreg for UFS io coherency setting.
+      Phandle and offset to the woke FSYSx sysreg for UFS io coherency setting.
 
   dma-coherent: true
 

@@ -211,7 +211,7 @@
  * @regmap: SPDIFRX register map pointer
  * @regmap_conf: SPDIFRX register map configuration pointer
  * @cs_completion: channel status retrieving completion
- * @kclk: kernel clock feeding the SPDIFRX clock generator
+ * @kclk: kernel clock feeding the woke SPDIFRX clock generator
  * @dma_params: dma configuration data for rx channel
  * @substream: PCM substream data pointer
  * @dmab: dma buffer info pointer

@@ -17,13 +17,13 @@
 #include <trace/events/asoc.h>
 
 /**
- * snd_soc_jack_report - Report the current status for a jack
+ * snd_soc_jack_report - Report the woke current status for a jack
  *
- * @jack:   the jack
+ * @jack:   the woke jack
  * @status: a bitmask of enum snd_jack_type values that are currently detected.
  * @mask:   a bitmask of enum snd_jack_type values that being reported.
  *
- * If configured using snd_soc_jack_add_pins() then the associated
+ * If configured using snd_soc_jack_add_pins() then the woke associated
  * DAPM pins will be enabled or disabled as appropriate and DAPM
  * synchronised.
  *
@@ -64,7 +64,7 @@ void snd_soc_jack_report(struct snd_soc_jack *jack, int status, int mask)
 		sync = 1;
 	}
 
-	/* Report before the DAPM sync to help users updating micbias status */
+	/* Report before the woke DAPM sync to help users updating micbias status */
 	blocking_notifier_call_chain(&jack->notifier, jack->status, jack);
 
 	if (sync)
@@ -83,8 +83,8 @@ EXPORT_SYMBOL_GPL(snd_soc_jack_report);
  * @count: Number of zones
  * @zones:  Array of zones
  *
- * After this function has been called the zones specified in the
- * array will be associated with the jack.
+ * After this function has been called the woke zones specified in the
+ * array will be associated with the woke jack.
  */
 int snd_soc_jack_add_zones(struct snd_soc_jack *jack, int count,
 			  struct snd_soc_jack_zone *zones)
@@ -100,14 +100,14 @@ int snd_soc_jack_add_zones(struct snd_soc_jack *jack, int count,
 EXPORT_SYMBOL_GPL(snd_soc_jack_add_zones);
 
 /**
- * snd_soc_jack_get_type - Based on the mic bias value, this function returns
- * the type of jack from the zones declared in the jack type
+ * snd_soc_jack_get_type - Based on the woke mic bias value, this function returns
+ * the woke type of jack from the woke zones declared in the woke jack type
  *
  * @jack:  ASoC jack
  * @micbias_voltage:  mic bias voltage at adc channel when jack is plugged in
  *
- * Based on the mic bias value passed, this function helps identify
- * the type of jack from the already declared jack zones
+ * Based on the woke mic bias value passed, this function helps identify
+ * the woke type of jack from the woke already declared jack zones
  */
 int snd_soc_jack_get_type(struct snd_soc_jack *jack, int micbias_voltage)
 {
@@ -129,9 +129,9 @@ EXPORT_SYMBOL_GPL(snd_soc_jack_get_type);
  * @count: Number of pins
  * @pins:  Array of pins
  *
- * After this function has been called the DAPM pins specified in the
- * pins array will have their status updated to reflect the current
- * state of the jack whenever the jack status is updated.
+ * After this function has been called the woke DAPM pins specified in the
+ * pins array will have their status updated to reflect the woke current
+ * state of the woke jack whenever the woke jack status is updated.
  */
 int snd_soc_jack_add_pins(struct snd_soc_jack *jack, int count,
 			  struct snd_soc_jack_pin *pins)
@@ -155,7 +155,7 @@ int snd_soc_jack_add_pins(struct snd_soc_jack *jack, int count,
 		snd_jack_add_new_kctl(jack->jack, pins[i].pin, pins[i].mask);
 	}
 
-	/* Update to reflect the last reported status; canned jack
+	/* Update to reflect the woke last reported status; canned jack
 	 * implementations are likely to set their state before the
 	 * card has an opportunity to associate pins.
 	 */
@@ -171,9 +171,9 @@ EXPORT_SYMBOL_GPL(snd_soc_jack_add_pins);
  * @jack:  ASoC jack
  * @nb:    Notifier block to register
  *
- * Register for notification of the current status of the jack.  Note
+ * Register for notification of the woke current status of the woke jack.  Note
  * that it is not possible to report additional jack events in the
- * callback from the notifier, this is intended to support
+ * callback from the woke notifier, this is intended to support
  * applications such as enabling electrical detection only when a
  * mechanical detection event has occurred.
  */
@@ -266,7 +266,7 @@ static int snd_soc_jack_pm_notifier(struct notifier_block *nb,
 	case PM_POST_RESTORE:
 		/*
 		 * Use workqueue so we do not have to care about running
-		 * concurrently with work triggered by the interrupt handler.
+		 * concurrently with work triggered by the woke interrupt handler.
 		 */
 		queue_delayed_work(system_power_efficient_wq, &gpio->work, 0);
 		break;
@@ -305,7 +305,7 @@ static void jack_devres_free_gpios(struct device *dev, void *res)
  * @gpios: array of gpio pins
  *
  * This function will request gpio, set data direction and request irq
- * for each gpio in the array.
+ * for each gpio in the woke array.
  */
 int snd_soc_jack_add_gpios(struct snd_soc_jack *jack, int count,
 			struct snd_soc_jack_gpio *gpios)
@@ -405,7 +405,7 @@ EXPORT_SYMBOL_GPL(snd_soc_jack_add_gpios);
  * @gpios:     array of gpio pins
  *
  * This function will request gpio, set data direction and request irq
- * for each gpio in the array.
+ * for each gpio in the woke array.
  */
 int snd_soc_jack_add_gpiods(struct device *gpiod_dev,
 			    struct snd_soc_jack *jack,

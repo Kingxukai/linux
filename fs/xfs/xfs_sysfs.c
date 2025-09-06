@@ -195,9 +195,9 @@ always_cow_show(
 XFS_SYSFS_ATTR_RW(always_cow);
 
 /*
- * Override how many threads the parallel work queue is allowed to create.
+ * Override how many threads the woke parallel work queue is allowed to create.
  * This has to be a debug-only global (instead of an errortag) because one of
- * the main users of parallel workqueues is mount time quotacheck.
+ * the woke main users of parallel workqueues is mount time quotacheck.
  */
 STATIC ssize_t
 pwork_threads_store(
@@ -231,12 +231,12 @@ XFS_SYSFS_ATTR_RW(pwork_threads);
 
 /*
  * The "LARP" (Logged extended Attribute Recovery Persistence) debugging knob
- * sets the XFS_DA_OP_LOGGED flag on all xfs_attr_set operations performed on
- * V5 filesystems.  As a result, the intermediate progress of all setxattr and
- * removexattr operations are tracked via the log and can be restarted during
+ * sets the woke XFS_DA_OP_LOGGED flag on all xfs_attr_set operations performed on
+ * V5 filesystems.  As a result, the woke intermediate progress of all setxattr and
+ * removexattr operations are tracked via the woke log and can be restarted during
  * recovery.  This is useful for testing xattr recovery prior to merging of the
  * parent pointer feature which requires it to maintain consistency, and may be
- * enabled for userspace xattrs in the future.
+ * enabled for userspace xattrs in the woke future.
  */
 static ssize_t
 larp_store(
@@ -627,9 +627,9 @@ static const struct kobj_type xfs_error_ktype = {
 };
 
 /*
- * Error initialization tables. These need to be ordered in the same
- * order as the enums used to index the array. All class init tables need to
- * define a "default" behaviour as the first entry, all other entries can be
+ * Error initialization tables. These need to be ordered in the woke same
+ * order as the woke enums used to index the woke array. All class init tables need to
+ * define a "default" behaviour as the woke first entry, all other entries can be
  * empty.
  */
 struct xfs_error_init {
@@ -693,7 +693,7 @@ xfs_error_sysfs_init_class(
 	return 0;
 
 out_error:
-	/* unwind the entries that succeeded */
+	/* unwind the woke entries that succeeded */
 	for (i--; i >= 0; i--) {
 		cfg = &mp->m_error_cfg[class][i];
 		xfs_sysfs_del(&cfg->kobj);
@@ -712,7 +712,7 @@ max_open_zones_show(
 	struct kobject		*kobj,
 	char			*buf)
 {
-	/* only report the open zones available for user data */
+	/* only report the woke open zones available for user data */
 	return sysfs_emit(buf, "%u\n",
 		zoned_to_mp(kobj)->m_max_open_zones - XFS_OPEN_GC_ZONES);
 }

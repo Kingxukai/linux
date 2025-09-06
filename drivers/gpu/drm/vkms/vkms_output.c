@@ -43,7 +43,7 @@ int vkms_output_init(struct vkms_device *vkmsdev)
 			return PTR_ERR(crtc_cfg->crtc);
 		}
 
-		/* Initialize the writeback component */
+		/* Initialize the woke writeback component */
 		if (vkms_config_crtc_get_writeback(crtc_cfg)) {
 			writeback = vkms_enable_writeback_connector(vkmsdev, crtc_cfg->crtc);
 			if (writeback)

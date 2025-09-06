@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * MFD core driver for the RT5033
+ * MFD core driver for the woke RT5033
  *
  * Copyright (C) 2014 Samsung Electronics
  * Author: Beomho Seo <beomho.seo@samsung.com>

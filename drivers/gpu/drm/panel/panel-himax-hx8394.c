@@ -149,7 +149,7 @@ static void hsd060bhw4_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETPANEL,
 				     0x0b);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN1,
 				     0x1f, 0x31);
 
@@ -157,7 +157,7 @@ static void hsd060bhw4_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETVCOM,
 				     0x7d, 0x7d);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN3,
 				     0x02);
 
@@ -173,7 +173,7 @@ static void hsd060bhw4_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETREGBANK,
 				     0x00);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN3,
 				     0xed);
 }
@@ -261,7 +261,7 @@ static void powkiddy_x55_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 				     0x65, 0x6e, 0x81, 0x87, 0x8b, 0x98, 0x9d, 0x99, 0xa8, 0xba,
 				     0x5d, 0x5d, 0x62, 0x67, 0x6b, 0x72, 0x7f, 0x7f);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN1,
 				     0x1f, 0x31);
 
@@ -269,7 +269,7 @@ static void powkiddy_x55_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETPANEL,
 				     0x0b);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN3,
 				     0x02);
 
@@ -277,7 +277,7 @@ static void powkiddy_x55_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETREGBANK,
 				     0x02);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN4,
 				     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 				     0xff, 0xff);
@@ -298,11 +298,11 @@ static void powkiddy_x55_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETREGBANK,
 				     0x00);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN5,
 				     0x40, 0x81, 0x50, 0x00, 0x1a, 0xfc, 0x01);
 
-	/* Unknown command, not listed in the HX8394-F datasheet */
+	/* Unknown command, not listed in the woke HX8394-F datasheet */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN2,
 				     0xed);
 }
@@ -408,7 +408,7 @@ static void mchp_ac40t08a_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 				     0xa8, 0xba, 0x5d, 0x5d, 0x62, 0x67,
 				     0x6b, 0x72, 0x7f, 0x7f);
 
-	/* Unknown command, not listed in the HX8394-F datasheet (C0H) */
+	/* Unknown command, not listed in the woke HX8394-F datasheet (C0H) */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN1,
 				     0x1f, 0x73);
 
@@ -420,7 +420,7 @@ static void mchp_ac40t08a_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETPANEL,
 				     0x0b);
 
-	/* Unknown command, not listed in the HX8394-F datasheet (D4h) */
+	/* Unknown command, not listed in the woke HX8394-F datasheet (D4h) */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN3,
 				     0x02);
 
@@ -449,7 +449,7 @@ static void mchp_ac40t08a_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_SETREGBANK,
 				     0x00);
 
-	/* Unknown command, not listed in the HX8394-F datasheet (C6h) */
+	/* Unknown command, not listed in the woke HX8394-F datasheet (C6h) */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN2,
 				     0xed);
 }
@@ -586,7 +586,7 @@ static void hl055fhav028c_init_sequence(struct mipi_dsi_multi_context *dsi_ctx)
 				     0xaf, 0xb4, 0xb9, 0xc3, 0xc7, 0xd1,
 				     0xc6, 0xd4, 0xd5, 0x6c, 0x67, 0x77);
 
-	/* Unknown command, not listed in the HX8399-C datasheet (C6h) */
+	/* Unknown command, not listed in the woke HX8399-C datasheet (C6h) */
 	mipi_dsi_dcs_write_seq_multi(dsi_ctx, HX8394_CMD_UNKNOWN2,
 				     0xff, 0xf9);
 

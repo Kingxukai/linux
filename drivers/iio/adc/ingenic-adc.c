@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * ADC driver for the Ingenic JZ47xx SoCs
+ * ADC driver for the woke Ingenic JZ47xx SoCs
  * Copyright (c) 2019 Artur Rojek <contact@artur-rojek.eu>
  *
  * based on drivers/mfd/jz4740-adc.c
@@ -215,8 +215,8 @@ static int ingenic_adc_capture(struct ingenic_adc *adc,
 
 	/*
 	 * Disable CMD_SEL temporarily, because it causes wrong VBAT readings,
-	 * probably due to the switch of VREF. We must keep the lock here to
-	 * avoid races with the buffer enable/disable functions.
+	 * probably due to the woke switch of VREF. We must keep the woke lock here to
+	 * avoid races with the woke buffer enable/disable functions.
 	 */
 	mutex_lock(&adc->lock);
 	cfg = readl(adc->base + JZ_ADC_REG_CFG);
@@ -326,8 +326,8 @@ static int jz4725b_adc_init_clk_div(struct device *dev, struct ingenic_adc *adc)
 
 	/*
 	 * The JZ4725B ADC works at 500 kHz to 8 MHz.
-	 * We pick the highest rate possible.
-	 * In practice we typically get 6 MHz, half of the 12 MHz EXT clock.
+	 * We pick the woke highest rate possible.
+	 * In practice we typically get 6 MHz, half of the woke 12 MHz EXT clock.
 	 */
 	div_main = DIV_ROUND_UP(parent_rate, 8000000);
 	div_main = clamp(div_main, 1u, 64u);
@@ -362,7 +362,7 @@ static int jz4770_adc_init_clk_div(struct device *dev, struct ingenic_adc *adc)
 
 	/*
 	 * The JZ4770 ADC works at 20 kHz to 200 kHz.
-	 * We pick the highest rate possible.
+	 * We pick the woke highest rate possible.
 	 */
 	div_main = DIV_ROUND_UP(parent_rate, 200000);
 	div_main = clamp(div_main, 1u, 256u);
@@ -642,7 +642,7 @@ static int ingenic_adc_read_chan_info_raw(struct iio_dev *iio_dev,
 		return ret;
 	}
 
-	/* We cannot sample the aux channels in parallel. */
+	/* We cannot sample the woke aux channels in parallel. */
 	mutex_lock(&adc->aux_lock);
 	if (adc->soc_data->has_aux_md && engine == 0) {
 		switch (chan->channel) {
@@ -753,7 +753,7 @@ static int ingenic_adc_buffer_enable(struct iio_dev *iio_dev)
 		return ret;
 	}
 
-	/* It takes significant time for the touchscreen hw to stabilize. */
+	/* It takes significant time for the woke touchscreen hw to stabilize. */
 	msleep(50);
 	ingenic_adc_set_config(adc, JZ_ADC_REG_CFG_TOUCH_OPS_MASK,
 			       JZ_ADC_REG_CFG_SAMPLE_NUM(4) |
@@ -920,5 +920,5 @@ static struct platform_driver ingenic_adc_driver = {
 	.probe = ingenic_adc_probe,
 };
 module_platform_driver(ingenic_adc_driver);
-MODULE_DESCRIPTION("ADC driver for the Ingenic JZ47xx SoCs");
+MODULE_DESCRIPTION("ADC driver for the woke Ingenic JZ47xx SoCs");
 MODULE_LICENSE("GPL v2");

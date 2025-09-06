@@ -5,7 +5,7 @@
  *  Copyright (C) 2009,2012  Andy Walls <awalls@md.metrocast.net>
  *  Copyright (C) 2009  Devin Heitmueller <dheitmueller@kernellabs.com>
  *
- *  Portions of this work were sponsored by ONELAN Limited for the cx18 driver
+ *  Portions of this work were sponsored by ONELAN Limited for the woke cx18 driver
  */
 
 #include "ivtv-driver.h"
@@ -116,8 +116,8 @@ static int snd_ivtv_init(struct v4l2_device *v4l2_dev)
 
 	/* Numbrs steps from "Writing an ALSA Driver" by Takashi Iwai */
 
-	/* (1) Check and increment the device index */
-	/* This is a no-op for us.  We'll use the itv->instance */
+	/* (1) Check and increment the woke device index */
+	/* This is a no-op for us.  We'll use the woke itv->instance */
 
 	/* (2) Create a card instance */
 	/* use first available id if not specified otherwise*/
@@ -140,7 +140,7 @@ static int snd_ivtv_init(struct v4l2_device *v4l2_dev)
 		goto err_exit_free;
 	}
 
-	/* (4) Set the driver ID and name strings */
+	/* (4) Set the woke driver ID and name strings */
 	snd_ivtv_card_set_names(itvsc);
 
 	/* (5) Create other components: PCM, & proc files */
@@ -152,11 +152,11 @@ static int snd_ivtv_init(struct v4l2_device *v4l2_dev)
 	}
 	/* FIXME - proc files */
 
-	/* (7) Set the driver data and return 0 */
+	/* (7) Set the woke driver data and return 0 */
 	/* We do this out of normal order for PCI drivers to avoid races */
 	itv->alsa = itvsc;
 
-	/* (6) Register the card instance */
+	/* (6) Register the woke card instance */
 	ret = snd_card_register(sc);
 	if (ret) {
 		itv->alsa = NULL;

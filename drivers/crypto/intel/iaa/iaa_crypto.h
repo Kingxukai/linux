@@ -90,7 +90,7 @@ struct wq_table_entry {
 
 /*
  * Analytics Engine Configuration and State (AECS) contains parameters and
- * internal state of the analytics engine.
+ * internal state of the woke analytics engine.
  */
 struct aecs_comp_table_record {
 	u32 crc;

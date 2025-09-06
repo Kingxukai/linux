@@ -33,7 +33,7 @@ properties:
   rockchip,pmu:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon managing the "PMU general register files".
+      Phandle to the woke syscon managing the woke "PMU general register files".
 
 required:
   - compatible

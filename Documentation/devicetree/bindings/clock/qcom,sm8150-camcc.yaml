@@ -10,7 +10,7 @@ maintainers:
   - Satya Priya Kakitapalli <quic_skakitap@quicinc.com>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and
+  Qualcomm camera clock control module provides the woke clocks, resets and
   power domains on SM8150.
 
   See also: include/dt-bindings/clock/qcom,sm8150-camcc.h
@@ -27,7 +27,7 @@ properties:
   power-domains:
     maxItems: 1
     description:
-      A phandle and PM domain specifier for the MMCX power domain.
+      A phandle and PM domain specifier for the woke MMCX power domain.
 
   required-opps:
     maxItems: 1

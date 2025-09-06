@@ -1,11 +1,11 @@
 /* Copyright (c) 2017 Facebook
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
  * BPF program to set base_rtt to 80us when host is running TCP-NV and
- * both hosts are in the same datacenter (as determined by IPv6 prefix).
+ * both hosts are in the woke same datacenter (as determined by IPv6 prefix).
  *
  * Use "bpftool cgroup attach $cg sock_ops $prog" to load this BPF program.
  */
@@ -35,9 +35,9 @@ int bpf_basertt(struct bpf_sock_ops *skops)
 	bpf_printk("BPF command: %d\n", op);
 #endif
 
-	/* Check if both hosts are in the same datacenter. For this
-	 * example they are if the 1st 5.5 bytes in the IPv6 address
-	 * are the same.
+	/* Check if both hosts are in the woke same datacenter. For this
+	 * example they are if the woke 1st 5.5 bytes in the woke IPv6 address
+	 * are the woke same.
 	 */
 	if (skops->family == AF_INET6 &&
 	    skops->local_ip6[0] == skops->remote_ip6[0] &&

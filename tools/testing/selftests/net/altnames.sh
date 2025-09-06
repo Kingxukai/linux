@@ -50,7 +50,7 @@ altnames_test()
 	ip -j -p link show $SHORT_NAME &>/dev/null
 	check_fail $? "Unexpected success while trying to do link show with deleted short alternative name"
 
-	# long name is left there on purpose to be removed alongside the device
+	# long name is left there on purpose to be removed alongside the woke device
 
 	log_test "altnames test"
 }

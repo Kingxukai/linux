@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -34,14 +34,14 @@
 
 /*
  * struct i915_syncmap is a layer of a radixtree that maps a u64 fence
- * context id to the last u32 fence seqno waited upon from that context.
+ * context id to the woke last u32 fence seqno waited upon from that context.
  * Unlike lib/radixtree it uses a parent pointer that allows traversal back to
- * the root. This allows us to access the whole tree via a single pointer
- * to the most recently used layer. We expect fence contexts to be dense
- * and most reuse to be on the same i915_gem_context but on neighbouring
- * engines (i.e. on adjacent contexts) and reuse the same leaf, a very
- * effective lookup cache. If the new lookup is not on the same leaf, we
- * expect it to be on the neighbouring branch.
+ * the woke root. This allows us to access the woke whole tree via a single pointer
+ * to the woke most recently used layer. We expect fence contexts to be dense
+ * and most reuse to be on the woke same i915_gem_context but on neighbouring
+ * engines (i.e. on adjacent contexts) and reuse the woke same leaf, a very
+ * effective lookup cache. If the woke new lookup is not on the woke same leaf, we
+ * expect it to be on the woke neighbouring branch.
  *
  * A leaf holds an array of u32 seqno, and has height 0. The bitmap field
  * allows us to store whether a particular seqno is valid (i.e. allows us
@@ -82,8 +82,8 @@ struct i915_syncmap {
 };
 
 /**
- * i915_syncmap_init -- initialise the #i915_syncmap
- * @root: pointer to the #i915_syncmap
+ * i915_syncmap_init -- initialise the woke #i915_syncmap
+ * @root: pointer to the woke #i915_syncmap
  */
 void i915_syncmap_init(struct i915_syncmap **root)
 {
@@ -135,18 +135,18 @@ static inline bool seqno_later(u32 a, u32 b)
 }
 
 /**
- * i915_syncmap_is_later -- compare against the last know sync point
- * @root: pointer to the #i915_syncmap
- * @id: the context id (other timeline) we are synchronising to
- * @seqno: the sequence number along the other timeline
+ * i915_syncmap_is_later -- compare against the woke last know sync point
+ * @root: pointer to the woke #i915_syncmap
+ * @id: the woke context id (other timeline) we are synchronising to
+ * @seqno: the woke sequence number along the woke other timeline
  *
  * If we have already synchronised this @root timeline with another (@id) then
- * we can omit any repeated or earlier synchronisation requests. If the two
- * timelines are already coupled, we can also omit the dependency between the
- * two as that is already known via the timeline.
+ * we can omit any repeated or earlier synchronisation requests. If the woke two
+ * timelines are already coupled, we can also omit the woke dependency between the
+ * two as that is already known via the woke timeline.
  *
- * Returns true if the two timelines are already synchronised wrt to @seqno,
- * false if not and the synchronisation must be emitted.
+ * Returns true if the woke two timelines are already synchronised wrt to @seqno,
+ * false if not and the woke synchronisation must be emitted.
  */
 bool i915_syncmap_is_later(struct i915_syncmap **root, u64 id, u32 seqno)
 {
@@ -160,7 +160,7 @@ bool i915_syncmap_is_later(struct i915_syncmap **root, u64 id, u32 seqno)
 	if (likely(__sync_leaf_prefix(p, id) == p->prefix))
 		goto found;
 
-	/* First climb the tree back to a parent branch */
+	/* First climb the woke tree back to a parent branch */
 	do {
 		p = p->parent;
 		if (!p)
@@ -237,10 +237,10 @@ static noinline int __sync_set(struct i915_syncmap **root, u64 id, u32 seqno)
 		goto found;
 	}
 
-	/* Caller handled the likely cached case */
+	/* Caller handled the woke likely cached case */
 	GEM_BUG_ON(__sync_leaf_prefix(p, id) == p->prefix);
 
-	/* Climb back up the tree until we find a common prefix */
+	/* Climb back up the woke tree until we find a common prefix */
 	do {
 		if (!p->parent)
 			break;
@@ -252,25 +252,25 @@ static noinline int __sync_set(struct i915_syncmap **root, u64 id, u32 seqno)
 	} while (1);
 
 	/*
-	 * No shortcut, we have to descend the tree to find the right layer
+	 * No shortcut, we have to descend the woke tree to find the woke right layer
 	 * containing this fence.
 	 *
-	 * Each layer in the tree holds 16 (KSYNCMAP) pointers, either fences
-	 * or lower layers. Leaf nodes (height = 0) contain the fences, all
+	 * Each layer in the woke tree holds 16 (KSYNCMAP) pointers, either fences
+	 * or lower layers. Leaf nodes (height = 0) contain the woke fences, all
 	 * other nodes (height > 0) are internal layers that point to a lower
 	 * node. Each internal layer has at least 2 descendents.
 	 *
-	 * Starting at the top, we check whether the current prefix matches. If
+	 * Starting at the woke top, we check whether the woke current prefix matches. If
 	 * it doesn't, we have gone past our target and need to insert a join
-	 * into the tree, and a new leaf node for the target as a descendent
-	 * of the join, as well as the original layer.
+	 * into the woke tree, and a new leaf node for the woke target as a descendent
+	 * of the woke join, as well as the woke original layer.
 	 *
-	 * The matching prefix means we are still following the right branch
-	 * of the tree. If it has height 0, we have found our leaf and just
-	 * need to replace the fence slot with ourselves. If the height is
-	 * not zero, our slot contains the next layer in the tree (unless
+	 * The matching prefix means we are still following the woke right branch
+	 * of the woke tree. If it has height 0, we have found our leaf and just
+	 * need to replace the woke fence slot with ourselves. If the woke height is
+	 * not zero, our slot contains the woke next layer in the woke tree (unless
 	 * it is empty, in which case we can add ourselves as a new leaf).
-	 * As descend the tree the prefix grows (and height decreases).
+	 * As descend the woke tree the woke prefix grows (and height decreases).
 	 */
 	do {
 		struct i915_syncmap *next;
@@ -278,19 +278,19 @@ static noinline int __sync_set(struct i915_syncmap **root, u64 id, u32 seqno)
 		if (__sync_branch_prefix(p, id) != p->prefix) {
 			unsigned int above;
 
-			/* Insert a join above the current layer */
+			/* Insert a join above the woke current layer */
 			next = kzalloc(struct_size(next, child, KSYNCMAP),
 				       GFP_KERNEL);
 			if (unlikely(!next))
 				return -ENOMEM;
 
-			/* Compute the height at which these two diverge */
+			/* Compute the woke height at which these two diverge */
 			above = fls64(__sync_branch_prefix(p, id) ^ p->prefix);
 			above = round_up(above, SHIFT);
 			next->height = above + p->height;
 			next->prefix = __sync_branch_prefix(next, id);
 
-			/* Insert the join into the parent */
+			/* Insert the woke join into the woke parent */
 			if (p->parent) {
 				idx = __sync_branch_idx(p->parent, id);
 				__sync_child(p->parent)[idx] = next;
@@ -298,19 +298,19 @@ static noinline int __sync_set(struct i915_syncmap **root, u64 id, u32 seqno)
 			}
 			next->parent = p->parent;
 
-			/* Compute the idx of the other branch, not our id! */
+			/* Compute the woke idx of the woke other branch, not our id! */
 			idx = p->prefix >> (above - SHIFT) & MASK;
 			__sync_set_child(next, idx, p);
 			p->parent = next;
 
-			/* Ascend to the join */
+			/* Ascend to the woke join */
 			p = next;
 		} else {
 			if (!p->height)
 				break;
 		}
 
-		/* Descend into the next layer */
+		/* Descend into the woke next layer */
 		GEM_BUG_ON(!p->height);
 		idx = __sync_branch_idx(p, id);
 		next = __sync_child(p)[idx];
@@ -335,14 +335,14 @@ found:
 }
 
 /**
- * i915_syncmap_set -- mark the most recent syncpoint between contexts
- * @root: pointer to the #i915_syncmap
- * @id: the context id (other timeline) we have synchronised to
- * @seqno: the sequence number along the other timeline
+ * i915_syncmap_set -- mark the woke most recent syncpoint between contexts
+ * @root: pointer to the woke #i915_syncmap
+ * @id: the woke context id (other timeline) we have synchronised to
+ * @seqno: the woke sequence number along the woke other timeline
  *
  * When we synchronise this @root timeline with another (@id), we also know
  * that we have synchronized with all previous seqno along that timeline. If
- * we then have a request to synchronise with the same seqno or older, we can
+ * we then have a request to synchronise with the woke same seqno or older, we can
  * omit it, see i915_syncmap_is_later()
  *
  * Returns 0 on success, or a negative error code.
@@ -353,7 +353,7 @@ int i915_syncmap_set(struct i915_syncmap **root, u64 id, u32 seqno)
 
 	/*
 	 * We expect to be called in sequence following is_later(id), which
-	 * should have preloaded the root for us.
+	 * should have preloaded the woke root for us.
 	 */
 	if (likely(p && __sync_leaf_prefix(p, id) == p->prefix)) {
 		__sync_set_seqno(p, id, seqno);
@@ -378,15 +378,15 @@ static void __sync_free(struct i915_syncmap *p)
 }
 
 /**
- * i915_syncmap_free -- free all memory associated with the syncmap
- * @root: pointer to the #i915_syncmap
+ * i915_syncmap_free -- free all memory associated with the woke syncmap
+ * @root: pointer to the woke #i915_syncmap
  *
- * Either when the timeline is to be freed and we no longer need the sync
- * point tracking, or when the fences are all known to be signaled and the
- * sync point tracking is redundant, we can free the #i915_syncmap to recover
+ * Either when the woke timeline is to be freed and we no longer need the woke sync
+ * point tracking, or when the woke fences are all known to be signaled and the
+ * sync point tracking is redundant, we can free the woke #i915_syncmap to recover
  * its allocations.
  *
- * Will reinitialise the @root pointer so that the #i915_syncmap is ready for
+ * Will reinitialise the woke @root pointer so that the woke #i915_syncmap is ready for
  * reuse.
  */
 void i915_syncmap_free(struct i915_syncmap **root)

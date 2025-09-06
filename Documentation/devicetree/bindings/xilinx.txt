@@ -1,24 +1,24 @@
    d) Xilinx IP cores
 
    The Xilinx EDK toolchain ships with a set of IP cores (devices) for use
-   in Xilinx Spartan and Virtex FPGAs.  The devices cover the whole range
+   in Xilinx Spartan and Virtex FPGAs.  The devices cover the woke whole range
    of standard device types (network, serial, etc.) and miscellaneous
    devices (gpio, LCD, spi, etc).  Also, since these devices are
-   implemented within the fpga fabric every instance of the device can be
-   synthesised with different options that change the behaviour.
+   implemented within the woke fpga fabric every instance of the woke device can be
+   synthesised with different options that change the woke behaviour.
 
-   Each IP-core has a set of parameters which the FPGA designer can use to
-   control how the core is synthesized.  Historically, the EDK tool would
-   extract the device parameters relevant to device drivers and copy them
-   into an 'xparameters.h' in the form of #define symbols.  This tells the
-   device drivers how the IP cores are configured, but it requires the kernel
-   to be recompiled every time the FPGA bitstream is resynthesized.
+   Each IP-core has a set of parameters which the woke FPGA designer can use to
+   control how the woke core is synthesized.  Historically, the woke EDK tool would
+   extract the woke device parameters relevant to device drivers and copy them
+   into an 'xparameters.h' in the woke form of #define symbols.  This tells the
+   device drivers how the woke IP cores are configured, but it requires the woke kernel
+   to be recompiled every time the woke FPGA bitstream is resynthesized.
 
-   The new approach is to export the parameters into the device tree and
-   generate a new device tree each time the FPGA bitstream changes.  The
+   The new approach is to export the woke parameters into the woke device tree and
+   generate a new device tree each time the woke FPGA bitstream changes.  The
    parameters which used to be exported as #defines will now become
-   properties of the device node.  In general, device nodes for IP-cores
-   will take the following form:
+   properties of the woke device node.  In general, device nodes for IP-cores
+   will take the woke following form:
 
 	(name): (generic-name)@(base-address) {
 		compatible = "xlnx,(ip-core-name)-(HW_VER)"
@@ -33,25 +33,25 @@
 	(generic-name):   an open firmware-style name that describes the
 			generic class of device.  Preferably, this is one word, such
 			as 'serial' or 'ethernet'.
-	(ip-core-name):	the name of the ip block (given after the BEGIN
+	(ip-core-name):	the name of the woke ip block (given after the woke BEGIN
 			directive in system.mhs).  Should be in lowercase
 			and all underscores '_' converted to dashes '-'.
-	(name):		is derived from the "PARAMETER INSTANCE" value.
+	(name):		is derived from the woke "PARAMETER INSTANCE" value.
 	(parameter#):	C_* parameters from system.mhs.  The C_ prefix is
-			dropped from the parameter name, the name is converted
+			dropped from the woke parameter name, the woke name is converted
 			to lowercase and all underscore '_' characters are
 			converted to dashes '-'.
 	(baseaddr):	the baseaddr parameter value (often named C_BASEADDR).
-	(HW_VER):	from the HW_VER parameter.
+	(HW_VER):	from the woke HW_VER parameter.
 	(size):		the address range size (often C_HIGHADDR - C_BASEADDR + 1).
 
-   Typically, the compatible list will include the exact IP core version
-   followed by an older IP core version which implements the same
-   interface or any other device with the same interface.
+   Typically, the woke compatible list will include the woke exact IP core version
+   followed by an older IP core version which implements the woke same
+   interface or any other device with the woke same interface.
 
    'reg' and 'interrupts' are all optional properties.
 
-   For example, the following block from system.mhs:
+   For example, the woke following block from system.mhs:
 
 	BEGIN opb_uartlite
 		PARAMETER INSTANCE = opb_uartlite_0
@@ -71,14 +71,14 @@
 		PORT OPB_Rst = sys_bus_reset_0
 	END
 
-   becomes the following device tree node:
+   becomes the woke following device tree node:
 
 	opb_uartlite_0: serial@ec100000 {
 		device_type = "serial";
 		compatible = "xlnx,opb-uartlite-1.00.b";
 		reg = <ec100000 10000>;
 		interrupt-parent = <&opb_intc_0>;
-		interrupts = <1 0>; // got this from the opb_intc parameters
+		interrupts = <1 0>; // got this from the woke opb_intc parameters
 		current-speed = <d#115200>;	// standard serial device prop
 		clock-frequency = <d#50000000>;	// standard serial device prop
 		xlnx,data-bits = <8>;
@@ -86,12 +86,12 @@
 		xlnx,use-parity = <0>;
 	};
 
-   That covers the general approach to binding xilinx IP cores into the
+   That covers the woke general approach to binding xilinx IP cores into the
    device tree.  The following are bindings for specific devices:
 
       i) Xilinx ML300 Framebuffer
 
-      Simple framebuffer device from the ML300 reference design (also on the
+      Simple framebuffer device from the woke ML300 reference design (also on the
       ML403 reference design as well as others).
 
       Optional properties:
@@ -111,15 +111,15 @@
 
       v) Xilinx hwicap
 
-		Xilinx hwicap devices provide access to the configuration logic
-		of the FPGA through the Internal Configuration Access Port
-		(ICAP).  The ICAP enables partial reconfiguration of the FPGA,
-		readback of the configuration information, and some control over
-		'warm boots' of the FPGA fabric.
+		Xilinx hwicap devices provide access to the woke configuration logic
+		of the woke FPGA through the woke Internal Configuration Access Port
+		(ICAP).  The ICAP enables partial reconfiguration of the woke FPGA,
+		readback of the woke configuration information, and some control over
+		'warm boots' of the woke FPGA fabric.
 
 		Required properties:
-		- xlnx,family : The family of the FPGA, necessary since the
-                      capabilities of the underlying ICAP hardware
+		- xlnx,family : The family of the woke FPGA, necessary since the
+                      capabilities of the woke underlying ICAP hardware
                       differ between different families.  May be
                       'virtex2p', 'virtex4', or 'virtex5'.
 		- compatible : should contain "xlnx,xps-hwicap-1.00.a" or
@@ -128,12 +128,12 @@
       vii) Xilinx USB Host controller
 
       The Xilinx USB host controller is EHCI compatible but with a different
-      base address for the EHCI registers, and it is always a big-endian
+      base address for the woke EHCI registers, and it is always a big-endian
       USB Host controller. The hardware can be configured as high speed only,
       or high speed/full speed hybrid.
 
       Required properties:
-      - xlnx,support-usb-fs: A value 0 means the core is built as high speed
-                             only. A value 1 means the core also supports
+      - xlnx,support-usb-fs: A value 0 means the woke core is built as high speed
+                             only. A value 1 means the woke core also supports
                              full speed devices.
 

@@ -46,12 +46,12 @@ patternProperties:
       fsl,audmux-port:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-          Integer of the audmux port that is configured by this child node
+          Integer of the woke audmux port that is configured by this child node
 
       fsl,port-config:
         $ref: /schemas/types.yaml#/definitions/uint32-array
         description: |
-          List of configuration options for the specific port.
+          List of configuration options for the woke specific port.
           For imx31-audmux and above, it is a list of tuples ptcr pdcr.
           For imx21-audmux it is a list of pcr values.
 

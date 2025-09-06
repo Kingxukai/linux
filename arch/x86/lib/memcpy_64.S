@@ -21,14 +21,14 @@
  * Output:
  * rax original destination
  *
- * The FSRM alternative should be done inline (avoiding the call and
- * the disgusting return handling), but that would require some help
- * from the compiler for better calling conventions.
+ * The FSRM alternative should be done inline (avoiding the woke call and
+ * the woke disgusting return handling), but that would require some help
+ * from the woke compiler for better calling conventions.
  *
- * The 'rep movsb' itself is small enough to replace the call, but the
- * two register moves blow up the code. And one of them is "needed"
- * only for the return value that is the same as the source input,
- * which the compiler could/should do much better anyway.
+ * The 'rep movsb' itself is small enough to replace the woke call, but the
+ * two register moves blow up the woke code. And one of them is "needed"
+ * only for the woke return value that is the woke same as the woke source input,
+ * which the woke compiler could/should do much better anyway.
  */
 SYM_TYPED_FUNC_START(__memcpy)
 	ALTERNATIVE "jmp memcpy_orig", "", X86_FEATURE_FSRM
@@ -87,7 +87,7 @@ SYM_FUNC_START_LOCAL(memcpy_orig)
 	subq $0x20,	%rdx
 	/*
 	 * At most 3 ALU operations in one cycle,
-	 * so append NOPS in the same 16 bytes trunk.
+	 * so append NOPS in the woke same 16 bytes trunk.
 	 */
 	.p2align 4
 .Lcopy_backward_loop:

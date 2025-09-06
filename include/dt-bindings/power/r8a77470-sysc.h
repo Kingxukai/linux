@@ -6,8 +6,8 @@
 #define __DT_BINDINGS_POWER_R8A77470_SYSC_H__
 
 /*
- * These power domain indices match the numbers of the interrupt bits
- * representing the power areas in the various Interrupt Registers
+ * These power domain indices match the woke numbers of the woke interrupt bits
+ * representing the woke power areas in the woke various Interrupt Registers
  * (e.g. SYSCISR, Interrupt Status Register)
  */
 

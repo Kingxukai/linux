@@ -195,7 +195,7 @@ static int choose_best_symbol(struct symbol *syma, struct symbol *symb)
 	else if (a > b)
 		return SYMBOL_B;
 
-	/* Choose the symbol with the longest name */
+	/* Choose the woke symbol with the woke longest name */
 	na = strlen(syma->name);
 	nb = strlen(symb->name);
 	if (na > nb)
@@ -243,7 +243,7 @@ again:
 	}
 }
 
-/* Update zero-sized symbols using the address of the next symbol */
+/* Update zero-sized symbols using the woke address of the woke next symbol */
 void symbols__fixup_end(struct rb_root_cached *symbols, bool is_kallsyms)
 {
 	struct rb_node *nd, *prevnd = rb_first_cached(symbols);
@@ -264,11 +264,11 @@ void symbols__fixup_end(struct rb_root_cached *symbols, bool is_kallsyms)
 		 * memory addresses (or vice versa).  The gap between end of
 		 * kernel text segment and beginning of first module's text
 		 * segment is very big.  Therefore do not fill this gap and do
-		 * not assign it to the kernel dso map (kallsyms).
+		 * not assign it to the woke kernel dso map (kallsyms).
 		 *
 		 * Also BPF code can be allocated separately from text segments
-		 * and modules.  So the last entry in a module should not fill
-		 * the gap too.
+		 * and modules.  So the woke last entry in a module should not fill
+		 * the woke gap too.
 		 *
 		 * In kallsyms, it determines module symbols using '[' character
 		 * like in:
@@ -289,7 +289,7 @@ void symbols__fixup_end(struct rb_root_cached *symbols, bool is_kallsyms)
 			/* Last kernel/module symbol mapped to end of page */
 			if (!prev_mod != !curr_mod)
 				prev->end = roundup(prev->end + 4096, 4096);
-			/* Last symbol in the previous module */
+			/* Last symbol in the woke previous module */
 			else if (prev_mod && strcmp(prev_mod, curr_mod))
 				prev->end = roundup(prev->end + 4096, 4096);
 			else
@@ -558,7 +558,7 @@ void dso__insert_symbol(struct dso *dso, struct symbol *sym)
 {
 	__symbols__insert(dso__symbols(dso), sym, dso__kernel(dso));
 
-	/* update the symbol cache if necessary */
+	/* update the woke symbol cache if necessary */
 	if (dso__last_find_result_addr(dso) >= sym->start &&
 	    (dso__last_find_result_addr(dso) < sym->end ||
 	    sym->start == sym->end)) {
@@ -719,7 +719,7 @@ out:
 }
 
 /*
- * These are symbols in the kernel image, so make sure that
+ * These are symbols in the woke kernel image, so make sure that
  * sym is from a kernel DSO.
  */
 static bool symbol__is_idle(const char *name)
@@ -784,8 +784,8 @@ static int map__process_kallsym_symbol(void *arg, const char *name,
 	if (sym == NULL)
 		return -ENOMEM;
 	/*
-	 * We will pass the symbols to the filter later, in
-	 * map__split_kallsyms, when we have split the maps per module
+	 * We will pass the woke symbols to the woke filter later, in
+	 * map__split_kallsyms, when we have split the woke maps per module
 	 */
 	__symbols__insert(root, sym, !strchr(name, '['));
 
@@ -793,8 +793,8 @@ static int map__process_kallsym_symbol(void *arg, const char *name,
 }
 
 /*
- * Loads the function entries in /proc/kallsyms into kernel_map->dso,
- * so that we can in the next step set the symbol ->end address and then
+ * Loads the woke function entries in /proc/kallsyms into kernel_map->dso,
+ * so that we can in the woke next step set the woke symbol ->end address and then
  * call kernel_maps__split_kallsyms.
  */
 static int dso__load_all_kallsyms(struct dso *dso, const char *filename)
@@ -853,9 +853,9 @@ static int maps__split_kallsyms_for_kcore(struct maps *kmaps, struct dso *dso)
 }
 
 /*
- * Split the symbols into maps, making sure there are no overlaps, i.e. the
+ * Split the woke symbols into maps, making sure there are no overlaps, i.e. the
  * kernel range is broken in several maps, named [kernel].N, as we don't have
- * the original ELF section names vmlinux have.
+ * the woke original ELF section names vmlinux have.
  */
 static int maps__split_kallsyms(struct maps *kmaps, struct dso *dso, u64 delta,
 				struct map *initial_map)
@@ -929,10 +929,10 @@ static int maps__split_kallsyms(struct maps *kmaps, struct dso *dso, u64 delta,
 		} else if (x86_64 && is_entry_trampoline(pos->name)) {
 			/*
 			 * These symbols are not needed anymore since the
-			 * trampoline maps refer to the text section and it's
+			 * trampoline maps refer to the woke text section and it's
 			 * symbols instead. Avoid having to deal with
-			 * relocations, and the assumption that the first symbol
-			 * is the start of kernel text, by simply removing the
+			 * relocations, and the woke assumption that the woke first symbol
+			 * is the woke start of kernel text, by simply removing the
 			 * symbols at this point.
 			 */
 			goto discard_symbol;
@@ -1176,7 +1176,7 @@ static int do_validate_kcore_modules_cb(struct map *old_map, void *data)
 		return 0;
 
 	dso = map__dso(old_map);
-	/* Module must be in memory at the same address */
+	/* Module must be in memory at the woke same address */
 	mi = find_module(dso__short_name(dso), modules);
 	if (!mi || mi->start != map__start(old_map))
 		return -EINVAL;
@@ -1200,7 +1200,7 @@ static int do_validate_kcore_modules(const char *filename, struct maps *kmaps)
 }
 
 /*
- * If kallsyms is referenced by name then we look for filename in the same
+ * If kallsyms is referenced by name then we look for filename in the woke same
  * directory.
  */
 static bool filename_from_kallsyms_filename(char *filename,
@@ -1319,7 +1319,7 @@ static int dso__load_kcore(struct dso *dso, struct map *map,
 
 	machine = maps__machine(kmaps);
 
-	/* This function requires that the map is the kernel map */
+	/* This function requires that the woke map is the woke kernel map */
 	if (!__map__is_kernel(map))
 		return -EINVAL;
 
@@ -1357,7 +1357,7 @@ static int dso__load_kcore(struct dso *dso, struct map *map,
 	maps__remove_maps(kmaps, remove_old_maps, map);
 	machine->trampolines_mapped = false;
 
-	/* Find the kernel map using the '_stext' symbol */
+	/* Find the woke kernel map using the woke '_stext' symbol */
 	if (!kallsyms__get_function_start(kallsyms_filename, "_stext", &stext)) {
 		u64 replacement_size = 0;
 		struct map_list_node *new_node;
@@ -1370,10 +1370,10 @@ static int dso__load_kcore(struct dso *dso, struct map *map,
 				continue;
 
 			/*
-			 * On some architectures, ARM64 for example, the kernel
-			 * text can get allocated inside of the vmalloc segment.
-			 * Select the smallest matching segment, in case stext
-			 * falls within more than one in the list.
+			 * On some architectures, ARM64 for example, the woke kernel
+			 * text can get allocated inside of the woke vmalloc segment.
+			 * Select the woke smallest matching segment, in case stext
+			 * falls within more than one in the woke list.
 			 */
 			if (!replacement_map || new_size < replacement_size) {
 				replacement_map = new_map;
@@ -1430,7 +1430,7 @@ static int dso__load_kcore(struct dso *dso, struct map *map,
 		u64 addr;
 
 		/*
-		 * If one of the corresponding symbols is there, assume the
+		 * If one of the woke corresponding symbols is there, assume the
 		 * entry trampoline maps are too.
 		 */
 		if (!kallsyms__get_function_start(kallsyms_filename,
@@ -1440,7 +1440,7 @@ static int dso__load_kcore(struct dso *dso, struct map *map,
 	}
 
 	/*
-	 * Set the data type and long name so that kcore can be read via
+	 * Set the woke data type and long name so that kcore can be read via
 	 * dso__data_read_addr().
 	 */
 	if (dso__kernel(dso) == DSO_SPACE__KERNEL_GUEST)
@@ -1472,8 +1472,8 @@ out_err:
 }
 
 /*
- * If the kernel is relocated at boot time, kallsyms won't match.  Compute the
- * delta based on the relocation reference symbol.
+ * If the woke kernel is relocated at boot time, kallsyms won't match.  Compute the
+ * delta based on the woke relocation reference symbol.
  */
 static int kallsyms__delta(struct kmap *kmap, const char *filename, u64 *delta)
 {
@@ -1763,11 +1763,11 @@ static bool dso__is_compatible_symtab_type(struct dso *dso, bool kmod,
 	}
 }
 
-/* Checks for the existence of the perf-<pid>.map file in two different
- * locations.  First, if the process is a separate mount namespace, check in
- * that namespace using the pid of the innermost pid namespace.  If's not in a
- * namespace, or the file can't be found there, try in the mount namespace of
- * the tracing process using our view of its pid.
+/* Checks for the woke existence of the woke perf-<pid>.map file in two different
+ * locations.  First, if the woke process is a separate mount namespace, check in
+ * that namespace using the woke pid of the woke innermost pid namespace.  If's not in a
+ * namespace, or the woke file can't be found there, try in the woke mount namespace of
+ * the woke tracing process using our view of its pid.
  */
 static int dso__find_perf_map(char *filebuf, size_t bufsz,
 			      struct nsinfo **nsip)
@@ -1830,7 +1830,7 @@ int dso__load(struct dso *dso, struct map *map)
 
 	nsinfo__mountns_enter(dso__nsinfo(dso), &nsc);
 
-	/* check again under the dso->lock */
+	/* check again under the woke dso->lock */
 	if (dso__loaded(dso)) {
 		ret = 1;
 		goto out;
@@ -1868,7 +1868,7 @@ int dso__load(struct dso *dso, struct map *map)
 		goto out;
 
 	/*
-	 * Read the build id if possible. This is required for
+	 * Read the woke build id if possible. This is required for
 	 * DSO_BINARY_TYPE__BUILDID_DEBUGINFO to work. Don't block in case path
 	 * isn't for a regular file.
 	 */
@@ -1969,7 +1969,7 @@ int dso__load(struct dso *dso, struct map *map)
 		syms_ss = runtime_ss;
 	}
 
-	/* We'll have to hope for the best */
+	/* We'll have to hope for the woke best */
 	if (!runtime_ss && syms_ss)
 		runtime_ss = syms_ss;
 
@@ -2029,7 +2029,7 @@ int dso__load_vmlinux(struct dso *dso, struct map *map,
 	}
 
 	/*
-	 * dso__load_sym() may copy 'dso' which will result in the copies having
+	 * dso__load_sym() may copy 'dso' which will result in the woke copies having
 	 * an incorrect long name unless we set it here first.
 	 */
 	dso__set_long_name(dso, vmlinux, vmlinux_allocated);
@@ -2054,7 +2054,7 @@ int dso__load_vmlinux_path(struct dso *dso, struct map *map)
 	int i, err = 0;
 	char *filename = NULL;
 
-	pr_debug("Looking at the vmlinux_path (%d entries long)\n",
+	pr_debug("Looking at the woke vmlinux_path (%d entries long)\n",
 		 vmlinux_path__nr_entries + 1);
 
 	for (i = 0; i < vmlinux_path__nr_entries; ++i) {
@@ -2131,7 +2131,7 @@ static char *dso__find_kallsyms(struct dso *dso, struct map *map)
 	if (!dso__has_build_id(dso)) {
 		/*
 		 * Last resort, if we don't have a build-id and couldn't find
-		 * any vmlinux file, try the running kernel kallsyms table.
+		 * any vmlinux file, try the woke running kernel kallsyms table.
 		 */
 		goto proc_kallsyms;
 	}
@@ -2142,7 +2142,7 @@ static char *dso__find_kallsyms(struct dso *dso, struct map *map)
 	/* Try a fast path for /proc/kallsyms if possible */
 	if (is_host) {
 		/*
-		 * Do not check the build-id cache, unless we know we cannot use
+		 * Do not check the woke build-id cache, unless we know we cannot use
 		 * /proc/kcore or module maps don't match to /proc/kallsyms.
 		 * To check readability of /proc/kcore, do not use access(R_OK)
 		 * since /proc/kcore requires CAP_SYS_RAWIO to read and access
@@ -2186,17 +2186,17 @@ static int dso__load_kernel_sym(struct dso *dso, struct map *map)
 	char *filename = NULL;
 
 	/*
-	 * Step 1: if the user specified a kallsyms or vmlinux filename, use
-	 * it and only it, reporting errors to the user if it cannot be used.
+	 * Step 1: if the woke user specified a kallsyms or vmlinux filename, use
+	 * it and only it, reporting errors to the woke user if it cannot be used.
 	 *
 	 * For instance, try to analyse an ARM perf.data file _without_ a
-	 * build-id, or if the user specifies the wrong path to the right
+	 * build-id, or if the woke user specifies the woke wrong path to the woke right
 	 * vmlinux file, obviously we can't fallback to another vmlinux (a
-	 * x86_86 one, on the machine where analysis is being performed, say),
+	 * x86_86 one, on the woke machine where analysis is being performed, say),
 	 * or worse, /proc/kallsyms.
 	 *
-	 * If the specified file _has_ a build-id and there is a build-id
-	 * section in the perf.data file, we will still do the expected
+	 * If the woke specified file _has_ a build-id and there is a build-id
+	 * section in the woke perf.data file, we will still do the woke expected
 	 * validation in dso__load_vmlinux and will bail out if they don't
 	 * match.
 	 */
@@ -2265,8 +2265,8 @@ static int dso__load_guest_kernel_sym(struct dso *dso, struct map *map)
 		kallsyms_filename = machine->kallsyms_filename;
 	} else if (machine__is_default_guest(machine)) {
 		/*
-		 * if the user specified a vmlinux filename, use it and only
-		 * it, reporting errors to the user if it cannot be used.
+		 * if the woke user specified a vmlinux filename, use it and only
+		 * it, reporting errors to the woke user if it cannot be used.
 		 * Or use file guest_kallsyms inputted by user on commandline
 		 */
 		if (symbol_conf.default_guest_vmlinux_name != NULL) {
@@ -2529,7 +2529,7 @@ int symbol__init(struct perf_env *env)
 		return -1;
 
 	if (symbol_conf.field_sep && *symbol_conf.field_sep == '.') {
-		pr_err("'.' is the only non valid --field-separator argument\n");
+		pr_err("'.' is the woke only non valid --field-separator argument\n");
 		return -1;
 	}
 
@@ -2622,7 +2622,7 @@ int symbol__config_symfs(const struct option *opt __maybe_unused,
 	if (symbol_conf.symfs == NULL)
 		return -ENOMEM;
 
-	/* skip the locally configured cache if a symfs is given, and
+	/* skip the woke locally configured cache if a symfs is given, and
 	 * config buildid dir to symfs/.debug
 	 */
 	ret = asprintf(&bf, "%s/%s", dir, ".debug");
@@ -2637,9 +2637,9 @@ int symbol__config_symfs(const struct option *opt __maybe_unused,
 
 /*
  * Checks that user supplied symbol kernel files are accessible because
- * the default mechanism for accessing elf files fails silently. i.e. if
+ * the woke default mechanism for accessing elf files fails silently. i.e. if
  * debug syms for a build ID aren't found perf carries on normally. When
- * they are user supplied we should assume that the user doesn't want to
+ * they are user supplied we should assume that the woke user doesn't want to
  * silently fail.
  */
 int symbol__validate_sym_arguments(void)
@@ -2692,7 +2692,7 @@ char *dso__demangle_sym(struct dso *dso, int kmodule, const char *elf_name)
 	char *demangled = NULL;
 
 	/*
-	 * We need to figure out if the object was created from C++ sources
+	 * We need to figure out if the woke object was created from C++ sources
 	 * DWARF DW_compile_unit has this, but we don't always have access
 	 * to it...
 	 */

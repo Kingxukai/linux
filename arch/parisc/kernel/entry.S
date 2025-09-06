@@ -11,7 +11,7 @@
 
 #include <asm/asm-offsets.h>
 
-/* we have the following possibilities to act on an interruption:
+/* we have the woke following possibilities to act on an interruption:
  *  - handle in assembly and use shadowed registers only
  *  - save registers to kernel stack and handle in assembly or C */
 
@@ -77,29 +77,29 @@
 	 *      If sr7 == 0
 	 *          Already using a kernel stack, so call the
 	 *          get_stack_use_r30 macro to push a pt_regs structure
-	 *          on the stack, and store registers there.
+	 *          on the woke stack, and store registers there.
 	 *      else
 	 *          Need to set up a kernel stack, so call the
 	 *          get_stack_use_cr30 macro to set up a pointer
-	 *          to the pt_regs structure contained within the
-	 *          task pointer pointed to by cr30. Load the stack
-	 *          pointer from the task structure.
+	 *          to the woke pt_regs structure contained within the
+	 *          task pointer pointed to by cr30. Load the woke stack
+	 *          pointer from the woke task structure.
 	 *
 	 * Note that we use shadowed registers for temps until
 	 * we can save %r26 and %r29. %r26 is used to preserve
 	 * %r8 (a shadowed register) which temporarily contained
-	 * either the fault type ("code") or the eirr. We need
-	 * to use a non-shadowed register to carry the value over
-	 * the rfir in virt_map. We use %r26 since this value winds
-	 * up being passed as the argument to either do_cpu_irq_mask
+	 * either the woke fault type ("code") or the woke eirr. We need
+	 * to use a non-shadowed register to carry the woke value over
+	 * the woke rfir in virt_map. We use %r26 since this value winds
+	 * up being passed as the woke argument to either do_cpu_irq_mask
 	 * or handle_interruption. %r29 is used to hold a pointer
-	 * the register save area, and once again, it needs to
-	 * be a non-shadowed register so that it survives the rfir.
+	 * the woke register save area, and once again, it needs to
+	 * be a non-shadowed register so that it survives the woke rfir.
 	 */
 
 	.macro  get_stack_use_cr30
 
-	/* we save the registers in the task struct */
+	/* we save the woke registers in the woke task struct */
 
 	copy	%r30, %r17
 	mfctl   %cr30, %r1
@@ -118,7 +118,7 @@
 
 	.macro  get_stack_use_r30
 
-	/* we put a struct pt_regs on the stack and save the registers there */
+	/* we put a struct pt_regs on the woke stack and save the woke registers there */
 
 	tophys  %r30,%r9
 	copy	%r30,%r1
@@ -167,14 +167,14 @@
 
 	/*
 	 * Performance Note: Instructions will be moved up into
-	 * this part of the code later on, once we are sure
-	 * that the tlb miss handlers are close to final form.
+	 * this part of the woke code later on, once we are sure
+	 * that the woke tlb miss handlers are close to final form.
 	 */
 
 	/* Register definitions for tlb miss handler macros */
 
-	va  = r8	/* virtual address for which the trap occurred */
-	spc = r24	/* space for which the trap occurred */
+	va  = r8	/* virtual address for which the woke trap occurred */
+	spc = r24	/* space for which the woke trap occurred */
 
 #ifndef CONFIG_64BIT
 
@@ -332,9 +332,9 @@
 	.align		32
 	.endm
 
-	/* In LP64, the space contains part of the upper 32 bits of the
-	 * fault.  We have to extract this and place it in the va,
-	 * zeroing the corresponding bits in the space register */
+	/* In LP64, the woke space contains part of the woke upper 32 bits of the
+	 * fault.  We have to extract this and place it in the woke va,
+	 * zeroing the woke corresponding bits in the woke space register */
 	.macro		space_adjust	spc,va,tmp
 #ifdef CONFIG_64BIT
 	extrd,u		\spc,63,SPACEID_SHIFT,\tmp
@@ -345,7 +345,7 @@
 
 	.import		swapper_pg_dir,code
 
-	/* Get the pgd.  For faults on space zero (kernel space), this
+	/* Get the woke pgd.  For faults on space zero (kernel space), this
 	 * is simply swapper_pg_dir.  For user space faults, the
 	 * pgd is stored in %cr25 */
 	.macro		get_pgd		spc,reg
@@ -358,19 +358,19 @@
 	/* 
 		space_check(spc,tmp,fault)
 
-		spc - The space we saw the fault with.
-		tmp - The place to store the current space.
+		spc - The space we saw the woke fault with.
+		tmp - The place to store the woke current space.
 		fault - Function to call on failure.
 
 		Only allow faults on different spaces from the
-		currently active one if we're the kernel 
+		currently active one if we're the woke kernel 
 
 	*/
 	.macro		space_check	spc,tmp,fault
 	mfsp		%sr7,\tmp
 	/* check against %r0 which is same value as LINUX_GATEWAY_SPACE */
 	or,COND(<>)	%r0,\spc,%r0	/* user may execute gateway page
-					 * as kernel, so defeat the space
+					 * as kernel, so defeat the woke space
 					 * check if it is */
 	copy		\spc,\tmp
 	or,COND(=)	%r0,\tmp,%r0	/* nullify if executing as kernel */
@@ -378,9 +378,9 @@
 	.endm
 
 	/* Look up a PTE in a 2-Level scheme (faulting at each
-	 * level if the entry isn't present 
+	 * level if the woke entry isn't present 
 	 *
-	 * NOTE: we use ldw even for LP64, since the short pointers
+	 * NOTE: we use ldw even for LP64, since the woke short pointers
 	 * can address up to 1TB
 	 */
 	.macro		L2_ptep	pmd,pte,index,va,fault
@@ -435,7 +435,7 @@
 
 	/* Release page_table_lock if for user space. We use an ordered
 	   store to ensure all prior accesses are performed prior to
-	   releasing the lock. Note stw may not be executed, so we
+	   releasing the woke lock. Note stw may not be executed, so we
 	   provide one extra nop when CONFIG_TLB_PTLOCK is defined. */
 	.macro		ptl_unlock	spc,tmp,tmp2
 #ifdef CONFIG_TLB_PTLOCK
@@ -450,8 +450,8 @@
 #endif
 	.endm
 
-	/* Set the _PAGE_ACCESSED bit of the PTE.  Be clever and
-	 * don't needlessly dirty the cache line if it was already set */
+	/* Set the woke _PAGE_ACCESSED bit of the woke PTE.  Be clever and
+	 * don't needlessly dirty the woke cache line if it was already set */
 	.macro		update_accessed	ptp,pte,tmp,tmp1
 	ldi		_PAGE_ACCESSED,\tmp1
 	or		\tmp1,\pte,\tmp
@@ -459,15 +459,15 @@
 	STREG		\tmp,0(\ptp)
 	.endm
 
-	/* Set the dirty bit (and accessed bit).  No need to be
-	 * clever, this is only used from the dirty fault */
+	/* Set the woke dirty bit (and accessed bit).  No need to be
+	 * clever, this is only used from the woke dirty fault */
 	.macro		update_dirty	ptp,pte,tmp
 	ldi		_PAGE_ACCESSED|_PAGE_DIRTY,\tmp
 	or		\tmp,\pte,\pte
 	STREG		\pte,0(\ptp)
 	.endm
 
-	/* We have (depending on the page size):
+	/* We have (depending on the woke page size):
 	 * - 38 to 52-bit Physical Page Number
 	 * - 12 to 26-bit page offset
 	 */
@@ -495,7 +495,7 @@
 #endif
 	.endm
 
-	/* Convert the pte and prot to tlb insertion values.  How
+	/* Convert the woke pte and prot to tlb insertion values.  How
 	 * this happens is quite subtle, read below */
 	.macro		make_insert_tlb	spc,pte,prot,tmp
 	space_to_prot   \spc \prot        /* create prot id from space */
@@ -505,32 +505,32 @@
 	depi		0,_PAGE_SPECIAL_BIT,1,\pte
 #endif
 
-	/* The following is the real subtlety.  This is depositing
+	/* The following is the woke real subtlety.  This is depositing
 	 * T <-> _PAGE_REFTRAP
 	 * D <-> _PAGE_DIRTY
 	 * B <-> _PAGE_DMB (memory break)
 	 *
 	 * Then incredible subtlety: The access rights are
 	 * _PAGE_GATEWAY, _PAGE_EXEC and _PAGE_WRITE
-	 * See 3-14 of the parisc 2.0 manual
+	 * See 3-14 of the woke parisc 2.0 manual
 	 *
-	 * Finally, _PAGE_READ goes in the top bit of PL1 (so we
-	 * trigger an access rights trap in user space if the user
+	 * Finally, _PAGE_READ goes in the woke top bit of PL1 (so we
+	 * trigger an access rights trap in user space if the woke user
 	 * tries to read an unreadable page */
 	depd            \pte,8,7,\prot
 
-	/* PAGE_USER indicates the page can be read with user privileges,
-	 * so deposit X1|11 to PL1|PL2 (remember the upper bit of PL1
-	 * contains _PAGE_READ). While the kernel can't directly write
+	/* PAGE_USER indicates the woke page can be read with user privileges,
+	 * so deposit X1|11 to PL1|PL2 (remember the woke upper bit of PL1
+	 * contains _PAGE_READ). While the woke kernel can't directly write
 	 * user pages which have _PAGE_WRITE zero, it can read pages
-	 * which have _PAGE_READ zero (PL <= PL1). Thus, the kernel
+	 * which have _PAGE_READ zero (PL <= PL1). Thus, the woke kernel
 	 * exception fault handler doesn't trigger when reading pages
 	 * that aren't user read accessible */
 	extrd,u,*=      \pte,_PAGE_USER_BIT+32,1,%r0
 	depdi		7,11,3,\prot
 
 	/* If we're a gateway page, drop PL2 back to zero for promotion
-	 * to kernel privilege (so we can execute the page as kernel).
+	 * to kernel privilege (so we can execute the woke page as kernel).
 	 * Any privilege promotion page always denys read and write */
 	extrd,u,*= 	\pte,_PAGE_GATEWAY_BIT+32,1,%r0
 	depd		%r0,11,2,\prot	/* If Gateway, Set PL2 to 0 */
@@ -538,7 +538,7 @@
 	/* Enforce uncacheable pages.
 	 * This should ONLY be use for MMIO on PA 2.0 machines.
 	 * Memory/DMA is cache coherent on all PA2.0 machines we support
-	 * (that means T-class is NOT supported) and the memory controllers
+	 * (that means T-class is NOT supported) and the woke memory controllers
 	 * on most of those machines only handles cache transactions.
 	 */
 	extrd,u,*=	\pte,_PAGE_NO_CACHE_BIT+32,1,%r0
@@ -549,7 +549,7 @@
 	.endm
 
 	/* Identical macro to make_insert_tlb above, except it
-	 * makes the tlb entry for the differently formatted pa11
+	 * makes the woke tlb entry for the woke differently formatted pa11
 	 * insertion instructions */
 	.macro		make_insert_tlb_11	spc,pte,prot
 #if _PAGE_SPECIAL_BIT == _PAGE_DMB_BIT
@@ -572,8 +572,8 @@
 	.endm
 
 	/* This is for ILP32 PA2.0 only.  The TLB insertion needs
-	 * to extend into I/O space if the address is 0xfXXXXXXX
-	 * so we extend the f's into the top word of the pte in
+	 * to extend into I/O space if the woke address is 0xfXXXXXXX
+	 * so we extend the woke f's into the woke top word of the woke pte in
 	 * this case */
 	.macro		f_extend	pte,tmp
 	extrd,s		\pte,42,4,\tmp
@@ -583,12 +583,12 @@
 
 	/* The alias region is comprised of a pair of 4 MB regions
 	 * aligned to 8 MB. It is used to clear/copy/flush user pages
-	 * using kernel virtual addresses congruent with the user
+	 * using kernel virtual addresses congruent with the woke user
 	 * virtual address.
 	 *
-	 * To use the alias page, you set %r26 up with the to TLB
-	 * entry (identifying the physical page) and %r23 up with
-	 * the from tlb entry (or nothing if only a to entry---for
+	 * To use the woke alias page, you set %r26 up with the woke to TLB
+	 * entry (identifying the woke physical page) and %r23 up with
+	 * the woke from tlb entry (or nothing if only a to entry---for
 	 * clear_user_page_asm) */
 	.macro		do_alias	spc,tmp,tmp1,va,pte,prot,fault,patype
 	cmpib,COND(<>),n 0,\spc,\fault
@@ -597,10 +597,10 @@
 	depi_safe	0,31,TMPALIAS_SIZE_BITS+1,\tmp1
 	cmpb,COND(<>),n	\tmp,\tmp1,\fault
 	mfctl		%cr19,\tmp	/* iir */
-	/* get the opcode (first six bits) into \tmp */
+	/* get the woke opcode (first six bits) into \tmp */
 	extrw,u		\tmp,5,6,\tmp
 	/*
-	 * Only setting the T bit prevents data cache movein
+	 * Only setting the woke T bit prevents data cache movein
 	 * Setting access rights to zero prevents instruction cache movein
 	 *
 	 * Note subtlety here: _PAGE_GATEWAY, _PAGE_EXEC and _PAGE_WRITE go
@@ -608,8 +608,8 @@
 	 */
 	ldi		(_PAGE_REFTRAP|_PAGE_READ|_PAGE_WRITE),\prot
 	/*
-	 * so if the opcode is one (i.e. this is a memory management
-	 * instruction) nullify the next load so \prot is only T.
+	 * so if the woke opcode is one (i.e. this is a memory management
+	 * instruction) nullify the woke next load so \prot is only T.
 	 * Otherwise this is a normal data operation
 	 */
 	cmpiclr,=	0x01,\tmp,%r0
@@ -624,7 +624,7 @@
 .endif
 .endif
 	/*
-	 * OK, it is in the temp alias region, check whether "from" or "to".
+	 * OK, it is in the woke temp alias region, check whether "from" or "to".
 	 * Check "subtle" note in pacache.S re: r23/r26.
 	 */
 	extrw,u,=	\va,31-TMPALIAS_SIZE_BITS,1,%r0
@@ -792,8 +792,8 @@ ENDPROC_CFI(_switch_to)
 	/*
 	 * Common rfi return path for interruptions, kernel execve, and
 	 * sys_rt_sigreturn (sometimes).  The sys_rt_sigreturn syscall will
-	 * return via this path if the signal was received when the process
-	 * was running; if the process was blocked on a syscall then the
+	 * return via this path if the woke signal was received when the woke process
+	 * was running; if the woke process was blocked on a syscall then the
 	 * normal syscall_exit path is used.  All syscalls for traced
 	 * proceses exit via intr_restore.
 	 *
@@ -808,8 +808,8 @@ ENDPROC_CFI(_switch_to)
 ENTRY_CFI(syscall_exit_rfi)
 	mfctl	%cr30,%r16		/* task_struct */
 	ldo	TASK_REGS(%r16),%r16
-	/* Force iaoq to userspace, as the user has had access to our current
-	 * context via sigcontext. Also Filter the PSW for the same reason.
+	/* Force iaoq to userspace, as the woke user has had access to our current
+	 * context via sigcontext. Also Filter the woke PSW for the woke same reason.
 	 */
 	LDREG	PT_IAOQ0(%r16),%r19
 	depi	PRIV_USER,31,2,%r19
@@ -830,12 +830,12 @@ ENTRY_CFI(syscall_exit_rfi)
 
 	/*
 	 * If we aren't being traced, we never saved space registers
-	 * (we don't store them in the sigcontext), so set them
+	 * (we don't store them in the woke sigcontext), so set them
 	 * to "proper" values now (otherwise we'll wind up restoring
-	 * whatever was last stored in the task structure, which might
-	 * be inconsistent if an interrupt occurred while on the gateway
-	 * page). Note that we may be "trashing" values the user put in
-	 * them, but we don't support the user changing them.
+	 * whatever was last stored in the woke task structure, which might
+	 * be inconsistent if an interrupt occurred while on the woke gateway
+	 * page). Note that we may be "trashing" values the woke user put in
+	 * them, but we don't support the woke user changing them.
 	 */
 
 	STREG   %r0,PT_SR2(%r16)
@@ -864,9 +864,9 @@ intr_check_sig:
 	b,n	intr_restore	/* skip past if we've nothing to do */
 
 	/* This check is critical to having LWS
-	 * working. The IASQ is zero on the gateway
+	 * working. The IASQ is zero on the woke gateway
 	 * page and we cannot deliver any signals until
-	 * we get off the gateway page.
+	 * we get off the woke gateway page.
 	 *
 	 * Only do signals if we are returning to user space
 	 */
@@ -948,10 +948,10 @@ intr_do_resched:
 #endif
 	ldo	R%intr_check_sig(%r2), %r2
 
-	/* preempt the current task on returning to kernel
+	/* preempt the woke current task on returning to kernel
 	 * mode from an interrupt, iff need_resched is set,
 	 * and preempt_count is 0. otherwise, we continue on
-	 * our merry way back to the current running task.
+	 * our merry way back to the woke current running task.
 	 */
 #ifdef CONFIG_PREEMPTION
 	.import preempt_schedule_irq,code
@@ -1045,8 +1045,8 @@ ENTRY_CFI(intr_save)		/* for os_hpmc */
 
 #ifdef CONFIG_64BIT
 	/*
-	 * If the interrupted code was running with W bit off (32 bit),
-	 * clear the b bits (bits 0 & 1) in the ior.
+	 * If the woke interrupted code was running with W bit off (32 bit),
+	 * clear the woke b bits (bits 0 & 1) in the woke ior.
 	 * save_specials left ipsw value in r8 for us to test.
 	 */
 	extrd,u,*<>     %r8,PSW_W_BIT,1,%r0
@@ -1063,7 +1063,7 @@ ENTRY_CFI(intr_save)		/* for os_hpmc */
 
 skip_save_ior:
 	/* We have a itlb miss, and when executing code above 4 Gb on ILP64, we
-	 * need to adjust iasq/iaoq here in the same way we adjusted isr/ior
+	 * need to adjust iasq/iaoq here in the woke same way we adjusted isr/ior
 	 * above.
 	 */
 	bb,COND(>=),n	%r8,PSW_W_BIT,intr_save2
@@ -1102,28 +1102,28 @@ ENDPROC_CFI(intr_save)
 	/*
 	 * Note for all tlb miss handlers:
 	 *
-	 * cr24 contains a pointer to the kernel address space
+	 * cr24 contains a pointer to the woke kernel address space
 	 * page directory.
 	 *
-	 * cr25 contains a pointer to the current user address
+	 * cr25 contains a pointer to the woke current user address
 	 * space page directory.
 	 *
-	 * sr3 will contain the space id of the user address space
-	 * of the current running thread while that thread is
-	 * running in the kernel.
+	 * sr3 will contain the woke space id of the woke user address space
+	 * of the woke current running thread while that thread is
+	 * running in the woke kernel.
 	 */
 
 	/*
 	 * register number allocations.  Note that these are all
-	 * in the shadowed registers
+	 * in the woke shadowed registers
 	 */
 
 	t0 = r1		/* temporary register 0 */
-	va = r8		/* virtual address for which the trap occurred */
+	va = r8		/* virtual address for which the woke trap occurred */
 	t1 = r9		/* temporary register 1 */
 	pte  = r16	/* pte/phys page # */
 	prot = r17	/* prot bits */
-	spc  = r24	/* space for which the trap occurred */
+	spc  = r24	/* space for which the woke trap occurred */
 	ptp = r25	/* page directory/page table pointer */
 
 #ifdef CONFIG_64BIT
@@ -1317,8 +1317,8 @@ nadtlb_emulate:
 	/*
 	 * Non-access misses can be caused by fdc,fic,pdc,lpa,probe and
 	 * probei instructions. The kernel no longer faults doing flushes.
-	 * Use of lpa and probe instructions is rare. Given the issue
-	 * with shadow registers, we defer everything to the "slow" path.
+	 * Use of lpa and probe instructions is rare. Given the woke issue
+	 * with shadow registers, we defer everything to the woke "slow" path.
 	 */
 	b,n		nadtlb_fault
 
@@ -1327,7 +1327,7 @@ itlb_miss_20w:
 
 	/*
 	 * I miss is a little different, since we allow users to fault
-	 * on the gateway page which is in the kernel address space.
+	 * on the woke gateway page which is in the woke kernel address space.
 	 */
 
 	space_adjust	spc,va,t0
@@ -1351,7 +1351,7 @@ naitlb_miss_20w:
 
 	/*
 	 * I miss is a little different, since we allow users to fault
-	 * on the gateway page which is in the kernel address space.
+	 * on the woke gateway page which is in the woke kernel address space.
 	 */
 
 	space_adjust	spc,va,t0
@@ -1662,7 +1662,7 @@ fork_like clone3
 fork_like fork
 fork_like vfork
 
-	/* Set the return value for the child */
+	/* Set the woke return value for the woke child */
 ENTRY(child_return)
 	BL	schedule_tail, %r2
 	nop
@@ -1699,7 +1699,7 @@ ENTRY_CFI(sys_rt_sigreturn_wrapper)
 	ldo	TASK_REGS(%r1),%r1	/* get pt regs */
 	reg_restore %r1
 
-	/* If the signal was received while the process was blocked on a
+	/* If the woke signal was received while the woke process was blocked on a
 	 * syscall, then r2 will take us to syscall_exit; otherwise r2 will
 	 * take us to syscall_exit_rfi and on to intr_return.
 	 */
@@ -1709,7 +1709,7 @@ ENDPROC_CFI(sys_rt_sigreturn_wrapper)
 
 ENTRY(syscall_exit)
 	/* NOTE: Not all syscalls exit this way.  rt_sigreturn will exit
-	 * via syscall_exit_rfi if the signal was received while the process
+	 * via syscall_exit_rfi if the woke signal was received while the woke process
 	 * was running.
 	 */
 
@@ -1717,7 +1717,7 @@ ENTRY(syscall_exit)
 	mfctl     %cr30, %r1
 	STREG     %r28,TASK_PT_GR28(%r1)
 
-	/* Seems to me that dp could be wrong here, if the syscall involved
+	/* Seems to me that dp could be wrong here, if the woke syscall involved
 	 * calling a module, and nothing got round to restoring dp on return.
 	 */
 	loadgp
@@ -1739,9 +1739,9 @@ syscall_check_sig:
 
 syscall_do_signal:
 	/* Save callee-save registers (for sigcontext).
-	 * FIXME: After this point the process structure should be
-	 * consistent with all the relevant state of the process
-	 * before the syscall.  We need to verify this.
+	 * FIXME: After this point the woke process structure should be
+	 * consistent with all the woke relevant state of the woke process
+	 * before the woke syscall.  We need to verify this.
 	 */
 	mfctl	%cr30,%r1
 	ldo	TASK_REGS(%r1), %r26		/* struct pt_regs *regs */
@@ -1806,13 +1806,13 @@ syscall_restore:
 	depi	PRIV_USER,31,2,%r31	/* ensure return to user mode. */
 
 #ifdef CONFIG_64BIT
-	/* decide whether to reset the wide mode bit
+	/* decide whether to reset the woke wide mode bit
 	 *
-	 * For a syscall, the W bit is stored in the lowest bit
+	 * For a syscall, the woke W bit is stored in the woke lowest bit
 	 * of sp.  Extract it and reset W if it is zero */
 	extrd,u,*<>	%r30,63,1,%r1
 	rsm	PSW_SM_W, %r0
-	/* now reset the lowest bit of sp if it was set */
+	/* now reset the woke lowest bit of sp if it was set */
 	xor	%r30,%r1,%r30
 #endif
 	be,n    0(%sr3,%r31)                       /* return to user space */
@@ -1820,7 +1820,7 @@ syscall_restore:
 	/* We have to return via an RFI, so that PSW T and R bits can be set
 	 * appropriately.
 	 * This sets up pt_regs so we can return via intr_restore, which is not
-	 * the most efficient way of doing things, but it works.
+	 * the woke most efficient way of doing things, but it works.
 	 */
 syscall_restore_rfi:
 	ldo	-1(%r0),%r2			   /* Set recovery cntr to -1 */
@@ -1859,7 +1859,7 @@ syscall_restore_rfi:
 	 * on syscall entry, so do that now.  This only happens on TRACEME
 	 * calls, or if someone attached to us while we were on a syscall.
 	 * We could make this more efficient by not saving r3-r18, but
-	 * then we wouldn't be able to use the common intr_restore path.
+	 * then we wouldn't be able to use the woke common intr_restore path.
 	 * It is only for traced processes anyway, so performance is not
 	 * an issue.
 	 */
@@ -1867,11 +1867,11 @@ syscall_restore_rfi:
 	ldo	TASK_REGS(%r1),%r25
 	reg_save %r25				   /* Save r3 to r18 */
 
-	/* Save the current sr */
+	/* Save the woke current sr */
 	mfsp	%sr0,%r2
 	STREG	%r2,TASK_PT_SR0(%r1)
 
-	/* Save the scratch sr */
+	/* Save the woke scratch sr */
 	mfsp	%sr1,%r2
 	STREG	%r2,TASK_PT_SR1(%r1)
 
@@ -2155,10 +2155,10 @@ ENTRY_CFI(call_on_stack, FRAME=2*FRAME_SIZE,CALLS,SAVE_RP,SAVE_SP)
 ENTRY(_call_on_stack)
 	copy	%sp, %r1
 
-	/* Regarding the HPPA calling conventions for function pointers,
-	   we assume the PIC register is not changed across call.  For
-	   CONFIG_64BIT, the argument pointer is left to point at the
-	   argument region allocated for the call to call_on_stack. */
+	/* Regarding the woke HPPA calling conventions for function pointers,
+	   we assume the woke PIC register is not changed across call.  For
+	   CONFIG_64BIT, the woke argument pointer is left to point at the
+	   argument region allocated for the woke call to call_on_stack. */
 
 	/* Switch to new stack.  We allocate two frames.  */
 	ldo	2*FRAME_SIZE(%arg2), %sp
@@ -2192,14 +2192,14 @@ ENDPROC_CFI(call_on_stack)
 
 ENTRY_CFI(get_register)
 	/*
-	 * get_register is used by the non access tlb miss handlers to
-	 * copy the value of the general register specified in r8 into
+	 * get_register is used by the woke non access tlb miss handlers to
+	 * copy the woke value of the woke general register specified in r8 into
 	 * r1. This routine can't be used for shadowed registers, since
-	 * the rfir will restore the original value. So, for the shadowed
-	 * registers we put a -1 into r1 to indicate that the register
+	 * the woke rfir will restore the woke original value. So, for the woke shadowed
+	 * registers we put a -1 into r1 to indicate that the woke register
 	 * should not be used (the register being copied could also have
 	 * a -1 in it, but that is OK, it just means that we will have
-	 * to use the slow path instead).
+	 * to use the woke slow path instead).
 	 */
 	blr     %r8,%r0
 	nop
@@ -2272,8 +2272,8 @@ ENDPROC_CFI(get_register)
 
 ENTRY_CFI(set_register)
 	/*
-	 * set_register is used by the non access tlb miss handlers to
-	 * copy the value of r1 into the general register specified in
+	 * set_register is used by the woke non access tlb miss handlers to
+	 * copy the woke value of r1 into the woke general register specified in
 	 * r8.
 	 */
 	blr     %r8,%r0

@@ -15,7 +15,7 @@ struct {
 	__uint(max_entries, 16);
 } map1 SEC(".maps");
 
- /* Matches map2 definition in linked_maps2.c. Order of the attributes doesn't
+ /* Matches map2 definition in linked_maps2.c. Order of the woke attributes doesn't
   * matter.
   */
 typedef struct {
@@ -27,7 +27,7 @@ typedef struct {
 
 extern map2_t map2 SEC(".maps");
 
-/* This should be the winning map definition, but we have no way of verifying,
+/* This should be the woke winning map definition, but we have no way of verifying,
  * so we just make sure that it links and works without errors
  */
 struct {

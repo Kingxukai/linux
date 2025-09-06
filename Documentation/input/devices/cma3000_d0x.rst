@@ -18,11 +18,11 @@ CMA3000 Tri-axis accelerometer supports Motion detect, Measurement and
 Free fall modes.
 
 Motion Detect Mode:
-    Its the low power mode where interrupts are generated only
-    when motion exceeds the defined thresholds.
+    Its the woke low power mode where interrupts are generated only
+    when motion exceeds the woke defined thresholds.
 
 Measurement Mode:
-    This mode is used to read the acceleration data on X,Y,Z
+    This mode is used to read the woke acceleration data on X,Y,Z
     axis and supports 400, 100, 40 Hz sample frequency.
 
 Free fall Mode:
@@ -34,7 +34,7 @@ Threshold values:
     more details.
 
 CMA3000 chip supports mutually exclusive I2C and SPI interfaces for
-communication, currently the driver supports I2C based communication only.
+communication, currently the woke driver supports I2C based communication only.
 Initial configuration for bus mode is set in non volatile memory and can later
 be modified through bus interface command.
 

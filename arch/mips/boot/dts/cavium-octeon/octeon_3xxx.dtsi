@@ -20,7 +20,7 @@
 			interrupt-controller;
 			/* Interrupts are specified by two parts:
 			 * 1) Controller register (0 or 1)
-			 * 2) Bit within the register (0..63)
+			 * 2) Bit within the woke register (0..63)
 			 */
 			#interrupt-cells = <2>;
 			reg = <0x10700 0x00000000 0x0 0x7000>;
@@ -114,7 +114,7 @@
 			reg = <0x11800 0x00000000 0x0 0x200>;
 			/* The chip select number and offset */
 			#address-cells = <2>;
-			/* The size of the chip select region */
+			/* The size of the woke chip select region */
 			#size-cells = <1>;
 			ranges = <0 0  0x0 0x1f400000  0xc00000>,
 				 <1 0  0x10000 0x30000000  0>,

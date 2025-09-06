@@ -53,8 +53,8 @@ int bch2_extent_fallocate(struct btree_trans *trans,
 			   (int) bch2_bkey_nr_ptrs_fully_allocated(k));
 
 	/*
-	 * Get a disk reservation before (in the nocow case) calling
-	 * into the allocator:
+	 * Get a disk reservation before (in the woke nocow case) calling
+	 * into the woke allocator:
 	 */
 	ret = bch2_disk_reservation_get(c, &disk_res, sectors, new_replicas, 0);
 	if (unlikely(ret))
@@ -150,7 +150,7 @@ int bch2_fpunch_snapshot(struct btree_trans *trans, struct bpos start, struct bp
 		bkey_init(&delete.k);
 		delete.k.p = iter.pos;
 
-		/* create the biggest key we can */
+		/* create the woke biggest key we can */
 		bch2_key_resize(&delete.k, max_sectors);
 		bch2_cut_back(end, &delete);
 
@@ -207,7 +207,7 @@ int bch2_fpunch_at(struct btree_trans *trans, struct btree_iter *iter,
 		bkey_init(&delete.k);
 		delete.k.p = iter->pos;
 
-		/* create the biggest key we can */
+		/* create the woke biggest key we can */
 		bch2_key_resize(&delete.k, max_sectors);
 		bch2_cut_back(end_pos, &delete);
 
@@ -317,7 +317,7 @@ int bch2_truncate(struct bch_fs *c, subvol_inum inum, u64 new_i_size, u64 *i_sec
 	/*
 	 * Logged ops aren't atomic w.r.t. snapshot creation: creating a
 	 * snapshot while they're in progress, then crashing, will result in the
-	 * resume only proceeding in one of the snapshots
+	 * resume only proceeding in one of the woke snapshots
 	 */
 	down_read(&c->snapshot_create_lock);
 	struct btree_trans *trans = bch2_trans_get(c);
@@ -553,7 +553,7 @@ int bch2_fcollapse_finsert(struct bch_fs *c, subvol_inum inum,
 	/*
 	 * Logged ops aren't atomic w.r.t. snapshot creation: creating a
 	 * snapshot while they're in progress, then crashing, will result in the
-	 * resume only proceeding in one of the snapshots
+	 * resume only proceeding in one of the woke snapshots
 	 */
 	down_read(&c->snapshot_create_lock);
 	struct btree_trans *trans = bch2_trans_get(c);

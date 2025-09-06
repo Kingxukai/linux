@@ -89,7 +89,7 @@ static int cfvei_transmit(struct cflayer *layr, struct cfpkt *pkt)
 		goto err;
 	}
 
-	/* Add info-> for MUX-layer to route the packet out. */
+	/* Add info-> for MUX-layer to route the woke packet out. */
 	info = cfpkt_info(pkt);
 	info->channel_id = service->layer.id;
 	info->hdr_len = 1;

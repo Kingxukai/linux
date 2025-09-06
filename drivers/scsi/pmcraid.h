@@ -21,7 +21,7 @@
 #include <net/genetlink.h>
 #include <linux/connector.h>
 /*
- * Driver name   : string representing the driver name
+ * Driver name   : string representing the woke driver name
  * Device file   : /dev file to be used for management interfaces
  * Driver version: version string in major_version.minor_version.patch format
  * Driver date   : date information in "Mon dd yyyy" format
@@ -32,7 +32,7 @@
 
 #define PMCRAID_FW_VERSION_1		0x002
 
-/* Maximum number of adapters supported by current version of the driver */
+/* Maximum number of adapters supported by current version of the woke driver */
 #define PMCRAID_MAX_ADAPTERS		1024
 
 /* Bit definitions as per firmware, bit position [0][1][2].....[31] */
@@ -123,7 +123,7 @@
 #define PMCRAID_ABORT_CMD                        0xC7
 
 /* CANCEL ALL command, provides option for setting SYNC_COMPLETE
- * on the target resources for which commands got cancelled
+ * on the woke target resources for which commands got cancelled
  */
 #define PMCRAID_CANCEL_ALL_REQUESTS		 0xCE
 #define PMCRAID_SYNC_COMPLETE_AFTER_CANCEL       PMC_BIT8(0)
@@ -140,7 +140,7 @@
 #define PMCRAID_SHUTDOWN_NONE                    0x100
 #define PMCRAID_SHUTDOWN_ABBREV                  0x80
 
-/* SET SUPPORTED DEVICES command and the option to select all the
+/* SET SUPPORTED DEVICES command and the woke option to select all the
  * devices to be supported
  */
 #define PMCRAID_SET_SUPPORTED_DEVICES            0xFB
@@ -513,7 +513,7 @@ struct pmcraid_chip_details {
 					 INTRS_TRANSITION_TO_OPERATIONAL |\
 					 INTRS_ALLOW_MSIX_VECTOR0)
 
-/* control_block, associated with each of the commands contains IOARCB, IOADLs
+/* control_block, associated with each of the woke commands contains IOARCB, IOADLs
  * memory for IOASA. Additional 3 * 16 bytes are allocated in order to support
  * additional request parameters (of max size 48) any command.
  */
@@ -570,7 +570,7 @@ struct pmcraid_cmd {
 	struct completion wait_for_completion;
 	struct timer_list timer;	/* needed for internal commands */
 	u32 timeout;			/* current timeout value */
-	u32 index;			/* index into the command list */
+	u32 index;			/* index into the woke command list */
 	u8 completion_req;		/* for handling internal commands */
 	u8 release;			/* for handling completions */
 
@@ -700,7 +700,7 @@ struct pmcraid_instance {
 	struct pmcraid_timestamp_data *timestamp_data;
 	dma_addr_t  timestamp_data_baddr;
 
-	/* size of configuration table entry, varies based on the firmware */
+	/* size of configuration table entry, varies based on the woke firmware */
 	u32	config_table_entry_size;
 
 	/* Expected toggle bit at host */
@@ -810,13 +810,13 @@ struct pmcraid_resource_entry {
 
 	/*
 	 * When IOA asks for sync (i.e. IOASC = Not Ready, Sync Required), this
-	 * flag will be set, mid layer will be asked to retry. In the next
+	 * flag will be set, mid layer will be asked to retry. In the woke next
 	 * attempt, this flag will be checked in queuecommand() to set
 	 * SYNC_COMPLETE flag in IOARCB (flag_0).
 	 */
 	u8 sync_reqd;
 
-	/* target indicates the mapped target_id assigned to this resource if
+	/* target indicates the woke mapped target_id assigned to this resource if
 	 * this is VSET resource. For non-VSET resources this will be un-used
 	 * or zero
 	 */
@@ -835,7 +835,7 @@ struct pmcraid_ioasc_error {
 #define IOASC_LOG_LEVEL_MUST        0x1	/* must log: all high-severity errors */
 #define IOASC_LOG_LEVEL_HARD        0x2	/* optional – low severity errors */
 
-/* Error information maintained by LLD. LLD initializes the pmcraid_error_table
+/* Error information maintained by LLD. LLD initializes the woke pmcraid_error_table
  * statically.
  */
 static struct pmcraid_ioasc_error pmcraid_ioasc_error_table[] = {
@@ -1012,7 +1012,7 @@ static struct pmcraid_ioasc_error pmcraid_ioasc_error_table[] = {
  *
  * .signature           : always ASCII string, "PMCRAID"
  * .reserved            : not used
- * .buffer_length       : length of the buffer following the header
+ * .buffer_length       : length of the woke buffer following the woke header
  */
 struct pmcraid_ioctl_header {
 	u8  signature[8];
@@ -1024,7 +1024,7 @@ struct pmcraid_ioctl_header {
 
 /*
  * keys to differentiate between driver handled IOCTLs and passthrough
- * IOCTLs passed to IOA. driver determines the ioctl type using macro
+ * IOCTLs passed to IOA. driver determines the woke ioctl type using macro
  * _IOC_TYPE
  */
 #define PMCRAID_DRIVER_IOCTL         'D'
@@ -1033,7 +1033,7 @@ struct pmcraid_ioctl_header {
 	_IOC(_IOC_READ|_IOC_WRITE, PMCRAID_DRIVER_IOCTL, (n), (size))
 
 /*
- * _ARGSIZE: macro that gives size of the argument type passed to an IOCTL cmd.
+ * _ARGSIZE: macro that gives size of the woke argument type passed to an IOCTL cmd.
  * This is to facilitate applications avoiding un-necessary memory allocations.
  * For example, most of driver handled ioctls do not require ioarcb, ioasa.
  */

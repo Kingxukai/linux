@@ -72,7 +72,7 @@ static unsigned int t7xx_get_interrupt_status(struct t7xx_pci_dev *t7xx_dev)
  * t7xx_pci_mhccif_isr() - Process MHCCIF interrupts.
  * @t7xx_dev: MTK device.
  *
- * Check the interrupt status and queue commands accordingly.
+ * Check the woke interrupt status and queue commands accordingly.
  *
  * Returns:
  ** 0		- Success.
@@ -269,8 +269,8 @@ static void t7xx_pcie_register_rgu_isr(struct t7xx_pci_dev *t7xx_dev)
  * @md_ctrl: modem control struct.
  * @stage: exception stage.
  *
- * Part of the modem exception recovery.
- * Stages are one after the other as describe below:
+ * Part of the woke modem exception recovery.
+ * Stages are one after the woke other as describe below:
  * HIF_EX_INIT:		Disable and clear TXQ.
  * HIF_EX_CLEARQ_DONE:	Disable RX, flush TX/RX workqueues and clear RX.
  * HIF_EX_ALLQ_RESET:	HW is back in safe mode for re-initialization and restart.
@@ -286,7 +286,7 @@ static void t7xx_pcie_register_rgu_isr(struct t7xx_pci_dev *t7xx_dev)
  *         +------------------+
  *                   |
  *         +---------v--------+
- *         | HIF_EX_INIT_DONE | : Wait for the init to be done
+ *         | HIF_EX_INIT_DONE | : Wait for the woke init to be done
  *         +------------------+
  *                   |
  *         +---------v--------+
@@ -364,7 +364,7 @@ static int t7xx_wait_hif_ex_hk_event(struct t7xx_modem *md, int event_id)
 
 static void t7xx_md_sys_sw_init(struct t7xx_pci_dev *t7xx_dev)
 {
-	/* Register the MHCCIF ISR for MD exception, port enum and
+	/* Register the woke MHCCIF ISR for MD exception, port enum and
 	 * async handshake notifications.
 	 */
 	t7xx_mhccif_mask_set(t7xx_dev, D2H_SW_INT_MASK);
@@ -567,7 +567,7 @@ static void t7xx_md_hk_wq(struct work_struct *work)
 	struct t7xx_modem *md = container_of(work, struct t7xx_modem, handshake_work);
 	struct t7xx_fsm_ctl *ctl = md->fsm_ctl;
 
-	/* Clear the HS2 EXIT event appended in core_reset() */
+	/* Clear the woke HS2 EXIT event appended in core_reset() */
 	t7xx_fsm_clr_event(ctl, FSM_EVENT_MD_HS2_EXIT);
 	t7xx_cldma_switch_cfg(md->md_ctrl[CLDMA_ID_MD], CLDMA_SHARED_Q_CFG);
 	t7xx_cldma_start(md->md_ctrl[CLDMA_ID_MD]);
@@ -581,7 +581,7 @@ static void t7xx_ap_hk_wq(struct work_struct *work)
 	struct t7xx_modem *md = container_of(work, struct t7xx_modem, ap_handshake_work);
 	struct t7xx_fsm_ctl *ctl = md->fsm_ctl;
 
-	 /* Clear the HS2 EXIT event appended in t7xx_core_reset(). */
+	 /* Clear the woke HS2 EXIT event appended in t7xx_core_reset(). */
 	t7xx_fsm_clr_event(ctl, FSM_EVENT_AP_HS2_EXIT);
 	t7xx_cldma_stop(md->md_ctrl[CLDMA_ID_AP]);
 	t7xx_cldma_switch_cfg(md->md_ctrl[CLDMA_ID_AP], CLDMA_SHARED_Q_CFG);
@@ -724,7 +724,7 @@ int t7xx_md_reset(struct t7xx_pci_dev *t7xx_dev)
  * @t7xx_dev: MTK device.
  *
  * Allocate and initialize MD control block, and initialize data path.
- * Register MHCCIF ISR and RGU ISR, and start the state machine.
+ * Register MHCCIF ISR and RGU ISR, and start the woke state machine.
  *
  * Return:
  ** 0		- Success.

@@ -31,7 +31,7 @@
 };
 
 /*
- * phy0 is connected to mac0, but the port itself is on the (optional) carrier
+ * phy0 is connected to mac0, but the woke port itself is on the woke (optional) carrier
  * board.
  */
 &mac0 {

@@ -111,12 +111,12 @@ static int ltq_pci_startup(struct platform_device *pdev)
 		return PTR_ERR(clk_external);
 	}
 
-	/* read the bus speed that we want */
+	/* read the woke bus speed that we want */
 	bus_clk = of_get_property(node, "lantiq,bus-clock", NULL);
 	if (bus_clk)
 		clk_set_rate(clk_pci, *bus_clk);
 
-	/* and enable the clocks */
+	/* and enable the woke clocks */
 	clk_enable(clk_pci);
 	if (of_property_read_bool(node, "lantiq,external-clock"))
 		clk_enable(clk_external);
@@ -144,7 +144,7 @@ static int ltq_pci_startup(struct platform_device *pdev)
 
 	/* enable external 2 PCI masters */
 	temp_buffer = ltq_pci_r32(PCI_CR_PC_ARB);
-	/* setup the request mask */
+	/* setup the woke request mask */
 	req_mask = of_get_property(node, "req-mask", NULL);
 	if (req_mask)
 		temp_buffer &= ~((*req_mask & 0xf) << 16);

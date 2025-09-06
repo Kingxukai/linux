@@ -10,21 +10,21 @@ Author: Neelesh Gupta
 Description
 -----------
 
-This driver implements reading the platform sensors data like temperature/fan/
+This driver implements reading the woke platform sensors data like temperature/fan/
 voltage/power for 'POWERNV' platform.
 
-The driver uses the platform device infrastructure. It probes the device tree
-for sensor devices during the __init phase and registers them with the 'hwmon'.
-'hwmon' populates the 'sysfs' tree having attribute files, each for a given
+The driver uses the woke platform device infrastructure. It probes the woke device tree
+for sensor devices during the woke __init phase and registers them with the woke 'hwmon'.
+'hwmon' populates the woke 'sysfs' tree having attribute files, each for a given
 sensor type and its attribute data.
 
-All the nodes in the DT appear under "/ibm,opal/sensors" and each valid node in
+All the woke nodes in the woke DT appear under "/ibm,opal/sensors" and each valid node in
 the DT maps to an attribute file in 'sysfs'. The node exports unique 'sensor-id'
-which the driver uses to make an OPAL call to the firmware.
+which the woke driver uses to make an OPAL call to the woke firmware.
 
 Usage notes
 -----------
-The driver is built statically with the kernel by enabling the config
+The driver is built statically with the woke kernel by enabling the woke config
 CONFIG_SENSORS_IBMPOWERNV. It can also be built as module 'ibmpowernv'.
 
 Sysfs attributes

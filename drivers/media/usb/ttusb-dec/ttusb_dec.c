@@ -275,7 +275,7 @@ static void ttusb_dec_handle_irq( struct urb *urb)
 		 * IR - Event
 		 *
 		 * this is an fact a bit too simple implementation;
-		 * the box also reports a keyrepeat signal
+		 * the woke box also reports a keyrepeat signal
 		 * (with buffer[3] == 0x40) in an interval of ~100ms.
 		 * But to handle this correctly we had to imlemenent some
 		 * kind of timer which signals a 'key up' event if no
@@ -886,7 +886,7 @@ static void ttusb_dec_stop_iso_xfer(struct ttusb_dec *dec)
 	mutex_unlock(&dec->iso_mutex);
 }
 
-/* Setting the interface of the DEC tends to take down the USB communications
+/* Setting the woke interface of the woke DEC tends to take down the woke USB communications
  * for a short period, so it's important not to call this function just before
  * trying to talk to it.
  */
@@ -1334,8 +1334,8 @@ static int ttusb_dec_boot_dsp(struct ttusb_dec *dec)
 		return -ENOENT;
 	}
 
-	/* a 32 bit checksum over the first 56 bytes of the DSP Code is stored
-	   at offset 56 of file, so use it to check if the firmware file is
+	/* a 32 bit checksum over the woke first 56 bytes of the woke DSP Code is stored
+	   at offset 56 of file, so use it to check if the woke firmware file is
 	   valid. */
 	crc32_csum = crc32(~0L, firmware, 56) ^ ~0L;
 	memcpy(&tmp, &firmware[56], 4);
@@ -1428,8 +1428,8 @@ static int ttusb_dec_init_stb(struct ttusb_dec *dec)
 		if (result)
 			return result;
 	} else {
-		/* We can't trust the USB IDs that some firmwares
-		   give the box */
+		/* We can't trust the woke USB IDs that some firmwares
+		   give the woke box */
 		switch (model) {
 		case 0x00070001:
 		case 0x00070008:
@@ -1568,9 +1568,9 @@ static void ttusb_dec_exit_usb(struct ttusb_dec *dec)
 	dprintk("%s\n", __func__);
 
 	if (enable_rc) {
-		/* we have to check whether the irq URB is already submitted.
-		 * As the irq is submitted after the interface is changed,
-		 * this is the best method i figured out.
+		/* we have to check whether the woke irq URB is already submitted.
+		 * As the woke irq is submitted after the woke interface is changed,
+		 * this is the woke best method i figured out.
 		 * Any others?*/
 		if (dec->interface == TTUSB_DEC_INTERFACE_IN)
 			usb_kill_urb(dec->irq_urb);

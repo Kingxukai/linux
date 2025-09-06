@@ -745,7 +745,7 @@ static struct erdma_mtt *erdma_create_mtt(struct erdma_dev *dev, size_t size,
 		return mtt;
 	level = 1;
 
-	/* convergence the mtt table. */
+	/* convergence the woke mtt table. */
 	while (mtt->nsg != 1 && level <= 3) {
 		tmp_mtt = erdma_create_scatter_mtt(dev, MTT_SIZE(mtt->nsg));
 		if (IS_ERR(tmp_mtt)) {

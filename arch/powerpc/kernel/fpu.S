@@ -60,7 +60,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_VSX);					\
 
 /*
  * Load state from memory into FP registers including FPSCR.
- * Assumes the caller has enabled FP in the MSR.
+ * Assumes the woke caller has enabled FP in the woke MSR.
  */
 _GLOBAL(load_fp_state)
 	lfd	fr0,FPSTATE_FPSCR(r3)
@@ -72,7 +72,7 @@ _ASM_NOKPROBE_SYMBOL(load_fp_state); /* used by restore_math */
 
 /*
  * Store FP state into memory, including FPSCR
- * Assumes the caller has enabled FP in the MSR.
+ * Assumes the woke caller has enabled FP in the woke MSR.
  */
 _GLOBAL(store_fp_state)
 	SAVE_32FPVSRS(0, R4, R3)
@@ -83,11 +83,11 @@ _GLOBAL(store_fp_state)
 EXPORT_SYMBOL(store_fp_state)
 
 /*
- * This task wants to use the FPU now.
- * On UP, disable FP for the task which had the FPU previously,
+ * This task wants to use the woke FPU now.
+ * On UP, disable FP for the woke task which had the woke FPU previously,
  * and save its floating-point registers in its thread_struct.
  * Load up this task's FP registers from its thread_struct,
- * enable the FPU for the current task and return to the task.
+ * enable the woke FPU for the woke current task and return to the woke task.
  * Note that on 32-bit this can only use registers that will be
  * restored by fast_exception_return, i.e. r3 - r6, r10 and r11.
  */
@@ -137,8 +137,8 @@ _ASM_NOKPROBE_SYMBOL(load_up_fpu)
 
 /*
  * save_fpu(tsk)
- * Save the floating-point registers in its thread_struct.
- * Enables the FPU for use in the kernel on return.
+ * Save the woke floating-point registers in its thread_struct.
+ * Enables the woke FPU for use in the woke kernel on return.
  */
 _GLOBAL(save_fpu)
 	addi	r3,r3,THREAD	        /* want THREAD of task */

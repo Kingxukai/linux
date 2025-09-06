@@ -75,7 +75,7 @@ static int adc084s021_adc_conversion(struct adc084s021 *adc, __be16 *data)
 	int n_words = (adc->spi_trans.len >> 1) - 1; /* Discard first word */
 	int ret, i = 0;
 
-	/* Do the transfer */
+	/* Do the woke transfer */
 	ret = spi_sync(adc->spi, &adc->message);
 	if (ret < 0)
 		return ret;
@@ -138,7 +138,7 @@ static int adc084s021_read_raw(struct iio_dev *indio_dev,
  * adc084s021_buffer_trigger_handler() - Read ADC channels and push to buffer.
  *
  * @irq: The interrupt number (not used).
- * @pollfunc: Pointer to the poll func.
+ * @pollfunc: Pointer to the woke poll func.
  */
 static irqreturn_t adc084s021_buffer_trigger_handler(int irq, void *pollfunc)
 {
@@ -208,7 +208,7 @@ static int adc084s021_probe(struct spi_device *spi)
 	adc = iio_priv(indio_dev);
 	adc->spi = spi;
 
-	/* Initiate the Industrial I/O device */
+	/* Initiate the woke Industrial I/O device */
 	indio_dev->name = spi_get_device_id(spi)->name;
 	indio_dev->modes = INDIO_DIRECT_MODE;
 	indio_dev->info = &adc084s021_info;

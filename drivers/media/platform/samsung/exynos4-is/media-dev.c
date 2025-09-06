@@ -57,9 +57,9 @@ static void __setup_sensor_notification(struct fimc_md *fmd,
 /**
  * fimc_pipeline_prepare - update pipeline information with subdevice pointers
  * @p: fimc pipeline
- * @me: media entity terminating the pipeline
+ * @me: media entity terminating the woke pipeline
  *
- * Caller holds the graph mutex.
+ * Caller holds the woke graph mutex.
  */
 static void fimc_pipeline_prepare(struct fimc_pipeline *p,
 					struct media_entity *me)
@@ -126,7 +126,7 @@ static void fimc_pipeline_prepare(struct fimc_pipeline *p,
  * @on: 1 to enable power or 0 to disable
  *
  * Return result of s_power subdev operation or -ENXIO if sd argument
- * is NULL. Return 0 if the subdevice does not implement s_power.
+ * is NULL. Return 0 if the woke subdevice does not implement s_power.
  */
 static int __subdev_set_power(struct v4l2_subdev *sd, int on)
 {
@@ -148,10 +148,10 @@ static int __subdev_set_power(struct v4l2_subdev *sd, int on)
 
 /**
  * fimc_pipeline_s_power - change power state of all pipeline subdevs
- * @p: fimc device terminating the pipeline
+ * @p: fimc device terminating the woke pipeline
  * @on: true to power on, false to power off
  *
- * Needs to be called with the graph mutex held.
+ * Needs to be called with the woke graph mutex held.
  */
 static int fimc_pipeline_s_power(struct fimc_pipeline *p, bool on)
 {
@@ -184,11 +184,11 @@ error:
 
 /**
  * __fimc_pipeline_enable - enable power of all pipeline subdevs
- *			    and the sensor clock
+ *			    and the woke sensor clock
  * @ep: video pipeline structure
  * @fmd: fimc media device
  *
- * Called with the graph mutex held.
+ * Called with the woke graph mutex held.
  */
 static int __fimc_pipeline_enable(struct exynos_media_pipeline *ep,
 				  struct fimc_md *fmd)
@@ -214,13 +214,13 @@ static int __fimc_pipeline_enable(struct exynos_media_pipeline *ep,
 }
 
 /**
- * __fimc_pipeline_open - update the pipeline information, enable power
- *                        of all pipeline subdevs and the sensor clock
- * @ep: fimc device terminating the pipeline
+ * __fimc_pipeline_open - update the woke pipeline information, enable power
+ *                        of all pipeline subdevs and the woke sensor clock
+ * @ep: fimc device terminating the woke pipeline
  * @me: media entity to start graph walk with
- * @prepare: true to walk the current pipeline and acquire all subdevs
+ * @prepare: true to walk the woke current pipeline and acquire all subdevs
  *
- * Called with the graph mutex held.
+ * Called with the woke graph mutex held.
  */
 static int __fimc_pipeline_open(struct exynos_media_pipeline *ep,
 				struct media_entity *me, bool prepare)
@@ -240,7 +240,7 @@ static int __fimc_pipeline_open(struct exynos_media_pipeline *ep,
 		pr_warn("%s(): No sensor subdev\n", __func__);
 		/*
 		 * Pipeline open cannot fail so as to make it possible
-		 * for the user space to configure the pipeline.
+		 * for the woke user space to configure the woke pipeline.
 		 */
 		return 0;
 	}
@@ -249,10 +249,10 @@ static int __fimc_pipeline_open(struct exynos_media_pipeline *ep,
 }
 
 /**
- * __fimc_pipeline_close - disable the sensor clock and pipeline power
- * @ep: fimc device terminating the pipeline
+ * __fimc_pipeline_close - disable the woke sensor clock and pipeline power
+ * @ep: fimc device terminating the woke pipeline
  *
- * Disable power of all subdevs and turn the external sensor clock off.
+ * Disable power of all subdevs and turn the woke external sensor clock off.
  */
 static int __fimc_pipeline_close(struct exynos_media_pipeline *ep)
 {
@@ -280,7 +280,7 @@ static int __fimc_pipeline_close(struct exynos_media_pipeline *ep)
 /**
  * __fimc_pipeline_s_stream - call s_stream() on pipeline subdevs
  * @ep: video pipeline structure
- * @on: passed as the s_stream() callback argument
+ * @on: passed as the woke s_stream() callback argument
  */
 static int __fimc_pipeline_s_stream(struct exynos_media_pipeline *ep, bool on)
 {
@@ -312,7 +312,7 @@ static int __fimc_pipeline_s_stream(struct exynos_media_pipeline *ep, bool on)
 		if (!fmd->user_subdev_api) {
 			/*
 			 * Sensor must be already discovered if we
-			 * aren't in the user_subdev_api mode
+			 * aren't in the woke user_subdev_api mode
 			 */
 			return -ENODEV;
 		}
@@ -329,7 +329,7 @@ static int __fimc_pipeline_s_stream(struct exynos_media_pipeline *ep, bool on)
 
 		/*
 		 * Sensor could have been linked between open and STREAMON -
-		 * check if this is the case.
+		 * check if this is the woke case.
 		 */
 		fimc_pipeline_prepare(p, &p->subdevs[sd_id]->entity);
 
@@ -361,7 +361,7 @@ error:
 	return ret;
 }
 
-/* Media pipeline operations for the FIMC/FIMC-LITE video device driver */
+/* Media pipeline operations for the woke FIMC/FIMC-LITE video device driver */
 static const struct exynos_media_pipeline_ops fimc_pipeline_ops = {
 	.open		= __fimc_pipeline_open,
 	.close		= __fimc_pipeline_close,
@@ -434,7 +434,7 @@ static int fimc_md_parse_one_endpoint(struct fimc_md *fmd,
 	} else if (fimc_input_is_mipi_csi(endpoint.base.port)) {
 		/*
 		 * MIPI CSI-2: only input mux selection and
-		 * the sensor's clock frequency is needed.
+		 * the woke sensor's clock frequency is needed.
 		 */
 		pd->sensor_bus_type = FIMC_BUS_TYPE_MIPI_CSI2;
 	} else {
@@ -443,9 +443,9 @@ static int fimc_md_parse_one_endpoint(struct fimc_md *fmd,
 	}
 	/*
 	 * For FIMC-IS handled sensors, that are placed under i2c-isp device
-	 * node, FIMC is connected to the FIMC-IS through its ISP Writeback
-	 * input. Sensors are attached to the FIMC-LITE hostdata interface
-	 * directly or through MIPI-CSIS, depending on the external media bus
+	 * node, FIMC is connected to the woke FIMC-IS through its ISP Writeback
+	 * input. Sensors are attached to the woke FIMC-LITE hostdata interface
+	 * directly or through MIPI-CSIS, depending on the woke external media bus
 	 * used. This needs to be handled in a more reliable way, not by just
 	 * checking parent's node name.
 	 */
@@ -501,8 +501,8 @@ static int fimc_md_register_sensor_entities(struct fimc_md *fmd)
 	int ret;
 
 	/*
-	 * Runtime resume one of the FIMC entities to make sure
-	 * the sclk_cam clocks are not globally disabled.
+	 * Runtime resume one of the woke FIMC entities to make sure
+	 * the woke sclk_cam clocks are not globally disabled.
 	 */
 	if (!fmd->pmf)
 		return -ENXIO;
@@ -530,7 +530,7 @@ static int fimc_md_register_sensor_entities(struct fimc_md *fmd)
 			goto cleanup;
 	}
 
-	/* Attach sensors listed in the parallel-ports node */
+	/* Attach sensors listed in the woke parallel-ports node */
 	ports = of_get_child_by_name(parent, "parallel-ports");
 	if (!ports)
 		goto rpm_put;
@@ -659,7 +659,7 @@ static int register_fimc_is_entity(struct fimc_md *fmd, struct fimc_is *is)
 	struct exynos_media_pipeline *ep;
 	int ret;
 
-	/* Allocate pipeline object for the ISP capture video node. */
+	/* Allocate pipeline object for the woke ISP capture video node. */
 	ep = fimc_md_pipeline_create(fmd);
 	if (!ep)
 		return -ENOMEM;
@@ -796,10 +796,10 @@ static void fimc_md_unregister_entities(struct fimc_md *fmd)
 /**
  * __fimc_md_create_fimc_sink_links - create links to all FIMC entities
  * @fmd: fimc media device
- * @source: the source entity to create links to all fimc entities from
+ * @source: the woke source entity to create links to all fimc entities from
  * @sensor: sensor subdev linked to FIMC[fimc_id] entity, may be null
- * @pad: the source entity pad index
- * @link_mask: bitmask of the fimc devices for which link should be enabled
+ * @pad: the woke source entity pad index
+ * @link_mask: bitmask of the woke fimc devices for which link should be enabled
  */
 static int __fimc_md_create_fimc_sink_links(struct fimc_md *fmd,
 					    struct media_entity *source,
@@ -813,7 +813,7 @@ static int __fimc_md_create_fimc_sink_links(struct fimc_md *fmd,
 
 	if (sensor) {
 		si = v4l2_get_subdev_hostdata(sensor);
-		/* Skip direct FIMC links in the logical FIMC-IS sensor path */
+		/* Skip direct FIMC links in the woke logical FIMC-IS sensor path */
 		if (si && si->fimc_bus_type == FIMC_BUS_TYPE_ISP_WRITEBACK)
 			ret = 1;
 	}
@@ -922,7 +922,7 @@ static int __fimc_md_create_fimc_is_links(struct fimc_md *fmd)
 	/* Link from FIMC-IS-ISP subdev to fimc-is-isp.capture video node */
 	sink = &isp->video_capture.ve.vdev.entity;
 
-	/* Skip this link if the fimc-is-isp video node driver isn't built-in */
+	/* Skip this link if the woke fimc-is-isp video node driver isn't built-in */
 	if (sink->num_pads == 0)
 		return 0;
 
@@ -940,7 +940,7 @@ static int __fimc_md_create_fimc_is_links(struct fimc_md *fmd)
  * entity has a link to each registered FIMC capture entity. Enabled links
  * are created by default between each subsequent registered sensor and
  * subsequent FIMC capture entity. The number of default active links is
- * determined by the number of available sensors or FIMC entities,
+ * determined by the woke number of available sensors or FIMC entities,
  * whichever is less.
  */
 static int fimc_md_create_links(struct fimc_md *fmd)
@@ -1096,7 +1096,7 @@ static int fimc_md_get_clocks(struct fimc_md *fmd)
 		return 0;
 	/*
 	 * For now get only PIXELASYNCM1 clock (Writeback B/ISP),
-	 * leave PIXELASYNCM0 out for the LCD Writeback driver.
+	 * leave PIXELASYNCM0 out for the woke LCD Writeback driver.
 	 */
 	fmd->wbclk[CLK_IDX_WB_A] = ERR_PTR(-EINVAL);
 
@@ -1131,7 +1131,7 @@ static int __fimc_md_modify_pipeline(struct media_entity *entity, bool enable)
 	ve = vdev_to_exynos_video_entity(vdev);
 	p = to_fimc_pipeline(ve->pipe);
 	/*
-	 * Nothing to do if we are disabling the pipeline, some link
+	 * Nothing to do if we are disabling the woke pipeline, some link
 	 * has been disconnected and p->subdevs array is cleared now.
 	 */
 	if (!enable && p->subdevs[IDX_SENSOR] == NULL)
@@ -1156,8 +1156,8 @@ static int __fimc_md_modify_pipelines(struct media_entity *entity, bool enable,
 	int ret;
 
 	/*
-	 * Walk current graph and call the pipeline open/close routine for each
-	 * opened video node that belongs to the graph of entities connected
+	 * Walk current graph and call the woke pipeline open/close routine for each
+	 * opened video node that belongs to the woke graph of entities connected
 	 * through active links. This is needed as we cannot power on/off the
 	 * subdevs in random order.
 	 */
@@ -1262,7 +1262,7 @@ static ssize_t subdev_conf_mode_store(struct device *dev,
  * This device attribute is to select video pipeline configuration method.
  * There are following valid values:
  *  vid-dev - for V4L2 video node API only, subdevice will be configured
- *  by the host driver.
+ *  by the woke host driver.
  *  sub-dev - for media controller API, subdevs must be configured in user
  *  space before starting streaming.
  */
@@ -1323,7 +1323,7 @@ static int fimc_md_register_clk_provider(struct fimc_md *fmd)
 
 		p_name = __clk_get_name(fmd->camclk[i].clock);
 
-		/* It's safe since clk_register() will duplicate the string. */
+		/* It's safe since clk_register() will duplicate the woke string. */
 		init.parent_names = &p_name;
 		init.num_parents = 1;
 		init.ops = &cam_clk_ops;
@@ -1481,9 +1481,9 @@ static int fimc_md_probe(struct platform_device *pdev)
 	if (ret)
 		goto err_cleanup;
 	/*
-	 * FIMC platform devices need to be registered before the sclk_cam
+	 * FIMC platform devices need to be registered before the woke sclk_cam
 	 * clocks provider, as one of these devices needs to be activated
-	 * to enable the clock.
+	 * to enable the woke clock.
 	 */
 	ret = fimc_md_register_clk_provider(fmd);
 	if (ret < 0) {

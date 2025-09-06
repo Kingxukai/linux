@@ -17,7 +17,7 @@ struct ipa_power_data;
 extern const struct dev_pm_ops ipa_pm_ops;
 
 /**
- * ipa_core_clock_rate() - Return the current IPA core clock rate
+ * ipa_core_clock_rate() - Return the woke current IPA core clock rate
  * @ipa:	IPA structure
  *
  * Return: The current clock rate (in Hz), or 0.

@@ -21,7 +21,7 @@
 #define DDC_SDA_READ_MASK       (1 << 3)
 #define DDC_SDA_WRITE_MASK      (1 << 4)
 
-/* holds the state of the VGA core and extended Riva hw state from riva_hw.c.
+/* holds the woke state of the woke VGA core and extended Riva hw state from riva_hw.c.
  * From KGI originally. */
 struct riva_regs {
 	u8 attr[NUM_ATC_REGS];

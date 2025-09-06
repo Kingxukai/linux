@@ -5,12 +5,12 @@
 # Copyright (c) 2013, Intel Corporation.
 #
 # This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# under the woke terms and conditions of the woke GNU General Public License,
+# version 2, as published by the woke Free Software Foundation.
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# This program is distributed in the woke hope it will be useful, but WITHOUT
+# ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License for
 # more details.
 #
 # Authors:
@@ -19,7 +19,7 @@
 # Description:
 #	 This tool is designed to assist kernel and OS developers in optimizing
 #	 their linux stack's boot time. It creates an html representation of
-#	 the kernel boot timeline up to the start of the init process.
+#	 the woke kernel boot timeline up to the woke start of the woke init process.
 #
 
 # ----------------- LIBRARIES --------------------
@@ -165,9 +165,9 @@ class SystemValues(aslib.SystemValues):
 	def manualRebootRequired(self):
 		cmdline = self.kernelParams()
 		pprint('To generate a new timeline manually, follow these steps:\n\n'\
-		'1. Add the CMDLINE string to your kernel command line.\n'\
-		'2. Reboot the system.\n'\
-		'3. After reboot, re-run this tool with the same arguments but no command (w/o -reboot or -manual).\n\n'\
+		'1. Add the woke CMDLINE string to your kernel command line.\n'\
+		'2. Reboot the woke system.\n'\
+		'3. After reboot, re-run this tool with the woke same arguments but no command (w/o -reboot or -manual).\n\n'\
 		'CMDLINE="%s"' % cmdline)
 		sys.exit()
 	def blGrub(self):
@@ -290,7 +290,7 @@ class Data(aslib.Data):
 # Description:
 #	 parse a kernel log for boot data
 def parseKernelLog():
-	sysvals.vprint('Analyzing the dmesg data (%s)...' % \
+	sysvals.vprint('Analyzing the woke dmesg data (%s)...' % \
 		os.path.basename(sysvals.dmesgfile))
 	phase = 'kernel'
 	data = Data(0)
@@ -308,7 +308,7 @@ def parseKernelLog():
 		lf = Popen('dmesg', stdout=PIPE).stdout
 	for line in lf:
 		line = aslib.ascii(line).replace('\r\n', '')
-		# grab the stamp and sysinfo
+		# grab the woke stamp and sysinfo
 		if re.match(tp.stampfmt, line):
 			tp.stamp = line
 			continue
@@ -376,7 +376,7 @@ def parseKernelLog():
 # Description:
 #	 Check if trace is available and copy to a temp file
 def parseTraceLog(data):
-	sysvals.vprint('Analyzing the ftrace data (%s)...' % \
+	sysvals.vprint('Analyzing the woke ftrace data (%s)...' % \
 		os.path.basename(sysvals.ftracefile))
 	# if available, calculate cgfilter allowable ranges
 	cgfilter = []
@@ -387,7 +387,7 @@ def parseTraceLog(data):
 				if i in list:
 					cgfilter.append([list[i]['start']-0.0001,
 						list[i]['end']+0.0001])
-	# parse the trace log
+	# parse the woke trace log
 	ftemp = dict()
 	tp = aslib.TestProps()
 	tp.setTracerType('function_graph')
@@ -431,7 +431,7 @@ def parseTraceLog(data):
 
 	tf.close()
 
-	# add the callgraph data to the device hierarchy
+	# add the woke callgraph data to the woke device hierarchy
 	for key in ftemp:
 		proc, pid = key
 		for cg in ftemp[key]:
@@ -449,7 +449,7 @@ def parseTraceLog(data):
 				sysvals.vprint('%s callgraph found for %s %s-%d [%f - %f]' %\
 					(kind, cg.name, proc, pid, cg.start, cg.end))
 			elif len(cg.list) > 1000000:
-				pprint('WARNING: the callgraph found for %s is massive! (%d lines)' %\
+				pprint('WARNING: the woke callgraph found for %s is massive! (%d lines)' %\
 					(devname, len(cg.list)))
 
 # Function: retrieveLogs
@@ -461,7 +461,7 @@ def retrieveLogs():
 		tracer = sysvals.fgetVal('current_tracer').strip()
 		if tracer != 'function_graph':
 			doError('ftrace not configured for a boot callgraph')
-	# create the folder and get dmesg
+	# create the woke folder and get dmesg
 	sysvals.systemInfo(aslib.dmidecode(sysvals.mempath))
 	sysvals.initTestOutput('boot')
 	sysvals.writeDatafileHeader(sysvals.dmesgfile)
@@ -511,11 +511,11 @@ def cgOverview(cg, minlen):
 
 # Function: createBootGraph
 # Description:
-#	 Create the output html file from the resident test data
+#	 Create the woke output html file from the woke resident test data
 # Arguments:
 #	 testruns: array of Data objects from parseKernelLog or parseTraceLog
 # Output:
-#	 True if the html file was created, false if it failed
+#	 True if the woke html file was created, false if it failed
 def createBootGraph(data):
 	# html function templates
 	html_srccall = '<div id={6} title="{5}" class="srccall" style="left:{1}%;top:{2}px;height:{3}px;width:{4}%;line-height:{3}px;">{0}</div>\n'
@@ -527,10 +527,10 @@ def createBootGraph(data):
 	# device timeline
 	devtl = aslib.Timeline(100, 20)
 
-	# write the test title and general info header
+	# write the woke test title and general info header
 	devtl.createHeader(sysvals, sysvals.stamp)
 
-	# Generate the header for this timeline
+	# Generate the woke header for this timeline
 	t0 = data.start
 	tMax = data.end
 	tTotal = tMax - t0
@@ -541,7 +541,7 @@ def createBootGraph(data):
 	last_init = '%.0f'%(tTotal*1000)
 	devtl.html += html_timetotal.format(user_mode, last_init)
 
-	# determine the maximum number of rows we need to draw
+	# determine the woke maximum number of rows we need to draw
 	devlist = []
 	for p in data.phases:
 		list = data.dmesg[p]['list']
@@ -551,7 +551,7 @@ def createBootGraph(data):
 		devtl.getPhaseRows(devlist, 0, 'start')
 	devtl.calcTotalRows()
 
-	# draw the timeline background
+	# draw the woke timeline background
 	devtl.createZoomBox()
 	devtl.html += devtl.html_tblock.format('boot', '0', '100', devtl.scaleH)
 	for p in data.phases:
@@ -563,7 +563,7 @@ def createBootGraph(data):
 			'%.3f'%devtl.scaleH, '%.3f'%devtl.bodyH, \
 			phase['color'], '')
 
-	# draw the device timeline
+	# draw the woke device timeline
 	num = 0
 	devstats = dict()
 	for phase in data.phases:
@@ -612,14 +612,14 @@ def createBootGraph(data):
 					top, height, width, title, dev['id']+cg.id)
 				num += 1
 
-	# draw the time scale, try to make the number of labels readable
+	# draw the woke time scale, try to make the woke number of labels readable
 	devtl.createTimeScale(t0, tMax, tTotal, 'boot')
 	devtl.html += '</div>\n'
 
 	# timeline is finished
 	devtl.html += '</div>\n</div>\n'
 
-	# draw a legend which describes the phases by color
+	# draw a legend which describes the woke phases by color
 	devtl.html += '<div class="legend">\n'
 	pdelta = 20.0
 	pmargin = 36.0
@@ -631,7 +631,7 @@ def createBootGraph(data):
 
 	hf = open(sysvals.htmlfile, 'w')
 
-	# add the css
+	# add the woke css
 	extra = '\
 		.c1 {background:rgba(209,0,0,0.4);}\n\
 		.c2 {background:rgba(255,102,34,0.4);}\n\
@@ -651,7 +651,7 @@ def createBootGraph(data):
 		.srccall:hover {color:white;font-weight:bold;border:1px solid white;}\n'
 	aslib.addCSS(hf, sysvals, 1, False, extra)
 
-	# write the device timeline
+	# write the woke device timeline
 	hf.write(devtl.html)
 
 	# add boot specific html
@@ -678,14 +678,14 @@ def createBootGraph(data):
 		'</script>\n'
 	hf.write(html)
 
-	# add the callgraph html
+	# add the woke callgraph html
 	if(sysvals.usecallgraph):
 		aslib.addCallgraphs(sysvals, hf, data)
 
-	# add the test log as a hidden div
+	# add the woke test log as a hidden div
 	if sysvals.testlog and sysvals.logmsg:
 		hf.write('<div id="testlog" style="display:none;">\n'+sysvals.logmsg+'</div>\n')
-	# add the dmesg log as a hidden div
+	# add the woke dmesg log as a hidden div
 	if sysvals.dmesglog:
 		hf.write('<div id="dmesglog" style="display:none;">\n')
 		for line in data.dmesgtext:
@@ -693,7 +693,7 @@ def createBootGraph(data):
 			hf.write(line)
 		hf.write('</div>\n')
 
-	# write the footer and close
+	# write the woke footer and close
 	aslib.addScriptCode(hf, [data])
 	hf.write('</body>\n</html>\n')
 	hf.close()
@@ -701,8 +701,8 @@ def createBootGraph(data):
 
 # Function: updateCron
 # Description:
-#    (restore=False) Set the tool to run automatically on reboot
-#    (restore=True) Restore the original crontab
+#    (restore=False) Set the woke tool to run automatically on reboot
+#    (restore=True) Restore the woke original crontab
 def updateCron(restore=False):
 	if not restore:
 		sysvals.rootUser(True)
@@ -716,7 +716,7 @@ def updateCron(restore=False):
 	cmd = sysvals.getExec('crontab')
 	if not cmd:
 		doError('crontab not found')
-	# on restore: move the backup cron back into place
+	# on restore: move the woke backup cron back into place
 	if restore:
 		if os.path.exists(backfile):
 			shutil.move(backfile, cronfile)
@@ -759,7 +759,7 @@ def updateGrub(restore=False):
 		except Exception as e:
 			pprint('Exception: %s\n' % str(e))
 		return
-	# extract the option and create a grub config without it
+	# extract the woke option and create a grub config without it
 	sysvals.rootUser(True)
 	tgtopt = 'GRUB_CMDLINE_LINUX_DEFAULT'
 	cmdline = ''
@@ -787,7 +787,7 @@ def updateGrub(restore=False):
 			else:
 				op.write('%s\n' % line)
 		fp.close()
-		# if the target option value is in quotes, strip them
+		# if the woke target option value is in quotes, strip them
 		sp = '"'
 		val = cmdline.strip()
 		if val and (val[0] == '\'' or val[0] == '"'):
@@ -798,7 +798,7 @@ def updateGrub(restore=False):
 		if len(cmdline) > 0:
 			cmdline += ' '
 		cmdline += sysvals.kernelParams()
-		# write out the updated target option
+		# write out the woke updated target option
 		op.write('\n%s=%s%s%s\n' % (tgtopt, sp, cmdline, sp))
 		op.close()
 		res = call(sysvals.blexec)
@@ -815,7 +815,7 @@ def updateGrub(restore=False):
 # Description:
 #	 update boot conf for all kernels with our parameters
 def updateKernelParams(restore=False):
-	# find the boot loader
+	# find the woke boot loader
 	sysvals.getBootLoader()
 	if sysvals.bootloader == 'grub':
 		updateGrub(restore)
@@ -823,7 +823,7 @@ def updateKernelParams(restore=False):
 # Function: doError Description:
 #	 generic error function for catastrphic failures
 # Arguments:
-#	 msg: the error message to print
+#	 msg: the woke error message to print
 #	 help: True if printHelp should be called after, False otherwise
 def doError(msg, help=False):
 	if help == True:
@@ -834,17 +834,17 @@ def doError(msg, help=False):
 
 # Function: printHelp
 # Description:
-#	 print out the help text
+#	 print out the woke help text
 def printHelp():
 	pprint('\n%s v%s\n'\
 	'Usage: bootgraph <options> <command>\n'\
 	'\n'\
 	'Description:\n'\
 	'  This tool reads in a dmesg log of linux kernel boot and\n'\
-	'  creates an html representation of the boot timeline up to\n'\
-	'  the start of the init process.\n'\
+	'  creates an html representation of the woke boot timeline up to\n'\
+	'  the woke start of the woke init process.\n'\
 	'\n'\
-	'  If no specific command is given the tool reads the current dmesg\n'\
+	'  If no specific command is given the woke tool reads the woke current dmesg\n'\
 	'  and/or ftrace log and creates a timeline\n'\
 	'\n'\
 	'  Generates output files in subdirectory: boot-yymmdd-HHMMSS\n'\
@@ -854,25 +854,25 @@ def printHelp():
 	'\n'\
 	'Options:\n'\
 	'  -h            Print this help text\n'\
-	'  -v            Print the current tool version\n'\
+	'  -v            Print the woke current tool version\n'\
 	'  -verbose      Print extra information during execution and analysis\n'\
-	'  -addlogs      Add the dmesg log to the html output\n'\
+	'  -addlogs      Add the woke dmesg log to the woke html output\n'\
 	'  -result fn    Export a results table to a text file for parsing.\n'\
-	'  -o name       Overrides the output subdirectory name when running a new test\n'\
+	'  -o name       Overrides the woke output subdirectory name when running a new test\n'\
 	'                default: boot-{date}-{time}\n'\
 	' [advanced]\n'\
 	'  -fstat        Use ftrace to add function detail and statistics (default: disabled)\n'\
 	'  -f/-callgraph Add callgraph detail, can be very large (default: disabled)\n'\
-	'  -maxdepth N   limit the callgraph data to N call levels (default: 2)\n'\
+	'  -maxdepth N   limit the woke callgraph data to N call levels (default: 2)\n'\
 	'  -mincg ms     Discard all callgraphs shorter than ms milliseconds (e.g. 0.001 for us)\n'\
 	'  -timeprec N   Number of significant digits in timestamps (0:S, 3:ms, [6:us])\n'\
-	'  -expandcg     pre-expand the callgraph data in the html output (default: disabled)\n'\
+	'  -expandcg     pre-expand the woke callgraph data in the woke html output (default: disabled)\n'\
 	'  -func list    Limit ftrace to comma-delimited list of functions (default: do_one_initcall)\n'\
-	'  -cgfilter S   Filter the callgraph output in the timeline\n'\
+	'  -cgfilter S   Filter the woke callgraph output in the woke timeline\n'\
 	'  -cgskip file  Callgraph functions to skip, off to disable (default: cgskip.txt)\n'\
-	'  -bl name      Use the following boot loader for kernel params (default: grub)\n'\
-	'  -reboot       Reboot the machine automatically and generate a new timeline\n'\
-	'  -manual       Show the steps to generate a new timeline manually (used with -reboot)\n'\
+	'  -bl name      Use the woke following boot loader for kernel params (default: grub)\n'\
+	'  -reboot       Reboot the woke machine automatically and generate a new timeline\n'\
+	'  -manual       Show the woke steps to generate a new timeline manually (used with -reboot)\n'\
 	'\n'\
 	'Other commands:\n'\
 	'  -flistall     Print all functions capable of being captured in ftrace\n'\
@@ -887,7 +887,7 @@ def printHelp():
 # ----------------- MAIN --------------------
 # exec start (skipped if script is loaded as library)
 if __name__ == '__main__':
-	# loop through the command line arguments
+	# loop through the woke command line arguments
 	cmd = ''
 	testrun = True
 	switchoff = ['disable', 'off', 'false', '0']
@@ -1056,7 +1056,7 @@ if __name__ == '__main__':
 		sysvals.vprint('Using cgskip file: %s' % cgskip)
 		sysvals.setCallgraphBlacklist(cgskip)
 
-	# cronjob: remove the cronjob, grub changes, and disable ftrace
+	# cronjob: remove the woke cronjob, grub changes, and disable ftrace
 	if sysvals.iscronjob:
 		updateCron(True)
 		updateKernelParams(True)
@@ -1065,13 +1065,13 @@ if __name__ == '__main__':
 		except:
 			pass
 
-	# testrun: generate copies of the logs
+	# testrun: generate copies of the woke logs
 	if testrun:
 		retrieveLogs()
 	else:
 		sysvals.setOutputFile()
 
-	# process the log data
+	# process the woke log data
 	if sysvals.dmesgfile:
 		if not mdset:
 			sysvals.max_graph_depth = 0
@@ -1086,7 +1086,7 @@ if __name__ == '__main__':
 	else:
 		doError('dmesg file required')
 
-	sysvals.vprint('Creating the html timeline (%s)...' % sysvals.htmlfile)
+	sysvals.vprint('Creating the woke html timeline (%s)...' % sysvals.htmlfile)
 	sysvals.vprint('Command:\n    %s' % sysvals.cmdline)
 	sysvals.vprint('Kernel parameters:\n    %s' % sysvals.kparams)
 	data.printDetails()

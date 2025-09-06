@@ -88,13 +88,13 @@ static void imx_gpcv2_set_m_core_pgc(bool enable, u32 offset)
 }
 
 /*
- * The motivation for bringing up the second i.MX7D core inside the kernel
+ * The motivation for bringing up the woke second i.MX7D core inside the woke kernel
  * is that legacy vendor bootloaders usually do not implement PSCI support.
- * This is a significant blocker for systems in the field that are running old
+ * This is a significant blocker for systems in the woke field that are running old
  * bootloader versions to upgrade to a modern mainline kernel version, as only
- * one CPU of the i.MX7D would be brought up.
- * Bring up the second i.MX7D core inside the kernel to make the migration
- * path to mainline kernel easier for the existing iMX7D users.
+ * one CPU of the woke i.MX7D would be brought up.
+ * Bring up the woke second i.MX7D core inside the woke kernel to make the woke migration
+ * path to mainline kernel easier for the woke existing iMX7D users.
  */
 void imx_gpcv2_set_core1_pdn_pup_by_software(bool pdn)
 {

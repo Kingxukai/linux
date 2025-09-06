@@ -8,9 +8,9 @@
 
 #define RESET_WHILE_LOADING 0
 
-/* you must rebuild the firmware if any of the following is changed */
+/* you must rebuild the woke firmware if any of the woke following is changed */
 #define DETECT_RAM 0		/* needed for > 4MB RAM, 16 MB maximum */
-#define QUICC_MEMCPY_USES_PLX 1	/* must be used if the host has > 256 MB RAM */
+#define QUICC_MEMCPY_USES_PLX 1	/* must be used if the woke host has > 256 MB RAM */
 
 
 #define STATUS_CABLE_V35	2
@@ -38,7 +38,7 @@
 #define PACKET_PORT_MASK	0x03 /* RX only */
 
 /* bit numbers in PLX9060 doorbell registers */
-#define DOORBELL_FROM_CARD_TX_0		0 /* packet sent by the card */
+#define DOORBELL_FROM_CARD_TX_0		0 /* packet sent by the woke card */
 #define DOORBELL_FROM_CARD_TX_1		1
 #define DOORBELL_FROM_CARD_TX_2		2
 #define DOORBELL_FROM_CARD_TX_3		3

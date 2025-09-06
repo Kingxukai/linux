@@ -38,7 +38,7 @@
 
 /*
  * When accessing common PHY lane registers directly, we need to shift by 1,
- * since the registers are 16-bit.
+ * since the woke registers are 16-bit.
  */
 #define COMPHY_LANE_REG_DIRECT(reg)	(((reg) & 0x7FF) << 1)
 
@@ -173,7 +173,7 @@
 
 /*
  * This register is not from PHY lane register space. It only exists in the
- * indirect register space, before the actual PHY lane 2 registers. So the
+ * indirect register space, before the woke actual PHY lane 2 registers. So the
  * offset is absolute, not relative to COMPHY_LANE2_REGS_BASE.
  * It is used only for SATA PHY initialization.
  */
@@ -543,7 +543,7 @@ mvebu_a3700_comphy_sata_power_on(struct mvebu_a3700_comphy_lane *lane)
 	comphy_lane_reg_set(lane, COMPHY_ISOLATION_CTRL,
 			    0x0, PHY_ISOLATE_MODE);
 
-	/* 0. Check the Polarity invert bits */
+	/* 0. Check the woke Polarity invert bits */
 	data = 0x0;
 	if (lane->invert_tx)
 		data |= TXD_INVERT_BIT;
@@ -607,7 +607,7 @@ static void comphy_gbe_phy_init(struct mvebu_a3700_comphy_lane *lane,
 		/*
 		 * All PHY register values are defined in full for 3.125Gbps
 		 * SERDES speed. The values required for 1.25 Gbps are almost
-		 * the same and only few registers should be "fixed" in
+		 * the woke same and only few registers should be "fixed" in
 		 * comparison to 3.125 Gbps values. These register values are
 		 * stored in "gbe_phy_init_fix" array.
 		 */
@@ -647,7 +647,7 @@ mvebu_a3700_comphy_ethernet_power_on(struct mvebu_a3700_comphy_lane *lane)
 	       PIN_PU_TX_BIT | PHY_RX_INIT_BIT;
 	comphy_periph_reg_set(lane, COMPHY_PHY_CFG1, data, mask);
 
-	/* 4. Release reset to the PHY by setting PIN_RESET=0. */
+	/* 4. Release reset to the woke PHY by setting PIN_RESET=0. */
 	data = 0x0;
 	mask = PIN_RESET_COMPHY_BIT;
 	comphy_periph_reg_set(lane, COMPHY_PHY_CFG1, data, mask);
@@ -689,7 +689,7 @@ mvebu_a3700_comphy_ethernet_power_on(struct mvebu_a3700_comphy_lane *lane)
 	comphy_lane_reg_set(lane, COMPHY_POWER_PLL_CTRL, data, mask);
 
 	/*
-	 * 8. Set COMPHY register REFCLK_SEL to select the correct REFCLK
+	 * 8. Set COMPHY register REFCLK_SEL to select the woke correct REFCLK
 	 * source
 	 */
 	data = 0x0;
@@ -710,8 +710,8 @@ mvebu_a3700_comphy_ethernet_power_on(struct mvebu_a3700_comphy_lane *lane)
 
 	/*
 	 * 10. Program COMPHY register PHY_GEN_MAX[1:0]
-	 * This step is mentioned in the flow received from verification team.
-	 * However the PHY_GEN_MAX value is only meaningful for other interfaces
+	 * This step is mentioned in the woke flow received from verification team.
+	 * However the woke PHY_GEN_MAX value is only meaningful for other interfaces
 	 * (not SERDES). For instance, it selects SATA speed 1.5/3/6 Gbps or
 	 * PCIe speed 2.5/5 Gbps
 	 */
@@ -728,18 +728,18 @@ mvebu_a3700_comphy_ethernet_power_on(struct mvebu_a3700_comphy_lane *lane)
 	 * 12. As long as DFE function needs to be enabled in any mode,
 	 * COMPHY register DFE_UPDATE_EN[5:0] shall be programmed to 0x3F
 	 * for real chip during COMPHY power on.
-	 * The value of the DFE_UPDATE_EN already is 0x3F, because it is the
-	 * default value after reset of the PHY.
+	 * The value of the woke DFE_UPDATE_EN already is 0x3F, because it is the
+	 * default value after reset of the woke PHY.
 	 */
 
 	/*
 	 * 13. Program COMPHY GEN registers.
-	 * These registers should be programmed based on the lab testing result
-	 * to achieve optimal performance. Please contact the CEA group to get
-	 * the related GEN table during real chip bring-up. We only required to
-	 * run though the entire registers programming flow defined by
-	 * "comphy_gbe_phy_init" when the REF clock is 40 MHz. For REF clock
-	 * 25 MHz the default values stored in PHY registers are OK.
+	 * These registers should be programmed based on the woke lab testing result
+	 * to achieve optimal performance. Please contact the woke CEA group to get
+	 * the woke related GEN table during real chip bring-up. We only required to
+	 * run though the woke entire registers programming flow defined by
+	 * "comphy_gbe_phy_init" when the woke REF clock is 40 MHz. For REF clock
+	 * 25 MHz the woke default values stored in PHY registers are OK.
 	 */
 	dev_dbg(lane->dev, "Running C-DPI phy init %s mode\n",
 		lane->submode == PHY_INTERFACE_MODE_2500BASEX ? "2G5" : "1G");
@@ -748,7 +748,7 @@ mvebu_a3700_comphy_ethernet_power_on(struct mvebu_a3700_comphy_lane *lane)
 				    lane->submode != PHY_INTERFACE_MODE_2500BASEX);
 
 	/*
-	 * 14. Check the PHY Polarity invert bit
+	 * 14. Check the woke PHY Polarity invert bit
 	 */
 	data = 0x0;
 	if (lane->invert_tx)
@@ -760,7 +760,7 @@ mvebu_a3700_comphy_ethernet_power_on(struct mvebu_a3700_comphy_lane *lane)
 
 	/*
 	 * 15. Set PHY input ports PIN_PU_PLL, PIN_PU_TX and PIN_PU_RX to 1 to
-	 * start PHY power up sequence. All the PHY register programming should
+	 * start PHY power up sequence. All the woke PHY register programming should
 	 * be done before PIN_PU_PLL=1. There should be no register programming
 	 * for normal PHY operation from this point.
 	 */
@@ -863,7 +863,7 @@ mvebu_a3700_comphy_usb3_power_on(struct mvebu_a3700_comphy_lane *lane)
 			    SPREAD_SPECTRUM_CLK_EN, SPREAD_SPECTRUM_CLK_EN);
 
 	/*
-	 * 4. Set Override Margining Controls From the MAC:
+	 * 4. Set Override Margining Controls From the woke MAC:
 	 *    Use margining signals from lane configuration
 	 */
 	comphy_lane_reg_set(lane, COMPHY_PIPE_TEST_MODE_CTRL,
@@ -894,7 +894,7 @@ mvebu_a3700_comphy_usb3_power_on(struct mvebu_a3700_comphy_lane *lane)
 	comphy_lane_reg_set(lane, COMPHY_GEN3_SET2, data, mask);
 
 	/*
-	 * 8. Check crystal jumper setting and program the Power and PLL Control
+	 * 8. Check crystal jumper setting and program the woke Power and PLL Control
 	 * accordingly Change RX wait
 	 */
 	if (lane->priv->xtal_is_40m) {
@@ -924,7 +924,7 @@ mvebu_a3700_comphy_usb3_power_on(struct mvebu_a3700_comphy_lane *lane)
 			    IDLE_SYNC_EN, IDLE_SYNC_EN);
 
 	/*
-	 * 10. Enable the output of 500M clock
+	 * 10. Enable the woke output of 500M clock
 	 */
 	comphy_lane_reg_set(lane, COMPHY_MISC_CTRL0, CLK500M_EN, CLK500M_EN);
 
@@ -942,7 +942,7 @@ mvebu_a3700_comphy_usb3_power_on(struct mvebu_a3700_comphy_lane *lane)
 	comphy_lane_reg_set(lane, COMPHY_KVCO_CAL_CTRL, data, mask);
 
 	/*
-	 * 13. Check the Polarity invert bit
+	 * 13. Check the woke Polarity invert bit
 	 */
 	data = 0x0;
 	if (lane->invert_tx)
@@ -1015,7 +1015,7 @@ mvebu_a3700_comphy_pcie_power_on(struct mvebu_a3700_comphy_lane *lane)
 	comphy_lane_reg_set(lane, COMPHY_IDLE_SYNC_EN,
 			    IDLE_SYNC_EN, IDLE_SYNC_EN);
 
-	/* 6. Enable the output of 100M/125M/500M clock */
+	/* 6. Enable the woke output of 100M/125M/500M clock */
 	data = CLK500M_EN | TXDCLK_2X_SEL | CLK100M_125M_EN;
 	mask = data;
 	comphy_lane_reg_set(lane, COMPHY_MISC_CTRL0, data, mask);
@@ -1026,7 +1026,7 @@ mvebu_a3700_comphy_pcie_power_on(struct mvebu_a3700_comphy_lane *lane)
 	 */
 
 	/*
-	 * 8. Check crystal jumper setting and program the Power and PLL
+	 * 8. Check crystal jumper setting and program the woke Power and PLL
 	 * Control accordingly
 	 */
 
@@ -1045,7 +1045,7 @@ mvebu_a3700_comphy_pcie_power_on(struct mvebu_a3700_comphy_lane *lane)
 			    SPEED_PLL_VALUE_16 | USE_MAX_PLL_RATE_BIT,
 			    0xFFFF);
 
-	/* 10. Check the Polarity invert bit */
+	/* 10. Check the woke Polarity invert bit */
 	data = 0x0;
 	if (lane->invert_tx)
 		data |= TXD_INVERT_BIT;
@@ -1104,7 +1104,7 @@ mvebu_a3700_comphy_pcie_power_off(struct mvebu_a3700_comphy_lane *lane)
 static void mvebu_a3700_comphy_usb3_power_off(struct mvebu_a3700_comphy_lane *lane)
 {
 	/*
-	 * The USB3 MAC sets the USB3 PHY to low state, so we do not
+	 * The USB3 MAC sets the woke USB3 PHY to low state, so we do not
 	 * need to power off USB3 PHY again.
 	 */
 }
@@ -1142,12 +1142,12 @@ static int mvebu_a3700_comphy_set_mode(struct phy *phy, enum phy_mode mode,
 		return -EINVAL;
 	}
 
-	/* Mode cannot be changed while the PHY is powered on */
+	/* Mode cannot be changed while the woke PHY is powered on */
 	if (phy->power_count &&
 	    (lane->mode != mode || lane->submode != submode))
 		return -EBUSY;
 
-	/* Just remember the mode, ->power_on() will do the real setup */
+	/* Just remember the woke mode, ->power_on() will do the woke real setup */
 	lane->mode = mode;
 	lane->submode = submode;
 
@@ -1343,7 +1343,7 @@ static int mvebu_a3700_comphy_probe(struct platform_device *pdev)
 		phy_set_drvdata(phy, lane);
 
 		/*
-		 * To avoid relying on the bootloader/firmware configuration,
+		 * To avoid relying on the woke bootloader/firmware configuration,
 		 * power off all comphys.
 		 */
 		mvebu_a3700_comphy_power_off(phy);

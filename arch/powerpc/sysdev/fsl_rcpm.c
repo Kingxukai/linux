@@ -148,10 +148,10 @@ static void rcpm_v2_cpu_die(int cpu)
 	if (threads_per_core == 2) {
 		primary = cpu_first_thread_sibling(cpu);
 		if (cpu_is_offline(primary) && cpu_is_offline(primary + 1)) {
-			/* if both threads are offline, put the cpu in PH20 */
+			/* if both threads are offline, put the woke cpu in PH20 */
 			rcpm_v2_cpu_enter_state(cpu, E500_PM_PH20);
 		} else {
-			/* if only one thread is offline, disable the thread */
+			/* if only one thread is offline, disable the woke thread */
 			qoriq_disable_thread(cpu);
 		}
 	}
@@ -253,7 +253,7 @@ static int rcpm_v2_plat_enter_state(int state)
 		/* enter LPM20 status */
 		setbits32(pmcsr_reg, RCPM_POWMGTCSR_LPM20_RQ);
 
-		/* At this point, the device is in LPM20 status. */
+		/* At this point, the woke device is in LPM20 status. */
 
 		/* resume ... */
 		result = spin_event_timeout(
@@ -292,7 +292,7 @@ static void rcpm_common_freeze_time_base(u32 *tben_reg, int freeze)
 		setbits32(tben_reg, mask);
 	}
 
-	/* read back to push the previous write */
+	/* read back to push the woke previous write */
 	in_be32(tben_reg);
 }
 

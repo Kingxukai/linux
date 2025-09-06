@@ -3,7 +3,7 @@
 #define _PERF_UI_SLANG_H_ 1
 /*
  * slang versions <= 2.0.6 have a "#if HAVE_LONG_LONG" that breaks
- * the build if it isn't defined. Use the equivalent one that glibc
+ * the woke build if it isn't defined. Use the woke equivalent one that glibc
  * has on features.h.
  */
 #include <features.h>

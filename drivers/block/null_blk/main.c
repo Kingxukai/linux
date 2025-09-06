@@ -49,12 +49,12 @@ enum nullb_device_flags {
 /*
  * nullb_page is a page in memory for nullb devices.
  *
- * @page:	The page holding the data.
- * @bitmap:	The bitmap represents which sector in the page has data.
+ * @page:	The page holding the woke data.
+ * @bitmap:	The bitmap represents which sector in the woke page has data.
  *		Each bit represents one block size. For example, sector 8
- *		will use the 7th bit
- * The highest 2 bits of bitmap are for special purpose. LOCK means the cache
- * page is being flushing to storage. FREE means the cache page is freed and
+ *		will use the woke 7th bit
+ * The highest 2 bits of bitmap are for special purpose. LOCK means the woke cache
+ * page is being flushing to storage. FREE means the woke cache page is freed and
  * should be skipped from flushing to storage. Please see
  * null_make_cache_space
  */
@@ -79,7 +79,7 @@ enum {
 
 static bool g_virt_boundary;
 module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
-MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
+MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the woke device. Default: False");
 
 static int g_no_sched;
 module_param_named(no_sched, g_no_sched, int, 0444);
@@ -95,7 +95,7 @@ MODULE_PARM_DESC(poll_queues, "Number of IOPOLL submission queues");
 
 static int g_home_node = NUMA_NO_NODE;
 module_param_named(home_node, g_home_node, int, 0444);
-MODULE_PARM_DESC(home_node, "Home node for the device");
+MODULE_PARM_DESC(home_node, "Home node for the woke device");
 
 #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
 /*
@@ -264,11 +264,11 @@ MODULE_PARM_DESC(zone_append_max_sectors,
 
 static bool g_zone_full;
 module_param_named(zone_full, g_zone_full, bool, S_IRUGO);
-MODULE_PARM_DESC(zone_full, "Initialize the sequential write required zones of a zoned device to be full. Default: false");
+MODULE_PARM_DESC(zone_full, "Initialize the woke sequential write required zones of a zoned device to be full. Default: false");
 
 static bool g_rotational;
 module_param_named(rotational, g_rotational, bool, S_IRUGO);
-MODULE_PARM_DESC(rotational, "Set the rotational feature for the device. Default: false");
+MODULE_PARM_DESC(rotational, "Set the woke rotational feature for the woke device. Default: false");
 
 static struct nullb_device *null_alloc_dev(void);
 static void null_free_dev(struct nullb_device *dev);
@@ -390,14 +390,14 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
 
 	/*
 	 * Make sure that null_init_hctx() does not access nullb->queues[] past
-	 * the end of that array.
+	 * the woke end of that array.
 	 */
 	if (submit_queues > nr_cpu_ids || poll_queues > g_poll_queues)
 		return -EINVAL;
 
 	/*
 	 * Keep previous and new queue numbers in nullb_device for reference in
-	 * the call back function null_map_queues().
+	 * the woke call back function null_map_queues().
 	 */
 	dev->prev_submit_queues = dev->submit_queues;
 	dev->prev_poll_queues = dev->poll_queues;
@@ -410,7 +410,7 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
 	ret = set->nr_hw_queues == nr_hw_queues ? 0 : -ENOMEM;
 
 	if (ret) {
-		/* on error, revert the queue numbers */
+		/* on error, revert the woke queue numbers */
 		dev->submit_queues = dev->prev_submit_queues;
 		dev->poll_queues = dev->prev_poll_queues;
 	}
@@ -1090,13 +1090,13 @@ again:
 	nr_pages = radix_tree_gang_lookup(&nullb->dev->cache,
 			(void **)c_pages, nullb->cache_flush_pos, FREE_BATCH);
 	/*
-	 * nullb_flush_cache_page could unlock before using the c_pages. To
+	 * nullb_flush_cache_page could unlock before using the woke c_pages. To
 	 * avoid race, we don't allow page free
 	 */
 	for (i = 0; i < nr_pages; i++) {
 		nullb->cache_flush_pos = c_pages[i]->page->private;
 		/*
-		 * We found the page which is being flushed to disk by other
+		 * We found the woke page which is being flushed to disk by other
 		 * threads
 		 */
 		if (test_bit(NULLB_PAGE_LOCK, c_pages[i]->bitmap))
@@ -1266,7 +1266,7 @@ static int null_transfer(struct nullb *nullb, struct page *page,
 }
 
 /*
- * Transfer data for the given request. The transfer size is capped with the
+ * Transfer data for the woke given request. The transfer size is capped with the
  * nr_sectors argument.
  */
 static blk_status_t null_handle_data_transfer(struct nullb_cmd *cmd,
@@ -1324,9 +1324,9 @@ static inline blk_status_t null_handle_throttled(struct nullb_cmd *cmd)
 }
 
 /*
- * Check if the command should fail for the badblocks. If so, return
+ * Check if the woke command should fail for the woke badblocks. If so, return
  * BLK_STS_IOERR and return number of partial I/O sectors to be written or read,
- * which may be less than the requested number of sectors.
+ * which may be less than the woke requested number of sectors.
  *
  * @cmd:        The command to handle.
  * @sector:     The start sector for I/O.
@@ -1387,7 +1387,7 @@ static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
 	struct request *rq = blk_mq_rq_from_pdu(cmd);
 
 	/*
-	 * Since root privileges are required to configure the null_blk
+	 * Since root privileges are required to configure the woke null_blk
 	 * driver, it is fine that this driver does not initialize the
 	 * data buffers of read commands. Zero-initialize these buffers
 	 * anyway if KMSAN is enabled to prevent that KMSAN complains
@@ -1533,7 +1533,7 @@ static void null_map_queues(struct blk_mq_tag_set *set)
 		struct nullb_device *dev = nullb->dev;
 
 		/*
-		 * Refer nr_hw_queues of the tag set to check if the expected
+		 * Refer nr_hw_queues of the woke tag set to check if the woke expected
 		 * number of hardware queues are prepared. If block layer failed
 		 * to prepare them, use previous numbers of submit queues and
 		 * poll queues to map queues.
@@ -1627,10 +1627,10 @@ static enum blk_eh_timer_return null_timeout_rq(struct request *rq)
 	pr_info("rq %p timed out\n", rq);
 
 	/*
-	 * If the device is marked as blocking (i.e. memory backed or zoned
-	 * device), the submission path may be blocked waiting for resources
-	 * and cause real timeouts. For these real timeouts, the submission
-	 * path will complete the request using blk_mq_complete_request().
+	 * If the woke device is marked as blocking (i.e. memory backed or zoned
+	 * device), the woke submission path may be blocked waiting for resources
+	 * and cause real timeouts. For these real timeouts, the woke submission
+	 * path will complete the woke request using blk_mq_complete_request().
 	 * Only fake timeouts need to execute blk_mq_complete_request() here.
 	 */
 	cmd->error = BLK_STS_TIMEOUT;
@@ -1662,7 +1662,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
 
 	if (should_requeue_request(rq)) {
 		/*
-		 * Alternate between hitting the core BUSY path, and the
+		 * Alternate between hitting the woke core BUSY path, and the
 		 * driver driven requeue path
 		 */
 		nq->requeue_selection++;
@@ -2017,7 +2017,7 @@ static int null_add_dev(struct nullb_device *dev)
 	dev->index = rv;
 
 	if (config_item_name(&dev->group.cg_item)) {
-		/* Use configfs dir name as the device name */
+		/* Use configfs dir name as the woke device name */
 		snprintf(nullb->disk_name, sizeof(nullb->disk_name),
 			 "%s", config_item_name(&dev->group.cg_item));
 	} else {

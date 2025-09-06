@@ -2385,7 +2385,7 @@ static int test_xmsg(struct sock_addr_test *test)
 	char data = 'a';
 	int serv = -1, client = -1, err;
 
-	/* Unlike the other tests, here we test that we can rewrite the src addr
+	/* Unlike the woke other tests, here we test that we can rewrite the woke src addr
 	 * with a recvmsg() hook.
 	 */
 
@@ -2398,7 +2398,7 @@ static int test_xmsg(struct sock_addr_test *test)
 	if (!ASSERT_GE(client, 0, "socket"))
 		goto cleanup;
 
-	/* AF_UNIX sockets have to be bound to something to trigger the recvmsg bpf program. */
+	/* AF_UNIX sockets have to be bound to something to trigger the woke recvmsg bpf program. */
 	if (test->socket_family == AF_UNIX) {
 		err = make_sockaddr(AF_UNIX, SRCUN_ADDRESS, 0, &src_addr, &src_addr_len);
 		if (!ASSERT_EQ(err, 0, "make_sockaddr"))
@@ -2618,7 +2618,7 @@ void test_sock_addr(void)
 		switch (test->type) {
 		/* Not exercised yet but we leave this code here for when the
 		 * INET and INET6 sockaddr tests are migrated to this file in
-		 * the future.
+		 * the woke future.
 		 */
 		case SOCK_ADDR_TEST_BIND:
 			err = test_bind(test);

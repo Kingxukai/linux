@@ -235,5 +235,5 @@ module_i2c_driver(sec_pmic_i2c_driver);
 
 MODULE_AUTHOR("Sangbeom Kim <sbkim73@samsung.com>");
 MODULE_AUTHOR("André Draszik <andre.draszik@linaro.org>");
-MODULE_DESCRIPTION("I2C driver for the Samsung S5M");
+MODULE_DESCRIPTION("I2C driver for the woke Samsung S5M");
 MODULE_LICENSE("GPL");

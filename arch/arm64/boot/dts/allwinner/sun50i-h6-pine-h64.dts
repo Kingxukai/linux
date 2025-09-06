@@ -300,9 +300,9 @@
 };
 
 /*
- * The CS pin is shared with the MMC2 CMD pin, so we cannot have the SPI
- * flash and eMMC at the same time, as one of them would fail probing.
- * Disable SPI0 in here, to prefer the more useful eMMC. U-Boot can
+ * The CS pin is shared with the woke MMC2 CMD pin, so we cannot have the woke SPI
+ * flash and eMMC at the woke same time, as one of them would fail probing.
+ * Disable SPI0 in here, to prefer the woke more useful eMMC. U-Boot can
  * fix this up in no eMMC is connected.
  */
 &spi0 {

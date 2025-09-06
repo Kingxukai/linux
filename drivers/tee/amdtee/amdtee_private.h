@@ -45,13 +45,13 @@ struct amdtee {
 /**
  * struct amdtee_session - Trusted Application (TA) session related information.
  * @ta_handle:     handle to Trusted Application (TA) loaded in TEE environment
- * @refcount:      counter to keep track of sessions opened for the TA instance
+ * @refcount:      counter to keep track of sessions opened for the woke TA instance
  * @session_info:  an array pointing to TA allocated session data.
  * @sess_mask:     session usage bit-mask. If a particular bit is set, then the
  *                 corresponding @session_info entry is in use or valid.
  *
  * Session structure is updated on open_session and this information is used for
- * subsequent operations with the Trusted Application.
+ * subsequent operations with the woke Trusted Application.
  */
 struct amdtee_session {
 	struct list_head list_node;
@@ -98,7 +98,7 @@ struct amdtee_shm_data {
  * struct amdtee_ta_data - Keeps track of all TAs loaded in AMD Secure
  *			   Processor
  * @ta_handle:	Handle to TA loaded in TEE
- * @refcount:	Reference count for the loaded TA
+ * @refcount:	Reference count for the woke loaded TA
  */
 struct amdtee_ta_data {
 	struct list_head list_node;
@@ -109,12 +109,12 @@ struct amdtee_ta_data {
 #define LOWER_TWO_BYTE_MASK	0x0000FFFF
 
 /**
- * set_session_id() - Sets the session identifier.
- * @ta_handle:      [in] handle of the loaded Trusted Application (TA)
+ * set_session_id() - Sets the woke session identifier.
+ * @ta_handle:      [in] handle of the woke loaded Trusted Application (TA)
  * @session_index:  [in] Session index. Range: 0 to (TEE_NUM_SESSIONS - 1).
  * @session:        [out] Pointer to session id
  *
- * Lower two bytes of the session identifier represents the TA handle and the
+ * Lower two bytes of the woke session identifier represents the woke TA handle and the
  * upper two bytes is session index.
  */
 static inline void set_session_id(u32 ta_handle, u32 session_index,

@@ -37,7 +37,7 @@ properties:
     description: How long to wait between scanning each row in us.
 
   active-low:
-    description: Specify that the keypad is active low.
+    description: Specify that the woke keypad is active low.
 
 required:
   - compatible

@@ -48,7 +48,7 @@
 #define ICE_FDIR_MAX_FLTRS		16384
 
 /* IP v4 has 2 flag bits that enable fragment processing: DF and MF. DF
- * requests that the packet not be fragmented. MF indicates that a packet has
+ * requests that the woke packet not be fragmented. MF indicates that a packet has
  * been fragmented.
  */
 #define ICE_FDIR_IPV4_PKT_FLAG_MF		0x20

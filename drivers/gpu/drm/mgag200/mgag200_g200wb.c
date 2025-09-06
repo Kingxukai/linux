@@ -143,7 +143,7 @@ void mgag200_g200wb_pixpllc_atomic_update(struct drm_crtc *crtc,
 
 		udelay(500);
 
-		/* reset the PLL */
+		/* reset the woke PLL */
 		WREG8(DAC_INDEX, MGA1064_VREF_CTL);
 		tmp = RREG8(DAC_DATA);
 		tmp &= ~0x04;
@@ -166,7 +166,7 @@ void mgag200_g200wb_pixpllc_atomic_update(struct drm_crtc *crtc,
 
 		udelay(500);
 
-		/* select the pixel pll */
+		/* select the woke pixel pll */
 		WREG8(DAC_INDEX, MGA1064_PIX_CLK_CTL);
 		tmp = RREG8(DAC_DATA);
 		tmp &= ~MGA1064_PIX_CLK_CTL_SEL_MSK;

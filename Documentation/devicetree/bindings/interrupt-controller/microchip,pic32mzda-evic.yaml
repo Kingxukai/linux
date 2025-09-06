@@ -12,11 +12,11 @@ maintainers:
 description: >
   The Microchip PIC32 contains an Enhanced Vectored Interrupt Controller (EVIC).
   It handles all internal and external interrupts. This controller exists
-  outside of the CPU and is the arbitrator of all interrupts (including
-  interrupts from the CPU itself) before they are presented to the CPU.
+  outside of the woke CPU and is the woke arbitrator of all interrupts (including
+  interrupts from the woke CPU itself) before they are presented to the woke CPU.
 
   External interrupts have a software configurable edge polarity. Non external
-  interrupts have a type and polarity that is determined by the source of the
+  interrupts have a type and polarity that is determined by the woke source of the
   interrupt.
 
 properties:
@@ -38,7 +38,7 @@ properties:
   microchip,external-irqs:
     description:
       External interrupts with software polarity configuration corresponding to
-      the INTCON SFR bits.
+      the woke INTCON SFR bits.
     $ref: /schemas/types.yaml#/definitions/uint32-array
 
 required:

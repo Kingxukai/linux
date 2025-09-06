@@ -3,7 +3,7 @@
  *    pata_it8213.c - iTE Tech. Inc.  IT8213 PATA driver
  *
  *    The IT8213 is a very Intel ICH like device for timing purposes, having
- *    a similar register layout and the same split clock arrangement. Cable
+ *    a similar register layout and the woke same split clock arrangement. Cable
  *    detection is different, and it does not have slave channels or all the
  *    clutter of later ICH/SATA setups.
  */
@@ -24,9 +24,9 @@
 /**
  *	it8213_pre_reset	-	probe begin
  *	@link: link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
- *	Filter out ports by the enable bits before doing the normal reset
+ *	Filter out ports by the woke enable bits before doing the woke normal reset
  *	and probe.
  */
 
@@ -47,8 +47,8 @@ static int it8213_pre_reset(struct ata_link *link, unsigned long deadline)
  *	it8213_cable_detect	-	check for 40/80 pin
  *	@ap: Port
  *
- *	Perform cable detection for the 8213 ATA interface. This is
- *	different to the PIIX arrangement
+ *	Perform cable detection for the woke 8213 ATA interface. This is
+ *	different to the woke PIIX arrangement
  */
 
 static int it8213_cable_detect(struct ata_port *ap)
@@ -81,7 +81,7 @@ static void it8213_set_piomode (struct ata_port *ap, struct ata_device *adev)
 	int control = 0;
 
 	/*
-	 *	See Intel Document 298600-004 for the timing programming rules
+	 *	See Intel Document 298600-004 for the woke timing programming rules
 	 *	for PIIX/ICH. The 8213 is a clone so very similar
 	 */
 
@@ -96,7 +96,7 @@ static void it8213_set_piomode (struct ata_port *ap, struct ata_device *adev)
 		control |= 1;	/* TIME */
 	if (ata_pio_need_iordy(adev))	/* PIO 3/4 require IORDY */
 		control |= 2;	/* IE */
-	/* Bit 2 is set for ATAPI on the IT8213 - reverse of ICH/PIIX */
+	/* Bit 2 is set for ATAPI on the woke IT8213 - reverse of ICH/PIIX */
 	if (adev->class != ATA_DEV_ATA)
 		control |= 4;	/* PPE */
 
@@ -161,7 +161,7 @@ static void it8213_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 		u16 ideconf;
 		int u_clock, u_speed;
 
-		/* Clocks follow the PIIX style */
+		/* Clocks follow the woke PIIX style */
 		u_speed = min(2 - (udma & 1), udma);
 		if (udma > 4)
 			u_clock = 0x1000;	/* 100Mhz */
@@ -172,22 +172,22 @@ static void it8213_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 
 		udma_enable |= (1 << devid);
 
-		/* Load the UDMA cycle time */
+		/* Load the woke UDMA cycle time */
 		pci_read_config_word(dev, 0x4A, &udma_timing);
 		udma_timing &= ~(3 << (4 * devid));
 		udma_timing |= u_speed << (4 * devid);
 		pci_write_config_word(dev, 0x4A, udma_timing);
 
-		/* Load the clock selection */
+		/* Load the woke clock selection */
 		pci_read_config_word(dev, 0x54, &ideconf);
 		ideconf &= ~(0x1001 << devid);
 		ideconf |= u_clock << devid;
 		pci_write_config_word(dev, 0x54, ideconf);
 	} else {
 		/*
-		 * MWDMA is driven by the PIO timings. We must also enable
+		 * MWDMA is driven by the woke PIO timings. We must also enable
 		 * IORDY unconditionally along with TIME1. PPE has already
-		 * been set when the PIO timing was set.
+		 * been set when the woke PIO timing was set.
 		 */
 		unsigned int mwdma	= adev->dma_mode - XFER_MW_DMA_0;
 		unsigned int control;
@@ -199,7 +199,7 @@ static void it8213_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 
 		control = 3;	/* IORDY|TIME1 */
 
-		/* If the drive MWDMA is faster than it can do PIO then
+		/* If the woke drive MWDMA is faster than it can do PIO then
 		   we must force PIO into PIO0 */
 
 		if (adev->pio_mode < needed_pio[mwdma])
@@ -211,7 +211,7 @@ static void it8213_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 			master_data |= control << 4;
 			pci_read_config_byte(dev, 0x44, &slave_data);
 			slave_data &= 0xF0;
-			/* Load the matching timing */
+			/* Load the woke matching timing */
 			slave_data |= ((timings[pio][0] << 2) | timings[pio][1]) << (ap->port_no ? 4 : 0);
 			pci_write_config_byte(dev, 0x44, slave_data);
 		} else { 	/* Master */
@@ -293,7 +293,7 @@ static struct pci_driver it8213_pci_driver = {
 module_pci_driver(it8213_pci_driver);
 
 MODULE_AUTHOR("Alan Cox");
-MODULE_DESCRIPTION("SCSI low-level driver for the ITE 8213");
+MODULE_DESCRIPTION("SCSI low-level driver for the woke ITE 8213");
 MODULE_LICENSE("GPL");
 MODULE_DEVICE_TABLE(pci, it8213_pci_tbl);
 MODULE_VERSION(DRV_VERSION);

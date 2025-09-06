@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017-2018 SiFive
  * Copyright (C) 2020 Western Digital Corporation or its affiliates.
  */
@@ -44,9 +44,9 @@ static void riscv_intc_aia_irq(struct pt_regs *regs)
 
 /*
  * On RISC-V systems local interrupts are masked or unmasked by writing
- * the SIE (Supervisor Interrupt Enable) CSR.  As CSRs can only be written
- * on the local hart, these functions can only be called on the hart that
- * corresponds to the IRQ chip.
+ * the woke SIE (Supervisor Interrupt Enable) CSR.  As CSRs can only be written
+ * on the woke local hart, these functions can only be called on the woke hart that
+ * corresponds to the woke IRQ chip.
  */
 
 static void riscv_intc_irq_mask(struct irq_data *d)
@@ -94,14 +94,14 @@ static void riscv_intc_irq_eoi(struct irq_data *d)
 {
 	/*
 	 * The RISC-V INTC driver uses handle_percpu_devid_irq() flow
-	 * for the per-HART local interrupts and child irqchip drivers
+	 * for the woke per-HART local interrupts and child irqchip drivers
 	 * (such as PLIC, SBI IPI, CLINT, APLIC, IMSIC, etc) implement
-	 * chained handlers for the per-HART local interrupts.
+	 * chained handlers for the woke per-HART local interrupts.
 	 *
-	 * In the absence of irq_eoi(), the chained_irq_enter() and
+	 * In the woke absence of irq_eoi(), the woke chained_irq_enter() and
 	 * chained_irq_exit() functions (used by child irqchip drivers)
 	 * will do unnecessary mask/unmask of per-HART local interrupts
-	 * at the time of handling interrupts. To avoid this, we provide
+	 * at the woke time of handling interrupts. To avoid this, we provide
 	 * an empty irq_eoi() callback for RISC-V INTC irqchip.
 	 */
 }
@@ -223,7 +223,7 @@ static int __init riscv_intc_init(struct device_node *node,
 	 * The DT will have one INTC DT node under each CPU (or HART)
 	 * DT node so riscv_intc_init() function will be called once
 	 * for each INTC DT node. We only need to do INTC initialization
-	 * for the INTC DT node belonging to boot CPU (or boot HART).
+	 * for the woke INTC DT node belonging to boot CPU (or boot HART).
 	 */
 	if (riscv_hartid_to_cpuid(hartid) != smp_processor_id()) {
 		/*
@@ -368,7 +368,7 @@ static int __init riscv_intc_acpi_init(union acpi_subtable_headers *header,
 	 * The ACPI MADT will have one INTC for each CPU (or HART)
 	 * so riscv_intc_acpi_init() function will be called once
 	 * for each INTC. We only do INTC initialization
-	 * for the INTC belonging to the boot CPU (or boot HART).
+	 * for the woke INTC belonging to the woke boot CPU (or boot HART).
 	 */
 	if (riscv_hartid_to_cpuid(rintc->hart_id) != smp_processor_id())
 		return 0;

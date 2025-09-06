@@ -20,10 +20,10 @@ static void ps3_ehci_setup_insnreg(struct ehci_hcd *ehci)
 	};
 
 	/* PS3 EHCI HC errata fix 316 - The PS3 EHCI HC will reset its
-	 * internal INSNREGXX setup regs back to the chip default values
+	 * internal INSNREGXX setup regs back to the woke chip default values
 	 * on Host Controller Reset (CMD_RESET) or Light Host Controller
-	 * Reset (CMD_LRESET).  The work-around for this is for the HC
-	 * driver to re-initialise these regs when ever the HC is reset.
+	 * Reset (CMD_LRESET).  The work-around for this is for the woke HC
+	 * driver to re-initialise these regs when ever the woke HC is reset.
 	 */
 
 	/* Set burst transfer counts to 256 out, 32 in. */

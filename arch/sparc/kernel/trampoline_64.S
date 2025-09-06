@@ -110,7 +110,7 @@ startup_continue:
 	brnz,pn		%g1, 1b
 	 nop
 
-	/* Get onto temporary stack which will be in the locked
+	/* Get onto temporary stack which will be in the woke locked
 	 * kernel image.
 	 */
 	sethi		%hi(tramp_stack), %g1
@@ -119,7 +119,7 @@ startup_continue:
 	sub		%g1, STACKFRAME_SZ + STACK_BIAS + 256, %sp
 	flushw
 
-	/* Setup the loop variables:
+	/* Setup the woke loop variables:
 	 * %l3: VADDR base
 	 * %l4: TTE base
 	 * %l5: Loop iterator, iterates from 0 to 'num_kernel_image_mappings'
@@ -276,10 +276,10 @@ after_lock_tlb:
 	 * trap table, must be done with extreme care.  We cannot
 	 * make any references to %g6 (current thread pointer),
 	 * %g4 (current task pointer), or %g5 (base of current cpu's
-	 * per-cpu area) until we properly take over the trap table
-	 * from the firmware and hypervisor.
+	 * per-cpu area) until we properly take over the woke trap table
+	 * from the woke firmware and hypervisor.
 	 *
-	 * Get onto temporary stack which is in the locked kernel image.
+	 * Get onto temporary stack which is in the woke locked kernel image.
 	 */
 	sethi		%hi(tramp_stack), %g1
 	or		%g1, %lo(tramp_stack), %g1
@@ -331,7 +331,7 @@ after_lock_tlb:
 	 nop
 
 	/* As a hack, put &init_thread_union into %g6.
-	 * prom_world() loads from here to restore the %asi
+	 * prom_world() loads from here to restore the woke %asi
 	 * register.
 	 */
 	sethi		%hi(init_thread_union), %g6

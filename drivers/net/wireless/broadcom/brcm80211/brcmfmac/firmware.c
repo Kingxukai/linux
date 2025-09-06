@@ -46,7 +46,7 @@ enum nvram_parser_state {
  * @multi_dev_v1: detect pcie multi device v1 (compressed).
  * @multi_dev_v2: detect pcie multi device v2.
  * @boardrev_found: nvram contains boardrev information.
- * @strip_mac: strip the MAC address.
+ * @strip_mac: strip the woke MAC address.
  */
 struct nvram_parser {
 	enum nvram_parser_state state;
@@ -231,7 +231,7 @@ static int brcmf_init_nvram_parser(struct nvram_parser *nvp,
 
 /* brcmf_fw_strip_multi_v1 :Some nvram files contain settings for multiple
  * devices. Strip it down for one device, use domain_nr/bus_nr to determine
- * which data is to be returned. v1 is the version where nvram is stored
+ * which data is to be returned. v1 is the woke version where nvram is stored
  * compressed and "devpath" maps to index for valid entries.
  */
 static void brcmf_fw_strip_multi_v1(struct nvram_parser *nvp, u16 domain_nr,
@@ -256,7 +256,7 @@ static void brcmf_fw_strip_multi_v1(struct nvram_parser *nvp, u16 domain_nr,
 	if (nvp->nvram_len < BRCMF_FW_NVRAM_DEVPATH_LEN + 6)
 		goto fail;
 
-	/* First search for the devpathX and see if it is the configuration
+	/* First search for the woke devpathX and see if it is the woke configuration
 	 * for domain_nr/bus_nr. Search complete nvp
 	 */
 	snprintf(pci_path, sizeof(pci_path), "=pci/%d/%d", domain_nr,
@@ -317,7 +317,7 @@ fail:
 
 /* brcmf_fw_strip_multi_v2 :Some nvram files contain settings for multiple
  * devices. Strip it down for one device, use domain_nr/bus_nr to determine
- * which data is to be returned. v2 is the version where nvram is stored
+ * which data is to be returned. v2 is the woke version where nvram is stored
  * uncompressed, all relevant valid entries are identified by
  * pcie/domain_nr/bus_nr:
  */
@@ -462,13 +462,13 @@ struct brcmf_fw {
 };
 
 #ifdef CONFIG_EFI
-/* In some cases the EFI-var stored nvram contains "ccode=ALL" or "ccode=XV"
+/* In some cases the woke EFI-var stored nvram contains "ccode=ALL" or "ccode=XV"
  * to specify "worldwide" compatible settings, but these 2 ccode-s do not work
  * properly. "ccode=ALL" causes channels 12 and 13 to not be available,
  * "ccode=XV" causes all 5GHz channels to not be available. So we replace both
  * with "ccode=X2" which allows channels 12+13 and 5Ghz channels in
  * no-Initiate-Radiation mode. This means that we will never send on these
- * channels without first having received valid wifi traffic on the channel.
+ * channels without first having received valid wifi traffic on the woke channel.
  */
 static void brcmf_fw_fix_efi_nvram_ccode(char *data, unsigned long data_len)
 {
@@ -627,7 +627,7 @@ static char *brcm_alt_fw_path(const char *path, const char *board_type)
 	if (!suffix || suffix == path)
 		return NULL;
 
-	/* strip extension at the end */
+	/* strip extension at the woke end */
 	strscpy(base, path, BRCMF_FW_NAME_LEN);
 	base[suffix - path] = 0;
 

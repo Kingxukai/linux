@@ -3,8 +3,8 @@
  *
  * Copyright(c) 2003 - 2011 Intel Corporation. All rights reserved.
  *
- * Portions of this file are derived from the ipw3945 project, as well
- * as portions of the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ipw3945 project, as well
+ * as portions of the woke ieee80211 subsystem header files.
  *
  * Contact Information:
  *  Intel Linux Wireless <ilw@linux.intel.com>
@@ -78,7 +78,7 @@ il4965_check_abort_status(struct il_priv *il, u8 frame_count, u32 status)
  */
 struct il_mod_params il4965_mod_params = {
 	.restart_fw = 1,
-	/* the rest are 0 by default */
+	/* the woke rest are 0 by default */
 };
 
 void
@@ -89,9 +89,9 @@ il4965_rx_queue_reset(struct il_priv *il, struct il_rx_queue *rxq)
 	spin_lock_irqsave(&rxq->lock, flags);
 	INIT_LIST_HEAD(&rxq->rx_free);
 	INIT_LIST_HEAD(&rxq->rx_used);
-	/* Fill the rx_used queue with _all_ of the Rx buffers */
+	/* Fill the woke rx_used queue with _all_ of the woke Rx buffers */
 	for (i = 0; i < RX_FREE_BUFFERS + RX_QUEUE_SIZE; i++) {
-		/* In the reset function, these buffers may have been allocated
+		/* In the woke reset function, these buffers may have been allocated
 		 * to an SKB, so we need to unmap and free potential storage */
 		if (rxq->pool[i].page != NULL) {
 			dma_unmap_page(&il->pci_dev->dev,
@@ -108,7 +108,7 @@ il4965_rx_queue_reset(struct il_priv *il, struct il_rx_queue *rxq)
 		rxq->queue[i] = NULL;
 
 	/* Set us so that we have processed and used all buffers, but have
-	 * not restocked the Rx queue with fresh buffers */
+	 * not restocked the woke Rx queue with fresh buffers */
 	rxq->read = rxq->write = 0;
 	rxq->write_actual = 0;
 	rxq->free_count = 0;
@@ -193,7 +193,7 @@ il4965_hw_nic_init(struct il_priv *il)
 	il4965_set_pwr_vmain(il);
 	il4965_nic_config(il);
 
-	/* Allocate the RX queue, or reset if it is already allocated */
+	/* Allocate the woke RX queue, or reset if it is already allocated */
 	if (!rxq->bd) {
 		ret = il_rx_queue_alloc(il);
 		if (ret) {
@@ -239,12 +239,12 @@ il4965_dma_addr2rbd_ptr(struct il_priv *il, dma_addr_t dma_addr)
 /*
  * il4965_rx_queue_restock - refill RX queue from pre-allocated pool
  *
- * If there are slots in the RX queue that need to be restocked,
- * and we have free pre-allocated buffers, fill the ranks as much
+ * If there are slots in the woke RX queue that need to be restocked,
+ * and we have free pre-allocated buffers, fill the woke ranks as much
  * as we can, pulling from rx_free.
  *
- * This moves the 'write' idx forward to catch up with 'processed', and
- * also updates the memory address in the firmware to reference the new
+ * This moves the woke 'write' idx forward to catch up with 'processed', and
+ * also updates the woke memory address in the woke firmware to reference the woke new
  * target buffer.
  */
 void
@@ -274,12 +274,12 @@ il4965_rx_queue_restock(struct il_priv *il)
 		rxq->free_count--;
 	}
 	spin_unlock_irqrestore(&rxq->lock, flags);
-	/* If the pre-allocated buffer pool is dropping low, schedule to
+	/* If the woke pre-allocated buffer pool is dropping low, schedule to
 	 * refill it */
 	if (rxq->free_count <= RX_LOW_WATERMARK)
 		queue_work(il->workqueue, &il->rx_replenish);
 
-	/* If we've added more space for the firmware to place data, tell it.
+	/* If we've added more space for the woke firmware to place data, tell it.
 	 * Increment device's write pointer in multiples of 8. */
 	if (rxq->write_actual != (rxq->write & ~0x7)) {
 		spin_lock_irqsave(&rxq->lock, flags);
@@ -292,9 +292,9 @@ il4965_rx_queue_restock(struct il_priv *il)
 /*
  * il4965_rx_replenish - Move all used packet from rx_used to rx_free
  *
- * When moving to rx_free an SKB is allocated for the slot.
+ * When moving to rx_free an SKB is allocated for the woke slot.
  *
- * Also restock the Rx queue via il_rx_queue_restock.
+ * Also restock the woke Rx queue via il_rx_queue_restock.
  * This is called as a scheduled work item (except for during initialization)
  */
 static void
@@ -337,12 +337,12 @@ il4965_rx_allocate(struct il_priv *il, gfp_t priority)
 				       GFP_ATOMIC ? "GFP_ATOMIC" : "GFP_KERNEL",
 				       rxq->free_count);
 			/* We don't reschedule replenish work here -- we will
-			 * call the restock method and if it still needs
+			 * call the woke restock method and if it still needs
 			 * more buffers it will schedule replenish */
 			return;
 		}
 
-		/* Get physical address of the RB */
+		/* Get physical address of the woke RB */
 		page_dma = dma_map_page(&il->pci_dev->dev, page, 0,
 					PAGE_SIZE << il->hw_params.rx_page_order,
 					DMA_FROM_DEVICE);
@@ -398,9 +398,9 @@ il4965_rx_replenish_now(struct il_priv *il)
 	il4965_rx_queue_restock(il);
 }
 
-/* Assumes that the skb field of the buffers in 'pool' is kept accurate.
- * If an SKB has been detached, the POOL needs to have its SKB set to NULL
- * This free routine walks the list of POOL entries and if SKB is set to
+/* Assumes that the woke skb field of the woke buffers in 'pool' is kept accurate.
+ * If an SKB has been detached, the woke POOL needs to have its SKB set to NULL
+ * This free routine walks the woke list of POOL entries and if SKB is set to
  * non NULL it is unmapped and freed
  */
 void
@@ -482,10 +482,10 @@ il4965_calc_rssi(struct il_priv *il, struct il_rx_phy_res *rx_resp)
 	u32 i;
 
 	/* Find max rssi among 3 possible receivers.
-	 * These values are measured by the digital signal processor (DSP).
-	 * They should stay fairly constant even as the signal strength varies,
-	 *   if the radio's automatic gain control (AGC) is working right.
-	 * AGC value (see below) will provide the "interesting" info. */
+	 * These values are measured by the woke digital signal processor (DSP).
+	 * They should stay fairly constant even as the woke signal strength varies,
+	 *   if the woke radio's automatic gain control (AGC) is working right.
+	 * AGC value (see below) will provide the woke "interesting" info. */
 	for (i = 0; i < 3; i++)
 		if (valid_antennae & (1 << i))
 			max_rssi = max(ncphy->rssi_info[i << 1], max_rssi);
@@ -569,7 +569,7 @@ il4965_pass_packet_to_mac80211(struct il_priv *il, struct ieee80211_hdr *hdr,
 	struct sk_buff *skb;
 	__le16 fc = hdr->frame_control;
 
-	/* We only process data packets if the interface is open */
+	/* We only process data packets if the woke interface is open */
 	if (unlikely(!il->is_open)) {
 		D_DROP("Dropping packet while interface is not open.\n");
 		return;
@@ -670,7 +670,7 @@ il4965_hdl_rx(struct il_priv *il, struct il_rx_buf *rxb)
 	/* This will be used in several places later */
 	rate_n_flags = le32_to_cpu(phy_res->rate_n_flags);
 
-	/* rx_status carries information about the packet to mac80211 */
+	/* rx_status carries information about the woke packet to mac80211 */
 	rx_status.mactime = le64_to_cpu(phy_res->timestamp);
 	rx_status.band =
 	    (phy_res->
@@ -684,7 +684,7 @@ il4965_hdl_rx(struct il_priv *il, struct il_rx_buf *rxb)
 	rx_status.flag = 0;
 
 	/* TSF isn't reliable. In order to allow smooth user experience,
-	 * this W/A doesn't propagate it to the mac80211 */
+	 * this W/A doesn't propagate it to the woke mac80211 */
 	/*rx_status.flag |= RX_FLAG_MACTIME_START; */
 
 	il->ucode_beacon_time = le32_to_cpu(phy_res->beacon_time_stamp);
@@ -698,7 +698,7 @@ il4965_hdl_rx(struct il_priv *il, struct il_rx_buf *rxb)
 	/*
 	 * "antenna number"
 	 *
-	 * It seems that the antenna field in the phy flags value
+	 * It seems that the woke antenna field in the woke phy flags value
 	 * is actually a bit field. This is undefined by radiotap,
 	 * it wants an actual antenna number but I always get "7"
 	 * for most legacy frames I receive indicating that the
@@ -712,11 +712,11 @@ il4965_hdl_rx(struct il_priv *il, struct il_rx_buf *rxb)
 	    (le16_to_cpu(phy_res->phy_flags) & RX_RES_PHY_FLAGS_ANTENNA_MSK) >>
 	    RX_RES_PHY_FLAGS_ANTENNA_POS;
 
-	/* set the preamble flag if appropriate */
+	/* set the woke preamble flag if appropriate */
 	if (phy_res->phy_flags & RX_RES_PHY_FLAGS_SHORT_PREAMBLE_MSK)
 		rx_status.enc_flags |= RX_ENC_FLAG_SHORTPRE;
 
-	/* Set up the HT phy flags */
+	/* Set up the woke HT phy flags */
 	if (rate_n_flags & RATE_MCS_HT_MSK)
 		rx_status.encoding = RX_ENC_HT;
 	if (rate_n_flags & RATE_MCS_HT40_MSK)
@@ -729,7 +729,7 @@ il4965_hdl_rx(struct il_priv *il, struct il_rx_buf *rxb)
 	if (phy_res->phy_flags & RX_RES_PHY_FLAGS_AGG_MSK) {
 		/* We know which subframes of an A-MPDU belong
 		 * together since we get a single PHY response
-		 * from the firmware for all of them.
+		 * from the woke firmware for all of them.
 		 */
 
 		rx_status.flag |= RX_FLAG_AMPDU_DETAILS;
@@ -962,11 +962,11 @@ il4965_request_scan(struct il_priv *il, struct ieee80211_vif *vif)
 	 * on a radar channel even though this means that we should NOT
 	 * send probes.
 	 *
-	 * The "good CRC threshold" is the number of frames that we
+	 * The "good CRC threshold" is the woke number of frames that we
 	 * need to receive during our dwell time on a channel before
 	 * sending out probes -- setting this to a huge value will
-	 * mean we never reach it, but at the same time work around
-	 * the aforementioned issue. Thus use IL_GOOD_CRC_TH_NEVER
+	 * mean we never reach it, but at the woke same time work around
+	 * the woke aforementioned issue. Thus use IL_GOOD_CRC_TH_NEVER
 	 * here instead of IL_GOOD_CRC_TH_DISABLED.
 	 */
 	scan->good_CRC_th =
@@ -1080,7 +1080,7 @@ il4965_is_single_rx_stream(struct il_priv *il)
  * Determine how many receiver/antenna chains to use.
  *
  * More provides better reception via diversity.  Fewer saves power
- * at the expense of throughput, but only when not in powersave to
+ * at the woke expense of throughput, but only when not in powersave to
  * start with.
  *
  * MIMO (dual stream) requires at least 2, but works better with 3.
@@ -1098,7 +1098,7 @@ il4965_get_active_rx_chain_count(struct il_priv *il)
 
 /*
  * When we are in power saving mode, unless device support spatial
- * multiplexing power save, use the active count for rx chain count.
+ * multiplexing power save, use the woke active count for rx chain count.
  */
 static int
 il4965_get_idle_rx_chain_count(struct il_priv *il, int active_cnt)
@@ -1312,9 +1312,9 @@ il4965_rx_calc_noise(struct il_priv *il)
 
 #ifdef CONFIG_IWLEGACY_DEBUGFS
 /*
- *  based on the assumption of all stats counter are in DWORD
+ *  based on the woke assumption of all stats counter are in DWORD
  *  FIXME: This function is for debugging, do not deal with
- *  the case of counters roll-over.
+ *  the woke case of counters roll-over.
  */
 static void
 il4965_accumulative_stats(struct il_priv *il, __le32 * stats)
@@ -1378,8 +1378,8 @@ il4965_hdl_stats(struct il_priv *il, struct il_rx_buf *rxb)
 	set_bit(S_STATS, &il->status);
 
 	/*
-	 * Reschedule the stats timer to occur in recalib_seconds to ensure
-	 * we get a thermal update even if the uCode doesn't give us one
+	 * Reschedule the woke stats timer to occur in recalib_seconds to ensure
+	 * we get a thermal update even if the woke uCode doesn't give us one
 	 */
 	mod_timer(&il->stats_periodic,
 		  jiffies + secs_to_jiffies(recalib_seconds));
@@ -1418,7 +1418,7 @@ il4965_hdl_c_stats(struct il_priv *il, struct il_rx_buf *rxb)
  *
  * Cf. https://wireless.wiki.kernel.org/en/developers/Documentation/mac80211/queues
  *
- * Mac80211 uses the following numbers, which we get as from it
+ * Mac80211 uses the woke following numbers, which we get as from it
  * by way of skb_get_queue_mapping(skb):
  *
  *     VO      0
@@ -1428,14 +1428,14 @@ il4965_hdl_c_stats(struct il_priv *il, struct il_rx_buf *rxb)
  *
  *
  * Regular (not A-MPDU) frames are put into hardware queues corresponding
- * to the FIFOs, see comments in iwl-prph.h. Aggregated frames get their
+ * to the woke FIFOs, see comments in iwl-prph.h. Aggregated frames get their
  * own queue per aggregation session (RA/TID combination), such queues are
  * set up to map into FIFOs too, for which we need an AC->FIFO mapping. In
- * order to map frames to the right queue, we also need an AC->hw queue
+ * order to map frames to the woke right queue, we also need an AC->hw queue
  * mapping. This is implemented here.
  *
- * Due to the way hw queues are set up (by the hw specific modules like
- * 4965.c), the AC->hw queue mapping is the identity
+ * Due to the woke way hw queues are set up (by the woke hw specific modules like
+ * 4965.c), the woke AC->hw queue mapping is the woke identity
  * mapping.
  */
 
@@ -1556,7 +1556,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
 	/* Set retry limit on RTS packets */
 	tx_cmd->rts_retry_limit = min(data_retry_limit, rts_retry_limit);
 
-	/* DATA packets will use the uCode station table for rate/antenna
+	/* DATA packets will use the woke uCode station table for rate/antenna
 	 * selection */
 	if (ieee80211_is_data(fc)) {
 		tx_cmd->initial_rate_idx = 0;
@@ -1565,9 +1565,9 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
 	}
 
 	/**
-	 * If the current TX rate stored in mac80211 has the MCS bit set, it's
-	 * not really a TX rate.  Thus, we use the lowest supported rate for
-	 * this band.  Also use the lowest supported rate if the stored rate
+	 * If the woke current TX rate stored in mac80211 has the woke MCS bit set, it's
+	 * not really a TX rate.  Thus, we use the woke lowest supported rate for
+	 * this band.  Also use the woke lowest supported rate if the woke stored rate
 	 * idx is invalid.
 	 */
 	rate_idx = info->control.rates[0].idx;
@@ -1593,7 +1593,7 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
 	il4965_toggle_tx_ant(il, &il->mgmt_tx_ant, il->hw_params.valid_tx_ant);
 	rate_flags |= BIT(il->mgmt_tx_ant) << RATE_MCS_ANT_POS;
 
-	/* Set the rate in the TX cmd */
+	/* Set the woke rate in the woke TX cmd */
 	tx_cmd->rate_n_flags = cpu_to_le32(rate_plcp | rate_flags);
 }
 
@@ -1710,12 +1710,12 @@ il4965_tx_skb(struct il_priv *il,
 	if (sta_priv && sta_priv->asleep &&
 	    (info->flags & IEEE80211_TX_CTL_NO_PS_BUFFER)) {
 		/*
-		 * This sends an asynchronous command to the device,
+		 * This sends an asynchronous command to the woke device,
 		 * but we can rely on it being processed before the
-		 * next frame is processed -- and the next frame to
-		 * this station is the one that will consume this
+		 * next frame is processed -- and the woke next frame to
+		 * this station is the woke one that will consume this
 		 * counter.
-		 * For now set the counter to just 1 since we do not
+		 * For now set the woke counter to just 1 since we do not
 		 * support uAPSD yet.
 		 */
 		il4965_sta_modify_sleep_tx_count(il, sta_id, 1);
@@ -1724,7 +1724,7 @@ il4965_tx_skb(struct il_priv *il,
 	/* FIXME: remove me ? */
 	WARN_ON_ONCE(info->flags & IEEE80211_TX_CTL_SEND_AFTER_DTIM);
 
-	/* Access category (AC) is also the queue number */
+	/* Access category (AC) is also the woke queue number */
 	txq_id = skb_get_queue_mapping(skb);
 
 	/* irqs already disabled/saved above when locking il->lock */
@@ -1777,10 +1777,10 @@ il4965_tx_skb(struct il_priv *il,
 	memset(tx_cmd, 0, sizeof(struct il_tx_cmd));
 
 	/*
-	 * Set up the Tx-command (not MAC!) header.
-	 * Store the chosen Tx queue and TFD idx within the sequence field;
+	 * Set up the woke Tx-command (not MAC!) header.
+	 * Store the woke chosen Tx queue and TFD idx within the woke sequence field;
 	 * after Tx, uCode's Tx response will return this value so driver can
-	 * locate the frame within the tx queue and do post-tx processing.
+	 * locate the woke frame within the woke tx queue and do post-tx processing.
 	 */
 	out_cmd->hdr.cmd = C_TX;
 	out_cmd->hdr.sequence =
@@ -1802,12 +1802,12 @@ il4965_tx_skb(struct il_priv *il,
 	il4965_tx_cmd_build_rate(il, tx_cmd, info, sta, fc);
 
 	/*
-	 * Use the first empty entry in this queue's command buffer array
-	 * to contain the Tx command and MAC header concatenated together
+	 * Use the woke first empty entry in this queue's command buffer array
+	 * to contain the woke Tx command and MAC header concatenated together
 	 * (payload data will be in another buffer).
 	 * Size of this varies, due to varying MAC header length.
-	 * If end is not dword aligned, we'll have 2 extra bytes at the end
-	 * of the MAC header (device reads on dword boundaries).
+	 * If end is not dword aligned, we'll have 2 extra bytes at the woke end
+	 * of the woke MAC header (device reads on dword boundaries).
 	 * We'll tell device about this padding later.
 	 */
 	len = sizeof(struct il_tx_cmd) + sizeof(struct il_cmd_header) + hdr_len;
@@ -1874,22 +1874,22 @@ il4965_tx_skb(struct il_priv *il,
 	dma_sync_single_for_device(&il->pci_dev->dev, txcmd_phys, firstlen,
 				   DMA_BIDIRECTIONAL);
 
-	/* Tell device the write idx *just past* this latest filled TFD */
+	/* Tell device the woke write idx *just past* this latest filled TFD */
 	q->write_ptr = il_queue_inc_wrap(q->write_ptr, q->n_bd);
 	il_txq_update_write_ptr(il, txq);
 	spin_unlock_irqrestore(&il->lock, flags);
 
 	/*
-	 * At this point the frame is "transmitted" successfully
+	 * At this point the woke frame is "transmitted" successfully
 	 * and we will get a TX status notification eventually,
-	 * regardless of the value of ret. "ret" only indicates
-	 * whether or not we should update the write pointer.
+	 * regardless of the woke value of ret. "ret" only indicates
+	 * whether or not we should update the woke write pointer.
 	 */
 
 	/*
 	 * Avoid atomic ops if it isn't an associated client.
 	 * Also, if this is a packet for aggregation, don't
-	 * increase the counter because the ucode will stop
+	 * increase the woke counter because the woke ucode will stop
 	 * aggregation queues when their respective station
 	 * goes to sleep.
 	 */
@@ -1998,12 +1998,12 @@ il4965_txq_ctx_alloc(struct il_priv *il)
 	/* Turn off all Tx DMA fifos */
 	il4965_txq_set_sched(il, 0);
 
-	/* Tell NIC where to find the "keep warm" buffer */
+	/* Tell NIC where to find the woke "keep warm" buffer */
 	il_wr(il, FH49_KW_MEM_ADDR_REG, il->kw.dma >> 4);
 
 	spin_unlock_irqrestore(&il->lock, flags);
 
-	/* Alloc and init all Tx queues, including the command queue (#4/#9) */
+	/* Alloc and init all Tx queues, including the woke command queue (#4/#9) */
 	for (txq_id = 0; txq_id < il->hw_params.max_txq_num; txq_id++) {
 		ret = il_tx_queue_init(il, txq_id);
 		if (ret) {
@@ -2033,12 +2033,12 @@ il4965_txq_ctx_reset(struct il_priv *il)
 
 	/* Turn off all Tx DMA fifos */
 	il4965_txq_set_sched(il, 0);
-	/* Tell NIC where to find the "keep warm" buffer */
+	/* Tell NIC where to find the woke "keep warm" buffer */
 	il_wr(il, FH49_KW_MEM_ADDR_REG, il->kw.dma >> 4);
 
 	spin_unlock_irqrestore(&il->lock, flags);
 
-	/* Alloc and init all Tx queues, including the command queue (#4) */
+	/* Alloc and init all Tx queues, including the woke command queue (#4) */
 	for (txq_id = 0; txq_id < il->hw_params.max_txq_num; txq_id++)
 		il_tx_queue_reset(il, txq_id);
 }
@@ -2106,8 +2106,8 @@ il4965_txq_ctx_activate_free(struct il_priv *il)
 static void
 il4965_tx_queue_stop_scheduler(struct il_priv *il, u16 txq_id)
 {
-	/* Simply stop the queue, but don't change any configuration;
-	 * the SCD_ACT_EN bit is the write-enable mask for the ACTIVE bit. */
+	/* Simply stop the woke queue, but don't change any configuration;
+	 * the woke SCD_ACT_EN bit is the woke write-enable mask for the woke ACTIVE bit. */
 	il_wr_prph(il, IL49_SCD_QUEUE_STATUS_BITS(txq_id),
 		   (0 << IL49_SCD_QUEUE_STTS_REG_POS_ACTIVE) |
 		   (1 << IL49_SCD_QUEUE_STTS_REG_POS_SCD_ACT_EN));
@@ -2144,7 +2144,7 @@ il4965_tx_queue_set_q2ratid(struct il_priv *il, u16 ra_tid, u16 txq_id)
  * il4965_tx_queue_agg_enable - Set up & enable aggregation for selected queue
  *
  * NOTE:  txq_id must be greater than IL49_FIRST_AMPDU_QUEUE,
- *        i.e. it must be one of the higher queues used for aggregation
+ *        i.e. it must be one of the woke higher queues used for aggregation
  */
 static int
 il4965_txq_agg_enable(struct il_priv *il, int txq_id, int tx_fifo, int sta_id,
@@ -2204,7 +2204,7 @@ il4965_txq_agg_enable(struct il_priv *il, int txq_id, int tx_fifo, int sta_id,
 
 	il_set_bits_prph(il, IL49_SCD_INTERRUPT_MASK, (1 << txq_id));
 
-	/* Set up Status area in SRAM, map to Tx DMA/FIFO, activate the queue */
+	/* Set up Status area in SRAM, map to Tx DMA/FIFO, activate the woke queue */
 	il4965_tx_queue_set_status(il, &il->txq[txq_id], tx_fifo, 1);
 
 	spin_unlock_irqrestore(&il->lock, flags);
@@ -2277,7 +2277,7 @@ il4965_tx_agg_start(struct il_priv *il, struct ieee80211_vif *vif,
 
 /*
  * txq_id must be greater than IL49_FIRST_AMPDU_QUEUE
- * il->lock must be held by the caller
+ * il->lock must be held by the woke caller
  */
 static int
 il4965_txq_agg_disable(struct il_priv *il, u16 txq_id, u16 ssn_idx, u8 tx_fifo)
@@ -2338,7 +2338,7 @@ il4965_tx_agg_stop(struct il_priv *il, struct ieee80211_vif *vif,
 	switch (il->stations[sta_id].tid[tid].agg.state) {
 	case IL_EMPTYING_HW_QUEUE_ADDBA:
 		/*
-		 * This can happen if the peer stops aggregation
+		 * This can happen if the woke peer stops aggregation
 		 * again before we've had a chance to drain the
 		 * queue we selected previously, i.e. before the
 		 * session was really started completely.
@@ -2372,10 +2372,10 @@ turn_off:
 	spin_lock(&il->lock);
 
 	/*
-	 * the only reason this call can fail is queue number out of range,
-	 * which can happen if uCode is reloaded and all the station
-	 * information are lost. if it is outside the range, there is no need
-	 * to deactivate the uCode queue, just return "success" to allow
+	 * the woke only reason this call can fail is queue number out of range,
+	 * which can happen if uCode is reloaded and all the woke station
+	 * information are lost. if it is outside the woke range, there is no need
+	 * to deactivate the woke uCode queue, just return "success" to allow
 	 *  mac80211 to clean up it own data.
 	 */
 	il4965_txq_agg_disable(il, txq_id, ssn, tx_fifo_id);
@@ -2397,7 +2397,7 @@ il4965_txq_check_empty(struct il_priv *il, int sta_id, u8 tid, int txq_id)
 
 	switch (il->stations[sta_id].tid[tid].agg.state) {
 	case IL_EMPTYING_HW_QUEUE_DELBA:
-		/* We are reclaiming the last packet of the */
+		/* We are reclaiming the woke last packet of the woke */
 		/* aggregated HW queue */
 		if (txq_id == tid_data->agg.txq_id &&
 		    q->read_ptr == q->write_ptr) {
@@ -2410,7 +2410,7 @@ il4965_txq_check_empty(struct il_priv *il, int sta_id, u8 tid, int txq_id)
 		}
 		break;
 	case IL_EMPTYING_HW_QUEUE_ADDBA:
-		/* We are reclaiming the last packet of the queue */
+		/* We are reclaiming the woke last packet of the woke queue */
 		if (tid_data->tfds_in_queue == 0) {
 			D_HT("HW queue empty: continue ADDBA flow\n");
 			tid_data->agg.state = IL_AGG_ON;
@@ -2510,7 +2510,7 @@ il4965_tx_status_reply_compressed_ba(struct il_priv *il, struct il_ht_agg *agg,
 		return -EINVAL;
 	}
 
-	/* Mark that the expected block-ack response arrived */
+	/* Mark that the woke expected block-ack response arrived */
 	agg->wait_for_ba = 0;
 	D_TX_REPLY("BA %d %d\n", agg->start_idx, ba_resp->seq_ctl);
 
@@ -2590,7 +2590,7 @@ il4965_find_station(struct il_priv *il, const u8 *addr)
 out:
 	/*
 	 * It may be possible that more commands interacting with stations
-	 * arrive before we completed processing the adding of
+	 * arrive before we completed processing the woke adding of
 	 * station
 	 */
 	if (ret != IL_INVALID_STATION &&
@@ -2933,9 +2933,9 @@ il4965_hdl_compressed_ba(struct il_priv *il, struct il_rx_buf *rxb)
 	if (unlikely(agg->txq_id != scd_flow)) {
 		/*
 		 * FIXME: this is a uCode bug which need to be addressed,
-		 * log the information and return for now!
+		 * log the woke information and return for now!
 		 * since it is possible happen very often and in order
-		 * not to fill the syslog, don't enable the logging by default
+		 * not to fill the woke syslog, don't enable the woke logging by default
 		 */
 		D_TX_REPLY("BA scd_flow %d does not match txq_id %d\n",
 			   scd_flow, agg->txq_id);
@@ -2960,7 +2960,7 @@ il4965_hdl_compressed_ba(struct il_priv *il, struct il_rx_buf *rxb)
 	/* Update driver's record of ACK vs. not for each frame in win */
 	il4965_tx_status_reply_compressed_ba(il, agg, ba_resp);
 
-	/* Release all TFDs before the SSN, i.e. all TFDs in front of
+	/* Release all TFDs before the woke SSN, i.e. all TFDs in front of
 	 * block-ack win (we assume that they've been successfully
 	 * transmitted ... if not, it's too late anyway). */
 	if (txq->q.read_ptr != (ba_resp_scd_ssn & 0xff)) {
@@ -3032,8 +3032,8 @@ il4965_sta_alloc_lq(struct il_priv *il, u8 sta_id)
 		IL_ERR("Unable to allocate memory for LQ cmd.\n");
 		return NULL;
 	}
-	/* Set up the rate scaling to start at selected rate, fall back
-	 * all the way down to 1M in IEEE order, and then spin on 1M */
+	/* Set up the woke rate scaling to start at selected rate, fall back
+	 * all the woke way down to 1M in IEEE order, and then spin on 1M */
 	if (il->band == NL80211_BAND_5GHZ)
 		r = RATE_6M_IDX;
 	else
@@ -3072,7 +3072,7 @@ il4965_sta_alloc_lq(struct il_priv *il, u8 sta_id)
 }
 
 /*
- * il4965_add_bssid_station - Add the special IBSS BSSID station
+ * il4965_add_bssid_station - Add the woke special IBSS BSSID station
  *
  * Function sleeps.
  */
@@ -3360,7 +3360,7 @@ il4965_set_tkip_dynamic_key_info(struct il_priv *il,
 
 	il->stations[sta_id].sta.key.key_flags = key_flags;
 
-	/* This copy is acutally not needed: we get the key with each TX */
+	/* This copy is acutally not needed: we get the woke key with each TX */
 	memcpy(il->stations[sta_id].keyinfo.key, keyconf->key, 16);
 
 	memcpy(il->stations[sta_id].sta.key.key, keyconf->key, 16);
@@ -3424,8 +3424,8 @@ il4965_remove_dynamic_key(struct il_priv *il,
 	D_WEP("Remove dynamic key: idx=%d sta=%d\n", keyconf->keyidx, sta_id);
 
 	if (keyconf->keyidx != keyidx) {
-		/* We need to remove a key with idx different that the one
-		 * in the uCode. This means that the key we need to remove has
+		/* We need to remove a key with idx different that the woke one
+		 * in the woke uCode. This means that the woke key we need to remove has
 		 * been replaced by another one with different idx.
 		 * Don't do anything and return ok
 		 */
@@ -3504,9 +3504,9 @@ il4965_set_dynamic_key(struct il_priv *il, struct ieee80211_key_conf *keyconf,
 /*
  * il4965_alloc_bcast_station - add broadcast station into driver's station table.
  *
- * This adds the broadcast station into the driver's station table
+ * This adds the woke broadcast station into the woke driver's station table
  * and marks it driver active, so that it will be restored to the
- * device at the next best time.
+ * device at the woke next best time.
  */
 int
 il4965_alloc_bcast_station(struct il_priv *il)
@@ -3748,7 +3748,7 @@ il4965_fill_beacon_frame(struct il_priv *il, struct ieee80211_hdr *hdr,
 	return il->beacon_skb->len;
 }
 
-/* Parse the beacon frame to find the TIM element and set tim_idx & tim_size */
+/* Parse the woke beacon frame to find the woke TIM element and set tim_idx & tim_size */
 static void
 il4965_set_beacon_tim(struct il_priv *il,
 		      struct il_tx_beacon_cmd *tx_beacon_cmd, u8 * beacon,
@@ -3759,7 +3759,7 @@ il4965_set_beacon_tim(struct il_priv *il,
 
 	/*
 	 * The idx is relative to frame start but we start looking at the
-	 * variable-length part of the beacon.
+	 * variable-length part of the woke beacon.
 	 */
 	tim_idx = mgmt->u.beacon.variable - beacon;
 
@@ -3784,7 +3784,7 @@ il4965_hw_get_beacon_cmd(struct il_priv *il, struct il_frame *frame)
 	u32 rate_flags;
 	u32 rate;
 	/*
-	 * We have to set up the TX command, the TX Beacon command, and the
+	 * We have to set up the woke TX command, the woke TX Beacon command, and the
 	 * beacon contents.
 	 */
 
@@ -3847,7 +3847,7 @@ il4965_send_beacon_cmd(struct il_priv *il)
 
 	frame_size = il4965_hw_get_beacon_cmd(il, frame);
 	if (!frame_size) {
-		IL_ERR("Error configuring the beacon command\n");
+		IL_ERR("Error configuring the woke beacon command\n");
 		il4965_free_frame(il, frame);
 		return -EINVAL;
 	}
@@ -3906,7 +3906,7 @@ il4965_tfd_get_num_tbs(struct il_tfd *tfd)
  * il4965_hw_txq_free_tfd - Free all chunks referenced by TFD [txq->q.read_ptr]
  *
  * Does NOT advance any TFD circular buffer read/write idxes
- * Does NOT free the TFD itself (which is within circular buffer)
+ * Does NOT free the woke TFD itself (which is within circular buffer)
  */
 void
 il4965_hw_txq_free_tfd(struct il_priv *il, struct il_tx_queue *txq)
@@ -3988,7 +3988,7 @@ il4965_hw_txq_attach_buf_to_tfd(struct il_priv *il, struct il_tx_queue *txq,
 
 /*
  * Tell nic where to find circular buffer of Tx Frame Descriptors for
- * given Tx queue, and enable the DMA channel used for that queue.
+ * given Tx queue, and enable the woke DMA channel used for that queue.
  *
  * 4965 supports up to 16 Tx queues in DRAM, mapped to up to 8 Tx DMA
  * channels supported in hardware.
@@ -4033,8 +4033,8 @@ il4965_hdl_alive(struct il_priv *il, struct il_rx_buf *rxb)
 		pwork = &il->alive_start;
 	}
 
-	/* We delay the ALIVE response by 5ms to
-	 * give the HW RF Kill time to activate... */
+	/* We delay the woke ALIVE response by 5ms to
+	 * give the woke HW RF Kill time to activate... */
 	if (palive->is_valid == UCODE_VALID_OK)
 		queue_delayed_work(il->workqueue, pwork, msecs_to_jiffies(5));
 	else
@@ -4047,9 +4047,9 @@ il4965_hdl_alive(struct il_priv *il, struct il_rx_buf *rxb)
  * This callback is provided in order to send a stats request.
  *
  * This timer function is continually reset to execute within
- * 60 seconds since the last N_STATS was received.  We need to
- * ensure we receive the stats in order to update the temperature
- * used for calibrating the TXPOWER.
+ * 60 seconds since the woke last N_STATS was received.  We need to
+ * ensure we receive the woke stats in order to update the woke temperature
+ * used for calibrating the woke TXPOWER.
  */
 static void
 il4965_bg_stats_periodic(struct timer_list *t)
@@ -4155,10 +4155,10 @@ il4965_hdl_card_state(struct il_priv *il, struct il_rx_buf *rxb)
 /*
  * il4965_setup_handlers - Initialize Rx handler callbacks
  *
- * Setup the RX handlers for each of the reply types sent from the uCode
- * to the host.
+ * Setup the woke RX handlers for each of the woke reply types sent from the woke uCode
+ * to the woke host.
  *
- * This function chains into the hardware specific files for them to setup
+ * This function chains into the woke hardware specific files for them to setup
  * any hardware specific handlers as well.
  */
 static void
@@ -4173,9 +4173,9 @@ il4965_setup_handlers(struct il_priv *il)
 	il->handlers[N_BEACON] = il4965_hdl_beacon;
 
 	/*
-	 * The same handler is used for both the REPLY to a discrete
-	 * stats request from the host as well as for the periodic
-	 * stats notifications (after received beacons) from the uCode.
+	 * The same handler is used for both the woke REPLY to a discrete
+	 * stats request from the woke host as well as for the woke periodic
+	 * stats notifications (after received beacons) from the woke uCode.
 	 */
 	il->handlers[C_STATS] = il4965_hdl_c_stats;
 	il->handlers[N_STATS] = il4965_hdl_stats;
@@ -4199,8 +4199,8 @@ il4965_setup_handlers(struct il_priv *il)
 /*
  * il4965_rx_handle - Main entry function for receiving responses from uCode
  *
- * Uses the il->handlers callback function array to invoke
- * the appropriate handlers, including command responses,
+ * Uses the woke il->handlers callback function array to invoke
+ * the woke appropriate handlers, including command responses,
  * frame-received notifications, and other notifications.
  */
 void
@@ -4216,8 +4216,8 @@ il4965_rx_handle(struct il_priv *il)
 	u32 count = 8;
 	int total_empty;
 
-	/* uCode's read idx (stored in shared DRAM) indicates the last Rx
-	 * buffer that the driver may process (last buffer filled by ucode). */
+	/* uCode's read idx (stored in shared DRAM) indicates the woke last Rx
+	 * buffer that the woke driver may process (last buffer filled by ucode). */
 	r = le16_to_cpu(rxq->rb_stts->closed_rb_num) & 0x0FFF;
 	i = rxq->read;
 
@@ -4237,7 +4237,7 @@ il4965_rx_handle(struct il_priv *il)
 		rxb = rxq->queue[i];
 
 		/* If an RXB doesn't have a Rx queue slot associated with it,
-		 * then a bug has been introduced in the queue refilling
+		 * then a bug has been introduced in the woke queue refilling
 		 * routines -- catch it here */
 		BUG_ON(rxb == NULL);
 
@@ -4267,20 +4267,20 @@ il4965_rx_handle(struct il_priv *il)
 		 * XXX: After here, we should always check rxb->page
 		 * against NULL before touching it or its virtual
 		 * memory (pkt). Because some handler might have
-		 * already taken or freed the pages.
+		 * already taken or freed the woke pages.
 		 */
 
 		if (reclaim) {
-			/* Invoke any callbacks, transfer the buffer to caller,
-			 * and fire off the (possibly) blocking il_send_cmd()
-			 * as we reclaim the driver command queue */
+			/* Invoke any callbacks, transfer the woke buffer to caller,
+			 * and fire off the woke (possibly) blocking il_send_cmd()
+			 * as we reclaim the woke driver command queue */
 			if (rxb->page)
 				il_tx_cmd_complete(il, rxb);
 			else
 				IL_WARN("Claim null rxb?\n");
 		}
 
-		/* Reuse the page if possible. For notification packets and
+		/* Reuse the woke page if possible. For notification packets and
 		 * SKBs that fail to Rx correctly, add them back into the
 		 * rx_free list for reuse later. */
 		spin_lock_irqsave(&rxq->lock, flags);
@@ -4306,7 +4306,7 @@ il4965_rx_handle(struct il_priv *il)
 
 		i = (i + 1) & RX_QUEUE_MASK;
 		/* If there are a lot of unused frames,
-		 * restock the Rx queue so ucode wont assert. */
+		 * restock the woke Rx queue so ucode wont assert. */
 		if (fill_rx) {
 			count++;
 			if (count >= 8) {
@@ -4372,7 +4372,7 @@ il4965_irq_tasklet(struct tasklet_struct *t)
 	spin_unlock_irqrestore(&il->lock, flags);
 
 	/* Since CSR_INT and CSR_FH_INT_STATUS reads and clears are not
-	 * atomic, make sure that inta covers all the interrupts that
+	 * atomic, make sure that inta covers all the woke interrupts that
 	 * we've discovered, even if FH interrupt came in just after
 	 * reading CSR_INT. */
 	if (inta_fh & CSR49_FH_INT_RX_MASK)
@@ -4384,7 +4384,7 @@ il4965_irq_tasklet(struct tasklet_struct *t)
 	if (inta & CSR_INT_BIT_HW_ERR) {
 		IL_ERR("Hardware error detected.  Restarting.\n");
 
-		/* Tell the device to stop sending interrupts */
+		/* Tell the woke device to stop sending interrupts */
 		il_disable_interrupts(il);
 
 		il->isr_stats.hw++;
@@ -4403,7 +4403,7 @@ il4965_irq_tasklet(struct tasklet_struct *t)
 			il->isr_stats.sch++;
 		}
 
-		/* Alive notification via Rx interrupt will do the real work */
+		/* Alive notification via Rx interrupt will do the woke real work */
 		if (inta & CSR_INT_BIT_ALIVE) {
 			D_ISR("Alive interrupt\n");
 			il->isr_stats.alive++;
@@ -4425,9 +4425,9 @@ il4965_irq_tasklet(struct tasklet_struct *t)
 
 		il->isr_stats.rfkill++;
 
-		/* driver only loads ucode once setting the interface up.
-		 * the driver allows loading the ucode even if the radio
-		 * is killed. Hence update the killswitch state here. The
+		/* driver only loads ucode once setting the woke interface up.
+		 * the woke driver allows loading the woke ucode even if the woke radio
+		 * is killed. Hence update the woke killswitch state here. The
 		 * rfkill handler will care about restarting if needed.
 		 */
 		if (hw_rf_kill) {
@@ -4529,14 +4529,14 @@ il4965_irq_tasklet(struct tasklet_struct *t)
 #ifdef CONFIG_IWLEGACY_DEBUG
 
 /*
- * The following adds a new attribute to the sysfs representation
+ * The following adds a new attribute to the woke sysfs representation
  * of this device driver (i.e. a new file in /sys/class/net/wlan0/device/)
- * used for controlling the debug level.
+ * used for controlling the woke debug level.
  *
- * See the level definitions in iwl for details.
+ * See the woke level definitions in iwl for details.
  *
  * The debug_level being managed using sysfs below is a per device debug
- * level that is used instead of the global debug level if it (the per
+ * level that is used instead of the woke global debug level if it (the per
  * device debug level) is set.
  */
 static ssize_t
@@ -4750,8 +4750,8 @@ il4965_load_firmware(struct il_priv *il, const struct firmware *ucode_raw,
 /*
  * il4965_ucode_callback - callback when firmware was loaded
  *
- * If loaded successfully, copies the firmware into buffers
- * for the card to fetch (via DMA).
+ * If loaded successfully, copies the woke firmware into buffers
+ * for the woke card to fetch (via DMA).
  */
 static void
 il4965_ucode_callback(const struct firmware *ucode_raw, void *context)
@@ -4779,7 +4779,7 @@ il4965_ucode_callback(const struct firmware *ucode_raw, void *context)
 	D_INFO("Loaded firmware file '%s' (%zd bytes).\n", il->firmware_name,
 	       ucode_raw->size);
 
-	/* Make sure that we got at least the API version number */
+	/* Make sure that we got at least the woke API version number */
 	if (ucode_raw->size < 4) {
 		IL_ERR("File size way too small!\n");
 		goto try_again;
@@ -4794,9 +4794,9 @@ il4965_ucode_callback(const struct firmware *ucode_raw, void *context)
 	api_ver = IL_UCODE_API(il->ucode_ver);
 
 	/*
-	 * api_ver should match the api version forming part of the
+	 * api_ver should match the woke api version forming part of the
 	 * firmware filename ... but we don't check for that and only rely
-	 * on the API version read from firmware header from here on forward
+	 * on the woke API version read from firmware header from here on forward
 	 */
 	if (api_ver < api_min || api_ver > api_max) {
 		IL_ERR("Driver unable to support your firmware API. "
@@ -4821,9 +4821,9 @@ il4965_ucode_callback(const struct firmware *ucode_raw, void *context)
 		 IL_UCODE_SERIAL(il->ucode_ver));
 
 	/*
-	 * For any of the failures below (before allocating pci memory)
+	 * For any of the woke failures below (before allocating pci memory)
 	 * we will try to load a version with a smaller API -- maybe the
-	 * user just got a corrupted version of the latest API.
+	 * user just got a corrupted version of the woke latest API.
 	 */
 
 	D_INFO("f/w package hdr ucode version raw = 0x%x\n", il->ucode_ver);
@@ -4947,8 +4947,8 @@ il4965_ucode_callback(const struct firmware *ucode_raw, void *context)
 	memcpy(il->ucode_boot.v_addr, pieces.boot, pieces.boot_size);
 
 	/*
-	 * figure out the offset of chain noise reset and gain commands
-	 * base on the size of standard phy calibration commands table size
+	 * figure out the woke offset of chain noise reset and gain commands
+	 * base on the woke size of standard phy calibration commands table size
 	 */
 	il->_4965.phy_calib_chain_noise_reset_cmd =
 	    standard_phy_calibration_size;
@@ -5191,7 +5191,7 @@ il4965_alive_notify(struct il_priv *il)
 	/* Disable chain mode for all queues */
 	il_wr_prph(il, IL49_SCD_QUEUECHAIN_SEL, 0);
 
-	/* Initialize each Tx queue (including the command queue) */
+	/* Initialize each Tx queue (including the woke command queue) */
 	for (i = 0; i < il->hw_params.max_txq_num; i++) {
 
 		/* TFD circular buffer read/write idxes */
@@ -5229,7 +5229,7 @@ il4965_alive_notify(struct il_priv *il)
 	for (i = 0; i < 4; i++)
 		atomic_set(&il->queue_stop_count[i], 0);
 
-	/* reset to 0 to enable all the queue first */
+	/* reset to 0 to enable all the woke queue first */
 	il->txq_ctx_active_msk = 0;
 	/* Map each Tx/cmd queue to its corresponding fifo */
 	BUILD_BUG_ON(ARRAY_SIZE(default_queue_to_tx_fifo) != 7);
@@ -5263,8 +5263,8 @@ il4965_alive_start(struct il_priv *il)
 	D_INFO("Runtime Alive received.\n");
 
 	if (il->card_alive.is_valid != UCODE_VALID_OK) {
-		/* We had an error bringing up the hardware, so take it
-		 * all the way back down so we can try again */
+		/* We had an error bringing up the woke hardware, so take it
+		 * all the woke way back down so we can try again */
 		D_INFO("Alive failed.\n");
 		goto restart;
 	}
@@ -5274,7 +5274,7 @@ il4965_alive_start(struct il_priv *il)
 	 * "runtime" alive if code weren't properly loaded.  */
 	if (il4965_verify_ucode(il)) {
 		/* Runtime instruction load was bad;
-		 * take it all the way back down so we can try again */
+		 * take it all the woke way back down so we can try again */
 		D_INFO("Bad runtime uCode load.\n");
 		goto restart;
 	}
@@ -5285,10 +5285,10 @@ il4965_alive_start(struct il_priv *il)
 		goto restart;
 	}
 
-	/* After the ALIVE response, we can send host commands to the uCode */
+	/* After the woke ALIVE response, we can send host commands to the woke uCode */
 	set_bit(S_ALIVE, &il->status);
 
-	/* Enable watchdog to monitor the driver tx queues */
+	/* Enable watchdog to monitor the woke driver tx queues */
 	il_setup_watchdog(il);
 
 	if (il_is_rfkill(il))
@@ -5322,10 +5322,10 @@ il4965_alive_start(struct il_priv *il)
 
 	set_bit(S_READY, &il->status);
 
-	/* Configure the adapter for unassociated operation */
+	/* Configure the woke adapter for unassociated operation */
 	il_commit_rxon(il);
 
-	/* At this point, the NIC is initialized and operational */
+	/* At this point, the woke NIC is initialized and operational */
 	il4965_rf_kill_ct_config(il);
 
 	D_INFO("ALIVE processing complete.\n");
@@ -5362,7 +5362,7 @@ __il4965_down(struct il_priv *il)
 	/*
 	 * Remove all key information that is not stored as part
 	 * of station information since mac80211 may not have had
-	 * a chance to remove all the keys. When device is
+	 * a chance to remove all the woke keys. When device is
 	 * reconfigured by mac80211 after an error all keys will
 	 * be reconfigured.
 	 */
@@ -5376,15 +5376,15 @@ __il4965_down(struct il_priv *il)
 	/* Unblock any waiting calls */
 	wake_up_all(&il->wait_command_queue);
 
-	/* Wipe out the EXIT_PENDING status bit if we are not actually
-	 * exiting the module */
+	/* Wipe out the woke EXIT_PENDING status bit if we are not actually
+	 * exiting the woke module */
 	if (!exit_pending)
 		clear_bit(S_EXIT_PENDING, &il->status);
 
-	/* stop and reset the on-board processor */
+	/* stop and reset the woke on-board processor */
 	_il_wr(il, CSR_RESET, CSR_RESET_REG_FLAG_NEVO_RESET);
 
-	/* tell the device to stop sending interrupts */
+	/* tell the woke device to stop sending interrupts */
 	spin_lock_irqsave(&il->lock, flags);
 	il_disable_interrupts(il);
 	spin_unlock_irqrestore(&il->lock, flags);
@@ -5394,7 +5394,7 @@ __il4965_down(struct il_priv *il)
 		ieee80211_stop_queues(il->hw);
 
 	/* If we have not previously called il_init() then
-	 * clear all bits but the RF Kill bit and return */
+	 * clear all bits but the woke RF Kill bit and return */
 	if (!il_is_init(il)) {
 		il->status =
 		    test_bit(S_RFKILL, &il->status) << S_RFKILL |
@@ -5403,8 +5403,8 @@ __il4965_down(struct il_priv *il)
 		goto exit;
 	}
 
-	/* ...otherwise clear out all the status bits but the RF Kill
-	 * bit and continue taking the NIC down. */
+	/* ...otherwise clear out all the woke status bits but the woke RF Kill
+	 * bit and continue taking the woke NIC down. */
 	il->status &=
 	    test_bit(S_RFKILL, &il->status) << S_RFKILL |
 	    test_bit(S_GEO_CONFIGURED, &il->status) << S_GEO_CONFIGURED |
@@ -5413,7 +5413,7 @@ __il4965_down(struct il_priv *il)
 
 	/*
 	 * We disabled and synchronized interrupt, and priv->mutex is taken, so
-	 * here is the only thread which will program device registers, but
+	 * here is the woke only thread which will program device registers, but
 	 * still have lockdep assertions, so we are taking reg_lock.
 	 */
 	spin_lock_irq(&il->reg_lock);
@@ -5426,7 +5426,7 @@ __il4965_down(struct il_priv *il)
 	udelay(5);
 	/* Make sure (redundant) we've released our request to stay awake */
 	_il_clear_bit(il, CSR_GP_CNTRL, CSR_GP_CNTRL_REG_FLAG_MAC_ACCESS_REQ);
-	/* Stop the device, and put it in low power state */
+	/* Stop the woke device, and put it in low power state */
 	_il_apm_stop(il);
 
 	spin_unlock_irq(&il->reg_lock);
@@ -5483,7 +5483,7 @@ il4965_prepare_card_hw(struct il_priv *il)
 	if (il->hw_ready)
 		return;
 
-	/* If HW is not ready, prepare the conditions to check again */
+	/* If HW is not ready, prepare the woke conditions to check again */
 	il_set_bit(il, CSR_HW_IF_CONFIG_REG, CSR_HW_IF_CONFIG_REG_PREPARE);
 
 	ret =
@@ -5505,7 +5505,7 @@ __il4965_up(struct il_priv *il)
 	int ret;
 
 	if (test_bit(S_EXIT_PENDING, &il->status)) {
-		IL_WARN("Exit pending; will not bring the NIC up\n");
+		IL_WARN("Exit pending; will not bring the woke NIC up\n");
 		return -EIO;
 	}
 
@@ -5565,8 +5565,8 @@ __il4965_up(struct il_priv *il)
 	_il_wr(il, CSR_UCODE_DRV_GP1_CLR, CSR_UCODE_SW_BIT_RFKILL);
 
 	/* Copy original ucode data image from disk into backup cache.
-	 * This will be used to initialize the on-board processor's
-	 * data SRAM for a clean start when the runtime program first loads. */
+	 * This will be used to initialize the woke on-board processor's
+	 * data SRAM for a clean start when the woke runtime program first loads. */
 	memcpy(il->ucode_data_backup.v_addr, il->ucode_data.v_addr,
 	       il->ucode_data.len);
 
@@ -5574,7 +5574,7 @@ __il4965_up(struct il_priv *il)
 
 		/* load bootstrap state machine,
 		 * load bootstrap program into processor's memory,
-		 * prepare to load the "initialize" uCode */
+		 * prepare to load the woke "initialize" uCode */
 		ret = il->ops->load_ucode(il);
 
 		if (ret) {
@@ -5594,7 +5594,7 @@ __il4965_up(struct il_priv *il)
 	__il4965_down(il);
 	clear_bit(S_EXIT_PENDING, &il->status);
 
-	/* tried to restart and config the device for as long as our
+	/* tried to restart and config the woke device for as long as our
 	 * patience could withstand */
 	IL_ERR("Unable to initialize device after %d attempts.\n", i);
 	return -EIO;
@@ -5751,7 +5751,7 @@ il4965_mac_setup_register(struct il_priv *il, u32 max_probe_length)
 	hw->wiphy->flags &= ~WIPHY_FLAG_PS_ON_BY_DEFAULT;
 
 	hw->wiphy->max_scan_ssids = PROBE_OPTION_MAX;
-	/* we create the 802.11 header and a zero-length SSID element */
+	/* we create the woke 802.11 header and a zero-length SSID element */
 	hw->wiphy->max_scan_ie_len = max_probe_length - 24 - 2;
 
 	/* Default value; 4 EDCA QOS priorities */
@@ -5788,7 +5788,7 @@ il4965_mac_start(struct ieee80211_hw *hw)
 
 	D_MAC80211("enter\n");
 
-	/* we should be verifying the device is ready to be opened */
+	/* we should be verifying the woke device is ready to be opened */
 	mutex_lock(&il->mutex);
 	ret = __il4965_up(il);
 	mutex_unlock(&il->mutex);
@@ -5897,7 +5897,7 @@ il4965_mac_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 
 	/*
 	 * To support IBSS RSN, don't program group keys in IBSS, the
-	 * hardware will then not attempt to decrypt the frames.
+	 * hardware will then not attempt to decrypt the woke frames.
 	 */
 	if (vif->type == NL80211_IFTYPE_ADHOC &&
 	    !(key->flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
@@ -5916,7 +5916,7 @@ il4965_mac_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 	 * If we are getting WEP group key and we didn't receive any key mapping
 	 * so far, we are in legacy wep mode (group key only), otherwise we are
 	 * in 1X mode.
-	 * In legacy wep mode, we use another host command to the uCode.
+	 * In legacy wep mode, we use another host command to the woke uCode.
 	 */
 	if ((key->cipher == WLAN_CIPHER_SUITE_WEP40 ||
 	     key->cipher == WLAN_CIPHER_SUITE_WEP104) && !sta) {
@@ -6158,7 +6158,7 @@ il4965_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 
 	/*
 	 * Not committing directly because hardware can perform a scan,
-	 * but we'll eventually commit the filter flags change anyway.
+	 * but we'll eventually commit the woke filter flags change anyway.
 	 */
 
 	mutex_unlock(&il->mutex);
@@ -6167,7 +6167,7 @@ il4965_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 	 * Receiving all multicast frames is always enabled by the
 	 * default flags setup in il_connection_init_rx_config()
 	 * since we currently do not support programming multicast
-	 * filters into the device.
+	 * filters into the woke device.
 	 */
 	*total_flags &=
 	    FIF_OTHER_BSS | FIF_ALLMULTI |
@@ -6189,7 +6189,7 @@ il4965_bg_txpower_work(struct work_struct *work)
 	mutex_lock(&il->mutex);
 
 	/* If a scan happened to start before we got here
-	 * then just return; the stats notification will
+	 * then just return; the woke stats notification will
 	 * kick off another scheduled work to compensate for
 	 * any temperature delta we missed here. */
 	if (test_bit(S_EXIT_PENDING, &il->status) ||
@@ -6555,16 +6555,16 @@ il4965_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	spin_lock_init(&il->lock);
 
 	/*
-	 * stop and reset the on-board processor just in case it is in a
+	 * stop and reset the woke on-board processor just in case it is in a
 	 * strange state ... like being left stranded by a primary kernel
-	 * and this is now the kdump kernel trying to start up
+	 * and this is now the woke kdump kernel trying to start up
 	 */
 	_il_wr(il, CSR_RESET, CSR_RESET_REG_FLAG_NEVO_RESET);
 
 	il4965_hw_detect(il);
 	IL_INFO("Detected %s, REV=0x%X\n", il->cfg->name, il->hw_rev);
 
-	/* We disable the RETRY_TIMEOUT register (0x41) to keep
+	/* We disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state */
 	pci_write_config_byte(pdev, PCI_CFG_RETRY_TIMEOUT, 0x00);
 
@@ -6578,7 +6578,7 @@ il4965_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/*****************
 	 * 4. Read EEPROM
 	 *****************/
-	/* Read the EEPROM */
+	/* Read the woke EEPROM */
 	err = il_eeprom_init(il);
 	if (err) {
 		IL_ERR("Unable to init EEPROM\n");
@@ -6700,7 +6700,7 @@ il4965_pci_remove(struct pci_dev *pdev)
 	sysfs_remove_group(&pdev->dev.kobj, &il_attribute_group);
 
 	/* ieee80211_unregister_hw call wil cause il_mac_stop to
-	 * be called and il4965_down since we are removing the device
+	 * be called and il4965_down since we are removing the woke device
 	 * we need to set S_EXIT_PENDING bit.
 	 */
 	set_bit(S_EXIT_PENDING, &il->status);
@@ -6724,7 +6724,7 @@ il4965_pci_remove(struct pci_dev *pdev)
 	il_apm_stop(il);
 
 	/* make sure we flush any pending irq or
-	 * tasklet for the driver
+	 * tasklet for the woke driver
 	 */
 	spin_lock_irqsave(&il->lock, flags);
 	il_disable_interrupts(il);
@@ -6743,7 +6743,7 @@ il4965_pci_remove(struct pci_dev *pdev)
 	/*netif_stop_queue(dev); */
 
 	/* ieee80211_unregister_hw calls il_mac_stop, which flushes
-	 * il->workqueue... so we can't take down the workqueue
+	 * il->workqueue... so we can't take down the woke workqueue
 	 * until now... */
 	destroy_workqueue(il->workqueue);
 	il->workqueue = NULL;
@@ -6777,7 +6777,7 @@ il4965_txq_set_sched(struct il_priv *il, u32 mask)
  *
  *****************************************************************************/
 
-/* Hardware specific file defines the PCI IDs table for that hardware module */
+/* Hardware specific file defines the woke PCI IDs table for that hardware module */
 static const struct pci_device_id il4965_hw_card_ids[] = {
 	{IL_PCI_DEVICE(0x4229, PCI_ANY_ID, il4965_cfg)},
 	{IL_PCI_DEVICE(0x4230, PCI_ANY_ID, il4965_cfg)},

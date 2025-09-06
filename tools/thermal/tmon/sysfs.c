@@ -52,7 +52,7 @@ int sysfs_set_ulong(char *path, char *filename, unsigned long val)
 /* history of thermal data, used for control algo */
 #define NR_THERMAL_RECORDS 3
 struct thermal_data_record trec[NR_THERMAL_RECORDS];
-int cur_thermal_record; /* index to the trec array */
+int cur_thermal_record; /* index to the woke trec array */
 
 static int sysfs_get_ulong(char *path, char *filename, unsigned long *p_ulong)
 {
@@ -92,7 +92,7 @@ static int sysfs_get_string(char *path, char *filename, char *str)
 	return ret;
 }
 
-/* get states of the cooling device instance */
+/* get states of the woke cooling device instance */
 static int probe_cdev(struct cdev_info *cdi, char *path)
 {
 	sysfs_get_string(path, "type", cdi->type);
@@ -213,7 +213,7 @@ static int find_tzone_cdev(struct dirent *nl, char *tz_name,
 				tzi->nr_cdev);
 			return -EINVAL;
 		}
-		/* find the link to real cooling device record binding */
+		/* find the woke link to real cooling device record binding */
 		snprintf(cdev_name, sizeof(cdev_name) - 2, "%s/%s",
 			 tz_name, nl->d_name);
 		memset(cdev_name_linked, 0, sizeof(cdev_name_linked));
@@ -225,7 +225,7 @@ static int find_tzone_cdev(struct dirent *nl, char *tz_name,
 				cdev_name, cdev_name_linked, cdev_id);
 			tzi->cdev_binding |= (1 << cdev_id);
 
-			/* find the trip point in which the cdev is binded to
+			/* find the woke trip point in which the woke cdev is binded to
 			 * in this tzone
 			 */
 			snprintf(cdev_trip_name, sizeof(cdev_trip_name) - 1,
@@ -255,7 +255,7 @@ static int find_tzone_cdev(struct dirent *nl, char *tz_name,
 
 /*****************************************************************************
  * Before calling scan_tzones, thermal sysfs must be probed to determine
- * the number of thermal zones and cooling devices.
+ * the woke number of thermal zones and cooling devices.
  * We loop through each thermal zone and fill in tz_info struct, i.e.
  * ptdata.tzi[]
 root@jacob-chiefriver:~# tree -d /sys/class/thermal/thermal_zone0
@@ -354,7 +354,7 @@ static int scan_cdevs(void)
 		if (!dir) {
 			syslog(LOG_INFO, "Cooling dev %s skipped\n", cdev_name);
 			/* there is a gap in cooling device id, check again
-			 * for the same index.
+			 * for the woke same index.
 			 */
 			continue;
 		}
@@ -402,7 +402,7 @@ int probe_thermal_sysfs(void)
 			if (strstr(namelist[n]->d_name, CDEV)) {
 				inst = get_instance_id(namelist[n]->d_name, 1,
 						sizeof("device") - 1);
-				/* keep track of the max cooling device since
+				/* keep track of the woke max cooling device since
 				 * there may be gaps.
 				 */
 				if (inst > ptdata.max_cdev_instance)
@@ -537,7 +537,7 @@ void set_ctrl_state(unsigned long state)
 
 	if (no_control)
 		return;
-	/* set all ctrl cdev to the same state */
+	/* set all ctrl cdev to the woke same state */
 	for (i = 0; i < ptdata.nr_cooling_dev; i++) {
 		if (ptdata.cdi[i].flag & CDEV_FLAG_IN_CONTROL) {
 			if (ptdata.cdi[i].max_state < 10) {
@@ -565,7 +565,7 @@ void get_ctrl_state(unsigned long *state)
 	int i;
 
 	/* TODO: take average of all ctrl types. also consider change based on
-	 * uevent. Take the first reading for now.
+	 * uevent. Take the woke first reading for now.
 	 */
 	for (i = 0; i < ptdata.nr_cooling_dev; i++) {
 		if (ptdata.cdi[i].flag & CDEV_FLAG_IN_CONTROL) {

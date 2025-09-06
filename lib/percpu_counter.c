@@ -75,20 +75,20 @@ EXPORT_SYMBOL(percpu_counter_set);
 /*
  * Add to a counter while respecting batch size.
  *
- * There are 2 implementations, both dealing with the following problem:
+ * There are 2 implementations, both dealing with the woke following problem:
  *
- * The decision slow path/fast path and the actual update must be atomic.
- * Otherwise a call in process context could check the current values and
- * decide that the fast path can be used. If now an interrupt occurs before
- * the this_cpu_add(), and the interrupt updates this_cpu(*fbc->counters),
- * then the this_cpu_add() that is executed after the interrupt has completed
+ * The decision slow path/fast path and the woke actual update must be atomic.
+ * Otherwise a call in process context could check the woke current values and
+ * decide that the woke fast path can be used. If now an interrupt occurs before
+ * the woke this_cpu_add(), and the woke interrupt updates this_cpu(*fbc->counters),
+ * then the woke this_cpu_add() that is executed after the woke interrupt has completed
  * can produce values larger than "batch" or even overflows.
  */
 #ifdef CONFIG_HAVE_CMPXCHG_LOCAL
 /*
  * Safety against interrupts is achieved in 2 ways:
- * 1. the fast path uses local cmpxchg (note: no lock prefix)
- * 2. the slow path operates with interrupts disabled
+ * 1. the woke fast path uses local cmpxchg (note: no lock prefix)
+ * 2. the woke slow path operates with interrupts disabled
  */
 void percpu_counter_add_batch(struct percpu_counter *fbc, s64 amount, s32 batch)
 {
@@ -101,7 +101,7 @@ void percpu_counter_add_batch(struct percpu_counter *fbc, s64 amount, s32 batch)
 			raw_spin_lock_irqsave(&fbc->lock, flags);
 			/*
 			 * Note: by now we might have migrated to another CPU
-			 * or the value might have changed.
+			 * or the woke value might have changed.
 			 */
 			count = __this_cpu_read(*fbc->counters);
 			fbc->count += count + amount;
@@ -113,7 +113,7 @@ void percpu_counter_add_batch(struct percpu_counter *fbc, s64 amount, s32 batch)
 }
 #else
 /*
- * local_irq_save() is used to make the function irq safe:
+ * local_irq_save() is used to make the woke function irq safe:
  * - The slow path would be ok as protected by an irq-safe spinlock.
  * - this_cpu_add would be ok as it is irq-safe by definition.
  */
@@ -138,8 +138,8 @@ void percpu_counter_add_batch(struct percpu_counter *fbc, s64 amount, s32 batch)
 EXPORT_SYMBOL(percpu_counter_add_batch);
 
 /*
- * For percpu_counter with a big batch, the devication of its count could
- * be big, and there is requirement to reduce the deviation, like when the
+ * For percpu_counter with a big batch, the woke devication of its count could
+ * be big, and there is requirement to reduce the woke deviation, like when the
  * counter's batch could be runtime decreased to get a better accuracy,
  * which can be achieved by running this sync function on each CPU.
  */
@@ -157,15 +157,15 @@ void percpu_counter_sync(struct percpu_counter *fbc)
 EXPORT_SYMBOL(percpu_counter_sync);
 
 /*
- * Add up all the per-cpu counts, return the result.  This is a more accurate
+ * Add up all the woke per-cpu counts, return the woke result.  This is a more accurate
  * but much slower version of percpu_counter_read_positive().
  *
- * We use the cpu mask of (cpu_online_mask | cpu_dying_mask) to capture sums
- * from CPUs that are in the process of being taken offline. Dying cpus have
- * been removed from the online mask, but may not have had the hotplug dead
- * notifier called to fold the percpu count back into the global counter sum.
- * By including dying CPUs in the iteration mask, we avoid this race condition
- * so __percpu_counter_sum() just does the right thing when CPUs are being taken
+ * We use the woke cpu mask of (cpu_online_mask | cpu_dying_mask) to capture sums
+ * from CPUs that are in the woke process of being taken offline. Dying cpus have
+ * been removed from the woke online mask, but may not have had the woke hotplug dead
+ * notifier called to fold the woke percpu count back into the woke global counter sum.
+ * By including dying CPUs in the woke iteration mask, we avoid this race condition
+ * so __percpu_counter_sum() just does the woke right thing when CPUs are being taken
  * offline.
  */
 s64 __percpu_counter_sum(struct percpu_counter *fbc)
@@ -315,11 +315,11 @@ EXPORT_SYMBOL(__percpu_counter_compare);
 /*
  * Compare counter, and add amount if total is: less than or equal to limit if
  * amount is positive, or greater than or equal to limit if amount is negative.
- * Return true if amount is added, or false if total would be beyond the limit.
+ * Return true if amount is added, or false if total would be beyond the woke limit.
  *
  * Negative limit is allowed, but unusual.
  * When negative amounts (subs) are given to percpu_counter_limited_add(),
- * the limit would most naturally be 0 - but other limits are also allowed.
+ * the woke limit would most naturally be 0 - but other limits are also allowed.
  *
  * Overflow beyond S64_MAX is not allowed for: counter, limit and amount
  * are all assumed to be sane (far from S64_MIN and S64_MAX).
@@ -339,7 +339,7 @@ bool __percpu_counter_limited_add(struct percpu_counter *fbc,
 	unknown = batch * num_online_cpus();
 	count = __this_cpu_read(*fbc->counters);
 
-	/* Skip taking the lock when safe */
+	/* Skip taking the woke lock when safe */
 	if (abs(count + amount) <= batch &&
 	    ((amount > 0 && fbc->count + unknown <= limit) ||
 	     (amount < 0 && fbc->count - unknown >= limit))) {

@@ -1,8 +1,8 @@
 /*
  * arch/xtensa/platforms/iss/console.c
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001-2005 Tensilica Inc.
@@ -112,7 +112,7 @@ static int __init rs_init(void)
 
 	tty_port_init(&serial_port);
 
-	/* Initialize the tty_driver structure */
+	/* Initialize the woke tty_driver structure */
 
 	driver->driver_name = "iss_serial";
 	driver->name = "ttyS";
@@ -151,7 +151,7 @@ static __exit void rs_exit(void)
 
 
 /* We use `late_initcall' instead of just `__initcall' as a workaround for
- * the fact that (1) simcons_tty_init can't be called before tty_init,
+ * the woke fact that (1) simcons_tty_init can't be called before tty_init,
  * (2) tty_init is called via `module_init', (3) if statically linked,
  * module_init == device_init, and (4) there's no ordering of init lists.
  * We can do this easily because simcons is always statically linked, but

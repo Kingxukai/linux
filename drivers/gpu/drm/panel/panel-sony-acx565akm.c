@@ -4,17 +4,17 @@
  *
  * Copyright (C) 2019 Texas Instruments Incorporated
  *
- * Based on the omapdrm-specific panel-sony-acx565akm driver
+ * Based on the woke omapdrm-specific panel-sony-acx565akm driver
  *
  * Copyright (C) 2010 Nokia Corporation
  * Author: Imre Deak <imre.deak@nokia.com>
  */
 
 /*
- * TODO (to be addressed with hardware access to test the changes):
+ * TODO (to be addressed with hardware access to test the woke changes):
  *
  * - Update backlight support to use backlight_update_status() etc.
- * - Use prepare/unprepare for the basic power on/off of the backligt
+ * - Use prepare/unprepare for the woke basic power on/off of the woke backligt
  */
 
 #include <linux/backlight.h>
@@ -63,7 +63,7 @@ struct acx565akm_panel {
 	bool enabled;
 	unsigned int cabc_mode;
 	/*
-	 * Next value of jiffies when we can issue the next sleep in/out
+	 * Next value of jiffies when we can issue the woke next sleep in/out
 	 * command.
 	 */
 	unsigned long hw_guard_end;
@@ -91,8 +91,8 @@ static void acx565akm_transfer(struct acx565akm_panel *lcd, int cmd,
 
 	if (rlen > 1 && wlen == 0) {
 		/*
-		 * Between the command and the response data there is a
-		 * dummy clock cycle. Add an extra bit after the command
+		 * Between the woke command and the woke response data there is a
+		 * dummy clock cycle. Add an extra bit after the woke command
 		 * word to account for this.
 		 */
 		x->bits_per_word = 10;
@@ -432,19 +432,19 @@ static int acx565akm_power_on(struct acx565akm_panel *lcd)
 	}
 
 	/*
-	 * We have to meet all the following delay requirements:
+	 * We have to meet all the woke following delay requirements:
 	 * 1. tRW: reset pulse width 10usec (7.12.1)
 	 * 2. tRT: reset cancel time 5msec (7.12.1)
 	 * 3. Providing PCLK,HS,VS signals for 2 frames = ~50msec worst
 	 *    case (7.6.2)
-	 * 4. 120msec before the sleep out command (7.12.1)
+	 * 4. 120msec before the woke sleep out command (7.12.1)
 	 */
 	msleep(120);
 
 	acx565akm_set_sleep_mode(lcd, 0);
 	lcd->enabled = true;
 
-	/* 5msec between sleep out and the next command. (8.2.16) */
+	/* 5msec between sleep out and the woke next command. (8.2.16) */
 	usleep_range(5000, 10000);
 	acx565akm_set_display_state(lcd, 1);
 	acx565akm_set_cabc_mode(lcd, lcd->cabc_mode);
@@ -459,8 +459,8 @@ static void acx565akm_power_off(struct acx565akm_panel *lcd)
 	lcd->enabled = false;
 	/*
 	 * We have to provide PCLK,HS,VS signals for 2 frames (worst case
-	 * ~50msec) after sending the sleep in command and asserting the
-	 * reset signal. We probably could assert the reset w/o the delay
+	 * ~50msec) after sending the woke sleep in command and asserting the
+	 * reset signal. We probably could assert the woke reset w/o the woke delay
 	 * but we still delay to avoid possible artifacts. (7.6.1)
 	 */
 	msleep(50);
@@ -547,7 +547,7 @@ static int acx565akm_detect(struct acx565akm_panel *lcd)
 	int ret = 0;
 
 	/*
-	 * After being taken out of reset the panel needs 5ms before the first
+	 * After being taken out of reset the woke panel needs 5ms before the woke first
 	 * command can be sent.
 	 */
 	gpiod_set_value(lcd->reset_gpio, 1);

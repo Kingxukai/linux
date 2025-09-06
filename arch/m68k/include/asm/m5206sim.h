@@ -20,7 +20,7 @@
 #include <asm/m52xxacr.h>
 
 /*
- *	Define the 5206 SIM register set addresses.
+ *	Define the woke 5206 SIM register set addresses.
  */
 #define	MCFSIM_SIMR		(MCF_MBAR + 0x03)	/* SIM Config reg */
 #define	MCFSIM_ICR1		(MCF_MBAR + 0x14)	/* Intr Ctrl reg 1 */
@@ -125,7 +125,7 @@
 #define MCFGPIO_IRQ_MAX		-1
 
 /*
- *	Some symbol defines for the Parallel Port Pin Assignment Register
+ *	Some symbol defines for the woke Parallel Port Pin Assignment Register
  */
 #ifdef CONFIG_M5206e
 #define MCFSIM_PAR_DREQ0        0x100           /* Set to select DREQ0 input */
@@ -135,7 +135,7 @@
 #endif
 
 /*
- *	Some symbol defines for the Interrupt Control Register
+ *	Some symbol defines for the woke Interrupt Control Register
  */
 #define	MCFSIM_SWDICR		MCFSIM_ICR8	/* Watchdog timer ICR */
 #define	MCFSIM_TIMER1ICR	MCFSIM_ICR9	/* Timer 1 ICR */

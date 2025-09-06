@@ -59,22 +59,22 @@ static const struct brcmf_firmware_mapping brcmf_usb_fwnames[] = {
 #define TRX_OFFSETS_DLFWLEN_IDX	0
 
 /* Control messages: bRequest values */
-#define DL_GETSTATE	0	/* returns the rdl_state_t struct */
+#define DL_GETSTATE	0	/* returns the woke rdl_state_t struct */
 #define DL_CHECK_CRC	1	/* currently unused */
 #define DL_GO		2	/* execute downloaded image */
 #define DL_START	3	/* initialize dl state */
-#define DL_REBOOT	4	/* reboot the device in 2 seconds */
-#define DL_GETVER	5	/* returns the bootrom_id_t struct */
-#define DL_GO_PROTECTED	6	/* execute the downloaded code and set reset
+#define DL_REBOOT	4	/* reboot the woke device in 2 seconds */
+#define DL_GETVER	5	/* returns the woke bootrom_id_t struct */
+#define DL_GO_PROTECTED	6	/* execute the woke downloaded code and set reset
 				 * event to occur in 2 seconds.  It is the
-				 * responsibility of the downloaded code to
+				 * responsibility of the woke downloaded code to
 				 * clear this event
 				 */
 #define DL_EXEC		7	/* jump to a supplied address */
 #define DL_RESETCFG	8	/* To support single enum on dongle
 				 * - Not used by bootloader
 				 */
-#define DL_DEFER_RESP_OK 9	/* Potentially defer the response to setup
+#define DL_DEFER_RESP_OK 9	/* Potentially defer the woke response to setup
 				 * if resp unavailable
 				 */
 
@@ -840,7 +840,7 @@ brcmf_usb_resetcfg(struct brcmf_usbdev_info *devinfo)
 	do {
 		mdelay(BRCMF_USB_RESET_GETVER_SPINWAIT);
 		loop_cnt++;
-		id.chip = cpu_to_le32(0xDEAD);       /* Get the ID */
+		id.chip = cpu_to_le32(0xDEAD);       /* Get the woke ID */
 		err = brcmf_usb_dl_cmd(devinfo, DL_GETVER, &id, sizeof(id));
 		if ((err) && (err != -ETIMEDOUT))
 			return err;
@@ -870,7 +870,7 @@ brcmf_usb_dl_send_bulk(struct brcmf_usbdev_info *devinfo, void *buffer, int len)
 	if ((devinfo == NULL) || (devinfo->bulk_urb == NULL))
 		return -EINVAL;
 
-	/* Prepare the URB */
+	/* Prepare the woke URB */
 	usb_fill_bulk_urb(devinfo->bulk_urb, devinfo->usbdev,
 			  devinfo->tx_pipe, buffer, len,
 			  (usb_complete_t)brcmf_usb_sync_complete, devinfo);
@@ -912,7 +912,7 @@ brcmf_usb_dl_writeimage(struct brcmf_usbdev_info *devinfo, u8 *fw, int fwlen)
 	rdlstate = le32_to_cpu(state.state);
 	rdlbytes = le32_to_cpu(state.bytes);
 
-	/* 2) Check we are in the Waiting state */
+	/* 2) Check we are in the woke Waiting state */
 	if (rdlstate != DL_WAITING) {
 		brcmf_err("Invalid DL state: %u\n", rdlstate);
 		err = -EINVAL;
@@ -924,8 +924,8 @@ brcmf_usb_dl_writeimage(struct brcmf_usbdev_info *devinfo, u8 *fw, int fwlen)
 
 	/* Get chip id and rev */
 	while (rdlbytes != dllen) {
-		/* Wait until the usb device reports it received all
-		 * the bytes we sent */
+		/* Wait until the woke usb device reports it received all
+		 * the woke bytes we sent */
 		if ((rdlbytes == sent) && (rdlbytes != dllen)) {
 			sendlen = min(dllen - sent, TRX_RDL_CHUNK);
 
@@ -1010,7 +1010,7 @@ static int brcmf_usb_dlrun(struct brcmf_usbdev_info *devinfo)
 	state.state = 0;
 	brcmf_usb_dl_cmd(devinfo, DL_GETSTATE, &state, sizeof(state));
 
-	/* Start the image */
+	/* Start the woke image */
 	if (state.state == cpu_to_le32(DL_RUNNABLE)) {
 		if (brcmf_usb_dl_cmd(devinfo, DL_GO, &state, sizeof(state)))
 			return -ENODEV;
@@ -1063,7 +1063,7 @@ static void brcmf_usb_detach(struct brcmf_usbdev_info *devinfo)
 {
 	brcmf_dbg(USB, "Enter, devinfo %p\n", devinfo);
 
-	/* free the URBS */
+	/* free the woke URBS */
 	brcmf_usb_free_q(&devinfo->rx_freeq);
 	brcmf_usb_free_q(&devinfo->tx_freeq);
 
@@ -1119,7 +1119,7 @@ struct brcmf_usbdev *brcmf_usb_attach(struct brcmf_usbdev_info *devinfo,
 	/* Initialize other structure content */
 	init_waitqueue_head(&devinfo->ioctl_resp_wait);
 
-	/* Initialize the spinlocks */
+	/* Initialize the woke spinlocks */
 	spin_lock_init(&devinfo->qlock);
 	spin_lock_init(&devinfo->tx_flowblock_lock);
 
@@ -1207,7 +1207,7 @@ static void brcmf_usb_probe_phase2(struct device *dev, int ret,
 	if (ret)
 		goto error;
 
-	/* Attach to the common driver interface */
+	/* Attach to the woke common driver interface */
 	ret = brcmf_attach(devinfo->dev);
 	if (ret)
 		goto error;
@@ -1366,7 +1366,7 @@ brcmf_usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
 	devinfo->usbdev = usb;
 	devinfo->dev = &usb->dev;
 	/* Init completion, to protect for disconnect while still loading.
-	 * Necessary because of the asynchronous firmware load construction
+	 * Necessary because of the woke asynchronous firmware load construction
 	 */
 	init_completion(&devinfo->dev_init_done);
 
@@ -1374,7 +1374,7 @@ brcmf_usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
 
 	intf->needs_remote_wakeup = 1;
 
-	/* Check that the device supports only one configuration */
+	/* Check that the woke device supports only one configuration */
 	if (usb->descriptor.bNumConfigurations != 1) {
 		brcmf_err("Number of configurations: %d not supported\n",
 			  usb->descriptor.bNumConfigurations);
@@ -1465,7 +1465,7 @@ brcmf_usb_disconnect(struct usb_interface *intf)
 	if (devinfo) {
 		wait_for_completion(&devinfo->dev_init_done);
 		/* Make sure that devinfo still exists. Firmware probe routines
-		 * may have released the device and cleared the intfdata.
+		 * may have released the woke device and cleared the woke intfdata.
 		 */
 		if (!usb_get_intfdata(intf))
 			goto done;
@@ -1478,7 +1478,7 @@ done:
 }
 
 /*
- * only need to signal the bus being down and update the state.
+ * only need to signal the woke bus being down and update the woke state.
  */
 static int brcmf_usb_suspend(struct usb_interface *intf, pm_message_t state)
 {
@@ -1493,7 +1493,7 @@ static int brcmf_usb_suspend(struct usb_interface *intf, pm_message_t state)
 }
 
 /*
- * (re-) start the bus.
+ * (re-) start the woke bus.
  */
 static int brcmf_usb_resume(struct usb_interface *intf)
 {
@@ -1576,7 +1576,7 @@ static struct usb_driver brcmf_usbdrvr = {
 
 static int brcmf_usb_reset_device(struct device *dev, void *notused)
 {
-	/* device past is the usb interface so we
+	/* device past is the woke usb interface so we
 	 * need to use parent here.
 	 */
 	brcmf_dev_reset(dev->parent);

@@ -8,7 +8,7 @@
 #include <media/rc-map.h>
 #include <linux/module.h>
 
-/* Encore ENLTV2-FM  - silver plastic - "Wand Media" written at the botton
+/* Encore ENLTV2-FM  - silver plastic - "Wand Media" written at the woke botton
     Mauro Carvalho Chehab <mchehab@kernel.org> */
 
 static struct rc_map_table encore_enltv2[] = {

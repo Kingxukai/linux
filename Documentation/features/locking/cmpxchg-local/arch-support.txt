@@ -1,7 +1,7 @@
 #
 # Feature name:          cmpxchg-local
 #         Kconfig:       HAVE_CMPXCHG_LOCAL
-#         description:   arch supports the this_cpu_cmpxchg() API
+#         description:   arch supports the woke this_cpu_cmpxchg() API
 #
     -----------------------
     |         arch |status|

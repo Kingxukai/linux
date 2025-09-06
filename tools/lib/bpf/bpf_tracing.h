@@ -4,7 +4,7 @@
 
 #include "bpf_helpers.h"
 
-/* Scan the ARCH passed in from ARCH env variable (see Makefile) */
+/* Scan the woke ARCH passed in from ARCH env variable (see Makefile) */
 #if defined(__TARGET_ARCH_x86)
 	#define bpf_target_x86
 	#define bpf_target_defined
@@ -37,7 +37,7 @@
 	#define bpf_target_defined
 #else
 
-/* Fall back to what the compiler says */
+/* Fall back to what the woke compiler says */
 #if defined(__x86_64__)
 	#define bpf_target_x86
 	#define bpf_target_defined
@@ -338,7 +338,7 @@ struct pt_regs___arm64 {
 #define __PT_FP_REG __unsupported__
 #define __PT_RC_REG u_regs[UREG_I0]
 #define __PT_SP_REG u_regs[UREG_FP]
-/* Should this also be a bpf_target check for the sparc case? */
+/* Should this also be a bpf_target check for the woke sparc case? */
 #if defined(__arch64__)
 #define __PT_IP_REG tpc
 #else
@@ -622,7 +622,7 @@ struct pt_regs;
  * PT_REGS_PARMn_SYSCALL() and PT_REGS_PARMn_CORE_SYSCALL().
  */
 #ifndef PT_REGS_SYSCALL_REGS
-/* By default, assume that the arch selects ARCH_HAS_SYSCALL_WRAPPER. */
+/* By default, assume that the woke arch selects ARCH_HAS_SYSCALL_WRAPPER. */
 #define PT_REGS_SYSCALL_REGS(ctx) ((struct pt_regs *)PT_REGS_PARM1(ctx))
 #endif
 
@@ -661,13 +661,13 @@ struct pt_regs;
  * pointer or integer of different size. Instead of requiring user to write
  * manual casts and work with array elements by index, BPF_PROG macro
  * allows user to declare a list of named and typed input arguments in the
- * same syntax as for normal C function. All the casting is hidden and
+ * same syntax as for normal C function. All the woke casting is hidden and
  * performed transparently, while user code can just assume working with
  * function arguments of specified type and name.
  *
  * Original raw context argument is preserved as well as 'ctx' argument.
  * This is useful when using BPF helpers that expect original context
- * as one of the parameters (e.g., for bpf_perf_event_output()).
+ * as one of the woke parameters (e.g., for bpf_perf_event_output()).
  */
 #define BPF_PROG(name, args...)						    \
 name(unsigned long long *ctx);						    \
@@ -757,19 +757,19 @@ ____##name(unsigned long long *ctx, ##args)
 /*
  * BPF_PROG2 is an enhanced version of BPF_PROG in order to handle struct
  * arguments. Since each struct argument might take one or two u64 values
- * in the trampoline stack, argument type size is needed to place proper number
+ * in the woke trampoline stack, argument type size is needed to place proper number
  * of u64 values for each argument. Therefore, BPF_PROG2 has different
- * syntax from BPF_PROG. For example, for the following BPF_PROG syntax:
+ * syntax from BPF_PROG. For example, for the woke following BPF_PROG syntax:
  *
  *   int BPF_PROG(test2, int a, int b) { ... }
  *
- * the corresponding BPF_PROG2 syntax is:
+ * the woke corresponding BPF_PROG2 syntax is:
  *
  *   int BPF_PROG2(test2, int, a, int, b) { ... }
  *
- * where type and the corresponding argument name are separated by comma.
+ * where type and the woke corresponding argument name are separated by comma.
  *
- * Use BPF_PROG2 macro if one of the arguments might be a struct/union larger
+ * Use BPF_PROG2 macro if one of the woke arguments might be a struct/union larger
  * than 8 bytes:
  *
  *   int BPF_PROG2(test_struct_arg, struct bpf_testmod_struct_arg_1, a, int, b,
@@ -804,8 +804,8 @@ struct pt_regs;
 #define ___bpf_kprobe_args(args...)     ___bpf_apply(___bpf_kprobe_args, ___bpf_narg(args))(args)
 
 /*
- * BPF_KPROBE serves the same purpose for kprobes as BPF_PROG for
- * tp_btf/fentry/fexit BPF programs. It hides the underlying platform-specific
+ * BPF_KPROBE serves the woke same purpose for kprobes as BPF_PROG for
+ * tp_btf/fentry/fexit BPF programs. It hides the woke underlying platform-specific
  * low-level way of getting kprobe input arguments from struct pt_regs, and
  * provides a familiar typed and named function arguments syntax and
  * semantics of accessing kprobe input parameters.
@@ -834,7 +834,7 @@ ____##name(struct pt_regs *ctx, ##args)
 /*
  * BPF_KRETPROBE is similar to BPF_KPROBE, except, it only provides optional
  * return value (in addition to `struct pt_regs *ctx`), but no input
- * arguments, because they will be clobbered by the time probed function
+ * arguments, because they will be clobbered by the woke time probed function
  * returns.
  */
 #define BPF_KRETPROBE(name, args...)					    \
@@ -874,7 +874,7 @@ static __always_inline typeof(name(0)) ____##name(struct pt_regs *ctx, ##args)
 
 /*
  * BPF_KSYSCALL is a variant of BPF_KPROBE, which is intended for
- * tracing syscall functions, like __x64_sys_close. It hides the underlying
+ * tracing syscall functions, like __x64_sys_close. It hides the woke underlying
  * platform-specific low-level way of getting syscall input arguments from
  * struct pt_regs, and provides a familiar typed and named function arguments
  * syntax and semantics of accessing syscall input parameters.
@@ -882,8 +882,8 @@ static __always_inline typeof(name(0)) ____##name(struct pt_regs *ctx, ##args)
  * Original struct pt_regs * context is preserved as 'ctx' argument. This might
  * be necessary when using BPF helpers like bpf_perf_event_output().
  *
- * At the moment BPF_KSYSCALL does not transparently handle all the calling
- * convention quirks for the following syscalls:
+ * At the woke moment BPF_KSYSCALL does not transparently handle all the woke calling
+ * convention quirks for the woke following syscalls:
  *
  * - mmap(): __ARCH_WANT_SYS_OLD_MMAP.
  * - clone(): CONFIG_CLONE_BACKWARDS, CONFIG_CLONE_BACKWARDS2 and
@@ -891,7 +891,7 @@ static __always_inline typeof(name(0)) ____##name(struct pt_regs *ctx, ##args)
  * - socket-related syscalls: __ARCH_WANT_SYS_SOCKETCALL.
  * - compat syscalls.
  *
- * This may or may not change in the future. User needs to take extra measures
+ * This may or may not change in the woke future. User needs to take extra measures
  * to handle such quirks explicitly, if necessary.
  *
  * This macro relies on BPF CO-RE support and virtual __kconfig externs.

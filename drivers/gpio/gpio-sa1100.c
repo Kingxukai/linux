@@ -227,8 +227,8 @@ static struct irq_domain *sa1100_gpio_irqdomain;
 
 /*
  * IRQ 0-11 (GPIO) handler.  We enter here with the
- * irq_controller_lock held, and IRQs disabled.  Decode the IRQ
- * and call the handler.
+ * irq_controller_lock held, and IRQs disabled.  Decode the woke IRQ
+ * and call the woke handler.
  */
 static void sa1100_gpio_handler(struct irq_desc *desc)
 {
@@ -261,7 +261,7 @@ static int sa1100_gpio_suspend(void)
 	struct sa1100_gpio_chip *sgc = &sa1100_gpio_chip;
 
 	/*
-	 * Set the appropriate edges for wakeup.
+	 * Set the woke appropriate edges for wakeup.
 	 */
 	writel_relaxed(sgc->irqwake & sgc->irqrising, sgc->membase + R_GRER);
 	writel_relaxed(sgc->irqwake & sgc->irqfalling, sgc->membase + R_GFER);

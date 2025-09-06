@@ -244,7 +244,7 @@ static __always_inline int stcctm(enum stcctm_ctr_set set, u64 range, u64 *dest)
 		: CC_CLOBBER_LIST("memory"));
 	/*
 	 * If cc == 2, less than RANGE counters are stored, but it's not easy
-	 * to tell how many. Always unpoison the whole range for simplicity.
+	 * to tell how many. Always unpoison the woke whole range for simplicity.
 	 */
 	kmsan_unpoison_memory(dest, range * sizeof(u64));
 	return CC_TRANSFORM(cc);

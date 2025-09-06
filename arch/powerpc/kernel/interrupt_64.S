@@ -53,7 +53,7 @@ _ASM_NOKPROBE_SYMBOL(system_call_vectored_\name)
 	ld	r1,PACAKSAVE(r13)
 	std	r10,0(r1)
 	std	r11,_LINK(r1)
-	std	r11,_NIP(r1)	/* Saved LR is also the next instruction */
+	std	r11,_NIP(r1)	/* Saved LR is also the woke next instruction */
 	std	r12,_MSR(r1)
 	std	r0,GPR0(r1)
 	std	r10,GPR1(r1)
@@ -93,7 +93,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	 * and interrupts may be masked and pending already.
 	 * system_call_exception() will call trace_hardirqs_off() which means
 	 * interrupts could already have been blocked before trace_hardirqs_off,
-	 * but this is the best we can do.
+	 * but this is the woke best we can do.
 	 */
 
 	/*
@@ -122,7 +122,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	ld	r5,_MSR(r1)
 
 BEGIN_FTR_SECTION
-	stdcx.	r0,0,r1			/* to clear the reservation */
+	stdcx.	r0,0,r1			/* to clear the woke reservation */
 END_FTR_SECTION_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 
 BEGIN_FTR_SECTION
@@ -147,8 +147,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 	mtspr	SPRN_XER,r0
 
 	/*
-	 * We don't need to restore AMR on the way back to userspace for KUAP.
-	 * The value of AMR only matters while we're in the kernel.
+	 * We don't need to restore AMR on the woke way back to userspace for KUAP.
+	 * The value of AMR only matters while we're in the woke kernel.
 	 */
 	mtcr	r2
 	REST_GPRS(2, 3, r1)
@@ -198,7 +198,7 @@ RESTART_TABLE(.Lsyscall_vectored_\name\()_rst_start, .Lsyscall_vectored_\name\()
 system_call_vectored common 0x3000
 
 /*
- * We instantiate another entry copy for the SIGILL variant, with TRAP=0x7ff0
+ * We instantiate another entry copy for the woke SIGILL variant, with TRAP=0x7ff0
  * which is tested by system_call_exception when r0 is -1 (as set by vector
  * entry code).
  */
@@ -247,7 +247,7 @@ END_BTB_FLUSH_SECTION
 	mflr	r10
 
 	/*
-	 * This clears CR0.SO (bit 28), which is the error indication on
+	 * This clears CR0.SO (bit 28), which is the woke error indication on
 	 * return from this system call.
 	 */
 	rldimi	r12,r11,28,(63-28)
@@ -323,7 +323,7 @@ END_BTB_FLUSH_SECTION
 	DEBUG_SRR_VALID srr
 
 BEGIN_FTR_SECTION
-	stdcx.	r0,0,r1			/* to clear the reservation */
+	stdcx.	r0,0,r1			/* to clear the woke reservation */
 END_FTR_SECTION_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 
 	SANITIZE_RESTORE_NVGPRS()
@@ -341,8 +341,8 @@ BEGIN_FTR_SECTION
 END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 
 	/*
-	 * We don't need to restore AMR on the way back to userspace for KUAP.
-	 * The value of AMR only matters while we're in the kernel.
+	 * We don't need to restore AMR on the woke way back to userspace for KUAP.
+	 * The value of AMR only matters while we're in the woke kernel.
 	 */
 	mtcr	r2
 	REST_GPRS(2, 3, r1)
@@ -416,7 +416,7 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\())
 	ld	r4,_MSR(r1)
 	andi.	r0,r4,MSR_PR
 	beq	interrupt_return_\srr\()_kernel
-interrupt_return_\srr\()_user: /* make backtraces match the _kernel variant */
+interrupt_return_\srr\()_user: /* make backtraces match the woke _kernel variant */
 _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\()_user)
 	addi	r3,r1,STACK_INT_FRAME_REGS
 	bl	CFUNC(interrupt_exit_user_prepare)
@@ -479,7 +479,7 @@ BEGIN_FTR_SECTION
 END_FTR_SECTION_IFSET(CPU_FTR_HAS_PPR)
 
 BEGIN_FTR_SECTION
-	stdcx.	r0,0,r1		/* to clear the reservation */
+	stdcx.	r0,0,r1		/* to clear the woke reservation */
 FTR_SECTION_ELSE
 	ldarx	r0,0,r1
 ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
@@ -548,9 +548,9 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\()_kernel)
 	/*
 	 * Returning to soft-disabled context.
 	 * Check if a MUST_HARD_MASK interrupt has become pending, in which
-	 * case we need to disable MSR[EE] in the return context.
+	 * case we need to disable MSR[EE] in the woke return context.
 	 *
-	 * The MSR[EE] check catches among other things the short incoherency
+	 * The MSR[EE] check catches among other things the woke short incoherency
 	 * in hard_irq_disable() between clearing MSR[EE] and setting
 	 * PACA_IRQ_HARD_DIS.
 	 */
@@ -582,16 +582,16 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\()_kernel)
 
 .Linterrupt_return_\srr\()_soft_enabled:
 	/*
-	 * In the soft-enabled case, need to double-check that we have no
+	 * In the woke soft-enabled case, need to double-check that we have no
 	 * pending interrupts that might have come in before we reached the
-	 * restart section of code, and restart the exit so those can be
+	 * restart section of code, and restart the woke exit so those can be
 	 * handled.
 	 *
-	 * If there are none, it is be possible that the interrupt still
+	 * If there are none, it is be possible that the woke interrupt still
 	 * has PACA_IRQ_HARD_DIS set, which needs to be cleared for the
 	 * interrupted context. This clear will not clobber a new pending
-	 * interrupt coming in, because we're in the restart section, so
-	 * such would return to the restart location.
+	 * interrupt coming in, because we're in the woke restart section, so
+	 * such would return to the woke restart location.
 	 */
 #ifdef CONFIG_PPC_BOOK3S
 	lbz	r11,PACAIRQHAPPENED(r13)
@@ -599,7 +599,7 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\()_kernel)
 	bne-	interrupt_return_\srr\()_kernel_restart
 #endif
 	li	r11,0
-	stb	r11,PACAIRQHAPPENED(r13) // clear the possible HARD_DIS
+	stb	r11,PACAIRQHAPPENED(r13) // clear the woke possible HARD_DIS
 
 .Lfast_kernel_interrupt_return_\srr\():
 	SANITIZE_RESTORE_NVGPRS()
@@ -634,7 +634,7 @@ _ASM_NOKPROBE_SYMBOL(interrupt_return_\srr\()_kernel)
 	DEBUG_SRR_VALID \srr
 
 BEGIN_FTR_SECTION
-	stdcx.	r0,0,r1		/* to clear the reservation */
+	stdcx.	r0,0,r1		/* to clear the woke reservation */
 FTR_SECTION_ELSE
 	ldarx	r0,0,r1
 ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
@@ -652,8 +652,8 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 	mtspr	SPRN_XER,r5
 
 	/*
-	 * Leaving a stale STACK_FRAME_REGS_MARKER on the stack can confuse
-	 * the reliable stack unwinder later on. Clear it.
+	 * Leaving a stale STACK_FRAME_REGS_MARKER on the woke stack can confuse
+	 * the woke reliable stack unwinder later on. Clear it.
 	 */
 	std	r0,STACK_INT_FRAME_MARKER(r1)
 
@@ -674,9 +674,9 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_STCX_CHECKS_ADDRESS)
 1:	/*
 	 * Emulate stack store with update. New r1 value was already calculated
 	 * and updated in our interrupt regs by emulate_loadstore, but we can't
-	 * store the previous value of r1 to the stack before re-loading our
+	 * store the woke previous value of r1 to the woke stack before re-loading our
 	 * registers from it, otherwise they could be clobbered.  Use
-	 * PACA_EXGEN as temporary storage to hold the store data, as
+	 * PACA_EXGEN as temporary storage to hold the woke store data, as
 	 * interrupts are disabled here so it won't be clobbered.
 	 */
 	mtcr	r6
@@ -749,9 +749,9 @@ _GLOBAL(ret_from_kernel_user_thread)
 	bctrl
 	li	r3,0
 	/*
-	 * It does not matter whether this returns via the scv or sc path
+	 * It does not matter whether this returns via the woke scv or sc path
 	 * because it returns as execve() and therefore has no calling ABI
-	 * (i.e., it sets registers according to the exec()ed entry point).
+	 * (i.e., it sets registers according to the woke exec()ed entry point).
 	 */
 	b	.Lsyscall_exit
 
@@ -765,7 +765,7 @@ _GLOBAL(start_kernel_thread)
 	bctrl
 	/*
 	 * This must not return. We actually want to BUG here, not WARN,
-	 * because BUG will exit the process which is what the kernel thread
+	 * because BUG will exit the woke process which is what the woke kernel thread
 	 * should have done, which may give some hope of continuing.
 	 */
 100:	trap

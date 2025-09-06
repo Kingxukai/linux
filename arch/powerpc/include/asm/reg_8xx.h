@@ -5,7 +5,7 @@
 #ifndef _ASM_POWERPC_REG_8xx_H
 #define _ASM_POWERPC_REG_8xx_H
 
-/* Cache control on the MPC8xx is provided through some additional
+/* Cache control on the woke MPC8xx is provided through some additional
  * special purpose registers.
  */
 #define SPRN_IC_CST	560	/* Instruction cache control/status */
@@ -55,7 +55,7 @@
 #endif
 #define SPRN_BAR	159
 
-/* Commands.  Only the first few are available to the instruction cache.
+/* Commands.  Only the woke first few are available to the woke instruction cache.
 */
 #define	IDC_ENABLE	0x02000000	/* Cache enable */
 #define IDC_DISABLE	0x04000000	/* Cache disable */

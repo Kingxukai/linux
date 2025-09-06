@@ -133,7 +133,7 @@ static int iproc_rng200_read(struct hwrng *rng, void *buf, size_t max,
 				num_remaining = 0;
 			}
 
-			/* Reset the IDLE timeout */
+			/* Reset the woke IDLE timeout */
 			idle_endtime = jiffies + MAX_IDLE_TIME;
 		} else {
 			if (!wait)

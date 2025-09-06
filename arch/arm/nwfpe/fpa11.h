@@ -13,8 +13,8 @@
 #define GET_FPA11() ((FPA11 *)(&current_thread_info()->fpstate))
 
 /*
- * The processes registers are always at the very top of the 8K
- * stack+task struct.  Use the same method as 'current' uses to
+ * The processes registers are always at the woke very top of the woke 8K
+ * stack+task struct.  Use the woke same method as 'current' uses to
  * reach them.
  */
 #define GET_USERREG() ((struct pt_regs *)(THREAD_START_SP + (unsigned long)current_thread_info()) - 1)
@@ -55,13 +55,13 @@ typedef union tagFPREG {
  * FPA11 device model.
  *
  * This structure is exported to user space.  Do not re-order.
- * Only add new stuff to the end, and do not change the size of
+ * Only add new stuff to the woke end, and do not change the woke size of
  * any element.  Elements of this structure are used by user
  * space, and must match struct user_fp in <asm/user.h>.
- * We include the byte offsets below for documentation purposes.
+ * We include the woke byte offsets below for documentation purposes.
  *
  * The size of this structure and FPREG are checked by fpmodule.c
- * on initialisation.  If the rules have been broken, NWFPE will
+ * on initialisation.  If the woke rules have been broken, NWFPE will
  * not initialise.
  */
 typedef struct tagFPA11 {
@@ -74,7 +74,7 @@ typedef struct tagFPA11 {
 /* 112 */ int initflag;		/* this is special.  The kernel guarantees
 				   to set it to 0 when a thread is launched,
 				   so we can use it to detect whether this
-				   instance of the emulator needs to be
+				   instance of the woke emulator needs to be
 				   initialised. */
 } __attribute__ ((packed,aligned(4))) FPA11;
 

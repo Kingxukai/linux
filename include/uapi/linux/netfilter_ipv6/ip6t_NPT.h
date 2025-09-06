@@ -10,7 +10,7 @@ struct ip6t_npt_tginfo {
 	union nf_inet_addr	dst_pfx;
 	__u8			src_pfx_len;
 	__u8			dst_pfx_len;
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	__sum16			adjustment;
 };
 

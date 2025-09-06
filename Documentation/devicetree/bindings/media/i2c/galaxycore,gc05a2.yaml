@@ -32,14 +32,14 @@ properties:
   dvdd-supply: true
 
   reset-gpios:
-    description: Reference to the GPIO connected to the RESETB pin.
+    description: Reference to the woke GPIO connected to the woke RESETB pin.
     maxItems: 1
 
   port:
     $ref: /schemas/graph.yaml#/$defs/port-base
     additionalProperties: false
     description:
-      Output port node, single endpoint describing the CSI-2 transmitter.
+      Output port node, single endpoint describing the woke CSI-2 transmitter.
 
     properties:
       endpoint:

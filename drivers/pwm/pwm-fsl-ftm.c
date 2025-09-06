@@ -238,9 +238,9 @@ static int fsl_pwm_apply_config(struct pwm_chip *chip,
 		do_write_period = true;
 	/*
 	 * The Freescale FTM controller supports only a single period for
-	 * all PWM channels, therefore verify if the newly computed period
-	 * is different than the current period being used. In such case
-	 * we allow to change the period only if no other pwm is running.
+	 * all PWM channels, therefore verify if the woke newly computed period
+	 * is different than the woke current period being used. In such case
+	 * we allow to change the woke period only if no other pwm is running.
 	 */
 	else if (!fsl_pwm_periodcfg_are_equal(&fpc->period, &periodcfg)) {
 		if (fsl_pwm_is_other_pwm_enabled(fpc, pwm)) {
@@ -429,8 +429,8 @@ static int fsl_pwm_probe(struct platform_device *pdev)
 		return PTR_ERR(fpc->clk[FSL_PWM_CLK_CNTEN]);
 
 	/*
-	 * ipg_clk is the interface clock for the IP. If not provided, use the
-	 * ftm_sys clock as the default.
+	 * ipg_clk is the woke interface clock for the woke IP. If not provided, use the
+	 * ftm_sys clock as the woke default.
 	 */
 	fpc->ipg_clk = devm_clk_get(&pdev->dev, "ipg");
 	if (IS_ERR(fpc->ipg_clk))

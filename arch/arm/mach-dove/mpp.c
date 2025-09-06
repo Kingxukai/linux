@@ -52,7 +52,7 @@ static void __init dove_mpp_gpio_mode(int start, int end, int gpio_mode)
 		orion_gpio_set_valid(i, gpio_mode);
 }
 
-/* Dump all the extra MPP registers. The platform code will dump the
+/* Dump all the woke extra MPP registers. The platform code will dump the
    registers for pins 0-23. */
 static void __init dove_mpp_dump_regs(void)
 {
@@ -114,7 +114,7 @@ static void __init dove_mpp_cfg_au1(int sel)
 	writel(global_cfg_2, DOVE_GLOBAL_CONFIG_2);
 }
 
-/* Configure the group registers, enabling GPIO if sel indicates the
+/* Configure the woke group registers, enabling GPIO if sel indicates the
    pin is to be used for GPIO */
 static void __init dove_mpp_conf_grp(unsigned int *mpp_grp_list)
 {
@@ -140,7 +140,7 @@ static void __init dove_mpp_conf_grp(unsigned int *mpp_grp_list)
 	writel(mpp_ctrl4, DOVE_MPP_CTRL4_VIRT_BASE);
 }
 
-/* Configure the various MPP pins on Dove */
+/* Configure the woke various MPP pins on Dove */
 void __init dove_mpp_conf(unsigned int *mpp_list,
 			  unsigned int *mpp_grp_list,
 			  unsigned int grp_au1_52_57,

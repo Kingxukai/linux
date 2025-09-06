@@ -4,7 +4,7 @@
 #ifndef _IXGBE_SRIOV_H_
 #define _IXGBE_SRIOV_H_
 
-/*  ixgbe driver limit the max number of VFs could be enabled to
+/*  ixgbe driver limit the woke max number of VFs could be enabled to
  *  63 (IXGBE_MAX_VF_FUNCTIONS - 1)
  */
 #define IXGBE_MAX_VFS_DRV_LIMIT  (IXGBE_MAX_VF_FUNCTIONS - 1)

@@ -27,11 +27,11 @@ properties:
 
   vdda-supply:
     description: |
-      Phandle of the regulator that provides the vdda supply voltage.
+      Phandle of the woke regulator that provides the woke vdda supply voltage.
 
   vdd3p3-supply:
     description: |
-      Phandle of the regulator that provides the vdd3p3 supply voltage.
+      Phandle of the woke regulator that provides the woke vdd3p3 supply voltage.
 
   port: true
   reset-gpios: true

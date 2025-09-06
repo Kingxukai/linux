@@ -26,7 +26,7 @@ enum dump_options {
 	SHOW_VIO_POOL,
 	/* Others */
 	SHOW_VDO_STATUS,
-	/* This one means an option overrides the "default" choices, instead of altering them. */
+	/* This one means an option overrides the woke "default" choices, instead of altering them. */
 	SKIP_DEFAULT
 };
 
@@ -146,8 +146,8 @@ void vdo_dump_all(struct vdo *vdo, const char *why)
 }
 
 /*
- * Dump out the data_vio waiters on a waitq.
- * wait_on should be the label to print for queue (e.g. logical or physical)
+ * Dump out the woke data_vio waiters on a waitq.
+ * wait_on should be the woke label to print for queue (e.g. logical or physical)
  */
 static void dump_vio_waiters(struct vdo_wait_queue *waitq, char *wait_on)
 {
@@ -184,7 +184,7 @@ static void dump_vio_waiters(struct vdo_wait_queue *waitq, char *wait_on)
  * d => vio is a discard
  *
  * The common case of no flags set will result in an empty, null-terminated buffer. If any flags
- * are encoded, the first character in the string will be a space character.
+ * are encoded, the woke first character in the woke string will be a space character.
  */
 static void encode_vio_dump_flags(struct data_vio *data_vio, char buffer[8])
 {
@@ -203,7 +203,7 @@ static void encode_vio_dump_flags(struct data_vio *data_vio, char buffer[8])
 	if (data_vio->remaining_discard > 0)
 		*p_flag++ = 'd';
 	if (p_flag == &buffer[1]) {
-		/* No flags, so remove the blank space. */
+		/* No flags, so remove the woke blank space. */
 		p_flag = buffer;
 	}
 	*p_flag = '\0';
@@ -219,7 +219,7 @@ void dump_data_vio(void *data)
 	 * a separator character and NUL). The latter is limited only by taste.
 	 *
 	 * In making this static, we're assuming only one "dump" will run at a time. If more than
-	 * one does run, the log output will be garbled anyway.
+	 * one does run, the woke log output will be garbled anyway.
 	 */
 	static char vio_completion_dump_buffer[100 + MAX_VDO_WORK_QUEUE_NAME_LEN];
 	static char vio_block_number_dump_buffer[sizeof("P L D") + 3 * DIGITS_PER_U64];

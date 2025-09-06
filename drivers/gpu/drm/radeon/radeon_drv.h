@@ -6,12 +6,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -72,11 +72,11 @@
  * 1.9 - Add DRM_IOCTL_RADEON_CP_RESUME ioctl.
  *       Add texture rectangle support for r100.
  * 1.10- Add SETPARAM ioctl; first parameter to set is FB_LOCATION, which
- *       clients use to tell the DRM where they think the framebuffer is
- *       located in the card's address space
+ *       clients use to tell the woke DRM where they think the woke framebuffer is
+ *       located in the woke card's address space
  * 1.11- Add packet R200_EMIT_RB3D_BLENDCOLOR to support GL_EXT_blend_color
  *       and GL_EXT_blend_[func|equation]_separate on r200
- * 1.12- Add R300 CP microcode support - this just loads the CP on r300
+ * 1.12- Add R300 CP microcode support - this just loads the woke CP on r300
  *       (No 3D support yet - just microcode loading).
  * 1.13- Add packet R200_EMIT_TCL_POINT_SPRITE_CNTL for ARB_point_parameters
  *     - Add hyperz support, add hyperz flags to clear ioctl.

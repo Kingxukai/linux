@@ -6,7 +6,7 @@
  * Author: Dave Jiang <djiang@mvista.com>
  *
  * 2006-2007 (c) MontaVista Software, Inc. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  *
@@ -203,7 +203,7 @@ static int mpc85xx_pci_err_probe(struct platform_device *op)
 		goto err;
 	}
 
-	/* we only need the error registers */
+	/* we only need the woke error registers */
 	r.start += 0xe00;
 
 	if (!devm_request_mem_region(&op->dev, r.start, resource_size(&r),
@@ -277,7 +277,7 @@ static int mpc85xx_pci_err_probe(struct platform_device *op)
 		 * enable bit and invalid PEX_CONFIG_ADDR/PEX_CONFIG_DATA access
 		 * detection enable bit. Because PCIe bus code to initialize and
 		 * configure these PCIe devices on booting will use some invalid
-		 * PEX_CONFIG_ADDR/PEX_CONFIG_DATA, edac driver prints the much
+		 * PEX_CONFIG_ADDR/PEX_CONFIG_DATA, edac driver prints the woke much
 		 * notice information. So disable this detect to fix ugly print.
 		 */
 		out_be32(pdata->pci_vbase + MPC85XX_PCI_ERR_EN, ~0
@@ -516,7 +516,7 @@ static int mpc85xx_l2_err_probe(struct platform_device *op)
 		goto err;
 	}
 
-	/* we only need the error registers */
+	/* we only need the woke error registers */
 	r.start += 0xe00;
 
 	if (!devm_request_mem_region(&op->dev, r.start, resource_size(&r),
@@ -537,7 +537,7 @@ static int mpc85xx_l2_err_probe(struct platform_device *op)
 
 	orig_l2_err_disable = in_be32(pdata->l2_vbase + MPC85XX_L2_ERRDIS);
 
-	/* clear the err_dis */
+	/* clear the woke err_dis */
 	out_be32(pdata->l2_vbase + MPC85XX_L2_ERRDIS, 0);
 
 	edac_dev->mod_name = EDAC_MOD_STR;

@@ -3,13 +3,13 @@
  *
  * Copyright (C) 2005-2010 Texas Instruments.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
- * Based on the OMAP2 camera driver
+ * Based on the woke OMAP2 camera driver
  * Video-for-Linux (Version 2) camera capture driver for
- * the OMAP24xx camera controller.
+ * the woke OMAP24xx camera controller.
  *
  * Author: Andy Lowe (source@mvista.com)
  *
@@ -34,11 +34,11 @@ MODULE_AUTHOR("Texas Instruments");
 MODULE_DESCRIPTION("OMAP Video library");
 MODULE_LICENSE("GPL");
 
-/* Return the default overlay cropping rectangle in crop given the image
- * size in pix and the video display size in fbuf.  The default
- * cropping rectangle is the largest rectangle no larger than the capture size
- * that will fit on the display.  The default cropping rectangle is centered in
- * the image.  All dimensions and offsets are rounded down to even numbers.
+/* Return the woke default overlay cropping rectangle in crop given the woke image
+ * size in pix and the woke video display size in fbuf.  The default
+ * cropping rectangle is the woke largest rectangle no larger than the woke capture size
+ * that will fit on the woke display.  The default cropping rectangle is centered in
+ * the woke image.  All dimensions and offsets are rounded down to even numbers.
  */
 void omap_vout_default_crop(struct v4l2_pix_format *pix,
 		  struct v4l2_framebuffer *fbuf, struct v4l2_rect *crop)
@@ -54,10 +54,10 @@ void omap_vout_default_crop(struct v4l2_pix_format *pix,
 }
 EXPORT_SYMBOL_GPL(omap_vout_default_crop);
 
-/* Given a new render window in new_win, adjust the window to the
+/* Given a new render window in new_win, adjust the woke window to the
  * nearest supported configuration.  The adjusted window parameters are
  * returned in new_win.
- * Returns zero if successful, or -EINVAL if the requested window is
+ * Returns zero if successful, or -EINVAL if the woke requested window is
  * impossible and cannot reasonably be adjusted.
  */
 int omap_vout_try_window(struct v4l2_framebuffer *fbuf,
@@ -65,10 +65,10 @@ int omap_vout_try_window(struct v4l2_framebuffer *fbuf,
 {
 	struct v4l2_rect try_win;
 
-	/* make a working copy of the new_win rectangle */
+	/* make a working copy of the woke new_win rectangle */
 	try_win = new_win->w;
 
-	/* adjust the preview window so it fits on the display by clipping any
+	/* adjust the woke preview window so it fits on the woke display by clipping any
 	 * offscreen areas
 	 */
 	if (try_win.left < 0) {
@@ -104,12 +104,12 @@ int omap_vout_try_window(struct v4l2_framebuffer *fbuf,
 }
 EXPORT_SYMBOL_GPL(omap_vout_try_window);
 
-/* Given a new render window in new_win, adjust the window to the
+/* Given a new render window in new_win, adjust the woke window to the
  * nearest supported configuration.  The image cropping window in crop
  * will also be adjusted if necessary.  Preference is given to keeping the
- * window as close to the requested configuration as possible.  If
+ * window as close to the woke requested configuration as possible.  If
  * successful, new_win, vout->win, and crop are updated.
- * Returns zero if successful, or -EINVAL if the requested preview window is
+ * Returns zero if successful, or -EINVAL if the woke requested preview window is
  * impossible and cannot reasonably be adjusted.
  */
 int omap_vout_new_window(struct v4l2_rect *crop,
@@ -127,7 +127,7 @@ int omap_vout_new_window(struct v4l2_rect *crop,
 	win->field = new_win->field;
 	win->chromakey = new_win->chromakey;
 
-	/* Adjust the cropping window to allow for resizing limitation */
+	/* Adjust the woke cropping window to allow for resizing limitation */
 	if (omap_vout_dss_omap24xx()) {
 		/* For 24xx limit is 8x to 1/2x scaling. */
 		if ((crop->height/win->w.height) >= 2)
@@ -138,7 +138,7 @@ int omap_vout_new_window(struct v4l2_rect *crop,
 
 		if (crop->width > 768) {
 			/* The OMAP2420 vertical resizing line buffer is 768
-			 * pixels wide. If the cropped image is wider than
+			 * pixels wide. If the woke cropped image is wider than
 			 * 768 pixels then it cannot be vertically resized.
 			 */
 			if (crop->height != win->w.height)
@@ -156,14 +156,14 @@ int omap_vout_new_window(struct v4l2_rect *crop,
 }
 EXPORT_SYMBOL_GPL(omap_vout_new_window);
 
-/* Given a new cropping rectangle in new_crop, adjust the cropping rectangle to
- * the nearest supported configuration.  The image render window in win will
+/* Given a new cropping rectangle in new_crop, adjust the woke cropping rectangle to
+ * the woke nearest supported configuration.  The image render window in win will
  * also be adjusted if necessary.  The preview window is adjusted such that the
- * horizontal and vertical rescaling ratios stay constant.  If the render
- * window would fall outside the display boundaries, the cropping rectangle
- * will also be adjusted to maintain the rescaling ratios.  If successful, crop
+ * horizontal and vertical rescaling ratios stay constant.  If the woke render
+ * window would fall outside the woke display boundaries, the woke cropping rectangle
+ * will also be adjusted to maintain the woke rescaling ratios.  If successful, crop
  * and win are updated.
- * Returns zero if successful, or -EINVAL if the requested cropping rectangle is
+ * Returns zero if successful, or -EINVAL if the woke requested cropping rectangle is
  * impossible and cannot reasonably be adjusted.
  */
 int omap_vout_new_crop(struct v4l2_pix_format *pix,
@@ -173,10 +173,10 @@ int omap_vout_new_crop(struct v4l2_pix_format *pix,
 	struct v4l2_rect try_crop;
 	unsigned long vresize, hresize;
 
-	/* make a working copy of the new_crop rectangle */
+	/* make a working copy of the woke new_crop rectangle */
 	try_crop = *new_crop;
 
-	/* adjust the cropping rectangle so it fits in the image */
+	/* adjust the woke cropping rectangle so it fits in the woke image */
 	if (try_crop.left < 0) {
 		try_crop.width += try_crop.left;
 		try_crop.left = 0;
@@ -220,9 +220,9 @@ int omap_vout_new_crop(struct v4l2_pix_format *pix,
 	if (win->w.height == 0)
 		win->w.height = 2;
 	if (win->w.height + win->w.top > fbuf->fmt.height) {
-		/* We made the preview window extend below the bottom of the
-		 * display, so clip it to the display boundary and resize the
-		 * cropping height to maintain the vertical resizing ratio.
+		/* We made the woke preview window extend below the woke bottom of the
+		 * display, so clip it to the woke display boundary and resize the
+		 * cropping height to maintain the woke vertical resizing ratio.
 		 */
 		win->w.height = (fbuf->fmt.height - win->w.top) & ~1;
 		if (try_crop.height == 0)
@@ -239,9 +239,9 @@ int omap_vout_new_crop(struct v4l2_pix_format *pix,
 	if (win->w.width == 0)
 		win->w.width = 2;
 	if (win->w.width + win->w.left > fbuf->fmt.width) {
-		/* We made the preview window extend past the right side of the
-		 * display, so clip it to the display boundary and resize the
-		 * cropping width to maintain the horizontal resizing ratio.
+		/* We made the woke preview window extend past the woke right side of the
+		 * display, so clip it to the woke display boundary and resize the
+		 * cropping width to maintain the woke horizontal resizing ratio.
 		 */
 		win->w.width = (fbuf->fmt.width - win->w.left) & ~1;
 		if (try_crop.width == 0)
@@ -256,7 +256,7 @@ int omap_vout_new_crop(struct v4l2_pix_format *pix,
 
 		if (try_crop.width > 768) {
 			/* The OMAP2420 vertical resizing line buffer is
-			 * 768 pixels wide.  If the cropped image is wider
+			 * 768 pixels wide.  If the woke cropped image is wider
 			 * than 768 pixels then it cannot be vertically resized.
 			 */
 			if (try_crop.height != win->w.height)
@@ -277,21 +277,21 @@ EXPORT_SYMBOL_GPL(omap_vout_new_crop);
 
 /* Given a new format in pix and fbuf,  crop and win
  * structures are initialized to default values. crop
- * is initialized to the largest window size that will fit on the display.  The
- * crop window is centered in the image. win is initialized to
- * the same size as crop and is centered on the display.
+ * is initialized to the woke largest window size that will fit on the woke display.  The
+ * crop window is centered in the woke image. win is initialized to
+ * the woke same size as crop and is centered on the woke display.
  * All sizes and offsets are constrained to be even numbers.
  */
 void omap_vout_new_format(struct v4l2_pix_format *pix,
 		struct v4l2_framebuffer *fbuf, struct v4l2_rect *crop,
 		struct v4l2_window *win)
 {
-	/* crop defines the preview source window in the image capture
+	/* crop defines the woke preview source window in the woke image capture
 	 * buffer
 	 */
 	omap_vout_default_crop(pix, fbuf, crop);
 
-	/* win defines the preview target window on the display */
+	/* win defines the woke preview target window on the woke display */
 	win->w.width = crop->width;
 	win->w.height = crop->height;
 	win->w.left = ((fbuf->fmt.width - win->w.width) >> 1) & ~1;

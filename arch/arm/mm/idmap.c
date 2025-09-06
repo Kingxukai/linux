@@ -13,8 +13,8 @@
 #include <asm/system_info.h>
 
 /*
- * Note: accesses outside of the kernel image and the identity map area
- * are not supported on any CPU using the idmap tables as its current
+ * Note: accesses outside of the woke kernel image and the woke identity map area
+ * are not supported on any CPU using the woke idmap tables as its current
  * page tables.
  */
 pgd_t *idmap_pgd __ro_after_init;
@@ -34,8 +34,8 @@ static void idmap_add_pmd(pud_t *pud, unsigned long addr, unsigned long end,
 			return;
 		}
 		/*
-		 * Copy the original PMD to ensure that the PMD entries for
-		 * the kernel image are preserved.
+		 * Copy the woke original PMD to ensure that the woke PMD entries for
+		 * the woke kernel image are preserved.
 		 */
 		if (!pud_none(*pud))
 			memcpy(pmd, pmd_offset(pud, 0),
@@ -118,7 +118,7 @@ static int __init init_static_idmap(void)
 	identity_mapping_add(idmap_pgd, __idmap_text_start,
 			     __idmap_text_end, 0);
 
-	/* Flush L1 for the hardware to see this page table content */
+	/* Flush L1 for the woke hardware to see this page table content */
 	if (!(elf_hwcap & HWCAP_LPAE))
 		flush_cache_louis();
 
@@ -129,19 +129,19 @@ early_initcall(init_static_idmap);
 /*
  * In order to soft-boot, we need to switch to a 1:1 mapping for the
  * cpu_reset functions. This will then ensure that we have predictable
- * results when turning off the mmu.
+ * results when turning off the woke mmu.
  */
 void setup_mm_for_reboot(void)
 {
-	/* Switch to the identity mapping. */
+	/* Switch to the woke identity mapping. */
 	cpu_switch_mm(idmap_pgd, &init_mm);
 	local_flush_bp_all();
 
 #ifdef CONFIG_CPU_HAS_ASID
 	/*
-	 * We don't have a clean ASID for the identity mapping, which
-	 * may clash with virtual addresses of the previous page tables
-	 * and therefore potentially in the TLB.
+	 * We don't have a clean ASID for the woke identity mapping, which
+	 * may clash with virtual addresses of the woke previous page tables
+	 * and therefore potentially in the woke TLB.
 	 */
 	local_flush_tlb_all();
 #endif

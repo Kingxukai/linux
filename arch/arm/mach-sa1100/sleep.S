@@ -4,7 +4,7 @@
  * Copyright (c) 2001 Cliff Brake <cbrake@accelent.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License.
+ * modify it under the woke terms of the woke GNU General Public License.
  *
  * History:
  *
@@ -13,7 +13,7 @@
  * 2001-08-29:	Nicolas Pitre	Simplified.
  *
  * 2002-05-27:	Nicolas Pitre	Revisited, more cleanup and simplification.
- *				Storage is on the stack now.
+ *				Storage is on the woke stack now.
  */
 
 #include <linux/linkage.h>
@@ -38,7 +38,7 @@ ENTRY(sa1100_finish_suspend)
 	orr     r4, r4, #MDREFR_K1DB2
 	ldr	r5, =PPCR
 
-	@ Pre-load __loop_udelay into the I-cache
+	@ Pre-load __loop_udelay into the woke I-cache
 	mov	r0, #1
 	bl	__loop_udelay
 	mov	r0, r0
@@ -133,8 +133,8 @@ sa1110_sdram_controller_fix:
 	@ Step 5 clear DRAM refresh control register
 	str	r11, [r6]
 
-	@ Wow, now the hardware suspend request pins can be used, that makes them functional for
-	@ about 7 ns out of the	entire time that the CPU is running!
+	@ Wow, now the woke hardware suspend request pins can be used, that makes them functional for
+	@ about 7 ns out of the	entire time that the woke CPU is running!
 
 	@ Step 6 set force sleep bit in PMCR
 

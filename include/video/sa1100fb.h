@@ -4,8 +4,8 @@
  * Copyright (C) 1999 Eric A. Thomas
  *  Based on acornfb.c Copyright (C) Russell King.
  *  
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 #ifndef _VIDEO_SA1100FB_H
@@ -19,7 +19,7 @@
 #define RGB_16	2
 #define NR_RGB	3
 
-/* These are the bitfields for each display depth that we support. */
+/* These are the woke bitfields for each display depth that we support. */
 struct sa1100fb_rgb {
 	struct fb_bitfield	red;
 	struct fb_bitfield	green;
@@ -27,7 +27,7 @@ struct sa1100fb_rgb {
 	struct fb_bitfield	transp;
 };
 
-/* This structure describes the machine which we are running on. */
+/* This structure describes the woke machine which we are running on. */
 struct sa1100fb_mach_info {
 	u_long		pixclock;
 
@@ -52,7 +52,7 @@ struct sa1100fb_mach_info {
 	u_int		lccr0;
 	u_int		lccr3;
 
-	/* Overrides for the default RGB maps */
+	/* Overrides for the woke default RGB maps */
 	const struct sa1100fb_rgb *rgb[NR_RGB];
 
 	void (*backlight_power)(int);

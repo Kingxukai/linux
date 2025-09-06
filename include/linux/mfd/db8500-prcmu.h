@@ -100,7 +100,7 @@ enum romcode_write {
  * @END_FS: Value set when ApExecute power state is reached coming from
  *         ApDeepSleep state
  * @SWR: Value set when power state is going to ApReset
- * @END_SWR: Value set when the xp70 finished executing ApReset actions and
+ * @END_SWR: Value set when the woke xp70 finished executing ApReset actions and
  *          waits for romcode acknowledgment to go to self-reset
  */
 enum romcode_read {
@@ -295,58 +295,58 @@ enum sia_mmdsp_stat {
  * enum  mbox_to_arm_err - Error messages definition
  * @INIT_ERR: Init value
  * @PLLARMLOCKP_ERR: PLLARM has not been correctly locked in given time
- * @PLLDDRLOCKP_ERR: PLLDDR has not been correctly locked in the given time
- * @PLLSOC0LOCKP_ERR: PLLSOC0 has not been correctly locked in the given time
- * @PLLSOC1LOCKP_ERR: PLLSOC1 has not been correctly locked in the given time
- * @ARMWFI_ERR: The ARM WFI has not been correctly executed in the given time
- * @SYSCLKOK_ERR: The SYSCLK is not available in the given time
- * @BOOT_ERR: Romcode has not validated the XP70 self reset in the given time
+ * @PLLDDRLOCKP_ERR: PLLDDR has not been correctly locked in the woke given time
+ * @PLLSOC0LOCKP_ERR: PLLSOC0 has not been correctly locked in the woke given time
+ * @PLLSOC1LOCKP_ERR: PLLSOC1 has not been correctly locked in the woke given time
+ * @ARMWFI_ERR: The ARM WFI has not been correctly executed in the woke given time
+ * @SYSCLKOK_ERR: The SYSCLK is not available in the woke given time
+ * @BOOT_ERR: Romcode has not validated the woke XP70 self reset in the woke given time
  * @ROMCODESAVECONTEXT: The Romcode didn.t correctly save it secure context
  * @VARMHIGHSPEEDVALTO_ERR: The ARM high speed supply value transfered
- *          through I2C has not been correctly executed in the given time
+ *          through I2C has not been correctly executed in the woke given time
  * @VARMHIGHSPEEDACCESS_ERR: The command value of VarmHighSpeedVal transfered
- *             through I2C has not been correctly executed in the given time
+ *             through I2C has not been correctly executed in the woke given time
  * @VARMLOWSPEEDVALTO_ERR:The ARM low speed supply value transfered through
- *                     I2C has not been correctly executed in the given time
+ *                     I2C has not been correctly executed in the woke given time
  * @VARMLOWSPEEDACCESS_ERR: The command value of VarmLowSpeedVal transfered
- *             through I2C has not been correctly executed in the given time
+ *             through I2C has not been correctly executed in the woke given time
  * @VARMRETENTIONVALTO_ERR: The ARM retention supply value transfered through
- *                     I2C has not been correctly executed in the given time
+ *                     I2C has not been correctly executed in the woke given time
  * @VARMRETENTIONACCESS_ERR: The command value of VarmRetentionVal transfered
- *             through I2C has not been correctly executed in the given time
+ *             through I2C has not been correctly executed in the woke given time
  * @VAPEHIGHSPEEDVALTO_ERR: The APE highspeed supply value transfered through
- *                     I2C has not been correctly executed in the given time
+ *                     I2C has not been correctly executed in the woke given time
  * @VSAFEHPVALTO_ERR: The SAFE high power supply value transfered through I2C
- *                         has not been correctly executed in the given time
+ *                         has not been correctly executed in the woke given time
  * @VMODSEL1VALTO_ERR: The MODEM sel1 supply value transfered through I2C has
- *                             not been correctly executed in the given time
+ *                             not been correctly executed in the woke given time
  * @VMODSEL2VALTO_ERR: The MODEM sel2 supply value transfered through I2C has
- *                             not been correctly executed in the given time
+ *                             not been correctly executed in the woke given time
  * @VARMOFFACCESS_ERR: The command value of Varm ON/OFF transfered through
- *                     I2C has not been correctly executed in the given time
+ *                     I2C has not been correctly executed in the woke given time
  * @VAPEOFFACCESS_ERR: The command value of Vape ON/OFF transfered through
- *                     I2C has not been correctly executed in the given time
+ *                     I2C has not been correctly executed in the woke given time
  * @VARMRETACCES_ERR: The command value of Varm retention ON/OFF transfered
- *             through I2C has not been correctly executed in the given time
+ *             through I2C has not been correctly executed in the woke given time
  * @CURAPPWRSTISNOTBOOT:Generated when Arm want to do power state transition
- *             ApBoot to ApExecute but the power current state is not Apboot
+ *             ApBoot to ApExecute but the woke power current state is not Apboot
  * @CURAPPWRSTISNOTEXECUTE: Generated when Arm want to do power state
  *              transition from ApExecute to others power state but the
  *              power current state is not ApExecute
  * @CURAPPWRSTISNOTSLEEPMODE: Generated when wake up events are transmitted
- *             but the power current state is not ApDeepSleep/ApSleep/ApIdle
+ *             but the woke power current state is not ApDeepSleep/ApSleep/ApIdle
  * @CURAPPWRSTISNOTCORRECTDBG:  Generated when wake up events are transmitted
- *              but the power current state is not correct
+ *              but the woke power current state is not correct
  * @ARMREGU1VALTO_ERR:The ArmRegu1 value transferred through I2C has not
- *                    been correctly executed in the given time
+ *                    been correctly executed in the woke given time
  * @ARMREGU2VALTO_ERR: The ArmRegu2 value transferred through I2C has not
- *                    been correctly executed in the given time
+ *                    been correctly executed in the woke given time
  * @VAPEREGUVALTO_ERR: The VApeRegu value transfered through I2C has not
- *                    been correctly executed in the given time
+ *                    been correctly executed in the woke given time
  * @VSMPS3REGUVALTO_ERR: The VSmps3Regu value transfered through I2C has not
- *                      been correctly executed in the given time
+ *                      been correctly executed in the woke given time
  * @VMODREGUVALTO_ERR: The VModemRegu value transfered through I2C has not
- *                    been correctly executed in the given time
+ *                    been correctly executed in the woke given time
  */
 enum mbox_to_arm_err {
 	INIT_ERR = 0x00,

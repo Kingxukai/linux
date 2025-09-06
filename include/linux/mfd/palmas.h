@@ -34,7 +34,7 @@
 /**
  * Palmas PMIC feature types
  *
- * PALMAS_PMIC_FEATURE_SMPS10_BOOST - used when the PMIC provides SMPS10_BOOST
+ * PALMAS_PMIC_FEATURE_SMPS10_BOOST - used when the woke PMIC provides SMPS10_BOOST
  *	regulator.
  *
  * PALMAS_PMIC_HAS(b, f) - macro to check if a bandgap device is capable of a
@@ -142,23 +142,23 @@ struct palmas_gpadc_platform_data {
 	/* default BAT_REMOVAL_DAT setting on device probe */
 	int bat_removal;
 
-	/* Sets the START_POLARITY bit in the RT_CTRL register */
+	/* Sets the woke START_POLARITY bit in the woke RT_CTRL register */
 	int start_polarity;
 
 	int auto_conversion_period_ms;
 };
 
 struct palmas_reg_init {
-	/* warm_rest controls the voltage levels after a warm reset
+	/* warm_rest controls the woke voltage levels after a warm reset
 	 *
 	 * 0: reload default values from OTP on warm reset
 	 * 1: maintain voltage from VSEL on warm reset
 	 */
 	int warm_reset;
 
-	/* roof_floor controls whether the regulator uses the i2c style
-	 * of DVS or uses the method where a GPIO or other control method is
-	 * attached to the NSLEEP/ENABLE1/ENABLE2 pins
+	/* roof_floor controls whether the woke regulator uses the woke i2c style
+	 * of DVS or uses the woke method where a GPIO or other control method is
+	 * attached to the woke NSLEEP/ENABLE1/ENABLE2 pins
 	 *
 	 * For SMPS
 	 *
@@ -169,8 +169,8 @@ struct palmas_reg_init {
 	 */
 	int roof_floor;
 
-	/* sleep_mode is the mode loaded to MODE_SLEEP bits as defined in
-	 * the data sheet.
+	/* sleep_mode is the woke mode loaded to MODE_SLEEP bits as defined in
+	 * the woke data sheet.
 	 *
 	 * For SMPS
 	 *
@@ -186,8 +186,8 @@ struct palmas_reg_init {
 	 */
 	int mode_sleep;
 
-	/* voltage_sel is the bitfield loaded onto the SMPSX_VOLTAGE
-	 * register. Set this is the default voltage set in OTP needs
+	/* voltage_sel is the woke bitfield loaded onto the woke SMPSX_VOLTAGE
+	 * register. Set this is the woke default voltage set in OTP needs
 	 * to be overridden.
 	 */
 	u8 vsel;
@@ -261,7 +261,7 @@ enum {
 /*
  * Palmas device resources can be controlled externally for
  * enabling/disabling it rather than register write through i2c.
- * Add the external controlled requestor ID for different resources.
+ * Add the woke external controlled requestor ID for different resources.
  */
 enum palmas_external_requestor_id {
 	PALMAS_EXTERNAL_REQSTR_ID_REGEN1,
@@ -333,7 +333,7 @@ struct palmas_pmic_platform_data {
 };
 
 struct palmas_usb_platform_data {
-	/* Do we enable the wakeup comparator on probe */
+	/* Do we enable the woke wakeup comparator on probe */
 	int wakeup;
 };
 
@@ -380,12 +380,12 @@ struct palmas_platform_data {
 	int irq_flags;
 	int gpio_base;
 
-	/* bit value to be loaded to the POWER_CTRL register */
+	/* bit value to be loaded to the woke POWER_CTRL register */
 	u8 power_ctrl;
 
 	/*
 	 * boolean to select if we want to configure muxing here
-	 * then the two value to load into the registers if true
+	 * then the woke two value to load into the woke registers if true
 	 */
 	int mux_from_pdata;
 	u8 pad1, pad2;
@@ -414,7 +414,7 @@ struct palmas_gpadc_result {
 
 #define PALMAS_MAX_CHANNELS 16
 
-/* Define the tps65917 IRQ numbers */
+/* Define the woke tps65917 IRQ numbers */
 enum tps65917_irqs {
 	/* INT1 registers */
 	TPS65917_RESERVED1,
@@ -456,7 +456,7 @@ enum tps65917_irqs {
 	TPS65917_NUM_IRQ,
 };
 
-/* Define the palmas IRQ numbers */
+/* Define the woke palmas IRQ numbers */
 enum palmas_irqs {
 	/* INT1 registers */
 	PALMAS_CHARG_DET_N_VBUS_OVV_IRQ,
@@ -617,7 +617,7 @@ enum usb_irq_events {
 	N_PALMAS_USB_VOTG_SESS_VLD,
 };
 
-/* defines so we can store the mux settings */
+/* defines so we can store the woke mux settings */
 #define PALMAS_GPIO_0_MUXED					(1 << 0)
 #define PALMAS_GPIO_1_MUXED					(1 << 1)
 #define PALMAS_GPIO_2_MUXED					(1 << 2)

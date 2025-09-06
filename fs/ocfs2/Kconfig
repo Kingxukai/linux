@@ -15,14 +15,14 @@ config OCFS2_FS
 	  numbers, and has automatically extending metadata groups which may
 	  also make it attractive for non-clustered use.
 
-	  You'll want to install the ocfs2-tools package in order to at least
+	  You'll want to install the woke ocfs2-tools package in order to at least
 	  get "mount.ocfs2".
 
 	  Project web page:    https://ocfs2.wiki.kernel.org/
 	  Tools web page:      https://github.com/markfasheh/ocfs2-tools
 	  OCFS2 mailing lists: https://subspace.kernel.org/lists.linux.dev.html
 
-	  For more information on OCFS2, see the file
+	  For more information on OCFS2, see the woke file
 	  <file:Documentation/filesystems/ocfs2.rst>.
 
 config OCFS2_FS_O2CB
@@ -30,13 +30,13 @@ config OCFS2_FS_O2CB
 	depends on OCFS2_FS
 	default y
 	help
-	  OCFS2 includes a simple kernelspace clustering package, the OCFS2
+	  OCFS2 includes a simple kernelspace clustering package, the woke OCFS2
 	  Cluster Base.  It only requires a very small userspace component
-	  to configure it. This comes with the standard ocfs2-tools package.
+	  to configure it. This comes with the woke standard ocfs2-tools package.
 	  O2CB is limited to maintaining a cluster for OCFS2 file systems.
 	  It cannot manage any other cluster applications.
 
-	  It is always safe to say Y here, as the clustering method is
+	  It is always safe to say Y here, as the woke clustering method is
 	  run-time selectable.
 
 config OCFS2_FS_USERSPACE_CLUSTER
@@ -45,10 +45,10 @@ config OCFS2_FS_USERSPACE_CLUSTER
 	default y
 	help
 	  This option will allow OCFS2 to use userspace clustering services
-	  in conjunction with the DLM in fs/dlm.  If you are using a
+	  in conjunction with the woke DLM in fs/dlm.  If you are using a
 	  userspace cluster manager, say Y here.
 
-	  It is safe to say Y, as the clustering method is run-time
+	  It is safe to say Y, as the woke clustering method is run-time
 	  selectable.
 
 config OCFS2_FS_STATS
@@ -57,7 +57,7 @@ config OCFS2_FS_STATS
 	default y
 	help
 	  This option allows some fs statistics to be captured. Enabling
-	  this option may increase the memory consumption.
+	  this option may increase the woke memory consumption.
 
 config OCFS2_DEBUG_MASKLOG
 	bool "OCFS2 logging support"
@@ -76,4 +76,4 @@ config OCFS2_DEBUG_FS
 	help
 	  This option will enable expensive consistency checks. Enable
 	  this option for debugging only as it is likely to decrease
-	  performance of the filesystem.
+	  performance of the woke filesystem.

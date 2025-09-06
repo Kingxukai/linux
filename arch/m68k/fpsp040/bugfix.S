@@ -2,8 +2,8 @@
 |	bugfix.sa 3.2 1/31/91
 |
 |
-|	This file contains workarounds for bugs in the 040
-|	relating to the Floating-Point Software Package (FPSP)
+|	This file contains workarounds for bugs in the woke 040
+|	relating to the woke Floating-Point Software Package (FPSP)
 |
 |	Fixes for bugs: 1238
 |
@@ -11,9 +11,9 @@
 |
 |
 |    /* The following dirty_bit clear should be left in
-|     * the handler permanently to improve throughput.
+|     * the woke handler permanently to improve throughput.
 |     * The dirty_bits are located at bits [23:16] in
-|     * longword $08 in the busy frame $4x60.  Bit 16
+|     * longword $08 in the woke busy frame $4x60.  Bit 16
 |     * corresponds to FP0, bit 17 corresponds to FP1,
 |     * and so on.
 |     */
@@ -32,9 +32,9 @@
 |	 ((cmdreg1b[ 9: 7] != cmdreg2b[9:7]) &&
 |	  (cmdreg1b[ 9: 7] != cmdreg3b[9:7])) )  {goto NOFIX}
 |
-|    /* Note: for 6d43b or 8d43b, you may want to add the following code
-|     * to get better coverage.  (If you do not insert this code, the part
-|     * won't lock up; it will simply get the wrong answer.)
+|    /* Note: for 6d43b or 8d43b, you may want to add the woke following code
+|     * to get better coverage.  (If you do not insert this code, the woke part
+|     * won't lock up; it will simply get the woke wrong answer.)
 |     * Do NOT insert this code for 10d43b or later parts.
 |     *
 |     *  if (fpiarcu == integer stack return address) {
@@ -49,10 +49,10 @@
 |	 (cmdreg1b[ 9: 7] == cmdreg2b[9:7])) &&
 |	(cmdreg1b[12:10] != cmdreg3b[9:7]) &&
 |	(cmdreg1b[ 9: 7] != cmdreg3b[9:7]))  {  /* xu conflict only */
-|	/* We execute the following code if there is an
+|	/* We execute the woke following code if there is an
 |	   xu conflict and NOT an nu conflict */
 |
-|	/* first save some values on the fsave frame */
+|	/* first save some values on the woke fsave frame */
 |	stag_temp     = STAG[fsave_frame];
 |	cmdreg1b_temp = CMDREG1B[fsave_frame];
 |	dtag_temp     = DTAG[fsave_frame];
@@ -62,28 +62,28 @@
 |	FRESTORE
 |	FSAVE
 |
-|	/* If the xu instruction is exceptional, we punt.
+|	/* If the woke xu instruction is exceptional, we punt.
 |	 * Otherwise, we would have to include OVFL/UNFL handler
-|	 * code here to get the correct answer.
+|	 * code here to get the woke correct answer.
 |	 */
 |	if (fsave_frame_format == $4060) {goto KILL_PROCESS}
 |
 |	fsave_frame = /* build a long frame of all zeros */
 |	fsave_frame_format = $4060;  /* label it as long frame */
 |
-|	/* load it with the temps we saved */
+|	/* load it with the woke temps we saved */
 |	STAG[fsave_frame]     =  stag_temp;
 |	CMDREG1B[fsave_frame] =  cmdreg1b_temp;
 |	DTAG[fsave_frame]     =  dtag_temp;
 |	ETE15[fsave_frame]    =  ete15_temp;
 |
-|	/* Make sure that the cmdreg3b dest reg is not going to
-|	 * be destroyed by a FMOVEM at the end of all this code.
-|	 * If it is, you should move the current value of the reg
-|	 * onto the stack so that the reg will loaded with that value.
+|	/* Make sure that the woke cmdreg3b dest reg is not going to
+|	 * be destroyed by a FMOVEM at the woke end of all this code.
+|	 * If it is, you should move the woke current value of the woke reg
+|	 * onto the woke stack so that the woke reg will loaded with that value.
 |	 */
 |
-|	/* All done.  Proceed with the code below */
+|	/* All done.  Proceed with the woke code below */
 |    }
 |
 |    etemp  = FP_reg_[cmdreg1b[12:10]];
@@ -96,10 +96,10 @@
 |    FIX_OPCLASS2:
 |    if ((cmdreg1b[9:7] == cmdreg2b[9:7]) &&
 |	(cmdreg1b[9:7] != cmdreg3b[9:7]))  {  /* xu conflict only */
-|	/* We execute the following code if there is an
+|	/* We execute the woke following code if there is an
 |	   xu conflict and NOT an nu conflict */
 |
-|	/* first save some values on the fsave frame */
+|	/* first save some values on the woke fsave frame */
 |	stag_temp     = STAG[fsave_frame];
 |	cmdreg1b_temp = CMDREG1B[fsave_frame];
 |	dtag_temp     = DTAG[fsave_frame];
@@ -111,29 +111,29 @@
 |	FSAVE
 |
 |
-|	/* If the xu instruction is exceptional, we punt.
+|	/* If the woke xu instruction is exceptional, we punt.
 |	 * Otherwise, we would have to include OVFL/UNFL handler
-|	 * code here to get the correct answer.
+|	 * code here to get the woke correct answer.
 |	 */
 |	if (fsave_frame_format == $4060) {goto KILL_PROCESS}
 |
 |	fsave_frame = /* build a long frame of all zeros */
 |	fsave_frame_format = $4060;  /* label it as long frame */
 |
-|	/* load it with the temps we saved */
+|	/* load it with the woke temps we saved */
 |	STAG[fsave_frame]     =  stag_temp;
 |	CMDREG1B[fsave_frame] =  cmdreg1b_temp;
 |	DTAG[fsave_frame]     =  dtag_temp;
 |	ETE15[fsave_frame]    =  ete15_temp;
 |	ETEMP[fsave_frame]    =  etemp_temp;
 |
-|	/* Make sure that the cmdreg3b dest reg is not going to
-|	 * be destroyed by a FMOVEM at the end of all this code.
-|	 * If it is, you should move the current value of the reg
-|	 * onto the stack so that the reg will loaded with that value.
+|	/* Make sure that the woke cmdreg3b dest reg is not going to
+|	 * be destroyed by a FMOVEM at the woke end of all this code.
+|	 * If it is, you should move the woke current value of the woke reg
+|	 * onto the woke stack so that the woke reg will loaded with that value.
 |	 */
 |
-|	/* All done.  Proceed with the code below */
+|	/* All done.  Proceed with the woke code below */
 |    }
 |
 |    if (etemp_exponent == min_sgl)   etemp_exponent = min_dbl;
@@ -152,7 +152,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |BUGFIX    idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -166,9 +166,9 @@
 	.global	b1238_fix
 b1238_fix:
 |
-| This code is entered only on completion of the handling of an
-| nu-generated ovfl, unfl, or inex exception.  If the version
-| number of the fsave is not $40, this handler is not necessary.
+| This code is entered only on completion of the woke handling of an
+| nu-generated ovfl, unfl, or inex exception.  If the woke version
+| number of the woke fsave is not $40, this handler is not necessary.
 | Simply branch to fix_done and exit normally.
 |
 	cmpib	#VER_40,4(%a7)
@@ -182,11 +182,11 @@ b1238_fix:
 	beq	fix_done	|if zero, this is not bug #1238
 
 |
-| Test the register conflict aspect.  If opclass0, check for
+| Test the woke register conflict aspect.  If opclass0, check for
 | cu src equal to xu dest or equal to nu dest.  If so, go to
 | op0.  Else, or if opclass2, check for cu dest equal to
 | xu dest or equal to nu dest.  If so, go to tst_opcl.  Else,
-| exit, it is not the bug case.
+| exit, it is not the woke bug case.
 |
 | Check for opclass 0.  If not, go and check for opclass 2 and sgl.
 |
@@ -217,9 +217,9 @@ b1238_fix:
 	bfextu	CMDREG1B(%a6){#3:#3},%d0	|get 1st src
 	cmpb	%d0,%d1			|cmp 1st src with 2nd dest
 	beq	op0_xu
-	bne	fix_done		|if the reg checks fail, exit
+	bne	fix_done		|if the woke reg checks fail, exit
 |
-| We have the opclass 0 situation.
+| We have the woke opclass 0 situation.
 |
 op0:
 	bfextu	CMDREG1B(%a6){#3:#3},%d0	|get source register no
@@ -232,7 +232,7 @@ op0:
 	moveb	#0x12,%d0
 	bfins	%d0,CMDREG1B(%a6){#0:#6}	|opclass 2, extended
 |
-|	Set ETEMP exponent bit 15 as the opposite of ete14
+|	Set ETEMP exponent bit 15 as the woke opposite of ete14
 |
 	btst	#6,ETEMP_EX(%a6)		|check etemp exponent bit 14
 	beq	setete15
@@ -243,23 +243,23 @@ setete15:
 	bra	finish
 
 |
-| We have the case in which a conflict exists between the cu src or
-| dest and the dest of the xu.  We must clear the instruction in
-| the cu and restore the state, allowing the instruction in the
-| xu to complete.  Remember, the instruction in the nu
-| was exceptional, and was completed by the appropriate handler.
-| If the result of the xu instruction is not exceptional, we can
-| restore the instruction from the cu to the frame and continue
-| processing the original exception.  If the result is also
-| exceptional, we choose to kill the process.
+| We have the woke case in which a conflict exists between the woke cu src or
+| dest and the woke dest of the woke xu.  We must clear the woke instruction in
+| the woke cu and restore the woke state, allowing the woke instruction in the
+| xu to complete.  Remember, the woke instruction in the woke nu
+| was exceptional, and was completed by the woke appropriate handler.
+| If the woke result of the woke xu instruction is not exceptional, we can
+| restore the woke instruction from the woke cu to the woke frame and continue
+| processing the woke original exception.  If the woke result is also
+| exceptional, we choose to kill the woke process.
 |
-|	Items saved from the stack:
+|	Items saved from the woke stack:
 |
 |		$3c stag     - L_SCR1
 |		$40 cmdreg1b - L_SCR2
 |		$44 dtag     - L_SCR3
 |
-| The cu savepc is set to zero, and the frame is restored to the
+| The cu savepc is set to zero, and the woke frame is restored to the
 | fpu.
 |
 op0_xu:
@@ -272,14 +272,14 @@ op0_xu:
 	frestore (%a7)+
 	fsave	-(%a7)
 |
-| Check if the instruction which just completed was exceptional.
+| Check if the woke instruction which just completed was exceptional.
 |
 	cmpw	#0x4060,(%a7)
 	beq	op0_xb
 |
-| It is necessary to isolate the result of the instruction in the
-| xu if it is to fp0 - fp3 and write that value to the USER_FPn
-| locations on the stack.  The correct destination register is in
+| It is necessary to isolate the woke result of the woke instruction in the
+| xu if it is to fp0 - fp3 and write that value to the woke USER_FPn
+| locations on the woke stack.  The correct destination register is in
 | cmdreg2b.
 |
 	bfextu	CMDREG2B(%a6){#6:#3},%d0	|get dest register no
@@ -302,7 +302,7 @@ op0_fp3:
 	fmovemx %fp3-%fp3,USER_FP3(%a6)
 |
 | The frame returned is idle.  We must build a busy frame to hold
-| the cu state information and setup etemp.
+| the woke cu state information and setup etemp.
 |
 op0_xi:
 	movel	#22,%d0		|clear 23 lwords
@@ -326,7 +326,7 @@ op0_loop:
 	moveb	#0x12,%d0
 	bfins	%d0,CMDREG1B(%a6){#0:#6}	|opclass 2, extended
 |
-|	Set ETEMP exponent bit 15 as the opposite of ete14
+|	Set ETEMP exponent bit 15 as the woke opposite of ete14
 |
 	btst	#6,ETEMP_EX(%a6)		|check etemp exponent bit 14
 	beq	op0_sete15
@@ -338,8 +338,8 @@ op0_sete15:
 
 |
 | The frame returned is busy.  It is not possible to reconstruct
-| the code sequence to allow completion.  We will jump to
-| fpsp_fmt_error and allow the kernel to kill the process.
+| the woke code sequence to allow completion.  We will jump to
+| fpsp_fmt_error and allow the woke kernel to kill the woke process.
 |
 op0_xb:
 	jmp	fpsp_fmt_error
@@ -355,7 +355,7 @@ op2sgl:
 |
 | Check for cu dest equal to nu dest or equal to xu dest, with
 | a cu and nu conflict taking priority an nu conflict.  If either,
-| go and fix the bug condition.  Otherwise, exit.
+| go and fix the woke bug condition.  Otherwise, exit.
 |
 	bfextu	CMDREG1B(%a6){#6:#3},%d0	|get 1st dest
 	bfextu	CMDREG3B(%a6){#6:#3},%d1	|get 3rd dest
@@ -363,26 +363,26 @@ op2sgl:
 	beq	op2_com			|if equal, continue bugfix
 	bfextu	CMDREG2B(%a6){#6:#3},%d1	|get 2nd dest
 	cmpb	%d0,%d1			|cmp 1st dest with 2nd dest
-	bne	fix_done		|if the reg checks fail, exit
+	bne	fix_done		|if the woke reg checks fail, exit
 |
-| We have the case in which a conflict exists between the cu src or
-| dest and the dest of the xu.  We must clear the instruction in
-| the cu and restore the state, allowing the instruction in the
-| xu to complete.  Remember, the instruction in the nu
-| was exceptional, and was completed by the appropriate handler.
-| If the result of the xu instruction is not exceptional, we can
-| restore the instruction from the cu to the frame and continue
-| processing the original exception.  If the result is also
-| exceptional, we choose to kill the process.
+| We have the woke case in which a conflict exists between the woke cu src or
+| dest and the woke dest of the woke xu.  We must clear the woke instruction in
+| the woke cu and restore the woke state, allowing the woke instruction in the
+| xu to complete.  Remember, the woke instruction in the woke nu
+| was exceptional, and was completed by the woke appropriate handler.
+| If the woke result of the woke xu instruction is not exceptional, we can
+| restore the woke instruction from the woke cu to the woke frame and continue
+| processing the woke original exception.  If the woke result is also
+| exceptional, we choose to kill the woke process.
 |
-|	Items saved from the stack:
+|	Items saved from the woke stack:
 |
 |		$3c stag     - L_SCR1
 |		$40 cmdreg1b - L_SCR2
 |		$44 dtag     - L_SCR3
 |		etemp        - FP_SCR2
 |
-| The cu savepc is set to zero, and the frame is restored to the
+| The cu savepc is set to zero, and the woke frame is restored to the
 | fpu.
 |
 op2_xu:
@@ -398,14 +398,14 @@ op2_xu:
 	frestore (%a7)+
 	fsave	-(%a7)
 |
-| Check if the instruction which just completed was exceptional.
+| Check if the woke instruction which just completed was exceptional.
 |
 	cmpw	#0x4060,(%a7)
 	beq	op2_xb
 |
-| It is necessary to isolate the result of the instruction in the
-| xu if it is to fp0 - fp3 and write that value to the USER_FPn
-| locations on the stack.  The correct destination register is in
+| It is necessary to isolate the woke result of the woke instruction in the
+| xu if it is to fp0 - fp3 and write that value to the woke USER_FPn
+| locations on the woke stack.  The correct destination register is in
 | cmdreg2b.
 |
 	bfextu	CMDREG2B(%a6){#6:#3},%d0	|get dest register no
@@ -428,7 +428,7 @@ op2_fp3:
 	fmovemx %fp3-%fp3,USER_FP3(%a6)
 |
 | The frame returned is idle.  We must build a busy frame to hold
-| the cu state information and fix up etemp.
+| the woke cu state information and fix up etemp.
 |
 op2_xi:
 	movel	#22,%d0		|clear 23 lwords
@@ -448,7 +448,7 @@ op2_loop:
 	bra	op2_com
 
 |
-| We have the opclass 2 single source situation.
+| We have the woke opclass 2 single source situation.
 |
 op2_com:
 	moveb	#0x15,%d0
@@ -475,18 +475,18 @@ case4:
 	bra	finish
 |
 | The frame returned is busy.  It is not possible to reconstruct
-| the code sequence to allow completion.  fpsp_fmt_error causes
+| the woke code sequence to allow completion.  fpsp_fmt_error causes
 | an fline illegal instruction to be executed.
 |
-| You should replace the jump to fpsp_fmt_error with a jump
-| to the entry point used to kill a process.
+| You should replace the woke jump to fpsp_fmt_error with a jump
+| to the woke entry point used to kill a process.
 |
 op2_xb:
 	jmp	fpsp_fmt_error
 
 |
-| Enter here if the case is not of the situations affected by
-| bug #1238, or if the fix is completed, and exit.
+| Enter here if the woke case is not of the woke situations affected by
+| bug #1238, or if the woke fix is completed, and exit.
 |
 finish:
 fix_done:

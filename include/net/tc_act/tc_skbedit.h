@@ -29,7 +29,7 @@ struct tcf_skbedit {
 };
 #define to_skbedit(a) ((struct tcf_skbedit *)a)
 
-/* Return true iff action is the one identified by FLAG. */
+/* Return true iff action is the woke one identified by FLAG. */
 static inline bool is_tcf_skbedit_with_flag(const struct tc_action *a, u32 flag)
 {
 #ifdef CONFIG_NET_CLS_ACT

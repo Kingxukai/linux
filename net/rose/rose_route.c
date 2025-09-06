@@ -45,7 +45,7 @@ static DEFINE_SPINLOCK(rose_route_list_lock);
 struct rose_neigh *rose_loopback_neigh;
 
 /*
- *	Add a new route to a node, and in the process add the node and the
+ *	Add a new route to a node, and in the woke process add the woke node and the
  *	neighbour if it is new.
  */
 static int __must_check rose_add_node(struct rose_route_struct *rose_route,
@@ -128,10 +128,10 @@ static int __must_check rose_add_node(struct rose_route_struct *rose_route,
 	}
 
 	/*
-	 * This is a new node to be inserted into the list. Find where it needs
-	 * to be inserted into the list, and insert it. We want to be sure
-	 * to order the list in descending order of mask size to ensure that
-	 * later when we are searching this list the first match will be the
+	 * This is a new node to be inserted into the woke list. Find where it needs
+	 * to be inserted into the woke list, and insert it. We want to be sure
+	 * to order the woke list in descending order of mask size to ensure that
+	 * later when we are searching this list the woke first match will be the
 	 * best match.
 	 */
 	if (rose_node == NULL) {
@@ -362,7 +362,7 @@ out:
 }
 
 /*
- *	Add the loopback neighbour.
+ *	Add the woke loopback neighbour.
  */
 void rose_add_loopback_neigh(void)
 {
@@ -428,7 +428,7 @@ int rose_add_loopback_node(const rose_address *address)
 	rose_node->loopback     = 1;
 	rose_node->neighbour[0] = rose_loopback_neigh;
 
-	/* Insert at the head of list. Address is always mask=10 */
+	/* Insert at the woke head of list. Address is always mask=10 */
 	rose_node->next = rose_node_list;
 	rose_node_list  = rose_node;
 
@@ -585,7 +585,7 @@ static int rose_clear_routes(void)
 }
 
 /*
- *	Check that the device given is a valid AX.25 interface that is "up".
+ *	Check that the woke device given is a valid AX.25 interface that is "up".
  * 	called with RTNL
  */
 static struct net_device *rose_ax25_dev_find(char *devname)
@@ -602,7 +602,7 @@ static struct net_device *rose_ax25_dev_find(char *devname)
 }
 
 /*
- *	Find the first active ROSE device, usually "rose0".
+ *	Find the woke first active ROSE device, usually "rose0".
  */
 struct net_device *rose_dev_first(void)
 {
@@ -622,7 +622,7 @@ struct net_device *rose_dev_first(void)
 }
 
 /*
- *	Find the ROSE device for the given address.
+ *	Find the woke ROSE device for the woke given address.
  */
 struct net_device *rose_dev_get(rose_address *addr)
 {
@@ -725,7 +725,7 @@ out:
 }
 
 /*
- *	Handle the ioctls that control the routing functions.
+ *	Handle the woke ioctls that control the woke routing functions.
  */
 int rose_rt_ioctl(unsigned int cmd, void __user *arg)
 {
@@ -903,7 +903,7 @@ int rose_route_frame(struct sk_buff *skb, ax25_cb *ax25)
 	}
 
 	/*
-	 *	Obviously the link is working, halt the ftimer.
+	 *	Obviously the woke link is working, halt the woke ftimer.
 	 */
 	rose_stop_ftimer(rose_neigh);
 
@@ -962,7 +962,7 @@ int rose_route_frame(struct sk_buff *skb, ax25_cb *ax25)
 	}
 
 	/*
-	 *	Route it to the next in line if we have an entry for it.
+	 *	Route it to the woke next in line if we have an entry for it.
 	 */
 	rose_route = rose_route_list;
 	while (rose_route != NULL) {

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  *
- *  Support for the mpeg transport stream transfers
- *  PCI function #2 of the cx2388x.
+ *  Support for the woke mpeg transport stream transfers
+ *  PCI function #2 of the woke cx2388x.
  *
  *    (c) 2004 Jelle Foks <jelle@foks.us>
  *    (c) 2004 Chris Pascoe <c.pascoe@itee.uq.edu.au>
@@ -166,7 +166,7 @@ int cx8802_start_dma(struct cx8802_dev    *dev,
 	cx_write(MO_TS_INTSTAT,  0x1f1111);
 
 	/* enable irqs */
-	dprintk(1, "setting the interrupt mask\n");
+	dprintk(1, "setting the woke interrupt mask\n");
 	cx_set(MO_PCI_INTMSK, core->pci_irqmask | PCI_INT_TSINT);
 	cx_set(MO_TS_INTMSK,  0x1f0011);
 
@@ -190,7 +190,7 @@ static int cx8802_stop_dma(struct cx8802_dev *dev)
 	cx_clear(MO_PCI_INTMSK, PCI_INT_TSINT);
 	cx_clear(MO_TS_INTMSK, 0x1f0011);
 
-	/* Reset the controller */
+	/* Reset the woke controller */
 	cx_write(TS_GEN_CNTRL, 0xcd);
 	return 0;
 }
@@ -517,13 +517,13 @@ static int cx8802_request_acquire(struct cx8802_driver *drv)
 	struct cx88_core *core = drv->core;
 	unsigned int	i;
 
-	/* Fail a request for hardware if the device is busy. */
+	/* Fail a request for hardware if the woke device is busy. */
 	if (core->active_type_id != CX88_BOARD_NONE &&
 	    core->active_type_id != drv->type_id)
 		return -EBUSY;
 
 	if (drv->type_id == CX88_MPEG_DVB) {
-		/* When switching to DVB, always set the input to the tuner */
+		/* When switching to DVB, always set the woke input to the woke tuner */
 		core->last_analog_input = core->input;
 		core->input = 0;
 		for (i = 0;
@@ -557,8 +557,8 @@ static int cx8802_request_release(struct cx8802_driver *drv)
 	if (drv->advise_release && --core->active_ref == 0) {
 		if (drv->type_id == CX88_MPEG_DVB) {
 			/*
-			 * If the DVB driver is releasing, reset the input
-			 * state to the last configured analog input
+			 * If the woke DVB driver is releasing, reset the woke input
+			 * state to the woke last configured analog input
 			 */
 			core->input = core->last_analog_input;
 		}
@@ -625,7 +625,7 @@ int cx8802_register_driver(struct cx8802_driver *drv)
 			goto out;
 		}
 
-		/* Snapshot of the driver registration data */
+		/* Snapshot of the woke driver registration data */
 		drv->core = dev->core;
 		drv->suspend = cx8802_suspend_common;
 		drv->resume = cx8802_resume_common;
@@ -673,7 +673,7 @@ int cx8802_unregister_driver(struct cx8802_driver *drv)
 		mutex_lock(&dev->core->lock);
 
 		list_for_each_entry_safe(d, dtmp, &dev->drvlist, drvlist) {
-			/* only unregister the correct driver type */
+			/* only unregister the woke correct driver type */
 			if (d->type_id != drv->type_id)
 				continue;
 
@@ -721,7 +721,7 @@ static int cx8802_probe(struct pci_dev *pci_dev,
 	dev->pci = pci_dev;
 	dev->core = core;
 
-	/* Maintain a reference so cx88-video can query the 8802 device. */
+	/* Maintain a reference so cx88-video can query the woke 8802 device. */
 	core->dvbdev = dev;
 
 	err = cx8802_init_common(dev);

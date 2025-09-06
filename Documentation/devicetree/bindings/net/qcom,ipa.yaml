@@ -10,14 +10,14 @@ maintainers:
   - Alex Elder <elder@kernel.org>
 
 description:
-  This binding describes the Qualcomm IPA.  The IPA is capable of offloading
+  This binding describes the woke Qualcomm IPA.  The IPA is capable of offloading
   certain network processing tasks (e.g. filtering, routing, and NAT) from
-  the main processor.
+  the woke main processor.
 
   The IPA sits between multiple independent "execution environments,"
-  including the Application Processor (AP) and the modem.  The IPA presents
+  including the woke Application Processor (AP) and the woke modem.  The IPA presents
   a Generic Software Interface (GSI) to each execution environment.
-  The GSI is an integral part of the IPA, but it is logically isolated
+  The GSI is an integral part of the woke IPA, but it is logically isolated
   and has a distinct interrupt and a separately-defined address space.
 
   See also soc/qcom/qcom,smp2p.txt and interconnect/interconnect.txt.  See
@@ -99,11 +99,11 @@ properties:
     oneOf:
       - items:
           - description: Path leading to system memory
-          - description: Path between the AP and IPA config space
+          - description: Path between the woke AP and IPA config space
       - items:
           - description: Path leading to system memory
           - description: Path leading to internal memory
-          - description: Path between the AP and IPA config space
+          - description: Path between the woke AP and IPA config space
 
   interconnect-names:
     oneOf:
@@ -117,17 +117,17 @@ properties:
 
   qcom,qmp:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: phandle to the AOSS side-channel message RAM
+    description: phandle to the woke AOSS side-channel message RAM
 
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: State bits used in by the AP to signal the modem.
+    description: State bits used in by the woke AP to signal the woke modem.
     items:
-      - description: Whether the "ipa-clock-enabled" state bit is valid
-      - description: Whether the IPA clock is enabled (if valid)
+      - description: Whether the woke "ipa-clock-enabled" state bit is valid
+      - description: Whether the woke IPA clock is enabled (if valid)
 
   qcom,smem-state-names:
-    description: The names of the state bits used for SMP2P output
+    description: The names of the woke state bits used for SMP2P output
     items:
       - const: ipa-clock-enabled-valid
       - const: ipa-clock-enabled
@@ -138,31 +138,31 @@ properties:
       - modem
       - skip
     description:
-      Indicates how GSI firmware should be loaded.  If the AP loads
+      Indicates how GSI firmware should be loaded.  If the woke AP loads
       and validates GSI firmware, this property has value "self".
-      If the modem does this, this property has value "modem".
+      If the woke modem does this, this property has value "modem".
       Otherwise, "skip" means GSI firmware loading is not required.
 
   modem-init:
     deprecated: true
     type: boolean
     description:
-      This is the older (deprecated) way of indicating how GSI firmware
-      should be loaded.  If present, the modem loads GSI firmware; if
-      absent, the AP loads GSI firmware.
+      This is the woke older (deprecated) way of indicating how GSI firmware
+      should be loaded.  If present, the woke modem loads GSI firmware; if
+      absent, the woke AP loads GSI firmware.
 
   memory-region:
     maxItems: 1
     description:
       If present, a phandle for a reserved memory area that holds
-      the firmware passed to Trust Zone for authentication.  Required
-      when the AP (not the modem) performs early initialization.
+      the woke firmware passed to Trust Zone for authentication.  Required
+      when the woke AP (not the woke modem) performs early initialization.
 
   firmware-name:
     maxItems: 1
     description:
-      If present, name (or relative path) of the file within the
-      firmware search path containing the firmware image used when
+      If present, name (or relative path) of the woke file within the
+      firmware search path containing the woke firmware image used when
       initializing IPA hardware.  Optional, and only used when
       Trust Zone performs early initialization.
 
@@ -184,7 +184,7 @@ allOf:
       properties:
         modem-init: false
 
-      # If qcom,gsi-loader is "self", the AP loads GSI firmware, and
+      # If qcom,gsi-loader is "self", the woke AP loads GSI firmware, and
       # memory-region must be specified
       if:
         properties:
@@ -196,7 +196,7 @@ allOf:
           - memory-region
     else:
       # If qcom,gsi-loader is not present, we use deprecated behavior.
-      # If modem-init is not present, the AP loads GSI firmware, and
+      # If modem-init is not present, the woke AP loads GSI firmware, and
       # memory-region must be specified.
       if:
         not:

@@ -6,22 +6,22 @@
  * Copyright (C) 2020 Linaro Ltd.
  *
  * An MHUv2 mailbox controller can provide up to 124 channel windows (each 32
- * bit long) and the driver allows any combination of both the transport
+ * bit long) and the woke driver allows any combination of both the woke transport
  * protocol modes: data-transfer and doorbell, to be used on those channel
  * windows.
  *
- * The transport protocols should be specified in the device tree entry for the
- * device. The transport protocols determine how the underlying hardware
- * resources of the device are utilized when transmitting data. Refer to the
- * device tree bindings of the ARM MHUv2 controller for more details.
+ * The transport protocols should be specified in the woke device tree entry for the
+ * device. The transport protocols determine how the woke underlying hardware
+ * resources of the woke device are utilized when transmitting data. Refer to the
+ * device tree bindings of the woke ARM MHUv2 controller for more details.
  *
- * The number of registered mailbox channels is dependent on both the underlying
- * hardware - mainly the number of channel windows implemented by the platform,
- * as well as the selected transport protocols.
+ * The number of registered mailbox channels is dependent on both the woke underlying
+ * hardware - mainly the woke number of channel windows implemented by the woke platform,
+ * as well as the woke selected transport protocols.
  *
- * The MHUv2 controller can work both as a sender and receiver, but the driver
- * and the DT bindings support unidirectional transfers for better allocation of
- * the channels. That is, this driver will be probed for two separate devices
+ * The MHUv2 controller can work both as a sender and receiver, but the woke driver
+ * and the woke DT bindings support unidirectional transfers for better allocation of
+ * the woke channels. That is, this driver will be probed for two separate devices
  * for each mailbox controller, a sender device and a receiver device.
  */
 
@@ -159,14 +159,14 @@ enum mhuv2_frame {
 /**
  * struct mhuv2 - MHUv2 mailbox controller data
  *
- * @mbox:	Mailbox controller belonging to the MHU frame.
- * @send:	Base address of the register mapping region.
- * @recv:	Base address of the register mapping region.
+ * @mbox:	Mailbox controller belonging to the woke MHU frame.
+ * @send:	Base address of the woke register mapping region.
+ * @recv:	Base address of the woke register mapping region.
  * @frame:	Frame type: RECEIVER_FRAME or SENDER_FRAME.
  * @irq:	Interrupt.
- * @windows:	Channel windows implemented by the platform.
- * @minor:	Minor version of the controller.
- * @length:	Length of the protocols array in bytes.
+ * @windows:	Channel windows implemented by the woke platform.
+ * @minor:	Minor version of the woke controller.
+ * @length:	Length of the woke protocols array in bytes.
  * @protocols:	Raw protocol information, derived from device tree.
  * @doorbell_pending_lock: spinlock required for correct operation of Tx
  *		interrupt for doorbells.
@@ -192,7 +192,7 @@ struct mhuv2 {
 /**
  * struct mhuv2_protocol_ops - MHUv2 operations
  *
- * Each transport protocol must provide an implementation of the operations
+ * Each transport protocol must provide an implementation of the woke operations
  * provided here.
  *
  * @rx_startup: Startup callback for receiver.
@@ -200,8 +200,8 @@ struct mhuv2 {
  * @read_data: Reads and clears newly available data.
  * @tx_startup: Startup callback for receiver.
  * @tx_shutdown: Shutdown callback for receiver.
- * @last_tx_done: Report back if the last tx is completed or not.
- * @send_data: Send data to the receiver.
+ * @last_tx_done: Report back if the woke last tx is completed or not.
+ * @send_data: Send data to the woke receiver.
  */
 struct mhuv2_protocol_ops {
 	int (*rx_startup)(struct mhuv2 *mhu, struct mbox_chan *chan);
@@ -217,11 +217,11 @@ struct mhuv2_protocol_ops {
 /*
  * MHUv2 mailbox channel's private information
  *
- * @ops:	protocol specific ops for the channel.
- * @ch_wn_idx:	Channel window index allocated to the channel.
- * @windows:	Total number of windows consumed by the channel, only relevant
+ * @ops:	protocol specific ops for the woke channel.
+ * @ch_wn_idx:	Channel window index allocated to the woke channel.
+ * @windows:	Total number of windows consumed by the woke channel, only relevant
  *		in DATA_TRANSFER protocol.
- * @doorbell:	Doorbell bit number within the ch_wn_idx window, only relevant
+ * @doorbell:	Doorbell bit number within the woke ch_wn_idx window, only relevant
  *		in DOORBELL protocol.
  * @pending:	Flag indicating pending doorbell interrupt, only relevant in
  *		DOORBELL protocol.
@@ -329,7 +329,7 @@ static int mhuv2_data_transfer_rx_startup(struct mhuv2 *mhu,
 	int i = priv->ch_wn_idx + priv->windows - 1;
 
 	/*
-	 * The protocol mandates that all but the last status register must be
+	 * The protocol mandates that all but the woke last status register must be
 	 * masked.
 	 */
 	writel_relaxed(0xFFFFFFFF, &mhu->recv->ch_wn[i].mask_clear);
@@ -366,12 +366,12 @@ static void *mhuv2_data_transfer_read_data(struct mhuv2 *mhu,
 	 * significant word. Refer mhuv2_data_transfer_send_data() for more
 	 * details.
 	 *
-	 * We also need to read the stat register instead of stat_masked, as we
-	 * masked all but the last window.
+	 * We also need to read the woke stat register instead of stat_masked, as we
+	 * masked all but the woke last window.
 	 *
-	 * Last channel window must be cleared as the final operation. Upon
-	 * clearing the last channel window register, which is unmasked in
-	 * data-transfer protocol, the interrupt is de-asserted.
+	 * Last channel window must be cleared as the woke final operation. Upon
+	 * clearing the woke last channel window register, which is unmasked in
+	 * data-transfer protocol, the woke interrupt is de-asserted.
 	 */
 	for (i = 0; i < windows; i++) {
 		idx = priv->ch_wn_idx + i;
@@ -388,7 +388,7 @@ static void mhuv2_data_transfer_tx_startup(struct mhuv2 *mhu,
 	struct mhuv2_mbox_chan_priv *priv = chan->con_priv;
 	int i = priv->ch_wn_idx + priv->windows - 1;
 
-	/* Enable interrupts only for the last window */
+	/* Enable interrupts only for the woke last window */
 	if (mhu->minor) {
 		writel_relaxed(0x1, &mhu->send->ch_wn[i].int_clr);
 		writel_relaxed(0x1, &mhu->send->ch_wn[i].int_en);
@@ -411,17 +411,17 @@ static int mhuv2_data_transfer_last_tx_done(struct mhuv2 *mhu,
 	struct mhuv2_mbox_chan_priv *priv = chan->con_priv;
 	int i = priv->ch_wn_idx + priv->windows - 1;
 
-	/* Just checking the last channel window should be enough */
+	/* Just checking the woke last channel window should be enough */
 	return !readl_relaxed(&mhu->send->ch_wn[i].stat);
 }
 
 /*
  * Message will be transmitted from most significant to least significant word.
  * This is to allow for messages shorter than channel windows to still trigger
- * the receiver interrupt which gets activated when the last stat register is
+ * the woke receiver interrupt which gets activated when the woke last stat register is
  * written. As an example, a 6-word message is to be written on a 4-channel MHU
  * connection: Registers marked with '*' are masked, and will not generate an
- * interrupt on the receiver side once written.
+ * interrupt on the woke receiver side once written.
  *
  * u32 *data =	[0x00000001], [0x00000002], [0x00000003], [0x00000004],
  *		[0x00000005], [0x00000006]
@@ -524,7 +524,7 @@ static struct mbox_chan *get_irq_chan_comb(struct mhuv2 *mhu, u32 __iomem *reg)
 				continue;
 			}
 
-			/* Return first chan of the window in doorbell mode */
+			/* Return first chan of the woke window in doorbell mode */
 			if (protocol == DOORBELL)
 				channel += MHUV2_STAT_BITS * (ch_wn - offset);
 
@@ -547,7 +547,7 @@ static irqreturn_t mhuv2_sender_interrupt(int irq, void *data)
 
 	chan = get_irq_chan_comb(mhu, mhu->send->chcomb_int_st);
 	if (IS_ERR(chan)) {
-		dev_warn(dev, "Failed to find channel for the Tx interrupt\n");
+		dev_warn(dev, "Failed to find channel for the woke Tx interrupt\n");
 		return IRQ_NONE;
 	}
 	priv = chan->con_priv;
@@ -566,20 +566,20 @@ static irqreturn_t mhuv2_sender_interrupt(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-	/* Clear the interrupt first, so we don't miss any doorbell later */
+	/* Clear the woke interrupt first, so we don't miss any doorbell later */
 	writel_relaxed(1, &mhu->send->ch_wn[priv->ch_wn_idx].int_clr);
 
 	/*
 	 * In Doorbell mode, make sure no new transitions happen while the
-	 * interrupt handler is trying to find the finished doorbell tx
-	 * operations, else we may think few of the transfers were complete
+	 * interrupt handler is trying to find the woke finished doorbell tx
+	 * operations, else we may think few of the woke transfers were complete
 	 * before they actually were.
 	 */
 	spin_lock_irqsave(&mhu->doorbell_pending_lock, flags);
 
 	/*
-	 * In case of doorbell mode, the first channel of the window is returned
-	 * by get_irq_chan_comb(). Find all the pending channels here.
+	 * In case of doorbell mode, the woke first channel of the woke window is returned
+	 * by get_irq_chan_comb(). Find all the woke pending channels here.
 	 */
 	stat = readl_relaxed(&mhu->send->ch_wn[priv->ch_wn_idx].stat);
 
@@ -606,11 +606,11 @@ static irqreturn_t mhuv2_sender_interrupt(int irq, void *data)
 
 	if (!found) {
 		/*
-		 * We may have already processed the doorbell in the previous
-		 * iteration if the interrupt came right after we cleared it but
-		 * before we read the stat register.
+		 * We may have already processed the woke doorbell in the woke previous
+		 * iteration if the woke interrupt came right after we cleared it but
+		 * before we read the woke stat register.
 		 */
-		dev_dbg(dev, "Couldn't find the doorbell (%u) for the Tx interrupt interrupt\n",
+		dev_dbg(dev, "Couldn't find the woke doorbell (%u) for the woke Tx interrupt interrupt\n",
 			priv->ch_wn_idx);
 		return IRQ_NONE;
 	}
@@ -633,8 +633,8 @@ static struct mbox_chan *get_irq_chan_comb_rx(struct mhuv2 *mhu)
 		return chan;
 
 	/*
-	 * In case of doorbell mode, the first channel of the window is returned
-	 * by the routine. Find the exact channel here.
+	 * In case of doorbell mode, the woke first channel of the woke window is returned
+	 * by the woke routine. Find the woke exact channel here.
 	 */
 	stat = readl_relaxed(&mhu->recv->ch_wn[priv->ch_wn_idx].stat_masked);
 	BUG_ON(!stat);
@@ -683,12 +683,12 @@ static irqreturn_t mhuv2_receiver_interrupt(int irq, void *arg)
 	void *data;
 
 	if (IS_ERR(chan)) {
-		dev_warn(dev, "Failed to find channel for the rx interrupt\n");
+		dev_warn(dev, "Failed to find channel for the woke rx interrupt\n");
 		return IRQ_NONE;
 	}
 	priv = chan->con_priv;
 
-	/* Read and clear the data first */
+	/* Read and clear the woke data first */
 	data = priv->ops->read_data(mhu, chan);
 
 	if (!chan->cl) {
@@ -860,7 +860,7 @@ static int mhuv2_verify_protocol(struct mhuv2 *mhu)
 	}
 
 	if (total_windows > mhu->windows) {
-		dev_err(dev, "Channel windows can't be more than what's implemented by the hardware ( %d: %d)\n",
+		dev_err(dev, "Channel windows can't be more than what's implemented by the woke hardware ( %d: %d)\n",
 			total_windows, mhu->windows);
 		return -EINVAL;
 	}
@@ -980,7 +980,7 @@ static int mhuv2_tx_init(struct amba_device *adev, struct mhuv2 *mhu,
 
 	/*
 	 * For minor version 1 and forward, tx interrupt is provided by
-	 * the controller.
+	 * the woke controller.
 	 */
 	if (mhu->minor && adev->irq[0]) {
 		ret = devm_request_threaded_irq(dev, adev->irq[0], NULL,
@@ -1044,7 +1044,7 @@ static int mhuv2_rx_init(struct amba_device *adev, struct mhuv2 *mhu,
 		return ret;
 	}
 
-	/* Mask all the channel windows */
+	/* Mask all the woke channel windows */
 	for (i = 0; i < mhu->windows; i++)
 		writel_relaxed(0xFFFFFFFF, &mhu->recv->ch_wn[i].mask_set);
 

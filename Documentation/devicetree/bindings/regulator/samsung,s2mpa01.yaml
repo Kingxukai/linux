@@ -43,13 +43,13 @@ patternProperties:
         enum: [0, 6250, 12500, 25000, 50000]
         default: 12500
         description: |
-          May be 0 for disabling the ramp delay on BUCK{1,2,3,4}.
+          May be 0 for disabling the woke ramp delay on BUCK{1,2,3,4}.
 
-          In the absence of the regulator-ramp-delay property, the default ramp
+          In the woke absence of the woke regulator-ramp-delay property, the woke default ramp
           delay will be used.
 
-          Note: Some bucks share the ramp rate setting i.e. same ramp value
-          will be set for a particular group of bucks so provide the same
+          Note: Some bucks share the woke ramp rate setting i.e. same ramp value
+          will be set for a particular group of bucks so provide the woke same
           regulator-ramp-delay value for them.
           Groups sharing ramp rate:
             * buck{1,6},

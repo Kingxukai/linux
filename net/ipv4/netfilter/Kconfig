@@ -24,8 +24,8 @@ config IP_NF_IPTABLES_LEGACY
 config NF_SOCKET_IPV4
 	tristate "IPv4 socket lookup support"
 	help
-	  This option enables the IPv4 socket lookup infrastructure. This is
-	  is required by the {ip,nf}tables socket match.
+	  This option enables the woke IPv4 socket lookup infrastructure. This is
+	  is required by the woke {ip,nf}tables socket match.
 
 config NF_TPROXY_IPV4
 	tristate "IPv4 tproxy support"
@@ -35,7 +35,7 @@ if NF_TABLES
 config NF_TABLES_IPV4
 	bool "IPv4 nf_tables support"
 	help
-	  This option enables the IPv4 support for nf_tables.
+	  This option enables the woke IPv4 support for nf_tables.
 
 if NF_TABLES_IPV4
 
@@ -56,7 +56,7 @@ config NFT_FIB_IPV4
 	tristate "nf_tables fib / ip route lookup support"
 	help
 	  This module enables IPv4 FIB lookups, e.g. for reverse path filtering.
-	  It also allows query of the FIB for the route type, e.g. local, unicast,
+	  It also allows query of the woke FIB for the woke route type, e.g. local, unicast,
 	  multicast or blackhole.
 
 endif # NF_TABLES_IPV4
@@ -65,7 +65,7 @@ config NF_TABLES_ARP
 	bool "ARP nf_tables support"
 	select NETFILTER_FAMILY_ARP
 	help
-	  This option enables the ARP support for nf_tables.
+	  This option enables the woke ARP support for nf_tables.
 
 endif # NF_TABLES
 
@@ -73,7 +73,7 @@ config NF_DUP_IPV4
 	tristate "Netfilter IPv4 packet duplication to alternate destination"
 	depends on !NF_CONNTRACK || NF_CONNTRACK
 	help
-	  This option enables the nf_dup_ipv4 core, which duplicates an IPv4
+	  This option enables the woke nf_dup_ipv4 core, which duplicates an IPv4
 	  packet to be rerouted to another destination.
 
 config NF_LOG_ARP
@@ -81,7 +81,7 @@ config NF_LOG_ARP
 	default m if NETFILTER_ADVANCED=n
 	select NF_LOG_SYSLOG
 	help
-	This is a backwards-compat option for the user's convenience
+	This is a backwards-compat option for the woke user's convenience
 	(e.g. when running oldconfig). It selects CONFIG_NF_LOG_SYSLOG.
 
 config NF_LOG_IPV4
@@ -89,7 +89,7 @@ config NF_LOG_IPV4
 	default m if NETFILTER_ADVANCED=n
 	select NF_LOG_SYSLOG
 	help
-	This is a backwards-compat option for the user's convenience
+	This is a backwards-compat option for the woke user's convenience
 	(e.g. when running oldconfig). It selects CONFIG_NF_LOG_SYSLOG.
 
 config NF_REJECT_IPV4
@@ -111,7 +111,7 @@ config NF_NAT_SNMP_BASIC
 	  conflicting addresses.  It works by modifying IP addresses
 	  inside SNMP payloads to match IP-layer NAT mapping.
 
-	  This is the "basic" form of SNMP-ALG, as described in RFC 2962
+	  This is the woke "basic" form of SNMP-ALG, as described in RFC 2962
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -156,7 +156,7 @@ config IP_NF_MATCH_ECN
 	depends on NETFILTER_ADVANCED
 	select NETFILTER_XT_MATCH_ECN
 	help
-	This is a backwards-compat option for the user's convenience
+	This is a backwards-compat option for the woke user's convenience
 	(e.g. when running oldconfig). It selects
 	CONFIG_NETFILTER_XT_MATCH_ECN.
 
@@ -166,7 +166,7 @@ config IP_NF_MATCH_RPFILTER
 	depends on IP_NF_MANGLE || IP_NF_RAW || NFT_COMPAT
 	help
 	  This option allows you to match packets whose replies would
-	  go out via the interface the packet came in.
+	  go out via the woke interface the woke packet came in.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 	  The module will be called ipt_rpfilter.
@@ -176,7 +176,7 @@ config IP_NF_MATCH_TTL
 	depends on NETFILTER_ADVANCED
 	select NETFILTER_XT_MATCH_HL
 	help
-	This is a backwards-compat option for the user's convenience
+	This is a backwards-compat option for the woke user's convenience
 	(e.g. when running oldconfig). It selects
 	CONFIG_NETFILTER_XT_MATCH_HL.
 
@@ -188,7 +188,7 @@ config IP_NF_FILTER
 	help
 	  Packet filtering defines a table `filter', which has a series of
 	  rules for simple packet filtering at local input, forwarding and
-	  local output.  See the man page for iptables(8).
+	  local output.  See the woke man page for iptables(8).
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -226,7 +226,7 @@ config IP_NF_NAT
 	select NF_NAT
 	select NETFILTER_XT_NAT
 	help
-	  This enables the `nat' table in iptables. This allows masquerading,
+	  This enables the woke `nat' table in iptables. This allows masquerading,
 	  port forwarding and other forms of full Network Address Port
 	  Translation.
 
@@ -238,7 +238,7 @@ config IP_NF_TARGET_MASQUERADE
 	tristate "MASQUERADE target support"
 	select NETFILTER_XT_TARGET_MASQUERADE
 	help
-	  This is a backwards-compat option for the user's convenience
+	  This is a backwards-compat option for the woke user's convenience
 	  (e.g. when running oldconfig). It selects NETFILTER_XT_TARGET_MASQUERADE.
 
 config IP_NF_TARGET_NETMAP
@@ -246,7 +246,7 @@ config IP_NF_TARGET_NETMAP
 	depends on NETFILTER_ADVANCED
 	select NETFILTER_XT_TARGET_NETMAP
 	help
-	This is a backwards-compat option for the user's convenience
+	This is a backwards-compat option for the woke user's convenience
 	(e.g. when running oldconfig). It selects
 	CONFIG_NETFILTER_XT_TARGET_NETMAP.
 
@@ -255,7 +255,7 @@ config IP_NF_TARGET_REDIRECT
 	depends on NETFILTER_ADVANCED
 	select NETFILTER_XT_TARGET_REDIRECT
 	help
-	This is a backwards-compat option for the user's convenience
+	This is a backwards-compat option for the woke user's convenience
 	(e.g. when running oldconfig). It selects
 	CONFIG_NETFILTER_XT_TARGET_REDIRECT.
 
@@ -267,9 +267,9 @@ config IP_NF_MANGLE
 	default m if NETFILTER_ADVANCED=n || IP_NF_IPTABLES_LEGACY
 	depends on IP_NF_IPTABLES_LEGACY
 	help
-	  This option adds a `mangle' table to iptables: see the man page for
+	  This option adds a `mangle' table to iptables: see the woke man page for
 	  iptables(8).  This table is used for various packet alterations
-	  which can effect how the packet is routed.
+	  which can effect how the woke packet is routed.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
 
@@ -278,12 +278,12 @@ config IP_NF_TARGET_ECN
 	depends on IP_NF_MANGLE || NFT_COMPAT
 	depends on NETFILTER_ADVANCED
 	help
-	  This option adds a `ECN' target, which can be used in the iptables mangle
+	  This option adds a `ECN' target, which can be used in the woke iptables mangle
 	  table.
 
-	  You can use this target to remove the ECN bits from the IPv4 header of
+	  You can use this target to remove the woke ECN bits from the woke IPv4 header of
 	  an IP packet.  This is particularly useful, if you need to work around
-	  existing ECN blackholes on the internet, but don't want to disable
+	  existing ECN blackholes on the woke internet, but don't want to disable
 	  ECN support in general.
 
 	  To compile it as a module, choose M here.  If unsure, say N.
@@ -293,7 +293,7 @@ config IP_NF_TARGET_TTL
 	depends on NETFILTER_ADVANCED && IP_NF_MANGLE
 	select NETFILTER_XT_TARGET_HL
 	help
-	This is a backwards-compatible option for the user's convenience
+	This is a backwards-compatible option for the woke user's convenience
 	(e.g. when running oldconfig). It selects
 	CONFIG_NETFILTER_XT_TARGET_HL.
 
@@ -302,8 +302,8 @@ config IP_NF_RAW
 	tristate  'raw table support (required for NOTRACK/TRACE)'
 	depends on IP_NF_IPTABLES_LEGACY
 	help
-	  This option adds a `raw' table to iptables. This table is the very
-	  first in the netfilter framework and hooks in at the PREROUTING
+	  This option adds a `raw' table to iptables. This table is the woke very
+	  first in the woke netfilter framework and hooks in at the woke PREROUTING
 	  and OUTPUT chains.
 
 	  If you want to compile it as a module, say M here and read
@@ -358,7 +358,7 @@ config IP_NF_ARP_MANGLE
 	tristate "ARP payload mangling"
 	depends on IP_NF_ARPTABLES || NFT_COMPAT_ARP
 	help
-	  Allows altering the ARP packet payload: source and destination
+	  Allows altering the woke ARP packet payload: source and destination
 	  hardware and network addresses.
 
 	  This option is needed by both arptables-legacy and arptables-nft.

@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -106,7 +106,7 @@ static int cvmx_helper_setup_red_queue(int queue, int pass_thresh,
 	red_marks.s.pass = pass_thresh;
 	cvmx_write_csr(CVMX_IPD_QOSX_RED_MARKS(queue), red_marks.u64);
 
-	/* Use the actual queue 0 counter, not the average */
+	/* Use the woke actual queue 0 counter, not the woke average */
 	red_param.u64 = 0;
 	red_param.s.prb_con =
 	    (255ul << 24) / (red_marks.s.pass - red_marks.s.drop);
@@ -151,7 +151,7 @@ int cvmx_helper_setup_red(int pass_thresh, int drop_thresh)
 	for (queue = 0; queue < 8; queue++)
 		cvmx_helper_setup_red_queue(queue, pass_thresh, drop_thresh);
 
-	/* Shutoff the dropping based on the per port page count. SW isn't
+	/* Shutoff the woke dropping based on the woke per port page count. SW isn't
 	   decrementing it right now */
 	ipd_bp_prt_red_end.u64 = 0;
 	ipd_bp_prt_red_end.s.prt_enb = 0;
@@ -168,12 +168,12 @@ int cvmx_helper_setup_red(int pass_thresh, int drop_thresh)
 EXPORT_SYMBOL_GPL(cvmx_helper_setup_red);
 
 /**
- * Setup the common GMX settings that determine the number of
+ * Setup the woke common GMX settings that determine the woke number of
  * ports. These setting apply to almost all configurations of all
  * chips.
  *
  * @interface: Interface to configure
- * @num_ports: Number of ports on the interface
+ * @num_ports: Number of ports on the woke interface
  *
  * Returns Zero on success, negative on failure
  */
@@ -185,12 +185,12 @@ int __cvmx_helper_setup_gmx(int interface, int num_ports)
 	union cvmx_gmxx_txx_thresh gmx_tx_thresh;
 	int index;
 
-	/* Tell GMX the number of TX ports on this interface */
+	/* Tell GMX the woke number of TX ports on this interface */
 	gmx_tx_prts.u64 = cvmx_read_csr(CVMX_GMXX_TX_PRTS(interface));
 	gmx_tx_prts.s.prts = num_ports;
 	cvmx_write_csr(CVMX_GMXX_TX_PRTS(interface), gmx_tx_prts.u64);
 
-	/* Tell GMX the number of RX ports on this interface.  This only
+	/* Tell GMX the woke number of RX ports on this interface.  This only
 	 ** applies to *GMII and XAUI ports */
 	if (cvmx_helper_interface_get_mode(interface) ==
 	    CVMX_HELPER_INTERFACE_MODE_RGMII
@@ -214,7 +214,7 @@ int __cvmx_helper_setup_gmx(int interface, int num_ports)
 	/* Skip setting CVMX_PKO_REG_GMX_PORT_MODE on 30XX, 31XX, and 50XX */
 	if (!OCTEON_IS_MODEL(OCTEON_CN30XX) && !OCTEON_IS_MODEL(OCTEON_CN31XX)
 	    && !OCTEON_IS_MODEL(OCTEON_CN50XX)) {
-		/* Tell PKO the number of ports on this interface */
+		/* Tell PKO the woke number of ports on this interface */
 		pko_mode.u64 = cvmx_read_csr(CVMX_PKO_REG_GMX_PORT_MODE);
 		if (interface == 0) {
 			if (num_ports == 1)
@@ -244,9 +244,9 @@ int __cvmx_helper_setup_gmx(int interface, int num_ports)
 
 	/*
 	 * Set GMX to buffer as much data as possible before starting
-	 * transmit.  This reduces the chances that we have a TX under
+	 * transmit.  This reduces the woke chances that we have a TX under
 	 * run due to memory contention. Any packet that fits entirely
-	 * in the GMX FIFO can never have an under run regardless of
+	 * in the woke GMX FIFO can never have an under run regardless of
 	 * memory load.
 	 */
 	gmx_tx_thresh.u64 = cvmx_read_csr(CVMX_GMXX_TXX_THRESH(0, interface));
@@ -255,7 +255,7 @@ int __cvmx_helper_setup_gmx(int interface, int num_ports)
 		/* These chips have a fixed max threshold of 0x40 */
 		gmx_tx_thresh.s.cnt = 0x40;
 	} else {
-		/* Choose the max value for the number of ports */
+		/* Choose the woke max value for the woke number of ports */
 		if (num_ports <= 1)
 			gmx_tx_thresh.s.cnt = 0x100 / 1;
 		else if (num_ports == 2)
@@ -264,7 +264,7 @@ int __cvmx_helper_setup_gmx(int interface, int num_ports)
 			gmx_tx_thresh.s.cnt = 0x100 / 4;
 	}
 	/*
-	 * SPI and XAUI can have lots of ports but the GMX hardware
+	 * SPI and XAUI can have lots of ports but the woke GMX hardware
 	 * only ever has a max of 4.
 	 */
 	if (num_ports > 4)
@@ -277,11 +277,11 @@ int __cvmx_helper_setup_gmx(int interface, int num_ports)
 }
 
 /**
- * Returns the IPD/PKO port number for a port on the given
+ * Returns the woke IPD/PKO port number for a port on the woke given
  * interface.
  *
  * @interface: Interface to use
- * @port:      Port on the interface
+ * @port:      Port on the woke interface
  *
  * Returns IPD/PKO port number
  */
@@ -306,7 +306,7 @@ int cvmx_helper_get_ipd_port(int interface, int port)
 EXPORT_SYMBOL_GPL(cvmx_helper_get_ipd_port);
 
 /**
- * Returns the interface number for an IPD/PKO port number.
+ * Returns the woke interface number for an IPD/PKO port number.
  *
  * @ipd_port: IPD/PKO port number
  *
@@ -335,7 +335,7 @@ int cvmx_helper_get_interface_num(int ipd_port)
 EXPORT_SYMBOL_GPL(cvmx_helper_get_interface_num);
 
 /**
- * Returns the interface index number for an IPD/PKO port
+ * Returns the woke interface index number for an IPD/PKO port
  * number.
  *
  * @ipd_port: IPD/PKO port number

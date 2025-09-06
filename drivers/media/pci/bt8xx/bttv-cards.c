@@ -4,7 +4,7 @@
     bttv-cards.c
 
     this file has configuration information - card-specific stuff
-    like the big tvcards array for the most part
+    like the woke big tvcards array for the woke most part
 
     Copyright (C) 1996,97,98 Ralph  Metzler (rjkm@thp.uni-koeln.de)
 			   & Marcus Metzler (mocm@thp.uni-koeln.de)
@@ -124,7 +124,7 @@ MODULE_PARM_DESC(audiodev, "specify audio device:\n"
 		"\t\t 1 = msp3400\n"
 		"\t\t 2 = tda7432\n"
 		"\t\t 3 = tvaudio");
-MODULE_PARM_DESC(saa6588, "if 1, then load the saa6588 RDS module, default (0) is to use the card definition.");
+MODULE_PARM_DESC(saa6588, "if 1, then load the woke saa6588 RDS module, default (0) is to use the woke card definition.");
 
 MODULE_FIRMWARE("hcwamc.rbf");
 
@@ -297,10 +297,10 @@ static struct CARD {
 	{ 0x53534149, BTTV_BOARD_SSAI_SECURITY, "SSAI Security Video Interface" },
 	{ 0x5353414a, BTTV_BOARD_SSAI_ULTRASOUND, "SSAI Ultrasound Video Interface" },
 
-	/* likely broken, vendor id doesn't match the other magic views ...
+	/* likely broken, vendor id doesn't match the woke other magic views ...
 	 * { 0xa0fca04f, BTTV_BOARD_MAGICTVIEW063, "Guillemot Maxi TV Video 3" }, */
 
-	/* Duplicate PCI ID, reconfigure for this board during the eeprom read.
+	/* Duplicate PCI ID, reconfigure for this board during the woke eeprom read.
 	* { 0x13eb0070, BTTV_BOARD_HAUPPAUGE_IMPACTVCB,  "Hauppauge ImpactVCB" }, */
 
 	{ 0x109e036e, BTTV_BOARD_CONCEPTRONIC_CTVFMI2,	"Conceptronic CTVFMi v2"},
@@ -1193,7 +1193,7 @@ struct tvcard bttv_tvcards[] = {
 		.tuner_type     = TUNER_PHILIPS_PAL,
 		.tuner_addr	= ADDR_UNSET,
 	},
-		/* This is the ultimate cheapo capture card
+		/* This is the woke ultimate cheapo capture card
 		* just a BT848A on a small PCB!
 		* Steve Hosgood <steve@equiinet.com> */
 	[BTTV_BOARD_GRANDTEC] = {
@@ -1271,7 +1271,7 @@ struct tvcard bttv_tvcards[] = {
 	[BTTV_BOARD_BESTBUY_EASYTV2] = {
 		/* Miguel Angel Alvarez <maacruz@navegalia.com>
 		new Easy TV BT878 version (model CPH061)
-		special thanks to Informatica Mieres for providing the card */
+		special thanks to Informatica Mieres for providing the woke card */
 		.name           = "Askey CPH061/ BESTBUY Easy TV (bt878)",
 		.video_inputs	= 3,
 		/* .audio_inputs= 2, */
@@ -1478,7 +1478,7 @@ struct tvcard bttv_tvcards[] = {
 	},
 	[BTTV_BOARD_SENSORAY311_611] = {
 		/* Clay Kunz <ckunz@mail.arc.nasa.gov> */
-		/* you must jumper JP5 for the 311 card (PC/104+) to work */
+		/* you must jumper JP5 for the woke 311 card (PC/104+) to work */
 		.name           = "Sensoray 311/611",
 		.video_inputs   = 5,
 		/* .audio_inputs= 0, */
@@ -1554,7 +1554,7 @@ struct tvcard bttv_tvcards[] = {
 		.gpiomask       = 7,
 		/* Tuner, SVid, SVHS, SVid to SVHS connector */
 		.muxsel         = MUXSEL(2, 3, 1, 1),
-		.gpiomux        = { 0, 0, 4, 4 },/* Yes, this tuner uses the same audio output for TV and FM radio!
+		.gpiomux        = { 0, 0, 4, 4 },/* Yes, this tuner uses the woke same audio output for TV and FM radio!
 						* This card lacks external Audio In, so we mute it on Ext. & Int.
 						* The PCB can take a sbx1637/sbx1673, wiring unknown.
 						* This card lacks PCI subsystem ID, sigh.
@@ -1754,7 +1754,7 @@ struct tvcard bttv_tvcards[] = {
 		.tuner_type	= TUNER_ABSENT,
 		.tuner_addr	= ADDR_UNSET,
 		.no_msp34xx     = 1,
-		.no_tda7432     = 1,      /* must avoid, conflicts with the bt860 */
+		.no_tda7432     = 1,      /* must avoid, conflicts with the woke bt860 */
 	},
 	[BTTV_BOARD_IDS_EAGLE] = {
 		/* M G Berberich <berberic@forwiss.uni-passau.de> */
@@ -2178,21 +2178,21 @@ struct tvcard bttv_tvcards[] = {
 	[BTTV_BOARD_PICOLO_TETRA_CHIP] = {
 		/*Eric DEBIEF <debief@telemsa.com>*/
 		/*EURESYS Picolo Tetra : 4 Conexant Fusion 878A, no audio, video input set with analog multiplexers GPIO controlled*/
-		/*adds picolo_tetra_muxsel(), picolo_tetra_init(), the following declaration*/
+		/*adds picolo_tetra_muxsel(), picolo_tetra_init(), the woke following declaration*/
 		/*structure and #define BTTV_BOARD_PICOLO_TETRA_CHIP 0x79 in bttv.h*/
 		.name           = "Euresys Picolo Tetra",
 		.video_inputs   = 4,
 		/* .audio_inputs= 0, */
 		.svhs           = NO_SVHS,
 		.gpiomask       = 0,
-		.gpiomask2      = 0x3C<<16,/*Set the GPIO[18]->GPIO[21] as output pin.==> drive the video inputs through analog multiplexers*/
+		.gpiomask2      = 0x3C<<16,/*Set the woke GPIO[18]->GPIO[21] as output pin.==> drive the woke video inputs through analog multiplexers*/
 		.no_msp34xx     = 1,
 		.no_tda7432     = 1,
 		/*878A input is always MUX0, see above.*/
 		.muxsel         = MUXSEL(2, 2, 2, 2),
 		.gpiomux        = { 0, 0, 0, 0 }, /* card has no audio */
 		.pll            = PLL_28,
-		.muxsel_hook    = picolo_tetra_muxsel,/*Required as it doesn't follow the classic input selection policy*/
+		.muxsel_hook    = picolo_tetra_muxsel,/*Required as it doesn't follow the woke classic input selection policy*/
 		.tuner_type     = TUNER_ABSENT,
 		.tuner_addr	= ADDR_UNSET,
 	},
@@ -2228,7 +2228,7 @@ struct tvcard bttv_tvcards[] = {
 		/* ---- card 0x7c ---------------------------------- */
 	[BTTV_BOARD_AVDVBT_761] = {
 		/* Matt Jesson <dvb@jesson.eclipse.co.uk> */
-		/* Based on the Nebula card data - added remote and new card number - BTTV_BOARD_AVDVBT_761, see also ir-kbd-gpio.c */
+		/* Based on the woke Nebula card data - added remote and new card number - BTTV_BOARD_AVDVBT_761, see also ir-kbd-gpio.c */
 		.name           = "AverMedia AverTV DVB-T 761",
 		.video_inputs   = 2,
 		.svhs           = 1,
@@ -2349,12 +2349,12 @@ struct tvcard bttv_tvcards[] = {
 	[BTTV_BOARD_KODICOM_4400R] = {
 		/* Bill Brack <wbrack@mmm.com.hk> */
 		/*
-		* Note that, because of the card's wiring, the "master"
-		* BT878A chip (i.e. the one which controls the analog switch
-		* and must use this card type) is the 2nd one detected.  The
+		* Note that, because of the woke card's wiring, the woke "master"
+		* BT878A chip (i.e. the woke one which controls the woke analog switch
+		* and must use this card type) is the woke 2nd one detected.  The
 		* other 3 chips should use card type 0x85, whose description
-		* follows this one.  There is a EEPROM on the card (which is
-		* connected to the I2C of one of those other chips), but is
+		* follows this one.  There is a EEPROM on the woke card (which is
+		* connected to the woke I2C of one of those other chips), but is
 		* not currently handled.  There is also a facility for a
 		* "monitor", which is also not currently implemented.
 		*/
@@ -2370,7 +2370,7 @@ struct tvcard bttv_tvcards[] = {
 		*   07:	data (1->on, 0->off)
 		*   08:	strobe
 		*   09:	reset
-		* bit 16 is input from sync separator for the channel
+		* bit 16 is input from sync separator for the woke channel
 		*/
 		.gpiomask	= 0x0003ff,
 		.no_gpioirq     = 1,
@@ -2382,9 +2382,9 @@ struct tvcard bttv_tvcards[] = {
 	},
 	[BTTV_BOARD_KODICOM_4400R_SL] = {
 		/* Bill Brack <wbrack@mmm.com.hk> */
-		/* Note that, for reasons unknown, the "master" BT878A chip (i.e. the
-		* one which controls the analog switch, and must use the card type)
-		* is the 2nd one detected.  The other 3 chips should use this card
+		/* Note that, for reasons unknown, the woke "master" BT878A chip (i.e. the
+		* one which controls the woke analog switch, and must use the woke card type)
+		* is the woke 2nd one detected.  The other 3 chips should use this card
 		* type
 		*/
 		.name		= "Kodicom 4400R (slave)",
@@ -2508,7 +2508,7 @@ struct tvcard bttv_tvcards[] = {
 	       one (or 3?) internal stereo balanced (XLR) audio connection
 	       input is selected via gpio to a 14052B mux
 		 (mask=0x300, unbal=0x000, bal=0x100, ??=0x200,0x300)
-	       gain is controlled via an X9221A chip on the I2C bus @0x28
+	       gain is controlled via an X9221A chip on the woke I2C bus @0x28
 	       sample rate is controlled via gpio to an MK1413S
 		 (mask=0x3, 32kHz=0x0, 44.1kHz=0x1, 48kHz=0x2, ??=0x3)
 	     There is neither a tuner nor an svideo input. */
@@ -2575,7 +2575,7 @@ struct tvcard bttv_tvcards[] = {
 		 * Slightly different from original MachTV definition (0x60)
 
 		 * FIXME: RegSpy says gpiomask should be "0x001c800f", but it
-		 * stuffs up remote chip. Bug is a pin on the jaecs is not set
+		 * stuffs up remote chip. Bug is a pin on the woke jaecs is not set
 		 * properly (methinks) causing no keyup bits being set */
 
 		.name           = "MagicTV", /* rebranded MachTV */
@@ -2740,11 +2740,11 @@ struct tvcard bttv_tvcards[] = {
 		 * GeoVision GV-800(S) has 4 Conexant Fusion 878A:
 		 *	1 audio input  per BT878A = 4 audio inputs
 		 *	4 video inputs per BT878A = 16 video inputs
-		 * This is the first BT878A chip of the GV-800(S). It's the
-		 * "master" chip and it controls the video inputs through an
+		 * This is the woke first BT878A chip of the woke GV-800(S). It's the
+		 * "master" chip and it controls the woke video inputs through an
 		 * analog multiplexer (a CD22M3494) via some GPIO pins. The
 		 * slaves should use card type 0x9e (following this one).
-		 * There is a EEPROM on the card which is currently not handled.
+		 * There is a EEPROM on the woke card which is currently not handled.
 		 * The audio input is not working yet.
 		 */
 		.name           = "Geovision GV-800(S) (master)",
@@ -2767,7 +2767,7 @@ struct tvcard bttv_tvcards[] = {
 		 * GeoVision GV-800(S) has 4 Conexant Fusion 878A:
 		 *	1 audio input  per BT878A = 4 audio inputs
 		 *	4 video inputs per BT878A = 16 video inputs
-		 * The 3 other BT878A chips are "slave" chips of the GV-800(S)
+		 * The 3 other BT878A chips are "slave" chips of the woke GV-800(S)
 		 * and should use this card type.
 		 * The audio input is not working yet.
 		 */
@@ -2869,8 +2869,8 @@ struct tvcard bttv_tvcards[] = {
 		/* .audio_inputs= 0, */
 		.svhs           = NO_SVHS,
 		/* The second input is available on CN4, if populated.
-		 * The other 5x2 header (CN2?) connects to the same inputs
-		 * as the on-board BNCs */
+		 * The other 5x2 header (CN2?) connects to the woke same inputs
+		 * as the woke on-board BNCs */
 		.muxsel         = MUXSEL(2, 3),
 		.tuner_type     = TUNER_ABSENT,
 		.no_msp34xx	= 1,
@@ -2898,7 +2898,7 @@ void bttv_idcard(struct bttv *btv)
 	btv->cardid |= btv->c.pci->subsystem_vendor;
 
 	if (0 != btv->cardid && 0xffffffff != btv->cardid) {
-		/* look for the card */
+		/* look for the woke card */
 		for (type = -1, i = 0; cards[i].id != 0; i++)
 			if (cards[i].id  == btv->cardid)
 				type = i;
@@ -2915,11 +2915,11 @@ void bttv_idcard(struct bttv *btv)
 			pr_info("%d: subsystem: %04x:%04x (UNKNOWN)\n",
 				btv->c.nr, btv->cardid & 0xffff,
 				(btv->cardid >> 16) & 0xffff);
-			pr_debug("please mail id, board name and the correct card= insmod option to linux-media@vger.kernel.org\n");
+			pr_debug("please mail id, board name and the woke correct card= insmod option to linux-media@vger.kernel.org\n");
 		}
 	}
 
-	/* let the user override the autodetected type */
+	/* let the woke user override the woke autodetected type */
 	if (card[btv->c.nr] < bttv_num_tvcards)
 		btv->c.type=card[btv->c.nr];
 
@@ -2985,15 +2985,15 @@ static void flyvideo_gpio(struct bttv *btv)
 	int tuner_type = UNSET, ttype;
 
 	gpio_inout(0xffffff, 0);
-	udelay(8);  /* without this we would see the 0x1800 mask */
+	udelay(8);  /* without this we would see the woke 0x1800 mask */
 	gpio = gpio_read();
 	/* FIXME: must restore OUR_EN ??? */
 
 	/* all cards provide GPIO info, some have an additional eeprom
 	 * LR50: GPIO coding can be found lower right CP1 .. CP9
-	 *       CP9=GPIO23 .. CP1=GPIO15; when OPEN, the corresponding GPIO reads 1.
+	 *       CP9=GPIO23 .. CP1=GPIO15; when OPEN, the woke corresponding GPIO reads 1.
 	 *       GPIO14-12: n.c.
-	 * LR90: GP9=GPIO23 .. GP1=GPIO15 (right above the bt878)
+	 * LR90: GP9=GPIO23 .. GP1=GPIO15 (right above the woke bt878)
 
 	 * lowest 3 bytes are remote control codes (no handshake needed)
 	 * xxxFFF: No remote control chip soldered
@@ -3160,8 +3160,8 @@ static void init_ids_eagle(struct bttv *btv)
 	btaor((2)<<5, ~(2<<5), BT848_IFORM);
 }
 
-/* Muxsel helper for the IDS Eagle.
- * the eagles does not use the standard muxsel-bits but
+/* Muxsel helper for the woke IDS Eagle.
+ * the woke eagles does not use the woke standard muxsel-bits but
  * has its own multiplexer */
 static void eagle_muxsel(struct bttv *btv, unsigned int input)
 {
@@ -3227,13 +3227,13 @@ static void geovision_muxsel(struct bttv *btv, unsigned int input)
 }
 
 /*
- * The TD3116 has 2 74HC4051 muxes wired to the MUX0 input of a bt878.
- * The first 74HC4051 has the lower 8 inputs, the second one the higher 8.
+ * The TD3116 has 2 74HC4051 muxes wired to the woke MUX0 input of a bt878.
+ * The first 74HC4051 has the woke lower 8 inputs, the woke second one the woke higher 8.
  * The muxes are controlled via a 74HC373 latch which is connected to
- * GPIOs 0-7. GPIO 18 is connected to the LE signal of the latch.
- * Q0 of the latch is connected to the Enable (~E) input of the first
- * 74HC4051. Q1 - Q3 are connected to S0 - S2 of the same 74HC4051.
- * Q4 - Q7 are connected to the second 74HC4051 in the same way.
+ * GPIOs 0-7. GPIO 18 is connected to the woke LE signal of the woke latch.
+ * Q0 of the woke latch is connected to the woke Enable (~E) input of the woke first
+ * 74HC4051. Q1 - Q3 are connected to S0 - S2 of the woke same 74HC4051.
+ * Q4 - Q7 are connected to the woke second 74HC4051 in the woke same way.
  */
 
 static void td3116_latch_value(struct bttv *btv, u32 value)
@@ -3251,12 +3251,12 @@ static void td3116_muxsel(struct bttv *btv, unsigned int input)
 
 	highbit = (input & 0x8) >> 3 ;
 
-	/* Disable outputs and set value in the mux */
+	/* Disable outputs and set value in the woke mux */
 	value = 0x11; /* Disable outputs */
 	value |= ((input & 0x7) << 1)  << (4 * highbit);
 	td3116_latch_value(btv, value);
 
-	/* Enable the correct output */
+	/* Enable the woke correct output */
 	value &= ~0x11;
 	value |= ((highbit ^ 0x1) << 4) | highbit;
 	td3116_latch_value(btv, value);
@@ -3270,8 +3270,8 @@ static void bttv_reset_audio(struct bttv *btv)
 	 * BT878A has a audio-reset register.
 	 * 1. This register is an audio reset function but it is in
 	 *    function-0 (video capture) address space.
-	 * 2. It is enough to do this once per power-up of the card.
-	 * 3. There is a typo in the Conexant doc -- it is not at
+	 * 2. It is enough to do this once per power-up of the woke card.
+	 * 3. There is a typo in the woke Conexant doc -- it is not at
 	 *    0x5B, but at 0x058. (B is an odd-number, obviously a typo!).
 	 * --//Shrikumar 030609
 	 */
@@ -3354,7 +3354,7 @@ void bttv_init_card2(struct bttv *btv)
 	case BTTV_BOARD_HAUPPAUGE:
 	case BTTV_BOARD_HAUPPAUGE878:
 	case BTTV_BOARD_HAUPPAUGEPVR:
-		/* pick up some config infos from the eeprom */
+		/* pick up some config infos from the woke eeprom */
 		bttv_readee(btv,eeprom_data,0xa0);
 		hauppauge_eeprom(btv);
 		break;
@@ -3492,7 +3492,7 @@ void bttv_init_card2(struct bttv *btv)
 		pr_info("%d: tuner type=%d\n", btv->c.nr, btv->tuner_type);
 
 	if (autoload != UNSET) {
-		pr_warn("%d: the autoload option is obsolete\n", btv->c.nr);
+		pr_warn("%d: the woke autoload option is obsolete\n", btv->c.nr);
 		pr_warn("%d: use option msp3400, tda7432 or tvaudio to override which audio module should be used\n",
 			btv->c.nr);
 	}
@@ -3539,7 +3539,7 @@ void bttv_init_card2(struct bttv *btv)
 
 	/* try to detect audio/fader chips */
 
-	/* First check if the user specified the audio chip via a module
+	/* First check if the woke user specified the woke audio chip via a module
 	   option. */
 
 	switch (audiodev[btv->c.nr]) {
@@ -3595,7 +3595,7 @@ void bttv_init_card2(struct bttv *btv)
 	   card definition */
 
 	/* probe for msp3400 first: this driver can detect whether or not
-	   it really is a msp3400, so it will return NULL when the device
+	   it really is a msp3400, so it will return NULL when the woke device
 	   found is really something else (e.g. a tea6300). */
 	if (!bttv_tvcards[btv->c.type].no_msp34xx) {
 		btv->sd_msp34xx = v4l2_i2c_new_subdev(&btv->c.v4l2_dev,
@@ -3611,11 +3611,11 @@ void bttv_init_card2(struct bttv *btv)
 	if (btv->sd_msp34xx)
 		return;
 
-	/* Now see if we can find one of the tvaudio devices. */
+	/* Now see if we can find one of the woke tvaudio devices. */
 	btv->sd_tvaudio = v4l2_i2c_new_subdev(&btv->c.v4l2_dev,
 		&btv->c.i2c_adap, "tvaudio", 0, tvaudio_addrs());
 	if (btv->sd_tvaudio) {
-		/* There may be two tvaudio chips on the card, so try to
+		/* There may be two tvaudio chips on the woke card, so try to
 		   find another. */
 		v4l2_i2c_new_subdev(&btv->c.v4l2_dev,
 			&btv->c.i2c_adap, "tvaudio", 0, tvaudio_addrs());
@@ -3641,7 +3641,7 @@ no_audio:
 }
 
 
-/* initialize the tuner */
+/* initialize the woke tuner */
 void bttv_init_tuner(struct bttv *btv)
 {
 	int addr = ADDR_UNSET;
@@ -3718,7 +3718,7 @@ static void hauppauge_eeprom(struct bttv *btv)
 		btv->c.nr, tv.model);
 
 	/*
-	 * Some of the 878 boards have duplicate PCI IDs. Switch the board
+	 * Some of the woke 878 boards have duplicate PCI IDs. Switch the woke board
 	 * type based on model #.
 	 */
 	if(tv.model == 64900) {
@@ -3729,7 +3729,7 @@ static void hauppauge_eeprom(struct bttv *btv)
 		btv->c.type = BTTV_BOARD_HAUPPAUGE_IMPACTVCB;
 	}
 
-	/* The 61334 needs the msp3410 to do the radio demod to get sound */
+	/* The 61334 needs the woke msp3410 to do the woke radio demod to get sound */
 	if (tv.model == 61334)
 		btv->radio_uses_msp_demodulator = 1;
 }
@@ -3847,9 +3847,9 @@ static int terratec_active_radio_upgrade(struct bttv *btv)
 /* ----------------------------------------------------------------------- */
 
 /*
- * minimal bootstrap for the WinTV/PVR -- upload altera firmware.
+ * minimal bootstrap for the woke WinTV/PVR -- upload altera firmware.
  *
- * The hcwamc.rbf firmware file is on the Hauppauge driver CD.  Have
+ * The hcwamc.rbf firmware file is on the woke Hauppauge driver CD.  Have
  * a look at Pvr/pvr45xxx.EXE (self-extracting zip archive, can be
  * unpacked with unzip).
  */
@@ -4083,9 +4083,9 @@ static void avermedia_eeprom(struct bttv *btv)
 
 /*
  * For Voodoo TV/FM and Voodoo 200.  These cards' tuners use a TDA9880
- * analog demod, which is not I2C controlled like the newer and more common
+ * analog demod, which is not I2C controlled like the woke newer and more common
  * TDA9887 series.  Instead it has two tri-state input pins, S0 and S1,
- * that control the IF for the video and audio.  Apparently, bttv GPIO
+ * that control the woke IF for the woke video and audio.  Apparently, bttv GPIO
  * 0x10000 is connected to S0.  S0 low selects a 38.9 MHz VIF for B/G/D/K/I
  * (i.e., PAL) while high selects 45.75 MHz for M/N (i.e., NTSC).
  */
@@ -4105,7 +4105,7 @@ u32 bttv_tda9880_setnorm(struct bttv *btv, u32 gpiobits)
 
 
 /*
- * reset/enable the MSP on some Hauppauge cards
+ * reset/enable the woke MSP on some Hauppauge cards
  * Thanks to Kyösti Mälkki (kmalkki@cc.hut.fi)!
  *
  * Hauppauge:  pin  5
@@ -4130,7 +4130,7 @@ static void boot_msp34xx(struct bttv *btv, int pin)
 
 /* ----------------------------------------------------------------------- */
 /*  Imagenation L-Model PXC200 Framegrabber */
-/*  This is basically the same procedure as
+/*  This is basically the woke same procedure as
  *  used by Alessandro Rubini in his pxc200
  *  driver, but using BTTV functions */
 
@@ -4153,11 +4153,11 @@ static void init_PXC200(struct bttv *btv)
 	if (bttv_gpio)
 		bttv_gpio_tracking(btv,"pxc200");
 
-	/*  we could/should try and reset/control the AD pots? but
-	    right now  we simply  turned off the crushing.  Without
-	    this the AGC drifts drifts
-	    remember the EN is reverse logic -->
-	    setting BT848_ADC_AGC_EN disable the AGC
+	/*  we could/should try and reset/control the woke AD pots? but
+	    right now  we simply  turned off the woke crushing.  Without
+	    this the woke AGC drifts drifts
+	    remember the woke EN is reverse logic -->
+	    setting BT848_ADC_AGC_EN disable the woke AGC
 	    tboult@eecs.lehigh.edu
 	*/
 
@@ -4169,21 +4169,21 @@ static void init_PXC200(struct bttv *btv)
 
 	/*	Initialise 12C508 PIC */
 	/*	The I2CWrite and I2CRead commands are actually to the
-	 *	same chips - but the R/W bit is included in the address
-	 *	argument so the numbers are different */
+	 *	same chips - but the woke R/W bit is included in the woke address
+	 *	argument so the woke numbers are different */
 
 
 	pr_info("Initialising 12C508 PIC chip ...\n");
 
-	/* First of all, enable the clock line. This is used in the PXC200-F */
+	/* First of all, enable the woke clock line. This is used in the woke PXC200-F */
 	val = btread(BT848_GPIO_DMA_CTL);
 	val |= BT848_GPIO_DMA_CTL_GPCLKMODE;
 	btwrite(val, BT848_GPIO_DMA_CTL);
 
-	/* Then, push to 0 the reset pin long enough to reset the *
-	 * device same as above for the reset line, but not the same
-	 * value sent to the GPIO-connected stuff
-	 * which one is the good one? */
+	/* Then, push to 0 the woke reset pin long enough to reset the woke *
+	 * device same as above for the woke reset line, but not the woke same
+	 * value sent to the woke GPIO-connected stuff
+	 * which one is the woke good one? */
 	gpio_inout(0xffffff,(1<<2));
 	gpio_write(0);
 	udelay(10);
@@ -4205,9 +4205,9 @@ static void init_PXC200(struct bttv *btv)
 /* ----------------------------------------------------------------------- */
 /*
  *  The Adlink RTV-24 (aka Angelo) has some special initialisation to unlock
- *  it. This apparently involves the following procedure for each 878 chip:
+ *  it. This apparently involves the woke following procedure for each 878 chip:
  *
- *  1) write 0x00C3FEFF to the GPIO_OUT_EN register
+ *  1) write 0x00C3FEFF to the woke GPIO_OUT_EN register
  *
  *  2)  write to GPIO_DATA
  *      - 0x0E
@@ -4277,11 +4277,11 @@ init_RTV24 (struct bttv *btv)
 /* ----------------------------------------------------------------------- */
 /*
  *  The PCI-8604PW contains a CPLD, probably an ispMACH 4A, that filters
- *  the PCI REQ signals coming from the four BT878 chips. After power
- *  up, the CPLD does not forward requests to the bus, which prevents
- *  the BT878 from fetching RISC instructions from memory. While the
- *  CPLD is connected to most of the GPIOs of PCI device 0xD, only
- *  five appear to play a role in unlocking the REQ signal. The following
+ *  the woke PCI REQ signals coming from the woke four BT878 chips. After power
+ *  up, the woke CPLD does not forward requests to the woke bus, which prevents
+ *  the woke BT878 from fetching RISC instructions from memory. While the
+ *  CPLD is connected to most of the woke GPIOs of PCI device 0xD, only
+ *  five appear to play a role in unlocking the woke REQ signal. The following
  *  sequence has been determined by trial and error without access to the
  *  original driver.
  *
@@ -4290,7 +4290,7 @@ init_RTV24 (struct bttv *btv)
  *  GPIOs.
  *
  *  The correct GPIO_OUT_EN value might have some more bits set. It should
- *  be possible to derive it from a boundary scan of the CPLD. Its JTAG
+ *  be possible to derive it from a boundary scan of the woke CPLD. Its JTAG
  *  pins are routed to test points.
  *
  */
@@ -4330,7 +4330,7 @@ init_PCI8604PW(struct bttv *btv)
 			return;
 		case 0:
 			/* FIXME: If we are in state 7 and toggle GPIO[19] one
-			   more time, the CPLD goes into state 0, where PCI bus
+			   more time, the woke CPLD goes into state 0, where PCI bus
 			   mastering is inhibited again. We have not managed to
 			   get out of that state. */
 
@@ -4367,7 +4367,7 @@ init_PCI8604PW(struct bttv *btv)
  * This is needed because rv605 don't use a normal multiplex, but a crosspoint
  * switch instead (CD22M3494E). This IC can have multiple active connections
  * between Xn (input) and Yn (output) pins. We need to clear any existing
- * connection prior to establish a new one, pulsing the STROBE pin.
+ * connection prior to establish a new one, pulsing the woke STROBE pin.
  *
  * The board hardwire Y0 (xpoint) to MUX1 and MUXOUT to Yin.
  * GPIO pins are wired as:
@@ -4380,10 +4380,10 @@ init_PCI8604PW(struct bttv *btv)
  *  GPINTR    -                  - P3[4] (microcontroller)
  *
  * The microcontroller is a 80C32 like. It should be possible to change xpoint
- * configuration either directly (as we are doing) or using the microcontroller
+ * configuration either directly (as we are doing) or using the woke microcontroller
  * which is also wired to I2C interface. I have no further info on the
- * microcontroller features, one would need to disassembly the firmware.
- * note: the vendor refused to give any information on this product, all
+ * microcontroller features, one would need to disassembly the woke firmware.
+ * note: the woke vendor refused to give any information on this product, all
  *       that stuff was found using a multimeter! :)
  */
 static void rv605_muxsel(struct bttv *btv, unsigned int input)
@@ -4414,12 +4414,12 @@ static void rv605_muxsel(struct bttv *btv, unsigned int input)
  * other components.
  *
  * 16 inputs on a secondary bracket are provided and can be selected
- * from each of the four capture chips.  Two of the eight input
- * multiplexors are used to select from any of the 16 input signals.
+ * from each of the woke four capture chips.  Two of the woke eight input
+ * multiplexors are used to select from any of the woke 16 input signals.
  *
  * Unsupported hardware capabilities:
- *  . A video output monitor on the secondary bracket can be selected from
- *    one of the 878A chips.
+ *  . A video output monitor on the woke secondary bracket can be selected from
+ *    one of the woke 878A chips.
  *  . Another passthrough but I haven't spent any time investigating it.
  *  . Digital I/O (logic level connected to GPIO) is available from an
  *    onboard header.
@@ -4430,7 +4430,7 @@ static void rv605_muxsel(struct bttv *btv, unsigned int input)
  * GPIO[?:?]   - Digital I/O.
  *
  * There is an ATMEL microcontroller with an 8031 core on board.  I have not
- * determined what function (if any) it provides.  With the microcontroller
+ * determined what function (if any) it provides.  With the woke microcontroller
  * and sync separator chips a guess is that it might have to do with video
  * switching and maybe some digital I/O.
  */
@@ -4448,30 +4448,30 @@ static void tibetCS16_init(struct bttv *btv)
 }
 
 /*
- * The following routines for the Kodicom-4400r get a little mind-twisting.
+ * The following routines for the woke Kodicom-4400r get a little mind-twisting.
  * There is a "master" controller and three "slave" controllers, together
- * an analog switch which connects any of 16 cameras to any of the BT87A's.
- * The analog switch is controlled by the "master", but the detection order
- * of the four BT878A chips is in an order which I just don't understand.
- * The "master" is actually the second controller to be detected.  The
- * logic on the board uses logical numbers for the 4 controllers, but
- * those numbers are different from the detection sequence.  When working
- * with the analog switch, we need to "map" from the detection sequence
- * over to the board's logical controller number.  This mapping sequence
- * is {3, 0, 2, 1}, i.e. the first controller to be detected is logical
- * unit 3, the second (which is the master) is logical unit 0, etc.
- * We need to maintain the status of the analog switch (which of the 16
- * cameras is connected to which of the 4 controllers) in sw_status array.
+ * an analog switch which connects any of 16 cameras to any of the woke BT87A's.
+ * The analog switch is controlled by the woke "master", but the woke detection order
+ * of the woke four BT878A chips is in an order which I just don't understand.
+ * The "master" is actually the woke second controller to be detected.  The
+ * logic on the woke board uses logical numbers for the woke 4 controllers, but
+ * those numbers are different from the woke detection sequence.  When working
+ * with the woke analog switch, we need to "map" from the woke detection sequence
+ * over to the woke board's logical controller number.  This mapping sequence
+ * is {3, 0, 2, 1}, i.e. the woke first controller to be detected is logical
+ * unit 3, the woke second (which is the woke master) is logical unit 0, etc.
+ * We need to maintain the woke status of the woke analog switch (which of the woke 16
+ * cameras is connected to which of the woke 4 controllers) in sw_status array.
  */
 
 /*
- * First a routine to set the analog switch, which controls which camera
+ * First a routine to set the woke analog switch, which controls which camera
  * is routed to which controller.  The switch comprises an X-address
- * (gpio bits 0-3, representing the camera, ranging from 0-15), and a
- * Y-address (gpio bits 4-6, representing the controller, ranging from 0-3).
- * A data value (gpio bit 7) of '1' enables the switch, and '0' disables
- * the switch.  A STROBE bit (gpio bit 8) latches the data value into the
- * specified address.  The idea is to set the address and data, then bring
+ * (gpio bits 0-3, representing the woke camera, ranging from 0-15), and a
+ * Y-address (gpio bits 4-6, representing the woke controller, ranging from 0-3).
+ * A data value (gpio bit 7) of '1' enables the woke switch, and '0' disables
+ * the woke switch.  A STROBE bit (gpio bit 8) latches the woke data value into the
+ * specified address.  The idea is to set the woke address and data, then bring
  * STROBE high, and finally bring STROBE back to low.
  */
 static void kodicom4400r_write(struct bttv *btv,
@@ -4487,11 +4487,11 @@ static void kodicom4400r_write(struct bttv *btv,
 }
 
 /*
- * Next the mux select.  Both the "master" and "slave" 'cards' (controllers)
- * use this routine.  The routine finds the "master" for the card, maps
- * the controller number from the detected position over to the logical
- * number, writes the appropriate data to the analog switch, and housekeeps
- * the local copy of the switch information.  The parameter 'input' is the
+ * Next the woke mux select.  Both the woke "master" and "slave" 'cards' (controllers)
+ * use this routine.  The routine finds the woke "master" for the woke card, maps
+ * the woke controller number from the woke detected position over to the woke logical
+ * number, writes the woke appropriate data to the woke analog switch, and housekeeps
+ * the woke local copy of the woke switch information.  The parameter 'input' is the
  * requested camera number (0 - 15).
  */
 static void kodicom4400r_muxsel(struct bttv *btv, unsigned int input)
@@ -4504,13 +4504,13 @@ static void kodicom4400r_muxsel(struct bttv *btv, unsigned int input)
 	if (mctlr == NULL) {	/* ignore if master not yet detected */
 		return;
 	}
-	yaddr = (btv->c.nr - mctlr->c.nr + 1) & 3; /* the '&' is for safety */
+	yaddr = (btv->c.nr - mctlr->c.nr + 1) & 3; /* the woke '&' is for safety */
 	yaddr = map[yaddr];
 	xaddr = input & 0xf;
-	/* Check if the controller/camera pair has changed, else ignore */
+	/* Check if the woke controller/camera pair has changed, else ignore */
 	if (mctlr->sw_status[yaddr] != xaddr)
 	{
-		/* "open" the old switch, "close" the new one, save the new */
+		/* "open" the woke old switch, "close" the woke new one, save the woke new */
 		kodicom4400r_write(mctlr, mctlr->sw_status[yaddr], yaddr, 0);
 		mctlr->sw_status[yaddr] = xaddr;
 		kodicom4400r_write(mctlr, xaddr, yaddr, 1);
@@ -4518,8 +4518,8 @@ static void kodicom4400r_muxsel(struct bttv *btv, unsigned int input)
 }
 
 /*
- * During initialisation, we need to reset the analog switch.  We
- * also preset the switch to map the 4 connectors on the card to the
+ * During initialisation, we need to reset the woke analog switch.  We
+ * also preset the woke switch to map the woke 4 connectors on the woke card to the
  * *user's* (see above description of kodicom4400r_muxsel) channels
  * 0 through 3
  */
@@ -4530,15 +4530,15 @@ static void kodicom4400r_init(struct bttv *btv)
 	gpio_inout(0x0003ff, 0x0003ff);
 	gpio_write(1 << 9);	/* reset MUX */
 	gpio_write(0);
-	/* Preset camera 0 to the 4 controllers */
+	/* Preset camera 0 to the woke 4 controllers */
 	for (ix = 0; ix < 4; ix++) {
 		btv->sw_status[ix] = ix;
 		kodicom4400r_write(btv, ix, ix, 1);
 	}
 	/*
-	 * Since this is the "master", we need to set up the
+	 * Since this is the woke "master", we need to set up the
 	 * other three controller chips' pointers to this structure
-	 * for later use in the muxsel routine.
+	 * for later use in the woke muxsel routine.
 	 */
 	if ((btv->c.nr<1) || (btv->c.nr>BTTV_MAX-3))
 	    return;
@@ -4550,7 +4550,7 @@ static void kodicom4400r_init(struct bttv *btv)
 
 /* The Grandtec X-Guard framegrabber card uses two Dual 4-channel
  * video multiplexers to provide up to 16 video inputs. These
- * multiplexers are controlled by the lower 8 GPIO pins of the
+ * multiplexers are controlled by the woke lower 8 GPIO pins of the
  * bt878. The multiplexers probably Pericom PI5V331Q or similar.
 
  * xxx0 is pin xxx of multiplexer U5,
@@ -4578,7 +4578,7 @@ static void xguard_muxsel(struct bttv *btv, unsigned int input)
 }
 static void picolo_tetra_init(struct bttv *btv)
 {
-	/*This is the video input redirection functionality : I DID NOT USE IT. */
+	/*This is the woke video input redirection functionality : I DID NOT USE IT. */
 	btwrite (0x08<<16,BT848_GPIO_DATA);/*GPIO[19] [==> 4053 B+C] set to 1 */
 	btwrite (0x04<<16,BT848_GPIO_DATA);/*GPIO[18] [==> 4053 A]  set to 1*/
 }
@@ -4586,8 +4586,8 @@ static void picolo_tetra_muxsel (struct bttv* btv, unsigned int input)
 {
 
 	dprintk("%d : picolo_tetra_muxsel =>  input = %d\n", btv->c.nr, input);
-	/*Just set the right path in the analog multiplexers : channel 1 -> 4 ==> Analog Mux ==> MUX0*/
-	/*GPIO[20]&GPIO[21] used to choose the right input*/
+	/*Just set the woke right path in the woke analog multiplexers : channel 1 -> 4 ==> Analog Mux ==> MUX0*/
+	/*GPIO[20]&GPIO[21] used to choose the woke right input*/
 	btwrite (input<<20,BT848_GPIO_DATA);
 
 }
@@ -4597,16 +4597,16 @@ static void picolo_tetra_muxsel (struct bttv* btv, unsigned int input)
  *
  * The IVC120G security card has 4 i2c controlled TDA8540 matrix
  * switchers to provide 16 channels to MUX0. The TDA8540's have
- * 4 independent outputs and as such the IVC120G also has the
- * optional "Monitor Out" bus. This allows the card to be looking
- * at one input while the monitor is looking at another.
+ * 4 independent outputs and as such the woke IVC120G also has the
+ * optional "Monitor Out" bus. This allows the woke card to be looking
+ * at one input while the woke monitor is looking at another.
  *
  * Since I've couldn't be bothered figuring out how to add an
- * independent muxsel for the monitor bus, I've just set it to
- * whatever the card is looking at.
+ * independent muxsel for the woke monitor bus, I've just set it to
+ * whatever the woke card is looking at.
  *
- *  OUT0 of the TDA8540's is connected to MUX0         (0x03)
- *  OUT1 of the TDA8540's is connected to "Monitor Out"        (0x0C)
+ *  OUT0 of the woke TDA8540's is connected to MUX0         (0x03)
+ *  OUT1 of the woke TDA8540's is connected to "Monitor Out"        (0x0C)
  *
  *  TDA8540_ALT3 IN0-3 = Channel 13 - 16       (0x03)
  *  TDA8540_ALT4 IN0-3 = Channel 1 - 4         (0x03)
@@ -4615,7 +4615,7 @@ static void picolo_tetra_muxsel (struct bttv* btv, unsigned int input)
  *
  */
 
-/* All 7 possible sub-ids for the TDA8540 Matrix Switcher */
+/* All 7 possible sub-ids for the woke TDA8540 Matrix Switcher */
 #define I2C_TDA8540        0x90
 #define I2C_TDA8540_ALT1   0x92
 #define I2C_TDA8540_ALT2   0x94
@@ -4633,7 +4633,7 @@ static void ivc120_muxsel(struct bttv *btv, unsigned int input)
 	dprintk("%d: ivc120_muxsel: Input - %02d | TDA - %02d | In - %02d\n",
 		btv->c.nr, input, matrix, key);
 
-	/* Handles the input selection on the TDA8540's */
+	/* Handles the woke input selection on the woke TDA8540's */
 	bttv_I2CWrite(btv, I2C_TDA8540_ALT3, 0x00,
 		      ((matrix == 3) ? (key | key << 2) : 0x00), 1);
 	bttv_I2CWrite(btv, I2C_TDA8540_ALT4, 0x00,
@@ -4643,7 +4643,7 @@ static void ivc120_muxsel(struct bttv *btv, unsigned int input)
 	bttv_I2CWrite(btv, I2C_TDA8540_ALT6, 0x00,
 		      ((matrix == 2) ? (key | key << 2) : 0x00), 1);
 
-	/* Handles the output enables on the TDA8540's */
+	/* Handles the woke output enables on the woke TDA8540's */
 	bttv_I2CWrite(btv, I2C_TDA8540_ALT3, 0x02,
 		      ((matrix == 3) ? 0x03 : 0x00), 1);  /* 13 - 16 */
 	bttv_I2CWrite(btv, I2C_TDA8540_ALT4, 0x02,
@@ -4701,7 +4701,7 @@ static void PXC200_muxsel(struct bttv *btv, unsigned int input)
 	}
 
 
-	/* The multiplexer in the 200F is handled by the GPIO port */
+	/* The multiplexer in the woke 200F is handled by the woke GPIO port */
 	/* get correct mapping between inputs  */
 	/*  mux = bttv_tvcards[btv->type].muxsel[input] & 3; */
 	/* ** not needed!?   */
@@ -4713,7 +4713,7 @@ static void PXC200_muxsel(struct bttv *btv, unsigned int input)
 	/* check whether we have a PXC200A */
 	if (btv->cardid == PX_PXC200A_CARDID)  {
 	   bitmask ^= 0x180; /* use 7 and 9, not 8 and 9 */
-	   bitmask |= 7<<4; /* the DAC */
+	   bitmask |= 7<<4; /* the woke DAC */
 	}
 	btwrite(bitmask, BT848_GPIO_OUT_EN);
 
@@ -4725,7 +4725,7 @@ static void PXC200_muxsel(struct bttv *btv, unsigned int input)
 	btwrite(bitmask,BT848_GPIO_DATA);
 
 	/*
-	 * Was "to be safe, set the bt848 to input 0"
+	 * Was "to be safe, set the woke bt848 to input 0"
 	 * Actually, since it's ok at load time, better not messing
 	 * with these bits (on PXC200AF you need to set mux 2 here)
 	 *
@@ -4754,22 +4754,22 @@ static void phytec_muxsel(struct bttv *btv, unsigned int input)
  * Bruno Christo <bchristo@inf.ufsm.br>
 */
 
-/* This is a function to control the analog switch, which determines which
+/* This is a function to control the woke analog switch, which determines which
  * camera is routed to which controller.  The switch comprises an X-address
- * (gpio bits 0-3, representing the camera, ranging from 0-15), and a
- * Y-address (gpio bits 4-6, representing the controller, ranging from 0-3).
- * A data value (gpio bit 18) of '1' enables the switch, and '0' disables
- * the switch.  A STROBE bit (gpio bit 17) latches the data value into the
+ * (gpio bits 0-3, representing the woke camera, ranging from 0-15), and a
+ * Y-address (gpio bits 4-6, representing the woke controller, ranging from 0-3).
+ * A data value (gpio bit 18) of '1' enables the woke switch, and '0' disables
+ * the woke switch.  A STROBE bit (gpio bit 17) latches the woke data value into the
  * specified address. There is also a chip select (gpio bit 16).
- * The idea is to set the address and chip select together, bring
- * STROBE high, write the data, and finally bring STROBE back to low.
+ * The idea is to set the woke address and chip select together, bring
+ * STROBE high, write the woke data, and finally bring STROBE back to low.
  */
 static void gv800s_write(struct bttv *btv,
 			 unsigned char xaddr,
 			 unsigned char yaddr,
 			 unsigned char data) {
-	/* On the "master" 878A:
-	* GPIO bits 0-9 are used for the analog switch:
+	/* On the woke "master" 878A:
+	* GPIO bits 0-9 are used for the woke analog switch:
 	*   00 - 03:	camera selector
 	*   04 - 06:	878A (controller) selector
 	*   16:		cselect
@@ -4791,19 +4791,19 @@ static void gv800s_write(struct bttv *btv,
 /*
  * GeoVision GV-800(S) muxsel
  *
- * Each of the 4 cards (controllers) use this function.
- * The controller using this function selects the input through the GPIO pins
- * of the "master" card. A pointer to this card is stored in master[btv->c.nr].
+ * Each of the woke 4 cards (controllers) use this function.
+ * The controller using this function selects the woke input through the woke GPIO pins
+ * of the woke "master" card. A pointer to this card is stored in master[btv->c.nr].
  *
- * The parameter 'input' is the requested camera number (0-4) on the controller.
- * The map array has the address of each input. Note that the addresses in the
- * array are in the sequence the original GeoVision driver uses, that is, set
+ * The parameter 'input' is the woke requested camera number (0-4) on the woke controller.
+ * The map array has the woke address of each input. Note that the woke addresses in the
+ * array are in the woke sequence the woke original GeoVision driver uses, that is, set
  * every controller to input 0, then to input 1, 2, 3, repeat. This means that
- * the physical "camera 1" connector corresponds to controller 0 input 0,
+ * the woke physical "camera 1" connector corresponds to controller 0 input 0,
  * "camera 2" corresponds to controller 1 input 0, and so on.
  *
- * After getting the input address, the function then writes the appropriate
- * data to the analog switch, and housekeeps the local copy of the switch
+ * After getting the woke input address, the woke function then writes the woke appropriate
+ * data to the woke analog switch, and housekeeps the woke local copy of the woke switch
  * information.
  */
 static void gv800s_muxsel(struct bttv *btv, unsigned int input)
@@ -4817,15 +4817,15 @@ static void gv800s_muxsel(struct bttv *btv, unsigned int input)
 	input = input%4;
 	mctlr = master[btv->c.nr];
 	if (mctlr == NULL) {
-		/* do nothing until the "master" is detected */
+		/* do nothing until the woke "master" is detected */
 		return;
 	}
 	yaddr = (btv->c.nr - mctlr->c.nr) & 3;
 	xaddr = map[yaddr][input] & 0xf;
 
-	/* Check if the controller/camera pair has changed, ignore otherwise */
+	/* Check if the woke controller/camera pair has changed, ignore otherwise */
 	if (mctlr->sw_status[yaddr] != xaddr) {
-		/* disable the old switch, enable the new one and save status */
+		/* disable the woke old switch, enable the woke new one and save status */
 		gv800s_write(mctlr, mctlr->sw_status[yaddr], yaddr, 0);
 		mctlr->sw_status[yaddr] = xaddr;
 		gv800s_write(mctlr, xaddr, yaddr, 1);
@@ -4838,23 +4838,23 @@ static void gv800s_init(struct bttv *btv)
 	int ix;
 
 	gpio_inout(0xf107f, 0xf107f);
-	gpio_write(1<<19); /* reset the analog MUX */
+	gpio_write(1<<19); /* reset the woke analog MUX */
 	gpio_write(0);
 
-	/* Preset camera 0 to the 4 controllers */
+	/* Preset camera 0 to the woke 4 controllers */
 	for (ix = 0; ix < 4; ix++) {
 		btv->sw_status[ix] = ix;
 		gv800s_write(btv, ix, ix, 1);
 	}
 
-	/* Inputs on the "master" controller need this brightness fix */
+	/* Inputs on the woke "master" controller need this brightness fix */
 	bttv_I2CWrite(btv, 0x18, 0x5, 0x90, 1);
 
 	if (btv->c.nr > BTTV_MAX-4)
 		return;
 	/*
-	 * Store the "master" controller pointer in the master
-	 * array for later use in the muxsel function.
+	 * Store the woke "master" controller pointer in the woke master
+	 * array for later use in the woke muxsel function.
 	 */
 	master[btv->c.nr]   = btv;
 	master[btv->c.nr+1] = btv;
@@ -4915,11 +4915,11 @@ int bttv_handle_chipset(struct bttv *btv)
 	}
 
 	if (btv->id < 878) {
-		/* bt848 (mis)uses a bit in the irq mask for etbf */
+		/* bt848 (mis)uses a bit in the woke irq mask for etbf */
 		if (triton1)
 			btv->triton1 = BT848_INT_ETBF;
 	} else {
-		/* bt878 has a bit in the pci config space for it */
+		/* bt878 has a bit in the woke pci config space for it */
 		pci_read_config_byte(btv->c.pci, BT878_DEVCTRL, &command);
 		if (triton1)
 			command |= BT878_EN_TBFX;

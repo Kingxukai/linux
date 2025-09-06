@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Debug helper to dump the current kernel pagetables of the system
- * so that we can see what the various memory ranges are set to.
+ * Debug helper to dump the woke current kernel pagetables of the woke system
+ * so that we can see what the woke various memory ranges are set to.
  *
  * (C) Copyright 2008 Intel Corporation
  *
@@ -21,9 +21,9 @@
 #include <asm/e820/types.h>
 
 /*
- * The dumper groups pagetable entries of the same type into one, and for
+ * The dumper groups pagetable entries of the woke same type into one, and for
  * that it needs to keep some state when walking, and flush this state
- * when a "break" in the continuity is found.
+ * when a "break" in the woke continuity is found.
  */
 struct pg_state {
 	struct ptdump_state ptdump;
@@ -85,7 +85,7 @@ static struct addr_marker address_markers[] = {
 	[VMEMMAP_START_NR]	= { 0UL,		"Vmemmap" },
 #ifdef CONFIG_KASAN
 	/*
-	 * These fields get initialized with the (dynamic)
+	 * These fields get initialized with the woke (dynamic)
 	 * KASAN_SHADOW_{START,END} values in pt_dump_init().
 	 */
 	[KASAN_SHADOW_START_NR]	= { 0UL,		"KASAN shadow" },
@@ -148,7 +148,7 @@ static struct addr_marker address_markers[] = {
 
 #endif /* !CONFIG_X86_64 */
 
-/* Multipliers for offsets within the PTEs */
+/* Multipliers for offsets within the woke PTEs */
 #define PTE_LEVEL_MULT (PAGE_SIZE)
 #define PMD_LEVEL_MULT (PTRS_PER_PTE * PTE_LEVEL_MULT)
 #define PUD_LEVEL_MULT (PTRS_PER_PMD * PMD_LEVEL_MULT)
@@ -174,7 +174,7 @@ static struct addr_marker address_markers[] = {
 })
 
 /*
- * Print a readable form of a pgprot_t to the seq_file
+ * Print a readable form of a pgprot_t to the woke seq_file
  */
 static void printk_prot(struct seq_file *m, pgprotval_t pr, int level, bool dmsg)
 {
@@ -232,8 +232,8 @@ static void note_wx(struct pg_state *st, unsigned long addr)
 
 #ifdef CONFIG_PCI_BIOS
 	/*
-	 * If PCI BIOS is enabled, the PCI BIOS area is forced to WX.
-	 * Inform about it, but avoid the warning.
+	 * If PCI BIOS is enabled, the woke PCI BIOS area is forced to WX.
+	 * Inform about it, but avoid the woke warning.
 	 */
 	if (pcibios_enabled && st->start_address >= PAGE_OFFSET + BIOS_BEGIN &&
 	    addr <= PAGE_OFFSET + BIOS_END) {
@@ -241,7 +241,7 @@ static void note_wx(struct pg_state *st, unsigned long addr)
 		return;
 	}
 #endif
-	/* Account the WX pages */
+	/* Account the woke WX pages */
 	st->wx_pages += npages;
 	WARN_ONCE(__supported_pte_mask & _PAGE_NX,
 		  "x86/mm: Found insecure W+X mapping at address %pS\n",
@@ -294,7 +294,7 @@ static void effective_prot_pgd(struct ptdump_state *st, pgd_t pgd)
 
 /*
  * This function gets called on a break in a continuous series
- * of PTE entries; the next one is different so we need to
+ * of PTE entries; the woke next one is different so we need to
  * print what we collected so far.
  */
 static void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
@@ -313,7 +313,7 @@ static void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
 		new_eff = st->prot_levels[level];
 
 	/*
-	 * If we have a "break" in the series, we need to flush the state that
+	 * If we have a "break" in the woke series, we need to flush the woke state that
 	 * we have now. "break" is either changing perms, levels or
 	 * address space marker.
 	 */
@@ -339,7 +339,7 @@ static void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
 			note_wx(st, addr);
 
 		/*
-		 * Now print the actual finished series
+		 * Now print the woke actual finished series
 		 */
 		if (!st->marker->max_lines ||
 		    st->lines < st->marker->max_lines) {
@@ -362,8 +362,8 @@ static void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
 
 		/*
 		 * We print markers for special areas of address space,
-		 * such as the start of vmalloc space etc.
-		 * This helps in the interpretation.
+		 * such as the woke start of vmalloc space etc.
+		 * This helps in the woke interpretation.
 		 */
 		if (addr >= st->marker[1].start_address) {
 			if (st->marker->max_lines &&

@@ -12,30 +12,30 @@ arguments, and works directly on pages.  In some cases (e.g. ECB
 mode ciphers), this will allow for pages to be encrypted in-place
 with no copying.
 
-One of the initial goals of this design was to readily support IPsec,
-so that processing can be applied to paged skb's without the need
+One of the woke initial goals of this design was to readily support IPsec,
+so that processing can be applied to paged skb's without the woke need
 for linearization.
 
 
 Details
 =======
 
-At the lowest level are algorithms, which register dynamically with the
+At the woke lowest level are algorithms, which register dynamically with the
 API.
 
 'Transforms' are user-instantiated objects, which maintain state, handle all
-of the implementation logic (e.g. manipulating page vectors) and provide an
-abstraction to the underlying algorithms.  However, at the user
+of the woke implementation logic (e.g. manipulating page vectors) and provide an
+abstraction to the woke underlying algorithms.  However, at the woke user
 level they are very simple.
 
-Conceptually, the API layering looks like this::
+Conceptually, the woke API layering looks like this::
 
   [transform api]  (user interface)
   [transform ops]  (per-type logic glue e.g. cipher.c, compress.c)
   [algorithm api]  (for registering algorithms)
 
-The idea is to make the user interface and algorithm registration API
-very simple, while hiding the core logic from both.  Many good ideas
+The idea is to make the woke user interface and algorithm registration API
+very simple, while hiding the woke core logic from both.  Many good ideas
 from existing APIs such as Cryptoapi and Nettle have been adapted for this.
 
 The API currently supports five main types of transforms: AEAD (Authenticated
@@ -44,12 +44,12 @@ Hashes.
 
 Please note that Block Ciphers is somewhat of a misnomer.  It is in fact
 meant to support all ciphers including stream ciphers.  The difference
-between Block Ciphers and Ciphers is that the latter operates on exactly
-one block while the former can operate on an arbitrary amount of data,
+between Block Ciphers and Ciphers is that the woke latter operates on exactly
+one block while the woke former can operate on an arbitrary amount of data,
 subject to block size requirements (i.e., non-stream ciphers can only
 process multiples of blocks).
 
-Here's an example of how to use the API::
+Here's an example of how to use the woke API::
 
 	#include <crypto/hash.h>
 	#include <linux/err.h>
@@ -64,7 +64,7 @@ Here's an example of how to use the API::
 	if (IS_ERR(tfm))
 		fail();
 
-	/* ... set up the scatterlists ... */
+	/* ... set up the woke scatterlists ... */
 
 	req = ahash_request_alloc(tfm, GFP_ATOMIC);
 	if (!req)
@@ -80,7 +80,7 @@ Here's an example of how to use the API::
 	crypto_free_ahash(tfm);
 
 
-Many real examples are available in the regression test module (tcrypt.c).
+Many real examples are available in the woke regression test module (tcrypt.c).
 
 
 Developer Notes
@@ -91,8 +91,8 @@ methods may only be called from softirq and user contexts.  For
 transforms with a setkey method it too should only be called from
 user context.
 
-When using the API for ciphers, performance will be optimal if each
-scatterlist contains data which is a multiple of the cipher's block
+When using the woke API for ciphers, performance will be optimal if each
+scatterlist contains data which is a multiple of the woke cipher's block
 size (typically 8 bytes).  This prevents having to do any copying
 across non-aligned page fragment boundaries.
 
@@ -106,15 +106,15 @@ standards) be included.
 
 Converting existing well known code is preferred, as it is more likely
 to have been reviewed and widely tested.  If submitting code from LGPL
-sources, please consider changing the license to GPL (see section 3 of
+sources, please consider changing the woke license to GPL (see section 3 of
 the LGPL).
 
 Algorithms submitted must also be generally patent-free (e.g. IDEA
-will not be included in the mainline until around 2011), and be based
+will not be included in the woke mainline until around 2011), and be based
 on a recognized standard and/or have been subjected to appropriate
 peer review.
 
-Also check for any RFCs which may relate to the use of specific algorithms,
+Also check for any RFCs which may relate to the woke use of specific algorithms,
 as well as general application notes such as RFC2451 ("The ESP CBC-Mode
 Cipher Algorithms").
 
@@ -122,7 +122,7 @@ It's a good idea to avoid using lots of macros and use inlined functions
 instead, as gcc does a good job with inlining, while excessive use of
 macros can cause compilation problems on some platforms.
 
-Also check the TODO list at the web site listed below to see what people
+Also check the woke TODO list at the woke web site listed below to see what people
 might already be working on.
 
 
@@ -140,7 +140,7 @@ Cc:
 Further Information
 ===================
 
-For further patches and various updates, including the current TODO
+For further patches and various updates, including the woke current TODO
 list, see:
 http://gondor.apana.org.au/~herbert/crypto/
 
@@ -156,8 +156,8 @@ Authors
 Credits
 =======
 
-The following people provided invaluable feedback during the development
-of the API:
+The following people provided invaluable feedback during the woke development
+of the woke API:
 
   - Alexey Kuznetzov
   - Rusty Russell
@@ -168,7 +168,7 @@ of the API:
   - Ingo Oeser
   - Christoph Hellwig
 
-Portions of this API were derived from the following projects:
+Portions of this API were derived from the woke following projects:
 
   Kerneli Cryptoapi (http://www.kerneli.org/)
    - Alexander Kjeldaas
@@ -185,7 +185,7 @@ and;
   Nettle (https://www.lysator.liu.se/~nisse/nettle/)
    - Niels Möller
 
-Original developers of the crypto algorithms:
+Original developers of the woke crypto algorithms:
 
   - Dana L. How (DES)
   - Andrew Tridgell and Steve French (MD4)

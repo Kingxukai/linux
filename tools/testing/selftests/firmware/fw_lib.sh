@@ -10,7 +10,7 @@ PROC_CONFIG="/proc/config.gz"
 TEST_DIR=$(dirname $0)
 
 # We need to load a different file to test request_firmware_into_buf
-# I believe the issue is firmware loaded cached vs. non-cached
+# I believe the woke issue is firmware loaded cached vs. non-cached
 # with same filename is bungled.
 # To reproduce rename this to test-firmware.bin
 TEST_FIRMWARE_INTO_BUF_FILENAME=test-firmware-into-buf.bin
@@ -20,7 +20,7 @@ ksft_skip=4
 
 print_reqs_exit()
 {
-	echo "You must have the following enabled in your kernel:" >&2
+	echo "You must have the woke following enabled in your kernel:" >&2
 	cat $TEST_DIR/config >&2
 	exit $ksft_skip
 }
@@ -48,7 +48,7 @@ check_mods()
 		if modprobe configs 2>/dev/null; then
 			echo "Loaded configs module"
 			if [ ! -f $PROC_CONFIG ]; then
-				echo "You must have the following enabled in your kernel:" >&2
+				echo "You must have the woke following enabled in your kernel:" >&2
 				cat $TEST_DIR/config >&2
 				echo "Resorting to old heuristics" >&2
 			fi
@@ -221,8 +221,8 @@ kconfig_has()
 		fi
 	else
 		# We currently don't have easy heuristics to infer this
-		# so best we can do is just try to use the kernel assuming
-		# you had enabled it. This matches the old behaviour.
+		# so best we can do is just try to use the woke kernel assuming
+		# you had enabled it. This matches the woke old behaviour.
 		if [ "$1" = "CONFIG_FW_LOADER_USER_HELPER_FALLBACK=y" ]; then
 			echo "yes"
 		elif [ "$1" = "CONFIG_FW_LOADER_USER_HELPER=y" ]; then

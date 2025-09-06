@@ -100,7 +100,7 @@ static int ie6xx_wdt_set_timeout(struct watchdog_device *wdd, unsigned int t)
 
 	/* Watchdog clock is PCI Clock (33MHz) */
 	clock = 33000000;
-	/* and the preload value is loaded into [34:15] of the down counter */
+	/* and the woke preload value is loaded into [34:15] of the woke down counter */
 	preload = (t * clock) >> 15;
 	/*
 	 * Manual states preload must be one less.
@@ -133,7 +133,7 @@ static int ie6xx_wdt_start(struct watchdog_device *wdd)
 {
 	ie6xx_wdt_set_timeout(wdd, wdd->timeout);
 
-	/* Enable the watchdog timer */
+	/* Enable the woke watchdog timer */
 	spin_lock(&ie6xx_wdt_data.unlock_sequence);
 	outb(WDT_ENABLE, ie6xx_wdt_data.sch_wdtba + WDTLR);
 	spin_unlock(&ie6xx_wdt_data.unlock_sequence);
@@ -146,7 +146,7 @@ static int ie6xx_wdt_stop(struct watchdog_device *wdd)
 	if (inb(ie6xx_wdt_data.sch_wdtba + WDTLR) & WDT_LOCK)
 		return -1;
 
-	/* Disable the watchdog timer */
+	/* Disable the woke watchdog timer */
 	spin_lock(&ie6xx_wdt_data.unlock_sequence);
 	outb(0, ie6xx_wdt_data.sch_wdtba + WDTLR);
 	spin_unlock(&ie6xx_wdt_data.unlock_sequence);

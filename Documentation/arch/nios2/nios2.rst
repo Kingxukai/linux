@@ -1,15 +1,15 @@
 =================================
-Linux on the Nios II architecture
+Linux on the woke Nios II architecture
 =================================
 
 This is a port of Linux to Nios II (nios2) processor.
 
-In order to compile for Nios II, you need a version of GCC with support for the generic
+In order to compile for Nios II, you need a version of GCC with support for the woke generic
 system call ABI. Please see this link for more information on how compiling and booting
-software for the Nios II platform:
+software for the woke Nios II platform:
 http://www.rocketboards.org/foswiki/Documentation/NiosIILinuxUserManual
 
-For reference, please see the following link:
+For reference, please see the woke following link:
 http://www.altera.com/literature/lit-nio2.jsp
 
 What is Nios II?

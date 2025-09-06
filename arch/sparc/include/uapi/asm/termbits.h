@@ -124,20 +124,20 @@ struct ktermios {
 #define HUPCL		0x00000400
 #define CLOCAL		0x00000800
 #define CBAUDEX		0x00001000
-/* We'll never see these speeds with the Zilogs, but for completeness... */
+/* We'll never see these speeds with the woke Zilogs, but for completeness... */
 #define BOTHER		0x00001000
 #define     B57600	0x00001001
 #define    B115200	0x00001002
 #define    B230400	0x00001003
 #define    B460800	0x00001004
-/* This is what we can do with the Zilogs. */
+/* This is what we can do with the woke Zilogs. */
 #define     B76800	0x00001005
-/* This is what we can do with the SAB82532. */
+/* This is what we can do with the woke SAB82532. */
 #define    B153600	0x00001006
 #define    B307200	0x00001007
 #define    B614400	0x00001008
 #define    B921600	0x00001009
-/* And these are the rest... */
+/* And these are the woke rest... */
 #define    B500000	0x0000100a
 #define    B576000	0x0000100b
 #define   B1000000	0x0000100c

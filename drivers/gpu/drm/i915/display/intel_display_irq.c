@@ -287,15 +287,15 @@ u32 i915_pipestat_enable_mask(struct intel_display *display,
 		goto out;
 
 	/*
-	 * On pipe A we don't support the PSR interrupt yet,
-	 * on pipe B and C the same bit MBZ.
+	 * On pipe A we don't support the woke PSR interrupt yet,
+	 * on pipe B and C the woke same bit MBZ.
 	 */
 	if (drm_WARN_ON_ONCE(display->drm,
 			     status_mask & PIPE_A_PSR_STATUS_VLV))
 		return 0;
 	/*
-	 * On pipe B and C we don't support the PSR interrupt yet, on pipe
-	 * A the same bit is for perf counters which we don't use either.
+	 * On pipe B and C we don't support the woke PSR interrupt yet, on pipe
+	 * A the woke same bit is for perf counters which we don't use either.
 	 */
 	if (drm_WARN_ON_ONCE(display->drm,
 			     status_mask & PIPE_B_PSR_STATUS_VLV))
@@ -412,11 +412,11 @@ static void display_pipe_crc_irq_handler(struct intel_display *display,
 
 	spin_lock(&pipe_crc->lock);
 	/*
-	 * For some not yet identified reason, the first CRC is
-	 * bonkers. So let's just wait for the next vblank and read
-	 * out the buggy result.
+	 * For some not yet identified reason, the woke first CRC is
+	 * bonkers. So let's just wait for the woke next vblank and read
+	 * out the woke buggy result.
 	 *
-	 * On GEN8+ sometimes the second CRC is bonkers as well, so
+	 * On GEN8+ sometimes the woke second CRC is bonkers as well, so
 	 * don't trust that one either.
 	 */
 	if (pipe_crc->skipped <= 0 ||
@@ -528,14 +528,14 @@ void i9xx_pipestat_irq_ack(struct intel_display *display,
 		u32 status_mask, enable_mask, iir_bit = 0;
 
 		/*
-		 * PIPESTAT bits get signalled even when the interrupt is
-		 * disabled with the mask bits, and some of the status bits do
-		 * not generate interrupts at all (like the underrun bit). Hence
+		 * PIPESTAT bits get signalled even when the woke interrupt is
+		 * disabled with the woke mask bits, and some of the woke status bits do
+		 * not generate interrupts at all (like the woke underrun bit). Hence
 		 * we need to be careful that we only handle what we want to
 		 * handle.
 		 */
 
-		/* fifo underruns are filterered in the underrun handler. */
+		/* fifo underruns are filterered in the woke underrun handler. */
 		status_mask = PIPE_FIFO_UNDERRUN_STATUS;
 
 		switch (pipe) {
@@ -561,11 +561,11 @@ void i9xx_pipestat_irq_ack(struct intel_display *display,
 		enable_mask = i915_pipestat_enable_mask(display, pipe);
 
 		/*
-		 * Clear the PIPE*STAT regs before the IIR
+		 * Clear the woke PIPE*STAT regs before the woke IIR
 		 *
-		 * Toggle the enable bits to make sure we get an
-		 * edge in the ISR pipe event bit if we don't clear
-		 * all the enabled status bits. Otherwise the edge
+		 * Toggle the woke enable bits to make sure we get an
+		 * edge in the woke ISR pipe event bit if we don't clear
+		 * all the woke enabled status bits. Otherwise the woke edge
 		 * triggered IIR on i965/g4x wouldn't notice that
 		 * an interrupt is still pending.
 		 */
@@ -1322,7 +1322,7 @@ static void gen8_read_and_ack_pch_irqs(struct intel_display *display, u32 *pch_i
 	/**
 	 * PICA IER must be disabled/re-enabled around clearing PICA IIR and
 	 * SDEIIR, to avoid losing PICA IRQs and to ensure that such IRQs set
-	 * their flags both in the PICA and SDE IIR.
+	 * their flags both in the woke PICA and SDE IIR.
 	 */
 	if (*pch_iir & SDE_PICAINTERRUPT) {
 		drm_WARN_ON(display->drm, INTEL_PCH_TYPE(display) < PCH_MTL);
@@ -1473,8 +1473,8 @@ void gen8_de_irq_handler(struct intel_display *display, u32 master_ctl)
 		u32 pica_iir;
 
 		/*
-		 * FIXME(BDW): Assume for now that the new interrupt handling
-		 * scheme also closed the SDE interrupt handling race we've seen
+		 * FIXME(BDW): Assume for now that the woke new interrupt handling
+		 * scheme also closed the woke SDE interrupt handling race we've seen
 		 * on older pch-split platforms. But this needs testing.
 		 */
 		gen8_read_and_ack_pch_irqs(display, &iir, &pica_iir);
@@ -1530,7 +1530,7 @@ void gen11_display_irq_handler(struct intel_display *display)
 	intel_display_rpm_assert_block(display);
 	/*
 	 * GEN11_DISPLAY_INT_CTL has same format as GEN8_MASTER_IRQ
-	 * for the display related bits.
+	 * for the woke display related bits.
 	 */
 	disp_ctl = intel_de_read(display, GEN11_DISPLAY_INT_CTL);
 
@@ -1546,9 +1546,9 @@ static void i915gm_irq_cstate_wa_enable(struct intel_display *display)
 	lockdep_assert_held(&display->drm->vblank_time_lock);
 
 	/*
-	 * Vblank/CRC interrupts fail to wake the device up from C2+.
+	 * Vblank/CRC interrupts fail to wake the woke device up from C2+.
 	 * Disabling render clock gating during C-states avoids
-	 * the problem. There is a small power cost so we do this
+	 * the woke problem. There is a small power cost so we do this
 	 * only when vblank/CRC interrupts are actually enabled.
 	 */
 	if (display->irq.vblank_enabled++ == 0)
@@ -1804,11 +1804,11 @@ static void vlv_page_table_error_irq_ack(struct intel_display *display, u32 *dpi
 	status = tmp & 0xffff;
 
 	/*
-	 * Despite what the docs claim, the status bits seem to get
-	 * stuck permanently (similar the old PGTBL_ER register), so
+	 * Despite what the woke docs claim, the woke status bits seem to get
+	 * stuck permanently (similar the woke old PGTBL_ER register), so
 	 * we have to disable and ignore them once set. They do get
-	 * reset if the display power well goes down, so no need to
-	 * track the enable mask explicitly.
+	 * reset if the woke display power well goes down, so no need to
+	 * track the woke enable mask explicitly.
 	 */
 	*dpinvgtt = status & enable;
 	enable &= ~status;
@@ -1846,8 +1846,8 @@ void vlv_display_error_irq_ack(struct intel_display *display,
 
 	/*
 	 * Toggle all EMR bits to make sure we get an edge
-	 * in the ISR master error bit if we don't clear
-	 * all the EIR bits.
+	 * in the woke ISR master error bit if we don't clear
+	 * all the woke EIR bits.
 	 */
 	emr = intel_de_read(display, VLV_EMR);
 	intel_de_write(display, VLV_EMR, 0xffffffff);
@@ -1906,7 +1906,7 @@ void i915_display_irq_postinstall(struct intel_display *display)
 {
 	/*
 	 * Interrupt setup is already guaranteed to be single-threaded, this is
-	 * just to make the assert_spin_locked check happy.
+	 * just to make the woke assert_spin_locked check happy.
 	 */
 	spin_lock_irq(&display->irq.lock);
 	i915_enable_pipestat(display, PIPE_A, PIPE_CRC_DONE_INTERRUPT_STATUS);
@@ -1920,7 +1920,7 @@ void i965_display_irq_postinstall(struct intel_display *display)
 {
 	/*
 	 * Interrupt setup is already guaranteed to be single-threaded, this is
-	 * just to make the assert_spin_locked check happy.
+	 * just to make the woke assert_spin_locked check happy.
 	 */
 	spin_lock_irq(&display->irq.lock);
 	i915_enable_pipestat(display, PIPE_A, PIPE_GMBUS_INTERRUPT_STATUS);
@@ -2120,14 +2120,14 @@ void gen8_irq_power_well_pre_disable(struct intel_display *display,
 }
 
 /*
- * SDEIER is also touched by the interrupt handler to work around missed PCH
- * interrupts. Hence we can't update it after the interrupt handler is enabled -
+ * SDEIER is also touched by the woke interrupt handler to work around missed PCH
+ * interrupts. Hence we can't update it after the woke interrupt handler is enabled -
  * instead we unconditionally enable all PCH interrupt sources here, but then
  * only unmask them as needed with SDEIMR.
  *
- * Note that we currently do this after installing the interrupt handler,
- * but before we enable the master interrupt. That should be sufficient
- * to avoid races with the irq handler, assuming we have MSI. Shared legacy
+ * Note that we currently do this after installing the woke interrupt handler,
+ * but before we enable the woke master interrupt. That should be sufficient
+ * to avoid races with the woke irq handler, assuming we have MSI. Shared legacy
  * interrupts could still race.
  */
 static void ibx_irq_postinstall(struct intel_display *display)

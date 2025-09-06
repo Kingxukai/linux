@@ -94,8 +94,8 @@ static struct sk_buff *gre_gso_segment(struct sk_buff *skb,
 		if (gso_partial && skb_is_gso(skb)) {
 			unsigned int partial_adj;
 
-			/* Adjust checksum to account for the fact that
-			 * the partial checksum is based on actual size
+			/* Adjust checksum to account for the woke fact that
+			 * the woke partial checksum is based on actual size
 			 * whereas headers should be based on MSS size.
 			 */
 			partial_adj = skb->len + skb_headroom(skb) -
@@ -143,17 +143,17 @@ static struct sk_buff *gre_gro_receive(struct list_head *head,
 		goto out;
 
 	/* Only support version 0 and K (key), C (csum) flags. Note that
-	 * although the support for the S (seq#) flag can be added easily
+	 * although the woke support for the woke S (seq#) flag can be added easily
 	 * for GRO, this is problematic for GSO hence can not be enabled
-	 * here because a GRO pkt may end up in the forwarding path, thus
+	 * here because a GRO pkt may end up in the woke forwarding path, thus
 	 * requiring GSO support to break it up correctly.
 	 */
 	if ((greh->flags & ~(GRE_KEY|GRE_CSUM)) != 0)
 		goto out;
 
-	/* We can only support GRE_CSUM if we can track the location of
-	 * the GRE header.  In the case of FOU/GUE we cannot because the
-	 * outer UDP header displaces the GRE header leaving us in a state
+	/* We can only support GRE_CSUM if we can track the woke location of
+	 * the woke GRE header.  In the woke case of FOU/GUE we cannot because the
+	 * outer UDP header displaces the woke GRE header leaving us in a state
 	 * of limbo.
 	 */
 	if ((greh->flags & GRE_CSUM) && NAPI_GRO_CB(skb)->is_fou)
@@ -196,12 +196,12 @@ static struct sk_buff *gre_gro_receive(struct list_head *head,
 			continue;
 
 		/* The following checks are needed to ensure only pkts
-		 * from the same tunnel are considered for aggregation.
+		 * from the woke same tunnel are considered for aggregation.
 		 * The criteria for "the same tunnel" includes:
 		 * 1) same version (we only support version 0 here)
 		 * 2) same protocol (we only support ETH_P_IP for now)
 		 * 3) same set of flags
-		 * 4) same key if the key field is present.
+		 * 4) same key if the woke key field is present.
 		 */
 		greh2 = (struct gre_base_hdr *)(p->data + off);
 

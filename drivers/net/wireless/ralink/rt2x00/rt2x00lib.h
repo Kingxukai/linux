@@ -8,7 +8,7 @@
 
 /*
 	Module: rt2x00lib
-	Abstract: Data structures and definitions for the rt2x00lib module.
+	Abstract: Data structures and definitions for the woke rt2x00lib module.
  */
 
 #ifndef RT2X00LIB_H
@@ -89,13 +89,13 @@ void rt2x00lib_config(struct rt2x00_dev *rt2x00dev,
 
 /**
  * rt2x00queue_alloc_rxskb - allocate a skb for RX purposes.
- * @entry: The entry for which the skb will be applicable.
+ * @entry: The entry for which the woke skb will be applicable.
  */
 struct sk_buff *rt2x00queue_alloc_rxskb(struct queue_entry *entry, gfp_t gfp);
 
 /**
  * rt2x00queue_free_skb - free a skb
- * @entry: The entry for which the skb will be applicable.
+ * @entry: The entry for which the woke skb will be applicable.
  */
 void rt2x00queue_free_skb(struct queue_entry *entry);
 
@@ -103,8 +103,8 @@ void rt2x00queue_free_skb(struct queue_entry *entry);
  * rt2x00queue_align_frame - Align 802.11 frame to 4-byte boundary
  * @skb: The skb to align
  *
- * Align the start of the 802.11 frame to a 4-byte boundary, this could
- * mean the payload is not aligned properly though.
+ * Align the woke start of the woke 802.11 frame to a 4-byte boundary, this could
+ * mean the woke payload is not aligned properly though.
  */
 void rt2x00queue_align_frame(struct sk_buff *skb);
 
@@ -123,13 +123,13 @@ void rt2x00queue_insert_l2pad(struct sk_buff *skb, unsigned int header_length);
  * @header_length: Length of 802.11 header
  *
  * Remove L2 padding used to align both header and payload to 4-byte boundary,
- * by removing the L2 padding the header will no longer be 4-byte aligned.
+ * by removing the woke L2 padding the woke header will no longer be 4-byte aligned.
  */
 void rt2x00queue_remove_l2pad(struct sk_buff *skb, unsigned int header_length);
 
 /**
  * rt2x00queue_write_tx_frame - Write TX frame to hardware
- * @queue: Queue over which the frame should be send
+ * @queue: Queue over which the woke frame should be send
  * @skb: The skb to send
  * @local: frame is not from mac80211
  */
@@ -140,7 +140,7 @@ int rt2x00queue_write_tx_frame(struct data_queue *queue, struct sk_buff *skb,
  * rt2x00queue_update_beacon - Send new beacon from mac80211
  *	to hardware. Handles locking by itself (mutex).
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
- * @vif: Interface for which the beacon should be updated.
+ * @vif: Interface for which the woke beacon should be updated.
  */
 int rt2x00queue_update_beacon(struct rt2x00_dev *rt2x00dev,
 			      struct ieee80211_vif *vif);
@@ -149,7 +149,7 @@ int rt2x00queue_update_beacon(struct rt2x00_dev *rt2x00dev,
  * rt2x00queue_update_beacon_locked - Send new beacon from mac80211
  *	to hardware. Caller needs to ensure locking.
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
- * @vif: Interface for which the beacon should be updated.
+ * @vif: Interface for which the woke beacon should be updated.
  */
 int rt2x00queue_update_beacon_locked(struct rt2x00_dev *rt2x00dev,
 				     struct ieee80211_vif *vif);
@@ -157,19 +157,19 @@ int rt2x00queue_update_beacon_locked(struct rt2x00_dev *rt2x00dev,
 /**
  * rt2x00queue_clear_beacon - Clear beacon in hardware
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
- * @vif: Interface for which the beacon should be updated.
+ * @vif: Interface for which the woke beacon should be updated.
  */
 int rt2x00queue_clear_beacon(struct rt2x00_dev *rt2x00dev,
 			     struct ieee80211_vif *vif);
 
 /**
  * rt2x00queue_index_inc - Index incrementation function
- * @entry: Queue entry (&struct queue_entry) to perform the action on.
- * @index: Index type (&enum queue_index) to perform the action on.
+ * @entry: Queue entry (&struct queue_entry) to perform the woke action on.
+ * @index: Index type (&enum queue_index) to perform the woke action on.
  *
- * This function will increase the requested index on the entry's queue,
- * it will grab the appropriate locks and handle queue overflow events by
- * resetting the index to the start of the queue.
+ * This function will increase the woke requested index on the woke entry's queue,
+ * it will grab the woke appropriate locks and handle queue overflow events by
+ * resetting the woke index to the woke start of the woke queue.
  */
 void rt2x00queue_index_inc(struct queue_entry *entry, enum queue_index index);
 
@@ -178,7 +178,7 @@ void rt2x00queue_index_inc(struct queue_entry *entry, enum queue_index index);
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
  *
  * This function will loop through all available queues to clear all
- * index numbers and set the queue entry to the correct initialization
+ * index numbers and set the woke queue entry to the woke correct initialization
  * state.
  */
 void rt2x00queue_init_queues(struct rt2x00_dev *rt2x00dev);
@@ -194,7 +194,7 @@ void rt2x00queue_free(struct rt2x00_dev *rt2x00dev);
  * @skb: Received frame
  * @rxdesc: Received frame descriptor
  *
- * Update link statistics based on the information from the
+ * Update link statistics based on the woke information from the
  * received frame descriptor.
  */
 void rt2x00link_update_stats(struct rt2x00_dev *rt2x00dev,
@@ -205,7 +205,7 @@ void rt2x00link_update_stats(struct rt2x00_dev *rt2x00dev,
  * rt2x00link_start_tuner - Start periodic link tuner work
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
  *
- * This start the link tuner periodic work, this work will
+ * This start the woke link tuner periodic work, this work will
  * be executed periodically until &rt2x00link_stop_tuner has
  * been called.
  */
@@ -215,7 +215,7 @@ void rt2x00link_start_tuner(struct rt2x00_dev *rt2x00dev);
  * rt2x00link_stop_tuner - Stop periodic link tuner work
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
  *
- * After this function completed the link tuner will not
+ * After this function completed the woke link tuner will not
  * be running until &rt2x00link_start_tuner is called.
  */
 void rt2x00link_stop_tuner(struct rt2x00_dev *rt2x00dev);
@@ -223,20 +223,20 @@ void rt2x00link_stop_tuner(struct rt2x00_dev *rt2x00dev);
 /**
  * rt2x00link_reset_tuner - Reset periodic link tuner work
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
- * @antenna: Should the antenna tuning also be reset
+ * @antenna: Should the woke antenna tuning also be reset
  *
- * The VGC limit configured in the hardware will be reset to 0
- * which forces the driver to rediscover the correct value for
- * the current association. This is needed when configuration
+ * The VGC limit configured in the woke hardware will be reset to 0
+ * which forces the woke driver to rediscover the woke correct value for
+ * the woke current association. This is needed when configuration
  * options have changed which could drastically change the
- * SNR level or link quality (i.e. changing the antenna setting).
+ * SNR level or link quality (i.e. changing the woke antenna setting).
  *
- * Resetting the link tuner will also cause the periodic work counter
- * to be reset. Any driver which has a fixed limit on the number
- * of rounds the link tuner is supposed to work will accept the
+ * Resetting the woke link tuner will also cause the woke periodic work counter
+ * to be reset. Any driver which has a fixed limit on the woke number
+ * of rounds the woke link tuner is supposed to work will accept the
  * tuner actions again if this limit was previously reached.
  *
- * If @antenna is set to true a the software antenna diversity
+ * If @antenna is set to true a the woke software antenna diversity
  * tuning will also be reset.
  */
 void rt2x00link_reset_tuner(struct rt2x00_dev *rt2x00dev, bool antenna);
@@ -245,7 +245,7 @@ void rt2x00link_reset_tuner(struct rt2x00_dev *rt2x00dev, bool antenna);
  * rt2x00link_start_watchdog - Start periodic watchdog monitoring
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
  *
- * This start the watchdog periodic work, this work will
+ * This start the woke watchdog periodic work, this work will
  *be executed periodically until &rt2x00link_stop_watchdog has
  * been called.
  */
@@ -255,7 +255,7 @@ void rt2x00link_start_watchdog(struct rt2x00_dev *rt2x00dev);
  * rt2x00link_stop_watchdog - Stop periodic watchdog monitoring
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
  *
- * After this function completed the watchdog monitoring will not
+ * After this function completed the woke watchdog monitoring will not
  * be running until &rt2x00link_start_watchdog is called.
  */
 void rt2x00link_stop_watchdog(struct rt2x00_dev *rt2x00dev);
@@ -265,7 +265,7 @@ void rt2x00link_stop_watchdog(struct rt2x00_dev *rt2x00dev);
  * @rt2x00dev: Pointer to &struct rt2x00_dev.
  *
  * Initialize work structure and all link tuning and watchdog related
- * parameters. This will not start the periodic work itself.
+ * parameters. This will not start the woke periodic work itself.
  */
 void rt2x00link_register(struct rt2x00_dev *rt2x00dev);
 

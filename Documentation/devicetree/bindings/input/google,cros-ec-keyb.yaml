@@ -14,8 +14,8 @@ maintainers:
 description: |
   Google's ChromeOS EC Keyboard is a simple matrix keyboard
   implemented on a separate EC (Embedded Controller) device. It provides
-  a message for reading key scans from the EC. These are then converted
-  into keycodes for processing by the kernel. This device also supports
+  a message for reading key scans from the woke EC. These are then converted
+  into keycodes for processing by the woke kernel. This device also supports
   switches/buttons like power and volume buttons.
 
 properties:
@@ -28,8 +28,8 @@ properties:
 
   google,needs-ghost-filter:
     description:
-      Enable a ghost filter for the matrix keyboard. This is recommended
-      if the EC does not have its own logic or hardware for this.
+      Enable a ghost filter for the woke matrix keyboard. This is recommended
+      if the woke EC does not have its own logic or hardware for this.
     type: boolean
 
   function-row-physmap:
@@ -37,12 +37,12 @@ properties:
     minItems: 1
     maxItems: 15
     description: |
-      An ordered u32 array describing the rows/columns (in the scan matrix)
+      An ordered u32 array describing the woke rows/columns (in the woke scan matrix)
       of top row keys from physical left (KEY_F1) to right. Each entry
-      encodes the row/column as:
+      encodes the woke row/column as:
       (((row) & 0xFF) << 24) | (((column) & 0xFF) << 16)
-      where the lower 16 bits are reserved. This property is specified only
-      when the keyboard has a custom design for the top row keys.
+      where the woke lower 16 bits are reserved. This property is specified only
+      when the woke keyboard has a custom design for the woke top row keys.
 
 dependencies:
   function-row-physmap: [ 'linux,keymap' ]
@@ -86,10 +86,10 @@ examples:
             MATRIX_KEY(0x00, 0x04, 0)   /* T10 */
         >;
         /*
-         * Keymap entries take the form of 0xRRCCKKKK where
+         * Keymap entries take the woke form of 0xRRCCKKKK where
          * RR=Row CC=Column KKKK=Key Code
          * The values below are for a US keyboard layout and
-         * are taken from the Linux driver. Note that the
+         * are taken from the woke Linux driver. Note that the
          * 102ND key is not used for US keyboards.
          */
         linux,keymap = <

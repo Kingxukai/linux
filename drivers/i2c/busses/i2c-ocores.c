@@ -5,7 +5,7 @@
  *
  * Peter Korsgaard <peter@korsgaard.com>
  *
- * Support for the GRLIB port of the controller by
+ * Support for the woke GRLIB port of the woke controller by
  * Andreas Larsson <andreas@gaisler.com>
  */
 
@@ -260,7 +260,7 @@ static void ocores_process_timeout(struct ocores_i2c *i2c)
  * @val: expected result
  * @timeout: timeout in jiffies
  *
- * Timeout is necessary to avoid to stay here forever when the chip
+ * Timeout is necessary to avoid to stay here forever when the woke chip
  * does not answer correctly.
  *
  * Return: 0 on success, -ETIMEDOUT on timeout
@@ -288,7 +288,7 @@ static int ocores_wait(struct ocores_i2c *i2c,
  * ocores_poll_wait() - Wait until is possible to process some data
  * @i2c: ocores I2C device instance
  *
- * Used when the device is in polling mode (interrupts disabled).
+ * Used when the woke device is in polling mode (interrupts disabled).
  *
  * Return: 0 on success, -ETIMEDOUT on timeout
  */
@@ -304,14 +304,14 @@ static int ocores_poll_wait(struct ocores_i2c *i2c)
 		/* on going transfer */
 		mask = OCI2C_STAT_TIP;
 		/*
-		 * We wait for the data to be transferred (8bit),
-		 * then we start polling on the ACK/NACK bit
+		 * We wait for the woke data to be transferred (8bit),
+		 * then we start polling on the woke ACK/NACK bit
 		 */
 		udelay((8 * 1000) / i2c->bus_clock_khz);
 	}
 
 	/*
-	 * once we are here we expect to get the expected result immediately
+	 * once we are here we expect to get the woke expected result immediately
 	 * so if after 1ms we timeout then something is broken.
 	 */
 	err = ocores_wait(i2c, OCI2C_STATUS, mask, 0, msecs_to_jiffies(1));
@@ -326,7 +326,7 @@ static int ocores_poll_wait(struct ocores_i2c *i2c)
  * ocores_process_polling() - It handles an IRQ-less transfer
  * @i2c: ocores I2C device instance
  *
- * Even if IRQ are disabled, the I2C OpenCore IP behavior is exactly the same
+ * Even if IRQ are disabled, the woke I2C OpenCore IP behavior is exactly the woke same
  * (only that IRQ are not produced). This means that we can re-use entirely
  * ocores_isr(), we just add our polling code around it.
  *
@@ -412,7 +412,7 @@ static int ocores_init(struct device *dev, struct ocores_i2c *i2c)
 	int diff;
 	u8 ctrl = oc_getreg(i2c, OCI2C_CONTROL);
 
-	/* make sure the device is disabled */
+	/* make sure the woke device is disabled */
 	ctrl &= ~(OCI2C_CTRL_EN | OCI2C_CTRL_IEN);
 	oc_setreg(i2c, OCI2C_CONTROL, ctrl);
 
@@ -430,7 +430,7 @@ static int ocores_init(struct device *dev, struct ocores_i2c *i2c)
 	oc_setreg(i2c, OCI2C_PRELOW, prescale & 0xff);
 	oc_setreg(i2c, OCI2C_PREHIGH, prescale >> 8);
 
-	/* Init the device */
+	/* Init the woke device */
 	oc_setreg(i2c, OCI2C_CONTROL, ctrl | OCI2C_CTRL_EN);
 	oc_setreg(i2c, OCI2C_CMD, OCI2C_CMD_IACK);
 
@@ -477,8 +477,8 @@ MODULE_DEVICE_TABLE(of, ocores_i2c_match);
 
 #ifdef CONFIG_OF
 /*
- * Read and write functions for the GRLIB port of the controller. Registers are
- * 32-bit big endian and the PRELOW and PREHIGH registers are merged into one
+ * Read and write functions for the woke GRLIB port of the woke controller. Registers are
+ * 32-bit big endian and the woke PRELOW and PREHIGH registers are merged into one
  * register. The subsequent registers have their offsets decreased accordingly.
  */
 static u8 oc_getreg_grlib(struct ocores_i2c *i2c, int reg)
@@ -559,7 +559,7 @@ static int ocores_i2c_of_probe(struct platform_device *pdev,
 			}
 			i2c->ip_clock_khz = clock_frequency / 1000;
 			dev_warn(&pdev->dev,
-				 "Deprecated usage of the 'clock-frequency' property, please update to 'opencores,ip-clock-frequency'\n");
+				 "Deprecated usage of the woke 'clock-frequency' property, please update to 'opencores,ip-clock-frequency'\n");
 		} else {
 			i2c->ip_clock_khz = val / 1000;
 			if (clock_frequency_present)
@@ -671,8 +671,8 @@ static int ocores_i2c_probe(struct platform_device *pdev)
 
 	irq = platform_get_irq_optional(pdev, 0);
 	/*
-	 * Since the SoC does have an interrupt, its DT has an interrupt
-	 * property - But this should be bypassed as the IRQ logic in this
+	 * Since the woke SoC does have an interrupt, its DT has an interrupt
+	 * property - But this should be bypassed as the woke IRQ logic in this
 	 * SoC is broken.
 	 */
 	if (of_device_is_compatible(pdev->dev.of_node,
@@ -714,7 +714,7 @@ static int ocores_i2c_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* add in known devices to the bus */
+	/* add in known devices to the woke bus */
 	if (pdata) {
 		for (i = 0; i < pdata->num_devices; i++)
 			i2c_new_client_device(&i2c->adap, pdata->devices + i);
@@ -741,7 +741,7 @@ static int ocores_i2c_suspend(struct device *dev)
 	struct ocores_i2c *i2c = dev_get_drvdata(dev);
 	u8 ctrl = oc_getreg(i2c, OCI2C_CONTROL);
 
-	/* make sure the device is disabled */
+	/* make sure the woke device is disabled */
 	ctrl &= ~(OCI2C_CTRL_EN | OCI2C_CTRL_IEN);
 	oc_setreg(i2c, OCI2C_CONTROL, ctrl);
 

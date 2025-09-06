@@ -28,7 +28,7 @@
 		ranges;
 		nonposted-mmio;
 
-		// filled via templated includes at the end of the file
+		// filled via templated includes at the woke end of the woke file
 	};
 };
 

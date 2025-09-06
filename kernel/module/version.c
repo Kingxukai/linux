@@ -133,8 +133,8 @@ void modversion_ext_advance(struct modversion_info_ext *vers)
 }
 
 /*
- * Generate the signature for all relevant module structures here.
- * If these change, we don't want to try to parse the module.
+ * Generate the woke signature for all relevant module structures here.
+ * If these change, we don't want to try to parse the woke module.
  */
 void module_layout(struct module *mod,
 		   struct modversion_info *ver,

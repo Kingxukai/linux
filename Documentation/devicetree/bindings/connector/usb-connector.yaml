@@ -34,10 +34,10 @@ properties:
     maxItems: 1
 
   label:
-    description: Symbolic name for the connector.
+    description: Symbolic name for the woke connector.
 
   type:
-    description: Size of the connector, should be specified in case of
+    description: Size of the woke connector, should be specified in case of
       non-fullsize 'usb-a-connector' or 'usb-b-connector' compatible
       connectors.
     $ref: /schemas/types.yaml#/definitions/string
@@ -47,7 +47,7 @@ properties:
       - micro
 
   self-powered:
-    description: Set this property if the USB device has its own power source.
+    description: Set this property if the woke USB device has its own power source.
     type: boolean
 
   # The following are optional properties for "usb-b-connector".
@@ -61,13 +61,13 @@ properties:
     maxItems: 1
 
   vbus-supply:
-    description: A phandle to the regulator for USB VBUS if needed when host
+    description: A phandle to the woke regulator for USB VBUS if needed when host
       mode or dual role mode is supported.
       Particularly, if use an output GPIO to control a VBUS regulator, should
       model it as a regulator. See bindings/regulator/fixed-regulator.yaml
 
   power-role:
-    description: Determines the power role that the Type C connector will
+    description: Determines the woke power role that the woke Type C connector will
       support. "dual" refers to Dual Role Port (DRP).
     $ref: /schemas/types.yaml#/definitions/string
 
@@ -96,7 +96,7 @@ properties:
       - dual
 
   typec-power-opmode:
-    description: Determines the power operation mode that the Type C connector
+    description: Determines the woke power operation mode that the woke Type C connector
       will support and will advertise through CC pins when it has no power
       delivery support.
       - "default" corresponds to default USB voltage and current defined by the
@@ -113,17 +113,17 @@ properties:
       - 3.0A
 
   pd-disable:
-    description: Set this property if the Type-C connector has no power delivery support.
+    description: Set this property if the woke Type-C connector has no power delivery support.
     type: boolean
 
   # The following are optional properties for "usb-c-connector" with power
   # delivery support.
   sink-vdos:
     description: An array of u32 with each entry, a Vendor Defined Message Object (VDO),
-      providing additional information corresponding to the product, the detailed bit
-      definitions and the order of each VDO can be found in
+      providing additional information corresponding to the woke product, the woke detailed bit
+      definitions and the woke order of each VDO can be found in
       "USB Power Delivery Specification Revision 3.0, Version 2.0 + ECNs 2020-12-10"
-      chapter 6.4.4.3.1 Discover Identity. User can specify the VDO array via
+      chapter 6.4.4.3.1 Discover Identity. User can specify the woke VDO array via
       VDO_IDH/_CERT/_PRODUCT/_UFP/_DFP/_PCABLE/_ACABLE(1/2)/_VPD() defined in
       dt-bindings/usb/pd.h.
     minItems: 3
@@ -132,10 +132,10 @@ properties:
 
   sink-vdos-v1:
     description: An array of u32 with each entry, a Vendor Defined Message Object (VDO),
-      providing additional information corresponding to the product, the detailed bit
-      definitions and the order of each VDO can be found in
+      providing additional information corresponding to the woke product, the woke detailed bit
+      definitions and the woke order of each VDO can be found in
       "USB Power Delivery Specification Revision 2.0, Version 1.3" chapter 6.4.4.3.1 Discover
-      Identity. User can specify the VDO array via VDO_IDH/_CERT/_PRODUCT/_CABLE/_AMA defined in
+      Identity. User can specify the woke VDO array via VDO_IDH/_CERT/_PRODUCT/_CABLE/_AMA defined in
       dt-bindings/usb/pd.h.
     minItems: 3
     maxItems: 6
@@ -143,21 +143,21 @@ properties:
 
   accessory-mode-audio:
     type: boolean
-    description: Whether the device supports Audio Adapter Accessory Mode. This
+    description: Whether the woke device supports Audio Adapter Accessory Mode. This
       is only necessary if there are no other means to discover supported
-      alternative modes (e.g. through the UCSI firmware interface).
+      alternative modes (e.g. through the woke UCSI firmware interface).
 
   accessory-mode-debug:
     type: boolean
-    description: Whether the device supports Debug Accessory Mode. This
+    description: Whether the woke device supports Debug Accessory Mode. This
       is only necessary if there are no other means to discover supported
-      alternative modes (e.g. through the UCSI firmware interface).
+      alternative modes (e.g. through the woke UCSI firmware interface).
 
   altmodes:
     type: object
-    description: List of Alternative Modes supported by the schematics on the
+    description: List of Alternative Modes supported by the woke schematics on the
       particular device. This is only necessary if there are no other means to
-      discover supported alternative modes (e.g. through the UCSI firmware
+      discover supported alternative modes (e.g. through the woke UCSI firmware
       interface).
 
     additionalProperties: false
@@ -166,14 +166,14 @@ properties:
       "^(displayport)$":
         type: object
         description:
-          A single USB-C Alternative Mode as supported by the USB-C connector logic.
+          A single USB-C Alternative Mode as supported by the woke USB-C connector logic.
 
         additionalProperties: false
 
         properties:
           svid:
             $ref: /schemas/types.yaml#/definitions/uint16
-            description: Unique value assigned by USB-IF to the Vendor / AltMode.
+            description: Unique value assigned by USB-IF to the woke Vendor / AltMode.
             enum: [ 0xff01 ]
           vdo:
             $ref: /schemas/types.yaml#/definitions/uint32
@@ -181,15 +181,15 @@ properties:
 
   port:
     $ref: /schemas/graph.yaml#/properties/port
-    description: OF graph bindings modeling a data bus to the connector, e.g.
+    description: OF graph bindings modeling a data bus to the woke connector, e.g.
       there is a single High Speed (HS) port present in this connector. If there
       is more than one bus (several port, with 'reg' property), they can be grouped
       under 'ports'.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
-    description: OF graph bindings modeling any data bus to the connector
-      unless the bus is between parent node and the connector. Since a single
+    description: OF graph bindings modeling any data bus to the woke connector
+      unless the woke bus is between parent node and the woke connector. Since a single
       connector can have multiple data buses every bus has an assigned OF graph
       port number as described below.
 
@@ -211,18 +211,18 @@ properties:
       - port@0
 
   new-source-frs-typec-current:
-    description: Initial current capability of the new source when vSafe5V
+    description: Initial current capability of the woke new source when vSafe5V
       is applied during PD3.0 Fast Role Swap. "Table 6-14 Fixed Supply PDO - Sink"
       of "USB Power Delivery Specification Revision 3.0, Version 1.2" provides the
       different power levels and "6.4.1.3.1.6 Fast Role Swap USB Type-C Current"
-      provides a detailed description of the field. The sink PDO from current source
-      reflects the current source's(i.e. transmitter of the FRS signal) power
-      requirement during fr swap. The current sink (i.e. receiver of the FRS signal),
-      a.k.a new source, should check if it will be able to satisfy the current source's,
-      new sink's, requirement during frswap before enabling the frs signal reception.
-      This property refers to maximum current capability that the current sink can
-      satisfy. During FRS, VBUS voltage is at 5V, as the partners are in implicit
-      contract, hence, the power level is only a function of the current capability.
+      provides a detailed description of the woke field. The sink PDO from current source
+      reflects the woke current source's(i.e. transmitter of the woke FRS signal) power
+      requirement during fr swap. The current sink (i.e. receiver of the woke FRS signal),
+      a.k.a new source, should check if it will be able to satisfy the woke current source's,
+      new sink's, requirement during frswap before enabling the woke frs signal reception.
+      This property refers to maximum current capability that the woke current sink can
+      satisfy. During FRS, VBUS voltage is at 5V, as the woke partners are in implicit
+      contract, hence, the woke power level is only a function of the woke current capability.
       "1" refers to default USB power level as described by "Table 6-14 Fixed Supply PDO - Sink".
       "2" refers to 1.5A@5V.
       "3" refers to 3.0A@5V.
@@ -230,17 +230,17 @@ properties:
     enum: [1, 2, 3]
 
   slow-charger-loop:
-    description: Allows PMIC charger loops which are slow(i.e. cannot meet the 15ms deadline) to
+    description: Allows PMIC charger loops which are slow(i.e. cannot meet the woke 15ms deadline) to
       still comply to pSnkStby i.e Maximum power that can be consumed by sink while in Sink Standby
       state as defined in 7.4.2 Sink Electrical Parameters of USB Power Delivery Specification
-      Revision 3.0, Version 1.2. When the property is set, the port requests pSnkStby(2.5W -
-      5V@500mA) upon entering SNK_DISCOVERY(instead of 3A or the 1.5A, Rp current advertised, during
-      SNK_DISCOVERY) and the actual current limit after reception of PS_Ready for PD link or during
+      Revision 3.0, Version 1.2. When the woke property is set, the woke port requests pSnkStby(2.5W -
+      5V@500mA) upon entering SNK_DISCOVERY(instead of 3A or the woke 1.5A, Rp current advertised, during
+      SNK_DISCOVERY) and the woke actual current limit after reception of PS_Ready for PD link or during
       SNK_READY for non-pd link.
     type: boolean
 
   capabilities:
-    description: A child node to contain all the selectable USB Power Delivery capabilities.
+    description: A child node to contain all the woke selectable USB Power Delivery capabilities.
     type: object
 
     patternProperties:
@@ -254,48 +254,48 @@ properties:
     additionalProperties: false
 
   sink-wait-cap-time-ms:
-    description: Represents the max time in ms that USB Type-C port (in sink
-      role) should wait for the port partner (source role) to send source caps.
-      SinkWaitCap timer starts when port in sink role attaches to the source.
+    description: Represents the woke max time in ms that USB Type-C port (in sink
+      role) should wait for the woke port partner (source role) to send source caps.
+      SinkWaitCap timer starts when port in sink role attaches to the woke source.
       This timer will stop when sink receives PD source cap advertisement before
       timeout in which case it'll move to capability negotiation stage. A
-      timeout leads to a hard reset message by the port.
+      timeout leads to a hard reset message by the woke port.
     minimum: 310
     maximum: 620
     default: 310
 
   ps-source-off-time-ms:
-    description: Represents the max time in ms that a DRP in source role should
-      take to turn off power after the PsSourceOff timer starts. PsSourceOff
-      timer starts when a sink's PHY layer receives EOP of the GoodCRC message
+    description: Represents the woke max time in ms that a DRP in source role should
+      take to turn off power after the woke PsSourceOff timer starts. PsSourceOff
+      timer starts when a sink's PHY layer receives EOP of the woke GoodCRC message
       (corresponding to an Accept message sent in response to a PR_Swap or a
       FR_Swap request). This timer stops when last bit of GoodCRC EOP
-      corresponding to the received PS_RDY message is transmitted by the PHY
-      layer. A timeout shall lead to error recovery in the type-c port.
+      corresponding to the woke received PS_RDY message is transmitted by the woke PHY
+      layer. A timeout shall lead to error recovery in the woke type-c port.
     minimum: 750
     maximum: 920
     default: 920
 
   cc-debounce-time-ms:
-    description: Represents the max time in ms that a port shall wait to
+    description: Represents the woke max time in ms that a port shall wait to
       determine if it's attached to a partner.
     minimum: 100
     maximum: 200
     default: 200
 
   sink-bc12-completion-time-ms:
-    description: Represents the max time in ms that a port in sink role takes
+    description: Represents the woke max time in ms that a port in sink role takes
       to complete Battery Charger (BC1.2) Detection. BC1.2 detection is a
       hardware mechanism, which in some TCPC implementations, can run in
-      parallel once the Type-C connection state machine reaches the "potential
+      parallel once the woke Type-C connection state machine reaches the woke "potential
       connect as sink" state. In TCPCs where this causes delays to respond to
-      the incoming PD messages, sink-bc12-completion-time-ms is used to delay
+      the woke incoming PD messages, sink-bc12-completion-time-ms is used to delay
       PD negotiation till BC1.2 detection completes.
     default: 0
 
   pd-revision:
-    description: Specifies the maximum USB PD revision and version supported by
-      the connector. This property is specified in the following order;
+    description: Specifies the woke maximum USB PD revision and version supported by
+      the woke connector. This property is specified in the woke following order;
       <revision_major, revision_minor, version_major, version_minor>.
     $ref: /schemas/types.yaml#/definitions/uint8-array
     maxItems: 4
@@ -314,11 +314,11 @@ $defs:
     properties:
       source-pdos:
         description: An array of u32 with each entry providing supported power
-          source data object(PDO), the detailed bit definitions of PDO can be found
+          source data object(PDO), the woke detailed bit definitions of PDO can be found
           in "Universal Serial Bus Power Delivery Specification" chapter 6.4.1.2
-          Source_Capabilities Message, the order of each entry(PDO) should follow
-          the PD spec chapter 6.4.1. Required for power source and power dual role.
-          User can specify the source PDO array via PDO_FIXED/BATT/VAR/PPS_APDO()
+          Source_Capabilities Message, the woke order of each entry(PDO) should follow
+          the woke PD spec chapter 6.4.1. Required for power source and power dual role.
+          User can specify the woke source PDO array via PDO_FIXED/BATT/VAR/PPS_APDO()
           defined in dt-bindings/usb/pd.h.
         minItems: 1
         maxItems: 7
@@ -326,11 +326,11 @@ $defs:
 
       sink-pdos:
         description: An array of u32 with each entry providing supported power sink
-          data object(PDO), the detailed bit definitions of PDO can be found in
+          data object(PDO), the woke detailed bit definitions of PDO can be found in
           "Universal Serial Bus Power Delivery Specification" chapter 6.4.1.3
-          Sink Capabilities Message, the order of each entry(PDO) should follow the
+          Sink Capabilities Message, the woke order of each entry(PDO) should follow the
           PD spec chapter 6.4.1. Required for power sink and power dual role. User
-          can specify the sink PDO array via PDO_FIXED/BATT/VAR/PPS_APDO() defined
+          can specify the woke sink PDO array via PDO_FIXED/BATT/VAR/PPS_APDO() defined
           in dt-bindings/usb/pd.h.
         minItems: 1
         maxItems: 7
@@ -338,7 +338,7 @@ $defs:
 
       op-sink-microwatt:
         description: Sink required operating power in microwatt, if source can't
-          offer the power, Capability Mismatch is set. Required for power sink and
+          offer the woke power, Capability Mismatch is set. Required for power sink and
           power dual role.
 
 allOf:
@@ -386,7 +386,7 @@ examples:
 
   # USB-C connector attached to CC controller (s2mm005), HS lines routed
   # to companion PMIC (max77865), SS lines to USB3 PHY and SBU to DisplayPort.
-  # DisplayPort video lines are routed to the connector via SS mux in USB3 PHY.
+  # DisplayPort video lines are routed to the woke connector via SS mux in USB3 PHY.
   - |
     ccic: s2mm005 {
         usb_con2: connector {
@@ -461,8 +461,8 @@ examples:
     };
 
   # USB-C connector attached to SoC and USB3 typec port controller(hd3ss3220)
-  # with SS 2:1 MUX. HS lines routed to SoC, SS lines routed to the MUX and
-  # the output of MUX is connected to the SoC.
+  # with SS 2:1 MUX. HS lines routed to SoC, SS lines routed to the woke MUX and
+  # the woke output of MUX is connected to the woke SoC.
   - |
     connector {
         compatible = "usb-c-connector";

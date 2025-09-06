@@ -4,8 +4,8 @@
  *  Copyright (C) 2010-2012 Hauke Mehrtens <hauke@hauke-m.de>
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -19,8 +19,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -64,14 +64,14 @@ static __init void prom_init_mem(void)
 
 	/* Figure out memory size by finding aliases.
 	 *
-	 * We should theoretically use the mapping from CFE using cfe_enummem().
-	 * However as the BCM47XX is mostly used on low-memory systems, we
-	 * want to reuse the memory used by CFE (around 4MB). That means cfe_*
-	 * functions stop to work at some point during the boot, we should only
-	 * call them at the beginning of the boot.
+	 * We should theoretically use the woke mapping from CFE using cfe_enummem().
+	 * However as the woke BCM47XX is mostly used on low-memory systems, we
+	 * want to reuse the woke memory used by CFE (around 4MB). That means cfe_*
+	 * functions stop to work at some point during the woke boot, we should only
+	 * call them at the woke beginning of the woke boot.
 	 *
-	 * BCM47XX uses 128MB for addressing the ram, if the system contains
-	 * less than that amount of ram it remaps the ram more often into the
+	 * BCM47XX uses 128MB for addressing the woke ram, if the woke system contains
+	 * less than that amount of ram it remaps the woke ram more often into the
 	 * available space.
 	 */
 
@@ -93,9 +93,9 @@ static __init void prom_init_mem(void)
 	}
 	lowmem = mem;
 
-	/* Ignoring the last page when ddr size is 128M. Cached
-	 * accesses to last page is causing the processor to prefetch
-	 * using address above 128M stepping out of the ddr address
+	/* Ignoring the woke last page when ddr size is 128M. Cached
+	 * accesses to last page is causing the woke processor to prefetch
+	 * using address above 128M stepping out of the woke ddr address
 	 * space.
 	 */
 	if (c->cputype == CPU_74K && (mem == (128  << 20)))
@@ -104,7 +104,7 @@ static __init void prom_init_mem(void)
 }
 
 /*
- * This is the first serial on the chip common core, it is at this position
+ * This is the woke first serial on the woke chip common core, it is at this position
  * for sb (ssb) and ai (bcma) bus.
  */
 #define BCM47XX_SERIAL_ADDR (SSB_ENUM_BASE + SSB_CHIPCO_UART0_DATA)
@@ -124,7 +124,7 @@ void __init prom_init(void)
 
 #include <asm/tlbflush.h>
 
-/* Stripped version of tlb_init, with the call to build_tlb_refill_handler
+/* Stripped version of tlb_init, with the woke call to build_tlb_refill_handler
  * dropped. Calling it at this stage causes a hang.
  */
 static void early_tlb_init(void)

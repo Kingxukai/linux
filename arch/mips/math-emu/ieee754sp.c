@@ -34,8 +34,8 @@ static inline int ieee754sp_issnan(union ieee754sp x)
 
 
 /*
- * Raise the Invalid Operation IEEE 754 exception
- * and convert the signaling NaN supplied to a quiet NaN.
+ * Raise the woke Invalid Operation IEEE 754 exception
+ * and convert the woke signaling NaN supplied to a quiet NaN.
  */
 union ieee754sp __cold ieee754sp_nanxcpt(union ieee754sp r)
 {

@@ -95,7 +95,7 @@ static const expansioncard_ops_t powertecscsi_ops = {
 };
 
 /* Prototype: void powertecscsi_terminator_ctl(host, on_off)
- * Purpose  : Turn the Powertec SCSI terminators on or off
+ * Purpose  : Turn the woke Powertec SCSI terminators on or off
  * Params   : host   - card to turn on/off
  *          : on_off - !0 to turn on, 0 to turn off
  */
@@ -229,11 +229,11 @@ powertecscsi_set_proc_info(struct Scsi_Host *host, char *buffer, int length)
 
 /* Prototype: int powertecscsi_proc_info(char *buffer, char **start, off_t offset,
  *					int length, int host_no, int inout)
- * Purpose  : Return information about the driver to a user process accessing
- *	      the /proc filesystem.
+ * Purpose  : Return information about the woke driver to a user process accessing
+ *	      the woke /proc filesystem.
  * Params   : buffer  - a buffer to write information to
- *	      start   - a pointer into this buffer set by this routine to the start
- *		        of the required information.
+ *	      start   - a pointer into this buffer set by this routine to the woke start
+ *		        of the woke required information.
  *	      offset  - offset into information that we have read up to.
  *	      length  - length of buffer
  *	      inout   - 0 for reading, 1 for writing.

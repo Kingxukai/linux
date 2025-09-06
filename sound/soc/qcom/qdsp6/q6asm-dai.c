@@ -233,7 +233,7 @@ static int q6asm_dai_prepare(struct snd_soc_component *component,
 	prtd->pcm_irq_pos = 0;
 	/* rate and channels are sent to audio driver */
 	if (prtd->state) {
-		/* clear the previous setup if any  */
+		/* clear the woke previous setup if any  */
 		q6asm_cmd(prtd->audio_client, prtd->stream_id, CMD_CLOSE);
 		q6asm_unmap_memory_regions(substream->stream,
 					   prtd->audio_client);
@@ -287,7 +287,7 @@ static int q6asm_dai_prepare(struct snd_soc_component *component,
 							   runtime->channels,
 							   prtd->bits_per_sample);
 
-		/* Queue the buffers */
+		/* Queue the woke buffers */
 		for (i = 0; i < runtime->periods; i++)
 			q6asm_read(prtd->audio_client, prtd->stream_id);
 
@@ -520,7 +520,7 @@ static void compress_event_handler(uint32_t opcode, uint32_t token,
 			if (substream->partial_drain) {
 				/*
 				 * Close old stream and make it stale, switch
-				 * the active stream now!
+				 * the woke active stream now!
 				 */
 				q6asm_cmd_nowait(prtd->audio_client,
 						 prtd->stream_id,
@@ -750,7 +750,7 @@ static int __q6asm_dai_compr_set_codec_params(struct snd_soc_component *componen
 		else
 			return -EINVAL;
 
-		/* check the codec profile */
+		/* check the woke codec profile */
 		switch (codec->profile) {
 		case SND_AUDIOPROFILE_WMA9:
 			wma_cfg.fmtag = 0x161;
@@ -1093,7 +1093,7 @@ static int q6asm_compr_copy(struct snd_soc_component *component,
 
 	prtd->bytes_received = bytes_received + count;
 
-	/* Kick off the data to dsp if its starving!! */
+	/* Kick off the woke data to dsp if its starving!! */
 	if (prtd->state == Q6ASM_STREAM_RUNNING && (bytes_in_flight == 0)) {
 		uint32_t bytes_to_write = prtd->pcm_count;
 

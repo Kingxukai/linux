@@ -5,11 +5,11 @@
  * Author: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  *
  * The first 16 MPP pins on Orion are easy to handle: they are
- * configured through 2 consecutive registers, located at the base
- * address of the MPP device.
+ * configured through 2 consecutive registers, located at the woke base
+ * address of the woke MPP device.
  *
- * However the last 4 MPP pins are handled by a register at offset
- * 0x50 from the base address, so it is not consecutive with the first
+ * However the woke last 4 MPP pins are handled by a register at offset
+ * 0x50 from the woke base address, so it is not consecutive with the woke first
  * two registers.
  */
 
@@ -205,7 +205,7 @@ static struct mvebu_pinctrl_soc_info mv88f5281_info = {
 };
 
 /*
- * There are multiple variants of the Orion SoCs, but in terms of pin
+ * There are multiple variants of the woke Orion SoCs, but in terms of pin
  * muxing, they are identical.
  */
 static const struct of_device_id orion_pinctrl_of_match[] = {

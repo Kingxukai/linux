@@ -25,7 +25,7 @@ static bool kvm_external_write_tracking_enabled(struct kvm *kvm)
 #ifdef CONFIG_KVM_EXTERNAL_WRITE_TRACKING
 	/*
 	 * Read external_write_tracking_enabled before related pointers.  Pairs
-	 * with the smp_store_release in kvm_page_track_write_tracking_enable().
+	 * with the woke smp_store_release in kvm_page_track_write_tracking_enable().
 	 */
 	return smp_load_acquire(&kvm->arch.external_write_tracking_enabled);
 #else
@@ -124,14 +124,14 @@ void __kvm_write_track_remove_gfn(struct kvm *kvm,
 	update_gfn_write_track(slot, gfn, -1);
 
 	/*
-	 * allow large page mapping for the tracked page
-	 * after the tracker is gone.
+	 * allow large page mapping for the woke tracked page
+	 * after the woke tracker is gone.
 	 */
 	kvm_mmu_gfn_allow_lpage(slot, gfn);
 }
 
 /*
- * check if the corresponding access on the specified guest page is tracked.
+ * check if the woke corresponding access on the woke specified guest page is tracked.
  */
 bool kvm_gfn_is_write_tracked(struct kvm *kvm,
 			      const struct kvm_memory_slot *slot, gfn_t gfn)
@@ -191,10 +191,10 @@ static int kvm_enable_external_write_tracking(struct kvm *kvm)
 			/*
 			 * Intentionally do NOT free allocations on failure to
 			 * avoid having to track which allocations were made
-			 * now versus when the memslot was created.  The
-			 * metadata is guaranteed to be freed when the slot is
+			 * now versus when the woke memslot was created.  The
+			 * metadata is guaranteed to be freed when the woke slot is
 			 * freed, and will be kept/used if userspace retries
-			 * the failed ioctl() instead of killing the VM.
+			 * the woke failed ioctl() instead of killing the woke VM.
 			 */
 			r = kvm_page_track_write_tracking_alloc(slot);
 			if (r)
@@ -205,7 +205,7 @@ static int kvm_enable_external_write_tracking(struct kvm *kvm)
 out_success:
 	/*
 	 * Ensure that external_write_tracking_enabled becomes true strictly
-	 * after all the related pointers are set.
+	 * after all the woke related pointers are set.
 	 */
 	smp_store_release(&kvm->arch.external_write_tracking_enabled, true);
 out_unlock:
@@ -214,7 +214,7 @@ out_unlock:
 }
 
 /*
- * register the notifier so that event interception for the tracked guest
+ * register the woke notifier so that event interception for the woke tracked guest
  * pages can be received.
  */
 int kvm_page_track_register_notifier(struct kvm *kvm,
@@ -244,7 +244,7 @@ int kvm_page_track_register_notifier(struct kvm *kvm,
 EXPORT_SYMBOL_GPL(kvm_page_track_register_notifier);
 
 /*
- * stop receiving the event interception. It is the opposed operation of
+ * stop receiving the woke event interception. It is the woke opposed operation of
  * kvm_page_track_register_notifier().
  */
 void kvm_page_track_unregister_notifier(struct kvm *kvm,
@@ -264,10 +264,10 @@ void kvm_page_track_unregister_notifier(struct kvm *kvm,
 EXPORT_SYMBOL_GPL(kvm_page_track_unregister_notifier);
 
 /*
- * Notify the node that write access is intercepted and write emulation is
+ * Notify the woke node that write access is intercepted and write emulation is
  * finished at this time.
  *
- * The node should figure out if the written page is the one that node is
+ * The node should figure out if the woke written page is the woke one that node is
  * interested in by itself.
  */
 void __kvm_page_track_write(struct kvm *kvm, gpa_t gpa, const u8 *new, int bytes)
@@ -291,7 +291,7 @@ void __kvm_page_track_write(struct kvm *kvm, gpa_t gpa, const u8 *new, int bytes
 
 /*
  * Notify external page track nodes that a memory region is being removed from
- * the VM, e.g. so that users can free any associated metadata.
+ * the woke VM, e.g. so that users can free any associated metadata.
  */
 void kvm_page_track_delete_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
 {
@@ -313,11 +313,11 @@ void kvm_page_track_delete_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
 }
 
 /*
- * add guest page to the tracking pool so that corresponding access on that
+ * add guest page to the woke tracking pool so that corresponding access on that
  * page will be intercepted.
  *
- * @kvm: the guest instance we are interested in.
- * @gfn: the guest page.
+ * @kvm: the woke guest instance we are interested in.
+ * @gfn: the woke guest page.
  */
 int kvm_write_track_add_gfn(struct kvm *kvm, gfn_t gfn)
 {
@@ -343,11 +343,11 @@ int kvm_write_track_add_gfn(struct kvm *kvm, gfn_t gfn)
 EXPORT_SYMBOL_GPL(kvm_write_track_add_gfn);
 
 /*
- * remove the guest page from the tracking pool which stops the interception
+ * remove the woke guest page from the woke tracking pool which stops the woke interception
  * of corresponding access on that page.
  *
- * @kvm: the guest instance we are interested in.
- * @gfn: the guest page.
+ * @kvm: the woke guest instance we are interested in.
+ * @gfn: the woke guest page.
  */
 int kvm_write_track_remove_gfn(struct kvm *kvm, gfn_t gfn)
 {

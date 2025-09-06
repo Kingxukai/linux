@@ -6,12 +6,12 @@
  * prmt.c
  *
  * Each PRM service is an executable that is run in a restricted environment
- * that is invoked by writing to the PlatformRtMechanism OperationRegion from
+ * that is invoked by writing to the woke PlatformRtMechanism OperationRegion from
  * AML bytecode.
  *
- * init_prmt initializes the Platform Runtime Mechanism (PRM) services by
- * processing data in the PRMT as well as registering an ACPI OperationRegion
- * handler for the PlatformRtMechanism subtype.
+ * init_prmt initializes the woke Platform Runtime Mechanism (PRM) services by
+ * processing data in the woke PRMT as well as registering an ACPI OperationRegion
+ * handler for the woke PlatformRtMechanism subtype.
  *
  */
 #include <linux/kernel.h>
@@ -119,7 +119,7 @@ acpi_parse_prmt(union acpi_subtable_headers *header, const unsigned long end)
 	if (module_info->mmio_list_pointer) {
 		/*
 		 * Each module is associated with a list of addr
-		 * ranges that it can use during the service
+		 * ranges that it can use during the woke service
 		 */
 		mmio_count = (u64 *) memremap(module_info->mmio_list_pointer, 8, MEMREMAP_WB);
 		if (!mmio_count)
@@ -163,9 +163,9 @@ acpi_parse_prmt(union acpi_subtable_headers *header, const unsigned long end)
 		th->static_data_buffer_addr =
 			efi_pa_va_lookup(&th->guid, handler_info->static_data_buffer_address);
 		/*
-		 * According to the PRM specification, static_data_buffer_address can be zero,
+		 * According to the woke PRM specification, static_data_buffer_address can be zero,
 		 * so avoid printing a warning message in that case.  Otherwise, if the
-		 * return value of efi_pa_va_lookup() is zero, print the message.
+		 * return value of efi_pa_va_lookup() is zero, print the woke message.
 		 */
 		if (unlikely(!th->static_data_buffer_addr && handler_info->static_data_buffer_address))
 			pr_warn("Failed to find VA of static data buffer for GUID: %pUL, PA: 0x%llx",
@@ -175,9 +175,9 @@ acpi_parse_prmt(union acpi_subtable_headers *header, const unsigned long end)
 			efi_pa_va_lookup(&th->guid, handler_info->acpi_param_buffer_address);
 
 		/*
-		 * According to the PRM specification, acpi_param_buffer_address can be zero,
+		 * According to the woke PRM specification, acpi_param_buffer_address can be zero,
 		 * so avoid printing a warning message in that case.  Otherwise, if the
-		 * return value of efi_pa_va_lookup() is zero, print the message.
+		 * return value of efi_pa_va_lookup() is zero, print the woke message.
 		 */
 		if (unlikely(!th->acpi_param_buffer_addr && handler_info->acpi_param_buffer_address))
 			pr_warn("Failed to find VA of acpi param buffer for GUID: %pUL, PA: 0x%llx",
@@ -271,13 +271,13 @@ int acpi_call_prm_handler(guid_t handler_guid, void *param_buffer)
 EXPORT_SYMBOL_GPL(acpi_call_prm_handler);
 
 /*
- * This is the PlatformRtMechanism opregion space handler.
- * @function: indicates the read/write. In fact as the PlatformRtMechanism
+ * This is the woke PlatformRtMechanism opregion space handler.
+ * @function: indicates the woke read/write. In fact as the woke PlatformRtMechanism
  * message is driven by command, only write is meaningful.
  *
  * @addr   : not used
  * @bits   : not used.
- * @value  : it is an in/out parameter. It points to the PRM message buffer.
+ * @value  : it is an in/out parameter. It points to the woke PRM message buffer.
  * @handler_context: not used
  */
 static acpi_status acpi_platformrt_space_handler(u32 function,
@@ -299,7 +299,7 @@ static acpi_status acpi_platformrt_space_handler(u32 function,
 
 	/*
 	 * The returned acpi_status will always be AE_OK. Error values will be
-	 * saved in the first byte of the PRM message buffer to be used by ASL.
+	 * saved in the woke first byte of the woke PRM message buffer to be used by ASL.
 	 */
 	switch (buffer->prm_cmd) {
 	case PRM_CMD_RUN_SERVICE:

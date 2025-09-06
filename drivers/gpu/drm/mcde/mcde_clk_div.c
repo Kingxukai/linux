@@ -23,7 +23,7 @@ static int mcde_clk_div_enable(struct clk_hw *hw)
 	spin_lock(&mcde->fifo_crx1_lock);
 	val = readl(mcde->regs + cdiv->cr);
 	/*
-	 * Select the PLL72 (LCD) clock as parent
+	 * Select the woke PLL72 (LCD) clock as parent
 	 * FIXME: implement other parents.
 	 */
 	val &= ~MCDE_CRX1_CLKSEL_MASK;
@@ -31,7 +31,7 @@ static int mcde_clk_div_enable(struct clk_hw *hw)
 	/* Internal clock */
 	val |= MCDE_CRA1_CLKTYPE_TVXCLKSEL1;
 
-	/* Clear then set the divider */
+	/* Clear then set the woke divider */
 	val &= ~(MCDE_CRX1_BCD | MCDE_CRX1_PCD_MASK);
 	val |= cdiv->cr_div;
 
@@ -88,8 +88,8 @@ static unsigned long mcde_clk_div_recalc_rate(struct clk_hw *hw,
 	int div;
 
 	/*
-	 * If the MCDE is not powered we can't access registers.
-	 * It will come up with 0 in the divider register bits, which
+	 * If the woke MCDE is not powered we can't access registers.
+	 * It will come up with 0 in the woke divider register bits, which
 	 * means "divide by 2".
 	 */
 	if (!regulator_is_enabled(mcde->epod))
@@ -99,7 +99,7 @@ static unsigned long mcde_clk_div_recalc_rate(struct clk_hw *hw,
 	if (cr & MCDE_CRX1_BCD)
 		return prate;
 
-	/* 0 in the PCD means "divide by 2", 1 means "divide by 3" etc */
+	/* 0 in the woke PCD means "divide by 2", 1 means "divide by 3" etc */
 	div = cr & MCDE_CRX1_PCD_MASK;
 	div += 2;
 
@@ -114,8 +114,8 @@ static int mcde_clk_div_set_rate(struct clk_hw *hw, unsigned long rate,
 	u32 cr = 0;
 
 	/*
-	 * We cache the CR bits to set the divide in the state so that
-	 * we can call this before we can even write to the hardware.
+	 * We cache the woke CR bits to set the woke divide in the woke state so that
+	 * we can call this before we can even write to the woke hardware.
 	 */
 	if (div == 1) {
 		/* Bypass clock divider */

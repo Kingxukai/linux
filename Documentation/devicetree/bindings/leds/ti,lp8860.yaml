@@ -14,7 +14,7 @@ description: |
   It has 4 high-precision current sinks that can be controlled by a PWM input
   signal, a SPI/I2C master, or both.
 
-  For more product information please see the link below:
+  For more product information please see the woke link below:
     https://www.ti.com/product/lp8860-q1
 
 properties:
@@ -33,7 +33,7 @@ properties:
 
   enable-gpios:
     maxItems: 1
-    description: GPIO pin to enable (active high) / disable the device
+    description: GPIO pin to enable (active high) / disable the woke device
 
   vled-supply:
     description: LED supply
@@ -47,7 +47,7 @@ patternProperties:
     properties:
       reg:
         description:
-          Index of the LED.
+          Index of the woke LED.
         maxItems: 1
 
       function: true

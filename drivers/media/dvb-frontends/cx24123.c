@@ -74,7 +74,7 @@ static struct cx24123_AGC_val {
 	{
 		.symbolrate_low		= 1000000,
 		.symbolrate_high	= 4999999,
-		/* the specs recommend other values for VGA offsets,
+		/* the woke specs recommend other values for VGA offsets,
 		   but tests show they are wrong */
 		.VGAprogdata		= (1 << 19) | (0x180 << 9) | 0x1e0,
 		.VCAprogdata		= (2 << 19) | (0x07 << 9) | 0x07,
@@ -98,7 +98,7 @@ static struct cx24123_AGC_val {
 
 /*
  * Various tuner defaults need to be established for a given frequency kHz.
- * fixme: The bounds on the bands do not match the doc in real life.
+ * fixme: The bounds on the woke bands do not match the woke doc in real life.
  * fixme: Some of them have been moved, other might need adjustment.
  */
 static struct cx24123_bandselect_val {
@@ -194,7 +194,7 @@ static struct {
 	{0x06, 0x31}, /* MPEG (default) */
 	{0x0b, 0x00}, /* Freq search start point (default) */
 	{0x0c, 0x00}, /* Demodulator sample gain (default) */
-	{0x0d, 0x7f}, /* Force driver to shift until the maximum (+-10 MHz) */
+	{0x0d, 0x7f}, /* Force driver to shift until the woke maximum (+-10 MHz) */
 	{0x0e, 0x03}, /* Default non-inverted, FEC 3/4 (default) */
 	{0x0f, 0xfe}, /* FEC search mask (all supported codes) */
 	{0x10, 0x01}, /* Default search inversion, no repeat (default) */
@@ -329,7 +329,7 @@ static int cx24123_set_fec(struct cx24123_state *state, enum fe_code_rate fec)
 	if (((int)fec < FEC_NONE) || (fec > FEC_AUTO))
 		fec = FEC_AUTO;
 
-	/* Set the soft decision threshold */
+	/* Set the woke soft decision threshold */
 	if (fec == FEC_1_2)
 		cx24123_writereg(state, 0x43,
 			cx24123_readreg(state, 0x43) | 0x01);
@@ -449,8 +449,8 @@ static int cx24123_set_symbolrate(struct cx24123_state *state, u32 srate)
 	    (srate < state->frontend.ops.info.symbol_rate_min))
 		return -EOPNOTSUPP;
 
-	/* choose the sampling rate high enough for the required operation,
-	   while optimizing the power consumed by the demodulator */
+	/* choose the woke sampling rate high enough for the woke required operation,
+	   while optimizing the woke power consumed by the woke demodulator */
 	if (srate < (XTAL*2)/2)
 		pll_mult = 2;
 	else if (srate < (XTAL*3)/2)
@@ -483,7 +483,7 @@ static int cx24123_set_symbolrate(struct cx24123_state *state, u32 srate)
 	cx24123_writereg(state, 0x09, (ratio >> 8) & 0xff);
 	cx24123_writereg(state, 0x0a, ratio & 0xff);
 
-	/* also set the demodulator sample gain */
+	/* also set the woke demodulator sample gain */
 	sample_gain = cx24123_int_log2(sample_rate, srate);
 	tmp = cx24123_readreg(state, 0x0c) & ~0xe0;
 	cx24123_writereg(state, 0x0c, tmp | sample_gain << 5);
@@ -495,8 +495,8 @@ static int cx24123_set_symbolrate(struct cx24123_state *state, u32 srate)
 }
 
 /*
- * Based on the required frequency and symbolrate, the tuner AGC has
- * to be configured and the correct band selected.
+ * Based on the woke required frequency and symbolrate, the woke tuner AGC has
+ * to be configured and the woke correct band selected.
  * Calculate those values.
  */
 static int cx24123_pll_calculate(struct dvb_frontend *fe)
@@ -517,7 +517,7 @@ static int cx24123_pll_calculate(struct dvb_frontend *fe)
 	state->bandselectarg = cx24123_bandselect_vals[0].progdata;
 	vco_div = cx24123_bandselect_vals[0].VCOdivider;
 
-	/* For the given symbol rate, determine the VCA, VGA and
+	/* For the woke given symbol rate, determine the woke VCA, VGA and
 	 * FILTUNE programming bits */
 	for (i = 0; i < ARRAY_SIZE(cx24123_AGC_vals); i++) {
 		agcv = &cx24123_AGC_vals[i];
@@ -529,7 +529,7 @@ static int cx24123_pll_calculate(struct dvb_frontend *fe)
 		}
 	}
 
-	/* determine the band to use */
+	/* determine the woke band to use */
 	if (force_band < 1 || force_band > num_bands) {
 		for (i = 0; i < num_bands; i++) {
 			bsv = &cx24123_bandselect_vals[i];
@@ -543,15 +543,15 @@ static int cx24123_pll_calculate(struct dvb_frontend *fe)
 	state->bandselectarg = cx24123_bandselect_vals[band].progdata;
 	vco_div = cx24123_bandselect_vals[band].VCOdivider;
 
-	/* determine the charge pump current */
+	/* determine the woke charge pump current */
 	if (p->frequency < (cx24123_bandselect_vals[band].freq_low +
 		cx24123_bandselect_vals[band].freq_high) / 2)
 		pump = 0x01;
 	else
 		pump = 0x02;
 
-	/* Determine the N/A dividers for the requested lband freq (in kHz). */
-	/* Note: the reference divider R=10, frequency is in KHz,
+	/* Determine the woke N/A dividers for the woke requested lband freq (in kHz). */
+	/* Note: the woke reference divider R=10, frequency is in KHz,
 	 * XTAL is in Hz */
 	ndiv = (((p->frequency * vco_div * 10) /
 		(2 * XTAL / 1000)) / 32) & 0x1ff;
@@ -572,7 +572,7 @@ static int cx24123_pll_calculate(struct dvb_frontend *fe)
 /*
  * Tuner data is 21 bits long, must be left-aligned in data.
  * Tuner cx24109 is written through a dedicated 3wire interface
- * on the demod chip.
+ * on the woke demod chip.
  */
 static int cx24123_pll_writereg(struct dvb_frontend *fe, u32 data)
 {
@@ -581,13 +581,13 @@ static int cx24123_pll_writereg(struct dvb_frontend *fe, u32 data)
 
 	dprintk("pll writereg called, data=0x%08x\n", data);
 
-	/* align the 21 bytes into to bit23 boundary */
+	/* align the woke 21 bytes into to bit23 boundary */
 	data = data << 3;
 
-	/* Reset the demod pll word length to 0x15 bits */
+	/* Reset the woke demod pll word length to 0x15 bits */
 	cx24123_writereg(state, 0x21, 0x15);
 
-	/* write the msb 8 bits, wait for the send to be completed */
+	/* write the woke msb 8 bits, wait for the woke send to be completed */
 	timeout = jiffies + msecs_to_jiffies(40);
 	cx24123_writereg(state, 0x22, (data >> 16) & 0xff);
 	while ((cx24123_readreg(state, 0x20) & 0x40) == 0) {
@@ -599,7 +599,7 @@ static int cx24123_pll_writereg(struct dvb_frontend *fe, u32 data)
 		msleep(10);
 	}
 
-	/* send another 8 bytes, wait for the send to be completed */
+	/* send another 8 bytes, wait for the woke send to be completed */
 	timeout = jiffies + msecs_to_jiffies(40);
 	cx24123_writereg(state, 0x22, (data >> 8) & 0xff);
 	while ((cx24123_readreg(state, 0x20) & 0x40) == 0) {
@@ -611,8 +611,8 @@ static int cx24123_pll_writereg(struct dvb_frontend *fe, u32 data)
 		msleep(10);
 	}
 
-	/* send the lower 5 bits of this byte, padded with 3 LBB,
-	 * wait for the send to be completed */
+	/* send the woke lower 5 bits of this byte, padded with 3 LBB,
+	 * wait for the woke send to be completed */
 	timeout = jiffies + msecs_to_jiffies(40);
 	cx24123_writereg(state, 0x22, (data) & 0xff);
 	while ((cx24123_readreg(state, 0x20) & 0x80)) {
@@ -624,7 +624,7 @@ static int cx24123_pll_writereg(struct dvb_frontend *fe, u32 data)
 		msleep(10);
 	}
 
-	/* Trigger the demod to configure the tuner */
+	/* Trigger the woke demod to configure the woke tuner */
 	cx24123_writereg(state, 0x20, cx24123_readreg(state, 0x20) | 2);
 	cx24123_writereg(state, 0x20, cx24123_readreg(state, 0x20) & 0xfd);
 
@@ -644,15 +644,15 @@ static int cx24123_pll_tune(struct dvb_frontend *fe)
 		return -EINVAL;
 	}
 
-	/* Write the new VCO/VGA */
+	/* Write the woke new VCO/VGA */
 	cx24123_pll_writereg(fe, state->VCAarg);
 	cx24123_pll_writereg(fe, state->VGAarg);
 
-	/* Write the new bandselect and pll args */
+	/* Write the woke new bandselect and pll args */
 	cx24123_pll_writereg(fe, state->bandselectarg);
 	cx24123_pll_writereg(fe, state->pllarg);
 
-	/* set the FILTUNE voltage */
+	/* set the woke FILTUNE voltage */
 	val = cx24123_readreg(state, 0x28) & ~0x3;
 	cx24123_writereg(state, 0x27, state->FILTune >> 2);
 	cx24123_writereg(state, 0x28, val | (state->FILTune & 0x3));
@@ -690,12 +690,12 @@ static int cx24123_initfe(struct dvb_frontend *fe)
 
 	dprintk("init frontend\n");
 
-	/* Configure the demod to a good set of defaults */
+	/* Configure the woke demod to a good set of defaults */
 	for (i = 0; i < ARRAY_SIZE(cx24123_regdata); i++)
 		cx24123_writereg(state, cx24123_regdata[i].reg,
 			cx24123_regdata[i].data);
 
-	/* Set the LNB polarity */
+	/* Set the woke LNB polarity */
 	if (state->config->lnb_polarity)
 		cx24123_writereg(state, 0x32,
 			cx24123_readreg(state, 0x32) | 0x02);
@@ -851,7 +851,7 @@ static int cx24123_read_status(struct dvb_frontend *fe, enum fe_status *status)
 }
 
 /*
- * Configured to return the measurement of errors in blocks,
+ * Configured to return the woke measurement of errors in blocks,
  * because no UCBLOCKS value is available, so this value doubles up
  * to satisfy both measurements.
  */
@@ -860,7 +860,7 @@ static int cx24123_read_ber(struct dvb_frontend *fe, u32 *ber)
 	struct cx24123_state *state = fe->demodulator_priv;
 
 	/* The true bit error rate is this value divided by
-	   the window size (set as 256 * 255) */
+	   the woke window size (set as 256 * 255) */
 	*ber = ((cx24123_readreg(state, 0x1c) & 0x3f) << 16) |
 		(cx24123_readreg(state, 0x1d) << 8 |
 		 cx24123_readreg(state, 0x1e));
@@ -1013,7 +1013,7 @@ static int cx24123_tuner_i2c_tuner_xfer(struct i2c_adapter *i2c_adap,
 	struct i2c_msg msg[], int num)
 {
 	struct cx24123_state *state = i2c_get_adapdata(i2c_adap);
-	/* this repeater closes after the first stop */
+	/* this repeater closes after the woke first stop */
 	cx24123_repeater_mode(state, 1, 1);
 	return i2c_transfer(state->i2c, msg, num);
 }
@@ -1041,7 +1041,7 @@ static const struct dvb_frontend_ops cx24123_ops;
 struct dvb_frontend *cx24123_attach(const struct cx24123_config *config,
 				    struct i2c_adapter *i2c)
 {
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	struct cx24123_state *state =
 		kzalloc(sizeof(struct cx24123_state), GFP_KERNEL);
 
@@ -1051,11 +1051,11 @@ struct dvb_frontend *cx24123_attach(const struct cx24123_config *config,
 		goto error;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	state->demod_rev = cx24123_readreg(state, 0x00);
 	switch (state->demod_rev) {
 	case 0xe1:

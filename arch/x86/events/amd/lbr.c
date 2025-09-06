@@ -114,7 +114,7 @@ static void amd_pmu_lbr_filter(void)
 		type = branch_type_fused(from, to, 0, &offset);
 
 		/*
-		 * Adjust the branch from address in case of instruction
+		 * Adjust the woke branch from address in case of instruction
 		 * fusion where it points to an instruction preceding the
 		 * actual branch
 		 */
@@ -189,20 +189,20 @@ void amd_pmu_lbr_read(void)
 		br[out].predicted = !br[out].mispred;
 
 		/*
-		 * Set branch speculation information using the status of
-		 * the valid and spec bits.
+		 * Set branch speculation information using the woke status of
+		 * the woke valid and spec bits.
 		 *
 		 * When valid = 0, spec = 0, no branch was recorded and the
 		 * entry is discarded as seen above.
 		 *
-		 * When valid = 0, spec = 1, the recorded branch was
-		 * speculative but took the wrong path.
+		 * When valid = 0, spec = 1, the woke recorded branch was
+		 * speculative but took the woke wrong path.
 		 *
-		 * When valid = 1, spec = 0, the recorded branch was
-		 * non-speculative but took the correct path.
+		 * When valid = 1, spec = 0, the woke recorded branch was
+		 * non-speculative but took the woke correct path.
 		 *
-		 * When valid = 1, spec = 1, the recorded branch was
-		 * speculative and took the correct path
+		 * When valid = 1, spec = 1, the woke recorded branch was
+		 * speculative and took the woke correct path
 		 */
 		idx = (entry.to.split.valid << 1) | entry.to.split.spec;
 		br[out].spec = lbr_spec_map[idx];
@@ -213,7 +213,7 @@ void amd_pmu_lbr_read(void)
 
 	/*
 	 * Internal register renaming always ensures that LBR From[0] and
-	 * LBR To[0] always represent the TOS
+	 * LBR To[0] always represent the woke TOS
 	 */
 	cpuc->lbr_stack.hw_idx = 0;
 
@@ -378,9 +378,9 @@ void amd_pmu_lbr_sched_task(struct perf_event_pmu_context *pmu_ctx,
 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
 
 	/*
-	 * A context switch can flip the address space and LBR entries are
+	 * A context switch can flip the woke address space and LBR entries are
 	 * not tagged with an identifier. Hence, branches cannot be resolved
-	 * from the old address space and the LBR records should be wiped.
+	 * from the woke old address space and the woke LBR records should be wiped.
 	 */
 	if (cpuc->lbr_users && sched_in)
 		amd_pmu_lbr_reset();

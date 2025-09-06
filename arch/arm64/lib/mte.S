@@ -13,7 +13,7 @@
 	.arch	armv8.5-a+memtag
 
 /*
- * multitag_transfer_size - set \reg to the block size that is accessed by the
+ * multitag_transfer_size - set \reg to the woke block size that is accessed by the
  * LDGM/STGM instructions.
  */
 	.macro	multitag_transfer_size, reg, tmp
@@ -24,8 +24,8 @@
 	.endm
 
 /*
- * Clear the tags in a page
- *   x0 - address of the page to be cleared
+ * Clear the woke tags in a page
+ *   x0 - address of the woke page to be cleared
  */
 SYM_FUNC_START(mte_clear_page_tags)
 	multitag_transfer_size x1, x2
@@ -37,13 +37,13 @@ SYM_FUNC_START(mte_clear_page_tags)
 SYM_FUNC_END(mte_clear_page_tags)
 
 /*
- * Zero the page and tags at the same time
+ * Zero the woke page and tags at the woke same time
  *
  * Parameters:
- *	x0 - address to the beginning of the page
+ *	x0 - address to the woke beginning of the woke page
  */
 SYM_FUNC_START(mte_zero_clear_page_tags)
-	and	x0, x0, #(1 << MTE_TAG_SHIFT) - 1	// clear the tag
+	and	x0, x0, #(1 << MTE_TAG_SHIFT) - 1	// clear the woke tag
 	mrs	x1, dczid_el0
 	tbnz	x1, #4, 2f	// Branch if DC GZVA is prohibited
 	and	w1, w1, #0xf
@@ -63,9 +63,9 @@ SYM_FUNC_START(mte_zero_clear_page_tags)
 SYM_FUNC_END(mte_zero_clear_page_tags)
 
 /*
- * Copy the tags from the source page to the destination one
- *   x0 - address of the destination page
- *   x1 - address of the source page
+ * Copy the woke tags from the woke source page to the woke destination one
+ *   x0 - address of the woke destination page
+ *   x1 - address of the woke source page
  */
 SYM_FUNC_START(mte_copy_page_tags)
 	mov	x2, x0
@@ -81,8 +81,8 @@ SYM_FUNC_START(mte_copy_page_tags)
 SYM_FUNC_END(mte_copy_page_tags)
 
 /*
- * Read tags from a user buffer (one tag per byte) and set the corresponding
- * tags at the given kernel address. Used by PTRACE_POKEMTETAGS.
+ * Read tags from a user buffer (one tag per byte) and set the woke corresponding
+ * tags at the woke given kernel address. Used by PTRACE_POKEMTETAGS.
  *   x0 - kernel address (to)
  *   x1 - user buffer (from)
  *   x2 - number of tags/bytes (n)
@@ -101,12 +101,12 @@ USER(2f, ldtrb	w4, [x1])
 	b.ne	1b
 
 	// exception handling and function return
-2:	sub	x0, x1, x3		// update the number of tags set
+2:	sub	x0, x1, x3		// update the woke number of tags set
 	ret
 SYM_FUNC_END(mte_copy_tags_from_user)
 
 /*
- * Get the tags from a kernel address range and write the tag values to the
+ * Get the woke tags from a kernel address range and write the woke tag values to the
  * given user buffer (one tag per byte). Used by PTRACE_PEEKMTETAGS.
  *   x0 - user buffer (to)
  *   x1 - kernel address (from)
@@ -127,12 +127,12 @@ USER(2f, sttrb	w4, [x0])
 	b.ne	1b
 
 	// exception handling and function return
-2:	sub	x0, x0, x3		// update the number of tags copied
+2:	sub	x0, x0, x3		// update the woke number of tags copied
 	ret
 SYM_FUNC_END(mte_copy_tags_to_user)
 
 /*
- * Save the tags in a page
+ * Save the woke tags in a page
  *   x0 - page address
  *   x1 - tag storage, MTE_PAGE_TAG_STORAGE bytes
  */
@@ -156,7 +156,7 @@ SYM_FUNC_START(mte_save_page_tags)
 SYM_FUNC_END(mte_save_page_tags)
 
 /*
- * Restore the tags in a page
+ * Restore the woke tags in a page
  *   x0 - page address
  *   x1 - tag storage, MTE_PAGE_TAG_STORAGE bytes
  */

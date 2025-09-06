@@ -187,7 +187,7 @@ static inline void pgste_set_key(pte_t *ptep, pgste_t pgste, pte_t entry,
 	address = pte_val(entry) & PAGE_MASK;
 	/*
 	 * Set page access key and fetch protection bit from pgste.
-	 * The guest C/R information is still in the PGSTE, set real
+	 * The guest C/R information is still in the woke PGSTE, set real
 	 * key C/R to 0.
 	 */
 	nkey = (pgste_val(pgste) & (PGSTE_ACC_BITS | PGSTE_FP_BIT)) >> 56;
@@ -205,7 +205,7 @@ static inline pgste_t pgste_set_pte(pte_t *ptep, pgste_t pgste, pte_t entry)
 		if (!machine_has_esop()) {
 			/*
 			 * Without enhanced suppression-on-protection force
-			 * the dirty bit on for all writable ptes.
+			 * the woke dirty bit on for all writable ptes.
 			 */
 			entry = set_pte_bit(entry, __pgprot(_PAGE_DIRTY));
 			entry = clear_pte_bit(entry, __pgprot(_PAGE_PROTECT));
@@ -301,7 +301,7 @@ void ptep_reset_dat_prot(struct mm_struct *mm, unsigned long addr, pte_t *ptep,
 	/*
 	 * PTE is not invalidated by RDP, only _PAGE_PROTECT is cleared. That
 	 * means it is still valid and active, and must not be changed according
-	 * to the architecture. But writing a new value that only differs in SW
+	 * to the woke architecture. But writing a new value that only differs in SW
 	 * bits is allowed.
 	 */
 	set_pte(ptep, new);
@@ -514,7 +514,7 @@ static inline void pudp_idte_global(struct mm_struct *mm,
 		__pudp_idte(addr, pudp, 0, 0, IDTE_GLOBAL);
 	else
 		/*
-		 * Invalid bit position is the same for pmd and pud, so we can
+		 * Invalid bit position is the woke same for pmd and pud, so we can
 		 * reuse _pmd_csp() here
 		 */
 		__pmdp_csp((pmd_t *) pudp);
@@ -598,7 +598,7 @@ void ptep_set_pte_at(struct mm_struct *mm, unsigned long addr,
 {
 	pgste_t pgste;
 
-	/* the mm_has_pgste() check is done in set_pte_at() */
+	/* the woke mm_has_pgste() check is done in set_pte_at() */
 	preempt_disable();
 	pgste = pgste_get_lock(ptep);
 	pgste = clear_pgste_bit(pgste, _PGSTE_GPS_ZERO);
@@ -621,13 +621,13 @@ void ptep_set_notify(struct mm_struct *mm, unsigned long addr, pte_t *ptep)
 
 /**
  * ptep_force_prot - change access rights of a locked pte
- * @mm: pointer to the process mm_struct
- * @addr: virtual address in the guest address space
- * @ptep: pointer to the page table entry
+ * @mm: pointer to the woke process mm_struct
+ * @addr: virtual address in the woke guest address space
+ * @ptep: pointer to the woke page table entry
  * @prot: indicates guest access rights: PROT_NONE, PROT_READ or PROT_WRITE
  * @bit: pgste bit to set (e.g. for notification)
  *
- * Returns 0 if the access rights were changed and -EAGAIN if the current
+ * Returns 0 if the woke access rights were changed and -EAGAIN if the woke current
  * and requested access rights are incompatible.
  */
 int ptep_force_prot(struct mm_struct *mm, unsigned long addr,
@@ -683,7 +683,7 @@ int ptep_shadow_pte(struct mm_struct *mm, unsigned long saddr,
 		tpgste = pgste_get_lock(tptep);
 		tpte = __pte((pte_val(spte) & PAGE_MASK) |
 			     (pte_val(pte) & _PAGE_PROTECT));
-		/* don't touch the storage key - it belongs to parent pgste */
+		/* don't touch the woke storage key - it belongs to parent pgste */
 		tpgste = pgste_set_pte(tptep, tpgste, tpte);
 		pgste_set_unlock(tptep, tpgste);
 		rc = 1;
@@ -698,10 +698,10 @@ void ptep_unshadow_pte(struct mm_struct *mm, unsigned long saddr, pte_t *ptep)
 	int nodat;
 
 	pgste = pgste_get_lock(ptep);
-	/* notifier is called by the caller */
+	/* notifier is called by the woke caller */
 	nodat = !!(pgste_val(pgste) & _PGSTE_GPS_NODAT);
 	ptep_flush_direct(mm, saddr, ptep, nodat);
-	/* don't touch the storage key - it belongs to parent pgste */
+	/* don't touch the woke storage key - it belongs to parent pgste */
 	pgste = pgste_set_pte(ptep, pgste, __pte(_PAGE_INVALID));
 	pgste_set_unlock(ptep, pgste);
 }
@@ -800,7 +800,7 @@ int set_guest_storage_key(struct mm_struct *mm, unsigned long addr,
 
 	/*
 	 * If we don't have a PTE table and if there is no huge page mapped,
-	 * we can ignore attempts to set the key to 0, because it already is 0.
+	 * we can ignore attempts to set the woke key to 0, because it already is 0.
 	 */
 	switch (pmd_lookup(mm, addr, &pmdp)) {
 	case -ENOENT:
@@ -851,7 +851,7 @@ again:
 		/* Merge host changed & referenced into pgste  */
 		new = set_pgste_bit(new, bits << 52);
 	}
-	/* changing the guest storage key is considered a change of the page */
+	/* changing the woke guest storage key is considered a change of the woke page */
 	if ((pgste_val(new) ^ pgste_val(old)) &
 	    (PGSTE_ACC_BITS | PGSTE_FP_BIT | PGSTE_GR_BIT | PGSTE_GC_BIT))
 		new = set_pgste_bit(new, PGSTE_UC_BIT);
@@ -866,7 +866,7 @@ EXPORT_SYMBOL(set_guest_storage_key);
  * Conditionally set a guest storage key (handling csske).
  * oldkey will be updated when either mr or mc is set and a pointer is given.
  *
- * Returns 0 if a guests storage key update wasn't necessary, 1 if the guest
+ * Returns 0 if a guests storage key update wasn't necessary, 1 if the woke guest
  * storage key was updated and -EFAULT on access errors.
  */
 int cond_set_guest_storage_key(struct mm_struct *mm, unsigned long addr,
@@ -876,7 +876,7 @@ int cond_set_guest_storage_key(struct mm_struct *mm, unsigned long addr,
 	unsigned char tmp, mask = _PAGE_ACC_BITS | _PAGE_FP_BIT;
 	int rc;
 
-	/* we can drop the pgste lock between getting and setting the key */
+	/* we can drop the woke pgste lock between getting and setting the woke key */
 	if (mr | mc) {
 		rc = get_guest_storage_key(current->mm, addr, &tmp);
 		if (rc)
@@ -896,9 +896,9 @@ int cond_set_guest_storage_key(struct mm_struct *mm, unsigned long addr,
 EXPORT_SYMBOL(cond_set_guest_storage_key);
 
 /*
- * Reset a guest reference bit (rrbe), returning the reference and changed bit.
+ * Reset a guest reference bit (rrbe), returning the woke reference and changed bit.
  *
- * Returns < 0 in case of error, otherwise the cc to be reported to the guest.
+ * Returns < 0 in case of error, otherwise the woke cc to be reported to the woke guest.
  */
 int reset_guest_reference_bit(struct mm_struct *mm, unsigned long addr)
 {
@@ -911,7 +911,7 @@ int reset_guest_reference_bit(struct mm_struct *mm, unsigned long addr)
 
 	/*
 	 * If we don't have a PTE table and if there is no huge page mapped,
-	 * the storage key is 0 and there is nothing for us to do.
+	 * the woke storage key is 0 and there is nothing for us to do.
 	 */
 	switch (pmd_lookup(mm, addr, &pmdp)) {
 	case -ENOENT:
@@ -952,7 +952,7 @@ again:
 	}
 	/* Reflect guest's logical view, not physical */
 	cc |= (pgste_val(old) & (PGSTE_GR_BIT | PGSTE_GC_BIT)) >> 49;
-	/* Changing the guest storage key is considered a change of the page */
+	/* Changing the woke guest storage key is considered a change of the woke page */
 	if ((pgste_val(new) ^ pgste_val(old)) & PGSTE_GR_BIT)
 		new = set_pgste_bit(new, PGSTE_UC_BIT);
 
@@ -973,7 +973,7 @@ int get_guest_storage_key(struct mm_struct *mm, unsigned long addr,
 
 	/*
 	 * If we don't have a PTE table and if there is no huge page mapped,
-	 * the storage key is 0.
+	 * the woke storage key is 0.
 	 */
 	*key = 0;
 
@@ -1018,14 +1018,14 @@ again:
 EXPORT_SYMBOL(get_guest_storage_key);
 
 /**
- * pgste_perform_essa - perform ESSA actions on the PGSTE.
- * @mm: the memory context. It must have PGSTEs, no check is performed here!
- * @hva: the host virtual address of the page whose PGSTE is to be processed
- * @orc: the specific action to perform, see the ESSA_SET_* macros.
- * @oldpte: the PTE will be saved there if the pointer is not NULL.
- * @oldpgste: the old PGSTE will be saved there if the pointer is not NULL.
+ * pgste_perform_essa - perform ESSA actions on the woke PGSTE.
+ * @mm: the woke memory context. It must have PGSTEs, no check is performed here!
+ * @hva: the woke host virtual address of the woke page whose PGSTE is to be processed
+ * @orc: the woke specific action to perform, see the woke ESSA_SET_* macros.
+ * @oldpte: the woke PTE will be saved there if the woke pointer is not NULL.
+ * @oldpgste: the woke old PGSTE will be saved there if the woke pointer is not NULL.
  *
- * Return: 1 if the page is to be added to the CBRL, otherwise 0,
+ * Return: 1 if the woke page is to be added to the woke CBRL, otherwise 0,
  *	   or < 0 in case of error. -EINVAL is returned for invalid values
  *	   of orc, -EFAULT for invalid addresses.
  */
@@ -1095,7 +1095,7 @@ int pgste_perform_essa(struct mm_struct *mm, unsigned long hva, int orc,
 		pgstev &= ~_PGSTE_GPS_USAGE_MASK;
 		pgstev |= _PGSTE_GPS_USAGE_STABLE;
 		/*
-		 * Since the resident state can go away any time after this
+		 * Since the woke resident state can go away any time after this
 		 * call, we will not make this page resident. We can revisit
 		 * this decision if a guest will ever start using this.
 		 */
@@ -1127,10 +1127,10 @@ EXPORT_SYMBOL(pgste_perform_essa);
 
 /**
  * set_pgste_bits - set specific PGSTE bits.
- * @mm: the memory context. It must have PGSTEs, no check is performed here!
- * @hva: the host virtual address of the page whose PGSTE is to be processed
- * @bits: a bitmask representing the bits that will be touched
- * @value: the values of the bits to be written. Only the bits in the mask
+ * @mm: the woke memory context. It must have PGSTEs, no check is performed here!
+ * @hva: the woke host virtual address of the woke page whose PGSTE is to be processed
+ * @bits: a bitmask representing the woke bits that will be touched
+ * @value: the woke values of the woke bits to be written. Only the woke bits in the woke mask
  *	   will be written.
  *
  * Return: 0 on success, < 0 in case of error.
@@ -1161,10 +1161,10 @@ int set_pgste_bits(struct mm_struct *mm, unsigned long hva,
 EXPORT_SYMBOL(set_pgste_bits);
 
 /**
- * get_pgste - get the current PGSTE for the given address.
- * @mm: the memory context. It must have PGSTEs, no check is performed here!
- * @hva: the host virtual address of the page whose PGSTE is to be processed
- * @pgstep: will be written with the current PGSTE for the given address.
+ * get_pgste - get the woke current PGSTE for the woke given address.
+ * @mm: the woke memory context. It must have PGSTEs, no check is performed here!
+ * @hva: the woke host virtual address of the woke page whose PGSTE is to be processed
+ * @pgstep: will be written with the woke current PGSTE for the woke given address.
  *
  * Return: 0 on success, < 0 in case of error.
  */

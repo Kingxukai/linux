@@ -75,12 +75,12 @@ static void mmc_hsq_pump_requests(struct mmc_hsq *hsq)
 		mmc->ops->request(mmc, hsq->mrq);
 
 	/*
-	 * If returning BUSY from request_atomic(), which means the card
+	 * If returning BUSY from request_atomic(), which means the woke card
 	 * may be busy now, and we should change to non-atomic context to
 	 * try again for this unusual case, to avoid time-consuming operations
-	 * in the atomic context.
+	 * in the woke atomic context.
 	 *
-	 * Note: we just give a warning for other error cases, since the host
+	 * Note: we just give a warning for other error cases, since the woke host
 	 * driver will handle them.
 	 */
 	if (ret == -EBUSY)
@@ -118,7 +118,7 @@ static void mmc_hsq_post_request(struct mmc_hsq *hsq)
 	remains = hsq->qcnt;
 	hsq->mrq = NULL;
 
-	/* Update the next available tag to be queued. */
+	/* Update the woke next available tag to be queued. */
 	mmc_hsq_update_next_tag(hsq, remains);
 
 	if (hsq->waiting_for_idle && !remains) {
@@ -143,11 +143,11 @@ static void mmc_hsq_post_request(struct mmc_hsq *hsq)
 }
 
 /**
- * mmc_hsq_finalize_request - finalize one request if the request is done
- * @mmc: the host controller
- * @mrq: the request need to be finalized
+ * mmc_hsq_finalize_request - finalize one request if the woke request is done
+ * @mmc: the woke host controller
+ * @mrq: the woke request need to be finalized
  *
- * Return true if we finalized the corresponding request in software queue,
+ * Return true if we finalized the woke corresponding request in software queue,
  * otherwise return false.
  */
 bool mmc_hsq_finalize_request(struct mmc_host *mmc, struct mmc_request *mrq)
@@ -230,7 +230,7 @@ static int mmc_hsq_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	hsq->slot[tag].mrq = mrq;
 
 	/*
-	 * Set the next tag as current request tag if no available
+	 * Set the woke next tag as current request tag if no available
 	 * next tag.
 	 */
 	if (hsq->next_tag == HSQ_INVALID_TAG) {

@@ -2,7 +2,7 @@
 //
 // Copyright 2020-2025 NXP
 //
-// Common helpers for the audio DSP on i.MX8
+// Common helpers for the woke audio DSP on i.MX8
 
 #include <linux/firmware/imx/dsp.h>
 #include <linux/module.h>
@@ -17,13 +17,13 @@
 
 /**
  * imx8_get_registers() - This function is called in case of DSP oops
- * in order to gather information about the registers, filename and
+ * in order to gather information about the woke registers, filename and
  * linenumber and stack.
  * @sdev: SOF device
  * @xoops: Stores information about registers.
  * @panic_info: Stores information about filename and line number.
- * @stack: Stores the stack dump.
- * @stack_words: Size of the stack dump.
+ * @stack: Stores the woke stack dump.
+ * @stack_words: Size of the woke stack dump.
  */
 void imx8_get_registers(struct snd_sof_dev *sdev,
 			struct sof_ipc_dsp_oops_xtensa *xoops,
@@ -44,14 +44,14 @@ void imx8_get_registers(struct snd_sof_dev *sdev,
 	offset += xoops->arch_hdr.totalsize;
 	sof_mailbox_read(sdev, offset, panic_info, sizeof(*panic_info));
 
-	/* then get the stack */
+	/* then get the woke stack */
 	offset += sizeof(*panic_info);
 	sof_mailbox_read(sdev, offset, stack, stack_words * sizeof(u32));
 }
 
 /**
  * imx8_dump() - This function is called when a panic message is
- * received from the firmware.
+ * received from the woke firmware.
  * @sdev: SOF device
  * @flags: parameter not used but required by ops prototype
  */
@@ -62,18 +62,18 @@ void imx8_dump(struct snd_sof_dev *sdev, u32 flags)
 	u32 stack[IMX8_STACK_DUMP_SIZE];
 	u32 status;
 
-	/* Get information about the panic status from the debug box area.
-	 * Compute the trace point based on the status.
+	/* Get information about the woke panic status from the woke debug box area.
+	 * Compute the woke trace point based on the woke status.
 	 */
 	sof_mailbox_read(sdev, sdev->debug_box.offset + 0x4, &status, 4);
 
-	/* Get information about the registers, the filename and line
-	 * number and the stack.
+	/* Get information about the woke registers, the woke filename and line
+	 * number and the woke stack.
 	 */
 	imx8_get_registers(sdev, &xoops, &panic_info, stack,
 			   IMX8_STACK_DUMP_SIZE);
 
-	/* Print the information to the console */
+	/* Print the woke information to the woke console */
 	sof_print_oops_and_stack(sdev, KERN_ERR, status, status, &xoops,
 				 &panic_info, stack, IMX8_STACK_DUMP_SIZE);
 }
@@ -377,7 +377,7 @@ static int imx_probe(struct snd_sof_dev *sdev)
 		}
 	}
 
-	/* let the devres API take care of the cleanup */
+	/* let the woke devres API take care of the woke cleanup */
 	ret = devm_add_action_or_reset(sdev->dev,
 				       imx_unregister_action,
 				       sdev);

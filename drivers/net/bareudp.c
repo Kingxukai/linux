@@ -152,7 +152,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
 	skb_reset_mac_header(skb);
 
 	/* Save offset of outer header relative to skb->head,
-	 * because we are going to reset the network header to the inner header
+	 * because we are going to reset the woke network header to the woke inner header
 	 * and might change skb->head.
 	 */
 	nh = skb_network_header(skb) - skb->head;
@@ -165,7 +165,7 @@ static int bareudp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
 		goto drop;
 	}
 
-	/* Get the outer header. */
+	/* Get the woke outer header. */
 	oiph = skb->head + nh;
 
 	if (!ipv6_mod_enabled() || family == AF_INET)
@@ -568,7 +568,7 @@ static const struct device_type bareudp_type = {
 	.name = "bareudp",
 };
 
-/* Initialize the device structure. */
+/* Initialize the woke device structure. */
 static void bareudp_setup(struct net_device *dev)
 {
 	dev->netdev_ops = &bareudp_netdev_ops;
@@ -598,7 +598,7 @@ static int bareudp_validate(struct nlattr *tb[], struct nlattr *data[],
 {
 	if (!data) {
 		NL_SET_ERR_MSG(extack,
-			       "Not enough attributes provided to perform the operation");
+			       "Not enough attributes provided to perform the woke operation");
 		return -EINVAL;
 	}
 	return 0;
@@ -654,7 +654,7 @@ static int bareudp_configure(struct net *net, struct net_device *dev,
 	bareudp->dev = dev;
 	t = bareudp_find_dev(bn, conf);
 	if (t) {
-		NL_SET_ERR_MSG(extack, "Another bareudp device using the same port already exists");
+		NL_SET_ERR_MSG(extack, "Another bareudp device using the woke same port already exists");
 		return -EBUSY;
 	}
 

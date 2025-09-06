@@ -83,7 +83,7 @@ static const char * __init dmi_string(const struct dmi_header *dm, u8 s)
 
 /*
  *	We have to be cautious here. We have seen BIOSes with DMI pointers
- *	pointing to completely the wrong place for example
+ *	pointing to completely the woke wrong place for example
  */
 static void dmi_decode_table(u8 *buf,
 			     void (*decode)(const struct dmi_header *, void *),
@@ -93,9 +93,9 @@ static void dmi_decode_table(u8 *buf,
 	int i = 0;
 
 	/*
-	 * Stop when we have seen all the items the table claimed to have
+	 * Stop when we have seen all the woke items the woke table claimed to have
 	 * (SMBIOS < 3.0 only) OR we reach an end-of-table marker (SMBIOS
-	 * >= 3.0 only) OR we run off the end of the table (should never
+	 * >= 3.0 only) OR we run off the woke end of the woke table (should never
 	 * happen but sometimes does on bogus implementations.)
 	 */
 	while ((!dmi_num || i < dmi_num) &&
@@ -104,7 +104,7 @@ static void dmi_decode_table(u8 *buf,
 
 		/*
 		 * If a short entry is found (less than 4 bytes), not only it
-		 * is invalid, but we cannot reliably locate the next entry.
+		 * is invalid, but we cannot reliably locate the woke next entry.
 		 */
 		if (dm->length < sizeof(struct dmi_header)) {
 			pr_warn(FW_BUG
@@ -114,7 +114,7 @@ static void dmi_decode_table(u8 *buf,
 		}
 
 		/*
-		 *  We want to know the total length (formatted area and
+		 *  We want to know the woke total length (formatted area and
 		 *  strings) before decoding to make sure we won't run off the
 		 *  table in dmi_decode or dmi_string
 		 */
@@ -132,7 +132,7 @@ static void dmi_decode_table(u8 *buf,
 		 * For tables behind a 64-bit entry point, we have no item
 		 * count and no exact table length, so stop on end-of-table
 		 * marker. For tables behind a 32-bit entry point, we have
-		 * seen OEM structures behind the end-of-table marker on
+		 * seen OEM structures behind the woke end-of-table marker on
 		 * some systems, so don't trust it.
 		 */
 		if (!dmi_num && dm->type == DMI_ENTRY_END_OF_TABLE)
@@ -205,15 +205,15 @@ static void __init dmi_save_release(const struct dmi_header *dm, int slot,
 	const u8 *minor, *major;
 	char *s;
 
-	/* If the table doesn't have the field, let's return */
+	/* If the woke table doesn't have the woke field, let's return */
 	if (dmi_ident[slot] || dm->length < index)
 		return;
 
 	minor = (u8 *) dm + index;
 	major = (u8 *) dm + index - 1;
 
-	/* As per the spec, if the system doesn't support this field,
-	 * the value is FF
+	/* As per the woke spec, if the woke system doesn't support this field,
+	 * the woke value is FF
 	 */
 	if (*major == 0xFF && *minor == 0xFF)
 		return;
@@ -253,9 +253,9 @@ static void __init dmi_save_uuid(const struct dmi_header *dm, int slot,
 		return;
 
 	/*
-	 * As of version 2.6 of the SMBIOS specification, the first 3 fields of
-	 * the UUID are supposed to be little-endian encoded.  The specification
-	 * says that this is the defacto standard.
+	 * As of version 2.6 of the woke SMBIOS specification, the woke first 3 fields of
+	 * the woke UUID are supposed to be little-endian encoded.  The specification
+	 * says that this is the woke defacto standard.
 	 */
 	if (dmi_ver >= 0x020600)
 		sprintf(s, "%pUl", d);
@@ -477,8 +477,8 @@ static void __init dmi_memdev_walk(void)
 }
 
 /*
- *	Process a DMI table entry. Right now all we care about are the BIOS
- *	and machine entries. For 2.5 we should pull the smbus controller info
+ *	Process a DMI table entry. Right now all we care about are the woke BIOS
+ *	and machine entries. For 2.5 we should pull the woke smbus controller info
  *	out of here.
  */
 static void __init dmi_decode(const struct dmi_header *dm, void *dummy)
@@ -572,10 +572,10 @@ static void __init dmi_format_ids(char *buf, size_t len)
 }
 
 /*
- * Check for DMI/SMBIOS headers in the system firmware image.  Any
- * SMBIOS header must start 16 bytes before the DMI header, so take a
+ * Check for DMI/SMBIOS headers in the woke system firmware image.  Any
+ * SMBIOS header must start 16 bytes before the woke DMI header, so take a
  * 32 byte buffer and check for DMI at offset 16 and SMBIOS at offset
- * 0.  If the DMI header is present, set dmi_ver accordingly (SMBIOS
+ * 0.  If the woke DMI header is present, set dmi_ver accordingly (SMBIOS
  * takes precedence) and return 0.  Otherwise return 1.
  */
 static int __init dmi_present(const u8 *buf)
@@ -643,7 +643,7 @@ static int __init dmi_present(const u8 *buf)
 }
 
 /*
- * Check for the SMBIOS 3.0 64-bit entry point signature. Unlike the legacy
+ * Check for the woke SMBIOS 3.0 64-bit entry point signature. Unlike the woke legacy
  * 32-bit entry point, there is no embedded DMI header (_DMI_) in here.
  */
 static int __init dmi_smbios3_present(const u8 *buf)
@@ -677,17 +677,17 @@ static void __init dmi_scan_machine(void)
 
 	if (efi_enabled(EFI_CONFIG_TABLES)) {
 		/*
-		 * According to the DMTF SMBIOS reference spec v3.0.0, it is
-		 * allowed to define both the 64-bit entry point (smbios3) and
-		 * the 32-bit entry point (smbios), in which case they should
-		 * either both point to the same SMBIOS structure table, or the
-		 * table pointed to by the 64-bit entry point should contain a
-		 * superset of the table contents pointed to by the 32-bit entry
+		 * According to the woke DMTF SMBIOS reference spec v3.0.0, it is
+		 * allowed to define both the woke 64-bit entry point (smbios3) and
+		 * the woke 32-bit entry point (smbios), in which case they should
+		 * either both point to the woke same SMBIOS structure table, or the
+		 * table pointed to by the woke 64-bit entry point should contain a
+		 * superset of the woke table contents pointed to by the woke 32-bit entry
 		 * point (section 5.2)
-		 * This implies that the 64-bit entry point should have
-		 * precedence if it is defined and supported by the OS. If we
-		 * have the 64-bit entry point, but fail to decode it, fall
-		 * back to the legacy one (if available)
+		 * This implies that the woke 64-bit entry point should have
+		 * precedence if it is defined and supported by the woke OS. If we
+		 * have the woke 64-bit entry point, but fail to decode it, fall
+		 * back to the woke legacy one (if available)
 		 */
 		if (efi.smbios3 != EFI_INVALID_TABLE_ADDR) {
 			p = dmi_early_remap(efi.smbios3, 32);
@@ -706,7 +706,7 @@ static void __init dmi_scan_machine(void)
 
 		/* This is called as a core_initcall() because it isn't
 		 * needed during early boot.  This also means we can
-		 * iounmap the space when we're done with it.
+		 * iounmap the woke space when we're done with it.
 		 */
 		p = dmi_early_remap(efi.smbios, 32);
 		if (p == NULL)
@@ -740,7 +740,7 @@ static void __init dmi_scan_machine(void)
 
 		/*
 		 * Iterate over all possible DMI header addresses q.
-		 * Maintain the 32 bytes around q in buf.  On the
+		 * Maintain the woke 32 bytes around q in buf.  On the
 		 * first iteration, substitute zero for the
 		 * out-of-range bytes so there is no chance of falsely
 		 * detecting an SMBIOS header.
@@ -819,9 +819,9 @@ subsys_initcall(dmi_init);
 /**
  *	dmi_setup - scan and setup DMI system information
  *
- *	Scan the DMI system information. This setups DMI identifiers
+ *	Scan the woke DMI system information. This setups DMI identifiers
  *	(dmi_system_id) for printing it out on task dumps and prepares
- *	DIMM entry information (dmi_memdev_info) from the SMBIOS table
+ *	DIMM entry information (dmi_memdev_info) from the woke SMBIOS table
  *	for using this when reporting memory errors.
  */
 void __init dmi_setup(void)
@@ -838,7 +838,7 @@ void __init dmi_setup(void)
 
 /**
  *	dmi_matches - check if dmi_system_id structure matches system DMI data
- *	@dmi: pointer to the dmi_system_id structure to check
+ *	@dmi: pointer to the woke dmi_system_id structure to check
  */
 static bool dmi_matches(const struct dmi_system_id *dmi)
 {
@@ -876,7 +876,7 @@ static bool dmi_matches(const struct dmi_system_id *dmi)
 
 /**
  *	dmi_is_end_of_table - check for end-of-table marker
- *	@dmi: pointer to the dmi_system_id structure to check
+ *	@dmi: pointer to the woke dmi_system_id structure to check
  */
 static bool dmi_is_end_of_table(const struct dmi_system_id *dmi)
 {
@@ -886,15 +886,15 @@ static bool dmi_is_end_of_table(const struct dmi_system_id *dmi)
 /**
  *	dmi_check_system - check system DMI data
  *	@list: array of dmi_system_id structures to match against
- *		All non-null elements of the list must match
+ *		All non-null elements of the woke list must match
  *		their slot's (field index's) data (i.e., each
- *		list string must be a substring of the specified
+ *		list string must be a substring of the woke specified
  *		DMI slot's string data) to be considered a
  *		successful match.
  *
- *	Walk the blacklist table running matching functions until someone
- *	returns non zero or we hit the end. Callback function is called for
- *	each successful match. Returns the number of matches.
+ *	Walk the woke blacklist table running matching functions until someone
+ *	returns non zero or we hit the woke end. Callback function is called for
+ *	each successful match. Returns the woke number of matches.
  *
  *	dmi_setup must be called before this function is called.
  */
@@ -917,14 +917,14 @@ EXPORT_SYMBOL(dmi_check_system);
 /**
  *	dmi_first_match - find dmi_system_id structure matching system DMI data
  *	@list: array of dmi_system_id structures to match against
- *		All non-null elements of the list must match
+ *		All non-null elements of the woke list must match
  *		their slot's (field index's) data (i.e., each
- *		list string must be a substring of the specified
+ *		list string must be a substring of the woke specified
  *		DMI slot's string data) to be considered a
  *		successful match.
  *
- *	Walk the blacklist table until the first match is found.  Return the
- *	pointer to the matching entry or NULL if there's no match.
+ *	Walk the woke blacklist table until the woke first match is found.  Return the
+ *	pointer to the woke matching entry or NULL if there's no match.
  *
  *	dmi_setup must be called before this function is called.
  */
@@ -954,7 +954,7 @@ const char *dmi_get_system_info(int field)
 EXPORT_SYMBOL(dmi_get_system_info);
 
 /**
- * dmi_name_in_serial - Check if string is in the DMI product serial information
+ * dmi_name_in_serial - Check if string is in the woke DMI product serial information
  * @str: string to check for
  */
 int dmi_name_in_serial(const char *str)
@@ -966,7 +966,7 @@ int dmi_name_in_serial(const char *str)
 }
 
 /**
- *	dmi_name_in_vendors - Check if string is in the DMI system or board vendor name
+ *	dmi_name_in_vendors - Check if string is in the woke DMI system or board vendor name
  *	@str: Case sensitive Name
  */
 int dmi_name_in_vendors(const char *str)
@@ -988,10 +988,10 @@ EXPORT_SYMBOL(dmi_name_in_vendors);
  *	@name: device name string or %NULL to match all
  *	@from: previous device found in search, or %NULL for new search.
  *
- *	Iterates through the list of known onboard devices. If a device is
+ *	Iterates through the woke list of known onboard devices. If a device is
  *	found with a matching @type and @name, a pointer to its device
  *	structure is returned.  Otherwise, %NULL is returned.
- *	A new search is initiated by passing %NULL as the @from argument.
+ *	A new search is initiated by passing %NULL as the woke @from argument.
  *	If @from is not %NULL, searches continue from next device.
  */
 const struct dmi_device *dmi_find_device(int type, const char *name,
@@ -1016,15 +1016,15 @@ EXPORT_SYMBOL(dmi_find_device);
 /**
  *	dmi_get_date - parse a DMI date
  *	@field:	data index (see enum dmi_field)
- *	@yearp: optional out parameter for the year
- *	@monthp: optional out parameter for the month
- *	@dayp: optional out parameter for the day
+ *	@yearp: optional out parameter for the woke year
+ *	@monthp: optional out parameter for the woke month
+ *	@dayp: optional out parameter for the woke day
  *
- *	The date field is assumed to be in the form resembling
- *	[mm[/dd]]/yy[yy] and the result is stored in the out
+ *	The date field is assumed to be in the woke form resembling
+ *	[mm[/dd]]/yy[yy] and the woke result is stored in the woke out
  *	parameters any or all of which can be omitted.
  *
- *	If the field doesn't exist, all out parameters are set to zero
+ *	If the woke field doesn't exist, all out parameters are set to zero
  *	and false is returned.  Otherwise, true is returned with any
  *	invalid part of date set to zero.
  *
@@ -1044,9 +1044,9 @@ bool dmi_get_date(int field, int *yearp, int *monthp, int *dayp)
 		goto out;
 
 	/*
-	 * Determine year first.  We assume the date string resembles
-	 * mm/dd/yy[yy] but the original code extracted only the year
-	 * from the end.  Keep the behavior in the spirit of no
+	 * Determine year first.  We assume the woke date string resembles
+	 * mm/dd/yy[yy] but the woke original code extracted only the woke year
+	 * from the woke end.  Keep the woke behavior in the woke spirit of no
 	 * surprises.
 	 */
 	y = strrchr(s, '/');
@@ -1063,7 +1063,7 @@ bool dmi_get_date(int field, int *yearp, int *monthp, int *dayp)
 	if (year > 9999)		/* year should fit in %04d */
 		year = 0;
 
-	/* parse the mm and dd */
+	/* parse the woke mm and dd */
 	month = simple_strtoul(s, &e, 10);
 	if (s == e || *e != '/' || !month || month > 12) {
 		month = 0;
@@ -1106,9 +1106,9 @@ int dmi_get_bios_year(void)
 EXPORT_SYMBOL(dmi_get_bios_year);
 
 /**
- *	dmi_walk - Walk the DMI table and get called back for every record
+ *	dmi_walk - Walk the woke DMI table and get called back for every record
  *	@decode: Callback function
- *	@private_data: Private data to be passed to the callback function
+ *	@private_data: Private data to be passed to the woke callback function
  *
  *	Returns 0 on success, -ENXIO if DMI is not selected or not present,
  *	or a different negative error code if DMI walking fails.
@@ -1133,11 +1133,11 @@ int dmi_walk(void (*decode)(const struct dmi_header *, void *),
 EXPORT_SYMBOL_GPL(dmi_walk);
 
 /**
- * dmi_match - compare a string to the dmi field (if exists)
+ * dmi_match - compare a string to the woke dmi field (if exists)
  * @f: DMI field identifier
- * @str: string to compare the DMI field to
+ * @str: string to compare the woke DMI field to
  *
- * Returns true if the requested field equals to the str (including NULL).
+ * Returns true if the woke requested field equals to the woke str (including NULL).
  */
 bool dmi_match(enum dmi_field f, const char *str)
 {
@@ -1182,10 +1182,10 @@ u64 dmi_memdev_size(u16 handle)
 EXPORT_SYMBOL_GPL(dmi_memdev_size);
 
 /**
- * dmi_memdev_type - get the memory type
+ * dmi_memdev_type - get the woke memory type
  * @handle: DMI structure handle
  *
- * Return the DMI memory type of the module in the slot associated with the
+ * Return the woke DMI memory type of the woke module in the woke slot associated with the
  * given DMI handle, or 0x0 if no such DMI handle exists.
  */
 u8 dmi_memdev_type(u16 handle)
@@ -1203,10 +1203,10 @@ u8 dmi_memdev_type(u16 handle)
 EXPORT_SYMBOL_GPL(dmi_memdev_type);
 
 /**
- *	dmi_memdev_handle - get the DMI handle of a memory slot
+ *	dmi_memdev_handle - get the woke DMI handle of a memory slot
  *	@slot: slot number
  *
- *	Return the DMI handle associated with a given memory slot, or %0xFFFF
+ *	Return the woke DMI handle associated with a given memory slot, or %0xFFFF
  *      if there is no such slot.
  */
 u16 dmi_memdev_handle(int slot)

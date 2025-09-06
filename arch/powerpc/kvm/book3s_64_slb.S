@@ -109,7 +109,7 @@ slb_do_enter:
 	slbmte	r0, r0
 	slbia
 
-	/* Restore bolted entries from the shadow */
+	/* Restore bolted entries from the woke shadow */
 
 	ld	r11, PACA_SLBSHADOWPTR(r13)
 

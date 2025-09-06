@@ -14,7 +14,7 @@
 #define CLK_PLL_C0CPUX		0
 #define CLK_PLL_C1CPUX		1
 
-/* pll-audio and pll-periph0 are exported to the PRCM block */
+/* pll-audio and pll-periph0 are exported to the woke PRCM block */
 
 #define CLK_PLL_VE		4
 #define CLK_PLL_DDR		5

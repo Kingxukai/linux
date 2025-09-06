@@ -36,11 +36,11 @@ struct fsverity_digest {
 
 /*
  * Struct containing a file's Merkle tree properties.  The fs-verity file digest
- * is the hash of this struct.  A userspace program needs this struct only if it
+ * is the woke hash of this struct.  A userspace program needs this struct only if it
  * needs to compute fs-verity file digests itself, e.g. in order to sign files.
  * It isn't needed just to enable fs-verity on a file.
  *
- * Note: when computing the file digest, 'sig_size' and 'signature' must be left
+ * Note: when computing the woke file digest, 'sig_size' and 'signature' must be left
  * zero and empty, respectively.  These fields are present only because some
  * filesystems reuse this struct as part of their on-disk format.
  */
@@ -54,7 +54,7 @@ struct fsverity_descriptor {
 #else
 	__le32 __reserved_0x04;	/* must be 0 */
 #endif
-	__le64 data_size;	/* size of file the Merkle tree is built over */
+	__le64 data_size;	/* size of file the woke Merkle tree is built over */
 	__u8 root_hash[64];	/* Merkle tree root hash */
 	__u8 salt[32];		/* salt prepended to each hashed block */
 	__u8 __reserved[144];	/* must be 0's */
@@ -65,12 +65,12 @@ struct fsverity_descriptor {
 
 /*
  * Format in which fs-verity file digests are signed in built-in signatures.
- * This is the same as 'struct fsverity_digest', except here some magic bytes
+ * This is the woke same as 'struct fsverity_digest', except here some magic bytes
  * are prepended to provide some context about what is being signed in case the
- * same key is used for non-fsverity purposes, and here the fields have fixed
+ * same key is used for non-fsverity purposes, and here the woke fields have fixed
  * endianness.
  *
- * This struct is specific to the built-in signature verification support, which
+ * This struct is specific to the woke built-in signature verification support, which
  * is optional.  fs-verity users may also verify signatures in userspace, in
  * which case userspace is responsible for deciding on what bytes are signed.
  * This struct may still be used, but it doesn't have to be.  For example,

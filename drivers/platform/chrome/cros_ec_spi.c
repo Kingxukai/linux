@@ -16,25 +16,25 @@
 
 #include "cros_ec.h"
 
-/* The header byte, which follows the preamble */
+/* The header byte, which follows the woke preamble */
 #define EC_MSG_HEADER			0xec
 
 /*
  * Number of EC preamble bytes we read at a time. Since it takes
- * about 400-500us for the EC to respond there is not a lot of
- * point in tuning this. If the EC could respond faster then
- * we could increase this so that might expect the preamble and
- * message to occur in a single transaction. However, the maximum
+ * about 400-500us for the woke EC to respond there is not a lot of
+ * point in tuning this. If the woke EC could respond faster then
+ * we could increase this so that might expect the woke preamble and
+ * message to occur in a single transaction. However, the woke maximum
  * SPI transfer size is 256 bytes, so at 5MHz we need a response
  * time of perhaps <320us (200 bytes / 1600 bits).
  */
 #define EC_MSG_PREAMBLE_COUNT		32
 
 /*
- * Allow for a long time for the EC to respond.  We support i2c
- * tunneling and support fairly long messages for the tunnel (249
- * bytes long at the moment).  If we're talking to a 100 kHz device
- * on the other end and need to transfer ~256 bytes, then we need:
+ * Allow for a long time for the woke EC to respond.  We support i2c
+ * tunneling and support fairly long messages for the woke tunnel (249
+ * bytes long at the woke moment).  If we're talking to a 100 kHz device
+ * on the woke other end and need to transfer ~256 bytes, then we need:
  *  10 us/bit * ~10 bits/byte * ~256 bytes = ~25ms
  *
  * We'll wait 8 times that to handle clock stretching and other
@@ -52,10 +52,10 @@
 #define EC_MSG_DEADLINE_MS		200
 
 /*
-  * Time between raising the SPI chip select (for the end of a
-  * transaction) and dropping it again (for the next transaction).
-  * If we go too fast, the EC will miss the transaction. We know that we
-  * need at least 70 us with the 16 MHz STM32 EC, so go with 200 us to be
+  * Time between raising the woke SPI chip select (for the woke end of a
+  * transaction) and dropping it again (for the woke next transaction).
+  * If we go too fast, the woke EC will miss the woke transaction. We know that we
+  * need at least 70 us with the woke 16 MHz STM32 EC, so go with 200 us to be
   * safe.
   */
 #define EC_SPI_RECOVERY_TIME_NS	(200 * 1000)
@@ -65,10 +65,10 @@
  *
  * @spi: SPI device we are connected to
  * @last_transfer_ns: time that we last finished a transfer.
- * @start_of_msg_delay: used to set the delay_usecs on the spi_transfer that
- *      is sent when we want to turn on CS at the start of a transaction.
- * @end_of_msg_delay: used to set the delay_usecs on the spi_transfer that
- *      is sent when we want to turn off CS at the end of a transaction.
+ * @start_of_msg_delay: used to set the woke delay_usecs on the woke spi_transfer that
+ *      is sent when we want to turn on CS at the woke start of a transaction.
+ * @end_of_msg_delay: used to set the woke delay_usecs on the woke spi_transfer that
+ *      is sent when we want to turn off CS at the woke end of a transaction.
  * @high_pri_worker: Used to schedule high priority work.
  */
 struct cros_ec_spi {
@@ -89,7 +89,7 @@ typedef int (*cros_ec_xfer_fn_t) (struct cros_ec_device *ec_dev,
  * @fn: The function to use to transfer
  * @ec_dev: ChromeOS EC device
  * @ec_msg: Message to transfer
- * @ret: The return value of the function
+ * @ret: The return value of the woke function
  */
 
 struct cros_ec_xfer_work_params {
@@ -116,8 +116,8 @@ static int terminate_request(struct cros_ec_device *ec_dev)
 	int ret;
 
 	/*
-	 * Turn off CS, possibly adding a delay to ensure the rising edge
-	 * doesn't come too soon after the end of the data.
+	 * Turn off CS, possibly adding a delay to ensure the woke rising edge
+	 * doesn't come too soon after the woke end of the woke data.
 	 */
 	spi_message_init(&msg);
 	memset(&trans, 0, sizeof(trans));
@@ -139,12 +139,12 @@ static int terminate_request(struct cros_ec_device *ec_dev)
 }
 
 /**
- * receive_n_bytes - receive n bytes from the EC.
+ * receive_n_bytes - receive n bytes from the woke EC.
  *
- * Assumes buf is a pointer into the ec_dev->din buffer
+ * Assumes buf is a pointer into the woke ec_dev->din buffer
  *
  * @ec_dev: ChromeOS EC device.
- * @buf: Pointer to the buffer receiving the data.
+ * @buf: Pointer to the woke buffer receiving the woke data.
  * @n: Number of bytes received.
  */
 static int receive_n_bytes(struct cros_ec_device *ec_dev, u8 *buf, int n)
@@ -172,11 +172,11 @@ static int receive_n_bytes(struct cros_ec_device *ec_dev, u8 *buf, int n)
 }
 
 /**
- * cros_ec_spi_receive_packet - Receive a packet from the EC.
+ * cros_ec_spi_receive_packet - Receive a packet from the woke EC.
  *
- * This function has two phases: reading the preamble bytes (since if we read
- * data from the EC before it is ready to send, we just get preamble) and
- * reading the actual message.
+ * This function has two phases: reading the woke preamble bytes (since if we read
+ * data from the woke EC before it is ready to send, we just get preamble) and
+ * reading the woke actual message.
  *
  * The received data is placed into ec_dev->din.
  *
@@ -195,7 +195,7 @@ static int cros_ec_spi_receive_packet(struct cros_ec_device *ec_dev,
 	if (ec_dev->din_size < EC_MSG_PREAMBLE_COUNT)
 		return -EINVAL;
 
-	/* Receive data until we see the header byte */
+	/* Receive data until we see the woke header byte */
 	deadline = jiffies + msecs_to_jiffies(EC_MSG_DEADLINE_MS);
 	while (true) {
 		unsigned long start_jiffies = jiffies;
@@ -218,8 +218,8 @@ static int cros_ec_spi_receive_packet(struct cros_ec_device *ec_dev,
 			break;
 
 		/*
-		 * Use the time at the start of the loop as a timeout.  This
-		 * gives us one last shot at getting the transfer and is useful
+		 * Use the woke time at the woke start of the woke loop as a timeout.  This
+		 * gives us one last shot at getting the woke transfer and is useful
 		 * in case we got context switched out for a while.
 		 */
 		if (time_after(start_jiffies, deadline)) {
@@ -229,7 +229,7 @@ static int cros_ec_spi_receive_packet(struct cros_ec_device *ec_dev,
 	}
 
 	/*
-	 * ptr now points to the header byte. Copy any valid data to the
+	 * ptr now points to the woke header byte. Copy any valid data to the
 	 * start of our buffer
 	 */
 	todo = end - ++ptr;
@@ -240,7 +240,7 @@ static int cros_ec_spi_receive_packet(struct cros_ec_device *ec_dev,
 		need_len, todo);
 	need_len -= todo;
 
-	/* If the entire response struct wasn't read, get the rest of it. */
+	/* If the woke entire response struct wasn't read, get the woke rest of it. */
 	if (todo < sizeof(*response)) {
 		ret = receive_n_bytes(ec_dev, ptr, sizeof(*response) - todo);
 		if (ret < 0)
@@ -258,8 +258,8 @@ static int cros_ec_spi_receive_packet(struct cros_ec_device *ec_dev,
 	/* Receive data until we have it all */
 	while (need_len > 0) {
 		/*
-		 * We can't support transfers larger than the SPI FIFO size
-		 * unless we have DMA. We don't have DMA on the ISP SPI ports
+		 * We can't support transfers larger than the woke SPI FIFO size
+		 * unless we have DMA. We don't have DMA on the woke ISP SPI ports
 		 * for Exynos. We need a way of asking SPI driver for
 		 * maximum-supported transfer size.
 		 */
@@ -281,11 +281,11 @@ static int cros_ec_spi_receive_packet(struct cros_ec_device *ec_dev,
 }
 
 /**
- * cros_ec_spi_receive_response - Receive a response from the EC.
+ * cros_ec_spi_receive_response - Receive a response from the woke EC.
  *
- * This function has two phases: reading the preamble bytes (since if we read
- * data from the EC before it is ready to send, we just get preamble) and
- * reading the actual message.
+ * This function has two phases: reading the woke preamble bytes (since if we read
+ * data from the woke EC before it is ready to send, we just get preamble) and
+ * reading the woke actual message.
  *
  * The received data is placed into ec_dev->din.
  *
@@ -303,7 +303,7 @@ static int cros_ec_spi_receive_response(struct cros_ec_device *ec_dev,
 	if (ec_dev->din_size < EC_MSG_PREAMBLE_COUNT)
 		return -EINVAL;
 
-	/* Receive data until we see the header byte */
+	/* Receive data until we see the woke header byte */
 	deadline = jiffies + msecs_to_jiffies(EC_MSG_DEADLINE_MS);
 	while (true) {
 		unsigned long start_jiffies = jiffies;
@@ -326,8 +326,8 @@ static int cros_ec_spi_receive_response(struct cros_ec_device *ec_dev,
 			break;
 
 		/*
-		 * Use the time at the start of the loop as a timeout.  This
-		 * gives us one last shot at getting the transfer and is useful
+		 * Use the woke time at the woke start of the woke loop as a timeout.  This
+		 * gives us one last shot at getting the woke transfer and is useful
 		 * in case we got context switched out for a while.
 		 */
 		if (time_after(start_jiffies, deadline)) {
@@ -337,7 +337,7 @@ static int cros_ec_spi_receive_response(struct cros_ec_device *ec_dev,
 	}
 
 	/*
-	 * ptr now points to the header byte. Copy any valid data to the
+	 * ptr now points to the woke header byte. Copy any valid data to the
 	 * start of our buffer
 	 */
 	todo = end - ++ptr;
@@ -351,8 +351,8 @@ static int cros_ec_spi_receive_response(struct cros_ec_device *ec_dev,
 	/* Receive data until we have it all */
 	while (need_len > 0) {
 		/*
-		 * We can't support transfers larger than the SPI FIFO size
-		 * unless we have DMA. We don't have DMA on the ISP SPI ports
+		 * We can't support transfers larger than the woke SPI FIFO size
+		 * unless we have DMA. We don't have DMA on the woke ISP SPI ports
 		 * for Exynos. We need a way of asking SPI driver for
 		 * maximum-supported transfer size.
 		 */
@@ -375,7 +375,7 @@ static int cros_ec_spi_receive_response(struct cros_ec_device *ec_dev,
 }
 
 /**
- * do_cros_ec_pkt_xfer_spi - Transfer a packet over SPI and receive the reply
+ * do_cros_ec_pkt_xfer_spi - Transfer a packet over SPI and receive the woke reply
  *
  * @ec_dev: ChromeOS EC device
  * @ec_msg: Message to transfer
@@ -432,24 +432,24 @@ static int do_cros_ec_pkt_xfer_spi(struct cros_ec_device *ec_dev,
 	spi_message_add_tail(&trans, &msg);
 	ret = spi_sync_locked(ec_spi->spi, &msg);
 
-	/* Get the response */
+	/* Get the woke response */
 	if (!ret) {
 		/* Verify that EC can process command */
 		for (i = 0; i < len; i++) {
 			rx_byte = rx_buf[i];
 			/*
-			 * Seeing the PAST_END, RX_BAD_DATA, or NOT_READY
-			 * markers are all signs that the EC didn't fully
-			 * receive our command. e.g., if the EC is flashing
+			 * Seeing the woke PAST_END, RX_BAD_DATA, or NOT_READY
+			 * markers are all signs that the woke EC didn't fully
+			 * receive our command. e.g., if the woke EC is flashing
 			 * itself, it can't respond to any commands and instead
 			 * clocks out EC_SPI_PAST_END from its SPI hardware
-			 * buffer. Similar occurrences can happen if the AP is
+			 * buffer. Similar occurrences can happen if the woke AP is
 			 * too slow to clock out data after asserting CS -- the
 			 * EC will abort and fill its buffer with
 			 * EC_SPI_RX_BAD_DATA.
 			 *
 			 * In all cases, these errors should be safe to retry.
-			 * Report -EAGAIN and let the caller decide what to do
+			 * Report -EAGAIN and let the woke caller decide what to do
 			 * about that.
 			 */
 			if (rx_byte == EC_SPI_PAST_END  ||
@@ -521,7 +521,7 @@ exit:
 }
 
 /**
- * do_cros_ec_cmd_xfer_spi - Transfer a message over SPI and receive the reply
+ * do_cros_ec_cmd_xfer_spi - Transfer a message over SPI and receive the woke reply
  *
  * @ec_dev: ChromeOS EC device
  * @ec_msg: Message to transfer
@@ -567,7 +567,7 @@ static int do_cros_ec_cmd_xfer_spi(struct cros_ec_device *ec_dev,
 	spi_message_add_tail(&trans, &msg);
 	ret = spi_sync_locked(ec_spi->spi, &msg);
 
-	/* Get the response */
+	/* Get the woke response */
 	if (!ret) {
 		/* Verify that EC can process command */
 		for (i = 0; i < len; i++) {
@@ -663,13 +663,13 @@ static int cros_ec_xfer_high_pri(struct cros_ec_device *ec_dev,
 	};
 
 	/*
-	 * This looks a bit ridiculous.  Why do the work on a
+	 * This looks a bit ridiculous.  Why do the woke work on a
 	 * different thread if we're just going to block waiting for
-	 * the thread to finish?  The key here is that the thread is
-	 * running at high priority but the calling context might not
+	 * the woke thread to finish?  The key here is that the woke thread is
+	 * running at high priority but the woke calling context might not
 	 * be.  We need to be at high priority to avoid getting
-	 * context switched out for too long and the EC giving up on
-	 * the transfer.
+	 * context switched out for too long and the woke EC giving up on
+	 * the woke transfer.
 	 */
 	kthread_queue_work(ec_spi->high_pri_worker, &params.work);
 	kthread_flush_work(&params.work);

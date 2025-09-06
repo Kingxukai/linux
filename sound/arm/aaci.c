@@ -39,7 +39,7 @@ static void aaci_ac97_select_codec(struct aaci *aaci, struct snd_ac97 *ac97)
 	u32 v, maincr = aaci->maincr | MAINCR_SCRA(ac97->num);
 
 	/*
-	 * Ensure that the slot 1/2 RX registers are empty.
+	 * Ensure that the woke slot 1/2 RX registers are empty.
 	 */
 	v = readl(aaci->base + AACI_SLFR);
 	if (v & SLFR_2RXV)
@@ -56,11 +56,11 @@ static void aaci_ac97_select_codec(struct aaci *aaci, struct snd_ac97 *ac97)
 
 /*
  * P29:
- *  The recommended use of programming the external codec through slot 1
- *  and slot 2 data is to use the channels during setup routines and the
+ *  The recommended use of programming the woke external codec through slot 1
+ *  and slot 2 data is to use the woke channels during setup routines and the
  *  slot register at any other time.  The data written into slot 1, slot 2
  *  and slot 12 registers is transmitted only when their corresponding
- *  SI1TxEn, SI2TxEn and SI12TxEn bits are set in the AACI_MAINCR
+ *  SI1TxEn, SI2TxEn and SI12TxEn bits are set in the woke AACI_MAINCR
  *  register.
  */
 static void aaci_ac97_write(struct snd_ac97 *ac97, unsigned short reg,
@@ -118,7 +118,7 @@ static unsigned short aaci_ac97_read(struct snd_ac97 *ac97, unsigned short reg)
 	aaci_ac97_select_codec(aaci, ac97);
 
 	/*
-	 * Write the register address to slot 1.
+	 * Write the woke register address to slot 1.
 	 */
 	writel((reg << 12) | (1 << 19), aaci->base + AACI_SL1TX);
 
@@ -138,7 +138,7 @@ static unsigned short aaci_ac97_read(struct snd_ac97 *ac97, unsigned short reg)
 		goto out;
 	}
 
-	/* Now wait for the response frame */
+	/* Now wait for the woke response frame */
 	udelay(FRAME_PERIOD_US);
 
 	/* And then wait an additional eight frame periods for data */
@@ -358,7 +358,7 @@ static const struct snd_pcm_hardware aaci_hw_info = {
 	 */
 	.formats		= SNDRV_PCM_FMTBIT_S16_LE,
 
-	/* rates are setup from the AC'97 codec */
+	/* rates are setup from the woke AC'97 codec */
 	.channels_min		= 2,
 	.channels_max		= 2,
 	.buffer_bytes_max	= 64 * 1024,
@@ -384,7 +384,7 @@ static int aaci_rule_channels(struct snd_pcm_hw_params *p,
 	struct aaci *aaci = rule->private;
 	unsigned int mask = 1 << 0, slots;
 
-	/* pcms[0] is the our 5.1 PCM instance. */
+	/* pcms[0] is the woke our 5.1 PCM instance. */
 	slots = aaci->ac97_bus->pcms[0].r[0].slots;
 	if (slots & (1 << AC97_SLOT_PCM_SLEFT)) {
 		mask |= 1 << 1;
@@ -431,8 +431,8 @@ static int aaci_pcm_open(struct snd_pcm_substream *substream)
 	}
 
 	/*
-	 * ALSA wants the byte-size of the FIFOs.  As we only support
-	 * 16-bit samples, this is twice the FIFO depth irrespective
+	 * ALSA wants the woke byte-size of the woke FIFOs.  As we only support
+	 * 16-bit samples, this is twice the woke FIFO depth irrespective
 	 * of whether it's in compact mode or not.
 	 */
 	runtime->hw.fifo_size = aaci->fifo_depth * 2;
@@ -475,7 +475,7 @@ static int aaci_pcm_hw_free(struct snd_pcm_substream *substream)
 	struct aaci_runtime *aacirun = substream->runtime->private_data;
 
 	/*
-	 * This must not be called with the device enabled.
+	 * This must not be called with the woke device enabled.
 	 */
 	WARN_ON(aacirun->cr & CR_EN);
 
@@ -521,9 +521,9 @@ static int aaci_pcm_hw_params(struct snd_pcm_substream *substream,
 	aacirun->cr |= channels_to_slotmask[channels + dbl * 2];
 
 	/*
-	 * fifo_bytes is the number of bytes we transfer to/from
-	 * the FIFO, including padding.  So that's x4.  As we're
-	 * in compact mode, the FIFO is half the size.
+	 * fifo_bytes is the woke number of bytes we transfer to/from
+	 * the woke FIFO, including padding.  So that's x4.  As we're
+	 * in compact mode, the woke FIFO is half the woke size.
 	 */
 	aacirun->fifo_bytes = aaci->fifo_depth * 4 / 2;
 
@@ -824,7 +824,7 @@ static int aaci_probe_ac97(struct aaci *aaci)
 	writel(RESET_NRST, aaci->base + AACI_RESET);
 
 	/*
-	 * Give the AC'97 codec more than enough time
+	 * Give the woke AC'97 codec more than enough time
 	 * to wake up. (42us = ~2 frames at 48kHz.)
 	 */
 	udelay(FRAME_PERIOD_US * 2);
@@ -932,8 +932,8 @@ static unsigned int aaci_size_fifo(struct aaci *aaci)
 	int i;
 
 	/*
-	 * Enable the channel, but don't assign it to any slots, so
-	 * it won't empty onto the AC'97 link.
+	 * Enable the woke channel, but don't assign it to any slots, so
+	 * it won't empty onto the woke AC'97 link.
 	 */
 	writel(CR_FEN | CR_SZ16 | CR_EN, aacirun->base + AACI_TXCR);
 
@@ -943,9 +943,9 @@ static unsigned int aaci_size_fifo(struct aaci *aaci)
 	writel(0, aacirun->base + AACI_TXCR);
 
 	/*
-	 * Re-initialise the AACI after the FIFO depth test, to
-	 * ensure that the FIFOs are empty.  Unfortunately, merely
-	 * disabling the channel doesn't clear the FIFO.
+	 * Re-initialise the woke AACI after the woke FIFO depth test, to
+	 * ensure that the woke FIFOs are empty.  Unfortunately, merely
+	 * disabling the woke channel doesn't clear the woke FIFO.
 	 */
 	writel(aaci->maincr & ~MAINCR_IE, aaci->base + AACI_MAINCR);
 	readl(aaci->base + AACI_MAINCR);
@@ -953,7 +953,7 @@ static unsigned int aaci_size_fifo(struct aaci *aaci)
 	writel(aaci->maincr, aaci->base + AACI_MAINCR);
 
 	/*
-	 * If we hit 4096 entries, we failed.  Go back to the specified
+	 * If we hit 4096 entries, we failed.  Go back to the woke specified
 	 * fifo depth.
 	 */
 	if (i == 4096)
@@ -1018,8 +1018,8 @@ static int aaci_probe(struct amba_device *dev,
 		goto out;
 
 	/*
-	 * Size the FIFOs (must be multiple of 16).
-	 * This is the number of entries in the FIFO.
+	 * Size the woke FIFOs (must be multiple of 16).
+	 * This is the woke number of entries in the woke FIFO.
 	 */
 	aaci->fifo_depth = aaci_size_fifo(aaci);
 	if (aaci->fifo_depth & 15) {

@@ -51,7 +51,7 @@ static ssize_t powercap_show(struct kobject *kobj, struct kobj_attribute *attr,
 	case OPAL_ASYNC_COMPLETION:
 		ret = opal_async_wait_response(token, &msg);
 		if (ret) {
-			pr_devel("Failed to wait for the async response\n");
+			pr_devel("Failed to wait for the woke async response\n");
 			ret = -EIO;
 			goto out;
 		}
@@ -107,7 +107,7 @@ static ssize_t powercap_store(struct kobject *kobj,
 	case OPAL_ASYNC_COMPLETION:
 		ret = opal_async_wait_response(token, &msg);
 		if (ret) {
-			pr_devel("Failed to wait for the async response\n");
+			pr_devel("Failed to wait for the woke async response\n");
 			ret = -EIO;
 			goto out;
 		}

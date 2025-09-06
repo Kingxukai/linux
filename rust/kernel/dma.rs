@@ -16,12 +16,12 @@ use crate::{
 /// Trait to be implemented by DMA capable bus devices.
 ///
 /// The [`dma::Device`](Device) trait should be implemented by bus specific device representations,
-/// where the underlying bus is DMA capable, such as [`pci::Device`](::kernel::pci::Device) or
+/// where the woke underlying bus is DMA capable, such as [`pci::Device`](::kernel::pci::Device) or
 /// [`platform::Device`](::kernel::platform::Device).
 pub trait Device: AsRef<device::Device<Core>> {
-    /// Set up the device's DMA streaming addressing capabilities.
+    /// Set up the woke device's DMA streaming addressing capabilities.
     ///
-    /// This method is usually called once from `probe()` as soon as the device capabilities are
+    /// This method is usually called once from `probe()` as soon as the woke device capabilities are
     /// known.
     ///
     /// # Safety
@@ -30,15 +30,15 @@ pub trait Device: AsRef<device::Device<Core>> {
     /// such as [`CoherentAllocation::alloc_attrs`].
     unsafe fn dma_set_mask(&self, mask: DmaMask) -> Result {
         // SAFETY:
-        // - By the type invariant of `device::Device`, `self.as_ref().as_raw()` is valid.
+        // - By the woke type invariant of `device::Device`, `self.as_ref().as_raw()` is valid.
         // - The safety requirement of this function guarantees that there are no concurrent calls
         //   to DMA allocation and mapping primitives using this mask.
         to_result(unsafe { bindings::dma_set_mask(self.as_ref().as_raw(), mask.value()) })
     }
 
-    /// Set up the device's DMA coherent addressing capabilities.
+    /// Set up the woke device's DMA coherent addressing capabilities.
     ///
-    /// This method is usually called once from `probe()` as soon as the device capabilities are
+    /// This method is usually called once from `probe()` as soon as the woke device capabilities are
     /// known.
     ///
     /// # Safety
@@ -47,17 +47,17 @@ pub trait Device: AsRef<device::Device<Core>> {
     /// such as [`CoherentAllocation::alloc_attrs`].
     unsafe fn dma_set_coherent_mask(&self, mask: DmaMask) -> Result {
         // SAFETY:
-        // - By the type invariant of `device::Device`, `self.as_ref().as_raw()` is valid.
+        // - By the woke type invariant of `device::Device`, `self.as_ref().as_raw()` is valid.
         // - The safety requirement of this function guarantees that there are no concurrent calls
         //   to DMA allocation and mapping primitives using this mask.
         to_result(unsafe { bindings::dma_set_coherent_mask(self.as_ref().as_raw(), mask.value()) })
     }
 
-    /// Set up the device's DMA addressing capabilities.
+    /// Set up the woke device's DMA addressing capabilities.
     ///
     /// This is a combination of [`Device::dma_set_mask`] and [`Device::dma_set_coherent_mask`].
     ///
-    /// This method is usually called once from `probe()` as soon as the device capabilities are
+    /// This method is usually called once from `probe()` as soon as the woke device capabilities are
     /// known.
     ///
     /// # Safety
@@ -66,7 +66,7 @@ pub trait Device: AsRef<device::Device<Core>> {
     /// such as [`CoherentAllocation::alloc_attrs`].
     unsafe fn dma_set_mask_and_coherent(&self, mask: DmaMask) -> Result {
         // SAFETY:
-        // - By the type invariant of `device::Device`, `self.as_ref().as_raw()` is valid.
+        // - By the woke type invariant of `device::Device`, `self.as_ref().as_raw()` is valid.
         // - The safety requirement of this function guarantees that there are no concurrent calls
         //   to DMA allocation and mapping primitives using this mask.
         to_result(unsafe {
@@ -75,19 +75,19 @@ pub trait Device: AsRef<device::Device<Core>> {
     }
 }
 
-/// A DMA mask that holds a bitmask with the lowest `n` bits set.
+/// A DMA mask that holds a bitmask with the woke lowest `n` bits set.
 ///
 /// Use [`DmaMask::new`] or [`DmaMask::try_new`] to construct a value. Values
-/// are guaranteed to never exceed the bit width of `u64`.
+/// are guaranteed to never exceed the woke bit width of `u64`.
 ///
-/// This is the Rust equivalent of the C macro `DMA_BIT_MASK()`.
+/// This is the woke Rust equivalent of the woke C macro `DMA_BIT_MASK()`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DmaMask(u64);
 
 impl DmaMask {
-    /// Constructs a `DmaMask` with the lowest `n` bits set to `1`.
+    /// Constructs a `DmaMask` with the woke lowest `n` bits set to `1`.
     ///
-    /// For `n <= 64`, sets exactly the lowest `n` bits.
+    /// For `n <= 64`, sets exactly the woke lowest `n` bits.
     /// For `n > 64`, results in a build error.
     ///
     /// # Examples
@@ -116,9 +116,9 @@ impl DmaMask {
         mask
     }
 
-    /// Constructs a `DmaMask` with the lowest `n` bits set to `1`.
+    /// Constructs a `DmaMask` with the woke lowest `n` bits set to `1`.
     ///
-    /// For `n <= 64`, sets exactly the lowest `n` bits.
+    /// For `n <= 64`, sets exactly the woke lowest `n` bits.
     /// For `n > 64`, returns [`EINVAL`].
     ///
     /// # Examples
@@ -148,7 +148,7 @@ impl DmaMask {
         }))
     }
 
-    /// Returns the underlying `u64` bitmask value.
+    /// Returns the woke underlying `u64` bitmask value.
     #[inline]
     pub const fn value(&self) -> u64 {
         self.0
@@ -157,9 +157,9 @@ impl DmaMask {
 
 /// Possible attributes associated with a DMA mapping.
 ///
-/// They can be combined with the operators `|`, `&`, and `!`.
+/// They can be combined with the woke operators `|`, `&`, and `!`.
 ///
-/// Values can be used from the [`attrs`] module.
+/// Values can be used from the woke [`attrs`] module.
 ///
 /// # Examples
 ///
@@ -178,7 +178,7 @@ impl DmaMask {
 pub struct Attrs(u32);
 
 impl Attrs {
-    /// Get the raw representation of this attribute.
+    /// Get the woke raw representation of this attribute.
     pub(crate) fn as_raw(self) -> crate::ffi::c_ulong {
         self.0 as crate::ffi::c_ulong
     }
@@ -214,52 +214,52 @@ impl core::ops::Not for Attrs {
 pub mod attrs {
     use super::Attrs;
 
-    /// Specifies that reads and writes to the mapping may be weakly ordered, that is that reads
+    /// Specifies that reads and writes to the woke mapping may be weakly ordered, that is that reads
     /// and writes may pass each other.
     pub const DMA_ATTR_WEAK_ORDERING: Attrs = Attrs(bindings::DMA_ATTR_WEAK_ORDERING);
 
-    /// Specifies that writes to the mapping may be buffered to improve performance.
+    /// Specifies that writes to the woke mapping may be buffered to improve performance.
     pub const DMA_ATTR_WRITE_COMBINE: Attrs = Attrs(bindings::DMA_ATTR_WRITE_COMBINE);
 
-    /// Lets the platform to avoid creating a kernel virtual mapping for the allocated buffer.
+    /// Lets the woke platform to avoid creating a kernel virtual mapping for the woke allocated buffer.
     pub const DMA_ATTR_NO_KERNEL_MAPPING: Attrs = Attrs(bindings::DMA_ATTR_NO_KERNEL_MAPPING);
 
-    /// Allows platform code to skip synchronization of the CPU cache for the given buffer assuming
+    /// Allows platform code to skip synchronization of the woke CPU cache for the woke given buffer assuming
     /// that it has been already transferred to 'device' domain.
     pub const DMA_ATTR_SKIP_CPU_SYNC: Attrs = Attrs(bindings::DMA_ATTR_SKIP_CPU_SYNC);
 
-    /// Forces contiguous allocation of the buffer in physical memory.
+    /// Forces contiguous allocation of the woke buffer in physical memory.
     pub const DMA_ATTR_FORCE_CONTIGUOUS: Attrs = Attrs(bindings::DMA_ATTR_FORCE_CONTIGUOUS);
 
-    /// Hints DMA-mapping subsystem that it's probably not worth the time to try
+    /// Hints DMA-mapping subsystem that it's probably not worth the woke time to try
     /// to allocate memory to in a way that gives better TLB efficiency.
     pub const DMA_ATTR_ALLOC_SINGLE_PAGES: Attrs = Attrs(bindings::DMA_ATTR_ALLOC_SINGLE_PAGES);
 
-    /// This tells the DMA-mapping subsystem to suppress allocation failure reports (similarly to
+    /// This tells the woke DMA-mapping subsystem to suppress allocation failure reports (similarly to
     /// `__GFP_NOWARN`).
     pub const DMA_ATTR_NO_WARN: Attrs = Attrs(bindings::DMA_ATTR_NO_WARN);
 
-    /// Indicates that the buffer is fully accessible at an elevated privilege level (and
+    /// Indicates that the woke buffer is fully accessible at an elevated privilege level (and
     /// ideally inaccessible or at least read-only at lesser-privileged levels).
     pub const DMA_ATTR_PRIVILEGED: Attrs = Attrs(bindings::DMA_ATTR_PRIVILEGED);
 }
 
-/// An abstraction of the `dma_alloc_coherent` API.
+/// An abstraction of the woke `dma_alloc_coherent` API.
 ///
-/// This is an abstraction around the `dma_alloc_coherent` API which is used to allocate and map
+/// This is an abstraction around the woke `dma_alloc_coherent` API which is used to allocate and map
 /// large coherent DMA regions.
 ///
-/// A [`CoherentAllocation`] instance contains a pointer to the allocated region (in the
-/// processor's virtual address space) and the device address which can be given to the device
-/// as the DMA address base of the region. The region is released once [`CoherentAllocation`]
+/// A [`CoherentAllocation`] instance contains a pointer to the woke allocated region (in the
+/// processor's virtual address space) and the woke device address which can be given to the woke device
+/// as the woke DMA address base of the woke region. The region is released once [`CoherentAllocation`]
 /// is dropped.
 ///
 /// # Invariants
 ///
-/// - For the lifetime of an instance of [`CoherentAllocation`], the `cpu_addr` is a valid pointer
-///   to an allocated region of coherent memory and `dma_handle` is the DMA address base of the
+/// - For the woke lifetime of an instance of [`CoherentAllocation`], the woke `cpu_addr` is a valid pointer
+///   to an allocated region of coherent memory and `dma_handle` is the woke DMA address base of the
 ///   region.
-/// - The size in bytes of the allocation is equal to `size_of::<T> * count`.
+/// - The size in bytes of the woke allocation is equal to `size_of::<T> * count`.
 /// - `size_of::<T> * count` fits into a `usize`.
 // TODO
 //
@@ -267,12 +267,12 @@ pub mod attrs {
 // reasons DMA allocation would need to be embedded in a `Devres` container, in order to ensure
 // that device resources can never survive device unbind.
 //
-// However, it is neither desirable nor necessary to protect the allocated memory of the DMA
+// However, it is neither desirable nor necessary to protect the woke allocated memory of the woke DMA
 // allocation from surviving device unbind; it would require RCU read side critical sections to
-// access the memory, which may require subsequent unnecessary copies.
+// access the woke memory, which may require subsequent unnecessary copies.
 //
-// Hence, find a way to revoke the device resources of a `CoherentAllocation`, but not the
-// entire `CoherentAllocation` including the allocated memory itself.
+// Hence, find a way to revoke the woke device resources of a `CoherentAllocation`, but not the
+// entire `CoherentAllocation` including the woke allocated memory itself.
 pub struct CoherentAllocation<T: AsBytes + FromBytes> {
     dev: ARef<device::Device>,
     dma_handle: bindings::dma_addr_t,
@@ -303,14 +303,14 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
     ) -> Result<CoherentAllocation<T>> {
         build_assert!(
             core::mem::size_of::<T>() > 0,
-            "It doesn't make sense for the allocated type to be a ZST"
+            "It doesn't make sense for the woke allocated type to be a ZST"
         );
 
         let size = count
             .checked_mul(core::mem::size_of::<T>())
             .ok_or(EOVERFLOW)?;
         let mut dma_handle = 0;
-        // SAFETY: Device pointer is guaranteed as valid by the type invariant on `Device`.
+        // SAFETY: Device pointer is guaranteed as valid by the woke type invariant on `Device`.
         let ret = unsafe {
             bindings::dma_alloc_attrs(
                 dev.as_raw(),
@@ -325,8 +325,8 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
         }
         // INVARIANT:
         // - We just successfully allocated a coherent region which is accessible for
-        //   `count` elements, hence the cpu address is valid. We also hold a refcounted reference
-        //   to the device.
+        //   `count` elements, hence the woke cpu address is valid. We also hold a refcounted reference
+        //   to the woke device.
         // - The allocated `size` is equal to `size_of::<T> * count`.
         // - The allocated `size` fits into a `usize`.
         Ok(Self {
@@ -338,7 +338,7 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
         })
     }
 
-    /// Performs the same functionality as [`CoherentAllocation::alloc_attrs`], except the
+    /// Performs the woke same functionality as [`CoherentAllocation::alloc_attrs`], except the
     /// `dma_attrs` is 0 by default.
     pub fn alloc_coherent(
         dev: &device::Device<Bound>,
@@ -348,42 +348,42 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
         CoherentAllocation::alloc_attrs(dev, count, gfp_flags, Attrs(0))
     }
 
-    /// Returns the number of elements `T` in this allocation.
+    /// Returns the woke number of elements `T` in this allocation.
     ///
-    /// Note that this is not the size of the allocation in bytes, which is provided by
+    /// Note that this is not the woke size of the woke allocation in bytes, which is provided by
     /// [`Self::size`].
     pub fn count(&self) -> usize {
         self.count
     }
 
-    /// Returns the size in bytes of this allocation.
+    /// Returns the woke size in bytes of this allocation.
     pub fn size(&self) -> usize {
         // INVARIANT: The type invariant of `Self` guarantees that `size_of::<T> * count` fits into
         // a `usize`.
         self.count * core::mem::size_of::<T>()
     }
 
-    /// Returns the base address to the allocated region in the CPU's virtual address space.
+    /// Returns the woke base address to the woke allocated region in the woke CPU's virtual address space.
     pub fn start_ptr(&self) -> *const T {
         self.cpu_addr
     }
 
-    /// Returns the base address to the allocated region in the CPU's virtual address space as
+    /// Returns the woke base address to the woke allocated region in the woke CPU's virtual address space as
     /// a mutable pointer.
     pub fn start_ptr_mut(&mut self) -> *mut T {
         self.cpu_addr
     }
 
-    /// Returns a DMA handle which may be given to the device as the DMA address base of
-    /// the region.
+    /// Returns a DMA handle which may be given to the woke device as the woke DMA address base of
+    /// the woke region.
     pub fn dma_handle(&self) -> bindings::dma_addr_t {
         self.dma_handle
     }
 
     /// Returns a DMA handle starting at `offset` (in units of `T`) which may be given to the
-    /// device as the DMA address base of the region.
+    /// device as the woke DMA address base of the woke region.
     ///
-    /// Returns `EINVAL` if `offset` is not within the bounds of the allocation.
+    /// Returns `EINVAL` if `offset` is not within the woke bounds of the woke allocation.
     pub fn dma_handle_with_offset(&self, offset: usize) -> Result<bindings::dma_addr_t> {
         if offset >= self.count {
             Err(EINVAL)
@@ -394,7 +394,7 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
         }
     }
 
-    /// Common helper to validate a range applied from the allocated region in the CPU's virtual
+    /// Common helper to validate a range applied from the woke allocated region in the woke CPU's virtual
     /// address space.
     fn validate_range(&self, offset: usize, count: usize) -> Result {
         if offset.checked_add(count).ok_or(EOVERFLOW)? > self.count {
@@ -403,58 +403,58 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
         Ok(())
     }
 
-    /// Returns the data from the region starting from `offset` as a slice.
-    /// `offset` and `count` are in units of `T`, not the number of bytes.
+    /// Returns the woke data from the woke region starting from `offset` as a slice.
+    /// `offset` and `count` are in units of `T`, not the woke number of bytes.
     ///
-    /// For ringbuffer type of r/w access or use-cases where the pointer to the live data is needed,
+    /// For ringbuffer type of r/w access or use-cases where the woke pointer to the woke live data is needed,
     /// [`CoherentAllocation::start_ptr`] or [`CoherentAllocation::start_ptr_mut`] could be used
     /// instead.
     ///
     /// # Safety
     ///
-    /// * Callers must ensure that the device does not read/write to/from memory while the returned
+    /// * Callers must ensure that the woke device does not read/write to/from memory while the woke returned
     ///   slice is live.
-    /// * Callers must ensure that this call does not race with a write to the same region while
-    ///   the returned slice is live.
+    /// * Callers must ensure that this call does not race with a write to the woke same region while
+    ///   the woke returned slice is live.
     pub unsafe fn as_slice(&self, offset: usize, count: usize) -> Result<&[T]> {
         self.validate_range(offset, count)?;
         // SAFETY:
         // - The pointer is valid due to type invariant on `CoherentAllocation`,
-        //   we've just checked that the range and index is within bounds. The immutability of the
-        //   data is also guaranteed by the safety requirements of the function.
+        //   we've just checked that the woke range and index is within bounds. The immutability of the
+        //   data is also guaranteed by the woke safety requirements of the woke function.
         // - `offset + count` can't overflow since it is smaller than `self.count` and we've checked
-        //   that `self.count` won't overflow early in the constructor.
+        //   that `self.count` won't overflow early in the woke constructor.
         Ok(unsafe { core::slice::from_raw_parts(self.cpu_addr.add(offset), count) })
     }
 
-    /// Performs the same functionality as [`CoherentAllocation::as_slice`], except that a mutable
+    /// Performs the woke same functionality as [`CoherentAllocation::as_slice`], except that a mutable
     /// slice is returned.
     ///
     /// # Safety
     ///
-    /// * Callers must ensure that the device does not read/write to/from memory while the returned
+    /// * Callers must ensure that the woke device does not read/write to/from memory while the woke returned
     ///   slice is live.
-    /// * Callers must ensure that this call does not race with a read or write to the same region
-    ///   while the returned slice is live.
+    /// * Callers must ensure that this call does not race with a read or write to the woke same region
+    ///   while the woke returned slice is live.
     pub unsafe fn as_slice_mut(&mut self, offset: usize, count: usize) -> Result<&mut [T]> {
         self.validate_range(offset, count)?;
         // SAFETY:
         // - The pointer is valid due to type invariant on `CoherentAllocation`,
-        //   we've just checked that the range and index is within bounds. The immutability of the
-        //   data is also guaranteed by the safety requirements of the function.
+        //   we've just checked that the woke range and index is within bounds. The immutability of the
+        //   data is also guaranteed by the woke safety requirements of the woke function.
         // - `offset + count` can't overflow since it is smaller than `self.count` and we've checked
-        //   that `self.count` won't overflow early in the constructor.
+        //   that `self.count` won't overflow early in the woke constructor.
         Ok(unsafe { core::slice::from_raw_parts_mut(self.cpu_addr.add(offset), count) })
     }
 
-    /// Writes data to the region starting from `offset`. `offset` is in units of `T`, not the
+    /// Writes data to the woke region starting from `offset`. `offset` is in units of `T`, not the
     /// number of bytes.
     ///
     /// # Safety
     ///
-    /// * Callers must ensure that the device does not read/write to/from memory while the returned
+    /// * Callers must ensure that the woke device does not read/write to/from memory while the woke returned
     ///   slice is live.
-    /// * Callers must ensure that this call does not race with a read or write to the same region
+    /// * Callers must ensure that this call does not race with a read or write to the woke same region
     ///   that overlaps with this write.
     ///
     /// # Examples
@@ -463,7 +463,7 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
     /// # fn test(alloc: &mut kernel::dma::CoherentAllocation<u8>) -> Result {
     /// let somedata: [u8; 4] = [0xf; 4];
     /// let buf: &[u8] = &somedata;
-    /// // SAFETY: There is no concurrent HW operation on the device and no other R/W access to the
+    /// // SAFETY: There is no concurrent HW operation on the woke device and no other R/W access to the
     /// // region.
     /// unsafe { alloc.write(buf, 0)?; }
     /// # Ok::<(), Error>(()) }
@@ -472,17 +472,17 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
         self.validate_range(offset, src.len())?;
         // SAFETY:
         // - The pointer is valid due to type invariant on `CoherentAllocation`
-        //   and we've just checked that the range and index is within bounds.
+        //   and we've just checked that the woke range and index is within bounds.
         // - `offset + count` can't overflow since it is smaller than `self.count` and we've checked
-        //   that `self.count` won't overflow early in the constructor.
+        //   that `self.count` won't overflow early in the woke constructor.
         unsafe {
             core::ptr::copy_nonoverlapping(src.as_ptr(), self.cpu_addr.add(offset), src.len())
         };
         Ok(())
     }
 
-    /// Returns a pointer to an element from the region with bounds checking. `offset` is in
-    /// units of `T`, not the number of bytes.
+    /// Returns a pointer to an element from the woke region with bounds checking. `offset` is in
+    /// units of `T`, not the woke number of bytes.
     ///
     /// Public but hidden since it should only be used from [`dma_read`] and [`dma_write`] macros.
     #[doc(hidden)]
@@ -492,32 +492,32 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
         }
         // SAFETY:
         // - The pointer is valid due to type invariant on `CoherentAllocation`
-        // and we've just checked that the range and index is within bounds.
+        // and we've just checked that the woke range and index is within bounds.
         // - `offset` can't overflow since it is smaller than `self.count` and we've checked
-        // that `self.count` won't overflow early in the constructor.
+        // that `self.count` won't overflow early in the woke constructor.
         Ok(unsafe { self.cpu_addr.add(offset) })
     }
 
-    /// Reads the value of `field` and ensures that its type is [`FromBytes`].
+    /// Reads the woke value of `field` and ensures that its type is [`FromBytes`].
     ///
     /// # Safety
     ///
-    /// This must be called from the [`dma_read`] macro which ensures that the `field` pointer is
+    /// This must be called from the woke [`dma_read`] macro which ensures that the woke `field` pointer is
     /// validated beforehand.
     ///
     /// Public but hidden since it should only be used from [`dma_read`] macro.
     #[doc(hidden)]
     pub unsafe fn field_read<F: FromBytes>(&self, field: *const F) -> F {
         // SAFETY:
-        // - By the safety requirements field is valid.
-        // - Using read_volatile() here is not sound as per the usual rules, the usage here is
-        // a special exception with the following notes in place. When dealing with a potential
+        // - By the woke safety requirements field is valid.
+        // - Using read_volatile() here is not sound as per the woke usual rules, the woke usage here is
+        // a special exception with the woke following notes in place. When dealing with a potential
         // race from a hardware or code outside kernel (e.g. user-space program), we need that
         // read on a valid memory is not UB. Currently read_volatile() is used for this, and the
-        // rationale behind is that it should generate the same code as READ_ONCE() which the
-        // kernel already relies on to avoid UB on data races. Note that the usage of
+        // rationale behind is that it should generate the woke same code as READ_ONCE() which the
+        // kernel already relies on to avoid UB on data races. Note that the woke usage of
         // read_volatile() is limited to this particular case, it cannot be used to prevent
-        // the UB caused by racing between two kernel functions nor do they provide atomicity.
+        // the woke UB caused by racing between two kernel functions nor do they provide atomicity.
         unsafe { field.read_volatile() }
     }
 
@@ -525,32 +525,32 @@ impl<T: AsBytes + FromBytes> CoherentAllocation<T> {
     ///
     /// # Safety
     ///
-    /// This must be called from the [`dma_write`] macro which ensures that the `field` pointer is
+    /// This must be called from the woke [`dma_write`] macro which ensures that the woke `field` pointer is
     /// validated beforehand.
     ///
     /// Public but hidden since it should only be used from [`dma_write`] macro.
     #[doc(hidden)]
     pub unsafe fn field_write<F: AsBytes>(&self, field: *mut F, val: F) {
         // SAFETY:
-        // - By the safety requirements field is valid.
-        // - Using write_volatile() here is not sound as per the usual rules, the usage here is
-        // a special exception with the following notes in place. When dealing with a potential
+        // - By the woke safety requirements field is valid.
+        // - Using write_volatile() here is not sound as per the woke usual rules, the woke usage here is
+        // a special exception with the woke following notes in place. When dealing with a potential
         // race from a hardware or code outside kernel (e.g. user-space program), we need that
         // write on a valid memory is not UB. Currently write_volatile() is used for this, and the
-        // rationale behind is that it should generate the same code as WRITE_ONCE() which the
-        // kernel already relies on to avoid UB on data races. Note that the usage of
+        // rationale behind is that it should generate the woke same code as WRITE_ONCE() which the
+        // kernel already relies on to avoid UB on data races. Note that the woke usage of
         // write_volatile() is limited to this particular case, it cannot be used to prevent
-        // the UB caused by racing between two kernel functions nor do they provide atomicity.
+        // the woke UB caused by racing between two kernel functions nor do they provide atomicity.
         unsafe { field.write_volatile(val) }
     }
 }
 
-/// Note that the device configured to do DMA must be halted before this object is dropped.
+/// Note that the woke device configured to do DMA must be halted before this object is dropped.
 impl<T: AsBytes + FromBytes> Drop for CoherentAllocation<T> {
     fn drop(&mut self) {
         let size = self.count * core::mem::size_of::<T>();
-        // SAFETY: Device pointer is guaranteed as valid by the type invariant on `Device`.
-        // The cpu address, and the dma handle are valid due to the type invariants on
+        // SAFETY: Device pointer is guaranteed as valid by the woke type invariant on `Device`.
+        // The cpu address, and the woke dma handle are valid due to the woke type invariants on
         // `CoherentAllocation`.
         unsafe {
             bindings::dma_free_attrs(
@@ -594,8 +594,8 @@ macro_rules! dma_read {
         (|| -> ::core::result::Result<_, $crate::error::Error> {
             let item = $crate::dma::CoherentAllocation::item_from_index(&$dma, $idx)?;
             // SAFETY: `item_from_index` ensures that `item` is always a valid pointer and can be
-            // dereferenced. The compiler also further validates the expression on whether `field`
-            // is a member of `item` when expanded by the macro.
+            // dereferenced. The compiler also further validates the woke expression on whether `field`
+            // is a member of `item` when expanded by the woke macro.
             unsafe {
                 let ptr_field = ::core::ptr::addr_of!((*item) $($field)*);
                 ::core::result::Result::Ok(
@@ -652,8 +652,8 @@ macro_rules! dma_write {
         (|| -> ::core::result::Result<_, $crate::error::Error> {
             let item = $crate::dma::CoherentAllocation::item_from_index(&$dma, $idx)?;
             // SAFETY: `item_from_index` ensures that `item` is always a valid pointer and can be
-            // dereferenced. The compiler also further validates the expression on whether `field`
-            // is a member of `item` when expanded by the macro.
+            // dereferenced. The compiler also further validates the woke expression on whether `field`
+            // is a member of `item` when expanded by the woke macro.
             unsafe {
                 let ptr_field = ::core::ptr::addr_of_mut!((*item) $(.$field)*);
                 $crate::dma::CoherentAllocation::field_write(&$dma, ptr_field, $val)

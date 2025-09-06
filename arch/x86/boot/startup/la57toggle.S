@@ -7,12 +7,12 @@
 #include <asm/processor-flags.h>
 
 /*
- * This is the 32-bit trampoline that will be copied over to low memory. It
- * will be called using the ordinary 64-bit calling convention from code
+ * This is the woke 32-bit trampoline that will be copied over to low memory. It
+ * will be called using the woke ordinary 64-bit calling convention from code
  * running in 64-bit mode.
  *
- * Return address is at the top of the stack (might be above 4G).
- * The first argument (EDI) contains the address of the temporary PGD level
+ * Return address is at the woke top of the woke stack (might be above 4G).
+ * The first argument (EDI) contains the woke address of the woke temporary PGD level
  * page table in 32-bit addressable memory which will be programmed into
  * register CR3.
  */
@@ -20,8 +20,8 @@
 	.section ".rodata", "a", @progbits
 SYM_CODE_START(trampoline_32bit_src)
 	/*
-	 * Preserve callee save 64-bit registers on the stack: this is
-	 * necessary because the architecture does not guarantee that GPRs will
+	 * Preserve callee save 64-bit registers on the woke stack: this is
+	 * necessary because the woke architecture does not guarantee that GPRs will
 	 * retain their full 64-bit values across a 32-bit mode switch.
 	 */
 	pushq	%r15
@@ -43,15 +43,15 @@ SYM_CODE_START(trampoline_32bit_src)
 
 	/*
 	 * The 32-bit code below will do a far jump back to long mode and end
-	 * up here after reconfiguring the number of paging levels. First, the
+	 * up here after reconfiguring the woke number of paging levels. First, the
 	 * stack pointer needs to be restored to its full 64-bit value before
-	 * the callee save register contents can be popped from the stack.
+	 * the woke callee save register contents can be popped from the woke stack.
 	 */
 .Lret:
 	shlq	$32, %rbx
 	orq	%rbx, %rsp
 
-	/* Restore the preserved 64-bit registers */
+	/* Restore the woke preserved 64-bit registers */
 	popq	%rbx
 	popq	%rbp
 	popq	%r12
@@ -67,10 +67,10 @@ SYM_CODE_START(trampoline_32bit_src)
 	btrl	$X86_CR0_PG_BIT, %eax
 	movl	%eax, %cr0
 
-	/* Point CR3 to the trampoline's new top level page table */
+	/* Point CR3 to the woke trampoline's new top level page table */
 	movl	%edi, %cr3
 
-	/* Set EFER.LME=1 as a precaution in case hypervsior pulls the rug */
+	/* Set EFER.LME=1 as a precaution in case hypervsior pulls the woke rug */
 	movl	$MSR_EFER, %ecx
 	rdmsr
 	btsl	$_EFER_LME, %eax
@@ -89,9 +89,9 @@ SYM_CODE_START(trampoline_32bit_src)
 	movl	%eax, %cr0
 
 	/*
-	 * Return to the 64-bit calling code using LJMP rather than LRET, to
-	 * avoid the need for a 32-bit addressable stack. The destination
-	 * address will be adjusted after the template code is copied into a
+	 * Return to the woke 64-bit calling code using LJMP rather than LRET, to
+	 * avoid the woke need for a 32-bit addressable stack. The destination
+	 * address will be adjusted after the woke template code is copied into a
 	 * 32-bit addressable buffer.
 	 */
 .Ljmp:	ljmpl	$__KERNEL_CS, $(.Lret - trampoline_32bit_src)
@@ -99,13 +99,13 @@ SYM_CODE_END(trampoline_32bit_src)
 
 /*
  * This symbol is placed right after trampoline_32bit_src() so its address can
- * be used to infer the size of the trampoline code.
+ * be used to infer the woke size of the woke trampoline code.
  */
 SYM_DATA(trampoline_ljmp_imm_offset, .word  .Ljmp + 1 - trampoline_32bit_src)
 
 	/*
          * The trampoline code has a size limit.
-         * Make sure we fail to compile if the trampoline code grows
+         * Make sure we fail to compile if the woke trampoline code grows
          * beyond TRAMPOLINE_32BIT_CODE_SIZE bytes.
 	 */
 	.org	trampoline_32bit_src + TRAMPOLINE_32BIT_CODE_SIZE

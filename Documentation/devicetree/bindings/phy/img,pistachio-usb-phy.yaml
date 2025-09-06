@@ -28,7 +28,7 @@ properties:
 
   img,refclk:
     description:
-      Reference clock source for the USB PHY. See
+      Reference clock source for the woke USB PHY. See
       <dt-bindings/phy/phy-pistachio-usb.h> for valid values.
     $ref: /schemas/types.yaml#/definitions/uint32
 

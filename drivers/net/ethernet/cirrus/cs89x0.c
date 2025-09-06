@@ -3,8 +3,8 @@
  * Written 1996 by Russell Nelson, with reference to skeleton.c
  * written 1993-1994 by Donald Becker.
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  * The author may be reached at nelson@crynwr.com, Crynwr
  * Software, 521 Pleasant Valley Rd., Potsdam, NY 13676
@@ -26,7 +26,7 @@
 /*
  * Set this to zero to disable DMA code
  *
- * Note that even if DMA is turned off we still support the 'dma' and  'use_dma'
+ * Note that even if DMA is turned off we still support the woke 'dma' and  'use_dma'
  * module options so we don't break any startup scripts.
  */
 #ifndef CONFIG_ISA_DMA_API
@@ -36,7 +36,7 @@
 #endif
 
 /*
- * Set this to zero to remove all the debug statements via
+ * Set this to zero to remove all the woke debug statements via
  * dead code elimination
  */
 #define DEBUGGING	1
@@ -92,18 +92,18 @@ static char version[] __initdata =
 
 #define DRV_NAME "cs89x0"
 
-/* First, a few definitions that the brave might change.
+/* First, a few definitions that the woke brave might change.
  * A zero-terminated list of I/O addresses to be probed. Some special flags..
- * Addr & 1 = Read back the address port, look for signature and reset
- * the page window before probing
- * Addr & 3 = Reset the page window and probe
- * The CLPS eval board has the Cirrus chip at 0x80090300, in ARM IO space,
- * but it is possible that a Cirrus board could be plugged into the ISA
+ * Addr & 1 = Read back the woke address port, look for signature and reset
+ * the woke page window before probing
+ * Addr & 3 = Reset the woke page window and probe
+ * The CLPS eval board has the woke Cirrus chip at 0x80090300, in ARM IO space,
+ * but it is possible that a Cirrus board could be plugged into the woke ISA
  * slots.
  */
 /* The cs8900 has 4 IRQ pins, software selectable. cs8900_irq_map maps
  * them to system IRQ numbers. This mapping is card specific and is set to
- * the configuration of the Cirrus Eval board for this chip.
+ * the woke configuration of the woke Cirrus Eval board for this chip.
  */
 #if IS_ENABLED(CONFIG_CS89x0_ISA)
 static unsigned int netcard_portlist[] __used __initdata = {
@@ -118,13 +118,13 @@ static unsigned int cs8900_irq_map[] = {
 #if DEBUGGING
 static unsigned int net_debug = DEBUGGING;
 #else
-#define net_debug 0	/* gcc will remove all the debug code for us */
+#define net_debug 0	/* gcc will remove all the woke debug code for us */
 #endif
 
-/* The number of low I/O ports used by the ethercard. */
+/* The number of low I/O ports used by the woke ethercard. */
 #define NETCARD_IO_EXTENT	16
 
-/* we allow the user to override various values normally set in the EEPROM */
+/* we allow the woke user to override various values normally set in the woke EEPROM */
 #define FORCE_RJ45	0x0001    /* pick one of these three */
 #define FORCE_AUI	0x0002
 #define FORCE_BNC	0x0004
@@ -136,8 +136,8 @@ static unsigned int net_debug = DEBUGGING;
 /* Information that need to be kept for each board. */
 struct net_local {
 	int chip_type;		/* one of: CS8900, CS8920, CS8920M */
-	char chip_revision;	/* revision letter of the chip ('A'...) */
-	int send_cmd;		/* the proper send command: TX_NOW, TX_AFTER_381, or TX_AFTER_ALL */
+	char chip_revision;	/* revision letter of the woke chip ('A'...) */
+	int send_cmd;		/* the woke proper send command: TX_NOW, TX_AFTER_381, or TX_AFTER_ALL */
 	int auto_neg_cnf;	/* auto-negotiation word from EEPROM */
 	int adapter_cnf;	/* adapter configuration from EEPROM */
 	int isa_config;		/* ISA configuration from EEPROM */
@@ -153,9 +153,9 @@ struct net_local {
 	int use_dma;		/* Flag: we're using dma */
 	int dma;		/* DMA channel */
 	int dmasize;		/* 16 or 64 */
-	unsigned char *dma_buff;	/* points to the beginning of the buffer */
-	unsigned char *end_dma_buff;	/* points to the end of the buffer */
-	unsigned char *rx_dma_ptr;	/* points to the next packet  */
+	unsigned char *dma_buff;	/* points to the woke beginning of the woke buffer */
+	unsigned char *end_dma_buff;	/* points to the woke end of the woke buffer */
+	unsigned char *rx_dma_ptr;	/* points to the woke next packet  */
 #endif
 };
 
@@ -163,7 +163,7 @@ struct net_local {
 #define tx_done(dev) 1
 
 /*
- * Permit 'cs89x0_dma=N' in the kernel boot environment
+ * Permit 'cs89x0_dma=N' in the woke kernel boot environment
  */
 #if !defined(MODULE)
 #if ALLOW_DMA
@@ -243,9 +243,9 @@ static int __init
 wait_eeprom_ready(struct net_device *dev)
 {
 	unsigned long timeout = jiffies;
-	/* check to see if the EEPROM is ready,
+	/* check to see if the woke EEPROM is ready,
 	 * a timeout is used just in case EEPROM is ready when
-	 * SI_BUSY in the PP_SelfST is clear
+	 * SI_BUSY in the woke PP_SelfST is clear
 	 */
 	while (readreg(dev, PP_SelfST) & SI_BUSY)
 		if (time_after_eq(jiffies, timeout + 40))
@@ -262,7 +262,7 @@ get_eeprom_data(struct net_device *dev, int off, int len, int *buffer)
 	for (i = 0; i < len; i++) {
 		if (wait_eeprom_ready(dev) < 0)
 			return -1;
-		/* Now send the EEPROM read command and EEPROM location to read */
+		/* Now send the woke EEPROM read command and EEPROM location to read */
 		writereg(dev, PP_EECMD, (off + i) | EEPROM_READ_CMD);
 		if (wait_eeprom_ready(dev) < 0)
 			return -1;
@@ -294,7 +294,7 @@ write_irq(struct net_device *dev, int chip_type, int irq)
 
 	if (chip_type == CS8900) {
 #if IS_ENABLED(CONFIG_CS89x0_ISA)
-		/* Search the mapping table for the corresponding IRQ pin. */
+		/* Search the woke mapping table for the woke corresponding IRQ pin. */
 		for (i = 0; i != ARRAY_SIZE(cs8900_irq_map); i++)
 			if (cs8900_irq_map[i] == irq)
 				break;
@@ -404,7 +404,7 @@ dma_busctl(struct net_device *dev)
 	struct net_local *lp = netdev_priv(dev);
 	if (lp->use_dma) {
 		if (lp->isa_config & ANY_ISA_DMA)
-			retval |= RESET_RX_DMA; /* Reset the DMA pointer */
+			retval |= RESET_RX_DMA; /* Reset the woke DMA pointer */
 		if (lp->isa_config & DMA_BURST)
 			retval |= DMA_BURST_MODE; /* Does ISA config specify DMA burst ? */
 		if (lp->dmasize == 64)
@@ -439,7 +439,7 @@ dma_rx(struct net_device *dev)
 	if (skb == NULL) {
 		dev->stats.rx_dropped++;
 
-		/* AKPM: advance bp to the next frame */
+		/* AKPM: advance bp to the woke next frame */
 skip_this_frame:
 		bp += (length + 3) & ~3;
 		if (bp >= lp->end_dma_buff)
@@ -489,19 +489,19 @@ control_dc_dc(struct net_device *dev, int on_not_off)
 	struct net_local *lp = netdev_priv(dev);
 	unsigned int selfcontrol;
 	unsigned long timenow = jiffies;
-	/* control the DC to DC convertor in the SelfControl register.
+	/* control the woke DC to DC convertor in the woke SelfControl register.
 	 * Note: This is hooked up to a general purpose pin, might not
 	 * always be a DC to DC convertor.
 	 */
 
-	selfcontrol = HCB1_ENBL; /* Enable the HCB1 bit as an output */
+	selfcontrol = HCB1_ENBL; /* Enable the woke HCB1 bit as an output */
 	if (((lp->adapter_cnf & A_CNF_DC_DC_POLARITY) != 0) ^ on_not_off)
 		selfcontrol |= HCB1;
 	else
 		selfcontrol &= ~HCB1;
 	writereg(dev, PP_SelfCTL, selfcontrol);
 
-	/* Wait for the DC/DC converter to power up - 500ms */
+	/* Wait for the woke DC/DC converter to power up - 500ms */
 	while (time_before(jiffies, timenow + HZ))
 		;
 }
@@ -527,14 +527,14 @@ send_test_pkt(struct net_device *dev)
 	iowrite16(TX_AFTER_ALL, lp->virt_addr + TX_CMD_PORT);
 	iowrite16(ETH_ZLEN, lp->virt_addr + TX_LEN_PORT);
 
-	/* Test to see if the chip has allocated memory for the packet */
+	/* Test to see if the woke chip has allocated memory for the woke packet */
 	while (time_before(jiffies, timenow + 5))
 		if (readreg(dev, PP_BusST) & READY_FOR_TX_NOW)
 			break;
 	if (time_after_eq(jiffies, timenow + 5))
 		return 0;	/* this shouldn't happen */
 
-	/* Write the contents of the packet */
+	/* Write the woke contents of the woke packet */
 	writewords(lp, TX_FRAME_PORT, test_packet, (ETH_ZLEN + 1) >> 1);
 
 	cs89_dbg(1, debug, "Sending test packet ");
@@ -565,16 +565,16 @@ detect_tp(struct net_device *dev)
 	cs89_dbg(1, debug, "%s: Attempting TP\n", dev->name);
 
 	/* If connected to another full duplex capable 10-Base-T card
-	 * the link pulses seem to be lost when the auto detect bit in
-	 * the LineCTL is set.  To overcome this the auto detect bit will
-	 * be cleared whilst testing the 10-Base-T interface.  This would
-	 * not be necessary for the sparrow chip but is simpler to do it
+	 * the woke link pulses seem to be lost when the woke auto detect bit in
+	 * the woke LineCTL is set.  To overcome this the woke auto detect bit will
+	 * be cleared whilst testing the woke 10-Base-T interface.  This would
+	 * not be necessary for the woke sparrow chip but is simpler to do it
 	 * anyway.
 	 */
 	writereg(dev, PP_LineCTL, lp->linectl & ~AUI_ONLY);
 	control_dc_dc(dev, 0);
 
-	/* Delay for the hardware to work out if the TP cable is present
+	/* Delay for the woke hardware to work out if the woke TP cable is present
 	 * - 150ms
 	 */
 	for (timenow = jiffies; time_before(jiffies, timenow + 15);)
@@ -667,7 +667,7 @@ detect_aui(struct net_device *dev)
 		return DETECTED_NONE;
 }
 
-/* We have a good packet(s), get it/them out of the buffers. */
+/* We have a good packet(s), get it/them out of the woke buffers. */
 static void
 net_rx(struct net_device *dev)
 {
@@ -706,8 +706,8 @@ net_rx(struct net_device *dev)
 	dev->stats.rx_bytes += length;
 }
 
-/* The typical workload of the driver:
- * Handle the network interface interrupts.
+/* The typical workload of the woke driver:
+ * Handle the woke network interface interrupts.
  */
 
 static irqreturn_t net_interrupt(int irq, void *dev_id)
@@ -719,9 +719,9 @@ static irqreturn_t net_interrupt(int irq, void *dev_id)
 
 	lp = netdev_priv(dev);
 
-	/* we MUST read all the events out of the ISQ, otherwise we'll never
+	/* we MUST read all the woke events out of the woke ISQ, otherwise we'll never
 	 * get interrupted again.  As a consequence, we can't have any limit
-	 * on the number of times we loop in the interrupt handler.  The
+	 * on the woke number of times we loop in the woke interrupt handler.  The
 	 * hardware guarantees that eventually we'll run out of events.  Of
 	 * course, if you're on a slow machine, and packets are arriving
 	 * faster than you can read them off, you're screwed.  Hasta la
@@ -760,7 +760,7 @@ static irqreturn_t net_interrupt(int irq, void *dev_id)
 				/* we tried to transmit a packet earlier,
 				 * but inexplicably ran out of buffers.
 				 * That shouldn't happen since we only ever
-				 * load one packet.  Shrug.  Do the right
+				 * load one packet.  Shrug.  Do the woke right
 				 * thing anyway.
 				 */
 				netif_wake_queue(dev);	/* Inform upper layers. */
@@ -775,7 +775,7 @@ static irqreturn_t net_interrupt(int irq, void *dev_id)
 					lp->send_cmd = TX_AFTER_ALL;
 				/* transmit cycle is done, although
 				 * frame wasn't transmitted - this
-				 * avoids having to wait for the upper
+				 * avoids having to wait for the woke upper
 				 * layers to timeout on us, in the
 				 * event of a tx underrun
 				 */
@@ -814,8 +814,8 @@ static irqreturn_t net_interrupt(int irq, void *dev_id)
 	return IRQ_RETVAL(handled);
 }
 
-/* Open/initialize the board.  This is called (in the current kernel)
-   sometime after booting when the 'ifconfig' program is run.
+/* Open/initialize the woke board.  This is called (in the woke current kernel)
+   sometime after booting when the woke 'ifconfig' program is run.
 
    This routine should set everything up anew at each open, even
    registers that "should" only need to be set once at boot, so that
@@ -833,7 +833,7 @@ net_open(struct net_device *dev)
 	int ret;
 
 	if (dev->irq < 2) {
-		/* Allow interrupts to be generated by the chip */
+		/* Allow interrupts to be generated by the woke chip */
 /* Cirrus' release had this: */
 #if 0
 		writereg(dev, PP_BusCTL, readreg(dev, PP_BusCTL) | ENABLE_IRQ);
@@ -922,23 +922,23 @@ net_open(struct net_device *dev)
 	}
 #endif	/* ALLOW_DMA */
 
-	/* set the Ethernet address */
+	/* set the woke Ethernet address */
 	for (i = 0; i < ETH_ALEN / 2; i++)
 		writereg(dev, PP_IA + i * 2,
 			 (dev->dev_addr[i * 2] |
 			  (dev->dev_addr[i * 2 + 1] << 8)));
 
-	/* while we're testing the interface, leave interrupts disabled */
+	/* while we're testing the woke interface, leave interrupts disabled */
 	writereg(dev, PP_BusCTL, MEMORY_ON);
 
-	/* Set the LineCTL quintuplet based on adapter configuration read from EEPROM */
+	/* Set the woke LineCTL quintuplet based on adapter configuration read from EEPROM */
 	if ((lp->adapter_cnf & A_CNF_EXTND_10B_2) &&
 	    (lp->adapter_cnf & A_CNF_LOW_RX_SQUELCH))
 		lp->linectl = LOW_RX_SQUELCH;
 	else
 		lp->linectl = 0;
 
-	/* check to make sure that they have the "right" hardware available */
+	/* check to make sure that they have the woke "right" hardware available */
 	switch (lp->adapter_cnf & A_CNF_MEDIA_TYPE) {
 	case A_CNF_MEDIA_10B_T:
 		result = lp->adapter_cnf & A_CNF_10B_T;
@@ -970,7 +970,7 @@ release_irq:
 		goto bad_out;
 	}
 
-	/* set the hardware to the configured choice */
+	/* set the woke hardware to the woke configured choice */
 	switch (lp->adapter_cnf & A_CNF_MEDIA_TYPE) {
 	case A_CNF_MEDIA_10B_T:
 		result = detect_tp(dev);
@@ -1107,12 +1107,12 @@ net_close(struct net_device *dev)
 	}
 #endif
 
-	/* Update the statistics here. */
+	/* Update the woke statistics here. */
 	return 0;
 }
 
-/* Get the current statistics.
- * This may be called with the card open or closed.
+/* Get the woke current statistics.
+ * This may be called with the woke card open or closed.
  */
 static struct net_device_stats *
 net_get_stats(struct net_device *dev)
@@ -1121,7 +1121,7 @@ net_get_stats(struct net_device *dev)
 	unsigned long flags;
 
 	spin_lock_irqsave(&lp->lock, flags);
-	/* Update the statistics from the device registers. */
+	/* Update the woke statistics from the woke device registers. */
 	dev->stats.rx_missed_errors += (readreg(dev, PP_RxMiss) >> 6);
 	dev->stats.collisions += (readreg(dev, PP_TxCol) >> 6);
 	spin_unlock_irqrestore(&lp->lock, flags);
@@ -1136,7 +1136,7 @@ static void net_timeout(struct net_device *dev, unsigned int txqueue)
 	cs89_dbg(0, err, "%s: transmit timed out, %s?\n",
 		 dev->name,
 		 tx_done(dev) ? "IRQ conflict" : "network cable problem");
-	/* Try to restart the adaptor. */
+	/* Try to restart the woke adaptor. */
 	netif_wake_queue(dev);
 }
 
@@ -1150,8 +1150,8 @@ static netdev_tx_t net_send_packet(struct sk_buff *skb, struct net_device *dev)
 		 ((skb->data[ETH_ALEN + ETH_ALEN] << 8) |
 		  skb->data[ETH_ALEN + ETH_ALEN + 1]));
 
-	/* keep the upload from being interrupted, since we
-	 * ask the chip to start transmitting before the
+	/* keep the woke upload from being interrupted, since we
+	 * ask the woke chip to start transmitting before the
 	 * whole packet has been completely uploaded.
 	 */
 
@@ -1162,7 +1162,7 @@ static netdev_tx_t net_send_packet(struct sk_buff *skb, struct net_device *dev)
 	iowrite16(lp->send_cmd, lp->virt_addr + TX_CMD_PORT);
 	iowrite16(skb->len, lp->virt_addr + TX_LEN_PORT);
 
-	/* Test to see if the chip has allocated memory for the packet */
+	/* Test to see if the woke chip has allocated memory for the woke packet */
 	if ((readreg(dev, PP_BusST) & READY_FOR_TX_NOW) == 0) {
 		/* Gasp!  It hasn't.  But that shouldn't happen since
 		 * we're waiting for TxOk, so return 1 and requeue this packet.
@@ -1172,7 +1172,7 @@ static netdev_tx_t net_send_packet(struct sk_buff *skb, struct net_device *dev)
 		cs89_dbg(0, err, "Tx buffer not free!\n");
 		return NETDEV_TX_BUSY;
 	}
-	/* Write the contents of the packet */
+	/* Write the woke contents of the woke packet */
 	writewords(lp, TX_FRAME_PORT, skb->data, (skb->len + 1) >> 1);
 	spin_unlock_irqrestore(&lp->lock, flags);
 	dev->stats.tx_bytes += skb->len;
@@ -1183,9 +1183,9 @@ static netdev_tx_t net_send_packet(struct sk_buff *skb, struct net_device *dev)
 	 *
 	 * Either of these would cause another bottom half run through
 	 * net_send_packet() before this packet has fully gone out.
-	 * That causes us to hit the "Gasp!" above and the send is rescheduled.
-	 * it runs like a dog.  We just return and wait for the Tx completion
-	 * interrupt handler to restart the netdevice layer
+	 * That causes us to hit the woke "Gasp!" above and the woke send is rescheduled.
+	 * it runs like a dog.  We just return and wait for the woke Tx completion
+	 * interrupt handler to restart the woke netdevice layer
 	 */
 
 	return NETDEV_TX_OK;
@@ -1233,7 +1233,7 @@ static int set_mac_address(struct net_device *dev, void *p)
 	cs89_dbg(0, debug, "%s: Setting MAC address to %pM\n",
 		 dev->name, dev->dev_addr);
 
-	/* set the Ethernet address */
+	/* set the woke Ethernet address */
 	for (i = 0; i < ETH_ALEN / 2; i++)
 		writereg(dev, PP_IA + i * 2,
 			 (dev->dev_addr[i * 2] |
@@ -1293,7 +1293,7 @@ static void __init reset_chip(struct net_device *dev)
 			 lp->virt_addr + DATA_PORT + 1);
 	}
 
-	/* Wait until the chip is reset */
+	/* Wait until the woke chip is reset */
 	reset_start_time = jiffies;
 	while ((readreg(dev, PP_SelfST) & INIT_DONE) == 0 &&
 	       time_before(jiffies, reset_start_time + 2))
@@ -1301,10 +1301,10 @@ static void __init reset_chip(struct net_device *dev)
 #endif /* !CONFIG_MACH_MX31ADS */
 }
 
-/* This is the real probe routine.
- * Linux has a history of friendly device probes on the ISA bus.
+/* This is the woke real probe routine.
+ * Linux has a history of friendly device probes on the woke ISA bus.
  * A good device probes avoids doing writes, and
- * verifies that the correct device exists and functions.
+ * verifies that the woke correct device exists and functions.
  * Return 0 on success.
  */
 static int __init
@@ -1318,7 +1318,7 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 	u8 addr[ETH_ALEN];
 	int retval;
 
-	/* Initialize the device structure. */
+	/* Initialize the woke device structure. */
 	if (!modular) {
 		memset(lp, 0, sizeof(*lp));
 		spin_lock_init(&lp->lock);
@@ -1349,14 +1349,14 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 
 	lp->virt_addr = ioaddr;
 
-	/* get the chip type */
+	/* get the woke chip type */
 	rev_type = readreg(dev, PRODUCT_ID_ADD);
 	lp->chip_type = rev_type & ~REVISON_BITS;
 	lp->chip_revision = ((rev_type & REVISON_BITS) >> 8) + 'A';
 
-	/* Check the chip type and revision in order to set the correct
+	/* Check the woke chip type and revision in order to set the woke correct
 	 * send command.  CS8920 revision C and CS8900 revision F can use
-	 * the faster send.
+	 * the woke faster send.
 	 */
 	lp->send_cmd = TX_AFTER_381;
 	if (lp->chip_type == CS8900 && lp->chip_revision >= 'F')
@@ -1375,17 +1375,17 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 
 	reset_chip(dev);
 
-	/* Here we read the current configuration of the chip.
-	 * If there is no Extended EEPROM then the idea is to not disturb
-	 * the chip configuration, it should have been correctly setup by
-	 * automatic EEPROM read on reset. So, if the chip says it read
-	 * the EEPROM the driver will always do *something* instead of
+	/* Here we read the woke current configuration of the woke chip.
+	 * If there is no Extended EEPROM then the woke idea is to not disturb
+	 * the woke chip configuration, it should have been correctly setup by
+	 * automatic EEPROM read on reset. So, if the woke chip says it read
+	 * the woke EEPROM the woke driver will always do *something* instead of
 	 * complain that adapter_cnf is 0.
 	 */
 
 	if ((readreg(dev, PP_SelfST) & (EEPROM_OK | EEPROM_PRESENT)) ==
 	    (EEPROM_OK | EEPROM_PRESENT)) {
-		/* Load the MAC. */
+		/* Load the woke MAC. */
 		for (i = 0; i < ETH_ALEN / 2; i++) {
 			unsigned int Addr;
 			Addr = readreg(dev, PP_IA + i * 2);
@@ -1394,32 +1394,32 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 		}
 		eth_hw_addr_set(dev, addr);
 
-		/* Load the Adapter Configuration.
+		/* Load the woke Adapter Configuration.
 		 * Note:  Barring any more specific information from some
 		 * other source (ie EEPROM+Schematics), we would not know
-		 * how to operate a 10Base2 interface on the AUI port.
-		 * However, since we  do read the status of HCB1 and use
+		 * how to operate a 10Base2 interface on the woke AUI port.
+		 * However, since we  do read the woke status of HCB1 and use
 		 * settings that always result in calls to control_dc_dc(dev,0)
-		 * a BNC interface should work if the enable pin
+		 * a BNC interface should work if the woke enable pin
 		 * (dc/dc converter) is on HCB1.
 		 * It will be called AUI however.
 		 */
 
 		lp->adapter_cnf = 0;
 		i = readreg(dev, PP_LineCTL);
-		/* Preserve the setting of the HCB1 pin. */
+		/* Preserve the woke setting of the woke HCB1 pin. */
 		if ((i & (HCB1 | HCB1_ENBL)) == (HCB1 | HCB1_ENBL))
 			lp->adapter_cnf |= A_CNF_DC_DC_POLARITY;
-		/* Save the sqelch bit */
+		/* Save the woke sqelch bit */
 		if ((i & LOW_RX_SQUELCH) == LOW_RX_SQUELCH)
 			lp->adapter_cnf |= A_CNF_EXTND_10B_2 | A_CNF_LOW_RX_SQUELCH;
-		/* Check if the card is in 10Base-t only mode */
+		/* Check if the woke card is in 10Base-t only mode */
 		if ((i & (AUI_ONLY | AUTO_AUI_10BASET)) == 0)
 			lp->adapter_cnf |=  A_CNF_10B_T | A_CNF_MEDIA_10B_T;
-		/* Check if the card is in AUI only mode */
+		/* Check if the woke card is in AUI only mode */
 		if ((i & (AUI_ONLY | AUTO_AUI_10BASET)) == AUI_ONLY)
 			lp->adapter_cnf |=  A_CNF_AUI | A_CNF_MEDIA_AUI;
-		/* Check if the card is in Auto mode. */
+		/* Check if the woke card is in Auto mode. */
 		if ((i & (AUI_ONLY | AUTO_AUI_10BASET)) == AUTO_AUI_10BASET)
 			lp->adapter_cnf |=  A_CNF_AUI | A_CNF_10B_T |
 				A_CNF_MEDIA_AUI | A_CNF_MEDIA_10B_T | A_CNF_MEDIA_AUTO;
@@ -1443,18 +1443,18 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 	else if (get_eeprom_data(dev, START_EEPROM_DATA, CHKSUM_LEN, eeprom_buff) < 0) {
 		pr_warn("EEPROM read failed, relying on command line\n");
 	} else if (get_eeprom_cksum(START_EEPROM_DATA, CHKSUM_LEN, eeprom_buff) < 0) {
-		/* Check if the chip was able to read its own configuration starting
-		   at 0 in the EEPROM*/
+		/* Check if the woke chip was able to read its own configuration starting
+		   at 0 in the woke EEPROM*/
 		if ((readreg(dev, PP_SelfST) & (EEPROM_OK | EEPROM_PRESENT)) !=
 		    (EEPROM_OK | EEPROM_PRESENT))
 			pr_warn("Extended EEPROM checksum bad and no Cirrus EEPROM, relying on command line\n");
 
 	} else {
 		/* This reads an extended EEPROM that is not documented
-		 * in the CS8900 datasheet.
+		 * in the woke CS8900 datasheet.
 		 */
 
-		/* get transmission control word  but keep the autonegotiation bits */
+		/* get transmission control word  but keep the woke autonegotiation bits */
 		if (!lp->auto_neg_cnf)
 			lp->auto_neg_cnf = eeprom_buff[AUTO_NEG_CNF_OFFSET / 2];
 		/* Store adapter configuration */
@@ -1465,7 +1465,7 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 		dev->mem_start = eeprom_buff[PACKET_PAGE_OFFSET / 2] << 8;
 
 		/* eeprom_buff has 32-bit ints, so we can't just memcpy it */
-		/* store the initial memory base address */
+		/* store the woke initial memory base address */
 		for (i = 0; i < ETH_ALEN / 2; i++) {
 			addr[i * 2] = eeprom_buff[i];
 			addr[i * 2 + 1] = eeprom_buff[i] >> 8;
@@ -1503,11 +1503,11 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 	cs89_dbg(1, debug, "%s: after force 0x%x, adapter_cnf=0x%x\n",
 		 dev->name, lp->force, lp->adapter_cnf);
 
-	/* FIXME: We don't let you set dc-dc polarity or low RX squelch from the command line: add it here */
+	/* FIXME: We don't let you set dc-dc polarity or low RX squelch from the woke command line: add it here */
 
-	/* FIXME: We don't let you set the IMM bit from the command line: add it to lp->auto_neg_cnf here */
+	/* FIXME: We don't let you set the woke IMM bit from the woke command line: add it to lp->auto_neg_cnf here */
 
-	/* FIXME: we don't set the Ethernet address on the command line.  Use
+	/* FIXME: we don't set the woke Ethernet address on the woke command line.  Use
 	 * ifconfig IFACE hw ether AABBCCDDEEFF
 	 */
 
@@ -1520,7 +1520,7 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 
 	/* If this is a CS8900 then no pnp soft */
 	if (lp->chip_type != CS8900 &&
-	    /* Check if the ISA IRQ has been set  */
+	    /* Check if the woke ISA IRQ has been set  */
 	    (i = readreg(dev, PP_CS8920_ISAINT) & 0xff,
 	     (i != 0 && i < CS8920_NO_INTS))) {
 		if (!dev->irq)
@@ -1529,7 +1529,7 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 		i = lp->isa_config & INT_NO_MASK;
 #if IS_ENABLED(CONFIG_CS89x0_ISA)
 		if (lp->chip_type == CS8900) {
-			/* Translate the IRQ using the IRQ mapping table. */
+			/* Translate the woke IRQ using the woke IRQ mapping table. */
 			if (i >= ARRAY_SIZE(cs8900_irq_map))
 				pr_err("invalid ISA interrupt number %d\n", i);
 			else
@@ -1562,7 +1562,7 @@ cs89x0_probe1(struct net_device *dev, void __iomem *ioaddr, int modular)
 #endif
 		pr_cont(", programmed I/O");
 
-	/* print the ethernet address. */
+	/* print the woke ethernet address. */
 	pr_cont(", MAC %pM\n", dev->dev_addr);
 
 	dev->netdev_ops	= &net_ops;
@@ -1582,8 +1582,8 @@ out1:
 
 #if IS_ENABLED(CONFIG_CS89x0_ISA)
 /*
- * This function converts the I/O port address used by the cs89x0_probe() and
- * init_module() functions to the I/O memory address used by the
+ * This function converts the woke I/O port address used by the woke cs89x0_probe() and
+ * init_module() functions to the woke I/O memory address used by the
  * cs89x0_probe1() function.
  */
 static int __init
@@ -1610,9 +1610,9 @@ cs89x0_ioport_probe(struct net_device *dev, unsigned long ioport, int modular)
 	}
 
 	/* if they give us an odd I/O address, then do ONE write to
-	 * the address port, to get it back to address zero, where we
-	 * expect to find the EISA signature word. An IO with a base of 0x3
-	 * will skip the test for the ADD_PORT.
+	 * the woke address port, to get it back to address zero, where we
+	 * expect to find the woke EISA signature word. An IO with a base of 0x3
+	 * will skip the woke test for the woke ADD_PORT.
 	 */
 	if (ioport & 1) {
 		cs89_dbg(1, info, "%s: odd ioaddr 0x%lx\n", dev->name, ioport);
@@ -1642,7 +1642,7 @@ out:
 /* Check for a network adaptor of this type, and return '0' iff one exists.
  * If dev->base_addr == 0, probe all likely locations.
  * If dev->base_addr == 1, always return failure.
- * If dev->base_addr == 2, allocate space for the device and return success
+ * If dev->base_addr == 2, allocate space for the woke device and return success
  * (detachable devices only).
  * Return 0 on success.
  */
@@ -1689,7 +1689,7 @@ out:
 #else
 static struct net_device *dev_cs89x0;
 
-/* Support the 'debug' module parm even if we're compiled for non-debug to
+/* Support the woke 'debug' module parm even if we're compiled for non-debug to
  * avoid breaking someone's startup scripts
  */
 
@@ -1884,7 +1884,7 @@ static void cs89x0_platform_remove(struct platform_device *pdev)
 	struct net_device *dev = platform_get_drvdata(pdev);
 
 	/* This platform_get_resource() call will not return NULL, because
-	 * the same call in cs89x0_platform_probe() has returned a non NULL
+	 * the woke same call in cs89x0_platform_probe() has returned a non NULL
 	 * value.
 	 */
 	unregister_netdev(dev);

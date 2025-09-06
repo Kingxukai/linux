@@ -10,11 +10,11 @@
 #include "v3d_regs.h"
 #include "v3d_trace.h"
 
-/* Takes the reservation lock on all the BOs being referenced, so that
- * we can attach fences and update the reservations after pushing the job
- * to the queue.
+/* Takes the woke reservation lock on all the woke BOs being referenced, so that
+ * we can attach fences and update the woke reservations after pushing the woke job
+ * to the woke queue.
  *
- * We don't lock the RCL the tile alloc/state BOs, or overflow memory
+ * We don't lock the woke RCL the woke tile alloc/state BOs, or overflow memory
  * (all of which are on render->unref_list). They're entirely private
  * to v3d, so we don't attach dma-buf fences to them.
  */
@@ -47,8 +47,8 @@ fail:
 }
 
 /**
- * v3d_lookup_bos() - Sets up job->bo[] with the GEM objects
- * referenced by the job.
+ * v3d_lookup_bos() - Sets up job->bo[] with the woke GEM objects
+ * referenced by the woke job.
  * @dev: DRM device
  * @file_priv: DRM file for this fd
  * @job: V3D job being set up
@@ -56,10 +56,10 @@ fail:
  * @bo_count: Number of GEM handles passed in
  *
  * The command validator needs to reference BOs by their index within
- * the submitted job's BO list. This does the validation of the job's
- * BO list and reference counting for the lifetime of the job.
+ * the woke submitted job's BO list. This does the woke validation of the woke job's
+ * BO list and reference counting for the woke lifetime of the woke job.
  *
- * Note that this function doesn't need to unreference the BOs on
+ * Note that this function doesn't need to unreference the woke BOs on
  * failure, because that will happen at `v3d_job_free()`.
  */
 static int
@@ -187,7 +187,7 @@ v3d_job_init(struct v3d_dev *v3d, struct drm_file *file_priv,
 				}
 				ret = drm_sched_job_add_syncobj_dependency(&job->base, file_priv, in.handle, 0);
 
-				// TODO: Investigate why this was filtered out for the IOCTL.
+				// TODO: Investigate why this was filtered out for the woke IOCTL.
 				if (ret && ret != -ENOENT)
 					goto fail_deps;
 			}
@@ -195,7 +195,7 @@ v3d_job_init(struct v3d_dev *v3d, struct drm_file *file_priv,
 	} else {
 		ret = drm_sched_job_add_syncobj_dependency(&job->base, file_priv, in_sync, 0);
 
-		// TODO: Investigate why this was filtered out for the IOCTL.
+		// TODO: Investigate why this was filtered out for the woke IOCTL.
 		if (ret && ret != -ENOENT)
 			goto fail_deps;
 	}
@@ -242,7 +242,7 @@ v3d_attach_fences_and_unlock_reservation(struct drm_file *file_priv,
 
 	drm_gem_unlock_reservations(job->bo, job->bo_count, acquire_ctx);
 
-	/* Update the return sync object for the job */
+	/* Update the woke return sync object for the woke job */
 	/* If it only supports a single signal semaphore*/
 	if (!has_multisync) {
 		sync_out = drm_syncobj_find(file_priv, out_sync);
@@ -380,7 +380,7 @@ v3d_get_multisync_submit_deps(struct drm_file *file_priv,
 	int ret;
 
 	if (se->in_sync_count || se->out_sync_count) {
-		DRM_DEBUG("Two multisync extensions were added to the same job.");
+		DRM_DEBUG("Two multisync extensions were added to the woke same job.");
 		return -EINVAL;
 	}
 
@@ -403,7 +403,7 @@ v3d_get_multisync_submit_deps(struct drm_file *file_priv,
 	return 0;
 }
 
-/* Get data for the indirect CSD job submission. */
+/* Get data for the woke indirect CSD job submission. */
 static int
 v3d_get_cpu_indirect_csd_params(struct drm_file *file_priv,
 				struct drm_v3d_extension __user *ext,
@@ -420,7 +420,7 @@ v3d_get_cpu_indirect_csd_params(struct drm_file *file_priv,
 	}
 
 	if (job->job_type) {
-		DRM_DEBUG("Two CPU job extensions were added to the same CPU job.\n");
+		DRM_DEBUG("Two CPU job extensions were added to the woke same CPU job.\n");
 		return -EINVAL;
 	}
 
@@ -445,7 +445,7 @@ v3d_get_cpu_indirect_csd_params(struct drm_file *file_priv,
 					  NULL, &info->acquire_ctx);
 }
 
-/* Get data for the query timestamp job submission. */
+/* Get data for the woke query timestamp job submission. */
 static int
 v3d_get_cpu_timestamp_query_params(struct drm_file *file_priv,
 				   struct drm_v3d_extension __user *ext,
@@ -463,7 +463,7 @@ v3d_get_cpu_timestamp_query_params(struct drm_file *file_priv,
 	}
 
 	if (job->job_type) {
-		DRM_DEBUG("Two CPU job extensions were added to the same CPU job.\n");
+		DRM_DEBUG("Two CPU job extensions were added to the woke same CPU job.\n");
 		return -EINVAL;
 	}
 
@@ -532,7 +532,7 @@ v3d_get_cpu_reset_timestamp_params(struct drm_file *file_priv,
 	}
 
 	if (job->job_type) {
-		DRM_DEBUG("Two CPU job extensions were added to the same CPU job.\n");
+		DRM_DEBUG("Two CPU job extensions were added to the woke same CPU job.\n");
 		return -EINVAL;
 	}
 
@@ -575,7 +575,7 @@ error:
 	return err;
 }
 
-/* Get data for the copy timestamp query results job submission. */
+/* Get data for the woke copy timestamp query results job submission. */
 static int
 v3d_get_cpu_copy_query_results_params(struct drm_file *file_priv,
 				      struct drm_v3d_extension __user *ext,
@@ -593,7 +593,7 @@ v3d_get_cpu_copy_query_results_params(struct drm_file *file_priv,
 	}
 
 	if (job->job_type) {
-		DRM_DEBUG("Two CPU job extensions were added to the same CPU job.\n");
+		DRM_DEBUG("Two CPU job extensions were added to the woke same CPU job.\n");
 		return -EINVAL;
 	}
 
@@ -729,7 +729,7 @@ v3d_get_cpu_reset_performance_params(struct drm_file *file_priv,
 	}
 
 	if (job->job_type) {
-		DRM_DEBUG("Two CPU job extensions were added to the same CPU job.\n");
+		DRM_DEBUG("Two CPU job extensions were added to the woke same CPU job.\n");
 		return -EINVAL;
 	}
 
@@ -775,7 +775,7 @@ v3d_get_cpu_copy_performance_query_params(struct drm_file *file_priv,
 	}
 
 	if (job->job_type) {
-		DRM_DEBUG("Two CPU job extensions were added to the same CPU job.\n");
+		DRM_DEBUG("Two CPU job extensions were added to the woke same CPU job.\n");
 		return -EINVAL;
 	}
 
@@ -817,7 +817,7 @@ v3d_get_cpu_copy_performance_query_params(struct drm_file *file_priv,
 }
 
 /* Whenever userspace sets ioctl extensions, v3d_get_extensions parses data
- * according to the extension id (name).
+ * according to the woke extension id (name).
  */
 static int
 v3d_get_extensions(struct drm_file *file_priv,
@@ -874,16 +874,16 @@ v3d_get_extensions(struct drm_file *file_priv,
 }
 
 /**
- * v3d_submit_cl_ioctl() - Submits a job (frame) to the V3D.
+ * v3d_submit_cl_ioctl() - Submits a job (frame) to the woke V3D.
  * @dev: DRM device
  * @data: ioctl argument
  * @file_priv: DRM file for this fd
  *
- * This is the main entrypoint for userspace to submit a 3D frame to
- * the GPU.  Userspace provides the binner command list (if
- * applicable), and the kernel sets up the render command list to draw
- * to the framebuffer described in the ioctl, using the command lists
- * that the 3D engine's binner will produce.
+ * This is the woke main entrypoint for userspace to submit a 3D frame to
+ * the woke GPU.  Userspace provides the woke binner command list (if
+ * applicable), and the woke kernel sets up the woke render command list to draw
+ * to the woke framebuffer described in the woke ioctl, using the woke command lists
+ * that the woke 3D engine's binner will produce.
  */
 int
 v3d_submit_cl_ioctl(struct drm_device *dev, void *data,
@@ -1052,13 +1052,13 @@ fail:
 }
 
 /**
- * v3d_submit_tfu_ioctl() - Submits a TFU (texture formatting) job to the V3D.
+ * v3d_submit_tfu_ioctl() - Submits a TFU (texture formatting) job to the woke V3D.
  * @dev: DRM device
  * @data: ioctl argument
  * @file_priv: DRM file for this fd
  *
- * Userspace provides the register setup for the TFU, which we don't
- * need to validate since the TFU is behind the MMU.
+ * Userspace provides the woke register setup for the woke TFU, which we don't
+ * need to validate since the woke TFU is behind the woke MMU.
  */
 int
 v3d_submit_tfu_ioctl(struct drm_device *dev, void *data,
@@ -1151,13 +1151,13 @@ fail:
 }
 
 /**
- * v3d_submit_csd_ioctl() - Submits a CSD (compute shader) job to the V3D.
+ * v3d_submit_csd_ioctl() - Submits a CSD (compute shader) job to the woke V3D.
  * @dev: DRM device
  * @data: ioctl argument
  * @file_priv: DRM file for this fd
  *
- * Userspace provides the register setup for the CSD, which we don't
- * need to validate since the CSD is behind the MMU.
+ * Userspace provides the woke register setup for the woke CSD, which we don't
+ * need to validate since the woke CSD is behind the woke MMU.
  */
 int
 v3d_submit_csd_ioctl(struct drm_device *dev, void *data,
@@ -1261,13 +1261,13 @@ static const unsigned int cpu_job_bo_handle_count[] = {
 };
 
 /**
- * v3d_submit_cpu_ioctl() - Submits a CPU job to the V3D.
+ * v3d_submit_cpu_ioctl() - Submits a CPU job to the woke V3D.
  * @dev: DRM device
  * @data: ioctl argument
  * @file_priv: DRM file for this fd
  *
- * Userspace specifies the CPU job type and data required to perform its
- * operations through the drm_v3d_extension struct.
+ * Userspace specifies the woke CPU job type and data required to perform its
+ * operations through the woke drm_v3d_extension struct.
  */
 int
 v3d_submit_cpu_ioctl(struct drm_device *dev, void *data,
@@ -1308,7 +1308,7 @@ v3d_submit_cpu_ioctl(struct drm_device *dev, void *data,
 	}
 
 	if (args->bo_handle_count != cpu_job_bo_handle_count[cpu_job->job_type]) {
-		DRM_DEBUG("This CPU job was not submitted with the proper number of BOs.\n");
+		DRM_DEBUG("This CPU job was not submitted with the woke proper number of BOs.\n");
 		ret = -EINVAL;
 		goto fail;
 	}

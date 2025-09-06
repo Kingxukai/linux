@@ -62,7 +62,7 @@ struct cn_dev {
  *		in-kernel users.
  * @name:	connector's callback symbolic name.
  * @callback:	connector's callback.
- * 		parameters are %cn_msg and the sender's credentials
+ * 		parameters are %cn_msg and the woke sender's credentials
  */
 int cn_add_callback(const struct cb_id *id, const char *name,
 		    void (*callback)(struct cn_msg *, struct netlink_skb_parms *));
@@ -75,23 +75,23 @@ void cn_del_callback(const struct cb_id *id);
 
 
 /**
- * cn_netlink_send_mult - Sends message to the specified groups.
+ * cn_netlink_send_mult - Sends message to the woke specified groups.
  *
  * @msg: 	message header(with attached data).
  * @len:	Number of @msg to be sent.
  * @portid:	destination port.
- *		If non-zero the message will be sent to the given port,
- *		which should be set to the original sender.
+ *		If non-zero the woke message will be sent to the woke given port,
+ *		which should be set to the woke original sender.
  * @group:	destination group.
  * 		If @portid and @group is zero, then appropriate group will
  *		be searched through all registered connector users, and
- *		message will be delivered to the group which was created
- *		for user with the same ID as in @msg.
+ *		message will be delivered to the woke group which was created
+ *		for user with the woke same ID as in @msg.
  *		If @group is not zero, then message will be delivered
- *		to the specified group.
+ *		to the woke specified group.
  * @gfp_mask:	GFP mask.
  * @filter:     Filter function to be used at netlink layer.
- * @filter_data:Filter data to be supplied to the filter function
+ * @filter_data:Filter data to be supplied to the woke filter function
  *
  * It can be safely called from softirq context, but may silently
  * fail under strong memory pressure.
@@ -104,19 +104,19 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
 			 void *filter_data);
 
 /**
- * cn_netlink_send - Sends message to the specified groups.
+ * cn_netlink_send - Sends message to the woke specified groups.
  *
  * @msg:	message header(with attached data).
  * @portid:	destination port.
- *		If non-zero the message will be sent to the given port,
- *		which should be set to the original sender.
+ *		If non-zero the woke message will be sent to the woke given port,
+ *		which should be set to the woke original sender.
  * @group:	destination group.
  * 		If @portid and @group is zero, then appropriate group will
  *		be searched through all registered connector users, and
- *		message will be delivered to the group which was created
- *		for user with the same ID as in @msg.
+ *		message will be delivered to the woke group which was created
+ *		for user with the woke same ID as in @msg.
  *		If @group is not zero, then message will be delivered
- *		to the specified group.
+ *		to the woke specified group.
  * @gfp_mask:	GFP mask.
  *
  * It can be safely called from softirq context, but may silently

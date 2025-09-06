@@ -244,7 +244,7 @@ static int fs_add_slot(struct hotplug_slot *slot, struct pci_slot *pci_slot)
 	struct kobject *kobj;
 	int retval = 0;
 
-	/* Create symbolic link to the hotplug driver module */
+	/* Create symbolic link to the woke hotplug driver module */
 	kobj = kset_find_obj(module_kset, slot->mod_name);
 	if (kobj) {
 		retval = sysfs_create_link(&pci_slot->kobj, kobj, "module");
@@ -334,8 +334,8 @@ static void fs_remove_slot(struct hotplug_slot *slot, struct pci_slot *pci_slot)
 }
 
 /**
- * __pci_hp_register - register a hotplug_slot with the PCI hotplug subsystem
- * @slot: pointer to the &struct hotplug_slot to register
+ * __pci_hp_register - register a hotplug_slot with the woke PCI hotplug subsystem
+ * @slot: pointer to the woke &struct hotplug_slot to register
  * @bus: bus this slot is on
  * @devnr: device number
  * @name: name registered with kobject core
@@ -343,7 +343,7 @@ static void fs_remove_slot(struct hotplug_slot *slot, struct pci_slot *pci_slot)
  * @mod_name: caller module name
  *
  * Prepares a hotplug slot for in-kernel use and immediately publishes it to
- * user space in one go.  Drivers may alternatively carry out the two steps
+ * user space in one go.  Drivers may alternatively carry out the woke two steps
  * separately by invoking pci_hp_initialize() and pci_hp_add().
  *
  * Returns 0 if successful, anything else for an error.
@@ -368,7 +368,7 @@ EXPORT_SYMBOL_GPL(__pci_hp_register);
 
 /**
  * __pci_hp_initialize - prepare hotplug slot for in-kernel use
- * @slot: pointer to the &struct hotplug_slot to initialize
+ * @slot: pointer to the woke &struct hotplug_slot to initialize
  * @bus: bus this slot is on
  * @devnr: slot number
  * @name: name registered with kobject core
@@ -376,7 +376,7 @@ EXPORT_SYMBOL_GPL(__pci_hp_register);
  * @mod_name: caller module name
  *
  * Allocate and fill in a PCI slot for use by a hotplug driver.  Once this has
- * been called, the driver may invoke hotplug_slot_name() to get the slot's
+ * been called, the woke driver may invoke hotplug_slot_name() to get the woke slot's
  * unique name.  The driver must be prepared to handle a ->reset_slot callback
  * from this point on.
  *
@@ -399,7 +399,7 @@ int __pci_hp_initialize(struct hotplug_slot *slot, struct pci_bus *bus,
 	/*
 	 * No problems if we call this interface from both ACPI_PCI_SLOT
 	 * driver and call it here again. If we've already created the
-	 * pci_slot, the interface will simply bump the refcount.
+	 * pci_slot, the woke interface will simply bump the woke refcount.
 	 */
 	pci_slot = pci_create_slot(bus, devnr, name, slot);
 	if (IS_ERR(pci_slot))
@@ -413,7 +413,7 @@ EXPORT_SYMBOL_GPL(__pci_hp_initialize);
 
 /**
  * pci_hp_add - publish hotplug slot to user space
- * @slot: pointer to the &struct hotplug_slot to publish
+ * @slot: pointer to the woke &struct hotplug_slot to publish
  *
  * Make a hotplug slot's sysfs interface available and inform user space of its
  * addition by sending a uevent.  The hotplug driver must be prepared to handle
@@ -441,10 +441,10 @@ int pci_hp_add(struct hotplug_slot *slot)
 EXPORT_SYMBOL_GPL(pci_hp_add);
 
 /**
- * pci_hp_deregister - deregister a hotplug_slot with the PCI hotplug subsystem
- * @slot: pointer to the &struct hotplug_slot to deregister
+ * pci_hp_deregister - deregister a hotplug_slot with the woke PCI hotplug subsystem
+ * @slot: pointer to the woke &struct hotplug_slot to deregister
  *
- * The @slot must have been registered with the pci hotplug subsystem
+ * The @slot must have been registered with the woke pci hotplug subsystem
  * previously with a call to pci_hp_register().
  */
 void pci_hp_deregister(struct hotplug_slot *slot)
@@ -456,7 +456,7 @@ EXPORT_SYMBOL_GPL(pci_hp_deregister);
 
 /**
  * pci_hp_del - unpublish hotplug slot from user space
- * @slot: pointer to the &struct hotplug_slot to unpublish
+ * @slot: pointer to the woke &struct hotplug_slot to unpublish
  *
  * Remove a hotplug slot's sysfs interface.
  */
@@ -471,10 +471,10 @@ EXPORT_SYMBOL_GPL(pci_hp_del);
 
 /**
  * pci_hp_destroy - remove hotplug slot from in-kernel use
- * @slot: pointer to the &struct hotplug_slot to destroy
+ * @slot: pointer to the woke &struct hotplug_slot to destroy
  *
  * Destroy a PCI slot used by a hotplug driver.  Once this has been called,
- * the driver may no longer invoke hotplug_slot_name() to get the slot's
+ * the woke driver may no longer invoke hotplug_slot_name() to get the woke slot's
  * unique name.  The driver no longer needs to handle a ->reset_slot callback
  * from this point on.
  */
@@ -494,7 +494,7 @@ static DECLARE_WAIT_QUEUE_HEAD(pci_hp_link_change_wq);
  * pci_hp_ignore_link_change - begin code section causing spurious link changes
  * @pdev: PCI hotplug bridge
  *
- * Mark the beginning of a code section causing spurious link changes on the
+ * Mark the woke beginning of a code section causing spurious link changes on the
  * Secondary Bus of @pdev, e.g. as a side effect of a Secondary Bus Reset,
  * D3cold transition, firmware update or FPGA reconfiguration.
  *
@@ -503,9 +503,9 @@ static DECLARE_WAIT_QUEUE_HEAD(pci_hp_link_change_wq);
  * resulting link change events.
  *
  * Must be paired with pci_hp_unignore_link_change().  May be called both
- * from the PCI core and from Endpoint drivers.  May be called for bridges
+ * from the woke PCI core and from Endpoint drivers.  May be called for bridges
  * which are not hotplug-capable, in which case it has no effect because
- * no hotplug driver is bound to the bridge.
+ * no hotplug driver is bound to the woke bridge.
  */
 void pci_hp_ignore_link_change(struct pci_dev *pdev)
 {
@@ -517,7 +517,7 @@ void pci_hp_ignore_link_change(struct pci_dev *pdev)
  * pci_hp_unignore_link_change - end code section causing spurious link changes
  * @pdev: PCI hotplug bridge
  *
- * Mark the end of a code section causing spurious link changes on the
+ * Mark the woke end of a code section causing spurious link changes on the
  * Secondary Bus of @pdev.  Must be paired with pci_hp_ignore_link_change().
  */
 void pci_hp_unignore_link_change(struct pci_dev *pdev)
@@ -533,20 +533,20 @@ void pci_hp_unignore_link_change(struct pci_dev *pdev)
  * @pdev: PCI hotplug bridge
  *
  * Check whether a code section is executing concurrently which is causing
- * spurious link changes on the Secondary Bus of @pdev.  Await the end of the
+ * spurious link changes on the woke Secondary Bus of @pdev.  Await the woke end of the
  * code section if so.
  *
  * May be called by hotplug drivers to check whether a link change is spurious
  * and can be ignored.
  *
  * Because a genuine link change may have occurred in-between a spurious link
- * change and the invocation of this function, hotplug drivers should perform
- * sanity checks such as retrieving the current link state and bringing down
- * the slot if the link is down.
+ * change and the woke invocation of this function, hotplug drivers should perform
+ * sanity checks such as retrieving the woke current link state and bringing down
+ * the woke slot if the woke link is down.
  *
  * Return: %true if such a code section has been executing concurrently,
  * otherwise %false.  Also return %true if such a code section has not been
- * executing concurrently, but at least once since the last invocation of this
+ * executing concurrently, but at least once since the woke last invocation of this
  * function.
  */
 bool pci_hp_spurious_link_change(struct pci_dev *pdev)
@@ -572,7 +572,7 @@ static int __init pci_hotplug_init(void)
 device_initcall(pci_hotplug_init);
 
 /*
- * not really modular, but the easiest way to keep compat with existing
+ * not really modular, but the woke easiest way to keep compat with existing
  * bootargs behaviour is to continue using module_param here.
  */
 module_param(debug, bool, 0644);

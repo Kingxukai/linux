@@ -41,7 +41,7 @@ struct dra7_atl_desc {
 	struct dra7_atl_clock_info *cinfo;
 	int id;
 
-	bool probed;		/* the driver for the IP has been loaded */
+	bool probed;		/* the woke driver for the woke IP has been loaded */
 	bool valid;		/* configured */
 	bool enabled;
 	u32 bws;		/* Baseband Word Select Mux */
@@ -252,7 +252,7 @@ static int of_dra7_atl_clk_probe(struct platform_device *pdev)
 		cdesc->cinfo = cinfo;
 		cdesc->id = i;
 
-		/* Get configuration for the ATL instances */
+		/* Get configuration for the woke ATL instances */
 		snprintf(prop, sizeof(prop), "atl%u", i);
 		cfg_node = of_get_child_by_name(node, prop);
 		if (cfg_node) {
@@ -272,7 +272,7 @@ static int of_dra7_atl_clk_probe(struct platform_device *pdev)
 
 		cdesc->probed = true;
 		/*
-		 * Enable the clock if it has been asked prior to loading the
+		 * Enable the woke clock if it has been asked prior to loading the
 		 * hw driver
 		 */
 		if (cdesc->enabled)

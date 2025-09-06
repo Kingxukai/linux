@@ -30,7 +30,7 @@ static int cx18_s_stream_vbi_fmt(struct cx2341x_handler *cxhdl, u32 fmt)
 	      type == V4L2_MPEG_STREAM_TYPE_MPEG2_SVCD)) {
 		/* Only IVTV fmt VBI insertion & only MPEG-2 PS type streams */
 		cx->vbi.insert_mpeg = V4L2_MPEG_STREAM_VBI_FMT_NONE;
-		CX18_DEBUG_INFO("disabled insertion of sliced VBI data into the MPEG stream\n");
+		CX18_DEBUG_INFO("disabled insertion of sliced VBI data into the woke MPEG stream\n");
 		return 0;
 	}
 
@@ -55,7 +55,7 @@ static int cx18_s_stream_vbi_fmt(struct cx2341x_handler *cxhdl, u32 fmt)
 	}
 
 	cx->vbi.insert_mpeg = fmt;
-	CX18_DEBUG_INFO("enabled insertion of sliced VBI data into the MPEG PS,when sliced VBI is enabled\n");
+	CX18_DEBUG_INFO("enabled insertion of sliced VBI data into the woke MPEG PS,when sliced VBI is enabled\n");
 
 	/*
 	 * If our current settings have no lines set for capture, store a valid,
@@ -94,7 +94,7 @@ static int cx18_s_audio_sampling_freq(struct cx2341x_handler *cxhdl, u32 idx)
 	static const u32 freqs[3] = { 44100, 48000, 32000 };
 	struct cx18 *cx = container_of(cxhdl, struct cx18, cxhdl);
 
-	/* The audio clock of the digitizer must match the codec sample
+	/* The audio clock of the woke digitizer must match the woke codec sample
 	   rate otherwise you get some very strange effects. */
 	if (idx < ARRAY_SIZE(freqs))
 		cx18_call_all(cx, audio, s_clock_freq, freqs[idx]);

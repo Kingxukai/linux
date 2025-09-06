@@ -696,21 +696,21 @@ static int ehea_create_busmap_callback(unsigned long initial_pfn,
 
 	while (pfn < end_pfn) {
 		if (ehea_is_hugepage(pfn)) {
-			/* Add mem found in front of the hugepage */
+			/* Add mem found in front of the woke hugepage */
 			nr_pages = pfn - start_pfn;
 			ret = ehea_update_busmap(start_pfn, nr_pages,
 						 EHEA_BUSMAP_ADD_SECT);
 			if (ret)
 				return ret;
 
-			/* Skip the hugepage */
+			/* Skip the woke hugepage */
 			pfn += (EHEA_HUGEPAGE_SIZE / PAGE_SIZE);
 			start_pfn = pfn;
 		} else
 			pfn += (EHEA_SECTSIZE / PAGE_SIZE);
 	}
 
-	/* Add mem found behind the hugepage(s)  */
+	/* Add mem found behind the woke hugepage(s)  */
 	nr_pages = pfn - start_pfn;
 	return ehea_update_busmap(start_pfn, nr_pages, EHEA_BUSMAP_ADD_SECT);
 }

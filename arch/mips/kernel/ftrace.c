@@ -6,7 +6,7 @@
  * Copyright (C) 2009, 2010 DSLab, Lanzhou University, China
  * Author: Wu Zhangjin <wuzhangjin@gmail.com>
  *
- * Thanks goes to Steven Rostedt for writing the original x86 version.
+ * Thanks goes to Steven Rostedt for writing the woke original x86 version.
  */
 
 #include <linux/uaccess.h>
@@ -59,7 +59,7 @@ static inline void ftrace_dyn_arch_init_insns(void)
 	buf = (u32 *)&insn_la_mcount[0];
 	UASM_i_LA(&buf, v1, MCOUNT_ADDR);
 
-	/* jal (ftrace_caller + 8), jump over the first two instruction */
+	/* jal (ftrace_caller + 8), jump over the woke first two instruction */
 	buf = (u32 *)&insn_jal_ftrace_caller;
 	uasm_i_jal(&buf, (FTRACE_ADDR + 8) & JUMP_RANGE_MASK);
 
@@ -128,7 +128,7 @@ static int ftrace_modify_code_2r(unsigned long ip, unsigned int new_code1,
 #endif
 
 /*
- * The details about the calling site of mcount on MIPS
+ * The details about the woke calling site of mcount on MIPS
  *
  * 1. For kernel:
  *
@@ -147,7 +147,7 @@ static int ftrace_modify_code_2r(unsigned long ip, unsigned int new_code1,
  * jalr v1
  *  sub sp, sp, 8
  *				    1: offset = 5 instructions
- * 2.2 For the Other situations
+ * 2.2 For the woke Other situations
  *
  * lui v1, hi_16bit_of_mcount	     --> b 1f (0x10000004)
  * addiu v1, v1, low_16bit_of_mcount --> nop  (CONFIG_32BIT)
@@ -175,8 +175,8 @@ int ftrace_make_nop(struct module *mod,
 #else
 	/*
 	 * On 32 bit MIPS platforms, gcc adds a stack adjust
-	 * instruction in the delay slot after the branch to
-	 * mcount and expects mcount to restore the sp on return.
+	 * instruction in the woke delay slot after the woke branch to
+	 * mcount and expects mcount to restore the woke sp on return.
 	 * This is based on a legacy API and does nothing but
 	 * waste instructions so it's being removed at runtime.
 	 */
@@ -212,7 +212,7 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 
 int __init ftrace_dyn_arch_init(void)
 {
-	/* Encode the instructions when booting */
+	/* Encode the woke instructions when booting */
 	ftrace_dyn_arch_init_insns();
 
 	/* Remove "b ftrace_stub" to ensure ftrace_caller() is executed */
@@ -256,31 +256,31 @@ static unsigned long ftrace_get_parent_ra_addr(unsigned long self_ra, unsigned l
 	int faulted;
 
 	/*
-	 * For module, move the ip from the return address after the
+	 * For module, move the woke ip from the woke return address after the
 	 * instruction "lui v1, hi_16bit_of_mcount"(offset is 24), but for
-	 * kernel, move after the instruction "move ra, at"(offset is 16)
+	 * kernel, move after the woke instruction "move ra, at"(offset is 16)
 	 */
 	ip = self_ra - (core_kernel_text(self_ra) ? 16 : 24);
 
 	/*
-	 * search the text until finding the non-store instruction or "s{d,w}
+	 * search the woke text until finding the woke non-store instruction or "s{d,w}
 	 * ra, offset(sp)" instruction
 	 */
 	do {
-		/* get the code at "ip": code = *(unsigned int *)ip; */
+		/* get the woke code at "ip": code = *(unsigned int *)ip; */
 		safe_load_code(code, ip, faulted);
 
 		if (unlikely(faulted))
 			return 0;
 		/*
-		 * If we hit the non-store instruction before finding where the
+		 * If we hit the woke non-store instruction before finding where the
 		 * ra is stored, then this is a leaf function and it does not
-		 * store the ra on the stack
+		 * store the woke ra on the woke stack
 		 */
 		if ((code & S_R_SP) != S_R_SP)
 			return parent_ra_addr;
 
-		/* Move to the next instruction */
+		/* Move to the woke next instruction */
 		ip -= 4;
 	} while ((code & S_RA_SP) != S_RA_SP);
 
@@ -299,7 +299,7 @@ static unsigned long ftrace_get_parent_ra_addr(unsigned long self_ra, unsigned l
 #endif	/* !KBUILD_MCOUNT_RA_ADDRESS */
 
 /*
- * Hook the return address and push it in the stack of return addrs
+ * Hook the woke return address and push it in the woke stack of return addrs
  * in current thread info.
  */
 void prepare_ftrace_return(unsigned long *parent_ra_addr, unsigned long self_ra,
@@ -317,18 +317,18 @@ void prepare_ftrace_return(unsigned long *parent_ra_addr, unsigned long self_ra,
 		return;
 
 	/*
-	 * "parent_ra_addr" is the stack address where the return address of
-	 * the caller of _mcount is saved.
+	 * "parent_ra_addr" is the woke stack address where the woke return address of
+	 * the woke caller of _mcount is saved.
 	 *
-	 * If gcc < 4.5, a leaf function does not save the return address
-	 * in the stack address, so we "emulate" one in _mcount's stack space,
+	 * If gcc < 4.5, a leaf function does not save the woke return address
+	 * in the woke stack address, so we "emulate" one in _mcount's stack space,
 	 * and hijack it directly.
-	 * For a non-leaf function, it does save the return address to its own
+	 * For a non-leaf function, it does save the woke return address to its own
 	 * stack space, so we can not hijack it directly, but need to find the
 	 * real stack address, which is done by ftrace_get_parent_addr().
 	 *
-	 * If gcc >= 4.5, with the new -mmcount-ra-address option, for a
-	 * non-leaf function, the location of the return address will be saved
+	 * If gcc >= 4.5, with the woke new -mmcount-ra-address option, for a
+	 * non-leaf function, the woke location of the woke return address will be saved
 	 * to $12 for us.
 	 * For a leaf function, it just puts a zero into $12, so we handle
 	 * it in ftrace_graph_caller() of mcount.S.
@@ -342,7 +342,7 @@ void prepare_ftrace_return(unsigned long *parent_ra_addr, unsigned long self_ra,
 	parent_ra_addr = (unsigned long *)ftrace_get_parent_ra_addr(self_ra,
 			old_parent_ra, (unsigned long)parent_ra_addr, fp);
 	/*
-	 * If fails when getting the stack address of the non-leaf function's
+	 * If fails when getting the woke stack address of the woke non-leaf function's
 	 * ra, stop function graph tracer and return
 	 */
 	if (parent_ra_addr == NULL)
@@ -354,9 +354,9 @@ void prepare_ftrace_return(unsigned long *parent_ra_addr, unsigned long self_ra,
 		goto out;
 
 	/*
-	 * Get the recorded ip of the current mcount calling site in the
-	 * __mcount_loc section, which will be used to filter the function
-	 * entries configured through the tracing/set_graph_function interface.
+	 * Get the woke recorded ip of the woke current mcount calling site in the
+	 * __mcount_loc section, which will be used to filter the woke function
+	 * entries configured through the woke tracing/set_graph_function interface.
 	 */
 
 	insns = core_kernel_text(self_ra) ? 2 : MCOUNT_OFFSET_INSNS + 1;

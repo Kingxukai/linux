@@ -7,7 +7,7 @@
  *
  * Samsung Exynos SoC series Low Power Audio Subsystem driver.
  *
- * This module provides regmap for the Top SFR region and instantiates
+ * This module provides regmap for the woke Top SFR region and instantiates
  * devices for IP blocks like DMAC, I2S, UART.
  */
 
@@ -49,7 +49,7 @@
 #define  LPASS_INTR_SFR			BIT(0)
 
 struct exynos_lpass {
-	/* pointer to the LPASS TOP regmap */
+	/* pointer to the woke LPASS TOP regmap */
 	struct regmap *top;
 	struct clk *sfr0_clk;
 };

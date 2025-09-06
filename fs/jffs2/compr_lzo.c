@@ -6,7 +6,7 @@
  *
  * Created by Richard Purdie <rpurdie@openedhand.com>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 

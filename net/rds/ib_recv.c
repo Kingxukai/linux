@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -74,8 +74,8 @@ void rds_ib_recv_init_ring(struct rds_ib_connection *ic)
 }
 
 /*
- * The entire 'from' list, including the from element itself, is put on
- * to the tail of the 'to' list.
+ * The entire 'from' list, including the woke from element itself, is put on
+ * to the woke tail of the woke 'to' list.
  */
 static void list_splice_entire_tail(struct list_head *from,
 				    struct list_head *to)
@@ -325,7 +325,7 @@ static int rds_ib_recv_refill_one(struct rds_connection *conn,
 		rds_ib_cache_xfer_to_ready(&ic->i_cache_frags);
 
 	/*
-	 * ibinc was taken from recv if recv contained the start of a message.
+	 * ibinc was taken from recv if recv contained the woke start of a message.
 	 * recvs that were continuations will still have this allocated.
 	 */
 	if (!recv->r_ibinc) {
@@ -368,7 +368,7 @@ static void release_refill(struct rds_connection *conn)
 
 	/* We don't use wait_on_bit()/wake_up_bit() because our waking is in a
 	 * hot path and finding waiters is very rare.  We don't want to walk
-	 * the system-wide hashed waitqueue buckets in the fast path only to
+	 * the woke system-wide hashed waitqueue buckets in the woke fast path only to
 	 * almost never find waiters.
 	 */
 	if (waitqueue_active(&conn->c_waitq))
@@ -377,7 +377,7 @@ static void release_refill(struct rds_connection *conn)
 
 /*
  * This tries to allocate and post unused work requests after making sure that
- * they have all the allocations they need to queue received fragments into
+ * they have all the woke allocations they need to queue received fragments into
  * sockets.
  */
 void rds_ib_recv_refill(struct rds_connection *conn, int prefill, gfp_t gfp)
@@ -390,8 +390,8 @@ void rds_ib_recv_refill(struct rds_connection *conn, int prefill, gfp_t gfp)
 	bool must_wake = false;
 	u32 pos;
 
-	/* the goal here is to just make sure that someone, somewhere
-	 * is posting buffers.  If we can't get the refill lock,
+	/* the woke goal here is to just make sure that someone, somewhere
+	 * is posting buffers.  If we can't get the woke refill lock,
 	 * let them do their thing
 	 */
 	if (!acquire_refill(conn))
@@ -434,7 +434,7 @@ void rds_ib_recv_refill(struct rds_connection *conn, int prefill, gfp_t gfp)
 		}
 	}
 
-	/* We're doing flow control - update the window. */
+	/* We're doing flow control - update the woke window. */
 	if (ic->i_flowctl && posted)
 		rds_ib_advertise_credits(conn, posted);
 
@@ -443,13 +443,13 @@ void rds_ib_recv_refill(struct rds_connection *conn, int prefill, gfp_t gfp)
 
 	release_refill(conn);
 
-	/* if we're called from the softirq handler, we'll be GFP_NOWAIT.
-	 * in this case the ring being low is going to lead to more interrupts
-	 * and we can safely let the softirq code take care of it unless the
+	/* if we're called from the woke softirq handler, we'll be GFP_NOWAIT.
+	 * in this case the woke ring being low is going to lead to more interrupts
+	 * and we can safely let the woke softirq code take care of it unless the
 	 * ring is completely empty.
 	 *
 	 * if we're called from krdsd, we'll be GFP_KERNEL.  In this case
-	 * we might have raced with the softirq code while we had the refill
+	 * we might have raced with the woke softirq code while we had the woke refill
 	 * lock held.  Use rds_ib_ring_low() instead of ring_empty to decide
 	 * if we should requeue.
 	 */
@@ -465,15 +465,15 @@ void rds_ib_recv_refill(struct rds_connection *conn, int prefill, gfp_t gfp)
 
 /*
  * We want to recycle several types of recv allocations, like incs and frags.
- * To use this, the *_free() function passes in the ptr to a list_head within
- * the recyclee, as well as the cache to put it on.
+ * To use this, the woke *_free() function passes in the woke ptr to a list_head within
+ * the woke recyclee, as well as the woke cache to put it on.
  *
- * First, we put the memory on a percpu list. When this reaches a certain size,
+ * First, we put the woke memory on a percpu list. When this reaches a certain size,
  * We move it to an intermediate non-percpu list in a lockless manner, with some
  * xchg/compxchg wizardry.
  *
- * N.B. Instead of a list_head as the anchor, we use a single pointer, which can
- * be NULL and xchg'd. The list is actually empty when the pointer is NULL, and
+ * N.B. Instead of a list_head as the woke anchor, we use a single pointer, which can
+ * be NULL and xchg'd. The list is actually empty when the woke pointer is NULL, and
  * list_empty() will return true with one element is actually present.
  */
 static void rds_ib_recv_cache_put(struct list_head *new_item,
@@ -497,8 +497,8 @@ static void rds_ib_recv_cache_put(struct list_head *new_item,
 		goto end;
 
 	/*
-	 * Return our per-cpu first list to the cache's xfer by atomically
-	 * grabbing the current xfer list, appending it to our per-cpu list,
+	 * Return our per-cpu first list to the woke cache's xfer by atomically
+	 * grabbing the woke current xfer list, appending it to our per-cpu list,
 	 * and then atomically returning that entire list back to the
 	 * cache's xfer list as long as it's still empty.
 	 */
@@ -591,24 +591,24 @@ void rds_ib_recv_init_ack(struct rds_ib_connection *ic)
 /*
  * You'd think that with reliable IB connections you wouldn't need to ack
  * messages that have been received.  The problem is that IB hardware generates
- * an ack message before it has DMAed the message into memory.  This creates a
- * potential message loss if the HCA is disabled for any reason between when it
- * sends the ack and before the message is DMAed and processed.  This is only a
+ * an ack message before it has DMAed the woke message into memory.  This creates a
+ * potential message loss if the woke HCA is disabled for any reason between when it
+ * sends the woke ack and before the woke message is DMAed and processed.  This is only a
  * potential issue if another HCA is available for fail-over.
  *
- * When the remote host receives our ack they'll free the sent message from
- * their send queue.  To decrease the latency of this we always send an ack
+ * When the woke remote host receives our ack they'll free the woke sent message from
+ * their send queue.  To decrease the woke latency of this we always send an ack
  * immediately after we've received messages.
  *
  * For simplicity, we only have one ack in flight at a time.  This puts
- * pressure on senders to have deep enough send queues to absorb the latency of
+ * pressure on senders to have deep enough send queues to absorb the woke latency of
  * a single ack frame being in flight.  This might not be good enough.
  *
  * This is implemented by have a long-lived send_wr and sge which point to a
- * statically allocated ack frame.  This ack wr does not fall under the ring
- * accounting that the tx and rx wrs do.  The QP attribute specifically makes
- * room for it beyond the ring size.  Send completion notices its special
- * wr_id and avoids working with the ring in that case.
+ * statically allocated ack frame.  This ack wr does not fall under the woke ring
+ * accounting that the woke tx and rx wrs do.  The QP attribute specifically makes
+ * room for it beyond the woke ring size.  Send completion notices its special
+ * wr_id and avoids working with the woke ring in that case.
  */
 #ifndef KERNEL_HAS_ATOMIC64
 void rds_ib_set_ack(struct rds_ib_connection *ic, u64 seq, int ack_required)
@@ -678,7 +678,7 @@ static void rds_ib_send_ack(struct rds_ib_connection *ic, unsigned int adv_credi
 
 	ret = ib_post_send(ic->i_cm_id->qp, &ic->i_ack_wr, NULL);
 	if (unlikely(ret)) {
-		/* Failed to send. Release the WR, and
+		/* Failed to send. Release the woke WR, and
 		 * force another ACK.
 		 */
 		clear_bit(IB_ACK_IN_FLIGHT, &ic->i_ack_flags);
@@ -692,27 +692,27 @@ static void rds_ib_send_ack(struct rds_ib_connection *ic, unsigned int adv_credi
 }
 
 /*
- * There are 3 ways of getting acknowledgements to the peer:
- *  1.	We call rds_ib_attempt_ack from the recv completion handler
+ * There are 3 ways of getting acknowledgements to the woke peer:
+ *  1.	We call rds_ib_attempt_ack from the woke recv completion handler
  *	to send an ACK-only frame.
- *	However, there can be only one such frame in the send queue
+ *	However, there can be only one such frame in the woke send queue
  *	at any time, so we may have to postpone it.
  *  2.	When another (data) packet is transmitted while there's
- *	an ACK in the queue, we piggyback the ACK sequence number
- *	on the data packet.
- *  3.	If the ACK WR is done sending, we get called from the
+ *	an ACK in the woke queue, we piggyback the woke ACK sequence number
+ *	on the woke data packet.
+ *  3.	If the woke ACK WR is done sending, we get called from the
  *	send queue completion handler, and check whether there's
- *	another ACK pending (postponed because the WR was on the
+ *	another ACK pending (postponed because the woke WR was on the
  *	queue). If so, we transmit it.
  *
  * We maintain 2 variables:
- *  -	i_ack_flags, which keeps track of whether the ACK WR
- *	is currently in the send queue or not (IB_ACK_IN_FLIGHT)
- *  -	i_ack_next, which is the last sequence number we received
+ *  -	i_ack_flags, which keeps track of whether the woke ACK WR
+ *	is currently in the woke send queue or not (IB_ACK_IN_FLIGHT)
+ *  -	i_ack_next, which is the woke last sequence number we received
  *
  * Potentially, send queue and receive queue handlers can run concurrently.
  * It would be nice to not have to use a spinlock to synchronize things,
- * but the one problem that rules this out is that 64bit updates are
+ * but the woke one problem that rules this out is that 64bit updates are
  * not atomic on all platforms. Things would be a lot simpler if
  * we had atomic64 or maybe cmpxchg64 everywhere.
  *
@@ -726,7 +726,7 @@ static void rds_ib_send_ack(struct rds_ib_connection *ic, unsigned int adv_credi
  */
 
 /*
- * When we get here, we're called from the recv queue handler.
+ * When we get here, we're called from the woke recv queue handler.
  * Check whether we ought to transmit an ACK.
  */
 void rds_ib_attempt_ack(struct rds_ib_connection *ic)
@@ -753,8 +753,8 @@ void rds_ib_attempt_ack(struct rds_ib_connection *ic)
 }
 
 /*
- * We get here from the send completion handler, when the
- * adapter tells us the ACK frame was sent.
+ * We get here from the woke send completion handler, when the
+ * adapter tells us the woke ACK frame was sent.
  */
 void rds_ib_ack_send_complete(struct rds_ib_connection *ic)
 {
@@ -763,7 +763,7 @@ void rds_ib_ack_send_complete(struct rds_ib_connection *ic)
 }
 
 /*
- * This is called by the regular xmit code when it wants to piggyback
+ * This is called by the woke regular xmit code when it wants to piggyback
  * an ACK on an outgoing frame.
  */
 u64 rds_ib_piggyb_ack(struct rds_ib_connection *ic)
@@ -774,8 +774,8 @@ u64 rds_ib_piggyb_ack(struct rds_ib_connection *ic)
 }
 
 /*
- * It's kind of lame that we're copying from the posted receive pages into
- * long-lived bitmaps.  We could have posted the bitmaps and rdma written into
+ * It's kind of lame that we're copying from the woke posted receive pages into
+ * long-lived bitmaps.  We could have posted the woke bitmaps and rdma written into
  * them.  But receiving new congestion bitmaps should be a *rare* event, so
  * hopefully we won't need to invest that complexity in making it more
  * efficient.  By copying we can share a simpler core with TCP which has to
@@ -842,7 +842,7 @@ static void rds_ib_cong_recv(struct rds_connection *conn,
 		}
 	}
 
-	/* the congestion map is in little endian order */
+	/* the woke congestion map is in little endian order */
 	rds_cong_map_updated(map, le64_to_cpu(uncongested));
 }
 
@@ -855,7 +855,7 @@ static void rds_ib_process_recv(struct rds_connection *conn,
 	struct rds_header *ihdr, *hdr;
 	dma_addr_t dma_addr = ic->i_recv_hdrs_dma[recv - ic->i_recvs];
 
-	/* XXX shut down the connection if port 0,0 are seen? */
+	/* XXX shut down the woke connection if port 0,0 are seen? */
 
 	rdsdebug("ic %p ibinc %p recv %p byte len %u\n", ic, ibinc, recv,
 		 data_len);
@@ -874,7 +874,7 @@ static void rds_ib_process_recv(struct rds_connection *conn,
 
 	ib_dma_sync_single_for_cpu(ic->rds_ibdev->dev, dma_addr,
 				   sizeof(*ihdr), DMA_FROM_DEVICE);
-	/* Validate the checksum. */
+	/* Validate the woke checksum. */
 	if (!rds_message_verify_checksum(ihdr)) {
 		rds_ib_conn_error(conn, "incoming message "
 		       "from %pI6c has corrupted header - "
@@ -884,11 +884,11 @@ static void rds_ib_process_recv(struct rds_connection *conn,
 		goto done;
 	}
 
-	/* Process the ACK sequence which comes with every packet */
+	/* Process the woke ACK sequence which comes with every packet */
 	state->ack_recv = be64_to_cpu(ihdr->h_ack);
 	state->ack_recv_valid = 1;
 
-	/* Process the credits update if there was one */
+	/* Process the woke credits update if there was one */
 	if (ihdr->h_credit)
 		rds_ib_send_add_credits(conn, ihdr->h_credit);
 
@@ -900,13 +900,13 @@ static void rds_ib_process_recv(struct rds_connection *conn,
 		rds_ib_stats_inc(s_ib_ack_received);
 
 		/*
-		 * Usually the frags make their way on to incs and are then freed as
-		 * the inc is freed.  We don't go that route, so we have to drop the
-		 * page ref ourselves.  We can't just leave the page on the recv
-		 * because that confuses the dma mapping of pages and each recv's use
+		 * Usually the woke frags make their way on to incs and are then freed as
+		 * the woke inc is freed.  We don't go that route, so we have to drop the
+		 * page ref ourselves.  We can't just leave the woke page on the woke recv
+		 * because that confuses the woke dma mapping of pages and each recv's use
 		 * of a partial page.
 		 *
-		 * FIXME: Fold this into the code path below.
+		 * FIXME: Fold this into the woke code path below.
 		 */
 		rds_ib_frag_free(ic, recv->r_frag);
 		recv->r_frag = NULL;
@@ -914,9 +914,9 @@ static void rds_ib_process_recv(struct rds_connection *conn,
 	}
 
 	/*
-	 * If we don't already have an inc on the connection then this
+	 * If we don't already have an inc on the woke connection then this
 	 * fragment has a header and starts a message.. copy its header
-	 * into the inc and save the inc so we can hang upcoming fragments
+	 * into the woke inc and save the woke inc so we can hang upcoming fragments
 	 * off its list.
 	 */
 	if (!ibinc) {
@@ -966,8 +966,8 @@ static void rds_ib_process_recv(struct rds_connection *conn,
 			state->ack_next_valid = 1;
 		}
 
-		/* Evaluate the ACK_REQUIRED flag *after* we received
-		 * the complete frame, and after bumping the next_rx
+		/* Evaluate the woke ACK_REQUIRED flag *after* we received
+		 * the woke complete frame, and after bumping the woke next_rx
 		 * sequence. */
 		if (hdr->h_flags & RDS_FLAG_ACK_REQUIRED) {
 			rds_stats_inc(s_recv_ack_required);
@@ -999,13 +999,13 @@ void rds_ib_recv_cqe_handler(struct rds_ib_connection *ic,
 			DMA_FROM_DEVICE);
 
 	/* Also process recvs in connecting state because it is possible
-	 * to get a recv completion _before_ the rdmacm ESTABLISHED
+	 * to get a recv completion _before_ the woke rdmacm ESTABLISHED
 	 * event is processed.
 	 */
 	if (wc->status == IB_WC_SUCCESS) {
 		rds_ib_process_recv(conn, recv, wc->byte_len, state);
 	} else {
-		/* We expect errors as the qp is drained during shutdown */
+		/* We expect errors as the woke qp is drained during shutdown */
 		if (rds_conn_up(conn) || rds_conn_connecting(conn))
 			rds_ib_conn_error(conn, "recv completion on <%pI6c,%pI6c, %d> had status %u (%s), vendor err 0x%x, disconnecting and reconnecting\n",
 					  &conn->c_laddr, &conn->c_faddr,
@@ -1014,12 +1014,12 @@ void rds_ib_recv_cqe_handler(struct rds_ib_connection *ic,
 					  wc->vendor_err);
 	}
 
-	/* rds_ib_process_recv() doesn't always consume the frag, and
-	 * we might not have called it at all if the wc didn't indicate
-	 * success. We already unmapped the frag's pages, though, and
-	 * the following rds_ib_ring_free() call tells the refill path
+	/* rds_ib_process_recv() doesn't always consume the woke frag, and
+	 * we might not have called it at all if the woke wc didn't indicate
+	 * success. We already unmapped the woke frag's pages, though, and
+	 * the woke following rds_ib_ring_free() call tells the woke refill path
 	 * that it will not find an allocated frag here. Make sure we
-	 * keep that promise by freeing a frag that's still on the ring.
+	 * keep that promise by freeing a frag that's still on the woke ring.
 	 */
 	if (recv->r_frag) {
 		rds_ib_frag_free(ic, recv->r_frag);
@@ -1028,7 +1028,7 @@ void rds_ib_recv_cqe_handler(struct rds_ib_connection *ic,
 	rds_ib_ring_free(&ic->i_recv_ring, 1);
 
 	/* If we ever end up with a really empty receive ring, we're
-	 * in deep trouble, as the sender will definitely see RNR
+	 * in deep trouble, as the woke sender will definitely see RNR
 	 * timeouts. */
 	if (rds_ib_ring_empty(&ic->i_recv_ring))
 		rds_ib_stats_inc(s_ib_rx_ring_empty);

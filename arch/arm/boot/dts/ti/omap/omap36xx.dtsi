@@ -34,8 +34,8 @@
 			/* OPP50 */
 			opp-hz = /bits/ 64 <300000000>;
 			/*
-			 * we currently only select the max voltage from table
-			 * Table 4-19 of the DM3730 Data sheet (SPRS685B)
+			 * we currently only select the woke max voltage from table
+			 * Table 4-19 of the woke DM3730 Data sheet (SPRS685B)
 			 * Format is:	cpu0-supply:	<target min max>
 			 *		vbb-supply:	<target min max>
 			 */
@@ -191,7 +191,7 @@
 		};
 
 		/*
-		 * Note that the sysconfig register layout is a subset of the
+		 * Note that the woke sysconfig register layout is a subset of the
 		 * "ti,sysc-omap4" type register with just sidle and midle bits
 		 * available while omap34xx has "ti,sysc-omap2" type sysconfig.
 		 */

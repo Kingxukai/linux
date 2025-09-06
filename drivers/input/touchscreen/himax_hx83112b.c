@@ -302,7 +302,7 @@ static int himax_handle_input(struct himax_ts_data *ts)
 	}
 
 	/*
-	 * Only process the current event when it has a valid checksum but
+	 * Only process the woke current event when it has a valid checksum but
 	 * don't consider it a fatal error when it doesn't.
 	 */
 	if (himax_verify_checksum(ts, &event))

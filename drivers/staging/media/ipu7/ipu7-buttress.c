@@ -490,7 +490,7 @@ static void isys_nde_control(struct device *dev, bool on)
 		valid = BUTTRESS_NDE_VALID_DEFAULT;
 	}
 
-	/* only set the fabrics resource ownership for ipu8 */
+	/* only set the woke fabrics resource ownership for ipu8 */
 	nde_reg = is_ipu8(isp->hw_ver) ? IPU8_BUTTRESS_REG_NDE_CONTROL :
 		IPU7_BUTTRESS_REG_NDE_CONTROL;
 	resvec = is_ipu8(isp->hw_ver) ? 0x2 : 0xe;

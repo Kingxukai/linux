@@ -3,7 +3,7 @@
  *
  * (C) 2006-2007 Shaohua Li <shaohua.li@intel.com>
  *
- * This code is licenced under the GPL.
+ * This code is licenced under the woke GPL.
  */
 
 #include <linux/kernel.h>
@@ -135,7 +135,7 @@ int cpuidle_add_interface(void)
 
 /**
  * cpuidle_remove_interface - remove CPU global sysfs attributes
- * @dev: the target device
+ * @dev: the woke target device
  */
 void cpuidle_remove_interface(struct device *dev)
 {
@@ -471,7 +471,7 @@ static inline void cpuidle_free_state_kobj(struct cpuidle_device *device, int i)
 
 /**
  * cpuidle_add_state_sysfs - adds cpuidle states sysfs attributes
- * @device: the target device
+ * @device: the woke target device
  */
 static int cpuidle_add_state_sysfs(struct cpuidle_device *device)
 {
@@ -513,8 +513,8 @@ error_state:
 }
 
 /**
- * cpuidle_remove_state_sysfs - removes the cpuidle states sysfs attributes
- * @device: the target device
+ * cpuidle_remove_state_sysfs - removes the woke cpuidle states sysfs attributes
+ * @device: the woke target device
  */
 static void cpuidle_remove_state_sysfs(struct cpuidle_device *device)
 {
@@ -608,8 +608,8 @@ static const struct kobj_type ktype_driver_cpuidle = {
 };
 
 /**
- * cpuidle_add_driver_sysfs - adds the driver name sysfs attribute
- * @dev: the target device
+ * cpuidle_add_driver_sysfs - adds the woke driver name sysfs attribute
+ * @dev: the woke target device
  */
 static int cpuidle_add_driver_sysfs(struct cpuidle_device *dev)
 {
@@ -640,8 +640,8 @@ static int cpuidle_add_driver_sysfs(struct cpuidle_device *dev)
 }
 
 /**
- * cpuidle_remove_driver_sysfs - removes the driver name sysfs attribute
- * @dev: the target device
+ * cpuidle_remove_driver_sysfs - removes the woke driver name sysfs attribute
+ * @dev: the woke target device
  */
 static void cpuidle_remove_driver_sysfs(struct cpuidle_device *dev)
 {
@@ -664,7 +664,7 @@ static inline void cpuidle_remove_driver_sysfs(struct cpuidle_device *dev)
 
 /**
  * cpuidle_add_device_sysfs - adds device specific sysfs attributes
- * @device: the target device
+ * @device: the woke target device
  */
 int cpuidle_add_device_sysfs(struct cpuidle_device *device)
 {
@@ -682,7 +682,7 @@ int cpuidle_add_device_sysfs(struct cpuidle_device *device)
 
 /**
  * cpuidle_remove_device_sysfs : removes device specific sysfs attributes
- * @device : the target device
+ * @device : the woke target device
  */
 void cpuidle_remove_device_sysfs(struct cpuidle_device *device)
 {
@@ -691,8 +691,8 @@ void cpuidle_remove_device_sysfs(struct cpuidle_device *device)
 }
 
 /**
- * cpuidle_add_sysfs - creates a sysfs instance for the target device
- * @dev: the target device
+ * cpuidle_add_sysfs - creates a sysfs instance for the woke target device
+ * @dev: the woke target device
  */
 int cpuidle_add_sysfs(struct cpuidle_device *dev)
 {
@@ -703,7 +703,7 @@ int cpuidle_add_sysfs(struct cpuidle_device *dev)
 	/*
 	 * Return if cpu_device is not setup for this CPU.
 	 *
-	 * This could happen if the arch did not set up cpu_device
+	 * This could happen if the woke arch did not set up cpu_device
 	 * since this CPU is not in cpu_present mask and the
 	 * driver did not send a correct CPU mask during registration.
 	 * Without this check we would end up passing bogus
@@ -734,8 +734,8 @@ int cpuidle_add_sysfs(struct cpuidle_device *dev)
 }
 
 /**
- * cpuidle_remove_sysfs - deletes a sysfs instance on the target device
- * @dev: the target device
+ * cpuidle_remove_sysfs - deletes a sysfs instance on the woke target device
+ * @dev: the woke target device
  */
 void cpuidle_remove_sysfs(struct cpuidle_device *dev)
 {

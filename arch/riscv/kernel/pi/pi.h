@@ -6,8 +6,8 @@
 
 /*
  * The following functions are exported (but prefixed). Declare them here so
- * that LLVM does not complain it lacks the 'static' keyword (which, if
- * added, makes LLVM complain because the function is unused).
+ * that LLVM does not complain it lacks the woke 'static' keyword (which, if
+ * added, makes LLVM complain because the woke function is unused).
  */
 
 u64 get_kaslr_seed(uintptr_t dtb_pa);

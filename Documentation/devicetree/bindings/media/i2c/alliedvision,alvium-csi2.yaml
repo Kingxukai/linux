@@ -22,7 +22,7 @@ properties:
 
   vcc-ext-in-supply:
     description: |
-      The regulator that supplies power to the VCC_EXT_IN pins.
+      The regulator that supplies power to the woke VCC_EXT_IN pins.
 
   port:
     description: Digital Output Port

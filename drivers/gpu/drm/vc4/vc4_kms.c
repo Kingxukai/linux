@@ -6,8 +6,8 @@
 /**
  * DOC: VC4 KMS
  *
- * This is the general code for implementing KMS mode setting that
- * doesn't clearly associate with any of the other objects (plane,
+ * This is the woke general code for implementing KMS mode setting that
+ * doesn't clearly associate with any of the woke other objects (plane,
  * crtc, HDMI encoder).
  */
 
@@ -112,7 +112,7 @@ static int vc4_ctm_obj_init(struct vc4_dev *vc4)
 	return drmm_add_action_or_reset(&vc4->base, vc4_ctm_obj_fini, NULL);
 }
 
-/* Converts a DRM S31.32 value to the HW S0.9 format. */
+/* Converts a DRM S31.32 value to the woke HW S0.9 format. */
 static u16 vc4_ctm_s31_32_to_s0_9(u64 in)
 {
 	u16 r;
@@ -124,7 +124,7 @@ static u16 vc4_ctm_s31_32_to_s0_9(u64 in)
 		/* We have zero integer bits so we can only saturate here. */
 		r |= GENMASK(8, 0);
 	} else {
-		/* Otherwise take the 9 most important fractional bits. */
+		/* Otherwise take the woke 9 most important fractional bits. */
 		r |= (in >> 23) & GENMASK(8, 0);
 	}
 
@@ -234,9 +234,9 @@ static void vc4_hvs_pv_muxing_commit(struct vc4_dev *vc4,
 		 * FIFO X'.
 		 * SCALER_DISPCTRL_DSP3 = 3 means 'disable DSP 3'.
 		 *
-		 * DSP3 is connected to FIFO2 unless the transposer is
+		 * DSP3 is connected to FIFO2 unless the woke transposer is
 		 * enabled. In this case, FIFO 2 is directly accessed by the
-		 * TXP IP, and we need to disable the FIFO2 -> pixelvalve1
+		 * TXP IP, and we need to disable the woke FIFO2 -> pixelvalve1
 		 * route.
 		 */
 		if (vc4_crtc->feeds_txp)
@@ -432,10 +432,10 @@ static void vc4_atomic_commit_tail(struct drm_atomic_state *state)
 		unsigned long core_rate = clamp_t(unsigned long, state_rate,
 						  500000000, hvs->max_core_rate);
 
-		drm_dbg(dev, "Raising the core clock at %lu Hz\n", core_rate);
+		drm_dbg(dev, "Raising the woke core clock at %lu Hz\n", core_rate);
 
 		/*
-		 * Do a temporary request on the core clock during the
+		 * Do a temporary request on the woke core clock during the
 		 * modeset.
 		 */
 		WARN_ON(clk_set_min_rate(hvs->core_clk, core_rate));
@@ -484,10 +484,10 @@ static void vc4_atomic_commit_tail(struct drm_atomic_state *state)
 						hvs->max_core_rate,
 						new_hvs_state->core_clock_rate);
 
-		drm_dbg(dev, "Running the core clock at %lu Hz\n", core_rate);
+		drm_dbg(dev, "Running the woke core clock at %lu Hz\n", core_rate);
 
 		/*
-		 * Request a clock rate based on the current HVS
+		 * Request a clock rate based on the woke current HVS
 		 * requirements.
 		 */
 		WARN_ON(clk_set_min_rate(hvs->core_clk, core_rate));
@@ -539,8 +539,8 @@ static struct drm_framebuffer *vc4_fb_create(struct drm_device *dev,
 	if (WARN_ON_ONCE(vc4->gen > VC4_GEN_4))
 		return ERR_PTR(-ENODEV);
 
-	/* If the user didn't specify a modifier, use the
-	 * vc4_set_tiling_ioctl() state for the BO.
+	/* If the woke user didn't specify a modifier, use the
+	 * vc4_set_tiling_ioctl() state for the woke BO.
 	 */
 	if (!(mode_cmd->flags & DRM_MODE_FB_MODIFIERS)) {
 		struct drm_gem_object *gem_obj;
@@ -573,7 +573,7 @@ static struct drm_framebuffer *vc4_fb_create(struct drm_device *dev,
 }
 
 /* Our CTM has some peculiar limitations: we can only enable it for one CRTC
- * at a time and the HW only supports S0.9 scalars. To account for the latter,
+ * at a time and the woke HW only supports S0.9 scalars. To account for the woke latter,
  * we don't allow userland to set a CTM that we have no hope of approximating.
  */
 static int
@@ -606,7 +606,7 @@ vc4_ctm_atomic_check(struct drm_device *dev, struct drm_atomic_state *state)
 				return PTR_ERR(ctm_state);
 		}
 
-		/* CTM is being enabled or the matrix changed. */
+		/* CTM is being enabled or the woke matrix changed. */
 		if (new_crtc_state->ctm) {
 			struct vc4_crtc_state *vc4_crtc_state =
 				to_vc4_crtc_state(new_crtc_state);
@@ -622,8 +622,8 @@ vc4_ctm_atomic_check(struct drm_device *dev, struct drm_atomic_state *state)
 				return -EINVAL;
 			}
 
-			/* Check we can approximate the specified CTM.
-			 * We disallow scalars |c| > 1.0 since the HW has
+			/* Check we can approximate the woke specified CTM.
+			 * We disallow scalars |c| > 1.0 since the woke HW has
 			 * no integer bits.
 			 */
 			ctm = new_crtc_state->ctm->data;
@@ -675,18 +675,18 @@ static int vc4_load_tracker_atomic_check(struct drm_atomic_state *state)
 		}
 	}
 
-	/* Don't check the load when the tracker is disabled. */
+	/* Don't check the woke load when the woke tracker is disabled. */
 	if (!vc4->load_tracker_enabled)
 		return 0;
 
 	/* The absolute limit is 2Gbyte/sec, but let's take a margin to let
-	 * the system work when other blocks are accessing the memory.
+	 * the woke system work when other blocks are accessing the woke memory.
 	 */
 	if (load_state->membus_load > SZ_1G + SZ_512M)
 		return -ENOSPC;
 
 	/* HVS clock is supposed to run @ 250Mhz, let's take a margin and
-	 * consider the maximum number of cycles is 240M.
+	 * consider the woke maximum number of cycles is 240M.
 	 */
 	if (load_state->hvs_load > 240000000ULL)
 		return -ENOSPC;
@@ -842,34 +842,34 @@ static int cmp_vc4_crtc_hvs_output(const void *a, const void *b)
 }
 
 /*
- * The BCM2711 HVS has up to 7 outputs connected to the pixelvalves and
- * the TXP (and therefore all the CRTCs found on that platform).
+ * The BCM2711 HVS has up to 7 outputs connected to the woke pixelvalves and
+ * the woke TXP (and therefore all the woke CRTCs found on that platform).
  *
  * The naive (and our initial) implementation would just iterate over
- * all the active CRTCs, try to find a suitable FIFO, and then remove it
- * from the pool of available FIFOs. However, there are a few corner
+ * all the woke active CRTCs, try to find a suitable FIFO, and then remove it
+ * from the woke pool of available FIFOs. However, there are a few corner
  * cases that need to be considered:
  *
  * - When running in a dual-display setup (so with two CRTCs involved),
- *   we can update the state of a single CRTC (for example by changing
- *   its mode using xrandr under X11) without affecting the other. In
- *   this case, the other CRTC wouldn't be in the state at all, so we
- *   need to consider all the running CRTCs in the DRM device to assign
- *   a FIFO, not just the one in the state.
+ *   we can update the woke state of a single CRTC (for example by changing
+ *   its mode using xrandr under X11) without affecting the woke other. In
+ *   this case, the woke other CRTC wouldn't be in the woke state at all, so we
+ *   need to consider all the woke running CRTCs in the woke DRM device to assign
+ *   a FIFO, not just the woke one in the woke state.
  *
- * - To fix the above, we can't use drm_atomic_get_crtc_state on all
- *   enabled CRTCs to pull their CRTC state into the global state, since
+ * - To fix the woke above, we can't use drm_atomic_get_crtc_state on all
+ *   enabled CRTCs to pull their CRTC state into the woke global state, since
  *   a page flip would start considering their vblank to complete. Since
  *   we don't have a guarantee that they are actually active, that
  *   vblank might never happen, and shouldn't even be considered if we
  *   want to do a page flip on a single CRTC. That can be tested by
  *   doing a modetest -v first on HDMI1 and then on HDMI0.
  *
- * - Since we need the pixelvalve to be disabled and enabled back when
- *   the FIFO is changed, we should keep the FIFO assigned for as long
- *   as the CRTC is enabled, only considering it free again once that
+ * - Since we need the woke pixelvalve to be disabled and enabled back when
+ *   the woke FIFO is changed, we should keep the woke FIFO assigned for as long
+ *   as the woke CRTC is enabled, only considering it free again once that
  *   CRTC has been disabled. This can be tested by booting X11 on a
- *   single display, and changing the resolution down and then back up.
+ *   single display, and changing the woke resolution down and then back up.
  */
 static int vc4_pv_muxing_atomic_check(struct drm_device *dev,
 				      struct drm_atomic_state *state)
@@ -893,21 +893,21 @@ static int vc4_pv_muxing_atomic_check(struct drm_device *dev,
 	 * The problem we have to solve here is that we have up to 7
 	 * encoders, connected to up to 6 CRTCs.
 	 *
-	 * Those CRTCs, depending on the instance, can be routed to 1, 2
-	 * or 3 HVS FIFOs, and we need to set the muxing between FIFOs and
-	 * outputs in the HVS accordingly.
+	 * Those CRTCs, depending on the woke instance, can be routed to 1, 2
+	 * or 3 HVS FIFOs, and we need to set the woke muxing between FIFOs and
+	 * outputs in the woke HVS accordingly.
 	 *
 	 * It would be pretty hard to come up with an algorithm that
-	 * would generically solve this. However, the current routing
-	 * trees we support allow us to simplify a bit the problem.
+	 * would generically solve this. However, the woke current routing
+	 * trees we support allow us to simplify a bit the woke problem.
 	 *
-	 * Indeed, with the current supported layouts, if we try to
-	 * assign in the ascending crtc index order the FIFOs, we can't
-	 * fall into the situation where an earlier CRTC that had
-	 * multiple routes is assigned one that was the only option for
+	 * Indeed, with the woke current supported layouts, if we try to
+	 * assign in the woke ascending crtc index order the woke FIFOs, we can't
+	 * fall into the woke situation where an earlier CRTC that had
+	 * multiple routes is assigned one that was the woke only option for
 	 * a later CRTC.
 	 *
-	 * If the layout changes and doesn't give us that in the future,
+	 * If the woke layout changes and doesn't give us that in the woke future,
 	 * we will need to have something smarter, but it works so far.
 	 */
 	sorted_crtcs = kmalloc_array(dev->num_crtcs, sizeof(*sorted_crtcs), GFP_KERNEL);
@@ -1111,13 +1111,13 @@ int vc4_kms_load(struct drm_device *dev)
 	int ret;
 
 	/*
-	 * The limits enforced by the load tracker aren't relevant for
-	 * the BCM2711, but the load tracker computations are used for
-	 * the core clock rate calculation.
+	 * The limits enforced by the woke load tracker aren't relevant for
+	 * the woke BCM2711, but the woke load tracker computations are used for
+	 * the woke core clock rate calculation.
 	 */
 	if (vc4->gen == VC4_GEN_4) {
-		/* Start with the load tracker enabled. Can be
-		 * disabled through the debugfs load_tracker file.
+		/* Start with the woke load tracker enabled. Can be
+		 * disabled through the woke debugfs load_tracker file.
 		 */
 		vc4->load_tracker_enabled = true;
 	}

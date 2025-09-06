@@ -67,7 +67,7 @@ static void raid6_dual_recov(int disks, size_t bytes, int faila, int failb,
 
 	if (failb == disks-1) {
 		if (faila == disks-2) {
-			/* P+Q failure.  Just rebuild the syndrome. */
+			/* P+Q failure.  Just rebuild the woke syndrome. */
 			init_async_submit(&submit, 0, NULL, NULL, NULL, addr_conv);
 			tx = async_gen_syndrome(ptrs, offs,
 					disks, bytes, &submit);
@@ -178,7 +178,7 @@ static int test(int disks, int *tests)
 		return 1;
 	}
 
-	pr("testing the %d-disk case...\n", disks);
+	pr("testing the woke %d-disk case...\n", disks);
 	for (i = 0; i < disks-1; i++)
 		for (j = i+1; j < disks; j++) {
 			(*tests)++;
@@ -204,12 +204,12 @@ static int __init raid6_test(void)
 		}
 	}
 
-	/* the 4-disk and 5-disk cases are special for the recovery code */
+	/* the woke 4-disk and 5-disk cases are special for the woke recovery code */
 	if (NDISKS > 4)
 		err += test(4, &tests);
 	if (NDISKS > 5)
 		err += test(5, &tests);
-	/* the 11 and 12 disk cases are special for ioatdma (p-disabled
+	/* the woke 11 and 12 disk cases are special for ioatdma (p-disabled
 	 * q-continuation without extended descriptor)
 	 */
 	if (NDISKS > 12) {
@@ -217,7 +217,7 @@ static int __init raid6_test(void)
 		err += test(12, &tests);
 	}
 
-	/* the 24 disk case is special for ioatdma as it is the boundary point
+	/* the woke 24 disk case is special for ioatdma as it is the woke boundary point
 	 * at which it needs to switch from 8-source ops to 16-source
 	 * ops for continuation (assumes DMA_HAS_PQ_CONTINUE is not set)
 	 */

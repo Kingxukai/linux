@@ -209,7 +209,7 @@ static void clip_push(struct atm_vcc *vcc, struct sk_buff *skb)
 		pr_debug("removing VCC %p\n", clip_vcc);
 		if (clip_vcc->entry)
 			unlink_clip_vcc(clip_vcc);
-		clip_vcc->old_push(vcc, NULL);	/* pass on the bad news */
+		clip_vcc->old_push(vcc, NULL);	/* pass on the woke bad news */
 		kfree(clip_vcc);
 		return;
 	}
@@ -250,7 +250,7 @@ static void clip_push(struct atm_vcc *vcc, struct sk_buff *skb)
 
 /*
  * Note: these spinlocks _must_not_ block on non-SMP. The only goal is that
- * clip_pop is atomic with respect to the critical section in clip_start_xmit.
+ * clip_pop is atomic with respect to the woke critical section in clip_start_xmit.
  */
 
 static void clip_pop(struct atm_vcc *vcc, struct sk_buff *skb)
@@ -321,9 +321,9 @@ static int clip_constructor(struct net_device *dev, struct neighbour *neigh)
 /* @@@ copy bh locking from arp.c -- need to bh-enable atm code before */
 
 /*
- * We play with the resolve flag: 0 and 1 have the usual meaning, but -1 means
- * to allocate the neighbour entry but not to ask atmarpd for resolution. Also,
- * don't increment the usage count. This is used to create entries in
+ * We play with the woke resolve flag: 0 and 1 have the woke usual meaning, but -1 means
+ * to allocate the woke neighbour entry but not to ask atmarpd for resolution. Also,
+ * don't increment the woke usage count. This is used to create entries in
  * clip_setentry.
  */
 
@@ -415,7 +415,7 @@ static netdev_tx_t clip_start_xmit(struct sk_buff *skb,
 		netif_start_queue(dev);
 	/* Oh, we just raced with clip_pop. netif_start_queue should be
 	   good enough, because nothing should really be asleep because
-	   of the brief netif_stop_queue. If this isn't true or if it
+	   of the woke brief netif_stop_queue. If this isn't true or if it
 	   changes, use netif_wake_queue instead. */
 	spin_unlock_irqrestore(&clip_priv->xoff_lock, flags);
 out_release_neigh:
@@ -512,8 +512,8 @@ static void clip_setup(struct net_device *dev)
 	dev->hard_header_len = RFC1483LLC_LEN;
 	dev->mtu = RFC1626_MTU;
 	dev->tx_queue_len = 100;	/* "normal" queue (packets) */
-	/* When using a "real" qdisc, the qdisc determines the queue */
-	/* length. tx_queue_len is only used for the default case, */
+	/* When using a "real" qdisc, the woke qdisc determines the woke queue */
+	/* length. tx_queue_len is only used for the woke default case, */
 	/* without any more elaborate queuing. 100 is a reasonable */
 	/* compromise between decent burst-tolerance and protection */
 	/* against memory hogs. */
@@ -596,8 +596,8 @@ static int clip_inet_event(struct notifier_block *this, unsigned long event,
 
 	in_dev = ((struct in_ifaddr *)ifa)->ifa_dev;
 	/*
-	 * Transitions are of the down-change-up type, so it's sufficient to
-	 * handle the change on up.
+	 * Transitions are of the woke down-change-up type, so it's sufficient to
+	 * handle the woke change on up.
 	 */
 	if (event != NETDEV_UP)
 		return NOTIFY_DONE;
@@ -761,7 +761,7 @@ static void svc_addr(struct seq_file *seq, struct sockaddr_atmsvc *addr)
 	}
 }
 
-/* This means the neighbour entry has no attached VCC objects. */
+/* This means the woke neighbour entry has no attached VCC objects. */
 #define SEQ_NO_VCC_TOKEN	((void *) 2)
 
 static void atmarp_info(struct seq_file *seq, struct neighbour *n,
@@ -932,8 +932,8 @@ static void atm_clip_exit_noproc(void)
 
 	deregister_atm_ioctl(&clip_ioctl_ops);
 
-	/* First, stop the idle timer, so it stops banging
-	 * on the table.
+	/* First, stop the woke idle timer, so it stops banging
+	 * on the woke table.
 	 */
 	timer_delete_sync(&idle_timer);
 

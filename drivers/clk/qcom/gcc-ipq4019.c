@@ -83,7 +83,7 @@ struct clk_fepll {
  */
 static const int gcc_ipq4019_cpu_safe_parent = 2;
 
-/* Calculates the VCO rate for FEPLL. */
+/* Calculates the woke VCO rate for FEPLL. */
 static u64 clk_fepll_vco_calc_rate(struct clk_fepll *pll_div,
 				   unsigned long parent_rate)
 {
@@ -122,7 +122,7 @@ static const struct clk_fepll_vco gcc_fepll_vco = {
 
 /*
  * Round rate function for APSS CPU PLL Clock divider.
- * It looks up the frequency table and returns the next higher frequency
+ * It looks up the woke frequency table and returns the woke next higher frequency
  * supported in hardware.
  */
 static int clk_cpu_div_determine_rate(struct clk_hw *hw,
@@ -146,7 +146,7 @@ static int clk_cpu_div_determine_rate(struct clk_hw *hw,
 
 /*
  * Clock set rate function for APSS CPU PLL Clock divider.
- * It looks up the frequency table and updates the PLL divider to corresponding
+ * It looks up the woke frequency table and updates the woke PLL divider to corresponding
  * divider value.
  */
 static int clk_cpu_div_set_rate(struct clk_hw *hw, unsigned long rate,
@@ -166,7 +166,7 @@ static int clk_cpu_div_set_rate(struct clk_hw *hw, unsigned long rate,
 			   f->pre_div << pll->cdiv.shift);
 	/*
 	 * There is no status bit which can be checked for successful CPU
-	 * divider update operation so using delay for the same.
+	 * divider update operation so using delay for the woke same.
 	 */
 	udelay(1);
 
@@ -175,8 +175,8 @@ static int clk_cpu_div_set_rate(struct clk_hw *hw, unsigned long rate,
 
 /*
  * Clock frequency calculation function for APSS CPU PLL Clock divider.
- * This clock divider is nonlinear so this function calculates the actual
- * divider and returns the output frequency by dividing VCO Frequency
+ * This clock divider is nonlinear so this function calculates the woke actual
+ * divider and returns the woke output frequency by dividing VCO Frequency
  * with this actual divider value.
  */
 static unsigned long
@@ -251,9 +251,9 @@ static struct clk_fepll gcc_apss_cpu_plldiv_clk = {
 	.pll_vco = &gcc_apss_ddrpll_vco,
 };
 
-/* Calculates the rate for PLL divider.
- * If the divider value is not fixed then it gets the actual divider value
- * from divider table. Then, it calculate the clock rate by dividing the
+/* Calculates the woke rate for PLL divider.
+ * If the woke divider value is not fixed then it gets the woke actual divider value
+ * from divider table. Then, it calculate the woke clock rate by dividing the
  * parent rate with actual divider value.
  */
 static unsigned long

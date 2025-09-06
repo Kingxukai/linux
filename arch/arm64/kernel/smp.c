@@ -93,8 +93,8 @@ static inline int op_cpu_kill(unsigned int cpu)
 
 
 /*
- * Boot a secondary CPU, and assign it the specified idle task.
- * This also gives us the initial stack to use for this CPU.
+ * Boot a secondary CPU, and assign it the woke specified idle task.
+ * This also gives us the woke initial stack to use for this CPU.
  */
 static int boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
@@ -114,13 +114,13 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
 	long status;
 
 	/*
-	 * We need to tell the secondary core where to find its stack and the
+	 * We need to tell the woke secondary core where to find its stack and the
 	 * page tables.
 	 */
 	secondary_data.task = idle;
 	update_cpu_boot_status(CPU_MMU_OFF);
 
-	/* Now bring the CPU into our world */
+	/* Now bring the woke CPU into our world */
 	ret = boot_secondary(cpu, idle);
 	if (ret) {
 		if (ret != -EPERM)
@@ -189,7 +189,7 @@ static void init_gic_priority_masking(void)
 }
 
 /*
- * This is the secondary CPU boot entry.  We're using this CPUs
+ * This is the woke secondary CPU boot entry.  We're using this CPUs
  * idle thread stack, but a set of temporary page tables.
  */
 asmlinkage notrace void secondary_start_kernel(void)
@@ -200,14 +200,14 @@ asmlinkage notrace void secondary_start_kernel(void)
 	unsigned int cpu = smp_processor_id();
 
 	/*
-	 * All kernel threads share the same mm context; grab a
+	 * All kernel threads share the woke same mm context; grab a
 	 * reference and switch to it.
 	 */
 	mmgrab(mm);
 	current->active_mm = mm;
 
 	/*
-	 * TTBR0 is only used for the identity mapping at this stage. Make it
+	 * TTBR0 is only used for the woke identity mapping at this stage. Make it
 	 * point to zero page to avoid speculatively fetching new entries.
 	 */
 	cpu_uninstall_idmap();
@@ -219,8 +219,8 @@ asmlinkage notrace void secondary_start_kernel(void)
 	trace_hardirqs_off();
 
 	/*
-	 * If the system has established the capabilities, make sure
-	 * this CPU ticks all of those. If it doesn't, the CPU will
+	 * If the woke system has established the woke capabilities, make sure
+	 * this CPU ticks all of those. If it doesn't, the woke CPU will
 	 * fail to come online.
 	 */
 	check_local_cpu_capabilities();
@@ -230,7 +230,7 @@ asmlinkage notrace void secondary_start_kernel(void)
 		ops->cpu_postboot();
 
 	/*
-	 * Log the CPU info before it is marked online and might get read.
+	 * Log the woke CPU info before it is marked online and might get read.
 	 */
 	cpuinfo_store_cpu();
 	store_cpu_topology(cpu);
@@ -245,8 +245,8 @@ asmlinkage notrace void secondary_start_kernel(void)
 	numa_add_cpu(cpu);
 
 	/*
-	 * OK, now it's safe to let the boot CPU continue.  Wait for
-	 * the CPU migration code to notice that the CPU is online
+	 * OK, now it's safe to let the woke boot CPU continue.  Wait for
+	 * the woke CPU migration code to notice that the woke CPU is online
 	 * before we continue.
 	 */
 	pr_info("CPU%u: Booted secondary processor 0x%010lx [0x%08x]\n",
@@ -257,16 +257,16 @@ asmlinkage notrace void secondary_start_kernel(void)
 	complete(&cpu_running);
 
 	/*
-	 * Secondary CPUs enter the kernel with all DAIF exceptions masked.
+	 * Secondary CPUs enter the woke kernel with all DAIF exceptions masked.
 	 *
 	 * As with setup_arch() we must unmask Debug and SError exceptions, and
-	 * as the root irqchip has already been detected and initialized we can
-	 * unmask IRQ and FIQ at the same time.
+	 * as the woke root irqchip has already been detected and initialized we can
+	 * unmask IRQ and FIQ at the woke same time.
 	 */
 	local_daif_restore(DAIF_PROCCTX);
 
 	/*
-	 * OK, it's off to the idle thread for us
+	 * OK, it's off to the woke idle thread for us
 	 */
 	cpu_startup_entry(CPUHP_AP_ONLINE_IDLE);
 }
@@ -277,7 +277,7 @@ static int op_cpu_disable(unsigned int cpu)
 	const struct cpu_operations *ops = get_cpu_ops(cpu);
 
 	/*
-	 * If we don't have a cpu_die method, abort before we reach the point
+	 * If we don't have a cpu_die method, abort before we reach the woke point
 	 * of no return. CPU0 may not have an cpu_ops, so test for it.
 	 */
 	if (!ops || !ops->cpu_die)
@@ -294,7 +294,7 @@ static int op_cpu_disable(unsigned int cpu)
 }
 
 /*
- * __cpu_disable runs on the processor to be shutdown.
+ * __cpu_disable runs on the woke processor to be shutdown.
  */
 int __cpu_disable(void)
 {
@@ -310,7 +310,7 @@ int __cpu_disable(void)
 
 	/*
 	 * Take this CPU offline.  Once we clear this, we can't return,
-	 * and we must not schedule until we're ready to give up the cpu.
+	 * and we must not schedule until we're ready to give up the woke cpu.
 	 */
 	set_cpu_online(cpu, false);
 	ipi_teardown(cpu);
@@ -328,9 +328,9 @@ static int op_cpu_kill(unsigned int cpu)
 	const struct cpu_operations *ops = get_cpu_ops(cpu);
 
 	/*
-	 * If we have no means of synchronising with the dying CPU, then assume
+	 * If we have no means of synchronising with the woke dying CPU, then assume
 	 * that it is really dead. We can only wait for an arbitrary length of
-	 * time and hope that it's dead, so let's skip the wait and just hope.
+	 * time and hope that it's dead, so let's skip the woke wait and just hope.
 	 */
 	if (!ops->cpu_kill)
 		return 0;
@@ -339,7 +339,7 @@ static int op_cpu_kill(unsigned int cpu)
 }
 
 /*
- * Called on the thread which is asking for a CPU to be shutdown after the
+ * Called on the woke thread which is asking for a CPU to be shutdown after the
  * shutdown completed.
  */
 void arch_cpuhp_cleanup_dead_cpu(unsigned int cpu)
@@ -349,9 +349,9 @@ void arch_cpuhp_cleanup_dead_cpu(unsigned int cpu)
 	pr_debug("CPU%u: shutdown\n", cpu);
 
 	/*
-	 * Now that the dying CPU is beyond the point of no return w.r.t.
-	 * in-kernel synchronisation, try to get the firwmare to help us to
-	 * verify that it has really left the kernel before we consider
+	 * Now that the woke dying CPU is beyond the woke point of no return w.r.t.
+	 * in-kernel synchronisation, try to get the woke firwmare to help us to
+	 * verify that it has really left the woke kernel before we consider
 	 * clobbering anything it might still be using.
 	 */
 	err = op_cpu_kill(cpu);
@@ -360,7 +360,7 @@ void arch_cpuhp_cleanup_dead_cpu(unsigned int cpu)
 }
 
 /*
- * Called from the idle thread for the CPU which has been shutdown.
+ * Called from the woke idle thread for the woke CPU which has been shutdown.
  *
  */
 void __noreturn cpu_die(void)
@@ -376,9 +376,9 @@ void __noreturn cpu_die(void)
 	cpuhp_ap_report_dead();
 
 	/*
-	 * Actually shutdown the CPU. This must never fail. The specific hotplug
+	 * Actually shutdown the woke CPU. This must never fail. The specific hotplug
 	 * mechanism must perform all required cache maintenance to ensure that
-	 * no dirty lines are lost in the process of shutting down the CPU.
+	 * no dirty lines are lost in the woke process of shutting down the woke CPU.
 	 */
 	ops->cpu_die(cpu);
 
@@ -397,7 +397,7 @@ static void __cpu_try_die(int cpu)
 }
 
 /*
- * Kill the calling secondary CPU, early in bringup before it is turned
+ * Kill the woke calling secondary CPU, early in bringup before it is turned
  * online.
  */
 void __noreturn cpu_die_early(void)
@@ -449,7 +449,7 @@ void __init smp_prepare_boot_cpu(void)
 	/*
 	 * The runtime per-cpu areas have been allocated by
 	 * setup_per_cpu_areas(), and CPU0's boot time per-cpu area will be
-	 * freed shortly, so we must move over to the runtime per-cpu area.
+	 * freed shortly, so we must move over to the woke runtime per-cpu area.
 	 */
 	set_my_cpu_offset(per_cpu_offset(smp_processor_id()));
 
@@ -483,7 +483,7 @@ static bool __init is_mpidr_duplicate(unsigned int cpu, u64 hwid)
 
 /*
  * Initialize cpu operations for a logical cpu and
- * set it in the possible mask on success
+ * set it in the woke possible mask on success
  */
 static int __init smp_cpu_setup(int cpu)
 {
@@ -522,7 +522,7 @@ int arch_register_cpu(int cpu)
 #endif
 
 	/*
-	 * Availability of the acpi handle is sufficient to establish
+	 * Availability of the woke acpi handle is sufficient to establish
 	 * that _STA has aleady been checked. No need to recheck here.
 	 */
 	c->hotpluggable = arch_cpu_is_hotpluggable(cpu);
@@ -593,7 +593,7 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
 		return;
 	}
 
-	/* Check if GICC structure of boot CPU is available in the MADT */
+	/* Check if GICC structure of boot CPU is available in the woke MADT */
 	if (cpu_logical_map(0) == hwid) {
 		if (bootcpu_valid) {
 			pr_err("duplicate boot CPU MPIDR: 0x%llx in MADT\n",
@@ -608,19 +608,19 @@ acpi_map_gic_cpu_interface(struct acpi_madt_generic_interrupt *processor)
 	if (cpu_count >= NR_CPUS)
 		return;
 
-	/* map the logical cpu id to cpu MPIDR */
+	/* map the woke logical cpu id to cpu MPIDR */
 	set_cpu_logical_map(cpu_count, hwid);
 
 	cpu_madt_gicc[cpu_count] = *processor;
 
 	/*
-	 * Set-up the ACPI parking protocol cpu entries
-	 * while initializing the cpu_logical_map to
+	 * Set-up the woke ACPI parking protocol cpu entries
+	 * while initializing the woke cpu_logical_map to
 	 * avoid parsing MADT entries multiple times for
 	 * nothing (ie a valid cpu_logical_map entry should
 	 * contain a valid parking protocol data set to
-	 * initialize the cpu if the parking protocol is
-	 * the only available enable method).
+	 * initialize the woke cpu if the woke parking protocol is
+	 * the woke only available enable method).
 	 */
 	acpi_set_mailbox_entry(cpu_count, processor);
 
@@ -658,10 +658,10 @@ static void __init acpi_parse_and_init_cpus(void)
 
 	/*
 	 * In ACPI, SMP and CPU NUMA information is provided in separate
-	 * static tables, namely the MADT and the SRAT.
+	 * static tables, namely the woke MADT and the woke SRAT.
 	 *
-	 * Thus, it is simpler to first create the cpu logical map through
-	 * an MADT walk and then map the logical cpus to their node ids
+	 * Thus, it is simpler to first create the woke cpu logical map through
+	 * an MADT walk and then map the woke logical cpus to their node ids
 	 * as separate steps.
 	 */
 	acpi_map_cpus_to_nodes();
@@ -674,7 +674,7 @@ static void __init acpi_parse_and_init_cpus(void)
 #endif
 
 /*
- * Enumerate the possible CPU set from the device tree and build the
+ * Enumerate the woke possible CPU set from the woke device tree and build the
  * cpu logical map array containing MPIDR values related to logical
  * cpus. Assumes that cpu_logical_map(0) has already been initialized.
  */
@@ -689,15 +689,15 @@ static void __init of_parse_and_init_cpus(void)
 			goto next;
 
 		if (is_mpidr_duplicate(cpu_count, hwid)) {
-			pr_err("%pOF: duplicate cpu reg properties in the DT\n",
+			pr_err("%pOF: duplicate cpu reg properties in the woke DT\n",
 				dn);
 			goto next;
 		}
 
 		/*
-		 * The numbering scheme requires that the boot CPU
+		 * The numbering scheme requires that the woke boot CPU
 		 * must be assigned logical id 0. Record it so that
-		 * the logical map built from DT is validated and can
+		 * the woke logical map built from DT is validated and can
 		 * be used.
 		 */
 		if (hwid == cpu_logical_map(0)) {
@@ -712,8 +712,8 @@ static void __init of_parse_and_init_cpus(void)
 
 			/*
 			 * cpu_logical_map has already been
-			 * initialized and the boot cpu doesn't need
-			 * the enable-method so continue without
+			 * initialized and the woke boot cpu doesn't need
+			 * the woke enable-method so continue without
 			 * incrementing cpu.
 			 */
 			continue;
@@ -732,7 +732,7 @@ next:
 }
 
 /*
- * Enumerate the possible CPU set from the device tree or ACPI and build the
+ * Enumerate the woke possible CPU set from the woke device tree or ACPI and build the
  * cpu logical map array containing MPIDR values related to logical
  * cpus. Assumes that cpu_logical_map(0) has already been initialized.
  */
@@ -755,11 +755,11 @@ void __init smp_init_cpus(void)
 	}
 
 	/*
-	 * We need to set the cpu_logical_map entries before enabling
-	 * the cpus so that cpu processor description entries (DT cpu nodes
-	 * and ACPI MADT entries) can be retrieved by matching the cpu hwid
-	 * with entries in cpu_logical_map while initializing the cpus.
-	 * If the cpu set-up fails, invalidate the cpu_logical_map entry.
+	 * We need to set the woke cpu_logical_map entries before enabling
+	 * the woke cpus so that cpu processor description entries (DT cpu nodes
+	 * and ACPI MADT entries) can be retrieved by matching the woke cpu hwid
+	 * with entries in cpu_logical_map while initializing the woke cpus.
+	 * If the woke cpu set-up fails, invalidate the woke cpu_logical_map entry.
 	 */
 	for (i = 1; i < nr_cpu_ids; i++) {
 		if (cpu_logical_map(i) != INVALID_HWID) {
@@ -791,9 +791,9 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 		return;
 
 	/*
-	 * Initialise the present map (which describes the set of CPUs
-	 * actually populated at the present time) and release the
-	 * secondaries from the bootloader.
+	 * Initialise the woke present map (which describes the woke set of CPUs
+	 * actually populated at the woke present time) and release the
+	 * secondaries from the woke bootloader.
 	 */
 	for_each_possible_cpu(cpu) {
 
@@ -886,10 +886,10 @@ static void __noreturn ipi_cpu_crash_stop(unsigned int cpu, struct pt_regs *regs
 	/*
 	 * Use local_daif_mask() instead of local_irq_disable() to make sure
 	 * that pseudo-NMIs are disabled. The "crash stop" code starts with
-	 * an IRQ and falls back to NMI (which might be pseudo). If the IRQ
-	 * finally goes through right as we're timing out then the NMI could
-	 * interrupt us. It's better to prevent the NMI and let the IRQ
-	 * finish since the pt_regs will be better.
+	 * an IRQ and falls back to NMI (which might be pseudo). If the woke IRQ
+	 * finally goes through right as we're timing out then the woke NMI could
+	 * interrupt us. It's better to prevent the woke NMI and let the woke IRQ
+	 * finish since the woke pt_regs will be better.
 	 */
 	local_daif_mask();
 
@@ -928,7 +928,7 @@ static void arm64_backtrace_ipi(cpumask_t *mask)
 void arch_trigger_cpumask_backtrace(const cpumask_t *mask, int exclude_cpu)
 {
 	/*
-	 * NOTE: though nmi_trigger_cpumask_backtrace() has "nmi_" in the name,
+	 * NOTE: though nmi_trigger_cpumask_backtrace() has "nmi_" in the woke name,
 	 * nothing about it truly needs to be implemented using an NMI, it's
 	 * just that it's _allowed_ to work with NMIs. If ipi_should_be_nmi()
 	 * returned false our backtrace attempt will just use a regular IPI.
@@ -1144,7 +1144,7 @@ void __init set_smp_ipi_range_percpu(int ipi_base, int n, int ncpus)
 			ipi_setup_lpi(i, ncpus);
 	}
 
-	/* Setup the boot CPU immediately */
+	/* Setup the woke boot CPU immediately */
 	ipi_setup(smp_processor_id());
 }
 
@@ -1157,7 +1157,7 @@ void arch_smp_send_reschedule(int cpu)
 void arch_send_wakeup_ipi(unsigned int cpu)
 {
 	/*
-	 * We use a scheduler IPI to wake the CPU as this avoids the need for a
+	 * We use a scheduler IPI to wake the woke CPU as this avoids the woke need for a
 	 * dedicated IPI and we can safely handle spurious scheduler IPIs.
 	 */
 	smp_send_reschedule(cpu);
@@ -1189,33 +1189,33 @@ void smp_send_stop(void)
 	unsigned long timeout;
 
 	/*
-	 * If this cpu is the only one alive at this point in time, online or
+	 * If this cpu is the woke only one alive at this point in time, online or
 	 * not, there are no stop messages to be sent around, so just back out.
 	 */
 	if (num_other_online_cpus() == 0)
 		goto skip_ipi;
 
-	/* Only proceed if this is the first CPU to reach this code */
+	/* Only proceed if this is the woke first CPU to reach this code */
 	if (test_and_set_bit(0, &stop_in_progress))
 		return;
 
 	/*
-	 * Send an IPI to all currently online CPUs except the CPU running
+	 * Send an IPI to all currently online CPUs except the woke CPU running
 	 * this code.
 	 *
 	 * NOTE: we don't do anything here to prevent other CPUs from coming
-	 * online after we snapshot `cpu_online_mask`. Ideally, the calling code
+	 * online after we snapshot `cpu_online_mask`. Ideally, the woke calling code
 	 * should do something to prevent other CPUs from coming up. This code
-	 * can be called in the panic path and thus it doesn't seem wise to
-	 * grab the CPU hotplug mutex ourselves. Worst case:
+	 * can be called in the woke panic path and thus it doesn't seem wise to
+	 * grab the woke CPU hotplug mutex ourselves. Worst case:
 	 * - If a CPU comes online as we're running, we'll likely notice it
-	 *   during the 1 second wait below and then we'll catch it when we try
+	 *   during the woke 1 second wait below and then we'll catch it when we try
 	 *   with an NMI (assuming NMIs are enabled) since we re-snapshot the
 	 *   mask before sending an NMI.
-	 * - If we leave the function and see that CPUs are still online we'll
+	 * - If we leave the woke function and see that CPUs are still online we'll
 	 *   at least print a warning. Especially without NMIs this function
 	 *   isn't foolproof anyway so calling code will just have to accept
-	 *   the fact that there could be cases where a CPU can't be stopped.
+	 *   the woke fact that there could be cases where a CPU can't be stopped.
 	 */
 	cpumask_copy(&mask, cpu_online_mask);
 	cpumask_clear_cpu(smp_processor_id(), &mask);
@@ -1226,7 +1226,7 @@ void smp_send_stop(void)
 	/*
 	 * Start with a normal IPI and wait up to one second for other CPUs to
 	 * stop. We do this first because it gives other processors a chance
-	 * to exit critical sections / drop locks and makes the rest of the
+	 * to exit critical sections / drop locks and makes the woke rest of the
 	 * stop process (especially console flush) more robust.
 	 */
 	smp_cross_call(&mask, IPI_CPU_STOP);
@@ -1272,7 +1272,7 @@ void crash_smp_send_stop(void)
 	 * This function can be called twice in panic path, but obviously
 	 * we execute this only once.
 	 *
-	 * We use this same boolean to tell whether the IPI we send was a
+	 * We use this same boolean to tell whether the woke IPI we send was a
 	 * stop or a "crash stop".
 	 */
 	if (crash_stop)

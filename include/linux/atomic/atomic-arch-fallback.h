@@ -445,7 +445,7 @@ extern void raw_cmpxchg128_relaxed_not_implemented(void);
  * raw_atomic_read() - atomic load with relaxed ordering
  * @v: pointer to atomic_t
  *
- * Atomically loads the value of @v with relaxed ordering.
+ * Atomically loads the woke value of @v with relaxed ordering.
  *
  * Safe to use in noinstr code; prefer atomic_read() elsewhere.
  *
@@ -461,7 +461,7 @@ raw_atomic_read(const atomic_t *v)
  * raw_atomic_read_acquire() - atomic load with acquire ordering
  * @v: pointer to atomic_t
  *
- * Atomically loads the value of @v with acquire ordering.
+ * Atomically loads the woke value of @v with acquire ordering.
  *
  * Safe to use in noinstr code; prefer atomic_read_acquire() elsewhere.
  *
@@ -2116,12 +2116,12 @@ raw_atomic_cmpxchg_relaxed(atomic_t *v, int old, int new)
  * @new: int value to assign
  *
  * If (@v == @old), atomically updates @v to @new with full ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_try_cmpxchg() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_try_cmpxchg(atomic_t *v, int *old, int new)
@@ -2150,12 +2150,12 @@ raw_atomic_try_cmpxchg(atomic_t *v, int *old, int new)
  * @new: int value to assign
  *
  * If (@v == @old), atomically updates @v to @new with acquire ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_try_cmpxchg_acquire() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_try_cmpxchg_acquire(atomic_t *v, int *old, int new)
@@ -2184,12 +2184,12 @@ raw_atomic_try_cmpxchg_acquire(atomic_t *v, int *old, int new)
  * @new: int value to assign
  *
  * If (@v == @old), atomically updates @v to @new with release ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_try_cmpxchg_release() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_try_cmpxchg_release(atomic_t *v, int *old, int new)
@@ -2217,12 +2217,12 @@ raw_atomic_try_cmpxchg_release(atomic_t *v, int *old, int new)
  * @new: int value to assign
  *
  * If (@v == @old), atomically updates @v to @new with relaxed ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_try_cmpxchg_relaxed() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_try_cmpxchg_relaxed(atomic_t *v, int *old, int new)
@@ -2249,7 +2249,7 @@ raw_atomic_try_cmpxchg_relaxed(atomic_t *v, int *old, int new)
  *
  * Safe to use in noinstr code; prefer atomic_sub_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_sub_and_test(int i, atomic_t *v)
@@ -2269,7 +2269,7 @@ raw_atomic_sub_and_test(int i, atomic_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_dec_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_dec_and_test(atomic_t *v)
@@ -2289,7 +2289,7 @@ raw_atomic_dec_and_test(atomic_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_inc_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_inc_and_test(atomic_t *v)
@@ -2310,7 +2310,7 @@ raw_atomic_inc_and_test(atomic_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_add_negative() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_add_negative(int i, atomic_t *v)
@@ -2337,7 +2337,7 @@ raw_atomic_add_negative(int i, atomic_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_add_negative_acquire() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_add_negative_acquire(int i, atomic_t *v)
@@ -2364,7 +2364,7 @@ raw_atomic_add_negative_acquire(int i, atomic_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_add_negative_release() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_add_negative_release(int i, atomic_t *v)
@@ -2390,7 +2390,7 @@ raw_atomic_add_negative_release(int i, atomic_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_add_negative_relaxed() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_add_negative_relaxed(int i, atomic_t *v)
@@ -2571,7 +2571,7 @@ raw_atomic_dec_if_positive(atomic_t *v)
  * raw_atomic64_read() - atomic load with relaxed ordering
  * @v: pointer to atomic64_t
  *
- * Atomically loads the value of @v with relaxed ordering.
+ * Atomically loads the woke value of @v with relaxed ordering.
  *
  * Safe to use in noinstr code; prefer atomic64_read() elsewhere.
  *
@@ -2587,7 +2587,7 @@ raw_atomic64_read(const atomic64_t *v)
  * raw_atomic64_read_acquire() - atomic load with acquire ordering
  * @v: pointer to atomic64_t
  *
- * Atomically loads the value of @v with acquire ordering.
+ * Atomically loads the woke value of @v with acquire ordering.
  *
  * Safe to use in noinstr code; prefer atomic64_read_acquire() elsewhere.
  *
@@ -4242,12 +4242,12 @@ raw_atomic64_cmpxchg_relaxed(atomic64_t *v, s64 old, s64 new)
  * @new: s64 value to assign
  *
  * If (@v == @old), atomically updates @v to @new with full ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic64_try_cmpxchg() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_try_cmpxchg(atomic64_t *v, s64 *old, s64 new)
@@ -4276,12 +4276,12 @@ raw_atomic64_try_cmpxchg(atomic64_t *v, s64 *old, s64 new)
  * @new: s64 value to assign
  *
  * If (@v == @old), atomically updates @v to @new with acquire ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic64_try_cmpxchg_acquire() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_try_cmpxchg_acquire(atomic64_t *v, s64 *old, s64 new)
@@ -4310,12 +4310,12 @@ raw_atomic64_try_cmpxchg_acquire(atomic64_t *v, s64 *old, s64 new)
  * @new: s64 value to assign
  *
  * If (@v == @old), atomically updates @v to @new with release ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic64_try_cmpxchg_release() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_try_cmpxchg_release(atomic64_t *v, s64 *old, s64 new)
@@ -4343,12 +4343,12 @@ raw_atomic64_try_cmpxchg_release(atomic64_t *v, s64 *old, s64 new)
  * @new: s64 value to assign
  *
  * If (@v == @old), atomically updates @v to @new with relaxed ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic64_try_cmpxchg_relaxed() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_try_cmpxchg_relaxed(atomic64_t *v, s64 *old, s64 new)
@@ -4375,7 +4375,7 @@ raw_atomic64_try_cmpxchg_relaxed(atomic64_t *v, s64 *old, s64 new)
  *
  * Safe to use in noinstr code; prefer atomic64_sub_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_sub_and_test(s64 i, atomic64_t *v)
@@ -4395,7 +4395,7 @@ raw_atomic64_sub_and_test(s64 i, atomic64_t *v)
  *
  * Safe to use in noinstr code; prefer atomic64_dec_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_dec_and_test(atomic64_t *v)
@@ -4415,7 +4415,7 @@ raw_atomic64_dec_and_test(atomic64_t *v)
  *
  * Safe to use in noinstr code; prefer atomic64_inc_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_inc_and_test(atomic64_t *v)
@@ -4436,7 +4436,7 @@ raw_atomic64_inc_and_test(atomic64_t *v)
  *
  * Safe to use in noinstr code; prefer atomic64_add_negative() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_add_negative(s64 i, atomic64_t *v)
@@ -4463,7 +4463,7 @@ raw_atomic64_add_negative(s64 i, atomic64_t *v)
  *
  * Safe to use in noinstr code; prefer atomic64_add_negative_acquire() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_add_negative_acquire(s64 i, atomic64_t *v)
@@ -4490,7 +4490,7 @@ raw_atomic64_add_negative_acquire(s64 i, atomic64_t *v)
  *
  * Safe to use in noinstr code; prefer atomic64_add_negative_release() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_add_negative_release(s64 i, atomic64_t *v)
@@ -4516,7 +4516,7 @@ raw_atomic64_add_negative_release(s64 i, atomic64_t *v)
  *
  * Safe to use in noinstr code; prefer atomic64_add_negative_relaxed() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic64_add_negative_relaxed(s64 i, atomic64_t *v)

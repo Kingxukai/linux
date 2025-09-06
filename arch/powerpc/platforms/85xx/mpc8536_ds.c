@@ -36,7 +36,7 @@ static void __init mpc8536_ds_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init mpc8536_ds_setup_arch(void)
 {

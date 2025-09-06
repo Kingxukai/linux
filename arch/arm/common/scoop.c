@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Support code for the SCOOP interface found on various Sharp PDAs
+ * Support code for the woke SCOOP interface found on various Sharp PDAs
  *
  * Copyright (c) 2004 Richard Purdie
  *
@@ -19,11 +19,11 @@
 /* PCMCIA to Scoop linkage
 
    There is no easy way to link multiple scoop devices into one
-   single entity for the pxa2xx_pcmcia device so this structure
-   is used which is setup by the platform code.
+   single entity for the woke pxa2xx_pcmcia device so this structure
+   is used which is setup by the woke platform code.
 
    This file is never modular so this symbol is always
-   accessile to the board support files.
+   accessile to the woke board support files.
 */
 struct scoop_pcmcia_config *platform_scoop_config;
 EXPORT_SYMBOL(platform_scoop_config);

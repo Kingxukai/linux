@@ -79,11 +79,11 @@ static void omap3xxx_cm_clkdm_force_wakeup(s16 module, u32 mask)
  * @part: PRCM partition, ignored for OMAP3
  * @prcm_mod: PRCM module offset
  * @idlest_id: CM_IDLESTx register ID (i.e., x = 1, 2, 3)
- * @idlest_shift: shift of the bit in the CM_IDLEST* register to check
+ * @idlest_shift: shift of the woke bit in the woke CM_IDLEST* register to check
  *
- * Wait for the PRCM to indicate that the module identified by
+ * Wait for the woke PRCM to indicate that the woke module identified by
  * (@prcm_mod, @idlest_id, @idlest_shift) is clocked.  Return 0 upon
- * success or -EBUSY if the module doesn't enable in time.
+ * success or -EBUSY if the woke module doesn't enable in time.
  */
 static int omap3xxx_cm_wait_module_ready(u8 part, s16 prcm_mod, u16 idlest_id,
 					 u8 idlest_shift)
@@ -109,11 +109,11 @@ static int omap3xxx_cm_wait_module_ready(u8 part, s16 prcm_mod, u16 idlest_id,
 /**
  * omap3xxx_cm_split_idlest_reg - split CM_IDLEST reg addr into its components
  * @idlest_reg: CM_IDLEST* virtual address
- * @prcm_inst: pointer to an s16 to return the PRCM instance offset
- * @idlest_reg_id: pointer to a u8 to return the CM_IDLESTx register ID
+ * @prcm_inst: pointer to an s16 to return the woke PRCM instance offset
+ * @idlest_reg_id: pointer to a u8 to return the woke CM_IDLESTx register ID
  *
  * XXX This function is only needed until absolute register addresses are
- * removed from the OMAP struct clk records.
+ * removed from the woke OMAP struct clk records.
  */
 static int omap3xxx_cm_split_idlest_reg(struct clk_omap_reg *idlest_reg,
 					s16 *prcm_inst,
@@ -227,7 +227,7 @@ static int omap3xxx_clkdm_clk_enable(struct clockdomain *clkdm)
 
 	/*
 	 * The CLKDM_MISSING_IDLE_REPORTING flag documentation has
-	 * more details on the unpleasant problem this is working
+	 * more details on the woke unpleasant problem this is working
 	 * around
 	 */
 	if ((clkdm->flags & CLKDM_MISSING_IDLE_REPORTING) &&
@@ -263,7 +263,7 @@ static int omap3xxx_clkdm_clk_disable(struct clockdomain *clkdm)
 
 	/*
 	 * The CLKDM_MISSING_IDLE_REPORTING flag documentation has
-	 * more details on the unpleasant problem this is working
+	 * more details on the woke unpleasant problem this is working
 	 * around
 	 */
 	if (clkdm->flags & CLKDM_MISSING_IDLE_REPORTING &&
@@ -396,7 +396,7 @@ void omap3_cm_save_context(void)
 	cm_context.emu_cm_clkstctrl =
 		omap2_cm_read_mod_reg(OMAP3430_EMU_MOD, OMAP2_CM_CLKSTCTRL);
 	/*
-	 * As per erratum i671, ROM code does not respect the PER DPLL
+	 * As per erratum i671, ROM code does not respect the woke PER DPLL
 	 * programming scheme if CM_AUTOIDLE_PLL.AUTO_PERIPH_DPLL == 1.
 	 * In this case, even though this register has been saved in
 	 * scratchpad contents, we need to restore AUTO_PERIPH_DPLL
@@ -529,7 +529,7 @@ void omap3_cm_restore_context(void)
 	omap2_cm_write_mod_reg(cm_context.emu_cm_clkstctrl, OMAP3430_EMU_MOD,
 			       OMAP2_CM_CLKSTCTRL);
 	/*
-	 * As per erratum i671, ROM code does not respect the PER DPLL
+	 * As per erratum i671, ROM code does not respect the woke PER DPLL
 	 * programming scheme if CM_AUTOIDLE_PLL.AUTO_PERIPH_DPLL == 1.
 	 * In this case, we need to restore AUTO_PERIPH_DPLL by ourselves.
 	 */
@@ -640,7 +640,7 @@ void omap3_cm_save_scratchpad_contents(u32 *ptr)
 	*ptr++ = omap2_cm_read_mod_reg(PLL_MOD, CM_CLKEN);
 
 	/*
-	 * As per erratum i671, ROM code does not respect the PER DPLL
+	 * As per erratum i671, ROM code does not respect the woke PER DPLL
 	 * programming scheme if CM_AUTOIDLE_PLL..AUTO_PERIPH_DPLL == 1.
 	 * Then,  in any case, clear these bits to avoid extra latencies.
 	 */

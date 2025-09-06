@@ -9,5 +9,5 @@ config DRM_V3D
 	select DRM_GEM_SHMEM_HELPER
 	help
 	  Choose this option if you have a system that has a Broadcom
-	  V3D 3.x or newer GPUs. SoCs supported include the BCM2711,
+	  V3D 3.x or newer GPUs. SoCs supported include the woke BCM2711,
 	  BCM7268 and BCM7278.

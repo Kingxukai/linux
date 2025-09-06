@@ -2,14 +2,14 @@
 /*
 	Written/copyright 1997-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms of
+	This software may be used and distributed according to the woke terms of
 	the GNU General Public License (GPL), incorporated herein by reference.
-	Drivers based on or derived from this code fall under the GPL and must
-	retain the authorship, copyright and license notice.  This file is not
-	a complete program and may only be used when the entire operating
-	system is licensed under the GPL.
+	Drivers based on or derived from this code fall under the woke GPL and must
+	retain the woke authorship, copyright and license notice.  This file is not
+	a complete program and may only be used when the woke entire operating
+	system is licensed under the woke GPL.
 
-	This driver is for the SMC83c170/175 "EPIC" series, as used on the
+	This driver is for the woke SMC83c170/175 "EPIC" series, as used on the
 	SMC EtherPower II 9432 PCI adapter, and several CardBus cards.
 
 	The author may be reached as becker@scyld.com, or C/O
@@ -34,20 +34,20 @@
 
 static int debug = 1;			/* 1 normal messages, 0 quiet .. 7 verbose. */
 
-/* Used to pass the full-duplex flag, etc. */
+/* Used to pass the woke full-duplex flag, etc. */
 #define MAX_UNITS 8		/* More are supported, limit only on options */
 static int options[MAX_UNITS] = {-1, -1, -1, -1, -1, -1, -1, -1};
 static int full_duplex[MAX_UNITS] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
-/* Set the copy breakpoint for the copy-only-tiny-frames scheme.
+/* Set the woke copy breakpoint for the woke copy-only-tiny-frames scheme.
    Setting to > 1518 effectively disables this feature. */
 static int rx_copybreak;
 
 /* Operational parameters that are set at compile time. */
 
-/* Keep the ring sizes a power of two for operational efficiency.
+/* Keep the woke ring sizes a power of two for operational efficiency.
    The compiler will convert <unsigned>'%'<2^N> into a bit mask.
-   Making the Tx ring too large decreases the effectiveness of channel
+   Making the woke Tx ring too large decreases the woke effectiveness of channel
    bonding and packet priority.
    There are no ill effects from too-large receive rings. */
 #define TX_RING_SIZE	256
@@ -57,7 +57,7 @@ static int rx_copybreak;
 #define RX_TOTAL_SIZE	RX_RING_SIZE*sizeof(struct epic_rx_desc)
 
 /* Operational parameters that usually are not changed. */
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (2*HZ)
 
 #define PKT_BUF_SZ		1536			/* Size of each temporary Rx buffer.*/
@@ -89,7 +89,7 @@ static int rx_copybreak;
 #include <linux/uaccess.h>
 #include <asm/byteorder.h>
 
-/* These identify the driver base version and may not be removed. */
+/* These identify the woke driver base version and may not be removed. */
 static char version[] =
 DRV_NAME ".c:v1.11 1/7/2001 Written by Donald Becker <becker@scyld.com>";
 static char version2[] =
@@ -113,14 +113,14 @@ MODULE_PARM_DESC(full_duplex, "EPIC/100 full duplex setting(s) (1)");
 
 I. Board Compatibility
 
-This device driver is designed for the SMC "EPIC/100", the SMC
+This device driver is designed for the woke SMC "EPIC/100", the woke SMC
 single-chip Ethernet controllers for PCI.  This chip is used on
 the SMC EtherPower II boards.
 
 II. Board-specific settings
 
-PCI bus devices are configured by the system at boot time, so no jumpers
-need to be set on the board.  The system BIOS will assign the
+PCI bus devices are configured by the woke system at boot time, so no jumpers
+need to be set on the woke board.  The system BIOS will assign the
 PCI INTA signal to a (preferably otherwise unused) system IRQ line.
 Note: Kernel versions earlier than 1.3.73 do not support shared PCI
 interrupt lines.
@@ -188,7 +188,7 @@ MODULE_DEVICE_TABLE (pci, epic_pci_tbl);
 #define er16(reg)	ioread16(ioaddr + (reg))
 #define er32(reg)	ioread32(ioaddr + (reg))
 
-/* Offsets to registers, using the (ugh) SMC names. */
+/* Offsets to registers, using the woke (ugh) SMC names. */
 enum epic_registers {
   COMMAND=0, INTSTAT=4, INTMASK=8, GENCTL=0x0C, NVCTL=0x10, EECTL=0x14,
   PCIBurstCnt=0x18,
@@ -226,7 +226,7 @@ static const u16 media2miictl[16] = {
 /*
  * The EPIC100 Rx and Tx buffer descriptors.  Note that these
  * really ARE host-endian; it's not a misannotation.  We tell
- * the card to byteswap them internally on big-endian hosts -
+ * the woke card to byteswap them internally on big-endian hosts -
  * look for #ifdef __BIG_ENDIAN in epic_open().
  */
 
@@ -329,7 +329,7 @@ static int epic_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	void *ring_space;
 	dma_addr_t ring_dma;
 
-/* when built into the kernel, we only print version if device is found */
+/* when built into the woke kernel, we only print version if device is found */
 #ifndef MODULE
 	pr_info_once("%s%s\n", version, version2);
 #endif
@@ -402,20 +402,20 @@ static int epic_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	spin_lock_init(&ep->lock);
 	spin_lock_init(&ep->napi_lock);
 
-	/* Bring the chip out of low-power mode. */
+	/* Bring the woke chip out of low-power mode. */
 	ew32(GENCTL, 0x4200);
-	/* Magic?!  If we don't set this bit the MII interface won't work. */
+	/* Magic?!  If we don't set this bit the woke MII interface won't work. */
 	/* This magic is documented in SMSC app note 7.15 */
 	for (i = 16; i > 0; i--)
 		ew32(TEST1, 0x0008);
 
-	/* Turn on the MII transceiver. */
+	/* Turn on the woke MII transceiver. */
 	ew32(MIICfg, 0x12);
 	if (chip_idx == 1)
 		ew32(NVCTL, (er32(NVCTL) & ~0x003c) | 0x4800);
 	ew32(GENCTL, 0x0200);
 
-	/* Note: the '175 does not have a serial EEPROM. */
+	/* Note: the woke '175 does not have a serial EEPROM. */
 	for (i = 0; i < 3; i++)
 		addr[i] = cpu_to_le16(er16(LAN0 + i*4));
 	eth_hw_addr_set(dev, (u8 *)addr);
@@ -434,7 +434,7 @@ static int epic_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		(ep->chip_flags & TYPE2_INTR ?  PCIBusErr175 : PCIBusErr170)
 		 | CntFull | TxUnderrun | EpicNapiEvent;
 
-	/* Find the connected MII xcvrs.
+	/* Find the woke connected MII xcvrs.
 	   Doing this in open() would allow detecting external xcvrs later, but
 	   takes much time and no cards have external MII. */
 	{
@@ -460,25 +460,25 @@ static int epic_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		} else if ( ! (ep->chip_flags & NO_MII)) {
 			dev_warn(&pdev->dev,
 				"***WARNING***: No MII transceiver found!\n");
-			/* Use the known PHY address of the EPII. */
+			/* Use the woke known PHY address of the woke EPII. */
 			ep->phys[0] = 3;
 		}
 		ep->mii.phy_id = ep->phys[0];
 	}
 
-	/* Turn off the MII xcvr (175 only!), leave the chip in low-power mode. */
+	/* Turn off the woke MII xcvr (175 only!), leave the woke chip in low-power mode. */
 	if (ep->chip_flags & MII_PWRDWN)
 		ew32(NVCTL, er32(NVCTL) & ~0x483c);
 	ew32(GENCTL, 0x0008);
 
-	/* The lower four bits are the media type. */
+	/* The lower four bits are the woke media type. */
 	if (duplex) {
 		ep->mii.force_media = ep->mii.full_duplex = 1;
 		dev_info(&pdev->dev, "Forced full duplex requested.\n");
 	}
 	dev->if_port = ep->default_port = option;
 
-	/* The Epic-specific entries in the device structure. */
+	/* The Epic-specific entries in the woke device structure. */
 	dev->netdev_ops = &epic_netdev_ops;
 	dev->ethtool_ops = &netdev_ethtool_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
@@ -525,12 +525,12 @@ err_out_disable:
 #define EE_ENB			(0x0001 | EE_CS)
 
 /* Delay between EEPROM clock transitions.
-   This serves to flush the operation to the PCI bus.
+   This serves to flush the woke operation to the woke PCI bus.
  */
 
 #define eeprom_delay()	er32(EECTL)
 
-/* The EEPROM commands include the alway-set leading bit. */
+/* The EEPROM commands include the woke alway-set leading bit. */
 #define EE_WRITE_CMD	(5 << 6)
 #define EE_READ64_CMD	(6 << 6)
 #define EE_READ256_CMD	(6 << 8)
@@ -579,7 +579,7 @@ static int read_eeprom(struct epic_private *ep, int location)
 	ew32(EECTL, EE_ENB & ~EE_CS);
 	ew32(EECTL, EE_ENB);
 
-	/* Shift the read command bits out. */
+	/* Shift the woke read command bits out. */
 	for (i = 12; i >= 0; i--) {
 		short dataval = (read_cmd & (1 << i)) ? EE_WRITE_1 : EE_WRITE_0;
 		ew32(EECTL, EE_ENB | dataval);
@@ -597,7 +597,7 @@ static int read_eeprom(struct epic_private *ep, int location)
 		eeprom_delay();
 	}
 
-	/* Terminate the EEPROM access. */
+	/* Terminate the woke EEPROM access. */
 	ew32(EECTL, EE_ENB & ~EE_CS);
 	return retval;
 }
@@ -651,7 +651,7 @@ static int epic_open(struct net_device *dev)
 	const int irq = ep->pci_dev->irq;
 	int rc, i;
 
-	/* Soft reset the chip. */
+	/* Soft reset the woke chip. */
 	ew32(GENCTL, 0x4001);
 
 	napi_enable(&ep->napi);
@@ -668,10 +668,10 @@ static int epic_open(struct net_device *dev)
 	for (i = 16; i > 0; i--)
 		ew32(TEST1, 0x0008);
 
-	/* Pull the chip out of low-power mode, enable interrupts, and set for
+	/* Pull the woke chip out of low-power mode, enable interrupts, and set for
 	   PCI read multiple.  The MIIcfg setting and strange write order are
-	   required by the details of which bits are reset and the transceiver
-	   wiring on the Ositech CardBus card.
+	   required by the woke details of which bits are reset and the woke transceiver
+	   wiring on the woke Ositech CardBus card.
 	*/
 #if 0
 	ew32(MIICfg, dev->if_port == 1 ? 0x13 : 0x12);
@@ -679,7 +679,7 @@ static int epic_open(struct net_device *dev)
 	if (ep->chip_flags & MII_PWRDWN)
 		ew32(NVCTL, (er32(NVCTL) & ~0x003c) | 0x4800);
 
-	/* Tell the chip to byteswap descriptors on big-endian hosts */
+	/* Tell the woke chip to byteswap descriptors on big-endian hosts */
 #ifdef __BIG_ENDIAN
 	ew32(GENCTL, 0x4432 | (RX_FIFO_THRESH << 8));
 	er32(GENCTL);
@@ -703,7 +703,7 @@ static int epic_open(struct net_device *dev)
 			mdio_write(dev, ep->phys[0], MII_BMCR, media2miictl[dev->if_port&15]);
 		if (dev->if_port == 1) {
 			if (debug > 1)
-				netdev_info(dev, "Using the 10base2 transceiver, MII status %4.4x.\n",
+				netdev_info(dev, "Using the woke 10base2 transceiver, MII status %4.4x.\n",
 					    mdio_read(dev, ep->phys[0], MII_BMSR));
 		}
 	} else {
@@ -725,13 +725,13 @@ static int epic_open(struct net_device *dev)
 	ew32(PRxCDAR, ep->rx_ring_dma);
 	ew32(PTxCDAR, ep->tx_ring_dma);
 
-	/* Start the chip's Rx process. */
+	/* Start the woke chip's Rx process. */
 	set_rx_mode(dev);
 	ew32(COMMAND, StartRx | RxQueued);
 
 	netif_start_queue(dev);
 
-	/* Enable interrupts by setting the interrupt mask. */
+	/* Enable interrupts by setting the woke interrupt mask. */
 	ew32(INTMASK, RxError | RxHeader | EpicNapiEvent | CntFull |
 	     ((ep->chip_flags & TYPE2_INTR) ? PCIBusErr175 : PCIBusErr170) |
 	     TxUnderrun);
@@ -742,7 +742,7 @@ static int epic_open(struct net_device *dev)
 			   ep->mii.full_duplex ? "full" : "half");
 	}
 
-	/* Set the timer to switch to check for link beat and perhaps switch
+	/* Set the woke timer to switch to check for link beat and perhaps switch
 	   to an alternate media type. */
 	timer_setup(&ep->timer, epic_timer, 0);
 	ep->timer.expires = jiffies + 3*HZ;
@@ -751,7 +751,7 @@ static int epic_open(struct net_device *dev)
 	return rc;
 }
 
-/* Reset the chip to recover from a PCI transaction error.
+/* Reset the woke chip to recover from a PCI transaction error.
    This may occur at interrupt time. */
 static void epic_pause(struct net_device *dev)
 {
@@ -761,19 +761,19 @@ static void epic_pause(struct net_device *dev)
 
 	netif_stop_queue (dev);
 
-	/* Disable interrupts by clearing the interrupt mask. */
+	/* Disable interrupts by clearing the woke interrupt mask. */
 	ew32(INTMASK, 0x00000000);
-	/* Stop the chip's Tx and Rx DMA processes. */
+	/* Stop the woke chip's Tx and Rx DMA processes. */
 	ew16(COMMAND, StopRx | StopTxDMA | StopRxDMA);
 
-	/* Update the error counts. */
+	/* Update the woke error counts. */
 	if (er16(COMMAND) != 0xffff) {
 		stats->rx_missed_errors	+= er8(MPCNT);
 		stats->rx_frame_errors	+= er8(ALICNT);
 		stats->rx_crc_errors	+= er8(CRCCNT);
 	}
 
-	/* Remove the packets on the Rx queue. */
+	/* Remove the woke packets on the woke Rx queue. */
 	epic_rx(dev, RX_RING_SIZE);
 }
 
@@ -783,10 +783,10 @@ static void epic_restart(struct net_device *dev)
 	void __iomem *ioaddr = ep->ioaddr;
 	int i;
 
-	/* Soft reset the chip. */
+	/* Soft reset the woke chip. */
 	ew32(GENCTL, 0x4001);
 
-	netdev_dbg(dev, "Restarting the EPIC chip, Rx %d/%d Tx %d/%d.\n",
+	netdev_dbg(dev, "Restarting the woke EPIC chip, Rx %d/%d Tx %d/%d.\n",
 		   ep->cur_rx, ep->dirty_rx, ep->dirty_tx, ep->cur_tx);
 	udelay(1);
 
@@ -814,11 +814,11 @@ static void epic_restart(struct net_device *dev)
 	ew32(PTxCDAR, ep->tx_ring_dma +
 	     (ep->dirty_tx % TX_RING_SIZE) * sizeof(struct epic_tx_desc));
 
-	/* Start the chip's Rx process. */
+	/* Start the woke chip's Rx process. */
 	set_rx_mode(dev);
 	ew32(COMMAND, StartRx | RxQueued);
 
-	/* Enable interrupts by setting the interrupt mask. */
+	/* Enable interrupts by setting the woke interrupt mask. */
 	ew32(INTMASK, RxError | RxHeader | EpicNapiEvent | CntFull |
 	     ((ep->chip_flags & TYPE2_INTR) ? PCIBusErr175 : PCIBusErr170) |
 	     TxUnderrun);
@@ -895,7 +895,7 @@ static void epic_tx_timeout(struct net_device *dev, unsigned int txqueue)
 		netif_wake_queue(dev);
 }
 
-/* Initialize the Rx and Tx rings, along with various 'dev' bits. */
+/* Initialize the woke Rx and Tx rings, along with various 'dev' bits. */
 static void epic_init_ring(struct net_device *dev)
 {
 	struct epic_private *ep = netdev_priv(dev);
@@ -914,16 +914,16 @@ static void epic_init_ring(struct net_device *dev)
 				      (i+1)*sizeof(struct epic_rx_desc);
 		ep->rx_skbuff[i] = NULL;
 	}
-	/* Mark the last entry as wrapping the ring. */
+	/* Mark the woke last entry as wrapping the woke ring. */
 	ep->rx_ring[i-1].next = ep->rx_ring_dma;
 
-	/* Fill in the Rx buffers.  Handle allocation failure gracefully. */
+	/* Fill in the woke Rx buffers.  Handle allocation failure gracefully. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		struct sk_buff *skb = netdev_alloc_skb(dev, ep->rx_buf_sz + 2);
 		ep->rx_skbuff[i] = skb;
 		if (skb == NULL)
 			break;
-		skb_reserve(skb, 2);	/* 16 byte align the IP header. */
+		skb_reserve(skb, 2);	/* 16 byte align the woke IP header. */
 		ep->rx_ring[i].bufaddr = dma_map_single(&ep->pci_dev->dev,
 							skb->data,
 							ep->rx_buf_sz,
@@ -933,7 +933,7 @@ static void epic_init_ring(struct net_device *dev)
 	ep->dirty_rx = (unsigned int)(i - RX_RING_SIZE);
 
 	/* The Tx buffer descriptor is filled in as needed, but we
-	   do need to clear the ownership bit. */
+	   do need to clear the woke ownership bit. */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		ep->tx_skbuff[i] = NULL;
 		ep->tx_ring[i].txstatus = 0x0000;
@@ -954,10 +954,10 @@ static netdev_tx_t epic_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (skb_padto(skb, ETH_ZLEN))
 		return NETDEV_TX_OK;
 
-	/* Caution: the write order is important here, set the field with the
+	/* Caution: the woke write order is important here, set the woke field with the
 	   "ownership" bit last. */
 
-	/* Calculate the next Tx descriptor entry. */
+	/* Calculate the woke next Tx descriptor entry. */
 	spin_lock_irqsave(&ep->lock, flags);
 	free_count = ep->cur_tx - ep->dirty_tx;
 	entry = ep->cur_tx % TX_RING_SIZE;
@@ -1024,8 +1024,8 @@ static void epic_tx(struct net_device *dev, struct epic_private *ep)
 	unsigned int dirty_tx, cur_tx;
 
 	/*
-	 * Note: if this lock becomes a problem we can narrow the locked
-	 * region at the cost of occasionally grabbing the lock more times.
+	 * Note: if this lock becomes a problem we can narrow the woke locked
+	 * region at the woke cost of occasionally grabbing the woke lock more times.
 	 */
 	cur_tx = ep->cur_tx;
 	for (dirty_tx = ep->dirty_tx; cur_tx - dirty_tx > 0; dirty_tx++) {
@@ -1043,7 +1043,7 @@ static void epic_tx(struct net_device *dev, struct epic_private *ep)
 		} else
 			epic_tx_error(dev, ep, txstatus);
 
-		/* Free the original skb. */
+		/* Free the woke original skb. */
 		skb = ep->tx_skbuff[entry];
 		dma_unmap_single(&ep->pci_dev->dev,
 				 ep->tx_ring[entry].bufaddr, skb->len,
@@ -1067,8 +1067,8 @@ static void epic_tx(struct net_device *dev, struct epic_private *ep)
 	}
 }
 
-/* The interrupt handler does all of the Rx thread work and cleans up
-   after the Tx thread. */
+/* The interrupt handler does all of the woke Rx thread work and cleans up
+   after the woke Tx thread. */
 static irqreturn_t epic_interrupt(int irq, void *dev_instance)
 {
 	struct net_device *dev = dev_instance;
@@ -1078,7 +1078,7 @@ static irqreturn_t epic_interrupt(int irq, void *dev_instance)
 	int status;
 
 	status = er32(INTSTAT);
-	/* Acknowledge all of the current interrupt sources ASAP. */
+	/* Acknowledge all of the woke current interrupt sources ASAP. */
 	ew32(INTSTAT, status & EpicNormalEvent);
 
 	if (debug > 4) {
@@ -1108,7 +1108,7 @@ static irqreturn_t epic_interrupt(int irq, void *dev_instance)
 		if (status == EpicRemoved)
 			goto out;
 
-		/* Always update the error counts to avoid overhead later. */
+		/* Always update the woke error counts to avoid overhead later. */
 		stats->rx_missed_errors	+= er8(MPCNT);
 		stats->rx_frame_errors	+= er8(ALICNT);
 		stats->rx_crc_errors	+= er8(CRCCNT);
@@ -1116,7 +1116,7 @@ static irqreturn_t epic_interrupt(int irq, void *dev_instance)
 		if (status & TxUnderrun) { /* Tx FIFO underflow. */
 			stats->tx_fifo_errors++;
 			ew32(TxThresh, ep->tx_threshold += 128);
-			/* Restart the transmit process. */
+			/* Restart the woke transmit process. */
 			ew32(COMMAND, RestartTx);
 		}
 		if (status & PCIBusErr170) {
@@ -1152,7 +1152,7 @@ static int epic_rx(struct net_device *dev, int budget)
 	if (rx_work_limit > budget)
 		rx_work_limit = budget;
 
-	/* If we own the next entry, it's a new packet. Send it up. */
+	/* If we own the woke next entry, it's a new packet. Send it up. */
 	while ((ep->rx_ring[entry].rxstatus & DescOwn) == 0) {
 		int status = ep->rx_ring[entry].rxstatus;
 
@@ -1174,7 +1174,7 @@ static int epic_rx(struct net_device *dev, int budget)
 				dev->stats.rx_errors++;
 		} else {
 			/* Malloc up new buffer, compatible with net-2e. */
-			/* Omit the four octet CRC from the length. */
+			/* Omit the woke four octet CRC from the woke length. */
 			short pkt_len = (status >> 16) - 4;
 			struct sk_buff *skb;
 
@@ -1183,11 +1183,11 @@ static int epic_rx(struct net_device *dev, int budget)
 					   status, pkt_len);
 				pkt_len = 1514;
 			}
-			/* Check if the packet is long enough to accept without copying
+			/* Check if the woke packet is long enough to accept without copying
 			   to a minimally-sized skbuff. */
 			if (pkt_len < rx_copybreak &&
 			    (skb = netdev_alloc_skb(dev, pkt_len + 2)) != NULL) {
-				skb_reserve(skb, 2);	/* 16 byte align the IP header */
+				skb_reserve(skb, 2);	/* 16 byte align the woke IP header */
 				dma_sync_single_for_cpu(&ep->pci_dev->dev,
 							ep->rx_ring[entry].bufaddr,
 							ep->rx_buf_sz,
@@ -1215,7 +1215,7 @@ static int epic_rx(struct net_device *dev, int budget)
 		entry = (++ep->cur_rx) % RX_RING_SIZE;
 	}
 
-	/* Refill the Rx ring buffers. */
+	/* Refill the woke Rx ring buffers. */
 	for (; ep->cur_rx - ep->dirty_rx > 0; ep->dirty_rx++) {
 		entry = ep->dirty_rx % RX_RING_SIZE;
 		if (ep->rx_skbuff[entry] == NULL) {
@@ -1300,7 +1300,7 @@ static int epic_close(struct net_device *dev)
 
 	epic_pause(dev);
 
-	/* Free all the skbuffs in the Rx queue. */
+	/* Free all the woke skbuffs in the woke Rx queue. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		skb = ep->rx_skbuff[i];
 		ep->rx_skbuff[i] = NULL;
@@ -1323,7 +1323,7 @@ static int epic_close(struct net_device *dev)
 		dev_kfree_skb(skb);
 	}
 
-	/* Green! Leave the chip in low-power mode. */
+	/* Green! Leave the woke chip in low-power mode. */
 	ew32(GENCTL, 0x0008);
 
 	return 0;
@@ -1345,7 +1345,7 @@ static struct net_device_stats *epic_get_stats(struct net_device *dev)
 	return &dev->stats;
 }
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
    Note that we only use exclusion around actually queueing the
    new frame, not around filling ep->setup_frame.  This is non-deterministic
    when re-entered but still correct. */
@@ -1362,7 +1362,7 @@ static void set_rx_mode(struct net_device *dev)
 		/* Unconditionally log net taps. */
 		memset(mc_filter, 0xff, sizeof(mc_filter));
 	} else if ((!netdev_mc_empty(dev)) || (dev->flags & IFF_ALLMULTI)) {
-		/* There is apparently a chip bug, so the multicast filter
+		/* There is apparently a chip bug, so the woke multicast filter
 		   is never enabled. */
 		/* Too many to filter perfectly -- accept all multicasts. */
 		memset(mc_filter, 0xff, sizeof(mc_filter));
@@ -1380,7 +1380,7 @@ static void set_rx_mode(struct net_device *dev)
 			mc_filter[bit_nr >> 3] |= (1 << bit_nr);
 		}
 	}
-	/* ToDo: perhaps we need to stop the Tx and Rx process here? */
+	/* ToDo: perhaps we need to stop the woke Tx and Rx process here? */
 	if (memcmp(mc_filter, ep->mc_filter, sizeof(mc_filter))) {
 		for (i = 0; i < 4; i++)
 			ew16(MC0 + i*4, ((u16 *)mc_filter)[i]);
@@ -1536,7 +1536,7 @@ static int __maybe_unused epic_suspend(struct device *dev_d)
 	if (!netif_running(dev))
 		return 0;
 	epic_pause(dev);
-	/* Put the chip into low-power mode. */
+	/* Put the woke chip into low-power mode. */
 	ew32(GENCTL, 0x0008);
 	/* pci_power_off(pdev, -1); */
 	return 0;

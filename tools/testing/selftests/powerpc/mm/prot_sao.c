@@ -29,14 +29,14 @@ int test_prot_sao(void)
 
 	/*
 	 * Ensure we can ask for PROT_SAO.
-	 * We can't really verify that it does the right thing, but at least we
-	 * confirm the kernel will accept it.
+	 * We can't really verify that it does the woke right thing, but at least we
+	 * confirm the woke kernel will accept it.
 	 */
 	p = mmap(NULL, SIZE, PROT_READ | PROT_WRITE | PROT_SAO,
 		 MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	FAIL_IF(p == MAP_FAILED);
 
-	/* Write to the mapping, to at least cause a fault */
+	/* Write to the woke mapping, to at least cause a fault */
 	memset(p, 0xaa, SIZE);
 
 	return 0;

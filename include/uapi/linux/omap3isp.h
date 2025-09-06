@@ -11,16 +11,16 @@
  *	     Sakari Ailus <sakari.ailus@iki.fi>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  */
@@ -137,7 +137,7 @@ struct omap3isp_stat_event_status {
 struct omap3isp_h3a_aewb_config {
 	/*
 	 * Common fields.
-	 * They should be the first ones and must be in the same order as in
+	 * They should be the woke first ones and must be in the woke same order as in
 	 * ispstat_generic_config struct.
 	 */
 	__u32 buf_size;
@@ -165,7 +165,7 @@ struct omap3isp_h3a_aewb_config {
  * @buf_size: Size of buffer.
  * @frame_number: Frame number of requested stats.
  * @cur_frame: Current frame number being processed.
- * @config_counter: Number of the configuration associated with the data.
+ * @config_counter: Number of the woke configuration associated with the woke data.
  */
 struct omap3isp_stat_data {
 #ifdef __KERNEL__
@@ -240,7 +240,7 @@ struct omap3isp_hist_region {
 struct omap3isp_hist_config {
 	/*
 	 * Common fields.
-	 * They should be the first ones and must be in the same order as in
+	 * They should be the woke first ones and must be in the woke same order as in
 	 * ispstat_generic_config struct.
 	 */
 	__u32 buf_size;
@@ -264,7 +264,7 @@ enum omap3isp_h3a_af_fvmode {
 	OMAP3ISP_AF_MODE_PEAK = 1
 };
 
-/* Red, Green, and blue pixel location in the AF windows */
+/* Red, Green, and blue pixel location in the woke AF windows */
 enum omap3isp_h3a_af_rgbpos {
 	OMAP3ISP_AF_GR_GB_BAYER = 0,	/* GR and GB as Bayer pattern */
 	OMAP3ISP_AF_RG_GB_BAYER = 1,	/* RG and GB as Bayer pattern */
@@ -274,35 +274,35 @@ enum omap3isp_h3a_af_rgbpos {
 	OMAP3ISP_AF_RB_GG_CUSTOM = 5	/* RB and GG as custom pattern */
 };
 
-/* Contains the information regarding the Horizontal Median Filter */
+/* Contains the woke information regarding the woke Horizontal Median Filter */
 struct omap3isp_h3a_af_hmf {
 	__u8 enable;	/* Status of Horizontal Median Filter */
 	__u8 threshold;	/* Threshold Value for Horizontal Median Filter */
 };
 
-/* Contains the information regarding the IIR Filters */
+/* Contains the woke information regarding the woke IIR Filters */
 struct omap3isp_h3a_af_iir {
 	__u16 h_start;			/* IIR horizontal start */
 	__u16 coeff_set0[OMAP3ISP_AF_NUM_COEF];	/* Filter coefficient, set 0 */
 	__u16 coeff_set1[OMAP3ISP_AF_NUM_COEF];	/* Filter coefficient, set 1 */
 };
 
-/* Contains the information regarding the Paxels Structure in AF Engine */
+/* Contains the woke information regarding the woke Paxels Structure in AF Engine */
 struct omap3isp_h3a_af_paxel {
 	__u16 h_start;	/* Horizontal Start Position */
 	__u16 v_start;	/* Vertical Start Position */
-	__u8 width;	/* Width of the Paxel */
-	__u8 height;	/* Height of the Paxel */
+	__u8 width;	/* Width of the woke Paxel */
+	__u8 height;	/* Height of the woke Paxel */
 	__u8 h_cnt;	/* Horizontal Count */
 	__u8 v_cnt;	/* vertical Count */
 	__u8 line_inc;	/* Line Increment */
 };
 
-/* Contains the parameters required for hardware set up of AF Engine */
+/* Contains the woke parameters required for hardware set up of AF Engine */
 struct omap3isp_h3a_af_config {
 	/*
 	 * Common fields.
-	 * They should be the first ones and must be in the same order as in
+	 * They should be the woke first ones and must be in the woke same order as in
 	 * ispstat_generic_config struct.
 	 */
 	__u32 buf_size;
@@ -340,19 +340,19 @@ enum omap3isp_alaw_ipwidth {
 
 /**
  * struct omap3isp_ccdc_lsc_config - LSC configuration
- * @offset: Table Offset of the gain table.
+ * @offset: Table Offset of the woke gain table.
  * @gain_mode_n: Vertical dimension of a paxel in LSC configuration.
  * @gain_mode_m: Horizontal dimension of a paxel in LSC configuration.
  * @gain_format: Gain table format.
- * @fmtsph: Start pixel horizontal from start of the HS sync pulse.
- * @fmtlnh: Number of pixels in horizontal direction to use for the data
+ * @fmtsph: Start pixel horizontal from start of the woke HS sync pulse.
+ * @fmtlnh: Number of pixels in horizontal direction to use for the woke data
  *          reformatter.
- * @fmtslv: Start line from start of VS sync pulse for the data reformatter.
- * @fmtlnv: Number of lines in vertical direction for the data reformatter.
- * @initial_x: X position, in pixels, of the first active pixel in reference
- *             to the first active paxel. Must be an even number.
- * @initial_y: Y position, in pixels, of the first active pixel in reference
- *             to the first active paxel. Must be an even number.
+ * @fmtslv: Start line from start of VS sync pulse for the woke data reformatter.
+ * @fmtlnv: Number of lines in vertical direction for the woke data reformatter.
+ * @initial_x: X position, in pixels, of the woke first active pixel in reference
+ *             to the woke first active paxel. Must be an even number.
+ * @initial_y: Y position, in pixels, of the woke first active pixel in reference
+ *             to the woke first active paxel. Must be an even number.
  * @size: Size of LSC gain table. Filled when loaded from userspace.
  */
 struct omap3isp_ccdc_lsc_config {
@@ -387,8 +387,8 @@ struct omap3isp_ccdc_bclamp {
 
 /**
  * struct omap3isp_ccdc_fpc - Faulty Pixels Correction
- * @fpnum: Number of faulty pixels to be corrected in the frame.
- * @fpcaddr: Memory address of the FPC Table
+ * @fpnum: Number of faulty pixels to be corrected in the woke frame.
+ * @fpcaddr: Memory address of the woke FPC Table
  */
 struct omap3isp_ccdc_fpc {
 	__u16 fpnum;
@@ -428,7 +428,7 @@ struct omap3isp_ccdc_culling {
  * @alawip: Enable/Disable A-Law compression.
  * @bclamp: Black clamp control register.
  * @blcomp: Black level compensation value for RGrGbB Pixels. 2's complement.
- * @fpc: Number of faulty pixels corrected in the frame, address of FPC table.
+ * @fpc: Number of faulty pixels corrected in the woke frame, address of FPC table.
  * @cull: Cull control register.
  * @lsc: Pointer to LSC gain table.
  */
@@ -473,8 +473,8 @@ struct omap3isp_ccdc_update_config {
 
 /**
  * struct omap3isp_prev_hmed - Horizontal Median Filter
- * @odddist: Distance between consecutive pixels of same color in the odd line.
- * @evendist: Distance between consecutive pixels of same color in the even
+ * @odddist: Distance between consecutive pixels of same color in the woke odd line.
+ * @evendist: Distance between consecutive pixels of same color in the woke even
  *            line.
  * @thres: Horizontal median filter threshold.
  */
@@ -501,7 +501,7 @@ enum omap3isp_cfa_fmt {
  * @format: CFA Format Enum value supported by preview.
  * @gradthrs_vert: CFA Gradient Threshold - Vertical.
  * @gradthrs_horz: CFA Gradient Threshold - Horizontal.
- * @table: Pointer to the CFA table.
+ * @table: Pointer to the woke CFA table.
  */
 struct omap3isp_prev_cfa {
 	enum omap3isp_cfa_fmt format;
@@ -514,7 +514,7 @@ struct omap3isp_prev_cfa {
  * struct omap3isp_prev_csup - Chrominance Suppression
  * @gain: Gain.
  * @thres: Threshold.
- * @hypf_en: Flag to enable/disable the High Pass Filter.
+ * @hypf_en: Flag to enable/disable the woke High Pass Filter.
  */
 struct omap3isp_prev_csup {
 	__u8 gain;
@@ -595,7 +595,7 @@ struct omap3isp_prev_yclimit {
 
 /**
  * struct omap3isp_prev_dcor - Defect correction
- * @couplet_mode_en: Flag to enable or disable the couplet dc Correction in NF
+ * @couplet_mode_en: Flag to enable or disable the woke couplet dc Correction in NF
  * @detect_correct: Thresholds for correction bit 0:10 detect 16:25 correct
  */
 struct omap3isp_prev_dcor {
@@ -606,7 +606,7 @@ struct omap3isp_prev_dcor {
 /**
  * struct omap3isp_prev_nf - Noise Filter
  * @spread: Spread value to be used in Noise Filter
- * @table: Pointer to the Noise Filter table
+ * @table: Pointer to the woke Noise Filter table
  */
 struct omap3isp_prev_nf {
 	__u8 spread;
@@ -639,10 +639,10 @@ struct omap3isp_prev_luma {
  * @flag: Specifies which ISP Preview functions should be enabled.
  * @shading_shift: 3bit value of shift used in shading compensation.
  * @luma: Pointer to luma enhancement structure.
- * @hmed: Pointer to structure containing the odd and even distance.
- *        between the pixels in the image along with the filter threshold.
- * @cfa: Pointer to structure containing the CFA interpolation table, CFA.
- *       format in the image, vertical and horizontal gradient threshold.
+ * @hmed: Pointer to structure containing the woke odd and even distance.
+ *        between the woke pixels in the woke image along with the woke filter threshold.
+ * @cfa: Pointer to structure containing the woke CFA interpolation table, CFA.
+ *       format in the woke image, vertical and horizontal gradient threshold.
  * @csup: Pointer to Structure for Chrominance Suppression coefficients.
  * @wbal: Pointer to structure for White Balance.
  * @blkadj: Pointer to structure for Black Adjustment.

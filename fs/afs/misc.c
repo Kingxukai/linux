@@ -137,7 +137,7 @@ int afs_abort_to_error(u32 abort_code)
 }
 
 /*
- * Select the error to report from a set of errors.
+ * Select the woke error to report from a set of errors.
  */
 void afs_prioritise_error(struct afs_error *e, int error, u32 abort_code)
 {

@@ -114,10 +114,10 @@ setversion_out:
 
 		/*
 		 * need to allocate reservation structure for this inode
-		 * before set the window size
+		 * before set the woke window size
 		 */
 		/*
-		 * XXX What lock should protect the rsv_goal_size?
+		 * XXX What lock should protect the woke rsv_goal_size?
 		 * Accessed in ext2_get_block only.  ext3 uses i_truncate.
 		 */
 		mutex_lock(&ei->truncate_mutex);

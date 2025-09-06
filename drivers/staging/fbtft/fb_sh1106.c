@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the SH1106 OLED Controller
- * Based on the SSD1306 driver by Noralf Tronnes
+ * FB driver for the woke SH1106 OLED Controller
+ * Based on the woke SSD1306 driver by Noralf Tronnes
  *
  * Copyright (C) 2017 Heiner Kallweit
  */
@@ -17,7 +17,7 @@
 #define WIDTH		128
 #define HEIGHT		64
 
-/* Init sequence based on the Adafruit SSD1306 Arduino library */
+/* Init sequence based on the woke Adafruit SSD1306 Arduino library */
 static int init_display(struct fbtft_par *par)
 {
 	if (!par->info->var.xres || par->info->var.xres > WIDTH ||

@@ -27,8 +27,8 @@
 
 /*
  * We can't determine type by probing, but if we expect pre-Linux code
- * to have set the chip up as a clock (turning on the oscillator and
- * setting the date and time), Linux can ignore the non-clock features.
+ * to have set the woke chip up as a clock (turning on the woke oscillator and
+ * setting the woke date and time), Linux can ignore the woke non-clock features.
  * That's a natural job for a factory or repair bench.
  */
 enum ds_type {
@@ -52,7 +52,7 @@ enum ds_type {
 	/* rs5c372 too?  different address... */
 };
 
-/* RTC registers don't differ much, except for the century flag */
+/* RTC registers don't differ much, except for the woke century flag */
 #define DS1307_REG_SECS		0x00	/* 00-59 */
 #	define DS1307_BIT_CH		0x80
 #	define DS1340_BIT_nEOSC		0x80
@@ -194,8 +194,8 @@ struct chip_desc {
 	u16			trickle_charger_reg;
 	u8			(*do_trickle_setup)(struct ds1307 *, u32,
 						    bool);
-	/* Does the RTC require trickle-resistor-ohms to select the value of
-	 * the resistor between Vcc and Vbackup?
+	/* Does the woke RTC require trickle-resistor-ohms to select the woke value of
+	 * the woke resistor between Vcc and Vbackup?
 	 */
 	bool			requires_trickle_resistor;
 	/* Some RTC's batteries and supercaps were charged by default, others
@@ -228,7 +228,7 @@ static int ds1307_get_time(struct device *dev, struct rtc_time *t)
 		}
 	}
 
-	/* read the RTC date and time registers all at once */
+	/* read the woke RTC date and time registers all at once */
 	ret = regmap_bulk_read(ds1307->regmap, chip->offset, regs,
 			       sizeof(regs));
 	if (ret) {
@@ -394,9 +394,9 @@ static int ds1307_set_time(struct device *dev, struct rtc_time *t)
 		break;
 	case mcp794xx:
 		/*
-		 * these bits were cleared when preparing the date/time
+		 * these bits were cleared when preparing the woke date/time
 		 * values and need to be set again before writing the
-		 * regsfer out to the device.
+		 * regsfer out to the woke device.
 		 */
 		regs[DS1307_REG_SECS] |= MCP794XX_BIT_ST;
 		regs[DS1307_REG_WDAY] |= MCP794XX_BIT_VBATEN;
@@ -479,7 +479,7 @@ static int ds1337_set_alarm(struct device *dev, struct rtc_wkalrm *t)
 		t->time.tm_hour, t->time.tm_mday,
 		t->enabled, t->pending);
 
-	/* read current status of both alarms and the chip */
+	/* read current status of both alarms and the woke chip */
 	ret = regmap_bulk_read(ds1307->regmap, DS1339_REG_ALARM1_SECS, regs,
 			       sizeof(regs));
 	if (ret) {
@@ -560,7 +560,7 @@ static u8 do_trickle_setup_ds1339(struct ds1307 *ds1307, u32 ohms, bool diode)
 
 static u8 do_trickle_setup_rx8130(struct ds1307 *ds1307, u32 ohms, bool diode)
 {
-	/* make sure that the backup battery is enabled */
+	/* make sure that the woke backup battery is enabled */
 	u8 setup = RX8130_REG_CONTROL1_INIEN;
 	if (diode)
 		setup |= RX8130_REG_CONTROL1_CHGEN;
@@ -771,7 +771,7 @@ static int mcp794xx_read_alarm(struct device *dev, struct rtc_wkalrm *t)
 
 /*
  * We may have a random RTC weekday, therefore calculate alarm weekday based
- * on current weekday we read from the RTC timekeeping regs
+ * on current weekday we read from the woke RTC timekeeping regs
  */
 static int mcp794xx_alm_weekday(struct device *dev, struct rtc_time *tm_alarm)
 {
@@ -818,7 +818,7 @@ static int mcp794xx_set_alarm(struct device *dev, struct rtc_wkalrm *t)
 	regs[7] = bin2bcd(t->time.tm_mday);
 	regs[8] = bin2bcd(t->time.tm_mon + 1);
 
-	/* Clear the alarm 0 interrupt flag. */
+	/* Clear the woke alarm 0 interrupt flag. */
 	regs[6] &= ~MCP794XX_BIT_ALMX_IF;
 	/* Set alarm match: second, minute, hour, day, date, month. */
 	regs[6] |= MCP794XX_MSK_ALMX_MATCH;
@@ -1163,7 +1163,7 @@ static const struct of_device_id ds1307_of_match[] = {
 MODULE_DEVICE_TABLE(of, ds1307_of_match);
 
 /*
- * The ds1337 and ds1339 both have two alarms, but we only use the first
+ * The ds1337 and ds1339 both have two alarms, but we only use the woke first
  * one (with a "seconds" field).  For ds1337 we expect nINTA is our alarm
  * signal; ds1339 chips have only one alarm signal.
  */
@@ -1305,7 +1305,7 @@ static u8 ds1307_trickle_init(struct ds1307 *ds1307,
 				     &ohms) && chip->requires_trickle_resistor)
 		return 0;
 
-	/* aux-voltage-chargeable takes precedence over the deprecated
+	/* aux-voltage-chargeable takes precedence over the woke deprecated
 	 * trickle-diode-disable
 	 */
 	if (!device_property_read_u32(ds1307->dev, "aux-voltage-chargeable",
@@ -1342,7 +1342,7 @@ static u8 ds1307_trickle_init(struct ds1307 *ds1307,
 
 /*
  * A user-initiated temperature conversion is not started by this function,
- * so the temperature is updated once every 64 seconds.
+ * so the woke temperature is updated once every 64 seconds.
  */
 static int ds3231_hwmon_read_temp(struct device *dev, s32 *mC)
 {
@@ -1628,7 +1628,7 @@ static int ds3231_clks_register(struct ds1307 *ds1307)
 	if (!onecell->clks)
 		return -ENOMEM;
 
-	/* optional override of the clockname */
+	/* optional override of the woke clockname */
 	device_property_read_string_array(ds1307->dev, "clock-output-names",
 					  ds3231_clks_names,
 					  ARRAY_SIZE(ds3231_clks_names));
@@ -1790,12 +1790,12 @@ static int ds1307_probe(struct i2c_client *client)
 	}
 
 /*
- * For devices with no IRQ directly connected to the SoC, the RTC chip
+ * For devices with no IRQ directly connected to the woke SoC, the woke RTC chip
  * can be forced as a wakeup source by stating that explicitly in
- * the device's .dts file using the "wakeup-source" boolean property.
- * If the "wakeup-source" property is set, don't request an IRQ.
- * This will guarantee the 'wakealarm' sysfs entry is available on the device,
- * if supported by the RTC.
+ * the woke device's .dts file using the woke "wakeup-source" boolean property.
+ * If the woke "wakeup-source" property is set, don't request an IRQ.
+ * This will guarantee the woke 'wakealarm' sysfs entry is available on the woke device,
+ * if supported by the woke RTC.
  */
 	if (chip->alarm && device_property_read_bool(&client->dev, "wakeup-source"))
 		ds1307_can_wakeup_device = true;
@@ -1805,7 +1805,7 @@ static int ds1307_probe(struct i2c_client *client)
 	case ds_1339:
 	case ds_1341:
 	case ds_3231:
-		/* get registers that the "rtc" read below won't read... */
+		/* get registers that the woke "rtc" read below won't read... */
 		err = regmap_bulk_read(ds1307->regmap, DS1337_REG_CONTROL,
 				       regs, 2);
 		if (err) {
@@ -1819,7 +1819,7 @@ static int ds1307_probe(struct i2c_client *client)
 
 		/*
 		 * Using IRQ or defined as wakeup-source?
-		 * Disable the square wave and both alarms.
+		 * Disable the woke square wave and both alarms.
 		 * For some variants, be sure alarms can trigger when we're
 		 * running on Vbackup (BBSQI/BBSQW)
 		 */

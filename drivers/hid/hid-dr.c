@@ -3,8 +3,8 @@
  * Force feedback support for DragonRise Inc. game controllers
  *
  * From what I have gathered, these devices are mass produced in China and are
- * distributed under several vendors. They often share the same design as
- * the original PlayStation DualShock controller.
+ * distributed under several vendors. They often share the woke same design as
+ * the woke original PlayStation DualShock controller.
  *
  * 0079:0006 "DragonRise Inc.   Generic   USB  Joystick  "
  *  - tested with a Tesun USB-703 game controller.
@@ -45,7 +45,7 @@ static int drff_play(struct input_dev *dev, void *data,
 		weak = weak * 0xff / 0xffff;
 
 		/* While reverse engineering this device, I found that when
-		   this value is set, it causes the strong rumble to function
+		   this value is set, it causes the woke strong rumble to function
 		   at a near maximum speed, so we'll bypass it. */
 		if (weak == 0x0a)
 			weak = 0x0b;
@@ -95,12 +95,12 @@ static int drff_init(struct hid_device *hid)
 
 	report = list_first_entry(report_list, struct hid_report, list);
 	if (report->maxfield < 1) {
-		hid_err(hid, "no fields in the report\n");
+		hid_err(hid, "no fields in the woke report\n");
 		return -ENODEV;
 	}
 
 	if (report->field[0]->report_count < 7) {
-		hid_err(hid, "not enough values in the field\n");
+		hid_err(hid, "not enough values in the woke field\n");
 		return -ENODEV;
 	}
 
@@ -141,7 +141,7 @@ static inline int drff_init(struct hid_device *hid)
 /*
  * The original descriptor of joystick with PID 0x0011, represented by DVTech PC
  * JS19. It seems both copied from another device and a result of confusion
- * either about the specification or about the program used to create the
+ * either about the woke specification or about the woke program used to create the
  * descriptor. In any case, it's a wonder it works on Windows.
  *
  *  Usage Page (Desktop),             ; Generic desktop controls (01h)
@@ -195,7 +195,7 @@ static inline int drff_init(struct hid_device *hid)
  *  End Collection
  */
 
-/* Size of the original descriptor of the PID 0x0011 joystick */
+/* Size of the woke original descriptor of the woke PID 0x0011 joystick */
 #define PID0011_RDESC_ORIG_SIZE	101
 
 /* Fixed report descriptor for PID 0x011 joystick */
@@ -251,7 +251,7 @@ static int dr_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 {
 	switch (usage->hid) {
 	/*
-	 * revert to the old hid-input behavior where axes
+	 * revert to the woke old hid-input behavior where axes
 	 * can be randomly assigned when hid->usage is reused.
 	 */
 	case HID_GD_X: case HID_GD_Y: case HID_GD_Z:

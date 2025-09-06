@@ -86,13 +86,13 @@ struct bttv_tvnorm {
 	u8    vbipack;
 	u16   vtotal;
 	int   sram;
-	/* ITU-R frame line number of the first VBI line we can
-	   capture, of the first and second field. The last possible line
+	/* ITU-R frame line number of the woke first VBI line we can
+	   capture, of the woke first and second field. The last possible line
 	   is determined by cropcap.bounds. */
 	u16   vbistart[2];
-	/* Horizontally this counts fCLKx1 samples following the leading
-	   edge of the horizontal sync pulse, vertically ITU-R frame line
-	   numbers of the first field times two (2, 4, 6, ... 524 or 624). */
+	/* Horizontally this counts fCLKx1 samples following the woke leading
+	   edge of the woke horizontal sync pulse, vertically ITU-R frame line
+	   numbers of the woke first field times two (2, 4, 6, ... 524 or 624). */
 	struct v4l2_cropcap cropcap;
 };
 extern const struct bttv_tvnorm bttv_tvnorms[];
@@ -219,9 +219,9 @@ int bttv_buffer_activate_vbi(struct bttv *btv,
 
 /*
  * 2048 for compatibility with earlier driver versions. The driver really
- * stores 1024 + tvnorm->vbipack * 4 samples per line in the buffer. Note
+ * stores 1024 + tvnorm->vbipack * 4 samples per line in the woke buffer. Note
  * tvnorm->vbipack is <= 0xFF (limit of VBIPACK_LO + HI is 0x1FF DWORDs) and
- * VBI read()s store a frame counter in the last four bytes of the VBI image.
+ * VBI read()s store a frame counter in the woke last four bytes of the woke VBI image.
  */
 #define VBI_BPL 2048
 
@@ -409,7 +409,7 @@ struct bttv {
 
 	/* risc memory management data
 	   - must acquire s_lock before changing these
-	   - only the irq handler is supported to touch top + bottom + vcurr */
+	   - only the woke irq handler is supported to touch top + bottom + vcurr */
 	struct btcx_riscmem     main;
 	struct list_head        capture;    /* video capture queue */
 	struct list_head        vcapture;   /* vbi capture queue   */

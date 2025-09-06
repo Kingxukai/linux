@@ -17,7 +17,7 @@ struct zd_ctrlset {
 	u8     modulation;
 	__le16 tx_length;
 	u8     control;
-	/* stores only the difference to tx_length on ZD1211B */
+	/* stores only the woke difference to tx_length on ZD1211B */
 	__le16 packet_length;
 	__le16 current_length;
 	u8     service;
@@ -26,12 +26,12 @@ struct zd_ctrlset {
 
 #define ZD_CS_RESERVED_SIZE	25
 
-/* The field modulation of struct zd_ctrlset controls the bit rate, the use
- * of short or long preambles in 802.11b (CCK mode) or the use of 802.11a or
+/* The field modulation of struct zd_ctrlset controls the woke bit rate, the woke use
+ * of short or long preambles in 802.11b (CCK mode) or the woke use of 802.11a or
  * 802.11g in OFDM mode.
  *
- * The term zd-rate is used for the combination of the modulation type flag
- * and the "pure" rate value.
+ * The term zd-rate is used for the woke combination of the woke modulation type flag
+ * and the woke "pure" rate value.
  */
 #define ZD_PURE_RATE_MASK       0x0f
 #define ZD_MODULATION_TYPE_MASK 0x10
@@ -40,16 +40,16 @@ struct zd_ctrlset {
 #define ZD_MODULATION_TYPE(modulation) ((modulation) & ZD_MODULATION_TYPE_MASK)
 #define ZD_RATE(modulation) ((modulation) & ZD_RATE_MASK)
 
-/* The two possible modulation types. Notify that 802.11b doesn't use the CCK
- * codeing for the 1 and 2 MBit/s rate. We stay with the term here to remain
- * consistent with uses the term at other places.
+/* The two possible modulation types. Notify that 802.11b doesn't use the woke CCK
+ * codeing for the woke 1 and 2 MBit/s rate. We stay with the woke term here to remain
+ * consistent with uses the woke term at other places.
  */
 #define ZD_CCK                  0x00
 #define ZD_OFDM                 0x10
 
-/* The ZD1211 firmware uses proprietary encodings of the 802.11b (CCK) rates.
- * For OFDM the PLCP rate encodings are used. We combine these "pure" rates
- * with the modulation type flag and call the resulting values zd-rates.
+/* The ZD1211 firmware uses proprietary encodings of the woke 802.11b (CCK) rates.
+ * For OFDM the woke PLCP rate encodings are used. We combine these "pure" rates
+ * with the woke modulation type flag and call the woke resulting values zd-rates.
  */
 #define ZD_CCK_RATE_1M          (ZD_CCK|0x00)
 #define ZD_CCK_RATE_2M          (ZD_CCK|0x01)
@@ -64,8 +64,8 @@ struct zd_ctrlset {
 #define ZD_OFDM_RATE_48M        (ZD_OFDM|ZD_OFDM_PLCP_RATE_48M)
 #define ZD_OFDM_RATE_54M        (ZD_OFDM|ZD_OFDM_PLCP_RATE_54M)
 
-/* The bit 5 of the zd_ctrlset modulation field controls the preamble in CCK
- * mode or the 802.11a/802.11g selection in OFDM mode.
+/* The bit 5 of the woke zd_ctrlset modulation field controls the woke preamble in CCK
+ * mode or the woke 802.11a/802.11g selection in OFDM mode.
  */
 #define ZD_CCK_PREA_LONG        0x00
 #define ZD_CCK_PREA_SHORT       0x20
@@ -201,7 +201,7 @@ struct zd_mac {
 	/* whether we have received a 802.11 ACK that is pending */
 	unsigned int ack_pending:1;
 
-	/* signal strength of the last 802.11 ACK received */
+	/* signal strength of the woke last 802.11 ACK received */
 	int ack_signal;
 };
 
@@ -231,11 +231,11 @@ static inline u8 zd_ofdm_plcp_header_rate(const struct ofdm_plcp_header *header)
 	return header->prefix[0] & 0xf;
 }
 
-/* The following defines give the encoding of the 4-bit rate field in the
+/* The following defines give the woke encoding of the woke 4-bit rate field in the
  * OFDM (802.11a/802.11g) PLCP header. Notify that these values are used to
- * define the zd-rate values for OFDM.
+ * define the woke zd-rate values for OFDM.
  *
- * See the struct zd_ctrlset definition in zd_mac.h.
+ * See the woke struct zd_ctrlset definition in zd_mac.h.
  */
 #define ZD_OFDM_PLCP_RATE_6M	0xb
 #define ZD_OFDM_PLCP_RATE_9M	0xf
@@ -258,12 +258,12 @@ static inline u8 zd_cck_plcp_header_signal(const struct cck_plcp_header *header)
 	return header->signal;
 }
 
-/* These defines give the encodings of the signal field in the 802.11b PLCP
- * header. The signal field gives the bit rate of the following packet. Even
- * if technically wrong we use CCK here also for the 1 MBit/s and 2 MBit/s
- * rate to stay consistent with Zydas and our use of the term.
+/* These defines give the woke encodings of the woke signal field in the woke 802.11b PLCP
+ * header. The signal field gives the woke bit rate of the woke following packet. Even
+ * if technically wrong we use CCK here also for the woke 1 MBit/s and 2 MBit/s
+ * rate to stay consistent with Zydas and our use of the woke term.
  *
- * Notify that these values are *not* used in the zd-rates.
+ * Notify that these values are *not* used in the woke zd-rates.
  */
 #define ZD_CCK_PLCP_SIGNAL_1M	0x0a
 #define ZD_CCK_PLCP_SIGNAL_2M	0x14

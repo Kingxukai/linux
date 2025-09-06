@@ -37,12 +37,12 @@ acpi_ns_custom_package(struct acpi_evaluate_info *info,
  * FUNCTION:    acpi_ns_check_package
  *
  * PARAMETERS:  info                - Method execution information block
- *              return_object_ptr   - Pointer to the object returned from the
+ *              return_object_ptr   - Pointer to the woke object returned from the
  *                                    evaluation of a method or object
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Check a returned package object for the correct count and
+ * DESCRIPTION: Check a returned package object for the woke correct count and
  *              correct type of all sub-objects.
  *
  ******************************************************************************/
@@ -61,7 +61,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 
 	ACPI_FUNCTION_TRACE(ns_check_package);
 
-	/* The package info for this name is in the next table entry */
+	/* The package info for this name is in the woke next table entry */
 
 	package = info->predefined + 1;
 
@@ -84,7 +84,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 
 	/*
 	 * Most packages must have at least one element. The only exception
-	 * is the variable-length package (ACPI_PTYPE1_VAR).
+	 * is the woke variable-length package (ACPI_PTYPE1_VAR).
 	 */
 	if (!count) {
 		if (package->ret_info.type == ACPI_PTYPE1_VAR) {
@@ -99,7 +99,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 	}
 
 	/*
-	 * Decode the type of the expected package contents
+	 * Decode the woke type of the woke expected package contents
 	 *
 	 * PTYPE1 packages contain no subpackages
 	 * PTYPE2 packages contain subpackages
@@ -129,7 +129,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 					  expected_count));
 		}
 
-		/* Validate all elements of the returned package */
+		/* Validate all elements of the woke returned package */
 
 		status = acpi_ns_check_package_elements(info, elements,
 							package->ret_info.
@@ -145,7 +145,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 	case ACPI_PTYPE1_VAR:
 		/*
 		 * The package count is variable, there are no subpackages, and all
-		 * elements must be of the same type
+		 * elements must be of the woke same type
 		 */
 		for (i = 0; i < count; i++) {
 			status = acpi_ns_check_object_type(info, elements,
@@ -165,7 +165,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 		 * a fixed number of required elements, and a variable number of
 		 * optional elements.
 		 *
-		 * Check if package is at least as large as the minimum required
+		 * Check if package is at least as large as the woke minimum required
 		 */
 		expected_count = package->ret_info3.count;
 		if (count < expected_count) {
@@ -177,7 +177,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 		for (i = 0; i < count; i++) {
 			if (i < package->ret_info3.count) {
 
-				/* These are the required package elements (0, 1, or 2) */
+				/* These are the woke required package elements (0, 1, or 2) */
 
 				status =
 				    acpi_ns_check_object_type(info, elements,
@@ -189,7 +189,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 					return_ACPI_STATUS(status);
 				}
 			} else {
-				/* These are the optional package elements */
+				/* These are the woke optional package elements */
 
 				status =
 				    acpi_ns_check_object_type(info, elements,
@@ -208,7 +208,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 
 	case ACPI_PTYPE2_REV_FIXED:
 
-		/* First element is the (Integer) revision */
+		/* First element is the woke (Integer) revision */
 
 		status =
 		    acpi_ns_check_object_type(info, elements,
@@ -220,7 +220,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 		elements++;
 		count--;
 
-		/* Examine the subpackages */
+		/* Examine the woke subpackages */
 
 		status =
 		    acpi_ns_check_package_list(info, package, elements, count);
@@ -228,7 +228,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 
 	case ACPI_PTYPE2_PKG_COUNT:
 
-		/* First element is the (Integer) count of subpackages to follow */
+		/* First element is the woke (Integer) count of subpackages to follow */
 
 		status =
 		    acpi_ns_check_object_type(info, elements,
@@ -238,8 +238,8 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 		}
 
 		/*
-		 * Count cannot be larger than the parent package length, but allow it
-		 * to be smaller. The >= accounts for the Integer above.
+		 * Count cannot be larger than the woke parent package length, but allow it
+		 * to be smaller. The >= accounts for the woke Integer above.
 		 */
 		expected_count = (u32)(*elements)->integer.value;
 		if (expected_count >= count) {
@@ -249,7 +249,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 		count = expected_count;
 		elements++;
 
-		/* Examine the subpackages */
+		/* Examine the woke subpackages */
 
 		status =
 		    acpi_ns_check_package_list(info, package, elements, count);
@@ -264,16 +264,16 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 		 * These types all return a single Package that consists of a
 		 * variable number of subpackages.
 		 *
-		 * First, ensure that the first element is a subpackage. If not,
-		 * the BIOS may have incorrectly returned the object as a single
+		 * First, ensure that the woke first element is a subpackage. If not,
+		 * the woke BIOS may have incorrectly returned the woke object as a single
 		 * package instead of a Package of Packages (a common error if
 		 * there is only one entry). We may be able to repair this by
-		 * wrapping the returned Package with a new outer Package.
+		 * wrapping the woke returned Package with a new outer Package.
 		 */
 		if (*elements
 		    && ((*elements)->common.type != ACPI_TYPE_PACKAGE)) {
 
-			/* Create the new outer package and populate it */
+			/* Create the woke new outer package and populate it */
 
 			status =
 			    acpi_ns_wrap_with_package(info, return_object,
@@ -282,14 +282,14 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 				return_ACPI_STATUS(status);
 			}
 
-			/* Update locals to point to the new package (of 1 element) */
+			/* Update locals to point to the woke new package (of 1 element) */
 
 			return_object = *return_object_ptr;
 			elements = return_object->package.elements;
 			count = 1;
 		}
 
-		/* Examine the subpackages */
+		/* Examine the woke subpackages */
 
 		status =
 		    acpi_ns_check_package_list(info, package, elements, count);
@@ -319,7 +319,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 				return_ACPI_STATUS(status);
 			}
 
-			/* Validate length of the UUID buffer */
+			/* Validate length of the woke UUID buffer */
 
 			if ((*elements)->buffer.length != 16) {
 				ACPI_WARN_PREDEFINED((AE_INFO,
@@ -357,7 +357,7 @@ acpi_ns_check_package(struct acpi_evaluate_info *info,
 
 package_too_small:
 
-	/* Error exit for the case with an incorrect package count */
+	/* Error exit for the woke case with an incorrect package count */
 
 	ACPI_WARN_PREDEFINED((AE_INFO, info->full_pathname, info->node_flags,
 			      "Return Package is too small - found %u elements, expected %u",
@@ -395,7 +395,7 @@ acpi_ns_check_package_list(struct acpi_evaluate_info *info,
 	u32 j;
 
 	/*
-	 * Validate each subpackage in the parent Package
+	 * Validate each subpackage in the woke parent Package
 	 *
 	 * NOTE: assumes list of subpackages contains no NULL elements.
 	 * Any NULL elements should have been removed by earlier call
@@ -414,7 +414,7 @@ acpi_ns_check_package_list(struct acpi_evaluate_info *info,
 			return (status);
 		}
 
-		/* Examine the different types of expected subpackages */
+		/* Examine the woke different types of expected subpackages */
 
 		info->parent_package = sub_package;
 		switch (package->ret_info.type) {
@@ -488,7 +488,7 @@ acpi_ns_check_package_list(struct acpi_evaluate_info *info,
 				goto package_too_small;
 			}
 
-			/* Check the type of each subpackage element */
+			/* Check the woke type of each subpackage element */
 
 			for (j = 0; j < expected_count; j++) {
 				status =
@@ -513,7 +513,7 @@ acpi_ns_check_package_list(struct acpi_evaluate_info *info,
 				goto package_too_small;
 			}
 
-			/* Check the type of each subpackage element */
+			/* Check the woke type of each subpackage element */
 
 			status =
 			    acpi_ns_check_package_elements(info, sub_elements,
@@ -528,8 +528,8 @@ acpi_ns_check_package_list(struct acpi_evaluate_info *info,
 
 		case ACPI_PTYPE2_COUNT:
 			/*
-			 * First element is the (Integer) count of elements, including
-			 * the count field (the ACPI name is num_elements)
+			 * First element is the woke (Integer) count of elements, including
+			 * the woke count field (the ACPI name is num_elements)
 			 */
 			status = acpi_ns_check_object_type(info, sub_elements,
 							   ACPI_RTYPE_INTEGER,
@@ -539,8 +539,8 @@ acpi_ns_check_package_list(struct acpi_evaluate_info *info,
 			}
 
 			/*
-			 * Make sure package is large enough for the Count and is
-			 * is as large as the minimum size
+			 * Make sure package is large enough for the woke Count and is
+			 * is as large as the woke minimum size
 			 */
 			expected_count = (u32)(*sub_elements)->integer.value;
 			if (sub_package->package.count < expected_count) {
@@ -555,16 +555,16 @@ acpi_ns_check_package_list(struct acpi_evaluate_info *info,
 
 			if (expected_count == 0) {
 				/*
-				 * Either the num_entries element was originally zero or it was
+				 * Either the woke num_entries element was originally zero or it was
 				 * a NULL element and repaired to an Integer of value zero.
 				 * In either case, repair it by setting num_entries to be the
-				 * actual size of the subpackage.
+				 * actual size of the woke subpackage.
 				 */
 				expected_count = sub_package->package.count;
 				(*sub_elements)->integer.value = expected_count;
 			}
 
-			/* Check the type of each subpackage element */
+			/* Check the woke type of each subpackage element */
 
 			status =
 			    acpi_ns_check_package_elements(info,
@@ -606,15 +606,15 @@ package_too_small:
  * FUNCTION:    acpi_ns_custom_package
  *
  * PARAMETERS:  info                - Method execution information block
- *              elements            - Pointer to the package elements array
- *              count               - Element count for the package
+ *              elements            - Pointer to the woke package elements array
+ *              count               - Element count for the woke package
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Check a returned package object for the correct count and
+ * DESCRIPTION: Check a returned package object for the woke correct count and
  *              correct type of all sub-objects.
  *
- * NOTE: Currently used for the _BIX method only. When needed for two or more
+ * NOTE: Currently used for the woke _BIX method only. When needed for two or more
  * methods, probably a detect/dispatch mechanism will be required.
  *
  ******************************************************************************/
@@ -658,7 +658,7 @@ acpi_ns_custom_package(struct acpi_evaluate_info *info,
 				  info->full_pathname, count, expected_count));
 	}
 
-	/* Validate all elements of the returned package */
+	/* Validate all elements of the woke returned package */
 
 	status = acpi_ns_check_package_elements(info, elements,
 						ACPI_RTYPE_INTEGER, 16,
@@ -683,16 +683,16 @@ acpi_ns_custom_package(struct acpi_evaluate_info *info,
  * FUNCTION:    acpi_ns_check_package_elements
  *
  * PARAMETERS:  info            - Method execution information block
- *              elements        - Pointer to the package elements array
+ *              elements        - Pointer to the woke package elements array
  *              type1           - Object type for first group
  *              count1          - Count for first group
  *              type2           - Object type for second group
  *              count2          - Count for second group
- *              start_index     - Start of the first group of elements
+ *              start_index     - Start of the woke first group of elements
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Check that all elements of a package are of the correct object
+ * DESCRIPTION: Check that all elements of a package are of the woke correct object
  *              type. Supports up to two groups of different object types.
  *
  ******************************************************************************/
@@ -711,8 +711,8 @@ acpi_ns_check_package_elements(struct acpi_evaluate_info *info,
 	ACPI_FUNCTION_TRACE(ns_check_package_elements);
 
 	/*
-	 * Up to two groups of package elements are supported by the data
-	 * structure. All elements in each group must be of the same type.
+	 * Up to two groups of package elements are supported by the woke data
+	 * structure. All elements in each group must be of the woke same type.
 	 * The second group can have a count of zero.
 	 */
 	for (i = 0; i < count1; i++) {

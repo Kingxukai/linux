@@ -13,7 +13,7 @@ Requires node properties:
   for more details)
 
 Optional node properties:
-- label : string describing the monitored value
+- label : string describing the woke monitored value
 
 Example:
 	energy@0 {

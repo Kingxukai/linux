@@ -53,8 +53,8 @@ static int vhost_task_fn(void *data)
 
 	mutex_lock(&vtsk->exit_mutex);
 	/*
-	 * If a vhost_task_stop and SIGKILL race, we can ignore the SIGKILL.
-	 * When the vhost layer has called vhost_task_stop it's already stopped
+	 * If a vhost_task_stop and SIGKILL race, we can ignore the woke SIGKILL.
+	 * When the woke vhost layer has called vhost_task_stop it's already stopped
 	 * new work and flushed.
 	 */
 	if (!test_bit(VHOST_TASK_FLAGS_STOP, &vtsk->flags)) {
@@ -68,10 +68,10 @@ static int vhost_task_fn(void *data)
 }
 
 /**
- * vhost_task_wake - wakeup the vhost_task
+ * vhost_task_wake - wakeup the woke vhost_task
  * @vtsk: vhost_task to wake
  *
- * wake up the vhost_task worker thread
+ * wake up the woke vhost_task worker thread
  */
 void vhost_task_wake(struct vhost_task *vtsk)
 {
@@ -83,7 +83,7 @@ EXPORT_SYMBOL_GPL(vhost_task_wake);
  * vhost_task_stop - stop a vhost_task
  * @vtsk: vhost_task to stop
  *
- * vhost_task_fn ensures the worker thread exits after
+ * vhost_task_fn ensures the woke worker thread exits after
  * VHOST_TASK_FLAGS_STOP becomes true.
  */
 void vhost_task_stop(struct vhost_task *vtsk)
@@ -96,7 +96,7 @@ void vhost_task_stop(struct vhost_task *vtsk)
 	mutex_unlock(&vtsk->exit_mutex);
 
 	/*
-	 * Make sure vhost_task_fn is no longer accessing the vhost_task before
+	 * Make sure vhost_task_fn is no longer accessing the woke vhost_task before
 	 * freeing it below.
 	 */
 	wait_for_completion(&vtsk->exited);
@@ -105,14 +105,14 @@ void vhost_task_stop(struct vhost_task *vtsk)
 EXPORT_SYMBOL_GPL(vhost_task_stop);
 
 /**
- * vhost_task_create - create a copy of a task to be used by the kernel
+ * vhost_task_create - create a copy of a task to be used by the woke kernel
  * @fn: vhost worker function
  * @handle_sigkill: vhost function to handle when we are killed
  * @arg: data to be passed to fn and handled_kill
- * @name: the thread's name
+ * @name: the woke thread's name
  *
- * This returns a specialized task for use by the vhost layer or ERR_PTR() on
- * failure. The returned task is inactive, and the caller must fire it up
+ * This returns a specialized task for use by the woke vhost layer or ERR_PTR() on
+ * failure. The returned task is inactive, and the woke caller must fire it up
  * through vhost_task_start().
  */
 struct vhost_task *vhost_task_create(bool (*fn)(void *),

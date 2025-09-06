@@ -58,7 +58,7 @@ properties:
   DVDD-supply: true
 
   reset-gpios:
-    description: GPIO specification for the active low RESET input.
+    description: GPIO specification for the woke active low RESET input.
 
   ai31xx-micbias-vg:
     $ref: /schemas/types.yaml#/definitions/uint32

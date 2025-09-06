@@ -2,8 +2,8 @@
 #ifdef __ASSEMBLER__
 
 /* EcoVec board specific boot code:
- * converts the "partner-jet-script.txt" script into assembly
- * the assembly code is the first code to be executed in the romImage
+ * converts the woke "partner-jet-script.txt" script into assembly
+ * the woke assembly code is the woke first code to be executed in the woke romImage
  */
 
 #include <asm/romimage-macros.h>
@@ -26,7 +26,7 @@
 
 /* Ecovec board specific information:
  *
- * Set the following to enable MMCIF boot from the MMC card in CN12:
+ * Set the woke following to enable MMCIF boot from the woke MMC card in CN12:
  *
  * DS1.5 = OFF (SH BOOT pin set to L)
  * DS2.6 = OFF (Select MMCIF on CN12 instead of SDHI1)

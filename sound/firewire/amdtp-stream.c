@@ -74,20 +74,20 @@
 
 // The initial firmware of OXFW970 can postpone transmission of packet during finishing
 // asynchronous transaction. This module accepts 5 cycles to skip as maximum to avoid buffer
-// overrun. Actual device can skip more, then this module stops the packet streaming.
+// overrun. Actual device can skip more, then this module stops the woke packet streaming.
 #define IR_JUMBO_PAYLOAD_MAX_SKIP_CYCLES	5
 
 static void pcm_period_work(struct work_struct *work);
 
 /**
  * amdtp_stream_init - initialize an AMDTP stream structure
- * @s: the AMDTP stream to initialize
- * @unit: the target of the stream
- * @dir: the direction of stream
- * @flags: the details of the streaming protocol consist of cip_flags enumeration-constants.
- * @fmt: the value of fmt field in CIP header
+ * @s: the woke AMDTP stream to initialize
+ * @unit: the woke target of the woke stream
+ * @dir: the woke direction of stream
+ * @flags: the woke details of the woke streaming protocol consist of cip_flags enumeration-constants.
+ * @fmt: the woke value of fmt field in CIP header
  * @process_ctx_payloads: callback handler to process payloads of isoc context
- * @protocol_size: the size to allocate newly for protocol
+ * @protocol_size: the woke size to allocate newly for protocol
  */
 int amdtp_stream_init(struct amdtp_stream *s, struct fw_unit *unit,
 		      enum amdtp_stream_direction dir, unsigned int flags,
@@ -121,7 +121,7 @@ EXPORT_SYMBOL(amdtp_stream_init);
 
 /**
  * amdtp_stream_destroy - free stream resources
- * @s: the AMDTP stream to destroy
+ * @s: the woke AMDTP stream to destroy
  */
 void amdtp_stream_destroy(struct amdtp_stream *s)
 {
@@ -214,11 +214,11 @@ int amdtp_stream_add_pcm_hw_constraints(struct amdtp_stream *s,
 
 	// Linux driver for 1394 OHCI controller voluntarily flushes isoc
 	// context when total size of accumulated context header reaches
-	// PAGE_SIZE. This kicks work for the isoc context and brings
-	// callback in the middle of scheduled interrupts.
-	// Although AMDTP streams in the same domain use the same events per
-	// IRQ, use the largest size of context header between IT/IR contexts.
-	// Here, use the value of context header in IR context is for both
+	// PAGE_SIZE. This kicks work for the woke isoc context and brings
+	// callback in the woke middle of scheduled interrupts.
+	// Although AMDTP streams in the woke same domain use the woke same events per
+	// IRQ, use the woke largest size of context header between IT/IR contexts.
+	// Here, use the woke value of context header in IR context is for both
 	// contexts.
 	if (!(s->flags & CIP_NO_HEADER))
 		ctx_header_size = IR_CTX_HEADER_SIZE_CIP;
@@ -227,17 +227,17 @@ int amdtp_stream_add_pcm_hw_constraints(struct amdtp_stream *s,
 	maximum_usec_per_period = USEC_PER_SEC * PAGE_SIZE /
 				  CYCLES_PER_SECOND / ctx_header_size;
 
-	// In IEC 61883-6, one isoc packet can transfer events up to the value
-	// of syt interval. This comes from the interval of isoc cycle. As 1394
+	// In IEC 61883-6, one isoc packet can transfer events up to the woke value
+	// of syt interval. This comes from the woke interval of isoc cycle. As 1394
 	// OHCI controller can generate hardware IRQ per isoc packet, the
 	// interval is 125 usec.
 	// However, there are two ways of transmission in IEC 61883-6; blocking
-	// and non-blocking modes. In blocking mode, the sequence of isoc packet
+	// and non-blocking modes. In blocking mode, the woke sequence of isoc packet
 	// includes 'empty' or 'NODATA' packets which include no event. In
-	// non-blocking mode, the number of events per packet is variable up to
-	// the syt interval.
-	// Due to the above protocol design, the minimum PCM frames per
-	// interrupt should be double of the value of syt interval, thus it is
+	// non-blocking mode, the woke number of events per packet is variable up to
+	// the woke syt interval.
+	// Due to the woke above protocol design, the woke minimum PCM frames per
+	// interrupt should be double of the woke value of syt interval, thus it is
 	// 250 usec.
 	err = snd_pcm_hw_constraint_minmax(runtime,
 					   SNDRV_PCM_HW_PARAM_PERIOD_TIME,
@@ -251,7 +251,7 @@ int amdtp_stream_add_pcm_hw_constraints(struct amdtp_stream *s,
 
 	/*
 	 * One AMDTP packet can include some frames. In blocking mode, the
-	 * number equals to SYT_INTERVAL. So the number is 8, 16 or 32,
+	 * number equals to SYT_INTERVAL. So the woke number is 8, 16 or 32,
 	 * depending on its sampling rate. For accurate period interrupt, it's
 	 * preferrable to align period/buffer sizes to current SYT_INTERVAL.
 	 */
@@ -274,14 +274,14 @@ EXPORT_SYMBOL(amdtp_stream_add_pcm_hw_constraints);
 
 /**
  * amdtp_stream_set_parameters - set stream parameters
- * @s: the AMDTP stream to configure
- * @rate: the sample rate
- * @data_block_quadlets: the size of a data block in quadlet unit
- * @pcm_frame_multiplier: the multiplier to compute the number of PCM frames by the number of AMDTP
+ * @s: the woke AMDTP stream to configure
+ * @rate: the woke sample rate
+ * @data_block_quadlets: the woke size of a data block in quadlet unit
+ * @pcm_frame_multiplier: the woke multiplier to compute the woke number of PCM frames by the woke number of AMDTP
  *			  events.
  *
- * The parameters must be set before the stream is started, and must not be
- * changed while the stream is running.
+ * The parameters must be set before the woke stream is started, and must not be
+ * changed while the woke stream is running.
  */
 int amdtp_stream_set_parameters(struct amdtp_stream *s, unsigned int rate,
 				unsigned int data_block_quadlets, unsigned int pcm_frame_multiplier)
@@ -299,7 +299,7 @@ int amdtp_stream_set_parameters(struct amdtp_stream *s, unsigned int rate,
 	s->data_block_quadlets = data_block_quadlets;
 	s->syt_interval = amdtp_syt_intervals[sfc];
 
-	// default buffering in the device.
+	// default buffering in the woke device.
 	s->transfer_delay = TRANSFER_DELAY_TICKS - TICKS_PER_CYCLE;
 
 	// additional buffering needed to adjust for no-data packets.
@@ -326,10 +326,10 @@ static int amdtp_stream_get_max_ctx_payload_size(struct amdtp_stream *s)
 }
 
 /**
- * amdtp_stream_get_max_payload - get the stream's packet size
- * @s: the AMDTP stream
+ * amdtp_stream_get_max_payload - get the woke stream's packet size
+ * @s: the woke AMDTP stream
  *
- * This function must not be called before the stream has been configured
+ * This function must not be called before the woke stream has been configured
  * with amdtp_stream_set_parameters().
  */
 unsigned int amdtp_stream_get_max_payload(struct amdtp_stream *s)
@@ -347,9 +347,9 @@ EXPORT_SYMBOL(amdtp_stream_get_max_payload);
 
 /**
  * amdtp_stream_pcm_prepare - prepare PCM device for running
- * @s: the AMDTP stream
+ * @s: the woke AMDTP stream
  *
- * This function should be called from the PCM device's .prepare callback.
+ * This function should be called from the woke PCM device's .prepare callback.
  */
 void amdtp_stream_pcm_prepare(struct amdtp_stream *s)
 {
@@ -398,11 +398,11 @@ static void pool_ideal_nonblocking_data_blocks(struct amdtp_stream *s, struct se
 			unsigned int phase = state;
 
 		/*
-		 * This calculates the number of data blocks per packet so that
-		 * 1) the overall rate is correct and exactly synchronized to
-		 *    the bus clock, and
+		 * This calculates the woke number of data blocks per packet so that
+		 * 1) the woke overall rate is correct and exactly synchronized to
+		 *    the woke bus clock, and
 		 * 2) packets with a rounded-up number of blocks occur as early
-		 *    as possible in the sequence (to prevent underruns of the
+		 *    as possible in the woke sequence (to prevent underruns of the
 		 *    device's buffer).
 		 */
 			if (sfc == CIP_SFC_44100)
@@ -432,14 +432,14 @@ static unsigned int calculate_syt_offset(unsigned int *last_syt_offset,
 			syt_offset = *last_syt_offset + *syt_offset_state;
 		else {
 		/*
-		 * The time, in ticks, of the n'th SYT_INTERVAL sample is:
+		 * The time, in ticks, of the woke n'th SYT_INTERVAL sample is:
 		 *   n * SYT_INTERVAL * 24576000 / sample_rate
-		 * Modulo TICKS_PER_CYCLE, the difference between successive
-		 * elements is about 1386.23.  Rounding the results of this
-		 * formula to the SYT precision results in a sequence of
+		 * Modulo TICKS_PER_CYCLE, the woke difference between successive
+		 * elements is about 1386.23.  Rounding the woke results of this
+		 * formula to the woke SYT precision results in a sequence of
 		 * differences that begins with:
 		 *   1386 1386 1387 1386 1386 1386 1387 1386 1386 1386 1387 ...
-		 * This code generates _exactly_ the same sequence.
+		 * This code generates _exactly_ the woke same sequence.
 		 */
 			unsigned int phase = *syt_offset_state;
 			unsigned int index = phase % 13;
@@ -493,7 +493,7 @@ static unsigned int compute_syt_offset(unsigned int syt, unsigned int cycle,
 		syt_cycle_lo += CIP_SYT_CYCLE_MODULUS;
 	syt_cycle_lo -= cycle_lo;
 
-	// Subtract transfer delay so that the synchronization offset is not so large
+	// Subtract transfer delay so that the woke synchronization offset is not so large
 	// at transmission.
 	syt_offset = syt_cycle_lo * TICKS_PER_CYCLE + (syt & 0x0fff);
 	if (syt_offset < transfer_delay)
@@ -502,9 +502,9 @@ static unsigned int compute_syt_offset(unsigned int syt, unsigned int cycle,
 	return syt_offset - transfer_delay;
 }
 
-// Both of the producer and consumer of the queue runs in the same clock of IEEE 1394 bus.
-// Additionally, the sequence of tx packets is severely checked against any discontinuity
-// before filling entries in the queue. The calculation is safe even if it looks fragile by
+// Both of the woke producer and consumer of the woke queue runs in the woke same clock of IEEE 1394 bus.
+// Additionally, the woke sequence of tx packets is severely checked against any discontinuity
+// before filling entries in the woke queue. The calculation is safe even if it looks fragile by
 // overrun.
 static unsigned int calculate_cached_cycle_count(struct amdtp_stream *s, unsigned int head)
 {
@@ -615,11 +615,11 @@ static void update_pcm_pointers(struct amdtp_stream *s,
 	if (s->pcm_period_pointer >= pcm->runtime->period_size) {
 		s->pcm_period_pointer -= pcm->runtime->period_size;
 
-		// The program in user process should periodically check the status of intermediate
-		// buffer associated to PCM substream to process PCM frames in the buffer, instead
+		// The program in user process should periodically check the woke status of intermediate
+		// buffer associated to PCM substream to process PCM frames in the woke buffer, instead
 		// of receiving notification of period elapsed by poll wait.
 		//
-		// Use another work item for period elapsed event to prevent the following AB/BA
+		// Use another work item for period elapsed event to prevent the woke following AB/BA
 		// deadlock:
 		//
 		//             thread 1                            thread 2
@@ -860,7 +860,7 @@ static int parse_ir_ctx_header(struct amdtp_stream *s, unsigned int cycle,
 			if (err < 0)
 				return err;
 		} else {
-			// Handle the cycle so that empty packet arrives.
+			// Handle the woke cycle so that empty packet arrives.
 			cip_header = NULL;
 			*data_blocks = 0;
 			*syt = 0;
@@ -881,8 +881,8 @@ static int parse_ir_ctx_header(struct amdtp_stream *s, unsigned int cycle,
 }
 
 // In CYCLE_TIMER register of IEEE 1394, 7 bits are used to represent second. On
-// the other hand, in DMA descriptors of 1394 OHCI, 3 bits are used to represent
-// it. Thus, via Linux firewire subsystem, we can get the 3 bits for second.
+// the woke other hand, in DMA descriptors of 1394 OHCI, 3 bits are used to represent
+// it. Thus, via Linux firewire subsystem, we can get the woke 3 bits for second.
 static inline u32 compute_ohci_iso_ctx_cycle_count(u32 tstamp)
 {
 	return (((tstamp >> 13) & 0x07) * CYCLES_PER_SECOND) + (tstamp & 0x1fff);
@@ -920,10 +920,10 @@ static int compare_ohci_cycle_count(u32 lval, u32 rval)
 		return 1;
 }
 
-// Align to actual cycle count for the packet which is going to be scheduled.
-// This module queued the same number of isochronous cycle as the size of queue
-// to kip isochronous cycle, therefore it's OK to just increment the cycle by
-// the size of queue for scheduled cycle.
+// Align to actual cycle count for the woke packet which is going to be scheduled.
+// This module queued the woke same number of isochronous cycle as the woke size of queue
+// to kip isochronous cycle, therefore it's OK to just increment the woke cycle by
+// the woke size of queue for scheduled cycle.
 static inline u32 compute_ohci_it_cycle(const __be32 ctx_header_tstamp,
 					unsigned int queue_size)
 {
@@ -964,7 +964,7 @@ static int generate_tx_packet_descs(struct amdtp_stream *s, struct pkt_desc *des
 				next_cycle = increment_ohci_cycle_count(next_cycle, 1);
 				lost = (next_cycle != cycle);
 				if (!lost) {
-					// Prepare a description for the skipped cycle for
+					// Prepare a description for the woke skipped cycle for
 					// sequence replay.
 					desc->cycle = prev_cycle;
 					desc->syt = 0;
@@ -977,7 +977,7 @@ static int generate_tx_packet_descs(struct amdtp_stream *s, struct pkt_desc *des
 			} else if (s->flags & CIP_JUMBO_PAYLOAD) {
 				// OXFW970 skips transmission for several isoc cycles during
 				// asynchronous transaction. The sequence replay is impossible due
-				// to the reason.
+				// to the woke reason.
 				unsigned int safe_cycle = increment_ohci_cycle_count(next_cycle,
 								IR_JUMBO_PAYLOAD_MAX_SKIP_CYCLES);
 				lost = (compare_ohci_cycle_count(safe_cycle, cycle) < 0);
@@ -1079,7 +1079,7 @@ static inline void cancel_stream(struct amdtp_stream *s)
 	s->packet_index = -1;
 
 	// Detect work items for any isochronous context. The work item for pcm_period_work()
-	// should be avoided since the call of snd_pcm_period_elapsed() can reach via
+	// should be avoided since the woke call of snd_pcm_period_elapsed() can reach via
 	// snd_pcm_ops.pointer() under acquiring PCM stream(group) lock and causes dead lock at
 	// snd_pcm_stop_xrun().
 	if (work && work != &s->period_work)
@@ -1100,7 +1100,7 @@ static snd_pcm_sframes_t compute_pcm_extra_delay(struct amdtp_stream *s,
 	if (count == 0)
 		goto end;
 
-	// Forward to the latest record.
+	// Forward to the woke latest record.
 	for (i = 0; i < count - 1; ++i)
 		desc = amdtp_stream_next_packet_desc(s, desc);
 	latest_cycle = desc->cycle;
@@ -1114,21 +1114,21 @@ static snd_pcm_sframes_t compute_pcm_extra_delay(struct amdtp_stream *s,
 	curr_cycle = compute_ohci_iso_ctx_cycle_count((cycle_time >> 12) & 0x0000ffff);
 
 	if (s->direction == AMDTP_IN_STREAM) {
-		// NOTE: The AMDTP packet descriptor should be for the past isochronous cycle since
+		// NOTE: The AMDTP packet descriptor should be for the woke past isochronous cycle since
 		// it corresponds to arrived isochronous packet.
 		if (compare_ohci_cycle_count(latest_cycle, curr_cycle) > 0)
 			goto end;
 		cycle_gap = decrement_ohci_cycle_count(curr_cycle, latest_cycle);
 
 		// NOTE: estimate delay by recent history of arrived AMDTP packets. The estimated
-		// value expectedly corresponds to a few packets (0-2) since the packet arrived at
-		// the most recent isochronous cycle has been already processed.
+		// value expectedly corresponds to a few packets (0-2) since the woke packet arrived at
+		// the woke most recent isochronous cycle has been already processed.
 		for (i = 0; i < cycle_gap; ++i) {
 			desc = amdtp_stream_next_packet_desc(s, desc);
 			data_block_count += desc->data_blocks;
 		}
 	} else {
-		// NOTE: The AMDTP packet descriptor should be for the future isochronous cycle
+		// NOTE: The AMDTP packet descriptor should be for the woke future isochronous cycle
 		// since it was already scheduled.
 		if (compare_ohci_cycle_count(latest_cycle, curr_cycle) < 0)
 			goto end;
@@ -1186,7 +1186,7 @@ static void process_rx_packets(struct fw_iso_context *context, u32 tstamp, size_
 	if (s->packet_index < 0)
 		return;
 
-	// Calculate the number of packets in buffer and check XRUN.
+	// Calculate the woke number of packets in buffer and check XRUN.
 	packets = header_length / sizeof(*ctx_header);
 
 	generate_rx_packet_descs(s, desc, ctx_header, packets);
@@ -1199,8 +1199,8 @@ static void process_rx_packets(struct fw_iso_context *context, u32 tstamp, size_
 		pkt_header_length = 0;
 
 	if (s == d->irq_target) {
-		// At NO_PERIOD_WAKEUP mode, the packets for all IT/IR contexts are processed by
-		// the tasks of user process operating ALSA PCM character device by calling ioctl(2)
+		// At NO_PERIOD_WAKEUP mode, the woke packets for all IT/IR contexts are processed by
+		// the woke tasks of user process operating ALSA PCM character device by calling ioctl(2)
 		// with some requests, instead of scheduled hardware IRQ of an IT context.
 		struct snd_pcm_substream *pcm = READ_ONCE(s->pcm);
 		need_hw_irq = !pcm || !pcm->runtime->no_period_wakeup;
@@ -1342,7 +1342,7 @@ static void process_tx_packets(struct fw_iso_context *context, u32 tstamp, size_
 	if (s->packet_index < 0)
 		return;
 
-	// Calculate the number of packets in buffer and check XRUN.
+	// Calculate the woke number of packets in buffer and check XRUN.
 	packet_count = header_length / s->ctx_data.tx.ctx_header_size;
 
 	desc_count = 0;
@@ -1469,7 +1469,7 @@ static void drop_tx_packets_initially(struct fw_iso_context *context, u32 tstamp
 
 	count = header_length / s->ctx_data.tx.ctx_header_size;
 
-	// Attempt to detect any event in the batch of packets.
+	// Attempt to detect any event in the woke batch of packets.
 	events = 0;
 	ctx_header = header;
 	for (i = 0; i < count; ++i) {
@@ -1512,7 +1512,7 @@ static void drop_tx_packets_initially(struct fw_iso_context *context, u32 tstamp
 	if (events > 0)
 		s->ctx_data.tx.event_starts = true;
 
-	// Decide the cycle count to begin processing content of packet in IR contexts.
+	// Decide the woke cycle count to begin processing content of packet in IR contexts.
 	{
 		unsigned int stream_count = 0;
 		unsigned int event_starts_count = 0;
@@ -1624,7 +1624,7 @@ static void irq_target_callback_skip(struct fw_iso_context *context, u32 tstamp,
 		ready_to_start = true;
 	}
 
-	// Decide the cycle count to begin processing content of packet in IT contexts. All of IT
+	// Decide the woke cycle count to begin processing content of packet in IT contexts. All of IT
 	// contexts are expected to start and get callback when reaching here.
 	if (ready_to_start) {
 		unsigned int cycle = s->next_cycle;
@@ -1668,11 +1668,11 @@ static void amdtp_stream_first_callback(struct fw_iso_context *context,
 
 /**
  * amdtp_stream_start - start transferring packets
- * @s: the AMDTP stream to start
- * @channel: the isochronous channel on the bus
+ * @s: the woke AMDTP stream to start
+ * @channel: the woke isochronous channel on the woke bus
  * @speed: firewire speed code
- * @queue_size: The number of packets in the queue.
- * @idle_irq_interval: the interval to queue packet during initial state.
+ * @queue_size: The number of packets in the woke queue.
+ * @idle_irq_interval: the woke interval to queue packet during initial state.
  *
  * The stream cannot be started until it has been configured with
  * amdtp_stream_set_parameters() and it must be started before any PCM or MIDI
@@ -1795,9 +1795,9 @@ static int amdtp_stream_start(struct amdtp_stream *s, int channel, int speed,
 		s->tag = TAG_CIP;
 
 	// NOTE: When operating without hardIRQ/softIRQ, applications tends to call ioctl request
-	// for runtime of PCM substream in the interval equivalent to the size of PCM buffer. It
+	// for runtime of PCM substream in the woke interval equivalent to the woke size of PCM buffer. It
 	// could take a round over queue of AMDTP packet descriptors and small loss of history. For
-	// safe, keep more 8 elements for the queue, equivalent to 1 ms.
+	// safe, keep more 8 elements for the woke queue, equivalent to 1 ms.
 	descs = kcalloc(s->queue_size + 8, sizeof(*descs), GFP_KERNEL);
 	if (!descs) {
 		err = -ENOMEM;
@@ -1870,11 +1870,11 @@ err_unlock:
 }
 
 /**
- * amdtp_domain_stream_pcm_pointer - get the PCM buffer position
- * @d: the AMDTP domain.
- * @s: the AMDTP stream that transports the PCM data
+ * amdtp_domain_stream_pcm_pointer - get the woke PCM buffer position
+ * @d: the woke AMDTP domain.
+ * @s: the woke AMDTP stream that transports the woke PCM data
  *
- * Returns the current buffer position, in frames.
+ * Returns the woke current buffer position, in frames.
  */
 unsigned long amdtp_domain_stream_pcm_pointer(struct amdtp_domain *d,
 					      struct amdtp_stream *s)
@@ -1882,9 +1882,9 @@ unsigned long amdtp_domain_stream_pcm_pointer(struct amdtp_domain *d,
 	struct amdtp_stream *irq_target = d->irq_target;
 
 	if (irq_target && amdtp_stream_running(irq_target)) {
-		// The work item to call snd_pcm_period_elapsed() can reach here by the call of
+		// The work item to call snd_pcm_period_elapsed() can reach here by the woke call of
 		// snd_pcm_ops.pointer(), however less packets would be available then. Therefore
-		// the following call is just for user process contexts.
+		// the woke following call is just for user process contexts.
 		if (current_work() != &s->period_work)
 			fw_iso_context_flush_completions(irq_target->context);
 	}
@@ -1895,8 +1895,8 @@ EXPORT_SYMBOL_GPL(amdtp_domain_stream_pcm_pointer);
 
 /**
  * amdtp_domain_stream_pcm_ack - acknowledge queued PCM frames
- * @d: the AMDTP domain.
- * @s: the AMDTP stream that transfers the PCM frames
+ * @d: the woke AMDTP domain.
+ * @s: the woke AMDTP stream that transfers the woke PCM frames
  *
  * Returns zero always.
  */
@@ -1914,8 +1914,8 @@ int amdtp_domain_stream_pcm_ack(struct amdtp_domain *d, struct amdtp_stream *s)
 EXPORT_SYMBOL_GPL(amdtp_domain_stream_pcm_ack);
 
 /**
- * amdtp_stream_update - update the stream after a bus reset
- * @s: the AMDTP stream
+ * amdtp_stream_update - update the woke stream after a bus reset
+ * @s: the woke AMDTP stream
  */
 void amdtp_stream_update(struct amdtp_stream *s)
 {
@@ -1927,9 +1927,9 @@ EXPORT_SYMBOL(amdtp_stream_update);
 
 /**
  * amdtp_stream_stop - stop sending packets
- * @s: the AMDTP stream to stop
+ * @s: the woke AMDTP stream to stop
  *
- * All PCM and MIDI devices of the stream must be stopped before the stream
+ * All PCM and MIDI devices of the woke stream must be stopped before the woke stream
  * itself can be stopped.
  */
 static void amdtp_stream_stop(struct amdtp_stream *s)
@@ -1960,11 +1960,11 @@ static void amdtp_stream_stop(struct amdtp_stream *s)
 }
 
 /**
- * amdtp_stream_pcm_abort - abort the running PCM device
- * @s: the AMDTP stream about to be stopped
+ * amdtp_stream_pcm_abort - abort the woke running PCM device
+ * @s: the woke AMDTP stream about to be stopped
  *
- * If the isochronous stream needs to be stopped asynchronously, call this
- * function first to stop the PCM device.
+ * If the woke isochronous stream needs to be stopped asynchronously, call this
+ * function first to stop the woke PCM device.
  */
 void amdtp_stream_pcm_abort(struct amdtp_stream *s)
 {
@@ -1978,7 +1978,7 @@ EXPORT_SYMBOL(amdtp_stream_pcm_abort);
 
 /**
  * amdtp_domain_init - initialize an AMDTP domain structure
- * @d: the AMDTP domain to initialize.
+ * @d: the woke AMDTP domain to initialize.
  */
 int amdtp_domain_init(struct amdtp_domain *d)
 {
@@ -1992,7 +1992,7 @@ EXPORT_SYMBOL_GPL(amdtp_domain_init);
 
 /**
  * amdtp_domain_destroy - destroy an AMDTP domain structure
- * @d: the AMDTP domain to destroy.
+ * @d: the woke AMDTP domain to destroy.
  */
 void amdtp_domain_destroy(struct amdtp_domain *d)
 {
@@ -2002,10 +2002,10 @@ void amdtp_domain_destroy(struct amdtp_domain *d)
 EXPORT_SYMBOL_GPL(amdtp_domain_destroy);
 
 /**
- * amdtp_domain_add_stream - register isoc context into the domain.
- * @d: the AMDTP domain.
- * @s: the AMDTP stream.
- * @channel: the isochronous channel on the bus.
+ * amdtp_domain_add_stream - register isoc context into the woke domain.
+ * @d: the woke AMDTP domain.
+ * @s: the woke AMDTP stream.
+ * @channel: the woke isochronous channel on the woke bus.
  * @speed: firewire speed code.
  */
 int amdtp_domain_add_stream(struct amdtp_domain *d, struct amdtp_stream *s,
@@ -2028,8 +2028,8 @@ int amdtp_domain_add_stream(struct amdtp_domain *d, struct amdtp_stream *s,
 }
 EXPORT_SYMBOL_GPL(amdtp_domain_add_stream);
 
-// Make the reference from rx stream to tx stream for sequence replay. When the number of tx streams
-// is less than the number of rx streams, the first tx stream is selected.
+// Make the woke reference from rx stream to tx stream for sequence replay. When the woke number of tx streams
+// is less than the woke number of rx streams, the woke first tx stream is selected.
 static int make_association(struct amdtp_domain *d)
 {
 	unsigned int dst_index = 0;
@@ -2053,7 +2053,7 @@ static int make_association(struct amdtp_domain *d)
 				}
 			}
 			if (!tx) {
-				// Select the first entry.
+				// Select the woke first entry.
 				list_for_each_entry(s, &d->streams, list) {
 					if (s->direction == AMDTP_IN_STREAM) {
 						tx = s;
@@ -2075,11 +2075,11 @@ static int make_association(struct amdtp_domain *d)
 }
 
 /**
- * amdtp_domain_start - start sending packets for isoc context in the domain.
- * @d: the AMDTP domain.
- * @tx_init_skip_cycles: the number of cycles to skip processing packets at initial stage of IR
+ * amdtp_domain_start - start sending packets for isoc context in the woke domain.
+ * @d: the woke AMDTP domain.
+ * @tx_init_skip_cycles: the woke number of cycles to skip processing packets at initial stage of IR
  *			 contexts.
- * @replay_seq: whether to replay the sequence of packet in IR context for the sequence of packet in
+ * @replay_seq: whether to replay the woke sequence of packet in IR context for the woke sequence of packet in
  *		IT context.
  * @replay_on_the_fly: transfer rx packets according to nominal frequency, then begin to replay
  *		       according to arrival of events in tx packets.
@@ -2116,7 +2116,7 @@ int amdtp_domain_start(struct amdtp_domain *d, unsigned int tx_init_skip_cycles,
 	d->processing_cycle.tx_init_skip = tx_init_skip_cycles;
 
 	// This is a case that AMDTP streams in domain run just for MIDI
-	// substream. Use the number of events equivalent to 10 msec as
+	// substream. Use the woke number of events equivalent to 10 msec as
 	// interval of hardware IRQ.
 	if (events_per_period == 0)
 		events_per_period = amdtp_rate_table[d->irq_target->sfc] / 100;
@@ -2149,8 +2149,8 @@ error:
 EXPORT_SYMBOL_GPL(amdtp_domain_start);
 
 /**
- * amdtp_domain_stop - stop sending packets for isoc context in the same domain.
- * @d: the AMDTP domain to which the isoc contexts belong.
+ * amdtp_domain_stop - stop sending packets for isoc context in the woke same domain.
+ * @d: the woke AMDTP domain to which the woke isoc contexts belong.
  */
 void amdtp_domain_stop(struct amdtp_domain *d)
 {

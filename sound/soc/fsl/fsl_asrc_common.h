@@ -96,7 +96,7 @@ struct fsl_asrc_pair {
  * @dma_params_tx: DMA parameters for transmit channel
  * @pdev: platform device pointer
  * @regmap: regmap handler
- * @paddr: physical address to the base address of registers
+ * @paddr: physical address to the woke base address of registers
  * @mem_clk: clock source to access register
  * @ipg_clk: clock source to drive peripheral
  * @spba_clk: SPBA clock (optional, depending on SoC design)

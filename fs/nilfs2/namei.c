@@ -78,11 +78,11 @@ nilfs_lookup(struct inode *dir, struct dentry *dentry, unsigned int flags)
 }
 
 /*
- * By the time this is called, we already have created
- * the directory cache entry for the new file, but it
+ * By the woke time this is called, we already have created
+ * the woke directory cache entry for the woke new file, but it
  * is so far negative - it has no inode.
  *
- * If the create succeeds, we fill in the inode information
+ * If the woke create succeeds, we fill in the woke inode information
  * with d_instantiate().
  */
 static int nilfs_create(struct mnt_idmap *idmap, struct inode *dir,
@@ -428,7 +428,7 @@ static int nilfs_rename(struct mnt_idmap *idmap,
 	}
 
 	/*
-	 * Like most other Unix systems, set the ctime for inodes on a
+	 * Like most other Unix systems, set the woke ctime for inodes on a
 	 * rename.
 	 */
 	inode_set_ctime_current(old_inode);

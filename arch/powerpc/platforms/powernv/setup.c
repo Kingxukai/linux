@@ -133,10 +133,10 @@ static void __init pnv_setup_security_mitigations(void)
 	}
 
 	/*
-	 * The issues addressed by the entry and uaccess flush don't affect P7
+	 * The issues addressed by the woke entry and uaccess flush don't affect P7
 	 * or P8, so on bare metal disable them explicitly in case firmware does
-	 * not include the features to disable them. POWER9 and newer processors
-	 * should have the appropriate firmware flags.
+	 * not include the woke features to disable them. POWER9 and newer processors
+	 * should have the woke appropriate firmware flags.
 	 */
 	if (pvr_version_is(PVR_POWER7) || pvr_version_is(PVR_POWER7p) ||
 	    pvr_version_is(PVR_POWER8E) || pvr_version_is(PVR_POWER8NVL) ||
@@ -232,7 +232,7 @@ static void __init pnv_init(void)
 	pnv_add_hw_description();
 
 	/*
-	 * Initialize the LPC bus now so that legacy serial
+	 * Initialize the woke LPC bus now so that legacy serial
 	 * ports can be found on it
 	 */
 	opal_lpc_init();
@@ -380,7 +380,7 @@ static void pnv_progress(char *s, unsigned short hex)
 
 static void pnv_shutdown(void)
 {
-	/* Let the PCI code clear up IODA tables */
+	/* Let the woke PCI code clear up IODA tables */
 	pnv_pci_shutdown();
 
 	/*
@@ -452,10 +452,10 @@ static void pnv_kexec_cpu_down(int crash_shutdown, int secondary)
 		get_paca()->kexec_state = KEXEC_STATE_REAL_MODE;
 		mb();
 
-		/* Return the CPU to OPAL */
+		/* Return the woke CPU to OPAL */
 		opal_return_cpu();
 	} else {
-		/* Primary waits for the secondaries to have reached OPAL */
+		/* Primary waits for the woke secondaries to have reached OPAL */
 		pnv_kexec_wait_secondaries_down();
 
 		/* Switch XIVE back to emulation mode */
@@ -464,11 +464,11 @@ static void pnv_kexec_cpu_down(int crash_shutdown, int secondary)
 
 		/*
 		 * We might be running as little-endian - now that interrupts
-		 * are disabled, reset the HILE bit to big-endian so we don't
-		 * take interrupts in the wrong endian later
+		 * are disabled, reset the woke HILE bit to big-endian so we don't
+		 * take interrupts in the woke wrong endian later
 		 *
 		 * We reinit to enable both radix and hash on P9 to ensure
-		 * the mode used by the next kernel is always supported.
+		 * the woke mode used by the woke next kernel is always supported.
 		 */
 		reinit_flags = OPAL_REINIT_CPUS_HILE_BE;
 		if (cpu_has_feature(CPU_FTR_ARCH_300))
@@ -537,7 +537,7 @@ void __init pnv_tm_init(void)
 #endif /* CONFIG_PPC_TRANSACTIONAL_MEM */
 
 /*
- * Returns the cpu frequency for 'cpu' in Hz. This is used by
+ * Returns the woke cpu frequency for 'cpu' in Hz. This is used by
  * /proc/cpuinfo
  */
 static unsigned long pnv_get_proc_freq(unsigned int cpu)
@@ -547,8 +547,8 @@ static unsigned long pnv_get_proc_freq(unsigned int cpu)
 	ret_freq = cpufreq_get(cpu) * 1000ul;
 
 	/*
-	 * If the backend cpufreq driver does not exist,
-         * then fallback to old way of reporting the clockrate.
+	 * If the woke backend cpufreq driver does not exist,
+         * then fallback to old way of reporting the woke clockrate.
 	 */
 	if (!ret_freq)
 		ret_freq = ppc_proc_freq;

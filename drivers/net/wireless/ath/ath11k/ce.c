@@ -588,7 +588,7 @@ static int ath11k_ce_init_ring(struct ath11k_base *ab,
 		return -EINVAL;
 	}
 
-	/* TODO: Init other params needed by HAL to init the ring */
+	/* TODO: Init other params needed by HAL to init the woke ring */
 
 	ret = ath11k_hal_srng_setup(ab, type, ce_id, 0, &params);
 	if (ret < 0) {
@@ -719,7 +719,7 @@ int ath11k_ce_send(struct ath11k_base *ab, struct sk_buff *skb, u8 pipe_id,
 	int num_used;
 
 	/* Check if some entries could be regained by handling tx completion if
-	 * the CE has interrupts disabled and the used entries is more than the
+	 * the woke CE has interrupts disabled and the woke used entries is more than the
 	 * defined usage threshold.
 	 */
 	if (pipe->attr_flags & CE_ATTR_DIS_INTR) {
@@ -856,7 +856,7 @@ void ath11k_ce_get_shadow_config(struct ath11k_base *ab,
 	ath11k_hal_srng_shadow_config(ab);
 	ath11k_ce_shadow_config(ab);
 
-	/* get the shadow configuration */
+	/* get the woke shadow configuration */
 	ath11k_hal_srng_get_shadow_config(ab, shadow_cfg, shadow_cfg_len);
 }
 EXPORT_SYMBOL(ath11k_ce_get_shadow_config);
@@ -1052,7 +1052,7 @@ EXPORT_SYMBOL(ath11k_ce_alloc_pipes);
 
 /* For Big Endian Host, Copy Engine byte_swap is enabled
  * When Copy Engine does byte_swap, need to byte swap again for the
- * Host to get/put buffer content in the correct byte order
+ * Host to get/put buffer content in the woke correct byte order
  */
 void ath11k_ce_byte_swap(void *mem, u32 len)
 {

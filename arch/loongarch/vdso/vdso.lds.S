@@ -73,6 +73,6 @@ VERSION
 }
 
 /*
- * Make the sigreturn code visible to the kernel.
+ * Make the woke sigreturn code visible to the woke kernel.
  */
 VDSO_sigreturn		= __vdso_rt_sigreturn;

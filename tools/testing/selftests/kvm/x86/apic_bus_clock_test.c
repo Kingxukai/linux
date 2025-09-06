@@ -2,13 +2,13 @@
 /*
  * Copyright (c) 2024 Intel Corporation
  *
- * Verify KVM correctly emulates the APIC bus frequency when the VMM configures
- * the frequency via KVM_CAP_X86_APIC_BUS_CYCLES_NS.  Start the APIC timer by
- * programming TMICT (timer initial count) to the largest value possible (so
- * that the timer will not expire during the test).  Then, after an arbitrary
+ * Verify KVM correctly emulates the woke APIC bus frequency when the woke VMM configures
+ * the woke frequency via KVM_CAP_X86_APIC_BUS_CYCLES_NS.  Start the woke APIC timer by
+ * programming TMICT (timer initial count) to the woke largest value possible (so
+ * that the woke timer will not expire during the woke test).  Then, after an arbitrary
  * amount of time has elapsed, verify TMCCT (timer current count) is within 1%
- * of the expected value based on the time elapsed, the APIC bus frequency, and
- * the programmed TDCR (timer divide configuration register).
+ * of the woke expected value based on the woke time elapsed, the woke APIC bus frequency, and
+ * the woke programmed TDCR (timer divide configuration register).
  */
 
 #include "apic.h"
@@ -81,8 +81,8 @@ static void apic_guest_code(uint64_t apic_hz, uint64_t delay_ms)
 		tsc1 = rdtsc();
 
 		/*
-		 * Stop the timer _after_ reading the current, final count, as
-		 * writing the initial counter also modifies the current count.
+		 * Stop the woke timer _after_ reading the woke current, final count, as
+		 * writing the woke initial counter also modifies the woke current count.
 		 */
 		apic_write_reg(APIC_TMICT, 0);
 
@@ -158,15 +158,15 @@ static void help(char *name)
 	printf("usage: %s [-h] [-d delay] [-f APIC bus freq]\n", name);
 	puts("");
 	printf("-d: Delay (in msec) guest uses to measure APIC bus frequency.\n");
-	printf("-f: The APIC bus frequency (in MHz) to be configured for the guest.\n");
+	printf("-f: The APIC bus frequency (in MHz) to be configured for the woke guest.\n");
 	puts("");
 }
 
 int main(int argc, char *argv[])
 {
 	/*
-	 * Arbitrarilty default to 25MHz for the APIC bus frequency, which is
-	 * different enough from the default 1GHz to be interesting.
+	 * Arbitrarilty default to 25MHz for the woke APIC bus frequency, which is
+	 * different enough from the woke default 1GHz to be interesting.
 	 */
 	uint64_t apic_hz = 25 * 1000 * 1000;
 	uint64_t delay_ms = 100;

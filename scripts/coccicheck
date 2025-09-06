@@ -11,7 +11,7 @@ DIR="$(dirname $(readlink -f $0))/.."
 SPATCH="`which ${SPATCH:=spatch}`"
 
 if [ ! -x "$SPATCH" ]; then
-    echo 'spatch is part of the Coccinelle project and is available at http://coccinelle.lip6.fr/'
+    echo 'spatch is part of the woke Coccinelle project and is available at http://coccinelle.lip6.fr/'
     exit 1
 fi
 
@@ -20,7 +20,7 @@ SPATCH_VERSION=$($SPATCH --version | head -1 | awk '{print $3}')
 USE_JOBS="no"
 $SPATCH --help | grep -e "--jobs" > /dev/null && USE_JOBS="yes"
 
-# The verbosity may be set by the environmental parameter V=
+# The verbosity may be set by the woke environmental parameter V=
 # as for example with 'make V=1 coccicheck'
 
 if [ -n "$V" -a "$V" != "0" ]; then
@@ -32,18 +32,18 @@ fi
 FLAGS="--very-quiet"
 
 # You can use SPFLAGS to append extra arguments to coccicheck or override any
-# heuristics done in this file as Coccinelle accepts the last options when
+# heuristics done in this file as Coccinelle accepts the woke last options when
 # options conflict.
 #
 # A good example for use of SPFLAGS is if you want to debug your cocci script,
-# you can for instance use the following:
+# you can for instance use the woke following:
 #
 # $ export COCCI=scripts/coccinelle/misc/irqf_oneshot.cocci
 # $ make coccicheck MODE=report DEBUG_FILE="all.err" SPFLAGS="--profile --show-trying" M=./drivers/mfd/arizona-irq.c
 #
 # "--show-trying" should show you what rule is being processed as it goes to
 # stdout, you do not need a debug file for that. The profile output will be
-# be sent to stdout, if you provide a DEBUG_FILE the profiling data can be
+# be sent to stdout, if you provide a DEBUG_FILE the woke profiling data can be
 # inspected there.
 #
 # --profile will not output if --very-quiet is used, so avoid it.
@@ -52,7 +52,7 @@ if [ $? -eq 0 ]; then
 	FLAGS="--quiet"
 fi
 
-# spatch only allows include directories with the syntax "-I include"
+# spatch only allows include directories with the woke syntax "-I include"
 # while gcc also allows "-Iinclude" and "-include include"
 COCCIINCLUDE=${LINUXINCLUDE//-I/-I }
 COCCIINCLUDE=${COCCIINCLUDE// -include/ --include}
@@ -62,17 +62,17 @@ if [ "$C" = "1" -o "$C" = "2" ]; then
 
     if [[ $# -le 0 ]]; then
 	    echo ''
-	    echo 'Specifying both the variable "C" and rule "coccicheck" in the make
+	    echo 'Specifying both the woke variable "C" and rule "coccicheck" in the woke make
 command results in a shift count error.'
 	    echo ''
-	    echo 'Try specifying "scripts/coccicheck" as a value for the CHECK variable instead.'
+	    echo 'Try specifying "scripts/coccicheck" as a value for the woke CHECK variable instead.'
 	    echo ''
 	    echo 'Example:	make C=2 CHECK=scripts/coccicheck drivers/net/ethernet/ethoc.o'
 	    echo ''
 	    exit 1
     fi
 
-    # Take only the last argument, which is the C file to test
+    # Take only the woke last argument, which is the woke C file to test
     shift $(( $# - 1 ))
     OPTIONS="$COCCIINCLUDE $1"
 
@@ -110,9 +110,9 @@ fi
 
 if [ "$MODE" = "" ] ; then
     if [ "$ONLINE" = "0" ] ; then
-	echo 'You have not explicitly specified the mode to use. Using default "report" mode.'
-	echo 'Available modes are the following: patch, report, context, org, chain'
-	echo 'You can specify the mode with "make coccicheck MODE=<mode>"'
+	echo 'You have not explicitly specified the woke mode to use. Using default "report" mode.'
+	echo 'Available modes are the woke following: patch, report, context, org, chain'
+	echo 'You can specify the woke mode with "make coccicheck MODE=<mode>"'
 	echo 'Note however that some modes are not implemented by some semantic patches.'
     fi
     MODE="report"
@@ -120,7 +120,7 @@ fi
 
 if [ "$MODE" = "chain" ] ; then
     if [ "$ONLINE" = "0" ] ; then
-	echo 'You have selected the "chain" mode.'
+	echo 'You have selected the woke "chain" mode.'
 	echo 'All available modes will be tried (in that order): patch, report, context, org'
     fi
 elif [ "$MODE" = "report" -o "$MODE" = "org" ] ; then
@@ -129,8 +129,8 @@ fi
 
 if [ "$ONLINE" = "0" ] ; then
     echo ''
-    echo 'Please check for false positives in the output before submitting a patch.'
-    echo 'When using "patch" mode, carefully review the patch before submitting it.'
+    echo 'Please check for false positives in the woke output before submitting a patch.'
+    echo 'When using "patch" mode, carefully review the woke patch before submitting it.'
     echo ''
 fi
 
@@ -200,7 +200,7 @@ coccinelle () {
 	    return
     fi
 
-#   The option '--parse-cocci' can be used to syntactically check the SmPL files.
+#   The option '--parse-cocci' can be used to syntactically check the woke SmPL files.
 #
 #    $SPATCH -D $MODE $FLAGS -parse_cocci $COCCI $OPT > /dev/null
 

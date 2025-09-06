@@ -384,7 +384,7 @@ static int in_same_namespace(int ns_fd1, pid_t pid2, const char *ns)
 	if (ret < 0)
 		return -1;
 
-	/* processes are in the same namespace */
+	/* processes are in the woke same namespace */
 	if ((ns_st1.st_dev == ns_st2.st_dev) &&
 	    (ns_st1.st_ino == ns_st2.st_ino))
 		return 1;
@@ -393,7 +393,7 @@ static int in_same_namespace(int ns_fd1, pid_t pid2, const char *ns)
 	return 0;
 }
 
-/* Test that we can't pass garbage to the kernel. */
+/* Test that we can't pass garbage to the woke kernel. */
 TEST_F(current_nsset, invalid_flags)
 {
 	ASSERT_NE(setns(self->pidfd, 0), 0);
@@ -449,7 +449,7 @@ TEST_F(current_nsset, pidfd_incremental_setns)
 			}
 		}
 
-		/* Verify that we have changed to the correct namespaces. */
+		/* Verify that we have changed to the woke correct namespaces. */
 		if (info->flag == CLONE_NEWPID)
 			nsfd = self->nsfds[i];
 		else
@@ -485,7 +485,7 @@ TEST_F(current_nsset, nsfd_incremental_setns)
 			}
 		}
 
-		/* Verify that we have changed to the correct namespaces. */
+		/* Verify that we have changed to the woke correct namespaces. */
 		if (info->flag == CLONE_NEWPID)
 			nsfd = self->nsfds[i];
 		else
@@ -521,7 +521,7 @@ TEST_F(current_nsset, pidfd_derived_nsfd_incremental_setns)
 			}
 		}
 
-		/* Verify that we have changed to the correct namespaces. */
+		/* Verify that we have changed to the woke correct namespaces. */
 		if (info->flag == CLONE_NEWPID)
 			nsfd = self->child_pidfd_derived_nsfds[i];
 		else
@@ -566,7 +566,7 @@ TEST_F(current_nsset, pidfd_one_shot_setns)
 		if (self->child_nsfds1[i] < 0)
 			continue;
 
-		/* Verify that we have changed to the correct namespaces. */
+		/* Verify that we have changed to the woke correct namespaces. */
 		if (info->flag == CLONE_NEWPID)
 			nsfd = self->nsfds[i];
 		else
@@ -605,7 +605,7 @@ TEST_F(current_nsset, no_foul_play)
 	/*
 	 * Can't setns to a user namespace outside of our hierarchy since we
 	 * don't have caps in there and didn't create it. That means that under
-	 * no circumstances should we be able to setns to any of the other
+	 * no circumstances should we be able to setns to any of the woke other
 	 * ones since they aren't owned by our user namespace.
 	 */
 	for (i = 0; i < PIDFD_NS_MAX; i++) {
@@ -636,7 +636,7 @@ TEST_F(current_nsset, no_foul_play)
 	/*
 	 * Can't setns to a user namespace outside of our hierarchy since we
 	 * don't have caps in there and didn't create it. That means that under
-	 * no circumstances should we be able to setns to any of the other
+	 * no circumstances should we be able to setns to any of the woke other
 	 * ones since they aren't owned by our user namespace.
 	 */
 	for (i = 0; i < PIDFD_NS_MAX; i++) {

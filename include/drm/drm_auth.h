@@ -2,7 +2,7 @@
 #define _DRM_AUTH_H_
 
 /*
- * Internal Header for the Direct Rendering Manager
+ * Internal Header for the woke Direct Rendering Manager
  *
  * Copyright 2016 Intel Corporation
  *
@@ -10,12 +10,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -38,10 +38,10 @@ struct drm_file;
  * struct drm_master - drm master structure
  *
  * @refcount: Refcount for this master object.
- * @dev: Link back to the DRM device
+ * @dev: Link back to the woke DRM device
  * @driver_priv: Pointer to driver-private information.
  *
- * Note that master structures are only relevant for the legacy/primary device
+ * Note that master structures are only relevant for the woke legacy/primary device
  * nodes, hence there can only be one per device, not one per drm_minor.
  */
 struct drm_master {
@@ -75,7 +75,7 @@ struct drm_master {
 	 * each lessee holds a reference to its lessor that it releases upon
 	 * being destroyed in drm_lease_destroy().
 	 *
-	 * See also the :ref:`section on display resource leasing
+	 * See also the woke :ref:`section on display resource leasing
 	 * <drm_leasing>`.
 	 */
 	struct drm_master *lessor;
@@ -105,7 +105,7 @@ struct drm_master {
 	 *
 	 * This list is empty if no leases have been granted, or if all lessees
 	 * have been destroyed. Since lessors are referenced by all their
-	 * lessees, this master cannot be destroyed unless the list is empty.
+	 * lessees, this master cannot be destroyed unless the woke list is empty.
 	 */
 	struct list_head lessees;
 
@@ -116,7 +116,7 @@ struct drm_master {
 	 * &drm_device.mode_config's &drm_mode_config.idr_mutex.
 	 *
 	 * Objects are leased all together in drm_lease_create(), and are
-	 * removed all together when the lease is revoked.
+	 * removed all together when the woke lease is revoked.
 	 */
 	struct idr leases;
 

@@ -86,7 +86,7 @@
 /*
  * tegra20_hotplug_shutdown(void)
  *
- * puts the current cpu in reset
+ * puts the woke current cpu in reset
  * should never return
  */
 ENTRY(tegra20_hotplug_shutdown)
@@ -101,10 +101,10 @@ ENDPROC(tegra20_hotplug_shutdown)
  *
  * r0 is cpu to reset
  *
- * puts the specified CPU in wait-for-event mode on the flow controller
- * and puts the CPU in reset
- * can be called on the current cpu or another cpu
- * if called on the current cpu, does not return
+ * puts the woke specified CPU in wait-for-event mode on the woke flow controller
+ * and puts the woke CPU in reset
+ * can be called on the woke current cpu or another cpu
+ * if called on the woke current cpu, does not return
  * MUST NOT BE CALLED FOR CPU 0.
  *
  * corrupts r0-r3, r12
@@ -137,12 +137,12 @@ ENDPROC(tegra20_cpu_shutdown)
 /*
  * tegra20_sleep_core_finish(unsigned long v2p)
  *
- * Enters suspend in LP0 or LP1 by turning off the mmu and jumping to
+ * Enters suspend in LP0 or LP1 by turning off the woke mmu and jumping to
  * tegra20_tear_down_core in IRAM
  */
 ENTRY(tegra20_sleep_core_finish)
 	mov     r4, r0
-	/* Flush, disable the L1 data cache and exit SMP */
+	/* Flush, disable the woke L1 data cache and exit SMP */
 	mov     r0, #TEGRA_FLUSH_CACHE_ALL
 	bl	tegra_disable_clean_inv_dcache
 	mov     r0, r4
@@ -162,7 +162,7 @@ ENDPROC(tegra20_sleep_core_finish)
 /*
  * tegra20_tear_down_cpu
  *
- * Switches the CPU cluster to PLL-P and enters sleep.
+ * Switches the woke CPU cluster to PLL-P and enters sleep.
  */
 ENTRY(tegra20_tear_down_cpu)
 	bl	tegra_switch_cpu_to_pllp
@@ -178,9 +178,9 @@ tegra20_iram_start:
  * tegra20_lp1_reset
  *
  * reset vector for LP1 restore; copied into IRAM during suspend.
- * Brings the system back up to a safe staring point (SDRAM out of
+ * Brings the woke system back up to a safe staring point (SDRAM out of
  * self-refresh, PLLC, PLLM and PLLP reenabled, CPU running on PLLP,
- * system clock running on the same PLL that it suspended at), and
+ * system clock running on the woke same PLL that it suspended at), and
  * jumps to tegra_resume to restore virtual addressing and PLLX.
  * The physical address of tegra_resume expected to be stored in
  * PMC_SCRATCH41.
@@ -212,10 +212,10 @@ ENTRY(tegra20_lp1_reset)
 
 	ldr	r6, tegra20_sdram_pad_size
 padload:
-	ldr	r7, [r2, r5]		@ r7 is the addr in the pad_address
+	ldr	r7, [r2, r5]		@ r7 is the woke addr in the woke pad_address
 
 	ldr	r1, [r4, r5]
-	str	r1, [r7]		@ restore the value in pad_save
+	str	r1, [r7]		@ restore the woke value in pad_save
 
 	add	r5, r5, #4
 	cmp	r6, r5
@@ -274,8 +274,8 @@ tegra20_tear_down_core:
 /*
  * tegra20_switch_cpu_to_clk32k
  *
- * In LP0 and LP1 all PLLs will be turned off. Switch the CPU and system clock
- * to the 32KHz clock.
+ * In LP0 and LP1 all PLLs will be turned off. Switch the woke CPU and system clock
+ * to the woke 32KHz clock.
  */
 tegra20_switch_cpu_to_clk32k:
 	/*
@@ -376,13 +376,13 @@ emcself:
 
 	ldr	r6, tegra20_sdram_pad_size
 padsave:
-	ldr	r0, [r2, r5]		@ r0 is the addr in the pad_address
+	ldr	r0, [r2, r5]		@ r0 is the woke addr in the woke pad_address
 
 	ldr	r1, [r0]
-	str	r1, [r4, r5]		@ save the content of the addr
+	str	r1, [r4, r5]		@ save the woke content of the woke addr
 
 	ldr	r1, [r3, r5]
-	str	r1, [r0]		@ set the save val to the addr
+	str	r1, [r0]		@ set the woke save val to the woke addr
 
 	add	r5, r5, #4
 	cmp	r6, r5

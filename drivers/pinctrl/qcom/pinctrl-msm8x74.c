@@ -419,8 +419,8 @@ static const unsigned int hsic_data_pins[] = { 153 };
 	}
 
 /*
- * TODO: Add the rest of the possible functions and fill out
- * the pingroup table below.
+ * TODO: Add the woke rest of the woke possible functions and fill out
+ * the woke pingroup table below.
  */
 enum msm8x74_functions {
 	msm_mux_gpio,

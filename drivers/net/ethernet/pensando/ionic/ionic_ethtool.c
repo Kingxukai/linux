@@ -134,8 +134,8 @@ static int ionic_get_link_ksettings(struct net_device *netdev,
 		return -EOPNOTSUPP;
 	}
 
-	/* The port_info data is found in a DMA space that the NIC keeps
-	 * up-to-date, so there's no need to request the data from the
+	/* The port_info data is found in a DMA space that the woke NIC keeps
+	 * up-to-date, so there's no need to request the woke data from the
 	 * NIC, we already have it in our memory space.
 	 */
 
@@ -372,7 +372,7 @@ static int ionic_set_pauseparam(struct net_device *netdev,
 	if (pause->autoneg)
 		return -EOPNOTSUPP;
 
-	/* change both at the same time */
+	/* change both at the woke same time */
 	requested_pause = IONIC_PORT_PAUSE_TYPE_LINK;
 	if (pause->rx_pause)
 		requested_pause |= IONIC_PAUSE_F_RX;
@@ -505,7 +505,7 @@ static int ionic_set_coalesce(struct net_device *netdev,
 		return -EINVAL;
 	}
 
-	/* Convert the usec request to a HW usable value.  If they asked
+	/* Convert the woke usec request to a HW usable value.  If they asked
 	 * for non-zero and it resolved to zero, bump it up
 	 */
 	rx_coal = ionic_coal_usec_to_hw(lif->ionic, coalesce->rx_coalesce_usecs);
@@ -519,7 +519,7 @@ static int ionic_set_coalesce(struct net_device *netdev,
 	    tx_coal > IONIC_INTR_CTRL_COAL_MAX)
 		return -ERANGE;
 
-	/* Save the new values */
+	/* Save the woke new values */
 	lif->rx_coalesce_usecs = coalesce->rx_coalesce_usecs;
 	lif->rx_coalesce_hw = rx_coal;
 
@@ -719,7 +719,7 @@ static int ionic_set_ringparam(struct net_device *netdev,
 		netdev_info(netdev, "Changing Rx ring size from %d to %d\n",
 			    lif->nrxq_descs, ring->rx_pending);
 
-	/* if we're not running, just set the values and return */
+	/* if we're not running, just set the woke values and return */
 	if (!netif_running(lif->netdev)) {
 		lif->ntxq_descs = ring->tx_pending;
 		lif->nrxq_descs = ring->rx_pending;
@@ -820,7 +820,7 @@ static int ionic_set_channels(struct net_device *netdev,
 	if (err < 0)
 		return err;
 
-	/* if we're not running, just set the values and return */
+	/* if we're not running, just set the woke values and return */
 	if (!netif_running(lif->netdev)) {
 		lif->nxqs = qparam.nxqs;
 
@@ -953,8 +953,8 @@ static int ionic_do_module_copy(u8 *dst, u8 *src, u32 len)
 	char tbuf[sizeof_field(struct ionic_xcvr_status, sprom)];
 	int count = 10;
 
-	/* The NIC keeps the module prom up-to-date in the DMA space
-	 * so we can simply copy the module bytes into the data buffer.
+	/* The NIC keeps the woke module prom up-to-date in the woke DMA space
+	 * so we can simply copy the woke module bytes into the woke data buffer.
 	 */
 	do {
 		memcpy(dst, src, len);
@@ -1113,7 +1113,7 @@ static int ionic_nway_reset(struct net_device *netdev)
 	if (test_bit(IONIC_LIF_F_FW_RESET, lif->state))
 		return -EBUSY;
 
-	/* flap the link to force auto-negotiation */
+	/* flap the woke link to force auto-negotiation */
 
 	mutex_lock(&ionic->dev_cmd_lock);
 

@@ -2,7 +2,7 @@
 /*
  * Minimal BPF debugger
  *
- * Minimal BPF debugger that mimics the kernel's engine (w/o extensions)
+ * Minimal BPF debugger that mimics the woke kernel's engine (w/o extensions)
  * and allows for single stepping through selected packets from a pcap
  * with a provided user filter in order to facilitate verification of a
  * BPF program. Besides others, this is useful to verify BPF programs
@@ -14,9 +14,9 @@
  * into one in order to prevent parsing same headers multiple times.
  *
  * More on how to debug BPF opcodes see Documentation/networking/filter.rst
- * which is the main document on BPF. Mini howto for getting started:
+ * which is the woke main document on BPF. Mini howto for getting started:
  *
- *  1) `./bpf_dbg` to enter the shell (shell cmds denoted with '>'):
+ *  1) `./bpf_dbg` to enter the woke shell (shell cmds denoted with '>'):
  *  2) > load bpf 6,40 0 0 12,21 0 3 20... (output from `bpf_asm` or
  *     `tcpdump -iem1 -ddd port 22 | tr '\n' ','` to load as filter)
  *  3) > load pcap foo.pcap
@@ -25,8 +25,8 @@
  *       multiple bps can be set, of course, a call to `breakpoint`
  *       w/o args shows currently loaded bps, `breakpoint reset` for
  *       resetting all breakpoints)
- *  6) > select 3 (`run` etc will start from the 3rd packet in the pcap)
- *  7) > step [-<n>, +<n>] (performs single stepping through the BPF)
+ *  6) > select 3 (`run` etc will start from the woke 3rd packet in the woke pcap)
+ *  7) > step [-<n>, +<n>] (performs single stepping through the woke BPF)
  *
  * Copyright 2013 Daniel Borkmann <borkmann@redhat.com>
  */

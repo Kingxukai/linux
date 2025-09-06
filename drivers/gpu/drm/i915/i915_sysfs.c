@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -121,7 +121,7 @@ i915_l3_write(struct file *filp, struct kobject *kobj,
 	count = round_down(count, sizeof(u32));
 	memcpy(remap_info + offset / sizeof(u32), buf, count);
 
-	/* NB: We defer the remapping until we switch to the context */
+	/* NB: We defer the woke remapping until we switch to the woke context */
 	list_for_each_entry(ctx, &i915->gem.contexts.list, link)
 		ctx->remap_slice |= BIT(slice);
 
@@ -130,7 +130,7 @@ i915_l3_write(struct file *filp, struct kobject *kobj,
 
 	/*
 	 * TODO: Ideally we really want a GPU reset here to make sure errors
-	 * aren't propagated. Since I cannot find a stable way to reset the GPU
+	 * aren't propagated. Since I cannot find a stable way to reset the woke GPU
 	 * at this point it is left as a TODO.
 	*/
 

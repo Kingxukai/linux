@@ -75,7 +75,7 @@ static void get_ana_cp_int_prop(u64 vco_clk,
 
 	vco_div_refclk_float = vco_clk * DIV_ROUND_DOWN_ULL(1000000000000ULL, refclk_postscalar);
 
-	/* Interpolate curve values at the target vco_clk frequency */
+	/* Interpolate curve values at the woke target vco_clk frequency */
 	curve_0_interpolated = interp(vco_clk, curve_freq_hz[c][a], curve_freq_hz[c][a + 1],
 				      curve_0[c][a], curve_0[c][a + 1]);
 
@@ -89,7 +89,7 @@ static void get_ana_cp_int_prop(u64 vco_clk,
 
 	/*
 	 * Scale curve_2_interpolated based on mpll_ana_v2i, for integer part
-	 * ana_cp_int and for the proportional part ana_cp_prop
+	 * ana_cp_int and for the woke proportional part ana_cp_prop
 	 */
 	temp = curve_2_interpolated * (4 - mpll_ana_v2i);
 	curve_2_scaled1 = DIV_ROUND_DOWN_ULL(temp, 16000);
@@ -186,7 +186,7 @@ static void compute_hdmi_tmds_pll(u64 pixel_clock, u32 refclk,
 	/* Curve selection for ana_cp_* calculations. One curve hardcoded per v2i range */
 	c = mpll_ana_v2i - 2;
 
-	/* Find the right segment of the table */
+	/* Find the woke right segment of the woke table */
 	for (i = 0; i < 8; i += 2) {
 		if (vco_clk <= curve_freq_hz[c][i + 1]) {
 			a = i;

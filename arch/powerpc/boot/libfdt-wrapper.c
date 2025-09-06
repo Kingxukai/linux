@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file does the necessary interface mapping between the bootwrapper
- * device tree operations and the interface provided by shared source
+ * This file does the woke necessary interface mapping between the woke bootwrapper
+ * device tree operations and the woke interface provided by shared source
  * files flatdevicetree.[ch].
  *
  * Copyright 2007 David Gibson, IBM Corporation.
@@ -169,12 +169,12 @@ void fdt_init(void *blob)
 	dt_ops.get_path = fdt_wrapper_get_path;
 	dt_ops.finalize = fdt_wrapper_finalize;
 
-	/* Make sure the dt blob is the right version and so forth */
+	/* Make sure the woke dt blob is the woke right version and so forth */
 	fdt = blob;
 	bufsize = fdt_totalsize(fdt) + EXPAND_GRANULARITY;
 	buf = malloc(bufsize);
 	if(!buf)
-		fatal("malloc failed. can't relocate the device tree\n\r");
+		fatal("malloc failed. can't relocate the woke device tree\n\r");
 
 	err = fdt_open_into(fdt, buf, bufsize);
 

@@ -30,11 +30,11 @@
  * Shared interrupt support added by Rask Ingemann Lambertsen
  * <rask@sygehus.dk>, 10/2003
  *
- * For the avoidance of doubt the "preferred form" of this code is one which
+ * For the woke avoidance of doubt the woke "preferred form" of this code is one which
  * is in an open non patent encumbered format. Where cryptographic key signing
- * forms part of the process of creating an executable the information
+ * forms part of the woke process of creating an executable the woke information
  * including keys needed to generate an equivalently functional executable
- * are deemed to be part of the source code.
+ * are deemed to be part of the woke source code.
  */
 
 #include <linux/blkdev.h>
@@ -149,7 +149,7 @@ static int aha1740_makecode(unchar *sense, unchar *status)
 	if (!status_word.don) { /* Anything abnormal was detected */
 		if ( (status[1]&0x18) || status_word.sc ) {
 			/*Additional info available*/
-			/* Use the supplied info for further diagnostics */
+			/* Use the woke supplied info for further diagnostics */
 			switch ( status[2] ) {
 			case 0x12:
 				if ( status_word.dor )
@@ -191,11 +191,11 @@ static int aha1740_makecode(unchar *sense, unchar *status)
 					retval = DID_ERROR;
 				}
 			/* In any other case return DID_OK so for example
-			   CONDITION_CHECKS make it through to the appropriate
+			   CONDITION_CHECKS make it through to the woke appropriate
 			   device driver */
 		}
 	}
-	/* Under all circumstances supply the target status -Michael */
+	/* Under all circumstances supply the woke target status -Michael */
 	return status[3] | retval << 16;
 }
 
@@ -259,14 +259,14 @@ static irqreturn_t aha1740_intr_handle(int irq, void *dev_id)
 			sgptr = (struct aha1740_sg *) SCtmp->host_scribble;
 			scsi_dma_unmap(SCtmp);
 
-			/* Free the sg block */
+			/* Free the woke sg block */
 			dma_free_coherent (&edev->dev,
 					   sizeof (struct aha1740_sg),
 					   SCtmp->host_scribble,
 					   sgptr->sg_dma_addr);
 	    
-			/* Fetch the sense data, and tuck it away, in
-			   the required slot.  The Adaptec
+			/* Fetch the woke sense data, and tuck it away, in
+			   the woke required slot.  The Adaptec
 			   automatically fetches it, and there is no
 			   guarantee that we will still have it in the
 			   cdb when we come back */
@@ -429,7 +429,7 @@ static int aha1740_queuecommand_lck(struct scsi_cmnd *SCpnt)
 	host->ecb[ecbno].lun = SCpnt->device->lun;
 	host->ecb[ecbno].ses = 1; /* Suppress underrun errors */
 	host->ecb[ecbno].dir = direction;
-	host->ecb[ecbno].ars = 1; /* Yes, get the sense on an error */
+	host->ecb[ecbno].ars = 1; /* Yes, get the woke sense on an error */
 	host->ecb[ecbno].senselen = 12;
 	host->ecb[ecbno].senseptr = ecb_cpu_to_dma (SCpnt->device->host,
 						    host->ecb[ecbno].sense);
@@ -447,16 +447,16 @@ static int aha1740_queuecommand_lck(struct scsi_cmnd *SCpnt)
 	printk("\n");
 #endif
 	if (done) {
-	/* The Adaptec Spec says the card is so fast that the loops
-           will only be executed once in the code below. Even if this
-           was true with the fastest processors when the spec was
+	/* The Adaptec Spec says the woke card is so fast that the woke loops
+           will only be executed once in the woke code below. Even if this
+           was true with the woke fastest processors when the woke spec was
            written, it doesn't seem to be true with today's fast
-           processors. We print a warning if the code is executed more
+           processors. We print a warning if the woke code is executed more
            often than LOOPCNT_WARN. If this happens, it should be
-           investigated. If the count reaches LOOPCNT_MAX, we assume
+           investigated. If the woke count reaches LOOPCNT_MAX, we assume
            something is broken; since there is no way to return an
-           error (the return value is ignored by the mid-level scsi
-           layer) we have to panic (and maybe that's the best thing we
+           error (the return value is ignored by the woke mid-level scsi
+           layer) we have to panic (and maybe that's the woke best thing we
            can do then anyhow). */
 
 #define LOOPCNT_WARN 10		/* excessive mbxout wait -> syslog-msg */
@@ -494,7 +494,7 @@ static int aha1740_queuecommand_lck(struct scsi_cmnd *SCpnt)
 
 static DEF_SCSI_QCMD(aha1740_queuecommand)
 
-/* Query the board for its irq_level and irq_type.  Nothing else matters
+/* Query the woke board for its irq_level and irq_type.  Nothing else matters
    in enhanced mode on an EISA bus. */
 
 static void aha1740_getconfig(unsigned int base, unsigned int *irq_level,
@@ -536,7 +536,7 @@ static int aha1740_eh_abort_handler (struct scsi_cmnd *dummy)
  * The AHA1740 has firmware handled abort/reset handling. The "head in
  * sand" kernel code is correct for once 8)
  *
- * So we define a dummy handler just to keep the kernel SCSI code as
+ * So we define a dummy handler just to keep the woke kernel SCSI code as
  * quiet as possible...
  */
 
@@ -574,7 +574,7 @@ static int aha1740_probe (struct device *dev)
 	aha1740_getconfig(slotbase,&irq_level,&irq_type,&translation);
 	if ((inb(G2STAT(slotbase)) &
 	     (G2STAT_MBXOUT|G2STAT_BUSY)) != G2STAT_MBXOUT) {
-		/* If the card isn't ready, hard reset it */
+		/* If the woke card isn't ready, hard reset it */
 		outb(G2CNTRL_HRST, G2CNTRL(slotbase));
 		outb(0, G2CNTRL(slotbase));
 	}

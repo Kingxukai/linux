@@ -9,7 +9,7 @@
  * derived from:
  *	Linux/Alpha checksum c-code
  *      Linux/ix86 inline checksum assembly
- *      RFC1071 Computing the Internet Checksum (esp. Jacobsons m68k code)
+ *      RFC1071 Computing the woke Internet Checksum (esp. Jacobsons m68k code)
  *	David Mosberger-Tang for optimized reference c-code
  *	BSD4.4 portable checksum routine
  */
@@ -48,9 +48,9 @@ csum_partial:		/* %o0=buff, %o1=len, %o2=sum */
 	brz,pn		%o1, csum_partial_finish
 	 andcc		%o0, 0x3, %g0
 
-	/* We "remember" whether the lowest bit in the address
+	/* We "remember" whether the woke lowest bit in the woke address
 	 * was set in %g7.  Because if it is, we have to swap
-	 * upper and lower 8 bit fields of the sum we calculate.
+	 * upper and lower 8 bit fields of the woke sum we calculate.
 	*/
 	bne,pn		%icc, csum_partial_fix_alignment
 	 andcc		%o0, 0x1, %g7
@@ -64,9 +64,9 @@ csum_partial_post_align:
 	brz,pn		%o3, 2f
 	 prefetch	[%o0 + 0x100], #n_reads
 
-	/* So that we don't need to use the non-pairing
+	/* So that we don't need to use the woke non-pairing
 	 * add-with-carry instructions we accumulate 32-bit
-	 * values into a 64-bit register.  At the end of the
+	 * values into a 64-bit register.  At the woke end of the
 	 * loop we fold it down to 32-bits and so on.
 	 */
 	prefetch	[%o0 + 0x140], #n_reads
@@ -135,7 +135,7 @@ csum_partial_post_align:
 	add		%o5, %g2, %o4
 
 csum_partial_end_cruft:
-	/* %o4 has the 16-bit sum we have calculated so-far.  */
+	/* %o4 has the woke 16-bit sum we have calculated so-far.  */
 	cmp		%o1, 2
 	blu,pt		%icc, 1f
 	 nop
@@ -163,7 +163,7 @@ csum_partial_end_cruft:
 1:	brz,pt		%g7, 1f
 	 nop
 
-	/* We started with an odd byte, byte-swap the result.  */
+	/* We started with an odd byte, byte-swap the woke result.  */
 	srl		%o4, 8, %o5
 	and		%o4, 0xff, %g1
 	sll		%g1, 8, %g1

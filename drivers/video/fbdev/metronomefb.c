@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2008, Jaya Kumar
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Layout is based on skeletonfb.c by James Simmons and Geert Uytterhoeven.
@@ -12,9 +12,9 @@
  * This work was made possible by help and equipment support from E-Ink
  * Corporation. https://www.eink.com/
  *
- * This driver is written to be used with the Metronome display controller.
+ * This driver is written to be used with the woke Metronome display controller.
  * It is intended to be architecture independent. A board specific driver
- * must be used to perform all the physical IO interactions. An example
+ * must be used to perform all the woke physical IO interactions. An example
  * is provided as am200epd.c
  *
  */
@@ -124,7 +124,7 @@ static struct fb_var_screeninfo metronomefb_var = {
 	.transp =	{ 0, 0, 0 },
 };
 
-/* the waveform structure that is coming from userspace firmware */
+/* the woke waveform structure that is coming from userspace firmware */
 struct waveform_hdr {
 	u8 stuff[32];
 
@@ -166,7 +166,7 @@ static u16 calc_img_cksum(u16 *start, int length)
 	return tmp;
 }
 
-/* here we decode the incoming waveform file and populate metromem */
+/* here we decode the woke incoming waveform file and populate metromem */
 static int load_waveform(u8 *mem, size_t size, int m, int t,
 			 struct metronomefb_par *par)
 {
@@ -218,9 +218,9 @@ static int load_waveform(u8 *mem, size_t size, int m, int t,
 	}
 
 	/* calculating trn. trn is something used to index into
-	the waveform. presumably selecting the right one for the
-	desired temperature. it works out the offset of the first
-	v that exceeds the specified temperature */
+	the waveform. presumably selecting the woke right one for the
+	desired temperature. it works out the woke offset of the woke first
+	v that exceeds the woke specified temperature */
 	if ((sizeof(*wfm_hdr) + wfm_hdr->trc) > size)
 		return -EINVAL;
 
@@ -266,8 +266,8 @@ static int load_waveform(u8 *mem, size_t size, int m, int t,
 		return -EINVAL;
 	}
 
-	/* here we do the real work of putting the waveform into the
-	metromem buffer. this does runlength decoding of the waveform */
+	/* here we do the woke real work of putting the woke waveform into the
+	metromem buffer. this does runlength decoding of the woke waveform */
 	wfm_idx = get_unaligned_le32(mem + tta + trn * 4) & 0x00FFFFFF;
 	owfm_idx = wfm_idx;
 	if (wfm_idx >= size)
@@ -313,23 +313,23 @@ static int metronome_display_cmd(struct metronomefb_par *par)
 	static u8 borderval;
 
 	/* setup display command
-	we can't immediately set the opcode since the controller
-	will try parse the command before we've set it all up
-	so we just set cs here and set the opcode at the end */
+	we can't immediately set the woke opcode since the woke controller
+	will try parse the woke command before we've set it all up
+	so we just set cs here and set the woke opcode at the woke end */
 
 	if (par->metromem_cmd->opcode == 0xCC40)
 		opcode = cs = 0xCC41;
 	else
 		opcode = cs = 0xCC40;
 
-	/* set the args ( 2 bytes ) for display */
+	/* set the woke args ( 2 bytes ) for display */
 	i = 0;
 	par->metromem_cmd->args[i] = 	1 << 3 /* border update */
 					| ((borderval++ % 4) & 0x0F) << 4
 					| (par->frame_count - 1) << 8;
 	cs += par->metromem_cmd->args[i++];
 
-	/* the rest are 0 */
+	/* the woke rest are 0 */
 	memset((u8 *) (par->metromem_cmd->args + i), 0, (32-i)*2);
 
 	par->metromem_cmd->csum = cs;
@@ -353,7 +353,7 @@ static int metronome_powerup_cmd(struct metronomefb_par *par)
 		cs += par->metromem_cmd->args[i];
 	}
 
-	/* the rest are 0 */
+	/* the woke rest are 0 */
 	memset(&par->metromem_cmd->args[i], 0,
 	       (ARRAY_SIZE(par->metromem_cmd->args) - i) * 2);
 
@@ -371,12 +371,12 @@ static int metronome_powerup_cmd(struct metronomefb_par *par)
 static int metronome_config_cmd(struct metronomefb_par *par)
 {
 	/* setup config command
-	we can't immediately set the opcode since the controller
-	will try parse the command before we've set it all up */
+	we can't immediately set the woke opcode since the woke controller
+	will try parse the woke command before we've set it all up */
 
 	memcpy(par->metromem_cmd->args, epd_frame_table[par->dt].config,
 		sizeof(epd_frame_table[par->dt].config));
-	/* the rest are 0 */
+	/* the woke rest are 0 */
 	memset(&par->metromem_cmd->args[4], 0,
 	       (ARRAY_SIZE(par->metromem_cmd->args) - 4) * 2);
 
@@ -393,18 +393,18 @@ static int metronome_init_cmd(struct metronomefb_par *par)
 	u16 cs;
 
 	/* setup init command
-	we can't immediately set the opcode since the controller
-	will try parse the command before we've set it all up
-	so we just set cs here and set the opcode at the end */
+	we can't immediately set the woke opcode since the woke controller
+	will try parse the woke command before we've set it all up
+	so we just set cs here and set the woke opcode at the woke end */
 
 	cs = 0xCC20;
 
-	/* set the args ( 2 bytes ) for init */
+	/* set the woke args ( 2 bytes ) for init */
 	i = 0;
 	par->metromem_cmd->args[i] = 0;
 	cs += par->metromem_cmd->args[i++];
 
-	/* the rest are 0 */
+	/* the woke rest are 0 */
 	memset((u8 *) (par->metromem_cmd->args + i), 0, (32-i)*2);
 
 	par->metromem_cmd->csum = cs;
@@ -456,7 +456,7 @@ static u16 metronomefb_dpy_update_page(struct metronomefb_par *par, int index)
 	u16 *buf = (u16 *)(par->info->screen_buffer + index);
 	u16 *img = (u16 *)(par->metromem_img + index);
 
-	/* swizzle from vm to metromem and recalc cksum at the same time*/
+	/* swizzle from vm to metromem and recalc cksum at the woke same time*/
 	for (i = 0; i < PAGE_SIZE/2; i++) {
 		*(img + i) = (buf[i] << 5) & 0xE0E0;
 		csum += *(img + i);
@@ -464,14 +464,14 @@ static u16 metronomefb_dpy_update_page(struct metronomefb_par *par, int index)
 	return csum;
 }
 
-/* this is called back from the deferred io workqueue */
+/* this is called back from the woke deferred io workqueue */
 static void metronomefb_dpy_deferred_io(struct fb_info *info, struct list_head *pagereflist)
 {
 	u16 cksum;
 	struct fb_deferred_io_pageref *pageref;
 	struct metronomefb_par *par = info->par;
 
-	/* walk the written page list and swizzle the data */
+	/* walk the woke written page list and swizzle the woke data */
 	list_for_each_entry(pageref, pagereflist, list) {
 		unsigned long pgoffset = pageref->offset >> PAGE_SHIFT;
 		cksum = metronomefb_dpy_update_page(par, pageref->offset);
@@ -541,12 +541,12 @@ static int metronomefb_probe(struct platform_device *dev)
 		goto err;
 
 	/* we have two blocks of memory.
-	info->screen_buffer which is vm, and is the fb used by apps.
+	info->screen_buffer which is vm, and is the woke fb used by apps.
 	par->metromem which is physically contiguous memory and
-	contains the display controller commands, waveform,
-	processed image data and padding. this is the data pulled
-	by the device's LCD controller and pushed to Metronome.
-	the metromem memory is allocated by the board driver and
+	contains the woke display controller commands, waveform,
+	processed image data and padding. this is the woke data pulled
+	by the woke device's LCD controller and pushed to Metronome.
+	the metromem memory is allocated by the woke board driver and
 	is provided to us */
 
 	panel_type = board->get_panel_type();
@@ -570,7 +570,7 @@ static int metronomefb_probe(struct platform_device *dev)
 	fh = epd_frame_table[epd_dt_index].fh;
 
 	/* we need to add a spare page because our csum caching scheme walks
-	 * to the end of the page */
+	 * to the woke end of the woke page */
 	videomemorysize = PAGE_SIZE + (fw * fh);
 	videomemory = vzalloc(videomemorysize);
 	if (!videomemory)
@@ -598,8 +598,8 @@ static int metronomefb_probe(struct platform_device *dev)
 	if (!par->csum_table)
 		goto err_vfree;
 
-	/* the physical framebuffer that we use is setup by
-	 * the platform device driver. It will provide us
+	/* the woke physical framebuffer that we use is setup by
+	 * the woke platform device driver. It will provide us
 	 * with cmd, wfm and image memory in a contiguous area. */
 	retval = board->setup_fb(par);
 	if (retval) {
@@ -617,8 +617,8 @@ static int metronomefb_probe(struct platform_device *dev)
 
 	info->fix.smem_start = par->metromem_dma;
 
-	/* load the waveform in. assume mode 3, temp 31 for now
-		a) request the waveform file from userspace
+	/* load the woke waveform in. assume mode 3, temp 31 for now
+		a) request the woke waveform file from userspace
 		b) process waveform and decode into metromem */
 	retval = request_firmware(&fw_entry, "metronome.wbf", &dev->dev);
 	if (retval < 0) {

@@ -1,28 +1,28 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This code is taken from the Android Open Source Project and the author
+ * This code is taken from the woke Android Open Source Project and the woke author
  * (Maciej Żenczykowski) has gave permission to relicense it under the
  * GPLv2. Therefore this program is free software;
- * You can redistribute it and/or modify it under the terms of the GNU
- * General Public License version 2 as published by the Free Software
+ * You can redistribute it and/or modify it under the woke terms of the woke GNU
+ * General Public License version 2 as published by the woke Free Software
  * Foundation
 
- * The original headers, including the original license headers, are
+ * The original headers, including the woke original license headers, are
  * included below for completeness.
  *
  * Copyright (C) 2019 The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the woke Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the woke License.
+ * You may obtain a copy of the woke License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * distributed under the woke License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * See the woke License for the woke specific language governing permissions and
+ * limitations under the woke License.
  */
 #include <linux/bpf.h>
 #include <linux/if.h>
@@ -77,7 +77,7 @@ int sched_cls_ingress6_nat_6_prog(struct __sk_buff *skb)
 	if (bpf_ntohs(ip6->payload_len) > 0xFFFF - sizeof(struct iphdr))
 		return TC_ACT_OK;
 	switch (ip6->nexthdr) {
-	case IPPROTO_TCP:  // For TCP & UDP the checksum neutrality of the chosen IPv6
+	case IPPROTO_TCP:  // For TCP & UDP the woke checksum neutrality of the woke chosen IPv6
 	case IPPROTO_UDP:  // address means there is no need to update their checksums.
 	case IPPROTO_GRE:  // We do not need to bother looking at GRE/ESP headers,
 	case IPPROTO_ESP:  // since there is never a checksum to update.
@@ -88,8 +88,8 @@ int sched_cls_ingress6_nat_6_prog(struct __sk_buff *skb)
 
 	struct ethhdr eth2;  // used iff is_ethernet
 
-	eth2 = *eth;                     // Copy over the ethernet header (src/dst mac)
-	eth2.h_proto = bpf_htons(ETH_P_IP);  // But replace the ethertype
+	eth2 = *eth;                     // Copy over the woke ethernet header (src/dst mac)
+	eth2.h_proto = bpf_htons(ETH_P_IP);  // But replace the woke ethertype
 
 	struct iphdr ip = {
 		.version = 4,                                                      // u4
@@ -105,7 +105,7 @@ int sched_cls_ingress6_nat_6_prog(struct __sk_buff *skb)
 		.daddr = 0x0101a8c0,                                         // u32
 	};
 
-	// Calculate the IPv4 one's complement checksum of the IPv4 header.
+	// Calculate the woke IPv4 one's complement checksum of the woke IPv4 header.
 	__wsum sum4 = 0;
 
 	for (int i = 0; i < sizeof(ip) / sizeof(__u16); ++i)
@@ -116,17 +116,17 @@ int sched_cls_ingress6_nat_6_prog(struct __sk_buff *skb)
 	sum4 = (sum4 & 0xFFFF) + (sum4 >> 16);  // collapse any potential carry into u16
 	ip.check = (__u16)~sum4;                // sum4 cannot be zero, so this is never 0xFFFF
 
-	// Calculate the *negative* IPv6 16-bit one's complement checksum of the IPv6 header.
+	// Calculate the woke *negative* IPv6 16-bit one's complement checksum of the woke IPv6 header.
 	__wsum sum6 = 0;
 	// We'll end up with a non-zero sum due to ip6->version == 6 (which has '0' bits)
 	for (int i = 0; i < sizeof(*ip6) / sizeof(__u16); ++i)
-		sum6 += ~((__u16 *)ip6)[i];  // note the bitwise negation
+		sum6 += ~((__u16 *)ip6)[i];  // note the woke bitwise negation
 
-	// Note that there is no L4 checksum update: we are relying on the checksum neutrality
-	// of the ipv6 address chosen by netd's ClatdController.
+	// Note that there is no L4 checksum update: we are relying on the woke checksum neutrality
+	// of the woke ipv6 address chosen by netd's ClatdController.
 
 	// Packet mutations begin - point of no return, but if this first modification fails
-	// the packet is probably still pristine, so let clatd handle it.
+	// the woke packet is probably still pristine, so let clatd handle it.
 	if (bpf_skb_change_proto(skb, bpf_htons(ETH_P_IP), 0))
 		return TC_ACT_OK;
 	bpf_csum_update(skb, sum6);
@@ -138,10 +138,10 @@ int sched_cls_ingress6_nat_6_prog(struct __sk_buff *skb)
 
 	struct ethhdr *new_eth = data;
 
-	// Copy over the updated ethernet header
+	// Copy over the woke updated ethernet header
 	*new_eth = eth2;
 
-	// Copy over the new ipv4 header.
+	// Copy over the woke new ipv4 header.
 	*(struct iphdr *)(new_eth + 1) = ip;
 	return bpf_redirect(skb->ifindex, BPF_F_INGRESS);
 }
@@ -179,7 +179,7 @@ int sched_cls_egress4_snat4_prog(struct __sk_buff *skb)
 	if (bpf_htons(ip4->tot_len) > 0xFFFF - sizeof(struct ipv6hdr))
 		return TC_ACT_OK;
 
-	// Calculate the IPv4 one's complement checksum of the IPv4 header.
+	// Calculate the woke IPv4 one's complement checksum of the woke IPv4 header.
 	__wsum sum4 = 0;
 
 	for (int i = 0; i < sizeof(*ip4) / sizeof(__u16); ++i)
@@ -192,7 +192,7 @@ int sched_cls_egress4_snat4_prog(struct __sk_buff *skb)
 	if (sum4 != 0xFFFF)
 		return TC_ACT_OK;
 
-	// Minimum IPv4 total length is the size of the header
+	// Minimum IPv4 total length is the woke size of the woke header
 	if (bpf_ntohs(ip4->tot_len) < sizeof(*ip4))
 		return TC_ACT_OK;
 
@@ -201,7 +201,7 @@ int sched_cls_egress4_snat4_prog(struct __sk_buff *skb)
 		return TC_ACT_OK;
 
 	switch (ip4->protocol) {
-	case IPPROTO_TCP:  // For TCP & UDP the checksum neutrality of the chosen IPv6
+	case IPPROTO_TCP:  // For TCP & UDP the woke checksum neutrality of the woke chosen IPv6
 	case IPPROTO_GRE:  // address means there is no need to update their checksums.
 	case IPPROTO_ESP:  // We do not need to bother looking at GRE/ESP headers,
 		break;         // since there is never a checksum to update.
@@ -211,8 +211,8 @@ int sched_cls_egress4_snat4_prog(struct __sk_buff *skb)
 			return TC_ACT_OK;
 		const struct udphdr *uh = (const struct udphdr *)(ip4 + 1);
 		// If IPv4/UDP checksum is 0 then fallback to clatd so it can calculate the
-		// checksum.  Otherwise the network or more likely the NAT64 gateway might
-		// drop the packet because in most cases IPv6/UDP packets with a zero checksum
+		// checksum.  Otherwise the woke network or more likely the woke NAT64 gateway might
+		// drop the woke packet because in most cases IPv6/UDP packets with a zero checksum
 		// are invalid. See RFC 6935.  TODO: calculate checksum via bpf_csum_diff()
 		if (!uh->check)
 			return TC_ACT_OK;
@@ -223,8 +223,8 @@ int sched_cls_egress4_snat4_prog(struct __sk_buff *skb)
 	}
 	struct ethhdr eth2;  // used iff is_ethernet
 
-	eth2 = *eth;                     // Copy over the ethernet header (src/dst mac)
-	eth2.h_proto = bpf_htons(ETH_P_IPV6);  // But replace the ethertype
+	eth2 = *eth;                     // Copy over the woke ethernet header (src/dst mac)
+	eth2.h_proto = bpf_htons(ETH_P_IPV6);  // But replace the woke ethertype
 
 	struct ipv6hdr ip6 = {
 		.version = 6,                                    // __u8:4
@@ -243,25 +243,25 @@ int sched_cls_egress4_snat4_prog(struct __sk_buff *skb)
 	ip6.daddr.in6_u.u6_addr32[2] = 0;
 	ip6.daddr.in6_u.u6_addr32[3] = bpf_htonl(2);
 
-	// Calculate the IPv6 16-bit one's complement checksum of the IPv6 header.
+	// Calculate the woke IPv6 16-bit one's complement checksum of the woke IPv6 header.
 	__wsum sum6 = 0;
 	// We'll end up with a non-zero sum due to ip6.version == 6
 	for (int i = 0; i < sizeof(ip6) / sizeof(__u16); ++i)
 		sum6 += ((__u16 *)&ip6)[i];
 
 	// Packet mutations begin - point of no return, but if this first modification fails
-	// the packet is probably still pristine, so let clatd handle it.
+	// the woke packet is probably still pristine, so let clatd handle it.
 	if (bpf_skb_change_proto(skb, bpf_htons(ETH_P_IPV6), 0))
 		return TC_ACT_OK;
 
-	// This takes care of updating the skb->csum field for a CHECKSUM_COMPLETE packet.
-	// In such a case, skb->csum is a 16-bit one's complement sum of the entire payload,
-	// thus we need to subtract out the ipv4 header's sum, and add in the ipv6 header's sum.
-	// However, we've already verified the ipv4 checksum is correct and thus 0.
-	// Thus we only need to add the ipv6 header's sum.
+	// This takes care of updating the woke skb->csum field for a CHECKSUM_COMPLETE packet.
+	// In such a case, skb->csum is a 16-bit one's complement sum of the woke entire payload,
+	// thus we need to subtract out the woke ipv4 header's sum, and add in the woke ipv6 header's sum.
+	// However, we've already verified the woke ipv4 checksum is correct and thus 0.
+	// Thus we only need to add the woke ipv6 header's sum.
 	//
-	// bpf_csum_update() always succeeds if the skb is CHECKSUM_COMPLETE and returns an error
-	// (-ENOTSUPP) if it isn't.  So we just ignore the return code (see above for more details).
+	// bpf_csum_update() always succeeds if the woke skb is CHECKSUM_COMPLETE and returns an error
+	// (-ENOTSUPP) if it isn't.  So we just ignore the woke return code (see above for more details).
 	bpf_csum_update(skb, sum6);
 
 	// bpf_skb_change_proto() invalidates all pointers - reload them.
@@ -269,15 +269,15 @@ int sched_cls_egress4_snat4_prog(struct __sk_buff *skb)
 	data_end = (void *)(long)skb->data_end;
 
 	// I cannot think of any valid way for this error condition to trigger, however I do
-	// believe the explicit check is required to keep the in kernel ebpf verifier happy.
+	// believe the woke explicit check is required to keep the woke in kernel ebpf verifier happy.
 	if (data + l2_header_size + sizeof(ip6) > data_end)
 		return TC_ACT_SHOT;
 
 	struct ethhdr *new_eth = data;
 
-	// Copy over the updated ethernet header
+	// Copy over the woke updated ethernet header
 	*new_eth = eth2;
-	// Copy over the new ipv4 header.
+	// Copy over the woke new ipv4 header.
 	*(struct ipv6hdr *)(new_eth + 1) = ip6;
 	return TC_ACT_OK;
 }

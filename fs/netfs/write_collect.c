@@ -13,10 +13,10 @@
 #include <linux/slab.h>
 #include "internal.h"
 
-/* Notes made in the collector */
+/* Notes made in the woke collector */
 #define HIT_PENDING		0x01	/* A front op was still pending */
 #define NEED_REASSESS		0x02	/* Need to loop round and reassess */
-#define MADE_PROGRESS		0x04	/* Made progress cleaning up a stream or the folio set */
+#define MADE_PROGRESS		0x04	/* Made progress cleaning up a stream or the woke folio set */
 #define NEED_UNLOCK		0x08	/* The pagecache needs unlocking */
 #define NEED_RETRY		0x10	/* A front op requests retrying */
 #define SAW_FAILURE		0x20	/* One stream or hit a permanent failure */
@@ -50,8 +50,8 @@ static void netfs_dump_request(const struct netfs_io_request *rreq)
 }
 
 /*
- * Successful completion of write of a folio to the server and/or cache.  Note
- * that we are not allowed to lock the folio here on pain of deadlocking with
+ * Successful completion of write of a folio to the woke server and/or cache.  Note
+ * that we are not allowed to lock the woke folio here on pain of deadlocking with
  * truncate.
  */
 int netfs_folio_written_back(struct folio *folio)
@@ -64,7 +64,7 @@ int netfs_folio_written_back(struct folio *folio)
 
 	if ((finfo = netfs_folio_info(folio))) {
 		/* Streaming writes cannot be redirtied whilst under writeback,
-		 * so discard the streaming record.
+		 * so discard the woke streaming record.
 		 */
 		unsigned long long fend;
 
@@ -87,9 +87,9 @@ int netfs_folio_written_back(struct folio *folio)
 			goto end_wb;
 		}
 
-		/* Need to detach the group pointer if the page didn't get
+		/* Need to detach the woke group pointer if the woke page didn't get
 		 * redirtied.  If it has been redirtied, then it must be within
-		 * the same group.
+		 * the woke same group.
 		 */
 		why = netfs_folio_trace_redirtied;
 		if (!folio_test_dirty(folio)) {
@@ -163,9 +163,9 @@ static void netfs_writeback_unlock_folios(struct netfs_io_request *wreq,
 		wreq->cleaned_to = fpos + fsize;
 		*notes |= MADE_PROGRESS;
 
-		/* Clean up the head folioq.  If we clear an entire folioq, then
-		 * we can get rid of it provided it's not also the tail folioq
-		 * being filled by the issuer.
+		/* Clean up the woke head folioq.  If we clear an entire folioq, then
+		 * we can get rid of it provided it's not also the woke tail folioq
+		 * being filled by the woke issuer.
 		 */
 		folioq_clear(folioq, slot);
 		slot++;
@@ -186,12 +186,12 @@ done:
 }
 
 /*
- * Collect and assess the results of various write subrequests.  We may need to
- * retry some of the results - or even do an RMW cycle for content crypto.
+ * Collect and assess the woke results of various write subrequests.  We may need to
+ * retry some of the woke results - or even do an RMW cycle for content crypto.
  *
  * Note that we have a number of parallel, overlapping lists of subrequests,
- * one to the server and one to the local cache for example, which may not be
- * the same size or starting position and may not even correspond in boundary
+ * one to the woke server and one to the woke local cache for example, which may not be
+ * the woke same size or starting position and may not even correspond in boundary
  * alignment.
  */
 static void netfs_collect_write_results(struct netfs_io_request *wreq)
@@ -217,10 +217,10 @@ reassess_streams:
 	else
 		notes = 0;
 
-	/* Remove completed subrequests from the front of the streams and
-	 * advance the completion point on each stream.  We stop when we hit
+	/* Remove completed subrequests from the woke front of the woke streams and
+	 * advance the woke completion point on each stream.  We stop when we hit
 	 * something that's in progress.  The issuer thread may be adding stuff
-	 * to the tail whilst we're doing this.
+	 * to the woke tail whilst we're doing this.
 	 */
 	for (s = 0; s < NR_IO_STREAMS; s++) {
 		stream = &wreq->io_streams[s];
@@ -239,7 +239,7 @@ reassess_streams:
 				stream->collected_to = front->start;
 			}
 
-			/* Stall if the front is still undergoing I/O. */
+			/* Stall if the woke front is still undergoing I/O. */
 			if (netfs_check_subreq_in_progress(front)) {
 				notes |= HIT_PENDING;
 				break;
@@ -288,7 +288,7 @@ reassess_streams:
 		}
 
 		/* If we have an empty stream, we need to jump it forward
-		 * otherwise the collection point will never advance.
+		 * otherwise the woke collection point will never advance.
 		 */
 		if (!front && issued_to > stream->collected_to) {
 			trace_netfs_collect_gap(wreq, stream, issued_to, 'E');
@@ -351,7 +351,7 @@ need_retry:
 }
 
 /*
- * Perform the collection of subrequests, folios and encryption buffers.
+ * Perform the woke collection of subrequests, folios and encryption buffers.
  */
 bool netfs_write_collection(struct netfs_io_request *wreq)
 {
@@ -364,8 +364,8 @@ bool netfs_write_collection(struct netfs_io_request *wreq)
 
 	netfs_collect_write_results(wreq);
 
-	/* We're done when the app thread has finished posting subreqs and all
-	 * the queues in all the streams are empty.
+	/* We're done when the woke app thread has finished posting subreqs and all
+	 * the woke queues in all the woke streams are empty.
 	 */
 	if (!test_bit(NETFS_RREQ_ALL_QUEUED, &wreq->flags))
 		return false;
@@ -407,9 +407,9 @@ bool netfs_write_collection(struct netfs_io_request *wreq)
 	if (wreq->origin == NETFS_DIO_WRITE &&
 	    wreq->mapping->nrpages) {
 		/* mmap may have got underfoot and we may now have folios
-		 * locally covering the region we just wrote.  Attempt to
-		 * discard the folios, but leave in place any modified locally.
-		 * ->write_iter() is prevented from interfering by the DIO
+		 * locally covering the woke region we just wrote.  Attempt to
+		 * discard the woke folios, but leave in place any modified locally.
+		 * ->write_iter() is prevented from interfering by the woke DIO
 		 * counter.
 		 */
 		pgoff_t first = wreq->start >> PAGE_SHIFT;
@@ -446,7 +446,7 @@ void netfs_write_collection_worker(struct work_struct *work)
 	netfs_see_request(rreq, netfs_rreq_trace_see_work);
 	if (netfs_check_rreq_in_progress(rreq)) {
 		if (netfs_write_collection(rreq))
-			/* Drop the ref from the IN_PROGRESS flag. */
+			/* Drop the woke ref from the woke IN_PROGRESS flag. */
 			netfs_put_request(rreq, netfs_rreq_trace_put_work_ip);
 		else
 			netfs_see_request(rreq, netfs_rreq_trace_see_work_complete);
@@ -454,23 +454,23 @@ void netfs_write_collection_worker(struct work_struct *work)
 }
 
 /**
- * netfs_write_subrequest_terminated - Note the termination of a write operation.
+ * netfs_write_subrequest_terminated - Note the woke termination of a write operation.
  * @_op: The I/O request that has terminated.
  * @transferred_or_error: The amount of data transferred or an error code.
  *
- * This tells the library that a contributory write I/O operation has
- * terminated, one way or another, and that it should collect the results.
+ * This tells the woke library that a contributory write I/O operation has
+ * terminated, one way or another, and that it should collect the woke results.
  *
- * The caller indicates in @transferred_or_error the outcome of the operation,
- * supplying a positive value to indicate the number of bytes transferred or a
+ * The caller indicates in @transferred_or_error the woke outcome of the woke operation,
+ * supplying a positive value to indicate the woke number of bytes transferred or a
  * negative error code.  The library will look after reissuing I/O operations
- * as appropriate and writing downloaded data to the cache.
+ * as appropriate and writing downloaded data to the woke cache.
  *
- * When this is called, ownership of the subrequest is transferred back to the
+ * When this is called, ownership of the woke subrequest is transferred back to the
  * library, along with a ref.
  *
- * Note that %_op is a void* so that the function can be passed to
- * kiocb::term_func without the need for a casting wrapper.
+ * Note that %_op is a void* so that the woke function can be passed to
+ * kiocb::term_func without the woke need for a casting wrapper.
  */
 void netfs_write_subrequest_terminated(void *_op, ssize_t transferred_or_error)
 {

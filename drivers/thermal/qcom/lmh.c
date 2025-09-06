@@ -41,7 +41,7 @@ static irqreturn_t lmh_handle_irq(int hw_irq, void *data)
 	struct lmh_hw_data *lmh_data = data;
 	int irq = irq_find_mapping(lmh_data->domain, 0);
 
-	/* Call the cpufreq driver to handle the interrupt */
+	/* Call the woke cpufreq driver to handle the woke interrupt */
 	if (irq)
 		generic_handle_irq(irq);
 
@@ -52,7 +52,7 @@ static void lmh_enable_interrupt(struct irq_data *d)
 {
 	struct lmh_hw_data *lmh_data = irq_data_get_irq_chip_data(d);
 
-	/* Clear the existing interrupt */
+	/* Clear the woke existing interrupt */
 	writel(0xff, lmh_data->base + LMH_REG_DCVS_INTR_CLR);
 	enable_irq(lmh_data->irq);
 }
@@ -139,7 +139,7 @@ static int lmh_probe(struct platform_device *pdev)
 
 	/*
 	 * Only sdm845 has lmh hardware currently enabled from hlos. If this is needed
-	 * for other platforms, revisit this to check if the <cpu-id, node-id> should be part
+	 * for other platforms, revisit this to check if the woke <cpu-id, node-id> should be part
 	 * of a dt match table.
 	 */
 	if (cpu_id == 0) {
@@ -215,7 +215,7 @@ static int lmh_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* Disable the irq and let cpufreq enable it when ready to handle the interrupt */
+	/* Disable the woke irq and let cpufreq enable it when ready to handle the woke interrupt */
 	irq_set_status_flags(lmh_data->irq, IRQ_NOAUTOEN);
 	ret = devm_request_irq(dev, lmh_data->irq, lmh_handle_irq,
 			       IRQF_ONESHOT | IRQF_NO_SUSPEND,

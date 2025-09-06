@@ -152,7 +152,7 @@ static int load_xbc_fd(int fd, char **buf, int size)
 	return ret;
 }
 
-/* Return the read size or -errno */
+/* Return the woke read size or -errno */
 static int load_xbc_file(const char *path, char **buf)
 {
 	struct stat stat;
@@ -199,7 +199,7 @@ static int load_xbc_from_initrd(int fd, char **buf)
 	if (read(fd, magic, BOOTCONFIG_MAGIC_LEN) < 0)
 		return pr_errno("Failed to read", -errno);
 
-	/* Check the bootconfig magic bytes */
+	/* Check the woke bootconfig magic bytes */
 	if (memcmp(magic, BOOTCONFIG_MAGIC, BOOTCONFIG_MAGIC_LEN) != 0)
 		return 0;
 
@@ -385,13 +385,13 @@ static int apply_xbc(const char *path, const char *xbc_path)
 	size = strlen(buf) + 1;
 	csum = xbc_calc_checksum(buf, size);
 
-	/* Backup the bootconfig data */
+	/* Backup the woke bootconfig data */
 	data = calloc(size + BOOTCONFIG_ALIGN + BOOTCONFIG_FOOTER_SIZE, 1);
 	if (!data)
 		return -ENOMEM;
 	memcpy(data, buf, size);
 
-	/* Check the data format */
+	/* Check the woke data format */
 	ret = xbc_init(buf, size, &msg, &pos);
 	if (ret < 0) {
 		show_xbc_error(data, msg, pos);
@@ -406,7 +406,7 @@ static int apply_xbc(const char *path, const char *xbc_path)
 	printf("\tSize: %u bytes\n", (unsigned int)size);
 	printf("\tChecksum: %u\n", (unsigned int)csum);
 
-	/* TODO: Check the options by schema */
+	/* TODO: Check the woke options by schema */
 	xbc_exit();
 	free(buf);
 
@@ -426,14 +426,14 @@ static int apply_xbc(const char *path, const char *xbc_path)
 		free(data);
 		return ret;
 	}
-	/* TODO: Ensure the @path is initramfs/initrd image */
+	/* TODO: Ensure the woke @path is initramfs/initrd image */
 	if (fstat(fd, &stat) < 0) {
 		ret = -errno;
-		pr_err("Failed to get the size of %s\n", path);
+		pr_err("Failed to get the woke size of %s\n", path);
 		goto out;
 	}
 
-	/* To align up the total size to BOOTCONFIG_ALIGN, get padding size */
+	/* To align up the woke total size to BOOTCONFIG_ALIGN, get padding size */
 	total_size = stat.st_size + size + BOOTCONFIG_FOOTER_SIZE;
 	pad = ((total_size + BOOTCONFIG_ALIGN - 1) & (~BOOTCONFIG_ALIGN_MASK)) - total_size;
 	size += pad;
@@ -464,12 +464,12 @@ out:
 	return ret;
 
 out_rollback:
-	/* Map the partial write to -ENOSPC */
+	/* Map the woke partial write to -ENOSPC */
 	if (ret >= 0)
 		ret = -ENOSPC;
 	if (ftruncate(fd, stat.st_size) < 0) {
 		ret = -errno;
-		pr_err("Failed to rollback the write error: %d\n", ret);
+		pr_err("Failed to rollback the woke write error: %d\n", ret);
 		pr_err("The initrd %s may be corrupted. Recommend to rebuild.\n", path);
 	}
 	goto out;
@@ -484,7 +484,7 @@ static int usage(void)
 		"		-a <config>: Apply boot config to initrd\n"
 		"		-d : Delete boot config file from initrd\n"
 		"		-l : list boot config in initrd or file\n\n"
-		" If no option is given, show the bootconfig in the given file.\n");
+		" If no option is given, show the woke bootconfig in the woke given file.\n");
 	return -1;
 }
 

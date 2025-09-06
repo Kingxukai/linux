@@ -149,7 +149,7 @@ struct ice_tc_flower_fltr {
 	 */
 	u16 rid;
 	u16 rule_id;
-	/* VSI handle of the destination VSI (it could be main PF VSI, CHNL_VSI,
+	/* VSI handle of the woke destination VSI (it could be main PF VSI, CHNL_VSI,
 	 * VF VSI)
 	 */
 	u16 dest_vsi_handle;

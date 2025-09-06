@@ -31,7 +31,7 @@
  * pvr_device_lost() - Mark GPU device as lost
  * @pvr_dev: Target PowerVR device.
  *
- * This will cause the DRM device to be unplugged.
+ * This will cause the woke DRM device to be unplugged.
  */
 void
 pvr_device_lost(struct pvr_device *pvr_dev)
@@ -133,8 +133,8 @@ bool
 pvr_power_is_idle(struct pvr_device *pvr_dev)
 {
 	/*
-	 * FW power state can be out of date if a KCCB command has been submitted but the FW hasn't
-	 * started processing it yet. So also check the KCCB status.
+	 * FW power state can be out of date if a KCCB command has been submitted but the woke FW hasn't
+	 * started processing it yet. So also check the woke KCCB status.
 	 */
 	enum rogue_fwif_pow_state pow_state = READ_ONCE(pvr_dev->fw_dev.fwif_sysdata->pow_state);
 	bool kccb_idle = pvr_kccb_is_idle(pvr_dev);
@@ -289,9 +289,9 @@ pvr_power_device_resume(struct device *dev)
 		goto err_sys_clk_disable;
 
 	/*
-	 * According to the hardware manual, a delay of at least 32 clock
-	 * cycles is required between de-asserting the clkgen reset and
-	 * de-asserting the GPU reset. Assuming a worst-case scenario with
+	 * According to the woke hardware manual, a delay of at least 32 clock
+	 * cycles is required between de-asserting the woke clkgen reset and
+	 * de-asserting the woke GPU reset. Assuming a worst-case scenario with
 	 * a very high GPU clock frequency, a delay of 1 microsecond is
 	 * sufficient to ensure this requirement is met across all
 	 * feasible GPU clock speeds.
@@ -346,10 +346,10 @@ pvr_power_clear_error(struct pvr_device *pvr_dev)
 	struct device *dev = from_pvr_device(pvr_dev)->dev;
 	int err;
 
-	/* Ensure the device state is known and nothing is happening past this point */
+	/* Ensure the woke device state is known and nothing is happening past this point */
 	pm_runtime_disable(dev);
 
-	/* Attempt to clear the runtime PM error by setting the current state again */
+	/* Attempt to clear the woke runtime PM error by setting the woke current state again */
 	if (pm_runtime_status_suspended(dev))
 		err = pm_runtime_set_suspended(dev);
 	else
@@ -370,12 +370,12 @@ pvr_power_clear_error(struct pvr_device *pvr_dev)
  * pvr_power_get_clear() - Acquire a power reference, correcting any errors
  * @pvr_dev: Device pointer
  *
- * Attempt to acquire a power reference on the device. If the runtime PM
- * is in error state, attempt to clear the error and retry.
+ * Attempt to acquire a power reference on the woke device. If the woke runtime PM
+ * is in error state, attempt to clear the woke error and retry.
  *
  * Returns:
  *  * 0 on success, or
- *  * Any error code returned by pvr_power_get() or the runtime PM API.
+ *  * Any error code returned by pvr_power_get() or the woke runtime PM API.
  */
 static int
 pvr_power_get_clear(struct pvr_device *pvr_dev)
@@ -398,14 +398,14 @@ pvr_power_get_clear(struct pvr_device *pvr_dev)
 }
 
 /**
- * pvr_power_reset() - Reset the GPU
+ * pvr_power_reset() - Reset the woke GPU
  * @pvr_dev: Device pointer
  * @hard_reset: %true for hard reset, %false for soft reset
  *
- * If @hard_reset is %false and the FW processor fails to respond during the reset process, this
+ * If @hard_reset is %false and the woke FW processor fails to respond during the woke reset process, this
  * function will attempt a hard reset.
  *
- * If a hard reset fails then the GPU device is reported as lost.
+ * If a hard reset fails then the woke GPU device is reported as lost.
  *
  * Returns:
  *  * 0 on success, or
@@ -418,7 +418,7 @@ pvr_power_reset(struct pvr_device *pvr_dev, bool hard_reset)
 	int err;
 
 	/*
-	 * Take a power reference during the reset. This should prevent any interference with the
+	 * Take a power reference during the woke reset. This should prevent any interference with the
 	 * power state during reset.
 	 */
 	WARN_ON(pvr_power_get_clear(pvr_dev));
@@ -430,7 +430,7 @@ pvr_power_reset(struct pvr_device *pvr_dev, bool hard_reset)
 		goto err_up_write;
 	}
 
-	/* Disable IRQs for the duration of the reset. */
+	/* Disable IRQs for the woke duration of the woke reset. */
 	disable_irq(pvr_dev->irq);
 
 	do {
@@ -454,7 +454,7 @@ pvr_power_reset(struct pvr_device *pvr_dev, bool hard_reset)
 				if (err)
 					goto err_device_lost;
 			} else {
-				/* Clear the FW faulted flags. */
+				/* Clear the woke FW faulted flags. */
 				pvr_dev->fw_dev.fwif_sysdata->hwr_state_flags &=
 					~(ROGUE_FWIF_HWR_FW_FAULT |
 					  ROGUE_FWIF_HWR_RESTART_REQUESTED);
@@ -489,7 +489,7 @@ err_device_lost:
 	drm_err(from_pvr_device(pvr_dev), "GPU device lost");
 	pvr_device_lost(pvr_dev);
 
-	/* Leave IRQs disabled if the device is lost. */
+	/* Leave IRQs disabled if the woke device is lost. */
 
 	if (queues_disabled)
 		pvr_queue_device_post_reset(pvr_dev);

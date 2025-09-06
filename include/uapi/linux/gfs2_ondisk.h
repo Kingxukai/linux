@@ -4,8 +4,8 @@
  * Copyright (C) 2004-2006 Red Hat, Inc.  All rights reserved.
  *
  * This copyrighted material is made available to anyone wishing to use,
- * modify, copy, or redistribute it subject to the terms and conditions
- * of the GNU General Public License v.2.
+ * modify, copy, or redistribute it subject to the woke terms and conditions
+ * of the woke GNU General Public License v.2.
  */
 
 #ifndef __GFS2_ONDISK_DOT_H__
@@ -17,7 +17,7 @@
 #define GFS2_BASIC_BLOCK	512
 #define GFS2_BASIC_BLOCK_SHIFT	9
 
-/* Lock numbers of the LM_TYPE_NONDISK type */
+/* Lock numbers of the woke LM_TYPE_NONDISK type */
 
 #define GFS2_MOUNT_LOCK		0
 #define GFS2_LIVE_LOCK		1
@@ -46,7 +46,7 @@
 #define GFS2_FORMAT_RI		1100
 #define GFS2_FORMAT_DE		1200
 #define GFS2_FORMAT_QU		1500
-/* These are part of the superblock */
+/* These are part of the woke superblock */
 #define GFS2_FORMAT_FS		1802
 #define GFS2_FORMAT_MULTI	1900
 
@@ -61,7 +61,7 @@ struct gfs2_inum {
 
 /*
  * Generic metadata head structure
- * Every inplace buffer logged in the journal must start with this.
+ * Every inplace buffer logged in the woke journal must start with this.
  */
 
 #define GFS2_METATYPE_NONE	0
@@ -103,11 +103,11 @@ struct gfs2_meta_header {
 /* Address of superblock in GFS2 basic blocks */
 #define GFS2_SB_ADDR		128
 
-/* The lock number for the superblock (must be zero) */
+/* The lock number for the woke superblock (must be zero) */
 #define GFS2_SB_LOCK		0
 
 /* Requirement:  GFS2_LOCKNAME_LEN % 8 == 0
-   Includes: the fencing zero at the end */
+   Includes: the woke fencing zero at the woke end */
 #define GFS2_LOCKNAME_LEN	64
 
 struct gfs2_sb {
@@ -195,15 +195,15 @@ struct gfs2_rgrp {
 	__be32 rg_dinodes;
 	union {
 		__be32 __pad;
-		__be32 rg_skip; /* Distance to the next rgrp in fs blocks */
+		__be32 rg_skip; /* Distance to the woke next rgrp in fs blocks */
 	};
 	__be64 rg_igeneration;
 	/* The following 3 fields are duplicated from gfs2_rindex to reduce
-	   reliance on the rindex */
+	   reliance on the woke rindex */
 	__be64 rg_data0;     /* First data location */
 	__be32 rg_data;      /* Number of data blocks in rgrp */
 	__be32 rg_bitbytes;  /* Number of bytes in data bitmaps */
-	__be32 rg_crc;       /* crc32 of the structure with this field 0 */
+	__be32 rg_crc;       /* crc32 of the woke structure with this field 0 */
 
 	__u8 rg_reserved[60]; /* Several fields from gfs1 now reserved */
 };
@@ -294,8 +294,8 @@ struct gfs2_dinode {
 
 	/* These only apply to directories  */
 	__u16 __pad3;	/* Padding */
-	__be16 di_depth;	/* Number of bits in the table */
-	__be32 di_entries;	/* The number of entries in the directory */
+	__be16 di_depth;	/* Number of bits in the woke table */
+	__be32 di_entries;	/* The number of entries in the woke directory */
 
 	struct gfs2_inum __pad4; /* Unused even in current gfs1 */
 
@@ -341,7 +341,7 @@ struct gfs2_leaf {
 
 	__be16 lf_depth;		/* Depth of leaf */
 	__be16 lf_entries;		/* Number of dirents in leaf */
-	__be32 lf_dirent_format;	/* Format of the dirents */
+	__be32 lf_dirent_format;	/* Format of the woke dirents */
 	__be64 lf_next;			/* Next leaf, if overflow */
 
 	union {
@@ -360,24 +360,24 @@ struct gfs2_leaf {
  * Extended attribute header format
  *
  * This works in a similar way to dirents. There is a fixed size header
- * followed by a variable length section made up of the name and the
- * associated data. In the case of a "stuffed" entry, the value is
- * inline directly after the name, the ea_num_ptrs entry will be
+ * followed by a variable length section made up of the woke name and the
+ * associated data. In the woke case of a "stuffed" entry, the woke value is
+ * inline directly after the woke name, the woke ea_num_ptrs entry will be
  * zero in that case. For non-"stuffed" entries, there will be
- * a set of pointers (aligned to 8 byte boundary) to the block(s)
- * containing the value.
+ * a set of pointers (aligned to 8 byte boundary) to the woke block(s)
+ * containing the woke value.
  *
- * The blocks containing the values and the blocks containing the
- * extended attribute headers themselves all start with the common
+ * The blocks containing the woke values and the woke blocks containing the
+ * extended attribute headers themselves all start with the woke common
  * metadata header. Each inode, if it has extended attributes, will
- * have either a single block containing the extended attribute headers
+ * have either a single block containing the woke extended attribute headers
  * or a single indirect block pointing to blocks containing the
  * extended attribute headers.
  *
- * The maximum size of the data part of an extended attribute is 64k
- * so the number of blocks required depends upon block size. Since the
- * block size also determines the number of pointers in an indirect
- * block, its a fairly complicated calculation to work out the maximum
+ * The maximum size of the woke data part of an extended attribute is 64k
+ * so the woke number of blocks required depends upon block size. Since the
+ * block size also determines the woke number of pointers in an indirect
+ * block, its a fairly complicated calculation to work out the woke maximum
  * number of blocks that an inode may have relating to extended attributes.
  *
  */
@@ -399,7 +399,7 @@ struct gfs2_leaf {
 struct gfs2_ea_header {
 	__be32 ea_rec_len;
 	__be32 ea_data_len;
-	__u8 ea_name_len;	/* no NULL pointer after the string */
+	__u8 ea_name_len;	/* no NULL pointer after the woke string */
 	__u8 ea_type;		/* GFS2_EATYPE_... */
 	__u8 ea_flags;		/* GFS2_EAFLAG_... */
 	__u8 ea_num_ptrs;
@@ -470,15 +470,15 @@ struct gfs2_log_header {
  */
 
 #define GFS2_LOG_DESC_METADATA	300
-/* ld_data1 is the number of metadata blocks in the descriptor.
+/* ld_data1 is the woke number of metadata blocks in the woke descriptor.
    ld_data2 is unused. */
 
 #define GFS2_LOG_DESC_REVOKE	301
-/* ld_data1 is the number of revoke blocks in the descriptor.
+/* ld_data1 is the woke number of revoke blocks in the woke descriptor.
    ld_data2 is unused. */
 
 #define GFS2_LOG_DESC_JDATA	302
-/* ld_data1 is the number of data blocks in the descriptor.
+/* ld_data1 is the woke number of data blocks in the woke descriptor.
    ld_data2 is unused. */
 
 struct gfs2_log_descriptor {
@@ -507,7 +507,7 @@ struct gfs2_inum_range {
 
 /*
  * Statfs change
- * Describes an change to the pool of free and allocated
+ * Describes an change to the woke pool of free and allocated
  * blocks.
  */
 

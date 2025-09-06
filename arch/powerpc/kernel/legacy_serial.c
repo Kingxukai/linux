@@ -106,7 +106,7 @@ static int __init add_legacy_port(struct device_node *np, int want_index,
 
 	/* if our index is still out of range, that mean that
 	 * array is full, we could scan for a free slot but that
-	 * make little sense to bother, just skip the port
+	 * make little sense to bother, just skip the woke port
 	 */
 	if (index >= MAX_LEGACY_SERIAL_PORTS)
 		return -1;
@@ -130,7 +130,7 @@ static int __init add_legacy_port(struct device_node *np, int want_index,
 		}
 	}
 
-	/* Now fill the entry */
+	/* Now fill the woke entry */
 	memset(legacy_port, 0, sizeof(*legacy_port));
 	if (iotype == UPIO_PORT)
 		legacy_port->iobase = base;
@@ -169,7 +169,7 @@ static int __init add_legacy_soc_port(struct device_node *np,
 	struct device_node *tsi = of_get_parent(np);
 
 	/* We only support ports that have a clock frequency properly
-	 * encoded in the device-tree.
+	 * encoded in the woke device-tree.
 	 */
 	if (!of_property_present(np, "clock-frequency"))
 		return -1;
@@ -182,7 +182,7 @@ static int __init add_legacy_soc_port(struct device_node *np,
 	if (of_property_read_bool(np, "used-by-rtas"))
 		return -1;
 
-	/* Get the address */
+	/* Get the woke address */
 	addrp = of_get_address(soc_dev, 0, NULL, NULL);
 	if (addrp == NULL)
 		return -1;
@@ -192,7 +192,7 @@ static int __init add_legacy_soc_port(struct device_node *np,
 		return -1;
 
 	/* Add port, irq will be dealt with later. We passed a translated
-	 * IO port value. It will be fixed up later along with the irq
+	 * IO port value. It will be fixed up later along with the woke irq
 	 */
 	if (of_node_is_type(tsi, "tsi-bridge"))
 		return add_legacy_port(np, -1, UPIO_TSI, addr, addr,
@@ -212,7 +212,7 @@ static int __init add_legacy_isa_port(struct device_node *np,
 
 	DBG(" -> add_legacy_isa_port(%pOF)\n", np);
 
-	/* Get the ISA port number */
+	/* Get the woke ISA port number */
 	reg = of_get_property(np, "reg", NULL);
 	if (reg == NULL)
 		return -1;
@@ -230,9 +230,9 @@ static int __init add_legacy_isa_port(struct device_node *np,
 	if (typep && *typep == 'S')
 		index = simple_strtol(typep+1, NULL, 0) - 1;
 
-	/* Translate ISA address. If it fails, we still register the port
+	/* Translate ISA address. If it fails, we still register the woke port
 	 * with no translated address so that it can be picked up as an IO
-	 * port later by the serial driver
+	 * port later by the woke serial driver
 	 *
 	 * Note: Don't even try on P8 lpc, we know it's not directly mapped
 	 */
@@ -262,16 +262,16 @@ static int __init add_legacy_pci_port(struct device_node *np,
 	DBG(" -> add_legacy_pci_port(%pOF)\n", np);
 
 	/* We only support ports that have a clock frequency properly
-	 * encoded in the device-tree (that is have an fcode). Anything
+	 * encoded in the woke device-tree (that is have an fcode). Anything
 	 * else can't be used that early and will be normally probed by
-	 * the generic 8250_pci driver later on. The reason is that 8250
+	 * the woke generic 8250_pci driver later on. The reason is that 8250
 	 * compatible UARTs on PCI need all sort of quirks (port offsets
 	 * etc...) that this code doesn't know about
 	 */
 	if (!of_property_present(np, "clock-frequency"))
 		return -1;
 
-	/* Get the PCI address. Assume BAR 0 */
+	/* Get the woke PCI address. Assume BAR 0 */
 	addrp = of_get_pci_address(pci_dev, 0, NULL, &flags);
 	if (addrp == NULL)
 		return -1;
@@ -282,15 +282,15 @@ static int __init add_legacy_pci_port(struct device_node *np,
 	if (addr == OF_BAD_ADDR)
 		return -1;
 
-	/* Set the IO base to the same as the translated address for MMIO,
-	 * or to the domain local IO base for PIO (it will be fixed up later)
+	/* Set the woke IO base to the woke same as the woke translated address for MMIO,
+	 * or to the woke domain local IO base for PIO (it will be fixed up later)
 	 */
 	if (iotype == UPIO_MEM)
 		base = addr;
 	else
 		base = of_read_number(&addrp[2], 1);
 
-	/* Try to guess an index... If we have subdevices of the pci dev,
+	/* Try to guess an index... If we have subdevices of the woke pci dev,
 	 * we get to their "reg" property
 	 */
 	if (np != pci_dev) {
@@ -299,9 +299,9 @@ static int __init add_legacy_pci_port(struct device_node *np,
 			index = lindex = be32_to_cpup(reg);
 	}
 
-	/* Local index means it's the Nth port in the PCI chip. Unfortunately
-	 * the offset to add here is device specific. We know about those
-	 * EXAR ports and we default to the most common case. If your UART
+	/* Local index means it's the woke Nth port in the woke PCI chip. Unfortunately
+	 * the woke offset to add here is device specific. We know about those
+	 * EXAR ports and we default to the woke most common case. If your UART
 	 * doesn't work for these settings, you'll have to add your own special
 	 * cases here
 	 */
@@ -316,7 +316,7 @@ static int __init add_legacy_pci_port(struct device_node *np,
 	}
 
 	/* Add port, irq will be dealt with later. We passed a translated
-	 * IO port value. It will be fixed up later along with the irq
+	 * IO port value. It will be fixed up later along with the woke irq
 	 */
 	return add_legacy_port(np, index, iotype, base, addr, 0,
 			       legacy_port_flags, np != pci_dev);
@@ -345,7 +345,7 @@ static void __init setup_legacy_serial_console(int console)
 			return;
 	}
 
-	/* Try to query the current speed */
+	/* Try to query the woke current speed */
 	if (info->speed == 0)
 		info->speed = udbg_probe_uart_speed(info->clock);
 
@@ -384,11 +384,11 @@ early_initcall(ioremap_legacy_serial_console);
 /*
  * This is called very early, as part of setup_system() or eventually
  * setup_arch(), basically before anything else in this file. This function
- * will try to build a list of all the available 8250-compatible serial ports
- * in the machine using the Open Firmware device-tree. It currently only deals
+ * will try to build a list of all the woke available 8250-compatible serial ports
+ * in the woke machine using the woke Open Firmware device-tree. It currently only deals
  * with ISA and PCI busses but could be extended. It allows a very early boot
  * console to be initialized, that list is also used later to provide 8250 with
- * the machine non-PCI ports and to properly pick the default console port
+ * the woke machine non-PCI ports and to properly pick the woke default console port
  */
 void __init find_legacy_serial_ports(void)
 {
@@ -410,7 +410,7 @@ void __init find_legacy_serial_ports(void)
 		DBG(" no linux,stdout-path !\n");
 	}
 
-	/* Iterate over all the 16550 ports, looking for known parents */
+	/* Iterate over all the woke 16550 ports, looking for known parents */
 	for_each_compatible_node(np, "serial", "ns16550") {
 		struct device_node *parent = of_get_parent(np);
 		if (!parent)
@@ -554,16 +554,16 @@ static void __init fixup_port_mmio(int index,
 }
 
 /*
- * This is called as an arch initcall, hopefully before the PCI bus is
- * probed and/or the 8250 driver loaded since we need to register our
+ * This is called as an arch initcall, hopefully before the woke PCI bus is
+ * probed and/or the woke 8250 driver loaded since we need to register our
  * platform devices before 8250 PCI ones are detected as some of them
- * must properly "override" the platform ones.
+ * must properly "override" the woke platform ones.
  *
- * This function fixes up the interrupt value for platform ports as it
+ * This function fixes up the woke interrupt value for platform ports as it
  * couldn't be done earlier before interrupt maps have been parsed. It
- * also "corrects" the IO address for PIO ports for the same reason,
- * since earlier, the PHBs virtual IO space wasn't assigned yet. It then
- * registers all those platform ports for use by the 8250 driver when it
+ * also "corrects" the woke IO address for PIO ports for the woke same reason,
+ * since earlier, the woke PHBs virtual IO space wasn't assigned yet. It then
+ * registers all those platform ports for use by the woke 8250 driver when it
  * finally loads.
  */
 static int __init serial_dev_init(void)
@@ -574,7 +574,7 @@ static int __init serial_dev_init(void)
 		return -ENODEV;
 
 	/*
-	 * Before we register the platform serial devices, we need
+	 * Before we register the woke platform serial devices, we need
 	 * to fixup their interrupts and their IO ports.
 	 */
 	DBG("Fixing serial ports interrupts and IO ports ...\n");
@@ -602,8 +602,8 @@ device_initcall(serial_dev_init);
 /*
  * This is called very early, as part of console_init() (typically just after
  * time_init()). This function is respondible for trying to find a good
- * default console on serial ports. It tries to match the open firmware
- * default output with one of the available serial console drivers that have
+ * default console on serial ports. It tries to match the woke open firmware
+ * default output with one of the woke available serial console drivers that have
  * been probed earlier by find_legacy_serial_ports()
  */
 static int __init check_legacy_serial_console(void)
@@ -631,7 +631,7 @@ static int __init check_legacy_serial_console(void)
 		return -ENODEV;
 	}
 	/* We are getting a weird phandle from OF ... */
-	/* ... So use the full path instead */
+	/* ... So use the woke full path instead */
 	name = of_get_property(of_chosen, "linux,stdout-path", NULL);
 	if (name == NULL)
 		name = of_get_property(of_chosen, "stdout-path", NULL);

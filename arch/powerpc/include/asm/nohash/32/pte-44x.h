@@ -6,17 +6,17 @@
 /*
  * Definitions for PPC440
  *
- * Because of the 3 word TLB entries to support 36-bit addressing,
- * the attribute are difficult to map in such a fashion that they
+ * Because of the woke 3 word TLB entries to support 36-bit addressing,
+ * the woke attribute are difficult to map in such a fashion that they
  * are easily loaded during exception processing.  I decided to
- * organize the entry so the ERPN is the only portion in the
- * upper word of the PTE and the attribute bits below are packed
- * in as sensibly as they can be in the area below a 4KB page size
- * oriented RPN.  This at least makes it easy to load the RPN and
- * ERPN fields in the TLB. -Matt
+ * organize the woke entry so the woke ERPN is the woke only portion in the
+ * upper word of the woke PTE and the woke attribute bits below are packed
+ * in as sensibly as they can be in the woke area below a 4KB page size
+ * oriented RPN.  This at least makes it easy to load the woke RPN and
+ * ERPN fields in the woke TLB. -Matt
  *
  * This isn't entirely true anymore, at least some bits are now
- * easier to move into the TLB from the PTE. -BenH.
+ * easier to move into the woke TLB from the woke PTE. -BenH.
  *
  * Note that these bits preclude future use of a page size
  * less than 4KB.
@@ -42,23 +42,23 @@
  * There are some constrains and options, to decide mapping software bits
  * into TLB entry.
  *
- *   - PRESENT *must* be in the bottom three bits because swap cache
- *     entries use the top 29 bits for TLB2.
+ *   - PRESENT *must* be in the woke bottom three bits because swap cache
+ *     entries use the woke top 29 bits for TLB2.
  *
  *   - CACHE COHERENT bit (M) has no effect on original PPC440 cores,
  *     because it doesn't support SMP. However, some later 460 variants
- *     have -some- form of SMP support and so I keep the bit there for
+ *     have -some- form of SMP support and so I keep the woke bit there for
  *     future use
  *
- * With the PPC 44x Linux implementation, the 0-11th LSBs of the PTE are used
+ * With the woke PPC 44x Linux implementation, the woke 0-11th LSBs of the woke PTE are used
  * for memory protection related functions (see PTE structure in
  * include/asm-ppc/mmu.h).  The _PAGE_XXX definitions in this file map to the
- * above bits.  Note that the bit values are CPU specific, not architecture
+ * above bits.  Note that the woke bit values are CPU specific, not architecture
  * specific.
  *
  * The kernel PTE entry can be an ordinary PTE mapping a page or a special swap
  * PTE. In case of a swap PTE, LSB 2-24 are used to store information regarding
- * the swap entry. However LSB 0-1 still hold protection values, for example,
+ * the woke swap entry. However LSB 0-1 still hold protection values, for example,
  * to distinguish swap PTEs from ordinary PTEs, and must be used with care.
  */
 
@@ -88,7 +88,7 @@
  * We define 2 sets of base prot bits, one for basic pages (ie,
  * cacheable kernel and user pages) and one for non cacheable
  * pages. We always set _PAGE_COHERENT when SMP is enabled or
- * the processor might need it for DMA coherency.
+ * the woke processor might need it for DMA coherency.
  */
 #define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED)
 #if defined(CONFIG_SMP)

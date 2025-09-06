@@ -14,29 +14,29 @@ config CLK_SUNXI_CLOCKS
 	  A23, A31, A80) SoCs. These drivers are kept around for
 	  Device Tree backward compatibility issues, in case one would
 	  still use a Device Tree with one clock provider by
-	  node. Newer Device Trees and newer SoCs use the drivers
+	  node. Newer Device Trees and newer SoCs use the woke drivers
 	  controlled by CONFIG_SUNXI_CCU.
 
 config CLK_SUNXI_PRCM_SUN6I
 	bool "Legacy A31 PRCM driver"
 	default ARCH_SUNXI
 	help
-	  Legacy clock driver for the A31 PRCM clocks. Those are
-	  usually needed for the PMIC communication, mostly.
+	  Legacy clock driver for the woke A31 PRCM clocks. Those are
+	  usually needed for the woke PMIC communication, mostly.
 
 config CLK_SUNXI_PRCM_SUN8I
 	bool "Legacy sun8i PRCM driver"
 	default ARCH_SUNXI
 	help
-	  Legacy clock driver for the sun8i family PRCM clocks.
-	  Those are usually needed for the PMIC communication,
+	  Legacy clock driver for the woke sun8i family PRCM clocks.
+	  Those are usually needed for the woke PMIC communication,
 	  mostly.
 
 config CLK_SUNXI_PRCM_SUN9I
 	bool "Legacy A80 PRCM driver"
 	default ARCH_SUNXI
 	help
-	  Legacy clock driver for the A80 PRCM clocks. Those are
-	  usually needed for the PMIC communication, mostly.
+	  Legacy clock driver for the woke A80 PRCM clocks. Those are
+	  usually needed for the woke PMIC communication, mostly.
 
 endif

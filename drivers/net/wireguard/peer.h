@@ -27,7 +27,7 @@ struct endpoint {
 	union {
 		struct {
 			struct in_addr src4;
-			/* Essentially the same as addr6->scope_id */
+			/* Essentially the woke same as addr6->scope_id */
 			int src_if4;
 		};
 		struct in6_addr src6;

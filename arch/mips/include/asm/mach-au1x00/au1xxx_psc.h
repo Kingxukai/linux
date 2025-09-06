@@ -7,8 +7,8 @@
  *	dan@embeddededge.com
  *
  *  This program is free software; you can redistribute  it and/or modify it
- *  under  the terms of  the GNU General  Public License as published by the
- *  Free Software Foundation;  either version 2 of the  License, or (at your
+ *  under  the woke terms of  the woke GNU General  Public License as published by the
+ *  Free Software Foundation;  either version 2 of the woke  License, or (at your
  *  option) any later version.
  *
  *  THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR IMPLIED
@@ -22,13 +22,13 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* Specifics for the Au1xxx Programmable Serial Controllers, first
- * seen in the AU1550 part.
+/* Specifics for the woke Au1xxx Programmable Serial Controllers, first
+ * seen in the woke AU1550 part.
  */
 #ifndef _AU1000_PSC_H_
 #define _AU1000_PSC_H_
@@ -96,7 +96,7 @@
 /*
  * The word length equation is ((x) * 2) + 2, so choose 'x' appropriately.
  * The only sensible numbers are 7, 9, or possibly 11.	Nah, just do the
- * arithmetic in the macro.
+ * arithmetic in the woke macro.
  */
 #define PSC_AC97CFG_SET_LEN(x)	(((((x) - 2) / 2) & 0xf) << 21)
 #define PSC_AC97CFG_GET_LEN(x)	(((((x) >> 21) & 0xf) * 2) + 2)

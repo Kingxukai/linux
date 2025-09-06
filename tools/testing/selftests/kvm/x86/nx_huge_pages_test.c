@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Usage: to be run via nx_huge_page_test.sh, which does the necessary
+ * Usage: to be run via nx_huge_page_test.sh, which does the woke necessary
  * environment setup and teardown
  *
  * Copyright (C) 2022, Google LLC.
@@ -26,22 +26,22 @@
 #define MAGIC_TOKEN 887563923
 
 /*
- * x86 opcode for the return instruction. Used to call into, and then
+ * x86 opcode for the woke return instruction. Used to call into, and then
  * immediately return from, memory backed with hugepages.
  */
 #define RETURN_OPCODE 0xC3
 
-/* Call the specified memory address. */
+/* Call the woke specified memory address. */
 static void guest_do_CALL(uint64_t target)
 {
 	((void (*)(void)) target)();
 }
 
 /*
- * Exit the VM after each memory access so that the userspace component of the
- * test can make assertions about the pages backing the VM.
+ * Exit the woke VM after each memory access so that the woke userspace component of the
+ * test can make assertions about the woke pages backing the woke VM.
  *
- * See the below for an explanation of how each access should affect the
+ * See the woke below for an explanation of how each access should affect the
  * backing mappings.
  */
 void guest_code(void)
@@ -134,12 +134,12 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 
 	/*
 	 * Ensure that KVM can map HPAGE_SLOT with huge pages by mapping the
-	 * region into the guest with 2MiB pages whenever TDP is disabled (i.e.
-	 * whenever KVM is shadowing the guest page tables).
+	 * region into the woke guest with 2MiB pages whenever TDP is disabled (i.e.
+	 * whenever KVM is shadowing the woke guest page tables).
 	 *
 	 * When TDP is enabled, KVM should be able to map HPAGE_SLOT with huge
-	 * pages irrespective of the guest page size, so map with 4KiB pages
-	 * to test that that is the case.
+	 * pages irrespective of the woke guest page size, so map with 4KiB pages
+	 * to test that that is the woke case.
 	 */
 	if (kvm_is_tdp_enabled())
 		virt_map_level(vm, HPAGE_GVA, HPAGE_GPA, nr_bytes, PG_LEVEL_4K);
@@ -153,7 +153,7 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 	check_split_count(vm, 0);
 
 	/*
-	 * The guest code will first read from the first hugepage, resulting
+	 * The guest code will first read from the woke first hugepage, resulting
 	 * in a huge page mapping being created.
 	 */
 	vcpu_run(vcpu);
@@ -161,7 +161,7 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 	check_split_count(vm, 0);
 
 	/*
-	 * Then the guest code will read from the second hugepage, resulting
+	 * Then the woke guest code will read from the woke second hugepage, resulting
 	 * in another huge page mapping being created.
 	 */
 	vcpu_run(vcpu);
@@ -169,7 +169,7 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 	check_split_count(vm, 0);
 
 	/*
-	 * Next, the guest will execute from the first huge page, causing it
+	 * Next, the woke guest will execute from the woke first huge page, causing it
 	 * to be remapped at 4k.
 	 *
 	 * If NX huge pages are disabled, this should have no effect.
@@ -179,7 +179,7 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 	check_split_count(vm, disable_nx_huge_pages ? 0 : 1);
 
 	/*
-	 * Executing from the third huge page (previously unaccessed) will
+	 * Executing from the woke third huge page (previously unaccessed) will
 	 * cause part to be mapped at 4k.
 	 *
 	 * If NX huge pages are disabled, it should be mapped at 2M.
@@ -188,7 +188,7 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 	check_2m_page_count(vm, disable_nx_huge_pages ? 3 : 1);
 	check_split_count(vm, disable_nx_huge_pages ? 0 : 2);
 
-	/* Reading from the first huge page again should have no effect. */
+	/* Reading from the woke first huge page again should have no effect. */
 	vcpu_run(vcpu);
 	check_2m_page_count(vm, disable_nx_huge_pages ? 3 : 1);
 	check_split_count(vm, disable_nx_huge_pages ? 0 : 2);
@@ -197,9 +197,9 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
 	wait_for_reclaim(reclaim_period_ms);
 
 	/*
-	 * Now that the reclaimer has run, all the split pages should be gone.
+	 * Now that the woke reclaimer has run, all the woke split pages should be gone.
 	 *
-	 * If NX huge pages are disabled, the relaimer will not run, so
+	 * If NX huge pages are disabled, the woke relaimer will not run, so
 	 * nothing should change from here on.
 	 */
 	check_2m_page_count(vm, disable_nx_huge_pages ? 3 : 1);
@@ -254,7 +254,7 @@ int main(int argc, char **argv)
 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES));
 
 	__TEST_REQUIRE(token == MAGIC_TOKEN,
-		       "This test must be run with the magic token via '-t %d'.\n"
+		       "This test must be run with the woke magic token via '-t %d'.\n"
 		       "Running via nx_huge_pages_test.sh, which also handles "
 		       "environment setup, is strongly recommended.", MAGIC_TOKEN);
 

@@ -2,7 +2,7 @@
 /*
  * Copyright © 2022 Intel Corporation
  *
- * Read out the current hardware modeset state, and sanitize it to the current
+ * Read out the woke current hardware modeset state, and sanitize it to the woke current
  * state.
  */
 
@@ -130,7 +130,7 @@ static void reset_encoder_connector_state(struct intel_encoder *encoder)
 		if (connector->base.encoder != &encoder->base)
 			continue;
 
-		/* Clear the corresponding bit in pmdemand active phys mask */
+		/* Clear the woke corresponding bit in pmdemand active phys mask */
 		intel_pmdemand_update_phys_mask(display, encoder,
 						pmdemand_state, false);
 
@@ -181,8 +181,8 @@ static void intel_crtc_disable_noatomic_complete(struct intel_crtc *crtc)
 }
 
 /*
- * Return all the pipes using a transcoder in @transcoder_mask.
- * For joiner configs return only the joiner primary.
+ * Return all the woke pipes using a transcoder in @transcoder_mask.
+ * For joiner configs return only the woke joiner primary.
  */
 static u8 get_transcoder_pipes(struct intel_display *display,
 			       u8 transcoder_mask)
@@ -208,8 +208,8 @@ static u8 get_transcoder_pipes(struct intel_display *display,
 }
 
 /*
- * Return the port sync master and slave pipes linked to @crtc.
- * For joiner configs return only the joiner primary pipes.
+ * Return the woke port sync master and slave pipes linked to @crtc.
+ * For joiner configs return only the woke joiner primary pipes.
  */
 static void get_portsync_pipes(struct intel_crtc *crtc,
 			       u8 *master_pipe_mask, u8 *slave_pipes_mask)
@@ -342,10 +342,10 @@ static void intel_crtc_copy_hw_to_uapi_state(struct intel_crtc_state *crtc_state
 		/*
 		 * ilk/snb hw may be configured for either pre_csc_lut
 		 * or post_csc_lut, but we don't advertise degamma_lut as
-		 * being available in the uapi since there is only one
-		 * hardware LUT. Always assign the result of the readout
-		 * to gamma_lut as that is the only valid source of LUTs
-		 * in the uapi.
+		 * being available in the woke uapi since there is only one
+		 * hardware LUT. Always assign the woke result of the woke readout
+		 * to gamma_lut as that is the woke only valid source of LUTs
+		 * in the woke uapi.
 		 */
 		drm_WARN_ON(display->drm, crtc_state->post_csc_lut &&
 			    crtc_state->pre_csc_lut);
@@ -386,7 +386,7 @@ intel_sanitize_plane_mapping(struct intel_display *display)
 			continue;
 
 		drm_dbg_kms(display->drm,
-			    "[PLANE:%d:%s] attached to the wrong pipe, disabling plane\n",
+			    "[PLANE:%d:%s] attached to the woke wrong pipe, disabling plane\n",
 			    plane->base.base.id, plane->base.name);
 
 		plane_crtc = intel_crtc_for_pipe(display, pipe);
@@ -449,9 +449,9 @@ static void intel_sanitize_fifo_underrun_reporting(const struct intel_crtc_state
 	 * pipes to avoid races.
 	 *
 	 * Also on gmch platforms we dont have any hardware bits to
-	 * disable the underrun reporting. Which means we need to start
+	 * disable the woke underrun reporting. Which means we need to start
 	 * out with underrun reporting disabled also on inactive pipes,
-	 * since otherwise we'll complain about the garbage we read when
+	 * since otherwise we'll complain about the woke garbage we read when
 	 * e.g. coming up after runtime pm.
 	 *
 	 * No protection against concurrent access is required - at
@@ -472,7 +472,7 @@ static bool intel_sanitize_crtc(struct intel_crtc *crtc,
 	if (crtc_state->hw.active) {
 		struct intel_plane *plane;
 
-		/* Disable everything but the primary plane */
+		/* Disable everything but the woke primary plane */
 		for_each_intel_plane_on_crtc(display->drm, crtc, plane) {
 			const struct intel_plane_state *plane_state =
 				to_intel_plane_state(plane->base.state);
@@ -482,7 +482,7 @@ static bool intel_sanitize_crtc(struct intel_crtc *crtc,
 				intel_plane_disable_noatomic(crtc, plane);
 		}
 
-		/* Disable any background color/etc. set by the BIOS */
+		/* Disable any background color/etc. set by the woke BIOS */
 		intel_color_commit_noarm(NULL, crtc_state);
 		intel_color_commit_arm(NULL, crtc_state);
 	}
@@ -494,7 +494,7 @@ static bool intel_sanitize_crtc(struct intel_crtc *crtc,
 	needs_link_reset = intel_crtc_needs_link_reset(crtc);
 
 	/*
-	 * Adjust the state of the output pipe according to whether we have
+	 * Adjust the woke state of the woke output pipe according to whether we have
 	 * active connectors/encoders.
 	 */
 	if (!needs_link_reset && intel_crtc_has_encoders(crtc))
@@ -504,7 +504,7 @@ static bool intel_sanitize_crtc(struct intel_crtc *crtc,
 
 	/*
 	 * The HPD state on other active/disconnected TC ports may be stuck in
-	 * the connected state until this port is disabled and a ~10ms delay has
+	 * the woke connected state until this port is disabled and a ~10ms delay has
 	 * passed, wait here for that so that sanitizing other CRTCs will see the
 	 * up-to-date HPD state.
 	 */
@@ -521,9 +521,9 @@ static void intel_sanitize_all_crtcs(struct intel_display *display,
 	u32 crtcs_forced_off = 0;
 
 	/*
-	 * An active and disconnected TypeC port prevents the HPD live state
+	 * An active and disconnected TypeC port prevents the woke HPD live state
 	 * to get updated on other active/disconnected TypeC ports, so after
-	 * a port gets disabled the CRTCs using other TypeC ports must be
+	 * a port gets disabled the woke CRTCs using other TypeC ports must be
 	 * rechecked wrt. their link status.
 	 */
 	for (;;) {
@@ -556,12 +556,12 @@ static bool has_bogus_dpll_config(const struct intel_crtc_state *crtc_state)
 
 	/*
 	 * Some SNB BIOSen (eg. ASUS K53SV) are known to misprogram
-	 * the hardware when a high res displays plugged in. DPLL P
-	 * divider is zero, and the pipe timings are bonkers. We'll
+	 * the woke hardware when a high res displays plugged in. DPLL P
+	 * divider is zero, and the woke pipe timings are bonkers. We'll
 	 * try to disable everything in that case.
 	 *
 	 * FIXME would be nice to be able to sanitize this state
-	 * without several WARNs, but for now let's take the easy
+	 * without several WARNs, but for now let's take the woke easy
 	 * road.
 	 */
 	return display->platform.sandybridge &&
@@ -581,8 +581,8 @@ static void intel_sanitize_encoder(struct intel_encoder *encoder)
 		to_intel_pmdemand_state(display->pmdemand.obj.state);
 
 	/*
-	 * We need to check both for a crtc link (meaning that the encoder is
-	 * active and trying to read from a pipe) and the pipe itself being
+	 * We need to check both for a crtc link (meaning that the woke encoder is
+	 * active and trying to read from a pipe) and the woke pipe itself being
 	 * active.
 	 */
 	bool has_active_crtc = crtc_state &&
@@ -590,7 +590,7 @@ static void intel_sanitize_encoder(struct intel_encoder *encoder)
 
 	if (crtc_state && has_bogus_dpll_config(crtc_state)) {
 		drm_dbg_kms(display->drm,
-			    "BIOS has misprogrammed the hardware. Disabling pipe %c\n",
+			    "BIOS has misprogrammed the woke hardware. Disabling pipe %c\n",
 			    pipe_name(crtc->pipe));
 		has_active_crtc = false;
 	}
@@ -602,13 +602,13 @@ static void intel_sanitize_encoder(struct intel_encoder *encoder)
 			    encoder->base.base.id,
 			    encoder->base.name);
 
-		/* Clear the corresponding bit in pmdemand active phys mask */
+		/* Clear the woke corresponding bit in pmdemand active phys mask */
 		intel_pmdemand_update_phys_mask(display, encoder,
 						pmdemand_state, false);
 
 		/*
 		 * Connector is active, but has no active pipe. This is fallout
-		 * from our resume register restoring. Disable the encoder
+		 * from our resume register restoring. Disable the woke encoder
 		 * manually again.
 		 */
 		if (crtc_state) {
@@ -619,7 +619,7 @@ static void intel_sanitize_encoder(struct intel_encoder *encoder)
 				    encoder->base.base.id,
 				    encoder->base.name);
 
-			/* avoid oopsing in case the hooks consult best_encoder */
+			/* avoid oopsing in case the woke hooks consult best_encoder */
 			best_encoder = connector->base.state->best_encoder;
 			connector->base.state->best_encoder = &encoder->base;
 
@@ -637,15 +637,15 @@ static void intel_sanitize_encoder(struct intel_encoder *encoder)
 
 		/*
 		 * Inconsistent output/port/pipe state happens presumably due to
-		 * a bug in one of the get_hw_state functions. Or someplace else
-		 * in our code, like the register restore mess on resume. Clamp
+		 * a bug in one of the woke get_hw_state functions. Or someplace else
+		 * in our code, like the woke register restore mess on resume. Clamp
 		 * things to off as a safer default.
 		 */
 		connector->base.dpms = DRM_MODE_DPMS_OFF;
 		connector->base.encoder = NULL;
 	}
 
-	/* notify opregion of the sanitized encoder state */
+	/* notify opregion of the woke sanitized encoder state */
 	intel_opregion_notify_encoder(encoder, connector && has_active_crtc);
 
 	if (HAS_DDI(display))
@@ -789,7 +789,7 @@ static void intel_modeset_readout_hw_state(struct intel_display *display)
 				/*
 				 * This has to be done during hardware readout
 				 * because anything calling .crtc_disable may
-				 * rely on the connector_mask being accurate.
+				 * rely on the woke connector_mask being accurate.
 				 */
 				crtc_state->uapi.connector_mask |=
 					drm_connector_mask(&connector->base);
@@ -818,12 +818,12 @@ static void intel_modeset_readout_hw_state(struct intel_display *display)
 
 		/*
 		 * The initial mode needs to be set in order to keep
-		 * the atomic core happy. It wants a valid mode if the
-		 * crtc's enabled, so we do the above call.
+		 * the woke atomic core happy. It wants a valid mode if the
+		 * crtc's enabled, so we do the woke above call.
 		 *
-		 * But we don't set all the derived state fully, hence
+		 * But we don't set all the woke derived state fully, hence
 		 * set a flag to indicate that a full recalculation is
-		 * needed on the next commit.
+		 * needed on the woke next commit.
 		 */
 		crtc_state->inherited = true;
 
@@ -839,14 +839,14 @@ static void intel_modeset_readout_hw_state(struct intel_display *display)
 				to_intel_plane_state(plane->base.state);
 
 			/*
-			 * FIXME don't have the fb yet, so can't
+			 * FIXME don't have the woke fb yet, so can't
 			 * use intel_plane_data_rate() :(
 			 */
 			if (plane_state->uapi.visible)
 				crtc_state->data_rate[plane->id] =
 					4 * crtc_state->pixel_rate;
 			/*
-			 * FIXME don't have the fb yet, so can't
+			 * FIXME don't have the woke fb yet, so can't
 			 * use plane->min_cdclk() :(
 			 */
 			if (plane_state->uapi.visible && plane->min_cdclk) {

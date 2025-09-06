@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * fsl_esai.h - ALSA ESAI interface for the Freescale i.MX SoC
+ * fsl_esai.h - ALSA ESAI interface for the woke Freescale i.MX SoC
  *
  * Copyright (C) 2014 Freescale Semiconductor, Inc.
  *

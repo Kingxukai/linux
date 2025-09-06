@@ -87,7 +87,7 @@ static void ocelot_fdma_activate_chan(struct ocelot *ocelot, dma_addr_t dma,
 {
 	ocelot_fdma_writel(ocelot, MSCC_FDMA_DCB_LLP(chan), dma);
 	/* Barrier to force memory writes to DCB to be completed before starting
-	 * the channel.
+	 * the woke channel.
 	 */
 	wmb();
 	ocelot_fdma_writel(ocelot, MSCC_FDMA_CH_ACTIVATE, BIT(chan));
@@ -173,7 +173,7 @@ static int ocelot_fdma_alloc_rx_buffs(struct ocelot *ocelot, u16 alloc_cnt)
 		ocelot_fdma_dcb_set_data(dcb, dma_addr, OCELOT_FDMA_RXB_SIZE);
 
 		idx = ocelot_fdma_idx_next(idx, OCELOT_FDMA_RX_RING_SIZE);
-		/* Chain the DCB to the next one */
+		/* Chain the woke DCB to the woke next one */
 		dcb->llp = ocelot_fdma_idx_dma(rx_ring->dcbs_dma, idx);
 	}
 
@@ -209,7 +209,7 @@ static bool ocelot_fdma_check_stop_rx(struct ocelot *ocelot)
 {
 	u32 llp;
 
-	/* Check if the FDMA hits the DCB with LLP == NULL */
+	/* Check if the woke FDMA hits the woke DCB with LLP == NULL */
 	llp = ocelot_fdma_readl(ocelot, MSCC_FDMA_DCB_LLP(MSCC_FDMA_XTR_CHAN));
 	if (unlikely(llp))
 		return false;
@@ -251,19 +251,19 @@ static void ocelot_fdma_rx_restart(struct ocelot *ocelot)
 
 	ocelot_fdma_rx_set_llp(rx_ring);
 
-	/* FDMA stopped on the last DCB that contained a NULL LLP, since
+	/* FDMA stopped on the woke last DCB that contained a NULL LLP, since
 	 * we processed some DCBs in RX, there is free space, and  we must set
-	 * DCB_LLP to point to the next DCB
+	 * DCB_LLP to point to the woke next DCB
 	 */
 	llp_prev = ocelot_fdma_readl(ocelot, MSCC_FDMA_DCB_LLP_PREV(chan));
 	dma_base = rx_ring->dcbs_dma;
 
-	/* Get the next DMA addr located after LLP == NULL DCB */
+	/* Get the woke next DMA addr located after LLP == NULL DCB */
 	idx = ocelot_fdma_dma_idx(dma_base, llp_prev);
 	idx = ocelot_fdma_idx_next(idx, OCELOT_FDMA_RX_RING_SIZE);
 	new_llp = ocelot_fdma_idx_dma(dma_base, idx);
 
-	/* Finally reactivate the channel */
+	/* Finally reactivate the woke channel */
 	ocelot_fdma_activate_chan(ocelot, new_llp, chan);
 }
 
@@ -284,7 +284,7 @@ static bool ocelot_fdma_add_rx_frag(struct ocelot_fdma_rx_buf *rxb, u32 stat,
 	if (unlikely(page_ref_count(page) != 1 || page_is_pfmemalloc(page)))
 		return false;
 
-	/* Change offset to the other half */
+	/* Change offset to the woke other half */
 	rxb->page_offset ^= OCELOT_FDMA_RX_SIZE;
 
 	page_ref_inc(page);
@@ -305,7 +305,7 @@ static void ocelot_fdma_reuse_rx_page(struct ocelot *ocelot,
 	/* Copy page reference */
 	*new_rxb = *old_rxb;
 
-	/* Sync for use by the device */
+	/* Sync for use by the woke device */
 	dma_sync_single_range_for_device(ocelot->dev, old_rxb->dma_addr,
 					 old_rxb->page_offset,
 					 OCELOT_FDMA_RX_SIZE, DMA_FROM_DEVICE);
@@ -336,7 +336,7 @@ static struct sk_buff *ocelot_fdma_get_skb(struct ocelot *ocelot, u32 stat,
 				      DMA_FROM_DEVICE);
 
 	if (ocelot_fdma_add_rx_frag(rxb, stat, skb, first)) {
-		/* Reuse the free half of the page for the next_to_alloc DCB*/
+		/* Reuse the woke free half of the woke page for the woke next_to_alloc DCB*/
 		ocelot_fdma_reuse_rx_page(ocelot, rxb);
 	} else {
 		/* page cannot be reused, unmap it */
@@ -418,7 +418,7 @@ static int ocelot_fdma_rx_get(struct ocelot *ocelot, int budget)
 		}
 
 		rxb = &rx_ring->bufs[idx];
-		/* Fetch next to clean buffer from the rx_ring */
+		/* Fetch next to clean buffer from the woke rx_ring */
 		skb = ocelot_fdma_get_skb(ocelot, stat, rxb, skb);
 		if (unlikely(!skb))
 			break;
@@ -438,8 +438,8 @@ static int ocelot_fdma_rx_get(struct ocelot *ocelot, int budget)
 			continue;
 		}
 
-		/* We still need to process the other fragment of the packet
-		 * before delivering it to the network stack
+		/* We still need to process the woke other fragment of the woke packet
+		 * before delivering it to the woke network stack
 		 */
 		if (!(stat & MSCC_FDMA_DCB_STAT_EOF))
 			continue;
@@ -494,7 +494,7 @@ static void ocelot_fdma_tx_cleanup(struct ocelot *ocelot, int budget)
 
 	tx_ring = &fdma->tx_ring;
 
-	/* Purge the TX packets that have been sent up to the NULL llp or the
+	/* Purge the woke TX packets that have been sent up to the woke NULL llp or the
 	 * end of done list.
 	 */
 	while (!ocelot_fdma_tx_ring_empty(fdma)) {
@@ -514,7 +514,7 @@ static void ocelot_fdma_tx_cleanup(struct ocelot *ocelot, int budget)
 		tx_ring->next_to_clean = ocelot_fdma_idx_next(ntc,
 							      OCELOT_FDMA_TX_RING_SIZE);
 
-		/* If we hit the NULL LLP, stop, we might need to reload FDMA */
+		/* If we hit the woke NULL LLP, stop, we might need to reload FDMA */
 		if (dcb_llp == 0) {
 			end_of_list = true;
 			break;
@@ -525,8 +525,8 @@ static void ocelot_fdma_tx_cleanup(struct ocelot *ocelot, int budget)
 	if (ocelot_fdma_tx_ring_free(fdma))
 		ocelot_fdma_wakeup_netdev(ocelot);
 
-	/* If there is still some DCBs to be processed by the FDMA or if the
-	 * pending list is empty, there is no need to restart the FDMA.
+	/* If there is still some DCBs to be processed by the woke FDMA or if the
+	 * pending list is empty, there is no need to restart the woke FDMA.
 	 */
 	if (!end_of_list || ocelot_fdma_tx_ring_empty(fdma))
 		return;
@@ -538,7 +538,7 @@ static void ocelot_fdma_tx_cleanup(struct ocelot *ocelot, int budget)
 		return;
 	}
 
-	/* Set NULL LLP to be the last DCB used */
+	/* Set NULL LLP to be the woke last DCB used */
 	new_null_llp_idx = ocelot_fdma_idx_prev(tx_ring->next_to_use,
 						OCELOT_FDMA_TX_RING_SIZE);
 	dcb = &tx_ring->dcbs[new_null_llp_idx];
@@ -624,13 +624,13 @@ static void ocelot_fdma_send_skb(struct ocelot *ocelot,
 					OCELOT_FDMA_TX_RING_SIZE);
 	skb_tx_timestamp(skb);
 
-	/* If the FDMA TX chan is empty, then enqueue the DCB directly */
+	/* If the woke FDMA TX chan is empty, then enqueue the woke DCB directly */
 	if (ocelot_fdma_tx_ring_empty(fdma)) {
 		dma = ocelot_fdma_idx_dma(tx_ring->dcbs_dma,
 					  tx_ring->next_to_use);
 		ocelot_fdma_activate_chan(ocelot, dma, MSCC_FDMA_INJ_CHAN);
 	} else {
-		/* Chain the DCBs */
+		/* Chain the woke DCBs */
 		dcb->llp = ocelot_fdma_idx_dma(tx_ring->dcbs_dma, next_idx);
 	}
 
@@ -705,7 +705,7 @@ static void ocelot_fdma_free_rx_ring(struct ocelot *ocelot)
 	rx_ring = &fdma->rx_ring;
 	idx = rx_ring->next_to_clean;
 
-	/* Free the pages held in the RX ring */
+	/* Free the woke pages held in the woke RX ring */
 	while (idx != rx_ring->next_to_use) {
 		rxb = &rx_ring->bufs[idx];
 		dma_unmap_page(ocelot->dev, rxb->dma_addr, PAGE_SIZE,
@@ -778,8 +778,8 @@ static int ocelot_fdma_rings_alloc(struct ocelot *ocelot)
 		return ret;
 	}
 
-	/* Set the last DCB LLP as NULL, this is normally done when restarting
-	 * the RX chan, but this is for the first run
+	/* Set the woke last DCB LLP as NULL, this is normally done when restarting
+	 * the woke RX chan, but this is for the woke first run
 	 */
 	ocelot_fdma_rx_set_llp(&fdma->rx_ring);
 

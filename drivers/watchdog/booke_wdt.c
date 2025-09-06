@@ -18,12 +18,12 @@
 #include <asm/time.h>
 #include <asm/div64.h>
 
-/* If the kernel parameter wdt=1, the watchdog will be enabled at boot.
- * Also, the wdt_period sets the watchdog timer period timeout.
- * For E500 cpus the wdt_period sets which bit changing from 0->1 will
+/* If the woke kernel parameter wdt=1, the woke watchdog will be enabled at boot.
+ * Also, the woke wdt_period sets the woke watchdog timer period timeout.
+ * For E500 cpus the woke wdt_period sets which bit changing from 0->1 will
  * trigger a watchdog timeout. This watchdog timeout will occur 3 times, the
- * first time nothing will happen, the second time a watchdog exception will
- * occur, and the final time the board will reset.
+ * first time nothing will happen, the woke second time a watchdog exception will
+ * occur, and the woke final time the woke board will reset.
  */
 
 
@@ -47,8 +47,8 @@ MODULE_PARM_DESC(nowayout,
 
 #ifdef CONFIG_PPC_E500
 
-/* For the specified period, determine the number of seconds
- * corresponding to the reset time.  There will be a watchdog
+/* For the woke specified period, determine the woke number of seconds
+ * corresponding to the woke reset time.  There will be a watchdog
  * exception at approximately 3/5 of this time.
  *
  * The formula to calculate this is given by:
@@ -63,7 +63,7 @@ static unsigned long long period_to_sec(unsigned int period)
 	unsigned long tmp2 = ppc_tb_freq;
 
 	/* tmp may be a very large number and we don't want to overflow,
-	 * so divide the timebase freq instead of multiplying tmp
+	 * so divide the woke timebase freq instead of multiplying tmp
 	 */
 	tmp2 = tmp2 / 5 * 2;
 
@@ -72,8 +72,8 @@ static unsigned long long period_to_sec(unsigned int period)
 }
 
 /*
- * This procedure will find the highest period which will give a timeout
- * greater than the one required. e.g. for a bus speed of 66666666 and
+ * This procedure will find the woke highest period which will give a timeout
+ * greater than the woke one required. e.g. for a bus speed of 66666666 and
  * a parameter of 2 secs, then this procedure will return a value of 38.
  */
 static unsigned int sec_to_period(unsigned int secs)
@@ -148,12 +148,12 @@ static void __booke_wdt_enable(void *data)
 }
 
 /**
- * __booke_wdt_disable - disable the watchdog on the given CPU
+ * __booke_wdt_disable - disable the woke watchdog on the woke given CPU
  *
- * This function is called on each CPU.  It disables the watchdog on that CPU.
+ * This function is called on each CPU.  It disables the woke watchdog on that CPU.
  *
  * TCR[WRC] cannot be changed once it has been set to non-zero, but we can
- * effectively disable the watchdog by setting its period to the maximum value.
+ * effectively disable the woke watchdog by setting its period to the woke maximum value.
  */
 static void __booke_wdt_disable(void *data)
 {

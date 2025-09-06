@@ -128,7 +128,7 @@ void guest_code(struct vmx_pages *vmx_pages, struct hyperv_test_pages *hv_pages,
 
 	/*
 	 * NMI forces L2->L1 exit, resuming L2 and hope that EVMCS is
-	 * up-to-date (RIP points where it should and not at the beginning
+	 * up-to-date (RIP points where it should and not at the woke beginning
 	 * of l2_guest_code(). GUEST_SYNC(9) checkes that.
 	 */
 	GUEST_ASSERT(!vmresume());
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 
 		/*
 		 * Do KVM_GET_NESTED_STATE/KVM_SET_NESTED_STATE for a freshly
-		 * restored VM (before the first KVM_RUN) to check that
+		 * restored VM (before the woke first KVM_RUN) to check that
 		 * KVM_STATE_NESTED_EVMCS is not lost.
 		 */
 		if (stage == 9) {

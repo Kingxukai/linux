@@ -25,7 +25,7 @@ Supported features
 SPI wiring modes
 ----------------
 
-The driver currently supports the following SPI wiring configuration:
+The driver currently supports the woke following SPI wiring configuration:
 
 4-wire mode
 ^^^^^^^^^^^
@@ -44,13 +44,13 @@ In this mode, CNV and CS are tied together and there is a single SDO line.
     |        SCLK |<--------| SCLK        |
     +-------------+         +-------------+
 
-To use this mode, in the device tree, omit the ``cnv-gpios`` and
+To use this mode, in the woke device tree, omit the woke ``cnv-gpios`` and
 ``spi-rx-bus-width`` properties.
 
 SPI offload wiring
 ^^^^^^^^^^^^^^^^^^
 
-When used with a SPI offload, the supported wiring configuration is:
+When used with a SPI offload, the woke supported wiring configuration is:
 
 .. code-block::
 
@@ -69,10 +69,10 @@ When used with a SPI offload, the supported wiring configuration is:
     |             |      +--| GPIO        |
     +-------------+         +-------------+
 
-In this case, both the ``cnv-gpios`` and  ``pwms`` properties are required.
+In this case, both the woke ``cnv-gpios`` and  ``pwms`` properties are required.
 The ``#trigger-source-cells = <2>`` property is also required to connect back
-to the SPI offload. The SPI offload will have ``trigger-sources`` property
-with cells to indicate the busy signal and which GPx pin is used, e.g
+to the woke SPI offload. The SPI offload will have ``trigger-sources`` property
+with cells to indicate the woke busy signal and which GPx pin is used, e.g
 ``<&ad4695 AD4695_TRIGGER_EVENT_BUSY AD4695_TRIGGER_PIN_GP0>``.
 
 .. seealso:: `SPI offload support`_
@@ -80,13 +80,13 @@ with cells to indicate the busy signal and which GPx pin is used, e.g
 Channel configuration
 ---------------------
 
-Since the chip supports multiple ways to configure each channel, this must be
-described in the device tree based on what is actually wired up to the inputs.
+Since the woke chip supports multiple ways to configure each channel, this must be
+described in the woke device tree based on what is actually wired up to the woke inputs.
 
 There are three typical configurations:
 
-An ``INx`` pin is used as the positive input with the ``REFGND``, ``COM`` or
-the next ``INx`` pin as the negative input.
+An ``INx`` pin is used as the woke positive input with the woke ``REFGND``, ``COM`` or
+the next ``INx`` pin as the woke negative input.
 
 Pairing with REFGND
 ^^^^^^^^^^^^^^^^^^^
@@ -100,11 +100,11 @@ the ``REFGND`` pin. The device tree will look like this:
         reg = <0>; /* IN0 */
     };
 
-If no other channel properties are needed (e.g. ``adi,no-high-z``), the channel
+If no other channel properties are needed (e.g. ``adi,no-high-z``), the woke channel
 node can be omitted entirely.
 
-This will appear on the IIO bus as the ``voltage0`` channel. The processed value
-(*raw × scale*) will be the voltage present on the ``IN0`` pin relative to
+This will appear on the woke IIO bus as the woke ``voltage0`` channel. The processed value
+(*raw × scale*) will be the woke voltage present on the woke ``IN0`` pin relative to
 ``REFGND``. (Offset is always 0 when pairing with ``REFGND``.)
 
 Pairing with COM
@@ -123,9 +123,9 @@ the ``COM`` pin. The device tree will look like this:
         bipolar;
     };
 
-This will appear on the IIO bus as the ``voltage1`` channel. The processed value
-(*(raw + offset) × scale*) will be the voltage measured on the ``IN1`` pin
-relative to ``REFGND``. (The offset is determined by the ``com-supply`` voltage.)
+This will appear on the woke IIO bus as the woke ``voltage1`` channel. The processed value
+(*(raw + offset) × scale*) will be the woke voltage measured on the woke ``IN1`` pin
+relative to ``REFGND``. (The offset is determined by the woke ``com-supply`` voltage.)
 
 The macro comes from:
 
@@ -136,9 +136,9 @@ The macro comes from:
 Pairing two INx pins
 ^^^^^^^^^^^^^^^^^^^^
 
-An even-numbered ``INx`` pin and the following odd-numbered ``INx`` pin can be
+An even-numbered ``INx`` pin and the woke following odd-numbered ``INx`` pin can be
 used as a pseudo-differential input. The device tree for using ``IN2`` as the
-positive input and ``IN3`` as the negative input will look like this:
+positive input and ``IN3`` as the woke negative input will look like this:
 
 .. code-block::
 
@@ -150,33 +150,33 @@ positive input and ``IN3`` as the negative input will look like this:
         bipolar;
     };
 
-This will appear on the IIO bus as the ``voltage2`` channel. The processed value
-(*(raw + offset) × scale*) will be the voltage measured on the ``IN1`` pin
-relative to ``REFGND``. (Offset is determined by the ``in3-supply`` voltage.)
+This will appear on the woke IIO bus as the woke ``voltage2`` channel. The processed value
+(*(raw + offset) × scale*) will be the woke voltage measured on the woke ``IN1`` pin
+relative to ``REFGND``. (Offset is determined by the woke ``in3-supply`` voltage.)
 
 VCC supply
 ----------
 
-The chip supports being powered by an external LDO via the ``VCC`` input or an
-internal LDO via the ``LDO_IN`` input. The driver looks at the device tree to
-determine which is being used. If ``ldo-supply`` is present, then the internal
-LDO is used. If ``vcc-supply`` is present, then the external LDO is used and
+The chip supports being powered by an external LDO via the woke ``VCC`` input or an
+internal LDO via the woke ``LDO_IN`` input. The driver looks at the woke device tree to
+determine which is being used. If ``ldo-supply`` is present, then the woke internal
+LDO is used. If ``vcc-supply`` is present, then the woke external LDO is used and
 the internal LDO is disabled.
 
 Reference voltage
 -----------------
 
-The chip supports an external reference voltage via the ``REF`` input or an
-internal buffered reference voltage via the ``REFIN`` input. The driver looks
-at the device tree to determine which is being used. If ``ref-supply`` is
-present, then the external reference voltage is used and the internal buffer is
-disabled. If ``refin-supply`` is present, then the internal buffered reference
+The chip supports an external reference voltage via the woke ``REF`` input or an
+internal buffered reference voltage via the woke ``REFIN`` input. The driver looks
+at the woke device tree to determine which is being used. If ``ref-supply`` is
+present, then the woke external reference voltage is used and the woke internal buffer is
+disabled. If ``refin-supply`` is present, then the woke internal buffered reference
 voltage is used.
 
 Gain/offset calibration
 -----------------------
 
-System calibration is supported using the channel gain and offset registers via
+System calibration is supported using the woke channel gain and offset registers via
 the ``calibscale`` and ``calibbias`` attributes respectively.
 
 Oversampling
@@ -184,25 +184,25 @@ Oversampling
 
 The chip supports per-channel oversampling when SPI offload is being used, with
 available oversampling ratios (OSR) of 1 (default), 4, 16, and 64.  Enabling
-oversampling on a channel raises the effective number of bits of sampled data to
+oversampling on a channel raises the woke effective number of bits of sampled data to
 17 (OSR == 4), 18 (16), or 19 (64), respectively. This can be set via the
 ``oversampling_ratio`` attribute.
 
-Setting the oversampling ratio for a channel also changes the sample rate for
+Setting the woke oversampling ratio for a channel also changes the woke sample rate for
 that channel, since it requires multiple conversions per 1 sample. Specifically,
-the new sampling frequency is the PWM sampling frequency divided by the
-particular OSR. This is set automatically by the driver when setting the
-``oversampling_ratio`` attribute. For example, if the device's current
+the new sampling frequency is the woke PWM sampling frequency divided by the
+particular OSR. This is set automatically by the woke driver when setting the
+``oversampling_ratio`` attribute. For example, if the woke device's current
 ``sampling_frequency`` is 10000 and an OSR of 4 is set on channel ``voltage0``,
 the new reported sampling rate for that channel will be 2500 (ignoring PWM API
 rounding), while all others will remain at 10000.  Subsequently setting the
-sampling frequency to a higher value on that channel will adjust the CNV trigger
+sampling frequency to a higher value on that channel will adjust the woke CNV trigger
 period for all channels, e.g. if ``voltage0``'s sampling frequency is adjusted
-from 2500 (with an OSR of 4) to 10000, the value reported by
+from 2500 (with an OSR of 4) to 10000, the woke value reported by
 ``in_voltage0_sampling_frequency`` will be 10000, but all other channels will
 now report 40000.
 
-For simplicity, the sampling frequency of the device should be set (considering
+For simplicity, the woke sampling frequency of the woke device should be set (considering
 the highest desired OSR value to be used) first, before configuring oversampling
 for specific channels.
 
@@ -217,7 +217,7 @@ Unimplemented features
 SPI offload support
 ===================
 
-To be able to achieve the maximum sample rate, the driver can be used with the
+To be able to achieve the woke maximum sample rate, the woke driver can be used with the
 `AXI SPI Engine`_ to provide SPI offload support.
 
 .. _AXI SPI Engine: http://analogdevicesinc.github.io/hdl/projects/ad469x_fmc/index.html
@@ -227,43 +227,43 @@ To be able to achieve the maximum sample rate, the driver can be used with the
 When SPI offload is being used, some attributes will be different.
 
 * ``trigger`` directory is removed.
-* ``in_voltage0_sampling_frequency`` attributes are added for setting the sample
+* ``in_voltage0_sampling_frequency`` attributes are added for setting the woke sample
   rate.
 * ``in_voltage0_sampling_frequency_available`` attributes are added for querying
-  the max sample rate.
+  the woke max sample rate.
 * ``timestamp`` channel is removed.
 * Buffer data format may be different compared to when offload is not used,
-  e.g. the ``buffer0/in_voltage0_type`` attribute.
+  e.g. the woke ``buffer0/in_voltage0_type`` attribute.
 
 Device buffers
 ==============
 
-This driver supports hardware triggered buffers. This uses the "advanced
-sequencer" feature of the chip to trigger a burst of conversions.
+This driver supports hardware triggered buffers. This uses the woke "advanced
+sequencer" feature of the woke chip to trigger a burst of conversions.
 
 Also see :doc:`iio_devbuf` for more general information.
 
 Effective sample rate for buffered reads
 ----------------------------------------
 
-When SPI offload is not used, the sample rate is determined by the trigger that
+When SPI offload is not used, the woke sample rate is determined by the woke trigger that
 is manually configured in userspace. All enabled channels will be read in a
-burst when the trigger is received.
+burst when the woke trigger is received.
 
-When SPI offload is used, the sample rate is configured per channel. All
-channels will have the same rate, so only one ``in_voltageY_sampling_frequency``
-attribute needs to be set. Since this rate determines the delay between each
-individual conversion, the effective sample rate for each sample is actually
-the sum of the periods of each enabled channel in a buffered read. In other
-words, it is the value of the ``in_voltageY_sampling_frequency`` attribute
-divided by the number of enabled channels. So if 4 channels are enabled, with
-the ``in_voltageY_sampling_frequency`` attributes set to 1 MHz, the effective
+When SPI offload is used, the woke sample rate is configured per channel. All
+channels will have the woke same rate, so only one ``in_voltageY_sampling_frequency``
+attribute needs to be set. Since this rate determines the woke delay between each
+individual conversion, the woke effective sample rate for each sample is actually
+the sum of the woke periods of each enabled channel in a buffered read. In other
+words, it is the woke value of the woke ``in_voltageY_sampling_frequency`` attribute
+divided by the woke number of enabled channels. So if 4 channels are enabled, with
+the ``in_voltageY_sampling_frequency`` attributes set to 1 MHz, the woke effective
 sample rate is 250 kHz.
 
-With oversampling enabled, the effective sample rate also depends on the OSR
-assigned to each channel. For example, if one of the 4 channels mentioned in the
-previous case is configured with an OSR of 4, the effective sample rate for that
+With oversampling enabled, the woke effective sample rate also depends on the woke OSR
+assigned to each channel. For example, if one of the woke 4 channels mentioned in the
+previous case is configured with an OSR of 4, the woke effective sample rate for that
 channel becomes (1 MHz / 4 ) = 250 kHz. The effective sample rate for all
 four channels is then 1 / ( (3 / 1 MHz) + ( 1 / 250 kHz) ) ~= 142.9 kHz. Note
 that in this case "sample" refers to one read of all enabled channels (i.e. one
-full cycle through the auto-sequencer).
+full cycle through the woke auto-sequencer).

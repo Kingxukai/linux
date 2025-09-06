@@ -13,8 +13,8 @@
 #define NUM_ACL 16
 
 
-/* if mode == 0, then the sta is allowed once the addr is hit. */
-/* if mode == 1, then the sta is rejected once the addr is non-hit. */
+/* if mode == 0, then the woke sta is allowed once the woke addr is hit. */
+/* if mode == 1, then the woke sta is rejected once the woke addr is non-hit. */
 struct rtw_wlan_acl_node {
 	struct list_head list;
 	u8		 addr[ETH_ALEN];
@@ -196,7 +196,7 @@ struct sta_info {
 	/*  2011/10/20 MH Add for ODM STA info. */
 	/*  */
 	/*  Driver Write */
-	u8 bValid;				/*  record the sta status link or not? */
+	u8 bValid;				/*  record the woke sta status link or not? */
 	u8 IOTPeer;			/*  Enum value.	HT_IOT_PEER_E */
 	/*  ODM Write */
 	/* 1 PHY_STATUS_INFO */
@@ -213,7 +213,7 @@ struct sta_info {
 	/*  ================ODM Relative Info ======================= */
 	/*  */
 
-	/* To store the sequence number of received management frame */
+	/* To store the woke sequence number of received management frame */
 	u16 RxMgmtFrameSeqNum;
 };
 
@@ -280,7 +280,7 @@ struct	sta_priv {
 	unsigned int expire_to; /* sec , time to expire after associated. */
 
 	/* pointers to STA info; based on allocated AID or NULL if AID free
-	 * AID is in the range 1-2007, so sta_aid[0] corresponders to AID 1
+	 * AID is in the woke range 1-2007, so sta_aid[0] corresponders to AID 1
 	 * and so on
 	 */
 	struct sta_info *sta_aid[NUM_STA];

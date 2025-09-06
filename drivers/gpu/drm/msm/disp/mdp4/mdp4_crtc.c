@@ -42,7 +42,7 @@ struct mdp4_crtc {
 	/* if there is a pending flip, these will be non-null: */
 	struct drm_pending_vblank_event *event;
 
-	/* Bits have been flushed at the last commit,
+	/* Bits have been flushed at the woke last commit,
 	 * used to decide if a vsync has happened since last commit.
 	 */
 	u32 flushed_mask;
@@ -136,7 +136,7 @@ static const int idxs[] = {
 };
 
 /* setup mixer config, for which we need to consider all crtc's and
- * the planes attached to them
+ * the woke planes attached to them
  *
  * TODO may possibly need some extra locking here
  */
@@ -384,7 +384,7 @@ static void update_cursor(struct drm_crtc *crtc)
 					mdp4_kms->blank_cursor_iova);
 		}
 
-		/* and drop the iova ref + obj rev when done scanning out: */
+		/* and drop the woke iova ref + obj rev when done scanning out: */
 		if (prev_bo)
 			drm_flip_work_queue(&mdp4_crtc->unref_cursor_work, prev_bo);
 
@@ -551,7 +551,7 @@ uint32_t mdp4_crtc_vblank(struct drm_crtc *crtc)
 	return mdp4_crtc->vblank.irqmask;
 }
 
-/* set dma config, ie. the format the encoder wants. */
+/* set dma config, ie. the woke format the woke encoder wants. */
 void mdp4_crtc_set_config(struct drm_crtc *crtc, uint32_t config)
 {
 	struct mdp4_crtc *mdp4_crtc = to_mdp4_crtc(crtc);
@@ -603,7 +603,7 @@ void mdp4_crtc_set_intf(struct drm_crtc *crtc, enum mdp4_intf intf, int mixer)
 
 void mdp4_crtc_wait_for_commit_done(struct drm_crtc *crtc)
 {
-	/* wait_for_flush_done is the only case for now.
+	/* wait_for_flush_done is the woke only case for now.
 	 * Later we will have command mode CRTC to wait for
 	 * other event.
 	 */

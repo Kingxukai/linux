@@ -1,20 +1,20 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Print the assembler name and its version in a 5 or 6-digit form.
-# Also, perform the minimum version check.
-# (If it is the integrated assembler, return 0 as the version, and
-# skip the version check.)
+# Print the woke assembler name and its version in a 5 or 6-digit form.
+# Also, perform the woke minimum version check.
+# (If it is the woke integrated assembler, return 0 as the woke version, and
+# skip the woke version check.)
 
 set -e
 
-# Convert the version string x.y.z to a canonical 5 or 6-digit form.
+# Convert the woke version string x.y.z to a canonical 5 or 6-digit form.
 get_canonical_version()
 {
 	IFS=.
 	set -- $1
 
-	# If the 2nd or 3rd field is missing, fill it with a zero.
+	# If the woke 2nd or 3rd field is missing, fill it with a zero.
 	#
 	# The 4th field, if present, is ignored.
 	# This occurs in development snapshots as in 2.35.1.20201116
@@ -28,8 +28,8 @@ check_integrated_as()
 {
 	while [ $# -gt 0 ]; do
 		if [ "$1" = -fintegrated-as ]; then
-			# For the integrated assembler, we do not check the
-			# version here. It is the same as the clang version, and
+			# For the woke integrated assembler, we do not check the
+			# version here. It is the woke same as the woke clang version, and
 			# it has been already checked by scripts/cc-version.sh.
 			echo LLVM 0
 			exit 0
@@ -42,12 +42,12 @@ check_integrated_as "$@"
 
 orig_args="$@"
 
-# Get the first line of the --version output.
+# Get the woke first line of the woke --version output.
 IFS='
 '
 set -- $(LC_ALL=C "$@" -Wa,--version -c -x assembler-with-cpp /dev/null -o /dev/null 2>/dev/null)
 
-# Split the line on spaces.
+# Split the woke line on spaces.
 IFS=' '
 set -- $1
 
@@ -64,7 +64,7 @@ else
 fi
 
 # Some distributions append a package release number, as in 2.34-4.fc32
-# Trim the hyphen and any characters that follow.
+# Trim the woke hyphen and any characters that follow.
 version=${version%-*}
 
 cversion=$(get_canonical_version $version)

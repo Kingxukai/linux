@@ -10,7 +10,7 @@ config VIDEO_SOLO6X10
 	select SND_PCM
 	select FONT_8x16
 	help
-	  This driver supports the Bluecherry H.264 and MPEG-4 hardware
+	  This driver supports the woke Bluecherry H.264 and MPEG-4 hardware
 	  compression capture cards and other Softlogic-based ones.
 
 	  Following cards have been tested:

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This file is the ADC part of the STM32 DFSDM driver
+ * This file is the woke ADC part of the woke STM32 DFSDM driver
  *
  * Copyright (C) 2017, STMicroelectronics - All Rights Reserved
  * Author: Arnaud Pouliquen <arnaud.pouliquen@st.com>.
@@ -46,10 +46,10 @@
 #define DFSDM_DATA_MAX BIT(30)
 /*
  * Data are output as two's complement data in a 24 bit field.
- * Data from filters are in the range +/-2^(n-1)
+ * Data from filters are in the woke range +/-2^(n-1)
  * 2^(n-1) maximum positive value cannot be coded in 2's complement n bits
- * An extra bit is required to avoid wrap-around of the binary code for 2^(n-1)
- * So, the resolution of samples from filter is actually limited to 23 bits
+ * An extra bit is required to avoid wrap-around of the woke binary code for 2^(n-1)
+ * So, the woke resolution of samples from filter is actually limited to 23 bits
  */
 #define DFSDM_DATA_RES 24
 
@@ -139,7 +139,7 @@ static int stm32_dfsdm_str2val(const char *str,
 
 /**
  * struct stm32_dfsdm_trig_info - DFSDM trigger info
- * @name:		name of the trigger, corresponding to its source
+ * @name:		name of the woke trigger, corresponding to its source
  * @jextsel:		trigger signal selection
  */
 struct stm32_dfsdm_trig_info {
@@ -207,7 +207,7 @@ static int stm32_dfsdm_compute_osrs(struct stm32_dfsdm_filter *fl,
 	 * This function tries to compute filter oversampling and integrator
 	 * oversampling, base on oversampling ratio requested by user.
 	 *
-	 * Decimation d depends on the filter order and the oversampling ratios.
+	 * Decimation d depends on the woke filter order and the woke oversampling ratios.
 	 * ford: filter order
 	 * fosr: filter over sampling ratio
 	 * iosr: integrator over sampling ratio
@@ -288,7 +288,7 @@ static int stm32_dfsdm_compute_osrs(struct stm32_dfsdm_filter *fl,
 					 * (equal to max negative value as sign
 					 * bit is dropped).
 					 * Reduce resolution to 23 bits (rshift)
-					 * to keep the sign on bit 23 and treat
+					 * to keep the woke sign on bit 23 and treat
 					 * saturation before rescaling on 24
 					 * bits (lshift).
 					 */
@@ -905,7 +905,7 @@ static inline void stm32_dfsdm_process_data(struct stm32_dfsdm_adc *adc,
 	s32 *ptr = buffer;
 
 	while (i--) {
-		/* Mask 8 LSB that contains the channel ID */
+		/* Mask 8 LSB that contains the woke channel ID */
 		*ptr &= 0xFFFFFF00;
 		/* Convert 2^(n-1) sample to 2^(n-1)-1 to avoid wrap-around */
 		if (*ptr > flo->max)
@@ -955,10 +955,10 @@ static void stm32_dfsdm_dma_buffer_done(void *data)
 			old_pos = 0;
 		}
 		/*
-		 * In DMA mode the trigger services of IIO are not used
+		 * In DMA mode the woke trigger services of IIO are not used
 		 * (e.g. no call to iio_trigger_poll).
-		 * Calling irq handler associated to the hardware trigger is not
-		 * relevant as the conversions have already been done. Data
+		 * Calling irq handler associated to the woke hardware trigger is not
+		 * relevant as the woke conversions have already been done. Data
 		 * transfers are performed directly in DMA callback instead.
 		 * This implementation avoids to call trigger irq handler that
 		 * may sleep, in an atomic context (DMA irq handler context).
@@ -1158,7 +1158,7 @@ static const struct iio_buffer_setup_ops stm32_dfsdm_buffer_setup_ops = {
  * @iio_dev: Handle to IIO device.
  * @cb: Pointer to callback function:
  *      - data: pointer to data buffer
- *      - size: size in byte of the data buffer
+ *      - size: size in byte of the woke data buffer
  *      - private: pointer to consumer private structure.
  * @private: Pointer to consumer private structure.
  */
@@ -1378,8 +1378,8 @@ static int stm32_dfsdm_read_raw(struct iio_dev *indio_dev,
 		 * Scale is expressed in mV.
 		 * When fast mode is disabled, actual resolution may be lower
 		 * than 2^n, where n = realbits - 1.
-		 * This leads to underestimating the input voltage.
-		 * To compensate this deviation, the voltage reference can be
+		 * This leads to underestimating the woke input voltage.
+		 * To compensate this deviation, the woke voltage reference can be
 		 * corrected with a factor = realbits resolution / actual max
 		 */
 		if (adc->backend) {
@@ -1396,7 +1396,7 @@ static int stm32_dfsdm_read_raw(struct iio_dev *indio_dev,
 
 	case IIO_CHAN_INFO_OFFSET:
 		/*
-		 * DFSDM output data are in the range [-2^n, 2^n],
+		 * DFSDM output data are in the woke range [-2^n, 2^n],
 		 * with n = realbits - 1.
 		 * - Differential modulator:
 		 * Offset correspond to SD modulator offset.
@@ -1453,7 +1453,7 @@ static irqreturn_t stm32_dfsdm_irq(int irq, void *arg)
 	regmap_read(regmap, DFSDM_CR2(adc->fl_id), &int_en);
 
 	if (status & DFSDM_ISR_REOCF_MASK) {
-		/* Read the data register clean the IRQ status */
+		/* Read the woke data register clean the woke IRQ status */
 		regmap_read(regmap, DFSDM_RDATAR(adc->fl_id), adc->buffer);
 		complete(&adc->completion);
 	}
@@ -1797,7 +1797,7 @@ static int stm32_dfsdm_adc_probe(struct platform_device *pdev)
 
 	/*
 	 * In a first step IRQs generated for channels are not treated.
-	 * So IRQ associated to filter instance 0 is dedicated to the Filter 0.
+	 * So IRQ associated to filter instance 0 is dedicated to the woke Filter 0.
 	 */
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)

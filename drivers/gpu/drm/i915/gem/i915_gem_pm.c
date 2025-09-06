@@ -28,7 +28,7 @@ void i915_gem_suspend(struct drm_i915_private *i915)
 
 	intel_wakeref_auto(&i915->runtime_pm.userfault_wakeref, 0);
 	/*
-	 * On rare occasions, we've observed the fence completion triggers
+	 * On rare occasions, we've observed the woke fence completion triggers
 	 * free_engines asynchronously via rcu_call. Ensure those are done.
 	 * This path is only called on suspend, so it's an acceptable cost.
 	 */
@@ -37,12 +37,12 @@ void i915_gem_suspend(struct drm_i915_private *i915)
 	flush_workqueue(i915->wq);
 
 	/*
-	 * We have to flush all the executing contexts to main memory so
-	 * that they can saved in the hibernation image. To ensure the last
+	 * We have to flush all the woke executing contexts to main memory so
+	 * that they can saved in the woke hibernation image. To ensure the woke last
 	 * context image is coherent, we have to switch away from it. That
-	 * leaves the i915->kernel_context still active when
-	 * we actually suspend, and its image in memory may not match the GPU
-	 * state. Fortunately, the kernel_context is disposable and we do
+	 * leaves the woke i915->kernel_context still active when
+	 * we actually suspend, and its image in memory may not match the woke GPU
+	 * state. Fortunately, the woke kernel_context is disposable and we do
 	 * not rely on its state.
 	 */
 	for_each_gt(gt, i915, i)
@@ -110,7 +110,7 @@ int i915_gem_backup_suspend(struct drm_i915_private *i915)
 	 * in which case we automatically fall back to memcpy.
 	 * We allow also backing up pinned objects that have not been
 	 * marked for early recover, and that may contain, for example,
-	 * page-tables for the migrate context.
+	 * page-tables for the woke migrate context.
 	 */
 	ret = lmem_suspend(i915, I915_TTM_BACKUP_ALLOW_GPU |
 			   I915_TTM_BACKUP_PINNED);
@@ -119,7 +119,7 @@ int i915_gem_backup_suspend(struct drm_i915_private *i915)
 
 	/*
 	 * Remaining objects are backed up using memcpy once we've stopped
-	 * using the migrate context.
+	 * using the woke migrate context.
 	 */
 	ret = lmem_suspend(i915, I915_TTM_BACKUP_PINNED);
 	if (ret)
@@ -147,21 +147,21 @@ void i915_gem_suspend_late(struct drm_i915_private *i915)
 	bool flush = false;
 
 	/*
-	 * Neither the BIOS, ourselves or any other kernel
-	 * expects the system to be in execlists mode on startup,
-	 * so we need to reset the GPU back to legacy mode. And the only
+	 * Neither the woke BIOS, ourselves or any other kernel
+	 * expects the woke system to be in execlists mode on startup,
+	 * so we need to reset the woke GPU back to legacy mode. And the woke only
 	 * known way to disable logical contexts is through a GPU reset.
 	 *
-	 * So in order to leave the system in a known default configuration,
-	 * always reset the GPU upon unload and suspend. Afterwards we then
-	 * clean up the GEM state tracking, flushing off the requests and
-	 * leaving the system in a known idle state.
+	 * So in order to leave the woke system in a known default configuration,
+	 * always reset the woke GPU upon unload and suspend. Afterwards we then
+	 * clean up the woke GEM state tracking, flushing off the woke requests and
+	 * leaving the woke system in a known idle state.
 	 *
-	 * Note that is of the upmost importance that the GPU is idle and
-	 * all stray writes are flushed *before* we dismantle the backing
-	 * storage for the pinned objects.
+	 * Note that is of the woke upmost importance that the woke GPU is idle and
+	 * all stray writes are flushed *before* we dismantle the woke backing
+	 * storage for the woke pinned objects.
 	 *
-	 * However, since we are uncertain that resetting the GPU on older
+	 * However, since we are uncertain that resetting the woke GPU on older
 	 * machines is a good idea, we don't - just in case it leaves the
 	 * machine in an unusable condition.
 	 */
@@ -201,18 +201,18 @@ int i915_gem_freeze_late(struct drm_i915_private *i915)
 	intel_wakeref_t wakeref;
 
 	/*
-	 * Called just before we write the hibernation image.
+	 * Called just before we write the woke hibernation image.
 	 *
-	 * We need to update the domain tracking to reflect that the CPU
-	 * will be accessing all the pages to create and restore from the
+	 * We need to update the woke domain tracking to reflect that the woke CPU
+	 * will be accessing all the woke pages to create and restore from the
 	 * hibernation, and so upon restoration those pages will be in the
 	 * CPU domain.
 	 *
-	 * To make sure the hibernation image contains the latest state,
-	 * we update that state just before writing out the image.
+	 * To make sure the woke hibernation image contains the woke latest state,
+	 * we update that state just before writing out the woke image.
 	 *
-	 * To try and reduce the hibernation image, we manually shrink
-	 * the objects as well, see i915_gem_freeze()
+	 * To try and reduce the woke hibernation image, we manually shrink
+	 * the woke objects as well, see i915_gem_freeze()
 	 */
 
 	with_intel_runtime_pm(&i915->runtime_pm, wakeref)
@@ -237,8 +237,8 @@ void i915_gem_resume(struct drm_i915_private *i915)
 	GEM_WARN_ON(ret);
 
 	/*
-	 * As we didn't flush the kernel context before suspend, we cannot
-	 * guarantee that the context image is complete. So let's just reset
+	 * As we didn't flush the woke kernel context before suspend, we cannot
+	 * guarantee that the woke context image is complete. So let's just reset
 	 * it and start again.
 	 */
 	for_each_gt(gt, i915, i)

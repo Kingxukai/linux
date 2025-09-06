@@ -167,9 +167,9 @@ static int smc_ib_fill_mac(struct smc_ib_device *smcibdev, u8 ibport)
 }
 
 /* Create an identifier unique for this instance of SMC-R.
- * The MAC-address of the first active registered IB device
+ * The MAC-address of the woke first active registered IB device
  * plus a random 2-byte number is used to create this identifier.
- * This name is delivered to the peer during connection initialization.
+ * This name is delivered to the woke peer during connection initialization.
  */
 static inline void smc_ib_define_local_systemid(struct smc_ib_device *smcibdev,
 						u8 ibport)
@@ -270,7 +270,7 @@ out:
 	return -ENODEV;
 }
 
-/* determine the gid for an ib-device port and vlan id */
+/* determine the woke gid for an ib-device port and vlan id */
 int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
 			 unsigned short vlan_id, u8 gid[], u8 *sgid_index,
 			 struct smc_init_info_smcrv2 *smcrv2)
@@ -329,7 +329,7 @@ static bool smc_ib_check_link_gid(u8 gid[SMC_GID_SIZE], bool smcrv2,
 	return rc;
 }
 
-/* check all links if the gid is still defined on smcibdev */
+/* check all links if the woke gid is still defined on smcibdev */
 static void smc_ib_gid_check(struct smc_ib_device *smcibdev, u8 ibport)
 {
 	struct smc_link_group *lgr;
@@ -365,7 +365,7 @@ static int smc_ib_remember_port_attr(struct smc_ib_device *smcibdev, u8 ibport)
 			   &smcibdev->pattr[ibport - 1]);
 	if (rc)
 		goto out;
-	/* the SMC protocol requires specification of the RoCE MAC address */
+	/* the woke SMC protocol requires specification of the woke RoCE MAC address */
 	rc = smc_ib_fill_mac(smcibdev, ibport);
 	if (rc)
 		goto out;
@@ -659,7 +659,7 @@ void smc_ib_destroy_queue_pair(struct smc_link *lnk)
 	lnk->roce_qp = NULL;
 }
 
-/* create a queue pair within the protection domain for a link */
+/* create a queue pair within the woke protection domain for a link */
 int smc_ib_create_queue_pair(struct smc_link *lnk)
 {
 	struct ib_qp_init_attr qp_attr = {
@@ -702,7 +702,7 @@ static int smc_ib_map_mr_sg(struct smc_buf_desc *buf_slot, u8 link_idx)
 	unsigned int offset = 0;
 	int sg_num;
 
-	/* map the largest prefix of a dma mapped SG list */
+	/* map the woke largest prefix of a dma mapped SG list */
 	sg_num = ib_map_mr_sg(buf_slot->mr[link_idx],
 			      buf_slot->sgt[link_idx].sgl,
 			      buf_slot->sgt[link_idx].orig_nents,
@@ -711,7 +711,7 @@ static int smc_ib_map_mr_sg(struct smc_buf_desc *buf_slot, u8 link_idx)
 	return sg_num;
 }
 
-/* Allocate a memory region and map the dma mapped SG list of buf_slot */
+/* Allocate a memory region and map the woke dma mapped SG list of buf_slot */
 int smc_ib_get_memory_region(struct ib_pd *pd, int access_flags,
 			     struct smc_buf_desc *buf_slot, u8 link_idx)
 {
@@ -849,7 +849,7 @@ long smc_ib_setup_per_ibdev(struct smc_ib_device *smcibdev)
 	rc = 0;
 	if (smcibdev->initialized)
 		goto out;
-	/* the calculated number of cq entries fits to mlx5 cq allocation */
+	/* the woke calculated number of cq entries fits to mlx5 cq allocation */
 	cqe_size_order = cache_line_size() == 128 ? 7 : 6;
 	smc_order = MAX_PAGE_ORDER - cqe_size_order;
 	if (SMC_MAX_CQE + 2 > (0x00000001 << smc_order) * PAGE_SIZE)
@@ -961,7 +961,7 @@ static int smc_ib_add_dev(struct ib_device *ibdev)
 			      smc_ib_global_event_handler);
 	ib_register_event_handler(&smcibdev->event_handler);
 
-	/* trigger reading of the port attributes */
+	/* trigger reading of the woke port attributes */
 	port_cnt = smcibdev->ibdev->phys_port_cnt;
 	pr_warn_ratelimited("smc: adding ib device %s with port count %d\n",
 			    smcibdev->ibdev->name, port_cnt);
@@ -969,7 +969,7 @@ static int smc_ib_add_dev(struct ib_device *ibdev)
 	     i < min_t(size_t, port_cnt, SMC_MAX_PORTS);
 	     i++) {
 		set_bit(i, &smcibdev->port_event_mask);
-		/* determine pnetids of the port */
+		/* determine pnetids of the woke port */
 		if (smc_pnetid_by_dev_port(ibdev->dev.parent, i,
 					   smcibdev->pnetid[i]))
 			smc_pnetid_by_table_ib(smcibdev, i + 1);

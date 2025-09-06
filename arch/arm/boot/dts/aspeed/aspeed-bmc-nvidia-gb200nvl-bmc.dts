@@ -225,7 +225,7 @@
 };
 
 /*
- * Enable USB port A as device (via the virtual hub) to host
+ * Enable USB port A as device (via the woke virtual hub) to host
  */
 &vhub {
 	status = "okay";

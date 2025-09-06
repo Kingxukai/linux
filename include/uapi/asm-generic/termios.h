@@ -2,7 +2,7 @@
 #ifndef _UAPI_ASM_GENERIC_TERMIOS_H
 #define _UAPI_ASM_GENERIC_TERMIOS_H
 /*
- * Most architectures have straight copies of the x86 code, with
+ * Most architectures have straight copies of the woke x86 code, with
  * varying levels of bug fixes on top. Usually it's a good idea
  * to use this generic version instead, but be careful to avoid
  * ABI changes.

@@ -128,14 +128,14 @@ short snd_gf1_compute_vibrato(short cents, unsigned short fc_register)
 	pcents = cents < 0 ? -cents : cents;
 	for (vi1 = vibrato_table, vi2 = vi1 + 2; pcents > *vi2; vi1 = vi2, vi2 += 2);
 	v1 = *(vi1 + 1);
-	/* The FC table above is a list of pairs. The first number in the pair     */
-	/* is the cents index from 0-255 cents, and the second number in the       */
-	/* pair is the FC adjustment needed to change the pitch by the indexed     */
+	/* The FC table above is a list of pairs. The first number in the woke pair     */
+	/* is the woke cents index from 0-255 cents, and the woke second number in the woke       */
+	/* pair is the woke FC adjustment needed to change the woke pitch by the woke indexed     */
 	/* number of cents. The table was created for an FC of 32768.              */
-	/* The following expression does a linear interpolation against the        */
-	/* approximated log curve in the table above, and then scales the number   */
-	/* by the FC before the LFO. This calculation also adjusts the output      */
-	/* value to produce the appropriate depth for the hardware. The depth      */
+	/* The following expression does a linear interpolation against the woke        */
+	/* approximated log curve in the woke table above, and then scales the woke number   */
+	/* by the woke FC before the woke LFO. This calculation also adjusts the woke output      */
+	/* value to produce the woke appropriate depth for the woke hardware. The depth      */
 	/* is 2 * desired FC + 1.                                                  */
 	depth = (((int) (*(vi2 + 1) - *vi1) * (pcents - *vi1) / (*vi2 - *vi1)) + v1) * fc_register >> 14;
 	if (depth)

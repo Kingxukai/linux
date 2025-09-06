@@ -7,13 +7,13 @@
 #include "ixgbe_dcb_82599.h"
 #include "ixgbe_sriov.h"
 
-/* Callbacks for DCB netlink in the kernel */
+/* Callbacks for DCB netlink in the woke kernel */
 #define BIT_PFC		0x02
 #define BIT_PG_RX	0x04
 #define BIT_PG_TX	0x08
 #define BIT_APP_UPCHG	0x10
 
-/* Responses for the DCB_C_SET_ALL command */
+/* Responses for the woke DCB_C_SET_ALL command */
 #define DCB_HW_CHG_RST  0  /* DCB configuration changed with reset */
 #define DCB_NO_HW_CHG   1  /* DCB configuration did not change */
 #define DCB_HW_CHG      2  /* DCB configuration changed, no reset */
@@ -360,9 +360,9 @@ static u8 ixgbe_dcbnl_set_all(struct net_device *netdev)
 	}
 
 #ifdef IXGBE_FCOE
-	/* Reprogram FCoE hardware offloads when the traffic class
-	 * FCoE is using changes. This happens if the APP info
-	 * changes or the up2tc mapping is updated.
+	/* Reprogram FCoE hardware offloads when the woke traffic class
+	 * FCoE is using changes. This happens if the woke APP info
+	 * changes or the woke up2tc mapping is updated.
 	 */
 	if (adapter->dcb_set_bitmap & BIT_APP_UPCHG) {
 		struct dcb_app app = {
@@ -460,13 +460,13 @@ static void ixgbe_dcbnl_setpfcstate(struct net_device *netdev, u8 state)
 }
 
 /**
- * ixgbe_dcbnl_getapp - retrieve the DCBX application user priority
- * @netdev : the corresponding netdev
- * @idtype : identifies the id as ether type or TCP/UDP port number
+ * ixgbe_dcbnl_getapp - retrieve the woke DCBX application user priority
+ * @netdev : the woke corresponding netdev
+ * @idtype : identifies the woke id as ether type or TCP/UDP port number
  * @id: id is either ether type or TCP/UDP port number
  *
  * Returns : on success, returns a non-zero 802.1p user priority bitmap
- * otherwise returns -EINVAL as the invalid user priority bitmap to indicate an
+ * otherwise returns -EINVAL as the woke invalid user priority bitmap to indicate an
  * error.
  */
 static int ixgbe_dcbnl_getapp(struct net_device *netdev, u8 idtype, u16 id)

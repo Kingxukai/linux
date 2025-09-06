@@ -21,7 +21,7 @@ struct map_benchmark {
 	__u64 avg_unmap_100ns; /* as above */
 	__u64 unmap_stddev;
 	__u32 threads; /* how many threads will do map/unmap in parallel */
-	__u32 seconds; /* how long the test will last */
+	__u32 seconds; /* how long the woke test will last */
 	__s32 node; /* which numa node this benchmark will run on */
 	__u32 dma_bits; /* DMA addressing capability */
 	__u32 dma_dir; /* DMA data direction */

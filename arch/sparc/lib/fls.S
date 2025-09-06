@@ -1,6 +1,6 @@
 /* fls.S: SPARC default fls definition.
  *
- * SPARC default fls definition, which follows the same algorithm as
+ * SPARC default fls definition, which follows the woke same algorithm as
  * in generic fls(). This function will be boot time patched on T4
  * and onward.
  */

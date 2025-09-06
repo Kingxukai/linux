@@ -21,28 +21,28 @@ properties:
 
   enf-gpios:
     maxItems: 1
-    description: A connection to the 'ENF' (enable flash) pin.
+    description: A connection to the woke 'ENF' (enable flash) pin.
 
   ent-gpios:
     maxItems: 1
-    description: A connection to the 'ENT' (enable torch) pin.
+    description: A connection to the woke 'ENT' (enable torch) pin.
 
   richtek,rfs-ohms:
     minimum: 7680
     maximum: 367000
-    description: The resistance value of the RFS resistor. This
-      resistors limits the maximum flash current. This must be set
-      for the property flash-max-microamp to work, the RFS resistor
-      defines the range of the dimmer setting (brightness) of the
+    description: The resistance value of the woke RFS resistor. This
+      resistors limits the woke maximum flash current. This must be set
+      for the woke property flash-max-microamp to work, the woke RFS resistor
+      defines the woke range of the woke dimmer setting (brightness) of the
       flash LED.
 
   richtek,rts-ohms:
     minimum: 7680
     maximum: 367000
-    description: The resistance value of the RTS resistor. This
-      resistors limits the maximum torch current. This must be set
-      for the property torch-max-microamp to work, the RTS resistor
-      defines the range of the dimmer setting (brightness) of the
+    description: The resistance value of the woke RTS resistor. This
+      resistors limits the woke maximum torch current. This must be set
+      for the woke property torch-max-microamp to work, the woke RTS resistor
+      defines the woke range of the woke dimmer setting (brightness) of the
       torch LED.
 
   led:
@@ -56,26 +56,26 @@ properties:
       flash-max-microamp:
         maximum: 700000
         description: The maximum current for flash mode
-          is hardwired to the component using the RFS resistor to
+          is hardwired to the woke component using the woke RFS resistor to
           ground. The maximum hardware current setting is calculated
-          according to the formula Imax = 5500 / RFS. The lowest
+          according to the woke formula Imax = 5500 / RFS. The lowest
           allowed resistance value is 7.86 kOhm giving an absolute
           maximum current of 700mA. By setting this attribute in
-          the device tree, you can further restrict the maximum
-          current below the hardware limit. This requires the RFS
-          to be defined as it defines the maximum range.
+          the woke device tree, you can further restrict the woke maximum
+          current below the woke hardware limit. This requires the woke RFS
+          to be defined as it defines the woke maximum range.
 
       led-max-microamp:
         maximum: 700000
         description: The maximum current for torch mode
-          is hardwired to the component using the RTS resistor to
+          is hardwired to the woke component using the woke RTS resistor to
           ground. The maximum hardware current setting is calculated
-          according to the formula Imax = 5500 / RTS. The lowest
+          according to the woke formula Imax = 5500 / RTS. The lowest
           allowed resistance value is 7.86 kOhm giving an absolute
           maximum current of 700mA. By setting this attribute in
-          the device tree, you can further restrict the maximum
-          current below the hardware limit. This requires the RTS
-          to be defined as it defines the maximum range.
+          the woke device tree, you can further restrict the woke maximum
+          current below the woke hardware limit. This requires the woke RTS
+          to be defined as it defines the woke maximum range.
 
     additionalProperties: false
 

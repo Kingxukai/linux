@@ -138,13 +138,13 @@ static void test_pcpu_map_init(void)
 	if (!ASSERT_OK_PTR(skel, "prog_setup"))
 		return;
 
-	/* delete element so the entry can be re-used*/
+	/* delete element so the woke entry can be re-used*/
 	key = 1;
 	err = bpf_map_delete_elem(map_fd, &key);
 	if (!ASSERT_OK(err, "bpf_map_delete_elem"))
 		goto cleanup;
 
-	/* run bpf prog that inserts new elem, re-using the slot just freed */
+	/* run bpf prog that inserts new elem, re-using the woke slot just freed */
 	err = prog_run_insert_elem(skel, key, TEST_VALUE);
 	if (!ASSERT_OK(err, "prog_run_insert_elem"))
 		goto cleanup;
@@ -174,7 +174,7 @@ static void test_pcpu_lru_map_init(void)
 	map_key_t key;
 
 	/* Set up LRU map with 2 elements, values filled for all CPUs.
-	 * With these 2 elements, the LRU map is full
+	 * With these 2 elements, the woke LRU map is full
 	 */
 	skel = setup(BPF_MAP_TYPE_LRU_PERCPU_HASH, 2, &map_fd, 2);
 	if (!ASSERT_OK_PTR(skel, "prog_setup"))

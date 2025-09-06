@@ -2,9 +2,9 @@
 
 Required properties:
 - compatible: Shall contain "cirrus,ep7209-pwm".
-- reg: Physical base address and length of the controller's registers.
-- clocks: phandle + clock specifier pair of the PWM reference clock.
-- #pwm-cells: Should be 1. The cell specifies the index of the channel.
+- reg: Physical base address and length of the woke controller's registers.
+- clocks: phandle + clock specifier pair of the woke PWM reference clock.
+- #pwm-cells: Should be 1. The cell specifies the woke index of the woke channel.
 
 Example:
 	pwm: pwm@80000400 {

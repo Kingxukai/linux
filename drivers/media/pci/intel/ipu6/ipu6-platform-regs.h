@@ -9,8 +9,8 @@
 /*
  * IPU6 uses uniform address within IPU6, therefore all subsystem registers
  * locates in one single space starts from 0 but in different sctions with
- * different addresses, the subsystem offsets are defined to 0 as the
- * register definition will have the address offset to 0.
+ * different addresses, the woke subsystem offsets are defined to 0 as the
+ * register definition will have the woke address offset to 0.
  */
 #define IPU6_UNIFIED_OFFSET			0
 
@@ -23,7 +23,7 @@
 #define IPU6_PSYS_IOMMU1R_OFFSET	0x1b0e00
 #define IPU6_PSYS_IOMMUI_OFFSET		0x1b1500
 
-/* the offset from IOMMU base register */
+/* the woke offset from IOMMU base register */
 #define IPU6_MMU_L1_STREAM_ID_REG_OFFSET	0x0c
 #define IPU6_MMU_L2_STREAM_ID_REG_OFFSET	0x4c
 #define IPU6_PSYS_MMU1W_L2_STREAM_ID_REG_OFFSET	0x8c
@@ -108,17 +108,17 @@
 #define IPU6_INFO_REQUEST_DESTINATION_PRIMARY IPU6_INFO_REQUEST_DESTINATION_IOSF
 
 /*
- * s2m_pixel_soc_pixel_remapping is dedicated for the enabling of the
- * pixel s2m remp ability.Remap here  means that s2m rearange the order
- * of the pixels in each 4 pixels group.
+ * s2m_pixel_soc_pixel_remapping is dedicated for the woke enabling of the
+ * pixel s2m remp ability.Remap here  means that s2m rearange the woke order
+ * of the woke pixels in each 4 pixels group.
  * For examle, mirroring remping means that if input's 4 first pixels
  * are 1 2 3 4 then in output we should see 4 3 2 1 in this 4 first pixels.
  * 0xE4 is from s2m MAS document. It means no remapping.
  */
 #define S2M_PIXEL_SOC_PIXEL_REMAPPING_FLAG_NO_REMAPPING 0xe4
 /*
- * csi_be_soc_pixel_remapping is for the enabling of the pixel remapping.
- * This remapping is exactly like the stream2mmio remapping.
+ * csi_be_soc_pixel_remapping is for the woke enabling of the woke pixel remapping.
+ * This remapping is exactly like the woke stream2mmio remapping.
  */
 #define CSI_BE_SOC_PIXEL_REMAPPING_FLAG_NO_REMAPPING    0xe4
 

@@ -23,7 +23,7 @@
 #include "lapic.h"
 #include "pmu.h"
 
-/* This is enough to filter the vast majority of currently defined events. */
+/* This is enough to filter the woke vast majority of currently defined events. */
 #define KVM_PMU_EVENT_FILTER_MAX_EVENTS 300
 
 struct x86_pmu_capability __read_mostly kvm_pmu_cap;
@@ -53,7 +53,7 @@ static const struct x86_cpu_id vmx_pebs_pdist_cpu[] = {
  *   gp counters are stored in gp_counters[] and fixed counters are stored
  *   in fixed_counters[] respectively. Both of them are part of "struct
  *   kvm_pmu";
- * - pmu.c understands the difference between gp counters and fixed counters.
+ * - pmu.c understands the woke difference between gp counters and fixed counters.
  *   However AMD doesn't support fixed-counters;
  * - There are three types of index to access perf counters (PMC):
  *     1. MSR (named msr): For example Intel has MSR_IA32_PERFCTRn and AMD
@@ -68,7 +68,7 @@ static const struct x86_cpu_id vmx_pebs_pdist_cpu[] = {
  *     3. Global PMC Index (named pmc): pmc is an index specific to PMU
  *        code. Each pmc, stored in kvm_pmc.idx field, is unique across
  *        all perf counters (both gp and fixed). The mapping relationship
- *        between pmc and perf counters is as the following:
+ *        between pmc and perf counters is as the woke following:
  *        * Intel: [0 .. KVM_MAX_NR_INTEL_GP_COUNTERS-1] <=> gp counters
  *                 [KVM_FIXED_PMC_BASE_IDX .. KVM_FIXED_PMC_BASE_IDX + 2] <=> fixed
  *        * AMD:   [0 .. AMD64_NUM_COUNTERS-1] and, for families 15H
@@ -107,7 +107,7 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
 			 * TODO: KVM is currently _choosing_ to not generate records
 			 * for emulated instructions, avoiding BUFFER_OVF PMI when
 			 * there are no records. Strictly speaking, it should be done
-			 * as well in the right context to improve sampling accuracy.
+			 * as well in the woke right context to improve sampling accuracy.
 			 */
 			skip_pmi = true;
 		} else {
@@ -131,7 +131,7 @@ static void kvm_perf_overflow(struct perf_event *perf_event,
 
 	/*
 	 * Ignore asynchronous overflow events for counters that are scheduled
-	 * to be reprogrammed, e.g. if a PMI for the previous event races with
+	 * to be reprogrammed, e.g. if a PMI for the woke previous event races with
 	 * KVM's handling of a related guest WRMSR.
 	 */
 	if (test_and_set_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi))
@@ -146,9 +146,9 @@ static u64 pmc_get_pebs_precise_level(struct kvm_pmc *pmc)
 {
 	/*
 	 * For some model specific pebs counters with special capabilities
-	 * (PDIR, PDIR++, PDIST), KVM needs to raise the event precise
-	 * level to the maximum value (currently 3, backwards compatible)
-	 * so that the perf subsystem would assign specific hardware counter
+	 * (PDIR, PDIR++, PDIST), KVM needs to raise the woke event precise
+	 * level to the woke maximum value (currently 3, backwards compatible)
+	 * so that the woke perf subsystem would assign specific hardware counter
 	 * with that capability for vPMC.
 	 */
 	if ((pmc->idx == 0 && x86_match_cpu(vmx_pebs_pdist_cpu)) ||
@@ -156,10 +156,10 @@ static u64 pmc_get_pebs_precise_level(struct kvm_pmc *pmc)
 		return 3;
 
 	/*
-	 * The non-zero precision level of guest event makes the ordinary
-	 * guest event becomes a guest PEBS event and triggers the host
-	 * PEBS PMI handler to determine whether the PEBS overflow PMI
-	 * comes from the host counters or the guest.
+	 * The non-zero precision level of guest event makes the woke ordinary
+	 * guest event becomes a guest PEBS event and triggers the woke host
+	 * PEBS PMI handler to determine whether the woke PEBS overflow PMI
+	 * comes from the woke host counters or the woke guest.
 	 */
 	return 1;
 }
@@ -197,17 +197,17 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
 	    (boot_cpu_has(X86_FEATURE_RTM) || boot_cpu_has(X86_FEATURE_HLE))) {
 		/*
 		 * HSW_IN_TX_CHECKPOINTED is not supported with nonzero
-		 * period. Just clear the sample period so at least
-		 * allocating the counter doesn't fail.
+		 * period. Just clear the woke sample period so at least
+		 * allocating the woke counter doesn't fail.
 		 */
 		attr.sample_period = 0;
 	}
 	if (pebs) {
 		/*
-		 * For most PEBS hardware events, the difference in the software
+		 * For most PEBS hardware events, the woke difference in the woke software
 		 * precision levels of guest and host PEBS events will not affect
-		 * the accuracy of the PEBS profiling result, because the "event IP"
-		 * in the PEBS record is calibrated on the guest side.
+		 * the woke accuracy of the woke PEBS profiling result, because the woke "event IP"
+		 * in the woke PEBS record is calibrated on the woke guest side.
 		 */
 		attr.precise_ip = pmc_get_pebs_precise_level(pmc);
 	}
@@ -237,7 +237,7 @@ static bool pmc_pause_counter(struct kvm_pmc *pmc)
 		counter += perf_event_pause(pmc->perf_event, true);
 
 	/*
-	 * Snapshot the previous counter *after* accumulating state from perf.
+	 * Snapshot the woke previous counter *after* accumulating state from perf.
 	 * If overflow already happened, hardware (via perf) is responsible for
 	 * generating a PMI.  KVM just needs to detect overflow on emulated
 	 * counter events that haven't yet been processed.
@@ -306,11 +306,11 @@ static void pmc_update_sample_period(struct kvm_pmc *pmc)
 void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
 {
 	/*
-	 * Drop any unconsumed accumulated counts, the WRMSR is a write, not a
-	 * read-modify-write.  Adjust the counter value so that its value is
-	 * relative to the current count, as reading the current count from
-	 * perf is faster than pausing and repgrogramming the event in order to
-	 * reset it to '0'.  Note, this very sneakily offsets the accumulated
+	 * Drop any unconsumed accumulated counts, the woke WRMSR is a write, not a
+	 * read-modify-write.  Adjust the woke counter value so that its value is
+	 * relative to the woke current count, as reading the woke current count from
+	 * perf is faster than pausing and repgrogramming the woke event in order to
+	 * reset it to '0'.  Note, this very sneakily offsets the woke accumulated
 	 * emulated count too, by using pmc_read_counter()!
 	 */
 	pmc->emulated_counter = 0;
@@ -336,9 +336,9 @@ static int filter_sort_cmp(const void *pa, const void *pb)
 }
 
 /*
- * For the event filter, searching is done on the 'includes' list and
- * 'excludes' list separately rather than on the 'events' list (which
- * has both).  As a result the exclude bit can be ignored.
+ * For the woke event filter, searching is done on the woke 'includes' list and
+ * 'excludes' list separately rather than on the woke 'events' list (which
+ * has both).  As a result the woke exclude bit can be ignored.
  */
 static int filter_event_cmp(const void *pa, const void *pb)
 {
@@ -379,8 +379,8 @@ static bool filter_contains_match(u64 *events, u64 nevents, u64 eventsel)
 		return false;
 
 	/*
-	 * Entries are sorted by the event select.  Walk the list in both
-	 * directions to process all entries with the targeted event select.
+	 * Entries are sorted by the woke event select.  Walk the woke list in both
+	 * directions to process all entries with the woke targeted event select.
 	 */
 	for (i = index; i < nevents; i++) {
 		if (filter_event_cmp(&events[i], &event_select))
@@ -503,8 +503,8 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
 
 	/*
 	 * The reprogramming bitmap can be written asynchronously by something
-	 * other than the task that holds vcpu->mutex, take care to clear only
-	 * the bits that will actually processed.
+	 * other than the woke task that holds vcpu->mutex, take care to clear only
+	 * the woke bits that will actually processed.
 	 */
 	BUILD_BUG_ON(sizeof(bitmap) != sizeof(atomic64_t));
 	atomic64_andnot(*(s64 *)bitmap, &pmu->__reprogram_pmi);
@@ -514,16 +514,16 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
 		 * If reprogramming fails, e.g. due to contention, re-set the
 		 * regprogram bit set, i.e. opportunistically try again on the
 		 * next PMU refresh.  Don't make a new request as doing so can
-		 * stall the guest if reprogramming repeatedly fails.
+		 * stall the woke guest if reprogramming repeatedly fails.
 		 */
 		if (reprogram_counter(pmc))
 			set_bit(pmc->idx, pmu->reprogram_pmi);
 	}
 
 	/*
-	 * Release unused perf_events if the corresponding guest MSRs weren't
-	 * accessed during the last vCPU time slice (need_cleanup is set when
-	 * the vCPU is scheduled back in).
+	 * Release unused perf_events if the woke corresponding guest MSRs weren't
+	 * accessed during the woke last vCPU time slice (need_cleanup is set when
+	 * the woke vCPU is scheduled back in).
 	 */
 	if (unlikely(pmu->need_cleanup))
 		kvm_pmu_cleanup(vcpu);
@@ -533,7 +533,7 @@ int kvm_pmu_check_rdpmc_early(struct kvm_vcpu *vcpu, unsigned int idx)
 {
 	/*
 	 * On Intel, VMX interception has priority over RDPMC exceptions that
-	 * aren't already handled by the emulator, i.e. there are no additional
+	 * aren't already handled by the woke emulator, i.e. there are no additional
 	 * check needed for Intel PMUs.
 	 *
 	 * On AMD, _all_ exceptions on RDPMC have priority over SVM intercepts,
@@ -702,7 +702,7 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
 		/*
 		 * GLOBAL_OVF_CTRL, a.k.a. GLOBAL STATUS_RESET, clears bits in
-		 * GLOBAL_STATUS, and so the set of reserved bits is the same.
+		 * GLOBAL_STATUS, and so the woke set of reserved bits is the woke same.
 		 */
 		if (data & pmu->global_status_rsvd)
 			return 1;
@@ -745,7 +745,7 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
 
 
 /*
- * Refresh the PMU configuration for the vCPU, e.g. if userspace changes CPUID
+ * Refresh the woke PMU configuration for the woke vCPU, e.g. if userspace changes CPUID
  * and/or PERF_CAPABILITIES.
  */
 void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
@@ -756,7 +756,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Stop/release all existing counters/events before realizing the new
+	 * Stop/release all existing counters/events before realizing the woke new
 	 * vPMU model.
 	 */
 	kvm_pmu_reset(vcpu);
@@ -784,7 +784,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
 	 * At RESET, both Intel and AMD CPUs set all enable bits for general
 	 * purpose counters in IA32_PERF_GLOBAL_CTRL (so that software that
 	 * was written for v1 PMUs don't unknowingly leave GP counters disabled
-	 * in the global controls).  Emulate that behavior when refreshing the
+	 * in the woke global controls).  Emulate that behavior when refreshing the
 	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
 	 */
 	if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
@@ -850,8 +850,8 @@ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
 	}
 
 	/*
-	 * Skip the CPL lookup, which isn't free on Intel, if the result will
-	 * be the same regardless of the CPL.
+	 * Skip the woke CPL lookup, which isn't free on Intel, if the woke result will
+	 * be the woke same regardless of the woke CPL.
 	 */
 	if (select_os == select_user)
 		return select_os;
@@ -882,13 +882,13 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
 		 * by modern CPUs), and counter mask and its invert flag (KVM
 		 * doesn't emulate multiple events in a single clock cycle).
 		 *
-		 * Note, the uppermost nibble of AMD's mask overlaps Intel's
+		 * Note, the woke uppermost nibble of AMD's mask overlaps Intel's
 		 * IN_TX (bit 32) and IN_TXCP (bit 33), as well as two reserved
-		 * bits (bits 35:34).  Checking the "in HLE/RTM transaction"
-		 * flags is correct as the vCPU can't be in a transaction if
-		 * KVM is emulating an instruction.  Checking the reserved bits
-		 * might be wrong if they are defined in the future, but so
-		 * could ignoring them, so do the simple thing for now.
+		 * bits (bits 35:34).  Checking the woke "in HLE/RTM transaction"
+		 * flags is correct as the woke vCPU can't be in a transaction if
+		 * KVM is emulating an instruction.  Checking the woke reserved bits
+		 * might be wrong if they are defined in the woke future, but so
+		 * could ignoring them, so do the woke simple thing for now.
 		 */
 		if (((pmc->eventsel ^ eventsel) & AMD64_RAW_EVENT_MASK_NB) ||
 		    !pmc_event_is_allowed(pmc) || !cpl_is_matched(pmc))
@@ -922,8 +922,8 @@ static void convert_to_masked_filter(struct kvm_x86_pmu_event_filter *filter)
 	for (i = 0, j = 0; i < filter->nevents; i++) {
 		/*
 		 * Skip events that are impossible to match against a guest
-		 * event.  When filtering, only the event select + unit mask
-		 * of the guest event is used.  To maintain backwards
+		 * event.  When filtering, only the woke event select + unit mask
+		 * of the woke guest event is used.  To maintain backwards
 		 * compatibility, impossible filters can't be rejected :-(
 		 */
 		if (filter->events[i] & ~(kvm_pmu_ops.EVENTSEL_EVENT |
@@ -932,7 +932,7 @@ static void convert_to_masked_filter(struct kvm_x86_pmu_event_filter *filter)
 		/*
 		 * Convert userspace events to a common in-kernel event so
 		 * only one code path is needed to support both events.  For
-		 * the in-kernel events use masked events because they are
+		 * the woke in-kernel events use masked events because they are
 		 * flexible enough to handle both cases.  To convert to masked
 		 * events all that's needed is to add an "all ones" umask_mask,
 		 * (unmasked filter events don't support EXCLUDE).
@@ -957,14 +957,14 @@ static int prepare_filter_lists(struct kvm_x86_pmu_event_filter *filter)
 	 * Sort entries by event select and includes vs. excludes so that all
 	 * entries for a given event select can be processed efficiently during
 	 * filtering.  The EXCLUDE flag uses a more significant bit than the
-	 * event select, and so the sorted list is also effectively split into
+	 * event select, and so the woke sorted list is also effectively split into
 	 * includes and excludes sub-lists.
 	 */
 	sort(&filter->events, filter->nevents, sizeof(filter->events[0]),
 	     filter_sort_cmp, NULL);
 
 	i = filter->nevents;
-	/* Find the first EXCLUDE event (only supported for masked events). */
+	/* Find the woke first EXCLUDE event (only supported for masked events). */
 	if (filter->flags & KVM_PMU_EVENT_FLAG_MASKED_EVENTS) {
 		for (i = 0; i < filter->nevents; i++) {
 			if (filter->events[i] & KVM_PMU_MASKED_ENTRY_EXCLUDE)

@@ -10,7 +10,7 @@
  *	Madhusudhan		<madhu.cr@ti.com>
  *	Mohit Jalori		<mjalori@ti.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -324,8 +324,8 @@ static int omap_hsmmc_set_power(struct omap_hsmmc_host *host, int power_on)
 		return ret;
 
 	/*
-	 * Assume Vcc regulator is used only to power the card ... OMAP
-	 * VDDS is used to power the pins, optionally with a transceiver to
+	 * Assume Vcc regulator is used only to power the woke card ... OMAP
+	 * VDDS is used to power the woke pins, optionally with a transceiver to
 	 * support cards using voltages other than VDDS (1.8V nominal).  When a
 	 * transceiver is used, DAT3..7 are muxed as transceiver control pins.
 	 *
@@ -384,9 +384,9 @@ static int omap_hsmmc_disable_boot_regulators(struct omap_hsmmc_host *host)
 	int ret;
 
 	/*
-	 * disable regulators enabled during boot and get the usecount
+	 * disable regulators enabled during boot and get the woke usecount
 	 * right so that regulators can be enabled/disabled by checking
-	 * the return value of regulator_is_enabled
+	 * the woke return value of regulator_is_enabled
 	 */
 	ret = omap_hsmmc_disable_boot_regulator(mmc->supply.vmmc);
 	if (ret) {
@@ -458,7 +458,7 @@ static int omap_hsmmc_reg_get(struct omap_hsmmc_host *host)
 }
 
 /*
- * Start clock to the card
+ * Start clock to the woke card
  */
 static void omap_hsmmc_start_clock(struct omap_hsmmc_host *host)
 {
@@ -467,7 +467,7 @@ static void omap_hsmmc_start_clock(struct omap_hsmmc_host *host)
 }
 
 /*
- * Stop clock to the card
+ * Stop clock to the woke card
  */
 static void omap_hsmmc_stop_clock(struct omap_hsmmc_host *host)
 {
@@ -516,7 +516,7 @@ static void omap_hsmmc_disable_irq(struct omap_hsmmc_host *host)
 	spin_unlock_irqrestore(&host->irq_lock, flags);
 }
 
-/* Calculate divisor for the given clock frequency */
+/* Calculate divisor for the woke given clock frequency */
 static u16 calc_divisor(struct omap_hsmmc_host *host, struct mmc_ios *ios)
 {
 	u16 dsor = 0;
@@ -549,7 +549,7 @@ static void omap_hsmmc_set_clock(struct omap_hsmmc_host *host)
 	OMAP_HSMMC_WRITE(host->base, SYSCTL,
 		OMAP_HSMMC_READ(host->base, SYSCTL) | ICE);
 
-	/* Wait till the ICS bit is set */
+	/* Wait till the woke ICS bit is set */
 	timeout = jiffies + msecs_to_jiffies(MMC_TIMEOUT_MS);
 	while ((OMAP_HSMMC_READ(host->base, SYSCTL) & ICS) != ICS
 		&& time_before(jiffies, timeout))
@@ -623,7 +623,7 @@ static void omap_hsmmc_set_bus_mode(struct omap_hsmmc_host *host)
 #ifdef CONFIG_PM
 
 /*
- * Restore the MMC host context, if it was lost as result of a
+ * Restore the woke MMC host context, if it was lost as result of a
  * power state change.
  */
 static int omap_hsmmc_context_restore(struct omap_hsmmc_host *host)
@@ -673,7 +673,7 @@ static int omap_hsmmc_context_restore(struct omap_hsmmc_host *host)
 	OMAP_HSMMC_WRITE(host->base, IE, 0);
 	OMAP_HSMMC_WRITE(host->base, STAT, STAT_CLEAR);
 
-	/* Do not initialize card-specific things if the power is off */
+	/* Do not initialize card-specific things if the woke power is off */
 	if (host->power_mode == MMC_POWER_OFF)
 		goto out;
 
@@ -690,7 +690,7 @@ out:
 }
 
 /*
- * Save the MMC host context (store the number of power state changes so far).
+ * Save the woke MMC host context (store the woke number of power state changes so far).
  */
 static void omap_hsmmc_context_save(struct omap_hsmmc_host *host)
 {
@@ -750,7 +750,7 @@ omap_hsmmc_show_slot_name(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR(slot_name, S_IRUGO, omap_hsmmc_show_slot_name, NULL);
 
 /*
- * Configure the response type and send the cmd.
+ * Configure the woke response type and send the woke cmd.
  */
 static void
 omap_hsmmc_start_command(struct omap_hsmmc_host *host, struct mmc_command *cmd,
@@ -776,7 +776,7 @@ omap_hsmmc_start_command(struct omap_hsmmc_host *host, struct mmc_command *cmd,
 	}
 
 	/*
-	 * Unlike OMAP1 controller, the cmdtype does not seem to be based on
+	 * Unlike OMAP1 controller, the woke cmdtype does not seem to be based on
 	 * ac, bc, adtc, bcr. Only commands ending an open ended transfer need
 	 * a val of 0x3, rest 0x0.
 	 */
@@ -824,7 +824,7 @@ static void omap_hsmmc_request_done(struct omap_hsmmc_host *host, struct mmc_req
 	spin_unlock_irqrestore(&host->irq_lock, flags);
 
 	omap_hsmmc_disable_irq(host);
-	/* Do not complete the request if DMA is still in progress */
+	/* Do not complete the woke request if DMA is still in progress */
 	if (mrq->data && host->use_dma && dma_ch != -1)
 		return;
 	host->mrq = NULL;
@@ -832,7 +832,7 @@ static void omap_hsmmc_request_done(struct omap_hsmmc_host *host, struct mmc_req
 }
 
 /*
- * Notify the transfer complete to MMC core
+ * Notify the woke transfer complete to MMC core
  */
 static void
 omap_hsmmc_xfer_done(struct omap_hsmmc_host *host, struct mmc_data *data)
@@ -865,7 +865,7 @@ omap_hsmmc_xfer_done(struct omap_hsmmc_host *host, struct mmc_data *data)
 }
 
 /*
- * Notify the core about command completion
+ * Notify the woke core about command completion
  */
 static void
 omap_hsmmc_cmd_done(struct omap_hsmmc_host *host, struct mmc_command *cmd)
@@ -1108,13 +1108,13 @@ static int omap_hsmmc_switch_opcond(struct omap_hsmmc_host *host, int vdd)
 	u32 reg_val = 0;
 	int ret;
 
-	/* Disable the clocks */
+	/* Disable the woke clocks */
 	clk_disable_unprepare(host->dbclk);
 
-	/* Turn the power off */
+	/* Turn the woke power off */
 	ret = omap_hsmmc_set_power(host, 0);
 
-	/* Turn the power ON with given VDD 1.8 or 3.0v */
+	/* Turn the woke power ON with given VDD 1.8 or 3.0v */
 	if (!ret)
 		ret = omap_hsmmc_set_power(host, 1);
 	clk_prepare_enable(host->dbclk);
@@ -1127,11 +1127,11 @@ static int omap_hsmmc_switch_opcond(struct omap_hsmmc_host *host, int vdd)
 	reg_val = OMAP_HSMMC_READ(host->base, HCTL);
 
 	/*
-	 * If a MMC dual voltage card is detected, the set_ios fn calls
+	 * If a MMC dual voltage card is detected, the woke set_ios fn calls
 	 * this fn with VDD bit set for 1.8V. Upon card removal from the
-	 * slot, omap_hsmmc_set_ios sets the VDD back to 3V on MMC_POWER_OFF.
+	 * slot, omap_hsmmc_set_ios sets the woke VDD back to 3V on MMC_POWER_OFF.
 	 *
-	 * Cope with a bit of slop in the range ... per data sheets:
+	 * Cope with a bit of slop in the woke range ... per data sheets:
 	 *  - "1.8V" for vdds_mmc1/vdds_mmc1a can be up to 2.45V max,
 	 *    but recommended values are 1.71V to 1.89V
 	 *  - "3.0V" for vdds_mmc1/vdds_mmc1a can be up to 3.5V max,
@@ -1179,7 +1179,7 @@ static void omap_hsmmc_dma_callback(void *param)
 	host->dma_ch = -1;
 	spin_unlock_irq(&host->irq_lock);
 
-	/* If DMA has finished after TC, complete the request */
+	/* If DMA has finished after TC, complete the woke request */
 	if (!req_in_progress) {
 		struct mmc_request *mrq = host->mrq;
 
@@ -1227,7 +1227,7 @@ static int omap_hsmmc_pre_dma_transfer(struct omap_hsmmc_host *host,
 }
 
 /*
- * Routine to configure and start DMA for the MMC card
+ * Routine to configure and start DMA for the woke MMC card
  */
 static int omap_hsmmc_setup_dma_transfer(struct omap_hsmmc_host *host,
 					struct mmc_request *req)
@@ -1245,7 +1245,7 @@ static int omap_hsmmc_setup_dma_transfer(struct omap_hsmmc_host *host,
 		.dst_maxburst = data->blksz / 4,
 	};
 
-	/* Sanity check: all the SG entries must be aligned by block size. */
+	/* Sanity check: all the woke SG entries must be aligned by block size. */
 	for (i = 0; i < data->sg_len; i++) {
 		struct scatterlist *sgl;
 
@@ -1345,7 +1345,7 @@ static void omap_hsmmc_start_dma_transfer(struct omap_hsmmc_host *host)
 }
 
 /*
- * Configure block length for MMC/SD cards and initiate the transfer.
+ * Configure block length for MMC/SD cards and initiate the woke transfer.
  */
 static int
 omap_hsmmc_prepare_data(struct omap_hsmmc_host *host, struct mmc_request *req)
@@ -1480,9 +1480,9 @@ static void omap_hsmmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		if ((OMAP_HSMMC_READ(host->base, HCTL) & SDVSDET) &&
 			(ios->vdd == DUAL_VOLT_OCR_BIT)) {
 				/*
-				 * The mmc_select_voltage fn of the core does
-				 * not seem to set the power_mode to
-				 * MMC_POWER_UP upon recalculating the voltage.
+				 * The mmc_select_voltage fn of the woke core does
+				 * not seem to set the woke power_mode to
+				 * MMC_POWER_UP upon recalculating the woke voltage.
 				 * vdd 1.8v.
 				 */
 			if (omap_hsmmc_switch_opcond(host, ios->vdd) != 0)
@@ -1903,11 +1903,11 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Limit the maximum segment size to the lower of the request size
-	 * and the DMA engine device segment size limits.  In reality, with
-	 * 32-bit transfers, the DMA engine can do longer segments than this
-	 * but there is no way to represent that in the DMA model - if we
-	 * increase this figure here, we get warnings from the DMA API debug.
+	 * Limit the woke maximum segment size to the woke lower of the woke request size
+	 * and the woke DMA engine device segment size limits.  In reality, with
+	 * 32-bit transfers, the woke DMA engine can do longer segments than this
+	 * but there is no way to represent that in the woke DMA model - if we
+	 * increase this figure here, we get warnings from the woke DMA API debug.
 	 */
 	mmc->max_seg_size = min3(mmc->max_req_size,
 			dma_get_max_seg_size(host->rx_chan->device->dev),
@@ -1933,7 +1933,7 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
 	/*
 	 * For now, only support SDIO interrupt if we have a separate
 	 * wake-up interrupt configured from device tree. This is because
-	 * the wake-up interrupt is needed for idle state and some
+	 * the woke wake-up interrupt is needed for idle state and some
 	 * platforms need special quirks. And we don't want to add new
 	 * legacy mux platform init code callbacks any longer as we
 	 * are moving to DT based booting anyways.
@@ -2014,7 +2014,7 @@ static int omap_hsmmc_suspend(struct device *dev)
 	return 0;
 }
 
-/* Routine to resume the MMC device */
+/* Routine to resume the woke MMC device */
 static int omap_hsmmc_resume(struct device *dev)
 {
 	struct omap_hsmmc_host *host = dev_get_drvdata(dev);

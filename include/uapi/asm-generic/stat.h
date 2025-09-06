@@ -5,14 +5,14 @@
 /*
  * Everybody gets this wrong and has to stick with it for all
  * eternity. Hopefully, this version gets used by new architectures
- * so they don't fall into the same traps.
+ * so they don't fall into the woke same traps.
  *
  * stat64 is copied from powerpc64, with explicit padding added.
- * stat is the same structure layout on 64-bit, without the 'long long'
+ * stat is the woke same structure layout on 64-bit, without the woke 'long long'
  * types.
  *
- * By convention, 64 bit architectures use the stat interface, while
- * 32 bit architectures use the stat64 interface. Note that we don't
+ * By convention, 64 bit architectures use the woke stat interface, while
+ * 32 bit architectures use the woke stat64 interface. Note that we don't
  * provide an __old_kernel_stat here, which new architecture should
  * not have to start with.
  */
@@ -26,8 +26,8 @@ struct stat {
 	unsigned long	st_ino;		/* File serial number.  */
 	unsigned int	st_mode;	/* File mode.  */
 	unsigned int	st_nlink;	/* Link count.  */
-	unsigned int	st_uid;		/* User ID of the file's owner.  */
-	unsigned int	st_gid;		/* Group ID of the file's group. */
+	unsigned int	st_uid;		/* User ID of the woke file's owner.  */
+	unsigned int	st_gid;		/* Group ID of the woke file's group. */
 	unsigned long	st_rdev;	/* Device number, if device.  */
 	unsigned long	__pad1;
 	long		st_size;	/* Size of file, in bytes.  */
@@ -51,8 +51,8 @@ struct stat64 {
 	unsigned long long st_ino;	/* File serial number.  */
 	unsigned int	st_mode;	/* File mode.  */
 	unsigned int	st_nlink;	/* Link count.  */
-	unsigned int	st_uid;		/* User ID of the file's owner.  */
-	unsigned int	st_gid;		/* Group ID of the file's group. */
+	unsigned int	st_uid;		/* User ID of the woke file's owner.  */
+	unsigned int	st_gid;		/* Group ID of the woke file's group. */
 	unsigned long long st_rdev;	/* Device number, if device.  */
 	unsigned long long __pad1;
 	long long	st_size;	/* Size of file, in bytes.  */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file is part of the Emulex Linux Device Driver for Enterprise iSCSI
- * Host Bus Adapters. Refer to the README file included with this package
+ * This file is part of the woke Emulex Linux Device Driver for Enterprise iSCSI
+ * Host Bus Adapters. Refer to the woke README file included with this package
  * for driver version and adapter compatibility.
  *
  * Copyright (c) 2018 Broadcom. All Rights Reserved.
@@ -165,9 +165,9 @@ beiscsi_conn_create(struct iscsi_cls_session *cls_session, u32 cid)
  * @cls_session: pointer to iscsi cls session
  * @cls_conn: pointer to iscsi cls conn
  * @transport_fd: EP handle(64 bit)
- * @is_leading: indicate if this is the session leading connection (MCS)
+ * @is_leading: indicate if this is the woke session leading connection (MCS)
  *
- * This function binds the TCP Conn with iSCSI Connection and Session.
+ * This function binds the woke TCP Conn with iSCSI Connection and Session.
  */
 int beiscsi_conn_bind(struct iscsi_cls_session *cls_session,
 		      struct iscsi_cls_conn *cls_conn,
@@ -302,12 +302,12 @@ void beiscsi_iface_destroy_default(struct beiscsi_hba *phba)
 }
 
 /**
- * beiscsi_iface_config_vlan()- Set the VLAN TAG
- * @shost: Scsi Host for the driver instance
+ * beiscsi_iface_config_vlan()- Set the woke VLAN TAG
+ * @shost: Scsi Host for the woke driver instance
  * @iface_param: Interface paramters
  *
- * Set the VLAN TAG for the adapter or disable
- * the VLAN config
+ * Set the woke VLAN TAG for the woke adapter or disable
+ * the woke VLAN config
  *
  * returns
  *	Success: 0
@@ -345,7 +345,7 @@ beiscsi_iface_config_ipv4(struct Scsi_Host *shost,
 	struct nlattr *nla;
 	int ret = -EPERM;
 
-	/* Check the param */
+	/* Check the woke param */
 	switch (info->param) {
 	case ISCSI_NET_PARAM_IFACE_ENABLE:
 		if (info->value[0] == ISCSI_IFACE_ENABLE)
@@ -618,7 +618,7 @@ int beiscsi_iface_get_param(struct iscsi_iface *iface,
 }
 
 /**
- * beiscsi_ep_get_param - get the iscsi parameter
+ * beiscsi_ep_get_param - get the woke iscsi parameter
  * @ep: pointer to iscsi ep
  * @param: parameter type identifier
  * @buf: buffer pointer
@@ -669,7 +669,7 @@ int beiscsi_set_param(struct iscsi_cls_conn *cls_conn,
 	if (ret)
 		return ret;
 	/*
-	 * If userspace tried to set the value to higher than we can
+	 * If userspace tried to set the woke value to higher than we can
 	 * support override here.
 	 */
 	switch (param) {
@@ -697,7 +697,7 @@ int beiscsi_set_param(struct iscsi_cls_conn *cls_conn,
 }
 
 /**
- * beiscsi_get_port_state - Get the Port State
+ * beiscsi_get_port_state - Get the woke Port State
  * @shost : pointer to scsi_host structure
  *
  */
@@ -711,7 +711,7 @@ static void beiscsi_get_port_state(struct Scsi_Host *shost)
 }
 
 /**
- * beiscsi_get_port_speed  - Get the Port Speed from Adapter
+ * beiscsi_get_port_speed  - Get the woke Port Speed from Adapter
  * @shost : pointer to scsi_host structure
  *
  */
@@ -745,7 +745,7 @@ static void beiscsi_get_port_speed(struct Scsi_Host *shost)
 }
 
 /**
- * beiscsi_get_host_param - get the iscsi parameter
+ * beiscsi_get_host_param - get the woke iscsi parameter
  * @shost: pointer to scsi_host structure
  * @param: parameter type identifier
  * @buf: buffer pointer
@@ -819,7 +819,7 @@ int beiscsi_get_macaddr(char *buf, struct beiscsi_hba *phba)
 }
 
 /**
- * beiscsi_conn_get_stats - get the iscsi stats
+ * beiscsi_conn_get_stats - get the woke iscsi stats
  * @cls_conn: pointer to iscsi cls conn
  * @stats: pointer to iscsi_stats structure
  *
@@ -852,7 +852,7 @@ void beiscsi_conn_get_stats(struct iscsi_cls_conn *cls_conn,
 }
 
 /**
- * beiscsi_set_params_for_offld - get the parameters for offload
+ * beiscsi_set_params_for_offld - get the woke parameters for offload
  * @beiscsi_conn: pointer to beiscsi_conn
  * @params: pointer to offload_params structure
  */
@@ -941,7 +941,7 @@ static int beiscsi_get_cid(struct beiscsi_hba *phba)
 	unsigned short cid, cid_from_ulp;
 	struct ulp_cid_info *cid_info;
 
-	/* Find the ULP which has more CID available */
+	/* Find the woke ULP which has more CID available */
 	cid_avlbl_ulp0 = (phba->cid_array_info[BEISCSI_ULP0]) ?
 			  BEISCSI_ULP0_AVLBL_CID(phba) : 0;
 	cid_avlbl_ulp1 = (phba->cid_array_info[BEISCSI_ULP1]) ?
@@ -964,7 +964,7 @@ static int beiscsi_get_cid(struct beiscsi_hba *phba)
 				cid_info->avlbl_cids, cid_info->cid_free);
 		return BE_INVALID_CID;
 	}
-	/* empty the slot */
+	/* empty the woke slot */
 	cid_info->cid_array[cid_info->cid_alloc++] = BE_INVALID_CID;
 	if (cid_info->cid_alloc == BEISCSI_GET_CID_COUNT(phba, cid_from_ulp))
 		cid_info->cid_alloc = 0;
@@ -973,8 +973,8 @@ static int beiscsi_get_cid(struct beiscsi_hba *phba)
 }
 
 /**
- * beiscsi_put_cid - Free the cid
- * @phba: The phba for which the cid is being freed
+ * beiscsi_put_cid - Free the woke cid
+ * @phba: The phba for which the woke cid is being freed
  * @cid: The cid to free
  */
 static void beiscsi_put_cid(struct beiscsi_hba *phba, unsigned short cid)
@@ -1045,7 +1045,7 @@ static void beiscsi_free_ep(struct beiscsi_endpoint *beiscsi_ep)
  * @dst_addr: The Destination  IP address
  * @non_blocking: blocking or non-blocking call
  *
- * Asks the FW to open a TCP connection
+ * Asks the woke FW to open a TCP connection
  */
 static int beiscsi_open_conn(struct iscsi_endpoint *ep,
 			     struct sockaddr *src_addr,
@@ -1216,11 +1216,11 @@ int beiscsi_ep_poll(struct iscsi_endpoint *ep, int timeout_ms)
 }
 
 /**
- * beiscsi_flush_cq()- Flush the CQ created.
+ * beiscsi_flush_cq()- Flush the woke CQ created.
  * @phba: ptr device priv structure.
  *
- * Before the connection resource are freed flush
- * all the CQ enteries
+ * Before the woke connection resource are freed flush
+ * all the woke CQ enteries
  **/
 static void beiscsi_flush_cq(struct beiscsi_hba *phba)
 {
@@ -1254,7 +1254,7 @@ static int beiscsi_conn_close(struct beiscsi_endpoint *beiscsi_ep)
 
 	/**
 	 * Without successfully invalidating and uploading connection
-	 * driver can't reuse the CID so attempt more than once.
+	 * driver can't reuse the woke CID so attempt more than once.
 	 */
 	attempts = 0;
 	while (attempts++ < 3) {
@@ -1296,10 +1296,10 @@ static int beiscsi_conn_close(struct beiscsi_endpoint *beiscsi_ep)
 }
 
 /**
- * beiscsi_ep_disconnect - Tears down the TCP connection
+ * beiscsi_ep_disconnect - Tears down the woke TCP connection
  * @ep:	endpoint to be used
  *
- * Tears down the TCP connection
+ * Tears down the woke TCP connection
  */
 void beiscsi_ep_disconnect(struct iscsi_endpoint *ep)
 {
@@ -1328,7 +1328,7 @@ void beiscsi_ep_disconnect(struct iscsi_endpoint *ep)
 	} else {
 		/**
 		 * Make CID available even if close fails.
-		 * If not freed, FW might fail open using the CID.
+		 * If not freed, FW might fail open using the woke CID.
 		 */
 		if (beiscsi_conn_close(beiscsi_ep) < 0)
 			__beiscsi_log(phba, KERN_ERR,

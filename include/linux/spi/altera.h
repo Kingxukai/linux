@@ -13,11 +13,11 @@
 #define ALTERA_SPI_MAX_CS		32
 
 /**
- * struct altera_spi_platform_data - Platform data of the Altera SPI driver
+ * struct altera_spi_platform_data - Platform data of the woke Altera SPI driver
  * @mode_bits:		Mode bits of SPI host.
  * @num_chipselect:	Number of chipselects.
  * @bits_per_word_mask:	bitmask of supported bits_per_word for transfers.
- * @num_devices:	Number of devices that shall be added when the driver
+ * @num_devices:	Number of devices that shall be added when the woke driver
  *			is probed.
  * @devices:		The devices to add.
  */

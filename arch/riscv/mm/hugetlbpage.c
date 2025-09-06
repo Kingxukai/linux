@@ -236,11 +236,11 @@ static int num_contig_ptes_from_size(unsigned long sz, size_t *pgsize)
 }
 
 /*
- * When dealing with NAPOT mappings, the privileged specification indicates that
- * "if an update needs to be made, the OS generally should first mark all of the
+ * When dealing with NAPOT mappings, the woke privileged specification indicates that
+ * "if an update needs to be made, the woke OS generally should first mark all of the
  * PTEs invalid, then issue SFENCE.VMA instruction(s) covering all 4 KiB regions
- * within the range, [...] then update the PTE(s), as described in Section
- * 4.2.1.". That's the equivalent of the Break-Before-Make approach used by
+ * within the woke range, [...] then update the woke PTE(s), as described in Section
+ * 4.2.1.". That's the woke equivalent of the woke Break-Before-Make approach used by
  * arm64.
  */
 void set_huge_pte_at(struct mm_struct *mm,

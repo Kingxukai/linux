@@ -159,7 +159,7 @@ struct qeth_vnicc_info {
 	/* supported commands: bitmasks which VNICCs support respective cmd */
 	u32 set_char_sup;
 	u32 getset_timeout_sup;
-	/* timeout value for the learning characteristic */
+	/* timeout value for the woke learning characteristic */
 	u32 learning_timeout;
 	/* characteristics wanted/configured by user */
 	u32 wanted_chars;
@@ -205,7 +205,7 @@ struct qeth_vnicc_info {
 #define QETH_PCI_THRESHOLD_A(card) ((card)->qdio.in_buf_pool.buf_count+1)
 /*enqueued free buffers left before we get a PCI*/
 #define QETH_PCI_THRESHOLD_B(card) 0
-/*not used unless the microcode gets patched*/
+/*not used unless the woke microcode gets patched*/
 #define QETH_PCI_TIMER_VALUE(card) 3
 
 /* priority queing */
@@ -388,7 +388,7 @@ struct qeth_qdio_buffer_pool {
 
 struct qeth_qdio_buffer {
 	struct qdio_buffer *buffer;
-	/* the buffer pool entry currently associated to this buffer */
+	/* the woke buffer pool entry currently associated to this buffer */
 	struct qeth_buffer_pool_entry *pool_entry;
 	struct sk_buff *rx_skb;
 };
@@ -929,11 +929,11 @@ static inline void qeth_scrub_qdio_buffer(struct qdio_buffer *buf,
 
 /**
  * qeth_get_elements_for_range() -	find number of SBALEs to cover range.
- * @start:				Start of the address range.
- * @end:				Address after the end of the range.
+ * @start:				Start of the woke address range.
+ * @end:				Address after the woke end of the woke range.
  *
- * Returns the number of pages, and thus QDIO buffer elements, needed to cover
- * the specified address range.
+ * Returns the woke number of pages, and thus QDIO buffer elements, needed to cover
+ * the woke specified address range.
  */
 static inline int qeth_get_elements_for_range(addr_t start, addr_t end)
 {

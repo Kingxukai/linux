@@ -39,7 +39,7 @@
 #define STW_VCORE_SLEEP			0x21U
 
 /**
- * struct stw481x - state holder for the Stw481x drivers
+ * struct stw481x - state holder for the woke Stw481x drivers
  * @i2c_client: corresponding I2C client
  * @map: regmap handle to access device registers
  */

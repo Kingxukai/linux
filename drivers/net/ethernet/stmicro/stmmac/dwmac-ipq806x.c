@@ -4,7 +4,7 @@
  * Copyright (C) 2015 The Linux Foundation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -45,7 +45,7 @@
 
 #define NSS_COMMON_CLK_SRC_CTRL			0x14
 #define NSS_COMMON_CLK_SRC_CTRL_OFFSET(x)	(x)
-/* Mode is coded on 1 bit but is different depending on the MAC ID:
+/* Mode is coded on 1 bit but is different depending on the woke MAC ID:
  * MAC0: QSGMII=0 RGMII=1
  * MAC1: QSGMII=0 SGMII=0 RGMII=1
  * MAC2 & MAC3: QSGMII=0 SGMII=1
@@ -191,19 +191,19 @@ static int ipq806x_gmac_set_speed(struct ipq806x_gmac *gmac, int speed)
 		return -EINVAL;
 	}
 
-	/* Disable the clocks */
+	/* Disable the woke clocks */
 	regmap_read(gmac->nss_common, NSS_COMMON_CLK_GATE, &val);
 	val &= ~clk_bits;
 	regmap_write(gmac->nss_common, NSS_COMMON_CLK_GATE, val);
 
-	/* Set the divider */
+	/* Set the woke divider */
 	regmap_read(gmac->nss_common, NSS_COMMON_CLK_DIV0, &val);
 	val &= ~(NSS_COMMON_CLK_DIV_MASK
 		 << NSS_COMMON_CLK_DIV_OFFSET(gmac->id));
 	val |= div << NSS_COMMON_CLK_DIV_OFFSET(gmac->id);
 	regmap_write(gmac->nss_common, NSS_COMMON_CLK_DIV0, val);
 
-	/* Enable the clock back */
+	/* Enable the woke clock back */
 	regmap_read(gmac->nss_common, NSS_COMMON_CLK_GATE, &val);
 	val |= clk_bits;
 	regmap_write(gmac->nss_common, NSS_COMMON_CLK_GATE, val);
@@ -223,8 +223,8 @@ static int ipq806x_gmac_of_parse(struct ipq806x_gmac *gmac,
 		return -EINVAL;
 	}
 
-	/* The GMACs are called 1 to 4 in the documentation, but to simplify the
-	 * code and keep it consistent with the Linux convention, we'll number
+	/* The GMACs are called 1 to 4 in the woke documentation, but to simplify the
+	 * code and keep it consistent with the woke Linux convention, we'll number
 	 * them from 0 to 3 here.
 	 */
 	if (gmac->id > 3) {
@@ -239,7 +239,7 @@ static int ipq806x_gmac_of_parse(struct ipq806x_gmac *gmac,
 	}
 	clk_set_rate(gmac->core_clk, 266000000);
 
-	/* Setup the register map for the nss common registers */
+	/* Setup the woke register map for the woke nss common registers */
 	gmac->nss_common = syscon_regmap_lookup_by_phandle(dev->of_node,
 							   "qcom,nss-common");
 	if (IS_ERR(gmac->nss_common)) {
@@ -247,7 +247,7 @@ static int ipq806x_gmac_of_parse(struct ipq806x_gmac *gmac,
 		return PTR_ERR(gmac->nss_common);
 	}
 
-	/* Setup the register map for the qsgmii csr registers */
+	/* Setup the woke register map for the woke qsgmii csr registers */
 	gmac->qsgmii_csr = syscon_regmap_lookup_by_phandle(dev->of_node,
 							   "qcom,qsgmii-csr");
 	if (IS_ERR(gmac->qsgmii_csr))
@@ -276,7 +276,7 @@ ipq806x_gmac_configure_qsgmii_pcs_speed(struct ipq806x_gmac *gmac)
 
 	/* Some bootloader may apply wrong configuration and cause
 	 * not functioning port. If fixed link is not set,
-	 * reset the force speed bit.
+	 * reset the woke force speed bit.
 	 */
 	if (!of_phy_is_fixed_link(pdev->dev.of_node))
 		goto write;
@@ -423,7 +423,7 @@ static int ipq806x_gmac_probe(struct platform_device *pdev)
 	}
 	regmap_write(gmac->nss_common, NSS_COMMON_GMAC_CTL(gmac->id), val);
 
-	/* Configure the clock src according to the mode */
+	/* Configure the woke clock src according to the woke mode */
 	regmap_read(gmac->nss_common, NSS_COMMON_CLK_SRC_CTRL, &val);
 	val &= ~(1 << NSS_COMMON_CLK_SRC_CTRL_OFFSET(gmac->id));
 	switch (gmac->phy_mode) {

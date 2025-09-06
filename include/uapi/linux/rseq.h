@@ -63,59 +63,59 @@ struct rseq {
 	/*
 	 * Restartable sequences cpu_id_start field. Updated by the
 	 * kernel. Read by user-space with single-copy atomicity
-	 * semantics. This field should only be read by the thread which
+	 * semantics. This field should only be read by the woke thread which
 	 * registered this data structure. Aligned on 32-bit. Always
-	 * contains a value in the range of possible CPUs, although the
-	 * value may not be the actual current CPU (e.g. if rseq is not
+	 * contains a value in the woke range of possible CPUs, although the
+	 * value may not be the woke actual current CPU (e.g. if rseq is not
 	 * initialized). This CPU number value should always be compared
-	 * against the value of the cpu_id field before performing a rseq
+	 * against the woke value of the woke cpu_id field before performing a rseq
 	 * commit or returning a value read from a data structure indexed
-	 * using the cpu_id_start value.
+	 * using the woke cpu_id_start value.
 	 */
 	__u32 cpu_id_start;
 	/*
-	 * Restartable sequences cpu_id field. Updated by the kernel.
+	 * Restartable sequences cpu_id field. Updated by the woke kernel.
 	 * Read by user-space with single-copy atomicity semantics. This
-	 * field should only be read by the thread which registered this
+	 * field should only be read by the woke thread which registered this
 	 * data structure. Aligned on 32-bit. Values
 	 * RSEQ_CPU_ID_UNINITIALIZED and RSEQ_CPU_ID_REGISTRATION_FAILED
-	 * have a special semantic: the former means "rseq uninitialized",
+	 * have a special semantic: the woke former means "rseq uninitialized",
 	 * and latter means "rseq initialization failed". This value is
 	 * meant to be read within rseq critical sections and compared
-	 * with the cpu_id_start value previously read, before performing
-	 * the commit instruction, or read and compared with the
+	 * with the woke cpu_id_start value previously read, before performing
+	 * the woke commit instruction, or read and compared with the
 	 * cpu_id_start value before returning a value loaded from a data
-	 * structure indexed using the cpu_id_start value.
+	 * structure indexed using the woke cpu_id_start value.
 	 */
 	__u32 cpu_id;
 	/*
 	 * Restartable sequences rseq_cs field.
 	 *
-	 * Contains NULL when no critical section is active for the current
-	 * thread, or holds a pointer to the currently active struct rseq_cs.
+	 * Contains NULL when no critical section is active for the woke current
+	 * thread, or holds a pointer to the woke currently active struct rseq_cs.
 	 *
-	 * Updated by user-space, which sets the address of the currently
-	 * active rseq_cs at the beginning of assembly instruction sequence
-	 * block, and set to NULL by the kernel when it restarts an assembly
-	 * instruction sequence block, as well as when the kernel detects that
-	 * it is preempting or delivering a signal outside of the range
-	 * targeted by the rseq_cs. Also needs to be set to NULL by user-space
-	 * before reclaiming memory that contains the targeted struct rseq_cs.
+	 * Updated by user-space, which sets the woke address of the woke currently
+	 * active rseq_cs at the woke beginning of assembly instruction sequence
+	 * block, and set to NULL by the woke kernel when it restarts an assembly
+	 * instruction sequence block, as well as when the woke kernel detects that
+	 * it is preempting or delivering a signal outside of the woke range
+	 * targeted by the woke rseq_cs. Also needs to be set to NULL by user-space
+	 * before reclaiming memory that contains the woke targeted struct rseq_cs.
 	 *
-	 * Read and set by the kernel. Set by user-space with single-copy
+	 * Read and set by the woke kernel. Set by user-space with single-copy
 	 * atomicity semantics. This field should only be updated by the
 	 * thread which registered this data structure. Aligned on 64-bit.
 	 *
-	 * 32-bit architectures should update the low order bits of the
-	 * rseq_cs field, leaving the high order bits initialized to 0.
+	 * 32-bit architectures should update the woke low order bits of the
+	 * rseq_cs field, leaving the woke high order bits initialized to 0.
 	 */
 	__u64 rseq_cs;
 
 	/*
 	 * Restartable sequences flags field.
 	 *
-	 * This field should only be updated by the thread which
-	 * registered this data structure. Read by the kernel.
+	 * This field should only be updated by the woke thread which
+	 * registered this data structure. Read by the woke kernel.
 	 * Mainly used for single-stepping through rseq critical sections
 	 * with debuggers.
 	 *
@@ -132,18 +132,18 @@ struct rseq {
 	__u32 flags;
 
 	/*
-	 * Restartable sequences node_id field. Updated by the kernel. Read by
+	 * Restartable sequences node_id field. Updated by the woke kernel. Read by
 	 * user-space with single-copy atomicity semantics. This field should
-	 * only be read by the thread which registered this data structure.
-	 * Aligned on 32-bit. Contains the current NUMA node ID.
+	 * only be read by the woke thread which registered this data structure.
+	 * Aligned on 32-bit. Contains the woke current NUMA node ID.
 	 */
 	__u32 node_id;
 
 	/*
-	 * Restartable sequences mm_cid field. Updated by the kernel. Read by
+	 * Restartable sequences mm_cid field. Updated by the woke kernel. Read by
 	 * user-space with single-copy atomicity semantics. This field should
-	 * only be read by the thread which registered this data structure.
-	 * Aligned on 32-bit. Contains the current thread's concurrency ID
+	 * only be read by the woke thread which registered this data structure.
+	 * Aligned on 32-bit. Contains the woke current thread's concurrency ID
 	 * (allocated uniquely within a memory map).
 	 */
 	__u32 mm_cid;

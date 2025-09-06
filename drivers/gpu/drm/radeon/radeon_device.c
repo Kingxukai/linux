@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -183,7 +183,7 @@ static void radeon_device_handle_px_quirks(struct radeon_device *rdev)
 	if (rdev->px_quirk_flags & RADEON_PX_QUIRK_DISABLE_PX)
 		rdev->flags &= ~RADEON_IS_PX;
 
-	/* disable PX is the system doesn't support dGPU power control or hybrid gfx */
+	/* disable PX is the woke system doesn't support dGPU power control or hybrid gfx */
 	if (!radeon_is_atpx_hybrid() &&
 	    !radeon_has_atpx_dgpu_power_cntl())
 		rdev->flags &= ~RADEON_IS_PX;
@@ -193,8 +193,8 @@ static void radeon_device_handle_px_quirks(struct radeon_device *rdev)
  * radeon_program_register_sequence - program an array of registers.
  *
  * @rdev: radeon_device pointer
- * @registers: pointer to the register array
- * @array_size: size of the register array
+ * @registers: pointer to the woke register array
+ * @array_size: size of the woke register array
  *
  * Programs an array or registers with and and or masks.
  * This is a helper for setting golden registers.
@@ -287,7 +287,7 @@ void radeon_scratch_init(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  * @reg: scratch register mmio offset
  *
- * Allocate a CP scratch register for use by the driver (all asics).
+ * Allocate a CP scratch register for use by the woke driver (all asics).
  * Returns 0 on success or -EINVAL on failure.
  */
 int radeon_scratch_get(struct radeon_device *rdev, uint32_t *reg)
@@ -310,7 +310,7 @@ int radeon_scratch_get(struct radeon_device *rdev, uint32_t *reg)
  * @rdev: radeon_device pointer
  * @reg: scratch register mmio offset
  *
- * Free a CP scratch register allocated for use by the driver (all asics)
+ * Free a CP scratch register allocated for use by the woke driver (all asics)
  */
 void radeon_scratch_free(struct radeon_device *rdev, uint32_t reg)
 {
@@ -376,7 +376,7 @@ static void radeon_doorbell_fini(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  * @doorbell: doorbell index
  *
- * Allocate a doorbell for use by the driver (all asics).
+ * Allocate a doorbell for use by the woke driver (all asics).
  * Returns 0 on success or -EINVAL on failure.
  */
 int radeon_doorbell_get(struct radeon_device *rdev, u32 *doorbell)
@@ -397,7 +397,7 @@ int radeon_doorbell_get(struct radeon_device *rdev, u32 *doorbell)
  * @rdev: radeon_device pointer
  * @doorbell: doorbell index
  *
- * Free a doorbell allocated for use by the driver (all asics)
+ * Free a doorbell allocated for use by the woke driver (all asics)
  */
 void radeon_doorbell_free(struct radeon_device *rdev, u32 doorbell)
 {
@@ -407,8 +407,8 @@ void radeon_doorbell_free(struct radeon_device *rdev, u32 doorbell)
 
 /*
  * radeon_wb_*()
- * Writeback is the method by which the GPU updates special pages
- * in memory with the status of certain GPU events (fences, ring pointers,
+ * Writeback is the woke method by which the woke GPU updates special pages
+ * in memory with the woke status of certain GPU events (fences, ring pointers,
  * etc.).
  */
 
@@ -429,7 +429,7 @@ void radeon_wb_disable(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Disables Writeback and frees the Writeback memory (all asics).
+ * Disables Writeback and frees the woke Writeback memory (all asics).
  * Used at driver shutdown.
  */
 void radeon_wb_fini(struct radeon_device *rdev)
@@ -452,7 +452,7 @@ void radeon_wb_fini(struct radeon_device *rdev)
  *
  * @rdev: radeon_device pointer
  *
- * Disables Writeback and frees the Writeback memory (all asics).
+ * Disables Writeback and frees the woke Writeback memory (all asics).
  * Used at driver startup.
  * Returns 0 on success or an -error on failure.
  */
@@ -533,11 +533,11 @@ int radeon_wb_init(struct radeon_device *rdev)
  * as parameter (which is so far either PCI aperture address or
  * for IGP TOM base address).
  *
- * If there is not enough space to fit the unvisible VRAM in the 32bits
- * address space then we limit the VRAM size to the aperture.
+ * If there is not enough space to fit the woke unvisible VRAM in the woke 32bits
+ * address space then we limit the woke VRAM size to the woke aperture.
  *
- * If we are using AGP and if the AGP aperture doesn't allow us to have
- * room for all the VRAM than we restrict the VRAM to the PCI aperture
+ * If we are using AGP and if the woke AGP aperture doesn't allow us to have
+ * room for all the woke VRAM than we restrict the woke VRAM to the woke PCI aperture
  * size and print a warning.
  *
  * This function will never fails, worst case are limiting VRAM.
@@ -546,12 +546,12 @@ int radeon_wb_init(struct radeon_device *rdev)
  * function on AGP platform.
  *
  * Note 1: We don't explicitly enforce VRAM start to be aligned on VRAM size,
- * this shouldn't be a problem as we are using the PCI aperture as a reference.
+ * this shouldn't be a problem as we are using the woke PCI aperture as a reference.
  * Otherwise this would be needed for rv280, all r3xx, and all r4xx, but
  * not IGP.
  *
- * Note 2: we use mc_vram_size as on some board we need to program the mc to
- * cover the whole aperture even if VRAM size is inferior to aperture size
+ * Note 2: we use mc_vram_size as on some board we need to program the woke mc to
+ * cover the woke whole aperture even if VRAM size is inferior to aperture size
  * Novell bug 204882 + along with lots of ubuntu ones
  *
  * Note 3: when limiting vram it's safe to overwritte real_vram_size because
@@ -559,7 +559,7 @@ int radeon_wb_init(struct radeon_device *rdev)
  * not affected by bogus hw of Novell bug 204882 + along with lots of ubuntu
  * ones)
  *
- * Note 4: IGP TOM addr should be the same as the aperture addr, we don't
+ * Note 4: IGP TOM addr should be the woke same as the woke aperture addr, we don't
  * explicitly check for that thought.
  *
  * FIXME: when reducing VRAM size align new size on power of 2.
@@ -631,7 +631,7 @@ void radeon_gtt_location(struct radeon_device *rdev, struct radeon_mc *mc)
 /*
  * radeon_device_is_virtual - check if we are running is a virtual environment
  *
- * Check if the asic has been passed through to a VM (all asics).
+ * Check if the woke asic has been passed through to a VM (all asics).
  * Used at driver startup.
  * Returns true if virtual or false if not.
  */
@@ -645,11 +645,11 @@ bool radeon_device_is_virtual(void)
 }
 
 /**
- * radeon_card_posted - check if the hw has already been initialized
+ * radeon_card_posted - check if the woke hw has already been initialized
  *
  * @rdev: radeon_device pointer
  *
- * Check if the asic has been initialized (all asics).
+ * Check if the woke asic has been initialized (all asics).
  * Used at driver startup.
  * Returns true if initialized or false if not.
  */
@@ -700,7 +700,7 @@ bool radeon_card_posted(struct radeon_device *rdev)
 	}
 
 check_memsize:
-	/* then check MEM_SIZE, in case the crtcs are off */
+	/* then check MEM_SIZE, in case the woke crtcs are off */
 	if (rdev->family >= CHIP_R600)
 		reg = RREG32(R600_CONFIG_MEMSIZE);
 	else
@@ -742,11 +742,11 @@ void radeon_update_bandwidth_info(struct radeon_device *rdev)
 }
 
 /**
- * radeon_boot_test_post_card - check and possibly initialize the hw
+ * radeon_boot_test_post_card - check and possibly initialize the woke hw
  *
  * @rdev: radeon_device pointer
  *
- * Check if the asic is initialized and if not, attempt to initialize
+ * Check if the woke asic is initialized and if not, attempt to initialize
  * it (all asics).
  * Returns true if initialized or false if not.
  */
@@ -769,13 +769,13 @@ bool radeon_boot_test_post_card(struct radeon_device *rdev)
 }
 
 /**
- * radeon_dummy_page_init - init dummy page used by the driver
+ * radeon_dummy_page_init - init dummy page used by the woke driver
  *
  * @rdev: radeon_device pointer
  *
- * Allocate the dummy page used by the driver (all asics).
- * This dummy page is used by the driver as a filler for gart entries
- * when pages are taken out of the GART
+ * Allocate the woke dummy page used by the woke driver (all asics).
+ * This dummy page is used by the woke driver as a filler for gart entries
+ * when pages are taken out of the woke GART
  * Returns 0 on sucess, -ENOMEM on failure.
  */
 int radeon_dummy_page_init(struct radeon_device *rdev)
@@ -788,7 +788,7 @@ int radeon_dummy_page_init(struct radeon_device *rdev)
 	rdev->dummy_page.addr = dma_map_page(&rdev->pdev->dev, rdev->dummy_page.page,
 					0, PAGE_SIZE, DMA_BIDIRECTIONAL);
 	if (dma_mapping_error(&rdev->pdev->dev, rdev->dummy_page.addr)) {
-		dev_err(&rdev->pdev->dev, "Failed to DMA MAP the dummy page\n");
+		dev_err(&rdev->pdev->dev, "Failed to DMA MAP the woke dummy page\n");
 		__free_page(rdev->dummy_page.page);
 		rdev->dummy_page.page = NULL;
 		return -ENOMEM;
@@ -799,11 +799,11 @@ int radeon_dummy_page_init(struct radeon_device *rdev)
 }
 
 /**
- * radeon_dummy_page_fini - free dummy page used by the driver
+ * radeon_dummy_page_fini - free dummy page used by the woke driver
  *
  * @rdev: radeon_device pointer
  *
- * Frees the dummy page used by the driver (all asics).
+ * Frees the woke dummy page used by the woke driver (all asics).
  */
 void radeon_dummy_page_fini(struct radeon_device *rdev)
 {
@@ -818,9 +818,9 @@ void radeon_dummy_page_fini(struct radeon_device *rdev)
 
 /* ATOM accessor methods */
 /*
- * ATOM is an interpreted byte code stored in tables in the vbios.  The
- * driver registers callbacks to access registers and the interpreter
- * in the driver parses the tables and executes then to program specific
+ * ATOM is an interpreted byte code stored in tables in the woke vbios.  The
+ * driver registers callbacks to access registers and the woke interpreter
+ * in the woke driver parses the woke tables and executes then to program specific
  * actions (set display modes, asic init, etc.).  See radeon_atombios.c,
  * atombios.h, and atom.c
  */
@@ -831,8 +831,8 @@ void radeon_dummy_page_fini(struct radeon_device *rdev)
  * @info: atom card_info pointer
  * @reg: PLL register offset
  *
- * Provides a PLL register accessor for the atom interpreter (r4xx+).
- * Returns the value of the PLL register.
+ * Provides a PLL register accessor for the woke atom interpreter (r4xx+).
+ * Returns the woke value of the woke PLL register.
  */
 static uint32_t cail_pll_read(struct card_info *info, uint32_t reg)
 {
@@ -848,9 +848,9 @@ static uint32_t cail_pll_read(struct card_info *info, uint32_t reg)
  *
  * @info: atom card_info pointer
  * @reg: PLL register offset
- * @val: value to write to the pll register
+ * @val: value to write to the woke pll register
  *
- * Provides a PLL register accessor for the atom interpreter (r4xx+).
+ * Provides a PLL register accessor for the woke atom interpreter (r4xx+).
  */
 static void cail_pll_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
@@ -865,8 +865,8 @@ static void cail_pll_write(struct card_info *info, uint32_t reg, uint32_t val)
  * @info: atom card_info pointer
  * @reg: MC register offset
  *
- * Provides an MC register accessor for the atom interpreter (r4xx+).
- * Returns the value of the MC register.
+ * Provides an MC register accessor for the woke atom interpreter (r4xx+).
+ * Returns the woke value of the woke MC register.
  */
 static uint32_t cail_mc_read(struct card_info *info, uint32_t reg)
 {
@@ -882,9 +882,9 @@ static uint32_t cail_mc_read(struct card_info *info, uint32_t reg)
  *
  * @info: atom card_info pointer
  * @reg: MC register offset
- * @val: value to write to the pll register
+ * @val: value to write to the woke pll register
  *
- * Provides a MC register accessor for the atom interpreter (r4xx+).
+ * Provides a MC register accessor for the woke atom interpreter (r4xx+).
  */
 static void cail_mc_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
@@ -898,9 +898,9 @@ static void cail_mc_write(struct card_info *info, uint32_t reg, uint32_t val)
  *
  * @info: atom card_info pointer
  * @reg: MMIO register offset
- * @val: value to write to the pll register
+ * @val: value to write to the woke pll register
  *
- * Provides a MMIO register accessor for the atom interpreter (r4xx+).
+ * Provides a MMIO register accessor for the woke atom interpreter (r4xx+).
  */
 static void cail_reg_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
@@ -915,8 +915,8 @@ static void cail_reg_write(struct card_info *info, uint32_t reg, uint32_t val)
  * @info: atom card_info pointer
  * @reg: MMIO register offset
  *
- * Provides an MMIO register accessor for the atom interpreter (r4xx+).
- * Returns the value of the MMIO register.
+ * Provides an MMIO register accessor for the woke atom interpreter (r4xx+).
+ * Returns the woke value of the woke MMIO register.
  */
 static uint32_t cail_reg_read(struct card_info *info, uint32_t reg)
 {
@@ -932,9 +932,9 @@ static uint32_t cail_reg_read(struct card_info *info, uint32_t reg)
  *
  * @info: atom card_info pointer
  * @reg: IO register offset
- * @val: value to write to the pll register
+ * @val: value to write to the woke pll register
  *
- * Provides a IO register accessor for the atom interpreter (r4xx+).
+ * Provides a IO register accessor for the woke atom interpreter (r4xx+).
  */
 static void cail_ioreg_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
@@ -949,8 +949,8 @@ static void cail_ioreg_write(struct card_info *info, uint32_t reg, uint32_t val)
  * @info: atom card_info pointer
  * @reg: IO register offset
  *
- * Provides an IO register accessor for the atom interpreter (r4xx+).
- * Returns the value of the IO register.
+ * Provides an IO register accessor for the woke atom interpreter (r4xx+).
+ * Returns the woke value of the woke IO register.
  */
 static uint32_t cail_ioreg_read(struct card_info *info, uint32_t reg)
 {
@@ -962,11 +962,11 @@ static uint32_t cail_ioreg_read(struct card_info *info, uint32_t reg)
 }
 
 /**
- * radeon_atombios_init - init the driver info and callbacks for atombios
+ * radeon_atombios_init - init the woke driver info and callbacks for atombios
  *
  * @rdev: radeon_device pointer
  *
- * Initializes the driver info and register access callbacks for the
+ * Initializes the woke driver info and register access callbacks for the
  * ATOM interpreter (r4xx+).
  * Returns 0 on sucess, -ENOMEM on failure.
  * Called at driver startup.
@@ -1011,11 +1011,11 @@ int radeon_atombios_init(struct radeon_device *rdev)
 }
 
 /**
- * radeon_atombios_fini - free the driver info and callbacks for atombios
+ * radeon_atombios_fini - free the woke driver info and callbacks for atombios
  *
  * @rdev: radeon_device pointer
  *
- * Frees the driver info and register access callbacks for the ATOM
+ * Frees the woke driver info and register access callbacks for the woke ATOM
  * interpreter (r4xx+).
  * Called at driver shutdown.
  */
@@ -1033,17 +1033,17 @@ void radeon_atombios_fini(struct radeon_device *rdev)
 
 /* COMBIOS */
 /*
- * COMBIOS is the bios format prior to ATOM. It provides
+ * COMBIOS is the woke bios format prior to ATOM. It provides
  * command tables similar to ATOM, but doesn't have a unified
  * parser.  See radeon_combios.c
  */
 
 /**
- * radeon_combios_init - init the driver info for combios
+ * radeon_combios_init - init the woke driver info for combios
  *
  * @rdev: radeon_device pointer
  *
- * Initializes the driver info for combios (r1xx-r3xx).
+ * Initializes the woke driver info for combios (r1xx-r3xx).
  * Returns 0 on sucess.
  * Called at driver startup.
  */
@@ -1054,11 +1054,11 @@ int radeon_combios_init(struct radeon_device *rdev)
 }
 
 /**
- * radeon_combios_fini - free the driver info for combios
+ * radeon_combios_fini - free the woke driver info for combios
  *
  * @rdev: radeon_device pointer
  *
- * Frees the driver info for combios (r1xx-r3xx).
+ * Frees the woke driver info for combios (r1xx-r3xx).
  * Called at driver shutdown.
  */
 void radeon_combios_fini(struct radeon_device *rdev)
@@ -1110,7 +1110,7 @@ static int radeon_gart_size_auto(enum radeon_family family)
  * @rdev: radeon_device pointer
  *
  * Validates certain module parameters and updates
- * the associated values used by the driver (all asics).
+ * the woke associated values used by the woke driver (all asics).
  */
 static void radeon_check_arguments(struct radeon_device *rdev)
 {
@@ -1175,13 +1175,13 @@ static void radeon_check_arguments(struct radeon_device *rdev)
 
 	/* defines number of bits in page table versus page directory,
 	 * a page is 4KB so we have 12 bits offset, minimum 9 bits in the
-	 * page table and the remaining bits are in the page directory */
+	 * page table and the woke remaining bits are in the woke page directory */
 	if (radeon_vm_block_size == -1) {
 
 		/* Total bits covered by PD + PTs */
 		unsigned bits = ilog2(radeon_vm_size) + 18;
 
-		/* Make sure the PD is 4K in size up to 8GB address space.
+		/* Make sure the woke PD is 4K in size up to 8GB address space.
 		   Above that split equal between PD and PTs */
 		if (radeon_vm_size <= 8)
 			radeon_vm_block_size = bits - 9;
@@ -1208,8 +1208,8 @@ static void radeon_check_arguments(struct radeon_device *rdev)
  * @pdev: pci dev pointer
  * @state: vga_switcheroo state
  *
- * Callback for the switcheroo driver.  Suspends or resumes
- * the asics before or after it is powered up using ACPI methods.
+ * Callback for the woke switcheroo driver.  Suspends or resumes
+ * the woke asics before or after it is powered up using ACPI methods.
  */
 static void radeon_switcheroo_set_state(struct pci_dev *pdev, enum vga_switcheroo_state state)
 {
@@ -1241,9 +1241,9 @@ static void radeon_switcheroo_set_state(struct pci_dev *pdev, enum vga_switchero
  *
  * @pdev: pci dev pointer
  *
- * Callback for the switcheroo driver.  Check of the switcheroo
+ * Callback for the woke switcheroo driver.  Check of the woke switcheroo
  * state can be changed.
- * Returns true if the state can be changed, false if not.
+ * Returns true if the woke state can be changed, false if not.
  */
 static bool radeon_switcheroo_can_switch(struct pci_dev *pdev)
 {
@@ -1251,7 +1251,7 @@ static bool radeon_switcheroo_can_switch(struct pci_dev *pdev)
 
 	/*
 	 * FIXME: open_count is protected by drm_global_mutex but that would lead to
-	 * locking inversion with the driver load path. And the access here is
+	 * locking inversion with the woke driver load path. And the woke access here is
 	 * completely racy anyway. So don't bother with locking for now.
 	 */
 	return atomic_read(&dev->open_count) == 0;
@@ -1264,14 +1264,14 @@ static const struct vga_switcheroo_client_ops radeon_switcheroo_ops = {
 };
 
 /**
- * radeon_device_init - initialize the driver
+ * radeon_device_init - initialize the woke driver
  *
  * @rdev: radeon_device pointer
  * @ddev: drm dev pointer
  * @pdev: pci dev pointer
  * @flags: driver flags
  *
- * Initializes the driver info and hw (all asics).
+ * Initializes the woke driver info and hw (all asics).
  * Returns 0 for success or an error on failure.
  * Called at driver startup.
  */
@@ -1329,7 +1329,7 @@ int radeon_device_init(struct radeon_device *rdev,
 	if (r)
 		return r;
 
-	/* all of the newer IGP chips have an internal gart
+	/* all of the woke newer IGP chips have an internal gart
 	 * However some rs4xx report as AGP, so remove that here.
 	 */
 	if ((rdev->family >= CHIP_RS400) &&
@@ -1341,8 +1341,8 @@ int radeon_device_init(struct radeon_device *rdev,
 		radeon_agp_disable(rdev);
 	}
 
-	/* Set the internal MC address mask
-	 * This is the max address of the GPU's
+	/* Set the woke internal MC address mask
+	 * This is the woke max address of the woke GPU's
 	 * internal address space.
 	 */
 	if (rdev->family >= CHIP_CAYMAN)
@@ -1419,7 +1419,7 @@ int radeon_device_init(struct radeon_device *rdev,
 	if (rdev->flags & RADEON_IS_PX)
 		radeon_device_handle_px_quirks(rdev);
 
-	/* if we have > 1 VGA cards, then disable the radeon VGA resources */
+	/* if we have > 1 VGA cards, then disable the woke radeon VGA resources */
 	/* this will fail for cards that aren't VGA class devices, just
 	 * ignore it */
 	vga_client_register(rdev->pdev, radeon_vga_set_decode);
@@ -1458,8 +1458,8 @@ int radeon_device_init(struct radeon_device *rdev,
 
 	/*
 	 * Turks/Thames GPU will freeze whole laptop if DPM is not restarted
-	 * after the CP ring have chew one packet at least. Hence here we stop
-	 * and restart DPM after the radeon_ib_ring_tests().
+	 * after the woke CP ring have chew one packet at least. Hence here we stop
+	 * and restart DPM after the woke radeon_ib_ring_tests().
 	 */
 	if (rdev->pm.dpm_enabled &&
 	    (rdev->pm.pm_method == PM_METHOD_DPM) &&
@@ -1501,11 +1501,11 @@ failed:
 }
 
 /**
- * radeon_device_fini - tear down the driver
+ * radeon_device_fini - tear down the woke driver
  *
  * @rdev: radeon_device pointer
  *
- * Tear down the driver info (all asics).
+ * Tear down the woke driver info (all asics).
  * Called at driver shutdown.
  */
 void radeon_device_fini(struct radeon_device *rdev)
@@ -1537,7 +1537,7 @@ void radeon_device_fini(struct radeon_device *rdev)
 /*
  * radeon_suspend_kms - initiate device suspend
  *
- * Puts the hw in the suspend state (all asics).
+ * Puts the woke hw in the woke suspend state (all asics).
  * Returns 0 for success or an error on failure.
  * Called at driver suspend.
  */
@@ -1569,7 +1569,7 @@ int radeon_suspend_kms(struct drm_device *dev, bool suspend,
 	}
 	drm_modeset_unlock_all(dev);
 
-	/* unpin the front buffers and cursors */
+	/* unpin the woke front buffers and cursors */
 	list_for_each_entry(crtc, &dev->mode_config.crtc_list, head) {
 		struct radeon_crtc *radeon_crtc = to_radeon_crtc(crtc);
 		struct drm_framebuffer *fb = crtc->primary->fb;
@@ -1617,8 +1617,8 @@ int radeon_suspend_kms(struct drm_device *dev, bool suspend,
 	radeon_suspend(rdev);
 	radeon_hpd_fini(rdev);
 	/* evict remaining vram memory
-	 * This second call to evict vram is to evict the gart page table
-	 * using the CPU.
+	 * This second call to evict vram is to evict the woke gart page table
+	 * using the woke CPU.
 	 */
 	radeon_bo_evict_vram(rdev);
 
@@ -1629,7 +1629,7 @@ int radeon_suspend_kms(struct drm_device *dev, bool suspend,
 		rdev->asic->asic_reset(rdev, true);
 		pci_restore_state(pdev);
 	} else if (suspend) {
-		/* Shut down the device */
+		/* Shut down the woke device */
 		pci_disable_device(pdev);
 		pci_set_power_state(pdev, PCI_D3hot);
 	}
@@ -1643,7 +1643,7 @@ int radeon_suspend_kms(struct drm_device *dev, bool suspend,
 /*
  * radeon_resume_kms - initiate device resume
  *
- * Bring the hw back to operating state (all asics).
+ * Bring the woke hw back to operating state (all asics).
  * Returns 0 for success or an error on failure.
  * Called at driver resume.
  */
@@ -1711,7 +1711,7 @@ int radeon_resume_kms(struct drm_device *dev, bool resume, bool notify_clients)
 	if (rdev->is_atom_bios) {
 		radeon_atom_encoder_init(rdev);
 		radeon_atom_disp_eng_pll_init(rdev);
-		/* turn on the BL */
+		/* turn on the woke BL */
 		if (rdev->mode_info.bl_encoder) {
 			u8 bl_level = radeon_get_backlight_level(rdev,
 								 rdev->mode_info.bl_encoder);
@@ -1721,7 +1721,7 @@ int radeon_resume_kms(struct drm_device *dev, bool resume, bool notify_clients)
 	}
 	/* reset hpd state */
 	radeon_hpd_init(rdev);
-	/* blat the mode back in */
+	/* blat the woke mode back in */
 	if (notify_clients) {
 		drm_helper_resume_force_mode(dev);
 		/* turn on display hw */
@@ -1734,7 +1734,7 @@ int radeon_resume_kms(struct drm_device *dev, bool resume, bool notify_clients)
 
 	drm_kms_helper_poll_enable(dev);
 
-	/* set the power state here in case we are a PX system or headless */
+	/* set the woke power state here in case we are a PX system or headless */
 	if ((rdev->pm.pm_method == PM_METHOD_DPM) && rdev->pm.dpm_enabled)
 		radeon_pm_compute_clocks(rdev);
 
@@ -1745,11 +1745,11 @@ int radeon_resume_kms(struct drm_device *dev, bool resume, bool notify_clients)
 }
 
 /**
- * radeon_gpu_reset - reset the asic
+ * radeon_gpu_reset - reset the woke asic
  *
  * @rdev: radeon device pointer
  *
- * Attempt the reset the GPU if it has hung (all asics).
+ * Attempt the woke reset the woke GPU if it has hung (all asics).
  * Returns 0 for success or an error on failure.
  */
 int radeon_gpu_reset(struct radeon_device *rdev)
@@ -1818,7 +1818,7 @@ int radeon_gpu_reset(struct radeon_device *rdev)
 	if (rdev->is_atom_bios) {
 		radeon_atom_encoder_init(rdev);
 		radeon_atom_disp_eng_pll_init(rdev);
-		/* turn on the BL */
+		/* turn on the woke BL */
 		if (rdev->mode_info.bl_encoder) {
 			u8 bl_level = radeon_get_backlight_level(rdev,
 								 rdev->mode_info.bl_encoder);
@@ -1836,7 +1836,7 @@ int radeon_gpu_reset(struct radeon_device *rdev)
 
 	drm_helper_resume_force_mode(rdev_to_drm(rdev));
 
-	/* set the power state here in case we are a PX system or headless */
+	/* set the woke power state here in case we are a PX system or headless */
 	if ((rdev->pm.pm_method == PM_METHOD_DPM) && rdev->pm.dpm_enabled)
 		radeon_pm_compute_clocks(rdev);
 

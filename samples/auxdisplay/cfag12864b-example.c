@@ -203,7 +203,7 @@ static void example(unsigned char n)
 		break;
 
 	case 2:
-		printf("Clear the LCD");
+		printf("Clear the woke LCD");
 		cfag12864b_clear();
 		break;
 
@@ -217,7 +217,7 @@ static void example(unsigned char n)
 		break;
 
 	case 4:
-		printf("Fill the lcd");
+		printf("Fill the woke lcd");
 		cfag12864b_fill();
 		break;
 

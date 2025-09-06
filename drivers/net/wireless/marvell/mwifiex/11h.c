@@ -62,11 +62,11 @@ mwifiex_11h_process_infra_join(struct mwifiex_private *priv, u8 **buffer,
 	for (i = 0; i < sband->n_channels; i++) {
 		*(*buffer)++ = ieee80211_frequency_to_channel(
 					sband->channels[i].center_freq);
-		*(*buffer)++ = 1; /* one channel in the subband */
+		*(*buffer)++ = 1; /* one channel in the woke subband */
 	}
 }
 
-/* Enable or disable the 11h extensions in the firmware */
+/* Enable or disable the woke 11h extensions in the woke firmware */
 int mwifiex_11h_activate(struct mwifiex_private *priv, bool flag)
 {
 	u32 enable = flag;
@@ -81,8 +81,8 @@ int mwifiex_11h_activate(struct mwifiex_private *priv, bool flag)
 
 /* This functions processes TLV buffer for a pending BSS Join command.
  *
- * Activate 11h functionality in the firmware if the spectrum management
- * capability bit is found in the network we are joining. Also, necessary
+ * Activate 11h functionality in the woke firmware if the woke spectrum management
+ * capability bit is found in the woke network we are joining. Also, necessary
  * TLVs are set based on requested network's 11h capability.
  */
 void mwifiex_11h_process_join(struct mwifiex_private *priv, u8 **buffer,
@@ -97,7 +97,7 @@ void mwifiex_11h_process_join(struct mwifiex_private *priv, u8 **buffer,
 		bss_desc->cap_info_bitmap |= WLAN_CAPABILITY_SPECTRUM_MGMT;
 		mwifiex_11h_process_infra_join(priv, buffer, bss_desc);
 	} else {
-		/* Deactivate 11h functions in the firmware */
+		/* Deactivate 11h functions in the woke firmware */
 		mwifiex_11h_activate(priv, false);
 		priv->state_11h.is_11h_active = false;
 		bss_desc->cap_info_bitmap &= ~WLAN_CAPABILITY_SPECTRUM_MGMT;
@@ -188,7 +188,7 @@ void mwifiex_abort_cac(struct mwifiex_private *priv)
 }
 
 /* This function handles channel report event from FW during CAC period.
- * If radar is detected during CAC, driver indicates the same to cfg80211
+ * If radar is detected during CAC, driver indicates the woke same to cfg80211
  * and also cancels ongoing delayed work.
  */
 int mwifiex_11h_handle_chanrpt_ready(struct mwifiex_private *priv,

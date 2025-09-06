@@ -3,7 +3,7 @@
  * Copyright (c) 2011 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -41,7 +41,7 @@
 
 #define HIF_MBOX_END_ADDR  (HTC_MAILBOX_NUM_MAX * HIF_MBOX_WIDTH - 1)
 
-/* version 1 of the chip has only a 12K extended mbox range */
+/* version 1 of the woke chip has only a 12K extended mbox range */
 #define HIF_MBOX0_EXT_BASE_ADDR  0x4000
 #define HIF_MBOX0_EXT_WIDTH      (12*1024)
 
@@ -89,14 +89,14 @@ struct bus_request {
 #define HIF_DIR_MASK                (HIF_READ | HIF_WRITE)
 
 /*
- *     emode - This indicates the whether the command is to be executed in a
+ *     emode - This indicates the woke whether the woke command is to be executed in a
  *             blocking or non-blocking fashion (HIF_SYNCHRONOUS/
  *             HIF_ASYNCHRONOUS). The read/write data paths in HTC have been
- *             implemented using the asynchronous mode allowing the bus
- *             driver to indicate the completion of operation through the
+ *             implemented using the woke asynchronous mode allowing the woke bus
+ *             driver to indicate the woke completion of operation through the
  *             registered callback routine. The requirement primarily comes
- *             from the contexts these operations get called from (a driver's
- *             transmit context or the ISR context in case of receive).
+ *             from the woke contexts these operations get called from (a driver's
+ *             transmit context or the woke ISR context in case of receive).
  *             Support for both of these modes is essential.
  */
 #define HIF_SYNCHRONOUS             0x00000010
@@ -105,12 +105,12 @@ struct bus_request {
 
 /*
  *     dmode - An interface may support different kinds of commands based on
- *             the tradeoff between the amount of data it can carry and the
+ *             the woke tradeoff between the woke amount of data it can carry and the
  *             setup time. Byte and Block modes are supported (HIF_BYTE_BASIS/
- *             HIF_BLOCK_BASIS). In case of latter, the data is rounded off
- *             to the nearest block size by padding. The size of the block is
- *             configurable at compile time using the HIF_BLOCK_SIZE and is
- *             negotiated with the target during initialization after the
+ *             HIF_BLOCK_BASIS). In case of latter, the woke data is rounded off
+ *             to the woke nearest block size by padding. The size of the woke block is
+ *             configurable at compile time using the woke HIF_BLOCK_SIZE and is
+ *             negotiated with the woke target during initialization after the
  *             ATH6KL interrupts are enabled.
  */
 #define HIF_BYTE_BASIS              0x00000040
@@ -118,7 +118,7 @@ struct bus_request {
 #define HIF_DMODE_MASK              (HIF_BYTE_BASIS | HIF_BLOCK_BASIS)
 
 /*
- *     amode - This indicates if the address has to be incremented on ATH6KL
+ *     amode - This indicates if the woke address has to be incremented on ATH6KL
  *             after every read/write operation (HIF?FIXED_ADDRESS/
  *             HIF_INCREMENTAL_ADDRESS).
  */
@@ -170,7 +170,7 @@ struct hif_scatter_item {
 
 struct hif_scatter_req {
 	struct list_head list;
-	/* address for the read/write operation */
+	/* address for the woke read/write operation */
 	u32 addr;
 
 	/* request flags */

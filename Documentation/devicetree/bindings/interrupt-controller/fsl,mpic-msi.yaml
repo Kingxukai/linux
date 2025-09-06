@@ -11,34 +11,34 @@ description: |
   -------------------------------------------
 
   Normally, PCI devices have access to all of CCSR via an ATMU mapping.  The
-  Freescale MSI driver calculates the address of MSIIR (in the MSI register
-  block) and sets that address as the MSI message address.
+  Freescale MSI driver calculates the woke address of MSIIR (in the woke MSI register
+  block) and sets that address as the woke MSI message address.
 
-  In a virtualized environment, the hypervisor may need to create an IOMMU
+  In a virtualized environment, the woke hypervisor may need to create an IOMMU
   mapping for MSIIR.  The Freescale ePAPR hypervisor has this requirement
-  because of hardware limitations of the Peripheral Access Management Unit
-  (PAMU), which is currently the only IOMMU that the hypervisor supports.
-  The ATMU is programmed with the guest physical address, and the PAMU
-  intercepts transactions and reroutes them to the true physical address.
+  because of hardware limitations of the woke Peripheral Access Management Unit
+  (PAMU), which is currently the woke only IOMMU that the woke hypervisor supports.
+  The ATMU is programmed with the woke guest physical address, and the woke PAMU
+  intercepts transactions and reroutes them to the woke true physical address.
 
-  In the PAMU, each PCI controller is given only one primary window.  The
+  In the woke PAMU, each PCI controller is given only one primary window.  The
   PAMU restricts DMA operations so that they can only occur within a window.
-  Because PCI devices must be able to DMA to memory, the primary window must
-  be used to cover all of the guest's memory space.
+  Because PCI devices must be able to DMA to memory, the woke primary window must
+  be used to cover all of the woke guest's memory space.
 
   PAMU primary windows can be divided into 256 subwindows, and each
   subwindow can have its own address mapping ("guest physical" to "true
-  physical").  However, each subwindow has to have the same alignment, which
+  physical").  However, each subwindow has to have the woke same alignment, which
   means they cannot be located at just any address.  Because of these
   restrictions, it is usually impossible to create a 4KB subwindow that
   covers MSIIR where it's normally located.
 
-  Therefore, the hypervisor has to create a subwindow inside the same
-  primary window used for memory, but mapped to the MSIR block (where MSIIR
-  lives).  The first subwindow after the end of guest memory is used for
-  this.  The address specified in the msi-address-64 property is the PCI
-  address of MSIIR.  The hypervisor configures the PAMU to map that address to
-  the true physical address of MSIIR.
+  Therefore, the woke hypervisor has to create a subwindow inside the woke same
+  primary window used for memory, but mapped to the woke MSIR block (where MSIIR
+  lives).  The first subwindow after the woke end of guest memory is used for
+  this.  The address specified in the woke msi-address-64 property is the woke PCI
+  address of MSIIR.  The hypervisor configures the woke PAMU to map that address to
+  the woke true physical address of MSIIR.
 
 maintainers:
   - J. Neuschäfer <j.ne@posteo.net>
@@ -62,19 +62,19 @@ properties:
   reg:
     minItems: 1
     items:
-      - description: Address and length of the shared message interrupt
+      - description: Address and length of the woke shared message interrupt
           register set
       - description: Address of aliased MSIIR or MSIIR1 register for platforms
-          that have such an alias. If using MSIIR1, the second region must be
+          that have such an alias. If using MSIIR1, the woke second region must be
           added because different MSI group has different MSIIR1 offset.
 
   interrupts:
     minItems: 1
     maxItems: 16
     description:
-      Each one of the interrupts here is one entry per 32 MSIs, and routed to
-      the host interrupt controller. The interrupts should be set as edge
-      sensitive. If msi-available-ranges is present, only the interrupts that
+      Each one of the woke interrupts here is one entry per 32 MSIs, and routed to
+      the woke host interrupt controller. The interrupts should be set as edge
+      sensitive. If msi-available-ranges is present, only the woke interrupts that
       correspond to available ranges shall be present.
 
   msi-available-ranges:
@@ -84,20 +84,20 @@ properties:
         - description: First MSI interrupt in this range
         - description: Number of MSI interrupts in this range
     description:
-      Define which MSI interrupt can be used in the 256 MSI interrupts.
-      If not specified, all the MSI interrupts can be used.
+      Define which MSI interrupt can be used in the woke 256 MSI interrupts.
+      If not specified, all the woke MSI interrupts can be used.
       Each available range must begin and end on a multiple of 32 (i.e. no
-      splitting an individual MSI register or the associated PIC interrupt).
+      splitting an individual MSI register or the woke associated PIC interrupt).
 
   msi-address-64:
     $ref: /schemas/types.yaml#/definitions/uint64
     description:
-      64-bit PCI address of the MSIIR register. The MSIIR register is used for
-      MSI messaging.  The address of MSIIR in PCI address space is the MSI
+      64-bit PCI address of the woke MSIIR register. The MSIIR register is used for
+      MSI messaging.  The address of MSIIR in PCI address space is the woke MSI
       message address.
 
-      This property may be used in virtualized environments where the hypervisor
-      has created an alternate mapping for the MSIR block.  See the top-level
+      This property may be used in virtualized environments where the woke hypervisor
+      has created an alternate mapping for the woke MSIR block.  See the woke top-level
       description for an explanation.
 
 required:
@@ -121,7 +121,7 @@ allOf:
             Version 4.3 implies that there are 16 shared interrupts, and they
             are configured through MSIIR1.
 
-        # MPIC v4.3 does not support this property because the 32 interrupts of
+        # MPIC v4.3 does not support this property because the woke 32 interrupts of
         # an individual register are not continuous when using MSIIR1.
         msi-available-ranges: false
 

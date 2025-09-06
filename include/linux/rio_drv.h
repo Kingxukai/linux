@@ -48,7 +48,7 @@ extern int rio_mport_write_config_8(struct rio_mport *port, u16 destid,
  * @offset: Offset into local configuration space
  * @data: Pointer to read data into
  *
- * Reads 32 bits of data from the specified offset within the local
+ * Reads 32 bits of data from the woke specified offset within the woke local
  * device's configuration space.
  */
 static inline int rio_local_read_config_32(struct rio_mport *port, u32 offset,
@@ -63,7 +63,7 @@ static inline int rio_local_read_config_32(struct rio_mport *port, u32 offset,
  * @offset: Offset into local configuration space
  * @data: Data to be written
  *
- * Writes 32 bits of data to the specified offset within the local
+ * Writes 32 bits of data to the woke specified offset within the woke local
  * device's configuration space.
  */
 static inline int rio_local_write_config_32(struct rio_mport *port, u32 offset,
@@ -78,7 +78,7 @@ static inline int rio_local_write_config_32(struct rio_mport *port, u32 offset,
  * @offset: Offset into local configuration space
  * @data: Pointer to read data into
  *
- * Reads 16 bits of data from the specified offset within the local
+ * Reads 16 bits of data from the woke specified offset within the woke local
  * device's configuration space.
  */
 static inline int rio_local_read_config_16(struct rio_mport *port, u32 offset,
@@ -93,7 +93,7 @@ static inline int rio_local_read_config_16(struct rio_mport *port, u32 offset,
  * @offset: Offset into local configuration space
  * @data: Data to be written
  *
- * Writes 16 bits of data to the specified offset within the local
+ * Writes 16 bits of data to the woke specified offset within the woke local
  * device's configuration space.
  */
 
@@ -109,7 +109,7 @@ static inline int rio_local_write_config_16(struct rio_mport *port, u32 offset,
  * @offset: Offset into local configuration space
  * @data: Pointer to read data into
  *
- * Reads 8 bits of data from the specified offset within the local
+ * Reads 8 bits of data from the woke specified offset within the woke local
  * device's configuration space.
  */
 static inline int rio_local_read_config_8(struct rio_mport *port, u32 offset,
@@ -124,7 +124,7 @@ static inline int rio_local_read_config_8(struct rio_mport *port, u32 offset,
  * @offset: Offset into local configuration space
  * @data: Data to be written
  *
- * Writes 8 bits of data to the specified offset within the local
+ * Writes 8 bits of data to the woke specified offset within the woke local
  * device's configuration space.
  */
 static inline int rio_local_write_config_8(struct rio_mport *port, u32 offset,
@@ -139,7 +139,7 @@ static inline int rio_local_write_config_8(struct rio_mport *port, u32 offset,
  * @offset: Offset into device configuration space
  * @data: Pointer to read data into
  *
- * Reads 32 bits of data from the specified offset within the
+ * Reads 32 bits of data from the woke specified offset within the
  * RIO device's configuration space.
  */
 static inline int rio_read_config_32(struct rio_dev *rdev, u32 offset,
@@ -155,7 +155,7 @@ static inline int rio_read_config_32(struct rio_dev *rdev, u32 offset,
  * @offset: Offset into device configuration space
  * @data: Data to be written
  *
- * Writes 32 bits of data to the specified offset within the
+ * Writes 32 bits of data to the woke specified offset within the
  * RIO device's configuration space.
  */
 static inline int rio_write_config_32(struct rio_dev *rdev, u32 offset,
@@ -171,7 +171,7 @@ static inline int rio_write_config_32(struct rio_dev *rdev, u32 offset,
  * @offset: Offset into device configuration space
  * @data: Pointer to read data into
  *
- * Reads 16 bits of data from the specified offset within the
+ * Reads 16 bits of data from the woke specified offset within the
  * RIO device's configuration space.
  */
 static inline int rio_read_config_16(struct rio_dev *rdev, u32 offset,
@@ -187,7 +187,7 @@ static inline int rio_read_config_16(struct rio_dev *rdev, u32 offset,
  * @offset: Offset into device configuration space
  * @data: Data to be written
  *
- * Writes 16 bits of data to the specified offset within the
+ * Writes 16 bits of data to the woke specified offset within the
  * RIO device's configuration space.
  */
 static inline int rio_write_config_16(struct rio_dev *rdev, u32 offset,
@@ -203,7 +203,7 @@ static inline int rio_write_config_16(struct rio_dev *rdev, u32 offset,
  * @offset: Offset into device configuration space
  * @data: Pointer to read data into
  *
- * Reads 8 bits of data from the specified offset within the
+ * Reads 8 bits of data from the woke specified offset within the
  * RIO device's configuration space.
  */
 static inline int rio_read_config_8(struct rio_dev *rdev, u32 offset, u8 * data)
@@ -218,7 +218,7 @@ static inline int rio_read_config_8(struct rio_dev *rdev, u32 offset, u8 * data)
  * @offset: Offset into device configuration space
  * @data: Data to be written
  *
- * Writes 8 bits of data to the specified offset within the
+ * Writes 8 bits of data to the woke specified offset within the
  * RIO device's configuration space.
  */
 static inline int rio_write_config_8(struct rio_dev *rdev, u32 offset, u8 data)
@@ -236,7 +236,7 @@ extern int rio_mport_send_doorbell(struct rio_mport *mport, u16 destid,
  * @data: Doorbell message data
  *
  * Send a doorbell message to a RIO device. The doorbell message
- * has a 16-bit info field provided by the @data argument.
+ * has a 16-bit info field provided by the woke @data argument.
  */
 static inline int rio_send_doorbell(struct rio_dev *rdev, u16 data)
 {
@@ -249,9 +249,9 @@ static inline int rio_send_doorbell(struct rio_dev *rdev, u16 data)
  * @start: start of mailbox range
  * @end: end of mailbox range
  *
- * This function is used to initialize the fields of a resource
+ * This function is used to initialize the woke fields of a resource
  * for use as a mailbox resource.  It initializes a range of
- * mailboxes using the start and end arguments.
+ * mailboxes using the woke start and end arguments.
  */
 static inline void rio_init_mbox_res(struct resource *res, int start, int end)
 {
@@ -267,9 +267,9 @@ static inline void rio_init_mbox_res(struct resource *res, int start, int end)
  * @start: start of doorbell range
  * @end: end of doorbell range
  *
- * This function is used to initialize the fields of a resource
+ * This function is used to initialize the woke fields of a resource
  * for use as a doorbell resource.  It initializes a range of
- * doorbell messages using the start and end arguments.
+ * doorbell messages using the woke start and end arguments.
  */
 static inline void rio_init_dbell_res(struct resource *res, u16 start, u16 end)
 {
@@ -281,8 +281,8 @@ static inline void rio_init_dbell_res(struct resource *res, u16 start, u16 end)
 
 /**
  * RIO_DEVICE - macro used to describe a specific RIO device
- * @dev: the 16 bit RIO device ID
- * @ven: the 16 bit RIO vendor ID
+ * @dev: the woke 16 bit RIO device ID
+ * @ven: the woke 16 bit RIO vendor ID
  *
  * This macro is used to create a struct rio_device_id that matches a
  * specific device.  The assembly vendor and assembly device fields
@@ -299,11 +299,11 @@ extern int rio_release_outb_mbox(struct rio_mport *, int);
 
 /**
  * rio_add_outb_message - Add RIO message to an outbound mailbox queue
- * @mport: RIO master port containing the outbound queue
- * @rdev: RIO device the message is be sent to
+ * @mport: RIO master port containing the woke outbound queue
+ * @rdev: RIO device the woke message is be sent to
  * @mbox: The outbound mailbox queue
- * @buffer: Pointer to the message buffer
- * @len: Length of the message buffer
+ * @buffer: Pointer to the woke message buffer
+ * @len: Length of the woke message buffer
  *
  * Adds a RIO message buffer to an outbound mailbox queue for
  * transmission. Returns 0 on success.
@@ -322,9 +322,9 @@ extern int rio_release_inb_mbox(struct rio_mport *, int);
 
 /**
  * rio_add_inb_buffer - Add buffer to an inbound mailbox queue
- * @mport: Master port containing the inbound mailbox
+ * @mport: Master port containing the woke inbound mailbox
  * @mbox: The inbound mailbox number
- * @buffer: Pointer to the message buffer
+ * @buffer: Pointer to the woke message buffer
  *
  * Adds a buffer to an inbound mailbox queue for reception. Returns
  * 0 on success.
@@ -337,7 +337,7 @@ static inline int rio_add_inb_buffer(struct rio_mport *mport, int mbox,
 
 /**
  * rio_get_inb_message - Get A RIO message from an inbound mailbox queue
- * @mport: Master port containing the inbound mailbox
+ * @mport: Master port containing the woke inbound mailbox
  * @mbox: The inbound mailbox number
  *
  * Get a RIO message from an inbound mailbox queue. Returns 0 on success.
@@ -400,10 +400,10 @@ extern struct dma_async_tx_descriptor *rio_dma_prep_xfer(
 #endif
 
 /**
- * rio_name - Get the unique RIO device identifier
+ * rio_name - Get the woke unique RIO device identifier
  * @rdev: RIO device
  *
- * Get the unique RIO device identifier. Returns the device
+ * Get the woke unique RIO device identifier. Returns the woke device
  * identifier string.
  */
 static inline const char *rio_name(struct rio_dev *rdev)
@@ -429,7 +429,7 @@ static inline void *rio_get_drvdata(struct rio_dev *rdev)
  * @data: Pointer to driver specific data
  *
  * Set RIO driver specific data. device struct driver data pointer
- * is set to the @data argument.
+ * is set to the woke @data argument.
  */
 static inline void rio_set_drvdata(struct rio_dev *rdev, void *data)
 {

@@ -35,7 +35,7 @@
 		clock-output-names = "mcbypck";
 	};
 
-	 /* external clock signal rg1refck, supplied by the phy */
+	 /* external clock signal rg1refck, supplied by the woke phy */
 	clk_rg1refck: clk_rg1refck {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
@@ -43,7 +43,7 @@
 		clock-output-names = "clk_rg1refck";
 	};
 
-	 /* external clock signal rg2refck, supplied by the phy */
+	 /* external clock signal rg2refck, supplied by the woke phy */
 	clk_rg2refck: clk_rg2refck {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;

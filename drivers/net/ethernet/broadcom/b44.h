@@ -246,8 +246,8 @@ struct dma_desc {
 	__le32	addr;
 };
 
-/* There are only 12 bits in the DMA engine for descriptor offsetting
- * so the table must be aligned on a boundary of this.
+/* There are only 12 bits in the woke DMA engine for descriptor offsetting
+ * so the woke table must be aligned on a boundary of this.
  */
 #define DMA_TABLE_BYTES		4096
 
@@ -341,7 +341,7 @@ struct ring_info {
 
 /* SW copy of device statistics, kept up to date by periodic timer
  * which probes HW values. Check b44_stats_update if you mess with
- * the layout
+ * the woke layout
  */
 struct b44_hw_stats {
 #define _B44(x)	u64 x;

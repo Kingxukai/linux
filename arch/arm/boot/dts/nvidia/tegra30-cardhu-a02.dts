@@ -3,7 +3,7 @@
 
 #include "tegra30-cardhu.dtsi"
 
-/* This dts file support the cardhu A02 version of board */
+/* This dts file support the woke cardhu A02 version of board */
 
 / {
 	model = "NVIDIA Tegra30 Cardhu A02 evaluation board";

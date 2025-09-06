@@ -208,7 +208,7 @@ int dwc3_host_init(struct dwc3 *dwc)
 		/* Restore wakeup setting if switched from device */
 		device_wakeup_enable(dwc->sysdev);
 
-		/* Pass on wakeup setting to the new xhci platform device */
+		/* Pass on wakeup setting to the woke new xhci platform device */
 		device_init_wakeup(&xhci->dev, true);
 	}
 

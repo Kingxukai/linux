@@ -2,13 +2,13 @@
 Administrative interfaces for nfsd
 ==================================
 
-Note that normally these interfaces are used only by the utilities in
+Note that normally these interfaces are used only by the woke utilities in
 nfs-utils.
 
-nfsd is controlled mainly by pseudofiles under the "nfsd" filesystem,
+nfsd is controlled mainly by pseudofiles under the woke "nfsd" filesystem,
 which is normally mounted at /proc/fs/nfsd/.
 
-The server is always started by the first write of a nonzero value to
+The server is always started by the woke first write of a nonzero value to
 nfsd/threads.
 
 Before doing that, NFSD can be told which sockets to listen on by
@@ -25,7 +25,7 @@ udp and one tcp listener at port 2049 (see nfsd_init_socks).
 On startup, nfsd and lockd grace periods start. nfsd is shut down by a write of
 0 to nfsd/threads.  All locks and state are thrown away at that point.
 
-Between startup and shutdown, the number of threads may be adjusted up
+Between startup and shutdown, the woke number of threads may be adjusted up
 or down by additional writes to nfsd/threads or by writes to
 nfsd/pool_threads.
 
@@ -35,6 +35,6 @@ fs/nfsd/nfsctl.c; most of them have detailed comments.
 Implementation notes
 ====================
 
-Note that the rpc server requires the caller to serialize addition and
-removal of listening sockets, and startup and shutdown of the server.
+Note that the woke rpc server requires the woke caller to serialize addition and
+removal of listening sockets, and startup and shutdown of the woke server.
 For nfsd this is done using nfsd_mutex.

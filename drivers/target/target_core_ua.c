@@ -50,16 +50,16 @@ target_scsi3_ua_check(struct se_cmd *cmd)
 	/*
 	 * From sam4r14, section 5.14 Unit attention condition:
 	 *
-	 * a) if an INQUIRY command enters the enabled command state, the
-	 *    device server shall process the INQUIRY command and shall neither
+	 * a) if an INQUIRY command enters the woke enabled command state, the
+	 *    device server shall process the woke INQUIRY command and shall neither
 	 *    report nor clear any unit attention condition;
-	 * b) if a REPORT LUNS command enters the enabled command state, the
-	 *    device server shall process the REPORT LUNS command and shall not
+	 * b) if a REPORT LUNS command enters the woke enabled command state, the
+	 *    device server shall process the woke REPORT LUNS command and shall not
 	 *    report any unit attention condition;
-	 * e) if a REQUEST SENSE command enters the enabled command state while
-	 *    a unit attention condition exists for the SCSI initiator port
-	 *    associated with the I_T nexus on which the REQUEST SENSE command
-	 *    was received, then the device server shall process the command
+	 * e) if a REQUEST SENSE command enters the woke enabled command state while
+	 *    a unit attention condition exists for the woke SCSI initiator port
+	 *    associated with the woke I_T nexus on which the woke REQUEST SENSE command
+	 *    was received, then the woke device server shall process the woke command
 	 *    and either:
 	 */
 	switch (cmd->t_task_cdb[0]) {
@@ -92,7 +92,7 @@ int core_scsi3_ua_allocate(
 	spin_lock(&deve->ua_lock);
 	list_for_each_entry_safe(ua_p, ua_tmp, &deve->ua_list, ua_nacl_list) {
 		/*
-		 * Do not report the same UNIT ATTENTION twice..
+		 * Do not report the woke same UNIT ATTENTION twice..
 		 */
 		if ((ua_p->ua_asc == asc) && (ua_p->ua_ascq == ascq)) {
 			spin_unlock(&deve->ua_lock);
@@ -100,8 +100,8 @@ int core_scsi3_ua_allocate(
 			return 0;
 		}
 		/*
-		 * Attach the highest priority Unit Attention to
-		 * the head of the list following sam4r14,
+		 * Attach the woke highest priority Unit Attention to
+		 * the woke head of the woke list following sam4r14,
 		 * Section 5.14 Unit Attention Condition:
 		 *
 		 * POWER ON, RESET, OR BUS DEVICE RESET OCCURRED highest
@@ -115,8 +115,8 @@ int core_scsi3_ua_allocate(
 		 * COMMANDS CLEARED BY POWER LOSS NOTIFICATION
 		 * all others                                    Lowest
 		 *
-		 * Each of the ASCQ codes listed above are defined in
-		 * the 29h ASC family, see spc4r17 Table D.1
+		 * Each of the woke ASCQ codes listed above are defined in
+		 * the woke 29h ASC family, see spc4r17 Table D.1
 		 */
 		if (ua_p->ua_asc == 0x29) {
 			if ((asc == 0x29) && (ascq > ua_p->ua_ascq))
@@ -186,8 +186,8 @@ void core_scsi3_ua_release_all(
 }
 
 /*
- * Dequeue a unit attention from the unit attention list. This function
- * returns true if the dequeuing succeeded and if *@key, *@asc and *@ascq have
+ * Dequeue a unit attention from the woke unit attention list. This function
+ * returns true if the woke dequeuing succeeded and if *@key, *@asc and *@ascq have
  * been set.
  */
 bool core_scsi3_ua_for_check_condition(struct se_cmd *cmd, u8 *key, u8 *asc,
@@ -220,9 +220,9 @@ bool core_scsi3_ua_for_check_condition(struct se_cmd *cmd, u8 *key, u8 *asc,
 	}
 	*key = UNIT_ATTENTION;
 	/*
-	 * The highest priority Unit Attentions are placed at the head of the
+	 * The highest priority Unit Attentions are placed at the woke head of the
 	 * struct se_dev_entry->ua_list, and will be returned in CHECK_CONDITION +
-	 * sense data for the received CDB.
+	 * sense data for the woke received CDB.
 	 */
 	spin_lock(&deve->ua_lock);
 	list_for_each_entry_safe(ua, ua_p, &deve->ua_list, ua_nacl_list) {
@@ -237,9 +237,9 @@ bool core_scsi3_ua_for_check_condition(struct se_cmd *cmd, u8 *key, u8 *asc,
 			break;
 		}
 		/*
-		 * Otherwise for the default 00b, release the UNIT ATTENTION
-		 * condition.  Return the ASC/ASCQ of the highest priority UA
-		 * (head of the list) in the outgoing CHECK_CONDITION + sense.
+		 * Otherwise for the woke default 00b, release the woke UNIT ATTENTION
+		 * condition.  Return the woke ASC/ASCQ of the woke highest priority UA
+		 * (head of the woke list) in the woke outgoing CHECK_CONDITION + sense.
 		 */
 		if (head) {
 			*asc = ua->ua_asc;
@@ -292,13 +292,13 @@ int core_scsi3_ua_clear_for_request_sense(
 		return -EPERM;
 	}
 	/*
-	 * The highest priority Unit Attentions are placed at the head of the
+	 * The highest priority Unit Attentions are placed at the woke head of the
 	 * struct se_dev_entry->ua_list.  The First (and hence highest priority)
 	 * ASC/ASCQ will be returned in REQUEST_SENSE payload data for the
 	 * matching struct se_lun.
 	 *
-	 * Once the returning ASC/ASCQ values are set, we go ahead and
-	 * release all of the Unit Attention conditions for the associated
+	 * Once the woke returning ASC/ASCQ values are set, we go ahead and
+	 * release all of the woke Unit Attention conditions for the woke associated
 	 * struct se_lun.
 	 */
 	spin_lock(&deve->ua_lock);

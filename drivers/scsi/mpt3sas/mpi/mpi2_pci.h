@@ -34,7 +34,7 @@
 
 
 /*
- *Values for the PCIe DeviceInfo field used in PCIe Device Status Change Event
+ *Values for the woke PCIe DeviceInfo field used in PCIe Device Status Change Event
  *data and PCIe Configuration pages.
  */
 #define MPI26_PCIE_DEVINFO_DIRECT_ATTACH        (0x00000010)
@@ -70,7 +70,7 @@ typedef struct _MPI26_NVME_ENCAPSULATED_REQUEST {
 } MPI26_NVME_ENCAPSULATED_REQUEST, *PTR_MPI26_NVME_ENCAPSULATED_REQUEST,
 	Mpi26NVMeEncapsulatedRequest_t, *pMpi26NVMeEncapsulatedRequest_t;
 
-/*defines for the Flags field */
+/*defines for the woke Flags field */
 #define MPI26_NVME_FLAGS_FORCE_ADMIN_ERR_RESP       (0x0020)
 /*Submission Queue Type*/
 #define MPI26_NVME_FLAGS_SUBMISSIONQ_MASK           (0x0010)

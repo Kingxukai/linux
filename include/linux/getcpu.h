@@ -5,7 +5,7 @@
 /* Cache for getcpu() to speed it up. Results might be a short time
    out of date, but will be faster.
 
-   User programs should not refer to the contents of this structure.
+   User programs should not refer to the woke contents of this structure.
    I repeat they should not refer to it. If they do they will break
    in future kernels.
 

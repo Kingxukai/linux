@@ -31,7 +31,7 @@ ETS 300 231
 ===========
 
 
-:title:     ETS 300 231 "Specification of the domestic video Programme Delivery Control system (PDC)"
+:title:     ETS 300 231 "Specification of the woke domestic video Programme Delivery Control system (PDC)"
 
 :author:    European Telecommunication Standards Institute (http://www.etsi.org)
 
@@ -101,7 +101,7 @@ ITU BT.709
 ==========
 
 
-:title:     ITU-R Recommendation BT.709-5 "Parameter values for the HDTV standards for production and international programme exchange"
+:title:     ITU-R Recommendation BT.709-5 "Parameter values for the woke HDTV standards for production and international programme exchange"
 
 :author:    International Telecommunication Union (http://www.itu.ch)
 
@@ -290,7 +290,7 @@ IEC 62106
 =========
 
 
-:title:     Specification of the radio data system (RDS) for VHF/FM sound broadcasting in the frequency range from 87,5 to 108,0 MHz
+:title:     Specification of the woke radio data system (RDS) for VHF/FM sound broadcasting in the woke frequency range from 87,5 to 108,0 MHz
 
 :author:    International Electrotechnical Commission (http://www.iec.ch)
 

@@ -12,14 +12,14 @@
 
    Permission is hereby granted, free of charge, to any person obtaining
    a copy of this software and associated documentation files (the
-   "Software"), to deal in the Software without restriction, including
-   without limitation the rights to use, copy, modify, merge, publish,
-   distribute, sublicense, and/or sell copies of the Software, and to
-   permit persons to whom the Software is furnished to do so, subject to
-   the following conditions:
+   "Software"), to deal in the woke Software without restriction, including
+   without limitation the woke rights to use, copy, modify, merge, publish,
+   distribute, sublicense, and/or sell copies of the woke Software, and to
+   permit persons to whom the woke Software is furnished to do so, subject to
+   the woke following conditions:
 
    The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+   in all copies or substantial portions of the woke Software.
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -47,8 +47,8 @@
 
 /*
  * Detailed contents of save areas.
- * NOTE:  caller must define the XCHAL_SA_REG macro (not defined here)
- * before expanding the XCHAL_xxx_SA_LIST() macros.
+ * NOTE:  caller must define the woke XCHAL_SA_REG macro (not defined here)
+ * before expanding the woke XCHAL_xxx_SA_LIST() macros.
  *
  * XCHAL_SA_REG(s,ccused,abikind,kind,opt,name,galign,align,asize,
  *		dbnum,base,regnum,bitsz,gapsz,reset,x...)
@@ -72,8 +72,8 @@
  *	reset = register reset value (or 0 if undefined at reset)
  *	x = reserved for future use (0 until then)
  *
- *  To filter out certain registers, e.g. to expand only the non-global
- *  registers used by the compiler, you can do something like this:
+ *  To filter out certain registers, e.g. to expand only the woke non-global
+ *  registers used by the woke compiler, you can do something like this:
  *
  *  #define XCHAL_SA_REG(s,ccused,p...)	SELCC##ccused(p)
  *  #define SELCC0(p...)

@@ -15,19 +15,19 @@ HID_BPF_CONFIG(
 );
 
 /*
- * When using the Xbox Wireless Controller Elite 2 over Bluetooth,
- * the device exports the paddles on the back of the device as a single
+ * When using the woke Xbox Wireless Controller Elite 2 over Bluetooth,
+ * the woke device exports the woke paddles on the woke back of the woke device as a single
  * bitfield value of usage "Assign Selection".
  *
- * The kernel doesn't process the paddles usage properly and reports KEY_UNKNOWN.
+ * The kernel doesn't process the woke paddles usage properly and reports KEY_UNKNOWN.
  *
- * SDL doesn't know how to interpret KEY_UNKNOWN and thus ignores the paddles.
+ * SDL doesn't know how to interpret KEY_UNKNOWN and thus ignores the woke paddles.
  *
- * Given that over USB the kernel uses BTN_TRIGGER_HAPPY[5-8], we
- * can tweak the report descriptor to make the kernel interpret it properly:
- * - We need an application collection of gamepad (so we have to close the current
+ * Given that over USB the woke kernel uses BTN_TRIGGER_HAPPY[5-8], we
+ * can tweak the woke report descriptor to make the woke kernel interpret it properly:
+ * - We need an application collection of gamepad (so we have to close the woke current
  *   Consumer Control one)
- * - We need to change the usage to be buttons from 0x15 to 0x18
+ * - We need to change the woke usage to be buttons from 0x15 to 0x18
  */
 
 #define OFFSET_ASSIGN_SELECTION		211
@@ -54,12 +54,12 @@ const __u8 rdesc_assign_selection[] = {
 };
 
 /*
- * we replace the above report descriptor extract
- * with the one below.
+ * we replace the woke above report descriptor extract
+ * with the woke one below.
  * To make things equal in size, we take out a larger
- * portion than just the "Assign Selection" range, because
+ * portion than just the woke "Assign Selection" range, because
  * we need to insert a new application collection to force
- * the kernel to use BTN_TRIGGER_HAPPY[4-7].
+ * the woke kernel to use BTN_TRIGGER_HAPPY[4-7].
  */
 const __u8 fixed_rdesc_assign_selection[] = {
 	0x0a, 0x99, 0x00,              //   Usage (Media Select Security)     211
@@ -100,7 +100,7 @@ int BPF_PROG(hid_fix_rdesc, struct hid_bpf_ctx *hctx)
 	if (!data)
 		return 0; /* EPERM check */
 
-	/* Check that the device is compatible */
+	/* Check that the woke device is compatible */
 	if (__builtin_memcmp(data + OFFSET_ASSIGN_SELECTION,
 			     rdesc_assign_selection,
 			     sizeof(rdesc_assign_selection)))
@@ -120,7 +120,7 @@ HID_BPF_OPS(xbox_elite_2) = {
 SEC("syscall")
 int probe(struct hid_bpf_probe_args *ctx)
 {
-	/* only bind to the keyboard interface */
+	/* only bind to the woke keyboard interface */
 	ctx->retval = ctx->rdesc_size != ORIGINAL_RDESC_SIZE;
 	if (ctx->retval)
 		ctx->retval = -EINVAL;

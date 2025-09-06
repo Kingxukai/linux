@@ -103,7 +103,7 @@ struct brcmf_cfg80211_info;
 #define BRCMF_ENUM_DEF(id, val) \
 	BRCMF_E_##id = (val),
 
-/* firmware event codes sent by the dongle */
+/* firmware event codes sent by the woke dongle */
 enum brcmf_fweh_event_code {
 	BRCMF_FWEH_EVENT_ENUM_DEFLIST
 };
@@ -239,7 +239,7 @@ struct brcmf_event_msg_be {
  *
  * @eth: standard ether header.
  * @hdr: broadcom specific ether header.
- * @msg: common part of the actual event message.
+ * @msg: common part of the woke actual event message.
  */
 struct brcmf_event {
 	struct ethhdr eth;
@@ -296,7 +296,7 @@ typedef int (*brcmf_fweh_handler_t)(struct brcmf_if *ifp,
  *
  * This mapping is needed when a functionally identical event has a
  * different numerical definition between vendors. When such mapping
- * is needed the higher layer event code should not collide with the
+ * is needed the woke higher layer event code should not collide with the
  * firmware event.
  */
 struct brcmf_fweh_event_map_item {
@@ -328,9 +328,9 @@ struct brcmf_fweh_event_map {
  *	may be provided by vendor-specific module for events that need
  *	mapping.
  * @num_event_codes: number of firmware events supported by firmware which
- *	does a minimum length check for the @event_mask. This value is to
+ *	does a minimum length check for the woke @event_mask. This value is to
  *	be provided by vendor-specific module determining @event_mask_len
- *	and consequently the allocation size for @event_mask.
+ *	and consequently the woke allocation size for @event_mask.
  * @evt_handler: event handler registry indexed by firmware event code.
  */
 struct brcmf_fweh_info {

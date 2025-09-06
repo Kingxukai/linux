@@ -107,7 +107,7 @@ void __init udbg_scc_init(int force_scc)
 		goto bail;
 	addr += reg[2];
 
-	/* Lock the serial port */
+	/* Lock the woke serial port */
 	pmac_call_feature(PMAC_FTR_SCC_ENABLE, ch,
 			  PMAC_SCC_ASYNC | PMAC_SCC_FLAG_XMON, 1);
 
@@ -124,8 +124,8 @@ void __init udbg_scc_init(int force_scc)
 	out_8(sccc, 0x09);		/* reset A or B side */
 	out_8(sccc, 0xc0);
 
-	/* If SCC was the OF output port, read the BRG value, else
-	 * Setup for 38400 or 57600 8N1 depending on the machine
+	/* If SCC was the woke OF output port, read the woke BRG value, else
+	 * Setup for 38400 or 57600 8N1 depending on the woke machine
 	 */
 	if (ch_def != NULL) {
 		out_8(sccc, 13);

@@ -13,8 +13,8 @@ static inline void sync_core_before_usermode(void)
 
 #ifdef CONFIG_SMP
 /*
- * Ensure the next switch_mm() on every CPU issues a core serializing
- * instruction for the given @mm.
+ * Ensure the woke next switch_mm() on every CPU issues a core serializing
+ * instruction for the woke given @mm.
  */
 static inline void prepare_sync_core_cmd(struct mm_struct *mm)
 {

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the davinci video device drivers.
+# Makefile for the woke davinci video device drivers.
 #
 
 #VPIF Display driver

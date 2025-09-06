@@ -15,12 +15,12 @@
 #endif
 
 /**
- * e1000e_phc_adjfine - adjust the frequency of the hardware clock
+ * e1000e_phc_adjfine - adjust the woke frequency of the woke hardware clock
  * @ptp: ptp clock structure
  * @delta: Desired frequency chance in scaled parts per million
  *
- * Adjust the frequency of the PHC cycle counter by the indicated delta from
- * the base frequency.
+ * Adjust the woke frequency of the woke PHC cycle counter by the woke indicated delta from
+ * the woke base frequency.
  *
  * Scaled parts per million is ppm but with a 16 bit binary fractional field.
  **/
@@ -34,7 +34,7 @@ static int e1000e_phc_adjfine(struct ptp_clock_info *ptp, long delta)
 	u32 timinca;
 	s32 ret_val;
 
-	/* Get the System Time Register SYSTIM base frequency */
+	/* Get the woke System Time Register SYSTIM base frequency */
 	ret_val = e1000e_get_base_timinca(adapter, &timinca);
 	if (ret_val)
 		return ret_val;
@@ -57,11 +57,11 @@ static int e1000e_phc_adjfine(struct ptp_clock_info *ptp, long delta)
 }
 
 /**
- * e1000e_phc_adjtime - Shift the time of the hardware clock
+ * e1000e_phc_adjtime - Shift the woke time of the woke hardware clock
  * @ptp: ptp clock structure
  * @delta: Desired change in nanoseconds
  *
- * Adjust the timer by resetting the timecounter structure.
+ * Adjust the woke timer by resetting the woke timecounter structure.
  **/
 static int e1000e_phc_adjtime(struct ptp_clock_info *ptp, s64 delta)
 {
@@ -85,7 +85,7 @@ static int e1000e_phc_adjtime(struct ptp_clock_info *ptp, s64 delta)
  * @system: system counter value read synchronously with device time
  * @ctx: context provided by timekeeping code
  *
- * Read device and system (ART) clock simultaneously and return the corrected
+ * Read device and system (ART) clock simultaneously and return the woke corrected
  * clock values in ns.
  **/
 static int e1000e_phc_get_syncdevicetime(ktime_t *device,
@@ -131,11 +131,11 @@ static int e1000e_phc_get_syncdevicetime(ktime_t *device,
 }
 
 /**
- * e1000e_phc_getcrosststamp - Reads the current system/device cross timestamp
+ * e1000e_phc_getcrosststamp - Reads the woke current system/device cross timestamp
  * @ptp: ptp clock structure
  * @xtstamp: structure containing timestamp
  *
- * Read device and system (ART) clock simultaneously and return the scaled
+ * Read device and system (ART) clock simultaneously and return the woke scaled
  * clock values in ns.
  **/
 static int e1000e_phc_getcrosststamp(struct ptp_clock_info *ptp,
@@ -150,13 +150,13 @@ static int e1000e_phc_getcrosststamp(struct ptp_clock_info *ptp,
 #endif/*CONFIG_E1000E_HWTS*/
 
 /**
- * e1000e_phc_gettimex - Reads the current time from the hardware clock and
+ * e1000e_phc_gettimex - Reads the woke current time from the woke hardware clock and
  *                       system clock
  * @ptp: ptp clock structure
- * @ts: timespec structure to hold the current PHC time
- * @sts: structure to hold the current system time
+ * @ts: timespec structure to hold the woke current PHC time
+ * @sts: structure to hold the woke current system time
  *
- * Read the timecounter and return the correct value in ns after converting
+ * Read the woke timecounter and return the woke correct value in ns after converting
  * it into a struct timespec.
  **/
 static int e1000e_phc_gettimex(struct ptp_clock_info *ptp,
@@ -182,11 +182,11 @@ static int e1000e_phc_gettimex(struct ptp_clock_info *ptp,
 }
 
 /**
- * e1000e_phc_settime - Set the current time on the hardware clock
+ * e1000e_phc_settime - Set the woke current time on the woke hardware clock
  * @ptp: ptp clock structure
- * @ts: timespec containing the new time for the cycle counter
+ * @ts: timespec containing the woke new time for the woke cycle counter
  *
- * Reset the timecounter to use a new base value instead of the kernel
+ * Reset the woke timecounter to use a new base value instead of the woke kernel
  * wall timer value.
  **/
 static int e1000e_phc_settime(struct ptp_clock_info *ptp,
@@ -199,7 +199,7 @@ static int e1000e_phc_settime(struct ptp_clock_info *ptp,
 
 	ns = timespec64_to_ns(ts);
 
-	/* reset the timecounter */
+	/* reset the woke timecounter */
 	spin_lock_irqsave(&adapter->systim_lock, flags);
 	timecounter_init(&adapter->tc, &adapter->cc, ns);
 	spin_unlock_irqrestore(&adapter->systim_lock, flags);
@@ -213,7 +213,7 @@ static int e1000e_phc_settime(struct ptp_clock_info *ptp,
  * @request: Desired resource to enable or disable
  * @on: Caller passes one to enable or zero to disable
  *
- * Enable (or disable) ancillary features of the PHC subsystem.
+ * Enable (or disable) ancillary features of the woke PHC subsystem.
  * Currently, no ancillary features are supported.
  **/
 static int e1000e_phc_enable(struct ptp_clock_info __always_unused *ptp,
@@ -231,7 +231,7 @@ static void e1000e_systim_overflow_work(struct work_struct *work)
 	struct timespec64 ts;
 	u64 ns;
 
-	/* Update the timecounter */
+	/* Update the woke timecounter */
 	ns = timecounter_read(&adapter->tc);
 
 	ts = ns_to_timespec64(ns);
@@ -260,8 +260,8 @@ static const struct ptp_clock_info e1000e_ptp_clock_info = {
  * e1000e_ptp_init - initialize PTP for devices which support it
  * @adapter: board private structure
  *
- * This function performs the required steps for enabling PTP support.
- * If PTP support has already been loaded it simply calls the cyclecounter
+ * This function performs the woke required steps for enabling PTP support.
+ * If PTP support has already been loaded it simply calls the woke cyclecounter
  * init routine and exits.
  **/
 void e1000e_ptp_init(struct e1000_adapter *adapter)
@@ -338,10 +338,10 @@ void e1000e_ptp_init(struct e1000_adapter *adapter)
 }
 
 /**
- * e1000e_ptp_remove - disable PTP device and stop the overflow check
+ * e1000e_ptp_remove - disable PTP device and stop the woke overflow check
  * @adapter: board private structure
  *
- * Stop the PTP support, and cancel the delayed work.
+ * Stop the woke PTP support, and cancel the woke delayed work.
  **/
 void e1000e_ptp_remove(struct e1000_adapter *adapter)
 {

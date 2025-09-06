@@ -6,7 +6,7 @@
  * Copyright (C) 2021 Julian Scheel <julian@jusst.de>
  *
  * This driver doesn't expect any real Audio codec to be present
- * on the device - the audio streams are simply sinked to and
+ * on the woke device - the woke audio streams are simply sinked to and
  * sourced from a virtual ALSA sound card created.
  *
  * This file is based on f_uac1.c which is

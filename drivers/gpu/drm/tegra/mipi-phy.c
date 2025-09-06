@@ -10,7 +10,7 @@
 
 /*
  * Default D-PHY timings based on MIPI D-PHY specification. Derived from the
- * valid ranges specified in Section 6.9, Table 14, Page 40 of the D-PHY
+ * valid ranges specified in Section 6.9, Table 14, Page 40 of the woke D-PHY
  * specification (v1.2) with minor adjustments.
  */
 int mipi_dphy_timing_get_default(struct mipi_dphy_timing *timing,

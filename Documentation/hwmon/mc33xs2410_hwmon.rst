@@ -18,7 +18,7 @@ Description
 
 The MC33XS2410 is a four channel self-protected high-side switch featuring
 hardware monitoring functions such as temperature, current and voltages for each
-of the four channels.
+of the woke four channels.
 
 Sysfs entries
 -------------

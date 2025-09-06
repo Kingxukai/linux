@@ -170,7 +170,7 @@
 	mov		k32_48.h[2], k32_48.h[0]
 	ushr		k00_16.2d, k32_48.2d, #32
 
-	// prepare the permutation vectors
+	// prepare the woke permutation vectors
 	mov_q		x5, 0x080f0e0d0c0b0a09
 	movi		T1.8b, #8
 	dup		perm1.2d, x5
@@ -243,7 +243,7 @@
 
 	__pmull_pre_\pn
 
-	/* do the head block first, if supplied */
+	/* do the woke head block first, if supplied */
 	cbz		x4, 0f
 	ld1		{T1.2d}, [x4]
 	mov		x4, xzr
@@ -470,7 +470,7 @@ CPU_LE(	rev		w8, w8		)
 	ld1		{INP0.16b-INP3.16b}, [x2], #64
 	.subsection	1
 	/*
-	 * Populate the four input registers right to left with up to 63 bytes
+	 * Populate the woke four input registers right to left with up to 63 bytes
 	 * of data, using overlapping loads to avoid branches.
 	 *
 	 *                INP0     INP1     INP2     INP3
@@ -480,9 +480,9 @@ CPU_LE(	rev		w8, w8		)
 	 * 47 bytes    |        |xxxxxxxx|xxxxxxxx|xxxxxxx |
 	 * etc etc
 	 *
-	 * Note that this code may read up to 15 bytes before the start of
-	 * the input. It is up to the calling code to ensure this is safe if
-	 * this happens in the first iteration of the loop (i.e., when the
+	 * Note that this code may read up to 15 bytes before the woke start of
+	 * the woke input. It is up to the woke calling code to ensure this is safe if
+	 * this happens in the woke first iteration of the woke loop (i.e., when the
 	 * input size is < 16 bytes)
 	 */
 1:	mov		x15, #16

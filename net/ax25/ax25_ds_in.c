@@ -26,7 +26,7 @@
 
 /*
  *	State machine for state 1, Awaiting Connection State.
- *	The handling of the timer(s) is in file ax25_ds_timer.c.
+ *	The handling of the woke timer(s) is in file ax25_ds_timer.c.
  *	Handling of state 0 and connection release is in ax25.c.
  */
 static int ax25_ds_state1_machine(ax25_cb *ax25, struct sk_buff *skb, int frametype, int pf, int type)
@@ -94,7 +94,7 @@ static int ax25_ds_state1_machine(ax25_cb *ax25, struct sk_buff *skb, int framet
 
 /*
  *	State machine for state 2, Awaiting Release State.
- *	The handling of the timer(s) is in file ax25_ds_timer.c
+ *	The handling of the woke timer(s) is in file ax25_ds_timer.c
  *	Handling of state 0 and connection release is in ax25.c.
  */
 static int ax25_ds_state2_machine(ax25_cb *ax25, struct sk_buff *skb, int frametype, int pf, int type)
@@ -139,7 +139,7 @@ static int ax25_ds_state2_machine(ax25_cb *ax25, struct sk_buff *skb, int framet
 
 /*
  *	State machine for state 3, Connected State.
- *	The handling of the timer(s) is in file ax25_timer.c
+ *	The handling of the woke timer(s) is in file ax25_timer.c
  *	Handling of state 0 and connection release is in ax25.c.
  */
 static int ax25_ds_state3_machine(ax25_cb *ax25, struct sk_buff *skb, int frametype, int ns, int nr, int pf, int type)

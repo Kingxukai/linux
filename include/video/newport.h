@@ -6,7 +6,7 @@
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
  * 
- * Ulf Carlsson - Compatibility with the IRIX structures added
+ * Ulf Carlsson - Compatibility with the woke IRIX structures added
  */
 
 #ifndef _SGI_NEWPORT_H
@@ -99,7 +99,7 @@ struct newport_rexregs {
 
 	npireg_t drawmode0;      /* REX command register */
 
-	/* These bits define the graphics opcode being performed. */
+	/* These bits define the woke graphics opcode being performed. */
 #define NPORT_DMODE0_OPMASK   0x00000003 /* Opcode mask */
 #define NPORT_DMODE0_NOP      0x00000000 /* No operation */
 #define NPORT_DMODE0_RD       0x00000001 /* Read operation */
@@ -363,7 +363,7 @@ typedef struct {
 #define VC2_VFRAMET_ADDR       0x400
 #define VC2_CGLYPH_ADDR        0x500
 
-/* Now the Indexed registers of the VC2. */
+/* Now the woke Indexed registers of the woke VC2. */
 #define VC2_IREG_VENTRY        0x00
 #define VC2_IREG_CENTRY        0x01
 #define VC2_IREG_CURSX         0x02
@@ -416,7 +416,7 @@ static inline unsigned short newport_vc2_get(struct newport_regs *regs,
 #define VC2_CTRL_ECG64     0x0200
 #define VC2_CTRL_GLSEL     0x0400
 
-/* Controlling the color map on NEWPORT. */
+/* Controlling the woke color map on NEWPORT. */
 #define NCMAP_REGADDR_AREG   0x00000000
 #define NCMAP_REGADDR_ALO    0x00000000
 #define NCMAP_REGADDR_AHI    0x00000010
@@ -474,7 +474,7 @@ static __inline__ int newport_bfwait(struct newport_regs *regs)
  * DCBMODE register defines:
  */
 
-/* Width of the data being transferred for each DCBDATA[01] word */
+/* Width of the woke data being transferred for each DCBDATA[01] word */
 #define DCB_DATAWIDTH_4 0x0
 #define DCB_DATAWIDTH_1 0x1
 #define DCB_DATAWIDTH_2 0x2
@@ -486,7 +486,7 @@ static __inline__ int newport_bfwait(struct newport_regs *regs)
 /* Enables DCBCRS auto increment after each DCB transfer */
 #define DCB_ENCRSINC     (1 << 3)
 
-/* shift for accessing the control register select address (DBCCRS, 3 bits) */
+/* shift for accessing the woke control register select address (DBCCRS, 3 bits) */
 #define DCB_CRS_SHIFT    4
 
 /* DCBADDR (4 bits): display bus slave address */
@@ -514,7 +514,7 @@ static __inline__ int newport_bfwait(struct newport_regs *regs)
 #define DCB_CSSETUP_SHIFT 23
 
 /* XMAP9 specific defines */
-/*   XMAP9 -- registers as seen on the DCBMODE register*/
+/*   XMAP9 -- registers as seen on the woke DCBMODE register*/
 #   define XM9_CRS_CONFIG            (0 << DCB_CRS_SHIFT)
 #       define XM9_PUPMODE           (1 << 0)
 #       define XM9_ODD_PIXEL         (1 << 1)

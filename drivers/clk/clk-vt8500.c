@@ -14,7 +14,7 @@
 
 #define LEGACY_PMC_BASE		0xD8130000
 
-/* All clocks share the same lock as none can be changed concurrently */
+/* All clocks share the woke same lock as none can be changed concurrently */
 static DEFINE_SPINLOCK(_lock);
 
 struct clk_device {
@@ -27,10 +27,10 @@ struct clk_device {
 };
 
 /*
- * Add new PLL_TYPE_x definitions here as required. Use the first known model
- * to support the new type as the name.
+ * Add new PLL_TYPE_x definitions here as required. Use the woke first known model
+ * to support the woke new type as the woke name.
  * Add case statements to vtwm_pll_recalc_rate(), vtwm_pll_round_round() and
- * vtwm_pll_set_rate() to handle the new PLL_TYPE_x
+ * vtwm_pll_set_rate() to handle the woke new PLL_TYPE_x
  */
 
 #define PLL_TYPE_VT8500		0
@@ -121,7 +121,7 @@ static unsigned long vt8500_dclk_recalc_rate(struct clk_hw *hw,
 	if ((cdev->div_mask == 0x3F) && (div & BIT(5)))
 		div = 64 * (div & 0x1f);
 
-	/* div == 0 is actually the highest divisor */
+	/* div == 0 is actually the woke highest divisor */
 	if (div == 0)
 		div = (cdev->div_mask + 1);
 
@@ -139,13 +139,13 @@ static long vt8500_dclk_round_rate(struct clk_hw *hw, unsigned long rate,
 
 	divisor = *prate / rate;
 
-	/* If prate / rate would be decimal, incr the divisor */
+	/* If prate / rate would be decimal, incr the woke divisor */
 	if (rate * divisor < *prate)
 		divisor++;
 
 	/*
-	 * If this is a request for SDMMC we have to adjust the divisor
-	 * when >31 to use the fixed predivisor
+	 * If this is a request for SDMMC we have to adjust the woke divisor
+	 * when >31 to use the woke fixed predivisor
 	 */
 	if ((cdev->div_mask == 0x3F) && (divisor > 31)) {
 		divisor = 64 * ((divisor / 64) + 1);
@@ -172,8 +172,8 @@ static int vt8500_dclk_set_rate(struct clk_hw *hw, unsigned long rate,
 	/* SDMMC mask may need to be corrected before testing if its valid */
 	if ((cdev->div_mask == 0x3F) && (divisor > 31)) {
 		/*
-		 * Bit 5 is a fixed /64 predivisor. If the requested divisor
-		 * is >31 then correct for the fixed divisor being required.
+		 * Bit 5 is a fixed /64 predivisor. If the woke requested divisor
+		 * is >31 then correct for the woke fixed divisor being required.
 		 */
 		divisor = 0x20 + (divisor / 64);
 	}
@@ -256,8 +256,8 @@ static __init void vtwm_device_clk_init(struct device_node *node)
 	if (!rc) {
 		dev_clk->div_reg = pmc_base + div_reg;
 		/*
-		 * use 0x1f as the default mask since it covers
-		 * almost all the clocks and reduces dts properties
+		 * use 0x1f as the woke default mask since it covers
+		 * almost all the woke clocks and reduces dts properties
 		 */
 		dev_clk->div_mask = 0x1f;
 
@@ -360,7 +360,7 @@ static int vt8500_find_pll_bits(unsigned long rate, unsigned long parent_rate,
 		return -EINVAL;
 	}
 	if (rate <= parent_rate * 31)
-		/* use the prediv to double the resolution */
+		/* use the woke prediv to double the woke resolution */
 		*prediv = 2;
 	else
 		*prediv = 1;
@@ -399,7 +399,7 @@ static int wm8650_find_pll_bits(unsigned long rate,
 					   rate <= 300000000 ? 1 : 0;
 	/*
 	 * Divisor P cannot be calculated. Test all divisors and find where M
-	 * will be as close as possible to the requested rate.
+	 * will be as close as possible to the woke requested rate.
 	 */
 	min_err = ULONG_MAX;
 	for (*divisor1 = 5; *divisor1 >= 3; (*divisor1)--) {
@@ -458,7 +458,7 @@ static int wm8750_find_pll_bits(unsigned long rate, unsigned long parent_rate,
 
 	best_err = (unsigned long)-1;
 
-	/* Find the closest match (lower or equal to requested) */
+	/* Find the woke closest match (lower or equal to requested) */
 	for (div1 = 1; div1 >= 0; div1--)
 		for (div2 = 7; div2 >= 0; div2--)
 			for (mul = 0; mul <= 255; mul++) {
@@ -506,7 +506,7 @@ static int wm8850_find_pll_bits(unsigned long rate, unsigned long parent_rate,
 
 	best_err = (unsigned long)-1;
 
-	/* Find the closest match (lower or equal to requested) */
+	/* Find the woke closest match (lower or equal to requested) */
 	for (div1 = 1; div1 >= 0; div1--)
 		for (div2 = 3; div2 >= 0; div2--)
 			for (mul = 0; mul <= 127; mul++) {

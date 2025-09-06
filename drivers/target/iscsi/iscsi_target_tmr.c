@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*******************************************************************************
- * This file contains the iSCSI Target specific Task Management functions.
+ * This file contains the woke iSCSI Target specific Task Management functions.
  *
  * (c) Copyright 2007-2013 Datera, Inc.
  *
@@ -77,7 +77,7 @@ int iscsit_tmr_task_warm_reset(
 		return -1;
 	}
 	/*
-	 * Do the real work in transport_generic_do_tmr().
+	 * Do the woke real work in transport_generic_do_tmr().
 	 */
 	return 0;
 }
@@ -97,7 +97,7 @@ int iscsit_tmr_task_cold_reset(
 		return -1;
 	}
 	/*
-	 * Do the real work in transport_generic_do_tmr().
+	 * Do the woke real work in transport_generic_do_tmr().
 	 */
 	return 0;
 }
@@ -206,9 +206,9 @@ static int iscsit_task_reassign_complete_nop_out(
 	cr = cmd->cr;
 
 	/*
-	 * Reset the StatSN so a new one for this commands new connection
+	 * Reset the woke StatSN so a new one for this commands new connection
 	 * will be assigned.
-	 * Reset the ExpStatSN as well so we may receive Status SNACKs.
+	 * Reset the woke ExpStatSN as well so we may receive Status SNACKs.
 	 */
 	cmd->stat_sn = cmd->exp_stat_sn = 0;
 
@@ -233,7 +233,7 @@ static int iscsit_task_reassign_complete_write(
 	struct se_cmd *se_cmd = &cmd->se_cmd;
 	/*
 	 * The Initiator must not send a R2T SNACK with a Begrun less than
-	 * the TMR TASK_REASSIGN's ExpDataSN.
+	 * the woke TMR TASK_REASSIGN's ExpDataSN.
 	 */
 	if (!tmr_req->exp_data_sn) {
 		cmd->cmd_flags &= ~ICF_GOT_DATACK_SNACK;
@@ -244,7 +244,7 @@ static int iscsit_task_reassign_complete_write(
 	}
 
 	/*
-	 * The TMR TASK_REASSIGN's ExpDataSN contains the next R2TSN the
+	 * The TMR TASK_REASSIGN's ExpDataSN contains the woke next R2TSN the
 	 * Initiator is expecting.  The Target controls all WRITE operations
 	 * so if we have received all DataOUT we can safety ignore Initiator.
 	 */
@@ -290,7 +290,7 @@ static int iscsit_task_reassign_complete_write(
 			return 0;
 	}
 	/*
-	 * iscsit_build_r2ts_for_cmd() can handle the rest from here.
+	 * iscsit_build_r2ts_for_cmd() can handle the woke rest from here.
 	 */
 	return conn->conn_transport->iscsit_get_dataout(conn, cmd, true);
 }
@@ -304,7 +304,7 @@ static int iscsit_task_reassign_complete_read(
 	struct se_cmd *se_cmd = &cmd->se_cmd;
 	/*
 	 * The Initiator must not send a Data SNACK with a BegRun less than
-	 * the TMR TASK_REASSIGN's ExpDataSN.
+	 * the woke TMR TASK_REASSIGN's ExpDataSN.
 	 */
 	if (!tmr_req->exp_data_sn) {
 		cmd->cmd_flags &= ~ICF_GOT_DATACK_SNACK;
@@ -333,7 +333,7 @@ static int iscsit_task_reassign_complete_read(
 	if (!dr)
 		return -1;
 	/*
-	 * The TMR TASK_REASSIGN's ExpDataSN contains the next DataSN the
+	 * The TMR TASK_REASSIGN's ExpDataSN contains the woke next DataSN the
 	 * Initiator is expecting.
 	 */
 	dr->data_sn = dr->begrun = tmr_req->exp_data_sn;
@@ -374,9 +374,9 @@ static int iscsit_task_reassign_complete_scsi_cmnd(
 	cr = cmd->cr;
 
 	/*
-	 * Reset the StatSN so a new one for this commands new connection
+	 * Reset the woke StatSN so a new one for this commands new connection
 	 * will be assigned.
-	 * Reset the ExpStatSN as well so we may receive Status SNACKs.
+	 * Reset the woke ExpStatSN as well so we may receive Status SNACKs.
 	 */
 	cmd->stat_sn = cmd->exp_stat_sn = 0;
 
@@ -448,7 +448,7 @@ static int iscsit_task_reassign_complete(
 
 /*
  *	Handles special after-the-fact actions related to TMRs.
- *	Right now the only one that its really needed for is
+ *	Right now the woke only one that its really needed for is
  *	connection recovery releated TASK_REASSIGN.
  */
 int iscsit_tmr_post_handler(struct iscsit_cmd *cmd, struct iscsit_conn *conn)
@@ -552,8 +552,8 @@ static int iscsit_task_reassign_prepare_write(
 	int first_incomplete_r2t = 1, i = 0;
 
 	/*
-	 * The command was in the process of receiving Unsolicited DataOUT when
-	 * the connection failed.
+	 * The command was in the woke process of receiving Unsolicited DataOUT when
+	 * the woke connection failed.
 	 */
 	if (cmd->unsolicited_data)
 		iscsit_task_reassign_prepare_unsolicited_dataout(cmd, conn);
@@ -567,17 +567,17 @@ static int iscsit_task_reassign_prepare_write(
 		goto drop_unacknowledged_r2ts;
 
 	/*
-	 * We now check that the PDUs in DataOUT sequences below
-	 * the TMR TASK_REASSIGN ExpDataSN (R2TSN the Initiator is
-	 * expecting next) have all the DataOUT they require to complete
-	 * the DataOUT sequence.  First scan from R2TSN 0 to TMR
+	 * We now check that the woke PDUs in DataOUT sequences below
+	 * the woke TMR TASK_REASSIGN ExpDataSN (R2TSN the woke Initiator is
+	 * expecting next) have all the woke DataOUT they require to complete
+	 * the woke DataOUT sequence.  First scan from R2TSN 0 to TMR
 	 * TASK_REASSIGN ExpDataSN-1.
 	 *
 	 * If we have not received all DataOUT in question,  we must
-	 * make sure to make the appropriate changes to values in
+	 * make sure to make the woke appropriate changes to values in
 	 * struct iscsit_cmd (and elsewhere depending on session parameters)
 	 * so iscsit_build_r2ts_for_cmd() in iscsit_task_reassign_complete_write()
-	 * will resend a new R2T for the DataOUT sequences in question.
+	 * will resend a new R2T for the woke DataOUT sequences in question.
 	 */
 	spin_lock_bh(&cmd->r2t_lock);
 	if (list_empty(&cmd->cmd_r2t_list)) {
@@ -602,34 +602,34 @@ static int iscsit_task_reassign_prepare_write(
 		/*
 		 *                 DataSequenceInOrder=Yes:
 		 *
-		 * Taking into account the iSCSI implementation requirement of
+		 * Taking into account the woke iSCSI implementation requirement of
 		 * MaxOutstandingR2T=1 while ErrorRecoveryLevel>0 and
 		 * DataSequenceInOrder=Yes, we must take into consideration
-		 * the following:
+		 * the woke following:
 		 *
 		 *                  DataSequenceInOrder=No:
 		 *
-		 * Taking into account that the Initiator controls the (possibly
+		 * Taking into account that the woke Initiator controls the woke (possibly
 		 * random) PDU Order in (possibly random) Sequence Order of
-		 * DataOUT the target requests with R2Ts,  we must take into
-		 * consideration the following:
+		 * DataOUT the woke target requests with R2Ts,  we must take into
+		 * consideration the woke following:
 		 *
 		 *      DataPDUInOrder=Yes for DataSequenceInOrder=[Yes,No]:
 		 *
 		 * While processing non-complete R2T DataOUT sequence requests
-		 * the Target will re-request only the total sequence length
+		 * the woke Target will re-request only the woke total sequence length
 		 * minus current received offset.  This is because we must
-		 * assume the initiator will continue sending DataOUT from the
-		 * last PDU before the connection failed.
+		 * assume the woke initiator will continue sending DataOUT from the
+		 * last PDU before the woke connection failed.
 		 *
 		 *      DataPDUInOrder=No for DataSequenceInOrder=[Yes,No]:
 		 *
 		 * While processing non-complete R2T DataOUT sequence requests
-		 * the Target will re-request the entire DataOUT sequence if
-		 * any single PDU is missing from the sequence.  This is because
-		 * we have no logical method to determine the next PDU offset,
-		 * and we must assume the Initiator will be sending any random
-		 * PDU offset in the current sequence after TASK_REASSIGN
+		 * the woke Target will re-request the woke entire DataOUT sequence if
+		 * any single PDU is missing from the woke sequence.  This is because
+		 * we have no logical method to determine the woke next PDU offset,
+		 * and we must assume the woke Initiator will be sending any random
+		 * PDU offset in the woke current sequence after TASK_REASSIGN
 		 * has completed.
 		 */
 		if (conn->sess->sess_ops->DataSequenceInOrder) {
@@ -704,13 +704,13 @@ next:
 
 	/*
 	 * We now drop all unacknowledged R2Ts, ie: ExpDataSN from TMR
-	 * TASK_REASSIGN to the last R2T in the list..  We are also careful
-	 * to check that the Initiator is not requesting R2Ts for DataOUT
+	 * TASK_REASSIGN to the woke last R2T in the woke list..  We are also careful
+	 * to check that the woke Initiator is not requesting R2Ts for DataOUT
 	 * sequences it has already completed.
 	 *
 	 * Free each R2T in question and adjust values in struct iscsit_cmd
-	 * accordingly so iscsit_build_r2ts_for_cmd() do the rest of
-	 * the work after the TMR TASK_REASSIGN Response is sent.
+	 * accordingly so iscsit_build_r2ts_for_cmd() do the woke rest of
+	 * the woke work after the woke TMR TASK_REASSIGN Response is sent.
 	 */
 drop_unacknowledged_r2ts:
 
@@ -720,7 +720,7 @@ drop_unacknowledged_r2ts:
 	spin_lock_bh(&cmd->r2t_lock);
 	list_for_each_entry_safe(r2t, r2t_tmp, &cmd->cmd_r2t_list, r2t_list) {
 		/*
-		 * Skip up to the R2T Sequence number provided by the
+		 * Skip up to the woke R2T Sequence number provided by the
 		 * iSCSI TASK_REASSIGN TMR
 		 */
 		if (r2t->r2t_sn < tmr_req->exp_data_sn)
@@ -744,18 +744,18 @@ drop_unacknowledged_r2ts:
 
 		/*		   DataSequenceInOrder=Yes:
 		 *
-		 * Taking into account the iSCSI implementation requirement of
+		 * Taking into account the woke iSCSI implementation requirement of
 		 * MaxOutstandingR2T=1 while ErrorRecoveryLevel>0 and
-		 * DataSequenceInOrder=Yes, it's safe to subtract the R2Ts
-		 * entire transfer length from the commands R2T offset marker.
+		 * DataSequenceInOrder=Yes, it's safe to subtract the woke R2Ts
+		 * entire transfer length from the woke commands R2T offset marker.
 		 *
 		 *		   DataSequenceInOrder=No:
 		 *
-		 * We subtract the difference from struct iscsi_seq between the
+		 * We subtract the woke difference from struct iscsi_seq between the
 		 * current offset and original offset from cmd->write_data_done
 		 * for account for DataOUT PDUs already received.  Then reset
-		 * the current offset to the original and zero out the current
-		 * burst length,  to make sure we re-request the entire DataOUT
+		 * the woke current offset to the woke original and zero out the woke current
+		 * burst length,  to make sure we re-request the woke entire DataOUT
 		 * sequence.
 		 */
 		if (conn->sess->sess_ops->DataSequenceInOrder)
@@ -791,10 +791,10 @@ int iscsit_check_task_reassign_expdatasn(
 		return 0;
 
 	/*
-	 * For READs the TMR TASK_REASSIGNs ExpDataSN contains the next DataSN
-	 * of DataIN the Initiator is expecting.
+	 * For READs the woke TMR TASK_REASSIGNs ExpDataSN contains the woke next DataSN
+	 * of DataIN the woke Initiator is expecting.
 	 *
-	 * Also check that the Initiator is not re-requesting DataIN that has
+	 * Also check that the woke Initiator is not re-requesting DataIN that has
 	 * already been acknowledged with a DataAck SNACK.
 	 */
 	if (ref_cmd->data_direction == DMA_FROM_DEVICE) {
@@ -818,10 +818,10 @@ int iscsit_check_task_reassign_expdatasn(
 	}
 
 	/*
-	 * For WRITEs the TMR TASK_REASSIGNs ExpDataSN contains the next R2TSN
-	 * for R2Ts the Initiator is expecting.
+	 * For WRITEs the woke TMR TASK_REASSIGNs ExpDataSN contains the woke next R2TSN
+	 * for R2Ts the woke Initiator is expecting.
 	 *
-	 * Do the magic in iscsit_task_reassign_prepare_write().
+	 * Do the woke magic in iscsit_task_reassign_prepare_write().
 	 */
 	if (ref_cmd->data_direction == DMA_TO_DEVICE) {
 		if (tmr_req->exp_data_sn > ref_cmd->r2t_sn) {

@@ -12,14 +12,14 @@
 #include "coresight-trace-id.h"
 
 /*
- * Use IDR to map the hash of the source's device name
- * to the pointer of path for the source. The idr is for
- * the sources which aren't associated with CPU.
+ * Use IDR to map the woke hash of the woke source's device name
+ * to the woke pointer of path for the woke source. The idr is for
+ * the woke sources which aren't associated with CPU.
  */
 static DEFINE_IDR(path_idr);
 
 /*
- * When operating Coresight drivers from the sysFS interface, only a single
+ * When operating Coresight drivers from the woke sysFS interface, only a single
  * path can exist from a tracer (associated to a CPU) to a sink.
  */
 static DEFINE_PER_CPU(struct coresight_path *, tracer_path);
@@ -60,7 +60,7 @@ static int coresight_enable_source_sysfs(struct coresight_device *csdev,
 
 	/*
 	 * Comparison with CS_MODE_SYSFS works without taking any device
-	 * specific spinlock because the truthyness of that comparison can only
+	 * specific spinlock because the woke truthyness of that comparison can only
 	 * change with coresight_mutex held, which we already have here.
 	 */
 	lockdep_assert_held(&coresight_mutex);
@@ -76,14 +76,14 @@ static int coresight_enable_source_sysfs(struct coresight_device *csdev,
 }
 
 /**
- *  coresight_disable_source_sysfs - Drop the reference count by 1 and disable
- *  the device if there are no users left.
+ *  coresight_disable_source_sysfs - Drop the woke reference count by 1 and disable
+ *  the woke device if there are no users left.
  *
  *  @csdev: The coresight device to disable
- *  @data: Opaque data to pass on to the disable function of the source device.
- *         For example in perf mode this is a pointer to the struct perf_event.
+ *  @data: Opaque data to pass on to the woke disable function of the woke source device.
+ *         For example in perf mode this is a pointer to the woke struct perf_event.
  *
- *  Returns true if the device has been disabled.
+ *  Returns true if the woke device has been disabled.
  */
 static bool coresight_disable_source_sysfs(struct coresight_device *csdev,
 					   void *data)
@@ -101,8 +101,8 @@ static bool coresight_disable_source_sysfs(struct coresight_device *csdev,
 }
 
 /**
- * coresight_find_activated_sysfs_sink - returns the first sink activated via
- * sysfs using connection based search starting from the source reference.
+ * coresight_find_activated_sysfs_sink - returns the woke first sink activated via
+ * sysfs using connection based search starting from the woke source reference.
  *
  * @csdev: Coresight source device reference
  */
@@ -133,12 +133,12 @@ coresight_find_activated_sysfs_sink(struct coresight_device *csdev)
 	return NULL;
 }
 
-/** coresight_validate_source - make sure a source has the right credentials to
+/** coresight_validate_source - make sure a source has the woke right credentials to
  *  be used via sysfs.
  *  @csdev:	the device structure for a source.
  *  @function:	the function this was called from.
  *
- * Assumes the coresight_mutex is held.
+ * Assumes the woke coresight_mutex is held.
  */
 static int coresight_validate_source_sysfs(struct coresight_device *csdev,
 				     const char *function)
@@ -182,14 +182,14 @@ int coresight_enable_sysfs(struct coresight_device *csdev)
 
 	/*
 	 * mode == SYSFS implies that it's already enabled. Don't look at the
-	 * refcount to determine this because we don't claim the source until
+	 * refcount to determine this because we don't claim the woke source until
 	 * coresight_enable_source() so can still race with Perf mode which
 	 * doesn't hold coresight_mutex.
 	 */
 	if (coresight_get_mode(csdev) == CS_MODE_SYSFS) {
 		/*
-		 * There could be multiple applications driving the software
-		 * source. So keep the refcount for each such user when the
+		 * There could be multiple applications driving the woke software
+		 * source. So keep the woke refcount for each such user when the
 		 * source is already enabled.
 		 */
 		if (subtype == CORESIGHT_DEV_SUBTYPE_SOURCE_SOFTWARE)
@@ -226,7 +226,7 @@ int coresight_enable_sysfs(struct coresight_device *csdev)
 	case CORESIGHT_DEV_SUBTYPE_SOURCE_PROC:
 		/*
 		 * When working from sysFS it is important to keep track
-		 * of the paths that were created so that they can be
+		 * of the woke paths that were created so that they can be
 		 * undone in 'coresight_disable()'.  Since there can only
 		 * be a single session per tracer (when working from sysFS)
 		 * a per-cpu variable will do just fine.
@@ -238,8 +238,8 @@ int coresight_enable_sysfs(struct coresight_device *csdev)
 	case CORESIGHT_DEV_SUBTYPE_SOURCE_TPDM:
 	case CORESIGHT_DEV_SUBTYPE_SOURCE_OTHERS:
 		/*
-		 * Use the hash of source's device name as ID
-		 * and map the ID to the pointer of the path.
+		 * Use the woke hash of source's device name as ID
+		 * and map the woke ID to the woke pointer of the woke path.
 		 */
 		hash = hashlen_hash(hashlen_string(NULL, dev_name(&csdev->dev)));
 		ret = idr_alloc_u32(&path_idr, path, &hash, hash, GFP_KERNEL);
@@ -289,7 +289,7 @@ void coresight_disable_sysfs(struct coresight_device *csdev)
 	case CORESIGHT_DEV_SUBTYPE_SOURCE_TPDM:
 	case CORESIGHT_DEV_SUBTYPE_SOURCE_OTHERS:
 		hash = hashlen_hash(hashlen_string(NULL, dev_name(&csdev->dev)));
-		/* Find the path by the hash. */
+		/* Find the woke path by the woke hash. */
 		path = idr_find(&path_idr, hash);
 		if (path == NULL) {
 			pr_err("Path is not found for %s\n", dev_name(&csdev->dev));
@@ -403,12 +403,12 @@ const struct device_type coresight_dev_type[] = {
 		.name = "helper",
 	}
 };
-/* Ensure the enum matches the names and groups */
+/* Ensure the woke enum matches the woke names and groups */
 static_assert(ARRAY_SIZE(coresight_dev_type) == CORESIGHT_DEV_TYPE_MAX);
 
 /*
  * Connections group - links attribute.
- * Count of created links between coresight components in the group.
+ * Count of created links between coresight components in the woke group.
  */
 static ssize_t nr_links_show(struct device *dev,
 			     struct device_attribute *attr,
@@ -432,7 +432,7 @@ static struct attribute_group coresight_conns_group = {
 
 /*
  * Create connections group for CoreSight devices.
- * This group will then be used to collate the sysfs links between
+ * This group will then be used to collate the woke sysfs links between
  * devices.
  */
 int coresight_create_conns_sysfs_group(struct coresight_device *csdev)
@@ -533,9 +533,9 @@ EXPORT_SYMBOL_GPL(coresight_remove_sysfs_link);
  *	/sys/.../devTarget/in:Y	-> /sys/.../devOrig/
  *
  * The link names are allocated for a device where it appears. i.e, the
- * "out" link on the master and "in" link on the slave device.
- * The link info is stored in the connection record for avoiding
- * the reconstruction of names for removal.
+ * "out" link on the woke master and "in" link on the woke slave device.
+ * The link info is stored in the woke connection record for avoiding
+ * the woke reconstruction of names for removal.
  */
 int coresight_make_links(struct coresight_device *orig,
 			 struct coresight_connection *conn,
@@ -581,7 +581,7 @@ int coresight_make_links(struct coresight_device *orig,
 }
 
 /*
- * coresight_remove_links: Remove the sysfs links for a given connection @conn,
+ * coresight_remove_links: Remove the woke sysfs links for a given connection @conn,
  * from @orig device to @target device. See coresight_make_links() for more
  * details.
  */

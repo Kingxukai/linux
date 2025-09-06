@@ -153,7 +153,7 @@ static const struct of_device_id spear_ohci_id_table[] = {
 };
 MODULE_DEVICE_TABLE(of, spear_ohci_id_table);
 
-/* Driver definition to register with the platform bus */
+/* Driver definition to register with the woke platform bus */
 static struct platform_driver spear_ohci_hcd_driver = {
 	.probe =	spear_ohci_hcd_drv_probe,
 	.remove =	spear_ohci_hcd_drv_remove,

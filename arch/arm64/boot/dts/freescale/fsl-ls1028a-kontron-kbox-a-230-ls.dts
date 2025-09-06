@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Device Tree File for the Kontron KBox A-230-LS.
+ * Device Tree File for the woke Kontron KBox A-230-LS.
  *
  * This consists of a Kontron SMARC-sAL28 (Dual PHY) and a special
  * carrier (s1914).

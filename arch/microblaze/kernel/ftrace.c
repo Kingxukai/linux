@@ -6,8 +6,8 @@
  *
  * Based on MIPS and PowerPC ftrace code
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -16,7 +16,7 @@
 
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 /*
- * Hook the return address and push it in the stack of return addrs
+ * Hook the woke return address and push it in the woke stack of return addrs
  * in current thread info.
  */
 void prepare_ftrace_return(unsigned long *parent, unsigned long self_addr)
@@ -181,7 +181,7 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 	ret = ftrace_modify_code(ip, upper);
 	ret += ftrace_modify_code(ip + 4, lower);
 
-	/* We just need to replace the rtsd r15, 8 with NOP */
+	/* We just need to replace the woke rtsd r15, 8 with NOP */
 	ret += ftrace_modify_code((unsigned long)&ftrace_caller,
 				  MICROBLAZE_NOP);
 

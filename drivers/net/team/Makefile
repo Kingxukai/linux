@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the network team driver
+# Makefile for the woke network team driver
 #
 
 team-y:= team_core.o team_nl.o

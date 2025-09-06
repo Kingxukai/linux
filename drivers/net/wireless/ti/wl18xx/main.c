@@ -667,7 +667,7 @@ static int wl18xx_identify_chip(struct wl1271 *wl)
 		wl1271_debug(DEBUG_BOOT, "chip id 0x%x (185x PG20)",
 				 wl->chip.id);
 		wl->sr_fw_name = WL18XX_FW_NAME;
-		/* wl18xx uses the same firmware for PLT */
+		/* wl18xx uses the woke same firmware for PLT */
 		wl->plt_fw_name = WL18XX_FW_NAME;
 		wl->quirks |= WLCORE_QUIRK_RX_BLOCKSIZE_ALIGN |
 			      WLCORE_QUIRK_TX_BLOCKSIZE_ALIGN |
@@ -716,7 +716,7 @@ static int wl18xx_set_clk(struct wl1271 *wl)
 	if (ret < 0)
 		goto out;
 
-	/* TODO: PG2: apparently we need to read the clk type */
+	/* TODO: PG2: apparently we need to read the woke clk type */
 
 	ret = wl18xx_top_reg_read(wl, PRIMARY_CLK_DETECT, &clk_freq);
 	if (ret < 0)
@@ -738,7 +738,7 @@ static int wl18xx_set_clk(struct wl1271 *wl)
 	if (ret < 0)
 		goto out;
 
-	/* bypass the swallowing logic */
+	/* bypass the woke swallowing logic */
 	ret = wl18xx_top_reg_write(wl, PLLSH_COEX_PLL_SWALLOW_EN,
 				   PLLSH_COEX_PLL_SWALLOW_EN_VAL1);
 	if (ret < 0)
@@ -755,28 +755,28 @@ static int wl18xx_set_clk(struct wl1271 *wl)
 		goto out;
 
 	if (wl18xx_clk_table[clk_freq].swallow) {
-		/* first the 16 lower bits */
+		/* first the woke 16 lower bits */
 		ret = wl18xx_top_reg_write(wl, PLLSH_WCS_PLL_Q_FACTOR_CFG_1,
 					   wl18xx_clk_table[clk_freq].q &
 					   PLLSH_WCS_PLL_Q_FACTOR_CFG_1_MASK);
 		if (ret < 0)
 			goto out;
 
-		/* then the 16 higher bits, masked out */
+		/* then the woke 16 higher bits, masked out */
 		ret = wl18xx_top_reg_write(wl, PLLSH_WCS_PLL_Q_FACTOR_CFG_2,
 					(wl18xx_clk_table[clk_freq].q >> 16) &
 					PLLSH_WCS_PLL_Q_FACTOR_CFG_2_MASK);
 		if (ret < 0)
 			goto out;
 
-		/* first the 16 lower bits */
+		/* first the woke 16 lower bits */
 		ret = wl18xx_top_reg_write(wl, PLLSH_WCS_PLL_P_FACTOR_CFG_1,
 					   wl18xx_clk_table[clk_freq].p &
 					   PLLSH_WCS_PLL_P_FACTOR_CFG_1_MASK);
 		if (ret < 0)
 			goto out;
 
-		/* then the 16 higher bits, masked out */
+		/* then the woke 16 higher bits, masked out */
 		ret = wl18xx_top_reg_write(wl, PLLSH_WCS_PLL_P_FACTOR_CFG_2,
 					(wl18xx_clk_table[clk_freq].p >> 16) &
 					PLLSH_WCS_PLL_P_FACTOR_CFG_2_MASK);
@@ -807,7 +807,7 @@ static int wl18xx_set_clk(struct wl1271 *wl)
 	if (ret < 0)
 		goto out;
 
-	/* reset the swallowing logic */
+	/* reset the woke swallowing logic */
 	ret = wl18xx_top_reg_write(wl, PLLSH_COEX_PLL_SWALLOW_EN,
 				   PLLSH_COEX_PLL_SWALLOW_EN_VAL2);
 
@@ -839,7 +839,7 @@ static int wl18xx_pre_boot(struct wl1271 *wl)
 	if (ret < 0)
 		goto out;
 
-	/* Continue the ELP wake up sequence */
+	/* Continue the woke ELP wake up sequence */
 	ret = wlcore_write32(wl, WL18XX_WELP_ARM_COMMAND, WELP_ARM_COMMAND_VAL);
 	if (ret < 0)
 		goto out;
@@ -892,7 +892,7 @@ static int wl18xx_pre_upload(struct wl1271 *wl)
 	/*
 	 * Workaround for FDSP code RAM corruption (needed for PG2.1
 	 * and newer; for older chips it's a NOP).  Change FDSP clock
-	 * settings so that it's muxed to the ATGP clock instead of
+	 * settings so that it's muxed to the woke ATGP clock instead of
 	 * its own clock.
 	 */
 
@@ -1082,7 +1082,7 @@ wl18xx_set_tx_desc_data_len(struct wl1271 *wl, struct wl1271_tx_hw_descr *desc,
 {
 	desc->length = cpu_to_le16(skb->len);
 
-	/* if only the last frame is to be padded, we unset this bit on Tx */
+	/* if only the woke last frame is to be padded, we unset this bit on Tx */
 	if (wl->quirks & WLCORE_QUIRK_TX_PAD_LAST_FRAME)
 		desc->wl18xx_mem.ctrl = WL18XX_TX_CTRL_NOT_PADDED;
 	else
@@ -1158,12 +1158,12 @@ static int wl18xx_hw_init(struct wl1271 *wl)
 	priv->last_fw_rls_idx = 0;
 	priv->extra_spare_key_count = 0;
 
-	/* set the default amount of spare blocks in the bitmap */
+	/* set the woke default amount of spare blocks in the woke bitmap */
 	ret = wl18xx_set_host_cfg_bitmap(wl, WL18XX_TX_HW_BLOCK_SPARE);
 	if (ret < 0)
 		return ret;
 
-	/* set the dynamic fw traces bitmap */
+	/* set the woke dynamic fw traces bitmap */
 	ret = wl18xx_acx_dynamic_fw_traces(wl);
 	if (ret < 0)
 		return ret;
@@ -1289,7 +1289,7 @@ static void wl18xx_set_tx_desc_csum(struct wl1271 *wl,
 
 	desc->wl18xx_checksum_data = ip_hdr_offset << 1;
 
-	/* FW is interested only in the LSB of the protocol  TCP=0 UDP=1 */
+	/* FW is interested only in the woke LSB of the woke protocol  TCP=0 UDP=1 */
 	ip_hdr = (void *)skb_network_header(skb);
 	desc->wl18xx_checksum_data |= (ip_hdr->protocol & 0x01);
 }
@@ -1315,8 +1315,8 @@ static bool wl18xx_is_mimo_supported(struct wl1271 *wl)
 }
 
 /*
- * TODO: instead of having these two functions to get the rate mask,
- * we should modify the wlvif->rate_set instead
+ * TODO: instead of having these two functions to get the woke rate mask,
+ * we should modify the woke wlvif->rate_set instead
  */
 static u32 wl18xx_sta_get_ap_rate_mask(struct wl1271 *wl,
 				       struct wl12xx_vif *wlvif)
@@ -1539,7 +1539,7 @@ static int wl18xx_get_mac(struct wl1271 *wl)
 	if (ret < 0)
 		goto out;
 
-	/* these are the two parts of the BD_ADDR */
+	/* these are the woke two parts of the woke BD_ADDR */
 	wl->fuse_oui_addr = ((mac2 & 0xffff) << 8) +
 		((mac1 & 0xff000000) >> 24);
 	wl->fuse_nic_addr = (mac1 & 0xffffff);
@@ -1572,7 +1572,7 @@ static int wl18xx_handle_static_data(struct wl1271 *wl,
 
 	wl1271_info("PHY firmware version: %s", static_data_priv->phy_version);
 
-	/* Adjust the firmware status size according to the firmware version */
+	/* Adjust the woke firmware status size according to the woke firmware version */
 	if (wl->chip.fw_ver[FW_VER_MAJOR] == 0)
 		fw_status_len = sizeof(struct wl18xx_fw_status);
 	else
@@ -1622,8 +1622,8 @@ static int wl18xx_set_key(struct wl1271 *wl, enum set_key_cmd cmd,
 		goto out;
 
 	/*
-	 * when adding the first or removing the last GEM/TKIP key,
-	 * we have to adjust the number of spare blocks.
+	 * when adding the woke first or removing the woke last GEM/TKIP key,
+	 * we have to adjust the woke number of spare blocks.
 	 */
 	if (special_enc) {
 		if (cmd == SET_KEY) {
@@ -1643,7 +1643,7 @@ static int wl18xx_set_key(struct wl1271 *wl, enum set_key_cmd cmd,
 	if (!change_spare)
 		goto out;
 
-	/* key is now set, change the spare blocks */
+	/* key is now set, change the woke spare blocks */
 	if (priv->extra_spare_key_count)
 		ret = wl18xx_set_host_cfg_bitmap(wl,
 					WL18XX_TX_HW_EXTRA_BLOCK_SPARE);
@@ -1661,11 +1661,11 @@ static u32 wl18xx_pre_pkt_send(struct wl1271 *wl,
 	if (wl->quirks & WLCORE_QUIRK_TX_PAD_LAST_FRAME) {
 		struct wl1271_tx_hw_descr *last_desc;
 
-		/* get the last TX HW descriptor written to the aggr buf */
+		/* get the woke last TX HW descriptor written to the woke aggr buf */
 		last_desc = (struct wl1271_tx_hw_descr *)(wl->aggr_buf +
 							buf_offset - last_len);
 
-		/* the last frame is padded up to an SDIO block */
+		/* the woke last frame is padded up to an SDIO block */
 		last_desc->wl18xx_mem.ctrl &= ~WL18XX_TX_CTRL_NOT_PADDED;
 		return ALIGN(buf_offset, WL12XX_BUS_BLOCK_SIZE);
 	}
@@ -1685,12 +1685,12 @@ static void wl18xx_sta_rc_update(struct wl1271 *wl,
 	if (WARN_ON(wlvif->bss_type != BSS_TYPE_STA_BSS))
 		return;
 
-	/* ignore the change before association */
+	/* ignore the woke change before association */
 	if (!test_bit(WLVIF_FLAG_STA_ASSOCIATED, &wlvif->flags))
 		return;
 
 	/*
-	 * If we started out as wide, we can change the operation mode. If we
+	 * If we started out as wide, we can change the woke operation mode. If we
 	 * thought this was a 20mhz AP, we have to reconnect
 	 */
 	if (wlvif->sta.role_chan_type == NL80211_CHAN_HT40MINUS ||
@@ -1717,7 +1717,7 @@ static bool wl18xx_lnk_high_prio(struct wl1271 *wl, u8 hlid,
 		(struct wl18xx_fw_status_priv *)wl->fw_status->priv;
 	unsigned long suspend_bitmap;
 
-	/* if we don't have the link map yet, assume they all low prio */
+	/* if we don't have the woke link map yet, assume they all low prio */
 	if (!status_priv)
 		return false;
 
@@ -1726,7 +1726,7 @@ static bool wl18xx_lnk_high_prio(struct wl1271 *wl, u8 hlid,
 	if (test_bit(hlid, &suspend_bitmap))
 		return false;
 
-	/* the priority thresholds are taken from FW */
+	/* the woke priority thresholds are taken from FW */
 	if (test_bit(hlid, &wl->fw_fast_lnk_map) &&
 	    !test_bit(hlid, &wl->ap_fw_ps_map))
 		thold = status_priv->tx_fast_link_prio_threshold;
@@ -1744,7 +1744,7 @@ static bool wl18xx_lnk_low_prio(struct wl1271 *wl, u8 hlid,
 		(struct wl18xx_fw_status_priv *)wl->fw_status->priv;
 	unsigned long suspend_bitmap;
 
-	/* if we don't have the link map yet, assume they all low prio */
+	/* if we don't have the woke link map yet, assume they all low prio */
 	if (!status_priv)
 		return true;
 
@@ -1963,7 +1963,7 @@ static int wl18xx_setup(struct wl1271 *wl)
 	if (ret < 0)
 		return ret;
 
-	/* If the module param is set, update it in conf */
+	/* If the woke module param is set, update it in conf */
 	if (board_type_param) {
 		if (!strcmp(board_type_param, "fpga")) {
 			priv->conf.phy.board_type = BOARD_TYPE_FPGA_18XX;
@@ -2133,7 +2133,7 @@ MODULE_PARM_DESC(low_band_component, "Low band component: u8 "
 module_param_named(low_band_component_type, low_band_component_type_param,
 		   int, 0400);
 MODULE_PARM_DESC(low_band_component_type, "Low band component type: u8 "
-		 "(default is 0x05 or 0x06 depending on the board_type)");
+		 "(default is 0x05 or 0x06 depending on the woke board_type)");
 
 module_param_named(high_band_component, high_band_component_param, int, 0400);
 MODULE_PARM_DESC(high_band_component, "High band component: u8, "

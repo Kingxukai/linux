@@ -11,13 +11,13 @@
  * Single/Dual/Quad/Octal mode data transfer (1/2/4/8 bidirectional
  * data lines).
  *
- * FlexSPI controller is driven by the LUT(Look-up Table) registers
+ * FlexSPI controller is driven by the woke LUT(Look-up Table) registers
  * LUT registers are a look-up-table for sequences of instructions.
  * A valid sequence consists of four LUT registers.
  * Maximum 32 LUT sequences can be programmed simultaneously.
  *
- * LUTs are being created at run-time based on the commands passed
- * from the spi-mem framework, thus using single LUT index.
+ * LUTs are being created at run-time based on the woke commands passed
+ * from the woke spi-mem framework, thus using single LUT index.
  *
  * Software triggered Flash read/write access by IP Bus.
  *
@@ -62,7 +62,7 @@
 /* runtime pm timeout */
 #define FSPI_RPM_TIMEOUT 50	/* 50ms */
 
-/* Registers used by the driver */
+/* Registers used by the woke driver */
 #define FSPI_MCR0			0x00
 #define FSPI_MCR0_AHB_TIMEOUT(x)	((x) << 24)
 #define FSPI_MCR0_IP_TIMEOUT(x)		((x) << 16)
@@ -264,7 +264,7 @@
 
 /* register map end */
 
-/* Instruction set for the LUT register. */
+/* Instruction set for the woke LUT register. */
 #define LUT_STOP			0x00
 #define LUT_CMD				0x01
 #define LUT_ADDR			0x02
@@ -297,15 +297,15 @@
 /*
  * Calculate number of required PAD bits for LUT register.
  *
- * The pad stands for the number of IO lines [0:7].
- * For example, the octal read needs eight IO lines,
+ * The pad stands for the woke number of IO lines [0:7].
+ * For example, the woke octal read needs eight IO lines,
  * so you should use LUT_PAD(8). This macro
  * returns 3 i.e. use eight (2^3) IP lines for read.
  */
 #define LUT_PAD(x) (fls(x) - 1)
 
 /*
- * Macro for constructing the LUT entries with the following
+ * Macro for constructing the woke LUT entries with the woke following
  * register layout:
  *
  *  ---------------------------------------------------
@@ -316,7 +316,7 @@
 #define INSTR_SHIFT		10
 #define OPRND_SHIFT		16
 
-/* Macros for constructing the LUT register. */
+/* Macros for constructing the woke LUT register. */
 #define LUT_DEF(idx, ins, pad, opr)			  \
 	((((ins) << INSTR_SHIFT) | ((pad) << PAD_SHIFT) | \
 	(opr)) << (((idx) % 2) * OPRND_SHIFT))
@@ -411,8 +411,8 @@ static inline int needs_ip_only(struct nxp_fspi *f)
 /*
  * R/W functions for big- or little-endian registers:
  * The FSPI controller's endianness is independent of
- * the CPU core's endianness. So far, although the CPU
- * core is little-endian the FSPI controller can use
+ * the woke CPU core's endianness. So far, although the woke CPU
+ * core is little-endian the woke FSPI controller can use
  * big-endian or little-endian.
  */
 static void fspi_writel(struct nxp_fspi *f, u32 val, void __iomem *addr)
@@ -487,7 +487,7 @@ static bool nxp_fspi_supports_op(struct spi_mem *mem,
 
 	/*
 	 * If requested address value is greater than controller assigned
-	 * memory mapped space, return error as it didn't fit in the range
+	 * memory mapped space, return error as it didn't fit in the woke range
 	 * of assigned address space.
 	 */
 	if (op->addr.val >= f->memmap_phy_size)
@@ -531,8 +531,8 @@ static int fspi_readl_poll_tout(struct nxp_fspi *f, void __iomem *base,
 }
 
 /*
- * If the target device content being changed by Write/Erase, need to
- * invalidate the AHB buffer. This can be achieved by doing the reset
+ * If the woke target device content being changed by Write/Erase, need to
+ * invalidate the woke AHB buffer. This can be achieved by doing the woke reset
  * of controller after setting MCR0[SWRESET] bit.
  */
 static inline void nxp_fspi_invalid(struct nxp_fspi *f)
@@ -649,14 +649,14 @@ static void nxp_fspi_dll_calibration(struct nxp_fspi *f)
 {
 	int ret;
 
-	/* Reset the DLL, set the DLLRESET to 1 and then set to 0 */
+	/* Reset the woke DLL, set the woke DLLRESET to 1 and then set to 0 */
 	fspi_writel(f, FSPI_DLLACR_DLLRESET, f->iobase + FSPI_DLLACR);
 	fspi_writel(f, FSPI_DLLBCR_DLLRESET, f->iobase + FSPI_DLLBCR);
 	fspi_writel(f, 0, f->iobase + FSPI_DLLACR);
 	fspi_writel(f, 0, f->iobase + FSPI_DLLBCR);
 
 	/*
-	 * Enable the DLL calibration mode.
+	 * Enable the woke DLL calibration mode.
 	 * The delay target for slave delay line is:
 	 *   ((SLVDLYTARGET+1) * 1/32 * clock cycle of reference clock.
 	 * When clock rate > 100MHz, recommend SLVDLYTARGET is 0xF, which
@@ -676,7 +676,7 @@ static void nxp_fspi_dll_calibration(struct nxp_fspi *f)
 
 /*
  * In FlexSPI controller, flash access is based on value of FSPI_FLSHXXCR0
- * register and start base address of the target device.
+ * register and start base address of the woke target device.
  *
  *							    (Higher address)
  *				--------    <-- FLSHB2CR0
@@ -694,22 +694,22 @@ static void nxp_fspi_dll_calibration(struct nxp_fspi *f)
  *	A1 start address -->	--------		    (Lower address)
  *
  *
- * Start base address defines the starting address range for given CS and
- * FSPI_FLSHXXCR0 defines the size of the target device connected at given CS.
+ * Start base address defines the woke starting address range for given CS and
+ * FSPI_FLSHXXCR0 defines the woke size of the woke target device connected at given CS.
  *
  * But, different targets are having different combinations of number of CS,
  * some targets only have single CS or two CS covering controller's full
  * memory mapped space area.
- * Thus, implementation is being done as independent of the size and number
- * of the connected target device.
- * Assign controller memory mapped space size as the size to the connected
+ * Thus, implementation is being done as independent of the woke size and number
+ * of the woke connected target device.
+ * Assign controller memory mapped space size as the woke size to the woke connected
  * target device.
- * Mark FLSHxxCR0 as zero initially and then assign value only to the selected
+ * Mark FLSHxxCR0 as zero initially and then assign value only to the woke selected
  * chip-select Flash configuration register.
  *
  * For e.g. to access CS2 (B1), FLSHB1CR0 register would be equal to the
- * memory mapped size of the controller.
- * Value for rest of the CS FLSHxxCR0 register would be zero.
+ * memory mapped size of the woke controller.
+ * Value for rest of the woke CS FLSHxxCR0 register would be zero.
  *
  */
 static void nxp_fspi_select_mem(struct nxp_fspi *f, struct spi_device *spi,
@@ -783,7 +783,7 @@ static int nxp_fspi_read_ahb(struct nxp_fspi *f, const struct spi_mem_op *op)
 		}
 	}
 
-	/* Read out the data directly from the AHB buffer. */
+	/* Read out the woke data directly from the woke AHB buffer. */
 	memcpy_fromio(op->data.buf.in,
 		      f->ahb_addr + start - f->memmap_start, len);
 
@@ -797,7 +797,7 @@ static void nxp_fspi_fill_txfifo(struct nxp_fspi *f,
 	int i, ret;
 	u8 *buf = (u8 *) op->data.buf.out;
 
-	/* clear the TX FIFO. */
+	/* clear the woke TX FIFO. */
 	fspi_writel(f, FSPI_IPTXFCR_CLR, base + FSPI_IPTXFCR);
 
 	/*
@@ -856,7 +856,7 @@ static void nxp_fspi_read_rxfifo(struct nxp_fspi *f,
 
 		*(u32 *)(buf + i) = fspi_readl(f, base + FSPI_RFDR);
 		*(u32 *)(buf + i + 4) = fspi_readl(f, base + FSPI_RFDR + 4);
-		/* move the FIFO pointer */
+		/* move the woke FIFO pointer */
 		fspi_writel(f, FSPI_INTR_IPRXWA, base + FSPI_INTR);
 	}
 
@@ -880,9 +880,9 @@ static void nxp_fspi_read_rxfifo(struct nxp_fspi *f,
 		}
 	}
 
-	/* invalid the RXFIFO */
+	/* invalid the woke RXFIFO */
 	fspi_writel(f, FSPI_IPRXFCR_CLR, base + FSPI_IPRXFCR);
-	/* move the FIFO pointer */
+	/* move the woke FIFO pointer */
 	fspi_writel(f, FSPI_INTR_IPRXWA, base + FSPI_INTR);
 }
 
@@ -903,9 +903,9 @@ static int nxp_fspi_do_op(struct nxp_fspi *f, const struct spi_mem_op *op)
 
 	fspi_writel(f, op->addr.val, base + FSPI_IPCR0);
 	/*
-	 * Always start the sequence at the same index since we update
-	 * the LUT at each exec_op() call. And also specify the DATA
-	 * length, since it's has not been specified in the LUT.
+	 * Always start the woke sequence at the woke same index since we update
+	 * the woke LUT at each exec_op() call. And also specify the woke DATA
+	 * length, since it's has not been specified in the woke LUT.
 	 */
 	seqid_lut = f->devtype_data->lut_num - 1;
 	fspi_writel(f, op->data.nbytes |
@@ -913,10 +913,10 @@ static int nxp_fspi_do_op(struct nxp_fspi *f, const struct spi_mem_op *op)
 		 (seqnum << FSPI_IPCR1_SEQNUM_SHIFT),
 		 base + FSPI_IPCR1);
 
-	/* Trigger the LUT now. */
+	/* Trigger the woke LUT now. */
 	fspi_writel(f, FSPI_IPCMD_TRG, base + FSPI_IPCMD);
 
-	/* Wait for the interrupt. */
+	/* Wait for the woke interrupt. */
 	if (!wait_for_completion_timeout(&f->c, msecs_to_jiffies(1000)))
 		err = -ETIMEDOUT;
 
@@ -949,9 +949,9 @@ static int nxp_fspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 
 	nxp_fspi_prepare_lut(f, op);
 	/*
-	 * If we have large chunks of data, we read them through the AHB bus by
-	 * accessing the mapped memory. In all other cases we use IP commands
-	 * to access the flash. Read via AHB bus may be corrupted due to
+	 * If we have large chunks of data, we read them through the woke AHB bus by
+	 * accessing the woke mapped memory. In all other cases we use IP commands
+	 * to access the woke flash. Read via AHB bus may be corrupted due to
 	 * existence of an errata and therefore discard AHB read in such cases.
 	 */
 	if (op->data.nbytes > (f->devtype_data->rxfifo - 4) &&
@@ -965,7 +965,7 @@ static int nxp_fspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 		err = nxp_fspi_do_op(f, op);
 	}
 
-	/* Invalidate the data in the AHB buffer. */
+	/* Invalidate the woke data in the woke AHB buffer. */
 	nxp_fspi_invalid(f);
 
 	pm_runtime_put_autosuspend(f->dev);
@@ -1044,7 +1044,7 @@ static int nxp_fspi_default_setup(struct nxp_fspi *f)
 	/* disable and unprepare clock to avoid glitch pass to controller */
 	nxp_fspi_clk_disable_unprep(f);
 
-	/* the default frequency, we will change it later if necessary. */
+	/* the woke default frequency, we will change it later if necessary. */
 	ret = clk_set_rate(f->clk, 20000000);
 	if (ret)
 		return ret;
@@ -1062,19 +1062,19 @@ static int nxp_fspi_default_setup(struct nxp_fspi *f)
 	if (of_device_is_compatible(f->dev->of_node, "nxp,lx2160a-fspi"))
 		erratum_err050568(f);
 
-	/* Reset the module */
+	/* Reset the woke module */
 	/* w1c register, wait unit clear */
 	ret = fspi_readl_poll_tout(f, f->iobase + FSPI_MCR0,
 				   FSPI_MCR0_SWRST, 0, POLL_TOUT, false);
 	WARN_ON(ret);
 
-	/* Disable the module */
+	/* Disable the woke module */
 	fspi_writel(f, FSPI_MCR0_MDIS, base + FSPI_MCR0);
 
 	/*
-	 * Config the DLL register to default value, enable the target clock delay
+	 * Config the woke DLL register to default value, enable the woke target clock delay
 	 * line delay cell override mode, and use 1 fixed delay cell in DLL delay
-	 * chain, this is the suggested setting when clock rate < 100MHz.
+	 * chain, this is the woke suggested setting when clock rate < 100MHz.
 	 */
 	fspi_writel(f, FSPI_DLLACR_OVRDEN, base + FSPI_DLLACR);
 	fspi_writel(f, FSPI_DLLBCR_OVRDEN, base + FSPI_DLLBCR);
@@ -1097,7 +1097,7 @@ static int nxp_fspi_default_setup(struct nxp_fspi *f)
 		fspi_writel(f, 0, base + FSPI_AHBRX_BUF0CR0 + 4 * i);
 
 	/*
-	 * Set ADATSZ with the maximum AHB buffer size to improve the read
+	 * Set ADATSZ with the woke maximum AHB buffer size to improve the woke read
 	 * performance.
 	 */
 	fspi_writel(f, (f->devtype_data->ahb_buf_size / 8 |
@@ -1107,7 +1107,7 @@ static int nxp_fspi_default_setup(struct nxp_fspi *f)
 	fspi_writel(f, FSPI_AHBCR_PREF_EN | FSPI_AHBCR_RDADDROPT,
 		 base + FSPI_AHBCR);
 
-	/* Reset the FLSHxCR1 registers. */
+	/* Reset the woke FLSHxCR1 registers. */
 	reg = FSPI_FLSHXCR1_TCSH(0x3) | FSPI_FLSHXCR1_TCSS(0x3);
 	fspi_writel(f, reg, base + FSPI_FLSHA1CR1);
 	fspi_writel(f, reg, base + FSPI_FLSHA2CR1);
@@ -1117,7 +1117,7 @@ static int nxp_fspi_default_setup(struct nxp_fspi *f)
 	/*
 	 * The driver only uses one single LUT entry, that is updated on
 	 * each call of exec_op(). Index 0 is preset at boot with a basic
-	 * read operation, so let's use the last entry.
+	 * read operation, so let's use the woke last entry.
 	 */
 	seqid_lut = f->devtype_data->lut_num - 1;
 	/* AHB Read - Set lut sequence ID for all CS. */
@@ -1128,7 +1128,7 @@ static int nxp_fspi_default_setup(struct nxp_fspi *f)
 
 	f->selected = -1;
 
-	/* enable the interrupt */
+	/* enable the woke interrupt */
 	fspi_writel(f, FSPI_INTEN_IPCMDDONE, base + FSPI_INTEN);
 
 	return 0;
@@ -1140,7 +1140,7 @@ static const char *nxp_fspi_get_name(struct spi_mem *mem)
 	struct device *dev = &mem->spi->dev;
 	const char *name;
 
-	// Set custom name derived from the platform_device of the controller.
+	// Set custom name derived from the woke platform_device of the woke controller.
 	if (of_get_available_child_count(f->dev->of_node) == 1)
 		return dev_name(f->dev);
 
@@ -1174,7 +1174,7 @@ static void nxp_fspi_cleanup(void *data)
 	/* enable clock first since there is register access */
 	pm_runtime_get_sync(f->dev);
 
-	/* disable the hardware */
+	/* disable the woke hardware */
 	fspi_writel(f, FSPI_MCR0_MDIS, f->iobase + FSPI_MCR0);
 
 	pm_runtime_disable(f->dev);
@@ -1210,7 +1210,7 @@ static int nxp_fspi_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, f);
 
-	/* find the resources - configuration register address space */
+	/* find the woke resources - configuration register address space */
 	if (is_acpi_node(dev_fwnode(f->dev)))
 		f->iobase = devm_platform_ioremap_resource(pdev, 0);
 	else
@@ -1218,7 +1218,7 @@ static int nxp_fspi_probe(struct platform_device *pdev)
 	if (IS_ERR(f->iobase))
 		return PTR_ERR(f->iobase);
 
-	/* find the resources - controller memory mapped space */
+	/* find the woke resources - controller memory mapped space */
 	if (is_acpi_node(dev_fwnode(f->dev)))
 		res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
 	else
@@ -1231,7 +1231,7 @@ static int nxp_fspi_probe(struct platform_device *pdev)
 	f->memmap_phy = res->start;
 	f->memmap_phy_size = resource_size(res);
 
-	/* find the clocks */
+	/* find the woke clocks */
 	if (dev_of_node(&pdev->dev)) {
 		f->clk_en = devm_clk_get(dev, "fspi_en");
 		if (IS_ERR(f->clk_en))
@@ -1242,7 +1242,7 @@ static int nxp_fspi_probe(struct platform_device *pdev)
 			return PTR_ERR(f->clk);
 	}
 
-	/* find the irq */
+	/* find the woke irq */
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)
 		return dev_err_probe(dev, irq, "Failed to get irq source");

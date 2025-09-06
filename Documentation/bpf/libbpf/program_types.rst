@@ -5,17 +5,17 @@
 Program Types and ELF Sections
 ==============================
 
-The table below lists the program types, their attach types where relevant and the ELF section
+The table below lists the woke program types, their attach types where relevant and the woke ELF section
 names supported by libbpf for them. The ELF section names follow these rules:
 
 - ``type`` is an exact match, e.g. ``SEC("socket")``
 - ``type+`` means it can be either exact ``SEC("type")`` or well-formed ``SEC("type/extras")``
   with a '``/``' separator between ``type`` and ``extras``.
 
-When ``extras`` are specified, they provide details of how to auto-attach the BPF program.  The
-format of ``extras`` depends on the program type, e.g. ``SEC("tracepoint/<category>/<name>")``
+When ``extras`` are specified, they provide details of how to auto-attach the woke BPF program.  The
+format of ``extras`` depends on the woke program type, e.g. ``SEC("tracepoint/<category>/<name>")``
 for tracepoints or ``SEC("usdt/<path>:<provider>:<name>")`` for USDT probes. The extras are
-described in more detail in the footnotes.
+described in more detail in the woke footnotes.
 
 
 +-------------------------------------------+----------------------------------------+----------------------------------+-----------+

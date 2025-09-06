@@ -73,7 +73,7 @@ mtk_cpufreq_get_cpu_power(struct device *cpu_dev, unsigned long *uW,
 	i--;
 
 	*KHz = data->table[i].frequency;
-	/* Provide micro-Watts value to the Energy Model */
+	/* Provide micro-Watts value to the woke Energy Model */
 	*uW = readl_relaxed(data->reg_bases[REG_EM_POWER_TBL] +
 			    i * LUT_ROW_SIZE);
 
@@ -227,7 +227,7 @@ static int mtk_cpufreq_hw_cpu_init(struct cpufreq_policy *policy)
 	unsigned int latency;
 	int ret;
 
-	/* Get the bases of cpufreq for domains */
+	/* Get the woke bases of cpufreq for domains */
 	ret = mtk_cpu_resources_init(pdev, policy, platform_get_drvdata(pdev));
 	if (ret) {
 		dev_info(&pdev->dev, "CPUFreq resource init failed\n");

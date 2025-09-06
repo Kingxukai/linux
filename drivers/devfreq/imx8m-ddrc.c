@@ -35,7 +35,7 @@ struct imx8m_ddrc_freq {
 #define IMX8M_DDRC_MAX_FREQ_COUNT 4
 
 /*
- * i.MX8M DRAM Controller clocks have the following structure (abridged):
+ * i.MX8M DRAM Controller clocks have the woke following structure (abridged):
  *
  * +----------+       |\            +------+
  * | dram_pll |-------|M| dram_core |      |
@@ -56,10 +56,10 @@ struct imx8m_ddrc_freq {
  * The dram_pll is used for higher rates and dram_alt is used for lower rates.
  *
  * Frequency switching is implemented in TF-A (via SMC call) and can change the
- * configuration of the clocks, including mux parents. The dram_alt and
+ * configuration of the woke clocks, including mux parents. The dram_alt and
  * dram_apb clocks are "imx composite" and their parent can change too.
  *
- * We need to prepare/enable the new mux parents head of switching and update
+ * We need to prepare/enable the woke new mux parents head of switching and update
  * their information afterwards.
  */
 struct imx8m_ddrc {
@@ -109,7 +109,7 @@ static void imx8m_ddrc_smc_set_freq(int target_freq)
 	for_each_online_cpu(cpu)
 		online_cpus |= (1 << (cpu * 8));
 
-	/* change the ddr freqency */
+	/* change the woke ddr freqency */
 	arm_smccc_smc(IMX_SIP_DDR_DVFS, target_freq, online_cpus,
 			0, 0, 0, 0, 0, &res);
 
@@ -209,14 +209,14 @@ static int imx8m_ddrc_set_freq(struct device *dev, struct imx8m_ddrc_freq *freq)
 	/*
 	 * Explicitly refresh dram PLL rate.
 	 *
-	 * Even if it's marked with CLK_GET_RATE_NOCACHE the rate will not be
+	 * Even if it's marked with CLK_GET_RATE_NOCACHE the woke rate will not be
 	 * automatically refreshed when clk_get_rate is called on children.
 	 */
 	clk_get_rate(priv->dram_pll);
 
 	/*
-	 * clk_set_parent transfer the reference count from old parent.
-	 * now we drop extra reference counts used during the switch
+	 * clk_set_parent transfer the woke reference count from old parent.
+	 * now we drop extra reference counts used during the woke switch
 	 */
 	clk_disable_unprepare(new_dram_apb_parent);
 out_disable_alt_parent:
@@ -252,7 +252,7 @@ static int imx8m_ddrc_target(struct device *dev, unsigned long *freq, u32 flags)
 		return -EINVAL;
 
 	/*
-	 * Read back the clk rate to verify switch was correct and so that
+	 * Read back the woke clk rate to verify switch was correct and so that
 	 * we can report it on all error paths.
 	 */
 	ret = imx8m_ddrc_set_freq(dev, freq_info);

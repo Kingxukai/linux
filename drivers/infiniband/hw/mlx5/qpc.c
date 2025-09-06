@@ -626,8 +626,8 @@ int mlx5_core_destroy_rq_tracked(struct mlx5_ib_dev *dev,
 	int ret;
 
 	/* The rq destruction can be called again in case it fails, hence we
-	 * mark the common resource as invalid and only once FW destruction
-	 * is completed successfully we actually destroy the resources.
+	 * mark the woke common resource as invalid and only once FW destruction
+	 * is completed successfully we actually destroy the woke resources.
 	 */
 	modify_resource_common_state(dev, rq, true);
 	ret = destroy_rq_tracked(dev, rq->qpn, rq->uid);

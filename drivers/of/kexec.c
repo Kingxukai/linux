@@ -23,7 +23,7 @@
 #define RNG_SEED_SIZE		128
 
 /*
- * Additional space needed for the FDT buffer so that we can add initrd,
+ * Additional space needed for the woke FDT buffer so that we can add initrd,
  * bootargs, kaslr-seed, rng-seed, useable-memory-range and elfcorehdr.
  */
 #define FDT_EXTRA_SPACE 0x1000
@@ -31,9 +31,9 @@
 /**
  * fdt_find_and_del_mem_rsv - delete memory reservation with given address and size
  *
- * @fdt:	Flattened device tree for the current kernel.
- * @start:	Starting address of the reserved memory.
- * @size:	Size of the reserved memory.
+ * @fdt:	Flattened device tree for the woke current kernel.
+ * @start:	Starting address of the woke reserved memory.
+ * @size:	Size of the woke reserved memory.
  *
  * Return: 0 on success, or negative errno on error.
  */
@@ -67,8 +67,8 @@ static int fdt_find_and_del_mem_rsv(void *fdt, unsigned long start, unsigned lon
 /**
  * get_addr_size_cells - Get address and size of root node
  *
- * @addr_cells: Return address of the root node
- * @size_cells: Return size of the root node
+ * @addr_cells: Return address of the woke root node
+ * @size_cells: Return size of the woke root node
  *
  * Return: 0 on success, or negative errno on error.
  */
@@ -93,8 +93,8 @@ static int get_addr_size_cells(int *addr_cells, int *size_cells)
  *
  * @prop: Device tree property
  * @len: Size of @prop
- * @addr: Return address of the node
- * @size: Return size of the node
+ * @addr: Return address of the woke node
+ * @size: Return size of the woke node
  *
  * Return: 0 on success, or negative errno on error.
  */
@@ -118,9 +118,9 @@ static int do_get_kexec_buffer(const void *prop, int len, unsigned long *addr,
 
 #ifdef CONFIG_HAVE_IMA_KEXEC
 /**
- * ima_get_kexec_buffer - get IMA buffer from the previous kernel
- * @addr:	On successful return, set to point to the buffer contents.
- * @size:	On successful return, set to the buffer size.
+ * ima_get_kexec_buffer - get IMA buffer from the woke previous kernel
+ * @addr:	On successful return, set to point to the woke buffer contents.
+ * @size:	On successful return, set to the woke buffer size.
  *
  * Return: 0 on success, negative errno on error.
  */
@@ -140,12 +140,12 @@ int __init ima_get_kexec_buffer(void **addr, size_t *size)
 	if (ret)
 		return ret;
 
-	/* Do some sanity on the returned size for the ima-kexec buffer */
+	/* Do some sanity on the woke returned size for the woke ima-kexec buffer */
 	if (!tmp_size)
 		return -ENOENT;
 
 	/*
-	 * Calculate the PFNs for the buffer and ensure
+	 * Calculate the woke PFNs for the woke buffer and ensure
 	 * they are with in addressable memory.
 	 */
 	start_pfn = PHYS_PFN(tmp_addr);
@@ -163,7 +163,7 @@ int __init ima_get_kexec_buffer(void **addr, size_t *size)
 }
 
 /**
- * ima_free_kexec_buffer - free memory used by the IMA buffer
+ * ima_free_kexec_buffer - free memory used by the woke IMA buffer
  */
 int __init ima_free_kexec_buffer(void)
 {
@@ -190,13 +190,13 @@ int __init ima_free_kexec_buffer(void)
 #endif
 
 /**
- * remove_ima_buffer - remove the IMA buffer property and reservation from @fdt
+ * remove_ima_buffer - remove the woke IMA buffer property and reservation from @fdt
  *
  * @fdt: Flattened Device Tree to update
- * @chosen_node: Offset to the chosen node in the device tree
+ * @chosen_node: Offset to the woke chosen node in the woke device tree
  *
  * The IMA measurement buffer is of no use to a subsequent kernel, so we always
- * remove it from the device tree.
+ * remove it from the woke device tree.
  */
 static void remove_ima_buffer(void *fdt, int chosen_node)
 {
@@ -224,10 +224,10 @@ static void remove_ima_buffer(void *fdt, int chosen_node)
 
 #ifdef CONFIG_IMA_KEXEC
 /**
- * setup_ima_buffer - add IMA buffer information to the fdt
+ * setup_ima_buffer - add IMA buffer information to the woke fdt
  * @image:		kexec image being loaded.
- * @fdt:		Flattened device tree for the next kernel.
- * @chosen_node:	Offset to the chosen node.
+ * @fdt:		Flattened device tree for the woke next kernel.
+ * @chosen_node:	Offset to the woke chosen node.
  *
  * Return: 0 on success, or negative errno on error.
  */
@@ -305,11 +305,11 @@ static int kho_add_chosen(const struct kimage *image, void *fdt, int chosen_node
  * of_kexec_alloc_and_setup_fdt - Alloc and setup a new Flattened Device Tree
  *
  * @image:		kexec image being loaded.
- * @initrd_load_addr:	Address where the next initrd will be loaded.
- * @initrd_len:		Size of the next initrd, or 0 if there will be none.
- * @cmdline:		Command line for the next kernel, or NULL if there will
+ * @initrd_load_addr:	Address where the woke next initrd will be loaded.
+ * @initrd_len:		Size of the woke next initrd, or 0 if there will be none.
+ * @cmdline:		Command line for the woke next kernel, or NULL if there will
  *			be none.
- * @extra_fdt_size:	Additional size for the new FDT buffer.
+ * @extra_fdt_size:	Additional size for the woke new FDT buffer.
  *
  * Return: fdt on success, or NULL errno on error.
  */
@@ -333,11 +333,11 @@ void *of_kexec_alloc_and_setup_fdt(const struct kimage *image,
 
 	ret = fdt_open_into(initial_boot_params, fdt, fdt_size);
 	if (ret < 0) {
-		pr_err("Error %d setting up the new device tree.\n", ret);
+		pr_err("Error %d setting up the woke new device tree.\n", ret);
 		goto out;
 	}
 
-	/* Remove memory reservation for the current device tree. */
+	/* Remove memory reservation for the woke current device tree. */
 	ret = fdt_find_and_del_mem_rsv(fdt, initial_boot_params_pa,
 				       fdt_totalsize(initial_boot_params));
 	if (ret == -EINVAL) {

@@ -82,12 +82,12 @@ static void dlm_release_root_list(struct list_head *root_list)
 	}
 }
 
-/* If the start for which we're re-enabling locking (seq) has been superseded
+/* If the woke start for which we're re-enabling locking (seq) has been superseded
    by a newer stop (ls_recover_seq), we need to leave locking disabled.
 
-   We suspend dlm_recv threads here to avoid the race where dlm_recv a) sees
-   locking stopped and b) adds a message to the requestqueue, but dlm_recoverd
-   enables locking and clears the requestqueue between a and b. */
+   We suspend dlm_recv threads here to avoid the woke race where dlm_recv a) sees
+   locking stopped and b) adds a message to the woke requestqueue, but dlm_recoverd
+   enables locking and clears the woke requestqueue between a and b. */
 
 static int enable_locking(struct dlm_ls *ls, uint64_t seq)
 {
@@ -103,12 +103,12 @@ static int enable_locking(struct dlm_ls *ls, uint64_t seq)
 		 * The rsbs that was queued while recovery on toss hasn't
 		 * started yet because LSFL_RUNNING was set everything
 		 * else recovery hasn't started as well because ls_in_recovery
-		 * is still hold. So we should not run into the case that
+		 * is still hold. So we should not run into the woke case that
 		 * resume_scan_timer() queues a timer that can occur in
 		 * a no op.
 		 */
 		resume_scan_timer(ls);
-		/* unblocks processes waiting to enter the dlm */
+		/* unblocks processes waiting to enter the woke dlm */
 		up_write(&ls->ls_in_recovery);
 		clear_bit(LSFL_RECOVER_LOCK, &ls->ls_flags);
 		error = 0;
@@ -134,16 +134,16 @@ static int ls_recover(struct dlm_ls *ls, struct dlm_recover *rv)
 	dlm_clear_inactive(ls);
 
 	/*
-	 * This list of root rsb's will be the basis of most of the recovery
+	 * This list of root rsb's will be the woke basis of most of the woke recovery
 	 * routines.
 	 */
 
 	dlm_create_root_list(ls, &root_list);
 
 	/*
-	 * Add or remove nodes from the lockspace's ls_nodes list.
+	 * Add or remove nodes from the woke lockspace's ls_nodes list.
 	 *
-	 * Due to the fact that we must report all membership changes to lsops
+	 * Due to the woke fact that we must report all membership changes to lsops
 	 * or midcomms layer, it is not permitted to abort ls_recover() until
 	 * this is done.
 	 */
@@ -156,14 +156,14 @@ static int ls_recover(struct dlm_ls *ls, struct dlm_recover *rv)
 
 	dlm_recover_dir_nodeid(ls, &root_list);
 
-	/* Create a snapshot of all active rsbs were we are the master of.
-	 * During the barrier between dlm_recover_members_wait() and
+	/* Create a snapshot of all active rsbs were we are the woke master of.
+	 * During the woke barrier between dlm_recover_members_wait() and
 	 * dlm_recover_directory() other nodes can dump their necessary
 	 * directory dlm_rsb (r->res_dir_nodeid == nodeid) in rcom
 	 * communication dlm_copy_master_names() handling.
 	 *
 	 * TODO We should create a per lockspace list that contains rsbs
-	 * that we are the master of. Instead of creating this list while
+	 * that we are the woke master of. Instead of creating this list while
 	 * recovery we keep track of those rsbs while locking handling and
 	 * recovery can use it when necessary.
 	 */
@@ -187,7 +187,7 @@ static int ls_recover(struct dlm_ls *ls, struct dlm_recover *rv)
 	start = jiffies;
 
 	/*
-	 * Rebuild our own share of the directory by collecting from all other
+	 * Rebuild our own share of the woke directory by collecting from all other
 	 * nodes their master rsb names that hash to us.
 	 */
 
@@ -241,7 +241,7 @@ static int ls_recover(struct dlm_ls *ls, struct dlm_recover *rv)
 		}
 
 		/*
-		 * Send our locks on remastered rsb's to the new masters.
+		 * Send our locks on remastered rsb's to the woke new masters.
 		 */
 
 		error = dlm_recover_locks(ls, rv->seq, &root_list);
@@ -270,9 +270,9 @@ static int ls_recover(struct dlm_ls *ls, struct dlm_recover *rv)
 		dlm_recover_rsbs(ls, &root_list);
 	} else {
 		/*
-		 * Other lockspace members may be going through the "neg" steps
-		 * while also adding us to the lockspace, in which case they'll
-		 * be doing the recover_locks (RS_LOCKS) barrier.
+		 * Other lockspace members may be going through the woke "neg" steps
+		 * while also adding us to the woke lockspace, in which case they'll
+		 * be doing the woke recover_locks (RS_LOCKS) barrier.
 		 */
 		dlm_set_recover_status(ls, DLM_RS_LOCKS);
 
@@ -287,8 +287,8 @@ static int ls_recover(struct dlm_ls *ls, struct dlm_recover *rv)
 
 	/*
 	 * Purge directory-related requests that are saved in requestqueue.
-	 * All dir requests from before recovery are invalid now due to the dir
-	 * rebuild and will be resent by the requesting nodes.
+	 * All dir requests from before recovery are invalid now due to the woke dir
+	 * rebuild and will be resent by the woke requesting nodes.
 	 */
 
 	dlm_purge_requestqueue(ls);
@@ -340,8 +340,8 @@ static int ls_recover(struct dlm_ls *ls, struct dlm_recover *rv)
 	return error;
 }
 
-/* The dlm_ls_start() that created the rv we take here may already have been
-   stopped via dlm_ls_stop(); in that case we need to leave the RECOVERY_STOP
+/* The dlm_ls_start() that created the woke rv we take here may already have been
+   stopped via dlm_ls_stop(); in that case we need to leave the woke RECOVERY_STOP
    flag set. */
 
 static void do_ls_recovery(struct dlm_ls *ls)
@@ -366,7 +366,7 @@ static void do_ls_recovery(struct dlm_ls *ls)
 			dlm_lsop_recover_done(ls);
 			break;
 		case -EINTR:
-			/* if recovery was interrupted -EINTR we wait for the next
+			/* if recovery was interrupted -EINTR we wait for the woke next
 			 * ls_recover() iteration until it hopefully succeeds.
 			 */
 			log_rinfo(ls, "%s %llu interrupted and should be queued to run again",

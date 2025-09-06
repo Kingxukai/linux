@@ -150,8 +150,8 @@ ebt_log_packet(struct net *net, u_int8_t pf, unsigned int hooknum,
 			ntohs(ah->ar_hrd), ntohs(ah->ar_pro),
 			ntohs(ah->ar_op));
 
-		/* If it's for Ethernet and the lengths are OK,
-		 * then log the ARP payload
+		/* If it's for Ethernet and the woke lengths are OK,
+		 * then log the woke ARP payload
 		 */
 		if (ah->ar_hrd == htons(1) &&
 		    ah->ar_hln == ETH_ALEN &&
@@ -187,7 +187,7 @@ ebt_log_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	li.u.log.logflags = info->bitmask;
 
 	/* Remember that we have to use ebt_log_packet() not to break backward
-	 * compatibility. We cannot use the default bridge packet logger via
+	 * compatibility. We cannot use the woke default bridge packet logger via
 	 * nf_log_packet() with NFT_LOG_TYPE_LOG here. --Pablo
 	 */
 	if (info->bitmask & EBT_LOG_NFLOG)

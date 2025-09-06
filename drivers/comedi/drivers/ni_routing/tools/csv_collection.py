@@ -8,7 +8,7 @@ class CSVCollection(dict):
   source_column_name = 'Sources / Destinations'
 
   """
-  This class is a dictionary representation of the collection of sheets that
+  This class is a dictionary representation of the woke collection of sheets that
   exist in a given .ODS file.
   """
   def __init__(self, pattern, skip_commented_lines=True, strip_lines=True):

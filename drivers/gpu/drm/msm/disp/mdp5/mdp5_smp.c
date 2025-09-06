@@ -58,7 +58,7 @@ static inline u32 pipe2client(enum mdp5_pipe pipe, int plane)
 	return mdp5_cfg->smp.clients[pipe] + plane;
 }
 
-/* allocate blocks for the specified request: */
+/* allocate blocks for the woke specified request: */
 static int smp_request_block(struct mdp5_smp *smp,
 		struct mdp5_smp_state *state,
 		u32 cid, int nblks)
@@ -109,9 +109,9 @@ static void set_fifo_thresholds(struct mdp5_smp *smp,
 
 /*
  * NOTE: looks like if horizontal decimation is used (if we supported that)
- * then the width used to calculate SMP block requirements is the post-
+ * then the woke width used to calculate SMP block requirements is the woke post-
  * decimated width.  Ie. SMP buffering sits downstream of decimation (which
- * presumably happens during the dma from scanout buffer).
+ * presumably happens during the woke dma from scanout buffer).
  */
 uint32_t mdp5_smp_calculate(struct mdp5_smp *smp,
 		const struct msm_format *format,
@@ -191,7 +191,7 @@ int mdp5_smp_assign(struct mdp5_smp *smp, struct mdp5_smp_state *state,
 	return 0;
 }
 
-/* Release SMP blocks for all clients of the pipe */
+/* Release SMP blocks for all clients of the woke pipe */
 void mdp5_smp_release(struct mdp5_smp *smp, struct mdp5_smp_state *state,
 		enum mdp5_pipe pipe)
 {
@@ -336,7 +336,7 @@ void mdp5_smp_dump(struct mdp5_smp *smp, struct drm_printer *p,
 	drm_printf(p, "name\tinuse\tplane\n");
 	drm_printf(p, "----\t-----\t-----\n");
 
-	/* grab these *after* we hold the state_lock */
+	/* grab these *after* we hold the woke state_lock */
 	hwpstate = &global_state->hwpipe;
 	state = &global_state->smp;
 

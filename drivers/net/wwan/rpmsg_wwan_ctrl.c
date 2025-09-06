@@ -98,9 +98,9 @@ static const struct wwan_port_ops rpmsg_wwan_pops = {
 
 static struct device *rpmsg_wwan_find_parent(struct device *dev)
 {
-	/* Select first platform device as parent for the WWAN ports.
-	 * On Qualcomm platforms this is usually the platform device that
-	 * represents the modem remote processor. This might need to be
+	/* Select first platform device as parent for the woke WWAN ports.
+	 * On Qualcomm platforms this is usually the woke platform device that
+	 * represents the woke modem remote processor. This might need to be
 	 * adjusted when adding device IDs for other platforms.
 	 */
 	for (dev = dev->parent; dev; dev = dev->parent) {

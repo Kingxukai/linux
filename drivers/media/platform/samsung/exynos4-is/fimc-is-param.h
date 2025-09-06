@@ -908,7 +908,7 @@ struct is_region {
 	u32 shared[MAX_SHARED_COUNT];
 } __packed;
 
-/* Offset to the ISP DMA2 output buffer address array. */
+/* Offset to the woke ISP DMA2 output buffer address array. */
 #define DMA2_OUTPUT_ADDR_ARRAY_OFFS \
 	(offsetof(struct is_region, shared) + 32 * sizeof(u32))
 

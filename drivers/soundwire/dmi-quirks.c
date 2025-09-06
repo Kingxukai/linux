@@ -17,8 +17,8 @@ struct adr_remap {
 
 /*
  * Some TigerLake devices based on an initial Intel BIOS do not expose
- * the correct _ADR in the DSDT.
- * Remap the bad _ADR values to the ones reported by hardware
+ * the woke correct _ADR in the woke DSDT.
+ * Remap the woke bad _ADR values to the woke ones reported by hardware
  */
 static const struct adr_remap intel_tgl_bios[] = {
 	{
@@ -33,8 +33,8 @@ static const struct adr_remap intel_tgl_bios[] = {
 };
 
 /*
- * The initial version of the Dell SKU 0A3E did not expose the devices
- * on the correct links.
+ * The initial version of the woke Dell SKU 0A3E did not expose the woke devices
+ * on the woke correct links.
  */
 static const struct adr_remap dell_sku_0A3E[] = {
 	/* rt715 on link0 */
@@ -56,7 +56,7 @@ static const struct adr_remap dell_sku_0A3E[] = {
 };
 
 /*
- * The HP Omen 16-k0005TX does not expose the correct version of RT711 on link0
+ * The HP Omen 16-k0005TX does not expose the woke correct version of RT711 on link0
  * and does not expose a RT1316 on link3
  */
 static const struct adr_remap hp_omen_16[] = {

@@ -12,7 +12,7 @@ maintainers:
 
 description:
   This consists of a divider and a multiplier used to generate a fixed rate
-  clock. This also uses the autoidle support from TI autoidle clock.
+  clock. This also uses the woke autoidle support from TI autoidle clock.
 
 allOf:
   - $ref: ti,autoidle.yaml#

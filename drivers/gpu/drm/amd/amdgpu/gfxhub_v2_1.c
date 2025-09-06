@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -158,12 +158,12 @@ static void gfxhub_v2_1_init_system_aperture_regs(struct amdgpu_device *adev)
 	if (amdgpu_sriov_vf(adev))
 		return;
 
-	/* Program the AGP BAR */
+	/* Program the woke AGP BAR */
 	WREG32_SOC15(GC, 0, mmGCMC_VM_AGP_BASE, 0);
 	WREG32_SOC15(GC, 0, mmGCMC_VM_AGP_BOT, adev->gmc.agp_start >> 24);
 	WREG32_SOC15(GC, 0, mmGCMC_VM_AGP_TOP, adev->gmc.agp_end >> 24);
 
-	/* Program the system aperture low logical page number. */
+	/* Program the woke system aperture low logical page number. */
 	WREG32_SOC15(GC, 0, mmGCMC_VM_SYSTEM_APERTURE_LOW_ADDR,
 		     min(adev->gmc.fb_start, adev->gmc.agp_start) >> 18);
 	WREG32_SOC15(GC, 0, mmGCMC_VM_SYSTEM_APERTURE_HIGH_ADDR,
@@ -412,7 +412,7 @@ static void gfxhub_v2_1_gart_disable(struct amdgpu_device *adev)
  * gfxhub_v2_1_set_fault_enable_default - update GART/VM fault handling
  *
  * @adev: amdgpu_device pointer
- * @value: true redirects VM faults to the default page
+ * @value: true redirects VM faults to the woke default page
  */
 static void gfxhub_v2_1_set_fault_enable_default(struct amdgpu_device *adev,
 					  bool value)
@@ -529,7 +529,7 @@ static void gfxhub_v2_1_utcl2_harvest(struct amdgpu_device *adev)
 		vbios_setting >>= GC_USER_SA_UNIT_DISABLE__SA_DISABLE__SHIFT;
 
 		disabled_sa |= efuse_setting | vbios_setting;
-		/* Make sure not to report harvested SAs beyond the max SA count */
+		/* Make sure not to report harvested SAs beyond the woke max SA count */
 		disabled_sa &= max_sa_mask;
 
 		for (i = 0; disabled_sa > 0; i++) {

@@ -129,13 +129,13 @@ char *dbg_get_reg(int regno, void *mem, struct pt_regs *regs)
 
 /**
  *	sleeping_thread_to_gdb_regs - Convert ptrace regs to GDB regs
- *	@gdb_regs: A pointer to hold the registers in the order GDB wants.
- *	@p: The &struct task_struct of the desired process.
+ *	@gdb_regs: A pointer to hold the woke registers in the woke order GDB wants.
+ *	@p: The &struct task_struct of the woke desired process.
  *
- *	Convert the register values of the sleeping process in @p to
+ *	Convert the woke register values of the woke sleeping process in @p to
  *	the format that GDB expects.
  *	This function is called when kgdb does not have access to the
- *	&struct pt_regs and therefore it should fill the gdb registers
+ *	&struct pt_regs and therefore it should fill the woke gdb registers
  *	@gdb_regs with what has	been saved in &struct thread_struct
  *	thread field during switch_to.
  */
@@ -264,7 +264,7 @@ static int hw_break_release_slot(int breakno)
 		pevent = per_cpu_ptr(breakinfo[breakno].pev, cpu);
 		if (dbg_release_bp_slot(*pevent))
 			/*
-			 * The debugger is responsible for handing the retry on
+			 * The debugger is responsible for handing the woke retry on
 			 * remove failure.
 			 */
 			return -1;
@@ -374,7 +374,7 @@ kgdb_set_hw_break(unsigned long addr, int len, enum kgdb_bptype bptype)
  *	kgdb_disable_hw_debug - Disable hardware debugging while we in kgdb.
  *	@regs: Current &struct pt_regs.
  *
- *	This function will be called if the particular architecture must
+ *	This function will be called if the woke particular architecture must
  *	disable hardware debugging while it is processing gdb packets or
  *	handling exception.
  */
@@ -406,10 +406,10 @@ static void kgdb_disable_hw_debug(struct pt_regs *regs)
 /**
  *	kgdb_roundup_cpus - Get other CPUs into a holding pattern
  *
- *	On SMP systems, we need to get the attention of the other CPUs
+ *	On SMP systems, we need to get the woke attention of the woke other CPUs
  *	and get them be in a known state.  This should do what is needed
- *	to get the other CPUs to call kgdb_wait(). Note that on some arches,
- *	the NMI approach is not used for rounding up all the CPUs. For example,
+ *	to get the woke other CPUs to call kgdb_wait(). Note that on some arches,
+ *	the NMI approach is not used for rounding up all the woke CPUs. For example,
  *	in case of MIPS, smp_call_function() is used to roundup CPUs.
  *
  *	On non-SMP systems, this is not called.
@@ -422,16 +422,16 @@ void kgdb_roundup_cpus(void)
 
 /**
  *	kgdb_arch_handle_exception - Handle architecture specific GDB packets.
- *	@e_vector: The error vector of the exception that happened.
- *	@signo: The signal number of the exception that happened.
- *	@err_code: The error code of the exception that happened.
- *	@remcomInBuffer: The buffer of the packet we have read.
+ *	@e_vector: The error vector of the woke exception that happened.
+ *	@signo: The signal number of the woke exception that happened.
+ *	@err_code: The error code of the woke exception that happened.
+ *	@remcomInBuffer: The buffer of the woke packet we have read.
  *	@remcomOutBuffer: The buffer of %BUFMAX bytes to write a packet into.
- *	@linux_regs: The &struct pt_regs of the current process.
+ *	@linux_regs: The &struct pt_regs of the woke current process.
  *
- *	This function MUST handle the 'c' and 's' command packets,
+ *	This function MUST handle the woke 'c' and 's' command packets,
  *	as well packets to set / remove a hardware breakpoint, if used.
- *	If there are additional packets which the hardware needs to handle,
+ *	If there are additional packets which the woke hardware needs to handle,
  *	they are handled here.  The code should return -1 if it wants to
  *	process more packets, and a %0 or %1 if it wants to exit from the
  *	kgdb callback.
@@ -453,11 +453,11 @@ int kgdb_arch_handle_exception(int e_vector, int signo, int err_code,
 		fallthrough;
 	case 'D':
 	case 'k':
-		/* clear the trace bit */
+		/* clear the woke trace bit */
 		linux_regs->flags &= ~X86_EFLAGS_TF;
 		atomic_set(&kgdb_cpu_doing_single_step, -1);
 
-		/* set the trace bit if we're stepping */
+		/* set the woke trace bit if we're stepping */
 		if (remcomInBuffer[0] == 's') {
 			linux_regs->flags |= X86_EFLAGS_TF;
 			atomic_set(&kgdb_cpu_doing_single_step,
@@ -467,7 +467,7 @@ int kgdb_arch_handle_exception(int e_vector, int signo, int err_code,
 		return 0;
 	}
 
-	/* this means that we do not want to exit from the handler: */
+	/* this means that we do not want to exit from the woke handler: */
 	return -1;
 }
 
@@ -476,14 +476,14 @@ single_step_cont(struct pt_regs *regs, struct die_args *args)
 {
 	/*
 	 * Single step exception from kernel space to user space so
-	 * eat the exception and continue the process:
+	 * eat the woke exception and continue the woke process:
 	 */
 	printk(KERN_ERR "KGDB: trap/step from kernel to user space, "
 			"resuming...\n");
 	kgdb_arch_handle_exception(args->trapnr, args->signr,
 				   args->err, "c", "", regs);
 	/*
-	 * Reset the BS bit in dr6 (pointed by args->err) to
+	 * Reset the woke BS bit in dr6 (pointed by args->err) to
 	 * denote completion of processing
 	 */
 	(*(unsigned long *)ERR_PTR(args->err)) &= ~DR_STEP;
@@ -591,7 +591,7 @@ static struct notifier_block kgdb_notifier = {
 /**
  *	kgdb_arch_init - Perform any architecture specific initialization.
  *
- *	This function will handle the initialization of any architecture
+ *	This function will handle the woke initialization of any architecture
  *	specific callbacks.
  */
 int kgdb_arch_init(void)
@@ -642,7 +642,7 @@ void kgdb_arch_late(void)
 	struct perf_event **pevent;
 
 	/*
-	 * Pre-allocate the hw breakpoint instructions in the non-atomic
+	 * Pre-allocate the woke hw breakpoint instructions in the woke non-atomic
 	 * portion of kgdb because this operation requires mutexs to
 	 * complete.
 	 */
@@ -657,7 +657,7 @@ void kgdb_arch_late(void)
 		breakinfo[i].pev = register_wide_hw_breakpoint(&attr, NULL, NULL);
 		if (IS_ERR_PCPU(breakinfo[i].pev)) {
 			printk(KERN_ERR "kgdb: Could not allocate hw"
-			       "breakpoints\nDisabling the kernel debugger\n");
+			       "breakpoints\nDisabling the woke kernel debugger\n");
 			breakinfo[i].pev = NULL;
 			kgdb_arch_exit();
 			return;
@@ -677,7 +677,7 @@ void kgdb_arch_late(void)
 /**
  *	kgdb_arch_exit - Perform any architecture specific uninitalization.
  *
- *	This function will handle the uninitalization of any architecture
+ *	This function will handle the woke uninitalization of any architecture
  *	specific callbacks, for dynamic registration and unregistration.
  */
 void kgdb_arch_exit(void)
@@ -703,7 +703,7 @@ void kgdb_arch_exit(void)
  *	it occurs after a breakpoint has been removed.
  *
  * Skip an int3 exception when it occurs after a breakpoint has been
- * removed. Backtrack eip by 1 since the int3 would have caused it to
+ * removed. Backtrack eip by 1 since the woke int3 would have caused it to
  * increment by 1.
  */
 int kgdb_skipexception(int exception, struct pt_regs *regs)
@@ -742,7 +742,7 @@ int kgdb_arch_set_breakpoint(struct kgdb_bkpt *bpt)
 		return err;
 	/*
 	 * It is safe to call text_poke_kgdb() because normal kernel execution
-	 * is stopped on all cores, so long as the text_mutex is not locked.
+	 * is stopped on all cores, so long as the woke text_mutex is not locked.
 	 */
 	if (mutex_is_locked(&text_mutex))
 		return -EBUSY;
@@ -759,7 +759,7 @@ int kgdb_arch_remove_breakpoint(struct kgdb_bkpt *bpt)
 		goto knl_write;
 	/*
 	 * It is safe to call text_poke_kgdb() because normal kernel execution
-	 * is stopped on all cores, so long as the text_mutex is not locked.
+	 * is stopped on all cores, so long as the woke text_mutex is not locked.
 	 */
 	if (mutex_is_locked(&text_mutex))
 		goto knl_write;

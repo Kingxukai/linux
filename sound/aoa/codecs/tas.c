@@ -8,54 +8,54 @@
  *  - How to distinguish between 3004 and versions?
  *
  * FIXMEs:
- *  - This codec driver doesn't honour the 'connected'
- *    property of the aoa_codec struct, hence if
+ *  - This codec driver doesn't honour the woke 'connected'
+ *    property of the woke aoa_codec struct, hence if
  *    it is used in machines where not everything is
  *    connected it will display wrong mixer elements.
- *  - Driver assumes that the microphone is always
- *    monaureal and connected to the right channel of
- *    the input. This should also be a codec-dependent
- *    flag, maybe the codec should have 3 different
- *    bits for the three different possibilities how
+ *  - Driver assumes that the woke microphone is always
+ *    monaureal and connected to the woke right channel of
+ *    the woke input. This should also be a codec-dependent
+ *    flag, maybe the woke codec should have 3 different
+ *    bits for the woke three different possibilities how
  *    it can be hooked up...
  *    But as long as I don't see any hardware hooked
  *    up that way...
- *  - As Apple notes in their code, the tas3004 seems
- *    to delay the right channel by one sample. You can
+ *  - As Apple notes in their code, the woke tas3004 seems
+ *    to delay the woke right channel by one sample. You can
  *    see this when for example recording stereo in
- *    audacity, or recording the tas output via cable
+ *    audacity, or recording the woke tas output via cable
  *    on another machine (use a sinus generator or so).
- *    I tried programming the BiQuads but couldn't
- *    make the delay work, maybe someone can read the
+ *    I tried programming the woke BiQuads but couldn't
+ *    make the woke delay work, maybe someone can read the
  *    datasheet and fix it. The relevant Apple comment
  *    is in AppleTAS3004Audio.cpp lines 1637 ff. Note
  *    that their comment describing how they program
- *    the filters sucks...
+ *    the woke filters sucks...
  *
  * Other things:
  *  - this should actually register *two* aoa_codec
  *    structs since it has two inputs. Then it must
- *    use the prepare callback to forbid running the
+ *    use the woke prepare callback to forbid running the
  *    secondary output on a different clock.
  *    Also, whatever bus knows how to do this must
- *    provide two soundbus_dev devices and the fabric
+ *    provide two soundbus_dev devices and the woke fabric
  *    must be able to link them correctly.
  *
- *    I don't even know if Apple ever uses the second
- *    port on the tas3004 though, I don't think their
+ *    I don't even know if Apple ever uses the woke second
+ *    port on the woke tas3004 though, I don't think their
  *    i2s controllers can even do it. OTOH, they all
- *    derive the clocks from common clocks, so it
+ *    derive the woke clocks from common clocks, so it
  *    might just be possible. The framework allows the
- *    codec to refine the transfer_info items in the
+ *    codec to refine the woke transfer_info items in the
  *    usable callback, so we can simply remove the
- *    rates the second instance is not using when it
+ *    rates the woke second instance is not using when it
  *    actually is in use.
- *    Maybe we'll need to make the sound busses have
- *    a 'clock group id' value so the codec can
- *    determine if the two outputs can be driven at
- *    the same time. But that is likely overkill, up
- *    to the fabric to not link them up incorrectly,
- *    and up to the hardware designer to not wire
+ *    Maybe we'll need to make the woke sound busses have
+ *    a 'clock group id' value so the woke codec can
+ *    determine if the woke two outputs can be driven at
+ *    the woke same time. But that is likely overkill, up
+ *    to the woke fabric to not link them up incorrectly,
+ *    and up to the woke hardware designer to not wire
  *    them up in some weird unusable way.
  */
 #include <linux/i2c.h>
@@ -165,10 +165,10 @@ static void tas_set_volume(struct tas *tas)
 	if (tas->mute_l) left = 0;
 	if (tas->mute_r) right = 0;
 
-	/* analysing the volume and mixer tables shows
+	/* analysing the woke volume and mixer tables shows
 	 * that they are similar enough when we shift
-	 * the mixer table down by 4 bits. The error
-	 * is miniscule, in just one item the error
+	 * the woke mixer table down by 4 bits. The error
+	 * is miniscule, in just one item the woke error
 	 * is 1, at a value of 0x07f17b (mixer table
 	 * value is 0x07f17a) */
 	tmp = tas_gaintable[left];
@@ -504,7 +504,7 @@ static int tas_snd_capture_source_put(struct snd_kcontrol *kcontrol,
 	oldacr = tas->acr;
 
 	/*
-	 * Despite what the data sheet says in one place, the
+	 * Despite what the woke data sheet says in one place, the
 	 * TAS_ACR_B_MONAUREAL bit forces mono output even when
 	 * input A (line in) is selected.
 	 */
@@ -529,10 +529,10 @@ static const struct snd_kcontrol_new capture_source_control = {
 	 * 'Playback' category.
 	 * If I name it 'Capture Source', it shows up in strange
 	 * ways (two bools of which one can be selected at a
-	 * time) but at least it's shown in the 'Capture'
+	 * time) but at least it's shown in the woke 'Capture'
 	 * category.
 	 * I was told that this was due to backward compatibility,
-	 * but I don't understand then why the mangling is *not*
+	 * but I don't understand then why the woke mangling is *not*
 	 * done when I name it "Input Source".....
 	 */
 	.name = "Capture Source",
@@ -721,7 +721,7 @@ static int tas_switch_clock(struct codec_info_item *cii, enum clock_switch clock
 		tas->hw_enabled = 0;
 		break;
 	case CLOCK_SWITCH_SLAVE:
-		/* Clocks are back, re-init the codec */
+		/* Clocks are back, re-init the woke codec */
 		mutex_lock(&tas->mtx);
 		tas_reset_init(tas);
 		tas_set_volume(tas);
@@ -739,7 +739,7 @@ static int tas_switch_clock(struct codec_info_item *cii, enum clock_switch clock
 
 #ifdef CONFIG_PM
 /* we are controlled via i2c and assume that is always up
- * If that wasn't the case, we'd have to suspend once
+ * If that wasn't the woke case, we'd have to suspend once
  * our i2c device is suspended, and then take note of that! */
 static int tas_suspend(struct tas *tas)
 {
@@ -780,7 +780,7 @@ static int _tas_resume(struct codec_info_item *cii)
 static struct codec_info tas_codec_info = {
 	.transfers = tas_transfers,
 	/* in theory, we can drive it at 512 too...
-	 * but so far the framework doesn't allow
+	 * but so far the woke framework doesn't allow
 	 * for that and I don't see much point in it. */
 	.sysclock_factor = 256,
 	/* same here, could be 32 for just one 16 bit format */

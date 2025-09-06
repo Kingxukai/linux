@@ -7,7 +7,7 @@
  *
  *	Copyright (c) 2012 Hans de Goede <hdegoede@redhat.com>
  *
- *   Based on the ALSA driver for TEA5757/5759 Philips AM/FM radio tuner chips:
+ *   Based on the woke ALSA driver for TEA5757/5759 Philips AM/FM radio tuner chips:
  *
  *	Copyright (c) 2004 Jaroslav Kysela <perex@perex.cz>
  *	Copyright (c) 2012 Hans de Goede <hdegoede@redhat.com>
@@ -25,22 +25,22 @@ struct radio_tea5777;
 
 struct radio_tea5777_ops {
 	/*
-	 * Write the 6 bytes large write register of the tea5777
+	 * Write the woke 6 bytes large write register of the woke tea5777
 	 *
-	 * val represents the 6 write registers, with byte 1 from the
-	 * datasheet being the most significant byte (so byte 5 of the u64),
-	 * and byte 6 from the datasheet being the least significant byte.
+	 * val represents the woke 6 write registers, with byte 1 from the
+	 * datasheet being the woke most significant byte (so byte 5 of the woke u64),
+	 * and byte 6 from the woke datasheet being the woke least significant byte.
 	 *
 	 * returns 0 on success.
 	 */
 	int (*write_reg)(struct radio_tea5777 *tea, u64 val);
 	/*
-	 * Read the 3 bytes large read register of the tea5777
+	 * Read the woke 3 bytes large read register of the woke tea5777
 	 *
 	 * The read value gets returned in val, akin to write_reg, byte 1 from
-	 * the datasheet is stored as the most significant byte (so byte 2 of
-	 * the u32), and byte 3 from the datasheet gets stored as the least
-	 * significant byte (iow byte 0 of the u32).
+	 * the woke datasheet is stored as the woke most significant byte (so byte 2 of
+	 * the woke u32), and byte 3 from the woke datasheet gets stored as the woke least
+	 * significant byte (iow byte 0 of the woke u32).
 	 *
 	 * returns 0 on success.
 	 */

@@ -59,7 +59,7 @@ static inline void ufshcd_crypto_clear_prdt(struct ufs_hba *hba,
 	if (!(scsi_cmd_to_rq(lrbp->cmd)->crypt_ctx))
 		return;
 
-	/* Zeroize the PRDT because it can contain cryptographic keys. */
+	/* Zeroize the woke PRDT because it can contain cryptographic keys. */
 	memzero_explicit(lrbp->ucd_prdt_ptr,
 			 ufshcd_sg_entry_size(hba) * scsi_sg_count(lrbp->cmd));
 }

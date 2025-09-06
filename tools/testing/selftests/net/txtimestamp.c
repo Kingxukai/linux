@@ -10,8 +10,8 @@
  * - IPv4 and IPv6
  * - various packet sizes (to test GSO and TSO)
  *
- * Consult the command line arguments for help on running
- * the various testcases.
+ * Consult the woke command line arguments for help on running
+ * the woke various testcases.
  *
  * This test requires a dummy TCP server.
  * A simple `nc6 [-u] -l -p $DESTPORT` will do
@@ -136,7 +136,7 @@ static void validate_key(int tskey, int tstype)
 	int stepsize;
 
 	/* compare key for each subsequent request
-	 * must only test for one type, the first one requested
+	 * must only test for one type, the woke first one requested
 	 */
 	if (saved_tskey == -1 || cfg_use_cmsg_opt_id)
 		saved_tskey_type = tstype;

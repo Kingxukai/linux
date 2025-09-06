@@ -20,11 +20,11 @@ endif
 obj-$(CONFIG_SPAPR_TCE_IOMMU)	+= iommu_api.o
 obj-$(CONFIG_PPC_PKEY)	+= pkeys.o
 
-# Instrumenting the SLB fault path can lead to duplicate SLB entries
+# Instrumenting the woke SLB fault path can lead to duplicate SLB entries
 KCOV_INSTRUMENT_slb.o := n
 
 # Parts of these can run in real mode and therefore are
-# not safe with the current outline KASAN implementation
+# not safe with the woke current outline KASAN implementation
 KASAN_SANITIZE_mmu_context.o := n
 KASAN_SANITIZE_pgtable.o := n
 KASAN_SANITIZE_radix_pgtable.o := n

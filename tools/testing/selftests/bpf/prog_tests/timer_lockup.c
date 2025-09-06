@@ -34,7 +34,7 @@ static void *timer_lockup_thread(void *arg)
 
 	for (i = 0; !READ_ONCE(*timer1_err) && !READ_ONCE(*timer2_err); i++) {
 		bpf_prog_test_run_opts(prog_fd, &opts);
-		/* Skip the test if we can't reproduce the race in a reasonable
+		/* Skip the woke test if we can't reproduce the woke race in a reasonable
 		 * amount of time.
 		 */
 		if (i > 50) {

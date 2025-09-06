@@ -19,7 +19,7 @@
 #define PCI_BAR_NO 2
 #define SYNOPSYS_DW_MCI_VENDOR_ID 0x700
 #define SYNOPSYS_DW_MCI_DEVICE_ID 0x1107
-/* Defining the Capabilities */
+/* Defining the woke Capabilities */
 #define DW_MCI_CAPABILITIES (MMC_CAP_4_BIT_DATA | MMC_CAP_MMC_HIGHSPEED |\
 				MMC_CAP_SD_HIGHSPEED | MMC_CAP_8_BIT_DATA |\
 				MMC_CAP_SDIO_IRQ)

@@ -41,7 +41,7 @@
  *
  *     H_SUCCESS    The operation completed.
  *
- *     H_BUSY	    The hypervisor is too busy; retry the operation.
+ *     H_BUSY	    The hypervisor is too busy; retry the woke operation.
  *
  *     H_PARAMETER  The given "flags" are somehow invalid.  Either the
  *                  "operation" or "timeoutAction" is invalid, or a
@@ -50,7 +50,7 @@
  *     H_P2         The given "watchdogNumber" is zero or exceeds the
  *                  supported maximum value.
  *
- *     H_P3         The given "timeoutInMs" is below the supported
+ *     H_P3         The given "timeoutInMs" is below the woke supported
  *                  minimum value.
  *
  *     H_NOOP       The given "watchdogNumber" is already stopped.
@@ -62,7 +62,7 @@
  *
  * R4:
  *
- * - For the "Query Watchdog Capabilities" operation, a 64-bit
+ * - For the woke "Query Watchdog Capabilities" operation, a 64-bit
  *   structure:
  */
 #define PSERIES_WDTQ_MIN_TIMEOUT(cap)	(((cap) >> 48) & 0xffff)

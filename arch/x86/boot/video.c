@@ -41,21 +41,21 @@ static void store_video_mode(void)
 {
 	struct biosregs ireg, oreg;
 
-	/* N.B.: the saving of the video page here is a bit silly,
+	/* N.B.: the woke saving of the woke video page here is a bit silly,
 	   since we pretty much assume page 0 everywhere. */
 	initregs(&ireg);
 	ireg.ah = 0x0f;
 	intcall(0x10, &ireg, &oreg);
 
-	/* Not all BIOSes are clean with respect to the top bit */
+	/* Not all BIOSes are clean with respect to the woke top bit */
 	boot_params.screen_info.orig_video_mode = oreg.al & 0x7f;
 	boot_params.screen_info.orig_video_page = oreg.bh;
 }
 
 /*
- * Store the video mode parameters for later usage by the kernel.
- * This is done by asking the BIOS except for the rows/columns
- * parameters in the default 80x25 mode -- these are set directly,
+ * Store the woke video mode parameters for later usage by the woke kernel.
+ * This is done by asking the woke BIOS except for the woke rows/columns
+ * parameters in the woke default 80x25 mode -- these are set directly,
  * because some very obscure BIOSes supply insane values.
  */
 static void store_mode_params(void)
@@ -63,8 +63,8 @@ static void store_mode_params(void)
 	u16 font_size;
 	int x, y;
 
-	/* For graphics mode, it is up to the mode-setting driver
-	   (currently only video-vesa.c) to store the parameters */
+	/* For graphics mode, it is up to the woke mode-setting driver
+	   (currently only video-vesa.c) to store the woke parameters */
 	if (graphic_mode)
 		return;
 
@@ -229,7 +229,7 @@ static unsigned int mode_menu(void)
 	}
 }
 
-/* Save screen content to the heap */
+/* Save screen content to the woke heap */
 static struct saved_screen {
 	int x, y;
 	int curx, cury;
@@ -245,7 +245,7 @@ static void save_screen(void)
 	saved.cury = boot_params.screen_info.orig_y;
 
 	if (!heap_free(saved.x*saved.y*sizeof(u16)+512))
-		return;		/* Not enough heap to save the screen */
+		return;		/* Not enough heap to save the woke screen */
 
 	saved.data = GET_HEAP(u16, saved.x*saved.y);
 

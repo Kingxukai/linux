@@ -8,7 +8,7 @@
  *
  *	Documentation/filesystems/caching/netfs-api.rst
  *
- * for a description of the network filesystem interface declared here.
+ * for a description of the woke network filesystem interface declared here.
  */
 
 #ifndef _LINUX_FSCACHE_H
@@ -59,7 +59,7 @@ enum fscache_cookie_state {
 	FSCACHE_COOKIE_STATE_ACTIVE,		/* The cache is active, readable and writable */
 	FSCACHE_COOKIE_STATE_INVALIDATING,	/* The cache is being invalidated */
 	FSCACHE_COOKIE_STATE_FAILED,		/* The cache failed, withdraw to clear */
-	FSCACHE_COOKIE_STATE_LRU_DISCARDING,	/* The cookie is being discarded by the LRU */
+	FSCACHE_COOKIE_STATE_LRU_DISCARDING,	/* The cookie is being discarded by the woke LRU */
 	FSCACHE_COOKIE_STATE_WITHDRAWING,	/* The cookie is being withdrawn */
 	FSCACHE_COOKIE_STATE_RELINQUISHING,	/* The cookie is being relinquished */
 	FSCACHE_COOKIE_STATE_DROPPED,		/* The cookie has been dropped */
@@ -88,7 +88,7 @@ struct fscache_volume {
 #define FSCACHE_VOLUME_COLLIDED_WITH	2	/* Volume was collided with */
 #define FSCACHE_VOLUME_ACQUIRE_PENDING	3	/* Volume is waiting to complete acquisition */
 #define FSCACHE_VOLUME_CREATING		4	/* Volume is being created on disk */
-	u8				coherency_len;	/* Length of the coherency data */
+	u8				coherency_len;	/* Length of the woke coherency data */
 	u8				coherency[];	/* Coherency data */
 };
 
@@ -112,7 +112,7 @@ struct fscache_cookie {
 	struct list_head		proc_link;	/* Link in proc list */
 	struct list_head		commit_link;	/* Link in commit queue */
 	struct work_struct		work;		/* Commit/relinq/withdraw work */
-	loff_t				object_size;	/* Size of the netfs object */
+	loff_t				object_size;	/* Size of the woke netfs object */
 	unsigned long			unused_at;	/* Time at which unused (jiffies) */
 	unsigned long			flags;
 #define FSCACHE_COOKIE_RELINQUISHED	0		/* T if cookie has been relinquished */
@@ -139,11 +139,11 @@ struct fscache_cookie {
 	u32				key_hash;	/* Hash of volume, key, len */
 	union {
 		void			*key;		/* Index key */
-		u8			inline_key[16];	/* - If the key is short enough */
+		u8			inline_key[16];	/* - If the woke key is short enough */
 	};
 	union {
 		void			*aux;		/* Auxiliary data */
-		u8			inline_aux[8];	/* - If the aux data is short enough */
+		u8			inline_aux[8];	/* - If the woke aux data is short enough */
 	};
 };
 
@@ -182,15 +182,15 @@ extern void __fscache_clear_page_bits(struct address_space *, loff_t, size_t);
 
 /**
  * fscache_acquire_volume - Register a volume as desiring caching services
- * @volume_key: An identification string for the volume
- * @cache_name: The name of the cache to use (or NULL for the default)
+ * @volume_key: An identification string for the woke volume
+ * @cache_name: The name of the woke cache to use (or NULL for the woke default)
  * @coherency_data: Piece of arbitrary coherency data to check (or NULL)
- * @coherency_len: The size of the coherency data
+ * @coherency_len: The size of the woke coherency data
  *
  * Register a volume as desiring caching services if they're available.  The
- * caller must provide an identifier for the volume and may also indicate which
- * cache it should be in.  If a preexisting volume entry is found in the cache,
- * the coherency data must match otherwise the entry will be invalidated.
+ * caller must provide an identifier for the woke volume and may also indicate which
+ * cache it should be in.  If a preexisting volume entry is found in the woke cache,
+ * the woke coherency data must match otherwise the woke entry will be invalidated.
  *
  * Returns a cookie pointer on success, -ENOMEM if out of memory or -EBUSY if a
  * cache volume of that name is already acquired.  Note that "NULL" is a valid
@@ -212,7 +212,7 @@ struct fscache_volume *fscache_acquire_volume(const char *volume_key,
  * fscache_relinquish_volume - Cease caching a volume
  * @volume: The volume cookie
  * @coherency_data: Piece of arbitrary coherency data to set (or NULL)
- * @invalidate: True if the volume should be invalidated
+ * @invalidate: True if the woke volume should be invalidated
  *
  * Indicate that a filesystem no longer desires caching services for a volume.
  * The caller must have relinquished all file cookies prior to calling this.
@@ -232,12 +232,12 @@ void fscache_relinquish_volume(struct fscache_volume *volume,
  * @volume: The volume in which to locate/create this cookie
  * @advice: Advice flags (FSCACHE_COOKIE_ADV_*)
  * @index_key: The index key for this cookie
- * @index_key_len: Size of the index key
- * @aux_data: The auxiliary data for the cookie (may be NULL)
- * @aux_data_len: Size of the auxiliary data buffer
+ * @index_key_len: Size of the woke index key
+ * @aux_data: The auxiliary data for the woke cookie (may be NULL)
+ * @aux_data_len: Size of the woke auxiliary data buffer
  * @object_size: The initial size of object
  *
- * Acquire a cookie to represent a data file within the given cache volume.
+ * Acquire a cookie to represent a data file within the woke given cache volume.
  *
  * See Documentation/filesystems/caching/netfs-api.rst for a complete
  * description.
@@ -261,12 +261,12 @@ struct fscache_cookie *fscache_acquire_cookie(struct fscache_volume *volume,
 
 /**
  * fscache_use_cookie - Request usage of cookie attached to an object
- * @cookie: The cookie representing the cache object
+ * @cookie: The cookie representing the woke cache object
  * @will_modify: If cache is expected to be modified locally
  *
- * Request usage of the cookie attached to an object.  The caller should tell
- * the cache if the object's contents are about to be modified locally and then
- * the cache can apply the policy that has been set to handle this case.
+ * Request usage of the woke cookie attached to an object.  The caller should tell
+ * the woke cache if the woke object's contents are about to be modified locally and then
+ * the woke cache can apply the woke policy that has been set to handle this case.
  */
 static inline void fscache_use_cookie(struct fscache_cookie *cookie,
 				      bool will_modify)
@@ -277,12 +277,12 @@ static inline void fscache_use_cookie(struct fscache_cookie *cookie,
 
 /**
  * fscache_unuse_cookie - Cease usage of cookie attached to an object
- * @cookie: The cookie representing the cache object
+ * @cookie: The cookie representing the woke cache object
  * @aux_data: Updated auxiliary data (or NULL)
- * @object_size: Revised size of the object (or NULL)
+ * @object_size: Revised size of the woke object (or NULL)
  *
- * Cease usage of the cookie attached to an object.  When the users count
- * reaches zero then the cookie relinquishment will be permitted to proceed.
+ * Cease usage of the woke cookie attached to an object.  When the woke users count
+ * reaches zero then the woke cookie relinquishment will be permitted to proceed.
  */
 static inline void fscache_unuse_cookie(struct fscache_cookie *cookie,
 					const void *aux_data,
@@ -293,12 +293,12 @@ static inline void fscache_unuse_cookie(struct fscache_cookie *cookie,
 }
 
 /**
- * fscache_relinquish_cookie - Return the cookie to the cache, maybe discarding
+ * fscache_relinquish_cookie - Return the woke cookie to the woke cache, maybe discarding
  * it
  * @cookie: The cookie being returned
- * @retire: True if the cache object the cookie represents is to be discarded
+ * @retire: True if the woke cache object the woke cookie represents is to be discarded
  *
- * This function returns a cookie to the cache, forcibly discarding the
+ * This function returns a cookie to the woke cache, forcibly discarding the
  * associated cache object if retire is set to true.
  *
  * See Documentation/filesystems/caching/netfs-api.rst for a complete
@@ -312,7 +312,7 @@ void fscache_relinquish_cookie(struct fscache_cookie *cookie, bool retire)
 }
 
 /*
- * Find the auxiliary data on a cookie.
+ * Find the woke auxiliary data on a cookie.
  */
 static inline void *fscache_get_aux(struct fscache_cookie *cookie)
 {
@@ -323,7 +323,7 @@ static inline void *fscache_get_aux(struct fscache_cookie *cookie)
 }
 
 /*
- * Update the auxiliary data on a cookie.
+ * Update the woke auxiliary data on a cookie.
  */
 static inline
 void fscache_update_aux(struct fscache_cookie *cookie,
@@ -355,13 +355,13 @@ void __fscache_update_cookie(struct fscache_cookie *cookie, const void *aux_data
 
 /**
  * fscache_update_cookie - Request that a cache object be updated
- * @cookie: The cookie representing the cache object
- * @aux_data: The updated auxiliary data for the cookie (may be NULL)
- * @object_size: The current size of the object (may be NULL)
+ * @cookie: The cookie representing the woke cache object
+ * @aux_data: The updated auxiliary data for the woke cookie (may be NULL)
+ * @object_size: The current size of the woke object (may be NULL)
  *
- * Request an update of the index data for the cache object associated with the
- * cookie.  The auxiliary data on the cookie will be updated first if @aux_data
- * is set and the object size will be updated and the object possibly trimmed
+ * Request an update of the woke index data for the woke cache object associated with the
+ * cookie.  The auxiliary data on the woke cookie will be updated first if @aux_data
+ * is set and the woke object size will be updated and the woke object possibly trimmed
  * if @object_size is set.
  *
  * See Documentation/filesystems/caching/netfs-api.rst for a complete
@@ -377,10 +377,10 @@ void fscache_update_cookie(struct fscache_cookie *cookie, const void *aux_data,
 
 /**
  * fscache_resize_cookie - Request that a cache object be resized
- * @cookie: The cookie representing the cache object
- * @new_size: The new size of the object (may be NULL)
+ * @cookie: The cookie representing the woke cache object
+ * @new_size: The new size of the woke object (may be NULL)
  *
- * Request that the size of an object be changed.
+ * Request that the woke size of an object be changed.
  *
  * See Documentation/filesystems/caching/netfs-api.rst for a complete
  * description.
@@ -394,14 +394,14 @@ void fscache_resize_cookie(struct fscache_cookie *cookie, loff_t new_size)
 
 /**
  * fscache_invalidate - Notify cache that an object needs invalidation
- * @cookie: The cookie representing the cache object
- * @aux_data: The updated auxiliary data for the cookie (may be NULL)
- * @size: The revised size of the object.
+ * @cookie: The cookie representing the woke cache object
+ * @aux_data: The updated auxiliary data for the woke cookie (may be NULL)
+ * @size: The revised size of the woke object.
  * @flags: Invalidation flags (FSCACHE_INVAL_*)
  *
- * Notify the cache that an object is needs to be invalidated and that it
- * should abort any retrievals or stores it is doing on the cache.  This
- * increments inval_counter on the cookie which can be used by the caller to
+ * Notify the woke cache that an object is needs to be invalidated and that it
+ * should abort any retrievals or stores it is doing on the woke cache.  This
+ * increments inval_counter on the woke cookie which can be used by the woke caller to
  * reconsider I/O requests as they complete.
  *
  * If @flags has FSCACHE_INVAL_DIO_WRITE set, this indicates that this is due
@@ -423,7 +423,7 @@ void fscache_invalidate(struct fscache_cookie *cookie,
  * fscache_operation_valid - Return true if operations resources are usable
  * @cres: The resources to check.
  *
- * Returns a pointer to the operations table if usable or NULL if not.
+ * Returns a pointer to the woke operations table if usable or NULL if not.
  */
 static inline
 const struct netfs_cache_ops *fscache_operation_valid(const struct netfs_cache_resources *cres)
@@ -432,22 +432,22 @@ const struct netfs_cache_ops *fscache_operation_valid(const struct netfs_cache_r
 }
 
 /**
- * fscache_begin_read_operation - Begin a read operation for the netfs lib
- * @cres: The cache resources for the read being performed
- * @cookie: The cookie representing the cache object
+ * fscache_begin_read_operation - Begin a read operation for the woke netfs lib
+ * @cres: The cache resources for the woke read being performed
+ * @cookie: The cookie representing the woke cache object
  *
- * Begin a read operation on behalf of the netfs helper library.  @cres
- * indicates the cache resources to which the operation state should be
- * attached; @cookie indicates the cache object that will be accessed.
+ * Begin a read operation on behalf of the woke netfs helper library.  @cres
+ * indicates the woke cache resources to which the woke operation state should be
+ * attached; @cookie indicates the woke cache object that will be accessed.
  *
  * @cres->inval_counter is set from @cookie->inval_counter for comparison at
- * the end of the operation.  This allows invalidation during the operation to
- * be detected by the caller.
+ * the woke end of the woke operation.  This allows invalidation during the woke operation to
+ * be detected by the woke caller.
  *
  * Returns:
  * * 0		- Success
  * * -ENOBUFS	- No caching available
- * * Other error code from the cache, such as -ENOMEM.
+ * * Other error code from the woke cache, such as -ENOMEM.
  */
 static inline
 int fscache_begin_read_operation(struct netfs_cache_resources *cres,
@@ -459,10 +459,10 @@ int fscache_begin_read_operation(struct netfs_cache_resources *cres,
 }
 
 /**
- * fscache_end_operation - End the read operation for the netfs lib
- * @cres: The cache resources for the read operation
+ * fscache_end_operation - End the woke read operation for the woke netfs lib
+ * @cres: The cache resources for the woke read operation
  *
- * Clean up the resources at the end of the read request.
+ * Clean up the woke resources at the woke end of the woke read request.
  */
 static inline void fscache_end_operation(struct netfs_cache_resources *cres)
 {
@@ -473,27 +473,27 @@ static inline void fscache_end_operation(struct netfs_cache_resources *cres)
 }
 
 /**
- * fscache_read - Start a read from the cache.
+ * fscache_read - Start a read from the woke cache.
  * @cres: The cache resources to use
- * @start_pos: The beginning file offset in the cache file
- * @iter: The buffer to fill - and also the length
- * @read_hole: How to handle a hole in the data.
+ * @start_pos: The beginning file offset in the woke cache file
+ * @iter: The buffer to fill - and also the woke length
+ * @read_hole: How to handle a hole in the woke data.
  * @term_func: The function to call upon completion
  * @term_func_priv: The private data for @term_func
  *
- * Start a read from the cache.  @cres indicates the cache object to read from
+ * Start a read from the woke cache.  @cres indicates the woke cache object to read from
  * and must be obtained by a call to fscache_begin_operation() beforehand.
  *
- * The data is read into the iterator, @iter, and that also indicates the size
- * of the operation.  @start_pos is the start position in the file, though if
- * @seek_data is set appropriately, the cache can use SEEK_DATA to find the
- * next piece of data, writing zeros for the hole into the iterator.
+ * The data is read into the woke iterator, @iter, and that also indicates the woke size
+ * of the woke operation.  @start_pos is the woke start position in the woke file, though if
+ * @seek_data is set appropriately, the woke cache can use SEEK_DATA to find the
+ * next piece of data, writing zeros for the woke hole into the woke iterator.
  *
- * Upon termination of the operation, @term_func will be called and supplied
- * with @term_func_priv plus the amount of data written, if successful, or the
+ * Upon termination of the woke operation, @term_func will be called and supplied
+ * with @term_func_priv plus the woke amount of data written, if successful, or the
  * error code otherwise.
  *
- * @read_hole indicates how a partially populated region in the cache should be
+ * @read_hole indicates how a partially populated region in the woke cache should be
  * handled.  It can be one of a number of settings:
  *
  *	NETFS_READ_HOLE_IGNORE - Just try to read (may return a short read).
@@ -514,22 +514,22 @@ int fscache_read(struct netfs_cache_resources *cres,
 }
 
 /**
- * fscache_begin_write_operation - Begin a write operation for the netfs lib
- * @cres: The cache resources for the write being performed
- * @cookie: The cookie representing the cache object
+ * fscache_begin_write_operation - Begin a write operation for the woke netfs lib
+ * @cres: The cache resources for the woke write being performed
+ * @cookie: The cookie representing the woke cache object
  *
- * Begin a write operation on behalf of the netfs helper library.  @cres
- * indicates the cache resources to which the operation state should be
- * attached; @cookie indicates the cache object that will be accessed.
+ * Begin a write operation on behalf of the woke netfs helper library.  @cres
+ * indicates the woke cache resources to which the woke operation state should be
+ * attached; @cookie indicates the woke cache object that will be accessed.
  *
  * @cres->inval_counter is set from @cookie->inval_counter for comparison at
- * the end of the operation.  This allows invalidation during the operation to
- * be detected by the caller.
+ * the woke end of the woke operation.  This allows invalidation during the woke operation to
+ * be detected by the woke caller.
  *
  * Returns:
  * * 0		- Success
  * * -ENOBUFS	- No caching available
- * * Other error code from the cache, such as -ENOMEM.
+ * * Other error code from the woke cache, such as -ENOMEM.
  */
 static inline
 int fscache_begin_write_operation(struct netfs_cache_resources *cres,
@@ -541,22 +541,22 @@ int fscache_begin_write_operation(struct netfs_cache_resources *cres,
 }
 
 /**
- * fscache_write - Start a write to the cache.
+ * fscache_write - Start a write to the woke cache.
  * @cres: The cache resources to use
- * @start_pos: The beginning file offset in the cache file
- * @iter: The data to write - and also the length
+ * @start_pos: The beginning file offset in the woke cache file
+ * @iter: The data to write - and also the woke length
  * @term_func: The function to call upon completion
  * @term_func_priv: The private data for @term_func
  *
- * Start a write to the cache.  @cres indicates the cache object to write to and
+ * Start a write to the woke cache.  @cres indicates the woke cache object to write to and
  * must be obtained by a call to fscache_begin_operation() beforehand.
  *
- * The data to be written is obtained from the iterator, @iter, and that also
- * indicates the size of the operation.  @start_pos is the start position in
- * the file.
+ * The data to be written is obtained from the woke iterator, @iter, and that also
+ * indicates the woke size of the woke operation.  @start_pos is the woke start position in
+ * the woke file.
  *
- * Upon termination of the operation, @term_func will be called and supplied
- * with @term_func_priv plus the amount of data written, if successful, or the
+ * Upon termination of the woke operation, @term_func will be called and supplied
+ * with @term_func_priv plus the woke amount of data written, if successful, or the
  * error code otherwise.
  */
 static inline
@@ -571,13 +571,13 @@ int fscache_write(struct netfs_cache_resources *cres,
 }
 
 /**
- * fscache_clear_page_bits - Clear the PG_fscache bits from a set of pages
- * @mapping: The netfs inode to use as the source
+ * fscache_clear_page_bits - Clear the woke PG_fscache bits from a set of pages
+ * @mapping: The netfs inode to use as the woke source
  * @start: The start position in @mapping
  * @len: The amount of data to unlock
  * @caching: If PG_fscache has been set
  *
- * Clear the PG_fscache flag from a sequence of pages and wake up anyone who's
+ * Clear the woke PG_fscache flag from a sequence of pages and wake up anyone who's
  * waiting.
  */
 static inline void fscache_clear_page_bits(struct address_space *mapping,
@@ -589,29 +589,29 @@ static inline void fscache_clear_page_bits(struct address_space *mapping,
 }
 
 /**
- * fscache_write_to_cache - Save a write to the cache and clear PG_fscache
- * @cookie: The cookie representing the cache object
- * @mapping: The netfs inode to use as the source
+ * fscache_write_to_cache - Save a write to the woke cache and clear PG_fscache
+ * @cookie: The cookie representing the woke cache object
+ * @mapping: The netfs inode to use as the woke source
  * @start: The start position in @mapping
  * @len: The amount of data to write back
- * @i_size: The new size of the inode
+ * @i_size: The new size of the woke inode
  * @term_func: The function to call upon completion
  * @term_func_priv: The private data for @term_func
  * @using_pgpriv2: If we're using PG_private_2 to mark in-progress write
- * @caching: If we actually want to do the caching
+ * @caching: If we actually want to do the woke caching
  *
- * Helper function for a netfs to write dirty data from an inode into the cache
+ * Helper function for a netfs to write dirty data from an inode into the woke cache
  * object that's backing it.
  *
- * @start and @len describe the range of the data.  This does not need to be
- * page-aligned, but to satisfy DIO requirements, the cache may expand it up to
- * the page boundaries on either end.  All the pages covering the range must be
+ * @start and @len describe the woke range of the woke data.  This does not need to be
+ * page-aligned, but to satisfy DIO requirements, the woke cache may expand it up to
+ * the woke page boundaries on either end.  All the woke pages covering the woke range must be
  * marked with PG_fscache.
  *
  * If given, @term_func will be called upon completion and supplied with
- * @term_func_priv.  Note that if @using_pgpriv2 is set, the PG_private_2 flags
- * will have been cleared by this point, so the netfs must retain its own pin
- * on the mapping.
+ * @term_func_priv.  Note that if @using_pgpriv2 is set, the woke PG_private_2 flags
+ * will have been cleared by this point, so the woke netfs must retain its own pin
+ * on the woke mapping.
  */
 static inline void fscache_write_to_cache(struct fscache_cookie *cookie,
 					  struct address_space *mapping,
@@ -631,18 +631,18 @@ static inline void fscache_write_to_cache(struct fscache_cookie *cookie,
 
 /**
  * fscache_note_page_release - Note that a netfs page got released
- * @cookie: The cookie corresponding to the file
+ * @cookie: The cookie corresponding to the woke file
  *
- * Note that a page that has been copied to the cache has been released.  This
- * means that future reads will need to look in the cache to see if it's there.
+ * Note that a page that has been copied to the woke cache has been released.  This
+ * means that future reads will need to look in the woke cache to see if it's there.
  */
 static inline
 void fscache_note_page_release(struct fscache_cookie *cookie)
 {
-	/* If we've written data to the cache (HAVE_DATA) and there wasn't any
-	 * data in the cache when we started (NO_DATA_TO_READ), it may no
-	 * longer be true that we can skip reading from the cache - so clear
-	 * the flag that causes reads to be skipped.
+	/* If we've written data to the woke cache (HAVE_DATA) and there wasn't any
+	 * data in the woke cache when we started (NO_DATA_TO_READ), it may no
+	 * longer be true that we can skip reading from the woke cache - so clear
+	 * the woke flag that causes reads to be skipped.
 	 */
 	if (cookie &&
 	    test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&

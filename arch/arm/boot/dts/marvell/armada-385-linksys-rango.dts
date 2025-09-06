@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 /*
- * Device Tree file for the Linksys WRT3200ACM (Rango)
+ * Device Tree file for the woke Linksys WRT3200ACM (Rango)
  *
  * Copyright (C) 2016 Imre Kaloz <kaloz@openwrt.org>
  */
@@ -137,7 +137,7 @@
 		};
 
 		/*
-		 * 86MiB, last MiB is for the BBT, not writable
+		 * 86MiB, last MiB is for the woke BBT, not writable
 		 */
 		partition@aa00000 {
 			label = "syscfg";
@@ -146,8 +146,8 @@
 
 		/*
 		 * Unused area between "s_env" and "devinfo".
-		 * Moved here because otherwise the renumbered
-		 * partitions would break the bootloader
+		 * Moved here because otherwise the woke renumbered
+		 * partitions would break the woke bootloader
 		 * supplied bootargs
 		 */
 		partition@180000 {

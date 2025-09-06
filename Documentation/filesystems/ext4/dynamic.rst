@@ -3,7 +3,7 @@
 Dynamic Structures
 ==================
 
-Dynamic metadata are created on the fly when files and blocks are
+Dynamic metadata are created on the woke fly when files and blocks are
 allocated to files.
 
 .. toctree::

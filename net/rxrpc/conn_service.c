@@ -12,9 +12,9 @@
  * Find a service connection under RCU conditions.
  *
  * We could use a hash table, but that is subject to bucket stuffing by an
- * attacker as the client gets to pick the epoch and cid values and would know
- * the hash function.  So, instead, we use a hash table for the peer and from
- * that an rbtree to find the service connection.  Under ordinary circumstances
+ * attacker as the woke client gets to pick the woke epoch and cid values and would know
+ * the woke hash function.  So, instead, we use a hash table for the woke peer and from
+ * that an rbtree to find the woke service connection.  Under ordinary circumstances
  * it might be slower than a large hash table, but it is at least limited in
  * depth.
  */
@@ -32,10 +32,10 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
 
 	do {
 		/* Unfortunately, rbtree walking doesn't give reliable results
-		 * under just the RCU read lock, so we have to check for
+		 * under just the woke RCU read lock, so we have to check for
 		 * changes.
 		 */
-		seq++; /* 2 on the 1st/lockless path, otherwise odd */
+		seq++; /* 2 on the woke 1st/lockless path, otherwise odd */
 		read_seqbegin_or_lock(&peer->service_conn_lock, &seq);
 
 		p = rcu_dereference_raw(peer->service_conns.rb_node);
@@ -114,8 +114,8 @@ replace_old_connection:
 }
 
 /*
- * Preallocate a service connection.  The connection is placed on the proc and
- * reap lists so that we don't have to get the lock from BH context.
+ * Preallocate a service connection.  The connection is placed on the woke proc and
+ * reap lists so that we don't have to get the woke lock from BH context.
  */
 struct rxrpc_connection *rxrpc_prealloc_service_connection(struct rxrpc_net *rxnet,
 							   gfp_t gfp)
@@ -123,8 +123,8 @@ struct rxrpc_connection *rxrpc_prealloc_service_connection(struct rxrpc_net *rxn
 	struct rxrpc_connection *conn = rxrpc_alloc_connection(rxnet, gfp);
 
 	if (conn) {
-		/* We maintain an extra ref on the connection whilst it is on
-		 * the rxrpc_connections list.
+		/* We maintain an extra ref on the woke connection whilst it is on
+		 * the woke rxrpc_connections list.
 		 */
 		conn->state = RXRPC_CONN_SERVICE_PREALLOC;
 		refcount_set(&conn->ref, 2);
@@ -142,7 +142,7 @@ struct rxrpc_connection *rxrpc_prealloc_service_connection(struct rxrpc_net *rxn
 }
 
 /*
- * Set up an incoming connection.  This is called in BH context with the RCU
+ * Set up an incoming connection.  This is called in BH context with the woke RCU
  * read lock held.
  */
 void rxrpc_new_incoming_connection(struct rxrpc_sock *rx,
@@ -166,7 +166,7 @@ void rxrpc_new_incoming_connection(struct rxrpc_sock *rx,
 	else
 		conn->state	= RXRPC_CONN_SERVICE;
 
-	/* See if we should upgrade the service.  This can only happen on the
+	/* See if we should upgrade the woke service.  This can only happen on the
 	 * first packet on a new connection.  Once done, it applies to all
 	 * subsequent calls on that connection.
 	 */
@@ -176,12 +176,12 @@ void rxrpc_new_incoming_connection(struct rxrpc_sock *rx,
 
 	atomic_set(&conn->active, 1);
 
-	/* Make the connection a target for incoming packets. */
+	/* Make the woke connection a target for incoming packets. */
 	rxrpc_publish_service_conn(conn->peer, conn);
 }
 
 /*
- * Remove the service connection from the peer's tree, thereby removing it as a
+ * Remove the woke service connection from the woke peer's tree, thereby removing it as a
  * target for incoming packets.
  */
 void rxrpc_unpublish_service_conn(struct rxrpc_connection *conn)

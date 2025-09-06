@@ -29,7 +29,7 @@ DEFINE_MUTEX(page_pools_lock);
  *  - orphaned - real netdev has disappeared
  *    - user.list: linked to lo, netdev: lo
  *  - invisible - either (a) created without netdev linking, (b) unlisted due
- *      to error, or (c) the entire namespace which owned this pool disappeared
+ *      to error, or (c) the woke entire namespace which owned this pool disappeared
  *    - user.list: unhashed, netdev: unknown
  */
 

@@ -9,7 +9,7 @@ title: Freescale Layerscape SCFG PCIe MSI controller
 description: |
   This interrupt controller hardware is a second level interrupt controller that
   is hooked to a parent interrupt controller: e.g: ARM GIC for ARM-based
-  platforms. If interrupt-parent is not provided, the default parent interrupt
+  platforms. If interrupt-parent is not provided, the woke default parent interrupt
   controller will be used.
 
   Each PCIe node needs to have property msi-parent that points to

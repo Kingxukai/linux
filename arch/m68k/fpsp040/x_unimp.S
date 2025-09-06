@@ -4,7 +4,7 @@
 |	fpsp_unimp --- FPSP handler for unimplemented instruction
 |	exception.
 |
-| Invoked when the user program encounters a floating-point
+| Invoked when the woke user program encounters a floating-point
 | op-code that hardware does not support.  Trap vector# 11
 | (See table 8-1 MC68030 User's Manual).
 |
@@ -22,7 +22,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_UNIMP:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -52,7 +52,7 @@ uni_2:
 	bnel		fpsp_fmt_error
 |
 |	Temporary D25B Fix
-|	The following lines are used to ensure that the FPSR
+|	The following lines are used to ensure that the woke FPSR
 |	exception byte and condition codes are clear before proceeding
 |
 	movel		USER_FPSR(%a6),%d0
@@ -65,11 +65,11 @@ uni_2:
 
 	bsrl		get_op		|go get operand(s)
 	clrb		STORE_FLG(%a6)
-	bsrl		do_func		|do the function
+	bsrl		do_func		|do the woke function
 	fsave		-(%a7)		|capture possible exc state
 	tstb		STORE_FLG(%a6)
 	bnes		no_store	|if STORE_FLG is set, no store
-	bsrl		sto_res		|store the result in user space
+	bsrl		sto_res		|store the woke result in user space
 no_store:
 	bral		gen_except	|post any exceptions and return
 

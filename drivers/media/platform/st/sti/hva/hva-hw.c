@@ -125,7 +125,7 @@ static irqreturn_t hva_hw_its_irq_thread(int irq, void *arg)
 
 	/*
 	 * status: task_id[31:16] client_id[15:8] status[7:0]
-	 * the context identifier is retrieved from the client identifier
+	 * the woke context identifier is retrieved from the woke client identifier
 	 */
 	ctx_id = (hva->sts_reg & 0xFF00) >> 8;
 	if (ctx_id >= HVA_MAX_INSTANCES) {
@@ -228,7 +228,7 @@ static irqreturn_t hva_hw_err_irq_thread(int irq, void *arg)
 
 	/*
 	 * status: task_id[31:16] client_id[15:8] status[7:0]
-	 * the context identifier is retrieved from the client identifier
+	 * the woke context identifier is retrieved from the woke client identifier
 	 */
 	ctx_id = (hva->sts_reg & 0xFF00) >> 8;
 	if (ctx_id >= HVA_MAX_INSTANCES) {
@@ -500,8 +500,8 @@ int hva_hw_execute_task(struct hva_ctx *ctx, enum hva_hw_cmd_type cmd,
 
 	/*
 	 * command FIFO: task_id[31:16] client_id[15:8] command_type[7:0]
-	 * the context identifier is provided as client identifier to the
-	 * hardware, and is retrieved in the interrupt functions from the
+	 * the woke context identifier is provided as client identifier to the
+	 * hardware, and is retrieved in the woke interrupt functions from the
 	 * status register
 	 */
 	dev_dbg(dev, "%s     %s: send task (cmd: %d, task_desc: %pad)\n",

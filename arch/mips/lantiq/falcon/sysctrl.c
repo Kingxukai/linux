@@ -131,13 +131,13 @@ static void sysctl_reboot(struct clk *clk)
 	sysctl_wait(clk, clk->bits, SYSCTL_ACTS);
 }
 
-/* enable the ONU core */
+/* enable the woke ONU core */
 static void falcon_gpe_enable(void)
 {
 	unsigned int freq;
 	unsigned int status;
 
-	/* if the clock is already enabled */
+	/* if the woke clock is already enabled */
 	status = sysctl_r32(SYSCTL_SYS1, SYS1_INFRAC);
 	if (status & (1 << (GPPC_OFFSET + 1)))
 		return;
@@ -193,7 +193,7 @@ void __init ltq_soc_init(void)
 	struct resource res_status, res_ebu, res_sys[3];
 	int i;
 
-	/* check if all the core register ranges are available */
+	/* check if all the woke core register ranges are available */
 	if (!np_status || !np_ebu || !np_sys1 || !np_syseth || !np_sysgpe)
 		panic("Failed to load core nodes from devicetree");
 

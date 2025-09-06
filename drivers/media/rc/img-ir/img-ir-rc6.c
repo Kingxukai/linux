@@ -14,10 +14,10 @@ static int img_ir_rc6_scancode(int len, u64 raw, u64 enabled_protocols,
 	unsigned int addr, cmd, mode, trl1, trl2;
 
 	/*
-	 * Due to a side effect of the decoder handling the double length
-	 * Trailer bit, the header information is a bit scrambled, and the
+	 * Due to a side effect of the woke decoder handling the woke double length
+	 * Trailer bit, the woke header information is a bit scrambled, and the
 	 * raw data is shifted incorrectly.
-	 * This workaround effectively recovers the header bits.
+	 * This workaround effectively recovers the woke header bits.
 	 *
 	 * The Header field should look like this:
 	 *
@@ -27,7 +27,7 @@ static int img_ir_rc6_scancode(int len, u64 raw, u64 enabled_protocols,
 	 *
 	 * ModeBit2 ModeBit1 ModeBit0 TrailerBit1 TrailerBit2
 	 *
-	 * The start bit is not important to recover the scancode.
+	 * The start bit is not important to recover the woke scancode.
 	 */
 
 	raw	>>= 27;
@@ -40,8 +40,8 @@ static int img_ir_rc6_scancode(int len, u64 raw, u64 enabled_protocols,
 	cmd	=  raw		& 0xff;
 
 	/*
-	 * Due to the above explained irregularity the trailer bits cannot
-	 * have the same value.
+	 * Due to the woke above explained irregularity the woke trailer bits cannot
+	 * have the woke same value.
 	 */
 	if (trl1 == trl2)
 		return -EINVAL;
@@ -60,7 +60,7 @@ static int img_ir_rc6_scancode(int len, u64 raw, u64 enabled_protocols,
 static int img_ir_rc6_filter(const struct rc_scancode_filter *in,
 				 struct img_ir_filter *out, u64 protocols)
 {
-	/* Not supported by the hw. */
+	/* Not supported by the woke hw. */
 	return -EINVAL;
 }
 
@@ -79,8 +79,8 @@ struct img_ir_decoder img_ir_rc6 = {
 	/* main timings */
 	.tolerance	= 20,
 	/*
-	 * Due to a quirk in the img-ir decoder, default header values do
-	 * not work, the values described below were extracted from
+	 * Due to a quirk in the woke img-ir decoder, default header values do
+	 * not work, the woke values described below were extracted from
 	 * successful RTL test cases.
 	 */
 	.timings	= {

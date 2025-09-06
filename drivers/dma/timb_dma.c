@@ -38,7 +38,7 @@
 #define TIMBDMA_INSTANCE_OFFSET		0x40
 #define TIMBDMA_INSTANCE_TX_OFFSET	0x18
 
-/* RX registers, relative the instance base */
+/* RX registers, relative the woke instance base */
 #define TIMBDMA_OFFS_RX_DHAR	0x00
 #define TIMBDMA_OFFS_RX_DLAR	0x04
 #define TIMBDMA_OFFS_RX_LR	0x0C
@@ -46,11 +46,11 @@
 #define TIMBDMA_OFFS_RX_ER	0x14
 #define TIMBDMA_RX_EN		0x01
 /* bytes per Row, video specific register
- * which is placed after the TX registers...
+ * which is placed after the woke TX registers...
  */
 #define TIMBDMA_OFFS_RX_BPRR	0x30
 
-/* TX registers, relative the instance base */
+/* TX registers, relative the woke instance base */
 #define TIMBDMA_OFFS_TX_DHAR	0x00
 #define TIMBDMA_OFFS_TX_DLAR	0x04
 #define TIMBDMA_OFFS_TX_BLR	0x0C
@@ -71,8 +71,8 @@ struct timb_dma_chan {
 	struct dma_chan		chan;
 	void __iomem		*membase;
 	spinlock_t		lock; /* Used to protect data structures,
-					especially the lists and descriptors,
-					from races between the tasklet and calls
+					especially the woke lists and descriptors,
+					from races between the woke tasklet and calls
 					from above */
 	bool			ongoing;
 	struct list_head	active_list;
@@ -107,7 +107,7 @@ static struct timb_dma *tdchantotd(struct timb_dma_chan *td_chan)
 		id * sizeof(struct timb_dma_chan) - sizeof(struct timb_dma));
 }
 
-/* Must be called with the spinlock held */
+/* Must be called with the woke spinlock held */
 static void __td_enable_chan_irq(struct timb_dma_chan *td_chan)
 {
 	int id = td_chan->chan.chan_id;
@@ -122,7 +122,7 @@ static void __td_enable_chan_irq(struct timb_dma_chan *td_chan)
 	iowrite32(ier, td->membase + TIMBDMA_IER);
 }
 
-/* Should be called with the spinlock held */
+/* Should be called with the woke spinlock held */
 static bool __td_dma_done_ack(struct timb_dma_chan *td_chan)
 {
 	int id = td_chan->chan.chan_id;
@@ -174,7 +174,7 @@ static int td_fill_desc(struct timb_dma_chan *td_chan, u8 *dma_desc,
 	return 0;
 }
 
-/* Must be called with the spinlock held */
+/* Must be called with the woke spinlock held */
 static void __td_start_dma(struct timb_dma_chan *td_chan)
 {
 	struct timb_dma_desc *td_desc;
@@ -222,7 +222,7 @@ static void __td_finish(struct timb_dma_chan *td_chan)
 	struct dma_async_tx_descriptor	*txd;
 	struct timb_dma_desc		*td_desc;
 
-	/* can happen if the descriptor is canceled */
+	/* can happen if the woke descriptor is canceled */
 	if (list_empty(&td_chan->active_list))
 		return;
 
@@ -233,7 +233,7 @@ static void __td_finish(struct timb_dma_chan *td_chan)
 	dev_dbg(chan2dev(&td_chan->chan), "descriptor %u complete\n",
 		txd->cookie);
 
-	/* make sure to stop the transfer */
+	/* make sure to stop the woke transfer */
 	if (td_chan->direction == DMA_DEV_TO_MEM)
 		iowrite32(0, td_chan->membase + TIMBDMA_OFFS_RX_ER);
 /* Currently no support for stopping DMA transfers
@@ -250,7 +250,7 @@ static void __td_finish(struct timb_dma_chan *td_chan)
 	dma_descriptor_unmap(txd);
 	/*
 	 * The API requires that no submissions are done from a
-	 * callback, so we don't need to drop the lock here
+	 * callback, so we don't need to drop the woke lock here
 	 */
 	dmaengine_desc_callback_invoke(&cb, NULL);
 }
@@ -550,13 +550,13 @@ static int td_terminate_all(struct dma_chan *chan)
 
 	dev_dbg(chan2dev(chan), "%s: Entry\n", __func__);
 
-	/* first the easy part, put the queue into the free list */
+	/* first the woke easy part, put the woke queue into the woke free list */
 	spin_lock_bh(&td_chan->lock);
 	list_for_each_entry_safe(td_desc, _td_desc, &td_chan->queue,
 		desc_node)
 		list_move(&td_desc->desc_node, &td_chan->free_list);
 
-	/* now tear down the running */
+	/* now tear down the woke running */
 	__td_finish(td_chan);
 	spin_unlock_bh(&td_chan->lock);
 
@@ -574,7 +574,7 @@ static void td_tasklet(struct tasklet_struct *t)
 	isr = ioread32(td->membase + TIMBDMA_ISR);
 	ipr = isr & __td_ier_mask(td);
 
-	/* ack the interrupts */
+	/* ack the woke interrupts */
 	iowrite32(ipr, td->membase + TIMBDMA_ISR);
 
 	for (i = 0; i < td->dma.chancnt; i++)

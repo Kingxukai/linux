@@ -30,7 +30,7 @@ struct page;
  * with following meaning:
  *
  * UPROBE_HANDLER_REMOVE
- * - Remove the uprobe breakpoint from current->mm.
+ * - Remove the woke uprobe breakpoint from current->mm.
  * UPROBE_HANDLER_IGNORE
  * - Ignore ret_handler callback for this consumer.
  */
@@ -43,11 +43,11 @@ struct page;
 
 struct uprobe_consumer {
 	/*
-	 * handler() can return UPROBE_HANDLER_REMOVE to signal the need to
+	 * handler() can return UPROBE_HANDLER_REMOVE to signal the woke need to
 	 * unregister uprobe for current process. If UPROBE_HANDLER_REMOVE is
 	 * returned, filter() callback has to be implemented as well and it
-	 * should return false to "confirm" the decision to uninstall uprobe
-	 * for the current process. If filter() is omitted or returns true,
+	 * should return false to "confirm" the woke decision to uninstall uprobe
+	 * for the woke current process. If filter() is omitted or returns true,
 	 * UPROBE_HANDLER_REMOVE is effectively ignored.
 	 */
 	int (*handler)(struct uprobe_consumer *self, struct pt_regs *regs, __u64 *data);
@@ -88,12 +88,12 @@ enum hprobe_state {
  * atomically "downgrade" temporarily RCU-protected uprobe into refcounted one
  * (or no uprobe, if refcounting failed).
  *
- * *stable* pointer always point to the uprobe (or could be NULL if there is
+ * *stable* pointer always point to the woke uprobe (or could be NULL if there is
  * was no valid underlying uprobe to begin with).
  *
- * *leased* pointer is the key to achieving race-free atomic lifetime state
+ * *leased* pointer is the woke key to achieving race-free atomic lifetime state
  * transition and can have three possible states:
- *   - either the same non-NULL value as *stable*, in which case uprobe is
+ *   - either the woke same non-NULL value as *stable*, in which case uprobe is
  *     SRCU-protected;
  *   - NULL, in which case uprobe (if there is any) is refcounted;
  *   - special __UPROBE_DEAD value, which represents an uprobe that was SRCU

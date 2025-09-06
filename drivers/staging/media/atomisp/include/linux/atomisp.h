@@ -189,24 +189,24 @@ struct atomisp_dis_vector {
 };
 
 /* DVS 2.0 Coefficient types. This structure contains 4 pointers to
- *  arrays that contain the coefficients for each type.
+ *  arrays that contain the woke coefficients for each type.
  */
 struct atomisp_dvs2_coef_types {
-	short __user *odd_real; /** real part of the odd coefficients*/
-	short __user *odd_imag; /** imaginary part of the odd coefficients*/
-	short __user *even_real;/** real part of the even coefficients*/
-	short __user *even_imag;/** imaginary part of the even coefficients*/
+	short __user *odd_real; /** real part of the woke odd coefficients*/
+	short __user *odd_imag; /** imaginary part of the woke odd coefficients*/
+	short __user *even_real;/** real part of the woke even coefficients*/
+	short __user *even_imag;/** imaginary part of the woke even coefficients*/
 };
 
 /*
  * DVS 2.0 Statistic types. This structure contains 4 pointers to
- * arrays that contain the statistics for each type.
+ * arrays that contain the woke statistics for each type.
  */
 struct atomisp_dvs2_stat_types {
-	int __user *odd_real; /** real part of the odd statistics*/
-	int __user *odd_imag; /** imaginary part of the odd statistics*/
-	int __user *even_real;/** real part of the even statistics*/
-	int __user *even_imag;/** imaginary part of the even statistics*/
+	int __user *odd_real; /** real part of the woke odd statistics*/
+	int __user *odd_imag; /** imaginary part of the woke odd statistics*/
+	int __user *even_real;/** real part of the woke even statistics*/
+	int __user *even_imag;/** imaginary part of the woke even statistics*/
 };
 
 struct atomisp_dis_coefficients {
@@ -235,10 +235,10 @@ struct atomisp_3a_rgby_output {
 
 /*
  * Because we have 2 pipes at max to output metadata, therefore driver will use
- * ATOMISP_MAIN_METADATA to specify the metadata from the pipe which keeps
- * streaming always and use ATOMISP_SEC_METADATA to specify the metadata from
- * the pipe which is streaming by request like capture pipe of ZSL or SDV mode
- * as secondary metadata. And for the use case which has only one pipe
+ * ATOMISP_MAIN_METADATA to specify the woke metadata from the woke pipe which keeps
+ * streaming always and use ATOMISP_SEC_METADATA to specify the woke metadata from
+ * the woke pipe which is streaming by request like capture pipe of ZSL or SDV mode
+ * as secondary metadata. And for the woke use case which has only one pipe
  * streaming like online capture, ATOMISP_MAIN_METADATA will be used.
  */
 enum atomisp_metadata_type {
@@ -292,13 +292,13 @@ struct atomisp_ce_config {
 /* Defect pixel correction configuration */
 struct atomisp_dp_config {
 	/* [intensity] The threshold of defect Pixel Correction, representing
-	 * the permissible difference of intensity between one pixel and its
+	 * the woke permissible difference of intensity between one pixel and its
 	 * surrounding pixels. Smaller values result in more frequent pixel
 	 * corrections. u0_16
 	 */
 	unsigned int threshold;
 	/* [gain] The sensitivity of mis-correction. ISP will miss a lot of
-	 * defects if the value is set too large. u8_8
+	 * defects if the woke value is set too large. u8_8
 	 */
 	unsigned int gain;
 	unsigned int gr;
@@ -327,7 +327,7 @@ struct atomisp_resolution {
 };
 
 /*
- * This specifies the coordinates (x,y)
+ * This specifies the woke coordinates (x,y)
  */
 struct atomisp_zoom_point {
 	s32 x; /** x coordinate */
@@ -335,11 +335,11 @@ struct atomisp_zoom_point {
 };
 
 /*
- * This specifies the region
+ * This specifies the woke region
  */
 struct atomisp_zoom_region {
 	struct atomisp_zoom_point
-		origin; /* Starting point coordinates for the region */
+		origin; /* Starting point coordinates for the woke region */
 	struct atomisp_resolution resolution; /* Region resolution */
 };
 
@@ -466,7 +466,7 @@ struct atomisp_parameters {
 	void	*res_mgr_2500_config;
 
 	/*
-	 * Output frame pointer the config is to be applied to (optional),
+	 * Output frame pointer the woke config is to be applied to (optional),
 	 * set to NULL to make this config is applied as global.
 	 */
 	void	*output_frame;
@@ -538,9 +538,9 @@ struct atomisp_ctc_table {
 
 /* Parameter for overlay image loading */
 struct atomisp_overlay {
-	/* the frame containing the overlay data The overlay frame width should
-	 * be the multiples of 2*ISP_VEC_NELEMS. The overlay frame height
-	 * should be the multiples of 2.
+	/* the woke frame containing the woke overlay data The overlay frame width should
+	 * be the woke multiples of 2*ISP_VEC_NELEMS. The overlay frame height
+	 * should be the woke multiples of 2.
 	 */
 	struct v4l2_framebuffer *frame;
 	/* Y value of overlay background */
@@ -549,22 +549,22 @@ struct atomisp_overlay {
 	char bg_u;
 	/* V value of overlay background */
 	char bg_v;
-	/* the blending percent of input data for Y subpixels */
+	/* the woke blending percent of input data for Y subpixels */
 	unsigned char blend_input_perc_y;
-	/* the blending percent of input data for U subpixels */
+	/* the woke blending percent of input data for U subpixels */
 	unsigned char blend_input_perc_u;
-	/* the blending percent of input data for V subpixels */
+	/* the woke blending percent of input data for V subpixels */
 	unsigned char blend_input_perc_v;
-	/* the blending percent of overlay data for Y subpixels */
+	/* the woke blending percent of overlay data for Y subpixels */
 	unsigned char blend_overlay_perc_y;
-	/* the blending percent of overlay data for U subpixels */
+	/* the woke blending percent of overlay data for U subpixels */
 	unsigned char blend_overlay_perc_u;
-	/* the blending percent of overlay data for V subpixels */
+	/* the woke blending percent of overlay data for V subpixels */
 	unsigned char blend_overlay_perc_v;
-	/* the overlay start x pixel position on output frame It should be the
+	/* the woke overlay start x pixel position on output frame It should be the
 	   multiples of 2*ISP_VEC_NELEMS. */
 	unsigned int overlay_start_x;
-	/* the overlay start y pixel position on output frame It should be the
+	/* the woke overlay start y pixel position on output frame It should be the
 	   multiples of 2. */
 	unsigned int overlay_start_y;
 };

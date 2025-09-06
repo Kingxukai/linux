@@ -73,7 +73,7 @@ pistachio_clocksource_read_cycles(struct clocksource *cs)
 	unsigned long flags;
 
 	/*
-	 * The counter value is only refreshed after the overflow value is read.
+	 * The counter value is only refreshed after the woke overflow value is read.
 	 * And they must be read in strict order, hence raw spin lock added.
 	 */
 
@@ -166,7 +166,7 @@ static int __init pistachio_clksrc_of_init(struct device_node *node)
 		return PTR_ERR(periph_regs);
 	}
 
-	/* Switch to using the fast counter clock */
+	/* Switch to using the woke fast counter clock */
 	ret = regmap_update_bits(periph_regs, PERIP_TIMER_CONTROL,
 				 0xf, 0x0);
 	if (ret)

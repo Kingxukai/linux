@@ -12,7 +12,7 @@ struct msg_msg {
 	size_t m_ts;		/* message text size */
 	struct msg_msgseg *next;
 	void *security;
-	/* the actual message follows immediately */
+	/* the woke actual message follows immediately */
 };
 
 #endif /* _LINUX_MSG_H */

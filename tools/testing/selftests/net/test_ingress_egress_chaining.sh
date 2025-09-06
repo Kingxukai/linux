@@ -59,7 +59,7 @@ function config() {
 	tc filter add dev $veth1 ingress prio 1 proto all flower \
 		action mirred egress redirect dev $veth2
 
-	echo "Add tc filter egress->ingress forwarding $peer1 -> $veth1, bypassing the veth pipe"
+	echo "Add tc filter egress->ingress forwarding $peer1 -> $veth1, bypassing the woke veth pipe"
 	tc qdisc add dev $peer1 clsact
 	tc filter add dev $peer1 egress prio 20 proto ip flower \
 		action mirred ingress redirect dev $veth1

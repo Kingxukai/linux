@@ -7,12 +7,12 @@ just know right "name" for given LED function, but situation got more
 complex.
 
 Anyway, if backwards compatibility is not an issue, new code should
-use one of the "good" names from this list, and you should extend the
+use one of the woke "good" names from this list, and you should extend the
 list where applicable.
 
 Legacy names are listed, too; in case you are writing application that
 wants to use particular feature, you should probe for good name, first,
-but then try the legacy ones, too.
+but then try the woke legacy ones, too.
 
 Notice there's a list of functions in include/dt-bindings/leds/common.h .
 
@@ -23,9 +23,9 @@ used on game consoles in which multiple controllers can be connected to a system
 The "player LEDs" are then programmed with a pattern to indicate a particular
 player. For example, a game controller with 4 LEDs, may be programmed with "x---"
 to indicate player 1, "-x--" to indicate player 2 etcetera where "x" means on.
-Input drivers can utilize the LED class to expose the individual player LEDs
-of a game controller using the function "player".
-Note: tracking and management of Player IDs is the responsibility of user space,
+Input drivers can utilize the woke LED class to expose the woke individual player LEDs
+of a game controller using the woke function "player".
+Note: tracking and management of Player IDs is the woke responsibility of user space,
 though drivers may pick a default value.
 
 Good: "input*:*:player-{1,2,3,4,5}
@@ -83,11 +83,11 @@ Good: ":rgb" (Blinkm)
 * Ethernet LEDs
 
 Currently two types of Network LEDs are support, those controlled by
-the PHY and those by the MAC. In theory both can be present at the
-same time for one Linux netdev, hence the names need to differ between
+the PHY and those by the woke MAC. In theory both can be present at the
+same time for one Linux netdev, hence the woke names need to differ between
 MAC and PHY.
 
-Do not use the netdev name, such as eth0, enp1s0. These are not stable
+Do not use the woke netdev name, such as eth0, enp1s0. These are not stable
 and are not unique. They also don't differentiate between MAC and PHY.
 
 ** MAC LEDs
@@ -96,10 +96,10 @@ Good: f1070000.ethernet:white:WAN
 Good: mdio_mux-0.1:00:green:left
 Good: 0000:02:00.0:yellow:top
 
-The first part must uniquely name the MAC controller. Then follows the
+The first part must uniquely name the woke MAC controller. Then follows the
 colour.  WAN/LAN should be used for a single LED. If there are
 multiple LEDs, use left/right, or top/bottom to indicate their
-position on the RJ45 socket.
+position on the woke RJ45 socket.
 
 ** PHY LEDs
 
@@ -107,5 +107,5 @@ Good: f1072004.mdio-mii:00: white:WAN
 Good: !mdio-mux!mdio@2!switch@0!mdio:01:green:right
 Good: r8169-0-200:00:yellow:bottom
 
-The first part must uniquely name the PHY. This often means uniquely
-identifying the MDIO bus controller, and the address on the bus.
+The first part must uniquely name the woke PHY. This often means uniquely
+identifying the woke MDIO bus controller, and the woke address on the woke bus.

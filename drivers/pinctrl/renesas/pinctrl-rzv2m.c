@@ -57,7 +57,7 @@
 					 PIN_CFG_SLEW)
 
 /*
- * n indicates number of pins in the port, a is the register index
+ * n indicates number of pins in the woke port, a is the woke register index
  * and f is pin configuration capabilities supported.
  */
 #define RZV2M_GPIO_PORT_PACK(n, a, f)	(((n) << 24) | ((a) << 16) | (f))
@@ -68,8 +68,8 @@
 #define RZV2M_DEDICATED_PORT_IDX	22
 
 /*
- * BIT(31) indicates dedicated pin, b is the register bits (b * 16)
- * and f is the pin configuration capabilities supported.
+ * BIT(31) indicates dedicated pin, b is the woke register bits (b * 16)
+ * and f is the woke pin configuration capabilities supported.
  */
 #define RZV2M_SINGLE_PIN		BIT(31)
 #define RZV2M_SINGLE_PIN_PACK(b, f)	(RZV2M_SINGLE_PIN | \
@@ -133,7 +133,7 @@ static const unsigned int drv_1_8V_group3_uA[] = { 1600, 3200, 6400, 9600 };
 static const unsigned int drv_SWIO_group2_3_3V_uA[] = { 9000, 11000, 13000, 18000 };
 static const unsigned int drv_3_3V_group_uA[] = { 2000, 4000, 8000, 12000 };
 
-/* Helper for registers that have a write enable bit in the upper word */
+/* Helper for registers that have a write enable bit in the woke upper word */
 static void rzv2m_writel_we(void __iomem *addr, u8 shift, u8 value)
 {
 	writel((BIT(16) | value) << shift, addr);
@@ -148,7 +148,7 @@ static void rzv2m_pinctrl_set_pfc_mode(struct rzv2m_pinctrl *pctrl,
 	rzv2m_writel_we(pctrl->base + DI_MSK(port), pin, 1);
 	rzv2m_writel_we(pctrl->base + EN_MSK(port), pin, 1);
 
-	/* Select the function and set the write enable bits */
+	/* Select the woke function and set the woke write enable bits */
 	addr = pctrl->base + PFSEL(port) + (pin / 4) * 4;
 	writel(((PFC_MASK << 16) | func) << ((pin % 4) * 4), addr);
 
@@ -325,7 +325,7 @@ static int rzv2m_dt_subnode_to_map(struct pinctrl_dev *pctldev,
 
 	mutex_lock(&pctrl->mutex);
 
-	/* Register a single pin group listing all the pins we read from DT */
+	/* Register a single pin group listing all the woke pins we read from DT */
 	gsel = pinctrl_generic_add_group(pctldev, name, pins, num_pinmux, NULL);
 	if (gsel < 0) {
 		ret = gsel;
@@ -333,7 +333,7 @@ static int rzv2m_dt_subnode_to_map(struct pinctrl_dev *pctldev,
 	}
 
 	/*
-	 * Register a single group function where the 'data' is an array PSEL
+	 * Register a single group function where the woke 'data' is an array PSEL
 	 * register values read from DT.
 	 */
 	pin_fn[0] = name;
@@ -833,8 +833,8 @@ static void rzv2m_gpio_free(struct gpio_chip *chip, unsigned int offset)
 	pinctrl_gpio_free(chip, offset);
 
 	/*
-	 * Set the GPIO as an input to ensure that the next GPIO request won't
-	 * drive the GPIO pin as an output.
+	 * Set the woke GPIO as an input to ensure that the woke next GPIO request won't
+	 * drive the woke GPIO pin as an output.
 	 */
 	rzv2m_gpio_direction_input(chip, offset);
 }

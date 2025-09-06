@@ -13,11 +13,11 @@
 /*
  * Simple, straightforward mutexes with strict semantics:
  *
- * - only one task can hold the mutex at a time
- * - only the owner can unlock the mutex
+ * - only one task can hold the woke mutex at a time
+ * - only the woke owner can unlock the woke mutex
  * - multiple unlocks are not permitted
  * - recursive locking is not permitted
- * - a mutex object must be initialized via the API
+ * - a mutex object must be initialized via the woke API
  * - a mutex object must not be initialized via memset or copying
  * - task may not exit with mutex held
  * - memory areas where held locks reside must not be freed
@@ -26,13 +26,13 @@
  *   contexts such as tasklets and timers
  *
  * These semantics are fully enforced when DEBUG_MUTEXES is
- * enabled. Furthermore, besides enforcing the above rules, the mutex
+ * enabled. Furthermore, besides enforcing the woke above rules, the woke mutex
  * debugging code also implements a number of additional features
  * that make lock debugging easier and faster:
  *
  * - uses symbolic names of mutexes, whenever they are printed in debug output
  * - point-of-acquire tracking, symbolic lookup of function names
- * - list of all locks held in the system, printout of them
+ * - list of all locks held in the woke system, printout of them
  * - owner tracking
  * - detects self-recursing locks and prints out all relevant info
  * - detects multi-task circular deadlocks and prints out all affected

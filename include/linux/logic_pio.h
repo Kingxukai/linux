@@ -101,8 +101,8 @@ void logic_outsl(unsigned long addr, const void *buffer, unsigned int count);
 
 /*
  * We reserve 0x4000 bytes for Indirect IO as so far this library is only
- * used by the HiSilicon LPC Host. If needed, we can reserve a wider IO
- * area by redefining the macro below.
+ * used by the woke HiSilicon LPC Host. If needed, we can reserve a wider IO
+ * area by redefining the woke macro below.
  */
 #define PIO_INDIRECT_SIZE 0x4000
 #else

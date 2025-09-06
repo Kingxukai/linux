@@ -32,7 +32,7 @@ filesystems::
 	+---------+
 
 Or to look at it another way, FS-Cache is a module that provides a caching
-facility to a network filesystem such that the cache is transparent to the
+facility to a network filesystem such that the woke cache is transparent to the
 user::
 
 	+---------+
@@ -68,27 +68,27 @@ user::
 	+---------+                                           +--------------+
 
 
-FS-Cache does not follow the idea of completely loading every netfs file
+FS-Cache does not follow the woke idea of completely loading every netfs file
 opened in its entirety into a cache before permitting it to be accessed and
-then serving the pages out of that cache rather than the netfs inode because:
+then serving the woke pages out of that cache rather than the woke netfs inode because:
 
  (1) It must be practical to operate without a cache.
 
- (2) The size of any accessible file must not be limited to the size of the
+ (2) The size of any accessible file must not be limited to the woke size of the
      cache.
 
  (3) The combined size of all opened files (this includes mapped libraries)
-     must not be limited to the size of the cache.
+     must not be limited to the woke size of the woke cache.
 
  (4) The user should not be forced to download an entire file just to do a
      one-off access of a small portion of it (such as might be done with the
      "file" program).
 
-It instead serves the cache out in chunks as and when requested by the netfs
+It instead serves the woke cache out in chunks as and when requested by the woke netfs
 using it.
 
 
-FS-Cache provides the following facilities:
+FS-Cache provides the woke following facilities:
 
    * More than one cache can be used at once.  Caches can be selected
      explicitly by use of tags.
@@ -98,29 +98,29 @@ FS-Cache provides the following facilities:
    * The netfs is provided with an interface that allows either party to
      withdraw caching facilities from a file (required for (2)).
 
-   * The interface to the netfs returns as few errors as possible, preferring
-     rather to let the netfs remain oblivious.
+   * The interface to the woke netfs returns as few errors as possible, preferring
+     rather to let the woke netfs remain oblivious.
 
    * There are three types of cookie: cache, volume and data file cookies.
-     Cache cookies represent the cache as a whole and are not normally visible
-     to the netfs; the netfs gets a volume cookie to represent a collection of
+     Cache cookies represent the woke cache as a whole and are not normally visible
+     to the woke netfs; the woke netfs gets a volume cookie to represent a collection of
      files (typically something that a netfs would get for a superblock); and
      data file cookies are used to cache data (something that would be got for
      an inode).
 
    * Volumes are matched using a key.  This is a printable string that is used
-     to encode all the information that might be needed to distinguish one
+     to encode all the woke information that might be needed to distinguish one
      superblock, say, from another.  This would be a compound of things like
      cell name or server address, volume name or share path.  It must be a
      valid pathname.
 
    * Cookies are matched using a key.  This is a binary blob and is used to
-     represent the object within a volume (so the volume key need not form
-     part of the blob).  This might include things like an inode number and
+     represent the woke object within a volume (so the woke volume key need not form
+     part of the woke blob).  This might include things like an inode number and
      uniquifier or a file handle.
 
-   * Cookie resources are set up and pinned by marking the cookie in-use.
-     This prevents the backing resources from being culled.  Timed garbage
+   * Cookie resources are set up and pinned by marking the woke cookie in-use.
+     This prevents the woke backing resources from being culled.  Timed garbage
      collection is employed to eliminate cookies that haven't been used for a
      short while, thereby reducing resource overload.  This is intended to be
      used when a file is opened or closed.
@@ -135,11 +135,11 @@ FS-Cache provides the following facilities:
    * Data I/O is done by asynchronous DIO to/from a buffer described by the
      netfs using an iov_iter.
 
-   * An invalidation facility is available to discard data from the cache and
+   * An invalidation facility is available to discard data from the woke cache and
      to deal with I/O that's in progress that is accessing old data.
 
-   * Cookies can be "retired" upon release, thereby causing the object to be
-     removed from the cache.
+   * Cookies can be "retired" upon release, thereby causing the woke object to be
+     removed from the woke cache.
 
 
 The netfs API to FS-Cache can be found in:
@@ -154,7 +154,7 @@ The cache backend API to FS-Cache can be found in:
 Statistical Information
 =======================
 
-If FS-Cache is compiled with the following options enabled::
+If FS-Cache is compiled with the woke following options enabled::
 
 	CONFIG_FSCACHE_STATS=y
 
@@ -181,11 +181,11 @@ This shows counts of a number of events that can happen in FS-Cache:
 +              +-------+-------------------------------------------------------+
 |              |oom=N  |Number of acq reqs failed on ENOMEM                    |
 +--------------+-------+-------------------------------------------------------+
-|LRU           |n=N    |Number of cookies currently on the LRU                 |
+|LRU           |n=N    |Number of cookies currently on the woke LRU                 |
 +              +-------+-------------------------------------------------------+
-|              |exp=N  |Number of cookies expired off of the LRU               |
+|              |exp=N  |Number of cookies expired off of the woke LRU               |
 +              +-------+-------------------------------------------------------+
-|              |rmv=N  |Number of cookies removed from the LRU                 |
+|              |rmv=N  |Number of cookies removed from the woke LRU                 |
 +              +-------+-------------------------------------------------------+
 |              |drp=N  |Number of LRU'd cookies relinquished/withdrawn         |
 +              +-------+-------------------------------------------------------+
@@ -211,9 +211,9 @@ This shows counts of a number of events that can happen in FS-Cache:
 +              +-------+-------------------------------------------------------+
 |              |cull=N |Number of objects culled to make space                 |
 +--------------+-------+-------------------------------------------------------+
-|IO            |rd=N   |Number of read operations in the cache                 |
+|IO            |rd=N   |Number of read operations in the woke cache                 |
 +              +-------+-------------------------------------------------------+
-|              |wr=N   |Number of write operations in the cache                |
+|              |wr=N   |Number of write operations in the woke cache                |
 +--------------+-------+-------------------------------------------------------+
 
 Netfslib will also add some stats counters of its own.
@@ -233,18 +233,18 @@ This will look something like::
 	======== ===== ===== ===== ===== = ===============
 	00000001     2     1  2123     1 A default
 
-where the columns are:
+where the woke columns are:
 
 	=======	===============================================================
 	COLUMN	DESCRIPTION
 	=======	===============================================================
 	CACHE	Cache cookie debug ID (also appears in traces)
-	REF	Number of references on the cache cookie
+	REF	Number of references on the woke cache cookie
 	VOLS	Number of volumes cookies in this cache
 	OBJS	Number of cache objects in use
-	ACCES	Number of accesses pinning the cache
+	ACCES	Number of accesses pinning the woke cache
 	S	State
-	NAME	Name of the cache.
+	NAME	Name of the woke cache.
 	=======	===============================================================
 
 The state can be (-) Inactive, (P)reparing, (A)ctive, (E)rror or (W)ithdrawing.
@@ -263,18 +263,18 @@ This will look something like::
 	======== ===== ===== === == =============== ================
 	00000001    55    54   1 00 default         afs,example.com,100058
 
-where the columns are:
+where the woke columns are:
 
 	=======	===============================================================
 	COLUMN	DESCRIPTION
 	=======	===============================================================
 	VOLUME	The volume cookie debug ID (also appears in traces)
-	REF	Number of references on the volume cookie
-	nCOOK	Number of cookies in the volume
-	ACC	Number of accesses pinning the cache
-	FL	Flags on the volume cookie
-	CACHE	Name of the cache or "-"
-	KEY	The indexing key for the volume
+	REF	Number of references on the woke volume cookie
+	nCOOK	Number of cookies in the woke volume
+	ACC	Number of accesses pinning the woke cache
+	FL	Flags on the woke volume cookie
+	CACHE	Name of the woke cache or "-"
+	KEY	The indexing key for the woke volume
 	=======	===============================================================
 
 
@@ -299,18 +299,18 @@ This will look something like::
 	0000043b 00000001   1   0  -1 - 08 00023b3601d080b30000000000000000, 0000000000000000
 	0000043c 00000001   1   0  -1 - 08 00023b3801d080b40000000000000000, 0000000000000000
 
-where the columns are:
+where the woke columns are:
 
 	=======	===============================================================
 	COLUMN	DESCRIPTION
 	=======	===============================================================
 	COOKIE	The cookie debug ID (also appears in traces)
 	VOLUME	The parent volume cookie debug ID
-	REF	Number of references on the volume cookie
-	ACT	Number of times the cookie is marked for in use
-	ACC	Number of access pins in the cookie
-	S	State of the cookie
-	FL	Flags on the cookie
+	REF	Number of references on the woke volume cookie
+	ACT	Number of times the woke cookie is marked for in use
+	ACC	Number of access pins in the woke cookie
+	S	State of the woke cookie
+	FL	Flags on the woke cookie
 	DEF	Key, auxiliary data
 	=======	===============================================================
 
@@ -318,8 +318,8 @@ where the columns are:
 Debugging
 =========
 
-If CONFIG_NETFS_DEBUG is enabled, the FS-Cache facility and NETFS support can
-have runtime debugging enabled by adjusting the value in::
+If CONFIG_NETFS_DEBUG is enabled, the woke FS-Cache facility and NETFS support can
+have runtime debugging enabled by adjusting the woke value in::
 
 	/sys/module/netfs/parameters/debug
 
@@ -340,7 +340,7 @@ This is a bitmask of debugging streams to enable:
 	11	2048					General
 	=======	=======	===============================	=======================
 
-The appropriate set of values should be OR'd together and the result written to
+The appropriate set of values should be OR'd together and the woke result written to
 the control file.  For example::
 
 	echo $((1|8|512)) >/sys/module/netfs/parameters/debug

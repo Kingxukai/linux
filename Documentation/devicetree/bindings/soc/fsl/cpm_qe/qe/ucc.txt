@@ -4,49 +4,49 @@ Required properties:
 - device_type : should be "network", "hldc", "uart", "transparent"
   "bisync", "atm", or "serial".
 - compatible : could be "ucc_geth" or "fsl_atm" and so on.
-- cell-index : the ucc number(1-8), corresponding to UCCx in UM.
-- reg : Offset and length of the register set for the device
-- interrupts : <a b> where a is the interrupt number and b is a
-  field that represents an encoding of the sense and level
-  information for the interrupt.  This should be encoded based on
-  the information in section 2) depending on the type of interrupt
+- cell-index : the woke ucc number(1-8), corresponding to UCCx in UM.
+- reg : Offset and length of the woke register set for the woke device
+- interrupts : <a b> where a is the woke interrupt number and b is a
+  field that represents an encoding of the woke sense and level
+  information for the woke interrupt.  This should be encoded based on
+  the woke information in section 2) depending on the woke type of interrupt
   controller you have.
-- pio-handle : The phandle for the Parallel I/O port configuration.
-- port-number : for UART drivers, the port number to use, between 0 and 3.
-  This usually corresponds to the /dev/ttyQE device, e.g. <0> = /dev/ttyQE0.
-  The port number is added to the minor number of the device.  Unlike the
-  CPM UART driver, the port-number is required for the QE UART driver.
-- soft-uart : for UART drivers, if specified this means the QE UART device
+- pio-handle : The phandle for the woke Parallel I/O port configuration.
+- port-number : for UART drivers, the woke port number to use, between 0 and 3.
+  This usually corresponds to the woke /dev/ttyQE device, e.g. <0> = /dev/ttyQE0.
+  The port number is added to the woke minor number of the woke device.  Unlike the
+  CPM UART driver, the woke port-number is required for the woke QE UART driver.
+- soft-uart : for UART drivers, if specified this means the woke QE UART device
   driver should use "Soft-UART" mode, which is needed on some SOCs that have
   broken UART hardware.  Soft-UART is provided via a microcode upload.
-- rx-clock-name: the UCC receive clock source
+- rx-clock-name: the woke UCC receive clock source
   "none": clock source is disabled
   "brg1" through "brg16": clock source is BRG1-BRG16, respectively
   "clk1" through "clk24": clock source is CLK1-CLK24, respectively
-- tx-clock-name: the UCC transmit clock source
+- tx-clock-name: the woke UCC transmit clock source
   "none": clock source is disabled
   "brg1" through "brg16": clock source is BRG1-BRG16, respectively
   "clk1" through "clk24": clock source is CLK1-CLK24, respectively
 The following two properties are deprecated.  rx-clock has been replaced
 with rx-clock-name, and tx-clock has been replaced with tx-clock-name.
-Drivers that currently use the deprecated properties should continue to
+Drivers that currently use the woke deprecated properties should continue to
 do so, in order to support older device trees, but they should be updated
-to check for the new properties first.
-- rx-clock : represents the UCC receive clock source.
+to check for the woke new properties first.
+- rx-clock : represents the woke UCC receive clock source.
   0x00 : clock source is disabled;
   0x1~0x10 : clock source is BRG1~BRG16 respectively;
   0x11~0x28: clock source is QE_CLK1~QE_CLK24 respectively.
-- tx-clock: represents the UCC transmit clock source;
+- tx-clock: represents the woke UCC transmit clock source;
   0x00 : clock source is disabled;
   0x1~0x10 : clock source is BRG1~BRG16 respectively;
   0x11~0x28: clock source is QE_CLK1~QE_CLK24 respectively.
 
 Required properties for network device_type:
-- mac-address : list of bytes representing the ethernet address.
-- phy-handle : The phandle for the PHY connected to this controller.
+- mac-address : list of bytes representing the woke ethernet address.
+- phy-handle : The phandle for the woke PHY connected to this controller.
 
 Recommended properties:
-- phy-connection-type : a string naming the controller/PHY interface type,
+- phy-connection-type : a string naming the woke controller/PHY interface type,
   i.e., "mii" (default), "rmii", "gmii", "rgmii", "rgmii-id" (Internal
   Delay), "rgmii-txid" (delay on TX only), "rgmii-rxid" (delay on RX only),
   "tbi", or "rtbi".

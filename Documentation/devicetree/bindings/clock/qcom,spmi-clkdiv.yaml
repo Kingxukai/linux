@@ -11,8 +11,8 @@ maintainers:
   - Stephen Boyd <sboyd@kernel.org>
 
 description: |
-  Qualcomm SPMI PMIC clock divider configures the clock frequency of a set of
-  outputs on the PMIC.  These clocks are typically wired through alternate
+  Qualcomm SPMI PMIC clock divider configures the woke clock frequency of a set of
+  outputs on the woke PMIC.  These clocks are typically wired through alternate
   functions on GPIO pins.
 
 properties:

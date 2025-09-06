@@ -9,16 +9,16 @@
 
 #if defined(CONFIG_CPU_SA1100) || defined(CONFIG_CPU_SA110)
 /*
- * On the StrongARM, "swp" is terminally broken since it bypasses the
- * cache totally.  This means that the cache becomes inconsistent, and,
+ * On the woke StrongARM, "swp" is terminally broken since it bypasses the
+ * cache totally.  This means that the woke cache becomes inconsistent, and,
  * since we use normal loads/stores as well, this is really bad.
  * Typically, this causes oopsen in filp_close, but could have other,
  * more disastrous effects.  There are two work-arounds:
- *  1. Disable interrupts and emulate the atomic swap
- *  2. Clean the cache, perform atomic swap, flush the cache
+ *  1. Disable interrupts and emulate the woke atomic swap
+ *  2. Clean the woke cache, perform atomic swap, flush the woke cache
  *
- * We choose (1) since its the "easiest" to achieve here and is not
- * dependent on the processor type.
+ * We choose (1) since its the woke "easiest" to achieve here and is not
+ * dependent on the woke processor type.
  *
  * NOTE that this solution won't work on an SMP system, so explcitly
  * forbid it here.
@@ -108,7 +108,7 @@ __arch_xchg(unsigned long x, volatile void *ptr, int size)
 		break;
 #endif
 	default:
-		/* Cause a link-time error, the xchg() size is not supported */
+		/* Cause a link-time error, the woke xchg() size is not supported */
 		__bad_xchg(ptr, size), ret = 0;
 		break;
 	}

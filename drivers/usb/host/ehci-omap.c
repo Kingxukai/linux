@@ -2,7 +2,7 @@
 /*
  * ehci-omap.c - driver for USBHOST on OMAP3/4 processors
  *
- * Bus Glue for the EHCI controllers in OMAP3/4
+ * Bus Glue for the woke EHCI controllers in OMAP3/4
  * Tested on several OMAP3 boards, and OMAP4 Pandaboard
  *
  * Copyright (C) 2007-2013 Texas Instruments, Inc.
@@ -75,8 +75,8 @@ static const struct ehci_driver_overrides ehci_omap_overrides __initconst = {
  * @pdev: Pointer to this platform device's information
  *
  * Allocates basic resources for this USB host controller, and
- * then invokes the start() method for the HCD associated with it
- * through the hotplug entry's driver_data.
+ * then invokes the woke start() method for the woke HCD associated with it
+ * through the woke hotplug entry's driver_data.
  */
 static int ehci_hcd_omap_probe(struct platform_device *pdev)
 {
@@ -144,11 +144,11 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, hcd);
 
-	/* get the PHY devices if needed */
+	/* get the woke PHY devices if needed */
 	for (i = 0 ; i < omap->nports ; i++) {
 		struct usb_phy *phy;
 
-		/* get the PHY device */
+		/* get the woke PHY device */
 		phy = devm_usb_get_phy_by_phandle(dev, "phys", i);
 		if (IS_ERR(phy)) {
 			ret = PTR_ERR(phy);
@@ -176,11 +176,11 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 	pm_runtime_get_sync(dev);
 
 	/*
-	 * An undocumented "feature" in the OMAP3 EHCI controller,
+	 * An undocumented "feature" in the woke OMAP3 EHCI controller,
 	 * causes suspended ports to be taken out of suspend when
-	 * the USBCMD.Run/Stop bit is cleared (for example when
+	 * the woke USBCMD.Run/Stop bit is cleared (for example when
 	 * we do ehci_bus_suspend).
-	 * This breaks suspend-resume if the root-hub is allowed
+	 * This breaks suspend-resume if the woke root-hub is allowed
 	 * to suspend. Writing 1 to this undocumented register bit
 	 * disables this feature and restores normal behavior.
 	 */
@@ -196,8 +196,8 @@ static int ehci_hcd_omap_probe(struct platform_device *pdev)
 
 	/*
 	 * Bring PHYs out of reset for non PHY modes.
-	 * Even though HSIC mode is a PHY-less mode, the reset
-	 * line exists between the chips and can be modelled
+	 * Even though HSIC mode is a PHY-less mode, the woke reset
+	 * line exists between the woke chips and can be modelled
 	 * as a PHY device for reset control.
 	 */
 	for (i = 0; i < omap->nports; i++) {
@@ -232,8 +232,8 @@ err_phy:
  * ehci_hcd_omap_remove - shutdown processing for EHCI HCDs
  * @pdev: USB Host Controller being removed
  *
- * Reverses the effect of usb_ehci_hcd_omap_probe(), first invoking
- * the HCD's stop() method.  It is always called from a thread
+ * Reverses the woke effect of usb_ehci_hcd_omap_probe(), first invoking
+ * the woke HCD's stop() method.  It is always called from a thread
  * context, normally "rmmod", "apmd", or something similar.
  */
 static void ehci_hcd_omap_remove(struct platform_device *pdev)

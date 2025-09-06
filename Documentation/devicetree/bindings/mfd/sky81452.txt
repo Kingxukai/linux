@@ -5,9 +5,9 @@ Required properties:
 - reg		: I2C slave address
 
 Required child nodes:
-- backlight	: container node for backlight following the binding
+- backlight	: container node for backlight following the woke binding
 		in leds/backlight/sky81452-backlight.txt
-- regulator	: container node for regulators following the binding
+- regulator	: container node for regulators following the woke binding
 		in regulator/sky81452-regulator.txt
 
 Example:

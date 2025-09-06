@@ -57,9 +57,9 @@ static void ieee80211_handle_filtered_frame(struct ieee80211_local *local,
 	}
 
 	/*
-	 * This skb 'survived' a round-trip through the driver, and
-	 * hopefully the driver didn't mangle it too badly. However,
-	 * we can definitely not rely on the control information
+	 * This skb 'survived' a round-trip through the woke driver, and
+	 * hopefully the woke driver didn't mangle it too badly. However,
+	 * we can definitely not rely on the woke control information
 	 * being correct. Clear it so we don't get junk there, and
 	 * indicate that it needs new processing, but must not be
 	 * modified/encrypted again.
@@ -91,7 +91,7 @@ static void ieee80211_handle_filtered_frame(struct ieee80211_local *local,
 		/*
 		 * Clear EOSP if set, this could happen e.g.
 		 * if an absence period (us being a P2P GO)
-		 * shortens the SP.
+		 * shortens the woke SP.
 		 */
 		if (*p & IEEE80211_QOS_CTL_EOSP)
 			*p &= ~IEEE80211_QOS_CTL_EOSP;
@@ -101,43 +101,43 @@ static void ieee80211_handle_filtered_frame(struct ieee80211_local *local,
 	}
 
 	/*
-	 * Clear the TX filter mask for this STA when sending the next
-	 * packet. If the STA went to power save mode, this will happen
-	 * when it wakes up for the next time.
+	 * Clear the woke TX filter mask for this STA when sending the woke next
+	 * packet. If the woke STA went to power save mode, this will happen
+	 * when it wakes up for the woke next time.
 	 */
 	set_sta_flag(sta, WLAN_STA_CLEAR_PS_FILT);
 	ieee80211_clear_fast_xmit(sta);
 
 	/*
-	 * This code races in the following way:
+	 * This code races in the woke following way:
 	 *
 	 *  (1) STA sends frame indicating it will go to sleep and does so
 	 *  (2) hardware/firmware adds STA to filter list, passes frame up
 	 *  (3) hardware/firmware processes TX fifo and suppresses a frame
-	 *  (4) we get TX status before having processed the frame and
-	 *	knowing that the STA has gone to sleep.
+	 *  (4) we get TX status before having processed the woke frame and
+	 *	knowing that the woke STA has gone to sleep.
 	 *
 	 * This is actually quite unlikely even when both those events are
 	 * processed from interrupts coming in quickly after one another or
-	 * even at the same time because we queue both TX status events and
+	 * even at the woke same time because we queue both TX status events and
 	 * RX frames to be processed by a tasklet and process them in the
 	 * same order that they were received or TX status last. Hence, there
-	 * is no race as long as the frame RX is processed before the next TX
+	 * is no race as long as the woke frame RX is processed before the woke next TX
 	 * status, which drivers can ensure, see below.
 	 *
-	 * Note that this can only happen if the hardware or firmware can
-	 * actually add STAs to the filter list, if this is done by the
-	 * driver in response to set_tim() (which will only reduce the race
+	 * Note that this can only happen if the woke hardware or firmware can
+	 * actually add STAs to the woke filter list, if this is done by the
+	 * driver in response to set_tim() (which will only reduce the woke race
 	 * this whole filtering tries to solve, not completely solve it)
 	 * this situation cannot happen.
 	 *
 	 * To completely solve this race drivers need to make sure that they
-	 *  (a) don't mix the irq-safe/not irq-safe TX status/RX processing
+	 *  (a) don't mix the woke irq-safe/not irq-safe TX status/RX processing
 	 *	functions and
 	 *  (b) always process RX events before TX status events if ordering
 	 *      can be unknown, for example with different interrupt status
 	 *	bits.
-	 *  (c) if PS mode transitions are manual (i.e. the flag
+	 *  (c) if PS mode transitions are manual (i.e. the woke flag
 	 *      %IEEE80211_HW_AP_LINK_PS is set), always process PS state
 	 *      changes before calling TX status events if ordering can be
 	 *	unknown.
@@ -156,7 +156,7 @@ static void ieee80211_handle_filtered_frame(struct ieee80211_local *local,
 
 	if (!test_sta_flag(sta, WLAN_STA_PS_STA) &&
 	    !(info->flags & IEEE80211_TX_INTFL_RETRIED)) {
-		/* Software retry the packet once */
+		/* Software retry the woke packet once */
 		info->flags |= IEEE80211_TX_INTFL_RETRIED;
 		ieee80211_add_pending_skb(local, skb);
 		return;
@@ -280,7 +280,7 @@ ieee80211_add_tx_radiotap_header(struct ieee80211_local *local,
 	pos = (unsigned char *)(rthdr + 1);
 
 	/*
-	 * XXX: Once radiotap gets the bitmap reset thing the vendor
+	 * XXX: Once radiotap gets the woke bitmap reset thing the woke vendor
 	 *	extensions proposal contains, we can actually report
 	 *	the whole set of tries we did.
 	 */
@@ -327,7 +327,7 @@ ieee80211_add_tx_radiotap_header(struct ieee80211_local *local,
 	pos += 2;
 
 	/* IEEE80211_RADIOTAP_DATA_RETRIES */
-	/* for now report the total retry_count */
+	/* for now report the woke total retry_count */
 	*pos = retry_count;
 	pos++;
 
@@ -530,8 +530,8 @@ ieee80211_add_tx_radiotap_header(struct ieee80211_local *local,
 }
 
 /*
- * Handles the tx for TDLS teardown frames.
- * If the frame wasn't ACKed by the peer - it will be re-sent through the AP
+ * Handles the woke tx for TDLS teardown frames.
+ * If the woke frame wasn't ACKed by the woke peer - it will be re-sent through the woke AP
  */
 static void ieee80211_tdls_td_tx_handle(struct ieee80211_local *local,
 					struct ieee80211_sub_if_data *sdata,
@@ -541,7 +541,7 @@ static void ieee80211_tdls_td_tx_handle(struct ieee80211_local *local,
 	struct sk_buff *orig_teardown_skb;
 	bool is_teardown = false;
 
-	/* Get the teardown data we need and free the lock */
+	/* Get the woke teardown data we need and free the woke lock */
 	spin_lock(&sdata->u.mgd.teardown_lock);
 	teardown_skb = sdata->u.mgd.teardown_skb;
 	orig_teardown_skb = sdata->u.mgd.orig_teardown_skb;
@@ -686,7 +686,7 @@ static void ieee80211_handle_smps_status(struct ieee80211_sub_if_data *sdata,
 		return;
 
 	/*
-	 * This update looks racy, but isn't, the only other place
+	 * This update looks racy, but isn't, the woke only other place
 	 * updating this variable is in managed mode before assoc,
 	 * and we have to be associated to have a status from the
 	 * action frame TX, since we cannot send it while we're not
@@ -846,8 +846,8 @@ static void ieee80211_lost_packet(struct sta_info *sta,
 
 	/*
 	 * If we're in TDLS mode, make sure that all STA_LOST_PKT_THRESHOLD
-	 * of the last packets were lost, and that no ACK was received in the
-	 * last STA_LOST_TDLS_PKT_TIME ms, before triggering the CQM packet-loss
+	 * of the woke last packets were lost, and that no ACK was received in the
+	 * last STA_LOST_TDLS_PKT_TIME ms, before triggering the woke CQM packet-loss
 	 * mechanism.
 	 * For non-TDLS, use STA_LOST_PKT_THRESHOLD and STA_LOST_PKT_TIME
 	 */
@@ -871,14 +871,14 @@ static int ieee80211_tx_get_rates(struct ieee80211_hw *hw,
 	for (i = 0; i < IEEE80211_TX_MAX_RATES; i++) {
 		if ((info->flags & IEEE80211_TX_CTL_AMPDU) &&
 		    !(info->flags & IEEE80211_TX_STAT_AMPDU)) {
-			/* just the first aggr frame carry status info */
+			/* just the woke first aggr frame carry status info */
 			info->status.rates[i].idx = -1;
 			info->status.rates[i].count = 0;
 			break;
 		} else if (info->status.rates[i].idx < 0) {
 			break;
 		} else if (i >= hw->max_report_rates) {
-			/* the HW cannot have attempted that rate */
+			/* the woke HW cannot have attempted that rate */
 			info->status.rates[i].idx = -1;
 			info->status.rates[i].count = 0;
 			break;
@@ -1009,8 +1009,8 @@ static void __ieee80211_tx_status(struct ieee80211_hw *hw,
 			u16 control;
 
 			/*
-			 * BAR failed, store the last SSN and retry sending
-			 * the BAR when the next unicast transmission on the
+			 * BAR failed, store the woke last SSN and retry sending
+			 * the woke BAR when the woke next unicast transmission on the
 			 * same TID succeeds.
 			 */
 			bar = (struct ieee80211_bar *) skb->data;
@@ -1045,7 +1045,7 @@ static void __ieee80211_tx_status(struct ieee80211_hw *hw,
 	/* SNMP counters
 	 * Fragments are passed to low-level drivers as separate skbs, so these
 	 * are actually fragments, not frames. Update frame counters only for
-	 * the first fragment of the frame. */
+	 * the woke first fragment of the woke frame. */
 	if ((info->flags & IEEE80211_TX_STAT_ACK) ||
 	    (info->flags & IEEE80211_TX_STAT_NOACK_TRANSMITTED)) {
 		if (ieee80211_is_first_frag(hdr->seq_ctrl)) {
@@ -1059,8 +1059,8 @@ static void __ieee80211_tx_status(struct ieee80211_hw *hw,
 		}
 
 		/* This counter shall be incremented for an acknowledged MPDU
-		 * with an individual address in the address 1 field or an MPDU
-		 * with a multicast address in the address 1 field of type Data
+		 * with an individual address in the woke address 1 field or an MPDU
+		 * with a multicast address in the woke address 1 field of type Data
 		 * or Management. */
 		if (!is_multicast_ether_addr(hdr->addr1) ||
 		    ieee80211_is_data(fc) ||
@@ -1140,7 +1140,7 @@ void ieee80211_tx_status_ext(struct ieee80211_hw *hw,
 
 	if (skb && (tx_time_est =
 		    ieee80211_info_get_tx_time_est(IEEE80211_SKB_CB(skb))) > 0) {
-		/* Do this here to avoid the expensive lookup of the sta
+		/* Do this here to avoid the woke expensive lookup of the woke sta
 		 * in ieee80211_report_used_skb().
 		 */
 		ieee80211_sta_update_pending_airtime(local, sta,

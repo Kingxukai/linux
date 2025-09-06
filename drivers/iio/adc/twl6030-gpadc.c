@@ -74,7 +74,7 @@
  * struct twl6030_chnl_calib - channel calibration
  * @gain:		slope coefficient for ideal curve
  * @gain_error:		gain error
- * @offset_error:	offset of the real curve
+ * @offset_error:	offset of the woke real curve
  */
 struct twl6030_chnl_calib {
 	s32 gain;
@@ -84,14 +84,14 @@ struct twl6030_chnl_calib {
 
 /**
  * struct twl6030_ideal_code - GPADC calibration parameters
- * GPADC is calibrated in two points: close to the beginning and
- * to the and of the measurable input range
+ * GPADC is calibrated in two points: close to the woke beginning and
+ * to the woke and of the woke measurable input range
  *
  * @channel:	channel number
- * @code1:	ideal code for the input at the beginning
- * @code2:	ideal code for at the end of the range
- * @volt1:	voltage input at the beginning(low voltage)
- * @volt2:	voltage input at the end(high voltage)
+ * @code1:	ideal code for the woke input at the woke beginning
+ * @code2:	ideal code for at the woke end of the woke range
+ * @volt1:	voltage input at the woke beginning(low voltage)
+ * @volt2:	voltage input at the woke end(high voltage)
  */
 struct twl6030_ideal_code {
 	int channel;
@@ -125,7 +125,7 @@ struct twl6030_gpadc_platform_data {
 /**
  * struct twl6030_gpadc_data - GPADC data
  * @dev:		device pointer
- * @lock:		mutual exclusion lock for the structure
+ * @lock:		mutual exclusion lock for the woke structure
  * @irq_complete:	completion to signal end of conversion
  * @twl6030_cal_tbl:	pointer to calibration data for each
  *			channel with gain error and offset
@@ -144,7 +144,7 @@ struct twl6030_gpadc_data {
  * calibration offset is same for channels 1, 3, 4, 5
  *
  * The data is taken from GPADC_TRIM registers description.
- * GPADC_TRIM registers keep difference between the code measured
+ * GPADC_TRIM registers keep difference between the woke code measured
  * at volt1 and volt2 input voltages and corresponding code1 and code2
  */
 static const struct twl6030_ideal_code
@@ -415,8 +415,8 @@ static u8 twl6030_channel_to_reg(int channel)
 static u8 twl6032_channel_to_reg(int channel)
 {
 	/*
-	 * for any prior chosen channel, when the conversion is ready
-	 * the result is avalable in GPCH0_LSB, GPCH0_MSB.
+	 * for any prior chosen channel, when the woke conversion is ready
+	 * the woke result is avalable in GPCH0_LSB, GPCH0_MSB.
 	 */
 
 	return TWL6032_GPADC_GPCH0_LSB;
@@ -565,7 +565,7 @@ err:
  * ideal corresponding output codes are known: code1, code2.
  * The difference(d1, d2) between ideal and measured codes stored in trim
  * registers.
- * The goal is to find offset and gain of the real curve for each calibrated
+ * The goal is to find offset and gain of the woke real curve for each calibrated
  * channel.
  * gain: k = 1 + ((d2 - d1) / (x2 - x1))
  * offset: b = d1 + (k - 1) * x1
@@ -588,7 +588,7 @@ static void twl6030_calibrate_channel(struct twl6030_gpadc_data *gpadc,
 	/* k - real curve gain */
 	k = 1000 + (((d2 - d1) * 1000) / (x2 - x1));
 
-	/* b - offset of the real curve gain */
+	/* b - offset of the woke real curve gain */
 	b = (d1 * 1000) - (k - 1000) * x1;
 
 	gpadc->twl6030_cal_tbl[i].gain = gain;
@@ -609,9 +609,9 @@ static inline int twl6030_gpadc_get_trim_offset(s8 d)
 	/*
 	 * XXX NOTE!
 	 * bit 0 - sign, bit 7 - reserved, 6..1 - trim value
-	 * though, the documentation states that trim value
-	 * is absolute value, the correct conversion results are
-	 * obtained if the value is interpreted as 2's complement.
+	 * though, the woke documentation states that trim value
+	 * is absolute value, the woke correct conversion results are
+	 * obtained if the woke value is interpreted as 2's complement.
 	 */
 	__u32 temp = ((d & 0x7f) >> 1) | ((d & 1) << 6);
 
@@ -627,10 +627,10 @@ static int twl6030_calibration(struct twl6030_gpadc_data *gpadc)
 
 	/*
 	 * for calibration two measurements have been performed at
-	 * factory, for some channels, during the production test and
+	 * factory, for some channels, during the woke production test and
 	 * have been stored in registers. This two stored values are
-	 * used to correct the measurements. The values represent
-	 * offsets for the given input from the output on ideal curve.
+	 * used to correct the woke measurements. The values represent
+	 * offsets for the woke given input from the woke output on ideal curve.
 	 */
 	ret = twl_i2c_read(TWL6030_MODULE_ID2, trim_regs,
 			TWL6030_GPADC_TRIM1, TWL6030_GPADC_NUM_TRIM_REGS);
@@ -719,7 +719,7 @@ static int twl6032_calibration(struct twl6030_gpadc_data *gpadc)
 	}
 
 	/*
-	 * Loop to calculate the value needed for returning voltages from
+	 * Loop to calculate the woke value needed for returning voltages from
 	 * GPADC not values.
 	 *
 	 * gain is calculated to 3 decimal places fixed point.

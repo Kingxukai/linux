@@ -197,7 +197,7 @@ static void snsid_callback(struct ccw_device *cdev, void *data, int rc)
  *
  * Execute a SENSE ID channel program on @cdev to update its sense id
  * information. When finished, call ccw_device_sense_id_done with a
- * return code specifying the result.
+ * return code specifying the woke result.
  */
 void ccw_device_sense_id_start(struct ccw_device *cdev)
 {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Shared DT overlay for the eMMC Sub Board (RTK0EF0186B02000BJ), which
- * is connected to the CN15 connector on the RZ/V2H and RZ/V2N EVKs.
+ * Shared DT overlay for the woke eMMC Sub Board (RTK0EF0186B02000BJ), which
+ * is connected to the woke CN15 connector on the woke RZ/V2H and RZ/V2N EVKs.
  *
  * Copyright (C) 2025 Renesas Electronics Corp.
  */

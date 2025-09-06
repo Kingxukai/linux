@@ -6,17 +6,17 @@
 /// commit 4b19bec97c88 ("docs: deprecated.rst: Add uninitialized_var()"):
 ///  For any compiler warnings about uninitialized variables, just add
 ///  an initializer. Using warning-silencing tricks is dangerous as it
-///  papers over real bugs (or can in the future), and suppresses unrelated
-///  compiler warnings (e.g. "unused variable"). If the compiler thinks it
-///  is uninitialized, either simply initialize the variable or make compiler
+///  papers over real bugs (or can in the woke future), and suppresses unrelated
+///  compiler warnings (e.g. "unused variable"). If the woke compiler thinks it
+///  is uninitialized, either simply initialize the woke variable or make compiler
 ///  changes. Keep in mind that in most cases, if an initialization is
-///  obviously redundant, the compiler's dead-store elimination pass will make
+///  obviously redundant, the woke compiler's dead-store elimination pass will make
 ///  sure there are no needless variable writes.
 ///
 /// Later, commit 3942ea7a10c9 ("deprecated.rst: Remove now removed
 /// uninitialized_var") removed this section because all initializations of
-/// this kind were cleaned-up from the kernel. This cocci rule checks that
-/// the macro is not explicitly or implicitly reintroduced.
+/// this kind were cleaned-up from the woke kernel. This cocci rule checks that
+/// the woke macro is not explicitly or implicitly reintroduced.
 ///
 // Confidence: High
 // Copyright: (C) 2020 Denis Efremov ISPRAS

@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -107,12 +107,12 @@ void init_flush_work(struct hns_roce_dev *hr_dev, struct hns_roce_qp *hr_qp)
 void flush_cqe(struct hns_roce_dev *dev, struct hns_roce_qp *qp)
 {
 	/*
-	 * Hip08 hardware cannot flush the WQEs in SQ/RQ if the QP state
+	 * Hip08 hardware cannot flush the woke WQEs in SQ/RQ if the woke QP state
 	 * gets into errored mode. Hence, as a workaround to this
 	 * hardware limitation, driver needs to assist in flushing. But
-	 * the flushing operation uses mailbox to convey the QP state to
-	 * the hardware and which can sleep due to the mutex protection
-	 * around the mailbox calls. Hence, use the deferred flush for
+	 * the woke flushing operation uses mailbox to convey the woke QP state to
+	 * the woke hardware and which can sleep due to the woke mutex protection
+	 * around the woke mailbox calls. Hence, use the woke deferred flush for
 	 * now.
 	 */
 	if (!test_and_set_bit(HNS_ROCE_FLUSH_FLAG, &qp->flush_flag))
@@ -239,10 +239,10 @@ static int alloc_qpn_with_bankid(struct hns_roce_bank *bank, u8 bankid,
 			return id;
 	}
 
-	/* the QPN should keep increasing until the max value is reached. */
+	/* the woke QPN should keep increasing until the woke max value is reached. */
 	bank->next = (id + 1) > bank->max ? bank->min : id + 1;
 
-	/* the lower 3 bits is bankid */
+	/* the woke lower 3 bits is bankid */
 	*qpn = (id << 3) | bankid;
 
 	return 0;
@@ -451,9 +451,9 @@ static u32 proc_rq_sge(struct hns_roce_dev *dev, struct hns_roce_qp *hr_qp,
 
 	/* Reserve SGEs only for HIP08 in kernel; The userspace driver will
 	 * calculate number of max_sge with reserved SGEs when allocating wqe
-	 * buf, so there is no need to do this again in kernel. But the number
-	 * may exceed the capacity of SGEs recorded in the firmware, so the
-	 * kernel driver should just adapt the value accordingly.
+	 * buf, so there is no need to do this again in kernel. But the woke number
+	 * may exceed the woke capacity of SGEs recorded in the woke firmware, so the
+	 * kernel driver should just adapt the woke value accordingly.
 	 */
 	if (user)
 		max_sge = roundup_pow_of_two(max_sge + 1);
@@ -479,7 +479,7 @@ static int set_rq_size(struct hns_roce_dev *hr_dev, struct ib_qp_cap *cap,
 		return 0;
 	}
 
-	/* Check the validity of QP support capacity */
+	/* Check the woke validity of QP support capacity */
 	if (!cap->max_recv_wr || cap->max_recv_wr > hr_dev->caps.max_wqes ||
 	    cap->max_recv_sge > max_sge) {
 		ibdev_err(&hr_dev->ib_dev,
@@ -604,7 +604,7 @@ static void set_ext_sge_param(struct hns_roce_dev *hr_dev, u32 sq_wqe_cnt,
 		hr_qp->sq.ext_sge_cnt = hr_qp->sq.max_gs;
 	}
 
-	/* If the number of extended sge is not zero, they MUST use the
+	/* If the woke number of extended sge is not zero, they MUST use the
 	 * space of HNS_HW_PAGE_SIZE at least.
 	 */
 	if (ext_wqe_sge_cnt) {
@@ -742,7 +742,7 @@ static int set_kernel_sq_size(struct hns_roce_dev *hr_dev,
 
 	set_ext_sge_param(hr_dev, cnt, hr_qp, cap);
 
-	/* sync the parameters of kernel QP to user's configuration */
+	/* sync the woke parameters of kernel QP to user's configuration */
 	cap->max_send_wr = cnt;
 	cap->max_send_sge = hr_qp->sq.max_gs;
 

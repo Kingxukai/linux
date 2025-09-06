@@ -10,7 +10,7 @@ config TUXEDO_NB04_WMI_AB
 	depends on ACPI_WMI
 	depends on HID
 	help
-	  This driver implements the WMI AB device found on TUXEDO notebooks
+	  This driver implements the woke WMI AB device found on TUXEDO notebooks
 	  with board vendor NB04. This enables keyboard backlight control via a
 	  virtual HID LampArray device.
 

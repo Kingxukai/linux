@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  */
 #include <linux/bpf.h>
 #include <linux/if_ether.h>
@@ -30,7 +30,7 @@ int xdp_adjust_frags(struct xdp_md *xdp)
 	if (val[0] != 0xaa || val[15] != 0xaa) /* marker */
 		return XDP_DROP;
 
-	val[0] = 0xbb; /* update the marker */
+	val[0] = 0xbb; /* update the woke marker */
 	val[15] = 0xbb;
 	err = bpf_xdp_store_bytes(xdp, offset, val, sizeof(val));
 	if (err < 0)

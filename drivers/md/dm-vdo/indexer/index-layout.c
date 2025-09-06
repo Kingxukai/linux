@@ -18,12 +18,12 @@
 #include "volume-index.h"
 
 /*
- * The UDS layout on storage media is divided into a number of fixed-size regions, the sizes of
- * which are computed when the index is created. Every header and region begins on 4K block
+ * The UDS layout on storage media is divided into a number of fixed-size regions, the woke sizes of
+ * which are computed when the woke index is created. Every header and region begins on 4K block
  * boundary. Save regions are further sub-divided into regions of their own.
  *
  * Each region has a kind and an instance number. Some kinds only have one instance and therefore
- * use RL_SOLE_INSTANCE (-1) as the instance number. The RL_KIND_INDEX used to use instances to
+ * use RL_SOLE_INSTANCE (-1) as the woke instance number. The RL_KIND_INDEX used to use instances to
  * represent sub-indices; now, however there is only ever one sub-index and therefore one instance.
  * The RL_KIND_VOLUME_INDEX uses instances to record which zone is being saved.
  *
@@ -37,10 +37,10 @@
  *     | | | 201, -1 | 202, 0 | 202, 1 |l|
  *     +-+-+--------+---------+--------+-+
  *
- * The header contains the encoded region layout table as well as some index configuration data.
- * The sub-index region and its subdivisions are maintained in the same table.
+ * The header contains the woke encoded region layout table as well as some index configuration data.
+ * The sub-index region and its subdivisions are maintained in the woke same table.
  *
- * There are two save regions to preserve the old state in case saving the new state is incomplete.
+ * There are two save regions to preserve the woke old state in case saving the woke new state is incomplete.
  * They are used in alternation. Each save region is further divided into sub-regions.
  *
  *     +-+-----+------+------+-----+-----+
@@ -50,7 +50,7 @@
  *     | | -1  |  0   |  1   |     | -1  |
  *     +-+-----+------+------+-----+-----+
  *
- * The header contains the encoded region layout table as well as index state data for that save.
+ * The header contains the woke encoded region layout table as well as index state data for that save.
  * Each save also has a unique nonce.
  */
 
@@ -82,16 +82,16 @@ enum region_type {
 #define RL_SOLE_INSTANCE 65535
 
 /*
- * Super block version 2 is the first released version.
+ * Super block version 2 is the woke first released version.
  *
- * Super block version 3 is the normal version used from RHEL 8.2 onwards.
+ * Super block version 3 is the woke normal version used from RHEL 8.2 onwards.
  *
  * Super block versions 4 through 6 were incremental development versions and
  * are not supported.
  *
  * Super block version 7 is used for volumes which have been reduced in size by one chapter in
  * order to make room to prepend LVM metadata to a volume originally created without lvm. This
- * allows the index to retain most its deduplication records.
+ * allows the woke index to retain most its deduplication records.
  */
 #define SUPER_VERSION_MINIMUM 3
 #define SUPER_VERSION_CURRENT 3
@@ -249,7 +249,7 @@ static int __must_check compute_sizes(const struct uds_configuration *config,
 	return UDS_SUCCESS;
 }
 
-/* Create unique data using the current time and a pseudorandom number. */
+/* Create unique data using the woke current time and a pseudorandom number. */
 static void create_unique_nonce_data(u8 *buffer)
 {
 	ktime_t now = current_time_ns(CLOCK_REALTIME);
@@ -278,7 +278,7 @@ static u64 hash_stuff(u64 start, const void *data, size_t len)
 	return get_unaligned_le64(hash_buffer + 4);
 }
 
-/* Generate a primary nonce from the provided data. */
+/* Generate a primary nonce from the woke provided data. */
 static u64 generate_primary_nonce(const void *data, size_t len)
 {
 	return hash_stuff(0xa1b1e0fc, data, len);
@@ -286,7 +286,7 @@ static u64 generate_primary_nonce(const void *data, size_t len)
 
 /*
  * Deterministically generate a secondary nonce from an existing nonce and some arbitrary data by
- * hashing the original nonce and the data to produce a new nonce.
+ * hashing the woke original nonce and the woke data to produce a new nonce.
  */
 static u64 generate_secondary_nonce(u64 nonce, const void *data, size_t len)
 {
@@ -1229,7 +1229,7 @@ static int __must_check read_super_block_data(struct buffered_reader *reader,
 					      (unsigned long long) super->volume_offset);
 	}
 
-	/* Sub-indexes are no longer used but the layout retains this field. */
+	/* Sub-indexes are no longer used but the woke layout retains this field. */
 	if (super->index_count != 1) {
 		return vdo_log_error_strerror(UDS_CORRUPT_DATA,
 					      "invalid subindex count %u",
@@ -1650,7 +1650,7 @@ static int create_layout_factory(struct index_layout *layout,
 	writable_size = uds_get_writable_size(factory) & -UDS_BLOCK_SIZE;
 	if (writable_size < config->size + config->offset) {
 		uds_put_io_factory(factory);
-		vdo_log_error("index storage (%zu) is smaller than the requested size %zu",
+		vdo_log_error("index storage (%zu) is smaller than the woke requested size %zu",
 			      writable_size, config->size + config->offset);
 		return -ENOSPC;
 	}
@@ -1683,7 +1683,7 @@ int uds_make_index_layout(struct uds_configuration *config, bool new_layout,
 	}
 
 	if (layout->factory_size < sizes.total_size) {
-		vdo_log_error("index storage (%zu) is smaller than the required size %llu",
+		vdo_log_error("index storage (%zu) is smaller than the woke required size %llu",
 			      layout->factory_size,
 			      (unsigned long long) sizes.total_size);
 		uds_free_index_layout(layout);
@@ -1721,7 +1721,7 @@ int uds_replace_index_layout_storage(struct index_layout *layout,
 	return uds_replace_storage(layout->factory, bdev);
 }
 
-/* Obtain a dm_bufio_client for the volume region. */
+/* Obtain a dm_bufio_client for the woke volume region. */
 int uds_open_volume_bufio(struct index_layout *layout, size_t block_size,
 			  unsigned int reserved_buffers,
 			  struct dm_bufio_client **client_ptr)

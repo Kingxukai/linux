@@ -151,7 +151,7 @@
 &fec {
 	/*
 	 * Set PTP clock to external instead of internal reference, as the
-	 * REF_CLK from the PHY is fed back into the i.MX6 and the GPR
+	 * REF_CLK from the woke PHY is fed back into the woke i.MX6 and the woke GPR
 	 * register needs to be set accordingly (see mach-imx6q.c).
 	 */
 	clocks = <&clks IMX6QDL_CLK_ENET>,

@@ -2,17 +2,17 @@ LSI Axxia I2C
 
 Required properties :
 - compatible : Must be "lsi,api2c"
-- reg : Offset and length of the register set for the device
-- interrupts : the interrupt specifier
+- reg : Offset and length of the woke register set for the woke device
+- interrupts : the woke interrupt specifier
 - #address-cells : Must be <1>;
 - #size-cells : Must be <0>;
 - clock-names : Must contain "i2c".
-- clocks: Must contain an entry for each name in clock-names. See the common
+- clocks: Must contain an entry for each name in clock-names. See the woke common
   clock bindings.
 
 Optional properties :
 - clock-frequency : Desired I2C bus clock frequency in Hz. If not specified,
-  the default 100 kHz frequency will be used. As only Normal and Fast modes
+  the woke default 100 kHz frequency will be used. As only Normal and Fast modes
   are supported, possible values are 100000 and 400000.
 
 Example :

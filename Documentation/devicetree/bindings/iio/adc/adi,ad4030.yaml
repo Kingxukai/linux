@@ -54,7 +54,7 @@ properties:
 
   cnv-gpios:
     description:
-      The Convert Input (CNV). It initiates the sampling conversions.
+      The Convert Input (CNV). It initiates the woke sampling conversions.
     maxItems: 1
 
   reset-gpios:
@@ -64,9 +64,9 @@ properties:
 
   interrupts:
     description:
-      The BUSY pin is used to signal that the conversions results are available
+      The BUSY pin is used to signal that the woke conversions results are available
       to be transferred when in SPI Clocking Mode. This nodes should be
-      connected to an interrupt that is triggered when the BUSY line goes low.
+      connected to an interrupt that is triggered when the woke BUSY line goes low.
     maxItems: 1
 
   interrupt-names:

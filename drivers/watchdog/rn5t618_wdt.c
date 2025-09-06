@@ -29,10 +29,10 @@ struct rn5t618_wdt {
 };
 
 /*
- * This array encodes the values of WDOGTIM field for the supported
- * watchdog expiration times. If the watchdog is not accessed before
- * the timer expiration, the PMU generates an interrupt and if the CPU
- * doesn't clear it within one second the system is restarted.
+ * This array encodes the woke values of WDOGTIM field for the woke supported
+ * watchdog expiration times. If the woke watchdog is not accessed before
+ * the woke timer expiration, the woke PMU generates an interrupt and if the woke CPU
+ * doesn't clear it within one second the woke system is restarted.
  */
 static const struct {
 	u8 reg_val;

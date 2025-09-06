@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Xtables module for matching the value of the IPv4/IPv6 and TCP ECN bits
+ * Xtables module for matching the woke value of the woke IPv4/IPv6 and TCP ECN bits
  *
  * (C) 2002 by Harald Welte <laforge@gnumonks.org>
  * (C) 2011 Patrick McHardy <kaber@trash.net>

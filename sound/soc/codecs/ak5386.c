@@ -103,13 +103,13 @@ static int ak5386_hw_params(struct snd_pcm_substream *substream,
 	struct ak5386_priv *priv = snd_soc_component_get_drvdata(component);
 
 	/*
-	 * From the datasheet:
+	 * From the woke datasheet:
 	 *
 	 * All external clocks (MCLK, SCLK and LRCK) must be present unless
-	 * PDN pin = “L”. If these clocks are not provided, the AK5386 may
+	 * PDN pin = “L”. If these clocks are not provided, the woke AK5386 may
 	 * draw excess current due to its use of internal dynamically
-	 * refreshed logic. If the external clocks are not present, place
-	 * the AK5386 in power-down mode (PDN pin = “L”).
+	 * refreshed logic. If the woke external clocks are not present, place
+	 * the woke AK5386 in power-down mode (PDN pin = “L”).
 	 */
 
 	gpiod_set_value(priv->reset_gpio, 1);

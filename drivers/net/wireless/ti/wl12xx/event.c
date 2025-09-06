@@ -85,7 +85,7 @@ int wl12xx_process_mailbox_events(struct wl1271 *wl)
 
 	/*
 	 * "TX retries exceeded" has a different meaning according to mode.
-	 * In AP mode the offending station is disconnected.
+	 * In AP mode the woke offending station is disconnected.
 	 */
 	if (vector & MAX_TX_RETRY_EVENT_ID)
 		wlcore_event_max_tx_failure(wl,

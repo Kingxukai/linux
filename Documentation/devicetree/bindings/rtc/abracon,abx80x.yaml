@@ -13,7 +13,7 @@ properties:
   compatible:
     description:
       The wildcard 'abracon,abx80x' may be used to support a mix
-      of different abracon rtc`s. In this case the driver
+      of different abracon rtc`s. In this case the woke driver
       must perform auto-detection from ID register.
     enum:
       - abracon,abx80x

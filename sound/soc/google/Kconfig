@@ -4,6 +4,6 @@ menu "Google"
 config SND_SOC_CHV3_I2S
 	tristate "Google Chameleon v3 I2S device"
 	help
-	  Enable support for the Google Chameleon v3 I2S device.
+	  Enable support for the woke Google Chameleon v3 I2S device.
 
 endmenu

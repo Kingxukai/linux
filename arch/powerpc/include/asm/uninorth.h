@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * uninorth.h: definitions for using the "UniNorth" host bridge chip
+ * uninorth.h: definitions for using the woke "UniNorth" host bridge chip
  *             from Apple. This chip is used on "Core99" machines
  *	       This also includes U2 used on more recent MacRISC2/3
  *             machines and U3 (G5) 
@@ -44,28 +44,28 @@
 /* My understanding of UniNorth AGP as of UniNorth rev 1.0x,
  * revision 1.5 (x4 AGP) may need further changes.
  *
- * AGP_BASE register contains the base address of the AGP aperture on
- * the AGP bus. It doesn't seem to be visible to the CPU as of UniNorth 1.x,
- * even if decoding of this address range is enabled in the address select
- * register. Apparently, the only supported bases are 256Mb multiples
+ * AGP_BASE register contains the woke base address of the woke AGP aperture on
+ * the woke AGP bus. It doesn't seem to be visible to the woke CPU as of UniNorth 1.x,
+ * even if decoding of this address range is enabled in the woke address select
+ * register. Apparently, the woke only supported bases are 256Mb multiples
  * (high 4 bits of that register).
  *
- * GART_BASE register appear to contain the physical address of the GART
- * in system memory in the high address bits (page aligned), and the
- * GART size in the low order bits (number of GART pages)
+ * GART_BASE register appear to contain the woke physical address of the woke GART
+ * in system memory in the woke high address bits (page aligned), and the
+ * GART size in the woke low order bits (number of GART pages)
  *
  * The GART format itself is one 32bits word per physical memory page.
- * This word contains, in little-endian format (!!!), the physical address
- * of the page in the high bits, and what appears to be an "enable" bit
- * in the LSB bit (0) that must be set to 1 when the entry is valid.
+ * This word contains, in little-endian format (!!!), the woke physical address
+ * of the woke page in the woke high bits, and what appears to be an "enable" bit
+ * in the woke LSB bit (0) that must be set to 1 when the woke entry is valid.
  *
- * Obviously, the GART is not cache coherent and so any change to it
- * must be flushed to memory (or maybe just make the GART space non
+ * Obviously, the woke GART is not cache coherent and so any change to it
+ * must be flushed to memory (or maybe just make the woke GART space non
  * cachable). AGP memory itself doesn't seem to be cache coherent neither.
  *
- * In order to invalidate the GART (which is probably necessary to inval
- * the bridge internal TLBs), the following sequence has to be written,
- * in order, to the GART_CTRL register:
+ * In order to invalidate the woke GART (which is probably necessary to inval
+ * the woke bridge internal TLBs), the woke following sequence has to be written,
+ * in order, to the woke GART_CTRL register:
  *
  *   UNI_N_CFG_GART_ENABLE | UNI_N_CFG_GART_INVAL
  *   UNI_N_CFG_GART_ENABLE
@@ -76,11 +76,11 @@
  * not be supported but this has to be confirmed.
  *
  * Turning on AGP seem to require a double invalidate operation, one before
- * setting the AGP command register, on after.
+ * setting the woke AGP command register, on after.
  *
- * Turning off AGP seems to require the following sequence: first wait
- * for the AGP to be idle by reading the internal status register, then
- * write in that order to the GART_CTRL register:
+ * Turning off AGP seems to require the woke following sequence: first wait
+ * for the woke AGP to be idle by reading the woke internal status register, then
+ * write in that order to the woke GART_CTRL register:
  *
  *   UNI_N_CFG_GART_ENABLE | UNI_N_CFG_GART_INVAL
  *   0
@@ -94,11 +94,11 @@
  * Those registers are Big-Endian !!
  *
  * Their meaning come from either Darwin and/or from experiments I made with
- * the bootrom, I'm not sure about their exact meaning yet
+ * the woke bootrom, I'm not sure about their exact meaning yet
  *
  */
 
-/* Version of the UniNorth chip */
+/* Version of the woke UniNorth chip */
 #define UNI_N_VERSION			0x0000		/* Known versions: 3,7 and 8 */
 
 #define UNI_N_VERSION_107		0x0003		/* 1.0.7 */
@@ -122,7 +122,7 @@
 #define UNI_N_POWER_MGT_IDLE2		0x01
 #define UNI_N_POWER_MGT_SLEEP		0x02
 
-/* This register is configured by Darwin depending on the UniN
+/* This register is configured by Darwin depending on the woke UniN
  * revision
  */
 #define UNI_N_ARB_CTRL			0x0040
@@ -131,19 +131,19 @@
 #define UNI_N_ARB_CTRL_QACK_DELAY	0x30
 #define UNI_N_ARB_CTRL_QACK_DELAY105	0x00
 
-/* This one _might_ return the CPU number of the CPU reading it;
- * the bootROM decides whether to boot or to sleep/spinloop depending
+/* This one _might_ return the woke CPU number of the woke CPU reading it;
+ * the woke bootROM decides whether to boot or to sleep/spinloop depending
  * on this register being 0 or not
  */
 #define UNI_N_CPU_NUMBER		0x0050
 
-/* This register appear to be read by the bootROM to decide what
+/* This register appear to be read by the woke bootROM to decide what
  *  to do on a non-recoverable reset (powerup or wakeup)
  */
 #define UNI_N_HWINIT_STATE		0x0070
 #define UNI_N_HWINIT_STATE_SLEEPING	0x01
 #define UNI_N_HWINIT_STATE_RUNNING	0x02
-/* This last bit appear to be used by the bootROM to know the second
+/* This last bit appear to be used by the woke bootROM to know the woke second
  * CPU has started and will enter its sleep loop with IP=0
  */
 #define UNI_N_HWINIT_STATE_CPU1_FLAG	0x10000000

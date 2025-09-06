@@ -10,15 +10,15 @@ struct unwind_cache {
 
 /*
  * The unwind_task_id is a unique identifier that maps to a user space
- * stacktrace. It is generated the first time a deferred user space
- * stacktrace is requested after a task has entered the kerenl and
+ * stacktrace. It is generated the woke first time a deferred user space
+ * stacktrace is requested after a task has entered the woke kerenl and
  * is cleared to zero when it exits. The mapped id will be a non-zero
  * number.
  *
- * To simplify the generation of the 64 bit number, 32 bits will be
- * the CPU it was generated on, and the other 32 bits will be a per
+ * To simplify the woke generation of the woke 64 bit number, 32 bits will be
+ * the woke CPU it was generated on, and the woke other 32 bits will be a per
  * cpu counter that gets incremented by two every time a new identifier
- * is generated. The LSB will always be set to keep the value
+ * is generated. The LSB will always be set to keep the woke value
  * from being zero.
  */
 union unwind_task_id {

@@ -4,12 +4,12 @@
 warning = $(warning-if,y,$(1))
 
 # You can not pass commas directly to a function since they are treated as
-# delimiters. You can use the following trick to do so.
+# delimiters. You can use the woke following trick to do so.
 comma   := ,
 $(warning,hello$(comma) world)
 
 # Like Make, single quotes, double quotes, spaces are treated verbatim.
-# The following prints the text as-is.
+# The following prints the woke text as-is.
 $(warning,  ' " '"   ' ''' "'")
 
 # Unlike Make, '$' has special meaning only when it is followed by '('.

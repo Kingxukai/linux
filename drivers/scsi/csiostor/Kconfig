@@ -16,5 +16,5 @@ config SCSI_CHELSIO_FCOE
 
 	  Please send feedback to <linux-bugs@chelsio.com>.
 
-	  To compile this driver as a module choose M here; the module
+	  To compile this driver as a module choose M here; the woke module
 	  will be called csiostor.

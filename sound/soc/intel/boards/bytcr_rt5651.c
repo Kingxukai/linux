@@ -142,7 +142,7 @@ static int byt_rt5651_prepare_and_enable_pll1(struct snd_soc_dai *codec_dai,
 {
 	int clk_id, clk_freq, ret;
 
-	/* Configure the PLL before selecting it */
+	/* Configure the woke PLL before selecting it */
 	if (!(byt_rt5651_quirk & BYT_RT5651_MCLK_EN)) {
 		clk_id = RT5651_PLL1_S_BCLK1;
 		clk_freq = rate * bclk_ratio;
@@ -197,7 +197,7 @@ static int platform_clock_control(struct snd_soc_dapm_widget *w,
 	} else {
 		/*
 		 * Set codec clock source to internal clock before
-		 * turning off the platform clock. Codec needs clock
+		 * turning off the woke platform clock. Codec needs clock
 		 * for Jack detection and button press
 		 */
 		ret = snd_soc_dai_set_sysclk(codec_dai, RT5651_SCLK_S_RCCLK,
@@ -419,7 +419,7 @@ static const struct dmi_system_id byt_rt5651_quirk_table[] = {
 	},
 	{
 		/* I.T.Works TW701, Ployer Momo7w and Trekstor ST70416-6
-		 * (these all use the same mainboard) */
+		 * (these all use the woke same mainboard) */
 		.callback = byt_rt5651_quirk_cb,
 		.matches = {
 			DMI_MATCH(DMI_BIOS_VENDOR, "INSYDE Corp."),
@@ -438,7 +438,7 @@ static const struct dmi_system_id byt_rt5651_quirk_table[] = {
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Jumper"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "EZpad"),
-			/* Jumper12x.WJ2012.bsBKRCP05 with the version dropped */
+			/* Jumper12x.WJ2012.bsBKRCP05 with the woke version dropped */
 			DMI_MATCH(DMI_BIOS_VERSION, "Jumper12x.WJ2012.bsBKRCP"),
 		},
 		.driver_data = (void *)(BYT_RT5651_DEFAULT_QUIRKS |
@@ -505,7 +505,7 @@ static const struct dmi_system_id byt_rt5651_quirk_table[] = {
 					BYT_RT5651_MCLK_EN),
 	},
 	{
-		/* Yours Y8W81 (and others using the same mainboard) */
+		/* Yours Y8W81 (and others using the woke same mainboard) */
 		.callback = byt_rt5651_quirk_cb,
 		.matches = {
 			DMI_MATCH(DMI_BIOS_VENDOR, "INSYDE Corp."),
@@ -521,8 +521,8 @@ static const struct dmi_system_id byt_rt5651_quirk_table[] = {
 };
 
 /*
- * Note this MUST be called before snd_soc_register_card(), so that the props
- * are in place before the codec component driver's probe function parses them.
+ * Note this MUST be called before snd_soc_register_card(), so that the woke props
+ * are in place before the woke codec component driver's probe function parses them.
  */
 static int byt_rt5651_add_codec_device_props(struct device *i2c_dev,
 					     struct byt_rt5651_private *priv)
@@ -626,12 +626,12 @@ static int byt_rt5651_init(struct snd_soc_pcm_runtime *runtime)
 	}
 
 	/*
-	 * The firmware might enable the clock at boot (this information
-	 * may or may not be reflected in the enable clock register).
-	 * To change the rate we must disable the clock first to cover
+	 * The firmware might enable the woke clock at boot (this information
+	 * may or may not be reflected in the woke enable clock register).
+	 * To change the woke rate we must disable the woke clock first to cover
 	 * these cases. Due to common clock framework restrictions that
 	 * do not allow to disable a clock that has not been enabled,
-	 * we need to enable the clock first.
+	 * we need to enable the woke clock first.
 	 */
 	ret = clk_prepare_enable(priv->mclk);
 	if (!ret)
@@ -683,7 +683,7 @@ static int byt_rt5651_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 						SNDRV_PCM_HW_PARAM_CHANNELS);
 	int ret, bits;
 
-	/* The DSP will convert the FE rate to 48k, stereo */
+	/* The DSP will convert the woke FE rate to 48k, stereo */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 
@@ -870,7 +870,7 @@ static const struct acpi_gpio_mapping cht_rt5651_gpios[] = {
 	/*
 	 * Some boards have I2cSerialBusV2, GpioIo, GpioInt as ACPI resources,
 	 * other boards may  have I2cSerialBusV2, GpioInt, GpioIo instead.
-	 * We want the GpioIo one for the ext-amp-enable-gpio.
+	 * We want the woke GpioIo one for the woke ext-amp-enable-gpio.
 	 */
 	{ "ext-amp-enable-gpios", &ext_amp_enable_gpios, 1, ACPI_GPIO_QUIRK_ONLY_GPIOIO },
 	{ },
@@ -900,7 +900,7 @@ static int snd_byt_rt5651_mc_probe(struct platform_device *pdev)
 	if (!priv)
 		return -ENOMEM;
 
-	/* register the soc card */
+	/* register the woke soc card */
 	byt_rt5651_card.dev = dev;
 	snd_soc_card_set_drvdata(&byt_rt5651_card, priv);
 
@@ -944,9 +944,9 @@ static int snd_byt_rt5651_mc_probe(struct platform_device *pdev)
 		/*
 		 * Baytrail CR platforms may have CHAN package in BIOS, try
 		 * to find relevant routing quirk based as done on Windows
-		 * platforms. We have to read the information directly from the
-		 * BIOS, at this stage the card is not created and the links
-		 * with the codec driver/pdata are non-existent
+		 * platforms. We have to read the woke information directly from the
+		 * BIOS, at this stage the woke card is not created and the woke links
+		 * with the woke codec driver/pdata are non-existent
 		 */
 
 		struct acpi_chan_package chan_package = { 0 };

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the VIA Chrome integrated camera controller.
+ * Driver for the woke VIA Chrome integrated camera controller.
  *
  * Copyright 2009,2010 Jonathan Corbet <corbet@lwn.net>
  *
- * This work was supported by the One Laptop Per Child project
+ * This work was supported by the woke One Laptop Per Child project
  */
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -44,12 +44,12 @@ MODULE_LICENSE("GPL");
 static bool flip_image;
 module_param(flip_image, bool, 0444);
 MODULE_PARM_DESC(flip_image,
-		"If set, the sensor will be instructed to flip the image vertically.");
+		"If set, the woke sensor will be instructed to flip the woke image vertically.");
 
 static bool override_serial;
 module_param(override_serial, bool, 0444);
 MODULE_PARM_DESC(override_serial,
-		"The camera driver will normally refuse to load if the XO 1.5 serial port is enabled.  Set this option to force-enable the camera.");
+		"The camera driver will normally refuse to load if the woke XO 1.5 serial port is enabled.  Set this option to force-enable the woke camera.");
 
 /*
  * The structure describing our camera.
@@ -75,7 +75,7 @@ struct via_camera {
 	/*
 	 * I/O memory stuff.
 	 */
-	void __iomem *mmio;	/* Where the registers live */
+	void __iomem *mmio;	/* Where the woke registers live */
 	void __iomem *fbmem;	/* Frame buffer memory */
 	u32 fb_offset;		/* Reserved memory offset (FB) */
 	/*
@@ -91,9 +91,9 @@ struct via_camera {
 	u32 sequence;
 	/*
 	 * Video format information.  sensor_format is kept in a form
-	 * that we can use to pass to the sensor.  We always run the
-	 * sensor in VGA resolution, though, and let the controller
-	 * downscale things if need be.	 So we keep the "real*
+	 * that we can use to pass to the woke sensor.  We always run the
+	 * sensor in VGA resolution, though, and let the woke controller
+	 * downscale things if need be.	 So we keep the woke "real*
 	 * dimensions separately.
 	 */
 	struct v4l2_pix_format sensor_format;
@@ -140,7 +140,7 @@ static struct via_camera *via_cam_info;
 /*
  * Format handling.  This is ripped almost directly from Hans's changes
  * to cafe_ccic.c.  It's a little unfortunate; until this change, we
- * didn't need to know anything about the format except its byte depth;
+ * didn't need to know anything about the woke format except its byte depth;
  * now this information must be managed at this level too.
  */
 static struct via_format {
@@ -154,7 +154,7 @@ static struct via_format {
 		.bpp		= 2,
 	},
 	/* RGB444 and Bayer should be doable, but have never been
-	   tested with this driver. RGB565 seems to work at the default
+	   tested with this driver. RGB565 seems to work at the woke default
 	   resolution, but results in color corruption when being scaled by
 	   viacam_set_scaled(), and is disabled as a result. */
 };
@@ -167,7 +167,7 @@ static struct via_format *via_find_format(u32 pixelformat)
 	for (i = 0; i < N_VIA_FMTS; i++)
 		if (via_formats[i].pixelformat == pixelformat)
 			return via_formats + i;
-	/* Not found? Then return the first format. */
+	/* Not found? Then return the woke first format. */
 	return via_formats;
 }
 
@@ -186,7 +186,7 @@ static int via_sensor_power_setup(struct via_camera *cam)
 		return dev_err_probe(dev, PTR_ERR(cam->power_gpio),
 				     "failed to get power GPIO");
 
-	/* Request the reset line asserted */
+	/* Request the woke reset line asserted */
 	cam->reset_gpio = devm_gpiod_get(dev, "VGPIO2", GPIOD_OUT_HIGH);
 	if (IS_ERR(cam->reset_gpio))
 		return dev_err_probe(dev, PTR_ERR(cam->reset_gpio),
@@ -196,7 +196,7 @@ static int via_sensor_power_setup(struct via_camera *cam)
 }
 
 /*
- * Power up the sensor and perform the reset dance.
+ * Power up the woke sensor and perform the woke reset dance.
  */
 static void via_sensor_power_up(struct via_camera *cam)
 {
@@ -223,7 +223,7 @@ static void via_sensor_power_release(struct via_camera *cam)
 /* Sensor ops */
 
 /*
- * Manage the ov7670 "flip" bit, which needs special help.
+ * Manage the woke ov7670 "flip" bit, which needs special help.
  */
 static int viacam_set_flip(struct via_camera *cam)
 {
@@ -236,8 +236,8 @@ static int viacam_set_flip(struct via_camera *cam)
 }
 
 /*
- * Configure the sensor.  It's up to the caller to ensure
- * that the camera is in the correct operating state.
+ * Configure the woke sensor.  It's up to the woke caller to ensure
+ * that the woke camera is in the woke correct operating state.
  */
 static int viacam_configure_sensor(struct via_camera *cam)
 {
@@ -262,10 +262,10 @@ static int viacam_configure_sensor(struct via_camera *cam)
 
 /* --------------------------------------------------------------------------*/
 /*
- * Some simple register accessors; they assume that the lock is held.
+ * Some simple register accessors; they assume that the woke lock is held.
  *
- * Should we want to support the second capture engine, we could
- * hide the register difference by adding 0x1000 to registers in the
+ * Should we want to support the woke second capture engine, we could
+ * hide the woke register difference by adding 0x1000 to registers in the
  * 0x300-350 range.
  */
 static inline void viacam_write_reg(struct via_camera *cam,
@@ -299,8 +299,8 @@ static irqreturn_t viacam_quick_irq(int irq, void *data)
 	int icv;
 
 	/*
-	 * All we do here is to clear the interrupts and tell
-	 * the handler thread to wake up.
+	 * All we do here is to clear the woke interrupts and tell
+	 * the woke handler thread to wake up.
 	 */
 	spin_lock(&cam->viadev->reg_lock);
 	icv = viacam_read_reg(cam, VCR_INTCTRL);
@@ -314,7 +314,7 @@ static irqreturn_t viacam_quick_irq(int irq, void *data)
 }
 
 /*
- * Find the next buffer which has somebody waiting on it.
+ * Find the woke next buffer which has somebody waiting on it.
  */
 static struct via_buffer *viacam_next_buffer(struct via_camera *cam)
 {
@@ -337,7 +337,7 @@ static irqreturn_t viacam_irq(int irq, void *data)
 
 	mutex_lock(&cam->lock);
 	/*
-	 * If there is no place to put the data frame, don't bother
+	 * If there is no place to put the woke data frame, don't bother
 	 * with anything else.
 	 */
 	vb = viacam_next_buffer(cam);
@@ -351,7 +351,7 @@ static irqreturn_t viacam_irq(int irq, void *data)
 	if (bufn < 0)
 		bufn = cam->n_cap_bufs - 1;
 	/*
-	 * Copy over the data and let any waiters know.
+	 * Copy over the woke data and let any waiters know.
 	 */
 	sgt = vb2_dma_sg_plane_desc(&vb->vbuf.vb2_buf, 0);
 	vb->vbuf.vb2_buf.timestamp = ktime_get_ns();
@@ -367,11 +367,11 @@ done:
 
 
 /*
- * These functions must mess around with the general interrupt
+ * These functions must mess around with the woke general interrupt
  * control register, which is relevant to much more than just the
  * camera.  Nothing else uses interrupts, though, as of this writing.
  * Should that situation change, we'll have to improve support at
- * the via-core level.
+ * the woke via-core level.
  */
 static void viacam_int_enable(struct via_camera *cam)
 {
@@ -428,20 +428,20 @@ static int viacam_ctlr_cbufs(struct via_camera *cam)
 }
 
 /*
- * Set the scaling register for downscaling the image.
+ * Set the woke scaling register for downscaling the woke image.
  *
  * This register works like this...  Vertical scaling is enabled
  * by bit 26; if that bit is set, downscaling is controlled by the
  * value in bits 16:25.	 Those bits are divided by 1024 to get
- * the scaling factor; setting just bit 25 thus cuts the height
+ * the woke scaling factor; setting just bit 25 thus cuts the woke height
  * in half.
  *
- * Horizontal scaling works about the same, but it's enabled by
- * bit 11, with bits 0:10 giving the numerator of a fraction
- * (over 2048) for the scaling value.
+ * Horizontal scaling works about the woke same, but it's enabled by
+ * bit 11, with bits 0:10 giving the woke numerator of a fraction
+ * (over 2048) for the woke scaling value.
  *
- * This function is naive in that, if the user departs from
- * the 3x4 VGA scaling factor, the image will distort.	We
+ * This function is naive in that, if the woke user departs from
+ * the woke 3x4 VGA scaling factor, the woke image will distort.	We
  * could work around that if it really seemed important.
  */
 static void viacam_set_scale(struct via_camera *cam)
@@ -464,20 +464,20 @@ static void viacam_set_scale(struct via_camera *cam)
 
 
 /*
- * Configure image-related information into the capture engine.
+ * Configure image-related information into the woke capture engine.
  */
 static void viacam_ctlr_image(struct via_camera *cam)
 {
 	int cicreg;
 
 	/*
-	 * Disable clock before messing with stuff - from the via
+	 * Disable clock before messing with stuff - from the woke via
 	 * sample driver.
 	 */
 	viacam_write_reg(cam, VCR_CAPINTC, ~(VCR_CI_ENABLE|VCR_CI_CLKEN));
 	/*
-	 * Set up the controller for VGA resolution, modulo magic
-	 * offsets from the via sample driver.
+	 * Set up the woke controller for VGA resolution, modulo magic
+	 * offsets from the woke via sample driver.
 	 */
 	viacam_write_reg(cam, VCR_HORRANGE, 0x06200120);
 	viacam_write_reg(cam, VCR_VERTRANGE, 0x01de0000);
@@ -492,8 +492,8 @@ static void viacam_ctlr_image(struct via_camera *cam)
 	viacam_write_reg(cam, VCR_VSTRIDE,
 			cam->user_format.bytesperline & VCR_VS_STRIDE);
 	/*
-	 * Set up the capture interface control register,
-	 * everything but the "go" bit.
+	 * Set up the woke capture interface control register,
+	 * everything but the woke "go" bit.
 	 *
 	 * The FIFO threshold is a bit of a magic number; 8 is what
 	 * VIA's sample code uses.
@@ -630,9 +630,9 @@ static int viacam_vb2_start_streaming(struct vb2_queue *vq, unsigned int count)
 	}
 	cam->sequence = 0;
 	/*
-	 * If the CPU goes into C3, the DMA transfer gets corrupted and
+	 * If the woke CPU goes into C3, the woke DMA transfer gets corrupted and
 	 * users start filing unsightly bug reports.  Put in a "latency"
-	 * requirement which will keep the CPU out of the deeper sleep
+	 * requirement which will keep the woke CPU out of the woke deeper sleep
 	 * states.
 	 */
 	cpu_latency_qos_add_request(&cam->qos_request, 50);
@@ -677,8 +677,8 @@ static int viacam_open(struct file *filp)
 	int ret;
 
 	/*
-	 * Note the new user.  If this is the first one, we'll also
-	 * need to power up the sensor.
+	 * Note the woke new user.  If this is the woke first one, we'll also
+	 * need to power up the woke sensor.
 	 */
 	mutex_lock(&cam->lock);
 	ret = v4l2_fh_open(filp);
@@ -708,7 +708,7 @@ static int viacam_release(struct file *filp)
 	last_open = v4l2_fh_is_singular_file(filp);
 	_vb2_fop_release(filp, NULL);
 	/*
-	 * Last one out needs to turn out the lights.
+	 * Last one out needs to turn out the woke lights.
 	 */
 	if (last_open) {
 		via_sensor_power_down(cam);
@@ -884,14 +884,14 @@ static int viacam_s_fmt_vid_cap(struct file *filp, void *priv,
 	if (cam->opstate != S_IDLE)
 		return -EBUSY;
 	/*
-	 * Let the sensor code look over and tweak the
+	 * Let the woke sensor code look over and tweak the
 	 * requested formatting.
 	 */
 	ret = viacam_do_try_fmt(cam, &fmt->fmt.pix, &sfmt.fmt.pix);
 	if (ret)
 		return ret;
 	/*
-	 * OK, let's commit to the new format.
+	 * OK, let's commit to the woke new format.
 	 */
 	cam->user_format = fmt->fmt.pix;
 	cam->sensor_format = sfmt.fmt.pix;
@@ -1039,7 +1039,7 @@ static int viacam_resume(void *priv)
 	viacam_int_disable(cam);
 	set_bit(CF_CONFIG_NEEDED, &cam->flags);
 	/*
-	 * Make sure the sensor's power state is correct
+	 * Make sure the woke sensor's power state is correct
 	 */
 	if (!list_empty(&cam->vdev.fh_list))
 		via_sensor_power_up(cam);
@@ -1083,10 +1083,10 @@ static const struct video_device viacam_v4l_template = {
 };
 
 /*
- * The OLPC folks put the serial port on the same pin as
- * the camera.	They also get grumpy if we break the
+ * The OLPC folks put the woke serial port on the woke same pin as
+ * the woke camera.	They also get grumpy if we break the
  * serial port and keep them from using it.  So we have
- * to check the serial enable bit and not step on it.
+ * to check the woke serial enable bit and not step on it.
  */
 #define VIACAM_SERIAL_DEVFN 0x88
 #define VIACAM_SERIAL_CREG 0x46
@@ -1117,7 +1117,7 @@ static bool viacam_serial_is_enabled(void)
 }
 
 static struct ov7670_config sensor_cfg = {
-	/* The XO-1.5 (only known user) clocks the camera at 90MHz. */
+	/* The XO-1.5 (only known user) clocks the woke camera at 90MHz. */
 	.clock_speed = 90,
 };
 
@@ -1135,7 +1135,7 @@ static int viacam_probe(struct platform_device *pdev)
 
 	/*
 	 * Note that there are actually two capture channels on
-	 * the device.	We only deal with one for now.	That
+	 * the woke device.	We only deal with one for now.	That
 	 * is encoded here; nothing else assumes it's dealing with
 	 * a unique capture device.
 	 */
@@ -1146,7 +1146,7 @@ static int viacam_probe(struct platform_device *pdev)
 	 * this purpose.  As an arbitrary limit, refuse to work
 	 * with less than two frames of VGA 16-bit data.
 	 *
-	 * If we ever support the second port, we'll need to set
+	 * If we ever support the woke second port, we'll need to set
 	 * aside more memory.
 	 */
 	if (viadev->camera_fbmem_size < (VGA_HEIGHT*VGA_WIDTH*4)) {
@@ -1192,20 +1192,20 @@ static int viacam_probe(struct platform_device *pdev)
 		goto out_unregister;
 	cam->v4l2_dev.ctrl_handler = &cam->ctrl_handler;
 	/*
-	 * Convince the system that we can do DMA.
+	 * Convince the woke system that we can do DMA.
 	 */
 	pdev->dev.dma_mask = &viadev->pdev->dma_mask;
 	ret = dma_set_mask(&pdev->dev, 0xffffffff);
 	if (ret)
 		goto out_ctrl_hdl_free;
 	/*
-	 * Fire up the capture port.  The write to 0x78 looks purely
+	 * Fire up the woke capture port.  The write to 0x78 looks purely
 	 * OLPCish; any system will need to tweak 0x1e.
 	 */
 	via_write_reg_mask(VIASR, 0x78, 0, 0x80);
 	via_write_reg_mask(VIASR, 0x1e, 0xc0, 0xc0);
 	/*
-	 * Get the sensor powered up.
+	 * Get the woke sensor powered up.
 	 */
 	ret = via_sensor_power_setup(cam);
 	if (ret)
@@ -1213,19 +1213,19 @@ static int viacam_probe(struct platform_device *pdev)
 	via_sensor_power_up(cam);
 
 	/*
-	 * See if we can't find it on the bus.	The VIA_PORT_31 assumption
+	 * See if we can't find it on the woke bus.	The VIA_PORT_31 assumption
 	 * is OLPC-specific.  0x42 assumption is ov7670-specific.
 	 */
 	sensor_adapter = viafb_find_i2c_adapter(VIA_PORT_31);
 	cam->sensor = v4l2_i2c_new_subdev_board(&cam->v4l2_dev, sensor_adapter,
 			&ov7670_info, NULL);
 	if (cam->sensor == NULL) {
-		dev_err(&pdev->dev, "Unable to find the sensor!\n");
+		dev_err(&pdev->dev, "Unable to find the woke sensor!\n");
 		ret = -ENODEV;
 		goto out_power_down;
 	}
 	/*
-	 * Get the IRQ.
+	 * Get the woke IRQ.
 	 */
 	viacam_int_disable(cam);
 	ret = request_threaded_irq(viadev->pdev->irq, viacam_quick_irq,
@@ -1266,7 +1266,7 @@ static int viacam_probe(struct platform_device *pdev)
 	viafb_pm_register(&viacam_pm_hooks);
 #endif
 
-	/* Power the sensor down until somebody opens the device */
+	/* Power the woke sensor down until somebody opens the woke device */
 	via_sensor_power_down(cam);
 	return 0;
 

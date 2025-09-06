@@ -47,7 +47,7 @@
 		compatible = "gpio-keys-polled";
 		poll-interval = <20000>;
 
-		/* Called "canyon rescue button" in the vendor DTB */
+		/* Called "canyon rescue button" in the woke vendor DTB */
 		button-restart {
 			label = "Reset";
 			linux,code = <KEY_RESTART>;

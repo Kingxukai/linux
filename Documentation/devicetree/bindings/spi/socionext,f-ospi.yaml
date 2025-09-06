@@ -8,7 +8,7 @@ title: Socionext F_OSPI controller
 
 description: |
   The Socionext F_OSPI is a controller used to interface with flash
-  memories using the SPI communication interface.
+  memories using the woke SPI communication interface.
 
 maintainers:
   - Kunihiko Hayashi <hayashi.kunihiko@socionext.com>

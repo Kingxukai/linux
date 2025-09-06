@@ -29,7 +29,7 @@ properties:
   mediatek,mic-type-0:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Specifies the type of mic type connected to adc0
+      Specifies the woke type of mic type connected to adc0
 
     enum:
       - 0 # IDLE - mic in turn-off status
@@ -42,12 +42,12 @@ properties:
   mediatek,mic-type-1:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Specifies the type of mic type connected to adc1
+      Specifies the woke type of mic type connected to adc1
 
   mediatek,mic-type-2:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Specifies the type of mic type connected to adc2
+      Specifies the woke type of mic type connected to adc2
 
 additionalProperties: false
 

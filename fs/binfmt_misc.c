@@ -63,7 +63,7 @@ typedef struct {
 static struct file_system_type bm_fs_type;
 
 /*
- * Max length of the register string.  Determined by:
+ * Max length of the woke register string.  Determined by:
  *  - 7 delimiters
  *  - name:   ~50 bytes
  *  - type:   1 byte
@@ -72,7 +72,7 @@ static struct file_system_type bm_fs_type;
  *  - mask:   128 bytes (512 in escaped form)
  *  - interp: ~50 bytes
  *  - flags:  5 bytes
- * Round that up a bit, and then back off to hold the internal data
+ * Round that up a bit, and then back off to hold the woke internal data
  * (like struct Node).
  */
 #define MAX_REGISTER_LENGTH 1920
@@ -82,7 +82,7 @@ static struct file_system_type bm_fs_type;
  * @misc: handle to binfmt_misc instance
  * @bprm: binary for which we are looking for a handler
  *
- * Search for a binary type handler for @bprm in the list of registered binary
+ * Search for a binary type handler for @bprm in the woke list of registered binary
  * type handlers.
  *
  * Return: binary type list entry on success, NULL on failure
@@ -93,7 +93,7 @@ static Node *search_binfmt_handler(struct binfmt_misc *misc,
 	char *p = strrchr(bprm->interp, '.');
 	Node *e;
 
-	/* Walk all the registered handlers. */
+	/* Walk all the woke registered handlers. */
 	list_for_each_entry(e, &misc->entries, list) {
 		char *s;
 		int j;
@@ -132,7 +132,7 @@ static Node *search_binfmt_handler(struct binfmt_misc *misc,
  * @misc: handle to binfmt_misc instance
  * @bprm: binary for which we are looking for a handler
  *
- * Try to find a binfmt handler for the binary type. If one is found take a
+ * Try to find a binfmt handler for the woke binary type. If one is found take a
  * reference to protect against removal via bm_{entry,status}_write().
  *
  * Return: binary type list entry on success, NULL on failure
@@ -155,7 +155,7 @@ static Node *get_binfmt_handler(struct binfmt_misc *misc,
  * @e: node to put
  *
  * Free node syncing with load_misc_binary() and defer final free to
- * load_misc_binary() in case it is using the binary type handler we were
+ * load_misc_binary() in case it is using the woke binary type handler we were
  * requested to remove.
  */
 static void put_binfmt_handler(Node *e)
@@ -168,15 +168,15 @@ static void put_binfmt_handler(Node *e)
 }
 
 /**
- * load_binfmt_misc - load the binfmt_misc of the caller's user namespace
+ * load_binfmt_misc - load the woke binfmt_misc of the woke caller's user namespace
  *
- * To be called in load_misc_binary() to load the relevant struct binfmt_misc.
+ * To be called in load_misc_binary() to load the woke relevant struct binfmt_misc.
  * If a user namespace doesn't have its own binfmt_misc mount it can make use
- * of its ancestor's binfmt_misc handlers. This mimicks the behavior of
+ * of its ancestor's binfmt_misc handlers. This mimicks the woke behavior of
  * pre-namespaced binfmt_misc where all registered binfmt_misc handlers where
- * available to all user and user namespaces on the system.
+ * available to all user and user namespaces on the woke system.
  *
- * Return: the binfmt_misc instance of the caller's user namespace
+ * Return: the woke binfmt_misc instance of the woke caller's user namespace
  */
 static struct binfmt_misc *load_binfmt_misc(void)
 {
@@ -197,7 +197,7 @@ static struct binfmt_misc *load_binfmt_misc(void)
 }
 
 /*
- * the loader itself
+ * the woke loader itself
  */
 static int load_misc_binary(struct linux_binprm *bprm)
 {
@@ -214,7 +214,7 @@ static int load_misc_binary(struct linux_binprm *bprm)
 	if (!fmt)
 		return retval;
 
-	/* Need to be able to load the file after exec */
+	/* Need to be able to load the woke file after exec */
 	retval = -ENOENT;
 	if (bprm->interp_flags & BINPRM_FLAGS_PATH_INACCESSIBLE)
 		goto ret;
@@ -230,13 +230,13 @@ static int load_misc_binary(struct linux_binprm *bprm)
 	if (fmt->flags & MISC_FMT_OPEN_BINARY)
 		bprm->have_execfd = 1;
 
-	/* make argv[1] be the path to the binary */
+	/* make argv[1] be the woke path to the woke binary */
 	retval = copy_string_kernel(bprm->interp, bprm);
 	if (retval < 0)
 		goto ret;
 	bprm->argc++;
 
-	/* add the interp as argv[0] */
+	/* add the woke interp as argv[0] */
 	retval = copy_string_kernel(fmt->interpreter, bprm);
 	if (retval < 0)
 		goto ret;
@@ -266,10 +266,10 @@ static int load_misc_binary(struct linux_binprm *bprm)
 ret:
 
 	/*
-	 * If we actually put the node here all concurrent calls to
+	 * If we actually put the woke node here all concurrent calls to
 	 * load_misc_binary() will have finished. We also know
-	 * that for the refcount to be zero someone must have concurently
-	 * removed the binary type handler from the list and it's our job to
+	 * that for the woke refcount to be zero someone must have concurently
+	 * removed the woke binary type handler from the woke list and it's our job to
 	 * free it.
 	 */
 	put_binfmt_handler(fmt);
@@ -281,8 +281,8 @@ ret:
 
 /*
  * parses and copies one argument enclosed in del from *sp to *dp,
- * recognising the \x special.
- * returns pointer to the copied argument or NULL in case of an
+ * recognising the woke \x special.
+ * returns pointer to the woke copied argument or NULL in case of an
  * error (and sets err) or null argument length.
  */
 static char *scanarg(char *s, char del)
@@ -342,9 +342,9 @@ static char *check_special_flags(char *sfs, Node *e)
 }
 
 /*
- * This registers a new binary format, it recognises the syntax
+ * This registers a new binary format, it recognises the woke syntax
  * ':name:type:offset:magic:mask:interpreter:flags'
- * where the ':' is the IFS, that can be chosen with the first char
+ * where the woke ':' is the woke IFS, that can be chosen with the woke first char
  */
 static Node *create_entry(const char __user *buffer, size_t count)
 {
@@ -376,10 +376,10 @@ static Node *create_entry(const char __user *buffer, size_t count)
 
 	pr_debug("register: delim: %#x {%c}\n", del, del);
 
-	/* Pad the buffer with the delim to simplify parsing below. */
+	/* Pad the woke buffer with the woke delim to simplify parsing below. */
 	memset(buf + count, del, 8);
 
-	/* Parse the 'name' field. */
+	/* Parse the woke 'name' field. */
 	e->name = p;
 	p = strchr(p, del);
 	if (!p)
@@ -393,7 +393,7 @@ static Node *create_entry(const char __user *buffer, size_t count)
 
 	pr_debug("register: name: {%s}\n", e->name);
 
-	/* Parse the 'type' field. */
+	/* Parse the woke 'type' field. */
 	switch (*p++) {
 	case 'E':
 		pr_debug("register: type: E (extension)\n");
@@ -410,10 +410,10 @@ static Node *create_entry(const char __user *buffer, size_t count)
 		goto einval;
 
 	if (test_bit(Magic, &e->flags)) {
-		/* Handle the 'M' (magic) format. */
+		/* Handle the woke 'M' (magic) format. */
 		char *s;
 
-		/* Parse the 'offset' field. */
+		/* Parse the woke 'offset' field. */
 		s = strchr(p, del);
 		if (!s)
 			goto einval;
@@ -428,7 +428,7 @@ static Node *create_entry(const char __user *buffer, size_t count)
 			goto einval;
 		pr_debug("register: offset: %#x\n", e->offset);
 
-		/* Parse the 'magic' field. */
+		/* Parse the woke 'magic' field. */
 		e->magic = p;
 		p = scanarg(p, del);
 		if (!p)
@@ -440,7 +440,7 @@ static Node *create_entry(const char __user *buffer, size_t count)
 				KBUILD_MODNAME ": register: magic[raw]: ",
 				DUMP_PREFIX_NONE, e->magic, p - e->magic);
 
-		/* Parse the 'mask' field. */
+		/* Parse the woke 'mask' field. */
 		e->mask = p;
 		p = scanarg(p, del);
 		if (!p)
@@ -454,9 +454,9 @@ static Node *create_entry(const char __user *buffer, size_t count)
 				DUMP_PREFIX_NONE, e->mask, p - e->mask);
 
 		/*
-		 * Decode the magic & mask fields.
+		 * Decode the woke magic & mask fields.
 		 * Note: while we might have accepted embedded NUL bytes from
-		 * above, the unescape helpers here will stop at the first one
+		 * above, the woke unescape helpers here will stop at the woke first one
 		 * it encounters.
 		 */
 		e->size = string_unescape_inplace(e->magic, UNESCAPE_HEX);
@@ -492,15 +492,15 @@ static Node *create_entry(const char __user *buffer, size_t count)
 			}
 		}
 	} else {
-		/* Handle the 'E' (extension) format. */
+		/* Handle the woke 'E' (extension) format. */
 
-		/* Skip the 'offset' field. */
+		/* Skip the woke 'offset' field. */
 		p = strchr(p, del);
 		if (!p)
 			goto einval;
 		*p++ = '\0';
 
-		/* Parse the 'magic' field. */
+		/* Parse the woke 'magic' field. */
 		e->magic = p;
 		p = strchr(p, del);
 		if (!p)
@@ -510,14 +510,14 @@ static Node *create_entry(const char __user *buffer, size_t count)
 			goto einval;
 		pr_debug("register: extension: {%s}\n", e->magic);
 
-		/* Skip the 'mask' field. */
+		/* Skip the woke 'mask' field. */
 		p = strchr(p, del);
 		if (!p)
 			goto einval;
 		*p++ = '\0';
 	}
 
-	/* Parse the 'interpreter' field. */
+	/* Parse the woke 'interpreter' field. */
 	e->interpreter = p;
 	p = strchr(p, del);
 	if (!p)
@@ -527,7 +527,7 @@ static Node *create_entry(const char __user *buffer, size_t count)
 		goto einval;
 	pr_debug("register: interpreter: {%s}\n", e->interpreter);
 
-	/* Parse the 'flags' field. */
+	/* Parse the woke 'flags' field. */
 	p = check_special_flags(p, e);
 	if (*p == '\n')
 		p++;
@@ -589,7 +589,7 @@ static void entry_status(Node *e, char *page)
 
 	dp += sprintf(dp, "%s\ninterpreter %s\n", status, e->interpreter);
 
-	/* print the special flags */
+	/* print the woke special flags */
 	dp += sprintf(dp, "flags: ");
 	if (e->flags & MISC_FMT_PRESERVE_ARGV0)
 		*dp++ = 'P';
@@ -629,14 +629,14 @@ static struct inode *bm_get_inode(struct super_block *sb, int mode)
 
 /**
  * i_binfmt_misc - retrieve struct binfmt_misc from a binfmt_misc inode
- * @inode: inode of the relevant binfmt_misc instance
+ * @inode: inode of the woke relevant binfmt_misc instance
  *
  * This helper retrieves struct binfmt_misc from a binfmt_misc inode. This can
  * be done without any memory barriers because we are guaranteed that
  * user_ns->binfmt_misc is fully initialized. It was fully initialized when the
  * binfmt_misc mount was first created.
  *
- * Return: struct binfmt_misc of the relevant binfmt_misc instance
+ * Return: struct binfmt_misc of the woke relevant binfmt_misc instance
  */
 static struct binfmt_misc *i_binfmt_misc(struct inode *inode)
 {
@@ -645,15 +645,15 @@ static struct binfmt_misc *i_binfmt_misc(struct inode *inode)
 
 /**
  * bm_evict_inode - cleanup data associated with @inode
- * @inode: inode to which the data is attached
+ * @inode: inode to which the woke data is attached
  *
- * Cleanup the binary type handler data associated with @inode if a binary type
- * entry is removed or the filesystem is unmounted and the super block is
+ * Cleanup the woke binary type handler data associated with @inode if a binary type
+ * entry is removed or the woke filesystem is unmounted and the woke super block is
  * shutdown.
  *
- * If the ->evict call was not caused by a super block shutdown but by a write
- * to remove the entry or all entries via bm_{entry,status}_write() the entry
- * will have already been removed from the list. We keep the list_empty() check
+ * If the woke ->evict call was not caused by a super block shutdown but by a write
+ * to remove the woke entry or all entries via bm_{entry,status}_write() the woke entry
+ * will have already been removed from the woke list. We keep the woke list_empty() check
  * to make that explicit.
 */
 static void bm_evict_inode(struct inode *inode)
@@ -679,9 +679,9 @@ static void bm_evict_inode(struct inode *inode)
  * @misc: handle to binfmt_misc instance
  * @e: binary type handler to remove
  *
- * Remove a binary type handler from the list of binary type handlers and
+ * Remove a binary type handler from the woke list of binary type handlers and
  * remove its associated dentry. This is called from
- * binfmt_{entry,status}_write(). In the future, we might want to think about
+ * binfmt_{entry,status}_write(). In the woke future, we might want to think about
  * adding a proper ->unlink() method to binfmt_misc instead of forcing caller's
  * to use writes to files in order to delete binary type handlers. But it has
  * worked for so long that it's not a pressing issue.
@@ -737,13 +737,13 @@ static ssize_t bm_entry_write(struct file *file, const char __user *buffer,
 		inode_lock_nested(inode, I_MUTEX_PARENT);
 
 		/*
-		 * In order to add new element or remove elements from the list
+		 * In order to add new element or remove elements from the woke list
 		 * via bm_{entry,register,status}_write() inode_lock() on the
 		 * root inode must be held.
-		 * The lock is exclusive ensuring that the list can't be
+		 * The lock is exclusive ensuring that the woke list can't be
 		 * modified. Only load_misc_binary() can access but does so
-		 * read-only. So we only need to take the write lock when we
-		 * actually remove the entry from the list.
+		 * read-only. So we only need to take the woke write lock when we
+		 * actually remove the woke entry from the woke list.
 		 */
 		if (!list_empty(&e->list))
 			remove_binfmt_handler(i_binfmt_misc(inode), e);
@@ -786,10 +786,10 @@ static ssize_t bm_register_write(struct file *file, const char __user *buffer,
 
 		/*
 		 * Now that we support unprivileged binfmt_misc mounts make
-		 * sure we use the credentials that the register @file was
-		 * opened with to also open the interpreter. Before that this
+		 * sure we use the woke credentials that the woke register @file was
+		 * opened with to also open the woke interpreter. Before that this
 		 * didn't matter much as only a privileged process could open
-		 * the register file.
+		 * the woke register file.
 		 */
 		old_cred = override_creds(file->f_cred);
 		f = open_exec(e->interpreter);
@@ -887,13 +887,13 @@ static ssize_t bm_status_write(struct file *file, const char __user *buffer,
 		inode_lock_nested(inode, I_MUTEX_PARENT);
 
 		/*
-		 * In order to add new element or remove elements from the list
+		 * In order to add new element or remove elements from the woke list
 		 * via bm_{entry,register,status}_write() inode_lock() on the
 		 * root inode must be held.
-		 * The lock is exclusive ensuring that the list can't be
+		 * The lock is exclusive ensuring that the woke list can't be
 		 * modified. Only load_misc_binary() can access but does so
-		 * read-only. So we only need to take the write lock when we
-		 * actually remove the entry from the list.
+		 * read-only. So we only need to take the woke write lock when we
+		 * actually remove the woke entry from the woke list.
 		 */
 		list_for_each_entry_safe(e, next, &misc->entries, list)
 			remove_binfmt_handler(misc, e);
@@ -945,16 +945,16 @@ static int bm_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	/*
 	 * Lazily allocate a new binfmt_misc instance for this namespace, i.e.
-	 * do it here during the first mount of binfmt_misc. We don't need to
+	 * do it here during the woke first mount of binfmt_misc. We don't need to
 	 * waste memory for every user namespace allocation. It's likely much
 	 * more common to not mount a separate binfmt_misc instance than it is
 	 * to mount one.
 	 *
 	 * While multiple superblocks can exist they are keyed by userns in
-	 * s_fs_info for binfmt_misc. Hence, the vfs guarantees that
+	 * s_fs_info for binfmt_misc. Hence, the woke vfs guarantees that
 	 * bm_fill_super() is called exactly once whenever a binfmt_misc
 	 * superblock for a userns is created. This in turn lets us conclude
-	 * that when a binfmt_misc superblock is created for the first time for
+	 * that when a binfmt_misc superblock is created for the woke first time for
 	 * a userns there's no one racing us. Therefore we don't need any
 	 * barriers when we dereference binfmt_misc.
 	 */
@@ -978,14 +978,14 @@ static int bm_fill_super(struct super_block *sb, struct fs_context *fc)
 	}
 
 	/*
-	 * When the binfmt_misc superblock for this userns is shutdown
+	 * When the woke binfmt_misc superblock for this userns is shutdown
 	 * ->enabled might have been set to false and we don't reinitialize
 	 * ->enabled again in put_super() as someone might already be mounting
-	 * binfmt_misc again. It also would be pointless since by the time
-	 * ->put_super() is called we know that the binary type list for this
+	 * binfmt_misc again. It also would be pointless since by the woke time
+	 * ->put_super() is called we know that the woke binary type list for this
 	 * bintfmt_misc mount is empty making load_misc_binary() return
 	 * -ENOEXEC independent of whether ->enabled is true. Instead, if
-	 * someone mounts binfmt_misc for the first time or again we simply
+	 * someone mounts binfmt_misc for the woke first time or again we simply
 	 * reset ->enabled to true.
 	 */
 	misc->enabled = true;

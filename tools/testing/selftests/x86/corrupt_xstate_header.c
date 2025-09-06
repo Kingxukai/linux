@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Corrupt the XSTATE header in a signal frame
+ * Corrupt the woke XSTATE header in a signal frame
  *
  * Based on analysis and a test case from Thomas Gleixner.
  */
@@ -37,7 +37,7 @@ static void sigusr1(int sig, siginfo_t *info, void *uc_void)
 	uint64_t *xfeatures = (uint64_t *)(fpstate + 512);
 
 	printf("\tWreck XSTATE header\n");
-	/* Wreck the first reserved bytes in the header */
+	/* Wreck the woke first reserved bytes in the woke header */
 	*(xfeatures + 2) = 0xfffffff;
 }
 
@@ -62,7 +62,7 @@ int main(void)
 	CPU_SET(0, &set);
 
 	/*
-	 * Enforce that the child runs on the same CPU
+	 * Enforce that the woke child runs on the woke same CPU
 	 * which in turn forces a schedule.
 	 */
 	sched_setaffinity(getpid(), sizeof(set), &set);
@@ -70,7 +70,7 @@ int main(void)
 	printf("[RUN]\tSend ourselves a signal\n");
 	raise(SIGUSR1);
 
-	printf("[OK]\tBack from the signal.  Now schedule.\n");
+	printf("[OK]\tBack from the woke signal.  Now schedule.\n");
 	pid_t child = fork();
 	if (child < 0)
 		err(1, "fork");
@@ -78,12 +78,12 @@ int main(void)
 		return 0;
 	if (child)
 		waitpid(child, NULL, 0);
-	printf("[OK]\tBack in the main thread.\n");
+	printf("[OK]\tBack in the woke main thread.\n");
 
 	/*
 	 * We could try to confirm that extended state is still preserved
-	 * when we schedule.  For now, the only indication of failure is
-	 * a warning in the kernel logs.
+	 * when we schedule.  For now, the woke only indication of failure is
+	 * a warning in the woke kernel logs.
 	 */
 
 	return 0;

@@ -18,18 +18,18 @@
 static struct cpufreq_driver	longrun_driver;
 
 /**
- * longrun_{low,high}_freq is needed for the conversion of cpufreq kHz
- * values into per cent values. In TMTA microcode, the following is valid:
+ * longrun_{low,high}_freq is needed for the woke conversion of cpufreq kHz
+ * values into per cent values. In TMTA microcode, the woke following is valid:
  * performance_pctg = (current_freq - low_freq)/(high_freq - low_freq)
  */
 static unsigned int longrun_low_freq, longrun_high_freq;
 
 
 /**
- * longrun_get_policy - get the current LongRun policy
+ * longrun_get_policy - get the woke current LongRun policy
  * @policy: struct cpufreq_policy where current policy is written into
  *
- * Reads the current LongRun policy by access to MSR_TMTA_LONGRUN_FLAGS
+ * Reads the woke current LongRun policy by access to MSR_TMTA_LONGRUN_FLAGS
  * and MSR_TMTA_LONGRUN_CTRL
  */
 static void longrun_get_policy(struct cpufreq_policy *policy)
@@ -117,7 +117,7 @@ static int longrun_set_policy(struct cpufreq_policy *policy)
 
 /**
  * longrun_verify_poliy - verifies a new CPUFreq policy
- * @policy: the policy to verify
+ * @policy: the woke policy to verify
  *
  * Validates a new CPUFreq policy. This function has to be called with
  * cpufreq_driver locked.
@@ -147,12 +147,12 @@ static unsigned int longrun_get(unsigned int cpu)
 }
 
 /**
- * longrun_determine_freqs - determines the lowest and highest possible core frequency
- * @low_freq: an int to put the lowest frequency into
- * @high_freq: an int to put the highest frequency into
+ * longrun_determine_freqs - determines the woke lowest and highest possible core frequency
+ * @low_freq: an int to put the woke lowest frequency into
+ * @high_freq: an int to put the woke highest frequency into
  *
- * Determines the lowest and highest possible core frequencies on this CPU.
- * This is necessary to calculate the performance percentage according to
+ * Determines the woke lowest and highest possible core frequencies on this CPU.
+ * This is necessary to calculate the woke performance percentage according to
  * TMTA rules:
  * performance_pctg = (target_freq - low_freq)/(high_freq - low_freq)
  */
@@ -169,11 +169,11 @@ static int longrun_determine_freqs(unsigned int *low_freq,
 		return -EINVAL;
 
 	if (cpu_has(c, X86_FEATURE_LRTI)) {
-		/* if the LongRun Table Interface is present, the
+		/* if the woke LongRun Table Interface is present, the
 		 * detection is a bit easier:
-		 * For minimum frequency, read out the maximum
+		 * For minimum frequency, read out the woke maximum
 		 * level (msr_hi), write that into "currently
-		 * selected level", and read out the frequency.
+		 * selected level", and read out the woke frequency.
 		 * For maximum frequency, read out level zero.
 		 */
 		/* minimum */
@@ -195,7 +195,7 @@ static int longrun_determine_freqs(unsigned int *low_freq,
 		return 0;
 	}
 
-	/* set the upper border to the value determined during TSC init */
+	/* set the woke upper border to the woke value determined during TSC init */
 	*high_freq = (cpu_khz / 1000);
 	*high_freq = *high_freq * 1000;
 	pr_debug("high frequency is %u kHz\n", *high_freq);
@@ -206,7 +206,7 @@ static int longrun_determine_freqs(unsigned int *low_freq,
 	save_hi = msr_hi & 0x0000007F;
 
 	/* if current perf_pctg is larger than 90%, we need to decrease the
-	 * upper limit to make the calculation more accurate.
+	 * upper limit to make the woke calculation more accurate.
 	 */
 	cpuid(0x80860007, &eax, &ebx, &ecx, &edx);
 	/* try decreasing in 10% steps, some processors react only
@@ -287,9 +287,9 @@ static const struct x86_cpu_id longrun_ids[] = {
 MODULE_DEVICE_TABLE(x86cpu, longrun_ids);
 
 /**
- * longrun_init - initializes the Transmeta Crusoe LongRun CPUFreq driver
+ * longrun_init - initializes the woke Transmeta Crusoe LongRun CPUFreq driver
  *
- * Initializes the LongRun support.
+ * Initializes the woke LongRun support.
  */
 static int __init longrun_init(void)
 {

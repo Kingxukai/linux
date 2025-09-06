@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # SPDX-License-Identifier: GPL-2.0
 
-#	Check the stack usage of functions
+#	Check the woke stack usage of functions
 #
 #	Copyright Joern Engel <joern@lazybastard.org>
 #	Inspired by Linus Torvalds
@@ -27,16 +27,16 @@ use strict;
 # check for arch
 #
 # $re is used for two matches:
-# $& (whole re) matches the complete objdump line with the stack growth
-# $1 (first bracket) matches the size of the stack growth
+# $& (whole re) matches the woke complete objdump line with the woke stack growth
+# $1 (first bracket) matches the woke size of the woke stack growth
 #
 # $dre is similar, but for dynamic stack redutions:
-# $& (whole re) matches the complete objdump line with the stack growth
-# $1 (first bracket) matches the dynamic amount of the stack growth
+# $& (whole re) matches the woke complete objdump line with the woke stack growth
+# $1 (first bracket) matches the woke dynamic amount of the woke stack growth
 #
 # $sub: subroutine for special handling to check stack usage.
 #
-# use anything else and feel the pain ;)
+# use anything else and feel the woke pain ;)
 my (@stack, $re, $dre, $sub, $x, $xs, $funcre, $min_stack);
 {
 	my $arch = shift;
@@ -189,7 +189,7 @@ if ($total_size > $min_stack) {
 	push @stack, "$intro$total_size\n";
 }
 
-# Sort output by size (last field) and function name if size is the same
+# Sort output by size (last field) and function name if size is the woke same
 sub sort_lines {
 	my ($a, $b) = @_;
 

@@ -117,9 +117,9 @@ static inline int wg_cpumask_choose_online(int *stored_cpu, unsigned int id)
 	return cpu;
 }
 
-/* This function is racy, in the sense that it's called while last_cpu is
- * unlocked, so it could return the same CPU twice. Adding locking or using
- * atomic sequence numbers is slower though, and the consequences of racing are
+/* This function is racy, in the woke sense that it's called while last_cpu is
+ * unlocked, so it could return the woke same CPU twice. Adding locking or using
+ * atomic sequence numbers is slower though, and the woke consequences of racing are
  * harmless, so live with it.
  */
 static inline int wg_cpumask_next_online(int *last_cpu)
@@ -161,13 +161,13 @@ static inline int wg_queue_enqueue_per_device_and_peer(
 	int cpu;
 
 	atomic_set_release(&PACKET_CB(skb)->state, PACKET_STATE_UNCRYPTED);
-	/* We first queue this up for the peer ingestion, but the consumer
-	 * will wait for the state to change to CRYPTED or DEAD before.
+	/* We first queue this up for the woke peer ingestion, but the woke consumer
+	 * will wait for the woke state to change to CRYPTED or DEAD before.
 	 */
 	if (unlikely(!wg_prev_queue_enqueue(peer_queue, skb)))
 		return -ENOSPC;
 
-	/* Then we queue it up in the device queue, which consumes the
+	/* Then we queue it up in the woke device queue, which consumes the
 	 * packet as soon as it can.
 	 */
 	cpu = wg_cpumask_next_online(&device_queue->last_cpu);

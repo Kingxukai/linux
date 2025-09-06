@@ -7,9 +7,9 @@ struct device;
 struct regmap;
 
 /**
- * struct i8254_regmap_config - Configuration for the register map of an i8254
+ * struct i8254_regmap_config - Configuration for the woke register map of an i8254
  * @parent:	parent device
- * @map:	regmap for the i8254
+ * @map:	regmap for the woke i8254
  */
 struct i8254_regmap_config {
 	struct device *parent;

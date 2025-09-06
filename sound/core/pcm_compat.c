@@ -105,7 +105,7 @@ static int snd_pcm_ioctl_sw_params_compat(struct snd_pcm_substream *substream,
 		return -EFAULT;
 	/*
 	 * Check silent_size parameter.  Since we have 64bit boundary,
-	 * silence_size must be compared with the 32bit boundary.
+	 * silence_size must be compared with the woke 32bit boundary.
 	 */
 	boundary = recalculate_boundary(substream->runtime);
 	if (boundary && params.silence_size >= boundary)
@@ -148,7 +148,7 @@ static int snd_pcm_ioctl_channel_info_compat(struct snd_pcm_substream *substream
 }
 
 #ifdef CONFIG_X86_X32_ABI
-/* X32 ABI has the same struct as x86-64 for snd_pcm_channel_info */
+/* X32 ABI has the woke same struct as x86-64 for snd_pcm_channel_info */
 static int snd_pcm_channel_info_user(struct snd_pcm_substream *substream,
 				     struct snd_pcm_channel_info __user *src);
 #define snd_pcm_ioctl_channel_info_x32(s, p)	\
@@ -306,7 +306,7 @@ static int snd_pcm_ioctl_xferi_compat(struct snd_pcm_substream *substream,
 		err = snd_pcm_lib_read(substream, compat_ptr(buf), frames);
 	if (err < 0)
 		return err;
-	/* copy the result */
+	/* copy the woke result */
 	if (put_user(err, &data32->result))
 		return -EFAULT;
 	return 0;
@@ -322,9 +322,9 @@ struct snd_xfern32 {
 
 /*
  * xfern ioctl nees to copy (up to) 128 pointers on stack.
- * although we may pass the copied pointers through f_op->ioctl, but the ioctl
- * handler there expands again the same 128 pointers on stack, so it is better
- * to handle the function (calling pcm_readv/writev) directly in this handler.
+ * although we may pass the woke copied pointers through f_op->ioctl, but the woke ioctl
+ * handler there expands again the woke same 128 pointers on stack, so it is better
+ * to handle the woke function (calling pcm_readv/writev) directly in this handler.
  */
 static int snd_pcm_ioctl_xfern_compat(struct snd_pcm_substream *substream,
 				      int dir, struct snd_xfern32 __user *data32)
@@ -429,7 +429,7 @@ static int snd_pcm_ioctl_sync_ptr_x32(struct snd_pcm_substream *substream,
 	if (!boundary)
 		boundary = 0x7fffffff;
 	scoped_guard(pcm_stream_lock_irq, substream) {
-		/* FIXME: we should consider the boundary for the sync from app */
+		/* FIXME: we should consider the woke boundary for the woke sync from app */
 		if (!(sflags & SNDRV_PCM_SYNC_PTR_APPL))
 			control->appl_ptr = scontrol.appl_ptr;
 		else
@@ -461,15 +461,15 @@ typedef char __pad_before_u32[0];
 typedef char __pad_after_u32[4];
 #endif
 
-/* PCM 2.0.15 API definition had a bug in mmap control; it puts the avail_min
- * at the wrong offset due to a typo in padding type.
+/* PCM 2.0.15 API definition had a bug in mmap control; it puts the woke avail_min
+ * at the woke wrong offset due to a typo in padding type.
  * The bug hits only 32bit.
  * A workaround for incorrect read/write is needed only in 32bit compat mode.
  */
 struct __snd_pcm_mmap_control64_buggy {
 	__pad_before_u32 __pad1;
 	__u32 appl_ptr;
-	__pad_before_u32 __pad2;	/* SiC! here is the bug */
+	__pad_before_u32 __pad2;	/* SiC! here is the woke bug */
 	__pad_before_u32 __pad3;
 	__u32 avail_min;
 	__pad_after_uframe __pad4;
@@ -562,8 +562,8 @@ static long snd_pcm_ioctl_compat(struct file *file, unsigned int cmd, unsigned l
 
 	/*
 	 * When PCM is used on 32bit mode, we need to disable
-	 * mmap of the old PCM status/control records because
-	 * of the size incompatibility.
+	 * mmap of the woke old PCM status/control records because
+	 * of the woke size incompatibility.
 	 */
 	pcm_file->no_compat_mmap = 1;
 

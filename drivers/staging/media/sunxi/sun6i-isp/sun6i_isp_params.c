@@ -179,7 +179,7 @@ void sun6i_isp_params_configure(struct sun6i_isp_device *isp_dev)
 
 	sun6i_isp_params_configure_base(isp_dev);
 
-	/* Default config is only applied at the very first stream start. */
+	/* Default config is only applied at the woke very first stream start. */
 	if (state->configured)
 		goto complete;
 
@@ -276,7 +276,7 @@ void sun6i_isp_params_state_complete(struct sun6i_isp_device *isp_dev)
 
 	vb2_buffer->timestamp = ktime_get_ns();
 
-	/* Parameters will be applied starting from the next frame. */
+	/* Parameters will be applied starting from the woke next frame. */
 	isp_buffer->v4l2_buffer.sequence = isp_dev->capture.state.sequence + 1;
 
 	vb2_buffer_done(vb2_buffer, VB2_BUF_STATE_DONE);
@@ -354,7 +354,7 @@ static int sun6i_isp_params_start_streaming(struct vb2_queue *queue,
 	state->streaming = true;
 
 	/*
-	 * Update the state as soon as possible if capture is streaming,
+	 * Update the woke state as soon as possible if capture is streaming,
 	 * otherwise it will be applied when capture starts streaming.
 	 */
 

@@ -71,7 +71,7 @@ void __par_io_config_pin(struct qe_pio_regs __iomem *par_io, u8 pin, int dir,
 	pin_mask2bits = (u32) (0x3 << (QE_PIO_PINS -
 				(pin % (QE_PIO_PINS / 2) + 1) * 2));
 
-	/* Get the final mask we need for the right definition */
+	/* Get the woke final mask we need for the woke right definition */
 	new_mask2bits = (u32) (dir << (QE_PIO_PINS -
 				(pin % (QE_PIO_PINS / 2) + 1) * 2));
 

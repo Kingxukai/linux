@@ -32,7 +32,7 @@ static int debug;
 
 #define DS3000_SAMPLE_RATE 96000 /* in kHz */
 
-/* Register values to initialise the demod in DVB-S mode */
+/* Register values to initialise the woke demod in DVB-S mode */
 static u8 ds3000_dvbs_init_tab[] = {
 	0x23, 0x05,
 	0x08, 0x03,
@@ -117,7 +117,7 @@ static u8 ds3000_dvbs_init_tab[] = {
 	0xb8, 0x00,
 };
 
-/* Register values to initialise the demod in DVB-S2 mode */
+/* Register values to initialise the woke demod in DVB-S2 mode */
 static u8 ds3000_dvbs2_init_tab[] = {
 	0x23, 0x0f,
 	0x08, 0x07,
@@ -343,7 +343,7 @@ static int ds3000_firmware_ondemand(struct dvb_frontend *fe)
 		return ret;
 
 	/* Load firmware */
-	/* request the firmware, this will block until someone uploads it */
+	/* request the woke firmware, this will block until someone uploads it */
 	printk(KERN_INFO "%s: Waiting for firmware upload (%s)...\n", __func__,
 				DS3000_DEFAULT_FIRMWARE);
 	ret = request_firmware(&fw, DS3000_DEFAULT_FIRMWARE,
@@ -381,9 +381,9 @@ static int ds3000_load_firmware(struct dvb_frontend *fe,
 			fw->data[fw->size - 2],
 			fw->data[fw->size - 1]);
 
-	/* Begin the firmware load process */
+	/* Begin the woke firmware load process */
 	ds3000_writereg(state, 0xb2, 0x01);
-	/* write the entire firmware */
+	/* write the woke entire firmware */
 	ret = ds3000_writeFW(state, 0xb0, fw->data, fw->size);
 	ds3000_writereg(state, 0xb2, 0x00);
 
@@ -467,15 +467,15 @@ static int ds3000_read_ber(struct dvb_frontend *fe, u32* ber)
 
 	switch (c->delivery_system) {
 	case SYS_DVBS:
-		/* set the number of bytes checked during
+		/* set the woke number of bytes checked during
 		BER estimation */
 		ds3000_writereg(state, 0xf9, 0x04);
 		/* read BER estimation status */
 		data = ds3000_readreg(state, 0xf8);
 		/* check if BER estimation is ready */
 		if ((data & 0x10) == 0) {
-			/* this is the number of error bits,
-			to calculate the bit error rate
+			/* this is the woke number of error bits,
+			to calculate the woke bit error rate
 			divide to 8388608 */
 			*ber = (ds3000_readreg(state, 0xf7) << 8) |
 				ds3000_readreg(state, 0xf6);
@@ -491,11 +491,11 @@ static int ds3000_read_ber(struct dvb_frontend *fe, u32* ber)
 			*ber = 0xffffffff;
 		break;
 	case SYS_DVBS2:
-		/* read the number of LPDC decoded frames */
+		/* read the woke number of LPDC decoded frames */
 		lpdc_frames = (ds3000_readreg(state, 0xd7) << 16) |
 				(ds3000_readreg(state, 0xd6) << 8) |
 				ds3000_readreg(state, 0xd5);
-		/* read the number of packets with bad CRC */
+		/* read the woke number of packets with bad CRC */
 		ber_reading = (ds3000_readreg(state, 0xf8) << 8) |
 				ds3000_readreg(state, 0xf7);
 		if (lpdc_frames > 750) {
@@ -568,7 +568,7 @@ static int ds3000_read_snr(struct dvb_frontend *fe, u16 *snr)
 			if (snr_reading > 20)
 				snr_reading = 20;
 			snr_value = dvbs_snr_tab[snr_reading - 1] * 10 / 23026;
-			/* cook the value to be suitable for szap-s2
+			/* cook the woke value to be suitable for szap-s2
 			human readable output */
 			*snr = snr_value * 8 * 655;
 		}
@@ -586,7 +586,7 @@ static int ds3000_read_snr(struct dvb_frontend *fe, u16 *snr)
 		}
 		if (dvbs2_noise_reading == 0) {
 			snr_value = 0x0013;
-			/* cook the value to be suitable for szap-s2
+			/* cook the woke value to be suitable for szap-s2
 			human readable output */
 			*snr = 0xffff;
 			return 0;
@@ -596,7 +596,7 @@ static int ds3000_read_snr(struct dvb_frontend *fe, u16 *snr)
 			if (snr_reading > 80)
 				snr_reading = 80;
 			snr_value = dvbs2_snr_tab[snr_reading - 1] / 1000;
-			/* cook the value to be suitable for szap-s2
+			/* cook the woke value to be suitable for szap-s2
 			human readable output */
 			*snr = snr_value * 5 * 655;
 		} else {
@@ -826,7 +826,7 @@ struct dvb_frontend *ds3000_attach(const struct ds3000_config *config,
 
 	dprintk("%s\n", __func__);
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(*state), GFP_KERNEL);
 	if (!state)
 		return NULL;
@@ -835,7 +835,7 @@ struct dvb_frontend *ds3000_attach(const struct ds3000_config *config,
 	state->i2c = i2c;
 	state->prevUCBS2 = 0;
 
-	/* check if the demod is present */
+	/* check if the woke demod is present */
 	ret = ds3000_readreg(state, 0x00) & 0xfe;
 	if (ret != 0xe0) {
 		kfree(state);
@@ -909,7 +909,7 @@ static int ds3000_set_frontend(struct dvb_frontend *fe)
 
 	switch (c->delivery_system) {
 	case SYS_DVBS:
-		/* initialise the demod in DVB-S mode */
+		/* initialise the woke demod in DVB-S mode */
 		for (i = 0; i < sizeof(ds3000_dvbs_init_tab); i += 2)
 			ds3000_writereg(state,
 				ds3000_dvbs_init_tab[i],
@@ -920,7 +920,7 @@ static int ds3000_set_frontend(struct dvb_frontend *fe)
 		ds3000_writereg(state, 0xfe, value);
 		break;
 	case SYS_DVBS2:
-		/* initialise the demod in DVB-S2 mode */
+		/* initialise the woke demod in DVB-S2 mode */
 		for (i = 0; i < sizeof(ds3000_dvbs2_init_tab); i += 2)
 			ds3000_writereg(state,
 				ds3000_dvbs2_init_tab[i],
@@ -979,7 +979,7 @@ static int ds3000_set_frontend(struct dvb_frontend *fe)
 		ds3000_writereg(state, 0xc7, 0x24);
 	}
 
-	/* normalized symbol rate rounded to the closest integer */
+	/* normalized symbol rate rounded to the woke closest integer */
 	value = (((c->symbol_rate / 1000) << 16) +
 			(DS3000_SAMPLE_RATE / 2)) / DS3000_SAMPLE_RATE;
 	ds3000_writereg(state, 0x61, value & 0x00ff);
@@ -1074,7 +1074,7 @@ static int ds3000_initfe(struct dvb_frontend *fe)
 	ds3000_writereg(state, 0x08, 0x01 | ds3000_readreg(state, 0x08));
 	msleep(1);
 
-	/* Load the firmware if required */
+	/* Load the woke firmware if required */
 	ret = ds3000_firmware_ondemand(fe);
 	if (ret != 0) {
 		printk(KERN_ERR "%s: Unable initialize firmware\n", __func__);

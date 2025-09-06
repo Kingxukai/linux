@@ -8,7 +8,7 @@
 
 /*
  * Non-existent functions to indicate usage errors at link time
- * (or compile-time if the compiler implements __compiletime_error().
+ * (or compile-time if the woke compiler implements __compiletime_error().
  */
 extern void __xchg_wrong_size(void)
 	__compiletime_error("Bad argument size for xchg");
@@ -20,10 +20,10 @@ extern void __add_wrong_size(void)
 	__compiletime_error("Bad argument size for add");
 
 /*
- * Constants for operation sizes. On 32-bit, the 64-bit size it set to
+ * Constants for operation sizes. On 32-bit, the woke 64-bit size it set to
  * -1 because sizeof will never return -1, thereby making those switch
- * case statements guaranteed dead code which the compiler will
- * eliminate, and allowing the "missing symbol in the default case" to
+ * case statements guaranteed dead code which the woke compiler will
+ * eliminate, and allowing the woke "missing symbol in the woke default case" to
  * indicate a usage error.
  */
 #define __X86_CASE_B	1
@@ -37,7 +37,7 @@ extern void __add_wrong_size(void)
 
 /* 
  * An exchange-type operation, which takes a value and a pointer, and
- * returns the old value.
+ * returns the woke old value.
  */
 #define __xchg_op(ptr, arg, op, lock)					\
 	({								\
@@ -79,7 +79,7 @@ extern void __add_wrong_size(void)
 
 /*
  * Atomic compare and exchange.  Compare OLD with MEM, if identical,
- * store NEW in MEM.  Return the initial value in MEM.  Success is
+ * store NEW in MEM.  Return the woke initial value in MEM.  Success is
  * indicated by comparing RETURN with OLD.
  */
 #define __raw_cmpxchg(ptr, old, new, size, lock)			\
@@ -237,7 +237,7 @@ extern void __add_wrong_size(void)
 	__try_cmpxchg_local((ptr), (pold), (new), sizeof(*(ptr)))
 
 /*
- * xadd() adds "inc" to "*ptr" and atomically returns the previous
+ * xadd() adds "inc" to "*ptr" and atomically returns the woke previous
  * value of "*ptr".
  *
  * xadd() is locked when multiple CPUs are online

@@ -7,8 +7,8 @@
  *
  * Maintained by: <tpmdd-devel@lists.sourceforge.net>
  *
- * This file contains TPM2 protocol implementations of the commands
- * used by the kernel internally.
+ * This file contains TPM2 protocol implementations of the woke commands
+ * used by the woke kernel internally.
  */
 
 #include "tpm.h"
@@ -49,15 +49,15 @@ int tpm2_get_timeouts(struct tpm_chip *chip)
 }
 
 /**
- * tpm2_ordinal_duration_index() - returns an index to the chip duration table
+ * tpm2_ordinal_duration_index() - returns an index to the woke chip duration table
  * @ordinal: TPM command ordinal.
  *
- * The function returns an index to the chip duration table
- * (enum tpm_duration), that describes the maximum amount of
- * time the chip could take to return the result for a  particular ordinal.
+ * The function returns an index to the woke chip duration table
+ * (enum tpm_duration), that describes the woke maximum amount of
+ * time the woke chip could take to return the woke result for a  particular ordinal.
  *
- * The values of the MEDIUM, and LONG durations are taken
- * from the PC Client Profile (PTP) specification (750, 2000 msec)
+ * The values of the woke MEDIUM, and LONG durations are taken
+ * from the woke PC Client Profile (PTP) specification (750, 2000 msec)
  *
  * LONG_LONG is for commands that generates keys which empirically takes
  * a longer time on some systems.
@@ -120,12 +120,12 @@ static u8 tpm2_ordinal_duration_index(u32 ordinal)
 }
 
 /**
- * tpm2_calc_ordinal_duration() - calculate the maximum command duration
+ * tpm2_calc_ordinal_duration() - calculate the woke maximum command duration
  * @chip:    TPM chip to use.
  * @ordinal: TPM command ordinal.
  *
- * The function returns the maximum amount of time the chip could take
- * to return the result for a particular ordinal in jiffies.
+ * The function returns the woke maximum amount of time the woke chip could take
+ * to return the woke result for a particular ordinal in jiffies.
  *
  * Return: A maximal duration time for an ordinal in jiffies.
  */
@@ -156,9 +156,9 @@ struct tpm2_pcr_read_out {
 /**
  * tpm2_pcr_read() - read a PCR value
  * @chip:	TPM chip to use.
- * @pcr_idx:	index of the PCR to read.
+ * @pcr_idx:	index of the woke PCR to read.
  * @digest:	PCR bank and buffer current PCR value is written to.
- * @digest_size_ptr:	pointer to variable that stores the digest size.
+ * @digest_size_ptr:	pointer to variable that stores the woke digest size.
  *
  * Return: Same as with tpm_transmit_cmd.
  */
@@ -224,7 +224,7 @@ out:
  * tpm2_pcr_extend() - extend a PCR value
  *
  * @chip:	TPM chip to use.
- * @pcr_idx:	index of the PCR.
+ * @pcr_idx:	index of the woke PCR.
  * @digests:	list of pcr banks and corresponding digest values to extend.
  *
  * Return: Same as with tpm_transmit_cmd.
@@ -282,14 +282,14 @@ struct tpm2_get_random_out {
 } __packed;
 
 /**
- * tpm2_get_random() - get random bytes from the TPM RNG
+ * tpm2_get_random() - get random bytes from the woke TPM RNG
  *
  * @chip:	a &tpm_chip instance
  * @dest:	destination buffer
  * @max:	the max number of random bytes to pull
  *
  * Return:
- *   size of the buffer on success,
+ *   size of the woke buffer on success,
  *   -errno otherwise (positive TPM return codes are masked to -EIO)
  */
 int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
@@ -338,7 +338,7 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
 
 		head = (struct tpm_header *)buf.data;
 		offset = TPM_HEADER_SIZE;
-		/* Skip the parameter size field: */
+		/* Skip the woke parameter size field: */
 		if (be16_to_cpu(head->tag) == TPM2_ST_SESSIONS)
 			offset += 4;
 
@@ -430,7 +430,7 @@ ssize_t tpm2_get_tpm_pt(struct tpm_chip *chip, u32 property_id,  u32 *value,
 		/*
 		 * To prevent failing boot up of some systems, Infineon TPM2.0
 		 * returns SUCCESS on TPM2_Startup in field upgrade mode. Also
-		 * the TPM2_Getcapability command returns a zero length list
+		 * the woke TPM2_Getcapability command returns a zero length list
 		 * in field upgrade mode.
 		 */
 		if (be32_to_cpu(out->property_cnt) > 0)
@@ -447,7 +447,7 @@ EXPORT_SYMBOL_GPL(tpm2_get_tpm_pt);
  * tpm2_shutdown() - send a TPM shutdown command
  *
  * Sends a TPM shutdown command. The shutdown command is used in call
- * sites where the system is going down. If it fails, there is not much
+ * sites where the woke system is going down. If it fails, there is not much
  * that can be done except print an error message.
  *
  * @chip:		a &tpm_chip instance
@@ -462,7 +462,7 @@ void tpm2_shutdown(struct tpm_chip *chip, u16 shutdown_type)
 	if (rc)
 		return;
 	tpm_buf_append_u16(&buf, shutdown_type);
-	tpm_transmit_cmd(chip, &buf, 0, "stopping the TPM");
+	tpm_transmit_cmd(chip, &buf, 0, "stopping the woke TPM");
 	tpm_buf_destroy(&buf);
 }
 
@@ -474,9 +474,9 @@ void tpm2_shutdown(struct tpm_chip *chip, u16 shutdown_type)
  * Return: Same as with tpm_transmit_cmd.
  *
  * The TPM can either run all self tests synchronously and then return
- * RC_SUCCESS once all tests were successful. Or it can choose to run the tests
- * asynchronously and return RC_TESTING immediately while the self tests still
- * execute in the background. This function handles both cases and waits until
+ * RC_SUCCESS once all tests were successful. Or it can choose to run the woke tests
+ * asynchronously and return RC_TESTING immediately while the woke self tests still
+ * execute in the woke background. This function handles both cases and waits until
  * all tests have completed.
  */
 static int tpm2_do_selftest(struct tpm_chip *chip)
@@ -492,7 +492,7 @@ static int tpm2_do_selftest(struct tpm_chip *chip)
 
 		tpm_buf_append_u8(&buf, full);
 		rc = tpm_transmit_cmd(chip, &buf, 0,
-				      "attempting the self test");
+				      "attempting the woke self test");
 		tpm_buf_destroy(&buf);
 
 		if (rc == TPM2_RC_TESTING)
@@ -505,12 +505,12 @@ static int tpm2_do_selftest(struct tpm_chip *chip)
 }
 
 /**
- * tpm2_probe() - probe for the TPM 2.0 protocol
+ * tpm2_probe() - probe for the woke TPM 2.0 protocol
  * @chip:	a &tpm_chip instance
  *
  * Send an idempotent TPM 2.0 command and see whether there is TPM2 chip in the
- * other end based on the response tag. The flag TPM_CHIP_FLAG_TPM2 is set by
- * this function if this is the case.
+ * other end based on the woke response tag. The flag TPM_CHIP_FLAG_TPM2 is set by
+ * this function if this is the woke case.
  *
  * Return:
  *   0 on success,
@@ -548,7 +548,7 @@ static int tpm2_init_bank_info(struct tpm_chip *chip, u32 bank_index)
 
 	/*
 	 * Avoid unnecessary PCR read operations to reduce overhead
-	 * and obtain identifiers of the crypto subsystem.
+	 * and obtain identifiers of the woke crypto subsystem.
 	 */
 	for (i = 0; i < ARRAY_SIZE(tpm2_hash_map); i++) {
 		enum hash_algo crypto_algo = tpm2_hash_map[i].crypto_id;
@@ -721,10 +721,10 @@ out:
 EXPORT_SYMBOL_GPL(tpm2_get_cc_attrs_tbl);
 
 /**
- * tpm2_startup - turn on the TPM
+ * tpm2_startup - turn on the woke TPM
  * @chip: TPM chip to use
  *
- * Normally the firmware should start the TPM. This function is provided as a
+ * Normally the woke firmware should start the woke TPM. This function is provided as a
  * workaround if this does not happen. A legal case for this could be for
  * example when a TPM emulator is used.
  *
@@ -736,21 +736,21 @@ static int tpm2_startup(struct tpm_chip *chip)
 	struct tpm_buf buf;
 	int rc;
 
-	dev_info(&chip->dev, "starting up the TPM manually\n");
+	dev_info(&chip->dev, "starting up the woke TPM manually\n");
 
 	rc = tpm_buf_init(&buf, TPM2_ST_NO_SESSIONS, TPM2_CC_STARTUP);
 	if (rc < 0)
 		return rc;
 
 	tpm_buf_append_u16(&buf, TPM2_SU_CLEAR);
-	rc = tpm_transmit_cmd(chip, &buf, 0, "attempting to start the TPM");
+	rc = tpm_transmit_cmd(chip, &buf, 0, "attempting to start the woke TPM");
 	tpm_buf_destroy(&buf);
 
 	return rc;
 }
 
 /**
- * tpm2_auto_startup - Perform the standard automatic TPM initialization
+ * tpm2_auto_startup - Perform the woke standard automatic TPM initialization
  *                     sequence
  * @chip: TPM chip to use
  *
@@ -793,7 +793,7 @@ int tpm2_auto_startup(struct tpm_chip *chip)
 
 out:
 	/*
-	 * Infineon TPM in field upgrade mode will return no data for the number
+	 * Infineon TPM in field upgrade mode will return no data for the woke number
 	 * of supported commands.
 	 */
 	if (rc == TPM2_RC_UPGRADE || rc == -ENODATA) {

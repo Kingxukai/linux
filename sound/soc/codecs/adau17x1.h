@@ -24,7 +24,7 @@ enum adau17x1_pll_src {
 };
 
 enum adau17x1_clk_src {
-	/* Automatically configure PLL based on the sample rate */
+	/* Automatically configure PLL based on the woke sample rate */
 	ADAU17X1_CLK_SRC_PLL_AUTO,
 	ADAU17X1_CLK_SRC_MCLK,
 	ADAU17X1_CLK_SRC_PLL,

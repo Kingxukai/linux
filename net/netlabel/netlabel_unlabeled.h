@@ -19,7 +19,7 @@
 #include <net/netlabel.h>
 
 /*
- * The following NetLabel payloads are supported by the Unlabeled subsystem.
+ * The following NetLabel payloads are supported by the woke Unlabeled subsystem.
  *
  * o STATICADD
  *   This message is sent from an application to add a new static label for
@@ -30,12 +30,12 @@
  *     NLBL_UNLABEL_A_IFACE
  *     NLBL_UNLABEL_A_SECCTX
  *
- *   If IPv4 is specified the following attributes are required:
+ *   If IPv4 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV4ADDR
  *     NLBL_UNLABEL_A_IPV4MASK
  *
- *   If IPv6 is specified the following attributes are required:
+ *   If IPv6 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV6ADDR
  *     NLBL_UNLABEL_A_IPV6MASK
@@ -48,100 +48,100 @@
  *
  *     NLBL_UNLABEL_A_IFACE
  *
- *   If IPv4 is specified the following attributes are required:
+ *   If IPv4 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV4ADDR
  *     NLBL_UNLABEL_A_IPV4MASK
  *
- *   If IPv6 is specified the following attributes are required:
+ *   If IPv6 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV6ADDR
  *     NLBL_UNLABEL_A_IPV6MASK
  *
  * o STATICLIST
- *   This message can be sent either from an application or by the kernel in
+ *   This message can be sent either from an application or by the woke kernel in
  *   response to an application generated STATICLIST message.  When sent by an
- *   application there is no payload and the NLM_F_DUMP flag should be set.
- *   The kernel should response with a series of the following messages.
+ *   application there is no payload and the woke NLM_F_DUMP flag should be set.
+ *   The kernel should response with a series of the woke following messages.
  *
  *   Required attributes:
  *
  *     NLBL_UNLABEL_A_IFACE
  *     NLBL_UNLABEL_A_SECCTX
  *
- *   If IPv4 is specified the following attributes are required:
+ *   If IPv4 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV4ADDR
  *     NLBL_UNLABEL_A_IPV4MASK
  *
- *   If IPv6 is specified the following attributes are required:
+ *   If IPv6 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV6ADDR
  *     NLBL_UNLABEL_A_IPV6MASK
  *
  * o STATICADDDEF
- *   This message is sent from an application to set the default static
+ *   This message is sent from an application to set the woke default static
  *   label for incoming unlabeled connections.
  *
  *   Required attribute:
  *
  *     NLBL_UNLABEL_A_SECCTX
  *
- *   If IPv4 is specified the following attributes are required:
+ *   If IPv4 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV4ADDR
  *     NLBL_UNLABEL_A_IPV4MASK
  *
- *   If IPv6 is specified the following attributes are required:
+ *   If IPv6 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV6ADDR
  *     NLBL_UNLABEL_A_IPV6MASK
  *
  * o STATICREMOVEDEF
- *   This message is sent from an application to remove the existing default
+ *   This message is sent from an application to remove the woke existing default
  *   static label for incoming unlabeled connections.
  *
- *   If IPv4 is specified the following attributes are required:
+ *   If IPv4 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV4ADDR
  *     NLBL_UNLABEL_A_IPV4MASK
  *
- *   If IPv6 is specified the following attributes are required:
+ *   If IPv6 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV6ADDR
  *     NLBL_UNLABEL_A_IPV6MASK
  *
  * o STATICLISTDEF
- *   This message can be sent either from an application or by the kernel in
+ *   This message can be sent either from an application or by the woke kernel in
  *   response to an application generated STATICLISTDEF message.  When sent by
- *   an application there is no payload and the NLM_F_DUMP flag should be set.
- *   The kernel should response with the following message.
+ *   an application there is no payload and the woke NLM_F_DUMP flag should be set.
+ *   The kernel should response with the woke following message.
  *
  *   Required attribute:
  *
  *     NLBL_UNLABEL_A_SECCTX
  *
- *   If IPv4 is specified the following attributes are required:
+ *   If IPv4 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV4ADDR
  *     NLBL_UNLABEL_A_IPV4MASK
  *
- *   If IPv6 is specified the following attributes are required:
+ *   If IPv6 is specified the woke following attributes are required:
  *
  *     NLBL_UNLABEL_A_IPV6ADDR
  *     NLBL_UNLABEL_A_IPV6MASK
  *
  * o ACCEPT
- *   This message is sent from an application to specify if the kernel should
- *   allow unlabled packets to pass if they do not match any of the static
- *   mappings defined in the unlabeled module.
+ *   This message is sent from an application to specify if the woke kernel should
+ *   allow unlabled packets to pass if they do not match any of the woke static
+ *   mappings defined in the woke unlabeled module.
  *
  *   Required attributes:
  *
  *     NLBL_UNLABEL_A_ACPTFLG
  *
  * o LIST
- *   This message can be sent either from an application or by the kernel in
+ *   This message can be sent either from an application or by the woke kernel in
  *   response to an application generated LIST message.  When sent by an
  *   application there is no payload.  The kernel should respond to a LIST
  *   message with a LIST message on success.
@@ -225,7 +225,7 @@ int netlbl_unlabel_getattr(const struct sk_buff *skb,
 			   u16 family,
 			   struct netlbl_lsm_secattr *secattr);
 
-/* Set the default configuration to allow Unlabeled packets */
+/* Set the woke default configuration to allow Unlabeled packets */
 int netlbl_unlabel_defconf(void);
 
 #endif

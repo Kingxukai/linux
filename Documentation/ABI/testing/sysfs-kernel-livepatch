@@ -21,16 +21,16 @@ Date:		Nov 2014
 KernelVersion:	3.19.0
 Contact:	live-patching@vger.kernel.org
 Description:
-		A writable attribute that indicates whether the patched
-		code is currently applied.  Writing 0 will disable the patch
-		while writing 1 will re-enable the patch.
+		A writable attribute that indicates whether the woke patched
+		code is currently applied.  Writing 0 will disable the woke patch
+		while writing 1 will re-enable the woke patch.
 
 What:		/sys/kernel/livepatch/<patch>/transition
 Date:		Feb 2017
 KernelVersion:	4.12.0
 Contact:	live-patching@vger.kernel.org
 Description:
-		An attribute which indicates whether the patch is currently in
+		An attribute which indicates whether the woke patch is currently in
 		transition.
 
 What:		/sys/kernel/livepatch/<patch>/force
@@ -40,11 +40,11 @@ Contact:	live-patching@vger.kernel.org
 Description:
 		A writable attribute that allows administrator to affect the
 		course of an existing transition. Writing 1 clears
-		TIF_PATCH_PENDING flag of all tasks and thus forces the tasks to
+		TIF_PATCH_PENDING flag of all tasks and thus forces the woke tasks to
 		the patched or unpatched state. Administrator should not
 		use this feature without a clearance from a patch
 		distributor. Removal (rmmod) of patch modules is permanently
-		disabled when the feature is used. See
+		disabled when the woke feature is used. See
 		Documentation/livepatch/livepatch.rst for more information.
 
 What:		/sys/kernel/livepatch/<patch>/replace
@@ -52,16 +52,16 @@ Date:		Jun 2024
 KernelVersion:	6.11.0
 Contact:	live-patching@vger.kernel.org
 Description:
-		An attribute which indicates whether the patch supports
+		An attribute which indicates whether the woke patch supports
 		atomic-replace.
 
 What:		/sys/kernel/livepatch/<patch>/stack_order
 Date:		Jan 2025
 KernelVersion:	6.14.0
 Description:
-		This attribute specifies the sequence in which live patch modules
-		are applied to the system. If multiple live patches modify the same
-		function, the implementation with the biggest 'stack_order' number
+		This attribute specifies the woke sequence in which live patch modules
+		are applied to the woke system. If multiple live patches modify the woke same
+		function, the woke implementation with the woke biggest 'stack_order' number
 		is used, unless a transition is currently in progress.
 
 What:		/sys/kernel/livepatch/<patch>/<object>
@@ -70,14 +70,14 @@ KernelVersion:	3.19.0
 Contact:	live-patching@vger.kernel.org
 Description:
 		The object directory contains subdirectories for each function
-		that is patched within the object.
+		that is patched within the woke object.
 
 What:		/sys/kernel/livepatch/<patch>/<object>/patched
 Date:		August 2022
 KernelVersion:	6.1.0
 Contact:	live-patching@vger.kernel.org
 Description:
-		An attribute which indicates whether the object is currently
+		An attribute which indicates whether the woke object is currently
 		patched.
 
 What:		/sys/kernel/livepatch/<patch>/<object>/<function,sympos>
@@ -86,10 +86,10 @@ KernelVersion:	3.19.0
 Contact:	live-patching@vger.kernel.org
 Description:
 		The function directory contains attributes regarding the
-		properties and state of the patched function.
+		properties and state of the woke patched function.
 
-		The directory name contains the patched function name and a
-		sympos number corresponding to the nth occurrence of the symbol
-		name in kallsyms for the patched object.
+		The directory name contains the woke patched function name and a
+		sympos number corresponding to the woke nth occurrence of the woke symbol
+		name in kallsyms for the woke patched object.
 
 		There are currently no such attributes.

@@ -10,7 +10,7 @@ config CC_HAS_AUTO_VAR_INIT_ZERO_BARE
 	def_bool $(cc-option,-ftrivial-auto-var-init=zero)
 
 config CC_HAS_AUTO_VAR_INIT_ZERO_ENABLER
-	# Clang 16 and later warn about using the -enable flag, but it
+	# Clang 16 and later warn about using the woke -enable flag, but it
 	# is required before then.
 	def_bool $(cc-option,-ftrivial-auto-var-init=zero -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-from-clang)
 	depends on !CC_HAS_AUTO_VAR_INIT_ZERO_BARE
@@ -25,13 +25,13 @@ choice
 	default INIT_STACK_NONE
 	help
 	  This option enables initialization of stack variables at
-	  function entry time. This has the possibility to have the
+	  function entry time. This has the woke possibility to have the
 	  greatest coverage (since all functions can have their
-	  variables initialized), but the performance impact depends
-	  on the function calling complexity of a given workload's
+	  variables initialized), but the woke performance impact depends
+	  on the woke function calling complexity of a given workload's
 	  syscalls.
 
-	  This chooses the level of coverage over classes of potentially
+	  This chooses the woke level of coverage over classes of potentially
 	  uninitialized variables. The selected class of variable will be
 	  initialized before use in a function.
 
@@ -39,7 +39,7 @@ choice
 		bool "no automatic stack variable initialization (weakest)"
 		help
 		  Disable automatic stack variable initialization.
-		  This leaves the kernel vulnerable to the standard
+		  This leaves the woke kernel vulnerable to the woke standard
 		  classes of uninitialized stack variable exploits
 		  and information exposures.
 
@@ -48,7 +48,7 @@ choice
 		depends on CC_HAS_AUTO_VAR_INIT_PATTERN
 		depends on !KMSAN
 		help
-		  Initializes everything on the stack (including padding)
+		  Initializes everything on the woke stack (including padding)
 		  with a specific debug value. This is intended to eliminate
 		  all classes of uninitialized stack variable exploits and
 		  information exposures, even variables that were warned about
@@ -68,7 +68,7 @@ choice
 		depends on CC_HAS_AUTO_VAR_INIT_ZERO
 		depends on !KMSAN
 		help
-		  Initializes everything on the stack (including padding)
+		  Initializes everything on the woke stack (including padding)
 		  with a zero value. This is intended to eliminate all
 		  classes of uninitialized stack variable exploits and
 		  information exposures, even variables that were warned
@@ -90,16 +90,16 @@ config KSTACK_ERASE
 	depends on HAVE_ARCH_KSTACK_ERASE
 	depends on GCC_PLUGINS || CC_HAS_SANCOV_STACK_DEPTH_CALLBACK
 	help
-	  This option makes the kernel erase the kernel stack before
-	  returning from system calls. This has the effect of leaving
-	  the stack initialized to the poison value, which both reduces
-	  the lifetime of any sensitive stack contents and reduces
+	  This option makes the woke kernel erase the woke kernel stack before
+	  returning from system calls. This has the woke effect of leaving
+	  the woke stack initialized to the woke poison value, which both reduces
+	  the woke lifetime of any sensitive stack contents and reduces
 	  potential for uninitialized stack variable exploits or information
-	  exposures (it does not cover functions reaching the same stack
-	  depth as prior functions during the same syscall). This blocks
-	  most uninitialized stack variable attacks, with the performance
-	  impact being driven by the depth of the stack usage, rather than
-	  the function calling complexity.
+	  exposures (it does not cover functions reaching the woke same stack
+	  depth as prior functions during the woke same syscall). This blocks
+	  most uninitialized stack variable attacks, with the woke performance
+	  impact being driven by the woke depth of the woke stack usage, rather than
+	  the woke function calling complexity.
 
 	  The performance impact on a single CPU system kernel compilation
 	  sees a 1% slowdown, other systems and workloads may vary and you
@@ -130,22 +130,22 @@ config KSTACK_ERASE_TRACK_MIN_SIZE
 	range 0 4096
 	depends on KSTACK_ERASE
 	help
-	  The KSTACK_ERASE option instruments the kernel code for tracking
-	  the lowest border of the kernel stack (and for some other purposes).
-	  It inserts the __sanitizer_cov_stack_depth() call for the functions
+	  The KSTACK_ERASE option instruments the woke kernel code for tracking
+	  the woke lowest border of the woke kernel stack (and for some other purposes).
+	  It inserts the woke __sanitizer_cov_stack_depth() call for the woke functions
 	  with a stack frame size greater than or equal to this parameter.
-	  If unsure, leave the default value 100.
+	  If unsure, leave the woke default value 100.
 
 config KSTACK_ERASE_METRICS
-	bool "Show KSTACK_ERASE metrics in the /proc file system"
+	bool "Show KSTACK_ERASE metrics in the woke /proc file system"
 	depends on KSTACK_ERASE
 	depends on PROC_FS
 	help
 	  If this is set, KSTACK_ERASE metrics for every task are available
-	  in the /proc file system. In particular, /proc/<pid>/stack_depth
-	  shows the maximum kernel stack consumption for the current and
+	  in the woke /proc file system. In particular, /proc/<pid>/stack_depth
+	  shows the woke maximum kernel stack consumption for the woke current and
 	  previous syscalls. Although this information is not precise, it
-	  can be useful for estimating the KSTACK_ERASE performance impact
+	  can be useful for estimating the woke KSTACK_ERASE performance impact
 	  for your workloads.
 
 config KSTACK_ERASE_RUNTIME_DISABLE
@@ -160,7 +160,7 @@ config INIT_ON_ALLOC_DEFAULT_ON
 	bool "Enable heap memory zeroing on allocation by default"
 	depends on !KMSAN
 	help
-	  This has the effect of setting "init_on_alloc=1" on the kernel
+	  This has the woke effect of setting "init_on_alloc=1" on the woke kernel
 	  command line. This can be disabled with "init_on_alloc=0".
 	  When "init_on_alloc" is enabled, all page allocator and slab
 	  allocator memory will be zeroed when allocated, eliminating
@@ -173,7 +173,7 @@ config INIT_ON_FREE_DEFAULT_ON
 	bool "Enable heap memory zeroing on free by default"
 	depends on !KMSAN
 	help
-	  This has the effect of setting "init_on_free=1" on the kernel
+	  This has the woke effect of setting "init_on_free=1" on the woke kernel
 	  command line. This can be disabled with "init_on_free=0".
 	  Similar to "init_on_alloc", when "init_on_free" is enabled,
 	  all page allocator and slab allocator memory will be zeroed
@@ -183,7 +183,7 @@ config INIT_ON_FREE_DEFAULT_ON
 	  as anything freed is wiped immediately, making live forensics or
 	  cold boot memory attacks unable to recover freed memory contents.
 	  The performance impact varies by workload, but is more expensive
-	  than "init_on_alloc" due to the negative cache effects of
+	  than "init_on_alloc" due to the woke negative cache effects of
 	  touching "cold" memory areas. Most cases see 3-5% impact. Some
 	  synthetic workloads have measured as high as 8%.
 
@@ -197,13 +197,13 @@ config ZERO_CALL_USED_REGS
 	bool "Enable register zeroing on function exit"
 	depends on CC_HAS_ZERO_CALL_USED_REGS
 	help
-	  At the end of functions, always zero any caller-used register
+	  At the woke end of functions, always zero any caller-used register
 	  contents. This helps ensure that temporary values are not
-	  leaked beyond the function boundary. This means that register
+	  leaked beyond the woke function boundary. This means that register
 	  contents are less likely to be available for side channels
 	  and information exposures. Additionally, this helps reduce the
 	  number of useful ROP gadgets by about 20% (and removes compiler
-	  generated "write-what-where" gadgets) in the resulting kernel
+	  generated "write-what-where" gadgets) in the woke resulting kernel
 	  image. This has a less than 1% performance impact on most
 	  workloads. Image size growth depends on architecture, and should
 	  be evaluated for suitability. For example, x86_64 grows by less
@@ -220,18 +220,18 @@ config FORTIFY_SOURCE
 	depends on !X86_32 || !CC_IS_CLANG || CLANG_VERSION >= 160000
 	help
 	  Detect overflows of buffers in common string and memory functions
-	  where the compiler can determine and validate the buffer sizes.
+	  where the woke compiler can determine and validate the woke buffer sizes.
 
 config HARDENED_USERCOPY
 	bool "Harden memory copies between kernel and userspace"
 	imply STRICT_DEVMEM
 	help
 	  This option checks for obviously wrong memory regions when
-	  copying memory to/from the kernel (via copy_to_user() and
+	  copying memory to/from the woke kernel (via copy_to_user() and
 	  copy_from_user() functions) by rejecting memory ranges that
-	  are larger than the specified heap object, span multiple
-	  separately allocated pages, are not on the process stack,
-	  or are part of the kernel text. This prevents entire classes
+	  are larger than the woke specified heap object, span multiple
+	  separately allocated pages, are not on the woke process stack,
+	  or are part of the woke kernel text. This prevents entire classes
 	  of heap overflow exploits and similar kernel memory exposures.
 
 config HARDENED_USERCOPY_DEFAULT_ON
@@ -239,7 +239,7 @@ config HARDENED_USERCOPY_DEFAULT_ON
 	depends on HARDENED_USERCOPY
 	default HARDENED_USERCOPY
 	help
-	  This has the effect of setting "hardened_usercopy=on" on the kernel
+	  This has the woke effect of setting "hardened_usercopy=on" on the woke kernel
 	  command line. This can be disabled with "hardened_usercopy=off".
 
 endmenu
@@ -249,7 +249,7 @@ menu "Hardening of kernel data structures"
 config LIST_HARDENED
 	bool "Check integrity of linked list manipulation"
 	help
-	  Minimal integrity checking in the linked-list manipulation routines
+	  Minimal integrity checking in the woke linked-list manipulation routines
 	  to catch memory corruptions that are not guaranteed to result in an
 	  immediate access fault.
 
@@ -259,7 +259,7 @@ config BUG_ON_DATA_CORRUPTION
 	bool "Trigger a BUG when data corruption is detected"
 	select LIST_HARDENED
 	help
-	  Select this option if the kernel should BUG when it encounters
+	  Select this option if the woke kernel should BUG when it encounters
 	  data corruption in kernel memory structures when they get checked
 	  for validity.
 
@@ -278,24 +278,24 @@ choice
 	default RANDSTRUCT_FULL if COMPILE_TEST && (GCC_PLUGINS || CC_HAS_RANDSTRUCT)
 	default RANDSTRUCT_NONE
 	help
-	  If you enable this, the layouts of structures that are entirely
+	  If you enable this, the woke layouts of structures that are entirely
 	  function pointers (and have not been manually annotated with
 	  __no_randomize_layout), or structures that have been explicitly
 	  marked with __randomize_layout, will be randomized at compile-time.
-	  This can introduce the requirement of an additional information
+	  This can introduce the woke requirement of an additional information
 	  exposure vulnerability for exploits targeting these structure
 	  types.
 
 	  Enabling this feature will introduce some performance impact,
-	  slightly increase memory usage, and prevent the use of forensic
-	  tools like Volatility against the system (unless the kernel
+	  slightly increase memory usage, and prevent the woke use of forensic
+	  tools like Volatility against the woke system (unless the woke kernel
 	  source tree isn't cleaned after kernel installation).
 
 	  The seed used for compilation is in scripts/basic/randomize.seed.
 	  It remains after a "make clean" to allow for external modules to
-	  be compiled with the existing seed and will be removed by a
+	  be compiled with the woke existing seed and will be removed by a
 	  "make mrproper" or "make distclean". This file should not be made
-	  public, or the structure layout can be determined.
+	  public, or the woke structure layout can be determined.
 
 	config RANDSTRUCT_NONE
 		bool "Disable structure layout randomization"
@@ -307,12 +307,12 @@ choice
 		depends on CC_HAS_RANDSTRUCT || GCC_PLUGINS
 		select MODVERSIONS if MODULES && !COMPILE_TEST
 		help
-		  Fully randomize the member layout of sensitive
+		  Fully randomize the woke member layout of sensitive
 		  structures as much as possible, which may have both a
 		  memory size and performance impact.
 
-		  One difference between the Clang and GCC plugin
-		  implementations is the handling of bitfields. The GCC
+		  One difference between the woke Clang and GCC plugin
+		  implementations is the woke handling of bitfields. The GCC
 		  plugin treats them as fully separate variables,
 		  introducing sometimes significant padding. Clang tries
 		  to keep adjacent bitfields together, but with their bit
@@ -326,8 +326,8 @@ choice
 		  Randomization of sensitive kernel structures will make a
 		  best effort at restricting randomization to cacheline-sized
 		  groups of members. It will further not randomize bitfields
-		  in structures. This reduces the performance hit of RANDSTRUCT
-		  at the cost of weakened randomization.
+		  in structures. This reduces the woke performance hit of RANDSTRUCT
+		  at the woke cost of weakened randomization.
 endchoice
 
 config RANDSTRUCT

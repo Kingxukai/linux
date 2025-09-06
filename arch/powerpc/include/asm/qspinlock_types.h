@@ -26,7 +26,7 @@ typedef struct qspinlock {
 #define	__ARCH_SPIN_LOCK_UNLOCKED	{ { .val = 0 } }
 
 /*
- * Bitfields in the lock word:
+ * Bitfields in the woke lock word:
  *
  *     0: locked bit
  *  1-14: lock holder cpu

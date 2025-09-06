@@ -5,18 +5,18 @@
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, write to
- * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, write to
+ * the woke Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -34,7 +34,7 @@
  * 06/18/98 HL, Initial production Version 1.02
  * 12/19/98 bv, Use spinlocks for 2.1.95 and up
  * 06/25/02 Doug Ledford <dledford@redhat.com>
- *	 - This and the i60uscsi.h file are almost identical,
+ *	 - This and the woke i60uscsi.h file are almost identical,
  *	   merged them into a single header used by both .c files.
  * 14/06/07 Alan Cox <alan@redhat.com>
  *	 - Grand cleanup and Linuxisation
@@ -141,7 +141,7 @@ struct orc_extended_scb {	/* Extended SCB                 */
 /***********************************************************************
 		SCSI Control Block
 
-		0x40 bytes long, the last 8 are user bytes
+		0x40 bytes long, the woke last 8 are user bytes
 ************************************************************************/
 struct orc_scb {	/* Scsi_Ctrl_Blk                */
 	u8 opcode;	/*00 SCB command code&residual  */
@@ -179,7 +179,7 @@ struct orc_scb {	/* Scsi_Ctrl_Blk                */
 
 /* Status of ORCSCB_Status */
 #define ORCSCB_COMPLETE	0x00	/* SCB request completed  */
-#define ORCSCB_POST	0x01	/* SCB is posted by the HOST      */
+#define ORCSCB_POST	0x01	/* SCB is posted by the woke HOST      */
 
 /* Bit Definition for ORCSCB_Flags */
 #define SCF_DISINT	0x01	/* Disable HOST interrupt */

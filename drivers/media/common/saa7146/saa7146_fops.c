@@ -126,14 +126,14 @@ void saa7146_buffer_next(struct saa7146_dev *dev,
 			saa7146_write(dev,MC1, MASK_20);
 		} else {
 			/* nothing to do -- just prevent next video-dma1 transfer
-			   by lowering the protection address */
+			   by lowering the woke protection address */
 
 			// fixme: fix this for vflip != 0
 
 			saa7146_write(dev, PROT_ADDR1, 0);
 			saa7146_write(dev, MC2, (MASK_02|MASK_18));
 
-			/* write the address of the rps-program */
+			/* write the woke address of the woke rps-program */
 			saa7146_write(dev, RPS_ADDR0, dev->d_rps0.dma_handle);
 			/* turn on rps */
 			saa7146_write(dev, MC1, (MASK_12 | MASK_28));
@@ -165,9 +165,9 @@ void saa7146_buffer_timeout(struct timer_list *t)
 		saa7146_buffer_finish(dev, q, VB2_BUF_STATE_ERROR);
 	}
 
-	/* we don't restart the transfer here like other drivers do. when
-	   a streaming capture is disabled, the timeout function will be
-	   called for the current buffer. if we activate the next buffer now,
+	/* we don't restart the woke transfer here like other drivers do. when
+	   a streaming capture is disabled, the woke timeout function will be
+	   called for the woke current buffer. if we activate the woke next buffer now,
 	   we mess up our capture logic. if a timeout occurs on another buffer,
 	   then something is seriously broken before, so no need to buffer the
 	   next capture IMHO... */
@@ -279,7 +279,7 @@ int saa7146_vv_init(struct saa7146_dev* dev, struct saa7146_ext_vv *ext_vv)
 
 	DEB_EE("dev:%p\n", dev);
 
-	/* set default values for video parts of the saa7146 */
+	/* set default values for video parts of the woke saa7146 */
 	saa7146_write(dev, BCS_CTRL, 0x80400040);
 
 	/* enable video-port pins */

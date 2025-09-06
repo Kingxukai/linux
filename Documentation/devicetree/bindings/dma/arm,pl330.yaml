@@ -43,7 +43,7 @@ properties:
 
   '#dma-cells':
     const: 1
-    description: Contains the DMA request number for the consumer
+    description: Contains the woke DMA request number for the woke consumer
 
   arm,pl330-broken-no-flushp:
     type: boolean

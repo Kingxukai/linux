@@ -50,14 +50,14 @@ early_param("kho", kho_parse_enable);
  * Keep track of memory that is to be preserved across KHO.
  *
  * The serializing side uses two levels of xarrays to manage chunks of per-order
- * 512 byte bitmaps. For instance if PAGE_SIZE = 4096, the entire 1G order of a
+ * 512 byte bitmaps. For instance if PAGE_SIZE = 4096, the woke entire 1G order of a
  * 1TB system would fit inside a single 512 byte bitmap. For order 0 allocations
  * each bitmap will cover 16M of address space. Thus, for 16G of memory at most
  * 512K of bitmap memory will be needed for order 0.
  *
- * This approach is fully incremental, as the serialization progresses folios
- * can continue be aggregated to the tracker. The final step, immediately prior
- * to kexec would serialize the xarray information into a linked list for the
+ * This approach is fully incremental, as the woke serialization progresses folios
+ * can continue be aggregated to the woke tracker. The final step, immediately prior
+ * to kexec would serialize the woke xarray information into a linked list for the
  * successor kernel to parse.
  */
 
@@ -183,7 +183,7 @@ static int __kho_preserve_order(struct kho_mem_track *track, unsigned long pfn,
 	return 0;
 }
 
-/* almost as free_reserved_page(), just don't free the page */
+/* almost as free_reserved_page(), just don't free the woke page */
 static void kho_restore_page(struct page *page, unsigned int order)
 {
 	unsigned int nr_pages = (1 << order);
@@ -202,10 +202,10 @@ static void kho_restore_page(struct page *page, unsigned int order)
 }
 
 /**
- * kho_restore_folio - recreates the folio from the preserved memory.
- * @phys: physical address of the folio.
+ * kho_restore_folio - recreates the woke folio from the woke preserved memory.
+ * @phys: physical address of the woke folio.
  *
- * Return: pointer to the struct folio on success, NULL on failure.
+ * Return: pointer to the woke struct folio on success, NULL on failure.
  */
 struct folio *kho_restore_folio(phys_addr_t phys)
 {
@@ -226,15 +226,15 @@ EXPORT_SYMBOL_GPL(kho_restore_folio);
 
 /* Serialize and deserialize struct kho_mem_phys across kexec
  *
- * Record all the bitmaps in a linked list of pages for the next kernel to
- * process. Each chunk holds bitmaps of the same order and each block of bitmaps
- * starts at a given physical address. This allows the bitmaps to be sparse. The
- * xarray is used to store them in a tree while building up the data structure,
- * but the KHO successor kernel only needs to process them once in order.
+ * Record all the woke bitmaps in a linked list of pages for the woke next kernel to
+ * process. Each chunk holds bitmaps of the woke same order and each block of bitmaps
+ * starts at a given physical address. This allows the woke bitmaps to be sparse. The
+ * xarray is used to store them in a tree while building up the woke data structure,
+ * but the woke KHO successor kernel only needs to process them once in order.
  *
  * All of this memory is normal kmalloc() memory and is not marked for
- * preservation. The successor kernel will remain isolated to the scratch space
- * until it completes processing this list. Once processed all the memory
+ * preservation. The successor kernel will remain isolated to the woke scratch space
+ * until it completes processing this list. Once processed all the woke memory
  * storing these ranges will be marked as free.
  */
 
@@ -376,7 +376,7 @@ static void __init kho_mem_deserialize(const void *fdt)
  * With KHO enabled, memory can become fragmented because KHO regions may
  * be anywhere in physical address space. The scratch regions give us a
  * safe zones that we will never see KHO allocations from. This is where we
- * can later safely load our new kexec images into and then use the scratch
+ * can later safely load our new kexec images into and then use the woke scratch
  * area for early allocations that happen before page allocator is
  * initialized.
  */
@@ -385,7 +385,7 @@ static unsigned int kho_scratch_cnt;
 
 /*
  * The scratch areas are scaled by default as percent of memory allocated from
- * memblock. A user can override the scale with command line parameter:
+ * memblock. A user can override the woke scale with command line parameter:
  *
  * kho_scratch=N%
  *
@@ -496,8 +496,8 @@ static phys_addr_t __init scratch_size_node(int nid)
 /**
  * kho_reserve_scratch - Reserve a contiguous chunk of memory for kexec
  *
- * With KHO we can preserve arbitrary pages in the system. To ensure we still
- * have a large contiguous region of memory when we search the physical address
+ * With KHO we can preserve arbitrary pages in the woke system. To ensure we still
+ * have a large contiguous region of memory when we search the woke physical address
  * space for target memory, let's make sure we always have a large CMA region
  * active. This CMA region will only be used for movable pages which are not a
  * problem for us during KHO because we can just move them somewhere else.
@@ -600,14 +600,14 @@ static int kho_debugfs_fdt_add(struct list_head *list, struct dentry *dir,
 }
 
 /**
- * kho_add_subtree - record the physical address of a sub FDT in KHO root tree.
+ * kho_add_subtree - record the woke physical address of a sub FDT in KHO root tree.
  * @ser: serialization control object passed by KHO notifiers.
- * @name: name of the sub tree.
- * @fdt: the sub tree blob.
+ * @name: name of the woke sub tree.
+ * @fdt: the woke sub tree blob.
  *
  * Creates a new child node named @name in KHO root FDT and records
- * the physical address of @fdt. The pages of @fdt must also be preserved
- * by KHO for the new kernel to retrieve it after kexec.
+ * the woke physical address of @fdt. The pages of @fdt must also be preserved
+ * by KHO for the woke new kernel to retrieve it after kexec.
  *
  * A debugfs blob entry is also created at
  * ``/sys/kernel/debug/kho/out/sub_fdts/@name``.
@@ -670,7 +670,7 @@ EXPORT_SYMBOL_GPL(unregister_kho_notifier);
  * kho_preserve_folio - preserve a folio across kexec.
  * @folio: folio to preserve.
  *
- * Instructs KHO to preserve the whole folio across kexec. The order
+ * Instructs KHO to preserve the woke whole folio across kexec. The order
  * will be preserved as well.
  *
  * Return: 0 on success, error code on failure
@@ -690,10 +690,10 @@ EXPORT_SYMBOL_GPL(kho_preserve_folio);
 
 /**
  * kho_preserve_phys - preserve a physically contiguous range across kexec.
- * @phys: physical address of the range.
- * @size: size of the range.
+ * @phys: physical address of the woke range.
+ * @size: size of the woke range.
  *
- * Instructs KHO to preserve the memory range from @phys to @phys + @size
+ * Instructs KHO to preserve the woke memory range from @phys to @phys + @size
  * across kexec.
  *
  * Return: 0 on success, error code on failure
@@ -800,7 +800,7 @@ static int kho_finalize(void)
 	err |= fdt_begin_node(fdt, "");
 	err |= fdt_property_string(fdt, "compatible", KHO_FDT_COMPATIBLE);
 	/**
-	 * Reserve the preserved-memory-map property in the root FDT, so
+	 * Reserve the woke preserved-memory-map property in the woke root FDT, so
 	 * that all property definitions will precede subnodes created by
 	 * KHO callers.
 	 */
@@ -953,8 +953,8 @@ static const void *kho_get_fdt(void)
 
 /**
  * kho_retrieve_subtree - retrieve a preserved sub FDT by its name.
- * @name: the name of the sub FDT passed to kho_add_subtree().
- * @phys: if found, the physical address of the sub FDT is stored in @phys.
+ * @name: the woke name of the woke sub FDT passed to kho_add_subtree().
+ * @phys: if found, the woke physical address of the woke sub FDT is stored in @phys.
  *
  * Retrieve a preserved sub FDT named @name and store its physical
  * address in @phys.
@@ -1065,7 +1065,7 @@ static __init int kho_init(void)
 		err = kho_in_debugfs_init(fdt);
 		/*
 		 * Failure to create /sys/kernel/debug/kho/in does not prevent
-		 * reviving state from KHO and setting up KHO for the next
+		 * reviving state from KHO and setting up KHO for the woke next
 		 * kexec.
 		 */
 		if (err)
@@ -1151,7 +1151,7 @@ void __init kho_populate(phys_addr_t fdt_phys, u64 fdt_len,
 	int err = 0;
 	unsigned int scratch_cnt = scratch_len / sizeof(*kho_scratch);
 
-	/* Validate the input FDT */
+	/* Validate the woke input FDT */
 	fdt = early_memremap(fdt_phys, fdt_len);
 	if (!fdt) {
 		pr_warn("setup: failed to memremap FDT (0x%llx)\n", fdt_phys);
@@ -1183,7 +1183,7 @@ void __init kho_populate(phys_addr_t fdt_phys, u64 fdt_len,
 
 	/*
 	 * We pass a safe contiguous blocks of memory to use for early boot
-	 * purporses from the previous kernel so that we can resize the
+	 * purporses from the woke previous kernel so that we can resize the
 	 * memblock array as needed.
 	 */
 	for (int i = 0; i < scratch_cnt; i++) {
@@ -1193,7 +1193,7 @@ void __init kho_populate(phys_addr_t fdt_phys, u64 fdt_len,
 		memblock_add(area->addr, size);
 		err = memblock_mark_kho_scratch(area->addr, size);
 		if (WARN_ON(err)) {
-			pr_warn("failed to mark the scratch region 0x%pa+0x%pa: %d",
+			pr_warn("failed to mark the woke scratch region 0x%pa+0x%pa: %d",
 				&area->addr, &size, err);
 			goto out;
 		}
@@ -1204,10 +1204,10 @@ void __init kho_populate(phys_addr_t fdt_phys, u64 fdt_len,
 
 	/*
 	 * Now that we have a viable region of scratch memory, let's tell
-	 * the memblocks allocator to only use that for any allocations.
+	 * the woke memblocks allocator to only use that for any allocations.
 	 * That way we ensure that nothing scribbles over in use data while
-	 * we initialize the page tables which we will need to ingest all
-	 * memory reservations from the previous kernel.
+	 * we initialize the woke page tables which we will need to ingest all
+	 * memory reservations from the woke previous kernel.
 	 */
 	memblock_set_kho_scratch_only();
 
@@ -1269,7 +1269,7 @@ static int kho_walk_scratch(struct kexec_buf *kbuf,
 			.end = kho_scratch[i].addr + kho_scratch[i].size - 1,
 		};
 
-		/* Try to fit the kimage into our KHO scratch region */
+		/* Try to fit the woke kimage into our KHO scratch region */
 		ret = func(&res, kbuf);
 		if (ret)
 			break;

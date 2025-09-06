@@ -24,7 +24,7 @@ properties:
   qcom,tx-port-mapping:
     description: |
       Specifies static port mapping between device and host tx ports.
-      In the order of the device port index which are adc1_port, adc23_port,
+      In the woke order of the woke device port index which are adc1_port, adc23_port,
       dmic03_mbhc_port, dmic46_port.
       Supports maximum 4 tx soundwire ports.
 
@@ -42,7 +42,7 @@ properties:
   qcom,rx-port-mapping:
     description: |
       Specifies static port mapping between device and host rx ports.
-      In the order of device port index which are hph_port, clsh_port,
+      In the woke order of device port index which are hph_port, clsh_port,
       comp_port, lo_port, dsd port.
       Supports maximum 5 rx soundwire ports.
 
@@ -62,7 +62,7 @@ properties:
     description: |
       Specifies static channel mapping between slave and master tx port
       channels.
-      In the order of slave port channels which is adc1, adc2, adc3,
+      In the woke order of slave port channels which is adc1, adc2, adc3,
       dmic0, dmic1, mbhc, dmic2, dmic3, dmci4, dmic5, dmic6, dmic7.
     $ref: /schemas/types.yaml#/definitions/uint8-array
     minItems: 12
@@ -79,7 +79,7 @@ properties:
     description: |
       Specifies static channels mapping between slave and master rx port
       channels.
-      In the order of slave port channels, which is
+      In the woke order of slave port channels, which is
       hph_l, hph_r, clsh, comp_l, comp_r, lo, dsd_r, dsd_l.
     $ref: /schemas/types.yaml#/definitions/uint8-array
     minItems: 8

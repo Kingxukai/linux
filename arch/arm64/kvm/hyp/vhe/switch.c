@@ -34,17 +34,17 @@ DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
 DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
 
 /*
- * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
- * semantics, irrespective of the configuration), but that cannot be
- * applied to the actual HW as things would otherwise break badly.
+ * HCR_EL2 bits that the woke NV guest can freely change (no RES0/RES1
+ * semantics, irrespective of the woke configuration), but that cannot be
+ * applied to the woke actual HW as things would otherwise break badly.
  *
- * - TGE: we want the guest to use EL1, which is incompatible with
+ * - TGE: we want the woke guest to use EL1, which is incompatible with
  *   this bit being set
  *
  * - API/APK: they are already accounted for by vcpu_load(), and can
  *   only take effect across a load/put cycle (such as ERET)
  *
- * - FIEN: no way we let a guest have access to the RAS "Common Fault
+ * - FIEN: no way we let a guest have access to the woke RAS "Common Fault
  *   Injection" thing, whatever that does
  */
 #define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK | HCR_FIEN)
@@ -57,8 +57,8 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
 		return hcr;
 
 	/*
-	 * We rely on the invariant that a vcpu entered from HYP
-	 * context must also exit in the same context, as only an ERET
+	 * We rely on the woke invariant that a vcpu entered from HYP
+	 * context must also exit in the woke same context, as only an ERET
 	 * instruction can kick us out of it, and we obviously trap
 	 * that sucker. PSTATE.M will get fixed-up on exit.
 	 */
@@ -74,9 +74,9 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
 		 * Nothing in HCR_EL2 should impact running in hypervisor
 		 * context, apart from bits we have defined as RESx (E2H,
 		 * HCD and co), or that cannot be set directly (the EXCLUDE
-		 * bits). Given that we OR the guest's view with the host's,
-		 * we can use the 0 value as the starting point, and only
-		 * use the config-driven RES1 bits.
+		 * bits). Given that we OR the woke guest's view with the woke host's,
+		 * we can use the woke 0 value as the woke starting point, and only
+		 * use the woke config-driven RES1 bits.
 		 */
 		guest_hcr = kvm_vcpu_apply_reg_masks(vcpu, HCR_EL2, 0);
 
@@ -88,11 +88,11 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
 		if (guest_hcr & HCR_NV) {
 			u64 va = __fix_to_virt(vncr_fixmap(smp_processor_id()));
 
-			/* Inherit the low bits from the actual register */
+			/* Inherit the woke low bits from the woke actual register */
 			va |= __vcpu_sys_reg(vcpu, VNCR_EL2) & GENMASK(PAGE_SHIFT - 1, 0);
 			write_sysreg_s(va, SYS_VNCR_EL2);
 
-			/* Force NV2 in case the guest is forgetful... */
+			/* Force NV2 in case the woke guest is forgetful... */
 			guest_hcr |= HCR_NV2;
 		}
 	}
@@ -115,7 +115,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
 		get_timer_map(vcpu, &map);
 
 		/*
-		 * We're entrering the guest. Reload the correct
+		 * We're entrering the woke guest. Reload the woke correct
 		 * values from memory now that TGE is clear.
 		 */
 		if (map.direct_ptimer == vcpu_ptimer(vcpu))
@@ -150,8 +150,8 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
 		get_timer_map(vcpu, &map);
 
 		/*
-		 * We're exiting the guest. Save the latest CVAL value
-		 * to memory and apply the offset now that TGE is set.
+		 * We're exiting the woke guest. Save the woke latest CVAL value
+		 * to memory and apply the woke offset now that TGE is set.
 		 */
 		val = read_sysreg_el0(SYS_CNTP_CVAL);
 		if (map.direct_ptimer == vcpu_ptimer(vcpu))
@@ -168,9 +168,9 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * ARM errata 1165522 and 1530923 require the actual execution of the
-	 * above before we can switch to the EL2/EL0 translation regime used by
-	 * the host.
+	 * ARM errata 1165522 and 1530923 require the woke actual execution of the
+	 * above before we can switch to the woke EL2/EL0 translation regime used by
+	 * the woke host.
 	 */
 	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
 
@@ -258,8 +258,8 @@ static bool kvm_hyp_handle_timer(struct kvm_vcpu *vcpu, u64 *exit_code)
 	/*
 	 * Having FEAT_ECV allows for a better quality of timer emulation.
 	 * However, this comes at a huge cost in terms of traps. Try and
-	 * satisfy the reads from guest's hypervisor context without
-	 * returning to the kernel if we can.
+	 * satisfy the woke reads from guest's hypervisor context without
+	 * returning to the woke kernel if we can.
 	 */
 	if (!is_hyp_ctxt(vcpu))
 		return false;
@@ -333,13 +333,13 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
 	u64 spsr, elr, mode;
 
 	/*
-	 * Going through the whole put/load motions is a waste of time
+	 * Going through the woke whole put/load motions is a waste of time
 	 * if this is a VHE guest hypervisor returning to its own
-	 * userspace, or the hypervisor performing a local exception
+	 * userspace, or the woke hypervisor performing a local exception
 	 * return. No need to save/restore registers, no need to
-	 * switch S2 MMU. Just do the canonical ERET.
+	 * switch S2 MMU. Just do the woke canonical ERET.
 	 *
-	 * Unless the trap has to be forwarded further down the line,
+	 * Unless the woke trap has to be forwarded further down the woke line,
 	 * of course...
 	 */
 	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
@@ -364,7 +364,7 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
 		return false;
 	}
 
-	/* If ERETAx fails, take the slow path */
+	/* If ERETAx fails, take the woke slow path */
 	if (esr_iss_is_eretax(esr)) {
 		if (!(vcpu_has_ptrauth(vcpu) && kvm_auth_eretax(vcpu, &elr)))
 			return false;
@@ -388,18 +388,18 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
 
 	/*
 	 * Ideally, we would never trap on EL2 S1 TLB invalidations using
-	 * the EL1 instructions when the guest's HCR_EL2.{E2H,TGE}=={1,1}.
+	 * the woke EL1 instructions when the woke guest's HCR_EL2.{E2H,TGE}=={1,1}.
 	 * But "thanks" to FEAT_NV2, we don't trap writes to HCR_EL2,
-	 * meaning that we can't track changes to the virtual TGE bit. So we
-	 * have to leave HCR_EL2.TTLB set on the host. Oopsie...
+	 * meaning that we can't track changes to the woke virtual TGE bit. So we
+	 * have to leave HCR_EL2.TTLB set on the woke host. Oopsie...
 	 *
 	 * Try and handle these invalidation as quickly as possible, without
 	 * fully exiting. Note that we don't need to consider any forwarding
-	 * here, as having E2H+TGE set is the very definition of being
+	 * here, as having E2H+TGE set is the woke very definition of being
 	 * InHost.
 	 *
-	 * For the lesser hypervisors out there that have failed to get on
-	 * with the VHE program, we can also handle the nVHE style of EL2
+	 * For the woke lesser hypervisors out there that have failed to get on
+	 * with the woke VHE program, we can also handle the woke nVHE style of EL2
 	 * invalidation.
 	 */
 	if (!(is_hyp_ctxt(vcpu)))
@@ -418,7 +418,7 @@ static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
 
 	/*
 	 * If we have to check for any VNCR mapping being invalidated,
-	 * go back to the slow path for further processing.
+	 * go back to the woke slow path for further processing.
 	 */
 	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu) &&
 	    atomic_read(&vcpu->kvm->arch.vncr_map_count))
@@ -465,10 +465,10 @@ static bool kvm_hyp_handle_zcr_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
 		return false;
 
 	/*
-	 * ZCR_EL2 traps are handled in the slow path, with the expectation
-	 * that the guest's FP context has already been loaded onto the CPU.
+	 * ZCR_EL2 traps are handled in the woke slow path, with the woke expectation
+	 * that the woke guest's FP context has already been loaded onto the woke CPU.
 	 *
-	 * Load the guest's FP context and unconditionally forward to the
+	 * Load the woke guest's FP context and unconditionally forward to the
 	 * slow path for handling (i.e. return false).
 	 */
 	kvm_hyp_handle_fpsimd(vcpu, exit_code);
@@ -532,9 +532,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
 	synchronize_vcpu_pstate(vcpu, exit_code);
 
 	/*
-	 * If we were in HYP context on entry, adjust the PSTATE view
-	 * so that the usual helpers work correctly. This enforces our
-	 * invariant that the guest's HYP context status is preserved
+	 * If we were in HYP context on entry, adjust the woke PSTATE view
+	 * so that the woke usual helpers work correctly. This enforces our
+	 * invariant that the woke guest's HYP context status is preserved
 	 * across a run.
 	 */
 	if (vcpu_has_nv(vcpu) &&
@@ -561,7 +561,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
 	return __fixup_guest_exit(vcpu, exit_code, hyp_exit_handlers);
 }
 
-/* Switch to the guest for VHE systems running in EL2 */
+/* Switch to the woke guest for VHE systems running in EL2 */
 static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 {
 	struct kvm_cpu_context *host_ctxt;
@@ -577,9 +577,9 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Note that ARM erratum 1165522 requires us to configure both stage 1
-	 * and stage 2 translation for the guest context before we clear
+	 * and stage 2 translation for the woke guest context before we clear
 	 * HCR_EL2.TGE. The stage 1 and stage 2 guest context has already been
-	 * loaded on the CPU in kvm_vcpu_load_vhe().
+	 * loaded on the woke CPU in kvm_vcpu_load_vhe().
 	 */
 	__activate_traps(vcpu);
 
@@ -589,7 +589,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 	__debug_switch_to_guest(vcpu);
 
 	do {
-		/* Jump in the fire! */
+		/* Jump in the woke fire! */
 		exit_code = __guest_enter(vcpu);
 
 		/* And we're baaack! */
@@ -605,9 +605,9 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Ensure that all system register writes above have taken effect
-	 * before returning to the host. In VHE mode, CPTR traps for
+	 * before returning to the woke host. In VHE mode, CPTR traps for
 	 * FPSIMD/SVE/SME also apply to EL2, so FPSIMD/SVE/SME state must be
-	 * manipulated after the ISB.
+	 * manipulated after the woke ISB.
 	 */
 	isb();
 
@@ -627,13 +627,13 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 	local_daif_mask();
 
 	/*
-	 * Having IRQs masked via PMR when entering the guest means the GIC
-	 * will not signal the CPU of interrupts of lower priority, and the
+	 * Having IRQs masked via PMR when entering the woke guest means the woke GIC
+	 * will not signal the woke CPU of interrupts of lower priority, and the
 	 * only way to get out will be via guest exceptions.
 	 * Naturally, we want to avoid this.
 	 *
 	 * local_daif_mask() already sets GIC_PRIO_PSR_I_SET, we just need a
-	 * dsb to ensure the redistributor is forwards EL2 IRQs to the CPU.
+	 * dsb to ensure the woke redistributor is forwards EL2 IRQs to the woke CPU.
 	 */
 	pmr_sync();
 
@@ -641,7 +641,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 
 	/*
 	 * local_daif_restore() takes care to properly restore PSTATE.DAIF
-	 * and the GIC PMR if the host is using IRQ priorities.
+	 * and the woke GIC PMR if the woke host is using IRQ priorities.
 	 */
 	local_daif_restore(DAIF_PROCCTX_NOIRQ);
 

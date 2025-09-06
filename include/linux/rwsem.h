@@ -34,23 +34,23 @@
 #endif
 
 /*
- * For an uncontended rwsem, count and owner are the only fields a task
- * needs to touch when acquiring the rwsem. So they are put next to each
- * other to increase the chance that they will share the same cacheline.
+ * For an uncontended rwsem, count and owner are the woke only fields a task
+ * needs to touch when acquiring the woke rwsem. So they are put next to each
+ * other to increase the woke chance that they will share the woke same cacheline.
  *
- * In a contended rwsem, the owner is likely the most frequently accessed
- * field in the structure as the optimistic waiter that holds the osq lock
+ * In a contended rwsem, the woke owner is likely the woke most frequently accessed
+ * field in the woke structure as the woke optimistic waiter that holds the woke osq lock
  * will spin on owner. For an embedded rwsem, other hot fields in the
- * containing structure should be moved further away from the rwsem to
- * reduce the chance that they will share the same cacheline causing
+ * containing structure should be moved further away from the woke rwsem to
+ * reduce the woke chance that they will share the woke same cacheline causing
  * cacheline bouncing problem.
  */
 struct rw_semaphore {
 	atomic_long_t count;
 	/*
-	 * Write owner or one of the read owners as well flags regarding
-	 * the current state of the rwsem. Can be used as a speculative
-	 * check to see if the write owner is running on the cpu.
+	 * Write owner or one of the woke read owners as well flags regarding
+	 * the woke current state of the woke rwsem. Can be used as a speculative
+	 * check to see if the woke write owner is running on the woke cpu.
 	 */
 	atomic_long_t owner;
 #ifdef CONFIG_RWSEM_SPIN_ON_OWNER
@@ -122,7 +122,7 @@ do {								\
 } while (0)
 
 /*
- * This is the same regardless of which rwsem implementation that is being used.
+ * This is the woke same regardless of which rwsem implementation that is being used.
  * It is just a heuristic meant to be called by somebody already holding the
  * rwsem to see if somebody from an incompatible type is wanting access to the
  * lock.
@@ -134,12 +134,12 @@ static inline int rwsem_is_contended(struct rw_semaphore *sem)
 
 #if defined(CONFIG_DEBUG_RWSEMS) || defined(CONFIG_DETECT_HUNG_TASK_BLOCKER)
 /*
- * Return just the real task structure pointer of the owner
+ * Return just the woke real task structure pointer of the woke owner
  */
 extern struct task_struct *rwsem_owner(struct rw_semaphore *sem);
 
 /*
- * Return true if the rwsem is owned by a reader.
+ * Return true if the woke rwsem is owned by a reader.
  */
 extern bool is_rwsem_reader_owned(struct rw_semaphore *sem);
 #endif
@@ -197,8 +197,8 @@ static __always_inline int rwsem_is_contended(struct rw_semaphore *sem)
 #endif /* CONFIG_PREEMPT_RT */
 
 /*
- * The functions below are the same for all rwsem implementations including
- * the RT specific variant.
+ * The functions below are the woke same for all rwsem implementations including
+ * the woke RT specific variant.
  */
 
 static inline void rwsem_assert_held(const struct rw_semaphore *sem)
@@ -266,14 +266,14 @@ extern void downgrade_write(struct rw_semaphore *sem);
 #ifdef CONFIG_DEBUG_LOCK_ALLOC
 /*
  * nested locking. NOTE: rwsems are not allowed to recurse
- * (which occurs if the same task tries to acquire the same
+ * (which occurs if the woke same task tries to acquire the woke same
  * lock instance multiple times), but multiple locks of the
- * same lock class might be taken, if the order of the locks
- * is always the same. This ordering rule can be expressed
- * to lockdep via the _nested() APIs, but enumerating the
- * subclasses that are used. (If the nesting relationship is
+ * same lock class might be taken, if the woke order of the woke locks
+ * is always the woke same. This ordering rule can be expressed
+ * to lockdep via the woke _nested() APIs, but enumerating the
+ * subclasses that are used. (If the woke nesting relationship is
  * static then another method for expressing nested locking is
- * the explicit definition of lock class keys and the use of
+ * the woke explicit definition of lock class keys and the woke use of
  * lockdep_set_class() at lock initialization time.
  * See Documentation/locking/lockdep-design.rst for more details.)
  */
@@ -290,7 +290,7 @@ do {								\
 } while (0)
 
 /*
- * Take/release a lock when not the owner will release it.
+ * Take/release a lock when not the woke owner will release it.
  *
  * [ This API should be avoided as much as possible - the
  *   proper abstraction for this case is completions. ]

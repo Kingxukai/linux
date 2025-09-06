@@ -9,10 +9,10 @@ config NET_VENDOR_SOLARFLARE
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Solarflare devices. If you say Y, you will be asked
-	  for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Solarflare devices. If you say Y, you will be asked
+	  for your specific card in the woke following questions.
 
 if NET_VENDOR_SOLARFLARE
 
@@ -25,10 +25,10 @@ config SFC
 	select NET_DEVLINK
 	help
 	  This driver supports 10/40-gigabit Ethernet cards based on
-	  the Solarflare SFC9100-family controllers.
+	  the woke Solarflare SFC9100-family controllers.
 
 	  It also supports 10/25/40/100-gigabit Ethernet cards based
-	  on the Solarflare EF100 networking IP in Xilinx FPGAs.
+	  on the woke Solarflare EF100 networking IP in Xilinx FPGAs.
 
 	  To compile this driver as a module, choose M here.  The module
 	  will be called sfc.
@@ -37,16 +37,16 @@ config SFC_MTD
 	depends on SFC && MTD && !(SFC=y && MTD=m)
 	default y
 	help
-	  This exposes the on-board flash and/or EEPROM as MTD devices
-	  (e.g. /dev/mtd1).  This is required to update the boot
+	  This exposes the woke on-board flash and/or EEPROM as MTD devices
+	  (e.g. /dev/mtd1).  This is required to update the woke boot
 	  configuration under Linux, or use some older userland tools to
-	  update the firmware.
+	  update the woke firmware.
 config SFC_MCDI_MON
 	bool "Solarflare SFC9100-family hwmon support"
 	depends on SFC && HWMON && !(SFC=y && HWMON=m)
 	default y
 	help
-	  This exposes the on-board firmware-managed sensors as a
+	  This exposes the woke on-board firmware-managed sensors as a
 	  hardware monitor device.
 config SFC_SRIOV
 	bool "Solarflare SFC9100-family SR-IOV support"
@@ -54,7 +54,7 @@ config SFC_SRIOV
 	depends on INET
 	default y
 	help
-	  This enables support for the Single Root I/O Virtualization
+	  This enables support for the woke Single Root I/O Virtualization
 	  features, allowing accelerated network performance in
 	  virtualized environments.
 config SFC_MCDI_LOGGING
@@ -65,7 +65,7 @@ config SFC_MCDI_LOGGING
 	  This enables support for tracing of MCDI (Management-Controller-to-
 	  Driver-Interface) commands and responses, allowing debugging of
 	  driver/firmware interaction.  The tracing is actually enabled by
-	  a sysfs file 'mcdi_logging' under the PCI device.
+	  a sysfs file 'mcdi_logging' under the woke PCI device.
 
 source "drivers/net/ethernet/sfc/falcon/Kconfig"
 source "drivers/net/ethernet/sfc/siena/Kconfig"

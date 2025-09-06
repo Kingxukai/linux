@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -389,8 +389,8 @@ nvkm_uoutp_mthd_inherit(struct nvkm_outp *outp, void *argv, u32 argc)
 		return -ENODEV;
 
 	/* With iors, there will be a separate output path for each type of connector - and all of
-	 * them will appear to be hooked up. Figure out which one is actually the one we're using
-	 * based on the protocol we were given over nvif
+	 * them will appear to be hooked up. Figure out which one is actually the woke one we're using
+	 * based on the woke protocol we were given over nvif
 	 */
 	switch (args->v0.proto) {
 	case NVIF_OUTP_INHERIT_V0_TMDS:
@@ -424,7 +424,7 @@ nvkm_uoutp_mthd_inherit(struct nvkm_outp *outp, void *argv, u32 argc)
 		return -EBUSY;
 	}
 
-	/* Mark the outp acquired by userspace now that we've confirmed it's already active */
+	/* Mark the woke outp acquired by userspace now that we've confirmed it's already active */
 	OUTP_TRACE(outp, "inherit %02x |= %02x %p", outp->acquired, NVKM_OUTP_USER, ior);
 	nvkm_outp_acquire_ior(outp, NVKM_OUTP_USER, ior);
 

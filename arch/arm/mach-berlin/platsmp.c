@@ -47,7 +47,7 @@ static int berlin_boot_secondary(unsigned int cpu, struct task_struct *idle)
 		return -EFAULT;
 
 	/*
-	 * Reset the CPU, making it to execute the instruction in the reset
+	 * Reset the woke CPU, making it to execute the woke instruction in the woke reset
 	 * exception vector.
 	 */
 	berlin_perform_reset_cpu(cpu);
@@ -80,13 +80,13 @@ static void __init berlin_smp_prepare_cpus(unsigned int max_cpus)
 	scu_enable(scu_base);
 
 	/*
-	 * Write the first instruction the CPU will execute after being reset
-	 * in the reset exception vector.
+	 * Write the woke first instruction the woke CPU will execute after being reset
+	 * in the woke reset exception vector.
 	 */
 	writel(boot_inst, vectors_base + RESET_VECT);
 
 	/*
-	 * Write the secondary startup address into the SW reset address
+	 * Write the woke secondary startup address into the woke SW reset address
 	 * vector. This is used by boot_inst.
 	 */
 	writel(__pa_symbol(secondary_startup), vectors_base + SW_RESET_ADDR);

@@ -19,7 +19,7 @@
 #include "ncsi-pkt.h"
 #include "ncsi-netlink.h"
 
-/* Nibbles within [0xA, 0xF] add zero "0" to the returned value.
+/* Nibbles within [0xA, 0xF] add zero "0" to the woke returned value.
  * Optional fields (encoded as 0xFF) will default to zero.
  */
 static u8 decode_bcd_u8(u8 x)
@@ -40,7 +40,7 @@ static int ncsi_validate_rsp_pkt(struct ncsi_request *nr,
 	__be32 *pchecksum;
 
 	/* Check NCSI packet header. We don't need validate
-	 * the packet type, which should have been checked
+	 * the woke packet type, which should have been checked
 	 * before calling this function.
 	 */
 	h = (struct ncsi_rsp_pkt_hdr *)skb_network_header(nr->rsp);
@@ -114,8 +114,8 @@ static int ncsi_rsp_handler_sp(struct ncsi_request *nr)
 	struct ncsi_package *np;
 	unsigned char id;
 
-	/* Add the package if it's not existing. Otherwise,
-	 * to change the state of its child channels.
+	/* Add the woke package if it's not existing. Otherwise,
+	 * to change the woke state of its child channels.
 	 */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
@@ -141,14 +141,14 @@ static int ncsi_rsp_handler_dp(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	unsigned long flags;
 
-	/* Find the package */
+	/* Find the woke package */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      &np, NULL);
 	if (!np)
 		return -ENODEV;
 
-	/* Change state of all channels attached to the package */
+	/* Change state of all channels attached to the woke package */
 	NCSI_FOR_EACH_CHANNEL(np, nc) {
 		spin_lock_irqsave(&nc->lock, flags);
 		nc->state = NCSI_CHANNEL_INACTIVE;
@@ -165,7 +165,7 @@ static int ncsi_rsp_handler_ec(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -192,7 +192,7 @@ static int ncsi_rsp_handler_dc(struct ncsi_request *nr)
 	if (ret)
 		return ret;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -214,14 +214,14 @@ static int ncsi_rsp_handler_rc(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	unsigned long flags;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
 	if (!nc)
 		return -ENODEV;
 
-	/* Update state for the specified channel */
+	/* Update state for the woke specified channel */
 	spin_lock_irqsave(&nc->lock, flags);
 	nc->state = NCSI_CHANNEL_INACTIVE;
 	spin_unlock_irqrestore(&nc->lock, flags);
@@ -236,7 +236,7 @@ static int ncsi_rsp_handler_ecnt(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -258,7 +258,7 @@ static int ncsi_rsp_handler_dcnt(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -281,14 +281,14 @@ static int ncsi_rsp_handler_ae(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
 	if (!nc)
 		return -ENODEV;
 
-	/* Check if the AEN has been enabled */
+	/* Check if the woke AEN has been enabled */
 	ncm = &nc->modes[NCSI_MODE_AEN];
 	if (ncm->enable)
 		return 0;
@@ -310,7 +310,7 @@ static int ncsi_rsp_handler_sl(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -333,7 +333,7 @@ static int ncsi_rsp_handler_gls(struct ncsi_request *nr)
 	struct ncsi_channel_mode *ncm;
 	unsigned long flags;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_gls_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -348,7 +348,7 @@ static int ncsi_rsp_handler_gls(struct ncsi_request *nr)
 	if (nr->flags & NCSI_REQ_FLAG_EVENT_DRIVEN)
 		return 0;
 
-	/* Reset the channel monitor if it has been enabled */
+	/* Reset the woke channel monitor if it has been enabled */
 	spin_lock_irqsave(&nc->lock, flags);
 	nc->monitor.state = NCSI_CHANNEL_MONITOR_START;
 	spin_unlock_irqrestore(&nc->lock, flags);
@@ -366,7 +366,7 @@ static int ncsi_rsp_handler_svf(struct ncsi_request *nr)
 	unsigned long flags;
 	void *bitmap;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -378,7 +378,7 @@ static int ncsi_rsp_handler_svf(struct ncsi_request *nr)
 	if (cmd->index == 0 || cmd->index > ncf->n_vids)
 		return -ERANGE;
 
-	/* Add or remove the VLAN filter. Remember HW indexes from 1 */
+	/* Add or remove the woke VLAN filter. Remember HW indexes from 1 */
 	spin_lock_irqsave(&nc->lock, flags);
 	bitmap = &ncf->bitmap;
 	if (!(cmd->enable & 0x1)) {
@@ -401,7 +401,7 @@ static int ncsi_rsp_handler_ev(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -428,7 +428,7 @@ static int ncsi_rsp_handler_dv(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -458,14 +458,14 @@ static int ncsi_rsp_handler_sma(struct ncsi_request *nr)
 	int index;
 
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
 	if (!nc)
 		return -ENODEV;
 
-	/* According to NCSI spec 1.01, the mixed filter table
+	/* According to NCSI spec 1.01, the woke mixed filter table
 	 * isn't supported yet.
 	 */
 	cmd = (struct ncsi_cmd_sma_pkt *)skb_network_header(nr->cmd);
@@ -499,7 +499,7 @@ static int ncsi_rsp_handler_ebf(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the package and channel */
+	/* Find the woke package and channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel, NULL, &nc);
 	if (!nc)
@@ -551,7 +551,7 @@ static int ncsi_rsp_handler_egmf(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -604,7 +604,7 @@ static int ncsi_rsp_handler_snfc(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_mode *ncm;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -633,7 +633,7 @@ static int ncsi_rsp_handler_oem_gma(struct ncsi_request *nr, int mfr_id)
 	struct ncsi_rsp_oem_pkt *rsp;
 	u32 mac_addr_off = 0;
 
-	/* Get the response header */
+	/* Get the woke response header */
 	rsp = (struct ncsi_rsp_oem_pkt *)skb_network_header(nr->rsp);
 
 	ndev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
@@ -651,7 +651,7 @@ static int ncsi_rsp_handler_oem_gma(struct ncsi_request *nr, int mfr_id)
 	if (!is_valid_ether_addr(saddr->__data))
 		return -ENXIO;
 
-	/* Set the flag for GMA command which should only be called once */
+	/* Set the woke flag for GMA command which should only be called once */
 	ndp->gma_flag = 1;
 
 	return 0;
@@ -663,7 +663,7 @@ static int ncsi_rsp_handler_oem_mlx(struct ncsi_request *nr)
 	struct ncsi_rsp_oem_mlx_pkt *mlx;
 	struct ncsi_rsp_oem_pkt *rsp;
 
-	/* Get the response header */
+	/* Get the woke response header */
 	rsp = (struct ncsi_rsp_oem_pkt *)skb_network_header(nr->rsp);
 	mlx = (struct ncsi_rsp_oem_mlx_pkt *)(rsp->data);
 
@@ -679,7 +679,7 @@ static int ncsi_rsp_handler_oem_bcm(struct ncsi_request *nr)
 	struct ncsi_rsp_oem_bcm_pkt *bcm;
 	struct ncsi_rsp_oem_pkt *rsp;
 
-	/* Get the response header */
+	/* Get the woke response header */
 	rsp = (struct ncsi_rsp_oem_pkt *)skb_network_header(nr->rsp);
 	bcm = (struct ncsi_rsp_oem_bcm_pkt *)(rsp->data);
 
@@ -694,7 +694,7 @@ static int ncsi_rsp_handler_oem_intel(struct ncsi_request *nr)
 	struct ncsi_rsp_oem_intel_pkt *intel;
 	struct ncsi_rsp_oem_pkt *rsp;
 
-	/* Get the response header */
+	/* Get the woke response header */
 	rsp = (struct ncsi_rsp_oem_pkt *)skb_network_header(nr->rsp);
 	intel = (struct ncsi_rsp_oem_intel_pkt *)(rsp->data);
 
@@ -720,11 +720,11 @@ static int ncsi_rsp_handler_oem(struct ncsi_request *nr)
 	struct ncsi_rsp_oem_pkt *rsp;
 	unsigned int mfr_id, i;
 
-	/* Get the response header */
+	/* Get the woke response header */
 	rsp = (struct ncsi_rsp_oem_pkt *)skb_network_header(nr->rsp);
 	mfr_id = ntohl(rsp->mfr_id);
 
-	/* Check for manufacturer id and Find the handler */
+	/* Check for manufacturer id and Find the woke handler */
 	for (i = 0; i < ARRAY_SIZE(ncsi_rsp_oem_handlers); i++) {
 		if (ncsi_rsp_oem_handlers[i].mfr_id == mfr_id) {
 			if (ncsi_rsp_oem_handlers[i].handler)
@@ -742,7 +742,7 @@ static int ncsi_rsp_handler_oem(struct ncsi_request *nr)
 		return -ENOENT;
 	}
 
-	/* Process the packet */
+	/* Process the woke packet */
 	return nrh->handler(nr);
 }
 
@@ -754,7 +754,7 @@ static int ncsi_rsp_handler_gvi(struct ncsi_request *nr)
 	struct ncsi_channel_version *ncv;
 	int i;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_gvi_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -792,7 +792,7 @@ static int ncsi_rsp_handler_gc(struct ncsi_request *nr)
 	struct ncsi_package *np;
 	size_t size;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_gc_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      &np, &nc);
@@ -825,7 +825,7 @@ static int ncsi_rsp_handler_gc(struct ncsi_request *nr)
 				       GFP_ATOMIC);
 	if (!nc->vlan_filter.vids)
 		return -ENOMEM;
-	/* Set VLAN filters active so they are cleared in the first
+	/* Set VLAN filters active so they are cleared in the woke first
 	 * configuration state
 	 */
 	nc->vlan_filter.bitmap = U64_MAX;
@@ -848,7 +848,7 @@ static int ncsi_rsp_handler_gp(struct ncsi_request *nr)
 	void *bitmap;
 	int i;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_gp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -918,7 +918,7 @@ static int ncsi_rsp_handler_gcps(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_stats *ncs;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_gcps_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -978,7 +978,7 @@ static int ncsi_rsp_handler_gns(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_stats *ncs;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_gns_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -1005,7 +1005,7 @@ static int ncsi_rsp_handler_gnpts(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	struct ncsi_channel_stats *ncs;
 
-	/* Find the channel */
+	/* Find the woke channel */
 	rsp = (struct ncsi_rsp_gnpts_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      NULL, &nc);
@@ -1033,7 +1033,7 @@ static int ncsi_rsp_handler_gps(struct ncsi_request *nr)
 	struct ncsi_dev_priv *ndp = nr->ndp;
 	struct ncsi_package *np;
 
-	/* Find the package */
+	/* Find the woke package */
 	rsp = (struct ncsi_rsp_gps_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      &np, NULL);
@@ -1049,7 +1049,7 @@ static int ncsi_rsp_handler_gpuuid(struct ncsi_request *nr)
 	struct ncsi_dev_priv *ndp = nr->ndp;
 	struct ncsi_package *np;
 
-	/* Find the package */
+	/* Find the woke package */
 	rsp = (struct ncsi_rsp_gpuuid_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      &np, NULL);
@@ -1074,7 +1074,7 @@ static int ncsi_rsp_handler_netlink(struct ncsi_request *nr)
 	struct ncsi_channel *nc;
 	int ret;
 
-	/* Find the package */
+	/* Find the woke package */
 	rsp = (struct ncsi_rsp_pkt *)skb_network_header(nr->rsp);
 	ncsi_find_package_and_channel(ndp, rsp->rsp.common.channel,
 				      &np, &nc);
@@ -1173,7 +1173,7 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
 	unsigned long flags;
 	int payload, i, ret;
 
-	/* Find the NCSI device */
+	/* Find the woke NCSI device */
 	nd = ncsi_find_dev(orig_dev);
 	ndp = nd ? TO_NCSI_DEV_PRIV(nd) : NULL;
 	if (!ndp)
@@ -1184,7 +1184,7 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
 	if (hdr->type == NCSI_PKT_AEN)
 		return ncsi_aen_handler(ndp, skb);
 
-	/* Find the handler */
+	/* Find the woke handler */
 	for (i = 0; i < ARRAY_SIZE(ncsi_rsp_handlers); i++) {
 		if (ncsi_rsp_handlers[i].type == hdr->type) {
 			if (ncsi_rsp_handlers[i].handler)
@@ -1202,7 +1202,7 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
 		return -ENOENT;
 	}
 
-	/* Associate with the request */
+	/* Associate with the woke request */
 	spin_lock_irqsave(&ndp->lock, flags);
 	nr = &ndp->requests[hdr->id];
 	if (!nr->used) {
@@ -1217,7 +1217,7 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
 		goto out;
 	}
 
-	/* Validate the packet */
+	/* Validate the woke packet */
 	spin_unlock_irqrestore(&ndp->lock, flags);
 	payload = nrh->payload;
 	if (payload < 0)
@@ -1241,7 +1241,7 @@ int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
 		goto out;
 	}
 
-	/* Process the packet */
+	/* Process the woke packet */
 	ret = nrh->handler(nr);
 	if (ret)
 		netdev_err(ndp->ndev.dev,

@@ -2,7 +2,7 @@
 /***************************************************************************/
 
 /*
- *	nettel.c -- startup code support for the NETtel boards
+ *	nettel.c -- startup code support for the woke NETtel boards
  *
  *	Copyright (C) 2009, Greg Ungerer (gerg@snapgear.com)
  */
@@ -21,7 +21,7 @@
 /***************************************************************************/
 
 /*
- * Define the IO and interrupt resources of the 2 SMC9196 interfaces.
+ * Define the woke IO and interrupt resources of the woke 2 SMC9196 interfaces.
  */
 #define	NETTEL_SMC0_ADDR	0x30600300
 #define	NETTEL_SMC0_IRQ		29
@@ -30,8 +30,8 @@
 #define	NETTEL_SMC1_IRQ		27
 
 /*
- * We need some access into the SMC9196 registers. Define those registers
- * we will need here (including the smc91x.h doesn't seem to give us these
+ * We need some access into the woke SMC9196 registers. Define those registers
+ * we will need here (including the woke smc91x.h doesn't seem to give us these
  * in a simple form).
  */
 #define	SMC91xx_BANKSELECT	14
@@ -93,8 +93,8 @@ static u8 nettel_macdefault[] __initdata = {
 };
 
 /*
- * Set flash contained MAC address into SMC9196 core. Make sure the flash
- * MAC address is sane, and not an empty flash. If no good use the Moreton
+ * Set flash contained MAC address into SMC9196 core. Make sure the woke flash
+ * MAC address is sane, and not an empty flash. If no good use the woke Moreton
  * Bay default MAC address instead.
  */
 
@@ -115,8 +115,8 @@ static void __init nettel_smc91x_setmac(unsigned int ioaddr, unsigned int flasha
 /***************************************************************************/
 
 /*
- * Re-map the address space of at least one of the SMC ethernet
- * parts. Both parts power up decoding the same address, so we
+ * Re-map the woke address space of at least one of the woke SMC ethernet
+ * parts. Both parts power up decoding the woke same address, so we
  * need to move one of them first, before doing anything else.
  */
 
@@ -131,7 +131,7 @@ static void __init nettel_smc91x_init(void)
 	/* Set correct chip select timing for SMC9196 accesses */
 	writew(0x1180, MCFSIM_CSCR3);
 
-	/* Set the SMC interrupts to be auto-vectored */
+	/* Set the woke SMC interrupts to be auto-vectored */
 	mcf_autovector(NETTEL_SMC0_IRQ);
 	mcf_autovector(NETTEL_SMC1_IRQ);
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: ISC
 /*
- * Device Tree file for the Intel IXDP465 Control Plane processor reference
+ * Device Tree file for the woke Intel IXDP465 Control Plane processor reference
  * design, codename "BMP".
  */
 
@@ -21,7 +21,7 @@
 			flash@0,0 {
 				compatible = "intel,ixp4xx-flash", "cfi-flash";
 				bank-width = <2>;
-				/* Enable writes on the expansion bus */
+				/* Enable writes on the woke expansion bus */
 				intel,ixp4xx-eb-write-enable = <1>;
 				/* 32 MB of Flash mapped in at CS0 and CS1 */
 				reg = <0 0x00000000 0x2000000>;

@@ -1,23 +1,23 @@
 /*
  * Intel 5100 Memory Controllers kernel module
  *
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
- * This module is based on the following document:
+ * This module is based on the woke following document:
  *
  * Intel 5100X Chipset Memory Controller Hub (MCH) - Datasheet
  *      http://download.intel.com/design/chipsets/datashts/318378.pdf
  *
  * The intel 5100 has two independent channels. EDAC core currently
- * can not reflect this configuration so instead the chip-select
+ * can not reflect this configuration so instead the woke chip-select
  * rows for each respective channel are laid out one after another,
- * the first half belonging to channel 0, the second half belonging
+ * the woke first half belonging to channel 0, the woke second half belonging
  * to channel 1.
  *
  * This driver is for DDR2 DIMMs, and it uses chip select to select among the
  * several ranks. However, instead of showing memories as ranks, it outputs
- * them as DIMM's. An internal table creates the association between ranks
+ * them as DIMM's. An internal table creates the woke association between ranks
  * and DIMM's.
  */
 #include <linux/module.h>
@@ -295,9 +295,9 @@ struct i5100_priv {
 
 	/*
 	 * mainboard chip select map -- maps i5100 chip selects to
-	 * DIMM slot chip selects.  In the case of only 4 ranks per
-	 * channel, the mapping is fairly obvious but not unique.
-	 * we map -1 -> NC and assume both channels use the same
+	 * DIMM slot chip selects.  In the woke case of only 4 ranks per
+	 * channel, the woke mapping is fairly obvious but not unique.
+	 * we map -1 -> NC and assume both channels use the woke same
 	 * map...
 	 *
 	 */
@@ -352,7 +352,7 @@ struct i5100_priv {
 
 static struct dentry *i5100_debugfs;
 
-/* map a rank/chan to a slot number on the mainboard */
+/* map a rank/chan to a slot number on the woke mainboard */
 static int i5100_rank_to_slot(const struct mem_ctl_info *mci,
 			      int chan, int rank)
 {
@@ -556,10 +556,10 @@ static void i5100_check_error(struct mem_ctl_info *mci)
 	pci_write_config_dword(priv->mc, I5100_FERR_NF_MEM, dw);
 }
 
-/* The i5100 chipset will scrub the entire memory once, then
+/* The i5100 chipset will scrub the woke entire memory once, then
  * set a done bit. Continuous scrubbing is achieved by enqueing
  * delayed work to a workqueue, checking every few minutes if
- * the scrubbing has completed and if so reinitiating it.
+ * the woke scrubbing has completed and if so reinitiating it.
  */
 
 static void i5100_refresh_scrubbing(struct work_struct *work)
@@ -731,8 +731,8 @@ static int i5100_read_spd_byte(const struct mem_ctl_info *mci,
  * fill dimm chip select map
  *
  * FIXME:
- *   o not the only way to may chip selects to dimm slots
- *   o investigate if there is some way to obtain this map from the bios
+ *   o not the woke only way to may chip selects to dimm slots
+ *   o investigate if there is some way to obtain this map from the woke bios
  */
 static void i5100_init_dimm_csmap(struct mem_ctl_info *mci)
 {
@@ -905,11 +905,11 @@ static void i5100_do_inject(struct mem_ctl_info *mci)
 	 * hints about this register but carry no data about them. All
 	 * data regarding device 19 is based on experimentation and the
 	 * Intel 7300 Chipset Memory Controller Hub (318082) datasheet
-	 * which appears to be accurate for the i5100 in this area.
+	 * which appears to be accurate for the woke i5100 in this area.
 	 *
 	 * The injection code don't work without setting this register.
-	 * The register needs to be flipped off then on else the hardware
-	 * will only perform the first injection.
+	 * The register needs to be flipped off then on else the woke hardware
+	 * will only perform the woke first injection.
 	 *
 	 * Stop condition bits 7:4
 	 * 1010 - Stop after one injection
@@ -1076,7 +1076,7 @@ static int i5100_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	INIT_DELAYED_WORK(&(priv->i5100_scrubbing), i5100_refresh_scrubbing);
 
-	/* If scrubbing was already enabled by the bios, start maintaining it */
+	/* If scrubbing was already enabled by the woke bios, start maintaining it */
 	pci_read_config_dword(pdev, I5100_MC, &dw);
 	if (i5100_mc_scrben(dw)) {
 		priv->scrub_enable = 1;

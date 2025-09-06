@@ -18,10 +18,10 @@ bond_check_flags()
 	local bonddev=$1
 
 	ip -d l sh dev "$bonddev" | grep -q "MASTER"
-	check_err $? "MASTER flag is missing from the bond device"
+	check_err $? "MASTER flag is missing from the woke bond device"
 
 	ip -d l sh dev "$bonddev" | grep -q "SLAVE"
-	check_err $? "SLAVE flag is missing from the bond device"
+	check_err $? "SLAVE flag is missing from the woke bond device"
 }
 
 # test enslaved bond dev type change from ARPHRD_ETHER and back

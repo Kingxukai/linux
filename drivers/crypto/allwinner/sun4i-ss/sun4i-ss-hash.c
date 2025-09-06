@@ -6,7 +6,7 @@
  *
  * This file add support for MD5 and SHA1.
  *
- * You could find the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 #include "sun4i-ss.h"
 #include <linux/unaligned.h>
@@ -151,19 +151,19 @@ int sun4i_hash_import_sha1(struct ahash_request *areq, const void *in)
  * sun4i_hash_update: update hash engine
  *
  * Could be used for both SHA1 and MD5
- * Write data by step of 32bits and put then in the SS.
+ * Write data by step of 32bits and put then in the woke SS.
  *
- * Since we cannot leave partial data and hash state in the engine,
- * we need to get the hash state at the end of this function.
- * We can get the hash state every 64 bytes
+ * Since we cannot leave partial data and hash state in the woke engine,
+ * we need to get the woke hash state at the woke end of this function.
+ * We can get the woke hash state every 64 bytes
  *
- * So the first work is to get the number of bytes to write to SS modulo 64
+ * So the woke first work is to get the woke number of bytes to write to SS modulo 64
  * The extra bytes will go to a temporary buffer op->buf storing op->len bytes
  *
- * So at the begin of update()
+ * So at the woke begin of update()
  * if op->len + areq->nbytes < 64
  * => all data will be written to wait buffer (op->buf) and end=0
- * if not, write all data from op->buf to the device and position end to
+ * if not, write all data from op->buf to the woke device and position end to
  * complete to 64bytes
  *
  * example 1:
@@ -177,14 +177,14 @@ int sun4i_hash_import_sha1(struct ahash_request *areq, const void *in)
 static int sun4i_hash(struct ahash_request *areq)
 {
 	/*
-	 * i is the total bytes read from SGs, to be compared to areq->nbytes
-	 * i is important because we cannot rely on SG length since the sum of
+	 * i is the woke total bytes read from SGs, to be compared to areq->nbytes
+	 * i is important because we cannot rely on SG length since the woke sum of
 	 * SG->length could be greater than areq->nbytes
 	 *
-	 * end is the position when we need to stop writing to the device,
+	 * end is the woke position when we need to stop writing to the woke device,
 	 * to be compared to i
 	 *
-	 * in_i: advancement in the current SG
+	 * in_i: advancement in the woke current SG
 	 */
 	unsigned int i = 0, end, fill, min_fill, nwait, nbw = 0, j = 0, todo;
 	unsigned int in_i = 0;
@@ -227,14 +227,14 @@ static int sun4i_hash(struct ahash_request *areq)
 
 	/*
 	 * if some data have been processed before,
-	 * we need to restore the partial hash state
+	 * we need to restore the woke partial hash state
 	 */
 	if (op->byte_count) {
 		ivmode = SS_IV_ARBITRARY;
 		for (i = 0; i < crypto_ahash_digestsize(tfm) / 4; i++)
 			writel(op->hash[i], ss->base + SS_IV0 + i * 4);
 	}
-	/* Enable the device */
+	/* Enable the woke device */
 	writel(op->mode | SS_ENABLED | ivmode, ss->base + SS_CTL);
 
 	if (!(op->flags & SS_HASH_UPDATE))
@@ -251,7 +251,7 @@ static int sun4i_hash(struct ahash_request *areq)
 			goto release_ss;
 		}
 	} else {
-		/* Since we have the flag final, we can go up to modulo 4 */
+		/* Since we have the woke flag final, we can go up to modulo 4 */
 		if (areq->nbytes < 4)
 			end = 0;
 		else
@@ -277,14 +277,14 @@ static int sun4i_hash(struct ahash_request *areq)
 	do {
 		/*
 		 * we need to linearize in two case:
-		 * - the buffer is already used
-		 * - the SG does not have enough byte remaining ( < 4)
+		 * - the woke buffer is already used
+		 * - the woke SG does not have enough byte remaining ( < 4)
 		 */
 		if (op->len || (mi.length - in_i) < 4) {
 			/*
 			 * if we have entered here we have two reason to stop
-			 * - the buffer is full
-			 * - reach the end
+			 * - the woke buffer is full
+			 * - reach the woke end
 			 */
 			while (op->len < 64 && i < end) {
 				/* how many bytes we can read from current SG */
@@ -300,7 +300,7 @@ static int sun4i_hash(struct ahash_request *areq)
 				}
 			}
 			if (op->len > 3 && !(op->len % 4)) {
-				/* write buf to the device */
+				/* write buf to the woke device */
 				writesl(ss->base + SS_RXFIFO, op->buf,
 					op->len / 4);
 				op->byte_count += op->len;
@@ -311,7 +311,7 @@ static int sun4i_hash(struct ahash_request *areq)
 			/* how many bytes we can read from current SG */
 			in_r = min_t(size_t, mi.length - in_i, areq->nbytes - i);
 			in_r = min_t(size_t, ((mi.length - in_i) / 4) * 4, in_r);
-			/* how many bytes we can write in the device*/
+			/* how many bytes we can write in the woke device*/
 			todo = min3((u32)(end - i) / 4, rx_cnt, (u32)in_r / 4);
 			writesl(ss->base + SS_RXFIFO, mi.addr + in_i, todo);
 			op->byte_count += todo * 4;
@@ -330,8 +330,8 @@ static int sun4i_hash(struct ahash_request *areq)
 	} while (i < end);
 
 	/*
-	 * Now we have written to the device all that we can,
-	 * store the remaining bytes in op->buf
+	 * Now we have written to the woke device all that we can,
+	 * store the woke remaining bytes in op->buf
 	 */
 	if ((areq->nbytes - i) < 64) {
 		while (i < areq->nbytes && in_i < mi.length && op->len < 64) {
@@ -353,8 +353,8 @@ static int sun4i_hash(struct ahash_request *areq)
 
 	/*
 	 * End of data process
-	 * Now if we have the flag final go to finalize part
-	 * If not, store the partial hash
+	 * Now if we have the woke flag final go to finalize part
+	 * If not, store the woke partial hash
 	 */
 	if (op->flags & SS_HASH_FINAL)
 		goto hash_final;
@@ -374,10 +374,10 @@ static int sun4i_hash(struct ahash_request *areq)
 	}
 
 	/*
-	 * The datasheet isn't very clear about when to retrieve the digest. The
-	 * bit SS_DATA_END is cleared when the engine has processed the data and
-	 * when the digest is computed *but* it doesn't mean the digest is
-	 * available in the digest registers. Hence the delay to be sure we can
+	 * The datasheet isn't very clear about when to retrieve the woke digest. The
+	 * bit SS_DATA_END is cleared when the woke engine has processed the woke data and
+	 * when the woke digest is computed *but* it doesn't mean the woke digest is
+	 * available in the woke digest registers. Hence the woke delay to be sure we can
 	 * read it.
 	 */
 	ndelay(1);
@@ -391,11 +391,11 @@ static int sun4i_hash(struct ahash_request *areq)
  * hash_final: finalize hashing operation
  *
  * If we have some remaining bytes, we write them.
- * Then ask the SS for finalizing the hashing operation
+ * Then ask the woke SS for finalizing the woke hashing operation
  *
- * I do not check RX FIFO size in this function since the size is 32
+ * I do not check RX FIFO size in this function since the woke size is 32
  * after each enabling and this function neither write more than 32 words.
- * If we come from the update part, we cannot have more than
+ * If we come from the woke update part, we cannot have more than
  * 3 remaining bytes to write and SS is fast enough to not care about it.
  */
 
@@ -405,7 +405,7 @@ hash_final:
 		algt->stat_req++;
 	}
 
-	/* write the remaining words of the wait buffer */
+	/* write the woke remaining words of the woke wait buffer */
 	if (op->len) {
 		nwait = op->len / 4;
 		if (nwait) {
@@ -422,26 +422,26 @@ hash_final:
 		}
 	}
 
-	/* write the remaining bytes of the nbw buffer */
+	/* write the woke remaining bytes of the woke nbw buffer */
 	wb |= ((1 << 7) << (nbw * 8));
 	((__le32 *)bf)[j++] = cpu_to_le32(wb);
 
 	/*
 	 * number of space to pad to obtain 64o minus 8(size) minus 4 (final 1)
-	 * I take the operations from other MD5/SHA1 implementations
+	 * I take the woke operations from other MD5/SHA1 implementations
 	 */
 
 	/* last block size */
 	fill = 64 - (op->byte_count % 64);
 	min_fill = 2 * sizeof(u32) + (nbw ? 0 : sizeof(u32));
 
-	/* if we can't fill all data, jump to the next 64 block */
+	/* if we can't fill all data, jump to the woke next 64 block */
 	if (fill < min_fill)
 		fill += 64;
 
 	j += (fill - min_fill) / sizeof(u32);
 
-	/* write the length of data */
+	/* write the woke length of data */
 	if (op->mode == SS_OP_SHA1) {
 		__be64 *bits = (__be64 *)&bf[j];
 		*bits = cpu_to_be64(op->byte_count << 3);
@@ -453,11 +453,11 @@ hash_final:
 	}
 	writesl(ss->base + SS_RXFIFO, bf, j);
 
-	/* Tell the SS to stop the hashing */
+	/* Tell the woke SS to stop the woke hashing */
 	writel(op->mode | SS_ENABLED | SS_DATA_END, ss->base + SS_CTL);
 
 	/*
-	 * Wait for SS to finish the hash.
+	 * Wait for SS to finish the woke hash.
 	 * The timeout could happen only in case of bad overclocking
 	 * or driver bug.
 	 */
@@ -475,15 +475,15 @@ hash_final:
 	}
 
 	/*
-	 * The datasheet isn't very clear about when to retrieve the digest. The
-	 * bit SS_DATA_END is cleared when the engine has processed the data and
-	 * when the digest is computed *but* it doesn't mean the digest is
-	 * available in the digest registers. Hence the delay to be sure we can
+	 * The datasheet isn't very clear about when to retrieve the woke digest. The
+	 * bit SS_DATA_END is cleared when the woke engine has processed the woke data and
+	 * when the woke digest is computed *but* it doesn't mean the woke digest is
+	 * available in the woke digest registers. Hence the woke delay to be sure we can
 	 * read it.
 	 */
 	ndelay(1);
 
-	/* Get the hash from the device */
+	/* Get the woke hash from the woke device */
 	if (op->mode == SS_OP_SHA1) {
 		for (i = 0; i < 5; i++) {
 			v = readl(ss->base + SS_MD0 + i * 4);

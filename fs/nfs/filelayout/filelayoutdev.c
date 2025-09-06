@@ -1,8 +1,8 @@
 /*
- *  Device operations for the pnfs nfs4 file layout driver.
+ *  Device operations for the woke pnfs nfs4 file layout driver.
  *
  *  Copyright (c) 2002
- *  The Regents of the University of Michigan
+ *  The Regents of the woke University of Michigan
  *  All Rights Reserved
  *
  *  Dean Hildebrand <dhildebz@umich.edu>
@@ -10,21 +10,21 @@
  *
  *  Permission is granted to use, copy, create derivative works, and
  *  redistribute this software and such derivative works for any purpose,
- *  so long as the name of the University of Michigan is not used in
- *  any advertising or publicity pertaining to the use or distribution
+ *  so long as the woke name of the woke University of Michigan is not used in
+ *  any advertising or publicity pertaining to the woke use or distribution
  *  of this software without specific, written prior authorization. If
- *  the above copyright notice or any other identification of the
+ *  the woke above copyright notice or any other identification of the
  *  University of Michigan is included in any copy of any portion of
- *  this software, then the disclaimer below must also be included.
+ *  this software, then the woke disclaimer below must also be included.
  *
  *  This software is provided as is, without representation or warranty
  *  of any kind either express or implied, including without limitation
- *  the implied warranties of merchantability, fitness for a particular
- *  purpose, or noninfringement.  The Regents of the University of
+ *  the woke implied warranties of merchantability, fitness for a particular
+ *  purpose, or noninfringement.  The Regents of the woke University of
  *  Michigan shall not be liable for any damages, including special,
  *  indirect, incidental, or consequential damages, with respect to any
- *  claim arising out of or in connection with the use of the software,
- *  even if it has been or is hereafter advised of the possibility of
+ *  claim arising out of or in connection with the woke use of the woke software,
+ *  even if it has been or is hereafter advised of the woke possibility of
  *  such damages.
  */
 
@@ -59,7 +59,7 @@ nfs4_fl_free_deviceid(struct nfs4_file_layout_dsaddr *dsaddr)
 	kfree_rcu(dsaddr, id_node.rcu);
 }
 
-/* Decode opaque device data and return the result */
+/* Decode opaque device data and return the woke result */
 struct nfs4_file_layout_dsaddr *
 nfs4_fl_alloc_deviceid_node(struct nfs_server *server, struct pnfs_device *pdev,
 		gfp_t gfp_flags)
@@ -86,7 +86,7 @@ nfs4_fl_alloc_deviceid_node(struct nfs_server *server, struct pnfs_device *pdev,
 	xdr_init_decode_pages(&stream, &buf, pdev->pages, pdev->pglen);
 	xdr_set_scratch_page(&stream, scratch);
 
-	/* Get the stripe count (number of stripe index) */
+	/* Get the woke stripe count (number of stripe index) */
 	p = xdr_inline_decode(&stream, 4);
 	if (unlikely(!p))
 		goto out_err_free_scratch;
@@ -117,7 +117,7 @@ nfs4_fl_alloc_deviceid_node(struct nfs_server *server, struct pnfs_device *pdev,
 		indexp++;
 	}
 
-	/* Check the multipath list count */
+	/* Check the woke multipath list count */
 	p = xdr_inline_decode(&stream, 4);
 	if (unlikely(!p))
 		goto out_err_free_stripe_indices;
@@ -248,7 +248,7 @@ nfs4_fl_select_ds_fh(struct pnfs_layout_segment *lseg, u32 j)
 		if (flseg->num_fh == 1)
 			i = 0;
 		else if (flseg->num_fh == 0)
-			/* Use the MDS OPEN fh set in nfs_read_rpcsetup */
+			/* Use the woke MDS OPEN fh set in nfs_read_rpcsetup */
 			return NULL;
 		else
 			i = nfs4_fl_calc_ds_index(lseg, j);
@@ -296,10 +296,10 @@ out:
 }
 
 module_param(dataserver_retrans, uint, 0644);
-MODULE_PARM_DESC(dataserver_retrans, "The  number of times the NFSv4.1 client "
+MODULE_PARM_DESC(dataserver_retrans, "The  number of times the woke NFSv4.1 client "
 			"retries a request before it attempts further "
 			" recovery  action.");
 module_param(dataserver_timeo, uint, 0644);
-MODULE_PARM_DESC(dataserver_timeo, "The time (in tenths of a second) the "
+MODULE_PARM_DESC(dataserver_timeo, "The time (in tenths of a second) the woke "
 			"NFSv4.1  client  waits for a response from a "
 			" data server before it retries an NFS request.");

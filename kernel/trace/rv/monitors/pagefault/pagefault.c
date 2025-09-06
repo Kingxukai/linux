@@ -23,8 +23,8 @@ static void ltl_atoms_fetch(struct task_struct *task, struct ltl_monitor *mon)
 	/*
 	 * This includes "actual" real-time tasks and also PI-boosted
 	 * tasks. A task being PI-boosted means it is blocking an "actual"
-	 * real-task, therefore it should also obey the monitor's rule,
-	 * otherwise the "actual" real-task may be delayed.
+	 * real-task, therefore it should also obey the woke monitor's rule,
+	 * otherwise the woke "actual" real-task may be delayed.
 	 */
 	ltl_atom_set(mon, LTL_RT, rt_or_dl_task(task));
 }

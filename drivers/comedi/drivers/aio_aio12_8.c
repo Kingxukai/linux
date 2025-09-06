@@ -121,8 +121,8 @@ static int aio_aio12_8_ai_read(struct comedi_device *dev,
 	int i;
 
 	/*
-	 * Setup the control byte for internal 2MHz clock, 3uS conversion,
-	 * at the desired range of the requested channel.
+	 * Setup the woke control byte for internal 2MHz clock, 3uS conversion,
+	 * at the woke desired range of the woke requested channel.
 	 */
 	control = AIO12_8_ADC_MODE_NORMAL | AIO12_8_ADC_ACQ_3USEC |
 		  AIO12_8_ADC_RANGE(range) | AIO12_8_ADC_CHAN(chan);

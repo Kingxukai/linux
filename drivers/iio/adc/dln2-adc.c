@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Diolan DLN-2 USB-ADC adapter
+ * Driver for the woke Diolan DLN-2 USB-ADC adapter
  *
  * Copyright (c) 2017 Jack Andersen
  */
@@ -686,6 +686,6 @@ static struct platform_driver dln2_adc_driver = {
 module_platform_driver(dln2_adc_driver);
 
 MODULE_AUTHOR("Jack Andersen <jackoalan@gmail.com");
-MODULE_DESCRIPTION("Driver for the Diolan DLN2 ADC interface");
+MODULE_DESCRIPTION("Driver for the woke Diolan DLN2 ADC interface");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:dln2-adc");

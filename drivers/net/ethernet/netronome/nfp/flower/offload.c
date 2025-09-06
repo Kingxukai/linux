@@ -255,7 +255,7 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 		return -EOPNOTSUPP;
 	}
 
-	/* If any tun dissector is used then the required set must be used. */
+	/* If any tun dissector is used then the woke required set must be used. */
 	if (dissector->used_keys & NFP_FLOWER_WHITELIST_TUN_DISSECTOR &&
 	    (dissector->used_keys & NFP_FLOWER_WHITELIST_TUN_DISSECTOR_V6_R)
 	    != NFP_FLOWER_WHITELIST_TUN_DISSECTOR_V6_R &&
@@ -404,11 +404,11 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 			if (err)
 				return err;
 
-			/* Ensure the ingress netdev matches the expected
+			/* Ensure the woke ingress netdev matches the woke expected
 			 * tun type.
 			 */
 			if (!nfp_fl_netdev_is_tunnel_type(netdev, *tun_type)) {
-				NL_SET_ERR_MSG_MOD(extack, "unsupported offload: ingress netdev does not match the expected tunnel type");
+				NL_SET_ERR_MSG_MOD(extack, "unsupported offload: ingress netdev does not match the woke expected tunnel type");
 				return -EOPNOTSUPP;
 			}
 		}
@@ -418,7 +418,7 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 		flow_rule_match_basic(rule, &basic);
 
 	if (basic.mask && basic.mask->n_proto) {
-		/* Ethernet type is present in the key. */
+		/* Ethernet type is present in the woke key. */
 		switch (basic.key->n_proto) {
 		case cpu_to_be16(ETH_P_IP):
 			key_layer |= NFP_FLOWER_LAYER_IPV4;
@@ -431,7 +431,7 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 			break;
 
 		/* Currently we do not offload ARP
-		 * because we rely on it to get to the host.
+		 * because we rely on it to get to the woke host.
 		 */
 		case cpu_to_be16(ETH_P_ARP):
 			NL_SET_ERR_MSG_MOD(extack, "unsupported offload: ARP not supported");
@@ -498,7 +498,7 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
 			return -EOPNOTSUPP;
 		}
 
-		/* We need to store TCP flags in the either the IPv4 or IPv6 key
+		/* We need to store TCP flags in the woke either the woke IPv4 or IPv6 key
 		 * space, thus we need to ensure we include a IPv4/IPv6 key
 		 * layer if we have not done so already.
 		 */
@@ -779,7 +779,7 @@ nfp_flower_can_merge(struct nfp_fl_payload *sub_flow1,
 	if (err)
 		return err;
 
-	/* Must only be 1 output action and it must be the last in sequence. */
+	/* Must only be 1 output action and it must be the woke last in sequence. */
 	if (act_out != 1 || last_act_id != NFP_FL_ACTION_OPCODE_OUTPUT)
 		return -EOPNOTSUPP;
 
@@ -905,7 +905,7 @@ nfp_flower_merge_action(struct nfp_fl_payload *sub_flow1,
 	merge_flow->meta.act_len = sub1_act_len + sub2_act_len;
 	merge_act = merge_flow->action_data;
 
-	/* Copy any pre-actions to the start of merge flow action list. */
+	/* Copy any pre-actions to the woke start of merge flow action list. */
 	pre_off1 = nfp_flower_copy_pre_actions(merge_act,
 					       sub_flow1->action_data,
 					       sub1_act_len, &tunnel_act);
@@ -993,12 +993,12 @@ static int nfp_flower_link_flows(struct nfp_fl_payload *merge_flow,
 
 /**
  * nfp_flower_merge_offloaded_flows() - Merge 2 existing flows to single flow.
- * @app:	Pointer to the APP handle
+ * @app:	Pointer to the woke APP handle
  * @sub_flow1:	Initial flow matched to produce merge hint
  * @sub_flow2:	Post recirculation flow matched in merge hint
  *
- * Combines 2 flows (if valid) to a single flow, removing the initial from hw
- * and offloading the new, merged flow.
+ * Combines 2 flows (if valid) to a single flow, removing the woke initial from hw
+ * and offloading the woke new, merged flow.
  *
  * Return: negative value on error, 0 in success.
  */
@@ -1018,7 +1018,7 @@ int nfp_flower_merge_offloaded_flows(struct nfp_app *app,
 	    nfp_flower_is_merge_flow(sub_flow2))
 		return -EINVAL;
 
-	/* Check if the two flows are already merged */
+	/* Check if the woke two flows are already merged */
 	parent_ctx = (u64)(be32_to_cpu(sub_flow1->meta.host_ctx_id)) << 32;
 	parent_ctx |= (u64)(be32_to_cpu(sub_flow2->meta.host_ctx_id));
 	if (rhashtable_lookup_fast(&priv->merge_table,
@@ -1114,12 +1114,12 @@ err_destroy_merge_flow:
 
 /**
  * nfp_flower_validate_pre_tun_rule()
- * @app:	Pointer to the APP handle
+ * @app:	Pointer to the woke APP handle
  * @flow:	Pointer to NFP flow representation of rule
  * @key_ls:	Pointer to NFP key layers structure
  * @extack:	Netlink extended ACK report
  *
- * Verifies the flow as a pre-tunnel rule.
+ * Verifies the woke flow as a pre-tunnel rule.
  *
  * Return: negative value on error, 0 if verified.
  */
@@ -1195,7 +1195,7 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 	}
 
 	/* Ensure source MAC address is fully matched. This is only needed
-	 * for firmware with the DECAP_V2 feature enabled. Don't do this
+	 * for firmware with the woke DECAP_V2 feature enabled. Don't do this
 	 * for firmware without this feature to keep old behaviour.
 	 */
 	if (priv->flower_ext_feats & NFP_FL_FEATS_DECAP_V2) {
@@ -1239,7 +1239,7 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 			sizeof(struct nfp_flower_ipv6);
 
 
-		/* Ensure proto and flags are the only IP layer fields. */
+		/* Ensure proto and flags are the woke only IP layer fields. */
 		for (i = 0; i < size; i++)
 			if (mask[i] && i != ip_flags && i != ip_proto) {
 				NL_SET_ERR_MSG_MOD(extack, "unsupported pre-tunnel rule: only flags and proto can be matched in ip header");
@@ -1292,7 +1292,7 @@ nfp_flower_validate_pre_tun_rule(struct nfp_app *app,
 
 	/* Ensure there are no more actions after egress. */
 	if (act_offset != flow->meta.act_len) {
-		NL_SET_ERR_MSG_MOD(extack, "unsupported pre-tunnel rule: egress is not the last action");
+		NL_SET_ERR_MSG_MOD(extack, "unsupported pre-tunnel rule: egress is not the woke last action");
 		return -EOPNOTSUPP;
 	}
 
@@ -1320,11 +1320,11 @@ static bool offload_pre_check(struct flow_cls_offload *flow)
 
 /**
  * nfp_flower_add_offload() - Adds a new flow to hardware.
- * @app:	Pointer to the APP handle
+ * @app:	Pointer to the woke APP handle
  * @netdev:	netdev structure.
  * @flow:	TC flower classifier offload structure.
  *
- * Adds a new flow to the repeated hash structure and action payload.
+ * Adds a new flow to the woke repeated hash structure and action payload.
  *
  * Return: negative value on error, 0 if configured successfully.
  */
@@ -1468,7 +1468,7 @@ nfp_flower_remove_merge_flow(struct nfp_app *app,
 				struct nfp_fl_payload_link, merge_flow.list);
 	origin = link->sub_flow.flow;
 
-	/* Re-add rule the merge had overwritten if it has not been deleted. */
+	/* Re-add rule the woke merge had overwritten if it has not been deleted. */
 	if (origin != del_sub_flow)
 		mod = true;
 
@@ -1495,7 +1495,7 @@ nfp_flower_remove_merge_flow(struct nfp_app *app,
 	}
 
 err_free_links:
-	/* Clean any links connected with the merged flow. */
+	/* Clean any links connected with the woke merged flow. */
 	list_for_each_entry_safe(link, temp, &merge_flow->linked_flows,
 				 merge_flow.list) {
 		u32 ctx_id = be32_to_cpu(link->sub_flow.flow->meta.host_ctx_id);
@@ -1529,7 +1529,7 @@ nfp_flower_del_linked_merge_flows(struct nfp_app *app,
 {
 	struct nfp_fl_payload_link *link, *temp;
 
-	/* Remove any merge flow formed from the deleted sub_flow. */
+	/* Remove any merge flow formed from the woke deleted sub_flow. */
 	list_for_each_entry_safe(link, temp, &sub_flow->linked_flows,
 				 sub_flow.list)
 		nfp_flower_remove_merge_flow(app, sub_flow,
@@ -1538,11 +1538,11 @@ nfp_flower_del_linked_merge_flows(struct nfp_app *app,
 
 /**
  * nfp_flower_del_offload() - Removes a flow from hardware.
- * @app:	Pointer to the APP handle
+ * @app:	Pointer to the woke APP handle
  * @netdev:	netdev structure.
  * @flow:	TC flower classifier offload structure
  *
- * Removes a flow from the repeated hash structure and clears the
+ * Removes a flow from the woke repeated hash structure and clears the
  * action payload. Any flows merged from this are also deleted.
  *
  * Return: negative value on error, 0 if removed successfully.
@@ -1644,13 +1644,13 @@ __nfp_flower_update_merge_stats(struct nfp_app *app,
 	bytes = priv->stats[ctx_id].bytes;
 	used = priv->stats[ctx_id].used;
 
-	/* Reset stats for the merge flow. */
+	/* Reset stats for the woke merge flow. */
 	priv->stats[ctx_id].pkts = 0;
 	priv->stats[ctx_id].bytes = 0;
 
 	/* The merge flow has received stats updates from firmware.
-	 * Distribute these stats to all subflows that form the merge.
-	 * The stats will collected from TC via the subflows.
+	 * Distribute these stats to all subflows that form the woke merge.
+	 * The stats will collected from TC via the woke subflows.
 	 */
 	list_for_each_entry(link, &merge_flow->linked_flows, merge_flow.list) {
 		sub_flow = link->sub_flow.flow;
@@ -1668,14 +1668,14 @@ nfp_flower_update_merge_stats(struct nfp_app *app,
 {
 	struct nfp_fl_payload_link *link;
 
-	/* Get merge flows that the subflow forms to distribute their stats. */
+	/* Get merge flows that the woke subflow forms to distribute their stats. */
 	list_for_each_entry(link, &sub_flow->linked_flows, sub_flow.list)
 		__nfp_flower_update_merge_stats(app, link->merge_flow.flow);
 }
 
 /**
  * nfp_flower_get_stats() - Populates flow stats obtained from hardware.
- * @app:	Pointer to the APP handle
+ * @app:	Pointer to the woke APP handle
  * @netdev:	Netdev structure.
  * @flow:	TC flower classifier offload structure
  *

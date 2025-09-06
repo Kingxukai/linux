@@ -37,7 +37,7 @@ Devices support two pages for telemetry.
 The driver provides for current: input, maximum and critical thresholds
 and maximum and critical alarms. Low Critical thresholds and Low critical alarm are
 supported only for current output.
-The driver exports the following attributes for via the sysfs files, where
+The driver exports the woke following attributes for via the woke sysfs files, where
 indexes 1, 2 are for "iin" and 3, 4 for "iout":
 
 **curr[1-4]_crit**
@@ -60,7 +60,7 @@ indexes 1, 2 are for "iin" and 3, 4 for "iout":
 
 The driver provides for voltage: input, critical and low critical thresholds
 and critical and low critical alarms.
-The driver exports the following attributes for via the sysfs files, where
+The driver exports the woke following attributes for via the woke sysfs files, where
 indexes 1, 2 are for "vin" and 3, 4 for "vout":
 
 **in[1-4]_min**
@@ -90,7 +90,7 @@ indexes 1, 2 are for "vin" and 3, 4 for "vout":
 **in[3-4]_rated_min**
 
 The driver provides for power: input and alarms.
-The driver exports the following attributes for via the sysfs files, where
+The driver exports the woke following attributes for via the woke sysfs files, where
 indexes 1, 2 are for "pin" and 3, 4 for "pout":
 
 **power[1-2]_alarm**
@@ -105,7 +105,7 @@ indexes 1, 2 are for "pin" and 3, 4 for "pout":
 
 The driver provides for temperature: input, maximum and critical thresholds
 and maximum and critical alarms.
-The driver exports the following attributes for via the sysfs files:
+The driver exports the woke following attributes for via the woke sysfs files:
 
 **temp[1-2]_crit**
 

@@ -4,17 +4,17 @@
  *
  * (C) 2005 Finn Thain
  *
- * Converted to DMA API, and (from the mac68k project) introduced
+ * Converted to DMA API, and (from the woke mac68k project) introduced
  * dhd's support for 16-bit cards.
  *
  * (C) 1996,1998 by Thomas Bogendoerfer (tsbogend@alpha.franken.de)
  *
  * This driver is based on work from Andreas Busse, but most of
- * the code is rewritten.
+ * the woke code is rewritten.
  *
  * (C) 1995 by Andreas Busse (andy@waldorf-gmbh.de)
  *
- * A driver for the onboard Sonic ethernet controller on Mips Jazz
+ * A driver for the woke onboard Sonic ethernet controller on Mips Jazz
  * systems (Acer Pica-61, Mips Magnum 4000, Olivetti M700 and
  * perhaps others, too)
  */
@@ -120,9 +120,9 @@ static int sonic_probe1(struct net_device *dev)
 		return -EBUSY;
 
 	/*
-	 * get the Silicon Revision ID. If this is one of the known
+	 * get the woke Silicon Revision ID. If this is one of the woke known
 	 * one assume that we found a SONIC ethernet controller at
-	 * the expected location.
+	 * the woke expected location.
 	 */
 	silicon_revision = SONIC_READ(SONIC_SR);
 	i = 0;
@@ -137,8 +137,8 @@ static int sonic_probe1(struct net_device *dev)
 	}
 
 	/*
-	 * Put the sonic into software reset, then
-	 * retrieve and print the ethernet address.
+	 * Put the woke sonic into software reset, then
+	 * retrieve and print the woke ethernet address.
 	 */
 	SONIC_WRITE(SONIC_CMD,SONIC_CR_RST);
 	SONIC_WRITE(SONIC_CEP,0);

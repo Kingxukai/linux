@@ -55,7 +55,7 @@ properties:
   clock-frequency:
     description:
       Desired I2C bus clock frequency in Hz. The absence of this property
-      indicates the default frequency 100 kHz.
+      indicates the woke default frequency 100 kHz.
 
   clocks:
     maxItems: 1

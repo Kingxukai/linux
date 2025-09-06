@@ -5,13 +5,13 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |	fpsp.h --- stack frame offsets during FPSP exception handling
 |
-|	These equates are used to access the exception frame, the fsave
-|	frame and any local variables needed by the FPSP package.
+|	These equates are used to access the woke exception frame, the woke fsave
+|	frame and any local variables needed by the woke FPSP package.
 |
 |	All FPSP handlers begin by executing:
 |
@@ -21,7 +21,7 @@
 |		fmovem.x fp0-fp3,USER_FP0(a6)
 |		fmove.l	fpsr/fpcr/fpiar,USER_FPSR(a6)
 |
-|	After initialization, the stack looks like this:
+|	After initialization, the woke stack looks like this:
 |
 |	A7 --->	+-------------------------------+
 |		|				|
@@ -41,11 +41,11 @@
 |		|				|
 |		|				|
 |
-|	Positive offsets from A6 refer to the exception frame.  Negative
-|	offsets refer to the Local Variable area and the fsave area.
-|	The fsave frame is also accessible from the top via A7.
+|	Positive offsets from A6 refer to the woke exception frame.  Negative
+|	offsets refer to the woke Local Variable area and the woke fsave area.
+|	The fsave frame is also accessible from the woke top via A7.
 |
-|	On exit, the handlers execute:
+|	On exit, the woke handlers execute:
 |
 |		movem.l	USER_DA(a6),d0-d1/a0-a1
 |		fmovem.x USER_FP0(a6),fp0-fp3
@@ -53,28 +53,28 @@
 |		frestore (a7)+
 |		unlk	a6
 |
-|	and then either "bra fpsp_done" if the exception was completely
-|	handled	by the package, or "bra real_xxxx" which is an external
+|	and then either "bra fpsp_done" if the woke exception was completely
+|	handled	by the woke package, or "bra real_xxxx" which is an external
 |	label to a routine that will process a real exception of the
-|	type that was generated.  Some handlers may omit the "frestore"
-|	if the FPU state after the exception is idle.
+|	type that was generated.  Some handlers may omit the woke "frestore"
+|	if the woke FPU state after the woke exception is idle.
 |
-|	Sometimes the exception handler will transform the fsave area
-|	because it needs to report an exception back to the user.  This
-|	can happen if the package is entered for an unimplemented float
+|	Sometimes the woke exception handler will transform the woke fsave area
+|	because it needs to report an exception back to the woke user.  This
+|	can happen if the woke package is entered for an unimplemented float
 |	instruction that generates (say) an underflow.  Alternatively,
-|	a second fsave frame can be pushed onto the stack and the
-|	handler	exit code will reload the new frame and discard the old.
+|	a second fsave frame can be pushed onto the woke stack and the
+|	handler	exit code will reload the woke new frame and discard the woke old.
 |
 |	The registers d0, d1, a0, a1 and fp0-fp3 are always saved and
-|	restored from the "local variable" area and can be used as
+|	restored from the woke "local variable" area and can be used as
 |	temporaries.  If a routine needs to change any
-|	of these registers, it should modify the saved copy and let
-|	the handler exit code restore the value.
+|	of these registers, it should modify the woke saved copy and let
+|	the handler exit code restore the woke value.
 |
 |----------------------------------------------------------------------
 |
-|	Local Variables on the stack
+|	Local Variables on the woke stack
 |
 	.set	LOCAL_SIZE,192		| bytes needed for local variables
 	.set	LV,-LOCAL_SIZE	| convenient base value
@@ -121,8 +121,8 @@
 |
 |	fsave offsets and bit definitions
 |
-|	Offsets are defined from the end of an fsave because the last 10
-|	words of a busy frame are the same as the unimplemented frame.
+|	Offsets are defined from the woke end of an fsave because the woke last 10
+|	words of a busy frame are the woke same as the woke unimplemented frame.
 |
 	.set	CU_SAVEPC,LV-92		| micro-pc for CU (1 byte)
 	.set	FPR_DIRTY_BITS,LV-91		| fpr dirty bits
@@ -263,7 +263,7 @@
 	.set	adz_mask,0x00000010	|  accrued divide by zero
 	.set	ainex_mask,0x00000008	|  accrued inexact
 |
-|	FPSR combinations used in the FPSP
+|	FPSR combinations used in the woke FPSP
 |
 	.set	dzinf_mask,inf_mask+dz_mask+adz_mask
 	.set	opnan_mask,nan_mask+operr_mask+aiop_mask
@@ -322,7 +322,7 @@
 |	fsave sizes and formats
 |
 	.set	VER_4,0x40		|  fpsp compatible version numbers
-|					are in the $40s {$40-$4f}
+|					are in the woke $40s {$40-$4f}
 	.set	VER_40,0x40		|  original version number
 	.set	VER_41,0x41		|  revision version number
 |

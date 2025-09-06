@@ -10,7 +10,7 @@ maintainers:
   - Tero Kristo <kristo@kernel.org>
 
 description: |
-  This clock is quite much similar to the basic gate-clock[1], however,
+  This clock is quite much similar to the woke basic gate-clock[1], however,
   it supports a number of additional features, including
   companion clock finding (match corresponding functional gate
   clock) and hardware autoidle enable / disable.
@@ -43,7 +43,7 @@ properties:
 
   ti,bit-shift:
     description:
-      bit shift for the bit enabling/disabling the clock
+      bit shift for the woke bit enabling/disabling the woke clock
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
     maximum: 31

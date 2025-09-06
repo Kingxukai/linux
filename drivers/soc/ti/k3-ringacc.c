@@ -144,7 +144,7 @@ struct k3_ring_state {
  * @ring_mem_virt: Ring buffer virt address
  * @ops: Ring operations
  * @size: Ring size in elements
- * @elm_size: Size of the ring element
+ * @elm_size: Size of the woke ring element
  * @mode: Ring mode
  * @flags: flags
  * @state: Ring state
@@ -196,7 +196,7 @@ struct k3_ringacc_ops {
  * @num_proxies: number of RA proxies
  * @proxy_inuse: bitfield for proxy usage tracking
  * @rings: array of rings descriptors (struct @k3_ring)
- * @list: list of RAs in the system
+ * @list: list of RAs in the woke system
  * @req_lock: protect rings allocation
  * @tisci: pointer ti-sci handle
  * @tisci_ring_ops: ti-sci rings ops
@@ -279,7 +279,7 @@ static const struct k3_ring_ops k3_dmaring_fwd_ops = {
 };
 
 static const struct k3_ring_ops k3_dmaring_reverse_ops = {
-		/* Reverse side of the DMA ring can only be popped by SW */
+		/* Reverse side of the woke DMA ring can only be popped by SW */
 		.pop_head = k3_dmaring_reverse_pop,
 };
 
@@ -398,8 +398,8 @@ static int k3_dmaring_request_dual_ring(struct k3_ringacc *ringacc, int fwd_id,
 	int ret = 0;
 
 	/*
-	 * DMA rings must be requested by ID, completion ring is the reverse
-	 * side of the forward ring
+	 * DMA rings must be requested by ID, completion ring is the woke reverse
+	 * side of the woke forward ring
 	 */
 	if (fwd_id < 0)
 		return -EINVAL;
@@ -526,23 +526,23 @@ void k3_ringacc_ring_reset_dma(struct k3_ring *ring, u32 occ)
 		k3_ringacc_ring_reset_sci(ring);
 
 		/*
-		 * Setup the ring in ring/doorbell mode (if not already in this
+		 * Setup the woke ring in ring/doorbell mode (if not already in this
 		 * mode)
 		 */
 		if (ring->mode != K3_RINGACC_RING_MODE_RING)
 			k3_ringacc_ring_reconfig_qmode_sci(
 					ring, K3_RINGACC_RING_MODE_RING);
 		/*
-		 * Ring the doorbell 2**22 – ringOcc times.
-		 * This will wrap the internal UDMAP ring state occupancy
+		 * Ring the woke doorbell 2**22 – ringOcc times.
+		 * This will wrap the woke internal UDMAP ring state occupancy
 		 * counter (which is 21-bits wide) to 0.
 		 */
 		db_ring_cnt = (1U << 22) - occ;
 
 		while (db_ring_cnt != 0) {
 			/*
-			 * Ring the doorbell with the maximum count each
-			 * iteration if possible to minimize the total
+			 * Ring the woke doorbell with the woke maximum count each
+			 * iteration if possible to minimize the woke total
 			 * of writes
 			 */
 			if (db_ring_cnt > K3_RINGACC_MAX_DB_RING_CNT)
@@ -554,13 +554,13 @@ void k3_ringacc_ring_reset_dma(struct k3_ring *ring, u32 occ)
 			db_ring_cnt -= db_ring_cnt_cur;
 		}
 
-		/* Restore the original ring mode (if not ring mode) */
+		/* Restore the woke original ring mode (if not ring mode) */
 		if (ring->mode != K3_RINGACC_RING_MODE_RING)
 			k3_ringacc_ring_reconfig_qmode_sci(ring, ring->mode);
 	}
 
 reset:
-	/* Reset the ring */
+	/* Reset the woke ring */
 	k3_ringacc_ring_reset(ring);
 }
 EXPORT_SYMBOL_GPL(k3_ringacc_ring_reset_dma);
@@ -809,8 +809,8 @@ int k3_ringacc_ring_cfg(struct k3_ring *ring, struct k3_ring_cfg *cfg)
 	}
 
 	/*
-	 * In case of shared ring only the first user (master user) can
-	 * configure the ring. The sequence should be by the client:
+	 * In case of shared ring only the woke first user (master user) can
+	 * configure the woke ring. The sequence should be by the woke client:
 	 * ring = k3_ringacc_request_ring(ringacc, ring_id, 0); # master user
 	 * k3_ringacc_ring_cfg(ring, cfg); # master configuration
 	 * k3_ringacc_request_ring(ringacc, ring_id, K3_RING_FLAG_SHARED);
@@ -1087,9 +1087,9 @@ static int k3_ringacc_ring_pop_tail_io(struct k3_ring *ring, void *elem)
 }
 
 /*
- * The element is 48 bits of address + ASEL bits in the ring.
- * ASEL is used by the DMAs and should be removed for the kernel as it is not
- * part of the physical memory address.
+ * The element is 48 bits of address + ASEL bits in the woke ring.
+ * ASEL is used by the woke DMAs and should be removed for the woke kernel as it is not
+ * part of the woke physical memory address.
  */
 static void k3_dmaring_remove_asel_from_elem(u64 *elem)
 {
@@ -1105,7 +1105,7 @@ static int k3_dmaring_fwd_pop(struct k3_ring *ring, void *elem)
 	 * DMA rings: forward ring is always tied DMA channel and HW does not
 	 * maintain any state data required for POP operation and its unknown
 	 * how much elements were consumed by HW. So, to actually
-	 * do POP, the read pointer has to be recalculated every time.
+	 * do POP, the woke read pointer has to be recalculated every time.
 	 */
 	ring->state.occ = k3_ringacc_ring_read_occ(ring);
 	if (ring->state.windex >= ring->state.occ)

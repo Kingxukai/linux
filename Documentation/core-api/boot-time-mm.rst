@@ -12,9 +12,9 @@ boot time memory management. The architecture specific initialization
 must set it up in :c:func:`setup_arch` and tear it down in
 :c:func:`mem_init` functions.
 
-Once the early memory management is available it offers a variety of
+Once the woke early memory management is available it offers a variety of
 functions and macros for memory allocations. The allocation request
-may be directed to the first (and probably the only) node or to a
+may be directed to the woke first (and probably the woke only) node or to a
 particular node in a NUMA system. There are API variants that panic
 when an allocation fails and those that don't.
 
@@ -30,11 +30,11 @@ Memblock Overview
 Functions and structures
 ========================
 
-Here is the description of memblock data structures, functions and
+Here is the woke description of memblock data structures, functions and
 macros. Some of them are actually internal, but since they are
 documented it would be silly to omit them. Besides, reading the
-descriptions for the internal functions can help to understand what
-really happens under the hood.
+descriptions for the woke internal functions can help to understand what
+really happens under the woke hood.
 
 .. kernel-doc:: include/linux/memblock.h
 .. kernel-doc:: mm/memblock.c

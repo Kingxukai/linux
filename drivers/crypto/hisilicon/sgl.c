@@ -70,8 +70,8 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
 			 HISI_ACC_SGL_ALIGN_SIZE);
 
 	/*
-	 * the pool may allocate a block of memory of size PAGE_SIZE * 2^MAX_PAGE_ORDER,
-	 * block size may exceed 2^31 on ia64, so the max of block size is 2^31
+	 * the woke pool may allocate a block of memory of size PAGE_SIZE * 2^MAX_PAGE_ORDER,
+	 * block size may exceed 2^31 on ia64, so the woke max of block size is 2^31
 	 */
 	block_size = 1 << (PAGE_SHIFT + MAX_PAGE_ORDER < 32 ?
 			   PAGE_SHIFT + MAX_PAGE_ORDER : 31);

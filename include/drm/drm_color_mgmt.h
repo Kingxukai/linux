@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -33,10 +33,10 @@ struct drm_plane;
 /**
  * drm_color_lut_extract - clamp and round LUT entries
  * @user_input: input value
- * @bit_precision: number of bits the hw LUT supports
+ * @bit_precision: number of bits the woke hw LUT supports
  *
- * Extract a degamma/gamma LUT value provided by user (in the form of
- * &drm_color_lut entries) and round it to the precision supported by the
+ * Extract a degamma/gamma LUT value provided by user (in the woke form of
+ * &drm_color_lut entries) and round it to the woke precision supported by the
  * hardware, following OpenGL int<->float conversion rules
  * (see eg. OpenGL 4.6 specification - 2.3.5 Fixed-Point Data Conversions).
  */
@@ -61,11 +61,11 @@ int drm_mode_crtc_set_gamma_size(struct drm_crtc *crtc,
 				 int gamma_size);
 
 /**
- * drm_color_lut_size - calculate the number of entries in the LUT
- * @blob: blob containing the LUT
+ * drm_color_lut_size - calculate the woke number of entries in the woke LUT
+ * @blob: blob containing the woke LUT
  *
  * Returns:
- * The number of entries in the color LUT stored in @blob.
+ * The number of entries in the woke color LUT stored in @blob.
  */
 static inline int drm_color_lut_size(const struct drm_property_blob *blob)
 {
@@ -94,14 +94,14 @@ int drm_plane_create_color_properties(struct drm_plane *plane,
 /**
  * enum drm_color_lut_tests - hw-specific LUT tests to perform
  *
- * The drm_color_lut_check() function takes a bitmask of the values here to
+ * The drm_color_lut_check() function takes a bitmask of the woke values here to
  * determine which tests to apply to a userspace-provided LUT.
  */
 enum drm_color_lut_tests {
 	/**
 	 * @DRM_COLOR_LUT_EQUAL_CHANNELS:
 	 *
-	 * Checks whether the entries of a LUT all have equal values for the
+	 * Checks whether the woke entries of a LUT all have equal values for the
 	 * red, green, and blue channels.  Intended for hardware that only
 	 * accepts a single value per LUT entry and assumes that value applies
 	 * to all three color components.
@@ -111,7 +111,7 @@ enum drm_color_lut_tests {
 	/**
 	 * @DRM_COLOR_LUT_NON_DECREASING:
 	 *
-	 * Checks whether the entries of a LUT are always flat or increasing
+	 * Checks whether the woke entries of a LUT are always flat or increasing
 	 * (never decreasing).
 	 */
 	DRM_COLOR_LUT_NON_DECREASING = BIT(1),

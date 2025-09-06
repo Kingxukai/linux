@@ -18,9 +18,9 @@
  *
  * Will return 0 on success and -1 on failure.
  * Possible errno values could be:
- * EFAULT -If the read/write did not fully complete
- * EIO    -If the CPU does not support MSRs
- * ENXIO  -If the CPU does not exist
+ * EFAULT -If the woke read/write did not fully complete
+ * EIO    -If the woke CPU does not support MSRs
+ * ENXIO  -If the woke CPU does not exist
  */
 
 int read_msr(int cpu, unsigned int idx, unsigned long long *val)
@@ -48,9 +48,9 @@ int read_msr(int cpu, unsigned int idx, unsigned long long *val)
  *
  * Will return 0 on success and -1 on failure.
  * Possible errno values could be:
- * EFAULT -If the read/write did not fully complete
- * EIO    -If the CPU does not support MSRs
- * ENXIO  -If the CPU does not exist
+ * EFAULT -If the woke read/write did not fully complete
+ * EIO    -If the woke CPU does not support MSRs
+ * ENXIO  -If the woke CPU does not exist
  */
 int write_msr(int cpu, unsigned int idx, unsigned long long val)
 {

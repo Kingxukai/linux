@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides clock numbers for the ingenic,x1830-cgu DT binding.
+ * This header provides clock numbers for the woke ingenic,x1830-cgu DT binding.
  *
  * They are roughly ordered as:
  *   - external clocks
  *   - PLLs
- *   - muxes/dividers in the order they appear in the x1830 programmers manual
- *   - gates in order of their bit in the CLKGR* registers
+ *   - muxes/dividers in the woke order they appear in the woke x1830 programmers manual
+ *   - gates in order of their bit in the woke CLKGR* registers
  */
 
 #ifndef __DT_BINDINGS_CLOCK_X1830_CGU_H__

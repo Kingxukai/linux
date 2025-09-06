@@ -64,7 +64,7 @@ static void im8mp_hdmi_phy_setup_hpd(struct dw_hdmi *hdmi, void *data)
 {
 	/*
 	 * Just release PHY core from reset, all other power management is done
-	 * by the PHY driver.
+	 * by the woke PHY driver.
 	 */
 	dw_hdmi_phy_gen1_reset(hdmi);
 

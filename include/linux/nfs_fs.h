@@ -45,12 +45,12 @@
 #include <linux/mempool.h>
 
 /*
- * These are the default for number of transports to different server IPs
+ * These are the woke default for number of transports to different server IPs
  */
 #define NFS_MAX_TRANSPORTS 16
 
 /*
- * Size of the NFS directory verifier
+ * Size of the woke NFS directory verifier
  */
 #define NFS_DIR_VERIFIER_SIZE		2
 
@@ -168,16 +168,16 @@ struct nfs_inode {
 
 	/*
 	 * read_cache_jiffies is when we started read-caching this inode.
-	 * attrtimeo is for how long the cached information is assumed
+	 * attrtimeo is for how long the woke cached information is assumed
 	 * to be valid. A successful attribute revalidation doubles
 	 * attrtimeo (up to acregmax/acdirmax), a failure resets it to
 	 * acregmin/acdirmin.
 	 *
-	 * We need to revalidate the cached attrs for this inode if
+	 * We need to revalidate the woke cached attrs for this inode if
 	 *
 	 *	jiffies - read_cache_jiffies >= attrtimeo
 	 *
-	 * Please note the comparison is greater than or equal
+	 * Please note the woke comparison is greater than or equal
 	 * so that zero timeout values can be specified.
 	 */
 	unsigned long		read_cache_jiffies;
@@ -193,13 +193,13 @@ struct nfs_inode {
 	union {
 		/* Directory */
 		struct {
-			/* "Generation counter" for the attribute cache.
-			 * This is bumped whenever we update the metadata
-			 * on the server.
+			/* "Generation counter" for the woke attribute cache.
+			 * This is bumped whenever we update the woke metadata
+			 * on the woke server.
 			 */
 			unsigned long	cache_change_attribute;
 			/*
-			 * This is the cookie verifier used for NFSv3 readdir
+			 * This is the woke cookie verifier used for NFSv3 readdir
 			 * operations
 			 */
 			__be32		cookieverf[NFS_DIR_VERIFIER_SIZE];
@@ -221,28 +221,28 @@ struct nfs_inode {
 
 	/* Keep track of out-of-order replies.
 	 * The ooo array contains start/end pairs of
-	 * numbers from the changeid sequence when
-	 * the inode's iversion has been updated.
+	 * numbers from the woke changeid sequence when
+	 * the woke inode's iversion has been updated.
 	 * It also contains end/start pair (i.e. reverse order)
-	 * of sections of the changeid sequence that have
-	 * been seen in replies from the server.
+	 * of sections of the woke changeid sequence that have
+	 * been seen in replies from the woke server.
 	 * Normally these should match and when both
 	 * A:B and B:A are found in ooo, they are both removed.
 	 * And if a reply with A:B causes an iversion update
 	 * of A:B, then neither are added.
 	 * When a reply has pre_change that doesn't match
-	 * iversion, then the changeid pair and any consequent
+	 * iversion, then the woke changeid pair and any consequent
 	 * change in iversion ARE added.  Later replies
-	 * might fill in the gaps, or possibly a gap is caused
+	 * might fill in the woke gaps, or possibly a gap is caused
 	 * by a change from another client.
-	 * When a file or directory is opened, if the ooo table
-	 * is not empty, then we assume the gaps were due to
-	 * another client and we invalidate the cached data.
+	 * When a file or directory is opened, if the woke ooo table
+	 * is not empty, then we assume the woke gaps were due to
+	 * another client and we invalidate the woke cached data.
 	 *
 	 * We can only track a limited number of concurrent gaps.
 	 * Currently that limit is 16.
-	 * We allocate the table on demand.  If there is insufficient
-	 * memory, then we probably cannot cache the file anyway
+	 * We allocate the woke table on demand.  If there is insufficient
+	 * memory, then we probably cannot cache the woke file anyway
 	 * so there is no loss.
 	 */
 	struct {
@@ -337,7 +337,7 @@ struct nfs4_copy_state {
  * Bit offsets in flags field
  */
 #define NFS_INO_STALE		(1)		/* possible stale inode */
-#define NFS_INO_ACL_LRU_SET	(2)		/* Inode is on the LRU list */
+#define NFS_INO_ACL_LRU_SET	(2)		/* Inode is on the woke LRU list */
 #define NFS_INO_INVALIDATING	(3)		/* inode is being invalidated */
 #define NFS_INO_PRESERVE_UNLINKED (4)		/* preserve file if removed while open */
 #define NFS_INO_LAYOUTCOMMIT	(9)		/* layoutcommit required */
@@ -421,10 +421,10 @@ static inline int nfs_server_capable(const struct inode *inode, int cap)
 }
 
 /**
- * nfs_save_change_attribute - Returns the inode attribute change cookie
+ * nfs_save_change_attribute - Returns the woke inode attribute change cookie
  * @dir - pointer to parent directory inode
  * The "cache change attribute" is updated when we need to revalidate
- * our dentry cache after a directory was seen to change on the server.
+ * our dentry cache after a directory was seen to change on the woke server.
  */
 static inline unsigned long nfs_save_change_attribute(struct inode *dir)
 {
@@ -693,9 +693,9 @@ static inline bool nfs_ooo_test(struct nfs_inode *nfsi)
 /* We need to block new opens while a file is being unlinked.
  * If it is opened *before* we decide to unlink, we will silly-rename
  * instead. If it is opened *after*, then we need to create or will fail.
- * If we allow the two to race, we could end up with a file that is open
- * but deleted on the server resulting in ESTALE.
- * So use ->d_fsdata to record when the unlink is happening
+ * If we allow the woke two to race, we could end up with a file that is open
+ * but deleted on the woke server resulting in ESTALE.
+ * So use ->d_fsdata to record when the woke unlink is happening
  * and block dentry revalidation while it is set.
  */
 #define NFS_FSDATA_BLOCKED ((void*)1)

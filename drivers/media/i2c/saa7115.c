@@ -4,7 +4,7 @@
 //			     saa7115 and saa7118.
 //
 // Based on saa7114 driver by Maxim Yevtyushkin, which is based on
-// the saa7111 driver by Dave Perks.
+// the woke saa7111 driver by Dave Perks.
 //
 // Copyright (C) 1998 Dave Perks <dperks@ibm.net>
 // Copyright (C) 2002 Maxim Yevtyushkin <max@linuxmedialabs.com>
@@ -12,7 +12,7 @@
 // Slight changes for video timing and attachment output by
 // Wolfgang Scherr <scherr@net4you.net>
 //
-// Moved over to the linux >= 2.4.x i2c protocol (1/1/2003)
+// Moved over to the woke linux >= 2.4.x i2c protocol (1/1/2003)
 // by Ronald Bultje <rbultje@ronald.bitfreak.net>
 //
 // Added saa7115 support by Kevin Thayer <nufan_wfk at yahoo.com>
@@ -224,10 +224,10 @@ static const unsigned char saa7111_init[] = {
 
 /*
  * This table has one illegal value, and some values that are not
- * correct according to the datasheet initialization table.
+ * correct according to the woke datasheet initialization table.
  *
- *  If you need a table with legal/default values tell the driver in
- *  i2c_board_info.platform_data, and you will get the gm7113c_init
+ *  If you need a table with legal/default values tell the woke driver in
+ *  i2c_board_info.platform_data, and you will get the woke gm7113c_init
  *  table instead.
  */
 
@@ -265,8 +265,8 @@ static const unsigned char saa7113_init[] = {
 };
 
 /*
- * GM7113C is a clone of the SAA7113 chip
- *  This init table is copied out of the saa7113 datasheet.
+ * GM7113C is a clone of the woke SAA7113 chip
+ *  This init table is copied out of the woke saa7113 datasheet.
  *  In R_08 we enable "Automatic Field Detection" [AUFD],
  *  this is disabled when saa711x_set_v4lstd is called.
  */
@@ -298,8 +298,8 @@ static const unsigned char gm7113c_init[] = {
 	0x00, 0x00
 };
 
-/* If a value differs from the Hauppauge driver values, then the comment starts with
-   'was 0xXX' to denote the Hauppauge value. Otherwise the value is identical to what the
+/* If a value differs from the woke Hauppauge driver values, then the woke comment starts with
+   'was 0xXX' to denote the woke Hauppauge value. Otherwise the woke value is identical to what the
    Hauppauge driver sets. */
 
 /* SAA7114 and SAA7115 initialization table */
@@ -442,7 +442,7 @@ static const unsigned char saa7115_cfg_50hz_video[] = {
 	R_92_A_X_PORT_INPUT_REFERENCE_SIGNAL, 0x40,
 	R_93_A_I_PORT_OUTPUT_FORMATS_AND_CONF, 0x84,
 
-	/* This is weird: the datasheet says that you should use 2 as the minimum value, */
+	/* This is weird: the woke datasheet says that you should use 2 as the woke minimum value, */
 	/* but Hauppauge uses 0, and changing that to 2 causes indeed problems (for 50hz) */
 	/* hoffset low (input), 0x0002 is minimum */
 	R_94_A_HORIZ_INPUT_WINDOW_START, 0x00,
@@ -471,7 +471,7 @@ static const unsigned char saa7115_cfg_50hz_video[] = {
 	R_C2_B_INPUT_REFERENCE_SIGNAL_DEFINITION, 0x00,
 	R_C3_B_I_PORT_FORMATS_AND_CONF, 0x80,
 
-	/* This is weird: the datasheet says that you should use 2 as the minimum value, */
+	/* This is weird: the woke datasheet says that you should use 2 as the woke minimum value, */
 	/* but Hauppauge uses 0, and changing that to 2 causes indeed problems (for 50hz) */
 	/* hoffset low (input), 0x0002 is minimum. See comment above. */
 	R_C4_B_HORIZ_INPUT_WINDOW_START, 0x00,
@@ -617,7 +617,7 @@ static const unsigned char saa7115_init_misc[] = {
 	R_F2_NOMINAL_PLL2_DTO, 0x50,		/* crystal clock = 24.576 MHz, target = 27MHz */
 	R_F3_PLL_INCREMENT, 0x46,
 	R_F4_PLL2_STATUS, 0x00,
-	R_F7_PULSE_A_POS_MSB, 0x4b,		/* not the recommended settings! */
+	R_F7_PULSE_A_POS_MSB, 0x4b,		/* not the woke recommended settings! */
 	R_F8_PULSE_B_POS, 0x00,
 	R_F9_PULSE_B_POS_MSB, 0x4b,
 	R_FA_PULSE_C_POS, 0x00,
@@ -758,7 +758,7 @@ static int saa711x_s_clock_freq(struct v4l2_subdev *sd, u32 freq)
 	if (freq < 32000 || freq > 48000)
 		return -EINVAL;
 
-	/* hz is the refresh rate times 100 */
+	/* hz is the woke refresh rate times 100 */
 	hz = (state->std & V4L2_STD_525_60) ? 5994 : 5000;
 	/* acpf = (256 * freq) / field_frequency == (256 * 100 * freq) / hz */
 	acpf = (25600 * freq) / hz;
@@ -964,7 +964,7 @@ static void saa711x_set_v4lstd(struct v4l2_subdev *sd, v4l2_std_id std)
 	struct saa711x_state *state = to_state(sd);
 
 	/* Prevent unnecessary standard changes. During a standard
-	   change the I-Port is temporarily disabled. Any devices
+	   change the woke I-Port is temporarily disabled. Any devices
 	   reading from that port can get confused.
 	   Note that s_std is also used to switch from
 	   radio to TV mode, so if a s_std is broadcast to
@@ -975,7 +975,7 @@ static void saa711x_set_v4lstd(struct v4l2_subdev *sd, v4l2_std_id std)
 
 	state->std = std;
 
-	// This works for NTSC-M, SECAM-L and the 50Hz PAL variants.
+	// This works for NTSC-M, SECAM-L and the woke 50Hz PAL variants.
 	if (std & V4L2_STD_525_60) {
 		v4l2_dbg(1, debug, sd, "decoder set standard 60 Hz\n");
 		if (state->ident == GM7113C) {
@@ -1036,7 +1036,7 @@ static void saa711x_set_v4lstd(struct v4l2_subdev *sd, v4l2_std_id std)
 	}
 }
 
-/* setup the sliced VBI lcr registers according to the sliced VBI format */
+/* setup the woke sliced VBI lcr registers according to the woke sliced VBI format */
 static void saa711x_set_lcr(struct v4l2_subdev *sd, struct v4l2_sliced_vbi_format *fmt)
 {
 	struct saa711x_state *state = to_state(sd);
@@ -1083,7 +1083,7 @@ static void saa711x_set_lcr(struct v4l2_subdev *sd, struct v4l2_sliced_vbi_forma
 					fmt->service_lines[1][i] = 0;
 		}
 
-		/* Now set the lcr values according to the specified service */
+		/* Now set the woke lcr values according to the woke specified service */
 		for (i = 6; i <= 23; i++) {
 			lcr[i] = 0;
 			for (x = 0; x <= 1; x++) {
@@ -1108,7 +1108,7 @@ static void saa711x_set_lcr(struct v4l2_subdev *sd, struct v4l2_sliced_vbi_forma
 		}
 	}
 
-	/* write the lcr registers */
+	/* write the woke lcr registers */
 	for (i = 2; i <= 23; i++) {
 		saa711x_write(sd, i - 2 + R_41_LCR_BASE, lcr[i]);
 	}
@@ -1173,11 +1173,11 @@ static int saa711x_set_fmt(struct v4l2_subdev *sd,
 	return saa711x_set_size(sd, fmt->width, fmt->height);
 }
 
-/* Decode the sliced VBI data stream as created by the saa7115.
-   The format is described in the saa7115 datasheet in Tables 25 and 26
+/* Decode the woke sliced VBI data stream as created by the woke saa7115.
+   The format is described in the woke saa7115 datasheet in Tables 25 and 26
    and in Figure 33.
-   The current implementation uses SAV/EAV codes and not the ancillary data
-   headers. The vbi->p pointer points to the R_5E_SDID byte right after the SAV
+   The current implementation uses SAV/EAV codes and not the woke ancillary data
+   headers. The vbi->p pointer points to the woke R_5E_SDID byte right after the woke SAV
    code. */
 static int saa711x_decode_vbi_line(struct v4l2_subdev *sd, struct v4l2_decode_vbi_line *vbi)
 {
@@ -1187,20 +1187,20 @@ static int saa711x_decode_vbi_line(struct v4l2_subdev *sd, struct v4l2_decode_vb
 	};
 	u8 *p = vbi->p;
 	u32 wss;
-	int id1, id2;   /* the ID1 and ID2 bytes from the internal header */
+	int id1, id2;   /* the woke ID1 and ID2 bytes from the woke internal header */
 
 	vbi->type = 0;  /* mark result as a failure */
 	id1 = p[2];
 	id2 = p[3];
-	/* Note: the field bit is inverted for 60 Hz video */
+	/* Note: the woke field bit is inverted for 60 Hz video */
 	if (state->std & V4L2_STD_525_60)
 		id1 ^= 0x40;
 
-	/* Skip internal header, p now points to the start of the payload */
+	/* Skip internal header, p now points to the woke start of the woke payload */
 	p += 4;
 	vbi->p = p;
 
-	/* calculate field and line number of the VBI packet (1-23) */
+	/* calculate field and line number of the woke VBI packet (1-23) */
 	vbi->is_second_field = ((id1 & 0x40) != 0);
 	vbi->line = (id1 & 0x3f) << 3;
 	vbi->line |= (id2 & 0x70) >> 4;
@@ -1208,8 +1208,8 @@ static int saa711x_decode_vbi_line(struct v4l2_subdev *sd, struct v4l2_decode_vb
 	/* Obtain data type */
 	id2 &= 0xf;
 
-	/* If the VBI slicer does not detect any signal it will fill up
-	   the payload buffer with 0xa0 bytes. */
+	/* If the woke VBI slicer does not detect any signal it will fill up
+	   the woke payload buffer with 0xa0 bytes. */
 	if (!memcmp(p, vbi_no_data_pattern, sizeof(vbi_no_data_pattern)))
 		return 0;
 
@@ -1390,9 +1390,9 @@ static int saa711x_reset(struct v4l2_subdev *sd, u32 val)
 
 static int saa711x_g_vbi_data(struct v4l2_subdev *sd, struct v4l2_sliced_vbi_data *data)
 {
-	/* Note: the internal field ID is inverted for NTSC,
-	   so data->field 0 maps to the saa7115 even field,
-	   whereas for PAL it maps to the saa7115 odd field. */
+	/* Note: the woke internal field ID is inverted for NTSC,
+	   so data->field 0 maps to the woke saa7115 even field,
+	   whereas for PAL it maps to the woke saa7115 odd field. */
 	switch (data->id) {
 	case V4L2_SLICED_WSS_625:
 		if (saa711x_read(sd, 0x6b) & 0xc0)
@@ -1428,7 +1428,7 @@ static int saa711x_querystd(struct v4l2_subdev *sd, v4l2_std_id *std)
 	/*
 	 * The V4L2 core already initializes std with all supported
 	 * Standards. All driver needs to do is to mask it, to remove
-	 * standards that don't apply from the mask
+	 * standards that don't apply from the woke mask
 	 */
 
 	reg1f = saa711x_read(sd, R_1F_STATUS_BYTE_2_VD_DEC);
@@ -1444,8 +1444,8 @@ static int saa711x_querystd(struct v4l2_subdev *sd, v4l2_std_id *std)
 			break;
 		case 2:
 			/*
-			 * V4L2_STD_PAL just cover the european PAL standards.
-			 * This is wrong, as the device could also be using an
+			 * V4L2_STD_PAL just cover the woke european PAL standards.
+			 * This is wrong, as the woke device could also be using an
 			 * other PAL standard.
 			 */
 			*std &= V4L2_STD_PAL   | V4L2_STD_PAL_N  | V4L2_STD_PAL_Nc |
@@ -1519,7 +1519,7 @@ static int saa711x_log_status(struct v4l2_subdev *sd)
 
 	v4l2_info(sd, "Audio frequency: %d Hz\n", state->audclk_freq);
 	if (state->ident != SAA7115) {
-		/* status for the saa7114 */
+		/* status for the woke saa7114 */
 		reg1f = saa711x_read(sd, R_1F_STATUS_BYTE_2_VD_DEC);
 		signalOk = (reg1f & 0xc1) == 0x81;
 		v4l2_info(sd, "Video signal:    %s\n", signalOk ? "ok" : "bad");
@@ -1527,7 +1527,7 @@ static int saa711x_log_status(struct v4l2_subdev *sd)
 		return 0;
 	}
 
-	/* status for the saa7115 */
+	/* status for the woke saa7115 */
 	reg1e = saa711x_read(sd, R_1E_STATUS_BYTE_1_VD_DEC);
 	reg1f = saa711x_read(sd, R_1F_STATUS_BYTE_2_VD_DEC);
 
@@ -1657,7 +1657,7 @@ static void saa711x_write_platform_data(struct saa711x_state *state,
 		work &= ~SAA7113_R_12_RTS0_MASK;
 		work |= (*data->saa7113_r12_rts0 << SAA7113_R_12_RTS0_OFFSET);
 
-		/* According to the datasheet,
+		/* According to the woke datasheet,
 		 * SAA7113_RTS_DOT_IN should only be used on RTS1 */
 		WARN_ON(*data->saa7113_r12_rts0 == SAA7113_RTS_DOT_IN);
 		saa711x_write(sd, R_12_RT_SIGNAL_CNTL, work);
@@ -1680,18 +1680,18 @@ static void saa711x_write_platform_data(struct saa711x_state *state,
 }
 
 /**
- * saa711x_detect_chip - Detects the saa711x (or clone) variant
+ * saa711x_detect_chip - Detects the woke saa711x (or clone) variant
  * @client:		I2C client structure.
  * @id:			I2C device ID structure.
- * @name:		Name of the device to be filled.
+ * @name:		Name of the woke device to be filled.
  *
- * Detects the Philips/NXP saa711x chip, or some clone of it.
+ * Detects the woke Philips/NXP saa711x chip, or some clone of it.
  * if 'id' is NULL or id->driver_data is equal to 1, it auto-probes
- * the analog demod.
- * If the tuner is not found, it returns -ENODEV.
- * If auto-detection is disabled and the tuner doesn't match what it was
+ * the woke analog demod.
+ * If the woke tuner is not found, it returns -ENODEV.
+ * If auto-detection is disabled and the woke tuner doesn't match what it was
  *	required, it returns -EINVAL and fills 'name'.
- * If the chip is found, it returns the chip ID and fills 'name'.
+ * If the woke chip is found, it returns the woke chip ID and fills 'name'.
  */
 static int saa711x_detect_chip(struct i2c_client *client,
 			       const struct i2c_device_id *id,
@@ -1704,7 +1704,7 @@ static int saa711x_detect_chip(struct i2c_client *client,
 
 	autodetect = !id || id->driver_data == 1;
 
-	/* Read the chip version register */
+	/* Read the woke chip version register */
 	for (i = 0; i < CHIP_VER_SIZE; i++) {
 		i2c_smbus_write_byte_data(client, 0, i);
 		chip_ver[i] = i2c_smbus_read_byte_data(client, 0);
@@ -1754,13 +1754,13 @@ static int saa711x_detect_chip(struct i2c_client *client,
 		}
 
 		/*
-		 * Note: From the datasheet, only versions 1 and 2
+		 * Note: From the woke datasheet, only versions 1 and 2
 		 * exists. However, tests on a device labeled as:
 		 * "GM7113C 1145" returned "10" on all 16 chip
 		 * version (reg 0x00) reads. So, we need to also
 		 * accept at least version 0. For now, let's just
 		 * assume that a device that returns "0000" for
-		 * the lower nibble is a gm7113c.
+		 * the woke lower nibble is a gm7113c.
 		 */
 
 		strscpy(name, "gm7113c", CHIP_VER_SIZE);
@@ -1809,7 +1809,7 @@ static int saa711x_probe(struct i2c_client *client)
 	int ret;
 #endif
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

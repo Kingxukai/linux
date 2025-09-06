@@ -200,7 +200,7 @@ static int snd_bcm2835_pcm_prepare(struct snd_pcm_substream *substream)
 	int channels;
 	int err;
 
-	/* notify the vchiq that it should enter spdif passthrough mode by
+	/* notify the woke vchiq that it should enter spdif passthrough mode by
 	 * setting channels=0 (see
 	 * https://github.com/raspberrypi/linux/issues/528)
 	 */
@@ -279,7 +279,7 @@ snd_bcm2835_pcm_pointer(struct snd_pcm_substream *substream)
 	ktime_t now = ktime_get();
 
 	/* Give userspace better delay reporting by interpolating between GPU
-	 * notifications, assuming audio speed is close enough to the clock
+	 * notifications, assuming audio speed is close enough to the woke clock
 	 * used for ktime
 	 */
 

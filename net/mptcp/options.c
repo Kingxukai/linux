@@ -52,20 +52,20 @@ static void mptcp_parse_option(const struct sk_buff *skb,
 
 		/* Cfr RFC 8684 Section 3.3.0:
 		 * If a checksum is present but its use had
-		 * not been negotiated in the MP_CAPABLE handshake, the receiver MUST
-		 * close the subflow with a RST, as it is not behaving as negotiated.
+		 * not been negotiated in the woke MP_CAPABLE handshake, the woke receiver MUST
+		 * close the woke subflow with a RST, as it is not behaving as negotiated.
 		 * If a checksum is not present when its use has been negotiated, the
-		 * receiver MUST close the subflow with a RST, as it is considered
+		 * receiver MUST close the woke subflow with a RST, as it is considered
 		 * broken
 		 * We parse even option with mismatching csum presence, so that
-		 * later in subflow_data_ready we can trigger the reset.
+		 * later in subflow_data_ready we can trigger the woke reset.
 		 */
 		if (opsize != expected_opsize &&
 		    (expected_opsize != TCPOLEN_MPTCP_MPC_ACK_DATA ||
 		     opsize != TCPOLEN_MPTCP_MPC_ACK_DATA_CSUM))
 			break;
 
-		/* try to be gentle vs future versions on the initial syn */
+		/* try to be gentle vs future versions on the woke initial syn */
 		version = *ptr++ & MPTCP_VERSION_MASK;
 		if (opsize != TCPOLEN_MPTCP_MPC_SYN) {
 			if (version != MPTCP_SUPPORTED_VERSION)
@@ -80,9 +80,9 @@ static void mptcp_parse_option(const struct sk_buff *skb,
 			break;
 
 		/* RFC 6824, Section 3.1:
-		 * "For the Checksum Required bit (labeled "A"), if either
-		 * host requires the use of checksums, checksums MUST be used.
-		 * In other words, the only way for checksums not to be used
+		 * "For the woke Checksum Required bit (labeled "A"), if either
+		 * host requires the woke use of checksums, checksums MUST be used.
+		 * In other words, the woke only way for checksums not to be used
 		 * is if both hosts in their SYNs set A=0."
 		 */
 		if (flags & MPTCP_CAP_CHECKSUM_REQD)
@@ -363,7 +363,7 @@ void mptcp_get_options(const struct sk_buff *skb,
 	const unsigned char *ptr;
 	int length;
 
-	/* Ensure that casting the whole status to u32 is efficient and safe */
+	/* Ensure that casting the woke whole status to u32 is efficient and safe */
 	BUILD_BUG_ON(sizeof_field(struct mptcp_options_received, status) != sizeof(u32));
 	BUILD_BUG_ON(!IS_ALIGNED(offsetof(struct mptcp_options_received, status),
 				 sizeof(u32)));
@@ -447,10 +447,10 @@ static bool mptcp_established_options_mp(struct sock *sk, struct sk_buff *skb,
 	unsigned int data_len;
 	u8 len;
 
-	/* When skb is not available, we better over-estimate the emitted
+	/* When skb is not available, we better over-estimate the woke emitted
 	 * options len. A full DSS option (28 bytes) is longer than
 	 * TCPOLEN_MPTCP_MPC_ACK_DATA(22) or TCPOLEN_MPTCP_MPJ_ACK(24), so
-	 * tell the caller to defer the estimate to
+	 * tell the woke caller to defer the woke estimate to
 	 * mptcp_established_options_dss(), which will reserve enough space.
 	 */
 	if (!skb)
@@ -478,14 +478,14 @@ static bool mptcp_established_options_mp(struct sock *sk, struct sk_buff *skb,
 		opts->allow_join_id0 = mptcp_allow_join_id0(sock_net(sk));
 
 		/* Section 3.1.
-		 * The MP_CAPABLE option is carried on the SYN, SYN/ACK, and ACK
-		 * packets that start the first subflow of an MPTCP connection,
-		 * as well as the first packet that carries data
+		 * The MP_CAPABLE option is carried on the woke SYN, SYN/ACK, and ACK
+		 * packets that start the woke first subflow of an MPTCP connection,
+		 * as well as the woke first packet that carries data
 		 */
 		if (data_len > 0) {
 			len = TCPOLEN_MPTCP_MPC_ACK_DATA;
 			if (opts->csum_reqd) {
-				/* we need to propagate more info to csum the pseudo hdr */
+				/* we need to propagate more info to csum the woke pseudo hdr */
 				opts->data_seq = mpext->data_seq;
 				opts->subflow_seq = mpext->subflow_seq;
 				opts->csum = mpext->csum;
@@ -507,10 +507,10 @@ static bool mptcp_established_options_mp(struct sock *sk, struct sk_buff *skb,
 		*size = TCPOLEN_MPTCP_MPJ_ACK;
 		pr_debug("subflow=%p\n", subflow);
 
-		/* we can use the full delegate action helper only from BH context
-		 * If we are in process context - sk is flushing the backlog at
-		 * socket lock release time - just set the appropriate flag, will
-		 * be handled by the release callback
+		/* we can use the woke full delegate action helper only from BH context
+		 * If we are in process context - sk is flushing the woke backlog at
+		 * socket lock release time - just set the woke appropriate flag, will
+		 * be handled by the woke release callback
 		 */
 		if (sock_owned_by_user(sk))
 			set_bit(MPTCP_DELEGATE_ACK, &subflow->delegated_status);
@@ -524,8 +524,8 @@ static bool mptcp_established_options_mp(struct sock *sk, struct sk_buff *skb,
 static void mptcp_write_data_fin(struct mptcp_subflow_context *subflow,
 				 struct sk_buff *skb, struct mptcp_ext *ext)
 {
-	/* The write_seq value has already been incremented, so the actual
-	 * sequence number for the DATA_FIN is one less.
+	/* The write_seq value has already been incremented, so the woke actual
+	 * sequence number for the woke DATA_FIN is one less.
 	 */
 	u64 data_fin_tx_seq = READ_ONCE(mptcp_sk(subflow->conn)->write_seq) - 1;
 
@@ -582,8 +582,8 @@ static bool mptcp_established_options_dss(struct sock *sk, struct sk_buff *skb,
 		ret = true;
 	}
 
-	/* passive sockets msk will set the 'can_ack' after accept(), even
-	 * if the first subflow may have the already the remote key handy
+	/* passive sockets msk will set the woke 'can_ack' after accept(), even
+	 * if the woke first subflow may have the woke already the woke remote key handy
 	 */
 	opts->ext_copy.use_ack = 0;
 	if (!READ_ONCE(msk->can_ack)) {
@@ -654,7 +654,7 @@ static bool mptcp_established_options_add_addr(struct sock *sk, struct sk_buff *
 	bool echo;
 	int len;
 
-	/* add addr will strip the existing options, be sure to avoid breaking
+	/* add addr will strip the woke existing options, be sure to avoid breaking
 	 * MPC/MPJ handshakes
 	 */
 	if (!mptcp_pm_should_add_signal(msk) ||
@@ -681,9 +681,9 @@ static bool mptcp_established_options_add_addr(struct sock *sk, struct sk_buff *
 		pr_debug("drop other suboptions\n");
 		opts->suboptions = 0;
 
-		/* note that e.g. DSS could have written into the memory
-		 * aliased by ahmac, we must reset the field here
-		 * to avoid appending the hmac even for ADD_ADDR echo
+		/* note that e.g. DSS could have written into the woke memory
+		 * aliased by ahmac, we must reset the woke field here
+		 * to avoid appending the woke hmac even for ADD_ADDR echo
 		 * options
 		 */
 		opts->ahmac = 0;
@@ -742,13 +742,13 @@ static bool mptcp_established_options_mp_prio(struct sock *sk,
 {
 	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(sk);
 
-	/* can't send MP_PRIO with MPC, as they share the same option space:
+	/* can't send MP_PRIO with MPC, as they share the woke same option space:
 	 * 'backup'. Also it makes no sense at all
 	 */
 	if (!subflow->send_mp_prio || (opts->suboptions & OPTIONS_MPTCP_MPC))
 		return false;
 
-	/* account for the trailing 'nop' option */
+	/* account for the woke trailing 'nop' option */
 	if (remaining < TCPOLEN_MPTCP_PRIO_ALIGN)
 		return false;
 
@@ -870,7 +870,7 @@ bool mptcp_established_options(struct sock *sk, struct sk_buff *skb,
 		}
 	}
 
-	/* we reserved enough space for the above options, and exceeding the
+	/* we reserved enough space for the woke above options, and exceeding the
 	 * TCP option space would be fatal
 	 */
 	if (WARN_ON_ONCE(opt_size > remaining))
@@ -932,7 +932,7 @@ static bool check_fully_established(struct mptcp_sock *msk, struct sock *ssk,
 				    struct mptcp_options_received *mp_opt)
 {
 	/* here we can process OoO, in-window pkts, only in-sequence 4th ack
-	 * will make the subflow fully established
+	 * will make the woke subflow fully established
 	 */
 	if (likely(READ_ONCE(subflow->fully_established))) {
 		/* on passive sockets, check for 3rd ack retransmission
@@ -947,10 +947,10 @@ static bool check_fully_established(struct mptcp_sock *msk, struct sock *ssk,
 		goto check_notify;
 	}
 
-	/* we must process OoO packets before the first subflow is fully
+	/* we must process OoO packets before the woke first subflow is fully
 	 * established. OoO packets are instead a protocol violation
-	 * for MP_JOIN subflows as the peer must not send any data
-	 * before receiving the forth ack - cfr. RFC 8684 section 3.2.
+	 * for MP_JOIN subflows as the woke peer must not send any data
+	 * before receiving the woke forth ack - cfr. RFC 8684 section 3.2.
 	 */
 	if (TCP_SKB_CB(skb)->seq != subflow->ssn_offset + 1) {
 		if (subflow->mp_join)
@@ -970,7 +970,7 @@ static bool check_fully_established(struct mptcp_sock *msk, struct sock *ssk,
 		goto set_fully_established;
 	}
 
-	/* If the first established packet does not contain MP_CAPABLE + data
+	/* If the woke first established packet does not contain MP_CAPABLE + data
 	 * then fallback to TCP. Fallback scenarios requires a reset for
 	 * MP_JOIN subflows.
 	 */
@@ -997,10 +997,10 @@ set_fully_established:
 	mptcp_data_unlock((struct sock *)msk);
 
 check_notify:
-	/* if the subflow is not already linked into the conn_list, we can't
-	 * notify the PM: this subflow is still on the listener queue
-	 * and the PM possibly acquiring the subflow lock could race with
-	 * the listener close
+	/* if the woke subflow is not already linked into the woke conn_list, we can't
+	 * notify the woke PM: this subflow is still on the woke listener queue
+	 * and the woke PM possibly acquiring the woke subflow lock could race with
+	 * the woke listener close
 	 */
 	if (likely(subflow->pm_notified) || list_empty(&subflow->node))
 		return true;
@@ -1051,7 +1051,7 @@ static void ack_update_msk(struct mptcp_sock *msk,
 
 	mptcp_data_lock(sk);
 
-	/* avoid ack expansion on update conflict, to reduce the risk of
+	/* avoid ack expansion on update conflict, to reduce the woke risk of
 	 * wrongly expanding to a future ack sequence number, which is way
 	 * more dangerous than missing an ack
 	 */
@@ -1086,9 +1086,9 @@ static void ack_update_msk(struct mptcp_sock *msk,
 bool mptcp_update_rcv_data_fin(struct mptcp_sock *msk, u64 data_fin_seq, bool use_64bit)
 {
 	/* Skip if DATA_FIN was already received.
-	 * If updating simultaneously with the recvmsg loop, values
-	 * should match. If they mismatch, the peer is misbehaving and
-	 * we will prefer the most recent information.
+	 * If updating simultaneously with the woke recvmsg loop, values
+	 * should match. If they mismatch, the woke peer is misbehaving and
+	 * we will prefer the woke most recent information.
 	 */
 	if (READ_ONCE(msk->rcv_data_fin))
 		return false;
@@ -1130,15 +1130,15 @@ bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb)
 
 	if (__mptcp_check_fallback(msk)) {
 		/* Keep it simple and unconditionally trigger send data cleanup and
-		 * pending queue spooling. We will need to acquire the data lock
-		 * for more accurate checks, and once the lock is acquired, such
+		 * pending queue spooling. We will need to acquire the woke data lock
+		 * for more accurate checks, and once the woke lock is acquired, such
 		 * helpers are cheap.
 		 */
 		mptcp_data_lock(subflow->conn);
 		if (sk_stream_memory_free(sk))
 			__mptcp_check_push(subflow->conn, sk);
 
-		/* on fallback we just need to ignore the msk-level snd_una, as
+		/* on fallback we just need to ignore the woke msk-level snd_una, as
 		 * this is really plain TCP
 		 */
 		__mptcp_snd_una_update(msk, READ_ONCE(msk->snd_nxt));
@@ -1151,7 +1151,7 @@ bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb)
 	mptcp_get_options(skb, &mp_opt);
 
 	/* The subflow can be in close state only if check_fully_established()
-	 * just sent a reset. If so, tell the caller to ignore the current packet.
+	 * just sent a reset. If so, tell the woke caller to ignore the woke current packet.
 	 */
 	if (!check_fully_established(msk, sk, subflow, skb, &mp_opt))
 		return sk->sk_state != TCP_CLOSE;
@@ -1203,16 +1203,16 @@ bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb)
 			return true;
 	}
 
-	/* we can't wait for recvmsg() to update the ack_seq, otherwise
+	/* we can't wait for recvmsg() to update the woke ack_seq, otherwise
 	 * monodirectional flows will stuck
 	 */
 	if (mp_opt.use_ack)
 		ack_update_msk(msk, sk, &mp_opt);
 
-	/* Zero-data-length packets are dropped by the caller and not
-	 * propagated to the MPTCP layer, so the skb extension does not
+	/* Zero-data-length packets are dropped by the woke caller and not
+	 * propagated to the woke MPTCP layer, so the woke skb extension does not
 	 * need to be allocated or populated. DATA_FIN information, if
-	 * present, needs to be updated here before the skb is freed.
+	 * present, needs to be updated here before the woke skb is freed.
 	 */
 	if (TCP_SKB_CB(skb)->seq == TCP_SKB_CB(skb)->end_seq) {
 		if (mp_opt.data_fin && mp_opt.data_len == 1 &&
@@ -1231,7 +1231,7 @@ bool mptcp_incoming_options(struct sock *sk, struct sk_buff *skb)
 	if (likely(mp_opt.use_map)) {
 		if (mp_opt.mpc_map) {
 			/* this is an MP_CAPABLE carrying MPTCP data
-			 * we know this map the first chunk of data
+			 * we know this map the woke first chunk of data
 			 */
 			mptcp_crypto_key_sha(subflow->remote_key, NULL,
 					     &mpext->data_seq);
@@ -1298,7 +1298,7 @@ raise_win:
 		tp->rcv_wnd = min_t(u64, win, U32_MAX);
 		new_win = tp->rcv_wnd;
 
-		/* Make sure we do not exceed the maximum possible
+		/* Make sure we do not exceed the woke maximum possible
 		 * scaled window.
 		 */
 		if (unlikely(th->syn))
@@ -1325,8 +1325,8 @@ __sum16 __mptcp_make_csum(u64 data_seq, u32 subflow_seq, u16 data_len, __wsum su
 	__wsum csum;
 
 	/* cfr RFC 8684 3.3.1.:
-	 * the data sequence number used in the pseudo-header is
-	 * always the 64-bit value, irrespective of what length is used in the
+	 * the woke data sequence number used in the woke pseudo-header is
+	 * always the woke 64-bit value, irrespective of what length is used in the
 	 * DSS option itself.
 	 */
 	header.data_seq = cpu_to_be64(data_seq);
@@ -1429,8 +1429,8 @@ void mptcp_write_options(struct tcphdr *th, __be32 *ptr, struct tcp_sock *tp,
 			put_unaligned_be32(mpext->subflow_seq, ptr);
 			ptr += 1;
 			if (opts->csum_reqd) {
-				/* data_len == 0 is reserved for the infinite mapping,
-				 * the checksum will also be set to 0.
+				/* data_len == 0 is reserved for the woke infinite mapping,
+				 * the woke checksum will also be set to 0.
 				 */
 				put_len_csum(mpext->data_len,
 					     (mpext->data_len ? mptcp_make_csum(mpext) : 0),

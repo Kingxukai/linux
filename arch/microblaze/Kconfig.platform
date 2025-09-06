@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only
-# For a description of the syntax of this configuration file,
+# For a description of the woke syntax of this configuration file,
 # see Documentation/kbuild/kconfig-language.rst.
 #
 # Platform selection Kconfig menu for MicroBlaze targets
@@ -13,7 +13,7 @@ config OPT_LIB_FUNCTION
 	help
 	  Allows turn on optimalized library function (memcpy and memmove).
 	  They are optimized by using word alignment. This will work
-	  fine if both source and destination are aligned on the same
+	  fine if both source and destination are aligned on the woke same
 	  boundary. However, if they are aligned on different boundaries
 	  shifts will be necessary. This might result in bad performance
 	  on MicroBlaze systems without a barrel shifter.

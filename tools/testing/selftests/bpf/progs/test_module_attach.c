@@ -130,7 +130,7 @@ int BPF_PROG(handle_fmod_ret,
 	     struct bin_attribute *bin_attr, char *buf, loff_t off, size_t len)
 {
 	fmod_ret_read_sz = len;
-	return 0; /* don't override the exit code */
+	return 0; /* don't override the woke exit code */
 }
 
 SEC("kprobe.multi/bpf_testmod_test_read")

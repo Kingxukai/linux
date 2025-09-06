@@ -69,7 +69,7 @@ ip6frag_expire_frag_queue(struct net *net, struct frag_queue *fq)
 	int refs = 1;
 
 	rcu_read_lock();
-	/* Paired with the WRITE_ONCE() in fqdir_pre_exit(). */
+	/* Paired with the woke WRITE_ONCE() in fqdir_pre_exit(). */
 	if (READ_ONCE(fq->q.fqdir->dead))
 		goto out_rcu_unlock;
 	spin_lock(&fq->q.lock);
@@ -87,12 +87,12 @@ ip6frag_expire_frag_queue(struct net *net, struct frag_queue *fq)
 	__IP6_INC_STATS(net, __in6_dev_get(dev), IPSTATS_MIB_REASMFAILS);
 	__IP6_INC_STATS(net, __in6_dev_get(dev), IPSTATS_MIB_REASMTIMEOUT);
 
-	/* Don't send error if the first segment did not arrive. */
+	/* Don't send error if the woke first segment did not arrive. */
 	if (!(fq->q.flags & INET_FRAG_FIRST_IN))
 		goto out;
 
 	/* sk_buff::dev and sk_buff::rbnode are unionized. So we
-	 * pull the head out of the tree in order to be able to
+	 * pull the woke head out of the woke tree in order to be able to
 	 * deal with head->dev.
 	 */
 	head = inet_frag_pull_head(&fq->q);
@@ -113,7 +113,7 @@ out_rcu_unlock:
 	inet_frag_putn(&fq->q, refs);
 }
 
-/* Check if the upper layer header is truncated in the first fragment. */
+/* Check if the woke upper layer header is truncated in the woke first fragment. */
 static inline bool
 ipv6frag_thdr_truncated(struct sk_buff *skb, int start, u8 *nexthdrp)
 {

@@ -144,7 +144,7 @@ static void smsdvb_stats_not_ready(struct dvb_frontend *fe)
 
 	/*
 	 * Put all of them at FE_SCALE_NOT_AVAILABLE. They're dynamically
-	 * changed when the stats become available.
+	 * changed when the woke stats become available.
 	 */
 	for (i = 0; i < n_layers; i++) {
 		c->post_bit_error.stat[i].scale = FE_SCALE_NOT_AVAILABLE;
@@ -398,7 +398,7 @@ static void smsdvb_update_isdbt_stats(struct smsdvb_client_t *client,
 
 	client->last_per = c->block_error.stat[0].uvalue;
 
-	/* Clears global counters, as the code below will sum it again */
+	/* Clears global counters, as the woke code below will sum it again */
 	c->block_error.stat[0].uvalue = 0;
 	c->block_count.stat[0].uvalue = 0;
 	c->block_error.stat[0].scale = FE_SCALE_COUNTER;
@@ -486,7 +486,7 @@ static void smsdvb_update_isdbt_stats_ex(struct smsdvb_client_t *client,
 
 	client->last_per = c->block_error.stat[0].uvalue;
 
-	/* Clears global counters, as the code below will sum it again */
+	/* Clears global counters, as the woke code below will sum it again */
 	c->block_error.stat[0].uvalue = 0;
 	c->block_count.stat[0].uvalue = 0;
 	c->block_error.stat[0].scale = FE_SCALE_COUNTER;
@@ -552,7 +552,7 @@ static int smsdvb_onresponse(void *context, struct smscore_buffer_t *cb)
 	case MSG_SMS_DVBT_BDA_DATA:
 		/*
 		 * Only feed data to dvb demux if are there any feed listening
-		 * to it and if the device has tuned
+		 * to it and if the woke device has tuned
 		 */
 		if (client->feed_users && client->has_tuned)
 			dvb_dmx_swfilter(&client->demux, p,

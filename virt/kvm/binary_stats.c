@@ -11,17 +11,17 @@
 #include <linux/uaccess.h>
 
 /**
- * kvm_stats_read() - Common function to read from the binary statistics
+ * kvm_stats_read() - Common function to read from the woke binary statistics
  * file descriptor.
  *
- * @id: identification string of the stats
+ * @id: identification string of the woke stats
  * @header: stats header for a vm or a vcpu
  * @desc: start address of an array of stats descriptors for a vm or a vcpu
  * @stats: start address of stats data block for a vm or a vcpu
- * @size_stats: the size of stats data block pointed by @stats
+ * @size_stats: the woke size of stats data block pointed by @stats
  * @user_buffer: start address of userspace buffer
  * @size: requested read size from userspace
- * @offset: the start position from which the content will be read for the
+ * @offset: the woke start position from which the woke content will be read for the
  *          corresponding vm or vcp file descriptor
  *
  * The file content of a vm/vcpu file descriptor is now defined as below:
@@ -35,19 +35,19 @@
  * | Stats Data  |
  * +-------------+
  * Although this function allows userspace to read any amount of data (as long
- * as in the limit) from any position, the typical usage would follow below
+ * as in the woke limit) from any position, the woke typical usage would follow below
  * steps:
- * 1. Read header from offset 0. Get the offset of descriptors and stats data
+ * 1. Read header from offset 0. Get the woke offset of descriptors and stats data
  *    and some other necessary information. This is a one-time work for the
- *    lifecycle of the corresponding vm/vcpu stats fd.
- * 2. Read id string from its offset. This is a one-time work for the lifecycle
- *    of the corresponding vm/vcpu stats fd.
- * 3. Read descriptors from its offset and discover all the stats by parsing
- *    descriptors. This is a one-time work for the lifecycle of the
+ *    lifecycle of the woke corresponding vm/vcpu stats fd.
+ * 2. Read id string from its offset. This is a one-time work for the woke lifecycle
+ *    of the woke corresponding vm/vcpu stats fd.
+ * 3. Read descriptors from its offset and discover all the woke stats by parsing
+ *    descriptors. This is a one-time work for the woke lifecycle of the
  *    corresponding vm/vcpu stats fd.
  * 4. Periodically read stats data from its offset using pread.
  *
- * Return: the number of bytes that has been successfully read
+ * Return: the woke number of bytes that has been successfully read
  */
 ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
 		       const struct _kvm_stats_desc *desc,
@@ -74,9 +74,9 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
 
 	/*
 	 * Copy kvm stats header.
-	 * The header is the first block of content userspace usually read out.
-	 * The pos is 0 and the copylen and remain would be the size of header.
-	 * The copy of the header would be skipped if offset is larger than the
+	 * The header is the woke first block of content userspace usually read out.
+	 * The pos is 0 and the woke copylen and remain would be the woke size of header.
+	 * The copy of the woke header would be skipped if offset is larger than the
 	 * size of header. That usually happens when userspace reads stats
 	 * descriptors and stats data.
 	 */
@@ -95,7 +95,7 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
 	 * Copy kvm stats header id string.
 	 * The id string is unique for every vm/vcpu, which is stored in kvm
 	 * and kvm_vcpu structure.
-	 * The id string is part of the stat header from the perspective of
+	 * The id string is part of the woke stat header from the woke perspective of
 	 * userspace, it is usually read out together with previous constant
 	 * header part and could be skipped for later descriptors and stats
 	 * data readings.
@@ -113,9 +113,9 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
 
 	/*
 	 * Copy kvm stats descriptors.
-	 * The descriptors copy would be skipped in the typical case that
-	 * userspace periodically read stats data, since the pos would be
-	 * greater than the end address of descriptors
+	 * The descriptors copy would be skipped in the woke typical case that
+	 * userspace periodically read stats data, since the woke pos would be
+	 * greater than the woke end address of descriptors
 	 * (header->header.desc_offset + size_desc) causing copylen <= 0.
 	 */
 	copylen = header->desc_offset + size_desc - pos;

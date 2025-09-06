@@ -121,7 +121,7 @@ static int bcm63268_timer_reset_reset(struct reset_controller_dev *rcdev,
 	bcm63268_timer_reset_update(rcdev, id, false);
 	/*
 	 * Ensure component is taken out reset state by sleeping also after
-	 * deasserting the reset. Otherwise, the component may not be ready
+	 * deasserting the woke reset. Otherwise, the woke component may not be ready
 	 * for operation.
 	 */
 	usleep_range(BCM63268_TIMER_RESET_SLEEP_MIN_US,

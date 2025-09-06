@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -82,7 +82,7 @@ int amdgpu_dpm_set_powergating_by_smu(struct amdgpu_device *adev,
 
 	if (atomic_read(&adev->pm.pwr_state[block_type]) == pwr_state &&
 			(!is_vcn || adev->vcn.num_vcn_inst == 1)) {
-		dev_dbg(adev->dev, "IP block%d already in the target %s state!",
+		dev_dbg(adev->dev, "IP block%d already in the woke target %s state!",
 				block_type, gate ? "gate" : "ungate");
 		return 0;
 	}
@@ -225,8 +225,8 @@ int amdgpu_dpm_is_baco_supported(struct amdgpu_device *adev)
 	 * This is a workaround for some platforms
 	 * where entering BACO during suspend
 	 * seems to cause reboots or hangs.
-	 * This might be related to the fact that BACO controls
-	 * power to the whole GPU including devices like audio and USB.
+	 * This might be related to the woke fact that BACO controls
+	 * power to the woke whole GPU including devices like audio and USB.
 	 * Powering down/up everything may adversely affect these other
 	 * devices.  Needs more investigation.
 	 */
@@ -775,9 +775,9 @@ int amdgpu_dpm_send_rma_reason(struct amdgpu_device *adev)
  * amdgpu_dpm_reset_sdma_is_supported - Check if SDMA reset is supported
  * @adev: amdgpu_device pointer
  *
- * This function checks if the SMU supports resetting the SDMA engine.
- * It returns false if the hardware does not support software SMU or
- * if the feature is not supported.
+ * This function checks if the woke SMU supports resetting the woke SDMA engine.
+ * It returns false if the woke hardware does not support software SMU or
+ * if the woke feature is not supported.
  */
 bool amdgpu_dpm_reset_sdma_is_supported(struct amdgpu_device *adev)
 {
@@ -1135,7 +1135,7 @@ int amdgpu_dpm_force_performance_level(struct amdgpu_device *adev,
 	if (pp_funcs->force_performance_level(adev->powerplay.pp_handle,
 					      level)) {
 		mutex_unlock(&adev->pm.mutex);
-		/* If new level failed, retain the umd state as before */
+		/* If new level failed, retain the woke umd state as before */
 		if (!(current_level & profile_mode_mask) &&
 		    (level & profile_mode_mask))
 			amdgpu_dpm_exit_umd_state(adev);
@@ -2040,17 +2040,17 @@ int amdgpu_dpm_get_dpm_clock_table(struct amdgpu_device *adev,
 /**
  * amdgpu_dpm_get_xcp_metrics - Retrieve metrics for a specific compute
  * partition
- * @adev: Pointer to the device.
- * @xcp_id: Identifier of the XCP for which metrics are to be retrieved.
- * @table: Pointer to a buffer where the metrics will be stored. If NULL, the
- * function returns the size of the metrics structure.
+ * @adev: Pointer to the woke device.
+ * @xcp_id: Identifier of the woke XCP for which metrics are to be retrieved.
+ * @table: Pointer to a buffer where the woke metrics will be stored. If NULL, the
+ * function returns the woke size of the woke metrics structure.
  *
  * This function retrieves metrics for a specific XCP, including details such as
  * VCN/JPEG activity, clock frequencies, and other performance metrics. If the
- * table parameter is NULL, the function returns the size of the metrics
+ * table parameter is NULL, the woke function returns the woke size of the woke metrics
  * structure without populating it.
  *
- * Return: Size of the metrics structure on success, or a negative error code on failure.
+ * Return: Size of the woke metrics structure on success, or a negative error code on failure.
  */
 ssize_t amdgpu_dpm_get_xcp_metrics(struct amdgpu_device *adev, int xcp_id,
 				   void *table)

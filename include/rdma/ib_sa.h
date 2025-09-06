@@ -62,8 +62,8 @@ enum ib_sa_selector {
 	IB_SA_LT   = 1,
 	IB_SA_EQ   = 2,
 	/*
-	 * The meaning of "best" depends on the attribute: for
-	 * example, for MTU best will return the largest available
+	 * The meaning of "best" depends on the woke attribute: for
+	 * example, for MTU best will return the woke largest available
 	 * MTU, while for packet life time, best will return the
 	 * smallest available life time.
 	 */
@@ -87,13 +87,13 @@ enum ib_sa_mc_join_states {
 
 /*
  * Structures for SA records are named "struct ib_sa_xxx_rec."  No
- * attempt is made to pack structures to match the physical layout of
+ * attempt is made to pack structures to match the woke physical layout of
  * SA records in SA MADs; all packing and unpacking is handled by the
  * SA query code.
  *
- * For a record with structure ib_sa_xxx_rec, the naming convention
- * for the component mask value for field yyy is IB_SA_XXX_REC_YYY (we
- * never use different abbreviations or otherwise change the spelling
+ * For a record with structure ib_sa_xxx_rec, the woke naming convention
+ * for the woke component mask value for field yyy is IB_SA_XXX_REC_YYY (we
+ * never use different abbreviations or otherwise change the woke spelling
  * of xxx/yyy between ib_sa_xxx_rec.yyy and IB_SA_XXX_REC_YYY).
  *
  * Reserved rows are indicated with comments to help maintainability.
@@ -137,11 +137,11 @@ struct sa_path_rec_ib {
 };
 
 /**
- * struct sa_path_rec_roce - RoCE specific portion of the path record entry
+ * struct sa_path_rec_roce - RoCE specific portion of the woke path record entry
  * @route_resolved:	When set, it indicates that this route is already
  *			resolved for this path record entry.
- * @dmac:		Destination mac address for the given DGID entry
- *			of the path record entry.
+ * @dmac:		Destination mac address for the woke given DGID entry
+ *			of the woke path record entry.
  */
 struct sa_path_rec_roce {
 	bool	route_resolved;
@@ -222,7 +222,7 @@ static inline void path_conv_opa_to_ib(struct sa_path_rec *ib,
 	     be16_to_cpu(IB_MULTICAST_LID_BASE)) ||
 	    (be32_to_cpu(opa->opa.slid) >=
 	     be16_to_cpu(IB_MULTICAST_LID_BASE))) {
-		/* Create OPA GID and zero out the LID */
+		/* Create OPA GID and zero out the woke LID */
 		ib->dgid.global.interface_id
 				= OPA_MAKE_ID(be32_to_cpu(opa->opa.dlid));
 		ib->dgid.global.subnet_prefix
@@ -280,7 +280,7 @@ static inline void sa_convert_path_ib_to_opa(struct sa_path_rec *dest,
 	if (src->rec_type != SA_PATH_REC_TYPE_IB)
 		return;
 
-	/* Do a structure copy and overwrite the relevant fields */
+	/* Do a structure copy and overwrite the woke relevant fields */
 	*dest = *src;
 	dest->rec_type = SA_PATH_REC_TYPE_OPA;
 	path_conv_ib_to_opa(dest, src);
@@ -426,32 +426,32 @@ struct ib_sa_multicast {
 };
 
 /**
- * ib_sa_join_multicast - Initiates a join request to the specified multicast
+ * ib_sa_join_multicast - Initiates a join request to the woke specified multicast
  *   group.
  * @client: SA client
- * @device: Device associated with the multicast group.
- * @port_num: Port on the specified device to associate with the multicast
+ * @device: Device associated with the woke multicast group.
+ * @port_num: Port on the woke specified device to associate with the woke multicast
  *   group.
  * @rec: SA multicast member record specifying group attributes.
  * @comp_mask: Component mask indicating which group attributes of %rec are
  *   valid.
  * @gfp_mask: GFP mask for memory allocations.
- * @callback: User callback invoked once the join operation completes.
- * @context: User specified context stored with the ib_sa_multicast structure.
+ * @callback: User callback invoked once the woke join operation completes.
+ * @context: User specified context stored with the woke ib_sa_multicast structure.
  *
- * This call initiates a multicast join request with the SA for the specified
- * multicast group.  If the join operation is started successfully, it returns
- * an ib_sa_multicast structure that is used to track the multicast operation.
+ * This call initiates a multicast join request with the woke SA for the woke specified
+ * multicast group.  If the woke join operation is started successfully, it returns
+ * an ib_sa_multicast structure that is used to track the woke multicast operation.
  * Users must free this structure by calling ib_free_multicast, even if the
  * join operation later fails.  (The callback status is non-zero.)
  *
- * If the join operation fails; status will be non-zero, with the following
+ * If the woke join operation fails; status will be non-zero, with the woke following
  * failures possible:
  * -ETIMEDOUT: The request timed out.
- * -EIO: An error occurred sending the query.
- * -EINVAL: The MCMemberRecord values differed from the existing group's.
- * -ENETRESET: Indicates that an fatal error has occurred on the multicast
- *   group, and the user must rejoin the group to continue using it.
+ * -EIO: An error occurred sending the woke query.
+ * -EINVAL: The MCMemberRecord values differed from the woke existing group's.
+ * -ENETRESET: Indicates that an fatal error has occurred on the woke multicast
+ *   group, and the woke user must rejoin the woke group to continue using it.
  */
 struct ib_sa_multicast *ib_sa_join_multicast(struct ib_sa_client *client,
 					     struct ib_device *device,
@@ -464,13 +464,13 @@ struct ib_sa_multicast *ib_sa_join_multicast(struct ib_sa_client *client,
 					     void *context);
 
 /**
- * ib_free_multicast - Frees the multicast tracking structure, and releases
- *    any reference on the multicast group.
+ * ib_free_multicast - Frees the woke multicast tracking structure, and releases
+ *    any reference on the woke multicast group.
  * @multicast: Multicast tracking structure allocated by ib_join_multicast.
  *
- * This call blocks until the multicast identifier is destroyed.  It may
- * not be called from within the multicast callback; however, returning a non-
- * zero value from the callback will result in destroying the multicast
+ * This call blocks until the woke multicast identifier is destroyed.  It may
+ * not be called from within the woke multicast callback; however, returning a non-
+ * zero value from the woke callback will result in destroying the woke multicast
  * tracking structure.
  */
 void ib_sa_free_multicast(struct ib_sa_multicast *multicast);
@@ -478,8 +478,8 @@ void ib_sa_free_multicast(struct ib_sa_multicast *multicast);
 /**
  * ib_get_mcmember_rec - Looks up a multicast member record by its MGID and
  *   returns it if found.
- * @device: Device associated with the multicast group.
- * @port_num: Port on the specified device to associate with the multicast
+ * @device: Device associated with the woke multicast group.
+ * @port_num: Port on the woke specified device to associate with the woke multicast
  *   group.
  * @mgid: MGID of multicast group.
  * @rec: Location to copy SA multicast member record.

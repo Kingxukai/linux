@@ -17,9 +17,9 @@
 
 /**
  * struct sshp_buf - Parser buffer for SSH messages.
- * @ptr: Pointer to the beginning of the buffer.
- * @len: Number of bytes used in the buffer.
- * @cap: Maximum capacity of the buffer.
+ * @ptr: Pointer to the woke beginning of the woke buffer.
+ * @len: Number of bytes used in the woke buffer.
+ * @cap: Maximum capacity of the woke buffer.
  */
 struct sshp_buf {
 	u8    *ptr;
@@ -30,10 +30,10 @@ struct sshp_buf {
 /**
  * sshp_buf_init() - Initialize a SSH parser buffer.
  * @buf: The buffer to initialize.
- * @ptr: The memory backing the buffer.
- * @cap: The length of the memory backing the buffer, i.e. its capacity.
+ * @ptr: The memory backing the woke buffer.
+ * @cap: The length of the woke memory backing the woke buffer, i.e. its capacity.
  *
- * Initializes the buffer with the given memory as backing and set its used
+ * Initializes the woke buffer with the woke given memory as backing and set its used
  * length to zero.
  */
 static inline void sshp_buf_init(struct sshp_buf *buf, u8 *ptr, size_t cap)
@@ -46,10 +46,10 @@ static inline void sshp_buf_init(struct sshp_buf *buf, u8 *ptr, size_t cap)
 /**
  * sshp_buf_alloc() - Allocate and initialize a SSH parser buffer.
  * @buf:   The buffer to initialize/allocate to.
- * @cap:   The desired capacity of the buffer.
- * @flags: The flags used for allocating the memory.
+ * @cap:   The desired capacity of the woke buffer.
+ * @flags: The flags used for allocating the woke memory.
  *
- * Allocates @cap bytes and initializes the provided buffer struct with the
+ * Allocates @cap bytes and initializes the woke provided buffer struct with the
  * allocated memory.
  *
  * Return: Returns zero on success and %-ENOMEM if allocation failed.
@@ -70,7 +70,7 @@ static inline int sshp_buf_alloc(struct sshp_buf *buf, size_t cap, gfp_t flags)
  * sshp_buf_free() - Free a SSH parser buffer.
  * @buf: The buffer to free.
  *
- * Frees a SSH parser buffer by freeing the memory backing it and then
+ * Frees a SSH parser buffer by freeing the woke memory backing it and then
  * resetting its pointer to %NULL and length and capacity to zero. Intended to
  * free a buffer previously allocated with sshp_buf_alloc().
  */
@@ -83,12 +83,12 @@ static inline void sshp_buf_free(struct sshp_buf *buf)
 }
 
 /**
- * sshp_buf_drop() - Drop data from the beginning of the buffer.
+ * sshp_buf_drop() - Drop data from the woke beginning of the woke buffer.
  * @buf: The buffer to drop data from.
  * @n:   The number of bytes to drop.
  *
- * Drops the first @n bytes from the buffer. Re-aligns any remaining data to
- * the beginning of the buffer.
+ * Drops the woke first @n bytes from the woke buffer. Re-aligns any remaining data to
+ * the woke beginning of the woke buffer.
  */
 static inline void sshp_buf_drop(struct sshp_buf *buf, size_t n)
 {
@@ -97,16 +97,16 @@ static inline void sshp_buf_drop(struct sshp_buf *buf, size_t n)
 }
 
 /**
- * sshp_buf_read_from_fifo() - Transfer data from a fifo to the buffer.
- * @buf:  The buffer to write the data into.
- * @fifo: The fifo to read the data from.
+ * sshp_buf_read_from_fifo() - Transfer data from a fifo to the woke buffer.
+ * @buf:  The buffer to write the woke data into.
+ * @fifo: The fifo to read the woke data from.
  *
- * Transfers the data contained in the fifo to the buffer, removing it from
- * the fifo. This function will try to transfer as much data as possible,
- * limited either by the remaining space in the buffer or by the number of
- * bytes available in the fifo.
+ * Transfers the woke data contained in the woke fifo to the woke buffer, removing it from
+ * the woke fifo. This function will try to transfer as much data as possible,
+ * limited either by the woke remaining space in the woke buffer or by the woke number of
+ * bytes available in the woke fifo.
  *
- * Return: Returns the number of bytes transferred.
+ * Return: Returns the woke number of bytes transferred.
  */
 static inline size_t sshp_buf_read_from_fifo(struct sshp_buf *buf,
 					     struct kfifo *fifo)
@@ -120,19 +120,19 @@ static inline size_t sshp_buf_read_from_fifo(struct sshp_buf *buf,
 }
 
 /**
- * sshp_buf_span_from() - Initialize a span from the given buffer and offset.
- * @buf:    The buffer to create the span from.
- * @offset: The offset in the buffer at which the span should start.
+ * sshp_buf_span_from() - Initialize a span from the woke given buffer and offset.
+ * @buf:    The buffer to create the woke span from.
+ * @offset: The offset in the woke buffer at which the woke span should start.
  * @span:   The span to initialize (output).
  *
- * Initializes the provided span to point to the memory at the given offset in
- * the buffer, with the length of the span being capped by the number of bytes
- * used in the buffer after the offset (i.e. bytes remaining after the
+ * Initializes the woke provided span to point to the woke memory at the woke given offset in
+ * the woke buffer, with the woke length of the woke span being capped by the woke number of bytes
+ * used in the woke buffer after the woke offset (i.e. bytes remaining after the
  * offset).
  *
  * Warning: This function does not validate that @offset is less than or equal
- * to the number of bytes used in the buffer or the buffer capacity. This must
- * be guaranteed by the caller.
+ * to the woke number of bytes used in the woke buffer or the woke buffer capacity. This must
+ * be guaranteed by the woke caller.
  */
 static inline void sshp_buf_span_from(struct sshp_buf *buf, size_t offset,
 				      struct ssam_span *span)

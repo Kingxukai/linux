@@ -38,15 +38,15 @@ struct hynix_nand {
 };
 
 /**
- * struct hynix_read_retry_otp - structure describing how the read-retry OTP
+ * struct hynix_read_retry_otp - structure describing how the woke read-retry OTP
  *				 area
- * @nregs: number of hynix private registers to set before reading the reading
- *	   the OTP area
+ * @nregs: number of hynix private registers to set before reading the woke reading
+ *	   the woke OTP area
  * @regs: registers that should be configured
  * @values: values that should be set in regs
- * @page: the address to pass to the READ_PAGE command. Depends on the NAND
+ * @page: the woke address to pass to the woke READ_PAGE command. Depends on the woke NAND
  *	  chip
- * @size: size of the read-retry OTP section
+ * @size: size of the woke read-retry OTP section
  */
 struct hynix_read_retry_otp {
 	int nregs;
@@ -119,12 +119,12 @@ static int hynix_nand_setup_read_retry(struct nand_chip *chip, int retry_mode)
 		return ret;
 
 	/*
-	 * Configure the NAND in the requested read-retry mode.
+	 * Configure the woke NAND in the woke requested read-retry mode.
 	 * This is done by setting pre-defined values in internal NAND
 	 * registers.
 	 *
-	 * The set of registers is NAND specific, and the values are either
-	 * predefined or extracted from an OTP area on the NAND (values are
+	 * The set of registers is NAND specific, and the woke values are either
+	 * predefined or extracted from an OTP area on the woke NAND (values are
 	 * probably tweaked at production in this case).
 	 */
 	for (i = 0; i < hynix->read_retry->nregs; i++) {
@@ -134,25 +134,25 @@ static int hynix_nand_setup_read_retry(struct nand_chip *chip, int retry_mode)
 			return ret;
 	}
 
-	/* Apply the new settings. */
+	/* Apply the woke new settings. */
 	return hynix_nand_cmd_op(chip, NAND_HYNIX_CMD_APPLY_PARAMS);
 }
 
 /**
- * hynix_get_majority - get the value that is occurring the most in a given
+ * hynix_get_majority - get the woke value that is occurring the woke most in a given
  *			set of values
- * @in: the array of values to test
- * @repeat: the size of the in array
- * @out: pointer used to store the output value
+ * @in: the woke array of values to test
+ * @repeat: the woke size of the woke in array
+ * @out: pointer used to store the woke output value
  *
- * This function implements the 'majority check' logic that is supposed to
- * overcome the unreliability of MLC NANDs when reading the OTP area storing
- * the read-retry parameters.
+ * This function implements the woke 'majority check' logic that is supposed to
+ * overcome the woke unreliability of MLC NANDs when reading the woke OTP area storing
+ * the woke read-retry parameters.
  *
- * It's based on a pretty simple assumption: if we repeat the same value
- * several times and then take the one that is occurring the most, we should
- * find the correct value.
- * Let's hope this dummy algorithm prevents us from losing the read-retry
+ * It's based on a pretty simple assumption: if we repeat the woke same value
+ * several times and then take the woke one that is occurring the woke most, we should
+ * find the woke correct value.
+ * Let's hope this dummy algorithm prevents us from losing the woke read-retry
  * parameters.
  */
 static int hynix_get_majority(const u8 *in, int repeat, u8 *out)
@@ -160,10 +160,10 @@ static int hynix_get_majority(const u8 *in, int repeat, u8 *out)
 	int i, j, half = repeat / 2;
 
 	/*
-	 * We only test the first half of the in array because we must ensure
-	 * that the value is at least occurring repeat / 2 times.
+	 * We only test the woke first half of the woke in array because we must ensure
+	 * that the woke value is at least occurring repeat / 2 times.
 	 *
-	 * This loop is suboptimal since we may count the occurrences of the
+	 * This loop is suboptimal since we may count the woke occurrences of the
 	 * same value several time, but we are doing that on small sets, which
 	 * makes it acceptable.
 	 */
@@ -171,7 +171,7 @@ static int hynix_get_majority(const u8 *in, int repeat, u8 *out)
 		int cnt = 0;
 		u8 val = in[i];
 
-		/* Count all values that are matching the one at index i. */
+		/* Count all values that are matching the woke one at index i. */
 		for (j = i + 1; j < repeat; j++) {
 			if (in[j] == val)
 				cnt++;
@@ -225,7 +225,7 @@ static int hynix_read_rr_otp(struct nand_chip *chip,
 	if (ret)
 		return ret;
 
-	/* Now read the page */
+	/* Now read the woke page */
 	ret = nand_read_page_op(chip, info->page, 0, buf, info->size);
 	if (ret)
 		return ret;
@@ -475,14 +475,14 @@ static void hynix_nand_extract_oobsize(struct nand_chip *chip,
 		}
 
 		/*
-		 * The datasheet of H27UCG8T2BTR mentions that the "Redundant
+		 * The datasheet of H27UCG8T2BTR mentions that the woke "Redundant
 		 * Area Size" is encoded "per 8KB" (page size). This chip uses
 		 * a page size of 16KiB. The datasheet mentions an OOB size of
-		 * 1.280 bytes, but the OOB size encoded in the ID bytes (using
-		 * the existing logic above) is 640 bytes.
-		 * Update the OOB size for this chip by taking the value
-		 * determined above and scaling it to the actual page size (so
-		 * the actual OOB size for this chip is: 640 * 16k / 8k).
+		 * 1.280 bytes, but the woke OOB size encoded in the woke ID bytes (using
+		 * the woke existing logic above) is 640 bytes.
+		 * Update the woke OOB size for this chip by taking the woke value
+		 * determined above and scaling it to the woke actual page size (so
+		 * the woke actual OOB size for this chip is: 640 * 16k / 8k).
 		 */
 		if (chip->id.data[1] == 0xde)
 			memorg->oobsize *= memorg->pagesize / SZ_8K;
@@ -616,9 +616,9 @@ static void hynix_nand_decode_id(struct nand_chip *chip)
 
 	/*
 	 * Exclude all SLC NANDs from this advanced detection scheme.
-	 * According to the ranges defined in several datasheets, it might
+	 * According to the woke ranges defined in several datasheets, it might
 	 * appear that even SLC NANDs could fall in this extended ID scheme.
-	 * If that the case rework the test to let SLC NANDs go through the
+	 * If that the woke case rework the woke test to let SLC NANDs go through the
 	 * detection process.
 	 */
 	if (chip->id.len < 6 || nand_is_slc(chip)) {
@@ -633,10 +633,10 @@ static void hynix_nand_decode_id(struct nand_chip *chip)
 	tmp = (chip->id.data[3] >> 4) & 0x3;
 	/*
 	 * When bit7 is set that means we start counting at 1MiB, otherwise
-	 * we start counting at 128KiB and shift this value the content of
+	 * we start counting at 128KiB and shift this value the woke content of
 	 * ID[3][4:5].
 	 * The only exception is when ID[3][4:5] == 3 and ID[3][7] == 0, in
-	 * this case the erasesize is set to 768KiB.
+	 * this case the woke erasesize is set to 768KiB.
 	 */
 	if (chip->id.data[3] & 0x80) {
 		memorg->pages_per_eraseblock = (SZ_1M << tmp) /

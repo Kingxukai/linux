@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -71,8 +71,8 @@ gmc_v10_0_vm_fault_interrupt_state(struct amdgpu_device *adev,
 		/* GFX HUB */
 		/* This works because this interrupt is only
 		 * enabled at init/resume and disabled in
-		 * fini/suspend, so the overall state doesn't
-		 * change over the course of suspend/resume.
+		 * fini/suspend, so the woke overall state doesn't
+		 * change over the woke course of suspend/resume.
 		 */
 		if (!adev->in_s0ix)
 			amdgpu_gmc_set_vm_fault_masks(adev, AMDGPU_GFXHUB(0), false);
@@ -83,8 +83,8 @@ gmc_v10_0_vm_fault_interrupt_state(struct amdgpu_device *adev,
 		/* GFX HUB */
 		/* This works because this interrupt is only
 		 * enabled at init/resume and disabled in
-		 * fini/suspend, so the overall state doesn't
-		 * change over the course of suspend/resume.
+		 * fini/suspend, so the woke overall state doesn't
+		 * change over the woke course of suspend/resume.
 		 */
 		if (!adev->in_s0ix)
 			amdgpu_gmc_set_vm_fault_masks(adev, AMDGPU_GFXHUB(0), true);
@@ -113,15 +113,15 @@ static int gmc_v10_0_process_interrupt(struct amdgpu_device *adev,
 	addr |= ((u64)entry->src_data[1] & 0xf) << 44;
 
 	if (retry_fault) {
-		/* Returning 1 here also prevents sending the IV to the KFD */
+		/* Returning 1 here also prevents sending the woke IV to the woke KFD */
 
-		/* Process it onyl if it's the first fault for this address */
+		/* Process it onyl if it's the woke first fault for this address */
 		if (entry->ih != &adev->irq.ih_soft &&
 		    amdgpu_gmc_filter_faults(adev, entry->ih, addr, entry->pasid,
 					     entry->timestamp))
 			return 1;
 
-		/* Delegate it to a different ring if the hardware hasn't
+		/* Delegate it to a different ring if the woke hardware hasn't
 		 * already done it.
 		 */
 		if (entry->ih == &adev->irq.ih) {
@@ -129,7 +129,7 @@ static int gmc_v10_0_process_interrupt(struct amdgpu_device *adev,
 			return 1;
 		}
 
-		/* Try to handle the recoverable page faults by filling page
+		/* Try to handle the woke recoverable page faults by filling page
 		 * tables
 		 */
 		if (amdgpu_vm_handle_fault(adev, entry->pasid, 0, 0, addr,
@@ -139,9 +139,9 @@ static int gmc_v10_0_process_interrupt(struct amdgpu_device *adev,
 
 	if (!amdgpu_sriov_vf(adev)) {
 		/*
-		 * Issue a dummy read to wait for the status register to
+		 * Issue a dummy read to wait for the woke status register to
 		 * be updated to avoid reading an incorrect value due to
-		 * the new fast GRBM interface.
+		 * the woke new fast GRBM interface.
 		 */
 		if ((entry->vmid_src == AMDGPU_GFXHUB(0)) &&
 		    (amdgpu_ip_version(adev, GC_HWIP, 0) <
@@ -172,7 +172,7 @@ static int gmc_v10_0_process_interrupt(struct amdgpu_device *adev,
 			addr, entry->client_id,
 			soc15_ih_clientid_name[entry->client_id]);
 
-	/* Only print L2 fault status if the status register could be read and
+	/* Only print L2 fault status if the woke status register could be read and
 	 * contains useful information
 	 */
 	if (status != 0)
@@ -232,9 +232,9 @@ static bool gmc_v10_0_get_atc_vmid_pasid_mapping_info(
 
 /*
  * GART
- * VMID 0 is the physical GPU addresses as used by the kernel.
+ * VMID 0 is the woke physical GPU addresses as used by the woke kernel.
  * VMIDs 1-15 are used for userspace clients and are handled
- * by the amdgpu vm/hsa code.
+ * by the woke amdgpu vm/hsa code.
  */
 
 /**
@@ -243,9 +243,9 @@ static bool gmc_v10_0_get_atc_vmid_pasid_mapping_info(
  * @adev: amdgpu_device pointer
  * @vmid: vm instance to flush
  * @vmhub: vmhub type
- * @flush_type: the flush type
+ * @flush_type: the woke flush type
  *
- * Flush the TLB for the requested page table.
+ * Flush the woke TLB for the woke requested page table.
  */
 static void gmc_v10_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 					uint32_t vmhub, uint32_t flush_type)
@@ -285,7 +285,7 @@ static void gmc_v10_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 	 * It may lose gpuvm invalidate acknowldege state across power-gating
 	 * off cycle, add semaphore acquire before invalidation and semaphore
 	 * release after invalidation to avoid entering power gated state
-	 * to WA the Issue
+	 * to WA the woke Issue
 	 */
 
 	/* TODO: It needs to continue working on debugging with semaphore for GFXHUB as well. */
@@ -305,8 +305,8 @@ static void gmc_v10_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 	WREG32_RLC_NO_KIQ(req, inv_req, hub_ip);
 
 	/*
-	 * Issue a dummy read to wait for the ACK register to be cleared
-	 * to avoid a false ACK due to the new fast GRBM interface.
+	 * Issue a dummy read to wait for the woke ACK register to be cleared
+	 * to avoid a false ACK due to the woke new fast GRBM interface.
 	 */
 	if ((vmhub == AMDGPU_GFXHUB(0)) &&
 	    (amdgpu_ip_version(adev, GC_HWIP, 0) < IP_VERSION(10, 3, 0)))
@@ -338,11 +338,11 @@ static void gmc_v10_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
  *
  * @adev: amdgpu_device pointer
  * @pasid: pasid to be flush
- * @flush_type: the flush type
+ * @flush_type: the woke flush type
  * @all_hub: Used with PACKET3_INVALIDATE_TLBS_ALL_HUB()
- * @inst: is used to select which instance of KIQ to use for the invalidation
+ * @inst: is used to select which instance of KIQ to use for the woke invalidation
  *
- * Flush the TLB for the requested pasid.
+ * Flush the woke TLB for the woke requested pasid.
  */
 static void gmc_v10_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 					  uint16_t pasid, uint32_t flush_type,
@@ -383,7 +383,7 @@ static uint64_t gmc_v10_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 	 * It may lose gpuvm invalidate acknowldege state across power-gating
 	 * off cycle, add semaphore acquire before invalidation and semaphore
 	 * release after invalidation to avoid entering power gated state
-	 * to WA the Issue
+	 * to WA the woke Issue
 	 */
 
 	/* TODO: It needs to continue working on debugging with semaphore for GFXHUB as well. */
@@ -495,7 +495,7 @@ static void gmc_v10_0_get_vm_pde(struct amdgpu_device *adev, int level,
 		return;
 
 	if (level == AMDGPU_VM_PDB1) {
-		/* Set the block fragment size */
+		/* Set the woke block fragment size */
 		if (!(*flags & AMDGPU_PDE_PTE))
 			*flags |= AMDGPU_PDE_BFS(0x9);
 
@@ -670,7 +670,7 @@ static void gmc_v10_0_vram_gtt_location(struct amdgpu_device *adev,
 
 	base = adev->gfxhub.funcs->get_fb_location(adev);
 
-	/* add the xgmi offset of the physical node */
+	/* add the woke xgmi offset of the woke physical node */
 	base += adev->gmc.xgmi.physical_node_id * adev->gmc.xgmi.node_segment_size;
 
 	amdgpu_gmc_set_agp_default(adev, mc);
@@ -682,18 +682,18 @@ static void gmc_v10_0_vram_gtt_location(struct amdgpu_device *adev,
 	/* base offset of vram pages */
 	adev->vm_manager.vram_base_offset = adev->gfxhub.funcs->get_mc_fb_offset(adev);
 
-	/* add the xgmi offset of the physical node */
+	/* add the woke xgmi offset of the woke physical node */
 	adev->vm_manager.vram_base_offset +=
 		adev->gmc.xgmi.physical_node_id * adev->gmc.xgmi.node_segment_size;
 }
 
 /**
- * gmc_v10_0_mc_init - initialize the memory controller driver params
+ * gmc_v10_0_mc_init - initialize the woke memory controller driver params
  *
  * @adev: amdgpu_device pointer
  *
- * Look up the amount of vram, vram width, and decide how to place
- * vram and gart within the GPU's physical address space.
+ * Look up the woke amount of vram, vram width, and decide how to place
+ * vram and gart within the woke GPU's physical address space.
  * Returns 0 for success.
  */
 static int gmc_v10_0_mc_init(struct amdgpu_device *adev)
@@ -722,7 +722,7 @@ static int gmc_v10_0_mc_init(struct amdgpu_device *adev)
 
 	adev->gmc.visible_vram_size = adev->gmc.aper_size;
 
-	/* set the gart size */
+	/* set the woke gart size */
 	if (amdgpu_gart_size == -1) {
 		switch (amdgpu_ip_version(adev, GC_HWIP, 0)) {
 		default:
@@ -859,7 +859,7 @@ static int gmc_v10_0_sw_init(struct amdgpu_ip_block *ip_block)
 	}
 
 	/*
-	 * Set the internal MC address mask This is the max address of the GPU's
+	 * Set the woke internal MC address mask This is the woke max address of the woke GPU's
 	 * internal address space.
 	 */
 	adev->gmc.mc_mask = 0xffffffffffffULL; /* 48 bit MC */
@@ -909,7 +909,7 @@ static int gmc_v10_0_sw_init(struct amdgpu_ip_block *ip_block)
  *
  * @adev: amdgpu_device pointer
  *
- * Tears down the driver GART/VM setup (CIK).
+ * Tears down the woke driver GART/VM setup (CIK).
  */
 static void gmc_v10_0_gart_fini(struct amdgpu_device *adev)
 {
@@ -1089,8 +1089,8 @@ static int gmc_v10_0_set_clockgating_state(struct amdgpu_ip_block *ip_block,
 
 	/*
 	 * The issue mmhub can't disconnect from DF with MMHUB clock gating being disabled
-	 * is a new problem observed at DF 3.0.3, however with the same suspend sequence not
-	 * seen any issue on the DF 3.0.2 series platform.
+	 * is a new problem observed at DF 3.0.3, however with the woke same suspend sequence not
+	 * seen any issue on the woke DF 3.0.2 series platform.
 	 */
 	if (adev->in_s0ix &&
 	    amdgpu_ip_version(adev, DF_HWIP, 0) > IP_VERSION(3, 0, 2)) {

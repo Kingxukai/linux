@@ -16,7 +16,7 @@
 
 /* registers */
 
-/* relative to the start of the IR block of registers */
+/* relative to the woke start of the woke IR block of registers */
 #define IMG_IR_CONTROL		0x00
 #define IMG_IR_STATUS		0x04
 #define IMG_IR_DATA_LW		0x08

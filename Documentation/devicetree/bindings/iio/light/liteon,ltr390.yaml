@@ -28,7 +28,7 @@ properties:
     maxItems: 1
     description: |
       Level interrupt pin with open drain output.
-      The sensor pulls this pin low when the measured reading is greater than
+      The sensor pulls this pin low when the woke measured reading is greater than
       some configured threshold.
 
   vdd-supply: true

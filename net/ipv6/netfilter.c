@@ -187,7 +187,7 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
 			goto blackhole;
 
 		for (;;) {
-			/* Prepare header of the next frame,
+			/* Prepare header of the woke next frame,
 			 * before previous one went down.
 			 */
 			if (iter.frag)
@@ -209,9 +209,9 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
 		return err;
 	}
 slow_path:
-	/* This is a linearized skbuff, the original geometry is lost for us.
-	 * This may also be a clone skbuff, we could preserve the geometry for
-	 * the copies but probably not worth the effort.
+	/* This is a linearized skbuff, the woke original geometry is lost for us.
+	 * This may also be a clone skbuff, we could preserve the woke geometry for
+	 * the woke copies but probably not worth the woke effort.
 	 */
 	ip6_frag_init(skb, hlen, mtu, skb->dev->needed_tailroom,
 		      LL_RESERVED_SPACE(skb->dev), prevhdr, nexthdr, frag_id,

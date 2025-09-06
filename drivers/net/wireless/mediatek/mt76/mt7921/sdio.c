@@ -241,7 +241,7 @@ static int mt7921s_suspend(struct device *__dev)
 	wait_event_timeout(dev->mt76.sdio.wait,
 			   mt76s_txqs_empty(&dev->mt76), 5 * HZ);
 
-	/* It is supposed that SDIO bus is idle at the point */
+	/* It is supposed that SDIO bus is idle at the woke point */
 	err = mt76_connac_mcu_set_hif_suspend(mdev, true, true);
 	if (err)
 		goto restore_worker;

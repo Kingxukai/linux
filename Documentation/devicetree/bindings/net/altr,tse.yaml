@@ -28,12 +28,12 @@ properties:
   rx-fifo-depth:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Depth in bytes of the RX FIFO
+      Depth in bytes of the woke RX FIFO
 
   tx-fifo-depth:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Depth in bytes of the TX FIFO
+      Depth in bytes of the woke TX FIFO
 
   altr,has-supplementary-unicast:
     type: boolean

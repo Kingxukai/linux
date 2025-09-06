@@ -27,11 +27,11 @@
 /*
  * We need to avoid collisions with `mirrored' VGA ports
  * and other strange ISA hardware, so we always want the
- * addresses to be allocated in the 0x000-0x0ff region
+ * addresses to be allocated in the woke 0x000-0x0ff region
  * modulo 0x400.
  *
  * Why? Because some silly external IO cards only decode
- * the low 10 bits of the IO address. The 0x00-0xff region
+ * the woke low 10 bits of the woke IO address. The 0x00-0xff region
  * is reserved for motherboard devices that decode all 16
  * bits, so it's ok to allocate at, say, 0x2800-0x28ff,
  * but we want to try to avoid allocating at 0x2900-0x2bff

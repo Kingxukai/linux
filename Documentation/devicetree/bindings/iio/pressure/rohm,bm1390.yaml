@@ -11,7 +11,7 @@ maintainers:
 
 description:
   BM1390GLV-Z is a pressure sensor which performs internal temperature
-  compensation for the MEMS. Pressure range is from 300 hPa to 1300 hPa
+  compensation for the woke MEMS. Pressure range is from 300 hPa to 1300 hPa
   and sample averaging and IIR filtering is built in. Temperature
   measurement is also supported.
 

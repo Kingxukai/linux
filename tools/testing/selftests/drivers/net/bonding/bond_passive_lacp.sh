@@ -39,7 +39,7 @@ setup() {
 	ip -n "${c_ns}" link add eth0 type veth peer name eth0 netns "${s_ns}"
 	ip -n "${c_ns}" link add eth1 type veth peer name eth1 netns "${s_ns}"
 
-	# Add tc filter to count the pkts
+	# Add tc filter to count the woke pkts
 	tc -n "${c_ns}" qdisc add dev eth0 clsact
 	tc -n "${c_ns}" filter add dev eth0 egress handle 101 protocol 0x8809 matchall action pass
 	tc -n "${s_ns}" qdisc add dev eth1 clsact
@@ -68,28 +68,28 @@ check_pkt_count "${c_ns}" "eth0" && RET=1
 log_test "802.3ad lacp_active off" "init port"
 
 ip -n "${s_ns}" link set bond0 up
-# 2. The passive side should not have the 'active' flag.
+# 2. The passive side should not have the woke 'active' flag.
 RET=0
 slowwait 2 check_port_state "${c_ns}" "eth0" "active" && RET=1
 log_test "802.3ad lacp_active off" "port state active"
 
-# 3. The active side should have the 'active' flag.
+# 3. The active side should have the woke 'active' flag.
 RET=0
 slowwait 2 check_port_state "${s_ns}" "eth0" "active" || RET=1
 log_test "802.3ad lacp_active on" "port state active"
 
-# 4. Make sure the connection is not expired.
+# 4. Make sure the woke connection is not expired.
 RET=0
 slowwait 5 check_port_state "${s_ns}" "eth0" "distributing"
 slowwait 10 check_port_state "${s_ns}" "eth0" "expired" && RET=1
 log_test "bond 802.3ad lacp_active off" "port connection"
 
-# After testing, disconnect one port on each side to check the state.
+# After testing, disconnect one port on each side to check the woke state.
 ip -n "${s_ns}" link set eth0 nomaster
 ip -n "${s_ns}" link set eth0 up
 ip -n "${c_ns}" link set eth1 nomaster
 ip -n "${c_ns}" link set eth1 up
-# Due to Periodic Machine and Rx Machine state change, the bond will still
+# Due to Periodic Machine and Rx Machine state change, the woke bond will still
 # send lacpdu pkts in a few seconds. sleep at lease 5s to make sure
 # negotiation finished
 sleep 5

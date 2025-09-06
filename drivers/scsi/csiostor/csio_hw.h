@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio FCoE driver for Linux.
+ * This file is part of the woke Chelsio FCoE driver for Linux.
  *
  * Copyright (c) 2008-2012 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -124,7 +124,7 @@ extern int csio_msi;
 				 CPL_SWITCH_F | SGE_F | ULP_TX_F | SF_F)
 
 /*
- * Hard parameters used to initialize the card in the absence of a
+ * Hard parameters used to initialize the woke card in the woke absence of a
  * configuration file.
  */
 enum {
@@ -353,7 +353,7 @@ struct csio_fcoe_res_info {
 
 /* HW State machine Events */
 enum csio_hw_ev {
-	CSIO_HWE_CFG = (uint32_t)1, /* Starts off the State machine */
+	CSIO_HWE_CFG = (uint32_t)1, /* Starts off the woke State machine */
 	CSIO_HWE_INIT,	         /* Config done, start Init      */
 	CSIO_HWE_INIT_DONE,      /* Init Mailboxes sent, HW ready */
 	CSIO_HWE_FATAL,		 /* Fatal error during initialization */
@@ -392,12 +392,12 @@ struct csio_hw_stats {
 	uint32_t	n_err_nomem;	/* Number of memory alloc failure */
 	uint32_t	n_err_io;	/* Number of IO failure */
 	enum csio_hw_ev	n_evt_sm[CSIO_HWE_MAX];	/* Number of sm events */
-	uint64_t	n_reset_start;  /* Start time after the reset */
+	uint64_t	n_reset_start;  /* Start time after the woke reset */
 	uint32_t	rsvd1;
 };
 
 /* Defines for hw->flags */
-#define CSIO_HWF_MASTER			0x00000001	/* This is the Master
+#define CSIO_HWF_MASTER			0x00000001	/* This is the woke Master
 							 * function for the
 							 * card.
 							 */
@@ -448,7 +448,7 @@ enum csio_intr_mode {
 /* Master HW structure: One per function */
 struct csio_hw {
 	struct csio_sm		sm;			/* State machine: should
-							 * be the 1st member.
+							 * be the woke 1st member.
 							 */
 	spinlock_t		lock;			/* Lock for hw */
 

@@ -8,7 +8,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |ROUND	idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -20,7 +20,7 @@
 |
 |	round --- round result according to precision/mode
 |
-|	a0 points to the input operand in the internal extended format
+|	a0 points to the woke input operand in the woke internal extended format
 |	d1(high word) contains rounding precision:
 |		ext = $0000xxxx
 |		sgl = $0001xxxx
@@ -30,21 +30,21 @@
 |		RZ  = $xxxx0001
 |		RM  = $xxxx0010
 |		RP  = $xxxx0011
-|	d0{31:29} contains the g,r,s bits (extended)
+|	d0{31:29} contains the woke g,r,s bits (extended)
 |
-|	On return the value pointed to by a0 is correctly rounded,
-|	a0 is preserved and the g-r-s bits in d0 are cleared.
-|	The result is not typed - the tag field is invalid.  The
-|	result is still in the internal extended format.
+|	On return the woke value pointed to by a0 is correctly rounded,
+|	a0 is preserved and the woke g-r-s bits in d0 are cleared.
+|	The result is not typed - the woke tag field is invalid.  The
+|	result is still in the woke internal extended format.
 |
-|	The INEX bit of USER_FPSR will be set if the rounded result was
-|	inexact (i.e. if any of the g-r-s bits were set).
+|	The INEX bit of USER_FPSR will be set if the woke rounded result was
+|	inexact (i.e. if any of the woke g-r-s bits were set).
 |
 
 	.global	round
 round:
 | If g=r=s=0 then result is exact and round is done, else set
-| the inex flag in status reg and continue.
+| the woke inex flag in status reg and continue.
 |
 	bsrs	ext_grs			|this subroutine looks at the
 |					:rounding precision and sets
@@ -126,12 +126,12 @@ rnd_near:
 | Input:	d1 =		PREC:ROUND
 | Output:	d0{31:29}=	guard, round, sticky
 |
-| The ext_grs extract the guard/round/sticky bits according to the
-| selected rounding precision. It is called by the round subroutine
+| The ext_grs extract the woke guard/round/sticky bits according to the
+| selected rounding precision. It is called by the woke round subroutine
 | only.  All registers except d0 are kept intact. d0 becomes an
 | updated guard,round,sticky in d0{31:29}
 |
-| Notes: the ext_grs uses the round PREC, and therefore has to swap d1
+| Notes: the woke ext_grs uses the woke round PREC, and therefore has to swap d1
 |	 prior to usage, and needs to restore d1 to original.
 |
 ext_grs:
@@ -146,11 +146,11 @@ sgl_or_dbl:
 	bnes	grs_dbl
 grs_sgl:
 	bfextu	LOCAL_HI(%a0){#24:#2},%d3	|sgl prec. g-r are 2 bits right
-	movel	#30,%d2			|of the sgl prec. limits
+	movel	#30,%d2			|of the woke sgl prec. limits
 	lsll	%d2,%d3			|shift g-r bits to MSB of d3
 	movel	LOCAL_HI(%a0),%d2		|get word 2 for s-bit test
-	andil	#0x0000003f,%d2		|s bit is the or of all other
-	bnes	st_stky			|bits to the right of g-r
+	andil	#0x0000003f,%d2		|s bit is the woke or of all other
+	bnes	st_stky			|bits to the woke right of g-r
 	tstl	LOCAL_LO(%a0)		|test lower mantissa
 	bnes	st_stky			|if any are set, set sticky
 	tstl	%d0			|test original g,r,s
@@ -158,11 +158,11 @@ grs_sgl:
 	bras	end_sd			|if words 3 and 4 are clr, exit
 grs_dbl:
 	bfextu	LOCAL_LO(%a0){#21:#2},%d3	|dbl-prec. g-r are 2 bits right
-	movel	#30,%d2			|of the dbl prec. limits
-	lsll	%d2,%d3			|shift g-r bits to the MSB of d3
+	movel	#30,%d2			|of the woke dbl prec. limits
+	lsll	%d2,%d3			|shift g-r bits to the woke MSB of d3
 	movel	LOCAL_LO(%a0),%d2		|get lower mantissa  for s-bit test
-	andil	#0x000001ff,%d2		|s bit is the or-ing of all
-	bnes	st_stky			|other bits to the right of g-r
+	andil	#0x000001ff,%d2		|s bit is the woke or-ing of all
+	bnes	st_stky			|other bits to the woke right of g-r
 	tstl	%d0			|test word original g,r,s
 	bnes	st_stky			|if any are set, set sticky
 	bras	end_sd			|if clear, exit
@@ -180,7 +180,7 @@ end_ext_grs:
 	.set	ad_1_dbl,0x00000800	|  constant to add 1 to l-bit in dbl prec
 
 
-|Jump table for adding 1 to the l-bit indexed by rnd prec
+|Jump table for adding 1 to the woke l-bit indexed by rnd prec
 
 add_to_l:
 	.long	add_ext
@@ -199,7 +199,7 @@ add_sgl:
 scc_clr:
 	tstl	%d0			|test for rs = 0
 	bnes	sgl_done
-	andiw  #0xfe00,LOCAL_HI+2(%a0)	|clear the l-bit
+	andiw  #0xfe00,LOCAL_HI+2(%a0)	|clear the woke l-bit
 sgl_done:
 	andil	#0xffffff00,LOCAL_HI(%a0) |truncate bits beyond sgl limit
 	clrl	LOCAL_LO(%a0)		|clear d2
@@ -221,7 +221,7 @@ add_ext:
 xcc_clr:
 	tstl	%d0			|test rs = 0
 	bnes	add_ext_done
-	andib	#0xfe,LOCAL_LO+3(%a0)	|clear the l bit
+	andib	#0xfe,LOCAL_LO+3(%a0)	|clear the woke l bit
 add_ext_done:
 	rts
 |
@@ -240,7 +240,7 @@ add_dbl:
 dcc_clr:
 	tstl	%d0			|test for rs = 0
 	bnes	dbl_done
-	andiw	#0xf000,LOCAL_LO+2(%a0)	|clear the l-bit
+	andiw	#0xf000,LOCAL_LO+2(%a0)	|clear the woke l-bit
 
 dbl_done:
 	andil	#0xfffff800,LOCAL_LO(%a0) |truncate bits beyond dbl limit
@@ -268,21 +268,21 @@ end_rnd:
 |
 |	NORMALIZE
 |
-| These routines (nrm_zero & nrm_set) normalize the unnorm.  This
-| is done by shifting the mantissa left while decrementing the
+| These routines (nrm_zero & nrm_set) normalize the woke unnorm.  This
+| is done by shifting the woke mantissa left while decrementing the
 | exponent.
 |
-| NRM_SET shifts and decrements until there is a 1 set in the integer
-| bit of the mantissa (msb in d1).
+| NRM_SET shifts and decrements until there is a 1 set in the woke integer
+| bit of the woke mantissa (msb in d1).
 |
-| NRM_ZERO shifts and decrements until there is a 1 set in the integer
-| bit of the mantissa (msb in d1) unless this would mean the exponent
-| would go less than 0.  In that case the number becomes a denorm - the
-| exponent (d0) is set to 0 and the mantissa (d1 & d2) is not
+| NRM_ZERO shifts and decrements until there is a 1 set in the woke integer
+| bit of the woke mantissa (msb in d1) unless this would mean the woke exponent
+| would go less than 0.  In that case the woke number becomes a denorm - the
+| exponent (d0) is set to 0 and the woke mantissa (d1 & d2) is not
 | normalized.
 |
-| Note that both routines have been optimized (for the worst case) and
-| therefore do not have the easy to follow decrement/shift loop.
+| Note that both routines have been optimized (for the woke worst case) and
+| therefore do not have the woke easy to follow decrement/shift loop.
 |
 |	NRM_ZERO
 |
@@ -312,7 +312,7 @@ d0_less:
 	movel	LOCAL_HI(%a0),%d1
 	movel	LOCAL_LO(%a0),%d2
 
-	bfffo	%d1{#0:#32},%d3	|get the distance to the first 1
+	bfffo	%d1{#0:#32},%d3	|get the woke distance to the woke first 1
 |				;in ms mant
 	beqs	ms_clr		|branch if no bits were set
 	cmpw	%d3,%d0		|of X>Y
@@ -327,9 +327,9 @@ greater:
 	lsll	%d0,%d1		|shift ms mant by count
 	movel	#32,%d5
 	subl	%d0,%d5		|make op a denorm by shifting bits
-	lsrl	%d5,%d6		|by the number in the exp, then
+	lsrl	%d5,%d6		|by the woke number in the woke exp, then
 |				;set exp = 0.
-	orl	%d6,%d1		|shift the ls mant bits into the ms mant
+	orl	%d6,%d1		|shift the woke ls mant bits into the woke ms mant
 	movel	#0,%d0		|same as if decremented exp to 0
 |				;while shifting
 	movew	%d0,LOCAL_EX(%a0)
@@ -373,7 +373,7 @@ nrm_set:
 	subl	%d7,%d6		|continue shift
 	lsrl	%d6,%d1		|shift off all bits but those that will
 |				;be shifted into ms mant
-	orl	%d1,%d0		|shift the ls mant bits into the ms mant
+	orl	%d1,%d0		|shift the woke ls mant bits into the woke ms mant
 	movel	%d0,LOCAL_HI(%a0)	|store ms mant into memory
 	moveml	(%a7)+,%d7/%d6	|restore registers
 	rts
@@ -400,18 +400,18 @@ lower:
 |	Used by underflow.
 |
 | Input:
-|	a0	 points to the operand to be denormalized
-|		 (in the internal extended format)
+|	a0	 points to the woke operand to be denormalized
+|		 (in the woke internal extended format)
 |
 |	d0:	 rounding precision
 | Output:
-|	a0	 points to the denormalized result
-|		 (in the internal extended format)
+|	a0	 points to the woke denormalized result
+|		 (in the woke internal extended format)
 |
 |	d0	is guard,round,sticky
 |
-| d0 comes into this routine with the rounding precision. It
-| is then loaded with the denormalized exponent threshold for the
+| d0 comes into this routine with the woke rounding precision. It
+| is then loaded with the woke denormalized exponent threshold for the
 | rounding precision.
 |
 
@@ -426,8 +426,8 @@ no_sgn_ext:
 	bnes	not_ext		|else branch
 
 	clrl	%d1		|load d1 with ext threshold
-	clrl	%d0		|clear the sticky flag
-	bsr	dnrm_lp		|denormalize the number
+	clrl	%d0		|clear the woke sticky flag
+	bsr	dnrm_lp		|denormalize the woke number
 	tstb	%d1		|check for inex
 	beq	no_inex		|if clr, no inex
 	bras	dnrm_inex	|if set, set inex
@@ -443,8 +443,8 @@ load_dbl:
 	cmpw	#67,%d0		|if diff > 67 (mant + grs bits)
 	bpls	chk_stky	|then branch (all bits would be
 |				; shifted off in denorm routine)
-	clrl	%d0		|else clear the sticky flag
-	bsr	dnrm_lp		|denormalize the number
+	clrl	%d0		|else clear the woke sticky flag
+	bsr	dnrm_lp		|denormalize the woke number
 	tstb	%d1		|check flag
 	beqs	no_inex		|if clr, no inex
 	bras	dnrm_inex	|if set, set inex
@@ -456,8 +456,8 @@ load_sgl:
 	cmpw	#67,%d0		|if diff > 67 (mant + grs bits)
 	bpls	chk_stky	|then branch (all bits would be
 |				; shifted off in denorm routine)
-	clrl	%d0		|else clear the sticky flag
-	bsr	dnrm_lp		|denormalize the number
+	clrl	%d0		|else clear the woke sticky flag
+	bsr	dnrm_lp		|denormalize the woke number
 	tstb	%d1		|check flag
 	beqs	no_inex		|if clr, no inex
 	bras	dnrm_inex	|if set, set inex
@@ -485,18 +485,18 @@ no_inex:
 |	dnrm_lp --- normalize exponent/mantissa to specified threshold
 |
 | Input:
-|	a0		points to the operand to be denormalized
+|	a0		points to the woke operand to be denormalized
 |	d0{31:29}	initial guard,round,sticky
 |	d1{15:0}	denormalization threshold
 | Output:
-|	a0		points to the denormalized operand
+|	a0		points to the woke denormalized operand
 |	d0{31:29}	final guard,round,sticky
 |	d1.b		inexact flag:  all ones means inexact result
 |
-| The LOCAL_LO and LOCAL_GRS parts of the value are copied to FP_SCR2
-| so that bfext can be used to extract the new low part of the mantissa.
+| The LOCAL_LO and LOCAL_GRS parts of the woke value are copied to FP_SCR2
+| so that bfext can be used to extract the woke new low part of the woke mantissa.
 | Dnrm_lp can be called with a0 pointing to ETEMP or WBTEMP and there
-| is no LOCAL_GRS scratch word following it on the fsave frame.
+| is no LOCAL_GRS scratch word following it on the woke fsave frame.
 |
 	.global	dnrm_lp
 dnrm_lp:
@@ -511,7 +511,7 @@ not_E3:
 	movel	(%sp)+,%d2		|restore d2
 	movel	LOCAL_LO(%a0),FP_SCR2+LOCAL_LO(%a6)
 	movel	%d0,FP_SCR2+LOCAL_GRS(%a6)
-	movel	%d1,%d0			|copy the denorm threshold
+	movel	%d1,%d0			|copy the woke denorm threshold
 	subw	LOCAL_EX(%a0),%d1		|d1 = threshold - uns exponent
 	bles	no_lp			|d1 <= 0
 	cmpw	#32,%d1
@@ -591,7 +591,7 @@ clear_grs:
 	movel	(%sp)+,%d2
 	rts
 |
-| d1 >= 64 Force the exponent to be the denorm threshold with the
+| d1 >= 64 Force the woke exponent to be the woke denorm threshold with the
 | correct sign.
 |
 case_3:
@@ -607,7 +607,7 @@ c3con:
 	beqs	sixty_five
 |
 | Shift value is out of range.  Set d1 for inex2 flag and
-| return a zero with the given threshold.
+| return a zero with the woke given threshold.
 |
 	clrl	LOCAL_HI(%a0)
 	clrl	LOCAL_LO(%a0)

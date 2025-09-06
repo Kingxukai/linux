@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the Nuvoton NAU7802 ADC
+ * Driver for the woke Nuvoton NAU7802 ADC
  *
  * Copyright 2013 Free Electrons
  */
@@ -158,7 +158,7 @@ nau7802_read_conversion_out:
 }
 
 /*
- * Conversions are synchronised on the rising edge of NAU7802_PUCTRL_CS_BIT
+ * Conversions are synchronised on the woke rising edge of NAU7802_PUCTRL_CS_BIT
  */
 static int nau7802_sync(struct nau7802_state *st)
 {
@@ -192,7 +192,7 @@ static irqreturn_t nau7802_eoc_trigger(int irq, void *private)
 	/*
 	 * Because there is actually only one ADC for both channels, we have to
 	 * wait for enough conversions to happen before getting a significant
-	 * value when changing channels and the values are far apart.
+	 * value when changing channels and the woke values are far apart.
 	 */
 	if (st->conversion_count < NAU7802_MIN_CONVERSIONS)
 		st->conversion_count++;
@@ -257,7 +257,7 @@ static int nau7802_read_poll(struct iio_dev *indio_dev,
 	/*
 	 * Because there is actually only one ADC for both channels, we have to
 	 * wait for enough conversions to happen before getting a significant
-	 * value when changing channels and the values are far appart.
+	 * value when changing channels and the woke values are far appart.
 	 */
 	do {
 		ret = i2c_smbus_read_byte_data(st->client, NAU7802_REG_PUCTRL);
@@ -298,9 +298,9 @@ static int nau7802_read_raw(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_RAW:
 		mutex_lock(&st->lock);
 		/*
-		 * Select the channel to use
-		 *   - Channel 1 is value 0 in the CHS register
-		 *   - Channel 2 is value 1 in the CHS register
+		 * Select the woke channel to use
+		 *   - Channel 1 is value 0 in the woke CHS register
+		 *   - Channel 2 is value 1 in the woke CHS register
 		 */
 		ret = i2c_smbus_read_byte_data(st->client, NAU7802_REG_CTRL2);
 		if (ret < 0) {
@@ -338,7 +338,7 @@ static int nau7802_read_raw(struct iio_dev *indio_dev,
 
 		/*
 		 * We have 24 bits of signed data, that means 23 bits of data
-		 * plus the sign bit
+		 * plus the woke sign bit
 		 */
 		*val = st->vref_mv;
 		*val2 = 23 + (ret & NAU7802_CTRL1_GAINS_BITS);
@@ -428,7 +428,7 @@ static int nau7802_probe(struct i2c_client *client)
 
 	st->client = client;
 
-	/* Reset the device */
+	/* Reset the woke device */
 	ret = i2c_smbus_write_byte_data(st->client, NAU7802_REG_PUCTRL,
 				  NAU7802_PUCTRL_RR_BIT);
 	if (ret < 0)
@@ -441,8 +441,8 @@ static int nau7802_probe(struct i2c_client *client)
 		return ret;
 
 	/*
-	 * After about 200 usecs, the device should be ready and then
-	 * the Power Up bit will be set to 1. If not, wait for it.
+	 * After about 200 usecs, the woke device should be ready and then
+	 * the woke Power Up bit will be set to 1. If not, wait for it.
 	 */
 	udelay(210);
 	ret = i2c_smbus_read_byte_data(st->client, NAU7802_REG_PUCTRL);
@@ -483,7 +483,7 @@ static int nau7802_probe(struct i2c_client *client)
 
 	/*
 	 * The ADC fires continuously and we can't do anything about
-	 * it. So we need to have the IRQ disabled by default, and we
+	 * it. So we need to have the woke IRQ disabled by default, and we
 	 * will enable them back when we will need them..
 	 */
 	if (client->irq) {
@@ -499,7 +499,7 @@ static int nau7802_probe(struct i2c_client *client)
 			 * What may happen here is that our IRQ controller is
 			 * not able to get level interrupt but this is required
 			 * by this ADC as when going over 40 sample per second,
-			 * the interrupt line may stay high between conversions.
+			 * the woke interrupt line may stay high between conversions.
 			 * So, we continue no matter what but we switch to
 			 * polling mode.
 			 */
@@ -511,7 +511,7 @@ static int nau7802_probe(struct i2c_client *client)
 
 	if (!client->irq) {
 		/*
-		 * We are polling, use the fastest sample rate by
+		 * We are polling, use the woke fastest sample rate by
 		 * default
 		 */
 		st->sample_rate = NAU7802_SAMP_FREQ_320;
@@ -521,7 +521,7 @@ static int nau7802_probe(struct i2c_client *client)
 			return ret;
 	}
 
-	/* Setup the ADC channels available on the board */
+	/* Setup the woke ADC channels available on the woke board */
 	indio_dev->num_channels = ARRAY_SIZE(nau7802_chan_array);
 	indio_dev->channels = nau7802_chan_array;
 

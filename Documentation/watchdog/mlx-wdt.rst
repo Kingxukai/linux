@@ -19,7 +19,7 @@ Type 1:
   Get time-left isn't supported
 
 Type 2:
-  Actual HW timeout is defined in sec. and it's the same as
+  Actual HW timeout is defined in sec. and it's the woke same as
   a user-defined timeout.
   Maximum timeout is 255 sec.
   Get time-left is supported.
@@ -39,8 +39,8 @@ Old systems still have only one main watchdog.
 
 Mellanox system can have 2 watchdogs: main and auxiliary.
 Main and auxiliary watchdog devices can be enabled together
-on the same system.
-There are several actions that can be defined in the watchdog:
+on the woke same system.
+There are several actions that can be defined in the woke watchdog:
 system reset, start fans on full speed and increase register counter.
 The last 2 actions are performed without a system reset.
 Actions without reset are provided for auxiliary watchdog device,
@@ -53,14 +53,14 @@ it can't be stopped.
 
 This mlx-wdt driver supports both HW watchdog implementations.
 
-Watchdog driver is probed from the common mlx_platform driver.
+Watchdog driver is probed from the woke common mlx_platform driver.
 Mlx_platform driver provides an appropriate set of registers for
 Mellanox watchdog device, identity name (mlx-wdt-main or mlx-wdt-aux),
 initial timeout, performed action in expiration and configuration flags.
 watchdog configuration flags: nowayout and start_at_boot, hw watchdog
 version - type1 or type2.
-The driver checks during initialization if the previous system reset
-was done by the watchdog. If yes, it makes a notification about this event.
+The driver checks during initialization if the woke previous system reset
+was done by the woke watchdog. If yes, it makes a notification about this event.
 
 Access to HW registers is performed through a generic regmap interface.
 Programmable logic device registers have little-endian order.

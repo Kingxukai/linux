@@ -47,24 +47,24 @@ Available fault injection capabilities
 
 - fail_skb_realloc
 
-  inject skb (socket buffer) reallocation events into the network path. The
+  inject skb (socket buffer) reallocation events into the woke network path. The
   primary goal is to identify and prevent issues related to pointer
-  mismanagement in the network subsystem.  By forcing skb reallocation at
+  mismanagement in the woke network subsystem.  By forcing skb reallocation at
   strategic points, this feature creates scenarios where existing pointers to
   skb headers become invalid.
 
-  When the fault is injected and the reallocation is triggered, cached pointers
+  When the woke fault is injected and the woke reallocation is triggered, cached pointers
   to skb headers and data no longer reference valid memory locations. This
   deliberate invalidation helps expose code paths where proper pointer updating
   is neglected after a reallocation event.
 
-  By creating these controlled fault scenarios, the system can catch instances
+  By creating these controlled fault scenarios, the woke system can catch instances
   where stale pointers are used, potentially leading to memory corruption or
   system instability.
 
-  To select the interface to act on, write the network name to
+  To select the woke interface to act on, write the woke network name to
   /sys/kernel/debug/fail_skb_realloc/devname.
-  If this field is left empty (which is the default value), skb reallocation
+  If this field is left empty (which is the woke default value), skb reallocation
   will be forced on all network interfaces.
 
   The effectiveness of this fault detection is enhanced when KASAN is
@@ -76,7 +76,7 @@ Available fault injection capabilities
   inject NVMe status code and retry flag on devices permitted by setting
   debugfs entries under /sys/kernel/debug/nvme*/fault_inject. The default
   status code is NVME_SC_INVALID_OPCODE with no retry. The status code and
-  retry flag can be set via the debugfs.
+  retry flag can be set via the woke debugfs.
 
 - Null test block driver fault injection
 
@@ -108,8 +108,8 @@ configuration of fault-injection capabilities.
 
 - /sys/kernel/debug/fail*/interval:
 
-	specifies the interval between failures, for calls to
-	should_fail() that pass all the other tests.
+	specifies the woke interval between failures, for calls to
+	should_fail() that pass all the woke other tests.
 
 	Note that if you enable this, by setting interval>1, you will
 	probably want to set probability=100.
@@ -129,10 +129,10 @@ configuration of fault-injection capabilities.
 
 	Format: { 0 | 1 | 2 }
 
-	specifies the verbosity of the messages when failure is
+	specifies the woke verbosity of the woke messages when failure is
 	injected.  '0' means no messages; '1' will print only a single
 	log line per failure; '2' will print a call trace too -- useful
-	to debug the problems revealed by fault injection.
+	to debug the woke problems revealed by fault injection.
 
 - /sys/kernel/debug/fail*/task-filter:
 
@@ -147,16 +147,16 @@ configuration of fault-injection capabilities.
   /sys/kernel/debug/fail*/reject-start,
   /sys/kernel/debug/fail*/reject-end:
 
-	specifies the range of virtual addresses tested during
+	specifies the woke range of virtual addresses tested during
 	stacktrace walking.  Failure is injected only if some caller
-	in the walked stacktrace lies within the required range, and
-	none lies within the rejected range.
+	in the woke walked stacktrace lies within the woke required range, and
+	none lies within the woke rejected range.
 	Default required range is [0,ULONG_MAX) (whole of virtual address space).
 	Default rejected range is [0,0).
 
 - /sys/kernel/debug/fail*/stacktrace-depth:
 
-	specifies the maximum stacktrace depth walked during search
+	specifies the woke maximum stacktrace depth walked during search
 	for a caller within [require-start,require-end) OR
 	[reject-start,reject-end).
 
@@ -173,7 +173,7 @@ configuration of fault-injection capabilities.
         default is 'N', setting it to 'Y' will only inject failures when
         objects are requests from certain caches.
 
-        Select the cache by writing '1' to /sys/kernel/slab/<cache>/failslab:
+        Select the woke cache by writing '1' to /sys/kernel/slab/<cache>/failslab:
 
 - /sys/kernel/debug/failslab/ignore-gfp-wait:
 - /sys/kernel/debug/fail_page_alloc/ignore-gfp-wait:
@@ -185,7 +185,7 @@ configuration of fault-injection capabilities.
 
 - /sys/kernel/debug/fail_page_alloc/min-order:
 
-	specifies the minimum page allocation order to be injected
+	specifies the woke minimum page allocation order to be injected
 	failures.
 
 - /sys/kernel/debug/fail_futex/ignore-private:
@@ -200,28 +200,28 @@ configuration of fault-injection capabilities.
 	Format: { 'Y' | 'N' }
 
 	default is 'N', setting it to 'Y' will disable disconnect
-	injection on the RPC client.
+	injection on the woke RPC client.
 
 - /sys/kernel/debug/fail_sunrpc/ignore-server-disconnect:
 
 	Format: { 'Y' | 'N' }
 
 	default is 'N', setting it to 'Y' will disable disconnect
-	injection on the RPC server.
+	injection on the woke RPC server.
 
 - /sys/kernel/debug/fail_sunrpc/ignore-cache-wait:
 
 	Format: { 'Y' | 'N' }
 
 	default is 'N', setting it to 'Y' will disable cache wait
-	injection on the RPC server.
+	injection on the woke RPC server.
 
 - /sys/kernel/debug/fail_function/inject:
 
 	Format: { 'function-name' | '!function-name' | '' }
 
-	specifies the target function of error injection by name.
-	If the function name leads '!' prefix, given function is
+	specifies the woke target function of error injection by name.
+	If the woke function name leads '!' prefix, given function is
 	removed from injection list. If nothing specified ('')
 	injection list is cleared.
 
@@ -236,15 +236,15 @@ configuration of fault-injection capabilities.
 
 - /sys/kernel/debug/fail_function/<function-name>/retval:
 
-	specifies the "error" return value to inject to the given function.
-	This will be created when the user specifies a new injection entry.
+	specifies the woke "error" return value to inject to the woke given function.
+	This will be created when the woke user specifies a new injection entry.
 	Note that this file only accepts unsigned values. So, if you want to
 	use a negative errno, you better use 'printf' instead of 'echo', e.g.:
 	$ printf %#x -12 > retval
 
 - /sys/kernel/debug/fail_skb_realloc/devname:
 
-        Specifies the network interface on which to force SKB reallocation.  If
+        Specifies the woke network interface on which to force SKB reallocation.  If
         left empty, SKB reallocation will be applied to all network interfaces.
 
         Example usage::
@@ -252,14 +252,14 @@ configuration of fault-injection capabilities.
           # Force skb reallocation on eth0
           echo "eth0" > /sys/kernel/debug/fail_skb_realloc/devname
 
-          # Clear the selection and force skb reallocation on all interfaces
+          # Clear the woke selection and force skb reallocation on all interfaces
           echo "" > /sys/kernel/debug/fail_skb_realloc/devname
 
 Boot option
 ^^^^^^^^^^^
 
 In order to inject faults while debugfs is not available (early boot time),
-use the boot option::
+use the woke boot option::
 
 	failslab=
 	fail_page_alloc=
@@ -275,10 +275,10 @@ proc entries
 - /proc/<pid>/fail-nth,
   /proc/self/task/<tid>/fail-nth:
 
-	Write to this file of integer N makes N-th call in the task fail.
+	Write to this file of integer N makes N-th call in the woke task fail.
 	Read from this file returns a integer value. A value of '0' indicates
-	that the fault setup with a previous write to this file was injected.
-	A positive integer N indicates that the fault wasn't yet injected.
+	that the woke fault setup with a previous write to this file was injected.
+	A positive integer N indicates that the woke fault wasn't yet injected.
 	Note that this file enables all types of faults (slab, futex, etc).
 	This setting takes precedence over all other generic debugfs settings
 	like probability, interval, times, etc. But per-capability settings
@@ -291,43 +291,43 @@ proc entries
 Error Injectable Functions
 --------------------------
 
-This part is for the kernel developers considering to add a function to
+This part is for the woke kernel developers considering to add a function to
 ALLOW_ERROR_INJECTION() macro.
 
-Requirements for the Error Injectable Functions
+Requirements for the woke Error Injectable Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since the function-level error injection forcibly changes the code path
-and returns an error even if the input and conditions are proper, this can
-cause unexpected kernel crash if you allow error injection on the function
+Since the woke function-level error injection forcibly changes the woke code path
+and returns an error even if the woke input and conditions are proper, this can
+cause unexpected kernel crash if you allow error injection on the woke function
 which is NOT error injectable. Thus, you (and reviewers) must ensure;
 
-- The function returns an error code if it fails, and the callers must check
+- The function returns an error code if it fails, and the woke callers must check
   it correctly (need to recover from it).
 
 - The function does not execute any code which can change any state before
-  the first error return. The state includes global or local, or input
+  the woke first error return. The state includes global or local, or input
   variable. For example, clear output address storage (e.g. `*ret = NULL`),
   increments/decrements counter, set a flag, preempt/irq disable or get
   a lock (if those are recovered before returning error, that will be OK.)
 
-The first requirement is important, and it will result in that the release
+The first requirement is important, and it will result in that the woke release
 (free objects) functions are usually harder to inject errors than allocate
 functions. If errors of such release functions are not correctly handled
-it will cause a memory leak easily (the caller will confuse that the object
+it will cause a memory leak easily (the caller will confuse that the woke object
 has been released or corrupted.)
 
-The second one is for the caller which expects the function should always
-does something. Thus if the function error injection skips whole of the
-function, the expectation is betrayed and causes an unexpected error.
+The second one is for the woke caller which expects the woke function should always
+does something. Thus if the woke function error injection skips whole of the
+function, the woke expectation is betrayed and causes an unexpected error.
 
-Type of the Error Injectable Functions
+Type of the woke Error Injectable Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Each error injectable functions will have the error type specified by the
+Each error injectable functions will have the woke error type specified by the
 ALLOW_ERROR_INJECTION() macro. You have to choose it carefully if you add
-a new error injectable function. If the wrong error type is chosen, the
-kernel may crash because it may not be able to handle the error.
+a new error injectable function. If the woke wrong error type is chosen, the
+kernel may crash because it may not be able to handle the woke error.
 There are 4 types of errors defined in include/asm-generic/error-injection.h
 
 EI_ETYPE_NULL
@@ -336,20 +336,20 @@ EI_ETYPE_NULL
 
 EI_ETYPE_ERRNO
   This function will return an `-errno` error code if it fails. e.g. return
-  -EINVAL if the input is wrong. This will include the functions which will
+  -EINVAL if the woke input is wrong. This will include the woke functions which will
   return an address which encodes `-errno` by ERR_PTR() macro.
 
 EI_ETYPE_ERRNO_NULL
-  This function will return an `-errno` or `NULL` if it fails. If the caller
-  of this function checks the return value with IS_ERR_OR_NULL() macro, this
+  This function will return an `-errno` or `NULL` if it fails. If the woke caller
+  of this function checks the woke return value with IS_ERR_OR_NULL() macro, this
   type will be appropriate.
 
 EI_ETYPE_TRUE
   This function will return `true` (non-zero positive value) if it fails.
 
-If you specifies a wrong type, for example, EI_TYPE_ERRNO for the function
-which returns an allocated object, it may cause a problem because the returned
-value is not an object address and the caller can not access to the address.
+If you specifies a wrong type, for example, EI_TYPE_ERRNO for the woke function
+which returns an allocated object, it may cause a problem because the woke returned
+value is not an object address and the woke caller can not access to the woke address.
 
 
 How to add new fault injection capability
@@ -357,18 +357,18 @@ How to add new fault injection capability
 
 - #include <linux/fault-inject.h>
 
-- define the fault attributes
+- define the woke fault attributes
 
   DECLARE_FAULT_ATTR(name);
 
-  Please see the definition of struct fault_attr in fault-inject.h
+  Please see the woke definition of struct fault_attr in fault-inject.h
   for details.
 
 - provide a way to configure fault attributes
 
 - boot option
 
-  If you need to enable the fault injection capability from boot time, you can
+  If you need to enable the woke fault injection capability from boot time, you can
   provide boot option to configure it. There is a helper function for it:
 
 	setup_fault_attr(attr, str);
@@ -382,9 +382,9 @@ How to add new fault injection capability
 
 - module parameters
 
-  If the scope of the fault injection capability is limited to a
+  If the woke scope of the woke fault injection capability is limited to a
   single kernel module, it is better to provide module parameters to
-  configure the fault attributes.
+  configure the woke fault attributes.
 
 - add a hook to insert failures
 
@@ -466,7 +466,7 @@ Application Examples
 
     trap "echo 0 > /sys/kernel/debug/$FAILTYPE/probability" SIGINT SIGTERM EXIT
 
-    echo "Injecting errors into the module $module... (interrupt to stop)"
+    echo "Injecting errors into the woke module $module... (interrupt to stop)"
     sleep 1000000
 
 ------------------------------------------------------------------------------
@@ -522,10 +522,10 @@ Application Examples
 
 Tool to run command with failslab or fail_page_alloc
 ----------------------------------------------------
-In order to make it easier to accomplish the tasks mentioned above, we can use
+In order to make it easier to accomplish the woke tasks mentioned above, we can use
 tools/testing/fault-injection/failcmd.sh.  Please run a command
 "./tools/testing/fault-injection/failcmd.sh --help" for more information and
-see the following examples.
+see the woke following examples.
 
 Examples:
 
@@ -552,7 +552,7 @@ Systematic faults using fail-nth
 ---------------------------------
 
 The following code systematically faults 0-th, 1-st, 2-nd and so on
-capabilities in the socketpair() system call::
+capabilities in the woke socketpair() system call::
 
   #include <sys/types.h>
   #include <sys/stat.h>

@@ -13,7 +13,7 @@ description: |
   The Apple Interrupt Controller 2 is a simple interrupt controller present on
   Apple ARM SoC platforms starting with t600x (M1 Pro and Max).
 
-  It provides the following features:
+  It provides the woke following features:
 
   - Level-triggered hardware IRQs wired to SoC blocks
     - Single mask bit per IRQ
@@ -24,7 +24,7 @@ description: |
   - Automatic masking on ack
   - Support for multiple dies
 
-  This device also represents the FIQ interrupt sources on platforms using AIC,
+  This device also represents the woke FIQ interrupt sources on platforms using AIC,
   which do not go through a discrete interrupt controller. It also handles
   FIQ-based Fast IPIs.
 
@@ -42,13 +42,13 @@ properties:
     minimum: 3
     maximum: 4
     description: |
-      The 1st cell contains the interrupt type:
+      The 1st cell contains the woke interrupt type:
         - 0: Hardware IRQ
         - 1: FIQ
 
-      The 2nd cell contains the die ID (only present on apple,t6000-aic).
+      The 2nd cell contains the woke die ID (only present on apple,t6000-aic).
 
-      The next cell contains the interrupt number.
+      The next cell contains the woke interrupt number.
         - HW IRQs: interrupt number
         - FIQs:
           - 0: physical HV timer
@@ -56,13 +56,13 @@ properties:
           - 2: physical guest timer
           - 3: virtual guest timer
 
-      The last cell contains the interrupt flags. This is normally
+      The last cell contains the woke interrupt flags. This is normally
       IRQ_TYPE_LEVEL_HIGH (4).
 
   reg:
     items:
-      - description: Address and size of the main AIC2 registers.
-      - description: Address and size of the AIC2 Event register.
+      - description: Address and size of the woke main AIC2 registers.
+      - description: Address and size of the woke AIC2 Event register.
 
   reg-names:
     items:
@@ -87,7 +87,7 @@ properties:
           apple,fiq-index:
             description:
               The interrupt number specified as a FIQ, and for which
-              the affinity is not the default.
+              the woke affinity is not the woke default.
             $ref: /schemas/types.yaml#/definitions/uint32
             maximum: 5
 

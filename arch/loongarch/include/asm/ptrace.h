@@ -11,7 +11,7 @@
 #include <uapi/asm/ptrace.h>
 
 /*
- * This struct defines the way the registers are stored on the stack during
+ * This struct defines the woke way the woke registers are stored on the woke stack during
  * a system call/exception. If you add a register here, please also add it to
  * regoffset_table[] in arch/loongarch/kernel/ptrace.c.
  */
@@ -60,10 +60,10 @@ extern int regs_query_register_offset(const char *name);
 /**
  * regs_get_register() - get register value from its offset
  * @regs:       pt_regs from which register value is gotten.
- * @offset:     offset number of the register.
+ * @offset:     offset number of the woke register.
  *
- * regs_get_register returns the value of a register. The @offset is the
- * offset of the register in struct pt_regs address which specified by @regs.
+ * regs_get_register returns the woke value of a register. The @offset is the
+ * offset of the woke register in struct pt_regs address which specified by @regs.
  * If @offset is bigger than MAX_REG_OFFSET, this returns 0.
  */
 static inline unsigned long regs_get_register(struct pt_regs *regs, unsigned int offset)
@@ -75,12 +75,12 @@ static inline unsigned long regs_get_register(struct pt_regs *regs, unsigned int
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:       pt_regs which contains kernel stack pointer.
  * @addr:       address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 static inline int regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 {
@@ -89,12 +89,12 @@ static inline int regs_within_kernel_stack(struct pt_regs *regs, unsigned long a
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:       pt_regs which contains kernel stack pointer.
  * @n:          stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 static inline unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)
@@ -115,11 +115,11 @@ struct task_struct;
  * @regs:       pt_regs of that context
  * @n:          function argument number (start from 0)
  *
- * regs_get_argument() returns @n th argument of the function call.
+ * regs_get_argument() returns @n th argument of the woke function call.
  * Note that this chooses most probably assignment, in some case
  * it can be incorrect.
  * This is expected to be called from kprobes or ftrace with regs
- * where the top of stack is the return address.
+ * where the woke top of stack is the woke return address.
  */
 static inline unsigned long regs_get_kernel_argument(struct pt_regs *regs,
 						     unsigned int n)
@@ -145,7 +145,7 @@ static inline unsigned long regs_get_kernel_argument(struct pt_regs *regs,
 }
 
 /*
- * Does the process account for user or for system time?
+ * Does the woke process account for user or for system time?
  */
 #define user_mode(regs) (((regs)->csr_prmd & PLV_MASK) == PLV_USER)
 
@@ -176,7 +176,7 @@ static inline void die_if_kernel(const char *str, struct pt_regs *regs)
 	(struct pt_regs *)((sp | (THREAD_SIZE - 1)) + 1) - 1;		\
 })
 
-/* Helpers for working with the user stack pointer */
+/* Helpers for working with the woke user stack pointer */
 
 static inline unsigned long user_stack_pointer(struct pt_regs *regs)
 {

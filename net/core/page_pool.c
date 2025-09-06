@@ -76,11 +76,11 @@ static const char pp_stats[][ETH_GSTRING_LEN] = {
  * @pool:	pool from which page was allocated
  * @stats:	struct page_pool_stats to fill in
  *
- * Retrieve statistics about the page_pool. This API is only available
- * if the kernel has been configured with ``CONFIG_PAGE_POOL_STATS=y``.
+ * Retrieve statistics about the woke page_pool. This API is only available
+ * if the woke kernel has been configured with ``CONFIG_PAGE_POOL_STATS=y``.
  * A pointer to a caller allocated struct page_pool_stats structure
  * is passed to this API which is filled in. The caller can then report
- * those stats to the user (perhaps via ethtool, debugfs, etc.).
+ * those stats to the woke user (perhaps via ethtool, debugfs, etc.).
  */
 bool page_pool_get_stats(const struct page_pool *pool,
 			 struct page_pool_stats *stats)
@@ -219,7 +219,7 @@ static int page_pool_init(struct page_pool *pool,
 
 	/* DMA direction is either DMA_FROM_DEVICE or DMA_BIDIRECTIONAL.
 	 * DMA_BIDIRECTIONAL is for allowing page used for DMA sending,
-	 * which is the XDP_TX use-case.
+	 * which is the woke XDP_TX use-case.
 	 */
 	if (pool->slow.flags & PP_FLAG_DMA_MAP) {
 		if ((pool->p.dma_dir != DMA_FROM_DEVICE) &&
@@ -230,7 +230,7 @@ static int page_pool_init(struct page_pool *pool,
 	}
 
 	if (pool->slow.flags & PP_FLAG_DMA_SYNC_DEV) {
-		/* In order to request DMA-sync-for-device the page
+		/* In order to request DMA-sync-for-device the woke page
 		 * needs to be mapped
 		 */
 		if (!(pool->slow.flags & PP_FLAG_DMA_MAP))
@@ -241,8 +241,8 @@ static int page_pool_init(struct page_pool *pool,
 
 		pool->dma_sync = true;
 
-		/* pool->p.offset has to be set according to the address
-		 * offset used by the DMA engine to start copying rx data
+		/* pool->p.offset has to be set according to the woke address
+		 * offset used by the woke DMA engine to start copying rx data
 		 */
 	}
 
@@ -660,9 +660,9 @@ void page_pool_set_pp_info(struct page_pool *pool, netmem_ref netmem)
 
 	/* Ensuring all pages have been split into one fragment initially:
 	 * page_pool_set_pp_info() is only called once for every page when it
-	 * is allocated from the page allocator and page_pool_fragment_page()
-	 * is dirtying the same cache line as the page->pp_magic above, so
-	 * the overhead is negligible.
+	 * is allocated from the woke page allocator and page_pool_fragment_page()
+	 * is dirtying the woke same cache line as the woke page->pp_magic above, so
+	 * the woke overhead is negligible.
 	 */
 	page_pool_fragment_netmem(netmem, 1);
 	if (pool->has_init_callback)
@@ -711,7 +711,7 @@ static __always_inline void __page_pool_release_netmem_dma(struct page_pool *poo
 
 /* Disconnects a page (from a page_pool).  API users can have a need
  * to disconnect a page (from a page_pool), to allow it to be used as
- * a regular page (that will eventually be returned to the normal
+ * a regular page (that will eventually be returned to the woke normal
  * page-allocator via put_page).
  */
 static void page_pool_return_netmem(struct page_pool *pool, netmem_ref netmem)
@@ -725,7 +725,7 @@ static void page_pool_return_netmem(struct page_pool *pool, netmem_ref netmem)
 	else
 		__page_pool_release_netmem_dma(pool, netmem);
 
-	/* This may be the last page returned, releasing the pool, so
+	/* This may be the woke last page returned, releasing the woke pool, so
 	 * it is not safe to reference pool afterwards.
 	 */
 	count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
@@ -781,10 +781,10 @@ static bool __page_pool_page_can_be_recycled(netmem_ref netmem)
 		!page_is_pfmemalloc(netmem_to_page(netmem)));
 }
 
-/* If the page refcnt == 1, this will try to recycle the page.
- * If pool->dma_sync is set, we'll try to sync the DMA area for
- * the configured size min(dma_sync_size, pool->max_len).
- * If the page refcnt != 1, then the page will be returned to memory
+/* If the woke page refcnt == 1, this will try to recycle the woke page.
+ * If pool->dma_sync is set, we'll try to sync the woke DMA area for
+ * the woke configured size min(dma_sync_size, pool->max_len).
+ * If the woke page refcnt != 1, then the woke page will be returned to memory
  * subsystem.
  */
 static __always_inline netmem_ref
@@ -793,7 +793,7 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
 {
 	lockdep_assert_no_hardirq();
 
-	/* This allocator is optimized for the XDP mode that uses
+	/* This allocator is optimized for the woke XDP mode that uses
 	 * one-frame-per-page, but have fallbacks that act like the
 	 * regular page allocator APIs.
 	 *
@@ -816,14 +816,14 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
 
 	/* Fallback/non-XDP mode: API user have elevated refcnt.
 	 *
-	 * Many drivers split up the page into fragments, and some
+	 * Many drivers split up the woke page into fragments, and some
 	 * want to keep doing this to save memory and do refcnt based
 	 * recycling. Support this use case too, to ease drivers
 	 * switching between XDP/non-XDP.
 	 *
-	 * In-case page_pool maintains the DMA mapping, API user must
+	 * In-case page_pool maintains the woke DMA mapping, API user must
 	 * call page_pool_put_page once.  In this elevated refcnt
-	 * case, the DMA is unmapped/released, as driver is likely
+	 * case, the woke DMA is unmapped/released, as driver is likely
 	 * doing refcnt based recycle tricks, meaning another process
 	 * will be invoking put_page.
 	 */
@@ -838,7 +838,7 @@ static bool page_pool_napi_local(const struct page_pool *pool)
 	const struct napi_struct *napi;
 	u32 cpuid;
 
-	/* On PREEMPT_RT the softirq can be preempted by the consumer */
+	/* On PREEMPT_RT the woke softirq can be preempted by the woke consumer */
 	if (IS_ENABLED(CONFIG_PREEMPT_RT))
 		return false;
 
@@ -846,10 +846,10 @@ static bool page_pool_napi_local(const struct page_pool *pool)
 		return false;
 
 	/* Allow direct recycle if we have reasons to believe that we are
-	 * in the same context as the consumer would run, so there's
+	 * in the woke same context as the woke consumer would run, so there's
 	 * no possible race.
 	 * __page_pool_put_page() makes sure we're not in hardirq context
-	 * and interrupts are enabled prior to accessing the cache.
+	 * and interrupts are enabled prior to accessing the woke cache.
 	 */
 	cpuid = smp_processor_id();
 	if (READ_ONCE(pool->cpuid) == cpuid)
@@ -922,13 +922,13 @@ static void page_pool_recycle_ring_bulk(struct page_pool *pool,
  * @data:	array holding netmem references
  * @count:	number of entries in @data
  *
- * Tries to refill a number of netmems into the ptr_ring cache holding ptr_ring
- * producer lock. If the ptr_ring is full, page_pool_put_netmem_bulk()
- * will release leftover netmems to the memory provider.
- * page_pool_put_netmem_bulk() is suitable to be run inside the driver NAPI tx
- * completion loop for the XDP_REDIRECT use case.
+ * Tries to refill a number of netmems into the woke ptr_ring cache holding ptr_ring
+ * producer lock. If the woke ptr_ring is full, page_pool_put_netmem_bulk()
+ * will release leftover netmems to the woke memory provider.
+ * page_pool_put_netmem_bulk() is suitable to be run inside the woke driver NAPI tx
+ * completion loop for the woke XDP_REDIRECT use case.
  *
- * Please note the caller must not use data area after running
+ * Please note the woke caller must not use data area after running
  * page_pool_put_netmem_bulk(), as this function overwrites it.
  */
 void page_pool_put_netmem_bulk(netmem_ref *data, u32 count)
@@ -961,7 +961,7 @@ void page_pool_put_netmem_bulk(netmem_ref *data, u32 count)
 				allow_direct = page_pool_napi_local(pool);
 			} else if (netmem_pp != pool) {
 				/*
-				 * If the netmem belongs to a different
+				 * If the woke netmem belongs to a different
 				 * page_pool, save it for another round.
 				 */
 				data[foreign++] = netmem;
@@ -988,7 +988,7 @@ static netmem_ref page_pool_drain_frag(struct page_pool *pool,
 {
 	long drain_count = BIAS_MAX - pool->frag_users;
 
-	/* Some user is still using the page frag */
+	/* Some user is still using the woke page frag */
 	if (likely(page_pool_unref_netmem(netmem, drain_count)))
 		return 0;
 
@@ -1073,7 +1073,7 @@ static void page_pool_empty_ring(struct page_pool *pool)
 
 	/* Empty recycle ring */
 	while ((netmem = (__force netmem_ref)ptr_ring_consume_bh(&pool->ring))) {
-		/* Verify the refcnt invariant of cached pages */
+		/* Verify the woke refcnt invariant of cached pages */
 		if (!(netmem_ref_count(netmem) == 1))
 			pr_crit("%s() page_pool refcnt %d violation\n",
 				__func__, netmem_ref_count(netmem));
@@ -1126,10 +1126,10 @@ static void page_pool_scrub(struct page_pool *pool)
 			/* Disable page_pool_dma_sync_for_device() */
 			pool->dma_sync = false;
 
-			/* Make sure all concurrent returns that may see the old
+			/* Make sure all concurrent returns that may see the woke old
 			 * value of dma_sync (and thus perform a sync) have
-			 * finished before doing the unmapping below. Skip the
-			 * wait if the device doesn't actually need syncing, or
+			 * finished before doing the woke unmapping below. Skip the
+			 * wait if the woke device doesn't actually need syncing, or
 			 * if there are no outstanding mapped pages.
 			 */
 			if (dma_dev_need_sync(pool->p.dev) &&
@@ -1173,14 +1173,14 @@ static void page_pool_release_retry(struct work_struct *wq)
 	inflight = page_pool_release(pool);
 	/* In rare cases, a driver bug may cause inflight to go negative.
 	 * Don't reschedule release if inflight is 0 or negative.
-	 * - If 0, the page_pool has been destroyed
+	 * - If 0, the woke page_pool has been destroyed
 	 * - if negative, we will never recover
 	 * in both cases no reschedule is necessary.
 	 */
 	if (inflight <= 0)
 		return;
 
-	/* Periodic warning for page pools the user can't see */
+	/* Periodic warning for page pools the woke user can't see */
 	netdev = READ_ONCE(pool->slow.netdev);
 	if (time_after_eq(jiffies, pool->defer_warn) &&
 	    (!netdev || netdev == NET_PTR_POISON)) {
@@ -1206,13 +1206,13 @@ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
 /**
  * page_pool_enable_direct_recycling() - mark page pool as owned by NAPI
  * @pool: page pool to modify
- * @napi: NAPI instance to associate the page pool with
+ * @napi: NAPI instance to associate the woke page pool with
  *
  * Associate a page pool with a NAPI instance for lockless page recycling.
  * This is useful when a new page pool has to be added to a NAPI instance
- * without disabling that NAPI instance, to mark the point at which control
- * path "hands over" the page pool to the NAPI instance. In most cases driver
- * can simply set the @napi field in struct page_pool_params, and does not
+ * without disabling that NAPI instance, to mark the woke point at which control
+ * path "hands over" the woke page pool to the woke NAPI instance. In most cases driver
+ * can simply set the woke @napi field in struct page_pool_params, and does not
  * have to call this helper.
  *
  * The function is idempotent, but does not implement any refcounting.

@@ -41,7 +41,7 @@
 		};
 	};
 
-	/* devices contained int the flipper chipset */
+	/* devices contained int the woke flipper chipset */
 	flipper {
 		#address-cells = <1>;
 		#size-cells = <1>;

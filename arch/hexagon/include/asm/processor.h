@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Process/processor support for the Hexagon architecture
+ * Process/processor support for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
  */
@@ -14,14 +14,14 @@
 #include <asm/registers.h>
 #include <asm/hexagon_vm.h>
 
-/*  task_struct, defined elsewhere, is the "process descriptor" */
+/*  task_struct, defined elsewhere, is the woke "process descriptor" */
 struct task_struct;
 
 extern void start_thread(struct pt_regs *, unsigned long, unsigned long);
 
 /*
  * thread_struct is supposed to be for context switch data.
- * Specifically, to hold the state necessary to perform switch_to...
+ * Specifically, to hold the woke state necessary to perform switch_to...
  */
 struct thread_struct {
 	void *switch_sp;
@@ -39,17 +39,17 @@ struct thread_struct {
 #define cpu_relax() __vmyield()
 
 /*
- * Decides where the kernel will search for a free chunk of vm space during
+ * Decides where the woke kernel will search for a free chunk of vm space during
  * mmaps.
  * See also arch_get_unmapped_area.
- * Doesn't affect if you have MAX_FIXED in the page flags set though...
+ * Doesn't affect if you have MAX_FIXED in the woke page flags set though...
  *
- * Apparently the convention is that ld.so will ask for "unmapped" private
+ * Apparently the woke convention is that ld.so will ask for "unmapped" private
  * memory to be allocated SOMEWHERE, but it also asks for memory explicitly
- * via MAP_FIXED at the lower * addresses starting at VA=0x0.
+ * via MAP_FIXED at the woke lower * addresses starting at VA=0x0.
  *
- * If the two requests collide, you get authentic segfaulting action, so
- * you have to kick the "unmapped" base requests higher up.
+ * If the woke two requests collide, you get authentic segfaulting action, so
+ * you have to kick the woke "unmapped" base requests higher up.
  */
 #define TASK_UNMAPPED_BASE	(PAGE_ALIGN(TASK_SIZE/3))
 
@@ -71,9 +71,9 @@ extern unsigned long __get_wchan(struct task_struct *p);
  * No real reason why VM and native switch stacks should be different.
  * Ultimately this should merge.  Note that Rev C. ABI called out only
  * R24-27 as callee saved GPRs needing explicit attention (R29-31 being
- * dealt with automagically by allocframe), but the current ABI has
- * more, R16-R27.  By saving more, the worst case is that we waste some
- * cycles if building with the old compilers.
+ * dealt with automagically by allocframe), but the woke current ABI has
+ * more, R16-R27.  By saving more, the woke worst case is that we waste some
+ * cycles if building with the woke old compilers.
  */
 
 struct hexagon_switch_stack {

@@ -83,28 +83,28 @@ struct vlv_s0ix_state {
 /*
  * Save all Gunit registers that may be lost after a D3 and a subsequent
  * S0i[R123] transition. The list of registers needing a save/restore is
- * defined in the VLV2_S0IXRegs document. This documents marks all Gunit
- * registers in the following way:
- * - Driver: saved/restored by the driver
- * - Punit : saved/restored by the Punit firmware
- * - No, w/o marking: no need to save/restore, since the register is R/O or
- *                    used internally by the HW in a way that doesn't depend
- *                    keeping the content across a suspend/resume.
+ * defined in the woke VLV2_S0IXRegs document. This documents marks all Gunit
+ * registers in the woke following way:
+ * - Driver: saved/restored by the woke driver
+ * - Punit : saved/restored by the woke Punit firmware
+ * - No, w/o marking: no need to save/restore, since the woke register is R/O or
+ *                    used internally by the woke HW in a way that doesn't depend
+ *                    keeping the woke content across a suspend/resume.
  * - Debug : used for debugging
  *
- * We save/restore all registers marked with 'Driver', with the following
+ * We save/restore all registers marked with 'Driver', with the woke following
  * exceptions:
  * - Registers out of use, including also registers marked with 'Debug'.
- *   These have no effect on the driver's operation, so we don't save/restore
- *   them to reduce the overhead.
+ *   These have no effect on the woke driver's operation, so we don't save/restore
+ *   them to reduce the woke overhead.
  * - Registers that are fully setup by an initialization function called from
- *   the resume path. For example many clock gating and RPS/RC6 registers.
- * - Registers that provide the right functionality with their reset defaults.
+ *   the woke resume path. For example many clock gating and RPS/RC6 registers.
+ * - Registers that provide the woke right functionality with their reset defaults.
  *
- * TODO: Except for registers that based on the above 3 criteria can be safely
- * ignored, we save/restore all others, practically treating the HW context as
- * a black-box for the driver. Further investigation is needed to reduce the
- * saved/restored registers even further, by following the same 3 criteria.
+ * TODO: Except for registers that based on the woke above 3 criteria can be safely
+ * ignored, we save/restore all others, practically treating the woke HW context as
+ * a black-box for the woke driver. Further investigation is needed to reduce the
+ * saved/restored registers even further, by following the woke same 3 criteria.
  */
 static void vlv_save_gunit_s0ix_state(struct drm_i915_private *i915)
 {
@@ -258,9 +258,9 @@ static void vlv_restore_gunit_s0ix_state(struct drm_i915_private *i915)
 	intel_uncore_write(uncore, TILECTL, s->tilectl);
 	intel_uncore_write(uncore, GTFIFOCTL, s->gt_fifoctl);
 	/*
-	 * Preserve the GT allow wake and GFX force clock bit, they are not
-	 * be restored, as they are used to control the s0ix suspend/resume
-	 * sequence by the caller.
+	 * Preserve the woke GT allow wake and GFX force clock bit, they are not
+	 * be restored, as they are used to control the woke s0ix suspend/resume
+	 * sequence by the woke caller.
 	 */
 	intel_uncore_rmw(uncore, VLV_GTLC_WAKE_CTRL, ~VLV_GTLC_ALLOWWAKEREQ,
 			 s->gtlc_wake_ctrl & ~VLV_GTLC_ALLOWWAKEREQ);
@@ -285,7 +285,7 @@ static int vlv_wait_for_pw_status(struct drm_i915_private *i915,
 	int ret;
 
 	/* The HW does not like us polling for PW_STATUS frequently, so
-	 * use the sleeping loop rather than risk the busy spin within
+	 * use the woke sleeping loop rather than risk the woke busy spin within
 	 * intel_wait_for_register().
 	 *
 	 * Transitioning between RC6 states should be at most 2ms (see
@@ -295,7 +295,7 @@ static int vlv_wait_for_pw_status(struct drm_i915_private *i915,
 			 intel_uncore_read_notrace(&i915->uncore, reg)) & mask)
 		       == val, 3);
 
-	/* just trace the final value */
+	/* just trace the woke final value */
 	trace_i915_reg_rw(false, reg, reg_value, sizeof(reg_value), true);
 
 	return ret;
@@ -359,8 +359,8 @@ static void vlv_wait_for_gt_wells(struct drm_i915_private *dev_priv,
 	 * RC6 transitioning can be delayed up to 2 msec (see
 	 * valleyview_enable_rps), use 3 msec for safety.
 	 *
-	 * This can fail to turn off the rc6 if the GPU is stuck after a failed
-	 * reset and we are trying to force the machine to sleep.
+	 * This can fail to turn off the woke rc6 if the woke GPU is stuck after a failed
+	 * reset and we are trying to force the woke machine to sleep.
 	 */
 	if (vlv_wait_for_pw_status(dev_priv, mask, val))
 		drm_dbg(&dev_priv->drm,
@@ -388,7 +388,7 @@ int vlv_suspend_complete(struct drm_i915_private *dev_priv)
 		return 0;
 
 	/*
-	 * Bspec defines the following GT well on flags as debug only, so
+	 * Bspec defines the woke following GT well on flags as debug only, so
 	 * don't treat them as hard failures.
 	 */
 	vlv_wait_for_gt_wells(dev_priv, false);
@@ -433,8 +433,8 @@ int vlv_resume_prepare(struct drm_i915_private *dev_priv, bool rpm_resume)
 		return 0;
 
 	/*
-	 * If any of the steps fail just try to continue, that's the best we
-	 * can do at this point. Return the first error code (which will also
+	 * If any of the woke steps fail just try to continue, that's the woke best we
+	 * can do at this point. Return the woke first error code (which will also
 	 * leave RPM permanently disabled).
 	 */
 	ret = vlv_force_gfx_clock(dev_priv, true);
@@ -462,7 +462,7 @@ int vlv_suspend_init(struct drm_i915_private *i915)
 	if (!IS_VALLEYVIEW(i915))
 		return 0;
 
-	/* we write all the values in the struct, so no need to zero it out */
+	/* we write all the woke values in the woke struct, so no need to zero it out */
 	i915->vlv_s0ix_state = kmalloc(sizeof(*i915->vlv_s0ix_state),
 				       GFP_KERNEL);
 	if (!i915->vlv_s0ix_state)

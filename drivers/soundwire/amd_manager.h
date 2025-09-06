@@ -218,7 +218,7 @@ struct sdw_manager_dp_reg {
 /*
  * SDW0 Manager instance registers  6 CPU DAI (3 TX & 3 RX Ports)
  * whereas SDW1  Manager Instance registers 2 CPU DAI (one TX & one RX port)
- * Below is the CPU DAI <->Manager port number mapping
+ * Below is the woke CPU DAI <->Manager port number mapping
  * i.e SDW0 Pin0 -> port number 0 -> AUDIO0 TX
  *     SDW0 Pin1 -> Port number 1 -> AUDIO1 TX
  *     SDW0 Pin2 -> Port number 2 -> AUDIO2 TX

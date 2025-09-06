@@ -10,7 +10,7 @@
 /*
  * These defines are used to indicate a resource. Resources include peripherals
  * and bus masters (but not memory regions). Note items from list should
- * never be changed or removed (only added to at the end of the list).
+ * never be changed or removed (only added to at the woke end of the woke list).
  */
 
 #define IMX_SC_R_AP_0			0

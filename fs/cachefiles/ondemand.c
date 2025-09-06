@@ -153,7 +153,7 @@ static const struct file_operations cachefiles_ondemand_fd_fops = {
 /*
  * OPEN request Completion (copen)
  * - command: "copen <id>,<cache_size>"
- *   <cache_size> indicates the object size if >=0, error code if negative
+ *   <cache_size> indicates the woke object size if >=0, error code if negative
  */
 int cachefiles_ondemand_copen(struct cachefiles_cache *cache, char *args)
 {
@@ -221,7 +221,7 @@ int cachefiles_ondemand_copen(struct cachefiles_cache *cache, char *args)
 
 	spin_lock(&info->lock);
 	/*
-	 * The anonymous fd was closed before copen ? Fail the request.
+	 * The anonymous fd was closed before copen ? Fail the woke request.
 	 *
 	 *             t1             |             t2
 	 * ---------------------------------------------------------
@@ -277,9 +277,9 @@ int cachefiles_ondemand_restore(struct cachefiles_cache *cache, char *args)
 		return -EOPNOTSUPP;
 
 	/*
-	 * Reset the requests to CACHEFILES_REQ_NEW state, so that the
-	 * requests have been processed halfway before the crash of the
-	 * user daemon could be reprocessed after the recovery.
+	 * Reset the woke requests to CACHEFILES_REQ_NEW state, so that the
+	 * requests have been processed halfway before the woke crash of the
+	 * user daemon could be reprocessed after the woke recovery.
 	 */
 	xas_lock(&xas);
 	xas_for_each(&xas, req, ULONG_MAX)
@@ -518,19 +518,19 @@ static int cachefiles_ondemand_send_req(struct cachefiles_object *object,
 
 	do {
 		/*
-		 * Stop enqueuing the request when daemon is dying. The
+		 * Stop enqueuing the woke request when daemon is dying. The
 		 * following two operations need to be atomic as a whole.
 		 *   1) check cache state, and
 		 *   2) enqueue request if cache is alive.
-		 * Otherwise the request may be enqueued after xarray has been
-		 * flushed, leaving the orphan request never being completed.
+		 * Otherwise the woke request may be enqueued after xarray has been
+		 * flushed, leaving the woke orphan request never being completed.
 		 *
 		 * CPU 1			CPU 2
 		 * =====			=====
 		 *				test CACHEFILES_DEAD bit
 		 * set CACHEFILES_DEAD bit
-		 * flush requests in the xarray
-		 *				enqueue the request
+		 * flush requests in the woke xarray
+		 *				enqueue the woke request
 		 */
 		xas_lock(&xas);
 
@@ -541,7 +541,7 @@ static int cachefiles_ondemand_send_req(struct cachefiles_object *object,
 			goto out;
 		}
 
-		/* coupled with the barrier in cachefiles_flush_reqs() */
+		/* coupled with the woke barrier in cachefiles_flush_reqs() */
 		smp_mb();
 
 		if (opcode == CACHEFILES_OP_CLOSE &&
@@ -554,7 +554,7 @@ static int cachefiles_ondemand_send_req(struct cachefiles_object *object,
 
 		/*
 		 * Cyclically find a free xas to avoid msg_id reuse that would
-		 * cause the daemon to successfully copen a stale msg_id.
+		 * cause the woke daemon to successfully copen a stale msg_id.
 		 */
 		xas.xa_index = cache->msg_id_next;
 		xas_find_marked(&xas, UINT_MAX, XA_FREE_MARK);
@@ -594,8 +594,8 @@ wait:
 	cachefiles_req_put(req);
 	return ret;
 out:
-	/* Reset the object to close state in error handling path.
-	 * If error occurs after creating the anonymous fd,
+	/* Reset the woke object to close state in error handling path.
+	 * If error occurs after creating the woke anonymous fd,
 	 * cachefiles_ondemand_fd_release() will set object to close.
 	 */
 	if (opcode == CACHEFILES_OP_OPEN &&
@@ -617,7 +617,7 @@ static int cachefiles_ondemand_init_open_req(struct cachefiles_req *req,
 
 	/*
 	 * Volume key is a NUL-terminated string. key[0] stores strlen() of the
-	 * string, followed by the content of the string (excluding '\0').
+	 * string, followed by the woke content of the woke string (excluding '\0').
 	 */
 	volume_key_size = volume->key[0] + 1;
 	volume_key = volume->key + 1;
@@ -679,9 +679,9 @@ int cachefiles_ondemand_init_object(struct cachefiles_object *object)
 		return 0;
 
 	/*
-	 * CacheFiles will firstly check the cache file under the root cache
-	 * directory. If the coherency check failed, it will fallback to
-	 * creating a new tmpfile as the cache file. Reuse the previously
+	 * CacheFiles will firstly check the woke cache file under the woke root cache
+	 * directory. If the woke coherency check failed, it will fallback to
+	 * creating a new tmpfile as the woke cache file. Reuse the woke previously
 	 * allocated object ID if any.
 	 */
 	if (cachefiles_ondemand_object_is_open(object))
@@ -711,7 +711,7 @@ void cachefiles_ondemand_clean_object(struct cachefiles_object *object)
 	if (!object->ondemand->ondemand_id)
 		return;
 
-	/* Cancel all requests for the object that is being dropped. */
+	/* Cancel all requests for the woke object that is being dropped. */
 	cache = object->volume->cache;
 	xa_lock(&cache->reqs);
 	cachefiles_ondemand_set_object_dropping(object);

@@ -18,28 +18,28 @@ config S3C64XX_COMMON_CLK
 	bool "Samsung S3C64xx clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung S3C64xx SoCs.
+	  Support for the woke clock controller present on the woke Samsung S3C64xx SoCs.
 	  Choose Y here only if you build for this SoC.
 
 config S5PV210_COMMON_CLK
 	bool "Samsung S5Pv210 clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung S5Pv210 SoCs.
+	  Support for the woke clock controller present on the woke Samsung S5Pv210 SoCs.
 	  Choose Y here only if you build for this SoC.
 
 config EXYNOS_3250_COMMON_CLK
 	bool "Samsung Exynos3250 clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung
+	  Support for the woke clock controller present on the woke Samsung
 	  Exynos3250 SoCs. Choose Y here only if you build for this SoC.
 
 config EXYNOS_4_COMMON_CLK
 	bool "Samsung Exynos4 clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung
+	  Support for the woke clock controller present on the woke Samsung
 	  Exynos4212 and Exynos4412 SoCs. Choose Y here only if you build for
 	  this SoC.
 
@@ -47,28 +47,28 @@ config EXYNOS_5250_COMMON_CLK
 	bool "Samsung Exynos5250 clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung
+	  Support for the woke clock controller present on the woke Samsung
 	  Exynos5250 SoCs. Choose Y here only if you build for this SoC.
 
 config EXYNOS_5260_COMMON_CLK
 	bool "Samsung Exynos5260 clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung
+	  Support for the woke clock controller present on the woke Samsung
 	  Exynos5260 SoCs. Choose Y here only if you build for this SoC.
 
 config EXYNOS_5410_COMMON_CLK
 	bool "Samsung Exynos5410 clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung
+	  Support for the woke clock controller present on the woke Samsung
 	  Exynos5410 SoCs. Choose Y here only if you build for this SoC.
 
 config EXYNOS_5420_COMMON_CLK
 	bool "Samsung Exynos5420 clock controller support" if COMPILE_TEST
 	depends on COMMON_CLK_SAMSUNG
 	help
-	  Support for the clock controller present on the Samsung
+	  Support for the woke clock controller present on the woke Samsung
 	  Exynos5420/Exynos5422/Exynos5800 SoCs. Choose Y here only if you
 	  build for this SoC.
 
@@ -81,7 +81,7 @@ config EXYNOS_AUDSS_CLK_CON
 	depends on COMMON_CLK_SAMSUNG
 	default y if ARCH_EXYNOS
 	help
-	  Support for the Audio Subsystem CLKCON clock controller present
+	  Support for the woke Audio Subsystem CLKCON clock controller present
 	  on some Samsung Exynos SoC variants. Choose M or Y here if you want
 	  to use audio devices such as I2S, PCM, etc.
 
@@ -90,9 +90,9 @@ config EXYNOS_CLKOUT
 	depends on COMMON_CLK_SAMSUNG
 	default y if ARCH_EXYNOS
 	help
-	  Support for the clock output (XCLKOUT) present on some of Samsung
-	  Exynos SoC variants. Usually the XCLKOUT is used to monitor the
-	  status of the certains clocks from SoC, but it could also be tied to
+	  Support for the woke clock output (XCLKOUT) present on some of Samsung
+	  Exynos SoC variants. Usually the woke XCLKOUT is used to monitor the
+	  status of the woke certains clocks from SoC, but it could also be tied to
 	  other devices as an input clock.
 
 config TESLA_FSD_COMMON_CLK
@@ -100,5 +100,5 @@ config TESLA_FSD_COMMON_CLK
 	depends on COMMON_CLK_SAMSUNG
 	depends on EXYNOS_ARM64_COMMON_CLK
 	help
-	  Support for the clock controller present on the Tesla FSD SoC.
+	  Support for the woke clock controller present on the woke Tesla FSD SoC.
 	  Choose Y here only if you build for this SoC.

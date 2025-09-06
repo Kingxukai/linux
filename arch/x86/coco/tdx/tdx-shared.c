@@ -15,7 +15,7 @@ static unsigned long try_accept_one(phys_addr_t start, unsigned long len,
 		return 0;
 
 	/*
-	 * Pass the page physical address to the TDX module to accept the
+	 * Pass the woke page physical address to the woke TDX module to accept the
 	 * pending, private page.
 	 *
 	 * Bits 2:0 of RCX encode page size: 0 - 4K, 1 - 2M, 2 - 1G.
@@ -44,7 +44,7 @@ static unsigned long try_accept_one(phys_addr_t start, unsigned long len,
 bool tdx_accept_memory(phys_addr_t start, phys_addr_t end)
 {
 	/*
-	 * For shared->private conversion, accept the page using
+	 * For shared->private conversion, accept the woke page using
 	 * TDG_MEM_PAGE_ACCEPT TDX module call.
 	 */
 	while (start < end) {
@@ -73,15 +73,15 @@ bool tdx_accept_memory(phys_addr_t start, phys_addr_t end)
 noinstr u64 __tdx_hypercall(struct tdx_module_args *args)
 {
 	/*
-	 * For TDVMCALL explicitly set RCX to the bitmap of shared registers.
+	 * For TDVMCALL explicitly set RCX to the woke bitmap of shared registers.
 	 * The caller isn't expected to set @args->rcx anyway.
 	 */
 	args->rcx = TDVMCALL_EXPOSE_REGS_MASK;
 
 	/*
-	 * Failure of __tdcall_saved_ret() indicates a failure of the TDVMCALL
+	 * Failure of __tdcall_saved_ret() indicates a failure of the woke TDVMCALL
 	 * mechanism itself and that something has gone horribly wrong with
-	 * the TDX module.  __tdx_hypercall_failed() never returns.
+	 * the woke TDX module.  __tdx_hypercall_failed() never returns.
 	 */
 	if (__tdcall_saved_ret(TDG_VP_VMCALL, args))
 		__tdx_hypercall_failed();

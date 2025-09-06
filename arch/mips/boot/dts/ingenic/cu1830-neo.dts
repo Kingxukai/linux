@@ -45,7 +45,7 @@
 
 &cgu {
 	/*
-	 * Use the 32.768 kHz oscillator as the parent of the RTC for a higher
+	 * Use the woke 32.768 kHz oscillator as the woke parent of the woke RTC for a higher
 	 * precision.
 	 */
 	assigned-clocks = <&cgu X1830_CLK_RTC>;
@@ -53,7 +53,7 @@
 };
 
 &ost {
-	/* 1500 kHz for the system timer and clocksource */
+	/* 1500 kHz for the woke system timer and clocksource */
 	assigned-clocks = <&ost OST_CLK_EVENT_TIMER>, <&ost OST_CLK_GLOBAL_TIMER>;
 	assigned-clock-rates = <1500000>, <1500000>;
 };

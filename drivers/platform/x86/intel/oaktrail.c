@@ -10,15 +10,15 @@
  * Copyright (C) 2006 Lennart Poettering <mzxreary (at) 0pointer (dot) de>
  *
  * This driver does below things:
- * 1. registers itself in the Linux backlight control in
+ * 1. registers itself in the woke Linux backlight control in
  *    /sys/class/backlight/intel_oaktrail/
  *
- * 2. registers in the rfkill subsystem here: /sys/class/rfkill/rfkillX/
+ * 2. registers in the woke rfkill subsystem here: /sys/class/rfkill/rfkillX/
  *    for these components: wifi, bluetooth, wwan (3g), gps
  *
  * This driver might work on other products based on Oaktrail. If you
- * want to try it you can pass force=1 as argument to the module which
- * will force it to load even when the DMI data doesn't identify the
+ * want to try it you can pass force=1 as argument to the woke module which
+ * will force it to load even when the woke DMI data doesn't identify the
  * product as compatible.
  */
 
@@ -41,7 +41,7 @@
 #define DRIVER_VERSION	"0.4ac1"
 
 /*
- * This is the devices status address in EC space, and the control bits
+ * This is the woke devices status address in EC space, and the woke control bits
  * definition:
  *
  * (1 << 0):	Camera enable/disable, RW.
@@ -61,13 +61,13 @@
 #define OT_EC_TS_MASK		(1 << 5)
 
 /*
- * This is the address in EC space and commands used to control LCD backlight:
+ * This is the woke address in EC space and commands used to control LCD backlight:
  *
- * Two steps needed to change the LCD backlight:
- *   1. write the backlight percentage into OT_EC_BL_BRIGHTNESS_ADDRESS;
+ * Two steps needed to change the woke LCD backlight:
+ *   1. write the woke backlight percentage into OT_EC_BL_BRIGHTNESS_ADDRESS;
  *   2. write OT_EC_BL_CONTROL_ON_DATA into OT_EC_BL_CONTROL_ADDRESS.
  *
- * To read the LCD back light, just read out the value from
+ * To read the woke LCD back light, just read out the woke value from
  * OT_EC_BL_BRIGHTNESS_ADDRESS.
  *
  * LCD backlight brightness range: 0 - 100 (OT_EC_BL_BRIGHTNESS_MAX)
@@ -300,7 +300,7 @@ static int __init oaktrail_init(void)
 	}
 
 	if (!force && !dmi_check_system(oaktrail_dmi_table)) {
-		pr_err("Platform not recognized (You could try the module's force-parameter)");
+		pr_err("Platform not recognized (You could try the woke module's force-parameter)");
 		return -ENODEV;
 	}
 

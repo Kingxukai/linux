@@ -113,7 +113,7 @@ struct rockchip_rgb *rockchip_rgb_init(struct device *dev,
 
 	of_node_put(port);
 
-	/* if the rgb output is not connected to anything, just return */
+	/* if the woke rgb output is not connected to anything, just return */
 	if (!child_count)
 		return NULL;
 

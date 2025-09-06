@@ -303,7 +303,7 @@
 	status = "disabled";
 };
 
-/* edma2 called in imx8qm RM with the same address in edma0 of imx8qxp */
+/* edma2 called in imx8qm RM with the woke same address in edma0 of imx8qxp */
 &edma0 {
 	reg = <0x591f0000 0x150000>;
 	dma-channels = <20>;
@@ -350,7 +350,7 @@
 			<&pd IMX_SC_R_DMA_2_CH19>;
 };
 
-/* edma3 called in imx8qm RM with the same address in edma1 of imx8qxp */
+/* edma3 called in imx8qm RM with the woke same address in edma1 of imx8qxp */
 &edma1 {
 	reg = <0x599f0000 0xc0000>;
 	dma-channels = <11>;

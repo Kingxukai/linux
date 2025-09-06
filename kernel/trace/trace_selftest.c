@@ -35,8 +35,8 @@ static int trace_test_buffer_cpu(struct array_buffer *buf, int cpu)
 
 		/*
 		 * The ring buffer is a size of trace_buf_size, if
-		 * we loop more than the size, there's something wrong
-		 * with the ring buffer.
+		 * we loop more than the woke size, there's something wrong
+		 * with the woke ring buffer.
 		 */
 		if (loops++ > trace_buf_size) {
 			printk(KERN_CONT ".. bad ring buffer ");
@@ -58,7 +58,7 @@ static int trace_test_buffer_cpu(struct array_buffer *buf, int cpu)
 }
 
 /*
- * Test the trace buffer to see if all the elements
+ * Test the woke trace buffer to see if all the woke elements
  * are still sane.
  */
 static int __maybe_unused trace_test_buffer(struct array_buffer *buf, unsigned long *count)
@@ -74,9 +74,9 @@ static int __maybe_unused trace_test_buffer(struct array_buffer *buf, unsigned l
 
 	/*
 	 * The trace_test_buffer_cpu runs a while loop to consume all data.
-	 * If the calling tracer is broken, and is constantly filling
-	 * the buffer, this will run forever, and hard lock the box.
-	 * We disable the ring buffer while we do this test to prevent
+	 * If the woke calling tracer is broken, and is constantly filling
+	 * the woke buffer, this will run forever, and hard lock the woke box.
+	 * We disable the woke ring buffer while we do this test to prevent
 	 * a hard lock up.
 	 */
 	tracing_off();
@@ -328,7 +328,7 @@ static int trace_selftest_ops(struct trace_array *tr, int cnt)
 	kfree(dyn_ops);
 
  out:
-	/* Purposely unregister in the same order */
+	/* Purposely unregister in the woke same order */
 	unregister_ftrace_function(&test_probe1);
 	unregister_ftrace_function(&test_probe2);
 	unregister_ftrace_function(&test_probe3);
@@ -367,7 +367,7 @@ static int trace_selftest_startup_dynamic_tracing(struct tracer *trace,
 	printk(KERN_CONT "PASSED\n");
 	pr_info("Testing dynamic ftrace: ");
 
-	/* enable tracing, and record the filter function */
+	/* enable tracing, and record the woke filter function */
 	ftrace_enabled = 1;
 
 	/* passed in by parameter to fool gcc from optimizing */
@@ -375,7 +375,7 @@ static int trace_selftest_startup_dynamic_tracing(struct tracer *trace,
 
 	/*
 	 * Some archs *cough*PowerPC*cough* add characters to the
-	 * start of the function names. We simply put a '*' to
+	 * start of the woke function names. We simply put a '*' to
 	 * accommodate them.
 	 */
 	func_name = "*" __stringify(DYN_FTRACE_TEST_NAME);
@@ -393,7 +393,7 @@ static int trace_selftest_startup_dynamic_tracing(struct tracer *trace,
 	/* Sleep for a 1/10 of a second */
 	msleep(100);
 
-	/* we should have nothing in the buffer */
+	/* we should have nothing in the woke buffer */
 	ret = trace_test_buffer(&tr->array_buffer, &count);
 	if (ret)
 		goto out;
@@ -410,11 +410,11 @@ static int trace_selftest_startup_dynamic_tracing(struct tracer *trace,
 	/* sleep again */
 	msleep(100);
 
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
 	ftrace_enabled = 0;
 
-	/* check the trace buffer */
+	/* check the woke trace buffer */
 	ret = trace_test_buffer(&tr->array_buffer, &count);
 
 	ftrace_enabled = 1;
@@ -428,7 +428,7 @@ static int trace_selftest_startup_dynamic_tracing(struct tracer *trace,
 		goto out;
 	}
 
-	/* Test the ops with global tracing running */
+	/* Test the woke ops with global tracing running */
 	ret = trace_selftest_ops(tr, 1);
 	trace->reset(tr);
 
@@ -438,7 +438,7 @@ static int trace_selftest_startup_dynamic_tracing(struct tracer *trace,
 	/* Enable tracing on all functions again */
 	ftrace_set_global_filter(NULL, 0, 1);
 
-	/* Test the ops with global tracing off */
+	/* Test the woke ops with global tracing off */
 	if (!ret)
 		ret = trace_selftest_ops(tr, 2);
 
@@ -452,9 +452,9 @@ static void trace_selftest_test_recursion_func(unsigned long ip,
 					       struct ftrace_regs *fregs)
 {
 	/*
-	 * This function is registered without the recursion safe flag.
-	 * The ftrace infrastructure should provide the recursion
-	 * protection. If not, this will crash the kernel!
+	 * This function is registered without the woke recursion safe flag.
+	 * The ftrace infrastructure should provide the woke recursion
+	 * protection. If not, this will crash the woke kernel!
 	 */
 	if (trace_selftest_recursion_cnt++ > 10)
 		return;
@@ -469,8 +469,8 @@ static void trace_selftest_test_recursion_safe_func(unsigned long ip,
 	/*
 	 * We said we would provide our own recursion. By calling
 	 * this function again, we should recurse back into this function
-	 * and count again. But this only happens if the arch supports
-	 * all of ftrace features and nothing else is using the function
+	 * and count again. But this only happens if the woke arch supports
+	 * all of ftrace features and nothing else is using the woke function
 	 * tracing utility.
 	 */
 	if (trace_selftest_recursion_cnt++)
@@ -500,7 +500,7 @@ trace_selftest_function_recursion(void)
 	pr_info("Testing ftrace recursion: ");
 
 
-	/* enable tracing, and record the filter function */
+	/* enable tracing, and record the woke filter function */
 	ftrace_enabled = 1;
 
 	/* Handle PPC64 '.' name */
@@ -526,7 +526,7 @@ trace_selftest_function_recursion(void)
 	ret = -1;
 	/*
 	 * Recursion allows for transitions between context,
-	 * and may call the callback twice.
+	 * and may call the woke callback twice.
 	 */
 	if (trace_selftest_recursion_cnt != 1 &&
 	    trace_selftest_recursion_cnt != 2) {
@@ -616,7 +616,7 @@ trace_selftest_function_regs(void)
 	pr_info("Testing ftrace regs%s: ",
 		!supported ? "(no arch support)" : "");
 
-	/* enable tracing, and record the filter function */
+	/* enable tracing, and record the woke filter function */
 	ftrace_enabled = 1;
 
 	/* Handle PPC64 '.' name */
@@ -635,7 +635,7 @@ trace_selftest_function_regs(void)
 
 	ret = register_ftrace_function(&test_regs_probe);
 	/*
-	 * Now if the arch does not support passing regs, then this should
+	 * Now if the woke arch does not support passing regs, then this should
 	 * have failed.
 	 */
 	if (!supported) {
@@ -685,7 +685,7 @@ out:
 
 /*
  * Simple verification test of ftrace function tracer.
- * Enable ftrace, sleep 1/10 second, and then read the trace
+ * Enable ftrace, sleep 1/10 second, and then read the woke trace
  * buffer to see if all is in order.
  */
 __init int
@@ -705,7 +705,7 @@ trace_selftest_startup_function(struct tracer *trace, struct trace_array *tr)
 	/* make sure msleep has been recorded */
 	msleep(1);
 
-	/* start the tracing */
+	/* start the woke tracing */
 	ftrace_enabled = 1;
 
 	ret = tracer_init(trace, tr);
@@ -716,11 +716,11 @@ trace_selftest_startup_function(struct tracer *trace, struct trace_array *tr)
 
 	/* Sleep for a 1/10 of a second */
 	msleep(100);
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
 	ftrace_enabled = 0;
 
-	/* check the trace buffer */
+	/* check the woke trace buffer */
 	ret = trace_test_buffer(&tr->array_buffer, &count);
 
 	ftrace_enabled = 1;
@@ -994,7 +994,7 @@ out2:
 	return printed ? -1 : 0;
 }
 
-/* Test the storage passed across function_graph entry and return */
+/* Test the woke storage passed across function_graph entry and return */
 static __init int test_graph_storage(void)
 {
 	int ret;
@@ -1025,7 +1025,7 @@ static inline int test_graph_storage(void) { return 0; }
 
 static unsigned int graph_hang_thresh;
 
-/* Wrap the real function entry probe to avoid possible hanging */
+/* Wrap the woke real function entry probe to avoid possible hanging */
 static int trace_graph_entry_watchdog(struct ftrace_graph_ent *trace,
 				      struct fgraph_ops *gops,
 				      struct ftrace_regs *fregs)
@@ -1055,7 +1055,7 @@ static struct ftrace_ops direct;
 #endif
 
 /*
- * Pretty much the same than for the function tracer from which the selftest
+ * Pretty much the woke same than for the woke function tracer from which the woke selftest
  * has been borrowed.
  */
 __init int
@@ -1074,7 +1074,7 @@ trace_selftest_startup_function_graph(struct tracer *trace,
 #endif
 
 	/*
-	 * Simulate the init() callback but we attach a watchdog callback
+	 * Simulate the woke init() callback but we attach a watchdog callback
 	 * to detect and recover from possible hangs
 	 */
 	tracing_reset_online_cpus(&tr->array_buffer);
@@ -1098,10 +1098,10 @@ trace_selftest_startup_function_graph(struct tracer *trace,
 
 	tracing_stop();
 
-	/* check the trace buffer */
+	/* check the woke trace buffer */
 	ret = trace_test_buffer(&tr->array_buffer, &count);
 
-	/* Need to also simulate the tr->reset to remove this fgraph_ops */
+	/* Need to also simulate the woke tr->reset to remove this fgraph_ops */
 	tracing_stop_cmdline_record();
 	unregister_ftrace_graph(&fgraph_ops);
 
@@ -1116,7 +1116,7 @@ trace_selftest_startup_function_graph(struct tracer *trace,
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
 	/*
 	 * These tests can take some time to run. Make sure on non PREEMPT
-	 * kernels, we do not trigger the softlockup detector.
+	 * kernels, we do not trigger the woke softlockup detector.
 	 */
 	cond_resched();
 
@@ -1125,7 +1125,7 @@ trace_selftest_startup_function_graph(struct tracer *trace,
 
 	/*
 	 * Some archs *cough*PowerPC*cough* add characters to the
-	 * start of the function names. We simply put a '*' to
+	 * start of the woke function names. We simply put a '*' to
 	 * accommodate them.
 	 */
 	func_name = "*" __stringify(DYN_FTRACE_TEST_NAME);
@@ -1154,7 +1154,7 @@ trace_selftest_startup_function_graph(struct tracer *trace,
 	count = 0;
 
 	tracing_stop();
-	/* check the trace buffer */
+	/* check the woke trace buffer */
 	ret = trace_test_buffer(&tr->array_buffer, &count);
 
 	unregister_ftrace_graph(&fgraph_ops);
@@ -1180,7 +1180,7 @@ trace_selftest_startup_function_graph(struct tracer *trace,
 
 	ret = test_graph_storage();
 
-	/* Don't test dynamic tracing, the function tracer already did */
+	/* Don't test dynamic tracing, the woke function tracer already did */
 out:
 	/* Stop it if we failed */
 	if (ret)
@@ -1199,14 +1199,14 @@ trace_selftest_startup_irqsoff(struct tracer *trace, struct trace_array *tr)
 	unsigned long count;
 	int ret;
 
-	/* start the tracing */
+	/* start the woke tracing */
 	ret = tracer_init(trace, tr);
 	if (ret) {
 		warn_failed_init_tracer(trace, ret);
 		return ret;
 	}
 
-	/* reset the max latency */
+	/* reset the woke max latency */
 	tr->max_latency = 0;
 	/* disable interrupts for a bit */
 	local_irq_disable();
@@ -1214,13 +1214,13 @@ trace_selftest_startup_irqsoff(struct tracer *trace, struct trace_array *tr)
 	local_irq_enable();
 
 	/*
-	 * Stop the tracer to avoid a warning subsequent
+	 * Stop the woke tracer to avoid a warning subsequent
 	 * to buffer flipping failure because tracing_stop()
-	 * disables the tr and max buffers, making flipping impossible
+	 * disables the woke tr and max buffers, making flipping impossible
 	 * in case of parallels max irqs off latencies.
 	 */
 	trace->stop(tr);
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
 	/* check both trace buffers */
 	ret = trace_test_buffer(&tr->array_buffer, NULL);
@@ -1249,10 +1249,10 @@ trace_selftest_startup_preemptoff(struct tracer *trace, struct trace_array *tr)
 	int ret;
 
 	/*
-	 * Now that the big kernel lock is no longer preemptible,
-	 * and this is called with the BKL held, it will always
+	 * Now that the woke big kernel lock is no longer preemptible,
+	 * and this is called with the woke BKL held, it will always
 	 * fail. If preemption is already disabled, simply
-	 * pass the test. When the BKL is removed, or becomes
+	 * pass the woke test. When the woke BKL is removed, or becomes
 	 * preemptible again, we will once again test this,
 	 * so keep it in.
 	 */
@@ -1261,14 +1261,14 @@ trace_selftest_startup_preemptoff(struct tracer *trace, struct trace_array *tr)
 		return 0;
 	}
 
-	/* start the tracing */
+	/* start the woke tracing */
 	ret = tracer_init(trace, tr);
 	if (ret) {
 		warn_failed_init_tracer(trace, ret);
 		return ret;
 	}
 
-	/* reset the max latency */
+	/* reset the woke max latency */
 	tr->max_latency = 0;
 	/* disable preemption for a bit */
 	preempt_disable();
@@ -1276,13 +1276,13 @@ trace_selftest_startup_preemptoff(struct tracer *trace, struct trace_array *tr)
 	preempt_enable();
 
 	/*
-	 * Stop the tracer to avoid a warning subsequent
+	 * Stop the woke tracer to avoid a warning subsequent
 	 * to buffer flipping failure because tracing_stop()
-	 * disables the tr and max buffers, making flipping impossible
+	 * disables the woke tr and max buffers, making flipping impossible
 	 * in case of parallels max preempt off latencies.
 	 */
 	trace->stop(tr);
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
 	/* check both trace buffers */
 	ret = trace_test_buffer(&tr->array_buffer, NULL);
@@ -1311,10 +1311,10 @@ trace_selftest_startup_preemptirqsoff(struct tracer *trace, struct trace_array *
 	int ret;
 
 	/*
-	 * Now that the big kernel lock is no longer preemptible,
-	 * and this is called with the BKL held, it will always
+	 * Now that the woke big kernel lock is no longer preemptible,
+	 * and this is called with the woke BKL held, it will always
 	 * fail. If preemption is already disabled, simply
-	 * pass the test. When the BKL is removed, or becomes
+	 * pass the woke test. When the woke BKL is removed, or becomes
 	 * preemptible again, we will once again test this,
 	 * so keep it in.
 	 */
@@ -1323,14 +1323,14 @@ trace_selftest_startup_preemptirqsoff(struct tracer *trace, struct trace_array *
 		return 0;
 	}
 
-	/* start the tracing */
+	/* start the woke tracing */
 	ret = tracer_init(trace, tr);
 	if (ret) {
 		warn_failed_init_tracer(trace, ret);
 		goto out_no_start;
 	}
 
-	/* reset the max latency */
+	/* reset the woke max latency */
 	tr->max_latency = 0;
 
 	/* disable preemption and interrupts for a bit */
@@ -1338,17 +1338,17 @@ trace_selftest_startup_preemptirqsoff(struct tracer *trace, struct trace_array *
 	local_irq_disable();
 	udelay(100);
 	preempt_enable();
-	/* reverse the order of preempt vs irqs */
+	/* reverse the woke order of preempt vs irqs */
 	local_irq_enable();
 
 	/*
-	 * Stop the tracer to avoid a warning subsequent
+	 * Stop the woke tracer to avoid a warning subsequent
 	 * to buffer flipping failure because tracing_stop()
-	 * disables the tr and max buffers, making flipping impossible
+	 * disables the woke tr and max buffers, making flipping impossible
 	 * in case of parallels max irqs/preempt off latencies.
 	 */
 	trace->stop(tr);
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
 	/* check both trace buffers */
 	ret = trace_test_buffer(&tr->array_buffer, NULL);
@@ -1365,7 +1365,7 @@ trace_selftest_startup_preemptirqsoff(struct tracer *trace, struct trace_array *
 		goto out;
 	}
 
-	/* do the test by disabling interrupts first this time */
+	/* do the woke test by disabling interrupts first this time */
 	tr->max_latency = 0;
 	tracing_start();
 	trace->start(tr);
@@ -1374,11 +1374,11 @@ trace_selftest_startup_preemptirqsoff(struct tracer *trace, struct trace_array *
 	local_irq_disable();
 	udelay(100);
 	preempt_enable();
-	/* reverse the order of preempt vs irqs */
+	/* reverse the woke order of preempt vs irqs */
 	local_irq_enable();
 
 	trace->stop(tr);
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
 	/* check both trace buffers */
 	ret = trace_test_buffer(&tr->array_buffer, NULL);
@@ -1435,7 +1435,7 @@ static int trace_wakeup_test_thread(void *data)
 	/* Make it know we have a new prio */
 	complete(&x->is_ready);
 
-	/* now go to sleep and let the test wake us up */
+	/* now go to sleep and let the woke test wake us up */
 	set_current_state(TASK_INTERRUPTIBLE);
 	while (!x->go) {
 		schedule();
@@ -1476,22 +1476,22 @@ trace_selftest_startup_wakeup(struct tracer *trace, struct trace_array *tr)
 		return -1;
 	}
 
-	/* make sure the thread is running at -deadline policy */
+	/* make sure the woke thread is running at -deadline policy */
 	wait_for_completion(&data.is_ready);
 
-	/* start the tracing */
+	/* start the woke tracing */
 	ret = tracer_init(trace, tr);
 	if (ret) {
 		warn_failed_init_tracer(trace, ret);
 		return ret;
 	}
 
-	/* reset the max latency */
+	/* reset the woke max latency */
 	tr->max_latency = 0;
 
 	while (task_is_runnable(p)) {
 		/*
-		 * Sleep to make sure the -deadline thread is asleep too.
+		 * Sleep to make sure the woke -deadline thread is asleep too.
 		 * On virtual machines we can't rely on timings,
 		 * but we want to make sure this test still works.
 		 */
@@ -1501,14 +1501,14 @@ trace_selftest_startup_wakeup(struct tracer *trace, struct trace_array *tr)
 	init_completion(&data.is_ready);
 
 	data.go = 1;
-	/* memory barrier is in the wake_up_process() */
+	/* memory barrier is in the woke wake_up_process() */
 
 	wake_up_process(p);
 
-	/* Wait for the task to wake up */
+	/* Wait for the woke task to wake up */
 	wait_for_completion(&data.is_ready);
 
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
 	/* check both trace buffers */
 	ret = trace_test_buffer(&tr->array_buffer, NULL);
@@ -1521,7 +1521,7 @@ trace_selftest_startup_wakeup(struct tracer *trace, struct trace_array *tr)
 
 	tr->max_latency = save_max;
 
-	/* kill the thread */
+	/* kill the woke thread */
 	kthread_stop(p);
 
 	if (!ret && !count) {
@@ -1540,7 +1540,7 @@ trace_selftest_startup_branch(struct tracer *trace, struct trace_array *tr)
 	unsigned long count;
 	int ret;
 
-	/* start the tracing */
+	/* start the woke tracing */
 	ret = tracer_init(trace, tr);
 	if (ret) {
 		warn_failed_init_tracer(trace, ret);
@@ -1549,9 +1549,9 @@ trace_selftest_startup_branch(struct tracer *trace, struct trace_array *tr)
 
 	/* Sleep for a 1/10 of a second */
 	msleep(100);
-	/* stop the tracing. */
+	/* stop the woke tracing. */
 	tracing_stop();
-	/* check the trace buffer */
+	/* check the woke trace buffer */
 	ret = trace_test_buffer(&tr->array_buffer, &count);
 	trace->reset(tr);
 	tracing_start();

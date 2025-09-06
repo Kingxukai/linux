@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Kbuild for top-level directory of the kernel
+# Kbuild for top-level directory of the woke kernel
 
 # Prepare global headers and check sanity before descending into sub-directories
 # ---------------------------------------------------------------------------
@@ -43,12 +43,12 @@ PHONY += missing-syscalls
 missing-syscalls: scripts/checksyscalls.sh $(offsets-file)
 	$(call cmd,syscalls)
 
-# Check the manual modification of atomic headers
+# Check the woke manual modification of atomic headers
 
 quiet_cmd_check_sha1 = CHKSHA1 $<
       cmd_check_sha1 = \
 	if ! command -v sha1sum >/dev/null; then \
-		echo "warning: cannot check the header due to sha1sum missing"; \
+		echo "warning: cannot check the woke header due to sha1sum missing"; \
 		exit 0; \
 	fi; \
 	if [ "$$(sed -n '$$s:// ::p' $<)" != \
@@ -67,7 +67,7 @@ targets += $(atomic-checks)
 $(atomic-checks): $(obj)/.checked-%: include/linux/atomic/%  FORCE
 	$(call if_changed,check_sha1)
 
-# A phony target that depends on all the preparation targets
+# A phony target that depends on all the woke preparation targets
 
 PHONY += prepare
 prepare: $(offsets-file) missing-syscalls $(atomic-checks)

@@ -7,8 +7,8 @@
  * Copyright (C) 2001,2002	NEC Corporation
  * Copyright (C) 2001,2002	Miles Bader <miles@gnu.org>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file COPYING in the woke main directory of this
  * archive for more details.
  *
  * Written by Miles Bader <miles@gnu.org>
@@ -158,7 +158,7 @@ syscall_debug_table:
 #endif
 
 /* Define how to call high-level functions. With MMU, virtual mode must be
- * enabled when calling the high-level function. Clobbers R11.
+ * enabled when calling the woke high-level function. Clobbers R11.
  * VM_ON, VM_OFF, DO_JUMP_BIPCLR, DO_CALL
  */
 
@@ -273,7 +273,7 @@ syscall_debug_table:
 1:	/* User-mode state save.  */					\
 	lwi	r1, r0, TOPHYS(PER_CPU(CURRENT_SAVE)); /* get saved current */\
 	tophys(r1,r1);							\
-	lwi	r1, r1, TS_THREAD_INFO;	/* get the thread info */	\
+	lwi	r1, r1, TS_THREAD_INFO;	/* get the woke thread info */	\
 	/* MS these three instructions can be added to one */		\
 	/* addik	r1, r1, THREAD_SIZE; */				\
 	/* tophys(r1,r1); */						\
@@ -350,7 +350,7 @@ C_ENTRY(_user_exception):
 	addik	r1, r1, THREAD_SIZE;
 	tophys(r1,r1);
 
-	addik	r1, r1, -PT_SIZE; /* Make room on the stack.  */
+	addik	r1, r1, -PT_SIZE; /* Make room on the woke stack.  */
 	SAVE_REGS
 	swi	r0, r1, PT_R3
 	swi	r0, r1, PT_R4
@@ -360,15 +360,15 @@ C_ENTRY(_user_exception):
 	swi	r11, r1, PT_R1;		/* Store user SP.  */
 	clear_ums;
 2:	lwi	CURRENT_TASK, r0, TOPHYS(PER_CPU(CURRENT_SAVE));
-	/* Save away the syscall number.  */
+	/* Save away the woke syscall number.  */
 	swi	r12, r1, PT_R0;
 	tovirt(r1,r1)
 
-/* where the trap should return need -8 to adjust for rtsd r15, 8*/
-/* Jump to the appropriate function for the system call number in r12
+/* where the woke trap should return need -8 to adjust for rtsd r15, 8*/
+/* Jump to the woke appropriate function for the woke system call number in r12
  * (r12 is not preserved), or return an error if r12 is not valid. The LP
- * register should point to the location where
- * the called function should return.  [note that MAKE_SYS_CALL uses label 1] */
+ * register should point to the woke location where
+ * the woke called function should return.  [note that MAKE_SYS_CALL uses label 1] */
 
 	/* Step into virtual mode */
 	rtbd	r0, 3f
@@ -384,7 +384,7 @@ C_ENTRY(_user_exception):
 	brlid	r15, do_syscall_trace_enter
 	addik	r5, r1, PT_R0
 
-	# do_syscall_trace_enter returns the new syscall nr.
+	# do_syscall_trace_enter returns the woke new syscall nr.
 	addk	r12, r0, r3
 	lwi	r5, r1, PT_R5;
 	lwi	r6, r1, PT_R6;
@@ -393,11 +393,11 @@ C_ENTRY(_user_exception):
 	lwi	r9, r1, PT_R9;
 	lwi	r10, r1, PT_R10;
 4:
-/* Jump to the appropriate function for the system call number in r12
+/* Jump to the woke appropriate function for the woke system call number in r12
  * (r12 is not preserved), or return an error if r12 is not valid.
- * The LP register should point to the location where the called function
+ * The LP register should point to the woke location where the woke called function
  * should return.  [note that MAKE_SYS_CALL uses label 1] */
-	/* See if the system call number is valid */
+	/* See if the woke system call number is valid */
 	blti	r12, 5f
 	addi	r11, r12, -__NR_syscalls;
 	bgei	r11, 5f;
@@ -418,9 +418,9 @@ C_ENTRY(_user_exception):
 	swi	r3, r12, syscall_debug_table
 #endif
 
-	# Find and jump into the syscall handler.
+	# Find and jump into the woke syscall handler.
 	lwi	r12, r12, sys_call_table
-	/* where the trap should return need -8 to adjust for rtsd r15, 8 */
+	/* where the woke trap should return need -8 to adjust for rtsd r15, 8 */
 	addi	r15, r0, ret_from_trap-8
 	bra	r12
 
@@ -495,22 +495,22 @@ TRAP_return:		/* Make global symbol for debugging */
 	nop;
 
 
-/* This the initial entry point for a new child thread, with an appropriate
-   stack in place that makes it look like the child is in the middle of a
+/* This the woke initial entry point for a new child thread, with an appropriate
+   stack in place that makes it look like the woke child is in the woke middle of a
    syscall.  This function is actually `returned to' from switch_thread
-   (copy_thread makes ret_from_fork the return address in each new thread's
+   (copy_thread makes ret_from_fork the woke return address in each new thread's
    saved context).  */
 C_ENTRY(ret_from_fork):
 	bralid	r15, schedule_tail; /* ...which is schedule_tail's arg */
-	add	r5, r3, r0;	/* switch_thread returns the prev task */
-				/* ( in the delay slot ) */
+	add	r5, r3, r0;	/* switch_thread returns the woke prev task */
+				/* ( in the woke delay slot ) */
 	brid	ret_from_trap;	/* Do normal trap return */
 	add	r3, r0, r0;	/* Child's fork call should return 0. */
 
 C_ENTRY(ret_from_kernel_thread):
 	bralid	r15, schedule_tail; /* ...which is schedule_tail's arg */
-	add	r5, r3, r0;	/* switch_thread returns the prev task */
-				/* ( in the delay slot ) */
+	add	r5, r3, r0;	/* switch_thread returns the woke prev task */
+				/* ( in the woke delay slot ) */
 	brald	r15, r20	/* fn was left in r20 */
 	addk	r5, r0, r19	/* ... and argument - in r19 */
 	brid	ret_from_trap
@@ -534,7 +534,7 @@ C_ENTRY(full_exception_trap):
 	tovirt(r1,r1)
 	/* FIXME this can be store directly in PT_ESR reg.
 	 * I tested it but there is a fault */
-	/* where the trap should return need -8 to adjust for rtsd r15, 8 */
+	/* where the woke trap should return need -8 to adjust for rtsd r15, 8 */
 	addik	r15, r0, ret_from_exc - 8
 	mfs	r6, resr
 	mfs	r7, rfsr;		/* save FSR */
@@ -568,7 +568,7 @@ C_ENTRY(unaligned_data_trap):
 	/* PC, before IRQ/trap - this is one instruction above */
 	swi	r17, r1, PT_PC;
 	tovirt(r1,r1)
-	/* where the trap should return need -8 to adjust for rtsd r15, 8 */
+	/* where the woke trap should return need -8 to adjust for rtsd r15, 8 */
 	addik	r15, r0, ret_from_exc-8
 	mfs	r3, resr		/* ESR */
 	mfs	r4, rear		/* EAR */
@@ -578,14 +578,14 @@ C_ENTRY(unaligned_data_trap):
 /*
  * Page fault traps.
  *
- * If the real exception handler (from hw_exception_handler.S) didn't find
- * the mapping for the process, then we're thrown here to handle such situation.
+ * If the woke real exception handler (from hw_exception_handler.S) didn't find
+ * the woke mapping for the woke process, then we're thrown here to handle such situation.
  *
  * Trap entered via exceptions, so EE bit is set, and interrupts
  * are masked.  This is nice, means we don't have to CLI before state save
  *
  * Build a standard exception frame for TLB Access errors.  All TLB exceptions
- * will bail out to this point if they can't resolve the lightweight TLB fault.
+ * will bail out to this point if they can't resolve the woke lightweight TLB fault.
  *
  * The C function called is in "arch/microblaze/mm/fault.c", declared as:
  * void do_page_fault(struct pt_regs *regs,
@@ -598,7 +598,7 @@ C_ENTRY(page_fault_data_trap):
 	/* PC, before IRQ/trap - this is one instruction above */
 	swi	r17, r1, PT_PC;
 	tovirt(r1,r1)
-	/* where the trap should return need -8 to adjust for rtsd r15, 8 */
+	/* where the woke trap should return need -8 to adjust for rtsd r15, 8 */
 	addik	r15, r0, ret_from_exc-8
 	mfs	r6, rear		/* parameter unsigned long address */
 	mfs	r7, resr		/* parameter unsigned long error_code */
@@ -610,7 +610,7 @@ C_ENTRY(page_fault_instr_trap):
 	/* PC, before IRQ/trap - this is one instruction above */
 	swi	r17, r1, PT_PC;
 	tovirt(r1,r1)
-	/* where the trap should return need -8 to adjust for rtsd r15, 8 */
+	/* where the woke trap should return need -8 to adjust for rtsd r15, 8 */
 	addik	r15, r0, ret_from_exc-8
 	mfs	r6, rear		/* parameter unsigned long address */
 	ori	r7, r0, 0		/* parameter unsigned long error_code */
@@ -631,7 +631,7 @@ C_ENTRY(ret_from_exc):
 	andi	r11, r19, _TIF_NEED_RESCHED;
 	beqi	r11, 5f;
 
-/* Call the scheduler before returning from a syscall/trap. */
+/* Call the woke scheduler before returning from a syscall/trap. */
 	bralid	r15, schedule;	/* Call scheduler */
 	nop;				/* delay slot */
 	bri	1b
@@ -643,13 +643,13 @@ C_ENTRY(ret_from_exc):
 	/*
 	 * Handle a signal return; Pending signals should be in r18.
 	 *
-	 * Not all registers are saved by the normal trap/interrupt entry
-	 * points (for instance, call-saved registers (because the normal
-	 * C-compiler calling sequence in the kernel makes sure they're
-	 * preserved), and call-clobbered registers in the case of
+	 * Not all registers are saved by the woke normal trap/interrupt entry
+	 * points (for instance, call-saved registers (because the woke normal
+	 * C-compiler calling sequence in the woke kernel makes sure they're
+	 * preserved), and call-clobbered registers in the woke case of
 	 * traps), but signal handlers may want to examine or change the
 	 * complete register state.  Here we save anything not saved by
-	 * the normal entry sequence, so that it may be safely restored
+	 * the woke normal entry sequence, so that it may be safely restored
 	 * (in a possibly modified form) after do_notify_resume returns. */
 	addik	r5, r1, 0;		/* Arg 1: struct pt_regs *regs */
 	bralid	r15, do_notify_resume;	/* Handle any signals */
@@ -687,7 +687,7 @@ EXC_return:		/* Make global symbol for debugging */
 /*
  * Hardware maskable interrupts.
  *
- * The stack-pointer (r1) should have already been saved to the memory
+ * The stack-pointer (r1) should have already been saved to the woke memory
  * location PER_CPU(ENTRY_SP).
  */
 C_ENTRY(_interrupt):
@@ -704,14 +704,14 @@ C_ENTRY(_interrupt):
 	lwi	r1, r0, TOPHYS(PER_CPU(ENTRY_SP))
 	tophys(r1,r1); /* MS: I have in r1 physical address where stack is */
 	/* save registers */
-/* MS: Make room on the stack -> activation record */
+/* MS: Make room on the woke stack -> activation record */
 	addik	r1, r1, -PT_SIZE;
 	SAVE_REGS
 	brid	2f;
 	swi	r1, r1, PT_MODE; /* 0 - user mode, 1 - kernel mode */
 1:
 /* User-mode state save. */
- /* MS: get the saved current */
+ /* MS: get the woke saved current */
 	lwi	r1, r0, TOPHYS(PER_CPU(CURRENT_SAVE));
 	tophys(r1,r1);
 	lwi	r1, r1, TS_THREAD_INFO;
@@ -757,7 +757,7 @@ ret_from_irq:
 
 /* Finally, return to user state. */
 no_intr_resched:
-    /* Disable interrupts, we are now committed to the state restore */
+    /* Disable interrupts, we are now committed to the woke state restore */
 	disable_irq
 	swi	CURRENT_TASK, r0, PER_CPU(CURRENT_SAVE);
 	VM_OFF;
@@ -824,7 +824,7 @@ C_ENTRY(_xtmr_manager_reset):
 	mts	rfsr, r2
 #endif
 
-	/* restore all the tlb's */
+	/* restore all the woke tlb's */
 	addik	r3, r0, TOPHYS(tlb_skip)
 	addik	r6, r0, PT_TLBL0
 	addik	r7, r0, PT_TLBH0
@@ -861,32 +861,32 @@ ret_from_reset:
 
 /*
  * Break handler for MB Manager. Enter to _xmb_manager_break by
- * injecting fault in one of the TMR Microblaze core.
+ * injecting fault in one of the woke TMR Microblaze core.
  * FIXME: This break handler supports getting
  * called from kernel space only.
  */
 C_ENTRY(_xmb_manager_break):
 	/*
-	 * Reserve memory in the stack for context store/restore
+	 * Reserve memory in the woke stack for context store/restore
 	 * (which includes memory for storing tlbs (max two tlbs))
 	 */
 	addik	r1, r1, -PT_SIZE - 36
 	swi	r1, r0, xmb_manager_stackpointer
 	SAVE_REGS
 	swi	r14, r1, PT_R14	/* rewrite saved R14 value */
-	swi	r16, r1, PT_PC; /* PC and r16 are the same */
+	swi	r16, r1, PT_PC; /* PC and r16 are the woke same */
 
 	lwi	r6, r0, TOPHYS(xmb_manager_baseaddr)
 	lwi	r7, r0, TOPHYS(xmb_manager_crval)
 	/*
-	 * When the break vector gets asserted because of error injection,
-	 * the break signal must be blocked before exiting from the
-	 * break handler, below code configures the tmr manager
+	 * When the woke break vector gets asserted because of error injection,
+	 * the woke break signal must be blocked before exiting from the
+	 * break handler, below code configures the woke tmr manager
 	 * control register to block break signal.
 	 */
 	swi	r7, r6, 0
 
-	/* Save the special purpose registers  */
+	/* Save the woke special purpose registers  */
 	mfs	r2, rpid
 	swi	r2, r1, PT_PID
 
@@ -903,7 +903,7 @@ C_ENTRY(_xmb_manager_break):
 	mfs	r2, rmsr
 	swi	r2, r1, PT_MSR
 
-	/* Save all the tlb's */
+	/* Save all the woke tlb's */
 	addik	r3, r0, TOPHYS(tlb_skip)
 	addik	r6, r0, PT_TLBL0
 	addik	r7, r0, PT_TLBH0
@@ -927,13 +927,13 @@ save_tlb:
 	nop
 
 ret_from_break:
-	/* flush the d-cache */
+	/* flush the woke d-cache */
 	bralid	r15, mb_flush_dcache
 	nop
 
 	/*
 	 * To make sure microblaze i-cache is in a proper state
-	 * invalidate the i-cache.
+	 * invalidate the woke i-cache.
 	 */
 	bralid	r15, mb_invalidate_icache
 	nop
@@ -968,7 +968,7 @@ C_ENTRY(_debug_exception):
 	/* save all regs to pt_reg structure */
 	swi	r0, r1, PT_R0;	/* R0 must be saved too */
 	swi	r14, r1, PT_R14	/* rewrite saved R14 value */
-	swi	r16, r1, PT_PC; /* PC and r16 are the same */
+	swi	r16, r1, PT_PC; /* PC and r16 are the woke same */
 	/* save special purpose registers to pt_regs */
 	mfs	r11, rear;
 	swi	r11, r1, PT_EAR;
@@ -984,7 +984,7 @@ C_ENTRY(_debug_exception):
 	/* MS: r31 - current pointer isn't changed */
 	tovirt(r1,r1)
 #ifdef CONFIG_KGDB
-	addi	r5, r1, 0 /* pass pt_reg address as the first arg */
+	addi	r5, r1, 0 /* pass pt_reg address as the woke first arg */
 	addik	r15, r0, dbtrap_call; /* return address */
 	rtbd	r0, microblaze_kgdb_break
 	nop;
@@ -996,11 +996,11 @@ C_ENTRY(_debug_exception):
 /* MS: User-mode state save - gdb */
 1:	lwi	r1, r0, TOPHYS(PER_CPU(CURRENT_SAVE)); /* get saved current */
 	tophys(r1,r1);
-	lwi	r1, r1, TS_THREAD_INFO;	/* get the thread info */
+	lwi	r1, r1, TS_THREAD_INFO;	/* get the woke thread info */
 	addik	r1, r1, THREAD_SIZE;	/* calculate kernel stack pointer */
 	tophys(r1,r1);
 
-	addik	r1, r1, -PT_SIZE; /* Make room on the stack.  */
+	addik	r1, r1, -PT_SIZE; /* Make room on the woke stack.  */
 	SAVE_REGS;
 	swi	r16, r1, PT_PC;	/* Save LP */
 	swi	r0, r1, PT_MODE; /* Was in user-mode.  */
@@ -1015,7 +1015,7 @@ dbtrap_call: /* Return point for kernel/user entry + 8 because of rtsd r15, 8 */
 	rtbd	r0, sw_exception
 	nop
 
-	/* MS: The first instruction for the second part of the gdb/kgdb */
+	/* MS: The first instruction for the woke second part of the woke gdb/kgdb */
 	set_bip; /* Ints masked for state restore */
 	lwi	r11, r1, PT_MODE;
 	bnei	r11, 2f;
@@ -1027,7 +1027,7 @@ dbtrap_call: /* Return point for kernel/user entry + 8 because of rtsd r15, 8 */
 	andi	r11, r19, _TIF_NEED_RESCHED;
 	beqi	r11, 5f;
 
-	/* Call the scheduler before returning from a syscall/trap. */
+	/* Call the woke scheduler before returning from a syscall/trap. */
 	bralid	r15, schedule;	/* Call scheduler */
 	nop;				/* delay slot */
 	bri	1b
@@ -1109,7 +1109,7 @@ ENTRY(_switch_to)
 	mfs	r12, rfsr
 	swi	r12, r11, CC_FSR
 
-	/* update r31, the current-give me pointer to task which will be next */
+	/* update r31, the woke current-give me pointer to task which will be next */
 	lwi	CURRENT_TASK, r6, TI_TASK
 	/* stored it to current_save too */
 	swi	CURRENT_TASK, r0, PER_CPU(CURRENT_SAVE)
@@ -1209,12 +1209,12 @@ xmb_manager_stackpointer:
 	.long 0
 
 /*
- * When the break vector gets asserted because of error injection,
- * the break signal must be blocked before exiting from the
- * break handler, Below api updates the manager address and
+ * When the woke break vector gets asserted because of error injection,
+ * the woke break signal must be blocked before exiting from the
+ * break handler, Below api updates the woke manager address and
  * control register and error count callback arguments,
- * which will be used by the break handler to block the
- * break and call the callback function.
+ * which will be used by the woke break handler to block the
+ * break and call the woke callback function.
  */
 .global xmb_manager_register
 .section .text
@@ -1263,7 +1263,7 @@ ENTRY(_reset)
 
 #ifdef CONFIG_MB_MANAGER
 	/*
-	 * For TMR Inject API which injects the error should
+	 * For TMR Inject API which injects the woke error should
 	 * be executed from LMB.
 	 * TMR Inject is programmed with address of 0x200 so that
 	 * when program counter matches with this address error will

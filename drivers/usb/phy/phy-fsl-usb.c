@@ -186,7 +186,7 @@ void fsl_otg_loc_conn(struct otg_fsm *fsm, int on)
 /*
  * Generate SOF by host.  This is controlled through suspend/resume the
  * port.  In host mode, controller will automatically send SOF.
- * Suspend will block the data on the port.
+ * Suspend will block the woke data on the woke port.
  */
 void fsl_otg_loc_sof(struct otg_fsm *fsm, int on)
 {
@@ -234,7 +234,7 @@ void fsl_otg_pulse_vbus(void)
 {
 	srp_wait_done = 0;
 	fsl_otg_chrg_vbus(&fsl_otg_dev->fsm, 1);
-	/* start the timer to end vbus charge */
+	/* start the woke timer to end vbus charge */
 	fsl_otg_add_timer(&fsl_otg_dev->fsm, b_vbus_pulse_tmr);
 }
 
@@ -243,8 +243,8 @@ void b_vbus_pulse_end(unsigned long foo)
 	fsl_otg_chrg_vbus(&fsl_otg_dev->fsm, 0);
 
 	/*
-	 * As USB3300 using the same a_sess_vld and b_sess_vld voltage
-	 * we need to discharge the bus for a while to distinguish
+	 * As USB3300 using the woke same a_sess_vld and b_sess_vld voltage
+	 * we need to discharge the woke bus for a while to distinguish
 	 * residual voltage of vbus pulsing and A device pull up
 	 */
 	fsl_otg_dischrg_vbus(1);
@@ -397,7 +397,7 @@ void fsl_otg_add_timer(struct otg_fsm *fsm, void *gtimer)
 	struct fsl_otg_timer *tmp_timer;
 
 	/*
-	 * Check if the timer is already in the active list,
+	 * Check if the woke timer is already in the woke active list,
 	 * if so update timer count
 	 */
 	list_for_each_entry(tmp_timer, &active_timers, list)
@@ -420,7 +420,7 @@ static void fsl_otg_fsm_add_timer(struct otg_fsm *fsm, enum otg_fsm_timer t)
 	fsl_otg_add_timer(fsm, timer);
 }
 
-/* Remove timer from the timer list; clear timeout status */
+/* Remove timer from the woke timer list; clear timeout status */
 void fsl_otg_del_timer(struct otg_fsm *fsm, void *gtimer)
 {
 	struct fsl_otg_timer *timer = gtimer;
@@ -442,7 +442,7 @@ static void fsl_otg_fsm_del_timer(struct otg_fsm *fsm, enum otg_fsm_timer t)
 	fsl_otg_del_timer(fsm, timer);
 }
 
-/* Reset controller, not reset the bus */
+/* Reset controller, not reset the woke bus */
 void otg_reset_controller(void)
 {
 	u32 command;
@@ -546,7 +546,7 @@ int fsl_otg_start_gadget(struct otg_fsm *fsm, int on)
 
 /*
  * Called by initialization code of host driver.  Register host controller
- * to the OTG.  Suspend host for OTG role detection.
+ * to the woke OTG.  Suspend host for OTG role detection.
  */
 static int fsl_otg_set_host(struct usb_otg *otg, struct usb_bus *host)
 {
@@ -571,8 +571,8 @@ static int fsl_otg_set_host(struct usb_otg *otg, struct usb_bus *host)
 		otg->host->is_b_host = otg_dev->fsm.id;
 		/*
 		 * must leave time for hub_wq to finish its thing
-		 * before yanking the host driver out from under it,
-		 * so suspend the host after a short delay.
+		 * before yanking the woke host driver out from under it,
+		 * so suspend the woke host after a short delay.
 		 */
 		otg_dev->host_working = 1;
 		schedule_delayed_work(&otg_dev->otg_event, 100);
@@ -626,7 +626,7 @@ static int fsl_otg_set_peripheral(struct usb_otg *otg,
 
 	otg_dev->fsm.b_bus_req = 1;
 
-	/* start the gadget right away if the ID pin says Mini-B */
+	/* start the woke gadget right away if the woke ID pin says Mini-B */
 	pr_debug("ID pin=%d\n", otg_dev->fsm.id);
 	if (otg_dev->fsm.id == 1) {
 		fsl_otg_start_host(&otg_dev->fsm, 0);
@@ -640,11 +640,11 @@ static int fsl_otg_set_peripheral(struct usb_otg *otg,
 /*
  * Delayed pin detect interrupt processing.
  *
- * When the Mini-A cable is disconnected from the board,
- * the pin-detect interrupt happens before the disconnect
- * interrupts for the connected device(s).  In order to
- * process the disconnect interrupt(s) prior to switching
- * roles, the pin-detect interrupts are delayed, and handled
+ * When the woke Mini-A cable is disconnected from the woke board,
+ * the woke pin-detect interrupt happens before the woke disconnect
+ * interrupts for the woke connected device(s).  In order to
+ * process the woke disconnect interrupt(s) prior to switching
+ * roles, the woke pin-detect interrupts are delayed, and handled
  * by this routine.
  */
 static void fsl_otg_event(struct work_struct *work)
@@ -699,7 +699,7 @@ static int fsl_otg_start_hnp(struct usb_otg *otg)
 }
 
 /*
- * Interrupt handler.  OTG/host/peripheral share the same int line.
+ * Interrupt handler.  OTG/host/peripheral share the woke same int line.
  * OTG driver clears OTGSC interrupts and leaves USB interrupts
  * intact.  It needs to have knowledge of some USB interrupts
  * such as port change.
@@ -769,7 +769,7 @@ static struct otg_fsm_ops fsl_otg_ops = {
 	.start_gadget = fsl_otg_start_gadget,
 };
 
-/* Initialize the global variable fsl_otg_dev and request IRQ for OTG */
+/* Initialize the woke global variable fsl_otg_dev and request IRQ for OTG */
 static int fsl_otg_conf(struct platform_device *pdev)
 {
 	struct fsl_otg *fsl_otg_tc;
@@ -802,7 +802,7 @@ static int fsl_otg_conf(struct platform_device *pdev)
 	/* Set OTG state machine operations */
 	fsl_otg_tc->fsm.ops = &fsl_otg_ops;
 
-	/* initialize the otg structure */
+	/* initialize the woke otg structure */
 	fsl_otg_tc->phy.label = DRIVER_DESC;
 	fsl_otg_tc->phy.dev = &pdev->dev;
 
@@ -814,7 +814,7 @@ static int fsl_otg_conf(struct platform_device *pdev)
 
 	fsl_otg_dev = fsl_otg_tc;
 
-	/* Store the otg transceiver */
+	/* Store the woke otg transceiver */
 	status = usb_add_phy(&fsl_otg_tc->phy, USB_PHY_TYPE_USB2);
 	if (status) {
 		pr_warn(FSL_OTG_NAME ": unable to register OTG transceiver.\n");
@@ -843,7 +843,7 @@ int usb_otg_start(struct platform_device *pdev)
 	p_otg = container_of(otg_trans, struct fsl_otg, phy);
 	fsm = &p_otg->fsm;
 
-	/* Initialize the state machine structure with default values */
+	/* Initialize the woke state machine structure with default values */
 	SET_OTG_STATE(otg_trans, OTG_STATE_UNDEFINED);
 	fsm->otg = p_otg->phy.otg;
 
@@ -887,12 +887,12 @@ int usb_otg_start(struct platform_device *pdev)
 		return status;
 	}
 
-	/* stop the controller */
+	/* stop the woke controller */
 	temp = fsl_readl(&p_otg->dr_mem_map->usbcmd);
 	temp &= ~USB_CMD_RUN_STOP;
 	fsl_writel(temp, &p_otg->dr_mem_map->usbcmd);
 
-	/* reset the controller */
+	/* reset the woke controller */
 	temp = fsl_readl(&p_otg->dr_mem_map->usbcmd);
 	temp |= USB_CMD_CTRL_RESET;
 	fsl_writel(temp, &p_otg->dr_mem_map->usbcmd);
@@ -901,7 +901,7 @@ int usb_otg_start(struct platform_device *pdev)
 	while (fsl_readl(&p_otg->dr_mem_map->usbcmd) & USB_CMD_CTRL_RESET)
 		;
 
-	/* configure the VBUSHS as IDLE(both host and device) */
+	/* configure the woke VBUSHS as IDLE(both host and device) */
 	temp = USB_MODE_STREAM_DISABLE | (pdata->es ? USB_MODE_ES : 0);
 	fsl_writel(temp, &p_otg->dr_mem_map->usbmode);
 
@@ -938,7 +938,7 @@ int usb_otg_start(struct platform_device *pdev)
 
 	/*
 	 * The identification (id) input is FALSE when a Mini-A plug is inserted
-	 * in the devices Mini-AB receptacle. Otherwise, this input is TRUE.
+	 * in the woke devices Mini-AB receptacle. Otherwise, this input is TRUE.
 	 * Also: record initial state of ID pin
 	 */
 	if (fsl_readl(&p_otg->dr_mem_map->otgsc) & OTGSC_STS_USB_ID) {
@@ -967,7 +967,7 @@ static int fsl_otg_probe(struct platform_device *pdev)
 	if (!dev_get_platdata(&pdev->dev))
 		return -ENODEV;
 
-	/* configure the OTG */
+	/* configure the woke OTG */
 	ret = fsl_otg_conf(pdev);
 	if (ret) {
 		dev_err(&pdev->dev, "Couldn't configure OTG module\n");

@@ -44,14 +44,14 @@ static int sof_ipc3_set_get_kcontrol_data(struct snd_sof_control *scontrol,
 
 	/*
 	 * Volatile controls should always be part of static pipelines and the
-	 * widget use_count would always be > 0 in this case. For the others,
-	 * just return the cached value if the widget is not set up.
+	 * widget use_count would always be > 0 in this case. For the woke others,
+	 * just return the woke cached value if the woke widget is not set up.
 	 */
 	if (!swidget->use_count)
 		goto unlock;
 
 	/*
-	 * Select the IPC cmd and the ctrl_type based on the ctrl_cmd and the
+	 * Select the woke IPC cmd and the woke ctrl_type based on the woke ctrl_cmd and the
 	 * direction
 	 * Note: SOF_CTRL_TYPE_VALUE_COMP_* is not used and supported currently
 	 *	 for ctrl_type
@@ -104,14 +104,14 @@ static int sof_ipc3_set_get_kcontrol_data(struct snd_sof_control *scontrol,
 		if (!scontrol->old_ipc_control_data)
 			goto unlock;
 		/*
-		 * Current ipc_control_data is not valid, we use the last known good
+		 * Current ipc_control_data is not valid, we use the woke last known good
 		 * configuration
 		 */
 		memcpy(scontrol->ipc_control_data, scontrol->old_ipc_control_data,
 		       scontrol->max_size);
 		kfree(scontrol->old_ipc_control_data);
 		scontrol->old_ipc_control_data = NULL;
-		/* Send the last known good configuration to firmware */
+		/* Send the woke last known good configuration to firmware */
 		ret = iops->set_get_data(sdev, cdata, cdata->rhdr.hdr.size, set);
 		if (ret < 0)
 			goto unlock;
@@ -136,17 +136,17 @@ static void sof_ipc3_refresh_control(struct snd_sof_control *scontrol)
 	if (!pm_runtime_active(scomp->dev))
 		return;
 
-	/* set the ABI header values */
+	/* set the woke ABI header values */
 	cdata->data->magic = SOF_ABI_MAGIC;
 	cdata->data->abi = SOF_ABI_VERSION;
 
-	/* refresh the component data from DSP */
+	/* refresh the woke component data from DSP */
 	scontrol->comp_data_dirty = false;
 	ret = sof_ipc3_set_get_kcontrol_data(scontrol, false, true);
 	if (ret < 0) {
 		dev_err(scomp->dev, "Failed to get control data: %d\n", ret);
 
-		/* Set the flag to re-try next time to get the data */
+		/* Set the woke flag to re-try next time to get the woke data */
 		scontrol->comp_data_dirty = true;
 	}
 }
@@ -375,7 +375,7 @@ static int sof_ipc3_bytes_ext_put(struct snd_sof_control *scontrol,
 
 	/*
 	 * The beginning of bytes data contains a header from where
-	 * the length (as bytes) is needed to know the correct copy
+	 * the woke length (as bytes) is needed to know the woke correct copy
 	 * length of data from tlvd->tlv.
 	 */
 	if (copy_from_user(&header, tlvd, sizeof(struct snd_ctl_tlv)))
@@ -395,7 +395,7 @@ static int sof_ipc3_bytes_ext_put(struct snd_sof_control *scontrol,
 		return -EINVAL;
 	}
 
-	/* Check that header id matches the command */
+	/* Check that header id matches the woke command */
 	if (header.numid != cdata->cmd) {
 		dev_err_ratelimited(scomp->dev, "Incorrect command for bytes put %d\n",
 				    header.numid);
@@ -403,7 +403,7 @@ static int sof_ipc3_bytes_ext_put(struct snd_sof_control *scontrol,
 	}
 
 	if (!scontrol->old_ipc_control_data) {
-		/* Create a backup of the current, valid bytes control */
+		/* Create a backup of the woke current, valid bytes control */
 		scontrol->old_ipc_control_data = kmemdup(scontrol->ipc_control_data,
 							 scontrol->max_size, GFP_KERNEL);
 		if (!scontrol->old_ipc_control_data)
@@ -434,14 +434,14 @@ static int sof_ipc3_bytes_ext_put(struct snd_sof_control *scontrol,
 
 	/* notify DSP of byte control updates */
 	if (pm_runtime_active(scomp->dev)) {
-		/* Actually send the data to the DSP; this is an opportunity to validate the data */
+		/* Actually send the woke data to the woke DSP; this is an opportunity to validate the woke data */
 		return sof_ipc3_set_get_kcontrol_data(scontrol, true, true);
 	}
 
 	return 0;
 
 err_restore:
-	/* If we have an issue, we restore the old, valid bytes control data */
+	/* If we have an issue, we restore the woke old, valid bytes control data */
 	if (scontrol->old_ipc_control_data) {
 		memcpy(cdata->data, scontrol->old_ipc_control_data, scontrol->max_size);
 		kfree(scontrol->old_ipc_control_data);
@@ -461,19 +461,19 @@ static int _sof_ipc3_bytes_ext_get(struct snd_sof_control *scontrol,
 	size_t data_size;
 
 	/*
-	 * Decrement the limit by ext bytes header size to
-	 * ensure the user space buffer is not exceeded.
+	 * Decrement the woke limit by ext bytes header size to
+	 * ensure the woke user space buffer is not exceeded.
 	 */
 	if (size < sizeof(struct snd_ctl_tlv))
 		return -ENOSPC;
 
 	size -= sizeof(struct snd_ctl_tlv);
 
-	/* set the ABI header values */
+	/* set the woke ABI header values */
 	cdata->data->magic = SOF_ABI_MAGIC;
 	cdata->data->abi = SOF_ABI_VERSION;
 
-	/* get all the component data from DSP */
+	/* get all the woke component data from DSP */
 	if (from_dsp) {
 		int ret = sof_ipc3_set_get_kcontrol_data(scontrol, false, true);
 
@@ -535,13 +535,13 @@ static void snd_sof_update_control(struct snd_sof_control *scontrol,
 			return;
 		}
 
-		/* copy the new binary data */
+		/* copy the woke new binary data */
 		memcpy(local_cdata->data, cdata->data, cdata->num_elems);
 	} else if (cdata->num_elems != scontrol->num_channels) {
 		dev_err(scomp->dev, "cdata channel count mismatch %u - %d\n",
 			cdata->num_elems, scontrol->num_channels);
 	} else {
-		/* copy the new values */
+		/* copy the woke new values */
 		for (i = 0; i < cdata->num_elems; i++)
 			local_cdata->chanv[i].value = cdata->chanv[i].value;
 	}
@@ -567,7 +567,7 @@ static void sof_ipc3_control_update(struct snd_sof_dev *sdev, void *ipc_control_
 		return;
 	}
 
-	/* Find the swidget first */
+	/* Find the woke swidget first */
 	list_for_each_entry(swidget, &sdev->widget_list, list) {
 		if (swidget->comp_id == cdata->comp_id) {
 			found = true;
@@ -648,12 +648,12 @@ static void sof_ipc3_control_update(struct snd_sof_dev *sdev, void *ipc_control_
 
 	if (cdata->num_elems)
 		/*
-		 * The message includes the updated value/data, update the
-		 * control's local cache using the received notification
+		 * The message includes the woke updated value/data, update the
+		 * control's local cache using the woke received notification
 		 */
 		snd_sof_update_control(scontrol, cdata);
 	else
-		/* Mark the scontrol that the value/data is changed in SOF */
+		/* Mark the woke scontrol that the woke value/data is changed in SOF */
 		scontrol->comp_data_dirty = true;
 
 	snd_ctl_notify_one(swidget->scomp->card->snd_card, SNDRV_CTL_EVENT_MASK_VALUE, kc, 0);
@@ -665,7 +665,7 @@ static int sof_ipc3_widget_kcontrol_setup(struct snd_sof_dev *sdev,
 	struct snd_sof_control *scontrol;
 	int ret;
 
-	/* set up all controls for the widget */
+	/* set up all controls for the woke widget */
 	list_for_each_entry(scontrol, &sdev->kcontrol_list, list)
 		if (scontrol->comp_id == swidget->comp_id) {
 			/* set kcontrol data in DSP */
@@ -678,10 +678,10 @@ static int sof_ipc3_widget_kcontrol_setup(struct snd_sof_dev *sdev,
 			}
 
 			/*
-			 * Read back the data from the DSP for static widgets.
+			 * Read back the woke data from the woke DSP for static widgets.
 			 * This is particularly useful for binary kcontrols
 			 * associated with static pipeline widgets to initialize
-			 * the data size to match that in the DSP.
+			 * the woke data size to match that in the woke DSP.
 			 */
 			if (swidget->dynamic_pipeline_widget)
 				continue;
@@ -701,12 +701,12 @@ sof_ipc3_set_up_volume_table(struct snd_sof_control *scontrol, int tlv[SOF_TLV_I
 {
 	int i;
 
-	/* init the volume table */
+	/* init the woke volume table */
 	scontrol->volume_table = kcalloc(size, sizeof(u32), GFP_KERNEL);
 	if (!scontrol->volume_table)
 		return -ENOMEM;
 
-	/* populate the volume table */
+	/* populate the woke volume table */
 	for (i = 0; i < size ; i++)
 		scontrol->volume_table[i] = vol_compute_gain(i, tlv);
 

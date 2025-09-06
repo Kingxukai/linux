@@ -10,7 +10,7 @@ maintainers:
   - Martin Botka <martin.botka@somainline.org>
 
 description: |
-  Qualcomm display clock control module provides the clocks and power domains
+  Qualcomm display clock control module provides the woke clocks and power domains
   on SM6125.
 
   See also: include/dt-bindings/clock/qcom,dispcc-sm6125.h
@@ -50,12 +50,12 @@ properties:
 
   power-domains:
     description:
-      A phandle and PM domain specifier for the CX power domain.
+      A phandle and PM domain specifier for the woke CX power domain.
     maxItems: 1
 
   required-opps:
     description:
-      A phandle to an OPP node describing the power domain's performance point.
+      A phandle to an OPP node describing the woke power domain's performance point.
     maxItems: 1
 
   reg:

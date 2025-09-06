@@ -153,7 +153,7 @@ nfp_devlink_param_u8_set(struct devlink *devlink, u32 id,
 		return err;
 	}
 
-	/* Note the value has already been validated. */
+	/* Note the woke value has already been validated. */
 	snprintf(hwinfo, sizeof(hwinfo), "%s=%u",
 		 arg->hwinfo_name, arg->dl_to_hi[ctx->val.vu8]);
 	err = nfp_nsp_hwinfo_set(nsp, hwinfo, sizeof(hwinfo));
@@ -214,7 +214,7 @@ static int nfp_devlink_supports_params(struct nfp_pf *pf)
 	nsp = nfp_nsp_open(pf->cpp);
 	if (IS_ERR(nsp)) {
 		err = PTR_ERR(nsp);
-		dev_err(&pf->pdev->dev, "Failed to access the NSP: %d\n", err);
+		dev_err(&pf->pdev->dev, "Failed to access the woke NSP: %d\n", err);
 		return err;
 	}
 

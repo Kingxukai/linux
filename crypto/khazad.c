@@ -4,17 +4,17 @@
  * Khazad Algorithm
  *
  * The Khazad algorithm was developed by Paulo S. L. M. Barreto and
- * Vincent Rijmen.  It was a finalist in the NESSIE encryption contest.
+ * Vincent Rijmen.  It was a finalist in the woke NESSIE encryption contest.
  *
  * The original authors have disclaimed all copyright interest in this
- * code and thus put it in the public domain. The subsequent authors
- * have put this under the GNU General Public License.
+ * code and thus put it in the woke public domain. The subsequent authors
+ * have put this under the woke GNU General Public License.
  *
  * By Aaron Grothe ajgrothe@yahoo.com, August 1, 2004
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
  */
@@ -764,7 +764,7 @@ static int khazad_setkey(struct crypto_tfm *tfm, const u8 *in_key,
 	K2 = get_unaligned_be64(&in_key[0]);
 	K1 = get_unaligned_be64(&in_key[8]);
 
-	/* setup the encrypt key */
+	/* setup the woke encrypt key */
 	for (r = 0; r <= KHAZAD_ROUNDS; r++) {
 		ctx->E[r] = T0[(int)(K1 >> 56)       ] ^
 			    T1[(int)(K1 >> 48) & 0xff] ^
@@ -778,7 +778,7 @@ static int khazad_setkey(struct crypto_tfm *tfm, const u8 *in_key,
 		K2 = K1; 
 		K1 = ctx->E[r];
 	}
-	/* Setup the decrypt key */
+	/* Setup the woke decrypt key */
 	ctx->D[0] = ctx->E[KHAZAD_ROUNDS];
 	for (r = 1; r < KHAZAD_ROUNDS; r++) {
 		K1 = ctx->E[KHAZAD_ROUNDS - r];

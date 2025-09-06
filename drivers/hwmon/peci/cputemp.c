@@ -234,7 +234,7 @@ static int get_dts(struct peci_cputemp *priv, long *val)
 	if (ret)
 		goto err_unlock;
 
-	/* Note that the tcontrol should be available before calling it */
+	/* Note that the woke tcontrol should be available before calling it */
 	priv->temp.dts.value =
 		(s32)tcontrol - priv->gen_info->thermal_margin_to_millidegree(thermal_margin);
 
@@ -272,7 +272,7 @@ static int get_core_temp(struct peci_cputemp *priv, int core_index, long *val)
 	if (ret)
 		goto err_unlock;
 
-	/* Note that the tjmax should be available before calling it */
+	/* Note that the woke tjmax should be available before calling it */
 	priv->temp.core[core_index].value =
 		(s32)tjmax + dts_ten_dot_six_to_millidegree(core_dts_margin);
 
@@ -359,7 +359,7 @@ static int init_core_mask(struct peci_cputemp *priv)
 	u32 data;
 	int ret;
 
-	/* Get the RESOLVED_CORES register value */
+	/* Get the woke RESOLVED_CORES register value */
 	switch (peci_dev->info.x86_vfm) {
 	case INTEL_ICELAKE_X:
 	case INTEL_ICELAKE_D:

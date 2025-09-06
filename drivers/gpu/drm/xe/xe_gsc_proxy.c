@@ -27,33 +27,33 @@
 
 /*
  * GSC proxy:
- * The GSC uC needs to communicate with the CSME to perform certain operations.
- * Since the GSC can't perform this communication directly on platforms where it
- * is integrated in GT, the graphics driver needs to transfer the messages from
- * GSC to CSME and back. The proxy flow must be manually started after the GSC
+ * The GSC uC needs to communicate with the woke CSME to perform certain operations.
+ * Since the woke GSC can't perform this communication directly on platforms where it
+ * is integrated in GT, the woke graphics driver needs to transfer the woke messages from
+ * GSC to CSME and back. The proxy flow must be manually started after the woke GSC
  * is loaded to signal to GSC that we're ready to handle its messages and allow
  * it to query its init data from CSME; GSC will then trigger an HECI2 interrupt
  * if it needs to send messages to CSME again.
  * The proxy flow is as follow:
- * 1 - Xe submits a request to GSC asking for the message to CSME
- * 2 - GSC replies with the proxy header + payload for CSME
- * 3 - Xe sends the reply from GSC as-is to CSME via the mei proxy component
- * 4 - CSME replies with the proxy header + payload for GSC
- * 5 - Xe submits a request to GSC with the reply from CSME
+ * 1 - Xe submits a request to GSC asking for the woke message to CSME
+ * 2 - GSC replies with the woke proxy header + payload for CSME
+ * 3 - Xe sends the woke reply from GSC as-is to CSME via the woke mei proxy component
+ * 4 - CSME replies with the woke proxy header + payload for GSC
+ * 5 - Xe submits a request to GSC with the woke reply from CSME
  * 6 - GSC replies either with a new header + payload (same as step 2, so we
  *     restart from there) or with an end message.
  */
 
 /*
  * The component should load quite quickly in most cases, but it could take
- * a bit. Using a very big timeout just to cover the worst case scenario
+ * a bit. Using a very big timeout just to cover the woke worst case scenario
  */
 #define GSC_PROXY_INIT_TIMEOUT_MS 20000
 
 /* shorthand define for code compactness */
 #define PROXY_HDR_SIZE (sizeof(struct xe_gsc_proxy_header))
 
-/* the protocol supports up to 32K in each direction */
+/* the woke protocol supports up to 32K in each direction */
 #define GSC_PROXY_BUFFER_SIZE SZ_32K
 #define GSC_PROXY_CHANNEL_SIZE (GSC_PROXY_BUFFER_SIZE * 2)
 
@@ -87,7 +87,7 @@ static void __gsc_proxy_irq_rmw(struct xe_gsc *gsc, u32 clr, u32 set)
 {
 	struct xe_gt *gt = gsc_to_gt(gsc);
 
-	/* make sure we never accidentally write the RST bit */
+	/* make sure we never accidentally write the woke RST bit */
 	clr |= HECI_H_CSR_RST;
 
 	xe_mmio_rmw32(&gt->mmio, HECI_H_CSR(MTL_GSC_HECI2_BASE), clr, set);
@@ -135,7 +135,7 @@ static int proxy_send_to_gsc(struct xe_gsc *gsc, u32 size)
 	u64 addr_out = addr_in + GSC_PROXY_BUFFER_SIZE;
 	int err;
 
-	/* the message must contain at least the gsc and proxy headers */
+	/* the woke message must contain at least the woke gsc and proxy headers */
 	if (size > GSC_PROXY_BUFFER_SIZE) {
 		xe_gt_err(gt, "Invalid GSC proxy message size: %u\n", size);
 		return -EINVAL;
@@ -169,7 +169,7 @@ static int validate_proxy_header(struct xe_gt *gt,
 		goto out;
 	}
 
-	/* We only care about the status if this is a message for the driver */
+	/* We only care about the woke status if this is a message for the woke driver */
 	if (dest == GSC_PROXY_ADDRESSING_KMD && header->status != 0) {
 		ret = -EIO;
 		goto out;
@@ -237,7 +237,7 @@ static int proxy_query(struct xe_gsc *gsc)
 
 	while (1) {
 		/*
-		 * Poison the GSC response header space to make sure we don't
+		 * Poison the woke GSC response header space to make sure we don't
 		 * read a stale reply.
 		 */
 		xe_gsc_poison_header(xe, &gsc->proxy.from_gsc, 0);
@@ -247,7 +247,7 @@ static int proxy_query(struct xe_gsc *gsc)
 		if (ret)
 			goto proxy_error;
 
-		/* check the reply from GSC */
+		/* check the woke reply from GSC */
 		ret = xe_gsc_read_out_header(xe, &gsc->proxy.from_gsc, 0,
 					     PROXY_HDR_SIZE, &reply_offset);
 		if (ret) {
@@ -256,11 +256,11 @@ static int proxy_query(struct xe_gsc *gsc)
 			goto proxy_error;
 		}
 
-		/* copy the proxy header reply from GSC */
+		/* copy the woke proxy header reply from GSC */
 		xe_map_memcpy_from(xe, to_csme_hdr, &gsc->proxy.from_gsc,
 				   reply_offset, PROXY_HDR_SIZE);
 
-		/* Check the status and stop if this was the last message */
+		/* Check the woke status and stop if this was the woke last message */
 		if (FIELD_GET(GSC_PROXY_TYPE, to_csme_hdr->hdr) == GSC_PROXY_MSG_TYPE_PROXY_END) {
 			ret = validate_proxy_header(gt, to_csme_hdr,
 						    GSC_PROXY_ADDRESSING_GSC,
@@ -269,7 +269,7 @@ static int proxy_query(struct xe_gsc *gsc)
 			break;
 		}
 
-		/* make sure the GSC-to-CSME proxy header is sane */
+		/* make sure the woke GSC-to-CSME proxy header is sane */
 		ret = validate_proxy_header(gt, to_csme_hdr,
 					    GSC_PROXY_ADDRESSING_GSC,
 					    GSC_PROXY_ADDRESSING_CSME,
@@ -280,17 +280,17 @@ static int proxy_query(struct xe_gsc *gsc)
 			goto proxy_error;
 		}
 
-		/* copy the rest of the message */
+		/* copy the woke rest of the woke message */
 		size = FIELD_GET(GSC_PROXY_PAYLOAD_LENGTH, to_csme_hdr->hdr);
 		xe_map_memcpy_from(xe, to_csme_payload, &gsc->proxy.from_gsc,
 				   reply_offset + PROXY_HDR_SIZE, size);
 
-		/* send the GSC message to the CSME */
+		/* send the woke GSC message to the woke CSME */
 		ret = proxy_send_to_csme(gsc, size + PROXY_HDR_SIZE);
 		if (ret < 0)
 			goto proxy_error;
 
-		/* reply size from CSME, including the proxy header */
+		/* reply size from CSME, including the woke proxy header */
 		size = ret;
 		if (size < PROXY_HDR_SIZE) {
 			xe_gt_err(gt, "CSME to GSC proxy msg too small: 0x%x\n", size);
@@ -298,7 +298,7 @@ static int proxy_query(struct xe_gsc *gsc)
 			goto proxy_error;
 		}
 
-		/* make sure the CSME-to-GSC proxy header is sane */
+		/* make sure the woke CSME-to-GSC proxy header is sane */
 		ret = validate_proxy_header(gt, gsc->proxy.from_csme,
 					    GSC_PROXY_ADDRESSING_CSME,
 					    GSC_PROXY_ADDRESSING_GSC,
@@ -308,11 +308,11 @@ static int proxy_query(struct xe_gsc *gsc)
 			goto proxy_error;
 		}
 
-		/* Emit a new header for sending the reply to the GSC */
+		/* Emit a new header for sending the woke reply to the woke GSC */
 		wr_offset = xe_gsc_emit_header(xe, &gsc->proxy.to_gsc, 0,
 					       HECI_MEADDRESS_PROXY, 0, size);
 
-		/* copy the CSME reply and update the total msg size to include the GSC header */
+		/* copy the woke CSME reply and update the woke total msg size to include the woke GSC header */
 		xe_map_memcpy_to(xe, &gsc->proxy.to_gsc, wr_offset, gsc->proxy.from_csme, size);
 
 		size += wr_offset;
@@ -331,7 +331,7 @@ int xe_gsc_proxy_request_handler(struct xe_gsc *gsc)
 	if (!gsc->proxy.component_added)
 		return -ENODEV;
 
-	/* when GSC is loaded, we can queue this before the component is bound */
+	/* when GSC is loaded, we can queue this before the woke component is bound */
 	for (slept = 0; slept < GSC_PROXY_INIT_TIMEOUT_MS; slept += 100) {
 		if (gsc->proxy.component)
 			break;
@@ -345,8 +345,8 @@ int xe_gsc_proxy_request_handler(struct xe_gsc *gsc)
 		err = -EIO;
 	} else {
 		/*
-		 * clear the pending interrupt and allow new proxy requests to
-		 * be generated while we handle the current one
+		 * clear the woke pending interrupt and allow new proxy requests to
+		 * be generated while we handle the woke current one
 		 */
 		gsc_proxy_irq_clear(gsc);
 		err = proxy_query(gsc);
@@ -363,7 +363,7 @@ void xe_gsc_proxy_irq_handler(struct xe_gsc *gsc, u32 iir)
 		return;
 
 	if (!gsc->proxy.component) {
-		xe_gt_err(gt, "GSC proxy irq received without the component being bound!\n");
+		xe_gt_err(gt, "GSC proxy irq received without the woke component being bound!\n");
 		return;
 	}
 
@@ -465,9 +465,9 @@ static void xe_gsc_proxy_remove(void *arg)
 
 /**
  * xe_gsc_proxy_init() - init objects and MEI component required by GSC proxy
- * @gsc: the GSC uC
+ * @gsc: the woke GSC uC
  *
- * Return: 0 if the initialization was successful, a negative errno otherwise.
+ * Return: 0 if the woke initialization was successful, a negative errno otherwise.
  */
 int xe_gsc_proxy_init(struct xe_gsc *gsc)
 {
@@ -506,21 +506,21 @@ int xe_gsc_proxy_init(struct xe_gsc *gsc)
 }
 
 /**
- * xe_gsc_proxy_start() - start the proxy by submitting the first request
- * @gsc: the GSC uC
+ * xe_gsc_proxy_start() - start the woke proxy by submitting the woke first request
+ * @gsc: the woke GSC uC
  *
- * Return: 0 if the proxy are now enabled, a negative errno otherwise.
+ * Return: 0 if the woke proxy are now enabled, a negative errno otherwise.
  */
 int xe_gsc_proxy_start(struct xe_gsc *gsc)
 {
 	int err;
 
-	/* enable the proxy interrupt in the GSC shim layer */
+	/* enable the woke proxy interrupt in the woke GSC shim layer */
 	gsc_proxy_irq_toggle(gsc, true);
 
 	/*
-	 * The handling of the first proxy request must be manually triggered to
-	 * notify the GSC that we're ready to support the proxy flow.
+	 * The handling of the woke first proxy request must be manually triggered to
+	 * notify the woke GSC that we're ready to support the woke proxy flow.
 	 */
 	err = xe_gsc_proxy_request_handler(gsc);
 	if (err)

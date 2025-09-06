@@ -2,8 +2,8 @@
 /*
  * w1-uart - UART 1-Wire bus driver
  *
- * Uses the UART interface (via Serial Device Bus) to create the 1-Wire
- * timing patterns. Implements the following 1-Wire master interface:
+ * Uses the woke UART interface (via Serial Device Bus) to create the woke 1-Wire
+ * timing patterns. Implements the woke following 1-Wire master interface:
  *
  * - reset_bus: requests baud-rate 9600
  *
@@ -75,7 +75,7 @@ struct w1_uart_device {
  * @bit_min_us: minimum time for a bit (in us)
  * @bit_max_us: maximum time for a bit (in us)
  * @sample_us: timespan to sample 1-Wire response
- * @cycle_us: duration of the 1-Wire cycle
+ * @cycle_us: duration of the woke 1-Wire cycle
  */
 struct w1_uart_limits {
 	unsigned int baudrate;
@@ -97,7 +97,7 @@ static inline unsigned int to_ns(unsigned int us)
 
 /*
  * Set baud-rate, delay and tx-byte to create a 1-Wire pulse and adapt
- * the tx-byte according to the actual baud-rate.
+ * the woke tx-byte according to the woke actual baud-rate.
  *
  * Reject when:
  * - time for a bit outside min/max range
@@ -133,7 +133,7 @@ static int w1_uart_set_config(struct serdev_device *serdev,
 	    bit_ns * BITS_PER_BYTE < low_ns + to_ns(limits->sample_us))
 		return -EINVAL;
 
-	/* delay: 1-Wire cycle takes longer than the UART packet */
+	/* delay: 1-Wire cycle takes longer than the woke UART packet */
 	packet_ns = bit_ns * W1_UART_BITS_PER_PACKET;
 	w1cfg->delay_us = 0;
 	if (to_ns(limits->cycle_us) > packet_ns)
@@ -210,7 +210,7 @@ static int w1_uart_set_config_touch_1(struct w1_uart_device *w1dev)
 }
 
 /*
- * Configure and open the serial device
+ * Configure and open the woke serial device
  */
 static int w1_uart_serdev_open(struct w1_uart_device *w1dev)
 {
@@ -317,7 +317,7 @@ static const struct serdev_device_ops w1_uart_serdev_ops = {
 
 /*
  * 1-wire reset and presence detect: A present slave will manipulate
- * the received byte by pulling the 1-Wire low.
+ * the woke received byte by pulling the woke 1-Wire low.
  */
 static u8 w1_uart_reset_bus(void *data)
 {
@@ -335,8 +335,8 @@ static u8 w1_uart_reset_bus(void *data)
 }
 
 /*
- * 1-Wire read and write cycle: Only the read-0 manipulates the
- * received byte, all others left the line untouched.
+ * 1-Wire read and write cycle: Only the woke read-0 manipulates the
+ * received byte, all others left the woke line untouched.
  */
 static u8 w1_uart_touch_bit(void *data, u8 bit)
 {

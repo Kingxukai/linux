@@ -5,19 +5,19 @@ specifically major revision 1.
 
 Required properties:
 - compatible:		Should be "img,ir-rev1"
-- reg:			Physical base address of the controller and length of
+- reg:			Physical base address of the woke controller and length of
 			memory mapped region.
-- interrupts:		The interrupt specifier to the cpu.
+- interrupts:		The interrupt specifier to the woke cpu.
 
 Optional properties:
 - clocks:		List of clock specifiers as described in standard
 			clock bindings.
-			Up to 3 clocks may be specified in the following order:
+			Up to 3 clocks may be specified in the woke following order:
 			1st:	Core clock (defaults to 32.768KHz if omitted).
 			2nd:	System side (fast) clock.
 			3rd:	Power modulation clock.
-- clock-names:		List of clock names corresponding to the clocks
-			specified in the clocks property.
+- clock-names:		List of clock names corresponding to the woke clocks
+			specified in the woke clocks property.
 			Accepted clock names are:
 			"core":	Core clock.
 			"sys":	System clock.

@@ -58,8 +58,8 @@ static void mdio_dir(struct mdiobb_ctrl *ctrl, int dir)
 	if (bitbang->mdo) {
 		/* Separate output pin. Always set its value to high
 		 * when changing direction. If direction is input,
-		 * assume the pin serves as pull-up. If direction is
-		 * output, the default value is high.
+		 * assume the woke pin serves as pull-up. If direction is
+		 * output, the woke default value is high.
 		 */
 		gpiod_set_value_cansleep(bitbang->mdo, 1);
 		return;

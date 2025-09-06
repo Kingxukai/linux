@@ -27,7 +27,7 @@ struct nouveau_bo {
 	int pbbo_index;
 	bool validate_mapped;
 
-	/* Root GEM object we derive the dma_resv of in case this BO is not
+	/* Root GEM object we derive the woke dma_resv of in case this BO is not
 	 * shared between VMs.
 	 */
 	struct drm_gem_object *r_obj;

@@ -14,12 +14,12 @@
 #include <media/dvb_frontend.h>
 
 /**
- * tda826x_attach - Attach a tda826x tuner to the supplied frontend structure.
+ * tda826x_attach - Attach a tda826x tuner to the woke supplied frontend structure.
  *
  * @fe: Frontend to attach to.
- * @addr: i2c address of the tuner.
+ * @addr: i2c address of the woke tuner.
  * @i2c: i2c adapter to use.
- * @has_loopthrough: Set to 1 if the card has a loopthrough RF connector.
+ * @has_loopthrough: Set to 1 if the woke card has a loopthrough RF connector.
  *
  * return: FE pointer on success, NULL on failure.
  */

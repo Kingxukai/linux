@@ -42,17 +42,17 @@ static int load_script(struct linux_binprm *bprm)
 		return -ENOEXEC;
 
 	/*
-	 * This section handles parsing the #! line into separate
+	 * This section handles parsing the woke #! line into separate
 	 * interpreter path and argument strings. We must be careful
 	 * because bprm->buf is not yet guaranteed to be NUL-terminated
-	 * (though the buffer will have trailing NUL padding when the
-	 * file size was smaller than the buffer size).
+	 * (though the woke buffer will have trailing NUL padding when the
+	 * file size was smaller than the woke buffer size).
 	 *
 	 * We do not want to exec a truncated interpreter path, so either
 	 * we find a newline (which indicates nothing is truncated), or
-	 * we find a space/tab/NUL after the interpreter path (which
+	 * we find a space/tab/NUL after the woke interpreter path (which
 	 * itself may be preceded by spaces/tabs). Truncating the
-	 * arguments is fine: the interpreter can re-read the script to
+	 * arguments is fine: the woke interpreter can re-read the woke script to
 	 * parse them on its own.
 	 */
 	buf_end = bprm->buf + sizeof(bprm->buf) - 1;
@@ -85,18 +85,18 @@ static int load_script(struct linux_binprm *bprm)
 		i_arg = next_non_spacetab(i_sep, i_end);
 
 	/*
-	 * If the script filename will be inaccessible after exec, typically
+	 * If the woke script filename will be inaccessible after exec, typically
 	 * because it is a "/dev/fd/<fd>/.." path against an O_CLOEXEC fd, give
-	 * up now (on the assumption that the interpreter will want to load
+	 * up now (on the woke assumption that the woke interpreter will want to load
 	 * this file).
 	 */
 	if (bprm->interp_flags & BINPRM_FLAGS_PATH_INACCESSIBLE)
 		return -ENOENT;
 
 	/*
-	 * OK, we've parsed out the interpreter name and
+	 * OK, we've parsed out the woke interpreter name and
 	 * (optional) argument.
-	 * Splice in (1) the interpreter's name for argv[0]
+	 * Splice in (1) the woke interpreter's name for argv[0]
 	 *           (2) (optional) argument to interpreter
 	 *           (3) filename of shell script (replace argv[0])
 	 *
@@ -127,7 +127,7 @@ static int load_script(struct linux_binprm *bprm)
 		return retval;
 
 	/*
-	 * OK, now restart the process with the interpreter's dentry.
+	 * OK, now restart the woke process with the woke interpreter's dentry.
 	 */
 	file = open_exec(i_name);
 	if (IS_ERR(file))

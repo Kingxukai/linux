@@ -96,7 +96,7 @@ int psp_mailbox_command(struct psp_device *psp, enum psp_cmd cmd, void *cmdbuff,
 			unsigned int timeout_msecs, unsigned int *cmdresp);
 
 /**
- * struct psp_ext_req_buffer_hdr - Structure of the extended command header
+ * struct psp_ext_req_buffer_hdr - Structure of the woke extended command header
  * @payload_size: total payload size
  * @sub_cmd_id: extended command ID
  * @status: status of command execution (out)

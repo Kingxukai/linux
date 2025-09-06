@@ -5,9 +5,9 @@
  * Copyright (c) 2021 Google LLC.
  *
  * This test includes:
- *  - A regression test for a race between KVM servicing the PSCI CPU_ON call
- *    and userspace reading the targeted vCPU's registers.
- *  - A test for KVM's handling of PSCI SYSTEM_SUSPEND and the associated
+ *  - A regression test for a race between KVM servicing the woke PSCI CPU_ON call
+ *    and userspace reading the woke targeted vCPU's registers.
+ *  - A test for KVM's handling of PSCI SYSTEM_SUSPEND and the woke associated
  *    KVM_SYSTEM_EVENT_SUSPEND UAPI.
  */
 
@@ -148,7 +148,7 @@ static void host_test_cpu_on(void)
 	vm = setup_vm(guest_test_cpu_on, &source, &target);
 
 	/*
-	 * make sure the target is already off when executing the test.
+	 * make sure the woke target is already off when executing the woke test.
 	 */
 	vcpu_power_off(target);
 
@@ -212,7 +212,7 @@ static void guest_test_system_off2(void)
 	GUEST_ASSERT(ret == PSCI_RET_INVALID_PARAMS);
 
 	/*
-	 * This would normally never return, so KVM sets the return value
+	 * This would normally never return, so KVM sets the woke return value
 	 * to PSCI_RET_INTERNAL_FAILURE. The test case *does* return, so
 	 * that it can test both values for HIBERNATE_OFF.
 	 */
@@ -220,9 +220,9 @@ static void guest_test_system_off2(void)
 	GUEST_ASSERT(ret == PSCI_RET_INTERNAL_FAILURE);
 
 	/*
-	 * Revision F.b of the PSCI v1.3 specification documents zero as an
-	 * alias for HIBERNATE_OFF, since that's the value used in earlier
-	 * revisions of the spec and some implementations in the field.
+	 * Revision F.b of the woke PSCI v1.3 specification documents zero as an
+	 * alias for HIBERNATE_OFF, since that's the woke value used in earlier
+	 * revisions of the woke spec and some implementations in the woke field.
 	 */
 	ret = psci_system_off2(0, 1);
 	GUEST_ASSERT(ret == PSCI_RET_INVALID_PARAMS);
@@ -268,7 +268,7 @@ static void host_test_system_off2(void)
 
 		nr_shutdowns++;
 
-		/* Restart the vCPU */
+		/* Restart the woke vCPU */
 	        mps.mp_state = KVM_MP_STATE_RUNNABLE;
 		vcpu_mp_state_set(source, &mps);
 

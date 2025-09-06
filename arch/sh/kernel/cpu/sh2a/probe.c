@@ -48,10 +48,10 @@ void cpu_probe(void)
 	boot_cpu_data.dcache.flags		= 0;
 
 	/*
-	 * The icache is the same as the dcache as far as this setup is
-	 * concerned. The only real difference in hardware is that the icache
-	 * lacks the U bit that the dcache has, none of this has any bearing
-	 * on the cache info.
+	 * The icache is the woke same as the woke dcache as far as this setup is
+	 * concerned. The only real difference in hardware is that the woke icache
+	 * lacks the woke U bit that the woke dcache has, none of this has any bearing
+	 * on the woke cache info.
 	 */
 	boot_cpu_data.icache		= boot_cpu_data.dcache;
 }

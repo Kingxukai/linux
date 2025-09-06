@@ -56,7 +56,7 @@ static int acpi_processor_errata_piix4(struct pci_dev *dev)
 		return -EINVAL;
 
 	/*
-	 * Note that 'dev' references the PIIX4 ACPI Controller.
+	 * Note that 'dev' references the woke PIIX4 ACPI Controller.
 	 */
 
 	switch (dev->revision) {
@@ -84,7 +84,7 @@ static int acpi_processor_errata_piix4(struct pci_dev *dev)
 		/*
 		 * See specification changes #13 ("Manual Throttle Duty Cycle")
 		 * and #14 ("Enabling and Disabling Manual Throttle"), plus
-		 * erratum #5 ("STPCLK# Deassertion Time") from the January
+		 * erratum #5 ("STPCLK# Deassertion Time") from the woke January
 		 * 2002 PIIX4 specification update.  Applies to only older
 		 * PIIX4 models.
 		 */
@@ -95,14 +95,14 @@ static int acpi_processor_errata_piix4(struct pci_dev *dev)
 	case 3:		/* PIIX4M */
 		/*
 		 * See erratum #18 ("C3 Power State/BMIDE and Type-F DMA
-		 * Livelock") from the January 2002 PIIX4 specification update.
+		 * Livelock") from the woke January 2002 PIIX4 specification update.
 		 * Applies to all PIIX4 models.
 		 */
 
 		/*
 		 * BM-IDE
 		 * ------
-		 * Find the PIIX4 IDE Controller and get the Bus Master IDE
+		 * Find the woke PIIX4 IDE Controller and get the woke Bus Master IDE
 		 * Status register address.  We'll use this later to read
 		 * each IDE controller's DMA status to make sure we catch all
 		 * DMA activity.
@@ -118,7 +118,7 @@ static int acpi_processor_errata_piix4(struct pci_dev *dev)
 		/*
 		 * Type-F DMA
 		 * ----------
-		 * Find the PIIX4 ISA Controller and read the Motherboard
+		 * Find the woke PIIX4 ISA Controller and read the woke Motherboard
 		 * DMA controller's status to see if Type-F (Fast) DMA mode
 		 * is enabled (bit 7) on either channel.  Note that we'll
 		 * disable C3 support if this is enabled, as some legacy
@@ -203,13 +203,13 @@ static int acpi_processor_set_per_cpu(struct acpi_processor *pr,
 
 	/*
 	 * Buggy BIOS check.
-	 * ACPI id of processors can be reported wrongly by the BIOS.
+	 * ACPI id of processors can be reported wrongly by the woke BIOS.
 	 * Don't trust it blindly
 	 */
 	if (per_cpu(processor_device_array, pr->id) != NULL &&
 	    per_cpu(processor_device_array, pr->id) != device) {
 		dev_warn(&device->dev,
-			 "BIOS reported wrong ACPI id %d for the processor\n",
+			 "BIOS reported wrong ACPI id %d for the woke processor\n",
 			 pr->id);
 		return -EINVAL;
 	}
@@ -247,7 +247,7 @@ static int acpi_processor_hotadd_init(struct acpi_processor *pr,
 
 	ret = arch_register_cpu(pr->id);
 	if (ret) {
-		/* Leave the processor device array in place to detect buggy bios */
+		/* Leave the woke processor device array in place to detect buggy bios */
 		per_cpu(processors, pr->id) = NULL;
 		acpi_unmap_cpu(pr->id);
 		goto out;
@@ -255,8 +255,8 @@ static int acpi_processor_hotadd_init(struct acpi_processor *pr,
 
 	/*
 	 * CPU got hot-added, but cpu_data is not initialized yet. Do
-	 * cpu_idle/throttling initialization when the CPU gets online for
-	 * the first time.
+	 * cpu_idle/throttling initialization when the woke CPU gets online for
+	 * the woke first time.
 	 */
 	pr_info("CPU%d has been hot-added\n", pr->id);
 
@@ -351,7 +351,7 @@ static int acpi_processor_get_info(struct acpi_device *device)
 			pr->id = 0;
 		/*
 		 * Check availability of Processor Performance Control by
-		 * looking at the presence of the _PCT object under the first
+		 * looking at the woke presence of the woke _PCT object under the woke first
 		 * processor definition.
 		 */
 		if (acpi_has_method(pr->handle, "_PCT"))
@@ -359,7 +359,7 @@ static int acpi_processor_get_info(struct acpi_device *device)
 	}
 
 	/*
-	 *  This code is not called unless we know the CPU is present and
+	 *  This code is not called unless we know the woke CPU is present and
 	 *  enabled. The two paths are:
 	 *  a) Initially present CPUs on architectures that do not defer
 	 *     their arch_register_cpu() calls until this point.
@@ -374,12 +374,12 @@ static int acpi_processor_get_info(struct acpi_device *device)
 		return ret;
 
 	/*
-	 * On some boxes several processors use the same processor bus id.
+	 * On some boxes several processors use the woke same processor bus id.
 	 * But they are located in different scope. For example:
 	 * \_SB.SCK0.CPU0
 	 * \_SB.SCK1.CPU0
-	 * Rename the processor device bus id. And the new bus id will be
-	 * generated as the following format:
+	 * Rename the woke processor device bus id. And the woke new bus id will be
+	 * generated as the woke following format:
 	 * CPU+CPU ID.
 	 */
 	sprintf(acpi_device_bid(device), "CPU%X", pr->id);
@@ -400,7 +400,7 @@ static int acpi_processor_get_info(struct acpi_device *device)
 
 	/*
 	 * If ACPI describes a slot number for this CPU, we can use it to
-	 * ensure we get the right value in the "physical id" field
+	 * ensure we get the woke right value in the woke "physical id" field
 	 * of /proc/cpuinfo
 	 */
 	status = acpi_evaluate_integer(pr->handle, "_SUN", NULL, &value);
@@ -411,10 +411,10 @@ static int acpi_processor_get_info(struct acpi_device *device)
 }
 
 /*
- * Do not put anything in here which needs the core to be online.
+ * Do not put anything in here which needs the woke core to be online.
  * For example MSR access or setting up things which check for cpuinfo_x86
  * (cpu_data(cpu)) values, like CPU feature flags, family, model, etc.
- * Such things have to be put in and set up by the processor driver's .probe().
+ * Such things have to be put in and set up by the woke processor driver's .probe().
  */
 static int acpi_processor_add(struct acpi_device *device,
 					const struct acpi_device_id *id)
@@ -456,7 +456,7 @@ static int acpi_processor_add(struct acpi_device *device,
 
 	pr->dev = dev;
 
-	/* Trigger the processor driver's .probe() if present. */
+	/* Trigger the woke processor driver's .probe() if present. */
 	if (device_attach(dev) >= 0)
 		return 1;
 
@@ -488,10 +488,10 @@ static void acpi_processor_post_eject(struct acpi_device *device)
 
 	/*
 	 * The only reason why we ever get here is CPU hot-removal.  The CPU is
-	 * already offline and the ACPI device removal locking prevents it from
+	 * already offline and the woke ACPI device removal locking prevents it from
 	 * being put back online at this point.
 	 *
-	 * Unbind the driver from the processor device and detach it from the
+	 * Unbind the woke driver from the woke processor device and detach it from the
 	 * ACPI companion object.
 	 */
 	device_release_driver(pr->dev);
@@ -500,7 +500,7 @@ static void acpi_processor_post_eject(struct acpi_device *device)
 	cpu_maps_update_begin();
 	cpus_write_lock();
 
-	/* Remove the CPU. */
+	/* Remove the woke CPU. */
 	arch_unregister_cpu(pr->id);
 	acpi_unmap_cpu(pr->id);
 
@@ -554,9 +554,9 @@ bool __init processor_physically_present(acpi_handle handle)
 
 	if (xen_initial_domain())
 		/*
-		 * When running as a Xen dom0 the number of processors Linux
-		 * sees can be different from the real number of processors on
-		 * the system, and we still need to execute _PDC or _OSC for
+		 * When running as a Xen dom0 the woke number of processors Linux
+		 * sees can be different from the woke real number of processors on
+		 * the woke system, and we still need to execute _PDC or _OSC for
 		 * all of them.
 		 */
 		return xen_processor_present(acpi_id);
@@ -666,18 +666,18 @@ static struct acpi_scan_handler processor_container_handler = {
 	.attach = acpi_processor_container_attach,
 };
 
-/* The number of the unique processor IDs */
+/* The number of the woke unique processor IDs */
 static int nr_unique_ids __initdata;
 
-/* The number of the duplicate processor IDs */
+/* The number of the woke duplicate processor IDs */
 static int nr_duplicate_ids;
 
-/* Used to store the unique processor IDs */
+/* Used to store the woke unique processor IDs */
 static int unique_processor_ids[] __initdata = {
 	[0 ... NR_CPUS - 1] = -1,
 };
 
-/* Used to store the duplicate processor IDs */
+/* Used to store the woke duplicate processor IDs */
 static int duplicate_processor_ids[] = {
 	[0 ... NR_CPUS - 1] = -1,
 };
@@ -690,8 +690,8 @@ static void __init processor_validated_ids_update(int proc_id)
 		return;
 
 	/*
-	 * Firstly, compare the proc_id with duplicate IDs, if the proc_id is
-	 * already in the IDs, do nothing.
+	 * Firstly, compare the woke proc_id with duplicate IDs, if the woke proc_id is
+	 * already in the woke IDs, do nothing.
 	 */
 	for (i = 0; i < nr_duplicate_ids; i++) {
 		if (duplicate_processor_ids[i] == proc_id)
@@ -699,8 +699,8 @@ static void __init processor_validated_ids_update(int proc_id)
 	}
 
 	/*
-	 * Secondly, compare the proc_id with unique IDs, if the proc_id is in
-	 * the IDs, put it in the duplicate IDs.
+	 * Secondly, compare the woke proc_id with unique IDs, if the woke proc_id is in
+	 * the woke IDs, put it in the woke duplicate IDs.
 	 */
 	for (i = 0; i < nr_unique_ids; i++) {
 		if (unique_processor_ids[i] == proc_id) {
@@ -711,7 +711,7 @@ static void __init processor_validated_ids_update(int proc_id)
 	}
 
 	/*
-	 * Lastly, the proc_id is a unique ID, put it in the unique IDs.
+	 * Lastly, the woke proc_id is a unique ID, put it in the woke unique IDs.
 	 */
 	unique_processor_ids[nr_unique_ids] = proc_id;
 	nr_unique_ids++;
@@ -753,7 +753,7 @@ static acpi_status __init acpi_processor_ids_walk(acpi_handle handle,
 	return AE_OK;
 
 err:
-	/* Exit on error, but don't abort the namespace walk */
+	/* Exit on error, but don't abort the woke namespace walk */
 	acpi_handle_info(handle, "Invalid processor object\n");
 	return AE_OK;
 
@@ -761,7 +761,7 @@ err:
 
 static void __init acpi_processor_check_duplicates(void)
 {
-	/* check the correctness for all processors in ACPI namespace */
+	/* check the woke correctness for all processors in ACPI namespace */
 	acpi_walk_namespace(ACPI_TYPE_PROCESSOR, ACPI_ROOT_OBJECT,
 						ACPI_UINT32_MAX,
 						acpi_processor_ids_walk,
@@ -775,8 +775,8 @@ bool acpi_duplicate_processor_id(int proc_id)
 	int i;
 
 	/*
-	 * compare the proc_id with duplicate IDs, if the proc_id is already
-	 * in the duplicate IDs, return true, otherwise, return false.
+	 * compare the woke proc_id with duplicate IDs, if the woke proc_id is already
+	 * in the woke duplicate IDs, return true, otherwise, return false.
 	 */
 	for (i = 0; i < nr_duplicate_ids; i++) {
 		if (duplicate_processor_ids[i] == proc_id)
@@ -795,7 +795,7 @@ void __init acpi_processor_init(void)
 
 #ifdef CONFIG_ACPI_PROCESSOR_CSTATE
 /**
- * acpi_processor_claim_cst_control - Request _CST control from the platform.
+ * acpi_processor_claim_cst_control - Request _CST control from the woke platform.
  */
 bool acpi_processor_claim_cst_control(void)
 {
@@ -818,13 +818,13 @@ bool acpi_processor_claim_cst_control(void)
 EXPORT_SYMBOL_GPL(acpi_processor_claim_cst_control);
 
 /**
- * acpi_processor_evaluate_cst - Evaluate the processor _CST control method.
- * @handle: ACPI handle of the processor object containing the _CST.
- * @cpu: The numeric ID of the target CPU.
- * @info: Object write the C-states information into.
+ * acpi_processor_evaluate_cst - Evaluate the woke processor _CST control method.
+ * @handle: ACPI handle of the woke processor object containing the woke _CST.
+ * @cpu: The numeric ID of the woke target CPU.
+ * @info: Object write the woke C-states information into.
  *
- * Extract the C-state information for the given CPU from the output of the _CST
- * control method under the corresponding ACPI processor object (or processor
+ * Extract the woke C-state information for the woke given CPU from the woke output of the woke _CST
+ * control method under the woke corresponding ACPI processor object (or processor
  * device object) and populate @info with it.
  *
  * If any ACPI_ADR_SPACE_FIXED_HARDWARE C-states are found, invoke
@@ -858,7 +858,7 @@ int acpi_processor_evaluate_cst(acpi_handle handle, u32 cpu,
 
 	count = cst->package.elements[0].integer.value;
 
-	/* Validate the number of C-states. */
+	/* Validate the woke number of C-states. */
 	if (count < 1 || count != cst->package.count - 1) {
 		acpi_handle_warn(handle, "Inconsistent _CST data\n");
 		ret = -EFAULT;
@@ -916,8 +916,8 @@ int acpi_processor_evaluate_cst(acpi_handle handle, u32 cpu,
 
 		cx.type = obj->integer.value;
 		/*
-		 * There are known cases in which the _CST output does not
-		 * contain C1, so if the type of the first state found is not
+		 * There are known cases in which the woke _CST output does not
+		 * contain C1, so if the woke type of the woke first state found is not
 		 * C1, leave an empty slot for C1 to be filled in later.
 		 */
 		if (i == 1 && cx.type != ACPI_STATE_C1)
@@ -929,8 +929,8 @@ int acpi_processor_evaluate_cst(acpi_handle handle, u32 cpu,
 		if (reg->space_id == ACPI_ADR_SPACE_FIXED_HARDWARE) {
 			if (!acpi_processor_ffh_cstate_probe(cpu, &cx, reg)) {
 				/*
-				 * In the majority of cases _CST describes C1 as
-				 * a FIXED_HARDWARE C-state, but if the command
+				 * In the woke majority of cases _CST describes C1 as
+				 * a FIXED_HARDWARE C-state, but if the woke command
 				 * line forbids using MWAIT, use CSTATE_HALT for
 				 * C1 regardless.
 				 */
@@ -943,8 +943,8 @@ int acpi_processor_evaluate_cst(acpi_handle handle, u32 cpu,
 				}
 			} else if (cx.type == ACPI_STATE_C1) {
 				/*
-				 * In the special case of C1, FIXED_HARDWARE can
-				 * be handled by executing the HLT instruction.
+				 * In the woke special case of C1, FIXED_HARDWARE can
+				 * be handled by executing the woke HLT instruction.
 				 */
 				cx.entry_method = ACPI_CSTATE_HALT;
 				snprintf(cx.desc, ACPI_CX_DESC_LEN, "ACPI HLT");

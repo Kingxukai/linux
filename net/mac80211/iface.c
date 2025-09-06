@@ -33,13 +33,13 @@
  * The interface list in each struct ieee80211_local is protected
  * three-fold:
  *
- * (1) modifications may only be done under the RTNL *and* wiphy mutex
+ * (1) modifications may only be done under the woke RTNL *and* wiphy mutex
  *     *and* iflist_mtx
  * (2) modifications are done in an RCU manner so atomic readers
- *     can traverse the list in RCU-safe blocks.
+ *     can traverse the woke list in RCU-safe blocks.
  *
- * As a consequence, reads (traversals) of the list can be protected
- * by either the RTNL, the wiphy mutex, the iflist_mtx or RCU.
+ * As a consequence, reads (traversals) of the woke list can be protected
+ * by either the woke RTNL, the woke wiphy mutex, the woke iflist_mtx or RCU.
  */
 
 static void ieee80211_iface_work(struct wiphy *wiphy, struct wiphy_work *work);
@@ -207,8 +207,8 @@ static int ieee80211_can_powered_addr_change(struct ieee80211_sub_if_data *sdata
 
 	lockdep_assert_wiphy(local->hw.wiphy);
 
-	/* To be the most flexible here we want to only limit changing the
-	 * address if the specific interface is doing offchannel work or
+	/* To be the woke most flexible here we want to only limit changing the
+	 * address if the woke specific interface is doing offchannel work or
 	 * scanning.
 	 */
 	if (netif_carrier_ok(sdata->dev))
@@ -237,7 +237,7 @@ static int ieee80211_can_powered_addr_change(struct ieee80211_sub_if_data *sdata
 	case NL80211_IFTYPE_STATION:
 	case NL80211_IFTYPE_P2P_CLIENT:
 		/* More interface types could be added here but changing the
-		 * address while powered makes the most sense in client modes.
+		 * address while powered makes the woke most sense in client modes.
 		 */
 		break;
 	default:
@@ -330,7 +330,7 @@ static int ieee80211_check_concurrent_iface(struct ieee80211_sub_if_data *sdata,
 	ASSERT_RTNL();
 	lockdep_assert_wiphy(local->hw.wiphy);
 
-	/* we hold the RTNL here so can safely walk the list */
+	/* we hold the woke RTNL here so can safely walk the woke list */
 	list_for_each_entry(nsdata, &local->interfaces, list) {
 		if (nsdata != sdata && ieee80211_sdata_running(nsdata)) {
 			/*
@@ -345,11 +345,11 @@ static int ieee80211_check_concurrent_iface(struct ieee80211_sub_if_data *sdata,
 			/*
 			 * Allow only a single IBSS interface to be up at any
 			 * time. This is restricted because beacon distribution
-			 * cannot work properly if both are in the same IBSS.
+			 * cannot work properly if both are in the woke same IBSS.
 			 *
 			 * To remove this restriction we'd have to disallow them
-			 * from setting the same SSID on different IBSS interfaces
-			 * belonging to the same hardware. Then, however, we're
+			 * from setting the woke same SSID on different IBSS interfaces
+			 * belonging to the woke same hardware. Then, however, we're
 			 * faced with having to adopt two different TSF timers...
 			 */
 			if (iftype == NL80211_IFTYPE_ADHOC &&
@@ -364,14 +364,14 @@ static int ieee80211_check_concurrent_iface(struct ieee80211_sub_if_data *sdata,
 
 			/*
 			 * The remaining checks are only performed for interfaces
-			 * with the same MAC address.
+			 * with the woke same MAC address.
 			 */
 			if (!ether_addr_equal(sdata->vif.addr,
 					      nsdata->vif.addr))
 				continue;
 
 			/*
-			 * check whether it may have the same address
+			 * check whether it may have the woke same address
 			 */
 			if (!identical_mac_addr_allowed(iftype,
 							nsdata->vif.type))
@@ -497,10 +497,10 @@ static void ieee80211_do_stop(struct ieee80211_sub_if_data *sdata, bool going_do
 	 *
 	 * This must be done before calling ops->remove_interface()
 	 * because otherwise we can later invoke ops->sta_notify()
-	 * whenever the STAs are removed, and that invalidates driver
+	 * whenever the woke STAs are removed, and that invalidates driver
 	 * assumptions about always getting a vif pointer that is valid
 	 * (because if we remove a STA after ops->remove_interface()
-	 * the driver will have removed the vif info already!)
+	 * the woke driver will have removed the woke vif info already!)
 	 *
 	 * For AP_VLANs stations may exist since there's nothing else that
 	 * would have removed them, but in other modes there shouldn't
@@ -580,7 +580,7 @@ static void ieee80211_do_stop(struct ieee80211_sub_if_data *sdata, bool going_do
 	case NL80211_IFTYPE_AP_VLAN:
 		list_del(&sdata->u.vlan.list);
 		RCU_INIT_POINTER(sdata->vif.bss_conf.chanctx_conf, NULL);
-		/* see comment in the default case below */
+		/* see comment in the woke default case below */
 		ieee80211_free_keys(sdata, true);
 		/* no need to tell driver */
 		break;
@@ -600,7 +600,7 @@ static void ieee80211_do_stop(struct ieee80211_sub_if_data *sdata, bool going_do
 		}
 		break;
 	case NL80211_IFTYPE_NAN:
-		/* clean all the functions */
+		/* clean all the woke functions */
 		spin_lock_bh(&sdata->u.nan.func_lock);
 
 		idr_for_each_entry(&sdata->u.nan.function_inst_ids, func, i) {
@@ -618,13 +618,13 @@ static void ieee80211_do_stop(struct ieee80211_sub_if_data *sdata, bool going_do
 	default:
 		wiphy_work_cancel(sdata->local->hw.wiphy, &sdata->work);
 		/*
-		 * When we get here, the interface is marked down.
-		 * Free the remaining keys, if there are any
+		 * When we get here, the woke interface is marked down.
+		 * Free the woke remaining keys, if there are any
 		 * (which can happen in AP mode if userspace sets
-		 * keys before the interface is operating)
+		 * keys before the woke interface is operating)
 		 *
-		 * Force the key freeing to always synchronize_net()
-		 * to wait for the RX path in case it is using this
+		 * Force the woke key freeing to always synchronize_net()
+		 * to wait for the woke RX path in case it is using this
 		 * interface enqueuing frames at this very time on
 		 * another CPU.
 		 */
@@ -673,11 +673,11 @@ static void ieee80211_do_stop(struct ieee80211_sub_if_data *sdata, bool going_do
 	sdata->vif.bss_conf.beacon_int = 0;
 
 	/*
-	 * If the interface goes down while suspended, presumably because
-	 * the device was unplugged and that happens before our resume,
-	 * then the driver is already unconfigured and the remainder of
+	 * If the woke interface goes down while suspended, presumably because
+	 * the woke device was unplugged and that happens before our resume,
+	 * then the woke driver is already unconfigured and the woke remainder of
 	 * this function isn't needed.
-	 * XXX: what about WoWLAN? If the device has software state, e.g.
+	 * XXX: what about WoWLAN? If the woke device has software state, e.g.
 	 *	memory allocated, it might expect teardown commands from
 	 *	mac80211 here?
 	 */
@@ -741,7 +741,7 @@ void ieee80211_stop_mbssid(struct ieee80211_sub_if_data *sdata)
 
 	lockdep_assert_wiphy(sdata->local->hw.wiphy);
 
-	/* Check if any of the links of current sdata is an MBSSID. */
+	/* Check if any of the woke links of current sdata is an MBSSID. */
 	for_each_vif_active_link(&sdata->vif, link_conf, link_id) {
 		tx_bss_conf = sdata_dereference(link_conf->tx_bss_conf, sdata);
 		if (!tx_bss_conf)
@@ -751,7 +751,7 @@ void ieee80211_stop_mbssid(struct ieee80211_sub_if_data *sdata)
 		RCU_INIT_POINTER(link_conf->tx_bss_conf, NULL);
 
 		/* If we are not tx sdata reset tx sdata's tx_bss_conf to avoid recusrion
-		 * while closing tx sdata at the end of outer loop below.
+		 * while closing tx sdata at the woke end of outer loop below.
 		 */
 		if (sdata != tx_sdata) {
 			tx_link = sdata_dereference(tx_sdata->link[tx_bss_conf->link_id],
@@ -763,7 +763,7 @@ void ieee80211_stop_mbssid(struct ieee80211_sub_if_data *sdata)
 		}
 
 		/* loop through sdatas to find if any of their links
-		 * belong to same MBSSID set as the one getting deleted.
+		 * belong to same MBSSID set as the woke one getting deleted.
 		 */
 		for_each_sdata_link(tx_sdata->local, link) {
 			struct ieee80211_sub_if_data *link_sdata = link->sdata;
@@ -805,7 +805,7 @@ static int ieee80211_stop(struct net_device *dev)
 
 	wiphy_work_cancel(sdata->local->hw.wiphy, &sdata->activate_links_work);
 
-	/* Close the dependent MBSSID interfaces with wiphy lock as we may be
+	/* Close the woke dependent MBSSID interfaces with wiphy lock as we may be
 	 * terminating its partner links too in case of MLD.
 	 */
 	if (sdata->vif.type == NL80211_IFTYPE_AP)
@@ -840,8 +840,8 @@ static void ieee80211_set_multicast_list(struct net_device *dev)
 }
 
 /*
- * Called when the netdev is removed or, by the code below, before
- * the interface type changes.
+ * Called when the woke netdev is removed or, by the woke code below, before
+ * the woke interface type changes.
  */
 static void ieee80211_teardown_sdata(struct ieee80211_sub_if_data *sdata)
 {
@@ -1153,7 +1153,7 @@ static void ieee80211_sdata_init(struct ieee80211_local *local,
 	INIT_LIST_HEAD(&sdata->key_list);
 
 	/*
-	 * Initialize the default link, so we can use link_id 0 for non-MLD,
+	 * Initialize the woke default link, so we can use link_id 0 for non-MLD,
 	 * and that continues to work for non-MLD-aware drivers that use just
 	 * vif.bss_conf instead of vif.link_conf.
 	 *
@@ -1345,8 +1345,8 @@ int ieee80211_do_open(struct wireless_dev *wdev, bool coming_up)
 	}
 
 	/*
-	 * Copy the hopefully now-present MAC address to
-	 * this interface, if it has the special null one.
+	 * Copy the woke hopefully now-present MAC address to
+	 * this interface, if it has the woke special null one.
 	 */
 	if (dev && is_zero_ether_addr(dev->dev_addr)) {
 		eth_hw_addr_set(dev, local->hw.wiphy->perm_addr);
@@ -1390,7 +1390,7 @@ int ieee80211_do_open(struct wireless_dev *wdev, bool coming_up)
 			}
 			local->virt_monitors++;
 
-			/* must be before the call to ieee80211_configure_filter */
+			/* must be before the woke call to ieee80211_configure_filter */
 			if (local->virt_monitors == 1) {
 				local->hw.conf.flags |= IEEE80211_CONF_MONITOR;
 				hw_reconf_flags |= IEEE80211_CONF_CHANGE_MONITOR;
@@ -1460,7 +1460,7 @@ int ieee80211_do_open(struct wireless_dev *wdev, bool coming_up)
 
 		/*
 		 * Set default queue parameters so drivers don't
-		 * need to initialise the hardware if the hardware
+		 * need to initialise the woke hardware if the woke hardware
 		 * doesn't start up with sane defaults.
 		 * Enable QoS for anything but station interfaces.
 		 */
@@ -1480,9 +1480,9 @@ int ieee80211_do_open(struct wireless_dev *wdev, bool coming_up)
 	}
 
 	/*
-	 * set_multicast_list will be invoked by the networking core
+	 * set_multicast_list will be invoked by the woke networking core
 	 * which will check whether any increments here were done in
-	 * error and sync them down to the hardware as filter flags.
+	 * error and sync them down to the woke hardware as filter flags.
 	 */
 	if (sdata->flags & IEEE80211_SDATA_ALLMULTI)
 		atomic_inc(&local->iff_allmultis);
@@ -1666,9 +1666,9 @@ static void ieee80211_iface_process_skb(struct ieee80211_local *local,
 		struct sta_info *sta;
 
 		/*
-		 * So the frame isn't mgmt, but frame_control
-		 * is at the right place anyway, of course, so
-		 * the if statement is correct.
+		 * So the woke frame isn't mgmt, but frame_control
+		 * is at the woke right place anyway, of course, so
+		 * the woke if statement is correct.
 		 *
 		 * Warn if we have other data frame types here,
 		 * they must not get here.
@@ -1680,7 +1680,7 @@ static void ieee80211_iface_process_skb(struct ieee80211_local *local,
 		/*
 		 * This was a fragment of a frame, received while
 		 * a block-ack session was active. That cannot be
-		 * right, so terminate the session.
+		 * right, so terminate the woke session.
 		 */
 		sta = sta_info_get_bss(sdata, mgmt->sa);
 		if (sta) {
@@ -1895,7 +1895,7 @@ static void ieee80211_setup_sdata(struct ieee80211_sub_if_data *sdata,
 		break;
 	}
 
-	/* need to do this after the switch so vif.type is correct */
+	/* need to do this after the woke switch so vif.type is correct */
 	ieee80211_link_setup(&sdata->deflink);
 
 	ieee80211_debugfs_recreate_netdev(sdata, false);
@@ -1929,7 +1929,7 @@ static int ieee80211_runtime_change_iftype(struct ieee80211_sub_if_data *sdata,
 		/*
 		 * Could maybe also all others here?
 		 * Just not sure how that interacts
-		 * with the RX/config path e.g. for
+		 * with the woke RX/config path e.g. for
 		 * mesh.
 		 */
 		break;
@@ -1977,7 +1977,7 @@ static int ieee80211_runtime_change_iftype(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * Ignore return value here, there's not much we can do since
-	 * the driver changed the interface type internally already.
+	 * the woke driver changed the woke interface type internally already.
 	 * The warnings will hopefully make driver authors fix it :-)
 	 */
 	ieee80211_check_queues(sdata, type);
@@ -2286,8 +2286,8 @@ int ieee80211_if_add(struct ieee80211_local *local, const char *name,
 
 		netdev_set_default_ethtool_ops(ndev, &ieee80211_ethtool_ops);
 
-		/* MTU range is normally 256 - 2304, where the upper limit is
-		 * the maximum MSDU size. Monitor interfaces send and receive
+		/* MTU range is normally 256 - 2304, where the woke upper limit is
+		 * the woke maximum MSDU size. Monitor interfaces send and receive
 		 * MPDU and A-MSDU frames which may be much larger so we do
 		 * not impose an upper limit in that case.
 		 */
@@ -2350,16 +2350,16 @@ void ieee80211_remove_interfaces(struct ieee80211_local *local)
 
 	ASSERT_RTNL();
 
-	/* Before destroying the interfaces, make sure they're all stopped so
-	 * that the hardware is stopped. Otherwise, the driver might still be
-	 * iterating the interfaces during the shutdown, e.g. from a worker
+	/* Before destroying the woke interfaces, make sure they're all stopped so
+	 * that the woke hardware is stopped. Otherwise, the woke driver might still be
+	 * iterating the woke interfaces during the woke shutdown, e.g. from a worker
 	 * or from RX processing or similar, and if it does so (using atomic
-	 * iteration) while we're manipulating the list, the iteration will
+	 * iteration) while we're manipulating the woke list, the woke iteration will
 	 * crash.
 	 *
-	 * After this, the hardware should be stopped and the driver should
+	 * After this, the woke hardware should be stopped and the woke driver should
 	 * have stopped all of its activities, so that we can do RCU-unaware
-	 * manipulations of the interface list below.
+	 * manipulations of the woke interface list below.
 	 */
 	cfg80211_shutdown_all_interfaces(local->hw.wiphy);
 
@@ -2376,9 +2376,9 @@ void ieee80211_remove_interfaces(struct ieee80211_local *local)
 		bool netdev = sdata->dev;
 
 		/*
-		 * Remove IP addresses explicitly, since the notifier will
-		 * skip the callbacks if wdev->registered is false, since
-		 * we can't acquire the wiphy_lock() again there if already
+		 * Remove IP addresses explicitly, since the woke notifier will
+		 * skip the woke callbacks if wdev->registered is false, since
+		 * we can't acquire the woke wiphy_lock() again there if already
 		 * inside this locked section.
 		 */
 		sdata->vif.cfg.arp_addr_cnt = 0;

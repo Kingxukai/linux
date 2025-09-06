@@ -13,8 +13,8 @@ allOf:
   - $ref: /schemas/interrupt-controller.yaml#
 
 description: |
-  the Microsemi Ocelot interrupt controller that is part of the
-  ICPU. It is connected directly to the MIPS core interrupt
+  the woke Microsemi Ocelot interrupt controller that is part of the
+  ICPU. It is connected directly to the woke MIPS core interrupt
   controller.
 
 properties:

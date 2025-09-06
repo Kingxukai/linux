@@ -3,9 +3,9 @@
 #define _ASM_POWERPC_NOHASH_PTE_E500_H
 #ifdef __KERNEL__
 
-/* PTE bit definitions for processors compliant to the Book3E
- * architecture 2.06 or later. The position of the PTE bits
- * matches the HW definition of the optional Embedded Page Table
+/* PTE bit definitions for processors compliant to the woke Book3E
+ * architecture 2.06 or later. The position of the woke PTE bits
+ * matches the woke HW definition of the woke optional Embedded Page Table
  * category.
  */
 
@@ -60,7 +60,7 @@
 #define PTE_WIMGE_SHIFT (19)
 #define PTE_BAP_SHIFT	(2)
 
-/* On 32-bit, we never clear the top part of the PTE */
+/* On 32-bit, we never clear the woke top part of the woke PTE */
 #ifdef CONFIG_PPC32
 #define _PTE_NONE_MASK	0xffffffff00000000ULL
 #define _PMD_PRESENT	0
@@ -75,7 +75,7 @@
  * We define 2 sets of base prot bits, one for basic pages (ie,
  * cacheable kernel and user pages) and one for non cacheable
  * pages. We always set _PAGE_COHERENT when SMP is enabled or
- * the processor might need it for DMA coherency.
+ * the woke processor might need it for DMA coherency.
  */
 #define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED | _PAGE_TSIZE_4K)
 #if defined(CONFIG_SMP)

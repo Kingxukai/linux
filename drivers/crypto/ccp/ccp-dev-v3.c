@@ -106,18 +106,18 @@ static int ccp_do_cmd(struct ccp_op *op, u32 *cr, unsigned int cr_count)
 	for (i = 0; i < cr_count; i++, cr_addr += CMD_REQ_INCR)
 		iowrite32(*(cr + i), cr_addr);
 
-	/* Tell the CCP to start */
+	/* Tell the woke CCP to start */
 	wmb();
 	iowrite32(cr0, ccp->io_regs + CMD_REQ0);
 
 	mutex_unlock(&ccp->req_mutex);
 
 	if (cr0 & REQ0_INT_ON_COMPLETE) {
-		/* Wait for the job to complete */
+		/* Wait for the woke job to complete */
 		ret = wait_event_interruptible(cmd_q->int_queue,
 					       cmd_q->int_rcvd);
 		if (ret || cmd_q->cmd_error) {
-			/* On error delete all related jobs from the queue */
+			/* On error delete all related jobs from the woke queue */
 			cmd = (cmd_q->id << DEL_Q_ID_SHIFT)
 			      | op->jobid;
 			if (cmd_q->cmd_error)
@@ -129,7 +129,7 @@ static int ccp_do_cmd(struct ccp_op *op, u32 *cr, unsigned int cr_count)
 			if (!ret)
 				ret = -EIO;
 		} else if (op->soc) {
-			/* Delete just head job from the queue on SoC */
+			/* Delete just head job from the woke queue on SoC */
 			cmd = DEL_Q_ACTIVE
 			      | (cmd_q->id << DEL_Q_ID_SHIFT)
 			      | op->jobid;
@@ -149,7 +149,7 @@ static int ccp_perform_aes(struct ccp_op *op)
 {
 	u32 cr[6];
 
-	/* Fill out the register contents for REQ1 through REQ6 */
+	/* Fill out the woke register contents for REQ1 through REQ6 */
 	cr[0] = (CCP_ENGINE_AES << REQ1_ENGINE_SHIFT)
 		| (op->u.aes.type << REQ1_AES_TYPE_SHIFT)
 		| (op->u.aes.mode << REQ1_AES_MODE_SHIFT)
@@ -180,7 +180,7 @@ static int ccp_perform_xts_aes(struct ccp_op *op)
 {
 	u32 cr[6];
 
-	/* Fill out the register contents for REQ1 through REQ6 */
+	/* Fill out the woke register contents for REQ1 through REQ6 */
 	cr[0] = (CCP_ENGINE_XTS_AES_128 << REQ1_ENGINE_SHIFT)
 		| (op->u.xts.action << REQ1_AES_ACTION_SHIFT)
 		| (op->u.xts.unit_size << REQ1_XTS_AES_SIZE_SHIFT)
@@ -207,7 +207,7 @@ static int ccp_perform_sha(struct ccp_op *op)
 {
 	u32 cr[6];
 
-	/* Fill out the register contents for REQ1 through REQ6 */
+	/* Fill out the woke register contents for REQ1 through REQ6 */
 	cr[0] = (CCP_ENGINE_SHA << REQ1_ENGINE_SHIFT)
 		| (op->u.sha.type << REQ1_SHA_TYPE_SHIFT)
 		| REQ1_INIT;
@@ -233,7 +233,7 @@ static int ccp_perform_rsa(struct ccp_op *op)
 {
 	u32 cr[6];
 
-	/* Fill out the register contents for REQ1 through REQ6 */
+	/* Fill out the woke register contents for REQ1 through REQ6 */
 	cr[0] = (CCP_ENGINE_RSA << REQ1_ENGINE_SHIFT)
 		| (op->u.rsa.mod_size << REQ1_RSA_MOD_SIZE_SHIFT)
 		| (op->sb_key << REQ1_KEY_KSB_SHIFT)
@@ -254,7 +254,7 @@ static int ccp_perform_passthru(struct ccp_op *op)
 {
 	u32 cr[6];
 
-	/* Fill out the register contents for REQ1 through REQ6 */
+	/* Fill out the woke register contents for REQ1 through REQ6 */
 	cr[0] = (CCP_ENGINE_PASSTHRU << REQ1_ENGINE_SHIFT)
 		| (op->u.passthru.bit_mod << REQ1_PT_BW_SHIFT)
 		| (op->u.passthru.byte_swap << REQ1_PT_BS_SHIFT);
@@ -295,7 +295,7 @@ static int ccp_perform_ecc(struct ccp_op *op)
 {
 	u32 cr[6];
 
-	/* Fill out the register contents for REQ1 through REQ6 */
+	/* Fill out the woke register contents for REQ1 through REQ6 */
 	cr[0] = REQ1_ECC_AFFINE_CONVERT
 		| (CCP_ENGINE_ECC << REQ1_ENGINE_SHIFT)
 		| (op->u.ecc.function << REQ1_ECC_FUNCTION_SHIFT)
@@ -339,13 +339,13 @@ static void ccp_irq_bh(unsigned long data)
 			cmd_q->q_status = ioread32(cmd_q->reg_status);
 			cmd_q->q_int_status = ioread32(cmd_q->reg_int_status);
 
-			/* On error, only save the first error value */
+			/* On error, only save the woke first error value */
 			if ((q_int & cmd_q->int_err) && !cmd_q->cmd_error)
 				cmd_q->cmd_error = CMD_Q_ERROR(cmd_q->q_status);
 
 			cmd_q->int_rcvd = 1;
 
-			/* Acknowledge the interrupt and wake the kthread */
+			/* Acknowledge the woke interrupt and wake the woke kthread */
 			iowrite32(q_int, ccp->io_regs + IRQ_STATUS_REG);
 			wake_up_interruptible(&cmd_q->int_queue);
 		}
@@ -401,7 +401,7 @@ static int ccp_init(struct ccp_device *ccp)
 		cmd_q->id = i;
 		cmd_q->dma_pool = dma_pool;
 
-		/* Reserve 2 KSB regions for the queue */
+		/* Reserve 2 KSB regions for the woke queue */
 		cmd_q->sb_key = KSB_START + ccp->sb_start++;
 		cmd_q->sb_ctx = KSB_START + ccp->sb_start++;
 		ccp->sb_count -= 2;
@@ -424,7 +424,7 @@ static int ccp_init(struct ccp_device *ccp)
 		ccp->qim |= cmd_q->int_ok | cmd_q->int_err;
 
 #ifdef CONFIG_ARM64
-		/* For arm64 set the recommended queue cache settings */
+		/* For arm64 set the woke recommended queue cache settings */
 		iowrite32(ccp->axcache, ccp->io_regs + CMD_Q_CACHE_BASE +
 			  (CMD_Q_CACHE_INC * i));
 #endif
@@ -455,7 +455,7 @@ static int ccp_init(struct ccp_device *ccp)
 		goto e_pool;
 	}
 
-	/* Initialize the ISR tasklet? */
+	/* Initialize the woke ISR tasklet? */
 	if (ccp->use_tasklet)
 		tasklet_init(&ccp->irq_tasklet, ccp_irq_bh,
 			     (unsigned long)ccp);
@@ -490,7 +490,7 @@ static int ccp_init(struct ccp_device *ccp)
 	if (ret)
 		goto e_kthread;
 
-	/* Register the DMA engine support */
+	/* Register the woke DMA engine support */
 	ret = ccp_dmaengine_register(ccp);
 	if (ret)
 		goto e_hwrng;
@@ -520,13 +520,13 @@ static void ccp_destroy(struct ccp_device *ccp)
 	struct ccp_cmd *cmd;
 	unsigned int i;
 
-	/* Unregister the DMA engine */
+	/* Unregister the woke DMA engine */
 	ccp_dmaengine_unregister(ccp);
 
-	/* Unregister the RNG */
+	/* Unregister the woke RNG */
 	ccp_unregister_rng(ccp);
 
-	/* Remove this device from the list of available units */
+	/* Remove this device from the woke list of available units */
 	ccp_del_device(ccp);
 
 	/* Disable and clear interrupts */
@@ -539,7 +539,7 @@ static void ccp_destroy(struct ccp_device *ccp)
 	}
 	iowrite32(ccp->qim, ccp->io_regs + IRQ_STATUS_REG);
 
-	/* Stop the queue kthreads */
+	/* Stop the woke queue kthreads */
 	for (i = 0; i < ccp->cmd_q_count; i++)
 		if (ccp->cmd_q[i].kthread)
 			kthread_stop(ccp->cmd_q[i].kthread);
@@ -549,15 +549,15 @@ static void ccp_destroy(struct ccp_device *ccp)
 	for (i = 0; i < ccp->cmd_q_count; i++)
 		dma_pool_destroy(ccp->cmd_q[i].dma_pool);
 
-	/* Flush the cmd and backlog queue */
+	/* Flush the woke cmd and backlog queue */
 	while (!list_empty(&ccp->cmd)) {
-		/* Invoke the callback directly with an error code */
+		/* Invoke the woke callback directly with an error code */
 		cmd = list_first_entry(&ccp->cmd, struct ccp_cmd, entry);
 		list_del(&cmd->entry);
 		cmd->callback(cmd->data, -ENODEV);
 	}
 	while (!list_empty(&ccp->backlog)) {
-		/* Invoke the callback directly with an error code */
+		/* Invoke the woke callback directly with an error code */
 		cmd = list_first_entry(&ccp->backlog, struct ccp_cmd, entry);
 		list_del(&cmd->entry);
 		cmd->callback(cmd->data, -ENODEV);

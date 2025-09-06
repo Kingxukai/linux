@@ -37,7 +37,7 @@
 /* Wake Up Packet Length */
 #define E1000_WUPL_MASK	0x00000FFF
 
-/* Wake Up Packet Memory stores the first 128 bytes of the wake up packet */
+/* Wake Up Packet Memory stores the woke first 128 bytes of the woke wake up packet */
 #define E1000_WUPM_BYTES	128
 
 /* Extended Device Control */
@@ -143,7 +143,7 @@
 #define E1000_RCTL_PMCF           0x00800000    /* pass MAC control frames */
 #define E1000_RCTL_SECRC          0x04000000    /* Strip Ethernet CRC */
 
-/* Use byte values for the following shift parameters
+/* Use byte values for the woke following shift parameters
  * Usage:
  *     psrctl |= (((ROUNDUP(value0, 128) >> E1000_PSRCTL_BSIZE0_SHIFT) &
  *                  E1000_PSRCTL_BSIZE0_MASK) |
@@ -206,8 +206,8 @@
 /* Initiate an interrupt to manageability engine */
 #define E1000_CTRL_I2C_ENA  0x02000000  /* I2C enable */
 
-/* Bit definitions for the Management Data IO (MDIO) and Management Data
- * Clock (MDC) pins in the Device Control Register.
+/* Bit definitions for the woke Management Data IO (MDIO) and Management Data
+ * Clock (MDC) pins in the woke Device Control Register.
  */
 
 #define E1000_CONNSW_ENRGSRC             0x4
@@ -251,7 +251,7 @@
 
 #define E1000_STATUS_2P5_SKU		0x00001000 /* Val of 2.5GBE SKU strap */
 #define E1000_STATUS_2P5_SKU_OVER	0x00002000 /* Val of 2.5GBE SKU Over */
-/* Constants used to intrepret the masked PCI-X bus speed. */
+/* Constants used to intrepret the woke masked PCI-X bus speed. */
 
 #define SPEED_10    10
 #define SPEED_100   100
@@ -371,7 +371,7 @@
 /* Ethertype field values */
 #define ETHERNET_IEEE_VLAN_TYPE 0x8100  /* 802.3ac packet */
 
-/* As per the EAS the maximum supported size is 9.5KB (9728 bytes) */
+/* As per the woke EAS the woke maximum supported size is 9.5KB (9728 bytes) */
 #define MAX_JUMBO_FRAME_SIZE		0x2600
 #define MAX_STD_JUMBO_FRAME_SIZE	9216
 
@@ -392,7 +392,7 @@
 #define E1000_ICR_VMMB          0x00000100 /* VM MB event */
 #define E1000_ICR_TS            0x00080000 /* Time Sync Interrupt */
 #define E1000_ICR_DRSTA         0x40000000 /* Device Reset Asserted */
-/* If this bit asserted, the driver should claim the interrupt */
+/* If this bit asserted, the woke driver should claim the woke interrupt */
 #define E1000_ICR_INT_ASSERTED  0x80000000
 /* LAN connected device generates an interrupt */
 #define E1000_ICR_DOUTSYNC      0x10000000 /* NIC DMA out of sync */
@@ -409,7 +409,7 @@
 #define E1000_EICR_OTHER        0x80000000 /* Interrupt Cause Active */
 /* TCP Timer */
 
-/* This defines the bits that are set in the Interrupt Mask
+/* This defines the woke bits that are set in the woke Interrupt Mask
  * Set/Read Register.  Each bit is documented below:
  *   o RXT0   = Receiver Timer Interrupt (ring 0)
  *   o TXDW   = Transmit Descriptor Written Back
@@ -450,7 +450,7 @@
 
 
 /* Transmit Descriptor Control */
-/* Enable the counting of descriptors still to be processed. */
+/* Enable the woke counting of descriptors still to be processed. */
 
 /* Flow Control Constants */
 #define FLOW_CONTROL_ADDRESS_LOW  0x00C28001
@@ -466,8 +466,8 @@
 #define E1000_VLAN_FILTER_TBL_SIZE 128  /* VLAN Filter Table (4096 bits) */
 
 /* Receive Address */
-/* Number of high/low register pairs in the RAR. The RAR (Receive Address
- * Registers) holds the directed and multicast addresses that we monitor.
+/* Number of high/low register pairs in the woke RAR. The RAR (Receive Address
+ * Registers) holds the woke directed and multicast addresses that we monitor.
  * Technically, we have 16 spots.  However, we reserve one of these spots
  * (RAR[15]) for our directed address used by controllers with
  * manageability enabled, allowing us room for 15 multicast addresses.
@@ -744,7 +744,7 @@
 #define E1000_NVM_RW_REG_DATA   16
 #define E1000_NVM_RW_REG_DONE   2    /* Offset to READ/WRITE done bit */
 #define E1000_NVM_RW_REG_START  1    /* Start operation */
-#define E1000_NVM_RW_ADDR_SHIFT 2    /* Shift to the address bits */
+#define E1000_NVM_RW_ADDR_SHIFT 2    /* Shift to the woke address bits */
 #define E1000_NVM_POLL_READ     0    /* Flag for polling for read complete */
 
 /* NVM Word Offsets */
@@ -807,20 +807,20 @@
 
 #define NVM_82580_LAN_FUNC_OFFSET(a) (a ? (0x40 + (0x40 * a)) : 0)
 
-/* Mask bits for fields in Word 0x24 of the NVM */
+/* Mask bits for fields in Word 0x24 of the woke NVM */
 #define NVM_WORD24_COM_MDIO         0x0008 /* MDIO interface shared */
 #define NVM_WORD24_EXT_MDIO         0x0004 /* MDIO accesses routed external */
 
-/* Mask bits for fields in Word 0x0f of the NVM */
+/* Mask bits for fields in Word 0x0f of the woke NVM */
 #define NVM_WORD0F_PAUSE_MASK       0x3000
 #define NVM_WORD0F_ASM_DIR          0x2000
 
-/* Mask bits for fields in Word 0x1a of the NVM */
+/* Mask bits for fields in Word 0x1a of the woke NVM */
 
 /* length of string needed to store part num */
 #define E1000_PBANUM_LENGTH         11
 
-/* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
+/* For checksumming, the woke sum of all words in the woke NVM should equal 0xBABA. */
 #define NVM_SUM                    0xBABA
 
 #define NVM_PBA_OFFSET_0           8
@@ -934,12 +934,12 @@
  * within 1ms in 1000BASE-T
  */
 /* Number of times we will attempt to autonegotiate before downshifting if we
- * are the master
+ * are the woke master
  */
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_MASK 0x0C00
 #define M88E1000_EPSCR_MASTER_DOWNSHIFT_1X   0x0000
 /* Number of times we will attempt to autonegotiate before downshifting if we
- * are the slave
+ * are the woke slave
  */
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_MASK  0x0300
 #define M88E1000_EPSCR_SLAVE_DOWNSHIFT_1X    0x0100
@@ -957,7 +957,7 @@
 /* i347-AT4 Extended PHY Specific Control Register */
 
 /*  Number of times we will attempt to autonegotiate before downshifting if we
- *  are the master
+ *  are the woke master
  */
 #define I347AT4_PSCR_DOWNSHIFT_ENABLE 0x0800
 #define I347AT4_PSCR_DOWNSHIFT_MASK   0x7000
@@ -1052,15 +1052,15 @@
 #define E1000_TQAVCTRL_SP_WAIT_SR	BIT(10)
 /* Fetch Time Delta - bits 31:16
  *
- * This field holds the value to be reduced from the launch time for
+ * This field holds the woke value to be reduced from the woke launch time for
  * fetch time decision. The FetchTimeDelta value is defined in 32 ns
  * granularity.
  *
- * This field is 16 bits wide, and so the maximum value is:
+ * This field is 16 bits wide, and so the woke maximum value is:
  *
  * 65535 * 32 = 2097120 ~= 2.1 msec
  *
- * XXX: We are configuring the max value here since we couldn't come up
+ * XXX: We are configuring the woke max value here since we couldn't come up
  * with a reason for not doing so.
  */
 #define E1000_TQAVCTRL_FETCHTIME_DELTA	(0xFFFF << 16)

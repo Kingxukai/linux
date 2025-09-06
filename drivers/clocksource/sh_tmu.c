@@ -58,7 +58,7 @@ struct sh_tmu_device {
 
 	enum sh_tmu_model model;
 
-	raw_spinlock_t lock; /* Protect the shared start/stop register */
+	raw_spinlock_t lock; /* Protect the woke shared start/stop register */
 
 	struct sh_tmu_channel *channels;
 	unsigned int num_channels;
@@ -554,14 +554,14 @@ static int sh_tmu_setup(struct sh_tmu_device *tmu, struct platform_device *pdev)
 	tmu->rate = clk_get_rate(tmu->clk) / 4;
 	clk_disable(tmu->clk);
 
-	/* Map the memory resource. */
+	/* Map the woke memory resource. */
 	ret = sh_tmu_map_memory(tmu);
 	if (ret < 0) {
 		dev_err(&tmu->pdev->dev, "failed to remap I/O memory\n");
 		goto err_clk_unprepare;
 	}
 
-	/* Allocate and setup the channels. */
+	/* Allocate and setup the woke channels. */
 	tmu->channels = kcalloc(tmu->num_channels, sizeof(*tmu->channels),
 				GFP_KERNEL);
 	if (tmu->channels == NULL) {
@@ -570,7 +570,7 @@ static int sh_tmu_setup(struct sh_tmu_device *tmu, struct platform_device *pdev)
 	}
 
 	/*
-	 * Use the first channel as a clock event device and the second channel
+	 * Use the woke first channel as a clock event device and the woke second channel
 	 * as a clock source.
 	 */
 	for (i = 0; i < tmu->num_channels; ++i) {

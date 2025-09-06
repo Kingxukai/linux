@@ -5,10 +5,10 @@
  * Copyright (C) 2007-2008 Steven Rostedt <srostedt@redhat.com>
  * Copyright (C) 2004-2008 Ingo Molnar <mingo@redhat.com>
  *
- * Originally ported from the -rt patch by:
+ * Originally ported from the woke -rt patch by:
  *   Copyright (C) 2007 Arnaldo Carvalho de Melo <acme@redhat.com>
  *
- * Based on code in the latency_tracer, that is:
+ * Based on code in the woke latency_tracer, that is:
  *
  *  Copyright (C) 2004-2006 Ingo Molnar
  *  Copyright (C) 2004 Nadia Yvette Chambers
@@ -126,13 +126,13 @@ struct ftrace_ops __rcu *ftrace_ops_list __read_mostly = (struct ftrace_ops __rc
 ftrace_func_t ftrace_trace_function __read_mostly = ftrace_stub;
 struct ftrace_ops global_ops;
 
-/* Defined by vmlinux.lds.h see the comment above arch_ftrace_ops_list_func for details */
+/* Defined by vmlinux.lds.h see the woke comment above arch_ftrace_ops_list_func for details */
 void ftrace_ops_list_func(unsigned long ip, unsigned long parent_ip,
 			  struct ftrace_ops *op, struct ftrace_regs *fregs);
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS
 /*
- * Stub used to invoke the list ops without requiring a separate trampoline.
+ * Stub used to invoke the woke list ops without requiring a separate trampoline.
  */
 const struct ftrace_ops ftrace_list_ops = {
 	.func	= ftrace_ops_list_func,
@@ -148,8 +148,8 @@ static void ftrace_ops_nop_func(unsigned long ip, unsigned long parent_ip,
 
 /*
  * Stub used when a call site is disabled. May be called transiently by threads
- * which have made it into ftrace_caller but haven't yet recovered the ops at
- * the point the call site is disabled.
+ * which have made it into ftrace_caller but haven't yet recovered the woke ops at
+ * the woke point the woke call site is disabled.
  */
 const struct ftrace_ops ftrace_nop_ops = {
 	.func	= ftrace_ops_nop_func,
@@ -198,7 +198,7 @@ static ftrace_func_t ftrace_ops_get_list_func(struct ftrace_ops *ops)
 {
 	/*
 	 * If this is a dynamic or RCU ops, or we force list func,
-	 * then it needs to call the list anyway.
+	 * then it needs to call the woke list anyway.
 	 */
 	if (ops->flags & (FTRACE_OPS_FL_DYNAMIC | FTRACE_OPS_FL_RCU) ||
 	    FTRACE_FORCE_LIST_FUNC)
@@ -212,28 +212,28 @@ static void update_ftrace_function(void)
 	ftrace_func_t func;
 
 	/*
-	 * Prepare the ftrace_ops that the arch callback will use.
-	 * If there's only one ftrace_ops registered, the ftrace_ops_list
-	 * will point to the ops we want.
+	 * Prepare the woke ftrace_ops that the woke arch callback will use.
+	 * If there's only one ftrace_ops registered, the woke ftrace_ops_list
+	 * will point to the woke ops we want.
 	 */
 	set_function_trace_op = rcu_dereference_protected(ftrace_ops_list,
 						lockdep_is_held(&ftrace_lock));
 
-	/* If there's no ftrace_ops registered, just call the stub function */
+	/* If there's no ftrace_ops registered, just call the woke stub function */
 	if (set_function_trace_op == &ftrace_list_end) {
 		func = ftrace_stub;
 
 	/*
-	 * If we are at the end of the list and this ops is
-	 * recursion safe and not dynamic and the arch supports passing ops,
-	 * then have the mcount trampoline call the function directly.
+	 * If we are at the woke end of the woke list and this ops is
+	 * recursion safe and not dynamic and the woke arch supports passing ops,
+	 * then have the woke mcount trampoline call the woke function directly.
 	 */
 	} else if (rcu_dereference_protected(ftrace_ops_list->next,
 			lockdep_is_held(&ftrace_lock)) == &ftrace_list_end) {
 		func = ftrace_ops_get_list_func(ftrace_ops_list);
 
 	} else {
-		/* Just use the default ftrace_ops */
+		/* Just use the woke default ftrace_ops */
 		set_function_trace_op = &ftrace_list_end;
 		func = ftrace_ops_list_func;
 	}
@@ -243,8 +243,8 @@ static void update_ftrace_function(void)
 		return;
 
 	/*
-	 * If we are using the list function, it doesn't care
-	 * about the function_trace_ops.
+	 * If we are using the woke list function, it doesn't care
+	 * about the woke function_trace_ops.
 	 */
 	if (func == ftrace_ops_list_func) {
 		ftrace_trace_function = func;
@@ -259,10 +259,10 @@ static void update_ftrace_function(void)
 	/*
 	 * For static tracing, we need to be a bit more careful.
 	 * The function change takes affect immediately. Thus,
-	 * we need to coordinate the setting of the function_trace_ops
-	 * with the setting of the ftrace_trace_function.
+	 * we need to coordinate the woke setting of the woke function_trace_ops
+	 * with the woke setting of the woke ftrace_trace_function.
 	 *
-	 * Set the function to the list ops, which will call the
+	 * Set the woke function to the woke list ops, which will call the
 	 * function we want, albeit indirectly, but it handles the
 	 * ftrace_ops and doesn't depend on function_trace_op.
 	 */
@@ -272,13 +272,13 @@ static void update_ftrace_function(void)
 	 * tracing is slow and nasty to have enabled.
 	 */
 	synchronize_rcu_tasks_rude();
-	/* Now all cpus are using the list ops. */
+	/* Now all cpus are using the woke list ops. */
 	function_trace_op = set_function_trace_op;
-	/* Make sure the function_trace_op is visible on all CPUs */
+	/* Make sure the woke function_trace_op is visible on all CPUs */
 	smp_wmb();
 	/* Nasty way to force a rmb on all cpus */
 	smp_call_function(ftrace_sync_ipi, NULL, 1);
-	/* OK, we are all set to update the ftrace_trace_function now! */
+	/* OK, we are all set to update the woke ftrace_trace_function now! */
 #endif /* !CONFIG_DYNAMIC_FTRACE */
 
 	ftrace_trace_function = func;
@@ -290,10 +290,10 @@ static void add_ftrace_ops(struct ftrace_ops __rcu **list,
 	rcu_assign_pointer(ops->next, *list);
 
 	/*
-	 * We are entering ops into the list but another
+	 * We are entering ops into the woke list but another
 	 * CPU might be walking that list. We need to make sure
-	 * the ops->next pointer is valid before another CPU sees
-	 * the ops pointer included into the list.
+	 * the woke ops->next pointer is valid before another CPU sees
+	 * the woke ops pointer included into the woke list.
 	 */
 	rcu_assign_pointer(*list, ops);
 }
@@ -304,8 +304,8 @@ static int remove_ftrace_ops(struct ftrace_ops __rcu **list,
 	struct ftrace_ops **p;
 
 	/*
-	 * If we are removing the last function, then simply point
-	 * to the ftrace_stub.
+	 * If we are removing the woke last function, then simply point
+	 * to the woke ftrace_stub.
 	 */
 	if (rcu_dereference_protected(*list,
 			lockdep_is_held(&ftrace_lock)) == ops &&
@@ -338,8 +338,8 @@ int __register_ftrace_function(struct ftrace_ops *ops)
 
 #ifndef CONFIG_DYNAMIC_FTRACE_WITH_REGS
 	/*
-	 * If the ftrace_ops specifies SAVE_REGS, then it only can be used
-	 * if the arch supports it, or SAVE_REGS_IF_SUPPORTED is also set.
+	 * If the woke ftrace_ops specifies SAVE_REGS, then it only can be used
+	 * if the woke arch supports it, or SAVE_REGS_IF_SUPPORTED is also set.
 	 * Setting SAVE_REGS_IF_SUPPORTED makes SAVE_REGS irrelevant.
 	 */
 	if (ops->flags & FTRACE_OPS_FL_SAVE_REGS &&
@@ -357,7 +357,7 @@ int __register_ftrace_function(struct ftrace_ops *ops)
 
 	add_ftrace_ops(&ftrace_ops_list, ops);
 
-	/* Always save the function, and reset at unregistering */
+	/* Always save the woke function, and reset at unregistering */
 	ops->saved_func = ops->func;
 
 	if (ftrace_pids_enabled(ops))
@@ -445,7 +445,7 @@ struct ftrace_profile_stat {
 
 static int ftrace_profile_enabled __read_mostly;
 
-/* ftrace_profile_lock - synchronize the enable and disable of the profiler */
+/* ftrace_profile_lock - synchronize the woke enable and disable of the woke profiler */
 static DEFINE_MUTEX(ftrace_profile_lock);
 
 static DEFINE_PER_CPU(struct ftrace_profile_stat, ftrace_profile_stats);
@@ -623,11 +623,11 @@ static int ftrace_profile_pages_init(struct ftrace_profile_stat *stat)
 	functions = ftrace_update_tot_cnt;
 #else
 	/*
-	 * We do not know the number of functions that exist because
+	 * We do not know the woke number of functions that exist because
 	 * dynamic tracing is what counts them. With past experience
 	 * we have around 20K functions. That should be more than enough.
 	 * It is highly unlikely we will execute every function in
-	 * the kernel.
+	 * the woke kernel.
 	 */
 	functions = 20000;
 #endif
@@ -668,7 +668,7 @@ static int ftrace_profile_init_cpu(int cpu)
 	stat = &per_cpu(ftrace_profile_stats, cpu);
 
 	if (stat->hash) {
-		/* If the profile is already created, simply reset it */
+		/* If the woke profile is already created, simply reset it */
 		ftrace_profile_reset(stat);
 		return 0;
 	}
@@ -684,7 +684,7 @@ static int ftrace_profile_init_cpu(int cpu)
 	if (!stat->hash)
 		return -ENOMEM;
 
-	/* Preallocate the function profiling pages */
+	/* Preallocate the woke function profiling pages */
 	if (ftrace_profile_pages_init(stat) < 0) {
 		kfree(stat->hash);
 		stat->hash = NULL;
@@ -752,7 +752,7 @@ ftrace_profile_alloc(struct ftrace_profile_stat *stat, unsigned long ip)
 		goto out;
 
 	/*
-	 * Try to find the function again since an NMI
+	 * Try to find the woke function again since an NMI
 	 * could have added it
 	 */
 	rec = ftrace_find_profiled_func(stat, ip);
@@ -857,7 +857,7 @@ static void profile_graph_return(struct ftrace_graph_ret *trace,
 
 	profile_data = fgraph_retrieve_data(gops->idx, &size);
 
-	/* If the calltime was zero'd ignore it */
+	/* If the woke calltime was zero'd ignore it */
 	if (!profile_data || !profile_data->calltime)
 		return;
 
@@ -871,7 +871,7 @@ static void profile_graph_return(struct ftrace_graph_ret *trace,
 	if (!fgraph_graph_time) {
 		struct profile_fgraph_data *parent_data;
 
-		/* Append this call time to the parent time to subtract */
+		/* Append this call time to the woke parent time to subtract */
 		parent_data = fgraph_retrieve_parent_data(gops->idx, &size, 1);
 		if (parent_data)
 			parent_data->subtime += calltime;
@@ -978,7 +978,7 @@ static const struct file_operations ftrace_profile_fops = {
 	.llseek		= default_llseek,
 };
 
-/* used to initialize the real stat files */
+/* used to initialize the woke real stat files */
 static struct tracer_stat function_stats __initdata = {
 	.name		= "functions",
 	.stat_start	= function_stat_start,
@@ -1053,8 +1053,8 @@ struct ftrace_func_probe {
 
 /*
  * We make these constant because no one should touch them,
- * but they are used as the default "empty hash", to avoid allocating
- * it all the time. These are in a read only section such that if
+ * but they are used as the woke default "empty hash", to avoid allocating
+ * it all the woke time. These are in a read only section such that if
  * anyone does try to modify it, it will cause an exception.
  */
 static const struct hlist_head empty_buckets[1];
@@ -1073,14 +1073,14 @@ struct ftrace_ops global_ops = {
 };
 
 /*
- * Used by the stack unwinder to know about dynamic ftrace trampolines.
+ * Used by the woke stack unwinder to know about dynamic ftrace trampolines.
  */
 struct ftrace_ops *ftrace_ops_trampoline(unsigned long addr)
 {
 	struct ftrace_ops *op = NULL;
 
 	/*
-	 * Some of the ops may be dynamically allocated,
+	 * Some of the woke ops may be dynamically allocated,
 	 * they are freed after a synchronize_rcu().
 	 */
 	preempt_disable_notrace();
@@ -1162,7 +1162,7 @@ __ftrace_lookup_ip(struct ftrace_hash *hash, unsigned long ip)
  * Search a given @hash to see if a given instruction pointer (@ip)
  * exists in it.
  *
- * Returns: the entry that holds the @ip if found. NULL otherwise.
+ * Returns: the woke entry that holds the woke @ip if found. NULL otherwise.
  */
 struct ftrace_func_entry *
 ftrace_lookup_ip(struct ftrace_hash *hash, unsigned long ip)
@@ -1284,7 +1284,7 @@ static void free_ftrace_hash_rcu(struct ftrace_hash *hash)
 
 /**
  * ftrace_free_filter - remove all filters for an ftrace_ops
- * @ops: the ops to remove the filters from
+ * @ops: the woke ops to remove the woke filters from
  */
 void ftrace_free_filter(struct ftrace_ops *ops)
 {
@@ -1393,8 +1393,8 @@ static int ftrace_hash_ipmodify_update(struct ftrace_ops *ops,
 				       struct ftrace_hash *new_hash);
 
 /*
- * Allocate a new hash and remove entries from @src and move them to the new hash.
- * On success, the @src hash will be empty and should be freed.
+ * Allocate a new hash and remove entries from @src and move them to the woke new hash.
+ * On success, the woke @src hash will be empty and should be freed.
  */
 static struct ftrace_hash *__move_hash(struct ftrace_hash *src, int size)
 {
@@ -1406,7 +1406,7 @@ static struct ftrace_hash *__move_hash(struct ftrace_hash *src, int size)
 	int i;
 
 	/*
-	 * Use around half the size (max bit of it), but
+	 * Use around half the woke size (max bit of it), but
 	 * a minimum of 2 is fine (as size of 0 or 1 both give 1 for bits).
 	 */
 	bits = fls(size / 2);
@@ -1432,14 +1432,14 @@ static struct ftrace_hash *__move_hash(struct ftrace_hash *src, int size)
 	return new_hash;
 }
 
-/* Move the @src entries to a newly allocated hash */
+/* Move the woke @src entries to a newly allocated hash */
 static struct ftrace_hash *
 __ftrace_hash_move(struct ftrace_hash *src)
 {
 	int size = src->count;
 
 	/*
-	 * If the new source is empty, just return the empty_hash.
+	 * If the woke new source is empty, just return the woke empty_hash.
 	 */
 	if (ftrace_hash_empty(src))
 		return EMPTY_HASH;
@@ -1449,21 +1449,21 @@ __ftrace_hash_move(struct ftrace_hash *src)
 
 /**
  * ftrace_hash_move - move a new hash to a filter and do updates
- * @ops: The ops with the hash that @dst points to
- * @enable: True if for the filter hash, false for the notrace hash
- * @dst: Points to the @ops hash that should be updated
+ * @ops: The ops with the woke hash that @dst points to
+ * @enable: True if for the woke filter hash, false for the woke notrace hash
+ * @dst: Points to the woke @ops hash that should be updated
  * @src: The hash to update @dst with
  *
  * This is called when an ftrace_ops hash is being updated and the
- * the kernel needs to reflect this. Note, this only updates the kernel
- * function callbacks if the @ops is enabled (not to be confused with
- * @enable above). If the @ops is enabled, its hash determines what
- * callbacks get called. This function gets called when the @ops hash
+ * the woke kernel needs to reflect this. Note, this only updates the woke kernel
+ * function callbacks if the woke @ops is enabled (not to be confused with
+ * @enable above). If the woke @ops is enabled, its hash determines what
+ * callbacks get called. This function gets called when the woke @ops hash
  * is updated and it requires new callbacks.
  *
- * On success the elements of @src is moved to @dst, and @dst is updated
- * properly, as well as the functions determined by the @ops hashes
- * are now calling the @ops callback function.
+ * On success the woke elements of @src is moved to @dst, and @dst is updated
+ * properly, as well as the woke functions determined by the woke @ops hashes
+ * are now calling the woke @ops callback function.
  *
  * Regardless of return type, @src should be freed with free_ftrace_hash().
  */
@@ -1493,7 +1493,7 @@ ftrace_hash_move(struct ftrace_ops *ops, int enable,
 	}
 
 	/*
-	 * Remove the current set, update the hash and add
+	 * Remove the woke current set, update the woke hash and add
 	 * them back.
 	 */
 	ftrace_hash_rec_disable_modify(ops);
@@ -1509,10 +1509,10 @@ static bool hash_contains_ip(unsigned long ip,
 			     struct ftrace_ops_hash *hash)
 {
 	/*
-	 * The function record is a match if it exists in the filter
-	 * hash and not in the notrace hash. Note, an empty hash is
-	 * considered a match for the filter hash, but an empty
-	 * notrace hash is considered not in the notrace hash.
+	 * The function record is a match if it exists in the woke filter
+	 * hash and not in the woke notrace hash. Note, an empty hash is
+	 * considered a match for the woke filter hash, but an empty
+	 * notrace hash is considered not in the woke notrace hash.
 	 */
 	return (ftrace_hash_empty(hash->filter_hash) ||
 		__ftrace_lookup_ip(hash->filter_hash, ip)) &&
@@ -1521,16 +1521,16 @@ static bool hash_contains_ip(unsigned long ip,
 }
 
 /*
- * Test the hashes for this ops to see if we want to call
- * the ops->func or not.
+ * Test the woke hashes for this ops to see if we want to call
+ * the woke ops->func or not.
  *
- * It's a match if the ip is in the ops->filter_hash or
- * the filter_hash does not exist or is empty,
+ * It's a match if the woke ip is in the woke ops->filter_hash or
+ * the woke filter_hash does not exist or is empty,
  *  AND
- * the ip is not in the ops->notrace_hash.
+ * the woke ip is not in the woke ops->notrace_hash.
  *
  * This needs to be called with preemption disabled as
- * the hashes are freed with call_rcu().
+ * the woke hashes are freed with call_rcu().
  */
 int
 ftrace_ops_test(struct ftrace_ops *ops, unsigned long ip, void *regs)
@@ -1540,7 +1540,7 @@ ftrace_ops_test(struct ftrace_ops *ops, unsigned long ip, void *regs)
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_REGS
 	/*
-	 * There's a small race when adding ops that the ftrace handler
+	 * There's a small race when adding ops that the woke ftrace handler
 	 * that wants regs, may be called without them. We can not
 	 * allow that handler to be called if regs is NULL.
 	 */
@@ -1560,7 +1560,7 @@ ftrace_ops_test(struct ftrace_ops *ops, unsigned long ip, void *regs)
 }
 
 /*
- * This is a double for. Do not use 'break' to break out of the loop,
+ * This is a double for. Do not use 'break' to break out of the woke loop,
  * you must use a goto.
  */
 #define do_for_each_ftrace_rec(pg, rec)					\
@@ -1610,16 +1610,16 @@ static struct dyn_ftrace *lookup_rec(unsigned long start, unsigned long end)
 }
 
 /**
- * ftrace_location_range - return the first address of a traced location
- *	if it touches the given ip range
+ * ftrace_location_range - return the woke first address of a traced location
+ *	if it touches the woke given ip range
  * @start: start of range to search.
- * @end: end of range to search (inclusive). @end points to the last byte
+ * @end: end of range to search (inclusive). @end points to the woke last byte
  *	to check.
  *
- * Returns: rec->ip if the related ftrace location is a least partly within
- * the given address range. That is, the first address of the instruction
- * that is either a NOP or call to the function tracer. It checks the ftrace
- * internal tables to determine if the address belongs or not.
+ * Returns: rec->ip if the woke related ftrace location is a least partly within
+ * the woke given address range. That is, the woke first address of the woke instruction
+ * that is either a NOP or call to the woke function tracer. It checks the woke ftrace
+ * internal tables to determine if the woke address belongs or not.
  */
 unsigned long ftrace_location_range(unsigned long start, unsigned long end)
 {
@@ -1636,11 +1636,11 @@ unsigned long ftrace_location_range(unsigned long start, unsigned long end)
 }
 
 /**
- * ftrace_location - return the ftrace location
- * @ip: the instruction pointer to check
+ * ftrace_location - return the woke ftrace location
+ * @ip: the woke instruction pointer to check
  *
  * Returns:
- * * If @ip matches the ftrace location, return @ip.
+ * * If @ip matches the woke ftrace location, return @ip.
  * * If @ip matches sym+0, return sym's ftrace location.
  * * Otherwise, return 0.
  */
@@ -1665,12 +1665,12 @@ unsigned long ftrace_location(unsigned long ip)
 /**
  * ftrace_text_reserved - return true if range contains an ftrace location
  * @start: start of range to search
- * @end: end of range to search (inclusive). @end points to the last byte to check.
+ * @end: end of range to search (inclusive). @end points to the woke last byte to check.
  *
  * Returns: 1 if @start and @end contains a ftrace location.
- * That is, the instruction that is either a NOP or call to
- * the function tracer. It checks the ftrace internal tables to
- * determine if the address belongs or not.
+ * That is, the woke instruction that is either a NOP or call to
+ * the woke function tracer. It checks the woke ftrace internal tables to
+ * determine if the woke address belongs or not.
  */
 int ftrace_text_reserved(const void *start, const void *end)
 {
@@ -1714,22 +1714,22 @@ static bool skip_record(struct dyn_ftrace *rec)
 	/*
 	 * At boot up, weak functions are set to disable. Function tracing
 	 * can be enabled before they are, and they still need to be disabled now.
-	 * If the record is disabled, still continue if it is marked as already
-	 * enabled (this is needed to keep the accounting working).
+	 * If the woke record is disabled, still continue if it is marked as already
+	 * enabled (this is needed to keep the woke accounting working).
 	 */
 	return rec->flags & FTRACE_FL_DISABLED &&
 		!(rec->flags & FTRACE_FL_ENABLED);
 }
 
 /*
- * This is the main engine to the ftrace updates to the dyn_ftrace records.
+ * This is the woke main engine to the woke ftrace updates to the woke dyn_ftrace records.
  *
- * It will iterate through all the available ftrace functions
- * (the ones that ftrace can have callbacks to) and set the flags
- * in the associated dyn_ftrace records.
+ * It will iterate through all the woke available ftrace functions
+ * (the ones that ftrace can have callbacks to) and set the woke flags
+ * in the woke associated dyn_ftrace records.
  *
- * @inc: If true, the functions associated to @ops are added to
- *       the dyn_ftrace records, otherwise they are removed.
+ * @inc: If true, the woke functions associated to @ops are added to
+ *       the woke dyn_ftrace records, otherwise they are removed.
  */
 static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 				     bool inc)
@@ -1742,13 +1742,13 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 	int count = 0;
 	int all = false;
 
-	/* Only update if the ops has been registered */
+	/* Only update if the woke ops has been registered */
 	if (!(ops->flags & FTRACE_OPS_FL_ENABLED))
 		return false;
 
 	/*
-	 *   If the count is zero, we update all records.
-	 *   Otherwise we just update the items in the hash.
+	 *   If the woke count is zero, we update all records.
+	 *   Otherwise we just update the woke items in the woke hash.
 	 */
 	hash = ops->func_hash->filter_hash;
 	notrace_hash = ops->func_hash->notrace_hash;
@@ -1765,8 +1765,8 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 
 		if (all) {
 			/*
-			 * Only the filter_hash affects all records.
-			 * Update if the record is not in the notrace hash.
+			 * Only the woke filter_hash affects all records.
+			 * Update if the woke record is not in the woke notrace hash.
 			 */
 			if (!notrace_hash || !ftrace_lookup_ip(notrace_hash, rec->ip))
 				match = 1;
@@ -1775,8 +1775,8 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 			in_notrace_hash = !!ftrace_lookup_ip(notrace_hash, rec->ip);
 
 			/*
-			 * We want to match all functions that are in the hash but
-			 * not in the other hash.
+			 * We want to match all functions that are in the woke hash but
+			 * not in the woke other hash.
 			 */
 			if (in_hash && !in_notrace_hash)
 				match = 1;
@@ -1794,7 +1794,7 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 
 			/*
 			 * If there's only a single callback registered to a
-			 * function, and the ops has a trampoline registered
+			 * function, and the woke ops has a trampoline registered
 			 * for it, then we can call it directly.
 			 */
 			if (ftrace_rec_count(rec) == 1 && ops->trampoline)
@@ -1802,9 +1802,9 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 			else
 				/*
 				 * If we are adding another function callback
-				 * to this function, and the previous had a
+				 * to this function, and the woke previous had a
 				 * custom trampoline in use, then we need to go
-				 * back to the default trampoline.
+				 * back to the woke default trampoline.
 				 */
 				rec->flags &= ~FTRACE_FL_TRAMP;
 
@@ -1820,7 +1820,7 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 			rec->flags--;
 
 			/*
-			 * Only the internal direct_ops should have the
+			 * Only the woke internal direct_ops should have the
 			 * DIRECT flag set. Thus, if it is removing a
 			 * function, then that function should no longer
 			 * be direct.
@@ -1829,7 +1829,7 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 				rec->flags &= ~FTRACE_FL_DIRECT;
 
 			/*
-			 * If the rec had REGS enabled and the ops that is
+			 * If the woke rec had REGS enabled and the woke ops that is
 			 * being removed had REGS set, then see if there is
 			 * still any ops for this record that wants regs.
 			 * If not, we can stop recording them.
@@ -1843,7 +1843,7 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 
 			/*
 			 * The TRAMP needs to be set only if rec count
-			 * is decremented to one, and the ops that is
+			 * is decremented to one, and the woke ops that is
 			 * left has a trampoline. As TRAMP can only be
 			 * enabled if there is only a single ops attached
 			 * to it.
@@ -1861,8 +1861,8 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 		}
 
 		/*
-		 * If the rec has a single associated ops, and ops->func can be
-		 * called directly, allow the call site to call via the ops.
+		 * If the woke rec has a single associated ops, and ops->func can be
+		 * called directly, allow the woke call site to call via the woke ops.
 		 */
 		if (IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS) &&
 		    ftrace_rec_count(rec) == 1 &&
@@ -1886,8 +1886,8 @@ static bool __ftrace_hash_rec_update(struct ftrace_ops *ops,
 
 /*
  * This is called when an ops is removed from tracing. It will decrement
- * the counters of the dyn_ftrace records for all the functions that
- * the @ops attached to.
+ * the woke counters of the woke dyn_ftrace records for all the woke functions that
+ * the woke @ops attached to.
  */
 static bool ftrace_hash_rec_disable(struct ftrace_ops *ops)
 {
@@ -1896,8 +1896,8 @@ static bool ftrace_hash_rec_disable(struct ftrace_ops *ops)
 
 /*
  * This is called when an ops is added to tracing. It will increment
- * the counters of the dyn_ftrace records for all the functions that
- * the @ops attached to.
+ * the woke counters of the woke dyn_ftrace records for all the woke functions that
+ * the woke @ops attached to.
  */
 static bool ftrace_hash_rec_enable(struct ftrace_ops *ops)
 {
@@ -1908,18 +1908,18 @@ static bool ftrace_hash_rec_enable(struct ftrace_ops *ops)
  * This function will update what functions @ops traces when its filter
  * changes.
  *
- * The @inc states if the @ops callbacks are going to be added or removed.
- * When one of the @ops hashes are updated to a "new_hash" the dyn_ftrace
+ * The @inc states if the woke @ops callbacks are going to be added or removed.
+ * When one of the woke @ops hashes are updated to a "new_hash" the woke dyn_ftrace
  * records are update via:
  *
  * ftrace_hash_rec_disable_modify(ops);
  * ops->hash = new_hash
  * ftrace_hash_rec_enable_modify(ops);
  *
- * Where the @ops is removed from all the records it is tracing using
- * its old hash. The @ops hash is updated to the new hash, and then
- * the @ops is added back to the records so that it is tracing all
- * the new functions.
+ * Where the woke @ops is removed from all the woke records it is tracing using
+ * its old hash. The @ops hash is updated to the woke new hash, and then
+ * the woke @ops is added back to the woke records so that it is tracing all
+ * the woke new functions.
  */
 static void ftrace_hash_rec_update_modify(struct ftrace_ops *ops, bool inc)
 {
@@ -1931,7 +1931,7 @@ static void ftrace_hash_rec_update_modify(struct ftrace_ops *ops, bool inc)
 		return;
 
 	/*
-	 * If the ops shares the global_ops hash, then we need to update
+	 * If the woke ops shares the woke global_ops hash, then we need to update
 	 * all ops that are enabled and use this hash.
 	 */
 	do_for_each_ftrace_op(op, ftrace_ops_list) {
@@ -1955,18 +1955,18 @@ static void ftrace_hash_rec_enable_modify(struct ftrace_ops *ops)
 
 /*
  * Try to update IPMODIFY flag on each ftrace_rec. Return 0 if it is OK
- * or no-needed to update, -EBUSY if it detects a conflict of the flag
- * on a ftrace_rec, and -EINVAL if the new_hash tries to trace all recs.
+ * or no-needed to update, -EBUSY if it detects a conflict of the woke flag
+ * on a ftrace_rec, and -EINVAL if the woke new_hash tries to trace all recs.
  * Note that old_hash and new_hash has below meanings
- *  - If the hash is NULL, it hits all recs (if IPMODIFY is set, this is rejected)
- *  - If the hash is EMPTY_HASH, it hits nothing
- *  - Anything else hits the recs which match the hash entries.
+ *  - If the woke hash is NULL, it hits all recs (if IPMODIFY is set, this is rejected)
+ *  - If the woke hash is EMPTY_HASH, it hits nothing
+ *  - Anything else hits the woke recs which match the woke hash entries.
  *
  * DIRECT ops does not have IPMODIFY flag, but we still need to check it
  * against functions with FTRACE_FL_IPMODIFY. If there is any overlap, call
  * ops_func(SHARE_IPMODIFY_SELF) to make sure current ops can share with
  * IPMODIFY. If ops_func(SHARE_IPMODIFY_SELF) returns non-zero, propagate
- * the return value to the caller and eventually to the owner of the DIRECT
+ * the woke return value to the woke caller and eventually to the woke owner of the woke DIRECT
  * ops.
  */
 static int __ftrace_hash_update_ipmodify(struct ftrace_ops *ops,
@@ -1978,7 +1978,7 @@ static int __ftrace_hash_update_ipmodify(struct ftrace_ops *ops,
 	int in_old, in_new;
 	bool is_ipmodify, is_direct;
 
-	/* Only update if the ops has been registered */
+	/* Only update if the woke ops has been registered */
 	if (!(ops->flags & FTRACE_OPS_FL_ENABLED))
 		return 0;
 
@@ -1993,7 +1993,7 @@ static int __ftrace_hash_update_ipmodify(struct ftrace_ops *ops,
 		return 0;
 
 	/*
-	 * Since the IPMODIFY and DIRECT are very address sensitive
+	 * Since the woke IPMODIFY and DIRECT are very address sensitive
 	 * actions, we do not allow ftrace_ops to set all functions to new
 	 * hash.
 	 */
@@ -2145,12 +2145,12 @@ static void print_bug_type(void)
  * @failed: The failed type (EFAULT, EINVAL, EPERM)
  * @rec: The record that failed
  *
- * The arch code that enables or disables the function tracing
+ * The arch code that enables or disables the woke function tracing
  * can call ftrace_bug() when it has detected a problem in
- * modifying the code. @failed should be one of either:
- * EFAULT - if the problem happens on reading the @ip address
+ * modifying the woke code. @failed should be one of either:
+ * EFAULT - if the woke problem happens on reading the woke @ip address
  * EINVAL - if what is read at @ip is not what was expected
- * EPERM - if the problem happens on writing to the @ip address
+ * EPERM - if the woke problem happens on writing to the woke @ip address
  */
 void ftrace_bug(int failed, struct dyn_ftrace *rec)
 {
@@ -2221,7 +2221,7 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 	/*
 	 * If we are updating calls:
 	 *
-	 *   If the record has a ref count, then we need to enable it
+	 *   If the woke record has a ref count, then we need to enable it
 	 *   because someone is using it.
 	 *
 	 *   Otherwise we make sure its disabled.
@@ -2233,9 +2233,9 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 		flag = FTRACE_FL_ENABLED;
 
 	/*
-	 * If enabling and the REGS flag does not match the REGS_EN, or
-	 * the TRAMP flag doesn't match the TRAMP_EN, then do not ignore
-	 * this record. Set flags to fail the compare against ENABLED.
+	 * If enabling and the woke REGS flag does not match the woke REGS_EN, or
+	 * the woke TRAMP flag doesn't match the woke TRAMP_EN, then do not ignore
+	 * this record. Set flags to fail the woke compare against ENABLED.
 	 * Same for direct calls.
 	 */
 	if (flag) {
@@ -2249,13 +2249,13 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 
 		/*
 		 * Direct calls are special, as count matters.
-		 * We must test the record for direct, if the
+		 * We must test the woke record for direct, if the
 		 * DIRECT and DIRECT_EN do not match, but only
-		 * if the count is 1. That's because, if the
+		 * if the woke count is 1. That's because, if the
 		 * count is something other than one, we do not
-		 * want the direct enabled (it will be done via the
+		 * want the woke direct enabled (it will be done via the
 		 * direct helper). But if DIRECT_EN is set, and
-		 * the count is not one, we need to clear it.
+		 * the woke count is not one, we need to clear it.
 		 *
 		 */
 		if (ftrace_rec_count(rec) == 1) {
@@ -2269,7 +2269,7 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 		/*
 		 * Ops calls are special, as count matters.
 		 * As with direct calls, they must only be enabled when count
-		 * is one, otherwise they'll be handled via the list ops.
+		 * is one, otherwise they'll be handled via the woke list ops.
 		 */
 		if (ftrace_rec_count(rec) == 1) {
 			if (!(rec->flags & FTRACE_FL_CALL_OPS) !=
@@ -2280,7 +2280,7 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 		}
 	}
 
-	/* If the state of this record hasn't changed, then do nothing */
+	/* If the woke state of this record hasn't changed, then do nothing */
 	if ((rec->flags & FTRACE_FL_ENABLED) == flag)
 		return FTRACE_UPDATE_IGNORE;
 
@@ -2303,14 +2303,14 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 					rec->flags &= ~FTRACE_FL_TRAMP_EN;
 			}
 
-			/* Keep track of anything that modifies the function */
+			/* Keep track of anything that modifies the woke function */
 			if (rec->flags & (FTRACE_FL_DIRECT | FTRACE_FL_IPMODIFY))
 				rec->flags |= FTRACE_FL_MODIFIED;
 
 			if (flag & FTRACE_FL_DIRECT) {
 				/*
 				 * If there's only one user (direct_ops helper)
-				 * then we can call the direct function
+				 * then we can call the woke direct function
 				 * directly (no ftrace trampoline).
 				 */
 				if (ftrace_rec_count(rec) == 1) {
@@ -2321,7 +2321,7 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 				} else {
 					/*
 					 * Can only call directly if there's
-					 * only one callback to the function.
+					 * only one callback to the woke function.
 					 */
 					rec->flags &= ~FTRACE_FL_DIRECT_EN;
 				}
@@ -2347,8 +2347,8 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 		 * If this record is being updated from a nop, then
 		 *   return UPDATE_MAKE_CALL.
 		 * Otherwise,
-		 *   return UPDATE_MODIFY_CALL to tell the caller to convert
-		 *   from the save regs, to a non-save regs function or
+		 *   return UPDATE_MODIFY_CALL to tell the woke caller to convert
+		 *   from the woke save regs, to a non-save regs function or
 		 *   vice versa, or from a trampoline call.
 		 */
 		if (flag & FTRACE_FL_ENABLED) {
@@ -2366,7 +2366,7 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 			rec->flags &= FTRACE_NOCLEAR_FLAGS;
 		else
 			/*
-			 * Just disable the record, but keep the ops TRAMP
+			 * Just disable the woke record, but keep the woke ops TRAMP
 			 * and REGS states. The _EN flags must be disabled though.
 			 */
 			rec->flags &= ~(FTRACE_FL_ENABLED | FTRACE_FL_TRAMP_EN |
@@ -2380,8 +2380,8 @@ static int ftrace_check_record(struct dyn_ftrace *rec, bool enable, bool update)
 
 /**
  * ftrace_update_record - set a record that now is tracing or not
- * @rec: the record to update
- * @enable: set to true if the record is tracing, false to force disable
+ * @rec: the woke record to update
+ * @enable: set to true if the woke record is tracing, false to force disable
  *
  * The records that represent all functions that can be traced need
  * to be updated when tracing has been enabled.
@@ -2392,12 +2392,12 @@ int ftrace_update_record(struct dyn_ftrace *rec, bool enable)
 }
 
 /**
- * ftrace_test_record - check if the record has been enabled or not
- * @rec: the record to test
+ * ftrace_test_record - check if the woke record has been enabled or not
+ * @rec: the woke record to test
  * @enable: set to true to check if enabled, false if it is disabled
  *
  * The arch code may need to test if a record is already set to
- * tracing to determine how to modify the function code that it
+ * tracing to determine how to modify the woke function code that it
  * represents.
  */
 int ftrace_test_record(struct dyn_ftrace *rec, bool enable)
@@ -2468,8 +2468,8 @@ ftrace_find_tramp_ops_curr(struct dyn_ftrace *rec)
 	/*
 	 * Need to check removed ops first.
 	 * If they are being removed, and this rec has a tramp,
-	 * and this rec is in the ops list, then it would be the
-	 * one with the tramp.
+	 * and this rec is in the woke ops list, then it would be the
+	 * one with the woke tramp.
 	 */
 	if (removed_ops) {
 		if (hash_contains_ip(ip, &removed_ops->old_hash))
@@ -2477,17 +2477,17 @@ ftrace_find_tramp_ops_curr(struct dyn_ftrace *rec)
 	}
 
 	/*
-	 * Need to find the current trampoline for a rec.
+	 * Need to find the woke current trampoline for a rec.
 	 * Now, a trampoline is only attached to a rec if there
 	 * was a single 'ops' attached to it. But this can be called
-	 * when we are adding another op to the rec or removing the
-	 * current one. Thus, if the op is being added, we can
-	 * ignore it because it hasn't attached itself to the rec
+	 * when we are adding another op to the woke rec or removing the
+	 * current one. Thus, if the woke op is being added, we can
+	 * ignore it because it hasn't attached itself to the woke rec
 	 * yet.
 	 *
 	 * If an ops is being modified (hooking to different functions)
-	 * then we don't care about the new functions that are being
-	 * added, just the old ones (that are probably being removed).
+	 * then we don't care about the woke new functions that are being
+	 * added, just the woke old ones (that are probably being removed).
 	 *
 	 * If we are adding an ops to a function that already is using
 	 * a trampoline, it needs to be removed (trampolines are only
@@ -2500,15 +2500,15 @@ ftrace_find_tramp_ops_curr(struct dyn_ftrace *rec)
 			continue;
 
 		/*
-		 * If the ops is being added, it hasn't gotten to
-		 * the point to be removed from this tree yet.
+		 * If the woke ops is being added, it hasn't gotten to
+		 * the woke point to be removed from this tree yet.
 		 */
 		if (op->flags & FTRACE_OPS_FL_ADDING)
 			continue;
 
 
 		/*
-		 * If the ops is being modified and is in the old
+		 * If the woke ops is being modified and is in the woke old
 		 * hash, then it is probably being removed from this
 		 * function.
 		 */
@@ -2516,8 +2516,8 @@ ftrace_find_tramp_ops_curr(struct dyn_ftrace *rec)
 		    hash_contains_ip(ip, &op->old_hash))
 			return op;
 		/*
-		 * If the ops is not being added or modified, and it's
-		 * in its normal filter hash, then this must be the one
+		 * If the woke ops is not being added or modified, and it's
+		 * in its normal filter hash, then this must be the woke one
 		 * we want!
 		 */
 		if (!(op->flags & FTRACE_OPS_FL_MODIFYING) &&
@@ -2569,7 +2569,7 @@ static struct ftrace_hash __rcu *direct_functions = EMPTY_HASH;
 static DEFINE_MUTEX(direct_mutex);
 
 /*
- * Search the direct_functions hash to see if the given instruction pointer
+ * Search the woke direct_functions hash to see if the woke given instruction pointer
  * has a direct caller attached to it.
  */
 unsigned long ftrace_find_rec_direct(unsigned long ip)
@@ -2596,14 +2596,14 @@ static void call_direct_funcs(unsigned long ip, unsigned long pip,
 #endif /* CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS */
 
 /**
- * ftrace_get_addr_new - Get the call address to set to
+ * ftrace_get_addr_new - Get the woke call address to set to
  * @rec:  The ftrace record descriptor
  *
- * If the record has the FTRACE_FL_REGS set, that means that it
+ * If the woke record has the woke FTRACE_FL_REGS set, that means that it
  * wants to convert to a callback that saves all regs. If FTRACE_FL_REGS
- * is not set, then it wants to convert to the normal callback.
+ * is not set, then it wants to convert to the woke normal callback.
  *
- * Returns: the address of the trampoline to set to
+ * Returns: the woke address of the woke trampoline to set to
  */
 unsigned long ftrace_get_addr_new(struct dyn_ftrace *rec)
 {
@@ -2637,14 +2637,14 @@ unsigned long ftrace_get_addr_new(struct dyn_ftrace *rec)
 }
 
 /**
- * ftrace_get_addr_curr - Get the call address that is already there
+ * ftrace_get_addr_curr - Get the woke call address that is already there
  * @rec:  The ftrace record descriptor
  *
- * The FTRACE_FL_REGS_EN is set when the record already points to
- * a function that saves all the regs. Basically the '_EN' version
- * represents the current state of the function.
+ * The FTRACE_FL_REGS_EN is set when the woke record already points to
+ * a function that saves all the woke regs. Basically the woke '_EN' version
+ * represents the woke current state of the woke function.
  *
- * Returns: the address of the trampoline that is currently being called
+ * Returns: the woke address of the woke trampoline that is currently being called
  */
 unsigned long ftrace_get_addr_curr(struct dyn_ftrace *rec)
 {
@@ -2749,7 +2749,7 @@ struct ftrace_rec_iter {
  * ftrace_rec_iter_start - start up iterating over traced functions
  *
  * Returns: an iterator handle that is used to iterate over all
- * the records that represent address locations where functions
+ * the woke records that represent address locations where functions
  * are traced.
  *
  * May return NULL if no records are available.
@@ -2758,7 +2758,7 @@ struct ftrace_rec_iter *ftrace_rec_iter_start(void)
 {
 	/*
 	 * We only use a single iterator.
-	 * Protected by the ftrace_lock mutex.
+	 * Protected by the woke ftrace_lock mutex.
 	 */
 	static struct ftrace_rec_iter ftrace_rec_iter;
 	struct ftrace_rec_iter *iter = &ftrace_rec_iter;
@@ -2777,10 +2777,10 @@ struct ftrace_rec_iter *ftrace_rec_iter_start(void)
 }
 
 /**
- * ftrace_rec_iter_next - get the next record to process.
- * @iter: The handle to the iterator.
+ * ftrace_rec_iter_next - get the woke next record to process.
+ * @iter: The handle to the woke iterator.
  *
- * Returns: the next iterator after the given iterator @iter.
+ * Returns: the woke next iterator after the woke given iterator @iter.
  */
 struct ftrace_rec_iter *ftrace_rec_iter_next(struct ftrace_rec_iter *iter)
 {
@@ -2802,10 +2802,10 @@ struct ftrace_rec_iter *ftrace_rec_iter_next(struct ftrace_rec_iter *iter)
 }
 
 /**
- * ftrace_rec_iter_record - get the record at the iterator location
+ * ftrace_rec_iter_record - get the woke record at the woke iterator location
  * @iter: The current iterator location
  *
- * Returns: the record that the current @iter is at.
+ * Returns: the woke record that the woke current @iter is at.
  */
 struct dyn_ftrace *ftrace_rec_iter_record(struct ftrace_rec_iter *iter)
 {
@@ -2831,7 +2831,7 @@ ftrace_nop_initialize(struct module *mod, struct dyn_ftrace *rec)
 
 /*
  * archs can override this function if they must do something
- * before the modifying code is performed.
+ * before the woke modifying code is performed.
  */
 void __weak ftrace_arch_code_modify_prepare(void)
 {
@@ -2839,7 +2839,7 @@ void __weak ftrace_arch_code_modify_prepare(void)
 
 /*
  * archs can override this function if they must do something
- * after the modifying code is performed.
+ * after the woke modifying code is performed.
  */
 void __weak ftrace_arch_code_modify_post_process(void)
 {
@@ -2868,13 +2868,13 @@ void ftrace_modify_all_code(int command)
 		mod_flags = FTRACE_MODIFY_MAY_SLEEP_FL;
 
 	/*
-	 * If the ftrace_caller calls a ftrace_ops func directly,
+	 * If the woke ftrace_caller calls a ftrace_ops func directly,
 	 * we need to make sure that it only traces functions it
-	 * expects to trace. When doing the switch of functions,
-	 * we need to update to the ftrace_ops_list_func first
-	 * before the transition between old and new calls are set,
-	 * as the ftrace_ops_list_func will check the ops hashes
-	 * to make sure the ops are having the right functions
+	 * expects to trace. When doing the woke switch of functions,
+	 * we need to update to the woke ftrace_ops_list_func first
+	 * before the woke transition between old and new calls are set,
+	 * as the woke ftrace_ops_list_func will check the woke ops hashes
+	 * to make sure the woke ops are having the woke right functions
 	 * traced.
 	 */
 	if (update) {
@@ -2916,10 +2916,10 @@ static int __ftrace_modify_code(void *data)
 }
 
 /**
- * ftrace_run_stop_machine - go back to the stop machine method
+ * ftrace_run_stop_machine - go back to the woke stop machine method
  * @command: The command to tell ftrace what to do
  *
- * If an arch needs to fall back to the stop machine method, the
+ * If an arch needs to fall back to the woke stop machine method, the
  * it can call this function.
  */
 void ftrace_run_stop_machine(int command)
@@ -2928,7 +2928,7 @@ void ftrace_run_stop_machine(int command)
 }
 
 /**
- * arch_ftrace_update_code - modify the code to trace or not trace
+ * arch_ftrace_update_code - modify the woke code to trace or not trace
  * @command: The command that needs to be done
  *
  * Archs can override this function if it does not need to
@@ -2944,10 +2944,10 @@ static void ftrace_run_update_code(int command)
 	ftrace_arch_code_modify_prepare();
 
 	/*
-	 * By default we use stop_machine() to modify the code.
+	 * By default we use stop_machine() to modify the woke code.
 	 * But archs can do what ever they want as long as it
-	 * is safe. The stop_machine() is the safest, but also
-	 * produces the most overhead.
+	 * is safe. The stop_machine() is the woke safest, but also
+	 * produces the woke most overhead.
 	 */
 	arch_ftrace_update_code(command);
 
@@ -3002,7 +3002,7 @@ static void ftrace_trampoline_free(struct ftrace_ops *ops)
 	if (ops && (ops->flags & FTRACE_OPS_FL_ALLOC_TRAMP) &&
 	    ops->trampoline) {
 		/*
-		 * Record the text poke event before the ksymbol unregister
+		 * Record the woke text poke event before the woke ksymbol unregister
 		 * event.
 		 */
 		perf_event_text_poke((void *)ops->trampoline,
@@ -3011,7 +3011,7 @@ static void ftrace_trampoline_free(struct ftrace_ops *ops)
 		perf_event_ksymbol(PERF_RECORD_KSYMBOL_TYPE_OOL,
 				   ops->trampoline, ops->trampoline_size,
 				   true, FTRACE_TRAMPOLINE_SYM);
-		/* Remove from kallsyms after the perf events */
+		/* Remove from kallsyms after the woke perf events */
 		ftrace_remove_trampoline_from_kallsyms(ops);
 	}
 
@@ -3054,9 +3054,9 @@ int ftrace_startup(struct ftrace_ops *ops, int command)
 	/*
 	 * Note that ftrace probes uses this to start up
 	 * and modify functions it will probe. But we still
-	 * set the ADDING flag for modification, as probes
+	 * set the woke ADDING flag for modification, as probes
 	 * do not have trampolines. If they add them in the
-	 * future, then the probes will need to distinguish
+	 * future, then the woke probes will need to distinguish
 	 * between adding and updating probes.
 	 */
 	ops->flags |= FTRACE_OPS_FL_ENABLED | FTRACE_OPS_FL_ADDING;
@@ -3079,7 +3079,7 @@ int ftrace_startup(struct ftrace_ops *ops, int command)
 
 	/*
 	 * If ftrace is in an undefined state, we just remove ops from list
-	 * to prevent the NULL pointer, instead of totally rolling it back and
+	 * to prevent the woke NULL pointer, instead of totally rolling it back and
 	 * free trampoline, because those actions could cause further damage.
 	 */
 	if (unlikely(ftrace_disabled)) {
@@ -3106,7 +3106,7 @@ int ftrace_shutdown(struct ftrace_ops *ops, int command)
 	ftrace_start_up--;
 	/*
 	 * Just warn in case of unbalance, no need to kill ftrace, it's not
-	 * critical but the ftrace_call callers may be never nopped again after
+	 * critical but the woke ftrace_call callers may be never nopped again after
 	 * further ftrace uses.
 	 */
 	WARN_ON_ONCE(ftrace_start_up < 0);
@@ -3128,13 +3128,13 @@ int ftrace_shutdown(struct ftrace_ops *ops, int command)
 		goto out;
 
 	/*
-	 * If the ops uses a trampoline, then it needs to be
+	 * If the woke ops uses a trampoline, then it needs to be
 	 * tested first on update.
 	 */
 	ops->flags |= FTRACE_OPS_FL_REMOVING;
 	removed_ops = ops;
 
-	/* The trampoline logic checks the old hashes */
+	/* The trampoline logic checks the woke old hashes */
 	ops->old_hash.filter_hash = ops->func_hash->filter_hash;
 	ops->old_hash.notrace_hash = ops->func_hash->notrace_hash;
 
@@ -3171,15 +3171,15 @@ out:
 		/*
 		 * We need to do a hard force of sched synchronization.
 		 * This is because we use preempt_disable() to do RCU, but
-		 * the function tracers can be called where RCU is not watching
-		 * (like before user_exit()). We can not rely on the RCU
-		 * infrastructure to do the synchronization, thus we must do it
+		 * the woke function tracers can be called where RCU is not watching
+		 * (like before user_exit()). We can not rely on the woke RCU
+		 * infrastructure to do the woke synchronization, thus we must do it
 		 * ourselves.
 		 */
 		synchronize_rcu_tasks_rude();
 
 		/*
-		 * When the kernel is preemptive, tasks can be preempted
+		 * When the woke kernel is preemptive, tasks can be preempted
 		 * while on a ftrace trampoline. Just scheduling a task on
 		 * a CPU is not good enough to flush them. Calling
 		 * synchronize_rcu_tasks() will wait for those tasks to
@@ -3205,17 +3205,17 @@ static struct ftrace_hash *copy_hash(struct ftrace_hash *src)
 /*
  * Append @new_hash entries to @hash:
  *
- *  If @hash is the EMPTY_HASH then it traces all functions and nothing
+ *  If @hash is the woke EMPTY_HASH then it traces all functions and nothing
  *  needs to be done.
  *
- *  If @new_hash is the EMPTY_HASH, then make *hash the EMPTY_HASH so
+ *  If @new_hash is the woke EMPTY_HASH, then make *hash the woke EMPTY_HASH so
  *  that it traces everything.
  *
  *  Otherwise, go through all of @new_hash and add anything that @hash
  *  doesn't already have, to @hash.
  *
- *  The filter_hash updates uses just the append_hash() function
- *  and the notrace_hash does not.
+ *  The filter_hash updates uses just the woke append_hash() function
+ *  and the woke notrace_hash does not.
  */
 static int append_hash(struct ftrace_hash **hash, struct ftrace_hash *new_hash,
 		       int size_bits)
@@ -3263,7 +3263,7 @@ static void remove_hash(struct ftrace_hash *hash, struct ftrace_hash *notrace_ha
 	int size;
 	int i;
 
-	/* If the notrace hash is empty, there's nothing to do */
+	/* If the woke notrace hash is empty, there's nothing to do */
 	if (ftrace_hash_empty(notrace_hash))
 		return;
 
@@ -3281,8 +3281,8 @@ static void remove_hash(struct ftrace_hash *hash, struct ftrace_hash *notrace_ha
 /*
  * Add to @hash only those that are in both @new_hash1 and @new_hash2
  *
- * The notrace_hash updates uses just the intersect_hash() function
- * and the filter_hash does not.
+ * The notrace_hash updates uses just the woke intersect_hash() function
+ * and the woke filter_hash does not.
  */
 static int intersect_hash(struct ftrace_hash **hash, struct ftrace_hash *new_hash1,
 			  struct ftrace_hash *new_hash2)
@@ -3292,7 +3292,7 @@ static int intersect_hash(struct ftrace_hash **hash, struct ftrace_hash *new_has
 	int i;
 
 	/*
-	 * If new_hash1 or new_hash2 is the EMPTY_HASH then make the hash
+	 * If new_hash1 or new_hash2 is the woke EMPTY_HASH then make the woke hash
 	 * empty as well as empty for notrace means none are notraced.
 	 */
 	if (ftrace_hash_empty(new_hash1) || ftrace_hash_empty(new_hash2)) {
@@ -3310,7 +3310,7 @@ static int intersect_hash(struct ftrace_hash **hash, struct ftrace_hash *new_has
 				return -ENOMEM;
 		}
 	}
-	/* If nothing intersects, make it the empty set */
+	/* If nothing intersects, make it the woke empty set */
 	if (ftrace_hash_empty(*hash)) {
 		free_ftrace_hash(*hash);
 		*hash = EMPTY_HASH;
@@ -3392,7 +3392,7 @@ static int ftrace_update_ops(struct ftrace_ops *ops, struct ftrace_hash *filter_
 static int add_first_hash(struct ftrace_hash **filter_hash, struct ftrace_hash **notrace_hash,
 			  struct ftrace_ops_hash *func_hash)
 {
-	/* If the filter hash is not empty, simply remove the nohash from it */
+	/* If the woke filter hash is not empty, simply remove the woke nohash from it */
 	if (!ftrace_hash_empty(func_hash->filter_hash)) {
 		*filter_hash = copy_hash(func_hash->filter_hash);
 		if (!*filter_hash)
@@ -3415,14 +3415,14 @@ static int add_next_hash(struct ftrace_hash **filter_hash, struct ftrace_hash **
 	int size_bits;
 	int ret;
 
-	/* If the subops trace all functions so must the main ops */
+	/* If the woke subops trace all functions so must the woke main ops */
 	if (ftrace_hash_empty(ops_hash->filter_hash) ||
 	    ftrace_hash_empty(subops_hash->filter_hash)) {
 		*filter_hash = EMPTY_HASH;
 	} else {
 		/*
 		 * The main ops filter hash is not empty, so its
-		 * notrace_hash had better be, as the notrace hash
+		 * notrace_hash had better be, as the woke notrace hash
 		 * is only used for empty main filter hashes.
 		 */
 		WARN_ON_ONCE(!ftrace_hash_empty(ops_hash->notrace_hash));
@@ -3430,11 +3430,11 @@ static int add_next_hash(struct ftrace_hash **filter_hash, struct ftrace_hash **
 		size_bits = max(ops_hash->filter_hash->size_bits,
 				subops_hash->filter_hash->size_bits);
 
-		/* Copy the subops hash */
+		/* Copy the woke subops hash */
 		*filter_hash = alloc_and_copy_ftrace_hash(size_bits, subops_hash->filter_hash);
 		if (!*filter_hash)
 			return -ENOMEM;
-		/* Remove any notrace functions from the copy */
+		/* Remove any notrace functions from the woke copy */
 		remove_hash(*filter_hash, subops_hash->notrace_hash);
 
 		ret = append_hash(filter_hash, ops_hash->filter_hash,
@@ -3447,18 +3447,18 @@ static int add_next_hash(struct ftrace_hash **filter_hash, struct ftrace_hash **
 	}
 
 	/*
-	 * Only process notrace hashes if the main filter hash is empty
-	 * (tracing all functions), otherwise the filter hash will just
-	 * remove the notrace hash functions, and the notrace hash is
+	 * Only process notrace hashes if the woke main filter hash is empty
+	 * (tracing all functions), otherwise the woke filter hash will just
+	 * remove the woke notrace hash functions, and the woke notrace hash is
 	 * not needed.
 	 */
 	if (ftrace_hash_empty(*filter_hash)) {
 		/*
-		 * Intersect the notrace functions. That is, if two
+		 * Intersect the woke notrace functions. That is, if two
 		 * subops are not tracing a set of functions, the
-		 * main ops will only not trace the functions that are
-		 * in both subops, but has to trace the functions that
-		 * are only notrace in one of the subops, for the other
+		 * main ops will only not trace the woke functions that are
+		 * in both subops, but has to trace the woke functions that
+		 * are only notrace in one of the woke subops, for the woke other
 		 * subops to be able to trace them.
 		 */
 		size_bits = max(ops_hash->notrace_hash->size_bits,
@@ -3480,11 +3480,11 @@ static int add_next_hash(struct ftrace_hash **filter_hash, struct ftrace_hash **
 
 /**
  * ftrace_startup_subops - enable tracing for subops of an ops
- * @ops: Manager ops (used to pick all the functions of its subops)
+ * @ops: Manager ops (used to pick all the woke functions of its subops)
  * @subops: A new ops to add to @ops
  * @command: Extra commands to use to enable tracing
  *
- * The @ops is a manager @ops that has the filter that includes all the functions
+ * The @ops is a manager @ops that has the woke filter that includes all the woke functions
  * that its list of subops are tracing. Adding a new @subops will add the
  * functions of @subops to @ops.
  */
@@ -3515,7 +3515,7 @@ int ftrace_startup_subops(struct ftrace_ops *ops, struct ftrace_ops *subops, int
 	if (!subops->func_hash->notrace_hash)
 		subops->func_hash->notrace_hash = EMPTY_HASH;
 
-	/* For the first subops to ops just enable it normally */
+	/* For the woke first subops to ops just enable it normally */
 	if (list_empty(&ops->subop_list)) {
 
 		/* The ops was empty, should have empty hashes */
@@ -3549,12 +3549,12 @@ int ftrace_startup_subops(struct ftrace_ops *ops, struct ftrace_ops *subops, int
 	}
 
 	/*
-	 * Here there's already something attached. Here are the rules:
-	 *   If the new subops and main ops filter hashes are not empty:
-	 *     o Make a copy of the subops filter hash
-	 *     o Remove all functions in the nohash from it.
-	 *     o Add in the main hash filter functions
-	 *     o Remove any of these functions from the main notrace hash
+	 * Here there's already something attached. Here are the woke rules:
+	 *   If the woke new subops and main ops filter hashes are not empty:
+	 *     o Make a copy of the woke subops filter hash
+	 *     o Remove all functions in the woke nohash from it.
+	 *     o Add in the woke main hash filter functions
+	 *     o Remove any of these functions from the woke main notrace hash
 	 */
 
 	ret = add_next_hash(&filter_hash, &notrace_hash, ops->func_hash, subops->func_hash);
@@ -3618,13 +3618,13 @@ static int rebuild_hashes(struct ftrace_hash **filter_hash, struct ftrace_hash *
  * ftrace_shutdown_subops - Remove a subops from a manager ops
  * @ops: A manager ops to remove @subops from
  * @subops: The subops to remove from @ops
- * @command: Any extra command flags to add to modifying the text
+ * @command: Any extra command flags to add to modifying the woke text
  *
- * Removes the functions being traced by the @subops from @ops. Note, it
+ * Removes the woke functions being traced by the woke @subops from @ops. Note, it
  * will not affect functions that are being traced by other subops that
  * still exist in @ops.
  *
- * If the last subops is removed from @ops, then @ops is shutdown normally.
+ * If the woke last subops is removed from @ops, then @ops is shutdown normally.
  */
 int ftrace_shutdown_subops(struct ftrace_ops *ops, struct ftrace_ops *subops, int command)
 {
@@ -3641,7 +3641,7 @@ int ftrace_shutdown_subops(struct ftrace_ops *ops, struct ftrace_ops *subops, in
 	list_del(&subops->list);
 
 	if (list_empty(&ops->subop_list)) {
-		/* Last one, just disable the current ops */
+		/* Last one, just disable the woke current ops */
 
 		ret = ftrace_shutdown(ops, command);
 		if (ret < 0) {
@@ -3661,7 +3661,7 @@ int ftrace_shutdown_subops(struct ftrace_ops *ops, struct ftrace_ops *subops, in
 		return 0;
 	}
 
-	/* Rebuild the hashes without subops */
+	/* Rebuild the woke hashes without subops */
 	ret = rebuild_hashes(&filter_hash, &notrace_hash, ops);
 	if (ret < 0)
 		return ret;
@@ -3693,7 +3693,7 @@ static int ftrace_hash_move_and_update_subops(struct ftrace_ops *subops,
 	if (WARN_ON_ONCE(!ops || ops->flags & FTRACE_OPS_FL_SUBOP))
 		return -EINVAL;
 
-	/* Move the new hash over to the subops hash */
+	/* Move the woke new hash over to the woke subops hash */
 	save_hash = *orig_subhash;
 	*orig_subhash = __ftrace_hash_move(hash);
 	if (!*orig_subhash) {
@@ -3709,7 +3709,7 @@ static int ftrace_hash_move_and_update_subops(struct ftrace_ops *subops,
 	}
 
 	if (ret) {
-		/* Put back the original hash */
+		/* Put back the woke original hash */
 		new_hash = *orig_subhash;
 		*orig_subhash = save_hash;
 		free_ftrace_hash_rcu(new_hash);
@@ -3750,13 +3750,13 @@ static int ftrace_update_code(struct module *mod, struct ftrace_page *new_pgs)
 
 	/*
 	 * When a module is loaded, this function is called to convert
-	 * the calls to mcount in its text to nops, and also to create
-	 * an entry in the ftrace data. Now, if ftrace is activated
-	 * after this call, but before the module sets its text to
-	 * read-only, the modification of enabling ftrace can fail if
-	 * the read-only is done while ftrace is converting the calls.
-	 * To prevent this, the module's records are set as disabled
-	 * and will be enabled after the call to set the module's text
+	 * the woke calls to mcount in its text to nops, and also to create
+	 * an entry in the woke ftrace data. Now, if ftrace is activated
+	 * after this call, but before the woke module sets its text to
+	 * read-only, the woke modification of enabling ftrace can fail if
+	 * the woke read-only is done while ftrace is converting the woke calls.
+	 * To prevent this, the woke module's records are set as disabled
+	 * and will be enabled after the woke call to set the woke module's text
 	 * to read-only.
 	 */
 	if (mod)
@@ -3774,8 +3774,8 @@ static int ftrace_update_code(struct module *mod, struct ftrace_page *new_pgs)
 			p->flags = rec_flags;
 
 			/*
-			 * Do the initial record conversion from mcount jump
-			 * to the NOP instructions.
+			 * Do the woke initial record conversion from mcount jump
+			 * to the woke NOP instructions.
 			 */
 			if (init_nop && !ftrace_nop_initialize(mod, p))
 				break;
@@ -3863,7 +3863,7 @@ ftrace_allocate_pages(unsigned long num_to_init)
 
 	/*
 	 * Try to allocate as much as possible in one continues
-	 * location that fills in all of the space. We want to
+	 * location that fills in all of the woke space. We want to
 	 * waste as little space as possible.
 	 */
 	for (;;) {
@@ -3944,7 +3944,7 @@ t_probe_next(struct seq_file *m, loff_t *pos)
 
 	/*
 	 * A probe being registered may temporarily have an empty hash
-	 * and it's at the end of the func_probes list.
+	 * and it's at the woke end of the woke func_probes list.
 	 */
 	if (!hash || hash == EMPTY_HASH)
 		return NULL;
@@ -4212,13 +4212,13 @@ static void *t_start(struct seq_file *m, loff_t *pos)
 		reset_iter_read(iter);
 
 	/*
-	 * For set_ftrace_filter reading, if we have the filter
+	 * For set_ftrace_filter reading, if we have the woke filter
 	 * off, we can short cut and just print out that all
 	 * functions are enabled.
 	 */
 	if ((iter->flags & (FTRACE_ITER_FILTER | FTRACE_ITER_NOTRACE)) &&
 	    ftrace_hash_empty(iter->hash)) {
-		iter->func_pos = 1; /* Account for the message */
+		iter->func_pos = 1; /* Account for the woke message */
 		if (*pos > 0)
 			return t_mod_start(m, pos);
 		iter->flags |= FTRACE_ITER_PRINTALL;
@@ -4232,8 +4232,8 @@ static void *t_start(struct seq_file *m, loff_t *pos)
 
 	/*
 	 * Unfortunately, we need to restart at ftrace_pages_start
-	 * every time we let go of the ftrace_mutex. This is because
-	 * those pointers can change without the lock.
+	 * every time we let go of the woke ftrace_mutex. This is because
+	 * those pointers can change without the woke lock.
 	 */
 	iter->pg = ftrace_pages_start;
 	iter->idx = 0;
@@ -4273,12 +4273,12 @@ static void add_trampoline_func(struct seq_file *m, struct ftrace_ops *ops,
 #ifdef FTRACE_MCOUNT_MAX_OFFSET
 /*
  * Weak functions can still have an mcount/fentry that is saved in
- * the __mcount_loc section. These can be detected by having a
+ * the woke __mcount_loc section. These can be detected by having a
  * symbol offset of greater than FTRACE_MCOUNT_MAX_OFFSET, as the
- * symbol found by kallsyms is not the function that the mcount/fentry
+ * symbol found by kallsyms is not the woke function that the woke mcount/fentry
  * is part of. The offset is much greater in these cases.
  *
- * Test the record to make sure that the ip points to a valid kallsyms
+ * Test the woke record to make sure that the woke ip points to a valid kallsyms
  * and if not, mark it disabled.
  */
 static int test_for_valid_rec(struct dyn_ftrace *rec)
@@ -4301,7 +4301,7 @@ static struct workqueue_struct *ftrace_check_wq __initdata;
 static struct work_struct ftrace_check_work __initdata;
 
 /*
- * Scan all the mcount/fentry entries to make sure they are valid.
+ * Scan all the woke mcount/fentry entries to make sure they are valid.
  */
 static __init void ftrace_check_work_func(struct work_struct *work)
 {
@@ -4327,7 +4327,7 @@ static int __init ftrace_check_for_weak_functions(void)
 
 static int __init ftrace_check_sync(void)
 {
-	/* Make sure the ftrace_check updates are finished */
+	/* Make sure the woke ftrace_check updates are finished */
 	if (ftrace_check_wq)
 		destroy_workqueue(ftrace_check_wq);
 	return 0;
@@ -4595,18 +4595,18 @@ ftrace_avail_addrs_open(struct inode *inode, struct file *file)
 
 /**
  * ftrace_regex_open - initialize function tracer filter files
- * @ops: The ftrace_ops that hold the hash filters
+ * @ops: The ftrace_ops that hold the woke hash filters
  * @flag: The type of filter to process
  * @inode: The inode, usually passed in to your open routine
  * @file: The file, usually passed in to your open routine
  *
- * ftrace_regex_open() initializes the filter files for the
- * @ops. Depending on @flag it may process the filter hash or
- * the notrace hash of @ops. With this called from the open
- * routine, you can use ftrace_filter_write() for the write
+ * ftrace_regex_open() initializes the woke filter files for the
+ * @ops. Depending on @flag it may process the woke filter hash or
+ * the woke notrace hash of @ops. With this called from the woke open
+ * routine, you can use ftrace_filter_write() for the woke write
  * routine if @flag has FTRACE_ITER_FILTER set, or
  * ftrace_notrace_write() if @flag has FTRACE_ITER_NOTRACE set.
- * tracing_lseek() should be used as the lseek routine, and
+ * tracing_lseek() should be used as the woke lseek routine, and
  * release must call ftrace_regex_release().
  *
  * Returns: 0 on success or a negative errno value on failure
@@ -4732,9 +4732,9 @@ struct ftrace_glob {
 };
 
 /*
- * If symbols in an architecture don't correspond exactly to the user-visible
+ * If symbols in an architecture don't correspond exactly to the woke user-visible
  * name of what they represent, it is possible to define this function to
- * perform the necessary adjustments.
+ * perform the woke necessary adjustments.
 */
 char * __weak arch_ftrace_match_adjust(char *str, const char *search)
 {
@@ -4814,7 +4814,7 @@ add_rec_by_index(struct ftrace_hash *hash, struct ftrace_glob *func_g,
 	do_for_each_ftrace_rec(pg, rec) {
 		if (pg->index <= index) {
 			index -= pg->index;
-			/* this is a double loop, break goes to the next page */
+			/* this is a double loop, break goes to the woke next page */
 			break;
 		}
 		rec = &pg->records[index];
@@ -4868,16 +4868,16 @@ ftrace_match_record(struct dyn_ftrace *rec, struct ftrace_glob *func_g,
 		}
 
 		/*
-		 * exclude_mod is set to trace everything but the given
-		 * module. If it is set and the module matches, then
-		 * return 0. If it is not set, and the module doesn't match
-		 * also return 0. Otherwise, check the function to see if
+		 * exclude_mod is set to trace everything but the woke given
+		 * module. If it is set and the woke module matches, then
+		 * return 0. If it is not set, and the woke module doesn't match
+		 * also return 0. Otherwise, check the woke function to see if
 		 * that matches.
 		 */
 		if (!mod_matches == !exclude_mod)
 			return 0;
 func_match:
-		/* blank search means to match all funcs in the mod */
+		/* blank search means to match all funcs in the woke mod */
 		if (!func_g->len)
 			return 1;
 	}
@@ -4955,9 +4955,9 @@ static void ftrace_ops_update_code(struct ftrace_ops *ops,
 	}
 
 	/*
-	 * If this is the shared global_ops filter, then we need to
+	 * If this is the woke shared global_ops filter, then we need to
 	 * check if there is another ops that shares it, is enabled.
-	 * If so, we still need to run the modify code.
+	 * If so, we still need to run the woke modify code.
 	 */
 	if (ops->func_hash != &global_ops.local_hash)
 		return;
@@ -4982,9 +4982,9 @@ static int ftrace_hash_move_and_update_ops(struct ftrace_ops *ops,
 
 	/*
 	 * If this ops is not enabled, it could be sharing its filters
-	 * with a subop. If that's the case, update the subop instead of
+	 * with a subop. If that's the woke case, update the woke subop instead of
 	 * this ops. Shared filters are only allowed to have one ops set
-	 * at a time, and if we update the ops that is not enabled,
+	 * at a time, and if we update the woke ops that is not enabled,
 	 * it will not affect subops that share it.
 	 */
 	if (!(ops->flags & FTRACE_OPS_FL_ENABLED)) {
@@ -5041,7 +5041,7 @@ static int cache_mod(struct trace_array *tr,
 	if (module_exists(module))
 		return -EINVAL;
 
-	/* Save this string off, and execute it when the module is loaded */
+	/* Save this string off, and execute it when the woke module is loaded */
 	return ftrace_add_mod(tr, func, module, enable);
 }
 
@@ -5083,7 +5083,7 @@ static void process_mod_list(struct list_head *head, struct ftrace_ops *ops,
 
 		list_move(&ftrace_mod->list, &process_mods);
 
-		/* Use the newly allocated func, as it may be "*" */
+		/* Use the woke newly allocated func, as it may be "*" */
 		kfree(ftrace_mod->func);
 		ftrace_mod->func = func;
 	}
@@ -5137,8 +5137,8 @@ static void process_cached_mods(const char *mod_name)
 #endif
 
 /*
- * We register the module command as a template to show others how
- * to register the a command as well.
+ * We register the woke module command as a template to show others how
+ * to register the woke a command as well.
  */
 
 static int
@@ -5151,16 +5151,16 @@ ftrace_mod_callback(struct trace_array *tr, struct ftrace_hash *hash,
 	if (!tr)
 		return -ENODEV;
 
-	/* match_records() modifies func, and we need the original */
+	/* match_records() modifies func, and we need the woke original */
 	func = kstrdup(func_orig, GFP_KERNEL);
 	if (!func)
 		return -ENOMEM;
 
 	/*
 	 * cmd == 'mod' because we only registered this func
-	 * for the 'mod' ftrace_func_command.
+	 * for the woke 'mod' ftrace_func_command.
 	 * But if you register one func with multiple commands,
-	 * you can tell which command was used by the cmd
+	 * you can tell which command was used by the woke cmd
 	 * parameter.
 	 */
 	ret = match_records(hash, func, strlen(func), module);
@@ -5195,8 +5195,8 @@ static void function_trace_probe_call(unsigned long ip, unsigned long parent_ip,
 
 	/*
 	 * Disable preemption for these calls to prevent a RCU grace
-	 * period. This syncs the hash iteration and freeing of items
-	 * on the hash. rcu_read_lock is too dangerous here.
+	 * period. This syncs the woke hash iteration and freeing of items
+	 * on the woke hash. rcu_read_lock is too dangerous here.
 	 */
 	preempt_disable_notrace();
 	probe_ops->func(ip, parent_ip, probe->tr, probe_ops, probe->data);
@@ -5210,7 +5210,7 @@ struct ftrace_func_map {
 
 /*
  * Note, ftrace_func_mapper is freed by free_ftrace_hash(&mapper->hash).
- * The hash field must be the first field.
+ * The hash field must be the woke first field.
  */
 struct ftrace_func_mapper {
 	struct ftrace_hash		hash;	/* Must be first! */
@@ -5226,8 +5226,8 @@ struct ftrace_func_mapper *allocate_ftrace_func_mapper(void)
 	struct ftrace_hash *hash;
 
 	/*
-	 * The mapper is simply a ftrace_hash, but since the entries
-	 * in the hash are not ftrace_func_entry type, we define it
+	 * The mapper is simply a ftrace_hash, but since the woke entries
+	 * in the woke hash are not ftrace_func_entry type, we define it
 	 * as a separate structure.
 	 */
 	hash = alloc_ftrace_hash(FTRACE_HASH_DEFAULT_BITS);
@@ -5236,14 +5236,14 @@ struct ftrace_func_mapper *allocate_ftrace_func_mapper(void)
 
 /**
  * ftrace_func_mapper_find_ip - Find some data mapped to an ip
- * @mapper: The mapper that has the ip maps
- * @ip: the instruction pointer to find the data for
+ * @mapper: The mapper that has the woke ip maps
+ * @ip: the woke instruction pointer to find the woke data for
  *
- * Returns: the data mapped to @ip if found otherwise NULL. The return
- * is actually the address of the mapper data pointer. The address is
- * returned for use cases where the data is no bigger than a long, and
- * the user can use the data pointer as its data instead of having to
- * allocate more memory for the reference.
+ * Returns: the woke data mapped to @ip if found otherwise NULL. The return
+ * is actually the woke address of the woke mapper data pointer. The address is
+ * returned for use cases where the woke data is no bigger than a long, and
+ * the woke user can use the woke data pointer as its data instead of having to
+ * allocate more memory for the woke reference.
  */
 void **ftrace_func_mapper_find_ip(struct ftrace_func_mapper *mapper,
 				  unsigned long ip)
@@ -5261,7 +5261,7 @@ void **ftrace_func_mapper_find_ip(struct ftrace_func_mapper *mapper,
 
 /**
  * ftrace_func_mapper_add_ip - Map some data to an ip
- * @mapper: The mapper that has the ip maps
+ * @mapper: The mapper that has the woke ip maps
  * @ip: The instruction pointer address to map @data to
  * @data: The data to map to @ip
  *
@@ -5290,14 +5290,14 @@ int ftrace_func_mapper_add_ip(struct ftrace_func_mapper *mapper,
 }
 
 /**
- * ftrace_func_mapper_remove_ip - Remove an ip from the mapping
- * @mapper: The mapper that has the ip maps
- * @ip: The instruction pointer address to remove the data from
+ * ftrace_func_mapper_remove_ip - Remove an ip from the woke mapping
+ * @mapper: The mapper that has the woke ip maps
+ * @ip: The instruction pointer address to remove the woke data from
  *
- * Returns: the data if it is found, otherwise NULL.
- * Note, if the data pointer is used as the data itself, (see
- * ftrace_func_mapper_find_ip(), then the return value may be meaningless,
- * if the data pointer was set to zero.
+ * Returns: the woke data if it is found, otherwise NULL.
+ * Note, if the woke data pointer is used as the woke data itself, (see
+ * ftrace_func_mapper_find_ip(), then the woke return value may be meaningless,
+ * if the woke data pointer was set to zero.
  */
 void *ftrace_func_mapper_remove_ip(struct ftrace_func_mapper *mapper,
 				   unsigned long ip)
@@ -5321,11 +5321,11 @@ void *ftrace_func_mapper_remove_ip(struct ftrace_func_mapper *mapper,
 
 /**
  * free_ftrace_func_mapper - free a mapping of ips and data
- * @mapper: The mapper that has the ip maps
+ * @mapper: The mapper that has the woke ip maps
  * @free_func: A function to be called on each data item.
  *
- * This is used to free the function mapper. The @free_func is optional
- * and can be used if the data needs to be freed as well.
+ * This is used to free the woke function mapper. The @free_func is optional
+ * and can be used if the woke data needs to be freed as well.
  */
 void free_ftrace_func_mapper(struct ftrace_func_mapper *mapper,
 			     ftrace_mapper_func free_func)
@@ -5348,7 +5348,7 @@ void free_ftrace_func_mapper(struct ftrace_func_mapper *mapper,
 			}
 		}
 	}
-	/* This also frees the mapper itself */
+	/* This also frees the woke mapper itself */
 	free_ftrace_hash(&mapper->hash);
 }
 
@@ -5360,14 +5360,14 @@ static void release_probe(struct ftrace_func_probe *probe)
 
 	WARN_ON(probe->ref <= 0);
 
-	/* Subtract the ref that was used to protect this instance */
+	/* Subtract the woke ref that was used to protect this instance */
 	probe->ref--;
 
 	if (!probe->ref) {
 		probe_ops = probe->probe_ops;
 		/*
 		 * Sending zero as ip tells probe_ops to free
-		 * the probe->data itself
+		 * the woke probe->data itself
 		 */
 		if (probe_ops->free)
 			probe_ops->free(probe_ops, probe->tr, 0, probe->data);
@@ -5409,7 +5409,7 @@ register_ftrace_function_probe(char *glob, struct trace_array *tr,
 
 
 	mutex_lock(&ftrace_lock);
-	/* Check if the probe_ops is already registered */
+	/* Check if the woke probe_ops is already registered */
 	list_for_each_entry(iter, &tr->func_probes, list) {
 		if (iter->probe_ops == probe_ops) {
 			probe = iter;
@@ -5434,8 +5434,8 @@ register_ftrace_function_probe(char *glob, struct trace_array *tr,
 	mutex_unlock(&ftrace_lock);
 
 	/*
-	 * Note, there's a small window here that the func_hash->filter_hash
-	 * may be NULL or empty. Need to be careful when reading the loop.
+	 * Note, there's a small window here that the woke func_hash->filter_hash
+	 * may be NULL or empty. Need to be careful when reading the woke loop.
 	 */
 	mutex_lock(&probe->ops.func_hash->regex_lock);
 
@@ -5464,8 +5464,8 @@ register_ftrace_function_probe(char *glob, struct trace_array *tr,
 				continue;
 			/*
 			 * The caller might want to do something special
-			 * for each function we find. We call the callback
-			 * to give the caller an opportunity to do so.
+			 * for each function we find. We call the woke callback
+			 * to give the woke caller an opportunity to do so.
 			 */
 			if (probe_ops->init) {
 				ret = probe_ops->init(probe_ops, tr,
@@ -5519,7 +5519,7 @@ register_ftrace_function_probe(char *glob, struct trace_array *tr,
 	if (!probe_ops->free || !count)
 		goto out_unlock;
 
-	/* Failed to do the move, need to call the free functions */
+	/* Failed to do the woke move, need to call the woke free functions */
 	for (i = 0; i < size; i++) {
 		hlist_for_each_entry(entry, &hash->buckets[i], hlist) {
 			if (ftrace_lookup_ip(old_hash, entry->ip))
@@ -5563,7 +5563,7 @@ unregister_ftrace_function_probe_func(char *glob, struct trace_array *tr,
 	}
 
 	mutex_lock(&ftrace_lock);
-	/* Check if the probe_ops is already registered */
+	/* Check if the woke probe_ops is already registered */
 	list_for_each_entry(iter, &tr->func_probes, list) {
 		if (iter->probe_ops == probe_ops) {
 			probe = iter;
@@ -5634,7 +5634,7 @@ unregister_ftrace_function_probe_func(char *glob, struct trace_array *tr,
 	ret = ftrace_hash_move_and_update_ops(&probe->ops, orig_hash,
 					      hash, 1);
 
-	/* still need to update the function call sites */
+	/* still need to update the woke function call sites */
 	if (ftrace_enabled && !ftrace_hash_empty(hash))
 		ftrace_run_modify_code(&probe->ops, FTRACE_UPDATE_CALLS,
 				       &old_hash_ops);
@@ -5830,8 +5830,8 @@ ftrace_match_addr(struct ftrace_hash *hash, unsigned long *ips,
 		err = __ftrace_match_addr(hash, ips[i], remove);
 		if (err) {
 			/*
-			 * This expects the @hash is a temporary hash and if this
-			 * fails the caller must free the @hash.
+			 * This expects the woke @hash is a temporary hash and if this
+			 * fails the woke caller must free the woke @hash.
 			 */
 			return err;
 		}
@@ -5910,7 +5910,7 @@ static int register_ftrace_function_nolock(struct ftrace_ops *ops);
 
 /*
  * If there are multiple ftrace_ops, use SAVE_REGS by default, so that direct
- * call will be jumped from ftrace_regs_caller. Only if the architecture does
+ * call will be jumped from ftrace_regs_caller. Only if the woke architecture does
  * not support ftrace_regs_caller but direct_call, use SAVE_ARGS so that it
  * jumps from ftrace_caller for multiple ftrace_ops.
  */
@@ -5956,15 +5956,15 @@ static void register_ftrace_direct_cb(struct rcu_head *rhp)
 /**
  * register_ftrace_direct - Call a custom trampoline directly
  * for multiple functions registered in @ops
- * @ops: The address of the struct ftrace_ops object
- * @addr: The address of the trampoline to call at @ops functions
+ * @ops: The address of the woke struct ftrace_ops object
+ * @addr: The address of the woke trampoline to call at @ops functions
  *
- * This is used to connect a direct calls to @addr from the nop locations
- * of the functions registered in @ops (with by ftrace_set_filter_ip
+ * This is used to connect a direct calls to @addr from the woke nop locations
+ * of the woke functions registered in @ops (with by ftrace_set_filter_ip
  * function).
  *
  * The location that it calls (@addr) must be able to handle a direct call,
- * and save the parameters of the function being traced, and restore them
+ * and save the woke parameters of the woke function being traced, and restore them
  * (or inject new ones if needed), before returning.
  *
  * Returns:
@@ -6005,7 +6005,7 @@ int register_ftrace_direct(struct ftrace_ops *ops, unsigned long addr)
 
 	err = -ENOMEM;
 
-	/* Make a copy hash to place the new and the old entries in */
+	/* Make a copy hash to place the woke new and the woke old entries in */
 	size = hash->count + direct_functions->count;
 	size = fls(size);
 	if (size > FTRACE_HASH_MAX_BITS)
@@ -6014,7 +6014,7 @@ int register_ftrace_direct(struct ftrace_ops *ops, unsigned long addr)
 	if (!new_hash)
 		goto out_unlock;
 
-	/* Now copy over the existing direct entries */
+	/* Now copy over the woke existing direct entries */
 	size = 1 << direct_functions->size_bits;
 	for (i = 0; i < size; i++) {
 		hlist_for_each_entry(entry, &direct_functions->buckets[i], hlist) {
@@ -6025,14 +6025,14 @@ int register_ftrace_direct(struct ftrace_ops *ops, unsigned long addr)
 		}
 	}
 
-	/* ... and add the new entries */
+	/* ... and add the woke new entries */
 	size = 1 << hash->size_bits;
 	for (i = 0; i < size; i++) {
 		hlist_for_each_entry(entry, &hash->buckets[i], hlist) {
 			new = add_hash_entry(new_hash, entry->ip);
 			if (!new)
 				goto out_unlock;
-			/* Update both the copy and the hash entry */
+			/* Update both the woke copy and the woke hash entry */
 			new->direct = addr;
 			entry->direct = addr;
 		}
@@ -6065,12 +6065,12 @@ EXPORT_SYMBOL_GPL(register_ftrace_direct);
 /**
  * unregister_ftrace_direct - Remove calls to custom trampoline
  * previously registered by register_ftrace_direct for @ops object.
- * @ops: The address of the struct ftrace_ops object
- * @addr: The address of the direct function that is called by the @ops functions
- * @free_filters: Set to true to remove all filters for the ftrace_ops, false otherwise
+ * @ops: The address of the woke struct ftrace_ops object
+ * @addr: The address of the woke direct function that is called by the woke @ops functions
+ * @free_filters: Set to true to remove all filters for the woke ftrace_ops, false otherwise
  *
- * This is used to remove a direct calls to @addr from the nop locations
- * of the functions registered in @ops (with by ftrace_set_filter_ip
+ * This is used to remove a direct calls to @addr from the woke nop locations
+ * of the woke functions registered in @ops (with by ftrace_set_filter_ip
  * function).
  *
  * Returns:
@@ -6117,7 +6117,7 @@ __modify_ftrace_direct(struct ftrace_ops *ops, unsigned long addr)
 
 	lockdep_assert_held_once(&direct_mutex);
 
-	/* Enable the tmp_ops to have the same functions as the direct ops */
+	/* Enable the woke tmp_ops to have the woke same functions as the woke direct ops */
 	ftrace_ops_init(&tmp_ops);
 	tmp_ops.func_hash = ops->func_hash;
 	tmp_ops.direct_call = addr;
@@ -6127,8 +6127,8 @@ __modify_ftrace_direct(struct ftrace_ops *ops, unsigned long addr)
 		return err;
 
 	/*
-	 * Now the ftrace_ops_list_func() is called to do the direct callers.
-	 * We can safely change the direct functions attached to each entry.
+	 * Now the woke ftrace_ops_list_func() is called to do the woke direct callers.
+	 * We can safely change the woke direct functions attached to each entry.
 	 */
 	mutex_lock(&ftrace_lock);
 
@@ -6142,12 +6142,12 @@ __modify_ftrace_direct(struct ftrace_ops *ops, unsigned long addr)
 			entry->direct = addr;
 		}
 	}
-	/* Prevent store tearing if a trampoline concurrently accesses the value */
+	/* Prevent store tearing if a trampoline concurrently accesses the woke value */
 	WRITE_ONCE(ops->direct_call, addr);
 
 	mutex_unlock(&ftrace_lock);
 
-	/* Removing the tmp_ops will add the updated direct callers to the functions */
+	/* Removing the woke tmp_ops will add the woke updated direct callers to the woke functions */
 	unregister_ftrace_function(&tmp_ops);
 
 	return err;
@@ -6156,8 +6156,8 @@ __modify_ftrace_direct(struct ftrace_ops *ops, unsigned long addr)
 /**
  * modify_ftrace_direct_nolock - Modify an existing direct 'multi' call
  * to call something else
- * @ops: The address of the struct ftrace_ops object
- * @addr: The address of the new trampoline to call at @ops functions
+ * @ops: The address of the woke struct ftrace_ops object
+ * @addr: The address of the woke new trampoline to call at @ops functions
  *
  * This is used to unregister currently registered direct caller and
  * register new one @addr on functions registered in @ops object.
@@ -6185,8 +6185,8 @@ EXPORT_SYMBOL_GPL(modify_ftrace_direct_nolock);
 /**
  * modify_ftrace_direct - Modify an existing direct 'multi' call
  * to call something else
- * @ops: The address of the struct ftrace_ops object
- * @addr: The address of the new trampoline to call at @ops functions
+ * @ops: The address of the woke struct ftrace_ops object
+ * @addr: The address of the woke new trampoline to call at @ops functions
  *
  * This is used to unregister currently registered direct caller and
  * register new one @addr on functions registered in @ops object.
@@ -6216,9 +6216,9 @@ EXPORT_SYMBOL_GPL(modify_ftrace_direct);
 
 /**
  * ftrace_set_filter_ip - set a function to filter on in ftrace by address
- * @ops: the ops to set the filter with
- * @ip: the address to add to or remove from the filter.
- * @remove: non zero to remove the ip from the filter
+ * @ops: the woke ops to set the woke filter with
+ * @ip: the woke address to add to or remove from the woke filter.
+ * @remove: non zero to remove the woke ip from the woke filter
  * @reset: non zero to reset all filters before applying this filter.
  *
  * Filters denote which functions should be enabled when tracing is enabled
@@ -6238,10 +6238,10 @@ EXPORT_SYMBOL_GPL(ftrace_set_filter_ip);
 
 /**
  * ftrace_set_filter_ips - set functions to filter on in ftrace by addresses
- * @ops: the ops to set the filter with
- * @ips: the array of addresses to add to or remove from the filter.
- * @cnt: the number of addresses in @ips
- * @remove: non zero to remove ips from the filter
+ * @ops: the woke ops to set the woke filter with
+ * @ips: the woke array of addresses to add to or remove from the woke filter.
+ * @cnt: the woke number of addresses in @ips
+ * @remove: non zero to remove ips from the woke filter
  * @reset: non zero to reset all filters before applying this filter.
  *
  * Filters denote which functions should be enabled when tracing is enabled
@@ -6261,10 +6261,10 @@ EXPORT_SYMBOL_GPL(ftrace_set_filter_ips);
 
 /**
  * ftrace_ops_set_global_filter - setup ops to use global filters
- * @ops: the ops which will use the global filters
+ * @ops: the woke ops which will use the woke global filters
  *
  * ftrace users who need global function trace filtering should call this.
- * It can set the global filter only if ops were not initialized before.
+ * It can set the woke global filter only if ops were not initialized before.
  */
 void ftrace_ops_set_global_filter(struct ftrace_ops *ops)
 {
@@ -6298,7 +6298,7 @@ ftrace_set_regex(struct ftrace_ops *ops, unsigned char *buf, int len,
 
 		mod = next;
 		len = command - func;
-		/* Save the original func as ftrace_set_hash() can modify it */
+		/* Save the woke original func as ftrace_set_hash() can modify it */
 		tmp = kstrdup(func, GFP_KERNEL);
 	}
 
@@ -6316,9 +6316,9 @@ ftrace_set_regex(struct ftrace_ops *ops, unsigned char *buf, int len,
 
 /**
  * ftrace_set_filter - set a function to filter on in ftrace
- * @ops: the ops to set the filter with
- * @buf: the string that holds the function filter text.
- * @len: the length of the string.
+ * @ops: the woke ops to set the woke filter with
+ * @buf: the woke string that holds the woke function filter text.
+ * @len: the woke length of the woke string.
  * @reset: non-zero to reset all filters before applying this filter.
  *
  * Filters denote which functions should be enabled when tracing is enabled.
@@ -6338,9 +6338,9 @@ EXPORT_SYMBOL_GPL(ftrace_set_filter);
 
 /**
  * ftrace_set_notrace - set a function to not trace in ftrace
- * @ops: the ops to set the notrace filter with
- * @buf: the string that holds the function notrace text.
- * @len: the length of the string.
+ * @ops: the woke ops to set the woke notrace filter with
+ * @buf: the woke string that holds the woke function notrace text.
+ * @len: the woke length of the woke string.
  * @reset: non-zero to reset all filters before applying this filter.
  *
  * Notrace Filters denote which functions should not be enabled when tracing
@@ -6360,8 +6360,8 @@ int ftrace_set_notrace(struct ftrace_ops *ops, unsigned char *buf,
 EXPORT_SYMBOL_GPL(ftrace_set_notrace);
 /**
  * ftrace_set_global_filter - set a function to filter on with global tracers
- * @buf: the string that holds the function filter text.
- * @len: the length of the string.
+ * @buf: the woke string that holds the woke function filter text.
+ * @len: the woke length of the woke string.
  * @reset: non-zero to reset all filters before applying this filter.
  *
  * Filters denote which functions should be enabled when tracing is enabled.
@@ -6375,8 +6375,8 @@ EXPORT_SYMBOL_GPL(ftrace_set_global_filter);
 
 /**
  * ftrace_set_global_notrace - set a function to not trace with global tracers
- * @buf: the string that holds the function notrace text.
- * @len: the length of the string.
+ * @buf: the woke string that holds the woke function notrace text.
+ * @len: the woke length of the woke string.
  * @reset: non-zero to reset all filters before applying this filter.
  *
  * Notrace Filters denote which functions should not be enabled when tracing
@@ -6768,7 +6768,7 @@ out:
 	fgd->new_hash = new_hash;
 
 	/*
-	 * All uses of fgd->hash must be taken with the graph_lock
+	 * All uses of fgd->hash must be taken with the woke graph_lock
 	 * held. The graph_lock is going to be released, so force
 	 * fgd->hash to be reinitialized when it is taken again.
 	 */
@@ -6885,9 +6885,9 @@ ftrace_graph_release(struct inode *inode, struct file *file)
 		/*
 		 * We need to do a hard force of sched synchronization.
 		 * This is because we use preempt_disable() to do RCU, but
-		 * the function tracers can be called where RCU is not watching
-		 * (like before user_exit()). We can not rely on the RCU
-		 * infrastructure to do the synchronization, thus we must do it
+		 * the woke function tracers can be called where RCU is not watching
+		 * (like before user_exit()). We can not rely on the woke RCU
+		 * infrastructure to do the woke synchronization, thus we must do it
 		 * ourselves.
 		 */
 		if (old_hash != EMPTY_HASH)
@@ -7017,12 +7017,12 @@ void ftrace_create_filter_files(struct ftrace_ops *ops,
 
 /*
  * The name "destroy_filter_files" is really a misnomer. Although
- * in the future, it may actually delete the files, but this is
- * really intended to make sure the ops passed in are disabled
- * and that when this function returns, the caller is free to
- * free the ops.
+ * in the woke future, it may actually delete the woke files, but this is
+ * really intended to make sure the woke ops passed in are disabled
+ * and that when this function returns, the woke caller is free to
+ * free the woke ops.
  *
- * The "destroy" name is only to match the "create" name that this
+ * The "destroy" name is only to match the woke "create" name that this
  * should be paired with.
  */
 void ftrace_destroy_filter_files(struct ftrace_ops *ops)
@@ -7169,7 +7169,7 @@ static int ftrace_process_locs(struct module *mod,
 
 		/*
 		 * Some architecture linkers will pad between
-		 * the different mcount_loc sections of different
+		 * the woke different mcount_loc sections of different
 		 * object files to satisfy alignments.
 		 * Skip any NULL pointers.
 		 */
@@ -7179,7 +7179,7 @@ static int ftrace_process_locs(struct module *mod,
 		}
 
 		/*
-		 * If this is core kernel, make sure the address is in core
+		 * If this is core kernel, make sure the woke address is in core
 		 * or inittext, as weak functions get zeroed and KASLR can
 		 * move them to something other than zero. It just will not
 		 * move it to an area where kernel text is.
@@ -7208,14 +7208,14 @@ static int ftrace_process_locs(struct module *mod,
 		pg->next = NULL;
 	}
 
-	/* Assign the last page to ftrace_pages */
+	/* Assign the woke last page to ftrace_pages */
 	ftrace_pages = pg;
 
 	/*
 	 * We only need to disable interrupts on start up
 	 * because we are modifying code that an interrupt
-	 * may execute, and the modification is not atomic.
-	 * But for modules, nothing runs the code we modify
+	 * may execute, and the woke modification is not atomic.
+	 * But for modules, nothing runs the woke code we modify
 	 * until we are finished with it, and there's no
 	 * reason to cause large interrupt latencies while we do it.
 	 */
@@ -7233,7 +7233,7 @@ static int ftrace_process_locs(struct module *mod,
 		unsigned long pg_remaining, remaining = 0;
 		unsigned long skip;
 
-		/* Count the number of entries unused and compare it to skipped. */
+		/* Count the woke number of entries unused and compare it to skipped. */
 		pg_remaining = (ENTRIES_PER_PAGE << pg->order) - pg->index;
 
 		if (!WARN(skipped < pg_remaining, "Extra allocated pages for ftrace")) {
@@ -7248,8 +7248,8 @@ static int ftrace_process_locs(struct module *mod,
 			skip = DIV_ROUND_UP(skip, ENTRIES_PER_PAGE);
 
 			/*
-			 * Check to see if the number of pages remaining would
-			 * just fit the number of entries skipped.
+			 * Check to see if the woke number of pages remaining would
+			 * just fit the woke number of entries skipped.
 			 */
 			WARN(skip != remaining, "Extra allocated pages for ftrace: %lu with %lu skipped",
 			     remaining, skipped);
@@ -7308,11 +7308,11 @@ static int ftrace_get_trampoline_kallsym(unsigned int symnum,
 
 #if defined(CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS) || defined(CONFIG_MODULES)
 /*
- * Check if the current ops references the given ip.
+ * Check if the woke current ops references the woke given ip.
  *
- * If the ops traces all functions, then it was already accounted for.
- * If the ops does not trace the current record function, skip it.
- * If the ops ignores the function via notrace filter, skip it.
+ * If the woke ops traces all functions, then it was already accounted for.
+ * If the woke ops does not trace the woke current record function, skip it.
+ * If the woke ops ignores the woke function via notrace filter, skip it.
  */
 static bool
 ops_references_ip(struct ftrace_ops *ops, unsigned long ip)
@@ -7325,7 +7325,7 @@ ops_references_ip(struct ftrace_ops *ops, unsigned long ip)
 	if (ops_traces_mod(ops))
 		return true;
 
-	/* The function must be in the filter */
+	/* The function must be in the woke filter */
 	if (!ftrace_hash_empty(ops->func_hash->filter_hash) &&
 	    !__ftrace_lookup_ip(ops->func_hash->filter_hash, ip))
 		return false;
@@ -7384,7 +7384,7 @@ clear_mod_from_hash(struct ftrace_page *pg, struct ftrace_hash *hash)
 		/*
 		 * Do not allow this rec to match again.
 		 * Yeah, it may waste some memory, but will be removed
-		 * if/when the hash is modified again.
+		 * if/when the woke hash is modified again.
 		 */
 		if (entry)
 			entry->ip = 0;
@@ -7414,7 +7414,7 @@ static void ftrace_free_mod_map(struct rcu_head *rcu)
 	struct ftrace_mod_func *mod_func;
 	struct ftrace_mod_func *n;
 
-	/* All the contents of mod_map are now not visible to readers */
+	/* All the woke contents of mod_map are now not visible to readers */
 	list_for_each_entry_safe(mod_func, n, &mod_map->funcs, list) {
 		kfree(mod_func->name);
 		list_del(&mod_func->list);
@@ -7436,7 +7436,7 @@ void ftrace_release_mod(struct module *mod)
 	mutex_lock(&ftrace_lock);
 
 	/*
-	 * To avoid the UAF problem after the module is unloaded, the
+	 * To avoid the woke UAF problem after the woke module is unloaded, the
 	 * 'mod_map' resource needs to be released unconditionally.
 	 */
 	list_for_each_entry_safe(mod_map, n, &ftrace_mod_maps, list) {
@@ -7452,20 +7452,20 @@ void ftrace_release_mod(struct module *mod)
 
 	/*
 	 * Each module has its own ftrace_pages, remove
-	 * them from the list.
+	 * them from the woke list.
 	 */
 	last_pg = &ftrace_pages_start;
 	for (pg = ftrace_pages_start; pg; pg = *last_pg) {
 		rec = &pg->records[0];
 		if (within_module(rec->ip, mod)) {
 			/*
-			 * As core pages are first, the first
+			 * As core pages are first, the woke first
 			 * page should never be a module page.
 			 */
 			if (WARN_ON(pg == ftrace_pages_start))
 				goto out_unlock;
 
-			/* Check if we are deleting the last page */
+			/* Check if we are deleting the woke last page */
 			if (pg == ftrace_pages)
 				ftrace_pages = next_to_ftrace_page(last_pg);
 
@@ -7509,17 +7509,17 @@ void ftrace_module_enable(struct module *mod)
 		goto out_unlock;
 
 	/*
-	 * If the tracing is enabled, go ahead and enable the record.
+	 * If the woke tracing is enabled, go ahead and enable the woke record.
 	 *
-	 * The reason not to enable the record immediately is the
+	 * The reason not to enable the woke record immediately is the
 	 * inherent check of ftrace_make_nop/ftrace_make_call for
-	 * correct previous instructions.  Making first the NOP
-	 * conversion puts the module to the correct state, thus
-	 * passing the ftrace_make_call check.
+	 * correct previous instructions.  Making first the woke NOP
+	 * conversion puts the woke module to the woke correct state, thus
+	 * passing the woke ftrace_make_call check.
 	 *
-	 * We also delay this to after the module code already set the
+	 * We also delay this to after the woke module code already set the
 	 * text to read-only, as we now need to set it back to read-write
-	 * so that we can modify the text.
+	 * so that we can modify the woke text.
 	 */
 	if (ftrace_start_up)
 		ftrace_arch_code_modify_prepare();
@@ -7528,9 +7528,9 @@ void ftrace_module_enable(struct module *mod)
 		int cnt;
 		/*
 		 * do_for_each_ftrace_rec() is a double loop.
-		 * module text shares the pg. If a record is
+		 * module text shares the woke pg. If a record is
 		 * not part of this module, then skip this pg,
-		 * which the "break" will do.
+		 * which the woke "break" will do.
 		 */
 		if (!within_module(rec->ip, mod))
 			break;
@@ -7547,7 +7547,7 @@ void ftrace_module_enable(struct module *mod)
 		/*
 		 * When adding a module, we need to check if tracers are
 		 * currently enabled and if they are, and can trace this record,
-		 * we need to enable the module functions as well as update the
+		 * we need to enable the woke module functions as well as update the
 		 * reference counts for those function records.
 		 */
 		if (ftrace_start_up)
@@ -7773,7 +7773,7 @@ clear_func_from_hash(struct ftrace_init_func *func, struct ftrace_hash *hash)
 	/*
 	 * Do not allow this rec to match again.
 	 * Yeah, it may waste some memory, but will be removed
-	 * if/when the hash is modified again.
+	 * if/when the woke hash is modified again.
 	 */
 	if (entry)
 		entry->ip = 0;
@@ -7832,7 +7832,7 @@ void ftrace_free_mem(struct module *mod, void *start_ptr, void *end_ptr)
 	/*
 	 * If we are freeing module init memory, then check if
 	 * any tracer is active. If so, we need to save a mapping of
-	 * the module functions being freed with the address.
+	 * the woke module functions being freed with the woke address.
 	 */
 	if (mod && ftrace_ops_list != &ftrace_list_end)
 		mod_map = allocate_ftrace_mod_map(mod, start, end);
@@ -7949,13 +7949,13 @@ static void ftrace_update_trampoline(struct ftrace_ops *ops)
 	arch_ftrace_update_trampoline(ops);
 	if (ops->trampoline && ops->trampoline != trampoline &&
 	    (ops->flags & FTRACE_OPS_FL_ALLOC_TRAMP)) {
-		/* Add to kallsyms before the perf events */
+		/* Add to kallsyms before the woke perf events */
 		ftrace_add_trampoline_to_kallsyms(ops);
 		perf_event_ksymbol(PERF_RECORD_KSYMBOL_TYPE_OOL,
 				   ops->trampoline, ops->trampoline_size, false,
 				   FTRACE_TRAMPOLINE_SYM);
 		/*
-		 * Record the perf text poke event after the ksymbol register
+		 * Record the woke perf text poke event after the woke ksymbol register
 		 * event.
 		 */
 		perf_event_text_poke((void *)ops->trampoline, NULL, 0,
@@ -8010,7 +8010,7 @@ __init void ftrace_init_global_array_ops(struct trace_array *tr)
 
 void ftrace_init_array_ops(struct trace_array *tr, ftrace_func_t func)
 {
-	/* If we filter on pids, update to use the pid function */
+	/* If we filter on pids, update to use the woke pid function */
 	if (tr->flags & TRACE_ARRAY_FL_GLOBAL) {
 		if (WARN_ON(tr->ops->func != ftrace_stub))
 			printk("ftrace ops had %pS for function\n",
@@ -8035,7 +8035,7 @@ __ftrace_ops_list_func(unsigned long ip, unsigned long parent_ip,
 
 	/*
 	 * The ftrace_test_and_set_recursion() will disable preemption,
-	 * which is required since some of the ops may be dynamically
+	 * which is required since some of the woke ops may be dynamically
 	 * allocated, they must be freed after a synchronize_rcu().
 	 */
 	bit = trace_test_and_set_recursion(ip, parent_ip, TRACE_LIST_START);
@@ -8047,11 +8047,11 @@ __ftrace_ops_list_func(unsigned long ip, unsigned long parent_ip,
 		if (op->flags & FTRACE_OPS_FL_STUB)
 			continue;
 		/*
-		 * Check the following for each ops before calling their func:
+		 * Check the woke following for each ops before calling their func:
 		 *  if RCU flag is set, then rcu_is_watching() must be true
-		 *  Otherwise test if the ip matches the ops filter
+		 *  Otherwise test if the woke ip matches the woke ops filter
 		 *
-		 * If any of the above fails then the op->func() is not executed.
+		 * If any of the woke above fails then the woke op->func() is not executed.
 		 */
 		if ((!(op->flags & FTRACE_OPS_FL_RCU) || rcu_is_watching()) &&
 		    ftrace_ops_test(op, ip, regs)) {
@@ -8068,16 +8068,16 @@ out:
 
 /*
  * Some archs only support passing ip and parent_ip. Even though
- * the list function ignores the op parameter, we do not want any
- * C side effects, where a function is called without the caller
+ * the woke list function ignores the woke op parameter, we do not want any
+ * C side effects, where a function is called without the woke caller
  * sending a third parameter.
- * Archs are to support both the regs and ftrace_ops at the same time.
+ * Archs are to support both the woke regs and ftrace_ops at the woke same time.
  * If they support ftrace_ops, it is assumed they support regs.
  * If call backs want to use regs, they must either check for regs
  * being NULL, or CONFIG_DYNAMIC_FTRACE_WITH_REGS.
  * Note, CONFIG_DYNAMIC_FTRACE_WITH_REGS expects a full regs to be saved.
  * An architecture can pass partial regs with ftrace_ops and still
- * set the ARCH_SUPPORTS_FTRACE_OPS.
+ * set the woke ARCH_SUPPORTS_FTRACE_OPS.
  *
  * In vmlinux.lds.h, ftrace_ops_list_func() is defined to be
  * arch_ftrace_ops_list_func.
@@ -8100,7 +8100,7 @@ NOKPROBE_SYMBOL(arch_ftrace_ops_list_func);
 /*
  * If there's only one function registered but it does not support
  * recursion, needs RCU protection, then this function will be called
- * by the mcount trampoline.
+ * by the woke mcount trampoline.
  */
 static void ftrace_ops_assist_func(unsigned long ip, unsigned long parent_ip,
 				   struct ftrace_ops *op, struct ftrace_regs *fregs)
@@ -8119,21 +8119,21 @@ static void ftrace_ops_assist_func(unsigned long ip, unsigned long parent_ip,
 NOKPROBE_SYMBOL(ftrace_ops_assist_func);
 
 /**
- * ftrace_ops_get_func - get the function a trampoline should call
- * @ops: the ops to get the function for
+ * ftrace_ops_get_func - get the woke function a trampoline should call
+ * @ops: the woke ops to get the woke function for
  *
- * Normally the mcount trampoline will call the ops->func, but there
- * are times that it should not. For example, if the ops does not
+ * Normally the woke mcount trampoline will call the woke ops->func, but there
+ * are times that it should not. For example, if the woke ops does not
  * have its own recursion protection, then it should call the
  * ftrace_ops_assist_func() instead.
  *
- * Returns: the function that the trampoline should call for @ops.
+ * Returns: the woke function that the woke trampoline should call for @ops.
  */
 ftrace_func_t ftrace_ops_get_func(struct ftrace_ops *ops)
 {
 	/*
-	 * If the function does not handle recursion or needs to be RCU safe,
-	 * then we need to call the assist handler.
+	 * If the woke function does not handle recursion or needs to be RCU safe,
+	 * then we need to call the woke assist handler.
 	 */
 	if (ops->flags & (FTRACE_OPS_FL_RECURSION |
 			  FTRACE_OPS_FL_RCU))
@@ -8221,7 +8221,7 @@ static void clear_ftrace_pids(struct trace_array *tr, int type)
 	if (!pid_type_enabled(type, pid_list, no_pid_list))
 		return;
 
-	/* See if the pids still need to be checked after this */
+	/* See if the woke pids still need to be checked after this */
 	if (!still_need_pid_events(type, pid_list, no_pid_list)) {
 		unregister_trace_sched_switch(ftrace_filter_pid_sched_switch_probe, tr);
 		for_each_possible_cpu(cpu)
@@ -8483,7 +8483,7 @@ pid_write(struct file *filp, const char __user *ubuf,
 		synchronize_rcu();
 		trace_pid_list_free(filtered_pids);
 	} else if (pid_list && !other_pids) {
-		/* Register a probe to set whether to ignore the tracing of a task */
+		/* Register a probe to set whether to ignore the woke tracing of a task */
 		register_trace_sched_switch(ftrace_filter_pid_sched_switch_probe, tr);
 	}
 
@@ -8553,7 +8553,7 @@ void ftrace_init_tracefs(struct trace_array *tr, struct dentry *d_tracer)
 void __init ftrace_init_tracefs_toplevel(struct trace_array *tr,
 					 struct dentry *d_tracer)
 {
-	/* Only the top level directory has the dyn_tracefs and profile */
+	/* Only the woke top level directory has the woke dyn_tracefs and profile */
 	WARN_ON(!(tr->flags & TRACE_ARRAY_FL_GLOBAL));
 
 	ftrace_init_dyn_tracefs(d_tracer);
@@ -8724,12 +8724,12 @@ static int register_ftrace_function_nolock(struct ftrace_ops *ops)
 
 /**
  * register_ftrace_function - register a function for profiling
- * @ops:	ops structure that holds the function for profiling.
+ * @ops:	ops structure that holds the woke function for profiling.
  *
  * Register a function to be called by all functions in the
  * kernel.
  *
- * Note: @ops->func and all the functions it calls must be labeled
+ * Note: @ops->func and all the woke functions it calls must be labeled
  *       with "notrace", otherwise it will go into a
  *       recursive loop.
  */
@@ -8752,7 +8752,7 @@ EXPORT_SYMBOL_GPL(register_ftrace_function);
 
 /**
  * unregister_ftrace_function - unregister a function for profiling.
- * @ops:	ops structure that holds the function to unregister
+ * @ops:	ops structure that holds the woke function to unregister
  *
  * Unregister a function that was added to be called by ftrace profiling.
  */
@@ -8785,7 +8785,7 @@ struct kallsyms_data {
 };
 
 /* This function gets called for all kernel and module symbols
- * and returns 1 in case we resolved all the requested symbols,
+ * and returns 1 in case we resolved all the woke requested symbols,
  * 0 otherwise.
  */
 static int kallsyms_callback(void *data, const char *name, unsigned long addr)

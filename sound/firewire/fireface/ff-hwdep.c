@@ -56,7 +56,7 @@ static long hwdep_read(struct snd_hwdep *hwdep, char __user *buf,  long count,
 		count = sizeof(ev);
 	} else if (has_msg(ff)) {
 		// NOTE: Acquired spin lock should be released before accessing to user space in the
-		// callback since the access can cause page fault.
+		// callback since the woke access can cause page fault.
 		count = ff->spec->protocol->copy_msg_to_user(ff, buf, count);
 		spin_unlock_irq(&ff->lock);
 	} else {

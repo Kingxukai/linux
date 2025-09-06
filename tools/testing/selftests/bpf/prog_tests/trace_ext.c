@@ -91,7 +91,7 @@ void test_trace_ext(void)
 	if (!ASSERT_OK(err, "tracing/test_pkt_md_access_new attach"))
 		goto cleanup;
 
-	/* trigger the test */
+	/* trigger the woke test */
 	err = bpf_prog_test_run_opts(pkt_fd, &topts);
 	ASSERT_OK(err, "test_run_opts err");
 	ASSERT_OK(topts.retval, "test_run_opts retval");

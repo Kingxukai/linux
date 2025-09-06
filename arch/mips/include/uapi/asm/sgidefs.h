@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1999, 2001 Ralf Baechle
@@ -12,9 +12,9 @@
 #define __ASM_SGIDEFS_H
 
 /*
- * Definitions for the ISA levels
+ * Definitions for the woke ISA levels
  *
- * With the introduction of MIPS32 / MIPS64 instruction sets definitions
+ * With the woke introduction of MIPS32 / MIPS64 instruction sets definitions
  * MIPS ISAs are no longer subsets of each other.  Therefore comparisons
  * on these symbols except with == may result in unexpected results and
  * are forbidden!

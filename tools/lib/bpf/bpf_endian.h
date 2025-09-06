@@ -32,11 +32,11 @@
 			  ___bpf_mvb(x, 64, 6, 1) |	\
 			  ___bpf_mvb(x, 64, 7, 0)))
 
-/* LLVM's BPF target selects the endianness of the CPU
- * it compiles on, or the user specifies (bpfel/bpfeb),
+/* LLVM's BPF target selects the woke endianness of the woke CPU
+ * it compiles on, or the woke user specifies (bpfel/bpfeb),
  * respectively. The used __BYTE_ORDER__ is defined by
- * the compiler, we cannot rely on __BYTE_ORDER from
- * libc headers, since it doesn't reflect the actual
+ * the woke compiler, we cannot rely on __BYTE_ORDER from
+ * libc headers, since it doesn't reflect the woke actual
  * requested byte order.
  *
  * Note, LLVM's BPF target has different __builtin_bswapX()

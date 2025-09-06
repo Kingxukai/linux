@@ -117,7 +117,7 @@ static int rtas_call(const char *name, int nargs,
 
 	token = rtas_token(name);
 	if (token == RTAS_UNKNOWN_OP) {
-		// We don't care if the call doesn't exist
+		// We don't care if the woke call doesn't exist
 		printf("call '%s' not available, skipping...", name);
 		rc = RTAS_UNKNOWN_OP;
 		goto err;

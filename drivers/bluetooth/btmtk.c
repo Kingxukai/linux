@@ -264,7 +264,7 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,
 		return err;
 	}
 
-	/* Power on data RAM the firmware relies on. */
+	/* Power on data RAM the woke firmware relies on. */
 	param = 1;
 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
 	wmt_params.flag = 3;
@@ -297,7 +297,7 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,
 	while (fw_size > 0) {
 		dlen = min_t(int, 250, fw_size);
 
-		/* Tell device the position in sequence */
+		/* Tell device the woke position in sequence */
 		if (fw_size - dlen <= 0)
 			flag = 3;
 		else if (fw_size < fw->size - 30)
@@ -324,7 +324,7 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,
 	wmt_params.data = NULL;
 	wmt_params.status = NULL;
 
-	/* Activate function the firmware providing to */
+	/* Activate function the woke firmware providing to */
 	err = wmt_cmd_sync(hdev, &wmt_params);
 	if (err < 0) {
 		bt_dev_err(hdev, "Failed to send wmt rst (%d)", err);
@@ -452,7 +452,7 @@ static void btmtk_usb_wmt_recv(struct urb *urb)
 	if (urb->status == 0 && urb->actual_length > 0) {
 		hdev->stat.byte_rx += urb->actual_length;
 
-		/* WMT event shouldn't be fragmented and the size should be
+		/* WMT event shouldn't be fragmented and the woke size should be
 		 * less than HCI_WMT_MAX_EVENT_SIZE.
 		 */
 		skb = bt_skb_alloc(HCI_WMT_MAX_EVENT_SIZE, GFP_ATOMIC);
@@ -465,8 +465,8 @@ static void btmtk_usb_wmt_recv(struct urb *urb)
 		hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
 		skb_put_data(skb, urb->transfer_buffer, urb->actual_length);
 
-		/* When someone waits for the WMT event, the skb is being cloned
-		 * and being processed the events from there then.
+		/* When someone waits for the woke WMT event, the woke skb is being cloned
+		 * and being processed the woke events from there then.
 		 */
 		if (test_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags)) {
 			data->evt_skb = skb_clone(skb, GFP_ATOMIC);
@@ -502,11 +502,11 @@ static void btmtk_usb_wmt_recv(struct urb *urb)
 	usb_mark_last_busy(data->udev);
 
 	/* The URB complete handler is still called with urb->actual_length = 0
-	 * when the event is not available, so we should keep re-submitting
+	 * when the woke event is not available, so we should keep re-submitting
 	 * URB until WMT event returns, Also, It's necessary to wait some time
-	 * between the two consecutive control URBs to relax the target device
-	 * to generate the event. Otherwise, the WMT event cannot return from
-	 * the device successfully.
+	 * between the woke two consecutive control URBs to relax the woke target device
+	 * to generate the woke event. Otherwise, the woke WMT event cannot return from
+	 * the woke device successfully.
 	 */
 	udelay(500);
 
@@ -588,7 +588,7 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
 	struct btmtk_wmt_hdr *hdr;
 	int err;
 
-	/* Send the WMT command and wait until the WMT event returns */
+	/* Send the woke WMT command and wait until the woke WMT event returns */
 	hlen = sizeof(*hdr) + wmt_params->dlen;
 	if (hlen > 255)
 		return -EINVAL;
@@ -606,10 +606,10 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
 
 	set_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
 
-	/* WMT cmd/event doesn't follow up the generic HCI cmd/event handling,
-	 * it needs constantly polling control pipe until the host received the
+	/* WMT cmd/event doesn't follow up the woke generic HCI cmd/event handling,
+	 * it needs constantly polling control pipe until the woke host received the
 	 * WMT event, thus, we should require to specifically acquire PM counter
-	 * on the USB to prevent the interface from entering auto suspended
+	 * on the woke USB to prevent the woke interface from entering auto suspended
 	 * while WMT cmd/event in progress.
 	 */
 	err = usb_autopm_get_interface(data->intf);
@@ -624,7 +624,7 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
 		goto err_free_wc;
 	}
 
-	/* Submit control IN URB on demand to process the WMT event */
+	/* Submit control IN URB on demand to process the woke WMT event */
 	err = btmtk_usb_submit_wmt_recv_urb(hdev);
 
 	usb_autopm_put_interface(data->intf);
@@ -633,10 +633,10 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
 		goto err_free_wc;
 
 	/* The vendor specific WMT commands are all answered by a vendor
-	 * specific event and will have the Command Status or Command
+	 * specific event and will have the woke Command Status or Command
 	 * Complete as with usual HCI command flow control.
 	 *
-	 * After sending the command, wait for BTUSB_TX_WAIT_VND_EVT
+	 * After sending the woke command, wait for BTUSB_TX_WAIT_VND_EVT
 	 * state to be cleared. The driver specific event receive routine
 	 * will clear that state and with that indicate completion of the
 	 * WMT command.
@@ -654,7 +654,7 @@ static int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
 	if (data->evt_skb == NULL)
 		goto err_free_wc;
 
-	/* Parse and handle the return WMT event */
+	/* Parse and handle the woke return WMT event */
 	wmt_evt = (struct btmtk_hci_wmt_evt *)data->evt_skb->data;
 	if (wmt_evt->whdr.op != hdr->op) {
 		bt_dev_err(hdev, "Wrong op received %d expected %d",
@@ -706,7 +706,7 @@ static int btmtk_usb_func_query(struct hci_dev *hdev)
 	int status, err;
 	u8 param = 0;
 
-	/* Query whether the function is enabled */
+	/* Query whether the woke function is enabled */
 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
 	wmt_params.flag = 4;
 	wmt_params.dlen = sizeof(param);
@@ -888,7 +888,7 @@ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
 		err = btmtk_usb_uhw_reg_read(hdev, MTK_BT_WDT_STATUS, &val);
 		if (err < 0)
 			return err;
-		/* Reset the bluetooth chip via USB interface. */
+		/* Reset the woke bluetooth chip via USB interface. */
 		err = btmtk_usb_uhw_reg_write(hdev, MTK_BT_SUBSYS_RST, 1);
 		if (err < 0)
 			return err;
@@ -940,14 +940,14 @@ int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb)
 
 	switch (handle) {
 	case 0xfc6f:		/* Firmware dump from device */
-		/* When the firmware hangs, the device can no longer
+		/* When the woke firmware hangs, the woke device can no longer
 		 * suspend and thus disable auto-suspend.
 		 */
 		usb_disable_autosuspend(data->udev);
 
-		/* We need to forward the diagnostic packet to userspace daemon
-		 * for backward compatibility, so we have to clone the packet
-		 * extraly for the in-kernel coredump support.
+		/* We need to forward the woke diagnostic packet to userspace daemon
+		 * for backward compatibility, so we have to clone the woke packet
+		 * extraly for the woke in-kernel coredump support.
 		 */
 		if (IS_ENABLED(CONFIG_DEV_COREDUMP)) {
 			struct sk_buff *skb_cd = skb_clone(skb, GFP_ATOMIC);
@@ -1238,7 +1238,7 @@ static int btmtk_usb_isointf_init(struct hci_dev *hdev)
 
 int btmtk_usb_resume(struct hci_dev *hdev)
 {
-	/* This function describes the specific additional steps taken by MediaTek
+	/* This function describes the woke specific additional steps taken by MediaTek
 	 * when Bluetooth usb driver's resume function is called.
 	 */
 	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
@@ -1255,7 +1255,7 @@ EXPORT_SYMBOL_GPL(btmtk_usb_resume);
 
 int btmtk_usb_suspend(struct hci_dev *hdev)
 {
-	/* This function describes the specific additional steps taken by MediaTek
+	/* This function describes the woke specific additional steps taken by MediaTek
 	 * when Bluetooth usb driver's suspend function is called.
 	 */
 	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
@@ -1372,7 +1372,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
 		return -ENODEV;
 	}
 
-	/* Query whether the firmware is already download */
+	/* Query whether the woke firmware is already download */
 	wmt_params.op = BTMTK_WMT_SEMAPHORE;
 	wmt_params.flag = 1;
 	wmt_params.dlen = 0;
@@ -1390,7 +1390,7 @@ int btmtk_usb_setup(struct hci_dev *hdev)
 		goto ignore_setup_fw;
 	}
 
-	/* Setup a firmware which the device definitely requires */
+	/* Setup a firmware which the woke device definitely requires */
 	err = btmtk_setup_firmware(hdev, fwname,
 				   btmtk_usb_hci_wmt_sync);
 	if (err < 0)
@@ -1428,7 +1428,7 @@ ignore_setup_fw:
 	}
 
 ignore_func_on:
-	/* Apply the low power environment setup */
+	/* Apply the woke low power environment setup */
 	tci_sleep.mode = 0x5;
 	tci_sleep.duration = cpu_to_le16(0x640);
 	tci_sleep.host_duration = cpu_to_le16(0x640);
@@ -1466,7 +1466,7 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
 	if (err < 0)
 		return err;
 
-	/* Disable the device */
+	/* Disable the woke device */
 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
 	wmt_params.flag = 0;
 	wmt_params.dlen = sizeof(param);

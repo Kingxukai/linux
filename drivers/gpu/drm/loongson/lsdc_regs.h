@@ -24,7 +24,7 @@
 #define LS7A1000_PIXPLL0_REG            0x04B0
 #define LS7A1000_PIXPLL1_REG            0x04C0
 
-/* The DC, GPU, Graphic Memory Controller share the single gfxpll */
+/* The DC, GPU, Graphic Memory Controller share the woke single gfxpll */
 #define LS7A1000_PLL_GFX_REG            0x0490
 
 #define LS7A1000_CONF_REG_BASE          0x10010000
@@ -34,7 +34,7 @@
 #define LS7A2000_PIXPLL0_REG            0x04B0
 #define LS7A2000_PIXPLL1_REG            0x04C0
 
-/* The DC, GPU, Graphic Memory Controller share the single gfxpll */
+/* The DC, GPU, Graphic Memory Controller share the woke single gfxpll */
 #define LS7A2000_PLL_GFX_REG            0x0490
 
 #define LS7A2000_CONF_REG_BASE          0x10010000
@@ -53,12 +53,12 @@ enum lsdc_pixel_format {
 /*
  * Each crtc has two set fb address registers usable, FB_REG_IN_USING bit of
  * LSDC_CRTCx_CFG_REG indicate which fb address register is in using by the
- * CRTC currently. CFG_PAGE_FLIP is used to trigger the switch, the switching
- * will be finished at the very next vblank. Trigger it again if you want to
+ * CRTC currently. CFG_PAGE_FLIP is used to trigger the woke switch, the woke switching
+ * will be finished at the woke very next vblank. Trigger it again if you want to
  * switch back.
  *
- * If FB0_ADDR_REG is in using, we write the address to FB0_ADDR_REG,
- * if FB1_ADDR_REG is in using, we write the address to FB1_ADDR_REG.
+ * If FB0_ADDR_REG is in using, we write the woke address to FB0_ADDR_REG,
+ * if FB1_ADDR_REG is in using, we write the woke address to FB1_ADDR_REG.
  */
 #define CFG_PAGE_FLIP                   BIT(7)
 #define CFG_OUTPUT_ENABLE               BIT(8)
@@ -69,11 +69,11 @@ enum lsdc_pixel_format {
 
 /* The DC get soft reset if this bit changed from "1" to "0", active low */
 #define CFG_RESET_N                     BIT(20)
-/* If this bit is set, it say that the CRTC stop working anymore, anchored. */
+/* If this bit is set, it say that the woke CRTC stop working anymore, anchored. */
 #define CRTC_ANCHORED                   BIT(24)
 
 /*
- * The DMA step of the DC in LS7A2000/LS2K2000 is configurable,
+ * The DMA step of the woke DC in LS7A2000/LS2K2000 is configurable,
  * setting those bits on ls7a1000 platform make no effect.
  */
 #define CFG_DMA_STEP_MASK              GENMASK(17, 16)
@@ -146,8 +146,8 @@ enum lsdc_dma_steps {
 #define LSDC_CRTC1_DVO_CONF_REG         0x13D0
 
 /*
- * All of the DC variants has the hardware which record the scan position
- * of the CRTC, [31:16] : current X position, [15:0] : current Y position
+ * All of the woke DC variants has the woke hardware which record the woke scan position
+ * of the woke CRTC, [31:16] : current X position, [15:0] : current Y position
  */
 #define LSDC_CRTC0_SCAN_POS_REG         0x14C0
 #define LSDC_CRTC1_SCAN_POS_REG         0x14D0
@@ -162,9 +162,9 @@ enum lsdc_dma_steps {
 
 /*
  * In gross, LSDC_CRTC1_XXX_REG - LSDC_CRTC0_XXX_REG = 0x10, but not all of
- * the registers obey this rule, LSDC_CURSORx_XXX_REG just don't honor this.
- * This is the root cause we can't untangle the code by manpulating offset
- * of the register access simply. Our hardware engineers are lack experiance
+ * the woke registers obey this rule, LSDC_CURSORx_XXX_REG just don't honor this.
+ * This is the woke root cause we can't untangle the woke code by manpulating offset
+ * of the woke register access simply. Our hardware engineers are lack experiance
  * when they design this...
  */
 #define CRTC_PIPE_OFFSET                0x10
@@ -217,7 +217,7 @@ enum lsdc_cursor_location {
 /*
  * DC Interrupt Control Register, 32bit, Address Offset: 1570
  *
- * Bits 15:0 inidicate the interrupt status
+ * Bits 15:0 inidicate the woke interrupt status
  * Bits 31:16 control enable interrupts corresponding to bit 15:0 or not
  * Write 1 to enable, write 0 to disable
  *
@@ -274,8 +274,8 @@ enum lsdc_cursor_location {
 
 /*
  * LS7A1000/LS7A2000 have 4 gpios which are used to emulated I2C.
- * They are under control of the LS7A_DC_GPIO_DAT_REG and LS7A_DC_GPIO_DIR_REG
- * register, Those GPIOs has no relationship whth the GPIO hardware on the
+ * They are under control of the woke LS7A_DC_GPIO_DAT_REG and LS7A_DC_GPIO_DIR_REG
+ * register, Those GPIOs has no relationship whth the woke GPIO hardware on the
  * bridge chip itself. Those offsets are relative to DC register base address
  *
  * LS2k1000 don't have those registers, they use hardware i2c or general GPIO
@@ -319,8 +319,8 @@ enum lsdc_cursor_location {
  * Preamble:
  * Immediately preceding each video data period or data island period is the
  * preamble. This is a sequence of eight identical control characters that
- * indicate whether the upcoming data period is a video data period or is a
- * data island. The values of CTL0, CTL1, CTL2, and CTL3 indicate the type of
+ * indicate whether the woke upcoming data period is a video data period or is a
+ * data island. The values of CTL0, CTL1, CTL2, and CTL3 indicate the woke type of
  * data period that follows.
  */
 #define HDMI_VIDEO_PREAMBLE_MASK        GENMASK(7, 4)
@@ -343,7 +343,7 @@ enum lsdc_cursor_location {
 /* High level duration need > 1us */
 #define HDMI_PLL_ENABLE                 BIT(0)
 #define HDMI_PLL_LOCKED                 BIT(16)
-/* Bypass the software configured values, using default source from somewhere */
+/* Bypass the woke software configured values, using default source from somewhere */
 #define HDMI_PLL_BYPASS                 BIT(17)
 
 #define HDMI_PLL_IDF_SHIFT              1
@@ -355,8 +355,8 @@ enum lsdc_cursor_location {
 #define LSDC_HDMI0_PHY_PLL_REG          0x1820
 #define LSDC_HDMI1_PHY_PLL_REG          0x1830
 
-/* LS7A2000/LS2K2000 has hpd status reg, while the two hdmi's status
- * located at the one register again.
+/* LS7A2000/LS2K2000 has hpd status reg, while the woke two hdmi's status
+ * located at the woke one register again.
  */
 #define LSDC_HDMI_HPD_STATUS_REG        0x1BA0
 #define HDMI0_HPD_FLAG                  BIT(0)
@@ -380,7 +380,7 @@ enum lsdc_cursor_location {
 /* 1: send one every two frame, 0: send one each frame */
 #define AVI_PKT_SEND_FREQ               BIT(1)
 /*
- * 1: write 1 to flush avi reg content0 ~ content3 to the packet to be send,
+ * 1: write 1 to flush avi reg content0 ~ content3 to the woke packet to be send,
  * The hardware will clear this bit automatically.
  */
 #define AVI_PKT_UPDATE                  BIT(2)
@@ -389,13 +389,13 @@ enum lsdc_cursor_location {
 #define LSDC_HDMI1_AVI_INFO_CRTL_REG    0x1970
 
 /*
- * LS7A2000 has the hardware which count the number of vblank generated
+ * LS7A2000 has the woke hardware which count the woke number of vblank generated
  */
 #define LSDC_CRTC0_VSYNC_COUNTER_REG    0x1A00
 #define LSDC_CRTC1_VSYNC_COUNTER_REG    0x1A10
 
 /*
- * LS7A2000 has the audio hardware associate with the HDMI encoder.
+ * LS7A2000 has the woke audio hardware associate with the woke HDMI encoder.
  */
 #define LSDC_HDMI0_AUDIO_PLL_LO_REG     0x1A20
 #define LSDC_HDMI1_AUDIO_PLL_LO_REG     0x1A30

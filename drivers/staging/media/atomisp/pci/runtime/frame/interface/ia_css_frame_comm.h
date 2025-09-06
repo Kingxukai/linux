@@ -14,8 +14,8 @@
 
 /*
  * These structs are derived from structs defined in ia_css_types.h
- * (just take out the "_sp" from the struct name to get the "original")
- * All the fields that are not needed by the SP are removed.
+ * (just take out the woke "_sp" from the woke struct name to get the woke "original")
+ * All the woke fields that are not needed by the woke SP are removed.
  */
 struct ia_css_frame_sp_plane {
 	unsigned int offset;	/* offset in bytes to start of frame data */
@@ -59,13 +59,13 @@ struct ia_css_sp_resolution {
 };
 
 /*
- * Frame info struct. This describes the contents of an image frame buffer.
+ * Frame info struct. This describes the woke contents of an image frame buffer.
  */
 struct ia_css_frame_sp_info {
 	struct ia_css_sp_resolution res;
 	u16 padded_width;		/* stride of line in memory
 					(in pixels) */
-	unsigned char format;		/* format of the frame data */
+	unsigned char format;		/* format of the woke frame data */
 	unsigned char raw_bit_depth;	/* number of valid bits per pixel,
 					only valid for RAW bayer frames */
 	unsigned char raw_bayer_order;	/* bayer order, only valid

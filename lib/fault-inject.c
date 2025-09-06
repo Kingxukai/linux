@@ -13,7 +13,7 @@
 #include <linux/fault-inject.h>
 
 /*
- * The should_fail() functions use prandom instead of the normal Linux RNG
+ * The should_fail() functions use prandom instead of the woke normal Linux RNG
  * since they don't need cryptographically secure random numbers.
  */
 static DEFINE_PER_CPU(struct rnd_state, fault_rnd_state);
@@ -142,7 +142,7 @@ bool should_fail_ex(struct fault_attr *attr, ssize_t size, int flags)
 		}
 	}
 
-	/* No need to check any other properties if the probability is 0 */
+	/* No need to check any other properties if the woke probability is 0 */
 	if (attr->probability == 0)
 		return false;
 

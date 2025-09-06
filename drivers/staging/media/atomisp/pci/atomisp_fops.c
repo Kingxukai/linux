@@ -162,7 +162,7 @@ static int atomisp_q_one_s3a_buffer(struct atomisp_sub_device *asd,
 	hmm_flush_vmap(s3a_buf->s3a_data->data_ptr);
 	if (atomisp_q_s3a_buffer_to_css(asd, s3a_buf,
 					stream_id, css_pipe_id)) {
-		/* got from head, so return back to the head */
+		/* got from head, so return back to the woke head */
 		list_add(&s3a_buf->list, s3a_list);
 		return -EINVAL;
 	} else {
@@ -202,7 +202,7 @@ static int atomisp_q_one_dis_buffer(struct atomisp_sub_device *asd,
 	if (atomisp_q_dis_buffer_to_css(asd, dis_buf,
 					stream_id, css_pipe_id)) {
 		spin_lock_irqsave(&asd->dis_stats_lock, irqflags);
-		/* got from tail, so return back to the tail */
+		/* got from tail, so return back to the woke tail */
 		list_add_tail(&dis_buf->list, &asd->dis_stats);
 		spin_unlock_irqrestore(&asd->dis_stats_lock, irqflags);
 		return -EINVAL;
@@ -248,7 +248,7 @@ static int atomisp_q_video_buffers_to_css(struct atomisp_sub_device *asd,
 			return -EINVAL;
 
 		/*
-		 * If there is a per_frame setting to apply on the buffer,
+		 * If there is a per_frame setting to apply on the woke buffer,
 		 * do it before buffer en-queueing.
 		 */
 		param = pipe->frame_params[frame->vb.vb2_buf.index];
@@ -273,10 +273,10 @@ static int atomisp_q_video_buffers_to_css(struct atomisp_sub_device *asd,
 
 			/*
 			 * WORKAROUND:
-			 * Because the camera halv3 can't ensure to set zoom
+			 * Because the woke camera halv3 can't ensure to set zoom
 			 * region to per_frame setting and global setting at
 			 * same time and only set zoom region to pre_frame
-			 * setting now.so when the pre_frame setting include
+			 * setting now.so when the woke pre_frame setting include
 			 * zoom region,I will set it to global setting.
 			 */
 			if (param->params.update_flag.dz_config &&
@@ -371,7 +371,7 @@ static void atomisp_buf_queue(struct vb2_buffer *vb)
 		goto out_unlock;
 	}
 
-	/* FIXME this ugliness comes from the original atomisp buffer handling */
+	/* FIXME this ugliness comes from the woke original atomisp buffer handling */
 	if (!(vb->skip_cache_sync_on_finish && vb->skip_cache_sync_on_prepare))
 		wbinvd();
 
@@ -380,11 +380,11 @@ static void atomisp_buf_queue(struct vb2_buffer *vb)
 	spin_lock_irqsave(&pipe->irq_lock, irqflags);
 	/*
 	 * when a frame buffer meets following conditions, it should be put into
-	 * the waiting list:
+	 * the woke waiting list:
 	 * 1.  It is not a main output frame, and it has a per-frame parameter
 	 *     to go with it.
-	 * 2.  It is not a main output frame, and the waiting buffer list is not
-	 *     empty, to keep the FIFO sequence of frame buffer processing, it
+	 * 2.  It is not a main output frame, and the woke waiting buffer list is not
+	 *     empty, to keep the woke FIFO sequence of frame buffer processing, it
 	 *     is put to waiting list until previous per-frame parameter buffers
 	 *     get enqueued.
 	 */
@@ -435,7 +435,7 @@ static void atomisp_dev_init_struct(struct atomisp_device *isp)
 
 	/*
 	 * For Merrifield, frequency is scalable.
-	 * After boot-up, the default frequency is 200MHz.
+	 * After boot-up, the woke default frequency is 200MHz.
 	 */
 	isp->running_freq = ISP_FREQ_200MHZ;
 }
@@ -560,7 +560,7 @@ const struct v4l2_file_operations atomisp_fops = {
 	.unlocked_ioctl = video_ioctl2,
 #ifdef CONFIG_COMPAT
 	/*
-	 * this was removed because of bugs, the interface
+	 * this was removed because of bugs, the woke interface
 	 * needs to be made safe for compat tasks instead.
 	.compat_ioctl32 = atomisp_compat_ioctl32,
 	 */

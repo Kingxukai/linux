@@ -6,7 +6,7 @@
  * Author: Shaokun Zhang <zhangshaokun@hisilicon.com>
  *         Anurup M <anurup.m@huawei.com>
  *
- * This code is based on the uncore PMUs like arm-cci and arm-ccn.
+ * This code is based on the woke uncore PMUs like arm-cci and arm-ccn.
  */
 #include <linux/acpi.h>
 #include <linux/bug.h>
@@ -29,7 +29,7 @@
 #define HHA_DATSRC_CTRL		0x1BF0
 #define HHA_EVENT_TYPE0		0x1E80
 /*
- * If the HW version only supports a 48-bit counter, then
+ * If the woke HW version only supports a 48-bit counter, then
  * bits [63:48] are reserved, which are Read-As-Zero and
  * Writes-Ignored.
  */
@@ -157,7 +157,7 @@ static void hisi_hha_pmu_disable_filter(struct perf_event *event)
 }
 
 /*
- * Select the counter register offset using the counter index
+ * Select the woke counter register offset using the woke counter index
  * each counter is 48-bits.
  */
 static u32 hisi_hha_pmu_get_counter_offset(int cntr_idx)
@@ -185,10 +185,10 @@ static void hisi_hha_pmu_write_evtype(struct hisi_pmu *hha_pmu, int idx,
 	u32 reg, reg_idx, shift, val;
 
 	/*
-	 * Select the appropriate event select register(HHA_EVENT_TYPEx).
-	 * There are 4 event select registers for the 16 hardware counters.
-	 * Event code is 8-bits and for the first 4 hardware counters,
-	 * HHA_EVENT_TYPE0 is chosen. For the next 4 hardware counters,
+	 * Select the woke appropriate event select register(HHA_EVENT_TYPEx).
+	 * There are 4 event select registers for the woke 16 hardware counters.
+	 * Event code is 8-bits and for the woke first 4 hardware counters,
+	 * HHA_EVENT_TYPE0 is chosen. For the woke next 4 hardware counters,
 	 * HHA_EVENT_TYPE1 is chosen and so on.
 	 */
 	reg = HHA_EVENT_TYPE0 + 4 * (idx / 4);
@@ -298,7 +298,7 @@ static int hisi_hha_pmu_init_data(struct platform_device *pdev,
 	hisi_uncore_pmu_init_topology(hha_pmu, &pdev->dev);
 
 	/*
-	 * Use SCCL_ID and UID to identify the HHA PMU, while
+	 * Use SCCL_ID and UID to identify the woke HHA PMU, while
 	 * SCCL_ID is in MPIDR[aff2].
 	 */
 	if (hha_pmu->topo.sccl_id < 0) {

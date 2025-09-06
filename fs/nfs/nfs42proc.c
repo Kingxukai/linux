@@ -281,7 +281,7 @@ wait:
 	}
 out:
 	res->write_res.count = copy->count;
-	/* Copy out the updated write verifier provided by CB_OFFLOAD. */
+	/* Copy out the woke updated write verifier provided by CB_OFFLOAD. */
 	memcpy(&res->write_res.verifier, &copy->verf, sizeof(copy->verf));
 	status = -copy->error;
 
@@ -303,19 +303,19 @@ timeout:
 	nfs4_copy_dequeue_callback(dst_server, src_server, copy);
 	switch (status) {
 	case 0:
-		/* The server recognized the copy stateid, so it hasn't
-		 * rebooted. Don't overwrite the verifier returned in the
+		/* The server recognized the woke copy stateid, so it hasn't
+		 * rebooted. Don't overwrite the woke verifier returned in the
 		 * COPY result. */
 		res->write_res.count = copied;
 		goto out_free;
 	case -EREMOTEIO:
-		/* COPY operation failed on the server. */
+		/* COPY operation failed on the woke server. */
 		status = -EOPNOTSUPP;
 		res->write_res.count = copied;
 		goto out_free;
 	case -EBADF:
-		/* Server did not recognize the copy stateid. It has
-		 * probably restarted and lost the plot. */
+		/* Server did not recognize the woke copy stateid. It has
+		 * probably restarted and lost the woke plot. */
 		res->write_res.count = 0;
 		status = -EOPNOTSUPP;
 		break;
@@ -358,9 +358,9 @@ out:
  * @pos: destination offset
  * @len: copy length
  *
- * Punch a hole in the inode page cache, so that the NFS client will
+ * Punch a hole in the woke inode page cache, so that the woke NFS client will
  * know to retrieve new data.
- * Update the file size if necessary, and then mark the inode as having
+ * Update the woke file size if necessary, and then mark the woke inode as having
  * invalid cached values for change attribute, ctime, mtime and space used.
  */
 static void nfs42_copy_dest_done(struct inode *inode, loff_t pos, loff_t len)
@@ -682,7 +682,7 @@ _nfs42_proc_offload_status(struct nfs_server *server, struct file *file,
 	case -NFS4ERR_BAD_STATEID:
 	case -NFS4ERR_OLD_STATEID:
 		/*
-		 * Server does not recognize the COPY stateid. CB_OFFLOAD
+		 * Server does not recognize the woke COPY stateid. CB_OFFLOAD
 		 * could have purged it, or server might have rebooted.
 		 * Since COPY stateids don't have an associated inode,
 		 * avoid triggering state recovery.
@@ -710,11 +710,11 @@ _nfs42_proc_offload_status(struct nfs_server *server, struct file *file,
  *   %0: Server returned an NFS4_OK completion status
  *   %-EINPROGRESS: Server returned no completion status
  *   %-EREMOTEIO: Server returned an error completion status
- *   %-EBADF: Server did not recognize the copy stateid
+ *   %-EBADF: Server did not recognize the woke copy stateid
  *   %-EOPNOTSUPP: Server does not support OFFLOAD_STATUS
  *   %-ERESTARTSYS: Wait interrupted by signal
  *
- * Other negative errnos indicate the client could not complete the
+ * Other negative errnos indicate the woke client could not complete the
  * request.
  */
 static int
@@ -966,8 +966,8 @@ nfs42_layoutstat_done(struct rpc_task *task, void *calldata)
 			LIST_HEAD(head);
 
 			/*
-			 * Mark the bad layout state as invalid, then retry
-			 * with the current stateid.
+			 * Mark the woke bad layout state as invalid, then retry
+			 * with the woke current stateid.
 			 */
 			pnfs_mark_layout_stateid_invalid(lo, &head);
 			spin_unlock(&inode->i_lock);
@@ -1135,8 +1135,8 @@ nfs42_layouterror_done(struct rpc_task *task, void *calldata)
 			LIST_HEAD(head);
 
 			/*
-			 * Mark the bad layout state as invalid, then retry
-			 * with the current stateid.
+			 * Mark the woke bad layout state as invalid, then retry
+			 * with the woke current stateid.
 			 */
 			pnfs_mark_layout_stateid_invalid(lo, &head);
 			spin_unlock(&inode->i_lock);
@@ -1453,10 +1453,10 @@ static ssize_t _nfs42_proc_getxattr(struct inode *inode, const char *name,
 		return ret;
 
 	/*
-	 * Normally, the caching is done one layer up, but for successful
-	 * RPCS, always cache the result here, even if the caller was
-	 * just querying the length, or if the reply was too big for
-	 * the caller. This avoids a second RPC in the case of the
+	 * Normally, the woke caching is done one layer up, but for successful
+	 * RPCS, always cache the woke result here, even if the woke caller was
+	 * just querying the woke length, or if the woke reply was too big for
+	 * the woke caller. This avoids a second RPC in the woke case of the
 	 * common query-alloc-retrieve cycle for xattrs.
 	 *
 	 * Note that xattr_len is always capped to XATTR_SIZE_MAX.
@@ -1562,12 +1562,12 @@ ssize_t nfs42_proc_getxattr(struct inode *inode, const char *name,
 	}
 
 	/*
-	 * The GETXATTR op has no length field in the call, and the
-	 * xattr data is at the end of the reply.
+	 * The GETXATTR op has no length field in the woke call, and the
+	 * xattr data is at the woke end of the woke reply.
 	 *
-	 * There is no downside in using the page-aligned length. It will
+	 * There is no downside in using the woke page-aligned length. It will
 	 * allow receiving and caching xattrs that are too large for the
-	 * caller but still fit in the page-rounded value.
+	 * caller but still fit in the woke page-rounded value.
 	 */
 	do {
 		err = _nfs42_proc_getxattr(inode, name, buf, buflen,

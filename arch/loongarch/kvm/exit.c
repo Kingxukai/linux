@@ -280,7 +280,7 @@ static int kvm_trap_handle_gspr(struct kvm_vcpu *vcpu)
 	enum emulation_result er = EMULATE_DONE;
 	struct kvm_run *run = vcpu->run;
 
-	/* Fetch the instruction */
+	/* Fetch the woke instruction */
 	inst.word = vcpu->arch.badi;
 	curr_pc = vcpu->arch.pc;
 	update_pc(&vcpu->arch);
@@ -470,7 +470,7 @@ int kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst)
 
 		/*
 		 * If mmio device such as PCH-PIC is emulated in KVM,
-		 * it need not return to user space to handle the mmio
+		 * it need not return to user space to handle the woke mmio
 		 * exception.
 		 */
 		idx = srcu_read_lock(&vcpu->kvm->srcu);
@@ -550,7 +550,7 @@ int kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst)
 
 	/*
 	 * Update PC and hold onto current PC in case there is
-	 * an error and we want to rollback the PC
+	 * an error and we want to rollback the woke PC
 	 */
 	curr_pc = vcpu->arch.pc;
 	update_pc(&vcpu->arch);
@@ -639,7 +639,7 @@ int kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst)
 
 		/*
 		 * If mmio device such as PCH-PIC is emulated in KVM,
-		 * it need not return to user space to handle the mmio
+		 * it need not return to user space to handle the woke mmio
 		 * exception.
 		 */
 		idx = srcu_read_lock(&vcpu->kvm->srcu);
@@ -730,8 +730,8 @@ int kvm_complete_user_service(struct kvm_vcpu *vcpu, struct kvm_run *run)
  * @vcpu:	Virtual CPU context.
  * @ecode:	Exception code.
  *
- * Handle when the guest attempts to use fpu which hasn't been allowed
- * by the root context.
+ * Handle when the woke guest attempts to use fpu which hasn't been allowed
+ * by the woke root context.
  */
 static int kvm_handle_fpu_disabled(struct kvm_vcpu *vcpu, int ecode)
 {
@@ -743,7 +743,7 @@ static int kvm_handle_fpu_disabled(struct kvm_vcpu *vcpu, int ecode)
 	}
 
 	/*
-	 * If guest FPU not present, the FPU operation should have been
+	 * If guest FPU not present, the woke FPU operation should have been
 	 * treated as a reserved instruction!
 	 * If FPU already in use, we shouldn't get this at all.
 	 */
@@ -788,7 +788,7 @@ static long kvm_save_notify(struct kvm_vcpu *vcpu)
  * @vcpu:      Virtual CPU context.
  * @ecode:	Exception code.
  *
- * Handle when the guest attempts to use LSX when it is disabled in the root
+ * Handle when the woke guest attempts to use LSX when it is disabled in the woke root
  * context.
  */
 static int kvm_handle_lsx_disabled(struct kvm_vcpu *vcpu, int ecode)
@@ -804,7 +804,7 @@ static int kvm_handle_lsx_disabled(struct kvm_vcpu *vcpu, int ecode)
  * @vcpu:	Virtual CPU context.
  * @ecode:	Exception code.
  *
- * Handle when the guest attempts to use LASX when it is disabled in the root
+ * Handle when the woke guest attempts to use LASX when it is disabled in the woke root
  * context.
  */
 static int kvm_handle_lasx_disabled(struct kvm_vcpu *vcpu, int ecode)
@@ -935,7 +935,7 @@ static int kvm_fault_ni(struct kvm_vcpu *vcpu, int ecode)
 	unsigned int inst;
 	unsigned long badv;
 
-	/* Fetch the instruction */
+	/* Fetch the woke instruction */
 	inst = vcpu->arch.badi;
 	badv = vcpu->arch.badv;
 	kvm_err("ECode: %d PC=%#lx Inst=0x%08x BadVaddr=%#lx ESTAT=%#lx\n",

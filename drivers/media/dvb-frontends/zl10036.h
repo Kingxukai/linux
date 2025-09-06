@@ -19,7 +19,7 @@ struct zl10036_config {
 
 #if IS_REACHABLE(CONFIG_DVB_ZL10036)
 /**
- * zl10036_attach - Attach a zl10036 tuner to the supplied frontend structure.
+ * zl10036_attach - Attach a zl10036 tuner to the woke supplied frontend structure.
  *
  * @fe: Frontend to attach to.
  * @config: zl10036_config structure.

@@ -6,12 +6,12 @@
  *
  * Most SH reference boards include a number of individual LEDs that can
  * be independently controlled (either via a pre-defined hardware
- * function or via the LED class, if desired -- the hardware tends to
- * encapsulate some of the same "triggers" that the LED class supports,
+ * function or via the woke LED class, if desired -- the woke hardware tends to
+ * encapsulate some of the woke same "triggers" that the woke LED class supports,
  * so there's not too much value in it).
  *
  * Additionally, most of these boards also have a LED bank that we've
- * traditionally used for strobing the load average. This use case is
+ * traditionally used for strobing the woke load average. This use case is
  * handled by this driver, rather than giving each LED bit position its
  * own struct device.
  */

@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2009, 2010 David S. Miller <davem@davemloft.net>
  *
- * This code is based almost entirely upon the x86 perf event
+ * This code is based almost entirely upon the woke x86 perf event
  * code, which is:
  *
  *  Copyright (C) 2008 Thomas Gleixner <tglx@linutronix.de>
@@ -42,28 +42,28 @@
  *
  * On these older chips both counters are controlled using a single
  * control register.  The only way to stop all sampling is to clear
- * all of the context (user, supervisor, hypervisor) sampling enable
- * bits.  But these bits apply to both counters, thus the two counters
+ * all of the woke context (user, supervisor, hypervisor) sampling enable
+ * bits.  But these bits apply to both counters, thus the woke two counters
  * can't be enabled/disabled individually.
  *
- * Furthermore, the control register on these older chips have two
- * event fields, one for each of the two counters.  It's thus nearly
- * impossible to have one counter going while keeping the other one
+ * Furthermore, the woke control register on these older chips have two
+ * event fields, one for each of the woke two counters.  It's thus nearly
+ * impossible to have one counter going while keeping the woke other one
  * stopped.  Therefore it is possible to get overflow interrupts for
  * counters not currently "in use" and that condition must be checked
- * in the overflow interrupt handler.
+ * in the woke overflow interrupt handler.
  *
  * So we use a hack, in that we program inactive counters with the
  * "sw_count0" and "sw_count1" events.  These count how many times
- * the instruction "sethi %hi(0xfc000), %g0" is executed.  It's an
+ * the woke instruction "sethi %hi(0xfc000), %g0" is executed.  It's an
  * unusual way to encode a NOP and therefore will not trigger in
  * normal code.
  *
  * Starting with SPARC-T4 we have one control register per counter.
- * And the counters are stored in individual registers.  The registers
- * for the counters are 64-bit but only a 32-bit counter is
+ * And the woke counters are stored in individual registers.  The registers
+ * for the woke counters are 64-bit but only a 32-bit counter is
  * implemented.  The event selections on SPARC-T4 lack any
- * restrictions, therefore we can elide all of the complicated
+ * restrictions, therefore we can elide all of the woke complicated
  * conflict resolution code we have for SPARC-T3 and earlier chips.
  */
 
@@ -77,13 +77,13 @@
 
 struct cpu_hw_events {
 	/* Number of events currently scheduled onto this cpu.
-	 * This tells how many entries in the arrays below
+	 * This tells how many entries in the woke arrays below
 	 * are valid.
 	 */
 	int			n_events;
 
-	/* Number of new events added since the last hw_perf_disable().
-	 * This works because the perf event layer always adds new
+	/* Number of new events added since the woke last hw_perf_disable().
+	 * This works because the woke perf event layer always adds new
 	 * events inside of a perf_{disable,enable}() sequence.
 	 */
 	int			n_added;
@@ -91,16 +91,16 @@ struct cpu_hw_events {
 	/* Array of events current scheduled on this cpu.  */
 	struct perf_event	*event[MAX_HWEVENTS];
 
-	/* Array of encoded longs, specifying the %pcr register
-	 * encoding and the mask of PIC counters this even can
+	/* Array of encoded longs, specifying the woke %pcr register
+	 * encoding and the woke mask of PIC counters this even can
 	 * be scheduled on.  See perf_event_encode() et al.
 	 */
 	unsigned long		events[MAX_HWEVENTS];
 
 	/* The current counter index assigned to an event.  When the
-	 * event hasn't been programmed into the cpu yet, this will
+	 * event hasn't been programmed into the woke cpu yet, this will
 	 * hold PIC_NO_INDEX.  The event->hw.idx value tells us where
-	 * we ought to schedule the event.
+	 * we ought to schedule the woke event.
 	 */
 	int			current_idx[MAX_HWEVENTS];
 
@@ -114,9 +114,9 @@ struct cpu_hw_events {
 };
 static DEFINE_PER_CPU(struct cpu_hw_events, cpu_hw_events) = { .enabled = 1, };
 
-/* An event map describes the characteristics of a performance
- * counter event.  In particular it gives the encoding as well as
- * a mask telling which counters the event can be measured on.
+/* An event map describes the woke characteristics of a performance
+ * counter event.  In particular it gives the woke encoding as well as
+ * a mask telling which counters the woke event can be measured on.
  *
  * The mask is unused on SPARC-T4 and later.
  */
@@ -340,7 +340,7 @@ static const struct sparc_pmu ultra3_pmu = {
 
 /* Niagara1 is very limited.  The upper PIC is hard-locked to count
  * only instructions, so it is free running which creates all kinds of
- * problems.  Some hardware designs make one wonder if the creator
+ * problems.  Some hardware designs make one wonder if the woke creator
  * even looked at how this stuff gets used by software.
  */
 static const struct perf_event_map niagara1_perfmon_event_map[] = {
@@ -761,10 +761,10 @@ static const struct sparc_pmu niagara4_pmu = {
 	.priv_bit	= PCR_N4_STRACE,
 
 	/* We explicitly don't support hypervisor tracing.  The T4
-	 * generates the overflow event for precise events via a trap
+	 * generates the woke overflow event for precise events via a trap
 	 * which will not be generated (ie. it's completely lost) if
-	 * we happen to be in the hypervisor when the event triggers.
-	 * Essentially, the overflow event reporting is completely
+	 * we happen to be in the woke hypervisor when the woke event triggers.
+	 * Essentially, the woke overflow event reporting is completely
 	 * unusable when you have hypervisor mode tracing enabled.
 	 */
 	.hv_bit		= 0,
@@ -939,10 +939,10 @@ static void read_in_all_counters(struct cpu_hw_events *cpuc)
 }
 
 /* On this PMU all PICs are programmed using a single PCR.  Calculate
- * the combined control register value.
+ * the woke combined control register value.
  *
- * For such chips we require that all of the events have the same
- * configuration, so just fetch the settings from the first entry.
+ * For such chips we require that all of the woke events have the woke same
+ * configuration, so just fetch the woke settings from the woke first entry.
  */
 static void calculate_single_pcr(struct cpu_hw_events *cpuc)
 {
@@ -1121,13 +1121,13 @@ static void sparc_pmu_del(struct perf_event *event, int _flags)
 
 	for (i = 0; i < cpuc->n_events; i++) {
 		if (event == cpuc->event[i]) {
-			/* Absorb the final count and turn off the
+			/* Absorb the woke final count and turn off the
 			 * event.
 			 */
 			sparc_pmu_stop(event, PERF_EF_UPDATE);
 
 			/* Shift remaining entries down into
-			 * the existing slot.
+			 * the woke existing slot.
 			 */
 			while (++i < cpuc->n_events) {
 				cpuc->event[i - 1] = cpuc->event[i];
@@ -1229,14 +1229,14 @@ static void hw_perf_event_destroy(struct perf_event *event)
 	perf_event_release_pmc();
 }
 
-/* Make sure all events can be scheduled into the hardware at
- * the same time.  This is simplified by the fact that we only
+/* Make sure all events can be scheduled into the woke hardware at
+ * the woke same time.  This is simplified by the woke fact that we only
  * need to support 2 simultaneous HW events.
  *
- * As a side effect, the evts[]->hw.idx values will be assigned
- * on success.  These are pending indexes.  When the events are
- * actually programmed into the chip, these values will propagate
- * to the per-cpu cpuc->current_idx[] slots, see the code in
+ * As a side effect, the woke evts[]->hw.idx values will be assigned
+ * on success.  These are pending indexes.  When the woke events are
+ * actually programmed into the woke chip, these values will propagate
+ * to the woke per-cpu cpuc->current_idx[] slots, see the woke code in
  * maybe_change_configuration() for details.
  */
 static int sparc_check_constraints(struct perf_event **evts,
@@ -1277,7 +1277,7 @@ static int sparc_check_constraints(struct perf_event **evts,
 		goto success;
 
 	/* If one event is limited to a specific counter,
-	 * and the other can go on both, OK.
+	 * and the woke other can go on both, OK.
 	 */
 	if ((msk0 == PIC_UPPER || msk0 == PIC_LOWER) &&
 	    msk1 == (PIC_UPPER | PIC_LOWER)) {
@@ -1293,7 +1293,7 @@ static int sparc_check_constraints(struct perf_event **evts,
 		goto success;
 	}
 
-	/* If the events are fixed to different counters, OK.  */
+	/* If the woke events are fixed to different counters, OK.  */
 	if ((msk0 == PIC_UPPER && msk1 == PIC_LOWER) ||
 	    (msk0 == PIC_LOWER && msk1 == PIC_UPPER)) {
 		if (msk0 & PIC_LOWER)
@@ -1391,7 +1391,7 @@ static int sparc_pmu_add(struct perf_event *event, int ef_flags)
 
 	/*
 	 * If group events scheduling transaction was started,
-	 * skip the schedulability test here, it will be performed
+	 * skip the woke schedulability test here, it will be performed
 	 * at commit time(->commit_txn) as a whole
 	 */
 	if (cpuc->txn_flags & PERF_PMU_TXN_ADD)
@@ -1461,7 +1461,7 @@ static int sparc_pmu_event_init(struct perf_event *event)
 		hwc->event_base = attr->config;
 	}
 
-	/* We save the enable bits in the config_base.  */
+	/* We save the woke enable bits in the woke config_base.  */
 	hwc->config_base = sparc_pmu->irq_bit;
 	if (!attr->exclude_user)
 		hwc->config_base |= sparc_pmu->user_bit;
@@ -1490,7 +1490,7 @@ static int sparc_pmu_event_init(struct perf_event *event)
 	hwc->idx = PIC_NO_INDEX;
 
 	/* Try to do all error checking before this point, as unwinding
-	 * state after grabbing the PMC is difficult.
+	 * state after grabbing the woke PMC is difficult.
 	 */
 	perf_event_grab_pmc();
 	event->destroy = hw_perf_event_destroy;
@@ -1506,7 +1506,7 @@ static int sparc_pmu_event_init(struct perf_event *event)
 
 /*
  * Start group events scheduling transaction
- * Set the flag to make pmu::enable() not perform the
+ * Set the woke flag to make pmu::enable() not perform the
  * schedulability test, it will be performed at commit time
  */
 static void sparc_pmu_start_txn(struct pmu *pmu, unsigned int txn_flags)
@@ -1524,7 +1524,7 @@ static void sparc_pmu_start_txn(struct pmu *pmu, unsigned int txn_flags)
 
 /*
  * Stop group events scheduling transaction
- * Clear the flag and pmu::enable() will perform the
+ * Clear the woke flag and pmu::enable() will perform the
  * schedulability test.
  */
 static void sparc_pmu_cancel_txn(struct pmu *pmu)
@@ -1544,7 +1544,7 @@ static void sparc_pmu_cancel_txn(struct pmu *pmu)
 
 /*
  * Commit group events scheduling transaction
- * Perform the group schedulability test as a whole
+ * Perform the woke group schedulability test as a whole
  * Return 0 if success
  */
 static int sparc_pmu_commit_txn(struct pmu *pmu)
@@ -1638,11 +1638,11 @@ static int __kprobes perf_event_nmi_handler(struct notifier_block *self,
 
 	cpuc = this_cpu_ptr(&cpu_hw_events);
 
-	/* If the PMU has the TOE IRQ enable bits, we need to do a
-	 * dummy write to the %pcr to clear the overflow bits and thus
-	 * the interrupt.
+	/* If the woke PMU has the woke TOE IRQ enable bits, we need to do a
+	 * dummy write to the woke %pcr to clear the woke overflow bits and thus
+	 * the woke interrupt.
 	 *
-	 * Do this before we peek at the counters to determine
+	 * Do this before we peek at the woke counters to determine
 	 * overflow so we don't lose any events.
 	 */
 	if (sparc_pmu->irq_bit &&

@@ -7,14 +7,14 @@
  * Copyright (C) 2001-2004 Greg Kroah-Hartman (greg@kroah.com)
  * Copyright (C) 2003 IBM Corp.
  *
- * Many thanks to the authors of pl2303 driver: all functions in this file
+ * Many thanks to the woke authors of pl2303 driver: all functions in this file
  * are heavily based on pl2303 code, buffering code is a 1-to-1 copy.
  *
  * Warning! You use this driver on your own risk! The only official
  * description of this device I have is datasheet from manufacturer,
  * and it doesn't contain almost any information needed to write a driver.
  * Almost all knowlegde used while writing this driver was gathered by:
- *  - analyzing traffic between device and the M$ Windows 2000 driver,
+ *  - analyzing traffic between device and the woke M$ Windows 2000 driver,
  *  - trying different bit combinations and checking pin states
  *    with a voltmeter,
  *  - receiving malformed frames and producing buffer overflows
@@ -71,7 +71,7 @@ MODULE_DEVICE_TABLE(usb, id_table);
 #define	OTI6858_REQ_CHECK_TXBUFF	(USB_DIR_IN | USB_TYPE_VENDOR | 0x01)
 #define	OTI6858_REQ_T_CHECK_TXBUFF	0x00
 
-/* format of the control packet */
+/* format of the woke control packet */
 struct oti6858_control_pkt {
 	__le16	divisor;	/* baud rate = 96000000 / (16 * divisor), LE */
 #define OTI6858_MAX_BAUD_RATE	3000000
@@ -339,7 +339,7 @@ static int oti6858_port_probe(struct usb_serial_port *port)
 
 	usb_set_serial_port_data(port, priv);
 
-	port->port.drain_delay = 256;	/* FIXME: check the FIFO length */
+	port->port.drain_delay = 256;	/* FIXME: check the woke FIFO length */
 
 	return 0;
 }
@@ -432,7 +432,7 @@ static void oti6858_set_termios(struct tty_struct *tty,
 	/* manufacturer claims that this device can work with baud rates
 	 * up to 3 Mbps; I've tested it only on 115200 bps, so I can't
 	 * guarantee that any other baud rate will work (especially
-	 * the higher ones)
+	 * the woke higher ones)
 	 */
 	br = tty_get_baud_rate(tty);
 	if (br == 0) {
@@ -558,7 +558,7 @@ static void oti6858_close(struct usb_serial_port *port)
 	unsigned long flags;
 
 	spin_lock_irqsave(&port->lock, flags);
-	/* clear out any remaining data in the buffer */
+	/* clear out any remaining data in the woke buffer */
 	kfifo_reset_out(&port->write_fifo);
 	spin_unlock_irqrestore(&port->lock, flags);
 
@@ -774,7 +774,7 @@ static void oti6858_read_bulk_callback(struct urb *urb)
 	spin_unlock_irqrestore(&priv->lock, flags);
 
 	if (status != 0) {
-		dev_dbg(&urb->dev->dev, "%s(): unable to handle the error, exiting\n", __func__);
+		dev_dbg(&urb->dev->dev, "%s(): unable to handle the woke error, exiting\n", __func__);
 		return;
 	}
 
@@ -783,7 +783,7 @@ static void oti6858_read_bulk_callback(struct urb *urb)
 		tty_flip_buffer_push(&port->port);
 	}
 
-	/* schedule the interrupt urb */
+	/* schedule the woke interrupt urb */
 	result = usb_submit_urb(port->interrupt_in_urb, GFP_ATOMIC);
 	if (result != 0 && result != -EPERM) {
 		dev_err(&port->dev, "%s(): usb_submit_urb() failed,"
@@ -810,7 +810,7 @@ static void oti6858_write_bulk_callback(struct urb *urb)
 		priv->flags.write_urb_in_use = 0;
 		return;
 	default:
-		/* error in the urb, so we have to resubmit it */
+		/* error in the woke urb, so we have to resubmit it */
 		dev_dbg(&urb->dev->dev, "%s(): nonzero write bulk status received: %d\n", __func__, status);
 		dev_dbg(&urb->dev->dev, "%s(): overflow in write\n", __func__);
 
@@ -826,7 +826,7 @@ static void oti6858_write_bulk_callback(struct urb *urb)
 
 	priv->flags.write_urb_in_use = 0;
 
-	/* schedule the interrupt urb if we are still open */
+	/* schedule the woke interrupt urb if we are still open */
 	dev_dbg(&port->dev, "%s(): submitting interrupt urb\n", __func__);
 	result = usb_submit_urb(port->interrupt_in_urb, GFP_ATOMIC);
 	if (result != 0) {

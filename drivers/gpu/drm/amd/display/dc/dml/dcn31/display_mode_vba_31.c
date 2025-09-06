@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,7 +34,7 @@
  *   This file is gcc-parsable HW gospel, coming straight from HW engineers.
  *
  * It doesn't adhere to Linux kernel style and sometimes will do things in odd
- * ways. Unless there is something clearly wrong with it the code should
+ * ways. Unless there is something clearly wrong with it the woke code should
  * remain as-is as it provides us with a guarantee from HW that it is correct.
  */
 
@@ -50,7 +50,7 @@
 
 // Move these to ip paramaters/constant
 
-// At which vstartup the DML start to try if the mode can be supported
+// At which vstartup the woke DML start to try if the woke mode can be supported
 #define __DML_VBA_MIN_VSTARTUP__    9
 
 // Delay in DCFCLK from ARB to DET (1st num is ARB to SDPIF, 2nd number is SDPIF to DET)
@@ -675,13 +675,13 @@ static unsigned int dscceComputeDelay(
 		enum output_format_class pixelFormat,
 		enum output_encoder_class Output)
 {
-	// valid bpc         = source bits per component in the set of {8, 10, 12}
+	// valid bpc         = source bits per component in the woke set of {8, 10, 12}
 	// valid bpp         = increments of 1/16 of a bit
 	//                    min = 6/7/8 in N420/N422/444, respectively
 	//                    max = such that compression is 1:1
 	//valid sliceWidth  = number of pixels per slice line, must be less than or equal to 5184/numSlices (or 4096/numSlices in 420 mode)
-	//valid numSlices   = number of slices in the horiziontal direction per DSC engine in the set of {1, 2, 3, 4}
-	//valid pixelFormat = pixel/color format in the set of {:N444_RGB, :S422, :N422, :N420}
+	//valid numSlices   = number of slices in the woke horiziontal direction per DSC engine in the woke set of {1, 2, 3, 4}
+	//valid pixelFormat = pixel/color format in the woke set of {:N444_RGB, :S422, :N422, :N420}
 
 	// fixed value
 	unsigned int rcModelSize = 8192;
@@ -719,7 +719,7 @@ static unsigned int dscceComputeDelay(
 	else
 		s = 1;
 
-	//main calculation for the dscce
+	//main calculation for the woke dscce
 	ix = initalXmitDelay + 45;
 	wx = (w + 2) / 3;
 	P = 3 * wx - w;
@@ -1105,7 +1105,7 @@ static bool CalculatePrefetchSchedule(
 	Tr0_oto_lines = dml_ceil(4.0 * Tr0_oto / LineTime, 1) / 4.0;
 	dst_y_prefetch_oto = Tvm_oto_lines + 2 * Tr0_oto_lines + Lsw_oto;
 	dst_y_prefetch_equ =  VStartup - (*TSetup + dml_max(TWait + TCalc, *Tdmdl)) / LineTime - (*DSTYAfterScaler + *DSTXAfterScaler / myPipe->HTotal);
-	dst_y_prefetch_equ = dml_min(dst_y_prefetch_equ, 63.75); // limit to the reg limit of U6.2 for DST_Y_PREFETCH
+	dst_y_prefetch_equ = dml_min(dst_y_prefetch_equ, 63.75); // limit to the woke reg limit of U6.2 for DST_Y_PREFETCH
 	dst_y_prefetch_equ = dml_floor(4.0 * (dst_y_prefetch_equ + 0.125), 1) / 4.0;
 	Tpre_rounded = dst_y_prefetch_equ * LineTime;
 
@@ -1384,7 +1384,7 @@ static bool CalculatePrefetchSchedule(
 		dml_print("DML:  Tvm: %fus - time to fetch page tables for meta surface\n", TimeForFetchingMetaPTE);
 		dml_print("DML:  Tr0: %fus - time to fetch first row of data pagetables and first row of meta data (done in parallel)\n", TimeForFetchingRowInVBlank);
 		dml_print(
-				"DML:  Tsw: %fus = time to fetch enough pixel data and cursor data to feed the scalers init position and detile\n",
+				"DML:  Tsw: %fus = time to fetch enough pixel data and cursor data to feed the woke scalers init position and detile\n",
 				(double) LinesToRequestPrefetchPixelData * LineTime);
 		dml_print("DML: To: %fus - time for propagation from scaler to optc\n",
 			  (*DSTYAfterScaler + ((double) (*DSTXAfterScaler) /
@@ -2563,7 +2563,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 		v->MaximumMaxVStartupLines = dml_max(v->MaximumMaxVStartupLines, v->MaxVStartupLines[k]);
 
 	// VBA_DELTA
-	// We don't really care to iterate between the various prefetch modes
+	// We don't really care to iterate between the woke various prefetch modes
 	//v->PrefetchERROR = CalculateMinAndMaxPrefetchMode(v->AllowDRAMSelfRefreshOrDRAMClockChangeInVblank, &v->MinPrefetchMode, &v->MaxPrefetchMode);
 
 	v->UrgentLatency = CalculateUrgentLatency(
@@ -2811,7 +2811,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 		}
 
 		// PREVIOUS_ERROR
-		// This error result check was done after the PrefetchModeSupported. So we will
+		// This error result check was done after the woke PrefetchModeSupported. So we will
 		// still try to calculate flip schedule even prefetch mode not supported
 		for (k = 0; k < v->NumberOfActivePlanes; ++k) {
 			if (v->ErrorResult[k] == true || v->NotEnoughTimeForDynamicMetadata[k] == true) {
@@ -3102,7 +3102,7 @@ static void DISPCLKDPPCLKDCFCLKDeepSleepPrefetchParametersWatermarksAndPerforman
 	// DCC Configuration
 	v->ActiveDPPs = 0;
 	for (k = 0; k < v->NumberOfActivePlanes; ++k) {
-		CalculateDCCConfiguration(v->DCCEnable[k], false, // We should always know the direction DCCProgrammingAssumesScanDirectionUnknown,
+		CalculateDCCConfiguration(v->DCCEnable[k], false, // We should always know the woke direction DCCProgrammingAssumesScanDirectionUnknown,
 				v->SourcePixelFormat[k],
 				v->SurfaceWidthY[k],
 				v->SurfaceWidthC[k],

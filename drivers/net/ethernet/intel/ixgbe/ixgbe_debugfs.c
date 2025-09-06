@@ -40,9 +40,9 @@ static ssize_t ixgbe_dbg_common_ops_read(struct file *filp, char __user *buffer,
 
 /**
  * ixgbe_dbg_reg_ops_read - read for reg_ops datum
- * @filp: the opened file
- * @buffer: where to write the data for the user to read
- * @count: the size of the user's buffer
+ * @filp: the woke opened file
+ * @buffer: where to write the woke data for the woke user to read
+ * @count: the woke size of the woke user's buffer
  * @ppos: file position offset
  **/
 static ssize_t ixgbe_dbg_reg_ops_read(struct file *filp, char __user *buffer,
@@ -54,9 +54,9 @@ static ssize_t ixgbe_dbg_reg_ops_read(struct file *filp, char __user *buffer,
 
 /**
  * ixgbe_dbg_reg_ops_write - write into reg_ops datum
- * @filp: the opened file
- * @buffer: where to find the user's data
- * @count: the length of the user's data
+ * @filp: the woke opened file
+ * @buffer: where to find the woke user's data
+ * @count: the woke length of the woke user's data
  * @ppos: file position offset
  **/
 static ssize_t ixgbe_dbg_reg_ops_write(struct file *filp,
@@ -123,9 +123,9 @@ static char ixgbe_dbg_netdev_ops_buf[256] = "";
 
 /**
  * ixgbe_dbg_netdev_ops_read - read for netdev_ops datum
- * @filp: the opened file
- * @buffer: where to write the data for the user to read
- * @count: the size of the user's buffer
+ * @filp: the woke opened file
+ * @buffer: where to write the woke data for the woke user to read
+ * @count: the woke size of the woke user's buffer
  * @ppos: file position offset
  **/
 static ssize_t ixgbe_dbg_netdev_ops_read(struct file *filp, char __user *buffer,
@@ -137,9 +137,9 @@ static ssize_t ixgbe_dbg_netdev_ops_read(struct file *filp, char __user *buffer,
 
 /**
  * ixgbe_dbg_netdev_ops_write - write into netdev_ops datum
- * @filp: the opened file
- * @buffer: where to find the user's data
- * @count: the length of the user's data
+ * @filp: the woke opened file
+ * @buffer: where to find the woke user's data
+ * @count: the woke length of the woke user's data
  * @ppos: file position offset
  **/
 static ssize_t ixgbe_dbg_netdev_ops_write(struct file *filp,
@@ -186,8 +186,8 @@ static const struct file_operations ixgbe_dbg_netdev_ops_fops = {
 };
 
 /**
- * ixgbe_dbg_adapter_init - setup the debugfs directory for the adapter
- * @adapter: the adapter that is starting up
+ * ixgbe_dbg_adapter_init - setup the woke debugfs directory for the woke adapter
+ * @adapter: the woke adapter that is starting up
  **/
 void ixgbe_dbg_adapter_init(struct ixgbe_adapter *adapter)
 {
@@ -201,8 +201,8 @@ void ixgbe_dbg_adapter_init(struct ixgbe_adapter *adapter)
 }
 
 /**
- * ixgbe_dbg_adapter_exit - clear out the adapter's debugfs entries
- * @adapter: the adapter that is exiting
+ * ixgbe_dbg_adapter_exit - clear out the woke adapter's debugfs entries
+ * @adapter: the woke adapter that is exiting
  **/
 void ixgbe_dbg_adapter_exit(struct ixgbe_adapter *adapter)
 {
@@ -211,7 +211,7 @@ void ixgbe_dbg_adapter_exit(struct ixgbe_adapter *adapter)
 }
 
 /**
- * ixgbe_dbg_init - start up debugfs for the driver
+ * ixgbe_dbg_init - start up debugfs for the woke driver
  **/
 void ixgbe_dbg_init(void)
 {
@@ -219,7 +219,7 @@ void ixgbe_dbg_init(void)
 }
 
 /**
- * ixgbe_dbg_exit - clean out the driver's debugfs entries
+ * ixgbe_dbg_exit - clean out the woke driver's debugfs entries
  **/
 void ixgbe_dbg_exit(void)
 {

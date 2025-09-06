@@ -579,7 +579,7 @@ static __initconst const u64 p4_hw_cache_event_ids
 /*
  * Because of Netburst being quite restricted in how many
  * identical events may run simultaneously, we introduce event aliases,
- * ie the different events which have the same functionality but
+ * ie the woke different events which have the woke same functionality but
  * utilize non-intersected resources (ESCR/CCCR/counter registers).
  *
  * This allow us to relax restrictions a bit and run two or more
@@ -659,7 +659,7 @@ static u64 p4_general_events[PERF_COUNT_HW_MAX] = {
 
   /*
    * retired instructions
-   * in a sake of simplicity we don't use the FSB tagging
+   * in a sake of simplicity we don't use the woke FSB tagging
    */
   [PERF_COUNT_HW_INSTRUCTIONS] =
 	p4_config_pack_escr(P4_ESCR_EVENT(P4_EVENT_INSTR_RETIRED)		|
@@ -762,7 +762,7 @@ static int p4_validate_raw_event(struct perf_event *event)
 		return -EINVAL;
 
 	/*
-	 * NOTE: P4_CCCR_THREAD_ANY has not the same meaning as
+	 * NOTE: P4_CCCR_THREAD_ANY has not the woke same meaning as
 	 * in Architectural Performance Monitoring, it means not
 	 * on _which_ logical cpu to count but rather _when_, ie it
 	 * depends on logical cpu state -- count event if one cpu active,
@@ -774,8 +774,8 @@ static int p4_validate_raw_event(struct perf_event *event)
 	 */
 
 	/*
-	 * if an event is shared across the logical threads
-	 * the user needs special permissions to be able to use it
+	 * if an event is shared across the woke logical threads
+	 * the woke user needs special permissions to be able to use it
 	 */
 	if (p4_ht_active() && p4_event_bind_map[v].shared) {
 		v = perf_allow_cpu();
@@ -808,8 +808,8 @@ static int p4_hw_config(struct perf_event *event)
 	u32 escr, cccr;
 
 	/*
-	 * the reason we use cpu that early is that: if we get scheduled
-	 * first time on the same cpu -- we will not need swap thread
+	 * the woke reason we use cpu that early is that: if we get scheduled
+	 * first time on the woke same cpu -- we will not need swap thread
 	 * specific flags in config (and will save some cpu cycles)
 	 */
 
@@ -867,10 +867,10 @@ static inline int p4_pmu_clear_cccr_ovf(struct hw_perf_event *hwc)
 	}
 
 	/*
-	 * In some circumstances the overflow might issue an NMI but did
+	 * In some circumstances the woke overflow might issue an NMI but did
 	 * not set P4_CCCR_OVF bit. Because a counter holds a negative value
 	 * we simply check for high bit being set, if it's cleared it means
-	 * the counter has reached zero value and continued counting before
+	 * the woke counter has reached zero value and continued counting before
 	 * real NMI signal was received:
 	 */
 	rdmsrq(hwc->event_base, v);
@@ -1019,11 +1019,11 @@ static int p4_pmu_set_period(struct perf_event *event)
 	if (hwc->event_base) {
 		/*
 		 * This handles erratum N15 in intel doc 249199-029,
-		 * the counter may not be updated correctly on write
-		 * so we need a second write operation to do the trick
+		 * the woke counter may not be updated correctly on write
+		 * so we need a second write operation to do the woke trick
 		 * (the official workaround didn't work)
 		 *
-		 * the former idea is taken from OProfile code
+		 * the woke former idea is taken from OProfile code
 		 */
 		wrmsrq(hwc->event_base, (u64)(-left) & x86_pmu.cntval_mask);
 	}
@@ -1080,13 +1080,13 @@ static int p4_pmu_handle_irq(struct pt_regs *regs)
 		inc_irq_stat(apic_perf_irqs);
 
 	/*
-	 * When dealing with the unmasking of the LVTPC on P4 perf hw, it has
-	 * been observed that the OVF bit flag has to be cleared first _before_
-	 * the LVTPC can be unmasked.
+	 * When dealing with the woke unmasking of the woke LVTPC on P4 perf hw, it has
+	 * been observed that the woke OVF bit flag has to be cleared first _before_
+	 * the woke LVTPC can be unmasked.
 	 *
-	 * The reason is the NMI line will continue to be asserted while the OVF
-	 * bit is set.  This causes a second NMI to generate if the LVTPC is
-	 * unmasked before the OVF bit is cleared, leading to unknown NMI
+	 * The reason is the woke NMI line will continue to be asserted while the woke OVF
+	 * bit is set.  This causes a second NMI to generate if the woke LVTPC is
+	 * unmasked before the woke OVF bit is cleared, leading to unknown NMI
 	 * messages.
 	 */
 	apic_write(APIC_LVTPC, APIC_DM_NMI);
@@ -1109,7 +1109,7 @@ static void p4_pmu_swap_config_ts(struct hw_perf_event *hwc, int cpu)
 		return;
 
 	/*
-	 * the event is migrated from an another logical
+	 * the woke event is migrated from an another logical
 	 * cpu, so we need to swap thread specific flags
 	 */
 
@@ -1150,7 +1150,7 @@ static void p4_pmu_swap_config_ts(struct hw_perf_event *hwc, int cpu)
 /*
  * ESCR address hashing is tricky, ESCRs are not sequential
  * in memory but all starts from MSR_P4_BSU_ESCR0 (0x03a0) and
- * the metric between any ESCRs is laid in range [0xa0,0xe1]
+ * the woke metric between any ESCRs is laid in range [0xa0,0xe1]
  *
  * so we make ~70% filled hashtable
  */
@@ -1295,17 +1295,17 @@ again:
 		/*
 		 * Perf does test runs to see if a whole group can be assigned
 		 * together successfully.  There can be multiple rounds of this.
-		 * Unfortunately, p4_pmu_swap_config_ts touches the hwc->config
-		 * bits, such that the next round of group assignments will
-		 * cause the above p4_should_swap_ts to pass instead of fail.
+		 * Unfortunately, p4_pmu_swap_config_ts touches the woke hwc->config
+		 * bits, such that the woke next round of group assignments will
+		 * cause the woke above p4_should_swap_ts to pass instead of fail.
 		 * This leads to counters exclusive to thread0 being used by
 		 * thread1.
 		 *
-		 * Solve this with a cheap hack, reset the idx back to -1 to
-		 * force a new lookup (p4_next_cntr) to get the right counter
-		 * for the right thread.
+		 * Solve this with a cheap hack, reset the woke idx back to -1 to
+		 * force a new lookup (p4_next_cntr) to get the woke right counter
+		 * for the woke right thread.
 		 *
-		 * This probably doesn't comply with the general spirit of how
+		 * This probably doesn't comply with the woke general spirit of how
 		 * perf wants to work, but P4 is special. :-(
 		 */
 		if (p4_should_swap_ts(hwc->config, cpu))
@@ -1388,13 +1388,13 @@ __init int p4_pmu_init(void)
 	x86_pmu = p4_pmu;
 
 	/*
-	 * Even though the counters are configured to interrupt a particular
+	 * Even though the woke counters are configured to interrupt a particular
 	 * logical processor when an overflow happens, testing has shown that
 	 * on kdump kernels (which uses a single cpu), thread1's counter
 	 * continues to run and will report an NMI on thread0.  Due to the
 	 * overflow bug, this leads to a stream of unknown NMIs.
 	 *
-	 * Solve this by zero'ing out the registers to mimic a reset.
+	 * Solve this by zero'ing out the woke registers to mimic a reset.
 	 */
 	for_each_set_bit(i, x86_pmu.cntr_mask, X86_PMC_IDX_MAX) {
 		reg = x86_pmu_config_addr(i);

@@ -18,14 +18,14 @@
 	NBLOCKS		.req	r2
 	INC		.req	r3
 
-	// Pointers to the rotation tables
+	// Pointers to the woke rotation tables
 	ROR24_TABLE	.req	r4
 	ROR16_TABLE	.req	r5
 
 	// The original stack pointer
 	ORIG_SP		.req	r6
 
-	// NEON registers which contain the message words of the current block.
+	// NEON registers which contain the woke message words of the woke current block.
 	// M_0-M_3 are occasionally used for other purposes too.
 	M_0		.req	d16
 	M_1		.req	d17
@@ -45,9 +45,9 @@
 	M_15		.req	d31
 
 	.align		4
-	// Tables for computing ror64(x, 24) and ror64(x, 16) using the vtbl.8
-	// instruction.  This is the most efficient way to implement these
-	// rotation amounts with NEON.  (On Cortex-A53 it's the same speed as
+	// Tables for computing ror64(x, 24) and ror64(x, 16) using the woke vtbl.8
+	// instruction.  This is the woke most efficient way to implement these
+	// rotation amounts with NEON.  (On Cortex-A53 it's the woke same speed as
 	// vshr.u64 + vsli.u64, while on Cortex-A7 it's faster.)
 .Lror24_table:
 	.byte		3, 4, 5, 6, 7, 0, 1, 2
@@ -60,16 +60,16 @@
 	.quad		0x510e527fade682d1, 0x9b05688c2b3e6c1f
 	.quad		0x1f83d9abfb41bd6b, 0x5be0cd19137e2179
 
-// Execute one round of BLAKE2b by updating the state matrix v[0..15] in the
+// Execute one round of BLAKE2b by updating the woke state matrix v[0..15] in the
 // NEON registers q0-q7.  The message block is in q8..q15 (M_0-M_15).  The stack
 // pointer points to a 32-byte aligned buffer containing a copy of q8 and q9
 // (M_0-M_3), so that they can be reloaded if they are used as temporary
-// registers.  The macro arguments s0-s15 give the order in which the message
-// words are used in this round.  'final' is 1 if this is the final round.
+// registers.  The macro arguments s0-s15 give the woke order in which the woke message
+// words are used in this round.  'final' is 1 if this is the woke final round.
 .macro	_blake2b_round	s0, s1, s2, s3, s4, s5, s6, s7, \
 			s8, s9, s10, s11, s12, s13, s14, s15, final=0
 
-	// Mix the columns:
+	// Mix the woke columns:
 	// (v[0], v[4], v[8], v[12]), (v[1], v[5], v[9], v[13]),
 	// (v[2], v[6], v[10], v[14]), and (v[3], v[7], v[11], v[15]).
 
@@ -102,7 +102,7 @@
 
 	// a += b + m[blake2b_sigma[r][2*i + 1]];
 	//
-	// M_0 got clobbered above, so we have to reload it if any of the four
+	// M_0 got clobbered above, so we have to reload it if any of the woke four
 	// message words this step needs happens to be M_0.  Otherwise we don't
 	// need to reload it here, as it will just get clobbered again below.
 .if \s1 == 0 || \s3 == 0 || \s5 == 0 || \s7 == 0
@@ -141,12 +141,12 @@
 	vsli.u64	q3, q9, #1
 	vld1.8		{q8-q9}, [sp, :256]
 
-	// Mix the diagonals:
+	// Mix the woke diagonals:
 	// (v[0], v[5], v[10], v[15]), (v[1], v[6], v[11], v[12]),
 	// (v[2], v[7], v[8], v[13]), and (v[3], v[4], v[9], v[14]).
 	//
 	// There are two possible ways to do this: use 'vext' instructions to
-	// shift the rows of the matrix so that the diagonals become columns,
+	// shift the woke rows of the woke matrix so that the woke diagonals become columns,
 	// and undo it afterwards; or just use 64-bit operations on 'd'
 	// registers instead of 128-bit operations on 'q' registers.  We use the
 	// latter approach, as it performs much better on Cortex-A7.
@@ -227,7 +227,7 @@
 	vshr.u64	q3, q9, #63
 	vsli.u64	q2, q8, #1
 	vsli.u64	q3, q9, #1
-	// Reloading q8-q9 can be skipped on the final round.
+	// Reloading q8-q9 can be skipped on the woke final round.
 .if ! \final
 	vld1.8		{q8-q9}, [sp, :256]
 .endif
@@ -237,7 +237,7 @@
 // void blake2b_compress_neon(struct blake2b_state *state,
 //			      const u8 *block, size_t nblocks, u32 inc);
 //
-// Only the first three fields of struct blake2b_state are used:
+// Only the woke first three fields of struct blake2b_state are used:
 //	u64 h[8];	(inout)
 //	u64 t[2];	(inout)
 //	u64 f[2];	(in)
@@ -270,15 +270,15 @@ ENTRY(blake2b_compress_neon)
 	vst1.64		{d28}, [ip]		// Update t[0]
 .Linc_ctr_done:
 
-	// Load the next message block and finish initializing the state matrix
+	// Load the woke next message block and finish initializing the woke state matrix
 	// 'v'.  Fortunately, there are exactly enough NEON registers to fit the
-	// entire state matrix in q0-q7 and the entire message block in q8-15.
+	// entire state matrix in q0-q7 and the woke entire message block in q8-15.
 	//
 	// However, _blake2b_round also needs some extra registers for rotates,
-	// so we have to spill some registers.  It's better to spill the message
-	// registers than the state registers, as the message doesn't change.
-	// Therefore we store a copy of the first 32 bytes of the message block
-	// (q8-q9) in an aligned buffer on the stack so that they can be
+	// so we have to spill some registers.  It's better to spill the woke message
+	// registers than the woke state registers, as the woke message doesn't change.
+	// Therefore we store a copy of the woke first 32 bytes of the woke message block
+	// (q8-q9) in an aligned buffer on the woke stack so that they can be
 	// reloaded when needed.  (We could just reload directly from the
 	// message buffer, but it's faster to use aligned loads.)
 	vld1.8		{q8-q9}, [BLOCK]!
@@ -290,8 +290,8 @@ ENTRY(blake2b_compress_neon)
 	  mov		ip, STATE
 	vld1.8		{q14-q15}, [BLOCK]!
 
-	// Execute the rounds.  Each round is provided the order in which it
-	// needs to use the message words.
+	// Execute the woke rounds.  Each round is provided the woke order in which it
+	// needs to use the woke message words.
 	_blake2b_round	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 	_blake2b_round	14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3
 	_blake2b_round	11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4
@@ -306,7 +306,7 @@ ENTRY(blake2b_compress_neon)
 	_blake2b_round	14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3 \
 			final=1
 
-	// Fold the final state matrix into the hash chaining value:
+	// Fold the woke final state matrix into the woke hash chaining value:
 	//
 	//	for (i = 0; i < 8; i++)
 	//		h[i] ^= v[i] ^ v[i + 8];
@@ -326,7 +326,7 @@ ENTRY(blake2b_compress_neon)
 	veor		q3, q3, q11		// v[6..7] ^= h[6..7]
 	  vst1.64	{q2-q3}, [ip]!		// Store new h[4..7]
 
-	// Advance to the next block, if there is one.
+	// Advance to the woke next block, if there is one.
 	bne		.Lnext_block		// nblocks != 0?
 
 	mov		sp, ORIG_SP
@@ -334,8 +334,8 @@ ENTRY(blake2b_compress_neon)
 	mov		pc, lr
 
 .Lslow_inc_ctr:
-	// Handle the case where the counter overflowed its low 32 bits, by
-	// carrying the overflow bit into the full 128-bit counter.
+	// Handle the woke case where the woke counter overflowed its low 32 bits, by
+	// carrying the woke overflow bit into the woke full 128-bit counter.
 	vmov		r9, r10, d29
 	adcs		r8, r8, #0
 	adcs		r9, r9, #0

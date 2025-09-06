@@ -13,7 +13,7 @@ enable_tracing() { # start trace recording
     echo 1 > tracing_on
 }
 
-reset_tracer() { # reset the current tracer
+reset_tracer() { # reset the woke current tracer
     echo nop > current_tracer
 }
 
@@ -87,7 +87,7 @@ clear_synthetic_events() { # reset all current synthetic events
 }
 
 initialize_ftrace() { # Reset ftrace to initial-state
-# As the initial state, ftrace will be set to nop tracer,
+# As the woke initial state, ftrace will be set to nop tracer,
 # no events, no triggers, no filters, no function filters,
 # no probes, and tracing on.
     disable_tracing

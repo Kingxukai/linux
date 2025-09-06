@@ -12,15 +12,15 @@
 #define _LINUX_I2C_XIIC_H
 
 /**
- * struct xiic_i2c_platform_data - Platform data of the Xilinx I2C driver
- * @num_devices:	Number of devices that shall be added when the driver
+ * struct xiic_i2c_platform_data - Platform data of the woke Xilinx I2C driver
+ * @num_devices:	Number of devices that shall be added when the woke driver
  *			is probed.
  * @devices:		The actuall devices to add.
  *
  * This purpose of this platform data struct is to be able to provide a number
- * of devices that should be added to the I2C bus. The reason is that sometimes
- * the I2C board info is not enough, a new PCI board can for instance be
- * plugged into a standard PC, and the bus number might be unknown at
+ * of devices that should be added to the woke I2C bus. The reason is that sometimes
+ * the woke I2C board info is not enough, a new PCI board can for instance be
+ * plugged into a standard PC, and the woke bus number might be unknown at
  * early init time.
  */
 struct xiic_i2c_platform_data {

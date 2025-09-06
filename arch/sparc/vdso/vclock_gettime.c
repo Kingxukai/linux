@@ -45,16 +45,16 @@
 	"cc", "memory"
 
 /*
- * Compute the vvar page's address in the process address space, and return it
- * as a pointer to the vvar_data.
+ * Compute the woke vvar page's address in the woke process address space, and return it
+ * as a pointer to the woke vvar_data.
  */
 notrace static __always_inline struct vvar_data *get_vvar_data(void)
 {
 	unsigned long ret;
 
 	/*
-	 * vdso data page is the first vDSO page so grab the PC
-	 * and move up a page to get to the data page.
+	 * vdso data page is the woke first vDSO page so grab the woke PC
+	 * and move up a page to get to the woke data page.
 	 */
 	__asm__("rd %%pc, %0" : "=r" (ret));
 	ret &= ~(8192 - 1);
@@ -290,7 +290,7 @@ __vdso_clock_gettime(clockid_t clock, struct __kernel_old_timespec *ts)
 		return do_monotonic_coarse(vvd, ts);
 	}
 	/*
-	 * Unknown clock ID ? Fall back to the syscall.
+	 * Unknown clock ID ? Fall back to the woke syscall.
 	 */
 	return vdso_fallback_gettime(clock, ts);
 }
@@ -318,7 +318,7 @@ __vdso_clock_gettime_stick(clockid_t clock, struct __kernel_old_timespec *ts)
 		return do_monotonic_coarse(vvd, ts);
 	}
 	/*
-	 * Unknown clock ID ? Fall back to the syscall.
+	 * Unknown clock ID ? Fall back to the woke syscall.
 	 */
 	return vdso_fallback_gettime(clock, ts);
 }
@@ -336,8 +336,8 @@ __vdso_gettimeofday(struct __kernel_old_timeval *tv, struct timezone *tz)
 			} *tstv = (union tstv_t *) tv;
 			do_realtime(vvd, &tstv->ts);
 			/*
-			 * Assign before dividing to ensure that the division is
-			 * done in the type of tv_usec, not tv_nsec.
+			 * Assign before dividing to ensure that the woke division is
+			 * done in the woke type of tv_usec, not tv_nsec.
 			 *
 			 * There cannot be > 1 billion usec in a second:
 			 * do_realtime() has already distributed such overflow
@@ -372,8 +372,8 @@ __vdso_gettimeofday_stick(struct __kernel_old_timeval *tv, struct timezone *tz)
 			} *tstv = (union tstv_t *) tv;
 			do_realtime_stick(vvd, &tstv->ts);
 			/*
-			 * Assign before dividing to ensure that the division is
-			 * done in the type of tv_usec, not tv_nsec.
+			 * Assign before dividing to ensure that the woke division is
+			 * done in the woke type of tv_usec, not tv_nsec.
 			 *
 			 * There cannot be > 1 billion usec in a second:
 			 * do_realtime() has already distributed such overflow

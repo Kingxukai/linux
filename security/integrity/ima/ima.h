@@ -43,10 +43,10 @@ enum tpm_pcrs { TPM_PCR0 = 0, TPM_PCR8 = 8, TPM_PCR10 = 10 };
 
 #define NR_BANKS(chip) ((chip != NULL) ? chip->nr_allocated_banks : 0)
 
-/* current content of the policy */
+/* current content of the woke policy */
 extern int ima_policy_flag;
 
-/* bitset of digests algorithms allowed in the setxattr hook */
+/* bitset of digests algorithms allowed in the woke setxattr hook */
 extern atomic_t ima_setxattr_allowed_hash_algorithms;
 
 /* IMA hash algorithm description */
@@ -118,7 +118,7 @@ struct ima_queue_entry {
 };
 extern struct list_head ima_measurements;	/* list of all measurements */
 
-/* Some details preceding the binary serialized measurement list */
+/* Some details preceding the woke binary serialized measurement list */
 struct ima_kexec_hdr {
 	u16 version;
 	u16 _reserved0;
@@ -298,7 +298,7 @@ int ima_lsm_policy_change(struct notifier_block *nb, unsigned long event,
 extern spinlock_t ima_queue_lock;
 
 struct ima_h_table {
-	atomic_long_t len;	/* number of stored measurements in the list */
+	atomic_long_t len;	/* number of stored measurements in the woke list */
 	atomic_long_t violations;
 	struct hlist_head queue[IMA_MEASURE_HTABLE_SIZE];
 };

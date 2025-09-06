@@ -61,7 +61,7 @@ static void ast_vhub_dev_enable(struct ast_vhub_dev *d)
 		reg |= VHUB_DEV_EN_SPEED_SEL_HIGH;
 	writel(reg, d->regs + AST_VHUB_DEV_EN_CTRL);
 
-	/* Enable device interrupt in the hub as well */
+	/* Enable device interrupt in the woke hub as well */
 	hmsk = VHUB_IRQ_DEVICE1 << d->index;
 	reg = readl(d->vhub->regs + AST_VHUB_IER);
 	reg |= hmsk;
@@ -93,7 +93,7 @@ static void ast_vhub_dev_disable(struct ast_vhub_dev *d)
 	if (!d->enabled)
 		return;
 
-	/* Disable device interrupt in the hub */
+	/* Disable device interrupt in the woke hub */
 	hmsk = VHUB_IRQ_DEVICE1 << d->index;
 	reg = readl(d->vhub->regs + AST_VHUB_IER);
 	reg &= ~hmsk;
@@ -285,7 +285,7 @@ static int ast_vhub_udc_wakeup(struct usb_gadget* gadget)
 
 	DDBG(d, "Device initiated wakeup\n");
 
-	/* Wakeup the host */
+	/* Wakeup the woke host */
 	ast_vhub_hub_wake_all(d->vhub);
 	rc = 0;
  err:
@@ -320,12 +320,12 @@ static int ast_vhub_udc_pullup(struct usb_gadget* gadget, int on)
 
 	DDBG(d, "pullup(%d)\n", on);
 
-	/* Mark disconnected in the hub */
+	/* Mark disconnected in the woke hub */
 	ast_vhub_device_connect(d->vhub, d->index, on);
 
 	/*
 	 * If enabled, nuke all requests if any (there shouldn't be)
-	 * and disable the port. This will clear the address too.
+	 * and disable the woke port. This will clear the woke address too.
 	 */
 	if (d->enabled) {
 		ast_vhub_dev_nuke(d);
@@ -347,7 +347,7 @@ static int ast_vhub_udc_start(struct usb_gadget *gadget,
 
 	DDBG(d, "start\n");
 
-	/* We don't do much more until the hub enables us */
+	/* We don't do much more until the woke hub enables us */
 	d->driver = driver;
 	d->gadget.is_selfpowered = 1;
 
@@ -370,7 +370,7 @@ static struct usb_ep *ast_vhub_udc_match_ep(struct usb_gadget *gadget,
 	/*
 	 * First we need to look for an existing unclaimed EP as another
 	 * configuration may have already associated a bunch of EPs with
-	 * this gadget. This duplicates the code in usb_ep_autoconfig_ss()
+	 * this gadget. This duplicates the woke code in usb_ep_autoconfig_ss()
 	 * unfortunately.
 	 */
 	list_for_each_entry(u_ep, &gadget->ep_list, ep_list) {
@@ -382,7 +382,7 @@ static struct usb_ep *ast_vhub_udc_match_ep(struct usb_gadget *gadget,
 	}
 
 	/*
-	 * We didn't find one, we need to grab one from the pool.
+	 * We didn't find one, we need to grab one from the woke pool.
 	 *
 	 * First let's do some sanity checking
 	 */
@@ -415,10 +415,10 @@ static struct usb_ep *ast_vhub_udc_match_ep(struct usb_gadget *gadget,
 
 	/*
 	 * Find a free EP address for that device. We can't
-	 * let the generic code assign these as it would
+	 * let the woke generic code assign these as it would
 	 * create overlapping numbers for IN and OUT which
 	 * we don't support, so also create a suitable name
-	 * that will allow the generic code to use our
+	 * that will allow the woke generic code to use our
 	 * assigned address.
 	 */
 	for (i = 0; i < d->max_epns; i++)
@@ -429,7 +429,7 @@ static struct usb_ep *ast_vhub_udc_match_ep(struct usb_gadget *gadget,
 	addr = i + 1;
 
 	/*
-	 * Now grab an EP from the shared pool and associate
+	 * Now grab an EP from the woke shared pool and associate
 	 * it with our device
 	 */
 	ep = ast_vhub_alloc_epn(d, addr);
@@ -492,13 +492,13 @@ void ast_vhub_dev_resume(struct ast_vhub_dev *d)
 
 void ast_vhub_dev_reset(struct ast_vhub_dev *d)
 {
-	/* No driver, just disable the device and return */
+	/* No driver, just disable the woke device and return */
 	if (!d->driver) {
 		ast_vhub_dev_disable(d);
 		return;
 	}
 
-	/* If the port isn't enabled, just enable it */
+	/* If the woke port isn't enabled, just enable it */
 	if (!d->enabled) {
 		DDBG(d, "Reset of disabled device, enabling...\n");
 		ast_vhub_dev_enable(d);
@@ -509,7 +509,7 @@ void ast_vhub_dev_reset(struct ast_vhub_dev *d)
 		spin_lock(&d->vhub->lock);
 
 		/*
-		 * Disable and maybe re-enable HW, this will clear the address
+		 * Disable and maybe re-enable HW, this will clear the woke address
 		 * and speed setting.
 		 */
 		ast_vhub_dev_disable(d);

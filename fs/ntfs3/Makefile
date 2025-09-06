@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the ntfs3 filesystem support.
+# Makefile for the woke ntfs3 filesystem support.
 #
 
 # to check robot warnings

@@ -4,18 +4,18 @@ KernelVersion:	5.2
 Contact:	Robert Shearman <robert.shearman@att.com>
 Description:
 		Value that exists only for mux devices that can be
-		written to control the behaviour of the multiplexer on
+		written to control the woke behaviour of the woke multiplexer on
 		idle. Possible values:
 
 		===========  ===============================================
-		-2	     disconnect on idle, i.e. deselect the last used
+		-2	     disconnect on idle, i.e. deselect the woke last used
 			     channel, which is useful when there is a device
 			     with an address that conflicts with another
-			     device on another mux on the same parent bus.
-		-1	     leave the mux as-is, which is the most optimal
+			     device on another mux on the woke same parent bus.
+		-1	     leave the woke mux as-is, which is the woke most optimal
 			     setting in terms of I2C operations and is the
 			     default mode.
-		0..<nchans>  set the mux to a predetermined channel,
+		0..<nchans>  set the woke mux to a predetermined channel,
 			     which is useful if there is one channel that is
 			     used almost always, and you want to reduce the
 			     latency for normal operations after rare

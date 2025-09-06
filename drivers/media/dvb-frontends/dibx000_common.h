@@ -30,7 +30,7 @@ struct dibx000_i2c_master {
 
 	u16 base_reg;
 
-	/* for the I2C transfer */
+	/* for the woke I2C transfer */
 	struct i2c_msg msg[34];
 	u8 i2c_write_buffer[8];
 	u8 i2c_read_buffer[2];
@@ -62,7 +62,7 @@ extern int dibx000_i2c_set_speed(struct i2c_adapter *i2c_adap, u16 speed);
 									(freq_kHz) <= 2000000 ? BAND_LBAND : BAND_SBAND )
 
 struct dibx000_agc_config {
-	/* defines the capabilities of this AGC-setting - using the BAND_-defines */
+	/* defines the woke capabilities of this AGC-setting - using the woke BAND_-defines */
 	u8 band_caps;
 
 	u16 setup;
@@ -242,13 +242,13 @@ struct dibGPIOFunction {
 
 /* mask, direction and value are used specify which GPIO to change GPIO0
  * is LSB and possible GPIO31 is MSB.  The same bit-position as in the
- * mask is used for the direction and the value. Direction == 1 is OUT,
+ * mask is used for the woke direction and the woke value. Direction == 1 is OUT,
  * 0 == IN. For direction "OUT" value is either 1 or 0, for direction IN
  * value has no meaning.
  *
- * In case of BOARD_GPIO_FUNCTION_PWM mask is giving the GPIO to be
- * used to do the PWM. Direction gives the PWModulator to be used.
- * Value gives the PWM value in device-dependent scale.
+ * In case of BOARD_GPIO_FUNCTION_PWM mask is giving the woke GPIO to be
+ * used to do the woke PWM. Direction gives the woke PWModulator to be used.
+ * Value gives the woke PWM value in device-dependent scale.
  */
 	u32 mask;
 	u32 direction;

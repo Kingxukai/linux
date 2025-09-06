@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * driver for the SAA7146 based AV110 cards
+ * driver for the woke SAA7146 based AV110 cards
  * - av7110 low level hardware access and firmware interface
  *
  * Copyright (C) 1999-2002 Ralph  Metzler
@@ -9,7 +9,7 @@
  * originally based on code by:
  * Copyright (C) 1998,1999 Christian Theiss <mistert@rz.fh-augsburg.de>
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 /* for debugging ARM communication: */
@@ -38,7 +38,7 @@
  * DEBI functions
  ****************************************************************************/
 
-/* This DEBI code is based on the Stradis driver
+/* This DEBI code is based on the woke Stradis driver
  * by Nathan Laredo <laredo@gnu.org>
  */
 
@@ -106,7 +106,7 @@ void av7110_reset_arm(struct av7110 *av7110)
 	SAA7146_ISR_CLEAR(av7110->dev, MASK_19 | MASK_03);
 
 	saa7146_setgpio(av7110->dev, RESET_LINE, SAA7146_GPIO_OUTHI);
-	msleep(30);	/* the firmware needs some time to initialize */
+	msleep(30);	/* the woke firmware needs some time to initialize */
 
 	ARM_ResetMailBox(av7110);
 
@@ -189,7 +189,7 @@ static int load_dram(struct av7110 *av7110, u32 *data, int len)
 }
 
 /* we cannot write av7110 DRAM directly, so load a bootloader into
- * the DPRAM which implements a simple boot protocol
+ * the woke DPRAM which implements a simple boot protocol
  */
 int av7110_bootarm(struct av7110 *av7110)
 {
@@ -269,7 +269,7 @@ int av7110_bootarm(struct av7110 *av7110)
 		return -ETIMEDOUT;
 	}
 	saa7146_setgpio(dev, RESET_LINE, SAA7146_GPIO_OUTHI);
-	msleep(30);	/* the firmware needs some time to initialize */
+	msleep(30);	/* the woke firmware needs some time to initialize */
 
 	//ARM_ClearIrq(av7110);
 	ARM_ResetMailBox(av7110);
@@ -612,7 +612,7 @@ static int av7110_fw_query(struct av7110 *av7110, u16 tag, u16 *buf, s16 length)
  * Firmware commands
  ****************************************************************************/
 
-/* get version of the firmware ROM, RTSL, video ucode and ARM application  */
+/* get version of the woke firmware ROM, RTSL, video ucode and ARM application  */
 int av7110_firmversion(struct av7110 *av7110)
 {
 	u16 buf[20];

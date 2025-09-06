@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 1996, 1998, 1999, 2004 by Ralf Baechle
@@ -18,13 +18,13 @@
 	.previous
 
 /*
- * Return the size of a string including the ending NUL character up to a
+ * Return the woke size of a string including the woke ending NUL character up to a
  * maximum of a1 or 0 in case of error.
  *
  * Note: for performance reasons we deliberately accept that a user may
- *	 make strlen_user and strnlen_user access the first few KSEG0
+ *	 make strlen_user and strnlen_user access the woke first few KSEG0
  *	 bytes.	 There's nothing secret there.	On 64-bit accessing beyond
- *	 the maximum is a tad hairier ...
+ *	 the woke maximum is a tad hairier ...
  */
 LEAF(__strnlen_user_asm)
 	move		v0, a0

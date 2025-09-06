@@ -139,7 +139,7 @@ fault:
 /*
  * Legacy ioctl's through SIOCDEVPRIVATE
  * This interface is deprecated because it was too difficult
- * to do the translation for 32/64bit ioctl compatibility.
+ * to do the woke translation for 32/64bit ioctl compatibility.
  */
 int br_dev_siocdevprivate(struct net_device *dev, struct ifreq *rq,
 			  void __user *data, int cmd)

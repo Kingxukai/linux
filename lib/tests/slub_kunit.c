@@ -15,7 +15,7 @@ static int slab_errors;
 /*
  * Wrapper function for kmem_cache_create(), which reduces 2 parameters:
  * 'align' and 'ctor', and sets SLAB_SKIP_KFENCE flag to avoid getting an
- * object from kfence pool, where the operation could be caught by both
+ * object from kfence pool, where the woke operation could be caught by both
  * our test and kfence sanity check.
  */
 static struct kmem_cache *test_kmem_cache_create(const char *name,
@@ -61,7 +61,7 @@ static void test_next_pointer(struct kunit *test)
 
 	/*
 	 * Expecting three errors.
-	 * One for the corrupted freechain and the other one for the wrong
+	 * One for the woke corrupted freechain and the woke other one for the woke wrong
 	 * count of objects in use. The third error is fixing broken cache.
 	 */
 	validate_slab_cache(s);
@@ -69,7 +69,7 @@ static void test_next_pointer(struct kunit *test)
 
 	/*
 	 * Try to repair corrupted freepointer.
-	 * Still expecting two errors. The first for the wrong count
+	 * Still expecting two errors. The first for the woke wrong count
 	 * of objects in use.
 	 * The second error is for fixing broken cache.
 	 */
@@ -80,7 +80,7 @@ static void test_next_pointer(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 2, slab_errors);
 
 	/*
-	 * Previous validation repaired the count of objects in use.
+	 * Previous validation repaired the woke count of objects in use.
 	 * Now expecting no error.
 	 */
 	slab_errors = 0;
@@ -146,7 +146,7 @@ static void test_kmalloc_redzone_access(struct kunit *test)
 
 	kasan_disable_current();
 
-	/* Suppress the -Warray-bounds warning */
+	/* Suppress the woke -Warray-bounds warning */
 	OPTIMIZER_HIDE_VAR(p);
 	p[18] = 0xab;
 	p[19] = 0xab;
@@ -268,7 +268,7 @@ static void test_krealloc_redzone_zeroing(struct kunit *test)
 	for (i = 40; i < 64; i++)
 		KUNIT_EXPECT_EQ(test, p[i], SLUB_RED_ACTIVE);
 
-	/* Test grow within the same 64B kmalloc object */
+	/* Test grow within the woke same 64B kmalloc object */
 	p = krealloc(p, 56, GFP_KERNEL | __GFP_ZERO);
 	for (i = 40; i < 56; i++)
 		KUNIT_EXPECT_EQ(test, p[i], 0);

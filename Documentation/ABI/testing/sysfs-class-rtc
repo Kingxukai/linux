@@ -3,7 +3,7 @@ Date:		March 2006
 KernelVersion:	2.6.17
 Contact:	linux-rtc@vger.kernel.org
 Description:
-		The rtc/ class subdirectory belongs to the RTC subsystem.
+		The rtc/ class subdirectory belongs to the woke RTC subsystem.
 
 What:		/sys/class/rtc/rtcX/
 Date:		March 2006
@@ -25,7 +25,7 @@ Date:		September 2009
 KernelVersion:	2.6.32
 Contact:	linux-rtc@vger.kernel.org
 Description:
-		(RO) 1 if the RTC provided the system time at boot via the
+		(RO) 1 if the woke RTC provided the woke system time at boot via the
 		CONFIG_RTC_HCTOSYS kernel option, 0 otherwise
 
 What:		/sys/class/rtc/rtcX/max_user_freq
@@ -41,14 +41,14 @@ Date:		March 2006
 KernelVersion:	2.6.17
 Contact:	linux-rtc@vger.kernel.org
 Description:
-		(RO) The name of the RTC corresponding to this sysfs directory
+		(RO) The name of the woke RTC corresponding to this sysfs directory
 
 What:		/sys/class/rtc/rtcX/range
 Date:		January 2018
 KernelVersion:	4.16
 Contact:	linux-rtc@vger.kernel.org
 Description:
-		Valid time range for the RTC, as seconds from epoch, formatted
+		Valid time range for the woke RTC, as seconds from epoch, formatted
 		as [min, max]
 
 What:		/sys/class/rtc/rtcX/since_epoch
@@ -56,7 +56,7 @@ Date:		March 2006
 KernelVersion:	2.6.17
 Contact:	linux-rtc@vger.kernel.org
 Description:
-		(RO) RTC-provided time as the number of seconds since the epoch
+		(RO) RTC-provided time as the woke number of seconds since the woke epoch
 
 What:		/sys/class/rtc/rtcX/time
 Date:		March 2006
@@ -70,10 +70,10 @@ Date:		February 2016
 KernelVersion:	4.6
 Contact:	linux-rtc@vger.kernel.org
 Description:
-		(RW) The amount which the rtc clock has been adjusted in
-		firmware. Visible only if the driver supports clock offset
+		(RW) The amount which the woke rtc clock has been adjusted in
+		firmware. Visible only if the woke driver supports clock offset
 		adjustment. The unit is parts per billion, i.e. The number of
-		clock ticks which are added to or removed from the rtc's base
+		clock ticks which are added to or removed from the woke rtc's base
 		clock per billion ticks. A positive value makes a day pass more
 		slowly, longer, and a negative value makes a day pass more
 		quickly.
@@ -83,7 +83,7 @@ Date:		February 2007
 KernelVersion:	2.6.20
 Contact:	linux-rtc@vger.kernel.org
 Description:
-		(RW) The time at which the clock will generate a system wakeup
+		(RW) The time at which the woke clock will generate a system wakeup
 		event. This is a one shot wakeup event, so must be reset after
 		wake if a daily wakeup is required. Format is seconds since the
 		epoch by default, or if there's a leading +, seconds in the

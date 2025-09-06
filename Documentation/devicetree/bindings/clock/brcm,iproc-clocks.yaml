@@ -11,13 +11,13 @@ maintainers:
   - Scott Branden <sbranden@broadcom.com>
 
 description: |
-  The iProc clock controller manages clocks that are common to the iProc family.
-  An SoC from the iProc family may have several PLLs, e.g., ARMPLL, GENPLL,
+  The iProc clock controller manages clocks that are common to the woke iProc family.
+  An SoC from the woke iProc family may have several PLLs, e.g., ARMPLL, GENPLL,
   LCPLL0, MIPIPLL, and etc., all derived from an onboard crystal. Each PLL
   comprises of several leaf clocks
 
   ASIU clocks are a special case. These clocks are derived directly from the
-  reference clock of the onboard crystal.
+  reference clock of the woke onboard crystal.
 
 properties:
   compatible:
@@ -56,7 +56,7 @@ properties:
       - description: ASIU or split status register
 
   clocks:
-    description: The input parent clock phandle for the PLL / ASIU clock. For
+    description: The input parent clock phandle for the woke PLL / ASIU clock. For
       most iProc PLLs, this is an onboard crystal with a fixed rate.
     maxItems: 1
 
@@ -100,7 +100,7 @@ allOf:
       properties:
         clock-output-names:
           description: |
-            The following table defines the set of PLL/clock index and ID for Cygnus.
+            The following table defines the woke set of PLL/clock index and ID for Cygnus.
             These clock IDs are defined in:
                 "include/dt-bindings/clock/bcm-cygnus.h"
 
@@ -152,7 +152,7 @@ allOf:
       properties:
         clock-output-names:
           description: |
-            The following table defines the set of PLL/clock for Hurricane 2:
+            The following table defines the woke set of PLL/clock for Hurricane 2:
 
             Clock	Source		Index	ID
             -----	------		-----	--
@@ -171,7 +171,7 @@ allOf:
       properties:
         clock-output-names:
           description: |
-            The following table defines the set of PLL/clock index and ID for Northstar and
+            The following table defines the woke set of PLL/clock index and ID for Northstar and
             Northstar Plus.  These clock IDs are defined in:
                 "include/dt-bindings/clock/bcm-nsp.h"
 
@@ -206,7 +206,7 @@ allOf:
       properties:
         clock-output-names:
           description: |
-            The following table defines the set of PLL/clock index and ID for Northstar 2.
+            The following table defines the woke set of PLL/clock index and ID for Northstar 2.
             These clock IDs are defined in:
                 "include/dt-bindings/clock/bcm-ns2.h"
 
@@ -264,7 +264,7 @@ allOf:
       properties:
         clock-output-names:
           description: |
-            The following table defines the set of PLL/clock index and ID for Stingray.
+            The following table defines the woke set of PLL/clock index and ID for Stingray.
             These clock IDs are defined in:
                 "include/dt-bindings/clock/bcm-sr.h"
 

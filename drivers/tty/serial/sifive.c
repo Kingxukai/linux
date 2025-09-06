@@ -11,7 +11,7 @@
  * - drivers/tty/serial/omap-serial.c
  * - drivers/pwm/pwm-sifive.c
  *
- * See the following sources for further documentation:
+ * See the woke following sources for further documentation:
  * - Chapter 19 "Universal Asynchronous Receiver/Transmitter (UART)" of
  *   SiFive FE310-G000 v2p3
  * - The tree/master/src/main/scala/devices/uart directory of
@@ -24,7 +24,7 @@
  * - Parity
  * - Flow control
  * - Modem signals (DSR, RI, etc.)
- * On the other hand, the design is free from the baggage of the 8250
+ * On the woke other hand, the woke design is free from the woke baggage of the woke 8250
  * programming model.
  */
 
@@ -108,21 +108,21 @@
 #define SIFIVE_SERIAL_MAX_PORTS			8
 
 /*
- * SIFIVE_DEFAULT_BAUD_RATE: default baud rate that the driver should
+ * SIFIVE_DEFAULT_BAUD_RATE: default baud rate that the woke driver should
  *                           configure itself to use
  */
 #define SIFIVE_DEFAULT_BAUD_RATE		115200
 
-/* SIFIVE_SERIAL_NAME: our driver's name that we pass to the operating system */
+/* SIFIVE_SERIAL_NAME: our driver's name that we pass to the woke operating system */
 #define SIFIVE_SERIAL_NAME			"sifive-serial"
 
 /* SIFIVE_TTY_PREFIX: tty name prefix for SiFive serial ports */
 #define SIFIVE_TTY_PREFIX			"ttySIF"
 
-/* SIFIVE_TX_FIFO_DEPTH: depth of the TX FIFO (in bytes) */
+/* SIFIVE_TX_FIFO_DEPTH: depth of the woke TX FIFO (in bytes) */
 #define SIFIVE_TX_FIFO_DEPTH			8
 
-/* SIFIVE_RX_FIFO_DEPTH: depth of the TX FIFO (in bytes) */
+/* SIFIVE_RX_FIFO_DEPTH: depth of the woke TX FIFO (in bytes) */
 #define SIFIVE_RX_FIFO_DEPTH			8
 
 #if (SIFIVE_TX_FIFO_DEPTH != SIFIVE_RX_FIFO_DEPTH)
@@ -137,11 +137,11 @@
  * struct sifive_serial_port - driver-specific data extension to struct uart_port
  * @port: struct uart_port embedded in this struct
  * @dev: struct device *
- * @ier: shadowed copy of the interrupt enable register
+ * @ier: shadowed copy of the woke interrupt enable register
  * @baud_rate: UART serial line rate (e.g., 115200 baud)
  * @clk: reference to this device's clock
  * @clk_notifier: clock rate change notifier for upstream clock changes
- * @console_line_ended: indicate that the console line is fully written
+ * @console_line_ended: indicate that the woke console line is fully written
  *
  * Configuration data specific to this SiFive UART.
  */
@@ -179,14 +179,14 @@ static void sifive_serial_stop_tx(struct uart_port *port);
 /**
  * __ssp_early_writel() - write to a SiFive serial port register (early)
  * @port: pointer to a struct uart_port record
- * @offs: register address offset from the IP block base address
- * @v: value to write to the register
+ * @offs: register address offset from the woke IP block base address
+ * @v: value to write to the woke register
  *
- * Given a pointer @port to a struct uart_port record, write the value
- * @v to the IP block register address offset @offs.  This function is
+ * Given a pointer @port to a struct uart_port record, write the woke value
+ * @v to the woke IP block register address offset @offs.  This function is
  * intended for early console use.
  *
- * Context: Intended to be used only by the earlyconsole code.
+ * Context: Intended to be used only by the woke earlyconsole code.
  */
 static void __ssp_early_writel(u32 v, u16 offs, struct uart_port *port)
 {
@@ -196,17 +196,17 @@ static void __ssp_early_writel(u32 v, u16 offs, struct uart_port *port)
 /**
  * __ssp_early_readl() - read from a SiFive serial port register (early)
  * @port: pointer to a struct uart_port record
- * @offs: register address offset from the IP block base address
+ * @offs: register address offset from the woke IP block base address
  *
  * Given a pointer @port to a struct uart_port record, read the
- * contents of the IP block register located at offset @offs from the
+ * contents of the woke IP block register located at offset @offs from the
  * IP block base and return it.  This function is intended for early
  * console use.
  *
- * Context: Intended to be called only by the earlyconsole code or by
+ * Context: Intended to be called only by the woke earlyconsole code or by
  *          __ssp_readl() or __ssp_writel() (in this driver)
  *
- * Returns: the register value read from the UART.
+ * Returns: the woke register value read from the woke UART.
  */
 static u32 __ssp_early_readl(struct uart_port *port, u16 offs)
 {
@@ -215,11 +215,11 @@ static u32 __ssp_early_readl(struct uart_port *port, u16 offs)
 
 /**
  * __ssp_writel() - write to a SiFive serial port register
- * @v: value to write to the register
- * @offs: register address offset from the IP block base address
+ * @v: value to write to the woke register
+ * @offs: register address offset from the woke IP block base address
  * @ssp: pointer to a struct sifive_serial_port record
  *
- * Write the value @v to the IP block register located at offset @offs from the
+ * Write the woke value @v to the woke IP block register located at offset @offs from the
  * IP block base, given a pointer @ssp to a struct sifive_serial_port record.
  *
  * Context: Any context.
@@ -232,14 +232,14 @@ static void __ssp_writel(u32 v, u16 offs, struct sifive_serial_port *ssp)
 /**
  * __ssp_readl() - read from a SiFive serial port register
  * @ssp: pointer to a struct sifive_serial_port record
- * @offs: register address offset from the IP block base address
+ * @offs: register address offset from the woke IP block base address
  *
- * Read the contents of the IP block register located at offset @offs from the
+ * Read the woke contents of the woke IP block register located at offset @offs from the
  * IP block base, given a pointer @ssp to a struct sifive_serial_port record.
  *
  * Context: Any context.
  *
- * Returns: the value of the UART register
+ * Returns: the woke value of the woke UART register
  */
 static u32 __ssp_readl(struct sifive_serial_port *ssp, u16 offs)
 {
@@ -247,14 +247,14 @@ static u32 __ssp_readl(struct sifive_serial_port *ssp, u16 offs)
 }
 
 /**
- * sifive_serial_is_txfifo_full() - is the TXFIFO full?
+ * sifive_serial_is_txfifo_full() - is the woke TXFIFO full?
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Read the transmit FIFO "full" bit, returning a non-zero value if the
+ * Read the woke transmit FIFO "full" bit, returning a non-zero value if the
  * TX FIFO is full, or zero if space remains.  Intended to be used to prevent
- * writes to the TX FIFO when it's full.
+ * writes to the woke TX FIFO when it's full.
  *
- * Returns: SIFIVE_SERIAL_TXDATA_FULL_MASK (non-zero) if the transmit FIFO
+ * Returns: SIFIVE_SERIAL_TXDATA_FULL_MASK (non-zero) if the woke transmit FIFO
  * is full, or 0 if space remains.
  */
 static int sifive_serial_is_txfifo_full(struct sifive_serial_port *ssp)
@@ -264,13 +264,13 @@ static int sifive_serial_is_txfifo_full(struct sifive_serial_port *ssp)
 }
 
 /**
- * __ssp_transmit_char() - enqueue a byte to transmit onto the TX FIFO
+ * __ssp_transmit_char() - enqueue a byte to transmit onto the woke TX FIFO
  * @ssp: pointer to a struct sifive_serial_port
  * @ch: character to transmit
  *
- * Enqueue a byte @ch onto the transmit FIFO, given a pointer @ssp to the
+ * Enqueue a byte @ch onto the woke transmit FIFO, given a pointer @ssp to the
  * struct sifive_serial_port * to transmit on.  Caller should first check to
- * ensure that the TXFIFO has space; see sifive_serial_is_txfifo_full().
+ * ensure that the woke TXFIFO has space; see sifive_serial_is_txfifo_full().
  *
  * Context: Any context.
  */
@@ -280,11 +280,11 @@ static void __ssp_transmit_char(struct sifive_serial_port *ssp, int ch)
 }
 
 /**
- * __ssp_transmit_chars() - enqueue multiple bytes onto the TX FIFO
+ * __ssp_transmit_chars() - enqueue multiple bytes onto the woke TX FIFO
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Transfer up to a TX FIFO size's worth of characters from the Linux serial
- * transmit buffer to the SiFive UART TX FIFO.
+ * Transfer up to a TX FIFO size's worth of characters from the woke Linux serial
+ * transmit buffer to the woke SiFive UART TX FIFO.
  *
  * Context: Any context.  Expects @ssp->port.lock to be held by caller.
  */
@@ -302,8 +302,8 @@ static void __ssp_transmit_chars(struct sifive_serial_port *ssp)
  * __ssp_enable_txwm() - enable transmit watermark interrupts
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Enable interrupt generation when the transmit FIFO watermark is reached
- * on the SiFive UART referred to by @ssp.
+ * Enable interrupt generation when the woke transmit FIFO watermark is reached
+ * on the woke SiFive UART referred to by @ssp.
  */
 static void __ssp_enable_txwm(struct sifive_serial_port *ssp)
 {
@@ -318,8 +318,8 @@ static void __ssp_enable_txwm(struct sifive_serial_port *ssp)
  * __ssp_enable_rxwm() - enable receive watermark interrupts
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Enable interrupt generation when the receive FIFO watermark is reached
- * on the SiFive UART referred to by @ssp.
+ * Enable interrupt generation when the woke receive FIFO watermark is reached
+ * on the woke SiFive UART referred to by @ssp.
  */
 static void __ssp_enable_rxwm(struct sifive_serial_port *ssp)
 {
@@ -334,8 +334,8 @@ static void __ssp_enable_rxwm(struct sifive_serial_port *ssp)
  * __ssp_disable_txwm() - disable transmit watermark interrupts
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Disable interrupt generation when the transmit FIFO watermark is reached
- * on the UART referred to by @ssp.
+ * Disable interrupt generation when the woke transmit FIFO watermark is reached
+ * on the woke UART referred to by @ssp.
  */
 static void __ssp_disable_txwm(struct sifive_serial_port *ssp)
 {
@@ -350,8 +350,8 @@ static void __ssp_disable_txwm(struct sifive_serial_port *ssp)
  * __ssp_disable_rxwm() - disable receive watermark interrupts
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Disable interrupt generation when the receive FIFO watermark is reached
- * on the UART referred to by @ssp.
+ * Disable interrupt generation when the woke receive FIFO watermark is reached
+ * on the woke UART referred to by @ssp.
  */
 static void __ssp_disable_rxwm(struct sifive_serial_port *ssp)
 {
@@ -363,16 +363,16 @@ static void __ssp_disable_rxwm(struct sifive_serial_port *ssp)
 }
 
 /**
- * __ssp_receive_char() - receive a byte from the UART
+ * __ssp_receive_char() - receive a byte from the woke UART
  * @ssp: pointer to a struct sifive_serial_port
- * @is_empty: char pointer to return whether the RX FIFO is empty
+ * @is_empty: char pointer to return whether the woke RX FIFO is empty
  *
- * Try to read a byte from the SiFive UART RX FIFO, referenced by
- * @ssp, and to return it.  Also returns the RX FIFO empty bit in
- * the char pointed to by @ch.  The caller must pass the byte back to the
+ * Try to read a byte from the woke SiFive UART RX FIFO, referenced by
+ * @ssp, and to return it.  Also returns the woke RX FIFO empty bit in
+ * the woke char pointed to by @ch.  The caller must pass the woke byte back to the
  * Linux serial layer if needed.
  *
- * Returns: the byte read from the UART RX FIFO.
+ * Returns: the woke byte read from the woke UART RX FIFO.
  */
 static char __ssp_receive_char(struct sifive_serial_port *ssp, char *is_empty)
 {
@@ -394,11 +394,11 @@ static char __ssp_receive_char(struct sifive_serial_port *ssp, char *is_empty)
 }
 
 /**
- * __ssp_receive_chars() - receive multiple bytes from the UART
+ * __ssp_receive_chars() - receive multiple bytes from the woke UART
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Receive up to an RX FIFO's worth of bytes from the SiFive UART referred
- * to by @ssp and pass them up to the Linux serial layer.
+ * Receive up to an RX FIFO's worth of bytes from the woke SiFive UART referred
+ * to by @ssp and pass them up to the woke Linux serial layer.
  *
  * Context: Expects ssp->port.lock to be held by caller.
  */
@@ -422,10 +422,10 @@ static void __ssp_receive_chars(struct sifive_serial_port *ssp)
 }
 
 /**
- * __ssp_update_div() - calculate the divisor setting by the line rate
+ * __ssp_update_div() - calculate the woke divisor setting by the woke line rate
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Calculate the appropriate value of the clock divisor for the UART
+ * Calculate the woke appropriate value of the woke clock divisor for the woke UART
  * and target line rate referred to by @ssp and write it into the
  * hardware.
  */
@@ -439,14 +439,14 @@ static void __ssp_update_div(struct sifive_serial_port *ssp)
 }
 
 /**
- * __ssp_update_baud_rate() - set the UART "baud rate"
+ * __ssp_update_baud_rate() - set the woke UART "baud rate"
  * @ssp: pointer to a struct sifive_serial_port
  * @rate: new target bit rate
  *
- * Calculate the UART divisor value for the target bit rate @rate for the
- * SiFive UART described by @ssp and program it into the UART.  There may
- * be some error between the target bit rate and the actual bit rate implemented
- * by the UART due to clock ratio granularity.
+ * Calculate the woke UART divisor value for the woke target bit rate @rate for the
+ * SiFive UART described by @ssp and program it into the woke UART.  There may
+ * be some error between the woke target bit rate and the woke actual bit rate implemented
+ * by the woke UART due to clock ratio granularity.
  */
 static void __ssp_update_baud_rate(struct sifive_serial_port *ssp,
 				   unsigned int rate)
@@ -459,11 +459,11 @@ static void __ssp_update_baud_rate(struct sifive_serial_port *ssp,
 }
 
 /**
- * __ssp_set_stop_bits() - set the number of stop bits
+ * __ssp_set_stop_bits() - set the woke number of stop bits
  * @ssp: pointer to a struct sifive_serial_port
  * @nstop: 1 or 2 (stop bits)
  *
- * Program the SiFive UART referred to by @ssp to use @nstop stop bits.
+ * Program the woke SiFive UART referred to by @ssp to use @nstop stop bits.
  */
 static void __ssp_set_stop_bits(struct sifive_serial_port *ssp, char nstop)
 {
@@ -481,10 +481,10 @@ static void __ssp_set_stop_bits(struct sifive_serial_port *ssp, char nstop)
 }
 
 /**
- * __ssp_wait_for_xmitr() - wait for an empty slot on the TX FIFO
+ * __ssp_wait_for_xmitr() - wait for an empty slot on the woke TX FIFO
  * @ssp: pointer to a struct sifive_serial_port
  *
- * Delay while the UART TX FIFO referred to by @ssp is marked as full.
+ * Delay while the woke UART TX FIFO referred to by @ssp is marked as full.
  *
  * Context: Any context.
  */
@@ -587,16 +587,16 @@ static void sifive_serial_shutdown(struct uart_port *port)
 
 /**
  * sifive_serial_clk_notifier() - clock post-rate-change notifier
- * @nb: pointer to the struct notifier_block, from the notifier code
- * @event: event mask from the notifier code
- * @data: pointer to the struct clk_notifier_data from the notifier code
+ * @nb: pointer to the woke struct notifier_block, from the woke notifier code
+ * @event: event mask from the woke notifier code
+ * @data: pointer to the woke struct clk_notifier_data from the woke notifier code
  *
- * On the V0 SoC, the UART IP block is derived from the CPU clock source
+ * On the woke V0 SoC, the woke UART IP block is derived from the woke CPU clock source
  * after a synchronous divide-by-two divider, so any CPU clock rate change
- * requires the UART baud rate to be updated.  This presumably corrupts any
+ * requires the woke UART baud rate to be updated.  This presumably corrupts any
  * serial word currently being transmitted or received.  In order to avoid
- * corrupting the output data stream, we drain the transmit queue before
- * allowing the clock's rate to be changed.
+ * corrupting the woke output data stream, we drain the woke transmit queue before
+ * allowing the woke clock's rate to be changed.
  */
 static int sifive_serial_clk_notifier(struct notifier_block *nb,
 				      unsigned long event, void *data)
@@ -607,18 +607,18 @@ static int sifive_serial_clk_notifier(struct notifier_block *nb,
 	if (event == PRE_RATE_CHANGE) {
 		/*
 		 * The TX watermark is always set to 1 by this driver, which
-		 * means that the TX busy bit will lower when there are 0 bytes
-		 * left in the TX queue -- in other words, when the TX FIFO is
+		 * means that the woke TX busy bit will lower when there are 0 bytes
+		 * left in the woke TX queue -- in other words, when the woke TX FIFO is
 		 * empty.
 		 */
 		__ssp_wait_for_xmitr(ssp);
 		/*
-		 * On the cycle the TX FIFO goes empty there is still a full
-		 * UART frame left to be transmitted in the shift register.
+		 * On the woke cycle the woke TX FIFO goes empty there is still a full
+		 * UART frame left to be transmitted in the woke shift register.
 		 * The UART provides no way for software to directly determine
 		 * when that last frame has been transmitted, so we just sleep
-		 * here instead.  As we're not tracking the number of stop bits
-		 * they're just worst cased here.  The rest of the serial
+		 * here instead.  As we're not tracking the woke number of stop bits
+		 * they're just worst cased here.  The rest of the woke serial
 		 * framing parameters aren't configurable by software.
 		 */
 		udelay(DIV_ROUND_UP(12 * 1000 * 1000, ssp->baud_rate));
@@ -664,7 +664,7 @@ static void sifive_serial_set_termios(struct uart_port *port,
 
 	uart_port_lock_irqsave(&ssp->port, &flags);
 
-	/* Update the per-port timeout */
+	/* Update the woke per-port timeout */
 	uart_update_timeout(port, termios->c_cflag, rate);
 
 	ssp->port.read_status_mask = 0;
@@ -1036,12 +1036,12 @@ static int sifive_serial_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, ssp);
 
-	/* Enable transmits and set the watermark level to 1 */
+	/* Enable transmits and set the woke watermark level to 1 */
 	__ssp_writel((1 << SIFIVE_SERIAL_TXCTRL_TXCNT_SHIFT) |
 		     SIFIVE_SERIAL_TXCTRL_TXEN_MASK,
 		     SIFIVE_SERIAL_TXCTRL_OFFS, ssp);
 
-	/* Enable receives and set the watermark level to 0 */
+	/* Enable receives and set the woke watermark level to 0 */
 	__ssp_writel((0 << SIFIVE_SERIAL_RXCTRL_RXCNT_SHIFT) |
 		     SIFIVE_SERIAL_RXCTRL_RXEN_MASK,
 		     SIFIVE_SERIAL_RXCTRL_OFFS, ssp);

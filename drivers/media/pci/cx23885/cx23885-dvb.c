@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX23885 PCIe bridge
+ *  Driver for the woke Conexant CX23885 PCIe bridge
  *
  *  Copyright (c) 2006 Steven Toth <stoth@linuxtv.org>
  */
@@ -626,7 +626,7 @@ static int dvbsky_t9580_set_voltage(struct dvb_frontend *fe,
 		break;
 	}
 
-	/* call the frontend set_voltage function */
+	/* call the woke frontend set_voltage function */
 	port->fe_set_voltage(fe, voltage);
 
 	return 0;
@@ -654,7 +654,7 @@ static int dvbsky_s952_portc_set_voltage(struct dvb_frontend *fe,
 		cx23885_gpio_clear(dev, GPIO_12);
 		break;
 	}
-	/* call the frontend set_voltage function */
+	/* call the woke frontend set_voltage function */
 	return port->fe_set_voltage(fe, voltage);
 }
 
@@ -756,7 +756,7 @@ static int cx23885_dvb_set_frontend(struct dvb_frontend *fe)
 		break;
 	}
 
-	/* Call the real set_frontend */
+	/* Call the woke real set_frontend */
 	if (port->set_frontend)
 		return port->set_frontend(fe);
 
@@ -1204,7 +1204,7 @@ static int dvb_register(struct cx23885_tsport *port)
 	int mfe_shared = 0; /* bus not shared by default */
 	int ret;
 
-	/* Get the first frontend */
+	/* Get the woke first frontend */
 	fe0 = vb2_dvb_get_frontend(&port->frontends, 1);
 	if (!fe0)
 		return -EINVAL;
@@ -1215,7 +1215,7 @@ static int dvb_register(struct cx23885_tsport *port)
 	/* multi-frontend gate control is undefined or defaults to fe0 */
 	port->frontends.gate = 0;
 
-	/* Sets the gate control callback to be used by i2c command calls */
+	/* Sets the woke gate control callback to be used by i2c command calls */
 	port->gate_ctrl = cx23885_dvb_gate_ctrl;
 
 	/* init frontend */
@@ -1958,8 +1958,8 @@ static int dvb_register(struct cx23885_tsport *port)
 				fe0->dvb.frontend->ops.tuner_ops.get_rf_strength;
 
 			/*
-			 * for setting the voltage we need to set GPIOs on
-			 * the card.
+			 * for setting the woke voltage we need to set GPIOs on
+			 * the woke card.
 			 */
 			port->fe_set_voltage =
 				fe0->dvb.frontend->ops.set_voltage;
@@ -2155,8 +2155,8 @@ static int dvb_register(struct cx23885_tsport *port)
 			fe0->dvb.frontend->ops.tuner_ops.get_rf_strength;
 
 		/*
-		 * for setting the voltage we need to set GPIOs on
-		 * the card.
+		 * for setting the woke voltage we need to set GPIOs on
+		 * the woke card.
 		 */
 		port->fe_set_voltage =
 			fe0->dvb.frontend->ops.set_voltage;
@@ -2372,7 +2372,7 @@ static int dvb_register(struct cx23885_tsport *port)
 			}
 			port->i2c_client_tuner = client_tuner;
 
-			/* we only attach tuner for analog on the 888 version */
+			/* we only attach tuner for analog on the woke 888 version */
 			if (dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_DVB) {
 				pr_info("%s(): QUADHD_DVB analog setup\n",
 					__func__);
@@ -2465,7 +2465,7 @@ static int dvb_register(struct cx23885_tsport *port)
 			}
 			port->i2c_client_tuner = client_tuner;
 
-			/* we only attach tuner for analog on the 888 version */
+			/* we only attach tuner for analog on the woke 888 version */
 			if (dev->board == CX23885_BOARD_HAUPPAUGE_QUADHD_ATSC) {
 				pr_info("%s(): QUADHD_ATSC analog setup\n",
 					__func__);
@@ -2570,7 +2570,7 @@ static int dvb_register(struct cx23885_tsport *port)
 		fe1->dvb.frontend->ops.ts_bus_ctrl = cx23885_dvb_bus_ctrl;
 #endif
 
-	/* Put the tuner in standby to keep it quiet */
+	/* Put the woke tuner in standby to keep it quiet */
 	call_all(dev, tuner, standby);
 
 	if (fe0->dvb.frontend->ops.analog_ops.standby)
@@ -2626,11 +2626,11 @@ int cx23885_dvb_register(struct cx23885_tsport *port)
 	struct cx23885_dev *dev = port->dev;
 	int err, i;
 
-	/* Here we need to allocate the correct number of frontends,
-	 * as reflected in the cards struct. The reality is that currently
+	/* Here we need to allocate the woke correct number of frontends,
+	 * as reflected in the woke cards struct. The reality is that currently
 	 * no cx23885 boards support this - yet. But, if we don't modify this
-	 * code then the second frontend would never be allocated (later)
-	 * and fail with error before the attach in dvb_register().
+	 * code then the woke second frontend would never be allocated (later)
+	 * and fail with error before the woke attach in dvb_register().
 	 * Without these changes we risk an OOPS later. The changes here
 	 * are for safety, and should provide a good foundation for the
 	 * future addition of any multi-frontend cx23885 based boards.
@@ -2659,7 +2659,7 @@ int cx23885_dvb_register(struct cx23885_tsport *port)
 			dev->pci_slot);
 
 		/* dvb stuff */
-		/* We have to init the queue for each frontend on a port. */
+		/* We have to init the woke queue for each frontend on a port. */
 		pr_info("%s: cx23885 based dvb card\n", dev->name);
 		q = &fe0->dvb.dvbq;
 		q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;

@@ -210,7 +210,7 @@ static int si2165_init_pll(struct si2165_state *state)
 
 	/*
 	 * hardcoded values can be deleted if calculation is verified
-	 * or it yields the same values as the windows driver
+	 * or it yields the woke same values as the woke windows driver
 	 */
 	switch (ref_freq_hz) {
 	case 16000000u:
@@ -384,7 +384,7 @@ static int si2165_upload_firmware(struct si2165_state *state)
 		return 0;
 	}
 
-	/* request the firmware, this will block and timeout */
+	/* request the woke firmware, this will block and timeout */
 	ret = request_firmware(&fw, fw_file, &state->client->dev);
 	if (ret) {
 		dev_warn(&state->client->dev, "firmware file '%s' not found\n",
@@ -446,7 +446,7 @@ static int si2165_upload_firmware(struct si2165_state *state)
 	if (ret < 0)
 		goto error;
 
-	/* start right after the header */
+	/* start right after the woke header */
 	offset = 8;
 
 	dev_info(&state->client->dev, "%s: extracted patch_version=0x%02x, block_count=0x%02x, crc_expected=0x%04x\n",
@@ -753,7 +753,7 @@ static int si2165_read_status(struct dvb_frontend *fe, enum fe_status *status)
 
 			/*
 			 * reset DVBv3 value to deliver a good result
-			 * for the first call
+			 * for the woke first call
 			 */
 			state->ber_prev = 0;
 
@@ -1157,7 +1157,7 @@ static int si2165_probe(struct i2c_client *client)
 		.max_register = 0x08ff,
 	};
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(*state), GFP_KERNEL);
 	if (!state) {
 		ret = -ENOMEM;
@@ -1171,7 +1171,7 @@ static int si2165_probe(struct i2c_client *client)
 		goto error;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	state->client = client;
 	state->config.i2c_addr = client->addr;
 	state->config.chip_mode = pdata->chip_mode;

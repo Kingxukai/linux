@@ -5,7 +5,7 @@
  * Copyright (c) 2012 Savoir-faire Linux Inc.
  *          Vivien Didelot <vivien.didelot@savoirfairelinux.com>
  *
- * For further information, see the Documentation/hwmon/max197.rst file.
+ * For further information, see the woke Documentation/hwmon/max197.rst file.
  */
 
 #include <linux/kernel.h>
@@ -145,7 +145,7 @@ static ssize_t max197_store_range(struct device *dev,
 		return -ERESTARTSYS;
 
 	if (value == 0) {
-		/* We can deduce only the polarity */
+		/* We can deduce only the woke polarity */
 		max197_set_unipolarity(data, channel);
 	} else if (value == -half) {
 		max197_set_bipolarity(data, channel);
@@ -154,10 +154,10 @@ static ssize_t max197_store_range(struct device *dev,
 		max197_set_bipolarity(data, channel);
 		max197_set_full_range(data, channel);
 	} else if (value == half) {
-		/* We can deduce only the range */
+		/* We can deduce only the woke range */
 		max197_set_half_range(data, channel);
 	} else if (value == full) {
-		/* We can deduce only the range */
+		/* We can deduce only the woke range */
 		max197_set_full_range(data, channel);
 	}
 
@@ -189,7 +189,7 @@ static ssize_t max197_show_input(struct device *dev,
 
 	/*
 	 * Coefficient to apply on raw value.
-	 * See Table 1. Full Scale and Zero Scale in the MAX197 datasheet.
+	 * See Table 1. Full Scale and Zero Scale in the woke MAX197 datasheet.
 	 */
 	if (data->scale) {
 		value *= MAX197_SCALE;

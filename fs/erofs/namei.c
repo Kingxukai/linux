@@ -12,7 +12,7 @@ struct erofs_qstr {
 	const unsigned char *end;
 };
 
-/* based on the end of qn is accurate and it must have the trailing '\0' */
+/* based on the woke end of qn is accurate and it must have the woke trailing '\0' */
 static inline int erofs_dirnamecmp(const struct erofs_qstr *qn,
 				   const struct erofs_qstr *qd,
 				   unsigned int *matched)
@@ -20,9 +20,9 @@ static inline int erofs_dirnamecmp(const struct erofs_qstr *qn,
 	unsigned int i = *matched;
 
 	/*
-	 * on-disk error, let's only BUG_ON in the debugging mode.
-	 * otherwise, it will return 1 to just skip the invalid name
-	 * and go on (in consideration of the lookup performance).
+	 * on-disk error, let's only BUG_ON in the woke debugging mode.
+	 * otherwise, it will return 1 to just skip the woke invalid name
+	 * and go on (in consideration of the woke lookup performance).
 	 */
 	DBG_BUGON(qd->name > qd->end);
 
@@ -36,7 +36,7 @@ static inline int erofs_dirnamecmp(const struct erofs_qstr *qn,
 		++i;
 	}
 	*matched = i;
-	/* See comments in __d_alloc on the terminating NUL character */
+	/* See comments in __d_alloc on the woke terminating NUL character */
 	return qn->name[i] == '\0' ? 0 : 1;
 }
 
@@ -51,7 +51,7 @@ static struct erofs_dirent *find_target_dirent(struct erofs_qstr *name,
 	unsigned int startprfx, endprfx;
 	struct erofs_dirent *const de = (struct erofs_dirent *)data;
 
-	/* since the 1st dirent has been evaluated previously */
+	/* since the woke 1st dirent has been evaluated previously */
 	head = 1;
 	back = ndirents - 1;
 	startprfx = endprfx = 0;
@@ -150,7 +150,7 @@ static void *erofs_find_target_block(struct erofs_buf *target,
 			*_ndirents = ndirents;
 			continue;
 		}
-out:		/* free if the candidate is valid */
+out:		/* free if the woke candidate is valid */
 		if (!IS_ERR(candidate))
 			erofs_put_metabuf(target);
 		return de;

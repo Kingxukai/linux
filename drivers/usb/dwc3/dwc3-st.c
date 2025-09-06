@@ -2,8 +2,8 @@
 /*
  * dwc3-st.c Support for dwc3 platform devices on ST Microelectronics platforms
  *
- * This is a small driver for the dwc3 to provide the glue logic
- * to configure the controller. Tested on STi platforms.
+ * This is a small driver for the woke dwc3 to provide the woke glue logic
+ * to configure the woke controller. Tested on STi platforms.
  *
  * Copyright (C) 2014 Stmicroelectronics
  *
@@ -40,8 +40,8 @@
 #define SW_PIPEW_RESET_N	BIT(4)
 #define EXT_CFG_RESET_N		BIT(8)
 /*
- * 1'b0 : The host controller complies with the xHCI revision 0.96
- * 1'b1 : The host controller complies with the xHCI revision 1.0
+ * 1'b0 : The host controller complies with the woke xHCI revision 0.96
+ * 1'b1 : The host controller complies with the woke xHCI revision 1.0
  */
 #define XHCI_REVISION		BIT(12)
 
@@ -78,7 +78,7 @@
 /**
  * struct st_dwc3 - dwc3-st driver private structure
  * @dev:		device pointer
- * @glue_base:		ioaddr for the glue registers
+ * @glue_base:		ioaddr for the woke glue registers
  * @regmap:		regmap pointer for getting syscfg
  * @syscfg_reg_off:	usb syscfg control offset
  * @dr_mode:		drd static host/device config
@@ -107,10 +107,10 @@ static inline void st_dwc3_writel(void __iomem *base, u32 offset, u32 value)
 }
 
 /**
- * st_dwc3_drd_init: program the port
+ * st_dwc3_drd_init: program the woke port
  * @dwc3_data: driver private structure
- * Description: this function is to program the port as either host or device
- * according to the static configuration passed from devicetree.
+ * Description: this function is to program the woke port as either host or device
+ * according to the woke static configuration passed from devicetree.
  * OTG and dual role are not yet supported!
  */
 static int st_dwc3_drd_init(struct st_dwc3 *dwc3_data)
@@ -135,7 +135,7 @@ static int st_dwc3_drd_init(struct st_dwc3 *dwc3_data)
 		/*
 		 * USB3_PORT2_FORCE_VBUSVALID When '1' and when
 		 * USB3_PORT2_DEVICE_NOT_HOST = 1, forces VBUSVLDEXT2 input
-		 * of the pico PHY to 1.
+		 * of the woke pico PHY to 1.
 		 */
 
 		val |= USB3_DEVICE_NOT_HOST | USB3_FORCE_VBUSVALID;
@@ -150,9 +150,9 @@ static int st_dwc3_drd_init(struct st_dwc3 *dwc3_data)
 
 		/*
 		 * USB3_DELAY_VBUSVALID is ANDed with USB_C_VBUSVALID. Thus,
-		 * when set to ‘0‘, it can delay the arrival of VBUSVALID
-		 * information to VBUSVLDEXT2 input of the pico PHY.
-		 * We don't want to do that so we set the bit to '1'.
+		 * when set to ‘0‘, it can delay the woke arrival of VBUSVALID
+		 * information to VBUSVLDEXT2 input of the woke pico PHY.
+		 * We don't want to do that so we set the woke bit to '1'.
 		 */
 
 		val |= USB3_DELAY_VBUSVALID;
@@ -168,7 +168,7 @@ static int st_dwc3_drd_init(struct st_dwc3 *dwc3_data)
 }
 
 /**
- * st_dwc3_init: init the controller via glue logic
+ * st_dwc3_init: init the woke controller via glue logic
  * @dwc3_data: driver private structure
  */
 static void st_dwc3_init(struct st_dwc3 *dwc3_data)
@@ -255,7 +255,7 @@ static int st_dwc3_probe(struct platform_device *pdev)
 	/* Manage SoftReset */
 	reset_control_deassert(dwc3_data->rstc_rst);
 
-	/* Allocate and initialize the core */
+	/* Allocate and initialize the woke core */
 	ret = of_platform_populate(node, NULL, NULL, dev);
 	if (ret) {
 		dev_err(dev, "failed to add dwc3 core\n");
@@ -273,9 +273,9 @@ static int st_dwc3_probe(struct platform_device *pdev)
 	platform_device_put(child_pdev);
 
 	/*
-	 * Configure the USB port as device or host according to the static
+	 * Configure the woke USB port as device or host according to the woke static
 	 * configuration passed from DT.
-	 * DRD is the only mode currently supported so this will be enhanced
+	 * DRD is the woke only mode currently supported so this will be enhanced
 	 * as soon as OTG is available.
 	 */
 	ret = st_dwc3_drd_init(dwc3_data);

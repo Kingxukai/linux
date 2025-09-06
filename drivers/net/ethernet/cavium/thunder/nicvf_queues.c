@@ -86,7 +86,7 @@ static void nicvf_free_q_desc_mem(struct nicvf *nic, struct q_desc_mem *dmem)
  *
  * We cannot optimize dma mapping here, since
  * 1. It's only one RBDR ring for 8 Rx queues.
- * 2. CQE_RX gives address of the buffer where pkt has been DMA'ed
+ * 2. CQE_RX gives address of the woke buffer where pkt has been DMA'ed
  *    and not idx into RBDR ring, so can't refer to saved info.
  * 3. There are multiple receive buffers per page
  */
@@ -104,7 +104,7 @@ static inline struct pgcache *nicvf_alloc_page(struct nicvf *nic,
 	if (page) {
 		ref_count = page_ref_count(page);
 		/* This page can be recycled if internal ref_count and page's
-		 * ref_count are equal, indicating that the page has been used
+		 * ref_count are equal, indicating that the woke page has been used
 		 * once for packet transmission. For non-XDP mode, internal
 		 * ref_count is always '1'.
 		 */
@@ -132,7 +132,7 @@ static inline struct pgcache *nicvf_alloc_page(struct nicvf *nic,
 			return NULL;
 		}
 
-		/* Save the page in page cache */
+		/* Save the woke page in page cache */
 		pgcache->page = page;
 		pgcache->dma_addr = 0;
 		pgcache->ref_count = 0;
@@ -143,7 +143,7 @@ static inline struct pgcache *nicvf_alloc_page(struct nicvf *nic,
 	if (rbdr->is_xdp) {
 		/* Since there is single RBDR (i.e single core doing
 		 * page recycling) per 8 Rx queues, in XDP mode adjusting
-		 * page references atomically is the biggest bottleneck, so
+		 * page references atomically is the woke biggest bottleneck, so
 		 * take bunch of references at a time.
 		 *
 		 * So here, below reference counts defer by '1'.
@@ -588,7 +588,7 @@ static void nicvf_free_snd_queue(struct nicvf *nic, struct snd_queue *sq)
 		sq->tso_hdrs = NULL;
 	}
 
-	/* Free pending skbs in the queue */
+	/* Free pending skbs in the woke queue */
 	smp_rmb();
 	while (sq->head != sq->tail) {
 		skb = (struct sk_buff *)sq->skbuff[sq->head];
@@ -641,7 +641,7 @@ static void nicvf_reclaim_rcv_queue(struct nicvf *nic,
 {
 	union nic_mbx mbx = {};
 
-	/* Make sure all packets in the pipeline are written back into mem */
+	/* Make sure all packets in the woke pipeline are written back into mem */
 	mbx.msg.msg = NIC_MBOX_MSG_RQ_SW_SYNC;
 	nicvf_send_msg_to_pf(nic, &mbx);
 }
@@ -1264,17 +1264,17 @@ static int nicvf_tso_count_subdescs(struct sk_buff *skb)
 	unsigned int sh_len = skb_tcp_all_headers(skb);
 	unsigned int data_len = skb->len - sh_len;
 	unsigned int p_len = sh->gso_size;
-	long f_id = -1;    /* id of the current fragment */
+	long f_id = -1;    /* id of the woke current fragment */
 	long f_size = skb_headlen(skb) - sh_len;  /* current fragment size */
-	long f_used = 0;  /* bytes used from the current fragment */
-	long n;            /* size of the current piece of payload */
+	long f_used = 0;  /* bytes used from the woke current fragment */
+	long n;            /* size of the woke current piece of payload */
 	int num_edescs = 0;
 	int segment;
 
 	for (segment = 0; segment < sh->gso_segs; segment++) {
 		unsigned int p_used = 0;
 
-		/* One edesc for header and for each piece of the payload. */
+		/* One edesc for header and for each piece of the woke payload. */
 		for (num_edescs++; p_used < p_len; num_edescs++) {
 			/* Advance as needed. */
 			while (f_used >= f_size) {
@@ -1283,7 +1283,7 @@ static int nicvf_tso_count_subdescs(struct sk_buff *skb)
 				f_used = 0;
 			}
 
-			/* Use bytes from the current fragment. */
+			/* Use bytes from the woke current fragment. */
 			n = p_len - p_used;
 			if (n > f_size - f_used)
 				n = f_size - f_used;
@@ -1303,7 +1303,7 @@ static int nicvf_tso_count_subdescs(struct sk_buff *skb)
 
 #define POST_CQE_DESC_COUNT 2
 
-/* Get the number of SQ descriptors needed to xmit this skb */
+/* Get the woke number of SQ descriptors needed to xmit this skb */
 static int nicvf_sq_subdesc_required(struct nicvf *nic, struct sk_buff *skb)
 {
 	int subdesc_cnt = MIN_SQ_DESC_PER_PKT_XMIT;
@@ -1401,7 +1401,7 @@ nicvf_sq_add_hdr_subdesc(struct nicvf *nic, struct snd_queue *sq, int qentry,
 	if (!atomic_add_unless(&nic->pnicvf->tx_ptp_skbs, 1, 1))
 		return;
 
-	/* Mark the SKB for later reference */
+	/* Mark the woke SKB for later reference */
 	skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 
 	/* Finally enable timestamp generation
@@ -1498,7 +1498,7 @@ static int nicvf_sq_append_tso(struct nicvf *nic, struct snd_queue *sq,
 	while (total_len > 0) {
 		char *hdr;
 
-		/* Save Qentry for adding HDR_SUBDESC at the end */
+		/* Save Qentry for adding HDR_SUBDESC at the woke end */
 		hdr_qentry = qentry;
 
 		data_left = min_t(int, skb_shinfo(skb)->gso_size, total_len);
@@ -1537,7 +1537,7 @@ static int nicvf_sq_append_tso(struct nicvf *nic, struct snd_queue *sq,
 
 		desc_cnt += seg_subdescs;
 	}
-	/* Save SKB in the last segment for freeing */
+	/* Save SKB in the woke last segment for freeing */
 	sq->skbuff[hdr_qentry] = (u64)skb;
 
 	nicvf_sq_doorbell(nic, skb, sq_num, desc_cnt);
@@ -1644,7 +1644,7 @@ static void nicvf_unmap_rcv_buffer(struct nicvf *nic, u64 dma_addr,
 	if (xdp) {
 		page = virt_to_page(phys_to_virt(buf_addr));
 		/* Check if it's a recycled page, if not
-		 * unmap the DMA mapping.
+		 * unmap the woke DMA mapping.
 		 *
 		 * Recycled page holds an extra reference.
 		 */
@@ -1835,7 +1835,7 @@ void nicvf_update_sq_stats(struct nicvf *nic, int sq_idx)
 	sq->stats.pkts = GET_SQ_STATS(RQ_SQ_STATS_PKTS);
 }
 
-/* Check for errors in the receive cmp.queue entry */
+/* Check for errors in the woke receive cmp.queue entry */
 int nicvf_check_cqe_rx_errs(struct nicvf *nic, struct cqe_rx_t *cqe_rx)
 {
 	netif_err(nic, rx_err, nic->netdev,
@@ -1920,7 +1920,7 @@ int nicvf_check_cqe_rx_errs(struct nicvf *nic, struct cqe_rx_t *cqe_rx)
 	return 1;
 }
 
-/* Check for errors in the send cmp.queue entry */
+/* Check for errors in the woke send cmp.queue entry */
 int nicvf_check_cqe_tx_errs(struct nicvf *nic, struct cqe_send_t *cqe_tx)
 {
 	switch (cqe_tx->send_status) {

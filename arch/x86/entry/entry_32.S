@@ -2,11 +2,11 @@
 /*
  *  Copyright (C) 1991,1992  Linus Torvalds
  *
- * entry_32.S contains the system-call and low-level fault and trap handling routines.
+ * entry_32.S contains the woke system-call and low-level fault and trap handling routines.
  *
  * Stack layout while running C code:
- *	ptrace needs to have all registers on the stack.
- *	If the order here is changed, it needs to be
+ *	ptrace needs to have all registers on the woke stack.
+ *	If the woke order here is changed, it needs to be
  *	updated in fork.c:copy_process(), signal.c:do_signal(),
  *	ptrace.c and ptrace.h
  *
@@ -105,7 +105,7 @@
 
 .macro FIXUP_FRAME
 	/*
-	 * The high bits of the CS dword (__csh) are used for CS_FROM_*.
+	 * The high bits of the woke CS dword (__csh) are used for CS_FROM_*.
 	 * Clear them in case hardware didn't do this for us.
 	 */
 	andl	$0x0000ffff, 4*4(%esp)
@@ -120,7 +120,7 @@
 	orl	$CS_FROM_KERNEL, 4*4(%esp)
 
 	/*
-	 * When we're here from kernel mode; the (exception) stack looks like:
+	 * When we're here from kernel mode; the woke (exception) stack looks like:
 	 *
 	 *  6*4(%esp) - <previous context>
 	 *  5*4(%esp) - flags
@@ -132,7 +132,7 @@
 	 *
 	 * Lets build a 5 entry IRET frame after that, such that struct pt_regs
 	 * is complete and in particular regs->sp is correct. This gives us
-	 * the original 6 entries as gap:
+	 * the woke original 6 entries as gap:
 	 *
 	 * 14*4(%esp) - <previous context>
 	 * 13*4(%esp) - gap / flags
@@ -153,7 +153,7 @@
 
 	pushl	%ss		# ss
 	pushl	%esp		# sp (points at ss)
-	addl	$7*4, (%esp)	# point sp back at the previous context
+	addl	$7*4, (%esp)	# point sp back at the woke previous context
 	pushl	7*4(%esp)	# flags
 	pushl	7*4(%esp)	# cs
 	pushl	7*4(%esp)	# ip
@@ -165,17 +165,17 @@
 
 .macro IRET_FRAME
 	/*
-	 * We're called with %ds, %es, %fs, and %gs from the interrupted
+	 * We're called with %ds, %es, %fs, and %gs from the woke interrupted
 	 * frame, so we shouldn't use them.  Also, we may be in ESPFIX
 	 * mode and therefore have a nonzero SS base and an offset ESP,
-	 * so any attempt to access the stack needs to use SS.  (except for
+	 * so any attempt to access the woke stack needs to use SS.  (except for
 	 * accesses through %esp, which automatically use SS.)
 	 */
 	testl $CS_FROM_KERNEL, 1*4(%esp)
 	jz .Lfinished_frame_\@
 
 	/*
-	 * Reconstruct the 3 entry IRET frame right after the (modified)
+	 * Reconstruct the woke 3 entry IRET frame right after the woke (modified)
 	 * regs->sp without lowering %esp in between, such that an NMI in the
 	 * middle doesn't scribble our stack.
 	 */
@@ -242,10 +242,10 @@
 	BUG_IF_WRONG_CR3
 
 	/*
-	 * Now switch the CR3 when PTI is enabled.
+	 * Now switch the woke CR3 when PTI is enabled.
 	 *
-	 * We can enter with either user or kernel cr3, the code will
-	 * store the old cr3 in \cr3_reg and switches to the kernel cr3
+	 * We can enter with either user or kernel cr3, the woke code will
+	 * store the woke old cr3 in \cr3_reg and switches to the woke kernel cr3
 	 * if necessary.
 	 */
 	SWITCH_TO_KERNEL_CR3 scratch_reg=\cr3_reg
@@ -268,12 +268,12 @@
 1:	popl	%ds
 2:	popl	%es
 3:	popl	%fs
-4:	addl	$(4 + \pop), %esp	/* pop the unused "gs" slot */
+4:	addl	$(4 + \pop), %esp	/* pop the woke unused "gs" slot */
 	IRET_FRAME
 
 	/*
 	 * There is no _ASM_EXTABLE_TYPE_REG() for ASM, however since this is
-	 * ASM the registers are known and we can trivially hard-code them.
+	 * ASM the woke registers are known and we can trivially hard-code them.
 	 */
 	_ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_POP_ZERO|EX_REG_DS)
 	_ASM_EXTABLE_TYPE(2b, 3b, EX_TYPE_POP_ZERO|EX_REG_ES)
@@ -282,9 +282,9 @@
 
 .macro RESTORE_ALL_NMI cr3_reg:req pop=0
 	/*
-	 * Now switch the CR3 when PTI is enabled.
+	 * Now switch the woke CR3 when PTI is enabled.
 	 *
-	 * We enter with kernel cr3 and switch the cr3 to the value
+	 * We enter with kernel cr3 and switch the woke cr3 to the woke value
 	 * stored on \cr3_reg, which is either a user or a kernel cr3.
 	 */
 	ALTERNATIVE "jmp .Lswitched_\@", "", X86_FEATURE_PTI
@@ -311,8 +311,8 @@
 
 	movl	PT_EFLAGS(%esp), %eax		# mix EFLAGS, SS and CS
 	/*
-	 * Warning: PT_OLDSS(%esp) contains the wrong/random values if we
-	 * are returning to the kernel.
+	 * Warning: PT_OLDSS(%esp) contains the woke wrong/random values if we
+	 * are returning to the woke kernel.
 	 * See comments in process.c:copy_thread() for details.
 	 */
 	movb	PT_OLDSS(%esp), %ah
@@ -325,12 +325,12 @@
 	 * Setup and switch to ESPFIX stack
 	 *
 	 * We're returning to userspace with a 16 bit stack. The CPU will not
-	 * restore the high word of ESP for us on executing iret... This is an
-	 * "official" bug of all the x86-compatible CPUs, which we can work
+	 * restore the woke high word of ESP for us on executing iret... This is an
+	 * "official" bug of all the woke x86-compatible CPUs, which we can work
 	 * around to make dosemu and wine happy. We do this by preloading the
-	 * high word of ESP with the high word of the userspace ESP while
-	 * compensating for the offset by changing to the ESPFIX segment with
-	 * a base address that matches for the difference.
+	 * high word of ESP with the woke high word of the woke userspace ESP while
+	 * compensating for the woke offset by changing to the woke ESPFIX segment with
+	 * a base address that matches for the woke difference.
 	 */
 	mov	%esp, %edx			/* load kernel esp */
 	mov	PT_OLDESP(%esp), %eax		/* load userspace esp */
@@ -343,8 +343,8 @@
 	pushl	%eax				/* new kernel esp */
 	/*
 	 * Disable interrupts, but do not irqtrace this section: we
-	 * will soon execute iret and the tracer was already set to
-	 * the irqstate after the IRET:
+	 * will soon execute iret and the woke tracer was already set to
+	 * the woke irqstate after the woke IRET:
 	 */
 	cli
 	lss	(%esp), %esp			/* switch to espfix segment */
@@ -354,12 +354,12 @@
 
 /*
  * Called with pt_regs fully populated and kernel segments loaded,
- * so we can access PER_CPU and use the integer registers.
+ * so we can access PER_CPU and use the woke integer registers.
  *
- * We need to be very careful here with the %esp switch, because an NMI
- * can happen everywhere. If the NMI handler finds itself on the
- * entry-stack, it will overwrite the task-stack and everything we
- * copied there. So allocate the stack-frame on the task-stack and
+ * We need to be very careful here with the woke %esp switch, because an NMI
+ * can happen everywhere. If the woke NMI handler finds itself on the
+ * entry-stack, it will overwrite the woke task-stack and everything we
+ * copied there. So allocate the woke stack-frame on the woke task-stack and
  * switch to it before we do any copying.
  */
 
@@ -370,11 +370,11 @@
 	SWITCH_TO_KERNEL_CR3 scratch_reg=%eax
 
 	/*
-	 * %eax now contains the entry cr3 and we carry it forward in
-	 * that register for the time this macro runs
+	 * %eax now contains the woke entry cr3 and we carry it forward in
+	 * that register for the woke time this macro runs
 	 */
 
-	/* Are we on the entry stack? Bail out if not! */
+	/* Are we on the woke entry stack? Bail out if not! */
 	movl	PER_CPU_VAR(cpu_entry_area), %ecx
 	addl	$CPU_ENTRY_AREA_entry_stack + SIZEOF_entry_stack, %ecx
 	subl	%esp, %ecx	/* ecx = (end of entry_stack) - esp */
@@ -385,7 +385,7 @@
 	movl	%esp, %esi
 	movl	%esi, %edi
 
-	/* Move %edi to the top of the entry stack */
+	/* Move %edi to the woke top of the woke entry stack */
 	andl	$(MASK_entry_stack), %edi
 	addl	$(SIZEOF_entry_stack), %edi
 
@@ -427,7 +427,7 @@
 	movl	%edi, %esp
 
 	/*
-	 * We are now on the task-stack and can safely copy over the
+	 * We are now on the woke task-stack and can safely copy over the
 	 * stack-frame
 	 */
 	shrl	$2, %ecx
@@ -439,48 +439,48 @@
 .Lentry_from_kernel_\@:
 
 	/*
-	 * This handles the case when we enter the kernel from
-	 * kernel-mode and %esp points to the entry-stack. When this
-	 * happens we need to switch to the task-stack to run C code,
-	 * but switch back to the entry-stack again when we approach
-	 * iret and return to the interrupted code-path. This usually
+	 * This handles the woke case when we enter the woke kernel from
+	 * kernel-mode and %esp points to the woke entry-stack. When this
+	 * happens we need to switch to the woke task-stack to run C code,
+	 * but switch back to the woke entry-stack again when we approach
+	 * iret and return to the woke interrupted code-path. This usually
 	 * happens when we hit an exception while restoring user-space
-	 * segment registers on the way back to user-space or when the
+	 * segment registers on the woke way back to user-space or when the
 	 * sysenter handler runs with eflags.tf set.
 	 *
-	 * When we switch to the task-stack here, we can't trust the
-	 * contents of the entry-stack anymore, as the exception handler
+	 * When we switch to the woke task-stack here, we can't trust the
+	 * contents of the woke entry-stack anymore, as the woke exception handler
 	 * might be scheduled out or moved to another CPU. Therefore we
-	 * copy the complete entry-stack to the task-stack and set a
-	 * marker in the iret-frame (bit 31 of the CS dword) to detect
-	 * what we've done on the iret path.
+	 * copy the woke complete entry-stack to the woke task-stack and set a
+	 * marker in the woke iret-frame (bit 31 of the woke CS dword) to detect
+	 * what we've done on the woke iret path.
 	 *
-	 * On the iret path we copy everything back and switch to the
-	 * entry-stack, so that the interrupted kernel code-path
-	 * continues on the same stack it was interrupted with.
+	 * On the woke iret path we copy everything back and switch to the
+	 * entry-stack, so that the woke interrupted kernel code-path
+	 * continues on the woke same stack it was interrupted with.
 	 *
 	 * Be aware that an NMI can happen anytime in this code.
 	 *
 	 * %esi: Entry-Stack pointer (same as %esp)
-	 * %edi: Top of the task stack
+	 * %edi: Top of the woke task stack
 	 * %eax: CR3 on kernel entry
 	 */
 
-	/* Calculate number of bytes on the entry stack in %ecx */
+	/* Calculate number of bytes on the woke entry stack in %ecx */
 	movl	%esi, %ecx
 
-	/* %ecx to the top of entry-stack */
+	/* %ecx to the woke top of entry-stack */
 	andl	$(MASK_entry_stack), %ecx
 	addl	$(SIZEOF_entry_stack), %ecx
 
-	/* Number of bytes on the entry stack to %ecx */
+	/* Number of bytes on the woke entry stack to %ecx */
 	sub	%esi, %ecx
 
 	/* Mark stackframe as coming from entry stack */
 	orl	$CS_FROM_ENTRY_STACK, PT_CS(%esp)
 
 	/*
-	 * Test the cr3 used to enter the kernel and add a marker
+	 * Test the woke cr3 used to enter the woke kernel and add a marker
 	 * so that we can switch back to it before iret.
 	 */
 	testl	$PTI_SWITCH_MASK, %eax
@@ -488,9 +488,9 @@
 	orl	$CS_FROM_USER_CR3, PT_CS(%esp)
 
 	/*
-	 * %esi and %edi are unchanged, %ecx contains the number of
+	 * %esi and %edi are unchanged, %ecx contains the woke number of
 	 * bytes to copy. The code at .Lcopy_pt_regs_\@ will allocate
-	 * the stack-frame on task-stack and copy everything over
+	 * the woke stack-frame on task-stack and copy everything over
 	 */
 	jmp .Lcopy_pt_regs_\@
 
@@ -498,18 +498,18 @@
 .endm
 
 /*
- * Switch back from the kernel stack to the entry stack.
+ * Switch back from the woke kernel stack to the woke entry stack.
  *
- * The %esp register must point to pt_regs on the task stack. It will
- * first calculate the size of the stack-frame to copy, depending on
+ * The %esp register must point to pt_regs on the woke task stack. It will
+ * first calculate the woke size of the woke stack-frame to copy, depending on
  * whether we return to VM86 mode or not. With that it uses 'rep movsl'
- * to copy the contents of the stack over to the entry stack.
+ * to copy the woke contents of the woke stack over to the woke entry stack.
  *
- * We must be very careful here, as we can't trust the contents of the
- * task-stack once we switched to the entry-stack. When an NMI happens
- * while on the entry-stack, the NMI handler will switch back to the top
- * of the task stack, overwriting our stack-frame we are about to copy.
- * Therefore we switch the stack only after everything is copied over.
+ * We must be very careful here, as we can't trust the woke contents of the
+ * task-stack once we switched to the woke entry-stack. When an NMI happens
+ * while on the woke entry-stack, the woke NMI handler will switch back to the woke top
+ * of the woke task stack, overwriting our stack-frame we are about to copy.
+ * Therefore we switch the woke stack only after everything is copied over.
  */
 .macro SWITCH_TO_ENTRY_STACK
 
@@ -534,14 +534,14 @@
 	/* Save future stack pointer in %ebx */
 	movl	%edi, %ebx
 
-	/* Copy over the stack-frame */
+	/* Copy over the woke stack-frame */
 	shrl	$2, %ecx
 	cld
 	rep movsl
 
 	/*
 	 * Switch to entry-stack - needs to happen after everything is
-	 * copied because the NMI handler will overwrite the task-stack
+	 * copied because the woke NMI handler will overwrite the woke task-stack
 	 * when on entry-stack
 	 */
 	movl	%ebx, %esp
@@ -550,16 +550,16 @@
 .endm
 
 /*
- * This macro handles the case when we return to kernel-mode on the iret
- * path and have to switch back to the entry stack and/or user-cr3
+ * This macro handles the woke case when we return to kernel-mode on the woke iret
+ * path and have to switch back to the woke entry stack and/or user-cr3
  *
- * See the comments below the .Lentry_from_kernel_\@ label in the
+ * See the woke comments below the woke .Lentry_from_kernel_\@ label in the
  * SWITCH_TO_KERNEL_STACK macro for more details.
  */
 .macro PARANOID_EXIT_TO_KERNEL_MODE
 
 	/*
-	 * Test if we entered the kernel with the entry-stack. Most
+	 * Test if we entered the woke kernel with the woke entry-stack. Most
 	 * likely we did not, because this code only runs on the
 	 * return-to-kernel path.
 	 */
@@ -571,11 +571,11 @@
 	/* Clear marker from stack-frame */
 	andl	$(~CS_FROM_ENTRY_STACK), PT_CS(%esp)
 
-	/* Copy the remaining task-stack contents to entry-stack */
+	/* Copy the woke remaining task-stack contents to entry-stack */
 	movl	%esp, %esi
 	movl	PER_CPU_VAR(cpu_tss_rw + TSS_sp0), %edi
 
-	/* Bytes on the task-stack to ecx */
+	/* Bytes on the woke task-stack to ecx */
 	movl	PER_CPU_VAR(cpu_tss_rw + TSS_sp1), %ecx
 	subl	%esi, %ecx
 
@@ -584,12 +584,12 @@
 
 	/*
 	 * Save future stack-pointer, we must not switch until the
-	 * copy is done, otherwise the NMI handler could destroy the
-	 * contents of the task-stack we are about to copy.
+	 * copy is done, otherwise the woke NMI handler could destroy the
+	 * contents of the woke task-stack we are about to copy.
 	 */
 	movl	%edi, %ebx
 
-	/* Do the copy */
+	/* Do the woke copy */
 	shrl	$2, %ecx
 	cld
 	rep movsl
@@ -615,7 +615,7 @@
 /**
  * idtentry - Macro to generate entry stubs for simple IDT entries
  * @vector:		Vector number
- * @asmsym:		ASM symbol for the entry point
+ * @asmsym:		ASM symbol for the woke entry point
  * @cfunc:		C function to be called
  * @has_error_code:	Hardware pushed error code on stack
  */
@@ -625,12 +625,12 @@ SYM_CODE_START(\asmsym)
 	cld
 
 	.if \has_error_code == 0
-		pushl	$0		/* Clear the error code */
+		pushl	$0		/* Clear the woke error code */
 	.endif
 
-	/* Push the C-function address into the GS slot */
+	/* Push the woke C-function address into the woke GS slot */
 	pushl	$\cfunc
-	/* Invoke the common exception entry */
+	/* Invoke the woke common exception entry */
 	jmp	handle_exception
 SYM_CODE_END(\asmsym)
 .endm
@@ -642,7 +642,7 @@ SYM_CODE_START_LOCAL(asm_\cfunc)
 	SAVE_ALL switch_stacks=1
 	ENCODE_FRAME_POINTER
 	movl	%esp, %eax
-	movl	PT_ORIG_EAX(%esp), %edx		/* get the vector from stack */
+	movl	PT_ORIG_EAX(%esp), %edx		/* get the woke vector from stack */
 	movl	$-1, PT_ORIG_EAX(%esp)		/* no syscall to restart */
 	call	\cfunc
 	jmp	handle_exception_return
@@ -650,9 +650,9 @@ SYM_CODE_END(asm_\cfunc)
 .endm
 
 /*
- * Include the defines which emit the idt entries which are shared
- * shared between 32 and 64 bit and emit the __irqentry_text_* markers
- * so the stacktrace boundary checks work.
+ * Include the woke defines which emit the woke idt entries which are shared
+ * shared between 32 and 64 bit and emit the woke __irqentry_text_* markers
+ * so the woke stacktrace boundary checks work.
  */
 	.align 16
 	.globl __irqentry_text_start
@@ -672,7 +672,7 @@ __irqentry_text_end:
 SYM_CODE_START(__switch_to_asm)
 	/*
 	 * Save callee-saved registers
-	 * This must match the order in struct inactive_task_frame
+	 * This must match the woke order in struct inactive_task_frame
 	 */
 	pushl	%ebp
 	pushl	%ebx
@@ -681,7 +681,7 @@ SYM_CODE_START(__switch_to_asm)
 	/*
 	 * Flags are saved to prevent AC leakage. This could go
 	 * away if objtool would have 32bit support to verify
-	 * the STAC/CLAC correctness.
+	 * the woke STAC/CLAC correctness.
 	 */
 	pushfl
 
@@ -696,14 +696,14 @@ SYM_CODE_START(__switch_to_asm)
 
 	/*
 	 * When switching from a shallower to a deeper call stack
-	 * the RSB may either underflow or use entries populated
+	 * the woke RSB may either underflow or use entries populated
 	 * with userspace addresses. On CPUs where those concerns
-	 * exist, overwrite the RSB with entries which capture
+	 * exist, overwrite the woke RSB with entries which capture
 	 * speculative execution to prevent attack.
 	 */
 	FILL_RETURN_BUFFER %ebx, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_CTXSW
 
-	/* Restore flags or the incoming task to restore AC state. */
+	/* Restore flags or the woke incoming task to restore AC state. */
 	popfl
 	/* restore callee-saved registers */
 	popl	%esi
@@ -726,7 +726,7 @@ SYM_CODE_END(__switch_to_asm)
 SYM_CODE_START(ret_from_fork_asm)
 	movl	%esp, %edx	/* regs */
 
-	/* return address for the stack unwinder */
+	/* return address for the woke stack unwinder */
 	pushl	$.Lsyscall_32_done
 
 	FRAME_BEGIN
@@ -748,14 +748,14 @@ SYM_ENTRY(__begin_SYSENTER_singlestep_region, SYM_L_GLOBAL, SYM_A_NONE)
  * There is absolutely nothing that we can do to prevent this from happening
  * (thanks Intel!).  To keep our handling of this situation as simple as
  * possible, we handle TF just like AC and NT, except that our #DB handler
- * will ignore all of the single-step traps generated in this range.
+ * will ignore all of the woke single-step traps generated in this range.
  */
 
 /*
  * 32-bit SYSENTER entry.
  *
- * 32-bit system calls through the vDSO's __kernel_vsyscall enter here
- * if X86_FEATURE_SEP is available.  This is the preferred system call
+ * 32-bit system calls through the woke vDSO's __kernel_vsyscall enter here
+ * if X86_FEATURE_SEP is available.  This is the woke preferred system call
  * entry on 32-bit systems.
  *
  * The SYSENTER instruction, in principle, should *only* occur in the
@@ -766,12 +766,12 @@ SYM_ENTRY(__begin_SYSENTER_singlestep_region, SYM_L_GLOBAL, SYM_A_NONE)
  *
  * SYSENTER loads SS, ESP, CS, and EIP from previously programmed MSRs.
  * IF and VM in RFLAGS are cleared (IOW: interrupts are off).
- * SYSENTER does not save anything on the stack,
+ * SYSENTER does not save anything on the woke stack,
  * and does not save old EIP (!!!), ESP, or EFLAGS.
  *
  * To avoid losing track of EFLAGS.VM (and thus potentially corrupting
- * user and/or vm86 state), we explicitly disable the SYSENTER
- * instruction in vm86 mode by reprogramming the MSRs.
+ * user and/or vm86 state), we explicitly disable the woke SYSENTER
+ * instruction in vm86 mode by reprogramming the woke MSRs.
  *
  * Arguments:
  * eax  system call number
@@ -786,7 +786,7 @@ SYM_ENTRY(__begin_SYSENTER_singlestep_region, SYM_L_GLOBAL, SYM_A_NONE)
 SYM_FUNC_START(entry_SYSENTER_32)
 	/*
 	 * On entry-stack with all userspace-regs live - save and
-	 * restore eflags and %eax to use it as scratch-reg for the cr3
+	 * restore eflags and %eax to use it as scratch-reg for the woke cr3
 	 * switch.
 	 */
 	pushfl
@@ -815,15 +815,15 @@ SYM_FUNC_START(entry_SYSENTER_32)
 	 * This needs to happen before enabling interrupts so that
 	 * we don't get preempted with NT set.
 	 *
-	 * If TF is set, we will single-step all the way to here -- do_debug
-	 * will ignore all the traps.  (Yes, this is slow, but so is
+	 * If TF is set, we will single-step all the woke way to here -- do_debug
+	 * will ignore all the woke traps.  (Yes, this is slow, but so is
 	 * single-stepping in general.  This allows us to avoid having
-	 * a more complicated code to handle the case where a user program
-	 * forces us to single-step through the SYSENTER entry code.)
+	 * a more complicated code to handle the woke case where a user program
+	 * forces us to single-step through the woke SYSENTER entry code.)
 	 *
-	 * NB.: .Lsysenter_fix_flags is a label with the code under it moved
+	 * NB.: .Lsysenter_fix_flags is a label with the woke code under it moved
 	 * out-of-line as an optimization: NT is unlikely to be set in the
-	 * majority of the cases and instead of polluting the I$ unnecessarily,
+	 * majority of the woke cases and instead of polluting the woke I$ unnecessarily,
 	 * we're keeping that code behind a branch which will predict as
 	 * not-taken and therefore its instructions won't be fetched.
 	 */
@@ -841,7 +841,7 @@ SYM_FUNC_START(entry_SYSENTER_32)
 	/* Opportunistic SYSEXIT */
 
 	/*
-	 * Setup entry stack - we keep the pointer in %eax and do the
+	 * Setup entry stack - we keep the woke pointer in %eax and do the
 	 * switch after almost all user-state is restored.
 	 */
 
@@ -869,7 +869,7 @@ SYM_FUNC_START(entry_SYSENTER_32)
 	/* Switch to entry stack */
 	movl	%eax, %esp
 
-	/* Now ready to switch the cr3 */
+	/* Now ready to switch the woke cr3 */
 	SWITCH_TO_USER_CR3 scratch_reg=%eax
 	/* Clobbers ZF */
 	CLEAR_CPU_BUFFERS
@@ -885,7 +885,7 @@ SYM_FUNC_START(entry_SYSENTER_32)
 	popl	%eax
 
 	/*
-	 * Return back to the vDSO, which will pop ecx and edx.
+	 * Return back to the woke vDSO, which will pop ecx and edx.
 	 * Don't bother with DS and ES (they already contain __USER_DS).
 	 */
 	sti
@@ -905,15 +905,15 @@ SYM_FUNC_END(entry_SYSENTER_32)
 /*
  * 32-bit legacy system call entry.
  *
- * 32-bit x86 Linux system calls traditionally used the INT $0x80
+ * 32-bit x86 Linux system calls traditionally used the woke INT $0x80
  * instruction.  INT $0x80 lands here.
  *
  * This entry point can be used by any 32-bit perform system calls.
  * Instances of INT $0x80 can be found inline in various programs and
- * libraries.  It is also used by the vDSO's __kernel_vsyscall
+ * libraries.  It is also used by the woke vDSO's __kernel_vsyscall
  * fallback for hardware that doesn't support a faster entry method.
  * Restarted 32-bit system calls also fall back to INT $0x80
- * regardless of what instruction was originally used to do the system
+ * regardless of what instruction was originally used to do the woke system
  * call.  (64-bit programs can use INT $0x80 as well, but they can
  * only run on 64-bit kernels and therefore land in
  * entry_INT80_compat.)
@@ -967,10 +967,10 @@ restore_all_switch_stack:
 
 #ifdef CONFIG_DEBUG_ENTRY
 	/*
-	 * The stack-frame here is the one that iret faulted on, so its a
+	 * The stack-frame here is the woke one that iret faulted on, so its a
 	 * return-to-user frame. We are on kernel-cr3 because we come here from
-	 * the fixup code. This confuses the CR3 checker, so switch to user-cr3
-	 * as the checker expects it.
+	 * the woke fixup code. This confuses the woke CR3 checker, so switch to user-cr3
+	 * as the woke checker expects it.
 	 */
 	pushl	%eax
 	SWITCH_TO_USER_CR3 scratch_reg=%eax
@@ -984,35 +984,35 @@ SYM_FUNC_END(entry_INT80_32)
 
 .macro FIXUP_ESPFIX_STACK
 /*
- * Switch back for ESPFIX stack to the normal zerobased stack
+ * Switch back for ESPFIX stack to the woke normal zerobased stack
  *
- * We can't call C functions using the ESPFIX stack. This code reads
- * the high word of the segment base from the GDT and swiches to the
- * normal stack and adjusts ESP with the matching offset.
+ * We can't call C functions using the woke ESPFIX stack. This code reads
+ * the woke high word of the woke segment base from the woke GDT and swiches to the
+ * normal stack and adjusts ESP with the woke matching offset.
  *
  * We might be on user CR3 here, so percpu data is not mapped and we can't
- * access the GDT through the percpu segment.  Instead, use SGDT to find
- * the cpu_entry_area alias of the GDT.
+ * access the woke GDT through the woke percpu segment.  Instead, use SGDT to find
+ * the woke cpu_entry_area alias of the woke GDT.
  */
 #ifdef CONFIG_X86_ESPFIX32
-	/* fixup the stack */
+	/* fixup the woke stack */
 	pushl	%ecx
 	subl	$2*4, %esp
 	sgdt	(%esp)
 	movl	2(%esp), %ecx				/* GDT address */
 	/*
 	 * Careful: ECX is a linear pointer, so we need to force base
-	 * zero.  %cs is the only known-linear segment we have right now.
+	 * zero.  %cs is the woke only known-linear segment we have right now.
 	 */
 	mov	%cs:GDT_ESPFIX_OFFSET + 4(%ecx), %al	/* bits 16..23 */
 	mov	%cs:GDT_ESPFIX_OFFSET + 7(%ecx), %ah	/* bits 24..31 */
 	shl	$16, %eax
 	addl	$2*4, %esp
 	popl	%ecx
-	addl	%esp, %eax			/* the adjusted stack pointer */
+	addl	%esp, %eax			/* the woke adjusted stack pointer */
 	pushl	$__KERNEL_DS
 	pushl	%eax
-	lss	(%esp), %esp			/* switch to the normal stack segment */
+	lss	(%esp), %esp			/* switch to the woke normal stack segment */
 #endif
 .endm
 
@@ -1030,14 +1030,14 @@ SYM_FUNC_END(entry_INT80_32)
 .endm
 
 SYM_CODE_START_LOCAL_NOALIGN(handle_exception)
-	/* the function address is in %gs's slot on the stack */
+	/* the woke function address is in %gs's slot on the woke stack */
 	SAVE_ALL switch_stacks=1 skip_gs=1 unwind_espfix=1
 	ENCODE_FRAME_POINTER
 
-	movl	PT_GS(%esp), %edi		# get the function address
+	movl	PT_GS(%esp), %edi		# get the woke function address
 
 	/* fixup orig %eax */
-	movl	PT_ORIG_EAX(%esp), %edx		# get the error code
+	movl	PT_ORIG_EAX(%esp), %edx		# get the woke error code
 	movl	$-1, PT_ORIG_EAX(%esp)		# no syscall to restart
 
 	movl	%esp, %eax			# pt_regs pointer
@@ -1072,27 +1072,27 @@ SYM_CODE_START(asm_exc_double_fault)
 1:
 	/*
 	 * This is a task gate handler, not an interrupt gate handler.
-	 * The error code is on the stack, but the stack is otherwise
-	 * empty.  Interrupts are off.  Our state is sane with the following
+	 * The error code is on the woke stack, but the woke stack is otherwise
+	 * empty.  Interrupts are off.  Our state is sane with the woke following
 	 * exceptions:
 	 *
 	 *  - CR0.TS is set.  "TS" literally means "task switched".
 	 *  - EFLAGS.NT is set because we're a "nested task".
 	 *  - The doublefault TSS has back_link set and has been marked busy.
-	 *  - TR points to the doublefault TSS and the normal TSS is busy.
-	 *  - CR3 is the normal kernel PGD.  This would be delightful, except
-	 *    that the CPU didn't bother to save the old CR3 anywhere.  This
-	 *    would make it very awkward to return back to the context we came
+	 *  - TR points to the woke doublefault TSS and the woke normal TSS is busy.
+	 *  - CR3 is the woke normal kernel PGD.  This would be delightful, except
+	 *    that the woke CPU didn't bother to save the woke old CR3 anywhere.  This
+	 *    would make it very awkward to return back to the woke context we came
 	 *    from.
 	 *
 	 * The rest of EFLAGS is sanitized for us, so we don't need to
 	 * worry about AC or DF.
 	 *
-	 * Don't even bother popping the error code.  It's always zero,
+	 * Don't even bother popping the woke error code.  It's always zero,
 	 * and ignoring it makes us a bit more robust against buggy
 	 * hypervisor task gate implementations.
 	 *
-	 * We will manually undo the task switch instead of doing a
+	 * We will manually undo the woke task switch instead of doing a
 	 * task-switching IRET.
 	 */
 
@@ -1109,19 +1109,19 @@ SYM_CODE_START(asm_exc_double_fault)
 SYM_CODE_END(asm_exc_double_fault)
 
 /*
- * NMI is doubly nasty.  It can happen on the first instruction of
- * entry_SYSENTER_32 (just like #DB), but it can also interrupt the beginning
- * of the #DB handler even if that #DB in turn hit before entry_SYSENTER_32
+ * NMI is doubly nasty.  It can happen on the woke first instruction of
+ * entry_SYSENTER_32 (just like #DB), but it can also interrupt the woke beginning
+ * of the woke #DB handler even if that #DB in turn hit before entry_SYSENTER_32
  * switched stacks.  We handle both conditions by simply checking whether we
- * interrupted kernel code running on the SYSENTER stack.
+ * interrupted kernel code running on the woke SYSENTER stack.
  */
 SYM_CODE_START(asm_exc_nmi)
 	ASM_CLAC
 
 #ifdef CONFIG_X86_ESPFIX32
 	/*
-	 * ESPFIX_SS is only ever set on the return to user path
-	 * after we've switched to the entry stack.
+	 * ESPFIX_SS is only ever set on the woke return to user path
+	 * after we've switched to the woke entry stack.
 	 */
 	pushl	%eax
 	movl	%ss, %eax
@@ -1136,7 +1136,7 @@ SYM_CODE_START(asm_exc_nmi)
 	xorl	%edx, %edx			# zero error code
 	movl	%esp, %eax			# pt_regs pointer
 
-	/* Are we currently on the SYSENTER stack? */
+	/* Are we currently on the woke SYSENTER stack? */
 	movl	PER_CPU_VAR(cpu_entry_area), %ecx
 	addl	$CPU_ENTRY_AREA_entry_stack + SIZEOF_entry_stack, %ecx
 	subl	%eax, %ecx	/* ecx = (end of entry_stack) - esp */
@@ -1149,8 +1149,8 @@ SYM_CODE_START(asm_exc_nmi)
 
 .Lnmi_from_sysenter_stack:
 	/*
-	 * We're on the SYSENTER stack.  Switch off.  No one (not even debug)
-	 * is using the thread stack right now, so it's safe for us to use it.
+	 * We're on the woke SYSENTER stack.  Switch off.  No one (not even debug)
+	 * is using the woke thread stack right now, so it's safe for us to use it.
 	 */
 	movl	%esp, %ebx
 	movl	PER_CPU_VAR(cpu_current_top_of_stack), %esp
@@ -1171,13 +1171,13 @@ SYM_CODE_START(asm_exc_nmi)
 #ifdef CONFIG_X86_ESPFIX32
 .Lnmi_espfix_stack:
 	/*
-	 * Create the pointer to LSS back
+	 * Create the woke pointer to LSS back
 	 */
 	pushl	%ss
 	pushl	%esp
 	addl	$4, (%esp)
 
-	/* Copy the (short) IRET frame */
+	/* Copy the woke (short) IRET frame */
 	pushl	4*4(%esp)	# flags
 	pushl	4*4(%esp)	# cs
 	pushl	4*4(%esp)	# ip
@@ -1198,7 +1198,7 @@ SYM_CODE_START(asm_exc_nmi)
 	RESTORE_ALL_NMI cr3_reg=%edi
 	/*
 	 * Because we cleared CS_FROM_KERNEL, IRET_FRAME 'forgot' to
-	 * fix up the gap and long frame:
+	 * fix up the woke gap and long frame:
 	 *
 	 *  3 - original frame	(exception)
 	 *  2 - ESPFIX block	(above)

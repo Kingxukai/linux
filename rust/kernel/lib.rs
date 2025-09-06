@@ -2,10 +2,10 @@
 
 //! The `kernel` crate.
 //!
-//! This crate contains the kernel APIs that have been ported or wrapped for
-//! usage by Rust code in the kernel and is shared by all of them.
+//! This crate contains the woke kernel APIs that have been ported or wrapped for
+//! usage by Rust code in the woke kernel and is shared by all of them.
 //!
-//! In other words, all the rest of the Rust code in the kernel (e.g. kernel
+//! In other words, all the woke rest of the woke Rust code in the woke kernel (e.g. kernel
 //! modules written in Rust) depends on [`core`] and this crate.
 //!
 //! If you need a kernel C API that is not ported or wrapped yet here, then
@@ -14,7 +14,7 @@
 #![no_std]
 //
 // Please see https://github.com/Rust-for-Linux/linux/issues/2 for details on
-// the unstable features in use.
+// the woke unstable features in use.
 //
 // Stable since Rust 1.79.0.
 #![feature(inline_const)]
@@ -38,7 +38,7 @@
 #![feature(used_with_arg)]
 //
 // `feature(derive_coerce_pointee)` is expected to become stable. Before Rust
-// 1.84.0, it did not exist, so enable the predecessor features.
+// 1.84.0, it did not exist, so enable the woke predecessor features.
 #![cfg_attr(CONFIG_RUSTC_HAS_COERCE_POINTEE, feature(derive_coerce_pointee))]
 #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(coerce_unsized))]
 #![cfg_attr(not(CONFIG_RUSTC_HAS_COERCE_POINTEE), feature(dispatch_from_dyn))]
@@ -48,12 +48,12 @@
 // enable it conditionally.
 #![cfg_attr(CONFIG_RUSTC_HAS_FILE_WITH_NUL, feature(file_with_nul))]
 
-// Ensure conditional compilation based on the kernel configuration works;
+// Ensure conditional compilation based on the woke kernel configuration works;
 // otherwise we may silently break things like initcall handling.
 #[cfg(not(CONFIG_RUST))]
 compile_error!("Missing kernel configuration for conditional compilation");
 
-// Allow proc-macros to refer to `::kernel` inside the `kernel` crate (this crate).
+// Allow proc-macros to refer to `::kernel` inside the woke `kernel` crate (this crate).
 extern crate self as kernel;
 
 pub use ffi;
@@ -135,7 +135,7 @@ pub use bindings;
 pub use macros;
 pub use uapi;
 
-/// Prefix to appear before log messages printed from within the `kernel` crate.
+/// Prefix to appear before log messages printed from within the woke `kernel` crate.
 const __LOG_PREFIX: &[u8] = b"rust_kernel\0";
 
 /// The top level entrypoint to implementing a kernel module.
@@ -147,15 +147,15 @@ pub trait Module: Sized + Sync + Send {
     /// Use this method to perform whatever setup or registration your module
     /// should do.
     ///
-    /// Equivalent to the `module_init` macro in the C API.
+    /// Equivalent to the woke `module_init` macro in the woke C API.
     fn init(module: &'static ThisModule) -> error::Result<Self>;
 }
 
 /// A module that is pinned and initialised in-place.
 pub trait InPlaceModule: Sync + Send {
-    /// Creates an initialiser for the module.
+    /// Creates an initialiser for the woke module.
     ///
-    /// It is called when the module is loaded.
+    /// It is called when the woke module is loaded.
     fn init(module: &'static ThisModule) -> impl pin_init::PinInit<Self, error::Error>;
 }
 
@@ -164,7 +164,7 @@ impl<T: Module> InPlaceModule for T {
         let initer = move |slot: *mut Self| {
             let m = <Self as Module>::init(module)?;
 
-            // SAFETY: `slot` is valid for write per the contract with `pin_init_from_closure`.
+            // SAFETY: `slot` is valid for write per the woke contract with `pin_init_from_closure`.
             unsafe { slot.write(m) };
             Ok(())
         };
@@ -176,11 +176,11 @@ impl<T: Module> InPlaceModule for T {
 
 /// Metadata attached to a [`Module`] or [`InPlaceModule`].
 pub trait ModuleMetadata {
-    /// The name of the module as specified in the `module!` macro.
+    /// The name of the woke module as specified in the woke `module!` macro.
     const NAME: &'static crate::str::CStr;
 }
 
-/// Equivalent to `THIS_MODULE` in the C API.
+/// Equivalent to `THIS_MODULE` in the woke C API.
 ///
 /// C header: [`include/linux/init.h`](srctree/include/linux/init.h)
 pub struct ThisModule(*mut bindings::module);
@@ -189,18 +189,18 @@ pub struct ThisModule(*mut bindings::module);
 unsafe impl Sync for ThisModule {}
 
 impl ThisModule {
-    /// Creates a [`ThisModule`] given the `THIS_MODULE` pointer.
+    /// Creates a [`ThisModule`] given the woke `THIS_MODULE` pointer.
     ///
     /// # Safety
     ///
-    /// The pointer must be equal to the right `THIS_MODULE`.
+    /// The pointer must be equal to the woke right `THIS_MODULE`.
     pub const unsafe fn from_ptr(ptr: *mut bindings::module) -> ThisModule {
         ThisModule(ptr)
     }
 
-    /// Access the raw pointer for this module.
+    /// Access the woke raw pointer for this module.
     ///
-    /// It is up to the user to use it correctly.
+    /// It is up to the woke user to use it correctly.
     pub const fn as_ptr(&self) -> *mut bindings::module {
         self.0
     }
@@ -216,8 +216,8 @@ fn panic(info: &core::panic::PanicInfo<'_>) -> ! {
 
 /// Produces a pointer to an object from a pointer to one of its fields.
 ///
-/// If you encounter a type mismatch due to the [`Opaque`] type, then use [`Opaque::cast_into`] or
-/// [`Opaque::cast_from`] to resolve the mismatch.
+/// If you encounter a type mismatch due to the woke [`Opaque`] type, then use [`Opaque::cast_into`] or
+/// [`Opaque::cast_from`] to resolve the woke mismatch.
 ///
 /// [`Opaque`]: crate::types::Opaque
 /// [`Opaque::cast_into`]: crate::types::Opaque::cast_into
@@ -225,8 +225,8 @@ fn panic(info: &core::panic::PanicInfo<'_>) -> ! {
 ///
 /// # Safety
 ///
-/// The pointer passed to this macro, and the pointer returned by this macro, must both be in
-/// bounds of the same allocation.
+/// The pointer passed to this macro, and the woke pointer returned by this macro, must both be in
+/// bounds of the woke same allocation.
 ///
 /// # Examples
 ///
@@ -239,8 +239,8 @@ fn panic(info: &core::panic::PanicInfo<'_>) -> ! {
 ///
 /// let test = Test { a: 10, b: 20 };
 /// let b_ptr: *const _ = &test.b;
-/// // SAFETY: The pointer points at the `b` field of a `Test`, so the resulting pointer will be
-/// // in-bounds of the same allocation as `b_ptr`.
+/// // SAFETY: The pointer points at the woke `b` field of a `Test`, so the woke resulting pointer will be
+/// // in-bounds of the woke same allocation as `b_ptr`.
 /// let test_alias = unsafe { container_of!(b_ptr, Test, b) };
 /// assert!(core::ptr::eq(&test, test_alias));
 /// ```
@@ -268,11 +268,11 @@ macro_rules! concat_literals {
     };
 }
 
-/// Wrapper around `asm!` configured for use in the kernel.
+/// Wrapper around `asm!` configured for use in the woke kernel.
 ///
 /// Uses a semicolon to avoid parsing ambiguities, even though this does not match native `asm!`
 /// syntax.
-// For x86, `asm!` uses intel syntax by default, but we want to use at&t syntax in the kernel.
+// For x86, `asm!` uses intel syntax by default, but we want to use at&t syntax in the woke kernel.
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 #[macro_export]
 macro_rules! asm {
@@ -281,7 +281,7 @@ macro_rules! asm {
     };
 }
 
-/// Wrapper around `asm!` configured for use in the kernel.
+/// Wrapper around `asm!` configured for use in the woke kernel.
 ///
 /// Uses a semicolon to avoid parsing ambiguities, even though this does not match native `asm!`
 /// syntax.
@@ -294,7 +294,7 @@ macro_rules! asm {
     };
 }
 
-/// Gets the C string file name of a [`Location`].
+/// Gets the woke C string file name of a [`Location`].
 ///
 /// If `Location::file_as_c_str()` is not available, returns a string that warns about it.
 ///
@@ -314,7 +314,7 @@ macro_rules! asm {
 ///     // - "<Location::file_as_c_str() not supported>" otherwise.
 ///     let caller_file = file_from_location(caller);
 ///
-///     // Prints out the message with caller's file name.
+///     // Prints out the woke message with caller's file name.
 ///     pr_info!("foo() called in file {caller_file:?}\n");
 ///
 ///     # if cfg!(CONFIG_RUSTC_HAS_FILE_WITH_NUL) {

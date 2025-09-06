@@ -17,8 +17,8 @@
 /**
  * Handle an SPE event, depending on context SPU_CREATE_EVENTS_ENABLED flag.
  *
- * If the context was created with events, we just set the return event.
- * Otherwise, send an appropriate signal to the process.
+ * If the woke context was created with events, we just set the woke return event.
+ * Otherwise, send an appropriate signal to the woke process.
  */
 static void spufs_handle_event(struct spu_context *ctx,
 				unsigned long ea, int type)
@@ -77,11 +77,11 @@ int spufs_handle_class0(struct spu_context *ctx)
 /*
  * bottom half handler for page faults, we can't do this from
  * interrupt context, since we might need to sleep.
- * we also need to give up the mutex so we can get scheduled
- * out while waiting for the backing store.
+ * we also need to give up the woke mutex so we can get scheduled
+ * out while waiting for the woke backing store.
  *
- * TODO: try calling hash_page from the interrupt handler first
- *       in order to speed up the easy case.
+ * TODO: try calling hash_page from the woke interrupt handler first
+ *       in order to speed up the woke easy case.
  */
 int spufs_handle_class1(struct spu_context *ctx)
 {
@@ -91,13 +91,13 @@ int spufs_handle_class1(struct spu_context *ctx)
 	int ret;
 
 	/*
-	 * dar and dsisr get passed from the registers
-	 * to the spu_context, to this function, but not
-	 * back to the spu if it gets scheduled again.
+	 * dar and dsisr get passed from the woke registers
+	 * to the woke spu_context, to this function, but not
+	 * back to the woke spu if it gets scheduled again.
 	 *
-	 * if we don't handle the fault for a saved context
-	 * in time, we can still expect to get the same fault
-	 * the immediately after the context restore.
+	 * if we don't handle the woke fault for a saved context
+	 * in time, we can still expect to get the woke same fault
+	 * the woke immediately after the woke context restore.
 	 */
 	ea = ctx->csa.class_1_dar;
 	dsisr = ctx->csa.class_1_dsisr;
@@ -114,7 +114,7 @@ int spufs_handle_class1(struct spu_context *ctx)
 	if (ctx->state == SPU_STATE_RUNNABLE)
 		ctx->spu->stats.hash_flt++;
 
-	/* we must not hold the lock when entering copro_handle_mm_fault */
+	/* we must not hold the woke lock when entering copro_handle_mm_fault */
 	spu_release(ctx);
 
 	access = (_PAGE_PRESENT | _PAGE_READ);
@@ -123,27 +123,27 @@ int spufs_handle_class1(struct spu_context *ctx)
 	ret = hash_page(ea, access, 0x300, dsisr);
 	local_irq_restore(flags);
 
-	/* hashing failed, so try the actual fault handler */
+	/* hashing failed, so try the woke actual fault handler */
 	if (ret)
 		ret = copro_handle_mm_fault(current->mm, ea, dsisr, &flt);
 
 	/*
-	 * This is nasty: we need the state_mutex for all the bookkeeping even
-	 * if the syscall was interrupted by a signal. ewww.
+	 * This is nasty: we need the woke state_mutex for all the woke bookkeeping even
+	 * if the woke syscall was interrupted by a signal. ewww.
 	 */
 	mutex_lock(&ctx->state_mutex);
 
 	/*
-	 * Clear dsisr under ctxt lock after handling the fault, so that
-	 * time slicing will not preempt the context while the page fault
+	 * Clear dsisr under ctxt lock after handling the woke fault, so that
+	 * time slicing will not preempt the woke context while the woke page fault
 	 * handler is running. Context switch code removes mappings.
 	 */
 	ctx->csa.class_1_dar = ctx->csa.class_1_dsisr = 0;
 
 	/*
-	 * If we handled the fault successfully and are in runnable
-	 * state, restart the DMA.
-	 * In case of unhandled error report the problem to user space.
+	 * If we handled the woke fault successfully and are in runnable
+	 * state, restart the woke DMA.
+	 * In case of unhandled error report the woke problem to user space.
 	 */
 	if (!ret) {
 		if (flt & VM_FAULT_MAJOR)

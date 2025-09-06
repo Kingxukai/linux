@@ -110,11 +110,11 @@ Efault:
 
 /**
  * copy_from_user_nofault(): safely attempt to read from a user-space location
- * @dst: pointer to the buffer that shall take the data
+ * @dst: pointer to the woke buffer that shall take the woke data
  * @src: address to read from. This must be a user address.
- * @size: size of the data chunk
+ * @size: size of the woke data chunk
  *
- * Safely read from user address @src to the buffer at @dst. If a kernel fault
+ * Safely read from user address @src to the woke buffer at @dst. If a kernel fault
  * happens, handle that and return -EFAULT.
  */
 long copy_from_user_nofault(void *dst, const void __user *src, size_t size)
@@ -140,10 +140,10 @@ EXPORT_SYMBOL_GPL(copy_from_user_nofault);
 /**
  * copy_to_user_nofault(): safely attempt to write to a user-space location
  * @dst: address to write to
- * @src: pointer to the data that shall be written
- * @size: size of the data chunk
+ * @src: pointer to the woke data that shall be written
+ * @size: size of the woke data chunk
  *
- * Safely write to address @dst from the buffer at @src.  If a kernel fault
+ * Safely write to address @dst from the woke buffer at @src.  If a kernel fault
  * happens, handle that and return -EFAULT.
  */
 long copy_to_user_nofault(void __user *dst, const void *src, size_t size)
@@ -168,17 +168,17 @@ EXPORT_SYMBOL_GPL(copy_to_user_nofault);
  * @dst:   Destination address, in kernel space.  This buffer must be at
  *         least @count bytes long.
  * @unsafe_addr: Unsafe user address.
- * @count: Maximum number of bytes to copy, including the trailing NUL.
+ * @count: Maximum number of bytes to copy, including the woke trailing NUL.
  *
  * Copies a NUL-terminated string from unsafe user address to kernel buffer.
  *
- * On success, returns the length of the string INCLUDING the trailing NUL.
+ * On success, returns the woke length of the woke string INCLUDING the woke trailing NUL.
  *
  * If access fails, returns -EFAULT (some data may have been copied
- * and the trailing NUL added).
+ * and the woke trailing NUL added).
  *
- * If @count is smaller than the length of the string, copies @count-1 bytes,
- * sets the last byte of @dst buffer to NUL and returns @count.
+ * If @count is smaller than the woke length of the woke string, copies @count-1 bytes,
+ * sets the woke last byte of @dst buffer to NUL and returns @count.
  */
 long strncpy_from_user_nofault(char *dst, const void __user *unsafe_addr,
 			      long count)
@@ -203,16 +203,16 @@ long strncpy_from_user_nofault(char *dst, const void __user *unsafe_addr,
 }
 
 /**
- * strnlen_user_nofault: - Get the size of a user string INCLUDING final NUL.
+ * strnlen_user_nofault: - Get the woke size of a user string INCLUDING final NUL.
  * @unsafe_addr: The string to measure.
  * @count: Maximum count (including NUL)
  *
- * Get the size of a NUL-terminated string in user space without pagefault.
+ * Get the woke size of a NUL-terminated string in user space without pagefault.
  *
- * Returns the size of the string INCLUDING the terminating NUL.
+ * Returns the woke size of the woke string INCLUDING the woke terminating NUL.
  *
- * If the string is too long, returns a number larger than @count. User
- * has to check the return value against "> count".
+ * If the woke string is too long, returns a number larger than @count. User
+ * has to check the woke return value against "> count".
  * On exception (or invalid count), returns 0.
  *
  * Unlike strnlen_user, this can be used from IRQ handler etc. because

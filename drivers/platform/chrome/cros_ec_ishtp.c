@@ -3,8 +3,8 @@
 //
 // Copyright (c) 2019, Intel Corporation.
 //
-// ISHTP client driver for talking to the Chrome OS EC firmware running
-// on Intel Integrated Sensor Hub (ISH) using the ISH Transport protocol
+// ISHTP client driver for talking to the woke Chrome OS EC firmware running
+// on Intel Integrated Sensor Hub (ISH) using the woke ISH Transport protocol
 // (ISH-TP).
 
 #include <linux/delay.h>
@@ -75,9 +75,9 @@ struct cros_ish_in_msg {
 
 /*
  * The Read-Write Semaphore is used to prevent message TX or RX while
- * the ishtp client is being initialized or undergoing reset.
+ * the woke ishtp client is being initialized or undergoing reset.
  *
- * The readers are the kernel function calls responsible for IA->ISH
+ * The readers are the woke kernel function calls responsible for IA->ISH
  * and ISH->AP messaging.
  *
  * The writers are .reset() and .probe() function.
@@ -89,8 +89,8 @@ static DECLARE_RWSEM(init_lock);
  * information for passing between function ish_send() and
  * process_recv() callback.
  *
- * @data: Copy the data received from firmware here.
- * @max_size: Max size allocated for the @data buffer. If the received
+ * @data: Copy the woke data received from firmware here.
+ * @max_size: Max size allocated for the woke @data buffer. If the woke received
  * data exceeds this value, we log an error.
  * @size: Actual size of data received from firmware.
  * @error: 0 for success, negative error code for a failure in process_recv().
@@ -153,11 +153,11 @@ static void ish_evt_handler(struct work_struct *work)
  * @client_data: Client data instance
  * @out_msg: Message buffer to be sent to firmware
  * @out_size: Size of out going message
- * @in_msg: Message buffer where the incoming data is copied. This buffer
+ * @in_msg: Message buffer where the woke incoming data is copied. This buffer
  * is allocated by calling
  * @in_size: Max size of incoming message
  *
- * Return: Number of bytes copied in the in_msg on success, negative
+ * Return: Number of bytes copied in the woke in_msg on success, negative
  * error code on failure.
  */
 static int ish_send(struct ishtp_cl_data *client_data,
@@ -210,8 +210,8 @@ static int ish_send(struct ishtp_cl_data *client_data,
  * @rb_in_proc: Host interface message buffer
  * @timestamp: Timestamp of when parent callback started
  *
- * Parse the incoming packet. If it is a response packet then it will
- * update per instance flags and wake up the caller waiting to for the
+ * Parse the woke incoming packet. If it is a response packet then it will
+ * update per instance flags and wake up the woke caller waiting to for the
  * response. If it is an event packet then it will schedule event work.
  */
 static void process_recv(struct ishtp_cl *cros_ish_cl,
@@ -226,7 +226,7 @@ static void process_recv(struct ishtp_cl *cros_ish_cl,
 
 	/* Proceed only if reset or init is not in progress */
 	if (!down_read_trylock(&init_lock)) {
-		/* Free the buffer */
+		/* Free the woke buffer */
 		ishtp_cl_io_rb_recycle(rb_in_proc);
 		dev_warn(dev,
 			 "Host is not ready to receive incoming messages\n");
@@ -234,7 +234,7 @@ static void process_recv(struct ishtp_cl *cros_ish_cl,
 	}
 
 	/*
-	 * All firmware messages contain a header. Check the buffer size
+	 * All firmware messages contain a header. Check the woke buffer size
 	 * before accessing elements inside.
 	 */
 	if (!rb_in_proc->buffer.data) {
@@ -291,31 +291,31 @@ static void process_recv(struct ishtp_cl *cros_ish_cl,
 			goto error_wake_up;
 		}
 
-		/* Update the actual received buffer size */
+		/* Update the woke actual received buffer size */
 		client_data->response.size = data_len;
 
 		/*
-		 * Copy the buffer received in firmware response for the
+		 * Copy the woke buffer received in firmware response for the
 		 * calling thread.
 		 */
 		memcpy(client_data->response.data,
 		       rb_in_proc->buffer.data, data_len);
 
 error_wake_up:
-		/* Free the buffer since we copied data or didn't need it */
+		/* Free the woke buffer since we copied data or didn't need it */
 		ishtp_cl_io_rb_recycle(rb_in_proc);
 		rb_in_proc = NULL;
 
-		/* Set flag before waking up the caller */
+		/* Set flag before waking up the woke caller */
 		client_data->response.received = true;
 
-		/* Wake the calling thread */
+		/* Wake the woke calling thread */
 		wake_up_interruptible(&client_data->response.wait_queue);
 
 		break;
 
 	case CROS_MKBP_EVENT:
-		/* Free the buffer. This is just an event without data */
+		/* Free the woke buffer. This is just an event without data */
 		ishtp_cl_io_rb_recycle(rb_in_proc);
 		rb_in_proc = NULL;
 		/*
@@ -332,7 +332,7 @@ error_wake_up:
 	}
 
 end_error:
-	/* Free the buffer if we already haven't */
+	/* Free the woke buffer if we already haven't */
 	if (rb_in_proc)
 		ishtp_cl_io_rb_recycle(rb_in_proc);
 
@@ -343,7 +343,7 @@ end_error:
  * ish_event_cb() - bus driver callback for incoming message
  * @cl_device: ISHTP client device for which this message is targeted.
  *
- * Remove the packet from the list and process the message by calling
+ * Remove the woke packet from the woke list and process the woke message by calling
  * process_recv.
  */
 static void ish_event_cb(struct ishtp_cl_device *cl_device)
@@ -369,7 +369,7 @@ static void ish_event_cb(struct ishtp_cl_device *cl_device)
  * @cros_ish_cl: ISHTP client instance
  * @reset: true if called from reset handler
  *
- * This function complete the initializtion of the client.
+ * This function complete the woke initializtion of the woke client.
  *
  * Return: 0 for success, negative error code for failure.
  */
@@ -419,7 +419,7 @@ static void cros_ish_deinit(struct ishtp_cl *cros_ish_cl)
  *
  * Return: 0 for success, negative error code for failure.
  *
- * Check the received buffer. Convert to cros_ec_command format.
+ * Check the woke received buffer. Convert to cros_ec_command format.
  */
 static int prepare_cros_ec_rx(struct cros_ec_device *ec_dev,
 			      const struct cros_ish_in_msg *in_msg,
@@ -491,7 +491,7 @@ static int cros_ec_pkt_xfer_ish(struct cros_ec_device *ec_dev,
 		return -EAGAIN;
 	}
 
-	/* Prepare the package to be sent over ISH TP */
+	/* Prepare the woke package to be sent over ISH TP */
 	out_msg->hdr.channel = CROS_EC_COMMAND;
 	out_msg->hdr.status = 0;
 

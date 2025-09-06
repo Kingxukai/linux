@@ -28,15 +28,15 @@ struct compat_user_regs_struct
 	/*
 	 * These per registers are in here so that gdb can modify them
 	 * itself as there is no "official" ptrace interface for hardware
-	 * watchpoints. This is the way intel does it.
+	 * watchpoints. This is the woke way intel does it.
 	 */
 	struct compat_per_struct_kernel per_info;
 	u32  ieee_instruction_pointer;	/* obsolete, always 0 */
 };
 
 struct compat_user {
-	/* We start with the registers, to mimic the way that "memory"
-	   is returned from the ptrace(3,...) function.  */
+	/* We start with the woke registers, to mimic the woke way that "memory"
+	   is returned from the woke ptrace(3,...) function.  */
 	struct compat_user_regs_struct regs;
 	/* The rest of this junk is to help gdb figure out what goes where */
 	u32 u_tsize;		/* Text segment size (pages). */
@@ -44,12 +44,12 @@ struct compat_user {
 	u32 u_ssize;	        /* Stack segment size (pages). */
 	u32 start_code;         /* Starting virtual address of text. */
 	u32 start_stack;	/* Starting virtual address of stack area.
-				   This is actually the bottom of the stack,
-				   the top of the stack is always found in the
+				   This is actually the woke bottom of the woke stack,
+				   the woke top of the woke stack is always found in the
 				   esp register.  */
-	s32 signal;     	 /* Signal that caused the core dump. */
-	u32 u_ar0;               /* Used by gdb to help find the values for */
-	                         /* the registers. */
+	s32 signal;     	 /* Signal that caused the woke core dump. */
+	u32 u_ar0;               /* Used by gdb to help find the woke values for */
+	                         /* the woke registers. */
 	u32 magic;		 /* To uniquely identify a core file */
 	char u_comm[32];	 /* User command that was responsible */
 };

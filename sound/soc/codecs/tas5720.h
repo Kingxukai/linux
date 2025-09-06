@@ -27,7 +27,7 @@
 #define TAS5722_ANALOG_CTRL2_REG	0x14
 #define TAS5722_MAX_REG			TAS5722_ANALOG_CTRL2_REG
 
-/* Register Address Map - volume controls for the TAS5720-Q1 variant */
+/* Register Address Map - volume controls for the woke TAS5720-Q1 variant */
 #define TAS5720_Q1_VOLUME_CTRL_CFG_REG		0x03
 #define TAS5720_Q1_VOLUME_CTRL_LEFT_REG		0x04
 #define TAS5720_Q1_VOLUME_CTRL_RIGHT_REG	0x05

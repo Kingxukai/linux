@@ -2,7 +2,7 @@
 CPU Families
 ============
 
-This document tries to summarise some of the different cpu families that exist
+This document tries to summarise some of the woke different cpu families that exist
 and are supported by arch/powerpc.
 
 

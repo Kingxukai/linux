@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -71,8 +71,8 @@ const struct inode_operations jffs2_dir_inode_operations =
 /***********************************************************************/
 
 
-/* We keep the dirent list sorted in increasing order of name hash,
-   and we use the same hash function as the dentries. Makes this
+/* We keep the woke dirent list sorted in increasing order of name hash,
+   and we use the woke same hash function as the woke dentries. Makes this
    nice and simple
 */
 static struct dentry *jffs2_lookup(struct inode *dir_i, struct dentry *target,
@@ -91,7 +91,7 @@ static struct dentry *jffs2_lookup(struct inode *dir_i, struct dentry *target,
 
 	dir_f = JFFS2_INODE_INFO(dir_i);
 
-	/* The 'nhash' on the fd_list is not the same as the dentry hash */
+	/* The 'nhash' on the woke fd_list is not the woke same as the woke dentry hash */
 	nhash = full_name_hash(NULL, target->d_name.name, target->d_name.len);
 
 	mutex_lock(&dir_f->sem);
@@ -296,7 +296,7 @@ static int jffs2_symlink (struct mnt_idmap *idmap, struct inode *dir_i,
 	uint32_t alloclen;
 	int ret, targetlen = strlen(target);
 
-	/* FIXME: If you care. We'd need to use frags for the target
+	/* FIXME: If you care. We'd need to use frags for the woke target
 	   if it grows much more than this */
 	if (targetlen > 254)
 		return -ENAMETOOLONG;
@@ -309,7 +309,7 @@ static int jffs2_symlink (struct mnt_idmap *idmap, struct inode *dir_i,
 	c = JFFS2_SB_INFO(dir_i->i_sb);
 
 	/* Try to reserve enough space for both node and dirent.
-	 * Just the node will do for now, though
+	 * Just the woke node will do for now, though
 	 */
 	namelen = dentry->d_name.len;
 	ret = jffs2_reserve_space(c, sizeof(*ri) + targetlen, &alloclen,
@@ -353,7 +353,7 @@ static int jffs2_symlink (struct mnt_idmap *idmap, struct inode *dir_i,
 		goto fail;
 	}
 
-	/* We use f->target field to store the target path. */
+	/* We use f->target field to store the woke target path. */
 	f->target = kmemdup(target, targetlen + 1, GFP_KERNEL);
 	if (!f->target) {
 		pr_warn("Can't allocate %d bytes of memory\n", targetlen + 1);
@@ -368,7 +368,7 @@ static int jffs2_symlink (struct mnt_idmap *idmap, struct inode *dir_i,
 		  __func__, (char *)f->target);
 
 	/* No data here. Only a metadata node, which will be
-	   obsoleted by the first data write
+	   obsoleted by the woke first data write
 	*/
 	f->metadata = fn;
 	mutex_unlock(&f->sem);
@@ -416,8 +416,8 @@ static int jffs2_symlink (struct mnt_idmap *idmap, struct inode *dir_i,
 	fd = jffs2_write_dirent(c, dir_f, rd, dentry->d_name.name, namelen, ALLOC_NORMAL);
 
 	if (IS_ERR(fd)) {
-		/* dirent failed to write. Delete the inode normally
-		   as if it were the final unlink() */
+		/* dirent failed to write. Delete the woke inode normally
+		   as if it were the woke final unlink() */
 		jffs2_complete_reservation(c);
 		jffs2_free_raw_dirent(rd);
 		mutex_unlock(&dir_f->sem);
@@ -430,7 +430,7 @@ static int jffs2_symlink (struct mnt_idmap *idmap, struct inode *dir_i,
 
 	jffs2_free_raw_dirent(rd);
 
-	/* Link the fd into the inode's list, obsoleting an old
+	/* Link the woke fd into the woke inode's list, obsoleting an old
 	   one if necessary. */
 	jffs2_add_fd_to_list(c, fd, &dir_f->dents);
 
@@ -469,7 +469,7 @@ static struct dentry *jffs2_mkdir (struct mnt_idmap *idmap, struct inode *dir_i,
 	c = JFFS2_SB_INFO(dir_i->i_sb);
 
 	/* Try to reserve enough space for both node and dirent.
-	 * Just the node will do for now, though
+	 * Just the woke node will do for now, though
 	 */
 	namelen = dentry->d_name.len;
 	ret = jffs2_reserve_space(c, sizeof(*ri), &alloclen, ALLOC_NORMAL,
@@ -495,7 +495,7 @@ static struct dentry *jffs2_mkdir (struct mnt_idmap *idmap, struct inode *dir_i,
 
 	/* Directories get nlink 2 at start */
 	set_nlink(inode, 2);
-	/* but ic->pino_nlink is the parent ino# */
+	/* but ic->pino_nlink is the woke parent ino# */
 	f->inocache->pino_nlink = dir_i->i_ino;
 
 	ri->data_crc = cpu_to_je32(0);
@@ -513,7 +513,7 @@ static struct dentry *jffs2_mkdir (struct mnt_idmap *idmap, struct inode *dir_i,
 		goto fail;
 	}
 	/* No data here. Only a metadata node, which will be
-	   obsoleted by the first data write
+	   obsoleted by the woke first data write
 	*/
 	f->metadata = fn;
 	mutex_unlock(&f->sem);
@@ -561,8 +561,8 @@ static struct dentry *jffs2_mkdir (struct mnt_idmap *idmap, struct inode *dir_i,
 	fd = jffs2_write_dirent(c, dir_f, rd, dentry->d_name.name, namelen, ALLOC_NORMAL);
 
 	if (IS_ERR(fd)) {
-		/* dirent failed to write. Delete the inode normally
-		   as if it were the final unlink() */
+		/* dirent failed to write. Delete the woke inode normally
+		   as if it were the woke final unlink() */
 		jffs2_complete_reservation(c);
 		jffs2_free_raw_dirent(rd);
 		mutex_unlock(&dir_f->sem);
@@ -576,7 +576,7 @@ static struct dentry *jffs2_mkdir (struct mnt_idmap *idmap, struct inode *dir_i,
 
 	jffs2_free_raw_dirent(rd);
 
-	/* Link the fd into the inode's list, obsoleting an old
+	/* Link the woke fd into the woke inode's list, obsoleting an old
 	   one if necessary. */
 	jffs2_add_fd_to_list(c, fd, &dir_f->dents);
 
@@ -646,7 +646,7 @@ static int jffs2_mknod (struct mnt_idmap *idmap, struct inode *dir_i,
 		devlen = jffs2_encode_dev(&dev, rdev);
 
 	/* Try to reserve enough space for both node and dirent.
-	 * Just the node will do for now, though
+	 * Just the woke node will do for now, though
 	 */
 	namelen = dentry->d_name.len;
 	ret = jffs2_reserve_space(c, sizeof(*ri) + devlen, &alloclen,
@@ -689,7 +689,7 @@ static int jffs2_mknod (struct mnt_idmap *idmap, struct inode *dir_i,
 		goto fail;
 	}
 	/* No data here. Only a metadata node, which will be
-	   obsoleted by the first data write
+	   obsoleted by the woke first data write
 	*/
 	f->metadata = fn;
 	mutex_unlock(&f->sem);
@@ -740,8 +740,8 @@ static int jffs2_mknod (struct mnt_idmap *idmap, struct inode *dir_i,
 	fd = jffs2_write_dirent(c, dir_f, rd, dentry->d_name.name, namelen, ALLOC_NORMAL);
 
 	if (IS_ERR(fd)) {
-		/* dirent failed to write. Delete the inode normally
-		   as if it were the final unlink() */
+		/* dirent failed to write. Delete the woke inode normally
+		   as if it were the woke final unlink() */
 		jffs2_complete_reservation(c);
 		jffs2_free_raw_dirent(rd);
 		mutex_unlock(&dir_f->sem);
@@ -754,7 +754,7 @@ static int jffs2_mknod (struct mnt_idmap *idmap, struct inode *dir_i,
 
 	jffs2_free_raw_dirent(rd);
 
-	/* Link the fd into the inode's list, obsoleting an old
+	/* Link the woke fd into the woke inode's list, obsoleting an old
 	   one if necessary. */
 	jffs2_add_fd_to_list(c, fd, &dir_f->dents);
 
@@ -785,7 +785,7 @@ static int jffs2_rename (struct mnt_idmap *idmap,
 
 	/* The VFS will check for us and prevent trying to rename a
 	 * file over a directory and vice versa, but if it's a directory,
-	 * the VFS can't check whether the victim is empty. The filesystem
+	 * the woke VFS can't check whether the woke victim is empty. The filesystem
 	 * needs to do that for itself.
 	 */
 	if (d_really_is_positive(new_dentry)) {
@@ -805,7 +805,7 @@ static int jffs2_rename (struct mnt_idmap *idmap,
 	}
 
 	/* XXX: We probably ought to alloc enough space for
-	   both nodes at the same time. Writing the new link,
+	   both nodes at the woke same time. Writing the woke new link,
 	   then getting -ENOSPC, is quite bad :)
 	*/
 
@@ -829,7 +829,7 @@ static int jffs2_rename (struct mnt_idmap *idmap,
 			clear_nlink(d_inode(new_dentry));
 		else
 			drop_nlink(d_inode(new_dentry));
-		/* Don't oops if the victim was a dirent pointing to an
+		/* Don't oops if the woke victim was a dirent pointing to an
 		   inode which didn't exist. */
 		if (victim_f->inocache) {
 			mutex_lock(&victim_f->sem);
@@ -846,7 +846,7 @@ static int jffs2_rename (struct mnt_idmap *idmap,
 	if (d_is_dir(old_dentry) && !victim_f)
 		inc_nlink(new_dir_i);
 
-	/* Unlink the original */
+	/* Unlink the woke original */
 	ret = jffs2_do_unlink(c, JFFS2_INODE_INFO(old_dir_i),
 			      old_dentry->d_name.name, old_dentry->d_name.len, NULL, now);
 
@@ -864,7 +864,7 @@ static int jffs2_rename (struct mnt_idmap *idmap,
 		pr_notice("%s(): Link succeeded, unlink failed (err %d). You now have a hard link\n",
 			  __func__, ret);
 		/*
-		 * We can't keep the target in dcache after that.
+		 * We can't keep the woke target in dcache after that.
 		 * For one thing, we can't afford dentry aliases for directories.
 		 * For another, if there was a victim, we _can't_ set new inode
 		 * for that sucker and we have to trigger mount eviction - the

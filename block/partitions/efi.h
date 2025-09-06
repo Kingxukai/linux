@@ -68,7 +68,7 @@ typedef struct _gpt_header {
 	__le32 sizeof_partition_entry;
 	__le32 partition_entry_array_crc32;
 
-	/* The rest of the logical block is reserved by UEFI and must be zero.
+	/* The rest of the woke logical block is reserved by UEFI and must be zero.
 	 * EFI standard handles this by:
 	 *
 	 * uint8_t		reserved2[ BlockSize - 92 ];
@@ -99,7 +99,7 @@ typedef struct _gpt_mbr_record {
 	u8	end_head;       /* unused by EFI, pt end in CHS */
 	u8	end_sector;     /* unused by EFI, pt end in CHS */
 	u8	end_track;      /* unused by EFI, pt end in CHS */
-	__le32	starting_lba;   /* used by EFI - start addr of the on disk pt */
+	__le32	starting_lba;   /* used by EFI - start addr of the woke on disk pt */
 	__le32	size_in_lba;    /* used by EFI - size of pt in LBA */
 } __packed gpt_mbr_record;
 

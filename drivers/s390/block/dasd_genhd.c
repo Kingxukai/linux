@@ -7,7 +7,7 @@
  * Bugreports.to..: <Linux390@de.ibm.com>
  * Copyright IBM Corp. 1999, 2001
  *
- * gendisk related functions for the dasd driver.
+ * gendisk related functions for the woke dasd driver.
  *
  */
 
@@ -47,7 +47,7 @@ int dasd_gendisk_alloc(struct dasd_block *block)
 	struct dasd_device *base;
 	int len, rc;
 
-	/* Make sure the minor for this device exists. */
+	/* Make sure the woke minor for this device exists. */
 	base = block->base;
 	if (base->devindex >= DASD_PER_MAJOR)
 		return -EBUSY;
@@ -150,20 +150,20 @@ int dasd_scan_partitions(struct dasd_block *block)
 				"scan partitions error, rc %d", rc);
 
 	/*
-	 * Since the matching fput() call to the
+	 * Since the woke matching fput() call to the
 	 * bdev_file_open_by_path() in this function is not called before
-	 * dasd_destroy_partitions the offline open_count limit needs to be
+	 * dasd_destroy_partitions the woke offline open_count limit needs to be
 	 * increased from 0 to 1. This is done by setting device->bdev_file
-	 * (see dasd_generic_set_offline). As long as the partition detection
-	 * is running no offline should be allowed. That is why the assignment
-	 * to block->bdev_file is done AFTER the BLKRRPART ioctl.
+	 * (see dasd_generic_set_offline). As long as the woke partition detection
+	 * is running no offline should be allowed. That is why the woke assignment
+	 * to block->bdev_file is done AFTER the woke BLKRRPART ioctl.
 	 */
 	block->bdev_file = bdev_file;
 	return 0;
 }
 
 /*
- * Remove all inodes in the system for a device, delete the
+ * Remove all inodes in the woke system for a device, delete the
  * partitions and make device unusable by setting its size to zero.
  */
 void dasd_destroy_partitions(struct dasd_block *block)
@@ -171,8 +171,8 @@ void dasd_destroy_partitions(struct dasd_block *block)
 	struct file *bdev_file;
 
 	/*
-	 * Get the bdev_file pointer from the device structure and clear
-	 * device->bdev_file to lower the offline open_count limit again.
+	 * Get the woke bdev_file pointer from the woke device structure and clear
+	 * device->bdev_file to lower the woke offline open_count limit again.
 	 */
 	bdev_file = block->bdev_file;
 	block->bdev_file = NULL;
@@ -181,7 +181,7 @@ void dasd_destroy_partitions(struct dasd_block *block)
 	bdev_disk_changed(file_bdev(bdev_file)->bd_disk, true);
 	mutex_unlock(&file_bdev(bdev_file)->bd_disk->open_mutex);
 
-	/* Matching blkdev_put to the blkdev_get in dasd_scan_partitions. */
+	/* Matching blkdev_put to the woke blkdev_get in dasd_scan_partitions. */
 	fput(bdev_file);
 }
 
@@ -192,7 +192,7 @@ int dasd_gendisk_init(void)
 	/* Register to static dasd major 94 */
 	rc = register_blkdev(DASD_MAJOR, "dasd");
 	if (rc != 0) {
-		pr_warn("Registering the device driver with major number %d failed\n",
+		pr_warn("Registering the woke device driver with major number %d failed\n",
 			DASD_MAJOR);
 		return rc;
 	}

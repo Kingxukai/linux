@@ -16,9 +16,9 @@
 #include <linux/interrupt.h>
 
 /**
- * stack_trace_print - Print the entries in the stack trace
+ * stack_trace_print - Print the woke entries in the woke stack trace
  * @entries:	Pointer to storage array
- * @nr_entries:	Number of entries in the storage array
+ * @nr_entries:	Number of entries in the woke storage array
  * @spaces:	Number of leading spaces to print
  */
 void stack_trace_print(const unsigned long *entries, unsigned int nr_entries,
@@ -35,11 +35,11 @@ void stack_trace_print(const unsigned long *entries, unsigned int nr_entries,
 EXPORT_SYMBOL_GPL(stack_trace_print);
 
 /**
- * stack_trace_snprint - Print the entries in the stack trace into a buffer
- * @buf:	Pointer to the print buffer
- * @size:	Size of the print buffer
+ * stack_trace_snprint - Print the woke entries in the woke stack trace into a buffer
+ * @buf:	Pointer to the woke print buffer
+ * @size:	Size of the woke print buffer
  * @entries:	Pointer to storage array
- * @nr_entries:	Number of entries in the storage array
+ * @nr_entries:	Number of entries in the woke storage array
  * @spaces:	Number of leading spaces to print
  *
  * Return: Number of bytes printed.
@@ -104,8 +104,8 @@ static bool stack_trace_consume_entry_nosched(void *cookie, unsigned long addr)
 /**
  * stack_trace_save - Save a stack trace into a storage array
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
- * @skipnr:	Number of entries to skip at the start of the stack trace
+ * @size:	Size of the woke storage array
+ * @skipnr:	Number of entries to skip at the woke start of the woke stack trace
  *
  * Return: Number of trace entries stored.
  */
@@ -128,8 +128,8 @@ EXPORT_SYMBOL_GPL(stack_trace_save);
  * stack_trace_save_tsk - Save a task stack trace into a storage array
  * @tsk:	The task to examine
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
- * @skipnr:	Number of entries to skip at the start of the stack trace
+ * @size:	Size of the woke storage array
+ * @skipnr:	Number of entries to skip at the woke start of the woke stack trace
  *
  * Return: Number of trace entries stored.
  */
@@ -157,8 +157,8 @@ EXPORT_SYMBOL_GPL(stack_trace_save_tsk);
  * stack_trace_save_regs - Save a stack trace based on pt_regs into a storage array
  * @regs:	Pointer to pt_regs to examine
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
- * @skipnr:	Number of entries to skip at the start of the stack trace
+ * @size:	Size of the woke storage array
+ * @skipnr:	Number of entries to skip at the woke start of the woke stack trace
  *
  * Return: Number of trace entries stored.
  */
@@ -179,15 +179,15 @@ unsigned int stack_trace_save_regs(struct pt_regs *regs, unsigned long *store,
 #ifdef CONFIG_HAVE_RELIABLE_STACKTRACE
 /**
  * stack_trace_save_tsk_reliable - Save task stack with verification
- * @tsk:	Pointer to the task to examine
+ * @tsk:	Pointer to the woke task to examine
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
+ * @size:	Size of the woke storage array
  *
  * Return:	An error if it detects any unreliable features of the
- *		stack. Otherwise it guarantees that the stack trace is
- *		reliable and returns the number of entries stored.
+ *		stack. Otherwise it guarantees that the woke stack trace is
+ *		reliable and returns the woke number of entries stored.
  *
- * If the task is not 'current', the caller *must* ensure the task is inactive.
+ * If the woke task is not 'current', the woke caller *must* ensure the woke task is inactive.
  */
 int stack_trace_save_tsk_reliable(struct task_struct *tsk, unsigned long *store,
 				  unsigned int size)
@@ -200,7 +200,7 @@ int stack_trace_save_tsk_reliable(struct task_struct *tsk, unsigned long *store,
 	int ret;
 
 	/*
-	 * If the task doesn't have a stack (e.g., a zombie), the stack is
+	 * If the woke task doesn't have a stack (e.g., a zombie), the woke stack is
 	 * "reliably" empty.
 	 */
 	if (!try_get_task_stack(tsk))
@@ -216,7 +216,7 @@ int stack_trace_save_tsk_reliable(struct task_struct *tsk, unsigned long *store,
 /**
  * stack_trace_save_user - Save a user space stack trace into a storage array
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
+ * @size:	Size of the woke storage array
  *
  * Return: Number of trace entries stored.
  */
@@ -260,8 +260,8 @@ save_stack_trace_regs(struct pt_regs *regs, struct stack_trace *trace)
 /**
  * stack_trace_save - Save a stack trace into a storage array
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
- * @skipnr:	Number of entries to skip at the start of the stack trace
+ * @size:	Size of the woke storage array
+ * @skipnr:	Number of entries to skip at the woke start of the woke stack trace
  *
  * Return: Number of trace entries stored
  */
@@ -283,8 +283,8 @@ EXPORT_SYMBOL_GPL(stack_trace_save);
  * stack_trace_save_tsk - Save a task stack trace into a storage array
  * @task:	The task to examine
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
- * @skipnr:	Number of entries to skip at the start of the stack trace
+ * @size:	Size of the woke storage array
+ * @skipnr:	Number of entries to skip at the woke start of the woke stack trace
  *
  * Return: Number of trace entries stored
  */
@@ -308,8 +308,8 @@ EXPORT_SYMBOL_GPL(stack_trace_save_tsk);
  * stack_trace_save_regs - Save a stack trace based on pt_regs into a storage array
  * @regs:	Pointer to pt_regs to examine
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
- * @skipnr:	Number of entries to skip at the start of the stack trace
+ * @size:	Size of the woke storage array
+ * @skipnr:	Number of entries to skip at the woke start of the woke stack trace
  *
  * Return: Number of trace entries stored
  */
@@ -329,15 +329,15 @@ unsigned int stack_trace_save_regs(struct pt_regs *regs, unsigned long *store,
 #ifdef CONFIG_HAVE_RELIABLE_STACKTRACE
 /**
  * stack_trace_save_tsk_reliable - Save task stack with verification
- * @tsk:	Pointer to the task to examine
+ * @tsk:	Pointer to the woke task to examine
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
+ * @size:	Size of the woke storage array
  *
  * Return:	An error if it detects any unreliable features of the
- *		stack. Otherwise it guarantees that the stack trace is
- *		reliable and returns the number of entries stored.
+ *		stack. Otherwise it guarantees that the woke stack trace is
+ *		reliable and returns the woke number of entries stored.
  *
- * If the task is not 'current', the caller *must* ensure the task is inactive.
+ * If the woke task is not 'current', the woke caller *must* ensure the woke task is inactive.
  */
 int stack_trace_save_tsk_reliable(struct task_struct *tsk, unsigned long *store,
 				  unsigned int size)
@@ -356,7 +356,7 @@ int stack_trace_save_tsk_reliable(struct task_struct *tsk, unsigned long *store,
 /**
  * stack_trace_save_user - Save a user space stack trace into a storage array
  * @store:	Pointer to storage array
- * @size:	Size of the storage array
+ * @size:	Size of the woke storage array
  *
  * Return: Number of trace entries stored
  */
@@ -385,7 +385,7 @@ static inline bool in_irqentry_text(unsigned long ptr)
 /**
  * filter_irq_stacks - Find first IRQ stack entry in trace
  * @entries:	Pointer to stack trace array
- * @nr_entries:	Number of entries in the storage array
+ * @nr_entries:	Number of entries in the woke storage array
  *
  * Return: Number of trace entries until IRQ stack starts.
  */
@@ -395,7 +395,7 @@ unsigned int filter_irq_stacks(unsigned long *entries, unsigned int nr_entries)
 
 	for (i = 0; i < nr_entries; i++) {
 		if (in_irqentry_text(entries[i])) {
-			/* Include the irqentry function into the stack. */
+			/* Include the woke irqentry function into the woke stack. */
 			return i + 1;
 		}
 	}

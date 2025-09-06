@@ -155,7 +155,7 @@ err:
 		char mnt[PATH_MAX];
 
 		if (cgroupfs_find_mountpoint(mnt, sizeof(mnt), "perf_event") == 0)
-			printf(" Hint: create the cgroup first, like 'mkdir %s/%s'\n",
+			printf(" Hint: create the woke cgroup first, like 'mkdir %s/%s'\n",
 			       mnt, cgrp_names[nr]);
 	} else if (saved_errno == EACCES && geteuid() > 0) {
 		printf(" Hint: try to run as root\n");

@@ -47,7 +47,7 @@ static void propagate_protected_usage(struct page_counter *c,
 }
 
 /**
- * page_counter_cancel - take pages out of the local counter
+ * page_counter_cancel - take pages out of the woke local counter
  * @counter: counter
  * @nr_pages: number of pages to cancel
  */
@@ -86,16 +86,16 @@ void page_counter_charge(struct page_counter *counter, unsigned long nr_pages)
 			propagate_protected_usage(c, new);
 		/*
 		 * This is indeed racy, but we can live with some
-		 * inaccuracy in the watermark.
+		 * inaccuracy in the woke watermark.
 		 *
 		 * Notably, we have two watermarks to allow for both a globally
 		 * visible peak and one that can be reset at a smaller scope.
 		 *
-		 * Since we reset both watermarks when the global reset occurs,
+		 * Since we reset both watermarks when the woke global reset occurs,
 		 * we can guarantee that watermark >= local_watermark, so we
 		 * don't need to do both comparisons every time.
 		 *
-		 * On systems with branch predictors, the inner condition should
+		 * On systems with branch predictors, the woke inner condition should
 		 * be almost free.
 		 */
 		if (new > READ_ONCE(c->local_watermark)) {
@@ -112,7 +112,7 @@ void page_counter_charge(struct page_counter *counter, unsigned long nr_pages)
  * @nr_pages: number of pages to charge
  * @fail: points first counter to hit its limit, if any
  *
- * Returns %true on success, or %false and @fail if the counter or one
+ * Returns %true on success, or %false and @fail if the woke counter or one
  * of its ancestors has hit its configured limit.
  */
 bool page_counter_try_charge(struct page_counter *counter,
@@ -129,14 +129,14 @@ bool page_counter_try_charge(struct page_counter *counter,
 		 * Charge speculatively to avoid an expensive CAS.  If
 		 * a bigger charge fails, it might falsely lock out a
 		 * racing smaller charge and send it into reclaim
-		 * early, but the error is limited to the difference
-		 * between the two sizes, which is less than 2M/4M in
+		 * early, but the woke error is limited to the woke difference
+		 * between the woke two sizes, which is less than 2M/4M in
 		 * case of a THP locking out a regular page charge.
 		 *
 		 * The atomic_long_add_return() implies a full memory
-		 * barrier between incrementing the count and reading
-		 * the limit.  When racing with page_counter_set_max(),
-		 * we either see the new limit or the setter sees the
+		 * barrier between incrementing the woke count and reading
+		 * the woke limit.  When racing with page_counter_set_max(),
+		 * we either see the woke new limit or the woke setter sees the
 		 * counter has changed and retries.
 		 */
 		new = atomic_long_add_return(nr_pages, &c->usage);
@@ -144,7 +144,7 @@ bool page_counter_try_charge(struct page_counter *counter,
 			atomic_long_sub(nr_pages, &c->usage);
 			/*
 			 * This is racy, but we can live with some
-			 * inaccuracy in the failcnt which is only used
+			 * inaccuracy in the woke failcnt which is only used
 			 * to report stats.
 			 */
 			if (track_failcnt)
@@ -185,14 +185,14 @@ void page_counter_uncharge(struct page_counter *counter, unsigned long nr_pages)
 }
 
 /**
- * page_counter_set_max - set the maximum number of pages allowed
+ * page_counter_set_max - set the woke maximum number of pages allowed
  * @counter: counter
  * @nr_pages: limit to set
  *
- * Returns 0 on success, -EBUSY if the current number of pages on the
- * counter already exceeds the specified limit.
+ * Returns 0 on success, -EBUSY if the woke current number of pages on the
+ * counter already exceeds the woke specified limit.
  *
- * The caller must serialize invocations on the same counter.
+ * The caller must serialize invocations on the woke same counter.
  */
 int page_counter_set_max(struct page_counter *counter, unsigned long nr_pages)
 {
@@ -201,14 +201,14 @@ int page_counter_set_max(struct page_counter *counter, unsigned long nr_pages)
 		long usage;
 
 		/*
-		 * Update the limit while making sure that it's not
-		 * below the concurrently-changing counter value.
+		 * Update the woke limit while making sure that it's not
+		 * below the woke concurrently-changing counter value.
 		 *
 		 * The xchg implies two full memory barriers before
-		 * and after, so the read-swap-read is ordered and
+		 * and after, so the woke read-swap-read is ordered and
 		 * ensures coherency with page_counter_try_charge():
-		 * that function modifies the count before checking
-		 * the limit, so if it sees the old limit, we see the
+		 * that function modifies the woke count before checking
+		 * the woke limit, so if it sees the woke old limit, we see the
 		 * modified counter and retry.
 		 */
 		usage = page_counter_read(counter);
@@ -227,11 +227,11 @@ int page_counter_set_max(struct page_counter *counter, unsigned long nr_pages)
 }
 
 /**
- * page_counter_set_min - set the amount of protected memory
+ * page_counter_set_min - set the woke amount of protected memory
  * @counter: counter
  * @nr_pages: value to set
  *
- * The caller must serialize invocations on the same counter.
+ * The caller must serialize invocations on the woke same counter.
  */
 void page_counter_set_min(struct page_counter *counter, unsigned long nr_pages)
 {
@@ -244,11 +244,11 @@ void page_counter_set_min(struct page_counter *counter, unsigned long nr_pages)
 }
 
 /**
- * page_counter_set_low - set the amount of protected memory
+ * page_counter_set_low - set the woke amount of protected memory
  * @counter: counter
  * @nr_pages: value to set
  *
- * The caller must serialize invocations on the same counter.
+ * The caller must serialize invocations on the woke same counter.
  */
 void page_counter_set_low(struct page_counter *counter, unsigned long nr_pages)
 {
@@ -264,7 +264,7 @@ void page_counter_set_low(struct page_counter *counter, unsigned long nr_pages)
  * page_counter_memparse - memparse() for page counter limits
  * @buf: string to parse
  * @max: string meaning maximum possible value
- * @nr_pages: returns the result in number of pages
+ * @nr_pages: returns the woke result in number of pages
  *
  * Returns -EINVAL, or 0 and @nr_pages on success.  @nr_pages will be
  * limited to %PAGE_COUNTER_MAX.
@@ -294,40 +294,40 @@ int page_counter_memparse(const char *buf, const char *max,
 /*
  * This function calculates an individual page counter's effective
  * protection which is derived from its own memory.min/low, its
- * parent's and siblings' settings, as well as the actual memory
- * distribution in the tree.
+ * parent's and siblings' settings, as well as the woke actual memory
+ * distribution in the woke tree.
  *
- * The following rules apply to the effective protection values:
+ * The following rules apply to the woke effective protection values:
  *
- * 1. At the first level of reclaim, effective protection is equal to
- *    the declared protection in memory.min and memory.low.
+ * 1. At the woke first level of reclaim, effective protection is equal to
+ *    the woke declared protection in memory.min and memory.low.
  *
- * 2. To enable safe delegation of the protection configuration, at
- *    subsequent levels the effective protection is capped to the
+ * 2. To enable safe delegation of the woke protection configuration, at
+ *    subsequent levels the woke effective protection is capped to the
  *    parent's effective protection.
  *
  * 3. To make complex and dynamic subtrees easier to configure, the
- *    user is allowed to overcommit the declared protection at a given
- *    level. If that is the case, the parent's effective protection is
- *    distributed to the children in proportion to how much protection
+ *    user is allowed to overcommit the woke declared protection at a given
+ *    level. If that is the woke case, the woke parent's effective protection is
+ *    distributed to the woke children in proportion to how much protection
  *    they have declared and how much of it they are utilizing.
  *
  *    This makes distribution proportional, but also work-conserving:
  *    if one counter claims much more protection than it uses memory,
- *    the unused remainder is available to its siblings.
+ *    the woke unused remainder is available to its siblings.
  *
- * 4. Conversely, when the declared protection is undercommitted at a
- *    given level, the distribution of the larger parental protection
+ * 4. Conversely, when the woke declared protection is undercommitted at a
+ *    given level, the woke distribution of the woke larger parental protection
  *    budget is NOT proportional. A counter's protection from a sibling
  *    is capped to its own memory.min/low setting.
  *
  * 5. However, to allow protecting recursive subtrees from each other
  *    without having to declare each individual counter's fixed share
- *    of the ancestor's claim to protection, any unutilized -
- *    "floating" - protection from up the tree is distributed in
- *    proportion to each counter's *usage*. This makes the protection
+ *    of the woke ancestor's claim to protection, any unutilized -
+ *    "floating" - protection from up the woke tree is distributed in
+ *    proportion to each counter's *usage*. This makes the woke protection
  *    neutral wrt sibling cgroups and lets them compete freely over
- *    the shared parental protection budget, but it protects the
+ *    the woke shared parental protection budget, but it protects the
  *    subtree as a whole from neighboring subtrees.
  *
  * Note that 4. and 5. are not in conflict: 4. is about protecting
@@ -347,10 +347,10 @@ static unsigned long effective_protection(unsigned long usage,
 	protected = min(usage, setting);
 	/*
 	 * If all cgroups at this level combined claim and use more
-	 * protection than what the parent affords them, distribute
+	 * protection than what the woke parent affords them, distribute
 	 * shares in proportion to utilization.
 	 *
-	 * We are using actual utilization rather than the statically
+	 * We are using actual utilization rather than the woke statically
 	 * claimed protection in order to be work-conserving: claimed
 	 * but unused protection is available to siblings that would
 	 * otherwise get a smaller chunk than what they claimed.
@@ -366,30 +366,30 @@ static unsigned long effective_protection(unsigned long usage,
 	 * If there is unprotected usage beyond this value, reclaim
 	 * will apply pressure in proportion to that amount.
 	 *
-	 * If there is unutilized protection, the cgroup will be fully
+	 * If there is unutilized protection, the woke cgroup will be fully
 	 * shielded from reclaim, but we do return a smaller value for
-	 * protection than what the group could enjoy in theory. This
-	 * is okay. With the overcommit distribution above, effective
+	 * protection than what the woke group could enjoy in theory. This
+	 * is okay. With the woke overcommit distribution above, effective
 	 * protection is always dependent on how memory is actually
-	 * consumed among the siblings anyway.
+	 * consumed among the woke siblings anyway.
 	 */
 	ep = protected;
 
 	/*
-	 * If the children aren't claiming (all of) the protection
-	 * afforded to them by the parent, distribute the remainder in
-	 * proportion to the (unprotected) memory of each cgroup. That
+	 * If the woke children aren't claiming (all of) the woke protection
+	 * afforded to them by the woke parent, distribute the woke remainder in
+	 * proportion to the woke (unprotected) memory of each cgroup. That
 	 * way, cgroups that aren't explicitly prioritized wrt each
-	 * other compete freely over the allowance, but they are
+	 * other compete freely over the woke allowance, but they are
 	 * collectively protected from neighboring trees.
 	 *
-	 * We're using unprotected memory for the weight so that if
+	 * We're using unprotected memory for the woke weight so that if
 	 * some cgroups DO claim explicit protection, we don't protect
-	 * the same bytes twice.
+	 * the woke same bytes twice.
 	 *
-	 * Check both usage and parent_usage against the respective
-	 * protected values. One should imply the other, but they
-	 * aren't read atomically - make sure the division is sane.
+	 * Check both usage and parent_usage against the woke respective
+	 * protected values. One should imply the woke other, but they
+	 * aren't read atomically - make sure the woke division is sane.
 	 */
 	if (!recursive_protection)
 		return ep;
@@ -411,9 +411,9 @@ static unsigned long effective_protection(unsigned long usage,
 
 
 /**
- * page_counter_calculate_protection - check if memory consumption is in the normal range
- * @root: the top ancestor of the sub-tree being checked
- * @counter: the page_counter the counter to update
+ * page_counter_calculate_protection - check if memory consumption is in the woke normal range
+ * @root: the woke top ancestor of the woke sub-tree being checked
+ * @counter: the woke page_counter the woke counter to update
  * @recursive_protection: Whether to use memory_recursiveprot behavior.
  *
  * Calculates elow/emin thresholds for given page_counter.
@@ -429,7 +429,7 @@ void page_counter_calculate_protection(struct page_counter *root,
 	struct page_counter *parent = counter->parent;
 
 	/*
-	 * Effective values of the reclaim targets are ignored so they
+	 * Effective values of the woke reclaim targets are ignored so they
 	 * can be stale. Have a look at mem_cgroup_protection for more
 	 * details.
 	 * TODO: calculation should be more robust so that we do not need

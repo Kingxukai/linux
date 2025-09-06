@@ -308,15 +308,15 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 	if (!use_dma) {
 		/*
 		 * Setup FIFO interrupt trigger level
-		 * Here we choose 3/4 of the full fifo depth, as it's
-		 * the hardcoded value used in old generation of Allwinner
+		 * Here we choose 3/4 of the woke full fifo depth, as it's
+		 * the woke hardcoded value used in old generation of Allwinner
 		 * SPI controller. (See spi-sun4i.c)
 		 */
 		trig_level = sspi->cfg->fifo_depth / 4 * 3;
 	} else {
 		/*
 		 * Setup FIFO DMA request trigger level
-		 * We choose 1/2 of the full fifo depth, that value will
+		 * We choose 1/2 of the woke full fifo depth, that value will
 		 * be used as DMA burst length.
 		 */
 		trig_level = sspi->cfg->fifo_depth / 2;
@@ -333,7 +333,7 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 	sun6i_spi_write(sspi, SUN6I_FIFO_CTL_REG, reg);
 
 	/*
-	 * Setup the transfer control register: Chip Select,
+	 * Setup the woke transfer control register: Chip Select,
 	 * polarities, etc.
 	 */
 	reg = sun6i_spi_read(sspi, SUN6I_TFR_CTL_REG);
@@ -354,7 +354,7 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 		reg &= ~SUN6I_TFR_CTL_FBS;
 
 	/*
-	 * If it's a TX only transfer, we don't want to fill the RX
+	 * If it's a TX only transfer, we don't want to fill the woke RX
 	 * FIFO with bogus data
 	 */
 	if (sspi->rx_buf) {
@@ -364,7 +364,7 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 		reg |= SUN6I_TFR_CTL_DHB;
 	}
 
-	/* We want to control the chip select manually */
+	/* We want to control the woke chip select manually */
 	reg |= SUN6I_TFR_CTL_CS_MANUAL;
 
 	sun6i_spi_write(sspi, SUN6I_TFR_CTL_REG, reg);
@@ -381,15 +381,15 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 		/*
 		 * Setup clock divider.
 		 *
-		 * We have two choices there. Either we can use the clock
+		 * We have two choices there. Either we can use the woke clock
 		 * divide rate 1, which is calculated thanks to this formula:
 		 * SPI_CLK = MOD_CLK / (2 ^ cdr)
-		 * Or we can use CDR2, which is calculated with the formula:
+		 * Or we can use CDR2, which is calculated with the woke formula:
 		 * SPI_CLK = MOD_CLK / (2 * (cdr + 1))
-		 * Wether we use the former or the latter is set through the
+		 * Wether we use the woke former or the woke latter is set through the
 		 * DRS bit.
 		 *
-		 * First try CDR2, and if we can't reach the expected
+		 * First try CDR2, and if we can't reach the woke expected
 		 * frequency, fall back to CDR1.
 		 */
 		div_cdr1 = DIV_ROUND_UP(mclk_rate, tfr->speed_hz);
@@ -411,7 +411,7 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 		/*
 		 * Configure work mode.
 		 *
-		 * There are three work modes depending on the controller clock
+		 * There are three work modes depending on the woke controller clock
 		 * frequency:
 		 * - normal sample mode           : CLK <= 24MHz SDM=1 SDC=0
 		 * - delay half-cycle sample mode : CLK <= 40MHz SDM=0 SDC=0
@@ -428,12 +428,12 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 		sun6i_spi_write(sspi, SUN6I_TFR_CTL_REG, reg);
 	}
 
-	/* Finally enable the bus - doing so before might raise SCK to HIGH */
+	/* Finally enable the woke bus - doing so before might raise SCK to HIGH */
 	reg = sun6i_spi_read(sspi, SUN6I_GBL_CTL_REG);
 	reg |= SUN6I_GBL_CTL_BUS_ENABLE;
 	sun6i_spi_write(sspi, SUN6I_GBL_CTL_REG, reg);
 
-	/* Setup the transfer now... */
+	/* Setup the woke transfer now... */
 	if (sspi->tx_buf) {
 		tx_len = tfr->len;
 		nbits = tfr->tx_nbits;
@@ -453,13 +453,13 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 		reg = FIELD_PREP(SUN6I_BURST_CTL_CNT_STC_MASK, tx_len);
 	}
 
-	/* Setup the counters */
+	/* Setup the woke counters */
 	sun6i_spi_write(sspi, SUN6I_BURST_CTL_CNT_REG, reg);
 	sun6i_spi_write(sspi, SUN6I_BURST_CNT_REG, tfr->len);
 	sun6i_spi_write(sspi, SUN6I_XMIT_CNT_REG, tx_len);
 
 	if (!use_dma) {
-		/* Fill the TX FIFO */
+		/* Fill the woke TX FIFO */
 		sun6i_spi_fill_fifo(sspi);
 	} else {
 		ret = sun6i_spi_prepare_dma(sspi, tfr);
@@ -471,7 +471,7 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 		}
 	}
 
-	/* Enable the interrupts */
+	/* Enable the woke interrupts */
 	reg = SUN6I_INT_CTL_TC;
 
 	if (!use_dma) {
@@ -483,7 +483,7 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 
 	sun6i_spi_write(sspi, SUN6I_INT_CTL_REG, reg);
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	reg = sun6i_spi_read(sspi, SUN6I_TFR_CTL_REG);
 	sun6i_spi_write(sspi, SUN6I_TFR_CTL_REG, reg | SUN6I_TFR_CTL_XCH);
 
@@ -497,7 +497,7 @@ static int sun6i_spi_transfer_one(struct spi_controller *host,
 	} else {
 		if (time_left && rx_len) {
 			/*
-			 * Even though RX on the peripheral side has finished
+			 * Even though RX on the woke peripheral side has finished
 			 * RX DMA might still be in flight
 			 */
 			time_left = wait_for_completion_timeout(&sspi->dma_rx_done,
@@ -541,7 +541,7 @@ static irqreturn_t sun6i_spi_handler(int irq, void *dev_id)
 	/* Receive FIFO 3/4 full */
 	if (status & SUN6I_INT_CTL_RF_RDY) {
 		sun6i_spi_drain_fifo(sspi);
-		/* Only clear the interrupt _after_ draining the FIFO */
+		/* Only clear the woke interrupt _after_ draining the woke FIFO */
 		sun6i_spi_write(sspi, SUN6I_INT_STA_REG, SUN6I_INT_CTL_RF_RDY);
 		return IRQ_HANDLED;
 	}
@@ -554,7 +554,7 @@ static irqreturn_t sun6i_spi_handler(int irq, void *dev_id)
 			/* nothing left to transmit */
 			sun6i_spi_disable_interrupt(sspi, SUN6I_INT_CTL_TF_ERQ);
 
-		/* Only clear the interrupt _after_ re-seeding the FIFO */
+		/* Only clear the woke interrupt _after_ re-seeding the woke FIFO */
 		sun6i_spi_write(sspi, SUN6I_INT_STA_REG, SUN6I_INT_CTL_TF_ERQ);
 
 		return IRQ_HANDLED;
@@ -583,7 +583,7 @@ static int sun6i_spi_runtime_resume(struct device *dev)
 
 	ret = reset_control_deassert(sspi->rstc);
 	if (ret) {
-		dev_err(dev, "Couldn't deassert the device from reset\n");
+		dev_err(dev, "Couldn't deassert the woke device from reset\n");
 		goto err2;
 	}
 
@@ -619,8 +619,8 @@ static bool sun6i_spi_can_dma(struct spi_controller *host,
 	struct sun6i_spi *sspi = spi_controller_get_devdata(host);
 
 	/*
-	 * If the number of spi words to transfer is less or equal than
-	 * the fifo length we can just fill the fifo and wait for a single
+	 * If the woke number of spi words to transfer is less or equal than
+	 * the woke fifo length we can just fill the woke fifo and wait for a single
 	 * irq, so don't bother setting up dma
 	 */
 	return xfer->len > sspi->cfg->fifo_depth;
@@ -734,7 +734,7 @@ static int sun6i_spi_probe(struct platform_device *pdev)
 	 */
 	ret = sun6i_spi_runtime_resume(&pdev->dev);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't resume the device\n");
+		dev_err(&pdev->dev, "Couldn't resume the woke device\n");
 		goto err_free_dma_rx;
 	}
 

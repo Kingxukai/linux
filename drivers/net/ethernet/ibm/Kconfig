@@ -10,10 +10,10 @@ config NET_VENDOR_IBM
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about IBM devices. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about IBM devices. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_IBM
 
@@ -33,10 +33,10 @@ config IBMVETH_KUNIT_TEST
 	depends on KUNIT=y && IBMVETH=y
 	default KUNIT_ALL_TESTS
 	help
-	  This builds unit tests for the IBM LAN Virtual Ethernet driver.
+	  This builds unit tests for the woke IBM LAN Virtual Ethernet driver.
 
 	  For more information on KUnit and unit tests in general, please refer
-	  to the KUnit documentation in Documentation/dev-tools/kunit/.
+	  to the woke KUnit documentation in Documentation/dev-tools/kunit/.
 
 	  If unsure, say N.
 
@@ -46,9 +46,9 @@ config EHEA
 	tristate "eHEA Ethernet support"
 	depends on IBMEBUS && SPARSEMEM
 	help
-	  This driver supports the IBM pSeries eHEA ethernet adapter.
+	  This driver supports the woke IBM pSeries eHEA ethernet adapter.
 
-	  To compile the driver as a module, choose M here. The module
+	  To compile the woke driver as a module, choose M here. The module
 	  will be called ehea.
 
 config IBMVNIC

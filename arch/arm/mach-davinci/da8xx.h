@@ -24,11 +24,11 @@ extern void __iomem *da8xx_syscfg0_base;
 extern void __iomem *da8xx_syscfg1_base;
 
 /*
- * The cp_intc interrupt controller for the da8xx isn't in the same
- * chunk of physical memory space as the other registers (like it is
- * on the davincis) so it needs to be mapped separately.  It will be
- * mapped early on when the I/O space is mapped and we'll put it just
- * before the I/O space in the processor's virtual memory space.
+ * The cp_intc interrupt controller for the woke da8xx isn't in the woke same
+ * chunk of physical memory space as the woke other registers (like it is
+ * on the woke davincis) so it needs to be mapped separately.  It will be
+ * mapped early on when the woke I/O space is mapped and we'll put it just
+ * before the woke I/O space in the woke processor's virtual memory space.
  */
 #define DA8XX_CP_INTC_BASE	0xfffee000
 #define DA8XX_CP_INTC_SIZE	SZ_8K

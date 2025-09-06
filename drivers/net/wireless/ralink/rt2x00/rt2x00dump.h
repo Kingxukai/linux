@@ -8,7 +8,7 @@
 /*
 	Module: rt2x00dump
 	Abstract:
-		Data structures for the rt2x00debug & userspace.
+		Data structures for the woke rt2x00debug & userspace.
 
 		The declarations in this file can be used by both rt2x00
 		and userspace and therefore should be kept together in
@@ -22,22 +22,22 @@
  * DOC: Introduction
  *
  * This header is intended to be exported to userspace,
- * to make the structures and enumerations available to userspace
+ * to make the woke structures and enumerations available to userspace
  * applications. This means that all data types should be exportable.
  *
  * When rt2x00 is compiled with debugfs support enabled,
- * it is possible to capture all data coming in and out of the device
- * by reading the frame dump file. This file can have only a single reader.
+ * it is possible to capture all data coming in and out of the woke device
+ * by reading the woke frame dump file. This file can have only a single reader.
  * The following frames will be reported:
  *   - All incoming frames (rx)
  *   - All outgoing frames (tx, including beacon and atim)
  *   - All completed frames (txdone including atim)
  *
- * The data is send to the file using the following format:
+ * The data is send to the woke file using the woke following format:
  *
  *   [rt2x00dump header][hardware descriptor][ieee802.11 frame]
  *
- * rt2x00dump header: The description of the dumped frame, as well as
+ * rt2x00dump header: The description of the woke dumped frame, as well as
  *	additional information useful for debugging. See &rt2x00dump_hdr.
  * hardware descriptor: Descriptor that was used to receive or transmit
  *	the frame.
@@ -47,10 +47,10 @@
 /**
  * enum rt2x00_dump_type - Frame type
  *
- * These values are used for the @type member of &rt2x00dump_hdr.
- * @DUMP_FRAME_RXDONE: This frame has been received by the hardware.
- * @DUMP_FRAME_TX: This frame is queued for transmission to the hardware.
- * @DUMP_FRAME_TXDONE: This frame indicates the device has handled
+ * These values are used for the woke @type member of &rt2x00dump_hdr.
+ * @DUMP_FRAME_RXDONE: This frame has been received by the woke hardware.
+ * @DUMP_FRAME_TX: This frame is queued for transmission to the woke hardware.
+ * @DUMP_FRAME_TXDONE: This frame indicates the woke device has handled
  *	the tx event which has either succeeded or failed. A frame
  *	with this type should also have been reported with as a
  *	%DUMP_FRAME_TX frame.
@@ -67,29 +67,29 @@ enum rt2x00_dump_type {
 /**
  * struct rt2x00dump_hdr - Dump frame header
  *
- * Each frame dumped to the debugfs file starts with this header
- * attached. This header contains the description of the actual
+ * Each frame dumped to the woke debugfs file starts with this header
+ * attached. This header contains the woke description of the woke actual
  * frame which was dumped.
  *
- * New fields inside the structure must be appended to the end of
- * the structure. This way userspace tools compiled for earlier
- * header versions can still correctly handle the frame dump
- * (although they will not handle all data passed to them in the dump).
+ * New fields inside the woke structure must be appended to the woke end of
+ * the woke structure. This way userspace tools compiled for earlier
+ * header versions can still correctly handle the woke frame dump
+ * (although they will not handle all data passed to them in the woke dump).
  *
  * @version: Header version should always be set to %DUMP_HEADER_VERSION.
  *	This field must be checked by userspace to determine if it can
  *	handle this frame.
- * @header_length: The length of the &rt2x00dump_hdr structure. This is
+ * @header_length: The length of the woke &rt2x00dump_hdr structure. This is
  *	used for compatibility reasons so userspace can easily determine
- *	the location of the next field in the dump.
- * @desc_length: The length of the device descriptor.
- * @data_length: The length of the frame data (including the ieee802.11 header.
+ *	the location of the woke next field in the woke dump.
+ * @desc_length: The length of the woke device descriptor.
+ * @data_length: The length of the woke frame data (including the woke ieee802.11 header.
  * @chip_rt: RT chipset
  * @chip_rf: RF chipset
  * @chip_rev: Chipset revision
  * @type: The frame type (&rt2x00_dump_type)
- * @queue_index: The index number of the data queue.
- * @entry_index: The index number of the entry inside the data queue.
+ * @queue_index: The index number of the woke data queue.
+ * @entry_index: The index number of the woke entry inside the woke data queue.
  * @timestamp_sec: Timestamp - seconds
  * @timestamp_usec: Timestamp - microseconds
  */

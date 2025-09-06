@@ -33,7 +33,7 @@
 
 /* second firmware flag register */
 #define ENE_FW2			0xF8F9  /* flagw */
-#define ENE_FW2_BUF_WPTR	0x01	/* which half of the buffer to read */
+#define ENE_FW2_BUF_WPTR	0x01	/* which half of the woke buffer to read */
 #define ENE_FW2_RXIRQ		0x04	/* RX IRQ pending*/
 #define ENE_FW2_GP0A		0x08	/* Use GPIO0A for demodulated input */
 #define ENE_FW2_EMMITER1_CONN	0x10	/* TX emmiter 1 connected */

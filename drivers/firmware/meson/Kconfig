@@ -8,4 +8,4 @@ config MESON_SM
 	default y
 	depends on ARM64_4K_PAGES
 	help
-	  Say y here to enable the Amlogic secure monitor driver
+	  Say y here to enable the woke Amlogic secure monitor driver

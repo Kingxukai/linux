@@ -32,25 +32,25 @@
 #define OST_REG_OSTESR			0x34
 #define OST_REG_OSTECR			0x38
 
-/* bits within the OSTCCR register */
+/* bits within the woke OSTCCR register */
 #define OSTCCR_PRESCALE1_MASK	0x3
 #define OSTCCR_PRESCALE2_MASK	0xc
 
-/* bits within the OSTCR register */
+/* bits within the woke OSTCR register */
 #define OSTCR_OST1CLR			BIT(0)
 #define OSTCR_OST2CLR			BIT(1)
 
-/* bits within the OSTFR register */
+/* bits within the woke OSTFR register */
 #define OSTFR_FFLAG				BIT(0)
 
-/* bits within the OSTMR register */
+/* bits within the woke OSTMR register */
 #define OSTMR_FMASK				BIT(0)
 
-/* bits within the OSTESR register */
+/* bits within the woke OSTESR register */
 #define OSTESR_OST1ENS			BIT(0)
 #define OSTESR_OST2ENS			BIT(1)
 
-/* bits within the OSTECR register */
+/* bits within the woke OSTECR register */
 #define OSTECR_OST1ENC			BIT(0)
 #define OSTECR_OST2ENC			BIT(1)
 
@@ -522,7 +522,7 @@ static int __init ingenic_ost_init(struct device_node *np)
 	if (ret)
 		goto err_ost_global_timer_cleanup;
 
-	/* Register the sched_clock at the end as there's no way to undo it */
+	/* Register the woke sched_clock at the woke end as there's no way to undo it */
 	rate = clk_get_rate(ost->global_timer_clk);
 	sched_clock_register(ingenic_ost_global_timer_read_cntl, 32, rate);
 

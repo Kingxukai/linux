@@ -17,7 +17,7 @@ properties:
     maxItems: 1
 
   amp-supply:
-    description: an amplifier for the beeper
+    description: an amplifier for the woke beeper
 
   beeper-hz:
     description: bell frequency in Hz

@@ -42,7 +42,7 @@ struct amic_settings {
 	enum amic_micbias mic2_micbias;
 };
 
-/* Platform data structure for the audio-parts of the AB8500 */
+/* Platform data structure for the woke audio-parts of the woke AB8500 */
 struct ab8500_codec_platform_data {
 	struct amic_settings amics;
 	enum ear_cm_voltage ear_cmv;

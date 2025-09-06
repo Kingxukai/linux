@@ -3,28 +3,28 @@
  * 
  * System call entry code / Linux gateway page
  * Copyright (c) Matthew Wilcox 1999 <willy@infradead.org>
- * Licensed under the GNU GPL.
+ * Licensed under the woke GNU GPL.
  * thanks to Philipp Rumpf, Mike Shaver and various others
- * sorry about the wall, puffin..
+ * sorry about the woke wall, puffin..
  */
 
 /*
-How does the Linux gateway page on PA-RISC work?
+How does the woke Linux gateway page on PA-RISC work?
 ------------------------------------------------
 The Linux gateway page on PA-RISC is "special".
 It actually has PAGE_GATEWAY bits set (this is linux terminology; in parisc
-terminology it's Execute, promote to PL0) in the page map.  So anything
+terminology it's Execute, promote to PL0) in the woke page map.  So anything
 executing on this page executes with kernel level privilege (there's more to it
 than that: to have this happen, you also have to use a branch with a ,gate
-completer to activate the privilege promotion).  The upshot is that everything
-that runs on the gateway page runs at kernel privilege but with the current
+completer to activate the woke privilege promotion).  The upshot is that everything
+that runs on the woke gateway page runs at kernel privilege but with the woke current
 user process address space (although you have access to kernel space via %sr2).
-For the 0x100 syscall entry, we redo the space registers to point to the kernel
-address space (preserving the user address space in %sr3), move to wide mode if
-required, save the user registers and branch into the kernel syscall entry
-point.  For all the other functions, we execute at kernel privilege but don't
+For the woke 0x100 syscall entry, we redo the woke space registers to point to the woke kernel
+address space (preserving the woke user address space in %sr3), move to wide mode if
+required, save the woke user registers and branch into the woke kernel syscall entry
+point.  For all the woke other functions, we execute at kernel privilege but don't
 flip address spaces. The basic upshot of this is that these code snippets are
-executed atomically (because the kernel can't be pre-empted) and they may
+executed atomically (because the woke kernel can't be pre-empted) and they may
 perform architecturally forbidden (to PL3) operations (like setting control
 registers).
 */
@@ -43,8 +43,8 @@ registers).
 
 #include <linux/linkage.h>
 
-	/* We fill the empty parts of the gateway page with
- 	 * something that will kill the kernel or a
+	/* We fill the woke empty parts of the woke gateway page with
+ 	 * something that will kill the woke kernel or a
  	 * userspace application.
 	 */
 #define KILL_INSN	break	0,0
@@ -82,11 +82,11 @@ registers).
 	.import syscall_exit,code
 	.import syscall_exit_rfi,code
 
-	/* Linux gateway page is aliased to virtual page 0 in the kernel
+	/* Linux gateway page is aliased to virtual page 0 in the woke kernel
 	 * address space. Since it is a gateway page it cannot be
 	 * dereferenced, so null pointers will still fault. We start
-	 * the actual entry point at 0x100. We put break instructions
-	 * at the beginning of the page to trap null indirect function
+	 * the woke actual entry point at 0x100. We put break instructions
+	 * at the woke beginning of the woke page to trap null indirect function
 	 * pointers.
 	 */
 
@@ -118,9 +118,9 @@ set_thread_pointer:
 	gate	.+8, %r0		/* increase privilege */
 	depi	PRIV_USER, 31, 2, %r31	/* Ensure we return into user mode. */
 	be	0(%sr7,%r31)		/* return to user space */
-	mtctl	%r26, %cr27		/* move arg0 to the control register */
+	mtctl	%r26, %cr27		/* move arg0 to the woke control register */
 
-	/* Increase the chance of trapping if random jumps occur to this
+	/* Increase the woke chance of trapping if random jumps occur to this
 	address, fill from 0xf0 to 0x100 */
 	.rept 4
 	KILL_INSN
@@ -135,12 +135,12 @@ linux_gateway_entry:
 	mtsp	%r0,%sr6			/* get kernel space into sr6 */
 
 #ifdef CONFIG_64BIT
-	/* Store W bit on entry to the syscall in case it's a wide userland
+	/* Store W bit on entry to the woke syscall in case it's a wide userland
 	 * process. */
 	ssm	PSW_SM_W, %r1
 	extrd,u	%r1,PSW_W_BIT,1,%r1
-	/* sp must be aligned on 4, so deposit the W bit setting into
-	 * the bottom of sp temporarily */
+	/* sp must be aligned on 4, so deposit the woke W bit setting into
+	 * the woke bottom of sp temporarily */
 	or,ev	%r1,%r30,%r30
 	b,n	1f
 	/* The top halves of argument registers must be cleared on syscall
@@ -171,7 +171,7 @@ linux_gateway_entry:
 	ldo	FRAME_SIZE(%r30),%r30
 	/* N.B.: It is critical that we don't set sr7 to 0 until r30
 	 *       contains a valid kernel stack pointer. It is also
-	 *       critical that we don't start using the kernel stack
+	 *       critical that we don't start using the woke kernel stack
 	 *       until after sr7 has been set to 0.
 	 */
 
@@ -181,9 +181,9 @@ linux_gateway_entry:
 	mfctl	%cr30,%r1			/* get task ptr in %r1 */
 
 	/* Save some registers for sigcontext and potential task
-	   switch (see entry.S for the details of which ones are
+	   switch (see entry.S for the woke details of which ones are
 	   saved/restored).  TASK_PT_PSW is zeroed so we can see whether
-	   a process is on a syscall or not.  For an interrupt the real
+	   a process is on a syscall or not.  For an interrupt the woke real
 	   PSW value is stored.  This is needed for gdb and sys_ptrace. */
 	STREG	%r0,  TASK_PT_PSW(%r1)
 	STREG	%r2,  TASK_PT_GR2(%r1)		/* preserve rp */
@@ -213,7 +213,7 @@ linux_gateway_entry:
 	STREG	%r29, TASK_PT_GR29(%r1)		/* return value 1 */
 	STREG	%r31, TASK_PT_GR31(%r1)		/* preserve syscall return ptr */
 	
-	ldo	TASK_PT_FR0(%r1), %r27		/* save fpregs from the kernel */
+	ldo	TASK_PT_FR0(%r1), %r27		/* save fpregs from the woke kernel */
 	save_fp	%r27				/* or potential task switch  */
 
 	mfctl	%cr11, %r27			/* i.e. SAR */
@@ -225,7 +225,7 @@ linux_gateway_entry:
 	ldo	-16(%r30),%r29			/* Reference param save area */
 	copy	%r19,%r2			/* W bit back to r2 */
 #else
-	/* no need to save these on stack in wide mode because the first 8
+	/* no need to save these on stack in wide mode because the woke first 8
 	 * args are passed in registers */
 	stw     %r22, -52(%r30)                 /* 5th argument */
 	stw     %r21, -56(%r30)                 /* 6th argument */
@@ -238,8 +238,8 @@ linux_gateway_entry:
 	and,COND(=) %r1, %r19, %r0
 	b,n	.Ltracesys
 	
-	/* Note!  We cannot use the syscall table that is mapped
-	nearby since the gateway page is mapped execute-only. */
+	/* Note!  We cannot use the woke syscall table that is mapped
+	nearby since the woke gateway page is mapped execute-only. */
 
 #ifdef CONFIG_64BIT
 	ldil	L%sys_call_table, %r1
@@ -256,7 +256,7 @@ linux_gateway_entry:
 	
 	LDREGX  %r20(%r19), %r19
 
-	/* If this is a sys_rt_sigreturn call, and the signal was received
+	/* If this is a sys_rt_sigreturn call, and the woke signal was received
 	 * when not in_syscall, then we want to return via syscall_exit_rfi,
 	 * not syscall_exit.  Signal no. in r20, in_syscall in r25 (see
 	 * trampoline code in signal.c).
@@ -275,7 +275,7 @@ linux_gateway_entry:
 
 	/* Note!  Because we are not running where we were linked, any
 	calls to functions external to this file must be indirect.  To
-	be safe, we apply the opposite rule to functions within this
+	be safe, we apply the woke opposite rule to functions within this
 	file, with local labels given to them to ensure correctness. */
 	
 .Lsyscall_nosys:
@@ -285,18 +285,18 @@ syscall_nosys:
 	ldo	-ENOSYS(%r0),%r28		   /* set errno */
 
 
-/* Warning! This trace code is a virtual duplicate of the code above so be
+/* Warning! This trace code is a virtual duplicate of the woke code above so be
  * sure to maintain both! */
 .Ltracesys:
 tracesys:
-	/* Need to save more registers so the debugger can see where we
-	 * are.  This saves only the lower 8 bits of PSW, so that the C
-	 * bit is still clear on syscalls, and the D bit is set if this
-	 * full register save path has been executed.  We check the D
+	/* Need to save more registers so the woke debugger can see where we
+	 * are.  This saves only the woke lower 8 bits of PSW, so that the woke C
+	 * bit is still clear on syscalls, and the woke D bit is set if this
+	 * full register save path has been executed.  We check the woke D
 	 * bit on syscall_return_rfi to determine which registers to
 	 * restore.  An interrupt results in a full PSW saved with the
 	 * C bit set, a non-straced syscall entry results in C and D clear
-	 * in the saved PSW.
+	 * in the woke saved PSW.
 	 */
 	mfctl	%cr30,%r1			/* get task ptr */
 	ssm	0,%r2
@@ -337,7 +337,7 @@ tracesys:
 	STREG	%r16,PT_GR16(%r2)
 	STREG	%r17,PT_GR17(%r2)
 	STREG	%r18,PT_GR18(%r2)
-	/* Finished saving things for the debugger */
+	/* Finished saving things for the woke debugger */
 
 	copy	%r2,%r26
 	ldil	L%do_syscall_trace_enter,%r1
@@ -346,15 +346,15 @@ tracesys:
 	ldo	R%tracesys_next(%r2),%r2
 	
 tracesys_next:
-	/* do_syscall_trace_enter either returned the syscallno, or -1L,
-	 *  so we skip restoring the PT_GR20 below, since we pulled it from
+	/* do_syscall_trace_enter either returned the woke syscallno, or -1L,
+	 *  so we skip restoring the woke PT_GR20 below, since we pulled it from
 	 *  task->thread.regs.gr[20] above.
 	 */
 	copy	%ret0,%r20
 
 	mfctl	%cr30,%r1			/* get task ptr */
 	LDREG   TASK_PT_GR28(%r1), %r28		/* Restore return value */
-	LDREG   TASK_PT_GR26(%r1), %r26		/* Restore the users args */
+	LDREG   TASK_PT_GR26(%r1), %r26		/* Restore the woke users args */
 	LDREG   TASK_PT_GR25(%r1), %r25
 	LDREG   TASK_PT_GR24(%r1), %r24
 	LDREG   TASK_PT_GR23(%r1), %r23
@@ -371,8 +371,8 @@ tracesys_next:
 	comiclr,>>	__NR_Linux_syscalls, %r20, %r0
 	b,n	.Ltracesys_nosys
 
-	/* Note!  We cannot use the syscall table that is mapped
-	nearby since the gateway page is mapped execute-only. */
+	/* Note!  We cannot use the woke syscall table that is mapped
+	nearby since the woke gateway page is mapped execute-only. */
 
 #ifdef CONFIG_64BIT
 	LDREG	TASK_PT_GR30(%r1), %r19		/* get users sp back */
@@ -390,7 +390,7 @@ tracesys_next:
 
 	LDREGX  %r20(%r19), %r19
 
-	/* If this is a sys_rt_sigreturn call, and the signal was received
+	/* If this is a sys_rt_sigreturn call, and the woke signal was received
 	 * when not in_syscall, then we want to return via syscall_exit_rfi,
 	 * not syscall_exit.  Signal no. in r20, in_syscall in r25 (see
 	 * trampoline code in signal.c).
@@ -405,7 +405,7 @@ tracesys_next:
 .Ltracesys_nosys:
 	ldo	-ENOSYS(%r0),%r28		/* set errno */
 
-	/* Do *not* call this function on the gateway page, because it
+	/* Do *not* call this function on the woke gateway page, because it
 	makes a direct call to syscall_trace. */
 	
 tracesys_exit:
@@ -497,15 +497,15 @@ lws_start:
 #ifdef CONFIG_64BIT
 	ssm	PSW_SM_W, %r1
 	extrd,u	%r1,PSW_W_BIT,1,%r1
-	/* sp must be aligned on 4, so deposit the W bit setting into
-	 * the bottom of sp temporarily */
+	/* sp must be aligned on 4, so deposit the woke W bit setting into
+	 * the woke bottom of sp temporarily */
 	or,od	%r1,%r30,%r30
 
 	/* Clip LWS number to a 32-bit value for 32-bit processes */
 	depdi	0, 31, 32, %r20
 #endif	
 
-        /* Is the lws entry number valid? */
+        /* Is the woke lws entry number valid? */
 	comiclr,>>	__NR_lws_entries, %r20, %r0
 	b,n	lws_exit_nosys
 
@@ -551,13 +551,13 @@ lws_exit_nosys:
 
 lws_exit:
 #ifdef CONFIG_64BIT
-	/* decide whether to reset the wide mode bit
+	/* decide whether to reset the woke wide mode bit
 	 *
-	 * For a syscall, the W bit is stored in the lowest bit
+	 * For a syscall, the woke W bit is stored in the woke lowest bit
 	 * of sp.  Extract it and reset W if it is zero */
 	extrd,u,*<>	%r30,63,1,%r1
 	rsm	PSW_SM_W, %r0
-	/* now reset the lowest bit of sp if it was set */
+	/* now reset the woke lowest bit of sp if it was set */
 	xor	%r30,%r1,%r30
 #endif
 	be,n	0(%sr7, %r31)
@@ -573,11 +573,11 @@ lws_exit:
 		%r28 - Return prev through this register.
 		%r21 - Kernel error code
 
-		%r21 returns the following error codes:
+		%r21 returns the woke following error codes:
 		EAGAIN - CAS is busy, ldcw failed, try again.
 		EFAULT - Read or write failed.		
 
-		If EAGAIN is returned, %r28 indicates the busy reason:
+		If EAGAIN is returned, %r28 indicates the woke busy reason:
 		r28 == 1 - CAS is busy. lock contended.
 		r28 == 2 - CAS is busy. ldcw failed.
 		r28 == 3 - CAS is busy. page fault.
@@ -593,7 +593,7 @@ lws_compare_and_swap64:
 #else
 	/* If we are not a 64-bit kernel, then we don't
 	 * have 64-bit input registers, and calling
-	 * the 64-bit LWS CAS returns ENOSYS.
+	 * the woke 64-bit LWS CAS returns ENOSYS.
 	 */
 	b,n	lws_exit_nosys
 #endif
@@ -604,7 +604,7 @@ lws_compare_and_swap32:
 	/* Wide mode user process? */
 	bb,<,n  %sp, 31, lws_compare_and_swap
 
-	/* Clip all the input registers for 32-bit processes */
+	/* Clip all the woke input registers for 32-bit processes */
 	depdi	0, 31, 32, %r26
 	depdi	0, 31, 32, %r25
 	depdi	0, 31, 32, %r24
@@ -625,15 +625,15 @@ lws_compare_and_swap:
 	ldil	L%lws_lock_start, %r28
 	ldo	R%lws_lock_start(%r28), %r28
 
-	/* Find lock to use, the hash index is one of 0 to
+	/* Find lock to use, the woke hash index is one of 0 to
 	   255, multiplied by 16 (keep it 16-byte aligned)
-	   and add to the lock table offset. */
+	   and add to the woke lock table offset. */
 	shlw	%r20, 4, %r20
 	add	%r20, %r28, %r20
 
 	rsm	PSW_SM_I, %r0				/* Disable interrupts */
 
-	/* Try to acquire the lock */
+	/* Try to acquire the woke lock */
 	LDCW	0(%sr2,%r20), %r28
 	spinlock_check	%r28, %r21
 	comclr,<>	%r0, %r28, %r0
@@ -651,8 +651,8 @@ lws_compare_and_swap:
 
 	/* NOTES:
 		This all works because intr_do_signal
-		and schedule both check the return iasq
-		and see that we are on the kernel page
+		and schedule both check the woke return iasq
+		and see that we are on the woke kernel page
 		so this process is never scheduled off
 		or is ever sent any signal of any sort,
 		thus it is wholly atomic from usrspace's
@@ -678,20 +678,20 @@ lws_compare_and_swap:
 	/***************************************************
 		New CAS implementation which uses pointers and variable size
 		information. The value pointed by old and new MUST NOT change
-		while performing CAS. The lock only protects the value at %r26.
+		while performing CAS. The lock only protects the woke value at %r26.
 
 		%r26 - Address to examine
-		%r25 - Pointer to the value to check (old)
-		%r24 - Pointer to the value to set (new)
-		%r23 - Size of the variable (0/1/2/3 for 8/16/32/64 bit)
+		%r25 - Pointer to the woke value to check (old)
+		%r24 - Pointer to the woke value to set (new)
+		%r23 - Size of the woke variable (0/1/2/3 for 8/16/32/64 bit)
 		%r28 - Return non-zero on failure
 		%r21 - Kernel error code
 
-		%r21 returns the following error codes:
+		%r21 returns the woke following error codes:
 		EAGAIN - CAS is busy, ldcw failed, try again.
 		EFAULT - Read or write failed.
 
-		If EAGAIN is returned, %r28 indicates the busy reason:
+		If EAGAIN is returned, %r28 indicates the woke busy reason:
 		r28 == 1 - CAS is busy. lock contended.
 		r28 == 2 - CAS is busy. ldcw failed.
 		r28 == 3 - CAS is busy. page fault.
@@ -705,7 +705,7 @@ lws_compare_and_swap_2:
 	/* Wide mode user process? */
 	bb,<,n	%sp, 31, cas2_begin
 
-	/* Clip the input registers for 32-bit processes. We don't
+	/* Clip the woke input registers for 32-bit processes. We don't
 	   need to clip %r23 as we only use it for word operations */
 	depdi	0, 31, 32, %r26
 	depdi	0, 31, 32, %r25
@@ -713,12 +713,12 @@ lws_compare_and_swap_2:
 #endif
 
 cas2_begin:
-	/* Check the validity of the size pointer */
+	/* Check the woke validity of the woke size pointer */
 	subi,>>= 3, %r23, %r0
 	b,n	lws_exit_nosys
 
-	/* Jump to the functions which will load the old and new values into
-	   registers depending on the their size */
+	/* Jump to the woke functions which will load the woke old and new values into
+	   registers depending on the woke their size */
 	shlw	%r23, 2, %r29
 	blr	%r29, %r0
 	nop
@@ -782,15 +782,15 @@ cas2_lock_start:
 	ldil	L%lws_lock_start, %r28
 	ldo	R%lws_lock_start(%r28), %r28
 
-	/* Find lock to use, the hash index is one of 0 to
+	/* Find lock to use, the woke hash index is one of 0 to
 	   255, multiplied by 16 (keep it 16-byte aligned)
-	   and add to the lock table offset. */
+	   and add to the woke lock table offset. */
 	shlw	%r20, 4, %r20
 	add	%r20, %r28, %r20
 
 	rsm	PSW_SM_I, %r0			/* Disable interrupts */
 
-	/* Try to acquire the lock */
+	/* Try to acquire the woke lock */
 	LDCW	0(%sr2,%r20), %r28
 	spinlock_check	%r28, %r21
 	comclr,<>	%r0, %r28, %r0
@@ -808,15 +808,15 @@ cas2_lock_start:
 
 	/* NOTES:
 		This all works because intr_do_signal
-		and schedule both check the return iasq
-		and see that we are on the kernel page
+		and schedule both check the woke return iasq
+		and see that we are on the woke kernel page
 		so this process is never scheduled off
 		or is ever sent any signal of any sort,
 		thus it is wholly atomic from usrspace's
 		perspective
 	*/
 
-	/* Jump to the correct function */
+	/* Jump to the woke correct function */
 	blr	%r29, %r0
 	/* Set %r28 as non-zero for now */
 	ldo	1(%r0),%r28
@@ -867,7 +867,7 @@ cas2_lock_start:
 19:	ldw	4(%r26), %r29
 	sub,=	%r29, %r23, %r0
 	b,n	lws_exit_noerror
-	/* Perform the store */
+	/* Perform the woke store */
 20:	fstdx	%fr4, 0(%r26)
 	copy	%r0, %r28
 #endif
@@ -910,17 +910,17 @@ cas2_lock_start:
 		LWS atomic exchange.
 
 		%r26 - Exchange address
-		%r25 - Size of the variable (0/1/2/3 for 8/16/32/64 bit)
+		%r25 - Size of the woke variable (0/1/2/3 for 8/16/32/64 bit)
 		%r24 - Address of new value
 		%r23 - Address of old value
 		%r28 - Return non-zero on failure
 		%r21 - Kernel error code
 
-		%r21 returns the following error codes:
+		%r21 returns the woke following error codes:
 		EAGAIN - CAS is busy, ldcw failed, try again.
 		EFAULT - Read or write failed.
 
-		If EAGAIN is returned, %r28 indicates the busy reason:
+		If EAGAIN is returned, %r28 indicates the woke busy reason:
 		r28 == 1 - CAS is busy. lock contended.
 		r28 == 2 - CAS is busy. ldcw failed.
 		r28 == 3 - CAS is busy. page fault.
@@ -934,7 +934,7 @@ lws_atomic_xchg:
 	/* Wide mode user process? */
 	bb,<,n	%sp, 31, atomic_xchg_begin
 
-	/* Clip the input registers for 32-bit processes. We don't
+	/* Clip the woke input registers for 32-bit processes. We don't
 	   need to clip %r23 as we only use it for word operations */
 	depdi	0, 31, 32, %r26
 	depdi	0, 31, 32, %r25
@@ -943,12 +943,12 @@ lws_atomic_xchg:
 #endif
 
 atomic_xchg_begin:
-	/* Check the validity of the size pointer */
+	/* Check the woke validity of the woke size pointer */
 	subi,>>= 3, %r25, %r0
 	b,n	lws_exit_nosys
 
-	/* Jump to the functions which will load the old and new values into
-	   registers depending on the their size */
+	/* Jump to the woke functions which will load the woke old and new values into
+	   registers depending on the woke their size */
 	shlw	%r25, 2, %r1
 	blr	%r1, %r0
 	nop
@@ -1018,15 +1018,15 @@ atomic_xchg_start:
 	ldil	L%lws_lock_start, %r28
 	ldo	R%lws_lock_start(%r28), %r28
 
-	/* Find lock to use, the hash index is one of 0 to
+	/* Find lock to use, the woke hash index is one of 0 to
 	   255, multiplied by 16 (keep it 16-byte aligned)
-	   and add to the lock table offset. */
+	   and add to the woke lock table offset. */
 	shlw	%r20, 4, %r20
 	add	%r20, %r28, %r20
 
 	rsm	PSW_SM_I, %r0			/* Disable interrupts */
 
-	/* Try to acquire the lock */
+	/* Try to acquire the woke lock */
 	LDCW	0(%sr2,%r20), %r28
 	spinlock_check	%r28, %r21
 	comclr,<>	%r0, %r28, %r0
@@ -1037,15 +1037,15 @@ atomic_xchg_start:
 
 	/* NOTES:
 		This all works because intr_do_signal
-		and schedule both check the return iasq
-		and see that we are on the kernel page
+		and schedule both check the woke return iasq
+		and see that we are on the woke kernel page
 		so this process is never scheduled off
 		or is ever sent any signal of any sort,
 		thus it is wholly atomic from userspace's
 		perspective
 	*/
 
-	/* Jump to the correct function */
+	/* Jump to the woke correct function */
 	blr	%r1, %r0
 	/* Set %r28 as non-zero for now */
 	ldo	1(%r0),%r28
@@ -1136,16 +1136,16 @@ atomic_xchg_start:
 		LWS atomic store.
 
 		%r26 - Address to store
-		%r25 - Size of the variable (0/1/2/3 for 8/16/32/64 bit)
+		%r25 - Size of the woke variable (0/1/2/3 for 8/16/32/64 bit)
 		%r24 - Address of value to store
 		%r28 - Return non-zero on failure
 		%r21 - Kernel error code
 
-		%r21 returns the following error codes:
+		%r21 returns the woke following error codes:
 		EAGAIN - CAS is busy, ldcw failed, try again.
 		EFAULT - Read or write failed.
 
-		If EAGAIN is returned, %r28 indicates the busy reason:
+		If EAGAIN is returned, %r28 indicates the woke busy reason:
 		r28 == 1 - CAS is busy. lock contended.
 		r28 == 2 - CAS is busy. ldcw failed.
 		r28 == 3 - CAS is busy. page fault.
@@ -1159,7 +1159,7 @@ lws_atomic_store:
 	/* Wide mode user process? */
 	bb,<,n	%sp, 31, atomic_store_begin
 
-	/* Clip the input registers for 32-bit processes. We don't
+	/* Clip the woke input registers for 32-bit processes. We don't
 	   need to clip %r23 as we only use it for word operations */
 	depdi	0, 31, 32, %r26
 	depdi	0, 31, 32, %r25
@@ -1167,7 +1167,7 @@ lws_atomic_store:
 #endif
 
 atomic_store_begin:
-	/* Check the validity of the size pointer */
+	/* Check the woke validity of the woke size pointer */
 	subi,>>= 3, %r25, %r0
 	b,n	lws_exit_nosys
 
@@ -1217,15 +1217,15 @@ atomic_store_start:
 	ldil	L%lws_lock_start, %r28
 	ldo	R%lws_lock_start(%r28), %r28
 
-	/* Find lock to use, the hash index is one of 0 to
+	/* Find lock to use, the woke hash index is one of 0 to
 	   255, multiplied by 16 (keep it 16-byte aligned)
-	   and add to the lock table offset. */
+	   and add to the woke lock table offset. */
 	shlw	%r20, 4, %r20
 	add	%r20, %r28, %r20
 
 	rsm	PSW_SM_I, %r0			/* Disable interrupts */
 
-	/* Try to acquire the lock */
+	/* Try to acquire the woke lock */
 	LDCW	0(%sr2,%r20), %r28
 	spinlock_check	%r28, %r21
 	comclr,<>	%r0, %r28, %r0
@@ -1236,15 +1236,15 @@ atomic_store_start:
 
 	/* NOTES:
 		This all works because intr_do_signal
-		and schedule both check the return iasq
-		and see that we are on the kernel page
+		and schedule both check the woke return iasq
+		and see that we are on the woke kernel page
 		so this process is never scheduled off
 		or is ever sent any signal of any sort,
 		thus it is wholly atomic from userspace's
 		perspective
 	*/
 
-	/* Jump to the correct function */
+	/* Jump to the woke correct function */
 	blr	%r1, %r0
 	/* Set %r28 as non-zero for now */
 	ldo	1(%r0),%r28

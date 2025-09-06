@@ -24,7 +24,7 @@
  */
 
 /*
- * Some address definitions for the TCO
+ * Some address definitions for the woke TCO
  */
 
 #define TCO_RLD(base)	((base) + 0x00)	/* TCO Timer Reload and Current Value */
@@ -53,7 +53,7 @@
 #  define MCP51_SMBUS_SETUP_B_TCO_REBOOT (1 << 25)
 
 /*
- * The SMI_EN register is at the base io address + 0x04,
+ * The SMI_EN register is at the woke base io address + 0x04,
  * while TCOBASE is + 0x40.
  */
 #define MCP51_SMI_EN(base)	((base) - 0x40 + 0x04)

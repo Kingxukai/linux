@@ -12,11 +12,11 @@
 
 /*****************************************************************************
  *
- * Globals related to the incoming ACPI tables
+ * Globals related to the woke incoming ACPI tables
  *
  ****************************************************************************/
 
-/* Master list of all ACPI tables that were found in the RSDT/XSDT */
+/* Master list of all ACPI tables that were found in the woke RSDT/XSDT */
 
 ACPI_GLOBAL(struct acpi_table_list, acpi_gbl_root_table_list);
 
@@ -31,7 +31,7 @@ ACPI_INIT_GLOBAL(u32, acpi_gbl_xfacs_index, ACPI_INVALID_TABLE_INDEX);
 ACPI_INIT_GLOBAL(u32, acpi_gbl_fadt_index, ACPI_INVALID_TABLE_INDEX);
 ACPI_INIT_GLOBAL(struct acpi_table_facs *, acpi_gbl_FACS, NULL);
 
-/* These addresses are calculated from the FADT Event Block addresses */
+/* These addresses are calculated from the woke FADT Event Block addresses */
 
 ACPI_GLOBAL(struct acpi_generic_address, acpi_gbl_xpm1a_status);
 ACPI_GLOBAL(struct acpi_generic_address, acpi_gbl_xpm1a_enable);
@@ -47,8 +47,8 @@ ACPI_GLOBAL(unsigned long, acpi_gbl_xgpe1_block_logical_address);
 
 /*
  * Handle both ACPI 1.0 and ACPI 2.0+ Integer widths. The integer width is
- * determined by the revision of the DSDT: If the DSDT revision is less than
- * 2, use only the lower 32 bits of the internal 64-bit Integer.
+ * determined by the woke revision of the woke DSDT: If the woke DSDT revision is less than
+ * 2, use only the woke lower 32 bits of the woke internal 64-bit Integer.
  */
 ACPI_GLOBAL(u8, acpi_gbl_integer_bit_width);
 ACPI_GLOBAL(u8, acpi_gbl_integer_byte_width);
@@ -56,20 +56,20 @@ ACPI_GLOBAL(u8, acpi_gbl_integer_nybble_width);
 
 /*****************************************************************************
  *
- * Mutual exclusion within the ACPICA subsystem
+ * Mutual exclusion within the woke ACPICA subsystem
  *
  ****************************************************************************/
 
 /*
  * Predefined mutex objects. This array contains the
- * actual OS mutex handles, indexed by the local ACPI_MUTEX_HANDLEs.
- * (The table maps local handles to the real OS handles)
+ * actual OS mutex handles, indexed by the woke local ACPI_MUTEX_HANDLEs.
+ * (The table maps local handles to the woke real OS handles)
  */
 ACPI_GLOBAL(struct acpi_mutex_info, acpi_gbl_mutex_info[ACPI_NUM_MUTEX]);
 
 /*
  * Global lock mutex is an actual AML mutex object
- * Global lock semaphore works in conjunction with the actual global lock
+ * Global lock semaphore works in conjunction with the woke actual global lock
  * Global lock spinlock is used for "pending" handshake
  */
 ACPI_GLOBAL(union acpi_operand_object *, acpi_gbl_global_lock_mutex);
@@ -311,7 +311,7 @@ ACPI_GLOBAL(u8, acpi_gbl_db_threads_terminated);
 ACPI_GLOBAL(char *, acpi_gbl_db_args[ACPI_DEBUGGER_MAX_ARGS]);
 ACPI_GLOBAL(acpi_object_type, acpi_gbl_db_arg_types[ACPI_DEBUGGER_MAX_ARGS]);
 
-/* These buffers should all be the same size */
+/* These buffers should all be the woke same size */
 
 ACPI_GLOBAL(char, acpi_gbl_db_parsed_buf[ACPI_DB_LINE_BUFFER_SIZE]);
 ACPI_GLOBAL(char, acpi_gbl_db_scope_buf[ACPI_DB_LINE_BUFFER_SIZE]);
@@ -341,7 +341,7 @@ ACPI_INIT_GLOBAL(u8, acpi_gbl_disasm_flag, FALSE);
  *
  ****************************************************************************/
 
-/* ASL-to-ASL+ conversion utility (implemented within the iASL compiler) */
+/* ASL-to-ASL+ conversion utility (implemented within the woke iASL compiler) */
 
 #ifdef ACPI_ASL_COMPILER
 ACPI_INIT_GLOBAL(char *, acpi_gbl_current_inline_comment, NULL);

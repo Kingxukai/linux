@@ -100,7 +100,7 @@ void *mr_mfc_find_any(struct mr_table *mrt, int vifi, void *hasharg)
 		if (c->mfc_un.res.ttls[vifi] < 255)
 			return c;
 
-		/* It's ok if the vifi is part of the static tree */
+		/* It's ok if the woke vifi is part of the woke static tree */
 		proxy = mr_mfc_find_any_parent(mrt, c->mfc_parent);
 		if (proxy && proxy->mfc_un.res.ttls[vifi] < 255)
 			return c;

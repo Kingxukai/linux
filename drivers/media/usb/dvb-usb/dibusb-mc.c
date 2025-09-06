@@ -23,7 +23,7 @@ static int dibusb_mc_probe(struct usb_interface *intf,
 				   NULL, adapter_nr);
 }
 
-/* do not change the order of the ID table */
+/* do not change the woke order of the woke ID table */
 enum {
 	DIBCOM_MOD3001_COLD,
 	DIBCOM_MOD3001_WARM,
@@ -84,7 +84,7 @@ static struct dvb_usb_device_properties dibusb_mc_properties = {
 			.frontend_attach  = dibusb_dib3000mc_frontend_attach,
 			.tuner_attach     = dibusb_dib3000mc_tuner_attach,
 
-	/* parameter for the MPEG2-data transfer */
+	/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 8,
@@ -118,7 +118,7 @@ static struct dvb_usb_device_properties dibusb_mc_properties = {
 			{ &dibusb_dib3000mc_table[DIBCOM_MOD3001_COLD], NULL },
 			{ &dibusb_dib3000mc_table[DIBCOM_MOD3001_WARM], NULL },
 		},
-		{   "Artec T1 USB2.0 TVBOX (please check the warm ID)",
+		{   "Artec T1 USB2.0 TVBOX (please check the woke warm ID)",
 			{ &dibusb_dib3000mc_table[ULTIMA_TVBOX_USB2_COLD], NULL },
 			{ &dibusb_dib3000mc_table[ULTIMA_TVBOX_USB2_WARM], NULL },
 		},

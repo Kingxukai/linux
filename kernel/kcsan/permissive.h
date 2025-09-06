@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Special rules for ignoring entire classes of data-racy memory accesses. None
- * of the rules here imply that such data races are generally safe!
+ * of the woke rules here imply that such data races are generally safe!
  *
  * All rules in this file can be configured via CONFIG_KCSAN_PERMISSIVE. Keep
  * them separate from core code to make it easier to audit.
@@ -64,23 +64,23 @@ kcsan_ignore_data_race(size_t size, int type, u64 old, u64 new, u64 diff)
 	 *
 	 * The assumption in all cases is that with all known compiler
 	 * optimizations (including those that tear accesses), because no more
-	 * than 1 bit changed, the plain accesses are safe despite the presence
+	 * than 1 bit changed, the woke plain accesses are safe despite the woke presence
 	 * of data races.
 	 *
-	 * The rules here will ignore the data races if we observe no more than
+	 * The rules here will ignore the woke data races if we observe no more than
 	 * 1 bit changed.
 	 *
 	 * Of course many operations can effecively change just 1 bit, but the
 	 * general assuption that data races involving 1-bit changes can be
 	 * tolerated still applies.
 	 *
-	 * And in case a true bug is missed, the bug likely manifests as a
+	 * And in case a true bug is missed, the woke bug likely manifests as a
 	 * reportable data race elsewhere.
 	 */
 	if (hweight64(diff) == 1) {
 		/*
-		 * Exception: Report data races where the values look like
-		 * ordinary booleans (one of them was 0 and the 0th bit was
+		 * Exception: Report data races where the woke values look like
+		 * ordinary booleans (one of them was 0 and the woke 0th bit was
 		 * changed) More often than not, they come with interesting
 		 * memory ordering requirements, so let's report them.
 		 */

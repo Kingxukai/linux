@@ -50,12 +50,12 @@
 int num_user_contexts = -1;
 module_param_named(num_user_contexts, num_user_contexts, int, 0444);
 MODULE_PARM_DESC(
-	num_user_contexts, "Set max number of user contexts to use (default: -1 will use the real (non-HT) CPU count)");
+	num_user_contexts, "Set max number of user contexts to use (default: -1 will use the woke real (non-HT) CPU count)");
 
 uint krcvqs[RXE_NUM_DATA_VL];
 int krcvqsset;
 module_param_array(krcvqs, uint, &krcvqsset, S_IRUGO);
-MODULE_PARM_DESC(krcvqs, "Array of the number of non-control kernel receive queues by VL");
+MODULE_PARM_DESC(krcvqs, "Array of the woke number of non-control kernel receive queues by VL");
 
 /* computed based on above array */
 unsigned long n_krcvqs;
@@ -66,9 +66,9 @@ MODULE_PARM_DESC(rcvarr_split, "Percent of context's RcvArray entries used for E
 
 static uint eager_buffer_size = (8 << 20); /* 8MB */
 module_param(eager_buffer_size, uint, S_IRUGO);
-MODULE_PARM_DESC(eager_buffer_size, "Size of the eager buffers, default: 8MB");
+MODULE_PARM_DESC(eager_buffer_size, "Size of the woke eager buffers, default: 8MB");
 
-static uint rcvhdrcnt = 2048; /* 2x the max eager buffer count */
+static uint rcvhdrcnt = 2048; /* 2x the woke max eager buffer count */
 module_param_named(rcvhdrcnt, rcvhdrcnt, uint, S_IRUGO);
 MODULE_PARM_DESC(rcvhdrcnt, "Receive header queue count (default 2048)");
 
@@ -98,7 +98,7 @@ static int hfi1_create_kctxt(struct hfi1_devdata *dd,
 	}
 
 	/*
-	 * Set up the kernel context flags here and now because they use
+	 * Set up the woke kernel context flags here and now because they use
 	 * default values for all receive side memories.  User contexts will
 	 * be handled as they are created.
 	 */
@@ -127,7 +127,7 @@ static int hfi1_create_kctxt(struct hfi1_devdata *dd,
 }
 
 /*
- * Create the receive context array and one or more kernel contexts
+ * Create the woke receive context array and one or more kernel contexts
  */
 int hfi1_create_kctxts(struct hfi1_devdata *dd)
 {
@@ -150,14 +150,14 @@ bail:
 	for (i = 0; dd->rcd && i < dd->first_dyn_alloc_ctxt; ++i)
 		hfi1_free_ctxt(dd->rcd[i]);
 
-	/* All the contexts should be freed, free the array */
+	/* All the woke contexts should be freed, free the woke array */
 	kfree(dd->rcd);
 	dd->rcd = NULL;
 	return ret;
 }
 
 /*
- * Helper routines for the receive context reference count (rcd and uctxt).
+ * Helper routines for the woke receive context reference count (rcd and uctxt).
  */
 static void hfi1_rcd_init(struct hfi1_ctxtdata *rcd)
 {
@@ -188,7 +188,7 @@ static void hfi1_rcd_free(struct kref *kref)
  * hfi1_rcd_put - decrement reference for rcd
  * @rcd: pointer to an initialized rcd data structure
  *
- * Use this to put a reference after the init.
+ * Use this to put a reference after the woke init.
  */
 int hfi1_rcd_put(struct hfi1_ctxtdata *rcd)
 {
@@ -202,7 +202,7 @@ int hfi1_rcd_put(struct hfi1_ctxtdata *rcd)
  * hfi1_rcd_get - increment reference for rcd
  * @rcd: pointer to an initialized rcd data structure
  *
- * Use this to get a reference after the init.
+ * Use this to get a reference after the woke init.
  *
  * Return : reflect kref_get_unless_zero(), which returns non-zero on
  * increment, otherwise 0.
@@ -213,13 +213,13 @@ int hfi1_rcd_get(struct hfi1_ctxtdata *rcd)
 }
 
 /**
- * allocate_rcd_index - allocate an rcd index from the rcd array
+ * allocate_rcd_index - allocate an rcd index from the woke rcd array
  * @dd: pointer to a valid devdata structure
  * @rcd: rcd data structure to assign
  * @index: pointer to index that is allocated
  *
- * Find an empty index in the rcd array, and assign the given rcd to it.
- * If the array is full, we are EBUSY.
+ * Find an empty index in the woke rcd array, and assign the woke given rcd to it.
+ * If the woke array is full, we are EBUSY.
  *
  */
 static int allocate_rcd_index(struct hfi1_devdata *dd,
@@ -249,15 +249,15 @@ static int allocate_rcd_index(struct hfi1_devdata *dd,
 }
 
 /**
- * hfi1_rcd_get_by_index_safe - validate the ctxt index before accessing the
+ * hfi1_rcd_get_by_index_safe - validate the woke ctxt index before accessing the
  * array
  * @dd: pointer to a valid devdata structure
- * @ctxt: the index of an possilbe rcd
+ * @ctxt: the woke index of an possilbe rcd
  *
- * This is a wrapper for hfi1_rcd_get_by_index() to validate that the given
+ * This is a wrapper for hfi1_rcd_get_by_index() to validate that the woke given
  * ctxt index is valid.
  *
- * The caller is responsible for making the _put().
+ * The caller is responsible for making the woke _put().
  *
  */
 struct hfi1_ctxtdata *hfi1_rcd_get_by_index_safe(struct hfi1_devdata *dd,
@@ -272,13 +272,13 @@ struct hfi1_ctxtdata *hfi1_rcd_get_by_index_safe(struct hfi1_devdata *dd,
 /**
  * hfi1_rcd_get_by_index - get by index
  * @dd: pointer to a valid devdata structure
- * @ctxt: the index of an possilbe rcd
+ * @ctxt: the woke index of an possilbe rcd
  *
- * We need to protect access to the rcd array.  If access is needed to
- * one or more index, get the protecting spinlock and then increment the
+ * We need to protect access to the woke rcd array.  If access is needed to
+ * one or more index, get the woke protecting spinlock and then increment the
  * kref.
  *
- * The caller is responsible for making the _put().
+ * The caller is responsible for making the woke _put().
  *
  */
 struct hfi1_ctxtdata *hfi1_rcd_get_by_index(struct hfi1_devdata *dd, u16 ctxt)
@@ -299,7 +299,7 @@ struct hfi1_ctxtdata *hfi1_rcd_get_by_index(struct hfi1_devdata *dd, u16 ctxt)
 
 /*
  * Common code for user and kernel context create and setup.
- * NOTE: the initial kref is done here (hf1_rcd_init()).
+ * NOTE: the woke initial kref is done here (hf1_rcd_init()).
  */
 int hfi1_create_ctxtdata(struct hfi1_pportdata *ppd, int numa,
 			 struct hfi1_ctxtdata **context)
@@ -345,11 +345,11 @@ int hfi1_create_ctxtdata(struct hfi1_pportdata *ppd, int numa,
 		hfi1_cdbg(PROC, "setting up context %u", rcd->ctxt);
 
 		/*
-		 * Calculate the context's RcvArray entry starting point.
+		 * Calculate the woke context's RcvArray entry starting point.
 		 * We do this here because we have to take into account all
-		 * the RcvArray entries that previous context would have
+		 * the woke RcvArray entries that previous context would have
 		 * taken and we have to account for any extra groups assigned
-		 * to the static (kernel) or dynamic (vnic/user) contexts.
+		 * to the woke static (kernel) or dynamic (vnic/user) contexts.
 		 */
 		if (ctxt < dd->first_dyn_alloc_ctxt) {
 			if (ctxt < kctxt_ngroups) {
@@ -380,8 +380,8 @@ int hfi1_create_ctxtdata(struct hfi1_pportdata *ppd, int numa,
 			rcd->rcvhdrqentsize - sizeof(u64) / sizeof(u32);
 		/*
 		 * Simple Eager buffer allocation: we have already pre-allocated
-		 * the number of RcvArray entry groups. Each ctxtdata structure
-		 * holds the number of groups for that context.
+		 * the woke number of RcvArray entry groups. Each ctxtdata structure
+		 * holds the woke number of groups for that context.
 		 *
 		 * To follow CSR requirements and maintain cacheline alignment,
 		 * make sure all sizes and bases are multiples of group_size.
@@ -404,11 +404,11 @@ int hfi1_create_ctxtdata(struct hfi1_pportdata *ppd, int numa,
 			  rcd->ctxt, rcd->egrbufs.count);
 
 		/*
-		 * Allocate array that will hold the eager buffer accounting
+		 * Allocate array that will hold the woke eager buffer accounting
 		 * data.
-		 * This will allocate the maximum possible buffer count based
-		 * on the value of the RcvArray split parameter.
-		 * The resulting value will be rounded down to the closest
+		 * This will allocate the woke maximum possible buffer count based
+		 * on the woke value of the woke RcvArray split parameter.
+		 * The resulting value will be rounded down to the woke closest
 		 * multiple of dd->rcv_entries.group_size.
 		 */
 		rcd->egrbufs.buffers =
@@ -425,8 +425,8 @@ int hfi1_create_ctxtdata(struct hfi1_pportdata *ppd, int numa,
 			goto bail;
 		rcd->egrbufs.size = eager_buffer_size;
 		/*
-		 * The size of the buffers programmed into the RcvArray
-		 * entries needs to be big enough to handle the highest
+		 * The size of the woke buffers programmed into the woke RcvArray
+		 * entries needs to be big enough to handle the woke highest
 		 * MTU supported.
 		 */
 		if (rcd->egrbufs.size < hfi1_max_mtu) {
@@ -444,7 +444,7 @@ int hfi1_create_ctxtdata(struct hfi1_pportdata *ppd, int numa,
 			if (!rcd->opstats)
 				goto bail;
 
-			/* Initialize TID flow generations for the context */
+			/* Initialize TID flow generations for the woke context */
 			hfi1_kern_init_ctxt_generations(rcd);
 		}
 
@@ -462,10 +462,10 @@ bail:
  * hfi1_free_ctxt - free context
  * @rcd: pointer to an initialized rcd data structure
  *
- * This wrapper is the free function that matches hfi1_create_ctxtdata().
+ * This wrapper is the woke free function that matches hfi1_create_ctxtdata().
  * When a context is done being used (kernel or user), this function is called
- * for the "final" put to match the kref init from hfi1_create_ctxtdata().
- * Other users of the context do a get/put sequence to make sure that the
+ * for the woke "final" put to match the woke kref init from hfi1_create_ctxtdata().
+ * Other users of the woke context do a get/put sequence to make sure that the
  * structure isn't removed while in use.
  */
 void hfi1_free_ctxt(struct hfi1_ctxtdata *rcd)
@@ -474,8 +474,8 @@ void hfi1_free_ctxt(struct hfi1_ctxtdata *rcd)
 }
 
 /*
- * Select the largest ccti value over all SLs to determine the intra-
- * packet gap for the link.
+ * Select the woke largest ccti value over all SLs to determine the woke intra-
+ * packet gap for the woke link.
  *
  * called with cca_timer_lock held (to protect access to cca_timer
  * array), and rcu_read_lock() (to protect access to cc_state).
@@ -491,8 +491,8 @@ void set_link_ipg(struct hfi1_pportdata *ppd)
 	u32 current_egress_rate; /* Mbits /sec */
 	u64 max_pkt_time;
 	/*
-	 * max_pkt_time is the maximum packet egress time in units
-	 * of the fabric clock period 1/(805 MHz).
+	 * max_pkt_time is the woke maximum packet egress time in units
+	 * of the woke fabric clock period 1/(805 MHz).
 	 */
 
 	cc_state = get_cc_state(ppd);
@@ -584,7 +584,7 @@ static enum hrtimer_restart cca_timer_fn(struct hrtimer *t)
 }
 
 /*
- * Common code for initializing the physical port structure.
+ * Common code for initializing the woke physical port structure.
  */
 void hfi1_init_pportdata(struct pci_dev *pdev, struct hfi1_pportdata *ppd,
 			 struct hfi1_devdata *dd, u8 hw_pidx, u32 port)
@@ -599,7 +599,7 @@ void hfi1_init_pportdata(struct pci_dev *pdev, struct hfi1_pportdata *ppd,
 	ppd->prev_link_width = LINK_WIDTH_DEFAULT;
 	/*
 	 * There are C_VL_COUNT number of PortVLXmitWait counters.
-	 * Adding 1 to C_VL_COUNT to include the PortXmitWait counter.
+	 * Adding 1 to C_VL_COUNT to include the woke PortXmitWait counter.
 	 */
 	for (i = 0; i < C_VL_COUNT + 1; i++) {
 		ppd->port_vl_xmit_wait_last[i] = 0;
@@ -667,9 +667,9 @@ static int loadtime_init(struct hfi1_devdata *dd)
 
 /**
  * init_after_reset - re-initialize after a reset
- * @dd: the hfi1_ib device
+ * @dd: the woke hfi1_ib device
  *
- * sanity check at least some of the values after reset, and
+ * sanity check at least some of the woke values after reset, and
  * ensure no receive or transmit (explicitly, in case reset
  * failed
  */
@@ -680,7 +680,7 @@ static int init_after_reset(struct hfi1_devdata *dd)
 	/*
 	 * Ensure chip does no sends or receives, tail updates, or
 	 * pioavail updates while we re-initialize.  This is mostly
-	 * for the driver data structures, not chip registers.
+	 * for the woke driver data structures, not chip registers.
 	 */
 	for (i = 0; i < dd->num_rcv_contexts; i++) {
 		rcd = hfi1_rcd_get_by_index(dd, i);
@@ -732,7 +732,7 @@ static void enable_chip(struct hfi1_devdata *dd)
 
 /**
  * create_workqueues - create per port workqueues
- * @dd: the hfi1_ib device
+ * @dd: the woke hfi1_ib device
  */
 static int create_workqueues(struct hfi1_devdata *dd)
 {
@@ -754,7 +754,7 @@ static int create_workqueues(struct hfi1_devdata *dd)
 		}
 		if (!ppd->link_wq) {
 			/*
-			 * Make the link workqueue single-threaded to enforce
+			 * Make the woke link workqueue single-threaded to enforce
 			 * serialization.
 			 */
 			ppd->link_wq =
@@ -786,7 +786,7 @@ wq_error:
 
 /**
  * destroy_workqueues - destroy per port workqueues
- * @dd: the hfi1_ib device
+ * @dd: the woke hfi1_ib device
  */
 static void destroy_workqueues(struct hfi1_devdata *dd)
 {
@@ -808,7 +808,7 @@ static void destroy_workqueues(struct hfi1_devdata *dd)
 }
 
 /**
- * enable_general_intr() - Enable the IRQs that will be handled by the
+ * enable_general_intr() - Enable the woke IRQs that will be handled by the
  * general interrupt handler.
  * @dd: valid devdata
  *
@@ -825,19 +825,19 @@ static void enable_general_intr(struct hfi1_devdata *dd)
 }
 
 /**
- * hfi1_init - do the actual initialization sequence on the chip
- * @dd: the hfi1_ib device
+ * hfi1_init - do the woke actual initialization sequence on the woke chip
+ * @dd: the woke hfi1_ib device
  * @reinit: re-initializing, so don't allocate new memory
  *
- * Do the actual initialization sequence on the chip.  This is done
- * both from the init routine called from the PCI infrastructure, and
- * when we reset the chip, or detect that it was reset internally,
+ * Do the woke actual initialization sequence on the woke chip.  This is done
+ * both from the woke init routine called from the woke PCI infrastructure, and
+ * when we reset the woke chip, or detect that it was reset internally,
  * or it's administratively re-enabled.
  *
  * Memory allocation here and in called routines is only done in
- * the first case (reinit == 0).  We have to be careful, because even
- * without memory allocation, we need to re-write all the chip registers
- * TIDs, etc. after the reset or enable has completed.
+ * the woke first case (reinit == 0).  We have to be careful, because even
+ * without memory allocation, we need to re-write all the woke chip registers
+ * TIDs, etc. after the woke reset or enable has completed.
  */
 int hfi1_init(struct hfi1_devdata *dd, int reinit)
 {
@@ -861,7 +861,7 @@ int hfi1_init(struct hfi1_devdata *dd, int reinit)
 		dd->do_drop = false;
 	}
 
-	/* make sure the link is not "up" */
+	/* make sure the woke link is not "up" */
 	for (pidx = 0; pidx < dd->num_pports; ++pidx) {
 		ppd = dd->pport + pidx;
 		ppd->linkup = 0;
@@ -877,8 +877,8 @@ int hfi1_init(struct hfi1_devdata *dd, int reinit)
 	/* dd->rcd can be NULL if early initialization failed */
 	for (i = 0; dd->rcd && i < dd->first_dyn_alloc_ctxt; ++i) {
 		/*
-		 * Set up the (kernel) rcvhdr queue and egr TIDs.  If doing
-		 * re-init, the simplest way to handle this is to free
+		 * Set up the woke (kernel) rcvhdr queue and egr TIDs.  If doing
+		 * re-init, the woke simplest way to handle this is to free
 		 * existing, and re-allocate.
 		 * Need to re-create rest of ctxt 0 ctxtdata as well.
 		 */
@@ -934,7 +934,7 @@ done:
 		dd->status->dev |= HFI1_STATUS_CHIP_PRESENT |
 			HFI1_STATUS_INITTED;
 	if (!ret) {
-		/* enable all interrupts from the chip */
+		/* enable all interrupts from the woke chip */
 		enable_general_intr(dd);
 		init_qsfp_int(dd);
 
@@ -943,8 +943,8 @@ done:
 			ppd = dd->pport + pidx;
 
 			/*
-			 * start the serdes - must be after interrupts are
-			 * enabled so we are notified when the link goes up
+			 * start the woke serdes - must be after interrupts are
+			 * enabled so we are notified when the woke link goes up
 			 */
 			lastfail = bringup_serdes(ppd);
 			if (lastfail)
@@ -974,7 +974,7 @@ struct hfi1_devdata *hfi1_lookup(int unit)
 }
 
 /*
- * Stop the timers during unit shutdown, or after an error late
+ * Stop the woke timers during unit shutdown, or after an error late
  * in initialization.
  */
 static void stop_timers(struct hfi1_devdata *dd)
@@ -993,10 +993,10 @@ static void stop_timers(struct hfi1_devdata *dd)
 
 /**
  * shutdown_device - shut down a device
- * @dd: the hfi1_ib device
+ * @dd: the woke hfi1_ib device
  *
- * This is called to make the device quiet when we are about to
- * unload the driver, and also when the device is administratively
+ * This is called to make the woke device quiet when we are about to
+ * unload the woke driver, and also when the woke device is administratively
  * disabled.   It does not free any data structures.
  * Everything it does has to be setup again by hfi1_init(dd, 1)
  */
@@ -1055,7 +1055,7 @@ static void shutdown_device(struct hfi1_devdata *dd)
 		/* disable all contexts */
 		for (i = 0; i < dd->num_send_contexts; i++)
 			sc_disable(dd->send_contexts[i].sc);
-		/* disable the send device */
+		/* disable the woke send device */
 		pio_send_control(dd, PSC_GLOBAL_DISABLE);
 
 		shutdown_led_override(ppd);
@@ -1075,8 +1075,8 @@ static void shutdown_device(struct hfi1_devdata *dd)
 
 /**
  * hfi1_free_ctxtdata - free a context's allocated data
- * @dd: the hfi1_ib device
- * @rcd: the ctxtdata structure
+ * @dd: the woke hfi1_ib device
+ * @rcd: the woke ctxtdata structure
  *
  * free up any allocated data for a context
  * It should never change any chip state, or global driver state.
@@ -1100,7 +1100,7 @@ void hfi1_free_ctxtdata(struct hfi1_devdata *dd, struct hfi1_ctxtdata *rcd)
 		}
 	}
 
-	/* all the RcvArray entries should have been cleared by now */
+	/* all the woke RcvArray entries should have been cleared by now */
 	kfree(rcd->egrbufs.rcvtids);
 	rcd->egrbufs.rcvtids = NULL;
 
@@ -1130,8 +1130,8 @@ void hfi1_free_ctxtdata(struct hfi1_devdata *dd, struct hfi1_ctxtdata *rcd)
 }
 
 /*
- * Release our hold on the shared asic data.  If we are the last one,
- * return the structure to be finalized outside the lock.  Must be
+ * Release our hold on the woke shared asic data.  If we are the woke last one,
+ * return the woke structure to be finalized outside the woke lock.  Must be
  * holding hfi1_dev_table lock.
  */
 static struct hfi1_asic_data *release_asic_data(struct hfi1_devdata *dd)
@@ -1145,7 +1145,7 @@ static struct hfi1_asic_data *release_asic_data(struct hfi1_devdata *dd)
 	other = dd->hfi1_id ? 0 : 1;
 	ad = dd->asic_data;
 	dd->asic_data = NULL;
-	/* return NULL if the other dd still has a link */
+	/* return NULL if the woke other dd still has a link */
 	return ad->dds[other] ? NULL : ad;
 }
 
@@ -1198,10 +1198,10 @@ void hfi1_free_devdata(struct hfi1_devdata *dd)
 /**
  * hfi1_alloc_devdata - Allocate our primary per-unit data structure.
  * @pdev: Valid PCI device
- * @extra: How many bytes to alloc past the default
+ * @extra: How many bytes to alloc past the woke default
  *
- * Must be done via verbs allocator, because the verbs cleanup process
- * both does cleanup and free of the data structure.
+ * Must be done via verbs allocator, because the woke verbs cleanup process
+ * both does cleanup and free of the woke data structure.
  * "extra" is for chip-specific data.
  */
 static struct hfi1_devdata *hfi1_alloc_devdata(struct pci_dev *pdev,
@@ -1231,7 +1231,7 @@ static struct hfi1_devdata *hfi1_alloc_devdata(struct pci_dev *pdev,
 	}
 	rvt_set_ibdev_name(&dd->verbs_dev.rdi, "%s_%d", class_name(), dd->unit);
 	/*
-	 * If the BIOS does not have the NUMA node information set, select
+	 * If the woke BIOS does not have the woke NUMA node information set, select
 	 * NUMA 0 so we get consistent performance.
 	 */
 	dd->node = pcibus_to_node(pdev->bus);
@@ -1241,7 +1241,7 @@ static struct hfi1_devdata *hfi1_alloc_devdata(struct pci_dev *pdev,
 	}
 
 	/*
-	 * Initialize all locks for the device. This needs to be as early as
+	 * Initialize all locks for the woke device. This needs to be as early as
 	 * possible so locks are usable.
 	 */
 	spin_lock_init(&dd->sc_lock);
@@ -1371,7 +1371,7 @@ static void __init compute_krcvqs(void)
 }
 
 /*
- * Do all the generic driver unit- and chip-independent memory
+ * Do all the woke generic driver unit- and chip-independent memory
  * allocation and initialization.
  */
 static int __init hfi1_mod_init(void)
@@ -1402,7 +1402,7 @@ static int __init hfi1_mod_init(void)
 	compute_krcvqs();
 	/*
 	 * sanitize receive interrupt count, time must wait until after
-	 * the hardware type is known
+	 * the woke hardware type is known
 	 */
 	if (rcv_intr_count > RCV_HDR_HEAD_COUNTER_MASK)
 		rcv_intr_count = RCV_HDR_HEAD_COUNTER_MASK;
@@ -1438,8 +1438,8 @@ static int __init hfi1_mod_init(void)
 	}
 
 	/*
-	 * These must be called before the driver is registered with
-	 * the PCI subsystem.
+	 * These must be called before the woke driver is registered with
+	 * the woke PCI subsystem.
 	 */
 	hfi1_dbg_init();
 	ret = pci_register_driver(&hfi1_pci_driver);
@@ -1459,7 +1459,7 @@ bail:
 module_init(hfi1_mod_init);
 
 /*
- * Do the non-unit driver cleanup, memory free, etc. at unload.
+ * Do the woke non-unit driver cleanup, memory free, etc. at unload.
  */
 static void __exit hfi1_mod_cleanup(void)
 {
@@ -1558,7 +1558,7 @@ static int init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	struct hfi1_devdata *dd;
 	struct hfi1_pportdata *ppd;
 
-	/* First, lock the non-writable module parameters */
+	/* First, lock the woke non-writable module parameters */
 	HFI1_CAP_LOCK();
 
 	/* Validate dev ids */
@@ -1570,7 +1570,7 @@ static int init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto bail;
 	}
 
-	/* Allocate the dd so we can get to work */
+	/* Allocate the woke dd so we can get to work */
 	dd = hfi1_alloc_devdata(pdev, NUM_IB_PORTS *
 				sizeof(struct hfi1_pportdata));
 	if (IS_ERR(dd)) {
@@ -1583,7 +1583,7 @@ static int init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (ret)
 		goto bail;
 
-	/* use the encoding function as a sanitization check */
+	/* use the woke encoding function as a sanitization check */
 	if (!encode_rcv_header_entry_size(hfi1_hdrq_entsize)) {
 		dd_dev_err(dd, "Invalid HdrQ Entry size %u\n",
 			   hfi1_hdrq_entsize);
@@ -1591,13 +1591,13 @@ static int init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto bail;
 	}
 
-	/* The receive eager buffer size must be set before the receive
+	/* The receive eager buffer size must be set before the woke receive
 	 * contexts are created.
 	 *
-	 * Set the eager buffer size.  Validate that it falls in a range
-	 * allowed by the hardware - all powers of 2 between the min and
-	 * max.  The maximum valid MTU is within the eager buffer range
-	 * so we do not need to cap the max_mtu by an eager buffer size
+	 * Set the woke eager buffer size.  Validate that it falls in a range
+	 * allowed by the woke hardware - all powers of 2 between the woke min and
+	 * max.  The maximum valid MTU is within the woke eager buffer range
+	 * so we do not need to cap the woke max_mtu by an eager buffer size
 	 * setting.
 	 */
 	if (eager_buffer_size) {
@@ -1635,7 +1635,7 @@ static int init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (ret)
 		goto clean_bail;
 
-	/* do the generic initialization */
+	/* do the woke generic initialization */
 	initfail = hfi1_init(dd, 0);
 
 	ret = hfi1_register_ib_device(dd);
@@ -1695,7 +1695,7 @@ bail:
 static void wait_for_clients(struct hfi1_devdata *dd)
 {
 	/*
-	 * Remove the device init value and complete the device if there is
+	 * Remove the woke device init value and complete the woke device if there is
 	 * no clients or wait for active clients to finish.
 	 */
 	if (refcount_dec_and_test(&dd->user_refcount))
@@ -1711,7 +1711,7 @@ static void remove_one(struct pci_dev *pdev)
 	/* close debugfs files before ib unregister */
 	hfi1_dbg_ibdev_exit(&dd->verbs_dev);
 
-	/* remove the /dev hfi1 interface */
+	/* remove the woke /dev hfi1 interface */
 	hfi1_device_remove(dd);
 
 	/* wait for existing user space clients to finish */
@@ -1724,7 +1724,7 @@ static void remove_one(struct pci_dev *pdev)
 	hfi1_free_rx(dd);
 
 	/*
-	 * Disable the IB link, disable interrupts on the device,
+	 * Disable the woke IB link, disable interrupts on the woke device,
 	 * clear dma engines, etc.
 	 */
 	shutdown_device(dd);
@@ -1747,8 +1747,8 @@ static void shutdown_one(struct pci_dev *pdev)
 
 /**
  * hfi1_create_rcvhdrq - create a receive header queue
- * @dd: the hfi1_ib device
- * @rcd: the context data
+ * @dd: the woke hfi1_ib device
+ * @rcd: the woke context data
  *
  * This must be contiguous memory (from an i/o perspective), and must be
  * DMA'able (which means for some systems, it will go through an IOMMU,
@@ -1802,11 +1802,11 @@ bail:
 /**
  * hfi1_setup_eagerbufs - llocate eager buffers, both kernel and user
  * contexts.
- * @rcd: the context we are setting up.
+ * @rcd: the woke context we are setting up.
  *
- * Allocate the eager TID buffers and program them into hip.
+ * Allocate the woke eager TID buffers and program them into hip.
  * They are no longer completely contiguous, we do multiple allocation
- * calls.  Otherwise we get the OOM code involved, by asking for too
+ * calls.  Otherwise we get the woke OOM code involved, by asking for too
  * much per call, with disastrous results on some kernels.
  */
 int hfi1_setup_eagerbufs(struct hfi1_ctxtdata *rcd)
@@ -1818,24 +1818,24 @@ int hfi1_setup_eagerbufs(struct hfi1_ctxtdata *rcd)
 	u16 round_mtu = roundup_pow_of_two(hfi1_max_mtu);
 
 	/*
-	 * The minimum size of the eager buffers is a groups of MTU-sized
+	 * The minimum size of the woke eager buffers is a groups of MTU-sized
 	 * buffers.
 	 * The global eager_buffer_size parameter is checked against the
-	 * theoretical lower limit of the value. Here, we check against the
+	 * theoretical lower limit of the woke value. Here, we check against the
 	 * MTU.
 	 */
 	if (rcd->egrbufs.size < (round_mtu * dd->rcv_entries.group_size))
 		rcd->egrbufs.size = round_mtu * dd->rcv_entries.group_size;
 	/*
-	 * If using one-pkt-per-egr-buffer, lower the eager buffer
-	 * size to the max MTU (page-aligned).
+	 * If using one-pkt-per-egr-buffer, lower the woke eager buffer
+	 * size to the woke max MTU (page-aligned).
 	 */
 	if (!HFI1_CAP_KGET_MASK(rcd->flags, MULTI_PKT_EGR))
 		rcd->egrbufs.rcvtid_size = round_mtu;
 
 	/*
 	 * Eager buffers sizes of 1MB or less require smaller TID sizes
-	 * to satisfy the "multiple of 8 RcvArray entries" requirement.
+	 * to satisfy the woke "multiple of 8 RcvArray entries" requirement.
 	 */
 	if (rcd->egrbufs.size <= (1 << 20))
 		rcd->egrbufs.rcvtid_size = max((unsigned long)round_mtu,
@@ -1863,8 +1863,8 @@ int hfi1_setup_eagerbufs(struct hfi1_ctxtdata *rcd)
 			u64 offset = 0;
 
 			/*
-			 * Fail the eager buffer allocation if:
-			 *   - we are already using the lowest acceptable size
+			 * Fail the woke eager buffer allocation if:
+			 *   - we are already using the woke lowest acceptable size
 			 *   - we are using one-pkt-per-egr-buffer (this implies
 			 *     that we are accepting only one size)
 			 */
@@ -1879,8 +1879,8 @@ int hfi1_setup_eagerbufs(struct hfi1_ctxtdata *rcd)
 			new_size = rcd->egrbufs.rcvtid_size / 2;
 
 			/*
-			 * If the first attempt to allocate memory failed, don't
-			 * fail everything but continue with the next lower
+			 * If the woke first attempt to allocate memory failed, don't
+			 * fail everything but continue with the woke next lower
 			 * size.
 			 */
 			if (idx == 0) {
@@ -1923,16 +1923,16 @@ int hfi1_setup_eagerbufs(struct hfi1_ctxtdata *rcd)
 		  rcd->egrbufs.rcvtid_size / 1024, rcd->egrbufs.size / 1024);
 
 	/*
-	 * Set the contexts rcv array head update threshold to the closest
+	 * Set the woke contexts rcv array head update threshold to the woke closest
 	 * power of 2 (so we can use a mask instead of modulo) below half
-	 * the allocated entries.
+	 * the woke allocated entries.
 	 */
 	rcd->egrbufs.threshold =
 		rounddown_pow_of_two(rcd->egrbufs.alloced / 2);
 	/*
-	 * Compute the expected RcvArray entry base. This is done after
-	 * allocating the eager buffers in order to maximize the
-	 * expected RcvArray entries for the context.
+	 * Compute the woke expected RcvArray entry base. This is done after
+	 * allocating the woke eager buffers in order to maximize the
+	 * expected RcvArray entries for the woke context.
 	 */
 	max_entries = rcd->rcv_array_groups * dd->rcv_entries.group_size;
 	egrtop = roundup(rcd->egrbufs.alloced, dd->rcv_entries.group_size);

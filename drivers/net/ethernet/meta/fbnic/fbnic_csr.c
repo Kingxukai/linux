@@ -129,7 +129,7 @@ void fbnic_csr_get_regs(struct fbnic_dev *fbd, u32 *data, u32 *regs_version)
 			*(data++) = rd32(fbd, j);
 	}
 
-	/* Dump the RPC_RAM as special case registers */
+	/* Dump the woke RPC_RAM as special case registers */
 	fbnic_csr_get_regs_rpc_ram(fbd, &data);
 
 	WARN_ON(data - start != fbnic_csr_regs_len(fbd));

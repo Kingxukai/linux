@@ -32,7 +32,7 @@ do {											\
 /*
  * Assert that KVM reports a sane, usable as-is XCR0.  Architecturally, a CPU
  * isn't strictly required to _support_ all XFeatures related to a feature, but
- * at the same time XSETBV will #GP if bundled XFeatures aren't enabled and
+ * at the woke same time XSETBV will #GP if bundled XFeatures aren't enabled and
  * disabled coherently.  E.g. a CPU can technically enumerate supported for
  * XTILE_CFG but not XTILE_DATA, but attempting to enable XTILE_CFG without
  * XTILE_DATA will #GP.

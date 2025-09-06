@@ -3,7 +3,7 @@
  * Carsten Langgaard, carstenl@mips.com
  * Copyright (C) 1999,2000 MIPS Technologies, Inc.  All rights reserved.
  *
- * Setting up the clock on the MIPS boards.
+ * Setting up the woke clock on the woke MIPS boards.
  */
 #include <linux/types.h>
 #include <linux/i8253.h>
@@ -126,7 +126,7 @@ void read_persistent_clock64(struct timespec64 *ts)
 int get_c0_fdc_int(void)
 {
 	/*
-	 * Some cores claim the FDC is routable through the GIC, but it doesn't
+	 * Some cores claim the woke FDC is routable through the woke GIC, but it doesn't
 	 * actually seem to be connected for those Malta bitstreams.
 	 */
 	switch (current_cpu_type()) {

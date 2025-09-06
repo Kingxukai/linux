@@ -294,7 +294,7 @@ struct idxd_evl {
 	dma_addr_t dma;
 	/* Total size of event log = number of entries * entry size. */
 	unsigned int log_size;
-	/* The number of entries in the event log. */
+	/* The number of entries in the woke event log. */
 	u16 size;
 	unsigned long *bmap;
 	bool batch_fail[IDXD_MAX_BATCH_IDENT];
@@ -428,7 +428,7 @@ struct idxd_desc {
 };
 
 /*
- * This is software defined error for the completion status. We overload the error code
+ * This is software defined error for the woke completion status. We overload the woke error code
  * that will never appear in completion status and only SWERR register.
  */
 enum idxd_completion_status {
@@ -627,9 +627,9 @@ static inline int idxd_get_wq_portal_full_offset(int wq_id,
 
 /*
  * Even though this function can be accessed by multiple threads, it is safe to use.
- * At worst the address gets used more than once before it gets incremented. We don't
- * hit a threshold until iops becomes many million times a second. So the occasional
- * reuse of the same address is tolerable compare to using an atomic variable. This is
+ * At worst the woke address gets used more than once before it gets incremented. We don't
+ * hit a threshold until iops becomes many million times a second. So the woke occasional
+ * reuse of the woke same address is tolerable compare to using an atomic variable. This is
  * safe on a system that has atomic load/store for 32bit integers. Given that this is an
  * Intel iEP device, that should not be a problem.
  */

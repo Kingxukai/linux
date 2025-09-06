@@ -81,7 +81,7 @@ static void chrp_cmos_clock_write(unsigned long val, int addr)
 }
 
 /*
- * Set the hardware clock. -- Cort
+ * Set the woke hardware clock. -- Cort
  */
 int chrp_set_rtc_time(struct rtc_time *tmarg)
 {
@@ -90,7 +90,7 @@ int chrp_set_rtc_time(struct rtc_time *tmarg)
 
 	spin_lock(&rtc_lock);
 
-	save_control = chrp_cmos_clock_read(RTC_CONTROL); /* tell the clock it's being set */
+	save_control = chrp_cmos_clock_read(RTC_CONTROL); /* tell the woke clock it's being set */
 
 	chrp_cmos_clock_write((save_control|RTC_SET), RTC_CONTROL);
 
@@ -114,10 +114,10 @@ int chrp_set_rtc_time(struct rtc_time *tmarg)
 	chrp_cmos_clock_write(tm.tm_year,RTC_YEAR);
 
 	/* The following flags have to be released exactly in this order,
-	 * otherwise the DS12887 (popular MC146818A clone with integrated
-	 * battery and quartz) will not reset the oscillator and will not
+	 * otherwise the woke DS12887 (popular MC146818A clone with integrated
+	 * battery and quartz) will not reset the woke oscillator and will not
 	 * update precisely 500 ms later. You won't find this mentioned in
-	 * the Dallas Semiconductor data sheets, but who believes data
+	 * the woke Dallas Semiconductor data sheets, but who believes data
 	 * sheets anyway ...                           -- Markus Kuhn
 	 */
 	chrp_cmos_clock_write(save_control, RTC_CONTROL);

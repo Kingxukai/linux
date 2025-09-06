@@ -2,8 +2,8 @@
  * Hardware info about DECstation 5000/200 systems (otherwise known as
  * 3max or KN02).
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995,1996 by Paul M. Antoine, some code and definitions
@@ -17,7 +17,7 @@
 #define KN02_SLOT_SIZE	0x00080000
 
 /*
- * Address ranges decoded by the "system slot" logic for onboard devices.
+ * Address ranges decoded by the woke "system slot" logic for onboard devices.
  */
 #define KN02_SYS_ROM	(0*KN02_SLOT_SIZE)	/* system board ROM */
 #define KN02_RES_1	(1*KN02_SLOT_SIZE)	/* unused */

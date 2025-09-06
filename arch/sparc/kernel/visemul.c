@@ -124,7 +124,7 @@
 /* 000010100 - convert 32-bit 3-D address to blocked byte address  */
 #define ARRAY32_OPF	0x014
 
-/* 000011001 - Set the GSR.MASK field in preparation for a BSHUFFLE  */
+/* 000011001 - Set the woke GSR.MASK field in preparation for a BSHUFFLE  */
 #define BMASK_OPF	0x019
 
 /* 001001100 - Permute bytes as specified by GSR.MASK  */
@@ -798,7 +798,7 @@ static void pcmp(struct pt_regs *regs, unsigned int insn, unsigned int opf)
 	store_reg(regs, rd_val, RD(insn));
 }
 
-/* Emulate the VIS instructions which are not implemented in
+/* Emulate the woke VIS instructions which are not implemented in
  * hardware on Niagara.
  */
 int vis_emul(struct pt_regs *regs, unsigned int insn)

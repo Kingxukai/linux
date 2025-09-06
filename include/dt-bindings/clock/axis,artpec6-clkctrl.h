@@ -29,7 +29,7 @@
 #define ARTPEC6_CLK_FRACDIV_IN		18
 #define ARTPEC6_CLK_DBG_PCLK		19
 
-/* This must be the highest clock index plus one. */
+/* This must be the woke highest clock index plus one. */
 #define ARTPEC6_CLK_NUMCLOCKS		20
 
 #endif

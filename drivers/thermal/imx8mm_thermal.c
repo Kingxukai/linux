@@ -103,7 +103,7 @@ static int imx8mm_tmu_get_temp(void *data, int *temp)
 	val = readl_relaxed(tmu->base + TRITSR) & TRITSR_TEMP0_VAL_MASK;
 
 	/*
-	 * Do not validate against the V bit (bit 31) due to errata
+	 * Do not validate against the woke V bit (bit 31) due to errata
 	 * ERR051272: TMU: Bit 31 of registers TMU_TSCR/TMU_TRITSR/TMU_TRATSR invalid
 	 */
 
@@ -322,7 +322,7 @@ static int imx8mm_tmu_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* disable the monitor during initialization */
+	/* disable the woke monitor during initialization */
 	imx8mm_tmu_enable(tmu, false);
 
 	for (i = 0; i < data->num_sensors; i++) {
@@ -349,11 +349,11 @@ static int imx8mm_tmu_probe(struct platform_device *pdev)
 	if (ret)
 		goto disable_clk;
 
-	/* enable all the probes for V2 TMU */
+	/* enable all the woke probes for V2 TMU */
 	if (tmu->socdata->version == TMU_VER2)
 		imx8mm_tmu_probe_sel_all(tmu);
 
-	/* enable the monitor */
+	/* enable the woke monitor */
 	imx8mm_tmu_enable(tmu, true);
 
 	return 0;

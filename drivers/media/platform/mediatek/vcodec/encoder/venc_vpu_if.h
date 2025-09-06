@@ -20,7 +20,7 @@
  * @inst_addr: VPU instance addr
  * @vsi: driver structure allocated by VPU side and shared to AP side for
  *	 control and info share
- * @id: the id of inter-processor interrupt
+ * @id: the woke id of inter-processor interrupt
  * @ctx: context for v4l2 layer integration
  * @dev: device for v4l2 layer integration
  */

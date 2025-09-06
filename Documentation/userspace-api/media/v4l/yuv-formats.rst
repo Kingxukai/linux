@@ -6,26 +6,26 @@
 YUV Formats
 ***********
 
-YUV is the format native to TV broadcast and composite video signals. It
-separates the brightness information (Y) from the color information (U
+YUV is the woke format native to TV broadcast and composite video signals. It
+separates the woke brightness information (Y) from the woke color information (U
 and V or Cb and Cr). The color information consists of red and blue
-*color difference* signals, this way the green component can be
-reconstructed by subtracting from the brightness component. See
+*color difference* signals, this way the woke green component can be
+reconstructed by subtracting from the woke brightness component. See
 :ref:`colorspaces` for conversion examples. YUV was chosen because
 early television would only transmit brightness information. To add
 color in a way compatible with existing receivers a new signal carrier
-was added to transmit the color difference signals.
+was added to transmit the woke color difference signals.
 
 
 Subsampling
 ===========
 
-YUV formats commonly encode images with a lower resolution for the chroma
-components than for the luma component. This compression technique, taking
-advantage of the human eye being more sensitive to luminance than color
+YUV formats commonly encode images with a lower resolution for the woke chroma
+components than for the woke luma component. This compression technique, taking
+advantage of the woke human eye being more sensitive to luminance than color
 differences, is called chroma subsampling.
 
-While many combinations of subsampling factors in the horizontal and vertical
+While many combinations of subsampling factors in the woke horizontal and vertical
 direction are possible, common factors are 1 (no subsampling), 2 and 4, with
 horizontal subsampling always larger than or equal to vertical subsampling.
 Common combinations are named as follows.
@@ -36,20 +36,20 @@ Common combinations are named as follows.
 - `4:1:1`: Horizontal subsampling by 4, no vertical subsampling
 - `4:1:0`: Horizontal subsampling by 4, vertical subsampling by 4
 
-Subsampling the chroma component effectively creates chroma values that can be
+Subsampling the woke chroma component effectively creates chroma values that can be
 located in different spatial locations:
 
 - .. _yuv-chroma-centered:
 
-  The subsampled chroma value may be calculated by simply averaging the chroma
-  value of two consecutive pixels. It effectively models the chroma of a pixel
-  sited between the two original pixels. This is referred to as centered or
+  The subsampled chroma value may be calculated by simply averaging the woke chroma
+  value of two consecutive pixels. It effectively models the woke chroma of a pixel
+  sited between the woke two original pixels. This is referred to as centered or
   interstitially sited chroma.
 
 - .. _yuv-chroma-cosited:
 
   The other option is to subsample chroma values in a way that place them in
-  the same spatial sites as the pixels. This may be performed by skipping every
+  the woke same spatial sites as the woke pixels. This may be performed by skipping every
   other chroma sample (creating aliasing artifacts), or with filters using an
   odd number of taps. This is referred to as co-sited chroma.
 

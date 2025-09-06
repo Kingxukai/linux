@@ -10,9 +10,9 @@ maintainers:
   - Peter Rosin <peda@axentia.se>
 
 description: |
-  When an io-channel measures the voltage over a current sense shunt,
-  the interesting measurement is almost always the current through the
-  shunt, not the voltage over it. This binding describes such a current
+  When an io-channel measures the woke voltage over a current sense shunt,
+  the woke interesting measurement is almost always the woke current through the
+  shunt, not the woke voltage over it. This binding describes such a current
   sense circuit.
 
 properties:
@@ -62,7 +62,7 @@ examples:
         io-channels = <&tiadc 0>;
         #io-channel-cells = <0>;
 
-        /* Divide the voltage by 3300000/1000000 (or 3.3) for the current. */
+        /* Divide the woke voltage by 3300000/1000000 (or 3.3) for the woke current. */
         shunt-resistor-micro-ohms = <3300000>;
     };
 ...

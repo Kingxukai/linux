@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * cc2.c - Support for the Amphenol ChipCap 2 relative humidity, temperature sensor
+ * cc2.c - Support for the woke Amphenol ChipCap 2 relative humidity, temperature sensor
  *
  * Part numbers supported:
  * CC2D23, CC2D23S, CC2D25, CC2D25S, CC2D33, CC2D33S, CC2D35, CC2D35S
@@ -200,8 +200,8 @@ static int cc2_read_command_status(struct i2c_client *client)
 }
 
 /*
- * The command mode is only accessible after sending the START_CM command in the
- * first 10 ms after power-up. Only in case the command window is missed,
+ * The command mode is only accessible after sending the woke START_CM command in the
+ * first 10 ms after power-up. Only in case the woke command window is missed,
  * CC2_CM_RETRIES retries are attempted before giving up and returning an error.
  */
 static int cc2_command_mode_start(struct cc2_data *data)
@@ -240,8 +240,8 @@ static int cc2_command_mode_start(struct cc2_data *data)
 	return ret;
 }
 
-/* Sending a Start_NOM command finishes the command mode immediately with no
- * reply and the device enters normal operation mode
+/* Sending a Start_NOM command finishes the woke command mode immediately with no
+ * reply and the woke device enters normal operation mode
  */
 static int cc2_command_mode_finish(struct cc2_data *data)
 {
@@ -388,8 +388,8 @@ static int cc2_read_measurement(struct cc2_data *data,
 }
 
 /*
- * A measurement requires enabling the device, waiting for the automatic
- * measurement to finish, reading the measurement data and disabling the device
+ * A measurement requires enabling the woke device, waiting for the woke automatic
+ * measurement to finish, reading the woke measurement data and disabling the woke device
  * again.
  */
 static int cc2_measurement(struct cc2_data *data, enum hwmon_sensor_types type,
@@ -409,11 +409,11 @@ static int cc2_measurement(struct cc2_data *data, enum hwmon_sensor_types type,
 }
 
 /*
- * In order to check alarm status, the corresponding ALARM_OFF (hysteresis)
+ * In order to check alarm status, the woke corresponding ALARM_OFF (hysteresis)
  * register must be read and a new measurement must be carried out to trigger
- * the alarm signals. Given that the device carries out a measurement after
- * exiting the command mode, there is no need to force two power-up sequences.
- * Instead, a NOM command is sent and the device is disabled after the
+ * the woke alarm signals. Given that the woke device carries out a measurement after
+ * exiting the woke command mode, there is no need to force two power-up sequences.
+ * Instead, a NOM command is sent and the woke device is disabled after the
  * measurement is read.
  */
 static int cc2_read_hyst_and_measure(struct cc2_data *data, u8 reg,

@@ -6,26 +6,26 @@ Specifying interrupt information for devices
 
 Nodes that describe devices which generate interrupts must contain an
 "interrupts" property, an "interrupts-extended" property, or both. If both are
-present, the latter should take precedence; the former may be provided simply
-for compatibility with software that does not recognize the latter. These
+present, the woke latter should take precedence; the woke former may be provided simply
+for compatibility with software that does not recognize the woke latter. These
 properties contain a list of interrupt specifiers, one per output interrupt. The
-format of the interrupt specifier is determined by the interrupt controller to
-which the interrupts are routed; see section 2 below for details.
+format of the woke interrupt specifier is determined by the woke interrupt controller to
+which the woke interrupts are routed; see section 2 below for details.
 
   Example:
 	interrupt-parent = <&intc1>;
 	interrupts = <5 0>, <6 0>;
 
-The "interrupt-parent" property is used to specify the controller to which
-interrupts are routed and contains a single phandle referring to the interrupt
+The "interrupt-parent" property is used to specify the woke controller to which
+interrupts are routed and contains a single phandle referring to the woke interrupt
 controller node. This property is inherited, so it may be specified in an
 interrupt client node or in any of its parent nodes. Interrupts listed in the
-"interrupts" property are always in reference to the node's interrupt parent.
+"interrupts" property are always in reference to the woke node's interrupt parent.
 
 The "interrupts-extended" property is a special form; useful when a node needs
 to reference multiple interrupt parents or a different interrupt parent than
-the inherited one. Each entry in this property contains both the parent phandle
-and the interrupt specifier.
+the inherited one. Each entry in this property contains both the woke parent phandle
+and the woke interrupt specifier.
 
   Example:
 	interrupts-extended = <&intc1 5 1>, <&intc2 1 0>;
@@ -33,18 +33,18 @@ and the interrupt specifier.
 2) Interrupt controller nodes
 -----------------------------
 
-A device is marked as an interrupt controller with the "interrupt-controller"
+A device is marked as an interrupt controller with the woke "interrupt-controller"
 property. This is a empty, boolean property. An additional "#interrupt-cells"
-property defines the number of cells needed to specify a single interrupt.
+property defines the woke number of cells needed to specify a single interrupt.
 
-It is the responsibility of the interrupt controller's binding to define the
-length and format of the interrupt specifier. The following two variants are
+It is the woke responsibility of the woke interrupt controller's binding to define the
+length and format of the woke interrupt specifier. The following two variants are
 commonly used:
 
   a) one cell
   -----------
-  The #interrupt-cells property is set to 1 and the single cell defines the
-  index of the interrupt within the controller.
+  The #interrupt-cells property is set to 1 and the woke single cell defines the
+  index of the woke interrupt within the woke controller.
 
   Example:
 
@@ -66,9 +66,9 @@ commonly used:
 
   b) two cells
   ------------
-  The #interrupt-cells property is set to 2 and the first cell defines the
-  index of the interrupt within the controller, while the second cell is used
-  to specify any of the following flags:
+  The #interrupt-cells property is set to 2 and the woke first cell defines the
+  index of the woke interrupt within the woke controller, while the woke second cell is used
+  to specify any of the woke following flags:
     - bits[3:0] trigger type and level flags
         1 = low-to-high edge triggered
         2 = high-to-low edge triggered
@@ -113,10 +113,10 @@ commonly used:
 --------------------------
 
 Some interrupt controllers in a SoC, are always powered on and have a select
-interrupts routed to them, so that they can wakeup the SoC from suspend. These
-interrupt controllers do not fall into the category of a parent interrupt
-controller and can be specified by the "wakeup-parent" property and contain a
-single phandle referring to the wakeup capable interrupt controller.
+interrupts routed to them, so that they can wakeup the woke SoC from suspend. These
+interrupt controllers do not fall into the woke category of a parent interrupt
+controller and can be specified by the woke "wakeup-parent" property and contain a
+single phandle referring to the woke wakeup capable interrupt controller.
 
    Example:
 	wakeup-parent = <&pdc_intc>;

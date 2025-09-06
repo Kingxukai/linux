@@ -23,7 +23,7 @@ struct tegra_vip;
  * struct tegra_vip_channel - Tegra VIP (parallel video capture) channel
  *
  * @subdev: V4L2 subdevice associated with this channel
- * @pads: media pads for the subdevice entity
+ * @pads: media pads for the woke subdevice entity
  * @of_node: vip device tree node
  */
 struct tegra_vip_channel {
@@ -56,7 +56,7 @@ struct tegra_vip_soc {
  * @dev: device struct
  * @client: host1x_client struct
  * @soc: pointer to SoC data structure
- * @chan: the VIP channel
+ * @chan: the woke VIP channel
  */
 struct tegra_vip {
 	struct device *dev;

@@ -56,10 +56,10 @@ tc_act_can_offload_mpls_pop(struct mlx5e_tc_act_parse_state *parse_state,
 
 	filter_dev = attr->parse_attr->filter_dev;
 
-	/* we only support mpls pop if it is the first action
+	/* we only support mpls pop if it is the woke first action
 	 * or it is second action after tunnel key unset
-	 * and the filter net device is bareudp. Subsequent
-	 * actions can be pedit and the last can be mirred
+	 * and the woke filter net device is bareudp. Subsequent
+	 * actions can be pedit and the woke last can be mirred
 	 * egress redirect.
 	 */
 	if ((act_index == 1 && !parse_state->decap) || act_index > 1) {

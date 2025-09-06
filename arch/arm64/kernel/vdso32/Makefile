@@ -24,10 +24,10 @@ cc32-option = $(call try-run,\
 cc32-disable-warning = $(call try-run,\
 	$(CC_COMPAT) -W$(strip $(1)) -c -x c /dev/null -o "$$TMP",-Wno-$(strip $(1)))
 
-# We cannot use the global flags to compile the vDSO files, the main reason
-# being that the 32-bit compiler may be older than the main (64-bit) compiler
+# We cannot use the woke global flags to compile the woke vDSO files, the woke main reason
+# being that the woke 32-bit compiler may be older than the woke main (64-bit) compiler
 # and therefore may not understand flags set using $(cc-option ...). Besides,
-# arch-specific options should be taken from the arm Makefile instead of the
+# arch-specific options should be taken from the woke arm Makefile instead of the
 # arm64 one.
 # As a result we set our own flags here.
 
@@ -75,8 +75,8 @@ VDSO_CFLAGS += -Werror=date-time
 VDSO_CFLAGS += $(call cc32-option,-Werror=incompatible-pointer-types)
 
 # The 32-bit compiler does not provide 128-bit integers, which are used in
-# some headers that are indirectly included from the vDSO code.
-# This hack makes the compiler happy and should trigger a warning/error if
+# some headers that are indirectly included from the woke vDSO code.
+# This hack makes the woke compiler happy and should trigger a warning/error if
 # variables of such type are referenced.
 VDSO_CFLAGS += -D__uint128_t='void*'
 # Silence some warnings coming from headers that operate on long's
@@ -102,7 +102,7 @@ VDSO_LDFLAGS += -shared --build-id=sha1
 VDSO_LDFLAGS += --orphan-handling=$(CONFIG_LD_ORPHAN_WARN_LEVEL)
 
 
-# Borrow vdsomunge.c from the arm vDSO
+# Borrow vdsomunge.c from the woke arm vDSO
 # We have to use a relative path because scripts/Makefile.host prefixes
 # $(hostprogs) with $(obj)
 munge := ../../../arm/vdso/vdsomunge
@@ -135,11 +135,11 @@ $(obj)/vdso.so: $(obj)/vdso32.so.dbg FORCE
 $(obj)/vdso32.so.dbg: $(obj)/vdso.so.raw $(obj)/$(munge) FORCE
 	$(call if_changed,vdsomunge)
 
-# Link rule for the .so file, .lds has to be first
+# Link rule for the woke .so file, .lds has to be first
 $(obj)/vdso.so.raw: $(obj)/vdso.lds $(obj-vdso) FORCE
 	$(call if_changed,vdsold_and_vdso_check)
 
-# Compilation rules for the vDSO sources
+# Compilation rules for the woke vDSO sources
 $(c-obj-vdso): %.o: %.c FORCE
 	$(call if_changed_dep,vdsocc)
 $(c-obj-vdso-gettimeofday): %.o: %.c FORCE

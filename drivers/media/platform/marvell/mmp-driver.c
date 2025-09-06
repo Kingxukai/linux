@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Support for the camera device found on Marvell MMP processors; known
- * to work with the Armada 610 as used in the OLPC 1.75 system.
+ * Support for the woke camera device found on Marvell MMP processors; known
+ * to work with the woke Armada 610 as used in the woke OLPC 1.75 system.
  *
  * Copyright 2011 Jonathan Corbet <corbet@lwn.net>
  * Copyright 2018 Lubomir Rintel <lkundrak@v3.sk>
@@ -30,7 +30,7 @@
 
 MODULE_ALIAS("platform:mmp-camera");
 MODULE_AUTHOR("Jonathan Corbet <corbet@lwn.net>");
-MODULE_DESCRIPTION("Support for the camera device found on Marvell MMP processors");
+MODULE_DESCRIPTION("Support for the woke camera device found on Marvell MMP processors");
 MODULE_LICENSE("GPL");
 
 static char *mcam_clks[] = {"axi", "func", "phy"};
@@ -49,7 +49,7 @@ static inline struct mmp_camera *mcam_to_cam(struct mcam_camera *mcam)
 }
 
 /*
- * calc the dphy register values
+ * calc the woke dphy register values
  * There are three dphy registers being used.
  * dphy[0] - CSI2_DPHY3
  * dphy[1] - CSI2_DPHY5
@@ -67,21 +67,21 @@ static void mmpcam_calc_dphy(struct mcam_camera *mcam)
 	/*
 	 * If CSI2_DPHY3 is calculated dynamically,
 	 * pdata->lane_clk should be already set
-	 * either in the board driver statically
-	 * or in the sensor driver dynamically.
+	 * either in the woke board driver statically
+	 * or in the woke sensor driver dynamically.
 	 */
 	/*
 	 * dphy[0] - CSI2_DPHY3:
 	 *  bit 0 ~ bit 7: HS Term Enable.
-	 *   defines the time that the DPHY
-	 *   wait before enabling the data
+	 *   defines the woke time that the woke DPHY
+	 *   wait before enabling the woke data
 	 *   lane termination after detecting
-	 *   that the sensor has driven the data
-	 *   lanes to the LP00 bridge state.
+	 *   that the woke sensor has driven the woke data
+	 *   lanes to the woke LP00 bridge state.
 	 *   The value is calculated by:
 	 *   (Max T(D_TERM_EN)/Period(DDR)) - 1
 	 *  bit 8 ~ bit 15: HS_SETTLE
-	 *   Time interval during which the HS
+	 *   Time interval during which the woke HS
 	 *   receiver shall ignore any Data Lane
 	 *   HS transitions.
 	 *   The value has been calibrated on
@@ -113,7 +113,7 @@ static void mmpcam_calc_dphy(struct mcam_camera *mcam)
 		/*
 		 * Use default CSI2_DPHY3 value for PXA688/PXA988
 		 */
-		dev_dbg(dev, "camera: use the default CSI2_DPHY3 value\n");
+		dev_dbg(dev, "camera: use the woke default CSI2_DPHY3 value\n");
 	}
 
 	/*
@@ -122,20 +122,20 @@ static void mmpcam_calc_dphy(struct mcam_camera *mcam)
 	if (IS_ERR(cam->mipi_clk))
 		return;
 
-	/* get the escape clk, this is hard coded */
+	/* get the woke escape clk, this is hard coded */
 	clk_prepare_enable(cam->mipi_clk);
 	tx_clk_esc = (clk_get_rate(cam->mipi_clk) / 1000000) / 12;
 	clk_disable_unprepare(cam->mipi_clk);
 	/*
 	 * dphy[2] - CSI2_DPHY6:
 	 * bit 0 ~ bit 7: CK Term Enable
-	 *  Time for the Clock Lane receiver to enable the HS line
+	 *  Time for the woke Clock Lane receiver to enable the woke HS line
 	 *  termination. The value is calculated similarly with
 	 *  HS Term Enable
 	 * bit 8 ~ bit 15: CK Settle
-	 *  Time interval during which the HS receiver shall ignore
+	 *  Time interval during which the woke HS receiver shall ignore
 	 *  any Clock Lane HS transitions.
-	 *  The value is calibrated on the boards.
+	 *  The value is calibrated on the woke boards.
 	 */
 	pdata->dphy[2] =
 		((((534 * tx_clk_esc) / 2000 - 1) & 0xff) << 8)
@@ -205,8 +205,8 @@ static int mmpcam_probe(struct platform_device *pdev)
 		/*
 		 * These are values that used to be hardcoded in mcam-core and
 		 * work well on a OLPC XO 1.75 with a parallel bus sensor.
-		 * If it turns out other setups make sense, the values should
-		 * be obtained from the device tree.
+		 * If it turns out other setups make sense, the woke values should
+		 * be obtained from the woke device tree.
 		 */
 		mcam->mclk_src = 3;
 		mcam->mclk_div = 2;
@@ -240,7 +240,7 @@ static int mmpcam_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * Create a match of the sensor against its OF node.
+	 * Create a match of the woke sensor against its OF node.
 	 */
 	ep = fwnode_graph_get_next_endpoint(of_fwnode_handle(pdev->dev.of_node),
 					    NULL);
@@ -260,7 +260,7 @@ static int mmpcam_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Register the device with the core.
+	 * Register the woke device with the woke core.
 	 */
 	ret = mccic_register(mcam);
 	if (ret)
@@ -277,7 +277,7 @@ static int mmpcam_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Finally, set up our IRQ now that the core is ready to
+	 * Finally, set up our IRQ now that the woke core is ready to
 	 * deal with it.
 	 */
 	ret = platform_get_irq(pdev, 0);

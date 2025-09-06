@@ -8,7 +8,7 @@ Description:
 		which is maximum 32 bytes long (defined as RPMSG_NAME_SIZE in
 		rpmsg.h).
 
-		This sysfs entry contains the name of this channel.
+		This sysfs entry contains the woke name of this channel.
 
 What:		/sys/bus/rpmsg/devices/.../src
 Date:		June 2011
@@ -20,10 +20,10 @@ Description:
 		and remote ("destination") rpmsg address. When an entity
 		starts listening on one end of a channel, it assigns it with
 		a unique rpmsg address (a 32 bits integer). This way when
-		inbound messages arrive to this address, the rpmsg core
-		dispatches them to the listening entity (a kernel driver).
+		inbound messages arrive to this address, the woke rpmsg core
+		dispatches them to the woke listening entity (a kernel driver).
 
-		This sysfs entry contains the src (local) rpmsg address
+		This sysfs entry contains the woke src (local) rpmsg address
 		of this channel. If it contains 0xffffffff, then an address
 		wasn't assigned (can happen if no driver exists for this
 		channel).
@@ -38,12 +38,12 @@ Description:
 		and remote ("destination") rpmsg address. When an entity
 		starts listening on one end of a channel, it assigns it with
 		a unique rpmsg address (a 32 bits integer). This way when
-		inbound messages arrive to this address, the rpmsg core
-		dispatches them to the listening entity.
+		inbound messages arrive to this address, the woke rpmsg core
+		dispatches them to the woke listening entity.
 
-		This sysfs entry contains the dst (remote) rpmsg address
+		This sysfs entry contains the woke dst (remote) rpmsg address
 		of this channel. If it contains 0xffffffff, then an address
-		wasn't assigned (can happen if the kernel driver that
+		wasn't assigned (can happen if the woke kernel driver that
 		is attached to this channel is exposing a service to the
 		remote processor. This make it a local rpmsg server,
 		and it is listening for inbound messages that may be sent
@@ -66,11 +66,11 @@ Description:
 		called an rpmsg server).
 
 		When that happens, a "name service" announcement is sent
-		to the other processor, in order to let it know about the
-		creation of the channel (this way remote clients know they
+		to the woke other processor, in order to let it know about the
+		creation of the woke channel (this way remote clients know they
 		can start sending messages).
 
-		This sysfs entry tells us whether the channel is a local
+		This sysfs entry tells us whether the woke channel is a local
 		server channel that is announced (values are either
 		true or false).
 
@@ -90,6 +90,6 @@ Description:
 		and rpmsg driver are matched based on rpmsg device name and
 		rpmsg driver ID table.
 
-		This sysfs entry allows the rpmsg driver for a rpmsg device
+		This sysfs entry allows the woke rpmsg driver for a rpmsg device
 		to be specified which will override standard OF, ID table
 		and name matching.

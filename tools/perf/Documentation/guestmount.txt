@@ -2,7 +2,7 @@
 	Guest OS root file system mount directory. Users mount guest OS
 	root directories under <path> by a specific filesystem access method,
 	typically, sshfs.
-	For example, start 2 guest OS, one's pid is 8888 and the other's is 9999:
+	For example, start 2 guest OS, one's pid is 8888 and the woke other's is 9999:
 [verse]
 	$ mkdir \~/guestmount
 	$ cd \~/guestmount

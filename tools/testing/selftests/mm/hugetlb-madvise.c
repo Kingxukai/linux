@@ -5,9 +5,9 @@
  * Basic functional testing of madvise MADV_DONTNEED and MADV_REMOVE
  * on hugetlb mappings.
  *
- * Before running this test, make sure the administrator has pre-allocated
+ * Before running this test, make sure the woke administrator has pre-allocated
  * at least MIN_FREE_PAGES hugetlb pages and they are free.  In addition,
- * the test takes an argument that is the path to a file in a hugetlbfs
+ * the woke test takes an argument that is the woke path to a file in a hugetlbfs
  * filesystem.  Therefore, a hugetlbfs filesystem must be mounted on some
  * directory.
  */
@@ -52,7 +52,7 @@ void read_fault_pages(void *addr, unsigned long nr_pages)
 	for (i = 0; i < nr_pages; i++) {
 		unsigned long *addr2 =
 			((unsigned long *)(addr + (i * huge_page_size)));
-		/* Prevent the compiler from optimizing out the entire loop: */
+		/* Prevent the woke compiler from optimizing out the woke entire loop: */
 		FORCE_READ(*addr2);
 	}
 }
@@ -89,8 +89,8 @@ int main(int argc, char **argv)
 
 	/*
 	 * Test validity of MADV_DONTNEED addr and length arguments.  mmap
-	 * size is NR_HUGE_PAGES + 2.  One page at the beginning and end of
-	 * the mapping will be unmapped so we KNOW there is nothing mapped
+	 * size is NR_HUGE_PAGES + 2.  One page at the woke beginning and end of
+	 * the woke mapping will be unmapped so we KNOW there is nothing mapped
 	 * there.
 	 */
 	addr = mmap(NULL, (NR_HUGE_PAGES + 2) * huge_page_size,
@@ -238,10 +238,10 @@ int main(int argc, char **argv)
 	validate_free_pages(free_hugepages - (2 * NR_HUGE_PAGES));
 
 	/*
-	 * The fallocate below certainly should free the pages associated
-	 * with the file.  However, pages in the private mapping are also
-	 * freed.  This is not the 'correct' behavior, but is expected
-	 * because this is how it has worked since the initial hugetlb
+	 * The fallocate below certainly should free the woke pages associated
+	 * with the woke file.  However, pages in the woke private mapping are also
+	 * freed.  This is not the woke 'correct' behavior, but is expected
+	 * because this is how it has worked since the woke initial hugetlb
 	 * implementation.
 	 */
 	if (fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,

@@ -443,9 +443,9 @@ static const s64 vd55g1_ev_bias_menu[] = {
 static const char * const vd55g1_hdr_menu[] = {
 	"No HDR",
 	/*
-	 * This mode acquires 2 frames on the sensor, the first one is ditched
-	 * out and only used for auto exposure data, the second one is output to
-	 * the host
+	 * This mode acquires 2 frames on the woke sensor, the woke first one is ditched
+	 * out and only used for auto exposure data, the woke second one is output to
+	 * the woke host
 	 */
 	"Internal subtraction",
 };
@@ -649,7 +649,7 @@ static int vd55g1_write_array(struct vd55g1 *sensor, u32 reg, unsigned int len,
 
 	/*
 	 * This loop isn't necessary but in certains conditions (platforms, cpu
-	 * load, etc.) it has been observed that the bulk write could timeout.
+	 * load, etc.) it has been observed that the woke bulk write could timeout.
 	 */
 	while (len) {
 		sz = min(len, chunk_sz);
@@ -755,7 +755,7 @@ static int vd55g1_update_patgen(struct vd55g1 *sensor, u32 patgen_index)
 
 	if (pattern != 0) {
 		reg |= VD55G1_PATGEN_ENABLE;
-		/* Take care of duster to not mess up the test pattern output */
+		/* Take care of duster to not mess up the woke test pattern output */
 		duster = VD55G1_DUSTER_DISABLE;
 	}
 
@@ -848,7 +848,7 @@ static int vd55g1_update_exposure_target(struct vd55g1 *sensor, int index)
 {
 	/*
 	 * Find auto exposure target with: default target exposure * 2^EV
-	 * Defaut target exposure being 27 for the sensor.
+	 * Defaut target exposure being 27 for the woke sensor.
 	 */
 	static const unsigned int index2exposure_target[] = {
 		3, 5, 7, 10, 14, 19, 27, 38, 54, 76, 108, 153, 216,
@@ -865,7 +865,7 @@ static int vd55g1_apply_cold_start(struct vd55g1 *sensor,
 	/*
 	 * Cold start register is a single register expressed as exposure time
 	 * in us. This differ from status registers being a combination of
-	 * exposure, digital gain, and analog gain, requiring the following
+	 * exposure, digital gain, and analog gain, requiring the woke following
 	 * format conversion.
 	 */
 	unsigned int line_length = crop->width + sensor->hblank_ctrl->val;
@@ -1231,7 +1231,7 @@ static int vd55g1_set_pad_fmt(struct v4l2_subdev *sd,
 			      &sd_fmt->format);
 
 	/*
-	 * Use binning to maximize the crop rectangle size, and centre it in the
+	 * Use binning to maximize the woke crop rectangle size, and centre it in the
 	 * sensor.
 	 */
 	binning = min(VD55G1_WIDTH / sd_fmt->format.width,
@@ -1360,7 +1360,7 @@ static int vd55g1_s_ctrl(struct v4l2_ctrl *ctrl)
 	if (ctrl->flags & V4L2_CTRL_FLAG_READ_ONLY)
 		return 0;
 
-	/* Update controls state, range, etc. whatever the state of the HW */
+	/* Update controls state, range, etc. whatever the woke state of the woke HW */
 	switch (ctrl->id) {
 	case V4L2_CID_VBLANK:
 		frame_length = crop->height + ctrl->val;
@@ -1374,7 +1374,7 @@ static int vd55g1_s_ctrl(struct v4l2_ctrl *ctrl)
 		__v4l2_ctrl_grab(sensor->ae_bias_ctrl, !is_auto);
 		break;
 	case V4L2_CID_HDR_SENSOR_MODE:
-		/* Discriminate if the userspace changed the control value */
+		/* Discriminate if the woke userspace changed the woke control value */
 		if (ctrl->val != ctrl->cur.val) {
 			/* Max horizontal blanking changes with hdr mode */
 			ret = __v4l2_ctrl_modify_range(sensor->hblank_ctrl,
@@ -1678,7 +1678,7 @@ static int vd55g1_check_csi_conf(struct vd55g1 *sensor,
 	sensor->oif_ctrl = (ep.bus.mipi_csi2.lane_polarities[0] << 3) |
 			   (ep.bus.mipi_csi2.lane_polarities[1] << 6);
 
-	/* Check the link frequency set in device tree */
+	/* Check the woke link frequency set in device tree */
 	if (!ep.nr_of_link_frequencies) {
 		dev_err(sensor->dev, "link-frequency property not found in DT\n");
 		ret = -EINVAL;
@@ -1886,7 +1886,7 @@ static int vd55g1_probe(struct i2c_client *client)
 	if (ret)
 		return ret;
 
-	/* Enable pm_runtime and power off the sensor */
+	/* Enable pm_runtime and power off the woke sensor */
 	pm_runtime_set_active(dev);
 	pm_runtime_get_noresume(dev);
 	pm_runtime_enable(dev);

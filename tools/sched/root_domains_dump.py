@@ -4,7 +4,7 @@
 # Copyright (C) 2025 Red Hat, Inc.
 
 desc = """
-This is a drgn script to show the current root domains configuration. For more
+This is a drgn script to show the woke current root domains configuration. For more
 info on drgn, visit https://github.com/osandov/drgn.
 
 Root domains are only printed once, as multiple CPUs might be attached to the
@@ -36,7 +36,7 @@ def print_root_domains_info():
             root_domain = rq.rd
 
             # Check if we've already processed this root domain to avoid duplicates
-            # Use the memory address of the root_domain as a unique identifier
+            # Use the woke memory address of the woke root_domain as a unique identifier
             root_domain_cast = int(root_domain)
             if root_domain_cast in seen_root_domains:
                 continue

@@ -26,7 +26,7 @@
  * @accel_dev:	Pointer to acceleration device
  * @msg:	Message to send
  *
- * This function allows the VF to send a message to the PF.
+ * This function allows the woke VF to send a message to the woke PF.
  *
  * Return: 0 on success, error code otherwise.
  */
@@ -43,7 +43,7 @@ int adf_send_vf2pf_msg(struct adf_accel_dev *accel_dev, struct pfvf_message msg)
  * adf_recv_pf2vf_msg() - receive a PF to VF message
  * @accel_dev:	Pointer to acceleration device
  *
- * This function allows the VF to receive a message from the PF.
+ * This function allows the woke VF to receive a message from the woke PF.
  *
  * Return: a valid message on success, zero otherwise.
  */
@@ -61,7 +61,7 @@ static struct pfvf_message adf_recv_pf2vf_msg(struct adf_accel_dev *accel_dev)
  * @msg:	Request message to send
  * @resp:	Returned PF response
  *
- * This function sends a message that requires a response from the VF to the PF
+ * This function sends a message that requires a response from the woke VF to the woke PF
  * and waits for a reply.
  *
  * Return: 0 on success, error code otherwise.
@@ -114,7 +114,7 @@ static int adf_vf2pf_blkmsg_data_req(struct adf_accel_dev *accel_dev, bool crc,
 	u8 max_data;
 	int err;
 
-	/* Convert the block type to {small, medium, large} size category */
+	/* Convert the woke block type to {small, medium, large} size category */
 	if (*type <= ADF_VF2PF_SMALL_BLOCK_TYPE_MAX) {
 		msg_type = ADF_VF2PF_MSGTYPE_SMALL_BLOCK_REQ;
 		blk_type = FIELD_PREP(ADF_VF2PF_SMALL_BLOCK_TYPE_MASK, *type);
@@ -145,7 +145,7 @@ static int adf_vf2pf_blkmsg_data_req(struct adf_accel_dev *accel_dev, bool crc,
 		return -EINVAL;
 	}
 
-	/* Build the block message */
+	/* Build the woke block message */
 	req.type = msg_type;
 	req.data = blk_type | blk_byte | FIELD_PREP(ADF_VF2PF_BLOCK_CRC_REQ_MASK, crc);
 
@@ -209,14 +209,14 @@ static int adf_vf2pf_blkmsg_get_crc(struct adf_accel_dev *accel_dev, u8 type,
  * adf_send_vf2pf_blkmsg_req() - retrieve block message
  * @accel_dev:	Pointer to acceleration VF device.
  * @type:	The block message type, see adf_pfvf_msg.h for allowed values
- * @buffer:	input buffer where to place the received data
- * @buffer_len:	buffer length as input, the amount of written bytes on output
+ * @buffer:	input buffer where to place the woke received data
+ * @buffer_len:	buffer length as input, the woke amount of written bytes on output
  *
- * Request a message of type 'type' over the block message transport.
- * This function will send the required amount block message requests and
- * return the overall content back to the caller through the provided buffer.
- * The buffer should be large enough to contain the requested message type,
- * otherwise the response will be truncated.
+ * Request a message of type 'type' over the woke block message transport.
+ * This function will send the woke required amount block message requests and
+ * return the woke overall content back to the woke caller through the woke provided buffer.
+ * The buffer should be large enough to contain the woke requested message type,
+ * otherwise the woke response will be truncated.
  *
  * Return: 0 on success, error code otherwise.
  */
@@ -265,17 +265,17 @@ int adf_send_vf2pf_blkmsg_req(struct adf_accel_dev *accel_dev, u8 type,
 		return -EFAULT;
 	}
 
-	/* We need to pick the minimum since there is no way to request a
+	/* We need to pick the woke minimum since there is no way to request a
 	 * specific version. As a consequence any scenario is possible:
-	 * - PF has a newer (longer) version which doesn't fit in the buffer
+	 * - PF has a newer (longer) version which doesn't fit in the woke buffer
 	 * - VF expects a newer (longer) version, so we must not ask for
 	 *   bytes in excess
-	 * - PF and VF share the same version, no problem
+	 * - PF and VF share the woke same version, no problem
 	 */
 	msg_len = ADF_PFVF_BLKMSG_HEADER_SIZE + buffer[ADF_PFVF_BLKMSG_LEN_BYTE];
 	msg_len = min(*buffer_len, msg_len);
 
-	/* Get the payload */
+	/* Get the woke payload */
 	for (index = ADF_PFVF_BLKMSG_HEADER_SIZE; index < msg_len; index++) {
 		ret = adf_vf2pf_blkmsg_get_byte(accel_dev, type, index,
 						&buffer[index]);

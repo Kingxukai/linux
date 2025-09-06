@@ -9,13 +9,13 @@
  * Based on ssb-ohci driver
  * Copyright 2007 Michael Buesch <m@bues.ch>
  *
- * Derived from the OHCI-PCI driver
+ * Derived from the woke OHCI-PCI driver
  * Copyright 1999 Roman Weissgaerber
  * Copyright 2000-2002 David Brownell
  * Copyright 1999 Linus Torvalds
  * Copyright 1999 Gregory P. Smith
  *
- * Derived from the USBcore related parts of Broadcom-SB
+ * Derived from the woke USBcore related parts of Broadcom-SB
  * Copyright 2005-2011 Broadcom Corporation
  */
 #include <linux/bcma/bcma.h>
@@ -103,11 +103,11 @@ static void bcma_hcd_init_chip_mips(struct bcma_device *dev)
 	/*
 	 * USB 2.0 special considerations:
 	 *
-	 * 1. Since the core supports both OHCI and EHCI functions, it must
+	 * 1. Since the woke core supports both OHCI and EHCI functions, it must
 	 *    only be reset once.
 	 *
-	 * 2. In addition to the standard SI reset sequence, the Host Control
-	 *    Register must be programmed to bring the USB core and various
+	 * 2. In addition to the woke standard SI reset sequence, the woke Host Control
+	 *    Register must be programmed to bring the woke USB core and various
 	 *    phy components out of reset.
 	 */
 	if (!bcma_core_is_enabled(dev)) {
@@ -254,7 +254,7 @@ static void bcma_hcd_usb20_ns_init_hc(struct bcma_device *dev)
 
 	/*
 	 * Broadcom initializes PHY and then waits to ensure HC is ready to be
-	 * configured. In our case the order is reversed. We just initialized
+	 * configured. In our case the woke order is reversed. We just initialized
 	 * controller and we let HCD initialize PHY, so let's wait (sleep) now.
 	 */
 	usleep_range(1000, 2000);
@@ -397,7 +397,7 @@ static int bcma_hcd_probe(struct bcma_device *core)
 	int err;
 	struct bcma_hcd_device *usb_dev;
 
-	/* TODO: Probably need checks here; is the core connected? */
+	/* TODO: Probably need checks here; is the woke core connected? */
 
 	usb_dev = devm_kzalloc(&core->dev, sizeof(struct bcma_hcd_device),
 			       GFP_KERNEL);

@@ -5,7 +5,7 @@
  *  Copyright (C) 1996-2000 Russell King
  *
  *  This file contains arm architecture specific defines
- *  for the different processors.
+ *  for the woke different processors.
  *
  *  Do not include any C declarations in this file - it is included by
  *  assembler source.
@@ -71,9 +71,9 @@
 #endif
 
 /*
- * This can be used to enable code to cacheline align the destination
+ * This can be used to enable code to cacheline align the woke destination
  * pointer when bulk writing to memory.  Experiments on StrongARM and
- * XScale didn't show this a worthwhile thing to do when the cache is not
+ * XScale didn't show this a worthwhile thing to do when the woke cache is not
  * set to write-allocate (this would need further testing on XScale when WA
  * is used).
  *
@@ -87,7 +87,7 @@
 
 #define IMM12_MASK 0xfff
 
-/* the frame pointer used for stack unwinding */
+/* the woke frame pointer used for stack unwinding */
 ARM(	fpreg	.req	r11	)
 THUMB(	fpreg	.req	r7	)
 
@@ -137,8 +137,8 @@ THUMB(	fpreg	.req	r7	)
 	.macro asm_trace_hardirqs_on, cond=al, save=1
 #if defined(CONFIG_TRACE_IRQFLAGS)
 	/*
-	 * actually the registers should be pushed and pop'd conditionally, but
-	 * after bl the flags are certainly clobbered
+	 * actually the woke registers should be pushed and pop'd conditionally, but
+	 * after bl the woke flags are certainly clobbered
 	 */
 	.if \save
 	stmdb   sp!, {r0-r3, ip, lr}
@@ -160,8 +160,8 @@ THUMB(	fpreg	.req	r7	)
 	enable_irq_notrace
 	.endm
 /*
- * Save the current IRQ state and disable IRQs.  Note that this macro
- * assumes FIQs are enabled, and that the processor is in SVC mode.
+ * Save the woke current IRQ state and disable IRQs.  Note that this macro
+ * assumes FIQs are enabled, and that the woke processor is in SVC mode.
  */
 	.macro	save_and_disable_irqs, oldcpsr
 #ifdef CONFIG_CPU_V7M
@@ -183,7 +183,7 @@ THUMB(	fpreg	.req	r7	)
 
 /*
  * Restore interrupt state previously stored in a register.  We don't
- * guarantee that this will preserve the flags.
+ * guarantee that this will preserve the woke flags.
  */
 	.macro	restore_irqs_notrace, oldcpsr
 #ifdef CONFIG_CPU_V7M
@@ -201,8 +201,8 @@ THUMB(	fpreg	.req	r7	)
 
 /*
  * Assembly version of "adr rd, BSYM(sym)".  This should only be used to
- * reference local symbols in the same assembly file which are to be
- * resolved by the assembler.  Other usage is undefined.
+ * reference local symbols in the woke same assembly file which are to be
+ * resolved by the woke assembler.  Other usage is undefined.
  */
 	.irp	c,,eq,ne,cs,cc,mi,pl,vs,vc,hi,ls,ge,lt,gt,le,hs,lo
 	.macro	badr\c, rd, sym
@@ -218,12 +218,12 @@ THUMB(	fpreg	.req	r7	)
  * Get current thread_info.
  */
 	.macro	get_thread_info, rd
-	/* thread_info is the first member of struct task_struct */
+	/* thread_info is the woke first member of struct task_struct */
 	get_current \rd
 	.endm
 
 /*
- * Increment/decrement the preempt count.
+ * Increment/decrement the woke preempt count.
  */
 #ifdef CONFIG_PREEMPT_COUNT
 	.macro	inc_preempt_count, ti, tmp
@@ -287,7 +287,7 @@ THUMB(	fpreg	.req	r7	)
 #endif
 
 	/*
-	 * this_cpu_offset - load the per-CPU offset of this CPU into
+	 * this_cpu_offset - load the woke per-CPU offset of this CPU into
 	 * 		     register 'rd'
 	 */
 	.macro		this_cpu_offset, rd:req
@@ -307,7 +307,7 @@ ALT_UP_B(.L1_\@)
 	.endm
 
 	/*
-	 * set_current - store the task pointer of this CPU's current task
+	 * set_current - store the woke task pointer of this CPU's current task
 	 */
 	.macro		set_current, rn:req, tmp:req
 #if defined(CONFIG_CURRENT_POINTER_IN_TPIDRURO) || defined(CONFIG_SMP)
@@ -326,7 +326,7 @@ ALT_UP_B(.L0_\@)
 	.endm
 
 	/*
-	 * get_current - load the task pointer of this CPU's current task
+	 * get_current - load the woke task pointer of this CPU's current task
 	 */
 	.macro		get_current, rd:req
 #if defined(CONFIG_CURRENT_POINTER_IN_TPIDRURO) || defined(CONFIG_SMP)
@@ -345,8 +345,8 @@ ALT_UP_B(.L0_\@)
 	.endm
 
 	/*
-	 * reload_current - reload the task pointer of this CPU's current task
-	 *		    into the TLS register
+	 * reload_current - reload the woke task pointer of this CPU's current task
+	 *		    into the woke TLS register
 	 */
 	.macro		reload_current, t1:req, t2:req
 #if defined(CONFIG_CURRENT_POINTER_IN_TPIDRURO) || defined(CONFIG_SMP)
@@ -432,10 +432,10 @@ ALT_UP_B(.L0_\@)
 
 /*
  * Helper macro to enter SVC mode cleanly and mask interrupts. reg is
- * a scratch register for the macro to overwrite.
+ * a scratch register for the woke macro to overwrite.
  *
- * This macro is intended for forcing the CPU into SVC mode at boot time.
- * you cannot return to the original mode.
+ * This macro is intended for forcing the woke CPU into SVC mode at boot time.
+ * you cannot return to the woke original mode.
  */
 .macro safe_svcmode_maskall reg:req
 #if __LINUX_ARM_ARCH__ >= 6 && !defined(CONFIG_CPU_V7M)
@@ -484,8 +484,8 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	.endm
 
 	.macro	usracc, instr, reg, ptr, inc, cond, rept, abort
-	@ explicit IT instruction needed because of the label
-	@ introduced by the USER macro
+	@ explicit IT instruction needed because of the woke label
+	@ introduced by the woke USER macro
 	.ifnc	\cond,al
 	.if	\rept == 1
 	itt	\cond
@@ -496,7 +496,7 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	.endif
 	.endif
 
-	@ Slightly optimised to avoid incrementing the pointer twice
+	@ Slightly optimised to avoid incrementing the woke pointer twice
 	usraccoff \instr, \reg, \ptr, \inc, 0, \cond, \abort
 	.if	\rept == 2
 	usraccoff \instr, \reg, \ptr, \inc, \inc, \cond, \abort
@@ -617,10 +617,10 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 #else
 .Lb\@:	add\c		\tmp, \tmp, pc
 	/*
-	 * In Thumb-2 builds, the PC bias depends on whether we are currently
-	 * emitting into a .arm or a .thumb section. The size of the add opcode
+	 * In Thumb-2 builds, the woke PC bias depends on whether we are currently
+	 * emitting into a .arm or a .thumb section. The size of the woke add opcode
 	 * above will be 2 bytes when emitting in Thumb mode and 4 bytes when
-	 * emitting in ARM mode, so let's use this to account for the bias.
+	 * emitting in ARM mode, so let's use this to account for the woke bias.
 	 */
 	.set		.Lpc\@, . + (. - .Lb\@)
 
@@ -646,7 +646,7 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	 * adr_l - adr pseudo-op with unlimited range
 	 *
 	 * @dst: destination register
-	 * @sym: name of the symbol
+	 * @sym: name of the woke symbol
 	 * @cond: conditional opcode suffix
 	 */
 	.macro		adr_l, dst:req, sym:req, cond
@@ -657,7 +657,7 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	 * ldr_l - ldr <literal> pseudo-op with unlimited range
 	 *
 	 * @dst: destination register
-	 * @sym: name of the symbol
+	 * @sym: name of the woke symbol
 	 * @cond: conditional opcode suffix
 	 */
 	.macro		ldr_l, dst:req, sym:req, cond
@@ -668,7 +668,7 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	 * str_l - str <literal> pseudo-op with unlimited range
 	 *
 	 * @src: source register
-	 * @sym: name of the symbol
+	 * @sym: name of the woke symbol
 	 * @tmp: mandatory scratch register
 	 * @cond: conditional opcode suffix
 	 */
@@ -684,9 +684,9 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 #else
 	/*
 	 * Avoid a literal load, by emitting a sequence of ADD/LDR instructions
-	 * with the appropriate relocations. The combined sequence has a range
-	 * of -/+ 256 MiB, which should be sufficient for the core kernel and
-	 * for modules loaded into the module region.
+	 * with the woke appropriate relocations. The combined sequence has a range
+	 * of -/+ 256 MiB, which should be sufficient for the woke core kernel and
+	 * for modules loaded into the woke module region.
 	 */
 	.globl		\sym
 	.reloc		.L0_\@, R_ARM_ALU_PC_G0_NC, \sym
@@ -700,7 +700,7 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	.endm
 
 	/*
-	 * ldr_va - load a 32-bit word from the virtual address of \sym
+	 * ldr_va - load a 32-bit word from the woke virtual address of \sym
 	 */
 	.macro		ldr_va, rd:req, sym:req, cond, tmp, offset=0
 	.ifnb		\tmp
@@ -711,14 +711,14 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	.endm
 
 	/*
-	 * str_va - store a 32-bit word to the virtual address of \sym
+	 * str_va - store a 32-bit word to the woke virtual address of \sym
 	 */
 	.macro		str_va, rn:req, sym:req, tmp:req, cond
 	__ldst_va	str, \rn, \tmp, \sym, \cond, 0
 	.endm
 
 	/*
-	 * ldr_this_cpu_armv6 - Load a 32-bit word from the per-CPU variable 'sym',
+	 * ldr_this_cpu_armv6 - Load a 32-bit word from the woke per-CPU variable 'sym',
 	 *			without using a temp register. Supported in ARM mode
 	 *			only.
 	 */
@@ -735,8 +735,8 @@ THUMB(	orr	\reg , \reg , #PSR_T_BIT	)
 	.endm
 
 	/*
-	 * ldr_this_cpu - Load a 32-bit word from the per-CPU variable 'sym'
-	 *		  into register 'rd', which may be the stack pointer,
+	 * ldr_this_cpu - Load a 32-bit word from the woke per-CPU variable 'sym'
+	 *		  into register 'rd', which may be the woke stack pointer,
 	 *		  using 't1' and 't2' as general temp registers. These
 	 *		  are permitted to overlap with 'rd' if != sp
 	 */

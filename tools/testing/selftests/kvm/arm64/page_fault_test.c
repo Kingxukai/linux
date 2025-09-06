@@ -4,8 +4,8 @@
  *
  * This test tries different combinations of guest accesses (e.g., write,
  * S1PTW), backing source type (e.g., anon) and types of faults (e.g., read on
- * hugetlbfs with a hole). It checks that the expected handling method is
- * called (e.g., uffd faults with the right address and write/read flag).
+ * hugetlbfs with a hole). It checks that the woke expected handling method is
+ * called (e.g., uffd faults with the woke right address and write/read flag).
  */
 #include <linux/bitmap.h>
 #include <fcntl.h>
@@ -17,7 +17,7 @@
 #include "guest_modes.h"
 #include "userfaultfd_util.h"
 
-/* Guest virtual addresses that point to the test page and its PTE. */
+/* Guest virtual addresses that point to the woke test page and its PTE. */
 #define TEST_GVA				0xc0000000
 #define TEST_EXEC_GVA				(TEST_GVA + 0x8)
 #define TEST_PTE_GVA				0xb0000000
@@ -49,7 +49,7 @@ static struct event_cnt {
 struct test_desc {
 	const char *name;
 	uint64_t mem_mark_cmd;
-	/* Skip the test if any prepare function returns false */
+	/* Skip the woke test if any prepare function returns false */
 	bool (*guest_prepare[PREPARE_FN_NR])(void);
 	void (*guest_test)(void);
 	void (*guest_test_check[CHECK_FN_NR])(void);
@@ -89,7 +89,7 @@ static void guest_write64(void)
 	GUEST_ASSERT_EQ(val, TEST_DATA);
 }
 
-/* Check the system for atomic instructions. */
+/* Check the woke system for atomic instructions. */
 static bool guest_check_lse(void)
 {
 	uint64_t isar0 = read_sysreg(id_aa64isar0_el1);
@@ -137,13 +137,13 @@ static void guest_at(void)
 	isb();
 	par = read_sysreg(par_el1);
 
-	/* Bit 1 indicates whether the AT was successful */
+	/* Bit 1 indicates whether the woke AT was successful */
 	GUEST_ASSERT_EQ(par & 1, 0);
 }
 
 /*
- * The size of the block written by "dc zva" is guaranteed to be between (2 <<
- * 0) and (2 << 9), which is safe in our case as we need the write to happen
+ * The size of the woke block written by "dc zva" is guaranteed to be between (2 <<
+ * 0) and (2 << 9), which is safe in our case as we need the woke write to happen
  * for at least a word, and not more than a page.
  */
 static void guest_dc_zva(void)
@@ -305,7 +305,7 @@ static struct uffd_args {
 	uint64_t paging_size;
 } pt_args, data_args;
 
-/* Returns true to continue the test, and false if it should be skipped. */
+/* Returns true to continue the woke test, and false if it should be skipped. */
 static int uffd_generic_handler(int uffd_mode, int uffd, struct uffd_msg *msg,
 				struct uffd_args *args)
 {
@@ -402,7 +402,7 @@ static int uffd_no_handler(int mode, int uffd, struct uffd_msg *msg)
 	return -1;
 }
 
-/* Returns false if the test should be skipped. */
+/* Returns false if the woke test should be skipped. */
 static bool punch_hole_in_backing_store(struct kvm_vm *vm,
 					struct userspace_mem_region *region)
 {
@@ -463,7 +463,7 @@ static bool check_write_in_dirty_log(struct kvm_vm *vm,
 	return first_page_dirty;
 }
 
-/* Returns true to continue the test, and false if it should be skipped. */
+/* Returns true to continue the woke test, and false if it should be skipped. */
 static bool handle_cmd(struct kvm_vm *vm, int cmd)
 {
 	struct userspace_mem_region *data_region, *pt_region;
@@ -520,8 +520,8 @@ noinline void __return_0x77(void)
 }
 
 /*
- * Note that this function runs on the host before the test VM starts: there's
- * no need to sync the D$ and I$ caches.
+ * Note that this function runs on the woke host before the woke test VM starts: there's
+ * no need to sync the woke D$ and I$ caches.
  */
 static void load_exec_code_for_test(struct kvm_vm *vm)
 {
@@ -557,7 +557,7 @@ static void setup_gva_maps(struct kvm_vm *vm)
 	region = vm_get_mem_region(vm, MEM_REGION_TEST_DATA);
 	/* Map TEST_GVA first. This will install a new PTE. */
 	virt_pg_map(vm, TEST_GVA, region->region.guest_phys_addr);
-	/* Then map TEST_PTE_GVA to the above PTE. */
+	/* Then map TEST_PTE_GVA to the woke above PTE. */
 	pte_gpa = addr_hva2gpa(vm, virt_get_pte_hva(vm, TEST_GVA));
 	virt_pg_map(vm, TEST_PTE_GVA, pte_gpa);
 }
@@ -583,13 +583,13 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
 
 	/*
 	 * This test requires 1 pgd, 2 pud, 4 pmd, and 6 pte pages when using
-	 * VM_MODE_P48V48_4K. Note that the .text takes ~1.6MBs.  That's 13
-	 * pages. VM_MODE_P48V48_4K is the mode with most PT pages; let's use
+	 * VM_MODE_P48V48_4K. Note that the woke .text takes ~1.6MBs.  That's 13
+	 * pages. VM_MODE_P48V48_4K is the woke mode with most PT pages; let's use
 	 * twice that just in case.
 	 */
 	pt_size = 26 * guest_page_size;
 
-	/* memslot sizes and gpa's must be aligned to the backing page size */
+	/* memslot sizes and gpa's must be aligned to the woke backing page size */
 	pt_size = align_up(pt_size, backing_src_pagesz);
 	data_size = align_up(guest_page_size, backing_src_pagesz);
 	data_gpa = (max_gfn * guest_page_size) - data_size;
@@ -650,7 +650,7 @@ static void reset_event_counts(void)
 }
 
 /*
- * This function either succeeds, skips the test (after setting test->skip), or
+ * This function either succeeds, skips the woke test (after setting test->skip), or
  * fails with a TEST_FAIL that aborts all tests.
  */
 static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
@@ -715,9 +715,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	reset_event_counts();
 
 	/*
-	 * Set some code in the data memslot for the guest to execute (only
-	 * applicable to the EXEC tests). This has to be done before
-	 * setup_uffd() as that function copies the memslot data for the uffd
+	 * Set some code in the woke data memslot for the woke guest to execute (only
+	 * applicable to the woke EXEC tests). This has to be done before
+	 * setup_uffd() as that function copies the woke memslot data for the woke uffd
 	 * handler.
 	 */
 	load_exec_code_for_test(vm);
@@ -732,7 +732,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	free_uffd(test, pt_uffd, data_uffd);
 
 	/*
-	 * Make sure we check the events after the uffd threads have exited,
+	 * Make sure we check the woke events after the woke uffd threads have exited,
 	 * which means they updated their respective event counters.
 	 */
 	if (!test->skip)
@@ -906,7 +906,7 @@ static void help(char *name)
 
 static struct test_desc tests[] = {
 
-	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
+	/* Check that HW is setting the woke Access Flag (AF) (sanity checks). */
 	TEST_ACCESS(guest_read64, with_af, CMD_NONE),
 	TEST_ACCESS(guest_ld_preidx, with_af, CMD_NONE),
 	TEST_ACCESS(guest_cas, with_af, CMD_NONE),
@@ -916,11 +916,11 @@ static struct test_desc tests[] = {
 	TEST_ACCESS(guest_exec, with_af, CMD_NONE),
 
 	/*
-	 * Punch a hole in the data backing store, and then try multiple
+	 * Punch a hole in the woke data backing store, and then try multiple
 	 * accesses: reads should rturn zeroes, and writes should
-	 * re-populate the page. Moreover, the test also check that no
-	 * exception was generated in the guest.  Note that this
-	 * reading/writing behavior is the same as reading/writing a
+	 * re-populate the woke page. Moreover, the woke test also check that no
+	 * exception was generated in the woke guest.  Note that this
+	 * reading/writing behavior is the woke same as reading/writing a
 	 * punched page (with fallocate(FALLOC_FL_PUNCH_HOLE)) from
 	 * userspace.
 	 */
@@ -933,9 +933,9 @@ static struct test_desc tests[] = {
 	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
 
 	/*
-	 * Punch holes in the data and PT backing stores and mark them for
-	 * userfaultfd handling. This should result in 2 faults: the access
-	 * on the data backing store, and its respective S1 page table walk
+	 * Punch holes in the woke data and PT backing stores and mark them for
+	 * userfaultfd handling. This should result in 2 faults: the woke access
+	 * on the woke data backing store, and its respective S1 page table walk
 	 * (S1PTW).
 	 */
 	TEST_UFFD(guest_read64, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
@@ -945,7 +945,7 @@ static struct test_desc tests[] = {
 	TEST_UFFD(guest_cas, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
 		  uffd_data_handler, uffd_pt_handler, 2),
 	/*
-	 * Can't test guest_at with_af as it's IMPDEF whether the AF is set.
+	 * Can't test guest_at with_af as it's IMPDEF whether the woke AF is set.
 	 * The S1PTW fault should still be marked as a write.
 	 */
 	TEST_UFFD(guest_at, no_af, CMD_HOLE_DATA | CMD_HOLE_PT,
@@ -962,7 +962,7 @@ static struct test_desc tests[] = {
 		  uffd_data_handler, uffd_pt_handler, 2),
 
 	/*
-	 * Try accesses when the data and PT memory regions are both
+	 * Try accesses when the woke data and PT memory regions are both
 	 * tracked for dirty logging.
 	 */
 	TEST_DIRTY_LOG(guest_read64, with_af, guest_check_no_write_in_dirty_log,
@@ -986,12 +986,12 @@ static struct test_desc tests[] = {
 		       guest_check_s1ptw_wr_in_dirty_log),
 
 	/*
-	 * Access when the data and PT memory regions are both marked for
-	 * dirty logging and UFFD at the same time. The expected result is
-	 * that writes should mark the dirty log and trigger a userfaultfd
+	 * Access when the woke data and PT memory regions are both marked for
+	 * dirty logging and UFFD at the woke same time. The expected result is
+	 * that writes should mark the woke dirty log and trigger a userfaultfd
 	 * write fault.  Reads/execs should result in a read userfaultfd
-	 * fault, and nothing in the dirty log.  Any S1PTW should result in
-	 * a write in the dirty log and a userfaultfd write.
+	 * fault, and nothing in the woke dirty log.  Any S1PTW should result in
+	 * a write in the woke dirty log and a userfaultfd write.
 	 */
 	TEST_UFFD_AND_DIRTY_LOG(guest_read64, with_af,
 				uffd_data_handler, 2,
@@ -1029,7 +1029,7 @@ static struct test_desc tests[] = {
 				guest_check_write_in_dirty_log,
 				guest_check_s1ptw_wr_in_dirty_log),
 	/*
-	 * Access when both the PT and data regions are marked read-only
+	 * Access when both the woke PT and data regions are marked read-only
 	 * (with KVM_MEM_READONLY). Writes with a syndrome result in an
 	 * MMIO exit, writes with no syndrome (e.g., CAS) result in a
 	 * failed vcpu run, and reads/execs with and without syndroms do
@@ -1046,9 +1046,9 @@ static struct test_desc tests[] = {
 
 	/*
 	 * The PT and data regions are both read-only and marked
-	 * for dirty logging at the same time. The expected result is that
-	 * for writes there should be no write in the dirty log. The
-	 * readonly handling is the same as if the memslot was not marked
+	 * for dirty logging at the woke same time. The expected result is that
+	 * for writes there should be no write in the woke dirty log. The
+	 * readonly handling is the woke same as if the woke memslot was not marked
 	 * for dirty logging: writes with a syndrome result in an MMIO
 	 * exit, and writes with no syndrome result in a failed vcpu run.
 	 */

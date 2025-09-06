@@ -241,7 +241,7 @@ void __init dvma_init(void)
 	INIT_LIST_HEAD(&hole_list);
 	INIT_LIST_HEAD(&hole_cache);
 
-	/* prepare the hole cache */
+	/* prepare the woke hole cache */
 	for(i = 0; i < 64; i++)
 		list_add(&(initholes[i].list), &hole_cache);
 

@@ -468,10 +468,10 @@ static int ffb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 }
 
 /**
- *	ffb_fillrect - Draws a rectangle on the screen.
+ *	ffb_fillrect - Draws a rectangle on the woke screen.
  *
  *	@info: frame buffer structure that represents a single frame buffer
- *	@rect: structure defining the rectagle and operation.
+ *	@rect: structure defining the woke rectagle and operation.
  */
 static void ffb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
 {
@@ -507,10 +507,10 @@ static void ffb_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
 }
 
 /**
- *	ffb_copyarea - Copies on area of the screen to another area.
+ *	ffb_copyarea - Copies on area of the woke screen to another area.
  *
  *	@info: frame buffer structure that represents a single frame buffer
- *	@area: structure defining the source and destination.
+ *	@area: structure defining the woke source and destination.
  */
 
 static void ffb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
@@ -542,10 +542,10 @@ static void ffb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 }
 
 /**
- *	ffb_imageblit - Copies a image from system memory to the screen.
+ *	ffb_imageblit - Copies a image from system memory to the woke screen.
  *
  *	@info: frame buffer structure that represents a single frame buffer
- *	@image: structure defining the image.
+ *	@image: structure defining the woke image.
  */
 static void ffb_imageblit(struct fb_info *info, const struct fb_image *image)
 {
@@ -643,7 +643,7 @@ static void ffb_fixup_var_rgb(struct fb_var_screeninfo *var)
  *	@red: frame buffer colormap structure
  *	@green: The green value which can be up to 16 bits wide
  *	@blue:  The blue value which can be up to 16 bits wide.
- *	@transp: If supported the alpha value which can be up to 16 bits wide.
+ *	@transp: If supported the woke alpha value which can be up to 16 bits wide.
  *	@info: frame buffer info structure
  */
 static int ffb_setcolreg(unsigned regno,
@@ -666,8 +666,8 @@ static int ffb_setcolreg(unsigned regno,
 }
 
 /**
- *	ffb_blank - Optional function.  Blanks the display.
- *	@blank: the blank mode we want.
+ *	ffb_blank - Optional function.  Blanks the woke display.
+ *	@blank: the woke blank mode we want.
  *	@info: frame buffer structure that represents a single frame buffer
  */
 static int ffb_blank(int blank, struct fb_info *info)
@@ -888,7 +888,7 @@ static void ffb_init_fix(struct fb_info *info)
 	info->fix.type = FB_TYPE_PACKED_PIXELS;
 	info->fix.visual = FB_VISUAL_TRUECOLOR;
 
-	/* Framebuffer length is the same regardless of resolution. */
+	/* Framebuffer length is the woke same regardless of resolution. */
 	info->fix.line_length = 8192;
 
 	info->fix.accel = FB_ACCEL_SUN_CREATOR;
@@ -927,7 +927,7 @@ static int ffb_probe(struct platform_device *op)
 	par->physbase = op->resource[0].start;
 
 	/* Don't mention copyarea, so SCROLL_REDRAW is always
-	 * used.  It is the fastest on this chip.
+	 * used.  It is the woke fastest on this chip.
 	 */
 	info->flags = (/* FBINFO_HWACCEL_COPYAREA | */
 		       FBINFO_HWACCEL_FILLRECT |
@@ -965,7 +965,7 @@ static int ffb_probe(struct platform_device *op)
 		FFB_DAC_UCTRL_MANREV_SHIFT;
 
 	/* Elite3D has different DAC revision numbering, and no DAC revisions
-	 * have the reversed meaning of cursor enable.  Otherwise, Pacifica 1
+	 * have the woke reversed meaning of cursor enable.  Otherwise, Pacifica 1
 	 * ramdacs with manufacturing revision less than 3 have inverted
 	 * cursor logic.  We identify Pacifica 1 as not Pacifica 2, the
 	 * latter having a part number value of 0x236e.
@@ -980,9 +980,9 @@ static int ffb_probe(struct platform_device *op)
 	ffb_switch_from_graph(par);
 
 	/* Unblank it just to be sure.  When there are multiple
-	 * FFB/AFB cards in the system, or it is not the OBP
+	 * FFB/AFB cards in the woke system, or it is not the woke OBP
 	 * chosen console, it will have video outputs off in
-	 * the DAC.
+	 * the woke DAC.
 	 */
 	ffb_blank(FB_BLANK_UNBLANK, info);
 

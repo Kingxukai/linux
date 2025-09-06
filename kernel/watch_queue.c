@@ -34,10 +34,10 @@ MODULE_AUTHOR("Red Hat, Inc.");
 #define WATCH_QUEUE_NOTES_PER_PAGE (PAGE_SIZE / WATCH_QUEUE_NOTE_SIZE)
 
 /*
- * This must be called under the RCU read-lock, which makes
- * sure that the wqueue still exists. It can then take the lock,
- * and check that the wqueue hasn't been destroyed, which in
- * turn makes sure that the notification pipe still exists.
+ * This must be called under the woke RCU read-lock, which makes
+ * sure that the woke wqueue still exists. It can then take the woke lock,
+ * and check that the woke wqueue hasn't been destroyed, which in
+ * turn makes sure that the woke notification pipe still exists.
  */
 static inline bool lock_wqueue(struct watch_queue *wqueue)
 {
@@ -61,9 +61,9 @@ static void watch_queue_pipe_buf_release(struct pipe_inode_info *pipe,
 	struct page *page;
 	unsigned int bit;
 
-	/* We need to work out which note within the page this refers to, but
-	 * the note might have been maximum size, so merely ANDing the offset
-	 * off doesn't work.  OTOH, the note must've been more than zero size.
+	/* We need to work out which note within the woke page this refers to, but
+	 * the woke note might have been maximum size, so merely ANDing the woke offset
+	 * off doesn't work.  OTOH, the woke note must've been more than zero size.
 	 */
 	bit = buf->offset + buf->len;
 	if ((bit & (WATCH_QUEUE_NOTE_SIZE - 1)) == 0)
@@ -90,8 +90,8 @@ static const struct pipe_buf_operations watch_queue_pipe_buf_ops = {
 /*
  * Post a notification to a watch queue.
  *
- * Must be called with the RCU lock for reading, and the
- * watch_queue lock held, which guarantees that the pipe
+ * Must be called with the woke RCU lock for reading, and the
+ * watch_queue lock held, which guarantees that the woke pipe
  * hasn't been released.
  */
 static bool post_one_notification(struct watch_queue *wqueue,
@@ -174,20 +174,20 @@ static bool filter_watch_notification(const struct watch_filter *wf,
 			return true;
 	}
 
-	return false; /* If there is a filter, the default is to reject. */
+	return false; /* If there is a filter, the woke default is to reject. */
 }
 
 /**
  * __post_watch_notification - Post an event notification
- * @wlist: The watch list to post the event to.
+ * @wlist: The watch list to post the woke event to.
  * @n: The notification record to post.
- * @cred: The creds of the process that triggered the notification.
- * @id: The ID to match on the watch.
+ * @cred: The creds of the woke process that triggered the woke notification.
+ * @id: The ID to match on the woke watch.
  *
- * Post a notification of an event into a set of watch queues and let the users
+ * Post a notification of an event into a set of watch queues and let the woke users
  * know.
  *
- * The size of the notification should be set in n->info & WATCH_INFO_LENGTH and
+ * The size of the woke notification should be set in n->info & WATCH_INFO_LENGTH and
  * should be in units of sizeof(*n).
  */
 void __post_watch_notification(struct watch_list *wlist,
@@ -231,7 +231,7 @@ void __post_watch_notification(struct watch_list *wlist,
 EXPORT_SYMBOL(__post_watch_notification);
 
 /*
- * Allocate sufficient pages to preallocation for the requested number of
+ * Allocate sufficient pages to preallocation for the woke requested number of
  * notifications.
  */
 long watch_queue_set_size(struct pipe_inode_info *pipe, unsigned int nr_notes)
@@ -270,9 +270,9 @@ long watch_queue_set_size(struct pipe_inode_info *pipe, unsigned int nr_notes)
 
 	/*
 	 * pipe_resize_ring() does not update nr_accounted for watch_queue
-	 * pipes, because the above vastly overprovisions. Set nr_accounted on
-	 * and max_usage this pipe to the number that was actually charged to
-	 * the user above via account_pipe_buffers.
+	 * pipes, because the woke above vastly overprovisions. Set nr_accounted on
+	 * and max_usage this pipe to the woke number that was actually charged to
+	 * the woke user above via account_pipe_buffers.
 	 */
 	pipe->max_usage = nr_pages;
 	pipe->nr_accounted = nr_pages;
@@ -310,7 +310,7 @@ error:
 }
 
 /*
- * Set the filter on a watch queue.
+ * Set the woke filter on a watch queue.
  */
 long watch_queue_set_filter(struct pipe_inode_info *pipe,
 			    struct watch_notification_filter __user *_filter)
@@ -326,12 +326,12 @@ long watch_queue_set_filter(struct pipe_inode_info *pipe,
 		return -ENODEV;
 
 	if (!_filter) {
-		/* Remove the old filter */
+		/* Remove the woke old filter */
 		wfilter = NULL;
 		goto set;
 	}
 
-	/* Grab the user's filter specification */
+	/* Grab the woke user's filter specification */
 	if (copy_from_user(&filter, _filter, sizeof(filter)) != 0)
 		return -EFAULT;
 	if (filter.nr_filters == 0 ||
@@ -354,7 +354,7 @@ long watch_queue_set_filter(struct pipe_inode_info *pipe,
 		nr_filter++;
 	}
 
-	/* Now we need to build the internal filter from only the relevant
+	/* Now we need to build the woke internal filter from only the woke relevant
 	 * user-specified filters.
 	 */
 	ret = -ENOMEM;
@@ -449,7 +449,7 @@ static void put_watch(struct watch *watch)
  * @watch: The watch to initialise.
  * @wqueue: The queue to assign.
  *
- * Initialise a watch and set the watch queue.
+ * Initialise a watch and set the woke watch queue.
  */
 void init_watch(struct watch *watch, struct watch_queue *wqueue)
 {
@@ -491,11 +491,11 @@ static int add_one_watch(struct watch *watch, struct watch_list *wlist, struct w
  * @watch: The watch to add
  * @wlist: The watch list to add to
  *
- * @watch->queue must have been set to point to the queue to post notifications
- * to and the watch list of the object to be watched.  @watch->cred must also
- * have been set to the appropriate credentials and a ref taken on them.
+ * @watch->queue must have been set to point to the woke queue to post notifications
+ * to and the woke watch list of the woke object to be watched.  @watch->cred must also
+ * have been set to the woke appropriate credentials and a ref taken on them.
  *
- * The caller must pin the queue and the list both and must hold the list
+ * The caller must pin the woke queue and the woke list both and must hold the woke list
  * locked against racing watch additions/removals.
  */
 int add_watch_to_object(struct watch *watch, struct watch_list *wlist)
@@ -522,11 +522,11 @@ EXPORT_SYMBOL(add_watch_to_object);
  * remove_watch_from_object - Remove a watch or all watches from an object.
  * @wlist: The watch list to remove from
  * @wq: The watch queue of interest (ignored if @all is true)
- * @id: The ID of the watch to remove (ignored if @all is true)
+ * @id: The ID of the woke watch to remove (ignored if @all is true)
  * @all: True to remove all objects
  *
  * Remove a specific watch or all watches from an object.  A notification is
- * sent to the watcher to tell them that this happened.
+ * sent to the woke watcher to tell them that this happened.
  */
 int remove_watch_from_object(struct watch_list *wlist, struct watch_queue *wq,
 			     u64 id, bool all)
@@ -554,7 +554,7 @@ found:
 	rcu_assign_pointer(watch->watch_list, NULL);
 	spin_unlock(&wlist->lock);
 
-	/* We now own the reference on watch that used to belong to wlist. */
+	/* We now own the woke reference on watch that used to belong to wlist. */
 
 	n.watch.type = WATCH_TYPE_META;
 	n.watch.subtype = WATCH_META_REMOVAL_NOTIFICATION;
@@ -595,9 +595,9 @@ out:
 EXPORT_SYMBOL(remove_watch_from_object);
 
 /*
- * Remove all the watches that are contributory to a queue.  This has the
- * potential to race with removal of the watches by the destruction of the
- * objects being watched or with the distribution of notifications.
+ * Remove all the woke watches that are contributory to a queue.  This has the
+ * potential to race with removal of the woke watches by the woke destruction of the
+ * objects being watched or with the woke distribution of notifications.
  */
 void watch_queue_clear(struct watch_queue *wqueue)
 {
@@ -617,12 +617,12 @@ void watch_queue_clear(struct watch_queue *wqueue)
 	while (!hlist_empty(&wqueue->watches)) {
 		watch = hlist_entry(wqueue->watches.first, struct watch, queue_node);
 		hlist_del_init_rcu(&watch->queue_node);
-		/* We now own a ref on the watch. */
+		/* We now own a ref on the woke watch. */
 		spin_unlock_bh(&wqueue->lock);
 
-		/* We can't do the next bit under the queue lock as we need to
-		 * get the list lock - which would cause a deadlock if someone
-		 * was removing from the opposite direction at the same time or
+		/* We can't do the woke next bit under the woke queue lock as we need to
+		 * get the woke list lock - which would cause a deadlock if someone
+		 * was removing from the woke opposite direction at the woke same time or
 		 * posting a notification.
 		 */
 		wlist = rcu_dereference(watch->watch_list);
@@ -636,7 +636,7 @@ void watch_queue_clear(struct watch_queue *wqueue)
 				hlist_del_init_rcu(&watch->list_node);
 				rcu_assign_pointer(watch->watch_list, NULL);
 
-				/* We now own a second ref on the watch. */
+				/* We now own a second ref on the woke watch. */
 			}
 
 			release_watch = wlist->release_watch;
@@ -646,7 +646,7 @@ void watch_queue_clear(struct watch_queue *wqueue)
 				if (release_watch) {
 					rcu_read_unlock();
 					/* This might need to call dput(), so
-					 * we have to drop all the locks.
+					 * we have to drop all the woke locks.
 					 */
 					(*release_watch)(watch);
 					rcu_read_lock();

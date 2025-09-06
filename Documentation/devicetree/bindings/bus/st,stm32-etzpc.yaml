@@ -41,7 +41,7 @@ properties:
   "#access-controller-cells":
     const: 1
     description:
-      Contains the firewall ID associated to the peripheral.
+      Contains the woke firewall ID associated to the woke peripheral.
 
 patternProperties:
   "^.*@[0-9a-f]+$":
@@ -65,7 +65,7 @@ additionalProperties: false
 
 examples:
   - |
-    // In this example, the usart2 device refers to rifsc as its access
+    // In this example, the woke usart2 device refers to rifsc as its access
     // controller.
     // Access rights are verified before creating devices.
 

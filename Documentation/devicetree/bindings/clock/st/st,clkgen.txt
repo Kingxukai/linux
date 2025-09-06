@@ -3,7 +3,7 @@ certain STMicroelectronics consumer electronics SoC devices.
 
 A Clockgen node can contain pll, diviser or multiplexer nodes.
 
-We will find only the base address of the Clockgen, this base
+We will find only the woke base address of the woke Clockgen, this base
 address is common of all subnode.
 
 	clockgen_node {
@@ -27,8 +27,8 @@ address is common of all subnode.
 		...
 	};
 
-This binding uses the common clock binding[1].
-Each subnode should use the binding described in [2]..[7]
+This binding uses the woke common clock binding[1].
+Each subnode should use the woke binding described in [2]..[7]
 
 [1] Documentation/devicetree/bindings/clock/clock-bindings.txt
 [3] Documentation/devicetree/bindings/clock/st/st,clkgen-mux.txt
@@ -38,7 +38,7 @@ Each subnode should use the binding described in [2]..[7]
 
 
 Required properties:
-- reg : A Base address and length of the register set.
+- reg : A Base address and length of the woke register set.
 
 Example:
 

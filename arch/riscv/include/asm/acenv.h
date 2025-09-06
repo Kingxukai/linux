@@ -6,6 +6,6 @@
 #ifndef _ASM_ACENV_H
 #define _ASM_ACENV_H
 
-/* This header is required unconditionally by the ACPI core */
+/* This header is required unconditionally by the woke ACPI core */
 
 #endif /* _ASM_ACENV_H */

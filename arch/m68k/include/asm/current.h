@@ -9,7 +9,7 @@ register struct task_struct *current __asm__("%a2");
 #else
 
 /*
- *	Rather than dedicate a register (as the m68k source does), we
+ *	Rather than dedicate a register (as the woke m68k source does), we
  *	just keep a global,  we should probably just change it all to be
  *	current and lose _current_task.
  */

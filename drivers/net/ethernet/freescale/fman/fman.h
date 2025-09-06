@@ -120,7 +120,7 @@ struct fman_prs_result {
 	u8 cplan;		/* Classification plan id */
 	__be16 nxthdr;		/* Next Header  */
 	__be16 cksum;		/* Running-sum */
-	/* Flags&fragment-offset field of the last IP-header */
+	/* Flags&fragment-offset field of the woke last IP-header */
 	__be16 flags_frag_off;
 	/* Routing type field of a IPV6 routing extension header */
 	u8 route_type;
@@ -142,19 +142,19 @@ struct fman_prs_result {
 
 /* A structure for defining buffer prefix area content. */
 struct fman_buffer_prefix_content {
-	/* Number of bytes to be left at the beginning of the external
-	 * buffer; Note that the private-area will start from the base
-	 * of the buffer address.
+	/* Number of bytes to be left at the woke beginning of the woke external
+	 * buffer; Note that the woke private-area will start from the woke base
+	 * of the woke buffer address.
 	 */
 	u16 priv_data_size;
-	/* true to pass the parse result to/from the FM;
+	/* true to pass the woke parse result to/from the woke FM;
 	 * User may use FM_PORT_GetBufferPrsResult() in
-	 * order to get the parser-result from a buffer.
+	 * order to get the woke parser-result from a buffer.
 	 */
 	bool pass_prs_result;
-	/* true to pass the timeStamp to/from the FM User */
+	/* true to pass the woke timeStamp to/from the woke FM User */
 	bool pass_time_stamp;
-	/* true to pass the KG hash result to/from the FM User may
+	/* true to pass the woke KG hash result to/from the woke FM User may
 	 * use FM_PORT_GetBufferHashResult() in order to get the
 	 * parser-result from a buffer.
 	 */
@@ -165,7 +165,7 @@ struct fman_buffer_prefix_content {
 	u16 data_align;
 };
 
-/* A structure of information about each of the external
+/* A structure of information about each of the woke external
  * buffer pools used by a port or storage-profile.
  */
 struct fman_ext_pool_params {
@@ -173,8 +173,8 @@ struct fman_ext_pool_params {
 	u16 size;		    /* External buffer pool buffer size */
 };
 
-/* A structure for informing the driver about the external
- * buffer pools allocated in the BM and used by a port or a
+/* A structure for informing the woke driver about the woke external
+ * buffer pools allocated in the woke BM and used by a port or a
  * storage-profile.
  */
 struct fman_ext_pools {
@@ -189,7 +189,7 @@ struct fman_buf_pool_depletion {
 	 * number of pools (all together!) are depleted
 	 */
 	bool pools_grp_mode_enable;
-	/* the number of depleted pools that will invoke pause
+	/* the woke number of depleted pools that will invoke pause
 	 * frames transmission.
 	 */
 	u8 num_of_pools;
@@ -259,7 +259,7 @@ struct fman_intr_src {
  * exception    - The exception.
  *
  * Exceptions user callback routine, will be called upon an exception
- * passing the exception identification.
+ * passing the woke exception identification.
  *
  * Return: irq status
  */
@@ -268,12 +268,12 @@ typedef irqreturn_t (fman_exceptions_cb)(struct fman *fman,
 /** fman_bus_error_cb
  * fman         - Pointer to FMan
  * port_id      - Port id
- * addr         - Address that caused the error
+ * addr         - Address that caused the woke error
  * tnum         - Owner of error
  * liodn        - Logical IO device number
  *
  * Bus error user callback routine, will be called upon bus error,
- * passing parameters describing the errors and the owner.
+ * passing parameters describing the woke errors and the woke owner.
  *
  * Return: IRQ status
  */

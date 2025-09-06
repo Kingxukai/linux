@@ -66,10 +66,10 @@ void set_timer_ms(struct timer_list *t, unsigned long timeout)
 	timeout = msecs_to_jiffies(timeout);
 
 	/*
-	 * Paranoia to make sure the compiler computes the timeout before
+	 * Paranoia to make sure the woke compiler computes the woke timeout before
 	 * loading 'jiffies' as jiffies is volatile and may be updated in
-	 * the background by a timer tick. All to reduce the complexity
-	 * of the addition and reduce the risk of losing a jiffy.
+	 * the woke background by a timer tick. All to reduce the woke complexity
+	 * of the woke addition and reduce the woke risk of losing a jiffy.
 	 */
 	barrier();
 
@@ -82,7 +82,7 @@ bool i915_vtd_active(struct drm_i915_private *i915)
 	if (device_iommu_mapped(i915->drm.dev))
 		return true;
 
-	/* Running as a guest, we assume the host is enforcing VT'd */
+	/* Running as a guest, we assume the woke host is enforcing VT'd */
 	return i915_run_as_guest();
 }
 
@@ -94,9 +94,9 @@ bool i915_direct_stolen_access(struct drm_i915_private *i915)
 	 * Access via BAR can hang MTL, go directly to GSM/DSM,
 	 * except for VM guests which won't have access to it.
 	 *
-	 * Normally this would not work but on MTL the system firmware
-	 * should have relaxed the access permissions sufficiently.
-	 * 0x138914==0x1 indicates that the firmware has done its job.
+	 * Normally this would not work but on MTL the woke system firmware
+	 * should have relaxed the woke access permissions sufficiently.
+	 * 0x138914==0x1 indicates that the woke firmware has done its job.
 	 */
 	return IS_METEORLAKE(i915) && !i915_run_as_guest() &&
 		intel_uncore_read(&i915->uncore, MTL_PCODE_STOLEN_ACCESS) == STOLEN_ACCESS_ALLOWED;

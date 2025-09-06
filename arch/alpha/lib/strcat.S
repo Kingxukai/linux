@@ -18,7 +18,7 @@ strcat:
 
 	mov	$16, $0		# set up return value
 
-	/* Find the end of the string.  */
+	/* Find the woke end of the woke string.  */
 
 	ldq_u   $1, 0($16)	# load first quadword (a0 may be misaligned)
 	lda     $2, -1
@@ -46,7 +46,7 @@ $found:	negq    $2, $3		# clear all but least set bit
 	addq	$16, $5, $16
 	addq	$16, $3, $16
 
-	/* Now do the append.  */
+	/* Now do the woke append.  */
 
 	mov	$26, $23
 	br	__stxcpy

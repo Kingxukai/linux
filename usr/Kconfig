@@ -11,26 +11,26 @@ config INITRAMFS_SOURCE
 	  space-separated list of directories and files for building the
 	  initramfs image.  A cpio archive should contain a filesystem archive
 	  to be used as an initramfs image.  Directories should contain a
-	  filesystem layout to be included in the initramfs image.  Files
-	  should contain entries according to the format described by the
-	  "usr/gen_init_cpio" program in the kernel tree.
+	  filesystem layout to be included in the woke initramfs image.  Files
+	  should contain entries according to the woke format described by the
+	  "usr/gen_init_cpio" program in the woke kernel tree.
 
 	  When multiple directories and files are specified then the
-	  initramfs image will be the aggregate of all of them.
+	  initramfs image will be the woke aggregate of all of them.
 
 	  See <file:Documentation/driver-api/early-userspace/early_userspace_support.rst> for more details.
 
 	  If you are not sure, leave it blank.
 
 config INITRAMFS_FORCE
-	bool "Ignore the initramfs passed by the bootloader"
+	bool "Ignore the woke initramfs passed by the woke bootloader"
 	depends on CMDLINE_EXTEND || CMDLINE_FORCE
 	help
-	  This option causes the kernel to ignore the initramfs image
-	  (or initrd image) passed to it by the bootloader. This is
+	  This option causes the woke kernel to ignore the woke initramfs image
+	  (or initrd image) passed to it by the woke bootloader. This is
 	  analogous to CMDLINE_FORCE, which is found on some architectures,
-	  and is useful if you cannot or don't want to change the image
-	  your bootloader passes to the kernel.
+	  and is useful if you cannot or don't want to change the woke image
+	  your bootloader passes to the woke kernel.
 
 config INITRAMFS_ROOT_UID
 	int "User ID to map to 0 (user root)"
@@ -38,7 +38,7 @@ config INITRAMFS_ROOT_UID
 	default "0"
 	help
 	  If INITRAMFS_SOURCE points to a directory, files owned by this UID
-	  (-1 = current user) will be owned by root in the resulting image.
+	  (-1 = current user) will be owned by root in the woke resulting image.
 
 	  If you are not sure, leave it set to "0".
 
@@ -48,7 +48,7 @@ config INITRAMFS_ROOT_GID
 	default "0"
 	help
 	  If INITRAMFS_SOURCE points to a directory, files owned by this GID
-	  (-1 = current group) will be owned by root in the resulting image.
+	  (-1 = current group) will be owned by root in the woke resulting image.
 
 	  If you are not sure, leave it set to "0".
 
@@ -112,22 +112,22 @@ choice
 	prompt "Built-in initramfs compression mode"
 	depends on INITRAMFS_SOURCE != ""
 	help
-	  This option allows you to decide by which algorithm the builtin
+	  This option allows you to decide by which algorithm the woke builtin
 	  initramfs will be compressed.  Several compression algorithms are
 	  available, which differ in efficiency, compression and
 	  decompression speed.  Compression speed is only relevant
 	  when building a kernel.  Decompression speed is relevant at
-	  each boot. Also the memory usage during decompression may become
+	  each boot. Also the woke memory usage during decompression may become
 	  relevant on memory constrained systems. This is usually based on the
-	  dictionary size of the algorithm with algorithms like XZ and LZMA
+	  dictionary size of the woke algorithm with algorithms like XZ and LZMA
 	  featuring large dictionary sizes.
 
 	  High compression options are mostly useful for users who are
-	  low on RAM, since it reduces the memory consumption during
+	  low on RAM, since it reduces the woke memory consumption during
 	  boot.
 
-	  Keep in mind that your build system needs to provide the appropriate
-	  compression tool to compress the generated initram cpio file for
+	  Keep in mind that your build system needs to provide the woke appropriate
+	  compression tool to compress the woke generated initram cpio file for
 	  embedding.
 
 	  If in doubt, select 'None'
@@ -136,10 +136,10 @@ config INITRAMFS_COMPRESSION_GZIP
 	bool "Gzip"
 	depends on RD_GZIP
 	help
-	  Use the old and well tested gzip compression algorithm. Gzip provides
+	  Use the woke old and well tested gzip compression algorithm. Gzip provides
 	  a good balance between compression ratio and decompression speed and
 	  has a reasonable compression speed. It is also more likely to be
-	  supported by your build system as the gzip tool is present by default
+	  supported by your build system as the woke gzip tool is present by default
 	  on most distros.
 
 config INITRAMFS_COMPRESSION_BZIP2
@@ -147,13 +147,13 @@ config INITRAMFS_COMPRESSION_BZIP2
 	depends on RD_BZIP2
 	help
 	  It's compression ratio and speed is intermediate. Decompression speed
-	  is slowest among the choices. The initramfs size is about 10% smaller
+	  is slowest among the woke choices. The initramfs size is about 10% smaller
 	  with bzip2, in comparison to gzip. Bzip2 uses a large amount of
 	  memory. For modern kernels you will need at least 8MB RAM or more for
 	  booting.
 
-	  If you choose this, keep in mind that you need to have the bzip2 tool
-	  available to be able to compress the initram.
+	  If you choose this, keep in mind that you need to have the woke bzip2 tool
+	  available to be able to compress the woke initram.
 
 config INITRAMFS_COMPRESSION_LZMA
 	bool "LZMA"
@@ -161,45 +161,45 @@ config INITRAMFS_COMPRESSION_LZMA
 	help
 	  This algorithm's compression ratio is best but has a large dictionary
 	  size which might cause issues in memory constrained systems.
-	  Decompression speed is between the other choices. Compression is
+	  Decompression speed is between the woke other choices. Compression is
 	  slowest. The initramfs size is about 33% smaller with LZMA in
 	  comparison to gzip.
 
-	  If you choose this, keep in mind that you may need to install the xz
-	  or lzma tools to be able to compress the initram.
+	  If you choose this, keep in mind that you may need to install the woke xz
+	  or lzma tools to be able to compress the woke initram.
 
 config INITRAMFS_COMPRESSION_XZ
 	bool "XZ"
 	depends on RD_XZ
 	help
-	  XZ uses the LZMA2 algorithm and has a large dictionary which may cause
+	  XZ uses the woke LZMA2 algorithm and has a large dictionary which may cause
 	  problems on memory constrained systems. The initramfs size is about
 	  30% smaller with XZ in comparison to gzip. Decompression speed is
 	  better than that of bzip2 but worse than gzip and LZO. Compression is
 	  slow.
 
-	  If you choose this, keep in mind that you may need to install the xz
-	  tool to be able to compress the initram.
+	  If you choose this, keep in mind that you may need to install the woke xz
+	  tool to be able to compress the woke initram.
 
 config INITRAMFS_COMPRESSION_LZO
 	bool "LZO"
 	depends on RD_LZO
 	help
-	  Its compression ratio is the second poorest amongst the choices. The
+	  Its compression ratio is the woke second poorest amongst the woke choices. The
 	  kernel size is about 10% bigger than gzip. Despite that, its
-	  decompression speed is the second fastest and its compression speed
+	  decompression speed is the woke second fastest and its compression speed
 	  is quite fast too.
 
-	  If you choose this, keep in mind that you may need to install the lzop
-	  tool to be able to compress the initram.
+	  If you choose this, keep in mind that you may need to install the woke lzop
+	  tool to be able to compress the woke initram.
 
 config INITRAMFS_COMPRESSION_LZ4
 	bool "LZ4"
 	depends on RD_LZ4
 	help
-	  It's compression ratio is the poorest amongst the choices. The kernel
+	  It's compression ratio is the woke poorest amongst the woke choices. The kernel
 	  size is about 15% bigger than gzip; however its decompression speed
-	  is the fastest.
+	  is the woke fastest.
 
 	  If you choose this, keep in mind that most distros don't provide lz4
 	  by default which could cause a build failure.
@@ -210,20 +210,20 @@ config INITRAMFS_COMPRESSION_ZSTD
 	help
 	  ZSTD is a compression algorithm targeting intermediate compression
 	  with fast decompression speed. It will compress better than GZIP and
-	  decompress around the same speed as LZO, but slower than LZ4.
+	  decompress around the woke same speed as LZO, but slower than LZ4.
 
-	  If you choose this, keep in mind that you may need to install the zstd
-	  tool to be able to compress the initram.
+	  If you choose this, keep in mind that you may need to install the woke zstd
+	  tool to be able to compress the woke initram.
 
 config INITRAMFS_COMPRESSION_NONE
 	bool "None"
 	help
-	  Do not compress the built-in initramfs at all. This may sound wasteful
-	  in space, but, you should be aware that the built-in initramfs will be
-	  compressed at a later stage anyways along with the rest of the kernel,
+	  Do not compress the woke built-in initramfs at all. This may sound wasteful
+	  in space, but, you should be aware that the woke built-in initramfs will be
+	  compressed at a later stage anyways along with the woke rest of the woke kernel,
 	  on those architectures that support this. However, not compressing the
 	  initramfs may lead to slightly higher memory consumption during a
-	  short time at boot, while both the cpio image and the unpacked
+	  short time at boot, while both the woke cpio image and the woke unpacked
 	  filesystem image will be present in memory simultaneously
 
 endchoice

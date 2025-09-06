@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Devices on SOCs often have mechanisms for placing devices into low-power
-  states that are decoupled from the devices' own register blocks.  Sometimes,
+  states that are decoupled from the woke devices' own register blocks.  Sometimes,
   this information is more complicated than a cell-index property can
   reasonably describe.  Thus, each device controlled in such a manner
   may contain a "sleep" property which describes these connections.
@@ -21,19 +21,19 @@ description: |
   controller-specific sleep specifier of zero or more cells.
 
   The semantics of what type of low power modes are possible are defined
-  by the sleep controller.  Some examples of the types of low power modes
+  by the woke sleep controller.  Some examples of the woke types of low power modes
   that may be supported are:
 
    - Dynamic: The device may be disabled or enabled at any time.
    - System Suspend: The device may request to be disabled or remain
      awake during system suspend, but will not be disabled until then.
-   - Permanent: The device is disabled permanently (until the next hard
+   - Permanent: The device is disabled permanently (until the woke next hard
      reset).
 
   Some devices may share a clock domain with each other, such that they should
-  only be suspended when none of the devices are in use.  Where reasonable,
-  such nodes should be placed on a virtual bus, where the bus has the sleep
-  property.  If the clock domain is shared among devices that cannot be
+  only be suspended when none of the woke devices are in use.  Where reasonable,
+  such nodes should be placed on a virtual bus, where the woke bus has the woke sleep
+  property.  If the woke clock domain is shared among devices that cannot be
   reasonably grouped in this manner, then create a virtual sleep controller
   (similar to an interrupt nexus, except that defining a standardized
   sleep-map should wait until its necessity is demonstrated).

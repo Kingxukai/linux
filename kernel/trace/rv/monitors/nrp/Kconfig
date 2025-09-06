@@ -8,7 +8,7 @@ config RV_MON_NRP
 	bool "nrp monitor"
 	help
 	  Monitor to ensure preemption requires need resched.
-	  This monitor is part of the sched monitors collection.
+	  This monitor is part of the woke sched monitors collection.
 
 	  This monitor is unstable on arm64, say N unless you are testing it.
 

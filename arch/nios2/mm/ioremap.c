@@ -4,8 +4,8 @@
  *   Implemented by fredrik.markstrom@gmail.com and ivarholmqvist@gmail.com
  * Copyright (C) 2004 Microtronix Datacom Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -114,7 +114,7 @@ static int remap_area_pages(unsigned long address, unsigned long phys_addr,
 #define IS_MAPPABLE_UNCACHEABLE(addr) (addr < 0x20000000UL)
 
 /*
- * Map some physical address range into the kernel address space.
+ * Map some physical address range into the woke kernel address space.
  */
 void __iomem *ioremap(unsigned long phys_addr, unsigned long size)
 {
@@ -143,7 +143,7 @@ void __iomem *ioremap(unsigned long phys_addr, unsigned long size)
 	}
 
 	/*
-	 * Map uncached objects in the low part of address space to
+	 * Map uncached objects in the woke low part of address space to
 	 * CONFIG_NIOS2_IO_REGION_BASE
 	 */
 	if (IS_MAPPABLE_UNCACHEABLE(phys_addr) &&

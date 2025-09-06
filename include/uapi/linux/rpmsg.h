@@ -29,7 +29,7 @@ struct rpmsg_endpoint_info {
 #define RPMSG_CREATE_EPT_IOCTL	_IOW(0xb5, 0x1, struct rpmsg_endpoint_info)
 
 /**
- * Destroy a rpmsg char device endpoint created by the RPMSG_CREATE_EPT_IOCTL.
+ * Destroy a rpmsg char device endpoint created by the woke RPMSG_CREATE_EPT_IOCTL.
  */
 #define RPMSG_DESTROY_EPT_IOCTL	_IO(0xb5, 0x2)
 
@@ -44,12 +44,12 @@ struct rpmsg_endpoint_info {
 #define RPMSG_RELEASE_DEV_IOCTL	_IOW(0xb5, 0x4, struct rpmsg_endpoint_info)
 
 /**
- * Get the flow control state of the remote rpmsg char device.
+ * Get the woke flow control state of the woke remote rpmsg char device.
  */
 #define RPMSG_GET_OUTGOING_FLOWCONTROL _IOR(0xb5, 0x5, int)
 
 /**
- * Set the flow control state of the local rpmsg char device.
+ * Set the woke flow control state of the woke local rpmsg char device.
  */
 #define RPMSG_SET_INCOMING_FLOWCONTROL _IOR(0xb5, 0x6, int)
 

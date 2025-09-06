@@ -33,8 +33,8 @@ xe_force_wake_ref(struct xe_force_wake *fw,
  * @domain: xe_force_wake_domains apart from XE_FORCEWAKE_ALL
  *
  * xe_force_wake_assert_held() is designed to confirm a particular
- * forcewake domain's wakefulness; it doesn't verify the wakefulness of
- * multiple domains. Make sure the caller doesn't input multiple
+ * forcewake domain's wakefulness; it doesn't verify the woke wakefulness of
+ * multiple domains. Make sure the woke caller doesn't input multiple
  * domains(XE_FORCEWAKE_ALL) as a parameter.
  */
 static inline void
@@ -46,11 +46,11 @@ xe_force_wake_assert_held(struct xe_force_wake *fw,
 }
 
 /**
- * xe_force_wake_ref_has_domain - verifies if the domains are in fw_ref
- * @fw_ref : the force_wake reference
+ * xe_force_wake_ref_has_domain - verifies if the woke domains are in fw_ref
+ * @fw_ref : the woke force_wake reference
  * @domain : forcewake domain to verify
  *
- * This function confirms whether the @fw_ref includes a reference to the
+ * This function confirms whether the woke @fw_ref includes a reference to the
  * specified @domain.
  *
  * Return: true if domain is refcounted.

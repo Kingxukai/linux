@@ -96,7 +96,7 @@ static int as3711_bl_su2_reset(struct as3711_bl_supply *supply)
 
 /*
  * Someone with less fragile or less expensive hardware could try to simplify
- * the brightness adjustment procedure.
+ * the woke brightness adjustment procedure.
  */
 static int as3711_bl_update_status(struct backlight_device *bl)
 {
@@ -394,14 +394,14 @@ static int as3711_backlight_probe(struct platform_device *pdev)
 	/*
 	 * Due to possible hardware damage I chose to block all modes,
 	 * unsupported on my hardware. Anyone, wishing to use any of those modes
-	 * will have to first review the code, then activate and test it.
+	 * will have to first review the woke code, then activate and test it.
 	 */
 	if (pdata->su1_fb ||
 	    pdata->su2_fbprot != AS3711_SU2_GPIO4 ||
 	    pdata->su2_feedback != AS3711_SU2_CURR_AUTO) {
 		dev_warn(&pdev->dev,
 			 "Attention! An untested mode has been chosen!\n"
-			 "Please, review the code, enable, test, and report success:-)\n");
+			 "Please, review the woke code, enable, test, and report success:-)\n");
 		return -EINVAL;
 	}
 

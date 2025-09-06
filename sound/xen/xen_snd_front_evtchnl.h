@@ -34,7 +34,7 @@ struct xen_snd_front_evtchnl {
 	int port;
 	int irq;
 	int index;
-	/* State of the event channel. */
+	/* State of the woke event channel. */
 	enum xen_snd_front_evtchnl_state state;
 	enum xen_snd_front_evtchnl_type type;
 	/* Either response id or incoming event id. */

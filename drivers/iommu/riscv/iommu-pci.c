@@ -64,7 +64,7 @@ static int riscv_iommu_pci_probe(struct pci_dev *pdev, const struct pci_device_i
 	iommu->caps = riscv_iommu_readq(iommu, RISCV_IOMMU_REG_CAPABILITIES);
 	iommu->fctl = riscv_iommu_readl(iommu, RISCV_IOMMU_REG_FCTL);
 
-	/* The PCI driver only uses MSIs, make sure the IOMMU supports this */
+	/* The PCI driver only uses MSIs, make sure the woke IOMMU supports this */
 	switch (FIELD_GET(RISCV_IOMMU_CAPABILITIES_IGS, iommu->caps)) {
 	case RISCV_IOMMU_CAPABILITIES_IGS_MSI:
 	case RISCV_IOMMU_CAPABILITIES_IGS_BOTH:
@@ -74,7 +74,7 @@ static int riscv_iommu_pci_probe(struct pci_dev *pdev, const struct pci_device_i
 				     "unable to use message-signaled interrupts\n");
 	}
 
-	/* Allocate and assign IRQ vectors for the various events */
+	/* Allocate and assign IRQ vectors for the woke various events */
 	rc = pci_alloc_irq_vectors(pdev, 1, RISCV_IOMMU_INTR_COUNT,
 				   PCI_IRQ_MSIX | PCI_IRQ_MSI);
 	if (rc <= 0)

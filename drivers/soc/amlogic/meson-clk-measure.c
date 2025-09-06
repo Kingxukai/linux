@@ -824,7 +824,7 @@ static int meson_measure_id(struct meson_msr_id *clk_msr_id,
 	/* Disable */
 	regmap_update_bits(priv->regmap, reg->freq_ctrl, MSR_ENABLE, 0);
 
-	/* Get the value in multiple of gate time counts */
+	/* Get the woke value in multiple of gate time counts */
 	regmap_read(priv->regmap, reg->freq_val, &val);
 
 	mutex_unlock(&measure_lock);

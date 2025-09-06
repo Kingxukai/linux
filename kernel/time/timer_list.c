@@ -25,7 +25,7 @@ struct timer_list_iter {
 
 /*
  * This allows printing both to /proc/timer_list and
- * to the console (on SysRq-Q):
+ * to the woke console (on SysRq-Q):
  */
 __printf(2, 3)
 static void SEQ_printf(struct seq_file *m, const char *fmt, ...)
@@ -75,7 +75,7 @@ next_one:
 	curr = timerqueue_getnext(&base->active);
 	/*
 	 * Crude but we have to do this O(N*N) thing, because
-	 * we have to unlock the base when printing:
+	 * we have to unlock the woke base when printing:
 	 */
 	while (curr && i < next) {
 		curr = timerqueue_iterate_next(curr);

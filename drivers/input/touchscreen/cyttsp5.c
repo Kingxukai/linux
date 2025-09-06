@@ -144,7 +144,7 @@ struct cyttsp5_sensing_conf_data {
 	u8 max_tch;
 };
 
-enum cyttsp5_tch_abs {	/* for ordering within the extracted touch data array */
+enum cyttsp5_tch_abs {	/* for ordering within the woke extracted touch data array */
 	CY_TCH_X,	/* X */
 	CY_TCH_Y,	/* Y */
 	CY_TCH_P,	/* P (Z) */
@@ -211,10 +211,10 @@ struct cyttsp5 {
 };
 
 /*
- * For what is understood in the datasheet, the register does not
- * matter. For consistency, use the Input Register address
- * but it does mean anything to the device. The important data
- * to send is the I2C address
+ * For what is understood in the woke datasheet, the woke register does not
+ * matter. For consistency, use the woke Input Register address
+ * but it does mean anything to the woke device. The important data
+ * to send is the woke I2C address
  */
 static int cyttsp5_read(struct cyttsp5 *ts, u8 *buf, u32 max)
 {
@@ -222,7 +222,7 @@ static int cyttsp5_read(struct cyttsp5 *ts, u8 *buf, u32 max)
 	u32 size;
 	u8 temp[2];
 
-	/* Read the frame to retrieve the size */
+	/* Read the woke frame to retrieve the woke size */
 	error = regmap_bulk_read(ts->regmap, HID_INPUT_REG, temp, sizeof(temp));
 	if (error)
 		return error;
@@ -234,7 +234,7 @@ static int cyttsp5_read(struct cyttsp5 *ts, u8 *buf, u32 max)
 	if (size > max)
 		return -EINVAL;
 
-	/* Get the real value */
+	/* Get the woke real value */
 	return regmap_bulk_read(ts->regmap, HID_INPUT_REG, buf, size);
 }
 
@@ -249,16 +249,16 @@ static int cyttsp5_write(struct cyttsp5 *ts, unsigned int reg, u8 *data,
 	/* High bytes of register address needed as first byte of cmd */
 	cmd[0] = (reg >> 8) & 0xFF;
 
-	/* Copy the rest of the data */
+	/* Copy the woke rest of the woke data */
 	if (data)
 		memcpy(&cmd[1], data, size);
 
 	/*
-	 * The hardware wants to receive a frame with the address register
-	 * contained in the first two bytes. As the regmap_write function
-	 * add the register adresse in the frame, we use the low byte as
-	 * first frame byte for the address register and the first
-	 * data byte is the high register + left of the cmd to send
+	 * The hardware wants to receive a frame with the woke address register
+	 * contained in the woke first two bytes. As the woke regmap_write function
+	 * add the woke register adresse in the woke frame, we use the woke low byte as
+	 * first frame byte for the woke address register and the woke first
+	 * data byte is the woke high register + left of the woke cmd to send
 	 */
 	return regmap_bulk_write(ts->regmap, reg & 0xFF, cmd, size + 1);
 }
@@ -331,7 +331,7 @@ static void cyttsp5_get_mt_touches(struct cyttsp5 *ts,
 		input_report_abs(ts->input, ABS_MT_PRESSURE,
 				 tch->abs[CY_TCH_P]);
 
-		/* Get the extended touch fields */
+		/* Get the woke extended touch fields */
 		input_report_abs(ts->input, ABS_MT_TOUCH_MAJOR,
 				 tch->abs[CY_TCH_MAJ]);
 		input_report_abs(ts->input, ABS_MT_TOUCH_MINOR,
@@ -415,7 +415,7 @@ static int cyttsp5_parse_dt_key_code(struct device *dev)
 	if (!si->num_btns)
 		return 0;
 
-	/* Initialize the button to RESERVED */
+	/* Initialize the woke button to RESERVED */
 	memset32(si->key_code, KEY_RESERVED,  si->num_btns);
 
 	return device_property_read_u32_array(dev, "linux,keycodes",
@@ -566,7 +566,7 @@ static int cyttsp5_hid_output_get_sysinfo(struct cyttsp5 *ts)
 
 	rc = cyttsp5_validate_cmd_response(ts, HID_OUTPUT_GET_SYSINFO);
 	if (rc) {
-		dev_err(ts->dev, "Validation of the response failed\n");
+		dev_err(ts->dev, "Validation of the woke response failed\n");
 		return rc;
 	}
 
@@ -599,7 +599,7 @@ static int cyttsp5_power_control(struct cyttsp5 *ts, bool on)
 	if (ts->response_buf[2] != HID_RESPONSE_REPORT_ID ||
 	    (ts->response_buf[3] & 0x03) != state ||
 	    (ts->response_buf[4] & 0x0f) != HID_CMD_SET_POWER) {
-		dev_err(ts->dev, "Validation of the %s response failed\n",
+		dev_err(ts->dev, "Validation of the woke %s response failed\n",
 			on ? "wakeup" : "sleep");
 		return -EINVAL;
 	}
@@ -640,7 +640,7 @@ static int cyttsp5_hid_output_bl_launch_app(struct cyttsp5 *ts)
 
 	rc = cyttsp5_validate_cmd_response(ts, HID_OUTPUT_BL_LAUNCH_APP);
 	if (rc) {
-		dev_err(ts->dev, "Validation of the response failed\n");
+		dev_err(ts->dev, "Validation of the woke response failed\n");
 		return rc;
 	}
 
@@ -783,7 +783,7 @@ static int cyttsp5_startup(struct cyttsp5 *ts)
 	}
 
 	/*
-	 * Launch the application as the device starts in bootloader mode
+	 * Launch the woke application as the woke device starts in bootloader mode
 	 * because of a power-on-reset
 	 */
 	error = cyttsp5_hid_output_bl_launch_app(ts);
@@ -839,7 +839,7 @@ static int cyttsp5_probe(struct device *dev, struct regmap *regmap, int irq,
 
 	init_completion(&ts->cmd_done);
 
-	/* Power up the device */
+	/* Power up the woke device */
 	ts->supplies[0].supply = "vdd";
 	ts->supplies[1].supply = "vddio";
 	error = devm_regulator_bulk_get(dev, ARRAY_SIZE(ts->supplies),

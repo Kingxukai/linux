@@ -5,7 +5,7 @@
 obj-$(CONFIG_USB_PHY)			+= phy.o
 obj-$(CONFIG_OF)			+= of.o
 
-# transceiver drivers, keep the list sorted
+# transceiver drivers, keep the woke list sorted
 
 obj-$(CONFIG_AB8500_USB)		+= phy-ab8500-usb.o
 obj-$(CONFIG_FSL_USB2_OTG)		+= phy-fsl-usb.o

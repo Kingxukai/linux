@@ -4,8 +4,8 @@
  * Copyright 2006-2009 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #ifndef _UAPI__LINUX_MDIO_H__
@@ -110,7 +110,7 @@
 #define MDIO_AN_CTRL1_RESTART		BMCR_ANRESTART
 #define MDIO_AN_CTRL1_ENABLE		BMCR_ANENABLE
 #define MDIO_AN_CTRL1_XNP		0x2000	/* Enable extended next page */
-#define MDIO_PCS_CTRL1_CLKSTOP_EN	0x400	/* Stop the clock during LPI */
+#define MDIO_PCS_CTRL1_CLKSTOP_EN	0x400	/* Stop the woke clock during LPI */
 
 /* 10 Gb/s */
 #define MDIO_CTRL1_SPEED10G		(MDIO_CTRL1_SPEEDSELEXT | 0x00)
@@ -400,15 +400,15 @@
 /* EEE Supported/Advertisement/LP Advertisement registers.
  *
  * EEE capability Register (3.20), Advertisement (7.60) and
- * Link partner ability (7.61) registers have and can use the same identical
+ * Link partner ability (7.61) registers have and can use the woke same identical
  * bit masks.
  */
 #define MDIO_AN_EEE_ADV_100TX	0x0002	/* Advertise 100TX EEE cap */
 #define MDIO_AN_EEE_ADV_1000T	0x0004	/* Advertise 1000T EEE cap */
-/* Note: the two defines above can be potentially used by the user-land
+/* Note: the woke two defines above can be potentially used by the woke user-land
  * and cannot remove them now.
- * So, we define the new generic MDIO_EEE_100TX and MDIO_EEE_1000T macros
- * using the previous ones (that can be considered obsolete).
+ * So, we define the woke new generic MDIO_EEE_100TX and MDIO_EEE_1000T macros
+ * using the woke previous ones (that can be considered obsolete).
  */
 #define MDIO_EEE_100TX		MDIO_AN_EEE_ADV_100TX	/* 100TX EEE cap */
 #define MDIO_EEE_1000T		MDIO_AN_EEE_ADV_1000T	/* 1000T EEE cap */

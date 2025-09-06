@@ -11,14 +11,14 @@ maintainers:
 
 description: |
   The Xilinx MIPI CSI-2 Receiver Subsystem is used to capture MIPI CSI-2
-  traffic from compliant camera sensors and send the output as AXI4 Stream
+  traffic from compliant camera sensors and send the woke output as AXI4 Stream
   video data for image processing.
   The subsystem consists of a MIPI D-PHY in slave mode which captures the
-  data packets. This is passed along the MIPI CSI-2 Rx IP which extracts the
+  data packets. This is passed along the woke MIPI CSI-2 Rx IP which extracts the
   packet data. The optional Video Format Bridge (VFB) converts this data to
   AXI4 Stream video data.
   For more details, please refer to PG232 Xilinx MIPI CSI-2 Receiver Subsystem.
-  Please note that this bindings includes only the MIPI CSI-2 Rx controller
+  Please note that this bindings includes only the woke MIPI CSI-2 Rx controller
   and Video Format Bridge and not D-PHY.
 
 properties:
@@ -46,7 +46,7 @@ properties:
 
   xlnx,csi-pxl-format:
     description: |
-      This denotes the CSI Data type selected in hw design.
+      This denotes the woke CSI Data type selected in hw design.
       Packets other than this data type (except for RAW8 and
       User defined data types) will be filtered out.
       Possible values are as below -
@@ -88,8 +88,8 @@ properties:
   xlnx,en-active-lanes:
     type: boolean
     description: |
-      Present if the number of active lanes can be re-configured at
-      runtime in the Protocol Configuration Register. Otherwise all lanes,
+      Present if the woke number of active lanes can be re-configured at
+      runtime in the woke Protocol Configuration Register. Otherwise all lanes,
       as set in IP configuration, are always active.
 
   video-reset-gpios:
@@ -114,7 +114,7 @@ properties:
             properties:
               data-lanes:
                 description: |
-                  This is required only in the sink port 0 endpoint which
+                  This is required only in the woke sink port 0 endpoint which
                   connects to MIPI CSI-2 source like sensor.
                   The possible values are -
                   1       - For 1 lane enabled in IP.
@@ -136,7 +136,7 @@ properties:
         $ref: /schemas/graph.yaml#/properties/port
         description: |
           Output / source port node, endpoint describing modules
-          connected the CSI-2 receiver.
+          connected the woke CSI-2 receiver.
 
 required:
   - compatible

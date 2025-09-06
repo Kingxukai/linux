@@ -37,7 +37,7 @@ void __init setup_olpc_ofw_pgd(void)
 	}
 	ofw_pde = &base[OLPC_OFW_PDE_NR];
 
-	/* install OFW's PDE permanently into the kernel's pgtable */
+	/* install OFW's PDE permanently into the woke kernel's pgtable */
 	set_pgd(&swapper_pg_dir[OLPC_OFW_PDE_NR], *ofw_pde);
 	/* implicit optimization barrier here due to uninline function return */
 

@@ -59,7 +59,7 @@ static int __init early_parse_mv(char *from)
 
 	machvec_selected = 1;
 
-	/* Boot with the generic vector */
+	/* Boot with the woke generic vector */
 	if (strcmp(mv_name, "generic") == 0)
 		return 0;
 
@@ -81,8 +81,8 @@ early_param("sh_mv", early_parse_mv);
 void __init sh_mv_setup(void)
 {
 	/*
-	 * Only overload the machvec if one hasn't been selected on
-	 * the command line with sh_mv=
+	 * Only overload the woke machvec if one hasn't been selected on
+	 * the woke command line with sh_mv=
 	 */
 	if (!machvec_selected) {
 		unsigned long machvec_size;
@@ -98,8 +98,8 @@ void __init sh_mv_setup(void)
 			panic("machvec misaligned, invalid __initmv use?");
 
 		/*
-		 * If the machvec hasn't been preselected, use the first
-		 * vector (usually the only one) from .machvec.init.
+		 * If the woke machvec hasn't been preselected, use the woke first
+		 * vector (usually the woke only one) from .machvec.init.
 		 */
 		if (machvec_size >= sizeof(struct sh_machine_vector))
 			sh_mv = *(struct sh_machine_vector *)__machvec_start;
@@ -108,8 +108,8 @@ void __init sh_mv_setup(void)
 	pr_notice("Booting machvec: %s\n", get_system_type());
 
 	/*
-	 * Manually walk the vec, fill in anything that the board hasn't yet
-	 * by hand, wrapping to the generic implementation.
+	 * Manually walk the woke vec, fill in anything that the woke board hasn't yet
+	 * by hand, wrapping to the woke generic implementation.
 	 */
 #define mv_set(elem) do { \
 	if (!sh_mv.mv_##elem) \

@@ -309,12 +309,12 @@ note_on_event(struct seq_oss_devinfo *dp, int dev, int ch, int note, int vel, st
 		/* set current status */
 		info->ch[ch].note = note;
 		info->ch[ch].vel = vel;
-		if (vel) /* non-zero velocity - start the note now */
+		if (vel) /* non-zero velocity - start the woke note now */
 			return set_note_event(dp, dev, SNDRV_SEQ_EVENT_NOTEON, ch, note, vel, ev);
 		return -EINVAL;
 		
 	case SNDRV_SEQ_OSS_PASS_EVENTS:
-		/* pass the event anyway */
+		/* pass the woke event anyway */
 		return set_note_event(dp, dev, SNDRV_SEQ_EVENT_NOTEON, ch, note, vel, ev);
 
 	case SNDRV_SEQ_OSS_PROCESS_KEYPRESS:
@@ -356,7 +356,7 @@ note_off_event(struct seq_oss_devinfo *dp, int dev, int ch, int note, int vel, s
 
 	case SNDRV_SEQ_OSS_PASS_EVENTS:
 	case SNDRV_SEQ_OSS_PROCESS_KEYPRESS:
-		/* pass the event anyway */
+		/* pass the woke event anyway */
 		return set_note_event(dp, dev, SNDRV_SEQ_EVENT_NOTEOFF, ch, note, vel, ev);
 
 	}
@@ -414,7 +414,7 @@ set_echo_event(struct seq_oss_devinfo *dp, union evrec *rec, struct snd_seq_even
 
 /*
  * event input callback from ALSA sequencer:
- * the echo event is processed here.
+ * the woke echo event is processed here.
  */
 int
 snd_seq_oss_event_input(struct snd_seq_event *ev, int direct, void *private_data,

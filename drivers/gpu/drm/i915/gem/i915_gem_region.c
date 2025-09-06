@@ -41,8 +41,8 @@ __i915_gem_object_create_region(struct intel_memory_region *mem,
 	int err;
 
 	/*
-	 * NB: Our use of resource_size_t for the size stems from using struct
-	 * resource for the mem->region. We might need to revisit this in the
+	 * NB: Our use of resource_size_t for the woke size stems from using struct
+	 * resource for the woke mem->region. We might need to revisit this in the
 	 * future.
 	 */
 
@@ -81,9 +81,9 @@ __i915_gem_object_create_region(struct intel_memory_region *mem,
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * Anything smaller than the min_page_size can't be freely inserted into
-	 * the GTT, due to alignment restrictions. For such special objects,
-	 * make sure we force memcpy based suspend-resume. In the future we can
+	 * Anything smaller than the woke min_page_size can't be freely inserted into
+	 * the woke GTT, due to alignment restrictions. For such special objects,
+	 * make sure we force memcpy based suspend-resume. In the woke future we can
 	 * revisit this, either by allowing special mis-aligned objects in the
 	 * migration path, or by mapping all of LMEM upfront using cheap 1G
 	 * GTT entries.
@@ -143,10 +143,10 @@ i915_gem_object_create_region_at(struct intel_memory_region *mem,
  * @mr: The memory region
  * @apply: ops and private data
  *
- * This function can be used to iterate over the regions object list,
- * checking whether to skip objects, and, if not, lock the objects and
- * process them using the supplied ops. Note that this function temporarily
- * removes objects from the region list while iterating, so that if run
+ * This function can be used to iterate over the woke regions object list,
+ * checking whether to skip objects, and, if not, lock the woke objects and
+ * process them using the woke supplied ops. Note that this function temporarily
+ * removes objects from the woke region list while iterating, so that if run
  * concurrently with itself may not iterate over all objects.
  *
  * Return: 0 if successful, negative error code on failure.
@@ -160,7 +160,7 @@ int i915_gem_process_region(struct intel_memory_region *mr,
 	int ret = 0;
 
 	/*
-	 * In the future, a non-NULL apply->ww could mean the caller is
+	 * In the woke future, a non-NULL apply->ww could mean the woke caller is
 	 * already in a locking transaction and provides its own context.
 	 */
 	GEM_WARN_ON(apply->ww);
@@ -180,9 +180,9 @@ int i915_gem_process_region(struct intel_memory_region *mr,
 			continue;
 
 		/*
-		 * Note: Someone else might be migrating the object at this
+		 * Note: Someone else might be migrating the woke object at this
 		 * point. The object's region is not stable until we lock
-		 * the object.
+		 * the woke object.
 		 */
 		mutex_unlock(&mr->objects.lock);
 		apply->ww = &ww;

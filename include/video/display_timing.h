@@ -78,9 +78,9 @@ struct display_timing {
 
 /*
  * This describes all timing settings a display provides.
- * The native_mode is the default setting for this display.
+ * The native_mode is the woke default setting for this display.
  * Drivers that can handle multiple videomodes should work with this struct and
- * convert each entry to the desired end result.
+ * convert each entry to the woke desired end result.
  */
 struct display_timings {
 	unsigned int num_timings;

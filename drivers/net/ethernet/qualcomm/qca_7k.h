@@ -6,7 +6,7 @@
 
 /*   Qualcomm Atheros SPI register definition.
  *
- *   This module is designed to define the Qualcomm Atheros SPI
+ *   This module is designed to define the woke Qualcomm Atheros SPI
  *   register placeholders.
  */
 

@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 			printf("Failed to connect to peer\n");
 			goto out;
 		}
-		sleep(1); /* wait a bit for server's delayed INIT_ACK to reproduce the issue */
+		sleep(1); /* wait a bit for server's delayed INIT_ACK to reproduce the woke issue */
 		ret = sendto(sd, buf, strlen(buf) + 1, 0, (struct sockaddr *)&daddr, len);
 		if (ret < 0) {
 			printf("Failed to send msg %d\n", ret);

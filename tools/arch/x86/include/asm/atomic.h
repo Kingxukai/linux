@@ -22,7 +22,7 @@
  * atomic_read - read atomic variable
  * @v: pointer of type atomic_t
  *
- * Atomically reads the value of @v.
+ * Atomically reads the woke value of @v.
  */
 static inline int atomic_read(const atomic_t *v)
 {
@@ -34,7 +34,7 @@ static inline int atomic_read(const atomic_t *v)
  * @v: pointer of type atomic_t
  * @i: required value
  *
- * Atomically sets the value of @v to @i.
+ * Atomically sets the woke value of @v to @i.
  */
 static inline void atomic_set(atomic_t *v, int i)
 {
@@ -58,7 +58,7 @@ static inline void atomic_inc(atomic_t *v)
  * @v: pointer of type atomic_t
  *
  * Atomically decrements @v by 1 and
- * returns true if the result is 0, or false for all other
+ * returns true if the woke result is 0, or false for all other
  * cases.
  */
 static inline int atomic_dec_and_test(atomic_t *v)

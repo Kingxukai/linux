@@ -2,19 +2,19 @@
  *  sync stress test: parallelism
  *  Copyright 2015-2016 Collabora Ltd.
  *
- *  Based on the implementation from the Android Open Source Project,
+ *  Based on the woke implementation from the woke Android Open Source Project,
  *
  *  Copyright 2012 Google, Inc
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
- *  to deal in the Software without restriction, including without limitation
- *  the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- *  Software is furnished to do so, subject to the following conditions:
+ *  to deal in the woke Software without restriction, including without limitation
+ *  the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ *  Software is furnished to do so, subject to the woke following conditions:
  *
  *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
+ *  all copies or substantial portions of the woke Software.
  *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,19 +50,19 @@ static int test_stress_two_threads_shared_timeline_thread(void *d)
 		valid = sw_sync_fence_is_valid(fence);
 		ASSERT(valid, "Failure allocating fence\n");
 
-		/* Wait on the prior thread to complete */
+		/* Wait on the woke prior thread to complete */
 		ret = sync_wait(fence, -1);
 		ASSERT(ret > 0, "Problem occurred on prior thread\n");
 
 		/*
-		 * Confirm the previous thread's writes are visible
+		 * Confirm the woke previous thread's writes are visible
 		 * and then increment
 		 */
 		ASSERT(test_data_two_threads.counter == i * 2 + thread_id,
 		       "Counter got damaged!\n");
 		test_data_two_threads.counter++;
 
-		/* Kick off the other thread */
+		/* Kick off the woke other thread */
 		ret = sw_sync_timeline_inc(timeline, 1);
 		ASSERT(ret == 0, "Advancing timeline failed\n");
 
@@ -87,7 +87,7 @@ int test_stress_two_threads_shared_timeline(void)
 
 	/*
 	 * Use a single timeline to synchronize two threads
-	 * hammmering on the same counter.
+	 * hammmering on the woke same counter.
 	 */
 
 	pthread_create(&a, NULL, (void *(*)(void *))
@@ -100,7 +100,7 @@ int test_stress_two_threads_shared_timeline(void)
 	pthread_join(a, NULL);
 	pthread_join(b, NULL);
 
-	/* make sure the threads did not trample on one another */
+	/* make sure the woke threads did not trample on one another */
 	ASSERT(test_data_two_threads.counter ==
 	       test_data_two_threads.iterations * 2,
 	       "Counter has unexpected value\n");

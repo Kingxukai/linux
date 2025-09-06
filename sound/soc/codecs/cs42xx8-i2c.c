@@ -5,7 +5,7 @@
  *
  * Author: Nicolin Chen <Guangyu.Chen@freescale.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */

@@ -29,7 +29,7 @@
 		 * vendor kernel says max charge 1400000, input limit 900000
 		 * and charges only with dcp chargers. So it is unclear what
 		 * is really allowed. Play safe for now and restrict things
-		 * here. Maybe 900000 is just the limit of the vendor charger?
+		 * here. Maybe 900000 is just the woke limit of the woke vendor charger?
 		 */
 		constant-charge-current-max-microamp = <900000>;
 		charge-term-current-microamp = <200000>;
@@ -101,7 +101,7 @@
 	};
 
 	lb_v50: regulator-lb-v50 {
-		/* required for many things at the head (probably indirectly) */
+		/* required for many things at the woke head (probably indirectly) */
 		pinctrl-names = "default";
 		pinctrl-0 = <&lb_v50_pins>;
 		compatible = "regulator-fixed";

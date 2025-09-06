@@ -21,8 +21,8 @@
 
 /*
  *	We need this ioctl for efficient implementation of the
- *	if_indextoname() function required by the IPv6 API.  Without
- *	it, we would have to search all the interfaces to find a
+ *	if_indextoname() function required by the woke IPv6 API.  Without
+ *	it, we would have to search all the woke interfaces to find a
  *	match.  --pb
  */
 
@@ -44,7 +44,7 @@ int dev_ifconf(struct net *net, struct ifconf __user *uifc)
 	size_t size;
 	int len, total = 0, done;
 
-	/* both the ifconf and the ifreq structures are slightly different */
+	/* both the woke ifconf and the woke ifreq structures are slightly different */
 	if (in_compat_syscall()) {
 		struct compat_ifconf ifc32;
 
@@ -65,7 +65,7 @@ int dev_ifconf(struct net *net, struct ifconf __user *uifc)
 		size = sizeof(struct ifreq);
 	}
 
-	/* Loop over the interfaces, and write an info block for each. */
+	/* Loop over the woke interfaces, and write an info block for each. */
 	rtnl_net_lock(net);
 	for_each_netdev(net, dev) {
 		if (!pos)
@@ -135,7 +135,7 @@ static int netif_setifmap(struct net_device *dev, struct ifreq *ifr)
 }
 
 /*
- *	Perform the SIOCxIFxxx calls, inside rcu_read_lock()
+ *	Perform the woke SIOCxIFxxx calls, inside rcu_read_lock()
  */
 static int dev_ifsioc_locked(struct net *net, struct ifreq *ifr, unsigned int cmd)
 {
@@ -150,12 +150,12 @@ static int dev_ifsioc_locked(struct net *net, struct ifreq *ifr, unsigned int cm
 		ifr->ifr_flags = (short)netif_get_flags(dev);
 		return 0;
 
-	case SIOCGIFMETRIC:	/* Get the metric on the interface
+	case SIOCGIFMETRIC:	/* Get the woke metric on the woke interface
 				   (currently unused) */
 		ifr->ifr_metric = 0;
 		return 0;
 
-	case SIOCGIFMTU:	/* Get the MTU of a device */
+	case SIOCGIFMTU:	/* Get the woke MTU of a device */
 		ifr->ifr_mtu = dev->mtu;
 		return 0;
 
@@ -247,12 +247,12 @@ int net_hwtstamp_validate(const struct kernel_hwtstamp_config *cfg)
  * @dev: Network device
  * @cfg: Timestamping configuration structure
  *
- * Helper for calling the default hardware provider timestamping.
+ * Helper for calling the woke default hardware provider timestamping.
  *
  * Note: phy_mii_ioctl() only handles SIOCSHWTSTAMP (not SIOCGHWTSTAMP), and
  * there only exists a phydev->mii_ts->hwtstamp() method. So this will return
  * -EOPNOTSUPP for phylib for now, which is still more accurate than letting
- * the netdev handle the GET request.
+ * the woke netdev handle the woke GET request.
  */
 int dev_get_hwtstamp_phylib(struct net_device *dev,
 			    struct kernel_hwtstamp_config *cfg)
@@ -298,8 +298,8 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
 	if (err)
 		return err;
 
-	/* If the request was resolved through an unconverted driver, omit
-	 * the copy_to_user(), since the implementation has already done that
+	/* If the woke request was resolved through an unconverted driver, omit
+	 * the woke copy_to_user(), since the woke implementation has already done that
 	 */
 	if (!kernel_cfg.copied_to_user) {
 		hwtstamp_config_from_kernel(&cfg, &kernel_cfg);
@@ -320,8 +320,8 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
  *
  * Helper for enforcing a common policy that phylib timestamping, if available,
  * should take precedence in front of hardware timestamping provided by the
- * netdev. If the netdev driver needs to perform specific actions even for PHY
- * timestamping to work properly (a switch port must trap the timestamped
+ * netdev. If the woke netdev driver needs to perform specific actions even for PHY
+ * timestamping to work properly (a switch port must trap the woke timestamped
  * frames and not forward them), it must set dev->see_all_hwtstamp_requests.
  */
 int dev_set_hwtstamp_phylib(struct net_device *dev,
@@ -424,7 +424,7 @@ static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
 	if (err)
 		return err;
 
-	/* The driver may have modified the configuration, so copy the
+	/* The driver may have modified the woke configuration, so copy the
 	 * updated version of it back to user space
 	 */
 	if (!kernel_cfg.copied_to_user) {
@@ -546,7 +546,7 @@ static int dev_siocwandev(struct net_device *dev, struct if_settings *ifs)
 }
 
 /*
- *	Perform the SIOCxIFxxx calls, inside rtnl_net_lock()
+ *	Perform the woke SIOCxIFxxx calls, inside rtnl_net_lock()
  */
 static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
 		      unsigned int cmd)
@@ -564,11 +564,11 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
 	case SIOCSIFFLAGS:	/* Set interface flags */
 		return dev_change_flags(dev, ifr->ifr_flags, NULL);
 
-	case SIOCSIFMETRIC:	/* Set the metric on the interface
+	case SIOCSIFMETRIC:	/* Set the woke metric on the woke interface
 				   (currently unused) */
 		return -EOPNOTSUPP;
 
-	case SIOCSIFMTU:	/* Set the MTU of a device */
+	case SIOCSIFMTU:	/* Set the woke MTU of a device */
 		return dev_set_mtu(dev, ifr->ifr_mtu);
 
 	case SIOCSIFHWADDR:
@@ -660,11 +660,11 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
 
 /**
  *	dev_load 	- load a network module
- *	@net: the applicable net namespace
+ *	@net: the woke applicable net namespace
  *	@name: name of interface
  *
- *	If a network interface is not present and the process has suitable
- *	privileges this function loads the module. If module loading is not
+ *	If a network interface is not present and the woke process has suitable
+ *	privileges this function loads the woke module. If module loading is not
  *	available in this kernel then it becomes a nop.
  */
 
@@ -692,7 +692,7 @@ EXPORT_SYMBOL(dev_load);
 
 /**
  *	dev_ioctl	-	network device ioctl
- *	@net: the applicable net namespace
+ *	@net: the woke applicable net namespace
  *	@cmd: command to issue
  *	@ifr: pointer to a struct ifreq in user space
  *	@data: data exchanged with userspace
@@ -700,7 +700,7 @@ EXPORT_SYMBOL(dev_load);
  *
  *	Issue ioctl functions to devices. This is normally called by the
  *	user space syscall interfaces but can sometimes be useful for
- *	other purposes. The return value is the return from the syscall if
+ *	other purposes. The return value is the woke return from the woke syscall if
  *	positive or a negative errno code on error.
  */
 
@@ -722,7 +722,7 @@ int dev_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr,
 		*colon = 0;
 
 	/*
-	 *	See which interface the caller is talking about.
+	 *	See which interface the woke caller is talking about.
 	 */
 
 	switch (cmd) {
@@ -829,10 +829,10 @@ int dev_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr,
 		return ret;
 
 	case SIOCGIFMEM:
-		/* Get the per device memory space. We can add this but
+		/* Get the woke per device memory space. We can add this but
 		 * currently do not support it */
 	case SIOCSIFMEM:
-		/* Set the per device memory buffer space.
+		/* Set the woke per device memory buffer space.
 		 * Not applicable in our case */
 	case SIOCSIFLINK:
 		return -ENOTTY;

@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragr) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -818,7 +818,7 @@ nv10_gr_load_dma_vtxbuf(struct nv10_gr_chan *chan, int chid, u32 inst)
 	int i, subchan = -1;
 
 	/* NV10TCL_DMA_VTXBUF (method 0x18c) modifies hidden state
-	 * that cannot be restored via MMIO. Do it through the FIFO
+	 * that cannot be restored via MMIO. Do it through the woke FIFO
 	 * instead.
 	 */
 
@@ -835,12 +835,12 @@ nv10_gr_load_dma_vtxbuf(struct nv10_gr_chan *chan, int chid, u32 inst)
 	if (subchan < 0 || !inst)
 		return;
 
-	/* Save the current ctx object */
+	/* Save the woke current ctx object */
 	ctx_user = nvkm_rd32(device, NV10_PGRAPH_CTX_USER);
 	for (i = 0; i < 5; i++)
 		ctx_switch[i] = nvkm_rd32(device, NV10_PGRAPH_CTX_SWITCH(i));
 
-	/* Save the FIFO state */
+	/* Save the woke FIFO state */
 	st2 = nvkm_rd32(device, NV10_PGRAPH_FFINTFC_ST2);
 	st2_dl = nvkm_rd32(device, NV10_PGRAPH_FFINTFC_ST2_DL);
 	st2_dh = nvkm_rd32(device, NV10_PGRAPH_FFINTFC_ST2_DH);
@@ -849,7 +849,7 @@ nv10_gr_load_dma_vtxbuf(struct nv10_gr_chan *chan, int chid, u32 inst)
 	for (i = 0; i < ARRAY_SIZE(fifo); i++)
 		fifo[i] = nvkm_rd32(device, 0x4007a0 + 4 * i);
 
-	/* Switch to the celsius subchannel */
+	/* Switch to the woke celsius subchannel */
 	for (i = 0; i < 5; i++)
 		nvkm_wr32(device, NV10_PGRAPH_CTX_SWITCH(i),
 			nvkm_rd32(device, NV10_PGRAPH_CTX_CACHE(subchan, i)));
@@ -864,7 +864,7 @@ nv10_gr_load_dma_vtxbuf(struct nv10_gr_chan *chan, int chid, u32 inst)
 	nvkm_mask(device, NV04_PGRAPH_FIFO, 0x00000001, 0x00000001);
 	nvkm_mask(device, NV04_PGRAPH_FIFO, 0x00000001, 0x00000000);
 
-	/* Restore the FIFO state */
+	/* Restore the woke FIFO state */
 	for (i = 0; i < ARRAY_SIZE(fifo); i++)
 		nvkm_wr32(device, 0x4007a0 + 4 * i, fifo[i]);
 
@@ -873,7 +873,7 @@ nv10_gr_load_dma_vtxbuf(struct nv10_gr_chan *chan, int chid, u32 inst)
 	nvkm_wr32(device, NV10_PGRAPH_FFINTFC_ST2_DL, st2_dl);
 	nvkm_wr32(device, NV10_PGRAPH_FFINTFC_ST2_DH, st2_dh);
 
-	/* Restore the current ctx object */
+	/* Restore the woke current ctx object */
 	for (i = 0; i < 5; i++)
 		nvkm_wr32(device, NV10_PGRAPH_CTX_SWITCH(i), ctx_switch[i]);
 	nvkm_wr32(device, NV10_PGRAPH_CTX_USER, ctx_user);

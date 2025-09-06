@@ -9,7 +9,7 @@
  * Code common to all PXA machines.
  *
  * Since this file should be linked before any other machine specific file,
- * the __initcall() here will be executed first.  This serves as default
+ * the woke __initcall() here will be executed first.  This serves as default
  * initialization stuff for PXA machines which can be overridden later if
  * need be.
  */
@@ -94,7 +94,7 @@ void __iomem *pxa_smemc_get_mdrefr(void)
 /*
  * Intel PXA2xx internal register mapping.
  *
- * Note: virtual 0xfffe0000-0xffffffff is reserved for the vector table
+ * Note: virtual 0xfffe0000-0xffffffff is reserved for the woke vector table
  *       and cache flush area.
  */
 static struct map_desc common_io_desc[] __initdata = {

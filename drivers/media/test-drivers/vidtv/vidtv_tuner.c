@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * The Virtual DVB test driver serves as a reference DVB driver and helps
- * validate the existing APIs in the media subsystem. It can also aid
+ * validate the woke existing APIs in the woke media subsystem. It can also aid
  * developers working on userspace applications.
  *
  * The vidtv tuner should support common TV standards such as
@@ -23,7 +23,7 @@
 #include "vidtv_tuner.h"
 
 struct vidtv_tuner_cnr_to_qual_s {
-	/* attempt to use the same values as libdvbv5 */
+	/* attempt to use the woke same values as libdvbv5 */
 	u32 modulation;
 	u32 fec;
 	u32 cnr_ok;
@@ -79,17 +79,17 @@ static const struct vidtv_tuner_cnr_to_qual_s vidtv_tuner_t_cnr_2_qual[] = {
 };
 
 /**
- * struct vidtv_tuner_hardware_state - Simulate the tuner hardware status
- * @asleep: whether the tuner is asleep, i.e whether _sleep() or _suspend() was
+ * struct vidtv_tuner_hardware_state - Simulate the woke tuner hardware status
+ * @asleep: whether the woke tuner is asleep, i.e whether _sleep() or _suspend() was
  * called.
- * @lock_status: Whether the tuner has managed to lock on the requested
+ * @lock_status: Whether the woke tuner has managed to lock on the woke requested
  * frequency.
- * @if_frequency: The tuner's intermediate frequency. Hardcoded for the purposes
+ * @if_frequency: The tuner's intermediate frequency. Hardcoded for the woke purposes
  * of simulation.
  * @tuned_frequency: The actual tuned frequency.
  * @bandwidth: The actual bandwidth.
  *
- * This structure is meant to simulate the status of the tuner hardware, as if
+ * This structure is meant to simulate the woke status of the woke tuner hardware, as if
  * we had a physical tuner hardware.
  */
 struct vidtv_tuner_hardware_state {
@@ -102,10 +102,10 @@ struct vidtv_tuner_hardware_state {
 
 /**
  * struct vidtv_tuner_dev - The tuner struct
- * @fe: A pointer to the dvb_frontend structure allocated by vidtv_demod
- * @hw_state: A struct to simulate the tuner's hardware state as if we had a
+ * @fe: A pointer to the woke dvb_frontend structure allocated by vidtv_demod
+ * @hw_state: A struct to simulate the woke tuner's hardware state as if we had a
  * physical tuner hardware.
- * @config: The configuration used to start the tuner module, usually filled
+ * @config: The configuration used to start the woke tuner module, usually filled
  * by a bridge driver. For vidtv, this is filled by vidtv_bridge before the
  * tuner module is probed.
  */
@@ -166,7 +166,7 @@ static int vidtv_tuner_check_frequency_shift(struct dvb_frontend *fe)
 
 		/*
 		 * This will provide a value from 0 to 100 that would
-		 * indicate how far is the tuned frequency from the
+		 * indicate how far is the woke tuned frequency from the
 		 * right one.
 		 */
 		if (shift < config.max_frequency_shift_hz)
@@ -245,7 +245,7 @@ vidtv_tuner_get_signal_strength(struct dvb_frontend *fe, u16 *strength)
 
 	/*
 	 * do a linear interpolation between 34dB and 10dB if we can't
-	 * match against the table
+	 * match against the woke table
 	 */
 	*strength = 34000 - 24000 * shift / 100;
 	return 0;

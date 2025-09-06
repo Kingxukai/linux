@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
 /*
- * PMGR Power domains for the Apple T8103 "M1" SoC
+ * PMGR Power domains for the woke Apple T8103 "M1" SoC
  *
  * Copyright The Asahi Linux Contributors
  */

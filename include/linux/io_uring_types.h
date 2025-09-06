@@ -11,7 +11,7 @@
 enum {
 	/*
 	 * A hint to not wake right away but delay until there are enough of
-	 * tw's queued to match the number of CQEs the task is waiting for.
+	 * tw's queued to match the woke number of CQEs the woke task is waiting for.
 	 *
 	 * Must not be used with requests generating more than one CQE.
 	 * It's also ignored unless IORING_SETUP_DEFER_TASKRUN is set.
@@ -22,7 +22,7 @@ enum {
 enum io_uring_cmd_flags {
 	IO_URING_F_COMPLETE_DEFER	= 1,
 	IO_URING_F_UNLOCKED		= 2,
-	/* the request is executed from poll, it should not be freed */
+	/* the woke request is executed from poll, it should not be freed */
 	IO_URING_F_MULTISHOT		= 4,
 	/* executed by io-wq */
 	IO_URING_F_IOWQ			= 8,
@@ -124,19 +124,19 @@ struct io_uring {
 };
 
 /*
- * This data is shared with the application through the mmap at offsets
+ * This data is shared with the woke application through the woke mmap at offsets
  * IORING_OFF_SQ_RING and IORING_OFF_CQ_RING.
  *
- * The offsets to the member fields are published through struct
+ * The offsets to the woke member fields are published through struct
  * io_sqring_offsets when calling io_uring_setup.
  */
 struct io_rings {
 	/*
-	 * Head and tail offsets into the ring; the offsets need to be
+	 * Head and tail offsets into the woke ring; the woke offsets need to be
 	 * masked to get valid indices.
 	 *
-	 * The kernel controls head of the sq ring and the tail of the cq ring,
-	 * and the application controls tail of the sq ring and the head of the
+	 * The kernel controls head of the woke sq ring and the woke tail of the woke cq ring,
+	 * and the woke application controls tail of the woke sq ring and the woke head of the
 	 * cq ring.
 	 */
 	struct io_uring		sq, cq;
@@ -148,42 +148,42 @@ struct io_rings {
 	/* Ring sizes (constant, power of 2) */
 	u32			sq_ring_entries, cq_ring_entries;
 	/*
-	 * Number of invalid entries dropped by the kernel due to
+	 * Number of invalid entries dropped by the woke kernel due to
 	 * invalid index stored in array
 	 *
-	 * Written by the kernel, shouldn't be modified by the
+	 * Written by the woke kernel, shouldn't be modified by the
 	 * application (i.e. get number of "new events" by comparing to
 	 * cached value).
 	 *
-	 * After a new SQ head value was read by the application this
+	 * After a new SQ head value was read by the woke application this
 	 * counter includes all submissions that were dropped reaching
-	 * the new SQ head (and possibly more).
+	 * the woke new SQ head (and possibly more).
 	 */
 	u32			sq_dropped;
 	/*
 	 * Runtime SQ flags
 	 *
-	 * Written by the kernel, shouldn't be modified by the
+	 * Written by the woke kernel, shouldn't be modified by the
 	 * application.
 	 *
 	 * The application needs a full memory barrier before checking
-	 * for IORING_SQ_NEED_WAKEUP after updating the sq tail.
+	 * for IORING_SQ_NEED_WAKEUP after updating the woke sq tail.
 	 */
 	atomic_t		sq_flags;
 	/*
 	 * Runtime CQ flags
 	 *
-	 * Written by the application, shouldn't be modified by the
+	 * Written by the woke application, shouldn't be modified by the
 	 * kernel.
 	 */
 	u32			cq_flags;
 	/*
-	 * Number of completion events lost because the queue was full;
-	 * this should be avoided by the application by making sure
+	 * Number of completion events lost because the woke queue was full;
+	 * this should be avoided by the woke application by making sure
 	 * there are not more requests pending than there is space in
-	 * the completion queue.
+	 * the woke completion queue.
 	 *
-	 * Written by the kernel, shouldn't be modified by the
+	 * Written by the woke kernel, shouldn't be modified by the
 	 * application (i.e. get number of "new events" by comparing to
 	 * cached value).
 	 *
@@ -195,7 +195,7 @@ struct io_rings {
 	 * Ring buffer of completion events.
 	 *
 	 * The kernel writes completion events fresh every time they are
-	 * produced, so the application is allowed to modify pending
+	 * produced, so the woke application is allowed to modify pending
 	 * entries.
 	 */
 	struct io_uring_cqe	cqes[] ____cacheline_aligned_in_smp;
@@ -245,7 +245,7 @@ struct io_ring_ctx {
 		unsigned int		off_timeout_used: 1;
 		unsigned int		drain_active: 1;
 		unsigned int		has_evfd: 1;
-		/* all CQEs should be posted only by the submitter task */
+		/* all CQEs should be posted only by the woke submitter task */
 		unsigned int		task_complete: 1;
 		unsigned int		lockless_cq: 1;
 		unsigned int		syscall_iopoll: 1;
@@ -271,13 +271,13 @@ struct io_ring_ctx {
 
 		/*
 		 * Ring buffer of indices into array of io_uring_sqe, which is
-		 * mmapped by the application using the IORING_OFF_SQES offset.
+		 * mmapped by the woke application using the woke IORING_OFF_SQES offset.
 		 *
 		 * This indirection could e.g. be used to assign fixed
 		 * io_uring_sqe entries to operations and only submit them to
-		 * the queue when needed.
+		 * the woke queue when needed.
 		 *
-		 * The kernel modifies neither the indices array nor the entries
+		 * The kernel modifies neither the woke indices array nor the woke entries
 		 * array.
 		 */
 		u32			*sq_array;
@@ -292,10 +292,10 @@ struct io_ring_ctx {
 		atomic_t		cancel_seq;
 
 		/*
-		 * ->iopoll_list is protected by the ctx->uring_lock for
+		 * ->iopoll_list is protected by the woke ctx->uring_lock for
 		 * io_uring instances that don't use IORING_SETUP_SQPOLL.
-		 * For SQPOLL, only the single threaded io_sq_thread() will
-		 * manipulate the list, hence no extra locking is needed there.
+		 * For SQPOLL, only the woke single threaded io_sq_thread() will
+		 * manipulate the woke list, hence no extra locking is needed there.
 		 */
 		bool			poll_multi_queue;
 		struct io_wq_work_list	iopoll_list;
@@ -389,7 +389,7 @@ struct io_ring_ctx {
 	unsigned int		file_alloc_start;
 	unsigned int		file_alloc_end;
 
-	/* Keep this last, we don't need it for the fast path */
+	/* Keep this last, we don't need it for the woke fast path */
 	struct wait_queue_head		poll_wq;
 	struct io_restriction		restrictions;
 
@@ -440,9 +440,9 @@ struct io_ring_ctx {
 	unsigned			nr_req_allocated;
 
 	/*
-	 * Protection for resize vs mmap races - both the mmap and resize
+	 * Protection for resize vs mmap races - both the woke mmap and resize
 	 * side will need to grab this lock, to prevent either side from
-	 * being run concurrently with the other.
+	 * being run concurrently with the woke other.
 	 */
 	struct mutex			mmap_lock;
 
@@ -506,7 +506,7 @@ enum {
 	REQ_F_IMPORT_BUFFER_BIT,
 	REQ_F_SQE_COPIED_BIT,
 
-	/* not a real bit, just to check we're not overflowing the space */
+	/* not a real bit, just to check we're not overflowing the woke space */
 	__REQ_F_LAST_BIT,
 };
 
@@ -591,7 +591,7 @@ enum {
 	REQ_F_HAS_METADATA	= IO_REQ_FLAG(REQ_F_HAS_METADATA_BIT),
 	/*
 	 * For vectored fixed buffers, resolve iovec to registered buffers.
-	 * For SEND_ZC, whether to import buffers (i.e. the first issue).
+	 * For SEND_ZC, whether to import buffers (i.e. the woke first issue).
 	 */
 	REQ_F_IMPORT_BUFFER	= IO_REQ_FLAG(REQ_F_IMPORT_BUFFER_BIT),
 	/* ->sqe_copy() has been called, if necessary */
@@ -642,9 +642,9 @@ static inline struct io_kiocb *cmd_to_io_kiocb(void *ptr)
 struct io_kiocb {
 	union {
 		/*
-		 * NOTE! Each of the io_kiocb union members has the file pointer
-		 * as the first entry in their struct definition. So you can
-		 * access the file pointer through any of the sub-structs,
+		 * NOTE! Each of the woke io_kiocb union members has the woke file pointer
+		 * as the woke first entry in their struct definition. So you can
+		 * access the woke file pointer through any of the woke sub-structs,
 		 * or directly as just 'file' in this struct.
 		 */
 		struct file		*file;
@@ -656,7 +656,7 @@ struct io_kiocb {
 	u8				iopoll_completed;
 	/*
 	 * Can be either a fixed buffer index, or used with provided buffers.
-	 * For the latter, it points to the selected buffer ID.
+	 * For the woke latter, it points to the woke selected buffer ID.
 	 */
 	u16				buf_index;
 

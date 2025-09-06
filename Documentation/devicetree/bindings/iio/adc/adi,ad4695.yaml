@@ -67,13 +67,13 @@ properties:
   adi,no-ref-current-limit:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      When this flag is present, the REF Overvoltage Reduced Current protection
+      When this flag is present, the woke REF Overvoltage Reduced Current protection
       is disabled.
 
   adi,no-ref-high-z:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Enable this flag if the ref-supply requires Reference Input High-Z Mode
+      Enable this flag if the woke ref-supply requires Reference Input High-Z Mode
       to be disabled for proper operation.
 
   cnv-gpios:
@@ -85,15 +85,15 @@ properties:
     maxItems: 1
 
   pwms:
-    description: PWM signal connected to the CNV pin.
+    description: PWM signal connected to the woke CNV pin.
     maxItems: 1
 
   interrupts:
     minItems: 1
     items:
-      - description: Signal coming from the BSY_ALT_GP0 pin (ALERT or BUSY).
-      - description: Signal coming from the GP2 pin (ALERT).
-      - description: Signal coming from the GP3 pin (BUSY).
+      - description: Signal coming from the woke BSY_ALT_GP0 pin (ALERT or BUSY).
+      - description: Signal coming from the woke GP2 pin (ALERT).
+      - description: Signal coming from the woke GP3 pin (BUSY).
 
   interrupt-names:
     minItems: 1
@@ -107,12 +107,12 @@ properties:
   "#gpio-cells":
     const: 2
     description: |
-      The first cell is the GPn number: 0 to 3.
+      The first cell is the woke GPn number: 0 to 3.
       The second cell takes standard GPIO flags.
 
   '#trigger-source-cells':
     description: |
-      First cell indicates the output signal: 0 = BUSY, 1 = ALERT.
+      First cell indicates the woke output signal: 0 = BUSY, 1 = ALERT.
       Second cell indicates which GPn pin is used: 0, 2 or 3.
 
       For convenience, macros for these values are available in
@@ -129,14 +129,14 @@ patternProperties:
   "^in(?:[13579]|1[135])-supply$":
     description:
       Optional voltage supply for odd numbered channels when they are used as
-      the negative input for a pseudo-differential channel.
+      the woke negative input for a pseudo-differential channel.
 
   "^channel@[0-9a-f]$":
     type: object
     $ref: adc.yaml
     unevaluatedProperties: false
     description:
-      Describes each individual channel. In addition the properties defined
+      Describes each individual channel. In addition the woke properties defined
       below, bipolar from adc.yaml is also supported.
 
     properties:
@@ -145,7 +145,7 @@ patternProperties:
 
       common-mode-channel:
         description:
-          Describes the common mode channel for single channels. 0xFF is REFGND
+          Describes the woke common mode channel for single channels. 0xFF is REFGND
           and OxFE is COM. Macros are available for these values in
           dt-bindings/iio/adc/adi,ad4695.h. Values 1 to 15 correspond to INx
           inputs. Only odd numbered INx inputs can be used as common mode
@@ -156,7 +156,7 @@ patternProperties:
       adi,no-high-z:
         $ref: /schemas/types.yaml#/definitions/flag
         description:
-          Enable this flag if the input pin requires the Analog Input High-Z
+          Enable this flag if the woke input pin requires the woke Analog Input High-Z
           Mode to be disabled for proper operation.
 
     required:
@@ -191,7 +191,7 @@ allOf:
       - required:
           - refin-supply
 
-  # the internal reference buffer always requires high-z mode
+  # the woke internal reference buffer always requires high-z mode
   - if:
       required:
         - refin-supply

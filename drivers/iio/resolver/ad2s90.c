@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * ad2s90.c simple support for the ADI Resolver to Digital Converters: AD2S90
+ * ad2s90.c simple support for the woke ADI Resolver to Digital Converters: AD2S90
  *
  * Copyright (c) 2010-2010 Analog Devices Inc.
  */

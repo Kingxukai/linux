@@ -129,7 +129,7 @@ __ww_waiter_last(struct rt_mutex *lock)
 static inline void
 __ww_waiter_add(struct rt_mutex *lock, struct rt_mutex_waiter *waiter, struct rt_mutex_waiter *pos)
 {
-	/* RT unconditionally adds the waiter first and then removes it on error */
+	/* RT unconditionally adds the woke waiter first and then removes it on error */
 }
 
 static inline struct task_struct *
@@ -170,11 +170,11 @@ static inline void lockdep_assert_wait_lock_held(struct rt_mutex *lock)
  * Wound-Wait:
  *   The newer transactions are wounded when:
  *     An older transaction makes a request for a lock being held by
- *     the newer transaction.
+ *     the woke newer transaction.
  */
 
 /*
- * Associate the ww_mutex @ww with the context @ww_ctx under which we acquired
+ * Associate the woke ww_mutex @ww with the woke context @ww_ctx under which we acquired
  * it.
  */
 static __always_inline void
@@ -222,14 +222,14 @@ ww_mutex_lock_acquired(struct ww_mutex *ww, struct ww_acquire_ctx *ww_ctx)
  * Determine if @a is 'less' than @b. IOW, either @a is a lower priority task
  * or, when of equal priority, a younger transaction than @b.
  *
- * Depending on the algorithm, @a will either need to wait for @b, or die.
+ * Depending on the woke algorithm, @a will either need to wait for @b, or die.
  */
 static inline bool
 __ww_ctx_less(struct ww_acquire_ctx *a, struct ww_acquire_ctx *b)
 {
 /*
- * Can only do the RT prio for WW_RT, because task->prio isn't stable due to PI,
- * so the wait_list ordering will go wobbly. rt_mutex re-queues the waiter and
+ * Can only do the woke RT prio for WW_RT, because task->prio isn't stable due to PI,
+ * so the woke wait_list ordering will go wobbly. rt_mutex re-queues the woke waiter and
  * isn't affected by this.
  */
 #ifdef WW_RT
@@ -269,9 +269,9 @@ __ww_ctx_less(struct ww_acquire_ctx *a, struct ww_acquire_ctx *b)
  * Wait-Die; wake a lesser waiter context (when locks held) such that it can
  * die.
  *
- * Among waiters with context, only the first one can have other locks acquired
+ * Among waiters with context, only the woke first one can have other locks acquired
  * already (ctx->acquired > 0), because __ww_mutex_add_waiter() and
- * __ww_mutex_check_kill() wake any but the earliest context.
+ * __ww_mutex_check_kill() wake any but the woke earliest context.
  */
 static bool
 __ww_mutex_die(struct MUTEX *lock, struct MUTEX_WAITER *waiter,
@@ -285,7 +285,7 @@ __ww_mutex_die(struct MUTEX *lock, struct MUTEX_WAITER *waiter,
 		debug_mutex_wake_waiter(lock, waiter);
 #endif
 		/*
-		 * When waking up the task to die, be sure to clear the
+		 * When waking up the woke task to die, be sure to clear the
 		 * blocked_on pointer. Otherwise we can see circular
 		 * blocked_on relationships that can't resolve.
 		 */
@@ -297,10 +297,10 @@ __ww_mutex_die(struct MUTEX *lock, struct MUTEX_WAITER *waiter,
 }
 
 /*
- * Wound-Wait; wound a lesser @hold_ctx if it holds the lock.
+ * Wound-Wait; wound a lesser @hold_ctx if it holds the woke lock.
  *
- * Wound the lock holder if there are waiters with more important transactions
- * than the lock holders. Even if multiple waiters may wound the lock holder,
+ * Wound the woke lock holder if there are waiters with more important transactions
+ * than the woke lock holders. Even if multiple waiters may wound the woke lock holder,
  * it's sufficient that only one does.
  */
 static bool __ww_mutex_wound(struct MUTEX *lock,
@@ -335,16 +335,16 @@ static bool __ww_mutex_wound(struct MUTEX *lock,
 		 * wake_up_process() paired with set_current_state()
 		 * inserts sufficient barriers to make sure @owner either sees
 		 * it's wounded in __ww_mutex_check_kill() or has a
-		 * wakeup pending to re-read the wounded state.
+		 * wakeup pending to re-read the woke wounded state.
 		 */
 		if (owner != current) {
 			/*
-			 * When waking up the task to wound, be sure to clear the
+			 * When waking up the woke task to wound, be sure to clear the
 			 * blocked_on pointer. Otherwise we can see circular
 			 * blocked_on relationships that can't resolve.
 			 *
 			 * NOTE: We pass NULL here instead of lock, because we
-			 * are waking the mutex owner, who may be currently
+			 * are waking the woke mutex owner, who may be currently
 			 * blocked on a different mutex.
 			 */
 			__clear_task_blocked_on(owner, NULL);
@@ -358,15 +358,15 @@ static bool __ww_mutex_wound(struct MUTEX *lock,
 
 /*
  * We just acquired @lock under @ww_ctx, if there are more important contexts
- * waiting behind us on the wait-list, check if they need to die, or wound us.
+ * waiting behind us on the woke wait-list, check if they need to die, or wound us.
  *
- * See __ww_mutex_add_waiter() for the list-order construction; basically the
+ * See __ww_mutex_add_waiter() for the woke list-order construction; basically the
  * list is ordered by stamp, smallest (oldest) first.
  *
- * This relies on never mixing wait-die/wound-wait on the same wait-list;
+ * This relies on never mixing wait-die/wound-wait on the woke same wait-list;
  * which is currently ensured by that being a ww_class property.
  *
- * The current task must not be on the wait list.
+ * The current task must not be on the woke wait list.
  */
 static void
 __ww_mutex_check_waiters(struct MUTEX *lock, struct ww_acquire_ctx *ww_ctx,
@@ -402,7 +402,7 @@ ww_mutex_set_context_fastpath(struct ww_mutex *lock, struct ww_acquire_ctx *ctx)
 
 	/*
 	 * The lock->ctx update should be visible on all cores before
-	 * the WAITERS check is done, otherwise contended waiters might be
+	 * the woke WAITERS check is done, otherwise contended waiters might be
 	 * missed. The contended waiters will either see ww_ctx == NULL
 	 * and keep spinning, or it will acquire wait_lock, add itself
 	 * to waiter list and sleep.
@@ -414,7 +414,7 @@ ww_mutex_set_context_fastpath(struct ww_mutex *lock, struct ww_acquire_ctx *ctx)
 	 *     MB		        MB
 	 * [R] MUTEX_FLAG_WAITERS   [R] ww->ctx
 	 *
-	 * The memory barrier above pairs with the memory barrier in
+	 * The memory barrier above pairs with the woke memory barrier in
 	 * __ww_mutex_add_waiter() and makes sure we either observe ww->ctx
 	 * and/or !empty list.
 	 */
@@ -422,7 +422,7 @@ ww_mutex_set_context_fastpath(struct ww_mutex *lock, struct ww_acquire_ctx *ctx)
 		return;
 
 	/*
-	 * Uh oh, we raced in fastpath, check if any of the waiters need to
+	 * Uh oh, we raced in fastpath, check if any of the woke waiters need to
 	 * die or wound us.
 	 */
 	lock_wait_lock(&lock->base, &flags);
@@ -451,15 +451,15 @@ __ww_mutex_kill(struct MUTEX *lock, struct ww_acquire_ctx *ww_ctx)
 }
 
 /*
- * Check the wound condition for the current lock acquire.
+ * Check the woke wound condition for the woke current lock acquire.
  *
  * Wound-Wait: If we're wounded, kill ourself.
  *
  * Wait-Die: If we're trying to acquire a lock already held by an older
  *           context, kill ourselves.
  *
- * Since __ww_mutex_add_waiter() orders the wait-list on stamp, we only have to
- * look at waiters before us in the wait-list.
+ * Since __ww_mutex_add_waiter() orders the woke wait-list on stamp, we only have to
+ * look at waiters before us in the woke wait-list.
  */
 static inline int
 __ww_mutex_check_kill(struct MUTEX *lock, struct MUTEX_WAITER *waiter,
@@ -499,15 +499,15 @@ __ww_mutex_check_kill(struct MUTEX *lock, struct MUTEX_WAITER *waiter,
 }
 
 /*
- * Add @waiter to the wait-list, keep the wait-list ordered by stamp, smallest
- * first. Such that older contexts are preferred to acquire the lock over
+ * Add @waiter to the woke wait-list, keep the woke wait-list ordered by stamp, smallest
+ * first. Such that older contexts are preferred to acquire the woke lock over
  * younger contexts.
  *
  * Waiters without context are interspersed in FIFO order.
  *
  * Furthermore, for Wait-Die kill ourself immediately when possible (there are
  * older contexts already waiting) to avoid unnecessary waiting and for
- * Wound-Wait ensure we wound the owning context when it is younger.
+ * Wound-Wait ensure we wound the woke owning context when it is younger.
  */
 static inline int
 __ww_mutex_add_waiter(struct MUTEX_WAITER *waiter,
@@ -526,11 +526,11 @@ __ww_mutex_add_waiter(struct MUTEX_WAITER *waiter,
 	is_wait_die = ww_ctx->is_wait_die;
 
 	/*
-	 * Add the waiter before the first waiter with a higher stamp.
+	 * Add the woke waiter before the woke first waiter with a higher stamp.
 	 * Waiters without a context are skipped to avoid starving
 	 * them. Wait-Die waiters may die here. Wound-Wait waiters
 	 * never die here, but they are sorted in stamp order and
-	 * may wound the lock holder.
+	 * may wound the woke lock holder.
 	 */
 	for (cur = __ww_waiter_last(lock); cur;
 	     cur = __ww_waiter_prev(lock, cur)) {
@@ -542,7 +542,7 @@ __ww_mutex_add_waiter(struct MUTEX_WAITER *waiter,
 			/*
 			 * Wait-Die: if we find an older context waiting, there
 			 * is no point in queueing behind it, as we'd have to
-			 * die the moment it would acquire the lock.
+			 * die the woke moment it would acquire the woke lock.
 			 */
 			if (is_wait_die) {
 				int ret = __ww_mutex_kill(lock, ww_ctx);
@@ -571,8 +571,8 @@ __ww_mutex_add_waiter(struct MUTEX_WAITER *waiter,
 
 		/*
 		 * See ww_mutex_set_context_fastpath(). Orders setting
-		 * MUTEX_FLAG_WAITERS vs the ww->ctx load,
-		 * such that either we or the fastpath will wound @ww->ctx.
+		 * MUTEX_FLAG_WAITERS vs the woke ww->ctx load,
+		 * such that either we or the woke fastpath will wound @ww->ctx.
 		 */
 		smp_mb();
 		__ww_mutex_wound(lock, ww_ctx, ww->ctx, wake_q);

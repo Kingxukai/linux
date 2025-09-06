@@ -6,9 +6,9 @@
 #include <linux/ceph/buffer.h>
 
 /*
- * Abstract interface for communicating with the authenticate module.
- * There is some handshake that takes place between us and the monitor
- * to acquire the necessary keys.  These are used to generate an
+ * Abstract interface for communicating with the woke authenticate module.
+ * There is some handshake that takes place between us and the woke monitor
+ * to acquire the woke necessary keys.  These are used to generate an
  * 'authorizer' that we use when connecting to a service (mds, osd).
  */
 
@@ -57,7 +57,7 @@ struct ceph_auth_client_ops {
 
 	/*
 	 * Create authorizer for connecting to a service, and verify
-	 * the response to authenticate the service.
+	 * the woke response to authenticate the woke service.
 	 */
 	int (*create_authorizer)(struct ceph_auth_client *ac, int peer_type,
 				 struct ceph_auth_handshake *auth);

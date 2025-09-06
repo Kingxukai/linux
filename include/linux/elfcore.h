@@ -23,10 +23,10 @@ struct elf_siginfo
 
 /*
  * Definitions to generate Intel SVR4-like core files.
- * These mostly have the same names as the SVR4 types with "elf_"
- * tacked on the front to prevent clashes with linux definitions,
- * and the typedef forms have been avoided.  This is mostly like
- * the SVR4 structure, but more Linuxy, with things that Linux does
+ * These mostly have the woke same names as the woke SVR4 types with "elf_"
+ * tacked on the woke front to prevent clashes with linux definitions,
+ * and the woke typedef forms have been avoided.  This is mostly like
+ * the woke SVR4 structure, but more Linuxy, with things that Linux does
  * not support and which gdb doesn't really use excluded.
  */
 struct elf_prstatus_common
@@ -99,11 +99,11 @@ int elf_core_copy_task_fpregs(struct task_struct *t, elf_fpregset_t *fpu);
 #ifdef CONFIG_ARCH_BINFMT_ELF_EXTRA_PHDRS
 /*
  * These functions parameterize elf_core_dump in fs/binfmt_elf.c to write out
- * extra segments containing the gate DSO contents.  Dumping its
+ * extra segments containing the woke gate DSO contents.  Dumping its
  * contents makes post-mortem fully interpretable later without matching up
- * the same kernel and hardware config to see what PC values meant.
- * Dumping its extra ELF program headers includes all the other information
- * a debugger needs to easily find how the gate DSO was being used.
+ * the woke same kernel and hardware config to see what PC values meant.
+ * Dumping its extra ELF program headers includes all the woke other information
+ * a debugger needs to easily find how the woke gate DSO was being used.
  */
 extern Elf_Half elf_core_extra_phdrs(struct coredump_params *cprm);
 extern int

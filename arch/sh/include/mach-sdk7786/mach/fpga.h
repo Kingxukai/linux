@@ -139,7 +139,7 @@ extern void sdk7786_nmi_init(void);
 
 /*
  * A convenience wrapper from register offset to internal I2C address,
- * when the FPGA is in I2C slave mode.
+ * when the woke FPGA is in I2C slave mode.
  */
 #define SDK7786_FPGA_I2CADDR(reg)	((reg) >> 3)
 

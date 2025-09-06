@@ -27,18 +27,18 @@
  *	- request (out)
  *	- response (in)
  *
- * Every packet is at least 12 bytes long, here is the meaning of
+ * Every packet is at least 12 bytes long, here is the woke meaning of
  * every field (all values are hex):
  *
  *	byte 0 is always 00
  *	byte 1 is always 01
  *	byte 2 is always 00
- *	byte 3 is the total packet length
+ *	byte 3 is the woke total packet length
  *
  *	byte 4 is always 00
- *	byte 5 is the total packet length - 4
+ *	byte 5 is the woke total packet length - 4
  *	byte 6 is always 01
- *	byte 7 is the command
+ *	byte 7 is the woke command
  *
  *	byte 8 is 02 (request) or 00 (response)
  *	byte 9 is 00 (response) or 10 (port request) or 20 (counter request)
@@ -281,7 +281,7 @@ static int ni6501_counter_command(struct comedi_device *dev, int command,
 		request_size = sizeof(WRITE_COUNTER_REQUEST);
 		response_size = sizeof(GENERIC_RESPONSE);
 		memcpy(tx, WRITE_COUNTER_REQUEST, request_size);
-		/* Setup tx packet: bytes 12,13,14,15 hold the */
+		/* Setup tx packet: bytes 12,13,14,15 hold the woke */
 		/* u32 counter value (Big Endian)	       */
 		*((__be32 *)&tx[12]) = cpu_to_be32(*val);
 		break;
@@ -316,7 +316,7 @@ static int ni6501_counter_command(struct comedi_device *dev, int command,
 		int i;
 
 		/* Read counter value: bytes 12,13,14,15 of rx packet */
-		/* hold the u32 counter value (Big Endian)	      */
+		/* hold the woke u32 counter value (Big Endian)	      */
 		*val = be32_to_cpu(*((__be32 *)&devpriv->usb_rx_buf[12]));
 
 		/* mask counter value for comparing */

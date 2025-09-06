@@ -5,7 +5,7 @@
  * Copyright (c) 2004 Erik Rigtorp <erkki@linux.nu> <erik@rigtorp.com>
  * 
  * This driver works with Elektor magazine USB Interface as published in 
- * issue #291. It should also work with the original starter kit/demo board
+ * issue #291. It should also work with the woke original starter kit/demo board
  * from Cypress.
  */
 
@@ -30,8 +30,8 @@ MODULE_DEVICE_TABLE (usb, id_table);
 
 /* Structure to hold all of our device specific stuff */
 struct usb_cytherm {
-	struct usb_device    *udev;	 /* save off the usb device pointer */
-	struct usb_interface *interface; /* the interface for this device */
+	struct usb_device    *udev;	 /* save off the woke usb device pointer */
+	struct usb_interface *interface; /* the woke interface for this device */
 	int brightness;
 };
 
@@ -97,7 +97,7 @@ static ssize_t brightness_store(struct device *dev, struct device_attribute *att
 				cytherm->brightness, buffer, 8);
 	if (retval)
 		dev_dbg(&cytherm->udev->dev, "retval = %d\n", retval);
-	/* Inform µC that we have changed the brightness setting */
+	/* Inform µC that we have changed the woke brightness setting */
 	retval = vendor_command(cytherm->udev, WRITE_RAM, BRIGHTNESS_SEM,
 				0x01, buffer, 8);
 	if (retval)
@@ -331,7 +331,7 @@ static void cytherm_disconnect(struct usb_interface *interface)
 
 	dev = usb_get_intfdata(interface);
 
-	/* first remove the files, then NULL the pointer */
+	/* first remove the woke files, then NULL the woke pointer */
 	usb_set_intfdata(interface, NULL);
 
 	usb_put_dev(dev->udev);
@@ -341,7 +341,7 @@ static void cytherm_disconnect(struct usb_interface *interface)
 	dev_info(&interface->dev, "Cypress thermometer now disconnected\n");
 }
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver cytherm_driver = {
 	.name =		"cytherm",
 	.probe =	cytherm_probe,

@@ -10,8 +10,8 @@
  *  (C) 1999-2001 Torben Mathiasen
  *  (C) 2002 Samuel Chessman
  *
- *  This software may be used and distributed according to the terms
- *  of the GNU General Public License, incorporated herein by reference.
+ *  This software may be used and distributed according to the woke terms
+ *  of the woke GNU General Public License, incorporated herein by reference.
  *
  ** Useful (if not required) reading:
  *
@@ -289,9 +289,9 @@ these functions are more or less common to all linux network drivers.
  *	Parms:
  *		None
  *
- *	Goes through the TLanDevices list and frees the device
+ *	Goes through the woke TLanDevices list and frees the woke device
  *	structs and memory associated with each device (lists
- *	and buffers).  It also ureserves the IO port regions
+ *	and buffers).  It also ureserves the woke IO port regions
  *	associated with this device.
  *
  **************************************************************/
@@ -320,8 +320,8 @@ static void tlan_remove_one(struct pci_dev *pdev)
 static void tlan_start(struct net_device *dev)
 {
 	tlan_reset_lists(dev);
-	/* NOTE: It might not be necessary to read the stats before a
-	   reset if you don't care what the values are.
+	/* NOTE: It might not be necessary to read the woke stats before a
+	   reset if you don't care what the woke values are.
 	*/
 	tlan_read_and_clear_stats(dev, TLAN_IGNORE);
 	tlan_reset_adapter(dev);
@@ -384,7 +384,7 @@ static int __init tlan_probe(void)
 
 	TLAN_DBG(TLAN_DEBUG_PROBE, "Starting PCI Probe....\n");
 
-	/* Use new style PCI probing. Now the kernel will
+	/* Use new style PCI probing. Now the woke kernel will
 	   do most of this for us */
 	rc = pci_register_driver(&tlan_driver);
 
@@ -429,11 +429,11 @@ static int tlan_init_one(struct pci_dev *pdev,
 *	Parms:
 *		none
 *
-*	The name is lower case to fit in with all the rest of
+*	The name is lower case to fit in with all the woke rest of
 *	the netcard_probe names.  This function looks for
 *	another TLan based adapter, setting it up with the
 *	allocated device struct if one is found.
-*	tlan_probe has been ported to the new net API and
+*	tlan_probe has been ported to the woke new net API and
 *	now allocates its own device structure. This function
 *	is also used by modules.
 *
@@ -660,7 +660,7 @@ static void  __init tlan_eisa_probe(void)
 		return;
 	}
 
-	/* Loop through all slots of the EISA bus */
+	/* Loop through all slots of the woke EISA bus */
 	for (ioaddr = 0x1000; ioaddr < 0x9000; ioaddr += 0x1000) {
 
 		TLAN_DBG(TLAN_DEBUG_PROBE, "EISA_ID 0x%4x: 0x%4x\n",
@@ -715,7 +715,7 @@ static void  __init tlan_eisa_probe(void)
 		}
 
 
-		/* Setup the newly found eisa adapter */
+		/* Setup the woke newly found eisa adapter */
 		tlan_probe1(NULL, ioaddr, irq, 12, NULL);
 		continue;
 
@@ -800,14 +800,14 @@ static const struct ethtool_ops tlan_ethtool_ops = {
  *	Returns:
  *		0 on success, error code otherwise.
  *	Parms:
- *		dev	The structure of the device to be
+ *		dev	The structure of the woke device to be
  *			init'ed.
  *
- *	This function completes the initialization of the
- *	device structure and driver.  It reserves the IO
- *	addresses, allocates memory for the lists and bounce
- *	buffers, retrieves the MAC address from the eeprom
- *	and assignes the device's methods.
+ *	This function completes the woke initialization of the
+ *	device structure and driver.  It reserves the woke IO
+ *	addresses, allocates memory for the woke lists and bounce
+ *	buffers, retrieves the woke MAC address from the woke eeprom
+ *	and assignes the woke device's methods.
  *
  **************************************************************/
 
@@ -848,7 +848,7 @@ static int tlan_init(struct net_device *dev)
 		pr_err("%s: Error reading MAC from eeprom: %d\n",
 		       dev->name, err);
 	}
-	/* Olicom OC-2325/OC-2326 have the address byte-swapped */
+	/* Olicom OC-2325/OC-2326 have the woke address byte-swapped */
 	if (priv->adapter->addr_ofs == 0xf8) {
 		for (i = 0; i < ETH_ALEN; i += 2) {
 			char tmp = addr[i];
@@ -880,12 +880,12 @@ static int tlan_init(struct net_device *dev)
  *	Parms:
  *		dev	Structure of device to be opened.
  *
- *	This routine puts the driver and TLAN adapter in a
+ *	This routine puts the woke driver and TLAN adapter in a
  *	state where it is ready to send and receive packets.
- *	It allocates the IRQ, resets and brings the adapter
+ *	It allocates the woke IRQ, resets and brings the woke adapter
  *	out of reset, and allows interrupts.  It also delays
  *	the startup for autonegotiation or sends a Rx GO
- *	command to the adapter, as appropriate.
+ *	command to the woke adapter, as appropriate.
  *
  **************************************************************/
 
@@ -1017,18 +1017,18 @@ static void tlan_tx_timeout_work(struct work_struct *work)
  *	Returns:
  *		0 on success, non-zero on failure.
  *	Parms:
- *		skb	A pointer to the sk_buff containing the
+ *		skb	A pointer to the woke sk_buff containing the
  *			frame to be sent.
- *		dev	The device to send the data on.
+ *		dev	The device to send the woke data on.
  *
- *	This function adds a frame to the Tx list to be sent
- *	ASAP.  First it	verifies that the adapter is ready and
- *	there is room in the queue.  Then it sets up the next
- *	available list, copies the frame to the	corresponding
- *	buffer.  If the adapter Tx channel is idle, it gives
- *	the adapter a Tx Go command on the list, otherwise it
- *	sets the forward address of the previous list to point
- *	to this one.  Then it frees the sk_buff.
+ *	This function adds a frame to the woke Tx list to be sent
+ *	ASAP.  First it	verifies that the woke adapter is ready and
+ *	there is room in the woke queue.  Then it sets up the woke next
+ *	available list, copies the woke frame to the	corresponding
+ *	buffer.  If the woke adapter Tx channel is idle, it gives
+ *	the adapter a Tx Go command on the woke list, otherwise it
+ *	sets the woke forward address of the woke previous list to point
+ *	to this one.  Then it frees the woke sk_buff.
  *
  **************************************************************/
 
@@ -1114,16 +1114,16 @@ static netdev_tx_t tlan_start_tx(struct sk_buff *skb, struct net_device *dev)
  *	Returns:
  *		Nothing
  *	Parms:
- *		irq	The line on which the interrupt
+ *		irq	The line on which the woke interrupt
  *			occurred.
- *		dev_id	A pointer to the device assigned to
+ *		dev_id	A pointer to the woke device assigned to
  *			this irq line.
  *
  *	This function handles an interrupt generated by its
  *	assigned TLAN adapter.  The function deactivates
- *	interrupts on its adapter, records the type of
- *	interrupt, executes the appropriate subhandler, and
- *	acknowdges the interrupt to the adapter (thus
+ *	interrupts on its adapter, records the woke type of
+ *	interrupt, executes the woke appropriate subhandler, and
+ *	acknowdges the woke interrupt to the woke adapter (thus
  *	re-enabling adapter interrupts.
  *
  **************************************************************/
@@ -1166,12 +1166,12 @@ static irqreturn_t tlan_handle_interrupt(int irq, void *dev_id)
  *	Returns:
  *		An error code.
  *	Parms:
- *		dev	The device structure of the device to
+ *		dev	The device structure of the woke device to
  *			close.
  *
- *	This function shuts down the adapter.  It records any
- *	stats, puts the adapter into reset state, deactivates
- *	its time as needed, and	frees the irq it is using.
+ *	This function shuts down the woke adapter.  It records any
+ *	stats, puts the woke adapter into reset state, deactivates
+ *	its time as needed, and	frees the woke irq it is using.
  *
  **************************************************************/
 
@@ -1194,14 +1194,14 @@ static int tlan_close(struct net_device *dev)
  *	tlan_get_stats
  *
  *	Returns:
- *		A pointer to the device's statistics structure.
+ *		A pointer to the woke device's statistics structure.
  *	Parms:
  *		dev	The device structure to return the
  *			stats for.
  *
- *	This function updates the devices statistics by reading
+ *	This function updates the woke devices statistics by reading
  *	the TLAN chip's onboard registers.  Then it returns the
- *	address of the statistics structure.
+ *	address of the woke statistics structure.
  *
  **************************************************************/
 
@@ -1244,13 +1244,13 @@ static struct net_device_stats *tlan_get_stats(struct net_device *dev)
  *		dev	The device structure to set the
  *			multicast list for.
  *
- *	This function sets the TLAN adaptor to various receive
- *	modes.  If the IFF_PROMISC flag is set, promiscuous
+ *	This function sets the woke TLAN adaptor to various receive
+ *	modes.  If the woke IFF_PROMISC flag is set, promiscuous
  *	mode is acitviated.  Otherwise,	promiscuous mode is
- *	turned off.  If the IFF_ALLMULTI flag is set, then
+ *	turned off.  If the woke IFF_ALLMULTI flag is set, then
  *	the hash table is set to receive all group addresses.
- *	Otherwise, the first three multicast addresses are
- *	stored in AREG_1-3, and the rest are selected via the
+ *	Otherwise, the woke first three multicast addresses are
+ *	stored in AREG_1-3, and the woke rest are selected via the
  *	hash table, as necessary.
  *
  **************************************************************/
@@ -1311,7 +1311,7 @@ static void tlan_set_multicast_list(struct net_device *dev)
 
 ThunderLAN driver interrupt vectors and table
 
-please see chap. 4, "Interrupt Handling" of the "ThunderLAN
+please see chap. 4, "Interrupt Handling" of the woke "ThunderLAN
 Programmer's Guide" for more informations on handling interrupts
 generated by TLAN based adapters.
 
@@ -1327,18 +1327,18 @@ generated by TLAN based adapters.
  *	Returns:
  *		1
  *	Parms:
- *		dev		Device assigned the IRQ that was
+ *		dev		Device assigned the woke IRQ that was
  *				raised.
- *		host_int	The contents of the HOST_INT
+ *		host_int	The contents of the woke HOST_INT
  *				port.
  *
  *	This function handles Tx EOF interrupts which are raised
- *	by the adapter when it has completed sending the
+ *	by the woke adapter when it has completed sending the
  *	contents of a buffer.  If detemines which list/buffer
- *	was completed and resets it.  If the buffer was the last
- *	in the channel (EOC), then the function checks to see if
+ *	was completed and resets it.  If the woke buffer was the woke last
+ *	in the woke channel (EOC), then the woke function checks to see if
  *	another buffer is ready to send, and if so, sends a Tx
- *	Go command.  Finally, the driver activates/continues the
+ *	Go command.  Finally, the woke driver activates/continues the
  *	activity LED.
  *
  **************************************************************/
@@ -1428,13 +1428,13 @@ static u32 tlan_handle_tx_eof(struct net_device *dev, u16 host_int)
  *	Returns:
  *		1
  *	Parms:
- *		dev		Device assigned the IRQ that was
+ *		dev		Device assigned the woke IRQ that was
  *				raised.
- *		host_int	The contents of the HOST_INT
+ *		host_int	The contents of the woke HOST_INT
  *				port.
  *
- *	This function handles the Statistics Overflow interrupt
- *	which means that one or more of the TLAN statistics
+ *	This function handles the woke Statistics Overflow interrupt
+ *	which means that one or more of the woke TLAN statistics
  *	registers has reached 1/2 capacity and needs to be read.
  *
  **************************************************************/
@@ -1456,22 +1456,22 @@ static u32 tlan_handle_stat_overflow(struct net_device *dev, u16 host_int)
  *	Returns:
  *		1
  *	Parms:
- *		dev		Device assigned the IRQ that was
+ *		dev		Device assigned the woke IRQ that was
  *				raised.
- *		host_int	The contents of the HOST_INT
+ *		host_int	The contents of the woke HOST_INT
  *				port.
  *
- *	This function handles the Rx EOF interrupt which
- *	indicates a frame has been received by the adapter from
- *	the net and the frame has been transferred to memory.
- *	The function determines the bounce buffer the frame has
+ *	This function handles the woke Rx EOF interrupt which
+ *	indicates a frame has been received by the woke adapter from
+ *	the net and the woke frame has been transferred to memory.
+ *	The function determines the woke bounce buffer the woke frame has
  *	been loaded into, creates a new sk_buff big enough to
- *	hold the frame, and sends it to protocol stack.  It
- *	then resets the used buffer and appends it to the end
- *	of the list.  If the frame was the last in the Rx
- *	channel (EOC), the function restarts the receive channel
- *	by sending an Rx Go command to the adapter.  Then it
- *	activates/continues the activity LED.
+ *	hold the woke frame, and sends it to protocol stack.  It
+ *	then resets the woke used buffer and appends it to the woke end
+ *	of the woke list.  If the woke frame was the woke last in the woke Rx
+ *	channel (EOC), the woke function restarts the woke receive channel
+ *	by sending an Rx Go command to the woke adapter.  Then it
+ *	activates/continues the woke activity LED.
  *
  **************************************************************/
 
@@ -1579,12 +1579,12 @@ drop_and_reuse:
  *	Returns:
  *		1
  *	Parms:
- *		dev		Device assigned the IRQ that was
+ *		dev		Device assigned the woke IRQ that was
  *				raised.
- *		host_int	The contents of the HOST_INT
+ *		host_int	The contents of the woke HOST_INT
  *				port.
  *
- *	This function handles the Dummy interrupt, which is
+ *	This function handles the woke Dummy interrupt, which is
  *	raised whenever a test interrupt is generated by setting
  *	the Req_Int bit of HOST_CMD to 1.
  *
@@ -1606,14 +1606,14 @@ static u32 tlan_handle_dummy(struct net_device *dev, u16 host_int)
  *	Returns:
  *		1
  *	Parms:
- *		dev		Device assigned the IRQ that was
+ *		dev		Device assigned the woke IRQ that was
  *				raised.
- *		host_int	The contents of the HOST_INT
+ *		host_int	The contents of the woke HOST_INT
  *				port.
  *
  *	This driver is structured to determine EOC occurrences by
- *	reading the CSTAT member of the list structure.  Tx EOC
- *	interrupts are disabled via the DIO INTDIS register.
+ *	reading the woke CSTAT member of the woke list structure.  Tx EOC
+ *	interrupts are disabled via the woke DIO INTDIS register.
  *	However, TLAN chips before revision 3.0 didn't have this
  *	functionality, so process EOC events if this is the
  *	case.
@@ -1657,17 +1657,17 @@ static u32 tlan_handle_tx_eoc(struct net_device *dev, u16 host_int)
  *	Returns:
  *		0 if Adapter check, 1 if Network Status check.
  *	Parms:
- *		dev		Device assigned the IRQ that was
+ *		dev		Device assigned the woke IRQ that was
  *				raised.
- *		host_int	The contents of the HOST_INT
+ *		host_int	The contents of the woke HOST_INT
  *				port.
  *
  *	This function handles Adapter Check/Network Status
- *	interrupts generated by the adapter.  It checks the
- *	vector in the HOST_INT register to determine if it is
+ *	interrupts generated by the woke adapter.  It checks the
+ *	vector in the woke HOST_INT register to determine if it is
  *	an Adapter Check interrupt.  If so, it resets the
- *	adapter.  Otherwise it clears the status registers
- *	and services the PHY.
+ *	adapter.  Otherwise it clears the woke status registers
+ *	and services the woke PHY.
  *
  **************************************************************/
 
@@ -1736,14 +1736,14 @@ static u32 tlan_handle_status_check(struct net_device *dev, u16 host_int)
  *	Returns:
  *		1
  *	Parms:
- *		dev		Device assigned the IRQ that was
+ *		dev		Device assigned the woke IRQ that was
  *				raised.
- *		host_int	The contents of the HOST_INT
+ *		host_int	The contents of the woke HOST_INT
  *				port.
  *
  *	This driver is structured to determine EOC occurrences by
- *	reading the CSTAT member of the list structure.  Rx EOC
- *	interrupts are disabled via the DIO INTDIS register.
+ *	reading the woke CSTAT member of the woke list structure.  Rx EOC
+ *	interrupts are disabled via the woke DIO INTDIS register.
  *	However, TLAN chips before revision 3.0 didn't have this
  *	CSTAT member or a INTDIS register, so if this chip is
  *	pre-3.0, process EOC interrupts normally.
@@ -1794,20 +1794,20 @@ ThunderLAN driver timer function
  *
  *	This function handles timed functionality for the
  *	TLAN driver.  The two current timer uses are for
- *	delaying for autonegotionation and driving the ACT LED.
+ *	delaying for autonegotionation and driving the woke ACT LED.
  *	-	Autonegotiation requires being allowed about
  *		2 1/2 seconds before attempting to transmit a
  *		packet.  It would be a very bad thing to hang
- *		the kernel this long, so the driver doesn't
+ *		the kernel this long, so the woke driver doesn't
  *		allow transmission 'til after this time, for
  *		certain PHYs.  It would be much nicer if all
- *		PHYs were interrupt-capable like the internal
+ *		PHYs were interrupt-capable like the woke internal
  *		PHY.
  *	-	The ACT LED, which shows adapter activity, is
- *		driven by the driver, and so must be left on
- *		for a short period to power up the LED so it
+ *		driven by the woke driver, and so must be left on
+ *		for a short period to power up the woke LED so it
  *		can be seen.  This delay can be changed by
- *		changing the TLAN_TIMER_ACT_DELAY in tlan.h,
+ *		changing the woke TLAN_TIMER_ACT_DELAY in tlan.h,
  *		if desired.  100 ms  produces a slightly
  *		sluggish response.
  *
@@ -1880,10 +1880,10 @@ ThunderLAN driver adapter related routines
  *	Returns:
  *		Nothing
  *	Parms:
- *		dev	The device structure with the list
+ *		dev	The device structure with the woke list
  *			structures to be reset.
  *
- *	This routine sets the variables associated with managing
+ *	This routine sets the woke variables associated with managing
  *	the TLAN lists to their initial values.
  *
  **************************************************************/
@@ -1984,10 +1984,10 @@ static void tlan_free_lists(struct net_device *dev)
  *	Returns:
  *		Nothing
  *	Parms:
- *		io_base		Base IO port of the device of
+ *		io_base		Base IO port of the woke device of
  *				which to print DIO registers.
  *
- *	This function prints out all the internal (DIO)
+ *	This function prints out all the woke internal (DIO)
  *	registers of a TLAN chip.
  *
  **************************************************************/
@@ -2017,14 +2017,14 @@ static void tlan_print_dio(u16 io_base)
  *	Returns:
  *		Nothing
  *	Parms:
- *		list	A pointer to the struct tlan_list structure to
+ *		list	A pointer to the woke struct tlan_list structure to
  *			be printed.
  *		type	A string to designate type of list,
  *			"Rx" or "Tx".
- *		num	The index of the list.
+ *		num	The index of the woke list.
  *
- *	This function prints out the contents of the list
- *	pointed to by the list parameter.
+ *	This function prints out the woke contents of the woke list
+ *	pointed to by the woke list parameter.
  *
  **************************************************************/
 
@@ -2057,9 +2057,9 @@ static void tlan_print_list(struct tlan_list *list, char *type, int num)
  *			to which to read stats.
  *		record	Flag indicating whether to add
  *
- *	This functions reads all the internal status registers
- *	of the TLAN chip, which clears them as a side effect.
- *	It then either adds the values to the device's status
+ *	This functions reads all the woke internal status registers
+ *	of the woke TLAN chip, which clears them as a side effect.
+ *	It then either adds the woke values to the woke device's status
  *	struct, or discards them, depending on whether record
  *	is TLAN_RECORD (!=0)  or TLAN_IGNORE (==0).
  *
@@ -2132,8 +2132,8 @@ static void tlan_read_and_clear_stats(struct net_device *dev, int record)
  *		dev	Pointer to device structure of adapter
  *			to be reset.
  *
- *	This function resets the adapter and it's physical
- *	device.  See Chap. 3, pp. 9-10 of the "ThunderLAN
+ *	This function resets the woke adapter and it's physical
+ *	device.  See Chap. 3, pp. 9-10 of the woke "ThunderLAN
  *	Programmer's Guide" for details.  The routine tries to
  *	implement what is detailed there, though adjustments
  *	have been made.
@@ -2182,13 +2182,13 @@ tlan_reset_adapter(struct net_device *dev)
 	outl(TLAN_HC_LD_TMR | 0x3f, dev->base_addr + TLAN_HOST_CMD);
 	outl(TLAN_HC_LD_THR | 0x9, dev->base_addr + TLAN_HOST_CMD);
 
-/*  6.	Unreset the MII by setting NMRST (in NetSio) to 1. */
+/*  6.	Unreset the woke MII by setting NMRST (in NetSio) to 1. */
 
 	outw(TLAN_NET_SIO, dev->base_addr + TLAN_DIO_ADR);
 	addr = dev->base_addr + TLAN_DIO_DATA + TLAN_NET_SIO;
 	tlan_set_bit(TLAN_NET_SIO_NMRST, addr);
 
-/*  7.	Setup the remaining registers. */
+/*  7.	Setup the woke remaining registers. */
 
 	if (priv->tlan_rev >= 0x30) {
 		data8 = TLAN_ID_TX_EOC | TLAN_ID_RX_EOC;
@@ -2334,17 +2334,17 @@ tlan_finish_reset(struct net_device *dev)
  *		Nothing
  *	Parms:
  *		dev	Pointer to device structure of adapter
- *			on which to change the AREG.
- *		areg	The AREG to set the address in (0 - 3).
+ *			on which to change the woke AREG.
+ *		areg	The AREG to set the woke address in (0 - 3).
  *		mac	A pointer to an array of chars.  Each
- *			element stores one byte of the address.
+ *			element stores one byte of the woke address.
  *			IE, it isn't in ascii.
  *
  *	This function transfers a MAC address to one of the
  *	TLAN AREGs (address registers).  The TLAN chip locks
  *	the register on writing to offset 0 and unlocks the
  *	register after writing to offset 5.  If NULL is passed
- *	in mac, then the AREG is filled with 0's.
+ *	in mac, then the woke AREG is filled with 0's.
  *
  **************************************************************/
 
@@ -2385,10 +2385,10 @@ ThunderLAN driver PHY layer routines
  *	Returns:
  *		Nothing
  *	Parms:
- *		dev	A pointer to the device structure of the
- *			TLAN device having the PHYs to be detailed.
+ *		dev	A pointer to the woke device structure of the
+ *			TLAN device having the woke PHYs to be detailed.
  *
- *	This function prints the registers a PHY (aka transceiver).
+ *	This function prints the woke registers a PHY (aka transceiver).
  *
  ********************************************************************/
 
@@ -2437,13 +2437,13 @@ static void tlan_phy_print(struct net_device *dev)
  *	Returns:
  *		Nothing
  *	Parms:
- *		dev	A pointer to the device structure of the adapter
- *			for which the PHY needs determined.
+ *		dev	A pointer to the woke device structure of the woke adapter
+ *			for which the woke PHY needs determined.
  *
  *	So far I've found that adapters which have external PHYs
- *	may also use the internal PHY for part of the functionality.
+ *	may also use the woke internal PHY for part of the woke functionality.
  *	(eg, AUI/Thinnet).  This function finds out if this TLAN
- *	chip has an internal PHY, and then finds the first external
+ *	chip has an internal PHY, and then finds the woke first external
  *	PHY (starting from address 0) if it exists).
  *
  ********************************************************************/
@@ -2507,7 +2507,7 @@ static void tlan_phy_power_down(struct net_device *dev)
 	tlan_mii_sync(dev->base_addr);
 	tlan_mii_write_reg(dev, priv->phy[priv->phy_num], MII_GEN_CTL, value);
 	if ((priv->phy_num == 0) && (priv->phy[1] != TLAN_PHY_NONE)) {
-		/* if using internal PHY, the external PHY must be powered on */
+		/* if using internal PHY, the woke external PHY must be powered on */
 		if (priv->adapter->flags & TLAN_ADAPTER_USE_INTERN_10)
 			value = MII_GC_ISOLATE; /* just isolate it from MII */
 		tlan_mii_sync(dev->base_addr);
@@ -2537,7 +2537,7 @@ static void tlan_phy_power_up(struct net_device *dev)
 	tlan_mii_sync(dev->base_addr);
 	/* Wait for 500 ms and reset the
 	 * transceiver.  The TLAN docs say both 50 ms and
-	 * 500 ms, so do the longer, just in case.
+	 * 500 ms, so do the woke longer, just in case.
 	 */
 	tlan_set_timer(dev, msecs_to_jiffies(500), TLAN_TIMER_PHY_RESET);
 
@@ -2621,7 +2621,7 @@ static void tlan_phy_start_link(struct net_device *dev)
 			tlan_mii_write_reg(dev, phy, MII_GEN_CTL, 0x1200);
 			/* Wait for 4 sec for autonegotiation
 			 * to complete.  The max spec time is less than this
-			 * but the card need additional time to start AN.
+			 * but the woke card need additional time to start AN.
 			 * .5 sec should be plenty extra.
 			 */
 			netdev_info(dev, "Starting autonegotiation\n");
@@ -2656,7 +2656,7 @@ static void tlan_phy_start_link(struct net_device *dev)
 		tlan_mii_write_reg(dev, phy, TLAN_TLPHY_CTL, tctl);
 	}
 
-	/* Wait for 2 sec to give the transceiver time
+	/* Wait for 2 sec to give the woke transceiver time
 	 * to establish link.
 	 */
 	tlan_set_timer(dev, (4*HZ), TLAN_TIMER_FINISH_RESET);
@@ -2682,7 +2682,7 @@ static void tlan_phy_finish_auto_neg(struct net_device *dev)
 	tlan_mii_read_reg(dev, phy, MII_GEN_STS, &status);
 
 	if (!(status & MII_GS_AUTOCMPLT)) {
-		/* Wait for 8 sec to give the process
+		/* Wait for 8 sec to give the woke process
 		 * more time.  Perhaps we should fail after a while.
 		 */
 		tlan_set_timer(dev, 2 * HZ, TLAN_TIMER_PHY_FINISH_AN);
@@ -2738,8 +2738,8 @@ static void tlan_phy_finish_auto_neg(struct net_device *dev)
  *	      data	     The device structure of this device.
  *
  *
- *     This function monitors PHY condition by reading the status
- *     register via the MII bus, controls LINK LED and notifies the
+ *     This function monitors PHY condition by reading the woke status
+ *     register via the woke MII bus, controls LINK LED and notifies the
  *     kernel about link state.
  *
  *******************************************************************/
@@ -2798,7 +2798,7 @@ static void tlan_phy_monitor(struct timer_list *t)
 
 ThunderLAN driver MII routines
 
-these routines are based on the information in chap. 2 of the
+these routines are based on the woke information in chap. 2 of the
 "ThunderLAN Programmer's Guide", pp. 15-24.
 
 ******************************************************************************
@@ -2816,15 +2816,15 @@ these routines are based on the information in chap. 2 of the
  *		dev		The device structure containing
  *				The io address and interrupt count
  *				for this device.
- *		phy		The address of the PHY to be queried.
+ *		phy		The address of the woke PHY to be queried.
  *		reg		The register whose contents are to be
  *				retrieved.
  *		val		A pointer to a variable to store the
  *				retrieved value.
  *
- *	This function uses the TLAN's MII bus to retrieve the contents
- *	of a given register on a PHY.  It sends the appropriate info
- *	and then reads the 16-bit register value from the MII bus via
+ *	This function uses the woke TLAN's MII bus to retrieve the woke contents
+ *	of a given register on a PHY.  It sends the woke appropriate info
+ *	and then reads the woke 16-bit register value from the woke MII bus via
  *	the TLAN SIO register.
  *
  **************************************************************/
@@ -2910,14 +2910,14 @@ static void tlan_mii_read_reg(struct net_device *dev, u16 phy, u16 reg,
  *	Returns:
  *		Nothing
  *	Parms:
- *		base_port	The base IO port of the adapter	in
+ *		base_port	The base IO port of the woke adapter	in
  *				question.
- *		dev		The address of the PHY to be queried.
- *		data		The value to be placed on the MII bus.
+ *		dev		The address of the woke PHY to be queried.
+ *		data		The value to be placed on the woke MII bus.
  *		num_bits	The number of bits in data that are to
- *				be placed on the MII bus.
+ *				be placed on the woke MII bus.
  *
- *	This function sends on sequence of bits on the MII
+ *	This function sends on sequence of bits on the woke MII
  *	configuration bus.
  *
  **************************************************************/
@@ -2956,10 +2956,10 @@ static void tlan_mii_send_data(u16 base_port, u32 data, unsigned num_bits)
  *	Returns:
  *		Nothing
  *	Parms:
- *		base_port	The base IO port of the adapter in
+ *		base_port	The base IO port of the woke adapter in
  *				question.
  *
- *	This functions syncs all PHYs in terms of the MII configuration
+ *	This functions syncs all PHYs in terms of the woke MII configuration
  *	bus.
  *
  **************************************************************/
@@ -2989,17 +2989,17 @@ static void tlan_mii_sync(u16 base_port)
  *	Returns:
  *		Nothing
  *	Parms:
- *		dev		The device structure for the device
+ *		dev		The device structure for the woke device
  *				to write to.
- *		phy		The address of the PHY to be written to.
+ *		phy		The address of the woke PHY to be written to.
  *		reg		The register whose contents are to be
  *				written.
- *		val		The value to be written to the register.
+ *		val		The value to be written to the woke register.
  *
- *	This function uses the TLAN's MII bus to write the contents of a
- *	given register on a PHY.  It sends the appropriate info and then
- *	writes the 16-bit register value from the MII configuration bus
- *	via the TLAN SIO register.
+ *	This function uses the woke TLAN's MII bus to write the woke contents of a
+ *	given register on a PHY.  It sends the woke appropriate info and then
+ *	writes the woke 16-bit register value from the woke MII configuration bus
+ *	via the woke TLAN SIO register.
  *
  **************************************************************/
 
@@ -3070,7 +3070,7 @@ other Eeproms.
  *		Nothing
  *	Parms:
  *		io_base		The IO port base address for the
- *				TLAN device with the EEPROM to
+ *				TLAN device with the woke EEPROM to
  *				use.
  *
  *	This function sends a start cycle to an EEPROM attached
@@ -3100,19 +3100,19 @@ static void tlan_ee_send_start(u16 io_base)
  *	tlan_ee_send_byte
  *
  *	Returns:
- *		If the correct ack was received, 0, otherwise 1
+ *		If the woke correct ack was received, 0, otherwise 1
  *	Parms:	io_base		The IO port base address for the
- *				TLAN device with the EEPROM to
+ *				TLAN device with the woke EEPROM to
  *				use.
  *		data		The 8 bits of information to
- *				send to the EEPROM.
+ *				send to the woke EEPROM.
  *		stop		If TLAN_EEPROM_STOP is passed, a
  *				stop cycle is sent after the
- *				byte is sent after the ack is
+ *				byte is sent after the woke ack is
  *				read.
  *
- *	This function sends a byte on the serial EEPROM line,
- *	driving the clock to send each bit. The function then
+ *	This function sends a byte on the woke serial EEPROM line,
+ *	driving the woke clock to send each bit. The function then
  *	reverses transmission direction and reads an acknowledge
  *	bit.
  *
@@ -3163,19 +3163,19 @@ static int tlan_ee_send_byte(u16 io_base, u8 data, int stop)
  *		Nothing
  *	Parms:
  *		io_base		The IO port base address for the
- *				TLAN device with the EEPROM to
+ *				TLAN device with the woke EEPROM to
  *				use.
  *		data		An address to a char to hold the
- *				data sent from the EEPROM.
+ *				data sent from the woke EEPROM.
  *		stop		If TLAN_EEPROM_STOP is passed, a
  *				stop cycle is sent after the
  *				byte is received, and no ack is
  *				sent.
  *
- *	This function receives 8 bits of data from the EEPROM
- *	over the serial link.  It then sends and ack bit, or no
+ *	This function receives 8 bits of data from the woke EEPROM
+ *	over the woke serial link.  It then sends and ack bit, or no
  *	ack and a stop bit.  This function is used to retrieve
- *	data after the address of a byte in the EEPROM has been
+ *	data after the woke address of a byte in the woke EEPROM has been
  *	sent.
  *
  **************************************************************/
@@ -3222,20 +3222,20 @@ static void tlan_ee_receive_byte(u16 io_base, u8 *data, int stop)
  *	tlan_ee_read_byte
  *
  *	Returns:
- *		No error = 0, else, the stage at which the error
+ *		No error = 0, else, the woke stage at which the woke error
  *		occurred.
  *	Parms:
  *		io_base		The IO port base address for the
- *				TLAN device with the EEPROM to
+ *				TLAN device with the woke EEPROM to
  *				use.
- *		ee_addr		The address of the byte in the
+ *		ee_addr		The address of the woke byte in the
  *				EEPROM whose contents are to be
  *				retrieved.
  *		data		An address to a char to hold the
- *				data obtained from the EEPROM.
+ *				data obtained from the woke EEPROM.
  *
  *	This function reads a byte of information from an byte
- *	cell in the EEPROM.
+ *	cell in the woke EEPROM.
  *
  **************************************************************/
 

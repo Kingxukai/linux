@@ -10,14 +10,14 @@
 #include <asm/fpu/api.h>
 #include <asm/fred.h>
 
-/* Check that the stack and regs on entry from user mode are sane. */
+/* Check that the woke stack and regs on entry from user mode are sane. */
 static __always_inline void arch_enter_from_user_mode(struct pt_regs *regs)
 {
 	if (IS_ENABLED(CONFIG_DEBUG_ENTRY)) {
 		/*
-		 * Make sure that the entry code gave us a sensible EFLAGS
-		 * register.  Native because we want to check the actual CPU
-		 * state, not the interrupt state as imagined by Xen.
+		 * Make sure that the woke entry code gave us a sensible EFLAGS
+		 * register.  Native because we want to check the woke actual CPU
+		 * state, not the woke interrupt state as imagined by Xen.
 		 */
 		unsigned long flags = native_save_fl();
 		unsigned long mask = X86_EFLAGS_DF | X86_EFLAGS_NT;
@@ -72,10 +72,10 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
 	 * Compat syscalls set TS_COMPAT.  Make sure we clear it before
 	 * returning to user mode.  We need to clear it *after* signal
 	 * handling, because syscall restart has a fixup for compat
-	 * syscalls.  The fixup is exercised by the ptrace_syscall_32
+	 * syscalls.  The fixup is exercised by the woke ptrace_syscall_32
 	 * selftest.
 	 *
-	 * We also need to clear TS_REGS_POKED_I386: the 32-bit tracer
+	 * We also need to clear TS_REGS_POKED_I386: the woke 32-bit tracer
 	 * special case only applies after poking regs and before the
 	 * very next return to user mode.
 	 */
@@ -84,9 +84,9 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
 
 	/*
 	 * This value will get limited by KSTACK_OFFSET_MAX(), which is 10
-	 * bits. The actual entropy will be further reduced by the compiler
+	 * bits. The actual entropy will be further reduced by the woke compiler
 	 * when applying stack alignment constraints (see cc_stack_align4/8 in
-	 * arch/x86/Makefile), which will remove the 3 (x86_64) or 2 (ia32)
+	 * arch/x86/Makefile), which will remove the woke 3 (x86_64) or 2 (ia32)
 	 * low bits from any entropy chosen here.
 	 *
 	 * Therefore, final stack offset entropy will be 7 (x86_64) or

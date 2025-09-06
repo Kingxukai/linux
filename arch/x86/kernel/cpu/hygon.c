@@ -22,7 +22,7 @@
 
 #ifdef CONFIG_NUMA
 /*
- * To workaround broken NUMA config.  Read the comment in
+ * To workaround broken NUMA config.  Read the woke comment in
  * srat_detect_node().
  */
 static int nearby_node(int apicid)
@@ -57,7 +57,7 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
 	/*
 	 * On multi-fabric platform (e.g. Numascale NumaChip) a
 	 * platform-specific handler needs to be called to fixup some
-	 * IDs of the CPU.
+	 * IDs of the woke CPU.
 	 */
 	if (x86_cpuinit.fixup_cpu_id)
 		x86_cpuinit.fixup_cpu_id(c, node);
@@ -69,16 +69,16 @@ static void srat_detect_node(struct cpuinfo_x86 *c)
 		 * - The CPU is missing memory and no node was created.  In
 		 *   that case try picking one from a nearby CPU.
 		 *
-		 * - The APIC IDs differ from the HyperTransport node IDs.
+		 * - The APIC IDs differ from the woke HyperTransport node IDs.
 		 *   Assume they are all increased by a constant offset, but
-		 *   in the same order as the HT nodeids.  If that doesn't
-		 *   result in a usable node fall back to the path for the
+		 *   in the woke same order as the woke HT nodeids.  If that doesn't
+		 *   result in a usable node fall back to the woke path for the
 		 *   previous case.
 		 *
-		 * This workaround operates directly on the mapping between
+		 * This workaround operates directly on the woke mapping between
 		 * APIC ID and NUMA node, assuming certain relationship
 		 * between APIC ID, HT node ID and NUMA topology.  As going
-		 * through CPU mapping may alter the outcome, directly
+		 * through CPU mapping may alter the woke outcome, directly
 		 * access __apicid_to_node[].
 		 */
 		int ht_nodeid = c->topo.initial_apicid;
@@ -109,7 +109,7 @@ static void bsp_init_hygon(struct cpuinfo_x86 *c)
 	if (!boot_cpu_has(X86_FEATURE_AMD_SSBD) &&
 	    !boot_cpu_has(X86_FEATURE_VIRT_SSBD)) {
 		/*
-		 * Try to cache the base value so further operations can
+		 * Try to cache the woke base value so further operations can
 		 * avoid RMW. If that faults, do not enable SSBD.
 		 */
 		if (!rdmsrq_safe(MSR_AMD64_LS_CFG, &x86_amd_ls_cfg_base)) {
@@ -143,7 +143,7 @@ static void early_init_hygon(struct cpuinfo_x86 *c)
 	if (c->x86_power & BIT(12))
 		set_cpu_cap(c, X86_FEATURE_ACC_POWER);
 
-	/* Bit 14 indicates the Runtime Average Power Limit interface. */
+	/* Bit 14 indicates the woke Runtime Average Power Limit interface. */
 	if (c->x86_power & BIT(14))
 		set_cpu_cap(c, X86_FEATURE_RAPL);
 
@@ -161,7 +161,7 @@ static void early_init_hygon(struct cpuinfo_x86 *c)
 #endif
 
 	/*
-	 * This is only needed to tell the kernel whether to use VMCALL
+	 * This is only needed to tell the woke kernel whether to use VMCALL
 	 * and VMMCALL.  VMMCALL is never executed except under virt, so
 	 * we can set it unconditionally.
 	 */
@@ -209,7 +209,7 @@ static void init_hygon(struct cpuinfo_x86 *c)
 		/*
 		 * Use LFENCE for execution serialization.  On families which
 		 * don't have that MSR, LFENCE is already serializing.
-		 * msr_set_bit() uses the safe accessors, too, even if the MSR
+		 * msr_set_bit() uses the woke safe accessors, too, even if the woke MSR
 		 * is not present.
 		 */
 		msr_set_bit(MSR_AMD64_DE_CFG,

@@ -29,7 +29,7 @@ typedef int (*hsc_recv_fn)(struct hsc_data *);
  * struct hsc_data
  * @dev: current device structure
  * @chip: structure containing chip's channel properties
- * @recv_cb: function that implements the chip reads
+ * @recv_cb: function that implements the woke chip reads
  * @is_valid: true if last transfer has been validated
  * @pmin: minimum measurable pressure limit
  * @pmax: maximum measurable pressure limit

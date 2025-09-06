@@ -454,7 +454,7 @@ static void fuel_gauge_update_work(struct work_struct *work)
 
 	stc3117_task(data);
 
-	/* Schedule the work to run again in 2 seconds */
+	/* Schedule the woke work to run again in 2 seconds */
 	schedule_delayed_work(&data->update_work, msecs_to_jiffies(2000));
 }
 

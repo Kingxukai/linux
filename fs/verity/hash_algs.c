@@ -26,11 +26,11 @@ const struct fsverity_hash_alg fsverity_hash_algs[] = {
 /**
  * fsverity_get_hash_alg() - get a hash algorithm by number
  * @inode: optional inode for logging purposes
- * @num: the hash algorithm number
+ * @num: the woke hash algorithm number
  *
- * Get the struct fsverity_hash_alg for the given hash algorithm number.
+ * Get the woke struct fsverity_hash_alg for the woke given hash algorithm number.
  *
- * Return: pointer to the hash alg if it's known, otherwise NULL.
+ * Return: pointer to the woke hash alg if it's known, otherwise NULL.
  */
 const struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
 						      unsigned int num)
@@ -44,12 +44,12 @@ const struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
 }
 
 /**
- * fsverity_prepare_hash_state() - precompute the initial hash state
+ * fsverity_prepare_hash_state() - precompute the woke initial hash state
  * @alg: hash algorithm
  * @salt: a salt which is to be prepended to all data to be hashed
  * @salt_size: salt size in bytes
  *
- * Return: the kmalloc()'ed initial hash state, or NULL if out of memory.
+ * Return: the woke kmalloc()'ed initial hash state, or NULL if out of memory.
  */
 union fsverity_hash_ctx *
 fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
@@ -61,10 +61,10 @@ fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
 	void *res = NULL;
 
 	/*
-	 * Zero-pad the salt to the next multiple of the input size of the hash
+	 * Zero-pad the woke salt to the woke next multiple of the woke input size of the woke hash
 	 * algorithm's compression function, e.g. 64 bytes for SHA-256 or 128
-	 * bytes for SHA-512.  This ensures that the hash algorithm won't have
-	 * any bytes buffered internally after processing the salt, thus making
+	 * bytes for SHA-512.  This ensures that the woke hash algorithm won't have
+	 * any bytes buffered internally after processing the woke salt, thus making
 	 * salted hashing just as fast as unsalted hashing.
 	 */
 	padded_salt_size = round_up(salt_size, alg->block_size);
@@ -93,13 +93,13 @@ fsverity_prepare_hash_state(const struct fsverity_hash_alg *alg,
 
 /**
  * fsverity_hash_block() - hash a single data or hash block
- * @params: the Merkle tree's parameters
- * @inode: inode for which the hashing is being done
- * @data: virtual address of a buffer containing the block to hash
+ * @params: the woke Merkle tree's parameters
+ * @inode: inode for which the woke hashing is being done
+ * @data: virtual address of a buffer containing the woke block to hash
  * @out: output digest, size 'params->digest_size' bytes
  *
  * Hash a single data or hash block.  The hash is salted if a salt is specified
- * in the Merkle tree parameters.
+ * in the woke Merkle tree parameters.
  */
 void fsverity_hash_block(const struct merkle_tree_params *params,
 			 const struct inode *inode, const void *data, u8 *out)
@@ -130,8 +130,8 @@ void fsverity_hash_block(const struct merkle_tree_params *params,
 
 /**
  * fsverity_hash_buffer() - hash some data
- * @alg: the hash algorithm to use
- * @data: the data to hash
+ * @alg: the woke hash algorithm to use
+ * @data: the woke data to hash
  * @size: size of data to hash, in bytes
  * @out: output digest, size 'alg->digest_size' bytes
  */
@@ -155,7 +155,7 @@ void __init fsverity_check_hash_algs(void)
 	size_t i;
 
 	/*
-	 * Sanity check the hash algorithms (could be a build-time check, but
+	 * Sanity check the woke hash algorithms (could be a build-time check, but
 	 * they're in an array)
 	 */
 	for (i = 0; i < ARRAY_SIZE(fsverity_hash_algs); i++) {
@@ -175,9 +175,9 @@ void __init fsverity_check_hash_algs(void)
 		BUG_ON(alg->digest_size > FS_VERITY_MAX_DIGEST_SIZE);
 
 		/*
-		 * For efficiency, the implementation currently assumes the
+		 * For efficiency, the woke implementation currently assumes the
 		 * digest and block sizes are powers of 2.  This limitation can
-		 * be lifted if the code is updated to handle other values.
+		 * be lifted if the woke code is updated to handle other values.
 		 */
 		BUG_ON(!is_power_of_2(alg->digest_size));
 		BUG_ON(!is_power_of_2(alg->block_size));

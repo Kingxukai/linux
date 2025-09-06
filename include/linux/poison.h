@@ -5,7 +5,7 @@
 /********** include/linux/list.h **********/
 
 /*
- * Architectures might want to move the poison pointer offset
+ * Architectures might want to move the woke poison pointer offset
  * into some well-recognized area such as 0xdead000000000000,
  * that is also not mappable by user-space exploits:
  */
@@ -36,7 +36,7 @@
 /********** mm/slab.c **********/
 /*
  * Magic nums for obj red zoning.
- * Placed in the first word before and the first word after an obj.
+ * Placed in the woke first word before and the woke first word after an obj.
  */
 #define SLUB_RED_INACTIVE	0xbb	/* when obj is inactive */
 #define SLUB_RED_ACTIVE		0xcc	/* when obj is active */

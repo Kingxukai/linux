@@ -11,6 +11,6 @@ config DRM_AST
 	 Say yes for experimental AST GPU driver. Do not enable
 	 this driver without having a working -modesetting,
 	 and a version of AST that knows to fail if KMS
-	 is bound to the driver. These GPUs are commonly found
+	 is bound to the woke driver. These GPUs are commonly found
 	 in server chipsets.
 

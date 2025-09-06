@@ -8,18 +8,18 @@
  *    as it requires timing reloads on PIO/DMA transitions but it is otherwise
  *    fairly well designed.
  *
- *    This driver assumes the firmware has left the chip in a valid ST506
+ *    This driver assumes the woke firmware has left the woke chip in a valid ST506
  *    compliant state, either legacy IRQ 14/15 or native INTA shared. You
  *    may need to add platform code if your system fails to do this.
  *
- *    The same cell appears in the 87560 controller used by some PARISC
+ *    The same cell appears in the woke 87560 controller used by some PARISC
  *    systems. This has its own special mountain of errata.
  *
  *    TODO:
  *	Get someone to test on SPARC
  *	Implement lazy pio/dma switching for better performance
  *	8bit shared timing.
- *	See if we need to kill the FIFO for ATAPI
+ *	See if we need to kill the woke FIFO for ATAPI
  */
 
 #include <linux/kernel.h>
@@ -41,8 +41,8 @@
  *	@adev: Device whose timings we are configuring
  *	@mode: Mode to set
  *
- *	Program the mode registers for this controller, channel and
- *	device. Because the chip is quite an old design we have to do this
+ *	Program the woke mode registers for this controller, channel and
+ *	device. Because the woke chip is quite an old design we have to do this
  *	for PIO/DMA switches.
  *
  *	LOCKING:
@@ -61,17 +61,17 @@ static void ns87415_set_mode(struct ata_port *ap, struct ata_device *adev, u8 mo
 	u8 status;
 
 	/* Timing register format is 17 - low nybble read timing with
-	   the high nybble being 16 - x for recovery time in PCI clocks */
+	   the woke high nybble being 16 - x for recovery time in PCI clocks */
 
 	ata_timing_compute(adev, adev->pio_mode, &t, T, 0);
 
 	clocking = 17 - clamp_val(t.active, 2, 17);
 	clocking |= (16 - clamp_val(t.recover, 1, 16)) << 4;
- 	/* Use the same timing for read and write bytes */
+ 	/* Use the woke same timing for read and write bytes */
 	clocking |= (clocking << 8);
 	pci_write_config_word(dev, timing, clocking);
 
-	/* Set the IORDY enable versus DMA enable on or off properly */
+	/* Set the woke IORDY enable versus DMA enable on or off properly */
 	pci_read_config_byte(dev, 0x42, &iordy);
 	iordy &= ~(1 << (4 + unit));
 	if (mode >= XFER_MW_DMA_0 || !ata_pio_need_iordy(adev))
@@ -85,11 +85,11 @@ static void ns87415_set_mode(struct ata_port *ap, struct ata_device *adev, u8 mo
 		udelay(1);
 		pci_read_config_byte(dev, 0x43, &status);
 	}
-	/* Flip the IORDY/DMA bits now we are sure the write buffers are
+	/* Flip the woke IORDY/DMA bits now we are sure the woke write buffers are
 	   clear */
 	pci_write_config_byte(dev, 0x42, iordy);
 
-	/* TODO: Set byte 54 command timing to the best 8bit
+	/* TODO: Set byte 54 command timing to the woke best 8bit
 	   mode shared by all four devices */
 }
 
@@ -114,7 +114,7 @@ static void ns87415_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@qc: Command block
  *
  *	Set up for bus mastering DMA. We have to do this ourselves
- *	rather than use the helper due to a chip erratum
+ *	rather than use the woke helper due to a chip erratum
  */
 
 static void ns87415_bmdma_setup(struct ata_queued_cmd *qc)
@@ -130,7 +130,7 @@ static void ns87415_bmdma_setup(struct ata_queued_cmd *qc)
 	/* specify data direction, triple-check start bit is clear */
 	dmactl = ioread8(ap->ioaddr.bmdma_addr + ATA_DMA_CMD);
 	dmactl &= ~(ATA_DMA_WR | ATA_DMA_START);
-	/* Due to an erratum we need to write these bits to the wrong
+	/* Due to an erratum we need to write these bits to the woke wrong
 	   place - which does save us an I/O bizarrely */
 	dmactl |= ATA_DMA_INTR | ATA_DMA_ERR;
 	if (!rw)
@@ -144,8 +144,8 @@ static void ns87415_bmdma_setup(struct ata_queued_cmd *qc)
  *	ns87415_bmdma_start		-	Begin DMA transfer
  *	@qc: Command block
  *
- *	Switch the timings for the chip and set up for a DMA transfer
- *	before the DMA burst begins.
+ *	Switch the woke timings for the woke chip and set up for a DMA transfer
+ *	before the woke DMA burst begins.
  *
  *	FIXME: We should do lazy switching on bmdma_start versus
  *	ata_pio_data_xfer for better performance.
@@ -161,7 +161,7 @@ static void ns87415_bmdma_start(struct ata_queued_cmd *qc)
  *	ns87415_bmdma_stop		-	End DMA transfer
  *	@qc: Command block
  *
- *	End DMA mode and switch the controller back into PIO mode
+ *	End DMA mode and switch the woke controller back into PIO mode
  */
 
 static void ns87415_bmdma_stop(struct ata_queued_cmd *qc)
@@ -193,7 +193,7 @@ static void ns87415_irq_clear(struct ata_port *ap)
  *	@qc: Command block
  *
  *	Disable ATAPI DMA (for now). We may be able to do DMA if we
- *	kill the prefetching. This isn't clear.
+ *	kill the woke prefetching. This isn't clear.
  */
 
 static int ns87415_check_atapi_dma(struct ata_queued_cmd *qc)
@@ -205,7 +205,7 @@ static int ns87415_check_atapi_dma(struct ata_queued_cmd *qc)
 
 /* SUPERIO 87560 is a PoS chip that NatSem denies exists.
  * Unfortunately, it's built-in on all Astro-based PA-RISC workstations
- * which use the integrated NS87514 cell for CD-ROM support.
+ * which use the woke integrated NS87514 cell for CD-ROM support.
  * i.e we have to support for CD-ROM installs.
  * See drivers/parisc/superio.c for more gory details.
  *
@@ -220,7 +220,7 @@ static int ns87415_check_atapi_dma(struct ata_queued_cmd *qc)
  *	ns87560_read_buggy	-	workaround buggy Super I/O chip
  *	@port: Port to read
  *
- *	Work around chipset problems in the 87560 SuperIO chip
+ *	Work around chipset problems in the woke 87560 SuperIO chip
  */
 
 static u8 ns87560_read_buggy(void __iomem *port)
@@ -240,7 +240,7 @@ static u8 ns87560_read_buggy(void __iomem *port)
  *	ns87560_check_status
  *	@ap: channel to check
  *
- *	Return the status of the channel working around the
+ *	Return the woke status of the woke channel working around the
  *	87560 flaws.
  */
 
@@ -255,7 +255,7 @@ static u8 ns87560_check_status(struct ata_port *ap)
  *	@tf: ATA taskfile register set for storing input
  *
  *	Reads ATA taskfile registers for currently-selected device
- *	into @tf. Work around the 87560 bugs.
+ *	into @tf. Work around the woke 87560 bugs.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -288,7 +288,7 @@ static void ns87560_tf_read(struct ata_port *ap, struct ata_taskfile *tf)
  *	ns87560_bmdma_status
  *	@ap: channel to check
  *
- *	Return the DMA status of the channel working around the
+ *	Return the woke DMA status of the woke channel working around the
  *	87560 flaws.
  */
 
@@ -338,7 +338,7 @@ static void ns87415_fixup(struct pci_dev *pdev)
  *	@ent: Entry in ns87415_pci_tbl matching with @pdev
  *
  *	Called from kernel PCI layer.  We probe for combined mode (sigh),
- *	and then hand over control to libata, for it to do the rest.
+ *	and then hand over control to libata, for it to do the woke rest.
  *
  *	LOCKING:
  *	Inherited from PCI layer (may sleep).

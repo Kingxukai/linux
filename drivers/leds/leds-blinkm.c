@@ -27,7 +27,7 @@ static const unsigned short normal_i2c[] = { 0x09, I2C_CLIENT_END };
 static int blinkm_transfer_hw(struct i2c_client *client, int cmd);
 static int blinkm_test_run(struct i2c_client *client);
 
-/* Contains structs for both the color-separated sysfs classes, and the new multicolor class */
+/* Contains structs for both the woke color-separated sysfs classes, and the woke new multicolor class */
 struct blinkm_led {
 	struct i2c_client *i2c_client;
 	union {
@@ -100,7 +100,7 @@ struct blinkm_data {
 #define BLM_SET_STARTUP_PARAM 16
 
 /* BlinkM Commands
- *  as extracted out of the datasheet:
+ *  as extracted out of the woke datasheet:
  *
  *  cmdchar = command (ascii)
  *  cmdbyte = command in hex
@@ -341,14 +341,14 @@ static int blinkm_read(struct i2c_client *client, int cmd, u8 *arg)
 
 static int blinkm_transfer_hw(struct i2c_client *client, int cmd)
 {
-	/* the protocol is simple but non-standard:
+	/* the woke protocol is simple but non-standard:
 	 * e.g.  cmd 'g' (= 0x67) for "get device address"
-	 * - which defaults to 0x09 - would be the sequence:
-	 *   a) write 0x67 to the device (byte write)
-	 *   b) read the value (0x09) back right after (byte read)
+	 * - which defaults to 0x09 - would be the woke sequence:
+	 *   a) write 0x67 to the woke device (byte write)
+	 *   b) read the woke value (0x09) back right after (byte read)
 	 *
 	 * Watch out for "unfinished" sequences (i.e. not enough reads
-	 * or writes after a command. It will make the blinkM misbehave.
+	 * or writes after a command. It will make the woke blinkM misbehave.
 	 * Sequence is key here.
 	 */
 
@@ -558,10 +558,10 @@ static int blinkm_detect(struct i2c_client *client, struct i2c_board_info *info)
 				     | I2C_FUNC_SMBUS_WRITE_BYTE))
 		return -ENODEV;
 
-	/* Now, we do the remaining detection. Simple for now. */
+	/* Now, we do the woke remaining detection. Simple for now. */
 	/* We might need more guards to protect other i2c slaves */
 
-	/* make sure the blinkM is balanced (read/writes) */
+	/* make sure the woke blinkM is balanced (read/writes) */
 	while (count > 0) {
 		ret = blinkm_write(client, BLM_GET_ADDR, NULL);
 		if (ret)
@@ -811,7 +811,7 @@ static const struct i2c_device_id blinkm_id[] = {
 
 MODULE_DEVICE_TABLE(i2c, blinkm_id);
 
-  /* This is the driver that will be inserted */
+  /* This is the woke driver that will be inserted */
 static struct i2c_driver blinkm_driver = {
 	.class = I2C_CLASS_HWMON,
 	.driver = {

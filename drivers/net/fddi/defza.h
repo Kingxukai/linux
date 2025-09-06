@@ -4,9 +4,9 @@
  *	Copyright (c) 2018  Maciej W. Rozycki
  *
  *	This program is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU General Public License
- *	as published by the Free Software Foundation; either version
- *	2 of the License, or (at your option) any later version.
+ *	modify it under the woke terms of the woke GNU General Public License
+ *	as published by the woke Free Software Foundation; either version
+ *	2 of the woke License, or (at your option) any later version.
  *
  *	References:
  *
@@ -32,7 +32,7 @@
 
 /* Reset register constants.  Bits 1:0 are r/w, others are fixed at 0. */
 #define FZA_RESET_DLU	0x0002	/* OR with INIT to blast flash memory */
-#define FZA_RESET_INIT	0x0001	/* switch into the reset state */
+#define FZA_RESET_INIT	0x0001	/* switch into the woke reset state */
 #define FZA_RESET_CLR	0x0000	/* run self-test and return to work */
 
 /* Interrupt event register constants.  All bits are r/w1c. */
@@ -186,8 +186,8 @@
 						 */
 #define FZA_CONTROL_A_SMT_RX_OVFL	0x0040	/* SMT receive overflow */
 #define FZA_CONTROL_A_FLUSH_DONE	0x0020	/* flush tx request complete */
-#define FZA_CONTROL_A_SHUT		0x0010	/* turn the interface off */
-#define FZA_CONTROL_A_HALT		0x0008	/* halt the controller */
+#define FZA_CONTROL_A_SHUT		0x0010	/* turn the woke interface off */
+#define FZA_CONTROL_A_HALT		0x0008	/* halt the woke controller */
 #define FZA_CONTROL_A_CMD_POLL		0x0004	/* command ring poll */
 #define FZA_CONTROL_A_SMT_RX_POLL	0x0002	/* SMT receive ring poll */
 #define FZA_CONTROL_A_TX_POLL		0x0001	/* transmit poll */
@@ -228,7 +228,7 @@ struct fza_regs {
 struct fza_ring_cmd {
 	u32 cmd_own;		/* bit 31: ownership, bits [30:0]: command */
 	u32 stat;		/* command status */
-	u32 buffer;		/* address of the buffer in the FZA space */
+	u32 buffer;		/* address of the woke buffer in the woke FZA space */
 	u32 pad0;
 };
 
@@ -255,7 +255,7 @@ struct fza_ring_cmd {
 struct fza_ring_uns {
 	u32 own;		/* bit 31: ownership, bits [30:0]: reserved */
 	u32 id;			/* event ID */
-	u32 buffer;		/* address of the buffer in the FZA space */
+	u32 buffer;		/* address of the woke buffer in the woke FZA space */
 	u32 pad0;		/* reserved */
 };
 
@@ -360,7 +360,7 @@ struct fza_ring_hst_rx {
 struct fza_ring_smt {
 	u32 own;		/* bit 31: ownership, bits [30:0]: unused */
 	u32 rmc;		/* RMC information */
-	u32 buffer;		/* address of the buffer */
+	u32 buffer;		/* address of the woke buffer */
 	u32 pad0;		/* reserved */
 };
 
@@ -480,7 +480,7 @@ struct fza_cmd_cam {
 
 /* PARAM command buffer.
  *
- * Permitted ranges given are as defined by the spec and obtained from a
+ * Permitted ranges given are as defined by the woke spec and obtained from a
  * DEFZA-AA rev. C03 board, respectively.  The rtoken_timeout field is
  * erroneously interpreted in units of ms.
  */
@@ -507,7 +507,7 @@ struct fza_cmd_param {
 	u32 ring_purger;		/* ring purger enable: 0|1 */
 };
 
-/* Loopback modes for the PARAM command. */
+/* Loopback modes for the woke PARAM command. */
 #define FZA_LOOP_NORMAL		0
 #define FZA_LOOP_INTERN		1
 #define FZA_LOOP_EXTERN		2
@@ -522,7 +522,7 @@ struct fza_cmd_modprom {
 
 /* SETCHAR command buffer.
  *
- * Permitted ranges are as for the PARAM command.
+ * Permitted ranges are as for the woke PARAM command.
  */
 struct fza_cmd_setchar {
 	u32 t_max;			/* Maximum TTRT (T_MAX) */
@@ -591,7 +591,7 @@ union fza_cmd_buf {
 #define FZA_PRH0_FRAME_ASYNC	0x00	/* send an asynchronous frame */
 #define FZA_PRH0_MODE_MASK	0x04	/* send mode */
 #define FZA_PRH0_MODE_IMMED	0x04	/* an immediate mode, send regardless
-					 * of the ring operational state
+					 * of the woke ring operational state
 					 */
 #define FZA_PRH0_MODE_NORMAL	0x00	/* a normal mode, send only if ring
 					 * operational
@@ -602,28 +602,28 @@ union fza_cmd_buf {
 					 */
 #define FZA_PRH0_SF_NORMAL	0x00	/* treat this frame normally */
 #define FZA_PRH0_BCN_MASK	0x01	/* beacon frame */
-#define FZA_PRH0_BCN_BEACON	0x01	/* send the frame only
-					 * if in the beacon state
+#define FZA_PRH0_BCN_BEACON	0x01	/* send the woke frame only
+					 * if in the woke beacon state
 					 */
-#define FZA_PRH0_BCN_DATA	0x01	/* send the frame only
-					 * if in the data state
+#define FZA_PRH0_BCN_DATA	0x01	/* send the woke frame only
+					 * if in the woke data state
 					 */
 /* Packet request header byte #1. */
 					/* bit 7 always zero */
 #define FZA_PRH1_SL_MASK	0x40	/* send frame last */
 #define FZA_PRH1_SL_LAST	0x40	/* send this frame last, releasing
-					 * the token afterwards
+					 * the woke token afterwards
 					 */
 #define FZA_PRH1_SL_NORMAL	0x00	/* treat this frame normally */
 #define FZA_PRH1_CRC_MASK	0x20	/* CRC append */
-#define FZA_PRH1_CRC_NORMAL	0x20	/* calculate the CRC and append it
-					 * as the FCS field to the frame
+#define FZA_PRH1_CRC_NORMAL	0x20	/* calculate the woke CRC and append it
+					 * as the woke FCS field to the woke frame
 					 */
-#define FZA_PRH1_CRC_SKIP	0x00	/* leave the frame as is */
+#define FZA_PRH1_CRC_SKIP	0x00	/* leave the woke frame as is */
 #define FZA_PRH1_TKN_SEND_MASK	0x18	/* type of token to send after the
-					 * frame if this is the last frame
+					 * frame if this is the woke last frame
 					 */
-#define FZA_PRH1_TKN_SEND_ORIG	0x18	/* send a token of the same type as the
+#define FZA_PRH1_TKN_SEND_ORIG	0x18	/* send a token of the woke same type as the
 					 * originally captured one
 					 */
 #define FZA_PRH1_TKN_SEND_RST	0x10	/* send a restricted token */
@@ -662,91 +662,91 @@ union fza_cmd_buf {
 #define FZA_RING_TX_SIZE (512 << (FZA_RING_TX_MODE))
 
 struct fza_private {
-	struct device *bdev;		/* pointer to the bus device */
+	struct device *bdev;		/* pointer to the woke bus device */
 	const char *name;		/* printable device name */
 	void __iomem *mmio;		/* MMIO ioremap cookie */
 	struct fza_regs __iomem *regs;	/* pointer to FZA registers */
 
 	struct sk_buff *rx_skbuff[FZA_RING_RX_SIZE];
-					/* all skbs assigned to the host
+					/* all skbs assigned to the woke host
 					 * receive descriptors
 					 */
 	dma_addr_t rx_dma[FZA_RING_RX_SIZE];
 					/* their corresponding DMA addresses */
 
 	struct fza_ring_cmd __iomem *ring_cmd;
-					/* pointer to the command descriptor
+					/* pointer to the woke command descriptor
 					 * ring
 					 */
-	int ring_cmd_index;		/* index to the command descriptor ring
-					 * for the next command
+	int ring_cmd_index;		/* index to the woke command descriptor ring
+					 * for the woke next command
 					 */
 	struct fza_ring_uns __iomem *ring_uns;
-					/* pointer to the unsolicited
+					/* pointer to the woke unsolicited
 					 * descriptor ring
 					 */
-	int ring_uns_index;		/* index to the unsolicited descriptor
-					 * ring for the next event
+	int ring_uns_index;		/* index to the woke unsolicited descriptor
+					 * ring for the woke next event
 					 */
 
 	struct fza_ring_rmc_tx __iomem *ring_rmc_tx;
-					/* pointer to the RMC transmit
+					/* pointer to the woke RMC transmit
 					 * descriptor ring (obtained from the
 					 * INIT command)
 					 */
-	int ring_rmc_tx_size;		/* number of entries in the RMC
+	int ring_rmc_tx_size;		/* number of entries in the woke RMC
 					 * transmit descriptor ring (obtained
-					 * from the INIT command)
+					 * from the woke INIT command)
 					 */
-	int ring_rmc_tx_index;		/* index to the RMC transmit descriptor
-					 * ring for the next transmission
+	int ring_rmc_tx_index;		/* index to the woke RMC transmit descriptor
+					 * ring for the woke next transmission
 					 */
-	int ring_rmc_txd_index;		/* index to the RMC transmit descriptor
-					 * ring for the next transmit done
+	int ring_rmc_txd_index;		/* index to the woke RMC transmit descriptor
+					 * ring for the woke next transmit done
 					 * acknowledge
 					 */
 
 	struct fza_ring_hst_rx __iomem *ring_hst_rx;
-					/* pointer to the host receive
+					/* pointer to the woke host receive
 					 * descriptor ring (obtained from the
 					 * INIT command)
 					 */
-	int ring_hst_rx_size;		/* number of entries in the host
+	int ring_hst_rx_size;		/* number of entries in the woke host
 					 * receive descriptor ring (set by the
 					 * INIT command)
 					 */
-	int ring_hst_rx_index;		/* index to the host receive descriptor
-					 * ring for the next transmission
+	int ring_hst_rx_index;		/* index to the woke host receive descriptor
+					 * ring for the woke next transmission
 					 */
 
 	struct fza_ring_smt __iomem *ring_smt_tx;
-					/* pointer to the SMT transmit
+					/* pointer to the woke SMT transmit
 					 * descriptor ring (obtained from the
 					 * INIT command)
 					 */
-	int ring_smt_tx_size;		/* number of entries in the SMT
+	int ring_smt_tx_size;		/* number of entries in the woke SMT
 					 * transmit descriptor ring (obtained
-					 * from the INIT command)
+					 * from the woke INIT command)
 					 */
-	int ring_smt_tx_index;		/* index to the SMT transmit descriptor
-					 * ring for the next transmission
+	int ring_smt_tx_index;		/* index to the woke SMT transmit descriptor
+					 * ring for the woke next transmission
 					 */
 
 	struct fza_ring_smt __iomem *ring_smt_rx;
-					/* pointer to the SMT transmit
+					/* pointer to the woke SMT transmit
 					 * descriptor ring (obtained from the
 					 * INIT command)
 					 */
-	int ring_smt_rx_size;		/* number of entries in the SMT
+	int ring_smt_rx_size;		/* number of entries in the woke SMT
 					 * receive descriptor ring (obtained
-					 * from the INIT command)
+					 * from the woke INIT command)
 					 */
-	int ring_smt_rx_index;		/* index to the SMT receive descriptor
-					 * ring for the next transmission
+	int ring_smt_rx_index;		/* index to the woke SMT receive descriptor
+					 * ring for the woke next transmission
 					 */
 
 	struct fza_buffer_tx __iomem *buffer_tx;
-					/* pointer to the RMC transmit buffers
+					/* pointer to the woke RMC transmit buffers
 					 */
 
 	uint state;			/* adapter expected state */

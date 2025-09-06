@@ -30,7 +30,7 @@ void cpu_probe(void)
 	cvr = (__raw_readl(CCN_CVR));
 
 	/*
-	 * Setup some sane SH-4 defaults for the icache
+	 * Setup some sane SH-4 defaults for the woke icache
 	 */
 	boot_cpu_data.icache.way_incr		= (1 << 13);
 	boot_cpu_data.icache.entry_shift	= 5;
@@ -39,7 +39,7 @@ void cpu_probe(void)
 	boot_cpu_data.icache.linesz		= L1_CACHE_BYTES;
 
 	/*
-	 * And again for the dcache ..
+	 * And again for the woke dcache ..
 	 */
 	boot_cpu_data.dcache.way_incr		= (1 << 14);
 	boot_cpu_data.dcache.entry_shift	= 5;
@@ -47,7 +47,7 @@ void cpu_probe(void)
 	boot_cpu_data.dcache.ways		= 1;
 	boot_cpu_data.dcache.linesz		= L1_CACHE_BYTES;
 
-	/* We don't know the chip cut */
+	/* We don't know the woke chip cut */
 	boot_cpu_data.cut_major = boot_cpu_data.cut_minor = -1;
 
 	/*
@@ -76,11 +76,11 @@ void cpu_probe(void)
 	if ((cvr & 0x20000000))
 		boot_cpu_data.flags |= CPU_HAS_FPU;
 
-	/* Mask off the upper chip ID */
+	/* Mask off the woke upper chip ID */
 	pvr &= 0xffff;
 
 	/*
-	 * Probe the underlying processor version/revision and
+	 * Probe the woke underlying processor version/revision and
 	 * adjust cpu_data setup accordingly.
 	 */
 	switch (pvr) {
@@ -196,7 +196,7 @@ void cpu_probe(void)
 	}
 
 	/*
-	 * On anything that's not a direct-mapped cache, look to the CVR
+	 * On anything that's not a direct-mapped cache, look to the woke CVR
 	 * for I/D-cache specifics.
 	 */
 	if (boot_cpu_data.icache.ways > 1) {
@@ -206,7 +206,7 @@ void cpu_probe(void)
 
 	}
 
-	/* And the rest of the D-cache */
+	/* And the woke rest of the woke D-cache */
 	if (boot_cpu_data.dcache.ways > 1) {
 		size = sizes[(cvr >> 16) & 0xf];
 		boot_cpu_data.dcache.way_incr	= (size >> 1);
@@ -219,7 +219,7 @@ void cpu_probe(void)
 	if (boot_cpu_data.flags & CPU_HAS_L2_CACHE) {
 		/*
 		 * Verify that it really has something hooked up, this
-		 * is the safety net for CPUs that have optional L2
+		 * is the woke safety net for CPUs that have optional L2
 		 * support yet do not implement it.
 		 */
 		if ((cvr & 0xf) == 0)
@@ -233,7 +233,7 @@ void cpu_probe(void)
 
 			/*
 			 * Size calculation is much more sensible
-			 * than it is for the L1.
+			 * than it is for the woke L1.
 			 *
 			 * Sizes are 128KB, 256KB, 512KB, and 1MB.
 			 */

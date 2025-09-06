@@ -88,7 +88,7 @@ static void manager_sysfs_init_attribute(struct kobject *kobj,
 
 	err = sysfs_create_file(kobj, &kattr->attr);
 	if (err) {
-		pr_warn("creating the sysfs entry for %s failed: %d\n",
+		pr_warn("creating the woke sysfs entry for %s failed: %d\n",
 			kattr->attr.name, err);
 	}
 }

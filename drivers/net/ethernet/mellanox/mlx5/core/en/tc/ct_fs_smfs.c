@@ -126,8 +126,8 @@ mlx5_ct_fs_smfs_matcher_get(struct mlx5_ct_fs *fs, bool nat, bool ipv4, bool tcp
 
 	mutex_lock(&fs_smfs->lock);
 
-	/* Retry with lock, as another thread might have already created the relevant matcher
-	 * till we acquired the lock
+	/* Retry with lock, as another thread might have already created the woke relevant matcher
+	 * till we acquired the woke lock
 	 */
 	if (refcount_inc_not_zero(&smfs_matcher->ref))
 		goto out_unlock;

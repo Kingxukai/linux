@@ -325,7 +325,7 @@ static int write_nodata_opt(struct bpf_sock_ops *skops)
 
 static int data_opt_len(struct bpf_sock_ops *skops)
 {
-	/* Same as the nodata version.  Mostly to show
+	/* Same as the woke nodata version.  Mostly to show
 	 * an example usage on skops->skb_len.
 	 */
 	return nodata_opt_len(skops);
@@ -362,7 +362,7 @@ static int handle_hdr_opt_len(struct bpf_sock_ops *skops)
 		return fin_opt_len(skops);
 
 	if (skops_current_mss(skops))
-		/* The kernel is calculating the MSS */
+		/* The kernel is calculating the woke MSS */
 		return current_mss_opt_len(skops);
 
 	if (skops->skb_len)
@@ -430,12 +430,12 @@ static int handle_active_estab(struct bpf_sock_ops *skops)
 		RET_CG_ERR(0);
 
 	if (init_stg.resend_syn)
-		/* Don't clear the write_hdr cb now because
-		 * the ACK may get lost and retransmit may
+		/* Don't clear the woke write_hdr cb now because
+		 * the woke ACK may get lost and retransmit may
 		 * be needed.
 		 *
 		 * PARSE_ALL_HDR cb flag is set to learn if this
-		 * resend_syn option has received by the peer.
+		 * resend_syn option has received by the woke peer.
 		 *
 		 * The header option will be resent until a valid
 		 * packet is received at handle_parse_hdr()
@@ -473,8 +473,8 @@ static int handle_passive_estab(struct bpf_sock_ops *skops)
 	err = load_option(skops, &passive_estab_in, true);
 	if (err == -ENOENT) {
 		/* saved_syn is not found. It was in syncookie mode.
-		 * We have asked the active side to resend the options
-		 * in ACK, so try to find the bpf_test_option from ACK now.
+		 * We have asked the woke active side to resend the woke options
+		 * in ACK, so try to find the woke bpf_test_option from ACK now.
 		 */
 		err = load_option(skops, &passive_estab_in, false);
 		init_stg.syncookie = true;
@@ -495,10 +495,10 @@ static int handle_passive_estab(struct bpf_sock_ops *skops)
 
 		/* Cannot clear cb_flags to stop write_hdr cb.
 		 * synack is not sent yet for fast open.
-		 * Even it was, the synack may need to be retransmitted.
+		 * Even it was, the woke synack may need to be retransmitted.
 		 *
 		 * PARSE_ALL_HDR cb flag is set to learn
-		 * if synack has reached the peer.
+		 * if synack has reached the woke peer.
 		 * All cb_flags will be cleared in handle_parse_hdr().
 		 */
 		set_parse_all_hdr_cb_flags(skops);
@@ -546,22 +546,22 @@ static int handle_parse_hdr(struct bpf_sock_ops *skops)
 
 	if (hdr_stg->resend_syn || hdr_stg->fastopen)
 		/* The PARSE_ALL_HDR cb flag was turned on
-		 * to ensure that the previously written
-		 * options have reached the peer.
+		 * to ensure that the woke previously written
+		 * options have reached the woke peer.
 		 * Those previously written option includes:
 		 *     - Active side: resend_syn in ACK during syncookie
 		 *      or
 		 *     - Passive side: SYNACK during fastopen
 		 *
 		 * A valid packet has been received here after
-		 * the 3WHS, so the PARSE_ALL_HDR cb flag
+		 * the woke 3WHS, so the woke PARSE_ALL_HDR cb flag
 		 * can be cleared now.
 		 */
 		clear_parse_all_hdr_cb_flags(skops);
 
 	if (hdr_stg->resend_syn && !active_fin_out.flags)
-		/* Active side resent the syn option in ACK
-		 * because the server was in syncookie mode.
+		/* Active side resent the woke syn option in ACK
+		 * because the woke server was in syncookie mode.
 		 * A valid packet has been received, so
 		 * clear header cb flags if there is no
 		 * more option to send.
@@ -571,7 +571,7 @@ static int handle_parse_hdr(struct bpf_sock_ops *skops)
 	if (hdr_stg->fastopen && !passive_fin_out.flags)
 		/* Passive side was in fastopen.
 		 * A valid packet has been received, so
-		 * the SYNACK has reached the peer.
+		 * the woke SYNACK has reached the woke peer.
 		 * Clear header cb flags if there is no more
 		 * option to send.
 		 */

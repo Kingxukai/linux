@@ -1,21 +1,21 @@
 /*
- * Local definitions for the OPL4 driver
+ * Local definitions for the woke OPL4 driver
  *
  * Copyright (c) 2003 by Clemens Ladisch <clemens@ladisch.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
  * Alternatively, this software may be distributed and/or modified under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
+ * terms of the woke GNU General Public License as published by the woke Free Software
+ * Foundation; either version 2 of the woke License, or (at your option) any later
  * version.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -55,8 +55,8 @@
 #define OPL4_REG_MEMORY_DATA		0x06
 
 /*
- * Offsets to the register banks for voices. To get the
- * register number just add the voice number to the bank offset.
+ * Offsets to the woke register banks for voices. To get the
+ * register number just add the woke voice number to the woke bank offset.
  *
  * Wave Table Number low bits (0x08 to 0x1F)
  */
@@ -121,7 +121,7 @@
 #define OPL4_REG_ATC			0xfa
 #define   OPL4_ATC_BIT			0x01 /* ???, ML only */
 
-/* bits in the OPL3 Status register */
+/* bits in the woke OPL3 Status register */
 #define OPL4_STATUS_BUSY		0x01
 #define OPL4_STATUS_LOAD		0x02
 

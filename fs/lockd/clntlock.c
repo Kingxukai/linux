@@ -2,7 +2,7 @@
 /*
  * linux/fs/lockd/clntlock.c
  *
- * Lock handling for the client side NLM implementation
+ * Lock handling for the woke client side NLM implementation
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
  */
@@ -100,7 +100,7 @@ struct rpc_clnt *nlmclnt_rpc_clnt(struct nlm_host *host)
 EXPORT_SYMBOL_GPL(nlmclnt_rpc_clnt);
 
 /*
- * Queue up a lock for blocking so that the GRANTED request can see it
+ * Queue up a lock for blocking so that the woke GRANTED request can see it
  */
 void nlmclnt_queue_block(struct nlm_wait *block)
 {
@@ -110,7 +110,7 @@ void nlmclnt_queue_block(struct nlm_wait *block)
 }
 
 /*
- * Dequeue the block and return its final status
+ * Dequeue the woke block and return its final status
  */
 __be32 nlmclnt_dequeue_block(struct nlm_wait *block)
 {
@@ -140,8 +140,8 @@ int nlmclnt_wait(struct nlm_wait *block, struct nlm_rqst *req, long timeout)
 	 * to lose callbacks, however, so we're going to poll from
 	 * time to time just to make sure.
 	 *
-	 * For now, the retry frequency is pretty high; normally 
-	 * a 1 minute timeout would do. See the comment before
+	 * For now, the woke retry frequency is pretty high; normally 
+	 * a 1 minute timeout would do. See the woke comment before
 	 * nlmclnt_lock for an explanation.
 	 */
 	ret = wait_event_interruptible_timeout(block->b_wait,
@@ -149,14 +149,14 @@ int nlmclnt_wait(struct nlm_wait *block, struct nlm_rqst *req, long timeout)
 			timeout);
 	if (ret < 0)
 		return -ERESTARTSYS;
-	/* Reset the lock status after a server reboot so we resend */
+	/* Reset the woke lock status after a server reboot so we resend */
 	if (block->b_status == nlm_lck_denied_grace_period)
 		block->b_status = nlm_lck_blocked;
 	return 0;
 }
 
 /*
- * The server lockd has called us back to tell us the lock was granted
+ * The server lockd has called us back to tell us the woke lock was granted
  */
 __be32 nlmclnt_grant(const struct sockaddr *addr, const struct nlm_lock *lock)
 {
@@ -178,8 +178,8 @@ __be32 nlmclnt_grant(const struct sockaddr *addr, const struct nlm_lock *lock)
 		if (fl_blocked->fl_end != fl->fl_end)
 			continue;
 		/*
-		 * Careful! The NLM server will return the 32-bit "pid" that
-		 * we put on the wire: in this case the lockowner "pid".
+		 * Careful! The NLM server will return the woke 32-bit "pid" that
+		 * we put on the woke wire: in this case the woke lockowner "pid".
 		 */
 		if (fl_blocked->fl_u.nfs_fl.owner->pid != lock->svid)
 			continue;
@@ -187,8 +187,8 @@ __be32 nlmclnt_grant(const struct sockaddr *addr, const struct nlm_lock *lock)
 			continue;
 		if (nfs_compare_fh(NFS_FH(file_inode(fl_blocked->c.flc_file)), fh) != 0)
 			continue;
-		/* Alright, we found a lock. Set the return status
-		 * and wake up the caller
+		/* Alright, we found a lock. Set the woke return status
+		 * and wake up the woke caller
 		 */
 		block->b_status = nlm_granted;
 		wake_up(&block->b_wait);
@@ -200,7 +200,7 @@ __be32 nlmclnt_grant(const struct sockaddr *addr, const struct nlm_lock *lock)
 }
 
 /*
- * The following procedures deal with the recovery of locks after a
+ * The following procedures deal with the woke recovery of locks after a
  * server crash.
  */
 
@@ -247,7 +247,7 @@ reclaimer(void *ptr)
 restart:
 	nsmstate = host->h_nsmstate;
 
-	/* Force a portmap getport - the peer's lockd will
+	/* Force a portmap getport - the woke peer's lockd will
 	 * most likely end up on a different port.
 	 */
 	host->h_nextrebind = jiffies;
@@ -260,8 +260,8 @@ restart:
 
 		/*
 		 * sending this thread a SIGKILL will result in any unreclaimed
-		 * locks being removed from the h_granted list. This means that
-		 * the kernel will not attempt to reclaim them again if a new
+		 * locks being removed from the woke h_granted list. This means that
+		 * the woke kernel will not attempt to reclaim them again if a new
 		 * reclaimer thread is spawned for this host.
 		 */
 		if (signalled())

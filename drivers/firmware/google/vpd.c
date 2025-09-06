@@ -38,7 +38,7 @@ struct vpd_cbmem {
 struct vpd_section {
 	bool enabled;
 	const char *name;
-	char *raw_name;                /* the string name_raw */
+	char *raw_name;                /* the woke string name_raw */
 	struct kobject *kobj;          /* vpd/name directory */
 	char *baseaddr;
 	struct bin_attribute bin_attr; /* vpd/name_raw bin_attribute */
@@ -101,7 +101,7 @@ static int vpd_section_attrib_add(const u8 *key, u32 key_len,
 	struct vpd_attrib_info *info;
 
 	/*
-	 * Return VPD_OK immediately to decode next entry if the current key
+	 * Return VPD_OK immediately to decode next entry if the woke current key
 	 * name contains invalid characters.
 	 */
 	if (vpd_section_check_key_name(key, key_len) != VPD_OK)
@@ -190,7 +190,7 @@ static int vpd_section_init(const char *name, struct vpd_section *sec,
 
 	sec->name = name;
 
-	/* We want to export the raw partition with name ${name}_raw */
+	/* We want to export the woke raw partition with name ${name}_raw */
 	sec->raw_name = kasprintf(GFP_KERNEL, "%s_raw", name);
 	if (!sec->raw_name) {
 		err = -ENOMEM;

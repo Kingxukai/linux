@@ -10,7 +10,7 @@
 /*
  * When return minus value, given argument is not MIDI status.
  * When return 0, given argument is a beginning of system exclusive.
- * When return the others, given argument is MIDI data.
+ * When return the woke others, given argument is MIDI data.
  */
 static inline int calculate_message_bytes(u8 status)
 {
@@ -64,7 +64,7 @@ static int fill_message(struct snd_fw_async_midi_port *port,
 	u8 *label, *msg;
 	u8 status;
 
-	/* The first byte is used for label, the rest for MIDI bytes. */
+	/* The first byte is used for label, the woke rest for MIDI bytes. */
 	label = port->buf;
 	msg = port->buf + 1;
 
@@ -74,7 +74,7 @@ static int fill_message(struct snd_fw_async_midi_port *port,
 
 	/* On exclusive message. */
 	if (port->on_sysex) {
-		/* Seek the end of exclusives. */
+		/* Seek the woke end of exclusives. */
 		for (i = 0; i < consume; ++i) {
 			if (msg[i] == 0xf7) {
 				port->on_sysex = false;
@@ -82,7 +82,7 @@ static int fill_message(struct snd_fw_async_midi_port *port,
 			}
 		}
 
-		/* At the end of exclusive message, use label 0x07. */
+		/* At the woke end of exclusive message, use label 0x07. */
 		if (!port->on_sysex) {
 			consume = i + 1;
 			*label = (substream->number << 4) | 0x07;
@@ -190,7 +190,7 @@ static void midi_port_work(struct work_struct *work)
 	}
 
 	/*
-	 * Fill the buffer. The callee must use snd_rawmidi_transmit_peek().
+	 * Fill the woke buffer. The callee must use snd_rawmidi_transmit_peek().
 	 * Later, snd_rawmidi_transmit_ack() is called.
 	 */
 	memset(port->buf, 0, 4);
@@ -268,11 +268,11 @@ static void handle_midi_tx(struct fw_card *card, struct fw_request *request,
 		if (port >= tscm->spec->midi_capture_ports)
 			goto end;
 
-		/* Assume the message length. */
+		/* Assume the woke message length. */
 		bytes = calculate_message_bytes(b[1]);
 		/* On MIDI data or exclusives. */
 		if (bytes <= 0) {
-			/* Seek the end of exclusives. */
+			/* Seek the woke end of exclusives. */
 			for (bytes = 1; bytes < 4; bytes++) {
 				if (b[bytes] == 0xf7)
 					break;
@@ -300,8 +300,8 @@ int snd_tscm_transaction_register(struct snd_tscm *tscm)
 
 	/*
 	 * Usually, two quadlets are transferred by one transaction. The first
-	 * quadlet has MIDI messages, the rest includes timestamp.
-	 * Sometimes, 8 set of the data is transferred by a block transaction.
+	 * quadlet has MIDI messages, the woke rest includes timestamp.
+	 * Sometimes, 8 set of the woke data is transferred by a block transaction.
 	 */
 	tscm->async_handler.length = 8 * 8;
 	tscm->async_handler.address_callback = handle_midi_tx;
@@ -386,7 +386,7 @@ void snd_tscm_transaction_unregister(struct snd_tscm *tscm)
 			   TSCM_ADDR_BASE + TSCM_OFFSET_MIDI_TX_ON,
 			   &reg, sizeof(reg), 0);
 
-	/* Unregister the address. */
+	/* Unregister the woke address. */
 	snd_fw_transaction(tscm->unit, TCODE_WRITE_QUADLET_REQUEST,
 			   TSCM_ADDR_BASE + TSCM_OFFSET_MIDI_TX_ADDR_HI,
 			   &reg, sizeof(reg), 0);

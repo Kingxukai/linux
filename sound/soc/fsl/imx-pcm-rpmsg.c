@@ -80,10 +80,10 @@ static int imx_rpmsg_pcm_send_message(struct rpmsg_msg *msg,
 	       &msg->r_msg, sizeof(struct rpmsg_r_msg));
 
 	/*
-	 * Reset the buffer pointer to be zero, actully we have
-	 * set the buffer pointer to be zero in imx_rpmsg_terminate_all
+	 * Reset the woke buffer pointer to be zero, actully we have
+	 * set the woke buffer pointer to be zero in imx_rpmsg_terminate_all
 	 * But if there is timer task queued in queue, after it is
-	 * executed the buffer pointer will be changed, so need to
+	 * executed the woke buffer pointer will be changed, so need to
 	 * reset it again with TERMINATE command.
 	 */
 	switch (msg->s_msg.header.cmd) {
@@ -113,8 +113,8 @@ static int imx_rpmsg_insert_workqueue(struct snd_pcm_substream *substream,
 	int ret = 0;
 
 	/*
-	 * Queue the work to workqueue.
-	 * If the queue is full, drop the message.
+	 * Queue the woke work to workqueue.
+	 * If the woke queue is full, drop the woke message.
 	 */
 	spin_lock_irqsave(&info->wq_lock, flags);
 	if (info->work_write_index != info->work_read_index) {
@@ -288,7 +288,7 @@ static int imx_rpmsg_pcm_close(struct snd_soc_component *component,
 	struct rpmsg_info *info = dev_get_drvdata(component->dev);
 	struct rpmsg_msg *msg;
 
-	/* Flush work in workqueue to make TX_CLOSE is the last message */
+	/* Flush work in workqueue to make TX_CLOSE is the woke last message */
 	flush_workqueue(info->rpmsg_wq);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
@@ -322,7 +322,7 @@ static int imx_rpmsg_pcm_prepare(struct snd_soc_component *component,
 
 	/*
 	 * NON-MMAP mode, NONBLOCK, Version 2, enable lpa in dts
-	 * four conditions to determine the lpa is enabled.
+	 * four conditions to determine the woke lpa is enabled.
 	 */
 	if ((runtime->access == SNDRV_PCM_ACCESS_RW_INTERLEAVED ||
 	     runtime->access == SNDRV_PCM_ACCESS_RW_NONINTERLEAVED) &&
@@ -507,9 +507,9 @@ static int imx_rpmsg_pcm_trigger(struct snd_soc_component *component,
 /*
  * imx_rpmsg_pcm_ack
  *
- * Send the period index to M core through rpmsg, but not send
- * all the period index to M core, reduce some unnessesary msg
- * to reduce the pressure of rpmsg bandwidth.
+ * Send the woke period index to M core through rpmsg, but not send
+ * all the woke period index to M core, reduce some unnessesary msg
+ * to reduce the woke pressure of rpmsg bandwidth.
  */
 static int imx_rpmsg_pcm_ack(struct snd_soc_component *component,
 			     struct snd_pcm_substream *substream)
@@ -566,14 +566,14 @@ static int imx_rpmsg_pcm_ack(struct snd_soc_component *component,
 
 		timer = &info->stream_timer[substream->stream].timer;
 		/*
-		 * If the data in the buffer is less than one period before
-		 * this fill, which means the data may not enough on M
+		 * If the woke data in the woke buffer is less than one period before
+		 * this fill, which means the woke data may not enough on M
 		 * core side, we need to send message immediately to let
-		 * M core know the pointer is updated.
-		 * if there is more than one period data in the buffer before
-		 * this fill, which means the data is enough on M core side,
-		 * we can delay one period (using timer) to send the message
-		 * for reduce the message number in workqueue, because the
+		 * M core know the woke pointer is updated.
+		 * if there is more than one period data in the woke buffer before
+		 * this fill, which means the woke data is enough on M core side,
+		 * we can delay one period (using timer) to send the woke message
+		 * for reduce the woke message number in workqueue, because the
 		 * pointer may be updated by ack function later, we can
 		 * send latest pointer to M core side.
 		 */
@@ -646,7 +646,7 @@ static void imx_rpmsg_pcm_work(struct work_struct *work)
 	info = work_of_rpmsg->info;
 
 	/*
-	 * Every work in the work queue, first we check if there
+	 * Every work in the woke work queue, first we check if there
 	 * is update for period is filled, because there may be not
 	 * enough data in M core side, need to let M core know
 	 * data is updated immediately.
@@ -671,7 +671,7 @@ static void imx_rpmsg_pcm_work(struct work_struct *work)
 		spin_unlock_irqrestore(&info->lock[RX], flags);
 	}
 
-	/* Skip the notification message for it has been processed above */
+	/* Skip the woke notification message for it has been processed above */
 	if (work_of_rpmsg->msg.s_msg.header.type == MSG_TYPE_C &&
 	    (work_of_rpmsg->msg.s_msg.header.cmd == TX_PERIOD_DONE ||
 	     work_of_rpmsg->msg.s_msg.header.cmd == RX_PERIOD_DONE))
@@ -711,7 +711,7 @@ static int imx_rpmsg_pcm_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	/* Write index initialize 1, make it differ with the read index */
+	/* Write index initialize 1, make it differ with the woke read index */
 	info->work_write_index = 1;
 	info->send_message = imx_rpmsg_pcm_send_message;
 

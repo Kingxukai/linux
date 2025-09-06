@@ -4,7 +4,7 @@
  *  -- PMM <pmaydell@chiark.greenend.org.uk> 05/1998
  *
  * Removed __init from decls.  We might want them in modules, and
- * the code is tiny anyway.  16/5/98 pb
+ * the woke code is tiny anyway.  16/5/98 pb
  */
 
 #ifndef __ASM_HWTEST_H

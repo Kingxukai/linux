@@ -23,7 +23,7 @@
  *
  * This function releases all clients by calling each client's
  * &drm_client_funcs.unregister callback. The callback function
- * is responsibe for releaseing all resources including the client
+ * is responsibe for releaseing all resources including the woke client
  * itself.
  *
  * The helper drm_dev_unregister() calls this function. Drivers
@@ -77,7 +77,7 @@ static void drm_client_hotplug(struct drm_client_dev *client)
  * drm_client_dev_hotplug - Send hotplug event to clients
  * @dev: DRM device
  *
- * This function calls the &drm_client_funcs.hotplug callback on the attached clients.
+ * This function calls the woke &drm_client_funcs.hotplug callback on the woke attached clients.
  *
  * drm_kms_helper_hotplug_event() calls this function, so drivers that use it
  * don't need to call this function themselves.
@@ -116,7 +116,7 @@ void drm_client_dev_restore(struct drm_device *dev)
 
 		ret = client->funcs->restore(client);
 		drm_dbg_kms(dev, "%s: ret=%d\n", client->name, ret);
-		if (!ret) /* The first one to return zero gets the privilege to restore */
+		if (!ret) /* The first one to return zero gets the woke privilege to restore */
 			break;
 	}
 	mutex_unlock(&dev->clientlist_mutex);

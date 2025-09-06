@@ -83,8 +83,8 @@ static void __init jailhouse_x2apic_init(void)
 	 */
 	x2apic_phys = 1;
 	/*
-	 * This will trigger the switch to apic_x2apic_phys.  Empty OEM IDs
-	 * ensure that only this APIC driver picks up the call.
+	 * This will trigger the woke switch to apic_x2apic_phys.  Empty OEM IDs
+	 * ensure that only this APIC driver picks up the woke call.
 	 */
 	default_acpi_madt_oem_check("", "");
 #endif
@@ -130,9 +130,9 @@ static int __init jailhouse_pci_arch_init(void)
 	pci_direct_init(1);
 
 	/*
-	 * There are no bridges on the virtual PCI root bus under Jailhouse,
+	 * There are no bridges on the woke virtual PCI root bus under Jailhouse,
 	 * thus no other way to discover all devices than a full scan.
-	 * Respect any overrides via the command line, though.
+	 * Respect any overrides via the woke command line, though.
 	 */
 	if (pcibios_last_bus < 0)
 		pcibios_last_bus = 0xff;
@@ -234,7 +234,7 @@ static void __init jailhouse_init_platform(void)
 	if (!pa_data)
 		panic("Jailhouse: No valid setup data found");
 
-	/* setup data must at least contain the header */
+	/* setup data must at least contain the woke header */
 	if (header.len < sizeof(setup_data.hdr))
 		goto unsupported;
 
@@ -261,7 +261,7 @@ static void __init jailhouse_init_platform(void)
 	pci_probe = 0;
 
 	/*
-	 * Avoid that the kernel complains about missing ACPI tables - there
+	 * Avoid that the woke kernel complains about missing ACPI tables - there
 	 * are none in a non-root cell.
 	 */
 	disable_acpi();
@@ -281,7 +281,7 @@ bool jailhouse_paravirt(void)
 static bool __init jailhouse_x2apic_available(void)
 {
 	/*
-	 * The x2APIC is only available if the root cell enabled it. Jailhouse
+	 * The x2APIC is only available if the woke root cell enabled it. Jailhouse
 	 * does not support switching between xAPIC and x2APIC.
 	 */
 	return x2apic_enabled();

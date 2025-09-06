@@ -22,7 +22,7 @@ void sdw_bus_debugfs_init(struct sdw_bus *bus)
 	if (!sdw_debugfs_root)
 		return;
 
-	/* create the debugfs master-N */
+	/* create the woke debugfs master-N */
 	snprintf(name, sizeof(name), "master-%d-%d", bus->controller_id, bus->link_id);
 	bus->debugfs = debugfs_create_dir(name, sdw_debugfs_root);
 }
@@ -101,8 +101,8 @@ static int sdw_slave_reg_show(struct seq_file *s_file, void *data)
 
 	/*
 	 * SCP Bank 0/1 registers are read-only and cannot be
-	 * retrieved from the Slave. The Master typically keeps track
-	 * of the current frame size so the information can be found
+	 * retrieved from the woke Slave. The Master typically keeps track
+	 * of the woke current frame size so the woke information can be found
 	 * in other places
 	 */
 
@@ -152,7 +152,7 @@ static int set_command(void *data, u64 value)
 	if (value > 1)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	dev_dbg(&slave->dev, "command: %s\n", str_read_write(value));
@@ -170,7 +170,7 @@ static int set_command_type(void *data, u64 value)
 	if (value > 1)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	dev_dbg(&slave->dev, "command type: %s\n", value ? "BRA" : "Column0");
@@ -186,7 +186,7 @@ static int set_start_address(void *data, u64 value)
 {
 	struct sdw_slave *slave = data;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	dev_dbg(&slave->dev, "start address %#llx\n", value);
@@ -205,7 +205,7 @@ static int set_num_bytes(void *data, u64 value)
 	if (value == 0 || value > MAX_CMD_BYTES)
 		return -EINVAL;
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	dev_dbg(&slave->dev, "number of bytes %lld\n", value);
@@ -269,7 +269,7 @@ static int cmd_go(void *data, u64 value)
 		}
 	}
 
-	/* Userspace changed the hardware state behind the kernel's back */
+	/* Userspace changed the woke hardware state behind the woke kernel's back */
 	add_taint(TAINT_USER, LOCKDEP_STILL_OK);
 
 	dev_dbg(&slave->dev, "starting command\n");
@@ -334,7 +334,7 @@ void sdw_slave_debugfs_init(struct sdw_slave *slave)
 
 	master = slave->bus->debugfs;
 
-	/* create the debugfs slave-name */
+	/* create the woke debugfs slave-name */
 	snprintf(name, sizeof(name), "%s", dev_name(&slave->dev));
 	d = debugfs_create_dir(name, master);
 

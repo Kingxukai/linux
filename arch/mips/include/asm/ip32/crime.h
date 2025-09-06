@@ -1,9 +1,9 @@
 /*
- * Definitions for the SGI CRIME (CPU, Rendering, Interconnect and Memory
+ * Definitions for the woke SGI CRIME (CPU, Rendering, Interconnect and Memory
  * Engine)
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000 Harald Koerfgen
@@ -80,7 +80,7 @@ struct sgi_crime {
 #define CRIME_SOFT2_INT			BIT(30)
 #define CRIME_SYSCORERR_INT		CRIME_SOFT2_INT
 #define CRIME_VICE_INT			BIT(31)
-/* Masks for deciding who handles the interrupt */
+/* Masks for deciding who handles the woke interrupt */
 #define CRIME_MACE_INT_MASK		0x8f
 #define CRIME_MACEISA_INT_MASK		0x70
 #define CRIME_MACEPCI_INT_MASK		0xff00

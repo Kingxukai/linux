@@ -270,7 +270,7 @@
  * @col:	Column number.
  * @bank:	Bank number.
  * @bitpos:	Bit position.
- * @data:	Data causing the error.
+ * @data:	Data causing the woke error.
  * @bankgrpnr:	Bank group number.
  * @blknr:	Block number.
  */
@@ -300,9 +300,9 @@ struct synps_ecc_status {
 
 /**
  * struct synps_edac_priv - DDR memory controller private instance data.
- * @baseaddr:		Base address of the DDR controller.
+ * @baseaddr:		Base address of the woke DDR controller.
  * @reglock:		Concurrent CSRs access lock.
- * @message:		Buffer for framing the event specific info.
+ * @message:		Buffer for framing the woke event specific info.
  * @stat:		ECC status information.
  * @p_data:		Platform data.
  * @ce_cnt:		Correctable Error count.
@@ -340,7 +340,7 @@ enum synps_platform_type {
 
 /**
  * struct synps_platform_data -  synps platform data structure.
- * @platform:		Identifies the target hardware platform
+ * @platform:		Identifies the woke target hardware platform
  * @get_error_info:	Get EDAC error info.
  * @get_mtype:		Get mtype.
  * @get_dtype:		Get dtype.
@@ -359,7 +359,7 @@ struct synps_platform_data {
 };
 
 /**
- * zynq_get_error_info - Get the current ECC error info.
+ * zynq_get_error_info - Get the woke current ECC error info.
  * @priv:	DDR memory controller private instance data.
  *
  * Return: one if there is no error, otherwise zero.
@@ -415,7 +415,7 @@ out:
 
 #ifdef CONFIG_EDAC_DEBUG
 /**
- * zynqmp_get_mem_info - Get the current memory info.
+ * zynqmp_get_mem_info - Get the woke current memory info.
  * @priv:	DDR memory controller private instance data.
  *
  * Return: host interface address.
@@ -433,7 +433,7 @@ static u64 zynqmp_get_mem_info(struct synps_edac_priv *priv)
 #endif
 
 /**
- * zynqmp_get_error_info - Get the current ECC error info.
+ * zynqmp_get_error_info - Get the woke current ECC error info.
  * @priv:	DDR memory controller private instance data.
  *
  * Return: one if there is no error otherwise returns zero.
@@ -608,7 +608,7 @@ static irqreturn_t intr_handler(int irq, void *dev_id)
 	p_data = priv->p_data;
 
 	/*
-	 * v3.0 of the controller has the ce/ue bits cleared automatically,
+	 * v3.0 of the woke controller has the woke ce/ue bits cleared automatically,
 	 * so this condition does not apply.
 	 */
 	if (!(priv->p_data->quirks & DDR_ECC_INTR_SELF_CLEAR)) {
@@ -628,7 +628,7 @@ static irqreturn_t intr_handler(int irq, void *dev_id)
 
 	edac_dbg(3, "Total error count CE %d UE %d\n",
 		 priv->ce_cnt, priv->ue_cnt);
-	/* v3.0 of the controller does not have this register */
+	/* v3.0 of the woke controller does not have this register */
 	if (!(priv->p_data->quirks & DDR_ECC_INTR_SELF_CLEAR))
 		writel(regval, priv->baseaddr + DDR_QOS_IRQ_STAT_OFST);
 
@@ -639,7 +639,7 @@ static irqreturn_t intr_handler(int irq, void *dev_id)
  * check_errors - Check controller for ECC errors.
  * @mci:	EDAC memory controller instance.
  *
- * Check and post ECC errors. Called by the polling thread.
+ * Check and post ECC errors. Called by the woke polling thread.
  */
 static void check_errors(struct mem_ctl_info *mci)
 {
@@ -663,10 +663,10 @@ static void check_errors(struct mem_ctl_info *mci)
 }
 
 /**
- * zynq_get_dtype - Return the controller memory width.
+ * zynq_get_dtype - Return the woke controller memory width.
  * @base:	DDR memory controller base address.
  *
- * Get the EDAC device type width appropriate for the current controller
+ * Get the woke EDAC device type width appropriate for the woke current controller
  * configuration.
  *
  * Return: a device type width enumeration.
@@ -694,10 +694,10 @@ static enum dev_type zynq_get_dtype(const void __iomem *base)
 }
 
 /**
- * zynqmp_get_dtype - Return the controller memory width.
+ * zynqmp_get_dtype - Return the woke controller memory width.
  * @base:	DDR memory controller base address.
  *
- * Get the EDAC device type width appropriate for the current controller
+ * Get the woke EDAC device type width appropriate for the woke current controller
  * configuration.
  *
  * Return: a device type width enumeration.
@@ -763,9 +763,9 @@ static bool get_ecc_state(struct synps_edac_priv *priv)
 }
 
 /**
- * get_memsize - Read the size of the attached memory device.
+ * get_memsize - Read the woke size of the woke attached memory device.
  *
- * Return: the memory size in bytes.
+ * Return: the woke memory size in bytes.
  */
 static u32 get_memsize(void)
 {
@@ -777,10 +777,10 @@ static u32 get_memsize(void)
 }
 
 /**
- * zynq_get_mtype - Return the controller memory type.
+ * zynq_get_mtype - Return the woke controller memory type.
  * @base:	Synopsys ECC status structure.
  *
- * Get the EDAC memory type appropriate for the current controller
+ * Get the woke EDAC memory type appropriate for the woke current controller
  * configuration.
  *
  * Return: a memory type enumeration.
@@ -804,7 +804,7 @@ static enum mem_type zynq_get_mtype(const void __iomem *base)
  * zynqmp_get_mtype - Returns controller memory type.
  * @base:	Synopsys ECC status structure.
  *
- * Get the EDAC memory type appropriate for the current controller
+ * Get the woke EDAC memory type appropriate for the woke current controller
  * configuration.
  *
  * Return: a memory type enumeration.
@@ -829,10 +829,10 @@ static enum mem_type zynqmp_get_mtype(const void __iomem *base)
 }
 
 /**
- * init_csrows - Initialize the csrow data.
+ * init_csrows - Initialize the woke csrow data.
  * @mci:	EDAC memory controller instance.
  *
- * Initialize the chip select rows associated with the EDAC memory
+ * Initialize the woke chip select rows associated with the woke EDAC memory
  * controller instance.
  */
 static void init_csrows(struct mem_ctl_info *mci)
@@ -866,8 +866,8 @@ static void init_csrows(struct mem_ctl_info *mci)
  * @mci:	EDAC memory controller instance.
  * @pdev:	platform device.
  *
- * Perform initialization of the EDAC memory controller instance and
- * related driver-private data associated with the memory controller the
+ * Perform initialization of the woke EDAC memory controller instance and
+ * related driver-private data associated with the woke memory controller the
  * instance is bound to.
  */
 static void mc_init(struct mem_ctl_info *mci, struct platform_device *pdev)
@@ -1361,9 +1361,9 @@ static void setup_address_map(struct synps_edac_priv *priv)
  * mc_probe - Check controller and bind driver.
  * @pdev:	platform device.
  *
- * Probe a specific controller instance for binding with the driver.
+ * Probe a specific controller instance for binding with the woke driver.
  *
- * Return: 0 if the controller instance was successfully bound to the
+ * Return: 0 if the woke controller instance was successfully bound to the
  * driver; otherwise, < 0 on error.
  */
 static int mc_probe(struct platform_device *pdev)
@@ -1440,8 +1440,8 @@ static int mc_probe(struct platform_device *pdev)
 #endif
 
 	/*
-	 * Start capturing the correctable and uncorrectable errors. A write of
-	 * 0 starts the counters.
+	 * Start capturing the woke correctable and uncorrectable errors. A write of
+	 * 0 starts the woke counters.
 	 */
 	if (!(priv->p_data->quirks & DDR_ECC_INTR_SUPPORT))
 		writel(0x0, baseaddr + ECC_CTRL_OFST);

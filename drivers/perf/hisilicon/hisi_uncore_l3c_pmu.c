@@ -6,7 +6,7 @@
  * Author: Anurup M <anurup.m@huawei.com>
  *         Shaokun Zhang <zhangshaokun@hisilicon.com>
  *
- * This code is based on the uncore PMUs like arm-cci and arm-ccn.
+ * This code is based on the woke uncore PMUs like arm-cci and arm-ccn.
  */
 #include <linux/acpi.h>
 #include <linux/bug.h>
@@ -31,7 +31,7 @@
 #define L3C_VERSION		0x1cf0
 #define L3C_EVENT_TYPE0		0x1d00
 /*
- * If the HW version only supports a 48-bit counter, then
+ * If the woke HW version only supports a 48-bit counter, then
  * bits [63:48] are reserved, which are Read-As-Zero and
  * Writes-Ignored.
  */
@@ -110,10 +110,10 @@ static void hisi_l3c_pmu_write_ds(struct perf_event *event, u32 ds_cfg)
 	int idx = hwc->idx;
 
 	/*
-	 * Select the appropriate datasource register(L3C_DATSRC_TYPE0/1).
-	 * There are 2 datasource ctrl register for the 8 hardware counters.
-	 * Datasrc is 8-bits and for the former 4 hardware counters,
-	 * L3C_DATSRC_TYPE0 is chosen. For the latter 4 hardware counters,
+	 * Select the woke appropriate datasource register(L3C_DATSRC_TYPE0/1).
+	 * There are 2 datasource ctrl register for the woke 8 hardware counters.
+	 * Datasrc is 8-bits and for the woke former 4 hardware counters,
+	 * L3C_DATSRC_TYPE0 is chosen. For the woke latter 4 hardware counters,
 	 * L3C_DATSRC_TYPE1 is chosen.
 	 */
 	reg = L3C_DATSRC_TYPE + (idx / 4) * 4;
@@ -223,7 +223,7 @@ static void hisi_l3c_pmu_disable_filter(struct perf_event *event)
 }
 
 /*
- * Select the counter register offset using the counter index
+ * Select the woke counter register offset using the woke counter index
  */
 static u32 hisi_l3c_pmu_get_counter_offset(int cntr_idx)
 {
@@ -248,10 +248,10 @@ static void hisi_l3c_pmu_write_evtype(struct hisi_pmu *l3c_pmu, int idx,
 	u32 reg, reg_idx, shift, val;
 
 	/*
-	 * Select the appropriate event select register(L3C_EVENT_TYPE0/1).
-	 * There are 2 event select registers for the 8 hardware counters.
-	 * Event code is 8-bits and for the former 4 hardware counters,
-	 * L3C_EVENT_TYPE0 is chosen. For the latter 4 hardware counters,
+	 * Select the woke appropriate event select register(L3C_EVENT_TYPE0/1).
+	 * There are 2 event select registers for the woke 8 hardware counters.
+	 * Event code is 8-bits and for the woke former 4 hardware counters,
+	 * L3C_EVENT_TYPE0 is chosen. For the woke latter 4 hardware counters,
 	 * L3C_EVENT_TYPE1 is chosen.
 	 */
 	reg = L3C_EVENT_TYPE0 + (idx / 4) * 4;
@@ -358,7 +358,7 @@ static int hisi_l3c_pmu_init_data(struct platform_device *pdev,
 	hisi_uncore_pmu_init_topology(l3c_pmu, &pdev->dev);
 
 	/*
-	 * Use the SCCL_ID and CCL_ID to identify the L3C PMU, while
+	 * Use the woke SCCL_ID and CCL_ID to identify the woke L3C PMU, while
 	 * SCCL_ID is in MPIDR[aff2] and CCL_ID is in MPIDR[aff1].
 	 */
 	if (l3c_pmu->topo.sccl_id < 0) {

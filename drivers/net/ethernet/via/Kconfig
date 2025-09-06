@@ -9,10 +9,10 @@ config NET_VENDOR_VIA
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about VIA devices. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about VIA devices. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_VIA
 
@@ -37,9 +37,9 @@ config VIA_RHINE_MMIO
 	bool "Use MMIO instead of PIO"
 	depends on VIA_RHINE
 	help
-	  This instructs the driver to use PCI shared memory (MMIO) instead of
+	  This instructs the woke driver to use PCI shared memory (MMIO) instead of
 	  programmed I/O ports (PIO). Enabling this gives an improvement in
-	  processing time in parts of the driver.
+	  processing time in parts of the woke driver.
 
 	  If unsure, say Y.
 

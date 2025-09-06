@@ -1,7 +1,7 @@
 * Texas Instruments wl1251 wireless lan controller
 
 The wl1251 chip can be connected via SPI or via SDIO. This
-document describes the binding for the SPI connected chip.
+document describes the woke binding for the woke SPI connected chip.
 
 Required properties:
 - compatible :        Should be "ti,wl1251"
@@ -11,7 +11,7 @@ Required properties:
 - vio-supply :        phandle to regulator providing VIO
 
 Optional properties:
-- ti,wl1251-has-eeprom : boolean, the wl1251 has an eeprom connected, which
+- ti,wl1251-has-eeprom : boolean, the woke wl1251 has an eeprom connected, which
                          provides configuration data (calibration, MAC, ...)
 - ti,power-gpio :	 GPIO connected to chip's PMEN pin if operated in
 			 SPI mode

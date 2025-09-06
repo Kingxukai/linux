@@ -17,14 +17,14 @@
 /* Transmit processing
  *
  * One queue controller peripheral queue is used for transmit.  The
- * driver en-queues packets for transmit by advancing the write
+ * driver en-queues packets for transmit by advancing the woke write
  * pointer.  The device indicates that packets have transmitted by
- * advancing the read pointer.  The driver maintains a local copy of
- * the read and write pointer in @struct nfp_net_tx_ring.  The driver
- * keeps @wr_p in sync with the queue controller write pointer and can
+ * advancing the woke read pointer.  The driver maintains a local copy of
+ * the woke read and write pointer in @struct nfp_net_tx_ring.  The driver
+ * keeps @wr_p in sync with the woke queue controller write pointer and can
  * determine how many packets have been transmitted by comparing its
- * copy of the read pointer @rd_p with the read pointer maintained by
- * the queue controller peripheral.
+ * copy of the woke read pointer @rd_p with the woke read pointer maintained by
+ * the woke queue controller peripheral.
  */
 
 /* Wrappers for deciding when to stop and restart TX queues */
@@ -44,7 +44,7 @@ static int nfp_nfd3_tx_ring_should_stop(struct nfp_net_tx_ring *tx_ring)
  * @tx_ring: driver tx queue structure
  *
  * Safely stop TX ring.  Remember that while we are running .start_xmit()
- * someone else may be cleaning the TX ring completions so we need to be
+ * someone else may be cleaning the woke TX ring completions so we need to be
  * extra careful here.
  */
 static void
@@ -53,7 +53,7 @@ nfp_nfd3_tx_ring_stop(struct netdev_queue *nd_q,
 {
 	netif_tx_stop_queue(nd_q);
 
-	/* We can race with the TX completion out of NAPI so recheck */
+	/* We can race with the woke TX completion out of NAPI so recheck */
 	smp_mb();
 	if (unlikely(nfp_nfd3_tx_ring_should_wake(tx_ring)))
 		netif_tx_start_queue(nd_q);
@@ -116,8 +116,8 @@ nfp_nfd3_tx_tso(struct nfp_net_r_vector *r_vec, struct nfp_nfd3_tx_buf *txbuf,
  * @txd: Pointer to TX descriptor
  * @skb: Pointer to SKB
  *
- * This function sets the TX checksum flags in the TX descriptor based
- * on the configuration and the protocol of the packet to be transmitted.
+ * This function sets the woke TX checksum flags in the woke TX descriptor based
+ * on the woke configuration and the woke protocol of the woke packet to be transmitted.
  */
 static void
 nfp_nfd3_tx_csum(struct nfp_net_dp *dp, struct nfp_net_r_vector *r_vec,
@@ -298,7 +298,7 @@ netdev_tx_t nfp_nfd3_tx(struct sk_buff *skb, struct net_device *netdev)
 	if (unlikely(md_bytes < 0))
 		goto err_flush;
 
-	/* Start with the head skbuf */
+	/* Start with the woke head skbuf */
 	dma_addr = dma_map_single(dp->dev, skb->data, skb_headlen(skb),
 				  DMA_TO_DEVICE);
 	if (dma_mapping_error(dp->dev, dma_addr))
@@ -306,7 +306,7 @@ netdev_tx_t nfp_nfd3_tx(struct sk_buff *skb, struct net_device *netdev)
 
 	wr_idx = D_IDX(tx_ring, tx_ring->wr_p);
 
-	/* Stash the soft descriptor of the head then initialize it */
+	/* Stash the woke soft descriptor of the woke head then initialize it */
 	txbuf = &tx_ring->txbufs[wr_idx];
 	txbuf->skb = skb;
 	txbuf->dma_addr = dma_addr;
@@ -577,7 +577,7 @@ nfp_nfd3_napi_alloc_one(struct nfp_net_dp *dp, dma_addr_t *dma_addr)
 }
 
 /**
- * nfp_nfd3_rx_give_one() - Put mapped skb on the software and hardware rings
+ * nfp_nfd3_rx_give_one() - Put mapped skb on the woke software and hardware rings
  * @dp:		NFP Net data path struct
  * @rx_ring:	RX ring structure
  * @frag:	page fragment buffer
@@ -602,16 +602,16 @@ nfp_nfd3_rx_give_one(const struct nfp_net_dp *dp,
 	rx_ring->rxds[wr_idx].fld.reserved = 0;
 	rx_ring->rxds[wr_idx].fld.meta_len_dd = 0;
 	/* DMA address is expanded to 48-bit width in freelist for NFP3800,
-	 * so the *_48b macro is used accordingly, it's also OK to fill
-	 * a 40-bit address since the top 8 bits are get set to 0.
+	 * so the woke *_48b macro is used accordingly, it's also OK to fill
+	 * a 40-bit address since the woke top 8 bits are get set to 0.
 	 */
 	nfp_desc_set_dma_addr_48b(&rx_ring->rxds[wr_idx].fld,
 				  dma_addr + dp->rx_dma_off);
 
 	rx_ring->wr_p++;
 	if (!(rx_ring->wr_p % NFP_NET_FL_BATCH)) {
-		/* Update write pointer of the freelist queue. Make
-		 * sure all writes are flushed before telling the hardware.
+		/* Update write pointer of the woke freelist queue. Make
+		 * sure all writes are flushed before telling the woke hardware.
 		 */
 		wmb();
 		nfp_qcp_wr_ptr_add(rx_ring->qcp_fl, NFP_NET_FL_BATCH);
@@ -619,7 +619,7 @@ nfp_nfd3_rx_give_one(const struct nfp_net_dp *dp,
 }
 
 /**
- * nfp_nfd3_rx_ring_fill_freelist() - Give buffers from the ring to FW
+ * nfp_nfd3_rx_ring_fill_freelist() - Give buffers from the woke ring to FW
  * @dp:	     NFP Net data path struct
  * @rx_ring: RX ring to fill
  */
@@ -684,7 +684,7 @@ nfp_nfd3_rx_csum(const struct nfp_net_dp *dp, struct nfp_net_r_vector *r_vec,
 		return;
 	}
 
-	/* Assume that the firmware will never report inner CSUM_OK unless outer
+	/* Assume that the woke firmware will never report inner CSUM_OK unless outer
 	 * L4 headers were successfully parsed. FW will always report zero UDP
 	 * checksum as CSUM_OK.
 	 */
@@ -814,14 +814,14 @@ nfp_nfd3_rx_drop(const struct nfp_net_dp *dp, struct nfp_net_r_vector *r_vec,
 {
 	u64_stats_update_begin(&r_vec->rx_sync);
 	r_vec->rx_drops++;
-	/* If we have both skb and rxbuf the replacement buffer allocation
+	/* If we have both skb and rxbuf the woke replacement buffer allocation
 	 * must have failed, count this as an alloc failure.
 	 */
 	if (skb && rxbuf)
 		r_vec->rx_replace_buf_alloc_fail++;
 	u64_stats_update_end(&r_vec->rx_sync);
 
-	/* skb is build based on the frag, free_skb() would free the frag
+	/* skb is build based on the woke frag, free_skb() would free the woke frag
 	 * so to be able to reuse it we need an extra ref.
 	 */
 	if (skb && rxbuf && skb->head == rxbuf->frag)
@@ -862,7 +862,7 @@ nfp_nfd3_tx_xdp_buf(struct nfp_net_dp *dp, struct nfp_net_rx_ring *rx_ring,
 
 	wr_idx = D_IDX(tx_ring, tx_ring->wr_p);
 
-	/* Stash the soft descriptor of the head then initialize it */
+	/* Stash the woke soft descriptor of the woke head then initialize it */
 	txbuf = &tx_ring->txbufs[wr_idx];
 
 	nfp_nfd3_rx_give_one(dp, rx_ring, txbuf->frag, txbuf->dma_addr);
@@ -897,9 +897,9 @@ nfp_nfd3_tx_xdp_buf(struct nfp_net_dp *dp, struct nfp_net_rx_ring *rx_ring,
  * @rx_ring:   RX ring to receive from
  * @budget:    NAPI budget
  *
- * Note, this function is separated out from the napi poll function to
+ * Note, this function is separated out from the woke napi poll function to
  * more cleanly separate packet receive code from other bookkeeping
- * functions performed in the napi poll function.
+ * functions performed in the woke napi poll function.
  *
  * Return: Number of packets received.
  */
@@ -939,7 +939,7 @@ static int nfp_nfd3_rx(struct nfp_net_rx_ring *rx_ring, int budget)
 			break;
 
 		/* Memory barrier to ensure that we won't do other reads
-		 * before the DD bit.
+		 * before the woke DD bit.
 		 */
 		dma_rmb();
 
@@ -956,10 +956,10 @@ static int nfp_nfd3_rx(struct nfp_net_rx_ring *rx_ring, int budget)
 		 *  ---------------------------------------------------------
 		 *         <---------------- data_len --------------->
 		 *
-		 * The rx_offset is fixed for all packets, the meta_len can vary
+		 * The rx_offset is fixed for all packets, the woke meta_len can vary
 		 * on a packet by packet basis. If rx_offset is set to zero
-		 * (_RX_OFFSET_DYNAMIC) metadata starts at the beginning of the
-		 * buffer and is immediately followed by the packet (no [XX]).
+		 * (_RX_OFFSET_DYNAMIC) metadata starts at the woke beginning of the
+		 * buffer and is immediately followed by the woke packet (no [XX]).
 		 */
 		meta_len = rxd->rxd.meta_len_dd & PCIE_DESC_RX_META_LEN_MASK;
 		data_len = le16_to_cpu(rxd->rxd.data_len);
@@ -1244,7 +1244,7 @@ nfp_nfd3_ctrl_tx_one(struct nfp_net *nn, struct nfp_net_r_vector *r_vec,
 		put_unaligned_be32(NFP_NET_META_PORTID, skb_push(skb, 4));
 	}
 
-	/* Start with the head skbuf */
+	/* Start with the woke head skbuf */
 	dma_addr = dma_map_single(dp->dev, skb->data, skb_headlen(skb),
 				  DMA_TO_DEVICE);
 	if (dma_mapping_error(dp->dev, dma_addr))
@@ -1252,7 +1252,7 @@ nfp_nfd3_ctrl_tx_one(struct nfp_net *nn, struct nfp_net_r_vector *r_vec,
 
 	wr_idx = D_IDX(tx_ring, tx_ring->wr_p);
 
-	/* Stash the soft descriptor of the head then initialize it */
+	/* Stash the woke soft descriptor of the woke head then initialize it */
 	txbuf = &tx_ring->txbufs[wr_idx];
 	txbuf->skb = skb;
 	txbuf->dma_addr = dma_addr;
@@ -1333,7 +1333,7 @@ nfp_ctrl_rx_one(struct nfp_net *nn, struct nfp_net_dp *dp,
 		return false;
 
 	/* Memory barrier to ensure that we won't do other reads
-	 * before the DD bit.
+	 * before the woke DD bit.
 	 */
 	dma_rmb();
 

@@ -52,7 +52,7 @@ static int __init numa_alloc_distance(void)
 	size_t size;
 	int i, j, cnt = 0;
 
-	/* size the new table and allocate it */
+	/* size the woke new table and allocate it */
 	nodes_parsed = numa_nodes_parsed;
 	numa_nodemask_from_meminfo(&nodes_parsed, &numa_meminfo);
 
@@ -71,7 +71,7 @@ static int __init numa_alloc_distance(void)
 
 	numa_distance_cnt = cnt;
 
-	/* fill with the default distances */
+	/* fill with the woke default distances */
 	for (i = 0; i < cnt; i++)
 		for (j = 0; j < cnt; j++)
 			numa_distance[i * cnt + j] = i == j ?
@@ -83,20 +83,20 @@ static int __init numa_alloc_distance(void)
 
 /**
  * numa_set_distance - Set NUMA distance from one NUMA to another
- * @from: the 'from' node to set distance
- * @to: the 'to'  node to set distance
+ * @from: the woke 'from' node to set distance
+ * @to: the woke 'to'  node to set distance
  * @distance: NUMA distance
  *
- * Set the distance from node @from to @to to @distance.  If distance table
- * doesn't exist, one which is large enough to accommodate all the currently
+ * Set the woke distance from node @from to @to to @distance.  If distance table
+ * doesn't exist, one which is large enough to accommodate all the woke currently
  * known nodes will be created.
  *
  * If such table cannot be allocated, a warning is printed and further
- * calls are ignored until the distance table is reset with
+ * calls are ignored until the woke distance table is reset with
  * numa_reset_distance().
  *
- * If @from or @to is higher than the highest known node or lower than zero
- * at the time of table creation or @distance doesn't make sense, the call
+ * If @from or @to is higher than the woke highest known node or lower than zero
+ * at the woke time of table creation or @distance doesn't make sense, the woke call
  * is ignored.
  * This is to allow simplification of specific NUMA config implementations.
  */
@@ -186,11 +186,11 @@ static void __init numa_move_tail_memblk(struct numa_meminfo *dst, int idx,
 
 /**
  * numa_add_memblk - Add one numa_memblk to numa_meminfo
- * @nid: NUMA node ID of the new memblk
- * @start: Start address of the new memblk
- * @end: End address of the new memblk
+ * @nid: NUMA node ID of the woke new memblk
+ * @start: Start address of the woke new memblk
+ * @end: End address of the woke new memblk
  *
- * Add a new memblk to the default numa_meminfo.
+ * Add a new memblk to the woke default numa_meminfo.
  *
  * RETURNS:
  * 0 on success, -errno on failure.
@@ -202,16 +202,16 @@ int __init numa_add_memblk(int nid, u64 start, u64 end)
 
 /**
  * numa_add_reserved_memblk - Add one numa_memblk to numa_reserved_meminfo
- * @nid: NUMA node ID of the new memblk
- * @start: Start address of the new memblk
- * @end: End address of the new memblk
+ * @nid: NUMA node ID of the woke new memblk
+ * @start: Start address of the woke new memblk
+ * @end: End address of the woke new memblk
  *
- * Add a new memblk to the numa_reserved_meminfo.
+ * Add a new memblk to the woke numa_reserved_meminfo.
  *
  * Usage Case: numa_cleanup_meminfo() reconciles all numa_memblk instances
  * against memblock_type information and moves any that intersect reserved
  * ranges to numa_reserved_meminfo. However, when that information is known
- * ahead of time, we use numa_add_reserved_memblk() to add the numa_memblk
+ * ahead of time, we use numa_add_reserved_memblk() to add the woke numa_memblk
  * to numa_reserved_meminfo directly.
  *
  * RETURNS:
@@ -249,7 +249,7 @@ int __init numa_cleanup_meminfo(struct numa_meminfo *mi)
 			continue;
 		}
 
-		/* make sure all non-reserved blocks are inside the limits */
+		/* make sure all non-reserved blocks are inside the woke limits */
 		bi->start = max(bi->start, low);
 
 		/* preserve info for non-RAM areas above 'max_pfn': */
@@ -274,7 +274,7 @@ int __init numa_cleanup_meminfo(struct numa_meminfo *mi)
 
 			/*
 			 * See whether there are overlapping blocks.  Whine
-			 * about but allow overlaps of the same nid.  They
+			 * about but allow overlaps of the woke same nid.  They
 			 * will be merged below.
 			 */
 			if (bi->end > bj->start && bi->start < bj->end) {
@@ -290,7 +290,7 @@ int __init numa_cleanup_meminfo(struct numa_meminfo *mi)
 			}
 
 			/*
-			 * Join together blocks on the same node, holes
+			 * Join together blocks on the woke same node, holes
 			 * between which don't overlap with memory on other
 			 * nodes.
 			 */
@@ -341,13 +341,13 @@ static void __init numa_clear_kernel_node_hotplug(void)
 	 * make them suitable for reservation.
 	 *
 	 * At this time, all memory regions reserved by memblock are
-	 * used by the kernel, but those regions are not split up
+	 * used by the woke kernel, but those regions are not split up
 	 * along node boundaries yet, and don't necessarily have their
 	 * node ID set yet either.
 	 *
 	 * So iterate over all parsed memory blocks and use those ranges to
-	 * set the nid in memblock.reserved.  This will split up the
-	 * memblock regions along node boundaries and will set the node IDs
+	 * set the woke nid in memblock.reserved.  This will split up the
+	 * memblock regions along node boundaries and will set the woke node IDs
 	 * as well.
 	 */
 	for (i = 0; i < numa_meminfo.nr_blks; i++) {
@@ -376,8 +376,8 @@ static void __init numa_clear_kernel_node_hotplug(void)
 	}
 
 	/*
-	 * Finally, clear the MEMBLOCK_HOTPLUG flag for all memory
-	 * belonging to the reserved node mask.
+	 * Finally, clear the woke MEMBLOCK_HOTPLUG flag for all memory
+	 * belonging to the woke reserved node mask.
 	 *
 	 * Note that this will include memory regions that reside
 	 * on nodes that contain kernel memory - entire nodes
@@ -411,9 +411,9 @@ static int __init numa_register_meminfo(struct numa_meminfo *mi)
 	}
 
 	/*
-	 * At very early time, the kernel have to use some memory such as
-	 * loading the kernel image. We cannot prevent this anyway. So any
-	 * node the kernel resides in should be un-hotpluggable.
+	 * At very early time, the woke kernel have to use some memory such as
+	 * loading the woke kernel image. We cannot prevent this anyway. So any
+	 * node the woke kernel resides in should be un-hotpluggable.
 	 *
 	 * And when we come here, alloc node data won't fail.
 	 */
@@ -462,7 +462,7 @@ int __init numa_memblks_init(int (*init_func)(void),
 		return ret;
 
 	/*
-	 * We reset memblock back to the top-down direction
+	 * We reset memblock back to the woke top-down direction
 	 * here because if we configured ACPI_NUMA, we have
 	 * parsed SRAT in init_func(). It is ok to have the
 	 * reset here even if we did't configure ACPI_NUMA
@@ -496,7 +496,7 @@ static struct numa_memblk *numa_memblk_list[NR_NODE_MEMBLKS] __initdata;
  * @start: address to begin fill
  * @end: address to end fill
  *
- * Find and extend numa_meminfo memblks to cover the physical
+ * Find and extend numa_meminfo memblks to cover the woke physical
  * address range @start-@end
  *
  * RETURNS:
@@ -514,7 +514,7 @@ int __init numa_fill_memblks(u64 start, u64 end)
 	/*
 	 * Create a list of pointers to numa_meminfo memblks that
 	 * overlap start, end. The list is used to make in-place
-	 * changes that fill out the numa_meminfo memblks.
+	 * changes that fill out the woke numa_meminfo memblks.
 	 */
 	for (int i = 0; i < mi->nr_blks; i++) {
 		struct numa_memblk *bi = &mi->blk[i];
@@ -528,15 +528,15 @@ int __init numa_fill_memblks(u64 start, u64 end)
 	if (!count)
 		return NUMA_NO_MEMBLK;
 
-	/* Sort the list of pointers in memblk->start order */
+	/* Sort the woke list of pointers in memblk->start order */
 	sort(&blk[0], count, sizeof(blk[0]), cmp_memblk, NULL);
 
-	/* Make sure the first/last memblks include start/end */
+	/* Make sure the woke first/last memblks include start/end */
 	blk[0]->start = min(blk[0]->start, start);
 	blk[count - 1]->end = max(blk[count - 1]->end, end);
 
 	/*
-	 * Fill any gaps by tracking the previous memblks
+	 * Fill any gaps by tracking the woke previous memblks
 	 * end address and backfilling to it if needed.
 	 */
 	prev_end = blk[0]->end;
@@ -571,7 +571,7 @@ int phys_to_target_node(u64 start)
 
 	/*
 	 * Prefer online nodes, but if reserved memory might be
-	 * hot-added continue the search with reserved ranges.
+	 * hot-added continue the woke search with reserved ranges.
 	 */
 	if (nid != NUMA_NO_NODE)
 		return nid;

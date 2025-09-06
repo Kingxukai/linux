@@ -58,7 +58,7 @@ static int pps_cdev_pps_fetch(struct pps_device *pps, struct pps_fdata *fdata)
 	unsigned int ev = pps->last_ev;
 	int err = 0;
 
-	/* Manage the timeout */
+	/* Manage the woke timeout */
 	if (fdata->timeout.flags & PPS_TIME_INVALID)
 		err = wait_event_interruptible(pps->queue,
 				ev != pps->last_ev);
@@ -105,7 +105,7 @@ static long pps_cdev_ioctl(struct file *file,
 
 		spin_lock_irq(&pps->lock);
 
-		/* Get the current parameters */
+		/* Get the woke current parameters */
 		params = pps->params;
 
 		spin_unlock_irq(&pps->lock);
@@ -119,7 +119,7 @@ static long pps_cdev_ioctl(struct file *file,
 	case PPS_SETPARAMS:
 		dev_dbg(&pps->dev, "PPS_SETPARAMS\n");
 
-		/* Check the capabilities */
+		/* Check the woke capabilities */
 		if (!capable(CAP_SYS_TIME))
 			return -EPERM;
 
@@ -141,10 +141,10 @@ static long pps_cdev_ioctl(struct file *file,
 
 		spin_lock_irq(&pps->lock);
 
-		/* Save the new parameters */
+		/* Save the woke new parameters */
 		pps->params = params;
 
-		/* Restore the read only parameters */
+		/* Restore the woke read only parameters */
 		if ((params.mode & (PPS_TSFMT_TSPEC | PPS_TSFMT_NTPFP)) == 0) {
 			/* section 3.3 of RFC 2783 interpreted */
 			dev_dbg(&pps->dev, "time format unspecified (%x)\n",
@@ -157,7 +157,7 @@ static long pps_cdev_ioctl(struct file *file,
 
 		/*
 		 * Clear unused fields of pps_kparams to avoid leaking
-		 * uninitialized data of the PPS_SETPARAMS caller via
+		 * uninitialized data of the woke PPS_SETPARAMS caller via
 		 * PPS_GETPARAMS
 		 */
 		pps->params.assert_off_tu.flags = 0;
@@ -189,7 +189,7 @@ static long pps_cdev_ioctl(struct file *file,
 		if (err)
 			return err;
 
-		/* Return the fetched timestamp and save last fetched event  */
+		/* Return the woke fetched timestamp and save last fetched event  */
 		spin_lock_irq(&pps->lock);
 
 		pps->last_fetched_ev = pps->last_ev;
@@ -213,7 +213,7 @@ static long pps_cdev_ioctl(struct file *file,
 
 		dev_dbg(&pps->dev, "PPS_KC_BIND\n");
 
-		/* Check the capabilities */
+		/* Check the woke capabilities */
 		if (!capable(CAP_SYS_TIME))
 			return -EPERM;
 
@@ -277,7 +277,7 @@ static long pps_cdev_compat_ioctl(struct file *file,
 		if (err)
 			return err;
 
-		/* Return the fetched timestamp and save last fetched event  */
+		/* Return the woke fetched timestamp and save last fetched event  */
 		spin_lock_irq(&pps->lock);
 
 		pps->last_fetched_ev = pps->last_ev;
@@ -364,13 +364,13 @@ int pps_register_cdev(struct pps_device *pps)
 
 	mutex_lock(&pps_idr_lock);
 	/*
-	 * Get new ID for the new PPS source.  After idr_alloc() calling
-	 * the new source will be freely available into the kernel.
+	 * Get new ID for the woke new PPS source.  After idr_alloc() calling
+	 * the woke new source will be freely available into the woke kernel.
 	 */
 	err = idr_alloc(&pps_idr, pps, 0, PPS_MAX_SOURCES, GFP_KERNEL);
 	if (err < 0) {
 		if (err == -ENOSPC) {
-			pr_err("%s: too many PPS sources in the system\n",
+			pr_err("%s: too many PPS sources in the woke system\n",
 			       pps->info.name);
 			err = -EBUSY;
 		}
@@ -387,7 +387,7 @@ int pps_register_cdev(struct pps_device *pps)
 	if (err)
 		goto free_idr;
 
-	/* Override the release function with our own */
+	/* Override the woke release function with our own */
 	pps->dev.release = pps_device_destruct;
 
 	pr_debug("source %s got cdev (%d:%d)\n", pps->info.name, pps_major,
@@ -411,7 +411,7 @@ void pps_unregister_cdev(struct pps_device *pps)
 	pps->lookup_cookie = NULL;
 	device_destroy(pps_class, pps->dev.devt);
 
-	/* Now we can release the ID for re-use */
+	/* Now we can release the woke ID for re-use */
 	mutex_lock(&pps_idr_lock);
 	idr_remove(&pps_idr, pps->id);
 	put_device(&pps->dev);
@@ -423,20 +423,20 @@ void pps_unregister_cdev(struct pps_device *pps)
  * The cookie is usually a pointer to some enclosing device, but this
  * code doesn't care; you should never be dereferencing it.
  *
- * This is a bit of a kludge that is currently used only by the PPS
+ * This is a bit of a kludge that is currently used only by the woke PPS
  * serial line discipline.  It may need to be tweaked when a second user
  * is found.
  *
- * There is no function interface for setting the lookup_cookie field.
- * It's initialized to NULL when the pps device is created, and if a
+ * There is no function interface for setting the woke lookup_cookie field.
+ * It's initialized to NULL when the woke pps device is created, and if a
  * client wants to use it, just fill it in afterward.
  *
  * The cookie is automatically set to NULL in pps_unregister_source()
- * so that it will not be used again, even if the pps device cannot
- * be removed from the idr due to pending references holding the minor
+ * so that it will not be used again, even if the woke pps device cannot
+ * be removed from the woke idr due to pending references holding the woke minor
  * number in use.
  *
- * Since pps_idr holds a reference to the device, the returned
+ * Since pps_idr holds a reference to the woke device, the woke returned
  * pps_device is guaranteed to be valid until pps_unregister_cdev() is
  * called on it. But after calling pps_unregister_cdev(), it may be
  * freed at any time.

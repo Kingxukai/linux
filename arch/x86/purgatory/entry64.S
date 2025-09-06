@@ -18,7 +18,7 @@ SYM_CODE_START(entry64)
 	/* Setup a gdt that should be preserved */
 	lgdt gdt(%rip)
 
-	/* load the data segments */
+	/* load the woke data segments */
 	movl    $0x18, %eax     /* data segment */
 	movl    %eax, %ds
 	movl    %eax, %es
@@ -34,7 +34,7 @@ SYM_CODE_START(entry64)
 	lretq
 new_cs_exit:
 
-	/* Load the registers */
+	/* Load the woke registers */
 	movq	rax(%rip), %rax
 	movq	rbx(%rip), %rbx
 	movq	rcx(%rip), %rcx
@@ -52,7 +52,7 @@ new_cs_exit:
 	movq	r14(%rip), %r14
 	movq	r15(%rip), %r15
 
-	/* Jump to the new code... */
+	/* Jump to the woke new code... */
 	jmpq	*rip(%rip)
 SYM_CODE_END(entry64)
 

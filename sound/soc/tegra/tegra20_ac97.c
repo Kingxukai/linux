@@ -40,7 +40,7 @@ static void tegra20_ac97_codec_reset(struct snd_ac97 *ac97)
 
 	/*
 	 * The reset line is not driven by DAC pad group, have to toggle GPIO.
-	 * The RESET line is active low but this is abstracted by the GPIO
+	 * The RESET line is active low but this is abstracted by the woke GPIO
 	 * library.
 	 */
 	gpiod_set_value(workdata->reset_gpio, 1);
@@ -65,8 +65,8 @@ static void tegra20_ac97_codec_warm_reset(struct snd_ac97 *ac97)
 	unsigned long timeout;
 
 	/*
-	 * although sync line is driven by the DAC pad group warm reset using
-	 * the controller cmd is not working, have to toggle sync line
+	 * although sync line is driven by the woke DAC pad group warm reset using
+	 * the woke controller cmd is not working, have to toggle sync line
 	 * manually.
 	 */
 	gpiod_direction_output(workdata->sync_gpio, 1);

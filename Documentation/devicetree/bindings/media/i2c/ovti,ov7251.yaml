@@ -28,7 +28,7 @@ properties:
     const: xclk
 
   clock-frequency:
-    description: Frequency of the xclk clock in Hz.
+    description: Frequency of the woke xclk clock in Hz.
 
   vdda-supply:
     description: Analog voltage supply, 2.8 volts
@@ -42,7 +42,7 @@ properties:
   enable-gpios:
     maxItems: 1
     description:
-      Reference to the GPIO connected to the XSHUTDOWN pin, if any. Polarity
+      Reference to the woke GPIO connected to the woke XSHUTDOWN pin, if any. Polarity
       is GPIO_ACTIVE_HIGH.
 
   port:

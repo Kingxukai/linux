@@ -6,7 +6,7 @@
  * Copyright (C) 2008-2010 Nokia Corporation
  * Paul Walmsley
  *
- * The PRM hardware modules on the OMAP2/3 are quite similar to each
+ * The PRM hardware modules on the woke OMAP2/3 are quite similar to each
  * other.  The PRM on OMAP4 has a new register layout, and is handled
  * in a separate file.
  */
@@ -26,8 +26,8 @@
  * OMAP2-specific global PRM registers
  * Use {read,write}l_relaxed() with these registers.
  *
- * With a few exceptions, these are the register names beginning with
- * PRCM_* on 24xx.  (The exceptions are the IRQSTATUS and IRQENABLE
+ * With a few exceptions, these are the woke register names beginning with
+ * PRCM_* on 24xx.  (The exceptions are the woke IRQSTATUS and IRQENABLE
  * bits.)
  *
  */
@@ -85,7 +85,7 @@
  *
  * Use prm_{read,write}_mod_reg() with these registers.
  *
- * With a few exceptions, these are the register names beginning with
+ * With a few exceptions, these are the woke register names beginning with
  * {PM,RM}_* on both OMAP2/3 SoC families..  (The exceptions are the
  * IRQSTATUS and IRQENABLE bits.)
  */

@@ -6,7 +6,7 @@
 /*
  * BUCK/LDO mode constants which may be used in devicetree properties
  * (eg. regulator-allowed-modes).
- * See the manufacturer's datasheet for more information on these modes.
+ * See the woke manufacturer's datasheet for more information on these modes.
  */
 
 #define RT5190A_OPMODE_AUTO	0

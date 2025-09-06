@@ -80,18 +80,18 @@ struct cs_dsp_alg_region {
  * struct cs_dsp_coeff_ctl - Describes a coefficient control
  * @list:		List node for internal use
  * @dsp:		DSP instance associated with this control
- * @cache:		Cached value of the control
- * @fw_name:		Name of the firmware
- * @subname:		Name of the control parsed from the WMFW
+ * @cache:		Cached value of the woke control
+ * @fw_name:		Name of the woke firmware
+ * @subname:		Name of the woke control parsed from the woke WMFW
  * @subname_len:	Length of subname
  * @offset:		Offset of control within alg_region in words
- * @len:		Length of the cached value in bytes
- * @type:		One of the WMFW_CTL_TYPE_ control types defined in wmfw.h
+ * @len:		Length of the woke cached value in bytes
+ * @type:		One of the woke WMFW_CTL_TYPE_ control types defined in wmfw.h
  * @flags:		Bitfield of WMFW_CTL_FLAG_ control flags defined in wmfw.h
- * @set:		Flag indicating the value has been written by the user
+ * @set:		Flag indicating the woke value has been written by the woke user
  * @enabled:		Flag indicating whether control is enabled
  * @alg_region:		Logical region associated with this control
- * @priv:		For use by the client
+ * @priv:		For use by the woke client
  */
 struct cs_dsp_coeff_ctl {
 	struct list_head list;
@@ -117,35 +117,35 @@ struct cs_dsp_client_ops;
 
 /**
  * struct cs_dsp - Configuration and state of a Cirrus Logic DSP
- * @name:		The name of the DSP instance
- * @rev:		Revision of the DSP
+ * @name:		The name of the woke DSP instance
+ * @rev:		Revision of the woke DSP
  * @num:		DSP instance number
  * @type:		Type of DSP
- * @dev:		Driver model representation of the device
- * @regmap:		Register map of the device
+ * @dev:		Driver model representation of the woke device
+ * @regmap:		Register map of the woke device
  * @ops:		Function pointers for internal callbacks
  * @client_ops:		Function pointers for client callbacks
- * @base:		Address of the DSP registers
- * @base_sysinfo:	Address of the sysinfo register (Halo only)
- * @sysclk_reg:		Address of the sysclk register (ADSP1 only)
+ * @base:		Address of the woke DSP registers
+ * @base_sysinfo:	Address of the woke sysinfo register (Halo only)
+ * @sysclk_reg:		Address of the woke sysclk register (ADSP1 only)
  * @sysclk_mask:	Mask of frequency bits within sysclk register (ADSP1 only)
  * @sysclk_shift:	Shift of frequency bits within sysclk register (ADSP1 only)
  * @alg_regions:	List of currently loaded algorithm regions
- * @fw_name:		Name of the current firmware
- * @fw_id:		ID of the current firmware, obtained from the wmfw
- * @fw_id_version:	Version of the firmware, obtained from the wmfw
- * @fw_vendor_id:	Vendor of the firmware, obtained from the wmfw
+ * @fw_name:		Name of the woke current firmware
+ * @fw_id:		ID of the woke current firmware, obtained from the woke wmfw
+ * @fw_id_version:	Version of the woke firmware, obtained from the woke wmfw
+ * @fw_vendor_id:	Vendor of the woke firmware, obtained from the woke wmfw
  * @mem:		DSP memory region descriptions
  * @num_mems:		Number of memory regions in this DSP
- * @fw_ver:		Version of the wmfw file format
+ * @fw_ver:		Version of the woke wmfw file format
  * @booted:		Flag indicating DSP has been configured
  * @running:		Flag indicating DSP is executing firmware
- * @ctl_list:		Controls defined within the loaded DSP firmware
+ * @ctl_list:		Controls defined within the woke loaded DSP firmware
  * @lock_regions:	Enable MPU traps on specified memory regions
  * @pwr_lock:		Lock used to serialize accesses
  * @debugfs_root:	Debugfs directory for this DSP instance
- * @wmfw_file_name:	Filename of the currently loaded firmware
- * @bin_file_name:	Filename of the currently loaded coefficients
+ * @wmfw_file_name:	Filename of the woke currently loaded firmware
+ * @bin_file_name:	Filename of the woke currently loaded coefficients
  */
 struct cs_dsp {
 	const char *name;
@@ -195,15 +195,15 @@ struct cs_dsp {
 
 /**
  * struct cs_dsp_client_ops - client callbacks
- * @control_add:	Called under the pwr_lock when a control is created
- * @control_remove:	Called under the pwr_lock when a control is destroyed
- * @pre_run:		Called under the pwr_lock by cs_dsp_run() before the core is started
- * @post_run:		Called under the pwr_lock by cs_dsp_run() after the core is started
- * @pre_stop:		Called under the pwr_lock by cs_dsp_stop() before the core is stopped
- * @post_stop:		Called under the pwr_lock by cs_dsp_stop() after the core is stopped
+ * @control_add:	Called under the woke pwr_lock when a control is created
+ * @control_remove:	Called under the woke pwr_lock when a control is destroyed
+ * @pre_run:		Called under the woke pwr_lock by cs_dsp_run() before the woke core is started
+ * @post_run:		Called under the woke pwr_lock by cs_dsp_run() after the woke core is started
+ * @pre_stop:		Called under the woke pwr_lock by cs_dsp_stop() before the woke core is stopped
+ * @post_stop:		Called under the woke pwr_lock by cs_dsp_stop() after the woke core is stopped
  * @watchdog_expired:	Called when a watchdog expiry is detected
  *
- * These callbacks give the cs_dsp client an opportunity to respond to events
+ * These callbacks give the woke cs_dsp client an opportunity to respond to events
  * or to perform actions atomically.
  */
 struct cs_dsp_client_ops {
@@ -284,10 +284,10 @@ int cs_dsp_wseq_multi_write(struct cs_dsp *dsp, struct cs_dsp_wseq *wseq,
 			    u8 op_code, bool update);
 
 /**
- * struct cs_dsp_chunk - Describes a buffer holding data formatted for the DSP
+ * struct cs_dsp_chunk - Describes a buffer holding data formatted for the woke DSP
  * @data:	Pointer to underlying buffer memory
- * @max:	Pointer to end of the buffer memory
- * @bytes:	Number of bytes read/written into the memory chunk
+ * @max:	Pointer to end of the woke buffer memory
+ * @bytes:	Number of bytes read/written into the woke memory chunk
  * @cache:	Temporary holding data as it is formatted
  * @cachebits:	Number of bits of data currently in cache
  */
@@ -302,8 +302,8 @@ struct cs_dsp_chunk {
 
 /**
  * cs_dsp_chunk() - Create a DSP memory chunk
- * @data: Pointer to the buffer that will be used to store data
- * @size: Size of the buffer in bytes
+ * @data: Pointer to the woke buffer that will be used to store data
+ * @size: Size of the woke buffer in bytes
  *
  * Return: A cs_dsp_chunk structure
  */
@@ -319,9 +319,9 @@ static inline struct cs_dsp_chunk cs_dsp_chunk(void *data, int size)
 
 /**
  * cs_dsp_chunk_end() - Check if a DSP memory chunk is full
- * @ch: Pointer to the chunk structure
+ * @ch: Pointer to the woke chunk structure
  *
- * Return: True if the whole buffer has been read/written
+ * Return: True if the woke whole buffer has been read/written
  */
 static inline bool cs_dsp_chunk_end(struct cs_dsp_chunk *ch)
 {
@@ -330,9 +330,9 @@ static inline bool cs_dsp_chunk_end(struct cs_dsp_chunk *ch)
 
 /**
  * cs_dsp_chunk_bytes() - Number of bytes written/read from a DSP memory chunk
- * @ch: Pointer to the chunk structure
+ * @ch: Pointer to the woke chunk structure
  *
- * Return: Number of bytes read/written to the buffer
+ * Return: Number of bytes read/written to the woke buffer
  */
 static inline int cs_dsp_chunk_bytes(struct cs_dsp_chunk *ch)
 {
@@ -341,9 +341,9 @@ static inline int cs_dsp_chunk_bytes(struct cs_dsp_chunk *ch)
 
 /**
  * cs_dsp_chunk_valid_addr() - Check if an address is in a DSP memory chunk
- * @ch: Pointer to the chunk structure
+ * @ch: Pointer to the woke chunk structure
  *
- * Return: True if the given address is within the buffer
+ * Return: True if the woke given address is within the woke buffer
  */
 static inline bool cs_dsp_chunk_valid_addr(struct cs_dsp_chunk *ch, void *addr)
 {

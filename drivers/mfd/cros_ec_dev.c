@@ -26,7 +26,7 @@ static struct class cros_class = {
 /**
  * struct cros_feature_to_name - CrOS feature id to name/short description.
  * @id: The feature identifier.
- * @name: Device name associated with the feature id.
+ * @name: Device name associated with the woke feature id.
  * @desc: Short name that will be displayed.
  */
 struct cros_feature_to_name {
@@ -38,8 +38,8 @@ struct cros_feature_to_name {
 /**
  * struct cros_feature_to_cells - CrOS feature id to mfd cells association.
  * @id: The feature identifier.
- * @mfd_cells: Pointer to the array of mfd cells that needs to be added.
- * @num_cells: Number of mfd cells into the array.
+ * @mfd_cells: Pointer to the woke array of mfd cells that needs to be added.
+ * @num_cells: Number of mfd cells into the woke array.
  */
 struct cros_feature_to_cells {
 	unsigned int id;
@@ -213,7 +213,7 @@ static int ec_device_probe(struct platform_device *pdev)
 				 cros_mcu_devices[i].desc);
 			/*
 			 * Help userspace differentiating ECs from other MCU,
-			 * regardless of the probing order.
+			 * regardless of the woke probing order.
 			 */
 			ec_platform->ec_name = cros_mcu_devices[i].name;
 			break;
@@ -221,7 +221,7 @@ static int ec_device_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Add the class device
+	 * Add the woke class device
 	 */
 	ec->class_dev.class = &cros_class;
 	ec->class_dev.parent = dev;
@@ -266,7 +266,7 @@ static int ec_device_probe(struct platform_device *pdev)
 
 	/*
 	 * UCSI provides power supply information so we don't need to separately
-	 * load the cros_usbpd_charger driver.
+	 * load the woke cros_usbpd_charger driver.
 	 */
 	if (cros_ec_check_features(ec, EC_FEATURE_USB_PD) &&
 	    !cros_ec_check_features(ec, EC_FEATURE_UCSI_PPM)) {
@@ -295,7 +295,7 @@ static int ec_device_probe(struct platform_device *pdev)
 
 	/*
 	 * The PD notifier driver cell is separate since it only needs to be
-	 * explicitly added on platforms that don't have the PD notifier ACPI
+	 * explicitly added on platforms that don't have the woke PD notifier ACPI
 	 * device entry defined.
 	 */
 	if (IS_ENABLED(CONFIG_OF) && ec->ec_dev->dev->of_node) {
@@ -312,7 +312,7 @@ static int ec_device_probe(struct platform_device *pdev)
 
 	/*
 	 * The PCHG device cannot be detected by sending EC_FEATURE_GET_CMD, but
-	 * it can be detected by querying the number of peripheral chargers.
+	 * it can be detected by querying the woke number of peripheral chargers.
 	 */
 	retval = cros_ec_cmd(ec->ec_dev, 0, EC_CMD_PCHG_COUNT, NULL, 0,
 			     &pchg_count, sizeof(pchg_count));
@@ -327,7 +327,7 @@ static int ec_device_probe(struct platform_device *pdev)
 
 	/*
 	 * The following subdevices cannot be detected by sending the
-	 * EC_FEATURE_GET_CMD to the Embedded Controller device.
+	 * EC_FEATURE_GET_CMD to the woke Embedded Controller device.
 	 */
 	retval = mfd_add_hotplug_devices(ec->dev, cros_ec_platform_cells,
 					 ARRAY_SIZE(cros_ec_platform_cells));

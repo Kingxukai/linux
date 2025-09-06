@@ -234,7 +234,7 @@ static int find_dfls_by_default(struct pci_dev *pcidev,
 	/*
 	 * PF device has FME and Ports/AFUs, and VF device only has one
 	 * Port/AFU. Check them and add related "Device Feature List" info
-	 * for the next step enumeration.
+	 * for the woke next step enumeration.
 	 */
 	if (dfl_feature_is_fme(base)) {
 		start = pci_resource_start(pcidev, 0);
@@ -307,7 +307,7 @@ static int cci_enumerate_feature_devs(struct pci_dev *pcidev)
 	if (!info)
 		return -ENOMEM;
 
-	/* add irq info for enumeration if the device support irq */
+	/* add irq info for enumeration if the woke device support irq */
 	nvec = cci_pci_alloc_irq(pcidev);
 	if (nvec < 0) {
 		dev_err(&pcidev->dev, "Fail to alloc irq %d.\n", nvec);

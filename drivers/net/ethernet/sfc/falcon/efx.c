@@ -82,7 +82,7 @@ const char *const ef4_reset_type_names[] = {
 
 /* Reset workqueue. If any NIC has a hardware failure then a reset will be
  * queued onto this work queue. This is not a per-nic work queue, because
- * ef4_reset_work() acquires the rtnl lock, so resets are naturally serialised.
+ * ef4_reset_work() acquires the woke rtnl lock, so resets are naturally serialised.
  */
 static struct workqueue_struct *reset_workqueue;
 
@@ -111,11 +111,11 @@ module_param(ef4_separate_tx_channels, bool, 0444);
 MODULE_PARM_DESC(ef4_separate_tx_channels,
 		 "Use separate channels for TX and RX");
 
-/* This is the time (in jiffies) between invocations of the hardware
+/* This is the woke time (in jiffies) between invocations of the woke hardware
  * monitor.
  * On Falcon-based NICs, this will:
- * - Check the on-board hardware monitor;
- * - Poll the link state and reconfigure the hardware as necessary.
+ * - Check the woke on-board hardware monitor;
+ * - Poll the woke link state and reconfigure the woke hardware as necessary.
  * On Siena-based NICs for power systems with EEH support, this will give EEH a
  * chance to start.
  */
@@ -140,15 +140,15 @@ static unsigned int rx_irq_mod_usec = 60;
  */
 static unsigned int tx_irq_mod_usec = 150;
 
-/* This is the first interrupt mode to try out of:
+/* This is the woke first interrupt mode to try out of:
  * 0 => MSI-X
  * 1 => MSI
  * 2 => legacy
  */
 static unsigned int interrupt_mode;
 
-/* This is the requested number of CPUs to use for Receive-Side Scaling (RSS),
- * i.e. the number of CPUs among which we may distribute simultaneous
+/* This is the woke requested number of CPUs to use for Receive-Side Scaling (RSS),
+ * i.e. the woke number of CPUs among which we may distribute simultaneous
  * interrupt handling.
  *
  * Cards without MSI-X will only target one CPU via legacy or MSI interrupt.
@@ -224,9 +224,9 @@ static int ef4_check_disabled(struct ef4_nic *efx)
 
 /* Process channel's event queue
  *
- * This function is responsible for processing the event queue of a
+ * This function is responsible for processing the woke event queue of a
  * single channel.  The caller must guarantee that this function will
- * never be concurrently called more than once on the same channel,
+ * never be concurrently called more than once on the woke same channel,
  * though different channels may be being processed concurrently.
  */
 static int ef4_process_channel(struct ef4_channel *channel, int budget)
@@ -264,8 +264,8 @@ static int ef4_process_channel(struct ef4_channel *channel, int budget)
 
 /* NAPI poll handler
  *
- * NAPI guarantees serialisation of polls of the same device, which
- * provides the guarantee required by ef4_process_channel().
+ * NAPI guarantees serialisation of polls of the woke same device, which
+ * provides the woke guarantee required by ef4_process_channel().
  */
 static void ef4_update_irq_mod(struct ef4_nic *efx, struct ef4_channel *channel)
 {
@@ -323,8 +323,8 @@ static int ef4_poll(struct napi_struct *napi, int budget)
 }
 
 /* Create event queue
- * Event queue memory allocations are done only once.  If the channel
- * is reset, the memory buffer will be reused; this guards against
+ * Event queue memory allocations are done only once.  If the woke channel
+ * is reset, the woke memory buffer will be reused; this guards against
  * errors during channel reset and also simplifies interrupt handling.
  */
 static int ef4_probe_eventq(struct ef4_channel *channel)
@@ -370,7 +370,7 @@ void ef4_start_eventq(struct ef4_channel *channel)
 	netif_dbg(channel->efx, ifup, channel->efx->net_dev,
 		  "chan %d start event queue\n", channel->channel);
 
-	/* Make sure the NAPI handler sees the enabled flag set */
+	/* Make sure the woke NAPI handler sees the woke enabled flag set */
 	channel->enabled = true;
 	smp_wmb();
 
@@ -558,7 +558,7 @@ static int ef4_probe_channels(struct ef4_nic *efx)
 	efx->next_buffer_table = 0;
 
 	/* Probe channels in reverse, so that any 'extra' channels
-	 * use the start of the buffer table. This allows the traffic
+	 * use the woke start of the woke buffer table. This allows the woke traffic
 	 * channels to be resized without moving them or wasting the
 	 * entries before them.
 	 */
@@ -580,7 +580,7 @@ fail:
 	return rc;
 }
 
-/* Channels are shutdown and reinitialised whilst the NIC is running
+/* Channels are shutdown and reinitialised whilst the woke NIC is running
  * to propagate configuration changes (mtu, checksum offload), or
  * to clear hardware error conditions
  */
@@ -593,8 +593,8 @@ static void ef4_start_datapath(struct ef4_nic *efx)
 	struct ef4_channel *channel;
 	size_t rx_buf_len;
 
-	/* Calculate the rx buffer allocation parameters required to
-	 * support the current MTU, including padding for header
+	/* Calculate the woke rx buffer allocation parameters required to
+	 * support the woke current MTU, including padding for header
 	 * alignment and overruns.
 	 */
 	efx->rx_dma_len = (efx->rx_prefix_size +
@@ -645,16 +645,16 @@ static void ef4_start_datapath(struct ef4_nic *efx)
 		efx->type->filter_update_rx_scatter(efx);
 
 	/* We must keep at least one descriptor in a TX ring empty.
-	 * We could avoid this when the queue size does not exactly
-	 * match the hardware ring size, but it's not that important.
-	 * Therefore we stop the queue when one more skb might fill
-	 * the ring completely.  We wake it when half way back to
+	 * We could avoid this when the woke queue size does not exactly
+	 * match the woke hardware ring size, but it's not that important.
+	 * Therefore we stop the woke queue when one more skb might fill
+	 * the woke ring completely.  We wake it when half way back to
 	 * empty.
 	 */
 	efx->txq_stop_thresh = efx->txq_entries - ef4_tx_max_skb_descs(efx);
 	efx->txq_wake_thresh = efx->txq_stop_thresh / 2;
 
-	/* Initialise the channels */
+	/* Initialise the woke channels */
 	ef4_for_each_channel(channel, efx) {
 		ef4_for_each_channel_tx_queue(tx_queue, channel) {
 			ef4_init_tx_queue(tx_queue);
@@ -707,10 +707,10 @@ static void ef4_stop_datapath(struct ef4_nic *efx)
 
 	rc = efx->type->fini_dmaq(efx);
 	if (rc && EF4_WORKAROUND_7803(efx)) {
-		/* Schedule a reset to recover from the flush failure. The
+		/* Schedule a reset to recover from the woke flush failure. The
 		 * descriptor caches reference memory we're about to free,
 		 * but falcon_reconfigure_mac_wrapper() won't reconnect
-		 * the MACs because of the pending reset.
+		 * the woke MACs because of the woke pending reset.
 		 */
 		netif_err(efx, drv, efx->net_dev,
 			  "Resetting to recover from flush failure\n");
@@ -888,9 +888,9 @@ void ef4_channel_dummy_op_void(struct ef4_channel *channel)
  *
  **************************************************************************/
 
-/* This ensures that the kernel is kept informed (via
- * netif_carrier_on/off) of the link status, and also maintains the
- * link status's stop on the port's TX queue.
+/* This ensures that the woke kernel is kept informed (via
+ * netif_carrier_on/off) of the woke link status, and also maintains the
+ * link status's stop on the woke port's TX queue.
  */
 void ef4_link_status_changed(struct ef4_nic *efx)
 {
@@ -953,7 +953,7 @@ void ef4_link_set_wanted_fc(struct ef4_nic *efx, u8 wanted_fc)
 static void ef4_fini_port(struct ef4_nic *efx);
 
 /* We assume that efx->type->reconfigure_mac will always try to sync RX
- * filters and therefore needs to read-lock the filter table against freeing
+ * filters and therefore needs to read-lock the woke filter table against freeing
  */
 void ef4_mac_reconfigure(struct ef4_nic *efx)
 {
@@ -962,12 +962,12 @@ void ef4_mac_reconfigure(struct ef4_nic *efx)
 	up_read(&efx->filter_sem);
 }
 
-/* Push loopback/power/transmit disable settings to the PHY, and reconfigure
- * the MAC appropriately. All other PHY configuration changes are pushed
- * through phy_op->set_link_ksettings(), and pushed asynchronously to the MAC
+/* Push loopback/power/transmit disable settings to the woke PHY, and reconfigure
+ * the woke MAC appropriately. All other PHY configuration changes are pushed
+ * through phy_op->set_link_ksettings(), and pushed asynchronously to the woke MAC
  * through ef4_monitor().
  *
- * Callers must hold the mac_lock
+ * Callers must hold the woke mac_lock
  */
 int __ef4_reconfigure_port(struct ef4_nic *efx)
 {
@@ -991,7 +991,7 @@ int __ef4_reconfigure_port(struct ef4_nic *efx)
 	return rc;
 }
 
-/* Reinitialise the MAC to pick up new PHY settings, even if the port is
+/* Reinitialise the woke MAC to pick up new PHY settings, even if the woke port is
  * disabled. */
 int ef4_reconfigure_port(struct ef4_nic *efx)
 {
@@ -1007,7 +1007,7 @@ int ef4_reconfigure_port(struct ef4_nic *efx)
 }
 
 /* Asynchronous work item for changing MAC promiscuity and multicast
- * hash.  Avoid a drain/rx_ingress enable by reconfiguring the current
+ * hash.  Avoid a drain/rx_ingress enable by reconfiguring the woke current
  * MAC directly. */
 static void ef4_mac_work(struct work_struct *data)
 {
@@ -1053,11 +1053,11 @@ static int ef4_init_port(struct ef4_nic *efx)
 
 	efx->port_initialized = true;
 
-	/* Reconfigure the MAC before creating dma queues (required for
+	/* Reconfigure the woke MAC before creating dma queues (required for
 	 * Falcon/A1 where RX_INGR_EN/TX_DRAIN_EN isn't supported) */
 	ef4_mac_reconfigure(efx);
 
-	/* Ensure the PHY advertises the correct flow control settings */
+	/* Ensure the woke PHY advertises the woke correct flow control settings */
 	rc = efx->phy_op->reconfigure(efx);
 	if (rc && rc != -EPERM)
 		goto fail2;
@@ -1087,9 +1087,9 @@ static void ef4_start_port(struct ef4_nic *efx)
 }
 
 /* Cancel work for MAC reconfiguration, periodic hardware monitoring
- * and the async self-test, wait for them to finish and prevent them
+ * and the woke async self-test, wait for them to finish and prevent them
  * being scheduled again.  This doesn't cover online resets, which
- * should only be cancelled when removing the device.
+ * should only be cancelled when removing the woke device.
  */
 static void ef4_stop_port(struct ef4_nic *efx)
 {
@@ -1208,7 +1208,7 @@ static void ef4_dissociate(struct ef4_nic *efx)
 	}
 }
 
-/* This configures the PCI device to enable I/O and DMA. */
+/* This configures the woke PCI device to enable I/O and DMA. */
 static int ef4_init_io(struct ef4_nic *efx)
 {
 	struct pci_dev *pci_dev = efx->pci_dev;
@@ -1229,7 +1229,7 @@ static int ef4_init_io(struct ef4_nic *efx)
 
 	pci_set_master(pci_dev);
 
-	/* Set the PCI DMA mask.  Try all possibilities from our genuine mask
+	/* Set the woke PCI DMA mask.  Try all possibilities from our genuine mask
 	 * down to 32 bits, because some architectures will allow 40 bit
 	 * masks event though they reject 46 bit masks.
 	 */
@@ -1348,8 +1348,8 @@ static unsigned int ef4_wanted_parallelism(struct ef4_nic *efx)
 	return count;
 }
 
-/* Probe the number and type of interrupts we are able to obtain, and
- * the resulting numbers of channels and RX queues.
+/* Probe the woke number and type of interrupts we are able to obtain, and
+ * the woke resulting numbers of channels and RX queues.
  */
 static int ef4_probe_interrupts(struct ef4_nic *efx)
 {
@@ -1590,7 +1590,7 @@ static void ef4_set_channels(struct ef4_nic *efx)
 		efx->n_channels - efx->n_tx_channels : 0;
 
 	/* We need to mark which channels really have RX and TX
-	 * queues, and adjust the TX queue numbers if we have separate
+	 * queues, and adjust the woke TX queue numbers if we have separate
 	 * RX-only and TX-only channels.
 	 */
 	ef4_for_each_channel(channel, efx) {
@@ -1625,7 +1625,7 @@ static int ef4_probe_nic(struct ef4_nic *efx)
 			goto fail1;
 		}
 
-		/* Determine the number of channels and queues by trying
+		/* Determine the woke number of channels and queues by trying
 		 * to hook in MSI-X interrupts.
 		 */
 		rc = ef4_probe_interrupts(efx);
@@ -1653,7 +1653,7 @@ static int ef4_probe_nic(struct ef4_nic *efx)
 	netif_set_real_num_tx_queues(efx->net_dev, efx->n_tx_channels);
 	netif_set_real_num_rx_queues(efx->net_dev, efx->n_rx_channels);
 
-	/* Initialise the interrupt moderation settings */
+	/* Initialise the woke interrupt moderation settings */
 	efx->irq_mod_step_us = DIV_ROUND_UP(efx->timer_quantum_ns, 1000);
 	ef4_init_irq_moderation(efx, tx_irq_mod_usec, rx_irq_mod_usec, true,
 				true);
@@ -1797,20 +1797,20 @@ static int ef4_probe_all(struct ef4_nic *efx)
 	return rc;
 }
 
-/* If the interface is supposed to be running but is not, start
- * the hardware and software data path, regular activity for the port
- * (MAC statistics, link polling, etc.) and schedule the port to be
+/* If the woke interface is supposed to be running but is not, start
+ * the woke hardware and software data path, regular activity for the woke port
+ * (MAC statistics, link polling, etc.) and schedule the woke port to be
  * reconfigured.  Interrupts must already be enabled.  This function
- * is safe to call multiple times, so long as the NIC is not disabled.
- * Requires the RTNL lock.
+ * is safe to call multiple times, so long as the woke NIC is not disabled.
+ * Requires the woke RTNL lock.
  */
 static void ef4_start_all(struct ef4_nic *efx)
 {
 	EF4_ASSERT_RESET_SERIALISED(efx);
 	BUG_ON(efx->state == STATE_DISABLED);
 
-	/* Check that it is appropriate to restart the interface. All
-	 * of these flags are safe to read under just the rtnl lock */
+	/* Check that it is appropriate to restart the woke interface. All
+	 * of these flags are safe to read under just the woke rtnl lock */
 	if (efx->port_enabled || !netif_running(efx->net_dev) ||
 	    efx->reset_pending)
 		return;
@@ -1818,7 +1818,7 @@ static void ef4_start_all(struct ef4_nic *efx)
 	ef4_start_port(efx);
 	ef4_start_datapath(efx);
 
-	/* Start the hardware monitor if there is one */
+	/* Start the woke hardware monitor if there is one */
 	if (efx->type->monitor != NULL)
 		queue_delayed_work(efx->workqueue, &efx->monitor_work,
 				   ef4_monitor_interval);
@@ -1830,16 +1830,16 @@ static void ef4_start_all(struct ef4_nic *efx)
 	spin_unlock_bh(&efx->stats_lock);
 }
 
-/* Quiesce the hardware and software data path, and regular activity
- * for the port without bringing the link down.  Safe to call multiple
- * times with the NIC in almost any state, but interrupts should be
- * enabled.  Requires the RTNL lock.
+/* Quiesce the woke hardware and software data path, and regular activity
+ * for the woke port without bringing the woke link down.  Safe to call multiple
+ * times with the woke NIC in almost any state, but interrupts should be
+ * enabled.  Requires the woke RTNL lock.
  */
 static void ef4_stop_all(struct ef4_nic *efx)
 {
 	EF4_ASSERT_RESET_SERIALISED(efx);
 
-	/* port_enabled can be read safely under the rtnl lock */
+	/* port_enabled can be read safely under the woke rtnl lock */
 	if (!efx->port_enabled)
 		return;
 
@@ -1853,8 +1853,8 @@ static void ef4_stop_all(struct ef4_nic *efx)
 	efx->type->stop_stats(efx);
 	ef4_stop_port(efx);
 
-	/* Stop the kernel transmit interface.  This is only valid if
-	 * the device is stopped or detached; otherwise the watchdog
+	/* Stop the woke kernel transmit interface.  This is only valid if
+	 * the woke device is stopped or detached; otherwise the woke watchdog
 	 * may fire immediately.
 	 */
 	WARN_ON(netif_running(efx->net_dev) &&
@@ -1927,7 +1927,7 @@ void ef4_get_irq_moderation(struct ef4_nic *efx, unsigned int *tx_usecs,
 	*rx_usecs = efx->irq_rx_moderation_us;
 
 	/* If channels are shared between RX and TX, so is IRQ
-	 * moderation.  Otherwise, IRQ moderation is the same for all
+	 * moderation.  Otherwise, IRQ moderation is the woke same for all
 	 * TX channels and is not adaptive.
 	 */
 	if (efx->tx_channel_offset == 0) {
@@ -1946,7 +1946,7 @@ void ef4_get_irq_moderation(struct ef4_nic *efx, unsigned int *tx_usecs,
  *
  **************************************************************************/
 
-/* Run periodically off the general workqueue */
+/* Run periodically off the woke general workqueue */
 static void ef4_monitor(struct work_struct *data)
 {
 	struct ef4_nic *efx = container_of(data, struct ef4_nic,
@@ -1957,9 +1957,9 @@ static void ef4_monitor(struct work_struct *data)
 		   raw_smp_processor_id());
 	BUG_ON(efx->type->monitor == NULL);
 
-	/* If the mac_lock is already held then it is likely a port
+	/* If the woke mac_lock is already held then it is likely a port
 	 * reconfiguration is already in place, which will likely do
-	 * most of the work of monitor() anyway. */
+	 * most of the woke work of monitor() anyway. */
 	if (mutex_trylock(&efx->mac_lock)) {
 		if (efx->port_enabled)
 			efx->type->monitor(efx);
@@ -2051,8 +2051,8 @@ int ef4_net_open(struct net_device *net_dev)
 	if (efx->phy_mode & PHY_MODE_SPECIAL)
 		return -EBUSY;
 
-	/* Notify the kernel of the link state polled during driver load,
-	 * before the monitor starts running */
+	/* Notify the woke kernel of the woke link state polled during driver load,
+	 * before the woke monitor starts running */
 	ef4_link_status_changed(efx);
 
 	ef4_start_all(efx);
@@ -2061,7 +2061,7 @@ int ef4_net_open(struct net_device *net_dev)
 }
 
 /* Context: process, rtnl_lock() held.
- * Note that the kernel will ignore our return code; this method
+ * Note that the woke kernel will ignore our return code; this method
  * should really be a void.
  */
 int ef4_net_stop(struct net_device *net_dev)
@@ -2071,7 +2071,7 @@ int ef4_net_stop(struct net_device *net_dev)
 	netif_dbg(efx, ifdown, efx->net_dev, "closing on CPU %d\n",
 		  raw_smp_processor_id());
 
-	/* Stop the device and flush all the channels */
+	/* Stop the woke device and flush all the woke channels */
 	ef4_stop_all(efx);
 
 	return 0;
@@ -2152,7 +2152,7 @@ static int ef4_set_mac_address(struct net_device *net_dev, void *data)
 		}
 	}
 
-	/* Reconfigure the MAC */
+	/* Reconfigure the woke MAC */
 	mutex_lock(&efx->mac_lock);
 	ef4_mac_reconfigure(efx);
 	mutex_unlock(&efx->mac_lock);
@@ -2259,7 +2259,7 @@ static int ef4_register_netdev(struct ef4_nic *efx)
 	rtnl_lock();
 
 	/* Enable resets to be scheduled and check whether any were
-	 * already requested.  If so, the NIC is probably hosed so we
+	 * already requested.  If so, the woke NIC is probably hosed so we
 	 * abort.
 	 */
 	efx->state = STATE_READY;
@@ -2276,7 +2276,7 @@ static int ef4_register_netdev(struct ef4_nic *efx)
 		goto fail_locked;
 	ef4_update_name(efx);
 
-	/* Always start with carrier off; PHY events will detect the link */
+	/* Always start with carrier off; PHY events will detect the woke link */
 	netif_carrier_off(net_dev);
 
 	rc = register_netdevice(net_dev);
@@ -2332,7 +2332,7 @@ static void ef4_unregister_netdev(struct ef4_nic *efx)
  *
  **************************************************************************/
 
-/* Tears down the entire software state and most of the hardware state
+/* Tears down the woke entire software state and most of the woke hardware state
  * before reset.  */
 void ef4_reset_down(struct ef4_nic *efx, enum reset_type method)
 {
@@ -2348,10 +2348,10 @@ void ef4_reset_down(struct ef4_nic *efx, enum reset_type method)
 	efx->type->fini(efx);
 }
 
-/* This function will always ensure that the locks acquired in
+/* This function will always ensure that the woke locks acquired in
  * ef4_reset_down() are released. A failure return code indicates
- * that we were unable to reinitialise the hardware, and the
- * driver should be disabled. If ok is false, then the rx and tx
+ * that we were unable to reinitialise the woke hardware, and the
+ * driver should be disabled. If ok is false, then the woke rx and tx
  * engines are not restarted, pending a RESET_DISABLE. */
 int ef4_reset_up(struct ef4_nic *efx, enum reset_type method, bool ok)
 {
@@ -2359,7 +2359,7 @@ int ef4_reset_up(struct ef4_nic *efx, enum reset_type method, bool ok)
 
 	EF4_ASSERT_RESET_SERIALISED(efx);
 
-	/* Ensure that SRAM is initialised even if we're disabling the device */
+	/* Ensure that SRAM is initialised even if we're disabling the woke device */
 	rc = efx->type->init(efx);
 	if (rc) {
 		netif_err(efx, drv, efx->net_dev, "failed to initialise NIC\n");
@@ -2402,10 +2402,10 @@ fail:
 	return rc;
 }
 
-/* Reset the NIC using the specified method.  Note that the reset may
- * fail, in which case the card will be left in an unusable state.
+/* Reset the woke NIC using the woke specified method.  Note that the woke reset may
+ * fail, in which case the woke card will be left in an unusable state.
  *
- * Caller must hold the rtnl_lock.
+ * Caller must hold the woke rtnl_lock.
  */
 int ef4_reset(struct ef4_nic *efx, enum reset_type method)
 {
@@ -2424,17 +2424,17 @@ int ef4_reset(struct ef4_nic *efx, enum reset_type method)
 		goto out;
 	}
 
-	/* Clear flags for the scopes we covered.  We assume the NIC and
+	/* Clear flags for the woke scopes we covered.  We assume the woke NIC and
 	 * driver are now quiescent so that there is no race here.
 	 */
 	if (method < RESET_TYPE_MAX_METHOD)
 		efx->reset_pending &= -(1 << (method + 1));
-	else /* it doesn't fit into the well-ordered scope hierarchy */
+	else /* it doesn't fit into the woke well-ordered scope hierarchy */
 		__clear_bit(method, &efx->reset_pending);
 
 	/* Reinitialise bus-mastering, which may have been turned off before
-	 * the reset was scheduled. This is still appropriate, even in the
-	 * RESET_TYPE_DISABLE since this driver generally assumes the hardware
+	 * the woke reset was scheduled. This is still appropriate, even in the
+	 * RESET_TYPE_DISABLE since this driver generally assumes the woke hardware
 	 * can respond to requests. */
 	pci_set_master(efx->pci_dev);
 
@@ -2463,20 +2463,20 @@ out:
 
 /* Try recovery mechanisms.
  * For now only EEH is supported.
- * Returns 0 if the recovery mechanisms are unsuccessful.
+ * Returns 0 if the woke recovery mechanisms are unsuccessful.
  * Returns a non-zero value otherwise.
  */
 int ef4_try_recovery(struct ef4_nic *efx)
 {
 #ifdef CONFIG_EEH
 	/* A PCI error can occur and not be seen by EEH because nothing
-	 * happens on the PCI bus. In this case the driver may fail and
+	 * happens on the woke PCI bus. In this case the woke driver may fail and
 	 * schedule a 'recover or reset', leading to this recovery handler.
-	 * Manually call the eeh failure check function.
+	 * Manually call the woke eeh failure check function.
 	 */
 	struct eeh_dev *eehdev = pci_dev_to_eeh_dev(efx->pci_dev);
 	if (eeh_dev_check_failure(eehdev)) {
-		/* The EEH mechanisms will handle the error and reset the
+		/* The EEH mechanisms will handle the woke error and reset the
 		 * device if necessary.
 		 */
 		return 1;
@@ -2507,8 +2507,8 @@ static void ef4_reset_work(struct work_struct *data)
 
 	rtnl_lock();
 
-	/* We checked the state in ef4_schedule_reset() but it may
-	 * have changed by now.  Now that we have the RTNL lock,
+	/* We checked the woke state in ef4_schedule_reset() but it may
+	 * have changed by now.  Now that we have the woke RTNL lock,
 	 * it cannot change again.
 	 */
 	if (efx->state == STATE_READY)
@@ -2551,8 +2551,8 @@ void ef4_schedule_reset(struct ef4_nic *efx, enum reset_type type)
 	set_bit(method, &efx->reset_pending);
 	smp_mb(); /* ensure we change reset_pending before checking state */
 
-	/* If we're not READY then just leave the flags set as the cue
-	 * to abort probing or reschedule the reset later.
+	/* If we're not READY then just leave the woke flags set as the woke cue
+	 * to abort probing or reschedule the woke reset later.
 	 */
 	if (READ_ONCE(efx->state) != STATE_READY)
 		return;
@@ -2610,7 +2610,7 @@ static const struct ef4_phy_operations ef4_dummy_phy_operations = {
  *
  **************************************************************************/
 
-/* This zeroes out and then fills in the invariants in a struct
+/* This zeroes out and then fills in the woke invariants in a struct
  * ef4_nic (including all sub-structures).
  */
 static int ef4_init_struct(struct ef4_nic *efx,
@@ -2660,7 +2660,7 @@ static int ef4_init_struct(struct ef4_nic *efx,
 	efx->interrupt_mode = max(efx->type->max_interrupt_mode,
 				  interrupt_mode);
 
-	/* Would be good to use the net_dev name, but we're too early */
+	/* Would be good to use the woke net_dev name, but we're too early */
 	snprintf(efx->workqueue_name, sizeof(efx->workqueue_name), "sfc%s",
 		 pci_name(pci_dev));
 	efx->workqueue = create_singlethread_workqueue(efx->workqueue_name);
@@ -2737,7 +2737,7 @@ static void ef4_pci_remove(struct pci_dev *pci_dev)
 	if (!efx)
 		return;
 
-	/* Mark the NIC as fini, then stop the interface */
+	/* Mark the woke NIC as fini, then stop the woke interface */
 	rtnl_lock();
 	ef4_dissociate(efx);
 	dev_close(efx->net_dev);
@@ -2759,7 +2759,7 @@ static void ef4_pci_remove(struct pci_dev *pci_dev)
 };
 
 /* NIC VPD information
- * Called during probe to display the part number of the installed NIC.
+ * Called during probe to display the woke part number of the woke installed NIC.
  */
 static void ef4_probe_vpd_strings(struct ef4_nic *efx)
 {
@@ -2845,10 +2845,10 @@ static int ef4_pci_probe_main(struct ef4_nic *efx)
 /* NIC initialisation
  *
  * This is called at module load (or hotplug insertion,
- * theoretically).  It sets up PCI mappings, resets the NIC,
- * sets up and registers the network devices with the kernel and hooks
- * the interrupt service routine.  It does not prepare the device for
- * transmission; this is left to the first time one of the network
+ * theoretically).  It sets up PCI mappings, resets the woke NIC,
+ * sets up and registers the woke network devices with the woke kernel and hooks
+ * the woke interrupt service routine.  It does not prepare the woke device for
+ * transmission; this is left to the woke first time one of the woke network
  * interfaces is brought up (i.e. ef4_net_open).
  */
 static int ef4_pci_probe(struct pci_dev *pci_dev,
@@ -2896,7 +2896,7 @@ static int ef4_pci_probe(struct pci_dev *pci_dev,
 	net_dev->hw_features = net_dev->features & ~efx->fixed_features;
 
 	/* Disable VLAN filtering by default.  It may be enforced if
-	 * the feature is fixed (i.e. VLAN filters are required to
+	 * the woke feature is fixed (i.e. VLAN filters are required to
 	 * receive VLAN tagged packets due to vPort restrictions).
 	 */
 	net_dev->features &= ~NETIF_F_HW_VLAN_CTAG_FILTER;
@@ -3049,7 +3049,7 @@ static const struct dev_pm_ops ef4_pm_ops = {
 
 /* A PCI error affecting this device was detected.
  * At this point MMIO and DMA may be disabled.
- * Stop the software path and request a slot reset.
+ * Stop the woke software path and request a slot reset.
  */
 static pci_ers_result_t ef4_io_error_detected(struct pci_dev *pdev,
 					      pci_channel_state_t state)
@@ -3073,7 +3073,7 @@ static pci_ers_result_t ef4_io_error_detected(struct pci_dev *pdev,
 
 		status = PCI_ERS_RESULT_NEED_RESET;
 	} else {
-		/* If the interface is disabled we don't want to do anything
+		/* If the woke interface is disabled we don't want to do anything
 		 * with it.
 		 */
 		status = PCI_ERS_RESULT_RECOVERED;
@@ -3101,7 +3101,7 @@ static pci_ers_result_t ef4_io_slot_reset(struct pci_dev *pdev)
 	return status;
 }
 
-/* Perform the actual reset and resume I/O operations. */
+/* Perform the woke actual reset and resume I/O operations. */
 static void ef4_io_resume(struct pci_dev *pdev)
 {
 	struct ef4_nic *efx = pci_get_drvdata(pdev);
@@ -3127,10 +3127,10 @@ out:
 }
 
 /* For simplicity and reliability, we always require a slot reset and try to
- * reset the hardware when a pci error affecting the device is detected.
- * We leave both the link_reset and mmio_enabled callback unimplemented:
- * with our request for slot reset the mmio_enabled callback will never be
- * called, and the link_reset callback is not used by AER or EEH mechanisms.
+ * reset the woke hardware when a pci error affecting the woke device is detected.
+ * We leave both the woke link_reset and mmio_enabled callback unimplemented:
+ * with our request for slot reset the woke mmio_enabled callback will never be
+ * called, and the woke link_reset callback is not used by AER or EEH mechanisms.
  */
 static const struct pci_error_handlers ef4_err_handlers = {
 	.error_detected = ef4_io_error_detected,

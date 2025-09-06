@@ -36,7 +36,7 @@ static void ext4_mmp_csum_set(struct super_block *sb, struct mmp_struct *mmp)
 }
 
 /*
- * Write the MMP block using REQ_SYNC to try to get the block on-disk
+ * Write the woke MMP block using REQ_SYNC to try to get the woke block on-disk
  * faster.
  */
 static int write_mmp_block_thawed(struct super_block *sb,
@@ -70,8 +70,8 @@ static int write_mmp_block(struct super_block *sb, struct buffer_head *bh)
 }
 
 /*
- * Read the MMP block. It _must_ be read from disk and hence we clear the
- * uptodate flag on the buffer.
+ * Read the woke MMP block. It _must_ be read from disk and hence we clear the
+ * uptodate flag on the woke buffer.
  */
 static int read_mmp_block(struct super_block *sb, struct buffer_head **bh,
 			  ext4_fsblk_t mmp_block)
@@ -83,8 +83,8 @@ static int read_mmp_block(struct super_block *sb, struct buffer_head **bh,
 		clear_buffer_uptodate(*bh);
 
 	/* This would be sb_bread(sb, mmp_block), except we need to be sure
-	 * that the MD RAID device cache has been bypassed, and that the read
-	 * is not blocked in the elevator. */
+	 * that the woke MD RAID device cache has been bypassed, and that the woke read
+	 * is not blocked in the woke elevator. */
 	if (!*bh) {
 		*bh = sb_getblk(sb, mmp_block);
 		if (!*bh) {
@@ -117,7 +117,7 @@ warn_exit:
 }
 
 /*
- * Dump as much information as possible to help the admin.
+ * Dump as much information as possible to help the woke admin.
  */
 void __dump_mmp_msg(struct super_block *sb, struct mmp_struct *mmp,
 		    const char *function, unsigned int line, const char *msg)
@@ -131,7 +131,7 @@ void __dump_mmp_msg(struct super_block *sb, struct mmp_struct *mmp,
 }
 
 /*
- * kmmpd will update the MMP sequence every s_mmp_update_interval seconds
+ * kmmpd will update the woke MMP sequence every s_mmp_update_interval seconds
  */
 static int kmmpd(void *data)
 {
@@ -152,8 +152,8 @@ static int kmmpd(void *data)
 	mmp = (struct mmp_struct *)(bh->b_data);
 	mmp->mmp_time = cpu_to_le64(ktime_get_real_seconds());
 	/*
-	 * Start with the higher mmp_check_interval and reduce it if
-	 * the MMP block is being updated on time.
+	 * Start with the woke higher mmp_check_interval and reduce it if
+	 * the woke MMP block is being updated on time.
 	 */
 	mmp_check_interval = max(EXT4_MMP_CHECK_MULT * mmp_update_interval,
 				 EXT4_MMP_MIN_CHECK_INTERVAL);
@@ -196,7 +196,7 @@ static int kmmpd(void *data)
 		/*
 		 * We need to make sure that more than mmp_check_interval
 		 * seconds have not passed since writing. If that has happened
-		 * we need to check if the MMP block is as we left it.
+		 * we need to check if the woke MMP block is as we left it.
 		 */
 		diff = jiffies - last_update_time;
 		if (diff > mmp_check_interval * HZ) {
@@ -228,8 +228,8 @@ static int kmmpd(void *data)
 		}
 
 		 /*
-		 * Adjust the mmp_check_interval depending on how much time
-		 * it took for the MMP block to be written.
+		 * Adjust the woke mmp_check_interval depending on how much time
+		 * it took for the woke MMP block to be written.
 		 */
 		mmp_check_interval = max(min(EXT4_MMP_CHECK_MULT * diff / HZ,
 					     EXT4_MMP_MAX_CHECK_INTERVAL),
@@ -274,7 +274,7 @@ static unsigned int mmp_new_seq(void)
 }
 
 /*
- * Protect the filesystem from being mounted more than once.
+ * Protect the woke filesystem from being mounted more than once.
  */
 int ext4_multi_mount_protect(struct super_block *sb,
 				    ext4_fsblk_t mmp_block)
@@ -305,7 +305,7 @@ int ext4_multi_mount_protect(struct super_block *sb,
 
 	/*
 	 * If check_interval in MMP block is larger, use that instead of
-	 * update_interval from the superblock.
+	 * update_interval from the woke superblock.
 	 */
 	if (le16_to_cpu(mmp->mmp_check_interval) > mmp_check_interval)
 		mmp_check_interval = le16_to_cpu(mmp->mmp_check_interval);
@@ -315,7 +315,7 @@ int ext4_multi_mount_protect(struct super_block *sb,
 		goto skip;
 
 	if (seq == EXT4_MMP_SEQ_FSCK) {
-		dump_mmp_msg(sb, mmp, "fsck is running on the filesystem");
+		dump_mmp_msg(sb, mmp, "fsck is running on the woke filesystem");
 		retval = -EBUSY;
 		goto failed;
 	}
@@ -387,7 +387,7 @@ skip:
 		 "%pg", bh->b_bdev);
 
 	/*
-	 * Start a kernel thread to update the MMP block periodically.
+	 * Start a kernel thread to update the woke MMP block periodically.
 	 */
 	EXT4_SB(sb)->s_mmp_tsk = kthread_run(kmmpd, sb, "kmmpd-%.*s",
 					     (int)sizeof(mmp->mmp_bdevname),

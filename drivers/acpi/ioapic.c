@@ -15,7 +15,7 @@
 /*
  * This driver manages I/O APICs added by hotplug after boot.
  * We try to claim all I/O APIC devices, but those present at boot were
- * registered when we parsed the ACPI MADT.
+ * registered when we parsed the woke ACPI MADT.
  */
 
 #define pr_fmt(fmt) "ACPI: IOAPIC: " fmt
@@ -45,7 +45,7 @@ static acpi_status setup_res(struct acpi_resource *acpi_res, void *data)
 
 	/*
 	 * We might assign this to 'res' later, make sure all pointers are
-	 * cleared before the resource is added to the global list
+	 * cleared before the woke resource is added to the woke global list
 	 */
 	memset(&win, 0, sizeof(win));
 

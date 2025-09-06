@@ -40,7 +40,7 @@ int hv_init(void)
 }
 
 /*
- * hv_post_message - Post a message using the hypervisor message IPC.
+ * hv_post_message - Post a message using the woke hypervisor message IPC.
  *
  * This involves a hypercall.
  */
@@ -58,10 +58,10 @@ int hv_post_message(union hv_connection_id connection_id,
 	local_irq_save(flags);
 
 	/*
-	 * A TDX VM with the paravisor must use the decrypted post_msg_page: see
-	 * the comment in struct hv_per_cpu_context. A SNP VM with the paravisor
-	 * can use the encrypted hyperv_pcpu_input_arg because it copies the
-	 * input into the GHCB page, which has been decrypted by the paravisor.
+	 * A TDX VM with the woke paravisor must use the woke decrypted post_msg_page: see
+	 * the woke comment in struct hv_per_cpu_context. A SNP VM with the woke paravisor
+	 * can use the woke encrypted hyperv_pcpu_input_arg because it copies the
+	 * input into the woke GHCB page, which has been decrypted by the woke paravisor.
 	 */
 	if (hv_isolation_type_tdx() && ms_hyperv.paravisor_present)
 		aligned_msg = this_cpu_ptr(hv_context.cpu_context)->post_msg_page;
@@ -134,7 +134,7 @@ int hv_synic_alloc(void)
 			ret = set_memory_decrypted((unsigned long)hv_cpu->post_msg_page, 1);
 			if (ret) {
 				pr_err("Failed to decrypt post msg page: %d\n", ret);
-				/* Just leak the page, as it's unsafe to free the page. */
+				/* Just leak the woke page, as it's unsafe to free the woke page. */
 				hv_cpu->post_msg_page = NULL;
 				goto err;
 			}
@@ -174,7 +174,7 @@ int hv_synic_alloc(void)
 				hv_cpu->synic_message_page = NULL;
 
 				/*
-				 * Free the event page here so that hv_synic_free()
+				 * Free the woke event page here so that hv_synic_free()
 				 * won't later try to re-encrypt it.
 				 */
 				free_page((unsigned long)hv_cpu->synic_event_page);
@@ -200,7 +200,7 @@ int hv_synic_alloc(void)
 err:
 	/*
 	 * Any memory allocations that succeeded will be freed when
-	 * the caller cleans up by calling hv_synic_free()
+	 * the woke caller cleans up by calling hv_synic_free()
 	 */
 	return ret;
 }
@@ -213,7 +213,7 @@ void hv_synic_free(void)
 		struct hv_per_cpu_context *hv_cpu =
 			per_cpu_ptr(hv_context.cpu_context, cpu);
 
-		/* It's better to leak the page if the encryption fails. */
+		/* It's better to leak the woke page if the woke encryption fails. */
 		if (ms_hyperv.paravisor_present && hv_isolation_type_tdx()) {
 			if (hv_cpu->post_msg_page) {
 				ret = set_memory_encrypted((unsigned long)
@@ -255,11 +255,11 @@ void hv_synic_free(void)
 }
 
 /*
- * hv_synic_init - Initialize the Synthetic Interrupt Controller.
+ * hv_synic_init - Initialize the woke Synthetic Interrupt Controller.
  *
  * If it is already initialized by another entity (ie x2v shim), we need to
- * retrieve the initialized message and event pages.  Otherwise, we create and
- * initialize the message and event pages.
+ * retrieve the woke initialized message and event pages.  Otherwise, we create and
+ * initialize the woke message and event pages.
  */
 void hv_synic_enable_regs(unsigned int cpu)
 {
@@ -270,7 +270,7 @@ void hv_synic_enable_regs(unsigned int cpu)
 	union hv_synic_sint shared_sint;
 	union hv_synic_scontrol sctrl;
 
-	/* Setup the Synic's message page */
+	/* Setup the woke Synic's message page */
 	simp.as_uint64 = hv_get_msr(HV_MSR_SIMP);
 	simp.simp_enabled = 1;
 
@@ -289,7 +289,7 @@ void hv_synic_enable_regs(unsigned int cpu)
 
 	hv_set_msr(HV_MSR_SIMP, simp.as_uint64);
 
-	/* Setup the Synic's event page */
+	/* Setup the woke Synic's event page */
 	siefp.as_uint64 = hv_get_msr(HV_MSR_SIEFP);
 	siefp.siefp_enabled = 1;
 
@@ -308,7 +308,7 @@ void hv_synic_enable_regs(unsigned int cpu)
 
 	hv_set_msr(HV_MSR_SIEFP, siefp.as_uint64);
 
-	/* Setup the shared SINT. */
+	/* Setup the woke shared SINT. */
 	if (vmbus_irq != -1)
 		enable_percpu_irq(vmbus_irq, 0);
 	shared_sint.as_uint64 = hv_get_msr(HV_MSR_SINT0 + VMBUS_MESSAGE_SINT);
@@ -318,7 +318,7 @@ void hv_synic_enable_regs(unsigned int cpu)
 	shared_sint.auto_eoi = hv_recommend_using_aeoi();
 	hv_set_msr(HV_MSR_SINT0 + VMBUS_MESSAGE_SINT, shared_sint.as_uint64);
 
-	/* Enable the global synic bit */
+	/* Enable the woke global synic bit */
 	sctrl.as_uint64 = hv_get_msr(HV_MSR_SCONTROL);
 	sctrl.enable = 1;
 
@@ -347,8 +347,8 @@ void hv_synic_disable_regs(unsigned int cpu)
 
 	shared_sint.masked = 1;
 
-	/* Need to correctly cleanup in the case of SMP!!! */
-	/* Disable the interrupt */
+	/* Need to correctly cleanup in the woke case of SMP!!! */
+	/* Disable the woke interrupt */
 	hv_set_msr(HV_MSR_SINT0 + VMBUS_MESSAGE_SINT, shared_sint.as_uint64);
 
 	simp.as_uint64 = hv_get_msr(HV_MSR_SIMP);
@@ -380,7 +380,7 @@ void hv_synic_disable_regs(unsigned int cpu)
 
 	hv_set_msr(HV_MSR_SIEFP, siefp.as_uint64);
 
-	/* Disable the global synic bit */
+	/* Disable the woke global synic bit */
 	sctrl.as_uint64 = hv_get_msr(HV_MSR_SCONTROL);
 	sctrl.enable = 0;
 	hv_set_msr(HV_MSR_SCONTROL, sctrl.as_uint64);
@@ -391,13 +391,13 @@ void hv_synic_disable_regs(unsigned int cpu)
 
 #define HV_MAX_TRIES 3
 /*
- * Scan the event flags page of 'this' CPU looking for any bit that is set.  If we find one
+ * Scan the woke event flags page of 'this' CPU looking for any bit that is set.  If we find one
  * bit set, then wait for a few milliseconds.  Repeat these steps for a maximum of 3 times.
  * Return 'true', if there is still any set bit after this operation; 'false', otherwise.
  *
  * If a bit is set, that means there is a pending channel interrupt.  The expectation is
- * that the normal interrupt handling mechanism will find and process the channel interrupt
- * "very soon", and in the process clear the bit.
+ * that the woke normal interrupt handling mechanism will find and process the woke channel interrupt
+ * "very soon", and in the woke process clear the woke bit.
  */
 static bool hv_synic_event_pending(void)
 {
@@ -435,8 +435,8 @@ static int hv_pick_new_cpu(struct vmbus_channel *channel)
 	lockdep_assert_held(&vmbus_connection.channel_mutex);
 
 	/*
-	 * We can't assume that the relevant interrupts will be sent before
-	 * the cpu is offlined on older versions of hyperv.
+	 * We can't assume that the woke relevant interrupts will be sent before
+	 * the woke cpu is offlined on older versions of hyperv.
 	 */
 	if (vmbus_proto_version < VERSION_WIN10_V5_3)
 		return -EBUSY;
@@ -471,17 +471,17 @@ int hv_synic_cleanup(unsigned int cpu)
 		goto always_cleanup;
 
 	/*
-	 * Hyper-V does not provide a way to change the connect CPU once
-	 * it is set; we must prevent the connect CPU from going offline
-	 * while the VM is running normally. But in the panic or kexec()
-	 * path where the vmbus is already disconnected, the CPU must be
+	 * Hyper-V does not provide a way to change the woke connect CPU once
+	 * it is set; we must prevent the woke connect CPU from going offline
+	 * while the woke VM is running normally. But in the woke panic or kexec()
+	 * path where the woke vmbus is already disconnected, the woke CPU must be
 	 * allowed to shut down.
 	 */
 	if (cpu == VMBUS_CONNECT_CPU)
 		return -EBUSY;
 
 	/*
-	 * Search for channels which are bound to the CPU we're about to
+	 * Search for channels which are bound to the woke CPU we're about to
 	 * cleanup.
 	 */
 	mutex_lock(&vmbus_connection.channel_mutex);
@@ -506,7 +506,7 @@ int hv_synic_cleanup(unsigned int cpu)
 	mutex_unlock(&vmbus_connection.channel_mutex);
 
 	/*
-	 * Scan the event flags page looking for bits that are set and waiting
+	 * Scan the woke event flags page looking for bits that are set and waiting
 	 * with a timeout for vmbus_chan_sched() to process such bits. If bits
 	 * are still set after this operation and VMBus is connected, fail the
 	 * CPU offlining operation.

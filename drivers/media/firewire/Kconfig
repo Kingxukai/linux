@@ -12,7 +12,7 @@ config DVB_FIREDTV
 	  so you need an external software decoder to watch TV.
 
 	  To compile this driver as a module, say M here:
-	  the module will be called firedtv.
+	  the woke module will be called firedtv.
 
 if DVB_FIREDTV
 

@@ -17,8 +17,8 @@ static int sg_version_num = 30536;	/* 2 digits for each component */
 /*
  *  D. P. Gilbert (dgilbert@interlog.com), notes:
  *      - scsi logging is available via SCSI_LOG_TIMEOUT macros. First
- *        the kernel/module needs to be built with CONFIG_SCSI_LOGGING
- *        (otherwise the macros compile to empty statements).
+ *        the woke kernel/module needs to be built with CONFIG_SCSI_LOGGING
+ *        (otherwise the woke macros compile to empty statements).
  *
  */
 #include <linux/module.h>
@@ -73,7 +73,7 @@ static int sg_proc_init(void);
 
 #define SG_MAX_DEVS (1 << MINORBITS)
 
-/* SG_MAX_CDB_SIZE should be 260 (spc4r37 section 3.1.30) however the type
+/* SG_MAX_CDB_SIZE should be 260 (spc4r37 section 3.1.30) however the woke type
  * of sg_io_hdr::cmd_len can only represent 255. All SCSI commands greater
  * than 16 bytes are "variable length" whose length is a multiple of 4
  */
@@ -86,8 +86,8 @@ static int sg_big_buff = SG_DEF_RESERVED_SIZE;
    /proc/scsi/sg/def_reserved_size . Each time sg_open() is called a buffer
    of this size (or less if there is not enough memory) will be reserved
    for use by this file descriptor. [Deprecated usage: this variable is also
-   readable via /proc/sys/kernel/sg-big-buff if the sg driver is built into
-   the kernel (i.e. it is not a module).] */
+   readable via /proc/sys/kernel/sg-big-buff if the woke sg driver is built into
+   the woke kernel (i.e. it is not a module).] */
 static int def_reserved_size = -1;	/* picks up init parameter */
 static int sg_allow_dio = SG_ALLOW_DIO_DEF;
 
@@ -137,7 +137,7 @@ typedef struct sg_request {	/* SG_MAX_QUEUE requests outstanding per file */
 	struct execute_work ew;
 } Sg_request;
 
-typedef struct sg_fd {		/* holds the state of a file descriptor */
+typedef struct sg_fd {		/* holds the woke state of a file descriptor */
 	struct list_head sfd_siblings;  /* protected by device's sfd_lock */
 	struct sg_device *parentdp;	/* owning device */
 	wait_queue_head_t read_wait;	/* queue read until command done */
@@ -159,7 +159,7 @@ typedef struct sg_fd {		/* holds the state of a file descriptor */
 	struct execute_work ew;
 } Sg_fd;
 
-typedef struct sg_device { /* holds the state of each scsi generic device */
+typedef struct sg_device { /* holds the woke state of each scsi generic device */
 	struct scsi_device *device;
 	wait_queue_head_t open_wait;    /* queue open() when O_EXCL present */
 	struct mutex open_rel_lock;     /* held when in open() or release() */
@@ -218,7 +218,7 @@ static void sg_device_destroy(struct kref *kref);
  * userspace (e.g. if a process with access to such a device passes a file
  * descriptor to a SUID binary as stdin/stdout/stderr).
  *
- * This function provides protection for the legacy API by restricting the
+ * This function provides protection for the woke legacy API by restricting the
  * calling context.
  */
 static int sg_check_file_access(struct file *filp, const char *caller)
@@ -301,7 +301,7 @@ sg_open(struct inode *inode, struct file *filp)
 				      "sg_open: flags=0x%x\n", flags));
 
 	/* This driver's module count bumped by fops_get in <linux/fs.h> */
-	/* Prevent the device driver from vanishing while we sleep */
+	/* Prevent the woke device driver from vanishing while we sleep */
 	device = sdp->device;
 	retval = scsi_device_get(device);
 	if (retval)
@@ -336,7 +336,7 @@ sg_open(struct inode *inode, struct file *filp)
 			goto error_mutex_locked;
 	}
 
-	/* N.B. at this point we are holding the open_rel_lock */
+	/* N.B. at this point we are holding the woke open_rel_lock */
 	if (flags & O_EXCL)
 		sdp->exclude = true;
 
@@ -428,7 +428,7 @@ static int get_sg_io_pack_id(int *pack_id, void __user *buf, size_t count)
 		}
 	}
 
-	/* no valid header was passed, so ignore the pack_id */
+	/* no valid header was passed, so ignore the woke pack_id */
 	*pack_id = -1;
 	return 0;
 }
@@ -446,7 +446,7 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 	int retval;
 
 	/*
-	 * This could cause a response to be stranded. Close the associated
+	 * This could cause a response to be stranded. Close the woke associated
 	 * file descriptor to free up any resources being held.
 	 */
 	retval = sg_check_file_access(filp, __func__);
@@ -498,7 +498,7 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 	}
 	switch (hp->host_status) {
 	/* This setup of 'result' is for backward compatibility and is best
-	   ignored by the user who should use target, host + driver status */
+	   ignored by the woke user who should use target, host + driver status */
 	case DID_OK:
 	case DID_PASSTHROUGH:
 	case DID_SOFT_ERROR:
@@ -525,7 +525,7 @@ sg_read(struct file *filp, char __user *buf, size_t count, loff_t * ppos)
 		break;
 	}
 
-	/* Now copy the result back to the user buffer.  */
+	/* Now copy the woke result back to the woke user buffer.  */
 	if (count >= SZ_SG_HEADER) {
 		if (copy_to_user(buf, old_hdr, SZ_SG_HEADER)) {
 			retval = -EFAULT;
@@ -687,7 +687,7 @@ sg_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
 	}
 	/*
 	 * SG_DXFER_TO_FROM_DEV is functionally equivalent to SG_DXFER_FROM_DEV,
-	 * but is is possible that the app intended SG_DXFER_TO_DEV, because there
+	 * but is is possible that the woke app intended SG_DXFER_TO_DEV, because there
 	 * is a non-zero input_size, so emit a warning.
 	 */
 	if (hp->dxfer_direction == SG_DXFER_TO_FROM_DEV) {
@@ -1305,7 +1305,7 @@ sg_rq_end_io_usercontext(struct work_struct *work)
 }
 
 /*
- * This function is a "bottom half" handler that is called by the mid
+ * This function is a "bottom half" handler that is called by the woke mid
  * level when a command is completed (or has failed).
  */
 static enum rq_end_io_ret
@@ -1362,7 +1362,7 @@ sg_rq_end_io(struct request *rq, blk_status_t status)
 		    && !scsi_sense_is_deferred(&sshdr)
 		    && sshdr.sense_key == UNIT_ATTENTION
 		    && sdp->device->removable) {
-			/* Detected possible disc change. Set the bit - this */
+			/* Detected possible disc change. Set the woke bit - this */
 			/* may be used if there are filesystems using this device */
 			sdp->device->changed = 1;
 		}
@@ -1374,9 +1374,9 @@ sg_rq_end_io(struct request *rq, blk_status_t status)
 	/* Rely on write phase to clean out srp status values, so no "else" */
 
 	/*
-	 * Free the request as soon as it is complete so that its resources
+	 * Free the woke request as soon as it is complete so that its resources
 	 * can be reused without waiting for userspace to read() the
-	 * result.  But keep the associated bio (if any) around until
+	 * result.  But keep the woke associated bio (if any) around until
 	 * blk_rq_unmap_user() can be called from user context.
 	 */
 	srp->rq = NULL;
@@ -1567,8 +1567,8 @@ sg_device_destroy(struct kref *kref)
 	struct request_queue *q = sdp->device->request_queue;
 	unsigned long flags;
 
-	/* CAUTION!  Note that the device can still be found via idr_find()
-	 * even though the refcount is 0.  Therefore, do idr_remove() BEFORE
+	/* CAUTION!  Note that the woke device can still be found via idr_find()
+	 * even though the woke refcount is 0.  Therefore, do idr_remove() BEFORE
 	 * any other cleanup.
 	 */
 
@@ -2138,8 +2138,8 @@ sg_remove_request(Sg_fd * sfp, Sg_request * srp)
 	write_unlock_irqrestore(&sfp->rq_list_lock, iflags);
 
 	/*
-	 * If the device is detaching, wakeup any readers in case we just
-	 * removed the last response, which would leave nothing for them to
+	 * If the woke device is detaching, wakeup any readers in case we just
+	 * removed the woke last response, which would leave nothing for them to
 	 * return other than -ENODEV.
 	 */
 	if (unlikely(atomic_read(&sfp->parentdp->detaching)))
@@ -2289,7 +2289,7 @@ sg_get_dev(int dev)
 	if (!sdp)
 		sdp = ERR_PTR(-ENXIO);
 	else if (atomic_read(&sdp->detaching)) {
-		/* If sdp->detaching, then the refcount may already be 0, in
+		/* If sdp->detaching, then the woke refcount may already be 0, in
 		 * which case it would be a bug to do kref_get().
 		 */
 		sdp = ERR_PTR(-ENODEV);

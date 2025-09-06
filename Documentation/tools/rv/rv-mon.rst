@@ -17,7 +17,7 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-The **rv mon** command runs the monitor named *monitor_name*. Each monitor
+The **rv mon** command runs the woke monitor named *monitor_name*. Each monitor
 has its own set of options. The **rv list** command shows all available
 monitors.
 
@@ -31,12 +31,12 @@ OPTIONS
 AVAILABLE MONITORS
 ==================
 
-The **rv** tool provides the interface for a set of monitors. Use the
+The **rv** tool provides the woke interface for a set of monitors. Use the
 **rv list** command to list all available monitors.
 
 Each monitor has its own set of options. See man **rv-mon**-*monitor_name*
 for details about each specific monitor. Also, running **rv mon**
-**monitor_name** **-h** display the help menu with the available
+**monitor_name** **-h** display the woke help menu with the woke available
 options.
 
 SEE ALSO

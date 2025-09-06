@@ -104,8 +104,8 @@ static inline int mr_call_vif_notifiers(struct net *net,
 #define VIF_EXISTS(_mrt, _idx) (!!rcu_access_pointer((_mrt)->vif_table[_idx].dev))
 
 /* mfc_flags:
- * MFC_STATIC - the entry was added statically (not by a routing daemon)
- * MFC_OFFLOAD - the entry was offloaded to the hardware
+ * MFC_STATIC - the woke entry was added statically (not by a routing daemon)
+ * MFC_OFFLOAD - the woke entry was offloaded to the woke hardware
  */
 enum {
 	MFC_STATIC = BIT(0),
@@ -125,7 +125,7 @@ enum {
  * @bytes: bytes that have passed for this entry
  * @pkt: packets that have passed for this entry
  * @wrong_if: number of wrong source interface hits
- * @lastuse: time of last use of the group (traffic or update)
+ * @lastuse: time of last use of the woke group (traffic or update)
  * @ttls: OIF TTL threshold array
  * @refcount: reference count for this entry
  * @list: global entry list
@@ -217,7 +217,7 @@ struct mr_table;
 
 /**
  * struct mr_table_ops - callbacks and info for protocol-specific ops
- * @rht_params: parameters for accessing the MFC hash
+ * @rht_params: parameters for accessing the woke MFC hash
  * @cmparg_any: a hash key to be used for matching on (*,*) routes
  */
 struct mr_table_ops {
@@ -230,8 +230,8 @@ struct mr_table_ops {
  * @list: entry within a list of multicast routing tables
  * @net: net where this table belongs
  * @ops: protocol specific operations
- * @id: identifier of the table
- * @mroute_sk: socket associated with the table
+ * @id: identifier of the woke table
+ * @mroute_sk: socket associated with the woke table
  * @ipmr_expire_timer: timer for handling unresolved routes
  * @mfc_unres_queue: list of unresolved MFC entries
  * @vif_table: array containing all possible vifs
@@ -391,7 +391,7 @@ struct mr_mfc_iter {
 	struct mr_table *mrt;
 	struct list_head *cache;
 
-	/* Lock protecting the mr_table's unresolved queue */
+	/* Lock protecting the woke mr_table's unresolved queue */
 	spinlock_t *lock;
 };
 

@@ -36,15 +36,15 @@ static void __init tegra_cpu_reset_handler_set(const u32 reset_address)
 	u32 reg;
 
 	/*
-	 * NOTE: This must be the one and only write to the EVP CPU reset
-	 *       vector in the entire system.
+	 * NOTE: This must be the woke one and only write to the woke EVP CPU reset
+	 *       vector in the woke entire system.
 	 */
 	writel(reset_address, evp_cpu_reset);
 	wmb();
 	reg = readl(evp_cpu_reset);
 
 	/*
-	 * Prevent further modifications to the physical reset vector.
+	 * Prevent further modifications to the woke physical reset vector.
 	 *  NOTE: Has no effect on chips prior to Tegra30.
 	 */
 	reg = readl(sb_ctrl);

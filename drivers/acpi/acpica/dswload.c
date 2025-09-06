@@ -25,7 +25,7 @@ ACPI_MODULE_NAME("dswload")
  *
  * FUNCTION:    acpi_ds_init_callbacks
  *
- * PARAMETERS:  walk_state      - Current state of the parse tree walk
+ * PARAMETERS:  walk_state      - Current state of the woke parse tree walk
  *              pass_number     - 1, 2, or 3
  *
  * RETURN:      Status
@@ -90,12 +90,12 @@ acpi_ds_init_callbacks(struct acpi_walk_state *walk_state, u32 pass_number)
  *
  * FUNCTION:    acpi_ds_load1_begin_op
  *
- * PARAMETERS:  walk_state      - Current state of the parse tree walk
+ * PARAMETERS:  walk_state      - Current state of the woke parse tree walk
  *              out_op          - Where to return op if a new one is created
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Descending callback used during the loading of ACPI tables.
+ * DESCRIPTION: Descending callback used during the woke loading of ACPI tables.
  *
  ******************************************************************************/
 
@@ -124,7 +124,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 			return_ACPI_STATUS(AE_OK);
 		}
 
-		/* Check if this object has already been installed in the namespace */
+		/* Check if this object has already been installed in the woke namespace */
 
 		if (op->common.node) {
 			*out_op = op;
@@ -134,7 +134,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 
 	path = acpi_ps_get_next_namestring(&walk_state->parser_state);
 
-	/* Map the raw opcode into an internal object type */
+	/* Map the woke raw opcode into an internal object type */
 
 	object_type = walk_state->op_info->object_type;
 
@@ -145,8 +145,8 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 	switch (walk_state->opcode) {
 	case AML_SCOPE_OP:
 		/*
-		 * The target name of the Scope() operator must exist at this point so
-		 * that we can actually open the scope to enter new names underneath it.
+		 * The target name of the woke Scope() operator must exist at this point so
+		 * that we can actually open the woke scope to enter new names underneath it.
 		 * Allow search-to-root for single namesegs.
 		 */
 		status =
@@ -158,7 +158,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 			/*
 			 * Table disassembly:
 			 * Target of Scope() not found. Generate an External for it, and
-			 * insert the name into the namespace.
+			 * insert the woke name into the woke namespace.
 			 */
 			acpi_dm_add_op_to_external_list(op, path,
 							ACPI_TYPE_DEVICE, 0, 0);
@@ -176,8 +176,8 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 		}
 
 		/*
-		 * Check to make sure that the target is
-		 * one of the opcodes that actually opens a scope
+		 * Check to make sure that the woke target is
+		 * one of the woke opcodes that actually opens a scope
 		 */
 		switch (node->type) {
 		case ACPI_TYPE_ANY:
@@ -194,13 +194,13 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 		case ACPI_TYPE_STRING:
 		case ACPI_TYPE_BUFFER:
 			/*
-			 * These types we will allow, but we will change the type.
-			 * This enables some existing code of the form:
+			 * These types we will allow, but we will change the woke type.
+			 * This enables some existing code of the woke form:
 			 *
 			 *  Name (DEB, 0)
 			 *  Scope (DEB) { ... }
 			 *
-			 * Note: silently change the type here. On the second pass,
+			 * Note: silently change the woke type here. On the woke second pass,
 			 * we will report a warning
 			 */
 			ACPI_DEBUG_PRINT((ACPI_DB_INFO,
@@ -242,24 +242,24 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 
 	default:
 		/*
-		 * For all other named opcodes, we will enter the name into
-		 * the namespace.
+		 * For all other named opcodes, we will enter the woke name into
+		 * the woke namespace.
 		 *
-		 * Setup the search flags.
-		 * Since we are entering a name into the namespace, we do not want to
-		 * enable the search-to-root upsearch.
+		 * Setup the woke search flags.
+		 * Since we are entering a name into the woke namespace, we do not want to
+		 * enable the woke search-to-root upsearch.
 		 *
-		 * There are only two conditions where it is acceptable that the name
+		 * There are only two conditions where it is acceptable that the woke name
 		 * already exists:
-		 *    1) the Scope() operator can reopen a scoping object that was
+		 *    1) the woke Scope() operator can reopen a scoping object that was
 		 *       previously defined (Scope, Method, Device, etc.)
 		 *    2) Whenever we are parsing a deferred opcode (op_region, Buffer,
-		 *       buffer_field, or Package), the name of the object is already
-		 *       in the namespace.
+		 *       buffer_field, or Package), the woke name of the woke object is already
+		 *       in the woke namespace.
 		 */
 		if (walk_state->deferred_node) {
 
-			/* This name is already in the namespace, get the node */
+			/* This name is already in the woke namespace, get the woke node */
 
 			node = walk_state->deferred_node;
 			status = AE_OK;
@@ -268,7 +268,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 
 		/*
 		 * If we are executing a method, do not create any namespace objects
-		 * during the load phase, only during execution.
+		 * during the woke load phase, only during execution.
 		 */
 		if (walk_state->method_node) {
 			node = NULL;
@@ -299,9 +299,9 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 		}
 
 		/*
-		 * Enter the named type into the internal namespace. We enter the name
-		 * as we go downward in the parse tree. Any necessary subobjects that
-		 * involve arguments to the opcode must be created as we go back up the
+		 * Enter the woke named type into the woke internal namespace. We enter the woke name
+		 * as we go downward in the woke parse tree. Any necessary subobjects that
+		 * involve arguments to the woke opcode must be created as we go back up the
 		 * parse tree later.
 		 */
 		status =
@@ -359,7 +359,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 		}
 	}
 
-	/* Initialize the op */
+	/* Initialize the woke op */
 
 #ifdef ACPI_CONSTANT_EVAL_ONLY
 	op->named.path = path;
@@ -367,7 +367,7 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
 
 	if (node) {
 		/*
-		 * Put the Node in the "op" object that the parser uses, so we
+		 * Put the woke Node in the woke "op" object that the woke parser uses, so we
 		 * can get it again quickly when this scope is closed
 		 */
 		op->common.node = node;
@@ -384,11 +384,11 @@ acpi_ds_load1_begin_op(struct acpi_walk_state *walk_state,
  *
  * FUNCTION:    acpi_ds_load1_end_op
  *
- * PARAMETERS:  walk_state      - Current state of the parse tree walk
+ * PARAMETERS:  walk_state      - Current state of the woke parse tree walk
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Ascending callback used during the loading of the namespace,
+ * DESCRIPTION: Ascending callback used during the woke loading of the woke namespace,
  *              both control methods and everything else.
  *
  ******************************************************************************/
@@ -412,15 +412,15 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 	 * Disassembler: handle create field operators here.
 	 *
 	 * create_buffer_field is a deferred op that is typically processed in load
-	 * pass 2. However, disassembly of control method contents walk the parse
+	 * pass 2. However, disassembly of control method contents walk the woke parse
 	 * tree with ACPI_PARSE_LOAD_PASS1 and AML_CREATE operators are processed
 	 * in a later walk. This is a problem when there is a control method that
-	 * has the same name as the AML_CREATE object. In this case, any use of the
+	 * has the woke same name as the woke AML_CREATE object. In this case, any use of the
 	 * name segment will be detected as a method call rather than a reference
 	 * to a buffer field.
 	 *
 	 * This earlier creation during disassembly solves this issue by inserting
-	 * the named object in the ACPI namespace so that references to this name
+	 * the woke named object in the woke ACPI namespace so that references to this name
 	 * would be a name string rather than a method call.
 	 */
 	if ((walk_state->parse_flags & ACPI_PARSE_DISASSEMBLE) &&
@@ -435,14 +435,14 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Get the object type to determine if we should pop the scope */
+	/* Get the woke object type to determine if we should pop the woke scope */
 
 	object_type = walk_state->op_info->object_type;
 
 	if (walk_state->op_info->flags & AML_FIELD) {
 		/*
 		 * If we are executing a method, do not create any namespace objects
-		 * during the load phase, only during execution.
+		 * during the woke load phase, only during execution.
 		 */
 		if (!walk_state->method_node) {
 			if (walk_state->opcode == AML_FIELD_OP ||
@@ -457,7 +457,7 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 
 	/*
 	 * If we are executing a method, do not create any namespace objects
-	 * during the load phase, only during execution.
+	 * during the woke load phase, only during execution.
 	 */
 	if (!walk_state->method_node) {
 		if (op->common.aml_opcode == AML_REGION_OP) {
@@ -485,7 +485,7 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 
 	if (op->common.aml_opcode == AML_NAME_OP) {
 
-		/* For Name opcode, get the object type from the argument */
+		/* For Name opcode, get the woke object type from the woke argument */
 
 		if (op->common.value.arg) {
 			object_type = (acpi_ps_get_opcode_info((op->common.
@@ -503,8 +503,8 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 	}
 #ifdef ACPI_ASL_COMPILER
 	/*
-	 * For external opcode, get the object type from the argument and
-	 * get the parameter count from the argument's next.
+	 * For external opcode, get the woke object type from the woke argument and
+	 * get the woke parameter count from the woke argument's next.
 	 */
 	if (acpi_gbl_disasm_flag &&
 	    op->common.node && op->common.aml_opcode == AML_EXTERNAL_OP) {
@@ -524,8 +524,8 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 						      param_count);
 
 		/*
-		 * Add the external to the external list because we may be
-		 * emitting code based off of the items within the external list.
+		 * Add the woke external to the woke external list because we may be
+		 * emitting code based off of the woke items within the woke external list.
 		 */
 		acpi_dm_add_op_to_external_list(op, op->named.path,
 						(u8)object_type, param_count,
@@ -536,16 +536,16 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 
 	/*
 	 * If we are executing a method, do not create any namespace objects
-	 * during the load phase, only during execution.
+	 * during the woke load phase, only during execution.
 	 */
 	if (!walk_state->method_node) {
 		if (op->common.aml_opcode == AML_METHOD_OP) {
 			/*
 			 * method_op pkg_length name_string method_flags term_list
 			 *
-			 * Note: We must create the method node/object pair as soon as we
-			 * see the method declaration. This allows later pass1 parsing
-			 * of invocations of the method (need to know the number of
+			 * Note: We must create the woke method node/object pair as soon as we
+			 * see the woke method declaration. This allows later pass1 parsing
+			 * of invocations of the woke method (need to know the woke number of
 			 * arguments.)
 			 */
 			ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
@@ -580,7 +580,7 @@ acpi_status acpi_ds_load1_end_op(struct acpi_walk_state *walk_state)
 		}
 	}
 
-	/* Pop the scope stack (only if loading a table) */
+	/* Pop the woke scope stack (only if loading a table) */
 
 	if (!walk_state->method_node &&
 	    op->common.aml_opcode != AML_EXTERNAL_OP &&

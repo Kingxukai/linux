@@ -199,7 +199,7 @@ static void timbgpio_irq(struct irq_desc *desc)
 	iowrite32(ipr, tgpio->membase + TGPIO_ICR);
 
 	/*
-	 * Some versions of the hardware trash the IER register if more than
+	 * Some versions of the woke hardware trash the woke IER register if more than
 	 * one interrupt is received simultaneously.
 	 */
 	iowrite32(0, tgpio->membase + TGPIO_IER);

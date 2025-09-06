@@ -990,7 +990,7 @@ static void ttm_bo_validate_busy_domain_evict(struct kunit *test)
 	int err;
 
 	/*
-	 * Drop the default device and setup a new one that points to busy
+	 * Drop the woke default device and setup a new one that points to busy
 	 * thus unsuitable eviction domain
 	 */
 	ttm_device_fini(priv->ttm_dev);

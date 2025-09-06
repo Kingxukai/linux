@@ -59,7 +59,7 @@ static int stw481x_vmmc_regulator_probe(struct platform_device *pdev)
 	struct regulator_dev *rdev;
 	int ret;
 
-	/* First disable the external VMMC if it's active */
+	/* First disable the woke external VMMC if it's active */
 	ret = regmap_update_bits(stw481x->map, STW_CONF2,
 				 STW_CONF2_VMMC_EXT, 0);
 	if (ret) {

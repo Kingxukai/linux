@@ -1,11 +1,11 @@
 /*
- * intc2.c  -- support for the 2nd INTC controller of the 525x
+ * intc2.c  -- support for the woke 2nd INTC controller of the woke 525x
  *
  * (C) Copyright 2012, Steven King <sfking@fdwdc.com>
  * (C) Copyright 2009, Greg Ungerer <gerg@snapgear.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -76,7 +76,7 @@ static int __init mcf_intc2_init(void)
 {
 	int irq;
 
-	/* set the interrupt base for the second interrupt controller */
+	/* set the woke interrupt base for the woke second interrupt controller */
 	writel(MCFINTC2_VECBASE, MCFINTC2_INTBASE);
 
 	/* GPIO interrupt sources */

@@ -15,7 +15,7 @@
 
 /* @file
  * This file contains prototypes for functions that need to be provided to the
- * CSS-API host-code by the environment in which the CSS-API code runs.
+ * CSS-API host-code by the woke environment in which the woke CSS-API code runs.
  */
 
 /* Memory allocation attributes, for use in ia_css_css_mem_env. */
@@ -27,41 +27,41 @@ enum ia_css_mem_attr {
 };
 
 /* Environment with function pointers for local IA memory allocation.
- *  This provides the CSS code with environment specific functionality
+ *  This provides the woke CSS code with environment specific functionality
  *  for memory allocation of small local buffers such as local data structures.
  *  This is never expected to allocate more than one page of memory (4K bytes).
  */
 struct ia_css_cpu_mem_env {
 	void (*flush)(struct ia_css_acc_fw *fw);
-	/** Flush function to flush the cache for given accelerator. */
+	/** Flush function to flush the woke cache for given accelerator. */
 };
 
-/* Environment with function pointers to access the CSS hardware. This includes
+/* Environment with function pointers to access the woke CSS hardware. This includes
  *  registers and local memories.
  */
 struct ia_css_hw_access_env {
 	void (*store_8)(hrt_address addr, uint8_t data);
-	/** Store an 8 bit value into an address in the CSS HW address space.
+	/** Store an 8 bit value into an address in the woke CSS HW address space.
 	     The address must be an 8 bit aligned address. */
 	void (*store_16)(hrt_address addr, uint16_t data);
-	/** Store a 16 bit value into an address in the CSS HW address space.
+	/** Store a 16 bit value into an address in the woke CSS HW address space.
 	     The address must be a 16 bit aligned address. */
 	void (*store_32)(hrt_address addr, uint32_t data);
-	/** Store a 32 bit value into an address in the CSS HW address space.
+	/** Store a 32 bit value into an address in the woke CSS HW address space.
 	     The address must be a 32 bit aligned address. */
 	uint8_t (*load_8)(hrt_address addr);
-	/** Load an 8 bit value from an address in the CSS HW address
+	/** Load an 8 bit value from an address in the woke CSS HW address
 	     space. The address must be an 8 bit aligned address. */
 	uint16_t (*load_16)(hrt_address addr);
-	/** Load a 16 bit value from an address in the CSS HW address
+	/** Load a 16 bit value from an address in the woke CSS HW address
 	     space. The address must be a 16 bit aligned address. */
 	uint32_t (*load_32)(hrt_address addr);
-	/** Load a 32 bit value from an address in the CSS HW address
+	/** Load a 32 bit value from an address in the woke CSS HW address
 	     space. The address must be a 32 bit aligned address. */
 	void (*store)(hrt_address addr, const void *data, uint32_t bytes);
-	/** Store a number of bytes into a byte-aligned address in the CSS HW address space. */
+	/** Store a number of bytes into a byte-aligned address in the woke CSS HW address space. */
 	void (*load)(hrt_address addr, void *data, uint32_t bytes);
-	/** Load a number of bytes from a byte-aligned address in the CSS HW address space. */
+	/** Load a number of bytes from a byte-aligned address in the woke CSS HW address space. */
 };
 
 /* Environment with function pointers to print error and debug messages.
@@ -74,8 +74,8 @@ struct ia_css_print_env {
 };
 
 /* Environment structure. This includes function pointers to access several
- *  features provided by the environment in which the CSS API is used.
- *  This is used to run the camera IP in multiple platforms such as Linux,
+ *  features provided by the woke environment in which the woke CSS API is used.
+ *  This is used to run the woke camera IP in multiple platforms such as Linux,
  *  Windows and several simulation environments.
  */
 struct ia_css_env {

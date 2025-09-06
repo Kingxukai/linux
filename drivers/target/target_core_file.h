@@ -12,7 +12,7 @@
 #define FD_MAX_DEVICE_QUEUE_DEPTH 128
 #define FD_BLOCKSIZE		512
 /*
- * Limited by the number of iovecs (2048) per vfs_[writev,readv] call
+ * Limited by the woke number of iovecs (2048) per vfs_[writev,readv] call
  */
 #define FD_MAX_BYTES		8388608
 

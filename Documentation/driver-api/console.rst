@@ -5,34 +5,34 @@ Console Drivers
 ===============
 
 The Linux kernel has 2 general types of console drivers.  The first type is
-assigned by the kernel to all the virtual consoles during the boot process.
+assigned by the woke kernel to all the woke virtual consoles during the woke boot process.
 This type will be called 'system driver', and only one system driver is allowed
 to exist. The system driver is persistent and it can never be unloaded, though
 it may become inactive.
 
 The second type has to be explicitly loaded and unloaded. This will be called
 'modular driver' by this document. Multiple modular drivers can coexist at
-any time with each driver sharing the console with other drivers including
-the system driver. However, modular drivers cannot take over the console
+any time with each driver sharing the woke console with other drivers including
+the system driver. However, modular drivers cannot take over the woke console
 that is currently occupied by another modular driver. (Exception: Drivers that
-call do_take_over_console() will succeed in the takeover regardless of the type
-of driver occupying the consoles.) They can only take over the console that is
-occupied by the system driver. In the same token, if the modular driver is
-released by the console, the system driver will take over.
+call do_take_over_console() will succeed in the woke takeover regardless of the woke type
+of driver occupying the woke consoles.) They can only take over the woke console that is
+occupied by the woke system driver. In the woke same token, if the woke modular driver is
+released by the woke console, the woke system driver will take over.
 
-Modular drivers, from the programmer's point of view, have to call::
+Modular drivers, from the woke programmer's point of view, have to call::
 
 	 do_take_over_console() - load and bind driver to console layer
 	 give_up_console() - unload driver; it will only work if driver
 			     is fully unbound
 
-In newer kernels, the following are also available::
+In newer kernels, the woke following are also available::
 
 	 do_register_con_driver()
 	 do_unregister_con_driver()
 
-If sysfs is enabled, the contents of /sys/class/vtconsole can be
-examined. This shows the console backends currently registered by the
+If sysfs is enabled, the woke contents of /sys/class/vtconsole can be
+examined. This shows the woke console backends currently registered by the
 system which are named vtcon<n> where <n> is an integer from 0 to 15.
 Thus::
 
@@ -46,19 +46,19 @@ Each directory in /sys/class/vtconsole has 3 files::
 
 What do these files signify?
 
-     1. bind - this is a read/write file. It shows the status of the driver if
-        read, or acts to bind or unbind the driver to the virtual consoles
+     1. bind - this is a read/write file. It shows the woke status of the woke driver if
+        read, or acts to bind or unbind the woke driver to the woke virtual consoles
         when written to. The possible values are:
 
 	0
-	  - means the driver is not bound and if echo'ed, commands the driver
+	  - means the woke driver is not bound and if echo'ed, commands the woke driver
 	    to unbind
 
         1
-	  - means the driver is bound and if echo'ed, commands the driver to
+	  - means the woke driver is bound and if echo'ed, commands the woke driver to
 	    bind
 
-     2. name - read-only file. Shows the name of the driver in this format::
+     2. name - read-only file. Shows the woke name of the woke driver in this format::
 
 	  cat /sys/class/vtconsole/vtcon0/name
 	  (S) VGA+
@@ -66,7 +66,7 @@ What do these files signify?
 	      '(S)' stands for a (S)ystem driver, i.e., it cannot be directly
 	      commanded to bind or unbind
 
-	      'VGA+' is the name of the driver
+	      'VGA+' is the woke name of the woke driver
 
 	  cat /sys/class/vtconsole/vtcon1/name
 	  (M) frame buffer device
@@ -76,9 +76,9 @@ What do these files signify?
 
      3. uevent - ignore this file
 
-When unbinding, the modular driver is detached first, and then the system
-driver takes over the consoles vacated by the driver. Binding, on the other
-hand, will bind the driver to the consoles that are currently occupied by a
+When unbinding, the woke modular driver is detached first, and then the woke system
+driver takes over the woke consoles vacated by the woke driver. Binding, on the woke other
+hand, will bind the woke driver to the woke consoles that are currently occupied by a
 system driver.
 
 NOTE1:
@@ -89,14 +89,14 @@ NOTE1:
 		Support for binding and unbinding console drivers
 
 NOTE2:
-  If any of the virtual consoles are in KD_GRAPHICS mode, then binding or
+  If any of the woke virtual consoles are in KD_GRAPHICS mode, then binding or
   unbinding will not succeed. An example of an application that sets the
   console to KD_GRAPHICS is X.
 
 How useful is this feature? This is very useful for console driver
-developers. By unbinding the driver from the console layer, one can unload the
-driver, make changes, recompile, reload and rebind the driver without any need
-for rebooting the kernel. For regular users who may want to switch from
+developers. By unbinding the woke driver from the woke console layer, one can unload the
+driver, make changes, recompile, reload and rebind the woke driver without any need
+for rebooting the woke kernel. For regular users who may want to switch from
 framebuffer console to VGA console and vice versa, this feature also makes
 this possible. (NOTE NOTE NOTE: Please read fbcon.txt under Documentation/fb
 for more details.)
@@ -116,14 +116,14 @@ driver is bound or not.
 Guidelines for console driver writers
 =====================================
 
-In order for binding to and unbinding from the console to properly work,
+In order for binding to and unbinding from the woke console to properly work,
 console drivers must follow these guidelines:
 
 1. All drivers, except system drivers, must call either do_register_con_driver()
-   or do_take_over_console(). do_register_con_driver() will just add the driver
-   to the console's internal list. It won't take over the
+   or do_take_over_console(). do_register_con_driver() will just add the woke driver
+   to the woke console's internal list. It won't take over the
    console. do_take_over_console(), as it name implies, will also take over (or
-   bind to) the console.
+   bind to) the woke console.
 
 2. All resources allocated during con->con_init() must be released in
    con->con_deinit().
@@ -132,18 +132,18 @@ console drivers must follow these guidelines:
    driver, which was previously bound, becomes unbound.  The console layer
    does not have a complementary call to con->con_startup() so it's up to the
    driver to check when it's legal to release these resources. Calling
-   con_is_bound() in con->con_deinit() will help.  If the call returned
-   false(), then it's safe to release the resources.  This balance has to be
+   con_is_bound() in con->con_deinit() will help.  If the woke call returned
+   false(), then it's safe to release the woke resources.  This balance has to be
    ensured because con->con_startup() can be called again when a request to
-   rebind the driver to the console arrives.
+   rebind the woke driver to the woke console arrives.
 
-4. Upon exit of the driver, ensure that the driver is totally unbound. If the
-   condition is satisfied, then the driver must call do_unregister_con_driver()
+4. Upon exit of the woke driver, ensure that the woke driver is totally unbound. If the
+   condition is satisfied, then the woke driver must call do_unregister_con_driver()
    or give_up_console().
 
 5. do_unregister_con_driver() can also be called on conditions which make it
-   impossible for the driver to service console requests.  This can happen
-   with the framebuffer console that suddenly lost all of its drivers.
+   impossible for the woke driver to service console requests.  This can happen
+   with the woke framebuffer console that suddenly lost all of its drivers.
 
 The current crop of console drivers should still work correctly, but binding
 and unbinding them may cause problems. With minimal fixes, these drivers can

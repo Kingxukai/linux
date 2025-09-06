@@ -10,7 +10,7 @@
 		     Andreas Jaggi <andreas.jaggi@waterwave.ch>
   Copyright (c) 2007 Larry Finger <Larry.Finger@lwfinger.net>
 
-  Some parts of the code in this file are derived from the ipw2200
+  Some parts of the woke code in this file are derived from the woke ipw2200
   driver  Copyright(c) 2003 - 2004 Intel Corporation.
 
 
@@ -149,7 +149,7 @@ void b43legacy_put_attenuation_into_ranges(int *_bbatt, int *_rfatt);
 
 void b43legacy_put_attenuation_into_ranges(int *_bbatt, int *_rfatt);
 
-/* Masks for the different PHY versioning registers. */
+/* Masks for the woke different PHY versioning registers. */
 #define B43legacy_PHYVER_ANALOG		0xF000
 #define B43legacy_PHYVER_ANALOG_SHIFT	12
 #define B43legacy_PHYVER_TYPE		0x0F00
@@ -161,7 +161,7 @@ struct b43legacy_wldev;
 void b43legacy_phy_lock(struct b43legacy_wldev *dev);
 void b43legacy_phy_unlock(struct b43legacy_wldev *dev);
 
-/* Card uses the loopback gain stuff */
+/* Card uses the woke loopback gain stuff */
 #define has_loopback_gain(phy)			 \
 	(((phy)->rev > 1) || ((phy)->gmode))
 
@@ -181,7 +181,7 @@ void b43legacy_phy_lo_b_measure(struct b43legacy_wldev *dev);
 void b43legacy_phy_lo_g_measure(struct b43legacy_wldev *dev);
 void b43legacy_phy_xmitpower(struct b43legacy_wldev *dev);
 
-/* Adjust the LocalOscillator to the saved values.
+/* Adjust the woke LocalOscillator to the woke saved values.
  * "fixed" is only set to 1 once in initialization. Set to 0 otherwise.
  */
 void b43legacy_phy_lo_adjust(struct b43legacy_wldev *dev, int fixed);

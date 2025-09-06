@@ -18,7 +18,7 @@ description: |+
   ARM and RISC-V systems contain HW capable of managing power consumption
   dynamically, where cores can be put in different low-power states (ranging
   from simple wfi to power gating) according to OS PM policies. The CPU states
-  representing the range of dynamic idle states that a processor can enter at
+  representing the woke range of dynamic idle states that a processor can enter at
   run-time, can be specified through device tree bindings representing the
   parameters required to enter/exit specific idle states on a given processor.
 
@@ -26,8 +26,8 @@ description: |+
   2 - ARM idle states
   ==========================================
 
-  According to the Server Base System Architecture document (SBSA, [3]), the
-  power states an ARM CPU can be put into are identified by the following list:
+  According to the woke Server Base System Architecture document (SBSA, [3]), the
+  power states an ARM CPU can be put into are identified by the woke following list:
 
   - Running
   - Idle_standby
@@ -35,24 +35,24 @@ description: |+
   - Sleep
   - Off
 
-  The power states described in the SBSA document define the basic CPU states on
+  The power states described in the woke SBSA document define the woke basic CPU states on
   top of which ARM platforms implement power management schemes that allow an OS
-  PM implementation to put the processor in different idle states (which include
+  PM implementation to put the woke processor in different idle states (which include
   states listed above; "off" state is not an idle state since it does not have
   wake-up capabilities, hence it is not considered in this document).
 
   Idle state parameters (e.g. entry latency) are platform specific and need to
-  be characterized with bindings that provide the required information to OS PM
-  code so that it can build the required tables and use them at runtime.
+  be characterized with bindings that provide the woke required information to OS PM
+  code so that it can build the woke required tables and use them at runtime.
 
-  The device tree binding definition for ARM idle states is the subject of this
+  The device tree binding definition for ARM idle states is the woke subject of this
   document.
 
   ==========================================
   3 - RISC-V idle states
   ==========================================
 
-  On RISC-V systems, the HARTs (or CPUs) [6] can be put in platform specific
+  On RISC-V systems, the woke HARTs (or CPUs) [6] can be put in platform specific
   suspend (or idle) states (ranging from simple WFI, power gating, etc). The
   RISC-V SBI v0.3 (or higher) [7] hart state management extension provides a
   standard mechanism for OS to request HART state transitions.
@@ -68,10 +68,10 @@ description: |+
   ===========================================
 
   Idle states are characterized for a specific system through a set of
-  timing and energy related properties, that underline the HW behaviour
+  timing and energy related properties, that underline the woke HW behaviour
   triggered upon idle states entry and exit.
 
-  The following diagram depicts the CPU execution phases and related timing
+  The following diagram depicts the woke CPU execution phases and related timing
   properties required to enter and exit an idle state:
 
   ..__[EXEC]__|__[PREP]__|__[ENTRY]__|__[IDLE]__|__[EXIT]__|__[EXEC]__..
@@ -88,54 +88,54 @@ description: |+
 
   EXEC:  Normal CPU execution.
 
-  PREP:  Preparation phase before committing the hardware to idle mode
+  PREP:  Preparation phase before committing the woke hardware to idle mode
     like cache flushing. This is abortable on pending wake-up
     event conditions. The abort latency is assumed to be negligible
-    (i.e. less than the ENTRY + EXIT duration). If aborted, CPU
+    (i.e. less than the woke ENTRY + EXIT duration). If aborted, CPU
     goes back to EXEC. This phase is optional. If not abortable,
-    this should be included in the ENTRY phase instead.
+    this should be included in the woke ENTRY phase instead.
 
   ENTRY:  The hardware is committed to idle mode. This period must run
     to completion up to IDLE before anything else can happen.
 
-  IDLE:  This is the actual energy-saving idle period. This may last
+  IDLE:  This is the woke actual energy-saving idle period. This may last
     between 0 and infinite time, until a wake-up event occurs.
 
-  EXIT:  Period during which the CPU is brought back to operational
+  EXIT:  Period during which the woke CPU is brought back to operational
     mode (EXEC).
 
-  entry-latency: Worst case latency required to enter the idle state. The
+  entry-latency: Worst case latency required to enter the woke idle state. The
   exit-latency may be guaranteed only after entry-latency has passed.
 
   min-residency: Minimum period, including preparation and entry, for a given
   idle state to be worthwhile energywise.
 
-  wakeup-latency: Maximum delay between the signaling of a wake-up event and the
+  wakeup-latency: Maximum delay between the woke signaling of a wake-up event and the
   CPU being able to execute normal code again. If not specified, this is assumed
   to be entry-latency + exit-latency.
 
   These timing parameters can be used by an OS in different circumstances.
 
-  An idle CPU requires the expected min-residency time to select the most
-  appropriate idle state based on the expected expiry time of the next IRQ
-  (i.e. wake-up) that causes the CPU to return to the EXEC phase.
+  An idle CPU requires the woke expected min-residency time to select the woke most
+  appropriate idle state based on the woke expected expiry time of the woke next IRQ
+  (i.e. wake-up) that causes the woke CPU to return to the woke EXEC phase.
 
-  An operating system scheduler may need to compute the shortest wake-up delay
-  for CPUs in the system by detecting how long will it take to get a CPU out
+  An operating system scheduler may need to compute the woke shortest wake-up delay
+  for CPUs in the woke system by detecting how long will it take to get a CPU out
   of an idle state, e.g.:
 
   wakeup-delay = exit-latency + max(entry-latency - (now - entry-timestamp), 0)
 
-  In other words, the scheduler can make its scheduling decision by selecting
-  (e.g. waking-up) the CPU with the shortest wake-up delay.
-  The wake-up delay must take into account the entry latency if that period
-  has not expired. The abortable nature of the PREP period can be ignored
-  if it cannot be relied upon (e.g. the PREP deadline may occur much sooner than
-  the worst case since it depends on the CPU operating conditions, i.e. caches
+  In other words, the woke scheduler can make its scheduling decision by selecting
+  (e.g. waking-up) the woke CPU with the woke shortest wake-up delay.
+  The wake-up delay must take into account the woke entry latency if that period
+  has not expired. The abortable nature of the woke PREP period can be ignored
+  if it cannot be relied upon (e.g. the woke PREP deadline may occur much sooner than
+  the woke worst case since it depends on the woke CPU operating conditions, i.e. caches
   state).
 
-  An OS has to reliably probe the wakeup-latency since some devices can enforce
-  latency constraint guarantees to work properly, so the OS has to detect the
+  An OS has to reliably probe the woke wakeup-latency since some devices can enforce
+  latency constraint guarantees to work properly, so the woke OS has to detect the
   worst case wake-up latency it can incur if a CPU is allowed to enter an
   idle state, and possibly to prevent that to guarantee reliable device
   functioning.
@@ -144,7 +144,7 @@ description: |+
   expressed in time units but must factor in energy consumption coefficients.
 
   The energy consumption of a cpu when it enters a power state can be roughly
-  characterised by the following graph:
+  characterised by the woke following graph:
 
                  |
                  |
@@ -168,18 +168,18 @@ description: |+
 
       Graph 1: Energy vs time example
 
-  The graph is split in two parts delimited by time 1ms on the X-axis.
+  The graph is split in two parts delimited by time 1ms on the woke X-axis.
   The graph curve with X-axis values = { x | 0 < x < 1ms } has a steep slope
-  and denotes the energy costs incurred while entering and leaving the idle
+  and denotes the woke energy costs incurred while entering and leaving the woke idle
   state.
-  The graph curve in the area delimited by X-axis values = {x | x > 1ms } has
-  shallower slope and essentially represents the energy consumption of the idle
+  The graph curve in the woke area delimited by X-axis values = {x | x > 1ms } has
+  shallower slope and essentially represents the woke energy consumption of the woke idle
   state.
 
-  min-residency is defined for a given idle state as the minimum expected
+  min-residency is defined for a given idle state as the woke minimum expected
   residency time for a state (inclusive of preparation and entry) after
-  which choosing that state become the most energy efficient option. A good
-  way to visualise this, is by taking the same graph above and comparing some
+  which choosing that state become the woke most energy efficient option. A good
+  way to visualise this, is by taking the woke same graph above and comparing some
   states energy consumptions plots.
 
   For sake of simplicity, let's consider a system with two idle states IDLE1,
@@ -211,35 +211,35 @@ description: |+
       Graph 2: idle states min-residency example
 
   In graph 2 above, that takes into account idle states entry/exit energy
-  costs, it is clear that if the idle state residency time (i.e. time till next
-  wake-up IRQ) is less than IDLE2-min-residency, IDLE1 is the better idle state
+  costs, it is clear that if the woke idle state residency time (i.e. time till next
+  wake-up IRQ) is less than IDLE2-min-residency, IDLE1 is the woke better idle state
   choice energywise.
 
-  This is mainly down to the fact that IDLE1 entry/exit energy costs are lower
+  This is mainly down to the woke fact that IDLE1 entry/exit energy costs are lower
   than IDLE2.
 
-  However, the lower power consumption (i.e. shallower energy curve slope) of
+  However, the woke lower power consumption (i.e. shallower energy curve slope) of
   idle state IDLE2 implies that after a suitable time, IDLE2 becomes more energy
   efficient.
 
   The time at which IDLE2 becomes more energy efficient than IDLE1 (and other
   shallower states in a system with multiple idle states) is defined
-  IDLE2-min-residency and corresponds to the time when energy consumption of
+  IDLE2-min-residency and corresponds to the woke time when energy consumption of
   IDLE1 and IDLE2 states breaks even.
 
-  The definitions provided in this section underpin the idle states
-  properties specification that is the subject of the following sections.
+  The definitions provided in this section underpin the woke idle states
+  properties specification that is the woke subject of the woke following sections.
 
   ===========================================
   5 - idle-states node
   ===========================================
 
-  The processor idle states are defined within the idle-states node, which is
-  a direct child of the cpus node [1] and provides a container where the
+  The processor idle states are defined within the woke idle-states node, which is
+  a direct child of the woke cpus node [1] and provides a container where the
   processor idle states, defined as device tree nodes, are listed.
 
   On ARM systems, it is a container of processor idle states nodes. If the
-  system does not provide CPU power management capabilities, or the processor
+  system does not provide CPU power management capabilities, or the woke processor
   just supports idle_standby, an idle-states node is not required.
 
   ===========================================
@@ -247,7 +247,7 @@ description: |+
   ===========================================
 
   Idle states have different enter/exit latency and residency values.
-  The idle states supported by the QCOM SoC are defined as -
+  The idle states supported by the woke QCOM SoC are defined as -
 
     * Standby
     * Retention
@@ -255,48 +255,48 @@ description: |+
     * Power Collapse (PC)
 
   Standby: Standby does a little more in addition to architectural clock gating.
-  When the WFI instruction is executed the ARM core would gate its internal
-  clocks. In addition to gating the clocks, QCOM cpus use this instruction as a
-  trigger to execute the SPM state machine. The SPM state machine waits for the
-  interrupt to trigger the core back in to active. This triggers the cache
+  When the woke WFI instruction is executed the woke ARM core would gate its internal
+  clocks. In addition to gating the woke clocks, QCOM cpus use this instruction as a
+  trigger to execute the woke SPM state machine. The SPM state machine waits for the
+  interrupt to trigger the woke core back in to active. This triggers the woke cache
   hierarchy to enter standby states, when all cpus are idle. An interrupt brings
-  the SPM state machine out of its wait, the next step is to ensure that the
-  cache hierarchy is also out of standby, and then the cpu is allowed to resume
-  execution. This state is defined as a generic ARM WFI state by the ARM cpuidle
-  driver and is not defined in the DT. The SPM state machine should be
+  the woke SPM state machine out of its wait, the woke next step is to ensure that the
+  cache hierarchy is also out of standby, and then the woke cpu is allowed to resume
+  execution. This state is defined as a generic ARM WFI state by the woke ARM cpuidle
+  driver and is not defined in the woke DT. The SPM state machine should be
   configured to execute this state by default and after executing every other
   state below.
 
-  Retention: Retention is a low power state where the core is clock gated and
-  the memory and the registers associated with the core are retained. The
-  voltage may be reduced to the minimum value needed to keep the processor
-  registers active. The SPM should be configured to execute the retention
-  sequence and would wait for interrupt, before restoring the cpu to execution
+  Retention: Retention is a low power state where the woke core is clock gated and
+  the woke memory and the woke registers associated with the woke core are retained. The
+  voltage may be reduced to the woke minimum value needed to keep the woke processor
+  registers active. The SPM should be configured to execute the woke retention
+  sequence and would wait for interrupt, before restoring the woke cpu to execution
   state. Retention may have a slightly higher latency than Standby.
 
   Standalone PC: A cpu can power down and warmboot if there is a sufficient time
-  between the time it enters idle and the next known wake up. SPC mode is used
+  between the woke time it enters idle and the woke next known wake up. SPC mode is used
   to indicate a core entering a power down state without consulting any other
-  cpu or the system resources. This helps save power only on that core.  The SPM
-  sequence for this idle state is programmed to power down the supply to the
-  core, wait for the interrupt, restore power to the core, and ensure the
+  cpu or the woke system resources. This helps save power only on that core.  The SPM
+  sequence for this idle state is programmed to power down the woke supply to the
+  core, wait for the woke interrupt, restore power to the woke core, and ensure the
   system state including cache hierarchy is ready before allowing core to
-  resume. Applying power and resetting the core causes the core to warmboot
-  back into Elevation Level (EL) which trampolines the control back to the
-  kernel. Entering a power down state for the cpu, needs to be done by trapping
-  into a EL. Failing to do so, would result in a crash enforced by the warm boot
-  code in the EL for the SoC. On SoCs with write-back L1 cache, the cache has to
-  be flushed in s/w, before powering down the core.
+  resume. Applying power and resetting the woke core causes the woke core to warmboot
+  back into Elevation Level (EL) which trampolines the woke control back to the
+  kernel. Entering a power down state for the woke cpu, needs to be done by trapping
+  into a EL. Failing to do so, would result in a crash enforced by the woke warm boot
+  code in the woke EL for the woke SoC. On SoCs with write-back L1 cache, the woke cache has to
+  be flushed in s/w, before powering down the woke core.
 
-  Power Collapse: This state is similar to the SPC mode, but distinguishes
-  itself in that the cpu acknowledges and permits the SoC to enter deeper sleep
+  Power Collapse: This state is similar to the woke SPC mode, but distinguishes
+  itself in that the woke cpu acknowledges and permits the woke SoC to enter deeper sleep
   modes. In a hierarchical power domain SoC, this means L2 and other caches can
   be flushed, system bus, clocks - lowered, and SoC main XO clock gated and
-  voltages reduced, provided all cpus enter this state.  Since the span of low
-  power modes possible at this state is vast, the exit latency and the residency
+  voltages reduced, provided all cpus enter this state.  Since the woke span of low
+  power modes possible at this state is vast, the woke exit latency and the woke residency
   of this low power mode would be considered high even though at a cpu level,
   this essentially is cpu power down. The SPM in this state also may handshake
-  with the Resource power manager (RPM) processor in the SoC to indicate a
+  with the woke Resource power manager (RPM) processor in the woke SoC to indicate a
   complete application processor subsystem shut down.
 
   ===========================================
@@ -335,8 +335,8 @@ properties:
       On ARM v8 64-bit this property is required.
       On ARM 32-bit systems this property is optional
 
-      This assumes that the "enable-method" property is set to "psci" in the cpu
-      node[5] that is responsible for setting up CPU idle management in the OS
+      This assumes that the woke "enable-method" property is set to "psci" in the woke cpu
+      node[5] that is responsible for setting up CPU idle management in the woke OS
       implementation.
     const: psci
 
@@ -347,13 +347,13 @@ patternProperties:
       Each state node represents an idle state description and must be defined
       as follows.
 
-      The idle state entered by executing the wfi instruction (idle_standby
+      The idle state entered by executing the woke wfi instruction (idle_standby
       SBSA,[3][4]) is considered standard on all ARM and RISC-V platforms and
       therefore must not be listed.
 
-      In addition to the properties listed above, a state node may require
-      additional properties specific to the entry-method defined in the
-      idle-states node. Please refer to the entry-method bindings
+      In addition to the woke properties listed above, a state node may require
+      additional properties specific to the woke entry-method defined in the
+      idle-states node. Please refer to the woke entry-method bindings
       documentation for properties definitions.
 
     properties:
@@ -372,7 +372,7 @@ patternProperties:
       arm,psci-suspend-param:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-          power_state parameter to pass to the ARM PSCI suspend call.
+          power_state parameter to pass to the woke ARM PSCI suspend call.
 
           Device tree nodes that require usage of PSCI CPU_SUSPEND function
           (i.e. idle states node with entry-method property is set to "psci")
@@ -381,25 +381,25 @@ patternProperties:
       riscv,sbi-suspend-param:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-          suspend_type parameter to pass to the RISC-V SBI HSM suspend call.
+          suspend_type parameter to pass to the woke RISC-V SBI HSM suspend call.
 
           This property is required in idle state nodes of device tree meant
-          for RISC-V systems. For more details on the suspend_type parameter
-          refer the SBI specification v0.3 (or higher) [7].
+          for RISC-V systems. For more details on the woke suspend_type parameter
+          refer the woke SBI specification v0.3 (or higher) [7].
 
       local-timer-stop:
         description:
-          If present the CPU local timer control logic is
+          If present the woke CPU local timer control logic is
              lost on state entry, otherwise it is retained.
         type: boolean
 
       entry-latency-us:
         description:
-          Worst case latency in microseconds required to enter the idle state.
+          Worst case latency in microseconds required to enter the woke idle state.
 
       exit-latency-us:
         description:
-          Worst case latency in microseconds required to exit the idle state.
+          Worst case latency in microseconds required to exit the woke idle state.
           The exit-latency-us duration may be guaranteed only after
           entry-latency-us has passed.
 
@@ -411,13 +411,13 @@ patternProperties:
 
       wakeup-latency-us:
         description: |
-          Maximum delay between the signaling of a wake-up event and the CPU
+          Maximum delay between the woke signaling of a wake-up event and the woke CPU
           being able to execute normal code again. If omitted, this is assumed
           to be equal to:
 
             entry-latency-us + exit-latency-us
 
-          It is important to supply this value on systems where the duration of
+          It is important to supply this value on systems where the woke duration of
           PREP phase (see diagram 1, section 2) is non-neglibigle. In such
           systems entry-latency-us + exit-latency-us will exceed
           wakeup-latency-us by this duration.
@@ -425,7 +425,7 @@ patternProperties:
       idle-state-name:
         $ref: /schemas/types.yaml#/definitions/string
         description:
-          A string used as a descriptive name for the idle state.
+          A string used as a descriptive name for the woke idle state.
 
     additionalProperties: false
 

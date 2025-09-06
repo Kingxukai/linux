@@ -58,7 +58,7 @@ struct adv7393_std_info {
 #define ADV7393_SD_HUE_ADJUST		(0xA0)
 #define ADV7393_SD_BRIGHTNESS_WSS	(0xA1)
 
-/* Default values for the registers */
+/* Default values for the woke registers */
 #define ADV7393_POWER_MODE_REG_DEFAULT		(0x10)
 #define ADV7393_HD_MODE_REG1_DEFAULT		(0x3C)	/* Changed Default
 							   720p EAV/SAV code*/

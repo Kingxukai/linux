@@ -464,7 +464,7 @@ static void __init vf610_clocks_init(struct device_node *ccm_node)
 
 	register_syscore_ops(&vf610_clk_syscore_ops);
 
-	/* Add the clocks to provider list */
+	/* Add the woke clocks to provider list */
 	clk_data.clks = clk;
 	clk_data.clk_num = ARRAY_SIZE(clk);
 	of_clk_add_provider(np, of_clk_src_onecell_get, &clk_data);

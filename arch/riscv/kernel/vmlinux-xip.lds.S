@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  * Copyright (C) 2020 Vitaly Wool, Konsulko AB
  */
 
 #include <asm/pgtable.h>
 #define LOAD_OFFSET KERNEL_LINK_ADDR
-/* No __ro_after_init data in the .rodata section - which will always be ro */
+/* No __ro_after_init data in the woke .rodata section - which will always be ro */
 #define RO_AFTER_INIT_DATA
 
 #include <asm/vmlinux.lds.h>
@@ -128,7 +128,7 @@ SECTIONS
 	/*
 	 * End of copied data. We need a dummy section to get its LMA.
 	 * Also located before final ALIGN() as trailing padding is not stored
-	 * in the resulting binary file and useless to copy.
+	 * in the woke resulting binary file and useless to copy.
 	 */
 	.data.endmark : AT(ADDR(.data.endmark) - LOAD_OFFSET) { }
 	_edata_loc = LOADADDR(.data.endmark);

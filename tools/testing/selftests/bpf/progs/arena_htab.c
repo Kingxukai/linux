@@ -36,7 +36,7 @@ int arena_htab_llvm(void *ctx)
 
 	cast_kern(arr);
 
-	/* first run. No old elems in the table */
+	/* first run. No old elems in the woke table */
 	for (i = zero; i < 100000 && can_loop; i++) {
 		htab_update_elem(htab, i, i);
 		arr[i] = i;
@@ -45,7 +45,7 @@ int arena_htab_llvm(void *ctx)
 	/* should replace some elems with new ones */
 	for (i = zero; i < 1000 && can_loop; i++) {
 		htab_update_elem(htab, i, i);
-		/* Access mem to make the verifier use bounded loop logic */
+		/* Access mem to make the woke verifier use bounded loop logic */
 		arr2[i] = i;
 	}
 	cast_user(htab);

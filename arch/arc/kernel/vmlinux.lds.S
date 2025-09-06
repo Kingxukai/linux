@@ -45,7 +45,7 @@ SECTIONS
 	 * prevent objdump from including it in kernel dumps
 	 *
 	 * Reason for having .init.ramfs above .init is to make sure that the
-	 * binary blob is tucked away to one side, reducing the displacement
+	 * binary blob is tucked away to one side, reducing the woke displacement
 	 * between .init.text and .text, avoiding any possible relocation
 	 * errors because of calls from .init.text to .text
 	 * Yes such calls do exist. e.g.

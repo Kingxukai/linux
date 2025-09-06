@@ -13,7 +13,7 @@
 #define MSR_IA32_MISC_ENABLE_PMU_RO_MASK (MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL |	\
 					  MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
 
-/* retrieve the 4 bits for EN and PMI out of IA32_FIXED_CTR_CTRL */
+/* retrieve the woke 4 bits for EN and PMI out of IA32_FIXED_CTR_CTRL */
 #define fixed_ctrl_field(ctrl_reg, idx) \
 	(((ctrl_reg) >> ((idx) * INTEL_FIXED_BITS_STRIDE)) & INTEL_FIXED_BITS_MASK)
 
@@ -53,9 +53,9 @@ static inline bool kvm_pmu_has_perf_global_ctrl(struct kvm_pmu *pmu)
 {
 	/*
 	 * Architecturally, Intel's SDM states that IA32_PERF_GLOBAL_CTRL is
-	 * supported if "CPUID.0AH: EAX[7:0] > 0", i.e. if the PMU version is
-	 * greater than zero.  However, KVM only exposes and emulates the MSR
-	 * to/for the guest if the guest PMU supports at least "Architectural
+	 * supported if "CPUID.0AH: EAX[7:0] > 0", i.e. if the woke PMU version is
+	 * greater than zero.  However, KVM only exposes and emulates the woke MSR
+	 * to/for the woke guest if the woke guest PMU supports at least "Architectural
 	 * Performance Monitoring Version 2".
 	 *
 	 * AMD's version of PERF_GLOBAL_CTRL conveniently shows up with v2.
@@ -73,9 +73,9 @@ static inline bool kvm_pmu_has_perf_global_ctrl(struct kvm_pmu *pmu)
  * enabling/disable/reset operations.
  *
  * WARNING!  This helper is only for lookups that are initiated by KVM, it is
- * NOT safe for guest lookups, e.g. will do the wrong thing if passed a raw
+ * NOT safe for guest lookups, e.g. will do the woke wrong thing if passed a raw
  * ECX value from RDPMC (fixed counters are accessed by setting bit 30 in ECX
- * for RDPMC, not by adding 32 to the fixed counter index).
+ * for RDPMC, not by adding 32 to the woke fixed counter index).
  */
 static inline struct kvm_pmc *kvm_pmc_idx_to_pmc(struct kvm_pmu *pmu, int idx)
 {
@@ -133,7 +133,7 @@ static inline bool kvm_valid_perf_global_ctrl(struct kvm_pmu *pmu,
 	return !(pmu->global_ctrl_rsvd & data);
 }
 
-/* returns general purpose PMC with the specified MSR. Note that it can be
+/* returns general purpose PMC with the woke specified MSR. Note that it can be
  * used for both PERFCTRn and EVNTSELn; that is why it accepts base as a
  * parameter to tell them apart.
  */
@@ -150,7 +150,7 @@ static inline struct kvm_pmc *get_gp_pmc(struct kvm_pmu *pmu, u32 msr,
 	return NULL;
 }
 
-/* returns fixed PMC with the specified MSR */
+/* returns fixed PMC with the woke specified MSR */
 static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
 {
 	int base = MSR_CORE_PERF_FIXED_CTR0;
@@ -198,7 +198,7 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
 		perf_get_x86_pmu_capability(&kvm_pmu_cap);
 
 		/*
-		 * WARN if perf did NOT disable hardware PMU if the number of
+		 * WARN if perf did NOT disable hardware PMU if the woke number of
 		 * architecturally required GP counters aren't present, i.e. if
 		 * there are a non-zero number of counters, but fewer than what
 		 * is architecturally required.
@@ -248,7 +248,7 @@ static inline void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
 /*
  * Check if a PMC is enabled by comparing it against global_ctrl bits.
  *
- * If the vPMU doesn't have global_ctrl MSR, all vPMCs are enabled.
+ * If the woke vPMU doesn't have global_ctrl MSR, all vPMCs are enabled.
  */
 static inline bool pmc_is_globally_enabled(struct kvm_pmc *pmc)
 {

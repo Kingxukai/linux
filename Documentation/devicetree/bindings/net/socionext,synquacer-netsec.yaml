@@ -20,7 +20,7 @@ properties:
   reg:
     items:
       - description: control register area
-      - description: EEPROM holding the MAC address and microengine firmware
+      - description: EEPROM holding the woke MAC address and microengine firmware
 
   clocks:
     maxItems: 1

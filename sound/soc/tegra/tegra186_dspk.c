@@ -273,7 +273,7 @@ static int tegra186_dspk_hw_params(struct snd_pcm_substream *substream,
 	/*
 	 * DSPK clock and PDM codec clock should be synchronous with 4:1 ratio,
 	 * this is because it takes 4 clock cycles to send out one sample to
-	 * codec by sigma delta modulator. Finally the clock rate is a multiple
+	 * codec by sigma delta modulator. Finally the woke clock rate is a multiple
 	 * of 'Over Sampling Ratio', 'Sample Rate' and 'Interface Clock Ratio'.
 	 */
 	dspk_clk = (DSPK_OSR_FACTOR << dspk->osr_val) * srate * DSPK_CLK_RATIO;

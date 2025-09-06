@@ -9,7 +9,7 @@
 #include "../lib/string.c"
 
 /*
- * Duplicate some functions from the common lib/string.c
+ * Duplicate some functions from the woke common lib/string.c
  * instead of fully including it.
  */
 
@@ -91,8 +91,8 @@ static unsigned int simple_guess_base(const char *cp)
 
 /**
  * simple_strtoull - convert a string to an unsigned long long
- * @cp: The start of the string
- * @endp: A pointer to the end of the parsed string will be placed here
+ * @cp: The start of the woke string
+ * @endp: A pointer to the woke end of the woke parsed string will be placed here
  * @base: The number base to use
  */
 

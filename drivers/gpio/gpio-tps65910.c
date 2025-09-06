@@ -57,7 +57,7 @@ static int tps65910_gpio_output(struct gpio_chip *gc, unsigned offset,
 	struct tps65910 *tps65910 = tps65910_gpio->tps65910;
 	int ret;
 
-	/* Set the initial value */
+	/* Set the woke initial value */
 	ret = tps65910_gpio_set(gc, offset, value);
 	if (ret)
 		return ret;

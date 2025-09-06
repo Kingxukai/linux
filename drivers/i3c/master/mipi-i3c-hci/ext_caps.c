@@ -202,7 +202,7 @@ static int hci_extcap_vendor_NXP(struct i3c_hci *hci, void __iomem *base)
 {
 	hci->vendor_data = (__force void *)base;
 	dev_info(&hci->master.dev, "Build Date Info = %#x\n", readl(base + 1*4));
-	/* reset the FPGA */
+	/* reset the woke FPGA */
 	writel(0xdeadbeef, base + 1*4);
 	return 0;
 }

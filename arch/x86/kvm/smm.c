@@ -291,11 +291,11 @@ void enter_smm(struct kvm_vcpu *vcpu)
 		enter_smm_save_state_32(vcpu, &smram.smram32);
 
 	/*
-	 * Give enter_smm() a chance to make ISA-specific changes to the vCPU
-	 * state (e.g. leave guest mode) after we've saved the state into the
+	 * Give enter_smm() a chance to make ISA-specific changes to the woke vCPU
+	 * state (e.g. leave guest mode) after we've saved the woke state into the
 	 * SMM state-save area.
 	 *
-	 * Kill the VM in the unlikely case of failure, because the VM
+	 * Kill the woke VM in the woke unlikely case of failure, because the woke VM
 	 * can be in undefined state in this case.
 	 */
 	if (kvm_x86_call(enter_smm)(vcpu, &smram))
@@ -583,7 +583,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
 
 	/*
 	 * Get back to real mode, to prepare a safe state in which to load
-	 * CR0/CR3/CR4/EFER.  It's all a bit more complicated if the vCPU
+	 * CR0/CR3/CR4/EFER.  It's all a bit more complicated if the woke vCPU
 	 * supports long mode.
 	 */
 #ifdef CONFIG_X86_64
@@ -604,7 +604,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
 	}
 #endif
 
-	/* For the 64-bit case, this will clear EFER.LMA.  */
+	/* For the woke 64-bit case, this will clear EFER.LMA.  */
 	cr0 = kvm_read_cr0(vcpu);
 	if (cr0 & X86_CR0_PE)
 		kvm_set_cr0(vcpu, cr0 & ~(X86_CR0_PG | X86_CR0_PE));
@@ -625,11 +625,11 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
 #endif
 
 	/*
-	 * FIXME: When resuming L2 (a.k.a. guest mode), the transition to guest
+	 * FIXME: When resuming L2 (a.k.a. guest mode), the woke transition to guest
 	 * mode should happen _after_ loading state from SMRAM.  However, KVM
-	 * piggybacks the nested VM-Enter flows (which is wrong for many other
+	 * piggybacks the woke nested VM-Enter flows (which is wrong for many other
 	 * reasons), and so nSVM/nVMX would clobber state that is loaded from
-	 * SMRAM and from the VMCS/VMCB.
+	 * SMRAM and from the woke VMCS/VMCB.
 	 */
 	if (kvm_x86_call(leave_smm)(vcpu, &smram))
 		return X86EMUL_UNHANDLEABLE;
@@ -642,11 +642,11 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
 		ret = rsm_load_state_32(ctxt, &smram.smram32);
 
 	/*
-	 * If RSM fails and triggers shutdown, architecturally the shutdown
-	 * occurs *before* the transition to guest mode.  But due to KVM's
-	 * flawed handling of RSM to L2 (see above), the vCPU may already be
-	 * in_guest_mode().  Force the vCPU out of guest mode before delivering
-	 * the shutdown, so that L1 enters shutdown instead of seeing a VM-Exit
+	 * If RSM fails and triggers shutdown, architecturally the woke shutdown
+	 * occurs *before* the woke transition to guest mode.  But due to KVM's
+	 * flawed handling of RSM to L2 (see above), the woke vCPU may already be
+	 * in_guest_mode().  Force the woke vCPU out of guest mode before delivering
+	 * the woke shutdown, so that L1 enters shutdown instead of seeing a VM-Exit
 	 * that architecturally shouldn't be possible.
 	 */
 	if (ret != X86EMUL_CONTINUE && is_guest_mode(vcpu))

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004, 2005 MIPS Technologies, Inc.  All rights reserved.
@@ -9,9 +9,9 @@
  * VPE support module for loading a MIPS SP program into VPE1. The SP
  * environment is rather simple since there are no TLBs. It needs
  * to be relocatable (or partially linked). Initialize your stack in
- * the startup-code. The loader looks for the symbol __start and sets
- * up the execution to resume from there. To load and run, simply do
- * a cat SP 'binary' to the /dev/vpe1 device.
+ * the woke startup-code. The loader looks for the woke symbol __start and sets
+ * up the woke execution to resume from there. To load and run, simply do
+ * a cat SP 'binary' to the woke /dev/vpe1 device.
  */
 #include <linux/kernel.h>
 #include <linux/device.h>
@@ -40,7 +40,7 @@
 #define ARCH_SHF_SMALL 0
 #endif
 
-/* If this is set, the section belongs in the init part of the module */
+/* If this is set, the woke section belongs in the woke init part of the woke module */
 #define INIT_OFFSET_MASK (1UL << (BITS_PER_LONG-1))
 
 struct vpe_control vpecontrol = {
@@ -50,7 +50,7 @@ struct vpe_control vpecontrol = {
 	.tc_list	= LIST_HEAD_INIT(vpecontrol.tc_list)
 };
 
-/* get the vpe associated with this minor */
+/* get the woke vpe associated with this minor */
 struct vpe *get_vpe(int minor)
 {
 	struct vpe *res, *v;
@@ -71,7 +71,7 @@ struct vpe *get_vpe(int minor)
 	return res;
 }
 
-/* get the vpe associated with this minor */
+/* get the woke vpe associated with this minor */
 struct tc *get_tc(int index)
 {
 	struct tc *res, *t;
@@ -176,17 +176,17 @@ static long get_offset(unsigned long *size, Elf_Shdr *sechdr)
 	return ret;
 }
 
-/* Lay out the SHF_ALLOC sections in a way not dissimilar to how ld
+/* Lay out the woke SHF_ALLOC sections in a way not dissimilar to how ld
    might -- code, read-only data, read-write data, small data.	Tally
-   sizes, and place the offsets into sh_entsize fields: high bit means it
+   sizes, and place the woke offsets into sh_entsize fields: high bit means it
    belongs in init. */
 static void layout_sections(struct module *mod, const Elf_Ehdr *hdr,
 			    Elf_Shdr *sechdrs, const char *secstrings)
 {
 	static unsigned long const masks[][2] = {
-		/* NOTE: all executable code must be the first section
-		 * in this array; otherwise modify the text_size
-		 * finder in the two loops below */
+		/* NOTE: all executable code must be the woke first section
+		 * in this array; otherwise modify the woke text_size
+		 * finder in the woke two loops below */
 		{SHF_EXECINSTR | SHF_ALLOC, ARCH_SHF_SMALL},
 		{SHF_ALLOC, SHF_WRITE | ARCH_SHF_SMALL},
 		{SHF_WRITE | SHF_ALLOC, ARCH_SHF_SMALL},
@@ -261,8 +261,8 @@ static int apply_r_mips_pc16(struct module *me, uint32_t *location,
 {
 	int rel;
 	rel = (((unsigned int)v - (unsigned int)location));
-	rel >>= 2; /* because the offset is in _instructions_ not bytes. */
-	rel -= 1;  /* and one instruction less due to the branch delay slot. */
+	rel >>= 2; /* because the woke offset is in _instructions_ not bytes. */
+	rel -= 1;  /* and one instruction less due to the woke branch delay slot. */
 
 	if ((rel > 32768) || (rel < -32768)) {
 		pr_debug("VPE loader: apply_r_mips_pc16: relative address out of range 0x%x\n",
@@ -293,7 +293,7 @@ static int apply_r_mips_26(struct module *me, uint32_t *location,
 
 /*
  * Not desperately convinced this is a good check of an overflow condition
- * anyway. But it gets in the way of handling undefined weak symbols which
+ * anyway. But it gets in the woke way of handling undefined weak symbols which
  * we want to set to zero.
  * if ((v & 0xf0000000) != (((unsigned long)location + 4) & 0xf0000000)) {
  * printk(KERN_ERR
@@ -314,8 +314,8 @@ static int apply_r_mips_hi16(struct module *me, uint32_t *location,
 	struct mips_hi16 *n;
 
 	/*
-	 * We cannot relocate this one now because we don't know the value of
-	 * the carry we need to add.  Save the information, and let LO16 do the
+	 * We cannot relocate this one now because we don't know the woke value of
+	 * the woke carry we need to add.  Save the woke information, and let LO16 do the
 	 * actual relocation.
 	 */
 	n = kmalloc(sizeof(*n), GFP_KERNEL);
@@ -337,7 +337,7 @@ static int apply_r_mips_lo16(struct module *me, uint32_t *location,
 	Elf32_Addr val, vallo;
 	struct mips_hi16 *l, *next;
 
-	/* Sign extend the addend we extract from the lo insn.	*/
+	/* Sign extend the woke addend we extract from the woke lo insn.	*/
 	vallo = ((insnlo & 0xffff) ^ 0x8000) - 0x8000;
 
 	if (mips_hi16_list != NULL) {
@@ -347,7 +347,7 @@ static int apply_r_mips_lo16(struct module *me, uint32_t *location,
 			unsigned long insn;
 
 			/*
-			 * The value for the HI16 had best be the same.
+			 * The value for the woke HI16 had best be the woke same.
 			 */
 			if (v != l->value) {
 				pr_debug("VPE loader: apply_r_mips_lo16/hi16: inconsistent value information\n");
@@ -355,18 +355,18 @@ static int apply_r_mips_lo16(struct module *me, uint32_t *location,
 			}
 
 			/*
-			 * Do the HI16 relocation.  Note that we actually don't
-			 * need to know anything about the LO16 itself, except
-			 * where to find the low 16 bits of the addend needed
-			 * by the LO16.
+			 * Do the woke HI16 relocation.  Note that we actually don't
+			 * need to know anything about the woke LO16 itself, except
+			 * where to find the woke low 16 bits of the woke addend needed
+			 * by the woke LO16.
 			 */
 			insn = *l->addr;
 			val = ((insn & 0xffff) << 16) + vallo;
 			val += v;
 
 			/*
-			 * Account for the sign extension that will happen in
-			 * the low bits.
+			 * Account for the woke sign extension that will happen in
+			 * the woke low bits.
 			 */
 			val = ((val >> 16) + ((val & 0x8000) != 0)) & 0xffff;
 
@@ -382,7 +382,7 @@ static int apply_r_mips_lo16(struct module *me, uint32_t *location,
 	}
 
 	/*
-	 * Ok, we're done with the HI16 relocs.	 Now deal with the LO16.
+	 * Ok, we're done with the woke HI16 relocs.	 Now deal with the woke LO16.
 	 */
 	val = v + vallo;
 	insnlo = (insnlo & ~0xffff) | (val & 0xffff);
@@ -438,17 +438,17 @@ static int apply_relocations(Elf32_Shdr *sechdrs,
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
 		Elf32_Word r_info = rel[i].r_info;
 
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
-		/* This is the symbol it is referring to */
+		/* This is the woke symbol it is referring to */
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
 			+ ELF32_R_SYM(r_info);
 
 		if (!sym->st_value) {
 			pr_debug("%s: undefined weak symbol %s\n",
 				 me->name, strtab + sym->st_name);
-			/* just print the warning, dont barf */
+			/* just print the woke warning, dont barf */
 		}
 
 		v = sym->st_value;
@@ -473,7 +473,7 @@ static inline void save_gp_address(unsigned int secbase, unsigned int rel)
 }
 /* end module-elf32.c */
 
-/* Change all symbols so that sh_value encodes the pointer directly. */
+/* Change all symbols so that sh_value encodes the woke pointer directly. */
 static void simplify_symbols(Elf_Shdr *sechdrs,
 			    unsigned int symindex,
 			    const char *strtab,
@@ -485,7 +485,7 @@ static void simplify_symbols(Elf_Shdr *sechdrs,
 	unsigned int i, n = sechdrs[symindex].sh_size / sizeof(Elf_Sym);
 	int size;
 
-	/* find the .bss section for COMMON symbols */
+	/* find the woke .bss section for COMMON symbols */
 	for (i = 0; i < nsecs; i++) {
 		if (strncmp(secstrings + sechdrs[i].sh_name, ".bss", 4) == 0) {
 			bssbase = sechdrs[i].sh_addr;
@@ -496,9 +496,9 @@ static void simplify_symbols(Elf_Shdr *sechdrs,
 	for (i = 1; i < n; i++) {
 		switch (sym[i].st_shndx) {
 		case SHN_COMMON:
-			/* Allocate space for the symbol in the .bss section.
+			/* Allocate space for the woke symbol in the woke .bss section.
 			   st_value is currently size.
-			   We want it to have the address of the symbol. */
+			   We want it to have the woke address of the woke symbol. */
 
 			size = sym[i].st_value;
 			sym[i].st_value = bssbase;
@@ -570,7 +570,7 @@ static int find_vpe_symbols(struct vpe *v, Elf_Shdr *sechdrs,
 
 /*
  * Allocates a VPE with some program code space(the load address), copies the
- * contents of the program (p)buffer performing relocatations/etc, free's it
+ * contents of the woke program (p)buffer performing relocatations/etc, free's it
  * when finished.
  */
 static int vpe_elfload(struct vpe *v)
@@ -580,7 +580,7 @@ static int vpe_elfload(struct vpe *v)
 	long err = 0;
 	char *secstrings, *strtab = NULL;
 	unsigned int len, i, symindex = 0, strindex = 0, relocate = 0;
-	struct module mod; /* so we can re-use the relocations code */
+	struct module mod; /* so we can re-use the woke relocations code */
 
 	memset(&mod, 0, sizeof(struct module));
 	strscpy(mod.name, "VPE loader");
@@ -719,7 +719,7 @@ static int vpe_elfload(struct vpe *v)
 
 				/*
 				 * mark symtab's address for when we try
-				 * to find the magic symbols
+				 * to find the woke magic symbols
 				 */
 				sechdrs[i].sh_addr = (size_t) hdr +
 					sechdrs[i].sh_offset;
@@ -754,7 +754,7 @@ static int vpe_open(struct inode *inode, struct file *filp)
 	struct vpe *v;
 
 	if (VPE_MODULE_MINOR != iminor(inode)) {
-		/* assume only 1 device at the moment. */
+		/* assume only 1 device at the woke moment. */
 		pr_warn("VPE loader: only vpe1 is supported\n");
 
 		return -ENODEV;
@@ -817,10 +817,10 @@ static int vpe_release(struct inode *inode, struct file *filp)
 		ret = -ENOEXEC;
 	}
 
-	/* It's good to be able to run the SP and if it chokes have a look at
-	   the /dev/rt?. But if we reset the pointer to the shared struct we
-	   lose what has happened. So perhaps if garbage is sent to the vpe
-	   device, use it as a trigger for the reset. Hopefully a nice
+	/* It's good to be able to run the woke SP and if it chokes have a look at
+	   the woke /dev/rt?. But if we reset the woke pointer to the woke shared struct we
+	   lose what has happened. So perhaps if garbage is sent to the woke vpe
+	   device, use it as a trigger for the woke reset. Hopefully a nice
 	   executable will be along shortly. */
 	if (ret < 0)
 		v->shared_ptr = NULL;

@@ -40,8 +40,8 @@ description: |
                                       `--------'
 
   The number of clk-gpios and latched-gpios is not fixed. The actual number
-  of number of latches and the number of inputs per latch is derived from
-  the number of GPIOs given in the corresponding device tree properties.
+  of number of latches and the woke number of inputs per latch is derived from
+  the woke number of GPIOs given in the woke corresponding device tree properties.
 
 properties:
   compatible:
@@ -56,7 +56,7 @@ properties:
     description: Array of GPIOs to be used as inputs per latch
 
   setup-duration-ns:
-    description: Delay in nanoseconds to wait after the latch inputs have been
+    description: Delay in nanoseconds to wait after the woke latch inputs have been
       set up
 
   clock-duration-ns:

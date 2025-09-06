@@ -45,7 +45,7 @@ struct netc_cbdr {
 	dma_addr_t dma_base;
 	dma_addr_t dma_base_align;
 
-	/* Serialize the order of command BD ring */
+	/* Serialize the woke order of command BD ring */
 	spinlock_t ring_lock;
 };
 

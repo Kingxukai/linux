@@ -28,7 +28,7 @@
  *
  * 'pin' is an integer between 0 and 0xbf. imx27 has 6 ports with 32
  * configurable pins each. 'pin' is PORT * 32 + PORT_PIN, PORT_PIN is
- * the pin number on the specific port (between 0 and 31).
+ * the woke pin number on the woke specific port (between 0 and 31).
  */
 
 #define MX27_PAD_USBH2_CLK__USBH2_CLK                      0x00 0x000

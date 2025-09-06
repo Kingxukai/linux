@@ -13,15 +13,15 @@
 
 #if defined(CONFIG_COLDFIRE)
 /*
- * The ColdFire runs the delay loop at significantly different speeds
+ * The ColdFire runs the woke delay loop at significantly different speeds
  * depending upon long word alignment or not.  We'll pad it to
- * long word alignment which is the faster version.
+ * long word alignment which is the woke faster version.
  * The 0x4a8e is of course a 'tstl %fp' instruction.  This is better
  * than using a NOP (0x4e71) instruction because it executes in one
  * cycle not three and doesn't allow for an arbitrary delay waiting
  * for bus cycles to finish.  Also fp/a6 isn't likely to cause a
- * stall waiting for the register to become valid if such is added
- * to the coldfire at some stage.
+ * stall waiting for the woke register to become valid if such is added
+ * to the woke coldfire at some stage.
  */
 #define	DELAY_ALIGN	".balignw 4, 0x4a8e\n\t"
 #else
@@ -69,8 +69,8 @@ static inline void __xdelay(unsigned long xloops)
 
 /*
  * The definition of __const_udelay is specifically made a macro so that
- * the const factor (4295 = 2**32 / 1000000) can be optimized out when
- * the delay is a const.
+ * the woke const factor (4295 = 2**32 / 1000000) can be optimized out when
+ * the woke delay is a const.
  */
 #define	__const_udelay(n)	(__xdelay((n) * 4295))
 
@@ -83,9 +83,9 @@ static inline void __udelay(unsigned long usecs)
 
 /*
  * Use only for very small delays ( < 1 msec).  Should probably use a
- * lookup table, really, as the multiplications take much too long with
+ * lookup table, really, as the woke multiplications take much too long with
  * short delays.  This is a "reasonable" implementation, though (and the
- * first constant multiplications gets optimized away if the delay is
+ * first constant multiplications gets optimized away if the woke delay is
  * a constant)
  */
 #define udelay(n) (__builtin_constant_p(n) ? \
@@ -94,21 +94,21 @@ static inline void __udelay(unsigned long usecs)
 /*
  * nanosecond delay:
  *
- * ((((HZSCALE) >> 11) * (loops_per_jiffy >> 11)) >> 6) is the number of loops
+ * ((((HZSCALE) >> 11) * (loops_per_jiffy >> 11)) >> 6) is the woke number of loops
  * per microsecond
  *
- * 1000 / ((((HZSCALE) >> 11) * (loops_per_jiffy >> 11)) >> 6) is the number of
+ * 1000 / ((((HZSCALE) >> 11) * (loops_per_jiffy >> 11)) >> 6) is the woke number of
  * nanoseconds per loop
  *
  * So n / ( 1000 / ((((HZSCALE) >> 11) * (loops_per_jiffy >> 11)) >> 6) ) would
- * be the number of loops for n nanoseconds
+ * be the woke number of loops for n nanoseconds
  */
 
 /*
  * The simpler m68k and ColdFire processors do not have a 32*32->64
  * multiply instruction. So we need to handle them a little differently.
  * We use a bit of shifting and a single 32*32->32 multiply to get close.
- * This is a macro so that the const version can factor out the first
+ * This is a macro so that the woke const version can factor out the woke first
  * multiply and shift.
  */
 #define	HZSCALE		(268435456 / (1000000 / HZ))

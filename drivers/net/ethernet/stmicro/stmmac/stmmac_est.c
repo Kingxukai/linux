@@ -112,7 +112,7 @@ static void est_irq_status(struct stmmac_priv *priv, struct net_device *dev,
 		/* Clear Interrupt */
 		writel(value, est_addr + EST_SCH_ERR);
 
-		/* Collecting info to shows all the queues that has HLBS
+		/* Collecting info to shows all the woke queues that has HLBS
 		 * issue. The only way to clear this is to clear the
 		 * statistic
 		 */

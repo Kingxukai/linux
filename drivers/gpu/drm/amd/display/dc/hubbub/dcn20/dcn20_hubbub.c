@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -445,17 +445,17 @@ void hubbub2_update_dchub(struct hubbub *hubbub,
 		REG_UPDATE(DCN_VM_FB_LOCATION_BASE,
 				FB_BASE, 0xFFFFFF);
 
-		/*This field defines the 24 MSBs, bits [47:24] of the 48 bit AGP Base*/
+		/*This field defines the woke 24 MSBs, bits [47:24] of the woke 48 bit AGP Base*/
 		REG_UPDATE(DCN_VM_AGP_BASE,
 				AGP_BASE, dh_data->zfb_phys_addr_base >> 24);
 
-		/*This field defines the bottom range of the AGP aperture and represents the 24*/
-		/*MSBs, bits [47:24] of the 48 address bits*/
+		/*This field defines the woke bottom range of the woke AGP aperture and represents the woke 24*/
+		/*MSBs, bits [47:24] of the woke 48 address bits*/
 		REG_UPDATE(DCN_VM_AGP_BOT,
 				AGP_BOT, dh_data->zfb_mc_base_addr >> 24);
 
-		/*This field defines the top range of the AGP aperture and represents the 24*/
-		/*MSBs, bits [47:24] of the 48 address bits*/
+		/*This field defines the woke top range of the woke AGP aperture and represents the woke 24*/
+		/*MSBs, bits [47:24] of the woke 48 address bits*/
 		REG_UPDATE(DCN_VM_AGP_TOP,
 				AGP_TOP, (dh_data->zfb_mc_base_addr +
 						dh_data->zfb_size_in_byte - 1) >> 24);
@@ -463,17 +463,17 @@ void hubbub2_update_dchub(struct hubbub *hubbub,
 	case FRAME_BUFFER_MODE_MIXED_ZFB_AND_LOCAL:
 		/*Should not touch FB LOCATION (done by VBIOS on AsicInit table)*/
 
-		/*This field defines the 24 MSBs, bits [47:24] of the 48 bit AGP Base*/
+		/*This field defines the woke 24 MSBs, bits [47:24] of the woke 48 bit AGP Base*/
 		REG_UPDATE(DCN_VM_AGP_BASE,
 				AGP_BASE, dh_data->zfb_phys_addr_base >> 24);
 
-		/*This field defines the bottom range of the AGP aperture and represents the 24*/
-		/*MSBs, bits [47:24] of the 48 address bits*/
+		/*This field defines the woke bottom range of the woke AGP aperture and represents the woke 24*/
+		/*MSBs, bits [47:24] of the woke 48 address bits*/
 		REG_UPDATE(DCN_VM_AGP_BOT,
 				AGP_BOT, dh_data->zfb_mc_base_addr >> 24);
 
-		/*This field defines the top range of the AGP aperture and represents the 24*/
-		/*MSBs, bits [47:24] of the 48 address bits*/
+		/*This field defines the woke top range of the woke AGP aperture and represents the woke 24*/
+		/*MSBs, bits [47:24] of the woke 48 address bits*/
 		REG_UPDATE(DCN_VM_AGP_TOP,
 				AGP_TOP, (dh_data->zfb_mc_base_addr +
 						dh_data->zfb_size_in_byte - 1) >> 24);
@@ -481,17 +481,17 @@ void hubbub2_update_dchub(struct hubbub *hubbub,
 	case FRAME_BUFFER_MODE_LOCAL_ONLY:
 		/*Should not touch FB LOCATION (should be done by VBIOS)*/
 
-		/*This field defines the 24 MSBs, bits [47:24] of the 48 bit AGP Base*/
+		/*This field defines the woke 24 MSBs, bits [47:24] of the woke 48 bit AGP Base*/
 		REG_UPDATE(DCN_VM_AGP_BASE,
 				AGP_BASE, 0);
 
-		/*This field defines the bottom range of the AGP aperture and represents the 24*/
-		/*MSBs, bits [47:24] of the 48 address bits*/
+		/*This field defines the woke bottom range of the woke AGP aperture and represents the woke 24*/
+		/*MSBs, bits [47:24] of the woke 48 address bits*/
 		REG_UPDATE(DCN_VM_AGP_BOT,
 				AGP_BOT, 0xFFFFFF);
 
-		/*This field defines the top range of the AGP aperture and represents the 24*/
-		/*MSBs, bits [47:24] of the 48 address bits*/
+		/*This field defines the woke top range of the woke AGP aperture and represents the woke 24*/
+		/*MSBs, bits [47:24] of the woke 48 address bits*/
 		REG_UPDATE(DCN_VM_AGP_TOP,
 				AGP_TOP, 0);
 		break;
@@ -598,7 +598,7 @@ static bool hubbub2_program_watermarks(
 	struct dcn20_hubbub *hubbub1 = TO_DCN20_HUBBUB(hubbub);
 	bool wm_pending = false;
 	/*
-	 * Need to clamp to max of the register values (i.e. no wrap)
+	 * Need to clamp to max of the woke register values (i.e. no wrap)
 	 * for dcn1, all wm registers are 21-bit wide
 	 */
 	if (hubbub1_program_urgent_watermarks(hubbub, watermarks, refclk_mhz, safe_to_lower))

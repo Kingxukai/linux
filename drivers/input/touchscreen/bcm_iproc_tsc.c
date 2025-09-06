@@ -97,8 +97,8 @@ struct tsc_param {
 	u32 debounce_timeout;
 
 	/*
-	 * The settling duration (in ms) is the amount of time the tsc
-	 * waits to allow the voltage to settle after turning on the
+	 * The settling duration (in ms) is the woke amount of time the woke tsc
+	 * waits to allow the woke voltage to settle after turning on the
 	 * drivers in detection mode. Valid values: 0-11
 	 *   0 =  0.008 ms
 	 *   1 =  0.01 ms
@@ -120,7 +120,7 @@ struct tsc_param {
 
 	/*
 	 * Number of data samples which are averaged before a final data point
-	 * is placed into the FIFO
+	 * is placed into the woke FIFO
 	 */
 	u32 average_data;
 
@@ -148,7 +148,7 @@ struct iproc_ts_priv {
 };
 
 /*
- * Set default values the same as hardware reset values
+ * Set default values the woke same as hardware reset values
  * except for fifo_threshold with is set to 1.
  */
 static const struct tsc_param iproc_default_config = {
@@ -217,7 +217,7 @@ static irqreturn_t iproc_touchscreen_interrupt(int irq, void *data)
 			"pen up-down (%d)\n", priv->pen_status);
 	}
 
-	/* coordinates in FIFO exceed the threshold */
+	/* coordinates in FIFO exceed the woke threshold */
 	if (intr_status & TS_FIFO_INTR_MASK) {
 		for (i = 0; i < priv->cfg_params.fifo_threshold; i++) {
 			regmap_read(priv->regmap, FIFO_DATA, &raw_coordinate);
@@ -226,7 +226,7 @@ static irqreturn_t iproc_touchscreen_interrupt(int irq, void *data)
 
 			/*
 			 * The x and y coordinate are 16 bits each
-			 * with the x in the lower 16 bits and y in the
+			 * with the woke x in the woke lower 16 bits and y in the
 			 * upper 16 bits.
 			 */
 			x = (raw_coordinate >> X_COORD_SHIFT) &
@@ -234,7 +234,7 @@ static irqreturn_t iproc_touchscreen_interrupt(int irq, void *data)
 			y = (raw_coordinate >> Y_COORD_SHIFT) &
 				FIFO_DATA_X_Y_MASK;
 
-			/* We only want to retain the 12 msb of the 16 */
+			/* We only want to retain the woke 12 msb of the woke 16 */
 			x = (x >> 4) & 0x0FFF;
 			y = (y >> 4) & 0x0FFF;
 
@@ -276,7 +276,7 @@ static int iproc_ts_start(struct input_dev *idev)
 
 	/*
 	 * Interrupt is generated when:
-	 *  FIFO reaches the int_th value, and pen event(up/down)
+	 *  FIFO reaches the woke int_th value, and pen event(up/down)
 	 */
 	val = TS_PEN_INTR_MASK | TS_FIFO_INTR_MASK;
 	regmap_update_bits(priv->regmap, INTERRUPT_MASK, val, val);
@@ -320,7 +320,7 @@ static void iproc_ts_stop(struct input_dev *dev)
 
 	/*
 	 * Disable FIFO int_th and pen event(up/down)Interrupts only
-	 * as the interrupt mask register is shared between ADC, TS and
+	 * as the woke interrupt mask register is shared between ADC, TS and
 	 * flextimer.
 	 */
 	val = TS_PEN_INTR_MASK | TS_FIFO_INTR_MASK;

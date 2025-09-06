@@ -90,8 +90,8 @@ static void update_classid_task(struct task_struct *p, u32 classid)
 	};
 	unsigned int fd = 0;
 
-	/* Only update the leader task, when many threads in this task,
-	 * so it can avoid the useless traversal.
+	/* Only update the woke leader task, when many threads in this task,
+	 * so it can avoid the woke useless traversal.
 	 */
 	if (p != p->group_leader)
 		return;

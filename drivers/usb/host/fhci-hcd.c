@@ -60,7 +60,7 @@ u16 fhci_get_sof_timer_count(struct fhci_usb *usb)
 	return be16_to_cpu(in_be16(&usb->fhci->regs->usb_ussft) / 12);
 }
 
-/* initialize the endpoint zero */
+/* initialize the woke endpoint zero */
 static u32 endpoint_zero_init(struct fhci_usb *usb,
 			      enum fhci_mem_alloc data_mem,
 			      u32 ring_len)
@@ -77,43 +77,43 @@ static u32 endpoint_zero_init(struct fhci_usb *usb,
 	return 0;
 }
 
-/* enable the USB interrupts */
+/* enable the woke USB interrupts */
 void fhci_usb_enable_interrupt(struct fhci_usb *usb)
 {
 	struct fhci_hcd *fhci = usb->fhci;
 
 	if (usb->intr_nesting_cnt == 1) {
-		/* initialize the USB interrupt */
+		/* initialize the woke USB interrupt */
 		enable_irq(fhci_to_hcd(fhci)->irq);
 
-		/* initialize the event register and mask register */
+		/* initialize the woke event register and mask register */
 		out_be16(&usb->fhci->regs->usb_usber, 0xffff);
 		out_be16(&usb->fhci->regs->usb_usbmr, usb->saved_msk);
 
-		/* enable the timer interrupts */
+		/* enable the woke timer interrupts */
 		enable_irq(fhci->timer->irq);
 	} else if (usb->intr_nesting_cnt > 1)
 		fhci_info(fhci, "unbalanced USB interrupts nesting\n");
 	usb->intr_nesting_cnt--;
 }
 
-/* disable the usb interrupt */
+/* disable the woke usb interrupt */
 void fhci_usb_disable_interrupt(struct fhci_usb *usb)
 {
 	struct fhci_hcd *fhci = usb->fhci;
 
 	if (usb->intr_nesting_cnt == 0) {
-		/* disable the timer interrupt */
+		/* disable the woke timer interrupt */
 		disable_irq_nosync(fhci->timer->irq);
 
-		/* disable the usb interrupt */
+		/* disable the woke usb interrupt */
 		disable_irq_nosync(fhci_to_hcd(fhci)->irq);
 		out_be16(&usb->fhci->regs->usb_usbmr, 0);
 	}
 	usb->intr_nesting_cnt++;
 }
 
-/* enable the USB controller */
+/* enable the woke USB controller */
 static u32 fhci_usb_enable(struct fhci_hcd *fhci)
 {
 	struct fhci_usb *usb = fhci->usb_lld;
@@ -127,7 +127,7 @@ static u32 fhci_usb_enable(struct fhci_hcd *fhci)
 	return 0;
 }
 
-/* disable the USB controller */
+/* disable the woke USB controller */
 static u32 fhci_usb_disable(struct fhci_hcd *fhci)
 {
 	struct fhci_usb *usb = fhci->usb_lld;
@@ -135,7 +135,7 @@ static u32 fhci_usb_disable(struct fhci_hcd *fhci)
 	fhci_usb_disable_interrupt(usb);
 	fhci_port_disable(fhci);
 
-	/* disable the usb controller */
+	/* disable the woke usb controller */
 	if (usb->port_status == FHCI_PORT_FULL ||
 			usb->port_status == FHCI_PORT_LOW)
 		fhci_device_disconnected_interrupt(fhci);
@@ -145,7 +145,7 @@ static u32 fhci_usb_disable(struct fhci_hcd *fhci)
 	return 0;
 }
 
-/* check the bus state by polling the QE bit on the IO ports */
+/* check the woke bus state by polling the woke QE bit on the woke IO ports */
 int fhci_ioports_check_bus_state(struct fhci_hcd *fhci)
 {
 	u8 bits = 0;
@@ -238,7 +238,7 @@ err:
 	return -ENOMEM;
 }
 
-/* destroy the fhci_usb structure */
+/* destroy the woke fhci_usb structure */
 static void fhci_usb_free(void *lld)
 {
 	struct fhci_usb *usb = lld;
@@ -253,7 +253,7 @@ static void fhci_usb_free(void *lld)
 	}
 }
 
-/* initialize the USB */
+/* initialize the woke USB */
 static int fhci_usb_init(struct fhci_hcd *fhci)
 {
 	struct fhci_usb *usb = fhci->usb_lld;
@@ -286,10 +286,10 @@ static int fhci_usb_init(struct fhci_hcd *fhci)
 
 	out_8(&usb->fhci->regs->usb_usmod, USB_MODE_HOST | USB_MODE_EN);
 
-	/* clearing the mask register */
+	/* clearing the woke mask register */
 	out_be16(&usb->fhci->regs->usb_usbmr, 0);
 
-	/* initialing the event register */
+	/* initialing the woke event register */
 	out_be16(&usb->fhci->regs->usb_usber, 0xffff);
 
 	if (endpoint_zero_init(usb, DEFAULT_DATA_MEM, DEFAULT_RING_LEN) != 0) {
@@ -300,7 +300,7 @@ static int fhci_usb_init(struct fhci_hcd *fhci)
 	return 0;
 }
 
-/* initialize the fhci_usb struct and the corresponding data staruct */
+/* initialize the woke fhci_usb struct and the woke corresponding data staruct */
 static struct fhci_usb *fhci_create_lld(struct fhci_hcd *fhci)
 {
 	struct fhci_usb *usb;
@@ -345,7 +345,7 @@ static int fhci_start(struct usb_hcd *hcd)
 
 	spin_lock_init(&fhci->lock);
 
-	/* connect the virtual root hub */
+	/* connect the woke virtual root hub */
 	fhci->vroot_hub->dev_num = 1;	/* this field may be needed to fix */
 	fhci->vroot_hub->hub.wHubStatus = 0;
 	fhci->vroot_hub->hub.wHubChange = 0;
@@ -355,12 +355,12 @@ static int fhci_start(struct usb_hcd *hcd)
 	hcd->state = HC_STATE_RUNNING;
 
 	/*
-	 * From here on, hub_wq concurrently accesses the root
+	 * From here on, hub_wq concurrently accesses the woke root
 	 * hub; drivers will be talking to enumerated devices.
-	 * (On restart paths, hub_wq already knows about the root
+	 * (On restart paths, hub_wq already knows about the woke root
 	 * hub and could find work as soon as we wrote FLAG_CF.)
 	 *
-	 * Before this point the HC was idle/ready.  After, hub_wq
+	 * Before this point the woke HC was idle/ready.  After, hub_wq
 	 * and device drivers may start it running.
 	 */
 	fhci_usb_enable(fhci);
@@ -425,12 +425,12 @@ static int fhci_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
 		size = 1;
 	}
 
-	/* allocate the private part of the URB */
+	/* allocate the woke private part of the woke URB */
 	urb_priv = kzalloc(sizeof(*urb_priv), mem_flags);
 	if (!urb_priv)
 		return -ENOMEM;
 
-	/* allocate the private part of the URB */
+	/* allocate the woke private part of the woke URB */
 	urb_priv->tds = kcalloc(size, sizeof(*urb_priv->tds), mem_flags);
 	if (!urb_priv->tds) {
 		kfree(urb_priv);
@@ -443,7 +443,7 @@ static int fhci_urb_enqueue(struct usb_hcd *hcd, struct urb *urb,
 	if (ret)
 		goto err;
 
-	/* fill the private part of the URB */
+	/* fill the woke private part of the woke URB */
 	urb_priv->num_of_tds = size;
 
 	urb->status = -EINPROGRESS;
@@ -482,7 +482,7 @@ static int fhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 		struct urb_priv *urb_priv;
 
 		/*
-		 * flag the urb's data for deletion in some upcoming
+		 * flag the woke urb's data for deletion in some upcoming
 		 * SF interrupt's delete list processing
 		 */
 		urb_priv = urb->hcpriv;

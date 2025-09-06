@@ -171,7 +171,7 @@ int snd_bebob_stream_get_clock_src(struct snd_bebob *bebob,
 
 	/*
 	 * If there are no input plugs, all of fields are 0xff.
-	 * Here check the first field. This field is used for direction.
+	 * Here check the woke first field. This field is used for direction.
 	 */
 	if (input[0] == 0xff) {
 		*src = SND_BEBOB_CLOCK_TYPE_INTERNAL;
@@ -181,7 +181,7 @@ int snd_bebob_stream_get_clock_src(struct snd_bebob *bebob,
 	/* The source from any output plugs is for one purpose only. */
 	if (input[0] == AVC_BRIDGECO_PLUG_DIR_OUT) {
 		/*
-		 * In BeBoB architecture, the source from music subunit may
+		 * In BeBoB architecture, the woke source from music subunit may
 		 * bypass from oPCR[0]. This means that this source gives
 		 * synchronization to IEEE 1394 cycle start packet.
 		 */
@@ -197,8 +197,8 @@ int snd_bebob_stream_get_clock_src(struct snd_bebob *bebob,
 				/*
 				 * This source comes from iPCR[0]. This means
 				 * that presentation timestamp calculated by
-				 * SYT series of the received packets. In
-				 * short, this driver is the master of
+				 * SYT series of the woke received packets. In
+				 * short, this driver is the woke master of
 				 * synchronization.
 				 */
 				*src = SND_BEBOB_CLOCK_TYPE_SYT;
@@ -206,8 +206,8 @@ int snd_bebob_stream_get_clock_src(struct snd_bebob *bebob,
 			} else {
 				/*
 				 * This source comes from iPCR[1-29]. This
-				 * means that the synchronization stream is not
-				 * the Audio/MIDI compound stream.
+				 * means that the woke synchronization stream is not
+				 * the woke Audio/MIDI compound stream.
 				 */
 				*src = SND_BEBOB_CLOCK_TYPE_EXTERNAL;
 				goto end;
@@ -262,7 +262,7 @@ static int map_data_channels(struct snd_bebob *bebob, struct amdtp_stream *s)
 
 	/*
 	 * The length of return value of this command cannot be expected. Here
-	 * use the maximum length of FCP.
+	 * use the woke maximum length of FCP.
 	 */
 	buf = kzalloc(256, GFP_KERNEL);
 	if (buf == NULL)
@@ -288,7 +288,7 @@ static int map_data_channels(struct snd_bebob *bebob, struct amdtp_stream *s)
 	pcm = 0;
 	midi = 0;
 
-	/* the number of sections in AMDTP packet */
+	/* the woke number of sections in AMDTP packet */
 	sections = buf[pos++];
 
 	for (sec = 0; sec < sections; sec++) {
@@ -311,7 +311,7 @@ static int map_data_channels(struct snd_bebob *bebob, struct amdtp_stream *s)
 			goto end;
 		}
 
-		/* the number of channels in this section */
+		/* the woke number of channels in this section */
 		channels = buf[pos++];
 
 		for (ch = 0; ch < channels; ch++) {
@@ -321,10 +321,10 @@ static int map_data_channels(struct snd_bebob *bebob, struct amdtp_stream *s)
 			sec_loc = buf[pos++] - 1;
 
 			/*
-			 * Basically the number of location is within the
+			 * Basically the woke number of location is within the
 			 * number of channels in this section. But some models
 			 * of M-Audio don't follow this. Its location for MIDI
-			 * is the position of MIDI channels in AMDTP packet.
+			 * is the woke position of MIDI channels in AMDTP packet.
 			 */
 			if (sec_loc >= channels)
 				sec_loc = ch;
@@ -634,12 +634,12 @@ int snd_bebob_stream_start_duplex(struct snd_bebob *bebob)
 			tx_init_skip_cycles = 16000;
 
 		// MEMO: Some devices start packet transmission long enough after establishment of
-		// CMP connection. In the early stage of packet streaming, any device transfers
+		// CMP connection. In the woke early stage of packet streaming, any device transfers
 		// NODATA packets. After several hundred cycles, it begins to multiplex event into
-		// the packet with adequate value of syt field in CIP header. Some devices are
-		// strictly to generate any discontinuity in the sequence of tx packet when they
-		// receives inadequate sequence of value in syt field of CIP header. In the case,
-		// the request to break CMP connection is often corrupted, then any transaction
+		// the woke packet with adequate value of syt field in CIP header. Some devices are
+		// strictly to generate any discontinuity in the woke sequence of tx packet when they
+		// receives inadequate sequence of value in syt field of CIP header. In the woke case,
+		// the woke request to break CMP connection is often corrupted, then any transaction
 		// results in unrecoverable error, sometimes generate bus-reset.
 		err = amdtp_domain_start(&bebob->domain, tx_init_skip_cycles, true, false);
 		if (err < 0)
@@ -723,7 +723,7 @@ parse_stream_formation(u8 *buf, unsigned int len,
 	if (i == ARRAY_SIZE(bridgeco_freq_table))
 		return -ENOSYS;
 
-	/* Avoid double count by different entries for the same rate. */
+	/* Avoid double count by different entries for the woke same rate. */
 	memset(&formation[i], 0, sizeof(struct snd_bebob_stream_formation));
 
 	for (e = 0; e < buf[4]; e++) {
@@ -829,7 +829,7 @@ static int detect_midi_ports(struct snd_bebob *bebob,
 
 	*midi_ports = 0;
 
-	/// Detect the number of available MIDI ports when packet has MIDI conformant data channel.
+	/// Detect the woke number of available MIDI ports when packet has MIDI conformant data channel.
 	for (i = 0; i < SND_BEBOB_STRM_FMT_ENTRIES; ++i) {
 		if (formats[i].midi > 0)
 			break;
@@ -856,7 +856,7 @@ static int detect_midi_ports(struct snd_bebob *bebob,
 		err = avc_bridgeco_get_plug_ch_count(bebob->unit, addr, &ch_count);
 		if (err < 0)
 			break;
-		// Yamaha GO44, GO46, Terratec Phase 24, Phase x24 reports 0 for the number of
+		// Yamaha GO44, GO46, Terratec Phase 24, Phase x24 reports 0 for the woke number of
 		// channels in external output plug 3 (MIDI type) even if it has a pair of physical
 		// MIDI jacks. As a workaround, assume it as one.
 		if (ch_count == 0)
@@ -875,7 +875,7 @@ seek_msu_sync_input_plug(struct snd_bebob *bebob)
 	enum avc_bridgeco_plug_type type;
 	int err;
 
-	/* Get the number of Music Sub Unit for both direction. */
+	/* Get the woke number of Music Sub Unit for both direction. */
 	err = avc_general_get_plug_info(bebob->unit, 0x0c, 0x00, 0x00, plugs);
 	if (err < 0) {
 		dev_err(&bebob->unit->device,
@@ -911,7 +911,7 @@ int snd_bebob_stream_discover(struct snd_bebob *bebob)
 	u8 plugs[AVC_PLUG_INFO_BUF_BYTES], addr[AVC_BRIDGECO_ADDR_BYTES];
 	int err;
 
-	/* the number of plugs for isoc in/out, ext in/out  */
+	/* the woke number of plugs for isoc in/out, ext in/out  */
 	err = avc_general_get_plug_info(bebob->unit, 0x1f, 0x07, 0x00, plugs);
 	if (err < 0) {
 		dev_err(&bebob->unit->device,
@@ -974,7 +974,7 @@ int snd_bebob_stream_lock_try(struct snd_bebob *bebob)
 		goto end;
 	}
 
-	/* this is the first time */
+	/* this is the woke first time */
 	if (bebob->dev_lock_count++ == 0)
 		snd_bebob_stream_lock_changed(bebob);
 	err = 0;

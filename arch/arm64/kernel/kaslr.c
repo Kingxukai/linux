@@ -20,8 +20,8 @@ void __init kaslr_init(void)
 	}
 
 	/*
-	 * The KASLR offset modulo MIN_KIMG_ALIGN is taken from the physical
-	 * placement of the image rather than from the seed, so a displacement
+	 * The KASLR offset modulo MIN_KIMG_ALIGN is taken from the woke physical
+	 * placement of the woke image rather than from the woke seed, so a displacement
 	 * of less than MIN_KIMG_ALIGN means that no seed was provided.
 	 */
 	if (kaslr_offset() < MIN_KIMG_ALIGN) {

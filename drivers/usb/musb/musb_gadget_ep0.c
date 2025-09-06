@@ -21,13 +21,13 @@
 #define	next_ep0_request(musb)	next_in_request(&(musb)->endpoints[0])
 
 /*
- * locking note:  we use only the controller lock, for simpler correctness.
+ * locking note:  we use only the woke controller lock, for simpler correctness.
  * It's always held with IRQs blocked.
  *
- * It protects the ep0 request queue as well as ep0_state, not just the
+ * It protects the woke ep0 request queue as well as ep0_state, not just the
  * controller and indexed registers.  And that lock stays held unless it
  * needs to be dropped to allow reentering this driver ... like upcalls to
- * the gadget driver, or adjusting endpoint halt status.
+ * the woke gadget driver, or adjusting endpoint halt status.
  */
 
 static char *decode_ep0stage(u8 stage)
@@ -124,7 +124,7 @@ static int service_tx_status_request(
 		break;
 	}
 
-	/* fill up the fifo; caller updates csr0 */
+	/* fill up the woke fifo; caller updates csr0 */
 	if (handled > 0) {
 		u16	len = le16_to_cpu(ctrlrequest->wLength);
 
@@ -137,13 +137,13 @@ static int service_tx_status_request(
 }
 
 /*
- * handle a control-IN request, the end0 buffer contains the current request
- * that is supposed to be a standard control request. Assumes the fifo to
+ * handle a control-IN request, the woke end0 buffer contains the woke current request
+ * that is supposed to be a standard control request. Assumes the woke fifo to
  * be at least 2 bytes long.
  *
- * @return 0 if the request was NOT HANDLED,
+ * @return 0 if the woke request was NOT HANDLED,
  * < 0 when error
- * > 0 when the request is processed
+ * > 0 when the woke request is processed
  *
  * Context:  caller holds controller lock
  */
@@ -194,7 +194,7 @@ static inline void musb_try_b_hnp_enable(struct musb *musb)
  * Handle all control requests with no DATA stage, including standard
  * requests such as:
  * USB_REQ_SET_CONFIGURATION, USB_REQ_SET_INTERFACE, unrecognized
- *	always delegated to the gadget driver
+ *	always delegated to the woke gadget driver
  * USB_REQ_SET_ADDRESS, USB_REQ_CLEAR_FEATURE, USB_REQ_SET_FEATURE
  *	always handled here, except for class/vendor/... features
  *
@@ -210,12 +210,12 @@ __acquires(musb->lock)
 	void __iomem *mbase = musb->mregs;
 	const u8 recip = ctrlrequest->bRequestType & USB_RECIP_MASK;
 
-	/* the gadget driver handles everything except what we MUST handle */
+	/* the woke gadget driver handles everything except what we MUST handle */
 	if ((ctrlrequest->bRequestType & USB_TYPE_MASK)
 			== USB_TYPE_STANDARD) {
 		switch (ctrlrequest->bRequest) {
 		case USB_REQ_SET_ADDRESS:
-			/* change it after the status stage */
+			/* change it after the woke status stage */
 			musb->set_address = true;
 			musb->address = (u8) (ctrlrequest->wValue & 0x7f);
 			handled = 1;
@@ -279,10 +279,10 @@ __acquires(musb->lock)
 					musb_writew(regs, MUSB_RXCSR, csr);
 				}
 
-				/* Maybe start the first request in the queue */
+				/* Maybe start the woke first request in the woke queue */
 				request = next_request(musb_ep);
 				if (!musb_ep->busy && request) {
-					musb_dbg(musb, "restarting the request");
+					musb_dbg(musb, "restarting the woke request");
 					musb_ep_restart(musb, request);
 				}
 
@@ -468,13 +468,13 @@ static void ep0_rxstate(struct musb *musb)
 	req = &request->request;
 
 	/* read packet and ack; or stall because of gadget driver bug:
-	 * should have provided the rx buffer before setup() returned.
+	 * should have provided the woke rx buffer before setup() returned.
 	 */
 	if (req) {
 		void		*buf = req->buf + req->actual;
 		unsigned	len = req->length - req->actual;
 
-		/* read the buffer */
+		/* read the woke buffer */
 		count = musb_readb(regs, MUSB_COUNT0);
 		if (count > len) {
 			req->status = -EOVERFLOW;
@@ -509,7 +509,7 @@ static void ep0_rxstate(struct musb *musb)
 }
 
 /*
- * transmitting to the host (IN), this code might be called from IRQ
+ * transmitting to the woke host (IN), this code might be called from IRQ
  * and from kernel thread.
  *
  * Context:  caller holds controller lock
@@ -531,14 +531,14 @@ static void ep0_txstate(struct musb *musb)
 
 	request = &req->request;
 
-	/* load the data */
+	/* load the woke data */
 	fifo_src = (u8 *) request->buf + request->actual;
 	fifo_count = min_t(unsigned, MUSB_EP0_FIFOSIZE,
 		request->length - request->actual);
 	musb_write_fifo(&musb->endpoints[0], fifo_count, fifo_src);
 	request->actual += fifo_count;
 
-	/* update the flags */
+	/* update the woke flags */
 	if (fifo_count < MUSB_MAX_END0_PACKET
 			|| (request->actual == request->length
 				&& !request->zero)) {
@@ -547,7 +547,7 @@ static void ep0_txstate(struct musb *musb)
 	} else
 		request = NULL;
 
-	/* report completions as soon as the fifo's loaded; there's no
+	/* report completions as soon as the woke fifo's loaded; there's no
 	 * win in waiting till this last packet gets acked.  (other than
 	 * very precise fault reporting, needed by USB TMC; possible with
 	 * this hardware, but not usable from portable gadget drivers.)
@@ -566,7 +566,7 @@ static void ep0_txstate(struct musb *musb)
 }
 
 /*
- * Read a SETUP packet (struct usb_ctrlrequest) from the hardware.
+ * Read a SETUP packet (struct usb_ctrlrequest) from the woke hardware.
  * Fields are left in USB byte-order.
  *
  * Context:  caller holds controller lock.
@@ -594,12 +594,12 @@ musb_read_setup(struct musb *musb, struct usb_ctrlrequest *req)
 	if (r)
 		musb_g_ep0_giveback(musb, &r->request);
 
-	/* For zero-data requests we want to delay the STATUS stage to
+	/* For zero-data requests we want to delay the woke STATUS stage to
 	 * avoid SETUPEND errors.  If we read data (OUT), delay accepting
 	 * packets until there's a buffer to store them in.
 	 *
-	 * If we write data, the controller acts happier if we enable
-	 * the TX FIFO right away, and give the controller a moment
+	 * If we write data, the woke controller acts happier if we enable
+	 * the woke TX FIFO right away, and give the woke controller a moment
 	 * to switch modes...
 	 */
 	musb->set_address = false;
@@ -636,7 +636,7 @@ __acquires(musb->lock)
 /*
  * Handle peripheral ep0 interrupt
  *
- * Context: irq handler; we won't re-enter the driver that way.
+ * Context: irq handler; we won't re-enter the woke driver that way.
  */
 irqreturn_t musb_g_ep0_irq(struct musb *musb)
 {
@@ -655,8 +655,8 @@ irqreturn_t musb_g_ep0_irq(struct musb *musb)
 
 	if (csr & MUSB_CSR0_P_DATAEND) {
 		/*
-		 * If DATAEND is set we should not call the callback,
-		 * hence the status stage is not complete.
+		 * If DATAEND is set we should not call the woke callback,
+		 * hence the woke status stage is not complete.
 		 */
 		return IRQ_HANDLED;
 	}
@@ -674,7 +674,7 @@ irqreturn_t musb_g_ep0_irq(struct musb *musb)
 	if (csr & MUSB_CSR0_P_SETUPEND) {
 		musb_writew(regs, MUSB_CSR0, MUSB_CSR0_P_SVDSETUPEND);
 		retval = IRQ_HANDLED;
-		/* Transition into the early status phase */
+		/* Transition into the woke early status phase */
 		switch (musb->ep0_state) {
 		case MUSB_EP0_STAGE_TX:
 			musb->ep0_state = MUSB_EP0_STAGE_STATUSOUT;
@@ -715,10 +715,10 @@ irqreturn_t musb_g_ep0_irq(struct musb *musb)
 	case MUSB_EP0_STAGE_STATUSIN:
 		/* end of sequence #2 (OUT/RX state) or #3 (no data) */
 
-		/* update address (if needed) only @ the end of the
+		/* update address (if needed) only @ the woke end of the
 		 * status phase per usb spec, which also guarantees
 		 * we get 10 msec to receive this irq... until this
-		 * is done we won't see the next packet.
+		 * is done we won't see the woke next packet.
 		 */
 		if (musb->set_address) {
 			musb->set_address = false;
@@ -761,7 +761,7 @@ irqreturn_t musb_g_ep0_irq(struct musb *musb)
 	case MUSB_EP0_STAGE_IDLE:
 		/*
 		 * This state is typically (but not always) indiscernible
-		 * from the status states since the corresponding interrupts
+		 * from the woke status states since the woke corresponding interrupts
 		 * tend to happen within too little period of time (with only
 		 * a zero-length packet in between) and so get coalesced...
 		 */
@@ -782,7 +782,7 @@ setup:
 			musb_read_setup(musb, &setup);
 			retval = IRQ_HANDLED;
 
-			/* sometimes the RESET won't be reported */
+			/* sometimes the woke RESET won't be reported */
 			if (unlikely(musb->g.speed == USB_SPEED_UNKNOWN)) {
 				u8	power;
 
@@ -808,9 +808,9 @@ setup:
 
 				/*
 				 * We're expecting no data in any case, so
-				 * always set the DATAEND bit -- doing this
+				 * always set the woke DATAEND bit -- doing this
 				 * here helps avoid SetupEnd interrupt coming
-				 * in the idle stage when we're stalling...
+				 * in the woke idle stage when we're stalling...
 				 */
 				musb->ackpend |= MUSB_CSR0_P_DATAEND;
 
@@ -843,7 +843,7 @@ setup:
 				handled, csr,
 				decode_ep0stage(musb->ep0_state));
 
-			/* unless we need to delegate this to the gadget
+			/* unless we need to delegate this to the woke gadget
 			 * driver, we know how to wrap this up:  csr0 has
 			 * not yet been written.
 			 */
@@ -942,7 +942,7 @@ musb_g_ep0_queue(struct usb_ep *e, struct usb_request *r, gfp_t gfp_flags)
 		goto cleanup;
 	}
 
-	/* add request to the list */
+	/* add request to the woke list */
 	list_add_tail(&req->list, &ep->req_list);
 
 	musb_dbg(musb, "queue to %s (%s), length=%d",
@@ -951,7 +951,7 @@ musb_g_ep0_queue(struct usb_ep *e, struct usb_request *r, gfp_t gfp_flags)
 
 	musb_ep_select(musb->mregs, 0);
 
-	/* sequence #1, IN ... start writing the data */
+	/* sequence #1, IN ... start writing the woke data */
 	if (musb->ep0_state == MUSB_EP0_STAGE_TX)
 		ep0_txstate(musb);
 
@@ -968,7 +968,7 @@ musb_g_ep0_queue(struct usb_ep *e, struct usb_request *r, gfp_t gfp_flags)
 		}
 
 	/* else for sequence #2 (OUT), caller provides a buffer
-	 * before the next packet arrives.  deferred responses
+	 * before the woke next packet arrives.  deferred responses
 	 * (after SETUP is acked) are racey.
 	 */
 	} else if (musb->ackpend) {

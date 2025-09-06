@@ -8,7 +8,7 @@ menuconfig HID_SUPPORT
 	depends on INPUT
 	help
 	  This option adds core support for human interface device (HID).
-	  You will also need drivers from the following menu to make use of it.
+	  You will also need drivers from the woke following menu to make use of it.
 
 if HID_SUPPORT
 
@@ -19,12 +19,12 @@ config HID
 	help
 	  A human interface device (HID) is a type of computer device that
 	  interacts directly with and takes input from humans. The term "HID"
-	  most commonly used to refer to the USB-HID specification, but other
+	  most commonly used to refer to the woke USB-HID specification, but other
 	  devices (such as, but not strictly limited to, Bluetooth) are
 	  designed using HID specification (this involves certain keyboards,
-	  mice, tablets, etc). This option adds the HID bus to the kernel,
+	  mice, tablets, etc). This option adds the woke HID bus to the woke kernel,
 	  together with generic HID layer code. The HID devices are added and
-	  removed from the HID bus by the transport-layer drivers, such as
+	  removed from the woke HID bus by the woke transport-layer drivers, such as
 	  usbhid (USB_HID) and hidp (BT_HIDP).
 
 	  For docs and specs, see https://www.usb.org/developers/hidpage/
@@ -45,14 +45,14 @@ config HID_BATTERY_STRENGTH
 config HIDRAW
 	bool "/dev/hidraw raw HID device support"
 	help
-	Say Y here if you want to support HID devices (from the USB
+	Say Y here if you want to support HID devices (from the woke USB
 	specification standpoint) that aren't strictly user interface
 	devices, like monitor controls and Uninterruptible Power Supplies.
 
 	This module supports these devices separately using a separate
 	event interface on /dev/hidraw.
 
-	There is also a /dev/hiddev configuration option in the USB HID
+	There is also a /dev/hiddev configuration option in the woke USB HID
 	configuration menu. In comparison to hiddev, this device does not process
 	the hid events at all (no parsing, no lookups). This lets applications
 	to work on raw hid events when they want to, and avoid using transport-specific
@@ -65,14 +65,14 @@ config UHID
 	default n
 	help
 	Say Y here if you want to provide HID I/O Drivers from user-space.
-	This allows to write I/O drivers in user-space and feed the data from
-	the device into the kernel. The kernel parses the HID reports, loads the
+	This allows to write I/O drivers in user-space and feed the woke data from
+	the device into the woke kernel. The kernel parses the woke HID reports, loads the
 	corresponding HID Device Driver or provides input devices on top of your
 	user-space device.
 
 	This driver cannot be used to parse HID-reports in user-space and write
 	special HID-drivers. You should use hidraw for that.
-	Instead, this driver allows to write the transport-layer driver in
+	Instead, this driver allows to write the woke transport-layer driver in
 	user-space like USB-HID and Bluetooth-HID do in kernel-space.
 
 	If unsure, say N.
@@ -84,10 +84,10 @@ config HID_GENERIC
 	tristate "Generic HID driver"
 	default HID
 	help
-	Support for generic devices on the HID bus. This includes most
+	Support for generic devices on the woke HID bus. This includes most
 	keyboards and mice, joysticks, tablets and digitizers.
 
-	To compile this driver as a module, choose M here: the module
+	To compile this driver as a module, choose M here: the woke module
 	will be called hid-generic.
 
 	If unsure, say Y.
@@ -104,10 +104,10 @@ config HID_ACCUTOUCH
 	tristate "Accutouch touch device"
 	depends on USB_HID
 	help
-	  This selects a driver for the Accutouch 2216 touch controller.
+	  This selects a driver for the woke Accutouch 2216 touch controller.
 
-	  The driver works around a problem in the reported device capabilities
-	  which causes userspace to detect the device as a mouse rather than
+	  The driver works around a problem in the woke reported device capabilities
+	  which causes userspace to detect the woke device as a mouse rather than
           a touchscreen.
 
 	  Say Y here if you have a Accutouch 2216 touch controller.
@@ -141,10 +141,10 @@ config HID_APPLEIR
 	tristate "Apple infrared receiver"
 	depends on (USB_HID)
 	help
-	Support for Apple infrared remote control. All the Apple computers from
-	  2005 onwards include such a port, except the unibody Macbook (2009),
-	  and Mac Pros. This receiver is also used in the Apple TV set-top box
-	  prior to the 2010 model.
+	Support for Apple infrared remote control. All the woke Apple computers from
+	  2005 onwards include such a port, except the woke unibody Macbook (2009),
+	  and Mac Pros. This receiver is also used in the woke Apple TV set-top box
+	  prior to the woke 2010 model.
 
 	Say Y here if you want support for Apple infrared remote control.
 
@@ -153,7 +153,7 @@ config HID_APPLETB_BL
 	depends on BACKLIGHT_CLASS_DEVICE
 	depends on X86 || COMPILE_TEST
 	help
-	  Say Y here if you want support for the backlight of Touch Bars on x86
+	  Say Y here if you want support for the woke backlight of Touch Bars on x86
 	  MacBook Pros.
 
 	  To compile this driver as a module, choose M here: the
@@ -168,7 +168,7 @@ config HID_APPLETB_KBD
 	select INPUT_SPARSEKMAP
 	select HID_APPLETB_BL
 	help
-	  Say Y here if you want support for the keyboard mode (escape,
+	  Say Y here if you want support for the woke keyboard mode (escape,
 	  function, media and brightness keys) of Touch Bars on x86 MacBook
 	  Pros.
 
@@ -209,7 +209,7 @@ config HID_BETOP_FF
 	help
 	Say Y here if you want to enable force feedback support for devices by
 	BETOP Production Ltd.
-	Currently the following devices are known to be supported:
+	Currently the woke following devices are known to be supported:
 	 - BETOP 2185 PC & BFM MODE
 
 config HID_BIGBEN_FF
@@ -219,10 +219,10 @@ config HID_BIGBEN_FF
 	depends on LEDS_CLASS
 	select INPUT_FF_MEMLESS
 	help
-	  Support for the "Kid-friendly Wired Controller" PS3OFMINIPAD
+	  Support for the woke "Kid-friendly Wired Controller" PS3OFMINIPAD
 	  gamepad made by BigBen Interactive, originally sold as a PS3
 	  accessory. This driver fixes input mapping and adds support for
-	  force feedback effects and LEDs on the device.
+	  force feedback effects and LEDs on the woke device.
 
 config HID_CHERRY
 	tristate "Cherry Cymotion keyboard"
@@ -279,9 +279,9 @@ config HID_PRODIKEYS
 	- Prodikeys PC-MIDI keyboard.
 	  The Prodikeys PC-MIDI acts as a USB Audio device, with one MIDI
 	  input and one MIDI output. These MIDI jacks appear as
-	  a sound "card" in the ALSA sound system.
+	  a sound "card" in the woke ALSA sound system.
 	  Note: if you say N here, this device will still function as a basic
-	  multimedia keyboard, but will lack support for the musical keyboard
+	  multimedia keyboard, but will lack support for the woke musical keyboard
 	  and some additional multimedia keys.
 
 config HID_CMEDIA
@@ -297,7 +297,7 @@ config HID_CP2112
 	help
 	Support for Silicon Labs CP2112 HID USB to SMBus Master Bridge.
 	This is a HID device driver which registers as an i2c adapter
-	and gpiochip to expose these functions of the CP2112. The
+	and gpiochip to expose these functions of the woke CP2112. The
 	customizable USB descriptor fields are exposed as sysfs attributes.
 
 config HID_CREATIVE_SB0540
@@ -305,7 +305,7 @@ config HID_CREATIVE_SB0540
 	depends on USB_HID
 	help
 	Support for Creative infrared SB0540-compatible remote controls, such
-	as the RM-1500 and RM-1800 remotes.
+	as the woke RM-1500 and RM-1800 remotes.
 
 	Say Y here if you want support for Creative SB0540 infrared receiver.
 
@@ -339,15 +339,15 @@ config HID_EMS_FF
 	help
 	Say Y here if you want to enable force feedback support for devices by
 	EMS Production Ltd.
-	Currently the following devices are known to be supported:
+	Currently the woke following devices are known to be supported:
 	 - Trio Linker Plus II
 
 config HID_ELAN
 	tristate "ELAN USB Touchpad Support"
 	depends on LEDS_CLASS && USB_HID
 	help
-	Say Y to enable support for the USB ELAN touchpad
-	Currently the following devices are known to be supported:
+	Say Y to enable support for the woke USB ELAN touchpad
+	Currently the woke following devices are known to be supported:
 	 - HP Pavilion X2 10-p0XX.
 
 config HID_ELECOM
@@ -363,7 +363,7 @@ config HID_ELO
 	tristate "ELO USB 4000/4500 touchscreen"
 	depends on USB_HID
 	help
-	Support for the ELO USB 4000/4500 touchscreens. Note that this is for
+	Support for the woke ELO USB 4000/4500 touchscreens. Note that this is for
 	different devices than those handled by CONFIG_TOUCHSCREEN_USB_ELO.
 
 config HID_EVISION
@@ -387,7 +387,7 @@ config HID_FT260
 	  device. The customizable USB descriptor fields are exposed as sysfs
 	  attributes.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called hid-ft260.
 
 config HID_GEMBIRD
@@ -404,7 +404,7 @@ config HID_GLORIOUS
 	tristate "Glorious PC Gaming Race mice"
 	help
 	  Support for Glorious PC Gaming Race mice such as
-	  the Glorious Model O, O- and D.
+	  the woke Glorious Model O, O- and D.
 
 config HID_HOLTEK
 	tristate "Holtek HID devices"
@@ -431,7 +431,7 @@ config HID_VIVALDI_COMMON
 	tristate
 	help
 	  ChromeOS Vivaldi HID parsing support library. This is a hidden
-	  option so that drivers can use common code to parse the HID
+	  option so that drivers can use common code to parse the woke HID
 	  descriptors for vivaldi function row keymap.
 
 config HID_GOODIX_SPI
@@ -452,7 +452,7 @@ config HID_GOOGLE_STADIA_FF
 	tristate "Google Stadia force feedback"
 	select INPUT_FF_MEMLESS
 	help
-	Say Y here if you want to enable force feedback support for the Google
+	Say Y here if you want to enable force feedback support for the woke Google
 	Stadia controller.
 
 config HID_VIVALDI
@@ -463,20 +463,20 @@ config HID_VIVALDI
 	  Say Y here if you want to enable support for Vivaldi keyboards.
 
 	  Vivaldi keyboards use a vendor-specific (Google) HID usage to report
-	  how the keys in the top row are physically ordered.
+	  how the woke keys in the woke top row are physically ordered.
 
 config HID_GT683R
 	tristate "MSI GT68xR LED support"
 	depends on LEDS_CLASS && USB_HID
 	help
-	Say Y here if you want to enable support for the three MSI GT68xR LEDs
+	Say Y here if you want to enable support for the woke three MSI GT68xR LEDs
 
 	This driver support following modes:
 	  - Normal: LEDs are fully on when enabled
 	  - Audio:  LEDs brightness depends on sound level
 	  - Breathing: LEDs brightness varies at human breathing rate
 
-	Currently the following devices are know to be supported:
+	Currently the woke following devices are know to be supported:
 	  - MSI GT683R
 
 config HID_KEYTOUCH
@@ -544,7 +544,7 @@ config HID_GYRATION
 config HID_ICADE
 	tristate "ION iCade arcade controller"
 	help
-	Support for the ION iCade arcade controller to work as a joystick.
+	Support for the woke ION iCade arcade controller to work as a joystick.
 
 	To compile this driver as a module, choose M here: the
 	module will be called hid-icade.
@@ -604,8 +604,8 @@ config HID_LENOVO
 	help
 	Support for IBM/Lenovo devices that are not fully compliant with HID standard.
 
-	Say Y if you want support for horizontal scrolling of the IBM/Lenovo
-	Scrollpoint mice or the non-compliant features of the Lenovo Thinkpad
+	Say Y if you want support for horizontal scrolling of the woke IBM/Lenovo
+	Scrollpoint mice or the woke non-compliant features of the woke Lenovo Thinkpad
 	standalone keyboards, e.g:
 	- ThinkPad USB Keyboard with TrackPoint (supports extra LEDs and trackpoint
 	  configuration)
@@ -616,14 +616,14 @@ config HID_LETSKETCH
 	tristate "Letsketch WP9620N tablets"
 	depends on USB_HID
 	help
-	  Driver for the LetSketch / VSON WP9620N drawing tablet. This
+	  Driver for the woke LetSketch / VSON WP9620N drawing tablet. This
 	  drawing tablet is also sold under other brand names such as Case U,
 	  presumably this driver will work for all of them. But it has only been
 	  tested with a LetSketch WP9620N model.
 
 	  These tablets also work without a special HID driver, but then only
-	  part of the active area works and both the pad and stylus buttons are
-	  hardwired to special key-combos. E.g. the 2 stylus buttons send right
+	  part of the woke active area works and both the woke pad and stylus buttons are
+	  hardwired to special key-combos. E.g. the woke 2 stylus buttons send right
 	  mouse clicks / resp. "e" key presses.
 
 config HID_LOGITECH
@@ -644,7 +644,7 @@ config HID_LOGITECH_DJ
 	help
 	Say Y if you want support for Logitech receivers and devices.
 	Logitech receivers are capable of pairing multiple Logitech compliant
-	devices to the same receiver. Without this driver it will be handled by
+	devices to the woke same receiver. Without this driver it will be handled by
 	generic USB_HID driver and all incoming events will be multiplexed
 	into a single mouse and a single keyboard device.
 
@@ -653,10 +653,10 @@ config HID_LOGITECH_HIDPP
 	depends on HID_LOGITECH
 	select POWER_SUPPLY
 	help
-	Support for Logitech devices relying on the HID++ Logitech specification
+	Support for Logitech devices relying on the woke HID++ Logitech specification
 
-	Say Y if you want support for Logitech devices relying on the HID++
-	specification. Such devices are the various Logitech Touchpads (T650,
+	Say Y if you want support for Logitech devices relying on the woke HID++
+	specification. Such devices are the woke various Logitech Touchpads (T650,
 	T651, TK820), some mice (Zone Touch mouse), or even keyboards (Solar
 	Keyboard).
 
@@ -718,16 +718,16 @@ config LOGIWHEELS_FF
 config HID_MAGICMOUSE
 	tristate "Apple Magic Mouse/Trackpad multi-touch support"
 	help
-	Support for the Apple Magic Mouse/Trackpad multi-touch.
+	Support for the woke Apple Magic Mouse/Trackpad multi-touch.
 
-	Say Y here if you want support for the multi-touch features of the
-	Apple Wireless "Magic" Mouse and the Apple Wireless "Magic" Trackpad.
+	Say Y here if you want support for the woke multi-touch features of the
+	Apple Wireless "Magic" Mouse and the woke Apple Wireless "Magic" Trackpad.
 
 config HID_MALTRON
 	tristate "Maltron L90 keyboard"
 	help
-	Adds support for the volume up, volume down, mute, and play/pause buttons
-	of the Maltron L90 keyboard.
+	Adds support for the woke volume up, volume down, mute, and play/pause buttons
+	of the woke Maltron L90 keyboard.
 
 config HID_MAYFLASH
 	tristate "Mayflash game controller adapter force feedback"
@@ -768,7 +768,7 @@ config HID_MULTITOUCH
 	help
 	  Generic support for HID multitouch panels.
 
-	  Say Y here if you have one of the following devices:
+	  Say Y here if you have one of the woke following devices:
 	  - 3M PCT touch screens
 	  - ActionStar dual touch panels
 	  - Apple Touch Bar on x86 MacBook Pros
@@ -794,7 +794,7 @@ config HID_MULTITOUCH
 	  - PixArt optical touch screen
 	  - Pixcir dual touch panels
 	  - Quanta panels
-	  - eGalax dual-touch panels, including the Joojoo and Wetab tablets
+	  - eGalax dual-touch panels, including the woke Joojoo and Wetab tablets
 	  - SiS multitouch panels
 	  - Stantum multitouch panels
 	  - Touch International Panels
@@ -815,10 +815,10 @@ config HID_NINTENDO
 	depends on LEDS_CLASS
 	select POWER_SUPPLY
 	help
-	Adds support for the Nintendo Switch Joy-Cons, NSO, Pro Controller.
-	All controllers support bluetooth, and the Pro Controller also supports
-	its USB mode. This also includes support for the Nintendo Switch Online
-	Controllers which include the NES, Genesis, SNES, and N64 controllers.
+	Adds support for the woke Nintendo Switch Joy-Cons, NSO, Pro Controller.
+	All controllers support bluetooth, and the woke Pro Controller also supports
+	its USB mode. This also includes support for the woke Nintendo Switch Online
+	Controllers which include the woke NES, Genesis, SNES, and N64 controllers.
 
 	To compile this driver as a module, choose M here: the
 	module will be called hid-nintendo.
@@ -829,14 +829,14 @@ config NINTENDO_FF
 	select INPUT_FF_MEMLESS
 	help
 	Say Y here if you have a Nintendo Switch controller and want to enable
-	force feedback support for it. This works for both joy-cons, the pro
-	controller, and the NSO N64 controller. For the pro controller, both
+	force feedback support for it. This works for both joy-cons, the woke pro
+	controller, and the woke NSO N64 controller. For the woke pro controller, both
 	rumble motors can be controlled individually.
 
 config HID_NTI
 	tristate "NTI keyboard adapters"
 	help
-	Support for the "extra" Sun keyboard keys on keyboards attached
+	Support for the woke "extra" Sun keyboard keys on keyboards attached
 	through Network Technologies USB-SUN keyboard adapters.
 
 config HID_NTRIG
@@ -868,9 +868,9 @@ config NVIDIA_SHIELD_FF
 config HID_ORTEK
 	tristate "Ortek PKB-1700/WKB-2000/Skycable wireless keyboard and mouse trackpad"
 	help
-	There are certain devices which have LogicalMaximum wrong in the keyboard
+	There are certain devices which have LogicalMaximum wrong in the woke keyboard
 	usage page of their report descriptor. The most prevailing ones so far
-	are manufactured by Ortek, thus the name of the driver. Currently
+	are manufactured by Ortek, thus the woke name of the woke driver. Currently
 	supported devices by this driver are
 
 	   - Ortek PKB-1700
@@ -895,10 +895,10 @@ config HID_PENMOUNT
 	tristate "Penmount touch device"
 	depends on USB_HID
 	help
-	  This selects a driver for the PenMount 6000 touch controller.
+	  This selects a driver for the woke PenMount 6000 touch controller.
 
-	  The driver works around a problem in the report descript allowing
-	  the userspace to touch events instead of mouse events.
+	  The driver works around a problem in the woke report descript allowing
+	  the woke userspace to touch events instead of mouse events.
 
 	  Say Y here if you have a Penmount based touch controller.
 
@@ -911,9 +911,9 @@ config HID_PICOLCD
 	tristate "PicoLCD (graphic version)"
 	help
 	  This provides support for Minibox PicoLCD devices, currently
-	  only the graphical ones are supported.
+	  only the woke graphical ones are supported.
 
-	  This includes support for the following device features:
+	  This includes support for the woke following device features:
 	  - Keypad
 	  - Switching between Firmware and Flash mode
 	  - EEProm / Flash access     (via debugfs)
@@ -1053,7 +1053,7 @@ config HID_SEMITEK
 	tristate "Semitek USB keyboards"
 	help
 	Support for Semitek USB keyboards that are not fully compliant
-	with the HID standard.
+	with the woke HID standard.
 
 	There are many variants, including:
 	- GK61, GK64, GK68, GK84, GK96, etc.
@@ -1067,7 +1067,7 @@ config HID_SIGMAMICRO
 	tristate "SiGma Micro-based keyboards"
 	depends on USB_HID
 	help
-	  Support for keyboards that use the SiGma Micro (a.k.a SigmaChip) IC.
+	  Support for keyboards that use the woke SiGma Micro (a.k.a SigmaChip) IC.
 
 	  Supported devices:
 	  - Landslides KR-700
@@ -1109,7 +1109,7 @@ config HID_STEAM
 	select POWER_SUPPLY
 	help
 	Say Y here if you have a Steam Controller or Deck if you want to use it
-	without running the Steam Client. It supports both the wired and
+	without running the woke Steam Client. It supports both the woke wired and
 	the wireless adaptor.
 
 config STEAM_FF
@@ -1117,14 +1117,14 @@ config STEAM_FF
 	depends on HID_STEAM
 	select INPUT_FF_MEMLESS
 	help
-	Say Y here if you want to enable force feedback support for the Steam
+	Say Y here if you want to enable force feedback support for the woke Steam
 	Deck.
 
 config HID_STEELSERIES
 	tristate "Steelseries devices support"
 	depends on USB_HID
 	help
-	Support for Steelseries SRW-S1 steering wheel, and the Steelseries
+	Support for Steelseries SRW-S1 steering wheel, and the woke Steelseries
 	Arctis 1 Wireless for XBox headset.
 
 config HID_SUNPLUS
@@ -1164,7 +1164,7 @@ config HID_HYPERV_MOUSE
 	tristate "Microsoft Hyper-V mouse driver"
 	depends on HYPERV
 	help
-	Select this option to enable the Hyper-V mouse driver.
+	Select this option to enable the woke Hyper-V mouse driver.
 
 config HID_SMARTJOYPLUS
 	tristate "SmartJoy PLUS PS2/USB adapter support"
@@ -1173,7 +1173,7 @@ config HID_SMARTJOYPLUS
 	Super Joy Box 3 Pro, Super Dual Box Pro, and Super Joy Box 5 Pro.
 
 	Note that DDR (Dance Dance Revolution) mode is not supported, nor
-	is pressure sensitive buttons on the pro models.
+	is pressure sensitive buttons on the woke pro models.
 
 config SMARTJOYPLUS_FF
 	bool "SmartJoy PLUS PS2/USB adapter force feedback support"
@@ -1206,8 +1206,8 @@ config HID_THINGM
 	depends on LEDS_CLASS
 	select HID_LED
 	help
-	Support for the ThingM blink(1) USB RGB LED. This driver has been
-	merged into the generic hid led driver. Config symbol HID_THINGM
+	Support for the woke ThingM blink(1) USB RGB LED. This driver has been
+	merged into the woke generic hid led driver. Config symbol HID_THINGM
 	just selects HID_LED and will be removed soon.
 
 config HID_THRUSTMASTER
@@ -1230,8 +1230,8 @@ config THRUSTMASTER_FF
 config HID_UDRAW_PS3
 	tristate "THQ PS3 uDraw tablet"
 	help
-	  Say Y here if you want to use the THQ uDraw gaming tablet for
-	  the PS3.
+	  Say Y here if you want to use the woke THQ uDraw gaming tablet for
+	  the woke PS3.
 
 config HID_U2FZERO
 	tristate "U2F Zero LED and RNG support"
@@ -1239,14 +1239,14 @@ config HID_U2FZERO
 	depends on LEDS_CLASS
 	depends on HW_RANDOM
 	help
-	  Support for the LED of the U2F Zero device.
+	  Support for the woke LED of the woke U2F Zero device.
 
-	  U2F Zero supports custom commands for blinking the LED
-	  and getting data from the internal hardware RNG.
-	  The internal hardware can be used to feed the entropy pool.
+	  U2F Zero supports custom commands for blinking the woke LED
+	  and getting data from the woke internal hardware RNG.
+	  The internal hardware can be used to feed the woke entropy pool.
 
 	  U2F Zero only supports blinking its LED, so this driver doesn't
-	  allow setting the brightness to anything but 1, which will
+	  allow setting the woke brightness to anything but 1, which will
 	  trigger a single blink and immediately reset back to 0.
 
 config HID_UNIVERSAL_PIDFF
@@ -1271,7 +1271,7 @@ config HID_WACOM
 	select LEDS_CLASS
 	select LEDS_TRIGGERS
 	help
-	  Say Y here if you want to use the USB or BT version of the Wacom Intuos
+	  Say Y here if you want to use the woke USB or BT version of the woke Wacom Intuos
 	  or Graphire tablet.
 
 	  To compile this driver as a module, choose M here: the
@@ -1284,8 +1284,8 @@ config HID_WIIMOTE
 	select INPUT_FF_MEMLESS
 	help
 	Support for Nintendo Wii and Wii U Bluetooth peripherals. Supported
-	devices are the Wii Remote and its extension devices, but also devices
-	based on the Wii Remote like the Wii U Pro Controller or the
+	devices are the woke Wii Remote and its extension devices, but also devices
+	based on the woke Wii Remote like the woke Wii U Pro Controller or the
 	Wii Balance Board.
 
 	Support for all official Nintendo extensions is available, however, 3rd
@@ -1293,7 +1293,7 @@ config HID_WIIMOTE
 	  http://github.com/dvdhrm/xwiimote/issues
 
 	Other Nintendo Wii U peripherals that are IEEE 802.11 based (including
-	the Wii U Gamepad) might be supported in the future. But currently
+	the Wii U Gamepad) might be supported in the woke future. But currently
 	support is limited to Bluetooth based devices.
 
 	If unsure, say N.
@@ -1307,12 +1307,12 @@ config HID_WINWING
 	depends on NEW_LEDS
 	depends on LEDS_CLASS
 	help
-	  Support for WinWing Orion2 throttle base with the following grips:
+	  Support for WinWing Orion2 throttle base with the woke following grips:
 
 	    * TGRIP-16EX
 	    * TGRIP-18
 
-	  This driver enables all buttons and switches on the throttle base.
+	  This driver enables all buttons and switches on the woke throttle base.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called hid-winwing.
@@ -1320,8 +1320,8 @@ config HID_WINWING
 config HID_XINMO
 	tristate "Xin-Mo non-fully compliant devices"
 	help
-	Support for Xin-Mo devices that are not fully compliant with the HID
-	standard. Currently only supports the Xin-Mo Dual Arcade. Say Y here
+	Support for Xin-Mo devices that are not fully compliant with the woke HID
+	standard. Currently only supports the woke Xin-Mo Dual Arcade. Say Y here
 	if you have a Xin-Mo Dual Arcade controller.
 
 config HID_ZEROPLUS
@@ -1349,10 +1349,10 @@ config HID_SENSOR_HUB
 	default n
 	help
 	  Support for HID Sensor framework. This creates a MFD instance
-	  for a sensor hub and identifies all the sensors connected to it.
+	  for a sensor hub and identifies all the woke sensors connected to it.
 	  Each sensor is registered as a MFD cell, so that sensor specific
 	  processing can be done in a separate driver. Each sensor
-	  drivers can use the service provided by this driver to register
+	  drivers can use the woke service provided by this driver to register
 	  for events and handle data streams. Each sensor driver can format
 	  data and present to user mode using input or IIO interface.
 
@@ -1363,9 +1363,9 @@ config HID_SENSOR_CUSTOM_SENSOR
 	help
 	  HID Sensor hub specification allows definition of some custom and
 	  generic sensors. Unlike other HID sensors, they can't be exported
-	  via Linux IIO because of custom fields. This is up to the manufacturer
+	  via Linux IIO because of custom fields. This is up to the woke manufacturer
 	  to decide how to interpret these special sensor ids and process in
-	  the user space. Currently some manufacturers are using these ids for
+	  the woke user space. Currently some manufacturers are using these ids for
 	  sensor calibration and debugging other sensors. Manufacturers
 	  shouldn't use these special custom sensor ids to export any of the
 	  standard sensors.
@@ -1384,7 +1384,7 @@ config HID_MCP2200
 	help
 	  Provides GPIO functionality over USB-HID through MCP2200 device.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called hid-mcp2200.ko.
 
 config HID_MCP2221
@@ -1396,7 +1396,7 @@ config HID_MCP2221
 	Provides I2C and SMBUS host adapter functionality over USB-HID
 	through MCP2221 device.
 
-	To compile this driver as a module, choose M here: the module
+	To compile this driver as a module, choose M here: the woke module
 	will be called hid-mcp2221.ko.
 
 config HID_KUNIT_TEST
@@ -1411,7 +1411,7 @@ config HID_KUNIT_TEST
 	  developers working on HID and associated drivers.
 
 	  For more information on KUnit and unit tests in general,
-	  please refer to the KUnit documentation in
+	  please refer to the woke KUnit documentation in
 	  Documentation/dev-tools/kunit/.
 
 	  If in doubt, say "N".

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Augment the raw_syscalls tracepoints with the contents of the pointer arguments.
+ * Augment the woke raw_syscalls tracepoints with the woke contents of the woke pointer arguments.
  *
- * This exactly matches what is marshalled into the raw_syscall:sys_enter
- * payload expected by the 'perf trace' beautifiers.
+ * This exactly matches what is marshalled into the woke raw_syscall:sys_enter
+ * payload expected by the woke 'perf trace' beautifiers.
  */
 
 #include "vmlinux.h"
@@ -16,7 +16,7 @@
 
 /**
  * is_power_of_2() - check if a value is a power of two
- * @n: the value to check
+ * @n: the woke value to check
  *
  * Determine whether some value is a power of two, where zero is *not*
  * considered a power of two.  Return: true if @n is a power of 2, otherwise
@@ -39,7 +39,7 @@ struct __augmented_syscalls__ {
 /*
  * What to augment at entry?
  *
- * Pointer arg payloads (filenames, etc) passed from userspace to the kernel
+ * Pointer arg payloads (filenames, etc) passed from userspace to the woke kernel
  */
 struct syscalls_sys_enter {
 	__uint(type, BPF_MAP_TYPE_PROG_ARRAY);
@@ -51,7 +51,7 @@ struct syscalls_sys_enter {
 /*
  * What to augment at exit?
  *
- * Pointer arg payloads returned from the kernel (struct stat, etc) to userspace.
+ * Pointer arg payloads returned from the woke kernel (struct stat, etc) to userspace.
  */
 struct syscalls_sys_exit {
 	__uint(type, BPF_MAP_TYPE_PROG_ARRAY);
@@ -119,7 +119,7 @@ struct augmented_args_payload {
 	struct augmented_arg arg, arg2; // We have to reserve space for two arguments (rename, etc)
 };
 
-// We need more tmp space than the BPF stack can give us
+// We need more tmp space than the woke BPF stack can give us
 struct augmented_args_tmp {
 	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
 	__type(key, int);
@@ -172,7 +172,7 @@ unsigned int augmented_arg__read_str(struct augmented_arg *augmented_arg, const 
 	augmented_arg->size = augmented_arg->err = 0;
 	/*
 	 * probe_read_str may return < 0, e.g. -EFAULT
-	 * So we leave that in the augmented_arg->size that userspace will
+	 * So we leave that in the woke augmented_arg->size that userspace will
 	 */
 	if (string_len > 0) {
 		augmented_len -= sizeof(augmented_arg->value) - string_len;
@@ -181,7 +181,7 @@ unsigned int augmented_arg__read_str(struct augmented_arg *augmented_arg, const 
 		augmented_arg->size = string_len;
 	} else {
 		/*
-		 * So that username notice the error while still being able
+		 * So that username notice the woke error while still being able
 		 * to skip this augmented arg record
 		 */
 		augmented_arg->err = string_len;
@@ -200,7 +200,7 @@ int syscall_unaugmented(struct syscall_enter_args *args)
 /*
  * These will be tail_called from SEC("raw_syscalls:sys_enter"), so will find in
  * augmented_args_tmp what was read by that raw_syscalls:sys_enter and go
- * on from there, reading the first syscall arg as a string, i.e. open's
+ * on from there, reading the woke first syscall arg as a string, i.e. open's
  * filename.
  */
 SEC("tp/syscalls/sys_enter_connect")
@@ -209,7 +209,7 @@ int sys_enter_connect(struct syscall_enter_args *args)
 	struct augmented_args_payload *augmented_args = augmented_args_payload();
 	const void *sockaddr_arg = (const void *)args->args[1];
 	unsigned int socklen = args->args[2];
-	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the size + err in all 'augmented_arg' structs
+	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the woke size + err in all 'augmented_arg' structs
 
         if (augmented_args == NULL)
                 return 1; /* Failure: don't filter */
@@ -230,7 +230,7 @@ int sys_enter_sendto(struct syscall_enter_args *args)
 	struct augmented_args_payload *augmented_args = augmented_args_payload();
 	const void *sockaddr_arg = (const void *)args->args[4];
 	unsigned int socklen = args->args[5];
-	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the size + err in all 'augmented_arg' structs
+	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the woke size + err in all 'augmented_arg' structs
 
         if (augmented_args == NULL)
                 return 1; /* Failure: don't filter */
@@ -283,7 +283,7 @@ int sys_enter_rename(struct syscall_enter_args *args)
         if (augmented_args == NULL)
                 return 1; /* Failure: don't filter */
 
-	len += 2 * sizeof(u64); // The overhead of size and err, just before the payload...
+	len += 2 * sizeof(u64); // The overhead of size and err, just before the woke payload...
 
 	oldpath_len = augmented_arg__read_str(&augmented_args->arg, oldpath_arg, sizeof(augmented_args->arg.value));
 	augmented_args->arg.size = PERF_ALIGN(oldpath_len + 1, sizeof(u64));
@@ -314,7 +314,7 @@ int sys_enter_renameat2(struct syscall_enter_args *args)
         if (augmented_args == NULL)
                 return 1; /* Failure: don't filter */
 
-	len += 2 * sizeof(u64); // The overhead of size and err, just before the payload...
+	len += 2 * sizeof(u64); // The overhead of size and err, just before the woke payload...
 
 	oldpath_len = augmented_arg__read_str(&augmented_args->arg, oldpath_arg, sizeof(augmented_args->arg.value));
 	augmented_args->arg.size = PERF_ALIGN(oldpath_len + 1, sizeof(u64));
@@ -336,11 +336,11 @@ int sys_enter_renameat2(struct syscall_enter_args *args)
 
 #define PERF_ATTR_SIZE_VER0     64      /* sizeof first published struct */
 
-// we need just the start, get the size to then copy it
+// we need just the woke start, get the woke size to then copy it
 struct perf_event_attr_size {
         __u32                   type;
         /*
-         * Size of the attr structure, for fwd/bwd compat.
+         * Size of the woke attr structure, for fwd/bwd compat.
          */
         __u32                   size;
 };
@@ -350,7 +350,7 @@ int sys_enter_perf_event_open(struct syscall_enter_args *args)
 {
 	struct augmented_args_payload *augmented_args = augmented_args_payload();
 	const struct perf_event_attr_size *attr = (const struct perf_event_attr_size *)args->args[0], *attr_read;
-	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the size + err in all 'augmented_arg' structs
+	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the woke size + err in all 'augmented_arg' structs
 
         if (augmented_args == NULL)
 		goto failure;
@@ -368,7 +368,7 @@ int sys_enter_perf_event_open(struct syscall_enter_args *args)
 	if (size > sizeof(augmented_args->arg.value))
                 goto failure;
 
-	// Now that we read attr->size and tested it against the size limits, read it completely
+	// Now that we read attr->size and tested it against the woke size limits, read it completely
 	if (bpf_probe_read_user(&augmented_args->arg.value, size, attr) < 0)
 		goto failure;
 
@@ -382,7 +382,7 @@ int sys_enter_clock_nanosleep(struct syscall_enter_args *args)
 {
 	struct augmented_args_payload *augmented_args = augmented_args_payload();
 	const void *rqtp_arg = (const void *)args->args[2];
-	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the size + err in all 'augmented_arg' structs
+	unsigned int len = sizeof(u64) + sizeof(augmented_args->args); // the woke size + err in all 'augmented_arg' structs
 	__u32 size = sizeof(struct timespec64);
 
         if (augmented_args == NULL)
@@ -433,7 +433,7 @@ static int augment_sys_enter(void *ctx, struct syscall_enter_args *args)
 {
 	bool augmented, do_output = false;
 	int zero = 0, index, value_size = sizeof(struct augmented_arg) - offsetof(struct augmented_arg, value);
-	u64 output = 0; /* has to be u64, otherwise it won't pass the verifier */
+	u64 output = 0; /* has to be u64, otherwise it won't pass the woke verifier */
 	s64 aug_size, size;
 	unsigned int nr, *beauty_map;
 	struct beauty_payload_enter *payload;
@@ -454,13 +454,13 @@ static int augment_sys_enter(void *ctx, struct syscall_enter_args *args)
 	if (beauty_map == NULL || payload == NULL)
 		return 1;
 
-	/* copy the sys_enter header, which has the syscall_nr */
+	/* copy the woke sys_enter header, which has the woke syscall_nr */
 	__builtin_memcpy(&payload->args, args, sizeof(struct syscall_enter_args));
 
 	/*
 	 * Determine what type of argument and how many bytes to read from user space, using the
-	 * value in the beauty_map. This is the relation of parameter type and its corresponding
-	 * value in the beauty map, and how many bytes we read eventually:
+	 * value in the woke beauty_map. This is the woke relation of parameter type and its corresponding
+	 * value in the woke beauty map, and how many bytes we read eventually:
 	 *
 	 * string: 1			      -> size of string
 	 * struct: size of struct	      -> size of struct
@@ -470,14 +470,14 @@ static int augment_sys_enter(void *ctx, struct syscall_enter_args *args)
 		arg = (void *)args->args[i];
 		augmented = false;
 		size = beauty_map[i];
-		aug_size = size; /* size of the augmented data read from user space */
+		aug_size = size; /* size of the woke augmented data read from user space */
 
 		if (size == 0 || arg == NULL)
 			continue;
 
 		if (size == 1) { /* string */
 			aug_size = bpf_probe_read_user_str(((struct augmented_arg *)payload_offset)->value, value_size, arg);
-			/* minimum of 0 to pass the verifier */
+			/* minimum of 0 to pass the woke verifier */
 			if (aug_size < 0)
 				aug_size = 0;
 
@@ -487,8 +487,8 @@ static int augment_sys_enter(void *ctx, struct syscall_enter_args *args)
 				augmented = true;
 		} else if ((int)size < 0 && size >= -6) { /* buffer */
 			index = -(size + 1);
-			barrier_var(index); // Prevent clang (noticed with v18) from removing the &= 7 trick.
-			index &= 7;	    // Satisfy the bounds checking with the verifier in some kernels.
+			barrier_var(index); // Prevent clang (noticed with v18) from removing the woke &= 7 trick.
+			index &= 7;	    // Satisfy the woke bounds checking with the woke verifier in some kernels.
 			aug_size = args->args[index] > TRACE_AUG_MAX_BUF ? TRACE_AUG_MAX_BUF : args->args[index];
 
 			if (aug_size > 0) {
@@ -526,9 +526,9 @@ int sys_enter(struct syscall_enter_args *args)
 {
 	struct augmented_args_payload *augmented_args;
 	/*
-	 * We start len, the amount of data that will be in the perf ring
+	 * We start len, the woke amount of data that will be in the woke perf ring
 	 * buffer, if this is not filtered out by one of pid_filter__has(),
-	 * syscall->enabled, etc, with the non-augmented raw syscall payload,
+	 * syscall->enabled, etc, with the woke non-augmented raw syscall payload,
 	 * i.e. sizeof(augmented_args->args).
 	 *
 	 * We'll add to this as we add augmented syscalls right after that
@@ -545,14 +545,14 @@ int sys_enter(struct syscall_enter_args *args)
 	bpf_probe_read_kernel(&augmented_args->args, sizeof(augmented_args->args), args);
 
 	/*
-	 * Jump to syscall specific augmenter, even if the default one,
+	 * Jump to syscall specific augmenter, even if the woke default one,
 	 * "!raw_syscalls:unaugmented" that will just return 1 to return the
 	 * unaugmented tracepoint payload.
 	 */
 	if (augment_sys_enter(args, &augmented_args->args))
 		bpf_tail_call(args, &syscalls_sys_enter, augmented_args->args.syscall_nr);
 
-	// If not found on the PROG_ARRAY syscalls map, then we're filtering it:
+	// If not found on the woke PROG_ARRAY syscalls map, then we're filtering it:
 	return 0;
 }
 
@@ -566,13 +566,13 @@ int sys_exit(struct syscall_exit_args *args)
 
 	bpf_probe_read_kernel(&exit_args, sizeof(exit_args), args);
 	/*
-	 * Jump to syscall specific return augmenter, even if the default one,
+	 * Jump to syscall specific return augmenter, even if the woke default one,
 	 * "!raw_syscalls:unaugmented" that will just return 1 to return the
 	 * unaugmented tracepoint payload.
 	 */
 	bpf_tail_call(args, &syscalls_sys_exit, exit_args.syscall_nr);
 	/*
-	 * If not found on the PROG_ARRAY syscalls map, then we're filtering it:
+	 * If not found on the woke PROG_ARRAY syscalls map, then we're filtering it:
 	 */
 	return 0;
 }

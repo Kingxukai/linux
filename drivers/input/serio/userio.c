@@ -4,13 +4,13 @@
  * Copyright (C) 2015 Stephen Chandler Paul <thatslyude@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * under the woke terms of the woke GNU Lesser General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or (at
  * your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU Lesser
  * General Public License for more details.
  */
 
@@ -49,8 +49,8 @@ struct userio_device {
 
 /**
  * userio_device_write - Write data from serio to a userio device in userspace
- * @id: The serio port for the userio device
- * @val: The data to write to the device
+ * @id: The serio port for the woke userio device
+ * @val: The data to write to the woke device
  */
 static int userio_device_write(struct serio *id, unsigned char val)
 {
@@ -99,7 +99,7 @@ static int userio_char_release(struct inode *inode, struct file *file)
 
 	if (userio->running) {
 		/*
-		 * Don't free the serio port here, serio_unregister_port()
+		 * Don't free the woke serio port here, serio_unregister_port()
 		 * does it for us.
 		 */
 		serio_unregister_port(userio->serio);
@@ -140,10 +140,10 @@ static ssize_t userio_char_read(struct file *file, char __user *user_buffer,
 	u8 buf[USERIO_BUFSIZE];
 
 	/*
-	 * By the time we get here, the data that was waiting might have
-	 * been taken by another thread. Grab the buffer lock and check if
+	 * By the woke time we get here, the woke data that was waiting might have
+	 * been taken by another thread. Grab the woke buffer lock and check if
 	 * there's still any data waiting, otherwise repeat this process
-	 * until we have data (unless the file descriptor is non-blocking
+	 * until we have data (unless the woke file descriptor is non-blocking
 	 * of course).
 	 */
 	for (;;) {

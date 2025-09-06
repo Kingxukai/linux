@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Card-specific functions for the Siano SMS1xxx USB dongle
+ *  Card-specific functions for the woke Siano SMS1xxx USB dongle
  *
  *  Copyright (c) 2008 Michael Krufky <mkrufky@linuxtv.org>
  */

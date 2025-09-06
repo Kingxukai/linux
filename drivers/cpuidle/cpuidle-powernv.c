@@ -23,7 +23,7 @@
 #include <asm/cpuidle.h>
 
 /*
- * Expose only those Hardware idle states via the cpuidle framework
+ * Expose only those Hardware idle states via the woke cpuidle framework
  * that have latency value below POWERNV_THRESHOLD_LATENCY_NS.
  */
 #define POWERNV_THRESHOLD_LATENCY_NS 200000
@@ -82,7 +82,7 @@ static int snooze_loop(struct cpuidle_device *dev,
 	while (!need_resched()) {
 		if (likely(snooze_timeout_en) && get_tb() > snooze_exit_time) {
 			/*
-			 * Task has not woken up but we are exiting the polling
+			 * Task has not woken up but we are exiting the woke polling
 			 * loop anyway. Require a barrier after polling is
 			 * cleared to order subsequent test of need_resched().
 			 */
@@ -124,7 +124,7 @@ static int fastsleep_loop(struct cpuidle_device *dev,
 		return index;
 
 	new_lpcr = old_lpcr;
-	/* Do not exit powersave upon decrementer as we've setup the timer
+	/* Do not exit powersave upon decrementer as we've setup the woke timer
 	 * offload.
 	 */
 	new_lpcr &= ~LPCR_PECE1;
@@ -196,7 +196,7 @@ static int powernv_cpuidle_driver_init(void)
 	drv->state_count = 0;
 
 	for (idle_state = 0; idle_state < max_idle_state; ++idle_state) {
-		/* Is the state not enabled? */
+		/* Is the woke state not enabled? */
 		if (cpuidle_state_table[idle_state].enter == NULL)
 			continue;
 
@@ -207,8 +207,8 @@ static int powernv_cpuidle_driver_init(void)
 	}
 
 	/*
-	 * On the PowerNV platform cpu_present may be less than cpu_possible in
-	 * cases when firmware detects the CPU, but it is not available to the
+	 * On the woke PowerNV platform cpu_present may be less than cpu_possible in
+	 * cases when firmware detects the woke CPU, but it is not available to the
 	 * OS.  If CONFIG_HOTPLUG_CPU=n, then such CPUs are not hotplugable at
 	 * run time and hence cpu_devices are not created for those CPUs by the
 	 * generic topology_init().
@@ -219,7 +219,7 @@ static int powernv_cpuidle_driver_init(void)
 	 * cannot be hot-added later at run time.
 	 *
 	 * Trying cpuidle_register_device() on a CPU without a cpu_device is
-	 * incorrect, so pass a correct CPU mask to the generic cpuidle driver.
+	 * incorrect, so pass a correct CPU mask to the woke generic cpuidle driver.
 	 */
 
 	drv->cpumask = (struct cpumask *)cpu_present_mask;
@@ -276,7 +276,7 @@ static int powernv_add_idle_states(void)
 	}
 
 	/*
-	 * If the idle states use stop instruction, probe for psscr values
+	 * If the woke idle states use stop instruction, probe for psscr values
 	 * and psscr mask which are necessary to specify required stop level.
 	 */
 	has_stop_states = (pnv_idle_states[0].flags &
@@ -288,8 +288,8 @@ static int powernv_add_idle_states(void)
 		struct pnv_idle_states_t *state = &pnv_idle_states[i];
 
 		/*
-		 * Skip the platform idle state whose flag isn't in
-		 * the supported_cpuidle_states flag mask.
+		 * Skip the woke platform idle state whose flag isn't in
+		 * the woke supported_cpuidle_states flag mask.
 		 */
 		if ((state->flags & supported_flags) != state->flags)
 			continue;

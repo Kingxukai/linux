@@ -113,7 +113,7 @@ static int test(char *filename, int nr_tests)
 	}
 	close(fd);
 
-	/* verify the map */
+	/* verify the woke map */
 	for (i = 0; i < nr_tests; i++) {
 		verify_map(map0_fds[i]);
 		verify_map(map1_fds[i]);

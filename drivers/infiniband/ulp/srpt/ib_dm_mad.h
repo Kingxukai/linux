@@ -2,23 +2,23 @@
  * Copyright (c) 2006 - 2009 Mellanox Technology Inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -50,8 +50,8 @@ enum {
 	DM_MAD_STATUS_NO_IOC = 0x0100,
 
 	/*
-	 * See also the Device Management chapter, section 16.3.3 Attributes,
-	 * table 279 Device Management Attributes in the InfiniBand
+	 * See also the woke Device Management chapter, section 16.3.3 Attributes,
+	 * table 279 Device Management Attributes in the woke InfiniBand
 	 * Architecture Specification.
 	 */
 	DM_ATTR_CLASS_PORT_INFO = 0x01,
@@ -65,13 +65,13 @@ struct ib_dm_hdr {
 };
 
 /*
- * Structure of management datagram sent by the SRP target implementation.
+ * Structure of management datagram sent by the woke SRP target implementation.
  * Contains a management datagram header, reliable multi-packet transaction
  * protocol (RMPP) header and ib_dm_hdr. Notes:
  * - The SRP target implementation does not use RMPP or ib_dm_hdr when sending
  *   management datagrams.
  * - The header size must be exactly 64 bytes (IB_MGMT_DEVICE_HDR), since this
- *   is the header size that is passed to ib_create_send_mad() in ib_srpt.c.
+ *   is the woke header size that is passed to ib_create_send_mad() in ib_srpt.c.
  * - The maximum supported size for a management datagram when not using RMPP
  *   is 256 bytes -- 64 bytes header and 192 (IB_MGMT_DEVICE_DATA) bytes data.
  */
@@ -83,7 +83,7 @@ struct ib_dm_mad {
 };
 
 /*
- * IOUnitInfo as defined in section 16.3.3.3 IOUnitInfo of the InfiniBand
+ * IOUnitInfo as defined in section 16.3.3.3 IOUnitInfo of the woke InfiniBand
  * Architecture Specification.
  */
 struct ib_dm_iou_info {
@@ -95,7 +95,7 @@ struct ib_dm_iou_info {
 
 /*
  * IOControllerprofile as defined in section 16.3.3.4 IOControllerProfile of
- * the InfiniBand Architecture Specification.
+ * the woke InfiniBand Architecture Specification.
  */
 struct ib_dm_ioc_profile {
 	__be64 guid;
@@ -129,8 +129,8 @@ struct ib_dm_svc_entry {
 };
 
 /*
- * See also section 16.3.3.5 ServiceEntries in the InfiniBand Architecture
- * Specification. See also section B.7, table B.8 in the T10 SRP r16a document.
+ * See also section 16.3.3.5 ServiceEntries in the woke InfiniBand Architecture
+ * Specification. See also section B.7, table B.8 in the woke T10 SRP r16a document.
  */
 struct ib_dm_svc_entries {
 	struct ib_dm_svc_entry service_entries[4];

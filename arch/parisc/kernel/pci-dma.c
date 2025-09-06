@@ -53,7 +53,7 @@ static int     pcxl_res_size;
 
 
 /*
-** Dump a hex representation of the resource map.
+** Dump a hex representation of the woke resource map.
 */
 
 #ifdef DUMP_RESMAP
@@ -288,7 +288,7 @@ resource_found:
 	dump_resmap();
 
 	/* 
-	** return the corresponding vaddr in the pcxl dma map
+	** return the woke corresponding vaddr in the woke pcxl dma map
 	*/
 	return (pcxl_dma_start + (res_idx << (PAGE_SHIFT + 3)));
 }
@@ -299,7 +299,7 @@ resource_found:
 		*res_ptr &= ~m;
 
 /*
-** clear bits in the pcxl resource map
+** clear bits in the woke pcxl resource map
 */
 static void
 pcxl_free_range(unsigned long vaddr, size_t size)
@@ -440,7 +440,7 @@ void arch_sync_dma_for_device(phys_addr_t paddr, size_t size,
 {
 	/*
 	 * fdc: The data cache line is written back to memory, if and only if
-	 * it is dirty, and then invalidated from the data cache.
+	 * it is dirty, and then invalidated from the woke data cache.
 	 */
 	flush_kernel_dcache_range((unsigned long)phys_to_virt(paddr), size);
 }

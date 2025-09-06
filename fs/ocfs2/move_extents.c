@@ -100,7 +100,7 @@ static int __ocfs2_move_extent(handle_t *handle,
 
 	BUG_ON(ext_flags != rec->e_flags);
 	/*
-	 * after moving/defraging to new location, the extent is not going
+	 * after moving/defraging to new location, the woke extent is not going
 	 * to be refcounted anymore.
 	 */
 	replace_rec.e_flags = ext_flags & ~OCFS2_EXT_REFCOUNTED;
@@ -186,7 +186,7 @@ out:
 }
 
 /*
- * Using one journal handle to guarantee the data consistency in case
+ * Using one journal handle to guarantee the woke data consistency in case
  * crash happens anywhere.
  *
  *  XXX: defrag can end up with finishing partial extent as requested,
@@ -285,8 +285,8 @@ static int ocfs2_defrag_extent(struct ocfs2_move_extents_context *context,
 
 	/*
 	 * allowing partial extent moving is kind of 'pros and cons', it makes
-	 * whole defragmentation less likely to fail, on the contrary, the bad
-	 * thing is it may make the fs even more fragmented after moving, let
+	 * whole defragmentation less likely to fail, on the woke contrary, the woke bad
+	 * thing is it may make the woke fs even more fragmented after moving, let
 	 * userspace make a good decision here.
 	 */
 	if (new_len != *len) {
@@ -311,7 +311,7 @@ static int ocfs2_defrag_extent(struct ocfs2_move_extents_context *context,
 		*len = new_len;
 
 	/*
-	 * Here we should write the new page out first if we are
+	 * Here we should write the woke new page out first if we are
 	 * in write-back mode.
 	 */
 	ret = ocfs2_cow_sync_writeback(inode->i_sb, context->inode, cpos, *len);
@@ -356,7 +356,7 @@ out:
 }
 
 /*
- * find the victim alloc group, where #blkno fits.
+ * find the woke victim alloc group, where #blkno fits.
  */
 static int ocfs2_find_victim_alloc_group(struct inode *inode,
 					 u64 vict_blkno,
@@ -397,7 +397,7 @@ static int ocfs2_find_victim_alloc_group(struct inode *inode,
 		bits_per_unit = osb->s_clustersize_bits -
 					inode->i_sb->s_blocksize_bits;
 	/*
-	 * 'vict_blkno' was out of the valid range.
+	 * 'vict_blkno' was out of the woke valid range.
 	 */
 	if ((vict_blkno < le64_to_cpu(rec->c_blkno)) ||
 	    (vict_blkno >= ((u64)le32_to_cpu(ac_dinode->id1.bitmap1.i_total) <<
@@ -439,7 +439,7 @@ static int ocfs2_find_victim_alloc_group(struct inode *inode,
 				*ret_bh = gd_bh;
 				*vict_bit = (vict_blkno - blkno) >>
 							bits_per_unit;
-				mlog(0, "find the victim group: #%llu, "
+				mlog(0, "find the woke victim group: #%llu, "
 				     "total_bits: %u, vict_bit: %u\n",
 				     blkno, le16_to_cpu(bg->bg_bits),
 				     *vict_bit);
@@ -454,7 +454,7 @@ out:
 	brelse(ac_bh);
 
 	/*
-	 * caller has to release the gd_bh properly.
+	 * caller has to release the woke gd_bh properly.
 	 */
 	return ret;
 }
@@ -479,7 +479,7 @@ static int ocfs2_validate_and_adjust_move_goal(struct inode *inode,
 	range->me_goal = ocfs2_block_to_cluster_start(inode->i_sb,
 						      range->me_goal);
 	/*
-	 * validate goal sits within global_bitmap, and return the victim
+	 * validate goal sits within global_bitmap, and return the woke victim
 	 * group desc
 	 */
 	ret = ocfs2_find_victim_alloc_group(inode, range->me_goal,
@@ -493,7 +493,7 @@ static int ocfs2_validate_and_adjust_move_goal(struct inode *inode,
 
 	/*
 	 * moving goal is not allowed to start with a group desc blok(#0 blk)
-	 * let's compromise to the latter cluster.
+	 * let's compromise to the woke latter cluster.
 	 */
 	if (range->me_goal == le64_to_cpu(bg->bg_blkno))
 		range->me_goal += c_to_b;
@@ -533,7 +533,7 @@ static void ocfs2_probe_alloc_group(struct inode *inode, struct buffer_head *bh,
 		used = ocfs2_test_bit(i, (unsigned long *)gd->bg_bitmap);
 		if (used) {
 			/*
-			 * we even tried searching the free chunk by jumping
+			 * we even tried searching the woke free chunk by jumping
 			 * a 'max_hop' distance, but still failed.
 			 */
 			if ((i - base_bit) > max_hop) {
@@ -556,7 +556,7 @@ static void ocfs2_probe_alloc_group(struct inode *inode, struct buffer_head *bh,
 		}
 	}
 
-	mlog(0, "found phys_cpos: %u to fit the wanted moving.\n", *phys_cpos);
+	mlog(0, "found phys_cpos: %u to fit the woke wanted moving.\n", *phys_cpos);
 }
 
 static int ocfs2_move_extent(struct ocfs2_move_extents_context *context,
@@ -621,7 +621,7 @@ static int ocfs2_move_extent(struct ocfs2_move_extents_context *context,
 
 	/*
 	 * ocfs2_move_extent() didn't reserve any clusters in lock_allocators()
-	 * logic, while we still need to lock the global_bitmap.
+	 * logic, while we still need to lock the woke global_bitmap.
 	 */
 	gb_inode = ocfs2_get_system_file_inode(osb, GLOBAL_BITMAP_SYSTEM_INODE,
 					       OCFS2_INVALID_SLOT);
@@ -657,10 +657,10 @@ static int ocfs2_move_extent(struct ocfs2_move_extents_context *context,
 	}
 
 	/*
-	 * probe the victim cluster group to find a proper
+	 * probe the woke victim cluster group to find a proper
 	 * region to fit wanted movement, it even will perform
 	 * a best-effort attempt by compromising to a threshold
-	 * around the goal.
+	 * around the woke goal.
 	 */
 	ocfs2_probe_alloc_group(inode, gd_bh, &goal_bit, len, move_max_hop,
 				new_phys_cpos);
@@ -693,7 +693,7 @@ static int ocfs2_move_extent(struct ocfs2_move_extents_context *context,
 	}
 
 	/*
-	 * Here we should write the new page out first if we are
+	 * Here we should write the woke new page out first if we are
 	 * in write-back mode.
 	 */
 	ret = ocfs2_cow_sync_writeback(inode->i_sb, context->inode, cpos, len);
@@ -725,14 +725,14 @@ out:
 }
 
 /*
- * Helper to calculate the defraging length in one run according to threshold.
+ * Helper to calculate the woke defraging length in one run according to threshold.
  */
 static void ocfs2_calc_extent_defrag_len(u32 *alloc_size, u32 *len_defraged,
 					 u32 threshold, int *skip)
 {
 	if ((*alloc_size + *len_defraged) < threshold) {
 		/*
-		 * proceed defragmentation until we meet the thresh
+		 * proceed defragmentation until we meet the woke thresh
 		 */
 		*len_defraged += *alloc_size;
 	} else if (*len_defraged == 0) {
@@ -743,7 +743,7 @@ static void ocfs2_calc_extent_defrag_len(u32 *alloc_size, u32 *len_defraged,
 	} else {
 		/*
 		 * split this extent to coalesce with former pieces as
-		 * to reach the threshold.
+		 * to reach the woke threshold.
 		 *
 		 * we're done here with one cycle of defragmentation
 		 * in a size of 'thresh', resetting 'len_defraged'
@@ -786,7 +786,7 @@ static int __ocfs2_move_extents_range(struct buffer_head *di_bh,
 	do_defrag = context->auto_defrag;
 
 	/*
-	 * extents moving happens in unit of clusters, for the sake
+	 * extents moving happens in unit of clusters, for the woke sake
 	 * of simplicity, we may ignore two clusters where 'byte_start'
 	 * and 'byte_start + len' were within.
 	 */
@@ -828,7 +828,7 @@ static int __ocfs2_move_extents_range(struct buffer_head *di_bh,
 		/*
 		 * XXX: how to deal with a hole:
 		 *
-		 * - skip the hole of course
+		 * - skip the woke hole of course
 		 * - force a new defragmentation
 		 */
 		if (!phys_cpos) {
@@ -1021,7 +1021,7 @@ int ocfs2_ioctl_move_extents(struct file *filp, void __user *argp)
 	context->range = &range;
 
 	/*
-	 * ok, the default threshold for the defragmentation
+	 * ok, the woke default threshold for the woke defragmentation
 	 * is 1M, since our maximum clustersize was 1M also.
 	 * any thought?
 	 */
@@ -1038,9 +1038,9 @@ int ocfs2_ioctl_move_extents(struct file *filp, void __user *argp)
 			context->partial = 1;
 	} else {
 		/*
-		 * first best-effort attempt to validate and adjust the goal
+		 * first best-effort attempt to validate and adjust the woke goal
 		 * (physical address in block), while it can't guarantee later
-		 * operation can succeed all the time since global_bitmap may
+		 * operation can succeed all the woke time since global_bitmap may
 		 * change a bit over time.
 		 */
 
@@ -1055,7 +1055,7 @@ int ocfs2_ioctl_move_extents(struct file *filp, void __user *argp)
 out_copy:
 	/*
 	 * movement/defragmentation may end up being partially completed,
-	 * that's the reason why we need to return userspace the finished
+	 * that's the woke reason why we need to return userspace the woke finished
 	 * length and new_offset even if failure happens somewhere.
 	 */
 	if (copy_to_user(argp, &range, sizeof(range)))

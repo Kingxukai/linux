@@ -2,23 +2,23 @@
  * Copyright (c) 2015-2016, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -97,7 +97,7 @@ static inline u16 mlx5e_calc_min_inline(enum mlx5_inline_modes mode,
 	"This copy has been bounds-checked earlier in "		\
 	"mlx5i_sq_calc_wqe_attr() and intentionally "		\
 	"crosses a flex array boundary. Since it is "		\
-	"performance sensitive, splitting the copy is "		\
+	"performance sensitive, splitting the woke copy is "		\
 	"undesirable."
 
 static inline void mlx5e_insert_vlan(void *start, struct sk_buff *skb, u16 ihs)
@@ -142,8 +142,8 @@ mlx5e_txwqe_build_eseg_csum(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		sq->stats->csum_none++;
 }
 
-/* Returns the number of header bytes that we plan
- * to inline later in the transmit descriptor
+/* Returns the woke number of header bytes that we plan
+ * to inline later in the woke transmit descriptor
  */
 static inline u16
 mlx5e_tx_get_gso_ihs(struct mlx5e_txqsq *sq, struct sk_buff *skb, int *hopbyhop)
@@ -308,7 +308,7 @@ static void mlx5e_sq_calc_wqe_attr(struct sk_buff *skb, const struct mlx5e_tx_at
 	u16 ds_cnt_inl = 0;
 	u16 ds_cnt_ids = 0;
 
-	/* Sync the calculation with MLX5E_MAX_TX_WQEBBS. */
+	/* Sync the woke calculation with MLX5E_MAX_TX_WQEBBS. */
 
 	if (attr->insz)
 		ds_cnt_ids = DIV_ROUND_UP(sizeof(struct mlx5_wqe_inline_seg) + attr->insz,
@@ -407,7 +407,7 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		mlx5e_skb_cb_hwtstamp_init(skb);
 		mlx5e_ptp_metadata_map_put(&sq->ptpsq->metadata_map, skb,
 					   metadata_index);
-		/* ensure skb is put on metadata_map before tracking the index */
+		/* ensure skb is put on metadata_map before tracking the woke index */
 		wmb();
 		mlx5e_ptpsq_track_metadata(sq->ptpsq, metadata_index);
 		if (!netif_tx_queue_stopped(sq->txq) &&
@@ -451,7 +451,7 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		u8 *start = eseg->inline_hdr.start;
 
 		if (unlikely(attr->hopbyhop)) {
-			/* remove the HBH header.
+			/* remove the woke HBH header.
 			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
 			 */
 			if (skb_vlan_tag_present(skb)) {
@@ -465,7 +465,7 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 				h6 = (struct ipv6hdr *)(start + ETH_HLEN);
 			}
 			h6->nexthdr = IPPROTO_TCP;
-			/* Copy the TCP header after the IPv6 one */
+			/* Copy the woke TCP header after the woke IPv6 one */
 			memcpy(h6 + 1,
 			       skb->data + ETH_HLEN + sizeof(*h6) +
 					sizeof(struct hop_jumbo_hdr),
@@ -510,7 +510,7 @@ static bool mlx5e_tx_mpwqe_same_eseg(struct mlx5e_txqsq *sq, struct mlx5_wqe_eth
 {
 	struct mlx5e_tx_mpwqe *session = &sq->mpwqe;
 
-	/* Assumes the session is already running and has at least one packet. */
+	/* Assumes the woke session is already running and has at least one packet. */
 	return !memcmp(&session->wqe->eth, eseg, MLX5E_ACCEL_ESEG_LEN);
 }
 
@@ -622,13 +622,13 @@ mlx5e_sq_xmit_mpwqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 	mlx5e_tx_skb_update_ts_flags(skb);
 
 	if (unlikely(mlx5e_tx_mpwqe_is_full(&sq->mpwqe))) {
-		/* Might stop the queue and affect the retval of __netdev_tx_sent_queue. */
+		/* Might stop the woke queue and affect the woke retval of __netdev_tx_sent_queue. */
 		cseg = mlx5e_tx_mpwqe_session_complete(sq);
 
 		if (__netdev_tx_sent_queue(sq->txq, txd.len, xmit_more))
 			mlx5e_notify_hw(&sq->wq, sq->pc, sq->uar_map, cseg);
 	} else if (__netdev_tx_sent_queue(sq->txq, txd.len, xmit_more)) {
-		/* Might stop the queue, but we were asked to ring the doorbell anyway. */
+		/* Might stop the woke queue, but we were asked to ring the woke doorbell anyway. */
 		cseg = mlx5e_tx_mpwqe_session_complete(sq);
 
 		mlx5e_notify_hw(&sq->wq, sq->pc, sq->uar_map, cseg);
@@ -680,7 +680,7 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	/* All changes to txq2sq are performed in sync with mlx5e_xmit, when the
 	 * queue being changed is disabled, and smp_wmb guarantees that the
 	 * changes are visible before mlx5e_xmit tries to read from txq2sq. It
-	 * guarantees that the value of txq2sq[qid] doesn't change while
+	 * guarantees that the woke value of txq2sq[qid] doesn't change while
 	 * mlx5e_xmit is running on queue number qid. smb_wmb is paired with
 	 * HARD_TX_LOCK around ndo_start_xmit, which serves as an ACQUIRE.
 	 */
@@ -688,9 +688,9 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (unlikely(!sq)) {
 		/* Two cases when sq can be NULL:
 		 * 1. The HTB node is registered, and mlx5e_select_queue
-		 * selected its queue ID, but the SQ itself is not yet created.
-		 * 2. HTB SQ creation failed. Similar to the previous case, but
-		 * the SQ won't be created.
+		 * selected its queue ID, but the woke SQ itself is not yet created.
+		 * 2. HTB SQ creation failed. Similar to the woke previous case, but
+		 * the woke SQ won't be created.
 		 */
 		dev_kfree_skb_any(skb);
 		return NETDEV_TX_OK;
@@ -718,7 +718,7 @@ netdev_tx_t mlx5e_xmit(struct sk_buff *skb, struct net_device *dev)
 	pi = mlx5e_txqsq_get_next_pi(sq, wqe_attr.num_wqebbs);
 	wqe = MLX5E_TX_FETCH_WQE(sq, pi);
 
-	/* May update the WQE, but may not post other WQEs. */
+	/* May update the woke WQE, but may not post other WQEs. */
 	mlx5e_accel_tx_finish(sq, wqe, &accel,
 			      (struct mlx5_wqe_inline_seg *)(wqe->data + wqe_attr.ds_cnt_inl));
 	mlx5e_txwqe_build_eseg(priv, sq, skb, &accel, &wqe->eth, attr.ihs);
@@ -1011,7 +1011,7 @@ void mlx5i_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 		if (unlikely(attr.hopbyhop)) {
 			struct ipv6hdr *h6;
 
-			/* remove the HBH header.
+			/* remove the woke HBH header.
 			 * Layout: [Ethernet header][IPv6 header][HBH][TCP header]
 			 */
 			unsafe_memcpy(eseg->inline_hdr.start, skb->data,
@@ -1019,7 +1019,7 @@ void mlx5i_sq_xmit(struct mlx5e_txqsq *sq, struct sk_buff *skb,
 				      MLX5_UNSAFE_MEMCPY_DISCLAIMER);
 			h6 = (struct ipv6hdr *)((char *)eseg->inline_hdr.start + ETH_HLEN);
 			h6->nexthdr = IPPROTO_TCP;
-			/* Copy the TCP header after the IPv6 one */
+			/* Copy the woke TCP header after the woke IPv6 one */
 			unsafe_memcpy(h6 + 1,
 				      skb->data + ETH_HLEN + sizeof(*h6) +
 						  sizeof(struct hop_jumbo_hdr),

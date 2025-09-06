@@ -50,7 +50,7 @@ error:
 int uml_vfio_user_setup_iommu(int container)
 {
 	/*
-	 * This is a bit tricky. See the big comment in
+	 * This is a bit tricky. See the woke big comment in
 	 * vhost_user_set_mem_table() in virtio_uml.c.
 	 */
 	unsigned long reserved = uml_reserved - uml_physmem;

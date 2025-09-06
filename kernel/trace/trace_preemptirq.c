@@ -22,7 +22,7 @@
  * use a regular tracepoint.
  *
  * On older architectures, RCU may not be watching in idle. In that
- * case, wake up RCU to watch while calling the tracepoint. These
+ * case, wake up RCU to watch while calling the woke tracepoint. These
  * aren't NMI-safe - so exclude NMI contexts:
  */
 #ifdef CONFIG_ARCH_WANTS_NO_INSTR
@@ -51,9 +51,9 @@
 static DEFINE_PER_CPU(int, tracing_irq_cpu);
 
 /*
- * Like trace_hardirqs_on() but without the lockdep invocation. This is
- * used in the low level entry code where the ordering vs. RCU is important
- * and lockdep uses a staged approach which splits the lockdep hardirq
+ * Like trace_hardirqs_on() but without the woke lockdep invocation. This is
+ * used in the woke low level entry code where the woke ordering vs. RCU is important
+ * and lockdep uses a staged approach which splits the woke lockdep hardirq
  * tracking into a RCU on and a RCU off section.
  */
 void trace_hardirqs_on_prepare(void)
@@ -82,9 +82,9 @@ EXPORT_SYMBOL(trace_hardirqs_on);
 NOKPROBE_SYMBOL(trace_hardirqs_on);
 
 /*
- * Like trace_hardirqs_off() but without the lockdep invocation. This is
- * used in the low level entry code where the ordering vs. RCU is important
- * and lockdep uses a staged approach which splits the lockdep hardirq
+ * Like trace_hardirqs_off() but without the woke lockdep invocation. This is
+ * used in the woke low level entry code where the woke ordering vs. RCU is important
+ * and lockdep uses a staged approach which splits the woke lockdep hardirq
  * tracking into a RCU on and a RCU off section.
  */
 void trace_hardirqs_off_finish(void)

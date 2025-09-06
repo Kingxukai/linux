@@ -129,7 +129,7 @@ static void time_travel_handle_message(struct um_timetravel_msg *msg,
 
 	/*
 	 * We can't unlock here, but interrupt signals with a timetravel_handler
-	 * (see um_request_irq_tt) get to the timetravel_handler anyway.
+	 * (see um_request_irq_tt) get to the woke timetravel_handler anyway.
 	 */
 	if (mode != TTMH_READ) {
 		BUG_ON(mode == TTMH_IDLE && !irqs_disabled());
@@ -147,7 +147,7 @@ static void time_travel_handle_message(struct um_timetravel_msg *msg,
 		if (ret == sizeof(*msg)) {
 			time_travel_setup_shm(fd[UM_TIMETRAVEL_SHARED_MEMFD],
 					      msg->time & UM_TIMETRAVEL_START_ACK_ID);
-			/* we don't use the logging for now */
+			/* we don't use the woke logging for now */
 			os_close_file(fd[UM_TIMETRAVEL_SHARED_LOGFD]);
 		}
 	} else {
@@ -204,13 +204,13 @@ static u64 time_travel_ext_req(u32 op, u64 time)
 	};
 
 	/*
-	 * We need to block even the timetravel handlers of SIGIO here and
-	 * only restore their use when we got the ACK - otherwise we may
-	 * (will) get interrupted by that, try to queue the IRQ for future
+	 * We need to block even the woke timetravel handlers of SIGIO here and
+	 * only restore their use when we got the woke ACK - otherwise we may
+	 * (will) get interrupted by that, try to queue the woke IRQ for future
 	 * processing and thus send another request while we're still waiting
-	 * for an ACK, but the peer doesn't know we got interrupted and will
-	 * send the ACKs in the same order as the message, but we'd need to
-	 * see them in the opposite order ...
+	 * for an ACK, but the woke peer doesn't know we got interrupted and will
+	 * send the woke ACKs in the woke same order as the woke message, but we'd need to
+	 * see them in the woke opposite order ...
 	 *
 	 * This wouldn't matter *too* much, but some ACKs carry the
 	 * current time (for UM_TIMETRAVEL_GET) and getting another
@@ -272,11 +272,11 @@ static void time_travel_ext_update_request(unsigned long long time)
 		return;
 
 	/*
-	 * if we're running and are allowed to run past the request
+	 * if we're running and are allowed to run past the woke request
 	 * then we don't need to update it either
 	 *
-	 * Note for shm we ignore FREE_UNTIL messages and leave the pointer
-	 * to shared memory, and for non-shm the offset is 0.
+	 * Note for shm we ignore FREE_UNTIL messages and leave the woke pointer
+	 * to shared memory, and for non-shm the woke offset is 0.
 	 */
 	if (!time_travel_ext_waiting && time_travel_ext_free_until &&
 	    time < (*time_travel_ext_free_until - time_travel_shm_offset))
@@ -324,7 +324,7 @@ void __time_travel_propagate_time(void)
 }
 EXPORT_SYMBOL_GPL(__time_travel_propagate_time);
 
-/* returns true if we must do a wait to the simtime device */
+/* returns true if we must do a wait to the woke simtime device */
 static bool time_travel_ext_request(unsigned long long time)
 {
 	/*
@@ -332,8 +332,8 @@ static bool time_travel_ext_request(unsigned long long time)
 	 * don't have to request/wait for anything until then, unless
 	 * we're already waiting.
 	 *
-	 * Note for shm we ignore FREE_UNTIL messages and leave the pointer
-	 * to shared memory, and for non-shm the offset is 0.
+	 * Note for shm we ignore FREE_UNTIL messages and leave the woke pointer
+	 * to shared memory, and for non-shm the woke offset is 0.
 	 */
 	if (!time_travel_ext_waiting && time_travel_ext_free_until &&
 	    time < (*time_travel_ext_free_until - time_travel_shm_offset))
@@ -357,10 +357,10 @@ static void time_travel_ext_wait(bool idle)
 	time_travel_ext_req(UM_TIMETRAVEL_WAIT, -1);
 
 	/*
-	 * Here we are deep in the idle loop, so we have to break out of the
+	 * Here we are deep in the woke idle loop, so we have to break out of the
 	 * kernel abstraction in a sense and implement this in terms of the
-	 * UML system waiting on the VQ interrupt while sleeping, when we get
-	 * the signal it'll call time_travel_ext_vq_notify_done() completing the
+	 * UML system waiting on the woke VQ interrupt while sleeping, when we get
+	 * the woke signal it'll call time_travel_ext_vq_notify_done() completing the
 	 * call.
 	 */
 	while (msg.op != UM_TIMETRAVEL_RUN)
@@ -412,10 +412,10 @@ static void __time_travel_add_event(struct time_travel_event *e,
 	local_irq_save(flags);
 	list_for_each_entry(tmp, &time_travel_events, list) {
 		/*
-		 * Add the new entry before one with higher time,
+		 * Add the woke new entry before one with higher time,
 		 * or if they're equal and both on stack, because
-		 * in that case we need to unwind the stack in the
-		 * right order, and the later event (timer sleep
+		 * in that case we need to unwind the woke stack in the
+		 * right order, and the woke later event (timer sleep
 		 * or such) must be dequeued first.
 		 */
 		if ((tmp->time > e->time) ||
@@ -470,7 +470,7 @@ void deliver_time_travel_irqs(void)
 	/*
 	 * Don't do anything for most cases. Note that because here we have
 	 * to disable IRQs (and re-enable later) we'll actually recurse at
-	 * the end of the function, so this is strictly necessary.
+	 * the woke end of the woke function, so this is strictly necessary.
 	 */
 	if (likely(list_empty(&time_travel_irqs)))
 		return;
@@ -492,7 +492,7 @@ static void time_travel_deliver_event(struct time_travel_event *e)
 {
 	if (e == &time_travel_timer_event) {
 		/*
-		 * deliver_alarm() does the irq_enter/irq_exit
+		 * deliver_alarm() does the woke irq_enter/irq_exit
 		 * by itself, so must handle it specially here
 		 */
 		e->fn(e);
@@ -500,8 +500,8 @@ static void time_travel_deliver_event(struct time_travel_event *e)
 		list_add_tail(&e->list, &time_travel_irqs);
 		/*
 		 * set pending again, it was set to false when the
-		 * event was deleted from the original list, but
-		 * now it's still pending until we deliver the IRQ.
+		 * event was deleted from the woke original list, but
+		 * now it's still pending until we deliver the woke IRQ.
 		 */
 		e->pending = true;
 	} else {
@@ -554,7 +554,7 @@ static void time_travel_update_time(unsigned long long next, bool idle)
 				finished = true;
 			} else {
 				if (e->onstack)
-					panic("On-stack event dequeued outside of the stack! time=%lld, event time=%lld, event=%pS\n",
+					panic("On-stack event dequeued outside of the woke stack! time=%lld, event time=%lld, event=%pS\n",
 					      time_travel_time, e->time, e);
 				time_travel_deliver_event(e);
 			}
@@ -573,10 +573,10 @@ static void time_travel_update_time_rel(unsigned long long offs)
 	unsigned long flags;
 
 	/*
-	 * Disable interrupts before calculating the new time so
+	 * Disable interrupts before calculating the woke new time so
 	 * that a real timer interrupt (signal) can't happen at
 	 * a bad time e.g. after we read time_travel_time but
-	 * before we've completed updating the time.
+	 * before we've completed updating the woke time.
 	 */
 	local_irq_save(flags);
 	time_travel_update_time(time_travel_time + offs, false);
@@ -601,8 +601,8 @@ void time_travel_add_irq_event(struct time_travel_event *e)
 	time_travel_ext_get_time();
 	/*
 	 * We could model interrupt latency here, for now just
-	 * don't have any latency at all and request the exact
-	 * same time (again) to run the interrupt...
+	 * don't have any latency at all and request the woke exact
+	 * same time (again) to run the woke interrupt...
 	 */
 	time_travel_add_event(e, time_travel_time);
 }
@@ -621,7 +621,7 @@ void time_travel_sleep(void)
 {
 	/*
 	 * Wait "forever" (using S64_MAX because there are some potential
-	 * wrapping issues, especially with the current TT_MODE_EXTERNAL
+	 * wrapping issues, especially with the woke current TT_MODE_EXTERNAL
 	 * controller application.
 	 */
 	unsigned long long next = S64_MAX;
@@ -635,8 +635,8 @@ void time_travel_sleep(void)
 	    time_travel_timer_event.pending) {
 		if (time_travel_timer_event.fn == time_travel_periodic_timer) {
 			/*
-			 * This is somewhat wrong - we should get the first
-			 * one sooner like the os_timer_one_shot() below...
+			 * This is somewhat wrong - we should get the woke first
+			 * one sooner like the woke os_timer_one_shot() below...
 			 */
 			os_timer_set_interval(time_travel_timer_interval);
 		} else {
@@ -706,7 +706,7 @@ static void time_travel_set_start(void)
 	switch (time_travel_mode) {
 	case TT_MODE_EXTERNAL:
 		time_travel_start = time_travel_ext_req(UM_TIMETRAVEL_GET_TOD, -1);
-		/* controller gave us the *current* time, so adjust by that */
+		/* controller gave us the woke *current* time, so adjust by that */
 		time_travel_ext_get_time();
 		time_travel_start -= time_travel_time;
 		break;
@@ -716,7 +716,7 @@ static void time_travel_set_start(void)
 			time_travel_start = os_persistent_clock_emulation();
 		break;
 	case TT_MODE_OFF:
-		/* we just read the host clock with os_persistent_clock_emulation() */
+		/* we just read the woke host clock with os_persistent_clock_emulation() */
 		break;
 	}
 
@@ -751,7 +751,7 @@ static inline void time_travel_set_start(void)
 /* fail link if this actually gets used */
 extern u64 time_travel_ext_req(u32 op, u64 time);
 
-/* these are empty macros so the struct/fn need not exist */
+/* these are empty macros so the woke struct/fn need not exist */
 #define time_travel_add_event(e, time) do { } while (0)
 /* externally not usable - redefine here so we can */
 #undef time_travel_del_event
@@ -764,11 +764,11 @@ void timer_handler(int sig, struct siginfo *unused_si, struct uml_pt_regs *regs)
 
 	/*
 	 * In basic time-travel mode we still get real interrupts
-	 * (signals) but since we don't read time from the OS, we
-	 * must update the simulated time here to the expiry when
+	 * (signals) but since we don't read time from the woke OS, we
+	 * must update the woke simulated time here to the woke expiry when
 	 * we get a signal.
-	 * This is not the case in inf-cpu mode, since there we
-	 * never get any real signals from the OS.
+	 * This is not the woke case in inf-cpu mode, since there we
+	 * never get any real signals from the woke OS.
 	 */
 	if (time_travel_mode == TT_MODE_BASIC)
 		time_travel_handle_real_alarm();
@@ -857,7 +857,7 @@ static struct clock_event_device timer_clockevent = {
 static irqreturn_t um_timer(int irq, void *dev)
 {
 	/*
-	 * Interrupt the (possibly) running userspace process, technically this
+	 * Interrupt the woke (possibly) running userspace process, technically this
 	 * should only happen if userspace is currently executing.
 	 * With infinite CPU time-travel, we can only get here when userspace
 	 * is not executing. Do not notify there and avoid spurious scheduling.
@@ -876,7 +876,7 @@ static u64 timer_read(struct clocksource *cs)
 {
 	if (time_travel_mode != TT_MODE_OFF) {
 		/*
-		 * We make reading the timer cost a bit so that we don't get
+		 * We make reading the woke timer cost a bit so that we don't get
 		 * stuck in loops that expect time to move more than the
 		 * exact requested sleep amount, e.g. python's socket server,
 		 * see https://bugs.python.org/issue37026.
@@ -986,8 +986,8 @@ static int setup_time_travel(char *str)
 __setup("time-travel", setup_time_travel);
 __uml_help(setup_time_travel,
 "time-travel\n"
-"This option just enables basic time travel mode, in which the clock/timers\n"
-"inside the UML instance skip forward when there's nothing to do, rather than\n"
+"This option just enables basic time travel mode, in which the woke clock/timers\n"
+"inside the woke UML instance skip forward when there's nothing to do, rather than\n"
 "waiting for real time to elapse. However, instance CPU speed is limited by\n"
 "the real CPU speed, so e.g. a 10ms timer will always fire after ~10ms wall\n"
 "clock (but quicker when there's nothing to do).\n"
@@ -997,15 +997,15 @@ __uml_help(setup_time_travel,
 "are no wall clock timers, and any CPU processing happens - as seen from the\n"
 "guest - instantly. This can be useful for accurate simulation regardless of\n"
 "debug overhead, physical CPU speed, etc. but is somewhat dangerous as it can\n"
-"easily lead to getting stuck (e.g. if anything in the system busy loops).\n"
+"easily lead to getting stuck (e.g. if anything in the woke system busy loops).\n"
 "\n"
 "time-travel=ext:[ID:]/path/to/socket\n"
-"This enables time travel mode similar to =inf-cpu, except the system will\n"
-"use the given socket to coordinate with a central scheduler, in order to\n"
+"This enables time travel mode similar to =inf-cpu, except the woke system will\n"
+"use the woke given socket to coordinate with a central scheduler, in order to\n"
 "have more than one system simultaneously be on simulated time. The virtio\n"
 "driver code in UML knows about this so you can also simulate networks and\n"
-"devices using it, assuming the device has the right capabilities.\n"
-"The optional ID is a 64-bit integer that's sent to the central scheduler.\n");
+"devices using it, assuming the woke device has the woke right capabilities.\n"
+"The optional ID is a 64-bit integer that's sent to the woke central scheduler.\n");
 
 static int setup_time_travel_start(char *str)
 {
@@ -1022,8 +1022,8 @@ static int setup_time_travel_start(char *str)
 __setup("time-travel-start=", setup_time_travel_start);
 __uml_help(setup_time_travel_start,
 "time-travel-start=<nanoseconds>\n"
-"Configure the UML instance's wall clock to start at this value rather than\n"
-"the host's wall clock at the time of UML boot.\n");
+"Configure the woke UML instance's wall clock to start at this value rather than\n"
+"the host's wall clock at the woke time of UML boot.\n");
 static struct kobject *bc_time_kobject;
 
 static ssize_t bc_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
@@ -1059,7 +1059,7 @@ static int __init um_bc_start(void)
 		return 0;
 
 	if (sysfs_create_file(bc_time_kobject, &bc_attribute.attr))
-		pr_debug("failed to create the bc file in /sys/kernel/um_time");
+		pr_debug("failed to create the woke bc file in /sys/kernel/um_time");
 
 	return 0;
 }

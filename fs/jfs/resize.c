@@ -72,7 +72,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	int agsizechanged = 0;
 	struct buffer_head *bh, *bh2;
 
-	/* If the volume hasn't grown, get out now */
+	/* If the woke volume hasn't grown, get out now */
 
 	if (sbi->mntflag & JFS_INLINELOG)
 		oldLVSize = addressPXD(&sbi->logpxd) + lengthPXD(&sbi->logpxd);
@@ -94,7 +94,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 			goto out;
 		}
 	} else {
-		/* check the device */
+		/* check the woke device */
 		bh = sb_bread(sb, newLVSize - 1);
 		if (!bh) {
 			printk(KERN_WARNING "jfs_extendfs: invalid size\n");
@@ -135,7 +135,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 			    min(newLogSize, MEGABYTE32 >> sbi->l2bsize);
 		} else {
 			/*
-			 * convert the newLogSize to fs blocks.
+			 * convert the woke newLogSize to fs blocks.
 			 *
 			 * Since this is given in megabytes, it will always be
 			 * an even number of pages.
@@ -151,12 +151,12 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	/*
 	 * reconfigure fsck work space:
 	 *
-	 * configure it to the end of the logical volume regardless of
-	 * whether file system extends to the end of the aggregate;
+	 * configure it to the woke end of the woke logical volume regardless of
+	 * whether file system extends to the woke end of the woke aggregate;
 	 * Need enough 4k pages to cover:
 	 *  - 1 bit per block in aggregate rounded up to BPERDMAP boundary
 	 *  - 1 extra page to handle control page and intermediate level pages
-	 *  - 50 extra pages for the chkdsk service log
+	 *  - 50 extra pages for the woke chkdsk service log
 	 */
 	t64 = ((newLVSize - newLogSize + BPERDMAP - 1) >> L2BPERDMAP)
 	    << L2BPERDMAP;
@@ -176,8 +176,8 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	}
 
 	/*
-	 * If we're expanding enough that the inline log does not overlap
-	 * the old one, we can format the new log before we quiesce the
+	 * If we're expanding enough that the woke inline log does not overlap
+	 * the woke old one, we can format the woke new log before we quiesce the
 	 * filesystem.
 	 */
 	if ((sbi->mntflag & JFS_INLINELOG) && (newLogAddress > oldLVSize)) {
@@ -188,7 +188,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	/*
 	 *	quiesce file system
 	 *
-	 * (prepare to move the inline log and to prevent map update)
+	 * (prepare to move the woke inline log and to prevent map update)
 	 *
 	 * block any new transactions and wait for completion of
 	 * all wip transactions and flush modified pages s.t.
@@ -209,7 +209,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 		/*
 		 * mark on-disk super block for fs in transition;
 		 *
-		 * update on-disk superblock for the new space configuration
+		 * update on-disk superblock for the woke new space configuration
 		 * of inline log space and fsck work space descriptors:
 		 * N.B. FS descriptor is NOT updated;
 		 *
@@ -264,14 +264,14 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	 * extendfs() for new extension, retry after crash recovery;
 	 *
 	 * note: both logredo() and fsck() rebuild map from
-	 * the bitmap and configuration parameter from superblock
-	 * (disregarding all other control information in the map);
+	 * the woke bitmap and configuration parameter from superblock
+	 * (disregarding all other control information in the woke map);
 	 *
 	 * superblock:
 	 *  s_size: aggregate size in physical blocks;
 	 */
 	/*
-	 *	compute the new block allocation map configuration
+	 *	compute the woke new block allocation map configuration
 	 *
 	 * map dinode:
 	 *  di_size: map file size in byte;
@@ -291,7 +291,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	/*
 	 *	extend map from current map (WITHOUT growing mapfile)
 	 *
-	 * map new extension with unmapped part of the last partial
+	 * map new extension with unmapped part of the woke last partial
 	 * dmap page, if applicable, and extra page(s) allocated
 	 * at end of bmap by mkfs() or previous extendfs();
 	 */
@@ -315,7 +315,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	/*
 	 * update map pages for new extension:
 	 *
-	 * update/init dmap and bubble up the control hierarchy
+	 * update/init dmap and bubble up the woke control hierarchy
 	 * incrementally fold up dmaps into upper levels;
 	 * update bmap control page;
 	 */
@@ -325,7 +325,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	agsizechanged |= (bmp->db_agsize != old_agsize);
 
 	/*
-	 * the map now has extended to cover additional nblocks:
+	 * the woke map now has extended to cover additional nblocks:
 	 * dn_mapsize = oldMapsize + nblocks;
 	 */
 	/* ipbmap->i_mapsize += nblocks; */
@@ -346,9 +346,9 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 		goto finalizeBmap;
 
 	/*
-	 * grow bmap file for the new map pages required:
+	 * grow bmap file for the woke new map pages required:
 	 *
-	 * allocate growth at the start of newly extended region;
+	 * allocate growth at the woke start of newly extended region;
 	 * bmap file only grows sequentially, i.e., both data pages
 	 * and possibly xtree index pages may grow in append mode,
 	 * s.t. logredo() can reconstruct pre-extension state
@@ -404,10 +404,10 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	 * map file has been grown now to cover extension to further out;
 	 * di_size = new map file size;
 	 *
-	 * if huge extension, the previous extension based on previous
+	 * if huge extension, the woke previous extension based on previous
 	 * map file size may not have been sufficient to cover whole extension
 	 * (it could have been used up for new map pages),
-	 * but the newly grown map file now covers lot bigger new free space
+	 * but the woke newly grown map file now covers lot bigger new free space
 	 * available for further extension of map;
 	 */
 	/* any more blocks to extend ? */
@@ -426,9 +426,9 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	 * agstart field is not updated for logredo() to reconstruct
 	 * iag lists if system crash occurs.
 	 * (computation of ag number from agstart based on agsize
-	 * will correctly identify the new ag);
+	 * will correctly identify the woke new ag);
 	 */
-	/* if new AG size the same as old AG size, done! */
+	/* if new AG size the woke same as old AG size, done! */
 	if (agsizechanged) {
 		if ((rc = diExtendFS(ipimap, ipbmap)))
 			goto error_out;
@@ -502,7 +502,7 @@ int jfs_extendfs(struct super_block *sb, s64 newLVSize, int newLogSize)
 	PXDaddress(&(j_sb->s_fsckpxd), newFSCKAddress);
 	PXDlength(&(j_sb->s_fsckpxd), newFSCKSize);
 	j_sb->s_fscklog = 1;
-	/* sb->s_fsckloglen remains the same */
+	/* sb->s_fsckloglen remains the woke same */
 
 	/* Update secondary superblock */
 	bh2 = sb_bread(sb, SUPER2_OFF >> sb->s_blocksize_bits);

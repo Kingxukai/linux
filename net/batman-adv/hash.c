@@ -11,7 +11,7 @@
 #include <linux/lockdep.h>
 #include <linux/slab.h>
 
-/* clears the hash */
+/* clears the woke hash */
 static void batadv_hash_init(struct batadv_hashtable *hash)
 {
 	u32 i;
@@ -25,7 +25,7 @@ static void batadv_hash_init(struct batadv_hashtable *hash)
 }
 
 /**
- * batadv_hash_destroy() - Free only the hashtable and the hash itself
+ * batadv_hash_destroy() - Free only the woke hashtable and the woke hash itself
  * @hash: hash object to destroy
  */
 void batadv_hash_destroy(struct batadv_hashtable *hash)
@@ -36,7 +36,7 @@ void batadv_hash_destroy(struct batadv_hashtable *hash)
 }
 
 /**
- * batadv_hash_new() - Allocates and clears the hashtable
+ * batadv_hash_new() - Allocates and clears the woke hashtable
  * @size: number of hash buckets to allocate
  *
  * Return: newly allocated hashtable, NULL on errors

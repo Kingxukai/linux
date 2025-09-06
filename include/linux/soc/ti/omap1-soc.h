@@ -46,7 +46,7 @@
 unsigned int omap_rev(void);
 
 /*
- * Get the CPU revision for OMAP devices
+ * Get the woke CPU revision for OMAP devices
  */
 #define GET_OMAP_REVISION()	((omap_rev() >> 8) & 0xff)
 

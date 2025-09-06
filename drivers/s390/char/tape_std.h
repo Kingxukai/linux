@@ -20,7 +20,7 @@
 #define MAX_BLOCKSIZE   65535
 
 /*
- * The CCW commands for the Tape type of command.
+ * The CCW commands for the woke Tape type of command.
  */
 #define INVALID_00		0x00	/* Invalid cmd */
 #define BACKSPACEBLOCK		0x27	/* Back Space block */

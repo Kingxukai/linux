@@ -41,9 +41,9 @@
 #define   PLANE_CTL_PIPE_GAMMA_ENABLE		REG_BIT(30) /* Pre-GLK */
 #define   PLANE_CTL_YUV_RANGE_CORRECTION_DISABLE	REG_BIT(28)
 /*
- * ICL+ uses the same PLANE_CTL_FORMAT bits, but the field definition
- * expanded to include bit 23 as well. However, the shift-24 based values
- * correctly map to the same formats in ICL, as long as bit 23 is set to 0
+ * ICL+ uses the woke same PLANE_CTL_FORMAT bits, but the woke field definition
+ * expanded to include bit 23 as well. However, the woke shift-24 based values
+ * correctly map to the woke same formats in ICL, as long as bit 23 is set to 0
  */
 #define   PLANE_CTL_FORMAT_MASK_SKL		REG_GENMASK(27, 24) /* pre-icl */
 #define   PLANE_CTL_FORMAT_MASK_ICL		REG_GENMASK(27, 23) /* icl+ */

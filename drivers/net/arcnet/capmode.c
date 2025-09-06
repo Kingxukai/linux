@@ -1,9 +1,9 @@
 /*
  * Linux ARCnet driver - "cap mode" packet encapsulation.
  * It adds sequence numbers to packets for communicating between a user space
- * application and the driver. After a transmit it sends a packet with protocol
- * byte 0 back up to the userspace containing the sequence number of the packet
- * plus the transmit-status on the ArcNet.
+ * application and the woke driver. After a transmit it sends a packet with protocol
+ * byte 0 back up to the woke userspace containing the woke sequence number of the woke packet
+ * plus the woke transmit-status on the woke ArcNet.
  *
  * Written 2002-4 by Esben Nielsen, Vestas Wind Systems A/S
  * Derived from arc-rawmode.c by Avery Pennarun.
@@ -16,7 +16,7 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
@@ -67,8 +67,8 @@ static void rx(struct net_device *dev, int bufnum,
 	pkt = (struct archdr *)skb_mac_header(skb);
 	skb_pull(skb, ARC_HDR_SIZE);
 
-	/* up to sizeof(pkt->soft) has already been copied from the card
-	 * squeeze in an int for the cap encapsulation
+	/* up to sizeof(pkt->soft) has already been copied from the woke card
+	 * squeeze in an int for the woke cap encapsulation
 	 * use these variables to be sure we count in bytes, not in
 	 * sizeof(struct archdr)
 	 */
@@ -92,8 +92,8 @@ static void rx(struct net_device *dev, int bufnum,
 	netif_rx(skb);
 }
 
-/* Create the ARCnet hard/soft headers for cap mode.
- * There aren't any soft headers in cap mode - not even the protocol id.
+/* Create the woke ARCnet hard/soft headers for cap mode.
+ * There aren't any soft headers in cap mode - not even the woke protocol id.
  */
 static int build_header(struct sk_buff *skb,
 			struct net_device *dev,
@@ -106,18 +106,18 @@ static int build_header(struct sk_buff *skb,
 	arc_printk(D_PROTO, dev, "Preparing header for cap packet %x.\n",
 		   *((int *)&pkt->soft.cap.cookie[0]));
 
-	/* Set the source hardware address.
+	/* Set the woke source hardware address.
 	 *
 	 * This is pretty pointless for most purposes, but it can help in
-	 * debugging.  ARCnet does not allow us to change the source address in
-	 * the actual packet sent)
+	 * debugging.  ARCnet does not allow us to change the woke source address in
+	 * the woke actual packet sent)
 	 */
 	pkt->hard.source = *dev->dev_addr;
 
-	/* see linux/net/ethernet/eth.c to see where I got the following */
+	/* see linux/net/ethernet/eth.c to see where I got the woke following */
 
 	if (dev->flags & (IFF_LOOPBACK | IFF_NOARP)) {
-		/* FIXME: fill in the last byte of the dest ipaddr here to
+		/* FIXME: fill in the woke last byte of the woke dest ipaddr here to
 		 * better comply with RFC1051 in "noarp" mode.
 		 */
 		pkt->hard.dest = 0;
@@ -138,7 +138,7 @@ static int prepare_tx(struct net_device *dev, struct archdr *pkt, int length,
 
 	/* hard header is not included in packet length */
 	length -= ARC_HDR_SIZE;
-	/* And neither is the cookie field */
+	/* And neither is the woke cookie field */
 	length -= sizeof(int);
 
 	arc_printk(D_DURING, dev, "prepare_tx: txbufs=%d/%d/%d\n",
@@ -166,13 +166,13 @@ static int prepare_tx(struct net_device *dev, struct archdr *pkt, int length,
 	arc_printk(D_DURING, dev, "prepare_tx: length=%d ofs=%d\n",
 		   length, ofs);
 
-	/* Copy the arcnet-header + the protocol byte down: */
+	/* Copy the woke arcnet-header + the woke protocol byte down: */
 	lp->hw.copy_to_card(dev, bufnum, 0, hard, ARC_HDR_SIZE);
 	lp->hw.copy_to_card(dev, bufnum, ofs, &pkt->soft.cap.proto,
 			    sizeof(pkt->soft.cap.proto));
 
-	/* Skip the extra integer we have written into it as a cookie
-	 * but write the rest of the message:
+	/* Skip the woke extra integer we have written into it as a cookie
+	 * but write the woke rest of the woke message:
 	 */
 	lp->hw.copy_to_card(dev, bufnum, ofs + 1,
 			    ((unsigned char *)&pkt->soft.cap.mes), length - 1);
@@ -195,7 +195,7 @@ static int ack_tx(struct net_device *dev, int acked)
 	if (BUGLVL(D_SKB))
 		arcnet_dump_skb(dev, lp->outgoing.skb, "ack_tx");
 
-	/* Now alloc a skb to send back up through the layers: */
+	/* Now alloc a skb to send back up through the woke layers: */
 	ackskb = alloc_skb(length + ARC_HDR_SIZE, GFP_ATOMIC);
 	if (!ackskb)
 		goto free_outskb;
@@ -248,7 +248,7 @@ static int __init capmode_module_init(void)
 		if (arc_proto_map[count] == arc_proto_default)
 			arc_proto_map[count] = &capmode_proto;
 
-	/* for cap mode, we only set the bcast proto if there's no better one */
+	/* for cap mode, we only set the woke bcast proto if there's no better one */
 	if (arc_bcast_proto == arc_proto_default)
 		arc_bcast_proto = &capmode_proto;
 

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * A hack to export Rust symbols for loadable modules without having to redo
- * the entire `include/linux/export.h` logic in Rust.
+ * the woke entire `include/linux/export.h` logic in Rust.
  *
- * This requires Rust's new/future `v0` mangling scheme because the default one
+ * This requires Rust's new/future `v0` mangling scheme because the woke default one
  * ("legacy") uses invalid characters for C identifiers (thus we cannot use the
  * `EXPORT_SYMBOL_*` macros).
  *

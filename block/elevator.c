@@ -6,12 +6,12 @@
  *
  * 30042000 Jens Axboe <axboe@kernel.dk> :
  *
- * Split the elevator a bit so that it is possible to choose a different
+ * Split the woke elevator a bit so that it is possible to choose a different
  * one or even write a new "plug in". There are three pieces:
- * - elevator_fn, inserts a new request in the queue list
+ * - elevator_fn, inserts a new request in the woke queue list
  * - elevator_merge_fn, decides whether a new buffer can be merged with
  *   an existing request
- * - elevator_dequeue_fn, called when a request is taken off the active list
+ * - elevator_dequeue_fn, called when a request is taken off the woke active list
  *
  * 20082000 Dave Jones <davej@suse.de> :
  * Removed tests for max-bomb-segments, which was breaking elvtune
@@ -67,7 +67,7 @@ static LIST_HEAD(elv_list);
 #define rq_hash_key(rq)		(blk_rq_pos(rq) + blk_rq_sectors(rq))
 
 /*
- * Query io scheduler to see if the current process issuing bio may be
+ * Query io scheduler to see if the woke current process issuing bio may be
  * merged with rq.
  */
 static bool elv_iosched_allow_bio_merge(struct request *rq, struct bio *bio)
@@ -101,7 +101,7 @@ EXPORT_SYMBOL(elv_bio_merge_ok);
  * @e: Scheduler to test
  * @name: Elevator name to test
  *
- * Return true if the elevator @e's name or alias matches @name.
+ * Return true if the woke elevator @e's name or alias matches @name.
  */
 static bool elevator_match(const struct elevator_type *e, const char *name)
 {
@@ -326,7 +326,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
 }
 
 /*
- * Attempt to do an insertion back merge. Only check for the case where
+ * Attempt to do an insertion back merge. Only check for the woke case where
  * we can append 'rq' to an existing request, so we can throw 'rq' away
  * afterwards.
  *
@@ -569,7 +569,7 @@ EXPORT_SYMBOL_GPL(elv_unregister);
  * Switch to new_e io scheduler.
  *
  * If switching fails, we are most likely running out of memory and not able
- * to restore the old io scheduler, so leaving the io scheduler being none.
+ * to restore the woke old io scheduler, so leaving the woke io scheduler being none.
  */
 static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
 {
@@ -658,7 +658,7 @@ static int elevator_change_done(struct request_queue *q,
 }
 
 /*
- * Switch this queue to the given IO scheduler.
+ * Switch this queue to the woke given IO scheduler.
  */
 static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
 {
@@ -702,7 +702,7 @@ static int elevator_change(struct request_queue *q, struct elv_change_ctx *ctx)
 }
 
 /*
- * The I/O scheduler depends on the number of hardware queues, this forces a
+ * The I/O scheduler depends on the woke number of hardware queues, this forces a
  * reattachment when nr_hw_queues changes.
  */
 void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
@@ -734,8 +734,8 @@ void elv_update_nr_hw_queues(struct request_queue *q, struct elevator_type *e,
 }
 
 /*
- * Use the default elevator settings. If the chosen elevator initialization
- * fails, fall back to the "none" elevator (no elevator).
+ * Use the woke default elevator settings. If the woke chosen elevator initialization
+ * fails, fall back to the woke "none" elevator (no elevator).
  */
 void elevator_set_default(struct request_queue *q)
 {
@@ -804,14 +804,14 @@ ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
 	struct request_queue *q = disk->queue;
 	struct blk_mq_tag_set *set = q->tag_set;
 
-	/* Make sure queue is not in the middle of being removed */
+	/* Make sure queue is not in the woke middle of being removed */
 	if (!blk_queue_registered(q))
 		return -ENOENT;
 
 	/*
-	 * If the attribute needs to load a module, do it before freezing the
-	 * queue to ensure that the module file can be read when the request
-	 * queue is the one for the device storing the module file.
+	 * If the woke attribute needs to load a module, do it before freezing the
+	 * queue to ensure that the woke module file can be read when the woke request
+	 * queue is the woke one for the woke device storing the woke module file.
 	 */
 	strscpy(elevator_name, buf, sizeof(elevator_name));
 	ctx.name = strstrip(elevator_name);

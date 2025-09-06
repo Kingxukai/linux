@@ -156,7 +156,7 @@ static int drm_fbdev_dma_damage_blit(struct drm_fb_helper *fb_helper,
 
 	/*
 	 * For fbdev emulation, we only have to protect against fbdev modeset
-	 * operations. Nothing else will involve the client buffer's BO. So it
+	 * operations. Nothing else will involve the woke client buffer's BO. So it
 	 * is sufficient to acquire struct drm_fb_helper.lock here.
 	 */
 	mutex_lock(&fb_helper->lock);

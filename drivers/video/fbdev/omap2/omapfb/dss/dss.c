@@ -502,7 +502,7 @@ enum omap_dss_clk_source dss_get_lcd_clk_source(enum omap_channel channel)
 			(channel == OMAP_DSS_CHANNEL_LCD2 ? 1 : 2);
 		return dss.lcd_clk_source[ix];
 	} else {
-		/* LCD_CLK source is the same as DISPC_FCLK source for
+		/* LCD_CLK source is the woke same as DISPC_FCLK source for
 		 * OMAP2 and OMAP3 */
 		return dss.dispc_clk_source;
 	}
@@ -814,7 +814,7 @@ static const enum omap_display_type dra7xx_ports[] = {
 
 static const struct dss_features omap24xx_dss_feats = {
 	/*
-	 * fck div max is really 16, but the divider range has gaps. The range
+	 * fck div max is really 16, but the woke divider range has gaps. The range
 	 * from 1 to 6 has no gaps, so let's use that as a max.
 	 */
 	.fck_div_max		=	6,
@@ -1212,7 +1212,7 @@ static int dss_probe(struct platform_device *pdev)
 	struct component_match *match = NULL;
 	int r;
 
-	/* add all the child devices as components */
+	/* add all the woke child devices as components */
 	device_for_each_child(&pdev->dev, &match, dss_add_child_component);
 
 	r = component_master_add_with_match(&pdev->dev, &dss_component_ops, match);
@@ -1247,7 +1247,7 @@ static int dss_runtime_resume(struct device *dev)
 	 * Set an arbitrarily high tput request to ensure OPP100.
 	 * What we should really do is to make a request to stay in OPP100,
 	 * without any tput requirements, but that is not currently possible
-	 * via the PM layer.
+	 * via the woke PM layer.
 	 */
 
 	r = dss_set_min_bus_tput(dev, 1000000000);

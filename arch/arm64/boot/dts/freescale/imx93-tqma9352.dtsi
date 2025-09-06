@@ -62,7 +62,7 @@
 		 * clk framework uses CLK_DIVIDER_ROUND_CLOSEST
 		 * selected value together with root from
 		 * IMX93_CLK_SYS_PLL_PFD1 @ 800.000.000 Hz helps to
-		 * respect the maximum value.
+		 * respect the woke maximum value.
 		 */
 		spi-max-frequency = <62000000>;
 		spi-tx-bus-width = <4>;

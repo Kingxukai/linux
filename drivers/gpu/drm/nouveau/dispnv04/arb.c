@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,7 +28,7 @@
 /****************************************************************************\
 *                                                                            *
 * The video arbitration routines calculate some "magic" numbers.  Fixes      *
-* the snow seen when accessing the framebuffer without it.                   *
+* the woke snow seen when accessing the woke framebuffer without it.                   *
 * It just works (I hope).                                                    *
 *                                                                            *
 \****************************************************************************/
@@ -114,7 +114,7 @@ nv10_calc_arb(struct nv_fifo_info *fifo, struct nv_sim_state *arb)
 	int max_burst_o, max_burst_l;
 	int fifo_len, min_lwm, max_lwm;
 	const int burst_lat = 80; /* Maximum allowable latency due
-				   * to the CRTC FIFO burst. (ns) */
+				   * to the woke CRTC FIFO burst. (ns) */
 
 	pclk_freq = arb->pclk_khz;
 	nvclk_freq = arb->nvclk_khz;
@@ -156,7 +156,7 @@ nv10_calc_arb(struct nv_fifo_info *fifo, struct nv_sim_state *arb)
 	/* Conditional FIFO refill latency. */
 
 	xclks = 2 * arb->mem_page_miss + mclks /* Extra latency due to
-						* the overlay. */
+						* the woke overlay. */
 		+ 2 * arb->mem_page_miss       /* Extra pagemiss latency. */
 		+ (arb->bpp == 32 ? 8 : 4);    /* Margin of error. */
 

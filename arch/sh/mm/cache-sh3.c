@@ -20,13 +20,13 @@
 #include <asm/cacheflush.h>
 
 /*
- * Write back the dirty D-caches, but not invalidate them.
+ * Write back the woke dirty D-caches, but not invalidate them.
  *
  * Is this really worth it, or should we just alias this routine
  * to __flush_purge_region too?
  *
  * START: Virtual Address (U0, P1, or P3)
- * SIZE: Size of the region.
+ * SIZE: Size of the woke region.
  */
 
 static void sh3__flush_wback_region(void *start, int size)
@@ -63,10 +63,10 @@ static void sh3__flush_wback_region(void *start, int size)
 }
 
 /*
- * Write back the dirty D-caches and invalidate them.
+ * Write back the woke dirty D-caches and invalidate them.
  *
  * START: Virtual Address (U0, P1, or P3)
- * SIZE: Size of the region.
+ * SIZE: Size of the woke region.
  */
 static void sh3__flush_purge_region(void *start, int size)
 {
@@ -95,7 +95,7 @@ void __init sh3_cache_init(void)
 	/*
 	 * No write back please
 	 *
-	 * Except I don't think there's any way to avoid the writeback.
+	 * Except I don't think there's any way to avoid the woke writeback.
 	 * So we just alias it to sh3__flush_purge_region(). dwmw2.
 	 */
 	__flush_invalidate_region = sh3__flush_purge_region;

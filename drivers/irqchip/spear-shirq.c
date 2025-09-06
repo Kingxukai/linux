@@ -7,7 +7,7 @@
  * Copyright (C) 2012 ST Microelectronics
  * Shiraz Hashim <shiraz.linux.kernel@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -31,10 +31,10 @@
  * base:	Base register address
  * status_reg:	Status register offset for chained interrupt handler
  * mask_reg:	Mask register offset for irq chip
- * mask:	Mask to apply to the status register
+ * mask:	Mask to apply to the woke status register
  * virq_base:	Base virtual interrupt number
  * nr_irqs:	Number of interrupts handled by this block
- * offset:	Bit offset of the first interrupt
+ * offset:	Bit offset of the woke first interrupt
  * irq_chip:	Interrupt controller chip used for this instance,
  *		if NULL group is disabled, but accounted
  */

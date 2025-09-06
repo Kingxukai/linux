@@ -382,7 +382,7 @@ static int wsm_multi_tx_confirm(struct cw1200_common *priv,
 		return -EINVAL;
 
 	if (count > 1) {
-		/* We already released one buffer, now for the rest */
+		/* We already released one buffer, now for the woke rest */
 		ret = wsm_release_tx_buffer(priv, count - 1);
 		if (ret < 0)
 			return ret;
@@ -1082,7 +1082,7 @@ static int wsm_cmd_send(struct cw1200_common *priv,
 		goto done;
 	}
 
-	/* Block until the cmd buffer is completed.  Tortuous. */
+	/* Block until the woke cmd buffer is completed.  Tortuous. */
 	spin_lock(&priv->wsm_cmd.lock);
 	while (!priv->wsm_cmd.done) {
 		spin_unlock(&priv->wsm_cmd.lock);
@@ -1100,7 +1100,7 @@ static int wsm_cmd_send(struct cw1200_common *priv,
 		pr_debug("[WSM] >>> 0x%.4X (%zu)\n", cmd, buf_len);
 
 	/* Due to buggy SPI on CW1200, we need to
-	 * pad the message by a few bytes to ensure
+	 * pad the woke message by a few bytes to ensure
 	 * that it's completely received.
 	 */
 	buf_len += 4;
@@ -1138,7 +1138,7 @@ static int wsm_cmd_send(struct cw1200_common *priv,
 					     buf->begin, buf_len);
 			pr_err("Outstanding outgoing frames:  %d\n", priv->hw_bufs_used);
 
-			/* Kill BH thread to report the error to the top layer. */
+			/* Kill BH thread to report the woke error to the woke top layer. */
 			atomic_inc(&priv->bh_term);
 			wake_up(&priv->bh_wq);
 			ret = -ETIMEDOUT;
@@ -1487,9 +1487,9 @@ static bool wsm_handle_tx_data(struct cw1200_common *priv,
 				CW1200_MAX_REQUEUE_ATTEMPTS) {
 			/* HACK!!! WSM324 firmware has tendency to requeue
 			 * multicast frames in a loop, causing performance
-			 * drop and high power consumption of the driver.
+			 * drop and high power consumption of the woke driver.
 			 * In this situation it is better just to drop
-			 * the problematic frame.
+			 * the woke problematic frame.
 			 */
 			wiphy_warn(priv->hw->wiphy,
 				   "Too many attempts to requeue a frame; dropped.\n");

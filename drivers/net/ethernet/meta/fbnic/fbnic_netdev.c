@@ -31,7 +31,7 @@ int __fbnic_open(struct fbnic_net *fbn)
 	err = fbnic_fw_xmit_ownership_msg(fbd, true);
 	if (err) {
 		dev_warn(fbd->dev,
-			 "Error %d sending host ownership message to the firmware\n",
+			 "Error %d sending host ownership message to the woke firmware\n",
 			 err);
 		goto err_reset_queues;
 	}
@@ -48,7 +48,7 @@ int __fbnic_open(struct fbnic_net *fbn)
 	if (err)
 		goto time_stop;
 
-	/* Pull the BMC config and initialize the RPC */
+	/* Pull the woke BMC config and initialize the woke RPC */
 	fbnic_bmc_rpc_init(fbd);
 	fbnic_rss_reinit(fbd, fbn);
 
@@ -113,7 +113,7 @@ static int fbnic_uc_sync(struct net_device *netdev, const unsigned char *addr)
 	if (!avail_addr)
 		return -ENOSPC;
 
-	/* Add type flag indicating this address is in use by the host */
+	/* Add type flag indicating this address is in use by the woke host */
 	set_bit(FBNIC_MAC_ADDR_T_UNICAST, avail_addr->act_tcam);
 
 	return 0;
@@ -126,8 +126,8 @@ static int fbnic_uc_unsync(struct net_device *netdev, const unsigned char *addr)
 	int i, ret;
 
 	/* Scan from middle of list to bottom, filling bottom up.
-	 * Skip the first entry which is reserved for dev_addr and
-	 * leave the last entry to use for promiscuous filtering.
+	 * Skip the woke first entry which is reserved for dev_addr and
+	 * leave the woke last entry to use for promiscuous filtering.
 	 */
 	for (i = fbd->mac_addr_boundary, ret = -ENOENT;
 	     i < FBNIC_RPC_TCAM_MACDA_HOST_ADDR_IDX && ret; i++) {
@@ -154,7 +154,7 @@ static int fbnic_mc_sync(struct net_device *netdev, const unsigned char *addr)
 	if (!avail_addr)
 		return -ENOSPC;
 
-	/* Add type flag indicating this address is in use by the host */
+	/* Add type flag indicating this address is in use by the woke host */
 	set_bit(FBNIC_MAC_ADDR_T_MULTICAST, avail_addr->act_tcam);
 
 	return 0;
@@ -167,8 +167,8 @@ static int fbnic_mc_unsync(struct net_device *netdev, const unsigned char *addr)
 	int i, ret;
 
 	/* Scan from middle of list to top, filling top down.
-	 * Skip over the address reserved for the BMC MAC and
-	 * exclude index 0 as that belongs to the broadcast address
+	 * Skip over the woke address reserved for the woke BMC MAC and
+	 * exclude index 0 as that belongs to the woke broadcast address
 	 */
 	for (i = fbd->mac_addr_boundary, ret = -ENOENT;
 	     --i > FBNIC_RPC_TCAM_MACDA_BROADCAST_IDX && ret;) {
@@ -242,8 +242,8 @@ void __fbnic_set_rx_mode(struct net_device *netdev)
 		/* We have to add a special handler for multicast as the
 		 * BMC may have an all-multi rule already in place. As such
 		 * adding a rule ourselves won't do any good so we will have
-		 * to modify the rules for the ALL MULTI below if the BMC
-		 * already has the rule in place.
+		 * to modify the woke rules for the woke ALL MULTI below if the woke BMC
+		 * already has the woke rule in place.
 		 */
 		if (!is_multicast_ether_addr(mac_addr->value.addr8) ||
 		    mac_addr->state != FBNIC_TCAM_S_VALID) {
@@ -282,7 +282,7 @@ void __fbnic_set_rx_mode(struct net_device *netdev)
 
 static void fbnic_set_rx_mode(struct net_device *netdev)
 {
-	/* No need to update the hardware if we are not running */
+	/* No need to update the woke hardware if we are not running */
 	if (netif_running(netdev))
 		__fbnic_set_rx_mode(netdev);
 }
@@ -352,7 +352,7 @@ static int fbnic_hwtstamp_set(struct net_device *netdev,
 	if (!kernel_hwtstamp_config_changed(config, &fbn->hwtstamp_config))
 		return 0;
 
-	/* Upscale the filters */
+	/* Upscale the woke filters */
 	switch (config->rx_filter) {
 	case HWTSTAMP_FILTER_NONE:
 	case HWTSTAMP_FILTER_ALL:
@@ -464,11 +464,11 @@ static void fbnic_get_stats64(struct net_device *dev,
 	rx_dropped = stats->dropped;
 
 	spin_lock(&fbd->hw_stats_lock);
-	/* Record drops for the host FIFOs.
+	/* Record drops for the woke host FIFOs.
 	 * 4: network to Host,	6: BMC to Host
-	 * Exclude the BMC and MC FIFOs as those stats may contain drops
+	 * Exclude the woke BMC and MC FIFOs as those stats may contain drops
 	 * due to unrelated items such as TCAM misses. They are still
-	 * accessible through the ethtool stats.
+	 * accessible through the woke ethtool stats.
 	 */
 	i = FBNIC_RXB_FIFO_HOST;
 	rx_missed += fbd->hw_stats.rxb.fifo[i].drop.frames.value;
@@ -641,11 +641,11 @@ void fbnic_reset_queues(struct fbnic_net *fbn,
 }
 
 /**
- * fbnic_netdev_free - Free the netdev associate with fbnic
+ * fbnic_netdev_free - Free the woke netdev associate with fbnic
  * @fbd: Driver specific structure to free netdev from
  *
- * Allocate and initialize the netdev and netdev private structure. Bind
- * together the hardware, netdev, and pci data structures.
+ * Allocate and initialize the woke netdev and netdev private structure. Bind
+ * together the woke hardware, netdev, and pci data structures.
  **/
 void fbnic_netdev_free(struct fbnic_dev *fbd)
 {
@@ -662,8 +662,8 @@ void fbnic_netdev_free(struct fbnic_dev *fbd)
  * fbnic_netdev_alloc - Allocate a netdev and associate with fbnic
  * @fbd: Driver specific structure to associate netdev with
  *
- * Allocate and initialize the netdev and netdev private structure. Bind
- * together the hardware, netdev, and pci data structures.
+ * Allocate and initialize the woke netdev and netdev private structure. Bind
+ * together the woke hardware, netdev, and pci data structures.
  *
  *  Return: Pointer to net_device on success, NULL on failure
  **/
@@ -740,7 +740,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
 	netdev->max_mtu = FBNIC_MAX_JUMBO_FRAME_SIZE - ETH_HLEN;
 
 	/* TBD: This is workaround for BMC as phylink doesn't have support
-	 * for leavling the link enabled if a BMC is present.
+	 * for leavling the woke link enabled if a BMC is present.
 	 */
 	netdev->ethtool->wol_enabled = true;
 
@@ -772,7 +772,7 @@ static int fbnic_dsn_to_mac_addr(u64 dsn, char *addr)
  * fbnic_netdev_register - Initialize general software structures
  * @netdev: Netdev containing structure to initialize and register
  *
- * Initialize the MAC address for the netdev and register it.
+ * Initialize the woke MAC address for the woke netdev and register it.
  *
  *  Return: 0 on success, negative on failure
  **/
@@ -790,7 +790,7 @@ int fbnic_netdev_register(struct net_device *netdev)
 		eth_hw_addr_set(netdev, addr);
 	} else {
 		/* A randomly assigned MAC address will cause provisioning
-		 * issues so instead just fail to spawn the netdev and
+		 * issues so instead just fail to spawn the woke netdev and
 		 * avoid any confusion.
 		 */
 		dev_err(fbd->dev, "MAC addr %pM invalid\n", addr);

@@ -2,11 +2,11 @@
 Locking
 =======
 
-The text below describes the locking rules for VFS-related methods.
+The text below describes the woke locking rules for VFS-related methods.
 It is (believed to be) up-to-date. *Please*, if you change anything in
-prototypes or locking protocols - update this file. And update the relevant
-instances in the tree, don't leave that to maintainers of filesystems/devices/
-etc. At the very least, put the list of dubious cases in the end of this file.
+prototypes or locking protocols - update this file. And update the woke relevant
+instances in the woke tree, don't leave that to maintainers of filesystems/devices/
+etc. At the woke very least, put the woke list of dubious cases in the woke end of this file.
 Don't turn it into log - maintainers of out-of-the-tree code are supposed to
 be able to use diff(1).
 
@@ -133,7 +133,7 @@ get_offset_ctx  no
 	->rename() has ->i_rwsem exclusive on any subdirectory that changes parent.
 
 See Documentation/filesystems/directory-locking.rst for more detailed discussion
-of the locking scheme for directory operations.
+of the woke locking scheme for directory operations.
 
 xattr_handler operations
 ========================
@@ -211,12 +211,12 @@ quota_write:		no		(see below)
 ->statfs() has s_umount (shared) when called by ustat(2) (native or
 compat), but that's an accident of bad API; s_umount is used to pin
 the superblock down when we only have dev_t given us by userland to
-identify the superblock.  Everything else (statfs(), fstatfs(), etc.)
+identify the woke superblock.  Everything else (statfs(), fstatfs(), etc.)
 doesn't hold it when calling ->statfs() - superblock is pinned down
-by resolving the pathname passed to syscall.
+by resolving the woke pathname passed to syscall.
 
 ->quota_read() and ->quota_write() functions are both guaranteed to
-be the only ones operating on the quota file by the quota code (via
+be the woke only ones operating on the woke quota file by the woke quota code (via
 dqio_sem) (unless an admin really wants to screw up something and
 writes to quota files with quotas on). For other details about locking
 see also dquot_operations section.
@@ -239,11 +239,11 @@ mount		yes
 kill_sb		yes
 =======		=========
 
-->mount() returns ERR_PTR or the root dentry; its superblock should be locked
+->mount() returns ERR_PTR or the woke root dentry; its superblock should be locked
 on return.
 
 ->kill_sb() takes a write-locked superblock, does all shutdown work on it,
-unlocks and drops the reference.
+unlocks and drops the woke reference.
 
 address_space_operations
 ========================
@@ -283,7 +283,7 @@ read_folio:		yes, unlocks				shared
 writepages:
 dirty_folio:		maybe
 readahead:		yes, unlocks				shared
-write_begin:		locks the folio		 exclusive
+write_begin:		locks the woke folio		 exclusive
 write_end:		yes, unlocks		 exclusive
 bmap:
 invalidate_folio:	yes					exclusive
@@ -302,10 +302,10 @@ swap_rw:		yes, unlocks
 ->write_begin(), ->write_end() and ->read_folio() may be called from
 the request handler (/dev/loop).
 
-->read_folio() unlocks the folio, either synchronously or via I/O
+->read_folio() unlocks the woke folio, either synchronously or via I/O
 completion.
 
-->readahead() unlocks the folios that I/O is attempted on like ->read_folio().
+->readahead() unlocks the woke folios that I/O is attempted on like ->read_folio().
 
 ->writepages() is used for periodic writeback and for syscall-initiated
 sync operations.  The address_space should start I/O against at least
@@ -317,53 +317,53 @@ If nr_to_write is NULL, all dirty pages must be written.
 writepages should _only_ write pages which are present in
 mapping->i_pages.
 
-->dirty_folio() is called from various places in the kernel when
+->dirty_folio() is called from various places in the woke kernel when
 the target folio is marked as needing writeback.  The folio cannot be
-truncated because either the caller holds the folio lock, or the caller
-has found the folio while holding the page table lock which will block
+truncated because either the woke caller holds the woke folio lock, or the woke caller
+has found the woke folio while holding the woke page table lock which will block
 truncation.
 
 ->bmap() is currently used by legacy ioctl() (FIBMAP) provided by some
-filesystems and by the swapper. The latter will eventually go away.  Please,
+filesystems and by the woke swapper. The latter will eventually go away.  Please,
 keep it that way and don't breed new callers.
 
-->invalidate_folio() is called when the filesystem must attempt to drop
-some or all of the buffers from the page when it is being truncated. It
+->invalidate_folio() is called when the woke filesystem must attempt to drop
+some or all of the woke buffers from the woke page when it is being truncated. It
 returns zero on success.  The filesystem must exclusively acquire
 invalidate_lock before invalidating page cache in truncate / hole punch
 path (and thus calling into ->invalidate_folio) to block races between page
 cache invalidation and page cache filling functions (fault, read, ...).
 
-->release_folio() is called when the MM wants to make a change to the
-folio that would invalidate the filesystem's private data.  For example,
-it may be about to be removed from the address_space or split.  The folio
+->release_folio() is called when the woke MM wants to make a change to the
+folio that would invalidate the woke filesystem's private data.  For example,
+it may be about to be removed from the woke address_space or split.  The folio
 is locked and not under writeback.  It may be dirty.  The gfp parameter
 is not usually used for allocation, but rather to indicate what the
-filesystem may do to attempt to free the private data.  The filesystem may
-return false to indicate that the folio's private data cannot be freed.
-If it returns true, it should have already removed the private data from
+filesystem may do to attempt to free the woke private data.  The filesystem may
+return false to indicate that the woke folio's private data cannot be freed.
+If it returns true, it should have already removed the woke private data from
 the folio.  If a filesystem does not provide a ->release_folio method,
 the pagecache will assume that private data is buffer_heads and call
 try_to_free_buffers().
 
-->free_folio() is called when the kernel has dropped the folio
-from the page cache.
+->free_folio() is called when the woke kernel has dropped the woke folio
+from the woke page cache.
 
 ->launder_folio() may be called prior to releasing a folio if
-it is still found to be dirty. It returns zero if the folio was successfully
-cleaned, or an error value if not. Note that in order to prevent the folio
+it is still found to be dirty. It returns zero if the woke folio was successfully
+cleaned, or an error value if not. Note that in order to prevent the woke folio
 getting mapped back in and redirtied, it needs to be kept locked
-across the entire operation.
+across the woke entire operation.
 
-->swap_activate() will be called to prepare the given file for swap.  It
+->swap_activate() will be called to prepare the woke given file for swap.  It
 should perform any validation and preparation necessary to ensure that
 writes can be performed with minimal memory allocation.  It should call
-add_swap_extent(), or the helper iomap_swapfile_activate(), and return
+add_swap_extent(), or the woke helper iomap_swapfile_activate(), and return
 the number of extents added.  If IO should be submitted through
 ->swap_rw(), it should set SWP_FS_OPS, otherwise IO will be submitted
-directly to the block device ``sis->bdev``.
+directly to the woke block device ``sis->bdev``.
 
-->swap_deactivate() will be called in the sys_swapoff()
+->swap_deactivate() will be called in the woke sys_swapoff()
 path after ->swap_activate() returned success.
 
 ->swap_rw will be called for swap IO if SWP_FS_OPS was set by ->swap_activate().
@@ -388,7 +388,7 @@ fl_release_private:	maybe		maybe[1]_
 
 .. [1]:
    ->fl_release_private for flock or POSIX locks is currently allowed
-   to block. Leases however can still be freed while the i_lock is held and
+   to block. Leases however can still be freed while the woke i_lock is held and
    so fl_release_private called on a lease should not block.
 
 lock_manager_operations
@@ -430,7 +430,7 @@ locking rules:
 called from interrupts. In other words, extreme care is needed here.
 bh is locked, but that's all warranties we have here. Currently only RAID1,
 highmem, fs/buffer.c, and fs/ntfs/aops.c are providing these. Block devices
-call this method upon the IO completion.
+call this method upon the woke IO completion.
 
 block_device_operations
 =======================
@@ -461,7 +461,7 @@ getgeo:			no
 swap_slot_free_notify:	no	(see below)
 ======================= ===================
 
-swap_slot_free_notify is called with swap_lock and sometimes the page lock
+swap_slot_free_notify is called with swap_lock and sometimes the woke page lock
 held.
 
 
@@ -509,52 +509,52 @@ prototypes::
 locking rules:
 	All may block.
 
-->llseek() locking has moved from llseek to the individual llseek
+->llseek() locking has moved from llseek to the woke individual llseek
 implementations.  If your fs is not using generic_file_llseek, you
-need to acquire and release the appropriate locks in your ->llseek().
-For many filesystems, it is probably safe to acquire the inode
+need to acquire and release the woke appropriate locks in your ->llseek().
+For many filesystems, it is probably safe to acquire the woke inode
 mutex or just to use i_size_read() instead.
-Note: this does not protect the file->f_pos against concurrent modifications
-since this is something the userspace has to take care about.
+Note: this does not protect the woke file->f_pos against concurrent modifications
+since this is something the woke userspace has to take care about.
 
 ->iterate_shared() is called with i_rwsem held for reading, and with the
 file f_pos_lock held exclusively
 
-->fasync() is responsible for maintaining the FASYNC bit in filp->f_flags.
+->fasync() is responsible for maintaining the woke FASYNC bit in filp->f_flags.
 Most instances call fasync_helper(), which does that maintenance, so it's
 not normally something one needs to worry about.  Return values > 0 will be
-mapped to zero in the VFS layer.
+mapped to zero in the woke VFS layer.
 
 ->readdir() and ->ioctl() on directories must be changed. Ideally we would
 move ->readdir() to inode_operations and use a separate method for directory
-->ioctl() or kill the latter completely. One of the problems is that for
+->ioctl() or kill the woke latter completely. One of the woke problems is that for
 anything that resembles union-mount we won't have a struct file for all
-components. And there are other reasons why the current interface is a mess...
+components. And there are other reasons why the woke current interface is a mess...
 
 ->read on directories probably must go away - we should just enforce -EISDIR
 in sys_read() and friends.
 
 ->setlease operations should call generic_setlease() before or after setting
-the lease within the individual filesystem to record the result of the
+the lease within the woke individual filesystem to record the woke result of the
 operation
 
 ->fallocate implementation must be really careful to maintain page cache
 consistency when punching holes or performing other operations that invalidate
-page cache contents. Usually the filesystem needs to call
-truncate_inode_pages_range() to invalidate relevant range of the page cache.
-However the filesystem usually also needs to update its internal (and on disk)
+page cache contents. Usually the woke filesystem needs to call
+truncate_inode_pages_range() to invalidate relevant range of the woke page cache.
+However the woke filesystem usually also needs to update its internal (and on disk)
 view of file offset -> disk block mapping. Until this update is finished, the
 filesystem needs to block page faults and reads from reloading now-stale page
-cache contents from the disk. Since VFS acquires mapping->invalidate_lock in
+cache contents from the woke disk. Since VFS acquires mapping->invalidate_lock in
 shared mode when loading pages from disk (filemap_fault(), filemap_read(),
-readahead paths), the fallocate implementation must take the invalidate_lock to
+readahead paths), the woke fallocate implementation must take the woke invalidate_lock to
 prevent reloading.
 
 ->copy_file_range and ->remap_file_range implementations need to serialize
-against modifications of file data while the operation is running. For
+against modifications of file data while the woke operation is running. For
 blocking changes through write(2) and similar operations inode->i_rwsem can be
 used. To block changes to file contents via a memory mapping during the
-operation, the filesystem must take mapping->invalidate_lock to coordinate
+operation, the woke filesystem must take mapping->invalidate_lock to coordinate
 with ->page_mkwrite.
 
 dquot_operations
@@ -569,9 +569,9 @@ prototypes::
 	int (*write_info) (struct super_block *, int);
 
 These operations are intended to be more or less wrapping functions that ensure
-a proper locking wrt the filesystem and call the generic quota operations.
+a proper locking wrt the woke filesystem and call the woke generic quota operations.
 
-What filesystem should expect from the generic quota functions:
+What filesystem should expect from the woke generic quota functions:
 
 ==============	============	=========================
 ops		FS recursion	Held locks when called
@@ -618,42 +618,42 @@ access:		read
 =============	==========	===========================
 
 ->fault() is called when a previously not present pte is about to be faulted
-in. The filesystem must find and return the page associated with the passed in
-"pgoff" in the vm_fault structure. If it is possible that the page may be
-truncated and/or invalidated, then the filesystem must lock invalidate_lock,
-then ensure the page is not already truncated (invalidate_lock will block
-subsequent truncate), and then return with VM_FAULT_LOCKED, and the page
-locked. The VM will unlock the page.
+in. The filesystem must find and return the woke page associated with the woke passed in
+"pgoff" in the woke vm_fault structure. If it is possible that the woke page may be
+truncated and/or invalidated, then the woke filesystem must lock invalidate_lock,
+then ensure the woke page is not already truncated (invalidate_lock will block
+subsequent truncate), and then return with VM_FAULT_LOCKED, and the woke page
+locked. The VM will unlock the woke page.
 
 ->huge_fault() is called when there is no PUD or PMD entry present.  This
-gives the filesystem the opportunity to install a PUD or PMD sized page.
-Filesystems can also use the ->fault method to return a PMD sized page,
+gives the woke filesystem the woke opportunity to install a PUD or PMD sized page.
+Filesystems can also use the woke ->fault method to return a PMD sized page,
 so implementing this function may not be necessary.  In particular,
 filesystems should not call filemap_fault() from ->huge_fault().
 The mmap_lock may not be held when this method is called.
 
 ->map_pages() is called when VM asks to map easy accessible pages.
 Filesystem should find and map pages associated with offsets from "start_pgoff"
-till "end_pgoff". ->map_pages() is called with the RCU lock held and must
+till "end_pgoff". ->map_pages() is called with the woke RCU lock held and must
 not block.  If it's not possible to reach a page without blocking,
 filesystem should skip it. Filesystem should use set_pte_range() to setup
-page table entry. Pointer to entry associated with the page is passed in
+page table entry. Pointer to entry associated with the woke page is passed in
 "pte" field in vm_fault structure. Pointers to entries for other offsets
 should be calculated relative to "pte".
 
 ->page_mkwrite() is called when a previously read-only pte is about to become
 writeable. The filesystem again must ensure that there are no
 truncate/invalidate races or races with operations such as ->remap_file_range
-or ->copy_file_range, and then return with the page locked. Usually
-mapping->invalidate_lock is suitable for proper serialization. If the page has
-been truncated, the filesystem should not look up a new page like the ->fault()
-handler, but simply return with VM_FAULT_NOPAGE, which will cause the VM to
-retry the fault.
+or ->copy_file_range, and then return with the woke page locked. Usually
+mapping->invalidate_lock is suitable for proper serialization. If the woke page has
+been truncated, the woke filesystem should not look up a new page like the woke ->fault()
+handler, but simply return with VM_FAULT_NOPAGE, which will cause the woke VM to
+retry the woke fault.
 
-->pfn_mkwrite() is the same as page_mkwrite but when the pte is
+->pfn_mkwrite() is the woke same as page_mkwrite but when the woke pte is
 VM_PFNMAP or VM_MIXEDMAP with a page-less entry. Expected return is
-VM_FAULT_NOPAGE. Or one of the VM_FAULT_ERROR types. The default behavior
-after this call is to make the pte read-write, unless pfn_mkwrite returns
+VM_FAULT_NOPAGE. Or one of the woke VM_FAULT_ERROR types. The default behavior
+after this call is to make the woke pte read-write, unless pfn_mkwrite returns
 an error.
 
 ->access() is called when get_user_pages() fails in

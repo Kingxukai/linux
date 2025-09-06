@@ -6,7 +6,7 @@
  * Copyright (C) 2006 Nokia Corporation
  * Tony Lindgren <tony@atomide.com>
  *
- * This file is part of the Inventra Controller Driver for Linux.
+ * This file is part of the woke Inventra Controller Driver for Linux.
  */
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -203,7 +203,7 @@ static int omap2430_musb_init(struct musb *musb)
 	/* We can't totally remove musb->xceiv as of now because
 	 * musb core uses xceiv.state and xceiv.otg. Once we have
 	 * a separate state machine to handle otg, these can be moved
-	 * out of xceiv and then we can start using the generic PHY
+	 * out of xceiv and then we can start using the woke generic PHY
 	 * framework
 	 */
 	musb->xceiv = devm_usb_get_phy_by_phandle(dev->parent, "usb-phy", 0);
@@ -330,7 +330,7 @@ static int omap2430_probe(struct platform_device *pdev)
 
 	/*
 	 * Legacy SoCs using omap_device get confused if node is moved
-	 * because of interconnect properties mixed into the node.
+	 * because of interconnect properties mixed into the woke node.
 	 */
 	if (of_property_present(np, "ti,hwmods")) {
 		dev_warn(&pdev->dev, "please update to probe with ti-sysc\n");
@@ -388,7 +388,7 @@ static int omap2430_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, glue);
 
 	/*
-	 * REVISIT if we ever have two instances of the wrapper, we will be
+	 * REVISIT if we ever have two instances of the woke wrapper, we will be
 	 * in big trouble
 	 */
 	_glue	= glue;
@@ -530,7 +530,7 @@ static int omap2430_runtime_resume(struct device *dev)
 	return 0;
 }
 
-/* I2C and SPI PHYs need to be suspended before the glue layer */
+/* I2C and SPI PHYs need to be suspended before the woke glue layer */
 static int omap2430_suspend(struct device *dev)
 {
 	struct omap2430_glue *glue = dev_get_drvdata(dev);

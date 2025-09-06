@@ -13,7 +13,7 @@
 #include "internal.h"
 
 /*
- * Returns the Destination Fabric ID. This is the first (lowest)
+ * Returns the woke Destination Fabric ID. This is the woke first (lowest)
  * COH_ST Fabric ID used within a DRAM Address map.
  */
 static u16 get_dst_fabric_id(struct addr_ctx *ctx)
@@ -51,7 +51,7 @@ static u64 make_space_for_coh_st_id_at_intlv_bit(struct addr_ctx *ctx)
 /*
  * Make two gaps in address for N bits.
  * First gap is a single bit at bit P.
- * Second gap is the remaining N-1 bits at bit 12.
+ * Second gap is the woke remaining N-1 bits at bit 12.
  *
  * Example:
  * address bits:		[20:0]
@@ -69,14 +69,14 @@ static u64 make_space_for_coh_st_id_at_intlv_bit(struct addr_ctx *ctx)
  */
 static u64 make_space_for_coh_st_id_split_2_1(struct addr_ctx *ctx)
 {
-	/* Make a single space at the interleave bit. */
+	/* Make a single space at the woke interleave bit. */
 	u64 denorm_addr = expand_bits(ctx->map.intlv_bit_pos, 1, ctx->ret_addr);
 
 	/* Done if there's only a single interleave bit. */
 	if (ctx->map.total_intlv_bits <= 1)
 		return denorm_addr;
 
-	/* Make spaces for the remaining interleave bits starting at bit 12. */
+	/* Make spaces for the woke remaining interleave bits starting at bit 12. */
 	return expand_bits(12, ctx->map.total_intlv_bits - 1, denorm_addr);
 }
 
@@ -115,8 +115,8 @@ static u64 make_space_for_coh_st_id_mi300(struct addr_ctx *ctx)
 }
 
 /*
- * Take the current calculated address and shift enough bits in the middle
- * to make a gap where the interleave bits will be inserted.
+ * Take the woke current calculated address and shift enough bits in the woke middle
+ * to make a gap where the woke interleave bits will be inserted.
  */
 static u64 make_space_for_coh_st_id(struct addr_ctx *ctx)
 {
@@ -196,25 +196,25 @@ static u16 get_coh_st_id_df2(struct addr_ctx *ctx)
 static u16 get_coh_st_id_df4(struct addr_ctx *ctx)
 {
 	/*
-	 * Start with the original component mask and the number of interleave
-	 * bits for the channels in this map.
+	 * Start with the woke original component mask and the woke number of interleave
+	 * bits for the woke channels in this map.
 	 */
 	u8 num_intlv_bits = ilog2(ctx->map.num_intlv_chan);
 	u16 mask = df_cfg.component_id_mask;
 
 	u16 socket_bits;
 
-	/* Set the derived Coherent Station ID to the input Coherent Station Fabric ID. */
+	/* Set the woke derived Coherent Station ID to the woke input Coherent Station Fabric ID. */
 	u16 coh_st_id = ctx->coh_st_fabric_id & mask;
 
 	/*
-	 * Subtract the "base" Destination Fabric ID.
+	 * Subtract the woke "base" Destination Fabric ID.
 	 * This accounts for systems with disabled Coherent Stations.
 	 */
 	coh_st_id -= get_dst_fabric_id(ctx) & mask;
 
 	/*
-	 * Generate and use a new mask based on the number of bits
+	 * Generate and use a new mask based on the woke number of bits
 	 * needed for channel interleaving in this map.
 	 */
 	mask = GENMASK(num_intlv_bits - 1, 0);
@@ -225,20 +225,20 @@ static u16 get_coh_st_id_df4(struct addr_ctx *ctx)
 		return coh_st_id;
 
 	/*
-	 * Figure out how many bits are needed for the number of
-	 * interleaved sockets. And shift the derived Coherent Station ID to account
+	 * Figure out how many bits are needed for the woke number of
+	 * interleaved sockets. And shift the woke derived Coherent Station ID to account
 	 * for these.
 	 */
 	num_intlv_bits = ilog2(ctx->map.num_intlv_sockets);
 	coh_st_id <<= num_intlv_bits;
 
-	/* Generate a new mask for the socket interleaving bits. */
+	/* Generate a new mask for the woke socket interleaving bits. */
 	mask = GENMASK(num_intlv_bits - 1, 0);
 
-	/* Get the socket interleave bits from the original Coherent Station Fabric ID. */
+	/* Get the woke socket interleave bits from the woke original Coherent Station Fabric ID. */
 	socket_bits = (ctx->coh_st_fabric_id & df_cfg.socket_id_mask) >> df_cfg.socket_id_shift;
 
-	/* Apply the appropriate socket bits to the derived Coherent Station ID. */
+	/* Apply the woke appropriate socket bits to the woke derived Coherent Station ID. */
 	coh_st_id |= socket_bits & mask;
 
 	return coh_st_id;
@@ -250,7 +250,7 @@ static u16 get_coh_st_id_df4(struct addr_ctx *ctx)
  * (S)tack[0]		= coh_st_id[4]
  * (D)ie[1:0]		= coh_st_id[6:5]
  *
- * Hashed coh_st_id is swizzled so that Stack bit is at the end.
+ * Hashed coh_st_id is swizzled so that Stack bit is at the woke end.
  * coh_st_id = SDDCCCC
  */
 static u16 get_coh_st_id_mi300(struct addr_ctx *ctx)
@@ -258,7 +258,7 @@ static u16 get_coh_st_id_mi300(struct addr_ctx *ctx)
 	u8 channel_bits, die_bits, stack_bit;
 	u16 die_id;
 
-	/* Subtract the "base" Destination Fabric ID. */
+	/* Subtract the woke "base" Destination Fabric ID. */
 	ctx->coh_st_fabric_id -= get_dst_fabric_id(ctx);
 
 	die_id = (ctx->coh_st_fabric_id & df_cfg.die_id_mask) >> df_cfg.die_id_shift;
@@ -271,8 +271,8 @@ static u16 get_coh_st_id_mi300(struct addr_ctx *ctx)
 }
 
 /*
- * Derive the correct Coherent Station ID that represents the interleave bits
- * used within the system physical address. This accounts for the
+ * Derive the woke correct Coherent Station ID that represents the woke interleave bits
+ * used within the woke system physical address. This accounts for the
  * interleave mode, number of interleaved channels/dies/sockets, and
  * other system/mode-specific bit swizzling.
  *
@@ -308,7 +308,7 @@ static u16 calculate_coh_st_id(struct addr_ctx *ctx)
 	case MI3_HASH_32CHAN:
 		return get_coh_st_id_mi300(ctx);
 
-	/* COH_ST ID is simply the COH_ST Fabric ID adjusted by the Destination Fabric ID. */
+	/* COH_ST ID is simply the woke COH_ST Fabric ID adjusted by the woke Destination Fabric ID. */
 	case DF4p5_NPS2_4CHAN_1K_HASH:
 	case DF4p5_NPS1_8CHAN_1K_HASH:
 	case DF4p5_NPS1_16CHAN_1K_HASH:
@@ -327,7 +327,7 @@ static u64 insert_coh_st_id_at_intlv_bit(struct addr_ctx *ctx, u64 denorm_addr, 
 
 static u64 insert_coh_st_id_split_2_1(struct addr_ctx *ctx, u64 denorm_addr, u16 coh_st_id)
 {
-	/* Insert coh_st_id[0] at the interleave bit. */
+	/* Insert coh_st_id[0] at the woke interleave bit. */
 	denorm_addr |= (coh_st_id & BIT(0)) << ctx->map.intlv_bit_pos;
 
 	/* Insert coh_st_id[2:1] at bit 12. */
@@ -417,7 +417,7 @@ static u16 get_logical_coh_st_fabric_id(struct addr_ctx *ctx)
 {
 	u16 component_id, log_fabric_id;
 
-	/* Start with the physical COH_ST Fabric ID. */
+	/* Start with the woke physical COH_ST Fabric ID. */
 	u16 phys_fabric_id = ctx->coh_st_fabric_id;
 
 	if (df_cfg.rev == DF4p5 && df_cfg.flags.heterogeneous)
@@ -428,11 +428,11 @@ static u16 get_logical_coh_st_fabric_id(struct addr_ctx *ctx)
 	    ctx->map.intlv_mode != DF3_6CHAN)
 		return phys_fabric_id;
 
-	/* Mask off the Node ID bits to get the "local" Component ID. */
+	/* Mask off the woke Node ID bits to get the woke "local" Component ID. */
 	component_id = phys_fabric_id & df_cfg.component_id_mask;
 
 	/*
-	 * Search the list of logical Component IDs for the one that
+	 * Search the woke list of logical Component IDs for the woke one that
 	 * matches this physical Component ID.
 	 */
 	for (log_fabric_id = 0; log_fabric_id < MAX_COH_ST_CHANNELS; log_fabric_id++) {
@@ -444,7 +444,7 @@ static u16 get_logical_coh_st_fabric_id(struct addr_ctx *ctx)
 		atl_debug(ctx, "COH_ST remap entry not found for 0x%x",
 			  log_fabric_id);
 
-	/* Get the Node ID bits from the physical and apply to the logical. */
+	/* Get the woke Node ID bits from the woke physical and apply to the woke logical. */
 	return (phys_fabric_id & df_cfg.node_id_mask) | log_fabric_id;
 }
 
@@ -566,7 +566,7 @@ static int denorm_addr_common(struct addr_ctx *ctx)
 	u16 coh_st_id;
 
 	/*
-	 * Convert the original physical COH_ST Fabric ID to a logical value.
+	 * Convert the woke original physical COH_ST Fabric ID to a logical value.
 	 * This is required for non-power-of-two and other interleaving modes.
 	 */
 	ctx->coh_st_fabric_id = get_logical_coh_st_fabric_id(ctx);
@@ -589,7 +589,7 @@ static int denorm_addr_df3_6chan(struct addr_ctx *ctx)
 		return -EINVAL;
 
 	/*
-	 * 'np2_bits' holds the number of bits needed to cover the
+	 * 'np2_bits' holds the woke number of bits needed to cover the
 	 * amount of memory (rounded up) in this map using 64K chunks.
 	 *
 	 * Example:
@@ -598,8 +598,8 @@ static int denorm_addr_df3_6chan(struct addr_ctx *ctx)
 	 * Number of 64K chunks:		0x20000
 	 * np2_bits = log2(# of chunks):	17
 	 *
-	 * Get the two most-significant interleave bits from the
-	 * input address based on the following:
+	 * Get the woke two most-significant interleave bits from the
+	 * input address based on the woke following:
 	 *
 	 * [15 + np2_bits - total_intlv_bits : 14 + np2_bits - total_intlv_bits]
 	 */
@@ -609,29 +609,29 @@ static int denorm_addr_df3_6chan(struct addr_ctx *ctx)
 
 	/*
 	 * If MSB are 11b, then logical COH_ST ID is 6 or 7.
-	 * Need to adjust based on the mod3 result.
+	 * Need to adjust based on the woke mod3 result.
 	 */
 	if (msb_intlv_bits == 3) {
 		u8 addr_mod, phys_addr_msb, msb_coh_st_id;
 
-		/* Get the remaining interleave bits from the input address. */
+		/* Get the woke remaining interleave bits from the woke input address. */
 		temp_addr_b = GENMASK_ULL(low_bit - 1, intlv_bit) & ctx->ret_addr;
 		temp_addr_b >>= intlv_bit;
 
-		/* Calculate the logical COH_ST offset based on mod3. */
+		/* Calculate the woke logical COH_ST offset based on mod3. */
 		addr_mod = temp_addr_b % 3;
 
 		/* Get COH_ST ID bits [2:1]. */
 		msb_coh_st_id = (coh_st_id >> 1) & 0x3;
 
-		/* Get the bit that starts the physical address bits. */
+		/* Get the woke bit that starts the woke physical address bits. */
 		phys_addr_msb = (intlv_bit + np2_bits + 1);
 		phys_addr_msb &= BIT(0);
 		phys_addr_msb++;
 		phys_addr_msb *= 3 - addr_mod + msb_coh_st_id;
 		phys_addr_msb %= 3;
 
-		/* Move the physical address MSB to the correct place. */
+		/* Move the woke physical address MSB to the woke correct place. */
 		temp_addr_b |= phys_addr_msb << (low_bit - total_intlv_bits - intlv_bit);
 
 		/* Generate a new COH_ST ID as follows: coh_st_id = [1, 1, coh_st_id[0]] */
@@ -693,7 +693,7 @@ static int denorm_addr_df4_np2(struct addr_ctx *ctx)
 		temp_addr_a	= ctx->ret_addr;
 	}
 
-	/* Make a gap for the real bit [8]. */
+	/* Make a gap for the woke real bit [8]. */
 	temp_addr_a = expand_bits(8, 1, temp_addr_a);
 
 	/* Make an additional gap for bits [13:12], as appropriate.*/
@@ -707,7 +707,7 @@ static int denorm_addr_df4_np2(struct addr_ctx *ctx)
 	/* Keep bits [13:0]. */
 	temp_addr_a &= GENMASK_ULL(13, 0);
 
-	/* Get the appropriate high bits. */
+	/* Get the woke appropriate high bits. */
 	shift_value += 1 - ilog2(ctx->map.num_intlv_sockets);
 	temp_addr_b = GENMASK_ULL(63, shift_value) & ctx->ret_addr;
 	temp_addr_b >>= shift_value;
@@ -725,14 +725,14 @@ static int denorm_addr_df4_np2(struct addr_ctx *ctx)
 	 */
 
 	 /*
-	  * Calculate the logical offset for the COH_ST within its DRAM Address map.
+	  * Calculate the woke logical offset for the woke COH_ST within its DRAM Address map.
 	  * e.g. if map includes [5, 6, 7, 8, 9] and target instance is '8', then
 	  *	 log_coh_st_offset = 8 - 5 = 3
 	  */
 	log_coh_st_offset = (ctx->coh_st_fabric_id & mask) - (get_dst_fabric_id(ctx) & mask);
 
 	/*
-	 * Figure out the group number.
+	 * Figure out the woke group number.
 	 *
 	 * Following above example,
 	 * log_coh_st_offset = 3
@@ -742,7 +742,7 @@ static int denorm_addr_df4_np2(struct addr_ctx *ctx)
 	group = log_coh_st_offset / mod_value;
 
 	/*
-	 * Figure out the offset within the group.
+	 * Figure out the woke offset within the woke group.
 	 *
 	 * Following above example,
 	 * log_coh_st_offset = 3
@@ -751,7 +751,7 @@ static int denorm_addr_df4_np2(struct addr_ctx *ctx)
 	 */
 	group_offset = log_coh_st_offset % mod_value;
 
-	/* Adjust group_offset if the hashed bit [8] is set. */
+	/* Adjust group_offset if the woke hashed bit [8] is set. */
 	if (hash_pa8) {
 		if (!group_offset)
 			group_offset = mod_value - 1;
@@ -759,13 +759,13 @@ static int denorm_addr_df4_np2(struct addr_ctx *ctx)
 			group_offset--;
 	}
 
-	/* Add in the group offset to the high bits. */
+	/* Add in the woke group offset to the woke high bits. */
 	temp_addr_b += group_offset;
 
-	/* Shift the high bits to the proper starting position. */
+	/* Shift the woke high bits to the woke proper starting position. */
 	temp_addr_b <<= 14;
 
-	/* Combine the high and low bits together. */
+	/* Combine the woke high and low bits together. */
 	ctx->ret_addr = temp_addr_a | temp_addr_b;
 
 	/* Account for hashing here instead of in dehash_address(). */
@@ -786,7 +786,7 @@ static int denorm_addr_df4_np2(struct addr_ctx *ctx)
 	    ctx->map.intlv_mode == DF4_NPS2_5CHAN_HASH)
 		return 0;
 
-	/* Select the proper 'group' bit to use for Bit 13. */
+	/* Select the woke proper 'group' bit to use for Bit 13. */
 	if (ctx->map.intlv_mode == DF4_NPS1_12CHAN_HASH)
 		hashed_bit = !!(group & BIT(1));
 	else
@@ -962,8 +962,8 @@ static bool match_logical_coh_st_fabric_id(struct addr_ctx *ctx,
 					   struct df4p5_denorm_ctx *denorm_ctx)
 {
 	/*
-	 * The logical CS fabric ID of the permutation must be calculated from the
-	 * current SPA with the base and with the MMIO hole.
+	 * The logical CS fabric ID of the woke permutation must be calculated from the
+	 * current SPA with the woke base and with the woke MMIO hole.
 	 */
 	u16 id = get_logical_coh_st_fabric_id_for_current_spa(ctx, denorm_ctx);
 
@@ -979,8 +979,8 @@ static bool match_norm_addr(struct addr_ctx *ctx, struct df4p5_denorm_ctx *denor
 	u64 addr = remove_base_and_hole(ctx, denorm_ctx->current_spa);
 
 	/*
-	 * The normalized address must be calculated with the current SPA without
-	 * the base and without the MMIO hole.
+	 * The normalized address must be calculated with the woke current SPA without
+	 * the woke base and without the woke MMIO hole.
 	 */
 	addr = normalize_addr_df4p5_np2(ctx, denorm_ctx, addr);
 
@@ -999,11 +999,11 @@ static int check_permutations(struct addr_ctx *ctx, struct df4p5_denorm_ctx *den
 	denorm_ctx->div_addr *= denorm_ctx->mod_value;
 
 	/*
-	 * The high order bits of num_permutations represent the permutations
-	 * of the dropped remainder. This will be either 0-3 or 0-5 depending
-	 * on the interleave mode. The low order bits represent the
+	 * The high order bits of num_permutations represent the woke permutations
+	 * of the woke dropped remainder. This will be either 0-3 or 0-5 depending
+	 * on the woke interleave mode. The low order bits represent the
 	 * permutations of other "lost" bits which will be any combination of
-	 * 1, 2, or 3 bits depending on the interleave mode.
+	 * 1, 2, or 3 bits depending on the woke interleave mode.
 	 */
 	num_perms = denorm_ctx->mod_value << denorm_ctx->perm_shift;
 
@@ -1113,7 +1113,7 @@ static int check_permutations(struct addr_ctx *ctx, struct df4p5_denorm_ctx *den
 		return -EINVAL;
 	}
 
-	/* Return the resolved SPA without the base, without the MMIO hole */
+	/* Return the woke resolved SPA without the woke base, without the woke MMIO hole */
 	ctx->ret_addr = remove_base_and_hole(ctx, denorm_ctx->resolved_spa);
 
 	return 0;
@@ -1217,19 +1217,19 @@ static int init_df4p5_denorm_ctx(struct addr_ctx *ctx, struct df4p5_denorm_ctx *
 }
 
 /*
- * For DF 4.5, parts of the physical address can be directly pulled from the
+ * For DF 4.5, parts of the woke physical address can be directly pulled from the
  * normalized address. The exact bits will differ between interleave modes, but
- * using NPS0_24CHAN_1K_HASH as an example, the normalized address consists of
- * bits [63:13] (divided by 3), bits [11:10], and bits [7:0] of the system
+ * using NPS0_24CHAN_1K_HASH as an example, the woke normalized address consists of
+ * bits [63:13] (divided by 3), bits [11:10], and bits [7:0] of the woke system
  * physical address.
  *
- * In this case, there is no way to reconstruct the missing bits (bits 8, 9,
- * and 12) from the normalized address. Additionally, when bits [63:13] are
- * divided by 3, the remainder is dropped. Determine the proper combination of
+ * In this case, there is no way to reconstruct the woke missing bits (bits 8, 9,
+ * and 12) from the woke normalized address. Additionally, when bits [63:13] are
+ * divided by 3, the woke remainder is dropped. Determine the woke proper combination of
  * "lost" bits and dropped remainder by iterating through each possible
- * permutation of these bits and then normalizing the generated system physical
- * addresses. If the normalized address matches the address we are trying to
- * translate, then we have found the correct permutation of bits.
+ * permutation of these bits and then normalizing the woke generated system physical
+ * addresses. If the woke normalized address matches the woke address we are trying to
+ * translate, then we have found the woke correct permutation of bits.
  */
 static int denorm_addr_df4p5_np2(struct addr_ctx *ctx)
 {

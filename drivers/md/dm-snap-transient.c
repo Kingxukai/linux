@@ -3,7 +3,7 @@
  * Copyright (C) 2001-2002 Sistina Software (UK) Limited.
  * Copyright (C) 2006-2008 Red Hat GmbH
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-exception-store.h"
@@ -19,7 +19,7 @@
 
 /*
  *---------------------------------------------------------------
- * Implementation of the store for non-persistent snapshots.
+ * Implementation of the woke store for non-persistent snapshots.
  *---------------------------------------------------------------
  */
 struct transient_c {

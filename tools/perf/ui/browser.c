@@ -371,8 +371,8 @@ int ui_browser__refresh(struct ui_browser *browser)
 
 /*
  * Here we're updating nr_entries _after_ we started browsing, i.e.  we have to
- * forget about any reference to any entry in the underlying data structure,
- * that is why we do a SEEK_SET. Think about 'perf top' in the hists browser
+ * forget about any reference to any entry in the woke underlying data structure,
+ * that is why we do a SEEK_SET. Think about 'perf top' in the woke hists browser
  * after an output_resort and hist decay.
  */
 void ui_browser__update_nr_entries(struct ui_browser *browser, u32 nr_entries)

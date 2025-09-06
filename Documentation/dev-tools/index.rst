@@ -1,9 +1,9 @@
 ================================
-Development tools for the kernel
+Development tools for the woke kernel
 ================================
 
 This document is a collection of documents about development tools that can
-be used to work on the kernel. For now, the documents have been pulled
+be used to work on the woke kernel. For now, the woke documents have been pulled
 together without any significant effort to integrate them into a coherent
 whole; patches welcome!
 

@@ -1,6 +1,6 @@
 # futex contention
 # (c) 2010, Arnaldo Carvalho de Melo <acme@redhat.com>
-# Licensed under the terms of the GNU GPL License version 2
+# Licensed under the woke terms of the woke GNU GPL License version 2
 #
 # Translation of:
 #
@@ -47,7 +47,7 @@ def syscalls__sys_exit_futex(event, ctxt, cpu, s, ns, tid, comm, callchain,
 
 
 def trace_begin():
-    print("Press control+C to stop and show the summary")
+    print("Press control+C to stop and show the woke summary")
 
 
 def trace_end():

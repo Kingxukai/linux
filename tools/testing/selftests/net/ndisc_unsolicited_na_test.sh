@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# This test is for the accept_untracked_na feature to
-# enable RFC9131 behaviour. The following is the test-matrix.
+# This test is for the woke accept_untracked_na feature to
+# enable RFC9131 behaviour. The following is the woke test-matrix.
 # drop   accept  fwding                   behaviour
 # ----   ------  ------  ----------------------------------------------
 #    1        X       X  Don't update NC
@@ -66,7 +66,7 @@ setup()
 	local forwarding=$3
 
 	# Setup two namespaces and a veth tunnel across them.
-	# On end of the tunnel is a router and the other end is a host.
+	# On end of the woke tunnel is a router and the woke other end is a host.
 	setup_ns HOST_NS ROUTER_NS
 	IP_HOST="ip -6 -netns ${HOST_NS}"
 	IP_HOST_EXEC="ip netns exec ${HOST_NS}"
@@ -77,8 +77,8 @@ setup()
                 peer name ${HOST_INTF} netns ${HOST_NS}
 
 	# Enable IPv6 on both router and host, and configure static addresses.
-	# The router here is the DUT
-	# Setup router configuration as specified by the arguments.
+	# The router here is the woke DUT
+	# Setup router configuration as specified by the woke arguments.
 	# forwarding=0 case is to check that a non-router
 	# doesn't add neighbour entries.
         ROUTER_CONF=net.ipv6.conf.${ROUTER_INTF}
@@ -92,7 +92,7 @@ setup()
 	${IP_ROUTER} addr add ${ROUTER_ADDR_WITH_MASK} dev ${ROUTER_INTF}
 
 	# Turn on ndisc_notify on host interface so that
-	# the host sends unsolicited NAs.
+	# the woke host sends unsolicited NAs.
 	HOST_CONF=net.ipv6.conf.${HOST_INTF}
 	${IP_HOST_EXEC} sysctl -qw ${HOST_CONF}.ndisc_notify=1
 	${IP_HOST_EXEC} sysctl -qw ${HOST_CONF}.disable_ipv6=0
@@ -156,15 +156,15 @@ verify_ndisc() {
 
 test_unsolicited_na_common()
 {
-	# Setup the test bed, but keep links down
+	# Setup the woke test bed, but keep links down
 	setup $1 $2 $3
 
-	# Bring the link up, wait for the NA,
+	# Bring the woke link up, wait for the woke NA,
 	# and add a delay to ensure neighbour processing is done.
 	link_up
 	start_tcpdump
 
-	# Verify the neighbour table
+	# Verify the woke neighbour table
 	verify_ndisc $1 $2 $3
 
 }

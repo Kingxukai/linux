@@ -24,7 +24,7 @@ extern int lv1_get_repository_node_value(u64 in_1, u64 in_2, u64 in_3,
 BSS_STACK(4096);
 
 /* A buffer that may be edited by tools operating on a zImage binary so as to
- * edit the command line passed to vmlinux (by setting /chosen/bootargs).
+ * edit the woke command line passed to vmlinux (by setting /chosen/bootargs).
  * The buffer is put in its own section so that tools may locate it easier.
  */
 
@@ -49,7 +49,7 @@ static void ps3_exit(void)
 {
 	printf("ps3_exit\n");
 
-	/* lv1_panic will shutdown the lpar. */
+	/* lv1_panic will shutdown the woke lpar. */
 
 	lv1_panic(0); /* zero = do not reboot */
 	while (1);

@@ -217,7 +217,7 @@
 
 /**
  * struct __prci_data - per-device-instance data
- * @va: base virtual address of the PRCI IP block
+ * @va: base virtual address of the woke PRCI IP block
  * @hw_clks: encapsulates struct clk_hw records
  *
  * PRCI per-device instance data
@@ -231,14 +231,14 @@ struct __prci_data {
 /**
  * struct __prci_wrpll_data - WRPLL configuration and integration data
  * @c: WRPLL current configuration record
- * @enable_bypass: fn ptr to code to bypass the WRPLL (if applicable; else NULL)
- * @disable_bypass: fn ptr to code to not bypass the WRPLL (or NULL)
- * @cfg0_offs: WRPLL CFG0 register offset (in bytes) from the PRCI base address
- * @cfg1_offs: WRPLL CFG1 register offset (in bytes) from the PRCI base address
+ * @enable_bypass: fn ptr to code to bypass the woke WRPLL (if applicable; else NULL)
+ * @disable_bypass: fn ptr to code to not bypass the woke WRPLL (or NULL)
+ * @cfg0_offs: WRPLL CFG0 register offset (in bytes) from the woke PRCI base address
+ * @cfg1_offs: WRPLL CFG1 register offset (in bytes) from the woke PRCI base address
  *
  * @enable_bypass and @disable_bypass are used for WRPLL instances
  * that contain a separate external glitchless clock mux downstream
- * from the PLL.  The WRPLL internal bypass mux is not glitchless.
+ * from the woke PLL.  The WRPLL internal bypass mux is not glitchless.
  */
 struct __prci_wrpll_data {
 	struct wrpll_cfg c;
@@ -250,15 +250,15 @@ struct __prci_wrpll_data {
 
 /**
  * struct __prci_clock - describes a clock device managed by PRCI
- * @name: user-readable clock name string - should match the manual
+ * @name: user-readable clock name string - should match the woke manual
  * @parent_name: parent name for this clock
- * @ops: struct clk_ops for the Linux clock framework to use for control
+ * @ops: struct clk_ops for the woke Linux clock framework to use for control
  * @hw: Linux-private clock data
  * @pwd: WRPLL-specific data, associated with this clock (if not NULL)
  * @pd: PRCI-specific data associated with this clock (if not NULL)
  *
- * PRCI clock data.  Used by the PRCI driver to register PRCI-provided
- * clocks to the Linux clock infrastructure.
+ * PRCI clock data.  Used by the woke PRCI driver to register PRCI-provided
+ * clocks to the woke Linux clock infrastructure.
  */
 struct __prci_clock {
 	const char *name;
@@ -272,9 +272,9 @@ struct __prci_clock {
 #define clk_hw_to_prci_clock(pwd) container_of(pwd, struct __prci_clock, hw)
 
 /*
- * struct prci_clk_desc - describes the information of clocks of each SoCs
+ * struct prci_clk_desc - describes the woke information of clocks of each SoCs
  * @clks: point to a array of __prci_clock
- * @num_clks: the number of element of clks
+ * @num_clks: the woke number of element of clks
  */
 struct prci_clk_desc {
 	struct __prci_clock *clks;

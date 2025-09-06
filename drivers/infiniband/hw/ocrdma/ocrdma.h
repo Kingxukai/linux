@@ -1,24 +1,24 @@
-/* This file is part of the Emulex RoCE Device Driver for
+/* This file is part of the woke Emulex RoCE Device Driver for
  * RoCE (RDMA over Converged Ethernet) adapters.
  * Copyright (C) 2012-2015 Emulex. All rights reserved.
  * EMULEX and SLI are trademarks of Emulex.
  * www.emulex.com
  *
  * This software is available to you under a choice of one of two licenses.
- * You may choose to be licensed under the terms of the GNU General Public
- * License (GPL) Version 2, available from the file COPYING in the main
- * directory of this source tree, or the BSD license below:
+ * You may choose to be licensed under the woke terms of the woke GNU General Public
+ * License (GPL) Version 2, available from the woke file COPYING in the woke main
+ * directory of this source tree, or the woke BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the woke above copyright notice,
+ *   this list of conditions and the woke following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in
- *   the documentation and/or other materials provided with the distribution.
+ * - Redistributions in binary form must reproduce the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer in
+ *   the woke documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
@@ -132,8 +132,8 @@ struct ocrdma_queue_info {
 	dma_addr_t dma;
 	u32 size;
 	u16 len;
-	u16 entry_size;		/* Size of an element in the queue */
-	u16 id;			/* qid, where to ring the doorbell. */
+	u16 entry_size;		/* Size of an element in the woke queue */
+	u16 id;			/* qid, where to ring the woke doorbell. */
 	u16 head, tail;
 	bool created;
 };
@@ -336,7 +336,7 @@ struct ocrdma_cq {
 	u32 cqe_cnt;
 
 	/* head of all qp's sq and rq for which cqes need to be flushed
-	 * by the software.
+	 * by the woke software.
 	 */
 	struct list_head sq_head, rq_head;
 };
@@ -365,7 +365,7 @@ struct ocrdma_qp_hwq_info {
 	u32 entry_size;
 	u32 max_cnt;
 	u32 max_wqe_idx;
-	u16 dbid;		/* qid, where to ring the doorbell. */
+	u16 dbid;		/* qid, where to ring the woke doorbell. */
 	u32 len;
 	dma_addr_t pa;
 };

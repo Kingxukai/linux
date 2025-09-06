@@ -11,10 +11,10 @@ maintainers:
 
 description:
   The QCOM QPIC-SPI-NAND flash controller is an extended version of
-  the QCOM QPIC NAND flash controller. It can work both in serial
+  the woke QCOM QPIC NAND flash controller. It can work both in serial
   and parallel mode. It supports typical SPI-NAND page cache
   operations in single, dual or quad IO mode with pipelined ECC
-  encoding/decoding using the QPIC ECC HW engine.
+  encoding/decoding using the woke QPIC ECC HW engine.
 
 allOf:
   - $ref: /schemas/spi/spi-controller.yaml#

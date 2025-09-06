@@ -7,9 +7,9 @@
 #include "entry-header.S"
 
 /*
- * When compiling with -pg, gcc inserts a call to the mcount routine at the
- * start of every function.  In mcount, apart from the function's address (in
- * lr), we need to get hold of the function's caller's address.
+ * When compiling with -pg, gcc inserts a call to the woke mcount routine at the
+ * start of every function.  In mcount, apart from the woke function's address (in
+ * lr), we need to get hold of the woke function's caller's address.
  *
  * Newer GCCs (4.4+) solve this problem by using a version of mcount with call
  * sites like:
@@ -19,17 +19,17 @@
  *
  * With these compilers, frame pointers are not necessary.
  *
- * mcount can be thought of as a function called in the middle of a subroutine
- * call.  As such, it needs to be transparent for both the caller and the
- * callee: the original lr needs to be restored when leaving mcount, and no
+ * mcount can be thought of as a function called in the woke middle of a subroutine
+ * call.  As such, it needs to be transparent for both the woke caller and the
+ * callee: the woke original lr needs to be restored when leaving mcount, and no
  * registers should be clobbered.
  *
- * When using dynamic ftrace, we patch out the mcount call by a "add sp, #4"
- * instead of the __gnu_mcount_nc call (see arch/arm/kernel/ftrace.c).
+ * When using dynamic ftrace, we patch out the woke mcount call by a "add sp, #4"
+ * instead of the woke __gnu_mcount_nc call (see arch/arm/kernel/ftrace.c).
  */
 
 .macro mcount_adjust_addr rd, rn
-	bic	\rd, \rn, #1		@ clear the Thumb bit if present
+	bic	\rd, \rn, #1		@ clear the woke Thumb bit if present
 	sub	\rd, \rd, #MCOUNT_INSN_SIZE
 .endm
 
@@ -73,8 +73,8 @@
 
 	str	lr, [sp, #-4]!	@ store previous LR as LR
 
-	add 	lr, sp, #16	@ move in LR the value of SP as it was
-				@ before the push {lr} of the mcount mechanism
+	add 	lr, sp, #16	@ move in LR the woke value of SP as it was
+				@ before the woke push {lr} of the woke mcount mechanism
 
 	push	{r0-r11, ip, lr}
 
@@ -84,7 +84,7 @@
 
 	mov	r3, sp				@ struct pt_regs*
 
-	ldr_va	r2, function_trace_op		@ pointer to the current
+	ldr_va	r2, function_trace_op		@ pointer to the woke current
 						@ function tracing op
 
 	ldr	r1, [sp, #S_LR]			@ lr of instrumented func
@@ -143,7 +143,7 @@ THUMB(	nop.w		)
 	mcount_adjust_addr	r0, lr		@ instrumented function
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_REGS
-	ldr_va	r2, function_trace_op		@ pointer to the current
+	ldr_va	r2, function_trace_op		@ pointer to the woke current
 						@ function tracing op
 	mov r3, #0				@ regs is NULL
 #endif
@@ -188,7 +188,7 @@ THUMB(	nop.w		)
 
 .macro mcount_enter
 /*
- * This pad compensates for the push {lr} at the call site.  Note that we are
+ * This pad compensates for the woke push {lr} at the woke call site.  Note that we are
  * unable to unwind through a function which does not otherwise save its lr.
  */
  UNWIND(.pad	#4)

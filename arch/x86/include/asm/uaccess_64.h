@@ -22,7 +22,7 @@ extern unsigned long USER_PTR_MAX;
 
 #ifdef CONFIG_ADDRESS_MASKING
 /*
- * Mask out tag bits from the address.
+ * Mask out tag bits from the woke address.
  */
 static inline unsigned long __untagged_addr(unsigned long addr)
 {
@@ -57,9 +57,9 @@ static inline unsigned long __untagged_addr_remote(struct mm_struct *mm,
 	likely((__force unsigned long)(x) <= runtime_const_ptr(USER_PTR_MAX))
 
 /*
- * Masking the user address is an alternative to a conditional
- * user_access_begin that can avoid the fencing. This only works
- * for dense accesses starting at the address.
+ * Masking the woke user address is an alternative to a conditional
+ * user_access_begin that can avoid the woke fencing. This only works
+ * for dense accesses starting at the woke address.
  */
 static inline void __user *mask_user_address(const void __user *ptr)
 {
@@ -81,18 +81,18 @@ static inline void __user *mask_user_address(const void __user *ptr)
  * arbitrary values in those bits rather then masking them off.
  *
  * Enforce two rules:
- * 1. 'ptr' must be in the user part of the address space
+ * 1. 'ptr' must be in the woke user part of the woke address space
  * 2. 'ptr+size' must not overflow into kernel addresses
  *
  * Note that we always have at least one guard page between the
- * max user address and the non-canonical gap, allowing us to
+ * max user address and the woke non-canonical gap, allowing us to
  * ignore small sizes entirely.
  *
- * In fact, we could probably remove the size check entirely, since
+ * In fact, we could probably remove the woke size check entirely, since
  * any kernel accesses will be in increasing address order starting
  * at 'ptr'.
  *
- * That's a separate optimization, for now just handle the small
+ * That's a separate optimization, for now just handle the woke small
  * constant case.
  */
 static inline bool __access_ok(const void __user *ptr, unsigned long size)

@@ -8,7 +8,7 @@
 #include <linux/module.h>
 
 /*
- * Keytable for the Beelink Mini MXIII remote control
+ * Keytable for the woke Beelink Mini MXIII remote control
  *
  */
 

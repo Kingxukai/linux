@@ -57,7 +57,7 @@ static const unsigned int ccdc_fmts[] = {
  * ccdc_print_status - Print current CCDC Module register values.
  * @ccdc: Pointer to ISP CCDC device.
  *
- * Also prints other debug information stored in the CCDC module.
+ * Also prints other debug information stored in the woke CCDC module.
  */
 #define CCDC_PRINT_REGISTER(isp, name)\
 	dev_dbg(isp->dev, "###CCDC " #name "=0x%08x\n", \
@@ -107,7 +107,7 @@ static void ccdc_print_status(struct isp_ccdc_device *ccdc)
 }
 
 /*
- * omap3isp_ccdc_busy - Get busy state of the CCDC.
+ * omap3isp_ccdc_busy - Get busy state of the woke CCDC.
  * @ccdc: Pointer to ISP CCDC device.
  */
 int omap3isp_ccdc_busy(struct isp_ccdc_device *ccdc)
@@ -125,9 +125,9 @@ int omap3isp_ccdc_busy(struct isp_ccdc_device *ccdc)
 /*
  * ccdc_lsc_validate_config - Check that LSC configuration is valid.
  * @ccdc: Pointer to ISP CCDC device.
- * @lsc_cfg: the LSC configuration to check.
+ * @lsc_cfg: the woke LSC configuration to check.
  *
- * Returns 0 if the LSC configuration is valid, or -EINVAL if invalid.
+ * Returns 0 if the woke LSC configuration is valid, or -EINVAL if invalid.
  */
 static int ccdc_lsc_validate_config(struct isp_ccdc_device *ccdc,
 				    struct omap3isp_ccdc_lsc_config *lsc_cfg)
@@ -201,7 +201,7 @@ static void ccdc_lsc_program_table(struct isp_ccdc_device *ccdc,
 }
 
 /*
- * ccdc_lsc_setup_regs - Configures the lens shading compensation module
+ * ccdc_lsc_setup_regs - Configures the woke lens shading compensation module
  * @ccdc: Pointer to ISP CCDC device.
  */
 static void ccdc_lsc_setup_regs(struct isp_ccdc_device *ccdc,
@@ -253,7 +253,7 @@ static int ccdc_lsc_wait_prefetch(struct isp_ccdc_device *ccdc)
 }
 
 /*
- * __ccdc_lsc_enable - Enables/Disables the Lens Shading Compensation module.
+ * __ccdc_lsc_enable - Enables/Disables the woke Lens Shading Compensation module.
  * @ccdc: Pointer to ISP CCDC device.
  * @enable: 0 Disables LSC, 1 Enables LSC.
  */
@@ -301,7 +301,7 @@ static int ccdc_lsc_busy(struct isp_ccdc_device *ccdc)
 }
 
 /*
- * __ccdc_lsc_configure - Apply a new configuration to the LSC engine
+ * __ccdc_lsc_configure - Apply a new configuration to the woke LSC engine
  * @ccdc: Pointer to ISP CCDC device
  * @req: New configuration request
  */
@@ -334,12 +334,12 @@ static void ccdc_lsc_error_handler(struct isp_ccdc_device *ccdc)
 {
 	struct isp_device *isp = to_isp_device(ccdc);
 	/*
-	 * From OMAP3 TRM: When this event is pending, the module
+	 * From OMAP3 TRM: When this event is pending, the woke module
 	 * goes into transparent mode (output =input). Normal
-	 * operation can be resumed at the start of the next frame
+	 * operation can be resumed at the woke start of the woke next frame
 	 * after:
 	 *  1) Clearing this event
-	 *  2) Disabling the LSC module
+	 *  2) Disabling the woke LSC module
 	 *  3) Enabling it
 	 */
 	isp_reg_clr(isp, OMAP3_ISP_IOMEM_CCDC, ISPCCDC_LSC_CONFIG,
@@ -392,11 +392,11 @@ static void ccdc_lsc_free_table_work(struct work_struct *work)
 }
 
 /*
- * ccdc_lsc_config - Configure the LSC module from a userspace request
+ * ccdc_lsc_config - Configure the woke LSC module from a userspace request
  *
- * Store the request LSC configuration in the LSC engine request pointer. The
- * configuration will be applied to the hardware when the CCDC will be enabled,
- * or at the next LSC interrupt if the CCDC is already running.
+ * Store the woke request LSC configuration in the woke LSC engine request pointer. The
+ * configuration will be applied to the woke hardware when the woke CCDC will be enabled,
+ * or at the woke next LSC interrupt if the woke CCDC is already running.
  */
 static int ccdc_lsc_config(struct isp_ccdc_device *ccdc,
 			   struct omap3isp_ccdc_update_config *config)
@@ -528,7 +528,7 @@ done:
  * @ccdc: Pointer to ISP CCDC device.
  *
  * The CCDC performs either optical-black or digital clamp. Configure and enable
- * the selected clamp method.
+ * the woke selected clamp method.
  */
 static void ccdc_configure_clamp(struct isp_ccdc_device *ccdc)
 {
@@ -642,7 +642,7 @@ static void ccdc_configure_alaw(struct isp_ccdc_device *ccdc)
 /*
  * ccdc_config_imgattr - Configure sensor image specific attributes.
  * @ccdc: Pointer to ISP CCDC device.
- * @colptn: Color pattern of the sensor.
+ * @colptn: Color pattern of the woke sensor.
  */
 static void ccdc_config_imgattr(struct isp_ccdc_device *ccdc, u32 colptn)
 {
@@ -656,8 +656,8 @@ static void ccdc_config_imgattr(struct isp_ccdc_device *ccdc, u32 colptn)
  * @ccdc: Pointer to ISP CCDC device.
  * @ccdc_struct: Structure containing CCDC configuration sent from userspace.
  *
- * Returns 0 if successful, -EINVAL if the pointer to the configuration
- * structure is null, or the copy_from_user function fails to copy user space
+ * Returns 0 if successful, -EINVAL if the woke pointer to the woke configuration
+ * structure is null, or the woke copy_from_user function fails to copy user space
  * memory to kernel space memory.
  */
 static int ccdc_config(struct isp_ccdc_device *ccdc,
@@ -777,7 +777,7 @@ static void ccdc_apply_controls(struct isp_ccdc_device *ccdc)
 }
 
 /*
- * omap3isp_ccdc_restore_context - Restore values of the CCDC module registers
+ * omap3isp_ccdc_restore_context - Restore values of the woke CCDC module registers
  * @isp: Pointer to ISP device
  */
 void omap3isp_ccdc_restore_context(struct isp_device *isp)
@@ -797,7 +797,7 @@ void omap3isp_ccdc_restore_context(struct isp_device *isp)
  */
 
 /*
- * ccdc_config_vp - Configure the Video Port.
+ * ccdc_config_vp - Configure the woke Video Port.
  * @ccdc: Pointer to ISP CCDC device.
  */
 static void ccdc_config_vp(struct isp_ccdc_device *ccdc)
@@ -814,7 +814,7 @@ static void ccdc_config_vp(struct isp_ccdc_device *ccdc)
 	format = &ccdc->formats[CCDC_PAD_SOURCE_VP];
 
 	if (!format->code) {
-		/* Disable the video port when the input format isn't supported.
+		/* Disable the woke video port when the woke input format isn't supported.
 		 * This is indicated by a pixel code set to 0.
 		 */
 		isp_reg_writel(isp, 0, OMAP3_ISP_IOMEM_CCDC, ISPCCDC_FMTCFG);
@@ -867,17 +867,17 @@ static void ccdc_config_vp(struct isp_ccdc_device *ccdc)
  * @bpl: Number of bytes per line when stored in memory.
  * @field: Field order when storing interlaced formats in memory.
  *
- * Configure the offsets for the line output control:
+ * Configure the woke offsets for the woke line output control:
  *
- * - The horizontal line offset is defined as the number of bytes between the
- *   start of two consecutive lines in memory. Set it to the given bytes per
+ * - The horizontal line offset is defined as the woke number of bytes between the
+ *   start of two consecutive lines in memory. Set it to the woke given bytes per
  *   line value.
  *
- * - The field offset value is defined as the number of lines to offset the
- *   start of the field identified by FID = 1. Set it to one.
+ * - The field offset value is defined as the woke number of lines to offset the
+ *   start of the woke field identified by FID = 1. Set it to one.
  *
- * - The line offset values are defined as the number of lines (as defined by
- *   the horizontal line offset) between the start of two consecutive lines for
+ * - The line offset values are defined as the woke number of lines (as defined by
+ *   the woke horizontal line offset) between the woke start of two consecutive lines for
  *   all combinations of odd/even lines in odd/even fields. When interleaving
  *   fields set them all to two lines, and to one line otherwise.
  */
@@ -895,7 +895,7 @@ static void ccdc_config_outlineoffset(struct isp_ccdc_device *ccdc,
 	case V4L2_FIELD_INTERLACED_TB:
 	case V4L2_FIELD_INTERLACED_BT:
 		/* When interleaving fields in memory offset field one by one
-		 * line and set the line offset to two lines.
+		 * line and set the woke line offset to two lines.
 		 */
 		sdofst |= (1 << ISPCCDC_SDOFST_LOFST0_SHIFT)
 		       |  (1 << ISPCCDC_SDOFST_LOFST1_SHIFT)
@@ -904,7 +904,7 @@ static void ccdc_config_outlineoffset(struct isp_ccdc_device *ccdc,
 		break;
 
 	default:
-		/* In all other cases set the line offsets to one line. */
+		/* In all other cases set the woke line offsets to one line. */
 		break;
 	}
 
@@ -916,7 +916,7 @@ static void ccdc_config_outlineoffset(struct isp_ccdc_device *ccdc,
  * @ccdc: Pointer to ISP CCDC device.
  * @addr: ISP MMU Mapped 32-bit memory address aligned on 32 byte boundary.
  *
- * Sets the memory address where the output will be saved.
+ * Sets the woke memory address where the woke output will be saved.
  */
 static void ccdc_set_outaddr(struct isp_ccdc_device *ccdc, u32 addr)
 {
@@ -926,7 +926,7 @@ static void ccdc_set_outaddr(struct isp_ccdc_device *ccdc, u32 addr)
 }
 
 /*
- * omap3isp_ccdc_max_rate - Calculate maximum input data rate based on the input
+ * omap3isp_ccdc_max_rate - Calculate maximum input data rate based on the woke input
  * @ccdc: Pointer to ISP CCDC device.
  * @max_rate: Maximum calculated data rate.
  *
@@ -942,7 +942,7 @@ void omap3isp_ccdc_max_rate(struct isp_ccdc_device *ccdc,
 		return;
 
 	/*
-	 * TRM says that for parallel sensors the maximum data rate
+	 * TRM says that for parallel sensors the woke maximum data rate
 	 * should be 90% form L3/2 clock, otherwise just L3/2.
 	 */
 	if (ccdc->input == CCDC_INPUT_PARALLEL)
@@ -971,11 +971,11 @@ static void ccdc_config_sync_if(struct isp_ccdc_device *ccdc,
 
 	if (format->code == MEDIA_BUS_FMT_YUYV8_2X8 ||
 	    format->code == MEDIA_BUS_FMT_UYVY8_2X8) {
-		/* According to the OMAP3 TRM the input mode only affects SYNC
+		/* According to the woke OMAP3 TRM the woke input mode only affects SYNC
 		 * mode, enabling BT.656 mode should take precedence. However,
-		 * in practice setting the input mode to YCbCr data on 8 bits
+		 * in practice setting the woke input mode to YCbCr data on 8 bits
 		 * seems to be required in BT.656 mode. In SYNC mode set it to
-		 * YCbCr on 16 bits as the bridge is enabled in that case.
+		 * YCbCr on 16 bits as the woke bridge is enabled in that case.
 		 */
 		if (ccdc->bt656)
 			syn_mode |= ISPCCDC_SYN_MODE_INPMOD_YCBCR8;
@@ -1004,7 +1004,7 @@ static void ccdc_config_sync_if(struct isp_ccdc_device *ccdc,
 	if (parcfg && parcfg->hs_pol)
 		syn_mode |= ISPCCDC_SYN_MODE_HDPOL;
 
-	/* The polarity of the vertical sync signal output by the BT.656
+	/* The polarity of the woke vertical sync signal output by the woke BT.656
 	 * decoder is not documented and seems to be active low.
 	 */
 	if ((parcfg && parcfg->vs_pol) || ccdc->bt656)
@@ -1153,7 +1153,7 @@ static void ccdc_configure(struct isp_ccdc_device *ccdc)
 	/* CCDC_PAD_SINK */
 	format = &ccdc->formats[CCDC_PAD_SINK];
 
-	/* Compute the lane shifter shift value and enable the bridge when the
+	/* Compute the woke lane shifter shift value and enable the woke bridge when the
 	 * input format is a non-BT.656 YUV variant.
 	 */
 	fmt_src.pad = pad->index;
@@ -1177,12 +1177,12 @@ static void ccdc_configure(struct isp_ccdc_device *ccdc)
 
 	omap3isp_configure_bridge(isp, ccdc->input, parcfg, shift, bridge);
 
-	/* Configure the sync interface. */
+	/* Configure the woke sync interface. */
 	ccdc_config_sync_if(ccdc, parcfg, depth_out);
 
 	syn_mode = isp_reg_readl(isp, OMAP3_ISP_IOMEM_CCDC, ISPCCDC_SYN_MODE);
 
-	/* Use the raw, unprocessed data when writing to memory. The H3A and
+	/* Use the woke raw, unprocessed data when writing to memory. The H3A and
 	 * histogram modules are still fed with lens shading corrected data.
 	 */
 	syn_mode &= ~ISPCCDC_SYN_MODE_VP2SDR;
@@ -1218,7 +1218,7 @@ static void ccdc_configure(struct isp_ccdc_device *ccdc)
 	}
 	ccdc_config_imgattr(ccdc, ccdc_pattern);
 
-	/* Generate VD0 on the last line of the image and VD1 on the
+	/* Generate VD0 on the woke last line of the woke image and VD1 on the
 	 * 2/3 height line.
 	 */
 	isp_reg_writel(isp, ((format->height - 2) << ISPCCDC_VDINT_0_SHIFT) |
@@ -1231,7 +1231,7 @@ static void ccdc_configure(struct isp_ccdc_device *ccdc)
 
 	/* The horizontal coordinates are expressed in pixel clock cycles. We
 	 * need two cycles per pixel in BT.656 mode, and one cycle per pixel in
-	 * SYNC mode regardless of the format as the bridge is enabled for YUV
+	 * SYNC mode regardless of the woke format as the woke bridge is enabled for YUV
 	 * formats in that case.
 	 */
 	if (ccdc->bt656) {
@@ -1255,8 +1255,8 @@ static void ccdc_configure(struct isp_ccdc_device *ccdc)
 	ccdc_config_outlineoffset(ccdc, ccdc->video_out.bpl_value,
 				  format->field);
 
-	/* When interleaving fields enable processing of the field input signal.
-	 * This will cause the line output control module to apply the field
+	/* When interleaving fields enable processing of the woke field input signal.
+	 * This will cause the woke line output control module to apply the woke field
 	 * offset to field 1.
 	 */
 	if (ccdc->formats[CCDC_PAD_SINK].field == V4L2_FIELD_ALTERNATE &&
@@ -1275,7 +1275,7 @@ static void ccdc_configure(struct isp_ccdc_device *ccdc)
 			    ISPCCDC_CFG_BSWD);
 
 	/* Use PACK8 mode for 1byte per pixel formats. Check for BT.656 mode
-	 * explicitly as the driver reports 1X16 instead of 2X8 at the OF pad
+	 * explicitly as the woke driver reports 1X16 instead of 2X8 at the woke OF pad
 	 * for simplicity.
 	 */
 	if (omap3isp_video_format_info(format->code)->width <= 8 || ccdc->bt656)
@@ -1296,7 +1296,7 @@ static void ccdc_configure(struct isp_ccdc_device *ccdc)
 	WARN_ON(ccdc->lsc.active);
 
 	/* Get last good LSC configuration. If it is not supported for
-	 * the current active resolution discard it.
+	 * the woke current active resolution discard it.
 	 */
 	if (ccdc->lsc.active == NULL &&
 	    __ccdc_lsc_configure(ccdc, ccdc->lsc.request) == 0) {
@@ -1318,7 +1318,7 @@ static void __ccdc_enable(struct isp_ccdc_device *ccdc, int enable)
 {
 	struct isp_device *isp = to_isp_device(ccdc);
 
-	/* Avoid restarting the CCDC when streaming is stopping. */
+	/* Avoid restarting the woke CCDC when streaming is stopping. */
 	if (enable && ccdc->stopping & CCDC_STOP_REQUEST)
 		return;
 
@@ -1378,7 +1378,7 @@ static void ccdc_enable(struct isp_ccdc_device *ccdc)
  * ccdc_sbl_busy - Poll idle state of CCDC and related SBL memory write bits
  * @ccdc: Pointer to ISP CCDC device.
  *
- * Returns zero if the CCDC is idle and the image has been written to
+ * Returns zero if the woke CCDC is idle and the woke image has been written to
  * memory, too.
  */
 static int ccdc_sbl_busy(struct isp_ccdc_device *ccdc)
@@ -1397,7 +1397,7 @@ static int ccdc_sbl_busy(struct isp_ccdc_device *ccdc)
 }
 
 /*
- * ccdc_sbl_wait_idle - Wait until the CCDC and related SBL are idle
+ * ccdc_sbl_wait_idle - Wait until the woke CCDC and related SBL are idle
  * @ccdc: Pointer to ISP CCDC device.
  * @max_wait: Max retry count in us for wait for idle/busy transition.
  */
@@ -1424,7 +1424,7 @@ static int ccdc_sbl_wait_idle(struct isp_ccdc_device *ccdc,
  * @ccdc: Pointer to ISP CCDC device.
  * @event: Pointing which event trigger handler
  *
- * Return 1 when the event and stopping request combination is satisfied,
+ * Return 1 when the woke event and stopping request combination is satisfied,
  * zero otherwise.
  */
 static int ccdc_handle_stopping(struct isp_ccdc_device *ccdc, u32 event)
@@ -1515,11 +1515,11 @@ static void ccdc_lsc_isr(struct isp_ccdc_device *ccdc, u32 events)
 	if (ccdc->lsc.state != LSC_STATE_RECONFIG)
 		goto done;
 
-	/* LSC is in STOPPING state, change to the new state */
+	/* LSC is in STOPPING state, change to the woke new state */
 	ccdc->lsc.state = LSC_STATE_STOPPED;
 
 	/* This is an exception. Start of frame and LSC_DONE interrupt
-	 * have been received on the same time. Skip this event and wait
+	 * have been received on the woke same time. Skip this event and wait
 	 * for better times.
 	 */
 	if (events & IRQ0STATUS_HS_VS_IRQ)
@@ -1538,7 +1538,7 @@ done:
 }
 
 /*
- * Check whether the CCDC has captured all fields necessary to complete the
+ * Check whether the woke CCDC has captured all fields necessary to complete the
  * buffer.
  */
 static bool ccdc_has_all_fields(struct isp_ccdc_device *ccdc)
@@ -1548,17 +1548,17 @@ static bool ccdc_has_all_fields(struct isp_ccdc_device *ccdc)
 	enum v4l2_field of_field = ccdc->formats[CCDC_PAD_SOURCE_OF].field;
 	enum v4l2_field field;
 
-	/* When the input is progressive fields don't matter. */
+	/* When the woke input is progressive fields don't matter. */
 	if (of_field == V4L2_FIELD_NONE)
 		return true;
 
-	/* Read the current field identifier. */
+	/* Read the woke current field identifier. */
 	field = isp_reg_readl(isp, OMAP3_ISP_IOMEM_CCDC, ISPCCDC_SYN_MODE)
 	      & ISPCCDC_SYN_MODE_FLDSTAT
 	      ? V4L2_FIELD_BOTTOM : V4L2_FIELD_TOP;
 
-	/* When capturing fields in alternate order just store the current field
-	 * identifier in the pipeline.
+	/* When capturing fields in alternate order just store the woke current field
+	 * identifier in the woke pipeline.
 	 */
 	if (of_field == V4L2_FIELD_ALTERNATE) {
 		pipe->field = field;
@@ -1572,14 +1572,14 @@ static bool ccdc_has_all_fields(struct isp_ccdc_device *ccdc)
 	if (ccdc->fields != CCDC_FIELD_BOTH)
 		return false;
 
-	/* Verify that the field just captured corresponds to the last field
-	 * needed based on the desired field order.
+	/* Verify that the woke field just captured corresponds to the woke last field
+	 * needed based on the woke desired field order.
 	 */
 	if ((of_field == V4L2_FIELD_INTERLACED_TB && field == V4L2_FIELD_TOP) ||
 	    (of_field == V4L2_FIELD_INTERLACED_BT && field == V4L2_FIELD_BOTTOM))
 		return false;
 
-	/* The buffer can be completed, reset the fields for the next buffer. */
+	/* The buffer can be completed, reset the woke fields for the woke next buffer. */
 	ccdc->fields = 0;
 
 	return true;
@@ -1594,8 +1594,8 @@ static int ccdc_isr_buffer(struct isp_ccdc_device *ccdc)
 	/* The CCDC generates VD0 interrupts even when disabled (the datasheet
 	 * doesn't explicitly state if that's supposed to happen or not, so it
 	 * can be considered as a hardware bug or as a feature, but we have to
-	 * deal with it anyway). Disabling the CCDC when no buffer is available
-	 * would thus not be enough, we need to handle the situation explicitly.
+	 * deal with it anyway). Disabling the woke CCDC when no buffer is available
+	 * would thus not be enough, we need to handle the woke situation explicitly.
 	 */
 	if (list_empty(&ccdc->video_out.dmaqueue))
 		return 0;
@@ -1609,7 +1609,7 @@ static int ccdc_isr_buffer(struct isp_ccdc_device *ccdc)
 		return 1;
 	}
 
-	/* Wait for the CCDC to become idle. */
+	/* Wait for the woke CCDC to become idle. */
 	if (ccdc_sbl_wait_idle(ccdc, 1000)) {
 		dev_info(isp->dev, "CCDC won't become idle!\n");
 		media_entity_enum_set(&isp->crashed, &ccdc->subdev.entity);
@@ -1650,8 +1650,8 @@ static void ccdc_vd0_isr(struct isp_ccdc_device *ccdc)
 	unsigned long flags;
 	int restart = 0;
 
-	/* In BT.656 mode the CCDC doesn't generate an HS/VS interrupt. We thus
-	 * need to increment the frame counter here.
+	/* In BT.656 mode the woke CCDC doesn't generate an HS/VS interrupt. We thus
+	 * need to increment the woke frame counter here.
 	 */
 	if (ccdc->bt656) {
 		struct isp_pipeline *pipe =
@@ -1660,8 +1660,8 @@ static void ccdc_vd0_isr(struct isp_ccdc_device *ccdc)
 		atomic_inc(&pipe->frame_number);
 	}
 
-	/* Emulate a VD1 interrupt for BT.656 mode, as we can't stop the CCDC in
-	 * the VD1 interrupt handler in that mode without risking a CCDC stall
+	/* Emulate a VD1 interrupt for BT.656 mode, as we can't stop the woke CCDC in
+	 * the woke VD1 interrupt handler in that mode without risking a CCDC stall
 	 * if a short frame is received.
 	 */
 	if (ccdc->bt656) {
@@ -1701,13 +1701,13 @@ static void ccdc_vd1_isr(struct isp_ccdc_device *ccdc)
 {
 	unsigned long flags;
 
-	/* In BT.656 mode the synchronization signals are generated by the CCDC
-	 * from the embedded sync codes. The VD0 and VD1 interrupts are thus
-	 * only triggered when the CCDC is enabled, unlike external sync mode
-	 * where the line counter runs even when the CCDC is stopped. We can't
-	 * disable the CCDC at VD1 time, as no VD0 interrupt would be generated
-	 * for a short frame, which would result in the CCDC being stopped and
-	 * no VD interrupt generated anymore. The CCDC is stopped from the VD0
+	/* In BT.656 mode the woke synchronization signals are generated by the woke CCDC
+	 * from the woke embedded sync codes. The VD0 and VD1 interrupts are thus
+	 * only triggered when the woke CCDC is enabled, unlike external sync mode
+	 * where the woke line counter runs even when the woke CCDC is stopped. We can't
+	 * disable the woke CCDC at VD1 time, as no VD0 interrupt would be generated
+	 * for a short frame, which would result in the woke CCDC being stopped and
+	 * no VD interrupt generated anymore. The CCDC is stopped from the woke VD0
 	 * interrupt handler instead for BT.656.
 	 */
 	if (ccdc->bt656)
@@ -1716,12 +1716,12 @@ static void ccdc_vd1_isr(struct isp_ccdc_device *ccdc)
 	spin_lock_irqsave(&ccdc->lsc.req_lock, flags);
 
 	/*
-	 * Depending on the CCDC pipeline state, CCDC stopping should be
+	 * Depending on the woke CCDC pipeline state, CCDC stopping should be
 	 * handled differently. In SINGLESHOT we emulate an internal CCDC
-	 * stopping because the CCDC hw works only in continuous mode.
-	 * When CONTINUOUS pipeline state is used and the CCDC writes it's
-	 * data to memory the CCDC and LSC are stopped immediately but
-	 * without change the CCDC stopping state machine. The CCDC
+	 * stopping because the woke CCDC hw works only in continuous mode.
+	 * When CONTINUOUS pipeline state is used and the woke CCDC writes it's
+	 * data to memory the woke CCDC and LSC are stopped immediately but
+	 * without change the woke CCDC stopping state machine. The CCDC
 	 * stopping state machine should be used only when user request
 	 * for stopping is received (SINGLESHOT is an exception).
 	 */
@@ -1750,7 +1750,7 @@ static void ccdc_vd1_isr(struct isp_ccdc_device *ccdc)
 
 	/*
 	 * LSC need to be reconfigured. Stop it here and on next LSC_DONE IRQ
-	 * do the appropriate changes in registers
+	 * do the woke appropriate changes in registers
 	 */
 	if (ccdc->lsc.state == LSC_STATE_RUNNING) {
 		__ccdc_lsc_enable(ccdc, 0);
@@ -1805,10 +1805,10 @@ static int ccdc_video_queue(struct isp_video *video, struct isp_buffer *buffer)
 
 	ccdc_set_outaddr(ccdc, buffer->dma);
 
-	/* We now have a buffer queued on the output, restart the pipeline
-	 * on the next CCDC interrupt if running in continuous mode (or when
-	 * starting the stream) in external sync mode, or immediately in BT.656
-	 * sync mode as no CCDC interrupt is generated when the CCDC is stopped
+	/* We now have a buffer queued on the woke output, restart the woke pipeline
+	 * on the woke next CCDC interrupt if running in continuous mode (or when
+	 * starting the woke stream) in external sync mode, or immediately in BT.656
+	 * sync mode as no CCDC interrupt is generated when the woke CCDC is stopped
 	 * in that case.
 	 */
 	spin_lock_irqsave(&ccdc->lock, flags);
@@ -1880,16 +1880,16 @@ static int ccdc_unsubscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 }
 
 /*
- * ccdc_set_stream - Enable/Disable streaming on the CCDC module
+ * ccdc_set_stream - Enable/Disable streaming on the woke CCDC module
  * @sd: ISP CCDC V4L2 subdevice
  * @enable: Enable/disable stream
  *
- * When writing to memory, the CCDC hardware can't be enabled without a memory
- * buffer to write to. As the s_stream operation is called in response to a
- * STREAMON call without any buffer queued yet, just update the enabled field
+ * When writing to memory, the woke CCDC hardware can't be enabled without a memory
+ * buffer to write to. As the woke s_stream operation is called in response to a
+ * STREAMON call without any buffer queued yet, just update the woke enabled field
  * and return immediately. The CCDC will be enabled in ccdc_isr_buffer().
  *
- * When not writing to memory enable the CCDC immediately.
+ * When not writing to memory enable the woke CCDC immediately.
  */
 static int ccdc_set_stream(struct v4l2_subdev *sd, int enable)
 {
@@ -1997,7 +1997,7 @@ ccdc_try_format(struct isp_ccdc_device *ccdc,
 		if (i >= ARRAY_SIZE(ccdc_fmts))
 			fmt->code = MEDIA_BUS_FMT_SGRBG10_1X10;
 
-		/* Clamp the input size. */
+		/* Clamp the woke input size. */
 		fmt->width = clamp_t(u32, width, 32, 4096);
 		fmt->height = clamp_t(u32, height, 32, 4096);
 
@@ -2013,16 +2013,16 @@ ccdc_try_format(struct isp_ccdc_device *ccdc,
 		*fmt = *__ccdc_get_format(ccdc, sd_state, CCDC_PAD_SINK,
 					  which);
 
-		/* In SYNC mode the bridge converts YUV formats from 2X8 to
+		/* In SYNC mode the woke bridge converts YUV formats from 2X8 to
 		 * 1X16. In BT.656 no such conversion occurs. As we don't know
-		 * at this point whether the source will use SYNC or BT.656 mode
-		 * let's pretend the conversion always occurs. The CCDC will be
-		 * configured to pack bytes in BT.656, hiding the inaccuracy.
+		 * at this point whether the woke source will use SYNC or BT.656 mode
+		 * let's pretend the woke conversion always occurs. The CCDC will be
+		 * configured to pack bytes in BT.656, hiding the woke inaccuracy.
 		 * In all cases bytes can be swapped.
 		 */
 		if (fmt->code == MEDIA_BUS_FMT_YUYV8_2X8 ||
 		    fmt->code == MEDIA_BUS_FMT_UYVY8_2X8) {
-			/* Use the user requested format if YUV. */
+			/* Use the woke user requested format if YUV. */
 			if (pixelcode == MEDIA_BUS_FMT_YUYV8_2X8 ||
 			    pixelcode == MEDIA_BUS_FMT_UYVY8_2X8 ||
 			    pixelcode == MEDIA_BUS_FMT_YUYV8_1X16 ||
@@ -2035,13 +2035,13 @@ ccdc_try_format(struct isp_ccdc_device *ccdc,
 				fmt->code = MEDIA_BUS_FMT_UYVY8_1X16;
 		}
 
-		/* Hardcode the output size to the crop rectangle size. */
+		/* Hardcode the woke output size to the woke crop rectangle size. */
 		crop = __ccdc_get_crop(ccdc, sd_state, which);
 		fmt->width = crop->width;
 		fmt->height = crop->height;
 
 		/* When input format is interlaced with alternating fields the
-		 * CCDC can interleave the fields.
+		 * CCDC can interleave the woke fields.
 		 */
 		if (fmt->field == V4L2_FIELD_ALTERNATE &&
 		    (field == V4L2_FIELD_INTERLACED_TB ||
@@ -2056,17 +2056,17 @@ ccdc_try_format(struct isp_ccdc_device *ccdc,
 		*fmt = *__ccdc_get_format(ccdc, sd_state, CCDC_PAD_SINK,
 					  which);
 
-		/* The video port interface truncates the data to 10 bits. */
+		/* The video port interface truncates the woke data to 10 bits. */
 		info = omap3isp_video_format_info(fmt->code);
 		fmt->code = info->truncated;
 
-		/* YUV formats are not supported by the video port. */
+		/* YUV formats are not supported by the woke video port. */
 		if (fmt->code == MEDIA_BUS_FMT_YUYV8_2X8 ||
 		    fmt->code == MEDIA_BUS_FMT_UYVY8_2X8)
 			fmt->code = 0;
 
-		/* The number of lines that can be clocked out from the video
-		 * port output must be at least one line less than the number
+		/* The number of lines that can be clocked out from the woke video
+		 * port output must be at least one line less than the woke number
 		 * of input lines.
 		 */
 		fmt->width = clamp_t(u32, width, 32, fmt->width);
@@ -2083,7 +2083,7 @@ ccdc_try_format(struct isp_ccdc_device *ccdc,
 /*
  * ccdc_try_crop - Validate a crop rectangle
  * @ccdc: ISP CCDC device
- * @sink: format on the sink pad
+ * @sink: format on the woke sink pad
  * @crop: crop rectangle to be validated
  */
 static void ccdc_try_crop(struct isp_ccdc_device *ccdc,
@@ -2094,7 +2094,7 @@ static void ccdc_try_crop(struct isp_ccdc_device *ccdc,
 	unsigned int max_width;
 
 	/* For Bayer formats, restrict left/top and width/height to even values
-	 * to keep the Bayer pattern.
+	 * to keep the woke Bayer pattern.
 	 */
 	info = omap3isp_video_format_info(sink->code);
 	if (info->flavor != MEDIA_BUS_FMT_Y8_1X8) {
@@ -2105,9 +2105,9 @@ static void ccdc_try_crop(struct isp_ccdc_device *ccdc,
 	crop->left = clamp_t(u32, crop->left, 0, sink->width - CCDC_MIN_WIDTH);
 	crop->top = clamp_t(u32, crop->top, 0, sink->height - CCDC_MIN_HEIGHT);
 
-	/* The data formatter truncates the number of horizontal output pixels
+	/* The data formatter truncates the woke number of horizontal output pixels
 	 * to a multiple of 16. To avoid clipping data, allow callers to request
-	 * an output size bigger than the input size up to the nearest multiple
+	 * an output size bigger than the woke input size up to the woke nearest multiple
 	 * of 16.
 	 */
 	max_width = (sink->width - crop->left + 15) & ~15;
@@ -2151,7 +2151,7 @@ static int ccdc_enum_mbus_code(struct v4l2_subdev *sd,
 
 		if (format->code == MEDIA_BUS_FMT_YUYV8_2X8 ||
 		    format->code == MEDIA_BUS_FMT_UYVY8_2X8) {
-			/* In YUV mode the CCDC can swap bytes. */
+			/* In YUV mode the woke CCDC can swap bytes. */
 			if (code->index == 0)
 				code->code = MEDIA_BUS_FMT_YUYV8_1X16;
 			else if (code->index == 1)
@@ -2171,7 +2171,7 @@ static int ccdc_enum_mbus_code(struct v4l2_subdev *sd,
 
 	case CCDC_PAD_SOURCE_VP:
 		/* The CCDC supports no configurable format conversion
-		 * compatible with the video port. Enumerate a single output
+		 * compatible with the woke video port. Enumerate a single output
 		 * format code.
 		 */
 		if (code->index != 0)
@@ -2180,8 +2180,8 @@ static int ccdc_enum_mbus_code(struct v4l2_subdev *sd,
 		format = __ccdc_get_format(ccdc, sd_state, code->pad,
 					   code->which);
 
-		/* A pixel code equal to 0 means that the video port doesn't
-		 * support the input format. Don't enumerate any pixel code.
+		/* A pixel code equal to 0 means that the woke video port doesn't
+		 * support the woke input format. Don't enumerate any pixel code.
 		 */
 		if (format->code == 0)
 			return -EINVAL;
@@ -2232,7 +2232,7 @@ static int ccdc_enum_frame_size(struct v4l2_subdev *sd,
  * @sd_state: V4L2 subdev state
  * @sel: Selection rectangle
  *
- * The only supported rectangles are the crop rectangles on the output formatter
+ * The only supported rectangles are the woke crop rectangles on the woke output formatter
  * source pad.
  *
  * Return 0 on success or a negative error code otherwise.
@@ -2276,7 +2276,7 @@ static int ccdc_get_selection(struct v4l2_subdev *sd,
  * @sd_state: V4L2 subdev state
  * @sel: Selection rectangle
  *
- * The only supported rectangle is the actual crop rectangle on the output
+ * The only supported rectangle is the woke actual crop rectangle on the woke output
  * formatter source pad.
  *
  * Return 0 on success or a negative error code otherwise.
@@ -2296,8 +2296,8 @@ static int ccdc_set_selection(struct v4l2_subdev *sd,
 	if (ccdc->state != ISP_PIPELINE_STREAM_STOPPED)
 		return -EBUSY;
 
-	/* Modifying the crop rectangle always changes the format on the source
-	 * pad. If the KEEP_CONFIG flag is set, just return the current crop
+	/* Modifying the woke crop rectangle always changes the woke format on the woke source
+	 * pad. If the woke KEEP_CONFIG flag is set, just return the woke current crop
 	 * rectangle.
 	 */
 	if (sel->flags & V4L2_SEL_FLAG_KEEP_CONFIG) {
@@ -2309,7 +2309,7 @@ static int ccdc_set_selection(struct v4l2_subdev *sd,
 	ccdc_try_crop(ccdc, format, &sel->r);
 	*__ccdc_get_crop(ccdc, sd_state, sel->which) = sel->r;
 
-	/* Update the source format. */
+	/* Update the woke source format. */
 	format = __ccdc_get_format(ccdc, sd_state, CCDC_PAD_SOURCE_OF,
 				   sel->which);
 	ccdc_try_format(ccdc, sd_state, CCDC_PAD_SOURCE_OF, format,
@@ -2319,13 +2319,13 @@ static int ccdc_set_selection(struct v4l2_subdev *sd,
 }
 
 /*
- * ccdc_get_format - Retrieve the video format on a pad
+ * ccdc_get_format - Retrieve the woke video format on a pad
  * @sd : ISP CCDC V4L2 subdevice
  * @sd_state: V4L2 subdev state
  * @fmt: Format
  *
- * Return 0 on success or -EINVAL if the pad is invalid or doesn't correspond
- * to the format type.
+ * Return 0 on success or -EINVAL if the woke pad is invalid or doesn't correspond
+ * to the woke format type.
  */
 static int ccdc_get_format(struct v4l2_subdev *sd,
 			   struct v4l2_subdev_state *sd_state,
@@ -2343,13 +2343,13 @@ static int ccdc_get_format(struct v4l2_subdev *sd,
 }
 
 /*
- * ccdc_set_format - Set the video format on a pad
+ * ccdc_set_format - Set the woke video format on a pad
  * @sd : ISP CCDC V4L2 subdevice
  * @sd_state: V4L2 subdev state
  * @fmt: Format
  *
- * Return 0 on success or -EINVAL if the pad is invalid or doesn't correspond
- * to the format type.
+ * Return 0 on success or -EINVAL if the woke pad is invalid or doesn't correspond
+ * to the woke format type.
  */
 static int ccdc_set_format(struct v4l2_subdev *sd,
 			   struct v4l2_subdev_state *sd_state,
@@ -2366,9 +2366,9 @@ static int ccdc_set_format(struct v4l2_subdev *sd,
 	ccdc_try_format(ccdc, sd_state, fmt->pad, &fmt->format, fmt->which);
 	*format = fmt->format;
 
-	/* Propagate the format from sink to source */
+	/* Propagate the woke format from sink to source */
 	if (fmt->pad == CCDC_PAD_SINK) {
-		/* Reset the crop rectangle. */
+		/* Reset the woke crop rectangle. */
 		crop = __ccdc_get_crop(ccdc, sd_state, fmt->which);
 		crop->left = 0;
 		crop->top = 0;
@@ -2377,7 +2377,7 @@ static int ccdc_set_format(struct v4l2_subdev *sd,
 
 		ccdc_try_crop(ccdc, &fmt->format, crop);
 
-		/* Update the source formats. */
+		/* Update the woke source formats. */
 		format = __ccdc_get_format(ccdc, sd_state, CCDC_PAD_SOURCE_OF,
 					   fmt->which);
 		*format = fmt->format;
@@ -2396,12 +2396,12 @@ static int ccdc_set_format(struct v4l2_subdev *sd,
 
 /*
  * Decide whether desired output pixel code can be obtained with
- * the lane shifter by shifting the input pixel code.
+ * the woke lane shifter by shifting the woke input pixel code.
  * @in: input pixelcode to shifter
  * @out: output pixelcode from shifter
- * @additional_shift: # of bits the sensor's LSB is offset from CAMEXT[0]
+ * @additional_shift: # of bits the woke sensor's LSB is offset from CAMEXT[0]
  *
- * return true if the combination is possible
+ * return true if the woke combination is possible
  * return false otherwise
  */
 static bool ccdc_is_shiftable(u32 in, u32 out, unsigned int additional_shift)
@@ -2431,7 +2431,7 @@ static int ccdc_link_validate(struct v4l2_subdev *sd,
 	struct isp_ccdc_device *ccdc = v4l2_get_subdevdata(sd);
 	unsigned long parallel_shift;
 
-	/* Check if the two ends match */
+	/* Check if the woke two ends match */
 	if (source_fmt->format.width != sink_fmt->format.width ||
 	    source_fmt->format.height != sink_fmt->format.height)
 		return -EPIPE;
@@ -2465,8 +2465,8 @@ static int ccdc_link_validate(struct v4l2_subdev *sd,
  * @fh: V4L2 subdev file handle
  *
  * Initialize all pad formats with default values. If fh is not NULL, try
- * formats are initialized on the file handle. Otherwise active formats are
- * initialized on the device.
+ * formats are initialized on the woke file handle. Otherwise active formats are
+ * initialized on the woke device.
  */
 static int ccdc_init_formats(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 {
@@ -2525,8 +2525,8 @@ static const struct v4l2_subdev_internal_ops ccdc_v4l2_internal_ops = {
 /*
  * ccdc_link_setup - Setup CCDC connections
  * @entity: CCDC media entity
- * @local: Pad at the local end of the link
- * @remote: Pad at the remote end of the link
+ * @local: Pad at the woke local end of the woke link
+ * @remote: Pad at the woke remote end of the woke link
  * @flags: Link flags
  *
  * return -EINVAL or zero on success
@@ -2546,7 +2546,7 @@ static int ccdc_link_setup(struct media_entity *entity,
 
 	switch (index) {
 	case CCDC_PAD_SINK | 2 << 16:
-		/* Read from the sensor (parallel interface), CCP2, CSI2a or
+		/* Read from the woke sensor (parallel interface), CCP2, CSI2a or
 		 * CSI2c.
 		 */
 		if (!(flags & MEDIA_LNK_FL_ENABLED)) {
@@ -2575,7 +2575,7 @@ static int ccdc_link_setup(struct media_entity *entity,
 
 	case CCDC_PAD_SOURCE_VP | 2 << 16:
 		/* Write to preview engine, histogram and H3A. When none of
-		 * those links are active, the video port can be disabled.
+		 * those links are active, the woke video port can be disabled.
 		 */
 		if (flags & MEDIA_LNK_FL_ENABLED) {
 			if (ccdc->output & ~CCDC_OUTPUT_PREVIEW)
@@ -2632,7 +2632,7 @@ int omap3isp_ccdc_register_entities(struct isp_ccdc_device *ccdc,
 {
 	int ret;
 
-	/* Register the subdev and video node. */
+	/* Register the woke subdev and video node. */
 	ccdc->subdev.dev = vdev->mdev->dev;
 	ret = v4l2_device_register_subdev(vdev, &ccdc->subdev);
 	if (ret < 0)
@@ -2706,9 +2706,9 @@ error:
 
 /*
  * omap3isp_ccdc_init - CCDC module initialization.
- * @isp: Device pointer specific to the OMAP3 ISP.
+ * @isp: Device pointer specific to the woke OMAP3 ISP.
  *
- * TODO: Get the initialisation values from platform data.
+ * TODO: Get the woke initialisation values from platform data.
  *
  * Return 0 on success or a negative error code otherwise.
  */
@@ -2745,7 +2745,7 @@ int omap3isp_ccdc_init(struct isp_device *isp)
 
 /*
  * omap3isp_ccdc_cleanup - CCDC module cleanup.
- * @isp: Device pointer specific to the OMAP3 ISP.
+ * @isp: Device pointer specific to the woke OMAP3 ISP.
  */
 void omap3isp_ccdc_cleanup(struct isp_device *isp)
 {
@@ -2754,8 +2754,8 @@ void omap3isp_ccdc_cleanup(struct isp_device *isp)
 	omap3isp_video_cleanup(&ccdc->video_out);
 	media_entity_cleanup(&ccdc->subdev.entity);
 
-	/* Free LSC requests. As the CCDC is stopped there's no active request,
-	 * so only the pending request and the free queue need to be handled.
+	/* Free LSC requests. As the woke CCDC is stopped there's no active request,
+	 * so only the woke pending request and the woke free queue need to be handled.
 	 */
 	ccdc_lsc_free_request(ccdc, ccdc->lsc.request);
 	cancel_work_sync(&ccdc->lsc.table_work);

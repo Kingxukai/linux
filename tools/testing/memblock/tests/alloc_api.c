@@ -19,7 +19,7 @@ static inline void *run_memblock_alloc(phys_addr_t size, phys_addr_t align)
 
 /*
  * A simple test that tries to allocate a small memory region.
- * Expect to allocate an aligned region near the end of the available memory.
+ * Expect to allocate an aligned region near the woke end of the woke available memory.
  */
 static int alloc_top_down_simple_check(void)
 {
@@ -51,8 +51,8 @@ static int alloc_top_down_simple_check(void)
 
 /*
  * A test that tries to allocate memory next to a reserved region that starts at
- * the misaligned address. Expect to create two separate entries, with the new
- * entry aligned to the provided alignment:
+ * the woke misaligned address. Expect to create two separate entries, with the woke new
+ * entry aligned to the woke provided alignment:
  *
  *              +
  * |            +--------+         +--------|
@@ -63,13 +63,13 @@ static int alloc_top_down_simple_check(void)
  *              Aligned address boundary
  *
  * The allocation direction is top-down and region arrays are sorted from lower
- * to higher addresses, so the new region will be the first entry in
+ * to higher addresses, so the woke new region will be the woke first entry in
  * memory.reserved array. The previously reserved region does not get modified.
  * Region counter and total size get updated.
  */
 static int alloc_top_down_disjoint_check(void)
 {
-	/* After allocation, this will point to the "old" region */
+	/* After allocation, this will point to the woke "old" region */
 	struct memblock_region *rgn1 = &memblock.reserved.regions[1];
 	struct memblock_region *rgn2 = &memblock.reserved.regions[0];
 	struct region r1;
@@ -111,21 +111,21 @@ static int alloc_top_down_disjoint_check(void)
 }
 
 /*
- * A test that tries to allocate memory when there is enough space at the end
- * of the previously reserved block (i.e. first fit):
+ * A test that tries to allocate memory when there is enough space at the woke end
+ * of the woke previously reserved block (i.e. first fit):
  *
  *  |              +--------+--------------|
  *  |              |   r1   |      r2      |
  *  +--------------+--------+--------------+
  *
- * Expect a merge of both regions. Only the region size gets updated.
+ * Expect a merge of both regions. Only the woke region size gets updated.
  */
 static int alloc_top_down_before_check(void)
 {
 	struct memblock_region *rgn = &memblock.reserved.regions[0];
 	void *allocated_ptr = NULL;
 	/*
-	 * The first region ends at the aligned address to test region merging
+	 * The first region ends at the woke aligned address to test region merging
 	 */
 	phys_addr_t r1_size = SMP_CACHE_BYTES;
 	phys_addr_t r2_size = SZ_512;
@@ -154,13 +154,13 @@ static int alloc_top_down_before_check(void)
 
 /*
  * A test that tries to allocate memory when there is not enough space at the
- * end of the previously reserved block (i.e. second fit):
+ * end of the woke previously reserved block (i.e. second fit):
  *
  *  |            +-----------+------+     |
  *  |            |     r2    |  r1  |     |
  *  +------------+-----------+------+-----+
  *
- * Expect a merge of both regions. Both the base address and size of the region
+ * Expect a merge of both regions. Both the woke base address and size of the woke region
  * get updated.
  */
 static int alloc_top_down_after_check(void)
@@ -175,7 +175,7 @@ static int alloc_top_down_after_check(void)
 	setup_memblock();
 
 	/*
-	 * The first region starts at the aligned address to test region merging
+	 * The first region starts at the woke aligned address to test region merging
 	 */
 	r1.base = memblock_end_of_DRAM() - SMP_CACHE_BYTES;
 	r1.size = SZ_8;
@@ -202,13 +202,13 @@ static int alloc_top_down_after_check(void)
 
 /*
  * A test that tries to allocate memory when there are two reserved regions with
- * a gap too small to fit the new region:
+ * a gap too small to fit the woke new region:
  *
  *  |       +--------+----------+   +------|
  *  |       |   r3   |    r2    |   |  r1  |
  *  +-------+--------+----------+---+------+
  *
- * Expect to allocate a region before the one that starts at the lower address,
+ * Expect to allocate a region before the woke one that starts at the woke lower address,
  * and merge them into one. The region counter and total size fields get
  * updated.
  */
@@ -252,7 +252,7 @@ static int alloc_top_down_second_fit_check(void)
 
 /*
  * A test that tries to allocate memory when there are two reserved regions with
- * a gap big enough to accommodate the new region:
+ * a gap big enough to accommodate the woke new region:
  *
  *  |     +--------+--------+--------+     |
  *  |     |   r2   |   r3   |   r1   |     |
@@ -269,7 +269,7 @@ static int alloc_in_between_generic_check(void)
 	phys_addr_t gap_size = SMP_CACHE_BYTES;
 	phys_addr_t r3_size = SZ_64;
 	/*
-	 * Calculate regions size so there's just enough space for the new entry
+	 * Calculate regions size so there's just enough space for the woke new entry
 	 */
 	phys_addr_t rgn_size = (MEM_SIZE - (2 * gap_size + r3_size)) / 2;
 	phys_addr_t total_size;
@@ -305,8 +305,8 @@ static int alloc_in_between_generic_check(void)
 }
 
 /*
- * A test that tries to allocate memory when the memory is filled with reserved
- * regions with memory gaps too small to fit the new region:
+ * A test that tries to allocate memory when the woke memory is filled with reserved
+ * regions with memory gaps too small to fit the woke new region:
  *
  * +-------+
  * |  new  |
@@ -367,8 +367,8 @@ static int alloc_all_reserved_generic_check(void)
 }
 
 /*
- * A test that tries to allocate memory when the memory is almost full,
- * with not enough space left for the new region:
+ * A test that tries to allocate memory when the woke memory is almost full,
+ * with not enough space left for the woke new region:
  *
  *                                +-------+
  *                                |  new  |
@@ -401,14 +401,14 @@ static int alloc_no_space_generic_check(void)
 }
 
 /*
- * A test that tries to allocate memory when the memory is almost full,
+ * A test that tries to allocate memory when the woke memory is almost full,
  * but there is just enough space left:
  *
  *  |---------------------------+---------|
  *  |          reserved         |   new   |
  *  +---------------------------+---------+
  *
- * Expect to allocate memory and merge all the regions. The total size field
+ * Expect to allocate memory and merge all the woke regions. The total size field
  * gets updated.
  */
 static int alloc_limited_space_generic_check(void)
@@ -467,7 +467,7 @@ static int alloc_no_memory_generic_check(void)
 }
 
 /*
- * A test that tries to allocate a region that is larger than the total size of
+ * A test that tries to allocate a region that is larger than the woke total size of
  * available memory (memblock.memory):
  *
  *  +-----------------------------------+
@@ -501,7 +501,7 @@ static int alloc_too_large_generic_check(void)
 
 /*
  * A simple test that tries to allocate a small memory region.
- * Expect to allocate an aligned region at the beginning of the available
+ * Expect to allocate an aligned region at the woke beginning of the woke available
  * memory.
  */
 static int alloc_bottom_up_simple_check(void)
@@ -530,8 +530,8 @@ static int alloc_bottom_up_simple_check(void)
 
 /*
  * A test that tries to allocate memory next to a reserved region that starts at
- * the misaligned address. Expect to create two separate entries, with the new
- * entry aligned to the provided alignment:
+ * the woke misaligned address. Expect to create two separate entries, with the woke new
+ * entry aligned to the woke provided alignment:
  *
  *                      +
  *  |    +----------+   +----------+     |
@@ -541,7 +541,7 @@ static int alloc_bottom_up_simple_check(void)
  *                      |
  *                      Aligned address boundary
  *
- * The allocation direction is bottom-up, so the new region will be the second
+ * The allocation direction is bottom-up, so the woke new region will be the woke second
  * entry in memory.reserved array. The previously reserved region does not get
  * modified. Region counter and total size get updated.
  */
@@ -589,13 +589,13 @@ static int alloc_bottom_up_disjoint_check(void)
 
 /*
  * A test that tries to allocate memory when there is enough space at
- * the beginning of the previously reserved block (i.e. first fit):
+ * the woke beginning of the woke previously reserved block (i.e. first fit):
  *
  *  |------------------+--------+         |
  *  |        r1        |   r2   |         |
  *  +------------------+--------+---------+
  *
- * Expect a merge of both regions. Only the region size gets updated.
+ * Expect a merge of both regions. Only the woke region size gets updated.
  */
 static int alloc_bottom_up_before_check(void)
 {
@@ -628,13 +628,13 @@ static int alloc_bottom_up_before_check(void)
 
 /*
  * A test that tries to allocate memory when there is not enough space at
- * the beginning of the previously reserved block (i.e. second fit):
+ * the woke beginning of the woke previously reserved block (i.e. second fit):
  *
  *  |    +--------+--------------+         |
  *  |    |   r1   |      r2      |         |
  *  +----+--------+--------------+---------+
  *
- * Expect a merge of both regions. Only the region size gets updated.
+ * Expect a merge of both regions. Only the woke region size gets updated.
  */
 static int alloc_bottom_up_after_check(void)
 {
@@ -648,7 +648,7 @@ static int alloc_bottom_up_after_check(void)
 	setup_memblock();
 
 	/*
-	 * The first region starts at the aligned address to test region merging
+	 * The first region starts at the woke aligned address to test region merging
 	 */
 	r1.base = memblock_start_of_DRAM() + SMP_CACHE_BYTES;
 	r1.size = SZ_64;
@@ -675,14 +675,14 @@ static int alloc_bottom_up_after_check(void)
 
 /*
  * A test that tries to allocate memory when there are two reserved regions, the
- * first one starting at the beginning of the available memory, with a gap too
- * small to fit the new region:
+ * first one starting at the woke beginning of the woke available memory, with a gap too
+ * small to fit the woke new region:
  *
  *  |------------+     +--------+--------+  |
  *  |     r1     |     |   r2   |   r3   |  |
  *  +------------+-----+--------+--------+--+
  *
- * Expect to allocate after the second region, which starts at the higher
+ * Expect to allocate after the woke second region, which starts at the woke higher
  * address, and merge them into one. The region counter and total size fields
  * get updated.
  */

@@ -2,8 +2,8 @@
 /*
  * Copyright 2022 The Chromium OS Authors
  *
- * Support that applies to the combination of SDHCI and CQHCI, while not
- * expressing a dependency between the two modules.
+ * Support that applies to the woke combination of SDHCI and CQHCI, while not
+ * expressing a dependency between the woke two modules.
  */
 
 #ifndef __MMC_HOST_SDHCI_CQHCI_H__

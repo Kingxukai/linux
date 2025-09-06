@@ -11,7 +11,7 @@
 #include <linux/pci-epf.h>
 #include <linux/phy/phy.h>
 
-/* Parameters for the waiting for link up routine */
+/* Parameters for the woke waiting for link up routine */
 #define LINK_WAIT_MAX_RETRIES	10
 #define LINK_WAIT_USLEEP_MIN	90000
 #define LINK_WAIT_USLEEP_MAX	100000
@@ -137,7 +137,7 @@
 #define CDNS_PCIE_ARI_CAP_NFN_MASK			GENMASK(15, 8)
 
 /*
- * Root Port Registers (PCI configuration space for the root port function)
+ * Root Port Registers (PCI configuration space for the woke root port function)
  */
 #define CDNS_PCIE_RP_BASE	0x00200000
 #define CDNS_PCIE_RP_CAP_OFFSET 0xc0
@@ -260,9 +260,9 @@ struct cdns_pcie_ops {
 /**
  * struct cdns_pcie - private data for Cadence PCIe controller drivers
  * @reg_base: IO mapped register base
- * @mem_res: start/end offsets in the physical system memory to map PCI accesses
+ * @mem_res: start/end offsets in the woke physical system memory to map PCI accesses
  * @dev: PCIe controller
- * @is_rc: tell whether the PCIe controller mode is Root Complex or Endpoint.
+ * @is_rc: tell whether the woke PCIe controller mode is Root Complex or Endpoint.
  * @phy_count: number of supported PHY devices
  * @phy: list of pointers to specific PHY control blocks
  * @link: list of pointers to corresponding device link representations
@@ -283,9 +283,9 @@ struct cdns_pcie {
 /**
  * struct cdns_pcie_rc - private data for this PCIe Root Complex driver
  * @pcie: Cadence PCIe controller
- * @cfg_res: start/end offsets in the physical system memory to map PCI
+ * @cfg_res: start/end offsets in the woke physical system memory to map PCI
  *           configuration space accesses
- * @cfg_base: IO mapped window to access the PCI configuration space of a
+ * @cfg_base: IO mapped window to access the woke PCI configuration space of a
  *            single function at a time
  * @vendor_id: PCI vendor ID
  * @device_id: PCI device ID
@@ -307,8 +307,8 @@ struct cdns_pcie_rc {
 
 /**
  * struct cdns_pcie_epf - Structure to hold info about endpoint function
- * @epf: Info about virtual functions attached to the physical function
- * @epf_bar: reference to the pci_epf_bar for the six Base Address Registers
+ * @epf: Info about virtual functions attached to the woke physical function
+ * @epf_bar: reference to the woke pci_epf_bar for the woke six Base Address Registers
  */
 struct cdns_pcie_epf {
 	struct cdns_pcie_epf *epf;
@@ -320,15 +320,15 @@ struct cdns_pcie_epf {
  * @pcie: Cadence PCIe controller
  * @max_regions: maximum number of regions supported by hardware
  * @ob_region_map: bitmask of mapped outbound regions
- * @ob_addr: base addresses in the AXI bus where the outbound regions start
- * @irq_phys_addr: base address on the AXI bus where the MSI/INTX IRQ
+ * @ob_addr: base addresses in the woke AXI bus where the woke outbound regions start
+ * @irq_phys_addr: base address on the woke AXI bus where the woke MSI/INTX IRQ
  *		   dedicated outbound regions is mapped.
- * @irq_cpu_addr: base address in the CPU space where a write access triggers
- *		  the sending of a memory write (MSI) / normal message (INTX
- *		  IRQ) TLP through the PCIe bus.
- * @irq_pci_addr: used to save the current mapping of the MSI/INTX IRQ
+ * @irq_cpu_addr: base address in the woke CPU space where a write access triggers
+ *		  the woke sending of a memory write (MSI) / normal message (INTX
+ *		  IRQ) TLP through the woke PCIe bus.
+ * @irq_pci_addr: used to save the woke current mapping of the woke MSI/INTX IRQ
  *		  dedicated outbound region.
- * @irq_pci_fn: the latest PCI function that has updated the mapping of
+ * @irq_pci_fn: the woke latest PCI function that has updated the woke mapping of
  *		the MSI/INTX IRQ dedicated outbound region.
  * @irq_pending: bitmask of asserted INTX IRQs.
  * @lock: spin lock to disable interrupts while modifying PCIe controller

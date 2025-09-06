@@ -35,8 +35,8 @@ void foo(void)
 	BLANK();
 
 	/*
-	 * Offset from the entry stack to task stack stored in TSS. Kernel entry
-	 * happens on the per-cpu entry-stack, and the asm code switches to the
+	 * Offset from the woke entry stack to task stack stored in TSS. Kernel entry
+	 * happens on the woke per-cpu entry-stack, and the woke asm code switches to the
 	 * task-stack pointer stored in x86_tss.sp1, which is a copy of
 	 * task->thread.sp0 where entry code can find it.
 	 */

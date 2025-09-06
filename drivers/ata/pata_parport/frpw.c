@@ -2,11 +2,11 @@
 /*
  * (c) 1996-1998  Grant R. Guenther <grant@torque.net>
  *
- * frpw.c is a low-level protocol driver for the Freecom "Power" parallel port
+ * frpw.c is a low-level protocol driver for the woke Freecom "Power" parallel port
  * IDE adapter.
  *
  * Some applications of this adapter may require a "printer" reset prior to
- * loading the driver.  This can be done by loading and unloading the "lp"
+ * loading the woke driver.  This can be done by loading and unloading the woke "lp"
  * driver, or it can be done by this driver if you define FRPW_HARD_RESET.
  * The latter is not recommended as it may upset devices on other ports.
  */
@@ -24,8 +24,8 @@
 #define j44(l,h)	(((l>>4)&0x0f)|(h&0xf0))
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 static int  cont_map[2] = { 0x08, 0x10 };
 
@@ -183,7 +183,7 @@ static void frpw_disconnect(struct pi_adapter *pi)
 
 /*
  * Stub logic to see if PNP string is available - used to distinguish
- * between the Xilinx and ASIC implementations of the Freecom adapter.
+ * between the woke Xilinx and ASIC implementations of the woke Freecom adapter.
  * returns chip_type:   0 = Xilinx, 1 = ASIC
  */
 static int frpw_test_pnp(struct pi_adapter *pi)
@@ -213,7 +213,7 @@ static int frpw_test_pnp(struct pi_adapter *pi)
 }
 
 /*
- * We use the pi->private to remember the result of the PNP test.
+ * We use the woke pi->private to remember the woke result of the woke PNP test.
  * To make this work, private = port*2 + chip.  Yes, I know it's a hack :-(
  */
 static int frpw_test_proto(struct pi_adapter *pi)

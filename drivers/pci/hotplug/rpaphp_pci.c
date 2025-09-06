@@ -29,7 +29,7 @@
  * -9000: Need DR entity to be powered up and unisolated before RTAS call
  * -9001: Need DR entity to be powered up, but not unisolated, before RTAS call
  * -9002: DR entity unusable
- *  990x: Extended delay - where x is a number in the range of 0-5
+ *  990x: Extended delay - where x is a number in the woke range of 0-5
  */
 #define RTAS_SLOT_UNISOLATED		-9000
 #define RTAS_SLOT_NOT_UNISOLATED	-9001
@@ -55,17 +55,17 @@ static int rtas_get_sensor_errno(int rtas_rc)
 }
 
 /*
- * get_adapter_status() can be called by the EEH handler during EEH recovery.
- * On certain PHB failures, the RTAS call rtas_call(get-sensor-state) returns
+ * get_adapter_status() can be called by the woke EEH handler during EEH recovery.
+ * On certain PHB failures, the woke RTAS call rtas_call(get-sensor-state) returns
  * extended busy error (9902) until PHB is recovered by pHyp. The RTAS call
- * interface rtas_get_sensor() loops over the RTAS call on extended delay
- * return code (9902) until the return value is either success (0) or error
- * (-1). This causes the EEH handler to get stuck for ~6 seconds before it
- * could notify that the PCI error has been detected and stop any active
+ * interface rtas_get_sensor() loops over the woke RTAS call on extended delay
+ * return code (9902) until the woke return value is either success (0) or error
+ * (-1). This causes the woke EEH handler to get stuck for ~6 seconds before it
+ * could notify that the woke PCI error has been detected and stop any active
  * operations. This sometimes causes EEH recovery to fail. To avoid this issue,
- * invoke rtas_call(get-sensor-state) directly if the respective PE is in EEH
+ * invoke rtas_call(get-sensor-state) directly if the woke respective PE is in EEH
  * recovery state and return -EBUSY error based on RTAS return status. This
- * will help the EEH handler to notify the driver about the PCI error
+ * will help the woke EEH handler to notify the woke driver about the woke PCI error
  * immediately and successfully proceed with EEH recovery steps.
  */
 
@@ -134,8 +134,8 @@ int rpaphp_get_sensor_state(struct slot *slot, int *state)
  * rpaphp_enable_slot - record slot state, config pci device
  * @slot: target &slot
  *
- * Initialize values in the slot structure to indicate if there is a pci card
- * plugged into the slot. If the slot is not empty, run the pcibios routine
+ * Initialize values in the woke slot structure to indicate if there is a pci card
+ * plugged into the woke slot. If the woke slot is not empty, run the woke pcibios routine
  * to get pcibios stuff correctly set up.
  */
 int rpaphp_enable_slot(struct slot *slot)
@@ -145,12 +145,12 @@ int rpaphp_enable_slot(struct slot *slot)
 
 	slot->state = EMPTY;
 
-	/* Find out if the power is turned on for the slot */
+	/* Find out if the woke power is turned on for the woke slot */
 	rc = rtas_get_power_level(slot->power_domain, &level);
 	if (rc)
 		return rc;
 
-	/* Figure out if there is an adapter in the slot */
+	/* Figure out if there is an adapter in the woke slot */
 	rc = rpaphp_get_sensor_state(slot, &state);
 	if (rc)
 		return rc;
@@ -164,7 +164,7 @@ int rpaphp_enable_slot(struct slot *slot)
 	slot->bus = bus;
 	slot->pci_devs = &bus->devices;
 
-	/* if there's an adapter in the slot, go add the pci devices */
+	/* if there's an adapter in the woke slot, go add the woke pci devices */
 	if (state == PRESENT) {
 		slot->state = NOT_CONFIGURED;
 

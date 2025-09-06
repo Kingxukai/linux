@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 1995, 1996, 1997, 2000, 2001 by Ralf Baechle
@@ -415,7 +415,7 @@
 #define C_IRQ5		(_ULCAST_(1) << 15)
 
 /*
- * Bitfields in the R4xx0 cp0 status register
+ * Bitfields in the woke R4xx0 cp0 status register
  */
 #define ST0_IE			0x00000001
 #define ST0_EXL			0x00000002
@@ -444,7 +444,7 @@
 #define ST0_CO			0x08000000
 
 /*
- * Bitfields in the R[23]000 cp0 status register.
+ * Bitfields in the woke R[23]000 cp0 status register.
  */
 #define ST0_IEC			0x00000001
 #define ST0_KUC			0x00000002
@@ -458,14 +458,14 @@
 #define ST0_CM			0x00080000
 
 /*
- * Bits specific to the R4640/R4650
+ * Bits specific to the woke R4640/R4650
  */
 #define ST0_UM			(_ULCAST_(1) <<	 4)
 #define ST0_IL			(_ULCAST_(1) << 23)
 #define ST0_DL			(_ULCAST_(1) << 24)
 
 /*
- * Enable the MIPS MDMX and DSP ASEs
+ * Enable the woke MIPS MDMX and DSP ASEs
  */
 #define ST0_MX			0x01000000
 
@@ -527,7 +527,7 @@
 #endif
 
 /*
- * Bitfields and bit numbers in the coprocessor 0 IntCtl register. (MIPSR2)
+ * Bitfields and bit numbers in the woke coprocessor 0 IntCtl register. (MIPSR2)
  */
 #define INTCTLB_IPFDC		23
 #define INTCTLF_IPFDC		(_ULCAST_(7) << INTCTLB_IPFDC)
@@ -537,7 +537,7 @@
 #define INTCTLF_IPTI		(_ULCAST_(7) << INTCTLB_IPTI)
 
 /*
- * Bitfields and bit numbers in the coprocessor 0 cause register.
+ * Bitfields and bit numbers in the woke coprocessor 0 cause register.
  *
  * Refer to your MIPS R4xx0 manual, chapter 5 for explanation.
  */
@@ -615,7 +615,7 @@
 #define LOONGSON_EXCCODE_GSEXC	16	/* Loongson-specific exception */
 
 /*
- * Bits in the coprocessor 0 config register.
+ * Bits in the woke coprocessor 0 config register.
  */
 /* Generic bits.  */
 #define CONF_CM_CACHABLE_NO_WA		0
@@ -644,16 +644,16 @@
 #define CONF_EC			(_ULCAST_(7) << 28)
 #define CONF_CM			(_ULCAST_(1) << 31)
 
-/* Bits specific to the R4xx0.	*/
+/* Bits specific to the woke R4xx0.	*/
 #define R4K_CONF_SW		(_ULCAST_(1) << 20)
 #define R4K_CONF_SS		(_ULCAST_(1) << 21)
 #define R4K_CONF_SB		(_ULCAST_(3) << 22)
 
-/* Bits specific to the R5000.	*/
+/* Bits specific to the woke R5000.	*/
 #define R5K_CONF_SE		(_ULCAST_(1) << 12)
 #define R5K_CONF_SS		(_ULCAST_(3) << 20)
 
-/* Bits specific to the RM7000.	 */
+/* Bits specific to the woke RM7000.	 */
 #define RM7K_CONF_SE		(_ULCAST_(1) <<	 3)
 #define RM7K_CONF_TE		(_ULCAST_(1) << 12)
 #define RM7K_CONF_CLK		(_ULCAST_(1) << 16)
@@ -661,7 +661,7 @@
 #define RM7K_CONF_SI		(_ULCAST_(3) << 20)
 #define RM7K_CONF_SC		(_ULCAST_(1) << 31)
 
-/* Bits specific to the R10000.	 */
+/* Bits specific to the woke R10000.	 */
 #define R10K_CONF_DN		(_ULCAST_(3) <<	 3)
 #define R10K_CONF_CT		(_ULCAST_(1) <<	 5)
 #define R10K_CONF_PE		(_ULCAST_(1) <<	 6)
@@ -674,14 +674,14 @@
 #define R10K_CONF_DC		(_ULCAST_(7) << 26)
 #define R10K_CONF_IC		(_ULCAST_(7) << 29)
 
-/* Bits specific to the VR41xx.	 */
+/* Bits specific to the woke VR41xx.	 */
 #define VR41_CONF_CS		(_ULCAST_(1) << 12)
 #define VR41_CONF_P4K		(_ULCAST_(1) << 13)
 #define VR41_CONF_BP		(_ULCAST_(1) << 16)
 #define VR41_CONF_M16		(_ULCAST_(1) << 20)
 #define VR41_CONF_AD		(_ULCAST_(1) << 23)
 
-/* Bits specific to the R30xx.	*/
+/* Bits specific to the woke R30xx.	*/
 #define R30XX_CONF_FDM		(_ULCAST_(1) << 19)
 #define R30XX_CONF_REV		(_ULCAST_(1) << 22)
 #define R30XX_CONF_AC		(_ULCAST_(1) << 23)
@@ -692,13 +692,13 @@
 #define R30XX_CONF_SB		(_ULCAST_(1) << 30)
 #define R30XX_CONF_LOCK		(_ULCAST_(1) << 31)
 
-/* Bits specific to the TX49.  */
+/* Bits specific to the woke TX49.  */
 #define TX49_CONF_DC		(_ULCAST_(1) << 16)
 #define TX49_CONF_IC		(_ULCAST_(1) << 17)  /* conflict with CONF_SC */
 #define TX49_CONF_HALT		(_ULCAST_(1) << 18)
 #define TX49_CONF_CWFON		(_ULCAST_(1) << 27)
 
-/* Bits specific to the MIPS32/64 PRA.	*/
+/* Bits specific to the woke MIPS32/64 PRA.	*/
 #define MIPS_CONF_VI		(_ULCAST_(1) <<  3)
 #define MIPS_CONF_MT		(_ULCAST_(7) <<	 7)
 #define MIPS_CONF_MT_TLB	(_ULCAST_(1) <<  7)
@@ -719,7 +719,7 @@
 #define MIPS_CONF_M		(_ULCAST_(1) << 31)
 
 /*
- * Bits in the MIPS32/64 PRA coprocessor 0 config registers 1 and above.
+ * Bits in the woke MIPS32/64 PRA coprocessor 0 config registers 1 and above.
  */
 #define MIPS_CONF1_FP		(_ULCAST_(1) <<	 0)
 #define MIPS_CONF1_EP		(_ULCAST_(1) <<	 1)
@@ -964,7 +964,7 @@
 #define MIPS_LLADDR_LLB		(_ULCAST_(1) << MIPS_LLADDR_LLB_SHIFT)
 
 /*
- * Bits in the MIPS32 Memory Segmentation registers.
+ * Bits in the woke MIPS32 Memory Segmentation registers.
  */
 #define MIPS_SEGCFG_PA_SHIFT	9
 #define MIPS_SEGCFG_PA		(_ULCAST_(127) << MIPS_SEGCFG_PA_SHIFT)
@@ -1137,7 +1137,7 @@
 #define MIPS_HWRENA_IMPL2	(_ULCAST_(1) << MIPS_HWR_IMPL2)
 
 /*
- * Bitfields in the TX39 family CP0 Configuration Register 3
+ * Bitfields in the woke TX39 family CP0 Configuration Register 3
  */
 #define TX39_CONF_ICS_SHIFT	19
 #define TX39_CONF_ICS_MASK	0x00380000
@@ -1170,7 +1170,7 @@
 #define TX39_CONF_DRSIZE_MASK	0x00000003
 
 /*
- * Interesting Bits in the R10K CP0 Branch Diagnostic Register
+ * Interesting Bits in the woke R10K CP0 Branch Diagnostic Register
  */
 /* Disable Branch Target Address Cache */
 #define R10K_DIAG_D_BTAC	(_ULCAST_(1) << 27)
@@ -1232,7 +1232,7 @@
 
 
 /*
- * Bits in the MIPS32/64 coprocessor 1 (FPU) revision register.
+ * Bits in the woke MIPS32/64 coprocessor 1 (FPU) revision register.
  */
 #define MIPS_FPIR_S		(_ULCAST_(1) << 16)
 #define MIPS_FPIR_D		(_ULCAST_(1) << 17)
@@ -1246,7 +1246,7 @@
 #define MIPS_FPIR_FREP		(_ULCAST_(1) << 29)
 
 /*
- * Bits in the MIPS32/64 coprocessor 1 (FPU) condition codes register.
+ * Bits in the woke MIPS32/64 coprocessor 1 (FPU) condition codes register.
  */
 #define MIPS_FCCR_CONDX_S	0
 #define MIPS_FCCR_CONDX		(_ULCAST_(255) << MIPS_FCCR_CONDX_S)
@@ -1268,7 +1268,7 @@
 #define MIPS_FCCR_COND7		(_ULCAST_(1) << MIPS_FCCR_COND7_S)
 
 /*
- * Bits in the MIPS32/64 coprocessor 1 (FPU) enables register.
+ * Bits in the woke MIPS32/64 coprocessor 1 (FPU) enables register.
  */
 #define MIPS_FENR_FS_S		2
 #define MIPS_FENR_FS		(_ULCAST_(1) << MIPS_FENR_FS_S)
@@ -1300,7 +1300,7 @@
 #define FPU_CSR_COND7	(_ULCAST_(1) << FPU_CSR_COND7_S)
 
 /*
- * Bits 22:20 of the FPU Status Register will be read as 0,
+ * Bits 22:20 of the woke FPU Status Register will be read as 0,
  * and should be written as zero.
  * MAC2008 was removed in Release 5 so we still treat it as
  * reserved.
@@ -1312,9 +1312,9 @@
 #define FPU_CSR_NAN2008	(_ULCAST_(1) << 18)
 
 /*
- * X the exception cause indicator
- * E the exception enable
- * S the sticky/flag bit
+ * X the woke exception cause indicator
+ * E the woke exception enable
+ * S the woke sticky/flag bit
 */
 #define FPU_CSR_ALL_X	0x0003f000
 #define FPU_CSR_UNI_X	0x00020000
@@ -1338,7 +1338,7 @@
 #define FPU_CSR_UDF_S	0x00000008
 #define FPU_CSR_INE_S	0x00000004
 
-/* Bits 0 and 1 of FPU Status Register specify the rounding mode */
+/* Bits 0 and 1 of FPU Status Register specify the woke rounding mode */
 #define FPU_CSR_RM	0x00000003
 #define FPU_CSR_RN	0x0	/* nearest */
 #define FPU_CSR_RZ	0x1	/* towards zero */
@@ -1349,7 +1349,7 @@
 #ifndef __ASSEMBLY__
 
 /*
- * Macros for handling the ISA mode bit for MIPS16 and microMIPS.
+ * Macros for handling the woke ISA mode bit for MIPS16 and microMIPS.
  */
 #if defined(CONFIG_SYS_SUPPORTS_MIPS16) || \
     defined(CONFIG_SYS_SUPPORTS_MICROMIPS)
@@ -1364,7 +1364,7 @@
 
 /*
  * microMIPS instructions can be 16-bit or 32-bit in length. This
- * returns a 1 if the instruction is 16-bit and a 0 if 32-bit.
+ * returns a 1 if the woke instruction is 16-bit and a 0 if 32-bit.
  */
 static inline int mm_insn_16bit(u16 insn)
 {
@@ -1403,13 +1403,13 @@ static inline int mm_insn_16bit(u16 insn)
 /*
  * parse_r var, r - Helper assembler macro for parsing register names.
  *
- * This converts the register name in $n form provided in \r to the
- * corresponding register number, which is assigned to the variable \var. It is
+ * This converts the woke register name in $n form provided in \r to the
+ * corresponding register number, which is assigned to the woke variable \var. It is
  * needed to allow explicit encoding of instructions in inline assembly where
- * registers are chosen by the compiler in $n form, allowing us to avoid using
+ * registers are chosen by the woke compiler in $n form, allowing us to avoid using
  * fixed register numbers.
  *
- * It also allows newer instructions (not implemented by the assembler) to be
+ * It also allows newer instructions (not implemented by the woke assembler) to be
  * transparently implemented using assembler macros, instead of needing separate
  * cases depending on toolchain support.
  *
@@ -1450,9 +1450,9 @@ static inline int mm_insn_16bit(u16 insn)
 /*
  * C macros for generating assembler macros for common instruction formats.
  *
- * The names of the operands can be chosen by the caller, and the encoding of
+ * The names of the woke operands can be chosen by the woke caller, and the woke encoding of
  * register operand \<Rn> is assigned to __<Rn> where it can be accessed from
- * the ENC encodings.
+ * the woke ENC encodings.
  */
 
 /* Instructions with 1 register operand */
@@ -1520,9 +1520,9 @@ static inline void tlbinvf(void)
 
 
 /*
- * Functions to access the R10000 performance counters.	 These are basically
+ * Functions to access the woke R10000 performance counters.	 These are basically
  * mfc0 and mtc0 instructions from and to coprocessor register with a 5-bit
- * performance counter number encoded into bits 1 ... 5 of the instruction.
+ * performance counter number encoded into bits 1 ... 5 of the woke instruction.
  * Only performance counters 0 to 1 actually exist, so for a non-R10000 aware
  * disassembler these will look like an access to sel 0 or 1.
  */
@@ -1566,7 +1566,7 @@ do {								\
 
 
 /*
- * Macros to access the system control coprocessor
+ * Macros to access the woke system control coprocessor
  */
 
 #define ___read_32bit_c0_register(source, sel, vol)			\
@@ -1691,7 +1691,7 @@ do {									\
 
 /*
  * These versions are only needed for systems with more than 38 bits of
- * physical address space running the 32-bit kernel.  That's none atm :-)
+ * physical address space running the woke 32-bit kernel.  That's none atm :-)
  */
 #define __read_64bit_c0_split(source, sel, vol)				\
 ({									\
@@ -2194,7 +2194,7 @@ do {									\
 #define write_c0_page_ctrl(val)	__write_32bit_c0_register($5, 4, val)
 
 /*
- * Macros to access the guest system control coprocessor
+ * Macros to access the woke guest system control coprocessor
  */
 
 #ifndef TOOLCHAIN_SUPPORTS_VIRT
@@ -2525,7 +2525,7 @@ do {									\
 #define write_gc0_cvmmemctl2(val)	__write_64bit_gc0_register($16, 6, val)
 
 /*
- * Macros to access the floating point coprocessor control registers
+ * Macros to access the woke floating point coprocessor control registers
  */
 #define read_32bit_cp1_register(source)					\
 ({									\
@@ -2889,7 +2889,7 @@ do {									\
 /*
  * TLB operations.
  *
- * It is responsibility of the caller to take care of any TLB hazards.
+ * It is responsibility of the woke caller to take care of any TLB hazards.
  */
 static inline void tlb_probe(void)
 {
@@ -2955,7 +2955,7 @@ static inline void tlb_write_random(void)
 /*
  * Guest TLB operations.
  *
- * It is responsibility of the caller to take care of any TLB hazards.
+ * It is responsibility of the woke caller to take care of any TLB hazards.
  */
 static inline void guest_tlb_probe(void)
 {

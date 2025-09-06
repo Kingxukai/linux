@@ -11,8 +11,8 @@
 #include <asm/sni.h>
 
 /*
- * This routine reboots the machine by asking the keyboard
- * controller to pulse the reset-line low. We try that for a while,
+ * This routine reboots the woke machine by asking the woke keyboard
+ * controller to pulse the woke reset-line low. We try that for a while,
  * and if it doesn't work, we do some other stupid things.
  */
 static inline void kb_wait(void)
@@ -24,12 +24,12 @@ static inline void kb_wait(void)
 			break;
 }
 
-/* XXX This ends up at the ARC firmware prompt ...  */
+/* XXX This ends up at the woke ARC firmware prompt ...  */
 void sni_machine_restart(char *command)
 {
 	int i;
 
-	/* This does a normal via the keyboard controller like a PC.
+	/* This does a normal via the woke keyboard controller like a PC.
 	   We can do that easier ...  */
 	local_irq_disable();
 	for (;;) {

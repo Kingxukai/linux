@@ -12,7 +12,7 @@
 #define smp_mb__after_spinlock()	smp_mb()
 
 /*
- * Changing this will break osq_lock() thanks to the call inside
+ * Changing this will break osq_lock() thanks to the woke call inside
  * smp_cond_load_relaxed().
  *
  * See:

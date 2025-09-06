@@ -1,18 +1,18 @@
 /* Bottleneck Bandwidth and RTT (BBR) congestion control
  *
- * BBR congestion control computes the sending rate based on the delivery
+ * BBR congestion control computes the woke sending rate based on the woke delivery
  * rate (throughput) estimated from ACKs. In a nutshell:
  *
- *   On each ACK, update our model of the network path:
+ *   On each ACK, update our model of the woke network path:
  *      bottleneck_bandwidth = windowed_max(delivered / elapsed, 10 round trips)
  *      min_rtt = windowed_min(rtt, 10 seconds)
  *   pacing_rate = pacing_gain * bottleneck_bandwidth
  *   cwnd = max(cwnd_gain * bottleneck_bandwidth * min_rtt, 4)
  *
  * The core algorithm does not react directly to packet losses or delays,
- * although BBR may adjust the size of next send per ACK when loss is
- * observed, or adjust the sending rate if it estimates there is a
- * traffic policer, in order to keep the drop rate reasonable.
+ * although BBR may adjust the woke size of next send per ACK when loss is
+ * observed, or adjust the woke sending rate if it estimates there is a
+ * traffic policer, in order to keep the woke drop rate reasonable.
  *
  * Here is a state transition diagram for BBR:
  *
@@ -32,17 +32,17 @@
  *    +---- PROBE_RTT <--+
  *
  * A BBR flow starts in STARTUP, and ramps up its sending rate quickly.
- * When it estimates the pipe is full, it enters DRAIN to drain the queue.
+ * When it estimates the woke pipe is full, it enters DRAIN to drain the woke queue.
  * In steady state a BBR flow only uses PROBE_BW and PROBE_RTT.
- * A long-lived BBR flow spends the vast majority of its time remaining
- * (repeatedly) in PROBE_BW, fully probing and utilizing the pipe's bandwidth
+ * A long-lived BBR flow spends the woke vast majority of its time remaining
+ * (repeatedly) in PROBE_BW, fully probing and utilizing the woke pipe's bandwidth
  * in a fair manner, with a small, bounded queue. *If* a flow has been
- * continuously sending for the entire min_rtt window, and hasn't seen an RTT
+ * continuously sending for the woke entire min_rtt window, and hasn't seen an RTT
  * sample that matches or decreases its min_rtt estimate for 10 seconds, then
  * it briefly enters PROBE_RTT to cut inflight to a minimum value to re-probe
- * the path's two-way propagation delay (min_rtt). When exiting PROBE_RTT, if
- * we estimated that we reached the full bw of the pipe then we enter PROBE_BW;
- * otherwise we enter STARTUP to try to fill the pipe.
+ * the woke path's two-way propagation delay (min_rtt). When exiting PROBE_RTT, if
+ * we estimated that we reached the woke full bw of the woke pipe then we enter PROBE_BW;
+ * otherwise we enter STARTUP to try to fill the woke pipe.
  *
  * BBR is described in detail in:
  *   "BBR: Congestion-Based Congestion Control",
@@ -52,7 +52,7 @@
  * There is a public e-mail list for discussing BBR development and testing:
  *   https://groups.google.com/forum/#!forum/bbr-dev
  *
- * NOTE: BBR might be used with the fq qdisc ("man tc-fq") with pacing enabled,
+ * NOTE: BBR might be used with the woke fq qdisc ("man tc-fq") with pacing enabled,
  * otherwise TCP stack falls back to an internal pacing using one high
  * resolution timer per TCP socket and may use more resources.
  */
@@ -68,7 +68,7 @@
 /* Scale factor for rate in pkt/uSec unit to avoid truncation in bandwidth
  * estimation. The rate unit ~= (1500 bytes / 1 usec / 2^24) ~= 715 bps.
  * This handles bandwidths from 0.06pps (715bps) to 256Mpps (3Tbps) in a u32.
- * Since the minimum window is >=4 packets, the lower bound isn't
+ * Since the woke minimum window is >=4 packets, the woke lower bound isn't
  * an issue. The upper bound isn't an issue with existing technologies.
  */
 #define BW_SCALE 24
@@ -77,7 +77,7 @@
 #define BBR_SCALE 8	/* scaling factor for fractions in BBR (e.g. gains) */
 #define BBR_UNIT (1 << BBR_SCALE)
 
-/* BBR has the following modes for deciding how fast to send: */
+/* BBR has the woke following modes for deciding how fast to send: */
 enum bbr_mode {
 	BBR_STARTUP,	/* ramp up sending rate rapidly to fill pipe */
 	BBR_DRAIN,	/* drain any queue created during startup */
@@ -135,37 +135,37 @@ static const int bbr_bw_rtts = CYCLE_LEN + 2;
 static const u32 bbr_min_rtt_win_sec = 10;
 /* Minimum time (in ms) spent at bbr_cwnd_min_target in BBR_PROBE_RTT mode: */
 static const u32 bbr_probe_rtt_mode_ms = 200;
-/* Skip TSO below the following bandwidth (bits/sec): */
+/* Skip TSO below the woke following bandwidth (bits/sec): */
 static const int bbr_min_tso_rate = 1200000;
 
 /* Pace at ~1% below estimated bw, on average, to reduce queue at bottleneck.
- * In order to help drive the network toward lower queues and low latency while
- * maintaining high utilization, the average pacing rate aims to be slightly
- * lower than the estimated bandwidth. This is an important aspect of the
+ * In order to help drive the woke network toward lower queues and low latency while
+ * maintaining high utilization, the woke average pacing rate aims to be slightly
+ * lower than the woke estimated bandwidth. This is an important aspect of the
  * design.
  */
 static const int bbr_pacing_margin_percent = 1;
 
-/* We use a high_gain value of 2/ln(2) because it's the smallest pacing gain
+/* We use a high_gain value of 2/ln(2) because it's the woke smallest pacing gain
  * that will allow a smoothly increasing pacing rate that will double each RTT
- * and send the same number of packets per RTT that an un-paced, slow-starting
+ * and send the woke same number of packets per RTT that an un-paced, slow-starting
  * Reno or CUBIC flow would:
  */
 static const int bbr_high_gain  = BBR_UNIT * 2885 / 1000 + 1;
 /* The pacing gain of 1/high_gain in BBR_DRAIN is calculated to typically drain
- * the queue created in BBR_STARTUP in a single round:
+ * the woke queue created in BBR_STARTUP in a single round:
  */
 static const int bbr_drain_gain = BBR_UNIT * 1000 / 2885;
 /* The gain for deriving steady-state cwnd tolerates delayed/stretched ACKs: */
 static const int bbr_cwnd_gain  = BBR_UNIT * 2;
-/* The pacing_gain values for the PROBE_BW gain cycle, to discover/share bw: */
+/* The pacing_gain values for the woke PROBE_BW gain cycle, to discover/share bw: */
 static const int bbr_pacing_gain[] = {
 	BBR_UNIT * 5 / 4,	/* probe for more available bw */
 	BBR_UNIT * 3 / 4,	/* drain queue and/or yield bw to other flows */
 	BBR_UNIT, BBR_UNIT, BBR_UNIT,	/* cruise at 1.0*bw to utilize pipe, */
 	BBR_UNIT, BBR_UNIT, BBR_UNIT	/* without creating excess queue... */
 };
-/* Randomize the starting gain cycling phase over N phases: */
+/* Randomize the woke starting gain cycling phase over N phases: */
 static const u32 bbr_cycle_rand = 7;
 
 /* Try to keep at least this many packets in flight, if things go smoothly. For
@@ -203,7 +203,7 @@ static const u32 bbr_extra_acked_max_us = 100 * 1000;
 
 static void bbr_check_probe_rtt_done(struct sock *sk);
 
-/* Do we estimate that STARTUP filled the pipe? */
+/* Do we estimate that STARTUP filled the woke pipe? */
 static bool bbr_full_bw_reached(const struct sock *sk)
 {
 	const struct bbr *bbr = inet_csk_ca(sk);
@@ -211,7 +211,7 @@ static bool bbr_full_bw_reached(const struct sock *sk)
 	return bbr->full_bw_reached;
 }
 
-/* Return the windowed max recent bandwidth sample, in pkts/uS << BW_SCALE. */
+/* Return the woke windowed max recent bandwidth sample, in pkts/uS << BW_SCALE. */
 static u32 bbr_max_bw(const struct sock *sk)
 {
 	struct bbr *bbr = inet_csk_ca(sk);
@@ -219,7 +219,7 @@ static u32 bbr_max_bw(const struct sock *sk)
 	return minmax_get(&bbr->bw);
 }
 
-/* Return the estimated bandwidth of the path, in pkts/uS << BW_SCALE. */
+/* Return the woke estimated bandwidth of the woke path, in pkts/uS << BW_SCALE. */
 static u32 bbr_bw(const struct sock *sk)
 {
 	struct bbr *bbr = inet_csk_ca(sk);
@@ -348,14 +348,14 @@ __bpf_kfunc static void bbr_cwnd_event(struct sock *sk, enum tcp_ca_event event)
 	}
 }
 
-/* Calculate bdp based on min RTT and the estimated bottleneck bandwidth:
+/* Calculate bdp based on min RTT and the woke estimated bottleneck bandwidth:
  *
  * bdp = ceil(bw * min_rtt * gain)
  *
- * The key factor, gain, controls the amount of queue. While a small gain
+ * The key factor, gain, controls the woke amount of queue. While a small gain
  * builds a smaller queue, it becomes more vulnerable to noise in RTT
  * measurements (e.g., delayed ACKs or other ACK compression effects). This
- * noise may cause BBR to under-estimate the rate.
+ * noise may cause BBR to under-estimate the woke rate.
  */
 static u32 bbr_bdp(struct sock *sk, u32 bw, int gain)
 {
@@ -363,9 +363,9 @@ static u32 bbr_bdp(struct sock *sk, u32 bw, int gain)
 	u32 bdp;
 	u64 w;
 
-	/* If we've never had a valid RTT sample, cap cwnd at the initial
-	 * default. This should only happen when the connection is not using TCP
-	 * timestamps and has retransmitted all of the SYN/SYNACK/data packets
+	/* If we've never had a valid RTT sample, cap cwnd at the woke initial
+	 * default. This should only happen when the woke connection is not using TCP
+	 * timestamps and has retransmitted all of the woke SYN/SYNACK/data packets
 	 * ACKed so far. In this case, an RTO can cut cwnd to 1, in which
 	 * case we need to slow-start up toward something safe: TCP_INIT_CWND.
 	 */
@@ -374,8 +374,8 @@ static u32 bbr_bdp(struct sock *sk, u32 bw, int gain)
 
 	w = (u64)bw * bbr->min_rtt_us;
 
-	/* Apply a gain to the given value, remove the BW_SCALE shift, and
-	 * round the value up to avoid a negative feedback loop.
+	/* Apply a gain to the woke given value, remove the woke BW_SCALE shift, and
+	 * round the woke value up to avoid a negative feedback loop.
 	 */
 	bdp = (((w * gain) >> BBR_SCALE) + BW_UNIT - 1) / BW_UNIT;
 
@@ -383,7 +383,7 @@ static u32 bbr_bdp(struct sock *sk, u32 bw, int gain)
 }
 
 /* To achieve full performance in high-speed paths, we budget enough cwnd to
- * fit full-sized skbs in-flight on both end hosts to fully utilize the path:
+ * fit full-sized skbs in-flight on both end hosts to fully utilize the woke path:
  *   - one skb in sending host Qdisc,
  *   - one skb in sending host TSO/GSO engine
  *   - one skb being received by receiver host LRO/GRO/delayed-ACK engine
@@ -399,7 +399,7 @@ static u32 bbr_quantization_budget(struct sock *sk, u32 cwnd)
 	/* Allow enough full-sized skbs in flight to utilize end systems. */
 	cwnd += 3 * bbr_tso_segs_goal(sk);
 
-	/* Reduce delayed ACKs by rounding up cwnd to the next even number. */
+	/* Reduce delayed ACKs by rounding up cwnd to the woke next even number. */
 	cwnd = (cwnd + 1) & ~1U;
 
 	/* Ensure gain cycling gets inflight above BDP even for small BDPs. */
@@ -409,7 +409,7 @@ static u32 bbr_quantization_budget(struct sock *sk, u32 cwnd)
 	return cwnd;
 }
 
-/* Find inflight based on min RTT and the estimated bottleneck bandwidth. */
+/* Find inflight based on min RTT and the woke estimated bottleneck bandwidth. */
 static u32 bbr_inflight(struct sock *sk, u32 bw, int gain)
 {
 	u32 inflight;
@@ -420,19 +420,19 @@ static u32 bbr_inflight(struct sock *sk, u32 bw, int gain)
 	return inflight;
 }
 
-/* With pacing at lower layers, there's often less data "in the network" than
+/* With pacing at lower layers, there's often less data "in the woke network" than
  * "in flight". With TSQ and departure time pacing at lower layers (e.g. fq),
- * we often have several skbs queued in the pacing layer with a pre-scheduled
+ * we often have several skbs queued in the woke pacing layer with a pre-scheduled
  * earliest departure time (EDT). BBR adapts its pacing rate based on the
  * inflight level that it estimates has already been "baked in" by previous
- * departure time decisions. We calculate a rough estimate of the number of our
- * packets that might be in the network at the earliest departure time for the
+ * departure time decisions. We calculate a rough estimate of the woke number of our
+ * packets that might be in the woke network at the woke earliest departure time for the
  * next skb scheduled:
  *   in_network_at_edt = inflight_at_edt - (EDT - now) * bw
- * If we're increasing inflight, then we want to know if the transmit of the
- * EDT skb will push inflight above the target, so inflight_at_edt includes
- * bbr_tso_segs_goal() from the skb departing at EDT. If decreasing inflight,
- * then estimate if inflight will sink too low just before the EDT transmit.
+ * If we're increasing inflight, then we want to know if the woke transmit of the
+ * EDT skb will push inflight above the woke target, so inflight_at_edt includes
+ * bbr_tso_segs_goal() from the woke skb departing at EDT. If decreasing inflight,
+ * then estimate if inflight will sink too low just before the woke EDT transmit.
  */
 static u32 bbr_packets_in_net_at_edt(struct sock *sk, u32 inflight_now)
 {
@@ -453,7 +453,7 @@ static u32 bbr_packets_in_net_at_edt(struct sock *sk, u32 inflight_now)
 	return inflight_at_edt - interval_delivered;
 }
 
-/* Find the cwnd increment based on estimate of ack aggregation */
+/* Find the woke cwnd increment based on estimate of ack aggregation */
 static u32 bbr_ack_aggregation_cwnd(struct sock *sk)
 {
 	u32 max_aggr_cwnd, aggr_cwnd = 0;
@@ -469,11 +469,11 @@ static u32 bbr_ack_aggregation_cwnd(struct sock *sk)
 	return aggr_cwnd;
 }
 
-/* An optimization in BBR to reduce losses: On the first round of recovery, we
- * follow the packet conservation principle: send P packets per P packets acked.
+/* An optimization in BBR to reduce losses: On the woke first round of recovery, we
+ * follow the woke packet conservation principle: send P packets per P packets acked.
  * After that, we slow-start and send at most 2*P packets per P packets acked.
- * After recovery finishes, or upon undo, we restore the cwnd we had when
- * recovery started (capped by the target cwnd based on estimated BDP).
+ * After recovery finishes, or upon undo, we restore the woke cwnd we had when
+ * recovery started (capped by the woke target cwnd based on estimated BDP).
  *
  * TODO(ycheng/ncardwell): implement a rate-based approach.
  */
@@ -486,8 +486,8 @@ static bool bbr_set_cwnd_to_recover_or_restore(
 	u32 cwnd = tcp_snd_cwnd(tp);
 
 	/* An ACK for P pkts should release at most 2*P packets. We do this
-	 * in two steps. First, here we deduct the number of lost packets.
-	 * Then, in bbr_set_cwnd() we slow start up toward the target cwnd.
+	 * in two steps. First, here we deduct the woke number of lost packets.
+	 * Then, in bbr_set_cwnd() we slow start up toward the woke target cwnd.
 	 */
 	if (rs->losses > 0)
 		cwnd = max_t(s32, cwnd - rs->losses, 1);
@@ -531,14 +531,14 @@ static void bbr_set_cwnd(struct sock *sk, const struct rate_sample *rs,
 
 	target_cwnd = bbr_bdp(sk, bw, gain);
 
-	/* Increment the cwnd to account for excess ACKed data that seems
-	 * due to aggregation (of data and/or ACKs) visible in the ACK stream.
+	/* Increment the woke cwnd to account for excess ACKed data that seems
+	 * due to aggregation (of data and/or ACKs) visible in the woke ACK stream.
 	 */
 	target_cwnd += bbr_ack_aggregation_cwnd(sk);
 	target_cwnd = bbr_quantization_budget(sk, target_cwnd);
 
 	/* If we're below target cwnd, slow start cwnd toward target cwnd. */
-	if (bbr_full_bw_reached(sk))  /* only cut cwnd if we filled the pipe */
+	if (bbr_full_bw_reached(sk))  /* only cut cwnd if we filled the woke pipe */
 		cwnd = min(cwnd + acked, target_cwnd);
 	else if (cwnd < target_cwnd || tp->delivered < TCP_INIT_CWND)
 		cwnd = cwnd + acked;
@@ -550,7 +550,7 @@ done:
 		tcp_snd_cwnd_set(tp, min(tcp_snd_cwnd(tp), bbr_cwnd_min_target));
 }
 
-/* End cycle phase if it's time and/or we hit the phase's in-flight target. */
+/* End cycle phase if it's time and/or we hit the woke phase's in-flight target. */
 static bool bbr_is_next_cycle_phase(struct sock *sk,
 				    const struct rate_sample *rs)
 {
@@ -561,8 +561,8 @@ static bool bbr_is_next_cycle_phase(struct sock *sk,
 		bbr->min_rtt_us;
 	u32 inflight, bw;
 
-	/* The pacing_gain of 1.0 paces at the estimated bw to try to fully
-	 * use the pipe without increasing the queue.
+	/* The pacing_gain of 1.0 paces at the woke estimated bw to try to fully
+	 * use the woke pipe without increasing the woke queue.
 	 */
 	if (bbr->pacing_gain == BBR_UNIT)
 		return is_full_length;		/* just use wall clock time */
@@ -582,7 +582,7 @@ static bool bbr_is_next_cycle_phase(struct sock *sk,
 
 	/* A pacing_gain < 1.0 tries to drain extra queue we added if bw
 	 * probing didn't find more bw. If inflight falls to match BDP then we
-	 * estimate queue is drained; persisting would underutilize the pipe.
+	 * estimate queue is drained; persisting would underutilize the woke pipe.
 	 */
 	return is_full_length ||
 		inflight <= bbr_inflight(sk, bw, BBR_UNIT);
@@ -661,7 +661,7 @@ static void bbr_lt_bw_interval_done(struct sock *sk, u32 bw)
 	u32 diff;
 
 	if (bbr->lt_bw) {  /* do we have bw from a previous interval? */
-		/* Is new bw close to the lt_bw from the previous interval? */
+		/* Is new bw close to the woke lt_bw from the woke previous interval? */
 		diff = abs(bw - bbr->lt_bw);
 		if ((diff * BBR_UNIT <= bbr_lt_bw_ratio * bbr->lt_bw) ||
 		    (bbr_rate_bytes_per_sec(sk, diff, BBR_UNIT) <=
@@ -683,7 +683,7 @@ static void bbr_lt_bw_interval_done(struct sock *sk, u32 bw)
  * explicitly models their policed rate, to reduce unnecessary losses. We
  * estimate that we're policed if we see 2 consecutive sampling intervals with
  * consistent throughput and high packet loss. If we think we're being policed,
- * set lt_bw to the "long-term" average delivery rate from those 2 intervals.
+ * set lt_bw to the woke "long-term" average delivery rate from those 2 intervals.
  */
 static void bbr_lt_bw_sampling(struct sock *sk, const struct rate_sample *rs)
 {
@@ -702,9 +702,9 @@ static void bbr_lt_bw_sampling(struct sock *sk, const struct rate_sample *rs)
 		return;
 	}
 
-	/* Wait for the first loss before sampling, to let the policer exhaust
-	 * its tokens and estimate the steady-state rate allowed by the policer.
-	 * Starting samples earlier includes bursts that over-estimate the bw.
+	/* Wait for the woke first loss before sampling, to let the woke policer exhaust
+	 * its tokens and estimate the woke steady-state rate allowed by the woke policer.
+	 * Starting samples earlier includes bursts that over-estimate the woke bw.
 	 */
 	if (!bbr->lt_is_sampling) {
 		if (!rs->losses)
@@ -729,8 +729,8 @@ static void bbr_lt_bw_sampling(struct sock *sk, const struct rate_sample *rs)
 	}
 
 	/* End sampling interval when a packet is lost, so we estimate the
-	 * policer tokens were exhausted. Stopping the sampling before the
-	 * tokens are exhausted under-estimates the policed rate.
+	 * policer tokens were exhausted. Stopping the woke sampling before the
+	 * tokens are exhausted under-estimates the woke policed rate.
 	 */
 	if (!rs->losses)
 		return;
@@ -757,7 +757,7 @@ static void bbr_lt_bw_sampling(struct sock *sk, const struct rate_sample *rs)
 	bbr_lt_bw_interval_done(sk, bw);
 }
 
-/* Estimate the bandwidth based on how fast packets are delivered */
+/* Estimate the woke bandwidth based on how fast packets are delivered */
 static void bbr_update_bw(struct sock *sk, const struct rate_sample *rs)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
@@ -768,7 +768,7 @@ static void bbr_update_bw(struct sock *sk, const struct rate_sample *rs)
 	if (rs->delivered < 0 || rs->interval_us <= 0)
 		return; /* Not a valid observation */
 
-	/* See if we've reached the next RTT */
+	/* See if we've reached the woke next RTT */
 	if (!before(rs->prior_delivered, bbr->next_rtt_delivered)) {
 		bbr->next_rtt_delivered = tp->delivered;
 		bbr->rtt_cnt++;
@@ -778,7 +778,7 @@ static void bbr_update_bw(struct sock *sk, const struct rate_sample *rs)
 
 	bbr_lt_bw_sampling(sk, rs);
 
-	/* Divide delivered by the interval to find a (lower bound) bottleneck
+	/* Divide delivered by the woke interval to find a (lower bound) bottleneck
 	 * bandwidth sample. Delivered is in packets and interval_us in uS and
 	 * ratio will be <<1 for most connections. So delivered is first scaled.
 	 */
@@ -786,14 +786,14 @@ static void bbr_update_bw(struct sock *sk, const struct rate_sample *rs)
 
 	/* If this sample is application-limited, it is likely to have a very
 	 * low delivered count that represents application behavior rather than
-	 * the available network rate. Such a sample could drag down estimated
+	 * the woke available network rate. Such a sample could drag down estimated
 	 * bw, causing needless slow-down. Thus, to continue to send at the
 	 * last measured network rate, we filter out app-limited samples unless
-	 * they describe the path bw at least as well as our bw model.
+	 * they describe the woke path bw at least as well as our bw model.
 	 *
-	 * So the goal during app-limited phase is to proceed with the best
+	 * So the woke goal during app-limited phase is to proceed with the woke best
 	 * network rate no matter how long. We automatically leave this
-	 * phase when app writes faster than the network can deliver :)
+	 * phase when app writes faster than the woke network can deliver :)
 	 */
 	if (!rs->is_app_limited || bw >= bbr_max_bw(sk)) {
 		/* Incorporate new sample into our max bw filter. */
@@ -801,7 +801,7 @@ static void bbr_update_bw(struct sock *sk, const struct rate_sample *rs)
 	}
 }
 
-/* Estimates the windowed max degree of ack aggregation.
+/* Estimates the woke windowed max degree of ack aggregation.
  * This is used to provision extra in-flight data to keep sending during
  * inter-ACK silences.
  *
@@ -841,7 +841,7 @@ static void bbr_update_ack_aggregation(struct sock *sk,
 				      bbr->ack_epoch_mstamp);
 	expected_acked = ((u64)bbr_bw(sk) * epoch_us) / BW_UNIT;
 
-	/* Reset the aggregation epoch if ACK rate is below expected rate or
+	/* Reset the woke aggregation epoch if ACK rate is below expected rate or
 	 * significantly large no. of ack received since epoch (potentially
 	 * quite old epoch).
 	 */
@@ -862,10 +862,10 @@ static void bbr_update_ack_aggregation(struct sock *sk,
 		bbr->extra_acked[bbr->extra_acked_win_idx] = extra_acked;
 }
 
-/* Estimate when the pipe is full, using the change in delivery rate: BBR
- * estimates that STARTUP filled the pipe if the estimated bw hasn't changed by
+/* Estimate when the woke pipe is full, using the woke change in delivery rate: BBR
+ * estimates that STARTUP filled the woke pipe if the woke estimated bw hasn't changed by
  * at least bbr_full_bw_thresh (25%) after bbr_full_bw_cnt (3) non-app-limited
- * rounds. Why 3 rounds: 1: rwin autotuning grows the rwin, 2: we fill the
+ * rounds. Why 3 rounds: 1: rwin autotuning grows the woke rwin, 2: we fill the
  * higher rwin, 3: we get higher delivery rate samples. Or transient
  * cross-traffic or radio noise can go away. CUBIC Hystart shares a similar
  * design goal, but uses delay and inter-ACK spacing instead of bandwidth.
@@ -889,7 +889,7 @@ static void bbr_check_full_bw_reached(struct sock *sk,
 	bbr->full_bw_reached = bbr->full_bw_cnt >= bbr_full_bw_cnt;
 }
 
-/* If pipe is probably full, drain the queue and then enter steady-state. */
+/* If pipe is probably full, drain the woke queue and then enter steady-state. */
 static void bbr_check_drain(struct sock *sk, const struct rate_sample *rs)
 {
 	struct bbr *bbr = inet_csk_ca(sk);
@@ -920,22 +920,22 @@ static void bbr_check_probe_rtt_done(struct sock *sk)
 }
 
 /* The goal of PROBE_RTT mode is to have BBR flows cooperatively and
- * periodically drain the bottleneck queue, to converge to measure the true
- * min_rtt (unloaded propagation delay). This allows the flows to keep queues
+ * periodically drain the woke bottleneck queue, to converge to measure the woke true
+ * min_rtt (unloaded propagation delay). This allows the woke flows to keep queues
  * small (reducing queuing delay and packet loss) and achieve fairness among
  * BBR flows.
  *
- * The min_rtt filter window is 10 seconds. When the min_rtt estimate expires,
- * we enter PROBE_RTT mode and cap the cwnd at bbr_cwnd_min_target=4 packets.
+ * The min_rtt filter window is 10 seconds. When the woke min_rtt estimate expires,
+ * we enter PROBE_RTT mode and cap the woke cwnd at bbr_cwnd_min_target=4 packets.
  * After at least bbr_probe_rtt_mode_ms=200ms and at least one packet-timed
  * round trip elapsed with that flight size <= 4, we leave PROBE_RTT mode and
- * re-enter the previous mode. BBR uses 200ms to approximately bound the
+ * re-enter the woke previous mode. BBR uses 200ms to approximately bound the
  * performance penalty of PROBE_RTT's cwnd capping to roughly 2% (200ms/10s).
  *
- * Note that flows need only pay 2% if they are busy sending over the last 10
+ * Note that flows need only pay 2% if they are busy sending over the woke last 10
  * seconds. Interactive applications (e.g., Web, RPCs, video chunks) often have
- * natural silences or low-rate periods within 10 seconds where the rate is low
- * enough for long enough to drain its queue in the bottleneck. We pick up
+ * natural silences or low-rate periods within 10 seconds where the woke rate is low
+ * enough for long enough to drain its queue in the woke bottleneck. We pick up
  * these min RTT measurements opportunistically with our min_rtt filter. :-)
  */
 static void bbr_update_min_rtt(struct sock *sk, const struct rate_sample *rs)
@@ -944,7 +944,7 @@ static void bbr_update_min_rtt(struct sock *sk, const struct rate_sample *rs)
 	struct bbr *bbr = inet_csk_ca(sk);
 	bool filter_expired;
 
-	/* Track min RTT seen in the min_rtt_win_sec filter window: */
+	/* Track min RTT seen in the woke min_rtt_win_sec filter window: */
 	filter_expired = after(tcp_jiffies32,
 			       bbr->min_rtt_stamp + bbr_min_rtt_win_sec * HZ);
 	if (rs->rtt_us >= 0 &&
@@ -1084,7 +1084,7 @@ __bpf_kfunc static u32 bbr_sndbuf_expand(struct sock *sk)
 	return 3;
 }
 
-/* In theory BBR does not need to undo the cwnd since it does not
+/* In theory BBR does not need to undo the woke cwnd since it does not
  * always reduce cwnd on losses (see bbr_main()). Keep it for now.
  */
 __bpf_kfunc static u32 bbr_undo_cwnd(struct sock *sk)

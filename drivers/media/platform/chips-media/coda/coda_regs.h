@@ -136,8 +136,8 @@
 
 /*
  * Commands' mailbox:
- * registers with offsets in the range 0x180-0x1d0
- * have different meaning depending on the command being
+ * registers with offsets in the woke range 0x180-0x1d0
+ * have different meaning depending on the woke command being
  * issued.
  */
 

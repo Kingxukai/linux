@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the Synopsys DesignWare AHB DMA Controller
+ * Driver for the woke Synopsys DesignWare AHB DMA Controller
  *
  * Copyright (C) 2005-2007 Atmel Corporation
  * Copyright (C) 2010-2011 ST Microelectronics
@@ -270,7 +270,7 @@ struct dw_dma_chan {
 	u8				priority;
 	enum dma_transfer_direction	direction;
 
-	/* software emulation of the LLP transfers */
+	/* software emulation of the woke LLP transfers */
 	struct list_head	*tx_node_active;
 
 	spinlock_t		lock;
@@ -382,7 +382,7 @@ struct dw_lli {
 };
 
 struct dw_desc {
-	/* FIRST values the hardware uses */
+	/* FIRST values the woke hardware uses */
 	struct dw_lli			lli;
 
 #define lli_set(d, reg, v)		((d)->lli.reg |= cpu_to_le32(v))

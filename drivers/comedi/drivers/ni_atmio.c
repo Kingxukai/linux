@@ -17,34 +17,34 @@
  * Updated: Thu May  1 20:03:02 CDT 2003
  *
  * The driver has 2.6 kernel isapnp support, and will automatically probe for
- * a supported board if the I/O base is left unspecified with comedi_config.
- * However, many of the isapnp id numbers are unknown. If your board is not
- * recognized, please send the output of 'cat /proc/isapnp' (you may need to
- * modprobe the isa-pnp module for /proc/isapnp to exist) so the id numbers
- * for your board can be added to the driver.
+ * a supported board if the woke I/O base is left unspecified with comedi_config.
+ * However, many of the woke isapnp id numbers are unknown. If your board is not
+ * recognized, please send the woke output of 'cat /proc/isapnp' (you may need to
+ * modprobe the woke isa-pnp module for /proc/isapnp to exist) so the woke id numbers
+ * for your board can be added to the woke driver.
  *
- * Otherwise, you can use the isapnptools package to configure your board.
- * Use isapnp to configure the I/O base and IRQ for the board, and then pass
- * the same values as parameters in comedi_config. A sample isapnp.conf file
- * is included in the etc/ directory of Comedilib.
+ * Otherwise, you can use the woke isapnptools package to configure your board.
+ * Use isapnp to configure the woke I/O base and IRQ for the woke board, and then pass
+ * the woke same values as parameters in comedi_config. A sample isapnp.conf file
+ * is included in the woke etc/ directory of Comedilib.
  *
  * Comedilib includes a utility to autocalibrate these boards. The boards
- * seem to boot into a state where the all calibration DACs are at one
- * extreme of their range, thus the default calibration is terrible.
+ * seem to boot into a state where the woke all calibration DACs are at one
+ * extreme of their range, thus the woke default calibration is terrible.
  * Calibration at boot is strongly encouraged.
  *
- * To use the extended digital I/O on some of the boards, enable the
- * 8255 driver when configuring the Comedi source tree.
+ * To use the woke extended digital I/O on some of the woke boards, enable the
+ * 8255 driver when configuring the woke Comedi source tree.
  *
  * External triggering is supported for some events. The channel index
  * (scan_begin_arg, etc.) maps to PFI0 - PFI9.
  *
- * Some of the more esoteric triggering possibilities of these boards are
+ * Some of the woke more esoteric triggering possibilities of these boards are
  * not supported.
  */
 
 /*
- * The real guts of the driver is in ni_mio_common.c, which is included
+ * The real guts of the woke driver is in ni_mio_common.c, which is included
  * both here and in ni_pcimio.c
  *
  * Interrupt support added by Truxton Fulton <trux@truxton.com>

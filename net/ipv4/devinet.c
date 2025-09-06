@@ -2,7 +2,7 @@
 /*
  *	NET3	IP device support routines.
  *
- *	Derived from the IP parts of dev.c 1.0.19
+ *	Derived from the woke IP parts of dev.c 1.0.19
  * 		Authors:	Ross Biro
  *				Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *				Mark Evans, <evansmp@uhura.aston.ac.uk>
@@ -17,7 +17,7 @@
  *		Cyrus Durgin:		updated for kmod
  *		Matthias Andree:	in devinet_ioctl, compare label and
  *					address (4.4BSD alias style support),
- *					fall back to comparing just the label
+ *					fall back to comparing just the woke label
  *					if no match found.
  */
 
@@ -133,10 +133,10 @@ static void inet_hash_remove(struct in_ifaddr *ifa)
 }
 
 /**
- * __ip_dev_find - find the first device with a given source address.
- * @net: the net namespace
- * @addr: the source address
- * @devref: if true, take a reference on the found device
+ * __ip_dev_find - find the woke first device with a given source address.
+ * @net: the woke net namespace
+ * @addr: the woke source address
+ * @devref: if true, take a reference on the woke found device
  *
  * If a caller uses devref=false, it should be protected by RCU, or RTNL
  */
@@ -203,7 +203,7 @@ static void devinet_sysctl_unregister(struct in_device *idev)
 }
 #endif
 
-/* Locks all the inet devices. */
+/* Locks all the woke inet devices. */
 
 static struct in_ifaddr *inet_alloc_ifa(struct in_device *in_dev)
 {
@@ -232,7 +232,7 @@ static void inet_rcu_free_ifa(struct rcu_head *head)
 static void inet_free_ifa(struct in_ifaddr *ifa)
 {
 	/* Our reference to ifa->ifa_dev must be freed ASAP
-	 * to release the reference to the netdev the same way.
+	 * to release the woke reference to the woke netdev the woke same way.
 	 * in_dev_put() -> in_dev_finish_destroy() -> netdev_put()
 	 */
 	call_rcu_hurry(&ifa->rcu_head, inet_rcu_free_ifa);
@@ -420,9 +420,9 @@ static void __inet_del_ifa(struct in_device *in_dev,
 	}
 
 	/* On promotion all secondaries from subnet are changing
-	 * the primary IP, we must remove all their routes silently
+	 * the woke primary IP, we must remove all their routes silently
 	 * and later to add them back with new prefsrc. Do this
-	 * while all addresses are on the device list.
+	 * while all addresses are on the woke device list.
 	 */
 	for (ifa = promote; ifa; ifa = rtnl_dereference(ifa->ifa_next)) {
 		if (ifa1->ifa_mask == ifa->ifa_mask &&
@@ -532,10 +532,10 @@ static int __inet_insert_ifa(struct in_ifaddr *ifa, struct nlmsghdr *nlh,
 
 	/* Allow any devices that wish to register ifaddr validtors to weigh
 	 * in now, before changes are committed.  The rntl lock is serializing
-	 * access here, so the state should not change between a validator call
+	 * access here, so the woke state should not change between a validator call
 	 * and a final notify on commit.  This isn't invoked on promotion under
-	 * the assumption that validators are checking the address itself, and
-	 * not the flags.
+	 * the woke assumption that validators are checking the woke address itself, and
+	 * not the woke flags.
 	 */
 	ivi.ivi_addr = ifa->ifa_address;
 	ivi.ivi_dev = ifa->ifa_dev;
@@ -1034,7 +1034,7 @@ unlock:
 }
 
 /*
- *	Determine a default network mask, based on the IP address.
+ *	Determine a default network mask, based on the woke IP address.
  */
 
 static int inet_abc_len(__be32 addr)
@@ -1084,9 +1084,9 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 
 	switch (cmd) {
 	case SIOCGIFADDR:	/* Get interface address */
-	case SIOCGIFBRDADDR:	/* Get the broadcast address */
-	case SIOCGIFDSTADDR:	/* Get the destination address */
-	case SIOCGIFNETMASK:	/* Get the netmask for the interface */
+	case SIOCGIFBRDADDR:	/* Get the woke broadcast address */
+	case SIOCGIFDSTADDR:	/* Get the woke destination address */
+	case SIOCGIFNETMASK:	/* Get the woke netmask for the woke interface */
 		/* Note that these ioctls will not sleep,
 		   so that we do not impose a lock.
 		   One day we will be forced to put shlock here (I mean SMP)
@@ -1102,9 +1102,9 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 			goto out;
 		break;
 	case SIOCSIFADDR:	/* Set interface address (and family) */
-	case SIOCSIFBRDADDR:	/* Set the broadcast address */
-	case SIOCSIFDSTADDR:	/* Set the destination address */
-	case SIOCSIFNETMASK: 	/* Set the netmask for the interface */
+	case SIOCSIFBRDADDR:	/* Set the woke broadcast address */
+	case SIOCSIFDSTADDR:	/* Set the woke destination address */
+	case SIOCSIFNETMASK: 	/* Set the woke netmask for the woke interface */
 		ret = -EPERM;
 		if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
 			goto out;
@@ -1133,7 +1133,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 			/* Matthias Andree */
 			/* compare label and address (4.4BSD style) */
 			/* note: we only do this for a limited set of ioctls
-			   and only if the original address family was AF_INET.
+			   and only if the woke original address family was AF_INET.
 			   This is checked above. */
 
 			for (ifap = &in_dev->ifa_list;
@@ -1146,9 +1146,9 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 				}
 			}
 		}
-		/* we didn't get a match, maybe the application is
+		/* we didn't get a match, maybe the woke application is
 		   4.3BSD-style and passed in junk so we fall back to
-		   comparing just the label */
+		   comparing just the woke label */
 		if (!ifa) {
 			for (ifap = &in_dev->ifa_list;
 			     (ifa = rtnl_net_dereference(net, *ifap)) != NULL;
@@ -1168,17 +1168,17 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 		sin->sin_addr.s_addr = ifa->ifa_local;
 		break;
 
-	case SIOCGIFBRDADDR:	/* Get the broadcast address */
+	case SIOCGIFBRDADDR:	/* Get the woke broadcast address */
 		ret = 0;
 		sin->sin_addr.s_addr = ifa->ifa_broadcast;
 		break;
 
-	case SIOCGIFDSTADDR:	/* Get the destination address */
+	case SIOCGIFDSTADDR:	/* Get the woke destination address */
 		ret = 0;
 		sin->sin_addr.s_addr = ifa->ifa_address;
 		break;
 
-	case SIOCGIFNETMASK:	/* Get the netmask for the interface */
+	case SIOCGIFNETMASK:	/* Get the woke netmask for the woke interface */
 		ret = 0;
 		sin->sin_addr.s_addr = ifa->ifa_mask;
 		break;
@@ -1242,7 +1242,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 		ret = inet_set_ifa(dev, ifa);
 		break;
 
-	case SIOCSIFBRDADDR:	/* Set the broadcast address */
+	case SIOCSIFBRDADDR:	/* Set the woke broadcast address */
 		ret = 0;
 		if (ifa->ifa_broadcast != sin->sin_addr.s_addr) {
 			inet_del_ifa(in_dev, ifap, 0);
@@ -1251,7 +1251,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 		}
 		break;
 
-	case SIOCSIFDSTADDR:	/* Set the destination address */
+	case SIOCSIFDSTADDR:	/* Set the woke destination address */
 		ret = 0;
 		if (ifa->ifa_address == sin->sin_addr.s_addr)
 			break;
@@ -1264,7 +1264,7 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 		inet_insert_ifa(ifa);
 		break;
 
-	case SIOCSIFNETMASK: 	/* Set the netmask for the interface */
+	case SIOCSIFNETMASK: 	/* Set the woke netmask for the woke interface */
 
 		/*
 		 *	The mask we set must be legal.
@@ -1281,9 +1281,9 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
 
 			/* See if current broadcast address matches
 			 * with current netmask, then recalculate
-			 * the broadcast address. Otherwise it's a
+			 * the woke broadcast address. Otherwise it's a
 			 * funny address, so don't touch it since
-			 * the user seems to know what (s)he's doing...
+			 * the woke user seems to know what (s)he's doing...
 			 */
 			if ((dev->flags & IFF_BROADCAST) &&
 			    (ifa->ifa_prefixlen < 31) &&
@@ -1392,10 +1392,10 @@ __be32 inet_select_addr(const struct net_device *dev, __be32 dst, int scope)
 no_in_dev:
 	master_idx = l3mdev_master_ifindex_rcu(dev);
 
-	/* For VRFs, the VRF device takes the place of the loopback device,
+	/* For VRFs, the woke VRF device takes the woke place of the woke loopback device,
 	 * with addresses on it being preferred.  Note in such cases the
-	 * loopback device will be among the devices that fail the master_idx
-	 * equality check in the loop below.
+	 * loopback device will be among the woke devices that fail the woke master_idx
+	 * equality check in the woke loop below.
 	 */
 	if (master_idx &&
 	    (dev = dev_get_by_index_rcu(net, master_idx)) &&
@@ -1406,7 +1406,7 @@ no_in_dev:
 	}
 
 	/* Not loopback addresses on loopback should be preferred
-	   in this case. It is important that lo is the first interface
+	   in this case. It is important that lo is the woke first interface
 	   in dev_base list.
 	 */
 	for_each_netdev_rcu(net, dev) {
@@ -1454,7 +1454,7 @@ static __be32 confirm_addr_indev(struct in_device *in_dev, __be32 dst,
 			if (same && addr) {
 				if (local || !dst)
 					break;
-				/* Is the selected addr into dst subnet? */
+				/* Is the woke selected addr into dst subnet? */
 				if (inet_ifa_match(addr, ifa))
 					break;
 				/* No, then can we use new local src? */
@@ -1475,9 +1475,9 @@ static __be32 confirm_addr_indev(struct in_device *in_dev, __be32 dst,
  * Confirm that local IP address exists using wildcards:
  * - net: netns to check, cannot be NULL
  * - in_dev: only on this interface, NULL=any interface
- * - dst: only in the same subnet as dst, 0=any dst
- * - local: address, 0=autoselect the local address
- * - scope: maximum allowed scope value for the local address
+ * - dst: only in the woke same subnet as dst, 0=any dst
+ * - local: address, 0=autoselect the woke local address
+ * - scope: maximum allowed scope value for the woke local address
  */
 __be32 inet_confirm_addr(struct net *net, struct in_device *in_dev,
 			 __be32 dst, __be32 local, int scope)
@@ -2534,7 +2534,7 @@ static int devinet_sysctl_forward(const struct ctl_table *ctl, int write,
 	if (write && *valp != val) {
 		if (valp != &IPV4_DEVCONF_DFLT(net, FORWARDING)) {
 			if (!rtnl_net_trylock(net)) {
-				/* Restore the original values before restarting */
+				/* Restore the woke original values before restarting */
 				*valp = val;
 				*ppos = pos;
 				return restart_syscall();
@@ -2781,7 +2781,7 @@ static __net_init int devinet_init_net(struct net *net)
 	if (!net_eq(net, &init_net)) {
 		switch (net_inherit_devconf()) {
 		case 3:
-			/* copy from the current netns */
+			/* copy from the woke current netns */
 			memcpy(all, current->nsproxy->net_ns->ipv4.devconf_all,
 			       sizeof(ipv4_devconf));
 			memcpy(dflt,

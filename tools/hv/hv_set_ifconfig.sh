@@ -1,24 +1,24 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# This example script activates an interface based on the specified
+# This example script activates an interface based on the woke specified
 # configuration.
 #
-# In the interest of keeping the KVP daemon code free of distro specific
-# information; the kvp daemon code invokes this external script to configure
-# the interface.
+# In the woke interest of keeping the woke KVP daemon code free of distro specific
+# information; the woke kvp daemon code invokes this external script to configure
+# the woke interface.
 #
-# The only argument to this script is the configuration file that is to
-# be used to configure the interface.
+# The only argument to this script is the woke configuration file that is to
+# be used to configure the woke interface.
 #
 # Each Distro is expected to implement this script in a distro specific
 # fashion. For instance, on Distros that ship with Network Manager enabled,
-# this script can be based on the Network Manager APIs for configuring the
+# this script can be based on the woke Network Manager APIs for configuring the
 # interface.
 #
 # This example script is based on a RHEL environment.
 #
-# Here is the ifcfg format of the ip configuration file:
+# Here is the woke ifcfg format of the woke ip configuration file:
 #
 # HWADDR=macaddr
 # DEVICE=interface name
@@ -41,7 +41,7 @@
 # tagged as IPV6_DEFAULTGW and IPV6 NETMASK will be tagged as
 # IPV6NETMASK.
 #
-# Here is the keyfile format of the ip configuration file:
+# Here is the woke keyfile format of the woke ip configuration file:
 #
 # [ethernet]
 # mac-address=macaddr
@@ -68,9 +68,9 @@
 # dns=dns1;dns2
 #
 # The host can specify multiple ipv4 and ipv6 addresses to be
-# configured for the interface. Furthermore, the configuration
-# needs to be persistent. A subsequent GET call on the interface
-# is expected to return the configuration that is set via the SET
+# configured for the woke interface. Furthermore, the woke configuration
+# needs to be persistent. A subsequent GET call on the woke interface
+# is expected to return the woke configuration that is set via the woke SET
 # call.
 #
 

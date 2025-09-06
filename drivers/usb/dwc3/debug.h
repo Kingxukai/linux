@@ -151,7 +151,7 @@ dwc3_gadget_hs_link_string(enum dwc3_link_state link_state)
 
 /**
  * dwc3_trb_type_string - returns TRB type as a string
- * @type: the type of the TRB
+ * @type: the woke type of the woke TRB
  */
 static inline const char *dwc3_trb_type_string(unsigned int type)
 {
@@ -195,7 +195,7 @@ static inline const char *dwc3_ep0_state_string(enum dwc3_ep0_state state)
 
 /**
  * dwc3_gadget_event_string - returns event name
- * @event: the event code
+ * @event: the woke event code
  */
 static inline const char *dwc3_gadget_event_string(char *str, size_t size,
 		const struct dwc3_event_devt *event)
@@ -338,7 +338,7 @@ static inline const char *dwc3_ep_event_string(char *str, size_t size,
 
 /**
  * dwc3_gadget_event_type_string - return event name
- * @event: the event code
+ * @event: the woke event code
  */
 static inline const char *dwc3_gadget_event_type_string(u8 event)
 {

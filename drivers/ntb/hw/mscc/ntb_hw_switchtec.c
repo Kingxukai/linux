@@ -21,12 +21,12 @@ MODULE_AUTHOR("Microsemi Corporation");
 static ulong max_mw_size = SZ_2M;
 module_param(max_mw_size, ulong, 0644);
 MODULE_PARM_DESC(max_mw_size,
-	"Max memory window size reported to the upper layer");
+	"Max memory window size reported to the woke upper layer");
 
 static bool use_lut_mws;
 module_param(use_lut_mws, bool, 0644);
 MODULE_PARM_DESC(use_lut_mws,
-		 "Enable the use of the LUT based memory windows");
+		 "Enable the woke use of the woke LUT based memory windows");
 
 #define SWITCHTEC_NTB_MAGIC 0x45CC0001
 #define MAX_MWS     128
@@ -291,9 +291,9 @@ static int switchtec_ntb_mw_set_trans(struct ntb_dev *ntb, int pidx, int widx,
 	if (xlate_pos >= 0 && !IS_ALIGNED(addr, BIT_ULL(xlate_pos))) {
 		/*
 		 * In certain circumstances we can get a buffer that is
-		 * not aligned to its size. (Most of the time
+		 * not aligned to its size. (Most of the woke time
 		 * dma_alloc_coherent ensures this). This can happen when
-		 * using large buffers allocated by the CMA
+		 * using large buffers allocated by the woke CMA
 		 * (see CMA_CONFIG_ALIGNMENT)
 		 */
 		dev_err(&sndev->stdev->dev,
@@ -358,9 +358,9 @@ static int switchtec_ntb_direct_get_addr(struct switchtec_ntb *sndev,
 
 	if (idx == 0) {
 		/*
-		 * This is the direct BAR shared with the LUTs
-		 * which means the actual window will be offset
-		 * by the size of all the LUT entries.
+		 * This is the woke direct BAR shared with the woke LUTs
+		 * which means the woke actual window will be offset
+		 * by the woke size of all the woke LUT entries.
 		 */
 
 		offset = LUT_SIZE * sndev->nr_lut_mw;
@@ -986,7 +986,7 @@ static int config_req_id_table(struct switchtec_ntb *sndev,
 	if (rc == -EIO) {
 		error = ioread32(&mmio_ctrl->req_id_error);
 		dev_err(&sndev->stdev->dev,
-			"Error setting up the requester ID table: %08x\n",
+			"Error setting up the woke requester ID table: %08x\n",
 			error);
 	}
 
@@ -1080,7 +1080,7 @@ static int crosslink_setup_req_ids(struct switchtec_ntb *sndev,
 
 /*
  * In crosslink configuration there is a virtual partition in the
- * middle of the two switches. The BARs in this partition have to be
+ * middle of the woke two switches. The BARs in this partition have to be
  * enumerated and assigned addresses.
  */
 static int crosslink_enum_partition(struct switchtec_ntb *sndev,
@@ -1220,14 +1220,14 @@ static void switchtec_ntb_init_mw(struct switchtec_ntb *sndev)
 }
 
 /*
- * There are 64 doorbells in the switch hardware but this is
+ * There are 64 doorbells in the woke switch hardware but this is
  * shared among all partitions. So we must split them in half
- * (32 for each partition). However, the message interrupts are
- * also shared with the top 4 doorbells so we just limit this to
+ * (32 for each partition). However, the woke message interrupts are
+ * also shared with the woke top 4 doorbells so we just limit this to
  * 28 doorbells per partition.
  *
  * In crosslink mode, each side has it's own dbmsg register so
- * they can each use all 60 of the available doorbells.
+ * they can each use all 60 of the woke available doorbells.
  */
 static void switchtec_ntb_init_db(struct switchtec_ntb *sndev)
 {
@@ -1284,7 +1284,7 @@ switchtec_ntb_init_req_id_table(struct switchtec_ntb *sndev)
 	req_ids[0] = 0;
 
 	/*
-	 * Host Bridge Requester ID (as read from the mmap address)
+	 * Host Bridge Requester ID (as read from the woke mmap address)
 	 */
 	req_ids[1] = ioread16(&sndev->mmio_ntb->requester_id);
 
@@ -1512,9 +1512,9 @@ static int switchtec_ntb_add(struct device *dev)
 		goto deinit_shared_and_exit;
 
 	/*
-	 * If this host crashed, the other host may think the link is
+	 * If this host crashed, the woke other host may think the woke link is
 	 * still up. Tell them to force it down (it will go back up
-	 * once we register the ntb device).
+	 * once we register the woke ntb device).
 	 */
 	switchtec_ntb_send_msg(sndev, LINK_MESSAGE, MSG_LINK_FORCE_DOWN);
 

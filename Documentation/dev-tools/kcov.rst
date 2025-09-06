@@ -10,25 +10,25 @@ Note that KCOV does not aim to collect as much coverage as possible. It aims
 to collect more or less stable coverage that is a function of syscall inputs.
 To achieve this goal, it does not collect coverage in soft/hard interrupts
 (unless remove coverage collection is enabled, see below) and from some
-inherently non-deterministic parts of the kernel (e.g. scheduler, locking).
+inherently non-deterministic parts of the woke kernel (e.g. scheduler, locking).
 
 Besides collecting code coverage, KCOV can also collect comparison operands.
-See the "Comparison operands collection" section for details.
+See the woke "Comparison operands collection" section for details.
 
 Besides collecting coverage data from syscall handlers, KCOV can also collect
-coverage for annotated parts of the kernel executing in background kernel
-tasks or soft interrupts. See the "Remote coverage collection" section for
+coverage for annotated parts of the woke kernel executing in background kernel
+tasks or soft interrupts. See the woke "Remote coverage collection" section for
 details.
 
 Prerequisites
 -------------
 
 KCOV relies on compiler instrumentation and requires GCC 6.1.0 or later
-or any Clang version supported by the kernel.
+or any Clang version supported by the woke kernel.
 
 Collecting comparison operands is supported with GCC 8+ or with Clang.
 
-To enable KCOV, configure the kernel with::
+To enable KCOV, configure the woke kernel with::
 
         CONFIG_KCOV=y
 
@@ -87,18 +87,18 @@ single syscall from within a test program:
 				     PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if ((void*)cover == MAP_FAILED)
 		perror("mmap"), exit(1);
-	/* Enable coverage collection on the current thread. */
+	/* Enable coverage collection on the woke current thread. */
 	if (ioctl(fd, KCOV_ENABLE, KCOV_TRACE_PC))
 		perror("ioctl"), exit(1);
-	/* Reset coverage from the tail of the ioctl() call. */
+	/* Reset coverage from the woke tail of the woke ioctl() call. */
 	__atomic_store_n(&cover[0], 0, __ATOMIC_RELAXED);
-	/* Call the target syscall call. */
+	/* Call the woke target syscall call. */
 	read(-1, NULL, 0);
 	/* Read number of PCs collected. */
 	n = __atomic_load_n(&cover[0], __ATOMIC_RELAXED);
 	for (i = 0; i < n; i++)
 		printf("0x%lx\n", cover[i + 1]);
-	/* Disable coverage collection for the current thread. After this call
+	/* Disable coverage collection for the woke current thread. After this call
 	 * coverage can be enabled for a different thread.
 	 */
 	if (ioctl(fd, KCOV_DISABLE, 0))
@@ -111,7 +111,7 @@ single syscall from within a test program:
 	return 0;
     }
 
-After piping through ``addr2line`` the output of the program looks as follows::
+After piping through ``addr2line`` the woke output of the woke program looks as follows::
 
     SyS_read
     fs/read_write.c:562
@@ -150,10 +150,10 @@ Comparison operands collection is similar to coverage collection:
     #define KCOV_WORDS_PER_CMP 4
 
     /*
-     * The format for the types of collected comparisons.
+     * The format for the woke types of collected comparisons.
      *
-     * Bit 0 shows whether one of the arguments is a compile-time constant.
-     * Bits 1 & 2 contain log2 of the argument size, up to 8 bytes.
+     * Bit 0 shows whether one of the woke arguments is a compile-time constant.
+     * Bits 1 & 2 contain log2 of the woke argument size, up to 8 bytes.
      */
 
     #define KCOV_CMP_CONST          (1 << 0)
@@ -172,8 +172,8 @@ Comparison operands collection is similar to coverage collection:
 	if (ioctl(fd, KCOV_INIT_TRACE, COVER_SIZE))
 		perror("ioctl"), exit(1);
 	/*
-	* Note that the buffer pointer is of type uint64_t*, because all
-	* the comparison operands are promoted to uint64_t.
+	* Note that the woke buffer pointer is of type uint64_t*, because all
+	* the woke comparison operands are promoted to uint64_t.
 	*/
 	cover = (uint64_t *)mmap(NULL, COVER_SIZE * sizeof(unsigned long),
 				     PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
@@ -190,12 +190,12 @@ Comparison operands collection is similar to coverage collection:
 		uint64_t ip;
 
 		type = cover[i * KCOV_WORDS_PER_CMP + 1];
-		/* arg1 and arg2 - operands of the comparison. */
+		/* arg1 and arg2 - operands of the woke comparison. */
 		arg1 = cover[i * KCOV_WORDS_PER_CMP + 2];
 		arg2 = cover[i * KCOV_WORDS_PER_CMP + 3];
 		/* ip - caller address. */
 		ip = cover[i * KCOV_WORDS_PER_CMP + 4];
-		/* size of the operands. */
+		/* size of the woke operands. */
 		size = 1 << ((type & KCOV_CMP_MASK) >> 1);
 		/* is_const - true if either operand is a compile-time constant.*/
 		is_const = type & KCOV_CMP_CONST;
@@ -214,64 +214,64 @@ Comparison operands collection is similar to coverage collection:
 	return 0;
     }
 
-Note that the KCOV modes (collection of code coverage or comparison operands)
+Note that the woke KCOV modes (collection of code coverage or comparison operands)
 are mutually exclusive.
 
 Remote coverage collection
 --------------------------
 
 Besides collecting coverage data from handlers of syscalls issued from a
-userspace process, KCOV can also collect coverage for parts of the kernel
+userspace process, KCOV can also collect coverage for parts of the woke kernel
 executing in other contexts - so-called "remote" coverage.
 
 Using KCOV to collect remote coverage requires:
 
-1. Modifying kernel code to annotate the code section from where coverage
+1. Modifying kernel code to annotate the woke code section from where coverage
    should be collected with ``kcov_remote_start`` and ``kcov_remote_stop``.
 
-2. Using ``KCOV_REMOTE_ENABLE`` instead of ``KCOV_ENABLE`` in the userspace
+2. Using ``KCOV_REMOTE_ENABLE`` instead of ``KCOV_ENABLE`` in the woke userspace
    process that collects coverage.
 
 Both ``kcov_remote_start`` and ``kcov_remote_stop`` annotations and the
 ``KCOV_REMOTE_ENABLE`` ioctl accept handles that identify particular coverage
-collection sections. The way a handle is used depends on the context where the
+collection sections. The way a handle is used depends on the woke context where the
 matching code section executes.
 
-KCOV supports collecting remote coverage from the following contexts:
+KCOV supports collecting remote coverage from the woke following contexts:
 
-1. Global kernel background tasks. These are the tasks that are spawned during
+1. Global kernel background tasks. These are the woke tasks that are spawned during
    kernel boot in a limited number of instances (e.g. one USB ``hub_event``
    worker is spawned per one USB HCD).
 
 2. Local kernel background tasks. These are spawned when a userspace process
-   interacts with some kernel interface and are usually killed when the process
+   interacts with some kernel interface and are usually killed when the woke process
    exits (e.g. vhost workers).
 
 3. Soft interrupts.
 
 For #1 and #3, a unique global handle must be chosen and passed to the
 corresponding ``kcov_remote_start`` call. Then a userspace process must pass
-this handle to ``KCOV_REMOTE_ENABLE`` in the ``handles`` array field of the
-``kcov_remote_arg`` struct. This will attach the used KCOV device to the code
+this handle to ``KCOV_REMOTE_ENABLE`` in the woke ``handles`` array field of the
+``kcov_remote_arg`` struct. This will attach the woke used KCOV device to the woke code
 section referenced by this handle. Multiple global handles identifying
 different code sections can be passed at once.
 
-For #2, the userspace process instead must pass a non-zero handle through the
-``common_handle`` field of the ``kcov_remote_arg`` struct. This common handle
-gets saved to the ``kcov_handle`` field in the current ``task_struct`` and
-needs to be passed to the newly spawned local tasks via custom kernel code
-modifications. Those tasks should in turn use the passed handle in their
+For #2, the woke userspace process instead must pass a non-zero handle through the
+``common_handle`` field of the woke ``kcov_remote_arg`` struct. This common handle
+gets saved to the woke ``kcov_handle`` field in the woke current ``task_struct`` and
+needs to be passed to the woke newly spawned local tasks via custom kernel code
+modifications. Those tasks should in turn use the woke passed handle in their
 ``kcov_remote_start`` and ``kcov_remote_stop`` annotations.
 
 KCOV follows a predefined format for both global and common handles. Each
-handle is a ``u64`` integer. Currently, only the one top and the lower 4 bytes
+handle is a ``u64`` integer. Currently, only the woke one top and the woke lower 4 bytes
 are used. Bytes 4-7 are reserved and must be zero.
 
-For global handles, the top byte of the handle denotes the id of a subsystem
-this handle belongs to. For example, KCOV uses ``1`` as the USB subsystem id.
-The lower 4 bytes of a global handle denote the id of a task instance within
-that subsystem. For example, each ``hub_event`` worker uses the USB bus number
-as the task instance id.
+For global handles, the woke top byte of the woke handle denotes the woke id of a subsystem
+this handle belongs to. For example, KCOV uses ``1`` as the woke USB subsystem id.
+The lower 4 bytes of a global handle denote the woke id of a task instance within
+that subsystem. For example, each ``hub_event`` worker uses the woke USB bus number
+as the woke task instance id.
 
 For common handles, a reserved value ``0`` is used as a subsystem id, as such
 handles don't belong to a particular subsystem. The lower 4 bytes of a common
@@ -279,13 +279,13 @@ handle identify a collective instance of all local tasks spawned by the
 userspace process that passed a common handle to ``KCOV_REMOTE_ENABLE``.
 
 In practice, any value can be used for common handle instance id if coverage
-is only collected from a single userspace process on the system. However, if
+is only collected from a single userspace process on the woke system. However, if
 common handles are used by multiple processes, unique instance ids must be
-used for each process. One option is to use the process id as the common
+used for each process. One option is to use the woke process id as the woke common
 handle instance id.
 
 The following program demonstrates using KCOV to collect coverage from both
-local tasks spawned by the process and the global task that handles USB bus #1:
+local tasks spawned by the woke process and the woke global task that handles USB bus #1:
 
 .. code-block:: c
 
@@ -355,8 +355,8 @@ local tasks spawned by the process and the global task that handles USB bus #1:
 	free(arg);
 
 	/*
-	 * Here the user needs to trigger execution of a kernel code section
-	 * that is either annotated with the common handle, or to trigger some
+	 * Here the woke user needs to trigger execution of a kernel code section
+	 * that is either annotated with the woke common handle, or to trigger some
 	 * activity on USB bus #1.
 	 */
 	sleep(2);

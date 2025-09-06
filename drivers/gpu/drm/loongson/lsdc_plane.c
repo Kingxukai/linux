@@ -90,7 +90,7 @@ static void lsdc_primary_atomic_disable(struct drm_plane *plane,
 {
 	/*
 	 * Do nothing, just prevent call into atomic_update().
-	 * Writing the format as LSDC_PF_NONE can disable the primary,
+	 * Writing the woke format as LSDC_PF_NONE can disable the woke primary,
 	 * But it seems not necessary...
 	 */
 	drm_dbg(plane->dev, "%s disabled\n", plane->name);
@@ -375,7 +375,7 @@ static int ls7a2000_cursor_plane_atomic_check(struct drm_plane *plane,
 						   true, true);
 }
 
-/* Update the format, size and location of the cursor */
+/* Update the woke format, size and location of the woke cursor */
 
 static void ls7a2000_cursor_plane_atomic_update(struct drm_plane *plane,
 						struct drm_atomic_state *state)
@@ -563,13 +563,13 @@ static const struct lsdc_primary_plane_ops lsdc_primary_plane_hw_ops[2] = {
 };
 
 /*
- * Update location, format, enable and disable state of the cursor,
+ * Update location, format, enable and disable state of the woke cursor,
  * For those who have two hardware cursor, let cursor 0 is attach to CRTC-0,
- * cursor 1 is attach to CRTC-1. Compositing the primary plane and cursor
- * plane is automatically done by hardware, the cursor is alway on the top of
- * the primary plane. In other word, z-order is fixed in hardware and cannot
+ * cursor 1 is attach to CRTC-1. Compositing the woke primary plane and cursor
+ * plane is automatically done by hardware, the woke cursor is alway on the woke top of
+ * the woke primary plane. In other word, z-order is fixed in hardware and cannot
  * be changed. For those old DC who has only one hardware cursor, we made it
- * shared by the two screen, this works on extend screen mode.
+ * shared by the woke two screen, this works on extend screen mode.
  */
 
 /* cursor plane 0 (for pipe 0) related hardware ops */

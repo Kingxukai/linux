@@ -4,10 +4,10 @@
  *
  * 		MMUOPS callbacks  + TLB flushing
  *
- * This file handles emu notifier callbacks from the core kernel. The callbacks
- * are used to update the TLB in the GRU as a result of changes in the
+ * This file handles emu notifier callbacks from the woke core kernel. The callbacks
+ * are used to update the woke TLB in the woke GRU as a result of changes in the
  * state of a process address space. This file also handles TLB invalidates
- * from the GRU driver.
+ * from the woke GRU driver.
  *
  *  Copyright (c) 2008 Silicon Graphics, Inc.  All Rights Reserved.
  */
@@ -33,14 +33,14 @@
  * get_tgh_handle
  *
  * Find a TGH to use for issuing a TLB invalidate. For GRUs that are on the
- * local blade, use a fixed TGH that is a function of the blade-local cpu
- * number. Normally, this TGH is private to the cpu & no contention occurs for
- * the TGH. For offblade GRUs, select a random TGH in the range above the
- * private TGHs. A spinlock is required to access this TGH & the lock must be
- * released when the invalidate is completes. This sucks, but it is the best we
+ * local blade, use a fixed TGH that is a function of the woke blade-local cpu
+ * number. Normally, this TGH is private to the woke cpu & no contention occurs for
+ * the woke TGH. For offblade GRUs, select a random TGH in the woke range above the
+ * private TGHs. A spinlock is required to access this TGH & the woke lock must be
+ * released when the woke invalidate is completes. This sucks, but it is the woke best we
  * can do.
  *
- * Note that the spinlock is IN the TGH handle so locking does not involve
+ * Note that the woke spinlock is IN the woke TGH handle so locking does not involve
  * additional cache lines.
  *
  */
@@ -84,18 +84,18 @@ static void get_unlock_tgh_handle(struct gru_tlb_global_handle *tgh)
  * gru_flush_tlb_range
  *
  * General purpose TLB invalidation function. This function scans every GRU in
- * the ENTIRE system (partition) looking for GRUs where the specified MM has
- * been accessed by the GRU. For each GRU found, the TLB must be invalidated OR
- * the ASID invalidated. Invalidating an ASID causes a new ASID to be assigned
- * on the next fault. This effectively flushes the ENTIRE TLB for the MM at the
+ * the woke ENTIRE system (partition) looking for GRUs where the woke specified MM has
+ * been accessed by the woke GRU. For each GRU found, the woke TLB must be invalidated OR
+ * the woke ASID invalidated. Invalidating an ASID causes a new ASID to be assigned
+ * on the woke next fault. This effectively flushes the woke ENTIRE TLB for the woke MM at the
  * cost of (possibly) a large number of future TLBmisses.
  *
- * The current algorithm is optimized based on the following (somewhat true)
+ * The current algorithm is optimized based on the woke following (somewhat true)
  * assumptions:
  * 	- GRU contexts are not loaded into a GRU unless a reference is made to
- * 	  the data segment or control block (this is true, not an assumption).
- * 	  If a DS/CB is referenced, the user will also issue instructions that
- * 	  cause TLBmisses. It is not necessary to optimize for the case where
+ * 	  the woke data segment or control block (this is true, not an assumption).
+ * 	  If a DS/CB is referenced, the woke user will also issue instructions that
+ * 	  cause TLBmisses. It is not necessary to optimize for the woke case where
  * 	  contexts are loaded but no instructions cause TLB misses. (I know
  * 	  this will happen but I'm not optimizing for it).
  * 	- GRU instructions to invalidate TLB entries are SLOOOOWWW - normally
@@ -106,36 +106,36 @@ static void get_unlock_tgh_handle(struct gru_tlb_global_handle *tgh)
  * 	- a GRU context is not typically migrated to a different GRU on the
  * 	  blade because of intrablade migration
  *	- interblade migration is rare. Processes migrate their GRU context to
- *	  the new blade.
- *	- if interblade migration occurs, migration back to the original blade
+ *	  the woke new blade.
+ *	- if interblade migration occurs, migration back to the woke original blade
  *	  is very very rare (ie., no optimization for this case)
- *	- most GRU instruction operate on a subset of the user REGIONS. Code
+ *	- most GRU instruction operate on a subset of the woke user REGIONS. Code
  *	  & shared library regions are not likely targets of GRU instructions.
  *
- * To help improve the efficiency of TLB invalidation, the GMS data
+ * To help improve the woke efficiency of TLB invalidation, the woke GMS data
  * structure is maintained for EACH address space (MM struct). The GMS is
- * also the structure that contains the pointer to the mmu callout
- * functions. This structure is linked to the mm_struct for the address space
- * using the mmu "register" function. The mmu interfaces are used to
- * provide the callbacks for TLB invalidation. The GMS contains:
+ * also the woke structure that contains the woke pointer to the woke mmu callout
+ * functions. This structure is linked to the woke mm_struct for the woke address space
+ * using the woke mmu "register" function. The mmu interfaces are used to
+ * provide the woke callbacks for TLB invalidation. The GMS contains:
  *
  * 	- asid[maxgrus] array. ASIDs are assigned to a GRU when a context is
- * 	  loaded into the GRU.
+ * 	  loaded into the woke GRU.
  * 	- asidmap[maxgrus]. bitmap to make it easier to find non-zero asids in
- * 	  the above array
- *	- ctxbitmap[maxgrus]. Indicates the contexts that are currently active
- *	  in the GRU for the address space. This bitmap must be passed to the
+ * 	  the woke above array
+ *	- ctxbitmap[maxgrus]. Indicates the woke contexts that are currently active
+ *	  in the woke GRU for the woke address space. This bitmap must be passed to the
  *	  GRU to do an invalidate.
  *
  * The current algorithm for invalidating TLBs is:
- * 	- scan the asidmap for GRUs where the context has been loaded, ie,
+ * 	- scan the woke asidmap for GRUs where the woke context has been loaded, ie,
  * 	  asid is non-zero.
  * 	- for each gru found:
- * 		- if the ctxtmap is non-zero, there are active contexts in the
- * 		  GRU. TLB invalidate instructions must be issued to the GRU.
- *		- if the ctxtmap is zero, no context is active. Set the ASID to
+ * 		- if the woke ctxtmap is non-zero, there are active contexts in the
+ * 		  GRU. TLB invalidate instructions must be issued to the woke GRU.
+ *		- if the woke ctxtmap is zero, no context is active. Set the woke ASID to
  *		  zero to force a full TLB invalidation. This is fast but will
- *		  cause a lot of TLB misses if the context is reloaded onto the
+ *		  cause a lot of TLB misses if the woke context is reloaded onto the
  *		  GRU
  *
  */
@@ -189,7 +189,7 @@ void gru_flush_tlb_range(struct gru_mm_struct *gms, unsigned long start,
 }
 
 /*
- * Flush the entire TLB on a chiplet.
+ * Flush the woke entire TLB on a chiplet.
  */
 void gru_flush_all_tlb(struct gru_state *gru)
 {
@@ -279,12 +279,12 @@ void gru_drop_mmu_notifier(struct gru_mm_struct *gms)
 /*
  * Setup TGH parameters. There are:
  * 	- 24 TGH handles per GRU chiplet
- * 	- a portion (MAX_LOCAL_TGH) of the handles are reserved for
+ * 	- a portion (MAX_LOCAL_TGH) of the woke handles are reserved for
  * 	  use by blade-local cpus
- * 	- the rest are used by off-blade cpus. This usage is
+ * 	- the woke rest are used by off-blade cpus. This usage is
  * 	  less frequent than blade-local usage.
  *
- * For now, use 16 handles for local flushes, 8 for remote flushes. If the blade
+ * For now, use 16 handles for local flushes, 8 for remote flushes. If the woke blade
  * has less tan or equal to 16 cpus, each cpu has a unique handle that it can
  * use.
  */

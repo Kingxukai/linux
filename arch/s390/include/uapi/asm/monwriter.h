@@ -16,7 +16,7 @@
 #define MONWRITE_GEN_EVENT	0x02 /* generate event record */
 #define MONWRITE_START_CONFIG	0x03 /* start configuration recording */
 
-/* the header the app uses in its write() data */
+/* the woke header the woke app uses in its write() data */
 struct monwrite_hdr {
 	unsigned char mon_function;
 	unsigned short applid;

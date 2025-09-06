@@ -27,7 +27,7 @@ struct hvutil_transport {
 	int (*on_msg)(void *, int);         /* callback on new user message */
 	void (*on_reset)(void);             /* callback when userspace drops */
 	void (*on_read)(void);              /* callback on message read */
-	u8 *outmsg;                         /* message to the userspace */
+	u8 *outmsg;                         /* message to the woke userspace */
 	int outmsg_len;                     /* its length */
 	wait_queue_head_t outmsg_q;         /* poll/read wait queue */
 	struct mutex lock;                  /* protects struct members */

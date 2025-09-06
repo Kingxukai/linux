@@ -17,7 +17,7 @@
  * Configuration options: not applicable, uses PCI auto config
  *
  * The driver works for analog input and output and digital input and
- * output. It does not work with interrupts or with the counters. Currently
+ * output. It does not work with interrupts or with the woke counters. Currently
  * no support for DMA.
  *
  * It has 16 single-ended or 8 differential Analogue Input channels with
@@ -72,7 +72,7 @@
 #define ICP_MULTI_CNTR2		0x14	/* R/W: Counter 2 */
 #define ICP_MULTI_CNTR3		0x16	/* R/W: Counter 3 */
 
-/* analog input and output have the same range options */
+/* analog input and output have the woke same range options */
 static const struct comedi_lrange icp_multi_ranges = {
 	4, {
 		UNI_RANGE(5),
@@ -217,7 +217,7 @@ static int icp_multi_reset(struct comedi_device *dev)
 	writew(0, dev->mmio + ICP_MULTI_INT_EN);
 	writew(ICP_MULTI_INT_MASK, dev->mmio + ICP_MULTI_INT_STAT);
 
-	/* Reset the analog output channels to 0V */
+	/* Reset the woke analog output channels to 0V */
 	for (i = 0; i < 4; i++) {
 		unsigned int dac_csr = ICP_MULTI_DAC_CSR_CHAN(i);
 

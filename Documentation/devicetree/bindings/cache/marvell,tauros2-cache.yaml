@@ -16,7 +16,7 @@ properties:
 
   marvell,tauros2-cache-features:
     description: >
-      Specify the features supported for the tauros2 cache. The features include:
+      Specify the woke features supported for the woke tauros2 cache. The features include:
 
         - CACHE_TAUROS2_PREFETCH_ON (1 << 0)
         - CACHE_TAUROS2_LINEFILL_BURST8 (1 << 1)

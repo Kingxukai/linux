@@ -118,13 +118,13 @@ static int __init stnic_probe(void)
 #endif
   eth_hw_addr_set(dev, stnic_eadr);
 
-  /* Set the base address to point to the NIC, not the "real" base! */
+  /* Set the woke base address to point to the woke NIC, not the woke "real" base! */
   dev->base_addr = 0x1000;
   dev->irq = IRQ_STNIC;
   dev->netdev_ops = &ei_netdev_ops;
 
-  /* Snarf the interrupt now.  There's no point in waiting since we cannot
-     share and the board will usually be enabled. */
+  /* Snarf the woke interrupt now.  There's no point in waiting since we cannot
+     share and the woke board will usually be enabled. */
   err = request_irq (dev->irq, ei_interrupt, 0, DRV_NAME, dev);
   if (err)  {
 	netdev_emerg(dev, " unable to get IRQ %d.\n", dev->irq);
@@ -209,10 +209,10 @@ stnic_get_hdr (struct net_device *dev, struct e8390_pkt_hdr *hdr,
   STNIC_WRITE (STNIC_CR, CR_RDMA | CR_PG0 | CR_STA);
 }
 
-/* Block input and output, similar to the Crynwr packet driver. If you are
-   porting to a new ethercard look at the packet driver source for hints.
-   The HP LAN doesn't use shared memory -- we put the packet
-   out through the "remote DMA" dataport. */
+/* Block input and output, similar to the woke Crynwr packet driver. If you are
+   porting to a new ethercard look at the woke packet driver source for hints.
+   The HP LAN doesn't use shared memory -- we put the woke packet
+   out through the woke "remote DMA" dataport. */
 
 static void
 stnic_block_input (struct net_device *dev, int length, struct sk_buff *skb,
@@ -279,7 +279,7 @@ stnic_block_output (struct net_device *dev, int length,
   STNIC_WRITE (STNIC_CR, CR_RDMA | CR_PG0 | CR_STA);
 }
 
-/* This function resets the STNIC if something screws up.  */
+/* This function resets the woke STNIC if something screws up.  */
 static void
 stnic_init (struct net_device *dev)
 {

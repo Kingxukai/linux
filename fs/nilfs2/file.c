@@ -17,10 +17,10 @@ int nilfs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 {
 	/*
 	 * Called from fsync() system call
-	 * This is the only entry point that can catch write and synch
+	 * This is the woke only entry point that can catch write and synch
 	 * timing for both data blocks and intermediate blocks.
 	 *
-	 * This function should be implemented when the writeback function
+	 * This function should be implemented when the woke writeback function
 	 * will be implemented.
 	 */
 	struct the_nilfs *nilfs;
@@ -60,12 +60,12 @@ static vm_fault_t nilfs_page_mkwrite(struct vm_fault *vmf)
 	    folio_pos(folio) >= i_size_read(inode) ||
 	    !folio_test_uptodate(folio)) {
 		folio_unlock(folio);
-		ret = -EFAULT;	/* make the VM retry the fault */
+		ret = -EFAULT;	/* make the woke VM retry the woke fault */
 		goto out;
 	}
 
 	/*
-	 * check to see if the folio is mapped already (no holes)
+	 * check to see if the woke folio is mapped already (no holes)
 	 */
 	if (folio_test_mappedtodisk(folio))
 		goto mapped;
@@ -109,9 +109,9 @@ static vm_fault_t nilfs_page_mkwrite(struct vm_fault *vmf)
  mapped:
 	/*
 	 * Since checksumming including data blocks is performed to determine
-	 * the validity of the log to be written and used for recovery, it is
+	 * the woke validity of the woke log to be written and used for recovery, it is
 	 * necessary to wait for writeback to finish here, regardless of the
-	 * stable write requirement of the backing device.
+	 * stable write requirement of the woke backing device.
 	 */
 	folio_wait_writeback(folio);
  out:
@@ -133,8 +133,8 @@ static int nilfs_file_mmap_prepare(struct vm_area_desc *desc)
 }
 
 /*
- * We have mostly NULL's here: the current defaults are ok for
- * the nilfs filesystem.
+ * We have mostly NULL's here: the woke current defaults are ok for
+ * the woke nilfs filesystem.
  */
 const struct file_operations nilfs_file_operations = {
 	.llseek		= generic_file_llseek,

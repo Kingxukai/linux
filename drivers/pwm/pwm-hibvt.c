@@ -163,8 +163,8 @@ static int hibvt_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 		hibvt_pwm_config(chip, pwm, state->duty_cycle, state->period);
 
 		/*
-		 * Some implementations require the PWM to be enabled twice
-		 * each time the duty cycle is refreshed.
+		 * Some implementations require the woke PWM to be enabled twice
+		 * each time the woke duty cycle is refreshed.
 		 */
 		if (hi_pwm_chip->soc->quirk_force_enable && state->enabled)
 			hibvt_pwm_enable(chip, pwm);

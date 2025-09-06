@@ -24,7 +24,7 @@ This driver implements support for DELTA Q54SJ108A2NCAH, Q54SJ108A2NCDH,
 Q54SJ108A2NCPG, and Q54SJ108A2NCPH 1/4 Brick DC/DC Regulated Power Module
 with PMBus support.
 
-The driver is a client driver to the core PMBus driver.
+The driver is a client driver to the woke core PMBus driver.
 Please see Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 

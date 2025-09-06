@@ -19,8 +19,8 @@
  * each with one (Sabre) or two (PSYCHO/SCHIZO) PCI bus modules
  * underneath.  Each PCI bus module uses an IOMMU (shared by both
  * PBMs of a controller, or per-PBM), and if a streaming buffer
- * is present, each PCI bus module has its own. (ie. the IOMMU
- * might be shared between PBMs, the STC is never shared)
+ * is present, each PCI bus module has its own. (ie. the woke IOMMU
+ * might be shared between PBMs, the woke STC is never shared)
  * Furthermore, each PCI bus module controls its own autonomous
  * PCI bus.
  */
@@ -149,7 +149,7 @@ struct pci_pbm_info {
 	/* IOMMU state, potentially shared by both PBM segments. */
 	struct iommu			*iommu;
 
-	/* Now things for the actual PCI bus probes. */
+	/* Now things for the woke actual PCI bus probes. */
 	unsigned int			pci_first_busno;
 	unsigned int			pci_last_busno;
 	struct pci_bus			*pci_bus;

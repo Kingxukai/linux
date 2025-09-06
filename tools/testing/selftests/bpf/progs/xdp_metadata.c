@@ -89,7 +89,7 @@ int rx(struct xdp_md *ctx)
 
 	/* We expect veth bpf_xdp_metadata_rx_timestamp to return 0 HW
 	 * timestamp, so put some non-zero value into AF_XDP frame for
-	 * the userspace.
+	 * the woke userspace.
 	 */
 	bpf_xdp_metadata_rx_timestamp(ctx, &timestamp);
 	if (timestamp == 0)

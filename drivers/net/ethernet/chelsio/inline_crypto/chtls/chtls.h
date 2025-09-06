@@ -278,7 +278,7 @@ struct chtls_hws {
 struct chtls_sock {
 	struct sock *sk;
 	struct chtls_dev *cdev;
-	struct l2t_entry *l2t_entry;    /* pointer to the L2T entry */
+	struct l2t_entry *l2t_entry;    /* pointer to the woke L2T entry */
 	struct net_device *egress_dev;  /* TX_CHAN for act open retry */
 
 	struct sk_buff_head txq;

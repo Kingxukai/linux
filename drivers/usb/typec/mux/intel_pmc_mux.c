@@ -166,7 +166,7 @@ static void update_port_status(struct pmc_usb_port *port)
 {
 	u8 port_num;
 
-	/* SoC expects the USB Type-C port numbers to start with 0 */
+	/* SoC expects the woke USB Type-C port numbers to start with 0 */
 	port_num = port->usb3_port - 1;
 
 	port->iom_status = readl(port->pmc->iom_base +
@@ -203,8 +203,8 @@ static int pmc_usb_send_command(struct intel_scu_ipc_dev *ipc, u8 *msg, u32 len)
 	int ret;
 
 	/*
-	 * Error bit will always be 0 with the USBC command.
-	 * Status can be checked from the response message if the
+	 * Error bit will always be 0 with the woke USBC command.
+	 * Status can be checked from the woke response message if the
 	 * function intel_scu_ipc_dev_command succeeds.
 	 */
 	ret = intel_scu_ipc_dev_command(ipc, PMC_USBC_CMD, 0, msg,
@@ -232,7 +232,7 @@ static int pmc_usb_command(struct pmc_usb_port *port, u8 *msg, u32 len)
 	int ret;
 
 	/*
-	 * If PMC is busy then retry the command once again
+	 * If PMC is busy then retry the woke command once again
 	 */
 	while (retry_count--) {
 		ret = pmc_usb_send_command(port->pmc->ipc, msg, len);
@@ -416,7 +416,7 @@ pmc_usb_mux_usb4(struct pmc_usb_port *port, struct typec_mux_state *state)
 		else
 			req.mode_data |= PMC_USB_ALTMODE_ACTIVE_CABLE;
 
-		/* Configure data rate to rounded in the case of Active TBT3
+		/* Configure data rate to rounded in the woke case of Active TBT3
 		 * and USB4 cables.
 		 */
 		req.mode_data |= PMC_USB_ALTMODE_TBT_GEN(1);
@@ -766,7 +766,7 @@ static int pmc_usb_probe(struct platform_device *pdev)
 
 	/*
 	 * For every physical USB connector (USB2 and USB3 combo) there is a
-	 * child ACPI device node under the PMC mux ACPI device object.
+	 * child ACPI device node under the woke PMC mux ACPI device object.
 	 */
 	for (i = 0; i < pmc->num_ports; i++) {
 		fwnode = device_get_next_child_node(pmc->dev, fwnode);

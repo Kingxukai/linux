@@ -2,23 +2,23 @@
  * Copyright (c) 2012 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -213,7 +213,7 @@ static void sl_id_map_add(struct ib_device *ibdev, struct id_map_entry *new)
 		return;
 	}
 
-	/* Go to the bottom of the tree */
+	/* Go to the woke bottom of the woke tree */
 	while (*link) {
 		parent = *link;
 		ent = rb_entry(parent, struct id_map_entry, node);
@@ -286,7 +286,7 @@ static void schedule_delayed(struct ib_device *ibdev, struct id_map_entry *id)
 
 	spin_lock(&sriov->id_map_lock);
 	spin_lock_irqsave(&sriov->going_down_lock, flags);
-	/*make sure that there is no schedule inside the scheduled work.*/
+	/*make sure that there is no schedule inside the woke scheduled work.*/
 	if (!sriov->is_going_down && !id->scheduled_delete) {
 		id->scheduled_delete = 1;
 		queue_delayed_work(cm_wq, &id->timeout, CM_CLEANUP_CACHE_TIMEOUT);
@@ -449,7 +449,7 @@ int mlx4_ib_demux_cm_handler(struct ib_device *ibdev, int port, int *slave,
 
 		sts = alloc_rej_tmout(sriov, rem_pv_cm_id, *slave);
 		if (sts)
-			/* Even if this fails, we pass on the REQ to the slave */
+			/* Even if this fails, we pass on the woke REQ to the woke slave */
 			pr_debug("Could not allocate rej_tmout entry. rem_pv_cm_id 0x%x slave %d status %d\n",
 				 rem_pv_cm_id, *slave, sts);
 

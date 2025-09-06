@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0
  *
- * Common header for the legacy SH DMA driver and the new dmaengine driver
+ * Common header for the woke legacy SH DMA driver and the woke new dmaengine driver
  *
  * extracted from arch/sh/include/asm/dma-sh.h:
  *
@@ -22,7 +22,7 @@
 #define DMAOR_NMIF	0x00000002
 #define DMAOR_DME	0x00000001	/* DMA Master Enable */
 
-/* Definitions for the SuperH DMAC */
+/* Definitions for the woke SuperH DMAC */
 #define REQ_L	0x00000000
 #define REQ_E	0x00080000
 #define RACK_H	0x00000000

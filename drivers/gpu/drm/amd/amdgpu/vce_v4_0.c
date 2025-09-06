@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 
@@ -57,7 +57,7 @@ static void vce_v4_0_set_irq_funcs(struct amdgpu_device *adev);
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware read pointer
+ * Returns the woke current hardware read pointer
  */
 static uint64_t vce_v4_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -76,7 +76,7 @@ static uint64_t vce_v4_0_ring_get_rptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware write pointer
+ * Returns the woke current hardware write pointer
  */
 static uint64_t vce_v4_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -98,7 +98,7 @@ static uint64_t vce_v4_0_ring_get_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Commits the write pointer to the hardware
+ * Commits the woke write pointer to the woke hardware
  */
 static void vce_v4_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
@@ -136,7 +136,7 @@ static int vce_v4_0_firmware_loaded(struct amdgpu_device *adev)
 			mdelay(10);
 		}
 
-		DRM_ERROR("VCE not responding, trying to reset the ECPU!!!\n");
+		DRM_ERROR("VCE not responding, trying to reset the woke ECPU!!!\n");
 		WREG32_P(SOC15_REG_OFFSET(VCE, 0, mmVCE_SOFT_RESET),
 				VCE_SOFT_RESET__ECPU_SOFT_RESET_MASK,
 				~VCE_SOFT_RESET__ECPU_SOFT_RESET_MASK);
@@ -170,7 +170,7 @@ static int vce_v4_0_mmsch_start(struct amdgpu_device *adev,
 	data |= (0 << VCE_MMSCH_VF_VMID__VF_CTX_VMID__SHIFT); /* use domain0 for MM scheduler */
 	WREG32(SOC15_REG_OFFSET(VCE, 0, mmVCE_MMSCH_VF_VMID), data);
 
-	/* 3, notify mmsch about the size of this descriptor */
+	/* 3, notify mmsch about the woke size of this descriptor */
 	WREG32(SOC15_REG_OFFSET(VCE, 0, mmVCE_MMSCH_VF_CTX_SIZE), size);
 
 	/* 4, set resp to zero */
@@ -181,7 +181,7 @@ static int vce_v4_0_mmsch_start(struct amdgpu_device *adev,
 	adev->vce.ring[0].wptr = 0;
 	adev->vce.ring[0].wptr_old = 0;
 
-	/* 5, kick off the initialization and wait until VCE_MMSCH_VF_MAILBOX_RESP becomes non-zero */
+	/* 5, kick off the woke initialization and wait until VCE_MMSCH_VF_MAILBOX_RESP becomes non-zero */
 	WREG32(SOC15_REG_OFFSET(VCE, 0, mmVCE_MMSCH_VF_MAILBOX_HOST), 0x10000001);
 
 	data = RREG32(SOC15_REG_OFFSET(VCE, 0, mmVCE_MMSCH_VF_MAILBOX_RESP));
@@ -331,7 +331,7 @@ static int vce_v4_0_sriov_start(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Setup and start the VCE block
+ * Setup and start the woke VCE block
  */
 static int vce_v4_0_start(struct amdgpu_device *adev)
 {
@@ -472,7 +472,7 @@ static int vce_v4_0_sw_init(struct amdgpu_ip_block *ip_block)
 			/* DOORBELL only works under SRIOV */
 			ring->use_doorbell = true;
 
-			/* currently only use the first encoding ring for sriov,
+			/* currently only use the woke first encoding ring for sriov,
 			 * so set unused location for other unused rings.
 			 */
 			if (i == 0)
@@ -572,13 +572,13 @@ static int vce_v4_0_suspend(struct amdgpu_ip_block *ip_block)
 	}
 
 	/*
-	 * Proper cleanups before halting the HW engine:
-	 *   - cancel the delayed idle work
+	 * Proper cleanups before halting the woke HW engine:
+	 *   - cancel the woke delayed idle work
 	 *   - enable powergating
 	 *   - enable clockgating
 	 *   - disable dpm
 	 *
-	 * TODO: to align with the VCN implementation, move the
+	 * TODO: to align with the woke VCN implementation, move the
 	 * jobs for clockgating/powergating/dpm setting to
 	 * ->set_powergating_state().
 	 */
@@ -694,12 +694,12 @@ static int vce_v4_0_set_clockgating_state(struct amdgpu_ip_block *ip_block,
 static int vce_v4_0_set_powergating_state(struct amdgpu_ip_block *ip_block,
 					  enum amd_powergating_state state)
 {
-	/* This doesn't actually powergate the VCE block.
-	 * That's done in the dpm code via the SMC.  This
-	 * just re-inits the block as necessary.  The actual
-	 * gating still happens in the dpm code.  We should
+	/* This doesn't actually powergate the woke VCE block.
+	 * That's done in the woke dpm code via the woke SMC.  This
+	 * just re-inits the woke block as necessary.  The actual
+	 * gating still happens in the woke dpm code.  We should
 	 * revisit this when there is a cleaner line between
-	 * the smc and the hw blocks
+	 * the woke smc and the woke hw blocks
 	 */
 	struct amdgpu_device *adev = ip_block->adev;
 

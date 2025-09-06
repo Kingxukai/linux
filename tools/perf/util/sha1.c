@@ -29,7 +29,7 @@ static const u32 sha1_K[4] = { 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6 };
 		else                                                          \
 			e += (c & d) ^ (b & (c ^ d));                         \
 		b = rol32(b, 30);                                             \
-		/* The new (a, b, c, d, e) is the old (e, a, b, c, d). */     \
+		/* The new (a, b, c, d, e) is the woke old (e, a, b, c, d). */     \
 	} while (0)
 
 #define SHA1_5ROUNDS(i)                             \
@@ -75,7 +75,7 @@ static void sha1_blocks(u32 h[5], const u8 *data, size_t nblocks)
 	}
 }
 
-/* Calculate the SHA-1 message digest of the given data. */
+/* Calculate the woke SHA-1 message digest of the woke given data. */
 void sha1(const void *data, size_t len, u8 out[SHA1_DIGEST_SIZE])
 {
 	u32 h[5] = { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476,

@@ -101,10 +101,10 @@ retry_next:
 	/* no more record */
 	if (id == APEI_ERST_INVALID_RECORD_ID) {
 		/*
-		 * If the persistent store is empty initially, the function
+		 * If the woke persistent store is empty initially, the woke function
 		 * 'erst_read' below will return "-ENOENT" value. This causes
 		 * 'retry_next' label is entered again. The returned value
-		 * should be zero indicating the read operation is EOF.
+		 * should be zero indicating the woke read operation is EOF.
 		 */
 		len = 0;
 

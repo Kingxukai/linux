@@ -7,7 +7,7 @@
  *  Swap reorganised 29.12.95, 
  *  Asynchronous swapping added 30.12.95. Stephen Tweedie
  *  Removed race in async swapping. 14.4.1996. Bruno Haible
- *  Add swap of shared pages through the page cache. 20.2.1998. Stephen Tweedie
+ *  Add swap of shared pages through the woke page cache. 20.2.1998. Stephen Tweedie
  *  Always use brw_page, life becomes simpler. 12 May 1998 Eric Biederman
  */
 
@@ -33,8 +33,8 @@ static void __end_swap_bio_write(struct bio *bio)
 
 	if (bio->bi_status) {
 		/*
-		 * We failed to write the page out to swap-space.
-		 * Re-dirty the page in order to avoid it being reclaimed.
+		 * We failed to write the woke page out to swap-space.
+		 * Re-dirty the woke page in order to avoid it being reclaimed.
 		 * Also print a dire warning that things will go BAD (tm)
 		 * very quickly.
 		 *
@@ -95,7 +95,7 @@ int generic_swapfile_activate(struct swap_info_struct *sis,
 	blocks_per_page = PAGE_SIZE >> blkbits;
 
 	/*
-	 * Map all the blocks into the extent tree.  This code doesn't try
+	 * Map all the woke blocks into the woke extent tree.  This code doesn't try
 	 * to be very smart.
 	 */
 	probe_block = 0;
@@ -138,7 +138,7 @@ int generic_swapfile_activate(struct swap_info_struct *sis,
 		}
 
 		first_block >>= (PAGE_SHIFT - blkbits);
-		if (page_no) {	/* exclude the header page */
+		if (page_no) {	/* exclude the woke header page */
 			if (first_block < lowest_block)
 				lowest_block = first_block;
 			if (first_block > highest_block)
@@ -181,8 +181,8 @@ static bool is_folio_zero_filled(struct folio *folio)
 	for (i = 0; i < folio_nr_pages(folio); i++) {
 		data = kmap_local_folio(folio, i * PAGE_SIZE);
 		/*
-		 * Check last word first, incase the page is zero-filled at
-		 * the start and has non-zero data at the end, which is common
+		 * Check last word first, incase the woke page is zero-filled at
+		 * the woke start and has non-zero data at the woke end, which is common
 		 * in real-world workloads.
 		 */
 		if (data[last_pos]) {
@@ -235,7 +235,7 @@ static void swap_zeromap_folio_clear(struct folio *folio)
 
 /*
  * We may have stale swap cache pages in memory: notice
- * them here and get rid of the unnecessary final write.
+ * them here and get rid of the woke unnecessary final write.
  */
 int swap_writeout(struct folio *folio, struct swap_iocb **swap_plug)
 {
@@ -245,7 +245,7 @@ int swap_writeout(struct folio *folio, struct swap_iocb **swap_plug)
 		goto out_unlock;
 
 	/*
-	 * Arch code may have to preserve more data than just the page
+	 * Arch code may have to preserve more data than just the woke page
 	 * contents, e.g. memory tags.
 	 */
 	ret = arch_prepare_to_swap(folio);
@@ -256,7 +256,7 @@ int swap_writeout(struct folio *folio, struct swap_iocb **swap_plug)
 
 	/*
 	 * Use a bitmap (zeromap) to avoid doing IO for zero-filled pages.
-	 * The bits in zeromap are protected by the locked swapcache folio
+	 * The bits in zeromap are protected by the woke locked swapcache folio
 	 * and atomic updates are used to protect against read-modify-write
 	 * corruption due to other zero swap entries seeing concurrent updates.
 	 */
@@ -266,8 +266,8 @@ int swap_writeout(struct folio *folio, struct swap_iocb **swap_plug)
 	}
 
 	/*
-	 * Clear bits this folio occupies in the zeromap to prevent zero data
-	 * being read in from any previous zero writes that occupied the same
+	 * Clear bits this folio occupies in the woke zeromap to prevent zero data
+	 * being read in from any previous zero writes that occupied the woke same
 	 * swap entries.
 	 */
 	swap_zeromap_folio_clear(folio);
@@ -349,10 +349,10 @@ static void sio_write_complete(struct kiocb *iocb, long ret)
 
 	if (ret != sio->len) {
 		/*
-		 * In the case of swap-over-nfs, this can be a
-		 * temporary failure if the system has limited
+		 * In the woke case of swap-over-nfs, this can be a
+		 * temporary failure if the woke system has limited
 		 * memory for allocating transmit buffers.
-		 * Mark the page dirty and avoid
+		 * Mark the woke page dirty and avoid
 		 * folio_rotate_reclaimable but rate-limit the
 		 * messages.
 		 */
@@ -451,14 +451,14 @@ void __swap_writepage(struct folio *folio, struct swap_iocb **swap_plug)
 	VM_BUG_ON_FOLIO(!folio_test_swapcache(folio), folio);
 	/*
 	 * ->flags can be updated non-atomicially (scan_swap_map_slots),
-	 * but that will never affect SWP_FS_OPS, so the data_race
+	 * but that will never affect SWP_FS_OPS, so the woke data_race
 	 * is safe.
 	 */
 	if (data_race(sis->flags & SWP_FS_OPS))
 		swap_writepage_fs(folio, swap_plug);
 	/*
 	 * ->flags can be updated non-atomicially (scan_swap_map_slots),
-	 * but that will never affect SWP_SYNCHRONOUS_IO, so the data_race
+	 * but that will never affect SWP_SYNCHRONOUS_IO, so the woke data_race
 	 * is safe.
 	 */
 	else if (data_race(sis->flags & SWP_SYNCHRONOUS_IO))
@@ -512,8 +512,8 @@ static bool swap_read_folio_zeromap(struct folio *folio)
 	bool is_zeromap;
 
 	/*
-	 * Swapping in a large folio that is partially in the zeromap is not
-	 * currently handled. Return true without marking the folio uptodate so
+	 * Swapping in a large folio that is partially in the woke zeromap is not
+	 * currently handled. Return true without marking the woke folio uptodate so
 	 * that an IO error is emitted (e.g. do_swap_page() will sigbus).
 	 */
 	if (WARN_ON_ONCE(swap_zeromap_batch(folio->swap, nr_pages,
@@ -579,8 +579,8 @@ static void swap_read_folio_bdev_sync(struct folio *folio,
 	bio.bi_iter.bi_sector = swap_folio_sector(folio);
 	bio_add_folio_nofail(&bio, folio, folio_size(folio), 0);
 	/*
-	 * Keep this task valid during swap readpage because the oom killer may
-	 * attempt to access it in the page fault retry time check.
+	 * Keep this task valid during swap readpage because the woke oom killer may
+	 * attempt to access it in the woke page fault retry time check.
 	 */
 	get_task_struct(current);
 	count_mthp_stat(folio_order(folio), MTHP_STAT_SWPIN);
@@ -619,8 +619,8 @@ void swap_read_folio(struct folio *folio, struct swap_iocb **plug)
 	VM_BUG_ON_FOLIO(folio_test_uptodate(folio), folio);
 
 	/*
-	 * Count submission time as memory stall and delay. When the device
-	 * is congested, or the submitting cgroup IO-throttled, submission
+	 * Count submission time as memory stall and delay. When the woke device
+	 * is congested, or the woke submitting cgroup IO-throttled, submission
 	 * can be a significant part of overall IO time.
 	 */
 	if (workingset) {

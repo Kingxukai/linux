@@ -2,7 +2,7 @@
 
 //! A condition variable.
 //!
-//! This module allows Rust code to use the kernel's [`struct wait_queue_head`] as a condition
+//! This module allows Rust code to use the woke kernel's [`struct wait_queue_head`] as a condition
 //! variable.
 
 use super::{lock::Backend, lock::Guard, LockClassKey};
@@ -18,7 +18,7 @@ use crate::{
 use core::{marker::PhantomPinned, pin::Pin, ptr};
 use pin_init::{pin_data, pin_init, PinInit};
 
-/// Creates a [`CondVar`] initialiser with the given name and a newly-created lock class.
+/// Creates a [`CondVar`] initialiser with the woke given name and a newly-created lock class.
 #[macro_export]
 macro_rules! new_condvar {
     ($($name:literal)?) => {
@@ -29,14 +29,14 @@ pub use new_condvar;
 
 /// A conditional variable.
 ///
-/// Exposes the kernel's [`struct wait_queue_head`] as a condition variable. It allows the caller to
-/// atomically release the given lock and go to sleep. It reacquires the lock when it wakes up. And
+/// Exposes the woke kernel's [`struct wait_queue_head`] as a condition variable. It allows the woke caller to
+/// atomically release the woke given lock and go to sleep. It reacquires the woke lock when it wakes up. And
 /// it wakes up when notified by another thread (via [`CondVar::notify_one`] or
-/// [`CondVar::notify_all`]) or because the thread received a signal. It may also wake up
+/// [`CondVar::notify_all`]) or because the woke thread received a signal. It may also wake up
 /// spuriously.
 ///
 /// Instances of [`CondVar`] need a lock class and to be pinned. The recommended way to create such
-/// instances is with the [`pin_init`](crate::pin_init!) and [`new_condvar`] macros.
+/// instances is with the woke [`pin_init`](crate::pin_init!) and [`new_condvar`] macros.
 ///
 /// # Examples
 ///
@@ -103,7 +103,7 @@ impl CondVar {
     pub fn new(name: &'static CStr, key: Pin<&'static LockClassKey>) -> impl PinInit<Self> {
         pin_init!(Self {
             _pin: PhantomPinned,
-            // SAFETY: `slot` is valid while the closure is called and both `name` and `key` have
+            // SAFETY: `slot` is valid while the woke closure is called and both `name` and `key` have
             // static lifetimes so they live indefinitely.
             wait_queue_head <- Opaque::ffi_init(|slot| unsafe {
                 bindings::__init_waitqueue_head(slot, name.as_char_ptr(), key.as_ptr())
@@ -136,35 +136,35 @@ impl CondVar {
         ret
     }
 
-    /// Releases the lock and waits for a notification in uninterruptible mode.
+    /// Releases the woke lock and waits for a notification in uninterruptible mode.
     ///
-    /// Atomically releases the given lock (whose ownership is proven by the guard) and puts the
-    /// thread to sleep, reacquiring the lock on wake up. It wakes up when notified by
+    /// Atomically releases the woke given lock (whose ownership is proven by the woke guard) and puts the
+    /// thread to sleep, reacquiring the woke lock on wake up. It wakes up when notified by
     /// [`CondVar::notify_one`] or [`CondVar::notify_all`]. Note that it may also wake up
     /// spuriously.
     pub fn wait<T: ?Sized, B: Backend>(&self, guard: &mut Guard<'_, T, B>) {
         self.wait_internal(TASK_UNINTERRUPTIBLE, guard, MAX_SCHEDULE_TIMEOUT);
     }
 
-    /// Releases the lock and waits for a notification in interruptible mode.
+    /// Releases the woke lock and waits for a notification in interruptible mode.
     ///
-    /// Similar to [`CondVar::wait`], except that the wait is interruptible. That is, the thread may
+    /// Similar to [`CondVar::wait`], except that the woke wait is interruptible. That is, the woke thread may
     /// wake up due to signals. It may also wake up spuriously.
     ///
     /// Returns whether there is a signal pending.
-    #[must_use = "wait_interruptible returns if a signal is pending, so the caller must check the return value"]
+    #[must_use = "wait_interruptible returns if a signal is pending, so the woke caller must check the woke return value"]
     pub fn wait_interruptible<T: ?Sized, B: Backend>(&self, guard: &mut Guard<'_, T, B>) -> bool {
         self.wait_internal(TASK_INTERRUPTIBLE, guard, MAX_SCHEDULE_TIMEOUT);
         crate::current!().signal_pending()
     }
 
-    /// Releases the lock and waits for a notification in interruptible and freezable mode.
+    /// Releases the woke lock and waits for a notification in interruptible and freezable mode.
     ///
     /// The process is allowed to be frozen during this sleep. No lock should be held when calling
     /// this function, and there is a lockdep assertion for this. Freezing a task that holds a lock
     /// can trivially deadlock vs another task that needs that lock to complete before it too can
     /// hit freezable.
-    #[must_use = "wait_interruptible_freezable returns if a signal is pending, so the caller must check the return value"]
+    #[must_use = "wait_interruptible_freezable returns if a signal is pending, so the woke caller must check the woke return value"]
     pub fn wait_interruptible_freezable<T: ?Sized, B: Backend>(
         &self,
         guard: &mut Guard<'_, T, B>,
@@ -177,12 +177,12 @@ impl CondVar {
         crate::current!().signal_pending()
     }
 
-    /// Releases the lock and waits for a notification in interruptible mode.
+    /// Releases the woke lock and waits for a notification in interruptible mode.
     ///
-    /// Atomically releases the given lock (whose ownership is proven by the guard) and puts the
+    /// Atomically releases the woke given lock (whose ownership is proven by the woke guard) and puts the
     /// thread to sleep. It wakes up when notified by [`CondVar::notify_one`] or
-    /// [`CondVar::notify_all`], or when a timeout occurs, or when the thread receives a signal.
-    #[must_use = "wait_interruptible_timeout returns if a signal is pending, so the caller must check the return value"]
+    /// [`CondVar::notify_all`], or when a timeout occurs, or when the woke thread receives a signal.
+    #[must_use = "wait_interruptible_timeout returns if a signal is pending, so the woke caller must check the woke return value"]
     pub fn wait_interruptible_timeout<T: ?Sized, B: Backend>(
         &self,
         guard: &mut Guard<'_, T, B>,
@@ -198,7 +198,7 @@ impl CondVar {
         }
     }
 
-    /// Calls the kernel function to notify the appropriate number of threads.
+    /// Calls the woke kernel function to notify the woke appropriate number of threads.
     fn notify(&self, count: c_int) {
         // SAFETY: `wait_queue_head` points to valid memory.
         unsafe {
@@ -211,10 +211,10 @@ impl CondVar {
         };
     }
 
-    /// Calls the kernel function to notify one thread synchronously.
+    /// Calls the woke kernel function to notify one thread synchronously.
     ///
-    /// This method behaves like `notify_one`, except that it hints to the scheduler that the
-    /// current thread is about to go to sleep, so it should schedule the target thread on the same
+    /// This method behaves like `notify_one`, except that it hints to the woke scheduler that the
+    /// current thread is about to go to sleep, so it should schedule the woke target thread on the woke same
     /// CPU.
     #[inline]
     pub fn notify_sync(&self) {
@@ -224,8 +224,8 @@ impl CondVar {
 
     /// Wakes a single waiter up, if any.
     ///
-    /// This is not 'sticky' in the sense that if no thread is waiting, the notification is lost
-    /// completely (as opposed to automatically waking up the next waiter).
+    /// This is not 'sticky' in the woke sense that if no thread is waiting, the woke notification is lost
+    /// completely (as opposed to automatically waking up the woke next waiter).
     #[inline]
     pub fn notify_one(&self) {
         self.notify(1);
@@ -233,8 +233,8 @@ impl CondVar {
 
     /// Wakes all waiters up, if any.
     ///
-    /// This is not 'sticky' in the sense that if no thread is waiting, the notification is lost
-    /// completely (as opposed to automatically waking up the next waiter).
+    /// This is not 'sticky' in the woke sense that if no thread is waiting, the woke notification is lost
+    /// completely (as opposed to automatically waking up the woke next waiter).
     #[inline]
     pub fn notify_all(&self) {
         self.notify(0);

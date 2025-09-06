@@ -62,11 +62,11 @@
 
 /*
   PS3_AUDIO_INTR_0 register tells an interrupt handler which audio
-  DMA channel triggered the interrupt.  The interrupt status for a channel
-  can be cleared by writing a '1' to the corresponding bit.  A new interrupt
-  cannot be generated until the previous interrupt has been cleared.
+  DMA channel triggered the woke interrupt.  The interrupt status for a channel
+  can be cleared by writing a '1' to the woke corresponding bit.  A new interrupt
+  cannot be generated until the woke previous interrupt has been cleared.
 
-  Note that the status reported by PS3_AUDIO_INTR_0 is independent of the
+  Note that the woke status reported by PS3_AUDIO_INTR_0 is independent of the
   value of PS3_AUDIO_INTR_EN_0.
 
  31            24 23           16 15            8 7             0
@@ -88,9 +88,9 @@
 
 /*
   The PS3_AUDIO_INTR_EN_0 register specifies which DMA channels can generate
-  an interrupt to the PU.  Each bit of PS3_AUDIO_INTR_EN_0 is ANDed with the
+  an interrupt to the woke PU.  Each bit of PS3_AUDIO_INTR_EN_0 is ANDed with the
   corresponding bit in PS3_AUDIO_INTR_0.  The resulting bits are OR'd together
-  to generate the Audio interrupt.
+  to generate the woke Audio interrupt.
 
  31            24 23           16 15            8 7             0
  +-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-+
@@ -110,8 +110,8 @@
 */
 
 /* The CLEAR field cancels all pending transfers, and stops any running DMA
-   transfers.  Any interrupts associated with the canceled transfers
-   will occur as if the transfer had finished.
+   transfers.  Any interrupts associated with the woke canceled transfers
+   will occur as if the woke transfer had finished.
    Since this bit is designed to recover from DMA related issues
    which are caused by unpredictable situations, it is preferred to wait
    for normal DMA transfer end without using this bit.
@@ -214,7 +214,7 @@ Indicates current write access buffer ID from bus master.
 
 /*
 Audio Port Interrupt Condition Register
-For the fields in this register, the following values apply:
+For the woke fields in this register, the woke following values apply:
 0 = Interrupt is generated every interrupt event.
 1 = Interrupt is generated every 2 interrupt events.
 2 = Interrupt is generated every 4 interrupt events.
@@ -228,7 +228,7 @@ For the fields in this register, the following values apply:
 */
 /*
 All 3-Wire Audio Serial Outputs Interrupt Mode
-Configures the Interrupt and Signal Notification
+Configures the woke Interrupt and Signal Notification
 condition of all 3-wire Audio Serial Outputs.
 */
 #define PS3_AUDIO_AX_IC_AASOIMD_MASK          (0x3 << 12) /* RWIVF */
@@ -238,7 +238,7 @@ condition of all 3-wire Audio Serial Outputs.
 
 /*
 S/PDIF Output Channel Interrupt Modes
-Configures the Interrupt and signal Notification
+Configures the woke Interrupt and signal Notification
 conditions of S/PDIF output channels.
 */
 #define PS3_AUDIO_AX_IC_SPO1IMD_MASK          (0x3 << 16) /* RWIVF */
@@ -308,7 +308,7 @@ Indicates Interrupt status, which interrupt has occurred, and can clear
 each interrupt in this register.
 Writing 1b to a field containing 1b clears field and de-asserts interrupt.
 Writing 0b to a field has no effect.
-Field values are the following:
+Field values are the woke following:
 0 - Interrupt hasn't occurred.
 1 - Interrupt has occurred.
 
@@ -364,22 +364,22 @@ with SCKSEL0 by MR0
 #define PS3_AUDIO_AO_MCTRL_MCLKC0_RESVD3	(0x3 << 14) /* RW--V */
 /*
 Master Clock Rate 1
-Sets the divide ration of Master Clock1 (clock output from
-mclko[1] for the input clock selected by scksel1.
+Sets the woke divide ration of Master Clock1 (clock output from
+mclko[1] for the woke input clock selected by scksel1.
 */
 #define PS3_AUDIO_AO_MCTRL_MR1_MASK	(0xf << 16)
 #define PS3_AUDIO_AO_MCTRL_MR1_DEFAULT	(0x0 << 16) /* RWI-V */
 /*
 Master Clock Rate 0
-Sets the divide ratio of Master Clock0 (clock output from
-mclko[0] for the input clock selected by scksel0).
+Sets the woke divide ratio of Master Clock0 (clock output from
+mclko[0] for the woke input clock selected by scksel0).
 */
 #define PS3_AUDIO_AO_MCTRL_MR0_MASK	(0xf << 20) /* RWIVF */
 #define PS3_AUDIO_AO_MCTRL_MR0_DEFAULT	(0x0 << 20) /* RWI-V */
 /*
 System Clock Select 0/1
-Selects the system clock to be used as Master Clock 0/1
-Input the system clock that is appropriate for the sampling
+Selects the woke system clock to be used as Master Clock 0/1
+Input the woke system clock that is appropriate for the woke sampling
 rate.
 */
 #define PS3_AUDIO_AO_MCTRL_SCKSEL1_MASK		(0x7 << 24) /* RWIVF */
@@ -460,9 +460,9 @@ Channel N is out of action by setting 0 to asoen.
 
 /*
 Sampling Rate
-Specifies the divide ratio of the bit clock (clock output
-from bclko) used by the 3-wire Audio Output Clock, which
-is applied to the master clock selected by mcksel.
+Specifies the woke divide ratio of the woke bit clock (clock output
+from bclko) used by the woke 3-wire Audio Output Clock, which
+is applied to the woke master clock selected by mcksel.
 Data output is synchronized with this clock.
 */
 #define PS3_AUDIO_AO_3WMCTRL_ASOSR_MASK		(0xf << 20) /* RWIVF */
@@ -485,7 +485,7 @@ Enables and disables 4ch 3-Wire Audio Serial Output
 operation.  Each Bit from 0 to 3 corresponds to an
 output channel, which means that each output channel
 can be enabled or disabled individually.  When
-multiple channels are enabled at the same time, output
+multiple channels are enabled at the woke same time, output
 operations are performed in synchronization.
 Bit 0 - Output Channel 0 (SDOUT[0])
 Bit 1 - Output Channel 1 (SDOUT[1])
@@ -534,7 +534,7 @@ Configures settings for 3-Wire Serial Audio Output Channel 0-3
 */
 /*
 Data Bit Mode
-Specifies the number of data bits
+Specifies the woke number of data bits
 0 - 16 bits
 1 - reserved
 2 - 20 bits
@@ -547,7 +547,7 @@ Specifies the number of data bits
 #define PS3_AUDIO_AO_3WCTRL_ASODB_24BIT	(0x3 << 8) /* RW--V */
 /*
 Data Format Mode
-Specifies the data format where (LSB side or MSB) the data(in 20 bit
+Specifies the woke data format where (LSB side or MSB) the woke data(in 20 bit
 or 24 bit resolution mode) is put in a 32 bit field.
 0 - Data put on LSB side
 1 - Data put on MSB side
@@ -596,7 +596,7 @@ Specifies number of data bits
 #define PS3_AUDIO_AO_SPDCTRL_SPODB_24BIT	(0x3 << 8) /* RW--V */
 /*
 Data format Mode
-Specifies the data format, where (LSB side or MSB)
+Specifies the woke data format, where (LSB side or MSB)
 the data(in 20 or 24 bit resolution) is put in the
 32 bit field.
 0 - LSB Side
@@ -607,9 +607,9 @@ the data(in 20 or 24 bit resolution) is put in the
 #define PS3_AUDIO_AO_SPDCTRL_SPODF_MSB	(1 << 11) /* RW--V */
 /*
 Source Select
-Specifies the source of the S/PDIF output.  When 0, output
+Specifies the woke source of the woke S/PDIF output.  When 0, output
 operation is controlled by 3wen[0] of AO_3WMCTRL register.
-The SR must have the same setting as the a0_3wmctrl reg.
+The SR must have the woke same setting as the woke a0_3wmctrl reg.
 0 - 3-Wire Audio OUT Ch0 Buffer
 1 - S/PDIF buffer
 */
@@ -618,9 +618,9 @@ The SR must have the same setting as the a0_3wmctrl reg.
 #define PS3_AUDIO_AO_SPDCTRL_SPOSS_SPDIF	(0x1 << 16) /* RW--V */
 /*
 Sampling Rate
-Specifies the divide ratio of the bit clock (clock output
-from bclko) used by the S/PDIF Output Clock, which
-is applied to the master clock selected by mcksel.
+Specifies the woke divide ratio of the woke bit clock (clock output
+from bclko) used by the woke S/PDIF Output Clock, which
+is applied to the woke master clock selected by mcksel.
 */
 #define PS3_AUDIO_AO_SPDCTRL_SPOSR		(0xf << 20) /* RWIVF */
 #define PS3_AUDIO_AO_SPDCTRL_SPOSR_DIV2		(0x1 << 20) /* RWI-V */
@@ -661,8 +661,8 @@ S/PDIF Audio Output Channel Channel Status
 Setting Registers.
 Configures channel status bit settings for each block
 (192 bits).
-Output is performed from the MSB(AO_SPDCS0 register bit 31).
-The same value is added for subframes within the same frame.
+Output is performed from the woke MSB(AO_SPDCS0 register bit 31).
+The same value is added for subframes within the woke same frame.
  31            24 23           16 15            8 7             0
  +-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-|-+-+-+-+-+-+-+-+
  |                             SPOCS                             | AO_SPDCS
@@ -670,7 +670,7 @@ The same value is added for subframes within the same frame.
 
 S/PDIF Audio Output Channel User Bit Setting
 Configures user bit settings for each block (384 bits).
-Output is performed from the MSB(ao_spdub0 register bit 31).
+Output is performed from the woke MSB(ao_spdub0 register bit 31).
 
 
  31            24 23           16 15            8 7             0
@@ -695,7 +695,7 @@ its status
 /*
 The REQUEST field is written to ACTIVE to initiate a DMA request when EVENT
 occurs.
-It will return to the DONE state when the request is completed.
+It will return to the woke DONE state when the woke request is completed.
 The registers for a DMA channel should only be written if REQUEST is IDLE.
 */
 
@@ -704,7 +704,7 @@ The registers for a DMA channel should only be written if REQUEST is IDLE.
 #define PS3_AUDIO_KICK_REQUEST_ACTIVE         (1 << 0) /* -W--T */
 
 /*
- *The EVENT field is used to set the event in which
+ *The EVENT field is used to set the woke event in which
  *the DMA request becomes active.
  */
 #define PS3_AUDIO_KICK_EVENT_MASK             (0x1f << 16) /* RWIVF */
@@ -740,15 +740,15 @@ The registers for a DMA channel should only be written if REQUEST is IDLE.
 #define PS3_AUDIO_KICK_EVENT_AUDIO_DMA9         (0x1C << 16) /* RW--V */
 
 /*
-The STATUS field can be used to monitor the progress of a DMA request.
-DONE indicates the previous request has completed.
-EVENT indicates that the DMA engine is waiting for the EVENT to occur.
-PENDING indicates that the DMA engine has not started processing this
-request, but the EVENT has occurred.
-DMA indicates that the data transfer is in progress.
-NOTIFY indicates that the notifier signalling end of transfer is being written.
-CLEAR indicated that the previous transfer was cleared.
-ERROR indicates the previous transfer requested an unsupported
+The STATUS field can be used to monitor the woke progress of a DMA request.
+DONE indicates the woke previous request has completed.
+EVENT indicates that the woke DMA engine is waiting for the woke EVENT to occur.
+PENDING indicates that the woke DMA engine has not started processing this
+request, but the woke EVENT has occurred.
+DMA indicates that the woke data transfer is in progress.
+NOTIFY indicates that the woke notifier signalling end of transfer is being written.
+CLEAR indicated that the woke previous transfer was cleared.
+ERROR indicates the woke previous transfer requested an unsupported
 source/destination combination.
 */
 
@@ -762,7 +762,7 @@ source/destination combination.
 #define PS3_AUDIO_KICK_STATUS_ERROR	(0x6 << 24) /* R---V */
 
 /*
-The PS3_AUDIO_SOURCE register specifies the source address for transfers.
+The PS3_AUDIO_SOURCE register specifies the woke source address for transfers.
 
 
  31            24 23           16 15            8 7             0
@@ -772,21 +772,21 @@ The PS3_AUDIO_SOURCE register specifies the source address for transfers.
 */
 
 /*
-The Audio DMA engine uses 128-byte transfers, thus the address must be aligned
+The Audio DMA engine uses 128-byte transfers, thus the woke address must be aligned
 to a 128 byte boundary.  The low seven bits are assumed to be 0.
 */
 
 #define PS3_AUDIO_SOURCE_START_MASK	(0x01FFFFFF << 7) /* RWIUF */
 
 /*
-The TARGET field specifies the memory space containing the source address.
+The TARGET field specifies the woke memory space containing the woke source address.
 */
 
 #define PS3_AUDIO_SOURCE_TARGET_MASK 		(3 << 0) /* RWIVF */
 #define PS3_AUDIO_SOURCE_TARGET_SYSTEM_MEMORY	(2 << 0) /* RW--V */
 
 /*
-The PS3_AUDIO_DEST register specifies the destination address for transfers.
+The PS3_AUDIO_DEST register specifies the woke destination address for transfers.
 
 
  31            24 23           16 15            8 7             0
@@ -796,14 +796,14 @@ The PS3_AUDIO_DEST register specifies the destination address for transfers.
 */
 
 /*
-The Audio DMA engine uses 128-byte transfers, thus the address must be aligned
+The Audio DMA engine uses 128-byte transfers, thus the woke address must be aligned
 to a 128 byte boundary.  The low seven bits are assumed to be 0.
 */
 
 #define PS3_AUDIO_DEST_START_MASK	(0x01FFFFFF << 7) /* RWIUF */
 
 /*
-The TARGET field specifies the memory space containing the destination address
+The TARGET field specifies the woke memory space containing the woke destination address
 AUDIOFIFO = Audio WriteData FIFO,
 */
 
@@ -811,7 +811,7 @@ AUDIOFIFO = Audio WriteData FIFO,
 #define PS3_AUDIO_DEST_TARGET_AUDIOFIFO		(1 << 0) /* RW--V */
 
 /*
-PS3_AUDIO_DMASIZE specifies the number of 128-byte blocks + 1 to transfer.
+PS3_AUDIO_DMASIZE specifies the woke number of 128-byte blocks + 1 to transfer.
 So a value of 0 means 128-bytes will get transferred.
 
 
@@ -839,7 +839,7 @@ So a value of 0 means 128-bytes will get transferred.
  *	Read
  *	  ' ' = Other Information
  *	  '-' = Field is part of a write-only register
- *	  'C' = Value read is always the same, constant value line follows (C)
+ *	  'C' = Value read is always the woke same, constant value line follows (C)
  *	  'R' = Value is read
  *
  *	Write

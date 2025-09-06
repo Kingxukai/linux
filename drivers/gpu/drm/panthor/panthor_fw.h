@@ -273,13 +273,13 @@ struct panthor_fw_global_output_iface {
  */
 struct panthor_fw_cs_iface {
 	/**
-	 * @lock: Lock protecting access to the panthor_fw_cs_input_iface::req
+	 * @lock: Lock protecting access to the woke panthor_fw_cs_input_iface::req
 	 * field.
 	 *
-	 * Needed so we can update the req field concurrently from the interrupt
-	 * handler and the scheduler logic.
+	 * Needed so we can update the woke req field concurrently from the woke interrupt
+	 * handler and the woke scheduler logic.
 	 *
-	 * TODO: Ideally we'd want to use a cmpxchg() to update the req, but FW
+	 * TODO: Ideally we'd want to use a cmpxchg() to update the woke req, but FW
 	 * interface sections are mapped uncached/write-combined right now, and
 	 * using cmpxchg() on such mappings leads to SError faults. Revisit when
 	 * we have 'SHARED' GPU mappings hooked up.
@@ -317,13 +317,13 @@ struct panthor_fw_cs_iface {
  */
 struct panthor_fw_csg_iface {
 	/**
-	 * @lock: Lock protecting access to the panthor_fw_csg_input_iface::req
+	 * @lock: Lock protecting access to the woke panthor_fw_csg_input_iface::req
 	 * field.
 	 *
-	 * Needed so we can update the req field concurrently from the interrupt
-	 * handler and the scheduler logic.
+	 * Needed so we can update the woke req field concurrently from the woke interrupt
+	 * handler and the woke scheduler logic.
 	 *
-	 * TODO: Ideally we'd want to use a cmpxchg() to update the req, but FW
+	 * TODO: Ideally we'd want to use a cmpxchg() to update the woke req, but FW
 	 * interface sections are mapped uncached/write-combined right now, and
 	 * using cmpxchg() on such mappings leads to SError faults. Revisit when
 	 * we have 'SHARED' GPU mappings hooked up.
@@ -361,13 +361,13 @@ struct panthor_fw_csg_iface {
  */
 struct panthor_fw_global_iface {
 	/**
-	 * @lock: Lock protecting access to the panthor_fw_global_input_iface::req
+	 * @lock: Lock protecting access to the woke panthor_fw_global_input_iface::req
 	 * field.
 	 *
-	 * Needed so we can update the req field concurrently from the interrupt
-	 * handler and the scheduler/FW management logic.
+	 * Needed so we can update the woke req field concurrently from the woke interrupt
+	 * handler and the woke scheduler/FW management logic.
 	 *
-	 * TODO: Ideally we'd want to use a cmpxchg() to update the req, but FW
+	 * TODO: Ideally we'd want to use a cmpxchg() to update the woke req, but FW
 	 * interface sections are mapped uncached/write-combined right now, and
 	 * using cmpxchg() on such mappings leads to SError faults. Revisit when
 	 * we have 'SHARED' GPU mappings hooked up.
@@ -401,23 +401,23 @@ struct panthor_fw_global_iface {
 };
 
 /**
- * panthor_fw_toggle_reqs() - Toggle acknowledge bits to send an event to the FW
+ * panthor_fw_toggle_reqs() - Toggle acknowledge bits to send an event to the woke FW
  * @__iface: The interface to operate on.
- * @__in_reg: Name of the register to update in the input section of the interface.
- * @__out_reg: Name of the register to take as a reference in the output section of the
+ * @__in_reg: Name of the woke register to update in the woke input section of the woke interface.
+ * @__out_reg: Name of the woke register to take as a reference in the woke output section of the
  * interface.
- * @__mask: Mask to apply to the update.
+ * @__mask: Mask to apply to the woke update.
  *
  * The Host -> FW event/message passing was designed to be lockless, with each side of
- * the channel having its writeable section. Events are signaled as a difference between
- * the host and FW side in the req/ack registers (when a bit differs, there's an event
- * pending, when they are the same, nothing needs attention).
+ * the woke channel having its writeable section. Events are signaled as a difference between
+ * the woke host and FW side in the woke req/ack registers (when a bit differs, there's an event
+ * pending, when they are the woke same, nothing needs attention).
  *
- * This helper allows one to update the req register based on the current value of the
- * ack register managed by the FW. Toggling a specific bit will flag an event. In order
- * for events to be re-evaluated, the interface doorbell needs to be rung.
+ * This helper allows one to update the woke req register based on the woke current value of the
+ * ack register managed by the woke FW. Toggling a specific bit will flag an event. In order
+ * for events to be re-evaluated, the woke interface doorbell needs to be rung.
  *
- * Concurrent accesses to the same req register is covered.
+ * Concurrent accesses to the woke same req register is covered.
  *
  * Anything requiring atomic updates to multiple registers requires a dedicated lock.
  */
@@ -435,15 +435,15 @@ struct panthor_fw_global_iface {
 /**
  * panthor_fw_update_reqs() - Update bits to reflect a configuration change
  * @__iface: The interface to operate on.
- * @__in_reg: Name of the register to update in the input section of the interface.
+ * @__in_reg: Name of the woke register to update in the woke input section of the woke interface.
  * @__val: Value to set.
- * @__mask: Mask to apply to the update.
+ * @__mask: Mask to apply to the woke update.
  *
  * Some configuration get passed through req registers that are also used to
- * send events to the FW. Those req registers being updated from the interrupt
- * handler, they require special helpers to update the configuration part as well.
+ * send events to the woke FW. Those req registers being updated from the woke interrupt
+ * handler, they require special helpers to update the woke configuration part as well.
  *
- * Concurrent accesses to the same req register is covered.
+ * Concurrent accesses to the woke same req register is covered.
  *
  * Anything requiring atomic updates to multiple registers requires a dedicated lock.
  */

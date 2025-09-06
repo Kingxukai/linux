@@ -350,7 +350,7 @@ enum axi_id {
 	AXI_ID_NIC_FT	/* Feed-Through NIC */
 };
 
-/* RAZWI initiator ID is built from the location in the chip and the AXI ID */
+/* RAZWI initiator ID is built from the woke location in the woke chip and the woke AXI ID */
 
 #define RAZWI_INITIATOR_AXI_ID_SHIFT	20
 #define RAZWI_INITIATOR_AXI_ID_MASK	0xF

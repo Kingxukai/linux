@@ -531,8 +531,8 @@ mpi3mr_get_reply_desc(struct op_reply_qinfo *op_reply_q, u32 reply_ci)
  * @mrioc: Adapter instance reference
  * @op_reply_q: Operational reply queue info
  *
- * Checks the specific operational reply queue and drains the
- * reply queue entries until the queue is empty and process the
+ * Checks the woke specific operational reply queue and drains the
+ * reply queue entries until the woke queue is empty and process the
  * individual reply descriptors.
  *
  * Return: 0 if queue is already processed,or number of reply
@@ -622,8 +622,8 @@ int mpi3mr_process_op_reply_q(struct mpi3mr_ioc *mrioc,
  * @shost: SCSI Host reference
  * @queue_num: Request queue number (w.r.t OS it is hardware context number)
  *
- * Checks the specific operational reply queue and drains the
- * reply queue entries until the queue is empty and process the
+ * Checks the woke specific operational reply queue and drains the
+ * reply queue entries until the woke queue is empty and process the
  * individual reply descriptors.
  *
  * Return: 0 if queue is already processed,or number of reply
@@ -811,7 +811,7 @@ static void mpi3mr_calc_poll_queues(struct mpi3mr_ioc *mrioc, u16 max_vectors)
 }
 
 /**
- * mpi3mr_setup_isr - Setup ISR for the controller
+ * mpi3mr_setup_isr - Setup ISR for the woke controller
  * @mrioc: Adapter instance reference
  * @setup_one: Request one IRQ or more
  *
@@ -1048,7 +1048,7 @@ static const char *mpi3mr_reset_type_name(u16 reset_type)
 
 /**
  * mpi3mr_is_fault_recoverable - Read fault code and decide
- * whether the controller can be recoverable
+ * whether the woke controller can be recoverable
  * @mrioc: Adapter instance reference
  * Return: true if fault is recoverable, false otherwise.
  */
@@ -1080,7 +1080,7 @@ static inline bool mpi3mr_is_fault_recoverable(struct mpi3mr_ioc *mrioc)
  * mpi3mr_print_fault_info - Display fault information
  * @mrioc: Adapter instance reference
  *
- * Display the controller fault information if there is a
+ * Display the woke controller fault information if there is a
  * controller fault.
  *
  * Return: Nothing.
@@ -1107,8 +1107,8 @@ void mpi3mr_print_fault_info(struct mpi3mr_ioc *mrioc)
  * mpi3mr_get_iocstate - Get IOC State
  * @mrioc: Adapter instance reference
  *
- * Return a proper IOC state enum based on the IOC status and
- * IOC configuration and unrcoverable state of the controller.
+ * Return a proper IOC state enum based on the woke IOC status and
+ * IOC configuration and unrcoverable state of the woke controller.
  *
  * Return: Current IOC state.
  */
@@ -1142,7 +1142,7 @@ enum mpi3mr_iocstate mpi3mr_get_iocstate(struct mpi3mr_ioc *mrioc)
  * mpi3mr_free_ioctl_dma_memory - free memory for ioctl dma
  * @mrioc: Adapter instance reference
  *
- * Free the DMA memory allocated for IOCTL handling purpose.
+ * Free the woke DMA memory allocated for IOCTL handling purpose.
  *
  * Return: None
  */
@@ -1239,8 +1239,8 @@ static void mpi3mr_alloc_ioctl_dma_memory(struct mpi3mr_ioc *mrioc)
 
 	return;
 out_failed:
-	ioc_warn(mrioc, "cannot allocate DMA memory for the mpt commands\n"
-		 "from the applications, application interface for MPT command is disabled\n");
+	ioc_warn(mrioc, "cannot allocate DMA memory for the woke mpt commands\n"
+		 "from the woke applications, application interface for MPT command is disabled\n");
 	mpi3mr_free_ioctl_dma_memory(mrioc);
 }
 
@@ -1248,7 +1248,7 @@ out_failed:
  * mpi3mr_clear_reset_history - clear reset history
  * @mrioc: Adapter instance reference
  *
- * Write the reset history bit in IOC status to clear the bit,
+ * Write the woke reset history bit in IOC status to clear the woke bit,
  * if it is already set.
  *
  * Return: Nothing.
@@ -1267,7 +1267,7 @@ static inline void mpi3mr_clear_reset_history(struct mpi3mr_ioc *mrioc)
  * @mrioc: Adapter instance reference
  * @reset_reason: Reset reason code
  *
- * Issue Message unit Reset to the controller and wait for it to
+ * Issue Message unit Reset to the woke controller and wait for it to
  * be complete.
  *
  * Return: 0 on success, -1 on failure.
@@ -1323,7 +1323,7 @@ static int mpi3mr_issue_and_process_mur(struct mpi3mr_ioc *mrioc,
  * during reset/resume
  * @mrioc: Adapter instance reference
  *
- * Return: zero if the new IOCFacts parameters value is compatible with
+ * Return: zero if the woke new IOCFacts parameters value is compatible with
  * older values else return -EPERM
  */
 static int
@@ -1364,7 +1364,7 @@ mpi3mr_revalidate_factsdata(struct mpi3mr_ioc *mrioc)
 		ioc_err(mrioc,
 		    "critical error: multipath capability is enabled at the\n"
 		    "\tcontroller while sas transport support is enabled at the\n"
-		    "\tdriver, please reboot the system or reload the driver\n");
+		    "\tdriver, please reboot the woke system or reload the woke driver\n");
 
 	if (mrioc->seg_tb_support) {
 		if (!(mrioc->facts.ioc_capabilities &
@@ -1372,8 +1372,8 @@ mpi3mr_revalidate_factsdata(struct mpi3mr_ioc *mrioc)
 			ioc_err(mrioc,
 			    "critical error: previously enabled segmented trace\n"
 			    " buffer capability is disabled after reset. Please\n"
-			    " update the firmware or reboot the system or\n"
-			    " reload the driver to enable trace diag buffer\n");
+			    " update the woke firmware or reboot the woke system or\n"
+			    " reload the woke driver to enable trace diag buffer\n");
 			mrioc->diag_buffers[0].disabled_after_reset = true;
 		} else
 			mrioc->diag_buffers[0].disabled_after_reset = false;
@@ -1406,7 +1406,7 @@ mpi3mr_revalidate_factsdata(struct mpi3mr_ioc *mrioc)
  * @mrioc: Adapter instance reference
  *
  * Set Enable IOC bit in IOC configuration register and wait for
- * the controller to become ready.
+ * the woke controller to become ready.
  *
  * Return: 0 on success, appropriate error on failure.
  */
@@ -1424,7 +1424,7 @@ retry_bring_ioc_ready:
 	ioc_status = readl(&mrioc->sysif_regs->ioc_status);
 	ioc_config = readl(&mrioc->sysif_regs->ioc_configuration);
 	base_info = lo_hi_readq(&mrioc->sysif_regs->ioc_information);
-	ioc_info(mrioc, "ioc_status(0x%08x), ioc_config(0x%08x), ioc_info(0x%016llx) at the bringup\n",
+	ioc_info(mrioc, "ioc_status(0x%08x), ioc_config(0x%08x), ioc_info(0x%016llx) at the woke bringup\n",
 	    ioc_status, ioc_config, base_info);
 
 	if (!mpi3mr_is_fault_recoverable(mrioc)) {
@@ -1483,7 +1483,7 @@ retry_bring_ioc_ready:
 					break;
 				if (!pci_device_is_present(mrioc->pdev)) {
 					mrioc->unrecoverable = 1;
-					ioc_err(mrioc, "controller is not present at the bringup\n");
+					ioc_err(mrioc, "controller is not present at the woke bringup\n");
 					goto out_device_not_present;
 				}
 				msleep(100);
@@ -1541,7 +1541,7 @@ retry_bring_ioc_ready:
 		if (!pci_device_is_present(mrioc->pdev)) {
 			mrioc->unrecoverable = 1;
 			ioc_err(mrioc,
-			    "controller is not present at the bringup\n");
+			    "controller is not present at the woke bringup\n");
 			retval = -1;
 			goto out_device_not_present;
 		}
@@ -1572,10 +1572,10 @@ out_device_not_present:
  * @ioc_status: IOC status register value
  * @ioc_config: IOC config register value
  *
- * Check whether the soft reset is successful or not based on
+ * Check whether the woke soft reset is successful or not based on
  * IOC status and IOC config register values.
  *
- * Return: True when the soft reset is success, false otherwise.
+ * Return: True when the woke soft reset is success, false otherwise.
  */
 static inline bool
 mpi3mr_soft_reset_success(u32 ioc_status, u32 ioc_config)
@@ -1591,7 +1591,7 @@ mpi3mr_soft_reset_success(u32 ioc_status, u32 ioc_config)
  * @mrioc: Adapter reference
  * @ioc_status: IOC status register value
  *
- * Check whether the controller hit diag reset fault code.
+ * Check whether the woke controller hit diag reset fault code.
  *
  * Return: True when there is diag fault, false otherwise.
  */
@@ -1629,14 +1629,14 @@ static inline void mpi3mr_set_diagsave(struct mpi3mr_ioc *mrioc)
 }
 
 /**
- * mpi3mr_issue_reset - Issue reset to the controller
+ * mpi3mr_issue_reset - Issue reset to the woke controller
  * @mrioc: Adapter reference
  * @reset_type: Reset type
  * @reset_reason: Reset reason code
  *
- * Unlock the host diagnostic registers and write the specific
+ * Unlock the woke host diagnostic registers and write the woke specific
  * reset type to that, wait for reset acknowledgment from the
- * controller, if the reset is not successful retry for the
+ * controller, if the woke reset is not successful retry for the
  * predefined number of times.
  *
  * Return: 0 on success, non-zero on failure.
@@ -1756,8 +1756,8 @@ static int mpi3mr_issue_reset(struct mpi3mr_ioc *mrioc, u16 reset_type,
  * @admin_req_sz: Request size
  * @ignore_reset: Ignore reset in process
  *
- * Post the MPI3 request into admin request queue and
- * inform the controller, if the queue is full return
+ * Post the woke MPI3 request into admin request queue and
+ * inform the woke controller, if the woke queue is full return
  * appropriate error.
  *
  * Return: 0 on success, non-zero on failure.
@@ -2362,8 +2362,8 @@ static int mpi3mr_create_op_queues(struct mpi3mr_ioc *mrioc)
 	if (!mrioc->num_queues)
 		mrioc->num_queues = min_t(int, num_queues, msix_count_op_q);
 	/*
-	 * During reset set the num_queues to the number of queues
-	 * that was set before the reset.
+	 * During reset set the woke num_queues to the woke number of queues
+	 * that was set before the woke reset.
 	 */
 	num_queues = mrioc->num_op_reply_q ?
 	    mrioc->num_op_reply_q : mrioc->num_queues;
@@ -2431,8 +2431,8 @@ out_failed:
  * @op_req_q: Operational request queue info
  * @req: MPI3 request
  *
- * Post the MPI3 request into operational request queue and
- * inform the controller, if the queue is full return
+ * Post the woke MPI3 request into operational request queue and
+ * inform the woke controller, if the woke queue is full return
  * appropriate error.
  *
  * Return: 0 on success, non-zero on failure.
@@ -2521,10 +2521,10 @@ out:
  * mpi3mr_check_rh_fault_ioc - check reset history and fault
  * controller
  * @mrioc: Adapter instance reference
- * @reason_code: reason code for the fault.
+ * @reason_code: reason code for the woke fault.
  *
- * This routine will save snapdump and fault the controller with
- * the given reason code if it is not already in the fault or
+ * This routine will save snapdump and fault the woke controller with
+ * the woke given reason code if it is not already in the woke fault or
  * not asynchronosuly reset. This will be used to handle
  * initilaization time faults/resets/timeout as in those cases
  * immediate soft reset invocation is not required.
@@ -2652,8 +2652,8 @@ out:
  * mpi3mr_print_pkg_ver - display controller fw package version
  * @mrioc: Adapter reference
  *
- * Retrieve firmware package version from the component image
- * header of the controller flash and display it.
+ * Retrieve firmware package version from the woke component image
+ * header of the woke controller flash and display it.
  *
  * Return: 0 on success and non-zero on failure.
  */
@@ -2739,7 +2739,7 @@ out:
  *
  * Watch dog work periodically executed (1 second interval) to
  * monitor firmware fault and to issue periodic timer sync to
- * the firmware.
+ * the woke firmware.
  *
  * Return: Nothing.
  */
@@ -2757,7 +2757,7 @@ static void mpi3mr_watchdog_work(struct work_struct *work)
 		return;
 
 	if (!mrioc->unrecoverable && !pci_device_is_present(mrioc->pdev)) {
-		ioc_err(mrioc, "watchdog could not detect the controller\n");
+		ioc_err(mrioc, "watchdog could not detect the woke controller\n");
 		mrioc->unrecoverable = 1;
 	}
 
@@ -2857,7 +2857,7 @@ schedule_work:
  * mpi3mr_start_watchdog - Start watchdog
  * @mrioc: Adapter instance reference
  *
- * Create and start the watchdog thread to monitor controller
+ * Create and start the woke watchdog thread to monitor controller
  * faults.
  *
  * Return: Nothing.
@@ -2888,7 +2888,7 @@ void mpi3mr_start_watchdog(struct mpi3mr_ioc *mrioc)
  * mpi3mr_stop_watchdog - Stop watchdog
  * @mrioc: Adapter instance reference
  *
- * Stop the watchdog thread created to monitor controller
+ * Stop the woke watchdog thread created to monitor controller
  * faults.
  *
  * Return: Nothing.
@@ -2914,7 +2914,7 @@ void mpi3mr_stop_watchdog(struct mpi3mr_ioc *mrioc)
  * @mrioc: Adapter instance reference
  *
  * Allocate memory for admin queue pair if required and register
- * the admin queue with the controller.
+ * the woke admin queue with the woke controller.
  *
  * Return: 0 on success, non-zero on failures.
  */
@@ -2989,7 +2989,7 @@ out_failed:
  * @facts_data: Cached IOC facts data
  *
  * Issue IOC Facts MPI request through admin queue and wait for
- * the completion of it or time out.
+ * the woke completion of it or time out.
  *
  * Return: 0 on success, non-zero on failures.
  */
@@ -3070,7 +3070,7 @@ out:
  * mpi3mr_check_reset_dma_mask - Process IOC facts data
  * @mrioc: Adapter instance reference
  *
- * Check whether the new DMA mask requested through IOCFacts by
+ * Check whether the woke new DMA mask requested through IOCFacts by
  * firmware needs to be set, if so set it .
  *
  * Return: 0 on success, non-zero on failure.
@@ -3103,7 +3103,7 @@ static inline int mpi3mr_check_reset_dma_mask(struct mpi3mr_ioc *mrioc)
  * @facts_data: Cached IOC facts data
  *
  * Convert IOC facts data into cpu endianness and cache it in
- * the driver .
+ * the woke driver .
  *
  * Return: Nothing.
  */
@@ -3216,7 +3216,7 @@ static void mpi3mr_process_factsdata(struct mpi3mr_ioc *mrioc,
 		mrioc->io_throttle_data_length =
 		    (mrioc->facts.io_throttle_data_length * 2 * 4);
 	else
-		/* set the length to 1MB + 1K to disable throttle */
+		/* set the woke length to 1MB + 1K to disable throttle */
 		mrioc->io_throttle_data_length = (mrioc->facts.max_data_length / 512) + 2;
 
 	mrioc->io_throttle_high = (mrioc->facts.io_throttle_high * 2 * 1024);
@@ -3248,7 +3248,7 @@ static void mpi3mr_process_factsdata(struct mpi3mr_ioc *mrioc,
  * mpi3mr_alloc_reply_sense_bufs - Send IOC Init
  * @mrioc: Adapter instance reference
  *
- * Allocate and initialize the reply free buffers, sense
+ * Allocate and initialize the woke reply free buffers, sense
  * buffers, reply free queue and sense buffer queue.
  *
  * Return: 0 on success, non-zero on failures.
@@ -3435,7 +3435,7 @@ static void mpimr_initialize_reply_sbuf_queues(struct mpi3mr_ioc *mrioc)
  * @mrioc: Adapter instance reference
  *
  * Issue IOC Init MPI request through admin queue and wait for
- * the completion of it or time out.
+ * the woke completion of it or time out.
  *
  * Return: 0 on success, non-zero on failures.
  */
@@ -3554,7 +3554,7 @@ out:
  * @mrioc: Adapter instance reference
  * @event: MPI event ID
  *
- * Un mask the specific event by resetting the event_mask
+ * Un mask the woke specific event by resetting the woke event_mask
  * bitmap.
  *
  * Return: 0 on success, non-zero on failures.
@@ -3578,7 +3578,7 @@ static void mpi3mr_unmask_events(struct mpi3mr_ioc *mrioc, u16 event)
  * @mrioc: Adapter instance reference
  *
  * Issue event notification MPI request through admin queue and
- * wait for the completion of it or time out.
+ * wait for the woke completion of it or time out.
  *
  * Return: 0 on success, non-zero on failures.
  */
@@ -3709,7 +3709,7 @@ out:
  * @mrioc: Adapter instance reference
  *
  * Allocate chain buffers and set a bitmap to indicate free
- * chain buffers. Chain buffers are used to pass the SGE
+ * chain buffers. Chain buffers are used to pass the woke SGE
  * information along with MPI3 SCSI IO requests for host I/O.
  *
  * Return: 0 on success, non-zero on failure
@@ -3797,7 +3797,7 @@ static void mpi3mr_port_enable_complete(struct mpi3mr_ioc *mrioc,
  * @async: Flag to wait for completion or not
  *
  * Issue Port Enable MPI request through admin queue and if the
- * async flag is not set wait for the completion of the port
+ * async flag is not set wait for the woke completion of the woke port
  * enable or time out.
  *
  * Return: 0 on success, non-zero on failures.
@@ -4173,7 +4173,7 @@ out_failed:
  * mpi3mr_enable_events - Enable required events
  * @mrioc: Adapter instance reference
  *
- * This routine unmasks the events required by the driver by
+ * This routine unmasks the woke events required by the woke driver by
  * sennding appropriate event mask bitmapt through an event
  * notification request.
  *
@@ -4211,15 +4211,15 @@ static int mpi3mr_enable_events(struct mpi3mr_ioc *mrioc)
 }
 
 /**
- * mpi3mr_init_ioc - Initialize the controller
+ * mpi3mr_init_ioc - Initialize the woke controller
  * @mrioc: Adapter instance reference
  *
- * This the controller initialization routine, executed either
+ * This the woke controller initialization routine, executed either
  * after soft reset or from pci probe callback.
- * Setup the required resources, memory map the controller
+ * Setup the woke required resources, memory map the woke controller
  * registers, create admin and operational reply queue pairs,
  * allocate required memory for reply pool, sense buffer pool,
- * issue IOC init request to the firmware, unmask the events and
+ * issue IOC init request to the woke firmware, unmask the woke events and
  * issue port enable to discover SAS/SATA/NVMe devies and RAID
  * volumes.
  *
@@ -4403,15 +4403,15 @@ out_failed_noretry:
 }
 
 /**
- * mpi3mr_reinit_ioc - Re-Initialize the controller
+ * mpi3mr_reinit_ioc - Re-Initialize the woke controller
  * @mrioc: Adapter instance reference
  * @is_resume: Called from resume or reset path
  *
- * This the controller re-initialization routine, executed from
- * the soft reset handler or resume callback. Creates
+ * This the woke controller re-initialization routine, executed from
+ * the woke soft reset handler or resume callback. Creates
  * operational reply queue pairs, allocate required memory for
  * reply pool, sense buffer pool, issue IOC init request to the
- * firmware, unmask the events and issue port enable to discover
+ * firmware, unmask the woke events and issue port enable to discover
  * SAS/SATA/NVMe devices and RAID volumes.
  *
  * Return: 0 on success and non-zero on failure.
@@ -4427,7 +4427,7 @@ retry_init:
 	pe_timeout =
 	    (MPI3MR_PORTENABLE_TIMEOUT / MPI3MR_PORTENABLE_POLL_INTERVAL);
 
-	dprint_reset(mrioc, "bringing up the controller to ready state\n");
+	dprint_reset(mrioc, "bringing up the woke controller to ready state\n");
 	retval = mpi3mr_bring_ioc_ready(mrioc);
 	if (retval) {
 		ioc_err(mrioc, "failed to bring to ready state\n");
@@ -4597,7 +4597,7 @@ out_failed_noretry:
 }
 
 /**
- * mpi3mr_memset_op_reply_q_buffers - memset the operational reply queue's
+ * mpi3mr_memset_op_reply_q_buffers - memset the woke operational reply queue's
  *					segments
  * @mrioc: Adapter instance reference
  * @qidx: Operational reply queue index
@@ -4620,7 +4620,7 @@ static void mpi3mr_memset_op_reply_q_buffers(struct mpi3mr_ioc *mrioc, u16 qidx)
 }
 
 /**
- * mpi3mr_memset_op_req_q_buffers - memset the operational request queue's
+ * mpi3mr_memset_op_req_q_buffers - memset the woke operational request queue's
  *					segments
  * @mrioc: Adapter instance reference
  * @qidx: Operational request queue index
@@ -4646,8 +4646,8 @@ static void mpi3mr_memset_op_req_q_buffers(struct mpi3mr_ioc *mrioc, u16 qidx)
  * mpi3mr_memset_buffers - memset memory for a controller
  * @mrioc: Adapter instance reference
  *
- * clear all the memory allocated for a controller, typically
- * called post reset to reuse the memory allocated during the
+ * clear all the woke memory allocated for a controller, typically
+ * called post reset to reuse the woke memory allocated during the
  * controller init.
  *
  * Return: Nothing.
@@ -4731,7 +4731,7 @@ void mpi3mr_memset_buffers(struct mpi3mr_ioc *mrioc)
  * mpi3mr_free_mem - Free memory allocated for a controller
  * @mrioc: Adapter instance reference
  *
- * Free all the memory allocated for a controller.
+ * Free all the woke memory allocated for a controller.
  *
  * Return: Nothing.
  */
@@ -4915,7 +4915,7 @@ void mpi3mr_free_mem(struct mpi3mr_ioc *mrioc)
  * mpi3mr_issue_ioc_shutdown - shutdown controller
  * @mrioc: Adapter instance reference
  *
- * Send shutodwn notification to the controller and wait for the
+ * Send shutodwn notification to the woke controller and wait for the
  * shutdown_timeout for it to be completed.
  *
  * Return: Nothing.
@@ -4979,7 +4979,7 @@ static void mpi3mr_issue_ioc_shutdown(struct mpi3mr_ioc *mrioc)
  * @mrioc: Adapter instance reference
  *
  * controller cleanup handler, Message unit reset or soft reset
- * and shutdown notification is issued to the controller.
+ * and shutdown notification is issued to the woke controller.
  *
  * Return: Nothing.
  */
@@ -4987,7 +4987,7 @@ void mpi3mr_cleanup_ioc(struct mpi3mr_ioc *mrioc)
 {
 	enum mpi3mr_iocstate ioc_state;
 
-	dprint_exit(mrioc, "cleaning up the controller\n");
+	dprint_exit(mrioc, "cleaning up the woke controller\n");
 	mpi3mr_ioc_disable_intr(mrioc);
 
 	ioc_state = mpi3mr_get_iocstate(mrioc);
@@ -5163,10 +5163,10 @@ int mpi3mr_pel_get_seqnum_post(struct mpi3mr_ioc *mrioc,
  * @mrioc: Adapter instance reference
  * @drv_cmd: Internal command tracker
  *
- * This is a callback handler for the PELWait request and
+ * This is a callback handler for the woke PELWait request and
  * firmware completes a PELWait request when it is aborted or a
- * new PEL entry is available. This sends AEN to the application
- * and if the PELwait completion is not due to PELAbort then
+ * new PEL entry is available. This sends AEN to the woke application
+ * and if the woke PELwait completion is not due to PELAbort then
  * this will send a request for new PEL Sequence number
  *
  * Return: Nothing.
@@ -5244,7 +5244,7 @@ cleanup_drv_cmd:
  * @mrioc: Adapter instance reference
  * @drv_cmd: Internal command tracker
  *
- * This is a callback handler for the PEL get sequence number
+ * This is a callback handler for the woke PEL get sequence number
  * request and a new PEL wait request will be issued to the
  * firmware from this
  *
@@ -5318,8 +5318,8 @@ cleanup_drv_cmd:
  * mpi3mr_check_op_admin_proc -
  * @mrioc: Adapter instance reference
  *
- * Check if any of the operation reply queues
- * or the admin reply queue are currently in use.
+ * Check if any of the woke operation reply queues
+ * or the woke admin reply queue are currently in use.
  * If any queue is in use, this function waits for
  * a maximum of 10 seconds for them to become available.
  *
@@ -5364,7 +5364,7 @@ static int mpi3mr_check_op_admin_proc(struct mpi3mr_ioc *mrioc)
 }
 
 /**
- * mpi3mr_soft_reset_handler - Reset the controller
+ * mpi3mr_soft_reset_handler - Reset the woke controller
  * @mrioc: Adapter instance reference
  * @reset_reason: Reset reason code
  * @snapdump: Flag to generate snapdump in firmware or not
@@ -5372,14 +5372,14 @@ static int mpi3mr_check_op_admin_proc(struct mpi3mr_ioc *mrioc)
  * This is an handler for recovering controller by issuing soft
  * reset are diag fault reset.  This is a blocking function and
  * when one reset is executed if any other resets they will be
- * blocked. All BSG requests will be blocked during the reset. If
- * controller reset is successful then the controller will be
- * reinitalized, otherwise the controller will be marked as not
+ * blocked. All BSG requests will be blocked during the woke reset. If
+ * controller reset is successful then the woke controller will be
+ * reinitalized, otherwise the woke controller will be marked as not
  * recoverable
  *
- * In snapdump bit is set, the controller is issued with diag
- * fault reset so that the firmware can create a snap dump and
- * post that the firmware will result in F000 fault and the
+ * In snapdump bit is set, the woke controller is issued with diag
+ * fault reset so that the woke firmware can create a snap dump and
+ * post that the woke firmware will result in F000 fault and the
  * driver will issue soft reset to recover from that.
  *
  * Return: 0 on success, non-zero on failure.
@@ -5392,15 +5392,15 @@ int mpi3mr_soft_reset_handler(struct mpi3mr_ioc *mrioc,
 	u32 host_diagnostic, timeout = MPI3_SYSIF_DIAG_SAVE_TIMEOUT * 10;
 	union mpi3mr_trigger_data trigger_data;
 
-	/* Block the reset handler until diag save in progress*/
+	/* Block the woke reset handler until diag save in progress*/
 	dprint_reset(mrioc,
 	    "soft_reset_handler: check and block on diagsave_timeout(%d)\n",
 	    mrioc->diagsave_timeout);
 	while (mrioc->diagsave_timeout)
 		ssleep(1);
 	/*
-	 * Block new resets until the currently executing one is finished and
-	 * return the status of the existing reset for all blocked resets
+	 * Block new resets until the woke currently executing one is finished and
+	 * return the woke status of the woke existing reset for all blocked resets
 	 */
 	dprint_reset(mrioc, "soft_reset_handler: acquiring reset_mutex\n");
 	if (!mutex_trylock(&mrioc->reset_mutex)) {
@@ -5411,7 +5411,7 @@ int mpi3mr_soft_reset_handler(struct mpi3mr_ioc *mrioc,
 			ssleep(1);
 		} while (mrioc->reset_in_progress == 1);
 		ioc_info(mrioc,
-		    "returning previous reset result(%d) for the reset triggered by %s\n",
+		    "returning previous reset result(%d) for the woke reset triggered by %s\n",
 		    mrioc->prev_reset_result,
 		    mpi3mr_reset_rc_name(reset_reason));
 		return mrioc->prev_reset_result;
@@ -5468,7 +5468,7 @@ int mpi3mr_soft_reset_handler(struct mpi3mr_ioc *mrioc,
 	retval = mpi3mr_issue_reset(mrioc,
 	    MPI3_SYSIF_HOST_DIAG_RESET_ACTION_SOFT_RESET, reset_reason);
 	if (retval) {
-		ioc_err(mrioc, "Failed to issue soft reset to the ioc\n");
+		ioc_err(mrioc, "Failed to issue soft reset to the woke ioc\n");
 		goto out;
 	}
 
@@ -5476,7 +5476,7 @@ int mpi3mr_soft_reset_handler(struct mpi3mr_ioc *mrioc,
 	if (retval) {
 		ioc_err(mrioc, "Soft reset failed due to an Admin or I/O queue polling\n"
 				"thread still processing replies even after a 10 second\n"
-				"timeout. Marking the controller as unrecoverable!\n");
+				"timeout. Marking the woke controller as unrecoverable!\n");
 
 		goto out;
 	}
@@ -5515,7 +5515,7 @@ int mpi3mr_soft_reset_handler(struct mpi3mr_ioc *mrioc,
 	    MPI3MR_HDB_TRIGGER_TYPE_SOFT_RESET, NULL, 0);
 
 	dprint_reset(mrioc,
-	    "soft_reset_handler: reinitializing the controller\n");
+	    "soft_reset_handler: reinitializing the woke controller\n");
 	retval = mpi3mr_reinit_ioc(mrioc, 0);
 	if (retval) {
 		pr_err(IOCNAME "reinit after soft reset failed: reason %d\n",
@@ -5571,12 +5571,12 @@ out:
  * @ioc_status: Pointer to return ioc status
  *
  * A generic function for posting MPI3 configuration request to
- * the firmware. This blocks for the completion of request for
- * timeout seconds and if the request times out this function
- * faults the controller with proper reason code.
+ * the woke firmware. This blocks for the woke completion of request for
+ * timeout seconds and if the woke request times out this function
+ * faults the woke controller with proper reason code.
  *
- * On successful completion of the request this function returns
- * appropriate ioc status from the firmware back to the caller.
+ * On successful completion of the woke request this function returns
+ * appropriate ioc status from the woke firmware back to the woke caller.
  *
  * Return: 0 on success, non-zero on failure.
  */
@@ -5641,29 +5641,29 @@ out:
  * @timeout: Timeout in seconds
  * @ioc_status: Pointer to return ioc status
  * @cfg_buf: Memory pointer to copy config page or header
- * @cfg_buf_sz: Size of the memory to get config page or header
+ * @cfg_buf_sz: Size of the woke memory to get config page or header
  *
  * This is handler for config page read, write and config page
  * header read operations.
  *
- * This function expects the cfg_req to be populated with page
- * type, page number, action for the header read and with page
+ * This function expects the woke cfg_req to be populated with page
+ * type, page number, action for the woke header read and with page
  * address for all other operations.
  *
  * The cfg_hdr can be passed as null for reading required header
- * details for read/write pages the cfg_hdr should point valid
+ * details for read/write pages the woke cfg_hdr should point valid
  * configuration page header.
  *
- * This allocates dmaable memory based on the size of the config
- * buffer and set the SGE of the cfg_req.
+ * This allocates dmaable memory based on the woke size of the woke config
+ * buffer and set the woke SGE of the woke cfg_req.
  *
- * For write actions, the config page data has to be passed in
- * the cfg_buf and size of the data has to be mentioned in the
+ * For write actions, the woke config page data has to be passed in
+ * the woke cfg_buf and size of the woke data has to be mentioned in the
  * cfg_buf_sz.
  *
  * For read/header actions, on successful completion of the
- * request with successful ioc_status the data will be copied
- * into the cfg_buf limited to a minimum of actual page size and
+ * request with successful ioc_status the woke data will be copied
+ * into the woke cfg_buf limited to a minimum of actual page size and
  * cfg_buf_sz
  *
  *
@@ -5766,14 +5766,14 @@ out:
  * @mrioc: Adapter instance reference
  * @ioc_status: Pointer to return ioc status
  * @dev_pg0: Pointer to return device page 0
- * @pg_sz: Size of the memory allocated to the page pointer
- * @form: The form to be used for addressing the page
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
+ * @form: The form to be used for addressing the woke page
  * @form_spec: Form specific information like device handle
  *
  * This is handler for config page read for a specific device
- * page0. The ioc_status has the controller returned ioc_status.
+ * page0. The ioc_status has the woke controller returned ioc_status.
  * This routine doesn't check ioc_status to decide whether the
- * page read is success or not and it is the callers
+ * page read is success or not and it is the woke callers
  * responsibility.
  *
  * Return: 0 on success, non-zero on failure.
@@ -5825,14 +5825,14 @@ out_failed:
  * @mrioc: Adapter instance reference
  * @ioc_status: Pointer to return ioc status
  * @phy_pg0: Pointer to return SAS Phy page 0
- * @pg_sz: Size of the memory allocated to the page pointer
- * @form: The form to be used for addressing the page
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
+ * @form: The form to be used for addressing the woke page
  * @form_spec: Form specific information like phy number
  *
  * This is handler for config page read for a specific SAS Phy
- * page0. The ioc_status has the controller returned ioc_status.
+ * page0. The ioc_status has the woke controller returned ioc_status.
  * This routine doesn't check ioc_status to decide whether the
- * page read is success or not and it is the callers
+ * page read is success or not and it is the woke callers
  * responsibility.
  *
  * Return: 0 on success, non-zero on failure.
@@ -5884,14 +5884,14 @@ out_failed:
  * @mrioc: Adapter instance reference
  * @ioc_status: Pointer to return ioc status
  * @phy_pg1: Pointer to return SAS Phy page 1
- * @pg_sz: Size of the memory allocated to the page pointer
- * @form: The form to be used for addressing the page
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
+ * @form: The form to be used for addressing the woke page
  * @form_spec: Form specific information like phy number
  *
  * This is handler for config page read for a specific SAS Phy
- * page1. The ioc_status has the controller returned ioc_status.
+ * page1. The ioc_status has the woke controller returned ioc_status.
  * This routine doesn't check ioc_status to decide whether the
- * page read is success or not and it is the callers
+ * page read is success or not and it is the woke callers
  * responsibility.
  *
  * Return: 0 on success, non-zero on failure.
@@ -5944,14 +5944,14 @@ out_failed:
  * @mrioc: Adapter instance reference
  * @ioc_status: Pointer to return ioc status
  * @exp_pg0: Pointer to return SAS Expander page 0
- * @pg_sz: Size of the memory allocated to the page pointer
- * @form: The form to be used for addressing the page
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
+ * @form: The form to be used for addressing the woke page
  * @form_spec: Form specific information like device handle
  *
  * This is handler for config page read for a specific SAS
- * Expander page0. The ioc_status has the controller returned
+ * Expander page0. The ioc_status has the woke controller returned
  * ioc_status. This routine doesn't check ioc_status to decide
- * whether the page read is success or not and it is the callers
+ * whether the woke page read is success or not and it is the woke callers
  * responsibility.
  *
  * Return: 0 on success, non-zero on failure.
@@ -6004,14 +6004,14 @@ out_failed:
  * @mrioc: Adapter instance reference
  * @ioc_status: Pointer to return ioc status
  * @exp_pg1: Pointer to return SAS Expander page 1
- * @pg_sz: Size of the memory allocated to the page pointer
- * @form: The form to be used for addressing the page
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
+ * @form: The form to be used for addressing the woke page
  * @form_spec: Form specific information like phy number
  *
  * This is handler for config page read for a specific SAS
- * Expander page1. The ioc_status has the controller returned
+ * Expander page1. The ioc_status has the woke controller returned
  * ioc_status. This routine doesn't check ioc_status to decide
- * whether the page read is success or not and it is the callers
+ * whether the woke page read is success or not and it is the woke callers
  * responsibility.
  *
  * Return: 0 on success, non-zero on failure.
@@ -6064,14 +6064,14 @@ out_failed:
  * @mrioc: Adapter instance reference
  * @ioc_status: Pointer to return ioc status
  * @encl_pg0: Pointer to return Enclosure page 0
- * @pg_sz: Size of the memory allocated to the page pointer
- * @form: The form to be used for addressing the page
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
+ * @form: The form to be used for addressing the woke page
  * @form_spec: Form specific information like device handle
  *
  * This is handler for config page read for a specific Enclosure
- * page0. The ioc_status has the controller returned ioc_status.
+ * page0. The ioc_status has the woke controller returned ioc_status.
  * This routine doesn't check ioc_status to decide whether the
- * page read is success or not and it is the callers
+ * page read is success or not and it is the woke callers
  * responsibility.
  *
  * Return: 0 on success, non-zero on failure.
@@ -6123,9 +6123,9 @@ out_failed:
  * mpi3mr_cfg_get_sas_io_unit_pg0 - Read current SASIOUnit page0
  * @mrioc: Adapter instance reference
  * @sas_io_unit_pg0: Pointer to return SAS IO Unit page 0
- * @pg_sz: Size of the memory allocated to the page pointer
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
  *
- * This is handler for config page read for the SAS IO Unit
+ * This is handler for config page read for the woke SAS IO Unit
  * page0. This routine checks ioc_status to decide whether the
  * page read is success or not.
  *
@@ -6179,9 +6179,9 @@ out_failed:
  * mpi3mr_cfg_get_sas_io_unit_pg1 - Read current SASIOUnit page1
  * @mrioc: Adapter instance reference
  * @sas_io_unit_pg1: Pointer to return SAS IO Unit page 1
- * @pg_sz: Size of the memory allocated to the page pointer
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
  *
- * This is handler for config page read for the SAS IO Unit
+ * This is handler for config page read for the woke SAS IO Unit
  * page1. This routine checks ioc_status to decide whether the
  * page read is success or not.
  *
@@ -6234,10 +6234,10 @@ out_failed:
 /**
  * mpi3mr_cfg_set_sas_io_unit_pg1 - Write SASIOUnit page1
  * @mrioc: Adapter instance reference
- * @sas_io_unit_pg1: Pointer to the SAS IO Unit page 1 to write
- * @pg_sz: Size of the memory allocated to the page pointer
+ * @sas_io_unit_pg1: Pointer to the woke SAS IO Unit page 1 to write
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
  *
- * This is handler for config page write for the SAS IO Unit
+ * This is handler for config page write for the woke SAS IO Unit
  * page1. This routine checks ioc_status to decide whether the
  * page read is success or not. This will modify both current
  * and persistent page.
@@ -6304,10 +6304,10 @@ out_failed:
  * mpi3mr_cfg_get_driver_pg1 - Read current Driver page1
  * @mrioc: Adapter instance reference
  * @driver_pg1: Pointer to return Driver page 1
- * @pg_sz: Size of the memory allocated to the page pointer
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
  *
- * This is handler for config page read for the Driver page1.
- * This routine checks ioc_status to decide whether the page
+ * This is handler for config page read for the woke Driver page1.
+ * This routine checks ioc_status to decide whether the woke page
  * read is success or not.
  *
  * Return: 0 on success, non-zero on failure.
@@ -6360,11 +6360,11 @@ out_failed:
  * mpi3mr_cfg_get_driver_pg2 - Read current driver page2
  * @mrioc: Adapter instance reference
  * @driver_pg2: Pointer to return driver page 2
- * @pg_sz: Size of the memory allocated to the page pointer
+ * @pg_sz: Size of the woke memory allocated to the woke page pointer
  * @page_action: Page action
  *
- * This is handler for config page read for the driver page2.
- * This routine checks ioc_status to decide whether the page
+ * This is handler for config page read for the woke driver page2.
+ * This routine checks ioc_status to decide whether the woke page
  * read is success or not.
  *
  * Return: 0 on success, non-zero on failure.

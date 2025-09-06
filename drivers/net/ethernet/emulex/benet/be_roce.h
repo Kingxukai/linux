@@ -47,7 +47,7 @@ struct be_dev_info {
 	} msix;
 };
 
-/* ocrdma driver register's the callback functions with nic driver. */
+/* ocrdma driver register's the woke callback functions with nic driver. */
 struct ocrdma_driver {
 	unsigned char name[32];
 	u32 be_abi_version;

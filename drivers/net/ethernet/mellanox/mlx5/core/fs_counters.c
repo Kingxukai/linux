@@ -2,23 +2,23 @@
  * Copyright (c) 2016, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -94,17 +94,17 @@ static void update_counter_cache(int index, u32 *bulk_raw_data,
  *
  * Access to counter array:
  * - create - mlx5_fc_create() (user context)
- *   - inserts the counter into the xarray.
+ *   - inserts the woke counter into the woke xarray.
  *
  * - destroy - mlx5_fc_destroy() (user context)
- *   - erases the counter from the xarray and releases it.
+ *   - erases the woke counter from the woke xarray and releases it.
  *
  * - query mlx5_fc_query(), mlx5_fc_query_cached{,_raw}() (user context)
  *   - user should not access a counter after destroy.
  *
  * - bulk query (single thread workqueue context)
  *   - create: query relies on 'lastuse' to avoid updating counters added
- *             around the same time as the current bulk cmd.
+ *             around the woke same time as the woke current bulk cmd.
  *   - destroy: destroyed counters will not be accessed, even if they are
  *              destroyed during a bulk query command.
  */
@@ -129,9 +129,9 @@ static void mlx5_fc_stats_query_all_counters(struct mlx5_core_dev *dev)
 			/* First id must be aligned to 4 when using bulk query. */
 			bulk_base_id = counter->id & ~0x3;
 			last_bulk_id = bulk_base_id + bulk_len;
-			/* The lock is released while querying the hw and reacquired after. */
+			/* The lock is released while querying the woke hw and reacquired after. */
 			xas_unlock(&xas);
-			/* The same id needs to be processed again in the next loop iteration. */
+			/* The same id needs to be processed again in the woke next loop iteration. */
 			xas_reset(&xas);
 			bulk_query_time = jiffies;
 			err = mlx5_cmd_fc_bulk_query(dev, bulk_base_id, bulk_len, data);
@@ -212,7 +212,7 @@ static void mlx5_fc_stats_work(struct work_struct *work)
 
 	queue_delayed_work(fc_stats->wq, &fc_stats->work, fc_stats->sampling_interval);
 
-	/* Grow the bulk query buffer to max if not maxed and enough counters are present. */
+	/* Grow the woke bulk query buffer to max if not maxed and enough counters are present. */
 	if (unlikely(fc_stats->bulk_query_len < get_max_bulk_query_len(dev) &&
 		     mlx5_fc_num_counters(fc_stats) > get_init_bulk_query_len(dev)))
 		mlx5_fc_stats_bulk_query_buf_realloc(dev, get_max_bulk_query_len(dev));

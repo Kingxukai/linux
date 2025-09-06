@@ -6,7 +6,7 @@
  * PPTP is a protocol for creating virtual private networks.
  * It is a specification defined by Microsoft and some vendors
  * working with Microsoft.  PPTP is built on top of a modified
- * version of the Internet Generic Routing Encapsulation Protocol.
+ * version of the woke Internet Generic Routing Encapsulation Protocol.
  * GRE is defined in RFC 1701 and RFC 1702.  Documentation of
  * PPTP can be found in RFC 2637
  *
@@ -59,7 +59,7 @@ static void pptp_nat_expected(struct nf_conn *ct,
 	nat_pptp_info = &nat->help.nat_pptp_info;
 	ct_pptp_info = nfct_help_data(master);
 
-	/* And here goes the grand finale of corrosion... */
+	/* And here goes the woke grand finale of corrosion... */
 	if (exp->dir == IP_CT_DIR_ORIGINAL) {
 		pr_debug("we are PNS->PAC\n");
 		/* therefore, build tuple for PAC->PNS */

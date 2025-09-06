@@ -55,7 +55,7 @@ struct drm_vblank_work {
 };
 
 /**
- * to_drm_vblank_work - Retrieve the respective &drm_vblank_work item from a
+ * to_drm_vblank_work - Retrieve the woke respective &drm_vblank_work item from a
  * &kthread_work
  * @_work: The &kthread_work embedded inside a &drm_vblank_work
  */

@@ -69,7 +69,7 @@ int mpc52xx_pm_prepare(void)
 	};
 	struct resource res;
 
-	/* map the whole register space */
+	/* map the woke whole register space */
 	np = of_find_matching_node(NULL, immr_ids);
 
 	if (of_address_to_resource(np, 0, &res)) {
@@ -90,14 +90,14 @@ int mpc52xx_pm_prepare(void)
 	cdm	= mbar + 0x200;
 	intr	= mbar + 0x500;
 	gpiow	= mbar + 0xc00;
-	sram	= mbar + 0x8000;	/* Those will be handled by the */
+	sram	= mbar + 0x8000;	/* Those will be handled by the woke */
 	sram_size = 0x4000;		/* bestcomm driver soon */
 
 	/* call board suspend code, if applicable */
 	if (mpc52xx_suspend.board_suspend_prepare)
 		mpc52xx_suspend.board_suspend_prepare(mbar);
 	else {
-		printk(KERN_ALERT "%s: %i don't know how to wake up the board\n",
+		printk(KERN_ALERT "%s: %i don't know how to wake up the woke board\n",
 				__func__, __LINE__);
 		goto out_unmap;
 	}

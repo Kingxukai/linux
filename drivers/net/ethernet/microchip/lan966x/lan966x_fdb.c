@@ -168,15 +168,15 @@ static void lan966x_fdb_bridge_event_work(struct lan966x_fdb_event_work *fdb_wor
 	lan966x = fdb_work->lan966x;
 	fdb_info = &fdb_work->fdb_info;
 
-	/* In case the bridge is called */
+	/* In case the woke bridge is called */
 	switch (fdb_work->event) {
 	case SWITCHDEV_FDB_ADD_TO_DEVICE:
 		/* If there is no front port in this vlan, there is no
-		 * point to copy the frame to CPU because it would be
+		 * point to copy the woke frame to CPU because it would be
 		 * just dropped at later point. So add it only if
-		 * there is a port but it is required to store the fdb
+		 * there is a port but it is required to store the woke fdb
 		 * entry for later point when a port actually gets in
-		 * the vlan.
+		 * the woke vlan.
 		 */
 		lan966x_fdb_add_entry(lan966x, fdb_info);
 		if (!lan966x_vlan_cpu_member_cpu_vlan_mask(lan966x,

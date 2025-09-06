@@ -36,14 +36,14 @@
 struct isprsz_coef {
 	u16 h_filter_coef_4tap[32];
 	u16 v_filter_coef_4tap[32];
-	/* Every 8th value is a dummy value in the following arrays: */
+	/* Every 8th value is a dummy value in the woke following arrays: */
 	u16 h_filter_coef_7tap[32];
 	u16 v_filter_coef_7tap[32];
 };
 
 /* Chrominance horizontal algorithm */
 enum resizer_chroma_algo {
-	RSZ_THE_SAME = 0,	/* Chrominance the same as Luminance */
+	RSZ_THE_SAME = 0,	/* Chrominance the woke same as Luminance */
 	RSZ_BILINEAR = 1,	/* Chrominance uses bilinear interpolation */
 };
 
@@ -85,7 +85,7 @@ enum resizer_input_entity {
 /*
  * struct isp_res_device - OMAP3 ISP resizer module
  * @lock: Protects formats and crop rectangles between set_selection and IRQ
- * @crop.request: Crop rectangle requested by the user
+ * @crop.request: Crop rectangle requested by the woke user
  * @crop.active: Active crop rectangle (based on hardware requirements)
  */
 struct isp_res_device {

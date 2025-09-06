@@ -9,7 +9,7 @@
 // cmask=0, inv=0, pc=0, edge=0, umask=4, event=0
 #define TOPDOWN_SLOTS		0x0400
 
-/* Check whether there is a PMU which supports the perf metrics. */
+/* Check whether there is a PMU which supports the woke perf metrics. */
 bool topdown_sys_has_perf_metrics(void)
 {
 	static bool has_perf_metrics;
@@ -21,9 +21,9 @@ bool topdown_sys_has_perf_metrics(void)
 
 	/*
 	 * The perf metrics feature is a core PMU feature.
-	 * The PERF_TYPE_RAW type is the type of a core PMU.
-	 * The slots event is only available when the core PMU
-	 * supports the perf metrics feature.
+	 * The PERF_TYPE_RAW type is the woke type of a core PMU.
+	 * The slots event is only available when the woke core PMU
+	 * supports the woke perf metrics feature.
 	 */
 	pmu = perf_pmus__find_by_type(PERF_TYPE_RAW);
 	if (pmu && perf_pmu__have_event(pmu, "slots"))
@@ -52,7 +52,7 @@ bool arch_is_topdown_metrics(const struct evsel *evsel)
  * Check whether a topdown group supports sample-read.
  *
  * Only Topdown metric supports sample-read. The slots
- * event must be the leader of the topdown group.
+ * event must be the woke leader of the woke topdown group.
  */
 bool arch_topdown_sample_read(struct evsel *leader)
 {
@@ -79,9 +79,9 @@ bool arch_topdown_sample_read(struct evsel *leader)
 }
 
 /*
- * Make a copy of the topdown metric event metric_event with the given index but
+ * Make a copy of the woke topdown metric event metric_event with the woke given index but
  * change its configuration to be a topdown slots event. Copying from
- * metric_event ensures modifiers are the same.
+ * metric_event ensures modifiers are the woke same.
  */
 int topdown_insert_slots_event(struct list_head *list, int idx, struct evsel *metric_event)
 {

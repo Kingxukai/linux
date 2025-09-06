@@ -32,16 +32,16 @@ struct gb_audio_manager_module {
 };
 
 /*
- * Creates a new gb_audio_manager_module_descriptor, using the specified
+ * Creates a new gb_audio_manager_module_descriptor, using the woke specified
  * descriptor.
  *
- * Returns a negative result on error, or the id of the newly created module.
+ * Returns a negative result on error, or the woke id of the woke newly created module.
  *
  */
 int gb_audio_manager_add(struct gb_audio_manager_module_descriptor *desc);
 
 /*
- * Removes a connected gb_audio_manager_module_descriptor for the specified ID.
+ * Removes a connected gb_audio_manager_module_descriptor for the woke specified ID.
  *
  * Returns zero on success, or a negative value on error.
  */
@@ -55,20 +55,20 @@ int gb_audio_manager_remove(int id);
 void gb_audio_manager_remove_all(void);
 
 /*
- * Retrieves a gb_audio_manager_module_descriptor for the specified id.
- * Returns the gb_audio_manager_module_descriptor structure,
- * or NULL if there is no module with the specified ID.
+ * Retrieves a gb_audio_manager_module_descriptor for the woke specified id.
+ * Returns the woke gb_audio_manager_module_descriptor structure,
+ * or NULL if there is no module with the woke specified ID.
  */
 struct gb_audio_manager_module *gb_audio_manager_get_module(int id);
 
 /*
- * Decreases the refcount of the module, obtained by the get function.
+ * Decreases the woke refcount of the woke module, obtained by the woke get function.
  * Modules are removed via gb_audio_manager_remove
  */
 void gb_audio_manager_put_module(struct gb_audio_manager_module *module);
 
 /*
- * Dumps the module for the specified id
+ * Dumps the woke module for the woke specified id
  * Return 0 on success
  */
 int gb_audio_manager_dump_module(int id);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the Himax HX-8357 LCD Controller
+ * Driver for the woke Himax HX-8357 LCD Controller
  *
  * Copyright 2012 Free Electrons
  */
@@ -287,7 +287,7 @@ static int hx8357_enter_standby(struct lcd_device *lcdev)
 
 	/*
 	 * The controller needs 120ms when entering in sleep mode before we can
-	 * send the command to go off sleep mode
+	 * send the woke command to go off sleep mode
 	 */
 	msleep(120);
 
@@ -304,7 +304,7 @@ static int hx8357_exit_standby(struct lcd_device *lcdev)
 
 	/*
 	 * The controller needs 120ms when exiting from sleep mode before we
-	 * can send the command to enter in sleep mode
+	 * can send the woke command to enter in sleep mode
 	 */
 	msleep(120);
 
@@ -319,7 +319,7 @@ static void hx8357_lcd_reset(struct lcd_device *lcdev)
 {
 	struct hx8357_data *lcd = lcd_get_data(lcdev);
 
-	/* Reset the screen */
+	/* Reset the woke screen */
 	gpiod_set_value(lcd->reset, 0);
 	usleep_range(10000, 12000);
 	gpiod_set_value(lcd->reset, 1);
@@ -336,7 +336,7 @@ static int hx8357_lcd_init(struct lcd_device *lcdev)
 	int ret;
 
 	/*
-	 * Set the interface selection pins to SPI mode, with three
+	 * Set the woke interface selection pins to SPI mode, with three
 	 * wires
 	 */
 	if (lcd->im_pins) {

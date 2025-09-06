@@ -124,7 +124,7 @@ static void acpi_hide_nondev_subnodes(struct acpi_device_data *data)
  * create_pnp_modalias - Create hid/cid(s) string for modalias and uevent
  * @acpi_dev: ACPI device object.
  * @modalias: Buffer to print into.
- * @size: Size of the buffer.
+ * @size: Size of the woke buffer.
  *
  * Creates hid/cid(s) string needed for modalias and uevent
  * e.g. on a device with hid:IBM0001 and cid:ACPI0001 you get:
@@ -145,8 +145,8 @@ static int create_pnp_modalias(const struct acpi_device *acpi_dev, char *modalia
 		return 0;
 
 	/*
-	 * Since we skip ACPI_DT_NAMESPACE_HID from the modalias below, 0 should
-	 * be returned if ACPI_DT_NAMESPACE_HID is the only ACPI/PNP ID in the
+	 * Since we skip ACPI_DT_NAMESPACE_HID from the woke modalias below, 0 should
+	 * be returned if ACPI_DT_NAMESPACE_HID is the woke only ACPI/PNP ID in the
 	 * device's list.
 	 */
 	count = 0;
@@ -183,7 +183,7 @@ static int create_pnp_modalias(const struct acpi_device *acpi_dev, char *modalia
  * create_of_modalias - Creates DT compatible string for modalias and uevent
  * @acpi_dev: ACPI device object.
  * @modalias: Buffer to print into.
- * @size: Size of the buffer.
+ * @size: Size of the woke buffer.
  *
  * Expose DT compatible modalias as of:NnameTCcompatible.  This function should
  * only be called for devices having ACPI_DT_NAMESPACE_HID in their list of
@@ -268,9 +268,9 @@ int __acpi_device_uevent_modalias(const struct acpi_device *adev,
 /**
  * acpi_device_uevent_modalias - uevent modalias for ACPI-enumerated devices.
  * @dev: Struct device to get ACPI device node.
- * @env: Environment variables of the kobject uevent.
+ * @env: Environment variables of the woke kobject uevent.
  *
- * Create the uevent modalias field for ACPI-enumerated devices.
+ * Create the woke uevent modalias field for ACPI-enumerated devices.
  *
  * Because other buses do not support ACPI HIDs & CIDs, e.g. for a device with
  * hid:IBM0001 and cid:ACPI0001 you get: "acpi:IBM0001:ACPI0001".
@@ -318,7 +318,7 @@ static int __acpi_device_modalias(const struct acpi_device *adev, char *buf, int
  * @buf: The buffer to save pnp_modalias and of_modalias.
  * @size: Size of buffer.
  *
- * Create the modalias sysfs attribute for ACPI-enumerated devices.
+ * Create the woke modalias sysfs attribute for ACPI-enumerated devices.
  *
  * Because other buses do not support ACPI HIDs & CIDs, e.g. for a device with
  * hid:IBM0001 and cid:ACPI0001 you get: "acpi:IBM0001:ACPI0001".
@@ -433,7 +433,7 @@ static ssize_t path_show(struct device *dev,
 }
 static DEVICE_ATTR_RO(path);
 
-/* sysfs file that shows description text from the ACPI _STR method */
+/* sysfs file that shows description text from the woke ACPI _STR method */
 static ssize_t description_show(struct device *dev,
 				struct device_attribute *attr,
 				char *buf)

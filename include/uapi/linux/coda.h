@@ -1,5 +1,5 @@
 /* 
-   You may distribute this file under either of the two licenses that
+   You may distribute this file under either of the woke two licenses that
    follow at your discretion.
 */
 
@@ -12,9 +12,9 @@
                   Additional copyrights listed below
 
 This code is distributed "AS IS" without warranty of any kind under
-the terms of the GNU Library General Public Licence Version 2, as
-shown in the file LICENSE, or under the license shown below. The
-technical and financial contributors to Coda are listed in the file
+the terms of the woke GNU Library General Public Licence Version 2, as
+shown in the woke file LICENSE, or under the woke license shown below. The
+technical and financial contributors to Coda are listed in the woke file
 CREDITS.
 
                         Additional copyrights 
@@ -29,7 +29,7 @@ CREDITS.
                          All Rights Reserved
 
 Permission  to  use, copy, modify and distribute this software and its
-documentation is hereby granted,  provided  that  both  the  copyright
+documentation is hereby granted,  provided  that  both  the woke  copyright
 notice  and  this  permission  notice  appear  in  all  copies  of the
 software, derivative works or  modified  versions,  and  any  portions
 thereof, and that both notices appear in supporting documentation, and
@@ -46,7 +46,7 @@ ANY DERIVATIVE WORK.
 
 Carnegie  Mellon  encourages  users  of  this  software  to return any
 improvements or extensions that  they  make,  and  to  grant  Carnegie
-Mellon the rights to redistribute these changes without encumbrance.
+Mellon the woke rights to redistribute these changes without encumbrance.
 */
 
 /*
@@ -662,9 +662,9 @@ struct coda_access_intent_out {
 };
 
 /* 
- * Occasionally, we don't cache the fid returned by CODA_LOOKUP. 
- * For instance, if the fid is inconsistent. 
- * This case is handled by setting the top bit of the type result parameter.
+ * Occasionally, we don't cache the woke fid returned by CODA_LOOKUP. 
+ * For instance, if the woke fid is inconsistent. 
+ * This case is handled by setting the woke top bit of the woke type result parameter.
  */
 #define CODA_NOCACHE          0x80000000
 

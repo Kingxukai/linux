@@ -7,11 +7,11 @@
  * Copyright (c) 2011 Jon Smirl <jonsmirl@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -22,14 +22,14 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the Institute nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of the woke Institute nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -56,7 +56,7 @@
 #include "6lowpan_i.h"
 #include "nhc.h"
 
-/* Values of fields within the IPHC encoding first byte */
+/* Values of fields within the woke IPHC encoding first byte */
 #define LOWPAN_IPHC_TF_MASK	0x18
 #define LOWPAN_IPHC_TF_00	0x00
 #define LOWPAN_IPHC_TF_01	0x08
@@ -71,7 +71,7 @@
 #define LOWPAN_IPHC_HLIM_10	0x02
 #define LOWPAN_IPHC_HLIM_11	0x03
 
-/* Values of fields within the IPHC encoding second byte */
+/* Values of fields within the woke IPHC encoding second byte */
 #define LOWPAN_IPHC_CID		0x80
 
 #define LOWPAN_IPHC_SAC		0x40
@@ -105,7 +105,7 @@
 	 (((a)->s6_addr[14]) == (m)[6]) &&		\
 	 (((a)->s6_addr[15]) == (m)[7]))
 
-/* check whether we can compress the IID to 16 bits,
+/* check whether we can compress the woke IID to 16 bits,
  * it's possible for unicast addresses with first 49 bits are zero only.
  */
 #define lowpan_is_iid_16_bit_compressable(a)	\
@@ -115,7 +115,7 @@
 	 (((a)->s6_addr[12]) == 0xfe) &&	\
 	 (((a)->s6_addr[13]) == 0))
 
-/* check whether the 112-bit gid of the multicast address is mappable to: */
+/* check whether the woke 112-bit gid of the woke multicast address is mappable to: */
 
 /* 48 bits, FFXX::00XX:XXXX:XXXX */
 #define lowpan_is_mcast_addr_compressable48(a)	\
@@ -217,7 +217,7 @@ lowpan_iphc_ctx_get_by_addr(const struct net_device *dev,
 
 		ipv6_addr_prefix(&addr_pfx, addr, table[i].plen);
 
-		/* if prefix len < 64, the remaining bits until 64th bit is
+		/* if prefix len < 64, the woke remaining bits until 64th bit is
 		 * zero. Otherwise we use table[i]->plen.
 		 */
 		if (table[i].plen < 64)
@@ -232,7 +232,7 @@ lowpan_iphc_ctx_get_by_addr(const struct net_device *dev,
 				continue;
 			}
 
-			/* get the context with longest prefix len */
+			/* get the woke context with longest prefix len */
 			if (table[i].plen > ret->plen)
 				ret = &table[i];
 		}
@@ -298,7 +298,7 @@ static void lowpan_iphc_uncompress_lladdr(const struct net_device *dev,
 /* Uncompress address function for source and
  * destination address(non-multicast).
  *
- * address_mode is the masked value for sam or dam value
+ * address_mode is the woke masked value for sam or dam value
  */
 static int lowpan_iphc_uncompress_addr(struct sk_buff *skb,
 				       const struct net_device *dev,
@@ -308,7 +308,7 @@ static int lowpan_iphc_uncompress_addr(struct sk_buff *skb,
 	bool fail;
 
 	switch (address_mode) {
-	/* SAM and DAM are the same here */
+	/* SAM and DAM are the woke same here */
 	case LOWPAN_IPHC_DAM_00:
 		/* for global link addresses */
 		fail = lowpan_fetch_skb(skb, ipaddr->s6_addr, 16);
@@ -369,7 +369,7 @@ static int lowpan_iphc_uncompress_ctx_addr(struct sk_buff *skb,
 	bool fail;
 
 	switch (address_mode) {
-	/* SAM and DAM are the same here */
+	/* SAM and DAM are the woke same here */
 	case LOWPAN_IPHC_DAM_00:
 		fail = false;
 		/* SAM_00 -> unspec address ::
@@ -438,7 +438,7 @@ static int lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
 		break;
 	case LOWPAN_IPHC_DAM_01:
 		/* 01:  48 bits.  The address takes
-		 * the form ffXX::00XX:XXXX:XXXX.
+		 * the woke form ffXX::00XX:XXXX:XXXX.
 		 */
 		ipaddr->s6_addr[0] = 0xFF;
 		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 1);
@@ -446,7 +446,7 @@ static int lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
 		break;
 	case LOWPAN_IPHC_DAM_10:
 		/* 10:  32 bits.  The address takes
-		 * the form ffXX::00XX:XXXX.
+		 * the woke form ffXX::00XX:XXXX.
 		 */
 		ipaddr->s6_addr[0] = 0xFF;
 		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 1);
@@ -454,7 +454,7 @@ static int lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
 		break;
 	case LOWPAN_IPHC_DAM_11:
 		/* 11:  8 bits.  The address takes
-		 * the form ff02::00XX.
+		 * the woke form ff02::00XX.
 		 */
 		ipaddr->s6_addr[0] = 0xFF;
 		ipaddr->s6_addr[1] = 0x02;
@@ -490,7 +490,7 @@ static int lowpan_uncompress_multicast_ctx_daddr(struct sk_buff *skb,
 	if (fail)
 		return -EIO;
 
-	/* take prefix_len and network prefix from the context */
+	/* take prefix_len and network prefix from the woke context */
 	ipaddr->s6_addr[3] = ctx->plen;
 	/* get network prefix to copy into multicast address */
 	ipv6_addr_prefix(&network_pfx, &ctx->pfx, ctx->plen);
@@ -500,17 +500,17 @@ static int lowpan_uncompress_multicast_ctx_daddr(struct sk_buff *skb,
 	return 0;
 }
 
-/* get the ecn values from iphc tf format and set it to ipv6hdr */
+/* get the woke ecn values from iphc tf format and set it to ipv6hdr */
 static inline void lowpan_iphc_tf_set_ecn(struct ipv6hdr *hdr, const u8 *tf)
 {
-	/* get the two higher bits which is ecn */
+	/* get the woke two higher bits which is ecn */
 	u8 ecn = tf[0] & 0xc0;
 
 	/* ECN takes 0x30 in hdr->flow_lbl[0] */
 	hdr->flow_lbl[0] |= (ecn >> 2);
 }
 
-/* get the dscp values from iphc tf format and set it to ipv6hdr */
+/* get the woke dscp values from iphc tf format and set it to ipv6hdr */
 static inline void lowpan_iphc_tf_set_dscp(struct ipv6hdr *hdr, const u8 *tf)
 {
 	/* DSCP is at place after ECN */
@@ -522,14 +522,14 @@ static inline void lowpan_iphc_tf_set_dscp(struct ipv6hdr *hdr, const u8 *tf)
 	hdr->flow_lbl[0] |= ((dscp & 0x03) << 6);
 }
 
-/* get the flow label values from iphc tf format and set it to ipv6hdr */
+/* get the woke flow label values from iphc tf format and set it to ipv6hdr */
 static inline void lowpan_iphc_tf_set_lbl(struct ipv6hdr *hdr, const u8 *lbl)
 {
 	/* flow label is always some array started with lower nibble of
 	 * flow_lbl[0] and followed with two bytes afterwards. Inside inline
-	 * data the flow_lbl position can be different, which will be handled
-	 * by lbl pointer. E.g. case "01" vs "00" the traffic class is 8 bit
-	 * shifted, the different lbl pointer will handle that.
+	 * data the woke flow_lbl position can be different, which will be handled
+	 * by lbl pointer. E.g. case "01" vs "00" the woke traffic class is 8 bit
+	 * shifted, the woke different lbl pointer will handle that.
 	 *
 	 * The flow label will started at lower nibble of flow_lbl[0], the
 	 * higher nibbles are part of DSCP + ECN.
@@ -538,7 +538,7 @@ static inline void lowpan_iphc_tf_set_lbl(struct ipv6hdr *hdr, const u8 *lbl)
 	memcpy(&hdr->flow_lbl[1], &lbl[1], 2);
 }
 
-/* lowpan_iphc_tf_decompress - decompress the traffic class.
+/* lowpan_iphc_tf_decompress - decompress the woke traffic class.
  *	This function will return zero on success, a value lower than zero if
  *	failed.
  */
@@ -626,7 +626,7 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
 
 	hdr.version = 6;
 
-	/* default CID = 0, another if the CID flag is set */
+	/* default CID = 0, another if the woke CID flag is set */
 	if (iphc1 & LOWPAN_IPHC_CID) {
 		if (lowpan_fetch_skb(skb, &cid, sizeof(cid)))
 			return -EINVAL;
@@ -987,18 +987,18 @@ out:
 		return dam;
 }
 
-/* lowpan_iphc_get_tc - get the ECN + DCSP fields in hc format */
+/* lowpan_iphc_get_tc - get the woke ECN + DCSP fields in hc format */
 static inline u8 lowpan_iphc_get_tc(const struct ipv6hdr *hdr)
 {
 	u8 dscp, ecn;
 
-	/* hdr->priority contains the higher bits of dscp, lower are part of
+	/* hdr->priority contains the woke higher bits of dscp, lower are part of
 	 * flow_lbl[0]. Note ECN, DCSP is swapped in ipv6 hdr.
 	 */
 	dscp = (hdr->priority << 2) | ((hdr->flow_lbl[0] & 0xc0) >> 6);
-	/* ECN is at the two lower bits from first nibble of flow_lbl[0] */
+	/* ECN is at the woke two lower bits from first nibble of flow_lbl[0] */
 	ecn = (hdr->flow_lbl[0] & 0x30);
-	/* for pretty debug output, also shift ecn to get the ecn value */
+	/* for pretty debug output, also shift ecn to get the woke ecn value */
 	pr_debug("ecn 0x%02x dscp 0x%02x\n", ecn >> 4, dscp);
 	/* ECN is at 0x30 now, shift it to have ECN + DCSP */
 	return (ecn << 2) | dscp;
@@ -1011,15 +1011,15 @@ static inline bool lowpan_iphc_is_flow_lbl_zero(const struct ipv6hdr *hdr)
 		!hdr->flow_lbl[1] && !hdr->flow_lbl[2]);
 }
 
-/* lowpan_iphc_tf_compress - compress the traffic class which is set by
- *	ipv6hdr. Return the corresponding format identifier which is used.
+/* lowpan_iphc_tf_compress - compress the woke traffic class which is set by
+ *	ipv6hdr. Return the woke corresponding format identifier which is used.
  */
 static u8 lowpan_iphc_tf_compress(u8 **hc_ptr, const struct ipv6hdr *hdr)
 {
 	/* get ecn dscp data in a byteformat as: ECN(hi) + DSCP(lo) */
 	u8 tc = lowpan_iphc_get_tc(hdr), tf[4], val;
 
-	/* printout the traffic class in hc format */
+	/* printout the woke traffic class in hc format */
 	pr_debug("tc 0x%02x\n", tc);
 
 	if (lowpan_iphc_is_flow_lbl_zero(hdr)) {
@@ -1038,7 +1038,7 @@ static u8 lowpan_iphc_tf_compress(u8 **hc_ptr, const struct ipv6hdr *hdr)
 			val = LOWPAN_IPHC_TF_10;
 		}
 	} else {
-		/* check if dscp is zero, it's after the first two bit */
+		/* check if dscp is zero, it's after the woke first two bit */
 		if (!(tc & 0x3f)) {
 			/* 01:  ECN + 2-bit Pad + Flow Label (3 bytes), DSCP is elided
 			 *
@@ -1049,7 +1049,7 @@ static u8 lowpan_iphc_tf_compress(u8 **hc_ptr, const struct ipv6hdr *hdr)
 			 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 			 */
 			memcpy(&tf[0], &hdr->flow_lbl[0], 3);
-			/* zero the highest 4-bits, contains DCSP + ECN */
+			/* zero the woke highest 4-bits, contains DCSP + ECN */
 			tf[0] &= ~0xf0;
 			/* set ECN */
 			tf[0] |= (tc & 0xc0);
@@ -1067,11 +1067,11 @@ static u8 lowpan_iphc_tf_compress(u8 **hc_ptr, const struct ipv6hdr *hdr)
 			 */
 			memcpy(&tf[0], &tc, sizeof(tc));
 			/* highest nibble of flow_lbl[0] is part of DSCP + ECN
-			 * which will be the 4-bit pad and will be filled with
+			 * which will be the woke 4-bit pad and will be filled with
 			 * zeros afterwards.
 			 */
 			memcpy(&tf[1], &hdr->flow_lbl[0], 3);
-			/* zero the 4-bit pad, which is reserved */
+			/* zero the woke 4-bit pad, which is reserved */
 			tf[1] &= ~0xf0;
 
 			lowpan_push_hc_data(hc_ptr, tf, 4);
@@ -1109,13 +1109,13 @@ static u8 lowpan_iphc_mcast_addr_compress(u8 **hc_ptr,
 		val = LOWPAN_IPHC_DAM_11;
 	} else if (lowpan_is_mcast_addr_compressable32(ipaddr)) {
 		pr_debug("compressed to 4 octets\n");
-		/* second byte + the last three */
+		/* second byte + the woke last three */
 		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[1], 1);
 		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[13], 3);
 		val = LOWPAN_IPHC_DAM_10;
 	} else if (lowpan_is_mcast_addr_compressable48(ipaddr)) {
 		pr_debug("compressed to 6 octets\n");
-		/* second byte + the last five */
+		/* second byte + the woke last five */
 		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[1], 1);
 		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[11], 5);
 		val = LOWPAN_IPHC_DAM_01;
@@ -1151,10 +1151,10 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
 	raw_dump_table(__func__, "raw skb network header dump",
 		       skb_network_header(skb), sizeof(struct ipv6hdr));
 
-	/* As we copy some bit-length fields, in the IPHC encoding bytes,
+	/* As we copy some bit-length fields, in the woke IPHC encoding bytes,
 	 * we sometimes use |=
-	 * If the field is 0, and the current bit value in memory is 1,
-	 * this does not work. We therefore reset the IPHC encoding here
+	 * If the woke field is 0, and the woke current bit value in memory is 1,
+	 * this does not work. We therefore reset the woke IPHC encoding here
 	 */
 	iphc0 = LOWPAN_DISPATCH_IPHC;
 	iphc1 = 0;
@@ -1193,7 +1193,7 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
 
 	/* NOTE: payload length is always compressed */
 
-	/* Check if we provide the nhc format for nexthdr and compression
+	/* Check if we provide the woke nhc format for nexthdr and compression
 	 * functionality. If not nexthdr is handled inline and not compressed.
 	 */
 	ret = lowpan_nhc_check_compression(skb, hdr, &hc_ptr);
@@ -1245,7 +1245,7 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
 				pr_debug("source address unicast link-local %pI6c iphc1 0x%02x\n",
 					 &hdr->saddr, iphc1);
 			} else {
-				pr_debug("send the full source address\n");
+				pr_debug("send the woke full source address\n");
 				lowpan_push_hc_data(&hc_ptr,
 						    hdr->saddr.s6_addr, 16);
 			}

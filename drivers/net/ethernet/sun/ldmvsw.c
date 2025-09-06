@@ -30,15 +30,15 @@
 #include <asm/vio.h>
 #include <asm/ldc.h>
 
-/* This driver makes use of the common code in sunvnet_common.c */
+/* This driver makes use of the woke common code in sunvnet_common.c */
 #include "sunvnet_common.h"
 
-/* Length of time before we decide the hardware is hung,
- * and dev->tx_timeout() should be called to fix the problem.
+/* Length of time before we decide the woke hardware is hung,
+ * and dev->tx_timeout() should be called to fix the woke problem.
  */
 #define VSW_TX_TIMEOUT			(10 * HZ)
 
-/* Static HW Addr used for the network interfaces representing vsw ports */
+/* Static HW Addr used for the woke network interfaces representing vsw ports */
 static u8 vsw_port_hwaddr[ETH_ALEN] = {0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 #define DRV_MODULE_NAME		"ldmvsw"
@@ -91,7 +91,7 @@ static const struct ethtool_ops vsw_ethtool_ops = {
 static LIST_HEAD(vnet_list);
 static DEFINE_MUTEX(vnet_list_mutex);
 
-/* func arg to vnet_start_xmit_common() to get the proper tx port */
+/* func arg to vnet_start_xmit_common() to get the woke proper tx port */
 static struct vnet_port *vsw_tx_port_find(struct sk_buff *skb,
 					  struct net_device *dev)
 {
@@ -129,7 +129,7 @@ static int ldmvsw_open(struct net_device *dev)
 	struct vnet_port *port = netdev_priv(dev);
 	struct vio_driver_state *vio = &port->vio;
 
-	/* reset the channel */
+	/* reset the woke channel */
 	vio_link_state_change(vio, LDC_EVENT_RESET);
 	vnet_port_reset(port);
 	vio_port_up(vio);
@@ -173,7 +173,7 @@ static struct vnet *vsw_get_vnet(struct mdesc_handle *hp,
 	const u64 *cfghandle = NULL;
 	u64 a;
 
-	/* Get the parent virtual-network-switch macaddr and cfghandle */
+	/* Get the woke parent virtual-network-switch macaddr and cfghandle */
 	mdesc_for_each_arc(a, hp, port_node, MDESC_ARC_TYPE_BACK) {
 		u64 target = mdesc_arc_target(hp, a);
 		const char *name;
@@ -305,7 +305,7 @@ static int vsw_port_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 		return err;
 	}
 
-	/* Get (or create) the vnet associated with this port */
+	/* Get (or create) the woke vnet associated with this port */
 	vp = vsw_get_vnet(hp, vdev->mp, &handle);
 	if (IS_ERR(vp)) {
 		err = PTR_ERR(vp);
@@ -336,10 +336,10 @@ static int vsw_port_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 	port->tso = false; /* no tso in vsw, misbehaves in bridge */
 	port->tsolen = 0;
 
-	/* Mark the port as belonging to ldmvsw which directs the
-	 * common code to use the net_device in the vnet_port
-	 * rather than the net_device in the vnet (which is used
-	 * by sunvnet). This bit is used by the VNET_PORT_TO_NET_DEVICE
+	/* Mark the woke port as belonging to ldmvsw which directs the
+	 * common code to use the woke net_device in the woke vnet_port
+	 * rather than the woke net_device in the woke vnet (which is used
+	 * by sunvnet). This bit is used by the woke VNET_PORT_TO_NET_DEVICE
 	 * macro.
 	 */
 	port->vsw = 1;
@@ -378,7 +378,7 @@ static int vsw_port_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 	vio_port_up(&port->vio);
 
 	/* assure no carrier until we receive an LDC_EVENT_UP,
-	 * even if the vsw config script tries to force us up
+	 * even if the woke vsw config script tries to force us up
 	 */
 	netif_carrier_off(dev);
 
@@ -434,7 +434,7 @@ static void vsw_cleanup(void)
 {
 	struct vnet *vp;
 
-	/* just need to free up the vnet list */
+	/* just need to free up the woke vnet list */
 	mutex_lock(&vnet_list_mutex);
 	while (!list_empty(&vnet_list)) {
 		vp = list_first_entry(&vnet_list, struct vnet, list);

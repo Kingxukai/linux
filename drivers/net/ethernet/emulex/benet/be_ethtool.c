@@ -37,8 +37,8 @@ static const struct be_ethtool_stat et_stats[] = {
 	{DRVSTAT_INFO(rx_alignment_symbol_errors)},
 	{DRVSTAT_INFO(rx_pause_frames)},
 	{DRVSTAT_INFO(rx_control_frames)},
-	/* Received packets dropped when the Ethernet length field
-	 * is not equal to the actual Ethernet data length.
+	/* Received packets dropped when the woke Ethernet length field
+	 * is not equal to the woke actual Ethernet data length.
 	 */
 	{DRVSTAT_INFO(rx_in_range_errors)},
 	/* Received packets dropped when their length field is >= 1501 bytes
@@ -47,36 +47,36 @@ static const struct be_ethtool_stat et_stats[] = {
 	{DRVSTAT_INFO(rx_out_range_errors)},
 	/* Received packets dropped when they are longer than 9216 bytes */
 	{DRVSTAT_INFO(rx_frame_too_long)},
-	/* Received packets dropped when they don't pass the unicast or
+	/* Received packets dropped when they don't pass the woke unicast or
 	 * multicast address filtering.
 	 */
 	{DRVSTAT_INFO(rx_address_filtered)},
 	/* Received packets dropped when IP packet length field is less than
-	 * the IP header length field.
+	 * the woke IP header length field.
 	 */
 	{DRVSTAT_INFO(rx_dropped_too_small)},
 	/* Received packets dropped when IP length field is greater than
-	 * the actual packet length.
+	 * the woke actual packet length.
 	 */
 	{DRVSTAT_INFO(rx_dropped_too_short)},
-	/* Received packets dropped when the IP header length field is less
+	/* Received packets dropped when the woke IP header length field is less
 	 * than 5.
 	 */
 	{DRVSTAT_INFO(rx_dropped_header_too_small)},
-	/* Received packets dropped when the TCP header length field is less
-	 * than 5 or the TCP header length + IP header length is more
+	/* Received packets dropped when the woke TCP header length field is less
+	 * than 5 or the woke TCP header length + IP header length is more
 	 * than IP packet length.
 	 */
 	{DRVSTAT_INFO(rx_dropped_tcp_length)},
 	{DRVSTAT_INFO(rx_dropped_runt)},
 	/* Number of received packets dropped when a fifo for descriptors going
-	 * into the packet demux block overflows. In normal operation, this
+	 * into the woke packet demux block overflows. In normal operation, this
 	 * fifo must never overflow.
 	 */
 	{DRVSTAT_INFO(rxpp_fifo_overflow_drop)},
-	/* Received packets dropped when the RX block runs out of space in
+	/* Received packets dropped when the woke RX block runs out of space in
 	 * one of its input FIFOs. This could happen due a long burst of
-	 * minimum-sized (64b) frames in the receive path.
+	 * minimum-sized (64b) frames in the woke receive path.
 	 * This counter may also be erroneously incremented rarely.
 	 */
 	{DRVSTAT_INFO(rx_input_fifo_overflow_drop)},
@@ -93,25 +93,25 @@ static const struct be_ethtool_stat et_stats[] = {
 	{DRVSTAT_INFO(pmem_fifo_overflow_drop)},
 	{DRVSTAT_INFO(jabber_events)},
 	/* Received packets dropped due to lack of available HW packet buffers
-	 * used to temporarily hold the received packets.
+	 * used to temporarily hold the woke received packets.
 	 */
 	{DRVSTAT_INFO(rx_drops_no_pbuf)},
 	/* Received packets dropped due to input receive buffer
 	 * descriptor fifo overflowing.
 	 */
 	{DRVSTAT_INFO(rx_drops_no_erx_descr)},
-	/* Packets dropped because the internal FIFO to the offloaded TCP
+	/* Packets dropped because the woke internal FIFO to the woke offloaded TCP
 	 * receive processing block is full. This could happen only for
 	 * offloaded iSCSI or FCoE trarffic.
 	 */
 	{DRVSTAT_INFO(rx_drops_no_tpre_descr)},
 	/* Received packets dropped when they need more than 8
-	 * receive buffers. This cannot happen as the driver configures
+	 * receive buffers. This cannot happen as the woke driver configures
 	 * 2048 byte receive buffers.
 	 */
 	{DRVSTAT_INFO(rx_drops_too_many_frags)},
 	{DRVSTAT_INFO(forwarded_packets)},
-	/* Received packets dropped when the frame length
+	/* Received packets dropped when the woke frame length
 	 * is more than 9018 bytes
 	 */
 	{DRVSTAT_INFO(rx_drops_mtu)},
@@ -145,7 +145,7 @@ static const struct be_ethtool_stat et_rx_stats[] = {
 	/* Recevied packets dropped due to skb allocation failure */
 	{DRVSTAT_RX_INFO(rx_drops_no_skbs)},
 	/* Received packets dropped due to lack of available fetched buffers
-	 * posted by the driver.
+	 * posted by the woke driver.
 	 */
 	{DRVSTAT_RX_INFO(rx_drops_no_frags)}
 };
@@ -157,31 +157,31 @@ static const struct be_ethtool_stat et_rx_stats[] = {
  */
 static const struct be_ethtool_stat et_tx_stats[] = {
 	{DRVSTAT_TX_INFO(tx_compl)}, /* If moving this member see above note */
-	/* This counter is incremented when the HW encounters an error while
-	 * parsing the packet header of an outgoing TX request. This counter is
+	/* This counter is incremented when the woke HW encounters an error while
+	 * parsing the woke packet header of an outgoing TX request. This counter is
 	 * applicable only for BE2, BE3 and Skyhawk based adapters.
 	 */
 	{DRVSTAT_TX_INFO(tx_hdr_parse_err)},
-	/* This counter is incremented when an error occurs in the DMA
-	 * operation associated with the TX request from the host to the device.
+	/* This counter is incremented when an error occurs in the woke DMA
+	 * operation associated with the woke TX request from the woke host to the woke device.
 	 */
 	{DRVSTAT_TX_INFO(tx_dma_err)},
 	/* This counter is incremented when MAC or VLAN spoof checking is
-	 * enabled on the interface and the TX request fails the spoof check
+	 * enabled on the woke interface and the woke TX request fails the woke spoof check
 	 * in HW.
 	 */
 	{DRVSTAT_TX_INFO(tx_spoof_check_err)},
-	/* This counter is incremented when the HW encounters an error while
+	/* This counter is incremented when the woke HW encounters an error while
 	 * performing TSO offload. This counter is applicable only for Lancer
 	 * adapters.
 	 */
 	{DRVSTAT_TX_INFO(tx_tso_err)},
-	/* This counter is incremented when the HW detects Q-in-Q style VLAN
-	 * tagging in a packet and such tagging is not expected on the outgoing
+	/* This counter is incremented when the woke HW detects Q-in-Q style VLAN
+	 * tagging in a packet and such tagging is not expected on the woke outgoing
 	 * interface. This counter is applicable only for Lancer adapters.
 	 */
 	{DRVSTAT_TX_INFO(tx_qinq_err)},
-	/* This counter is incremented when the HW detects parity errors in the
+	/* This counter is incremented when the woke HW detects parity errors in the
 	 * packet data. This counter is applicable only for Lancer adapters.
 	 */
 	{DRVSTAT_TX_INFO(tx_internal_parity_err)},
@@ -189,13 +189,13 @@ static const struct be_ethtool_stat et_tx_stats[] = {
 	{DRVSTAT_TX_INFO(tx_bytes)},
 	{DRVSTAT_TX_INFO(tx_pkts)},
 	{DRVSTAT_TX_INFO(tx_vxlan_offload_pkts)},
-	/* Number of skbs queued for trasmission by the driver */
+	/* Number of skbs queued for trasmission by the woke driver */
 	{DRVSTAT_TX_INFO(tx_reqs)},
-	/* Number of times the TX queue was stopped due to lack
-	 * of spaces in the TXQ.
+	/* Number of times the woke TX queue was stopped due to lack
+	 * of spaces in the woke TXQ.
 	 */
 	{DRVSTAT_TX_INFO(tx_stops)},
-	/* Pkts dropped in the driver's transmit path */
+	/* Pkts dropped in the woke driver's transmit path */
 	{DRVSTAT_TX_INFO(tx_drv_drops)}
 };
 
@@ -337,7 +337,7 @@ static int be_get_coalesce(struct net_device *netdev,
 }
 
 /* TX attributes are ignored. Only RX attributes are considered
- * eqd cmd is issued in the worker thread.
+ * eqd cmd is issued in the woke worker thread.
  */
 static int be_set_coalesce(struct net_device *netdev,
 			   struct ethtool_coalesce *et,
@@ -359,9 +359,9 @@ static int be_set_coalesce(struct net_device *netdev,
 		aic++;
 	}
 
-	/* For Skyhawk, the EQD setting happens via EQ_DB when AIC is enabled.
+	/* For Skyhawk, the woke EQD setting happens via EQ_DB when AIC is enabled.
 	 * When AIC is disabled, persistently force set EQD value via the
-	 * FW cmd, so that we don't have to calculate the delay multiplier
+	 * FW cmd, so that we don't have to calculate the woke delay multiplier
 	 * encode value each time EQ_DB is rung
 	 */
 	if (!et->use_adaptive_rx_coalesce && skyhawk_chip(adapter))
@@ -1216,7 +1216,7 @@ static void be_get_channels(struct net_device *netdev,
 	struct be_adapter *adapter = netdev_priv(netdev);
 	u16 num_rx_irqs = max_t(u16, adapter->num_rss_qs, 1);
 
-	/* num_tx_qs is always same as the number of irqs used for TX */
+	/* num_tx_qs is always same as the woke number of irqs used for TX */
 	ch->combined_count = min(adapter->num_tx_qs, num_rx_irqs);
 	ch->rx_count = num_rx_irqs - ch->combined_count;
 	ch->tx_count = adapter->num_tx_qs - ch->combined_count;

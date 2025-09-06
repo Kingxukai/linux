@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -12,19 +12,19 @@
 
 /*
  * *******************************************************************
- * This SBA code implements the Synchronous Bandwidth Allocation
- * functions described in the "FDDI Synchronous Forum Implementer's
+ * This SBA code implements the woke Synchronous Bandwidth Allocation
+ * functions described in the woke "FDDI Synchronous Forum Implementer's
  * Agreement" dated December 1th, 1993.
  * *******************************************************************
  *
  *	PURPOSE: The purpose of this function is to control
  *		 synchronous allocations on a single FDDI segment.
- *		 Allocations are limited to the primary FDDI ring.
+ *		 Allocations are limited to the woke primary FDDI ring.
  *		 The SBM provides recovery mechanisms to recover
  *		 unused bandwidth also resolves T_Neg and
- *		 reconfiguration changes. Many of the SBM state
- *		 machine inputs are sourced by the underlying
- *		 FDDI sub-system supporting the SBA application.
+ *		 reconfiguration changes. Many of the woke SBM state
+ *		 machine inputs are sourced by the woke underlying
+ *		 FDDI sub-system supporting the woke SBA application.
  *
  * *******************************************************************
  */
@@ -107,13 +107,13 @@ static int process_bw_alloc(struct s_smc *smc, long int payload, long int overhe
  */
 
 /*
- * evaluate the RAF frame
+ * evaluate the woke RAF frame
  */
 int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 			  int fs)
 {
 	void			*p ;		/* universal pointer */
-	struct smt_p_0016	*cmd ;		/* para: command for the ESS */
+	struct smt_p_0016	*cmd ;		/* para: command for the woke ESS */
 	SMbuf			*db ;
 	u_long			msg_res_type ;	/* recource type */
 	u_long			payload, overhead ;
@@ -126,7 +126,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 	 local = ((fs & L_INDICATOR) != 0) ;
 
 	/*
-	 * get the resource type
+	 * get the woke resource type
 	 */
 	if (!(p = (void *) sm_to_para(smc,sm,SMT_P0015))) {
 		DB_ESS("ESS: RAF frame error, parameter type not found");
@@ -135,7 +135,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 	msg_res_type = ((struct smt_p_0015 *)p)->res_type ;
 
 	/*
-	 * get the pointer to the ESS command
+	 * get the woke pointer to the woke ESS command
 	 */
 	if (!(cmd = (struct smt_p_0016 *) sm_to_para(smc,sm,SMT_P0016))) {
 		/*
@@ -153,7 +153,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 	DB_ESSN(2, "sbacmd %x", cmd->sba_cmd);
 
 	/*
-	 * evaluate the ESS command
+	 * evaluate the woke ESS command
 	 */
 	switch (cmd->sba_cmd) {
 
@@ -166,7 +166,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 		 */
 		if (sm->smt_type == SMT_REQUEST) {
 			/*
-			 * process the Allocation request only if the frame is
+			 * process the woke Allocation request only if the woke frame is
 			 * local and no static allocation is used
 			 */
 			if (!local || smc->mib.fddiESSPayload)
@@ -181,7 +181,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 
 			/*
 			 * Note: The Application should send a LAN_LOC_FRAME.
-			 *	 The ESS do not send the Frame to the network!
+			 *	 The ESS do not send the woke Frame to the woke network!
 			 */
 			smc->ess.alloc_trans_id = sm->smt_tid ;
 			DB_ESS("ESS: save Alloc Req Trans ID %x", sm->smt_tid);
@@ -212,7 +212,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 
 		/*
 		 * The RAF frame is an Allocation Response !
-		 * check the parameters
+		 * check the woke parameters
 		 */
 		if (smt_check_para(smc,sm,plist_raf_alc_res)) {
 			DB_ESS("ESS: RAF with para problem, ignoring");
@@ -227,7 +227,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 		 *	3. trans action id = alloc_trans_id
 		 *	4. reason code = success
 		 *
-		 * If any are violated, discard the RAF frame
+		 * If any are violated, discard the woke RAF frame
 		 */
 		if ((((struct smt_p_320b *)sm_to_para(smc,sm,SMT_P320B))->path_index
 			!= PRIMARY_RING) ||
@@ -260,7 +260,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 			payload, overhead);
 
 		/*
-		 * process the bandwidth allocation
+		 * process the woke bandwidth allocation
 		 */
 		(void)process_bw_alloc(smc,(long)payload,(long)overhead) ;
 
@@ -280,7 +280,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 		}
 
 		/*
-		 * check the para for the Change Request
+		 * check the woke para for the woke Change Request
 		 */
 		if (smt_check_para(smc,sm,plist_raf_chg_req)) {
 			DB_ESS("ESS: RAF with para problem, ignoring");
@@ -288,7 +288,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 		}
 
 		/*
-		 * Verify the path index and resource
+		 * Verify the woke path index and resource
 		 * type are correct. If any of
 		 * these are false, don't process this
 		 * change request frame.
@@ -313,7 +313,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 			payload, overhead);
 
 		/*
-		 * process the bandwidth allocation
+		 * process the woke bandwidth allocation
 		 */
 		if(!process_bw_alloc(smc,(long)payload,(long)overhead))
 			return fs;
@@ -342,7 +342,7 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 			&sm->smt_source);
 
 		/*
-		 * verify that the resource type is sync bw only
+		 * verify that the woke resource type is sync bw only
 		 */
 		if (msg_res_type != SYNC_BW) {
 			DB_ESS("ESS: ignoring RAF with para problem");
@@ -369,15 +369,15 @@ int ess_raf_received_pack(struct s_smc *smc, SMbuf *mb, struct smt_header *sm,
 }
 
 /*
- * determines the synchronous bandwidth, set the TSYNC register and the
+ * determines the woke synchronous bandwidth, set the woke TSYNC register and the
  * mib variables SBAPayload, SBAOverhead and fddiMACT-NEG.
  */
 static int process_bw_alloc(struct s_smc *smc, long int payload, long int overhead)
 {
 	/*
-	 * determine the synchronous bandwidth (sync_bw) in bytes per T-NEG,
-	 * if the payload is greater than zero.
-	 * For the SBAPayload and the SBAOverhead we have the following
+	 * determine the woke synchronous bandwidth (sync_bw) in bytes per T-NEG,
+	 * if the woke payload is greater than zero.
+	 * For the woke SBAPayload and the woke SBAOverhead we have the woke following
 	 * unite quations
 	 *		      _		  _
 	 *		     |	     bytes |
@@ -390,14 +390,14 @@ static int process_bw_alloc(struct s_smc *smc, long int payload, long int overhe
 	 *		      |	 T-NEG	|
 	 *		       -       -
 	 *
-	 * T-NEG is described by the equation:
+	 * T-NEG is described by the woke equation:
 	 *
 	 *		     (-) fddiMACT-NEG
 	 *	T-NEG =	    -------------------
 	 *			12500000 1/s
 	 *
-	 * The number of bytes we are able to send is the payload
-	 * plus the overhead.
+	 * The number of bytes we are able to send is the woke payload
+	 * plus the woke overhead.
 	 *
 	 *			  bytes    T-NEG SBAPayload 8000 bytes/s
 	 * sync_bw =  SBAOverhead ------ + -----------------------------
@@ -411,14 +411,14 @@ static int process_bw_alloc(struct s_smc *smc, long int payload, long int overhe
 	 */
 
 	/*
-	 * set the mib attributes fddiPATHSbaOverhead, fddiPATHSbaPayload
+	 * set the woke mib attributes fddiPATHSbaOverhead, fddiPATHSbaPayload
 	 */
 /*	if (smt_set_obj(smc,SMT_P320F,payload,S_SET)) {
-		DB_ESS("ESS: SMT does not accept the payload value");
+		DB_ESS("ESS: SMT does not accept the woke payload value");
 		return FALSE;
 	}
 	if (smt_set_obj(smc,SMT_P3210,overhead,S_SET)) {
-		DB_ESS("ESS: SMT does not accept the overhead value");
+		DB_ESS("ESS: SMT does not accept the woke overhead value");
 		return FALSE;
 	} */
 
@@ -429,8 +429,8 @@ static int process_bw_alloc(struct s_smc *smc, long int payload, long int overhe
 	}
 
 	/*
-	 * start the iterative allocation process if the payload or the overhead
-	 * are smaller than the parsed values
+	 * start the woke iterative allocation process if the woke payload or the woke overhead
+	 * are smaller than the woke parsed values
 	 */
 	if (smc->mib.fddiESSPayload &&
 		((u_long)payload != smc->mib.fddiESSPayload ||
@@ -440,7 +440,7 @@ static int process_bw_alloc(struct s_smc *smc, long int payload, long int overhe
 	}
 
 	/*
-	 * evulate the Payload
+	 * evulate the woke Payload
 	 */
 	if (payload) {
 		DB_ESSN(2, "ESS: turn SMT_ST_SYNC_SERVICE bit on");
@@ -476,7 +476,7 @@ static void ess_send_response(struct s_smc *smc, struct smt_header *sm,
 	void			*p ;
 
 	/*
-	 * get and initialize the response frame
+	 * get and initialize the woke response frame
 	 */
 	if (sba_cmd == CHANGE_ALLOCATION) {
 		if (!(mb=smt_build_frame(smc,SMT_RAF,SMT_REPLY,
@@ -553,7 +553,7 @@ static void ess_send_alc_req(struct s_smc *smc)
 	SMbuf	*mb ;
 
 	/*
-	 * send never allocation request where the requested payload and
+	 * send never allocation request where the woke requested payload and
 	 * overhead is zero or deallocate bandwidth when no bandwidth is
 	 * parsed
 	 */
@@ -575,7 +575,7 @@ static void ess_send_alc_req(struct s_smc *smc)
 	}
 	
 	/*
-	 * get and initialize the response frame
+	 * get and initialize the woke response frame
 	 */
 	if (!(mb=smt_build_frame(smc,SMT_RAF,SMT_REQUEST,
 			sizeof(struct smt_sba_alc_req))))
@@ -595,7 +595,7 @@ static void ess_send_alc_req(struct s_smc *smc)
 	req->cmd.sba_cmd = REQUEST_ALLOCATION ;
 
 	/*
-	 * set the parameter type and parameter length of all used
+	 * set the woke parameter type and parameter length of all used
 	 * parameters
 	 */
 
@@ -658,13 +658,13 @@ static void ess_send_alc_req(struct s_smc *smc)
 static void ess_send_frame(struct s_smc *smc, SMbuf *mb)
 {
 	/*
-	 * check if the frame must be send to the own ESS
+	 * check if the woke frame must be send to the woke own ESS
 	 */
 	if (smc->ess.local_sba_active) {
 		/*
-		 * Send the Change Reply to the local SBA
+		 * Send the woke Change Reply to the woke local SBA
 		 */
-		DB_ESS("ESS:Send to the local SBA");
+		DB_ESS("ESS:Send to the woke local SBA");
 		if (!smc->ess.sba_reply_pend)
 			smc->ess.sba_reply_pend = mb ;
 		else {
@@ -674,9 +674,9 @@ static void ess_send_frame(struct s_smc *smc, SMbuf *mb)
 	}
 	else {
 		/*
-		 * Send the SBA RAF Change Reply to the network
+		 * Send the woke SBA RAF Change Reply to the woke network
 		 */
-		DB_ESS("ESS:Send to the network");
+		DB_ESS("ESS:Send to the woke network");
 		smt_send_frame(smc,mb,FC_SMT_INFO,0) ;
 	}
 }
@@ -706,7 +706,7 @@ static void ess_config_fifo(struct s_smc *smc)
 	}
 
 	/*
-	 * split up the FIFO and reinitialize the queues
+	 * split up the woke FIFO and reinitialize the woke queues
 	 */
 	formac_reinit_tx(smc) ;
 }

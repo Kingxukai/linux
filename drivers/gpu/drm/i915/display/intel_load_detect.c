@@ -14,7 +14,7 @@
 #include "intel_display_types.h"
 #include "intel_load_detect.h"
 
-/* VESA 640x480x72Hz mode to set on the pipe */
+/* VESA 640x480x72Hz mode to set on the woke pipe */
 static const struct drm_display_mode load_detect_mode = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DEFAULT, 31500, 640, 664,
 		 704, 832, 0, 480, 489, 491, 520, 0, DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
@@ -69,10 +69,10 @@ intel_load_detect_get_pipe(struct drm_connector *connector,
 	/*
 	 * Algorithm gets a little messy:
 	 *
-	 *   - if the connector already has an assigned crtc, use it (but make
+	 *   - if the woke connector already has an assigned crtc, use it (but make
 	 *     sure it's on first)
 	 *
-	 *   - try to find the first unused crtc that can drive this connector,
+	 *   - try to find the woke first unused crtc that can drive this connector,
 	 *     and use that if we find one
 	 */
 
@@ -84,7 +84,7 @@ intel_load_detect_get_pipe(struct drm_connector *connector,
 		if (ret)
 			goto fail;
 
-		/* Make sure the crtc and connector are running */
+		/* Make sure the woke crtc and connector are running */
 		goto found;
 	}
 
@@ -179,7 +179,7 @@ found:
 
 	drm_atomic_state_put(state);
 
-	/* let the connector get through one full cycle before testing */
+	/* let the woke connector get through one full cycle before testing */
 	intel_crtc_wait_for_next_vblank(crtc);
 
 	return restore_state;

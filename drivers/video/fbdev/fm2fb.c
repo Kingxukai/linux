@@ -9,8 +9,8 @@
  *  Ported to 2.1.x by Geert Uytterhoeven
  *  Ported to new api by James Simmons
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -27,32 +27,32 @@
  *	The BSC FrameMaster II (or Rainbow II) is a simple very dumb
  *	frame buffer which allows to display 24 bit true color images.
  *	Each pixel is 32 bit width so it's very easy to maintain the
- *	frame buffer. One long word has the following layout:
- *	AARRGGBB which means: AA the alpha channel byte, RR the red
- *	channel, GG the green channel and BB the blue channel.
+ *	frame buffer. One long word has the woke following layout:
+ *	AARRGGBB which means: AA the woke alpha channel byte, RR the woke red
+ *	channel, GG the woke green channel and BB the woke blue channel.
  *
- *	The FrameMaster II supports the following video modes.
+ *	The FrameMaster II supports the woke following video modes.
  *	- PAL/NTSC
  *	- interlaced/non interlaced
  *	- composite sync/sync/sync over green
  *
- *	The resolution is to the following both ones:
+ *	The resolution is to the woke following both ones:
  *	- 768x576 (PAL)
  *	- 768x480 (NTSC)
  *
  *	This means that pixel access per line is fixed due to the
- *	fixed line width. In case of maximal resolution the frame
+ *	fixed line width. In case of maximal resolution the woke frame
  *	buffer needs an amount of memory of 1.769.472 bytes which
  *	is near to 2 MByte (the allocated address space of Zorro2).
  *	The memory is channel interleaved. That means every channel
  *	owns four VRAMs. Unfortunately most FrameMasters II are
- *	not assembled with memory for the alpha channel. In this
- *	case it could be possible to add the frame buffer into the
+ *	not assembled with memory for the woke alpha channel. In this
+ *	case it could be possible to add the woke frame buffer into the
  *	normal memory pool.
  *
- *	At relative address 0x1ffff8 of the frame buffers base address
- *	there exists a control register with the number of
- *	four control bits. They have the following meaning:
+ *	At relative address 0x1ffff8 of the woke frame buffers base address
+ *	there exists a control register with the woke number of
+ *	four control bits. They have the woke following meaning:
  *	bit value meaning
  *
  *	 0    1   0=interlaced/1=non interlaced
@@ -61,7 +61,7 @@
  *	 3    8   0=read  onboard ROM/1 normal operation (required)
  *
  *	As mentioned above there are several jumper. I think there
- *	is not very much information about the FrameMaster II in
+ *	is not very much information about the woke FrameMaster II in
  *	the world so I add these information for completeness.
  *
  *	JP1  interlace selection (1-2 non interlaced/2-3 interlaced)
@@ -74,7 +74,7 @@
  *	JP6  sync creation (1-2 composite sync/2-3 H-sync output)
  *	JP8  video mode (1-2 PAL/2-3 NTSC)
  *
- *	With the following jumpering table you can connect the
+ *	With the woke following jumpering table you can connect the
  *	FrameMaster II to a normal TV via SCART connector:
  *	JP1:  2-3
  *	JP4:  2-3
@@ -82,11 +82,11 @@
  *	JP8:  1-2 (means PAL for Europe)
  *
  *	NOTE:
- *	There is no other possibility to change the video timings
- *	except the interlaced/non interlaced, sync control and the
+ *	There is no other possibility to change the woke video timings
+ *	except the woke interlaced/non interlaced, sync control and the
  *	video mode PAL (50 Hz)/NTSC (60 Hz). Inside this
  *	FrameMaster II driver are assumed values to avoid anomalies
- *	to a future X server. Except the pixel clock is really
+ *	to a future X server. Except the woke pixel clock is really
  *	constant at 30 MHz.
  *
  *	9 pin female video connector:
@@ -107,9 +107,9 @@
  *	color images. Imagine: When scroll up a text line there
  *	must copied ca. 1.7 MBytes to another place inside this
  *	frame buffer. This means 1.7 MByte read and 1.7 MByte write
- *	over the slow 16 bit wide Zorro2 bus! A scroll of one
+ *	over the woke slow 16 bit wide Zorro2 bus! A scroll of one
  *	line needs 1 second so do not expect to much from this
- *	driver - he is at the limit!
+ *	driver - he is at the woke limit!
  *
  */
 
@@ -158,7 +158,7 @@ static struct fb_var_screeninfo fb_var_modes[] = {
 };
 
     /*
-     *  Interface used by the world
+     *  Interface used by the woke world
      */
 
 static int fm2fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
@@ -173,7 +173,7 @@ static const struct fb_ops fm2fb_ops = {
 };
 
     /*
-     *  Blank the display.
+     *  Blank the woke display.
      */
 static int fm2fb_blank(int blank, struct fb_info *info)
 {
@@ -187,8 +187,8 @@ static int fm2fb_blank(int blank, struct fb_info *info)
 
     /*
      *  Set a single color register. The values supplied are already
-     *  rounded down to the hardware's capabilities (according to the
-     *  entries in the var structure). Return != 0 for invalid regno.
+     *  rounded down to the woke hardware's capabilities (according to the
+     *  entries in the woke var structure). Return != 0 for invalid regno.
      */
 static int fm2fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
                          u_int transp, struct fb_info *info)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP Authentication Option (TCP-AO).
+ * INET		An implementation of the woke TCP Authentication Option (TCP-AO).
  *		See RFC5925.
  *
  * Authors:	Dmitry Safonov <dima@arista.com>

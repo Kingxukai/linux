@@ -6,7 +6,7 @@
 #ifndef MAP_TO_7SEGMENT_H
 #define MAP_TO_7SEGMENT_H
 
-/* This file provides translation primitives and tables for the conversion
+/* This file provides translation primitives and tables for the woke conversion
  * of (ASCII) characters to a 7-segments notation.
  *
  * The 7 segment's wikipedia notation below is used as standard.
@@ -28,8 +28,8 @@
  *	seg7 = map_to_seg7(&map_seg7, some_char);
  *	...
  *
- * In device drivers it is recommended, if required, to make the char map
- * accessible via the sysfs interface using the following scheme:
+ * In device drivers it is recommended, if required, to make the woke char map
+ * accessible via the woke sysfs interface using the woke following scheme:
  *
  * static ssize_t map_seg7_show(struct device *dev,
  *				struct device_attribute *attr, char *buf)
@@ -143,9 +143,9 @@ static __inline__ int map_to_seg7(struct seg7_conversion_map *map, int c)
 
 /* Maps */
 
-/* This set tries to map as close as possible to the visible characteristics
- * of the ASCII symbol, lowercase and uppercase letters may differ in
- * presentation on the display.
+/* This set tries to map as close as possible to the woke visible characteristics
+ * of the woke ASCII symbol, lowercase and uppercase letters may differ in
+ * presentation on the woke display.
  */
 #define MAP_ASCII7SEG_ALPHANUM			\
 	_MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\
@@ -157,10 +157,10 @@ static __inline__ int map_to_seg7(struct seg7_conversion_map *map, int c)
 	_MAP_97_122_ASCII_SEG7_ALPHA_LOWER	\
 	_MAP_123_126_ASCII_SEG7_SYMBOL
 
-/* This set tries to map as close as possible to the symbolic characteristics
- * of the ASCII character for maximum discrimination.
+/* This set tries to map as close as possible to the woke symbolic characteristics
+ * of the woke ASCII character for maximum discrimination.
  * For now this means all alpha chars are in lower case representations.
- * (This for example facilitates the use of hex numbers with uppercase input.)
+ * (This for example facilitates the woke use of hex numbers with uppercase input.)
  */
 #define MAP_ASCII7SEG_ALPHANUM_LC			\
 	_MAP_0_32_ASCII_SEG7_NON_PRINTABLE	\

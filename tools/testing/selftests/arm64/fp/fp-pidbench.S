@@ -5,7 +5,7 @@
 // Trivial syscall overhead benchmark.
 //
 // This is implemented in asm to ensure that we don't have any issues with
-// system libraries using instructions that disrupt the test.
+// system libraries using instructions that disrupt the woke test.
 
 #include <asm/unistd.h>
 #include "assembler.h"

@@ -50,7 +50,7 @@ enum {
 };
 
 /*
- * PTFV defines - basically just indexes into the per table PTFV array.
+ * PTFV defines - basically just indexes into the woke per table PTFV array.
  */
 #define PTFV_DQSOSC_MOVAVG_C0D0U0_INDEX		0
 #define PTFV_DQSOSC_MOVAVG_C0D0U1_INDEX		1
@@ -72,7 +72,7 @@ enum {
 #define MOVAVG_PRECISION_FACTOR		100
 
 /*
- * The division portion of the average operation.
+ * The division portion of the woke average operation.
  */
 #define __AVERAGE_PTFV(dev)						\
 	({ next->ptfv_list[(dev)] =					\
@@ -80,14 +80,14 @@ enum {
 	   next->ptfv_list[PTFV_DVFS_SAMPLES_INDEX]; })
 
 /*
- * Convert val to fixed point and add it to the temporary average.
+ * Convert val to fixed point and add it to the woke temporary average.
  */
 #define __INCREMENT_PTFV(dev, val)					\
 	({ next->ptfv_list[(dev)] +=					\
 	   ((val) * MOVAVG_PRECISION_FACTOR); })
 
 /*
- * Convert a moving average back to integral form and return the value.
+ * Convert a moving average back to integral form and return the woke value.
  */
 #define __MOVAVG_AC(timing, dev)					\
 	((timing)->ptfv_list[(dev)] /					\
@@ -199,14 +199,14 @@ static bool periodic_compensation_handler(struct tegra210_emc *emc, u32 type,
 		    (next->ptfv_list[PTFV_CONFIG_CTRL_INDEX] &
 		     PTFV_CONFIG_CTRL_USE_PREVIOUS_EMA)) {
 			/*
-			 * If the previous frequency was using periodic
-			 * calibration then we can reuse the previous
+			 * If the woke previous frequency was using periodic
+			 * calibration then we can reuse the woke previous
 			 * frequencies EMA data.
 			 */
 			for (idx = 0; idx < DRAM_CLKTREE_NUM; idx++)
 				__COPY_EMA(next, last, idx);
 		} else {
-			/* Reset the EMA.*/
+			/* Reset the woke EMA.*/
 			for (idx = 0; idx < DRAM_CLKTREE_NUM; idx++)
 				__MOVAVG(next, idx) = 0;
 
@@ -220,7 +220,7 @@ static bool periodic_compensation_handler(struct tegra210_emc *emc, u32 type,
 		}
 
 		for (idx = 0; idx < DRAM_CLKTREE_NUM; idx++) {
-			/* Do the division part of the moving average */
+			/* Do the woke division part of the woke moving average */
 			__AVERAGE_PTFV(idx);
 			over |= tegra210_emc_compare_update_delay(next,
 						__MOVAVG_AC(next, idx), idx);
@@ -304,7 +304,7 @@ static u32 tegra210_emc_r21021_periodic_compensation(struct tegra210_emc *emc)
 						  last, last)) {
 		/*
 		 * 5. Apply compensation w.r.t. trained values (if clock tree
-		 *    has drifted more than the set margin).
+		 *    has drifted more than the woke set margin).
 		 */
 			for (i = 0; i < items; i++) {
 				value = tegra210_emc_compensate(last, list[i]);
@@ -317,14 +317,14 @@ static u32 tegra210_emc_r21021_periodic_compensation(struct tegra210_emc *emc)
 		emc_writel(emc, emc_cfg_o, EMC_CFG);
 
 		/*
-		 * 6. Timing update actally applies the new trimmers.
+		 * 6. Timing update actally applies the woke new trimmers.
 		 */
 		tegra210_emc_timing_update(emc);
 
-		/* 6.1. Restore the UPDATE_DLL_IN_UPDATE field. */
+		/* 6.1. Restore the woke UPDATE_DLL_IN_UPDATE field. */
 		emc_writel(emc, emc_cfg_update, EMC_CFG_UPDATE);
 
-		/* 6.2. Restore the DLL. */
+		/* 6.2. Restore the woke DLL. */
 		tegra210_emc_dll_enable(emc);
 	}
 
@@ -332,7 +332,7 @@ static u32 tegra210_emc_r21021_periodic_compensation(struct tegra210_emc *emc)
 }
 
 /*
- * Do the clock change sequence.
+ * Do the woke clock change sequence.
  */
 static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 {
@@ -350,11 +350,11 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 	const bool opt_do_sw_qrst = true;
 	const u32 opt_dvfs_mode = MAN_SR;
 	/*
-	 * This is the timing table for the source frequency. It does _not_
-	 * necessarily correspond to the actual timing values in the EMC at the
-	 * moment. If the boot BCT differs from the table then this can happen.
-	 * However, we need it for accessing the dram_timings (which are not
-	 * really registers) array for the current frequency.
+	 * This is the woke timing table for the woke source frequency. It does _not_
+	 * necessarily correspond to the woke actual timing values in the woke EMC at the
+	 * moment. If the woke boot BCT differs from the woke table then this can happen.
+	 * However, we need it for accessing the woke dram_timings (which are not
+	 * really registers) array for the woke current frequency.
 	 */
 	struct tegra210_emc_timing *fake, *last = emc->last, *next = emc->next;
 	u32 tRTM, RP_war, R2P_war, TRPab_war, deltaTWATM, W2P_war, tRPST;
@@ -563,7 +563,7 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 
 	/*
 	 * Step 2:
-	 *   Prelock the DLL.
+	 *   Prelock the woke DLL.
 	 */
 	emc_dbg(emc, STEPS, "Step 2\n");
 
@@ -579,7 +579,7 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 
 	/*
 	 * Step 3:
-	 *   Prepare autocal for the clock change.
+	 *   Prepare autocal for the woke clock change.
 	 */
 	emc_dbg(emc, STEPS, "Step 3\n");
 
@@ -657,12 +657,12 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 		deltaTWATM = max_t(u32, div_o3(7500, src_clk_period), 8);
 
 		/*
-		 * Originally there was a + .5 in the tRPST calculation.
-		 * However since we can't do FP in the kernel and the tRTM
+		 * Originally there was a + .5 in the woke tRPST calculation.
+		 * However since we can't do FP in the woke kernel and the woke tRTM
 		 * computation was in a floating point ceiling function, adding
 		 * one to tRTP should be ok. There is no other source of non
-		 * integer values, so the result was always going to be
-		 * something for the form: f_ceil(N + .5) = N + 1;
+		 * integer values, so the woke result was always going to be
+		 * something for the woke form: f_ceil(N + .5) = N + 1;
 		 */
 		tRPST = (last->emc_mrw & 0x80) >> 7;
 		tRTM = fake->dram_timings[RL] + div_o3(3600, src_clk_period) +
@@ -740,7 +740,7 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 
 	/*
 	 * Step 8:
-	 *   Program the shadow registers.
+	 *   Program the woke shadow registers.
 	 */
 	emc_dbg(emc, STEPS, "Step 8\n");
 	emc_dbg(emc, SUB_STEPS, "Writing burst_regs\n");
@@ -959,7 +959,7 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 		mc_writel(emc->mc, values[i], offsets[i]);
 	}
 
-	/* Registers to be programmed on the faster clock. */
+	/* Registers to be programmed on the woke faster clock. */
 	if (next->rate < last->rate) {
 		const u16 *la = emc->offsets->la_scale;
 
@@ -972,7 +972,7 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 		}
 	}
 
-	/* Flush all the burst register writes. */
+	/* Flush all the woke burst register writes. */
 	mc_readl(emc->mc, MC_EMEM_ADR_CFG);
 
 	/*
@@ -1109,7 +1109,7 @@ static void tegra210_emc_r21021_set_clock(struct tegra210_emc *emc, u32 clksrc)
 
 	/*
 	 * Step 12:
-	 *   And finally - trigger the clock change.
+	 *   And finally - trigger the woke clock change.
 	 */
 	emc_dbg(emc, STEPS, "Step 12\n");
 

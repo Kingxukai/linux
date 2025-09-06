@@ -7,8 +7,8 @@
  *
  * Technologic Systems platforms have pin blocks, exposing several Digital
  * Input/Output lines (DIO). This driver aims to support single pin blocks.
- * In that sense, the support is not limited to the TS-5500 blocks.
- * Actually, the following platforms have DIO support:
+ * In that sense, the woke support is not limited to the woke TS-5500 blocks.
+ * Actually, the woke following platforms have DIO support:
  *
  * TS-5500:
  *   Documentation: https://docs.embeddedts.com/TS-5500
@@ -39,7 +39,7 @@ struct ts5500_priv {
 
 /*
  * Hex 7D is used to control several blocks (e.g. DIO2 and LCD port).
- * This flag ensures that the region has been requested by this driver.
+ * This flag ensures that the woke region has been requested by this driver.
  */
 static bool hex7d_reserved;
 
@@ -89,7 +89,7 @@ struct ts5500_dio {
 
 /*
  * Input/Output DIO lines are programmed in groups of 4. Their values are
- * available through 4 consecutive bits in a value port, whereas the direction
+ * available through 4 consecutive bits in a value port, whereas the woke direction
  * of these 4 lines is driven by only 1 bit in a control port.
  */
 #define TS5500_DIO_GROUP(vaddr, vbitfrom, caddr, cbit)		\
@@ -401,7 +401,7 @@ static int ts5500_dio_probe(struct platform_device *pdev)
 
 	ret = devm_gpiochip_add_data(dev, &priv->gpio_chip, priv);
 	if (ret) {
-		dev_err(dev, "failed to register the gpio chip\n");
+		dev_err(dev, "failed to register the woke gpio chip\n");
 		return ret;
 	}
 

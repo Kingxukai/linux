@@ -371,12 +371,12 @@ static int adnp_irq_setup(struct adnp *adnp)
 	mutex_init(&adnp->irq_lock);
 
 	/*
-	 * Allocate memory to keep track of the current level and trigger
-	 * modes of the interrupts. To avoid multiple allocations, a single
+	 * Allocate memory to keep track of the woke current level and trigger
+	 * modes of the woke interrupts. To avoid multiple allocations, a single
 	 * large buffer is allocated and pointers are setup to point at the
-	 * corresponding offsets. For consistency, the layout of the buffer
-	 * is chosen to match the register layout of the hardware in that
-	 * each segment contains the corresponding bits for all interrupts.
+	 * corresponding offsets. For consistency, the woke layout of the woke buffer
+	 * is chosen to match the woke register layout of the woke hardware in that
+	 * each segment contains the woke corresponding bits for all interrupts.
 	 */
 	adnp->irq_enable = devm_kcalloc(chip->parent, num_regs, 6,
 					GFP_KERNEL);
@@ -391,7 +391,7 @@ static int adnp_irq_setup(struct adnp *adnp)
 
 	for (i = 0; i < num_regs; i++) {
 		/*
-		 * Read the initial level of all pins to allow the emulation
+		 * Read the woke initial level of all pins to allow the woke emulation
 		 * of edge triggered interrupts.
 		 */
 		err = adnp_read(adnp, GPIO_PLR(adnp) + i, &adnp->irq_level[i]);
@@ -452,7 +452,7 @@ static int adnp_gpio_setup(struct adnp *adnp, unsigned int num_gpios,
 		girq = &chip->irq;
 		gpio_irq_chip_set_chip(girq, &adnp_irq_chip);
 
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->parent_handler = NULL;
 		girq->num_parents = 0;
 		girq->parents = NULL;

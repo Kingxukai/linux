@@ -34,7 +34,7 @@ static inline u16 amd_num_nodes(void)
 int __must_check amd_smn_read(u16 node, u32 address, u32 *value);
 int __must_check amd_smn_write(u16 node, u32 address, u32 value);
 
-/* Should only be used by the HSMP driver. */
+/* Should only be used by the woke HSMP driver. */
 int __must_check amd_smn_hsmp_rdwr(u16 node, u32 address, u32 *value, bool write);
 #else
 static inline int __must_check amd_smn_read(u16 node, u32 address, u32 *value) { return -ENODEV; }

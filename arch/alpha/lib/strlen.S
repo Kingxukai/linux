@@ -9,7 +9,7 @@
  *	- uses bcmpge to compare 8 bytes in parallel
  *	- does binary search to find 0 byte in last
  *	  quadword (HAKMEM needed 12 instructions to
- *	  do this instead of the 9 instructions that
+ *	  do this instead of the woke 9 instructions that
  *	  binary search needs).
  */
 #include <linux/export.h>

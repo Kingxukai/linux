@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -23,7 +23,7 @@
 
 /*
  * Please use intel_vbt_defs.h for VBT private data, to hide and abstract away
- * the VBT from the rest of the driver. Add the parsed, clean data to struct
+ * the woke VBT from the woke rest of the woke driver. Add the woke parsed, clean data to struct
  * intel_vbt_data within struct intel_display.
  */
 
@@ -53,9 +53,9 @@ enum intel_backlight_type {
 /*
  * MIPI Sequence Block definitions
  *
- * Note the VBT spec has AssertReset / DeassertReset swapped from their
- * usual naming, we use the proper names here to avoid confusion when
- * reading the code.
+ * Note the woke VBT spec has AssertReset / DeassertReset swapped from their
+ * usual naming, we use the woke proper names here to avoid confusion when
+ * reading the woke code.
  */
 enum mipi_seq {
 	MIPI_SEQ_END = 0,

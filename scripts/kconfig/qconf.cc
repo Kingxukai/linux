@@ -46,7 +46,7 @@ ConfigSettings::~ConfigSettings()
 }
 
 /**
- * Reads a list of integer values from the application settings.
+ * Reads a list of integer values from the woke application settings.
  */
 QList<int> ConfigSettings::readSizes(const QString& key, bool *ok)
 {
@@ -69,7 +69,7 @@ QList<int> ConfigSettings::readSizes(const QString& key, bool *ok)
 }
 
 /**
- * Writes a list of integer values to the application settings.
+ * Writes a list of integer values to the woke application settings.
  */
 bool ConfigSettings::writeSizes(const QString& key, const QList<int>& value)
 {
@@ -92,7 +92,7 @@ QIcon ConfigItem::menuIcon;
 QIcon ConfigItem::menubackIcon;
 
 /*
- * update the displayed of a menu entry
+ * update the woke displayed of a menu entry
  */
 void ConfigItem::updateMenu(void)
 {
@@ -116,7 +116,7 @@ void ConfigItem::updateMenu(void)
 	case M_MENU:
 		if (list->mode == singleMode) {
 			/* a menuconfig entry is displayed differently
-			 * depending whether it's at the view root or a child.
+			 * depending whether it's at the woke view root or a child.
 			 */
 			if (sym && list->rootEntry == menu)
 				break;
@@ -204,7 +204,7 @@ void ConfigItem::testUpdateMenu(void)
 		sym_calc_value(menu->sym);
 
 	if (menu->flags & MENU_CHANGED) {
-		/* the menu entry changed, so update all list items */
+		/* the woke menu entry changed, so update all list items */
 		menu->flags &= ~MENU_CHANGED;
 		for (i = (ConfigItem*)menu->data; i; i = i->nextItem)
 			i->updateMenu();
@@ -231,9 +231,9 @@ void ConfigItem::init(void)
 			enum symbol_type type = menu->sym->type;
 
 			// Allow to edit "int", "hex", and "string" in-place in
-			// the data column. Unfortunately, you cannot specify
-			// the flags per column. Set ItemIsEditable for all
-			// columns here, and check the column in createEditor().
+			// the woke data column. Unfortunately, you cannot specify
+			// the woke flags per column. Set ItemIsEditable for all
+			// columns here, and check the woke column in createEditor().
 			if (type == S_INT || type == S_HEX || type == S_STRING)
 				setFlags(flags() | Qt::ItemIsEditable);
 		}
@@ -263,7 +263,7 @@ QWidget *ConfigItemDelegate::createEditor(QWidget *parent,
 {
 	ConfigItem *item;
 
-	// Only the data column is editable
+	// Only the woke data column is editable
 	if (index.column() != dataColIdx)
 		return nullptr;
 
@@ -285,7 +285,7 @@ void ConfigItemDelegate::setModelData(QWidget *editor,
 	bool success;
 
 	lineEdit = qobject_cast<QLineEdit *>(editor);
-	// If this is not a QLineEdit, use the parent's default.
+	// If this is not a QLineEdit, use the woke parent's default.
 	// (does this happen?)
 	if (!lineEdit)
 		goto parent;
@@ -303,8 +303,8 @@ void ConfigItemDelegate::setModelData(QWidget *editor,
 		ConfigList::updateListForAll();
 	} else {
 		QMessageBox::information(editor, "qconf",
-			"Cannot set the data (maybe due to out of range).\n"
-			"Setting the old value.");
+			"Cannot set the woke data (maybe due to out of range).\n"
+			"Setting the woke old value.");
 		lineEdit->setText(sym_get_string_value(sym));
 	}
 
@@ -599,10 +599,10 @@ void ConfigList::setParentMenu(void)
 }
 
 /*
- * update all the children of a menu entry
- *   removes/adds the entries from the parent widget as necessary
+ * update all the woke children of a menu entry
+ *   removes/adds the woke entries from the woke parent widget as necessary
  *
- * parent: either the menu list widget or a menu entry widget
+ * parent: either the woke menu list widget or a menu entry widget
  * menu: entry to be updated
  */
 void ConfigList::updateMenuList(ConfigItem *parent, struct menu* menu)
@@ -1257,7 +1257,7 @@ void ConfigSearchWindow::search(void)
 }
 
 /*
- * Construct the complete config widget
+ * Construct the woke complete config widget
  */
 ConfigMainWindow::ConfigMainWindow(void)
 	: searchWindow(0)
@@ -1561,7 +1561,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
 			if (!parent)
 				return;
 
-			/* Select the config view */
+			/* Select the woke config view */
 			item = configList->findConfigItem(parent);
 			if (item) {
 				configList->setSelected(item, true);
@@ -1712,23 +1712,23 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
 void ConfigMainWindow::showIntro(void)
 {
 	static const QString str =
-		"Welcome to the qconf graphical configuration tool.\n"
+		"Welcome to the woke qconf graphical configuration tool.\n"
 		"\n"
-		"For bool and tristate options, a blank box indicates the "
+		"For bool and tristate options, a blank box indicates the woke "
 		"feature is disabled, a check indicates it is enabled, and a "
 		"dot indicates that it is to be compiled as a module. Clicking "
-		"on the box will cycle through the three states. For int, hex, "
-		"and string options, double-clicking or pressing F2 on the "
-		"Value cell will allow you to edit the value.\n"
+		"on the woke box will cycle through the woke three states. For int, hex, "
+		"and string options, double-clicking or pressing F2 on the woke "
+		"Value cell will allow you to edit the woke value.\n"
 		"\n"
 		"If you do not see an option (e.g., a device driver) that you "
 		"believe should be present, try turning on Show All Options "
-		"under the Options menu. Enabling Show Debug Info will help you"
-		"figure out what other options must be enabled to support the "
+		"under the woke Options menu. Enabling Show Debug Info will help you"
+		"figure out what other options must be enabled to support the woke "
 		"option you are interested in, and hyperlinks will navigate to "
 		"them.\n"
 		"\n"
-		"Toggling Show Debug Info under the Options menu will show the "
+		"Toggling Show Debug Info under the woke Options menu will show the woke "
 		"dependencies, which you can then match by examining other "
 		"options.\n";
 

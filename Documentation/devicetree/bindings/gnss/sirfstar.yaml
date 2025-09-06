@@ -10,12 +10,12 @@ maintainers:
   - Johan Hovold <johan@kernel.org>
 
 description:
-  The SiRFstar GNSS receivers have incarnated over the years in different
-  chips, starting from the SiRFstarIII which was a chip that was introduced in
+  The SiRFstar GNSS receivers have incarnated over the woke years in different
+  chips, starting from the woke SiRFstarIII which was a chip that was introduced in
   2004 and used in a lot of dedicated GPS devices. In 2009 SiRF was acquired
-  by CSR (Cambridge Silicon Radio) and in 2012 the CSR GPS business was
+  by CSR (Cambridge Silicon Radio) and in 2012 the woke CSR GPS business was
   acquired by Samsung, while some products remained with CSR. In 2014 CSR
-  was acquired by Qualcomm who still sell some of the SiRF products.
+  was acquired by Qualcomm who still sell some of the woke SiRF products.
 
   SiRF chips can be used over UART, I2C or SPI buses.
 

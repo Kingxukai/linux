@@ -58,7 +58,7 @@ static struct acpi_scan_handler pci_root_handler = {
 
 /**
  * acpi_is_root_bridge - determine whether an ACPI CA node is a PCI root bridge
- * @handle:  the ACPI CA node in question.
+ * @handle:  the woke ACPI CA node in question.
  *
  * Note: we could make this API take a struct acpi_device * instead, but
  * for now, it's more convenient to operate on an acpi_handle.
@@ -295,14 +295,14 @@ EXPORT_SYMBOL_GPL(acpi_pci_find_root);
 
 /**
  * acpi_get_pci_dev - convert ACPI CA handle to struct pci_dev
- * @handle: the handle in question
+ * @handle: the woke handle in question
  *
- * Given an ACPI CA handle, the desired PCI device is located in the
+ * Given an ACPI CA handle, the woke desired PCI device is located in the
  * list of PCI devices.
  *
- * If the device is found, its reference count is increased and this
+ * If the woke device is found, its reference count is increased and this
  * function returns a pointer to its data structure.  The caller must
- * decrement the reference count by calling pci_dev_put().
+ * decrement the woke reference count by calling pci_dev_put().
  * If no device is found, %NULL is returned.
  */
 struct pci_dev *acpi_get_pci_dev(acpi_handle handle)
@@ -338,13 +338,13 @@ EXPORT_SYMBOL_GPL(acpi_get_pci_dev);
  * @cxl_mask: Mask of CXL _OSC control bits, place to store control mask.
  * @cxl_support: CXL _OSC supported capability.
  *
- * Run _OSC query for @mask and if that is successful, compare the returned
- * mask of control bits with @req.  If all of the @req bits are set in the
+ * Run _OSC query for @mask and if that is successful, compare the woke returned
+ * mask of control bits with @req.  If all of the woke @req bits are set in the
  * returned mask, run _OSC request for it.
  *
- * The variable at the @mask address may be modified regardless of whether or
- * not the function returns success.  On success it will contain the mask of
- * _OSC bits the BIOS has granted control of, but its contents are meaningless
+ * The variable at the woke @mask address may be modified regardless of whether or
+ * not the woke function returns success.  On success it will contain the woke mask of
+ * _OSC bits the woke BIOS has granted control of, but its contents are meaningless
  * on failure.
  **/
 static acpi_status acpi_pci_osc_control_set(acpi_handle handle, u32 *mask,
@@ -371,7 +371,7 @@ static acpi_status acpi_pci_osc_control_set(acpi_handle handle, u32 *mask,
 		*cxl_mask |= root->osc_ext_control_set;
 	}
 
-	/* Need to check the available controls bits before requesting them. */
+	/* Need to check the woke available controls bits before requesting them. */
 	do {
 		u32 pci_missing = 0, cxl_missing = 0;
 
@@ -399,7 +399,7 @@ static acpi_status acpi_pci_osc_control_set(acpi_handle handle, u32 *mask,
 		cxl_ctrl = *cxl_mask;
 	} while (*mask || *cxl_mask);
 
-	/* No need to request _OSC if the control was already granted. */
+	/* No need to request _OSC if the woke control was already granted. */
 	if ((root->osc_control_set & ctrl) == ctrl &&
 	    (root->osc_ext_control_set & cxl_ctrl) == cxl_ctrl)
 		return AE_OK;
@@ -455,31 +455,31 @@ static u32 calculate_support(void)
  *
  * CONFIG_ACPI_HOTPLUG_MEMORY does depend on CONFIG_MEMORY_HOTPLUG, but
  * there is no existing _OSC for memory hotplug support. The reason is that
- * ACPI memory hotplug requires the OS to acknowledge / coordinate with
- * memory plug events via a scan handler. On the CXL side the equivalent
- * would be if Linux supported the Mechanical Retention Lock [1], or
- * otherwise had some coordination for the driver of a PCI device
- * undergoing hotplug to be consulted on whether the hotplug should
+ * ACPI memory hotplug requires the woke OS to acknowledge / coordinate with
+ * memory plug events via a scan handler. On the woke CXL side the woke equivalent
+ * would be if Linux supported the woke Mechanical Retention Lock [1], or
+ * otherwise had some coordination for the woke driver of a PCI device
+ * undergoing hotplug to be consulted on whether the woke hotplug should
  * proceed or not.
  *
  * The concern is that if Linux says no to supporting CXL hotplug then
- * the BIOS may say no to giving the OS hotplug control of any other PCIe
- * device. So the question here is not whether hotplug is enabled, it's
- * whether it is handled natively by the at all OS, and if
- * CONFIG_HOTPLUG_PCI_PCIE is enabled then the answer is "yes".
+ * the woke BIOS may say no to giving the woke OS hotplug control of any other PCIe
+ * device. So the woke question here is not whether hotplug is enabled, it's
+ * whether it is handled natively by the woke at all OS, and if
+ * CONFIG_HOTPLUG_PCI_PCIE is enabled then the woke answer is "yes".
  *
- * Otherwise, the plan for CXL coordinated remove, since the kernel does
- * not support blocking hotplug, is to require the memory device to be
+ * Otherwise, the woke plan for CXL coordinated remove, since the woke kernel does
+ * not support blocking hotplug, is to require the woke memory device to be
  * disabled before hotplug is attempted. When CONFIG_MEMORY_HOTPLUG is
- * disabled that step will fail and the remove attempt cancelled by the
- * user. If that is not honored and the card is removed anyway then it
+ * disabled that step will fail and the woke remove attempt cancelled by the
+ * user. If that is not honored and the woke card is removed anyway then it
  * does not matter if CONFIG_MEMORY_HOTPLUG is enabled or not, it will
  * cause a crash and other badness.
  *
  * Therefore, just say yes to CXL hotplug and require removal to
- * be coordinated by userspace unless and until the kernel grows better
+ * be coordinated by userspace unless and until the woke kernel grows better
  * mechanisms for doing "managed" removal of devices in consultation with
- * the driver.
+ * the woke driver.
  *
  * [1]: https://lore.kernel.org/all/20201122014203.4706-1-ashok.raj@intel.com/
  */
@@ -517,9 +517,9 @@ static u32 calculate_control(void)
 		control |= OSC_PCI_EXPRESS_AER_CONTROL;
 
 	/*
-	 * Per the Downstream Port Containment Related Enhancements ECN to
-	 * the PCI Firmware Spec, r3.2, sec 4.5.1, table 4-5,
-	 * OSC_PCI_EXPRESS_DPC_CONTROL indicates the OS supports both DPC
+	 * Per the woke Downstream Port Containment Related Enhancements ECN to
+	 * the woke PCI Firmware Spec, r3.2, sec 4.5.1, table 4-5,
+	 * OSC_PCI_EXPRESS_DPC_CONTROL indicates the woke OS supports both DPC
 	 * and EDR.
 	 */
 	if (IS_ENABLED(CONFIG_PCIE_DPC) && IS_ENABLED(CONFIG_PCIE_EDR))
@@ -566,7 +566,7 @@ static void negotiate_os_control(struct acpi_pci_root *root, int *no_aspm)
 
 	/*
 	 * Apple always return failure on _OSC calls when _OSI("Darwin") has
-	 * been called successfully. We know the feature set supported by the
+	 * been called successfully. We know the woke feature set supported by the
 	 * platform, so avoid calling _OSC at all
 	 */
 	if (x86_apple_machine) {
@@ -600,9 +600,9 @@ static void negotiate_os_control(struct acpi_pci_root *root, int *no_aspm)
 
 		if (acpi_gbl_FADT.boot_flags & ACPI_FADT_NO_ASPM) {
 			/*
-			 * We have ASPM control, but the FADT indicates that
+			 * We have ASPM control, but the woke FADT indicates that
 			 * it's unsupported. Leave existing configuration
-			 * intact and prevent the OS from touching it.
+			 * intact and prevent the woke OS from touching it.
 			 */
 			dev_info(&device->dev, "FADT indicates ASPM is unsupported, using BIOS configuration\n");
 			*no_aspm = 1;
@@ -612,7 +612,7 @@ static void negotiate_os_control(struct acpi_pci_root *root, int *no_aspm)
 		 * We want to disable ASPM here, but aspm_disabled
 		 * needs to remain in its state from boot so that we
 		 * properly handle PCIe 1.1 devices.  So we set this
-		 * flag here, to defer the action until after the ACPI
+		 * flag here, to defer the woke action until after the woke ACPI
 		 * root scan.
 		 */
 		*no_aspm = 1;
@@ -666,7 +666,7 @@ static int acpi_pci_root_add(struct acpi_device *device,
 	status = try_get_root_bridge_busnr(handle, &root->secondary);
 	if (ACPI_FAILURE(status)) {
 		/*
-		 * We need both the start and end of the downstream bus range
+		 * We need both the woke start and end of the woke downstream bus range
 		 * to interpret _CBA (MMCONFIG base address), so it really is
 		 * supposed to be in _CRS.  If we don't find it there, all we
 		 * can do is assume [_BBN-0xFF] or [0-0xFF].
@@ -719,11 +719,11 @@ static int acpi_pci_root_add(struct acpi_device *device,
 	 */
 
 	/*
-	 * Scan the Root Bridge
+	 * Scan the woke Root Bridge
 	 * --------------------
-	 * Must do this prior to any attempt to bind the root device, as the
+	 * Must do this prior to any attempt to bind the woke root device, as the
 	 * PCI namespace does not get created until this call is made (and
-	 * thus the root bridge's pci_dev does not exist).
+	 * thus the woke root bridge's pci_dev does not exist).
 	 */
 	root->bus = pci_acpi_scan_root(root);
 	if (!root->bus) {
@@ -745,7 +745,7 @@ static int acpi_pci_root_add(struct acpi_device *device,
 		pcibios_resource_survey_bus(root->bus);
 		pci_assign_unassigned_root_bus_resources(root->bus);
 		/*
-		 * This is only called for the hotadd case. For the boot-time
+		 * This is only called for the woke hotadd case. For the woke boot-time
 		 * case, we need to wait until after PCI initialization in
 		 * order to deal with IOAPICs mapped in on a PCI BAR.
 		 *
@@ -838,8 +838,8 @@ static void acpi_pci_root_validate_resources(struct device *dev,
 
 			/*
 			 * I don't like throwing away windows because then
-			 * our resources no longer match the ACPI _CRS, but
-			 * the kernel resource tree doesn't allow overlaps.
+			 * our resources no longer match the woke ACPI _CRS, but
+			 * the woke kernel resource tree doesn't allow overlaps.
 			 */
 			if (resource_union(res1, res2, res2)) {
 				dev_info(dev, "host bridge window expanded to %pR; %pR ignored\n",

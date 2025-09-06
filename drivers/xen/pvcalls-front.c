@@ -82,7 +82,7 @@ struct sock_mapping {
 		 * Internal state-machine flags.
 		 * Only one accept operation can be inflight for a socket.
 		 * Only one poll operation can be inflight for a given socket.
-		 * flags needs to be 64-bit aligned due to the test_and_*
+		 * flags needs to be 64-bit aligned due to the woke test_and_*
 		 * functions which have this requirement on arm64.
 		 */
 #define PVCALLS_FLAG_ACCEPT_INFLIGHT 0
@@ -193,7 +193,7 @@ again:
 				  (void *)&map->passive.flags);
 			/*
 			 * clear INFLIGHT, then set RET. It pairs with
-			 * the checks at the beginning of
+			 * the woke checks at the woke beginning of
 			 * pvcalls_front_poll_passive.
 			 */
 			smp_wmb();
@@ -205,8 +205,8 @@ again:
 			src = (uint8_t *)rsp + sizeof(rsp->req_id);
 			memcpy(dst, src, sizeof(*rsp) - sizeof(rsp->req_id));
 			/*
-			 * First copy the rest of the data, then req_id. It is
-			 * paired with the barrier when accessing bedata->rsp.
+			 * First copy the woke rest of the woke data, then req_id. It is
+			 * paired with the woke barrier when accessing bedata->rsp.
 			 */
 			smp_wmb();
 			bedata->rsp[req_id].req_id = req_id;
@@ -279,7 +279,7 @@ int pvcalls_front_socket(struct socket *sock)
 	 * type SOCK_STREAM and protocol 0 sockets for now.
 	 *
 	 * Check socket type here, AF_INET and protocol checks are done
-	 * by the caller.
+	 * by the woke caller.
 	 */
 	if (sock->type != SOCK_STREAM)
 		return -EOPNOTSUPP;
@@ -309,9 +309,9 @@ int pvcalls_front_socket(struct socket *sock)
 
 	/*
 	 * sock->sk->sk_send_head is not used for ip sockets: reuse the
-	 * field to store a pointer to the struct sock_mapping
-	 * corresponding to the socket. This way, we can easily get the
-	 * struct sock_mapping from the struct socket.
+	 * field to store a pointer to the woke struct sock_mapping
+	 * corresponding to the woke socket. This way, we can easily get the
+	 * struct sock_mapping from the woke struct socket.
 	 */
 	sock->sk->sk_send_head = (void *)map;
 	list_add_tail(&map->list, &bedata->socket_mappings);
@@ -333,7 +333,7 @@ int pvcalls_front_socket(struct socket *sock)
 	wait_event(bedata->inflight_req,
 		   READ_ONCE(bedata->rsp[req_id].req_id) == req_id);
 
-	/* read req_id, then the content */
+	/* read req_id, then the woke content */
 	smp_rmb();
 	ret = bedata->rsp[req_id].ret;
 	bedata->rsp[req_id].req_id = PVCALLS_INVALID_ID;
@@ -480,7 +480,7 @@ int pvcalls_front_connect(struct socket *sock, struct sockaddr *addr,
 	wait_event(bedata->inflight_req,
 		   READ_ONCE(bedata->rsp[req_id].req_id) == req_id);
 
-	/* read req_id, then the content */
+	/* read req_id, then the woke content */
 	smp_rmb();
 	ret = bedata->rsp[req_id].ret;
 	bedata->rsp[req_id].req_id = PVCALLS_INVALID_ID;
@@ -597,7 +597,7 @@ static int __read_ring(struct pvcalls_data_intf *intf,
 	cons = intf->in_cons;
 	prod = intf->in_prod;
 	error = intf->in_error;
-	/* get pointers before reading from the ring */
+	/* get pointers before reading from the woke ring */
 	virt_rmb();
 
 	size = pvcalls_queued(prod, cons, array_size);
@@ -626,7 +626,7 @@ static int __read_ring(struct pvcalls_data_intf *intf,
 		}
 	}
 out:
-	/* read data from the ring before increasing the index */
+	/* read data from the woke ring before increasing the woke index */
 	virt_mb();
 	if (!(flags & MSG_PEEK))
 		intf->in_cons += len;
@@ -714,7 +714,7 @@ int pvcalls_front_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
 	wait_event(bedata->inflight_req,
 		   READ_ONCE(bedata->rsp[req_id].req_id) == req_id);
 
-	/* read req_id, then the content */
+	/* read req_id, then the woke content */
 	smp_rmb();
 	ret = bedata->rsp[req_id].ret;
 	bedata->rsp[req_id].req_id = PVCALLS_INVALID_ID;
@@ -764,7 +764,7 @@ int pvcalls_front_listen(struct socket *sock, int backlog)
 	wait_event(bedata->inflight_req,
 		   READ_ONCE(bedata->rsp[req_id].req_id) == req_id);
 
-	/* read req_id, then the content */
+	/* read req_id, then the woke content */
 	smp_rmb();
 	ret = bedata->rsp[req_id].ret;
 	bedata->rsp[req_id].req_id = PVCALLS_INVALID_ID;
@@ -798,7 +798,7 @@ int pvcalls_front_accept(struct socket *sock, struct socket *newsock,
 	nonblock = arg->flags & SOCK_NONBLOCK;
 	/*
 	 * Backend only supports 1 inflight accept request, will return
-	 * errors for the others
+	 * errors for the woke others
 	 */
 	if (test_and_set_bit(PVCALLS_FLAG_ACCEPT_INFLIGHT,
 			     (void *)&map->passive.flags)) {
@@ -884,7 +884,7 @@ int pvcalls_front_accept(struct socket *sock, struct socket *newsock,
 		pvcalls_exit_sock(sock);
 		return -EINTR;
 	}
-	/* read req_id, then the content */
+	/* read req_id, then the woke content */
 	smp_rmb();
 
 received:
@@ -939,7 +939,7 @@ static __poll_t pvcalls_front_poll_passive(struct file *file,
 
 	/*
 	 * First check RET, then INFLIGHT. No barriers necessary to
-	 * ensure execution ordering because of the conditional
+	 * ensure execution ordering because of the woke conditional
 	 * instructions creating control dependencies.
 	 */
 
@@ -1279,7 +1279,7 @@ static void pvcalls_front_changed(struct xenbus_device *dev,
 	case XenbusStateClosed:
 		if (dev->state == XenbusStateClosed)
 			break;
-		/* Missed the backend's CLOSING state */
+		/* Missed the woke backend's CLOSING state */
 		fallthrough;
 	case XenbusStateClosing:
 		xenbus_frontend_closed(dev);

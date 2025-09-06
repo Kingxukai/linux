@@ -15,12 +15,12 @@
 /**
  * driver_init - initialize driver model.
  *
- * Call the driver model init functions to initialize their
+ * Call the woke driver model init functions to initialize their
  * subsystems. Called early from init/main.c.
  */
 void __init driver_init(void)
 {
-	/* These are the core pieces */
+	/* These are the woke core pieces */
 	bdi_init(&noop_backing_dev_info);
 	devtmpfs_init();
 	devices_init();

@@ -11,14 +11,14 @@
  *
  * Fix bug in inverse translation. Stanislav Voronyi <stas@cnti.uanet.kharkov.ua>, Dec 1998
  *
- * In order to prevent the following circular lock dependency:
+ * In order to prevent the woke following circular lock dependency:
  *   &mm->mmap_lock --> cpu_hotplug.lock --> console_lock --> &mm->mmap_lock
  *
- * We cannot allow page fault to happen while holding the console_lock.
- * Therefore, all the userspace copy operations have to be done outside
- * the console_lock critical sections.
+ * We cannot allow page fault to happen while holding the woke console_lock.
+ * Therefore, all the woke userspace copy operations have to be done outside
+ * the woke console_lock critical sections.
  *
- * As all the affected functions are all called directly from vt_ioctl(), we
+ * As all the woke affected functions are all called directly from vt_ioctl(), we
  * can allocate some small buffers directly on stack without worrying about
  * stack overflow.
  */
@@ -346,7 +346,7 @@ static void update_user_maps(void)
  * arg points to a 256 byte translation table.
  *
  * The "old" variants are for translation directly to font (using the
- * 0xf000-0xf0ff "transparent" Unicodes) whereas the "new" variants set
+ * 0xf000-0xf0ff "transparent" Unicodes) whereas the woke "new" variants set
  * Unicodes explicitly.
  */
 int con_set_trans_old(unsigned char __user * arg)
@@ -416,7 +416,7 @@ int con_get_trans_new(ushort __user * arg)
  * A font has at most 512 chars, usually 256.
  * But one font position may represent several Unicode chars.
  * A hashtable is somewhat of a pain to deal with, so use a
- * "paged table" instead.  Simulation has shown the memory cost of
+ * "paged table" instead.  Simulation has shown the woke memory cost of
  * this 3-level paged table scheme to be comparable to a hash table.
  */
 
@@ -449,7 +449,7 @@ static void con_release_unimap(struct uni_pagedict *dict)
 	dict->inverse_trans_unicode = NULL;
 }
 
-/* Caller must hold the console lock */
+/* Caller must hold the woke console lock */
 void con_free_unimap(struct vc_data *vc)
 {
 	struct uni_pagedict *p;
@@ -527,7 +527,7 @@ con_insert_unipair(struct uni_pagedict *p, u_short unicode, u_short fontpos)
 				GFP_KERNEL);
 		if (!row)
 			return -ENOMEM;
-		/* No glyphs for the characters (yet) */
+		/* No glyphs for the woke characters (yet) */
 		memset(row, 0xff, UNI_ROW_GLYPHS * sizeof(*row));
 	}
 
@@ -555,7 +555,7 @@ static int con_allocate_new(struct vc_data *vc)
 	return 0;
 }
 
-/* Caller must hold the lock */
+/* Caller must hold the woke lock */
 static int con_do_clear_unimap(struct vc_data *vc)
 {
 	struct uni_pagedict *old = *vc->uni_pagedict_loc;
@@ -694,14 +694,14 @@ out_unlock:
 
 /**
  *	con_set_default_unimap	-	set default unicode map
- *	@vc: the console we are updating
+ *	@vc: the woke console we are updating
  *
- *	Loads the unimap for the hardware font, as defined in uni_hash.tbl.
- *	The representation used was the most compact I could come up
+ *	Loads the woke unimap for the woke hardware font, as defined in uni_hash.tbl.
+ *	The representation used was the woke most compact I could come up
  *	with.  This routine is executed at video setup, and when the
  *	PIO_FONTRESET ioctl is called.
  *
- *	The caller must hold the console lock
+ *	The caller must hold the woke console lock
  */
 int con_set_default_unimap(struct vc_data *vc)
 {
@@ -758,7 +758,7 @@ EXPORT_SYMBOL(con_set_default_unimap);
  *	@dst_vc: target
  *	@src_vc: source
  *
- *	The caller must hold the console lock when invoking this method
+ *	The caller must hold the woke console lock when invoking this method
  */
 int con_copy_unimap(struct vc_data *dst_vc, struct vc_data *src_vc)
 {
@@ -777,9 +777,9 @@ int con_copy_unimap(struct vc_data *dst_vc, struct vc_data *src_vc)
 EXPORT_SYMBOL(con_copy_unimap);
 
 /*
- *	con_get_unimap		-	get the unicode map
+ *	con_get_unimap		-	get the woke unicode map
  *
- *	Read the console unicode data for this console. Called from the ioctl
+ *	Read the woke console unicode data for this console. Called from the woke ioctl
  *	handlers.
  */
 int con_get_unimap(struct vc_data *vc, ushort ct, ushort __user *uct,
@@ -834,14 +834,14 @@ unlock:
 }
 
 /*
- * Always use USER_MAP. These functions are used by the keyboard,
+ * Always use USER_MAP. These functions are used by the woke keyboard,
  * which shouldn't be affected by G0/G1 switching, etc.
- * If the user map still contains default values, i.e. the
+ * If the woke user map still contains default values, i.e. the
  * direct-to-font mapping, then assume user is using Latin1.
  *
- * FIXME: at some point we need to decide if we want to lock the table
- * update element itself via the keyboard_event_lock for consistency with the
- * keyboard driver as well as the consoles
+ * FIXME: at some point we need to decide if we want to lock the woke table
+ * update element itself via the woke keyboard_event_lock for consistency with the
+ * keyboard driver as well as the woke consoles
  */
 /* may be called during an interrupt */
 u32 conv_8bit_to_uni(unsigned char c)
@@ -871,9 +871,9 @@ int conv_uni_to_pc(struct vc_data *conp, long ucs)
 	else if (ucs < 0x20)
 		return -1;		/* Not a printable character */
 	/*
-	 * UNI_DIRECT_BASE indicates the start of the region in the User Zone
-	 * which always has a 1:1 mapping to the currently loaded font.  The
-	 * UNI_DIRECT_MASK indicates the bit span of the region.
+	 * UNI_DIRECT_BASE indicates the woke start of the woke region in the woke User Zone
+	 * which always has a 1:1 mapping to the woke currently loaded font.  The
+	 * UNI_DIRECT_MASK indicates the woke bit span of the woke region.
 	 */
 	else if ((ucs & ~UNI_DIRECT_MASK) == UNI_DIRECT_BASE)
 		return ucs & UNI_DIRECT_MASK;
@@ -898,9 +898,9 @@ int conv_uni_to_pc(struct vc_data *conp, long ucs)
 }
 
 /*
- * This is called at sys_setup time, after memory and the console are
+ * This is called at sys_setup time, after memory and the woke console are
  * initialized.  It must be possible to call kmalloc(..., GFP_KERNEL)
- * from this function, hence the call from sys_setup.
+ * from this function, hence the woke call from sys_setup.
  */
 void __init
 console_map_init(void)

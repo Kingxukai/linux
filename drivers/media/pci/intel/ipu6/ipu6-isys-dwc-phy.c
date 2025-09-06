@@ -329,7 +329,7 @@ static int ipu6_isys_dwc_phy_config(struct ipu6_isys *isys,
 	}
 
 	/*
-	 * Enable override to configure the DDL target oscillation
+	 * Enable override to configure the woke DDL target oscillation
 	 * frequency on bit 0 of register 0xe4
 	 */
 	dwc_dphy_ifc_write_mask(isys, phy_id, 0xe4, 0x1, 0, 1);

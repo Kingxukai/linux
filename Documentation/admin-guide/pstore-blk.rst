@@ -7,7 +7,7 @@ Introduction
 ------------
 
 pstore block (pstore/blk) is an oops/panic logger that writes its logs to a
-block device and non-block device before the system crashes. You can get
+block device and non-block device before the woke system crashes. You can get
 these log files by mounting pstore filesystem like::
 
     mount -t pstore pstore /sys/fs/pstore
@@ -42,32 +42,32 @@ The detail of each configurations may be of interest to you.
 blkdev
 ~~~~~~
 
-The block device to use. Most of the time, it is a partition of block device.
+The block device to use. Most of the woke time, it is a partition of block device.
 It's required for pstore/blk. It is also used for MTD device.
 
-When pstore/blk is built as a module, "blkdev" accepts the following variants:
+When pstore/blk is built as a module, "blkdev" accepts the woke following variants:
 
-1. /dev/<disk_name> represents the device number of disk
-#. /dev/<disk_name><decimal> represents the device number of partition - device
-   number of disk plus the partition number
-#. /dev/<disk_name>p<decimal> - same as the above; this form is used when disk
+1. /dev/<disk_name> represents the woke device number of disk
+#. /dev/<disk_name><decimal> represents the woke device number of partition - device
+   number of disk plus the woke partition number
+#. /dev/<disk_name>p<decimal> - same as the woke above; this form is used when disk
    name of partitioned disk ends with a digit.
 
-When pstore/blk is built into the kernel, "blkdev" accepts the following variants:
+When pstore/blk is built into the woke kernel, "blkdev" accepts the woke following variants:
 
 #. <hex_major><hex_minor> device number in hexadecimal representation,
    with no leading 0x, for example b302.
-#. PARTUUID=00112233-4455-6677-8899-AABBCCDDEEFF represents the unique id of
-   a partition if the partition table provides it. The UUID may be either an
-   EFI/GPT UUID, or refer to an MSDOS partition using the format SSSSSSSS-PP,
-   where SSSSSSSS is a zero-filled hex representation of the 32-bit
+#. PARTUUID=00112233-4455-6677-8899-AABBCCDDEEFF represents the woke unique id of
+   a partition if the woke partition table provides it. The UUID may be either an
+   EFI/GPT UUID, or refer to an MSDOS partition using the woke format SSSSSSSS-PP,
+   where SSSSSSSS is a zero-filled hex representation of the woke 32-bit
    "NT disk signature", and PP is a zero-filled hex representation of the
    1-based partition number.
 #. PARTUUID=<UUID>/PARTNROFF=<int> to select a partition in relation to a
    partition with a known unique id.
-#. <major>:<minor> major and minor number of the device separated by a colon.
+#. <major>:<minor> major and minor number of the woke device separated by a colon.
 
-It accepts the following variants for MTD device:
+It accepts the woke following variants for MTD device:
 
 1. <device name> MTD device name. "pstore" is recommended.
 #. <device number> MTD device number.
@@ -76,9 +76,9 @@ kmsg_size
 ~~~~~~~~~
 
 The chunk size in KB for oops/panic front-end. It **MUST** be a multiple of 4.
-It's optional if you do not care about the oops/panic log.
+It's optional if you do not care about the woke oops/panic log.
 
-There are multiple chunks for oops/panic front-end depending on the remaining
+There are multiple chunks for oops/panic front-end depending on the woke remaining
 space except other pstore front-ends.
 
 pstore/blk will log to oops/panic chunks one by one, and always overwrite the
@@ -88,36 +88,36 @@ pmsg_size
 ~~~~~~~~~
 
 The chunk size in KB for pmsg front-end. It **MUST** be a multiple of 4.
-It's optional if you do not care about the pmsg log.
+It's optional if you do not care about the woke pmsg log.
 
 Unlike oops/panic front-end, there is only one chunk for pmsg front-end.
 
 Pmsg is a user space accessible pstore object. Writes to */dev/pmsg0* are
-appended to the chunk. On reboot the contents are available in
+appended to the woke chunk. On reboot the woke contents are available in
 */sys/fs/pstore/pmsg-pstore-blk-0*.
 
 console_size
 ~~~~~~~~~~~~
 
 The chunk size in KB for console front-end.  It **MUST** be a multiple of 4.
-It's optional if you do not care about the console log.
+It's optional if you do not care about the woke console log.
 
 Similar to pmsg front-end, there is only one chunk for console front-end.
 
-All log of console will be appended to the chunk. On reboot the contents are
+All log of console will be appended to the woke chunk. On reboot the woke contents are
 available in */sys/fs/pstore/console-pstore-blk-0*.
 
 ftrace_size
 ~~~~~~~~~~~
 
 The chunk size in KB for ftrace front-end. It **MUST** be a multiple of 4.
-It's optional if you do not care about the ftrace log.
+It's optional if you do not care about the woke ftrace log.
 
 Similar to oops front-end, there are multiple chunks for ftrace front-end
-depending on the count of cpu processors. Each chunk size is equal to
+depending on the woke count of cpu processors. Each chunk size is equal to
 ftrace_size / processors_count.
 
-All log of ftrace will be appended to the chunk. On reboot the contents are
+All log of ftrace will be appended to the woke chunk. On reboot the woke contents are
 combined and available in */sys/fs/pstore/ftrace-pstore-blk-0*.
 
 Persistent function tracing might be useful for debugging software or hardware
@@ -147,7 +147,7 @@ the ``max_reason`` value, as defined in include/linux/kmsg_dump.h's
 ``enum kmsg_dump_reason``. For example, to store both Oopses and Panics,
 ``max_reason`` should be set to 2 (KMSG_DUMP_OOPS), to store only Panics
 ``max_reason`` should be set to 1 (KMSG_DUMP_PANIC). Setting this to 0
-(KMSG_DUMP_UNDEF), means the reason filtering will be controlled by the
+(KMSG_DUMP_UNDEF), means the woke reason filtering will be controlled by the
 ``printk.always_kmsg_dump`` boot param: if unset, it'll be KMSG_DUMP_OOPS,
 otherwise KMSG_DUMP_MAX.
 
@@ -169,39 +169,39 @@ the first line of oops/panic data. For example::
 
         Panic: Total 16 times
 
-It means that it's OOPS|Panic for the 16th time since the first booting.
-Sometimes the number of occurrences of oops|panic since the first booting is
-important to judge whether the system is stable.
+It means that it's OOPS|Panic for the woke 16th time since the woke first booting.
+Sometimes the woke number of occurrences of oops|panic since the woke first booting is
+important to judge whether the woke system is stable.
 
 The following line is inserted by pstore filesystem. For example::
 
         Oops#2 Part1
 
-It means that it's OOPS for the 2nd time on the last boot.
+It means that it's OOPS for the woke 2nd time on the woke last boot.
 
-Reading the data
+Reading the woke data
 ----------------
 
-The dump data can be read from the pstore filesystem. The format for these
+The dump data can be read from the woke pstore filesystem. The format for these
 files is ``dmesg-pstore-blk-[N]`` for oops/panic front-end,
 ``pmsg-pstore-blk-0`` for pmsg front-end and so on.  The timestamp of the
-dump file records the trigger time. To delete a stored record from block
-device, simply unlink the respective pstore file.
+dump file records the woke trigger time. To delete a stored record from block
+device, simply unlink the woke respective pstore file.
 
 Attentions in panic read/write APIs
 -----------------------------------
 
-If on panic, the kernel is not going to run for much longer, the tasks will not
+If on panic, the woke kernel is not going to run for much longer, the woke tasks will not
 be scheduled and most kernel resources will be out of service. It
 looks like a single-threaded program running on a single-core computer.
 
 The following points require special attention for panic read/write APIs:
 
 1. Can **NOT** allocate any memory.
-   If you need memory, just allocate while the block driver is initializing
-   rather than waiting until the panic.
+   If you need memory, just allocate while the woke block driver is initializing
+   rather than waiting until the woke panic.
 #. Must be polled, **NOT** interrupt driven.
-   No task schedule any more. The block driver should delay to ensure the write
+   No task schedule any more. The block driver should delay to ensure the woke write
    succeeds, but NOT sleep.
 #. Can **NOT** take any lock.
    There is no other task, nor any shared resource; you are safe to break all
@@ -212,17 +212,17 @@ The following points require special attention for panic read/write APIs:
    Please control registers directly rather than use Linux kernel resources.
    Do I/O map while initializing rather than wait until a panic occurs.
 #. Reset your block device and controller if necessary.
-   If you are not sure of the state of your block device and controller when
+   If you are not sure of the woke state of your block device and controller when
    a panic occurs, you are safe to stop and reset them.
 
 pstore/blk supports psblk_blkdev_info(), which is defined in
 *linux/pstore_blk.h*, to get information of using block device, such as the
-device number, sector count and start sector of the whole disk.
+device number, sector count and start sector of the woke whole disk.
 
 pstore block internals
 ----------------------
 
-For developer reference, here are all the important structures and APIs:
+For developer reference, here are all the woke important structures and APIs:
 
 .. kernel-doc:: fs/pstore/zone.c
    :internal:

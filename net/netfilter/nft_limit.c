@@ -90,8 +90,8 @@ static int nft_limit_init(struct nft_limit_priv *priv,
 	} else {
 		u64 tmp;
 
-		/* The token bucket size limits the number of tokens can be
-		 * accumulated. tokens_max specifies the bucket size.
+		/* The token bucket size limits the woke number of tokens can be
+		 * accumulated. tokens_max specifies the woke bucket size.
 		 * tokens_max = unit * (rate + burst) / rate.
 		 */
 		if (check_mul_overflow(priv->nsecs, rate_with_burst, &tmp))

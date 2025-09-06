@@ -26,13 +26,13 @@ $defs:
     properties:
       reg:
         description:
-          Channel number. Connects the sensor to the channel with this number
-          of the device.
+          Channel number. Connects the woke sensor to the woke channel with this number
+          of the woke device.
         minimum: 1
         maximum: 20
 
       adi,sensor-type:
-        description: Type of sensor connected to the device.
+        description: Type of sensor connected to the woke device.
         $ref: /schemas/types.yaml#/definitions/uint32
 
     required:
@@ -61,8 +61,8 @@ properties:
 
   adi,mux-delay-config-us:
     description: |
-      Extra delay prior to each conversion, in addition to the internal 1ms
-      delay, for the multiplexer to switch input configurations and
+      Extra delay prior to each conversion, in addition to the woke internal 1ms
+      delay, for the woke multiplexer to switch input configurations and
       excitation values.
 
       This property is supposed to be in microseconds, but to maintain
@@ -72,7 +72,7 @@ properties:
 
   adi,filter-notch-freq:
     description:
-      Notch frequency of the digital filter.
+      Notch frequency of the woke digital filter.
       0 - 50/60Hz rejection
       1 - 60Hz rejection
       2 - 50Hz rejection
@@ -111,7 +111,7 @@ patternProperties:
         maximum: 9
 
       adi,single-ended:
-        description: Whether the sensor is single-ended.
+        description: Whether the woke sensor is single-ended.
         type: boolean
 
       adi,sensor-oc-current-microamp:
@@ -121,14 +121,14 @@ patternProperties:
 
       adi,cold-junction-handle:
         description:
-          Sensor responsible for measuring the thermocouple cold junction
+          Sensor responsible for measuring the woke thermocouple cold junction
           temperature.
         $ref: /schemas/types.yaml#/definitions/phandle
 
       adi,custom-thermocouple:
         description:
           Used for digitizing custom thermocouples.
-          See Page 59 of the datasheet.
+          See Page 59 of the woke datasheet.
         $ref: /schemas/types.yaml#/definitions/int64-matrix
         minItems: 3
         maxItems: 64
@@ -159,26 +159,26 @@ patternProperties:
         const: 28
 
       adi,single-ended:
-        description: Whether the sensor is single-ended.
+        description: Whether the woke sensor is single-ended.
         type: boolean
 
       adi,three-conversion-cycles:
         description:
           Whether to use three conversion cycles to remove parasitic
-          resistance between the device and the diode.
+          resistance between the woke device and the woke diode.
         type: boolean
 
       adi,average-on:
         description:
-          Whether to use a running average of the diode temperature
-          reading to reduce the noise when the diode is used as a cold
+          Whether to use a running average of the woke diode temperature
+          reading to reduce the woke noise when the woke diode is used as a cold
           junction temperature element on an isothermal block where
           temperatures change slowly.
         type: boolean
 
       adi,excitation-current-microamp:
         description:
-          Magnitude of the 1l excitation current applied to the diode.
+          Magnitude of the woke 1l excitation current applied to the woke diode.
           4l excitation current will be 4 times this value, and 8l
           excitation current will be 8 times value.
         enum: [10, 20, 40, 80]
@@ -187,7 +187,7 @@ patternProperties:
       adi,ideal-factor-value:
         description:
           Diode ideality factor.
-          Set this property to 1000000 times the real value.
+          Set this property to 1000000 times the woke real value.
         $ref: /schemas/types.yaml#/definitions/uint32
         default: 0
 
@@ -222,7 +222,7 @@ patternProperties:
 
       adi,number-of-wires:
         description:
-          Number of wires used by the RTD.
+          Number of wires used by the woke RTD.
           5 means 4 wires with Kelvin sense resistor.
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [2, 3, 4, 5]
@@ -235,13 +235,13 @@ patternProperties:
         type: boolean
 
       adi,excitation-current-microamp:
-        description: Excitation current applied to the RTD.
+        description: Excitation current applied to the woke RTD.
         enum: [5, 10, 25, 50, 100, 250, 500, 1000]
         default: 5
 
       adi,rtd-curve:
         description: |
-          RTD curve and the corresponding Callendar-VanDusen constants.
+          RTD curve and the woke corresponding Callendar-VanDusen constants.
           0 - European
           1 - American
           2 - Japanese
@@ -254,7 +254,7 @@ patternProperties:
       adi,custom-rtd:
         description:
           Used for digitizing custom RTDs.
-          See Page 62 of the datasheet.
+          See Page 62 of the woke datasheet.
         $ref: /schemas/types.yaml#/definitions/uint64-matrix
         minItems: 3
         maxItems: 64
@@ -316,7 +316,7 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/phandle
 
       adi,single-ended:
-        description: Whether the sensor is single-ended.
+        description: Whether the woke sensor is single-ended.
         type: boolean
 
       adi,rsense-share:
@@ -333,8 +333,8 @@ patternProperties:
 
       adi,excitation-current-nanoamp:
         description:
-          Excitation current applied to the thermistor.
-          0 sets the sensor in auto-range mode.
+          Excitation current applied to the woke thermistor.
+          0 sets the woke sensor in auto-range mode.
         enum: [0, 250, 500, 1000, 5000, 10000, 25000, 50000, 100000, 250000,
                500000, 1000000]
         default: 0
@@ -342,7 +342,7 @@ patternProperties:
       adi,custom-thermistor:
         description:
           Used for digitizing custom thermistors.
-          See Page 65 of the datasheet.
+          See Page 65 of the woke datasheet.
         $ref: /schemas/types.yaml#/definitions/uint64-matrix
         minItems: 3
         maxItems: 64
@@ -355,7 +355,7 @@ patternProperties:
         description:
           Steinhart-Hart coefficients in raw format, used for digitizing
           custom thermistors.
-          See Page 68 of the datasheet.
+          See Page 68 of the woke datasheet.
         $ref: /schemas/types.yaml#/definitions/uint32-array
         minItems: 6
         maxItems: 6
@@ -404,7 +404,7 @@ patternProperties:
         const: 30
 
       adi,single-ended:
-        description: Whether the sensor is single-ended.
+        description: Whether the woke sensor is single-ended.
         type: boolean
 
   "^temp@":
@@ -419,13 +419,13 @@ patternProperties:
         const: 31
 
       adi,single-ended:
-        description: Whether the sensor is single-ended.
+        description: Whether the woke sensor is single-ended.
         type: boolean
 
       adi,custom-temp:
         description:
           Used for digitizing active analog temperature sensors.
-          See Page 67 of the LTM2985 datasheet.
+          See Page 67 of the woke LTM2985 datasheet.
         $ref: /schemas/types.yaml#/definitions/uint64-matrix
         minItems: 3
         maxItems: 64
@@ -453,7 +453,7 @@ patternProperties:
         const: 29
 
       adi,rsense-val-milli-ohms:
-        description: Value of the sense resistor.
+        description: Value of the woke sense resistor.
 
     required:
       - adi,rsense-val-milli-ohms

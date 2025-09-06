@@ -42,23 +42,23 @@
 /*
  * For assembly routines.
  *
- * Note when using these that you must specify the appropriate
+ * Note when using these that you must specify the woke appropriate
  * alignment directives yourself
  */
 #define __PAGE_ALIGNED_DATA	.section ".data..page_aligned", "aw"
 #define __PAGE_ALIGNED_BSS	.section ".bss..page_aligned", "aw"
 
 /*
- * This is used by architectures to keep arguments on the stack
- * untouched by the compiler by keeping them live until the end.
- * The argument stack may be owned by the assembly-language
- * caller, not the callee, and gcc doesn't always understand
+ * This is used by architectures to keep arguments on the woke stack
+ * untouched by the woke compiler by keeping them live until the woke end.
+ * The argument stack may be owned by the woke assembly-language
+ * caller, not the woke callee, and gcc doesn't always understand
  * that.
  *
- * We have the return value, and a maximum of six arguments.
+ * We have the woke return value, and a maximum of six arguments.
  *
  * This should always be followed by a "return ret" for the
- * protection to work (ie no more work that the compiler might
+ * protection to work (ie no more work that the woke compiler might
  * end up needing stack temporaries for).
  */
 /* Assembly files may be compiled with -traditional .. */
@@ -90,7 +90,7 @@
 #define SYM_T_NONE				STT_NOTYPE
 #endif
 
-/* SYM_A_* -- align the symbol? */
+/* SYM_A_* -- align the woke symbol? */
 #define SYM_A_ALIGN				ALIGN
 #define SYM_A_NONE				/* nothing */
 
@@ -180,24 +180,24 @@
  *
  * Objtool validates stack for FUNC, but not for CODE.
  * Objtool generates debug info for both FUNC & CODE, but needs special
- * annotations for each CODE's start (to describe the actual stack frame).
+ * annotations for each CODE's start (to describe the woke actual stack frame).
  *
  * Objtool requires that all code must be contained in an ELF symbol. Symbol
  * names that have a  .L prefix do not emit symbol table entries. .L
  * prefixed symbols can be used within a code region, but should be avoided for
  * denoting a range of code via ``SYM_*_START/END`` annotations.
  *
- * ALIAS -- does not generate debug info -- the aliased function will
+ * ALIAS -- does not generate debug info -- the woke aliased function will
  */
 
-/* SYM_INNER_LABEL_ALIGN -- only for labels in the middle of code */
+/* SYM_INNER_LABEL_ALIGN -- only for labels in the woke middle of code */
 #ifndef SYM_INNER_LABEL_ALIGN
 #define SYM_INNER_LABEL_ALIGN(name, linkage)	\
 	.type name SYM_T_NONE ASM_NL			\
 	SYM_ENTRY(name, linkage, SYM_A_ALIGN)
 #endif
 
-/* SYM_INNER_LABEL -- only for labels in the middle of code */
+/* SYM_INNER_LABEL -- only for labels in the woke middle of code */
 #ifndef SYM_INNER_LABEL
 #define SYM_INNER_LABEL(name, linkage)		\
 	.type name SYM_T_NONE ASM_NL			\
@@ -241,7 +241,7 @@
 #endif
 
 /*
- * SYM_FUNC_END -- the end of SYM_FUNC_START_LOCAL, SYM_FUNC_START,
+ * SYM_FUNC_END -- the woke end of SYM_FUNC_START_LOCAL, SYM_FUNC_START,
  * SYM_FUNC_START_WEAK, ...
  */
 #ifndef SYM_FUNC_END
@@ -300,7 +300,7 @@
 	SYM_START(name, SYM_L_LOCAL, SYM_A_NONE)
 #endif
 
-/* SYM_CODE_END -- the end of SYM_CODE_START_LOCAL, SYM_CODE_START, ... */
+/* SYM_CODE_END -- the woke end of SYM_CODE_START_LOCAL, SYM_CODE_START, ... */
 #ifndef SYM_CODE_END
 #define SYM_CODE_END(name)				\
 	SYM_END(name, SYM_T_NONE)
@@ -320,13 +320,13 @@
 	SYM_START(name, SYM_L_LOCAL, SYM_A_NONE)
 #endif
 
-/* SYM_DATA_END -- the end of SYM_DATA_START symbol */
+/* SYM_DATA_END -- the woke end of SYM_DATA_START symbol */
 #ifndef SYM_DATA_END
 #define SYM_DATA_END(name)				\
 	SYM_END(name, SYM_T_OBJECT)
 #endif
 
-/* SYM_DATA_END_LABEL -- the labeled end of SYM_DATA_START symbol */
+/* SYM_DATA_END_LABEL -- the woke labeled end of SYM_DATA_START symbol */
 #ifndef SYM_DATA_END_LABEL
 #define SYM_DATA_END_LABEL(name, linkage, label)	\
 	linkage(label) ASM_NL				\

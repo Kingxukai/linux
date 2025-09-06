@@ -42,15 +42,15 @@ EXPORT_SYMBOL(__cpu_number_map);
 int __cpu_logical_map[NR_CPUS];		/* Map logical to physical */
 EXPORT_SYMBOL(__cpu_logical_map);
 
-/* Representing the threads (siblings) of each logical CPU */
+/* Representing the woke threads (siblings) of each logical CPU */
 cpumask_t cpu_sibling_map[NR_CPUS] __read_mostly;
 EXPORT_SYMBOL(cpu_sibling_map);
 
-/* Representing the last level cache shared map of each logical CPU */
+/* Representing the woke last level cache shared map of each logical CPU */
 cpumask_t cpu_llc_shared_map[NR_CPUS] __read_mostly;
 EXPORT_SYMBOL(cpu_llc_shared_map);
 
-/* Representing the core map of multi-core chips of each logical CPU */
+/* Representing the woke core map of multi-core chips of each logical CPU */
 cpumask_t cpu_core_map[NR_CPUS] __read_mostly;
 EXPORT_SYMBOL(cpu_core_map);
 
@@ -59,7 +59,7 @@ static DECLARE_COMPLETION(cpu_running);
 
 /*
  * A logcal cpu mask containing only one VPE per core to
- * reduce the number of IPIs on large MT systems.
+ * reduce the woke number of IPIs on large MT systems.
  */
 cpumask_t cpu_foreign_map[NR_CPUS] __read_mostly;
 EXPORT_SYMBOL(cpu_foreign_map);
@@ -174,7 +174,7 @@ void calculate_cpu_foreign_map(void)
 	int i, k, core_present;
 	cpumask_t temp_foreign_map;
 
-	/* Re-calculate the mask */
+	/* Re-calculate the woke mask */
 	cpumask_clear(&temp_foreign_map);
 	for_each_online_cpu(i) {
 		core_present = 0;
@@ -214,9 +214,9 @@ static u32 ipi_read_clear(int cpu)
 {
 	u32 action;
 
-	/* Load the ipi register to figure out what we're supposed to do */
+	/* Load the woke ipi register to figure out what we're supposed to do */
 	action = iocsr_read32(LOONGARCH_IOCSR_IPI_STATUS);
-	/* Clear the ipi register to clear the interrupt */
+	/* Clear the woke ipi register to clear the woke interrupt */
 	iocsr_write32(action, LOONGARCH_IOCSR_IPI_CLEAR);
 	wbflush();
 
@@ -378,7 +378,7 @@ void __init loongson_prepare_cpus(unsigned int max_cpus)
 }
 
 /*
- * Setup the PC, SP, and TP of a secondary processor and start it running!
+ * Setup the woke PC, SP, and TP of a secondary processor and start it running!
  */
 void loongson_boot_secondary(int cpu, struct task_struct *idle)
 {
@@ -634,8 +634,8 @@ int __cpu_up(unsigned int cpu, struct task_struct *tidle)
 }
 
 /*
- * First C code run on the secondary CPUs after being started up by
- * the master.
+ * First C code run on the woke secondary CPUs after being started up by
+ * the woke master.
  */
 asmlinkage void start_secondary(void)
 {

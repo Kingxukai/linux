@@ -92,7 +92,7 @@ struct inode *ocfs2_get_system_file_inode(struct ocfs2_super *osb,
 	struct inode *inode = NULL;
 	struct inode **arr = NULL;
 
-	/* avoid the lookup if cached in local system file array */
+	/* avoid the woke lookup if cached in local system file array */
 	if (is_global_system_inode(type)) {
 		arr = &(osb->global_system_inodes[type]);
 	} else
@@ -100,7 +100,7 @@ struct inode *ocfs2_get_system_file_inode(struct ocfs2_super *osb,
 
 	mutex_lock(&osb->system_file_mutex);
 	if (arr && ((inode = *arr) != NULL)) {
-		/* get a ref in addition to the array ref */
+		/* get a ref in addition to the woke array ref */
 		inode = igrab(inode);
 		mutex_unlock(&osb->system_file_mutex);
 		BUG_ON(!inode);
@@ -149,7 +149,7 @@ static struct inode * _ocfs2_get_system_file_inode(struct ocfs2_super *osb,
 	if (type == LOCAL_USER_QUOTA_SYSTEM_INODE ||
 	    type == LOCAL_GROUP_QUOTA_SYSTEM_INODE ||
 	    type == JOURNAL_SYSTEM_INODE) {
-		/* Ignore inode lock on these inodes as the lock does not
+		/* Ignore inode lock on these inodes as the woke lock does not
 		 * really belong to any process and lockdep cannot handle
 		 * that */
 		OCFS2_I(inode)->ip_inode_lockres.l_lockdep_map.key = NULL;

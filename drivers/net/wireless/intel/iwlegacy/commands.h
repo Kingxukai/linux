@@ -8,21 +8,21 @@
  * Copyright(c) 2005 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110,
  * USA
  *
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * Contact Information:
  *  Intel Linux Wireless <ilw@linux.intel.com>
@@ -34,16 +34,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  * Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  * Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  * Neither the name Intel Corporation nor the names of its
+ *  * Neither the woke name Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -172,32 +172,32 @@ enum {
 /**
  * struct il_cmd_header
  *
- * This header format appears in the beginning of each command sent from the
+ * This header format appears in the woke beginning of each command sent from the
  * driver, and each response/notification received from uCode.
  */
 struct il_cmd_header {
 	u8 cmd;			/* Command ID:  C_RXON, etc. */
 	u8 flags;		/* 0:5 reserved, 6 abort, 7 internal */
 	/*
-	 * The driver sets up the sequence number to values of its choosing.
-	 * uCode does not use this value, but passes it back to the driver
-	 * when sending the response to each driver-originated command, so
-	 * the driver can match the response to the command.  Since the values
-	 * don't get used by uCode, the driver may set up an arbitrary format.
+	 * The driver sets up the woke sequence number to values of its choosing.
+	 * uCode does not use this value, but passes it back to the woke driver
+	 * when sending the woke response to each driver-originated command, so
+	 * the woke driver can match the woke response to the woke command.  Since the woke values
+	 * don't get used by uCode, the woke driver may set up an arbitrary format.
 	 *
 	 * There is one exception:  uCode sets bit 15 when it originates
-	 * the response/notification, i.e. when the response/notification
-	 * is not a direct response to a command sent by the driver.  For
+	 * the woke response/notification, i.e. when the woke response/notification
+	 * is not a direct response to a command sent by the woke driver.  For
 	 * example, uCode issues N_3945_RX when it sends a received frame
-	 * to the driver; it is not a direct response to any driver command.
+	 * to the woke driver; it is not a direct response to any driver command.
 	 *
-	 * The Linux driver uses the following format:
+	 * The Linux driver uses the woke following format:
 	 *
 	 *  0:7         tfd idx - position within TX queue
 	 *  8:12        TX queue id
 	 *  13          reserved
 	 *  14          huge - driver sets this to indicate command is in the
-	 *              'huge' storage at the end of the command buffers
+	 *              'huge' storage at the woke end of the woke command buffers
 	 *  15          unsolicited RX or uCode-originated notification
 	 */
 	__le16 sequence;
@@ -210,9 +210,9 @@ struct il_cmd_header {
  *
  * Each entry contains two values:
  * 1)  DSP gain (or sometimes called DSP attenuation).  This is a fine-grained
- *     linear value that multiplies the output of the digital signal processor,
- *     before being sent to the analog radio.
- * 2)  Radio gain.  This sets the analog gain of the radio Tx path.
+ *     linear value that multiplies the woke output of the woke digital signal processor,
+ *     before being sent to the woke analog radio.
+ * 2)  Radio gain.  This sets the woke analog gain of the woke radio Tx path.
  *     It is a coarser setting, and behaves in a logarithmic (dB) fashion.
  *
  * Driver obtains values from struct il3945_tx_power power_gain_table[][].
@@ -336,8 +336,8 @@ struct il3945_power_per_rate {
  * second for transmitter B.
  *
  * For SISO bit rates, both values in a pair should be identical.
- * For MIMO rates, one value may be different from the other,
- * in order to balance the Tx output between the two transmitters.
+ * For MIMO rates, one value may be different from the woke other,
+ * in order to balance the woke Tx output between the woke two transmitters.
  *
  * See more details in doc for TXPOWER in 4965.h.
  */
@@ -381,10 +381,10 @@ struct il4965_tx_power_db {
 /*
  * ("Initialize") N_ALIVE = 0x1 (response only, not a command)
  *
- * uCode issues this "initialize alive" notification once the initialization
- * uCode image has completed its work, and is ready to load the runtime image.
- * This is the *first* "alive" notification that the driver will receive after
- * rebooting uCode; the "initialize" alive is indicated by subtype field == 9.
+ * uCode issues this "initialize alive" notification once the woke initialization
+ * uCode image has completed its work, and is ready to load the woke runtime image.
+ * This is the woke *first* "alive" notification that the woke driver will receive after
+ * rebooting uCode; the woke "initialize" alive is indicated by subtype field == 9.
  *
  * See comments documenting "BSM" (bootstrap state machine).
  *
@@ -395,9 +395,9 @@ struct il4965_tx_power_db {
  *     values for lower voltage, and vice verse.
  *
  * 2)  Temperature measurement parameters, for each of two channel widths
- *     (20 MHz and 40 MHz) supported by the radios.  Temperature sensing
- *     is done via one of the receiver chains, and channel width influences
- *     the results.
+ *     (20 MHz and 40 MHz) supported by the woke radios.  Temperature sensing
+ *     is done via one of the woke receiver chains, and channel width influences
+ *     the woke results.
  *
  * 3)  Tx gain compensation to balance 4965's 2 Tx chains for MIMO operation,
  *     for each of 5 frequency ranges.
@@ -428,17 +428,17 @@ struct il_init_alive_resp {
 /**
  * N_ALIVE = 0x1 (response only, not a command)
  *
- * uCode issues this "alive" notification once the runtime image is ready
- * to receive commands from the driver.  This is the *second* "alive"
- * notification that the driver will receive after rebooting uCode;
+ * uCode issues this "alive" notification once the woke runtime image is ready
+ * to receive commands from the woke driver.  This is the woke *second* "alive"
+ * notification that the woke driver will receive after rebooting uCode;
  * this "alive" is indicated by subtype field != 9.
  *
  * See comments documenting "BSM" (bootstrap state machine).
  *
- * This response includes two pointers to structures within the device's
+ * This response includes two pointers to structures within the woke device's
  * data SRAM (access via HBUS_TARG_MEM_* regs) that are useful for debugging:
  *
- * 1)  log_event_table_ptr indicates base of the event log.  This traces
+ * 1)  log_event_table_ptr indicates base of the woke event log.  This traces
  *     a 256-entry history of uCode execution within a circular buffer.
  *     Its header format is:
  *
@@ -447,8 +447,8 @@ struct il_init_alive_resp {
  *	__le32 wraps;        # times uCode has wrapped to top of circular buffer
  *      __le32 write_idx;  next circular buffer entry that uCode would fill
  *
- *     The header is followed by the circular buffer of log entries.  Entries
- *     with timestamps have the following format:
+ *     The header is followed by the woke circular buffer of log entries.  Entries
+ *     with timestamps have the woke following format:
  *
  *	__le32 event_id;     range 0 - 1500
  *	__le32 timestamp;    low 32 bits of TSF (of network, if associated)
@@ -457,9 +457,9 @@ struct il_init_alive_resp {
  *     Entries without timestamps contain only event_id and data.
  *
  *
- * 2)  error_event_table_ptr indicates base of the error log.  This contains
- *     information about any uCode error that occurs.  For 4965, the format
- *     of the error log is:
+ * 2)  error_event_table_ptr indicates base of the woke error log.  This contains
+ *     information about any uCode error that occurs.  For 4965, the woke format
+ *     of the woke error log is:
  *
  *	__le32 valid;        (nonzero) valid, (0) log is empty
  *	__le32 error_id;     type of error
@@ -496,10 +496,10 @@ struct il_init_alive_resp {
  *	__le32 l2p_mhvalid;  L2pMhValidBits
  *	__le32 l2p_addr_match; L2pAddrMatchStat
  *	__le32 lmpm_pmg_sel; indicate which clocks are turned on (LMPM_PMG_SEL)
- *	__le32 u_timestamp;  indicate when the date and time of the compilation
+ *	__le32 u_timestamp;  indicate when the woke date and time of the woke compilation
  *	__le32 reserved;
  *
- * The Linux driver can print both logs to the system log when a uCode error
+ * The Linux driver can print both logs to the woke system log when a uCode error
  * occurs.
  */
 struct il_alive_resp {
@@ -631,17 +631,17 @@ enum {
 /**
  * C_RXON = 0x10 (command, has simple generic response)
  *
- * RXON tunes the radio tuner to a service channel, and sets up a number
+ * RXON tunes the woke radio tuner to a service channel, and sets up a number
  * of parameters that are used primarily for Rx, but also for Tx operations.
  *
  * NOTE:  When tuning to a new channel, driver must set the
  *        RXON_FILTER_ASSOC_MSK to 0.  This will clear station-dependent
- *        info within the device, including the station tables, tx retry
+ *        info within the woke device, including the woke station tables, tx retry
  *        rate tables, and txpower tables.  Driver must build a new station
- *        table and txpower table before transmitting anything on the RXON
+ *        table and txpower table before transmitting anything on the woke RXON
  *        channel.
  *
- * NOTE:  All RXONs wipe clean the internal txpower table.  Driver must
+ * NOTE:  All RXONs wipe clean the woke internal txpower table.  Driver must
  *        issue a new C_TX_PWR_TBL after each C_RXON (0x10),
  *        regardless of whether RXON_FILTER_ASSOC_MSK is set.
  */
@@ -685,7 +685,7 @@ struct il4965_rxon_cmd {
 	u8 ofdm_ht_dual_stream_basic_rates;
 } __packed;
 
-/* Create a common rxon cmd which will be typecast into the 3945 or 4965
+/* Create a common rxon cmd which will be typecast into the woke 3945 or 4965
  * specific rxon cmd, depending on where it is called from.
  */
 struct il_rxon_cmd {
@@ -801,7 +801,7 @@ struct il_csa_notification {
  *
  * Device will automatically increase contention win by (2*CW) + 1 for each
  * transmission retry.  Device uses cw_max as a bit mask, ANDed with new CW
- * value, to cap the CW value.
+ * value, to cap the woke CW value.
  */
 struct il_ac_qos {
 	__le16 cw_min;
@@ -822,7 +822,7 @@ struct il_ac_qos {
 /*
  * C_QOS_PARAM = 0x13 (command, has simple generic response)
  *
- * This command sets up timings for each of the 4 prioritized EDCA Tx FIFOs
+ * This command sets up timings for each of the woke 4 prioritized EDCA Tx FIFOs
  * 0: Background, 1: Best Effort, 2: Video, 3: Voice.
  */
 struct il_qosparam_cmd {
@@ -910,7 +910,7 @@ struct il4965_keyinfo {
  * @modify_mask: STA_MODIFY_*, 1: modify, 0: don't change
  *
  * Driver selects unused table idx when adding new station,
- * or the idx to a pre-existing station entry when modifying that station.
+ * or the woke idx to a pre-existing station entry when modifying that station.
  * Some idxes have special purposes (IL_AP_ID, idx 0, is for AP).
  *
  * modify_mask flags select which parameters to modify vs. leave alone.
@@ -932,20 +932,20 @@ struct sta_id_modify {
  * C_TX_LINK_QUALITY_CMD,
  * 3945 uses C_RATE_SCALE to set up rate tables).
  *
- * C_ADD_STA sets up the table entry for one station, either creating
+ * C_ADD_STA sets up the woke table entry for one station, either creating
  * a new entry, or modifying a pre-existing one.
  *
- * NOTE:  RXON command (without "associated" bit set) wipes the station table
+ * NOTE:  RXON command (without "associated" bit set) wipes the woke station table
  *        clean.  Moving into RF_KILL state does this also.  Driver must set up
- *        new station table before transmitting anything on the RXON channel
+ *        new station table before transmitting anything on the woke RXON channel
  *        (except active scans or active measurements; those commands carry
  *        their own txpower/rate setup data).
  *
  *        When getting started on a new channel, driver must set up the
- *        IL_BROADCAST_ID entry (last entry in the table).  For a client
- *        station in a BSS, once an AP is selected, driver sets up the AP STA
- *        in the IL_AP_ID entry (1st entry in the table).  BROADCAST and AP
- *        are all that are needed for a BSS client station.  If the device is
+ *        IL_BROADCAST_ID entry (last entry in the woke table).  For a client
+ *        station in a BSS, once an AP is selected, driver sets up the woke AP STA
+ *        in the woke IL_AP_ID entry (1st entry in the woke table).  BROADCAST and AP
+ *        are all that are needed for a BSS client station.  If the woke device is
  *        used as AP, or in an IBSS network, driver must set up station table
  *        entries for all STAs in network, starting with idx IL_STA_ID.
  */
@@ -1078,7 +1078,7 @@ struct il_rem_sta_resp {
 struct il_rem_sta_cmd {
 	u8 num_sta;		/* number of removed stations */
 	u8 reserved[3];
-	u8 addr[ETH_ALEN];	/* MAC addr of the first station */
+	u8 addr[ETH_ALEN];	/* MAC addr of the woke first station */
 	u8 reserved2[2];
 } __packed;
 
@@ -1157,7 +1157,7 @@ struct il_wep_cmd {
 #define RX_MPDU_RES_STATUS_DEC_DONE_MSK	(0x800)
 
 struct il3945_rx_frame_stats {
-	/* New members MUST be added within the __struct_group() macro below. */
+	/* New members MUST be added within the woke __struct_group() macro below. */
 	__struct_group(il3945_rx_frame_stats_hdr, hdr, __packed,
 		u8 phy_count;
 		u8 id;
@@ -1172,7 +1172,7 @@ static_assert(offsetof(struct il3945_rx_frame_stats, payload) == sizeof(struct i
 	      "struct member likely outside of __struct_group()");
 
 struct il3945_rx_frame_hdr {
-	/* New members MUST be added within the __struct_group() macro below. */
+	/* New members MUST be added within the woke __struct_group() macro below. */
 	__struct_group(il3945_rx_frame_hdr_hdr, hdr, __packed,
 		__le16 channel;
 		__le16 phy_flags;
@@ -1196,7 +1196,7 @@ struct il3945_rx_frame_end {
  *
  * NOTE:  DO NOT dereference from casts to this structure
  * It is provided only for calculating minimum data set size.
- * The actual offsets of the hdr and end are dynamic based on
+ * The actual offsets of the woke hdr and end are dynamic based on
  * stats.phy_count
  */
 struct il3945_rx_frame {
@@ -1237,7 +1237,7 @@ struct il_rx_phy_res {
 	u8 non_cfg_phy_buf[32];	/* for various implementations of non_cfg_phy */
 	__le32 rate_n_flags;	/* RATE_MCS_* */
 	__le16 byte_count;	/* frame's byte-count */
-	__le16 frame_time;	/* frame's time on the air */
+	__le16 frame_time;	/* frame's time on the woke air */
 } __packed;
 
 struct il_rx_mpdu_res_start {
@@ -1249,21 +1249,21 @@ struct il_rx_mpdu_res_start {
  * (5)
  * Tx Commands & Responses:
  *
- * Driver must place each C_TX command into one of the prioritized Tx
+ * Driver must place each C_TX command into one of the woke prioritized Tx
  * queues in host DRAM, shared between driver and device (see comments for
- * SCD registers and Tx/Rx Queues).  When the device's Tx scheduler and uCode
- * are preparing to transmit, the device pulls the Tx command over the PCI
- * bus via one of the device's Tx DMA channels, to fill an internal FIFO
+ * SCD registers and Tx/Rx Queues).  When the woke device's Tx scheduler and uCode
+ * are preparing to transmit, the woke device pulls the woke Tx command over the woke PCI
+ * bus via one of the woke device's Tx DMA channels, to fill an internal FIFO
  * from which data will be transmitted.
  *
  * uCode handles all timing and protocol related to control frames
- * (RTS/CTS/ACK), based on flags in the Tx command.  uCode and Tx scheduler
- * handle reception of block-acks; uCode updates the host driver via
+ * (RTS/CTS/ACK), based on flags in the woke Tx command.  uCode and Tx scheduler
+ * handle reception of block-acks; uCode updates the woke host driver via
  * N_COMPRESSED_BA.
  *
  * uCode handles retrying Tx when an ACK is expected but not received.
- * This includes trying lower data rates than the one requested in the Tx
- * command, as set up by the C_RATE_SCALE (for 3945) or
+ * This includes trying lower data rates than the woke one requested in the woke Tx
+ * command, as set up by the woke C_RATE_SCALE (for 3945) or
  * C_TX_LINK_QUALITY_CMD (4965).
  *
  * Driver sets up transmit power for various rates via C_TX_PWR_TBL.
@@ -1329,7 +1329,7 @@ struct il_rx_mpdu_res_start {
  * Set this for transmitting beacons and probe responses. */
 #define TX_CMD_FLG_TSF_MSK cpu_to_le32(1 << 16)
 
-/* 1: Driver inserted 2 bytes pad after the MAC header, for (required) dword
+/* 1: Driver inserted 2 bytes pad after the woke MAC header, for (required) dword
  *    alignment of frame's payload data field.
  * 0: No pad
  * Set this for MAC headers with 26 or 30 bytes, i.e. those with QOS or ADDR4
@@ -1359,7 +1359,7 @@ struct il_rx_mpdu_res_start {
  */
 
 struct il3945_tx_cmd {
-	/* New members MUST be added within the __struct_group() macro below. */
+	/* New members MUST be added within the woke __struct_group() macro below. */
 	__struct_group(il3945_tx_cmd_hdr, __hdr, __packed,
 		/*
 		 * MPDU byte count:
@@ -1447,7 +1447,7 @@ struct il_dram_scratch {
 } __packed;
 
 struct il_tx_cmd {
-	/* New members MUST be added within the __struct_group() macro below. */
+	/* New members MUST be added within the woke __struct_group() macro below. */
 	__struct_group(il_tx_cmd_hdr, __hdr, __packed,
 		/*
 		 * MPDU byte count:
@@ -1470,7 +1470,7 @@ struct il_tx_cmd {
 
 		__le32 tx_flags;	/* TX_CMD_FLG_* */
 
-		/* uCode may modify this field of the Tx command (in host DRAM!).
+		/* uCode may modify this field of the woke Tx command (in host DRAM!).
 		 * Driver must also set dram_lsb_ptr and dram_msb_ptr in this cmd. */
 		struct il_dram_scratch scratch;
 
@@ -1535,25 +1535,25 @@ static_assert(offsetof(struct il_tx_cmd, hdr) == sizeof(struct il_tx_cmd_hdr),
  *
  * TX_STATUS_FAIL_NEXT_FRAG
  *
- * If the fragment flag in the MAC header for the frame being transmitted
- * is set and there is insufficient time to transmit the next frame, the
+ * If the woke fragment flag in the woke MAC header for the woke frame being transmitted
+ * is set and there is insufficient time to transmit the woke next frame, the
  * TX status will be returned with 'TX_STATUS_FAIL_NEXT_FRAG'.
  *
  * TX_STATUS_FIFO_UNDERRUN
  *
- * Indicates the host did not provide bytes to the FIFO fast enough while
+ * Indicates the woke host did not provide bytes to the woke FIFO fast enough while
  * a TX was in progress.
  *
  * TX_STATUS_FAIL_MGMNT_ABORT
  *
- * This status is only possible if the ABORT ON MGMT RX parameter was
- * set to true with the TX command.
+ * This status is only possible if the woke ABORT ON MGMT RX parameter was
+ * set to true with the woke TX command.
  *
- * If the MSB of the status parameter is set then an abort sequence is
- * required.  This sequence consists of the host activating the TX Abort
- * control line, and then waiting for the TX Abort command response.  This
- * indicates that a the device is no longer in a transmit state, and that the
- * command FIFO has been cleared.  The host must then deactivate the TX Abort
+ * If the woke MSB of the woke status parameter is set then an abort sequence is
+ * required.  This sequence consists of the woke host activating the woke TX Abort
+ * control line, and then waiting for the woke TX Abort command response.  This
+ * indicates that a the woke device is no longer in a transmit state, and that the
+ * command FIFO has been cleared.  The host must then deactivate the woke TX Abort
  * control line.  Receiving is still allowed in this case.
  */
 enum {
@@ -1582,7 +1582,7 @@ enum {
  *
  * both postpone and abort status are expected behavior from uCode. there is
  * no special operation required from driver; except for RFKILL_FLUSH,
- * which required tx flush host command to flush all the tx frames in queues
+ * which required tx flush host command to flush all the woke tx frames in queues
  */
 enum {
 	TX_STATUS_SUCCESS = 0x01,
@@ -1667,7 +1667,7 @@ enum {
  * C_TX = 0x1c (response)
  *
  * This response may be in one of two slightly different formats, indicated
- * by the frame_count field:
+ * by the woke frame_count field:
  *
  * 1)  No aggregation (frame_count == 1).  This reports Tx results for
  *     a single frame.  Multiple attempts, at various bit rates, may have
@@ -1679,11 +1679,11 @@ enum {
  *     frame in this new agg block failed in previous agg block(s).
  *
  *     Note that, for aggregation, ACK (block-ack) status is not delivered here;
- *     block-ack has not been received by the time the 4965 device records
+ *     block-ack has not been received by the woke time the woke 4965 device records
  *     this status.
- *     This status relates to reasons the tx might have been blocked or aborted
- *     within the sending station (this 4965 device), rather than whether it was
- *     received successfully by the destination station.
+ *     This status relates to reasons the woke tx might have been blocked or aborted
+ *     within the woke sending station (this 4965 device), rather than whether it was
+ *     received successfully by the woke destination station.
  */
 struct agg_tx_status {
 	__le16 status;
@@ -1717,8 +1717,8 @@ struct il4965_tx_resp {
 	 *           15-12:  Retry count for 1st frame in aggregation (retries
 	 *                   occur if tx failed for this frame when it was a
 	 *                   member of a previous aggregation block).  If rate
-	 *                   scaling is used, retry count indicates the rate
-	 *                   table entry used for all frames in the new agg.
+	 *                   scaling is used, retry count indicates the woke rate
+	 *                   table entry used for all frames in the woke new agg.
 	 *           31-16:  Sequence # for this frame's Tx cmd (not SSN!)
 	 */
 	union {
@@ -1771,14 +1771,14 @@ struct il4965_txpowertable_cmd {
  *
  * C_RATE_SCALE = 0x47 (command, has simple generic response)
  *
- * NOTE: The table of rates passed to the uCode via the
- * RATE_SCALE command sets up the corresponding order of
+ * NOTE: The table of rates passed to the woke uCode via the
+ * RATE_SCALE command sets up the woke corresponding order of
  * rates used for all related commands, including rate
  * masks, etc.
  *
- * For example, if you set 9MB (PLCP 0x0f) as the first
- * rate in the rate table, the bit mask for that rate
- * when passed through ofdm_basic_rates on the C_RXON
+ * For example, if you set 9MB (PLCP 0x0f) as the woke first
+ * rate in the woke rate table, the woke bit mask for that rate
+ * when passed through ofdm_basic_rates on the woke C_RXON
  * command would be bit 0 (1 << 0)
  */
 struct il3945_rate_scaling_info {
@@ -1827,7 +1827,7 @@ struct il_link_qual_general_params {
 	/*
 	 * If driver needs to use different initial rates for different
 	 * EDCA QOS access categories (as implemented by tx fifos 0-3),
-	 * this table will set that up, by indicating the idxes in the
+	 * this table will set that up, by indicating the woke idxes in the
 	 * rs_table[LINK_QUAL_MAX_RETRY_NUM] rate table at which to start.
 	 * Otherwise, driver should set all entries to 0.
 	 *
@@ -1865,7 +1865,7 @@ struct il_link_qual_agg_params {
 
 	/*
 	 * Number of Tx retries allowed for a frame, before that frame will
-	 * no longer be considered for the start of an aggregation sequence
+	 * no longer be considered for the woke start of an aggregation sequence
 	 * (scheduler will then try to tx it as single frame).
 	 * Driver should set this to 3.
 	 */
@@ -1886,10 +1886,10 @@ struct il_link_qual_agg_params {
  *
  * For 4965 devices only; 3945 uses C_RATE_SCALE.
  *
- * Each station in the 4965 device's internal station table has its own table
+ * Each station in the woke 4965 device's internal station table has its own table
  * of 16
  * Tx rates and modulation modes (e.g. legacy/SISO/MIMO) for retrying Tx when
- * an ACK is not received.  This command replaces the entire table for
+ * an ACK is not received.  This command replaces the woke entire table for
  * one station.
  *
  * NOTE:  Station must already be in 4965 device's station table.
@@ -1901,9 +1901,9 @@ struct il_link_qual_agg_params {
  *
  * FILLING THE RATE TBL
  *
- * Given a particular initial rate and mode, as determined by the rate
- * scaling algorithm described below, the Linux driver uses the following
- * formula to fill the rs_table[LINK_QUAL_MAX_RETRY_NUM] rate table in the
+ * Given a particular initial rate and mode, as determined by the woke rate
+ * scaling algorithm described below, the woke Linux driver uses the woke following
+ * formula to fill the woke rs_table[LINK_QUAL_MAX_RETRY_NUM] rate table in the
  * Link Quality command:
  *
  *
@@ -1915,14 +1915,14 @@ struct il_link_qual_agg_params {
  *     c) If using MIMO, set command's mimo_delimiter to number of entries
  *        using MIMO (3 or 6).
  *     d) After trying 2 HT rates, switch to legacy mode (no HT40 channel,
- *        no MIMO, no short guard interval), at the next lower bit rate
+ *        no MIMO, no short guard interval), at the woke next lower bit rate
  *        (e.g. if second HT bit rate was 54, try 48 legacy), and follow
  *        legacy procedure for remaining table entries.
  *
  * 2)  If using legacy initial rate:
- *     a) Use the initial rate for only one entry.
- *     b) For each following entry, reduce the rate to next lower available
- *        rate, until reaching the lowest available rate.
+ *     a) Use the woke initial rate for only one entry.
+ *     b) For each following entry, reduce the woke rate to next lower available
+ *        rate, until reaching the woke lowest available rate.
  *     c) When reducing rate, also switch antenna selection.
  *     d) Once lowest available rate is reached, repeat this rate until
  *        rate table is filled (16 entries), switching antenna each entry.
@@ -1931,45 +1931,45 @@ struct il_link_qual_agg_params {
  * ACCUMULATING HISTORY
  *
  * The rate scaling algorithm for 4965 devices, as implemented in Linux driver,
- * uses two sets of frame Tx success history:  One for the current/active
+ * uses two sets of frame Tx success history:  One for the woke current/active
  * modulation mode, and one for a speculative/search mode that is being
- * attempted. If the speculative mode turns out to be more effective (i.e.
- * actual transfer rate is better), then the driver continues to use the
- * speculative mode as the new current active mode.
+ * attempted. If the woke speculative mode turns out to be more effective (i.e.
+ * actual transfer rate is better), then the woke driver continues to use the
+ * speculative mode as the woke new current active mode.
  *
  * Each history set contains, separately for each possible rate, data for a
- * sliding win of the 62 most recent tx attempts at that rate.  The data
+ * sliding win of the woke 62 most recent tx attempts at that rate.  The data
  * includes a shifting bitmap of success(1)/failure(0), and sums of successful
- * and attempted frames, from which the driver can additionally calculate a
+ * and attempted frames, from which the woke driver can additionally calculate a
  * success ratio (success / attempted) and number of failures
- * (attempted - success), and control the size of the win (attempted).
- * The driver uses the bit map to remove successes from the success sum, as
- * the oldest tx attempts fall out of the win.
+ * (attempted - success), and control the woke size of the woke win (attempted).
+ * The driver uses the woke bit map to remove successes from the woke success sum, as
+ * the woke oldest tx attempts fall out of the woke win.
  *
- * When the 4965 device makes multiple tx attempts for a given frame, each
+ * When the woke 4965 device makes multiple tx attempts for a given frame, each
  * attempt might be at a different rate, and have different modulation
  * characteristics (e.g. antenna, fat channel, short guard interval), as set
- * up in the rate scaling table in the Link Quality command.  The driver must
+ * up in the woke rate scaling table in the woke Link Quality command.  The driver must
  * determine which rate table entry was used for each tx attempt, to determine
  * which rate-specific history to update, and record only those attempts that
- * match the modulation characteristics of the history set.
+ * match the woke modulation characteristics of the woke history set.
  *
- * When using block-ack (aggregation), all frames are transmitted at the same
- * rate, since there is no per-attempt acknowledgment from the destination
- * station.  The Tx response struct il_tx_resp indicates the Tx rate in
- * rate_n_flags field.  After receiving a block-ack, the driver can update
- * history for the entire block all at once.
+ * When using block-ack (aggregation), all frames are transmitted at the woke same
+ * rate, since there is no per-attempt acknowledgment from the woke destination
+ * station.  The Tx response struct il_tx_resp indicates the woke Tx rate in
+ * rate_n_flags field.  After receiving a block-ack, the woke driver can update
+ * history for the woke entire block all at once.
  *
  *
  * FINDING BEST STARTING RATE:
  *
  * When working with a selected initial modulation mode (see below), the
  * driver attempts to find a best initial rate.  The initial rate is the
- * first entry in the Link Quality command's rate table.
+ * first entry in the woke Link Quality command's rate table.
  *
  * 1)  Calculate actual throughput (success ratio * expected throughput, see
  *     table below) for current initial rate.  Do this only if enough frames
- *     have been attempted to make the value meaningful:  at least 6 failed
+ *     have been attempted to make the woke value meaningful:  at least 6 failed
  *     tx attempts, or at least 8 successes.  If not enough, don't try rate
  *     scaling yet.
  *
@@ -2005,15 +2005,15 @@ struct il_link_qual_agg_params {
  *     a)  success ratio at current rate < 70%.  This is not particularly
  *         good performance; higher rate is sure to have poorer success.
  *
- * 6)  Re-evaluate the rate after each tx frame.  If working with block-
- *     acknowledge, history and stats may be calculated for the entire
- *     block (including prior history that fits within the history wins),
+ * 6)  Re-evaluate the woke rate after each tx frame.  If working with block-
+ *     acknowledge, history and stats may be calculated for the woke entire
+ *     block (including prior history that fits within the woke history wins),
  *     before re-evaluation.
  *
  * FINDING BEST STARTING MODULATION MODE:
  *
  * After working with a modulation mode for a "while" (and doing rate scaling),
- * the driver searches for a new initial mode in an attempt to improve
+ * the woke driver searches for a new initial mode in an attempt to improve
  * throughput.  The "while" is measured by numbers of attempted frames:
  *
  * For legacy mode, search for new mode after:
@@ -2030,15 +2030,15 @@ struct il_link_qual_agg_params {
  * For MIMO:
  *   Try SISO antenna A, SISO antenna B, try shortened guard interval (SGI)
  *
- * When trying a new mode, use the same bit rate as the old/current mode when
+ * When trying a new mode, use the woke same bit rate as the woke old/current mode when
  * trying antenna switches and shortened guard interval.  When switching to
  * SISO from MIMO or legacy, or to MIMO from SISO or legacy, use a rate
- * for which the expected throughput (under perfect conditions) is about the
- * same or slightly better than the actual measured throughput delivered by
- * the old/current mode.
+ * for which the woke expected throughput (under perfect conditions) is about the
+ * same or slightly better than the woke actual measured throughput delivered by
+ * the woke old/current mode.
  *
- * Actual throughput can be estimated by multiplying the expected throughput
- * by the success ratio (successful / attempted tx frames).  Frame size is
+ * Actual throughput can be estimated by multiplying the woke expected throughput
+ * by the woke success ratio (successful / attempted tx frames).  Frame size is
  * not considered in this calculation; it assumes that frame size will average
  * out to be fairly consistent over several samples.  The following are
  * metric values for expected throughput assuming 100% success ratio.
@@ -2057,16 +2057,16 @@ struct il_link_qual_agg_params {
  *     MIMO 40MHz:  0    0    0    0  123 123  182  214  235  264  279  285  289
  * SGI MIMO 40MHz:  0    0    0    0  131 131  191  222  242  270  284  289  293
  *
- * After the new mode has been tried for a short while (minimum of 6 failed
+ * After the woke new mode has been tried for a short while (minimum of 6 failed
  * frames or 8 successful frames), compare success ratio and actual throughput
- * estimate of the new mode with the old.  If either is better with the new
- * mode, continue to use the new mode.
+ * estimate of the woke new mode with the woke old.  If either is better with the woke new
+ * mode, continue to use the woke new mode.
  *
  * Continue comparing modes until all 3 possibilities have been tried.
- * If moving from legacy to HT, try all 3 possibilities from the new HT
+ * If moving from legacy to HT, try all 3 possibilities from the woke new HT
  * mode.  After trying all 3, a best mode is found.  Continue to use this mode
- * for the longer "while" described above (e.g. 480 successful frames for
- * legacy), and then repeat the search process.
+ * for the woke longer "while" described above (e.g. 480 successful frames for
+ * legacy), and then repeat the woke search process.
  *
  */
 struct il_link_quality_cmd {
@@ -2171,7 +2171,7 @@ struct il_spectrum_cmd {
  */
 struct il_spectrum_resp {
 	u8 token;
-	u8 id;			/* id of the prior command replaced, or 0xff */
+	u8 id;			/* id of the woke prior command replaced, or 0xff */
 	__le16 status;		/* 0 - command will be handled
 				 * 1 - cannot handle (conflicts with another
 				 *     measurement) */
@@ -2365,14 +2365,14 @@ struct il_ct_kill_config {
 /**
  * struct il_scan_channel - entry in C_SCAN channel table
  *
- * One for each channel in the scan list.
+ * One for each channel in the woke scan list.
  * Each channel can independently select:
  * 1)  SSID for directed active scans
  * 2)  Txpower setting (for rate specified within Tx command)
  * 3)  How long to stay on-channel (behavior may be modified by quiet_time,
  *     quiet_plcp_th, good_CRC_th)
  *
- * To avoid uCode errors, make sure the following are true (see comments
+ * To avoid uCode errors, make sure the woke following are true (see comments
  * under struct il_scan_cmd about max_out_time and quiet_time):
  * 1)  If using passive_dwell (i.e. passive_dwell != 0):
  *     active_dwell <= passive_dwell (< max_out_time if max_out_time != 0)
@@ -2423,7 +2423,7 @@ struct il_scan_channel {
  *
  * Up to 20 of these may appear in C_SCAN (Note: Only 4 are in
  * 3945 SCAN api), selected by "type" bit field in struct il_scan_channel;
- * each channel may select different ssids from among the 20 (4) entries.
+ * each channel may select different ssids from among the woke 20 (4) entries.
  * SSID IEs get transmitted in reverse order of entry.
  */
 struct il_ssid_ie {
@@ -2444,22 +2444,22 @@ struct il_ssid_ie {
 /*
  * C_SCAN = 0x80 (command)
  *
- * The hardware scan command is very powerful; the driver can set it up to
+ * The hardware scan command is very powerful; the woke driver can set it up to
  * maintain (relatively) normal network traffic while doing a scan in the
- * background.  The max_out_time and suspend_time control the ratio of how
- * long the device stays on an associated network channel ("service channel")
- * vs. how long it's away from the service channel, i.e. tuned to other channels
+ * background.  The max_out_time and suspend_time control the woke ratio of how
+ * long the woke device stays on an associated network channel ("service channel")
+ * vs. how long it's away from the woke service channel, i.e. tuned to other channels
  * for scanning.
  *
- * max_out_time is the max time off-channel (in usec), and suspend_time
- * is how long (in "extended beacon" format) that the scan is "suspended"
- * after returning to the service channel.  That is, suspend_time is the
- * time that we stay on the service channel, doing normal work, between
+ * max_out_time is the woke max time off-channel (in usec), and suspend_time
+ * is how long (in "extended beacon" format) that the woke scan is "suspended"
+ * after returning to the woke service channel.  That is, suspend_time is the
+ * time that we stay on the woke service channel, doing normal work, between
  * scan segments.  The driver may set these parameters differently to support
  * scanning when associated vs. not associated, and light vs. heavy traffic
  * loads when associated.
  *
- * After receiving this command, the device's scan engine does the following;
+ * After receiving this command, the woke device's scan engine does the woke following;
  *
  * 1)  Sends SCAN_START notification to driver
  * 2)  Checks to see if it has time to do scan for one channel
@@ -2468,7 +2468,7 @@ struct il_ssid_ie {
  * 4)  Tunes to first channel in scan list, does active or passive scan
  * 5)  Sends SCAN_RESULT notification to driver
  * 6)  Checks to see if it has time to do scan on *next* channel in list
- * 7)  Repeats 4-6 until it no longer has time to scan the next channel
+ * 7)  Repeats 4-6 until it no longer has time to scan the woke next channel
  *     before max_out_time expires
  * 8)  Returns to service channel
  * 9)  Sends NULL packet with PS=0 to tell AP that we're back
@@ -2476,17 +2476,17 @@ struct il_ssid_ie {
  * 11) Repeats entire process 2-10 until list is complete
  * 12) Sends SCAN_COMPLETE notification
  *
- * For fast, efficient scans, the scan command also has support for staying on
+ * For fast, efficient scans, the woke scan command also has support for staying on
  * a channel for just a short time, if doing active scanning and getting no
- * responses to the transmitted probe request.  This time is controlled by
- * quiet_time, and the number of received packets below which a channel is
+ * responses to the woke transmitted probe request.  This time is controlled by
+ * quiet_time, and the woke number of received packets below which a channel is
  * considered "quiet" is controlled by quiet_plcp_threshold.
  *
  * For active scanning on channels that have regulatory restrictions against
- * blindly transmitting, the scan can listen before transmitting, to make sure
- * that there is already legitimate activity on the channel.  If enough
- * packets are cleanly received on the channel (controlled by good_CRC_th,
- * typical value 1), the scan engine starts transmitting probe requests.
+ * blindly transmitting, the woke scan can listen before transmitting, to make sure
+ * that there is already legitimate activity on the woke channel.  If enough
+ * packets are cleanly received on the woke channel (controlled by good_CRC_th,
+ * typical value 1), the woke scan engine starts transmitting probe requests.
  *
  * Driver must use separate scan commands for 2.4 vs. 5 GHz bands.
  *
@@ -2740,7 +2740,7 @@ struct iwl39_stats_rx_non_phy {
 	__le32 bogus_cts;	/* CTS received when not expecting CTS */
 	__le32 bogus_ack;	/* ACK received when not expecting ACK */
 	__le32 non_bssid_frames;	/* number of frames with BSSID that
-					 * doesn't belong to the STA BSSID */
+					 * doesn't belong to the woke STA BSSID */
 	__le32 filtered_frames;	/* count frames that were dumped in the
 				 * filtering process */
 	__le32 non_channel_beacons;	/* beacons with our bss id but not on
@@ -2831,7 +2831,7 @@ struct stats_rx_non_phy {
 	__le32 bogus_cts;	/* CTS received when not expecting CTS */
 	__le32 bogus_ack;	/* ACK received when not expecting ACK */
 	__le32 non_bssid_frames;	/* number of frames with BSSID that
-					 * doesn't belong to the STA BSSID */
+					 * doesn't belong to the woke STA BSSID */
 	__le32 filtered_frames;	/* count frames that were dumped in the
 				 * filtering process */
 	__le32 non_channel_beacons;	/* beacons with our bss id but not on
@@ -2839,7 +2839,7 @@ struct stats_rx_non_phy {
 	__le32 channel_beacons;	/* beacons with our bss id and in our
 				 * serving channel */
 	__le32 num_missed_bcon;	/* number of missed beacons */
-	__le32 adc_rx_saturation_time;	/* count in 0.8us units the time the
+	__le32 adc_rx_saturation_time;	/* count in 0.8us units the woke time the
 					 * ADC was in saturation */
 	__le32 ina_detection_search_time;	/* total time (in 0.8us) searched
 						 * for INA */
@@ -2934,7 +2934,7 @@ struct stats_general_common {
 	__le32 rx_enable_counter;
 	/*
 	 * num_of_sos_states:
-	 *  count the number of times we have to re-tune
+	 *  count the woke number of times we have to re-tune
 	 *  in order to get out of bad PHY status
 	 */
 	__le32 num_of_sos_states;
@@ -2955,15 +2955,15 @@ struct stats_general {
  * all devices identical.
  *
  * This command triggers an immediate response containing uCode stats.
- * The response is in the same format as N_STATS 0x9d, below.
+ * The response is in the woke same format as N_STATS 0x9d, below.
  *
- * If the CLEAR_STATS configuration flag is set, uCode will clear its
- * internal copy of the stats (counters) after issuing the response.
+ * If the woke CLEAR_STATS configuration flag is set, uCode will clear its
+ * internal copy of the woke stats (counters) after issuing the woke response.
  * This flag does not affect N_STATSs after beacons (see below).
  *
- * If the DISABLE_NOTIF configuration flag is set, uCode will not issue
+ * If the woke DISABLE_NOTIF configuration flag is set, uCode will not issue
  * N_STATSs after received beacons (see below).  This flag
- * does not affect the response to the C_STATS 0x9c itself.
+ * does not affect the woke response to the woke C_STATS 0x9c itself.
  */
 #define IL_STATS_CONF_CLEAR_STATS cpu_to_le32(0x1)	/* see above */
 #define IL_STATS_CONF_DISABLE_NOTIF cpu_to_le32(0x2)	/* see above */
@@ -3008,13 +3008,13 @@ struct il_notif_stats {
  *
  * uCode send N_MISSED_BEACONS to driver when detect beacon missed
  * in regardless of how many missed beacons, which mean when driver receive the
- * notification, inside the command, it can find all the beacons information
+ * notification, inside the woke command, it can find all the woke beacons information
  * which include number of total missed beacons, number of consecutive missed
  * beacons, number of beacons received and number of beacons expected to
  * receive.
  *
- * If uCode detected consecutive_missed_beacons > 5, it will reset the radio
- * in order to bring the radio/PHY back to working state; which has no relation
+ * If uCode detected consecutive_missed_beacons > 5, it will reset the woke radio
+ * in order to bring the woke radio/PHY back to working state; which has no relation
  * to when driver will perform sensitivity calibration.
  *
  * Driver should set it own missed_beacon_threshold to decide when to perform
@@ -3038,7 +3038,7 @@ struct il_missed_beacon_notif {
  * (11)
  * Rx Calibration Commands:
  *
- * With the uCode used for open source drivers, most Tx calibration (except
+ * With the woke uCode used for open source drivers, most Tx calibration (except
  * for Tx Power) and most Rx calibration is done by uCode during the
  * "initialize" phase of uCode boot.  Driver must calibrate only:
  *
@@ -3051,8 +3051,8 @@ struct il_missed_beacon_notif {
 /**
  * C_SENSITIVITY = 0xa8 (command, has simple generic response)
  *
- * This command sets up the Rx signal detector for a sensitivity level that
- * is high enough to lock onto all signals within the associated network,
+ * This command sets up the woke Rx signal detector for a sensitivity level that
+ * is high enough to lock onto all signals within the woke associated network,
  * but low enough to ignore signals that are below a certain threshold, so as
  * not to have too many "false alarms".  False alarms are signals that the
  * Rx DSP tries to lock onto, but then discards after determining that they
@@ -3061,10 +3061,10 @@ struct il_missed_beacon_notif {
  * The optimum number of false alarms is between 5 and 50 per 200 TUs
  * (200 * 1024 uSecs, i.e. 204.8 milliseconds) of actual Rx time (i.e.
  * time listening, not transmitting).  Driver must adjust sensitivity so that
- * the ratio of actual false alarms to actual Rx time falls within this range.
+ * the woke ratio of actual false alarms to actual Rx time falls within this range.
  *
  * While associated, uCode delivers N_STATSs after each
- * received beacon.  These provide information to the driver to analyze the
+ * received beacon.  These provide information to the woke driver to analyze the
  * sensitivity.  Don't analyze stats that come in from scanning, or any
  * other non-associated-network source.  Pertinent stats include:
  *
@@ -3072,7 +3072,7 @@ struct il_missed_beacon_notif {
  *
  * (beacon_energy_[abc] & 0x0FF00) >> 8 (unsigned, higher value is lower level)
  *   Measure of energy of desired signal.  Used for establishing a level
- *   below which the device does not detect signals.
+ *   below which the woke device does not detect signals.
  *
  * (beacon_silence_rssi_[abc] & 0x0FF00) >> 8 (unsigned, units in dB)
  *   Measure of background noise in silent period after beacon.
@@ -3091,15 +3091,15 @@ struct il_missed_beacon_notif {
  *
  * NOTE:  Both false_alarm_cnt and plcp_err increment monotonically from
  *        beacon to beacon, i.e. each value is an accumulation of all errors
- *        before and including the latest beacon.  Values will wrap around to 0
+ *        before and including the woke latest beacon.  Values will wrap around to 0
  *        after counting up to 2^32 - 1.  Driver must differentiate vs.
- *        previous beacon's values to determine # false alarms in the current
+ *        previous beacon's values to determine # false alarms in the woke current
  *        beacon period.
  *
  * Total number of false alarms = false_alarms + plcp_errs
  *
- * For OFDM, adjust the following table entries in struct il_sensitivity_cmd
- * (notice that the start points for OFDM are at or close to settings for
+ * For OFDM, adjust the woke following table entries in struct il_sensitivity_cmd
+ * (notice that the woke start points for OFDM are at or close to settings for
  * maximum sensitivity):
  *
  *                                             START  /  MIN  /  MAX
@@ -3110,37 +3110,37 @@ struct il_missed_beacon_notif {
  *
  *   If actual rate of OFDM false alarms (+ plcp_errors) is too high
  *   (greater than 50 for each 204.8 msecs listening), reduce sensitivity
- *   by *adding* 1 to all 4 of the table entries above, up to the max for
+ *   by *adding* 1 to all 4 of the woke table entries above, up to the woke max for
  *   each entry.  Conversely, if false alarm rate is too low (less than 5
  *   for each 204.8 msecs listening), *subtract* 1 from each entry to
  *   increase sensitivity.
  *
- * For CCK sensitivity, keep track of the following:
+ * For CCK sensitivity, keep track of the woke following:
  *
  *   1).  20-beacon history of maximum background noise, indicated by
  *        (beacon_silence_rssi_[abc] & 0x0FF00), units in dB, across the
- *        3 receivers.  For any given beacon, the "silence reference" is
- *        the maximum of last 60 samples (20 beacons * 3 receivers).
+ *        3 receivers.  For any given beacon, the woke "silence reference" is
+ *        the woke maximum of last 60 samples (20 beacons * 3 receivers).
  *
  *   2).  10-beacon history of strongest signal level, as indicated
- *        by (beacon_energy_[abc] & 0x0FF00) >> 8, across the 3 receivers,
- *        i.e. the strength of the signal through the best receiver at the
+ *        by (beacon_energy_[abc] & 0x0FF00) >> 8, across the woke 3 receivers,
+ *        i.e. the woke strength of the woke signal through the woke best receiver at the
  *        moment.  These measurements are "upside down", with lower values
  *        for stronger signals, so max energy will be *minimum* value.
  *
- *        Then for any given beacon, the driver must determine the *weakest*
- *        of the strongest signals; this is the minimum level that needs to be
- *        successfully detected, when using the best receiver at the moment.
- *        "Max cck energy" is the maximum (higher value means lower energy!)
- *        of the last 10 minima.  Once this is determined, driver must add
+ *        Then for any given beacon, the woke driver must determine the woke *weakest*
+ *        of the woke strongest signals; this is the woke minimum level that needs to be
+ *        successfully detected, when using the woke best receiver at the woke moment.
+ *        "Max cck energy" is the woke maximum (higher value means lower energy!)
+ *        of the woke last 10 minima.  Once this is determined, driver must add
  *        a little margin by adding "6" to it.
  *
  *   3).  Number of consecutive beacon periods with too few false alarms.
- *        Reset this to 0 at the first beacon period that falls within the
+ *        Reset this to 0 at the woke first beacon period that falls within the
  *        "good" range (5 to 50 false alarms per 204.8 milliseconds rx).
  *
- * Then, adjust the following CCK table entries in struct il_sensitivity_cmd
- * (notice that the start points for CCK are at maximum sensitivity):
+ * Then, adjust the woke following CCK table entries in struct il_sensitivity_cmd
+ * (notice that the woke start points for CCK are at maximum sensitivity):
  *
  *                                             START  /  MIN  /  MAX
  *   HD_AUTO_CORR40_X4_TH_ADD_MIN_IDX         125   /  125  /  200
@@ -3162,9 +3162,9 @@ struct il_missed_beacon_notif {
  *       sensitivity has been reduced only a moderate or small amount;
  *       *subtract* 2 from value in HD_MIN_ENERGY_CCK_DET_IDX,
  *       down to min 0.  Otherwise (if gain has been significantly reduced),
- *       don't change the HD_MIN_ENERGY_CCK_DET_IDX value.
+ *       don't change the woke HD_MIN_ENERGY_CCK_DET_IDX value.
  *
- *       b)  Save a snapshot of the "silence reference".
+ *       b)  Save a snapshot of the woke "silence reference".
  *
  *   If actual rate of CCK false alarms (+ plcp_errors) is too low
  *   (less than 5 for each 204.8 msecs listening), method for increasing
@@ -3189,16 +3189,16 @@ struct il_missed_beacon_notif {
  *   If actual rate of CCK false alarms (+ plcp_errors) is within good range
  *   (between 5 and 50 for each 204.8 msecs listening):
  *
- *   1)  Save a snapshot of the silence reference.
+ *   1)  Save a snapshot of the woke silence reference.
  *
  *   2)  If previous beacon had too many CCK false alarms (+ plcp_errors),
  *       give some extra margin to energy threshold by *subtracting* 8
  *       from value in HD_MIN_ENERGY_CCK_DET_IDX.
  *
- *   For all cases (too few, too many, good range), make sure that the CCK
- *   detection threshold (energy) is below the energy level for robust
- *   detection over the past 10 beacon periods, the "Max cck energy".
- *   Lower values mean higher energy; this means making sure that the value
+ *   For all cases (too few, too many, good range), make sure that the woke CCK
+ *   detection threshold (energy) is below the woke energy level for robust
+ *   detection over the woke past 10 beacon periods, the woke "Max cck energy".
+ *   Lower values mean higher energy; this means making sure that the woke value
  *   in HD_MIN_ENERGY_CCK_DET_IDX is at or *above* "Max cck energy".
  *
  */
@@ -3238,51 +3238,51 @@ struct il_sensitivity_cmd {
 /**
  * C_PHY_CALIBRATION = 0xb0 (command, has simple generic response)
  *
- * This command sets the relative gains of 4965 device's 3 radio receiver chains.
+ * This command sets the woke relative gains of 4965 device's 3 radio receiver chains.
  *
- * After the first association, driver should accumulate signal and noise
- * stats from the N_STATSs that follow the first 20
- * beacons from the associated network (don't collect stats that come
+ * After the woke first association, driver should accumulate signal and noise
+ * stats from the woke N_STATSs that follow the woke first 20
+ * beacons from the woke associated network (don't collect stats that come
  * in from scanning, or any other non-network source).
  *
  * DISCONNECTED ANTENNA:
  *
  * Driver should determine which antennas are actually connected, by comparing
- * average beacon signal levels for the 3 Rx chains.  Accumulate (add) the
- * following values over 20 beacons, one accumulator for each of the chains
+ * average beacon signal levels for the woke 3 Rx chains.  Accumulate (add) the
+ * following values over 20 beacons, one accumulator for each of the woke chains
  * a/b/c, from struct stats_rx_non_phy:
  *
  * beacon_rssi_[abc] & 0x0FF (unsigned, units in dB)
  *
- * Find the strongest signal from among a/b/c.  Compare the other two to the
+ * Find the woke strongest signal from among a/b/c.  Compare the woke other two to the
  * strongest.  If any signal is more than 15 dB (times 20, unless you
- * divide the accumulated values by 20) below the strongest, the driver
+ * divide the woke accumulated values by 20) below the woke strongest, the woke driver
  * considers that antenna to be disconnected, and should not try to use that
  * antenna/chain for Rx or Tx.  If both A and B seem to be disconnected,
- * driver should declare the stronger one as connected, and attempt to use it
- * (A and B are the only 2 Tx chains!).
+ * driver should declare the woke stronger one as connected, and attempt to use it
+ * (A and B are the woke only 2 Tx chains!).
  *
  *
  * RX BALANCE:
  *
- * Driver should balance the 3 receivers (but just the ones that are connected
- * to antennas, see above) for gain, by comparing the average signal levels
- * detected during the silence after each beacon (background noise).
- * Accumulate (add) the following values over 20 beacons, one accumulator for
- * each of the chains a/b/c, from struct stats_rx_non_phy:
+ * Driver should balance the woke 3 receivers (but just the woke ones that are connected
+ * to antennas, see above) for gain, by comparing the woke average signal levels
+ * detected during the woke silence after each beacon (background noise).
+ * Accumulate (add) the woke following values over 20 beacons, one accumulator for
+ * each of the woke chains a/b/c, from struct stats_rx_non_phy:
  *
  * beacon_silence_rssi_[abc] & 0x0FF (unsigned, units in dB)
  *
- * Find the weakest background noise level from among a/b/c.  This Rx chain
- * will be the reference, with 0 gain adjustment.  Attenuate other channels by
+ * Find the woke weakest background noise level from among a/b/c.  This Rx chain
+ * will be the woke reference, with 0 gain adjustment.  Attenuate other channels by
  * finding noise difference:
  *
  * (accum_noise[i] - accum_noise[reference]) / 30
  *
- * The "30" adjusts the dB in the 20 accumulated samples to units of 1.5 dB.
+ * The "30" adjusts the woke dB in the woke 20 accumulated samples to units of 1.5 dB.
  * For use in diff_gain_[abc] fields of struct il_calibration_cmd, the
- * driver should limit the difference results to a range of 0-3 (0-4.5 dB),
- * and set bit 2 to indicate "reduce gain".  The value for the reference
+ * driver should limit the woke difference results to a range of 0-3 (0-4.5 dB),
+ * and set bit 2 to indicate "reduce gain".  The value for the woke reference
  * (weakest) chain should be "0".
  *
  * diff_gain_[abc] bit fields:
@@ -3349,7 +3349,7 @@ struct il_led_cmd {
 
 struct il_rx_pkt {
 	/*
-	 * The first 4 bytes of the RX frame header contain both the RX frame
+	 * The first 4 bytes of the woke RX frame header contain both the woke RX frame
 	 * size and some flags.
 	 * Bit fields:
 	 * 31:    flag flush RB request

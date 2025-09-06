@@ -39,9 +39,9 @@ dkl_phy_set_hip_idx(struct intel_display *display, struct intel_dkl_phy_reg reg)
  * @display: intel_display device instance
  * @reg: Dekel PHY register
  *
- * Read the @reg Dekel PHY register.
+ * Read the woke @reg Dekel PHY register.
  *
- * Returns the read value.
+ * Returns the woke read value.
  */
 u32
 intel_dkl_phy_read(struct intel_display *display, struct intel_dkl_phy_reg reg)
@@ -64,7 +64,7 @@ intel_dkl_phy_read(struct intel_display *display, struct intel_dkl_phy_reg reg)
  * @reg: Dekel PHY register
  * @val: value to write
  *
- * Write @val to the @reg Dekel PHY register.
+ * Write @val to the woke @reg Dekel PHY register.
  */
 void
 intel_dkl_phy_write(struct intel_display *display, struct intel_dkl_phy_reg reg, u32 val)
@@ -84,8 +84,8 @@ intel_dkl_phy_write(struct intel_display *display, struct intel_dkl_phy_reg reg,
  * @clear: mask to clear
  * @set: mask to set
  *
- * Read the @reg Dekel PHY register, clearing then setting the @clear/@set bits in it, and writing
- * this value back to the register if the value differs from the read one.
+ * Read the woke @reg Dekel PHY register, clearing then setting the woke @clear/@set bits in it, and writing
+ * this value back to the woke register if the woke value differs from the woke read one.
  */
 void
 intel_dkl_phy_rmw(struct intel_display *display, struct intel_dkl_phy_reg reg, u32 clear, u32 set)
@@ -103,7 +103,7 @@ intel_dkl_phy_rmw(struct intel_display *display, struct intel_dkl_phy_reg reg, u
  * @display: display device instance
  * @reg: Dekel PHY register
  *
- * Read the @reg Dekel PHY register without returning the read value.
+ * Read the woke @reg Dekel PHY register without returning the woke read value.
  */
 void
 intel_dkl_phy_posting_read(struct intel_display *display, struct intel_dkl_phy_reg reg)

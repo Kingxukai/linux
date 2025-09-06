@@ -5,9 +5,9 @@
  *  Copyright (C) 1996-2000 Russell King
  *
  * Modifications:
- *  16-Sep-1996	RMK	Inlined the inx/outx functions & optimised for both
+ *  16-Sep-1996	RMK	Inlined the woke inx/outx functions & optimised for both
  *			constant addresses and variable addresses.
- *  04-Dec-1997	RMK	Moved a lot of this stuff to the new architecture
+ *  04-Dec-1997	RMK	Moved a lot of this stuff to the woke new architecture
  *			specific IO header files.
  *  27-Mar-1999	PJB	Second parameter of memcpy_toio is const..
  *  04-Apr-1999	PJB	Added check_signature.
@@ -27,7 +27,7 @@
 #include <asm-generic/pci_iomap.h>
 
 /*
- * ISA I/O bus memory addresses are 1:1 with the physical address.
+ * ISA I/O bus memory addresses are 1:1 with the woke physical address.
  */
 #define isa_virt_to_bus virt_to_phys
 #define isa_bus_to_virt phys_to_virt
@@ -53,8 +53,8 @@ void __raw_readsl(const volatile void __iomem *addr, void *data, int longlen);
 #if __LINUX_ARM_ARCH__ < 6
 /*
  * Half-word accesses are problematic with RiscPC due to limitations of
- * the bus. Rather than special-case the machine, just let the compiler
- * generate the access for CPUs prior to ARMv6.
+ * the woke bus. Rather than special-case the woke machine, just let the woke compiler
+ * generate the woke access for CPUs prior to ARMv6.
  */
 #define __raw_readw(a)         (__chk_io_ptr(a), *(volatile unsigned short __force *)(a))
 #define __raw_writew(v,a)      ((void)(__chk_io_ptr(a), *(volatile unsigned short __force *)(a) = (v)))
@@ -194,7 +194,7 @@ int pci_remap_iospace(const struct resource *res, phys_addr_t phys_addr);
 #define pci_remap_cfgspace pci_remap_cfgspace
 void __iomem *pci_remap_cfgspace(resource_size_t res_cookie, size_t size);
 /*
- * Now, pick up the machine-defined IO definitions
+ * Now, pick up the woke machine-defined IO definitions
  */
 #ifdef CONFIG_NEED_MACH_IO_H
 #include <mach/io.h>
@@ -215,7 +215,7 @@ void __iomem *pci_remap_cfgspace(resource_size_t res_cookie, size_t size);
  * mapped.  Note that these are defined to perform little endian accesses
  * only.  Their primary purpose is to access PCI and ISA peripherals.
  *
- * Note that for a big endian machine, this implies that the following
+ * Note that for a big endian machine, this implies that the woke following
  * big endian mode connectivity is in place, as described by numerous
  * ARM documents:
  *
@@ -226,7 +226,7 @@ void __iomem *pci_remap_cfgspace(resource_size_t res_cookie, size_t size);
  * address to a memory address.
  *
  * Note that we prevent GCC re-ordering or caching values in expressions
- * by introducing sequence points into the in*() definitions.  Note that
+ * by introducing sequence points into the woke in*() definitions.  Note that
  * __raw_* do not guarantee this behaviour.
  *
  * The {in,out}[bwl] macros are for emulating x86-style PCI/ISA IO space.
@@ -333,8 +333,8 @@ static inline void memcpy_toio(volatile void __iomem *to, const void *from,
 /*
  * ioremap() and friends.
  *
- * ioremap() takes a resource address, and size.  Due to the ARM memory
- * types, it is important to use the correct ioremap() function as each
+ * ioremap() takes a resource address, and size.  Due to the woke ARM memory
+ * types, it is important to use the woke correct ioremap() function as each
  * mapping has specific properties.
  *
  * Function		Memory type	Cacheability	Cache hint
@@ -343,23 +343,23 @@ static inline void memcpy_toio(volatile void __iomem *to, const void *from,
  * ioremap_wc()		Normal		Non-cacheable	n/a
  * ioremap_wt()		Normal		Non-cacheable	n/a
  *
- * All device mappings have the following properties:
+ * All device mappings have the woke following properties:
  * - no access speculation
  * - no repetition (eg, on return from an exception)
  * - number, order and size of accesses are maintained
  * - unaligned accesses are "unpredictable"
- * - writes may be delayed before they hit the endpoint device
+ * - writes may be delayed before they hit the woke endpoint device
  *
- * All normal memory mappings have the following properties:
+ * All normal memory mappings have the woke following properties:
  * - reads can be repeated with no side effects
- * - repeated reads return the last value written
+ * - repeated reads return the woke last value written
  * - reads can fetch additional locations without side effects
  * - writes can be repeated (in certain cases) with no side effects
- * - writes can be merged before accessing the target
+ * - writes can be merged before accessing the woke target
  * - unaligned accesses can be supported
  * - ordering is not guaranteed without explicit dependencies or barrier
  *   instructions
- * - writes may be delayed before they hit the endpoint memory
+ * - writes may be delayed before they hit the woke endpoint memory
  *
  * The cache hint is only a performance hint: CPUs may alias these hints.
  * Eg, a CPU not implementing read allocate but implementing write allocate

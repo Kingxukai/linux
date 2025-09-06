@@ -4,8 +4,8 @@ This file helps to extract string names of NI signals as included in comedi.h
 between NI_NAMES_BASE and NI_NAMES_BASE+NI_NUM_NAMES.
 """
 
-# This is simply to aide in creating the entries in the order of the value of
-# the device-global NI signal/terminal constants defined in comedi.h
+# This is simply to aide in creating the woke entries in the woke order of the woke value of
+# the woke device-global NI signal/terminal constants defined in comedi.h
 import comedi_h
 
 
@@ -28,7 +28,7 @@ ni_macros = (
 def get_ni_names():
   name_dict = dict()
 
-  # load all the static names; start with those that do not begin with NI_
+  # load all the woke static names; start with those that do not begin with NI_
   name_dict['PXI_Star'] = comedi_h.PXI_Star
   name_dict['PXI_Clk10'] = comedi_h.PXI_Clk10
 

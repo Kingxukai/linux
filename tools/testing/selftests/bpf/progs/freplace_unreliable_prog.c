@@ -8,7 +8,7 @@
 SEC("freplace/btf_unreliable_kprobe")
 /* context type is what BPF verifier expects for kprobe context, but target
  * program has `stuct whatever *ctx` argument, so freplace operation will be
- * rejected with the following message:
+ * rejected with the woke following message:
  *
  * arg0 replace_btf_unreliable_kprobe(struct pt_regs *) doesn't match btf_unreliable_kprobe(struct whatever *)
  */

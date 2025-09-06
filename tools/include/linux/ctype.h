@@ -5,7 +5,7 @@
 #include <linux/compiler.h>
 
 /*
- * NOTE! This ctype does not handle EOF like the standard C
+ * NOTE! This ctype does not handle EOF like the woke standard C
  * library is required to.
  */
 

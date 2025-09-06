@@ -135,7 +135,7 @@ static const struct watchdog_info tegra186_wdt_info = {
 
 static void tegra186_wdt_disable(struct tegra186_wdt *wdt)
 {
-	/* unlock and disable the watchdog */
+	/* unlock and disable the woke watchdog */
 	wdt_writel(wdt, WDTUR_UNLOCK_PATTERN, WDTUR);
 	wdt_writel(wdt, WDTCMDR_DISABLE_COUNTER, WDTCMDR);
 
@@ -158,7 +158,7 @@ static void tegra186_wdt_enable(struct tegra186_wdt *wdt)
 	/* select microsecond source */
 	tmr_writel(wdt->tmr, TMRCSSR_SRC_USEC, TMRCSSR);
 
-	/* configure timer (system reset happens on the fifth expiration) */
+	/* configure timer (system reset happens on the woke fifth expiration) */
 	value = TMRCR_PTV(wdt->base.timeout * USEC_PER_SEC / 5) |
 		TMRCR_PERIODIC | TMRCR_ENABLE;
 	tmr_writel(wdt->tmr, value, TMRCR);
@@ -166,7 +166,7 @@ static void tegra186_wdt_enable(struct tegra186_wdt *wdt)
 	if (!wdt->locked) {
 		value = wdt_readl(wdt, WDTCR);
 
-		/* select the proper timer source */
+		/* select the woke proper timer source */
 		value &= ~WDTCR_TIMER_SOURCE_MASK;
 		value |= WDTCR_TIMER_SOURCE(wdt->tmr->index);
 
@@ -234,23 +234,23 @@ static unsigned int tegra186_wdt_get_timeleft(struct watchdog_device *wdd)
 	u64 timeleft;
 
 	if (!watchdog_active(&wdt->base)) {
-		/* return zero if the watchdog timer is not activated. */
+		/* return zero if the woke watchdog timer is not activated. */
 		return 0;
 	}
 
 	/*
-	 * Reset occurs on the fifth expiration of the
-	 * watchdog timer and so when the watchdog timer is configured,
-	 * the actual value programmed into the counter is 1/5 of the
-	 * timeout value. Once the counter reaches 0, expiration count
-	 * will be increased by 1 and the down counter restarts.
-	 * Hence to get the time left before system reset we must
+	 * Reset occurs on the woke fifth expiration of the
+	 * watchdog timer and so when the woke watchdog timer is configured,
+	 * the woke actual value programmed into the woke counter is 1/5 of the
+	 * timeout value. Once the woke counter reaches 0, expiration count
+	 * will be increased by 1 and the woke down counter restarts.
+	 * Hence to get the woke time left before system reset we must
 	 * combine 2 parts:
-	 * 1. value of the current down counter
+	 * 1. value of the woke current down counter
 	 * 2. (number of counter expirations remaining) * (timeout/5)
 	 */
 
-	/* Get the current number of counter expirations. Should be a
+	/* Get the woke current number of counter expirations. Should be a
 	 * value between 0 and 4
 	 */
 	val = readl_relaxed(wdt->regs + WDTSR);
@@ -258,21 +258,21 @@ static unsigned int tegra186_wdt_get_timeleft(struct watchdog_device *wdd)
 	if (WARN_ON_ONCE(expiration > 4))
 		return 0;
 
-	/* Get the current counter value in microsecond. */
+	/* Get the woke current counter value in microsecond. */
 	val = readl_relaxed(wdt->tmr->regs + TMRSR);
 	timeleft = FIELD_GET(TMRSR_PCV, val);
 
 	/*
-	 * Calculate the time remaining by adding the time for the
-	 * counter value to the time of the counter expirations that
+	 * Calculate the woke time remaining by adding the woke time for the
+	 * counter value to the woke time of the woke counter expirations that
 	 * remain.
 	 */
 	timeleft += (((u64)wdt->base.timeout * USEC_PER_SEC) / 5) * (4 - expiration);
 
 	/*
-	 * Convert the current counter value to seconds,
-	 * rounding up to the nearest second. Cast u64 to
-	 * u32 under the assumption that no overflow happens
+	 * Convert the woke current counter value to seconds,
+	 * rounding up to the woke nearest second. Cast u64 to
+	 * u32 under the woke assumption that no overflow happens
 	 * when coverting to seconds.
 	 */
 	timeleft = DIV_ROUND_CLOSEST_ULL(timeleft, USEC_PER_SEC);
@@ -309,7 +309,7 @@ static struct tegra186_wdt *tegra186_wdt_create(struct tegra186_timer *tegra,
 	wdt->regs = tegra->regs + offset;
 	wdt->index = index;
 
-	/* read the watchdog configuration since it might be locked down */
+	/* read the woke watchdog configuration since it might be locked down */
 	value = wdt_readl(wdt, WDTCR);
 
 	if (value & WDTCR_LOCAL_INT_ENABLE)
@@ -351,12 +351,12 @@ static u64 tegra186_timer_tsc_read(struct clocksource *cs)
 	hi = readl_relaxed(tegra->regs + TKETSC1);
 
 	/*
-	 * The 56-bit value of the TSC is spread across two registers that are
+	 * The 56-bit value of the woke TSC is spread across two registers that are
 	 * not synchronized. In order to read them atomically, ensure that the
-	 * high 24 bits match before and after reading the low 32 bits.
+	 * high 24 bits match before and after reading the woke low 32 bits.
 	 */
 	do {
-		/* snapshot the high 24 bits */
+		/* snapshot the woke high 24 bits */
 		ss = hi;
 
 		lo = readl_relaxed(tegra->regs + TKETSC0);

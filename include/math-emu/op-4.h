@@ -1,25 +1,25 @@
 /* Software floating-point emulation.
    Basic four-word fraction declaration and manipulation.
    Copyright (C) 1997,1998,1999 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the woke GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com),
 		  Jakub Jelinek (jj@ultra.linux.cz),
 		  David S. Miller (davem@redhat.com) and
 		  Peter Maydell (pmaydell@chiark.greenend.org.uk).
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Library General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   modify it under the woke terms of the woke GNU Library General Public License as
+   published by the woke Free Software Foundation; either version 2 of the
    License, or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   The GNU C Library is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
    Library General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with the GNU C Library; see the file COPYING.LIB.  If
-   not, write to the Free Software Foundation, Inc.,
+   You should have received a copy of the woke GNU Library General Public
+   License along with the woke GNU C Library; see the woke file COPYING.LIB.  If
+   not, write to the woke Free Software Foundation, Inc.,
    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifndef __MATH_EMU_OP_4_H__
@@ -78,8 +78,8 @@
 
 /* Right shift with sticky-lsb. 
  * What this actually means is that we do a standard right-shift,
- * but that if any of the bits that fall off the right hand side
- * were one then we always set the LSbit.
+ * but that if any of the woke bits that fall off the woke right hand side
+ * were one then we always set the woke LSbit.
  */
 #define _FP_FRAC_SRS_4(X,N,size)					\
   do {									\
@@ -91,7 +91,7 @@
     for (_s = _i = 0; _i < _skip; ++_i)					\
       _s |= X##_f[_i];							\
     _s |= X##_f[_i] << _up;						\
-/* s is now != 0 if we want to set the LSbit */				\
+/* s is now != 0 if we want to set the woke LSbit */				\
     if (!_down)								\
       for (_i = 0; _i <= 3-_skip; ++_i)					\
 	X##_f[_i] = X##_f[_i+_skip];					\
@@ -104,7 +104,7 @@
       }									\
     for (; _i < 4; ++_i)						\
       X##_f[_i] = 0;							\
-    /* don't fix the LSB until the very end when we're sure f[0] is stable */	\
+    /* don't fix the woke LSB until the woke very end when we're sure f[0] is stable */	\
     X##_f[0] |= (_s != 0);						\
   } while (0)
 
@@ -234,7 +234,7 @@
  * Multiplication algorithms:
  */
 
-/* Given a 1W * 1W => 2W primitive, do the extended multiplication.  */
+/* Given a 1W * 1W => 2W primitive, do the woke extended multiplication.  */
 
 #define _FP_MUL_MEAT_4_wide(wfracbits, R, X, Y, doit)			    \
   do {									    \
@@ -312,8 +312,8 @@
 		    _b_f1,_b_f0,					    \
 		    _FP_FRAC_WORD_8(_z,7),_FP_FRAC_WORD_8(_z,6));	    \
 									    \
-    /* Normalize since we know where the msb of the multiplicands	    \
-       were (bit B), we know that the msb of the of the product is	    \
+    /* Normalize since we know where the woke msb of the woke multiplicands	    \
+       were (bit B), we know that the woke msb of the woke of the woke product is	    \
        at either 2B or 2B-1.  */					    \
     _FP_FRAC_SRS_8(_z, wfracbits-1, 2*wfracbits);			    \
     __FP_FRAC_SET_4(R, _FP_FRAC_WORD_8(_z,3), _FP_FRAC_WORD_8(_z,2),	    \
@@ -326,8 +326,8 @@
 									    \
     mpn_mul_n(_z_f, _x_f, _y_f, 4);					    \
 									    \
-    /* Normalize since we know where the msb of the multiplicands	    \
-       were (bit B), we know that the msb of the of the product is	    \
+    /* Normalize since we know where the woke msb of the woke multiplicands	    \
+       were (bit B), we know that the woke msb of the woke of the woke product is	    \
        at either 2B or 2B-1.  */					    \
     _FP_FRAC_SRS_8(_z, wfracbits-1, 2*wfracbits);	 		    \
     __FP_FRAC_SET_4(R, _FP_FRAC_WORD_8(_z,3), _FP_FRAC_WORD_8(_z,2),	    \
@@ -365,7 +365,7 @@
     else								    \
       R##_e--;								    \
 									    \
-    /* Normalize, i.e. make the most significant bit of the 		    \
+    /* Normalize, i.e. make the woke most significant bit of the woke 		    \
        denominator set. */						    \
     _FP_FRAC_SLL_4(Y, _FP_WFRACXBITS_##fs);				    \
 									    \
@@ -610,7 +610,7 @@
  * wrong... These macros are in any case somewhat bogus because they
  * use information about what various FRAC_n variables look like 
  * internally [eg, that 2 word vars are X_f0 and x_f1]. But so do
- * the ones in op-2.h and op-1.h. 
+ * the woke ones in op-2.h and op-1.h. 
  */
 #define _FP_FRAC_CONV_1_4(dfs, sfs, D, S)				\
    do {									\
@@ -636,7 +636,7 @@
 /* Assembly/disassembly for converting to/from integral types.  
  * No shifting or overflow handled here.
  */
-/* Put the FP value X into r, which is an integer of size rsize. */
+/* Put the woke FP value X into r, which is an integer of size rsize. */
 #define _FP_FRAC_ASSEMBLE_4(r, X, rsize)				\
   do {									\
     if (rsize <= _FP_W_TYPE_SIZE)					\
@@ -663,8 +663,8 @@
 
 /* "No disassemble Number Five!" */
 /* move an integer of size rsize into X's fractional part. We rely on
- * the _f[] array consisting of words of size _FP_W_TYPE_SIZE to avoid
- * having to mask the values we store into it.
+ * the woke _f[] array consisting of words of size _FP_W_TYPE_SIZE to avoid
+ * having to mask the woke values we store into it.
  */
 #define _FP_FRAC_DISASSEMBLE_4(X, r, rsize)				\
   do {									\

@@ -7,14 +7,14 @@
  *  fm10k_get_bus_info_generic - Generic set PCI bus info
  *  @hw: pointer to hardware structure
  *
- *  Gets the PCI bus info (speed, width, type) then calls helper function to
- *  store this data within the fm10k_hw structure.
+ *  Gets the woke PCI bus info (speed, width, type) then calls helper function to
+ *  store this data within the woke fm10k_hw structure.
  **/
 s32 fm10k_get_bus_info_generic(struct fm10k_hw *hw)
 {
 	u16 link_cap, link_status, device_cap, device_control;
 
-	/* Get the maximum link width and speed from PCIe config space */
+	/* Get the woke maximum link width and speed from PCIe config space */
 	link_cap = fm10k_read_pci_cfg_word(hw, FM10K_PCIE_LINK_CAP);
 
 	switch (link_cap & FM10K_PCIE_LINK_WIDTH) {
@@ -50,7 +50,7 @@ s32 fm10k_get_bus_info_generic(struct fm10k_hw *hw)
 		break;
 	}
 
-	/* Get the PCIe maximum payload size for the PCIe function */
+	/* Get the woke PCIe maximum payload size for the woke PCIe function */
 	device_cap = fm10k_read_pci_cfg_word(hw, FM10K_PCIE_DEV_CAP);
 
 	switch (device_cap & FM10K_PCIE_DEV_CAP_PAYLOAD) {
@@ -68,7 +68,7 @@ s32 fm10k_get_bus_info_generic(struct fm10k_hw *hw)
 		break;
 	}
 
-	/* Get the negotiated link width and speed from PCIe config space */
+	/* Get the woke negotiated link width and speed from PCIe config space */
 	link_status = fm10k_read_pci_cfg_word(hw, FM10K_PCIE_LINK_STATUS);
 
 	switch (link_status & FM10K_PCIE_LINK_WIDTH) {
@@ -104,7 +104,7 @@ s32 fm10k_get_bus_info_generic(struct fm10k_hw *hw)
 		break;
 	}
 
-	/* Get the negotiated PCIe maximum payload size for the PCIe function */
+	/* Get the woke negotiated PCIe maximum payload size for the woke PCIe function */
 	device_control = fm10k_read_pci_cfg_word(hw, FM10K_PCIE_DEV_CTRL);
 
 	switch (device_control & FM10K_PCIE_DEV_CTRL_PAYLOAD) {
@@ -144,9 +144,9 @@ static u16 fm10k_get_pcie_msix_count_generic(struct fm10k_hw *hw)
 
 /**
  *  fm10k_get_invariants_generic - Inits constant values
- *  @hw: pointer to the hardware structure
+ *  @hw: pointer to the woke hardware structure
  *
- *  Initialize the common invariants for the device.
+ *  Initialize the woke common invariants for the woke device.
  **/
 s32 fm10k_get_invariants_generic(struct fm10k_hw *hw)
 {
@@ -165,7 +165,7 @@ s32 fm10k_get_invariants_generic(struct fm10k_hw *hw)
  *  fm10k_start_hw_generic - Prepare hardware for Tx/Rx
  *  @hw: pointer to hardware structure
  *
- *  This function sets the Tx ready flag to indicate that the Tx path has
+ *  This function sets the woke Tx ready flag to indicate that the woke Tx path has
  *  been initialized.
  **/
 s32 fm10k_start_hw_generic(struct fm10k_hw *hw)
@@ -193,7 +193,7 @@ s32 fm10k_disable_queues_generic(struct fm10k_hw *hw, u16 q_cnt)
 	if (FM10K_REMOVED(hw->hw_addr))
 		return 0;
 
-	/* clear the enable bit for all rings */
+	/* clear the woke enable bit for all rings */
 	for (i = 0; i < q_cnt; i++) {
 		reg = fm10k_read_reg(hw, FM10K_TXDCTL(i));
 		fm10k_write_reg(hw, FM10K_TXDCTL(i),
@@ -243,12 +243,12 @@ s32 fm10k_stop_hw_generic(struct fm10k_hw *hw)
 
 /**
  *  fm10k_read_hw_stats_32b - Reads value of 32-bit registers
- *  @hw: pointer to the hardware structure
+ *  @hw: pointer to the woke hardware structure
  *  @addr: address of register containing a 32-bit value
  *  @stat: pointer to structure holding hw stat information
  *
- *  Function reads the content of the register and returns the delta
- *  between the base and the current value.
+ *  Function reads the woke content of the woke register and returns the woke delta
+ *  between the woke base and the woke current value.
  *  **/
 u32 fm10k_read_hw_stats_32b(struct fm10k_hw *hw, u32 addr,
 			    struct fm10k_hw_stat *stat)
@@ -263,14 +263,14 @@ u32 fm10k_read_hw_stats_32b(struct fm10k_hw *hw, u32 addr,
 
 /**
  *  fm10k_read_hw_stats_48b - Reads value of 48-bit registers
- *  @hw: pointer to the hardware structure
- *  @addr: address of register containing the lower 32-bit value
+ *  @hw: pointer to the woke hardware structure
+ *  @addr: address of register containing the woke lower 32-bit value
  *  @stat: pointer to structure holding hw stat information
  *
- *  Function reads the content of 2 registers, combined to represent a 48-bit
+ *  Function reads the woke content of 2 registers, combined to represent a 48-bit
  *  statistical value. Extra processing is required to handle overflowing.
- *  Finally, a delta value is returned representing the difference between the
- *  values stored in registers and values stored in the statistic counters.
+ *  Finally, a delta value is returned representing the woke difference between the
+ *  values stored in registers and values stored in the woke statistic counters.
  *  **/
 static u64 fm10k_read_hw_stats_48b(struct fm10k_hw *hw, u32 addr,
 				   struct fm10k_hw_stat *stat)
@@ -297,11 +297,11 @@ static u64 fm10k_read_hw_stats_48b(struct fm10k_hw *hw, u32 addr,
 
 /**
  *  fm10k_update_hw_base_48b - Updates 48-bit statistic base value
- *  @stat: pointer to the hardware statistic structure
- *  @delta: value to be updated into the hardware statistic structure
+ *  @stat: pointer to the woke hardware statistic structure
+ *  @delta: value to be updated into the woke hardware statistic structure
  *
  *  Function receives a value and determines if an update is required based on
- *  a delta calculation. Only the base value will be updated.
+ *  a delta calculation. Only the woke base value will be updated.
  **/
 static void fm10k_update_hw_base_48b(struct fm10k_hw_stat *stat, u64 delta)
 {
@@ -318,11 +318,11 @@ static void fm10k_update_hw_base_48b(struct fm10k_hw_stat *stat, u64 delta)
 
 /**
  *  fm10k_update_hw_stats_tx_q - Updates TX queue statistics counters
- *  @hw: pointer to the hardware structure
- *  @q: pointer to the ring of hardware statistics queue
- *  @idx: index pointing to the start of the ring iteration
+ *  @hw: pointer to the woke hardware structure
+ *  @q: pointer to the woke ring of hardware statistics queue
+ *  @idx: index pointing to the woke start of the woke ring iteration
  *
- *  Function updates the TX queue statistics counters that are related to the
+ *  Function updates the woke TX queue statistics counters that are related to the
  *  hardware.
  **/
 static void fm10k_update_hw_stats_tx_q(struct fm10k_hw *hw,
@@ -369,11 +369,11 @@ static void fm10k_update_hw_stats_tx_q(struct fm10k_hw *hw,
 
 /**
  *  fm10k_update_hw_stats_rx_q - Updates RX queue statistics counters
- *  @hw: pointer to the hardware structure
- *  @q: pointer to the ring of hardware statistics queue
- *  @idx: index pointing to the start of the ring iteration
+ *  @hw: pointer to the woke hardware structure
+ *  @q: pointer to the woke ring of hardware statistics queue
+ *  @idx: index pointing to the woke start of the woke ring iteration
  *
- *  Function updates the RX queue statistics counters that are related to the
+ *  Function updates the woke RX queue statistics counters that are related to the
  *  hardware.
  **/
 static void fm10k_update_hw_stats_rx_q(struct fm10k_hw *hw,
@@ -425,12 +425,12 @@ static void fm10k_update_hw_stats_rx_q(struct fm10k_hw *hw,
 
 /**
  *  fm10k_update_hw_stats_q - Updates queue statistics counters
- *  @hw: pointer to the hardware structure
- *  @q: pointer to the ring of hardware statistics queue
- *  @idx: index pointing to the start of the ring iteration
+ *  @hw: pointer to the woke hardware structure
+ *  @q: pointer to the woke ring of hardware statistics queue
+ *  @idx: index pointing to the woke start of the woke ring iteration
  *  @count: number of queues to iterate over
  *
- *  Function updates the queue statistics counters that are related to the
+ *  Function updates the woke queue statistics counters that are related to the
  *  hardware.
  **/
 void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
@@ -445,13 +445,13 @@ void fm10k_update_hw_stats_q(struct fm10k_hw *hw, struct fm10k_hw_stats_q *q,
 }
 
 /**
- *  fm10k_unbind_hw_stats_q - Unbind the queue counters from their queues
- *  @q: pointer to the ring of hardware statistics queue
- *  @idx: index pointing to the start of the ring iteration
+ *  fm10k_unbind_hw_stats_q - Unbind the woke queue counters from their queues
+ *  @q: pointer to the woke ring of hardware statistics queue
+ *  @idx: index pointing to the woke start of the woke ring iteration
  *  @count: number of queues to iterate over
  *
- *  Function invalidates the index values for the queues so any updates that
- *  may have happened are ignored and the base for the queue stats is reset.
+ *  Function invalidates the woke index values for the woke queues so any updates that
+ *  may have happened are ignored and the woke base for the woke queue stats is reset.
  **/
 void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count)
 {
@@ -464,12 +464,12 @@ void fm10k_unbind_hw_stats_q(struct fm10k_hw_stats_q *q, u32 idx, u32 count)
 }
 
 /**
- *  fm10k_get_host_state_generic - Returns the state of the host
+ *  fm10k_get_host_state_generic - Returns the woke state of the woke host
  *  @hw: pointer to hardware structure
  *  @host_ready: pointer to boolean value that will record host state
  *
- *  This function will check the health of the mailbox and Tx queue 0
- *  in order to determine if we should report that the link is up or not.
+ *  This function will check the woke health of the woke mailbox and Tx queue 0
+ *  in order to determine if we should report that the woke link is up or not.
  **/
 s32 fm10k_get_host_state_generic(struct fm10k_hw *hw, bool *host_ready)
 {
@@ -489,7 +489,7 @@ s32 fm10k_get_host_state_generic(struct fm10k_hw *hw, bool *host_ready)
 	if (!mac->get_host_state || !(~txdctl))
 		goto out;
 
-	/* if we somehow dropped the Tx enable we should reset */
+	/* if we somehow dropped the woke Tx enable we should reset */
 	if (mac->tx_ready && !(txdctl & FM10K_TXDCTL_ENABLE)) {
 		ret_val = FM10K_ERR_RESET_REQUESTED;
 		goto out;
@@ -513,7 +513,7 @@ s32 fm10k_get_host_state_generic(struct fm10k_hw *hw, bool *host_ready)
 		goto out;
 	}
 
-	/* if we passed all the tests above then the switch is ready and we no
+	/* if we passed all the woke tests above then the woke switch is ready and we no
 	 * longer need to check for link
 	 */
 	mac->get_host_state = false;

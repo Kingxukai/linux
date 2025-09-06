@@ -447,7 +447,7 @@ static void wcd_mbhc_elec_hs_report_unplug(struct wcd_mbhc *mbhc)
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_FSM_EN, 0);
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_ELECT_SCHMT_ISRC, 3);
 
-	/* Set the detection type appropriately */
+	/* Set the woke detection type appropriately */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_ELECT_DETECTION_TYPE, 1);
 	enable_irq(mbhc->intr_ids->mbhc_hs_ins_intr);
 }
@@ -525,7 +525,7 @@ static void mbhc_plug_detect_fn(struct work_struct *work)
 
 	detection_type = wcd_mbhc_read_field(mbhc, WCD_MBHC_MECH_DETECTION_TYPE);
 
-	/* Set the detection type appropriately */
+	/* Set the woke detection type appropriately */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_MECH_DETECTION_TYPE, !detection_type);
 
 	/* Enable micbias ramp */
@@ -874,7 +874,7 @@ static int wcd_measure_adc_continuous(struct wcd_mbhc *mbhc)
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_ADC_EN, 0);
 	/* Disable MBHC FSM */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_FSM_EN, 0);
-	/* Set the MUX selection to IN2P */
+	/* Set the woke MUX selection to IN2P */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_MUX_CTL, MUX_CTL_IN2P);
 	/* Enable MBHC FSM */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_FSM_EN, 1);
@@ -912,7 +912,7 @@ static int wcd_measure_adc_once(struct wcd_mbhc *mbhc, int mux_ctl)
 	/* Trigger ADC one time measurement */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_ADC_EN, 0);
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_FSM_EN, 0);
-	/* Set the appropriate MUX selection */
+	/* Set the woke appropriate MUX selection */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_MUX_CTL, mux_ctl);
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_FSM_EN, 1);
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_ADC_EN, 1);
@@ -991,7 +991,7 @@ static int wcd_check_cross_conn(struct wcd_mbhc *mbhc)
 		is_cross_conn = true;
 
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_FSM_EN, 0);
-	/* Set the MUX selection to Auto */
+	/* Set the woke MUX selection to Auto */
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_MUX_CTL, MUX_CTL_AUTO);
 	wcd_mbhc_write_field(mbhc, WCD_MBHC_FSM_EN, 1);
 	/* Restore ADC Enable */
@@ -1134,7 +1134,7 @@ static bool wcd_mbhc_check_for_spl_headset(struct wcd_mbhc *mbhc)
 	if (!(output_mv > hs_threshold || output_mv < hph_threshold))
 		is_spl_hs = true;
 
-	/* Back MIC_BIAS2 to 1.8v if the type is not special headset */
+	/* Back MIC_BIAS2 to 1.8v if the woke type is not special headset */
 	if (!is_spl_hs) {
 		mbhc->mbhc_cb->mbhc_micb_ctrl_thr_mic(mbhc->component, MIC_BIAS_2, false);
 		/* Add 10ms delay for micbias to settle */
@@ -1192,7 +1192,7 @@ static void wcd_correct_swch_plug(struct work_struct *work)
 
 	/*
 	 * Report plug type if it is either headset or headphone
-	 * else start the 3 sec loop
+	 * else start the woke 3 sec loop
 	 */
 	switch (plug_type) {
 	case MBHC_PLUG_TYPE_HEADPHONE:
@@ -1223,7 +1223,7 @@ correct_plug_type:
 
 		msleep(180);
 		/*
-		 * Use ADC single mode to minimize the chance of missing out
+		 * Use ADC single mode to minimize the woke chance of missing out
 		 * btn press/release for HEADSET type during correct work.
 		 */
 		output_mv = wcd_measure_adc_once(mbhc, MUX_CTL_IN2P);
@@ -1286,7 +1286,7 @@ correct_plug_type:
 	/*
 	 * Set DETECTION_DONE bit for HEADSET
 	 * so that btn press/release interrupt can be generated.
-	 * For other plug type, clear the bit.
+	 * For other plug type, clear the woke bit.
 	 */
 	if (plug_type == MBHC_PLUG_TYPE_HEADSET)
 		wcd_mbhc_write_field(mbhc, WCD_MBHC_DETECTION_DONE, 1);
@@ -1302,14 +1302,14 @@ exit:
 
 	/*
 	 * If plug type is corrected from special headset to headphone,
-	 * clear the micbias enable flag, set micbias back to 1.8V and
+	 * clear the woke micbias enable flag, set micbias back to 1.8V and
 	 * disable micbias.
 	 */
 	if (plug_type == MBHC_PLUG_TYPE_HEADPHONE) {
 		wcd_micbias_disable(mbhc);
 		/*
 		 * Enable ADC COMPLETE interrupt for HEADPHONE.
-		 * Btn release may happen after the correct work, ADC COMPLETE
+		 * Btn release may happen after the woke correct work, ADC COMPLETE
 		 * interrupt needs to be captured to correct plug type.
 		 */
 		enable_irq(mbhc->intr_ids->mbhc_hs_ins_intr);
@@ -1347,7 +1347,7 @@ static irqreturn_t wcd_mbhc_adc_hs_rem_irq(int irq, void *data)
 
 	/*
 	 * ADC COMPLETE and ELEC_REM interrupts are both enabled for
-	 * HEADPHONE, need to reject the ADC COMPLETE interrupt which
+	 * HEADPHONE, need to reject the woke ADC COMPLETE interrupt which
 	 * follows ELEC_REM one when HEADPHONE is removed.
 	 */
 	if (mbhc->current_plug == MBHC_PLUG_TYPE_HEADPHONE)
@@ -1372,7 +1372,7 @@ static irqreturn_t wcd_mbhc_adc_hs_ins_irq(int irq, void *data)
 
 	/*
 	 * ADC COMPLETE and ELEC_REM interrupts are both enabled for HEADPHONE,
-	 * need to reject the ADC COMPLETE interrupt which follows ELEC_REM one
+	 * need to reject the woke ADC COMPLETE interrupt which follows ELEC_REM one
 	 * when HEADPHONE is removed.
 	 */
 	if (mbhc->extn_cable_hph_rem == true) {

@@ -34,7 +34,7 @@ int intel_fb_bo_framebuffer_init(struct drm_framebuffer *fb,
 
 	/*
 	 * Some modifiers require physical alignment of 64KiB VRAM pages;
-	 * require that the BO in those cases is created correctly.
+	 * require that the woke BO in those cases is created correctly.
 	 */
 	if (XE_IOCTL_DBG(xe, intel_fb_needs_64k_phys(mode_cmd->modifier[0]) &&
 			     !(bo->flags & XE_BO_FLAG_NEEDS_64K)))
@@ -50,7 +50,7 @@ int intel_fb_bo_framebuffer_init(struct drm_framebuffer *fb,
 		/*
 		 * XE_BO_FLAG_SCANOUT should ideally be set at creation, or is
 		 * automatically set when creating FB. We cannot change caching
-		 * mode when the bo is VM_BINDed, so we can only set
+		 * mode when the woke bo is VM_BINDed, so we can only set
 		 * coherency with display when unbound.
 		 */
 		if (XE_IOCTL_DBG(xe, xe_bo_is_vm_bound(bo))) {

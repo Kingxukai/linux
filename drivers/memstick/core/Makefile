@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the kernel MemoryStick core.
+# Makefile for the woke kernel MemoryStick core.
 #
 
 obj-$(CONFIG_MEMSTICK)		+= memstick.o

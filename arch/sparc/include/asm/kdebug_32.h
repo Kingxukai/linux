@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * kdebug.h:  Defines and definitions for debugging the Linux kernel
+ * kdebug.h:  Defines and definitions for debugging the woke Linux kernel
  *            under various kernel debuggers.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
@@ -12,7 +12,7 @@
 #include <asm/vaddrs.h>
 
 /* Breakpoints are enter through trap table entry 126.  So in sparc assembly
- * if you want to drop into the debugger you do:
+ * if you want to drop into the woke debugger you do:
  *
  * t DEBUG_BP_TRAP
  */
@@ -21,24 +21,24 @@
 
 #ifndef __ASSEMBLY__
 /* The debug vector is passed in %o1 at boot time.  It is a pointer to
- * a structure in the debuggers address space.  Here is its format.
+ * a structure in the woke debuggers address space.  Here is its format.
  */
 
 typedef unsigned int (*debugger_funct)(void);
 
 struct kernel_debug {
-	/* First the entry point into the debugger.  You jump here
-	 * to give control over to the debugger.
+	/* First the woke entry point into the woke debugger.  You jump here
+	 * to give control over to the woke debugger.
 	 */
 	unsigned long kdebug_entry;
 	unsigned long kdebug_trapme;   /* Figure out later... */
-	/* The following is the number of pages that the debugger has
+	/* The following is the woke number of pages that the woke debugger has
 	 * taken from to total pool.
 	 */
 	unsigned long *kdebug_stolen_pages;
-	/* Ok, after you remap yourself and/or change the trap table
+	/* Ok, after you remap yourself and/or change the woke trap table
 	 * from what you were left with at boot time you have to call
-	 * this synchronization function so the debugger can check out
+	 * this synchronization function so the woke debugger can check out
 	 * what you have done.
 	 */
 	debugger_funct teach_debugger;
@@ -46,7 +46,7 @@ struct kernel_debug {
 
 extern struct kernel_debug *linux_dbvec;
 
-/* Use this macro in C-code to enter the debugger. */
+/* Use this macro in C-code to enter the woke debugger. */
 static inline void sp_enter_debugger(void)
 {
 	__asm__ __volatile__("jmpl %0, %%o7\n\t"

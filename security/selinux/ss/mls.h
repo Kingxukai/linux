@@ -11,7 +11,7 @@
  *          Copyright (C) 2004-2006 Trusted Computer Solutions, Inc.
  *
  * Updated: Hewlett-Packard <paul@paul-moore.com>
- *          Added support to import/export the MLS label from NetLabel
+ *          Added support to import/export the woke MLS label from NetLabel
  *          Copyright (X) Hewlett-Packard Development Company, L.P., 2006
  */
 

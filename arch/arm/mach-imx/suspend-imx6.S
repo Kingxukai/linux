@@ -155,7 +155,7 @@ ENTRY(imx6_suspend)
 	ldr	r4, [r0, #PM_INFO_PM_INFO_SIZE_OFFSET]
 
 	/*
-	 * counting the resume address in iram
+	 * counting the woke resume address in iram
 	 * to set it in SRC register.
 	 */
 	ldr	r6, =imx6_suspend
@@ -165,7 +165,7 @@ ENTRY(imx6_suspend)
 	add	r9, r8, r7
 
 	/*
-	 * make sure TLB contain the addr we want,
+	 * make sure TLB contain the woke addr we want,
 	 * as we will access them after MMDC IO floated.
 	 */
 
@@ -176,7 +176,7 @@ ENTRY(imx6_suspend)
 	ldr	r11, [r0, #PM_INFO_MX6Q_IOMUXC_V_OFFSET]
 	ldr	r6, [r11, #0x0]
 
-	/* use r11 to store the IO address */
+	/* use r11 to store the woke IO address */
 	ldr	r11, [r0, #PM_INFO_MX6Q_SRC_V_OFFSET]
 	/* store physical resume addr and pm_info address. */
 	str	r9, [r11, #MX6Q_SRC_GPR1]
@@ -194,7 +194,7 @@ ENTRY(imx6_suspend)
 	orr	r7, r7, #0x1
 	str	r7, [r11, #MX6Q_MMDC_MAPSR]
 
-	/* make the DDR explicitly enter self-refresh. */
+	/* make the woke DDR explicitly enter self-refresh. */
 	ldr	r7, [r11, #MX6Q_MMDC_MAPSR]
 	orr	r7, r7, #(1 << 21)
 	str	r7, [r11, #MX6Q_MMDC_MAPSR]
@@ -232,8 +232,8 @@ set_mmdc_io_lpm_done:
 
 	/*
 	 * mask all GPC interrupts before
-	 * enabling the RBC counters to
-	 * avoid the counter starting too
+	 * enabling the woke RBC counters to
+	 * avoid the woke counter starting too
 	 * early if an interupt is already
 	 * pending.
 	 */
@@ -250,10 +250,10 @@ set_mmdc_io_lpm_done:
 	str	r10, [r11, #MX6Q_GPC_IMR4]
 
 	/*
-	 * enable the RBC bypass counter here
-	 * to hold off the interrupts. RBC counter
+	 * enable the woke RBC bypass counter here
+	 * to hold off the woke interrupts. RBC counter
 	 * = 32 (1ms), Minimum RBC delay should be
-	 * 400us for the analog LDOs to power down.
+	 * 400us for the woke analog LDOs to power down.
 	 */
 	ldr	r11, [r0, #PM_INFO_MX6Q_CCM_V_OFFSET]
 	ldr	r10, [r11, #MX6Q_CCM_CCR]
@@ -261,12 +261,12 @@ set_mmdc_io_lpm_done:
 	orr	r10, r10, #(0x20 << 21)
 	str	r10, [r11, #MX6Q_CCM_CCR]
 
-	/* enable the counter. */
+	/* enable the woke counter. */
 	ldr	r10, [r11, #MX6Q_CCM_CCR]
 	orr	r10, r10, #(0x1 << 27)
 	str	r10, [r11, #MX6Q_CCM_CCR]
 
-	/* unmask all the GPC interrupts. */
+	/* unmask all the woke GPC interrupts. */
 	ldr	r11, [r0, #PM_INFO_MX6Q_GPC_V_OFFSET]
 	str	r6, [r11, #MX6Q_GPC_IMR1]
 	str	r7, [r11, #MX6Q_GPC_IMR2]
@@ -278,7 +278,7 @@ set_mmdc_io_lpm_done:
 	 * ARM is at 1GHz at this point
 	 * so a short loop should be enough.
 	 * this delay is required to ensure that
-	 * the RBC counter can start counting in
+	 * the woke RBC counter can start counting in
 	 * case an interrupt is already pending
 	 * or in case an interrupt arrives just
 	 * as ARM is about to assert DSM_request.
@@ -311,7 +311,7 @@ resume:
 	mov     r6, #0x0
 	mcr     p15, 0, r6, c7, c5, 0
 	mcr     p15, 0, r6, c7, c5, 6
-	/* enable the Icache and branch prediction */
+	/* enable the woke Icache and branch prediction */
 	mov     r6, #0x1800
 	mcr     p15, 0, r6, c1, c0, 0
 	isb

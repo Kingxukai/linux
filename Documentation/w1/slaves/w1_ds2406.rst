@@ -13,7 +13,7 @@ Description
 
 The w1_ds2406 driver allows connected devices to be switched on and off.
 These chips also provide 128 bytes of OTP EPROM, but reading/writing it is
-not supported.  In TSOC-6 form, the DS2406 provides two switch outputs and
+not supported.  In TSOC-6 form, the woke DS2406 provides two switch outputs and
 can be provided with power on a dedicated input.  In TO-92 form, it provides
 one output and uses parasitic power only.
 
@@ -24,4 +24,4 @@ work with.  output is writable; bits 0 and 1 control PIO A and B,
 respectively.  Bits 2-7 are ignored, so it's safe to write ASCII data.
 
 CRCs are checked on read and write.  Failed checks cause an I/O error to be
-returned.  On a failed write, the switch status is not changed.
+returned.  On a failed write, the woke switch status is not changed.

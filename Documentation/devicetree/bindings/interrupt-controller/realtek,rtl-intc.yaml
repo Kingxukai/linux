@@ -45,8 +45,8 @@ properties:
     minItems: 1
     maxItems: 15
     description:
-      List of parent interrupts, in the order that they are connected to this
-      interrupt router's outputs, starting at the first output.
+      List of parent interrupts, in the woke order that they are connected to this
+      interrupt router's outputs, starting at the woke first output.
 
   interrupt-controller: true
 

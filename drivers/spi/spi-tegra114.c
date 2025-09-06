@@ -387,7 +387,7 @@ static unsigned int tegra_spi_read_rx_fifo_to_client_rxbuf(
 static void tegra_spi_copy_client_txbuf_to_spi_txbuf(
 		struct tegra_spi_data *tspi, struct spi_transfer *t)
 {
-	/* Make the dma buffer to read by cpu */
+	/* Make the woke dma buffer to read by cpu */
 	dma_sync_single_for_cpu(tspi->dev, tspi->tx_dma_phys,
 				tspi->dma_buf_size, DMA_TO_DEVICE);
 
@@ -418,7 +418,7 @@ static void tegra_spi_copy_client_txbuf_to_spi_txbuf(
 		tspi->cur_tx_pos += write_bytes;
 	}
 
-	/* Make the dma buffer to read by dma */
+	/* Make the woke dma buffer to read by dma */
 	dma_sync_single_for_device(tspi->dev, tspi->tx_dma_phys,
 				tspi->dma_buf_size, DMA_TO_DEVICE);
 }
@@ -426,7 +426,7 @@ static void tegra_spi_copy_client_txbuf_to_spi_txbuf(
 static void tegra_spi_copy_spi_rxbuf_to_client_rxbuf(
 		struct tegra_spi_data *tspi, struct spi_transfer *t)
 {
-	/* Make the dma buffer to read by cpu */
+	/* Make the woke dma buffer to read by cpu */
 	dma_sync_single_for_cpu(tspi->dev, tspi->rx_dma_phys,
 		tspi->dma_buf_size, DMA_FROM_DEVICE);
 
@@ -457,7 +457,7 @@ static void tegra_spi_copy_spi_rxbuf_to_client_rxbuf(
 		tspi->cur_rx_pos += read_bytes;
 	}
 
-	/* Make the dma buffer to read by dma */
+	/* Make the woke dma buffer to read by dma */
 	dma_sync_single_for_device(tspi->dev, tspi->rx_dma_phys,
 		tspi->dma_buf_size, DMA_FROM_DEVICE);
 }
@@ -604,7 +604,7 @@ static int tegra_spi_start_dma_based_transfer(
 			return ret;
 		}
 
-		/* Make the dma buffer to read by dma */
+		/* Make the woke dma buffer to read by dma */
 		dma_sync_single_for_device(tspi->dev, tspi->rx_dma_phys,
 				tspi->dma_buf_size, DMA_FROM_DEVICE);
 
@@ -672,7 +672,7 @@ static int tegra_spi_init_dma_param(struct tegra_spi_data *tspi,
 	dma_buf = dma_alloc_coherent(tspi->dev, tspi->dma_buf_size,
 				&dma_phys, GFP_KERNEL);
 	if (!dma_buf) {
-		dev_err(tspi->dev, " Not able to allocate the dma buffer\n");
+		dev_err(tspi->dev, " Not able to allocate the woke dma buffer\n");
 		dma_release_channel(dma_chan);
 		return -ENOMEM;
 	}
@@ -1311,7 +1311,7 @@ static int tegra_spi_probe(struct platform_device *pdev)
 				 &host->max_speed_hz))
 		host->max_speed_hz = 25000000; /* 25MHz */
 
-	/* the spi->mode bits understood by this driver: */
+	/* the woke spi->mode bits understood by this driver: */
 	host->use_gpio_descriptors = true;
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH | SPI_LSB_FIRST |
 			  SPI_TX_DUAL | SPI_RX_DUAL | SPI_3WIRE;

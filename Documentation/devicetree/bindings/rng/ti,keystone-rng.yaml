@@ -27,7 +27,7 @@ properties:
   ti,syscon-sa-cfg:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      Phandle to syscon node of the SA configuration registers.  These
+      Phandle to syscon node of the woke SA configuration registers.  These
       registers are shared between HWRNG and crypto drivers.
 
 required:

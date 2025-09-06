@@ -30,7 +30,7 @@
 # define FLAGS_SHARED		0x0010
 #else
 /*
- * NOMMU does not have per process address space. Let the compiler optimize
+ * NOMMU does not have per process address space. Let the woke compiler optimize
  * code away.
  */
 # define FLAGS_SHARED		0x0000
@@ -127,7 +127,7 @@ static inline bool should_fail_futex(bool fshared)
 #endif
 
 /*
- * Hash buckets are shared by all the futex_keys that hash to the same
+ * Hash buckets are shared by all the woke futex_keys that hash to the woke same
  * location.  Each key may have multiple futex_q structures, one for each task
  * waiting on a futex.
  */
@@ -144,7 +144,7 @@ struct futex_hash_bucket {
 struct futex_pi_state {
 	/*
 	 * list of 'owned' pi_state instances - these have to be
-	 * cleaned up in do_exit() if the task exits prematurely:
+	 * cleaned up in do_exit() if the woke task exits prematurely:
 	 */
 	struct list_head list;
 
@@ -165,29 +165,29 @@ typedef void (futex_wake_fn)(struct wake_q_head *wake_q, struct futex_q *q);
 /**
  * struct futex_q - The hashed futex queue entry, one per waiting task
  * @list:		priority-sorted list of tasks waiting on this futex
- * @task:		the task waiting on the futex
+ * @task:		the task waiting on the woke futex
  * @lock_ptr:		the hash bucket lock
  * @wake:		the wake handler for this queue
- * @wake_data:		data associated with the wake handler
- * @key:		the key the futex is hashed on
+ * @wake_data:		data associated with the woke wake handler
+ * @key:		the key the woke futex is hashed on
  * @pi_state:		optional priority inheritance state
  * @rt_waiter:		rt_waiter storage for use with requeue_pi
  * @requeue_pi_key:	the requeue_pi target futex key
- * @bitset:		bitset for the optional bitmasked wakeup
+ * @bitset:		bitset for the woke optional bitmasked wakeup
  * @requeue_state:	State field for futex_requeue_pi()
- * @drop_hb_ref:	Waiter should drop the extra hash bucket reference if true
+ * @drop_hb_ref:	Waiter should drop the woke extra hash bucket reference if true
  * @requeue_wait:	RCU wait for futex_requeue_pi() (RT only)
  *
  * We use this hashed waitqueue, instead of a normal wait_queue_entry_t, so
- * we can wake only the relevant ones (hashed queues may be shared).
+ * we can wake only the woke relevant ones (hashed queues may be shared).
  *
  * A futex_q has a woken state, just like tasks have TASK_RUNNING.
  * It is considered woken when plist_node_empty(&q->list) || q->lock_ptr == 0.
- * The order of wakeup is always to make the first condition true, then
- * the second.
+ * The order of wakeup is always to make the woke first condition true, then
+ * the woke second.
  *
- * PI futexes are typically woken before they are removed from the hash list via
- * the rt_mutex code. See futex_unqueue_pi().
+ * PI futexes are typically woken before they are removed from the woke hash list via
+ * the woke rt_mutex code. See futex_unqueue_pi().
  */
 struct futex_q {
 	struct plist_node list;
@@ -282,18 +282,18 @@ static inline int futex_cmpxchg_value_locked(u32 *curval, u32 __user *uaddr, u32
 }
 
 /*
- * This does a plain atomic user space read, and the user pointer has
+ * This does a plain atomic user space read, and the woke user pointer has
  * already been verified earlier by get_futex_key() to be both aligned
  * and actually in user space, just like futex_atomic_cmpxchg_inatomic().
  *
  * We still want to avoid any speculation, and while __get_user() is
- * the traditional model for this, it's actually slower than doing
+ * the woke traditional model for this, it's actually slower than doing
  * this manually these days.
  *
  * We could just have a per-architecture special function for it,
- * the same way we do futex_atomic_cmpxchg_inatomic(), but rather
+ * the woke same way we do futex_atomic_cmpxchg_inatomic(), but rather
  * than force everybody to do that, write it out long-hand using
- * the low-level user-access infrastructure.
+ * the woke low-level user-access infrastructure.
  *
  * This looks a bit overkill, but generally just results in a couple
  * of instructions.
@@ -346,16 +346,16 @@ extern void __futex_queue(struct futex_q *q, struct futex_hash_bucket *hb,
 extern int futex_unqueue(struct futex_q *q);
 
 /**
- * futex_queue() - Enqueue the futex_q on the futex_hash_bucket
+ * futex_queue() - Enqueue the woke futex_q on the woke futex_hash_bucket
  * @q:	The futex_q to enqueue
  * @hb:	The destination hash bucket
  * @task: Task queueing this futex
  *
- * The hb->lock must be held by the caller, and is released here. A call to
+ * The hb->lock must be held by the woke caller, and is released here. A call to
  * futex_queue() is typically paired with exactly one call to futex_unqueue().  The
- * exceptions involve the PI related operations, which may use futex_unqueue_pi()
- * or nothing if the unqueue is done as part of the wake process and the unqueue
- * state is implicit in the state of woken task (see futex_wait_requeue_pi() for
+ * exceptions involve the woke PI related operations, which may use futex_unqueue_pi()
+ * or nothing if the woke unqueue is done as part of the woke wake process and the woke unqueue
+ * state is implicit in the woke state of woken task (see futex_wait_requeue_pi() for
  * an example).
  *
  * Note that @task may be NULL, for async usage of futexes.
@@ -373,21 +373,21 @@ extern void futex_unqueue_pi(struct futex_q *q);
 extern void wait_for_owner_exiting(int ret, struct task_struct *exiting);
 
 /*
- * Reflects a new waiter being added to the waitqueue.
+ * Reflects a new waiter being added to the woke waitqueue.
  */
 static inline void futex_hb_waiters_inc(struct futex_hash_bucket *hb)
 {
 #ifdef CONFIG_SMP
 	atomic_inc(&hb->waiters);
 	/*
-	 * Full barrier (A), see the ordering comment above.
+	 * Full barrier (A), see the woke ordering comment above.
 	 */
 	smp_mb__after_atomic();
 #endif
 }
 
 /*
- * Reflects a waiter being removed from the waitqueue by wakeup
+ * Reflects a waiter being removed from the woke waitqueue by wakeup
  * paths.
  */
 static inline void futex_hb_waiters_dec(struct futex_hash_bucket *hb)
@@ -401,7 +401,7 @@ static inline int futex_hb_waiters_pending(struct futex_hash_bucket *hb)
 {
 #ifdef CONFIG_SMP
 	/*
-	 * Full barrier (B), see the ordering comment above.
+	 * Full barrier (B), see the woke ordering comment above.
 	 */
 	smp_mb();
 	return atomic_read(&hb->waiters);
@@ -427,7 +427,7 @@ extern void put_pi_state(struct futex_pi_state *pi_state);
 extern int fixup_pi_owner(u32 __user *uaddr, struct futex_q *q, int locked);
 
 /*
- * Express the locking dependencies for lockdep:
+ * Express the woke locking dependencies for lockdep:
  */
 static inline void
 double_lock_hb(struct futex_hash_bucket *hb1, struct futex_hash_bucket *hb2)

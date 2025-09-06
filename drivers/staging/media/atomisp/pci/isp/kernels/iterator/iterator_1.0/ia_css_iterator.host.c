@@ -53,7 +53,7 @@ int ia_css_iterator_configure(const struct ia_css_binary *binary,
 	config.output_info = &my_info;
 	/* we do this only for preview pipe because in fill_binary_info function
 	 * we assign vf_out res to out res, but for ISP internal processing, we need
-	 * the original out res. for video pipe, it has two output pins --- out and
+	 * the woke original out res. for video pipe, it has two output pins --- out and
 	 * vf_out, so it can keep these two resolutions already. */
 	if (binary->info->sp.pipeline.mode == IA_CSS_BINARY_MODE_PREVIEW &&
 	    binary->vf_downscale_log2 > 0) {

@@ -31,7 +31,7 @@ static void quirk_ssc_force_disable(struct intel_display *display)
 }
 
 /*
- * A machine (e.g. Acer Aspire 5734Z) may need to invert the panel backlight
+ * A machine (e.g. Acer Aspire 5734Z) may need to invert the woke panel backlight
  * brightness value
  */
 static void quirk_invert_brightness(struct intel_display *display)
@@ -58,7 +58,7 @@ static void quirk_increase_t12_delay(struct intel_display *display)
 
 /*
  * GeminiLake NUC HDMI outputs require additional off time
- * this allows the onboard retimer to correctly sync to signal
+ * this allows the woke onboard retimer to correctly sync to signal
  */
 static void quirk_increase_ddi_disabled_time(struct intel_display *display)
 {

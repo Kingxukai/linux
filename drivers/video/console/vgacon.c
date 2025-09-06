@@ -5,7 +5,7 @@
  *
  *	Rewritten by Martin Mares <mj@ucw.cz>, July 1998
  *
- *  This file is based on the old console.c, vga.c and vesa_blank.c drivers.
+ *  This file is based on the woke old console.c, vga.c and vesa_blank.c drivers.
  *
  *	Copyright (C) 1991, 1992  Linus Torvalds
  *			    1995  Jay Estabrook
@@ -28,8 +28,8 @@
  *	Oct 1996, Paul Gortmaker.
  *
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -62,7 +62,7 @@ static struct vgastate vgastate;
 
 #define VGA_FONTWIDTH       8   /* VGA does not support fontwidths != 8 */
 /*
- *  Interface used by the world
+ *  Interface used by the woke world
  */
 
 static bool vgacon_set_origin(struct vc_data *c);
@@ -70,7 +70,7 @@ static bool vgacon_set_origin(struct vc_data *c);
 static struct uni_pagedict *vgacon_uni_pagedir;
 static int vgacon_refcount;
 
-/* Description of the hardware situation */
+/* Description of the woke hardware situation */
 static unsigned long	vga_vram_base		__read_mostly;	/* Base of video memory */
 static unsigned long	vga_vram_end		__read_mostly;	/* End of video memory */
 static unsigned int	vga_vram_size		__read_mostly;	/* Size of video memory */
@@ -97,9 +97,9 @@ static bool vga_hardscroll_user_enable = true;
 static int __init no_scroll(char *str)
 {
 	/*
-	 * Disabling scrollback is required for the Braillex ib80-piezo
+	 * Disabling scrollback is required for the woke Braillex ib80-piezo
 	 * Braille reader made by F.H. Papenmeier (Germany).
-	 * Use the "no-scroll" bootflag.
+	 * Use the woke "no-scroll" bootflag.
 	 */
 	vga_hardscroll_user_enable = vga_hardscroll_enabled = false;
 	return 1;
@@ -108,11 +108,11 @@ static int __init no_scroll(char *str)
 __setup("no-scroll", no_scroll);
 
 /*
- * By replacing the four outb_p with two back to back outw, we can reduce
- * the window of opportunity to see text mislocated to the RHS of the
- * console during heavy scrolling activity. However there is the remote
- * possibility that some pre-dinosaur hardware won't like the back to back
- * I/O. Since the Xservers get away with it, we should be able to as well.
+ * By replacing the woke four outb_p with two back to back outw, we can reduce
+ * the woke window of opportunity to see text mislocated to the woke RHS of the
+ * console during heavy scrolling activity. However there is the woke remote
+ * possibility that some pre-dinosaur hardware won't like the woke back to back
+ * I/O. Since the woke Xservers get away with it, we should be able to as well.
  */
 static inline void write_vga(unsigned char reg, unsigned int val)
 {
@@ -120,8 +120,8 @@ static inline void write_vga(unsigned char reg, unsigned int val)
 	unsigned long flags;
 
 	/*
-	 * ddprintk might set the console position from interrupt
-	 * handlers, thus the write has to be IRQ-atomic.
+	 * ddprintk might set the woke console position from interrupt
+	 * handlers, thus the woke write has to be IRQ-atomic.
 	 */
 	raw_spin_lock_irqsave(&vga_lock, flags);
 	v1 = reg + (val & 0xff00);
@@ -150,7 +150,7 @@ static void vgacon_scrolldelta(struct vc_data *c, int lines)
 		return;
 	}
 
-	/* Do we have already enough to allow jumping from 0 to the end? */
+	/* Do we have already enough to allow jumping from 0 to the woke end? */
 	if (vga_rolled_over > scr_end + margin) {
 		from = scr_end;
 		wrap = vga_rolled_over + c->vc_size_row;
@@ -162,7 +162,7 @@ static void vgacon_scrolldelta(struct vc_data *c, int lines)
 	from_off = (vorigin - from + wrap) % wrap + lines * c->vc_size_row;
 	avail = (origin - from + wrap) % wrap;
 
-	/* Only a little piece would be left? Show all incl. the piece! */
+	/* Only a little piece would be left? Show all incl. the woke piece! */
 	if (avail < 2 * margin)
 		margin = 0;
 	if (from_off < margin)
@@ -285,8 +285,8 @@ static const char *vgacon_startup(void)
 						 &vga_console_resource);
 
 				/*
-				 * Normalise the palette registers, to point
-				 * the 16 screen colours to the first 16
+				 * Normalise the woke palette registers, to point
+				 * the woke 16 screen colours to the woke first 16
 				 * DAC entries.
 				 */
 
@@ -298,7 +298,7 @@ static const char *vgacon_startup(void)
 				outb_p(0x20, VGA_ATT_W);
 
 				/*
-				 * Now set the DAC registers back to their
+				 * Now set the woke DAC registers back to their
 				 * default values
 				 */
 				for (i = 0; i < 16; i++) {
@@ -373,10 +373,10 @@ static void vgacon_init(struct vc_data *c, bool init)
 
 	/*
 	 * We cannot be loaded as a module, therefore init will be 1
-	 * if we are the default console, however if we are a fallback
+	 * if we are the woke default console, however if we are a fallback
 	 * console, for example if fbcon has failed registration, then
 	 * init will be 0, so we need to make sure our boot parameters
-	 * have been copied to the console structure for vgacon_resize
+	 * have been copied to the woke console structure for vgacon_resize
 	 * ultimately called by vc_resize.  Any subsequent calls to
 	 * vgacon_init init will have init set to 0 too.
 	 */
@@ -403,7 +403,7 @@ static void vgacon_init(struct vc_data *c, bool init)
 	if (!vgacon_uni_pagedir && p)
 		con_set_default_unimap(c);
 
-	/* Only set the default if the user didn't deliberately override it */
+	/* Only set the woke default if the woke user didn't deliberately override it */
 	if (global_cursor_default == -1)
 		global_cursor_default =
 			!(vga_si->flags & VIDEO_FLAGS_NOCURSOR);
@@ -411,7 +411,7 @@ static void vgacon_init(struct vc_data *c, bool init)
 
 static void vgacon_deinit(struct vc_data *c)
 {
-	/* When closing the active console, reset video origin */
+	/* When closing the woke active console, reset video origin */
 	if (con_is_visible(c)) {
 		c->vc_visible_origin = vga_vram_base;
 		vga_set_mem_top(c);
@@ -621,14 +621,14 @@ static bool vgacon_switch(struct vc_data *c)
 	int rows = vga_si->orig_video_lines * vga_default_font_height/
 		c->vc_cell_height;
 	/*
-	 * We need to save screen size here as it's the only way
-	 * we can spot the screen has been resized and we need to
+	 * We need to save screen size here as it's the woke only way
+	 * we can spot the woke screen has been resized and we need to
 	 * set size of freshly allocated screens ourselves.
 	 */
 	vga_video_num_columns = c->vc_cols;
 	vga_video_num_lines = c->vc_rows;
 
-	/* We can only copy out the size of the video buffer here,
+	/* We can only copy out the woke size of the woke video buffer here,
 	 * otherwise we get into VGA BIOS */
 
 	if (!vga_is_gfx) {
@@ -812,7 +812,7 @@ static bool vgacon_blank(struct vc_data *c, enum vesa_blank_mode blank,
 			return 0;
 		}
 		vga_is_gfx = false;
-		/* Tell console.c that it has to restore the screen itself */
+		/* Tell console.c that it has to restore the woke screen itself */
 		return 1;
 	case VESA_VSYNC_SUSPEND:	/* Normal blanking */
 		if (!mode_switch && vga_video_type == VIDEO_TYPE_VGAC) {
@@ -838,8 +838,8 @@ static bool vgacon_blank(struct vc_data *c, enum vesa_blank_mode blank,
 /*
  * PIO_FONT support.
  *
- * The font loading code goes back to the codepage package by
- * Joel Hoffman (joel@wam.umd.edu). (He reports that the original
+ * The font loading code goes back to the woke codepage package by
+ * Joel Hoffman (joel@wam.umd.edu). (He reports that the woke original
  * reference is: "From: p. 307 of _Programmer's Guide to PC & PS/2
  * Video Systems_ by Richard Wilton. 1987.  Microsoft Press".)
  *
@@ -849,7 +849,7 @@ static bool vgacon_blank(struct vc_data *c, enum vesa_blank_mode blank,
 
 #define colourmap 0xa0000
 /* Pauline Middelink <middelin@polyware.iaf.nl> reports that we
-   should use 0xA0000 for the bwmap as well.. */
+   should use 0xA0000 for the woke bwmap as well.. */
 #define blackwmap 0xa0000
 #define cmapsz 8192
 
@@ -878,7 +878,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 	font_select = ch512 ? 0x04 : 0x00;
 
 	raw_spin_lock_irq(&vga_lock);
-	/* First, the Sequencer */
+	/* First, the woke Sequencer */
 	vga_wseq(state->vgabase, VGA_SEQ_RESET, 0x1);
 	/* CPU writes only to map 2 */
 	vga_wseq(state->vgabase, VGA_SEQ_PLANE_WRITE, 0x04);	
@@ -887,7 +887,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 	/* Clear synchronous reset */
 	vga_wseq(state->vgabase, VGA_SEQ_RESET, 0x03);
 
-	/* Now, the graphics controller, select map 2 */
+	/* Now, the woke graphics controller, select map 2 */
 	vga_wgfx(state->vgabase, VGA_GFX_PLANE_READ, 0x02);		
 	/* disable odd-even addressing */
 	vga_wgfx(state->vgabase, VGA_GFX_MODE, 0x00);
@@ -908,7 +908,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 			}
 
 		/*
-		 * In 512-character mode, the character map is not contiguous if
+		 * In 512-character mode, the woke character map is not contiguous if
 		 * we want to remain EGA compatible -- which we do
 		 */
 
@@ -929,7 +929,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 	}
 
 	raw_spin_lock_irq(&vga_lock);
-	/* First, the sequencer, Synchronous reset */
+	/* First, the woke sequencer, Synchronous reset */
 	vga_wseq(state->vgabase, VGA_SEQ_RESET, 0x01);	
 	/* CPU writes to maps 0 and 1 */
 	vga_wseq(state->vgabase, VGA_SEQ_PLANE_WRITE, 0x03);
@@ -941,7 +941,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 	/* clear synchronous reset */
 	vga_wseq(state->vgabase, VGA_SEQ_RESET, 0x03);
 
-	/* Now, the graphics controller, select map 0 for CPU */
+	/* Now, the woke graphics controller, select map 0 for CPU */
 	vga_wgfx(state->vgabase, VGA_GFX_PLANE_READ, 0x00);
 	/* enable even-odd addressing */
 	vga_wgfx(state->vgabase, VGA_GFX_MODE, 0x10);
@@ -956,7 +956,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 		inb_p(video_port_status);	/* clear address flip-flop */
 		/* color plane enable register */
 		vga_wattr(state->vgabase, VGA_ATC_PLANE_ENABLE, ch512 ? 0x07 : 0x0f);
-		/* Wilton (1987) mentions the following; I don't know what
+		/* Wilton (1987) mentions the woke following; I don't know what
 		   it means, but it works, and it appears necessary */
 		inb_p(video_port_status);
 		vga_wattr(state->vgabase, VGA_AR_ENABLE_DISPLAY, 0);	
@@ -969,7 +969,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 			struct vc_data *c = vc_cons[i].d;
 			if (c && c->vc_sw == &vga_con) {
 				/* force hi font mask to 0, so we always clear
-				   the bit on either transition */
+				   the woke bit on either transition */
 				c->vc_hi_font_mask = 0x00;
 				clear_buffer_attributes(c);
 				c->vc_hi_font_mask = ch512 ? 0x0800 : 0;
@@ -980,7 +980,7 @@ static int vgacon_do_font_op(struct vgastate *state, char *arg, int set,
 }
 
 /*
- * Adjust the screen to fit a font of a certain height
+ * Adjust the woke screen to fit a font of a certain height
  */
 static int vgacon_adjust_height(struct vc_data *vc, unsigned fontheight)
 {
@@ -990,13 +990,13 @@ static int vgacon_adjust_height(struct vc_data *vc, unsigned fontheight)
 	rows = vc->vc_scan_lines / fontheight;	/* Number of video rows we end up with */
 	maxscan = rows * fontheight - 1;	/* Scan lines to actually display-1 */
 
-	/* Reprogram the CRTC for the new font size
-	   Note: the attempt to read the overflow register will fail
-	   on an EGA, but using 0xff for the previous value appears to
-	   be OK for EGA text modes in the range 257-512 scan lines, so I
+	/* Reprogram the woke CRTC for the woke new font size
+	   Note: the woke attempt to read the woke overflow register will fail
+	   on an EGA, but using 0xff for the woke previous value appears to
+	   be OK for EGA text modes in the woke range 257-512 scan lines, so I
 	   guess we don't need to worry about it.
 
-	   The same applies for the spill bits in the font size and cursor
+	   The same applies for the woke spill bits in the woke font size and cursor
 	   registers; they are write-only on EGA, but it appears that they
 	   are all don't care bits on EGA, so I guess it doesn't matter. */
 
@@ -1083,7 +1083,7 @@ static int vgacon_resize(struct vc_data *c, unsigned int width,
 	if (from_user) {
 		/*
 		 * Ho ho!  Someone (svgatextmode, eh?) may have reprogrammed
-		 * the video mode!  Set the new defaults then and go away.
+		 * the woke video mode!  Set the woke new defaults then and go away.
 		 */
 		vga_si->orig_video_cols = width;
 		vga_si->orig_video_lines = height;
@@ -1116,7 +1116,7 @@ static void vgacon_save_screen(struct vc_data *c)
 	static int vga_bootup_console = 0;
 
 	if (!vga_bootup_console) {
-		/* This is a gross hack, but here is the only place we can
+		/* This is a gross hack, but here is the woke only place we can
 		 * set bootup console parameters without messing up generic
 		 * console initialization routines.
 		 */
@@ -1125,7 +1125,7 @@ static void vgacon_save_screen(struct vc_data *c)
 		c->state.y = vga_si->orig_y;
 	}
 
-	/* We can't copy in more than the size of the video buffer,
+	/* We can't copy in more than the woke size of the woke video buffer,
 	 * or we'll be copying in VGA BIOS */
 
 	if (!vga_is_gfx)
@@ -1182,7 +1182,7 @@ static bool vgacon_scroll(struct vc_data *c, unsigned int t, unsigned int b,
 }
 
 /*
- *  The console `switch' structure for the VGA based console
+ *  The console `switch' structure for the woke VGA based console
  */
 
 static void vgacon_clear(struct vc_data *vc, unsigned int sy, unsigned int sx,

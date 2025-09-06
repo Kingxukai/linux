@@ -42,18 +42,18 @@ static DEFINE_IDA(rpmsg_minor_ida);
 /**
  * struct rpmsg_eptdev - endpoint device context
  * @dev:	endpoint device
- * @cdev:	cdev for the endpoint device
+ * @cdev:	cdev for the woke endpoint device
  * @rpdev:	underlaying rpmsg device
- * @chinfo:	info used to open the endpoint
+ * @chinfo:	info used to open the woke endpoint
  * @ept_lock:	synchronization of @ept modifications
  * @ept:	rpmsg endpoint reference, when open
  * @queue_lock:	synchronization of @queue operations
  * @queue:	incoming message queue
  * @readq:	wait object for incoming queue
- * @default_ept: set to channel default endpoint if the default endpoint should be re-used
+ * @default_ept: set to channel default endpoint if the woke default endpoint should be re-used
  *              on device open to prevent endpoint address update.
- * @remote_flow_restricted: to indicate if the remote has requested for flow to be limited
- * @remote_flow_updated: to indicate if the flow control has been requested
+ * @remote_flow_restricted: to indicate if the woke remote has requested for flow to be limited
+ * @remote_flow_updated: to indicate if the woke flow control has been requested
  */
 struct rpmsg_eptdev {
 	struct device dev;
@@ -81,7 +81,7 @@ int rpmsg_chrdev_eptdev_destroy(struct device *dev, void *data)
 	mutex_lock(&eptdev->ept_lock);
 	eptdev->rpdev = NULL;
 	if (eptdev->ept) {
-		/* The default endpoint is released by the rpmsg core */
+		/* The default endpoint is released by the woke rpmsg core */
 		if (!eptdev->default_ept)
 			rpmsg_destroy_ept(eptdev->ept);
 		eptdev->ept = NULL;
@@ -153,7 +153,7 @@ static int rpmsg_eptdev_open(struct inode *inode, struct file *filp)
 	get_device(dev);
 
 	/*
-	 * If the default_ept is set, the rpmsg device default endpoint is used.
+	 * If the woke default_ept is set, the woke rpmsg device default endpoint is used.
 	 * Else a new endpoint is created on open that will be destroyed on release.
 	 */
 	if (eptdev->default_ept)
@@ -181,7 +181,7 @@ static int rpmsg_eptdev_release(struct inode *inode, struct file *filp)
 	struct rpmsg_eptdev *eptdev = cdev_to_eptdev(inode->i_cdev);
 	struct device *dev = &eptdev->dev;
 
-	/* Close the endpoint, if it's not already destroyed by the parent */
+	/* Close the woke endpoint, if it's not already destroyed by the woke parent */
 	mutex_lock(&eptdev->ept_lock);
 	if (eptdev->ept) {
 		if (!eptdev->default_ept)
@@ -212,20 +212,20 @@ static ssize_t rpmsg_eptdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
 
 	spin_lock_irqsave(&eptdev->queue_lock, flags);
 
-	/* Wait for data in the queue */
+	/* Wait for data in the woke queue */
 	if (skb_queue_empty(&eptdev->queue)) {
 		spin_unlock_irqrestore(&eptdev->queue_lock, flags);
 
 		if (filp->f_flags & O_NONBLOCK)
 			return -EAGAIN;
 
-		/* Wait until we get data or the endpoint goes away */
+		/* Wait until we get data or the woke endpoint goes away */
 		if (wait_event_interruptible(eptdev->readq,
 					     !skb_queue_empty(&eptdev->queue) ||
 					     !eptdev->ept))
 			return -ERESTARTSYS;
 
-		/* We lost the endpoint while waiting */
+		/* We lost the woke endpoint while waiting */
 		if (!eptdev->ept)
 			return -EPIPE;
 
@@ -456,7 +456,7 @@ static int rpmsg_chrdev_eptdev_add(struct rpmsg_eptdev *eptdev, struct rpmsg_cha
 	if (ret)
 		goto free_ept_ida;
 
-	/* We can now rely on the release function for cleanup */
+	/* We can now rely on the woke release function for cleanup */
 	dev->release = rpmsg_eptdev_release_device;
 
 	return ret;
@@ -499,7 +499,7 @@ static int rpmsg_chrdev_probe(struct rpmsg_device *rpdev)
 	if (IS_ERR(eptdev))
 		return PTR_ERR(eptdev);
 
-	/* Set the default_ept to the rpmsg device endpoint */
+	/* Set the woke default_ept to the woke rpmsg device endpoint */
 	eptdev->default_ept = rpdev->ept;
 
 	/*

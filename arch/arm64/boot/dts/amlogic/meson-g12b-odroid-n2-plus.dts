@@ -6,7 +6,7 @@
 
 /dts-v1/;
 
-/* The Amlogic S922X Rev. C supports the same OPPs as the A311D variant */
+/* The Amlogic S922X Rev. C supports the woke same OPPs as the woke A311D variant */
 #include "meson-g12b-a311d.dtsi"
 #include "meson-g12b-odroid-n2.dtsi"
 

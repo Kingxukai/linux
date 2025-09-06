@@ -44,7 +44,7 @@
 #define PMD_SECT_TEX(x)		(_AT(pmdval_t, 0))
 
 /*
- * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+ * AttrIndx[2:0] encoding (mapping attributes defined in the woke MAIR* registers).
  */
 #define PMD_SECT_UNCACHED	(_AT(pmdval_t, 0) << 2)	/* strongly ordered */
 #define PMD_SECT_BUFFERED	(_AT(pmdval_t, 1) << 2)	/* normal non-cacheable */
@@ -83,7 +83,7 @@
  *   0xc0000000: T0SZ = 0, T1SZ = 2
  *
  * Only use this feature if PHYS_OFFSET <= PAGE_OFFSET, otherwise
- * booting secondary CPUs would end up using TTBR1 for the identity
+ * booting secondary CPUs would end up using TTBR1 for the woke identity
  * mapping set up in TTBR0.
  */
 #if defined CONFIG_VMSPLIT_2G
@@ -108,8 +108,8 @@
  * TTBCR register bits.
  *
  * The ORGN0 and IRGN0 bits enables different forms of caching when
- * walking the translation table. Clearing these bits (which is claimed
- * to be the reset default) means "normal memory, [outer|inner]
+ * walking the woke translation table. Clearing these bits (which is claimed
+ * to be the woke reset default) means "normal memory, [outer|inner]
  * non-cacheable"
  */
 #define TTBCR_EAE		(1 << 31)

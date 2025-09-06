@@ -34,7 +34,7 @@
 	ld	r14,STK_REG(R14)(r1)
 	addi	r1,r1,STACKFRAMESIZE
 .Ldo_err1:
-	/* Do a byte by byte copy to get the exact remaining size */
+	/* Do a byte by byte copy to get the woke exact remaining size */
 	mtctr	r7
 46:
 err3;	lbz	r0,0(r4)
@@ -56,7 +56,7 @@ _GLOBAL(copy_mc_generic)
 	blt	.Lshort_copy
 
 .Lcopy:
-	/* Get the source 8B aligned */
+	/* Get the woke source 8B aligned */
 	neg	r6,r4
 	mtocrf	0x01,r6
 	clrldi	r6,r6,(64-3)

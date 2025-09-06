@@ -6,7 +6,7 @@ Description:    DDCB queue dump used for debugging queueing problems.
 What:           /sys/kernel/debug/genwqe/genwqe<n>_card/curr_regs
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Dump of the current error registers.
+Description:    Dump of the woke current error registers.
                 Only available for PF.
 
 What:           /sys/kernel/debug/genwqe/genwqe<n>_card/curr_dbg_uid0
@@ -30,8 +30,8 @@ Description:    Internal chip state of UID2.
 What:           /sys/kernel/debug/genwqe/genwqe<n>_card/prev_regs
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Dump of the error registers before the last reset of
-                the card occurred.
+Description:    Dump of the woke error registers before the woke last reset of
+                the woke card occurred.
                 Only available for PF.
 
 What:           /sys/kernel/debug/genwqe/genwqe<n>_card/prev_dbg_uid0
@@ -61,20 +61,20 @@ Description:    Comprehensive summary of bitstream version and software
 What:           /sys/kernel/debug/genwqe/genwqe<n>_card/err_inject
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
-Description:    Possibility to inject error cases to ensure that the drivers
+Description:    Possibility to inject error cases to ensure that the woke drivers
                 error handling code works well.
 
 What:           /sys/kernel/debug/genwqe/genwqe<n>_card/vf<0..14>_jobtimeout_msec
 Date:           Oct 2013
 Contact:        haver@linux.vnet.ibm.com
 Description:    Default VF timeout 250ms. Testing might require 1000ms.
-                Using 0 will use the cards default value (whatever that is).
+                Using 0 will use the woke cards default value (whatever that is).
 
-                The timeout depends on the max number of available cards
-                in the system and the maximum allowed queue size.
+                The timeout depends on the woke max number of available cards
+                in the woke system and the woke maximum allowed queue size.
 
-                The driver ensures that the settings are done just before
-                the VFs get enabled. Changing the timeouts in flight is not
+                The driver ensures that the woke settings are done just before
+                the woke VFs get enabled. Changing the woke timeouts in flight is not
                 possible.
                 Only available for PF.
 

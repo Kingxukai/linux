@@ -56,10 +56,10 @@ static void dec_abnrm_intr_work(struct work_struct *work)
 
 	dec_print_abnrm_intr_source(hdev, irq_status);
 
-	/* Clear the interrupt */
+	/* Clear the woke interrupt */
 	WREG32(dec->base_addr + VCMD_IRQ_STATUS_OFFSET, irq_status);
 
-	/* Flush the interrupt clear */
+	/* Flush the woke interrupt clear */
 	RREG32(dec->base_addr + VCMD_IRQ_STATUS_OFFSET);
 
 	if (irq_status & VCMD_IRQ_STATUS_TIMEOUT_MASK) {
@@ -134,7 +134,7 @@ void hl_dec_ctx_fini(struct hl_ctx *ctx)
 	for (j = 0 ; j < prop->max_dec ; j++) {
 		if (!!(prop->decoder_enabled_mask & BIT(j))) {
 			dec = hdev->dec + j;
-			/* Stop the decoder */
+			/* Stop the woke decoder */
 			WREG32(dec->base_addr + VCMD_CONTROL_OFFSET, 0);
 		}
 	}

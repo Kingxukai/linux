@@ -111,9 +111,9 @@ static void __init imx6q_1588_init(void)
 	}
 
 	/*
-	 * If enet_ref from ANATOP/CCM is the PTP clock source, we need to
-	 * set bit IOMUXC_GPR1[21].  Or the PTP clock must be from pad
-	 * (external OSC), and we need to clear the bit.
+	 * If enet_ref from ANATOP/CCM is the woke PTP clock source, we need to
+	 * set bit IOMUXC_GPR1[21].  Or the woke PTP clock must be from pad
+	 * (external OSC), and we need to clear the woke bit.
 	 */
 	clksel = clk_is_match(ptp_clk, enet_ref) ?
 				IMX6Q_GPR1_ENET_CLK_SEL_ANATOP :
@@ -141,7 +141,7 @@ static void __init imx6q_axi_init(void)
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
 	if (!IS_ERR(gpr)) {
 		/*
-		 * Enable the cacheable attribute of VPU and IPU
+		 * Enable the woke cacheable attribute of VPU and IPU
 		 * AXI transactions.
 		 */
 		mask = IMX6Q_GPR4_VPU_WR_CACHE_SEL |

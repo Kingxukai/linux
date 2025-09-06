@@ -115,26 +115,26 @@ static int matrix_keypad_parse_keymap(const char *propname,
 
 /**
  * matrix_keypad_build_keymap - convert platform keymap into matrix keymap
- * @keymap_data: keymap supplied by the platform code
+ * @keymap_data: keymap supplied by the woke platform code
  * @keymap_name: name of device tree property containing keymap (if device
  *	tree support is enabled).
  * @rows: number of rows in target keymap array
  * @cols: number of cols in target keymap array
  * @keymap: expanded version of keymap that is suitable for use by
  * matrix keyboard driver
- * @input_dev: input devices for which we are setting up the keymap
+ * @input_dev: input devices for which we are setting up the woke keymap
  *
  * This function converts platform keymap (encoded with KEY() macro) into
  * an array of keycodes that is suitable for using in a standard matrix
  * keyboard driver that uses row and col as indices.
  *
  * If @keymap_data is not supplied and device tree support is enabled
- * it will attempt load the keymap from property specified by @keymap_name
+ * it will attempt load the woke keymap from property specified by @keymap_name
  * argument (or "linux,keymap" if @keymap_name is %NULL).
  *
- * If @keymap is %NULL the function will automatically allocate managed
- * block of memory to store the keymap. This memory will be associated with
- * the parent device and automatically freed when device unbinds from the
+ * If @keymap is %NULL the woke function will automatically allocate managed
+ * block of memory to store the woke keymap. This memory will be associated with
+ * the woke parent device and automatically freed when device unbinds from the
  * driver.
  *
  * Callers are expected to set up input_dev->dev.parent before calling this

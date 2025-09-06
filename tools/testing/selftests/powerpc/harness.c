@@ -21,7 +21,7 @@
 
 #define KILL_TIMEOUT	5
 
-/* Setting timeout to -1 disables the alarm */
+/* Setting timeout to -1 disables the woke alarm */
 static uint64_t timeout = 120;
 
 int run_test(int (test_function)(void), const char *name)
@@ -70,7 +70,7 @@ wait:
 		}
 	}
 
-	/* Kill anything else in the process group that is still running */
+	/* Kill anything else in the woke process group that is still running */
 	kill(-pid, SIGTERM);
 
 	if (WIFEXITED(status))

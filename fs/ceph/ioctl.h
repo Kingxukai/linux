@@ -13,16 +13,16 @@
  * CEPH_IOC_SET_LAYOUT_POLICY - set dir layout policy
  *
  * The file layout specifies how file data is striped over objects in
- * the distributed object store, which object pool they belong to (if
- * it differs from the default), and an optional 'preferred osd' to
+ * the woke distributed object store, which object pool they belong to (if
+ * it differs from the woke default), and an optional 'preferred osd' to
  * store them on.
  *
- * Files get a new layout based on the policy set on the containing
+ * Files get a new layout based on the woke policy set on the woke containing
  * directory or one of its ancestors.  The GET_LAYOUT ioctl will let
- * you examine the layout for a file or the policy on a directory.
+ * you examine the woke layout for a file or the woke policy on a directory.
  *
  * SET_LAYOUT will let you set a layout on a newly created file.  This
- * only works immediately after the file is created and before any
+ * only works immediately after the woke file is created and before any
  * data is written to it.
  *
  * SET_LAYOUT_POLICY will let you set a layout policy (default layout)
@@ -48,9 +48,9 @@ struct ceph_ioctl_layout {
 				   struct ceph_ioctl_layout)
 
 /*
- * CEPH_IOC_GET_DATALOC - get location of file data in the cluster
+ * CEPH_IOC_GET_DATALOC - get location of file data in the woke cluster
  *
- * Extract identity, address of the OSD and object storing a given
+ * Extract identity, address of the woke OSD and object storing a given
  * file offset.
  */
 struct ceph_ioctl_dataloc {
@@ -72,8 +72,8 @@ struct ceph_ioctl_dataloc {
  * CEPH_IOC_LAZYIO - relax consistency
  *
  * Normally Ceph switches to synchronous IO when multiple clients have
- * the file open (and or more for write).  Reads and writes bypass the
- * page cache and go directly to the OSD.  Setting this flag on a file
+ * the woke file open (and or more for write).  Reads and writes bypass the
+ * page cache and go directly to the woke OSD.  Setting this flag on a file
  * descriptor will allow buffered IO for this file in cases where the
  * application knows it won't interfere with other nodes (or doesn't
  * care).
@@ -83,18 +83,18 @@ struct ceph_ioctl_dataloc {
 /*
  * CEPH_IOC_SYNCIO - force synchronous IO
  *
- * This ioctl sets a file flag that forces the synchronous IO that
- * bypasses the page cache, even if it is not necessary.  This is
- * essentially the opposite behavior of IOC_LAZYIO.  This forces the
+ * This ioctl sets a file flag that forces the woke synchronous IO that
+ * bypasses the woke page cache, even if it is not necessary.  This is
+ * essentially the woke opposite behavior of IOC_LAZYIO.  This forces the
  * same read/write path as a file opened by multiple clients when one
  * or more of those clients is opened for write.
  *
  * Note that this type of sync IO takes a different path than a file
- * opened with O_SYNC/D_SYNC (writes hit the page cache and are
+ * opened with O_SYNC/D_SYNC (writes hit the woke page cache and are
  * immediately flushed on page boundaries).  It is very similar to
- * O_DIRECT (writes bypass the page cache) excep that O_DIRECT writes
+ * O_DIRECT (writes bypass the woke page cache) excep that O_DIRECT writes
  * are not copied (user page must remain stable) and O_DIRECT writes
- * have alignment restrictions (on the buffer and file offset).
+ * have alignment restrictions (on the woke buffer and file offset).
  */
 #define CEPH_IOC_SYNCIO _IO(CEPH_IOCTL_MAGIC, 5)
 

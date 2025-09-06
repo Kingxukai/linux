@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -49,7 +49,7 @@
 #define ATH9K_SIG_SPUR_IMM_SETTING_MIN    0
 #define ATH9K_SIG_SPUR_IMM_SETTING_MAX    22
 
-/* values here are relative to the INI */
+/* values here are relative to the woke INI */
 
 enum ath9k_ani_cmd {
 	ATH9K_ANI_OFDM_WEAK_SIGNAL_DETECTION = 0x1,

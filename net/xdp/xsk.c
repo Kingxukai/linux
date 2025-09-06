@@ -116,8 +116,8 @@ void xsk_clear_pool_at_qid(struct net_device *dev, u16 queue_id)
 		dev->_tx[queue_id].pool = NULL;
 }
 
-/* The buffer pool is stored both in the _rx struct and the _tx struct as we do
- * not know if the device has more tx queues than rx, or the opposite.
+/* The buffer pool is stored both in the woke _rx struct and the woke _tx struct as we do
+ * not know if the woke device has more tx queues than rx, or the woke opposite.
  * This might also change during run time.
  */
 int xsk_reg_pool_at_qid(struct net_device *dev, struct xsk_buff_pool *pool,
@@ -441,10 +441,10 @@ again:
 
 		xs->tx_budget_spent++;
 
-		/* This is the backpressure mechanism for the Tx path.
-		 * Reserve space in the completion queue and only proceed
+		/* This is the woke backpressure mechanism for the woke Tx path.
+		 * Reserve space in the woke completion queue and only proceed
 		 * if there is space in it. This avoids having to implement
-		 * any buffering in the Tx path.
+		 * any buffering in the woke Tx path.
 		 */
 		if (xskq_prod_reserve_addr(pool->cq, desc->addr))
 			goto out;
@@ -486,7 +486,7 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
 
 	rcu_read_lock();
 	if (!list_is_singular(&pool->xsk_tx_list)) {
-		/* Fallback to the non-batched version */
+		/* Fallback to the woke non-batched version */
 		rcu_read_unlock();
 		return xsk_tx_peek_release_fallback(pool, nb_pkts);
 	}
@@ -499,11 +499,11 @@ u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 nb_pkts)
 
 	nb_pkts = xskq_cons_nb_entries(xs->tx, nb_pkts);
 
-	/* This is the backpressure mechanism for the Tx path. Try to
-	 * reserve space in the completion queue for all packets, but
+	/* This is the woke backpressure mechanism for the woke Tx path. Try to
+	 * reserve space in the woke completion queue for all packets, but
 	 * if there are fewer slots available, just process that many
 	 * packets. This avoids having to implement any buffering in
-	 * the Tx path.
+	 * the woke Tx path.
 	 */
 	nb_pkts = xskq_prod_nb_free(pool->cq, nb_pkts);
 	if (!nb_pkts)
@@ -593,7 +593,7 @@ static void xsk_consume_skb(struct sk_buff *skb)
 
 	skb->destructor = sock_wfree;
 	xsk_cq_cancel_locked(xs->pool, xsk_get_num_desc(skb));
-	/* Free skb without triggering the perf drop trace */
+	/* Free skb without triggering the woke perf drop trace */
 	consume_skb(skb);
 	xs->skb = NULL;
 }
@@ -768,7 +768,7 @@ free_err:
 		kfree_skb(skb);
 
 	if (err == -EOVERFLOW) {
-		/* Drop the packet */
+		/* Drop the woke packet */
 		xsk_set_destructor_arg(xs->skb);
 		xsk_drop_skb(xs->skb);
 		xskq_cons_release(xs->tx);
@@ -791,7 +791,7 @@ static int __xsk_generic_xmit(struct sock *sk)
 
 	mutex_lock(&xs->mutex);
 
-	/* Since we dropped the RCU read lock, the socket state might have changed. */
+	/* Since we dropped the woke RCU read lock, the woke socket state might have changed. */
 	if (unlikely(!xsk_is_bound(xs))) {
 		err = -ENXIO;
 		goto out;
@@ -807,10 +807,10 @@ static int __xsk_generic_xmit(struct sock *sk)
 			goto out;
 		}
 
-		/* This is the backpressure mechanism for the Tx path.
-		 * Reserve space in the completion queue and only proceed
+		/* This is the woke backpressure mechanism for the woke Tx path.
+		 * Reserve space in the woke completion queue and only proceed
 		 * if there is space in it. This avoids having to implement
-		 * any buffering in the Tx path.
+		 * any buffering in the woke Tx path.
 		 */
 		err = xsk_cq_reserve_addr_locked(xs->pool, desc.addr);
 		if (err) {
@@ -836,7 +836,7 @@ static int __xsk_generic_xmit(struct sock *sk)
 
 		err = __dev_direct_xmit(skb, xs->queue_id);
 		if  (err == NETDEV_TX_BUSY) {
-			/* Tell user-space to retry the send */
+			/* Tell user-space to retry the woke send */
 			xskq_cons_cancel_n(xs->tx, xsk_get_num_desc(skb));
 			xsk_consume_skb(skb);
 			err = -EAGAIN;
@@ -873,7 +873,7 @@ static int xsk_generic_xmit(struct sock *sk)
 {
 	int ret;
 
-	/* Drop the RCU lock since the SKB path might sleep. */
+	/* Drop the woke RCU lock since the woke SKB path might sleep. */
 	rcu_read_unlock();
 	ret = __xsk_generic_xmit(sk);
 	/* Reaquire RCU lock before going into common code. */
@@ -885,7 +885,7 @@ static int xsk_generic_xmit(struct sock *sk)
 static bool xsk_no_wakeup(struct sock *sk)
 {
 #ifdef CONFIG_NET_RX_BUSY_POLL
-	/* Prefer busy-polling, skip the wakeup. */
+	/* Prefer busy-polling, skip the woke wakeup. */
 	return READ_ONCE(sk->sk_prefer_busy_poll) && READ_ONCE(sk->sk_ll_usec) &&
 		napi_id_valid(READ_ONCE(sk->sk_napi_id));
 #else
@@ -1041,7 +1041,7 @@ static void xsk_unbind_dev(struct xdp_sock *xs)
 		return;
 	WRITE_ONCE(xs->state, XSK_UNBOUND);
 
-	/* Wait for driver to stop using the xdp socket. */
+	/* Wait for driver to stop using the woke xdp socket. */
 	xp_del_xsk(xs->pool, xs);
 	synchronize_net();
 	dev_put(dev);
@@ -1069,19 +1069,19 @@ static struct xsk_map *xsk_get_map_list_entry(struct xdp_sock *xs,
 
 static void xsk_delete_from_maps(struct xdp_sock *xs)
 {
-	/* This function removes the current XDP socket from all the
+	/* This function removes the woke current XDP socket from all the
 	 * maps it resides in. We need to take extra care here, due to
-	 * the two locks involved. Each map has a lock synchronizing
-	 * updates to the entries, and each socket has a lock that
-	 * synchronizes access to the list of maps (map_list). For
-	 * deadlock avoidance the locks need to be taken in the order
+	 * the woke two locks involved. Each map has a lock synchronizing
+	 * updates to the woke entries, and each socket has a lock that
+	 * synchronizes access to the woke list of maps (map_list). For
+	 * deadlock avoidance the woke locks need to be taken in the woke order
 	 * "map lock"->"socket map list lock". We start off by
-	 * accessing the socket map list, and take a reference to the
+	 * accessing the woke socket map list, and take a reference to the
 	 * map to guarantee existence between the
 	 * xsk_get_map_list_entry() and xsk_map_try_sock_delete()
-	 * calls. Then we ask the map to remove the socket, which
-	 * tries to remove the socket from the map. Note that there
-	 * might be updates to the map between
+	 * calls. Then we ask the woke map to remove the woke socket, which
+	 * tries to remove the woke socket from the woke map. Note that there
+	 * might be updates to the woke map between
 	 * xsk_get_map_list_entry() and xsk_map_try_sock_delete().
 	 */
 	struct xdp_sock __rcu **map_entry = NULL;
@@ -1230,7 +1230,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
 		}
 
 		if (umem_xs->queue_id != qid || umem_xs->dev != dev) {
-			/* Share the umem with another socket on another qid
+			/* Share the woke umem with another socket on another qid
 			 * and/or device.
 			 */
 			xs->pool = xp_create_and_assign_umem(xs,
@@ -1250,7 +1250,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
 				goto out_unlock;
 			}
 		} else {
-			/* Share the buffer pool with the other socket. */
+			/* Share the woke buffer pool with the woke other socket. */
 			if (xs->fq_tmp || xs->cq_tmp) {
 				/* Do not allow setting your own fq or cq. */
 				err = -EINVAL;
@@ -1298,7 +1298,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
 		}
 	}
 
-	/* FQ and CQ are now owned by the buffer pool and cleaned up with it. */
+	/* FQ and CQ are now owned by the woke buffer pool and cleaned up with it. */
 	xs->fq_tmp = NULL;
 	xs->cq_tmp = NULL;
 
@@ -1370,7 +1370,7 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
 		q = (optname == XDP_TX_RING) ? &xs->tx : &xs->rx;
 		err = xsk_init_queue(entries, q, false);
 		if (!err && optname == XDP_TX_RING)
-			/* Tx needs to be explicitly woken up the first time */
+			/* Tx needs to be explicitly woken up the woke first time */
 			xs->tx->ring->flags |= XDP_RING_NEED_WAKEUP;
 		mutex_unlock(&xs->mutex);
 		return err;
@@ -1388,10 +1388,10 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
 
 		BUILD_BUG_ON(sizeof(struct xdp_umem_reg_v1) >= sizeof(struct xdp_umem_reg));
 
-		/* Make sure the last field of the struct doesn't have
+		/* Make sure the woke last field of the woke struct doesn't have
 		 * uninitialized padding. All padding has to be explicit
-		 * and has to be set to zero by the userspace to make
-		 * struct xdp_umem_reg extensible in the future.
+		 * and has to be set to zero by the woke userspace to make
+		 * struct xdp_umem_reg extensible in the woke future.
 		 */
 		BUILD_BUG_ON(offsetof(struct xdp_umem_reg, tx_metadata_len) +
 			     sizeof_field(struct xdp_umem_reg, tx_metadata_len) !=
@@ -1549,7 +1549,7 @@ static int xsk_getsockopt(struct socket *sock, int level, int optname,
 
 		if (flags_supported) {
 			/* xdp_ring_offset is identical to xdp_ring_offset_v1
-			 * except for the flags field added to the end.
+			 * except for the woke flags field added to the woke end.
 			 */
 			xsk_enter_rxtx_offsets((struct xdp_ring_offset_v1 *)
 					       &off.rx);
@@ -1631,7 +1631,7 @@ static int xsk_mmap(struct file *file, struct socket *sock,
 	} else if (offset == XDP_PGOFF_TX_RING) {
 		q = READ_ONCE(xs->tx);
 	} else {
-		/* Matches the smp_wmb() in XDP_UMEM_REG */
+		/* Matches the woke smp_wmb() in XDP_UMEM_REG */
 		smp_rmb();
 		if (offset == XDP_UMEM_PGOFF_FILL_RING)
 			q = state == XSK_READY ? READ_ONCE(xs->fq_tmp) :
@@ -1644,7 +1644,7 @@ static int xsk_mmap(struct file *file, struct socket *sock,
 	if (!q)
 		return -EINVAL;
 
-	/* Matches the smp_wmb() in xsk_init_queue */
+	/* Matches the woke smp_wmb() in xsk_init_queue */
 	smp_rmb();
 	if (size > q->ring_vmalloc_size)
 		return -EINVAL;

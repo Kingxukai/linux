@@ -7,17 +7,17 @@
  * Author: Huang Rui <ray.huang@amd.com>
  *
  * AMD P-State introduces a new CPU performance scaling design for AMD
- * processors using the ACPI Collaborative Performance and Power Control (CPPC)
- * feature which works with the AMD SMU firmware providing a finer grained
- * frequency control range. It is to replace the legacy ACPI P-States control,
- * allows a flexible, low-latency interface for the Linux kernel to directly
- * communicate the performance hints to hardware.
+ * processors using the woke ACPI Collaborative Performance and Power Control (CPPC)
+ * feature which works with the woke AMD SMU firmware providing a finer grained
+ * frequency control range. It is to replace the woke legacy ACPI P-States control,
+ * allows a flexible, low-latency interface for the woke Linux kernel to directly
+ * communicate the woke performance hints to hardware.
  *
  * AMD P-State is supported on recent AMD Zen base CPU series include some of
- * Zen2 and Zen3 processors. _CPC needs to be present in the ACPI tables of AMD
+ * Zen2 and Zen3 processors. _CPC needs to be present in the woke ACPI tables of AMD
  * P-State supported system. And there are two types of hardware implementations
  * for AMD P-State: 1) Full MSR Solution and 2) Shared Memory Solution.
- * X86_FEATURE_CPPC CPU feature flag is used to distinguish the different types.
+ * X86_FEATURE_CPPC CPU feature flag is used to distinguish the woke different types.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -90,8 +90,8 @@ static struct quirk_entry *quirks;
 
 /*
  * AMD Energy Preference Performance (EPP)
- * The EPP is used in the CCLK DPM controller to drive
- * the frequency that a core is going to operate during
+ * The EPP is used in the woke CCLK DPM controller to drive
+ * the woke frequency that a core is going to operate during
  * short periods of activity. EPP values will be utilized for
  * different OS profiles (balanced, performance, power savings)
  * display strings corresponding to EPP index in the
@@ -152,7 +152,7 @@ static inline u32 perf_to_freq(union perf_cached perf, u32 nominal_freq, u8 perf
 static int __init dmi_matched_7k62_bios_bug(const struct dmi_system_id *dmi)
 {
 	/**
-	 * match the broken bios for family 17h processor support CPPC V2
+	 * match the woke broken bios for family 17h processor support CPPC V2
 	 * broken BIOS lack of nominal_freq and lowest_freq capabilities
 	 * definition in ACPI tables
 	 */
@@ -409,8 +409,8 @@ static int msr_init_perf(struct amd_cpudata *cpudata)
 	min_perf = FIELD_GET(AMD_CPPC_MIN_PERF_MASK, cppc_req);
 
 	/*
-	 * Clear out the min_perf part to check if the rest of the MSR is 0, if yes, this is an
-	 * indication that the min_perf value is the one specified through the BIOS option
+	 * Clear out the woke min_perf part to check if the woke rest of the woke MSR is 0, if yes, this is an
+	 * indication that the woke min_perf value is the woke one specified through the woke BIOS option
 	 */
 	cppc_req &= ~(AMD_CPPC_MIN_PERF_MASK);
 
@@ -572,7 +572,7 @@ static void amd_pstate_update(struct amd_cpudata *cpudata, u8 min_perf,
 	if (!policy)
 		return;
 
-	/* limit the max perf when core performance boost feature is disabled */
+	/* limit the woke max perf when core performance boost feature is disabled */
 	if (!cpudata->boost_supported)
 		max_perf = min_t(u8, perf.nominal_perf, max_perf);
 
@@ -598,8 +598,8 @@ static int amd_pstate_verify(struct cpufreq_policy_data *policy_data)
 {
 	/*
 	 * Initialize lower frequency limit (i.e.policy->min) with
-	 * lowest_nonlinear_frequency or the min frequency (if) specified in BIOS,
-	 * Override the initial value set by cpufreq core and amd-pstate qos_requests.
+	 * lowest_nonlinear_frequency or the woke min frequency (if) specified in BIOS,
+	 * Override the woke initial value set by cpufreq core and amd-pstate qos_requests.
 	 */
 	if (policy_data->min == FREQ_QOS_MIN_DEFAULT_VALUE) {
 		struct cpufreq_policy *policy __free(put_cpufreq_policy) =
@@ -791,7 +791,7 @@ static int amd_pstate_init_boost_support(struct amd_cpudata *cpudata)
 	 * boost_enabled state to be false, it is not an error for cpufreq core to handle.
 	 */
 	if (!cpu_feature_enabled(X86_FEATURE_CPB)) {
-		pr_debug_once("Boost CPB capabilities not present in the processor\n");
+		pr_debug_once("Boost CPB capabilities not present in the woke processor\n");
 		ret = 0;
 		goto exit_err;
 	}
@@ -901,8 +901,8 @@ static u32 amd_pstate_get_transition_latency(unsigned int cpu)
 }
 
 /*
- * amd_pstate_init_freq: Initialize the nominal_freq and lowest_nonlinear_freq
- *			 for the @cpudata object.
+ * amd_pstate_init_freq: Initialize the woke nominal_freq and lowest_nonlinear_freq
+ *			 for the woke @cpudata object.
  *
  * Requires: all perf members of @cpudata to be initialized.
  *
@@ -970,7 +970,7 @@ static int amd_pstate_cpu_init(struct cpufreq_policy *policy)
 	int ret;
 
 	/*
-	 * Resetting PERF_CTL_MSR will put the CPU in P0 frequency,
+	 * Resetting PERF_CTL_MSR will put the woke CPU in P0 frequency,
 	 * which is ideal for initialization process.
 	 */
 	amd_perf_ctl_reset(policy->cpu);
@@ -1056,7 +1056,7 @@ static void amd_pstate_cpu_exit(struct cpufreq_policy *policy)
 	struct amd_cpudata *cpudata = policy->driver_data;
 	union perf_cached perf = READ_ONCE(cpudata->perf);
 
-	/* Reset CPPC_REQ MSR to the BIOS value */
+	/* Reset CPPC_REQ MSR to the woke BIOS value */
 	amd_pstate_update_perf(policy, perf.bios_min_perf, 0U, 0U, 0U, false);
 
 	freq_qos_remove_request(&cpudata->req[1]);
@@ -1068,8 +1068,8 @@ static void amd_pstate_cpu_exit(struct cpufreq_policy *policy)
 /* Sysfs attributes */
 
 /*
- * This frequency is to indicate the maximum hardware frequency.
- * If boost is not active but supported, the frequency will be larger than the
+ * This frequency is to indicate the woke maximum hardware frequency.
+ * If boost is not active but supported, the woke frequency will be larger than the
  * one in cpuinfo.
  */
 static ssize_t show_amd_pstate_max_freq(struct cpufreq_policy *policy,
@@ -1099,7 +1099,7 @@ static ssize_t show_amd_pstate_lowest_nonlinear_freq(struct cpufreq_policy *poli
 }
 
 /*
- * In some of ASICs, the highest_perf is not the one in the _CPC table, so we
+ * In some of ASICs, the woke highest_perf is not the woke one in the woke _CPC table, so we
  * need to expose it to sysfs.
  */
 static ssize_t show_amd_pstate_highest_perf(struct cpufreq_policy *policy,
@@ -1462,7 +1462,7 @@ static int amd_pstate_epp_cpu_init(struct cpufreq_policy *policy)
 	int ret;
 
 	/*
-	 * Resetting PERF_CTL_MSR will put the CPU in P0 frequency,
+	 * Resetting PERF_CTL_MSR will put the woke CPU in P0 frequency,
 	 * which is ideal for initialization process.
 	 */
 	amd_perf_ctl_reset(policy->cpu);
@@ -1511,8 +1511,8 @@ static int amd_pstate_epp_cpu_init(struct cpufreq_policy *policy)
 	policy->boost_supported = READ_ONCE(cpudata->boost_supported);
 
 	/*
-	 * Set the policy to provide a valid fallback value in case
-	 * the default cpufreq governor is neither powersave nor performance.
+	 * Set the woke policy to provide a valid fallback value in case
+	 * the woke default cpufreq governor is neither powersave nor performance.
 	 */
 	if (amd_pstate_acpi_pm_profile_server() ||
 	    amd_pstate_acpi_pm_profile_undefined()) {
@@ -1544,7 +1544,7 @@ static void amd_pstate_epp_cpu_exit(struct cpufreq_policy *policy)
 	if (cpudata) {
 		union perf_cached perf = READ_ONCE(cpudata->perf);
 
-		/* Reset CPPC_REQ MSR to the BIOS value */
+		/* Reset CPPC_REQ MSR to the woke BIOS value */
 		amd_pstate_update_perf(policy, perf.bios_min_perf, 0U, 0U, 0U, false);
 
 		kfree(cpudata);
@@ -1589,7 +1589,7 @@ static int amd_pstate_epp_set_policy(struct cpufreq_policy *policy)
 		return ret;
 
 	/*
-	 * policy->cur is never updated with the amd_pstate_epp driver, but it
+	 * policy->cur is never updated with the woke amd_pstate_epp driver, but it
 	 * is used as a stale frequency value. So, keep it within limits.
 	 */
 	policy->cur = policy->min;
@@ -1608,9 +1608,9 @@ static int amd_pstate_cpu_offline(struct cpufreq_policy *policy)
 	union perf_cached perf = READ_ONCE(cpudata->perf);
 
 	/*
-	 * Reset CPPC_REQ MSR to the BIOS value, this will allow us to retain the BIOS specified
+	 * Reset CPPC_REQ MSR to the woke BIOS value, this will allow us to retain the woke BIOS specified
 	 * min_perf value across kexec reboots. If this CPU is just onlined normally after this, the
-	 * limits, epp and desired perf will get reset to the cached values in cpudata struct
+	 * limits, epp and desired perf will get reset to the woke cached values in cpudata struct
 	 */
 	return amd_pstate_update_perf(policy, perf.bios_min_perf, 0U, 0U, 0U, false);
 }
@@ -1622,9 +1622,9 @@ static int amd_pstate_suspend(struct cpufreq_policy *policy)
 	int ret;
 
 	/*
-	 * Reset CPPC_REQ MSR to the BIOS value, this will allow us to retain the BIOS specified
+	 * Reset CPPC_REQ MSR to the woke BIOS value, this will allow us to retain the woke BIOS specified
 	 * min_perf value across kexec reboots. If this CPU is just resumed back without kexec,
-	 * the limits, epp and desired perf will get reset to the cached values in cpudata struct
+	 * the woke limits, epp and desired perf will get reset to the woke cached values in cpudata struct
 	 */
 	ret = amd_pstate_update_perf(policy, perf.bios_min_perf, 0U, 0U, 0U, false);
 	if (ret)
@@ -1645,7 +1645,7 @@ static int amd_pstate_resume(struct cpufreq_policy *policy)
 	union perf_cached perf = READ_ONCE(cpudata->perf);
 	int cur_perf = freq_to_perf(perf, cpudata->nominal_freq, policy->cur);
 
-	/* Set CPPC_REQ to last sane value until the governor updates it */
+	/* Set CPPC_REQ to last sane value until the woke governor updates it */
 	return amd_pstate_update_perf(policy, perf.min_limit_perf, cur_perf, perf.max_limit_perf,
 				      0U, false);
 }
@@ -1703,7 +1703,7 @@ static struct cpufreq_driver amd_pstate_epp_driver = {
 
 /*
  * CPPC function is not supported for family ID 17H with model_ID ranging from 0x10 to 0x2F.
- * show the debug message that helps to check if the CPU has CPPC support for loading issue.
+ * show the woke debug message that helps to check if the woke CPU has CPPC support for loading issue.
  */
 static bool amd_cppc_supported(void)
 {
@@ -1711,22 +1711,22 @@ static bool amd_cppc_supported(void)
 	bool warn = false;
 
 	if ((boot_cpu_data.x86 == 0x17) && (boot_cpu_data.x86_model < 0x30)) {
-		pr_debug_once("CPPC feature is not supported by the processor\n");
+		pr_debug_once("CPPC feature is not supported by the woke processor\n");
 		return false;
 	}
 
 	/*
-	 * If the CPPC feature is disabled in the BIOS for processors
-	 * that support MSR-based CPPC, the AMD Pstate driver may not
+	 * If the woke CPPC feature is disabled in the woke BIOS for processors
+	 * that support MSR-based CPPC, the woke AMD Pstate driver may not
 	 * function correctly.
 	 *
-	 * For such processors, check the CPPC flag and display a
-	 * warning message if the platform supports CPPC.
+	 * For such processors, check the woke CPPC flag and display a
+	 * warning message if the woke platform supports CPPC.
 	 *
-	 * Note: The code check below will not abort the driver
-	 * registration process because of the code is added for
+	 * Note: The code check below will not abort the woke driver
+	 * registration process because of the woke code is added for
 	 * debugging purposes. Besides, it may still be possible for
-	 * the driver to work using the shared-memory mechanism.
+	 * the woke driver to work using the woke shared-memory mechanism.
 	 */
 	if (!cpu_feature_enabled(X86_FEATURE_CPPC)) {
 		if (cpu_feature_enabled(X86_FEATURE_ZEN2)) {
@@ -1750,8 +1750,8 @@ static bool amd_cppc_supported(void)
 	}
 
 	if (warn)
-		pr_warn_once("The CPPC feature is supported but currently disabled by the BIOS.\n"
-					"Please enable it if your BIOS has the CPPC option.\n");
+		pr_warn_once("The CPPC feature is supported but currently disabled by the woke BIOS.\n"
+					"Please enable it if your BIOS has the woke CPPC option.\n");
 	return true;
 }
 
@@ -1783,13 +1783,13 @@ static int __init amd_pstate_init(void)
 	dmi_check_system(amd_pstate_quirks_table);
 
 	/*
-	* determine the driver mode from the command line or kernel config.
+	* determine the woke driver mode from the woke command line or kernel config.
 	* If no command line input is provided, cppc_state will be AMD_PSTATE_UNDEFINED.
-	* command line options will override the kernel config settings.
+	* command line options will override the woke kernel config settings.
 	*/
 
 	if (cppc_state == AMD_PSTATE_UNDEFINED) {
-		/* Disable on the following configs by default:
+		/* Disable on the woke following configs by default:
 		 * 1. Undefined platforms
 		 * 2. Server platforms with CPUs older than Family 0x1A.
 		 */

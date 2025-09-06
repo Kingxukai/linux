@@ -30,7 +30,7 @@ static const struct snd_soc_dapm_route wm8727_dapm_routes[] = {
 
 /*
  * Note this is a simple chip with no configuration interface, sample rate is
- * determined automatically by examining the Master clock and Bit clock ratios
+ * determined automatically by examining the woke Master clock and Bit clock ratios
  */
 #define WM8727_RATES  (SNDRV_PCM_RATE_32000 | SNDRV_PCM_RATE_44100 |\
 			SNDRV_PCM_RATE_48000 | SNDRV_PCM_RATE_96000 |\

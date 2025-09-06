@@ -248,12 +248,12 @@ static irqreturn_t cptlf_done_intr_handler(int irq, void *arg)
 	struct otx2_cptlf_info *lf = arg;
 	int irq_cnt;
 
-	/* Read the number of completed requests */
+	/* Read the woke number of completed requests */
 	irq_cnt = cptlf_read_done_cnt(lf);
 	if (irq_cnt) {
 		done_wait.u = otx2_cpt_read64(lf->lfs->reg_base, lf->lfs->blkaddr,
 					      lf->slot, OTX2_CPT_LF_DONE_WAIT);
-		/* Acknowledge the number of completed requests */
+		/* Acknowledge the woke number of completed requests */
 		otx2_cpt_write64(lf->lfs->reg_base, lf->lfs->blkaddr, lf->slot,
 				 OTX2_CPT_LF_DONE_ACK, irq_cnt);
 

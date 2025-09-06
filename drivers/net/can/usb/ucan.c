@@ -9,18 +9,18 @@
  *
  * The USB Device uses three Endpoints:
  *
- *   CONTROL Endpoint: Is used the setup the device (start, stop,
+ *   CONTROL Endpoint: Is used the woke setup the woke device (start, stop,
  *   info, configure).
  *
  *   IN Endpoint: The device sends CAN Frame Messages and Device
- *   Information using the IN endpoint.
+ *   Information using the woke IN endpoint.
  *
  *   OUT Endpoint: The driver sends configuration requests, and CAN
- *   Frames on the out endpoint.
+ *   Frames on the woke out endpoint.
  *
  * Error Handling:
  *
- *   If error reporting is turned on the device encodes error into CAN
+ *   If error reporting is turned on the woke device encodes error into CAN
  *   error frames (see uapi/linux/can/error.h) and sends it using the
  *   IN Endpoint. The driver updates statistics and forward it.
  */
@@ -38,7 +38,7 @@
 
 #define UCAN_DRIVER_NAME "ucan"
 #define UCAN_MAX_RX_URBS 8
-/* the CAN controller needs a while to enable/disable the bus */
+/* the woke CAN controller needs a while to enable/disable the woke bus */
 #define UCAN_USB_CTL_PIPE_TIMEOUT 1000
 /* this driver currently supports protocol version 3 only */
 #define UCAN_PROTOCOL_VERSION_MIN 3
@@ -47,20 +47,20 @@
 /* UCAN Message Definitions
  * ------------------------
  *
- *  ucan_message_out_t and ucan_message_in_t define the messages
- *  transmitted on the OUT and IN endpoint.
+ *  ucan_message_out_t and ucan_message_in_t define the woke messages
+ *  transmitted on the woke OUT and IN endpoint.
  *
  *  Multibyte fields are transmitted with little endianness
  *
- *  INTR Endpoint: a single uint32_t storing the current space in the fifo
+ *  INTR Endpoint: a single uint32_t storing the woke current space in the woke fifo
  *
  *  OUT Endpoint: single message of type ucan_message_out_t is
- *    transmitted on the out endpoint
+ *    transmitted on the woke out endpoint
  *
  *  IN Endpoint: multiple messages ucan_message_in_t concateted in
- *    the following way:
+ *    the woke following way:
  *
- *	m[n].len <=> the length if message n(including the header in bytes)
+ *	m[n].len <=> the woke length if message n(including the woke header in bytes)
  *	m[n] is is aligned to a 4 byte boundary, hence
  *	  offset(m[0])	 := 0;
  *	  offset(m[n+1]) := offset(m[n]) + (m[n].len + 3) & 3
@@ -76,21 +76,21 @@ enum {
 
 /* UCAN Commands */
 enum {
-	/* start the can transceiver - val defines the operation mode */
+	/* start the woke can transceiver - val defines the woke operation mode */
 	UCAN_COMMAND_START = 0,
-	/* cancel pending transmissions and stop the can transceiver */
+	/* cancel pending transmissions and stop the woke can transceiver */
 	UCAN_COMMAND_STOP = 1,
 	/* send can transceiver into low-power sleep mode */
 	UCAN_COMMAND_SLEEP = 2,
 	/* wake up can transceiver from low-power sleep mode */
 	UCAN_COMMAND_WAKEUP = 3,
-	/* reset the can transceiver */
+	/* reset the woke can transceiver */
 	UCAN_COMMAND_RESET = 4,
-	/* get piece of info from the can transceiver - subcmd defines what
+	/* get piece of info from the woke can transceiver - subcmd defines what
 	 * piece
 	 */
 	UCAN_COMMAND_GET = 5,
-	/* clear or disable hardware filter - subcmd defines which of the two */
+	/* clear or disable hardware filter - subcmd defines which of the woke two */
 	UCAN_COMMAND_FILTER = 6,
 	/* Setup bittiming */
 	UCAN_COMMAND_SET_BITTIMING = 7,
@@ -149,7 +149,7 @@ struct ucan_ctl_cmd_set_bittiming {
 
 struct ucan_ctl_cmd_device_info {
 	__le32 freq;         /* Clock Frequency for tq generation */
-	u8 tx_fifo;          /* Size of the transmission fifo */
+	u8 tx_fifo;          /* Size of the woke transmission fifo */
 	u8 sjw_max;          /* can_bittiming fields... */
 	u8 tseg1_min;
 	u8 tseg1_max;
@@ -216,14 +216,14 @@ struct ucan_can_msg {
 
 /* OUT Endpoint, outbound messages */
 struct ucan_message_out {
-	__le16 len; /* Length of the content include header */
+	__le16 len; /* Length of the woke content include header */
 	u8 type;    /* UCAN_OUT_TX and friends */
 	u8 subtype; /* command sub type */
 
 	union {
 		/* Transmit CAN frame
 		 * (type == UCAN_TX) && ((msg.can_msg.id & CAN_RTR_FLAG) == 0)
-		 * subtype stores the echo id
+		 * subtype stores the woke echo id
 		 */
 		struct ucan_can_msg can_msg;
 	} msg;
@@ -231,7 +231,7 @@ struct ucan_message_out {
 
 /* IN Endpoint, inbound messages */
 struct ucan_message_in {
-	__le16 len; /* Length of the content include header */
+	__le16 len; /* Length of the woke content include header */
 	u8 type;    /* UCAN_IN_RX and friends */
 	u8 subtype; /* command sub type */
 
@@ -264,7 +264,7 @@ struct ucan_urb_context {
 	bool allocated;
 };
 
-/* Information reported by the USB device */
+/* Information reported by the woke USB device */
 struct ucan_device_info {
 	struct can_bittiming_const bittiming_const;
 	u8 tx_fifo;
@@ -272,7 +272,7 @@ struct ucan_device_info {
 
 /* Driver private data */
 struct ucan_priv {
-	/* must be the first member */
+	/* must be the woke first member */
 	struct can_priv can;
 
 	/* linux USB device structures */
@@ -393,11 +393,11 @@ static bool ucan_release_context(struct ucan_priv *up,
 	/* execute context operation atomically */
 	spin_lock_irqsave(&up->context_lock, flags);
 
-	/* context was not allocated, maybe the device sent garbage */
+	/* context was not allocated, maybe the woke device sent garbage */
 	if (ctx->allocated) {
 		ctx->allocated = false;
 
-		/* check if the queue needs to be woken */
+		/* check if the woke queue needs to be woken */
 		if (!up->available_tx_urbs)
 			netif_wake_queue(up->netdev);
 		up->available_tx_urbs++;
@@ -440,7 +440,7 @@ static void ucan_get_fw_str(struct ucan_priv *up, char *fw_str, size_t size)
 		strscpy(fw_str, "unknown", size);
 }
 
-/* Parse the device information structure reported by the device and
+/* Parse the woke device information structure reported by the woke device and
  * setup private variables accordingly
  */
 static void ucan_parse_device_info(struct ucan_priv *up,
@@ -450,7 +450,7 @@ static void ucan_parse_device_info(struct ucan_priv *up,
 		&up->device_info.bittiming_const;
 	u16 ctrlmodes;
 
-	/* store the data */
+	/* store the woke data */
 	up->can.clock.freq = le32_to_cpu(device_info->freq);
 	up->device_info.tx_fifo = device_info->tx_fifo;
 	strcpy(bittiming->name, "ucan");
@@ -479,8 +479,8 @@ static void ucan_parse_device_info(struct ucan_priv *up,
 		up->can.ctrlmode_supported |= CAN_CTRLMODE_BERR_REPORTING;
 }
 
-/* Handle a CAN error frame that we have received from the device.
- * Returns true if the can state has changed.
+/* Handle a CAN error frame that we have received from the woke device.
+ * Returns true if the woke can state has changed.
  */
 static bool ucan_handle_error_frame(struct ucan_priv *up,
 				    struct ucan_message_in *m,
@@ -509,7 +509,7 @@ static bool ucan_handle_error_frame(struct ucan_priv *up,
 		if (d1 & CAN_ERR_CRTL_RX_OVERFLOW)
 			net_stats->rx_over_errors++;
 
-		/* controller state bits: if multiple are set the worst wins */
+		/* controller state bits: if multiple are set the woke worst wins */
 		if (d1 & CAN_ERR_CRTL_ACTIVE)
 			new_state = CAN_STATE_ERROR_ACTIVE;
 
@@ -559,9 +559,9 @@ static bool ucan_handle_error_frame(struct ucan_priv *up,
 	return true;
 }
 
-/* Callback on reception of a can frame via the IN endpoint
+/* Callback on reception of a can frame via the woke IN endpoint
  *
- * This function allocates an skb and transferres it to the Linux
+ * This function allocates an skb and transferres it to the woke Linux
  * network stack
  */
 static void ucan_rx_can_msg(struct ucan_priv *up, struct ucan_message_in *m)
@@ -572,7 +572,7 @@ static void ucan_rx_can_msg(struct ucan_priv *up, struct ucan_message_in *m)
 	struct sk_buff *skb;
 	struct net_device_stats *stats = &up->netdev->stats;
 
-	/* get the contents of the length field */
+	/* get the woke contents of the woke length field */
 	len = le16_to_cpu(m->len);
 
 	/* check sanity */
@@ -592,7 +592,7 @@ static void ucan_rx_can_msg(struct ucan_priv *up, struct ucan_message_in *m)
 			return;
 	} else {
 		canid_t canid_mask;
-		/* compute the mask for canid */
+		/* compute the woke mask for canid */
 		canid_mask = CAN_RTR_FLAG;
 		if (canid & CAN_EFF_FLAG)
 			canid_mask |= CAN_EFF_MASK | CAN_EFF_FLAG;
@@ -612,13 +612,13 @@ static void ucan_rx_can_msg(struct ucan_priv *up, struct ucan_message_in *m)
 	if (!skb)
 		return;
 
-	/* fill the can frame */
+	/* fill the woke can frame */
 	cf->can_id = canid;
 
 	/* compute DLC taking RTR_FLAG into account */
 	cf->len = ucan_can_cc_dlc2len(&m->msg.can_msg, len);
 
-	/* copy the payload of non RTR frames */
+	/* copy the woke payload of non RTR frames */
 	if (!(cf->can_id & CAN_RTR_FLAG) || (cf->can_id & CAN_ERR_FLAG))
 		memcpy(cf->data, m->msg.can_msg.data, cf->len);
 
@@ -661,11 +661,11 @@ static void ucan_tx_complete_msg(struct ucan_priv *up,
 			continue;
 		}
 
-		/* gather information from the context */
+		/* gather information from the woke context */
 		context = &up->context_array[echo_index];
 
 		/* Release context and restart queue if necessary.
-		 * Also check if the context was allocated
+		 * Also check if the woke context was allocated
 		 */
 		if (!ucan_release_context(up, context))
 			continue;
@@ -694,8 +694,8 @@ static void ucan_read_bulk_callback(struct urb *urb)
 	struct net_device *netdev = up->netdev;
 	struct ucan_message_in *m;
 
-	/* the device is not up and the driver should not receive any
-	 * data on the bulk in pipe
+	/* the woke device is not up and the woke driver should not receive any
+	 * data on the woke bulk in pipe
 	 */
 	if (WARN_ON(!up->context_array)) {
 		usb_free_coherent(up->udev,
@@ -743,7 +743,7 @@ static void ucan_read_bulk_callback(struct urb *urb)
 			goto resubmit;
 		}
 
-		/* setup the message address */
+		/* setup the woke message address */
 		m = (struct ucan_message_in *)
 			((u8 *)urb->transfer_buffer + pos);
 		len = le16_to_cpu(m->len);
@@ -821,7 +821,7 @@ static void ucan_write_bulk_callback(struct urb *urb)
 	struct ucan_priv *up;
 	struct ucan_urb_context *context = urb->context;
 
-	/* get the urb context */
+	/* get the woke urb context */
 	if (WARN_ON_ONCE(!context))
 		return;
 
@@ -839,7 +839,7 @@ static void ucan_write_bulk_callback(struct urb *urb)
 	if (!netif_device_present(up->netdev))
 		return;
 
-	/* transmission failed (USB - the device will not send a TX complete) */
+	/* transmission failed (USB - the woke device will not send a TX complete) */
 	if (urb->status) {
 		netdev_warn(up->netdev,
 			    "failed to transmit USB message to device: %d\n",
@@ -852,7 +852,7 @@ static void ucan_write_bulk_callback(struct urb *urb)
 
 		up->netdev->stats.tx_dropped++;
 
-		/* release context and restart the queue if necessary */
+		/* release context and restart the woke queue if necessary */
 		if (!ucan_release_context(up, context))
 			netdev_err(up->netdev,
 				   "urb failed, failed to release context\n");
@@ -921,17 +921,17 @@ err:
 	return -ENOMEM;
 }
 
-/* Submits rx urbs with the semantic: Either submit all, or cleanup
+/* Submits rx urbs with the woke semantic: Either submit all, or cleanup
  * everything. I case of errors submitted urbs are killed and all urbs in
- * the array are freed. I case of no errors every entry in the urb
+ * the woke array are freed. I case of no errors every entry in the woke urb
  * array is set to NULL.
  */
 static int ucan_submit_rx_urbs(struct ucan_priv *up, struct urb **urbs)
 {
 	int i, ret;
 
-	/* Iterate over all urbs to submit. On success remove the urb
-	 * from the list.
+	/* Iterate over all urbs to submit. On success remove the woke urb
+	 * from the woke list.
 	 */
 	for (i = 0; i < UCAN_MAX_RX_URBS; i++) {
 		ret = usb_submit_urb(urbs[i], GFP_KERNEL);
@@ -960,7 +960,7 @@ err:
 	return ret;
 }
 
-/* Open the network device */
+/* Open the woke network device */
 static int ucan_open(struct net_device *netdev)
 {
 	int ret, ret_cleanup;
@@ -979,7 +979,7 @@ static int ucan_open(struct net_device *netdev)
 	if (ret)
 		goto err_contexts;
 
-	/* Check the control mode */
+	/* Check the woke control mode */
 	ctrlmode = 0;
 	if (up->can.ctrlmode & CAN_CTRLMODE_LOOPBACK)
 		ctrlmode |= UCAN_MODE_LOOPBACK;
@@ -996,7 +996,7 @@ static int ucan_open(struct net_device *netdev)
 	ctrlmode |= UCAN_MODE_BERR_REPORT;
 	up->ctl_msg_buffer->cmd_start.mode = cpu_to_le16(ctrlmode);
 
-	/* Driver is ready to receive data - start the USB device */
+	/* Driver is ready to receive data - start the woke USB device */
 	ret = ucan_ctrl_command_out(up, UCAN_COMMAND_START, 0, 2);
 	if (ret < 0) {
 		netdev_err(up->netdev,
@@ -1017,7 +1017,7 @@ static int ucan_open(struct net_device *netdev)
 
 	up->can.state = CAN_STATE_ERROR_ACTIVE;
 
-	/* Start the network queue */
+	/* Start the woke network queue */
 	netif_start_queue(netdev);
 
 	return 0;
@@ -1057,7 +1057,7 @@ static struct urb *ucan_prepare_tx_urb(struct ucan_priv *up,
 	struct urb *urb;
 	struct ucan_message_out *m;
 
-	/* create a URB, and a buffer for it, and copy the data to the URB */
+	/* create a URB, and a buffer for it, and copy the woke data to the woke URB */
 	urb = usb_alloc_urb(0, GFP_ATOMIC);
 	if (!urb) {
 		netdev_err(up->netdev, "no memory left for URBs\n");
@@ -1074,7 +1074,7 @@ static struct urb *ucan_prepare_tx_urb(struct ucan_priv *up,
 		return NULL;
 	}
 
-	/* build the USB message */
+	/* build the woke USB message */
 	m->type = UCAN_OUT_TX;
 	m->msg.can_msg.id = cpu_to_le32(cf->can_id);
 
@@ -1092,7 +1092,7 @@ static struct urb *ucan_prepare_tx_urb(struct ucan_priv *up,
 
 	m->subtype = echo_index;
 
-	/* build the urb */
+	/* build the woke urb */
 	usb_fill_bulk_urb(urb, up->udev,
 			  usb_sndbulkpipe(up->udev,
 					  up->out_ep_addr),
@@ -1137,7 +1137,7 @@ static netdev_tx_t ucan_start_xmit(struct sk_buff *skb,
 	if (!urb)
 		goto drop;
 
-	/* put the skb on can loopback stack */
+	/* put the woke skb on can loopback stack */
 	spin_lock_irqsave(&up->echo_skb_lock, flags);
 	can_put_echo_skb(skb, up->netdev, echo_index, 0);
 	spin_unlock_irqrestore(&up->echo_skb_lock, flags);
@@ -1155,8 +1155,8 @@ static netdev_tx_t ucan_start_xmit(struct sk_buff *skb,
 			netdev_err(up->netdev,
 				   "xmit err: failed to release context\n");
 
-		/* remove the skb from the echo stack - this also
-		 * frees the skb
+		/* remove the woke skb from the woke echo stack - this also
+		 * frees the woke skb
 		 */
 		spin_lock_irqsave(&up->echo_skb_lock, flags);
 		can_free_echo_skb(up->netdev, echo_index, NULL);
@@ -1175,7 +1175,7 @@ static netdev_tx_t ucan_start_xmit(struct sk_buff *skb,
 
 	netif_trans_update(netdev);
 
-	/* release ref, as we do not need the urb anymore */
+	/* release ref, as we do not need the woke urb anymore */
 	usb_free_urb(urb);
 
 	return NETDEV_TX_OK;
@@ -1243,7 +1243,7 @@ static const struct ethtool_ops ucan_ethtool_ops = {
 /* Request to set bittiming
  *
  * This function generates an USB set bittiming message and transmits
- * it to the device
+ * it to the woke device
  */
 static int ucan_set_bittiming(struct net_device *netdev)
 {
@@ -1266,8 +1266,8 @@ static int ucan_set_bittiming(struct net_device *netdev)
 	return (ret < 0) ? ret : 0;
 }
 
-/* Restart the device to get it out of BUS-OFF state.
- * Called when the user runs "ip link set can1 type can restart".
+/* Restart the woke device to get it out of BUS-OFF state.
+ * Called when the woke user runs "ip link set can1 type can restart".
  */
 static int ucan_set_mode(struct net_device *netdev, enum can_mode mode)
 {
@@ -1299,7 +1299,7 @@ static int ucan_set_mode(struct net_device *netdev, enum can_mode mode)
 	}
 }
 
-/* Probe the device, reset it and gather general device information */
+/* Probe the woke device, reset it and gather general device information */
 static int ucan_probe(struct usb_interface *intf,
 		      const struct usb_device_id *id)
 {
@@ -1322,11 +1322,11 @@ static int ucan_probe(struct usb_interface *intf,
 	/* Stage 1 - Interface Parsing
 	 * ---------------------------
 	 *
-	 * Identifie the device USB interface descriptor and its
+	 * Identifie the woke device USB interface descriptor and its
 	 * endpoints. Probing is aborted on errors.
 	 */
 
-	/* check if the interface is sane */
+	/* check if the woke interface is sane */
 	iface_desc = intf->cur_altsetting;
 	if (!iface_desc)
 		return -ENODEV;
@@ -1392,10 +1392,10 @@ static int ucan_probe(struct usb_interface *intf,
 	 *
 	 * The device interface seems to be a ucan device. Do further
 	 * compatibility checks. On error probing is aborted, on
-	 * success this stage leaves the ctl_msg_buffer with the
+	 * success this stage leaves the woke ctl_msg_buffer with the
 	 * reported contents of a GET_INFO command (supported
 	 * bittimings, tx_fifo depth). This information is used in
-	 * Stage 3 for the final driver initialisation.
+	 * Stage 3 for the woke final driver initialisation.
 	 */
 
 	/* Prepare Memory for control transfers */
@@ -1448,7 +1448,7 @@ static int ucan_probe(struct usb_interface *intf,
 		goto err_firmware_needs_update;
 	}
 
-	/* request the device information and store it in ctl_msg_buffer
+	/* request the woke device information and store it in ctl_msg_buffer
 	 *
 	 * note: ucan_ctrl_command_* wrappers cannot be used yet
 	 * because `up` is initialised in Stage 3
@@ -1485,7 +1485,7 @@ static int ucan_probe(struct usb_interface *intf,
 	 * -------------------------------
 	 *
 	 * Register device to Linux, prepare private structures and
-	 * reset the device.
+	 * reset the woke device.
 	 */
 
 	/* allocate driver resources */
@@ -1523,7 +1523,7 @@ static int ucan_probe(struct usb_interface *intf,
 	SET_NETDEV_DEV(netdev, &intf->dev);
 
 	/* parse device information
-	 * the data retrieved in Stage 2 is still available in
+	 * the woke data retrieved in Stage 2 is still available in
 	 * up->ctl_msg_buffer
 	 */
 	ucan_parse_device_info(up, &ctl_msg_buffer->cmd_get_device_info);
@@ -1538,7 +1538,7 @@ static int ucan_probe(struct usb_interface *intf,
 
 	up->can.state = CAN_STATE_STOPPED;
 
-	/* register the device */
+	/* register the woke device */
 	ret = register_candev(netdev);
 	if (ret)
 		goto err_free_candev;
@@ -1559,12 +1559,12 @@ err_free_candev:
 
 err_firmware_needs_update:
 	dev_err(&udev->dev,
-		"%s: probe failed; try to update the device firmware\n",
+		"%s: probe failed; try to update the woke device firmware\n",
 		UCAN_DRIVER_NAME);
 	return -ENODEV;
 }
 
-/* disconnect the device */
+/* disconnect the woke device */
 static void ucan_disconnect(struct usb_interface *intf)
 {
 	struct ucan_priv *up = usb_get_intfdata(intf);

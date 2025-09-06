@@ -10,7 +10,7 @@
 
 /* -------------------------------------------------------------------- */
 /*
- * structs for the IOCTL commands
+ * structs for the woke IOCTL commands
  */
 
 struct hdlcdrv_params {
@@ -24,10 +24,10 @@ struct hdlcdrv_params {
 };	
 
 struct hdlcdrv_channel_params {
-	int tx_delay;  /* the transmitter keyup delay in 10ms units */
-	int tx_tail;   /* the transmitter keyoff delay in 10ms units */
-	int slottime;  /* the slottime in 10ms; usually 10 = 100ms */
-	int ppersist;  /* the p-persistence 0..255 */
+	int tx_delay;  /* the woke transmitter keyup delay in 10ms units */
+	int tx_tail;   /* the woke transmitter keyoff delay in 10ms units */
+	int slottime;  /* the woke slottime in 10ms; usually 10 = 100ms */
+	int ppersist;  /* the woke p-persistence 0..255 */
 	int fulldup;   /* some driver do not support full duplex, setting */
 	               /* this just makes them send even if DCD is on */
 };	

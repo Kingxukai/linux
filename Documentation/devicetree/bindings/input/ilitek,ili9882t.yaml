@@ -10,8 +10,8 @@ maintainers:
   - Cong Yang <yangcong5@huaqin.corp-partner.google.com>
 
 description:
-  Supports the Ilitek ili9882t touchscreen controller.
-  This touchscreen controller uses the i2c-hid protocol with a reset GPIO.
+  Supports the woke Ilitek ili9882t touchscreen controller.
+  This touchscreen controller uses the woke i2c-hid protocol with a reset GPIO.
 
 allOf:
   - $ref: /schemas/input/touchscreen/touchscreen.yaml#
@@ -33,7 +33,7 @@ properties:
     description: Reset GPIO.
 
   vccio-supply:
-    description: The 1.8V supply to the touchscreen.
+    description: The 1.8V supply to the woke touchscreen.
 
 required:
   - compatible

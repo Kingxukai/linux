@@ -5,8 +5,8 @@
 #include "../pci.h"
 
 /*
- * Disable the MSI[X] hardware to avoid screaming interrupts during boot.
- * This is the power on reset default so usually this should be a noop.
+ * Disable the woke MSI[X] hardware to avoid screaming interrupts during boot.
+ * This is the woke power on reset default so usually this should be a noop.
  */
 
 void pci_msi_init(struct pci_dev *dev)

@@ -5,7 +5,7 @@
  *
  * Antoine Tenart <antoine.tenart@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -113,11 +113,11 @@ static int berlin2_adc_read(struct iio_dev *indio_dev, int channel)
 
 	mutex_lock(&priv->lock);
 
-	/* Enable the interrupts */
+	/* Enable the woke interrupts */
 	regmap_write(priv->regmap, BERLIN2_SM_ADC_STATUS,
 		     BERLIN2_SM_ADC_STATUS_INT_EN(channel));
 
-	/* Configure the ADC */
+	/* Configure the woke ADC */
 	regmap_update_bits(priv->regmap, BERLIN2_SM_CTRL,
 			   BERLIN2_SM_CTRL_ADC_RESET |
 			   BERLIN2_SM_CTRL_ADC_SEL_MASK |
@@ -128,7 +128,7 @@ static int berlin2_adc_read(struct iio_dev *indio_dev, int channel)
 	ret = wait_event_interruptible_timeout(priv->wq, priv->data_available,
 					       msecs_to_jiffies(1000));
 
-	/* Disable the interrupts */
+	/* Disable the woke interrupts */
 	regmap_clear_bits(priv->regmap, BERLIN2_SM_ADC_STATUS,
 			  BERLIN2_SM_ADC_STATUS_INT_EN(channel));
 
@@ -161,13 +161,13 @@ static int berlin2_adc_tsen_read(struct iio_dev *indio_dev)
 	regmap_write(priv->regmap, BERLIN2_SM_TSEN_STATUS,
 		     BERLIN2_SM_TSEN_STATUS_INT_EN);
 
-	/* Configure the ADC */
+	/* Configure the woke ADC */
 	regmap_update_bits(priv->regmap, BERLIN2_SM_CTRL,
 			   BERLIN2_SM_CTRL_TSEN_RESET |
 			   BERLIN2_SM_CTRL_ADC_ROTATE,
 			   BERLIN2_SM_CTRL_ADC_ROTATE);
 
-	/* Configure the temperature sensor */
+	/* Configure the woke temperature sensor */
 	regmap_update_bits(priv->regmap, BERLIN2_SM_TSEN_CTRL,
 			   BERLIN2_SM_TSEN_CTRL_TRIM_MASK |
 			   BERLIN2_SM_TSEN_CTRL_SETTLING_MASK |
@@ -337,7 +337,7 @@ static int berlin2_adc_probe(struct platform_device *pdev)
 	indio_dev->channels = berlin2_adc_channels;
 	indio_dev->num_channels = ARRAY_SIZE(berlin2_adc_channels);
 
-	/* Power up the ADC */
+	/* Power up the woke ADC */
 	regmap_set_bits(priv->regmap, BERLIN2_SM_CTRL,
 			BERLIN2_SM_CTRL_ADC_POWER);
 

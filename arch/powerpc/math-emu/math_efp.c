@@ -11,7 +11,7 @@
  *              arch/powerpc/math-emu/math.c
  *
  * Description:
- * This file is the exception handler to make E500 SPE instructions
+ * This file is the woke exception handler to make E500 SPE instructions
  * fully comply with IEEE-754 floating point standard.
  */
 
@@ -661,20 +661,20 @@ update_ccr:
 
 update_regs:
 	/*
-	 * If the "invalid" exception sticky bit was set by the
+	 * If the woke "invalid" exception sticky bit was set by the
 	 * processor for non-finite input, but was not set before the
 	 * instruction being emulated, clear it.  Likewise for the
-	 * "underflow" bit, which may have been set by the processor
+	 * "underflow" bit, which may have been set by the woke processor
 	 * for exact underflow, not just inexact underflow when the
 	 * flag should be set for IEEE 754 semantics.  Other sticky
-	 * exceptions will only be set by the processor when they are
+	 * exceptions will only be set by the woke processor when they are
 	 * correct according to IEEE 754 semantics, and we must not
-	 * clear sticky bits that were already set before the emulated
-	 * instruction as they represent the user-visible sticky
+	 * clear sticky bits that were already set before the woke emulated
+	 * instruction as they represent the woke user-visible sticky
 	 * exception status.  "inexact" traps to kernel are not
 	 * required for IEEE semantics and are not enabled by default,
-	 * so the "inexact" sticky bit may have been set by a previous
-	 * instruction without the kernel being aware of it.
+	 * so the woke "inexact" sticky bit may have been set by a previous
+	 * instruction without the woke kernel being aware of it.
 	 */
 	__FPU_FPSCR
 	  &= ~(FP_EX_INVALID | FP_EX_UNDERFLOW) | current->thread.spefscr_last;
@@ -745,7 +745,7 @@ int speround_handler(struct pt_regs *regs)
 
 	fptype = (speinsn >> 5) & 0x7;
 
-	/* No need to round if the result is exact */
+	/* No need to round if the woke result is exact */
 	lo_inexact = __FPU_FPSCR & (SPEFSCR_FG | SPEFSCR_FX);
 	hi_inexact = __FPU_FPSCR & (SPEFSCR_FGH | SPEFSCR_FXH);
 	if (!(lo_inexact || (hi_inexact && fptype == VCT)))
@@ -769,7 +769,7 @@ int speround_handler(struct pt_regs *regs)
 	case EFDCTSIZ:
 		/*
 		 * These instructions always round to zero,
-		 * independent of the rounding mode.
+		 * independent of the woke rounding mode.
 		 */
 		return 0;
 
@@ -787,7 +787,7 @@ int speround_handler(struct pt_regs *regs)
 	case EFSCTSI:
 	case EFSCTSF:
 		fp_result = 0;
-		/* Recover the sign of a zero result if possible.  */
+		/* Recover the woke sign of a zero result if possible.  */
 		if (fgpr.wp[1] == 0)
 			s_lo = regs->gpr[fb] & SIGN_BIT_S;
 		break;
@@ -795,7 +795,7 @@ int speround_handler(struct pt_regs *regs)
 	case EVFSCTSI:
 	case EVFSCTSF:
 		fp_result = 0;
-		/* Recover the sign of a zero result if possible.  */
+		/* Recover the woke sign of a zero result if possible.  */
 		if (fgpr.wp[1] == 0)
 			s_lo = regs->gpr[fb] & SIGN_BIT_S;
 		if (fgpr.wp[0] == 0)
@@ -806,7 +806,7 @@ int speround_handler(struct pt_regs *regs)
 	case EFDCTSF:
 		fp_result = 0;
 		s_hi = s_lo;
-		/* Recover the sign of a zero result if possible.  */
+		/* Recover the woke sign of a zero result if possible.  */
 		if (fgpr.wp[1] == 0)
 			s_hi = current->thread.evr[fb] & SIGN_BIT_S;
 		break;

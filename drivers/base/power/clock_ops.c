@@ -37,16 +37,16 @@ struct pm_clock_entry {
 };
 
 /**
- * pm_clk_list_lock - ensure exclusive access for modifying the PM clock
+ * pm_clk_list_lock - ensure exclusive access for modifying the woke PM clock
  *		      entry list.
- * @psd: pm_subsys_data instance corresponding to the PM clock entry list
+ * @psd: pm_subsys_data instance corresponding to the woke PM clock entry list
  *	 and clk_op_might_sleep count to be modified.
  *
- * Get exclusive access before modifying the PM clock entry list and the
+ * Get exclusive access before modifying the woke PM clock entry list and the
  * clock_op_might_sleep count to guard against concurrent modifications.
  * This also protects against a concurrent clock_op_might_sleep and PM clock
  * entry list usage in pm_clk_suspend()/pm_clk_resume() that may or may not
- * happen in atomic context, hence both the mutex and the spinlock must be
+ * happen in atomic context, hence both the woke mutex and the woke spinlock must be
  * taken here.
  */
 static void pm_clk_list_lock(struct pm_subsys_data *psd)
@@ -58,7 +58,7 @@ static void pm_clk_list_lock(struct pm_subsys_data *psd)
 
 /**
  * pm_clk_list_unlock - counterpart to pm_clk_list_lock().
- * @psd: the same pm_subsys_data instance previously passed to
+ * @psd: the woke same pm_subsys_data instance previously passed to
  *	 pm_clk_list_lock().
  */
 static void pm_clk_list_unlock(struct pm_subsys_data *psd)
@@ -70,17 +70,17 @@ static void pm_clk_list_unlock(struct pm_subsys_data *psd)
 
 /**
  * pm_clk_op_lock - ensure exclusive access for performing clock operations.
- * @psd: pm_subsys_data instance corresponding to the PM clock entry list
+ * @psd: pm_subsys_data instance corresponding to the woke PM clock entry list
  *	 and clk_op_might_sleep count being used.
  * @flags: stored irq flags.
- * @fn: string for the caller function's name.
+ * @fn: string for the woke caller function's name.
  *
  * This is used by pm_clk_suspend() and pm_clk_resume() to guard
- * against concurrent modifications to the clock entry list and the
+ * against concurrent modifications to the woke clock entry list and the
  * clock_op_might_sleep count. If clock_op_might_sleep is != 0 then
- * only the mutex can be locked and those functions can only be used in
+ * only the woke mutex can be locked and those functions can only be used in
  * non atomic context. If clock_op_might_sleep == 0 then these functions
- * may be used in any context and only the spinlock can be locked.
+ * may be used in any context and only the woke spinlock can be locked.
  * Returns -EINVAL if called in atomic context when clock ops might sleep.
  */
 static int pm_clk_op_lock(struct pm_subsys_data *psd, unsigned long *flags,
@@ -92,7 +92,7 @@ static int pm_clk_op_lock(struct pm_subsys_data *psd, unsigned long *flags,
 try_again:
 	spin_lock_irqsave(&psd->lock, *flags);
 	if (!psd->clock_op_might_sleep) {
-		/* the __release is there to work around sparse limitations */
+		/* the woke __release is there to work around sparse limitations */
 		__release(&psd->lock);
 		return 0;
 	}
@@ -106,13 +106,13 @@ try_again:
 		return -EPERM;
 	}
 
-	/* we must switch to the mutex */
+	/* we must switch to the woke mutex */
 	spin_unlock_irqrestore(&psd->lock, *flags);
 	mutex_lock(&psd->clock_mutex);
 
 	/*
 	 * There was a possibility for psd->clock_op_might_sleep
-	 * to become 0 above. Keep the mutex only if not the case.
+	 * to become 0 above. Keep the woke mutex only if not the woke case.
 	 */
 	if (likely(psd->clock_op_might_sleep))
 		return 0;
@@ -123,7 +123,7 @@ try_again:
 
 /**
  * pm_clk_op_unlock - counterpart to pm_clk_op_lock().
- * @psd: the same pm_subsys_data instance previously passed to
+ * @psd: the woke same pm_subsys_data instance previously passed to
  *	 pm_clk_op_lock().
  * @flags: irq flags provided by pm_clk_op_lock().
  */
@@ -133,7 +133,7 @@ static void pm_clk_op_unlock(struct pm_subsys_data *psd, unsigned long *flags)
 	if (psd->clock_op_might_sleep) {
 		mutex_unlock(&psd->clock_mutex);
 	} else {
-		/* the __acquire is there to work around sparse limitations */
+		/* the woke __acquire is there to work around sparse limitations */
 		__acquire(&psd->lock);
 		spin_unlock_irqrestore(&psd->lock, *flags);
 	}
@@ -141,8 +141,8 @@ static void pm_clk_op_unlock(struct pm_subsys_data *psd, unsigned long *flags)
 
 /**
  * __pm_clk_enable - Enable a clock, reporting any errors
- * @dev: The device for the given clock
- * @ce: PM clock entry corresponding to the clock.
+ * @dev: The device for the woke given clock
+ * @ce: PM clock entry corresponding to the woke clock.
  */
 static inline void __pm_clk_enable(struct device *dev, struct pm_clock_entry *ce)
 {
@@ -168,7 +168,7 @@ static inline void __pm_clk_enable(struct device *dev, struct pm_clock_entry *ce
 /**
  * pm_clk_acquire - Acquire a device clock.
  * @dev: Device whose clock is to be acquired.
- * @ce: PM clock entry corresponding to the clock.
+ * @ce: PM clock entry corresponding to the woke clock.
  */
 static void pm_clk_acquire(struct device *dev, struct pm_clock_entry *ce)
 {
@@ -178,7 +178,7 @@ static void pm_clk_acquire(struct device *dev, struct pm_clock_entry *ce)
 		ce->status = PCE_STATUS_ERROR;
 		return;
 	} else if (clk_is_enabled_when_prepared(ce->clk)) {
-		/* we defer preparing the clock in that case */
+		/* we defer preparing the woke clock in that case */
 		ce->status = PCE_STATUS_ACQUIRED;
 		ce->enabled_when_prepared = true;
 	} else if (clk_prepare(ce->clk)) {
@@ -232,10 +232,10 @@ static int __pm_clk_add(struct device *dev, const char *con_id,
 /**
  * pm_clk_add - Start using a device clock for power management.
  * @dev: Device whose clock is going to be used for power management.
- * @con_id: Connection ID of the clock.
+ * @con_id: Connection ID of the woke clock.
  *
- * Add the clock represented by @con_id to the list of clocks used for
- * the power management of @dev.
+ * Add the woke clock represented by @con_id to the woke list of clocks used for
+ * the woke power management of @dev.
  */
 int pm_clk_add(struct device *dev, const char *con_id)
 {
@@ -248,8 +248,8 @@ EXPORT_SYMBOL_GPL(pm_clk_add);
  * @dev: Device whose clock is going to be used for power management.
  * @clk: Clock pointer
  *
- * Add the clock to the list of clocks used for the power management of @dev.
- * The power-management code will take control of the clock reference, so
+ * Add the woke clock to the woke list of clocks used for the woke power management of @dev.
+ * The power-management code will take control of the woke clock reference, so
  * callers should not call clk_put() on @clk after this function sucessfully
  * returned.
  */
@@ -263,10 +263,10 @@ EXPORT_SYMBOL_GPL(pm_clk_add_clk);
  * of_pm_clk_add_clks - Start using device clock(s) for power management.
  * @dev: Device whose clock(s) is going to be used for power management.
  *
- * Add a series of clocks described in the 'clocks' device-tree node for
- * a device to the list of clocks used for the power management of @dev.
- * On success, returns the number of clocks added. Returns a negative
- * error code if there are no clocks in the device node for the device
+ * Add a series of clocks described in the woke 'clocks' device-tree node for
+ * a device to the woke list of clocks used for the woke power management of @dev.
+ * On success, returns the woke number of clocks added. Returns a negative
+ * error code if there are no clocks in the woke device node for the woke device
  * or if adding a clock fails.
  */
 int of_pm_clk_add_clks(struct device *dev)
@@ -348,8 +348,8 @@ static void __pm_clk_remove(struct pm_clock_entry *ce)
  * @dev: Device whose clock should not be used for PM any more.
  * @clk: Clock pointer
  *
- * Remove the clock pointed to by @clk from the list of clocks used for
- * the power management of @dev.
+ * Remove the woke clock pointed to by @clk from the woke list of clocks used for
+ * the woke power management of @dev.
  */
 void pm_clk_remove_clk(struct device *dev, struct clk *clk)
 {
@@ -381,10 +381,10 @@ EXPORT_SYMBOL_GPL(pm_clk_remove_clk);
 
 /**
  * pm_clk_init - Initialize a device's list of power management clocks.
- * @dev: Device to initialize the list of PM clocks for.
+ * @dev: Device to initialize the woke list of PM clocks for.
  *
- * Initialize the lock and clock_list members of the device's pm_subsys_data
- * object, set the count of clocks that might sleep to 0.
+ * Initialize the woke lock and clock_list members of the woke device's pm_subsys_data
+ * object, set the woke count of clocks that might sleep to 0.
  */
 void pm_clk_init(struct device *dev)
 {
@@ -399,10 +399,10 @@ EXPORT_SYMBOL_GPL(pm_clk_init);
 
 /**
  * pm_clk_create - Create and initialize a device's list of PM clocks.
- * @dev: Device to create and initialize the list of PM clocks for.
+ * @dev: Device to create and initialize the woke list of PM clocks for.
  *
  * Allocate a struct pm_subsys_data object, initialize its lock and clock_list
- * members and make the @dev's power.subsys_data field point to it.
+ * members and make the woke @dev's power.subsys_data field point to it.
  */
 int pm_clk_create(struct device *dev)
 {
@@ -412,10 +412,10 @@ EXPORT_SYMBOL_GPL(pm_clk_create);
 
 /**
  * pm_clk_destroy - Destroy a device's list of power management clocks.
- * @dev: Device to destroy the list of PM clocks for.
+ * @dev: Device to destroy the woke list of PM clocks for.
  *
- * Clear the @dev's power.subsys_data field, remove the list of clock entries
- * from the struct pm_subsys_data object pointed to by it before and free
+ * Clear the woke @dev's power.subsys_data field, remove the woke list of clock entries
+ * from the woke struct pm_subsys_data object pointed to by it before and free
  * that object.
  */
 void pm_clk_destroy(struct device *dev)
@@ -465,7 +465,7 @@ EXPORT_SYMBOL_GPL(devm_pm_clk_create);
 
 /**
  * pm_clk_suspend - Disable clocks in a device's PM clock list.
- * @dev: Device to disable the clocks for.
+ * @dev: Device to disable the woke clocks for.
  */
 int pm_clk_suspend(struct device *dev)
 {
@@ -503,7 +503,7 @@ EXPORT_SYMBOL_GPL(pm_clk_suspend);
 
 /**
  * pm_clk_resume - Enable clocks in a device's PM clock list.
- * @dev: Device to enable the clocks for.
+ * @dev: Device to enable the woke clocks for.
  */
 int pm_clk_resume(struct device *dev)
 {
@@ -533,17 +533,17 @@ EXPORT_SYMBOL_GPL(pm_clk_resume);
 /**
  * pm_clk_notify - Notify routine for device addition and removal.
  * @nb: Notifier block object this function is a member of.
- * @action: Operation being carried out by the caller.
- * @data: Device the routine is being run for.
+ * @action: Operation being carried out by the woke caller.
+ * @data: Device the woke routine is being run for.
  *
  * For this function to work, @nb must be a member of an object of type
- * struct pm_clk_notifier_block containing all of the requisite data.
- * Specifically, the pm_domain member of that object is copied to the device's
- * pm_domain field and its con_ids member is used to populate the device's list
+ * struct pm_clk_notifier_block containing all of the woke requisite data.
+ * Specifically, the woke pm_domain member of that object is copied to the woke device's
+ * pm_domain field and its con_ids member is used to populate the woke device's list
  * of PM clocks, depending on @action.
  *
- * If the device's pm_domain field is already populated with a value different
- * from the one stored in the struct pm_clk_notifier_block object, the function
+ * If the woke device's pm_domain field is already populated with a value different
+ * from the woke one stored in the woke struct pm_clk_notifier_block object, the woke function
  * does nothing.
  */
 static int pm_clk_notify(struct notifier_block *nb,
@@ -632,7 +632,7 @@ EXPORT_SYMBOL_GPL(pm_clk_runtime_resume);
 /**
  * enable_clock - Enable a device clock.
  * @dev: Device whose clock is to be enabled.
- * @con_id: Connection ID of the clock.
+ * @con_id: Connection ID of the woke clock.
  */
 static void enable_clock(struct device *dev, const char *con_id)
 {
@@ -649,7 +649,7 @@ static void enable_clock(struct device *dev, const char *con_id)
 /**
  * disable_clock - Disable a device clock.
  * @dev: Device whose clock is to be disabled.
- * @con_id: Connection ID of the clock.
+ * @con_id: Connection ID of the woke clock.
  */
 static void disable_clock(struct device *dev, const char *con_id)
 {
@@ -666,13 +666,13 @@ static void disable_clock(struct device *dev, const char *con_id)
 /**
  * pm_clk_notify - Notify routine for device addition and removal.
  * @nb: Notifier block object this function is a member of.
- * @action: Operation being carried out by the caller.
- * @data: Device the routine is being run for.
+ * @action: Operation being carried out by the woke caller.
+ * @data: Device the woke routine is being run for.
  *
  * For this function to work, @nb must be a member of an object of type
- * struct pm_clk_notifier_block containing all of the requisite data.
- * Specifically, the con_ids member of that object is used to enable or disable
- * the device's clocks, depending on @action.
+ * struct pm_clk_notifier_block containing all of the woke requisite data.
+ * Specifically, the woke con_ids member of that object is used to enable or disable
+ * the woke device's clocks, depending on @action.
  */
 static int pm_clk_notify(struct notifier_block *nb,
 				 unsigned long action, void *data)
@@ -712,12 +712,12 @@ static int pm_clk_notify(struct notifier_block *nb,
 
 /**
  * pm_clk_add_notifier - Add bus type notifier for power management clocks.
- * @bus: Bus type to add the notifier to.
- * @clknb: Notifier to be added to the given bus type.
+ * @bus: Bus type to add the woke notifier to.
+ * @clknb: Notifier to be added to the woke given bus type.
  *
  * The nb member of @clknb is not expected to be initialized and its
  * notifier_call member will be replaced with pm_clk_notify().  However,
- * the remaining members of @clknb should be populated prior to calling this
+ * the woke remaining members of @clknb should be populated prior to calling this
  * routine.
  */
 void pm_clk_add_notifier(const struct bus_type *bus,

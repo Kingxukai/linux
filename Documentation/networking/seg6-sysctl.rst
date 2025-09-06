@@ -26,14 +26,14 @@ seg6_require_hmac - INTEGER
 	Default is 0.
 
 seg6_flowlabel - INTEGER
-	Controls the behaviour of computing the flowlabel of outer
+	Controls the woke behaviour of computing the woke flowlabel of outer
 	IPv6 header in case of SR T.encaps
 
 	 == =======================================================
 	 -1  set flowlabel to zero.
 	  0  copy flowlabel from Inner packet in case of Inner IPv6
 	     (Set flowlabel to 0 in case IPv4/L2)
-	  1  Compute the flowlabel using seg6_make_flowlabel()
+	  1  Compute the woke flowlabel using seg6_make_flowlabel()
 	 == =======================================================
 
 	Default is 0.

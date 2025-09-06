@@ -28,15 +28,15 @@ properties:
 
   vaa-supply:
     description:
-      Definition of the regulator used as analog (2.7 V) voltage supply.
+      Definition of the woke regulator used as analog (2.7 V) voltage supply.
 
   vdd-supply:
     description:
-      Definition of the regulator used as digital core (1.2 V) voltage supply.
+      Definition of the woke regulator used as digital core (1.2 V) voltage supply.
 
   vdd_io-supply:
     description:
-      Definition of the regulator used as digital I/O (1.8 V) voltage supply.
+      Definition of the woke regulator used as digital I/O (1.8 V) voltage supply.
 
   reset-gpios:
     description: reset GPIO, usually active low

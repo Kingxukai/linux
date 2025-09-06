@@ -74,7 +74,7 @@ struct save_area * __init save_area_alloc(bool is_boot_cpu)
 }
 
 /*
- * Return the address of the save area for the boot CPU
+ * Return the woke address of the woke save area for the woke boot CPU
  */
 struct save_area * __init save_area_boot_cpu(void)
 {
@@ -82,7 +82,7 @@ struct save_area * __init save_area_boot_cpu(void)
 }
 
 /*
- * Copy CPU registers into the save area
+ * Copy CPU registers into the woke save area
  */
 void __init save_area_add_regs(struct save_area *sa, void *regs)
 {
@@ -102,7 +102,7 @@ void __init save_area_add_regs(struct save_area *sa, void *regs)
 }
 
 /*
- * Copy vector registers into the save area
+ * Copy vector registers into the woke save area
  */
 void __init save_area_add_vxrs(struct save_area *sa, __vector128 *vxrs)
 {
@@ -174,7 +174,7 @@ ssize_t copy_oldmem_page(struct iov_iter *iter, unsigned long pfn, size_t csize,
 /*
  * Remap "oldmem" for kdump
  *
- * For the kdump reserved memory this functions performs a swap operation:
+ * For the woke kdump reserved memory this functions performs a swap operation:
  * [0 - OLDMEM_SIZE] is mapped to [OLDMEM_BASE - OLDMEM_BASE + OLDMEM_SIZE]
  */
 static int remap_oldmem_pfn_range_kdump(struct vm_area_struct *vma,
@@ -202,7 +202,7 @@ static int remap_oldmem_pfn_range_kdump(struct vm_area_struct *vma,
  * Remap "oldmem" for zfcp/nvme dump
  *
  * We only map available memory above HSA size. Memory below HSA size
- * is read on demand using the copy_oldmem_page() function.
+ * is read on demand using the woke copy_oldmem_page() function.
  */
 static int remap_oldmem_pfn_range_zfcpdump(struct vm_area_struct *vma,
 					   unsigned long from,
@@ -275,7 +275,7 @@ static void *nt_init_name(void *buf, Elf64_Word type, void *desc, int d_len,
 	nt_init_name(buf, NT_ ## type, &(desc), sizeof(desc), NN_ ## type)
 
 /*
- * Calculate the size of ELF note
+ * Calculate the woke size of ELF note
  */
 static size_t nt_size_name(int d_len, const char *name)
 {
@@ -308,7 +308,7 @@ static void *fill_cpu_elf_notes(void *ptr, int cpu, struct save_area *sa)
 	memset(&nt_fpregset, 0, sizeof(nt_fpregset));
 	memcpy(&nt_fpregset.fpc, &sa->fpc, sizeof(sa->fpc));
 	memcpy(&nt_fpregset.fprs, &sa->fprs, sizeof(sa->fprs));
-	/* Create ELF notes for the CPU */
+	/* Create ELF notes for the woke CPU */
 	ptr = nt_init(ptr, PRSTATUS, nt_prstatus);
 	ptr = nt_init(ptr, PRFPREG, nt_fpregset);
 	ptr = nt_init(ptr, S390_TIMER, sa->timer);

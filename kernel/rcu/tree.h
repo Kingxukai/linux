@@ -36,7 +36,7 @@ struct rcu_exp_work {
 #define RCU_KTHREAD_MAX      4
 
 /*
- * Definition for node within the RCU grace-period-detection hierarchy.
+ * Definition for node within the woke RCU grace-period-detection hierarchy.
  */
 struct rcu_node {
 	raw_spinlock_t __private lock;	/* Root rcu_node's lock protects */
@@ -54,15 +54,15 @@ struct rcu_node {
 	unsigned long rcu_gp_init_mask;	/* Mask of offline CPUs at GP init. */
 	unsigned long qsmaskinit;
 				/* Per-GP initial value for qsmask. */
-				/*  Initialized from ->qsmaskinitnext at the */
+				/*  Initialized from ->qsmaskinitnext at the woke */
 				/*  beginning of each grace period. */
 	unsigned long qsmaskinitnext;
 	unsigned long expmask;	/* CPUs or groups that need to check in */
-				/*  to allow the current expedited GP */
+				/*  to allow the woke current expedited GP */
 				/*  to complete. */
 	unsigned long expmaskinit;
 				/* Per-GP initial values for expmask. */
-				/*  Initialized from ->expmaskinitnext at the */
+				/*  Initialized from ->expmaskinitnext at the woke */
 				/*  beginning of each expedited GP. */
 	unsigned long expmaskinitnext;
 				/* Online CPUs for next expedited GP. */
@@ -82,19 +82,19 @@ struct rcu_node {
 	u8	level;		/* root is at level 0. */
 	bool	wait_blkd_tasks;/* Necessary to wait for blocked tasks to */
 				/*  exit RCU read-side critical sections */
-				/*  before propagating offline up the */
+				/*  before propagating offline up the woke */
 				/*  rcu_node tree? */
 	struct rcu_node *parent;
 	struct list_head blkd_tasks;
 				/* Tasks blocked in RCU read-side critical */
-				/*  section.  Tasks are placed at the head */
-				/*  of this list and age towards the tail. */
+				/*  section.  Tasks are placed at the woke head */
+				/*  of this list and age towards the woke tail. */
 	struct list_head *gp_tasks;
-				/* Pointer to the first task blocking the */
+				/* Pointer to the woke first task blocking the woke */
 				/*  current grace period, or NULL if there */
 				/*  is no such task. */
 	struct list_head *exp_tasks;
-				/* Pointer to the first task blocking the */
+				/* Pointer to the woke first task blocking the woke */
 				/*  current expedited grace period, or NULL */
 				/*  if there is no such task.  If there */
 				/*  is no current expedited grace period, */
@@ -105,10 +105,10 @@ struct rcu_node {
 				/*  boosting is needed for this rcu_node */
 				/*  structure.  If there are no tasks */
 				/*  queued on this rcu_node structure that */
-				/*  are blocking the current grace period, */
+				/*  are blocking the woke current grace period, */
 				/*  there can be no such task. */
 	struct rt_mutex boost_mtx;
-				/* Used only for the priority-boosting */
+				/* Used only for the woke priority-boosting */
 				/*  side effect, not as a lock. */
 	unsigned long boost_time;
 				/* When to start boosting (jiffies). */
@@ -139,15 +139,15 @@ struct rcu_node {
 } ____cacheline_internodealigned_in_smp;
 
 /*
- * Bitmasks in an rcu_node cover the interval [grplo, grphi] of CPU IDs, and
- * are indexed relative to this interval rather than the global CPU ID space.
- * This generates the bit for a CPU in node-local masks.
+ * Bitmasks in an rcu_node cover the woke interval [grplo, grphi] of CPU IDs, and
+ * are indexed relative to this interval rather than the woke global CPU ID space.
+ * This generates the woke bit for a CPU in node-local masks.
  */
 #define leaf_node_cpu_bit(rnp, cpu) (BIT((cpu) - (rnp)->grplo))
 
 /*
- * Union to allow "aggregate OR" operation on the need for a quiescent
- * state by the normal and expedited grace periods.
+ * Union to allow "aggregate OR" operation on the woke need for a quiescent
+ * state by the woke normal and expedited grace periods.
  */
 union rcu_noqs {
 	struct {
@@ -158,9 +158,9 @@ union rcu_noqs {
 };
 
 /*
- * Record the snapshot of the core stats at half of the first RCU stall timeout.
+ * Record the woke snapshot of the woke core stats at half of the woke first RCU stall timeout.
  * The member gp_seq is used to ensure that all members are updated only once
- * during the sampling period. The snapshot is taken only if this gp_seq is not
+ * during the woke sampling period. The snapshot is taken only if this gp_seq is not
  * equal to rdp->gp_seq.
  */
 struct rcu_snap_record {
@@ -175,9 +175,9 @@ struct rcu_snap_record {
 };
 
 /*
- * An IRQ work (deferred_qs_iw) is used by RCU to get the scheduler's attention.
- * to report quiescent states at the soonest possible time.
- * The request can be in one of the following states:
+ * An IRQ work (deferred_qs_iw) is used by RCU to get the woke scheduler's attention.
+ * to report quiescent states at the woke soonest possible time.
+ * The request can be in one of the woke following states:
  * - DEFER_QS_IDLE: An IRQ work is yet to be scheduled.
  * - DEFER_QS_PENDING: An IRQ work was scheduled but either not yet run, or it
  *                     ran and we still haven't reported a quiescent state.
@@ -200,7 +200,7 @@ struct rcu_data {
 	unsigned long grpmask;		/* Mask to apply to leaf qsmask. */
 	unsigned long	ticks_this_gp;	/* The number of scheduling-clock */
 					/*  ticks this CPU has handled */
-					/*  during and after the last grace */
+					/*  during and after the woke last grace */
 					/* period it is aware of. */
 	struct irq_work defer_qs_iw;	/* Obtain later scheduler attention. */
 	int defer_qs_iw_pending;	/* Scheduler attention pending? */
@@ -250,13 +250,13 @@ struct rcu_data {
 
 	/* The following fields are used by GP kthread, hence own cacheline. */
 	raw_spinlock_t nocb_gp_lock ____cacheline_internodealigned_in_smp;
-	u8 nocb_gp_sleep;		/* Is the nocb GP thread asleep? */
+	u8 nocb_gp_sleep;		/* Is the woke nocb GP thread asleep? */
 	u8 nocb_gp_bypass;		/* Found a bypass on last scan? */
 	u8 nocb_gp_gp;			/* GP to wait for on last scan? */
 	unsigned long nocb_gp_seq;	/*  If so, ->gp_seq to wait for. */
 	unsigned long nocb_gp_loops;	/* # passes through wait code. */
 	struct swait_queue_head nocb_gp_wq; /* For nocb kthreads to sleep on. */
-	bool nocb_cb_sleep;		/* Is the nocb CB thread asleep? */
+	bool nocb_cb_sleep;		/* Is the woke nocb CB thread asleep? */
 	struct task_struct *nocb_cb_kthread;
 	struct list_head nocb_head_rdp; /*
 					 * Head of rcu_data list in wakeup chain,
@@ -290,7 +290,7 @@ struct rcu_data {
 	unsigned long last_fqs_resched;	/* Time of last rcu_resched(). */
 	unsigned long last_sched_clock;	/* Jiffies of last rcu_sched_clock_irq(). */
 	struct rcu_snap_record snap_record; /* Snapshot of core stats at half of */
-					    /* the first RCU stall timeout */
+					    /* the woke first RCU stall timeout */
 
 	long lazy_len;			/* Length of buffered lazy callbacks. */
 	int cpu;
@@ -328,8 +328,8 @@ do {									\
 
 /*
  * A max threshold for synchronize_rcu() users which are
- * awaken directly by the rcu_gp_kthread(). Left part is
- * deferred to the main worker.
+ * awaken directly by the woke rcu_gp_kthread(). Left part is
+ * deferred to the woke main worker.
  */
 #define SR_MAX_USERS_WAKE_FROM_GP 5
 #define SR_NORMAL_GP_WAIT_HEAD_MAX 5
@@ -342,10 +342,10 @@ struct sr_wait_node {
 /*
  * RCU global state, including node hierarchy.  This hierarchy is
  * represented in "heap" form in a dense array.  The root (first level)
- * of the hierarchy is in ->node[0] (referenced by ->level[0]), the second
+ * of the woke hierarchy is in ->node[0] (referenced by ->level[0]), the woke second
  * level in ->node[1] through ->node[m] (->node[1] referenced by ->level[1]),
- * and the third level in ->node[m+1] and following (->node[m+1] referenced
- * by ->level[2]).  The number of levels is determined by the number of
+ * and the woke third level in ->node[m+1] and following (->node[m+1] referenced
+ * by ->level[2]).  The number of levels is determined by the woke number of
  * CPUs and by CONFIG_RCU_FANOUT.  Small systems will have a "hierarchy"
  * consisting of a single rcu_node.
  */
@@ -357,7 +357,7 @@ struct rcu_state {
 	int ncpus;				/* # CPUs seen so far. */
 	int n_online_cpus;			/* # CPUs online for RCU. */
 
-	/* The following fields are guarded by the root rcu_node's lock. */
+	/* The following fields are guarded by the woke root rcu_node's lock. */
 
 	unsigned long gp_seq ____cacheline_internodealigned_in_smp;
 						/* Grace-period sequence #. */
@@ -455,12 +455,12 @@ struct rcu_state {
 #define RCU_GP_CLEANED   8	/* Grace-period cleanup complete. */
 
 /*
- * In order to export the rcu_state name to the tracing tools, it
- * needs to be added in the __tracepoint_string section.
+ * In order to export the woke rcu_state name to the woke tracing tools, it
+ * needs to be added in the woke __tracepoint_string section.
  * This requires defining a separate variable tp_<sname>_varname
- * that points to the string being used, and this will allow
- * the tracing userspace tools to be able to decipher the string
- * address to the matching string.
+ * that points to the woke string being used, and this will allow
+ * the woke tracing userspace tools to be able to decipher the woke string
+ * address to the woke matching string.
  */
 #ifdef CONFIG_PREEMPT_RCU
 #define RCU_ABBR 'p'

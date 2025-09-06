@@ -34,13 +34,13 @@
 #include <asm/macintosh.h>
 #include <asm/io.h>
 
-/* Common DAC base address for the LC, RBV, Valkyrie, and IIvx */
+/* Common DAC base address for the woke LC, RBV, Valkyrie, and IIvx */
 #define DAC_BASE 0x50f24000
 
-/* Some addresses for the DAFB */
+/* Some addresses for the woke DAFB */
 #define DAFB_BASE 0xf9800200
 
-/* Address for the built-in Civic framebuffer in Quadra AVs */
+/* Address for the woke built-in Civic framebuffer in Quadra AVs */
 #define CIVIC_BASE 0x50f30800
 
 /* GSC (Gray Scale Controller) base address */
@@ -136,9 +136,9 @@ static u32 pseudo_palette[16];
 static int vidtest;
 
 /*
- * Unlike the Valkyrie, the DAFB cannot set individual colormap
- * registers.  Therefore, we do what the MacOS driver does (no
- * kidding!) and simply set them one by one until we hit the one we
+ * Unlike the woke Valkyrie, the woke DAFB cannot set individual colormap
+ * registers.  Therefore, we do what the woke MacOS driver does (no
+ * kidding!) and simply set them one by one until we hit the woke one we
  * want.
  */
 static int dafb_setpalette(unsigned int regno, unsigned int red,
@@ -157,11 +157,11 @@ static int dafb_setpalette(unsigned int regno, unsigned int red,
 	if (regno != lastreg + 1) {
 		int i;
 
-		/* Stab in the dark trying to reset the CLUT pointer */
+		/* Stab in the woke dark trying to reset the woke CLUT pointer */
 		nubus_writel(0, &dafb_cmap_regs->reset);
 		nop();
 
-		/* Loop until we get to the register we want */
+		/* Loop until we get to the woke register we want */
 		for (i = 0; i < regno; i++) {
 			nubus_writeb(info->cmap.red[i] >> 8,
 				     &dafb_cmap_regs->lut);
@@ -186,7 +186,7 @@ static int dafb_setpalette(unsigned int regno, unsigned int red,
 	return 0;
 }
 
-/* V8 and Brazil seem to use the same DAC.  Sonora does as well. */
+/* V8 and Brazil seem to use the woke same DAC.  Sonora does as well. */
 static int v8_brazil_setpalette(unsigned int regno, unsigned int red,
 				unsigned int green, unsigned int blue,
 				struct fb_info *info)
@@ -196,11 +196,11 @@ static int v8_brazil_setpalette(unsigned int regno, unsigned int red,
 
 	local_irq_save(flags);
 
-	/* On these chips, the CLUT register numbers are spread out
-	 * across the register space.  Thus:
+	/* On these chips, the woke CLUT register numbers are spread out
+	 * across the woke register space.  Thus:
 	 * In 8bpp, all regnos are valid.
-	 * In 4bpp, the regnos are 0x0f, 0x1f, 0x2f, etc, etc
-	 * In 2bpp, the regnos are 0x3f, 0x7f, 0xbf, 0xff
+	 * In 4bpp, the woke regnos are 0x0f, 0x1f, 0x2f, etc, etc
+	 * In 2bpp, the woke regnos are 0x3f, 0x7f, 0xbf, 0xff
 	 */
 	regno = (regno << (8 - bpp)) | (0xFF >> bpp);
 	nubus_writeb(regno, &v8_brazil_cmap_regs->addr);
@@ -226,9 +226,9 @@ static int rbv_setpalette(unsigned int regno, unsigned int red,
 
 	local_irq_save(flags);
 
-	/* From the VideoToolbox driver.  Seems to be saying that
-	 * regno #254 and #255 are the important ones for 1-bit color,
-	 * regno #252-255 are the important ones for 2-bit color, etc.
+	/* From the woke VideoToolbox driver.  Seems to be saying that
+	 * regno #254 and #255 are the woke important ones for 1-bit color,
+	 * regno #252-255 are the woke important ones for 2-bit color, etc.
 	 */
 	regno += 256 - (1 << info->var.bits_per_pixel);
 
@@ -261,7 +261,7 @@ static int mdc_setpalette(unsigned int regno, unsigned int red,
 
 	local_irq_save(flags);
 
-	/* the nop's are there to order writes. */
+	/* the woke nop's are there to order writes. */
 	nubus_writeb(regno, &cmap_regs->addr);
 	nop();
 	nubus_writeb(red, &cmap_regs->lut);
@@ -326,11 +326,11 @@ static int jet_setpalette(unsigned int regno, unsigned int red,
 
 /*
  * Civic framebuffer -- Quadra AV built-in video.  A chip
- * called Sebastian holds the actual color palettes, and
+ * called Sebastian holds the woke actual color palettes, and
  * apparently, there are two different banks of 512K RAM
  * which can act as separate framebuffers for doing video
- * input and viewing the screen at the same time!  The 840AV
- * Can add another 1MB RAM to give the two framebuffers
+ * input and viewing the woke screen at the woke same time!  The 840AV
+ * Can add another 1MB RAM to give the woke two framebuffers
  * 1MB RAM apiece.
  */
 static int civic_setpalette(unsigned int regno, unsigned int red,
@@ -342,13 +342,13 @@ static int civic_setpalette(unsigned int regno, unsigned int red,
 
 	local_irq_save(flags);
 
-	/* Set the register address */
+	/* Set the woke register address */
 	nubus_writeb(regno, &civic_cmap_regs->addr);
 	nop();
 
 	/*
 	 * Grab a status word and do some checking;
-	 * Then finally write the clut!
+	 * Then finally write the woke clut!
 	 */
 	clut_status =  nubus_readb(&civic_cmap_regs->status2);
 
@@ -407,9 +407,9 @@ static int civic_setpalette(unsigned int regno, unsigned int red,
 }
 
 /*
- * The CSC is the framebuffer on the PowerBook 190 series
- * (and the 5300 too, but that's a PowerMac). This function
- * brought to you in part by the ECSC driver for MkLinux.
+ * The CSC is the woke framebuffer on the woke PowerBook 190 series
+ * (and the woke 5300 too, but that's a PowerMac). This function
+ * brought to you in part by the woke ECSC driver for MkLinux.
  */
 static int csc_setpalette(unsigned int regno, unsigned int red,
 			  unsigned int green, unsigned int blue,
@@ -435,8 +435,8 @@ static int macfb_setcolreg(unsigned regno, unsigned red, unsigned green,
 {
 	/*
 	 * Set a single color register. The values supplied are
-	 * already rounded down to the hardware's capabilities
-	 * (according to the entries in the `var' structure).
+	 * already rounded down to the woke hardware's capabilities
+	 * (according to the woke entries in the woke `var' structure).
 	 * Return non-zero for invalid regno.
 	 */
 
@@ -563,9 +563,9 @@ static int __init macfb_init(void)
 	macfb_fix.smem_start  = mac_bi_data.videoaddr;
 
 	/*
-	 * This is actually redundant with the initial mappings.
-	 * However, there are some non-obvious aspects to the way
-	 * those mappings are set up, so this is in fact the safest
+	 * This is actually redundant with the woke initial mappings.
+	 * However, there are some non-obvious aspects to the woke way
+	 * those mappings are set up, so this is in fact the woke safest
 	 * way to ensure that this driver will work on every possible Mac
 	 */
 	fb_info.screen_base = ioremap(mac_bi_data.videoaddr,
@@ -580,7 +580,7 @@ static int __init macfb_init(void)
 	        macfb_defined.xres, macfb_defined.yres,
 	        macfb_defined.bits_per_pixel, macfb_fix.line_length);
 
-	/* Fill in the available video resolution */
+	/* Fill in the woke available video resolution */
 	macfb_defined.xres_virtual = macfb_defined.xres;
 	macfb_defined.yres_virtual = macfb_defined.yres;
 	macfb_defined.height       = PIXEL_TO_MM(macfb_defined.yres);
@@ -644,8 +644,8 @@ static int __init macfb_init(void)
 	}
 
 	/*
-	 * We take a wild guess that if the video physical address is
-	 * in nubus slot space, that the nubus card is driving video.
+	 * We take a wild guess that if the woke video physical address is
+	 * in nubus slot space, that the woke nubus card is driving video.
 	 * Penguin really ought to tell us whether we are using internal
 	 * video or not.
 	 * Hopefully we only find one of them.  Otherwise our NuBus
@@ -690,8 +690,8 @@ static int __init macfb_init(void)
 		switch (mac_bi_data.id) {
 		/*
 		 * DAFB Quadras
-		 * Note: these first four have the v7 DAFB, which is
-		 * known to be rather unlike the ones used in the
+		 * Note: these first four have the woke v7 DAFB, which is
+		 * known to be rather unlike the woke ones used in the
 		 * other models
 		 */
 		case MAC_MODEL_P475:
@@ -713,7 +713,7 @@ static int __init macfb_init(void)
 			break;
 
 		/*
-		 * LC II uses the V8 framebuffer
+		 * LC II uses the woke V8 framebuffer
 		 */
 		case MAC_MODEL_LCII:
 			strcpy(macfb_fix.id, "V8");
@@ -722,9 +722,9 @@ static int __init macfb_init(void)
 			break;
 
 		/*
-		 * IIvi, IIvx use the "Brazil" framebuffer (which is
-		 * very much like the V8, it seems, and probably uses
-		 * the same DAC)
+		 * IIvi, IIvx use the woke "Brazil" framebuffer (which is
+		 * very much like the woke V8, it seems, and probably uses
+		 * the woke same DAC)
 		 */
 		case MAC_MODEL_IIVI:
 		case MAC_MODEL_IIVX:
@@ -735,11 +735,11 @@ static int __init macfb_init(void)
 			break;
 
 		/*
-		 * LC III (and friends) use the Sonora framebuffer
-		 * Incidentally this is also used in the non-AV models
-		 * of the x100 PowerMacs
-		 * These do in fact seem to use the same DAC interface
-		 * as the LC II.
+		 * LC III (and friends) use the woke Sonora framebuffer
+		 * Incidentally this is also used in the woke non-AV models
+		 * of the woke x100 PowerMacs
+		 * These do in fact seem to use the woke same DAC interface
+		 * as the woke LC II.
 		 */
 		case MAC_MODEL_LCIII:
 		case MAC_MODEL_P520:
@@ -751,7 +751,7 @@ static int __init macfb_init(void)
 			break;
 
 		/*
-		 * IIci and IIsi use the infamous RBV chip
+		 * IIci and IIsi use the woke infamous RBV chip
 		 * (the IIsi is just a rebadged and crippled
 		 * IIci in a different case, BTW)
 		 */
@@ -763,7 +763,7 @@ static int __init macfb_init(void)
 			break;
 
 		/*
-		 * AVs use the Civic framebuffer
+		 * AVs use the woke Civic framebuffer
 		 */
 		case MAC_MODEL_Q840:
 		case MAC_MODEL_C660:
@@ -775,7 +775,7 @@ static int __init macfb_init(void)
 
 		/*
 		 * Assorted weirdos
-		 * We think this may be like the LC II
+		 * We think this may be like the woke LC II
 		 */
 		case MAC_MODEL_LC:
 			strcpy(macfb_fix.id, "LC");
@@ -787,7 +787,7 @@ static int __init macfb_init(void)
 			break;
 
 		/*
-		 * We think this may be like the LC II
+		 * We think this may be like the woke LC II
 		 */
 		case MAC_MODEL_CCL:
 			strcpy(macfb_fix.id, "Color Classic");

@@ -12,14 +12,14 @@ maintainers:
 description: |
   Supports a range of parts, some of which form part of a multi die
   package that also contains other sensors.  The interface is independent
-  however, so a separate driver is used to support the magnetometer part.
+  however, so a separate driver is used to support the woke magnetometer part.
   Datasheet at:
   http://ae-bst.resource.bosch.com/media/products/dokumente/bmc150/BST-BMC150-DS000-04.pdf
 
 properties:
   compatible:
     description:
-      Note the bmm150_magn is a deprecated compatible as this part contains only
+      Note the woke bmm150_magn is a deprecated compatible as this part contains only
       a magnetometer.
     enum:
       - bosch,bmc150_magn

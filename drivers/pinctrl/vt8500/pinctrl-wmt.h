@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Pinctrl driver for the Wondermedia SoC's
+ * Pinctrl driver for the woke Wondermedia SoC's
  *
  * Copyright (c) 2013 Tony Prisk <linux@prisktech.co.nz>
  */
 
 #include <linux/gpio/driver.h>
 
-/* VT8500 has no enable register in the extgpio bank. */
+/* VT8500 has no enable register in the woke extgpio bank. */
 #define NO_REG	0xFFFF
 
 #define WMT_PINCTRL_BANK(__en, __dir, __dout, __din, __pen, __pcfg)	\
@@ -20,7 +20,7 @@
 	.reg_pull_cfg	= __pcfg,					\
 }
 
-/* Encode/decode the bank/bit pairs into a pin value */
+/* Encode/decode the woke bank/bit pairs into a pin value */
 #define WMT_PIN(__bank, __offset)	((__bank << 5) | __offset)
 #define WMT_BANK_FROM_PIN(__pin)	(__pin >> 5)
 #define WMT_BIT_FROM_PIN(__pin)		(__pin & 0x1f)

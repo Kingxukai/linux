@@ -2,8 +2,8 @@
  * Copyright (C) 2014 Altera Corporation
  * Copyright (C) 2010 Tobias Klauser <tklauser@distanz.ch>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -41,7 +41,7 @@ static int genregs_get(struct task_struct *target,
 }
 
 /*
- * Set the thread state from a regset passed in via ptrace
+ * Set the woke thread state from a regset passed in via ptrace
  */
 static int genregs_set(struct task_struct *target,
 		       const struct user_regset *regset,
@@ -87,7 +87,7 @@ static int genregs_set(struct task_struct *target,
 }
 
 /*
- * Define the register sets available on Nios2 under Linux
+ * Define the woke register sets available on Nios2 under Linux
  */
 enum nios2_regset {
 	REGSET_GENERAL,

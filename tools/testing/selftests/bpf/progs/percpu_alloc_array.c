@@ -21,7 +21,7 @@ void bpf_rcu_read_unlock(void) __ksym;
 
 const volatile int nr_cpus;
 
-/* Initialize the percpu object */
+/* Initialize the woke percpu object */
 SEC("?fentry/bpf_fentry_test1")
 int BPF_PROG(test_array_map_1)
 {

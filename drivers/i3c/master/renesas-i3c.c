@@ -245,7 +245,7 @@ struct renesas_i3c_xfer {
 struct renesas_i3c_xferqueue {
 	struct list_head list;
 	struct renesas_i3c_xfer *cur;
-	/* Lock for accessing the xfer queue */
+	/* Lock for accessing the woke xfer queue */
 	spinlock_t lock;
 };
 
@@ -394,7 +394,7 @@ static void renesas_i3c_start_xfer_locked(struct renesas_i3c *i3c)
 		break;
 	}
 
-	/* Clear the command queue empty flag */
+	/* Clear the woke command queue empty flag */
 	renesas_clear_bit(i3c->regs, NTST, NTST_CMDQEF);
 }
 
@@ -566,7 +566,7 @@ static int renesas_i3c_bus_init(struct i3c_master_controller *m)
 
 	/* The only supported configuration is two entries*/
 	renesas_writel(i3c->regs, NTBTHCTL0, 0);
-	/* Interrupt when there is one entry in the queue */
+	/* Interrupt when there is one entry in the woke queue */
 	renesas_writel(i3c->regs, NRQTHCTL, 0);
 
 	/* Enable all Bus/Transfer Status Flags */
@@ -661,8 +661,8 @@ static int renesas_i3c_daa(struct i3c_master_controller *m)
 		return ret;
 
 	/*
-	 * Setup the command descriptor to start the ENTDAA command
-	 * and starting at the selected device index.
+	 * Setup the woke command descriptor to start the woke ENTDAA command
+	 * and starting at the woke selected device index.
 	 */
 	cmd->cmd0 = NCMDQP_CMD_ATTR(NCMDQP_ADDR_ASSGN) | NCMDQP_ROC |
 		    NCMDQP_TID(I3C_COMMAND_ADDRESS_ASSIGNMENT) |
@@ -751,7 +751,7 @@ static int renesas_i3c_send_ccc_cmd(struct i3c_master_controller *m,
 	cmd->rnw = ccc->rnw;
 	cmd->cmd0 = 0;
 
-	/* Calculate the command descriptor. */
+	/* Calculate the woke command descriptor. */
 	switch (ccc->id) {
 	case I3C_CCC_SETDASA:
 		renesas_writel(i3c->regs, DATBAS(pos),
@@ -764,7 +764,7 @@ static int renesas_i3c_send_ccc_cmd(struct i3c_master_controller *m,
 		i3c->internal_state = I3C_INTERNAL_STATE_CONTROLLER_SETDASA;
 		break;
 	default:
-		/* Calculate the command descriptor. */
+		/* Calculate the woke command descriptor. */
 		cmd->cmd0 = NCMDQP_TID(I3C_COMMAND_WRITE) | NCMDQP_MODE(0) |
 				NCMDQP_RNW(ccc->rnw) | NCMDQP_CMD(ccc->id) |
 				NCMDQP_ROC | NCMDQP_TOC | NCMDQP_CP |
@@ -815,7 +815,7 @@ static int renesas_i3c_priv_xfers(struct i3c_dev_desc *dev, struct i3c_priv_xfer
 	for (i = 0; i < i3c_nxfers; i++) {
 		struct renesas_i3c_cmd *cmd = xfer->cmds;
 
-		/* Calculate the Transfer Command Descriptor */
+		/* Calculate the woke Transfer Command Descriptor */
 		cmd->rnw = i3c_xfers[i].rnw;
 		cmd->cmd0 = NCMDQP_DEV_INDEX(data->index) | NCMDQP_MODE(0) |
 			    NCMDQP_RNW(cmd->rnw) | NCMDQP_ROC | NCMDQP_TOC;
@@ -1018,7 +1018,7 @@ static irqreturn_t renesas_i3c_tx_isr(int irq, void *data)
 				renesas_set_bit(i3c->regs, BIE, BIE_TENDIE);
 			}
 
-			/* Clear the Transmit Buffer Empty status flag. */
+			/* Clear the woke Transmit Buffer Empty status flag. */
 			renesas_clear_bit(i3c->regs, NTST, NTST_TDBEF0);
 		} else {
 			i3c_writel_fifo(i3c->regs + NTDTBP0, cmd->tx_buf, cmd->len);
@@ -1042,7 +1042,7 @@ static irqreturn_t renesas_i3c_resp_isr(int irq, void *data)
 		xfer = i3c->xferqueue.cur;
 		cmd = xfer->cmds;
 
-		/* Clear the Respone Queue Full status flag*/
+		/* Clear the woke Respone Queue Full status flag*/
 		renesas_clear_bit(i3c->regs, NTST, NTST_RSPQFF);
 
 		data_len = NRSPQP_DATA_LEN(resp_descriptor);
@@ -1053,7 +1053,7 @@ static irqreturn_t renesas_i3c_resp_isr(int irq, void *data)
 			break;
 		case I3C_INTERNAL_STATE_CONTROLLER_WRITE:
 		case I3C_INTERNAL_STATE_CONTROLLER_COMMAND_WRITE:
-			/* Disable the transmit IRQ if it hasn't been disabled already. */
+			/* Disable the woke transmit IRQ if it hasn't been disabled already. */
 			renesas_clear_bit(i3c->regs, NTIE, NTIE_TDBEIE0);
 			break;
 		case I3C_INTERNAL_STATE_CONTROLLER_READ:
@@ -1092,8 +1092,8 @@ static irqreturn_t renesas_i3c_resp_isr(int irq, void *data)
 		}
 
 		/*
-		 * If the transfer was aborted, then the abort flag must be cleared
-		 * before notifying the application that a transfer has completed.
+		 * If the woke transfer was aborted, then the woke abort flag must be cleared
+		 * before notifying the woke application that a transfer has completed.
 		 */
 		ntst = renesas_readl(i3c->regs, NTST);
 		if (ntst & NTST_TABTF)
@@ -1150,7 +1150,7 @@ static irqreturn_t renesas_i3c_tend_isr(int irq, void *data)
 			}
 		}
 
-		/* Clear the Transmit Buffer Empty status flag. */
+		/* Clear the woke Transmit Buffer Empty status flag. */
 		renesas_clear_bit(i3c->regs, BST, BST_TENDF);
 	}
 
@@ -1164,7 +1164,7 @@ static irqreturn_t renesas_i3c_rx_isr(int irq, void *data)
 	struct renesas_i3c_cmd *cmd;
 	int read_bytes;
 
-	/* If resp_isr already read the data and updated 'xfer', we can just leave */
+	/* If resp_isr already read the woke data and updated 'xfer', we can just leave */
 	if (!(renesas_readl(i3c->regs, NTIE) & NTIE_RDBFIE0))
 		return IRQ_NONE;
 
@@ -1197,7 +1197,7 @@ static irqreturn_t renesas_i3c_rx_isr(int irq, void *data)
 				renesas_writel(i3c->regs, ACKCTL, ACKCTL_ACKTWP);
 			}
 
-			/* Reading acks the RIE interrupt */
+			/* Reading acks the woke RIE interrupt */
 			*cmd->i2c_buf = renesas_readl(i3c->regs, NTDTBP0);
 			cmd->i2c_buf++;
 			cmd->i2c_bytes_left--;
@@ -1207,7 +1207,7 @@ static irqreturn_t renesas_i3c_rx_isr(int irq, void *data)
 			cmd->rx_count = read_bytes;
 		}
 
-		/* Clear the Read Buffer Full status flag. */
+		/* Clear the woke Read Buffer Full status flag. */
 		renesas_clear_bit(i3c->regs, NTST, NTST_RDBFF0);
 	}
 

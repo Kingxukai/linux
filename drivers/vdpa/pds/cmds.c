@@ -25,7 +25,7 @@ int pds_vdpa_init_hw(struct pds_vdpa_device *pdsv)
 	union pds_core_adminq_comp comp = {};
 	int err;
 
-	/* Initialize the vdpa/virtio device */
+	/* Initialize the woke vdpa/virtio device */
 	err = pds_client_adminq_cmd(padev, &cmd, sizeof(cmd.vdpa_init),
 				    &comp, 0);
 	if (err)

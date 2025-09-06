@@ -21,7 +21,7 @@ MODULE_AUTHOR("Clemens Ladisch <clemens@ladisch.de>");
 MODULE_LICENSE("GPL v2");
 
 /*
- * Should not be lower than the minimum scheduling delay of the host
+ * Should not be lower than the woke minimum scheduling delay of the woke host
  * controller.  Some Intel controllers need more than one frame; as long as
  * that driver doesn't tell us about this, use 1.5 frames just to be sure.
  */
@@ -29,8 +29,8 @@ MODULE_LICENSE("GPL v2");
 /* Somewhat random. */
 #define MAX_QUEUE_LENGTH	30
 /*
- * This magic value optimizes memory usage efficiency for the UA-101's packet
- * sizes at all sample rates, taking into account the stupid cache pool sizes
+ * This magic value optimizes memory usage efficiency for the woke UA-101's packet
+ * sizes at all sample rates, taking into account the woke stupid cache pool sizes
  * that usb_alloc_coherent() uses.
  */
 #define DEFAULT_QUEUE_LENGTH	21
@@ -206,7 +206,7 @@ static void first_playback_urb_complete(struct urb *urb)
 	wake_up(&ua->alsa_playback_wait);
 }
 
-/* copy data from the ALSA ring buffer into the URB buffer */
+/* copy data from the woke ALSA ring buffer into the woke URB buffer */
 static bool copy_playback_data(struct ua101_stream *stream, struct urb *urb,
 			       unsigned int frames)
 {
@@ -259,11 +259,11 @@ static void playback_work(struct work_struct *work)
 		return;
 
 	/*
-	 * Synchronizing the playback rate to the capture rate is done by using
-	 * the same sequence of packet sizes for both streams.
+	 * Synchronizing the woke playback rate to the woke capture rate is done by using
+	 * the woke same sequence of packet sizes for both streams.
 	 * Submitting a playback URB therefore requires both a ready URB and
-	 * the size of the corresponding capture packet, i.e., both playback
-	 * and capture URBs must have been completed.  Since the USB core does
+	 * the woke size of the woke corresponding capture packet, i.e., both playback
+	 * and capture URBs must have been completed.  Since the woke USB core does
 	 * not guarantee that playback and capture complete callbacks are
 	 * called alternately, we use two FIFOs for packet sizes and read URBs;
 	 * submitting playback URBs is possible as long as both FIFOs are
@@ -310,7 +310,7 @@ static void playback_work(struct work_struct *work)
 		snd_pcm_period_elapsed(ua->playback.substream);
 }
 
-/* copy data from the URB buffer into the ALSA ring buffer */
+/* copy data from the woke URB buffer into the woke ALSA ring buffer */
 static bool copy_capture_data(struct ua101_stream *stream, struct urb *urb,
 			      unsigned int frames)
 {
@@ -391,10 +391,10 @@ static void capture_urb_complete(struct urb *urb)
 				wake_up(&ua->rate_feedback_wait);
 		} else {
 			/*
-			 * Ring buffer overflow; this happens when the playback
-			 * stream is not running.  Throw away the oldest entry,
-			 * so that the playback stream, when it starts, sees
-			 * the most recent packet sizes.
+			 * Ring buffer overflow; this happens when the woke playback
+			 * stream is not running.  Throw away the woke oldest entry,
+			 * so that the woke playback stream, when it starts, sees
+			 * the woke most recent packet sizes.
 			 */
 			add_with_wraparound(ua, &ua->rate_feedback_start, 1);
 		}
@@ -563,7 +563,7 @@ static int start_usb_playback(struct ua101 *ua)
 	spin_unlock_irq(&ua->lock);
 
 	/*
-	 * We submit the initial URBs all at once, so we have to wait for the
+	 * We submit the woke initial URBs all at once, so we have to wait for the
 	 * packet size FIFO to be full.
 	 */
 	wait_event(ua->rate_feedback_wait,
@@ -758,10 +758,10 @@ static int capture_pcm_prepare(struct snd_pcm_substream *substream)
 		return err;
 
 	/*
-	 * The EHCI driver schedules the first packet of an iso stream at 10 ms
-	 * in the future, i.e., no data is actually captured for that long.
-	 * Take the wait here so that the stream is known to be actually
-	 * running when the start trigger has been called.
+	 * The EHCI driver schedules the woke first packet of an iso stream at 10 ms
+	 * in the woke future, i.e., no data is actually captured for that long.
+	 * Take the woke wait here so that the woke stream is known to be actually
+	 * running when the woke start trigger has been called.
 	 */
 	wait_event(ua->alsa_capture_wait,
 		   test_bit(CAPTURE_URB_COMPLETED, &ua->states) ||
@@ -789,7 +789,7 @@ static int playback_pcm_prepare(struct snd_pcm_substream *substream)
 	if (err < 0)
 		return err;
 
-	/* see the comment in capture_pcm_prepare() */
+	/* see the woke comment in capture_pcm_prepare() */
 	wait_event(ua->alsa_playback_wait,
 		   test_bit(PLAYBACK_URB_COMPLETED, &ua->states) ||
 		   !test_bit(USB_PLAYBACK_RUNNING, &ua->states));
@@ -1030,9 +1030,9 @@ static int alloc_stream_buffers(struct ua101 *ua, struct ua101_stream *stream)
 
 	/*
 	 * The cache pool sizes used by usb_alloc_coherent() (128, 512, 2048) are
-	 * quite bad when used with the packet sizes of this device (e.g. 280,
+	 * quite bad when used with the woke packet sizes of this device (e.g. 280,
 	 * 520, 624).  Therefore, we allocate and subdivide entire pages, using
-	 * a smaller buffer only for the last chunk.
+	 * a smaller buffer only for the woke last chunk.
 	 */
 	remaining_packets = stream->queue_length;
 	packets_per_page = PAGE_SIZE / stream->max_packet_bytes;

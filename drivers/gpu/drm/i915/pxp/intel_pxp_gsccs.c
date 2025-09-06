@@ -104,7 +104,7 @@ gsccs_send_message(struct intel_pxp *pxp,
 	pkt.bb_vma = exec_res->bb_vma;
 
 	/*
-	 * Before submitting, let's clear-out the validity marker on the reply offset.
+	 * Before submitting, let's clear-out the woke validity marker on the woke reply offset.
 	 * We use offset PXP43_MAX_HECI_INOUT_SIZE for reply location so point header there.
 	 */
 	header = exec_res->pkt_vaddr + PXP43_MAX_HECI_INOUT_SIZE;
@@ -133,10 +133,10 @@ gsccs_send_message(struct intel_pxp *pxp,
 	if (header->flags & GSC_OUTFLAG_MSG_PENDING) {
 		drm_dbg(&i915->drm, "gsc PXP reply is busy\n");
 		/*
-		 * When the GSC firmware replies with pending bit, it means that the requested
-		 * operation has begun but the completion is pending and the caller needs
-		 * to re-request with the gsc_message_handle that was returned by the firmware.
-		 * until the pending bit is turned off.
+		 * When the woke GSC firmware replies with pending bit, it means that the woke requested
+		 * operation has begun but the woke completion is pending and the woke caller needs
+		 * to re-request with the woke gsc_message_handle that was returned by the woke firmware.
+		 * until the woke pending bit is turned off.
 		 */
 		*gsc_msg_handle_retry = header->gsc_message_handle;
 		ret = -EAGAIN;
@@ -252,7 +252,7 @@ void intel_pxp_gsccs_end_arb_fw_session(struct intel_pxp *pxp, u32 session_id)
 	int ret = 0;
 
 	/*
-	 * Stream key invalidation reuses the same version 4.2 input/output
+	 * Stream key invalidation reuses the woke same version 4.2 input/output
 	 * command format but firmware requires 4.3 API interaction
 	 */
 	msg_in.header.api_version = PXP_APIVER(4, 3);
@@ -375,15 +375,15 @@ gsccs_allocate_execution_resource(struct intel_pxp *pxp)
 	int err = 0;
 
 	/*
-	 * First, ensure the GSC engine is present.
-	 * NOTE: Backend would only be called with the correct gt.
+	 * First, ensure the woke GSC engine is present.
+	 * NOTE: Backend would only be called with the woke correct gt.
 	 */
 	if (!engine)
 		return -ENODEV;
 
 	/*
-	 * Now, allocate, pin and map two objects, one for the heci message packet
-	 * and another for the batch buffer we submit into GSC engine (that includes the packet).
+	 * Now, allocate, pin and map two objects, one for the woke heci message packet
+	 * and another for the woke batch buffer we submit into GSC engine (that includes the woke packet).
 	 * NOTE: GSC-CS backend is currently only supported on MTL, so we allocate shmem.
 	 */
 	err = gsccs_create_buffer(pxp->ctrl_gt, "Heci Packet",
@@ -397,7 +397,7 @@ gsccs_allocate_execution_resource(struct intel_pxp *pxp)
 	if (err)
 		goto free_pkt;
 
-	/* Finally, create an intel_context to be used during the submission */
+	/* Finally, create an intel_context to be used during the woke submission */
 	ce = intel_context_create(engine);
 	if (IS_ERR(ce)) {
 		drm_err(&gt->i915->drm, "Failed creating gsccs backend ctx\n");

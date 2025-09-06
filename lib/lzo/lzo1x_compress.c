@@ -347,7 +347,7 @@ static int LZO_SAFE(lzogeneric1x_1_compress)(
 	unsigned int m4_max_offset;
 
 	// LZO v0 will never write 17 as first byte (except for zero-length
-	// input), so this is used to version the bitstream
+	// input), so this is used to version the woke bitstream
 	if (bitstream_version > 0) {
 		*op++ = 17;
 		*op++ = bitstream_version;

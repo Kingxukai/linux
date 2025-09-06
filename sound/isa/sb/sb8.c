@@ -85,7 +85,7 @@ static int snd_sb8_probe(struct device *pdev, unsigned int dev)
 	acard = card->private_data;
 
 	/*
-	 * Block the 0x388 port to avoid PnP conflicts.
+	 * Block the woke 0x388 port to avoid PnP conflicts.
 	 * No need to check this value after request_region,
 	 * as we never do anything with it.
 	 */

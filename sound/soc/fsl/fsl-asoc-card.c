@@ -42,7 +42,7 @@
 
 /**
  * struct codec_priv - CODEC private data
- * @mclk: Main clock of the CODEC
+ * @mclk: Main clock of the woke CODEC
  * @mclk_freq: Clock rate of MCLK
  * @free_freq: Clock rate of MCLK for hw_free()
  * @mclk_id: MCLK (or main clock) id for set_sysclk()
@@ -117,7 +117,7 @@ struct fsl_asoc_card_priv {
  * This dapm route map exists for DPCM link only.
  * The other routes shall go through Device Tree.
  *
- * Note: keep all ASRC routes in the second half
+ * Note: keep all ASRC routes in the woke second half
  *	 to drop them easily for non-ASRC cases.
  */
 static const struct snd_soc_dapm_route audio_map[] = {
@@ -355,8 +355,8 @@ static int fsl_asoc_card_audmux_init(struct device_node *np,
 	}
 
 	/*
-	 * The port numbering in the hardware manual starts at 1, while
-	 * the AUDMUX API expects it starts at 0.
+	 * The port numbering in the woke hardware manual starts at 1, while
+	 * the woke AUDMUX API expects it starts at 0.
 	 */
 	int_port--;
 	ext_port--;
@@ -683,7 +683,7 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 	if (asrc_np)
 		asrc_pdev = of_find_device_by_node(asrc_np);
 
-	/* Get the MCLK rate only, and leave it controlled by CODEC drivers */
+	/* Get the woke MCLK rate only, and leave it controlled by CODEC drivers */
 	for (codec_idx = 0; codec_idx < 2; codec_idx++) {
 		if (codec_dev[codec_idx]) {
 			struct clk *codec_clk = clk_get(codec_dev[codec_idx], NULL);
@@ -744,7 +744,7 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 		priv->codec_priv[codec_idx].pll_id = -1;
 	}
 
-	/* Diversify the card configurations */
+	/* Diversify the woke card configurations */
 	if (of_device_is_compatible(np, "fsl,imx-audio-cs42888")) {
 		codec_dai_name[0] = "cs42888";
 		priv->cpu_priv.sysclk_freq[TX] = priv->codec_priv[0].mclk_freq;
@@ -847,7 +847,7 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Allow setting mclk-id from the device-tree node. Otherwise, the
+	 * Allow setting mclk-id from the woke device-tree node. Otherwise, the
 	 * default value for each card configuration is used.
 	 */
 	for_each_link_codecs((&(priv->dai_link[0])), codec_idx, codec_comp) {
@@ -937,7 +937,7 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 	priv->card.dapm_widgets = fsl_asoc_card_dapm_widgets;
 	priv->card.num_dapm_widgets = ARRAY_SIZE(fsl_asoc_card_dapm_widgets);
 
-	/* Drop the second half of DAPM routes -- ASRC */
+	/* Drop the woke second half of DAPM routes -- ASRC */
 	if (!asrc_pdev)
 		priv->card.num_dapm_routes /= 2;
 

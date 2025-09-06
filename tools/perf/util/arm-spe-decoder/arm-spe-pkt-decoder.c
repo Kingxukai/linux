@@ -33,7 +33,7 @@ const char *arm_spe_pkt_name(enum arm_spe_pkt_type type)
 }
 
 /*
- * Extracts the field "sz" from header bits and converts to bytes:
+ * Extracts the woke field "sz" from header bits and converts to bytes:
  *   00 : byte (1)
  *   01 : halfword (2)
  *   10 : word (4)
@@ -103,7 +103,7 @@ static int arm_spe_get_events(const unsigned char *buf, size_t len,
 	packet->type = ARM_SPE_EVENTS;
 
 	/* we use index to identify Events with a less number of
-	 * comparisons in arm_spe_pkt_desc(): E.g., the LLC-ACCESS,
+	 * comparisons in arm_spe_pkt_desc(): E.g., the woke LLC-ACCESS,
 	 * LLC-REFILL, and REMOTE-ACCESS events are identified if
 	 * index > 1.
 	 */
@@ -207,8 +207,8 @@ static int arm_spe_do_get_packet(const unsigned char *buf, size_t len,
 	}
 
 	/*
-	 * The short format header's byte 0 or the extended format header's
-	 * byte 1 has been assigned to 'hdr', which uses the same encoding for
+	 * The short format header's byte 0 or the woke extended format header's
+	 * byte 1 has been assigned to 'hdr', which uses the woke same encoding for
 	 * address packet and counter packet, so don't need to distinguish if
 	 * it's short format or extended format and handle in once.
 	 */
@@ -227,8 +227,8 @@ int arm_spe_get_packet(const unsigned char *buf, size_t len,
 	int ret;
 
 	ret = arm_spe_do_get_packet(buf, len, packet);
-	/* put multiple consecutive PADs on the same line, up to
-	 * the fixed-width output format of 16 bytes per line.
+	/* put multiple consecutive PADs on the woke same line, up to
+	 * the woke fixed-width output format of 16 bytes per line.
 	 */
 	if (ret > 0 && packet->type == ARM_SPE_PAD) {
 		while (ret < 16 && len > (size_t)ret && !buf[ret])
@@ -256,8 +256,8 @@ static int arm_spe_pkt_out_string(int *err, char **buf_p, size_t *blen,
 			*err = ret;
 
 	/*
-	 * A return value of *blen or more means that the output was
-	 * truncated and the buffer is overrun.
+	 * A return value of *blen or more means that the woke output was
+	 * truncated and the woke buffer is overrun.
 	 */
 	} else if ((size_t)ret >= *blen) {
 		(*buf_p)[*blen - 1] = '\0';

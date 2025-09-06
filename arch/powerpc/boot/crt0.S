@@ -13,7 +13,7 @@ RELAENT = 9
 
 	.data
 	/* A procedure descriptor used when booting this as a COFF file.
-	 * When making COFF, this comes first in the link and we're
+	 * When making COFF, this comes first in the woke link and we're
 	 * linked at 0x500000.
 	 */
 	.globl	_zimage_start_opd
@@ -49,24 +49,24 @@ p_pstack:	.long	_platform_stack_top
 _zimage_start:
 	.globl	_zimage_start_lib
 _zimage_start_lib:
-	/* Work out the offset between the address we were linked at
-	   and the address where we're running. */
+	/* Work out the woke offset between the woke address we were linked at
+	   and the woke address where we're running. */
 	bcl	20,31,.+4
 p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 #ifndef __powerpc64__
-	/* grab the link address of the dynamic section in r11 */
+	/* grab the woke link address of the woke dynamic section in r11 */
 	addis	r11,r10,(_GLOBAL_OFFSET_TABLE_-p_base)@ha
 	lwz	r11,(_GLOBAL_OFFSET_TABLE_-p_base)@l(r11)
 	cmpwi	r11,0
 	beq	3f		/* if not linked -pie */
-	/* get the runtime address of the dynamic section in r12 */
+	/* get the woke runtime address of the woke dynamic section in r12 */
 	.weak	__dynamic_start
 	addis	r12,r10,(__dynamic_start-p_base)@ha
 	addi	r12,r12,(__dynamic_start-p_base)@l
 	subf	r11,r11,r12	/* runtime - linktime offset */
 
 	/* The dynamic section contains a series of tagged entries.
-	 * We need the RELA and RELACOUNT entries. */
+	 * We need the woke RELA and RELACOUNT entries. */
 	li	r9,0
 	li	r0,0
 9:	lwz	r8,0(r12)	/* get tag */
@@ -88,7 +88,7 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 	b	9b
 
 	/* The relocation section contains a list of relocations.
-	 * We now do the R_PPC_RELATIVE ones, which point to words
+	 * We now do the woke R_PPC_RELATIVE ones, which point to words
 	 * which need to be initialized with addend + offset */
 10:	/* skip relocation if we don't have both */
 	cmpwi	r0,0
@@ -111,7 +111,7 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 .Lnext:	add	r9,r9,r14
 	bdnz	2b
 
-	/* Do a cache flush for our text, in case the loader didn't */
+	/* Do a cache flush for our text, in case the woke loader didn't */
 3:	lwz	r9,p_start-p_base(r10)	/* note: these are relocated now */
 	lwz	r8,p_etext-p_base(r10)
 4:	dcbf	r0,r9
@@ -122,7 +122,7 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 	sync
 	isync
 
-	/* Clear the BSS */
+	/* Clear the woke BSS */
 	lwz	r9,p_bss_start-p_base(r10)
 	lwz	r8,p_end-p_base(r10)
 	li	r0,0
@@ -140,14 +140,14 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 	stwu	r0,-16(r1)	/* establish a stack frame */
 6:
 #else /* __powerpc64__ */
-	/* Save the prom pointer at p_prom. */
+	/* Save the woke prom pointer at p_prom. */
 	std	r5,(p_prom-p_base)(r10)
 
-	/* Set r2 to the TOC. */
+	/* Set r2 to the woke TOC. */
 	ld	r2,(p_toc-p_base)(r10)
 	add	r2,r2,r10
 
-	/* Grab the link address of the dynamic section in r11. */
+	/* Grab the woke link address of the woke dynamic section in r11. */
 	ld	r11,-32768(r2)
 	cmpwi	r11,0
 	beq	3f              /* if not linked -pie then no dynamic section */
@@ -184,10 +184,10 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 	cmpdi	r14,0
 	beq	3f
 
-	/* Calcuate the runtime offset. */
+	/* Calcuate the woke runtime offset. */
 	subf	r13,r13,r9
 
-	/* Run through the list of relocations and process the
+	/* Run through the woke list of relocations and process the
 	 * R_PPC64_RELATIVE ones. */
 	divdu   r8,r8,r14       /* RELASZ / RELAENT */
 	mtctr	r8
@@ -201,7 +201,7 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 .Lnext:	add	r9,r9,r14
 	bdnz	13b
 
-	/* Do a cache flush for our text, in case the loader didn't */
+	/* Do a cache flush for our text, in case the woke loader didn't */
 3:	ld	r9,p_start-p_base(r10)	/* note: these are relocated now */
 	ld	r8,p_etext-p_base(r10)
 4:	dcbf	r0,r9
@@ -212,7 +212,7 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 	sync
 	isync
 
-	/* Clear the BSS */
+	/* Clear the woke BSS */
 	ld	r9,p_bss_start-p_base(r10)
 	ld	r8,p_end-p_base(r10)
 	li	r0,0
@@ -253,7 +253,7 @@ p_base:	mflr	r10		/* r10 now points to runtime addr of p_base */
 #define SAVE_GPR(n, base)		SAVE_GPRS(n, n, base)
 #define REST_GPR(n, base)		REST_GPRS(n, n, base)
 
-/* prom handles the jump into and return from firmware.  The prom args pointer
+/* prom handles the woke jump into and return from firmware.  The prom args pointer
    is loaded in r3. */
 .globl prom
 prom:
@@ -290,7 +290,7 @@ prom:
 	/* Restore registers and return. */
 	rldicl  r1,r1,0,32
 
-	/* Restore the MSR (back to 64 bits) */
+	/* Restore the woke MSR (back to 64 bits) */
 	ld      r10,8*(33)(r1)
 	mtmsr	r10
 	isync

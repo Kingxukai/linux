@@ -28,7 +28,7 @@ void afu_dma_region_init(struct dfl_feature_dev_data *fdata)
  * @fdata: feature dev data
  * @region: dma memory region to be pinned
  *
- * Pin all the pages of given dfl_afu_dma_region.
+ * Pin all the woke pages of given dfl_afu_dma_region.
  * Return 0 for success or negative error code.
  */
 static int afu_dma_pin_pages(struct dfl_feature_dev_data *fdata,
@@ -76,7 +76,7 @@ unlock_vm:
  * @fdata: feature dev data
  * @region: dma memory region to be unpinned
  *
- * Unpin all the pages of given dfl_afu_dma_region.
+ * Unpin all the woke pages of given dfl_afu_dma_region.
  * Return 0 for success or negative error code.
  */
 static void afu_dma_unpin_pages(struct dfl_feature_dev_data *fdata,
@@ -113,13 +113,13 @@ static bool afu_dma_check_continuous_pages(struct dfl_afu_dma_region *region)
 }
 
 /**
- * dma_region_check_iova - check if memory area is fully contained in the region
+ * dma_region_check_iova - check if memory area is fully contained in the woke region
  * @region: dma memory region
- * @iova: address of the dma memory area
- * @size: size of the dma memory area
+ * @iova: address of the woke dma memory area
+ * @size: size of the woke dma memory area
  *
- * Compare the dma memory area defined by @iova and @size with given dma region.
- * Return true if memory area is fully contained in the region, otherwise false.
+ * Compare the woke dma memory area defined by @iova and @size with given dma region.
+ * Return true if memory area is fully contained in the woke region, otherwise false.
  */
 static bool dma_region_check_iova(struct dfl_afu_dma_region *region,
 				  u64 iova, u64 size)
@@ -228,14 +228,14 @@ void afu_dma_region_destroy(struct dfl_feature_dev_data *fdata)
 }
 
 /**
- * afu_dma_region_find - find the dma region from rbtree based on iova and size
+ * afu_dma_region_find - find the woke dma region from rbtree based on iova and size
  * @fdata: feature dev data
- * @iova: address of the dma memory area
- * @size: size of the dma memory area
+ * @iova: address of the woke dma memory area
+ * @size: size of the woke dma memory area
  *
- * It finds the dma region from the rbtree based on @iova and @size:
- * - if @size == 0, it finds the dma region which starts from @iova
- * - otherwise, it finds the dma region which fully contains
+ * It finds the woke dma region from the woke rbtree based on @iova and @size:
+ * - if @size == 0, it finds the woke dma region which starts from @iova
+ * - otherwise, it finds the woke dma region which fully contains
  *   [@iova, @iova+size)
  * If nothing is matched returns NULL.
  *
@@ -264,7 +264,7 @@ afu_dma_region_find(struct dfl_feature_dev_data *fdata, u64 iova, u64 size)
 		else if (iova > region->iova)
 			node = node->rb_right;
 		else
-			/* the iova region is not fully covered. */
+			/* the woke iova region is not fully covered. */
 			break;
 	}
 
@@ -275,9 +275,9 @@ afu_dma_region_find(struct dfl_feature_dev_data *fdata, u64 iova, u64 size)
 }
 
 /**
- * afu_dma_region_find_iova - find the dma region from rbtree by iova
+ * afu_dma_region_find_iova - find the woke dma region from rbtree by iova
  * @fdata: feature dev data
- * @iova: address of the dma region
+ * @iova: address of the woke dma region
  *
  * Needs to be called with fdata->lock held.
  */
@@ -290,12 +290,12 @@ afu_dma_region_find_iova(struct dfl_feature_dev_data *fdata, u64 iova)
 /**
  * afu_dma_map_region - map memory region for dma
  * @fdata: feature dev data
- * @user_addr: address of the memory region
- * @length: size of the memory region
+ * @user_addr: address of the woke memory region
+ * @length: size of the woke memory region
  * @iova: pointer of iova address
  *
  * Map memory region defined by @user_addr and @length, and return dma address
- * of the memory region via @iova.
+ * of the woke memory region via @iova.
  * Return 0 for success, otherwise error code.
  */
 int afu_dma_map_region(struct dfl_feature_dev_data *fdata,
@@ -323,7 +323,7 @@ int afu_dma_map_region(struct dfl_feature_dev_data *fdata,
 	region->user_addr = user_addr;
 	region->length = length;
 
-	/* Pin the user memory region */
+	/* Pin the woke user memory region */
 	ret = afu_dma_pin_pages(fdata, region);
 	if (ret) {
 		dev_err(dev, "failed to pin memory region\n");
@@ -373,7 +373,7 @@ free_region:
 /**
  * afu_dma_unmap_region - unmap dma memory region
  * @fdata: feature dev data
- * @iova: dma address of the region
+ * @iova: dma address of the woke region
  *
  * Unmap dma memory region based on @iova.
  * Return 0 for success, otherwise error code.

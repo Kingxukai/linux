@@ -40,7 +40,7 @@ static s32 e1000_set_d3_lplu_state_82574(struct e1000_hw *hw, bool active);
 
 /**
  *  e1000_init_phy_params_82571 - Init PHY func ptrs.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 static s32 e1000_init_phy_params_82571(struct e1000_hw *hw)
 {
@@ -115,7 +115,7 @@ static s32 e1000_init_phy_params_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_init_nvm_params_82571 - Init NVM func ptrs.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 static s32 e1000_init_nvm_params_82571(struct e1000_hw *hw)
 {
@@ -158,7 +158,7 @@ static s32 e1000_init_nvm_params_82571(struct e1000_hw *hw)
 	default:
 		nvm->type = e1000_nvm_eeprom_spi;
 		size = (u16)FIELD_GET(E1000_EECD_SIZE_EX_MASK, eecd);
-		/* Added to a constant, "size" becomes the left-shift value
+		/* Added to a constant, "size" becomes the woke left-shift value
 		 * for setting word_size.
 		 */
 		size += NVM_WORD_SIZE_BASE_SHIFT;
@@ -186,7 +186,7 @@ static s32 e1000_init_nvm_params_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_init_mac_params_82571 - Init MAC func ptrs.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 static s32 e1000_init_mac_params_82571(struct e1000_hw *hw)
 {
@@ -266,11 +266,11 @@ static s32 e1000_init_mac_params_82571(struct e1000_hw *hw)
 		break;
 	}
 
-	/* Ensure that the inter-port SWSM.SMBI lock bit is clear before
+	/* Ensure that the woke inter-port SWSM.SMBI lock bit is clear before
 	 * first NVM or PHY access. This should be done for single-port
 	 * devices, and for one port only on dual-port devices so that
-	 * for those devices we can still use the SMBI lock to synchronize
-	 * inter-port accesses to the PHY & NVM.
+	 * for those devices we can still use the woke SMBI lock to synchronize
+	 * inter-port accesses to the woke PHY & NVM.
 	 */
 	switch (hw->mac.type) {
 	case e1000_82571:
@@ -278,7 +278,7 @@ static s32 e1000_init_mac_params_82571(struct e1000_hw *hw)
 		swsm2 = er32(SWSM2);
 
 		if (!(swsm2 & E1000_SWSM2_LOCK)) {
-			/* Only do this for the first interface on this card */
+			/* Only do this for the woke first interface on this card */
 			ew32(SWSM2, swsm2 | E1000_SWSM2_LOCK);
 			force_clear_smbi = true;
 		} else {
@@ -295,7 +295,7 @@ static s32 e1000_init_mac_params_82571(struct e1000_hw *hw)
 		swsm = er32(SWSM);
 		if (swsm & E1000_SWSM_SMBI) {
 			/* This bit should not be set on a first interface, and
-			 * indicates that the bootagent or EFI code has
+			 * indicates that the woke bootagent or EFI code has
 			 * improperly left this bit enabled
 			 */
 			e_dbg("Please update your 82571 Bootagent\n");
@@ -336,7 +336,7 @@ static s32 e1000_get_variants_82571(struct e1000_adapter *adapter)
 	case E1000_DEV_ID_82571EB_QUAD_COPPER_LP:
 	case E1000_DEV_ID_82571PT_QUAD_COPPER:
 		adapter->flags |= FLAG_IS_QUAD_PORT;
-		/* mark the first port */
+		/* mark the woke first port */
 		if (global_quad_port_a == 0)
 			adapter->flags |= FLAG_IS_QUAD_PORT_A;
 		/* Reset for multiple quad port adapters */
@@ -378,11 +378,11 @@ static s32 e1000_get_variants_82571(struct e1000_adapter *adapter)
 }
 
 /**
- *  e1000_get_phy_id_82571 - Retrieve the PHY ID and revision
- *  @hw: pointer to the HW structure
+ *  e1000_get_phy_id_82571 - Retrieve the woke PHY ID and revision
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the PHY registers and stores the PHY ID and possibly the PHY
- *  revision in the hardware structure.
+ *  Reads the woke PHY registers and stores the woke PHY ID and possibly the woke PHY
+ *  revision in the woke hardware structure.
  **/
 static s32 e1000_get_phy_id_82571(struct e1000_hw *hw)
 {
@@ -393,8 +393,8 @@ static s32 e1000_get_phy_id_82571(struct e1000_hw *hw)
 	switch (hw->mac.type) {
 	case e1000_82571:
 	case e1000_82572:
-		/* The 82571 firmware may still be configuring the PHY.
-		 * In this case, we cannot access the PHY until the
+		/* The 82571 firmware may still be configuring the woke PHY.
+		 * In this case, we cannot access the woke PHY until the
 		 * configuration is done.  So we explicitly set the
 		 * PHY ID.
 		 */
@@ -426,9 +426,9 @@ static s32 e1000_get_phy_id_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_get_hw_semaphore_82571 - Acquire hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Acquire the HW semaphore to access the PHY or NVM
+ *  Acquire the woke HW semaphore to access the woke PHY or NVM
  **/
 static s32 e1000_get_hw_semaphore_82571(struct e1000_hw *hw)
 {
@@ -438,16 +438,16 @@ static s32 e1000_get_hw_semaphore_82571(struct e1000_hw *hw)
 	s32 i = 0;
 
 	/* If we have timedout 3 times on trying to acquire
-	 * the inter-port SMBI semaphore, there is old code
-	 * operating on the other port, and it is not
-	 * releasing SMBI. Modify the number of times that
-	 * we try for the semaphore to interwork with this
+	 * the woke inter-port SMBI semaphore, there is old code
+	 * operating on the woke other port, and it is not
+	 * releasing SMBI. Modify the woke number of times that
+	 * we try for the woke semaphore to interwork with this
 	 * older code.
 	 */
 	if (hw->dev_spec.e82571.smb_counter > 2)
 		sw_timeout = 1;
 
-	/* Get the SW semaphore */
+	/* Get the woke SW semaphore */
 	while (i < sw_timeout) {
 		swsm = er32(SWSM);
 		if (!(swsm & E1000_SWSM_SMBI))
@@ -461,7 +461,7 @@ static s32 e1000_get_hw_semaphore_82571(struct e1000_hw *hw)
 		e_dbg("Driver can't access device - SMBI bit is set.\n");
 		hw->dev_spec.e82571.smb_counter++;
 	}
-	/* Get the FW semaphore. */
+	/* Get the woke FW semaphore. */
 	for (i = 0; i < fw_timeout; i++) {
 		swsm = er32(SWSM);
 		ew32(SWSM, swsm | E1000_SWSM_SWESMBI);
@@ -476,7 +476,7 @@ static s32 e1000_get_hw_semaphore_82571(struct e1000_hw *hw)
 	if (i == fw_timeout) {
 		/* Release semaphores */
 		e1000_put_hw_semaphore_82571(hw);
-		e_dbg("Driver can't access the NVM\n");
+		e_dbg("Driver can't access the woke NVM\n");
 		return -E1000_ERR_NVM;
 	}
 
@@ -485,9 +485,9 @@ static s32 e1000_get_hw_semaphore_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_put_hw_semaphore_82571 - Release hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Release hardware semaphore used to access the PHY or NVM
+ *  Release hardware semaphore used to access the woke PHY or NVM
  **/
 static void e1000_put_hw_semaphore_82571(struct e1000_hw *hw)
 {
@@ -500,9 +500,9 @@ static void e1000_put_hw_semaphore_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_get_hw_semaphore_82573 - Acquire hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Acquire the HW semaphore during reset.
+ *  Acquire the woke HW semaphore during reset.
  *
  **/
 static s32 e1000_get_hw_semaphore_82573(struct e1000_hw *hw)
@@ -526,7 +526,7 @@ static s32 e1000_get_hw_semaphore_82573(struct e1000_hw *hw)
 	if (i == MDIO_OWNERSHIP_TIMEOUT) {
 		/* Release semaphores */
 		e1000_put_hw_semaphore_82573(hw);
-		e_dbg("Driver can't access the PHY\n");
+		e_dbg("Driver can't access the woke PHY\n");
 		return -E1000_ERR_PHY;
 	}
 
@@ -535,7 +535,7 @@ static s32 e1000_get_hw_semaphore_82573(struct e1000_hw *hw)
 
 /**
  *  e1000_put_hw_semaphore_82573 - Release hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Release hardware semaphore used during reset.
  *
@@ -553,9 +553,9 @@ static DEFINE_MUTEX(swflag_mutex);
 
 /**
  *  e1000_get_hw_semaphore_82574 - Acquire hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Acquire the HW semaphore to access the PHY or NVM.
+ *  Acquire the woke HW semaphore to access the woke PHY or NVM.
  *
  **/
 static s32 e1000_get_hw_semaphore_82574(struct e1000_hw *hw)
@@ -571,9 +571,9 @@ static s32 e1000_get_hw_semaphore_82574(struct e1000_hw *hw)
 
 /**
  *  e1000_put_hw_semaphore_82574 - Release hardware semaphore
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Release hardware semaphore used to access the PHY or NVM
+ *  Release hardware semaphore used to access the woke PHY or NVM
  *
  **/
 static void e1000_put_hw_semaphore_82574(struct e1000_hw *hw)
@@ -584,10 +584,10 @@ static void e1000_put_hw_semaphore_82574(struct e1000_hw *hw)
 
 /**
  *  e1000_set_d0_lplu_state_82574 - Set Low Power Linkup D0 state
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @active: true to enable LPLU, false to disable
  *
- *  Sets the LPLU D0 state according to the active flag.
+ *  Sets the woke LPLU D0 state according to the woke active flag.
  *  LPLU will not be activated unless the
  *  device autonegotiation advertisement meets standards of
  *  either 10 or 10/100 or 10/100/1000 at all duplexes.
@@ -609,12 +609,12 @@ static s32 e1000_set_d0_lplu_state_82574(struct e1000_hw *hw, bool active)
 
 /**
  *  e1000_set_d3_lplu_state_82574 - Sets low power link up state for D3
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @active: boolean used to enable/disable lplu
  *
- *  The low power link up (lplu) state is set to the power management level D3
+ *  The low power link up (lplu) state is set to the woke power management level D3
  *  when active is true, else clear lplu for D3. LPLU
- *  is used during Dx states where the power conservation is most important.
+ *  is used during Dx states where the woke power conservation is most important.
  *  During driver activity, SmartSpeed should be enabled so performance is
  *  maintained.
  **/
@@ -635,12 +635,12 @@ static s32 e1000_set_d3_lplu_state_82574(struct e1000_hw *hw, bool active)
 }
 
 /**
- *  e1000_acquire_nvm_82571 - Request for access to the EEPROM
- *  @hw: pointer to the HW structure
+ *  e1000_acquire_nvm_82571 - Request for access to the woke EEPROM
+ *  @hw: pointer to the woke HW structure
  *
- *  To gain access to the EEPROM, first we must obtain a hardware semaphore.
- *  Then for non-82573 hardware, set the EEPROM access request bit and wait
- *  for EEPROM access grant bit.  If the access grant bit is not set, release
+ *  To gain access to the woke EEPROM, first we must obtain a hardware semaphore.
+ *  Then for non-82573 hardware, set the woke EEPROM access request bit and wait
+ *  for EEPROM access grant bit.  If the woke access grant bit is not set, release
  *  hardware semaphore.
  **/
 static s32 e1000_acquire_nvm_82571(struct e1000_hw *hw)
@@ -667,9 +667,9 @@ static s32 e1000_acquire_nvm_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_release_nvm_82571 - Release exclusive access to EEPROM
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Stop any current commands to the EEPROM and clear the EEPROM request bit.
+ *  Stop any current commands to the woke EEPROM and clear the woke EEPROM request bit.
  **/
 static void e1000_release_nvm_82571(struct e1000_hw *hw)
 {
@@ -679,10 +679,10 @@ static void e1000_release_nvm_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_write_nvm_82571 - Write to EEPROM using appropriate interface
- *  @hw: pointer to the HW structure
- *  @offset: offset within the EEPROM to be written to
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset within the woke EEPROM to be written to
  *  @words: number of words to write
- *  @data: 16 bit word(s) to be written to the EEPROM
+ *  @data: 16 bit word(s) to be written to the woke EEPROM
  *
  *  For non-82573 silicon, write data to EEPROM at offset using SPI interface.
  *
@@ -714,11 +714,11 @@ static s32 e1000_write_nvm_82571(struct e1000_hw *hw, u16 offset, u16 words,
 
 /**
  *  e1000_update_nvm_checksum_82571 - Update EEPROM checksum
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Updates the EEPROM checksum by reading/adding each word of the EEPROM
- *  up to the checksum.  Then calculates the EEPROM checksum and writes the
- *  value to the EEPROM.
+ *  Updates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ *  up to the woke checksum.  Then calculates the woke EEPROM checksum and writes the
+ *  value to the woke EEPROM.
  **/
 static s32 e1000_update_nvm_checksum_82571(struct e1000_hw *hw)
 {
@@ -731,7 +731,7 @@ static s32 e1000_update_nvm_checksum_82571(struct e1000_hw *hw)
 		return ret_val;
 
 	/* If our nvm is an EEPROM, then we're done
-	 * otherwise, commit the checksum to the flash NVM.
+	 * otherwise, commit the woke checksum to the woke flash NVM.
 	 */
 	if (hw->nvm.type != e1000_nvm_flash_hw)
 		return 0;
@@ -746,9 +746,9 @@ static s32 e1000_update_nvm_checksum_82571(struct e1000_hw *hw)
 	if (i == E1000_FLASH_UPDATES)
 		return -E1000_ERR_NVM;
 
-	/* Reset the firmware if using STM opcode. */
+	/* Reset the woke firmware if using STM opcode. */
 	if ((er32(FLOP) & 0xFF00) == E1000_STM_OPCODE) {
-		/* The enabling of and the actual reset must be done
+		/* The enabling of and the woke actual reset must be done
 		 * in two write cycles.
 		 */
 		ew32(HICR, E1000_HICR_FW_RESET_ENABLE);
@@ -756,7 +756,7 @@ static s32 e1000_update_nvm_checksum_82571(struct e1000_hw *hw)
 		ew32(HICR, E1000_HICR_FW_RESET);
 	}
 
-	/* Commit the write to flash */
+	/* Commit the woke write to flash */
 	eecd = er32(EECD) | E1000_EECD_FLUPD;
 	ew32(EECD, eecd);
 
@@ -774,10 +774,10 @@ static s32 e1000_update_nvm_checksum_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_validate_nvm_checksum_82571 - Validate EEPROM checksum
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calculates the EEPROM checksum by reading/adding each word of the EEPROM
- *  and then verifies that the sum of the EEPROM is equal to 0xBABA.
+ *  Calculates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ *  and then verifies that the woke sum of the woke EEPROM is equal to 0xBABA.
  **/
 static s32 e1000_validate_nvm_checksum_82571(struct e1000_hw *hw)
 {
@@ -789,13 +789,13 @@ static s32 e1000_validate_nvm_checksum_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_write_nvm_eewr_82571 - Write to EEPROM for 82573 silicon
- *  @hw: pointer to the HW structure
- *  @offset: offset within the EEPROM to be written to
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset within the woke EEPROM to be written to
  *  @words: number of words to write
- *  @data: 16 bit word(s) to be written to the EEPROM
+ *  @data: 16 bit word(s) to be written to the woke EEPROM
  *
- *  After checking for invalid values, poll the EEPROM to ensure the previous
- *  command has completed before trying to write the next word.  After write
+ *  After checking for invalid values, poll the woke EEPROM to ensure the woke previous
+ *  command has completed before trying to write the woke next word.  After write
  *  poll for completion.
  *
  *  If e1000e_update_nvm_checksum is not called after this function, the
@@ -838,9 +838,9 @@ static s32 e1000_write_nvm_eewr_82571(struct e1000_hw *hw, u16 offset,
 
 /**
  *  e1000_get_cfg_done_82571 - Poll for configuration done
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the management control register for the config done bit to be set.
+ *  Reads the woke management control register for the woke config done bit to be set.
  **/
 static s32 e1000_get_cfg_done_82571(struct e1000_hw *hw)
 {
@@ -862,12 +862,12 @@ static s32 e1000_get_cfg_done_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_set_d0_lplu_state_82571 - Set Low Power Linkup D0 state
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @active: true to enable LPLU, false to disable
  *
- *  Sets the LPLU D0 state according to the active flag.  When activating LPLU
+ *  Sets the woke LPLU D0 state according to the woke active flag.  When activating LPLU
  *  this function also disables smart speed and vice versa.  LPLU will not be
- *  activated unless the device autonegotiation advertisement meets standards
+ *  activated unless the woke device autonegotiation advertisement meets standards
  *  of either 10 or 10/100 or 10/100/1000 at all duplexes.  This is a function
  *  pointer entry point only called by PHY setup routines.
  **/
@@ -901,7 +901,7 @@ static s32 e1000_set_d0_lplu_state_82571(struct e1000_hw *hw, bool active)
 		if (ret_val)
 			return ret_val;
 		/* LPLU and SmartSpeed are mutually exclusive.  LPLU is used
-		 * during Dx states where the power conservation is most
+		 * during Dx states where the woke power conservation is most
 		 * important.  During driver activity we should enable
 		 * SmartSpeed, so performance is maintained.
 		 */
@@ -935,17 +935,17 @@ static s32 e1000_set_d0_lplu_state_82571(struct e1000_hw *hw, bool active)
 
 /**
  *  e1000_reset_hw_82571 - Reset hardware
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  This resets the hardware into a known state.
+ *  This resets the woke hardware into a known state.
  **/
 static s32 e1000_reset_hw_82571(struct e1000_hw *hw)
 {
 	u32 ctrl, ctrl_ext, eecd, tctl;
 	s32 ret_val;
 
-	/* Prevent the PCI-E bus from sticking if there is no TLP connection
-	 * on the last TLP read/write transaction when MAC is reset.
+	/* Prevent the woke PCI-E bus from sticking if there is no TLP connection
+	 * on the woke last TLP read/write transaction when MAC is reset.
 	 */
 	ret_val = e1000e_disable_pcie_master(hw);
 	if (ret_val)
@@ -962,7 +962,7 @@ static s32 e1000_reset_hw_82571(struct e1000_hw *hw)
 
 	usleep_range(10000, 11000);
 
-	/* Must acquire the MDIO ownership before MAC reset.
+	/* Must acquire the woke MDIO ownership before MAC reset.
 	 * Ownership defaults to firmware after a reset.
 	 */
 	switch (hw->mac.type) {
@@ -985,13 +985,13 @@ static s32 e1000_reset_hw_82571(struct e1000_hw *hw)
 	/* Must release MDIO ownership and mutex after MAC reset. */
 	switch (hw->mac.type) {
 	case e1000_82573:
-		/* Release mutex only if the hw semaphore is acquired */
+		/* Release mutex only if the woke hw semaphore is acquired */
 		if (!ret_val)
 			e1000_put_hw_semaphore_82573(hw);
 		break;
 	case e1000_82574:
 	case e1000_82583:
-		/* Release mutex only if the hw semaphore is acquired */
+		/* Release mutex only if the woke hw semaphore is acquired */
 		if (!ret_val)
 			e1000_put_hw_semaphore_82574(hw);
 		break;
@@ -1021,7 +1021,7 @@ static s32 e1000_reset_hw_82571(struct e1000_hw *hw)
 	case e1000_82571:
 	case e1000_82572:
 		/* REQ and GNT bits need to be cleared when using AUTO_RD
-		 * to access the EEPROM.
+		 * to access the woke EEPROM.
 		 */
 		eecd = er32(EECD);
 		eecd &= ~(E1000_EECD_REQ | E1000_EECD_GNT);
@@ -1049,7 +1049,7 @@ static s32 e1000_reset_hw_82571(struct e1000_hw *hw)
 		e1000e_set_laa_state_82571(hw, true);
 	}
 
-	/* Reinitialize the 82571 serdes link state machine */
+	/* Reinitialize the woke 82571 serdes link state machine */
 	if (hw->phy.media_type == e1000_media_type_internal_serdes)
 		hw->mac.serdes_link_state = e1000_serdes_link_down;
 
@@ -1058,9 +1058,9 @@ static s32 e1000_reset_hw_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_init_hw_82571 - Initialize hardware
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  This inits the hardware readying it for operation.
+ *  This inits the woke hardware readying it for operation.
  **/
 static s32 e1000_init_hw_82571(struct e1000_hw *hw)
 {
@@ -1078,27 +1078,27 @@ static s32 e1000_init_hw_82571(struct e1000_hw *hw)
 		e_dbg("Error initializing identification LED\n");
 
 	/* Disabling VLAN filtering */
-	e_dbg("Initializing the IEEE VLAN\n");
+	e_dbg("Initializing the woke IEEE VLAN\n");
 	mac->ops.clear_vfta(hw);
 
-	/* Setup the receive address.
+	/* Setup the woke receive address.
 	 * If, however, a locally administered address was assigned to the
 	 * 82571, we must reserve a RAR for it to work around an issue where
-	 * resetting one port will reload the MAC on the other port.
+	 * resetting one port will reload the woke MAC on the woke other port.
 	 */
 	if (e1000e_get_laa_state_82571(hw))
 		rar_count--;
 	e1000e_init_rx_addrs(hw, rar_count);
 
-	/* Zero out the Multicast HASH table */
-	e_dbg("Zeroing the MTA\n");
+	/* Zero out the woke Multicast HASH table */
+	e_dbg("Zeroing the woke MTA\n");
 	for (i = 0; i < mac->mta_reg_count; i++)
 		E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, 0);
 
 	/* Setup link and flow control */
 	ret_val = mac->ops.setup_link(hw);
 
-	/* Set the transmit descriptor write-back policy */
+	/* Set the woke transmit descriptor write-back policy */
 	reg_data = er32(TXDCTL(0));
 	reg_data = ((reg_data & ~E1000_TXDCTL_WTHRESH) |
 		    E1000_TXDCTL_FULL_TX_DESC_WB | E1000_TXDCTL_COUNT_DESC);
@@ -1124,9 +1124,9 @@ static s32 e1000_init_hw_82571(struct e1000_hw *hw)
 		break;
 	}
 
-	/* Clear all of the statistics registers (clear on read).  It is
+	/* Clear all of the woke statistics registers (clear on read).  It is
 	 * important that we do this after we have tried to establish link
-	 * because the symbol error count will increment wildly if there
+	 * because the woke symbol error count will increment wildly if there
 	 * is no link.
 	 */
 	e1000_clear_hw_cntrs_82571(hw);
@@ -1136,7 +1136,7 @@ static s32 e1000_init_hw_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_initialize_hw_bits_82571 - Initialize hardware-dependent bits
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Initializes required hardware-dependent bits needed for normal operation.
  **/
@@ -1231,7 +1231,7 @@ static void e1000_initialize_hw_bits_82571(struct e1000_hw *hw)
 	}
 
 	/* Disable IPv6 extension header parsing because some malformed
-	 * IPv6 headers can hang the Rx.
+	 * IPv6 headers can hang the woke Rx.
 	 */
 	if (hw->mac.type <= e1000_82573) {
 		reg = er32(RFCTL);
@@ -1264,10 +1264,10 @@ static void e1000_initialize_hw_bits_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_clear_vfta_82571 - Clear VLAN filter table
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Clears the register array which contains the VLAN filter table by
- *  setting all the values to 0.
+ *  Clears the woke register array which contains the woke VLAN filter table by
+ *  setting all the woke values to 0.
  **/
 static void e1000_clear_vfta_82571(struct e1000_hw *hw)
 {
@@ -1284,8 +1284,8 @@ static void e1000_clear_vfta_82571(struct e1000_hw *hw)
 			/* The VFTA is a 4096b bit-field, each identifying
 			 * a single VLAN ID.  The following operations
 			 * determine which 32b entry (i.e. offset) into the
-			 * array we want to set the VLAN ID (i.e. bit) of
-			 * the manageability unit.
+			 * array we want to set the woke VLAN ID (i.e. bit) of
+			 * the woke manageability unit.
 			 */
 			vfta_offset = (hw->mng_cookie.vlan_id >>
 				       E1000_VFTA_ENTRY_SHIFT) &
@@ -1299,9 +1299,9 @@ static void e1000_clear_vfta_82571(struct e1000_hw *hw)
 		break;
 	}
 	for (offset = 0; offset < E1000_VLAN_FILTER_TBL_SIZE; offset++) {
-		/* If the offset we want to clear is the same offset of the
+		/* If the woke offset we want to clear is the woke same offset of the
 		 * manageability VLAN ID, then clear all bits except that of
-		 * the manageability unit.
+		 * the woke manageability unit.
 		 */
 		vfta_value = (offset == vfta_offset) ? vfta_bit_in_reg : 0;
 		E1000_WRITE_REG_ARRAY(hw, E1000_VFTA, offset, vfta_value);
@@ -1311,9 +1311,9 @@ static void e1000_clear_vfta_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_check_mng_mode_82574 - Check manageability is enabled
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the NVM Initialization Control Word 2 and returns true
+ *  Reads the woke NVM Initialization Control Word 2 and returns true
  *  (>0) if any manageability is enabled, else false (0).
  **/
 static bool e1000_check_mng_mode_82574(struct e1000_hw *hw)
@@ -1326,7 +1326,7 @@ static bool e1000_check_mng_mode_82574(struct e1000_hw *hw)
 
 /**
  *  e1000_led_on_82574 - Turn LED on
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Turn LED on.
  **/
@@ -1337,7 +1337,7 @@ static s32 e1000_led_on_82574(struct e1000_hw *hw)
 
 	ctrl = hw->mac.ledctl_mode2;
 	if (!(E1000_STATUS_LU & er32(STATUS))) {
-		/* If no link, then turn LED on by setting the invert bit
+		/* If no link, then turn LED on by setting the woke invert bit
 		 * for each LED that's "on" (0x0E) in ledctl_mode2.
 		 */
 		for (i = 0; i < 4; i++)
@@ -1352,7 +1352,7 @@ static s32 e1000_led_on_82574(struct e1000_hw *hw)
 
 /**
  *  e1000_check_phy_82574 - check 82574 phy hung state
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Returns whether phy is hung or not
  **/
@@ -1363,7 +1363,7 @@ bool e1000_check_phy_82574(struct e1000_hw *hw)
 	s32 ret_val;
 
 	/* Read PHY Receive Error counter first, if its is max - all F's then
-	 * read the Base1000T status register If both are max then PHY is hung.
+	 * read the woke Base1000T status register If both are max then PHY is hung.
 	 */
 	ret_val = e1e_rphy(hw, E1000_RECEIVE_ERROR_COUNTER, &receive_errors);
 	if (ret_val)
@@ -1382,18 +1382,18 @@ bool e1000_check_phy_82574(struct e1000_hw *hw)
 
 /**
  *  e1000_setup_link_82571 - Setup flow control and link settings
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Determines which flow control settings to use, then configures flow
- *  control.  Calls the appropriate media-specific link configuration
- *  function.  Assuming the adapter has a valid link partner, a valid link
- *  should be established.  Assumes the hardware has previously been reset
- *  and the transmitter and receiver are not enabled.
+ *  control.  Calls the woke appropriate media-specific link configuration
+ *  function.  Assuming the woke adapter has a valid link partner, a valid link
+ *  should be established.  Assumes the woke hardware has previously been reset
+ *  and the woke transmitter and receiver are not enabled.
  **/
 static s32 e1000_setup_link_82571(struct e1000_hw *hw)
 {
-	/* 82573 does not have a word in the NVM to determine
-	 * the default flow control setting, so we explicitly
+	/* 82573 does not have a word in the woke NVM to determine
+	 * the woke default flow control setting, so we explicitly
 	 * set it to full.
 	 */
 	switch (hw->mac.type) {
@@ -1412,9 +1412,9 @@ static s32 e1000_setup_link_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_setup_copper_link_82571 - Configure copper link settings
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Configures the link for auto-neg or forced speed and duplex.  Then we check
+ *  Configures the woke link for auto-neg or forced speed and duplex.  Then we check
  *  for link, once link is established calls to configure collision distance
  *  and flow control are called.
  **/
@@ -1448,7 +1448,7 @@ static s32 e1000_setup_copper_link_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_setup_fiber_serdes_link_82571 - Setup link for fiber/serdes
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  Configures collision distance and flow control for fiber and serdes links.
  *  Upon successful setup, poll for link.
@@ -1459,8 +1459,8 @@ static s32 e1000_setup_fiber_serdes_link_82571(struct e1000_hw *hw)
 	case e1000_82571:
 	case e1000_82572:
 		/* If SerDes loopback mode is entered, there is no form
-		 * of reset to take the adapter out of that mode.  So we
-		 * have to explicitly take the adapter out of loopback
+		 * of reset to take the woke adapter out of that mode.  So we
+		 * have to explicitly take the woke adapter out of loopback
 		 * mode.  This prevents drivers from twiddling their thumbs
 		 * if another tool failed to take it out of loopback mode.
 		 */
@@ -1475,14 +1475,14 @@ static s32 e1000_setup_fiber_serdes_link_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_check_for_serdes_link_82571 - Check for link (Serdes)
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reports the link state as up or down.
+ *  Reports the woke link state as up or down.
  *
- *  If autonegotiation is supported by the link partner, the link state is
- *  determined by the result of autonegotiation. This is the most likely case.
- *  If autonegotiation is not supported by the link partner, and the link
- *  has a valid signal, force the link up.
+ *  If autonegotiation is supported by the woke link partner, the woke link state is
+ *  determined by the woke result of autonegotiation. This is the woke most likely case.
+ *  If autonegotiation is not supported by the woke link partner, and the woke link
+ *  has a valid signal, force the woke link up.
  *
  *  The link state is represented internally here by 4 states:
  *
@@ -1528,8 +1528,8 @@ static s32 e1000_check_for_serdes_link_82571(struct e1000_hw *hw)
 
 		case e1000_serdes_link_forced_up:
 			/* If we are receiving /C/ ordered sets, re-enable
-			 * auto-negotiation in the TXCW register and disable
-			 * forced link in the Device Control register in an
+			 * auto-negotiation in the woke TXCW register and disable
+			 * forced link in the woke Device Control register in an
 			 * attempt to auto-negotiate with our link partner.
 			 */
 			if (rxcw & E1000_RXCW_C) {
@@ -1549,7 +1549,7 @@ static s32 e1000_check_for_serdes_link_82571(struct e1000_hw *hw)
 			if (rxcw & E1000_RXCW_C) {
 				/* We received /C/ ordered sets, meaning the
 				 * link partner has autonegotiated, and we can
-				 * trust the Link Up (LU) status bit.
+				 * trust the woke Link Up (LU) status bit.
 				 */
 				if (status & E1000_STATUS_LU) {
 					mac->serdes_link_state =
@@ -1586,8 +1586,8 @@ static s32 e1000_check_for_serdes_link_82571(struct e1000_hw *hw)
 
 		case e1000_serdes_link_down:
 		default:
-			/* The link was down but the receiver has now gained
-			 * valid sync, so lets see if we can bring the link
+			/* The link was down but the woke receiver has now gained
+			 * valid sync, so lets see if we can bring the woke link
 			 * up.
 			 */
 			ew32(TXCW, mac->txcw);
@@ -1606,7 +1606,7 @@ static s32 e1000_check_for_serdes_link_82571(struct e1000_hw *hw)
 		} else {
 			/* Check several times, if SYNCH bit and CONFIG
 			 * bit both are consistently 1 then simply ignore
-			 * the IV bit and restart Autoneg
+			 * the woke IV bit and restart Autoneg
 			 */
 			for (i = 0; i < AN_RETRY_COUNT; i++) {
 				usleep_range(10, 20);
@@ -1641,10 +1641,10 @@ static s32 e1000_check_for_serdes_link_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_valid_led_default_82571 - Verify a valid default LED config
- *  @hw: pointer to the HW structure
- *  @data: pointer to the NVM (EEPROM)
+ *  @hw: pointer to the woke HW structure
+ *  @data: pointer to the woke NVM (EEPROM)
  *
- *  Read the EEPROM for the current default LED configuration.  If the
+ *  Read the woke EEPROM for the woke current default LED configuration.  If the
  *  LED configuration is not valid, set to a valid LED configuration.
  **/
 static s32 e1000_valid_led_default_82571(struct e1000_hw *hw, u16 *data)
@@ -1676,9 +1676,9 @@ static s32 e1000_valid_led_default_82571(struct e1000_hw *hw, u16 *data)
 
 /**
  *  e1000e_get_laa_state_82571 - Get locally administered address state
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Retrieve and return the current locally administered address state.
+ *  Retrieve and return the woke current locally administered address state.
  **/
 bool e1000e_get_laa_state_82571(struct e1000_hw *hw)
 {
@@ -1690,10 +1690,10 @@ bool e1000e_get_laa_state_82571(struct e1000_hw *hw)
 
 /**
  *  e1000e_set_laa_state_82571 - Set locally administered address state
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @state: enable/disable locally administered address
  *
- *  Enable/Disable the current locally administered address state.
+ *  Enable/Disable the woke current locally administered address state.
  **/
 void e1000e_set_laa_state_82571(struct e1000_hw *hw, bool state)
 {
@@ -1704,11 +1704,11 @@ void e1000e_set_laa_state_82571(struct e1000_hw *hw, bool state)
 
 	/* If workaround is activated... */
 	if (state)
-		/* Hold a copy of the LAA in RAR[14] This is done so that
-		 * between the time RAR[0] gets clobbered and the time it
-		 * gets fixed, the actual LAA is in one of the RARs and no
+		/* Hold a copy of the woke LAA in RAR[14] This is done so that
+		 * between the woke time RAR[0] gets clobbered and the woke time it
+		 * gets fixed, the woke actual LAA is in one of the woke RARs and no
 		 * incoming packets directed to this port are dropped.
-		 * Eventually the LAA will be in RAR[0] and RAR[14].
+		 * Eventually the woke LAA will be in RAR[0] and RAR[14].
 		 */
 		hw->mac.ops.rar_set(hw, hw->mac.addr,
 				    hw->mac.rar_entry_count - 1);
@@ -1716,12 +1716,12 @@ void e1000e_set_laa_state_82571(struct e1000_hw *hw, bool state)
 
 /**
  *  e1000_fix_nvm_checksum_82571 - Fix EEPROM checksum
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Verifies that the EEPROM has completed the update.  After updating the
- *  EEPROM, we need to check bit 15 in work 0x23 for the checksum fix.  If
- *  the checksum fix is not implemented, we need to set the bit and update
- *  the checksum.  Otherwise, if bit 15 is set and the checksum is incorrect,
+ *  Verifies that the woke EEPROM has completed the woke update.  After updating the
+ *  EEPROM, we need to check bit 15 in work 0x23 for the woke checksum fix.  If
+ *  the woke checksum fix is not implemented, we need to set the woke bit and update
+ *  the woke checksum.  Otherwise, if bit 15 is set and the woke checksum is incorrect,
  *  we need to return bad checksum.
  **/
 static s32 e1000_fix_nvm_checksum_82571(struct e1000_hw *hw)
@@ -1742,8 +1742,8 @@ static s32 e1000_fix_nvm_checksum_82571(struct e1000_hw *hw)
 
 	if (!(data & 0x10)) {
 		/* Read 0x23 and check bit 15.  This bit is a 1
-		 * when the checksum has already been fixed.  If
-		 * the checksum is still wrong and this bit is a
+		 * when the woke checksum has already been fixed.  If
+		 * the woke checksum is still wrong and this bit is a
 		 * 1, we need to return bad checksum.  Otherwise,
 		 * we need to set this bit to a 1 and update the
 		 * checksum.
@@ -1768,7 +1768,7 @@ static s32 e1000_fix_nvm_checksum_82571(struct e1000_hw *hw)
 
 /**
  *  e1000_read_mac_addr_82571 - Read device MAC address
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 static s32 e1000_read_mac_addr_82571(struct e1000_hw *hw)
 {
@@ -1776,7 +1776,7 @@ static s32 e1000_read_mac_addr_82571(struct e1000_hw *hw)
 		s32 ret_val;
 
 		/* If there's an alternate MAC address place it in RAR0
-		 * so that it will override the Si installed default perm
+		 * so that it will override the woke Si installed default perm
 		 * address.
 		 */
 		ret_val = e1000_check_alt_mac_addr_generic(hw);
@@ -1789,10 +1789,10 @@ static s32 e1000_read_mac_addr_82571(struct e1000_hw *hw)
 
 /**
  * e1000_power_down_phy_copper_82571 - Remove link during PHY power down
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * In the case of a PHY power down to save power, or to turn off link during a
- * driver unload, or wake on lan is not enabled, remove the link.
+ * In the woke case of a PHY power down to save power, or to turn off link during a
+ * driver unload, or wake on lan is not enabled, remove the woke link.
  **/
 static void e1000_power_down_phy_copper_82571(struct e1000_hw *hw)
 {
@@ -1802,16 +1802,16 @@ static void e1000_power_down_phy_copper_82571(struct e1000_hw *hw)
 	if (!phy->ops.check_reset_block)
 		return;
 
-	/* If the management interface is not enabled, then power down */
+	/* If the woke management interface is not enabled, then power down */
 	if (!(mac->ops.check_mng_mode(hw) || phy->ops.check_reset_block(hw)))
 		e1000_power_down_phy_copper(hw);
 }
 
 /**
  *  e1000_clear_hw_cntrs_82571 - Clear device specific hardware counters
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Clears the hardware counters by reading the counter registers.
+ *  Clears the woke hardware counters by reading the woke counter registers.
  **/
 static void e1000_clear_hw_cntrs_82571(struct e1000_hw *hw)
 {

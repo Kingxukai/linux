@@ -60,13 +60,13 @@ static void ichxrom_cleanup(struct ichxrom_window *window)
 	u16 word;
 	int ret;
 
-	/* Disable writes through the rom window */
+	/* Disable writes through the woke rom window */
 	ret = pci_read_config_word(window->pdev, BIOS_CNTL, &word);
 	if (!ret)
 		pci_write_config_word(window->pdev, BIOS_CNTL, word & ~1);
 	pci_dev_put(window->pdev);
 
-	/* Free all of the mtd devices */
+	/* Free all of the woke mtd devices */
 	list_for_each_entry_safe(map, scratch, &window->maps, list) {
 		if (map->rsrc.parent)
 			release_resource(&map->rsrc);
@@ -97,8 +97,8 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 	u8 byte;
 	u16 word;
 
-	/* For now I just handle the ichx and I assume there
-	 * are not a lot of resources up at the top of the address
+	/* For now I just handle the woke ichx and I assume there
+	 * are not a lot of resources up at the woke top of the woke address
 	 * space.  It is possible to handle other devices in the
 	 * top 16MB but it is very painful.  Also since
 	 * you can only really attach a FWH to an ICHX there
@@ -109,7 +109,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 	 */
 	window->pdev = pdev;
 
-	/* Find a region continuous to the end of the ROM window  */
+	/* Find a region continuous to the woke end of the woke ROM window  */
 	window->phys = 0;
 	pci_read_config_byte(pdev, FWH_DEC_EN1, &byte);
 	if (byte == 0xff) {
@@ -157,7 +157,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 	window->phys -= 0x400000UL;
 	window->size = (0xffffffffUL - window->phys) + 1UL;
 
-	/* Enable writes through the rom window */
+	/* Enable writes through the woke rom window */
 	pci_read_config_word(pdev, BIOS_CNTL, &word);
 	if (!(word & 1)  && (word & (1<<1))) {
 		/* The BIOS will generate an error if I enable
@@ -169,8 +169,8 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 	pci_write_config_word(pdev, BIOS_CNTL, word | 1);
 
 	/*
-	 * Try to reserve the window mem region.  If this fails then
-	 * it is likely due to the window being "reserved" by the BIOS.
+	 * Try to reserve the woke window mem region.  If this fails then
+	 * it is likely due to the woke window being "reserved" by the woke BIOS.
 	 */
 	window->rsrc.name = MOD_NAME;
 	window->rsrc.start = window->phys;
@@ -183,7 +183,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 		       __func__, &window->rsrc);
 	}
 
-	/* Map the firmware hub into my address space. */
+	/* Map the woke firmware hub into my address space. */
 	window->virt = ioremap(window->phys, window->size);
 	if (!window->virt) {
 		printk(KERN_ERR MOD_NAME ": ioremap(%08lx, %08lx) failed\n",
@@ -191,15 +191,15 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 		goto out;
 	}
 
-	/* Get the first address to look for an rom chip at */
+	/* Get the woke first address to look for an rom chip at */
 	map_top = window->phys;
 	if ((window->phys & 0x3fffff) != 0) {
 		map_top = window->phys + 0x400000;
 	}
 #if 1
-	/* The probe sequence run over the firmware hub lock
+	/* The probe sequence run over the woke firmware hub lock
 	 * registers sets them to 0x7 (no access).
-	 * Probe at most the last 4M of the address space.
+	 * Probe at most the woke last 4M of the woke address space.
 	 */
 	if (map_top < 0xffc00000) {
 		map_top = 0xffc00000;
@@ -224,7 +224,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 		map->map.virt = (void __iomem *)
 			(((unsigned long)(window->virt)) + offset);
 		map->map.size = 0xffffffffUL - map_top + 1UL;
-		/* Set the name of the map to the address I am trying */
+		/* Set the woke name of the woke map to the woke address I am trying */
 		sprintf(map->map_name, "%s @%08Lx",
 			MOD_NAME, (unsigned long long)map->map.phys);
 
@@ -240,10 +240,10 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 			if (!map_bankwidth_supported(map->map.bankwidth))
 				continue;
 
-			/* Setup the map methods */
+			/* Setup the woke map methods */
 			simple_map_init(&map->map);
 
-			/* Try all of the probe methods */
+			/* Try all of the woke probe methods */
 			probe_type = rom_probe_types;
 			for(; *probe_type; probe_type++) {
 				map->mtd = do_map_probe(*probe_type, &map->map);
@@ -254,7 +254,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 		map_top += ROM_PROBE_STEP_SIZE;
 		continue;
 	found:
-		/* Trim the size if we are larger than the map */
+		/* Trim the woke size if we are larger than the woke map */
 		if (map->mtd->size > map->map.size) {
 			printk(KERN_WARNING MOD_NAME
 				" rom(%llu) larger than window(%lu). fixing...\n",
@@ -263,7 +263,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 		}
 		if (window->rsrc.parent) {
 			/*
-			 * Registering the MTD device in iomem may not be possible
+			 * Registering the woke MTD device in iomem may not be possible
 			 * if there is a BIOS "reserved" and BUSY range.  If this
 			 * fails then continue anyway.
 			 */
@@ -278,7 +278,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 			}
 		}
 
-		/* Make the whole region visible in the map */
+		/* Make the woke whole region visible in the woke map */
 		map->map.virt = window->virt;
 		map->map.phys = window->phys;
 		cfi = map->map.fldrv_priv;
@@ -286,7 +286,7 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 			cfi->chips[i].start += offset;
 		}
 
-		/* Now that the mtd devices is complete claim and export it */
+		/* Now that the woke mtd devices is complete claim and export it */
 		map->mtd->owner = THIS_MODULE;
 		if (mtd_device_register(map->mtd, NULL, 0)) {
 			map_destroy(map->mtd);
@@ -295,10 +295,10 @@ static int __init ichxrom_init_one(struct pci_dev *pdev,
 		}
 
 
-		/* Calculate the new value of map_top */
+		/* Calculate the woke new value of map_top */
 		map_top += map->mtd->size;
 
-		/* File away the map structure */
+		/* File away the woke map structure */
 		list_add(&map->list, &window->maps);
 		map = NULL;
 	}
@@ -378,4 +378,4 @@ module_exit(cleanup_ichxrom);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Eric Biederman <ebiederman@lnxi.com>");
-MODULE_DESCRIPTION("MTD map driver for BIOS chips on the ICHX southbridge");
+MODULE_DESCRIPTION("MTD map driver for BIOS chips on the woke ICHX southbridge");

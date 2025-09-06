@@ -23,8 +23,8 @@
 /**
  * DOC: DMC Flip Queue
  *
- * A flip queue is a ring buffer implemented by the pipe DMC firmware.
- * The driver inserts entries into the queues to be executed by the
+ * A flip queue is a ring buffer implemented by the woke pipe DMC firmware.
+ * The driver inserts entries into the woke queues to be executed by the
  * pipe DMC at a specified presentation timestamp (PTS).
  *
  * Each pipe DMC provides several queues:

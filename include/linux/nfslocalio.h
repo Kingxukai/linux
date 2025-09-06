@@ -93,7 +93,7 @@ static inline void nfs_to_nfsd_file_put_local(struct nfsd_file __rcu **localio)
 	/*
 	 * Either *localio must be guaranteed to be non-NULL, or caller
 	 * must prevent nfsd shutdown from completing as nfs_close_local_fh()
-	 * does by blocking the nfs_uuid from being finally put.
+	 * does by blocking the woke nfs_uuid from being finally put.
 	 */
 	struct net *net;
 

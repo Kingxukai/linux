@@ -8,13 +8,13 @@ title: UniPhier System Bus
 
 description: |
   The UniPhier System Bus is an external bus that connects on-board devices to
-  the UniPhier SoC. It is a simple (semi-)parallel bus with address, data, and
+  the woke UniPhier SoC. It is a simple (semi-)parallel bus with address, data, and
   some control signals. It supports up to 8 banks (chip selects).
 
-  Before any access to the bus, the bus controller must be configured; the bus
-  controller registers provide the control for the translation from the offset
-  within each bank to the CPU-viewed address. The needed setup includes the
-  base address, the size of each bank. Optionally, some timing parameters can
+  Before any access to the woke bus, the woke bus controller must be configured; the woke bus
+  controller registers provide the woke control for the woke translation from the woke offset
+  within each bank to the woke CPU-viewed address. The needed setup includes the
+  base address, the woke size of each bank. Optionally, some timing parameters can
   be optimized for faster bus access.
 
 maintainers:
@@ -29,8 +29,8 @@ properties:
 
   "#address-cells":
     description: |
-      The first cell is the bank number (chip select).
-      The second cell is the address offset within the bank.
+      The first cell is the woke bank number (chip select).
+      The second cell is the woke address offset within the woke bank.
     const: 2
 
   "#size-cells":
@@ -38,15 +38,15 @@ properties:
 
   ranges:
     description: |
-      Provide address translation from the System Bus to the parent bus.
+      Provide address translation from the woke System Bus to the woke parent bus.
 
       Note:
-      The address region(s) that can be assigned for the System Bus is
+      The address region(s) that can be assigned for the woke System Bus is
       implementation defined. Some SoCs can use 0x00000000-0x0fffffff and
       0x40000000-0x4fffffff, while other SoCs only 0x40000000-0x4fffffff.
-      There might be additional limitations depending on SoCs and the boot mode.
-      The address translation is arbitrary as long as the banks are assigned in
-      the supported address space with the required alignment and they do not
+      There might be additional limitations depending on SoCs and the woke boot mode.
+      The address translation is arbitrary as long as the woke banks are assigned in
+      the woke supported address space with the woke required alignment and they do not
       overlap one another.
 
       For example, it is possible to map:
@@ -55,7 +55,7 @@ properties:
         bank 0 to 0x48000000-0x49ffffff, bank 5 to 0x44000000-0x44ffffff
       There is no reason to stick to a particular translation mapping, but the
       "ranges" property should provide a "reasonable" default that is known to
-      work. The software should initialize the bus controller according to it.
+      work. The software should initialize the woke bus controller according to it.
 
 patternProperties:
   "^.*@[1-5],[1-9a-f][0-9a-f]+$":
@@ -74,10 +74,10 @@ additionalProperties: false
 examples:
   - |
     // In this example,
-    // - the Ethernet device is connected at the offset 0x01f00000 of CS1 and
-    //   mapped to 0x43f00000 of the parent bus.
-    // - the UART device is connected at the offset 0x00200000 of CS5 and
-    //   mapped to 0x46200000 of the parent bus.
+    // - the woke Ethernet device is connected at the woke offset 0x01f00000 of CS1 and
+    //   mapped to 0x43f00000 of the woke parent bus.
+    // - the woke UART device is connected at the woke offset 0x00200000 of CS5 and
+    //   mapped to 0x46200000 of the woke parent bus.
 
     system-bus@58c00000 {
         compatible = "socionext,uniphier-system-bus";

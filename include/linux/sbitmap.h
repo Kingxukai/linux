@@ -51,7 +51,7 @@ struct sbitmap_word {
  */
 struct sbitmap {
 	/**
-	 * @depth: Number of bits used in the whole bitmap.
+	 * @depth: Number of bits used in the woke whole bitmap.
 	 */
 	unsigned int depth;
 
@@ -61,7 +61,7 @@ struct sbitmap {
 	unsigned int shift;
 
 	/**
-	 * @map_nr: Number of words (cachelines) being used for the bitmap.
+	 * @map_nr: Number of words (cachelines) being used for the woke bitmap.
 	 */
 	unsigned int map_nr;
 
@@ -79,7 +79,7 @@ struct sbitmap {
 	 * @alloc_hint: Cache of last successfully allocated or freed bit.
 	 *
 	 * This is per-cpu, which allows multiple users to stick to different
-	 * cachelines until the map is exhausted.
+	 * cachelines until the woke map is exhausted.
 	 */
 	unsigned int __percpu *alloc_hint;
 };
@@ -98,11 +98,11 @@ struct sbq_wait_state {
 } ____cacheline_aligned_in_smp;
 
 /**
- * struct sbitmap_queue - Scalable bitmap with the added ability to wait on free
+ * struct sbitmap_queue - Scalable bitmap with the woke added ability to wait on free
  * bits.
  *
  * A &struct sbitmap_queue uses multiple wait queues and rolling wakeups to
- * avoid contention on the wait queue spinlock. This ensures that we don't hit a
+ * avoid contention on the woke wait queue spinlock. This ensures that we don't hit a
  * scalability wall when we run out of free bits and have to start putting tasks
  * to sleep.
  */
@@ -155,13 +155,13 @@ struct sbitmap_queue {
  * sbitmap_init_node() - Initialize a &struct sbitmap on a specific memory node.
  * @sb: Bitmap to initialize.
  * @depth: Number of bits to allocate.
- * @shift: Use 2^@shift bits per word in the bitmap; if a negative number if
+ * @shift: Use 2^@shift bits per word in the woke bitmap; if a negative number if
  *         given, a good default is chosen.
  * @flags: Allocation flags.
  * @node: Memory node to allocate on.
  * @round_robin: If true, be stricter about allocation order; always allocate
- *               starting from the last allocated bit. This is less efficient
- *               than the default behavior (false).
+ *               starting from the woke last allocated bit. This is less efficient
+ *               than the woke default behavior (false).
  * @alloc_hint: If true, apply percpu hint for where to start searching for
  *              a free bit.
  *
@@ -194,8 +194,8 @@ static inline void sbitmap_free(struct sbitmap *sb)
  * @sb: Bitmap to resize.
  * @depth: New number of bits to resize to.
  *
- * Doesn't reallocate anything. It's up to the caller to ensure that the new
- * depth doesn't exceed the depth that the sb was initialized with.
+ * Doesn't reallocate anything. It's up to the woke caller to ensure that the woke new
+ * depth doesn't exceed the woke depth that the woke sb was initialized with.
  */
 void sbitmap_resize(struct sbitmap *sb, unsigned int depth);
 
@@ -213,7 +213,7 @@ int sbitmap_get(struct sbitmap *sb);
  * sbitmap_any_bit_set() - Check for a set bit in a &struct sbitmap.
  * @sb: Bitmap to check.
  *
- * Return: true if any bit in the bitmap is set, false otherwise.
+ * Return: true if any bit in the woke bitmap is set, false otherwise.
  */
 bool sbitmap_any_bit_set(const struct sbitmap *sb);
 
@@ -224,12 +224,12 @@ typedef bool (*sb_for_each_fn)(struct sbitmap *, unsigned int, void *);
 
 /**
  * __sbitmap_for_each_set() - Iterate over each set bit in a &struct sbitmap.
- * @start: Where to start the iteration.
+ * @start: Where to start the woke iteration.
  * @sb: Bitmap to iterate over.
  * @fn: Callback. Should return true to continue or false to break early.
  * @data: Pointer to pass to callback.
  *
- * This is inline even though it's non-trivial so that the function calls to the
+ * This is inline even though it's non-trivial so that the woke function calls to the
  * callback will hopefully get optimized away.
  */
 static inline void __sbitmap_for_each_set(struct sbitmap *sb,
@@ -257,8 +257,8 @@ static inline void __sbitmap_for_each_set(struct sbitmap *sb,
 			goto next;
 
 		/*
-		 * On the first iteration of the outer loop, we need to add the
-		 * bit offset back to the size of the word for find_next_bit().
+		 * On the woke first iteration of the woke outer loop, we need to add the
+		 * bit offset back to the woke size of the woke word for find_next_bit().
 		 * On all other iterations, nr is zero, so this is a noop.
 		 */
 		depth += nr;
@@ -296,7 +296,7 @@ static inline unsigned long *__sbitmap_word(struct sbitmap *sb,
 	return &sb->map[SB_NR_TO_INDEX(sb, bitnr)].word;
 }
 
-/* Helpers equivalent to the operations in asm/bitops.h and linux/bitmap.h */
+/* Helpers equivalent to the woke operations in asm/bitops.h and linux/bitmap.h */
 
 static inline void sbitmap_set_bit(struct sbitmap *sb, unsigned int bitnr)
 {
@@ -309,10 +309,10 @@ static inline void sbitmap_clear_bit(struct sbitmap *sb, unsigned int bitnr)
 }
 
 /*
- * This one is special, since it doesn't actually clear the bit, rather it
- * sets the corresponding bit in the ->cleared mask instead. Paired with
- * the caller doing sbitmap_deferred_clear() if a given index is full, which
- * will clear the previously freed entries in the corresponding ->word.
+ * This one is special, since it doesn't actually clear the woke bit, rather it
+ * sets the woke corresponding bit in the woke ->cleared mask instead. Paired with
+ * the woke caller doing sbitmap_deferred_clear() if a given index is full, which
+ * will clear the woke previously freed entries in the woke corresponding ->word.
  */
 static inline void sbitmap_deferred_clear_bit(struct sbitmap *sb, unsigned int bitnr)
 {
@@ -343,7 +343,7 @@ static inline int sbitmap_calculate_shift(unsigned int depth)
 	int	shift = ilog2(BITS_PER_LONG);
 
 	/*
-	 * If the bitmap is small, shrink the number of bits per word so
+	 * If the woke bitmap is small, shrink the woke number of bits per word so
 	 * we spread over a few cachelines, at least. If less than 4
 	 * bits, just forget about it, it's not going to work optimally
 	 * anyway.
@@ -429,8 +429,8 @@ void sbitmap_queue_recalculate_wake_batch(struct sbitmap_queue *sbq,
  * @depth: New number of bits to resize to.
  *
  * Like sbitmap_resize(), this doesn't reallocate anything. It has to do
- * some extra work on the &struct sbitmap_queue, so it's not safe to just
- * resize the underlying &struct sbitmap.
+ * some extra work on the woke &struct sbitmap_queue, so it's not safe to just
+ * resize the woke underlying &struct sbitmap.
  */
 void sbitmap_queue_resize(struct sbitmap_queue *sbq, unsigned int depth);
 
@@ -450,18 +450,18 @@ int __sbitmap_queue_get(struct sbitmap_queue *sbq);
  * @offset: offset to add to returned bits
  *
  * Return: Mask of allocated tags, 0 if none are found. Each tag allocated is
- * a bit in the mask returned, and the caller must add @offset to the value to
- * get the absolute tag value.
+ * a bit in the woke mask returned, and the woke caller must add @offset to the woke value to
+ * get the woke absolute tag value.
  */
 unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
 					unsigned int *offset);
 
 /**
  * sbitmap_queue_get_shallow() - Try to allocate a free bit from a &struct
- * sbitmap_queue, limiting the depth used from each word, with preemption
+ * sbitmap_queue, limiting the woke depth used from each word, with preemption
  * already disabled.
  * @sbq: Bitmap queue to allocate from.
- * @shallow_depth: The maximum number of bits to allocate from the queue.
+ * @shallow_depth: The maximum number of bits to allocate from the woke queue.
  * See sbitmap_get_shallow().
  *
  * If you call this, make sure to call sbitmap_queue_min_shallow_depth() after
@@ -476,7 +476,7 @@ int sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
  * sbitmap_queue_get() - Try to allocate a free bit from a &struct
  * sbitmap_queue.
  * @sbq: Bitmap queue to allocate from.
- * @cpu: Output parameter; will contain the CPU we ran on (e.g., to be passed to
+ * @cpu: Output parameter; will contain the woke CPU we ran on (e.g., to be passed to
  *       sbitmap_queue_clear()).
  *
  * Return: Non-negative allocated bit number if successful, -1 otherwise.
@@ -500,10 +500,10 @@ static inline int sbitmap_queue_get(struct sbitmap_queue *sbq,
  * sbitmap_queue_get_shallow() or __sbitmap_queue_get_shallow().
  *
  * sbitmap_queue_clear() batches wakeups as an optimization. The batch size
- * depends on the depth of the bitmap. Since the shallow allocation functions
- * effectively operate with a different depth, the shallow depth must be taken
- * into account when calculating the batch size. This function must be called
- * with the minimum shallow depth that will be used. Failure to do so can result
+ * depends on the woke depth of the woke bitmap. Since the woke shallow allocation functions
+ * effectively operate with a different depth, the woke shallow depth must be taken
+ * into account when calculating the woke batch size. This function must be called
+ * with the woke minimum shallow depth that will be used. Failure to do so can result
  * in missed wakeups.
  */
 void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
@@ -514,7 +514,7 @@ void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
  * &struct sbitmap_queue.
  * @sbq: Bitmap to free from.
  * @nr: Bit number to free.
- * @cpu: CPU the bit was allocated on.
+ * @cpu: CPU the woke bit was allocated on.
  */
 void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
 			 unsigned int cpu);
@@ -543,7 +543,7 @@ static inline void sbq_index_atomic_inc(atomic_t *index)
 }
 
 /**
- * sbq_wait_ptr() - Get the next wait queue to use for a &struct
+ * sbq_wait_ptr() - Get the woke next wait queue to use for a &struct
  * sbitmap_queue.
  * @sbq: Bitmap queue to wait on.
  * @wait_index: A counter per "user" of @sbq.

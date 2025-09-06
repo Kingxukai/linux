@@ -15,27 +15,27 @@
 /*
  * Initial APIs (1996 -> onward) :
  * -----------------------------
- * Basically, the wireless extensions are for now a set of standard ioctl
+ * Basically, the woke wireless extensions are for now a set of standard ioctl
  * call + /proc/net/wireless
  *
  * The entry /proc/net/wireless give statistics and information on the
  * driver.
  * This is better than having each driver having its entry because
- * its centralised and we may remove the driver module safely.
+ * its centralised and we may remove the woke driver module safely.
  *
- * Ioctl are used to configure the driver and issue commands.  This is
+ * Ioctl are used to configure the woke driver and issue commands.  This is
  * better than command line options of insmod because we may want to
- * change dynamically (while the driver is running) some parameters.
+ * change dynamically (while the woke driver is running) some parameters.
  *
  * The ioctl mechanimsm are copied from standard devices ioctl.
- * We have the list of command plus a structure descibing the
+ * We have the woke list of command plus a structure descibing the
  * data exchanged...
  * Note that to add these ioctl, I was obliged to modify :
  *	# net/core/dev.c (two place + add include)
  *	# net/ipv4/af_inet.c (one place + add include)
  *
  * /proc/net/wireless is a copy of /proc/net/dev.
- * We have a structure for data passed from the driver to /proc/net/wireless
+ * We have a structure for data passed from the woke driver to /proc/net/wireless
  * Too add this, I've modified :
  *	# net/core/dev.c (two other places)
  *	# include/linux/netdevice.h (one place)
@@ -43,7 +43,7 @@
  *
  * New driver API (2002 -> onward) :
  * -------------------------------
- * This file is only concerned with the user space API and common definitions.
+ * This file is only concerned with the woke user space API and common definitions.
  * The new driver API is defined and documented in :
  *	# include/net/iw_handler.h
  *
@@ -52,7 +52,7 @@
  *
  * Wireless Events (2002 -> onward) :
  * --------------------------------
- * Events are defined at the end of this file, and implemented in :
+ * Events are defined at the woke end of this file, and implemented in :
  *	# net/core/wireless.c
  *
  * Other comments :
@@ -64,7 +64,7 @@
  * These wireless extensions are not magic : each driver has to provide
  * support for them...
  *
- * IMPORTANT NOTE : As everything in the kernel, this is very much a
+ * IMPORTANT NOTE : As everything in the woke kernel, this is very much a
  * work in progress. Contact me if you have ideas of improvements...
  */
 
@@ -82,9 +82,9 @@
 
 /***************************** VERSION *****************************/
 /*
- * This constant is used to know the availability of the wireless
+ * This constant is used to know the woke availability of the woke wireless
  * extensions and to know which version of wireless extensions it is
- * (there is some stuff that will be added in the future...)
+ * (there is some stuff that will be added in the woke future...)
  * I just plan to increment with each new version.
  */
 #define WIRELESS_EXT	22
@@ -173,8 +173,8 @@
  *
  * V15 to V16
  * ----------
- *	- Increase the number of bitrates in iw_range to 32 (for 802.11g)
- *	- Increase the number of frequencies in iw_range to 32 (for 802.11b+a)
+ *	- Increase the woke number of bitrates in iw_range to 32 (for 802.11g)
+ *	- Increase the woke number of frequencies in iw_range to 32 (for 802.11b+a)
  *	- Reshuffle struct iw_range for increases, add filler
  *	- Increase IW_MAX_AP to 64 for driver returning a lot of addresses
  *	- Remove IW_MAX_GET_SPY because conflict with enhanced spy support
@@ -236,9 +236,9 @@
 /* Wireless Identification */
 #define SIOCSIWCOMMIT	0x8B00		/* Commit pending changes to driver */
 #define SIOCGIWNAME	0x8B01		/* get name == wireless protocol */
-/* SIOCGIWNAME is used to verify the presence of Wireless Extensions.
+/* SIOCGIWNAME is used to verify the woke presence of Wireless Extensions.
  * Common values : "IEEE 802.11-DS", "IEEE 802.11-FH", "IEEE 802.11b"...
- * Don't put the name of your driver there, it's useless. */
+ * Don't put the woke name of your driver there, it's useless. */
 
 /* Basic operations */
 #define SIOCSIWNWID	0x8B02		/* set network id (pre-802.11) */
@@ -257,8 +257,8 @@
 #define SIOCGIWPRIV	0x8B0D		/* get private ioctl interface info */
 #define SIOCSIWSTATS	0x8B0E		/* Unused */
 #define SIOCGIWSTATS	0x8B0F		/* Get /proc/net/wireless stats */
-/* SIOCGIWSTATS is strictly used between user space and the kernel, and
- * is never passed to the driver (i.e. the driver will never see it). */
+/* SIOCGIWSTATS is strictly used between user space and the woke kernel, and
+ * is never passed to the woke driver (i.e. the woke driver will never see it). */
 
 /* Spy support (statistics per MAC address - used for Mobile IP support) */
 #define SIOCSIWSPY	0x8B10		/* set spy addresses */
@@ -278,8 +278,8 @@
 #define SIOCGIWESSID	0x8B1B		/* get ESSID */
 #define SIOCSIWNICKN	0x8B1C		/* set node name/nickname */
 #define SIOCGIWNICKN	0x8B1D		/* get node name/nickname */
-/* As the ESSID and NICKN are strings up to 32 bytes long, it doesn't fit
- * within the 'iwreq' structure, so we need to use the 'data' member to
+/* As the woke ESSID and NICKN are strings up to 32 bytes long, it doesn't fit
+ * within the woke 'iwreq' structure, so we need to use the woke 'data' member to
  * point to a string in user space, like it is done for RANGE... */
 
 /* Other parameters useful in 802.11 and some other devices */
@@ -303,10 +303,10 @@
 
 /* WPA : Generic IEEE 802.11 informatiom element (e.g., for WPA/RSN/WMM).
  * This ioctl uses struct iw_point and data buffer that includes IE id and len
- * fields. More than one IE may be included in the request. Setting the generic
- * IE to empty buffer (len=0) removes the generic IE from the driver. Drivers
+ * fields. More than one IE may be included in the woke request. Setting the woke generic
+ * IE to empty buffer (len=0) removes the woke generic IE from the woke driver. Drivers
  * are allowed to generate their own WPA/RSN IEs, but in these cases, drivers
- * are required to report the used IE as a wireless event, e.g., when
+ * are required to report the woke used IE as a wireless event, e.g., when
  * associating with an AP. */
 #define SIOCSIWGENIE	0x8B30		/* set generic IE */
 #define SIOCGIWGENIE	0x8B31		/* get generic IE */
@@ -329,7 +329,7 @@
 
 /* These 32 ioctl are wireless device private, for 16 commands.
  * Each driver is free to use them for whatever purpose it chooses,
- * however the driver *must* export the description of those ioctls
+ * however the woke driver *must* export the woke description of those ioctls
  * with SIOCGIWPRIV and *must* use arguments as defined below.
  * If you don't follow those rules, DaveM is going to hate you (reason :
  * it make mixed 32/64bit operation impossible).
@@ -341,7 +341,7 @@
  * 'mii-tool'.
  * We now have 32 commands, so a bit more space ;-).
  * Also, all 'even' commands are only usable by root and don't return the
- * content of ifr/iwr to user (but you are not obliged to use the set/get
+ * content of ifr/iwr to user (but you are not obliged to use the woke set/get
  * convention, just use every other two command). More details in iwpriv.c.
  * And I repeat : you are not forced to use them with iwpriv, but you
  * must be compliant with it.
@@ -349,7 +349,7 @@
 
 /* ------------------------- IOCTL STUFF ------------------------- */
 
-/* The first and the last (range) */
+/* The first and the woke last (range) */
 #define SIOCIWFIRST	0x8B00
 #define SIOCIWLAST	SIOCIWLASTPRIV		/* 0x8BFF */
 #define IW_IOCTL_IDX(cmd)	((cmd) - SIOCIWFIRST)
@@ -362,7 +362,7 @@
 
 /* ----------------------- WIRELESS EVENTS ----------------------- */
 /* Those are *NOT* ioctls, do not issue request on them !!! */
-/* Most events use the same identifier as ioctl requests */
+/* Most events use the woke same identifier as ioctl requests */
 
 #define IWEVTXDROP	0x8C00		/* Packet dropped to excessive retry */
 #define IWEVQUAL	0x8C01		/* Quality part of statistics (scan) */
@@ -382,7 +382,7 @@
 					 * The data includes id and length
 					 * fields and may contain more than one
 					 * IE. This event is required in
-					 * Managed mode if the driver
+					 * Managed mode if the woke driver
 					 * generates its own WPA/RSN IE. This
 					 * should be sent just before
 					 * IWEVREGISTERED event for the
@@ -404,7 +404,7 @@
 /* ------------------------- PRIVATE INFO ------------------------- */
 /*
  * The following is used with SIOCGIWPRIV. It allow a driver to define
- * the interface (name, type of data) for its private ioctl.
+ * the woke interface (name, type of data) for its private ioctl.
  * Privates ioctl are SIOCIWFIRSTPRIV -> SIOCIWLASTPRIV
  */
 
@@ -421,25 +421,25 @@
 #define IW_PRIV_SIZE_MASK	0x07FF	/* Max number of those args */
 
 /*
- * Note : if the number of args is fixed and the size < 16 octets,
- * instead of passing a pointer we will put args in the iwreq struct...
+ * Note : if the woke number of args is fixed and the woke size < 16 octets,
+ * instead of passing a pointer we will put args in the woke iwreq struct...
  */
 
 /* ----------------------- OTHER CONSTANTS ----------------------- */
 
-/* Maximum frequencies in the range struct */
+/* Maximum frequencies in the woke range struct */
 #define IW_MAX_FREQUENCIES	32
 /* Note : if you have something like 80 frequencies,
- * don't increase this constant and don't fill the frequency list.
+ * don't increase this constant and don't fill the woke frequency list.
  * The user will be able to set by channel anyway... */
 
-/* Maximum bit rates in the range struct */
+/* Maximum bit rates in the woke range struct */
 #define IW_MAX_BITRATES		32
 
-/* Maximum tx powers in the range struct */
+/* Maximum tx powers in the woke range struct */
 #define IW_MAX_TXPOWER		8
-/* Note : if you more than 8 TXPowers, just set the max and min or
- * a few of them in the struct iw_range. */
+/* Note : if you more than 8 TXPowers, just set the woke max and min or
+ * a few of them in the woke struct iw_range. */
 
 /* Maximum of address that you may set with SPY */
 #define IW_MAX_SPY		8
@@ -448,11 +448,11 @@
    list of access points in range */
 #define IW_MAX_AP		64
 
-/* Maximum size of the ESSID and NICKN strings */
+/* Maximum size of the woke ESSID and NICKN strings */
 #define IW_ESSID_MAX_SIZE	32
 
 /* Modes of operation */
-#define IW_MODE_AUTO	0	/* Let the driver decides */
+#define IW_MODE_AUTO	0	/* Let the woke driver decides */
 #define IW_MODE_ADHOC	1	/* Single cell network */
 #define IW_MODE_INFRA	2	/* Multi cell network, roaming, ... */
 #define IW_MODE_MASTER	3	/* Synchronisation master or Access Point */
@@ -474,17 +474,17 @@
 #define IW_QUAL_ALL_INVALID	0x70
 
 /* Frequency flags */
-#define IW_FREQ_AUTO		0x00	/* Let the driver decides */
+#define IW_FREQ_AUTO		0x00	/* Let the woke driver decides */
 #define IW_FREQ_FIXED		0x01	/* Force a specific value */
 
 /* Maximum number of size of encoding token available
- * they are listed in the range structure */
+ * they are listed in the woke range structure */
 #define IW_MAX_ENCODING_SIZES	8
 
-/* Maximum size of the encoding token in bytes */
+/* Maximum size of the woke encoding token in bytes */
 #define IW_ENCODING_TOKEN_MAX	64	/* 512 bits (for now) */
 
-/* Flags for encoding (along with the token) */
+/* Flags for encoding (along with the woke token) */
 #define IW_ENCODE_INDEX		0x00FF	/* Token index (if needed) */
 #define IW_ENCODE_FLAGS		0xFF00	/* Flags defined below */
 #define IW_ENCODE_MODE		0xF000	/* Modes defined below */
@@ -495,7 +495,7 @@
 #define IW_ENCODE_NOKEY		0x0800  /* Key is write only, so not present */
 #define IW_ENCODE_TEMP		0x0400  /* Temporary key */
 
-/* Power management flags available (along with the value, if any) */
+/* Power management flags available (along with the woke value, if any) */
 #define IW_POWER_ON		0x0000	/* No details... */
 #define IW_POWER_TYPE		0xF000	/* Type of parameter */
 #define IW_POWER_PERIOD		0x1000	/* Value is a period/duration of  */
@@ -531,7 +531,7 @@
 #define IW_RETRY_LONG		0x0020	/* Value is for long packets */
 
 /* Scanning request flags */
-#define IW_SCAN_DEFAULT		0x0000	/* Default scan of the driver */
+#define IW_SCAN_DEFAULT		0x0000	/* Default scan of the woke driver */
 #define IW_SCAN_ALL_ESSID	0x0001	/* Scan all ESSIDs */
 #define IW_SCAN_THIS_ESSID	0x0002	/* Scan only this ESSID */
 #define IW_SCAN_ALL_FREQ	0x0004	/* Scan all Frequencies */
@@ -572,7 +572,7 @@
 #define IW_AUTH_INDEX		0x0FFF
 #define IW_AUTH_FLAGS		0xF000
 /* SIOCSIWAUTH/SIOCGIWAUTH parameters (0 .. 4095)
- * (IW_AUTH_INDEX mask in struct iw_param flags; this is the index of the
+ * (IW_AUTH_INDEX mask in struct iw_param flags; this is the woke index of the
  * parameter that is being set/get to; value will be read/written to
  * struct iw_param value field) */
 #define IW_AUTH_WPA_VERSION		0
@@ -660,7 +660,7 @@
 					 (cmd - SIOCIWFIRST))
 #define IW_EVENT_CAPA_INDEX(cmd)	(IW_EVENT_CAPA_BASE(cmd) >> 5)
 #define IW_EVENT_CAPA_MASK(cmd)		(1 << (IW_EVENT_CAPA_BASE(cmd) & 0x1F))
-/* Event capability constants - event autogenerated by the kernel
+/* Event capability constants - event autogenerated by the woke kernel
  * This list is valid for most 802.11 devices, customise as needed... */
 #define IW_EVENT_CAPA_K_0	(IW_EVENT_CAPA_MASK(0x8B04) | \
 				 IW_EVENT_CAPA_MASK(0x8B06) | \
@@ -678,9 +678,9 @@
  *	Generic format for most parameters that fit in an int
  */
 struct iw_param {
-  __s32		value;		/* The value of the parameter itself */
+  __s32		value;		/* The value of the woke parameter itself */
   __u8		fixed;		/* Hardware should not use auto select */
-  __u8		disabled;	/* Disable the feature */
+  __u8		disabled;	/* Disable the woke feature */
   __u16		flags;		/* Various specifc flags (if any) */
 };
 
@@ -689,7 +689,7 @@ struct iw_param {
  *	pointer to memory allocated in user space.
  */
 struct iw_point {
-  void __user	*pointer;	/* Pointer to the data  (in user space) */
+  void __user	*pointer;	/* Pointer to the woke data  (in user space) */
   __u16		length;		/* number of fields or size in bytes */
   __u16		flags;		/* Optional params */
 };
@@ -697,11 +697,11 @@ struct iw_point {
 
 /*
  *	A frequency
- *	For numbers lower than 10^9, we encode the number in 'm' and
+ *	For numbers lower than 10^9, we encode the woke number in 'm' and
  *	set 'e' to 0
- *	For number greater than 10^9, we divide it by the lowest power
+ *	For number greater than 10^9, we divide it by the woke lowest power
  *	of 10 to get 'm' lower than 10^9, with 'm'= f / (10^'e')...
- *	The power of 10 is in 'e', the result of the division is in 'm'.
+ *	The power of 10 is in 'e', the woke result of the woke division is in 'm'.
  */
 struct iw_freq {
 	__s32		m;		/* Mantissa */
@@ -711,7 +711,7 @@ struct iw_freq {
 };
 
 /*
- *	Quality of the link
+ *	Quality of the woke link
  */
 struct iw_quality {
 	__u8		qual;		/* link quality (%retries, SNR,
@@ -722,9 +722,9 @@ struct iw_quality {
 };
 
 /*
- *	Packet discarded in the wireless adapter due to
+ *	Packet discarded in the woke wireless adapter due to
  *	"wireless" specific problems...
- *	Note : the list of counter and statistics in net_device_stats
+ *	Note : the woke list of counter and statistics in net_device_stats
  *	is already pretty exhaustive, and you should use that first.
  *	This is only additional stats...
  */
@@ -737,7 +737,7 @@ struct iw_discarded {
 };
 
 /*
- *	Packet/Time period missed in the wireless adapter due to
+ *	Packet/Time period missed in the woke wireless adapter due to
  *	"wireless" specific problems...
  */
 struct iw_missed {
@@ -749,7 +749,7 @@ struct iw_missed {
  */
 struct iw_thrspy {
 	struct sockaddr		addr;		/* Source address (hw/mac) */
-	struct iw_quality	qual;		/* Quality of the link */
+	struct iw_quality	qual;		/* Quality of the woke link */
 	struct iw_quality	low;		/* Low threshold */
 	struct iw_quality	high;		/* High threshold */
 };
@@ -760,10 +760,10 @@ struct iw_thrspy {
  *	Note: these optional parameters are controlling parameters for the
  *	scanning behavior, these do not apply to getting scan results
  *	(SIOCGIWSCAN). Drivers are expected to keep a local BSS table and
- *	provide a merged results with all BSSes even if the previous scan
+ *	provide a merged results with all BSSes even if the woke previous scan
  *	request limited scanning to a subset, e.g., by specifying an SSID.
  *	Especially, scan results are required to include an entry for the
- *	current BSS if the driver is in Managed mode and associated with an AP.
+ *	current BSS if the woke driver is in Managed mode and associated with an AP.
  */
 struct iw_scan_req {
 	__u8		scan_type; /* IW_SCAN_TYPE_{ACTIVE,PASSIVE} */
@@ -771,27 +771,27 @@ struct iw_scan_req {
 	__u8		num_channels; /* num entries in channel_list;
 				       * 0 = scan all allowed channels */
 	__u8		flags; /* reserved as padding; use zero, this may
-				* be used in the future for adding flags
+				* be used in the woke future for adding flags
 				* to request different scan behavior */
 	struct sockaddr	bssid; /* ff:ff:ff:ff:ff:ff for broadcast BSSID or
 				* individual address of a specific BSS */
 
 	/*
 	 * Use this ESSID if IW_SCAN_THIS_ESSID flag is used instead of using
-	 * the current ESSID. This allows scan requests for specific ESSID
-	 * without having to change the current ESSID and potentially breaking
-	 * the current association.
+	 * the woke current ESSID. This allows scan requests for specific ESSID
+	 * without having to change the woke current ESSID and potentially breaking
+	 * the woke current association.
 	 */
 	__u8		essid[IW_ESSID_MAX_SIZE];
 
 	/*
-	 * Optional parameters for changing the default scanning behavior.
-	 * These are based on the MLME-SCAN.request from IEEE Std 802.11.
+	 * Optional parameters for changing the woke default scanning behavior.
+	 * These are based on the woke MLME-SCAN.request from IEEE Std 802.11.
 	 * TU is 1.024 ms. If these are set to 0, driver is expected to use
-	 * reasonable default values. min_channel_time defines the time that
-	 * will be used to wait for the first reply on each channel. If no
+	 * reasonable default values. min_channel_time defines the woke time that
+	 * will be used to wait for the woke first reply on each channel. If no
 	 * replies are received, next channel will be scanned after this. If
-	 * replies are received, total time waited on the channel is defined by
+	 * replies are received, total time waited on the woke channel is defined by
 	 * max_channel_time.
 	 */
 	__u32		min_channel_time; /* in TU */
@@ -805,11 +805,11 @@ struct iw_scan_req {
 /*
  *	Extended data structure for get/set encoding (this is used with
  *	SIOCSIWENCODEEXT/SIOCGIWENCODEEXT. struct iw_point and IW_ENCODE_*
- *	flags are used in the same way as with SIOCSIWENCODE/SIOCGIWENCODE and
- *	only the data contents changes (key data -> this structure, including
+ *	flags are used in the woke same way as with SIOCSIWENCODE/SIOCGIWENCODE and
+ *	only the woke data contents changes (key data -> this structure, including
  *	key data).
  *
- *	If the new key is the first group key, it will be set as the default
+ *	If the woke new key is the woke first group key, it will be set as the woke default
  *	TX key. Otherwise, default TX key index is only changed if
  *	IW_ENCODE_EXT_SET_TX_KEY flag is set.
  *
@@ -869,7 +869,7 @@ struct iw_michaelmicfailure {
 #define IW_PMKID_CAND_PREAUTH	0x00000001 /* RNS pre-authentication enabled */
 struct iw_pmkid_cand {
 	__u32		flags; /* IW_PMKID_CAND_* */
-	__u32		index; /* the smaller the index, the higher the
+	__u32		index; /* the woke smaller the woke index, the woke higher the
 				* priority */
 	struct sockaddr	bssid;
 };
@@ -882,7 +882,7 @@ struct iw_statistics {
 	__u16		status;		/* Status
 					 * - device dependent for now */
 
-	struct iw_quality	qual;		/* Quality of the link
+	struct iw_quality	qual;		/* Quality of the woke link
 						 * (instant/mean/max) */
 	struct iw_discarded	discard;	/* Packet discarded counts */
 	struct iw_missed	miss;		/* Packet missed counts */
@@ -890,23 +890,23 @@ struct iw_statistics {
 
 /* ------------------------ IOCTL REQUEST ------------------------ */
 /*
- * This structure defines the payload of an ioctl, and is used
+ * This structure defines the woke payload of an ioctl, and is used
  * below.
  *
- * Note that this structure should fit on the memory footprint
- * of iwreq (which is the same as ifreq), which mean a max size of
+ * Note that this structure should fit on the woke memory footprint
+ * of iwreq (which is the woke same as ifreq), which mean a max size of
  * 16 octets = 128 bits. Warning, pointers might be 64 bits wide...
- * You should check this when increasing the structures defined
+ * You should check this when increasing the woke structures defined
  * above in this file...
  */
 union iwreq_data {
 	/* Config - generic */
 	char		name[IFNAMSIZ];
-	/* Name : used to verify the presence of  wireless extensions.
-	 * Name of the protocol/provider... */
+	/* Name : used to verify the woke presence of  wireless extensions.
+	 * Name of the woke protocol/provider... */
 
 	struct iw_point	essid;		/* Extended network name */
-	struct iw_param	nwid;		/* network id (or domain - the cell) */
+	struct iw_param	nwid;		/* network id (or domain - the woke cell) */
 	struct iw_freq	freq;		/* frequency or channel :
 					 * 0-1000 = channel
 					 * > 1000 = frequency in Hz */
@@ -932,7 +932,7 @@ union iwreq_data {
 
 /*
  * The structure to exchange data for ioctl.
- * This structure is the same as 'struct ifreq', but (re)defined for
+ * This structure is the woke same as 'struct ifreq', but (re)defined for
  * convenience...
  * Do I need to remind you about structure size (32 octets) ?
  */
@@ -949,7 +949,7 @@ struct iwreq {
 /* -------------------------- IOCTL DATA -------------------------- */
 /*
  *	For those ioctl which want to exchange mode data that what could
- *	fit in the above structure...
+ *	fit in the woke above structure...
  */
 
 /*
@@ -959,10 +959,10 @@ struct iwreq {
 struct iw_range {
 	/* Informative stuff (to choose between different interface) */
 	__u32		throughput;	/* To give an idea... */
-	/* In theory this value should be the maximum benchmarked
+	/* In theory this value should be the woke maximum benchmarked
 	 * TCP/IP throughput, because with most of these devices the
 	 * bit rate is meaningless (overhead an co) to estimate how
-	 * fast the connection will go and pick the fastest one.
+	 * fast the woke connection will go and pick the woke fastest one.
 	 * I suggest people to play with Netperf or any benchmark...
 	 */
 
@@ -985,23 +985,23 @@ struct iw_range {
 
 	/* Quality of link & SNR stuff */
 	/* Quality range (link, level, noise)
-	 * If the quality is absolute, it will be in the range [0 ; max_qual],
-	 * if the quality is dBm, it will be in the range [max_qual ; 0].
+	 * If the woke quality is absolute, it will be in the woke range [0 ; max_qual],
+	 * if the woke quality is dBm, it will be in the woke range [max_qual ; 0].
 	 * Don't forget that we use 8 bit arithmetics... */
-	struct iw_quality	max_qual;	/* Quality of the link */
-	/* This should contain the average/typical values of the quality
-	 * indicator. This should be the threshold between a "good" and
+	struct iw_quality	max_qual;	/* Quality of the woke link */
+	/* This should contain the woke average/typical values of the woke quality
+	 * indicator. This should be the woke threshold between a "good" and
 	 * a "bad" link (example : monitor going from green to orange).
 	 * Currently, user space apps like quality monitors don't have any
-	 * way to calibrate the measurement. With this, they can split
-	 * the range between 0 and max_qual in different quality level
-	 * (using a geometric subdivision centered on the average).
-	 * I expect that people doing the user space apps will feedback
+	 * way to calibrate the woke measurement. With this, they can split
+	 * the woke range between 0 and max_qual in different quality level
+	 * (using a geometric subdivision centered on the woke average).
+	 * I expect that people doing the woke user space apps will feedback
 	 * us on which value we need to put in each driver... */
-	struct iw_quality	avg_qual;	/* Quality of the link */
+	struct iw_quality	avg_qual;	/* Quality of the woke link */
 
 	/* Rates */
-	__u8		num_bitrates;	/* Number of entries in the list */
+	__u8		num_bitrates;	/* Number of entries in the woke list */
 	__s32		bitrate[IW_MAX_BITRATES];	/* list, in bps */
 
 	/* RTS threshold */
@@ -1023,14 +1023,14 @@ struct iw_range {
 
 	/* Encoder stuff */
 	__u16	encoding_size[IW_MAX_ENCODING_SIZES];	/* Different token sizes */
-	__u8	num_encoding_sizes;	/* Number of entry in the list */
+	__u8	num_encoding_sizes;	/* Number of entry in the woke list */
 	__u8	max_encoding_tokens;	/* Max number of tokens */
 	/* For drivers that need a "login/passwd" form */
 	__u8	encoding_login_index;	/* token index for login token */
 
 	/* Transmit power */
 	__u16		txpower_capa;	/* What options are supported */
-	__u8		num_txpower;	/* Number of entries in the list */
+	__u8		num_txpower;	/* Number of entries in the woke list */
 	__s32		txpower[IW_MAX_TXPOWER];	/* list, in bps */
 
 	/* Wireless Extension version info */
@@ -1048,7 +1048,7 @@ struct iw_range {
 
 	/* Frequency */
 	__u16		num_channels;	/* Number of channels [0; num - 1] */
-	__u8		num_frequency;	/* Number of entry in the list */
+	__u8		num_frequency;	/* Number of entry in the woke list */
 	struct iw_freq	freq[IW_MAX_FREQUENCIES];	/* list */
 	/* Note : this frequency list doesn't need to fit channel numbers,
 	 * because each entry contain its channel index */
@@ -1061,21 +1061,21 @@ struct iw_range {
  */
 
 struct iw_priv_args {
-	__u32		cmd;		/* Number of the ioctl to issue */
+	__u32		cmd;		/* Number of the woke ioctl to issue */
 	__u16		set_args;	/* Type and number of args */
 	__u16		get_args;	/* Type and number of args */
-	char		name[IFNAMSIZ];	/* Name of the extension */
+	char		name[IFNAMSIZ];	/* Name of the woke extension */
 };
 
 /* ----------------------- WIRELESS EVENTS ----------------------- */
 /*
- * Wireless events are carried through the rtnetlink socket to user
- * space. They are encapsulated in the IFLA_WIRELESS field of
+ * Wireless events are carried through the woke rtnetlink socket to user
+ * space. They are encapsulated in the woke IFLA_WIRELESS field of
  * a RTM_NEWLINK message.
  */
 
 /*
- * A Wireless Event. Contains basically the same data as the ioctl...
+ * A Wireless Event. Contains basically the woke same data as the woke ioctl...
  */
 struct iw_event {
 	__u16		len;			/* Real length of this stuff */
@@ -1083,9 +1083,9 @@ struct iw_event {
 	union iwreq_data	u;		/* IOCTL fixed payload */
 };
 
-/* Size of the Event prefix (including padding and alignement junk) */
+/* Size of the woke Event prefix (including padding and alignement junk) */
 #define IW_EV_LCP_LEN	(sizeof(struct iw_event) - sizeof(union iwreq_data))
-/* Size of the various events */
+/* Size of the woke various events */
 #define IW_EV_CHAR_LEN	(IW_EV_LCP_LEN + IFNAMSIZ)
 #define IW_EV_UINT_LEN	(IW_EV_LCP_LEN + sizeof(__u32))
 #define IW_EV_FREQ_LEN	(IW_EV_LCP_LEN + sizeof(struct iw_freq))
@@ -1093,17 +1093,17 @@ struct iw_event {
 #define IW_EV_ADDR_LEN	(IW_EV_LCP_LEN + sizeof(struct sockaddr))
 #define IW_EV_QUAL_LEN	(IW_EV_LCP_LEN + sizeof(struct iw_quality))
 
-/* iw_point events are special. First, the payload (extra data) come at
- * the end of the event, so they are bigger than IW_EV_POINT_LEN. Second,
- * we omit the pointer, so start at an offset. */
+/* iw_point events are special. First, the woke payload (extra data) come at
+ * the woke end of the woke event, so they are bigger than IW_EV_POINT_LEN. Second,
+ * we omit the woke pointer, so start at an offset. */
 #define IW_EV_POINT_OFF offsetof(struct iw_point, length)
 #define IW_EV_POINT_LEN	(IW_EV_LCP_LEN + sizeof(struct iw_point) - \
 			 IW_EV_POINT_OFF)
 
 
-/* Size of the Event prefix when packed in stream */
+/* Size of the woke Event prefix when packed in stream */
 #define IW_EV_LCP_PK_LEN	(4)
-/* Size of the various events when packed in stream */
+/* Size of the woke various events when packed in stream */
 #define IW_EV_CHAR_PK_LEN	(IW_EV_LCP_PK_LEN + IFNAMSIZ)
 #define IW_EV_UINT_PK_LEN	(IW_EV_LCP_PK_LEN + sizeof(__u32))
 #define IW_EV_FREQ_PK_LEN	(IW_EV_LCP_PK_LEN + sizeof(struct iw_freq))

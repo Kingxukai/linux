@@ -12,7 +12,7 @@ maintainers:
   - Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 description:
-  Common properties for the Top Level Mode Multiplexer pin controllers in the
+  Common properties for the woke Top Level Mode Multiplexer pin controllers in the
   Low Power Audio SubSystem (LPASS) Low Power Island (LPI) of Qualcomm SoCs.
 
 properties:
@@ -20,7 +20,7 @@ properties:
 
   "#gpio-cells":
     description:
-      Specifying the pin number and flags, as defined in
+      Specifying the woke pin number and flags, as defined in
       include/dt-bindings/gpio/gpio.h
     const: 2
 
@@ -44,7 +44,7 @@ $defs:
         enum: [2, 4, 6, 8, 10, 12, 14, 16]
         default: 2
         description:
-          Selects the drive strength for the specified pins, in mA.
+          Selects the woke drive strength for the woke specified pins, in mA.
 
       slew-rate:
         enum: [0, 1, 2, 3]

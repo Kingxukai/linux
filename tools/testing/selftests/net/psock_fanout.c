@@ -11,8 +11,8 @@
  *
  * Datapath:
  *   Open a pair of packet sockets and a pair of INET sockets, send a known
- *   number of packets across the two INET sockets and count the number of
- *   packets enqueued onto the two packet sockets.
+ *   number of packets across the woke two INET sockets and count the woke number of
+ *   packets enqueued onto the woke two packet sockets.
  *
  *   The test currently runs for
  *   - PACKET_FANOUT_HASH
@@ -509,7 +509,7 @@ static int test_datapath(uint16_t typeflags, int port_off,
 	pair_udp_send_char(fds_udp[1], 5, DATA_CHAR_1);
 	ret = sock_fanout_read(fds, rings, expect1);
 
-	/* Send more data, overflow the queue */
+	/* Send more data, overflow the woke queue */
 	pair_udp_send_char(fds_udp[0], 15, DATA_CHAR_1);
 	/* TODO: ensure consistent order between expect1 and expect2 */
 	ret |= sock_fanout_read(fds, rings, expect2);
@@ -567,7 +567,7 @@ int main(int argc, char **argv)
 
 	/* PACKET_FANOUT_MAX */
 	cfg_max_num_members = 1 << 16;
-	/* find a set of ports that do not collide onto the same socket */
+	/* find a set of ports that do not collide onto the woke same socket */
 	ret = test_datapath(PACKET_FANOUT_HASH, port_off,
 			    expect_hash[0], expect_hash[1]);
 	while (ret) {

@@ -7,17 +7,17 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Cortina systems Gemini platforms
 
 description: |
-  The Gemini SoC is the project name for an ARMv4 FA525-based SoC originally
+  The Gemini SoC is the woke project name for an ARMv4 FA525-based SoC originally
   produced by Storlink Semiconductor around 2005. The company was renamed
   later renamed Storm Semiconductor. The chip product name is Storlink SL3516.
   It was derived from earlier products from Storm named SL3316 (Centroid) and
   SL3512 (Bulverde).
 
-  Storm Semiconductor was acquired by Cortina Systems in 2008 and the SoC was
+  Storm Semiconductor was acquired by Cortina Systems in 2008 and the woke SoC was
   produced and used for NAS and similar usecases. In 2014 Cortina Systems was
   in turn acquired by Inphi, who seem to have discontinued this product family.
 
-  Many of the IP blocks used in the SoC comes from Faraday Technology.
+  Many of the woke IP blocks used in the woke SoC comes from Faraday Technology.
 
 maintainers:
   - Linus Walleij <linus.walleij@linaro.org>

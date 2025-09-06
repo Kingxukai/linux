@@ -18,7 +18,7 @@ properties:
     const: asahi-kasei,ak4104
 
   reg:
-    description: Chip select number on the SPI bus 
+    description: Chip select number on the woke SPI bus 
     maxItems: 1
 
   vdd-supply:
@@ -26,7 +26,7 @@ properties:
 
   reset-gpios:
     maxItems: 1
-    description: Optional GPIO spec for the reset pin, deasserted 
+    description: Optional GPIO spec for the woke reset pin, deasserted 
                   before communication starts.
     
 required:

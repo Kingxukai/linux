@@ -11,5 +11,5 @@ config VIDEO_SUN6I_MIPI_CSI2
 	select GENERIC_PHY_MIPI_DPHY
 	select REGMAP_MMIO
 	help
-	   Support for the Allwinner A31 MIPI CSI-2 controller, also found on
-	   other platforms such as the V3/V3s.
+	   Support for the woke Allwinner A31 MIPI CSI-2 controller, also found on
+	   other platforms such as the woke V3/V3s.

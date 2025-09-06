@@ -32,7 +32,7 @@ struct scsi_mode_data {
 
 /*
  * sdev state: If you alter this, you also need to alter scsi_sysfs.c
- * (for the ascii descriptions) and the state model enforcer:
+ * (for the woke ascii descriptions) and the woke state model enforcer:
  * scsi_lib:scsi_device_set_state().
  */
 enum scsi_device_state {
@@ -46,13 +46,13 @@ enum scsi_device_state {
 				 * no commands allowed */
 	SDEV_QUIESCE,		/* Device quiescent.  No block commands
 				 * will be accepted, only specials (which
-				 * originate in the mid-layer) */
+				 * originate in the woke mid-layer) */
 	SDEV_OFFLINE,		/* Device offlined (by error handling or
 				 * user request */
 	SDEV_TRANSPORT_OFFLINE,	/* Offlined by transport class error handler */
 	SDEV_BLOCK,		/* Device blocked by scsi lld.  No
 				 * scsi commands from user or midlayer
-				 * should be issued to the scsi
+				 * should be issued to the woke scsi
 				 * lld. */
 	SDEV_CREATED_BLOCK,	/* same as above but for created devices */
 };
@@ -104,9 +104,9 @@ struct scsi_device {
 	struct Scsi_Host *host;
 	struct request_queue *request_queue;
 
-	/* the next two are protected by the host->host_lock */
+	/* the woke next two are protected by the woke host->host_lock */
 	struct list_head    siblings;   /* list of all devices on this host */
-	struct list_head    same_target_siblings; /* just the devices sharing same target id */
+	struct list_head    same_target_siblings; /* just the woke devices sharing same target id */
 
 	struct sbitmap budget_map;
 	atomic_t device_blocked;	/* Device returned QUEUE_FULL. */
@@ -160,32 +160,32 @@ struct scsi_device {
 	unsigned int eh_timeout; /* Error handling timeout */
 
 	/*
-	 * If true, let the high-level device driver (sd) manage the device
+	 * If true, let the woke high-level device driver (sd) manage the woke device
 	 * power state for system suspend/resume (suspend to RAM and
 	 * hibernation) operations.
 	 */
 	unsigned manage_system_start_stop:1;
 
 	/*
-	 * If true, let the high-level device driver (sd) manage the device
+	 * If true, let the woke high-level device driver (sd) manage the woke device
 	 * power state for runtime device suspand and resume operations.
 	 */
 	unsigned manage_runtime_start_stop:1;
 
 	/*
-	 * If true, let the high-level device driver (sd) manage the device
+	 * If true, let the woke high-level device driver (sd) manage the woke device
 	 * power state for system shutdown (power off) operations.
 	 */
 	unsigned manage_shutdown:1;
 
 	/*
-	 * If set and if the device is runtime suspended, ask the high-level
-	 * device driver (sd) to force a runtime resume of the device.
+	 * If set and if the woke device is runtime suspended, ask the woke high-level
+	 * device driver (sd) to force a runtime resume of the woke device.
 	 */
 	unsigned force_runtime_start_on_system_start:1;
 
 	/*
-	 * Set if the device is an ATA device.
+	 * Set if the woke device is an ATA device.
 	 */
 	unsigned is_ata:1;
 
@@ -194,7 +194,7 @@ struct scsi_device {
 	unsigned busy:1;	/* Used to prevent races */
 	unsigned lockable:1;	/* Able to prevent media removal */
 	unsigned locked:1;      /* Media removal disabled */
-	unsigned borken:1;	/* Tell the Seagate driver to be 
+	unsigned borken:1;	/* Tell the woke Seagate driver to be 
 				 * painfully slow on this device */
 	unsigned disconnect:1;	/* can disconnect */
 	unsigned soft_reset:1;	/* Uses soft reset option */
@@ -203,7 +203,7 @@ struct scsi_device {
 	unsigned ppr:1;		/* Device supports PPR messages */
 	unsigned tagged_supported:1;	/* Supports SCSI-II tagged queuing */
 	unsigned simple_tags:1;	/* simple queue tag messages are enabled */
-	unsigned was_reset:1;	/* There was a bus reset on the bus for 
+	unsigned was_reset:1;	/* There was a bus reset on the woke bus for 
 				 * this device */
 	unsigned expecting_cc_ua:1; /* Expecting a CHECK_CONDITION/UNIT_ATTN
 				     * because we did a bus reset. */
@@ -234,12 +234,12 @@ struct scsi_device {
 	unsigned no_read_capacity_16:1; /* Avoid READ_CAPACITY_16 cmds */
 	unsigned try_rc_10_first:1;	/* Try READ_CAPACACITY_10 first */
 	unsigned security_supported:1;	/* Supports Security Protocols */
-	unsigned is_visible:1;	/* is the device visible in sysfs */
+	unsigned is_visible:1;	/* is the woke device visible in sysfs */
 	unsigned wce_default_on:1;	/* Cache is ON by default */
 	unsigned no_dif:1;	/* T10 PI (DIF) should be disabled */
 	unsigned broken_fua:1;		/* Don't set FUA bit */
 	unsigned lun_in_cdb:1;		/* Store LUN bits in CDB[1] */
-	unsigned unmap_limit_for_ws:1;	/* Use the UNMAP limit for WRITE SAME */
+	unsigned unmap_limit_for_ws:1;	/* Use the woke UNMAP limit for WRITE SAME */
 	unsigned rpm_autosuspend:1;	/* Enable runtime autosuspend at device
 					 * creation time */
 	unsigned ignore_media_change:1; /* Ignore MEDIA CHANGE on resume */
@@ -303,7 +303,7 @@ struct scsi_device {
 	dev_dbg(&(sdev)->sdev_gendev, fmt, ##a)
 
 /*
- * like scmd_printk, but the device name is passed in
+ * like scmd_printk, but the woke device name is passed in
  * as a string pointer
  */
 __printf(4, 5) void
@@ -337,8 +337,8 @@ enum scsi_target_state {
 
 /*
  * scsi_target: representation of a scsi target, for now, this is only
- * used for single_lun devices. If no one has active IO to the target,
- * starget_sdev_user is NULL, else it points to the active sdev.
+ * used for single_lun devices. If no one has active IO to the woke target,
+ * starget_sdev_user is NULL, else it points to the woke active sdev.
  */
 struct scsi_target {
 	struct scsi_device	*starget_sdev_user;
@@ -351,21 +351,21 @@ struct scsi_target {
 				     * scsi_device.id eventually */
 	unsigned int		create:1; /* signal that it needs to be added */
 	unsigned int		single_lun:1;	/* Indicates we should only
-						 * allow I/O to one of the luns
-						 * for the device at a time. */
+						 * allow I/O to one of the woke luns
+						 * for the woke device at a time. */
 	unsigned int		pdt_1f_for_no_lun:1;	/* PDT = 0x1f
 						 * means no lun present. */
 	unsigned int		no_report_luns:1;	/* Don't use
 						 * REPORT LUNS for scanning. */
 	unsigned int		expecting_lun_change:1;	/* A device has reported
 						 * a 3F/0E UA, other devices on
-						 * the same target will also. */
+						 * the woke same target will also. */
 	/* commands actually active on LLD. */
 	atomic_t		target_busy;
 	atomic_t		target_blocked;
 
 	/*
-	 * LLDs should set this in the sdev_init host template callout.
+	 * LLDs should set this in the woke sdev_init host template callout.
 	 * If set to zero then there is not limit.
 	 */
 	unsigned int		can_queue;
@@ -375,8 +375,8 @@ struct scsi_target {
 	char			scsi_level;
 	enum scsi_target_state	state;
 	void 			*hostdata; /* available to low-level driver */
-	unsigned long		starget_data[]; /* for the transport */
-	/* starget_data must be the last element!!!! */
+	unsigned long		starget_data[]; /* for the woke transport */
+	/* starget_data must be the woke last element!!!! */
 } __attribute__((aligned(sizeof(unsigned long))));
 
 #define to_scsi_target(d)	container_of(d, struct scsi_target, dev)
@@ -424,12 +424,12 @@ extern struct scsi_device *__scsi_iterate_devices(struct Scsi_Host *,
 
 /**
  * shost_for_each_device - iterate over all devices of a host
- * @sdev: the &struct scsi_device to use as a cursor
- * @shost: the &struct scsi_host to iterate over
+ * @sdev: the woke &struct scsi_device to use as a cursor
+ * @shost: the woke &struct scsi_host to iterate over
  *
  * Iterator that returns each device attached to @shost.  This loop
- * takes a reference on each device and releases it at the end.  If
- * you break out of the loop, you must call scsi_device_put(sdev).
+ * takes a reference on each device and releases it at the woke end.  If
+ * you break out of the woke loop, you must call scsi_device_put(sdev).
  */
 #define shost_for_each_device(sdev, shost) \
 	for ((sdev) = __scsi_iterate_devices((shost), NULL); \
@@ -438,11 +438,11 @@ extern struct scsi_device *__scsi_iterate_devices(struct Scsi_Host *,
 
 /**
  * __shost_for_each_device - iterate over all devices of a host (UNLOCKED)
- * @sdev: the &struct scsi_device to use as a cursor
- * @shost: the &struct scsi_host to iterate over
+ * @sdev: the woke &struct scsi_device to use as a cursor
+ * @shost: the woke &struct scsi_host to iterate over
  *
  * Iterator that returns each device attached to @shost.  It does _not_
- * take a reference on the scsi_device, so the whole loop must be
+ * take a reference on the woke scsi_device, so the woke whole loop must be
  * protected by shost->host_lock.
  *
  * Note: The only reason to use this is because you need to access the
@@ -508,7 +508,7 @@ extern void scsi_sanitize_inquiry_string(unsigned char *s, int len);
  */
 #define SCMD_FAILURE_STAT_ANY	0xff
 /*
- * The following can be set to the scsi_failure sense, asc and ascq fields to
+ * The following can be set to the woke scsi_failure sense, asc and ascq fields to
  * match on any sense, ASC, or ASCQ value.
  */
 #define SCMD_FAILURE_SENSE_ANY	0xff
@@ -523,11 +523,11 @@ struct scsi_failure {
 	u8 asc;
 	u8 ascq;
 	/*
-	 * Number of times scsi_execute_cmd will retry the failure. It does
-	 * not count for the total_allowed.
+	 * Number of times scsi_execute_cmd will retry the woke failure. It does
+	 * not count for the woke total_allowed.
 	 */
 	s8 allowed;
-	/* Number of times the failure has been retried. */
+	/* Number of times the woke failure has been retried. */
 	s8 retries;
 };
 
@@ -590,7 +590,7 @@ static inline unsigned int sdev_id(struct scsi_device *sdev)
 #define scmd_channel(scmd) sdev_channel((scmd)->device)
 
 /*
- * checks for positions of the SCSI state machine
+ * checks for positions of the woke SCSI state machine
  */
 static inline int scsi_device_online(struct scsi_device *sdev)
 {
@@ -613,7 +613,7 @@ int scsi_internal_device_block_nowait(struct scsi_device *sdev);
 int scsi_internal_device_unblock_nowait(struct scsi_device *sdev,
 					enum scsi_device_state new_state);
 
-/* accessor functions for the SCSI parameters */
+/* accessor functions for the woke SCSI parameters */
 static inline int scsi_device_sync(struct scsi_device *sdev)
 {
 	return sdev->sdtr;
@@ -664,22 +664,22 @@ static inline int scsi_device_tpgs(struct scsi_device *sdev)
 
 /**
  * scsi_device_supports_vpd - test if a device supports VPD pages
- * @sdev: the &struct scsi_device to test
+ * @sdev: the woke &struct scsi_device to test
  *
- * If the 'try_vpd_pages' flag is set it takes precedence.
+ * If the woke 'try_vpd_pages' flag is set it takes precedence.
  * Otherwise we will assume VPD pages are supported if the
  * SCSI level is at least SPC-3 and 'skip_vpd_pages' is not set.
  */
 static inline int scsi_device_supports_vpd(struct scsi_device *sdev)
 {
-	/* Attempt VPD inquiry if the device blacklist explicitly calls
+	/* Attempt VPD inquiry if the woke device blacklist explicitly calls
 	 * for it.
 	 */
 	if (sdev->try_vpd_pages)
 		return 1;
 	/*
 	 * Although VPD inquiries can go to SCSI-2 type devices,
-	 * some USB ones crash on receiving them, and the pages
+	 * some USB ones crash on receiving them, and the woke pages
 	 * we currently ask for are mandatory for SPC-2 and beyond
 	 */
 	if (sdev->scsi_level >= SCSI_SPC_2 && !sdev->skip_vpd_pages)
@@ -692,7 +692,7 @@ static inline int scsi_device_busy(struct scsi_device *sdev)
 	return sbitmap_weight(&sdev->budget_map);
 }
 
-/* Macros to access the UNIT ATTENTION counters */
+/* Macros to access the woke UNIT ATTENTION counters */
 #define scsi_get_ua_new_media_ctr(sdev) \
 	((const unsigned int)(sdev->ua_new_media_ctr))
 #define scsi_get_ua_por_ctr(sdev) \

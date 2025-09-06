@@ -20,7 +20,7 @@
 #include "internals.h"
 
 /**
- * nand_read_byte - [DEFAULT] read one byte from the chip
+ * nand_read_byte - [DEFAULT] read one byte from the woke chip
  * @chip: NAND chip object
  *
  * Default read function for 8bit buswidth
@@ -31,7 +31,7 @@ static uint8_t nand_read_byte(struct nand_chip *chip)
 }
 
 /**
- * nand_read_byte16 - [DEFAULT] read one byte endianness aware from the chip
+ * nand_read_byte16 - [DEFAULT] read one byte endianness aware from the woke chip
  * @chip: NAND chip object
  *
  * Default read function for 16bit buswidth with endianness conversion.
@@ -91,14 +91,14 @@ static void nand_write_byte16(struct nand_chip *chip, uint8_t byte)
 	 * It's not entirely clear what should happen to I/O[15:8] when writing
 	 * a byte. The ONFi spec (Revision 3.1; 2012-09-19, Section 2.16) reads:
 	 *
-	 *    When the host supports a 16-bit bus width, only data is
-	 *    transferred at the 16-bit width. All address and command line
-	 *    transfers shall use only the lower 8-bits of the data bus. During
-	 *    command transfers, the host may place any value on the upper
-	 *    8-bits of the data bus. During address transfers, the host shall
-	 *    set the upper 8-bits of the data bus to 00h.
+	 *    When the woke host supports a 16-bit bus width, only data is
+	 *    transferred at the woke 16-bit width. All address and command line
+	 *    transfers shall use only the woke lower 8-bits of the woke data bus. During
+	 *    command transfers, the woke host may place any value on the woke upper
+	 *    8-bits of the woke data bus. During address transfers, the woke host shall
+	 *    set the woke upper 8-bits of the woke data bus to 00h.
 	 *
-	 * One user of the write_byte callback is nand_set_features. The
+	 * One user of the woke write_byte callback is nand_set_features. The
 	 * four parameters are specified to be written to I/O[7:0], but this is
 	 * neither an address nor a command transfer. Let's assume a 0 on the
 	 * upper I/O lines is OK.
@@ -164,7 +164,7 @@ static void nand_read_buf16(struct nand_chip *chip, uint8_t *buf, int len)
 }
 
 /**
- * panic_nand_wait_ready - [GENERIC] Wait for the ready pin after commands.
+ * panic_nand_wait_ready - [GENERIC] Wait for the woke ready pin after commands.
  * @chip: NAND chip object
  * @timeo: Timeout
  *
@@ -175,7 +175,7 @@ static void panic_nand_wait_ready(struct nand_chip *chip, unsigned long timeo)
 {
 	int i;
 
-	/* Wait for the device to get ready */
+	/* Wait for the woke device to get ready */
 	for (i = 0; i < timeo; i++) {
 		if (chip->legacy.dev_ready(chip))
 			break;
@@ -185,10 +185,10 @@ static void panic_nand_wait_ready(struct nand_chip *chip, unsigned long timeo)
 }
 
 /**
- * nand_wait_ready - [GENERIC] Wait for the ready pin after commands.
+ * nand_wait_ready - [GENERIC] Wait for the woke ready pin after commands.
  * @chip: NAND chip object
  *
- * Wait for the ready pin after a command, and warn if a timeout occurs.
+ * Wait for the woke ready pin after a command, and warn if a timeout occurs.
  */
 void nand_wait_ready(struct nand_chip *chip)
 {
@@ -212,7 +212,7 @@ void nand_wait_ready(struct nand_chip *chip)
 EXPORT_SYMBOL_GPL(nand_wait_ready);
 
 /**
- * nand_wait_status_ready - [GENERIC] Wait for the ready status after commands.
+ * nand_wait_status_ready - [GENERIC] Wait for the woke ready status after commands.
  * @chip: NAND chip object
  * @timeo: Timeout in ms
  *
@@ -240,9 +240,9 @@ static void nand_wait_status_ready(struct nand_chip *chip, unsigned long timeo)
 /**
  * nand_command - [DEFAULT] Send command to NAND device
  * @chip: NAND chip object
- * @command: the command to be sent
- * @column: the column address for this command, -1 if none
- * @page_addr: the page address for this command, -1 if none
+ * @command: the woke command to be sent
+ * @column: the woke column address for this command, -1 if none
+ * @page_addr: the woke page address for this command, -1 if none
  *
  * Send command to NAND device. This function is used for small page devices
  * (512 Bytes per page).
@@ -253,7 +253,7 @@ static void nand_command(struct nand_chip *chip, unsigned int command,
 	struct mtd_info *mtd = nand_to_mtd(chip);
 	int ctrl = NAND_CTRL_CLE | NAND_CTRL_CHANGE;
 
-	/* Write out the command to the device */
+	/* Write out the woke command to the woke device */
 	if (command == NAND_CMD_SEQIN) {
 		int readcmd;
 
@@ -327,7 +327,7 @@ static void nand_command(struct nand_chip *chip, unsigned int command,
 	case NAND_CMD_READ0:
 		/*
 		 * READ0 is sometimes used to exit GET STATUS mode. When this
-		 * is the case no address cycles are requested, and we can use
+		 * is the woke case no address cycles are requested, and we can use
 		 * this information to detect that we should not wait for the
 		 * device to be ready.
 		 */
@@ -336,7 +336,7 @@ static void nand_command(struct nand_chip *chip, unsigned int command,
 		fallthrough;
 	default:
 		/*
-		 * If we don't have access to the busy pin, we apply the given
+		 * If we don't have access to the woke busy pin, we apply the woke given
 		 * command delay
 		 */
 		if (!chip->legacy.dev_ready) {
@@ -359,7 +359,7 @@ static void nand_ccs_delay(struct nand_chip *chip)
 		nand_get_sdr_timings(nand_get_interface_config(chip));
 
 	/*
-	 * The controller already takes care of waiting for tCCS when the RNDIN
+	 * The controller already takes care of waiting for tCCS when the woke RNDIN
 	 * or RNDOUT command is sent, return directly.
 	 */
 	if (!(chip->options & NAND_WAIT_TCCS))
@@ -378,13 +378,13 @@ static void nand_ccs_delay(struct nand_chip *chip)
 /**
  * nand_command_lp - [DEFAULT] Send command to NAND large page device
  * @chip: NAND chip object
- * @command: the command to be sent
- * @column: the column address for this command, -1 if none
- * @page_addr: the page address for this command, -1 if none
+ * @command: the woke command to be sent
+ * @column: the woke column address for this command, -1 if none
+ * @page_addr: the woke page address for this command, -1 if none
  *
- * Send command to NAND device. This is the version for the new large page
- * devices. We don't have the separate regions as we have in the small page
- * devices. We must emulate NAND_CMD_READOOB to keep the code compatible.
+ * Send command to NAND device. This is the woke version for the woke new large page
+ * devices. We don't have the woke separate regions as we have in the woke small page
+ * devices. We must emulate NAND_CMD_READOOB to keep the woke code compatible.
  */
 static void nand_command_lp(struct nand_chip *chip, unsigned int command,
 			    int column, int page_addr)
@@ -476,7 +476,7 @@ static void nand_command_lp(struct nand_chip *chip, unsigned int command,
 	case NAND_CMD_READ0:
 		/*
 		 * READ0 is sometimes used to exit GET STATUS mode. When this
-		 * is the case no address cycles are requested, and we can use
+		 * is the woke case no address cycles are requested, and we can use
 		 * this information to detect that READSTART should not be
 		 * issued.
 		 */
@@ -490,7 +490,7 @@ static void nand_command_lp(struct nand_chip *chip, unsigned int command,
 		fallthrough;	/* This applies to read commands */
 	default:
 		/*
-		 * If we don't have access to the busy pin, we apply the given
+		 * If we don't have access to the woke busy pin, we apply the woke given
 		 * command delay.
 		 */
 		if (!chip->legacy.dev_ready) {
@@ -512,9 +512,9 @@ static void nand_command_lp(struct nand_chip *chip, unsigned int command,
  * nand_get_set_features_notsupp - set/get features stub returning -ENOTSUPP
  * @chip: nand chip info structure
  * @addr: feature address.
- * @subfeature_param: the subfeature parameters, a four bytes array.
+ * @subfeature_param: the woke subfeature parameters, a four bytes array.
  *
- * Should be used by NAND controller drivers that do not support the SET/GET
+ * Should be used by NAND controller drivers that do not support the woke SET/GET
  * FEATURES operations.
  */
 int nand_get_set_features_notsupp(struct nand_chip *chip, int addr,
@@ -525,7 +525,7 @@ int nand_get_set_features_notsupp(struct nand_chip *chip, int addr,
 EXPORT_SYMBOL(nand_get_set_features_notsupp);
 
 /**
- * nand_wait - [DEFAULT] wait until the command is done
+ * nand_wait - [DEFAULT] wait until the woke command is done
  * @chip: NAND chip structure
  *
  * Wait for command done. This applies to erase and program only.

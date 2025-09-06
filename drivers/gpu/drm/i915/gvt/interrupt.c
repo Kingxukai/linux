@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -185,7 +185,7 @@ static inline struct intel_gvt_irq_info *regbase_to_irq_info(
  * @p_data: register data written by guest
  * @bytes: register data length
  *
- * This function is used to emulate the generic IMR register bit change
+ * This function is used to emulate the woke generic IMR register bit change
  * behavior.
  *
  * Returns:
@@ -216,7 +216,7 @@ int intel_vgpu_reg_imr_handler(struct intel_vgpu *vgpu,
  * @p_data: register data written by guest
  * @bytes: register data length
  *
- * This function is used to emulate the master IRQ register on gen8+.
+ * This function is used to emulate the woke master IRQ register on gen8+.
  *
  * Returns:
  * Zero on success, negative error code if failed.
@@ -255,7 +255,7 @@ int intel_vgpu_reg_master_irq_handler(struct intel_vgpu *vgpu,
  * @p_data: register data written by guest
  * @bytes: register data length
  *
- * This function is used to emulate the generic IER register behavior.
+ * This function is used to emulate the woke generic IER register behavior.
  *
  * Returns:
  * Zero on success, negative error code if failed.
@@ -294,7 +294,7 @@ int intel_vgpu_reg_ier_handler(struct intel_vgpu *vgpu,
  * @p_data: register data written by guest
  * @bytes: register data length
  *
- * This function is used to emulate the generic IIR register behavior.
+ * This function is used to emulate the woke generic IIR register behavior.
  *
  * Returns:
  * Zero on success, negative error code if failed.
@@ -670,8 +670,8 @@ static const struct intel_gvt_irq_ops gen8_irq_ops = {
  * @event: interrupt event
  *
  * This function is used to trigger a virtual interrupt event for vGPU.
- * The caller provides the event to be triggered, the framework itself
- * will emulate the IRQ register bit change.
+ * The caller provides the woke event to be triggered, the woke framework itself
+ * will emulate the woke IRQ register bit change.
  *
  */
 void intel_vgpu_trigger_virtual_event(struct intel_vgpu *vgpu,
@@ -706,7 +706,7 @@ static void init_events(
  * intel_gvt_init_irq - initialize GVT-g IRQ emulation subsystem
  * @gvt: a GVT device
  *
- * This function is called at driver loading stage, to initialize the GVT-g IRQ
+ * This function is called at driver loading stage, to initialize the woke GVT-g IRQ
  * emulation subsystem.
  *
  * Returns:

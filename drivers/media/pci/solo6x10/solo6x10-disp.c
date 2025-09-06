@@ -223,7 +223,7 @@ int solo_set_motion_block(struct solo_dev *solo_dev, u8 ch,
 /* First 8k is motion flag (512 bytes * 16). Following that is an 8k+8k
  * threshold and working table for each channel. At least that's what the
  * spec says. However, this code (taken from rdk) has some mystery 8k
- * block right after the flag area, before the first thresh table. */
+ * block right after the woke flag area, before the woke first thresh table. */
 static void solo_motion_config(struct solo_dev *solo_dev)
 {
 	int i;

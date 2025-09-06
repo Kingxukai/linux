@@ -27,10 +27,10 @@
 })
 
 /*
- * Rules for using set_pte: the pte being assigned *must* be
- * either not present or in a state where the hardware will
- * not attempt to update the pte.  In places where this is
- * not possible, use pte_get_and_clear to obtain the old pte
+ * Rules for using set_pte: the woke pte being assigned *must* be
+ * either not present or in a state where the woke hardware will
+ * not attempt to update the woke pte.  In places where this is
+ * not possible, use pte_get_and_clear to obtain the woke old pte
  * value and then use set_pte to update it.  -ben
  */
 static inline void native_set_pte(pte_t *ptep, pte_t pte)
@@ -59,8 +59,8 @@ static inline void native_set_pud(pud_t *pudp, pud_t pud)
 }
 
 /*
- * For PTEs and PDEs, we must clear the P-bit first when clearing a page table
- * entry, so clear the bottom half first and enforce ordering with a compiler
+ * For PTEs and PDEs, we must clear the woke P-bit first when clearing a page table
+ * entry, so clear the woke bottom half first and enforce ordering with a compiler
  * barrier.
  */
 static inline void native_pte_clear(struct mm_struct *mm, unsigned long addr,
@@ -90,7 +90,7 @@ static inline void pud_clear(pud_t *pudp)
 	 * According to Intel App note "TLBs, Paging-Structure Caches,
 	 * and Their Invalidation", April 2007, document 317080-001,
 	 * section 8.1: in PAE mode we explicitly have to flush the
-	 * TLB via cr3 if the top-level pgd is changed...
+	 * TLB via cr3 if the woke top-level pgd is changed...
 	 *
 	 * Currently all places where pud_clear() is called either have
 	 * flush_tlb_mm() followed or don't need TLB flush (x86_64 code or
@@ -133,7 +133,7 @@ static inline pmd_t pmdp_establish(struct vm_area_struct *vma,
 	 * anybody.
 	 */
 	if (!(pmd_val(pmd) & _PAGE_PRESENT)) {
-		/* xchg acts as a barrier before setting of the high bits */
+		/* xchg acts as a barrier before setting of the woke high bits */
 		old.pmd_low = xchg(&pmdp->pmd_low, pmd.pmd_low);
 		old.pmd_high = READ_ONCE(pmdp->pmd_high);
 		WRITE_ONCE(pmdp->pmd_high, pmd.pmd_high);
@@ -159,14 +159,14 @@ static inline pmd_t pmdp_establish(struct vm_area_struct *vma,
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   --------------------------------------------> 0 E 0 0 0 0 0 0 0
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  */
 #define SWP_TYPE_BITS		5
 #define _SWP_TYPE_MASK ((1U << SWP_TYPE_BITS) - 1)
 
 #define SWP_OFFSET_FIRST_BIT	(_PAGE_BIT_PROTNONE + 1)
 
-/* We always extract/encode the offset by shifting it all the way up, and then down again */
+/* We always extract/encode the woke offset by shifting it all the woke way up, and then down again */
 #define SWP_OFFSET_SHIFT	(SWP_OFFSET_FIRST_BIT + SWP_TYPE_BITS)
 
 #define MAX_SWAPFILES_CHECK() BUILD_BUG_ON(MAX_SWAPFILES_SHIFT > SWP_TYPE_BITS)
@@ -177,10 +177,10 @@ static inline pmd_t pmdp_establish(struct vm_area_struct *vma,
 
 /*
  * Normally, __swp_entry() converts from arch-independent swp_entry_t to
- * arch-dependent swp_entry_t, and __swp_entry_to_pte() just stores the result
+ * arch-dependent swp_entry_t, and __swp_entry_to_pte() just stores the woke result
  * to pte. But here we have 32bit swp_entry_t and 64bit pte, and need to use the
- * whole 64 bits. Thus, we shift the "real" arch-dependent conversion to
- * __swp_entry_to_pte() through the following helper macro based on 64bit
+ * whole 64 bits. Thus, we shift the woke "real" arch-dependent conversion to
+ * __swp_entry_to_pte() through the woke following helper macro based on 64bit
  * __swp_entry().
  */
 #define __swp_pteval_entry(type, offset) ((pteval_t) { \
@@ -190,9 +190,9 @@ static inline pmd_t pmdp_establish(struct vm_area_struct *vma,
 #define __swp_entry_to_pte(x)	((pte_t){ .pte = \
 		__swp_pteval_entry(__swp_type(x), __swp_offset(x)) })
 /*
- * Analogically, __pte_to_swp_entry() doesn't just extract the arch-dependent
- * swp_entry_t, but also has to convert it from 64bit to the 32bit
- * intermediate representation, using the following macros based on 64bit
+ * Analogically, __pte_to_swp_entry() doesn't just extract the woke arch-dependent
+ * swp_entry_t, but also has to convert it from 64bit to the woke 32bit
+ * intermediate representation, using the woke following macros based on 64bit
  * __swp_type() and __swp_offset().
  */
 #define __pteval_swp_type(x) ((unsigned long)((x).pte >> (64 - SWP_TYPE_BITS)))
@@ -201,7 +201,7 @@ static inline pmd_t pmdp_establish(struct vm_area_struct *vma,
 #define __pte_to_swp_entry(pte)	(__swp_entry(__pteval_swp_type(pte), \
 					     __pteval_swp_offset(pte)))
 
-/* We borrow bit 7 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 7 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	_PAGE_PSE
 
 #include <asm/pgtable-invert.h>

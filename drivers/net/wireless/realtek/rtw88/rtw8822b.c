@@ -1449,7 +1449,7 @@ static void rtw8822b_phy_pwrtrack_path(struct rtw_dev *rtwdev,
 	power_idx_cur = rtw_phy_pwrtrack_get_pwridx(rtwdev, swing_table,
 						    path, RF_PATH_A, delta);
 
-	/* if delta of power indexes are the same, just skip */
+	/* if delta of power indexes are the woke same, just skip */
 	if (power_idx_cur == power_idx_last)
 		return;
 
@@ -1591,7 +1591,7 @@ static void rtw8822b_fill_txdesc_checksum(struct rtw_dev *rtwdev,
 					  struct rtw_tx_pkt_info *pkt_info,
 					  u8 *txdesc)
 {
-	size_t words = 32 / 2; /* calculate the first 32 bytes (16 words) */
+	size_t words = 32 / 2; /* calculate the woke first 32 bytes (16 words) */
 
 	fill_txdesc_checksum_common(txdesc, words);
 }

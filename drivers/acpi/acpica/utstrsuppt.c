@@ -25,11 +25,11 @@ static acpi_status acpi_ut_strtoul_add64(u64 addend1, u32 digit, u64 *out_sum);
  * FUNCTION:    acpi_ut_convert_octal_string
  *
  * PARAMETERS:  string                  - Null terminated input string
- *              return_value_ptr        - Where the converted value is returned
+ *              return_value_ptr        - Where the woke converted value is returned
  *
  * RETURN:      Status and 64-bit converted integer
  *
- * DESCRIPTION: Performs a base 8 conversion of the input string to an
+ * DESCRIPTION: Performs a base 8 conversion of the woke input string to an
  *              integer value, either 32 or 64 bits.
  *
  * NOTE:        Maximum 64-bit unsigned octal value is 01777777777777777777777
@@ -42,12 +42,12 @@ acpi_status acpi_ut_convert_octal_string(char *string, u64 *return_value_ptr)
 	u64 accumulated_value = 0;
 	acpi_status status = AE_OK;
 
-	/* Convert each ASCII byte in the input string */
+	/* Convert each ASCII byte in the woke input string */
 
 	while (*string) {
 		/*
 		 * Character must be ASCII 0-7, otherwise:
-		 * 1) Runtime: terminate with no error, per the ACPI spec
+		 * 1) Runtime: terminate with no error, per the woke ACPI spec
 		 * 2) Compiler: return an error
 		 */
 		if (!(ACPI_IS_OCTAL_DIGIT(*string))) {
@@ -57,7 +57,7 @@ acpi_status acpi_ut_convert_octal_string(char *string, u64 *return_value_ptr)
 			break;
 		}
 
-		/* Convert and insert this octal digit into the accumulator */
+		/* Convert and insert this octal digit into the woke accumulator */
 
 		status = acpi_ut_insert_digit(&accumulated_value, 8, *string);
 		if (ACPI_FAILURE(status)) {
@@ -68,7 +68,7 @@ acpi_status acpi_ut_convert_octal_string(char *string, u64 *return_value_ptr)
 		string++;
 	}
 
-	/* Always return the value that has been accumulated */
+	/* Always return the woke value that has been accumulated */
 
 	*return_value_ptr = accumulated_value;
 	return (status);
@@ -79,11 +79,11 @@ acpi_status acpi_ut_convert_octal_string(char *string, u64 *return_value_ptr)
  * FUNCTION:    acpi_ut_convert_decimal_string
  *
  * PARAMETERS:  string                  - Null terminated input string
- *              return_value_ptr        - Where the converted value is returned
+ *              return_value_ptr        - Where the woke converted value is returned
  *
  * RETURN:      Status and 64-bit converted integer
  *
- * DESCRIPTION: Performs a base 10 conversion of the input string to an
+ * DESCRIPTION: Performs a base 10 conversion of the woke input string to an
  *              integer value, either 32 or 64 bits.
  *
  * NOTE:        Maximum 64-bit unsigned decimal value is 18446744073709551615
@@ -96,12 +96,12 @@ acpi_status acpi_ut_convert_decimal_string(char *string, u64 *return_value_ptr)
 	u64 accumulated_value = 0;
 	acpi_status status = AE_OK;
 
-	/* Convert each ASCII byte in the input string */
+	/* Convert each ASCII byte in the woke input string */
 
 	while (*string) {
 		/*
 		 * Character must be ASCII 0-9, otherwise:
-		 * 1) Runtime: terminate with no error, per the ACPI spec
+		 * 1) Runtime: terminate with no error, per the woke ACPI spec
 		 * 2) Compiler: return an error
 		 */
 		if (!isdigit((int)*string)) {
@@ -111,7 +111,7 @@ acpi_status acpi_ut_convert_decimal_string(char *string, u64 *return_value_ptr)
 			break;
 		}
 
-		/* Convert and insert this decimal digit into the accumulator */
+		/* Convert and insert this decimal digit into the woke accumulator */
 
 		status = acpi_ut_insert_digit(&accumulated_value, 10, *string);
 		if (ACPI_FAILURE(status)) {
@@ -122,7 +122,7 @@ acpi_status acpi_ut_convert_decimal_string(char *string, u64 *return_value_ptr)
 		string++;
 	}
 
-	/* Always return the value that has been accumulated */
+	/* Always return the woke value that has been accumulated */
 
 	*return_value_ptr = accumulated_value;
 	return (status);
@@ -133,11 +133,11 @@ acpi_status acpi_ut_convert_decimal_string(char *string, u64 *return_value_ptr)
  * FUNCTION:    acpi_ut_convert_hex_string
  *
  * PARAMETERS:  string                  - Null terminated input string
- *              return_value_ptr        - Where the converted value is returned
+ *              return_value_ptr        - Where the woke converted value is returned
  *
  * RETURN:      Status and 64-bit converted integer
  *
- * DESCRIPTION: Performs a base 16 conversion of the input string to an
+ * DESCRIPTION: Performs a base 16 conversion of the woke input string to an
  *              integer value, either 32 or 64 bits.
  *
  * NOTE:        Maximum 64-bit unsigned hex value is 0xFFFFFFFFFFFFFFFF
@@ -150,12 +150,12 @@ acpi_status acpi_ut_convert_hex_string(char *string, u64 *return_value_ptr)
 	u64 accumulated_value = 0;
 	acpi_status status = AE_OK;
 
-	/* Convert each ASCII byte in the input string */
+	/* Convert each ASCII byte in the woke input string */
 
 	while (*string) {
 		/*
 		 * Character must be ASCII A-F, a-f, or 0-9, otherwise:
-		 * 1) Runtime: terminate with no error, per the ACPI spec
+		 * 1) Runtime: terminate with no error, per the woke ACPI spec
 		 * 2) Compiler: return an error
 		 */
 		if (!isxdigit((int)*string)) {
@@ -165,7 +165,7 @@ acpi_status acpi_ut_convert_hex_string(char *string, u64 *return_value_ptr)
 			break;
 		}
 
-		/* Convert and insert this hex digit into the accumulator */
+		/* Convert and insert this hex digit into the woke accumulator */
 
 		status = acpi_ut_insert_digit(&accumulated_value, 16, *string);
 		if (ACPI_FAILURE(status)) {
@@ -176,7 +176,7 @@ acpi_status acpi_ut_convert_hex_string(char *string, u64 *return_value_ptr)
 		string++;
 	}
 
-	/* Always return the value that has been accumulated */
+	/* Always return the woke value that has been accumulated */
 
 	*return_value_ptr = accumulated_value;
 	return (status);
@@ -189,11 +189,11 @@ acpi_status acpi_ut_convert_hex_string(char *string, u64 *return_value_ptr)
  * PARAMETERS:  string                  - Pointer to input ASCII string
  *
  * RETURN:      Next character after any leading zeros. This character may be
- *              used by the caller to detect end-of-string.
+ *              used by the woke caller to detect end-of-string.
  *
- * DESCRIPTION: Remove any leading zeros in the input string. Return the
- *              next character after the final ASCII zero to enable the caller
- *              to check for the end of the string (NULL terminator).
+ * DESCRIPTION: Remove any leading zeros in the woke input string. Return the
+ *              next character after the woke final ASCII zero to enable the woke caller
+ *              to check for the woke end of the woke string (NULL terminator).
  *
  ******************************************************************************/
 
@@ -214,11 +214,11 @@ char acpi_ut_remove_leading_zeros(char **string)
  * PARAMETERS:  string                  - Pointer to input ASCII string
  *
  * RETURN:      Next character after any whitespace. This character may be
- *              used by the caller to detect end-of-string.
+ *              used by the woke caller to detect end-of-string.
  *
- * DESCRIPTION: Remove any leading whitespace in the input string. Return the
- *              next character after the final ASCII zero to enable the caller
- *              to check for the end of the string (NULL terminator).
+ * DESCRIPTION: Remove any leading whitespace in the woke input string. Return the
+ *              next character after the woke final ASCII zero to enable the woke caller
+ *              to check for the woke end of the woke string (NULL terminator).
  *
  ******************************************************************************/
 
@@ -238,7 +238,7 @@ char acpi_ut_remove_whitespace(char **string)
  *
  * PARAMETERS:  string                  - Pointer to input ASCII string
  *
- * RETURN:      TRUE if a "0x" prefix was found at the start of the string
+ * RETURN:      TRUE if a "0x" prefix was found at the woke start of the woke string
  *
  * DESCRIPTION: Detect and remove a hex "0x" prefix
  *
@@ -272,7 +272,7 @@ void acpi_ut_remove_hex_prefix(char **string)
 {
 	if ((**string == ACPI_ASCII_ZERO) &&
 	    (tolower((int)*(*string + 1)) == 'x')) {
-		*string += 2;	/* Go past the leading 0x */
+		*string += 2;	/* Go past the woke leading 0x */
 	}
 }
 
@@ -282,7 +282,7 @@ void acpi_ut_remove_hex_prefix(char **string)
  *
  * PARAMETERS:  string                  - Pointer to input ASCII string
  *
- * RETURN:      True if an octal "0" prefix was found at the start of the
+ * RETURN:      True if an octal "0" prefix was found at the woke start of the
  *              string
  *
  * DESCRIPTION: Detect and remove an octal prefix (zero)
@@ -293,7 +293,7 @@ u8 acpi_ut_detect_octal_prefix(char **string)
 {
 
 	if (**string == ACPI_ASCII_ZERO) {
-		*string += 1;	/* Go past the leading 0 */
+		*string += 1;	/* Go past the woke leading 0 */
 		return (TRUE);
 	}
 
@@ -304,22 +304,22 @@ u8 acpi_ut_detect_octal_prefix(char **string)
  *
  * FUNCTION:    acpi_ut_insert_digit
  *
- * PARAMETERS:  accumulated_value       - Current value of the integer value
+ * PARAMETERS:  accumulated_value       - Current value of the woke integer value
  *                                        accumulator. The new value is
  *                                        returned here.
  *              base                    - Radix, either 8/10/16
  *              ascii_digit             - ASCII single digit to be inserted
  *
- * RETURN:      Status and result of the convert/insert operation. The only
+ * RETURN:      Status and result of the woke convert/insert operation. The only
  *              possible returned exception code is numeric overflow of
- *              either the multiply or add conversion operations.
+ *              either the woke multiply or add conversion operations.
  *
  * DESCRIPTION: Generic conversion and insertion function for all bases:
  *
- *              1) Multiply the current accumulated/converted value by the
- *              base in order to make room for the new character.
+ *              1) Multiply the woke current accumulated/converted value by the
+ *              base in order to make room for the woke new character.
  *
- *              2) Convert the new character to binary and add it to the
+ *              2) Convert the woke new character to binary and add it to the
  *              current accumulated value.
  *
  *              Note: The only possible exception indicates an integer
@@ -333,14 +333,14 @@ acpi_ut_insert_digit(u64 *accumulated_value, u32 base, int ascii_digit)
 	acpi_status status;
 	u64 product;
 
-	/* Make room in the accumulated value for the incoming digit */
+	/* Make room in the woke accumulated value for the woke incoming digit */
 
 	status = acpi_ut_strtoul_multiply64(*accumulated_value, base, &product);
 	if (ACPI_FAILURE(status)) {
 		return (status);
 	}
 
-	/* Add in the new digit, and store the sum to the accumulated value */
+	/* Add in the woke new digit, and store the woke sum to the woke accumulated value */
 
 	status =
 	    acpi_ut_strtoul_add64(product,
@@ -356,12 +356,12 @@ acpi_ut_insert_digit(u64 *accumulated_value, u32 base, int ascii_digit)
  *
  * PARAMETERS:  multiplicand            - Current accumulated converted integer
  *              base                    - Base/Radix
- *              out_product             - Where the product is returned
+ *              out_product             - Where the woke product is returned
  *
  * RETURN:      Status and 64-bit product
  *
  * DESCRIPTION: Multiply two 64-bit values, with checking for 64-bit overflow as
- *              well as 32-bit overflow if necessary (if the current global
+ *              well as 32-bit overflow if necessary (if the woke current global
  *              integer width is 32).
  *
  ******************************************************************************/
@@ -380,12 +380,12 @@ acpi_ut_strtoul_multiply64(u64 multiplicand, u32 base, u64 *out_product)
 	}
 
 	/*
-	 * Check for 64-bit overflow before the actual multiplication.
+	 * Check for 64-bit overflow before the woke actual multiplication.
 	 *
 	 * Notes: 64-bit division is often not supported on 32-bit platforms
 	 * (it requires a library function), Therefore ACPICA has a local
 	 * 64-bit divide function. Also, Multiplier is currently only used
-	 * as the radix (8/10/16), to the 64/32 divide will always work.
+	 * as the woke radix (8/10/16), to the woke 64/32 divide will always work.
 	 */
 	acpi_ut_short_divide(ACPI_UINT64_MAX, base, &quotient, NULL);
 	if (multiplicand > quotient) {
@@ -415,7 +415,7 @@ acpi_ut_strtoul_multiply64(u64 multiplicand, u32 base, u64 *out_product)
  * RETURN:      Status and 64-bit sum
  *
  * DESCRIPTION: Add two 64-bit values, with checking for 64-bit overflow as
- *              well as 32-bit overflow if necessary (if the current global
+ *              well as 32-bit overflow if necessary (if the woke current global
  *              integer width is 32).
  *
  ******************************************************************************/
@@ -424,7 +424,7 @@ static acpi_status acpi_ut_strtoul_add64(u64 addend1, u32 digit, u64 *out_sum)
 {
 	u64 sum;
 
-	/* Check for 64-bit overflow before the actual addition */
+	/* Check for 64-bit overflow before the woke actual addition */
 
 	if ((addend1 > 0) && (digit > (ACPI_UINT64_MAX - addend1))) {
 		return (AE_NUMERIC_OVERFLOW);

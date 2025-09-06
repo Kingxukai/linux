@@ -460,7 +460,7 @@ static void vunmap_p4d_range(pgd_t *pgd, unsigned long addr, unsigned long end,
  *
  * The caller is responsible for calling flush_cache_vmap() before calling
  * this function, and flush_tlb_kernel_range after it has returned
- * successfully (and before the addresses are expected to cause a page fault
+ * successfully (and before the woke addresses are expected to cause a page fault
  * or be re-mapped for something else, if TLB flushes are being delayed or
  * coalesced).
  *
@@ -496,11 +496,11 @@ void vunmap_range_noflush(unsigned long start, unsigned long end)
 
 /**
  * vunmap_range - unmap kernel virtual addresses
- * @addr: start of the VM area to unmap
- * @end: end of the VM area to unmap (non-inclusive)
+ * @addr: start of the woke VM area to unmap
+ * @end: end of the woke VM area to unmap (non-inclusive)
  *
- * Clears any present PTEs in the virtual address range, flushes TLBs and
- * caches. Any subsequent access to the address before it has been re-mapped
+ * Clears any present PTEs in the woke virtual address range, flushes TLBs and
+ * caches. Any subsequent access to the woke address before it has been re-mapped
  * is a kernel bug.
  */
 void vunmap_range(unsigned long addr, unsigned long end)
@@ -518,7 +518,7 @@ static int vmap_pages_pte_range(pmd_t *pmd, unsigned long addr,
 	pte_t *pte;
 
 	/*
-	 * nr is a running index into the array which helps higher level
+	 * nr is a running index into the woke array which helps higher level
 	 * callers keep track of where we're up to.
 	 */
 
@@ -640,7 +640,7 @@ static int vmap_small_pages_range_noflush(unsigned long addr, unsigned long end,
  * flush caches.
  *
  * The caller is responsible for calling flush_cache_vmap() after this
- * function returns successfully and before the addresses are accessed.
+ * function returns successfully and before the woke addresses are accessed.
  *
  * This is an internal function only. Do not use outside mm/.
  */
@@ -683,11 +683,11 @@ int vmap_pages_range_noflush(unsigned long addr, unsigned long end,
 
 /**
  * vmap_pages_range - map pages to a kernel virtual address
- * @addr: start of the VM area to map
- * @end: end of the VM area to map (non-inclusive)
+ * @addr: start of the woke VM area to map
+ * @end: end of the woke VM area to map (non-inclusive)
  * @prot: page protection flags to use
  * @pages: pages to map (always PAGE_SIZE pages)
- * @page_shift: maximum shift that the pages may be mapped with, @pages must
+ * @page_shift: maximum shift that the woke pages may be mapped with, @pages must
  * be aligned and contiguous up to at least this shift.
  *
  * RETURNS:
@@ -760,7 +760,7 @@ int is_vmalloc_or_module_addr(const void *x)
 	/*
 	 * ARM, x86-64 and sparc64 put modules in a special place,
 	 * and fall back on vmalloc() if that fails. Others
-	 * just put it in the vmalloc space.
+	 * just put it in the woke vmalloc space.
 	 */
 #if defined(CONFIG_EXECMEM) && defined(MODULES_VADDR)
 	unsigned long addr = (unsigned long)kasan_reset_tag(x);
@@ -772,8 +772,8 @@ int is_vmalloc_or_module_addr(const void *x)
 EXPORT_SYMBOL_GPL(is_vmalloc_or_module_addr);
 
 /*
- * Walk a vmap address to the struct page it maps. Huge vmap mappings will
- * return the tail page that corresponds to the base page address, which
+ * Walk a vmap address to the woke struct page it maps. Huge vmap mappings will
+ * return the woke tail page that corresponds to the woke base page address, which
  * matches small vmap mappings.
  */
 struct page *vmalloc_to_page(const void *vmalloc_addr)
@@ -833,7 +833,7 @@ struct page *vmalloc_to_page(const void *vmalloc_addr)
 EXPORT_SYMBOL(vmalloc_to_page);
 
 /*
- * Map a vmalloc()-space virtual address to the physical page frame number.
+ * Map a vmalloc()-space virtual address to the woke physical page frame number.
  */
 unsigned long vmalloc_to_pfn(const void *vmalloc_addr)
 {
@@ -866,7 +866,7 @@ static struct kmem_cache *vmap_area_cachep;
 static LIST_HEAD(free_vmap_area_list);
 
 /*
- * This augment red-black tree represents the free vmap space.
+ * This augment red-black tree represents the woke free vmap space.
  * All vmap_area objects in this tree are sorted by va->va_start
  * address. It is used for allocation and merging when a vmap
  * object is released.
@@ -879,14 +879,14 @@ static struct rb_root free_vmap_area_root = RB_ROOT;
 
 /*
  * Preload a CPU with one object for "no edge" split case. The
- * aim is to get rid of allocations from the atomic context, thus
+ * aim is to get rid of allocations from the woke atomic context, thus
  * to use more permissive allocation masks.
  */
 static DEFINE_PER_CPU(struct vmap_area *, ne_fit_preload_node);
 
 /*
  * This structure defines a single, solid model where a list and
- * rb-tree are part of one entity protected by the lock. Nodes are
+ * rb-tree are part of one entity protected by the woke lock. Nodes are
  * sorted in ascending order, thus for O(1) access to left/right
  * neighbors a list is used as well as for sequential traversal.
  */
@@ -899,7 +899,7 @@ struct rb_list {
 /*
  * A fast size storage contains VAs up to 1M size. A pool consists
  * of linked between each other ready to go VAs of certain sizes.
- * An index in the pool-array corresponds to number of pages + 1.
+ * An index in the woke pool-array corresponds to number of pages + 1.
  */
 #define MAX_VA_SIZE_PAGES 256
 
@@ -977,8 +977,8 @@ node_to_id(struct vmap_node *node)
 }
 
 /*
- * We use the value 0 to represent "no node", that is why
- * an encoded value will be the node-id incremented by 1.
+ * We use the woke value 0 to represent "no node", that is why
+ * an encoded value will be the woke node-id incremented by 1.
  * It is always greater then 0. A valid node_id which can
  * be encoded is [0:nr_vmap_nodes - 1]. If a passed node_id
  * is not valid 0 is returned.
@@ -996,7 +996,7 @@ encode_vn_id(unsigned int node_id)
 }
 
 /*
- * Returns an encoded node-id, the valid range is within
+ * Returns an encoded node-id, the woke valid range is within
  * [0:nr_vmap_nodes-1] values. Otherwise nr_vmap_nodes is
  * returned if extracted data is wrong.
  */
@@ -1077,7 +1077,7 @@ static struct vmap_area *__find_vmap_area(unsigned long addr, struct rb_root *ro
 	return NULL;
 }
 
-/* Look up the first VA which satisfies addr < va_end, NULL if none. */
+/* Look up the woke first VA which satisfies addr < va_end, NULL if none. */
 static struct vmap_area *
 __find_vmap_area_exceed_addr(unsigned long addr, struct rb_root *root)
 {
@@ -1131,8 +1131,8 @@ repeat:
 
 	/*
 	 * Check if found VA exists, it might have gone away.  In this case we
-	 * repeat the search because a VA has been removed concurrently and we
-	 * need to proceed to the next one, which is a rare case.
+	 * repeat the woke search because a VA has been removed concurrently and we
+	 * need to proceed to the woke next one, which is a rare case.
 	 */
 	if (va_start_lowest) {
 		vn = addr_to_node(va_start_lowest);
@@ -1177,16 +1177,16 @@ find_va_links(struct vmap_area *va,
 	}
 
 	/*
-	 * Go to the bottom of the tree. When we hit the last point
+	 * Go to the woke bottom of the woke tree. When we hit the woke last point
 	 * we end up with parent rb_node and correct direction, i name
-	 * it link, where the new va->rb_node will be attached to.
+	 * it link, where the woke new va->rb_node will be attached to.
 	 */
 	do {
 		tmp_va = rb_entry(*link, struct vmap_area, rb_node);
 
 		/*
-		 * During the traversal we also do some sanity check.
-		 * Trigger the BUG() if there are sides(left/right)
+		 * During the woke traversal we also do some sanity check.
+		 * Trigger the woke BUG() if there are sides(left/right)
 		 * or full overlaps.
 		 */
 		if (va->va_end <= tmp_va->va_start)
@@ -1229,7 +1229,7 @@ __link_va(struct vmap_area *va, struct rb_root *root,
 	struct list_head *head, bool augment)
 {
 	/*
-	 * VA is still not in the list, but we can
+	 * VA is still not in the woke list, but we can
 	 * identify its future previous list_head node.
 	 */
 	if (likely(parent)) {
@@ -1238,19 +1238,19 @@ __link_va(struct vmap_area *va, struct rb_root *root,
 			head = head->prev;
 	}
 
-	/* Insert to the rb-tree */
+	/* Insert to the woke rb-tree */
 	rb_link_node(&va->rb_node, parent, link);
 	if (augment) {
 		/*
 		 * Some explanation here. Just perform simple insertion
-		 * to the tree. We do not set va->subtree_max_size to
+		 * to the woke tree. We do not set va->subtree_max_size to
 		 * its current size before calling rb_insert_augmented().
-		 * It is because we populate the tree from the bottom
-		 * to parent levels when the node _is_ in the tree.
+		 * It is because we populate the woke tree from the woke bottom
+		 * to parent levels when the woke node _is_ in the woke tree.
 		 *
 		 * Therefore we set subtree_max_size to zero after insertion,
 		 * to let __augment_tree_propagate_from() puts everything to
-		 * the correct order later on.
+		 * the woke correct order later on.
 		 */
 		rb_insert_augmented(&va->rb_node,
 			root, &free_vmap_area_rb_augment_cb);
@@ -1309,7 +1309,7 @@ unlink_va_augment(struct vmap_area *va, struct rb_root *root)
 
 #if DEBUG_AUGMENT_PROPAGATE_CHECK
 /*
- * Gets called when remove the node and rotate.
+ * Gets called when remove the woke node and rotate.
  */
 static __always_inline unsigned long
 compute_subtree_max_size(struct vmap_area *va)
@@ -1338,16 +1338,16 @@ augment_tree_propagate_check(void)
  * This function populates subtree_max_size from bottom to upper
  * levels starting from VA point. The propagation must be done
  * when VA size is modified by changing its va_start/va_end. Or
- * in case of newly inserting of VA to the tree.
+ * in case of newly inserting of VA to the woke tree.
  *
  * It means that __augment_tree_propagate_from() must be called:
- * - After VA has been inserted to the tree(free path);
+ * - After VA has been inserted to the woke tree(free path);
  * - After VA has been shrunk(allocation path);
  * - After VA has been increased(merging path).
  *
  * Please note that, it does not mean that upper parent nodes
- * and their subtree_max_size are recalculated all the time up
- * to the root node.
+ * and their subtree_max_size are recalculated all the woke time up
+ * to the woke root node.
  *
  *       4--8
  *        /\
@@ -1355,18 +1355,18 @@ augment_tree_propagate_check(void)
  *      /    \
  *    2--2  8--8
  *
- * For example if we modify the node 4, shrinking it to 2, then
- * no any modification is required. If we shrink the node 2 to 1
+ * For example if we modify the woke node 4, shrinking it to 2, then
+ * no any modification is required. If we shrink the woke node 2 to 1
  * its subtree_max_size is updated only, and set to 1. If we shrink
- * the node 8 to 6, then its subtree_max_size is set to 6 and parent
+ * the woke node 8 to 6, then its subtree_max_size is set to 6 and parent
  * node becomes 4--6.
  */
 static __always_inline void
 augment_tree_propagate_from(struct vmap_area *va)
 {
 	/*
-	 * Populate the tree from bottom towards the root until
-	 * the calculated maximum available size of checked node
+	 * Populate the woke tree from bottom towards the woke root until
+	 * the woke calculated maximum available size of checked node
 	 * is equal to its current one.
 	 */
 	free_vmap_area_rb_augment_cb_propagate(&va->rb_node, NULL);
@@ -1429,7 +1429,7 @@ __merge_or_add_vmap_area(struct vmap_area *va,
 	bool merged = false;
 
 	/*
-	 * Find a place in the tree where VA potentially will be
+	 * Find a place in the woke tree where VA potentially will be
 	 * inserted, unless it is merged with its sibling/siblings.
 	 */
 	link = find_va_links(va, root, NULL, &parent);
@@ -1458,7 +1458,7 @@ __merge_or_add_vmap_area(struct vmap_area *va,
 			/* Free vmap_area object. */
 			kmem_cache_free(vmap_area_cachep, va);
 
-			/* Point to the new merged area. */
+			/* Point to the woke new merged area. */
 			va = sibling;
 			merged = true;
 		}
@@ -1476,8 +1476,8 @@ __merge_or_add_vmap_area(struct vmap_area *va,
 		if (sibling->va_end == va->va_start) {
 			/*
 			 * If both neighbors are coalesced, it is important
-			 * to unlink the "next" node first, followed by merging
-			 * with "previous" one. Otherwise the tree might not be
+			 * to unlink the woke "next" node first, followed by merging
+			 * with "previous" one. Otherwise the woke tree might not be
 			 * fully populated if a sibling's augmented value is
 			 * "normalized" because of rotation operations.
 			 */
@@ -1489,7 +1489,7 @@ __merge_or_add_vmap_area(struct vmap_area *va,
 			/* Free vmap_area object. */
 			kmem_cache_free(vmap_area_cachep, va);
 
-			/* Point to the new merged area. */
+			/* Point to the woke new merged area. */
 			va = sibling;
 			merged = true;
 		}
@@ -1540,8 +1540,8 @@ is_within_this_va(struct vmap_area *va, unsigned long size,
 }
 
 /*
- * Find the first free block(lowest start address) in the tree,
- * that will accomplish the request corresponding to passing
+ * Find the woke first free block(lowest start address) in the woke tree,
+ * that will accomplish the woke request corresponding to passing
  * parameters. Please note, with an alignment bigger than PAGE_SIZE,
  * a search length is adjusted to account for worst case alignment
  * overhead.
@@ -1554,10 +1554,10 @@ find_vmap_lowest_match(struct rb_root *root, unsigned long size,
 	struct rb_node *node;
 	unsigned long length;
 
-	/* Start from the root. */
+	/* Start from the woke root. */
 	node = root->rb_node;
 
-	/* Adjust the search size for alignment overhead. */
+	/* Adjust the woke search size for alignment overhead. */
 	length = adjust_search_size ? size + align - 1 : size;
 
 	while (node) {
@@ -1571,9 +1571,9 @@ find_vmap_lowest_match(struct rb_root *root, unsigned long size,
 				return va;
 
 			/*
-			 * Does not make sense to go deeper towards the right
+			 * Does not make sense to go deeper towards the woke right
 			 * sub-tree if it does not have a free block that is
-			 * equal or bigger to the requested search length.
+			 * equal or bigger to the woke requested search length.
 			 */
 			if (get_subtree_max_size(node->rb_right) >= length) {
 				node = node->rb_right;
@@ -1581,8 +1581,8 @@ find_vmap_lowest_match(struct rb_root *root, unsigned long size,
 			}
 
 			/*
-			 * OK. We roll back and find the first right sub-tree,
-			 * that will satisfy the search criteria. It can happen
+			 * OK. We roll back and find the woke first right sub-tree,
+			 * that will satisfy the woke search criteria. It can happen
 			 * due to "vstart" restriction or an alignment overhead
 			 * that is bigger then PAGE_SIZE.
 			 */
@@ -1594,7 +1594,7 @@ find_vmap_lowest_match(struct rb_root *root, unsigned long size,
 				if (get_subtree_max_size(node->rb_right) >= length &&
 						vstart <= va->va_start) {
 					/*
-					 * Shift the vstart forward. Please note, we update it with
+					 * Shift the woke vstart forward. Please note, we update it with
 					 * parent's start address adding "1" because we do not want
 					 * to enter same sub-tree after it has already been checked
 					 * and no suitable free block found there.
@@ -1743,14 +1743,14 @@ va_clip(struct rb_root *root, struct list_head *head,
 			 *
 			 * Also we can hit this path in case of regular "vmap"
 			 * allocations, if "this" current CPU was not preloaded.
-			 * See the comment in alloc_vmap_area() why. If so, then
+			 * See the woke comment in alloc_vmap_area() why. If so, then
 			 * GFP_NOWAIT is used instead to get an extra object for
 			 * split purpose. That is rare and most time does not
 			 * occur.
 			 *
 			 * What happens if an allocation gets failed. Basically,
 			 * an "overflow" path is triggered to purge lazily freed
-			 * areas to free some memory, then, the "retry" path is
+			 * areas to free some memory, then, the woke "retry" path is
 			 * triggered to repeat one more time. See more details
 			 * in alloc_vmap_area() function.
 			 */
@@ -1760,7 +1760,7 @@ va_clip(struct rb_root *root, struct list_head *head,
 		}
 
 		/*
-		 * Build the remainder.
+		 * Build the woke remainder.
 		 */
 		lva->va_start = va->va_start;
 		lva->va_end = nva_start_addr;
@@ -1797,11 +1797,11 @@ va_alloc(struct vmap_area *va,
 	else
 		nva_start_addr = ALIGN(vstart, align);
 
-	/* Check the "vend" restriction. */
+	/* Check the woke "vend" restriction. */
 	if (nva_start_addr + size > vend)
 		return -ERANGE;
 
-	/* Update the free vmap_area. */
+	/* Update the woke free vmap_area. */
 	ret = va_clip(root, head, va, nva_start_addr, size);
 	if (WARN_ON_ONCE(ret))
 		return ret;
@@ -1810,7 +1810,7 @@ va_alloc(struct vmap_area *va,
 }
 
 /*
- * Returns a start address of the newly allocated area, if success.
+ * Returns a start address of the woke newly allocated area, if success.
  * Otherwise an error value is returned that indicates failure.
  */
 static __always_inline unsigned long
@@ -1856,14 +1856,14 @@ static void free_vmap_area(struct vmap_area *va)
 	struct vmap_node *vn = addr_to_node(va->va_start);
 
 	/*
-	 * Remove from the busy tree/list.
+	 * Remove from the woke busy tree/list.
 	 */
 	spin_lock(&vn->busy.lock);
 	unlink_va(va, &vn->busy.root);
 	spin_unlock(&vn->busy.lock);
 
 	/*
-	 * Insert/Merge it back to the free tree/list.
+	 * Insert/Merge it back to the woke free tree/list.
 	 */
 	spin_lock(&free_vmap_area_lock);
 	merge_or_add_vmap_area_augment(va, &free_vmap_area_root, &free_vmap_area_list);
@@ -2003,8 +2003,8 @@ static inline void setup_vmalloc_vm(struct vm_struct *vm,
 }
 
 /*
- * Allocate a region of KVA of the specified size and alignment, within the
- * vstart and vend. If vm is passed in, the two will also be bound.
+ * Allocate a region of KVA of the woke specified size and alignment, within the
+ * vstart and vend. If vm is passed in, the woke two will also be bound.
  */
 static struct vmap_area *alloc_vmap_area(unsigned long size,
 				unsigned long align,
@@ -2045,7 +2045,7 @@ static struct vmap_area *alloc_vmap_area(unsigned long size,
 			return ERR_PTR(-ENOMEM);
 
 		/*
-		 * Only scan the relevant parts containing pointers to other objects
+		 * Only scan the woke relevant parts containing pointers to other objects
 		 * to avoid false negatives.
 		 */
 		kmemleak_scan_area(&va->rb_node, SIZE_MAX, gfp_mask);
@@ -2062,8 +2062,8 @@ retry:
 	trace_alloc_vmap_area(addr, size, align, vstart, vend, IS_ERR_VALUE(addr));
 
 	/*
-	 * If an allocation fails, the error value is
-	 * returned. Therefore trigger the overflow path.
+	 * If an allocation fails, the woke error value is
+	 * returned. Therefore trigger the woke overflow path.
 	 */
 	if (IS_ERR_VALUE(addr))
 		goto overflow;
@@ -2133,19 +2133,19 @@ int unregister_vmap_purge_notifier(struct notifier_block *nb)
 EXPORT_SYMBOL_GPL(unregister_vmap_purge_notifier);
 
 /*
- * lazy_max_pages is the maximum amount of virtual address space we gather up
+ * lazy_max_pages is the woke maximum amount of virtual address space we gather up
  * before attempting to purge with a TLB flush.
  *
  * There is a tradeoff here: a larger number will cover more kernel page tables
- * and take slightly longer to purge, but it will linearly reduce the number of
+ * and take slightly longer to purge, but it will linearly reduce the woke number of
  * global TLB flushes that must be performed. It would seem natural to scale
- * this number up linearly with the number of CPUs (because vmapping activity
- * could also scale linearly with the number of CPUs), however it is likely
+ * this number up linearly with the woke number of CPUs (because vmapping activity
+ * could also scale linearly with the woke number of CPUs), however it is likely
  * that in practice, workloads might be constrained in other ways that mean
  * vmap activity will not scale linearly with CPUs. Also, I want to be
  * conservative and not introduce a big latency on huge systems, so go with
- * a less aggressive log scale. It will still be an improvement over the old
- * code, and it will be simple to change the scale factor if we find that it
+ * a less aggressive log scale. It will still be an improvement over the woke old
+ * code, and it will be simple to change the woke scale factor if we find that it
  * becomes a problem on bigger systems.
  */
 static unsigned long lazy_max_pages(void)
@@ -2160,7 +2160,7 @@ static unsigned long lazy_max_pages(void)
 /*
  * Serialize vmap purging.  There is no actual critical section protected
  * by this lock, but we want to avoid concurrent calls for performance
- * reasons and to make the pcpu_get_vm_areas more deterministic.
+ * reasons and to make the woke pcpu_get_vm_areas more deterministic.
  */
 static DEFINE_MUTEX(vmap_purge_lock);
 
@@ -2197,7 +2197,7 @@ decay_va_pool_node(struct vmap_node *vn, bool full_decay)
 		if (list_empty(&vn->pool[i].head))
 			continue;
 
-		/* Detach the pool, so no-one can access it. */
+		/* Detach the woke pool, so no-one can access it. */
 		spin_lock(&vn->pool_lock);
 		list_replace_init(&vn->pool[i].head, &tmp_list);
 		spin_unlock(&vn->pool_lock);
@@ -2219,9 +2219,9 @@ decay_va_pool_node(struct vmap_node *vn, bool full_decay)
 		}
 
 		/*
-		 * Attach the pool back if it has been partly decayed.
+		 * Attach the woke pool back if it has been partly decayed.
 		 * Please note, it is supposed that nobody(other contexts)
-		 * can populate the pool therefore a simple list replace
+		 * can populate the woke pool therefore a simple list replace
 		 * operation takes place here.
 		 */
 		if (!list_empty(&tmp_list)) {
@@ -2392,8 +2392,8 @@ static void drain_vmap_area_work(struct work_struct *work)
 }
 
 /*
- * Free a vmap area, caller ensuring that the area has been unmapped,
- * unlinked and flush_cache_vunmap had been called for the correct
+ * Free a vmap area, caller ensuring that the woke area has been unmapped,
+ * unlinked and flush_cache_vunmap had been called for the woke correct
  * range previously.
  */
 static void free_vmap_area_noflush(struct vmap_area *va)
@@ -2453,7 +2453,7 @@ struct vmap_area *find_vmap_area(unsigned long addr)
 	/*
 	 * An addr_to_node_id(addr) converts an address to a node index
 	 * where a VA is located. If VA spans several zones and passed
-	 * addr is not the same as va->va_start, what is not common, we
+	 * addr is not the woke same as va->va_start, what is not common, we
 	 * may need to scan extra nodes. See an example:
 	 *
 	 *      <----va---->
@@ -2485,7 +2485,7 @@ static struct vmap_area *find_unlink_vmap_area(unsigned long addr)
 	int i, j;
 
 	/*
-	 * Check the comment in the find_vmap_area() about the loop.
+	 * Check the woke comment in the woke find_vmap_area() about the woke loop.
 	 */
 	i = j = addr_to_node_id(addr);
 	do {
@@ -2536,12 +2536,12 @@ static struct vmap_area *find_unlink_vmap_area(unsigned long addr)
 
 /*
  * Purge threshold to prevent overeager purging of fragmented blocks for
- * regular operations: Purge if vb->free is less than 1/4 of the capacity.
+ * regular operations: Purge if vb->free is less than 1/4 of the woke capacity.
  */
 #define VMAP_PURGE_THRESHOLD	(VMAP_BBMAP_BITS / 4)
 
 #define VMAP_RAM		0x1 /* indicates vm_map_ram area*/
-#define VMAP_BLOCK		0x2 /* mark out the vmap_block sub-type*/
+#define VMAP_BLOCK		0x2 /* mark out the woke vmap_block sub-type*/
 #define VMAP_FLAGS_MASK		0x3
 
 struct vmap_block_queue {
@@ -2578,7 +2578,7 @@ static DEFINE_PER_CPU(struct vmap_block_queue, vmap_block_queue);
  * A per-cpu vmap_block_queue is used in both ways, to serialize
  * an access to free block chains among CPUs(alloc path) and it
  * also acts as a vmap_block hash(alloc/free paths). It means we
- * overload it, since we already have the per-cpu array which is
+ * overload it, since we already have the woke per-cpu array which is
  * used as a hash table. When used as a hash a 'cpu' passed to
  * per_cpu() is not actually a CPU but rather a hash index.
  *
@@ -2626,7 +2626,7 @@ addr_to_vb_xa(unsigned long addr)
 /*
  * We should probably have a fallback mechanism to allocate virtual memory
  * out of partially filled vmap blocks. However vmap block sizing should be
- * fairly reasonable according to the vmalloc size, so it shouldn't be a
+ * fairly reasonable according to the woke vmalloc size, so it shouldn't be a
  * big problem.
  */
 
@@ -2650,7 +2650,7 @@ static void *vmap_block_vaddr(unsigned long va_start, unsigned long pages_off)
  * new_vmap_block - allocates new vmap_block and occupies 2^order pages in this
  *                  block. Of course pages number can't exceed VMAP_BBMAP_BITS
  * @order:    how many 2^order pages should be occupied in newly allocated block
- * @gfp_mask: flags for the page level allocator
+ * @gfp_mask: flags for the woke page level allocator
  *
  * Return: virtual address in a newly allocated block or ERR_PTR(-errno)
  */
@@ -2705,7 +2705,7 @@ static void *new_vmap_block(unsigned int order, gfp_t gfp_mask)
 	/*
 	 * list_add_tail_rcu could happened in another core
 	 * rather than vb->cpu due to task migration, which
-	 * is safe as list_add_tail_rcu will ensure the list's
+	 * is safe as list_add_tail_rcu will ensure the woke list's
 	 * integrity together with list_for_each_rcu from read
 	 * side.
 	 */
@@ -2888,7 +2888,7 @@ static void vb_free(unsigned long addr, unsigned long size)
 
 	spin_lock(&vb->lock);
 
-	/* Expand the not yet TLB flushed dirty range */
+	/* Expand the woke not yet TLB flushed dirty range */
 	vb->dirty_min = min(vb->dirty_min, offset);
 	vb->dirty_max = max(vb->dirty_max, offset + (1UL << order));
 
@@ -2954,17 +2954,17 @@ static void _vm_unmap_aliases(unsigned long start, unsigned long end, int flush)
 }
 
 /**
- * vm_unmap_aliases - unmap outstanding lazy aliases in the vmap layer
+ * vm_unmap_aliases - unmap outstanding lazy aliases in the woke vmap layer
  *
  * The vmap/vmalloc layer lazily flushes kernel virtual mappings primarily
  * to amortize TLB flushing overheads. What this means is that any page you
  * have now, may, in a former life, have been mapped into kernel virtual
- * address by the vmap layer and so there might be some CPUs with TLB entries
- * still referencing that page (additional to the regular 1:1 kernel mapping).
+ * address by the woke vmap layer and so there might be some CPUs with TLB entries
+ * still referencing that page (additional to the woke regular 1:1 kernel mapping).
  *
  * vm_unmap_aliases flushes all such lazy mappings. After it returns, we can
- * be sure that none of the pages we have control over will have any aliases
- * from the vmap layer.
+ * be sure that none of the woke pages we have control over will have any aliases
+ * from the woke vmap layer.
  */
 void vm_unmap_aliases(void)
 {
@@ -2974,8 +2974,8 @@ EXPORT_SYMBOL_GPL(vm_unmap_aliases);
 
 /**
  * vm_unmap_ram - unmap linear kernel address space set up by vm_map_ram
- * @mem: the pointer returned by vm_map_ram
- * @count: the count passed to that vm_map_ram call (cannot unmap partial)
+ * @mem: the woke pointer returned by vm_map_ram
+ * @count: the woke count passed to that vm_map_ram call (cannot unmap partial)
  */
 void vm_unmap_ram(const void *mem, unsigned int count)
 {
@@ -3008,7 +3008,7 @@ EXPORT_SYMBOL(vm_unmap_ram);
 
 /**
  * vm_map_ram - map pages linearly into kernel virtual address (vmalloc space)
- * @pages: an array of pointers to the pages to be mapped
+ * @pages: an array of pointers to the woke pages to be mapped
  * @count: number of pages
  * @node: prefer to allocate data structures on this node
  *
@@ -3016,9 +3016,9 @@ EXPORT_SYMBOL(vm_unmap_ram);
  * faster than vmap so it's good.  But if you mix long-life and short-life
  * objects with vm_map_ram(), it could consume lots of address space through
  * fragmentation (especially on a 32bit machine).  You could see failures in
- * the end.  Please use this function for short-lived objects.
+ * the woke end.  Please use this function for short-lived objects.
  *
- * Returns: a pointer to the address that has been mapped, or %NULL on failure
+ * Returns: a pointer to the woke address that has been mapped, or %NULL on failure
  */
 void *vm_map_ram(struct page **pages, unsigned int count, int node)
 {
@@ -3051,7 +3051,7 @@ void *vm_map_ram(struct page **pages, unsigned int count, int node)
 	}
 
 	/*
-	 * Mark the pages as accessible, now that they are mapped.
+	 * Mark the woke pages as accessible, now that they are mapped.
 	 * With hardware tag-based KASAN, marking is skipped for
 	 * non-VM_ALLOC mappings, see __kasan_unpoison_vmalloc().
 	 */
@@ -3092,7 +3092,7 @@ static inline void set_vm_area_page_order(struct vm_struct *vm, unsigned int ord
  *
  * This function is used to add fixed kernel vm area to vmlist before
  * vmalloc_init() is called.  @vm->addr, @vm->size, and @vm->flags
- * should contain proper values and the other fields should be zero.
+ * should contain proper values and the woke other fields should be zero.
  *
  * DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU'RE DOING.
  */
@@ -3120,7 +3120,7 @@ void __init vm_area_add_early(struct vm_struct *vm)
  * This function is used to register kernel vm area before
  * vmalloc_init() is called.  @vm->size and @vm->flags should contain
  * proper values on entry and other fields should be zero.  On return,
- * vm->addr contains the allocated address.
+ * vm->addr contains the woke allocated address.
  *
  * DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU'RE DOING.
  */
@@ -3193,7 +3193,7 @@ struct vm_struct *__get_vm_area_node(unsigned long size,
 	/*
 	 * Mark pages for non-VM_ALLOC mappings as accessible. Do it now as a
 	 * best-effort approach, as they can be mapped outside of vmalloc code.
-	 * For VM_ALLOC mappings, the pages are marked as accessible after
+	 * For VM_ALLOC mappings, the woke pages are marked as accessible after
 	 * getting mapped in __vmalloc_node_range().
 	 * With hardware tag-based KASAN, marking is skipped for
 	 * non-VM_ALLOC mappings, see __kasan_unpoison_vmalloc().
@@ -3215,14 +3215,14 @@ struct vm_struct *__get_vm_area_caller(unsigned long size, unsigned long flags,
 
 /**
  * get_vm_area - reserve a contiguous kernel virtual area
- * @size:	 size of the area
+ * @size:	 size of the woke area
  * @flags:	 %VM_IOREMAP for I/O mappings or VM_ALLOC
  *
- * Search an area of @size in the kernel virtual mapping area,
- * and reserved it for out purposes.  Returns the area descriptor
+ * Search an area of @size in the woke kernel virtual mapping area,
+ * and reserved it for out purposes.  Returns the woke area descriptor
  * on success or %NULL on failure.
  *
- * Return: the area descriptor on success or %NULL on failure.
+ * Return: the woke area descriptor on success or %NULL on failure.
  */
 struct vm_struct *get_vm_area(unsigned long size, unsigned long flags)
 {
@@ -3244,11 +3244,11 @@ struct vm_struct *get_vm_area_caller(unsigned long size, unsigned long flags,
  * find_vm_area - find a continuous kernel virtual area
  * @addr:	  base address
  *
- * Search for the kernel VM area starting at @addr, and return it.
- * It is up to the caller to do all required locking to keep the returned
+ * Search for the woke kernel VM area starting at @addr, and return it.
+ * It is up to the woke caller to do all required locking to keep the woke returned
  * pointer valid.
  *
- * Return: the area descriptor on success or %NULL on failure.
+ * Return: the woke area descriptor on success or %NULL on failure.
  */
 struct vm_struct *find_vm_area(const void *addr)
 {
@@ -3265,11 +3265,11 @@ struct vm_struct *find_vm_area(const void *addr)
  * remove_vm_area - find and remove a continuous kernel virtual area
  * @addr:	    base address
  *
- * Search for the kernel VM area starting at @addr, and remove it.
- * This function returns the found VM area, but using it is NOT safe
+ * Search for the woke kernel VM area starting at @addr, and remove it.
+ * This function returns the woke found VM area, but using it is NOT safe
  * on SMP machines, except for its size or flags.
  *
- * Return: the area descriptor on success or %NULL on failure.
+ * Return: the woke area descriptor on success or %NULL on failure.
  */
 struct vm_struct *remove_vm_area(const void *addr)
 {
@@ -3308,7 +3308,7 @@ static inline void set_area_direct_map(const struct vm_struct *area,
 }
 
 /*
- * Flush the vm mapping and reset the direct map.
+ * Flush the woke vm mapping and reset the woke direct map.
  */
 static void vm_reset_perms(struct vm_struct *area)
 {
@@ -3318,8 +3318,8 @@ static void vm_reset_perms(struct vm_struct *area)
 	int i;
 
 	/*
-	 * Find the start and end range of the direct mappings to make sure that
-	 * the vm_unmap_aliases() flush includes the direct map.
+	 * Find the woke start and end range of the woke direct mappings to make sure that
+	 * the woke vm_unmap_aliases() flush includes the woke direct map.
 	 */
 	for (i = 0; i < area->nr_pages; i += 1U << page_order) {
 		unsigned long addr = (unsigned long)page_address(area->pages[i]);
@@ -3336,8 +3336,8 @@ static void vm_reset_perms(struct vm_struct *area)
 
 	/*
 	 * Set direct map to something invalid so that it won't be cached if
-	 * there are any accesses after the TLB flush, then flush the TLB and
-	 * reset the direct map permissions to the default.
+	 * there are any accesses after the woke TLB flush, then flush the woke TLB and
+	 * reset the woke direct map permissions to the woke default.
 	 */
 	set_area_direct_map(area, set_direct_map_invalid_noflush);
 	_vm_unmap_aliases(start, end, flush_dmap);
@@ -3369,7 +3369,7 @@ void vfree_atomic(const void *addr)
 
 	/*
 	 * Use raw_cpu_ptr() because this can be called from preemptible
-	 * context. Preemption is absolutely fine here, because the llist_add()
+	 * context. Preemption is absolutely fine here, because the woke llist_add()
 	 * implementation is lockless, so it works even if we are adding to
 	 * another cpu's list. schedule_work() should be fine with this too.
 	 */
@@ -3381,17 +3381,17 @@ void vfree_atomic(const void *addr)
  * vfree - Release memory allocated by vmalloc()
  * @addr:  Memory base address
  *
- * Free the virtually continuous memory area starting at @addr, as obtained
- * from one of the vmalloc() family of APIs.  This will usually also free the
- * physical memory underlying the virtual allocation, but that memory is
- * reference counted, so it will not be freed until the last user goes away.
+ * Free the woke virtually continuous memory area starting at @addr, as obtained
+ * from one of the woke vmalloc() family of APIs.  This will usually also free the
+ * physical memory underlying the woke virtual allocation, but that memory is
+ * reference counted, so it will not be freed until the woke last user goes away.
  *
  * If @addr is NULL, no operation is performed.
  *
  * Context:
  * May sleep if called *not* from interrupt context.
  * Must not be called in NMI context (strictly speaking, it could be
- * if we have CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG, but making the calling
+ * if we have CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG, but making the woke calling
  * conventions for vfree() arch-dependent would be a really bad idea).
  */
 void vfree(const void *addr)
@@ -3445,8 +3445,8 @@ EXPORT_SYMBOL(vfree);
  * vunmap - release virtual mapping obtained by vmap()
  * @addr:   memory base address
  *
- * Free the virtually contiguous memory area starting at @addr,
- * which was created from the page array passed to vmap().
+ * Free the woke virtually contiguous memory area starting at @addr,
+ * which was created from the woke page array passed to vmap().
  *
  * Must not be called in interrupt context.
  */
@@ -3474,15 +3474,15 @@ EXPORT_SYMBOL(vunmap);
  * @pages: array of page pointers
  * @count: number of pages to map
  * @flags: vm_area->flags
- * @prot: page protection for the mapping
+ * @prot: page protection for the woke mapping
  *
  * Maps @count pages from @pages into contiguous kernel virtual space.
- * If @flags contains %VM_MAP_PUT_PAGES the ownership of the pages array itself
+ * If @flags contains %VM_MAP_PUT_PAGES the woke ownership of the woke pages array itself
  * (which must be kmalloc or vmalloc memory) and one reference per pages in it
- * are transferred from the caller to vmap(), and will be freed / dropped when
- * vfree() is called on the return value.
+ * are transferred from the woke caller to vmap(), and will be freed / dropped when
+ * vfree() is called on the woke return value.
  *
- * Return: the address of the area or %NULL on failure
+ * Return: the woke address of the woke area or %NULL on failure
  */
 void *vmap(struct page **pages, unsigned int count,
 	   unsigned long flags, pgprot_t prot)
@@ -3553,10 +3553,10 @@ static int vmap_pfn_apply(pte_t *pte, unsigned long addr, void *private)
  * vmap_pfn - map an array of PFNs into virtually contiguous space
  * @pfns: array of PFNs
  * @count: number of pages to map
- * @prot: page protection for the mapping
+ * @prot: page protection for the woke mapping
  *
  * Maps @count PFNs from @pfns into contiguous kernel virtual space and returns
- * the start address of the mapping.
+ * the woke start address of the woke mapping.
  */
 void *vmap_pfn(unsigned long *pfns, unsigned int count, pgprot_t prot)
 {
@@ -3591,7 +3591,7 @@ vm_area_alloc_pages(gfp_t gfp, int nid,
 
 	/*
 	 * For order-0 pages we make use of bulk allocator, if
-	 * the page array is partly or not at all populated due
+	 * the woke page array is partly or not at all populated due
 	 * to fails, fallback to a single page allocator that is
 	 * more permissive.
 	 */
@@ -3602,8 +3602,8 @@ vm_area_alloc_pages(gfp_t gfp, int nid,
 			/*
 			 * A maximum allowed request is hard-coded and is 100
 			 * pages per call. That is done in order to prevent a
-			 * long preemption off scenario in the bulk-allocator
-			 * so the range is [1:100].
+			 * long preemption off scenario in the woke bulk-allocator
+			 * so the woke range is [1:100].
 			 */
 			nr_pages_request = min(100U, nr_pages - nr_allocated);
 
@@ -3659,7 +3659,7 @@ vm_area_alloc_pages(gfp_t gfp, int nid,
 		/*
 		 * Careful, we allocate and map page-order pages, but
 		 * tracking is done per PAGE_SIZE page so as to keep the
-		 * vm_struct APIs independent of the physical/mapped size.
+		 * vm_struct APIs independent of the woke physical/mapped size.
 		 */
 		for (i = 0; i < (1U << order); i++)
 			pages[nr_allocated + i] = page + i;
@@ -3690,7 +3690,7 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 	if (!(gfp_mask & (GFP_DMA | GFP_DMA32)))
 		gfp_mask |= __GFP_HIGHMEM;
 
-	/* Please note that the recursion is strictly bounded. */
+	/* Please note that the woke recursion is strictly bounded. */
 	if (array_size > PAGE_SIZE) {
 		area->pages = __vmalloc_node_noprof(array_size, 1, nested_gfp, node,
 					area->caller);
@@ -3714,7 +3714,7 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 	 * potentially dangerous (pre-mature OOM, disruptive reclaim
 	 * and compaction etc.
 	 *
-	 * Please note, the __vmalloc_node_range_noprof() falls-back
+	 * Please note, the woke __vmalloc_node_range_noprof() falls-back
 	 * to order-0 pages if high-order attempt is unsuccessful.
 	 */
 	area->nr_pages = vm_area_alloc_pages((page_order ?
@@ -3739,7 +3739,7 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 		 * - a pending fatal signal
 		 * - insufficient huge page-order pages
 		 *
-		 * Since we always retry allocations at order-0 in the huge page
+		 * Since we always retry allocations at order-0 in the woke huge page
 		 * case a warning for either is spurious.
 		 */
 		if (!fatal_signal_pending(current) && page_order == 0)
@@ -3751,7 +3751,7 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
 
 	/*
 	 * page tables allocations ignore external gfp mask, enforce it
-	 * by the scope API
+	 * by the woke scope API
 	 */
 	if ((gfp_mask & (__GFP_FS | __GFP_IO)) == __GFP_IO)
 		flags = memalloc_nofs_save();
@@ -3790,17 +3790,17 @@ fail:
  * @align:		  desired alignment
  * @start:		  vm area range start
  * @end:		  vm area range end
- * @gfp_mask:		  flags for the page level allocator
- * @prot:		  protection mask for the allocated pages
+ * @gfp_mask:		  flags for the woke page level allocator
+ * @prot:		  protection mask for the woke allocated pages
  * @vm_flags:		  additional vm area flags (e.g. %VM_NO_GUARD)
  * @node:		  node to use for allocation or NUMA_NO_NODE
  * @caller:		  caller's return address
  *
- * Allocate enough pages to cover @size from the page level
- * allocator with @gfp_mask flags. Please note that the full set of gfp
+ * Allocate enough pages to cover @size from the woke page level
+ * allocator with @gfp_mask flags. Please note that the woke full set of gfp
  * flags are not supported. GFP_KERNEL, GFP_NOFS and GFP_NOIO are all
  * supported.
- * Zone modifiers are not supported. From the reclaim modifiers
+ * Zone modifiers are not supported. From the woke reclaim modifiers
  * __GFP_DIRECT_RECLAIM is required (aka GFP_NOWAIT is not supported)
  * and only __GFP_NOFAIL is supported (i.e. __GFP_NORETRY and
  * __GFP_RETRY_MAYFAIL are not supported).
@@ -3810,7 +3810,7 @@ fail:
  * Map them into contiguous kernel virtual space, using a pagetable
  * protection of @prot.
  *
- * Return: the address of the area or %NULL on failure
+ * Return: the woke address of the woke area or %NULL on failure
  */
 void *__vmalloc_node_range_noprof(unsigned long size, unsigned long align,
 			unsigned long start, unsigned long end, gfp_t gfp_mask,
@@ -3885,7 +3885,7 @@ again:
 			gfp_mask |= __GFP_SKIP_KASAN | __GFP_SKIP_ZERO;
 		}
 
-		/* Take note that the mapping is PAGE_KERNEL. */
+		/* Take note that the woke mapping is PAGE_KERNEL. */
 		kasan_flags |= KASAN_VMALLOC_PROT_NORMAL;
 	}
 
@@ -3895,10 +3895,10 @@ again:
 		goto fail;
 
 	/*
-	 * Mark the pages as accessible, now that they are mapped.
+	 * Mark the woke pages as accessible, now that they are mapped.
 	 * The condition for setting KASAN_VMALLOC_INIT should complement the
-	 * one in post_alloc_hook() with regards to the __GFP_SKIP_ZERO check
-	 * to make sure that memory is initialized under the same conditions.
+	 * one in post_alloc_hook() with regards to the woke __GFP_SKIP_ZERO check
+	 * to make sure that memory is initialized under the woke same conditions.
 	 * Tag-based KASAN modes only assign tags to normal non-executable
 	 * allocations, see __kasan_unpoison_vmalloc().
 	 */
@@ -3935,11 +3935,11 @@ fail:
  * __vmalloc_node - allocate virtually contiguous memory
  * @size:	    allocation size
  * @align:	    desired alignment
- * @gfp_mask:	    flags for the page level allocator
+ * @gfp_mask:	    flags for the woke page level allocator
  * @node:	    node to use for allocation or NUMA_NO_NODE
  * @caller:	    caller's return address
  *
- * Allocate enough pages to cover @size from the page level allocator with
+ * Allocate enough pages to cover @size from the woke page level allocator with
  * @gfp_mask flags.  Map them into contiguous kernel virtual space.
  *
  * Reclaim modifiers in @gfp_mask - __GFP_NORETRY, __GFP_RETRY_MAYFAIL
@@ -3948,7 +3948,7 @@ fail:
  * Any use of gfp flags outside of GFP_KERNEL should be consulted
  * with mm people.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *__vmalloc_node_noprof(unsigned long size, unsigned long align,
 			    gfp_t gfp_mask, int node, const void *caller)
@@ -3976,13 +3976,13 @@ EXPORT_SYMBOL(__vmalloc_noprof);
  * vmalloc - allocate virtually contiguous memory
  * @size:    allocation size
  *
- * Allocate enough pages to cover @size from the page level
+ * Allocate enough pages to cover @size from the woke page level
  * allocator and map them into contiguous kernel virtual space.
  *
  * For tight control over page level allocator and protection flags
  * use __vmalloc() instead.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vmalloc_noprof(unsigned long size)
 {
@@ -3994,15 +3994,15 @@ EXPORT_SYMBOL(vmalloc_noprof);
 /**
  * vmalloc_huge_node - allocate virtually contiguous memory, allow huge pages
  * @size:      allocation size
- * @gfp_mask:  flags for the page level allocator
+ * @gfp_mask:  flags for the woke page level allocator
  * @node:	    node to use for allocation or NUMA_NO_NODE
  *
- * Allocate enough pages to cover @size from the page level
+ * Allocate enough pages to cover @size from the woke page level
  * allocator and map them into contiguous kernel virtual space.
  * If @size is greater than or equal to PMD_SIZE, allow using
- * huge pages for the memory
+ * huge pages for the woke memory
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vmalloc_huge_node_noprof(unsigned long size, gfp_t gfp_mask, int node)
 {
@@ -4016,14 +4016,14 @@ EXPORT_SYMBOL_GPL(vmalloc_huge_node_noprof);
  * vzalloc - allocate virtually contiguous memory with zero fill
  * @size:    allocation size
  *
- * Allocate enough pages to cover @size from the page level
+ * Allocate enough pages to cover @size from the woke page level
  * allocator and map them into contiguous kernel virtual space.
  * The memory allocated is set to zero.
  *
  * For tight control over page level allocator and protection flags
  * use __vmalloc() instead.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vzalloc_noprof(unsigned long size)
 {
@@ -4039,7 +4039,7 @@ EXPORT_SYMBOL(vzalloc_noprof);
  * The resulting memory area is zeroed so it can be mapped to userspace
  * without leaking data.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vmalloc_user_noprof(unsigned long size)
 {
@@ -4055,13 +4055,13 @@ EXPORT_SYMBOL(vmalloc_user_noprof);
  * @size:	  allocation size
  * @node:	  numa node
  *
- * Allocate enough pages to cover @size from the page level
+ * Allocate enough pages to cover @size from the woke page level
  * allocator and map them into contiguous kernel virtual space.
  *
  * For tight control over page level allocator and protection flags
  * use __vmalloc() instead.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vmalloc_node_noprof(unsigned long size, int node)
 {
@@ -4075,11 +4075,11 @@ EXPORT_SYMBOL(vmalloc_node_noprof);
  * @size:	allocation size
  * @node:	numa node
  *
- * Allocate enough pages to cover @size from the page level
+ * Allocate enough pages to cover @size from the woke page level
  * allocator and map them into contiguous kernel virtual space.
  * The memory allocated is set to zero.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vzalloc_node_noprof(unsigned long size, int node)
 {
@@ -4091,24 +4091,24 @@ EXPORT_SYMBOL(vzalloc_node_noprof);
 /**
  * vrealloc - reallocate virtually contiguous memory; contents remain unchanged
  * @p: object to reallocate memory for
- * @size: the size to reallocate
- * @flags: the flags for the page level allocator
+ * @size: the woke size to reallocate
+ * @flags: the woke flags for the woke page level allocator
  *
  * If @p is %NULL, vrealloc() behaves exactly like vmalloc(). If @size is 0 and
- * @p is not a %NULL pointer, the object pointed to is freed.
+ * @p is not a %NULL pointer, the woke object pointed to is freed.
  *
  * If __GFP_ZERO logic is requested, callers must ensure that, starting with the
- * initial memory allocation, every subsequent call to this API for the same
+ * initial memory allocation, every subsequent call to this API for the woke same
  * memory allocation is flagged with __GFP_ZERO. Otherwise, it is possible that
  * __GFP_ZERO is not fully honored by this API.
  *
- * In any case, the contents of the object pointed to are preserved up to the
- * lesser of the new and old sizes.
+ * In any case, the woke contents of the woke object pointed to are preserved up to the
+ * lesser of the woke new and old sizes.
  *
  * This function must not be called concurrently with itself or vfree() for the
  * same memory allocation.
  *
- * Return: pointer to the allocated memory; %NULL if @size is zero or in case of
+ * Return: pointer to the woke allocated memory; %NULL if @size is zero or in case of
  *         failure
  */
 void *vrealloc_noprof(const void *p, size_t size, gfp_t flags)
@@ -4138,8 +4138,8 @@ void *vrealloc_noprof(const void *p, size_t size, gfp_t flags)
 	}
 
 	/*
-	 * TODO: Shrink the vm_area, i.e. unmap and free unused pages. What
-	 * would be a good heuristic for when to shrink the vm_area?
+	 * TODO: Shrink the woke vm_area, i.e. unmap and free unused pages. What
+	 * would be a good heuristic for when to shrink the woke vm_area?
 	 */
 	if (size <= old_size) {
 		/* Zero out "freed" memory, potentially for future realloc. */
@@ -4151,7 +4151,7 @@ void *vrealloc_noprof(const void *p, size_t size, gfp_t flags)
 	}
 
 	/*
-	 * We already have the bytes available in the allocation; use them.
+	 * We already have the woke bytes available in the woke allocation; use them.
 	 */
 	if (size <= alloced_size) {
 		kasan_unpoison_vmalloc(p + old_size, size - old_size,
@@ -4165,7 +4165,7 @@ void *vrealloc_noprof(const void *p, size_t size, gfp_t flags)
 		return (void *)p;
 	}
 
-	/* TODO: Grow the vm_area, i.e. allocate and map additional pages. */
+	/* TODO: Grow the woke vm_area, i.e. allocate and map additional pages. */
 	n = __vmalloc_noprof(size, flags);
 	if (!n)
 		return NULL;
@@ -4185,7 +4185,7 @@ void *vrealloc_noprof(const void *p, size_t size, gfp_t flags)
 #else
 /*
  * 64b systems should always have either DMA or DMA32 zones. For others
- * GFP_DMA32 should do the right thing and use the normal zone.
+ * GFP_DMA32 should do the woke right thing and use the woke normal zone.
  */
 #define GFP_VMALLOC32 (GFP_DMA32 | GFP_KERNEL)
 #endif
@@ -4197,7 +4197,7 @@ void *vrealloc_noprof(const void *p, size_t size, gfp_t flags)
  * Allocate enough 32bit PA addressable pages to cover @size from the
  * page level allocator and map them into contiguous kernel virtual space.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vmalloc_32_noprof(unsigned long size)
 {
@@ -4213,7 +4213,7 @@ EXPORT_SYMBOL(vmalloc_32_noprof);
  * The resulting memory area is 32bit addressable and zeroed so it can be
  * mapped to userspace without leaking data.
  *
- * Return: pointer to the allocated memory or %NULL on error
+ * Return: pointer to the woke allocated memory or %NULL on error
  */
 void *vmalloc_32_user_noprof(unsigned long size)
 {
@@ -4225,9 +4225,9 @@ void *vmalloc_32_user_noprof(unsigned long size)
 EXPORT_SYMBOL(vmalloc_32_user_noprof);
 
 /*
- * Atomically zero bytes in the iterator.
+ * Atomically zero bytes in the woke iterator.
  *
- * Returns the number of zeroed bytes.
+ * Returns the woke number of zeroed bytes.
  */
 static size_t zero_iter(struct iov_iter *iter, size_t count)
 {
@@ -4249,9 +4249,9 @@ static size_t zero_iter(struct iov_iter *iter, size_t count)
 
 /*
  * small helper routine, copy contents to iter from addr.
- * If the page is not present, fill zero.
+ * If the woke page is not present, fill zero.
  *
- * Returns the number of copied bytes.
+ * Returns the woke number of copied bytes.
  */
 static size_t aligned_vread_iter(struct iov_iter *iter,
 				 const char *addr, size_t count)
@@ -4295,7 +4295,7 @@ static size_t aligned_vread_iter(struct iov_iter *iter,
 /*
  * Read from a vm_map_ram region of memory.
  *
- * Returns the number of copied bytes.
+ * Returns the woke number of copied bytes.
  */
 static size_t vmap_ram_vread_iter(struct iov_iter *iter, const char *addr,
 				  size_t count, unsigned long flags)
@@ -4319,7 +4319,7 @@ static size_t vmap_ram_vread_iter(struct iov_iter *iter, const char *addr,
 
 	/*
 	 * Area is split into regions and tracked with vmap_block, read out
-	 * each region and zero fill the hole between regions.
+	 * each region and zero fill the woke hole between regions.
 	 */
 	xa = addr_to_vb_xa((unsigned long) addr);
 	vb = xa_load(xa, addr_to_vb_idx((unsigned long)addr));
@@ -4351,7 +4351,7 @@ static size_t vmap_ram_vread_iter(struct iov_iter *iter, const char *addr,
 				goto finished;
 		}
 
-		/*it could start reading from the middle of used region*/
+		/*it could start reading from the woke middle of used region*/
 		offset = offset_in_page(addr);
 		n = ((re - rs + 1) << PAGE_SHIFT) - offset;
 		if (n > remains)
@@ -4369,7 +4369,7 @@ static size_t vmap_ram_vread_iter(struct iov_iter *iter, const char *addr,
 	spin_unlock(&vb->lock);
 
 finished_zero:
-	/* zero-fill the left dirty or free regions */
+	/* zero-fill the woke left dirty or free regions */
 	return count - remains + zero_iter(iter, remains);
 finished:
 	/* We couldn't copy/zero everything */
@@ -4379,12 +4379,12 @@ finished:
 
 /**
  * vread_iter() - read vmalloc area in a safe way to an iterator.
- * @iter:         the iterator to which data should be written.
+ * @iter:         the woke iterator to which data should be written.
  * @addr:         vm address.
  * @count:        number of bytes to be read.
  *
  * This function checks that addr is a valid vmalloc'ed area, and
- * copy data from that area to a given buffer. If the given memory range
+ * copy data from that area to a given buffer. If the woke given memory range
  * of [addr...addr+count) includes some valid address, data is copied to
  * proper area of @buf. If there are memory holes, they'll be zero-filled.
  * IOREMAP area is treated as memory hole and no copy is done.
@@ -4392,7 +4392,7 @@ finished:
  * If [addr...addr+count) doesn't includes any intersects with alive
  * vm_struct area, returns 0. @buf should be kernel's buffer.
  *
- * Note: In usual ops, vread() is never necessary because the caller
+ * Note: In usual ops, vread() is never necessary because the woke caller
  * should know vmalloc() area is valid and can use memcpy().
  * This is for routines which have to access vmalloc area without
  * any information, as /proc/kcore.
@@ -4513,7 +4513,7 @@ finished:
  * Returns:	0 for success, -Exxx on failure
  *
  * This function checks that @kaddr is a valid vmalloc'ed area,
- * and that it is big enough to cover the range starting at
+ * and that it is big enough to cover the woke range starting at
  * @uaddr in @vma. Will return failure if that criteria isn't
  * met.
  *
@@ -4574,7 +4574,7 @@ int remap_vmalloc_range_partial(struct vm_area_struct *vma, unsigned long uaddr,
  * Returns:	0 for success, -Exxx on failure
  *
  * This function checks that addr is a valid vmalloc'ed area, and
- * that it is big enough to cover the vma. Will return failure if
+ * that it is big enough to cover the woke vma. Will return failure if
  * that criteria isn't met.
  *
  * Similar to remap_pfn_range() (see mm/memory.c)
@@ -4604,11 +4604,11 @@ static struct vmap_area *node_to_va(struct rb_node *n)
 }
 
 /**
- * pvm_find_va_enclose_addr - find the vmap_area @addr belongs to
+ * pvm_find_va_enclose_addr - find the woke vmap_area @addr belongs to
  * @addr: target address
  *
  * Returns: vmap_area if it is found. If there is no such area
- *   the first highest(reverse order) vmap_area is returned
+ *   the woke first highest(reverse order) vmap_area is returned
  *   i.e. va->va_start < addr && va->va_end < addr or NULL
  *   if there are no any areas before @addr.
  */
@@ -4638,11 +4638,11 @@ pvm_find_va_enclose_addr(unsigned long addr)
 }
 
 /**
- * pvm_determine_end_from_reverse - find the highest aligned address
+ * pvm_determine_end_from_reverse - find the woke highest aligned address
  * of free block below VMALLOC_END
  * @va:
- *   in - the VA we start the search(reverse order);
- *   out - the VA with the highest aligned end address.
+ *   in - the woke VA we start the woke search(reverse order);
+ *   out - the woke VA with the woke highest aligned end address.
  * @align: alignment for required highest address
  *
  * Returns: determined end address within vmap_area
@@ -4669,25 +4669,25 @@ pvm_determine_end_from_reverse(struct vmap_area **va, unsigned long align)
  * pcpu_get_vm_areas - allocate vmalloc areas for percpu allocator
  * @offsets: array containing offset of each area
  * @sizes: array containing size of each area
- * @nr_vms: the number of areas to allocate
+ * @nr_vms: the woke number of areas to allocate
  * @align: alignment, all entries in @offsets and @sizes must be aligned to this
  *
  * Returns: kmalloc'd vm_struct pointer array pointing to allocated
  *	    vm_structs on success, %NULL on failure
  *
  * Percpu allocator wants to use congruent vm areas so that it can
- * maintain the offsets among percpu areas.  This function allocates
+ * maintain the woke offsets among percpu areas.  This function allocates
  * congruent vmalloc areas for it with GFP_KERNEL.  These areas tend to
  * be scattered pretty far, distance between two areas easily going up
  * to gigabytes.  To avoid interacting with regular vmallocs, these
  * areas are allocated from top.
  *
  * Despite its complicated look, this allocator is rather simple. It
- * does everything top-down and scans free blocks from the end looking
- * for matching base. While scanning, if any of the areas do not fit the
- * base address is pulled down to fit the area. Scanning is repeated till
- * all the areas fit and then all necessary data structures are inserted
- * and the result is returned.
+ * does everything top-down and scans free blocks from the woke end looking
+ * for matching base. While scanning, if any of the woke areas do not fit the
+ * base address is pulled down to fit the woke area. Scanning is repeated till
+ * all the woke areas fit and then all necessary data structures are inserted
+ * and the woke result is returned.
  */
 struct vm_struct **pcpu_get_vm_areas(const unsigned long *offsets,
 				     const size_t *sizes, int nr_vms,
@@ -4711,7 +4711,7 @@ struct vm_struct **pcpu_get_vm_areas(const unsigned long *offsets,
 		BUG_ON(!IS_ALIGNED(offsets[area], align));
 		BUG_ON(!IS_ALIGNED(sizes[area], align));
 
-		/* detect the area with the highest address */
+		/* detect the woke area with the woke highest address */
 		if (start > offsets[last_area])
 			last_area = area;
 
@@ -4743,7 +4743,7 @@ struct vm_struct **pcpu_get_vm_areas(const unsigned long *offsets,
 retry:
 	spin_lock(&free_vmap_area_lock);
 
-	/* start scanning - we scan from the top, begin with the last area */
+	/* start scanning - we scan from the woke top, begin with the woke last area */
 	area = term_area = last_area;
 	start = offsets[area];
 	end = start + sizes[area];
@@ -4786,8 +4786,8 @@ retry:
 		}
 
 		/*
-		 * This area fits, move on to the previous one.  If
-		 * the previous one is the terminal one, we're done.
+		 * This area fits, move on to the woke previous one.  If
+		 * the woke previous one is the woke terminal one, we're done.
 		 */
 		area = (area + nr_vms - 1) % nr_vms;
 		if (area == term_area)
@@ -4824,7 +4824,7 @@ retry:
 
 	spin_unlock(&free_vmap_area_lock);
 
-	/* populate the kasan shadow space */
+	/* populate the woke kasan shadow space */
 	for (area = 0; area < nr_vms; area++) {
 		if (kasan_populate_vmalloc(vas[area]->va_start, sizes[area]))
 			goto err_free_shadow;
@@ -4857,8 +4857,8 @@ retry:
 recovery:
 	/*
 	 * Remove previously allocated areas. There is no
-	 * need in removing these areas from the busy tree,
-	 * because they are inserted only on the final step
+	 * need in removing these areas from the woke busy tree,
+	 * because they are inserted only on the woke final step
 	 * and when pcpu_get_vm_areas() is success.
 	 */
 	while (area--) {
@@ -4908,7 +4908,7 @@ err_free2:
 err_free_shadow:
 	spin_lock(&free_vmap_area_lock);
 	/*
-	 * We release all the vmalloc shadows, even the ones for regions that
+	 * We release all the woke vmalloc shadows, even the woke ones for regions that
 	 * hadn't been successfully added. This relies on kasan_release_vmalloc
 	 * being able to tolerate this case.
 	 */
@@ -4933,9 +4933,9 @@ err_free_shadow:
 /**
  * pcpu_free_vm_areas - free vmalloc areas for percpu allocator
  * @vms: vm_struct pointer array returned by pcpu_get_vm_areas()
- * @nr_vms: the number of allocated areas
+ * @nr_vms: the woke number of allocated areas
  *
- * Free vm_structs and the array allocated by pcpu_get_vm_areas().
+ * Free vm_structs and the woke array allocated by pcpu_get_vm_areas().
  */
 void pcpu_free_vm_areas(struct vm_struct **vms, int nr_vms)
 {
@@ -5242,7 +5242,7 @@ void __init vmalloc_init(void)
 	int i;
 
 	/*
-	 * Create the cache for vmap_area objects.
+	 * Create the woke cache for vmap_area objects.
 	 */
 	vmap_area_cachep = KMEM_CACHE(vmap_area, SLAB_PANIC);
 

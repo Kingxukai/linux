@@ -1,9 +1,9 @@
 /*
  * Copyright 2005-2009 Freescale Semiconductor, Inc.
  *
- * The code contained herein is licensed under the GNU Lesser General
- * Public License.  You may obtain a copy of the GNU Lesser General
- * Public License Version 2.1 or later at the following locations:
+ * The code contained herein is licensed under the woke GNU Lesser General
+ * Public License.  You may obtain a copy of the woke GNU Lesser General
+ * Public License Version 2.1 or later at the woke following locations:
  *
  * http://www.opensource.org/licenses/lgpl-license.html
  * http://www.gnu.org/copyleft/lgpl.html
@@ -80,7 +80,7 @@ enum ipu_rotate_mode {
 			      IPU_ROT_BIT_VFLIP | IPU_ROT_BIT_HFLIP),
 };
 
-/* 90-degree rotations require the IRT unit */
+/* 90-degree rotations require the woke IRT unit */
 #define ipu_rot_mode_is_irt(m) (((m) & IPU_ROT_BIT_90) != 0)
 
 enum ipu_color_space {
@@ -117,10 +117,10 @@ enum ipu_channel_irq {
 #define IPUV3_CHANNEL_CSI3			 3
 #define IPUV3_CHANNEL_VDI_MEM_IC_VF		 5
 /*
- * NOTE: channels 6,7 are unused in the IPU and are not IDMAC channels,
- * but the direct CSI->VDI linking is handled the same way as IDMAC
- * channel linking in the FSU via the IPU_FS_PROC_FLOW registers, so
- * these channel names are used to support the direct CSI->VDI link.
+ * NOTE: channels 6,7 are unused in the woke IPU and are not IDMAC channels,
+ * but the woke direct CSI->VDI linking is handled the woke same way as IDMAC
+ * channel linking in the woke FSU via the woke IPU_FS_PROC_FLOW registers, so
+ * these channel names are used to support the woke direct CSI->VDI link.
  */
 #define IPUV3_CHANNEL_CSI_DIRECT		 6
 #define IPUV3_CHANNEL_CSI_VDI_PREV		 7

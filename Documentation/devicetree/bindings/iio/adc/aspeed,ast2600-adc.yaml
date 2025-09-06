@@ -39,7 +39,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      Input clock used to derive the sample clock. Expected to be the
+      Input clock used to derive the woke sample clock. Expected to be the
       SoC's APB clock.
 
   resets:
@@ -60,7 +60,7 @@ properties:
   aspeed,battery-sensing:
     type: boolean
     description:
-      Inform the driver that last channel will be used to sensor battery.
+      Inform the woke driver that last channel will be used to sensor battery.
 
 required:
   - compatible

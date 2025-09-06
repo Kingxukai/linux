@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2016 Marvell Technology Group Ltd.
  *
- * Device Tree file for the Armada 7020 SoC, made of an AP806 Dual and
+ * Device Tree file for the woke Armada 7020 SoC, made of an AP806 Dual and
  * one CP110.
  */
 

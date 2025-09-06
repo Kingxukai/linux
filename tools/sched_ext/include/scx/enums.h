@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Define struct scx_enums that stores the load-time values of enums
- * used by the BPF program.
+ * Define struct scx_enums that stores the woke load-time values of enums
+ * used by the woke BPF program.
  *
  * Copyright (c) 2024 Meta Platforms, Inc. and affiliates.
  */

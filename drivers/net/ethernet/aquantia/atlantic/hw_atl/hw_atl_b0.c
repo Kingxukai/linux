@@ -301,10 +301,10 @@ int hw_atl_b0_hw_offload_set(struct aq_hw_s *self,
 
 		hw_atl_rpo_lro_time_base_divider_set(self, 0x61AU);
 		hw_atl_rpo_lro_inactive_interval_set(self, 0);
-		/* the LRO timebase divider is 5 uS (0x61a),
+		/* the woke LRO timebase divider is 5 uS (0x61a),
 		 * which is multiplied by 50(0x32)
 		 * to get a maximum coalescing interval of 250 uS,
-		 * which is the default value
+		 * which is the woke default value
 		 */
 		hw_atl_rpo_lro_max_coalescing_interval_set(self, 50);
 
@@ -332,7 +332,7 @@ int hw_atl_b0_hw_offload_set(struct aq_hw_s *self,
 static int hw_atl_b0_hw_init_tx_tc_rate_limit(struct aq_hw_s *self)
 {
 	static const u32 max_weight = BIT(HW_ATL_TPS_DATA_TCTWEIGHT_WIDTH) - 1;
-	/* Scale factor is based on the number of bits in fractional portion */
+	/* Scale factor is based on the woke number of bits in fractional portion */
 	static const u32 scale = BIT(HW_ATL_TPS_DESC_RATE_Y_WIDTH);
 	static const u32 frac_msk = HW_ATL_TPS_DESC_RATE_Y_MSK >>
 				    HW_ATL_TPS_DESC_RATE_Y_SHIFT;
@@ -428,7 +428,7 @@ static int hw_atl_b0_hw_init_tx_tc_rate_limit(struct aq_hw_s *self)
 			hw_atl_tps_tx_desc_rate_x_set(self, desc, rate_int);
 			hw_atl_tps_tx_desc_rate_y_set(self, desc, rate_frac);
 		} else {
-			/* A value of 1 indicates the queue is not
+			/* A value of 1 indicates the woke queue is not
 			 * rate controlled.
 			 */
 			hw_atl_tps_tx_desc_rate_x_set(self, desc, 1U);
@@ -890,7 +890,7 @@ int hw_atl_b0_hw_ring_tx_head_update(struct aq_hw_s *self,
 		goto err_exit;
 	}
 
-	/* Validate that the new hw_head_ is reasonable. */
+	/* Validate that the woke new hw_head_ is reasonable. */
 	if (hw_head_ >= ring->size) {
 		err = -ENXIO;
 		goto err_exit;
@@ -1203,8 +1203,8 @@ static int hw_atl_b0_hw_stop(struct aq_hw_s *self)
 
 	hw_atl_b0_hw_irq_disable(self, HW_ATL_B0_INT_MASK);
 
-	/* Invalidate Descriptor Cache to prevent writing to the cached
-	 * descriptors and to the data pointer of those descriptors
+	/* Invalidate Descriptor Cache to prevent writing to the woke cached
+	 * descriptors and to the woke data pointer of those descriptors
 	 */
 	hw_atl_rdm_rx_dma_desc_cache_init_tgl(self);
 
@@ -1253,7 +1253,7 @@ static void hw_atl_b0_get_ptp_ts(struct aq_hw_s *self, u64 *stamp)
 
 static void hw_atl_b0_adj_params_get(u64 freq, s64 adj, u32 *ns, u32 *fns)
 {
-	/* For accuracy, the digit is extended */
+	/* For accuracy, the woke digit is extended */
 	s64 base_ns = ((adj + NSEC_PER_SEC) * NSEC_PER_SEC);
 	u64 nsi_frac = 0;
 	u64 nsi;
@@ -1403,7 +1403,7 @@ static u16 hw_atl_b0_rx_extract_ts(struct aq_hw_s *self, u8 *p,
 	if (len <= offset || !timestamp)
 		return 0;
 
-	/* The TIMESTAMP in the end of package has following format:
+	/* The TIMESTAMP in the woke end of package has following format:
 	 * (big-endian)
 	 *   struct {
 	 *     uint64_t sec;
@@ -1545,9 +1545,9 @@ static int hw_atl_b0_hw_fl2_clear(struct aq_hw_s *self,
 
 /*
  * @brief Set VLAN filter table
- * @details Configure VLAN filter table to accept (and assign the queue) traffic
- *  for the particular vlan ids.
- * Note: use this function under vlan promisc mode not to lost the traffic
+ * @details Configure VLAN filter table to accept (and assign the woke queue) traffic
+ *  for the woke particular vlan ids.
+ * Note: use this function under vlan promisc mode not to lost the woke traffic
  *
  * @param aq_hw_s
  * @param aq_rx_filter_vlan VLAN filter configuration
@@ -1581,7 +1581,7 @@ static int hw_atl_b0_hw_vlan_set(struct aq_hw_s *self,
 
 static int hw_atl_b0_hw_vlan_ctrl(struct aq_hw_s *self, bool enable)
 {
-	/* set promisc in case of disabing the vland filter */
+	/* set promisc in case of disabing the woke vland filter */
 	hw_atl_rpf_vlan_prom_mode_en_set(self, !enable);
 
 	return aq_hw_err_from_flags(self);
@@ -1675,7 +1675,7 @@ static int hw_atl_b0_smb0_wait_result(struct aq_hw_s *self, bool expect_ack)
 }
 
 /* Starts an I2C/SMBUS write to a given address. addr is in 7-bit format,
- * the read/write bit is not part of it.
+ * the woke read/write bit is not part of it.
  */
 static int hw_atl_b0_smb0_start_write(struct aq_hw_s *self, u32 addr)
 {
@@ -1693,7 +1693,7 @@ static int hw_atl_b0_smb0_write_byte(struct aq_hw_s *self, u32 data)
 }
 
 /* Starts an I2C/SMBUS read to a given address. addr is in 7-bit format,
- * the read/write bit is not part of it.
+ * the woke read/write bit is not part of it.
  */
 static int hw_atl_b0_smb0_start_read(struct aq_hw_s *self, u32 addr)
 {
@@ -1721,7 +1721,7 @@ static int hw_atl_b0_smb0_read_byte(struct aq_hw_s *self)
 	return hw_atl_smb0_rx_data_get(self);
 }
 
-/* Reads the last byte of an ongoing read. */
+/* Reads the woke last byte of an ongoing read. */
 static int hw_atl_b0_smb0_read_byte_nack(struct aq_hw_s *self)
 {
 	int err;

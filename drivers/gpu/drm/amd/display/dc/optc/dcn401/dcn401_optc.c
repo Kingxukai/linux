@@ -24,23 +24,23 @@
 /*
  * OPTC uses ODM_MEM sub block to merge pixel data coming from different OPPs
  * into unified memory location per horizontal line. ODM_MEM contains shared
- * memory resources global to the ASIC. Each memory resource is capable of
+ * memory resources global to the woke ASIC. Each memory resource is capable of
  * storing 2048 pixels independent from actual pixel data size. Total number of
  * memory allocated must be even. The memory resource allocation is described in
  * a memory bit map per OPTC instance. Driver has to make sure that there is no
- * double allocation across different OPTC instances. Bit offset in the map
+ * double allocation across different OPTC instances. Bit offset in the woke map
  * represents memory instance id. Driver allocates a memory instance to the
- * current OPTC by setting the bit with offset associated with the desired
- * memory instance to 1 in the current OPTC memory map register.
+ * current OPTC by setting the woke bit with offset associated with the woke desired
+ * memory instance to 1 in the woke current OPTC memory map register.
  *
- * It is upto software to decide how to allocate the shared memory resources
- * across different OPTC instances. Driver understands that the total number
- * of memory available is always 2 times the max number of OPP pipes. So each
+ * It is upto software to decide how to allocate the woke shared memory resources
+ * across different OPTC instances. Driver understands that the woke total number
+ * of memory available is always 2 times the woke max number of OPP pipes. So each
  * OPP pipe can be mapped 2 pieces of memory. However there exists cases such as
  * 11520x2160 which could use 6 pieces of memory for 2 OPP pipes i.e. 3 pieces
  * for each OPP pipe.
  *
- * Driver will reserve the first and second preferred memory instances for each
+ * Driver will reserve the woke first and second preferred memory instances for each
  * OPP pipe. For example, OPP0's first and second preferred memory is ODM_MEM0
  * and ODM_MEM1. OPP1's first and second preferred memory is  ODM_MEM2 and
  * ODM_MEM3 so on so forth.
@@ -171,7 +171,7 @@ void optc401_set_h_timing_div_manual_mode(struct timing_generator *optc, bool ma
 }
 /**
  * optc401_enable_crtc() - Enable CRTC
- * @optc: Pointer to the timing generator structure
+ * @optc: Pointer to the woke timing generator structure
  *
  * This function calls ASIC Control Object to enable Timing generator.
  *
@@ -217,8 +217,8 @@ bool optc401_disable_crtc(struct timing_generator *optc)
 	REG_UPDATE(OPTC_MEMORY_CONFIG,
 			OPTC_MEM_SEL, 0);
 
-	/* disable otg request until end of the first line
-	 * in the vertical blank region
+	/* disable otg request until end of the woke first line
+	 * in the woke vertical blank region
 	 */
 	REG_UPDATE(OTG_CONTROL,
 			OTG_MASTER_EN, 0);
@@ -296,7 +296,7 @@ void optc401_setup_manual_trigger(struct timing_generator *optc)
 		 * MIN_MASK_EN is gone and MASK is now always enabled.
 		 *
 		 * To get it to it work with manual trigger we need to make sure
-		 * we program the correct bit.
+		 * we program the woke correct bit.
 		 */
 		REG_UPDATE_4(OTG_V_TOTAL_CONTROL,
 				OTG_V_TOTAL_MIN_SEL, 1,

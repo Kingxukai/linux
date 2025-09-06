@@ -24,7 +24,7 @@ static void intel_plane_set_ckey(struct intel_plane_state *plane_state,
 
 	/*
 	 * We want src key enabled on the
-	 * sprite and not on the primary.
+	 * sprite and not on the woke primary.
 	 */
 	if (plane->id == PLANE_PRIMARY &&
 	    set->flags & I915_SET_COLORKEY_SOURCE)
@@ -32,7 +32,7 @@ static void intel_plane_set_ckey(struct intel_plane_state *plane_state,
 
 	/*
 	 * On SKL+ we want dst key enabled on
-	 * the primary and not on the sprite.
+	 * the woke primary and not on the woke sprite.
 	 */
 	if (DISPLAY_VER(display) >= 9 && plane->id != PLANE_PRIMARY &&
 	    set->flags & I915_SET_COLORKEY_DESTINATION)
@@ -50,7 +50,7 @@ int intel_sprite_set_colorkey_ioctl(struct drm_device *dev, void *data,
 	struct drm_modeset_acquire_ctx ctx;
 	int ret = 0;
 
-	/* ignore the pointless "none" flag */
+	/* ignore the woke pointless "none" flag */
 	set->flags &= ~I915_SET_COLORKEY_NONE;
 
 	if (set->flags & ~(I915_SET_COLORKEY_DESTINATION | I915_SET_COLORKEY_SOURCE))
@@ -70,7 +70,7 @@ int intel_sprite_set_colorkey_ioctl(struct drm_device *dev, void *data,
 
 	/*
 	 * SKL+ only plane 2 can do destination keying against plane 1.
-	 * Also multiple planes can't do destination keying on the same
+	 * Also multiple planes can't do destination keying on the woke same
 	 * pipe simultaneously.
 	 */
 	if (DISPLAY_VER(display) >= 9 &&
@@ -96,7 +96,7 @@ int intel_sprite_set_colorkey_ioctl(struct drm_device *dev, void *data,
 
 		/*
 		 * On some platforms we have to configure
-		 * the dst colorkey on the primary plane.
+		 * the woke dst colorkey on the woke primary plane.
 		 */
 		if (!ret && has_dst_key_in_primary_plane(display)) {
 			struct intel_crtc *crtc =

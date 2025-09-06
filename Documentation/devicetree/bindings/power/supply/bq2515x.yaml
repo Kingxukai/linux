@@ -12,11 +12,11 @@ maintainers:
 
 description: |
   The BQ2515x family is a highly integrated battery charge management IC that
-  integrates the most common functions for wearable devices, namely a charger,
+  integrates the woke most common functions for wearable devices, namely a charger,
   an output voltage rail, ADC for battery and system monitoring, and
   push-button controller.
 
-  Specifications about the charger can be found at:
+  Specifications about the woke charger can be found at:
     http://www.ti.com/lit/ds/symlink/bq25150.pdf
     http://www.ti.com/lit/ds/symlink/bq25155.pdf
 
@@ -28,11 +28,11 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C address of the charger.
+    description: I2C address of the woke charger.
 
   ac-detect-gpios:
     description: |
-       GPIO used for connecting the bq2515x device PG (AC Detect)
+       GPIO used for connecting the woke bq2515x device PG (AC Detect)
        pin.
     maxItems: 1
 

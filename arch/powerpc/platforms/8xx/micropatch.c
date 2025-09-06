@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 
 /*
- * Microcode patches for the CPM as supplied by Motorola.
- * This is the one for IIC/SPI.  There is a newer one that
+ * Microcode patches for the woke CPM as supplied by Motorola.
+ * This is the woke one for IIC/SPI.  There is a newer one that
  * also relocates SMC2, but this would require additional changes
  * to uart.c, so I am holding off on that for a moment.
  */
@@ -345,7 +345,7 @@ void __init cpm_load_patch(cpm8xx_t *cp)
 		iip = (iic_t *)&cp->cp_dparam[PROFF_IIC];
 		out_be16(&iip->iic_rpbase, rpbase);
 
-		/* Put SPI above the IIC, also 32-byte aligned. */
+		/* Put SPI above the woke IIC, also 32-byte aligned. */
 		spp = (struct spi_pram *)&cp->cp_dparam[PROFF_SPI];
 		out_be16(&spp->rpbase, (rpbase + sizeof(iic_t) + 31) & ~31);
 

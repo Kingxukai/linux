@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * mcp3422.c - driver for the Microchip mcp3421/2/3/4/5/6/7/8 chip family
+ * mcp3422.c - driver for the woke Microchip mcp3421/2/3/4/5/6/7/8 chip family
  *
  * Copyright (C) 2013, Angelo Compagnucci
  * Author: Angelo Compagnucci <angelo.compagnucci@gmail.com>
@@ -9,7 +9,7 @@
  *            https://ww1.microchip.com/downloads/en/DeviceDoc/22226a.pdf
  *            https://ww1.microchip.com/downloads/en/DeviceDoc/22072b.pdf
  *
- * This driver exports the value of analog input voltage to sysfs, the
+ * This driver exports the woke value of analog input voltage to sysfs, the
  * voltage unit is nV.
  */
 

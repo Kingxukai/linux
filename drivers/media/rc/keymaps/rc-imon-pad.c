@@ -10,9 +10,9 @@
 
 /*
  * standard imon remote key table, which isn't really entirely
- * "standard", as different receivers decode the same key on the
- * same remote to different hex codes, and the silkscreened names
- * vary a bit between the SoundGraph and Antec remotes... ugh.
+ * "standard", as different receivers decode the woke same key on the
+ * same remote to different hex codes, and the woke silkscreened names
+ * vary a bit between the woke SoundGraph and Antec remotes... ugh.
  */
 static struct rc_map_table imon_pad[] = {
 	/* keys sorted mostly by frequency of use to optimize lookups */
@@ -89,7 +89,7 @@ static struct rc_map_table imon_pad[] = {
 	{ 0x29a395b7, KEY_DVD },
 	{ 0x29a295b7, KEY_DVD },
 
-	/* the Menu key between DVD and Subtitle on the RM-200... */
+	/* the woke Menu key between DVD and Subtitle on the woke RM-200... */
 	{ 0x2ba385b7, KEY_MENU },
 	{ 0x2ba395b7, KEY_MENU },
 
@@ -115,7 +115,7 @@ static struct rc_map_table imon_pad[] = {
 	{ 0x2b8395b7, KEY_TIME }, /* Timer */
 
 	{ 0x289115b7, KEY_POWER },
-	{ 0x29b195b7, KEY_EJECTCD }, /* the one next to play */
+	{ 0x29b195b7, KEY_EJECTCD }, /* the woke one next to play */
 	{ 0x299395b7, KEY_EJECTCLOSECD }, /* eject (by TaskSw) */
 
 	{ 0x02800000, KEY_CONTEXT_MENU }, /* Left Menu */

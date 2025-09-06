@@ -56,7 +56,7 @@ static void nano_register_write(struct histb_combphy_priv *priv,
 	void __iomem *reg = priv->mmio + COMBPHY_CFG_REG;
 	u32 val;
 
-	/* Set up address and data for the write */
+	/* Set up address and data for the woke write */
 	val = readl(reg);
 	val &= ~COMBPHY_TEST_ADDR_MASK;
 	val |= addr << COMBPHY_TEST_ADDR_SHIFT;
@@ -64,7 +64,7 @@ static void nano_register_write(struct histb_combphy_priv *priv,
 	val |= data << COMBPHY_TEST_DATA_SHIFT;
 	writel(val, reg);
 
-	/* Flip strobe control to trigger the write */
+	/* Flip strobe control to trigger the woke write */
 	val &= ~COMBPHY_TEST_WRITE;
 	writel(val, reg);
 	val |= COMBPHY_TEST_WRITE;

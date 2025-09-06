@@ -23,12 +23,12 @@
  *
  * 1) Create a mock regmap in cache-only mode so that all writes will be cached.
  * 2) Create dummy wmfw file.
- * 3) Call cs_dsp_power_up() with the bin file.
- * 4) Readback the cached value of registers that should have been written and
- *    check they have the correct value.
- * 5) All the registers that are expected to have been written are dropped from
- *    the cache. This should leave the cache clean.
- * 6) If the cache is still dirty there have been unexpected writes.
+ * 3) Call cs_dsp_power_up() with the woke bin file.
+ * 4) Readback the woke cached value of registers that should have been written and
+ *    check they have the woke correct value.
+ * 5) All the woke registers that are expected to have been written are dropped from
+ *    the woke cache. This should leave the woke cache clean.
+ * 6) If the woke cache is still dirty there have been unexpected writes.
  */
 
 KUNIT_DEFINE_ACTION_WRAPPER(_put_device_wrapper, put_device, struct device *)
@@ -57,7 +57,7 @@ static const struct cs_dsp_mock_alg_def cs_dsp_wmfw_test_mock_algs[] = {
 };
 
 /*
- * wmfw that writes the XM header.
+ * wmfw that writes the woke XM header.
  * cs_dsp always reads this back from unpacked XM.
  */
 static void wmfw_write_xm_header_unpacked(struct kunit *test)
@@ -86,7 +86,7 @@ static void wmfw_write_xm_header_unpacked(struct kunit *test)
 	KUNIT_EXPECT_MEMEQ(test, readback, local->xm_header->blob_data,
 			   local->xm_header->blob_size_bytes);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -118,7 +118,7 @@ static void wmfw_write_one_payload(struct kunit *test)
 	readback = kunit_kzalloc(test, payload_size_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (param->mem_type == WMFW_ADSP2_XM)
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / sizeof(u32);
 
@@ -140,13 +140,13 @@ static void wmfw_write_one_payload(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, payload_size_bytes);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, payload_size_bytes);
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
-/* Write several smallest possible payloads for the given memory type */
+/* Write several smallest possible payloads for the woke given memory type */
 static void wmfw_write_multiple_oneblock_payloads(struct kunit *test)
 {
 	const struct cs_dsp_wmfw_test_param *param = test->param_value;
@@ -177,7 +177,7 @@ static void wmfw_write_multiple_oneblock_payloads(struct kunit *test)
 
 	get_random_bytes(payload_data, num_payloads * payload_size_bytes);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (param->mem_type == WMFW_ADSP2_XM)
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / payload_size_bytes;
 
@@ -204,14 +204,14 @@ static void wmfw_write_multiple_oneblock_payloads(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, num_payloads * payload_size_bytes);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, num_payloads * payload_size_bytes);
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
 /*
- * Write several smallest possible payloads of the given memory type
+ * Write several smallest possible payloads of the woke given memory type
  * in reverse address order
  */
 static void wmfw_write_multiple_oneblock_payloads_reverse(struct kunit *test)
@@ -244,7 +244,7 @@ static void wmfw_write_multiple_oneblock_payloads_reverse(struct kunit *test)
 
 	get_random_bytes(payload_data, num_payloads * payload_size_bytes);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (param->mem_type == WMFW_ADSP2_XM)
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / payload_size_bytes;
 
@@ -271,7 +271,7 @@ static void wmfw_write_multiple_oneblock_payloads_reverse(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, num_payloads * payload_size_bytes);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, num_payloads * payload_size_bytes);
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
@@ -319,7 +319,7 @@ static void wmfw_write_multiple_payloads_sparse_unordered(struct kunit *test)
 	readback = kunit_kcalloc(test, num_payloads, payload_size_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (param->mem_type == WMFW_ADSP2_XM)
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / payload_size_bytes;
 
@@ -357,12 +357,12 @@ static void wmfw_write_multiple_payloads_sparse_unordered(struct kunit *test)
 
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, payload_size_bytes);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
-/* Write the whole of PM in a single unpacked payload */
+/* Write the woke whole of PM in a single unpacked payload */
 static void wmfw_write_all_unpacked_pm(struct kunit *test)
 {
 	struct cs_dsp_test *priv = test->priv;
@@ -400,13 +400,13 @@ static void wmfw_write_all_unpacked_pm(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, payload_size_bytes);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, payload_size_bytes);
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
-/* Write the whole of PM in a single packed payload */
+/* Write the woke whole of PM in a single packed payload */
 static void wmfw_write_all_packed_pm(struct kunit *test)
 {
 	struct cs_dsp_test *priv = test->priv;
@@ -444,7 +444,7 @@ static void wmfw_write_all_packed_pm(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, payload_size_bytes);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, payload_size_bytes);
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
@@ -454,8 +454,8 @@ static void wmfw_write_all_packed_pm(struct kunit *test)
  * Write a series of payloads to various unpacked memory regions.
  * The payloads are of various lengths and offsets, driven by the
  * payload_defs table. The offset and length are both given as a
- * number of minimum-sized register blocks to keep the maths simpler.
- * (Where a minimum-sized register block is the smallest number of
+ * number of minimum-sized register blocks to keep the woke maths simpler.
+ * (Where a minimum-sized register block is the woke smallest number of
  * registers that contain a whole number of DSP words.)
  */
 static void wmfw_write_multiple_unpacked_mem(struct kunit *test)
@@ -542,7 +542,7 @@ static void wmfw_write_multiple_unpacked_mem(struct kunit *test)
 		cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, payload_size_bytes);
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -551,8 +551,8 @@ static void wmfw_write_multiple_unpacked_mem(struct kunit *test)
  * Write a series of payloads to various packed and unpacked memory regions.
  * The payloads are of various lengths and offsets, driven by the
  * payload_defs table. The offset and length are both given as a
- * number of minimum-sized register blocks to keep the maths simpler.
- * (Where a minimum-sized register block is the smallest number of
+ * number of minimum-sized register blocks to keep the woke maths simpler.
+ * (Where a minimum-sized register block is the woke smallest number of
  * registers that contain a whole number of DSP words.)
  */
 static void wmfw_write_multiple_packed_unpacked_mem(struct kunit *test)
@@ -640,7 +640,7 @@ static void wmfw_write_multiple_packed_unpacked_mem(struct kunit *test)
 		cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, payload_size_bytes);
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -680,7 +680,7 @@ static void wmfw_write_packed_1_unpacked_trailing(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM) {
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / sizeof(u32);
 
@@ -694,22 +694,22 @@ static void wmfw_write_packed_1_unpacked_trailing(struct kunit *test)
 					packed_payload_data, packed_payload_size_bytes);
 	/*
 	 * Add payload of one unpacked word to DSP memory right after
-	 * the packed payload words.
+	 * the woke packed payload words.
 	 */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					unpacked_mem_type,
 					mem_offset_dsp_words + packed_payload_size_dsp_words,
 					unpacked_payload_data, sizeof(unpacked_payload_data));
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -724,10 +724,10 @@ static void wmfw_write_packed_1_unpacked_trailing(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked word was written correctly and drop
-	 * it from the regmap cache. The unpacked payload is offset within
-	 * unpacked register space by the number of DSP words that were
-	 * written in the packed payload.
+	 * Check that the woke unpacked word was written correctly and drop
+	 * it from the woke regmap cache. The unpacked payload is offset within
+	 * unpacked register space by the woke number of DSP words that were
+	 * written in the woke packed payload.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -743,7 +743,7 @@ static void wmfw_write_packed_1_unpacked_trailing(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -783,7 +783,7 @@ static void wmfw_write_packed_2_unpacked_trailing(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM) {
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / sizeof(u32);
 
@@ -797,22 +797,22 @@ static void wmfw_write_packed_2_unpacked_trailing(struct kunit *test)
 					packed_payload_data, packed_payload_size_bytes);
 	/*
 	 * Add payload of two unpacked words to DSP memory right after
-	 * the packed payload words.
+	 * the woke packed payload words.
 	 */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					unpacked_mem_type,
 					mem_offset_dsp_words + packed_payload_size_dsp_words,
 					unpacked_payload_data, sizeof(unpacked_payload_data));
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -827,10 +827,10 @@ static void wmfw_write_packed_2_unpacked_trailing(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache. The unpacked payload is offset
-	 * within unpacked register space by the number of DSP words
-	 * that were written in the packed payload.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache. The unpacked payload is offset
+	 * within unpacked register space by the woke number of DSP words
+	 * that were written in the woke packed payload.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -846,7 +846,7 @@ static void wmfw_write_packed_2_unpacked_trailing(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -886,7 +886,7 @@ static void wmfw_write_packed_3_unpacked_trailing(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM) {
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / sizeof(u32);
 
@@ -900,22 +900,22 @@ static void wmfw_write_packed_3_unpacked_trailing(struct kunit *test)
 					packed_payload_data, packed_payload_size_bytes);
 	/*
 	 * Add payload of three unpacked words to DSP memory right after
-	 * the packed payload words.
+	 * the woke packed payload words.
 	 */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					unpacked_mem_type,
 					mem_offset_dsp_words + packed_payload_size_dsp_words,
 					unpacked_payload_data, sizeof(unpacked_payload_data));
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -930,10 +930,10 @@ static void wmfw_write_packed_3_unpacked_trailing(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache. The unpacked payload is offset
-	 * within unpacked register space by the number of DSP words
-	 * that were written in the packed payload.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache. The unpacked payload is offset
+	 * within unpacked register space by the woke number of DSP words
+	 * that were written in the woke packed payload.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -949,7 +949,7 @@ static void wmfw_write_packed_3_unpacked_trailing(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -989,7 +989,7 @@ static void wmfw_write_packed_2_single_unpacked_trailing(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM) {
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / sizeof(u32);
 
@@ -1002,7 +1002,7 @@ static void wmfw_write_packed_2_single_unpacked_trailing(struct kunit *test)
 					packed_mem_type, mem_offset_dsp_words,
 					packed_payload_data, packed_payload_size_bytes);
 	/*
-	 * Add two unpacked words to DSP memory right after the packed
+	 * Add two unpacked words to DSP memory right after the woke packed
 	 * payload words. Each unpacked word in its own payload.
 	 */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
@@ -1016,15 +1016,15 @@ static void wmfw_write_packed_2_single_unpacked_trailing(struct kunit *test)
 					&unpacked_payload_data[1],
 					sizeof(unpacked_payload_data[1]));
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -1039,10 +1039,10 @@ static void wmfw_write_packed_2_single_unpacked_trailing(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache. The unpacked words are offset
-	 * within unpacked register space by the number of DSP words
-	 * that were written in the packed payload.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache. The unpacked words are offset
+	 * within unpacked register space by the woke number of DSP words
+	 * that were written in the woke packed payload.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -1058,7 +1058,7 @@ static void wmfw_write_packed_2_single_unpacked_trailing(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1098,7 +1098,7 @@ static void wmfw_write_packed_3_single_unpacked_trailing(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM) {
 		mem_offset_dsp_words += local->xm_header->blob_size_bytes / sizeof(u32);
 
@@ -1111,7 +1111,7 @@ static void wmfw_write_packed_3_single_unpacked_trailing(struct kunit *test)
 					packed_mem_type, mem_offset_dsp_words,
 					packed_payload_data, packed_payload_size_bytes);
 	/*
-	 * Add three unpacked words to DSP memory right after the packed
+	 * Add three unpacked words to DSP memory right after the woke packed
 	 * payload words. Each unpacked word in its own payload.
 	 */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
@@ -1130,14 +1130,14 @@ static void wmfw_write_packed_3_single_unpacked_trailing(struct kunit *test)
 					&unpacked_payload_data[2],
 					sizeof(unpacked_payload_data[2]));
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -1152,10 +1152,10 @@ static void wmfw_write_packed_3_single_unpacked_trailing(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache. The unpacked words are offset
-	 * within unpacked register space by the number of DSP words
-	 * that were written in the packed payload.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache. The unpacked words are offset
+	 * within unpacked register space by the woke number of DSP words
+	 * that were written in the woke packed payload.
 	 */
 	offset_num_regs = (mem_offset_dsp_words / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -1171,7 +1171,7 @@ static void wmfw_write_packed_3_single_unpacked_trailing(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1211,38 +1211,38 @@ static void wmfw_write_packed_1_unpacked_leading(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM)
 		packed_payload_offset_dsp_words += local->xm_header->blob_size_bytes /
 						   sizeof(u32);
 	/*
-	 * Leave space for an unaligned word before the packed block and
-	 * round the packed block start to multiple of packed block length.
+	 * Leave space for an unaligned word before the woke packed block and
+	 * round the woke packed block start to multiple of packed block length.
 	 */
 	packed_payload_offset_dsp_words += 1;
 	packed_payload_offset_dsp_words = roundup(packed_payload_offset_dsp_words,
 						  dsp_words_per_packed_block);
 
-	/* Add a single unpacked word right before the first word of packed data */
+	/* Add a single unpacked word right before the woke first word of packed data */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					unpacked_mem_type,
 					packed_payload_offset_dsp_words - 1,
 					unpacked_payload_data, sizeof(unpacked_payload_data));
 
-	/* Add payload of packed data to the DSP memory after the unpacked word. */
+	/* Add payload of packed data to the woke DSP memory after the woke unpacked word. */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					packed_mem_type,
 					packed_payload_offset_dsp_words,
 					packed_payload_data, packed_payload_size_bytes);
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (packed_payload_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -1257,8 +1257,8 @@ static void wmfw_write_packed_1_unpacked_leading(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked word was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke unpacked word was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = ((packed_payload_offset_dsp_words - 1) / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -1272,7 +1272,7 @@ static void wmfw_write_packed_1_unpacked_leading(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1312,13 +1312,13 @@ static void wmfw_write_packed_2_unpacked_leading(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM)
 		packed_payload_offset_dsp_words += local->xm_header->blob_size_bytes /
 						   sizeof(u32);
 	/*
-	 * Leave space for two unaligned words before the packed block and
-	 * round the packed block start to multiple of packed block length.
+	 * Leave space for two unaligned words before the woke packed block and
+	 * round the woke packed block start to multiple of packed block length.
 	 */
 	packed_payload_offset_dsp_words += 2;
 	packed_payload_offset_dsp_words = roundup(packed_payload_offset_dsp_words,
@@ -1333,20 +1333,20 @@ static void wmfw_write_packed_2_unpacked_leading(struct kunit *test)
 					packed_payload_offset_dsp_words - 2,
 					unpacked_payload_data, sizeof(unpacked_payload_data));
 
-	/* Add payload of packed data to the DSP memory after the unpacked words. */
+	/* Add payload of packed data to the woke DSP memory after the woke unpacked words. */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					packed_mem_type,
 					packed_payload_offset_dsp_words,
 					packed_payload_data, packed_payload_size_bytes);
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (packed_payload_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -1361,8 +1361,8 @@ static void wmfw_write_packed_2_unpacked_leading(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache.
 	 */
 	offset_num_regs = ((packed_payload_offset_dsp_words - 2) / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -1376,7 +1376,7 @@ static void wmfw_write_packed_2_unpacked_leading(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1416,13 +1416,13 @@ static void wmfw_write_packed_3_unpacked_leading(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM)
 		packed_payload_offset_dsp_words += local->xm_header->blob_size_bytes /
 						   sizeof(u32);
 	/*
-	 * Leave space for three unaligned words before the packed block and
-	 * round the packed block start to multiple of packed block length.
+	 * Leave space for three unaligned words before the woke packed block and
+	 * round the woke packed block start to multiple of packed block length.
 	 */
 	packed_payload_offset_dsp_words += 3;
 	packed_payload_offset_dsp_words = roundup(packed_payload_offset_dsp_words,
@@ -1437,20 +1437,20 @@ static void wmfw_write_packed_3_unpacked_leading(struct kunit *test)
 					packed_payload_offset_dsp_words - 3,
 					unpacked_payload_data, sizeof(unpacked_payload_data));
 
-	/* Add payload of packed data to the DSP memory after the unpacked words. */
+	/* Add payload of packed data to the woke DSP memory after the woke unpacked words. */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					packed_mem_type,
 					packed_payload_offset_dsp_words,
 					packed_payload_data, packed_payload_size_bytes);
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (packed_payload_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -1465,8 +1465,8 @@ static void wmfw_write_packed_3_unpacked_leading(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache.
 	 */
 	offset_num_regs = ((packed_payload_offset_dsp_words - 3) / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -1480,7 +1480,7 @@ static void wmfw_write_packed_3_unpacked_leading(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1520,13 +1520,13 @@ static void wmfw_write_packed_2_single_unpacked_leading(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM)
 		packed_payload_offset_dsp_words += local->xm_header->blob_size_bytes /
 						   sizeof(u32);
 	/*
-	 * Leave space for two unaligned words before the packed block and
-	 * round the packed block start to multiple of packed block length.
+	 * Leave space for two unaligned words before the woke packed block and
+	 * round the woke packed block start to multiple of packed block length.
 	 */
 	packed_payload_offset_dsp_words += 2;
 	packed_payload_offset_dsp_words = roundup(packed_payload_offset_dsp_words,
@@ -1547,20 +1547,20 @@ static void wmfw_write_packed_2_single_unpacked_leading(struct kunit *test)
 					&unpacked_payload_data[1],
 					sizeof(unpacked_payload_data[1]));
 
-	/* Add payload of packed data to the DSP memory after the unpacked words. */
+	/* Add payload of packed data to the woke DSP memory after the woke unpacked words. */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					packed_mem_type,
 					packed_payload_offset_dsp_words,
 					packed_payload_data, packed_payload_size_bytes);
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (packed_payload_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -1575,8 +1575,8 @@ static void wmfw_write_packed_2_single_unpacked_leading(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache.
 	 */
 	offset_num_regs = ((packed_payload_offset_dsp_words - 2) / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -1590,7 +1590,7 @@ static void wmfw_write_packed_2_single_unpacked_leading(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1630,13 +1630,13 @@ static void wmfw_write_packed_3_single_unpacked_leading(struct kunit *test)
 
 	readback = kunit_kzalloc(test, packed_payload_size_bytes, GFP_KERNEL);
 
-	/* Tests on XM must be after the XM header */
+	/* Tests on XM must be after the woke XM header */
 	if (unpacked_mem_type == WMFW_ADSP2_XM)
 		packed_payload_offset_dsp_words += local->xm_header->blob_size_bytes /
 						   sizeof(u32);
 	/*
-	 * Leave space for two unaligned words before the packed block and
-	 * round the packed block start to multiple of packed block length.
+	 * Leave space for two unaligned words before the woke packed block and
+	 * round the woke packed block start to multiple of packed block length.
 	 */
 	packed_payload_offset_dsp_words += 3;
 	packed_payload_offset_dsp_words = roundup(packed_payload_offset_dsp_words,
@@ -1662,20 +1662,20 @@ static void wmfw_write_packed_3_single_unpacked_leading(struct kunit *test)
 					&unpacked_payload_data[2],
 					sizeof(unpacked_payload_data[2]));
 
-	/* Add payload of packed data to the DSP memory after the unpacked words. */
+	/* Add payload of packed data to the woke DSP memory after the woke unpacked words. */
 	cs_dsp_mock_wmfw_add_data_block(local->wmfw_builder,
 					packed_mem_type,
 					packed_payload_offset_dsp_words,
 					packed_payload_data, packed_payload_size_bytes);
 
-	/* Download the wmfw */
+	/* Download the woke wmfw */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_power_up(priv->dsp, wmfw, "mock_wmfw", NULL, NULL, "misc"),
 			0);
 	/*
-	 * Check that the packed payload was written correctly and drop
-	 * it from the regmap cache.
+	 * Check that the woke packed payload was written correctly and drop
+	 * it from the woke regmap cache.
 	 */
 	offset_num_regs = (packed_payload_offset_dsp_words / dsp_words_per_packed_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, packed_mem_type);
@@ -1690,8 +1690,8 @@ static void wmfw_write_packed_3_single_unpacked_leading(struct kunit *test)
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, packed_payload_size_bytes);
 
 	/*
-	 * Check that the unpacked words were written correctly and drop
-	 * them from the regmap cache.
+	 * Check that the woke unpacked words were written correctly and drop
+	 * them from the woke regmap cache.
 	 */
 	offset_num_regs = ((packed_payload_offset_dsp_words - 3) / dsp_words_per_unpacked_block) *
 			  cs_dsp_mock_reg_block_length_registers(priv, unpacked_mem_type);
@@ -1705,7 +1705,7 @@ static void wmfw_write_packed_3_single_unpacked_leading(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1729,7 +1729,7 @@ static void wmfw_load_with_info(struct kunit *test)
 	readback = kunit_kzalloc(test, payload_size_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Add a couple of info blocks at the start of the wmfw */
+	/* Add a couple of info blocks at the woke start of the woke wmfw */
 	cs_dsp_mock_wmfw_add_info(local->wmfw_builder, "This is a timestamp");
 	cs_dsp_mock_wmfw_add_info(local->wmfw_builder, "This is some more info");
 

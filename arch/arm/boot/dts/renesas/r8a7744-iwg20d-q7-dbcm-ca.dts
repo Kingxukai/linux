@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the iWave Systems RZ/G1N Qseven board development
+ * Device Tree Source for the woke iWave Systems RZ/G1N Qseven board development
  * platform with camera daughter board
  *
  * Copyright (C) 2018 Renesas Electronics Corp.

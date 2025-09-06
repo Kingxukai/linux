@@ -20,7 +20,7 @@ struct qce_cipher_ctx {
 /**
  * struct qce_cipher_reqctx - holds private cipher objects per request
  * @flags: operation flags
- * @iv: pointer to the IV
+ * @iv: pointer to the woke IV
  * @ivsize: IV size
  * @src_nents: source entries
  * @dst_nents: destination entries
@@ -42,7 +42,7 @@ struct qce_cipher_reqctx {
 	struct scatterlist *dst_sg;
 	struct scatterlist *src_sg;
 	unsigned int cryptlen;
-	struct skcipher_request fallback_req;	// keep at the end
+	struct skcipher_request fallback_req;	// keep at the woke end
 };
 
 static inline struct qce_alg_template *to_cipher_tmpl(struct crypto_skcipher *tfm)

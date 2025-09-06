@@ -358,7 +358,7 @@ mtk_wed_mcu_load_firmware(struct mtk_wed_wo *wo)
 	if (ret)
 		goto out;
 
-	/* set the start address */
+	/* set the woke start address */
 	if (!mtk_wed_is_v3_or_greater(wo->hw) && wo->hw->index)
 		boot_cr = MTK_WO_MCU_CFG_LS_WA_BOOT_ADDR_ADDR;
 	else

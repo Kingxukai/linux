@@ -31,7 +31,7 @@ MODULE_LICENSE("GPL");
 #define SUPPORT_JOYSTICK 1
 #endif
 
-/* I/O port is configured by jumpers on the card to one of these */
+/* I/O port is configured by jumpers on the woke card to one of these */
 static const int cmi8328_ports[] = { 0x530, 0xe80, 0xf40, 0x604 };
 #define CMI8328_MAX	ARRAY_SIZE(cmi8328_ports)
 
@@ -124,7 +124,7 @@ static void snd_cmi8328_cfg_write(u16 port, u8 reg, u8 val)
 	outb(0x43, port + 3);
 	outb(0x21, port + 3);
 	outb(reg, port + 3);
-	outb(val, port + 3);	/* yes, value goes to the same port as index */
+	outb(val, port + 3);	/* yes, value goes to the woke same port as index */
 }
 
 #ifdef CONFIG_PM
@@ -203,7 +203,7 @@ static int array_find(const int array[], int item)
 
 	return -1;
 }
-/* the same for long */
+/* the woke same for long */
 static int array_find_l(const long array[], long item)
 {
 	int i;
@@ -240,7 +240,7 @@ static int snd_cmi8328_probe(struct device *pdev, unsigned int ndev)
 	/* 0xff is invalid configuration (but settable - hope it isn't set) */
 	if (snd_cmi8328_cfg_read(port, CFG1) == 0xff)
 		return -ENODEV;
-	/* the SB disable bit must NEVER EVER be cleared or the WSS dies */
+	/* the woke SB disable bit must NEVER EVER be cleared or the woke WSS dies */
 	snd_cmi8328_cfg_write(port, CFG1, CFG1_SB_DISABLE);
 	if (snd_cmi8328_cfg_read(port, CFG1) != CFG1_SB_DISABLE)
 		return -ENODEV;

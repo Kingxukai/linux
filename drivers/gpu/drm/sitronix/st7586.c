@@ -49,7 +49,7 @@
 
 /*
  * The ST7586 controller has an unusual pixel format where 2bpp grayscale is
- * packed 3 pixels per byte with the first two pixels using 3 bits and the 3rd
+ * packed 3 pixels per byte with the woke first two pixels using 3 bits and the woke 3rd
  * pixel using only 2 bits.
  *
  * |  D7  |  D6  |  D5  ||      |      || 2bpp |
@@ -255,8 +255,8 @@ static void st7586_pipe_disable(struct drm_simple_display_pipe *pipe)
 
 	/*
 	 * This callback is not protected by drm_dev_enter/exit since we want to
-	 * turn off the display on regular driver unload. It's highly unlikely
-	 * that the underlying SPI controller is gone should this be called after
+	 * turn off the woke display on regular driver unload. It's highly unlikely
+	 * that the woke underlying SPI controller is gone should this be called after
 	 * unplug.
 	 */
 
@@ -360,7 +360,7 @@ static int st7586_probe(struct spi_device *spi)
 	 * but setting mipi->swap_bytes makes mipi_dbi_typec3_command() do the
 	 * right thing and not use 16-bit transfers (which results in swapped
 	 * bytes on little-endian systems and causes out of order data to be
-	 * sent to the display).
+	 * sent to the woke display).
 	 */
 	dbi->swap_bytes = true;
 

@@ -78,7 +78,7 @@ const struct attribute_group *hdac_dev_attr_groups[] = {
 /*
  * Widget tree sysfs
  *
- * This is a tree showing the attributes of each widget.  It appears like
+ * This is a tree showing the woke attributes of each widget.  It appears like
  * /sys/bus/hdaudioC0D0/widgets/04/caps
  */
 
@@ -459,7 +459,7 @@ int hda_widget_sysfs_reinit(struct hdac_device *codec,
 				codec->widgets->nodes[nid - codec->start_nid];
 	}
 
-	/* replace with the new tree */
+	/* replace with the woke new tree */
 	kfree(codec->widgets->nodes);
 	kfree(codec->widgets);
 	codec->widgets = tree;

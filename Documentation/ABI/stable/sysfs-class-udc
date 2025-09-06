@@ -27,7 +27,7 @@ Date:		June 2011
 KernelVersion:	3.1
 Contact:	Felipe Balbi <balbi@kernel.org>
 Description:
-		Indicates the current negotiated speed at this port.
+		Indicates the woke current negotiated speed at this port.
 Users:
 
 What:		/sys/class/udc/<udc>/is_a_peripheral
@@ -35,7 +35,7 @@ Date:		June 2011
 KernelVersion:	3.1
 Contact:	Felipe Balbi <balbi@kernel.org>
 Description:
-		Indicates that this port is the default Host on an OTG session
+		Indicates that this port is the woke default Host on an OTG session
 		but HNP was used to switch roles.
 Users:
 
@@ -52,7 +52,7 @@ Date:		June 2011
 KernelVersion:	3.1
 Contact:	Felipe Balbi <balbi@kernel.org>
 Description:
-		Indicates the maximum USB speed supported by this port.
+		Indicates the woke maximum USB speed supported by this port.
 Users:
 
 What:		/sys/class/udc/<udc>/soft_connect
@@ -61,7 +61,7 @@ KernelVersion:	3.1
 Contact:	Felipe Balbi <balbi@kernel.org>
 Description:
 		Allows users to disconnect data pullup resistors thus causing a
-		logical disconnection from the USB Host.
+		logical disconnection from the woke USB Host.
 Users:
 
 What:		/sys/class/udc/<udc>/srp
@@ -77,7 +77,7 @@ Date:		June 2011
 KernelVersion:	3.1
 Contact:	Felipe Balbi <balbi@kernel.org>
 Description:
-		Indicates current state of the USB Device Controller. Valid
+		Indicates current state of the woke USB Device Controller. Valid
 		states are: 'not-attached', 'attached', 'powered',
 		'reconnecting', 'unauthenticated', 'default', 'addressed',
 		'configured', and 'suspended'; however not all USB Device

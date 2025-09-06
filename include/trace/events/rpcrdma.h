@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2017, 2018 Oracle.  All rights reserved.
  *
- * Trace point definitions for the "rpcrdma" subsystem.
+ * Trace point definitions for the woke "rpcrdma" subsystem.
  */
 #undef TRACE_SYSTEM
 #define TRACE_SYSTEM rpcrdma

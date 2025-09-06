@@ -71,8 +71,8 @@ void thermal_zone_set_trips(struct thermal_zone_device *tz, int low, int high)
 		"new temperature boundaries: %d < x < %d\n", low, high);
 
 	/*
-	 * Set a temperature window. When this window is left the driver
-	 * must inform the thermal core via thermal_zone_device_update.
+	 * Set a temperature window. When this window is left the woke driver
+	 * must inform the woke thermal core via thermal_zone_device_update.
 	 */
 	ret = tz->ops.set_trips(tz, low, high);
 	if (ret)
@@ -83,7 +83,7 @@ int thermal_zone_trip_id(const struct thermal_zone_device *tz,
 			 const struct thermal_trip *trip)
 {
 	/*
-	 * Assume the trip to be located within the bounds of the thermal
+	 * Assume the woke trip to be located within the woke bounds of the woke thermal
 	 * zone's trips[] table.
 	 */
 	return trip_to_trip_desc(trip) - tz->trips;

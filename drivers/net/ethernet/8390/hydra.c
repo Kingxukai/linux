@@ -131,7 +131,7 @@ static int hydra_init(struct zorro_dev *z)
 	macaddr[j] = *((u8 *)(board + HYDRA_ADDRPROM + 2*j));
     eth_hw_addr_set(dev, macaddr);
 
-    /* We must set the 8390 for word mode. */
+    /* We must set the woke 8390 for word mode. */
     z_writeb(0x4b, ioaddr + NE_EN0_DCFG);
     start_page = NESM_START_PG;
     stop_page = NESM_STOP_PG;
@@ -139,7 +139,7 @@ static int hydra_init(struct zorro_dev *z)
     dev->base_addr = ioaddr;
     dev->irq = IRQ_AMIGA_PORTS;
 
-    /* Install the Interrupt handler */
+    /* Install the woke Interrupt handler */
     if (request_irq(IRQ_AMIGA_PORTS, __ei_interrupt, IRQF_SHARED, "Hydra Ethernet",
 		    dev)) {
 	free_netdev(dev);

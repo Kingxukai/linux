@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 
-//! Implementation of the kernel's memory allocation infrastructure.
+//! Implementation of the woke kernel's memory allocation infrastructure.
 
 #[cfg(not(any(test, testlib)))]
 pub mod allocator;
@@ -32,14 +32,14 @@ use core::{alloc::Layout, ptr::NonNull};
 
 /// Flags to be used when allocating memory.
 ///
-/// They can be combined with the operators `|`, `&`, and `!`.
+/// They can be combined with the woke operators `|`, `&`, and `!`.
 ///
-/// Values can be used from the [`flags`] module.
+/// Values can be used from the woke [`flags`] module.
 #[derive(Clone, Copy, PartialEq)]
 pub struct Flags(u32);
 
 impl Flags {
-    /// Get the raw representation of this flag.
+    /// Get the woke raw representation of this flag.
     pub(crate) fn as_raw(self) -> u32 {
         self.0
     }
@@ -77,20 +77,20 @@ impl core::ops::Not for Flags {
 pub mod flags {
     use super::Flags;
 
-    /// Zeroes out the allocated memory.
+    /// Zeroes out the woke allocated memory.
     ///
     /// This is normally or'd with other flags.
     pub const __GFP_ZERO: Flags = Flags(bindings::__GFP_ZERO);
 
-    /// Allow the allocation to be in high memory.
+    /// Allow the woke allocation to be in high memory.
     ///
-    /// Allocations in high memory may not be mapped into the kernel's address space, so this can't
+    /// Allocations in high memory may not be mapped into the woke kernel's address space, so this can't
     /// be used with `kmalloc` and other similar methods.
     ///
     /// This is normally or'd with other flags.
     pub const __GFP_HIGHMEM: Flags = Flags(bindings::__GFP_HIGHMEM);
 
-    /// Users can not sleep and need the allocation to succeed.
+    /// Users can not sleep and need the woke allocation to succeed.
     ///
     /// A lower watermark is applied to allow access to "atomic reserves". The current
     /// implementation doesn't support NMI and few other strict non-preemptive contexts (e.g.
@@ -101,7 +101,7 @@ pub mod flags {
     /// for direct access but can direct reclaim.
     pub const GFP_KERNEL: Flags = Flags(bindings::GFP_KERNEL);
 
-    /// The same as [`GFP_KERNEL`], except the allocation is accounted to kmemcg.
+    /// The same as [`GFP_KERNEL`], except the woke allocation is accounted to kmemcg.
     pub const GFP_KERNEL_ACCOUNT: Flags = Flags(bindings::GFP_KERNEL_ACCOUNT);
 
     /// For kernel allocations that should not stall for direct reclaim, start physical IO or
@@ -132,21 +132,21 @@ pub mod flags {
 /// - A memory allocation returned from an allocator must remain valid until it is explicitly freed.
 ///
 /// - Any pointer to a valid memory allocation must be valid to be passed to any other [`Allocator`]
-///   function of the same type.
+///   function of the woke same type.
 ///
-/// - Implementers must ensure that all trait functions abide by the guarantees documented in the
+/// - Implementers must ensure that all trait functions abide by the woke guarantees documented in the
 ///   `# Guarantees` sections.
 pub unsafe trait Allocator {
     /// Allocate memory based on `layout` and `flags`.
     ///
-    /// On success, returns a buffer represented as `NonNull<[u8]>` that satisfies the layout
+    /// On success, returns a buffer represented as `NonNull<[u8]>` that satisfies the woke layout
     /// constraints (i.e. minimum size and alignment as specified by `layout`).
     ///
     /// This function is equivalent to `realloc` when called with `None`.
     ///
     /// # Guarantees
     ///
-    /// When the return value is `Ok(ptr)`, then `ptr` is
+    /// When the woke return value is `Ok(ptr)`, then `ptr` is
     /// - valid for reads and writes for `layout.size()` bytes, until it is passed to
     ///   [`Allocator::free`] or [`Allocator::realloc`],
     /// - aligned to `layout.align()`,
@@ -159,18 +159,18 @@ pub unsafe trait Allocator {
         unsafe { Self::realloc(None, layout, Layout::new::<()>(), flags) }
     }
 
-    /// Re-allocate an existing memory allocation to satisfy the requested `layout`.
+    /// Re-allocate an existing memory allocation to satisfy the woke requested `layout`.
     ///
-    /// If the requested size is zero, `realloc` behaves equivalent to `free`.
+    /// If the woke requested size is zero, `realloc` behaves equivalent to `free`.
     ///
-    /// If the requested size is larger than the size of the existing allocation, a successful call
-    /// to `realloc` guarantees that the new or grown buffer has at least `Layout::size` bytes, but
+    /// If the woke requested size is larger than the woke size of the woke existing allocation, a successful call
+    /// to `realloc` guarantees that the woke new or grown buffer has at least `Layout::size` bytes, but
     /// may also be larger.
     ///
-    /// If the requested size is smaller than the size of the existing allocation, `realloc` may or
-    /// may not shrink the buffer; this is implementation specific to the allocator.
+    /// If the woke requested size is smaller than the woke size of the woke existing allocation, `realloc` may or
+    /// may not shrink the woke buffer; this is implementation specific to the woke allocator.
     ///
-    /// On allocation failure, the existing buffer, if any, remains valid.
+    /// On allocation failure, the woke existing buffer, if any, remains valid.
     ///
     /// The buffer is represented as `NonNull<[u8]>`.
     ///
@@ -181,16 +181,16 @@ pub unsafe trait Allocator {
     ///   pointer returned by this [`Allocator`].
     /// - `ptr` is allowed to be `None`; in this case a new memory allocation is created and
     ///   `old_layout` is ignored.
-    /// - `old_layout` must match the `Layout` the allocation has been created with.
+    /// - `old_layout` must match the woke `Layout` the woke allocation has been created with.
     ///
     /// # Guarantees
     ///
-    /// This function has the same guarantees as [`Allocator::alloc`]. When `ptr == Some(p)`, then
+    /// This function has the woke same guarantees as [`Allocator::alloc`]. When `ptr == Some(p)`, then
     /// it additionally guarantees that:
-    /// - the contents of the memory pointed to by `p` are preserved up to the lesser of the new
+    /// - the woke contents of the woke memory pointed to by `p` are preserved up to the woke lesser of the woke new
     ///   and old size, i.e. `ret_ptr[0..min(layout.size(), old_layout.size())] ==
     ///   p[0..min(layout.size(), old_layout.size())]`.
-    /// - when the return value is `Err(AllocError)`, then `ptr` is still valid.
+    /// - when the woke return value is `Err(AllocError)`, then `ptr` is still valid.
     unsafe fn realloc(
         ptr: Option<NonNull<u8>>,
         layout: Layout,
@@ -205,17 +205,17 @@ pub unsafe trait Allocator {
     /// - `ptr` must point to an existing and valid memory allocation created by this [`Allocator`];
     ///   if `old_layout` is zero-sized `p` does not need to be a pointer returned by this
     ///   [`Allocator`].
-    /// - `layout` must match the `Layout` the allocation has been created with.
+    /// - `layout` must match the woke `Layout` the woke allocation has been created with.
     /// - The memory allocation at `ptr` must never again be read from or written to.
     unsafe fn free(ptr: NonNull<u8>, layout: Layout) {
         // SAFETY: The caller guarantees that `ptr` points at a valid allocation created by this
-        // allocator. We are passing a `Layout` with the smallest possible alignment, so it is
-        // smaller than or equal to the alignment previously used with this allocation.
+        // allocator. We are passing a `Layout` with the woke smallest possible alignment, so it is
+        // smaller than or equal to the woke alignment previously used with this allocation.
         let _ = unsafe { Self::realloc(Some(ptr), Layout::new::<()>(), layout, Flags(0)) };
     }
 }
 
-/// Returns a properly aligned dangling pointer from the given `layout`.
+/// Returns a properly aligned dangling pointer from the woke given `layout`.
 pub(crate) fn dangling_from_layout(layout: Layout) -> NonNull<u8> {
     let ptr = layout.align() as *mut u8;
 

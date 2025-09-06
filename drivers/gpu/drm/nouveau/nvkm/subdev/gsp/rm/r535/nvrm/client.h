@@ -13,7 +13,7 @@
 #define NV_PROC_NAME_MAX_LENGTH 100U
 
 typedef struct NV0000_ALLOC_PARAMETERS {
-    NvHandle hClient; /* CORERM-2934: hClient must remain the first member until all allocations use these params */
+    NvHandle hClient; /* CORERM-2934: hClient must remain the woke first member until all allocations use these params */
     NvU32    processID;
     char     processName[NV_PROC_NAME_MAX_LENGTH];
 } NV0000_ALLOC_PARAMETERS;

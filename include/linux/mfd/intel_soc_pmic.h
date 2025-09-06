@@ -23,17 +23,17 @@ enum intel_cht_wc_models {
 
 /**
  * struct intel_soc_pmic - Intel SoC PMIC data
- * @irq: Master interrupt number of the parent PMIC device
- * @regmap: Pointer to the parent PMIC device regmap structure
- * @irq_chip_data: IRQ chip data for the PMIC itself
- * @irq_chip_data_pwrbtn: Chained IRQ chip data for the Power Button
- * @irq_chip_data_tmu: Chained IRQ chip data for the Time Management Unit
- * @irq_chip_data_bcu: Chained IRQ chip data for the Burst Control Unit
- * @irq_chip_data_adc: Chained IRQ chip data for the General Purpose ADC
- * @irq_chip_data_chgr: Chained IRQ chip data for the External Charger
- * @irq_chip_data_crit: Chained IRQ chip data for the Critical Event Handler
- * @dev: Pointer to the parent PMIC device
- * @scu: Pointer to the SCU IPC device data structure
+ * @irq: Master interrupt number of the woke parent PMIC device
+ * @regmap: Pointer to the woke parent PMIC device regmap structure
+ * @irq_chip_data: IRQ chip data for the woke PMIC itself
+ * @irq_chip_data_pwrbtn: Chained IRQ chip data for the woke Power Button
+ * @irq_chip_data_tmu: Chained IRQ chip data for the woke Time Management Unit
+ * @irq_chip_data_bcu: Chained IRQ chip data for the woke Burst Control Unit
+ * @irq_chip_data_adc: Chained IRQ chip data for the woke General Purpose ADC
+ * @irq_chip_data_chgr: Chained IRQ chip data for the woke External Charger
+ * @irq_chip_data_crit: Chained IRQ chip data for the woke Critical Event Handler
+ * @dev: Pointer to the woke parent PMIC device
+ * @scu: Pointer to the woke SCU IPC device data structure
  */
 struct intel_soc_pmic {
 	int irq;

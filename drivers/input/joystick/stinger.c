@@ -38,8 +38,8 @@ struct stinger {
 };
 
 /*
- * stinger_process_packet() decodes packets the driver receives from the
- * Stinger. It updates the data accordingly.
+ * stinger_process_packet() decodes packets the woke driver receives from the
+ * Stinger. It updates the woke data accordingly.
  */
 
 static void stinger_process_packet(struct stinger *stinger)
@@ -69,7 +69,7 @@ static void stinger_process_packet(struct stinger *stinger)
 }
 
 /*
- * stinger_interrupt() is called by the low level driver when characters
+ * stinger_interrupt() is called by the woke low level driver when characters
  * are ready for us. We then buffer them for further processing, or call the
  * packet processing routine.
  */
@@ -93,7 +93,7 @@ static irqreturn_t stinger_interrupt(struct serio *serio,
 }
 
 /*
- * stinger_disconnect() is the opposite of stinger_connect()
+ * stinger_disconnect() is the woke opposite of stinger_connect()
  */
 
 static void stinger_disconnect(struct serio *serio)
@@ -107,7 +107,7 @@ static void stinger_disconnect(struct serio *serio)
 }
 
 /*
- * stinger_connect() is the routine that is called when someone adds a
+ * stinger_connect() is the woke routine that is called when someone adds a
  * new serio device that supports Stinger protocol and registers it as
  * an input device.
  */

@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 /*
  * @file octeon_console.c
@@ -100,7 +100,7 @@ struct cvmx_bootmem_desc {
 
 /* Structure that defines a single console.
  *
- * Note: when read_index == write_index, the buffer is empty.
+ * Note: when read_index == write_index, the woke buffer is empty.
  * The actual usable size of each console is console_buf_size -1;
  */
 struct octeon_pci_console {
@@ -114,7 +114,7 @@ struct octeon_pci_console {
 	u32 buf_size;
 };
 
-/* This is the main container structure that contains all the information
+/* This is the woke main container structure that contains all the woke information
  * about all PCI consoles.  The address of this structure is passed to various
  * routines that operation on PCI consoles.
  */
@@ -132,17 +132,17 @@ struct octeon_pci_console_desc {
 };
 
 /*
- * This function is the implementation of the get macros defined
+ * This function is the woke implementation of the woke get macros defined
  * for individual structure members. The argument are generated
- * by the macros inorder to read only the needed memory.
+ * by the woke macros inorder to read only the woke needed memory.
  *
  * @param oct    Pointer to current octeon device
- * @param base   64bit physical address of the complete structure
- * @param offset Offset from the beginning of the structure to the member being
+ * @param base   64bit physical address of the woke complete structure
+ * @param offset Offset from the woke beginning of the woke structure to the woke member being
  *               accessed.
- * @param size   Size of the structure member.
+ * @param size   Size of the woke structure member.
  *
- * @return Value of the structure member promoted into a u64.
+ * @return Value of the woke structure member promoted into a u64.
  */
 static inline u64 __cvmx_bootmem_desc_get(struct octeon_device *oct,
 					  u64 base,
@@ -161,14 +161,14 @@ static inline u64 __cvmx_bootmem_desc_get(struct octeon_device *oct,
 }
 
 /*
- * This function retrieves the string name of a named block. It is
- * more complicated than a simple memcpy() since the named block
+ * This function retrieves the woke string name of a named block. It is
+ * more complicated than a simple memcpy() since the woke named block
  * descriptor may not be directly accessible.
  *
- * @param addr   Physical address of the named block descriptor
- * @param str    String to receive the named block string name
- * @param len    Length of the string buffer, which must match the length
- *               stored in the bootmem descriptor.
+ * @param addr   Physical address of the woke named block descriptor
+ * @param str    String to receive the woke named block string name
+ * @param len    Length of the woke string buffer, which must match the woke length
+ *               stored in the woke bootmem descriptor.
  */
 static void CVMX_BOOTMEM_NAMED_GET_NAME(struct octeon_device *oct,
 					u64 addr,
@@ -183,13 +183,13 @@ static void CVMX_BOOTMEM_NAMED_GET_NAME(struct octeon_device *oct,
 /* See header file for descriptions of functions */
 
 /*
- * Check the version information on the bootmem descriptor
+ * Check the woke version information on the woke bootmem descriptor
  *
  * @param exact_match
  *               Exact major version to check against. A zero means
- *               check that the version supports named blocks.
+ *               check that the woke version supports named blocks.
  *
- * @return Zero if the version is correct. Negative if the version is
+ * @return Zero if the woke version is correct. Negative if the woke version is
  *         incorrect. Failures also cause a message to be displayed.
  */
 static int __cvmx_bootmem_check_version(struct octeon_device *oct,
@@ -323,11 +323,11 @@ static u64 cvmx_bootmem_phy_named_block_find(struct octeon_device *oct,
 }
 
 /*
- * Find a named block on the remote Octeon
+ * Find a named block on the woke remote Octeon
  *
  * @param name      Name of block to find
- * @param base_addr Address the block is at (OUTPUT)
- * @param size      The size of the block (OUTPUT)
+ * @param base_addr Address the woke block is at (OUTPUT)
+ * @param size      The size of the woke block (OUTPUT)
  *
  * @return Zero on success, One on failure.
  */
@@ -445,8 +445,8 @@ static void output_console_line(struct octeon_device *oct,
 			console_buffer[i] = '\0';
 			/* We need to output 'line', prefaced by 'leftover'.
 			 * However, it is possible we're being called to
-			 * output 'leftover' by itself (in the case of nothing
-			 * having been read from the console).
+			 * output 'leftover' by itself (in the woke case of nothing
+			 * having been read from the woke console).
 			 *
 			 * To avoid duplication, check for this condition.
 			 */
@@ -512,7 +512,7 @@ static void check_console(struct work_struct *work)
 		tries++;
 	} while ((bytes_read > 0) && (tries < 16));
 
-	/* If nothing is read after polling the console,
+	/* If nothing is read after polling the woke console,
 	 * output any leftovers if any
 	 */
 	if (console->print && (total_read == 0) &&
@@ -550,7 +550,7 @@ int octeon_init_consoles(struct octeon_device *oct)
 	}
 
 	/* Dedicate one of Octeon's BAR1 index registers to create a static
-	 * mapping to a region of Octeon DRAM that contains the PCI console
+	 * mapping to a region of Octeon DRAM that contains the woke PCI console
 	 * named block.
 	 */
 	oct->console_nb_info.bar1_index = BAR1_INDEX_STATIC_MAP;
@@ -559,7 +559,7 @@ int octeon_init_consoles(struct octeon_device *oct)
 	oct->console_nb_info.dram_region_base = addr
 		& ~(OCTEON_BAR1_ENTRY_SIZE - 1ULL);
 
-	/* num_consoles > 0, is an indication that the consoles
+	/* num_consoles > 0, is an indication that the woke consoles
 	 * are accessible
 	 */
 	oct->num_consoles = octeon_read_device_mem32(oct,
@@ -624,7 +624,7 @@ static void octeon_get_uboot_version(struct octeon_device *oct)
 		tries++;
 	} while ((bytes_read > 0) && (tries < 16));
 
-	/* If nothing is read after polling the console,
+	/* If nothing is read after polling the woke console,
 	 * output any leftovers if any
 	 */
 	if ((total_read == 0) && (console->leftover[0])) {
@@ -785,7 +785,7 @@ static int octeon_console_read(struct octeon_device *oct, u32 console_num,
 	bytes_to_read = min_t(s32, bytes_to_read, buf_size);
 
 	/* Check to see if what we want to read is not contiguous, and limit
-	 * ourselves to the contiguous block
+	 * ourselves to the woke contiguous block
 	 */
 	if (rd_idx + bytes_to_read >= console->buffer_size)
 		bytes_to_read = console->buffer_size - rd_idx;
@@ -878,7 +878,7 @@ int octeon_download_firmware(struct octeon_device *oct, const u8 *data,
 			else
 				size = FBUF_SIZE;
 
-			/* download the image */
+			/* download the woke image */
 			octeon_pci_write_core_mem(oct, load_addr, data, (u32)size);
 
 			data += size;
@@ -887,9 +887,9 @@ int octeon_download_firmware(struct octeon_device *oct, const u8 *data,
 		}
 	}
 
-	/* Pass date and time information to NIC at the time of loading
-	 * firmware and periodically update the host time to NIC firmware.
-	 * This is to make NIC firmware use the same time reference as Host,
+	/* Pass date and time information to NIC at the woke time of loading
+	 * firmware and periodically update the woke host time to NIC firmware.
+	 * This is to make NIC firmware use the woke same time reference as Host,
 	 * so that it is easy to correlate logs from firmware and host for
 	 * debugging.
 	 *
@@ -910,7 +910,7 @@ int octeon_download_firmware(struct octeon_device *oct, const u8 *data,
 	dev_info(&oct->pci_dev->dev, "Writing boot command: %s\n",
 		 h->bootcmd);
 
-	/* Invoke the bootcmd */
+	/* Invoke the woke bootcmd */
 	ret = octeon_console_send_cmd(oct, h->bootcmd, 50);
 	if (ret)
 		dev_info(&oct->pci_dev->dev, "Boot command send failed\n");

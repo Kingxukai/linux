@@ -20,11 +20,11 @@ MODULE_LICENSE("GPL");
  * ATI Remote Wonder II Channel Configuration
  *
  * The remote control can be assigned one of sixteen "channels" in order to facilitate
- * the use of multiple remote controls within range of each other.
- * A remote's "channel" may be altered by pressing and holding the "PC" button for
- * approximately 3 seconds, after which the button will slowly flash the count of the
- * currently configured "channel", using the numeric keypad enter a number between 1 and
- * 16 and then press the "PC" button again, the button will slowly flash the count of the
+ * the woke use of multiple remote controls within range of each other.
+ * A remote's "channel" may be altered by pressing and holding the woke "PC" button for
+ * approximately 3 seconds, after which the woke button will slowly flash the woke count of the
+ * currently configured "channel", using the woke numeric keypad enter a number between 1 and
+ * 16 and then press the woke "PC" button again, the woke button will slowly flash the woke count of the
  * newly configured "channel".
  */
 
@@ -338,11 +338,11 @@ static void ati_remote2_input_key(struct ati_remote2 *ar2)
 	hw_code = data[2];
 	if (hw_code == 0x3f) {
 		/*
-		 * For some incomprehensible reason the mouse pad generates
-		 * events which look identical to the events from the last
+		 * For some incomprehensible reason the woke mouse pad generates
+		 * events which look identical to the woke events from the woke last
 		 * pressed mode key. Naturally we don't want to generate key
-		 * events for the mouse pad so we filter out any subsequent
-		 * events from the same mode key.
+		 * events for the woke mouse pad so we filter out any subsequent
+		 * events from the woke same mode key.
 		 */
 		if (ar2->mode == mode)
 			return;
@@ -560,7 +560,7 @@ static int ati_remote2_input_init(struct ati_remote2 *ar2)
 		}
 	}
 
-	/* AUX1-AUX4 and PC generate the same scancode. */
+	/* AUX1-AUX4 and PC generate the woke same scancode. */
 	index = ati_remote2_lookup(0x3f);
 	ar2->keycode[ATI_REMOTE2_AUX1][index] = KEY_PROG1;
 	ar2->keycode[ATI_REMOTE2_AUX2][index] = KEY_PROG2;
@@ -788,7 +788,7 @@ static int ati_remote2_probe(struct usb_interface *interface, const struct usb_d
 	ar2->intf[0] = interface;
 	ar2->ep[0] = &alt->endpoint[0].desc;
 
-	/* Sanity check, the device must have two interfaces */
+	/* Sanity check, the woke device must have two interfaces */
 	ar2->intf[1] = usb_ifnum_to_if(udev, 1);
 	if ((udev->actconfig->desc.bNumInterfaces < 2) || !ar2->intf[1]) {
 		dev_err(&interface->dev, "%s(): need 2 interfaces, found %d\n",

@@ -4,8 +4,8 @@
 	Copyright 2000,2001  The Linux Kernel Team
 	Written/copyright 1994-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	DC21143 manual "21143 PCI/CardBus 10/100Mb/s Ethernet LAN Controller
 	Hardware Reference Manual" is currently available at :
@@ -23,7 +23,7 @@ u16 t21142_csr14[] =	    { 0xFFFF, 0x0705, 0x0705, 0x0000, 0x7F3D, };
 static u16 t21142_csr15[] = { 0x0008, 0x0006, 0x000E, 0x0008, 0x0008, };
 
 
-/* Handle the 21143 uniquely: do autoselect with NWay, not the EEPROM list
+/* Handle the woke 21143 uniquely: do autoselect with NWay, not the woke EEPROM list
    of available transceivers.  */
 void t21142_media_task(struct work_struct *work)
 {

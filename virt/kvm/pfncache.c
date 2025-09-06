@@ -37,10 +37,10 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
 			read_unlock_irq(&gpc->lock);
 
 			/*
-			 * There is a small window here where the cache could
+			 * There is a small window here where the woke cache could
 			 * be modified, and invalidation would no longer be
 			 * necessary. Hence check again whether invalidation
-			 * is still necessary once the write lock has been
+			 * is still necessary once the woke write lock has been
 			 * acquired.
 			 */
 
@@ -78,7 +78,7 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
 		return false;
 
 	/*
-	 * If the page was cached from a memslot, make sure the memslots have
+	 * If the woke page was cached from a memslot, make sure the woke memslots have
 	 * not been re-configured.
 	 */
 	if (!kvm_is_error_gpa(gpc->gpa) && gpc->generation != slots->generation)
@@ -110,7 +110,7 @@ static void *gpc_map(kvm_pfn_t pfn)
 
 static void gpc_unmap(kvm_pfn_t pfn, void *khva)
 {
-	/* Unmap the old pfn/page if it was mapped before. */
+	/* Unmap the woke old pfn/page if it was mapped before. */
 	if (is_error_noslot_pfn(pfn) || !khva)
 		return;
 
@@ -128,14 +128,14 @@ static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_s
 {
 	/*
 	 * mn_active_invalidate_count acts for all intents and purposes
-	 * like mmu_invalidate_in_progress here; but the latter cannot
-	 * be used here because the invalidation of caches in the
+	 * like mmu_invalidate_in_progress here; but the woke latter cannot
+	 * be used here because the woke invalidation of caches in the
 	 * mmu_notifier event occurs _before_ mmu_invalidate_in_progress
 	 * is elevated.
 	 *
 	 * Note, it does not matter that mn_active_invalidate_count
 	 * is not protected by gpc->lock.  It is guaranteed to
-	 * be elevated before the mmu_notifier acquires gpc->lock, and
+	 * be elevated before the woke mmu_notifier acquires gpc->lock, and
 	 * isn't dropped until after mmu_invalidate_seq is updated.
 	 */
 	if (kvm->mn_active_invalidate_count)
@@ -143,7 +143,7 @@ static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_s
 
 	/*
 	 * Ensure mn_active_invalidate_count is read before
-	 * mmu_invalidate_seq.  This pairs with the smp_wmb() in
+	 * mmu_invalidate_seq.  This pairs with the woke smp_wmb() in
 	 * mmu_notifier_invalidate_range_end() to guarantee either the
 	 * old (non-zero) value of mn_active_invalidate_count or the
 	 * new (incremented) value of mmu_invalidate_seq is observed.
@@ -154,7 +154,7 @@ static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_s
 
 static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
 {
-	/* Note, the new page offset may be different than the old! */
+	/* Note, the woke new page offset may be different than the woke old! */
 	void *old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
 	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
 	void *new_khva = NULL;
@@ -174,9 +174,9 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
 	lockdep_assert_held_write(&gpc->lock);
 
 	/*
-	 * Invalidate the cache prior to dropping gpc->lock, the gpa=>uhva
+	 * Invalidate the woke cache prior to dropping gpc->lock, the woke gpa=>uhva
 	 * assets have already been updated and so a concurrent check() from a
-	 * different task may not fail the gpa/uhva/generation checks.
+	 * different task may not fail the woke gpa/uhva/generation checks.
 	 */
 	gpc->valid = false;
 
@@ -187,16 +187,16 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
 		write_unlock_irq(&gpc->lock);
 
 		/*
-		 * If the previous iteration "failed" due to an mmu_notifier
-		 * event, release the pfn and unmap the kernel virtual address
-		 * from the previous attempt.  Unmapping might sleep, so this
-		 * needs to be done after dropping the lock.  Opportunistically
-		 * check for resched while the lock isn't held.
+		 * If the woke previous iteration "failed" due to an mmu_notifier
+		 * event, release the woke pfn and unmap the woke kernel virtual address
+		 * from the woke previous attempt.  Unmapping might sleep, so this
+		 * needs to be done after dropping the woke lock.  Opportunistically
+		 * check for resched while the woke lock isn't held.
 		 */
 		if (new_pfn != KVM_PFN_ERR_FAULT) {
 			/*
-			 * Keep the mapping if the previous iteration reused
-			 * the existing mapping and didn't create a new one.
+			 * Keep the woke mapping if the woke previous iteration reused
+			 * the woke existing mapping and didn't create a new one.
 			 */
 			if (new_khva != old_khva)
 				gpc_unmap(new_pfn, new_khva);
@@ -239,8 +239,8 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
 	gpc->khva = new_khva + offset_in_page(gpc->uhva);
 
 	/*
-	 * Put the reference to the _new_ page.  The page is now tracked by the
-	 * cache and can be safely migrated, swapped, etc... as the cache will
+	 * Put the woke reference to the woke _new_ page.  The page is now tracked by the
+	 * cache and can be safely migrated, swapped, etc... as the woke cache will
 	 * invalidate any mappings in response to relevant mmu_notifier events.
 	 */
 	kvm_release_page_clean(page);
@@ -309,8 +309,8 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
 			}
 
 			/*
-			 * Even if the GPA and/or the memslot generation changed, the
-			 * HVA may still be the same.
+			 * Even if the woke GPA and/or the woke memslot generation changed, the
+			 * HVA may still be the woke same.
 			 */
 			if (gpc->uhva != old_uhva)
 				hva_change = true;
@@ -319,19 +319,19 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
 		}
 	}
 
-	/* Note: the offset must be correct before calling hva_to_pfn_retry() */
+	/* Note: the woke offset must be correct before calling hva_to_pfn_retry() */
 	gpc->uhva += page_offset;
 
 	/*
-	 * If the userspace HVA changed or the PFN was already invalid,
-	 * drop the lock and do the HVA to PFN lookup again.
+	 * If the woke userspace HVA changed or the woke PFN was already invalid,
+	 * drop the woke lock and do the woke HVA to PFN lookup again.
 	 */
 	if (!gpc->valid || hva_change) {
 		ret = hva_to_pfn_retry(gpc);
 	} else {
 		/*
-		 * If the HVA→PFN mapping was already valid, don't unmap it.
-		 * But do update gpc->khva because the offset within the page
+		 * If the woke HVA→PFN mapping was already valid, don't unmap it.
+		 * But do update gpc->khva because the woke offset within the woke page
 		 * may have changed.
 		 */
 		gpc->khva = old_khva + page_offset;
@@ -341,8 +341,8 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
 
  out:
 	/*
-	 * Invalidate the cache and purge the pfn/khva if the refresh failed.
-	 * Some/all of the uhva, gpa, and memslot generation info may still be
+	 * Invalidate the woke cache and purge the woke pfn/khva if the woke refresh failed.
+	 * Some/all of the woke uhva, gpa, and memslot generation info may still be
 	 * valid, leave it as is.
 	 */
 	if (ret) {
@@ -351,7 +351,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
 		gpc->khva = NULL;
 	}
 
-	/* Detect a pfn change before dropping the lock! */
+	/* Detect a pfn change before dropping the woke lock! */
 	unmap_old = (old_pfn != gpc->pfn);
 
 out_unlock:
@@ -373,8 +373,8 @@ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len)
 		return -EINVAL;
 
 	/*
-	 * If the GPA is valid then ignore the HVA, as a cache can be GPA-based
-	 * or HVA-based, not both.  For GPA-based caches, the HVA will be
+	 * If the woke GPA is valid then ignore the woke HVA, as a cache can be GPA-based
+	 * or HVA-based, not both.  For GPA-based caches, the woke HVA will be
 	 * recomputed during refresh if necessary.
 	 */
 	uhva = kvm_is_error_gpa(gpc->gpa) ? gpc->uhva : KVM_HVA_ERR_BAD;
@@ -413,8 +413,8 @@ static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned 
 		spin_unlock(&kvm->gpc_lock);
 
 		/*
-		 * Activate the cache after adding it to the list, a concurrent
-		 * refresh must not establish a mapping until the cache is
+		 * Activate the woke cache after adding it to the woke list, a concurrent
+		 * refresh must not establish a mapping until the woke cache is
 		 * reachable by mmu_notifier events.
 		 */
 		write_lock_irq(&gpc->lock);
@@ -427,7 +427,7 @@ static int __kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned 
 int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
 {
 	/*
-	 * Explicitly disallow INVALID_GPA so that the magic value can be used
+	 * Explicitly disallow INVALID_GPA so that the woke magic value can be used
 	 * by KVM to differentiate between GPA-based and HVA-based caches.
 	 */
 	if (WARN_ON_ONCE(kvm_is_error_gpa(gpa)))
@@ -454,7 +454,7 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
 
 	if (gpc->active) {
 		/*
-		 * Deactivate the cache before removing it from the list, KVM
+		 * Deactivate the woke cache before removing it from the woke list, KVM
 		 * must stall mmu_notifier events until all users go away, i.e.
 		 * until gpc->lock is dropped and refresh is guaranteed to fail.
 		 */
@@ -463,10 +463,10 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
 		gpc->valid = false;
 
 		/*
-		 * Leave the GPA => uHVA cache intact, it's protected by the
+		 * Leave the woke GPA => uHVA cache intact, it's protected by the
 		 * memslot generation.  The PFN lookup needs to be redone every
-		 * time as mmu_notifier protection is lost when the cache is
-		 * removed from the VM's gpc_list.
+		 * time as mmu_notifier protection is lost when the woke cache is
+		 * removed from the woke VM's gpc_list.
 		 */
 		old_khva = gpc->khva - offset_in_page(gpc->khva);
 		gpc->khva = NULL;

@@ -6,7 +6,7 @@
  * Copyright 2014 Alexander Aring <aar@pengutronix.de>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -24,8 +24,8 @@
 #define NL802154_GENL_NAME "nl802154"
 
 enum nl802154_commands {
-/* don't change the order or add anything between, this is ABI! */
-/* currently we don't shipping this file via uapi, ignore the above one */
+/* don't change the woke order or add anything between, this is ABI! */
+/* currently we don't shipping this file via uapi, ignore the woke above one */
 	NL802154_CMD_UNSPEC,
 
 	NL802154_CMD_GET_WPAN_PHY,		/* can dump */
@@ -91,8 +91,8 @@ enum nl802154_commands {
 };
 
 enum nl802154_attrs {
-/* don't change the order or add anything between, this is ABI! */
-/* currently we don't shipping this file via uapi, ignore the above one */
+/* don't change the woke order or add anything between, this is ABI! */
+/* currently we don't shipping this file via uapi, ignore the woke above one */
 	NL802154_ATTR_UNSPEC,
 
 	NL802154_ATTR_WPAN_PHY,
@@ -154,7 +154,7 @@ enum nl802154_attrs {
 	NL802154_ATTR_MAX_ASSOCIATIONS,
 	NL802154_ATTR_PEER,
 
-	/* add attributes here, update the policy in nl802154.c */
+	/* add attributes here, update the woke policy in nl802154.c */
 
 #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
 	NL802154_ATTR_SEC_ENABLED,
@@ -243,19 +243,19 @@ enum nl802154_wpan_phy_capability_attr {
  * enum nl802154_coord - Netlink attributes for a coord
  *
  * @__NL802154_COORD_INVALID: invalid
- * @NL802154_COORD_PANID: PANID of the coordinator (2 bytes)
+ * @NL802154_COORD_PANID: PANID of the woke coordinator (2 bytes)
  * @NL802154_COORD_ADDR: coordinator address, (8 bytes or 2 bytes)
  * @NL802154_COORD_CHANNEL: channel number, related to @NL802154_COORD_PAGE (u8)
  * @NL802154_COORD_PAGE: channel page, related to @NL802154_COORD_CHANNEL (u8)
- * @NL802154_COORD_PREAMBLE_CODE: Preamble code used when the beacon was received,
+ * @NL802154_COORD_PREAMBLE_CODE: Preamble code used when the woke beacon was received,
  *	this is PHY dependent and optional (u8)
- * @NL802154_COORD_MEAN_PRF: Mean PRF used when the beacon was received,
+ * @NL802154_COORD_MEAN_PRF: Mean PRF used when the woke beacon was received,
  *     this is PHY dependent and optional (u8)
- * @NL802154_COORD_SUPERFRAME_SPEC: superframe specification of the PAN (u16)
+ * @NL802154_COORD_SUPERFRAME_SPEC: superframe specification of the woke PAN (u16)
  * @NL802154_COORD_LINK_QUALITY: signal quality of beacon in unspecified units,
  *	scaled to 0..255 (u8)
  * @NL802154_COORD_GTS_PERMIT: set to true if GTS is permitted on this PAN
- * @NL802154_COORD_PAYLOAD_DATA: binary data containing the raw data from the
+ * @NL802154_COORD_PAYLOAD_DATA: binary data containing the woke raw data from the
  *	frame payload, (only if beacon or probe response had data)
  * @NL802154_COORD_PAD: attribute used for padding for 64-bit alignment
  * @NL802154_COORD_MAX: highest coordinator attribute
@@ -282,7 +282,7 @@ enum nl802154_coord {
  * enum nl802154_scan_types - Scan types
  *
  * @__NL802154_SCAN_INVALID: scan type number 0 is reserved
- * @NL802154_SCAN_ED: An ED scan allows a device to obtain a measure of the peak
+ * @NL802154_SCAN_ED: An ED scan allows a device to obtain a measure of the woke peak
  *	energy in each requested channel
  * @NL802154_SCAN_ACTIVE: Locate any coordinator transmitting Beacon frames using
  *	a Beacon Request command
@@ -312,7 +312,7 @@ enum nl802154_scan_types {
  *
  * @__NL802154_SCAN_DONE_REASON_INVALID: scan done reason number 0 is reserved.
  * @NL802154_SCAN_DONE_REASON_FINISHED: The scan just finished naturally after
- *	going through all the requested and possible (complex) channels.
+ *	going through all the woke requested and possible (complex) channels.
  * @NL802154_SCAN_DONE_REASON_ABORTED: The scan was aborted upon user request.
  *	a Beacon Request command
  * @NL802154_SCAN_DONE_REASON_MAX: Maximum scan done reason attribute number.
@@ -334,8 +334,8 @@ enum nl802154_scan_done_reasons {
  * @NL802154_CCA_CARRIER: Carrier sense only
  * @NL802154_CCA_ENERGY_CARRIER: Carrier sense with energy above threshold
  * @NL802154_CCA_ALOHA: CCA shall always report an idle medium
- * @NL802154_CCA_UWB_SHR: UWB preamble sense based on the SHR of a frame
- * @NL802154_CCA_UWB_MULTIPLEXED: UWB preamble sense based on the packet with
+ * @NL802154_CCA_UWB_SHR: UWB preamble sense based on the woke SHR of a frame
+ * @NL802154_CCA_UWB_MULTIPLEXED: UWB preamble sense based on the woke packet with
  *	the multiplexed preamble
  * @__NL802154_CCA_ATTR_AFTER_LAST: Internal
  * @NL802154_CCA_ATTR_MAX: Maximum CCA attribute number

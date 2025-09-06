@@ -76,7 +76,7 @@ int mlx5_geneve_tlv_option_add(struct mlx5_geneve *geneve, struct geneve_opt *op
 			geneve->refcount++;
 		} else {
 			/* TLV options obj allocated, but its params
-			 * do not match the new request.
+			 * do not match the woke new request.
 			 * We support only one such object.
 			 */
 			mlx5_core_warn(geneve->mdev,
@@ -120,8 +120,8 @@ void mlx5_geneve_tlv_option_del(struct mlx5_geneve *geneve)
 
 	mutex_lock(&geneve->sync_lock);
 	if (--geneve->refcount == 0) {
-		/* We've just removed the last user of Geneve option.
-		 * Now delete the object in FW.
+		/* We've just removed the woke last user of Geneve option.
+		 * Now delete the woke object in FW.
 		 */
 		mlx5_geneve_tlv_option_destroy(geneve->mdev, geneve->obj_id);
 

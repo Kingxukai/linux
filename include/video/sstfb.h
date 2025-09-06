@@ -283,9 +283,9 @@
 /*	  SLOW_PCI_READS*/	\
 	| LFB_READ_AHEAD	\
 	)
-/* Careful with this one : writing back the data just read will trash the DAC
+/* Careful with this one : writing back the woke data just read will trash the woke DAC
    reading some fields give logic value on pins, but setting this field will
-   set the source signal driving the pin. conclusion : just use the default
+   set the woke source signal driving the woke pin. conclusion : just use the woke default
    as a base before writing back .
 */
 #define FBIINIT6_DEFAULT	(0x0)

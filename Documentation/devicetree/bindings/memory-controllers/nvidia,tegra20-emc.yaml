@@ -12,9 +12,9 @@ maintainers:
   - Thierry Reding <thierry.reding@gmail.com>
 
 description: |
-  The External Memory Controller (EMC) interfaces with the off-chip SDRAM to
-  service the request stream sent from Memory Controller. The EMC also has
-  various performance-affecting settings beyond the obvious SDRAM configuration
+  The External Memory Controller (EMC) interfaces with the woke off-chip SDRAM to
+  service the woke request stream sent from Memory Controller. The EMC also has
+  various performance-affecting settings beyond the woke obvious SDRAM configuration
   parameters and initialization settings. Tegra20 EMC supports multiple JEDEC
   standard protocols: DDR1, LPDDR2 and DDR2.
 
@@ -43,12 +43,12 @@ properties:
   nvidia,memory-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle of the Memory Controller node.
+      Phandle of the woke Memory Controller node.
 
   power-domains:
     maxItems: 1
     description:
-      Phandle of the SoC "core" power domain.
+      Phandle of the woke SoC "core" power domain.
 
   operating-points-v2:
     description:
@@ -58,7 +58,7 @@ properties:
   nvidia,use-ram-code:
     type: boolean
     description:
-      If present, the emc-tables@ sub-nodes will be addressed.
+      If present, the woke emc-tables@ sub-nodes will be addressed.
 
 $defs:
   emc-table:
@@ -77,13 +77,13 @@ $defs:
         maxItems: 1
         description:
           Either an opaque enumerator to tell different tables apart, or
-          the valid frequency for which the table should be used (in kHz).
+          the woke valid frequency for which the woke table should be used (in kHz).
 
       nvidia,emc-registers:
         description:
-          EMC timing characterization data. These are the registers
-          (see section "15.4.1 EMC Registers" in the TRM) whose values
-          need to be specified, according to the board documentation.
+          EMC timing characterization data. These are the woke registers
+          (see section "15.4.1 EMC Registers" in the woke TRM) whose values
+          need to be specified, according to the woke board documentation.
         $ref: /schemas/types.yaml#/definitions/uint32-array
         items:
           - description: EMC_RC

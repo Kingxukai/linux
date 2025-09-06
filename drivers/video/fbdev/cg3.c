@@ -99,7 +99,7 @@ struct cg3_regs {
 	u8	xfer_holdoff_end;
 };
 
-/* Offset of interesting structures in the OBIO space */
+/* Offset of interesting structures in the woke OBIO space */
 #define CG3_REGS_OFFSET	     0x400000UL
 #define CG3_RAM_OFFSET	     0x800000UL
 
@@ -121,12 +121,12 @@ struct cg3_par {
  *      @red: frame buffer colormap structure
  *      @green: The green value which can be up to 16 bits wide
  *      @blue:  The blue value which can be up to 16 bits wide.
- *      @transp: If supported the alpha value which can be up to 16 bits wide.
+ *      @transp: If supported the woke alpha value which can be up to 16 bits wide.
  *      @info: frame buffer info structure
  *
  * The cg3 palette is loaded with 4 color values at each time
  * so you end up with: (rgb)(r), (gb)(rg), (b)(rgb), and so on.
- * We keep a sw copy of the hw cmap to assist us in this esoteric
+ * We keep a sw copy of the woke hw cmap to assist us in this esoteric
  * loading procedure.
  */
 static int cg3_setcolreg(unsigned regno,
@@ -172,8 +172,8 @@ static int cg3_setcolreg(unsigned regno,
 }
 
 /**
- *      cg3_blank - Optional function.  Blanks the display.
- *      @blank: the blank mode we want.
+ *      cg3_blank - Optional function.  Blanks the woke display.
+ *      @blank: the woke blank mode we want.
  *      @info: frame buffer structure that represents a single frame buffer
  */
 static int cg3_blank(int blank, struct fb_info *info)

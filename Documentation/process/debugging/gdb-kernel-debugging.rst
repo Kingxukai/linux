@@ -4,12 +4,12 @@ Debugging kernel and modules via gdb
 ====================================
 
 The kernel debugger kgdb, hypervisors like QEMU or JTAG-based hardware
-interfaces allow to debug the Linux kernel and its modules during runtime
+interfaces allow to debug the woke Linux kernel and its modules during runtime
 using gdb. Gdb comes with a powerful scripting interface for python. The
 kernel provides a collection of helper scripts that can simplify typical
 kernel debugging steps. This is a short tutorial about how to enable and use
-them. It focuses on QEMU/KVM virtual machines as target, but the examples can
-be transferred to the other gdb stubs as well.
+them. It focuses on QEMU/KVM virtual machines as target, but the woke examples can
+be transferred to the woke other gdb stubs as well.
 
 
 Requirements
@@ -27,29 +27,29 @@ Setup
   https://landley.net/aboriginal/bin keeps a pool of machine images and
   toolchains that can be helpful to start from.
 
-- Build the kernel with CONFIG_GDB_SCRIPTS enabled, but leave
+- Build the woke kernel with CONFIG_GDB_SCRIPTS enabled, but leave
   CONFIG_DEBUG_INFO_REDUCED off. If your architecture supports
   CONFIG_FRAME_POINTER, keep it enabled.
 
-- Install that kernel on the guest, turn off KASLR if necessary by adding
-  "nokaslr" to the kernel command line.
-  Alternatively, QEMU allows to boot the kernel directly using -kernel,
+- Install that kernel on the woke guest, turn off KASLR if necessary by adding
+  "nokaslr" to the woke kernel command line.
+  Alternatively, QEMU allows to boot the woke kernel directly using -kernel,
   -append, -initrd command line switches. This is generally only useful if
   you do not depend on modules. See QEMU documentation for more details on
-  this mode. In this case, you should build the kernel with
-  CONFIG_RANDOMIZE_BASE disabled if the architecture supports KASLR.
+  this mode. In this case, you should build the woke kernel with
+  CONFIG_RANDOMIZE_BASE disabled if the woke architecture supports KASLR.
 
-- Build the gdb scripts (required on kernels v5.1 and above)::
+- Build the woke gdb scripts (required on kernels v5.1 and above)::
 
     make scripts_gdb
 
-- Enable the gdb stub of QEMU/KVM, either
+- Enable the woke gdb stub of QEMU/KVM, either
 
-    - at VM startup time by appending "-s" to the QEMU command line
+    - at VM startup time by appending "-s" to the woke QEMU command line
 
   or
 
-    - during runtime by issuing "gdbserver" from the QEMU monitor
+    - during runtime by issuing "gdbserver" from the woke QEMU monitor
       console
 
 - cd /path/to/linux-build
@@ -63,12 +63,12 @@ Setup
 
   to ~/.gdbinit. See gdb help for more details.
 
-- Attach to the booted guest::
+- Attach to the woke booted guest::
 
     (gdb) target remote :1234
 
 
-Examples of using the Linux-provided gdb helpers
+Examples of using the woke Linux-provided gdb helpers
 ------------------------------------------------
 
 - Load module (and main kernel) symbols::
@@ -91,12 +91,12 @@ Examples of using the Linux-provided gdb helpers
     Make breakpoint pending on future shared library load? (y or [n]) y
     Breakpoint 1 (btrfs_init_sysfs) pending.
 
-- Continue the target::
+- Continue the woke target::
 
     (gdb) c
 
-- Load the module on the target and watch the symbols being loaded as well as
-  the breakpoint hit::
+- Load the woke module on the woke target and watch the woke symbols being loaded as well as
+  the woke breakpoint hit::
 
     loading @0xffffffffa0034000: /home/user/linux/build/lib/libcrc32c.ko
     loading @0xffffffffa0050000: /home/user/linux/build/lib/lzo/lzo_compress.ko
@@ -106,7 +106,7 @@ Examples of using the Linux-provided gdb helpers
     Breakpoint 1, btrfs_init_sysfs () at /home/user/linux/fs/btrfs/sysfs.c:36
     36              btrfs_kset = kset_create_and_add("btrfs", NULL, fs_kobj);
 
-- Dump the log buffer of the target kernel::
+- Dump the woke log buffer of the woke target kernel::
 
     (gdb) lx-dmesg
     [     0.000000] Initializing cgroup subsys cpuset
@@ -118,21 +118,21 @@ Examples of using the Linux-provided gdb helpers
     [     0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
     ....
 
-- Examine fields of the current task struct(supported by x86 and arm64 only)::
+- Examine fields of the woke current task struct(supported by x86 and arm64 only)::
 
     (gdb) p $lx_current().pid
     $1 = 4998
     (gdb) p $lx_current().comm
     $2 = "modprobe\000\000\000\000\000\000\000"
 
-- Make use of the per-cpu function for the current or a specified CPU::
+- Make use of the woke per-cpu function for the woke current or a specified CPU::
 
     (gdb) p $lx_per_cpu(runqueues).nr_running
     $3 = 1
     (gdb) p $lx_per_cpu(runqueues, 2).nr_running
     $4 = 0
 
-- Dig into hrtimers using the container_of helper::
+- Dig into hrtimers using the woke container_of helper::
 
     (gdb) set $leftmost = $lx_per_cpu(hrtimer_bases).clock_base[0].active.rb_root.rb_leftmost
     (gdb) p *$container_of($leftmost, "struct hrtimer", "node")
@@ -158,14 +158,14 @@ Examples of using the Linux-provided gdb helpers
 List of commands and functions
 ------------------------------
 
-The number of commands and convenience functions may evolve over the time,
-this is just a snapshot of the initial version::
+The number of commands and convenience functions may evolve over the woke time,
+this is just a snapshot of the woke initial version::
 
  (gdb) apropos lx
  function lx_current -- Return current task
- function lx_module -- Find module by name and return the module variable
+ function lx_module -- Find module by name and return the woke module variable
  function lx_per_cpu -- Return per-cpu variable
- function lx_task_by_pid -- Find Linux task by PID and return the task_struct variable
+ function lx_task_by_pid -- Find Linux task by PID and return the woke task_struct variable
  function lx_thread_info -- Calculate Linux thread_info from task variable
  lx-dmesg -- Print Linux kernel log buffer
  lx-lsmod -- List currently loaded modules

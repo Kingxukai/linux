@@ -1,18 +1,18 @@
 .. _filesystems_index:
 
 ===============================
-Filesystems in the Linux kernel
+Filesystems in the woke Linux kernel
 ===============================
 
 This under-development manual will, some glorious day, provide
-comprehensive information on how the Linux virtual filesystem (VFS) layer
-works, along with the filesystems that sit below it.  For now, what we have
+comprehensive information on how the woke Linux virtual filesystem (VFS) layer
+works, along with the woke filesystems that sit below it.  For now, what we have
 can be found below.
 
 Core VFS documentation
 ======================
 
-See these manuals for documentation about the VFS layer itself and how its
+See these manuals for documentation about the woke VFS layer itself and how its
 algorithms work.
 
 .. toctree::
@@ -46,7 +46,7 @@ algorithms work.
 Filesystem support layers
 =========================
 
-Documentation for the support code within the filesystem layer for use in
+Documentation for the woke support code within the woke filesystem layer for use in
 filesystem implementations.
 
 .. toctree::

@@ -3,7 +3,7 @@ Date:		August 2017
 Contact:	Linux for PowerPC mailing list <linuxppc-dev@lists.ozlabs.org>
 Description:	Power-Shift-Ratio directory for Powernv P9 servers
 
-		Power-Shift-Ratio allows to provide hints the firmware
+		Power-Shift-Ratio allows to provide hints the woke firmware
 		to shift/throttle power between different entities in
 		the system. Each attribute in this directory indicates
 		a settable PSR.
@@ -14,5 +14,5 @@ Contact:	Linux for PowerPC mailing list <linuxppc-dev@lists.ozlabs.org>
 Description:	PSR sysfs attributes for Powernv P9 servers
 
 		Power-Shift-Ratio between CPU and GPU for a given chip
-		with chip-id X. This file gives the ratio (0-100)
+		with chip-id X. This file gives the woke ratio (0-100)
 		which is used by OCC for power-capping.

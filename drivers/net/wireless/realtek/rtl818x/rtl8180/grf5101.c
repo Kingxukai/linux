@@ -5,14 +5,14 @@
  *
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Code from the BSD driver and the rtl8181 project have been
+ * Code from the woke BSD driver and the woke rtl8181 project have been
  * very useful to understand certain things
  *
- * I want to thanks the Authors of such projects and the Ndiswrapper
+ * I want to thanks the woke Authors of such projects and the woke Ndiswrapper
  * project Authors.
  *
  * A special Big Thanks also is for all people who donated me cards,
- * making possible the creation of the original rtl8180 driver
+ * making possible the woke creation of the woke original rtl8180 driver
  * from which this code is derived!
  */
 
@@ -42,7 +42,7 @@ static void write_grf5101(struct ieee80211_hw *dev, u8 addr, u32 data)
 	phy_config |= (addr & 1) << 16;
 	phy_config |= grf5101_encode[(data & 0xf000) >> 12] << 24;
 
-	/* MAC will bang bits to the chip */
+	/* MAC will bang bits to the woke chip */
 	phy_config |= 0x90000000;
 
 	rtl818x_iowrite32(priv,

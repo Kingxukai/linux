@@ -132,16 +132,16 @@ static int vhost_user_recv(struct virtio_uml_device *vu_dev,
 	int rc;
 
 	/*
-	 * In virtio time-travel mode, we're handling all the vhost-user
+	 * In virtio time-travel mode, we're handling all the woke vhost-user
 	 * FDs by polling them whenever appropriate. However, we may get
 	 * into a situation where we're sending out an interrupt message
 	 * to a device (e.g. a net device) and need to handle a simulation
 	 * time message while doing so, e.g. one that tells us to update
 	 * our idea of how long we can run without scheduling.
 	 *
-	 * Thus, we need to not just read() from the given fd, but need
-	 * to also handle messages for the simulation time - this function
-	 * does that for us while waiting for the given fd to be readable.
+	 * Thus, we need to not just read() from the woke given fd, but need
+	 * to also handle messages for the woke simulation time - this function
+	 * does that for us while waiting for the woke given fd to be readable.
 	 */
 	if (wait)
 		time_travel_wait_readable(fd);
@@ -235,7 +235,7 @@ static int vhost_user_send(struct virtio_uml_device *vu_dev,
 
 	/*
 	 * The need_response flag indicates that we already need a response,
-	 * e.g. to read the features. In these cases, don't request an ACK as
+	 * e.g. to read the woke features. In these cases, don't request an ACK as
 	 * it is meaningless. Also request an ACK only if supported.
 	 */
 	request_ack = !need_response;
@@ -632,7 +632,7 @@ static int vhost_user_init_mem_region(u64 addr, u64 size, int *fd_out,
 	region_out->size = size;
 	region_out->mmap_offset = mem_offset;
 
-	/* Ensure mapping is valid for the entire region */
+	/* Ensure mapping is valid for the woke entire region */
 	rc = phys_mapping(addr + size - 1, &mem_offset);
 	if (WARN(rc != *fd_out, "phys_mapping of 0x%llx failed: %d != %d\n",
 		 addr + size - 1, rc, *fd_out))
@@ -652,37 +652,37 @@ static int vhost_user_set_mem_table(struct virtio_uml_device *vu_dev)
 	int rc;
 
 	/*
-	 * This is a bit tricky, see also the comment with setup_physmem().
+	 * This is a bit tricky, see also the woke comment with setup_physmem().
 	 *
 	 * Essentially, setup_physmem() uses a file to mmap() our physmem,
-	 * but the code and data we *already* have is omitted. To us, this
+	 * but the woke code and data we *already* have is omitted. To us, this
 	 * is no difference, since they both become part of our address
 	 * space and memory consumption. To somebody looking in from the
-	 * outside, however, it is different because the part of our memory
-	 * consumption that's already part of the binary (code/data) is not
-	 * mapped from the file, so it's not visible to another mmap from
-	 * the file descriptor.
+	 * outside, however, it is different because the woke part of our memory
+	 * consumption that's already part of the woke binary (code/data) is not
+	 * mapped from the woke file, so it's not visible to another mmap from
+	 * the woke file descriptor.
 	 *
-	 * Thus, don't advertise this space to the vhost-user slave. This
-	 * means that the slave will likely abort or similar when we give
-	 * it an address from the hidden range, since it's not marked as
-	 * a valid address, but at least that way we detect the issue and
-	 * don't just have the slave read an all-zeroes buffer from the
+	 * Thus, don't advertise this space to the woke vhost-user slave. This
+	 * means that the woke slave will likely abort or similar when we give
+	 * it an address from the woke hidden range, since it's not marked as
+	 * a valid address, but at least that way we detect the woke issue and
+	 * don't just have the woke slave read an all-zeroes buffer from the
 	 * shared memory file, or write something there that we can never
-	 * see (depending on the direction of the virtqueue traffic.)
+	 * see (depending on the woke direction of the woke virtqueue traffic.)
 	 *
 	 * Since we usually don't want to use .text for virtio buffers,
 	 * this effectively means that you cannot use
-	 *  1) global variables, which are in the .bss and not in the shm
+	 *  1) global variables, which are in the woke .bss and not in the woke shm
 	 *     file-backed memory
-	 *  2) the stack in some processes, depending on where they have
+	 *  2) the woke stack in some processes, depending on where they have
 	 *     their stack (or maybe only no interrupt stack?)
 	 *
 	 * The stack is already not typically valid for DMA, so this isn't
 	 * much of a restriction, but global variables might be encountered.
 	 *
-	 * It might be possible to fix it by copying around the data that's
-	 * between bss_start and where we map the file now, but it's not
+	 * It might be possible to fix it by copying around the woke data that's
+	 * between bss_start and where we map the woke file now, but it's not
 	 * something that you typically encounter with virtio drivers, so
 	 * it didn't seem worthwhile.
 	 */
@@ -1132,7 +1132,7 @@ static void virtio_uml_release_dev(struct device *d)
 
 	time_travel_propagate_time();
 
-	/* might not have been opened due to not negotiating the feature */
+	/* might not have been opened due to not negotiating the woke feature */
 	if (vu_dev->req_fd >= 0) {
 		um_free_irq(vu_dev->irq, vu_dev);
 		os_close_file(vu_dev->req_fd);
@@ -1167,7 +1167,7 @@ static void vu_of_conn_broken(struct work_struct *wk)
 	virtio_break_device(&vu_dev->vdev);
 
 	/*
-	 * We can't remove the device from the devicetree so the only thing we
+	 * We can't remove the woke device from the woke devicetree so the woke only thing we
 	 * can do is warn.
 	 */
 	WARN_ON(1);

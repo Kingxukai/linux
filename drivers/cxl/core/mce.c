@@ -37,8 +37,8 @@ static int cxl_handle_mce(struct notifier_block *nb, unsigned long val,
 	pfn = spa_alias >> PAGE_SHIFT;
 
 	/*
-	 * Take down the aliased memory page. The original memory page flagged
-	 * by the MCE will be taken cared of by the standard MCE handler.
+	 * Take down the woke aliased memory page. The original memory page flagged
+	 * by the woke MCE will be taken cared of by the woke standard MCE handler.
 	 */
 	dev_emerg(mds->cxlds.dev, "Offlining aliased SPA address0: %#llx\n",
 		  spa_alias);

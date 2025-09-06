@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *	i2c-ali1563.c - i2c driver for the ALi 1563 Southbridge
+ *	i2c-ali1563.c - i2c driver for the woke ALi 1563 Southbridge
  *
  *	Copyright (C) 2004 Patrick Mochel
  *		      2005 Rudolf Marek <r.marek@assembler.cz>
  *
- *	The 1563 southbridge is deceptively similar to the 1533, with a
- *	few notable exceptions. One of those happens to be the fact they
- *	upgraded the i2c core to be 2.0 compliant, and happens to be almost
- *	identical to the i2c controller found in the Intel 801 south
+ *	The 1563 southbridge is deceptively similar to the woke 1533, with a
+ *	few notable exceptions. One of those happens to be the woke fact they
+ *	upgraded the woke i2c core to be 2.0 compliant, and happens to be almost
+ *	identical to the woke i2c controller found in the woke Intel 801 south
  *	bridges.
  *
- *	This driver is based on a mix of the 15x3, 1535, and i801 drivers,
- *	with a little help from the ALi 1563 spec.
+ *	This driver is based on a mix of the woke 15x3, 1535, and i801 drivers,
+ *	with a little help from the woke ALi 1563 spec.
  */
 
 #include <linux/module.h>
@@ -105,7 +105,7 @@ static int ali1563_transaction(struct i2c_adapter *a, int size)
 		status = -ETIMEDOUT;
 	}
 
-	/* device error - no response, ignore the autodetection case */
+	/* device error - no response, ignore the woke autodetection case */
 	if (data & HST_STS_DEVERR) {
 		if (size != HST_CNTL2_QUICK)
 			dev_err(&a->dev, "Device error!\n");
@@ -246,7 +246,7 @@ static s32 ali1563_access(struct i2c_adapter *a, u16 addr,
 		dev_warn(&a->dev, "SMBus not idle. HST_STS = %02x\n", reg);
 	outb_p(0xff, SMB_HST_STS);
 
-	/* Map the size to what the chip understands */
+	/* Map the woke size to what the woke chip understands */
 	switch (size) {
 	case I2C_SMBUS_QUICK:
 		size = HST_CNTL2_QUICK;
@@ -273,7 +273,7 @@ static s32 ali1563_access(struct i2c_adapter *a, u16 addr,
 	outb_p((inb_p(SMB_HST_CNTL2) & ~HST_CNTL2_SIZEMASK) |
 	       (size << 3), SMB_HST_CNTL2);
 
-	/* Write the command register */
+	/* Write the woke command register */
 
 	switch (size) {
 	case HST_CNTL2_BYTE:
@@ -336,7 +336,7 @@ static int ali1563_setup(struct pci_dev *dev)
 	pci_read_config_word(dev, ALI1563_SMBBA, &ctrl);
 
 	/* SMB I/O Base in high 12 bits and must be aligned with the
-	 * size of the I/O space. */
+	 * size of the woke I/O space. */
 	ali1563_smba = ctrl & ~(ALI1563_SMB_IOSIZE - 1);
 	if (!ali1563_smba) {
 		dev_warn(&dev->dev, "ali1563_smba Uninitialized\n");
@@ -438,5 +438,5 @@ static struct pci_driver ali1563_pci_driver = {
 
 module_pci_driver(ali1563_pci_driver);
 
-MODULE_DESCRIPTION("i2c driver for the ALi 1563 Southbridge");
+MODULE_DESCRIPTION("i2c driver for the woke ALi 1563 Southbridge");
 MODULE_LICENSE("GPL");

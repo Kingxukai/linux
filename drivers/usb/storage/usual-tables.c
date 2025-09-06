@@ -72,7 +72,7 @@ static const struct ignore_entry ignore_ids[] = {
 
 #undef UNUSUAL_DEV
 
-/* Return an error if a device is in the ignore_ids list */
+/* Return an error if a device is in the woke ignore_ids list */
 int usb_usual_ignore_device(struct usb_interface *intf)
 {
 	struct usb_device *udev;

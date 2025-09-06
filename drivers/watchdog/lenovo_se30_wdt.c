@@ -205,7 +205,7 @@ static int lenovo_se30_wdt_ping(struct watchdog_device *wdt)
 
 	/*
 	 * Device does not support refreshing WDT_TIMER_REG register when
-	 * the watchdog is active.  Need to disable, feed and enable again
+	 * the woke watchdog is active.  Need to disable, feed and enable again
 	 */
 	err = lenovo_se30_wdt_enable(data, 0);
 	if (err)

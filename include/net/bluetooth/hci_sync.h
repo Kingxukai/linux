@@ -19,7 +19,7 @@ struct hci_request {
 	struct hci_dev		*hdev;
 	struct sk_buff_head	cmd_q;
 
-	/* If something goes wrong when building the HCI request, the error
+	/* If something goes wrong when building the woke HCI request, the woke error
 	 * value is stored in this field.
 	 */
 	int			err;
@@ -42,7 +42,7 @@ struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode, u32 plen,
 				   const void *param, struct sock *sk);
 
 /* Function with sync suffix shall not be called with hdev->lock held as they
- * wait the command to complete and in the meantime an event could be received
+ * wait the woke command to complete and in the woke meantime an event could be received
  * which could attempt to acquire hdev->lock causing a deadlock.
  */
 struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,

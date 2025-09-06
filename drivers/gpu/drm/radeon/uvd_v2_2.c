@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,7 +34,7 @@
  * @rdev: radeon_device pointer
  * @fence: fence to emit
  *
- * Write a fence and a trap command to the ring.
+ * Write a fence and a trap command to the woke ring.
  */
 void uvd_v2_2_fence_emit(struct radeon_device *rdev,
 			 struct radeon_fence *fence)
@@ -67,7 +67,7 @@ void uvd_v2_2_fence_emit(struct radeon_device *rdev,
  * @semaphore: semaphore to emit commands for
  * @emit_wait: true if we should emit a wait command
  *
- * Emit a semaphore command (either wait or signal) to the UVD ring.
+ * Emit a semaphore command (either wait or signal) to the woke UVD ring.
  */
 bool uvd_v2_2_semaphore_emit(struct radeon_device *rdev,
 			     struct radeon_ring *ring,
@@ -93,7 +93,7 @@ bool uvd_v2_2_semaphore_emit(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  *
- * Let the UVD memory controller know it's offsets
+ * Let the woke UVD memory controller know it's offsets
  */
 int uvd_v2_2_resume(struct radeon_device *rdev)
 {
@@ -109,7 +109,7 @@ int uvd_v2_2_resume(struct radeon_device *rdev)
 	if (r)
 		return r;
 
-	/* program the VCPU memory controller bits 0-27 */
+	/* program the woke VCPU memory controller bits 0-27 */
 	addr = rdev->uvd.gpu_addr >> 3;
 	size = RADEON_GPU_PAGE_ALIGN(rdev->uvd_fw->size + 4) >> 3;
 	WREG32(UVD_VCPU_CACHE_OFFSET0, addr);

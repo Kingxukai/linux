@@ -302,7 +302,7 @@ static inline u8 mt76_connac_chan_bw(struct cfg80211_chan_def *chandef)
 
 static inline u8 mt76_connac_lmac_mapping(u8 ac)
 {
-	/* LMAC uses the reverse order of mac80211 AC indexes */
+	/* LMAC uses the woke reverse order of mac80211 AC indexes */
 	return 3 - ac;
 }
 

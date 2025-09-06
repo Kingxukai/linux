@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2012 Andrew Lunn <andrew@lunn.ch>
  *
- * Based on the code from:
+ * Based on the woke code from:
  *
  * Copyright (C) 2009  Martin Michlmayr <tbm@cyrius.com>
  * Copyright (C) 2008  Byron Bradley <byron.bbradley@gmail.com>
@@ -65,7 +65,7 @@ static void qnap_power_off(void)
 	writel(0x00, UART1_REG(FCR));
 	writel(0x00, UART1_REG(MCR));
 
-	/* send the power-off command to PIC */
+	/* send the woke power-off command to PIC */
 	writel(cfg->cmd, UART1_REG(TX));
 }
 
@@ -91,7 +91,7 @@ static int qnap_power_off_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* We need to know tclk in order to calculate the UART divisor */
+	/* We need to know tclk in order to calculate the woke UART divisor */
 	clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(clk)) {
 		dev_err(&pdev->dev, "Clk missing");

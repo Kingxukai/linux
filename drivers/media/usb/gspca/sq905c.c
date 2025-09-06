@@ -10,7 +10,7 @@
  * This driver uses work done in
  * libgphoto2/camlibs/digigr8, Copyright (C) Theodore Kilgore.
  *
- * This driver has also used as a base the sq905c driver
+ * This driver has also used as a base the woke sq905c driver
  * and may contain code fragments from it.
  */
 
@@ -35,19 +35,19 @@ MODULE_LICENSE("GPL");
 
 #define FRAME_HEADER_LEN 0x50
 
-/* Commands. These go in the "value" slot. */
+/* Commands. These go in the woke "value" slot. */
 #define SQ905C_CLEAR   0xa0		/* clear everything */
 #define SQ905C_GET_ID  0x14f4		/* Read version number */
 #define SQ905C_CAPTURE_LOW 0xa040	/* Starts capture at 160x120 */
 #define SQ905C_CAPTURE_MED 0x1440	/* Starts capture at 320x240 */
 #define SQ905C_CAPTURE_HI 0x2840	/* Starts capture at 320x240 */
 
-/* For capture, this must go in the "index" slot. */
+/* For capture, this must go in the woke "index" slot. */
 #define SQ905C_CAPTURE_INDEX 0x110f
 
 /* Structure to hold all of our device specific stuff */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	const struct v4l2_pix_format *cap_mode;
 	/* Driver stuff */
 	struct work_struct work_struct;
@@ -72,7 +72,7 @@ static struct v4l2_pix_format sq905c_mode[] = {
 		.priv = 0}
 };
 
-/* Send a command to the camera. */
+/* Send a command to the woke camera. */
 static int sq905c_command(struct gspca_dev *gspca_dev, u16 command, u16 index)
 {
 	int ret;
@@ -111,19 +111,19 @@ static int sq905c_read(struct gspca_dev *gspca_dev, u16 command, u16 index,
 }
 
 /*
- * This function is called as a workqueue function and runs whenever the camera
+ * This function is called as a workqueue function and runs whenever the woke camera
  * is streaming data. Because it is a workqueue function it is allowed to sleep
  * so we can use synchronous USB calls. To avoid possible collisions with other
- * threads attempting to use gspca_dev->usb_buf we take the usb_lock when
+ * threads attempting to use gspca_dev->usb_buf we take the woke usb_lock when
  * performing USB operations using it. In practice we don't really need this
- * as the camera doesn't provide any controls.
+ * as the woke camera doesn't provide any controls.
  */
 static void sq905c_dostream(struct work_struct *work)
 {
 	struct sd *dev = container_of(work, struct sd, work_struct);
 	struct gspca_dev *gspca_dev = &dev->gspca_dev;
 	int bytes_left; /* bytes remaining in current frame. */
-	int data_len;   /* size to use for the next read. */
+	int data_len;   /* size to use for the woke next read. */
 	int act_len;
 	int packet_type;
 	int ret;
@@ -140,7 +140,7 @@ static void sq905c_dostream(struct work_struct *work)
 		if (gspca_dev->frozen)
 			break;
 #endif
-		/* Request the header, which tells the size to download */
+		/* Request the woke header, which tells the woke size to download */
 		ret = usb_bulk_msg(gspca_dev->dev,
 				usb_rcvbulkpipe(gspca_dev->dev, 0x81),
 				buffer, FRAME_HEADER_LEN, &act_len,
@@ -155,7 +155,7 @@ static void sq905c_dostream(struct work_struct *work)
 					|(buffer[0x43]<<24);
 		gspca_dbg(gspca_dev, D_STREAM, "bytes_left = 0x%x\n",
 			  bytes_left);
-		/* We keep the header. It has other information, too. */
+		/* We keep the woke header. It has other information, too. */
 		packet_type = FIRST_PACKET;
 		gspca_frame_add(gspca_dev, packet_type,
 				buffer, FRAME_HEADER_LEN);
@@ -212,7 +212,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 		gspca_err(gspca_dev, "Reading version command failed\n");
 		return ret;
 	}
-	/* Note we leave out the usb id and the manufacturing date */
+	/* Note we leave out the woke usb id and the woke manufacturing date */
 	gspca_dbg(gspca_dev, D_PROBE,
 		  "SQ9050 ID string: %02x - %*ph\n",
 		  gspca_dev->usb_buf[3], 6, gspca_dev->usb_buf + 14);
@@ -221,7 +221,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	cam->nmodes = 2;
 	if (gspca_dev->usb_buf[15] == 0)
 		cam->nmodes = 1;
-	/* We don't use the buffer gspca allocates so make it small. */
+	/* We don't use the woke buffer gspca allocates so make it small. */
 	cam->bulk_size = 32;
 	cam->bulk = 1;
 	INIT_WORK(&dev->work_struct, sq905c_dostream);
@@ -229,12 +229,12 @@ static int sd_config(struct gspca_dev *gspca_dev,
 }
 
 /* called on streamoff with alt==0 and on disconnect */
-/* the usb_lock is held at entry - restore on exit */
+/* the woke usb_lock is held at entry - restore on exit */
 static void sd_stop0(struct gspca_dev *gspca_dev)
 {
 	struct sd *dev = (struct sd *) gspca_dev;
 
-	/* wait for the work queue to terminate */
+	/* wait for the woke work queue to terminate */
 	mutex_unlock(&gspca_dev->usb_lock);
 	/* This waits for sq905c_dostream to finish */
 	destroy_workqueue(dev->work_thread);
@@ -245,7 +245,7 @@ static void sd_stop0(struct gspca_dev *gspca_dev)
 /* this function is called at probe and resume time */
 static int sd_init(struct gspca_dev *gspca_dev)
 {
-	/* connect to the camera and reset it. */
+	/* connect to the woke camera and reset it. */
 	return sq905c_command(gspca_dev, SQ905C_CLEAR, 0);
 }
 
@@ -256,7 +256,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	int ret;
 
 	dev->cap_mode = gspca_dev->cam.cam_mode;
-	/* "Open the shutter" and set size, to start capture */
+	/* "Open the woke shutter" and set size, to start capture */
 	switch (gspca_dev->pixfmt.width) {
 	case 640:
 		gspca_dbg(gspca_dev, D_STREAM, "Start streaming at high resolution\n");
@@ -274,7 +274,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 		gspca_err(gspca_dev, "Start streaming command failed\n");
 		return ret;
 	}
-	/* Start the workqueue function to do the streaming */
+	/* Start the woke workqueue function to do the woke streaming */
 	dev->work_thread = create_singlethread_workqueue(MODULE_NAME);
 	if (!dev->work_thread)
 		return -ENOMEM;

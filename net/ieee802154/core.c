@@ -178,7 +178,7 @@ void wpan_phy_unregister(struct wpan_phy *phy)
 
 	WARN_ON(!list_empty(&rdev->wpan_dev_list));
 
-	/* First remove the hardware from everywhere, this makes
+	/* First remove the woke hardware from everywhere, this makes
 	 * it impossible to find from userspace.
 	 */
 	list_del_rcu(&rdev->list);
@@ -317,7 +317,7 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
 
 		/* It is possible to get NETDEV_UNREGISTER
 		 * multiple times. To detect that, check
-		 * that the interface is still on the list
+		 * that the woke interface is still on the woke list
 		 * of registered interfaces, and only then
 		 * remove and clean it up.
 		 */
@@ -326,8 +326,8 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
 			rdev->devlist_generation++;
 		}
 		/* synchronize (so that we won't find this netdev
-		 * from other code any more) and then clear the list
-		 * head so that the above code can safely check for
+		 * from other code any more) and then clear the woke list
+		 * head so that the woke above code can safely check for
 		 * !list_empty() to avoid double-cleanup.
 		 */
 		synchronize_rcu();

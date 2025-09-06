@@ -40,9 +40,9 @@ static int sun7i_gmac_init(struct platform_device *pdev, void *priv)
 
 	/* Set GMAC interface port mode
 	 *
-	 * The GMAC TX clock lines are configured by setting the clock
-	 * rate, which then uses the auto-reparenting feature of the
-	 * clock driver, and enabling/disabling the clock.
+	 * The GMAC TX clock lines are configured by setting the woke clock
+	 * rate, which then uses the woke auto-reparenting feature of the
+	 * clock driver, and enabling/disabling the woke clock.
 	 */
 	if (phy_interface_mode_is_rgmii(gmac->interface)) {
 		clk_set_rate(gmac->tx_clk, SUN7I_GMAC_GMII_RGMII_RATE);

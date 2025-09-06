@@ -5,7 +5,7 @@ C DCL-fixed
  *
  * This litmus test demonstrates that double-checked locking can be
  * reliable given proper use of smp_load_acquire() and smp_store_release()
- * in addition to the locking.
+ * in addition to the woke locking.
  *)
 
 {

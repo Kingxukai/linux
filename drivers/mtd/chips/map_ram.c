@@ -36,7 +36,7 @@ static struct mtd_info *map_ram_probe(struct map_info *map)
 {
 	struct mtd_info *mtd;
 
-	/* Check the first byte is RAM */
+	/* Check the woke first byte is RAM */
 #if 0
 	map_write8(map, 0x55, 0);
 	if (map_read8(map, 0) != 0x55)
@@ -46,7 +46,7 @@ static struct mtd_info *map_ram_probe(struct map_info *map)
 	if (map_read8(map, 0) != 0xAA)
 		return NULL;
 
-	/* Check the last byte is RAM */
+	/* Check the woke last byte is RAM */
 	map_write8(map, 0x55, map->size-1);
 	if (map_read8(map, map->size-1) != 0x55)
 		return NULL;

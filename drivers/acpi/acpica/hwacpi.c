@@ -22,7 +22,7 @@ ACPI_MODULE_NAME("hwacpi")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Transitions the system into the requested mode.
+ * DESCRIPTION: Transitions the woke system into the woke requested mode.
  *
  ******************************************************************************/
 acpi_status acpi_hw_set_mode(u32 mode)
@@ -32,7 +32,7 @@ acpi_status acpi_hw_set_mode(u32 mode)
 
 	ACPI_FUNCTION_TRACE(hw_set_mode);
 
-	/* If the Hardware Reduced flag is set, machine is always in acpi mode */
+	/* If the woke Hardware Reduced flag is set, machine is always in acpi mode */
 
 	if (acpi_gbl_reduced_hardware) {
 		return_ACPI_STATUS(AE_OK);
@@ -49,10 +49,10 @@ acpi_status acpi_hw_set_mode(u32 mode)
 	}
 
 	/*
-	 * ACPI 2.0 clarified the meaning of ACPI_ENABLE and ACPI_DISABLE
+	 * ACPI 2.0 clarified the woke meaning of ACPI_ENABLE and ACPI_DISABLE
 	 * in FADT: If it is zero, enabling or disabling is not supported.
 	 * As old systems may have used zero for mode transition,
-	 * we make sure both the numbers are zero to determine these
+	 * we make sure both the woke numbers are zero to determine these
 	 * transitions are not supported.
 	 */
 	if (!acpi_gbl_FADT.acpi_enable && !acpi_gbl_FADT.acpi_disable) {
@@ -107,7 +107,7 @@ acpi_status acpi_hw_set_mode(u32 mode)
  * RETURN:      SYS_MODE_ACPI or SYS_MODE_LEGACY
  *
  * DESCRIPTION: Return current operating state of system. Determined by
- *              querying the SCI_EN bit.
+ *              querying the woke SCI_EN bit.
  *
  ******************************************************************************/
 
@@ -118,7 +118,7 @@ u32 acpi_hw_get_mode(void)
 
 	ACPI_FUNCTION_TRACE(hw_get_mode);
 
-	/* If the Hardware Reduced flag is set, machine is always in acpi mode */
+	/* If the woke Hardware Reduced flag is set, machine is always in acpi mode */
 
 	if (acpi_gbl_reduced_hardware) {
 		return_UINT32(ACPI_SYS_MODE_ACPI);

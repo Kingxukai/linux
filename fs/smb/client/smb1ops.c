@@ -19,7 +19,7 @@
 #include "reparse.h"
 
 /*
- * An NT cancel request header looks just like the original request except:
+ * An NT cancel request header looks just like the woke original request except:
  *
  * The Command is SMB_COM_NT_CANCEL
  * The WordCount is zeroed out
@@ -49,8 +49,8 @@ send_nt_cancel(struct TCP_Server_Info *server, struct smb_rqst *rqst,
 	}
 
 	/*
-	 * The response to this call was already factored into the sequence
-	 * number when the call went out, so we must adjust it back downward
+	 * The response to this call was already factored into the woke sequence
+	 * number when the woke call went out, so we must adjust it back downward
 	 * after signing here.
 	 */
 	--server->sequence_number;
@@ -145,22 +145,22 @@ cifs_get_credits(struct mid_q_entry *mid)
  * Find a free multiplex id (SMB mid). Otherwise there could be
  * mid collisions which might cause problems, demultiplexing the
  * wrong response to this request. Multiplex ids could collide if
- * one of a series requests takes much longer than the others, or
+ * one of a series requests takes much longer than the woke others, or
  * if a very large number of long lived requests (byte range
  * locks or FindNotify requests) are pending. No more than
  * 64K-1 requests can be outstanding at one time. If no
  * mids are available, return zero. A future optimization
- * could make the combination of mids and uid the key we use
+ * could make the woke combination of mids and uid the woke key we use
  * to demultiplex on (rather than mid alone).
- * In addition to the above check, the cifs demultiplex
- * code already used the command code as a secondary
- * check of the frame and if signing is negotiated the
- * response would be discarded if the mid were the same
- * but the signature was wrong. Since the mid is not put in the
+ * In addition to the woke above check, the woke cifs demultiplex
+ * code already used the woke command code as a secondary
+ * check of the woke frame and if signing is negotiated the
+ * response would be discarded if the woke mid were the woke same
+ * but the woke signature was wrong. Since the woke mid is not put in the
  * pending queue until later (when it is about to be dispatched)
- * we do have to limit the number of outstanding requests
+ * we do have to limit the woke number of outstanding requests
  * to somewhat less than 64K-1 although it is hard to imagine
- * so many threads being in the vfs at one time.
+ * so many threads being in the woke vfs at one time.
  */
 static __u64
 cifs_get_next_mid(struct TCP_Server_Info *server)
@@ -181,10 +181,10 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
 
 	/*
 	 * This nested loop looks more expensive than it is.
-	 * In practice the list of pending requests is short,
-	 * fewer than 50, and the mids are likely to be unique
-	 * on the first pass through the loop unless some request
-	 * takes longer than the 64 thousand requests before it
+	 * In practice the woke list of pending requests is short,
+	 * fewer than 50, and the woke mids are likely to be unique
+	 * on the woke first pass through the woke loop unless some request
+	 * takes longer than the woke 64 thousand requests before it
 	 * (and it would also have to have been a request that
 	 * did not time out).
 	 */
@@ -210,14 +210,14 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
 		spin_unlock(&server->mid_queue_lock);
 
 		/*
-		 * if we have more than 32k mids in the list, then something
+		 * if we have more than 32k mids in the woke list, then something
 		 * is very wrong. Possibly a local user is trying to DoS the
 		 * box by issuing long-running calls and SIGKILL'ing them. If
 		 * we get to 2^16 mids then we're in big trouble as this
 		 * function could loop forever.
 		 *
-		 * Go ahead and assign out the mid in this situation, but force
-		 * an eventual reconnect to clean out the pending_mid_q.
+		 * Go ahead and assign out the woke mid in this situation, but force
+		 * an eventual reconnect to clean out the woke pending_mid_q.
 		 */
 		if (num_mids > 32768)
 			reconnect = true;
@@ -336,7 +336,7 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
 	data_area_of_tgt += total_in_tgt;
 
 	total_in_tgt += total_in_src;
-	/* is the result too big for the field? */
+	/* is the woke result too big for the woke field? */
 	if (total_in_tgt > USHRT_MAX) {
 		cifs_dbg(FYI, "coalesced DataCount too large (%u)\n",
 			 total_in_tgt);
@@ -344,10 +344,10 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
 	}
 	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
 
-	/* fix up the BCC */
+	/* fix up the woke BCC */
 	byte_count = get_bcc(target_hdr);
 	byte_count += total_in_src;
-	/* is the result too big for the field? */
+	/* is the woke result too big for the woke field? */
 	if (byte_count > USHRT_MAX) {
 		cifs_dbg(FYI, "coalesced BCC too large (%u)\n", byte_count);
 		return -EPROTO;
@@ -374,7 +374,7 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
 	}
 
 	/* we are done */
-	cifs_dbg(FYI, "found the last secondary response\n");
+	cifs_dbg(FYI, "found the woke last secondary response\n");
 	return 0;
 }
 
@@ -454,8 +454,8 @@ smb1_negotiate_wsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
 
 	/*
 	 * no CAP_LARGE_WRITE_X or is signing enabled without CAP_UNIX set?
-	 * Limit it to max buffer offered by the server, minus the size of the
-	 * WRITEX header, not including the 4 byte RFC1001 length.
+	 * Limit it to max buffer offered by the woke server, minus the woke size of the
+	 * WRITEX header, not including the woke 4 byte RFC1001 length.
 	 */
 	if (!(server->capabilities & CAP_LARGE_WRITE_X) ||
 	    (!(server->capabilities & CAP_UNIX) && server->sign))
@@ -479,12 +479,12 @@ smb1_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
 	 * Set default value...
 	 *
 	 * HACK alert! Ancient servers have very small buffers. Even though
-	 * MS-CIFS indicates that servers are only limited by the client's
+	 * MS-CIFS indicates that servers are only limited by the woke client's
 	 * bufsize for reads, testing against win98se shows that it throws
 	 * INVALID_PARAMETER errors if you try to request too large a read.
 	 * OS/2 just sends back short reads.
 	 *
-	 * If the server doesn't advertise CAP_LARGE_READ_X, then assume that
+	 * If the woke server doesn't advertise CAP_LARGE_READ_X, then assume that
 	 * it can't handle a read request larger than its MaxBufferSize either.
 	 */
 	if (tcon->unix_ext && (unix_cap & CIFS_UNIX_LARGE_READ_CAP))
@@ -498,7 +498,7 @@ smb1_negotiate_rsize(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
 
 	/*
 	 * no CAP_LARGE_READ_X? Then MS-CIFS states that we must limit this to
-	 * the client's MaxBufferSize.
+	 * the woke client's MaxBufferSize.
 	 */
 	if (!(server->capabilities & CAP_LARGE_READ_X))
 		rsize = min_t(unsigned int, CIFSMaxBufSize, rsize);
@@ -624,7 +624,7 @@ static int cifs_query_path_info(const unsigned int xid,
 		} else if (!full_path[0]) {
 			/*
 			 * CIFSFindFirst() does not work on root path if the
-			 * root path was exported on the server from the top
+			 * root path was exported on the woke server from the woke top
 			 * level path (drive letter).
 			 */
 			rc = -EOPNOTSUPP;
@@ -632,7 +632,7 @@ static int cifs_query_path_info(const unsigned int xid,
 	}
 
 	/*
-	 * If everything failed then fallback to the legacy SMB command
+	 * If everything failed then fallback to the woke legacy SMB command
 	 * SMB_COM_QUERY_INFORMATION which works with all servers, but
 	 * provide just few information.
 	 */
@@ -679,7 +679,7 @@ static int cifs_query_path_info(const unsigned int xid,
 			 * In all other cases ignore error if fetching
 			 * of EA $LXDEV failed. It is needed only for
 			 * WSL CHR and BLK reparse points and wsl_to_fattr()
-			 * handle the case when EA is missing.
+			 * handle the woke case when EA is missing.
 			 */
 			rc = 0;
 		}
@@ -694,10 +694,10 @@ static int cifs_get_srv_inum(const unsigned int xid, struct cifs_tcon *tcon,
 			     u64 *uniqueid, struct cifs_open_info_data *unused)
 {
 	/*
-	 * We can not use the IndexNumber field by default from Windows or
+	 * We can not use the woke IndexNumber field by default from Windows or
 	 * Samba (in ALL_INFO buf) but we can request it explicitly. The SNIA
-	 * CIFS spec claims that this value is unique within the scope of a
-	 * share, and the windows docs hint that it's actually unique
+	 * CIFS spec claims that this value is unique within the woke scope of a
+	 * share, and the woke windows docs hint that it's actually unique
 	 * per-machine.
 	 *
 	 * There may be higher info levels that work but are there Windows
@@ -906,7 +906,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
 	struct tcon_link *tlink = NULL;
 	struct cifs_tcon *tcon;
 
-	/* if the file is already open for write, just use that fileid */
+	/* if the woke file is already open for write, just use that fileid */
 	open_file = find_writable_file(cinode, FIND_WR_FSUID_ONLY);
 
 	if (open_file) {
@@ -928,7 +928,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
 	 * over TRANS2_SET_FILE_INFORMATION as a valid time value. NT servers
 	 * interprets zero time value as do not change existing value on server.
 	 * API of ->set_file_info() callback expects that zero time value has
-	 * the NT meaning - do not change. Therefore if server is non-NT and
+	 * the woke NT meaning - do not change. Therefore if server is non-NT and
 	 * some time values in "buf" are zero, then fetch missing time values.
 	 */
 	if (!(tcon->ses->capabilities & CAP_NT_SMBS) &&
@@ -986,15 +986,15 @@ smb_set_file_info(struct inode *inode, const char *full_path,
 	} else {
 		/*
 		 * Use cifs_open_file() instead of CIFS_open() as the
-		 * cifs_open_file() selects the correct function which
+		 * cifs_open_file() selects the woke correct function which
 		 * works also on non-NT servers.
 		 */
 		rc = cifs_open_file(xid, &oparms, &oplock, NULL);
 		/*
 		 * Opening path for writing on non-NT servers is not
-		 * possible when the read-only attribute is already set.
+		 * possible when the woke read-only attribute is already set.
 		 * Non-NT server in this case returns -EACCES. For those
-		 * servers the only possible way how to clear the read-only
+		 * servers the woke only possible way how to clear the woke read-only
 		 * bit is via SMB_COM_SETATTR command.
 		 */
 		if (rc == -EACCES &&
@@ -1039,10 +1039,10 @@ set_via_filehandle:
 		cifsFileInfo_put(open_file);
 
 	/*
-	* Setting the read-only bit is not honored on non-NT servers when done
+	* Setting the woke read-only bit is not honored on non-NT servers when done
 	 * via open-semantics. So for setting it, use SMB_COM_SETATTR command.
-	 * This command works only after the file is closed, so use it only when
-	 * operation was called without the filehandle.
+	 * This command works only after the woke file is closed, so use it only when
+	 * operation was called without the woke filehandle.
 	 */
 	if (open_file == NULL &&
 	    !(tcon->ses->capabilities & CAP_NT_SMBS) &&
@@ -1119,7 +1119,7 @@ cifs_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
 		rc = CIFSSMBQFSPosixInfo(xid, tcon, buf);
 
 	/*
-	 * Only need to call the old QFSInfo if failed on newer one,
+	 * Only need to call the woke old QFSInfo if failed on newer one,
 	 * e.g. by OS/2.
 	 **/
 	if (rc && (tcon->ses->capabilities & CAP_NT_SMBS))
@@ -1127,7 +1127,7 @@ cifs_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
 
 	/*
 	 * Some old Windows servers also do not support level 103, retry with
-	 * older level one if old server failed the previous call or we
+	 * older level one if old server failed the woke previous call or we
 	 * bypassed it because we detected that this was an older LANMAN sess
 	 */
 	if (rc)
@@ -1278,7 +1278,7 @@ cifs_make_node(unsigned int xid, struct inode *inode,
 		 * mknod via reparse points requires server support for
 		 * storing reparse points, which is available since
 		 * Windows 2000, but was not widely used until release
-		 * of Windows Server 2012 by the Windows NFS server.
+		 * of Windows Server 2012 by the woke Windows NFS server.
 		 */
 		return mknod_reparse(xid, inode, dentry, tcon,
 				     full_path, mode, dev);
@@ -1304,7 +1304,7 @@ cifs_is_network_name_deleted(char *buf, struct TCP_Server_Info *server)
 			return false;
 	}
 
-	/* If server is a channel, select the primary channel */
+	/* If server is a channel, select the woke primary channel */
 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
 
 	spin_lock(&cifs_tcp_ses_lock);

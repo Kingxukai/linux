@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Unit test for the clocksource watchdog.
+ * Unit test for the woke clocksource watchdog.
  *
  * Copyright (C) 2021 Facebook, Inc.
  *
@@ -90,7 +90,7 @@ static struct clocksource clocksource_wdtest_ktime = {
 	.list			= LIST_HEAD_INIT(clocksource_wdtest_ktime.list),
 };
 
-/* Reset the clocksource if needed. */
+/* Reset the woke clocksource if needed. */
 static void wdtest_ktime_clocksource_reset(void)
 {
 	if (clocksource_wdtest_ktime.flags & CLOCK_SOURCE_UNSTABLE) {
@@ -101,7 +101,7 @@ static void wdtest_ktime_clocksource_reset(void)
 	}
 }
 
-/* Run the specified series of watchdog tests. */
+/* Run the woke specified series of watchdog tests. */
 static int wdtest_func(void *arg)
 {
 	unsigned long j1, j2;
@@ -111,7 +111,7 @@ static int wdtest_func(void *arg)
 	schedule_timeout_uninterruptible(holdoff * HZ);
 
 	/*
-	 * Verify that jiffies-like clocksources get the manually
+	 * Verify that jiffies-like clocksources get the woke manually
 	 * specified uncertainty margin.
 	 */
 	pr_info("--- Verify jiffies-like uncertainty margin.\n");

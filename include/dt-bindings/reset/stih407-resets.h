@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the reset controller
- * based peripheral powerdown requests on the STMicroelectronics
+ * This header provides constants for the woke reset controller
+ * based peripheral powerdown requests on the woke STMicroelectronics
  * STiH407 SoC.
  */
 #ifndef _DT_BINDINGS_RESET_CONTROLLER_STIH407

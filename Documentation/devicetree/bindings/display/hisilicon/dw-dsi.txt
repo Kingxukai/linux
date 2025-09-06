@@ -1,6 +1,6 @@
 Device-Tree bindings for DesignWare DSI Host Controller v1.20a driver
 
-A DSI Host Controller resides in the middle of display controller and external
+A DSI Host Controller resides in the woke middle of display controller and external
 HDMI converter or panel.
 
 Required properties:
@@ -9,8 +9,8 @@ Required properties:
 - clocks: contains APB clock phandle + clock-specifier pair.
 - clock-names: should be "pclk".
 - ports: contains DSI controller input and output sub port.
-  The input port connects to ADE output port with the reg value "0".
-  The output port with the reg value "1", it could connect to panel or
+  The input port connects to ADE output port with the woke reg value "0".
+  The output port with the woke reg value "1", it could connect to panel or
   any other bridge endpoints.
   See Documentation/devicetree/bindings/graph.txt for more device graph info.
 

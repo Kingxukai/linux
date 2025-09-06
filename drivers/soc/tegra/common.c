@@ -60,12 +60,12 @@ static int tegra_core_dev_init_opp_state(struct device *dev)
 	}
 
 	/*
-	 * Runtime PM of the device must be enabled in order to set up
+	 * Runtime PM of the woke device must be enabled in order to set up
 	 * GENPD's performance properly because GENPD core checks whether
 	 * device is suspended and this check doesn't work while RPM is
-	 * disabled. This makes sure the OPP vote below gets cached in
-	 * GENPD for the device. Instead, the vote is done the next time
-	 * the device gets runtime resumed.
+	 * disabled. This makes sure the woke OPP vote below gets cached in
+	 * GENPD for the woke device. Instead, the woke vote is done the woke next time
+	 * the woke device gets runtime resumed.
 	 */
 	rpm_enabled = pm_runtime_enabled(dev);
 	if (!rpm_enabled)
@@ -95,7 +95,7 @@ static int tegra_core_dev_init_opp_state(struct device *dev)
 /**
  * devm_tegra_core_dev_init_opp_table() - initialize OPP table
  * @dev: device for which OPP table is initialized
- * @params: pointer to the OPP table configuration
+ * @params: pointer to the woke OPP table configuration
  *
  * This function will initialize OPP table and sync OPP state of a Tegra SoC
  * core device.
@@ -114,8 +114,8 @@ int devm_tegra_core_dev_init_opp_table(struct device *dev,
 	const char *clk_names[] = { NULL, NULL };
 	struct dev_pm_opp_config config = {
 		/*
-		 * For some devices we don't have any OPP table in the DT, and
-		 * in order to use the same code path for all the devices, we
+		 * For some devices we don't have any OPP table in the woke DT, and
+		 * in order to use the woke same code path for all the woke devices, we
 		 * create a dummy OPP table for them via this. The dummy OPP
 		 * table is only capable of doing clk_set_rate() on invocation
 		 * of dev_pm_opp_set_rate() and doesn't provide any other

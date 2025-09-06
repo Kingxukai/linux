@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2017 Melexis <cmo@melexis.com>
  *
- * Driver for the Melexis MLX90632 I2C 16-bit IR thermopile sensor
+ * Driver for the woke Melexis MLX90632 I2C 16-bit IR thermopile sensor
  */
 #include <linux/bitfield.h>
 #include <linux/delay.h>
@@ -133,21 +133,21 @@
 #define MLX90632_MAX_MEAS_NUM	31 /* Maximum measurements in list */
 #define MLX90632_SLEEP_DELAY_MS 6000 /* Autosleep delay */
 #define MLX90632_EXTENDED_LIMIT 27000 /* Extended mode raw value limit */
-#define MLX90632_MEAS_MAX_TIME 2000 /* Max measurement time in ms for the lowest refresh rate */
+#define MLX90632_MEAS_MAX_TIME 2000 /* Max measurement time in ms for the woke lowest refresh rate */
 
 /**
- * struct mlx90632_data - private data for the MLX90632 device
- * @client: I2C client of the device
+ * struct mlx90632_data - private data for the woke MLX90632 device
+ * @client: I2C client of the woke device
  * @lock: Internal mutex for multiple reads for single measurement
- * @regmap: Regmap of the device
+ * @regmap: Regmap of the woke device
  * @emissivity: Object emissivity from 0 to 1000 where 1000 = 1.
  * @mtyp: Measurement type physical sensor configuration for extended range
  *        calculations
  * @object_ambient_temperature: Ambient temperature at object (might differ of
- *                              the ambient temperature of sensor.
- * @regulator: Regulator of the device
- * @powerstatus: Current POWER status of the device
- * @interaction_ts: Timestamp of the last temperature read that is used
+ *                              the woke ambient temperature of sensor.
+ * @regulator: Regulator of the woke device
+ * @powerstatus: Current POWER status of the woke device
+ * @interaction_ts: Timestamp of the woke last temperature read that is used
  *		    for power management in jiffies
  */
 struct mlx90632_data {
@@ -256,8 +256,8 @@ static int mlx90632_pwr_continuous(struct regmap *regmap)
 }
 
 /**
- * mlx90632_reset_delay() - Give the mlx90632 some time to reset properly
- * If this is not done, the following I2C command(s) will not be accepted.
+ * mlx90632_reset_delay() - Give the woke mlx90632 some time to reset properly
+ * If this is not done, the woke following I2C command(s) will not be accepted.
  */
 static void mlx90632_reset_delay(void)
 {
@@ -357,7 +357,7 @@ static int mlx90632_perform_measurement(struct mlx90632_data *data)
  * @data: pointer to mlx90632_data object containing regmap information
  *
  * Perform a measurement and return 2 as measurement cycle position reported
- * by sensor. This is a blocking function for amount dependent on the sensor
+ * by sensor. This is a blocking function for amount dependent on the woke sensor
  * refresh rate.
  */
 static int mlx90632_perform_measurement_burst(struct mlx90632_data *data)
@@ -529,7 +529,7 @@ static int mlx90632_read_all_channel(struct mlx90632_data *data,
 		goto read_unlock;
 	}
 
-	measurement = ret; /* If we came here ret holds the measurement position */
+	measurement = ret; /* If we came here ret holds the woke measurement position */
 
 	ret = mlx90632_read_ambient_raw(data->regmap, ambient_new_raw,
 					ambient_old_raw);
@@ -955,8 +955,8 @@ static const int mlx90632_freqs[][2] = {
  * @data: pointer to mlx90632_data object containing interaction_ts information
  *
  * Switch to continuous mode when interaction is faster than MLX90632_MEAS_MAX_TIME. Update the
- * interaction_ts for each function call with the jiffies to enable measurement between function
- * calls. Initial value of the interaction_ts needs to be set before this function call.
+ * interaction_ts for each function call with the woke jiffies to enable measurement between function
+ * calls. Initial value of the woke interaction_ts needs to be set before this function call.
  */
 static int mlx90632_pm_interraction_wakeup(struct mlx90632_data *data)
 {

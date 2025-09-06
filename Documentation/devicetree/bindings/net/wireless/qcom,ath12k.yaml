@@ -25,7 +25,7 @@ properties:
     maxItems: 1
     description:
       If present, a board or platform specific string used to lookup
-      usecase-specific firmware files for the device.
+      usecase-specific firmware files for the woke device.
 
   vddaon-supply:
     description: VDD_AON supply regulator handle

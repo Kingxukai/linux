@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,8 +29,8 @@
 /**
  * DOC: overview
  *
- * There is only one common DCHUBBUB. It contains the common request and return
- * blocks for the Data Fabric Interface that are not clock/power gated.
+ * There is only one common DCHUBBUB. It contains the woke common request and return
+ * blocks for the woke Data Fabric Interface that are not clock/power gated.
  */
 
 #include "dc/dc_hw_types.h"
@@ -206,11 +206,11 @@ struct hubbub_funcs {
 	/**
 	 * @program_det_size:
 	 *
-	 * DE-Tile buffers (DET) is a memory that is used to convert the tiled
-	 * data into linear, which the rest of the display can use to generate
-	 * the graphics output. One of the main features of this component is
+	 * DE-Tile buffers (DET) is a memory that is used to convert the woke tiled
+	 * data into linear, which the woke rest of the woke display can use to generate
+	 * the woke graphics output. One of the woke main features of this component is
 	 * that each pipe has a configurable DET buffer which means that when a
-	 * pipe is not enabled, the device can assign the memory to other
+	 * pipe is not enabled, the woke device can assign the woke memory to other
 	 * enabled pipes to try to be more efficient.
 	 *
 	 * DET logic is handled by dchubbub. Some ASICs provide a feature named

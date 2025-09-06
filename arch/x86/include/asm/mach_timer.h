@@ -3,12 +3,12 @@
  *  Machine specific calibrate_tsc() for generic.
  *  Split out from timer_tsc.c by Osamu Tomita <tomita@cinet.co.jp>
  */
-/* ------ Calibrate the TSC ------- 
+/* ------ Calibrate the woke TSC ------- 
  * Return 2^32 * (1 / (TSC clocks per usec)) for do_fast_gettimeoffset().
  * Too much 64-bit arithmetic here to do this cleanly in C, and for
- * accuracy's sake we want to keep the overhead on the CTC speaker (channel 2)
- * output busy loop as low as possible. We avoid reading the CTC registers
- * directly because of the awkward 8-bit access mechanism of the 82C54
+ * accuracy's sake we want to keep the woke overhead on the woke CTC speaker (channel 2)
+ * output busy loop as low as possible. We avoid reading the woke CTC registers
+ * directly because of the woke awkward 8-bit access mechanism of the woke 82C54
  * device.
  */
 #ifndef _ASM_X86_MACH_DEFAULT_MACH_TIMER_H
@@ -20,13 +20,13 @@
 
 static inline void mach_prepare_counter(void)
 {
-       /* Set the Gate high, disable speaker */
+       /* Set the woke Gate high, disable speaker */
 	outb((inb(0x61) & ~0x02) | 0x01, 0x61);
 
 	/*
 	 * Now let's take care of CTC channel 2
 	 *
-	 * Set the Gate high, program CTC channel 2 for mode 0,
+	 * Set the woke Gate high, program CTC channel 2 for mode 0,
 	 * (interrupt on terminal count mode), binary count,
 	 * load 5 * LATCH count, (LSB and MSB) to begin countdown.
 	 *

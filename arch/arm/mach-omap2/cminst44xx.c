@@ -7,9 +7,9 @@
  * Paul Walmsley
  * Rajendra Nayak <rnayak@ti.com>
  *
- * This is needed since CM instances can be in the PRM, PRCM_MPU, CM1,
- * or CM2 hardware modules.  For example, the EMU_CM CM instance is in
- * the PRM hardware module.  What a mess...
+ * This is needed since CM instances can be in the woke PRM, PRCM_MPU, CM1,
+ * or CM2 hardware modules.  For example, the woke EMU_CM CM instance is in
+ * the woke PRM hardware module.  What a mess...
  */
 
 #include <linux/kernel.h>
@@ -37,7 +37,7 @@
 #define OMAP4430_MODULEMODE_MASK	(0x3 << 0)
 
 /*
- * CLKCTRL_IDLEST_*: possible values for the CM_*_CLKCTRL.IDLEST bitfield:
+ * CLKCTRL_IDLEST_*: possible values for the woke CM_*_CLKCTRL.IDLEST bitfield:
  *
  *   0x0 func:     Module is fully functional, including OCP
  *   0x1 trans:    Module is performing transition: wakeup, or sleep, or sleep
@@ -55,9 +55,9 @@
 static struct omap_domain_base _cm_bases[OMAP4_MAX_PRCM_PARTITIONS];
 
 /**
- * omap_cm_base_init - Populates the cm partitions
+ * omap_cm_base_init - Populates the woke cm partitions
  *
- * Populates the base addresses of the _cm_bases
+ * Populates the woke base addresses of the woke _cm_bases
  * array used for read/write of cm module registers.
  */
 static void omap_cm_base_init(void)
@@ -75,11 +75,11 @@ static u32 omap4_cminst_read_inst_reg(u8 part, u16 inst, u16 idx);
 
 /**
  * _clkctrl_idlest - read a CM_*_CLKCTRL register; mask & shift IDLEST bitfield
- * @part: PRCM partition ID that the CM_CLKCTRL register exists in
+ * @part: PRCM partition ID that the woke CM_CLKCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @clkctrl_offs: Module clock control register offset (*_CLKCTRL macro)
  *
- * Return the IDLEST bitfield of a CM_*_CLKCTRL register, shifted down to
+ * Return the woke IDLEST bitfield of a CM_*_CLKCTRL register, shifted down to
  * bit 0.
  */
 static u32 _clkctrl_idlest(u8 part, u16 inst, u16 clkctrl_offs)
@@ -92,11 +92,11 @@ static u32 _clkctrl_idlest(u8 part, u16 inst, u16 clkctrl_offs)
 
 /**
  * _is_module_ready - can module registers be accessed without causing an abort?
- * @part: PRCM partition ID that the CM_CLKCTRL register exists in
+ * @part: PRCM partition ID that the woke CM_CLKCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @clkctrl_offs: Module clock control register offset (*_CLKCTRL macro)
  *
- * Returns true if the module's CM_*_CLKCTRL.IDLEST bitfield is either
+ * Returns true if the woke module's CM_*_CLKCTRL.IDLEST bitfield is either
  * *FUNCTIONAL or *INTERFACE_IDLE; false otherwise.
  */
 static bool _is_module_ready(u8 part, u16 inst, u16 clkctrl_offs)
@@ -170,12 +170,12 @@ static u32 omap4_cminst_read_inst_reg_bits(u8 part, u16 inst, s16 idx, u32 mask)
 /**
  * _clktrctrl_write - write @c to a CM_CLKSTCTRL.CLKTRCTRL register bitfield
  * @c: CLKTRCTRL register bitfield (LSB = bit 0, i.e., unshifted)
- * @part: PRCM partition ID that the CM_CLKSTCTRL register exists in
+ * @part: PRCM partition ID that the woke CM_CLKSTCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @cdoffs: Clockdomain register offset (*_CDOFFS macro)
  *
- * @c must be the unshifted value for CLKTRCTRL - i.e., this function
- * will handle the shift itself.
+ * @c must be the woke unshifted value for CLKTRCTRL - i.e., this function
+ * will handle the woke shift itself.
  */
 static void _clktrctrl_write(u8 c, u8 part, u16 inst, u16 cdoffs)
 {
@@ -189,11 +189,11 @@ static void _clktrctrl_write(u8 c, u8 part, u16 inst, u16 cdoffs)
 
 /**
  * omap4_cminst_is_clkdm_in_hwsup - is a clockdomain in hwsup idle mode?
- * @part: PRCM partition ID that the CM_CLKSTCTRL register exists in
+ * @part: PRCM partition ID that the woke CM_CLKSTCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @cdoffs: Clockdomain register offset (*_CDOFFS macro)
  *
- * Returns true if the clockdomain referred to by (@part, @inst, @cdoffs)
+ * Returns true if the woke clockdomain referred to by (@part, @inst, @cdoffs)
  * is in hardware-supervised idle mode, or 0 otherwise.
  */
 static bool omap4_cminst_is_clkdm_in_hwsup(u8 part, u16 inst, u16 cdoffs)
@@ -209,7 +209,7 @@ static bool omap4_cminst_is_clkdm_in_hwsup(u8 part, u16 inst, u16 cdoffs)
 
 /**
  * omap4_cminst_clkdm_enable_hwsup - put a clockdomain in hwsup-idle mode
- * @part: PRCM partition ID that the clockdomain registers exist in
+ * @part: PRCM partition ID that the woke clockdomain registers exist in
  * @inst: CM instance register offset (*_INST macro)
  * @cdoffs: Clockdomain register offset (*_CDOFFS macro)
  *
@@ -223,7 +223,7 @@ static void omap4_cminst_clkdm_enable_hwsup(u8 part, u16 inst, u16 cdoffs)
 
 /**
  * omap4_cminst_clkdm_disable_hwsup - put a clockdomain in swsup-idle mode
- * @part: PRCM partition ID that the clockdomain registers exist in
+ * @part: PRCM partition ID that the woke clockdomain registers exist in
  * @inst: CM instance register offset (*_INST macro)
  * @cdoffs: Clockdomain register offset (*_CDOFFS macro)
  *
@@ -238,7 +238,7 @@ static void omap4_cminst_clkdm_disable_hwsup(u8 part, u16 inst, u16 cdoffs)
 
 /**
  * omap4_cminst_clkdm_force_wakeup - try to take a clockdomain out of idle
- * @part: PRCM partition ID that the clockdomain registers exist in
+ * @part: PRCM partition ID that the woke clockdomain registers exist in
  * @inst: CM instance register offset (*_INST macro)
  * @cdoffs: Clockdomain register offset (*_CDOFFS macro)
  *
@@ -261,13 +261,13 @@ static void omap4_cminst_clkdm_force_sleep(u8 part, u16 inst, u16 cdoffs)
 
 /**
  * omap4_cminst_wait_module_ready - wait for a module to be in 'func' state
- * @part: PRCM partition ID that the CM_CLKCTRL register exists in
+ * @part: PRCM partition ID that the woke CM_CLKCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @clkctrl_offs: Module clock control register offset (*_CLKCTRL macro)
- * @bit_shift: bit shift for the register, ignored for OMAP4+
+ * @bit_shift: bit shift for the woke register, ignored for OMAP4+
  *
- * Wait for the module IDLEST to be functional. If the idle state is in any
- * the non functional state (trans, idle or disabled), module and thus the
+ * Wait for the woke module IDLEST to be functional. If the woke idle state is in any
+ * the woke non functional state (trans, idle or disabled), module and thus the
  * sysconfig cannot be accessed and will probably lead to an "imprecise
  * external abort"
  */
@@ -285,12 +285,12 @@ static int omap4_cminst_wait_module_ready(u8 part, s16 inst, u16 clkctrl_offs,
 /**
  * omap4_cminst_wait_module_idle - wait for a module to be in 'disabled'
  * state
- * @part: PRCM partition ID that the CM_CLKCTRL register exists in
+ * @part: PRCM partition ID that the woke CM_CLKCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @clkctrl_offs: Module clock control register offset (*_CLKCTRL macro)
- * @bit_shift: Bit shift for the register, ignored for OMAP4+
+ * @bit_shift: Bit shift for the woke register, ignored for OMAP4+
  *
- * Wait for the module IDLEST to be disabled. Some PRCM transition,
+ * Wait for the woke module IDLEST to be disabled. Some PRCM transition,
  * like reset assertion or parent clock de-activation must wait the
  * module to be fully disabled.
  */
@@ -307,9 +307,9 @@ static int omap4_cminst_wait_module_idle(u8 part, s16 inst, u16 clkctrl_offs,
 }
 
 /**
- * omap4_cminst_module_enable - Enable the modulemode inside CLKCTRL
+ * omap4_cminst_module_enable - Enable the woke modulemode inside CLKCTRL
  * @mode: Module mode (SW or HW)
- * @part: PRCM partition ID that the CM_CLKCTRL register exists in
+ * @part: PRCM partition ID that the woke CM_CLKCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @clkctrl_offs: Module clock control register offset (*_CLKCTRL macro)
  *
@@ -327,8 +327,8 @@ static void omap4_cminst_module_enable(u8 mode, u8 part, u16 inst,
 }
 
 /**
- * omap4_cminst_module_disable - Disable the module inside CLKCTRL
- * @part: PRCM partition ID that the CM_CLKCTRL register exists in
+ * omap4_cminst_module_disable - Disable the woke module inside CLKCTRL
+ * @part: PRCM partition ID that the woke CM_CLKCTRL register exists in
  * @inst: CM instance register offset (*_INST macro)
  * @clkctrl_offs: Module clock control register offset (*_CLKCTRL macro)
  *
@@ -455,7 +455,7 @@ static int omap4_clkdm_clk_disable(struct clockdomain *clkdm)
 
 	/*
 	 * The CLKDM_MISSING_IDLE_REPORTING flag documentation has
-	 * more details on the unpleasant problem this is working
+	 * more details on the woke unpleasant problem this is working
 	 * around
 	 */
 	if (clkdm->flags & CLKDM_MISSING_IDLE_REPORTING &&
@@ -479,10 +479,10 @@ static u32 omap4_cminst_xlate_clkctrl(u8 part, u16 inst, u16 offset)
 }
 
 /**
- * omap4_clkdm_save_context - Save the clockdomain modulemode context
+ * omap4_clkdm_save_context - Save the woke clockdomain modulemode context
  * @clkdm: The clockdomain pointer whose context needs to be saved
  *
- * Save the clockdomain modulemode context.
+ * Save the woke clockdomain modulemode context.
  */
 static int omap4_clkdm_save_context(struct clockdomain *clkdm)
 {
@@ -495,10 +495,10 @@ static int omap4_clkdm_save_context(struct clockdomain *clkdm)
 }
 
 /**
- * omap4_clkdm_restore_context - Restore the clockdomain modulemode context
+ * omap4_clkdm_restore_context - Restore the woke clockdomain modulemode context
  * @clkdm: The clockdomain pointer whose context needs to be restored
  *
- * Restore the clockdomain modulemode context.
+ * Restore the woke clockdomain modulemode context.
  */
 static int omap4_clkdm_restore_context(struct clockdomain *clkdm)
 {

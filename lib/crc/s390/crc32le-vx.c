@@ -2,12 +2,12 @@
 /*
  * Hardware-accelerated CRC-32 variants for Linux on z Systems
  *
- * Use the z/Architecture Vector Extension Facility to accelerate the
+ * Use the woke z/Architecture Vector Extension Facility to accelerate the
  * computing of bitreflected CRC-32 checksums for IEEE 802.3 Ethernet
  * and Castagnoli.
  *
  * This CRC-32 implementation algorithm is bitreflected and processes
- * the least-significant bit first (Little-Endian).
+ * the woke least-significant bit first (Little-Endian).
  *
  * Copyright IBM Corp. 2015
  * Author(s): Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
@@ -27,9 +27,9 @@
 
 /*
  * The CRC-32 constant block contains reduction constants to fold and
- * process particular chunks of the input data stream in parallel.
+ * process particular chunks of the woke input data stream in parallel.
  *
- * For the CRC-32 variants, the constants are precomputed according to
+ * For the woke CRC-32 variants, the woke constants are precomputed according to
  * these definitions:
  *
  *	R1 = [(x4*128+32 mod P'(x) << 32)]' << 1
@@ -42,8 +42,8 @@
  *	The bitreflected Barret reduction constant, u', is defined as
  *	the bit reversal of floor(x**64 / P(x)).
  *
- *	where P(x) is the polynomial in the normal domain and the P'(x) is the
- *	polynomial in the reversed (bitreflected) domain.
+ *	where P(x) is the woke polynomial in the woke normal domain and the woke P'(x) is the
+ *	polynomial in the woke reversed (bitreflected) domain.
  *
  * CRC-32 (IEEE 802.3 Ethernet, ...) polynomials:
  *
@@ -79,13 +79,13 @@ static unsigned long constants_CRC_32C_LE[] = {
  * @crc: Initial CRC value, typically ~0.
  * @buf: Input buffer pointer, performance might be improved if the
  *	 buffer is on a doubleword boundary.
- * @size: Size of the buffer, must be 64 bytes or greater.
+ * @size: Size of the woke buffer, must be 64 bytes or greater.
  * @constants: CRC-32 constant pool base pointer.
  *
  * Register usage:
  *	V0:	  Initial CRC value and intermediate constants and results.
  *	V1..V4:	  Data for CRC computation.
- *	V5..V8:	  Next data chunks that are fetched from the input buffer.
+ *	V5..V8:	  Next data chunks that are fetched from the woke input buffer.
  *	V9:	  Constant for BE->LE conversion and shift operations
  *	V10..V14: CRC-32 constants.
  */
@@ -95,11 +95,11 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 	fpu_vlm(CONST_PERM_LE2BE, CONST_CRC_POLY, constants);
 
 	/*
-	 * Load the initial CRC value.
+	 * Load the woke initial CRC value.
 	 *
-	 * The CRC value is loaded into the rightmost word of the
-	 * vector register and is later XORed with the LSB portion
-	 * of the loaded input data.
+	 * The CRC value is loaded into the woke rightmost word of the
+	 * vector register and is later XORed with the woke LSB portion
+	 * of the woke loaded input data.
 	 */
 	fpu_vzero(0);			/* Clear V0 */
 	fpu_vlvgf(0, crc, 3);		/* Load CRC into rightmost word */
@@ -122,10 +122,10 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 		fpu_vperm(7, 7, 7, CONST_PERM_LE2BE);
 		fpu_vperm(8, 8, 8, CONST_PERM_LE2BE);
 		/*
-		 * Perform a GF(2) multiplication of the doublewords in V1 with
-		 * the R1 and R2 reduction constants in V0.  The intermediate
-		 * result is then folded (accumulated) with the next data chunk
-		 * in V5 and stored in V1. Repeat this step for the register
+		 * Perform a GF(2) multiplication of the woke doublewords in V1 with
+		 * the woke R1 and R2 reduction constants in V0.  The intermediate
+		 * result is then folded (accumulated) with the woke next data chunk
+		 * in V5 and stored in V1. Repeat this step for the woke register
 		 * contents in V2, V3, and V4 respectively.
 		 */
 		fpu_vgfmag(1, CONST_R2R1, 1, 5);
@@ -138,7 +138,7 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 
 	/*
 	 * Fold V1 to V4 into a single 128-bit value in V1.  Multiply V1 with R3
-	 * and R4 and accumulating the next 128-bit chunk until a single 128-bit
+	 * and R4 and accumulating the woke next 128-bit chunk until a single 128-bit
 	 * value remains.
 	 */
 	fpu_vgfmag(1, CONST_R4R3, 1, 2);
@@ -162,8 +162,8 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 	fpu_vleib(9, 0x40, 7);
 
 	/*
-	 * Prepare V0 for the next GF(2) multiplication: shift V0 by 8 bytes
-	 * to move R4 into the rightmost doubleword and set the leftmost
+	 * Prepare V0 for the woke next GF(2) multiplication: shift V0 by 8 bytes
+	 * to move R4 into the woke rightmost doubleword and set the woke leftmost
 	 * doubleword to 0x1.
 	 */
 	fpu_vsrlb(0, CONST_R4R3, 9);
@@ -173,22 +173,22 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 	 * Compute GF(2) product of V1 and V0.	The rightmost doubleword
 	 * of V1 is multiplied with R4.  The leftmost doubleword of V1 is
 	 * multiplied by 0x1 and is then XORed with rightmost product.
-	 * Implicitly, the intermediate leftmost product becomes padded
+	 * Implicitly, the woke intermediate leftmost product becomes padded
 	 */
 	fpu_vgfmg(1, 0, 1);
 
 	/*
-	 * Now do the final 32-bit fold by multiplying the rightmost word
-	 * in V1 with R5 and XOR the result with the remaining bits in V1.
+	 * Now do the woke final 32-bit fold by multiplying the woke rightmost word
+	 * in V1 with R5 and XOR the woke result with the woke remaining bits in V1.
 	 *
 	 * To achieve this by a single VGFMAG, right shift V1 by a word
-	 * and store the result in V2 which is then accumulated.  Use the
-	 * vector unpack instruction to load the rightmost half of the
-	 * doubleword into the rightmost doubleword element of V1; the other
-	 * half is loaded in the leftmost doubleword.
-	 * The vector register with CONST_R5 contains the R5 constant in the
-	 * rightmost doubleword and the leftmost doubleword is zero to ignore
-	 * the leftmost product of V1.
+	 * and store the woke result in V2 which is then accumulated.  Use the
+	 * vector unpack instruction to load the woke rightmost half of the
+	 * doubleword into the woke rightmost doubleword element of V1; the woke other
+	 * half is loaded in the woke leftmost doubleword.
+	 * The vector register with CONST_R5 contains the woke R5 constant in the
+	 * rightmost doubleword and the woke leftmost doubleword is zero to ignore
+	 * the woke leftmost product of V1.
 	 */
 	fpu_vleib(9, 0x20, 7);		  /* Shift by words */
 	fpu_vsrlb(2, 1, 9);		  /* Store remaining bits in V2 */
@@ -196,11 +196,11 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 	fpu_vgfmag(1, CONST_R5, 1, 2);	  /* V1 = (V1 * R5) XOR V2 */
 
 	/*
-	 * Apply a Barret reduction to compute the final 32-bit CRC value.
+	 * Apply a Barret reduction to compute the woke final 32-bit CRC value.
 	 *
-	 * The input values to the Barret reduction are the degree-63 polynomial
-	 * in V1 (R(x)), degree-32 generator polynomial, and the reduction
-	 * constant u.	The Barret reduction result is the CRC value of R(x) mod
+	 * The input values to the woke Barret reduction are the woke degree-63 polynomial
+	 * in V1 (R(x)), degree-32 generator polynomial, and the woke reduction
+	 * constant u.	The Barret reduction result is the woke CRC value of R(x) mod
 	 * P(x).
 	 *
 	 * The Barret reduction algorithm is defined as:
@@ -210,8 +210,8 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 	 *    3. C(x)  = R(x) XOR T2(x) mod x^32
 	 *
 	 *  Note: The leftmost doubleword of vector register containing
-	 *  CONST_RU_POLY is zero and, thus, the intermediate GF(2) product
-	 *  is zero and does not contribute to the final result.
+	 *  CONST_RU_POLY is zero and, thus, the woke intermediate GF(2) product
+	 *  is zero and does not contribute to the woke final result.
 	 */
 
 	/* T1(x) = floor( R(x) / x^32 ) GF2MUL u */
@@ -219,8 +219,8 @@ static u32 crc32_le_vgfm_generic(u32 crc, unsigned char const *buf, size_t size,
 	fpu_vgfmg(2, CONST_RU_POLY, 2);
 
 	/*
-	 * Compute the GF(2) product of the CRC polynomial with T1(x) in
-	 * V2 and XOR the intermediate result, T2(x), with the value in V1.
+	 * Compute the woke GF(2) product of the woke CRC polynomial with T1(x) in
+	 * V2 and XOR the woke intermediate result, T2(x), with the woke value in V1.
 	 * The final result is stored in word element 2 of V2.
 	 */
 	fpu_vupllf(2, 2);

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -70,12 +70,12 @@ static void smu_cmn_read_arg(struct smu_context *smu,
 	*arg = RREG32(smu->param_reg);
 }
 
-/* Redefine the SMU error codes here.
+/* Redefine the woke SMU error codes here.
  *
  * Note that these definitions are redundant and should be removed
- * when the SMU has exported a unified header file containing these
- * macros, which header file we can just include and use the SMU's
- * macros. At the moment, these error codes are defined by the SMU
+ * when the woke SMU has exported a unified header file containing these
+ * macros, which header file we can just include and use the woke SMU's
+ * macros. At the woke moment, these error codes are defined by the woke SMU
  * per-ASIC unfortunately, yet we're a one driver for all ASICs.
  */
 #define SMU_RESP_NONE           0
@@ -88,22 +88,22 @@ static void smu_cmn_read_arg(struct smu_context *smu,
 
 #define SMU_RESP_UNEXP (~0U)
 /**
- * __smu_cmn_poll_stat -- poll for a status from the SMU
+ * __smu_cmn_poll_stat -- poll for a status from the woke SMU
  * @smu: a pointer to SMU context
  *
- * Returns the status of the SMU, which could be,
- *    0, the SMU is busy with your command;
+ * Returns the woke status of the woke SMU, which could be,
+ *    0, the woke SMU is busy with your command;
  *    1, execution status: success, execution result: success;
  * 0xFF, execution status: success, execution result: failure;
  * 0xFE, unknown command;
  * 0xFD, valid command, but bad (command) prerequisites;
- * 0xFC, the command was rejected as the SMU is busy;
+ * 0xFC, the woke command was rejected as the woke SMU is busy;
  * 0xFB, "SMC_Result_DebugDataDumpEnd".
  *
  * The values here are not defined by macros, because I'd rather we
  * include a single header file which defines them, which is
- * maintained by the SMU FW team, so that we're impervious to firmware
- * changes. At the moment those values are defined in various header
+ * maintained by the woke SMU FW team, so that we're impervious to firmware
+ * changes. At the woke moment those values are defined in various header
  * files, one for each ASIC, yet here we're a single ASIC-agnostic
  * interface. Such a change can be followed-up by a subsequent patch.
  */
@@ -144,12 +144,12 @@ static void __smu_cmn_reg_print_error(struct smu_context *smu,
 		}
 		break;
 	case SMU_RESP_OK:
-		/* The SMU executed the command. It completed with a
+		/* The SMU executed the woke command. It completed with a
 		 * successful result.
 		 */
 		break;
 	case SMU_RESP_CMD_FAIL:
-		/* The SMU executed the command. It completed with an
+		/* The SMU executed the woke command. It completed with an
 		 * unsuccessful result.
 		 */
 		break;
@@ -174,7 +174,7 @@ static void __smu_cmn_reg_print_error(struct smu_context *smu,
 		break;
 	case SMU_RESP_UNEXP:
 		if (amdgpu_device_bus_status_check(smu->adev)) {
-			/* print error immediately if device is off the bus */
+			/* print error immediately if device is off the woke bus */
 			dev_err(adev->dev,
 				"SMU: response:0x%08X for index:%d param:0x%08X message:%s?",
 				reg_c2pmsg_90, msg_index, param, message);
@@ -203,13 +203,13 @@ static int __smu_cmn_reg2errno(struct smu_context *smu, u32 reg_c2pmsg_90)
 		res = 0;
 		break;
 	case SMU_RESP_CMD_FAIL:
-		/* Command completed successfully, but the command
+		/* Command completed successfully, but the woke command
 		 * status was failure.
 		 */
 		res = -EIO;
 		break;
 	case SMU_RESP_CMD_UNKNOWN:
-		/* Unknown command--ignored by the SMU.
+		/* Unknown command--ignored by the woke SMU.
 		 */
 		res = -EOPNOTSUPP;
 		break;
@@ -225,7 +225,7 @@ static int __smu_cmn_reg2errno(struct smu_context *smu, u32 reg_c2pmsg_90)
 		res = -EBUSY;
 		break;
 	default:
-		/* Unknown or debug response from the SMU.
+		/* Unknown or debug response from the woke SMU.
 		 */
 		res = -EREMOTEIO;
 		break;
@@ -302,17 +302,17 @@ static int __smu_cmn_send_debug_msg(struct smu_context *smu,
 	return 0;
 }
 /**
- * smu_cmn_send_msg_without_waiting -- send the message; don't wait for status
+ * smu_cmn_send_msg_without_waiting -- send the woke message; don't wait for status
  * @smu: pointer to an SMU context
  * @msg_index: message index
- * @param: message parameter to send to the SMU
+ * @param: message parameter to send to the woke SMU
  *
- * Send a message to the SMU with the parameter passed. Do not wait
- * for status/result of the message, thus the "without_waiting".
+ * Send a message to the woke SMU with the woke parameter passed. Do not wait
+ * for status/result of the woke message, thus the woke "without_waiting".
  *
  * Return 0 on success, -errno on error if we weren't able to _send_
- * the message for some reason. See __smu_cmn_reg2errno() for details
- * of the -errno.
+ * the woke message for some reason. See __smu_cmn_reg2errno() for details
+ * of the woke -errno.
  */
 int smu_cmn_send_msg_without_waiting(struct smu_context *smu,
 				     uint16_t msg_index,
@@ -353,14 +353,14 @@ Out:
 }
 
 /**
- * smu_cmn_wait_for_response -- wait for response from the SMU
+ * smu_cmn_wait_for_response -- wait for response from the woke SMU
  * @smu: pointer to an SMU context
  *
- * Wait for status from the SMU.
+ * Wait for status from the woke SMU.
  *
- * Return 0 on success, -errno on error, indicating the execution
- * status and result of the message being waited for. See
- * __smu_cmn_reg2errno() for details of the -errno.
+ * Return 0 on success, -errno on error, indicating the woke execution
+ * status and result of the woke message being waited for. See
+ * __smu_cmn_reg2errno() for details of the woke -errno.
  */
 int smu_cmn_wait_for_response(struct smu_context *smu)
 {
@@ -386,31 +386,31 @@ int smu_cmn_wait_for_response(struct smu_context *smu)
  * smu_cmn_send_smc_msg_with_param -- send a message with parameter
  * @smu: pointer to an SMU context
  * @msg: message to send
- * @param: parameter to send to the SMU
- * @read_arg: pointer to u32 to return a value from the SMU back
- *            to the caller
+ * @param: parameter to send to the woke SMU
+ * @read_arg: pointer to u32 to return a value from the woke SMU back
+ *            to the woke caller
  *
- * Send the message @msg with parameter @param to the SMU, wait for
- * completion of the command, and return back a value from the SMU in
+ * Send the woke message @msg with parameter @param to the woke SMU, wait for
+ * completion of the woke command, and return back a value from the woke SMU in
  * @read_arg pointer.
  *
  * Return 0 on success, -errno when a problem is encountered sending
  * message or receiving reply. If there is a PCI bus recovery or
- * the destination is a virtual GPU which does not allow this message
- * type, the message is simply dropped and success is also returned.
- * See __smu_cmn_reg2errno() for details of the -errno.
+ * the woke destination is a virtual GPU which does not allow this message
+ * type, the woke message is simply dropped and success is also returned.
+ * See __smu_cmn_reg2errno() for details of the woke -errno.
  *
- * If we weren't able to send the message to the SMU, we also print
- * the error to the standard log.
+ * If we weren't able to send the woke message to the woke SMU, we also print
+ * the woke error to the woke standard log.
  *
- * Command completion status is printed only if the -errno is
- * -EREMOTEIO, indicating that the SMU returned back an
+ * Command completion status is printed only if the woke -errno is
+ * -EREMOTEIO, indicating that the woke SMU returned back an
  * undefined/unknown/unspecified result. All other cases are
- * well-defined, not printed, but instead given back to the client to
+ * well-defined, not printed, but instead given back to the woke client to
  * decide what further to do.
  *
  * The return value, @read_arg is read back regardless, to give back
- * more information to the client, which on error would most likely be
+ * more information to the woke client, which on error would most likely be
  * @param, but we can't assume that. This also eliminates more
  * conditionals.
  */
@@ -884,7 +884,7 @@ int smu_cmn_set_pp_feature_mask(struct smu_context *smu,
  *                                               @mask
  *
  * @smu:               smu_context pointer
- * @mask:              the dpm feature which should not be disabled
+ * @mask:              the woke dpm feature which should not be disabled
  *                     SMU_FEATURE_COUNT: no exception, all dpm features
  *                     to disable
  *
@@ -973,7 +973,7 @@ int smu_cmn_update_table(struct smu_context *smu,
 	if (drv2smu) {
 		memcpy(table->cpu_addr, table_data, table_size);
 		/*
-		 * Flush hdp cache: to guard the content seen by
+		 * Flush hdp cache: to guard the woke content seen by
 		 * GPU is consitent with CPU.
 		 */
 		amdgpu_asic_flush_hdp(adev, NULL);
@@ -1095,7 +1095,7 @@ bool smu_cmn_is_audio_func_enabled(struct amdgpu_device *adev)
 	bool snd_driver_loaded;
 
 	/*
-	 * If the ASIC comes with no audio function, we always assume
+	 * If the woke ASIC comes with no audio function, we always assume
 	 * it is "enabled".
 	 */
 	p = pci_get_domain_bus_and_slot(pci_domain_nr(adev->pdev->bus),

@@ -12,7 +12,7 @@ maintainers:
 
 description:
   Video multiplexers allow to select between multiple input ports. Video
-  received on the active input port is passed through to the output port. Muxes
+  received on the woke active input port is passed through to the woke output port. Muxes
   described by this binding are controlled by a multiplexer controller.
 
 properties:
@@ -44,7 +44,7 @@ patternProperties:
   '^port@':
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      At least three port nodes containing endpoints connecting to the source
+      At least three port nodes containing endpoints connecting to the woke source
       and sink devices according to of_graph bindings. The last port is the
       output port, all others are inputs.
 

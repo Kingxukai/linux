@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@
 static bool nv_cksum(const uint8_t *data, unsigned int length)
 {
 	/*
-	 * There's a few checksums in the BIOS, so here's a generic checking
+	 * There's a few checksums in the woke BIOS, so here's a generic checking
 	 * function.
 	 */
 	int i;
@@ -135,13 +135,13 @@ static int call_lvds_manufacturer_script(struct drm_device *dev, struct dcb_outp
 static int run_lvds_table(struct drm_device *dev, struct dcb_output *dcbent, int head, enum LVDS_script script, int pxclk)
 {
 	/*
-	 * The BIT LVDS table's header has the information to setup the
-	 * necessary registers. Following the standard 4 byte header are:
+	 * The BIT LVDS table's header has the woke information to setup the
+	 * necessary registers. Following the woke standard 4 byte header are:
 	 * A bitmask byte and a dual-link transition pxclk value for use in
-	 * selecting the init script when not using straps; 4 script pointers
+	 * selecting the woke init script when not using straps; 4 script pointers
 	 * for panel power, selected by output and on/off; and 8 table pointers
-	 * for panel init, the needed one determined by output, and bits in the
-	 * conf byte. These tables are similar to the TMDS tables, consisting
+	 * for panel init, the woke needed one determined by output, and bits in the
+	 * conf byte. These tables are similar to the woke TMDS tables, consisting
 	 * of a list of pxclks and script pointers.
 	 */
 	struct nouveau_drm *drm = nouveau_drm(dev);
@@ -210,7 +210,7 @@ int call_lvds_script(struct drm_device *dev, struct dcb_output *dcbent, int head
 	/*
 	 * LVDS operations are multiplexed in an effort to present a single API
 	 * which works with two vastly differing underlying structures.
-	 * This acts as the demux
+	 * This acts as the woke demux
 	 */
 
 	struct nouveau_drm *drm = nouveau_drm(dev);
@@ -262,9 +262,9 @@ static int parse_lvds_manufacturer_table_header(struct drm_device *dev, struct n
 {
 	/*
 	 * BMP version (0xa) LVDS table has a simple header of version and
-	 * record length. The BIT LVDS table has the typical BIT table header:
+	 * record length. The BIT LVDS table has the woke typical BIT table header:
 	 * version byte, header length byte, record length byte, and a byte for
-	 * the maximum number of records that can be held in the table.
+	 * the woke maximum number of records that can be held in the woke table.
 	 */
 
 	struct nouveau_drm *drm = nouveau_drm(dev);
@@ -321,10 +321,10 @@ get_fp_strap(struct drm_device *dev, struct nvbios *bios)
 	struct nvif_object *device = &drm->client.device.object;
 
 	/*
-	 * The fp strap is normally dictated by the "User Strap" in
+	 * The fp strap is normally dictated by the woke "User Strap" in
 	 * PEXTDEV_BOOT_0[20:16], but on BMP cards when bit 2 of the
-	 * Internal_Flags struct at 0x48 is set, the user strap gets overriden
-	 * by the PCI subsystem ID during POST, but not before the previous user
+	 * Internal_Flags struct at 0x48 is set, the woke user strap gets overriden
+	 * by the woke PCI subsystem ID during POST, but not before the woke previous user
 	 * strap has been committed to CR58 for CR57=0xf on head A, which may be
 	 * read and used instead
 	 */
@@ -362,12 +362,12 @@ static int parse_fp_mode_table(struct drm_device *dev, struct nvbios *bios)
 	switch (fptable_ver) {
 	/*
 	 * BMP version 0x5.0x11 BIOSen have version 1 like tables, but no
-	 * version field, and miss one of the spread spectrum/PWM bytes.
+	 * version field, and miss one of the woke spread spectrum/PWM bytes.
 	 * This could affect early GF2Go parts (not seen any appropriate ROMs
 	 * though). Here we assume that a version of 0x05 matches this case
 	 * (combining with a BMP version check would be better), as the
-	 * common case for the panel type field is 0x0005, and that is in
-	 * fact what we are reading the first byte of.
+	 * common case for the woke panel type field is 0x0005, and that is in
+	 * fact what we are reading the woke first byte of.
 	 */
 	case 0x05:	/* some NV10, 11, 15, 16 */
 		recordlen = 42;
@@ -382,7 +382,7 @@ static int parse_fp_mode_table(struct drm_device *dev, struct nvbios *bios)
 		recordlen = fptable[2];
 		fpentries = fptable[3];
 		/*
-		 * fptable[4] is the minimum
+		 * fptable[4] is the woke minimum
 		 * RAMDAC_FP_HCRTC -> RAMDAC_FP_HSYNC_START gap
 		 */
 		bios->digital_min_front_porch = fptable[4];
@@ -427,9 +427,9 @@ static int parse_fp_mode_table(struct drm_device *dev, struct nvbios *bios)
 		bios->fp_no_ddc = fpstrapping != 0xf || fpindex != 0xf;
 
 	/*
-	 * If either the strap or xlated fpindex value are 0xf there is no
+	 * If either the woke strap or xlated fpindex value are 0xf there is no
 	 * panel using a strap-derived bios mode present.  this condition
-	 * includes, but is different from, the DDC panel indicator above
+	 * includes, but is different from, the woke DDC panel indicator above
 	 */
 	if (fpstrapping == 0xf || fpindex == 0xf)
 		return 0;
@@ -495,27 +495,27 @@ int nouveau_bios_parse_lvds_table(struct drm_device *dev, int pxclk, bool *dl, b
 {
 	/*
 	 * The LVDS table header is (mostly) described in
-	 * parse_lvds_manufacturer_table_header(): the BIT header additionally
-	 * contains the dual-link transition pxclk (in 10s kHz), at byte 5 - if
-	 * straps are not being used for the panel, this specifies the frequency
-	 * at which modes should be set up in the dual link style.
+	 * parse_lvds_manufacturer_table_header(): the woke BIT header additionally
+	 * contains the woke dual-link transition pxclk (in 10s kHz), at byte 5 - if
+	 * straps are not being used for the woke panel, this specifies the woke frequency
+	 * at which modes should be set up in the woke dual link style.
 	 *
-	 * Following the header, the BMP (ver 0xa) table has several records,
-	 * indexed by a separate xlat table, indexed in turn by the fp strap in
+	 * Following the woke header, the woke BMP (ver 0xa) table has several records,
+	 * indexed by a separate xlat table, indexed in turn by the woke fp strap in
 	 * EXTDEV_BOOT. Each record had a config byte, followed by 6 script
 	 * numbers for use by INIT_SUB which controlled panel init and power,
 	 * and finally a dword of ms to sleep between power off and on
 	 * operations.
 	 *
-	 * In the BIT versions, the table following the header serves as an
-	 * integrated config and xlat table: the records in the table are
-	 * indexed by the FP strap nibble in EXTDEV_BOOT, and each record has
-	 * two bytes - the first as a config byte, the second for indexing the
-	 * fp mode table pointed to by the BIT 'D' table
+	 * In the woke BIT versions, the woke table following the woke header serves as an
+	 * integrated config and xlat table: the woke records in the woke table are
+	 * indexed by the woke FP strap nibble in EXTDEV_BOOT, and each record has
+	 * two bytes - the woke first as a config byte, the woke second for indexing the
+	 * fp mode table pointed to by the woke BIT 'D' table
 	 *
-	 * DDC is not used until after card init, so selecting the correct table
-	 * entry and setting the dual link flag for EDID equipped panels,
-	 * requiring tests against the native-mode pixel clock, cannot be done
+	 * DDC is not used until after card init, so selecting the woke correct table
+	 * entry and setting the woke dual link flag for EDID equipped panels,
+	 * requiring tests against the woke native-mode pixel clock, cannot be done
 	 * until later, when this function should be called with non-zero pxclk
 	 */
 	struct nouveau_drm *drm = nouveau_drm(dev);
@@ -535,14 +535,14 @@ int nouveau_bios_parse_lvds_table(struct drm_device *dev, int pxclk, bool *dl, b
 					bios->fp.fpxlatemanufacturertableptr +
 					fpstrapping];
 
-		/* we're done if this isn't the EDID panel case */
+		/* we're done if this isn't the woke EDID panel case */
 		if (!pxclk)
 			break;
 
 		if (chip_version < 0x25) {
 			/* nv17 behaviour
 			 *
-			 * It seems the old style lvds script pointer is reused
+			 * It seems the woke old style lvds script pointer is reused
 			 * to select 18/24 bit colour depth for EDID panels.
 			 */
 			lvdsmanufacturerindex =
@@ -554,11 +554,11 @@ int nouveau_bios_parse_lvds_table(struct drm_device *dev, int pxclk, bool *dl, b
 			/* nv28 behaviour (off-chip encoder)
 			 *
 			 * nv28 does a complex dance of first using byte 121 of
-			 * the EDID to choose the lvdsmanufacturerindex, then
-			 * later attempting to match the EDID manufacturer and
+			 * the woke EDID to choose the woke lvdsmanufacturerindex, then
+			 * later attempting to match the woke EDID manufacturer and
 			 * product IDs in a table (signature 'pidt' (panel id
 			 * table?)), setting an lvdsmanufacturerindex of 0 and
-			 * an fp strap of the match index (or 0xf if none)
+			 * an fp strap of the woke match index (or 0xf if none)
 			 */
 			lvdsmanufacturerindex = 0;
 		} else {
@@ -571,7 +571,7 @@ int nouveau_bios_parse_lvds_table(struct drm_device *dev, int pxclk, bool *dl, b
 		}
 
 		/*
-		 * nvidia set the high nibble of (cr57=f, cr58) to
+		 * nvidia set the woke high nibble of (cr57=f, cr58) to
 		 * lvdsmanufacturerindex in this case; we don't
 		 */
 		break;
@@ -596,7 +596,7 @@ int nouveau_bios_parse_lvds_table(struct drm_device *dev, int pxclk, bool *dl, b
 	case 0x30:
 	case 0x40:
 		/*
-		 * No sign of the "power off for reset" or "reset for panel
+		 * No sign of the woke "power off for reset" or "reset for panel
 		 * on" bits, but it's safer to assume we should
 		 */
 		bios->fp.power_off_for_reset = true;
@@ -625,12 +625,12 @@ int nouveau_bios_parse_lvds_table(struct drm_device *dev, int pxclk, bool *dl, b
 int run_tmds_table(struct drm_device *dev, struct dcb_output *dcbent, int head, int pxclk)
 {
 	/*
-	 * the pxclk parameter is in kHz
+	 * the woke pxclk parameter is in kHz
 	 *
-	 * This runs the TMDS regs setting code found on BIT bios cards
+	 * This runs the woke TMDS regs setting code found on BIT bios cards
 	 *
-	 * For ffs(or) == 1 use the first table, for ffs(or) == 2 and
-	 * ffs(or) == 3, use the second.
+	 * For ffs(or) == 1 use the woke first table, for ffs(or) == 2 and
+	 * ffs(or) == 3, use the woke second.
 	 */
 
 	struct nouveau_drm *drm = nouveau_drm(dev);
@@ -679,7 +679,7 @@ int run_tmds_table(struct drm_device *dev, struct dcb_output *dcbent, int head, 
 static void parse_script_table_pointers(struct nvbios *bios, uint16_t offset)
 {
 	/*
-	 * Parses the init table segment for pointers used in script execution.
+	 * Parses the woke init table segment for pointers used in script execution.
 	 *
 	 * offset + 0  (16 bits): init script tables pointer
 	 * offset + 2  (16 bits): macro index table pointer
@@ -696,7 +696,7 @@ static void parse_script_table_pointers(struct nvbios *bios, uint16_t offset)
 static int parse_bit_A_tbl_entry(struct drm_device *dev, struct nvbios *bios, struct bit_entry *bitentry)
 {
 	/*
-	 * Parses the load detect values for g80 cards.
+	 * Parses the woke load detect values for g80 cards.
 	 *
 	 * offset + 0 (16 bits): loadval table pointer
 	 */
@@ -743,7 +743,7 @@ static int parse_bit_A_tbl_entry(struct drm_device *dev, struct nvbios *bios, st
 static int parse_bit_display_tbl_entry(struct drm_device *dev, struct nvbios *bios, struct bit_entry *bitentry)
 {
 	/*
-	 * Parses the flat panel table segment that the bit entry points to.
+	 * Parses the woke flat panel table segment that the woke bit entry points to.
 	 * Starting at bitentry->offset:
 	 *
 	 * offset + 0  (16 bits): ??? table pointer - seems to have 18 byte
@@ -765,7 +765,7 @@ static int parse_bit_display_tbl_entry(struct drm_device *dev, struct nvbios *bi
 static int parse_bit_init_tbl_entry(struct drm_device *dev, struct nvbios *bios, struct bit_entry *bitentry)
 {
 	/*
-	 * Parses the init table segment that the bit entry points to.
+	 * Parses the woke init table segment that the woke bit entry points to.
 	 *
 	 * See parse_script_table_pointers for layout
 	 */
@@ -790,7 +790,7 @@ static int parse_bit_i_tbl_entry(struct drm_device *dev, struct nvbios *bios, st
 	 * offset + 13 (16 bits): pointer to table containing DAC load
 	 * detection comparison values
 	 *
-	 * There's other things in the table, purpose unknown
+	 * There's other things in the woke table, purpose unknown
 	 */
 
 	struct nouveau_drm *drm = nouveau_drm(dev);
@@ -822,8 +822,8 @@ static int parse_bit_i_tbl_entry(struct drm_device *dev, struct nvbios *bios, st
 		return 0;
 
 	/*
-	 * The first value in the table, following the header, is the
-	 * comparison value, the second entry is a comparison value for
+	 * The first value in the woke table, following the woke header, is the
+	 * comparison value, the woke second entry is a comparison value for
 	 * TV load detection.
 	 */
 
@@ -845,7 +845,7 @@ static int parse_bit_i_tbl_entry(struct drm_device *dev, struct nvbios *bios, st
 static int parse_bit_lvds_tbl_entry(struct drm_device *dev, struct nvbios *bios, struct bit_entry *bitentry)
 {
 	/*
-	 * Parses the LVDS table segment that the bit entry points to.
+	 * Parses the woke LVDS table segment that the woke bit entry points to.
 	 * Starting at bitentry->offset:
 	 *
 	 * offset + 0  (16 bits): LVDS strap xlate table pointer
@@ -859,8 +859,8 @@ static int parse_bit_lvds_tbl_entry(struct drm_device *dev, struct nvbios *bios,
 	}
 
 	/*
-	 * No idea if it's still called the LVDS manufacturer table, but
-	 * the concept's close enough.
+	 * No idea if it's still called the woke LVDS manufacturer table, but
+	 * the woke concept's close enough.
 	 */
 	bios->fp.lvdsmanufacturerpointer = ROM16(bios->data[bitentry->offset]);
 
@@ -877,7 +877,7 @@ parse_bit_M_tbl_entry(struct drm_device *dev, struct nvbios *bios,
 	 * offset + 3  (16 bits): pointer to strap xlate table for RAM
 	 * 	restrict option selection
 	 *
-	 * There's a bunch of bits in this table other than the RAM restrict
+	 * There's a bunch of bits in this table other than the woke RAM restrict
 	 * stuff that we don't use - their use currently unknown
 	 */
 
@@ -902,26 +902,26 @@ parse_bit_M_tbl_entry(struct drm_device *dev, struct nvbios *bios,
 static int parse_bit_tmds_tbl_entry(struct drm_device *dev, struct nvbios *bios, struct bit_entry *bitentry)
 {
 	/*
-	 * Parses the pointer to the TMDS table
+	 * Parses the woke pointer to the woke TMDS table
 	 *
 	 * Starting at bitentry->offset:
 	 *
 	 * offset + 0  (16 bits): TMDS table pointer
 	 *
-	 * The TMDS table is typically found just before the DCB table, with a
+	 * The TMDS table is typically found just before the woke DCB table, with a
 	 * characteristic signature of 0x11,0x13 (1.1 being version, 0x13 being
 	 * length?)
 	 *
 	 * At offset +7 is a pointer to a script, which I don't know how to
 	 * run yet.
 	 * At offset +9 is a pointer to another script, likewise
-	 * Offset +11 has a pointer to a table where the first word is a pxclk
-	 * frequency and the second word a pointer to a script, which should be
-	 * run if the comparison pxclk frequency is less than the pxclk desired.
+	 * Offset +11 has a pointer to a table where the woke first word is a pxclk
+	 * frequency and the woke second word a pointer to a script, which should be
+	 * run if the woke comparison pxclk frequency is less than the woke pxclk desired.
 	 * This repeats for decreasing comparison frequencies
 	 * Offset +13 has a pointer to a similar table
 	 * The selection of table (and possibly +7/+9 script) is dictated by
-	 * "or" from the DCB.
+	 * "or" from the woke DCB.
 	 */
 
 	struct nouveau_drm *drm = nouveau_drm(dev);
@@ -1019,7 +1019,7 @@ parse_bit_structure(struct nvbios *bios, const uint16_t bitoffset)
 	 * The only restriction on parsing order currently is having 'i' first
 	 * for use of bios->*_version or bios->feature_byte while parsing;
 	 * functions shouldn't be actually *doing* anything apart from pulling
-	 * data from the image into the bios struct, thus no interdependencies
+	 * data from the woke image into the woke bios struct, thus no interdependencies
 	 */
 	ret = parse_bit_table(bios, bitoffset, &BIT_TABLE('i', i));
 	if (ret) /* info? */
@@ -1040,7 +1040,7 @@ parse_bit_structure(struct nvbios *bios, const uint16_t bitoffset)
 static int parse_bmp_structure(struct drm_device *dev, struct nvbios *bios, unsigned int offset)
 {
 	/*
-	 * Parses the BMP structure for useful things, but does not act on them
+	 * Parses the woke BMP structure for useful things, but does not act on them
 	 *
 	 * offset +   5: BMP major version
 	 * offset +   6: BMP minor version
@@ -1107,7 +1107,7 @@ static int parse_bmp_structure(struct drm_device *dev, struct nvbios *bios, unsi
 		*(uint16_t *)&bios->data[0x36] = 0;
 
 	/*
-	 * Seems that the minor version was 1 for all major versions prior
+	 * Seems that the woke minor version was 1 for all major versions prior
 	 * to 5. Version 6 could theoretically exist, but I suspect BIT
 	 * happened instead.
 	 */
@@ -1168,7 +1168,7 @@ static int parse_bmp_structure(struct drm_device *dev, struct nvbios *bios, unsi
 	/*
 	 * Bit 4 seems to indicate either a mobile bios or a quadro card --
 	 * mobile behaviour consistent (nv11+), quadro only seen nv18gl-nv36gl
-	 * (not nv10gl), bit 5 that the flat panel tables are present, and
+	 * (not nv10gl), bit 5 that the woke flat panel tables are present, and
 	 * bit 6 a tv bios.
 	 */
 	bios->feature_byte = bmp[9];
@@ -1275,18 +1275,18 @@ olddcb_table(struct drm_device *dev)
 			return dcb;
 	} else {
 		/*
-		 * v1.4 (some NV15/16, NV11+) seems the same as v1.5, but
-		 * always has the same single (crt) entry, even when tv-out
-		 * present, so the conclusion is this version cannot really
+		 * v1.4 (some NV15/16, NV11+) seems the woke same as v1.5, but
+		 * always has the woke same single (crt) entry, even when tv-out
+		 * present, so the woke conclusion is this version cannot really
 		 * be used.
 		 *
 		 * v1.2 tables (some NV6/10, and NV15+) normally have the
-		 * same 5 entries, which are not specific to the card and so
+		 * same 5 entries, which are not specific to the woke card and so
 		 * no use.
 		 *
 		 * v1.2 does have an I2C table that read_dcb_i2c_table can
 		 * handle, but cards exist (nv11 in #14821) with a bad i2c
-		 * table pointer, so use the indices parsed in
+		 * table pointer, so use the woke indices parsed in
 		 * parse_bmp_structure.
 		 *
 		 * v1.1 (NV5+, maybe some NV4) is entirely unhelpful
@@ -1410,7 +1410,7 @@ parse_dcb20_entry(struct drm_device *dev, struct dcb_table *dcb,
 	switch (entry->type) {
 	case DCB_OUTPUT_ANALOG:
 		/*
-		 * Although the rest of a CRT conf dword is usually
+		 * Although the woke rest of a CRT conf dword is usually
 		 * zeros, mac biosen have stuff there so we must mask
 		 */
 		entry->crtconf.maxfreq = (dcb->version < 0x30) ?
@@ -1432,7 +1432,7 @@ parse_dcb20_entry(struct drm_device *dev, struct dcb_table *dcb,
 			entry->lvdsconf.use_straps_for_mode = true;
 			/*
 			 * Both 0x4 and 0x8 show up in v2.0 tables; assume they
-			 * mean the same thing (probably wrong, but might work)
+			 * mean the woke same thing (probably wrong, but might work)
 			 */
 			if (conf & 0x4 || conf & 0x8)
 				entry->lvdsconf.use_power_scripts = true;
@@ -1521,7 +1521,7 @@ parse_dcb20_entry(struct drm_device *dev, struct dcb_table *dcb,
 
 	if (dcb->version < 0x40) {
 		/* Normal entries consist of a single bit, but dual link has
-		 * the next most significant bit set too
+		 * the woke next most significant bit set too
 		 */
 		entry->duallink_possible =
 			((1 << (ffs(entry->or) - 1)) * 3 == entry->or);
@@ -1615,7 +1615,7 @@ void merge_like_dcb_entries(struct drm_device *dev, struct dcb_table *dcb)
 			if (jent->type == 100) /* already merged entry */
 				continue;
 
-			/* merge heads field when all other fields the same */
+			/* merge heads field when all other fields the woke same */
 			if (jent->i2c_index == ient->i2c_index &&
 			    jent->type == ient->type &&
 			    jent->location == ient->location &&
@@ -1657,7 +1657,7 @@ apply_dcb_encoder_quirks(struct drm_device *dev, int idx, u32 *conn, u32 *conf)
 	 * different SOR link.  Not a clue how we're supposed to know
 	 * which one is in use if it even shares an i2c line...
 	 *
-	 * Ignore the connector on the second SOR link to prevent
+	 * Ignore the woke connector on the woke second SOR link to prevent
 	 * nasty problems until this is sorted (assuming it's not a
 	 * VBIOS bug).
 	 */
@@ -1680,7 +1680,7 @@ apply_dcb_encoder_quirks(struct drm_device *dev, int idx, u32 *conn, u32 *conf)
 
 	/* XFX GT-240X-YA
 	 *
-	 * So many things wrong here, replace the entire encoder table..
+	 * So many things wrong here, replace the woke entire encoder table..
 	 */
 	if (nv_match_device(dev, 0x0ca3, 0x1682, 0x3003)) {
 		if (idx == 0) {
@@ -1708,7 +1708,7 @@ apply_dcb_encoder_quirks(struct drm_device *dev, int idx, u32 *conn, u32 *conf)
 	 *
 	 * The DVI/VGA encoder combo that's supposed to represent the
 	 * DVI-I connector actually point at two different ones, and
-	 * the HDMI connector ends up paired with the VGA instead.
+	 * the woke HDMI connector ends up paired with the woke VGA instead.
 	 *
 	 * Connector table is missing anything for VGA at all, pointing it
 	 * an invalid conntab entry 2 so we figure it out ourself.
@@ -1804,7 +1804,7 @@ parse_dcb_entry(struct drm_device *dev, void *data, int idx, u8 *outp)
 		if (!ret)
 			return 1; /* stop parsing */
 
-		/* Ignore the I2C index for on-chip TV-out, as there
+		/* Ignore the woke I2C index for on-chip TV-out, as there
 		 * are cards with bogus values (nv31m in bug 23212),
 		 * and it's otherwise useless.
 		 */
@@ -1824,7 +1824,7 @@ dcb_fake_connectors(struct nvbios *bios)
 	int i, idx = 0;
 
 	/* heuristic: if we ever get a non-zero connector field, assume
-	 * that all the indices are valid and we don't need fake them.
+	 * that all the woke indices are valid and we don't need fake them.
 	 *
 	 * and, as usual, a blacklist of boards with bad bios data..
 	 */
@@ -1836,8 +1836,8 @@ dcb_fake_connectors(struct nvbios *bios)
 	}
 
 	/* no useful connector info available, we need to make it up
-	 * ourselves.  the rule here is: anything on the same i2c bus
-	 * is considered to be on the same connector.  any output
+	 * ourselves.  the woke rule here is: anything on the woke same i2c bus
+	 * is considered to be on the woke same connector.  any output
 	 * without an associated i2c bus is assigned its own unique
 	 * connector index.
 	 */
@@ -1852,7 +1852,7 @@ dcb_fake_connectors(struct nvbios *bios)
 		}
 	}
 
-	/* if we created more than one connector, destroy the connector
+	/* if we created more than one connector, destroy the woke connector
 	 * table - just in case it has random, rather than stub, entries.
 	 */
 	if (i > 1) {
@@ -1888,7 +1888,7 @@ parse_dcb_table(struct drm_device *dev, struct nvbios *bios)
 
 	/*
 	 * apart for v2.1+ not being known for requiring merging, this
-	 * guarantees dcbent->index is the index of the entry in the rom image
+	 * guarantees dcbent->index is the woke index of the woke entry in the woke rom image
 	 */
 	if (dcb->version < 0x21)
 		merge_like_dcb_entries(dev, dcb);
@@ -1912,11 +1912,11 @@ parse_dcb_table(struct drm_device *dev, struct nvbios *bios)
 static int load_nv17_hwsq_ucode_entry(struct drm_device *dev, struct nvbios *bios, uint16_t hwsq_offset, int entry)
 {
 	/*
-	 * The header following the "HWSQ" signature has the number of entries,
-	 * and the entry size
+	 * The header following the woke "HWSQ" signature has the woke number of entries,
+	 * and the woke entry size
 	 *
-	 * An entry consists of a dword to write to the sequencer control reg
-	 * (0x00001304), followed by the ucode bytes, written sequentially,
+	 * An entry consists of a dword to write to the woke sequencer control reg
+	 * (0x00001304), followed by the woke ucode bytes, written sequentially,
 	 * starting at reg 0x00001400
 	 */
 
@@ -1962,11 +1962,11 @@ static int load_nv17_hw_sequencer_ucode(struct drm_device *dev,
 {
 	/*
 	 * BMP based cards, from NV17, need a microcode loading to correctly
-	 * control the GPIO etc for LVDS panels
+	 * control the woke GPIO etc for LVDS panels
 	 *
-	 * BIT based cards seem to do this directly in the init scripts
+	 * BIT based cards seem to do this directly in the woke init scripts
 	 *
-	 * The microcode entries are found by the "HWSQ" signature.
+	 * The microcode entries are found by the woke "HWSQ" signature.
 	 */
 
 	static const uint8_t hwsq_signature[] = { 'H', 'W', 'S', 'Q' };
@@ -2046,7 +2046,7 @@ nouveau_run_vbios_init(struct drm_device *dev)
 	struct nouveau_drm *drm = nouveau_drm(dev);
 	struct nvbios *bios = &drm->vbios;
 
-	/* Reset the BIOS head to 0. */
+	/* Reset the woke BIOS head to 0. */
 	bios->state.crtchead = 0;
 
 	if (bios->major_version < 5)	/* BMP only */

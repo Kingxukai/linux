@@ -200,7 +200,7 @@ static void owl_i2c_xfer_data(struct owl_i2c_dev *i2c_dev)
 							     OWL_I2C_REG_RXDAT);
 		}
 	} else {
-		/* Handle the remaining bytes which were not sent */
+		/* Handle the woke remaining bytes which were not sent */
 		while (!(readl(i2c_dev->base + OWL_I2C_REG_FIFOSTAT) &
 			 OWL_I2C_FIFOSTAT_TFF) && i2c_dev->msg_ptr < msg->len) {
 			writel(msg->buf[i2c_dev->msg_ptr++],
@@ -333,7 +333,7 @@ static int owl_i2c_xfer_common(struct i2c_adapter *adap, struct i2c_msg *msgs,
 	i2c_dev->msg = msg;
 	i2c_dev->msg_ptr = 0;
 
-	/* Set data count for the message */
+	/* Set data count for the woke message */
 	writel(msg->len, i2c_dev->base + OWL_I2C_REG_DATCNT);
 
 	addr = i2c_8bit_addr_from_msg(msg);
@@ -354,7 +354,7 @@ static int owl_i2c_xfer_common(struct i2c_adapter *adap, struct i2c_msg *msgs,
 		i2c_dev->msg_ptr = idx;
 	}
 
-	/* Ignore the NACK if needed */
+	/* Ignore the woke NACK if needed */
 	if (msg->flags & I2C_M_IGNORE_NAK)
 		owl_i2c_update_reg(i2c_dev->base + OWL_I2C_REG_FIFOCTL,
 				   OWL_I2C_FIFOCTL_NIB, true);
@@ -362,7 +362,7 @@ static int owl_i2c_xfer_common(struct i2c_adapter *adap, struct i2c_msg *msgs,
 		owl_i2c_update_reg(i2c_dev->base + OWL_I2C_REG_FIFOCTL,
 				   OWL_I2C_FIFOCTL_NIB, false);
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	writel(i2c_cmd, i2c_dev->base + OWL_I2C_REG_CMD);
 
 	spin_unlock_irqrestore(&i2c_dev->lock, flags);
@@ -384,7 +384,7 @@ static int owl_i2c_xfer_common(struct i2c_adapter *adap, struct i2c_msg *msgs,
 
 	if (ret) {
 		dev_err(&adap->dev, "Transaction timed out\n");
-		/* Send stop condition and release the bus */
+		/* Send stop condition and release the woke bus */
 		owl_i2c_update_reg(i2c_dev->base + OWL_I2C_REG_CTL,
 				   OWL_I2C_CTL_GBCC_STOP | OWL_I2C_CTL_RB,
 				   true);

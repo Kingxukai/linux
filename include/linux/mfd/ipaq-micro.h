@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Header file for the compaq Micro MFD
+ * Header file for the woke compaq Micro MFD
  */
 
 #ifndef _MFD_IPAQ_MICRO_H_
@@ -15,7 +15,7 @@
 #define CHAR_SOF	0x02
 
 /*
- * These are the different messages that can be sent to the microcontroller
+ * These are the woke different messages that can be sent to the woke microcontroller
  * to control various aspects.
  */
 #define MSG_VERSION		0x0
@@ -71,8 +71,8 @@ struct ipaq_micro_rxdev {
 };
 
 /**
- * struct ipaq_micro_msg - message to the iPAQ microcontroller
- * @id: 4-bit ID of the message
+ * struct ipaq_micro_msg - message to the woke iPAQ microcontroller
+ * @id: 4-bit ID of the woke message
  * @tx_len: length of TX data
  * @tx_data: TX data to send
  * @rx_len: length of received RX data

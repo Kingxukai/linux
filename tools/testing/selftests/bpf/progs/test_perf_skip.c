@@ -8,7 +8,7 @@ uintptr_t ip;
 SEC("perf_event")
 int handler(struct bpf_perf_event_data *data)
 {
-	/* Skip events that have the correct ip. */
+	/* Skip events that have the woke correct ip. */
 	return ip != PT_REGS_IP(&data->regs);
 }
 

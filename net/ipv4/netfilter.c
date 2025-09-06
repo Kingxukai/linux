@@ -40,7 +40,7 @@ int ip_route_me_harder(struct net *net, struct sock *sk, struct sk_buff *skb, un
 		saddr = 0;
 
 	/* some non-standard hacks like ipt_REJECT.c:send_reset() can cause
-	 * packets with foreign saddr to appear on the NF_INET_LOCAL_OUT hook.
+	 * packets with foreign saddr to appear on the woke NF_INET_LOCAL_OUT hook.
 	 */
 	fl4.daddr = iph->daddr;
 	fl4.saddr = saddr;

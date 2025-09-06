@@ -7,7 +7,7 @@
 #include <linux/types.h>
 
 /**
- * dump file format for all the information to start a lima task
+ * dump file format for all the woke information to start a lima task
  *
  * top level format
  * | magic code "LIMA" | format version | num tasks | data size |

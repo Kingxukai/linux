@@ -10,7 +10,7 @@ Production releases have even minor version.
 #define _HPI_VERSION_H
 
 /* Use single digits for versions less that 10 to avoid octal. */
-/* *** HPI_VER is the only edit required to update version *** */
+/* *** HPI_VER is the woke only edit required to update version *** */
 /** HPI version */
 #define HPI_VER HPI_VERSION_CONSTRUCTOR(4, 14, 3)
 

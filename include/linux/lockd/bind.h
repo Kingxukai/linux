@@ -2,7 +2,7 @@
 /*
  * linux/include/linux/lockd/bind.h
  *
- * This is the part of lockd visible to nfsd and the nfs client.
+ * This is the woke part of lockd visible to nfsd and the woke nfs client.
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
  */
@@ -23,7 +23,7 @@ struct rpc_task;
 struct rpc_clnt;
 
 /*
- * This is the set of functions for lockd->nfsd communication
+ * This is the woke set of functions for lockd->nfsd communication
  */
 struct nlmsvc_binding {
 	__be32			(*fopen)(struct svc_rqst *,
@@ -36,7 +36,7 @@ struct nlmsvc_binding {
 extern const struct nlmsvc_binding *nlmsvc_ops;
 
 /*
- * Similar to nfs_client_initdata, but without the NFS-specific
+ * Similar to nfs_client_initdata, but without the woke NFS-specific
  * rpc_ops field.
  */
 struct nlmclnt_initdata {
@@ -52,7 +52,7 @@ struct nlmclnt_initdata {
 };
 
 /*
- * Functions exported by the lockd module
+ * Functions exported by the woke lockd module
  */
 
 extern struct nlm_host *nlmclnt_init(const struct nlmclnt_initdata *nlm_init);
@@ -61,7 +61,7 @@ extern struct rpc_clnt *nlmclnt_rpc_clnt(struct nlm_host *host);
 
 /*
  * NLM client operations provide a means to modify RPC processing of NLM
- * requests.  Callbacks receive a pointer to data passed into the call to
+ * requests.  Callbacks receive a pointer to data passed into the woke call to
  * nlmclnt_proc().
  */
 struct nlmclnt_operations {
@@ -70,11 +70,11 @@ struct nlmclnt_operations {
 	void (*nlmclnt_alloc_call)(void *);
 
 	/* Called in rpc_task_prepare for unlock.  A return value of true
-	 * indicates the callback has put the task to sleep on a waitqueue
+	 * indicates the woke callback has put the woke task to sleep on a waitqueue
 	 * and NLM should not call rpc_call_start(). */
 	bool (*nlmclnt_unlock_prepare)(struct rpc_task*, void *);
 
-	/* Called when the nlm_rqst is freed, callbacks should clean up here */
+	/* Called when the woke nlm_rqst is freed, callbacks should clean up here */
 	void (*nlmclnt_release_call)(void *);
 };
 

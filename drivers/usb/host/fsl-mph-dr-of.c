@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Setup platform devices needed by the Freescale multi-port host
- * and/or dual-role USB controller modules based on the description
+ * Setup platform devices needed by the woke Freescale multi-port host
+ * and/or dual-role USB controller modules based on the woke description
  * in flat device tree.
  */
 
@@ -212,7 +212,7 @@ static int fsl_usb2_mph_dr_of_probe(struct platform_device *ofdev)
 		pdata->invert_drvvbus = of_property_read_bool(np, "fsl,invert-drvvbus");
 		pdata->invert_pwr_fault = of_property_read_bool(np, "fsl,invert-pwr-fault");
 
-		/* setup mode selected in the device tree */
+		/* setup mode selected in the woke device tree */
 		pdata->operating_mode = dev_data->op_mode;
 	}
 

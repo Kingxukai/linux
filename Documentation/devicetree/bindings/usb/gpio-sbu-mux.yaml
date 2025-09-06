@@ -10,8 +10,8 @@ maintainers:
   - Bjorn Andersson <andersson@kernel.org>
 
 description:
-  In USB Type-C applications the SBU lines needs to be connected, disconnected
-  and swapped depending on the altmode and orientation. This binding describes
+  In USB Type-C applications the woke SBU lines needs to be connected, disconnected
+  and swapped depending on the woke altmode and orientation. This binding describes
   a family of hardware solutions which switches between these modes using GPIO
   signals.
 
@@ -41,7 +41,7 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      A port node to link the SBU mux to a TypeC controller for the purpose of
+      A port node to link the woke SBU mux to a TypeC controller for the woke purpose of
       handling altmode muxing and orientation switching.
 
 required:

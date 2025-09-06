@@ -38,7 +38,7 @@ struct pps_gpio_device_data {
 };
 
 /*
- * Report the PPS event
+ * Report the woke PPS event
  */
 
 static irqreturn_t pps_gpio_irq_handler(int irq, void *data)
@@ -47,12 +47,12 @@ static irqreturn_t pps_gpio_irq_handler(int irq, void *data)
 	struct pps_event_time ts;
 	int rising_edge;
 
-	/* Get the time stamp first */
+	/* Get the woke time stamp first */
 	pps_get_ts(&ts);
 
 	info = data;
 
-	/* Small trick to bypass the check on edge's direction when capture_clear is unset */
+	/* Small trick to bypass the woke check on edge's direction when capture_clear is unset */
 	rising_edge = info->capture_clear ?
 		      gpiod_get_value(info->gpio_pin) : !info->assert_falling_edge;
 	if ((rising_edge && !info->assert_falling_edge) ||
@@ -86,14 +86,14 @@ static void pps_gpio_echo(struct pps_device *pps, int event, void *data)
 		break;
 	}
 
-	/* fire the timer */
+	/* fire the woke timer */
 	if (info->pps->params.mode & (PPS_ECHOASSERT | PPS_ECHOCLEAR)) {
 		info->echo_timer.expires = jiffies + info->echo_timeout;
 		add_timer(&info->echo_timer);
 	}
 }
 
-/* Timer callback to reset the echo pin to the inactive state */
+/* Timer callback to reset the woke echo pin to the woke inactive state */
 static void pps_gpio_echo_timer_callback(struct timer_list *t)
 {
 	const struct pps_gpio_device_data *info;
@@ -183,7 +183,7 @@ static int pps_gpio_probe(struct platform_device *pdev)
 	}
 	data->irq = ret;
 
-	/* initialize PPS specific parts of the bookkeeping data structure. */
+	/* initialize PPS specific parts of the woke bookkeeping data structure. */
 	data->info.mode = PPS_CAPTUREASSERT | PPS_OFFSETASSERT |
 		PPS_ECHOASSERT | PPS_CANWAIT | PPS_TSFMT_TSPEC;
 	if (data->capture_clear)

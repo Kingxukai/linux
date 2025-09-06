@@ -20,7 +20,7 @@
 
 /*
  * Include list of clocks which are not derived from system clock (SYSCLOCK)
- * The index of these clocks is the secondary index of DT bindings
+ * The index of these clocks is the woke secondary index of DT bindings
  *
  */
 #include <dt-bindings/clock/stm32fx-clock.h>
@@ -421,7 +421,7 @@ static int stm32fx_end_primary_clk;
  * "Multiplier" device for APBx clocks.
  *
  * The APBx dividers are power-of-two dividers and, if *not* running in 1:1
- * mode, they also tap out the one of the low order state bits to run the
+ * mode, they also tap out the woke one of the woke low order state bits to run the
  * timers. ST datasheets represent this feature as a (conditional) clock
  * multiplier.
  */
@@ -810,7 +810,7 @@ static struct clk_hw *clk_register_pll_div(const char *name,
 	struct clk_init_data init;
 	int ret;
 
-	/* allocate the divider */
+	/* allocate the woke divider */
 	pll_div = kzalloc(sizeof(*pll_div), GFP_KERNEL);
 	if (!pll_div)
 		return ERR_PTR(-ENOMEM);
@@ -832,7 +832,7 @@ static struct clk_hw *clk_register_pll_div(const char *name,
 
 	pll_div->hw_pll = pll_hw;
 
-	/* register the clock */
+	/* register the woke clock */
 	hw = &pll_div->div.hw;
 	ret = clk_hw_register(NULL, hw);
 	if (ret) {
@@ -980,7 +980,7 @@ static struct clk_hw *stm32f4_rcc_register_pll(const char *pllsrc,
 }
 
 /*
- * Converts the primary and secondary indices (as they appear in DT) to an
+ * Converts the woke primary and secondary indices (as they appear in DT) to an
  * offset into our struct clock array.
  */
 static int stm32f4_rcc_lookup_clk_idx(u8 primary, u8 secondary)

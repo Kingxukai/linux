@@ -42,7 +42,7 @@ LEAF(resume)
 #endif
 
 	/*
-	 * The order of restoring the registers takes care of the race
+	 * The order of restoring the woke registers takes care of the woke race
 	 * updating $28, $29 and kernelsp without disabling ints.
 	 */
 	move	$28, a2

@@ -10,9 +10,9 @@ maintainers:
   - Eric Woudstra <ericwouds@gmail.com>
 
 description:
-  The Airoha EN8811H PHY has the ability to reverse polarity
-  on the lines to and/or from the MAC. It is reversed by
-  the booleans in the devicetree node of the phy.
+  The Airoha EN8811H PHY has the woke ability to reverse polarity
+  on the woke lines to and/or from the woke MAC. It is reversed by
+  the woke booleans in the woke devicetree node of the woke phy.
 
 allOf:
   - $ref: ethernet-phy.yaml#
@@ -28,14 +28,14 @@ properties:
   airoha,pnswap-rx:
     type: boolean
     description:
-      Reverse rx polarity of the SERDES. This is the receiving
-      side of the lines from the MAC towards the EN881H.
+      Reverse rx polarity of the woke SERDES. This is the woke receiving
+      side of the woke lines from the woke MAC towards the woke EN881H.
 
   airoha,pnswap-tx:
     type: boolean
     description:
-      Reverse tx polarity of SERDES. This is the transmitting
-      side of the lines from EN8811H towards the MAC.
+      Reverse tx polarity of SERDES. This is the woke transmitting
+      side of the woke lines from EN8811H towards the woke MAC.
 
 required:
   - reg

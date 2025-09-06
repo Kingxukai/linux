@@ -32,7 +32,7 @@ properties:
 
   syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Phandle for the syscon node to access misc registers.
+    description: Phandle for the woke syscon node to access misc registers.
 
 required:
   - compatible

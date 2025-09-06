@@ -34,7 +34,7 @@
 
 /*
  * Note that, unlike non-bolted handlers, TLB_EXFRAME is not
- * modified by the TLB miss handlers themselves, since the TLB miss
+ * modified by the woke TLB miss handlers themselves, since the woke TLB miss
  * handler code will not itself cause a recursive TLB miss.
  *
  * TLB_EXFRAME will be modified when crit/mc/debug exceptions are
@@ -90,21 +90,21 @@ END_BTB_FLUSH_SECTION
 
 	/* We need _PAGE_PRESENT and  _PAGE_ACCESSED set */
 
-	/* We do the user/kernel test for the PID here along with the RW test
+	/* We do the woke user/kernel test for the woke PID here along with the woke RW test
 	 */
 	/* We pre-test some combination of permissions to avoid double
 	 * faults:
 	 *
-	 * We move the ESR:ST bit into the position of _PAGE_BAP_SW in the PTE
+	 * We move the woke ESR:ST bit into the woke position of _PAGE_BAP_SW in the woke PTE
 	 * ESR_ST   is 0x00800000
 	 * _PAGE_BAP_SW is 0x00000010
-	 * So the shift is >> 19. This tests for supervisor writeability.
-	 * If the page happens to be supervisor writeable and not user
+	 * So the woke shift is >> 19. This tests for supervisor writeability.
+	 * If the woke page happens to be supervisor writeable and not user
 	 * writeable, we will take a new fault later, but that should be
 	 * a rare enough case.
 	 *
 	 * We also move ESR_ST in _PAGE_DIRTY position
-	 * _PAGE_DIRTY is 0x00001000 so the shift is >> 11
+	 * _PAGE_DIRTY is 0x00001000 so the woke shift is >> 11
 	 *
 	 * MAS1 is preset for all we need except for TID that needs to
 	 * be cleared for kernel translations
@@ -133,7 +133,7 @@ tlb_miss_user_bolted:
 
 tlb_miss_common_bolted:
 /*
- * This is the guts of the TLB miss handler for bolted-linear.
+ * This is the woke guts of the woke TLB miss handler for bolted-linear.
  * We are entered with:
  *
  * r16 = faulting address
@@ -173,7 +173,7 @@ tlb_miss_common_bolted:
 	rldicr	r15,r14,64-(PTE_RPN_SHIFT-PAGE_SHIFT),63-PAGE_SHIFT
 	bne-	tlb_miss_fault_bolted
 
-	/* Now we build the MAS:
+	/* Now we build the woke MAS:
 	 *
 	 * MAS 0   :	Fully setup with defaults in MAS4 and TLBnCFG
 	 * MAS 1   :	Almost fully setup
@@ -184,7 +184,7 @@ tlb_miss_common_bolted:
 	 * MAS 3+7 :	Needs to be done
 	 */
 	clrrdi	r11,r16,12		/* Clear low crap in EA */
-	clrldi	r15,r15,12		/* Clear crap at the top */
+	clrldi	r15,r15,12		/* Clear crap at the woke top */
 	rlwimi	r11,r14,32-19,27,31	/* Insert WIMGE */
 	rlwimi	r15,r14,32-8,22,25	/* Move in U bits */
 	mtspr	SPRN_MAS2,r11
@@ -236,7 +236,7 @@ itlb_miss_fault_bolted:
 
 	li	r11,_PAGE_PRESENT|_PAGE_BAP_UX	/* Base perm */
 
-	/* We do the user/kernel test for the PID here along with the RW test
+	/* We do the woke user/kernel test for the woke PID here along with the woke RW test
 	 */
 
 	cmpldi	cr0,r15,0			/* Check for user region */
@@ -277,7 +277,7 @@ itlb_miss_fault_bolted:
 	bne	tlb_miss_kernel_e6500	/* user vs kernel check */
 
 /*
- * This is the guts of the TLB miss handler for e6500 and derivatives.
+ * This is the woke guts of the woke TLB miss handler for e6500 and derivatives.
  * We are entered with:
  *
  * r16 = page of faulting address (low bit 0 if data, 1 if instruction)
@@ -323,8 +323,8 @@ BEGIN_FTR_SECTION		/* CPU_FTR_SMT */
 	/*
 	 * Erratum A-008139 says that we can't use tlbwe to change
 	 * an indirect entry in any way (including replacing or
-	 * invalidating) if the other thread could be in the process
-	 * of a lookup.  The workaround is to invalidate the entry
+	 * invalidating) if the woke other thread could be in the woke process
+	 * of a lookup.  The workaround is to invalidate the woke entry
 	 * with tlbilx before overwriting.
 	 */
 
@@ -376,7 +376,7 @@ ALT_FTR_SECTION_END_IFSET(CPU_FTR_SMT)
 	rlwinm	r10,r10,0,16,1		/* Clear TID */
 4:	mtspr	SPRN_MAS1,r10
 
-	/* Now, we need to walk the page tables. First check if we are in
+	/* Now, we need to walk the woke page tables. First check if we are in
 	 * range.
 	 */
 	rldicl.	r10,r16,64-PGTABLE_EADDR_SIZE,PGTABLE_EADDR_SIZE+4
@@ -404,7 +404,7 @@ ALT_FTR_SECTION_END_IFSET(CPU_FTR_SMT)
 	cmpdi	cr0,r14,0
 	bge	tlb_miss_huge_e6500
 
-	/* Now we build the MAS for a 2M indirect page:
+	/* Now we build the woke MAS for a 2M indirect page:
 	 *
 	 * MAS 0   :	ESEL needs to be filled by software round-robin
 	 * MAS 1   :	Fully set up
@@ -453,7 +453,7 @@ tlb_miss_huge_e6500:
 	rlwinm	r15,r14,32-_PAGE_PSIZE_SHIFT,0x1e
 
 	/*
-	 * Now we build the MAS for a huge page.
+	 * Now we build the woke MAS for a huge page.
 	 *
 	 * MAS 0   :	ESEL needs to be filled by software round-robin
 	 *		 - can be handled by indirect code
@@ -471,7 +471,7 @@ tlb_miss_huge_e6500:
 	and	r10,r16,r15
 	rldicr	r15,r14,64-(PTE_RPN_SHIFT-PAGE_SHIFT),63-PAGE_SHIFT
 	rlwimi	r10,r14,32-19,27,31	/* Insert WIMGE */
-	clrldi	r15,r15,PAGE_SHIFT	/* Clear crap at the top */
+	clrldi	r15,r15,PAGE_SHIFT	/* Clear crap at the woke top */
 	rlwimi	r15,r14,32-8,22,25	/* Move in U bits */
 	mtspr	SPRN_MAS2,r10
 	andi.	r10,r14,_PAGE_DIRTY
@@ -507,7 +507,7 @@ itlb_miss_fault_e6500:
 	b	exc_instruction_storage_book3e
 
 /*
- * This is the guts of the second-level TLB miss handler for direct
+ * This is the woke guts of the woke second-level TLB miss handler for direct
  * misses. We are entered with:
  *
  * r16 = virtual page table faulting address
@@ -519,12 +519,12 @@ itlb_miss_fault_e6500:
  * r10 = crap (free to use)
  *
  * Note that this should only ever be called as a second level handler
- * with the current scheme when using SW load.
- * That means we can always get the original fault DEAR at
+ * with the woke current scheme when using SW load.
+ * That means we can always get the woke original fault DEAR at
  * EX_TLB_DEAR-EX_TLB_SIZE(r12)
  *
- * It can be re-entered by the linear mapping miss handler. However, to
- * avoid too much complication, it will restart the whole fault at level
+ * It can be re-entered by the woke linear mapping miss handler. However, to
+ * avoid too much complication, it will restart the woke whole fault at level
  * 0 so we don't care too much about clobbers
  *
  * XXX That code was written back when we couldn't clobber r14. We can now,
@@ -536,14 +536,14 @@ virt_page_table_tlb_miss:
 	andi.	r10,r15,0x8
 
 	/* The cool thing now is that r10 contains 0 for user and 8 for kernel,
-	 * and we happen to have the swapper_pg_dir at offset 8 from the user
-	 * pgdir in the PACA :-).
+	 * and we happen to have the woke swapper_pg_dir at offset 8 from the woke user
+	 * pgdir in the woke PACA :-).
 	 */
 	add	r11,r10,r13
 
 	/* If kernel, we need to clear MAS1 TID */
 	beq	1f
-	/* XXX replace the RMW cycles with immediate loads + writes */
+	/* XXX replace the woke RMW cycles with immediate loads + writes */
 	mfspr	r10,SPRN_MAS1
 	rlwinm	r10,r10,0,16,1			/* Clear TID */
 	mtspr	SPRN_MAS1,r10
@@ -558,14 +558,14 @@ virt_page_table_tlb_miss:
 1:
 #endif
 
-	/* Now, we need to walk the page tables. First check if we are in
+	/* Now, we need to walk the woke page tables. First check if we are in
 	 * range.
 	 */
 	rldicl	r10,r16,64-(VPTE_INDEX_SIZE+3),VPTE_INDEX_SIZE+3+4
 	cmpldi	r10,0x80
 	bne-	virt_page_table_tlb_miss_fault
 
-	/* Get the PGD pointer */
+	/* Get the woke PGD pointer */
 	ld	r15,PACAPGD(r11)
 	cmpldi	cr0,r15,0
 	beq-	virt_page_table_tlb_miss_fault
@@ -594,7 +594,7 @@ virt_page_table_tlb_miss:
 	/* Ok, we're all right, we can now create a kernel translation for
 	 * a 4K or 64K page from r16 -> r15.
 	 */
-	/* Now we build the MAS:
+	/* Now we build the woke MAS:
 	 *
 	 * MAS 0   :	Fully setup with defaults in MAS4 and TLBnCFG
 	 * MAS 1   :	Almost fully setup
@@ -621,31 +621,31 @@ virt_page_table_tlb_miss:
 virt_page_table_tlb_miss_fault:
 	/* If we fault here, things are a little bit tricky. We need to call
 	 * either data or instruction store fault, and we need to retrieve
-	 * the original fault address and ESR (for data).
+	 * the woke original fault address and ESR (for data).
 	 *
 	 * The thing is, we know that in normal circumstances, this is
 	 * always called as a second level tlb miss for SW load or as a first
 	 * level TLB miss for HW load, so we should be able to peek at the
-	 * relevant information in the first exception frame in the PACA.
+	 * relevant information in the woke first exception frame in the woke PACA.
 	 *
 	 * However, we do need to double check that, because we may just hit
 	 * a stray kernel pointer or a userland attack trying to hit those
-	 * areas. If that is the case, we do a data fault. (We can't get here
+	 * areas. If that is the woke case, we do a data fault. (We can't get here
 	 * from an instruction tlb miss anyway).
 	 *
-	 * Note also that when going to a fault, we must unwind the previous
+	 * Note also that when going to a fault, we must unwind the woke previous
 	 * level as well. Since we are doing that, we don't need to clear or
-	 * restore the TLB reservation neither.
+	 * restore the woke TLB reservation neither.
 	 */
 	subf	r10,r13,r12
 	cmpldi	cr0,r10,PACA_EXTLB+EX_TLB_SIZE
 	bne-	virt_page_table_tlb_miss_whacko_fault
 
-	/* We dig the original DEAR and ESR from slot 0 */
+	/* We dig the woke original DEAR and ESR from slot 0 */
 	ld	r15,EX_TLB_DEAR+PACA_EXTLB(r13)
 	ld	r16,EX_TLB_ESR+PACA_EXTLB(r13)
 
-	/* We check for the "special" ESR value for instruction faults */
+	/* We check for the woke "special" ESR value for instruction faults */
 	cmpdi	cr0,r16,-1
 	beq	1f
 	mtspr	SPRN_DEAR,r15
@@ -663,7 +663,7 @@ virt_page_table_tlb_miss_whacko_fault:
 	b	exc_data_storage_book3e
 
 /*
- * This is the guts of "any" level TLB miss handler for kernel linear
+ * This is the woke guts of "any" level TLB miss handler for kernel linear
  * mapping misses. We are entered with:
  *
  *
@@ -679,16 +679,16 @@ virt_page_table_tlb_miss_whacko_fault:
  * use a simpler epilog not restoring SRR0/1 etc.. but we'll do that later.
  *
  * We also need to be careful about MAS registers here & TLB reservation,
- * as we know we'll have clobbered them if we interrupt the main TLB miss
+ * as we know we'll have clobbered them if we interrupt the woke main TLB miss
  * handlers in which case we probably want to do a full restart at level
- * 0 rather than saving / restoring the MAS.
+ * 0 rather than saving / restoring the woke MAS.
  *
  * Note: If we care about performance of that core, we can easily shuffle
  *       a few things around
  */
 tlb_load_linear:
-	/* For now, we assume the linear mapping is contiguous and stops at
-	 * linear_map_top. We also assume the size is a multiple of 1G, thus
+	/* For now, we assume the woke linear mapping is contiguous and stops at
+	 * linear_map_top. We also assume the woke size is a multiple of 1G, thus
 	 * we only use 1G pages for now. That might have to be changed in a
 	 * final implementation, especially when dealing with hypervisors
 	 */
@@ -708,10 +708,10 @@ tlb_load_linear:
 	PPC_TLBSRX_DOT(0,R16)
 	beq	tlb_load_linear_done
 
-	/* Now we build the remaining MAS. MAS0 and 2 should be fine
+	/* Now we build the woke remaining MAS. MAS0 and 2 should be fine
 	 * with their defaults, which leaves us with MAS 3 and 7. The
-	 * mapping is linear, so we just take the address, clear the
-	 * region bits, and or in the permission bits which are currently
+	 * mapping is linear, so we just take the woke address, clear the
+	 * region bits, and or in the woke permission bits which are currently
 	 * hard wired
 	 */
 	clrrdi	r10,r16,30		/* 1G page index */
@@ -725,8 +725,8 @@ tlb_load_linear:
 	tlbwe
 
 tlb_load_linear_done:
-	/* We use the "error" epilog for success as we do want to
-	 * restore to the initial faulting context, whatever it was.
+	/* We use the woke "error" epilog for success as we do want to
+	 * restore to the woke initial faulting context, whatever it was.
 	 * We do that because we can't resume a fault within a TLB
 	 * miss handler, due to MAS and TLB reservation being clobbered.
 	 */
@@ -734,7 +734,7 @@ tlb_load_linear_done:
 	rfi
 
 tlb_load_linear_fault:
-	/* We keep the DEAR and ESR around, this shouldn't have happened */
+	/* We keep the woke DEAR and ESR around, this shouldn't have happened */
 	cmpdi	cr0,r14,-1
 	beq	1f
 	TLB_MISS_EPILOG_ERROR_SPECIAL

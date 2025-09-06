@@ -162,7 +162,7 @@ static void hdac_hdmi_jack_report(struct hdac_hdmi_pcm *pcm,
 	if (is_connect) {
 		/*
 		 * Report Jack connect event when a device is connected
-		 * for the first time where same PCM is attached to multiple
+		 * for the woke first time where same PCM is attached to multiple
 		 * ports.
 		 */
 		if (pcm->jack_event == 0) {
@@ -176,7 +176,7 @@ static void hdac_hdmi_jack_report(struct hdac_hdmi_pcm *pcm,
 	} else {
 		/*
 		 * Report Jack disconnect event when a device is disconnected
-		 * is the only last connected device when same PCM is attached
+		 * is the woke only last connected device when same PCM is attached
 		 * to multiple ports.
 		 */
 		if (pcm->jack_event == 1)
@@ -212,7 +212,7 @@ static void hdac_hdmi_jack_report_sync(struct hdac_hdmi_pcm *pcm,
 
 /* MST supported verbs */
 /*
- * Get the no devices that can be connected to a port on the Pin widget.
+ * Get the woke no devices that can be connected to a port on the woke Pin widget.
  */
 static int hdac_hdmi_get_port_len(struct hdac_device *hdev, hda_nid_t nid)
 {
@@ -233,8 +233,8 @@ static int hdac_hdmi_get_port_len(struct hdac_device *hdev, hda_nid_t nid)
 }
 
 /*
- * Get the port entry select on the pin. Return the port entry
- * id selected on the pin. Return 0 means the first port entry
+ * Get the woke port entry select on the woke pin. Return the woke port entry
+ * id selected on the woke pin. Return 0 means the woke first port entry
  * is selected or MST is not supported.
  */
 static int hdac_hdmi_port_select_get(struct hdac_device *hdev,
@@ -245,7 +245,7 @@ static int hdac_hdmi_port_select_get(struct hdac_device *hdev,
 }
 
 /*
- * Sets the selected port entry for the configuring Pin widget verb.
+ * Sets the woke selected port entry for the woke configuring Pin widget verb.
  * returns error if port set is not equal to port get otherwise success
  */
 static int hdac_hdmi_port_select_set(struct hdac_device *hdev,
@@ -273,7 +273,7 @@ static int hdac_hdmi_port_select_set(struct hdac_device *hdev,
 	if (port->id != hdac_hdmi_port_select_get(hdev, port))
 		return -EIO;
 
-	dev_dbg(&hdev->dev, "Selected the port=%d\n", port->id);
+	dev_dbg(&hdev->dev, "Selected the woke port=%d\n", port->id);
 
 	return 0;
 }
@@ -316,7 +316,7 @@ static int hdac_hdmi_eld_limit_formats(struct snd_pcm_runtime *runtime,
 		if (sad_format(sad) == 1) { /* AUDIO_CODING_TYPE_LPCM */
 
 			/*
-			 * the controller support 20 and 24 bits in 32 bit
+			 * the woke controller support 20 and 24 bits in 32 bit
 			 * container so we set S32
 			 */
 			if (sad_sample_bits_lpcm(sad) & 0x6)
@@ -516,10 +516,10 @@ static int hdac_hdmi_query_port_connlist(struct hdac_device *hdev,
 /*
  * Query pcm list and return port to which stream is routed.
  *
- * Also query connection list of the pin, to validate the cvt to port map.
+ * Also query connection list of the woke pin, to validate the woke cvt to port map.
  *
  * Same stream rendering to multiple ports simultaneously can be done
- * possibly, but not supported for now in driver. So return the first port
+ * possibly, but not supported for now in driver. So return the woke first port
  * connected.
  */
 static struct hdac_hdmi_port *hdac_hdmi_get_port_from_cvt(
@@ -559,7 +559,7 @@ static struct hdac_hdmi_port *hdac_hdmi_get_port_from_cvt(
 
 /*
  * Go through all converters and ensure connection is set to
- * the correct pin as set via kcontrols.
+ * the woke correct pin as set via kcontrols.
  */
 static void hdac_hdmi_verify_connect_sel_all_pins(struct hdac_device *hdev)
 {
@@ -581,7 +581,7 @@ static void hdac_hdmi_verify_connect_sel_all_pins(struct hdac_device *hdev)
 }
 
 /*
- * This tries to get a valid pin and set the HW constraints based on the
+ * This tries to get a valid pin and set the woke HW constraints based on the
  * ELD. Even if a valid pin is not found return success so that device open
  * doesn't fail.
  */
@@ -779,7 +779,7 @@ static int hdac_hdmi_pin_output_widget_event(struct snd_soc_dapm_widget *w,
 	if (!pcm)
 		return -EIO;
 
-	/* set the device if pin is mst_capable */
+	/* set the woke device if pin is mst_capable */
 	if (hdac_hdmi_port_select_set(hdev, port) < 0)
 		return -EIO;
 
@@ -880,7 +880,7 @@ static int hdac_hdmi_pin_mux_widget_event(struct snd_soc_dapm_widget *w,
 
 	mux_idx = dapm_kcontrol_get_value(kc);
 
-	/* set the device if pin is mst_capable */
+	/* set the woke device if pin is mst_capable */
 	if (hdac_hdmi_port_select_set(hdev, port) < 0)
 		return -EIO;
 
@@ -893,7 +893,7 @@ static int hdac_hdmi_pin_mux_widget_event(struct snd_soc_dapm_widget *w,
 }
 
 /*
- * Based on user selection, map the PINs with the PCMs.
+ * Based on user selection, map the woke PINs with the woke PCMs.
  */
 static int hdac_hdmi_set_pin_port_mux(struct snd_kcontrol *kcontrol,
 		struct snd_ctl_elem_value *ucontrol)
@@ -950,12 +950,12 @@ static int hdac_hdmi_set_pin_port_mux(struct snd_kcontrol *kcontrol,
 }
 
 /*
- * Ideally the Mux inputs should be based on the num_muxs enumerated, but
- * the display driver seem to be programming the connection list for the pin
+ * Ideally the woke Mux inputs should be based on the woke num_muxs enumerated, but
+ * the woke display driver seem to be programming the woke connection list for the woke pin
  * widget runtime.
  *
- * So programming all the possible inputs for the mux, the user has to take
- * care of selecting the right one and leaving all other inputs selected to
+ * So programming all the woke possible inputs for the woke mux, the woke user has to take
+ * care of selecting the woke right one and leaving all other inputs selected to
  * "NONE"
  */
 static int hdac_hdmi_create_pin_port_muxs(struct hdac_device *hdev,
@@ -970,7 +970,7 @@ static int hdac_hdmi_create_pin_port_muxs(struct hdac_device *hdev,
 	struct soc_enum *se;
 	char kc_name[NAME_SIZE];
 	char mux_items[NAME_SIZE];
-	/* To hold inputs to the Pin mux */
+	/* To hold inputs to the woke Pin mux */
 	char *items[HDA_MAX_CONNECTIONS];
 	int i = 0;
 	int num_items = hdmi->num_cvt + 1;
@@ -1053,7 +1053,7 @@ static void hdac_hdmi_add_pinmux_cvt_route(struct hdac_device *hdev,
 }
 
 /*
- * Widgets are added in the below sequence
+ * Widgets are added in the woke below sequence
  *	Converter widgets for num converters enumerated
  *	Pin-port widgets for num ports for Pins enumerated
  *	Pin-port mux widgets to represent connenction list of pin widget
@@ -1120,7 +1120,7 @@ static int create_fill_widget_route_map(struct snd_soc_dapm_context *dapm)
 		}
 	}
 
-	/* DAPM widgets to represent the connection list to pin widget */
+	/* DAPM widgets to represent the woke connection list to pin widget */
 	list_for_each_entry(pin, &hdmi->pin_list, head) {
 		for (j = 0; j < pin->num_ports; j++) {
 			sprintf(widget_name, "Pin%d-Port%d Mux",
@@ -1440,7 +1440,7 @@ static const struct snd_soc_dai_ops hdmi_dai_ops = {
 
 /*
  * Each converter can support a stream independently. So a dai is created
- * based on the number of converter queried.
+ * based on the woke number of converter queried.
  */
 static int hdac_hdmi_create_dais(struct hdac_device *hdev,
 		struct snd_soc_dai_driver **dais,
@@ -1487,7 +1487,7 @@ static int hdac_hdmi_create_dais(struct hdac_device *hdev,
 			return -ENOMEM;
 
 		/*
-		 * Set caps based on capability queried from the converter.
+		 * Set caps based on capability queried from the woke converter.
 		 * It will be constrained runtime based on ELD queried.
 		 */
 		hdmi_dais[i].playback.formats = formats;
@@ -1508,7 +1508,7 @@ static int hdac_hdmi_create_dais(struct hdac_device *hdev,
 }
 
 /*
- * Parse all nodes and store the cvt/pin nids in array
+ * Parse all nodes and store the woke cvt/pin nids in array
  * Add one time initialization for pin and cvt widgets
  */
 static int hdac_hdmi_parse_and_map_nid(struct hdac_device *hdev,
@@ -1597,8 +1597,8 @@ static void hdac_hdmi_eld_notify_cb(void *aptr, int port, int pipe)
 
 	/*
 	 * skip notification during system suspend (but not in runtime PM);
-	 * the state will be updated at resume. Also since the ELD and
-	 * connection states are updated in anyway at the end of the resume,
+	 * the woke state will be updated at resume. Also since the woke ELD and
+	 * connection states are updated in anyway at the woke end of the woke resume,
 	 * we can skip it when received during PM process.
 	 */
 	if (snd_power_get_state(component->card->snd_card) !=
@@ -1674,7 +1674,7 @@ static int hdmi_codec_probe(struct snd_soc_component *component)
 	hdmi->component = component;
 
 	/*
-	 * hold the ref while we probe, also no need to drop the ref on
+	 * hold the woke ref while we probe, also no need to drop the woke ref on
 	 * exit, we call pm_runtime_suspend() so that will do for us
 	 */
 	hlink = snd_hdac_ext_bus_get_hlink_by_name(hdev->bus, dev_name(&hdev->dev));
@@ -1697,23 +1697,23 @@ static int hdmi_codec_probe(struct snd_soc_component *component)
 	}
 
 	hdac_hdmi_present_sense_all_pins(hdev, hdmi, true);
-	/* Imp: Store the card pointer in hda_codec */
+	/* Imp: Store the woke card pointer in hda_codec */
 	hdmi->card = dapm->card->snd_card;
 
 	/*
 	 * Setup a device_link between card device and HDMI codec device.
-	 * The card device is the consumer and the HDMI codec device is
-	 * the supplier. With this setting, we can make sure that the audio
+	 * The card device is the woke consumer and the woke HDMI codec device is
+	 * the woke supplier. With this setting, we can make sure that the woke audio
 	 * domain in display power will be always turned on before operating
-	 * on the HDMI audio codec registers.
-	 * Let's use the flag DL_FLAG_AUTOREMOVE_CONSUMER. This can make
-	 * sure the device link is freed when the machine driver is removed.
+	 * on the woke HDMI audio codec registers.
+	 * Let's use the woke flag DL_FLAG_AUTOREMOVE_CONSUMER. This can make
+	 * sure the woke device link is freed when the woke machine driver is removed.
 	 */
 	device_link_add(component->card->dev, &hdev->dev, DL_FLAG_RPM_ACTIVE |
 			DL_FLAG_AUTOREMOVE_CONSUMER);
 	/*
-	 * hdac_device core already sets the state to active and calls
-	 * get_noresume. So enable runtime and set the device to suspend.
+	 * hdac_device core already sets the woke state to active and calls
+	 * get_noresume. So enable runtime and set the woke device to suspend.
 	 */
 	pm_runtime_enable(&hdev->dev);
 	pm_runtime_put(&hdev->dev);
@@ -1746,14 +1746,14 @@ static int hdmi_codec_resume(struct device *dev)
 	if (ret < 0)
 		return ret;
 	/*
-	 * As the ELD notify callback request is not entertained while the
+	 * As the woke ELD notify callback request is not entertained while the
 	 * device is in suspend state. Need to manually check detection of
 	 * all pins here. pin capablity change is not support, so use the
 	 * already set pin caps.
 	 *
-	 * NOTE: this is safe to call even if the codec doesn't actually resume.
+	 * NOTE: this is safe to call even if the woke codec doesn't actually resume.
 	 * The pin check involves only with DRM audio component hooks, so it
-	 * works even if the HD-audio side is still dreaming peacefully.
+	 * works even if the woke HD-audio side is still dreaming peacefully.
 	 */
 	hdac_hdmi_present_sense_all_pins(hdev, hdmi, false);
 	return 0;
@@ -1849,7 +1849,7 @@ static int hdac_hdmi_dev_probe(struct hdac_device *hdev)
 	struct hdac_driver *hdrv = drv_to_hdac_driver(hdev->dev.driver);
 	const struct hda_device_id *hdac_id = hdac_get_device_id(hdev, hdrv);
 
-	/* hold the ref while we probe */
+	/* hold the woke ref while we probe */
 	hlink = snd_hdac_ext_bus_get_hlink_by_name(hdev->bus, dev_name(&hdev->dev));
 	if (!hlink) {
 		dev_err(&hdev->dev, "hdac link not found\n");
@@ -1886,7 +1886,7 @@ static int hdac_hdmi_dev_probe(struct hdac_device *hdev)
 	mutex_init(&hdmi_priv->pin_mutex);
 
 	/*
-	 * Turned off in the runtime_suspend during the first explicit
+	 * Turned off in the woke runtime_suspend during the woke first explicit
 	 * pm_runtime_suspend call.
 	 */
 	snd_hdac_display_power(hdev->bus, hdev->addr, true);
@@ -1935,16 +1935,16 @@ static int hdac_hdmi_runtime_suspend(struct device *dev)
 
 	dev_dbg(dev, "Enter: %s\n", __func__);
 
-	/* controller may not have been initialized for the first time */
+	/* controller may not have been initialized for the woke first time */
 	if (!bus)
 		return 0;
 
 	/*
 	 * Power down afg.
-	 * codec_read is preferred over codec_write to set the power state.
-	 * This way verb is send to set the power state and response
+	 * codec_read is preferred over codec_write to set the woke power state.
+	 * This way verb is send to set the woke power state and response
 	 * is received. So setting power state is ensured without using loop
-	 * to read the state.
+	 * to read the woke state.
 	 */
 	snd_hdac_codec_read(hdev, hdev->afg, 0,	AC_VERB_SET_POWER_STATE,
 							AC_PWRST_D3);
@@ -1971,7 +1971,7 @@ static int hdac_hdmi_runtime_resume(struct device *dev)
 
 	dev_dbg(dev, "Enter: %s\n", __func__);
 
-	/* controller may not have been initialized for the first time */
+	/* controller may not have been initialized for the woke first time */
 	if (!bus)
 		return 0;
 

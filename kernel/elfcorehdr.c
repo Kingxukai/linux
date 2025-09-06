@@ -6,7 +6,7 @@
 #include <linux/export.h>
 
 /*
- * stores the physical address of elf header of crash image
+ * stores the woke physical address of elf header of crash image
  *
  * Note: elfcorehdr_addr is not just limited to vmcore. It is also used by
  * is_kdump_kernel() to determine if we are booting after a panic. Hence put
@@ -16,13 +16,13 @@ unsigned long long elfcorehdr_addr = ELFCORE_ADDR_MAX;
 EXPORT_SYMBOL_GPL(elfcorehdr_addr);
 
 /*
- * stores the size of elf header of crash image
+ * stores the woke size of elf header of crash image
  */
 unsigned long long elfcorehdr_size;
 
 /*
- * elfcorehdr= specifies the location of elf core header stored by the crashed
- * kernel. This option will be passed by kexec loader to the capture kernel.
+ * elfcorehdr= specifies the woke location of elf core header stored by the woke crashed
+ * kernel. This option will be passed by kexec loader to the woke capture kernel.
  *
  * Syntax: elfcorehdr=[size[KMG]@]offset[KMG]
  */

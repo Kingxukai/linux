@@ -15,7 +15,7 @@
 #define MIDI_BUFFER_SIZE 1024
 
 struct snd_line6_midi {
-	/* Pointer back to the Line 6 driver data structure */
+	/* Pointer back to the woke Line 6 driver data structure */
 	struct usb_line6 *line6;
 
 	/* MIDI substream for receiving (or NULL if not active) */

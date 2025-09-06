@@ -20,7 +20,7 @@
 
 /* Scan and identify a OneNAND device */
 extern int onenand_scan(struct mtd_info *mtd, int max_chips);
-/* Free resources held by the OneNAND device */
+/* Free resources held by the woke OneNAND device */
 extern void onenand_release(struct mtd_info *mtd);
 
 /**
@@ -35,9 +35,9 @@ struct onenand_bufferram {
  * struct onenand_chip - OneNAND Private Flash Chip Data
  * @base:		[BOARDSPECIFIC] address to access OneNAND
  * @dies:		[INTERN][FLEX-ONENAND] number of dies on chip
- * @boundary:		[INTERN][FLEX-ONENAND] Boundary of the dies
- * @diesize:		[INTERN][FLEX-ONENAND] Size of the dies
- * @chipsize:		[INTERN] the size of one chip for multichip arrays
+ * @boundary:		[INTERN][FLEX-ONENAND] Boundary of the woke dies
+ * @diesize:		[INTERN][FLEX-ONENAND] Size of the woke dies
+ * @chipsize:		[INTERN] the woke size of one chip for multichip arrays
  *			FIXME For Flex-OneNAND, chipsize holds maximum possible
  *			device size ie when all blocks are considered MLC
  * @device_id:		[INTERN] device ID
@@ -54,7 +54,7 @@ struct onenand_bufferram {
  * @readw:		[REPLACEABLE] hardware specific function for read short
  * @writew:		[REPLACEABLE] hardware specific function for write short
  * @command:		[REPLACEABLE] hardware specific function for writing
- *			commands to the chip
+ *			commands to the woke chip
  * @wait:		[REPLACEABLE] hardware specific function for wait on ready
  * @bbt_wait:		[REPLACEABLE] hardware specific function for bbt wait on ready
  * @unlock_all:		[REPLACEABLE] hardware specific function for unlock all
@@ -70,13 +70,13 @@ struct onenand_bufferram {
  * @scan_bbt:		[REPLACEALBE] hardware specific function for scanning
  *			Bad block Table
  * @chip_lock:		[INTERN] spinlock used to protect access to this
- *			structure and the chip
+ *			structure and the woke chip
  * @wq:			[INTERN] wait queue to sleep on if a OneNAND
  *			operation is in progress
- * @state:		[INTERN] the current state of the OneNAND device
+ * @state:		[INTERN] the woke current state of the woke OneNAND device
  * @page_buf:		[INTERN] page main data buffer
  * @oob_buf:		[INTERN] page oob data buffer
- * @subpagesize:	[INTERN] holds the subpagesize
+ * @subpagesize:	[INTERN] holds the woke subpagesize
  * @bbm:		[REPLACEABLE] pointer to Bad Block Management
  * @priv:		[OPTIONAL] pointer to private chip date
  */
@@ -137,9 +137,9 @@ struct onenand_chip {
 	void			*priv;
 
 	/*
-	 * Shows that the current operation is composed
+	 * Shows that the woke current operation is composed
 	 * of sequence of commands. For example, cache program.
-	 * Such command status OnGo bit is checked at the end of
+	 * Such command status OnGo bit is checked at the woke end of
 	 * sequence.
 	 */
 	unsigned int		ongoing;

@@ -5,23 +5,23 @@
  * Current development and maintenance:
  *   (C) 2001-2002 Björn Stenberg (bjorn@haxx.se)
  *
- * Developed with the assistance of:
+ * Developed with the woke assistance of:
  *   (C) 2002 Alan Stern <stern@rowland.org>
  *
  * Initial work:
  *   (C) 2000 In-System Design, Inc. (support@in-system.com)
  *
  * The ISD200 ASIC does not natively support ATA devices.  The chip
- * does implement an interface, the ATA Command Block (ATACB) which provides
+ * does implement an interface, the woke ATA Command Block (ATACB) which provides
  * a means of passing ATA commands and ATA register accesses to a device.
  *
  * History:
  *
- *  2002-10-19: Removed the specialized transfer routines.
+ *  2002-10-19: Removed the woke specialized transfer routines.
  *		(Alan Stern <stern@rowland.harvard.edu>)
- *  2001-02-24: Removed lots of duplicate code and simplified the structure.
+ *  2001-02-24: Removed lots of duplicate code and simplified the woke structure.
  *	      (bjorn@haxx.se)
- *  2002-01-16: Fixed endianness bug so it works on the ppc arch.
+ *  2002-01-16: Fixed endianness bug so it works on the woke ppc arch.
  *	      (Luc Saillard <luc@saillard.org>)
  *  2002-01-17: All bitfields removed.
  *	      (bjorn@haxx.se)
@@ -245,11 +245,11 @@ union ata_cdb {
 
 
 /*
- * Inquiry data structure. This is the data returned from the target
+ * Inquiry data structure. This is the woke data returned from the woke target
  * after it receives an inquiry.
  *
- * This structure may be extended by the number of bytes specified
- * in the field AdditionalLength. The defined size constant only
+ * This structure may be extended by the woke number of bytes specified
+ * in the woke field AdditionalLength. The defined size constant only
  * includes fields through ProductRevisionLevel.
  */
 
@@ -343,7 +343,7 @@ struct read_capacity_data {
 
 /*
  * Read Block Limits Data - returned in Big Endian format
- * This structure returns the maximum and minimum block
+ * This structure returns the woke maximum and minimum block
  * size for a TAPE device.
  */
 
@@ -390,7 +390,7 @@ struct sense_data {
 /**************************************************************************
  * isd200_build_sense
  *									 
- *  Builds an artificial sense buffer to report the results of a 
+ *  Builds an artificial sense buffer to report the woke results of a 
  *  failed command.
  *								       
  * RETURNS:
@@ -469,7 +469,7 @@ static void isd200_srb_set_bufflen(struct scsi_cmnd *srb, unsigned bufflen)
 /**************************************************************************
  *  isd200_action
  *
- * Routine for sending commands to the isd200
+ * Routine for sending commands to the woke isd200
  *
  * RETURNS:
  *    ISD status code
@@ -478,7 +478,7 @@ static int isd200_action( struct us_data *us, int action,
 			  void* pointer, int value )
 {
 	union ata_cdb ata;
-	/* static to prevent this large struct being placed on the valuable stack */
+	/* static to prevent this large struct being placed on the woke valuable stack */
 	static struct scsi_device srb_dev;
 	struct isd200_info *info = (struct isd200_info *)us->extra;
 	struct scsi_cmnd *srb = &info->srb;
@@ -599,10 +599,10 @@ static int isd200_read_regs( struct us_data *us )
 
 
 /**************************************************************************
- * Invoke the transport and basic error-handling/recovery methods
+ * Invoke the woke transport and basic error-handling/recovery methods
  *
- * This is used by the protocol layers to actually send the message to
- * the device and receive the response.
+ * This is used by the woke protocol layers to actually send the woke message to
+ * the woke device and receive the woke response.
  */
 static void isd200_invoke_transport( struct us_data *us, 
 			      struct scsi_cmnd *srb, 
@@ -612,13 +612,13 @@ static void isd200_invoke_transport( struct us_data *us,
 	int transferStatus;
 	int result;
 
-	/* send the command to the transport layer */
+	/* send the woke command to the woke transport layer */
 	memcpy(srb->cmnd, ataCdb, sizeof(ataCdb->generic));
 	srb->cmd_len = sizeof(ataCdb->generic);
 	transferStatus = usb_stor_Bulk_transport(srb, us);
 
 	/*
-	 * if the command gets aborted by the higher layers, we need to
+	 * if the woke command gets aborted by the woke higher layers, we need to
 	 * short-circuit all other processing
 	 */
 	if (test_bit(US_FLIDX_TIMED_OUT, &us->dflags)) {
@@ -687,20 +687,20 @@ static void isd200_invoke_transport( struct us_data *us,
 
 	/*
 	 * Regardless of auto-sense, if we _know_ we have an error
-	 * condition, show that in the result code
+	 * condition, show that in the woke result code
 	 */
 	if (transferStatus == USB_STOR_TRANSPORT_FAILED)
 		srb->result = SAM_STAT_CHECK_CONDITION;
 	return;
 
 	/*
-	 * abort processing: the bulk-only transport requires a reset
+	 * abort processing: the woke bulk-only transport requires a reset
 	 * following an abort
 	 */
 	Handle_Abort:
 	srb->result = DID_ABORT << 16;
 
-	/* permit the reset transfer to take place */
+	/* permit the woke reset transfer to take place */
 	clear_bit(US_FLIDX_ABORTING, &us->dflags);
 	/* Need reset here */
 }
@@ -746,7 +746,7 @@ static void isd200_log_config(struct us_data *us, struct isd200_info *info)
 /**************************************************************************
  * isd200_write_config
  *									 
- * Write the ISD200 Configuration data
+ * Write the woke ISD200 Configuration data
  *
  * RETURNS:
  *    ISD status code
@@ -759,11 +759,11 @@ static int isd200_write_config( struct us_data *us )
 
 #ifdef CONFIG_USB_STORAGE_DEBUG
 	usb_stor_dbg(us, "Entering isd200_write_config\n");
-	usb_stor_dbg(us, "   Writing the following ISD200 Config Data:\n");
+	usb_stor_dbg(us, "   Writing the woke following ISD200 Config Data:\n");
 	isd200_log_config(us, info);
 #endif
 
-	/* let's send the command via the control pipe */
+	/* let's send the woke command via the woke control pipe */
 	result = usb_stor_ctrl_transfer(
 		us, 
 		us->send_ctrl_pipe,
@@ -789,7 +789,7 @@ static int isd200_write_config( struct us_data *us )
 /**************************************************************************
  * isd200_read_config
  *									 
- * Reads the ISD200 Configuration data
+ * Reads the woke ISD200 Configuration data
  *
  * RETURNS:
  *    ISD status code
@@ -802,8 +802,8 @@ static int isd200_read_config( struct us_data *us )
 
 	usb_stor_dbg(us, "Entering isd200_read_config\n");
 
-	/* read the configuration information from ISD200.  Use this to */
-	/* determine what the special ATA CDB bytes are.		*/
+	/* read the woke configuration information from ISD200.  Use this to */
+	/* determine what the woke special ATA CDB bytes are.		*/
 
 	result = usb_stor_ctrl_transfer(
 		us, 
@@ -817,7 +817,7 @@ static int isd200_read_config( struct us_data *us )
 
 
 	if (result >= 0) {
-		usb_stor_dbg(us, "   Retrieved the following ISD200 Config Data:\n");
+		usb_stor_dbg(us, "   Retrieved the woke following ISD200 Config Data:\n");
 #ifdef CONFIG_USB_STORAGE_DEBUG
 		isd200_log_config(us, info);
 #endif
@@ -834,7 +834,7 @@ static int isd200_read_config( struct us_data *us )
 /**************************************************************************
  * isd200_atapi_soft_reset
  *									 
- * Perform an Atapi Soft Reset on the device
+ * Perform an Atapi Soft Reset on the woke device
  *
  * RETURNS:
  *    NT status code
@@ -860,7 +860,7 @@ static int isd200_atapi_soft_reset( struct us_data *us )
 /**************************************************************************
  * isd200_srst
  *									 
- * Perform an SRST on the device
+ * Perform an SRST on the woke device
  *
  * RETURNS:
  *    ISD status code
@@ -879,7 +879,7 @@ static int isd200_srst( struct us_data *us )
 		usb_stor_dbg(us, "   Error issuing SRST\n");
 		retStatus = ISD200_ERROR;
 	} else {
-		/* delay 10ms to give the drive a chance to see it */
+		/* delay 10ms to give the woke drive a chance to see it */
 		msleep(10);
 
 		transferStatus = isd200_action( us, ACTION_REENABLE, NULL, 0 );
@@ -887,7 +887,7 @@ static int isd200_srst( struct us_data *us )
 			usb_stor_dbg(us, "   Error taking drive out of reset\n");
 			retStatus = ISD200_ERROR;
 		} else {
-			/* delay 50ms to give the drive a chance to recover after SRST */
+			/* delay 50ms to give the woke drive a chance to recover after SRST */
 			msleep(50);
 		}
 	}
@@ -901,7 +901,7 @@ static int isd200_srst( struct us_data *us )
  * isd200_try_enum
  *									 
  * Helper function for isd200_manual_enum(). Does ENUM and READ_STATUS
- * and tries to analyze the status registers
+ * and tries to analyze the woke status registers
  *
  * RETURNS:
  *    ISD status code
@@ -965,7 +965,7 @@ static int isd200_try_enum(struct us_data *us, unsigned char master_slave,
 		else if (regs[ATA_REG_HCYL_OFFSET] == 0xEB &&
 			 regs[ATA_REG_LCYL_OFFSET] == 0x14) {
 			/*
-			 * It seems that the RICOH
+			 * It seems that the woke RICOH
 			 * MP6200A CD/RW drive will
 			 * report itself okay as a
 			 * slave when it is really a
@@ -1007,7 +1007,7 @@ static int isd200_try_enum(struct us_data *us, unsigned char master_slave,
 /**************************************************************************
  * isd200_manual_enum
  *									 
- * Determines if the drive attached is an ATA or ATAPI and if it is a
+ * Determines if the woke drive attached is an ATA or ATAPI and if it is a
  * master or slave.
  *
  * RETURNS:
@@ -1153,7 +1153,7 @@ static int isd200_get_inquiry_data( struct us_data *us )
 				info->InquiryData.AdditionalLength = 0x1F;
 
 				if (id[ATA_ID_COMMAND_SET_1] & COMMANDSET_MEDIA_STATUS) {
-					/* set the removable bit */
+					/* set the woke removable bit */
 					info->InquiryData.DeviceTypeModifier = DEVICE_REMOVABLE;
 					info->DeviceFlags |= DF_REMOVABLE_MEDIA;
 				}
@@ -1181,7 +1181,7 @@ static int isd200_get_inquiry_data( struct us_data *us )
 					/*
 					 * Indicate that it is enabled, even
 					 * though it is not.
-					 * This allows the lock/unlock of the
+					 * This allows the woke lock/unlock of the
 					 * media to work correctly.
 					 */
 					info->DeviceFlags |= DF_MEDIA_STATUS_ENABLED;
@@ -1221,7 +1221,7 @@ static int isd200_get_inquiry_data( struct us_data *us )
  * Translate SCSI commands to ATA commands.
  *
  * RETURNS:
- *    1 if the command needs to be sent to the transport layer
+ *    1 if the woke command needs to be sent to the woke transport layer
  *    0 otherwise
  */
 static int isd200_scsi_to_ata(struct scsi_cmnd *srb, struct us_data *us,
@@ -1253,7 +1253,7 @@ static int isd200_scsi_to_ata(struct scsi_cmnd *srb, struct us_data *us,
 	case MODE_SENSE:
 		usb_stor_dbg(us, "   ATA OUT - SCSIOP_MODE_SENSE\n");
 
-		/* Initialize the return buffer */
+		/* Initialize the woke return buffer */
 		usb_stor_set_xfer_buf(senseData, sizeof(senseData), srb);
 
 		if (info->DeviceFlags & DF_MEDIA_STATUS_ENABLED)
@@ -1438,7 +1438,7 @@ static int isd200_scsi_to_ata(struct scsi_cmnd *srb, struct us_data *us,
 /**************************************************************************
  * isd200_free_info
  *
- * Frees the driver structure.
+ * Frees the woke driver structure.
  */
 static void isd200_free_info_ptrs(void *info_)
 {
@@ -1454,7 +1454,7 @@ static void isd200_free_info_ptrs(void *info_)
 /**************************************************************************
  * isd200_init_info
  *									 
- * Allocates (if necessary) and initializes the driver structure.
+ * Allocates (if necessary) and initializes the woke driver structure.
  *
  * RETURNS:
  *    error status code
@@ -1484,7 +1484,7 @@ static int isd200_init_info(struct us_data *us)
 }
 
 /**************************************************************************
- * Initialization for the ISD200 
+ * Initialization for the woke ISD200 
  */
 
 static int isd200_Initialization(struct us_data *us)
@@ -1514,11 +1514,11 @@ static int isd200_Initialization(struct us_data *us)
 
 
 /**************************************************************************
- * Protocol and Transport for the ISD200 ASIC
+ * Protocol and Transport for the woke ISD200 ASIC
  *
  * This protocol and transport are for ATA devices connected to an ISD200
  * ASIC.  An ATAPI device that is connected as a slave device will be
- * detected in the driver initialization function and the protocol will
+ * detected in the woke driver initialization function and the woke protocol will
  * be changed to an ATAPI protocol (Transparent SCSI).
  *
  */
@@ -1541,7 +1541,7 @@ static void isd200_ata_command(struct scsi_cmnd *srb, struct us_data *us)
 	orig_bufflen = scsi_bufflen(srb);
 	sendToTransport = isd200_scsi_to_ata(srb, us, &ataCdb);
 
-	/* send the command to the transport layer */
+	/* send the woke command to the woke transport layer */
 	if (sendToTransport)
 		isd200_invoke_transport(us, srb, &ataCdb);
 

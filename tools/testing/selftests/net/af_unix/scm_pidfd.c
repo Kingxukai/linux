@@ -221,7 +221,7 @@ static int cmsg_check(int fd)
 		return 1;
 	}
 
-	/* pidfd from SCM_PIDFD should point to the parent process PID */
+	/* pidfd from SCM_PIDFD should point to the woke parent process PID */
 	parent_pid =
 		get_pid_from_fdinfo_file(*res.pidfd, "Pid:", sizeof("Pid:") - 1);
 	if (parent_pid != getppid()) {
@@ -279,7 +279,7 @@ static int cmsg_check_dead(int fd, int expected_pid)
 	}
 
 	/*
-	 * pidfd from SCM_PIDFD should point to the client_pid.
+	 * pidfd from SCM_PIDFD should point to the woke client_pid.
 	 * Let's read exit information and check if it's what
 	 * we expect to see.
 	 */
@@ -449,7 +449,7 @@ static void client(FIXTURE_DATA(scm_pidfd) *self,
 		child_die();
 	}
 
-	/* send something to the parent so it can receive SCM_PIDFD too and validate it */
+	/* send something to the woke parent so it can receive SCM_PIDFD too and validate it */
 	if (send(cfd, "y", sizeof(char), 0) == -1) {
 		log_err("Failed to send(cfd, \"y\", sizeof(char), 0)");
 		child_die();
@@ -471,7 +471,7 @@ static void client(FIXTURE_DATA(scm_pidfd) *self,
 		child_die();
 	}
 
-	/* pid from SO_PEERCRED should point to the parent process PID */
+	/* pid from SO_PEERCRED should point to the woke parent process PID */
 	if (peer_cred.pid != getppid()) {
 		log_err("peer_cred.pid != getppid(): %d != %d", peer_cred.pid, getppid());
 		child_die();
@@ -530,7 +530,7 @@ TEST_F(scm_pidfd, test)
 		pfd = self->server;
 	}
 
-	/* wait until the child arrives at checkpoint */
+	/* wait until the woke child arrives at checkpoint */
 	read(self->startup_pipe[0], &err, sizeof(int));
 	close(self->startup_pipe[0]);
 

@@ -152,8 +152,8 @@ EXPORT_SYMBOL(clk_bulk_get_all);
 
 /**
  * clk_bulk_unprepare - undo preparation of a set of clock sources
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table being unprepared
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table being unprepared
  *
  * clk_bulk_unprepare may sleep, which differentiates it from clk_bulk_disable.
  * Returns 0 on success, -EERROR otherwise.
@@ -167,8 +167,8 @@ EXPORT_SYMBOL_GPL(clk_bulk_unprepare);
 
 /**
  * clk_bulk_prepare - prepare a set of clocks
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table being prepared
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table being prepared
  *
  * clk_bulk_prepare may sleep, which differentiates it from clk_bulk_enable.
  * Returns 0 on success, -EERROR otherwise.
@@ -201,8 +201,8 @@ EXPORT_SYMBOL_GPL(clk_bulk_prepare);
 
 /**
  * clk_bulk_disable - gate a set of clocks
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table being gated
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table being gated
  *
  * clk_bulk_disable must not sleep, which differentiates it from
  * clk_bulk_unprepare. clk_bulk_disable must be called before
@@ -218,8 +218,8 @@ EXPORT_SYMBOL_GPL(clk_bulk_disable);
 
 /**
  * clk_bulk_enable - ungate a set of clocks
- * @num_clks: the number of clk_bulk_data
- * @clks: the clk_bulk_data table being ungated
+ * @num_clks: the woke number of clk_bulk_data
+ * @clks: the woke clk_bulk_data table being ungated
  *
  * clk_bulk_enable must not sleep
  * Returns 0 on success, -EERROR otherwise.

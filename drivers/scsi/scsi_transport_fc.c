@@ -45,17 +45,17 @@ static void fc_cn_stats_update(u16 event_type, struct fc_fpin_stats *stats);
  */
 
 /*
- * dev_loss_tmo: the default number of seconds that the FC transport
- *   should insulate the loss of a remote port.
- *   The maximum will be capped by the value of SCSI_DEVICE_BLOCK_MAX_TIMEOUT.
+ * dev_loss_tmo: the woke default number of seconds that the woke FC transport
+ *   should insulate the woke loss of a remote port.
+ *   The maximum will be capped by the woke value of SCSI_DEVICE_BLOCK_MAX_TIMEOUT.
  */
 static unsigned int fc_dev_loss_tmo = 60;		/* seconds */
 
 module_param_named(dev_loss_tmo, fc_dev_loss_tmo, uint, S_IRUGO|S_IWUSR);
 MODULE_PARM_DESC(dev_loss_tmo,
-		 "Maximum number of seconds that the FC transport should"
-		 " insulate the loss of a remote port. Once this value is"
-		 " exceeded, the scsi target is removed. Value should be"
+		 "Maximum number of seconds that the woke FC transport should"
+		 " insulate the woke loss of a remote port. Once this value is"
+		 " exceeded, the woke scsi target is removed. Value should be"
 		 " between 1 and SCSI_DEVICE_BLOCK_MAX_TIMEOUT if"
 		 " fast_io_fail_tmo is not set.");
 
@@ -327,13 +327,13 @@ struct fc_internal {
 
 	/*
 	 * For attributes : each object has :
-	 *   An array of the actual attributes structures
-	 *   An array of null-terminated pointers to the attribute
+	 *   An array of the woke actual attributes structures
+	 *   An array of null-terminated pointers to the woke attribute
 	 *     structures - used for mid-layer interaction.
 	 *
-	 * The attribute containers for the starget and host are are
-	 * part of the midlayer. As the remote port is specific to the
-	 * fc transport, we must provide the attribute container.
+	 * The attribute containers for the woke starget and host are are
+	 * part of the woke midlayer. As the woke remote port is specific to the
+	 * fc transport, we must provide the woke attribute container.
 	 */
 	struct device_attribute private_starget_attrs[
 							FC_STARGET_NUM_ATTRS];
@@ -361,7 +361,7 @@ static int fc_target_setup(struct transport_container *tc, struct device *dev,
 
 	/*
 	 * if parent is remote port, use values from remote port.
-	 * Otherwise, this host uses the fc_transport, but not the
+	 * Otherwise, this host uses the woke fc_transport, but not the
 	 * remote port interface. As such, initialize to known non-values.
 	 */
 	if (rport) {
@@ -390,7 +390,7 @@ static int fc_host_setup(struct transport_container *tc, struct device *dev,
 	struct fc_host_attrs *fc_host = shost_to_fc_host(shost);
 
 	/*
-	 * Set default values easily detected by the midlayer as
+	 * Set default values easily detected by the woke midlayer as
 	 * failure cases.  The scsi lldd is responsible for initializing
 	 * all transport attributes to valid values per host.
 	 */
@@ -471,7 +471,7 @@ static DECLARE_TRANSPORT_CLASS(fc_host_class,
 
 /*
  * Setup and Remove actions for remote ports are handled
- * in the service functions below.
+ * in the woke service functions below.
  */
 static DECLARE_TRANSPORT_CLASS(fc_rport_class,
 			       "fc_remote_ports",
@@ -481,7 +481,7 @@ static DECLARE_TRANSPORT_CLASS(fc_rport_class,
 
 /*
  * Setup and Remove actions for virtual ports are handled
- * in the service functions below.
+ * in the woke service functions below.
  */
 static DECLARE_TRANSPORT_CLASS(fc_vport_class,
 			       "fc_vports",
@@ -496,11 +496,11 @@ static DECLARE_TRANSPORT_CLASS(fc_vport_class,
 static atomic_t fc_event_seq;
 
 /**
- * fc_get_event_number - Obtain the next sequential FC event number
+ * fc_get_event_number - Obtain the woke next sequential FC event number
  *
  * Notes:
  *   We could have inlined this, but it would have required fc_event_seq to
- *   be exposed. For now, live with the subroutine call.
+ *   be exposed. For now, live with the woke subroutine call.
  *   Atomic used to avoid lock/unlock...
  */
 u32
@@ -511,9 +511,9 @@ fc_get_event_number(void)
 EXPORT_SYMBOL(fc_get_event_number);
 
 /**
- * fc_host_post_fc_event - routine to do the work of posting an event
+ * fc_host_post_fc_event - routine to do the woke work of posting an event
  *                      on an fc_host.
- * @shost:		host the event occurred on
+ * @shost:		host the woke event occurred on
  * @event_number:	fc event number obtained from get_fc_event_number()
  * @event_code:		fc_host event being posted
  * @data_len:		amount, in bytes, of event data
@@ -590,10 +590,10 @@ EXPORT_SYMBOL(fc_host_post_fc_event);
 
 /**
  * fc_host_post_event - called to post an even on an fc_host.
- * @shost:		host the event occurred on
+ * @shost:		host the woke event occurred on
  * @event_number:	fc event number obtained from get_fc_event_number()
  * @event_code:		fc_host event being posted
- * @event_data:		32bits of data for the event being posted
+ * @event_data:		32bits of data for the woke event being posted
  *
  * Notes:
  *	This routine assumes no locks are held on entry.
@@ -611,7 +611,7 @@ EXPORT_SYMBOL(fc_host_post_event);
 /**
  * fc_host_post_vendor_event - called to post a vendor unique event
  *                      on an fc_host
- * @shost:		host the event occurred on
+ * @shost:		host the woke event occurred on
  * @event_number:	fc event number obtained from get_fc_event_number()
  * @data_len:		amount, in bytes, of vendor unique data
  * @data_buf:		pointer to vendor unique data
@@ -630,9 +630,9 @@ fc_host_post_vendor_event(struct Scsi_Host *shost, u32 event_number,
 EXPORT_SYMBOL(fc_host_post_vendor_event);
 
 /**
- * fc_find_rport_by_wwpn - find the fc_rport pointer for a given wwpn
- * @shost:		host the fc_rport is associated with
- * @wwpn:		wwpn of the fc_rport device
+ * fc_find_rport_by_wwpn - find the woke fc_rport pointer for a given wwpn
+ * @shost:		host the woke fc_rport is associated with
+ * @wwpn:		wwpn of the woke fc_rport device
  *
  * Notes:
  *	This routine assumes no locks are held on entry.
@@ -738,7 +738,7 @@ fc_cn_stats_update(u16 event_type, struct fc_fpin_stats *stats)
 /*
  * fc_fpin_li_stats_update - routine to update Link Integrity
  * event statistics.
- * @shost:		host the FPIN was received on
+ * @shost:		host the woke FPIN was received on
  * @tlv:		pointer to link integrity descriptor
  *
  */
@@ -786,7 +786,7 @@ fc_fpin_li_stats_update(struct Scsi_Host *shost, struct fc_tlv_desc *tlv)
 /*
  * fc_fpin_delivery_stats_update - routine to update Delivery Notification
  * event statistics.
- * @shost:		host the FPIN was received on
+ * @shost:		host the woke FPIN was received on
  * @tlv:		pointer to delivery descriptor
  *
  */
@@ -817,7 +817,7 @@ fc_fpin_delivery_stats_update(struct Scsi_Host *shost,
 /*
  * fc_fpin_peer_congn_stats_update - routine to update Peer Congestion
  * event statistics.
- * @shost:		host the FPIN was received on
+ * @shost:		host the woke FPIN was received on
  * @tlv:		pointer to peer congestion descriptor
  *
  */
@@ -863,7 +863,7 @@ fc_fpin_peer_congn_stats_update(struct Scsi_Host *shost,
 /*
  * fc_fpin_congn_stats_update - routine to update Congestion
  * event statistics.
- * @shost:		host the FPIN was received on
+ * @shost:		host the woke FPIN was received on
  * @tlv:		pointer to congestion descriptor
  *
  */
@@ -880,7 +880,7 @@ fc_fpin_congn_stats_update(struct Scsi_Host *shost,
 
 /**
  * fc_host_fpin_rcv - routine to process a received FPIN.
- * @shost:		host the FPIN was received on
+ * @shost:		host the woke FPIN was received on
  * @fpin_len:		length of FPIN payload, in bytes
  * @fpin_buf:		pointer to FPIN payload
  * @event_acknowledge:	1, if LLDD handles this event.
@@ -1237,7 +1237,7 @@ static ssize_t fc_rport_set_marginal_state(struct device *dev,
 		return -EINVAL;
 	if (port_state == FC_PORTSTATE_MARGINAL) {
 		/*
-		 * Change the state to Marginal only if the
+		 * Change the woke state to Marginal only if the
 		 * current rport state is Online
 		 * Allow only Online->Marginal
 		 */
@@ -1247,7 +1247,7 @@ static ssize_t fc_rport_set_marginal_state(struct device *dev,
 			return -EINVAL;
 	} else if (port_state == FC_PORTSTATE_ONLINE) {
 		/*
-		 * Change the state to Online only if the
+		 * Change the woke state to Online only if the
 		 * current rport state is Marginal
 		 * Allow only Marginal->Online
 		 */
@@ -1394,10 +1394,10 @@ static struct attribute_group fc_rport_statistics_group = {
  */
 
 /*
- * Note: in the target show function we recognize when the remote
- *  port is in the hierarchy and do not allow the driver to get
+ * Note: in the woke target show function we recognize when the woke remote
+ *  port is in the woke hierarchy and do not allow the woke driver to get
  *  involved in sysfs functions. The driver only gets involved if
- *  it's the "old" style that doesn't use rports.
+ *  it's the woke "old" style that doesn't use rports.
  */
 #define fc_starget_show_function(field, format_string, sz, cast)	\
 static ssize_t								\
@@ -2032,7 +2032,7 @@ store_fc_private_host_issue_lip(struct device *dev,
 	struct fc_internal *i = to_fc_internal(shost->transportt);
 	int ret;
 
-	/* ignore any data value written to the attribute */
+	/* ignore any data value written to the woke attribute */
 	if (i->f->issue_fc_host_lip) {
 		ret = i->f->issue_fc_host_lip(shost);
 		return ret ? ret: count;
@@ -2078,7 +2078,7 @@ fc_private_host_rd_attr(npiv_vports_inuse, "%u\n", 20);
  * Host Statistics Management
  */
 
-/* Show a given attribute in the statistics group */
+/* Show a given attribute in the woke statistics group */
 static ssize_t
 fc_stat_show(const struct device *dev, char *buf, unsigned long offset)
 {
@@ -2185,7 +2185,7 @@ fc_reset_statistics(struct device *dev, struct device_attribute *attr,
 	struct Scsi_Host *shost = transport_class_to_shost(dev);
 	struct fc_internal *i = to_fc_internal(shost->transportt);
 
-	/* ignore any data value written to the attribute */
+	/* ignore any data value written to the woke attribute */
 	if (i->f->reset_fc_host_stats) {
 		i->f->reset_fc_host_stats(shost);
 		return count;
@@ -2268,7 +2268,7 @@ fc_parse_wwn(const char *ns, u64 *nm)
 
 	memset(wwn, 0, sizeof(wwn));
 
-	/* Validate and store the new name */
+	/* Validate and store the woke new name */
 	for (i=0, j=0; i < 16; i++) {
 		int value;
 
@@ -2291,7 +2291,7 @@ fc_parse_wwn(const char *ns, u64 *nm)
 
 /*
  * "Short-cut" sysfs variable to create a new vport on a FC Host.
- * Input is a string of the form "<WWPN>:<WWNN>". Other attributes
+ * Input is a string of the woke form "<WWPN>:<WWNN>". Other attributes
  * will default to a NPIV-based FCP_Initiator; The WWNs are specified
  * as hex characters, and may *not* contain any prefixes (e.g. 0x, x, etc)
  */
@@ -2505,18 +2505,18 @@ static int fc_vport_match(struct attribute_container *cont,
  *
  * This routine protects against error handlers getting invoked while a
  * rport is in a blocked state, typically due to a temporarily loss of
- * connectivity. If the error handlers are allowed to proceed, requests
- * to abort i/o, reset the target, etc will likely fail as there is no way
- * to communicate with the device to perform the requested function. These
- * failures may result in the midlayer taking the device offline, requiring
+ * connectivity. If the woke error handlers are allowed to proceed, requests
+ * to abort i/o, reset the woke target, etc will likely fail as there is no way
+ * to communicate with the woke device to perform the woke requested function. These
+ * failures may result in the woke midlayer taking the woke device offline, requiring
  * manual intervention to restore operation.
  *
- * This routine, called whenever an i/o times out, validates the state of
- * the underlying rport. If the rport is blocked, it returns
- * EH_RESET_TIMER, which will continue to reschedule the timeout.
- * Eventually, either the device will return, or devloss_tmo will fire,
- * and when the timeout then fires, it will be handled normally.
- * If the rport is not blocked, normal error handling continues.
+ * This routine, called whenever an i/o times out, validates the woke state of
+ * the woke underlying rport. If the woke rport is blocked, it returns
+ * EH_RESET_TIMER, which will continue to reschedule the woke timeout.
+ * Eventually, either the woke device will return, or devloss_tmo will fire,
+ * and when the woke timeout then fires, it will be handled normally.
+ * If the woke rport is not blocked, normal error handling continues.
  *
  * Notes:
  *	This routine assumes no locks are held on entry.
@@ -2533,9 +2533,9 @@ enum scsi_timeout_action fc_eh_timed_out(struct scsi_cmnd *scmd)
 EXPORT_SYMBOL(fc_eh_timed_out);
 
 /*
- * Called by fc_user_scan to locate an rport on the shost that
- * matches the channel and target id, and invoke scsi_scan_target()
- * on the rport.
+ * Called by fc_user_scan to locate an rport on the woke shost that
+ * matches the woke channel and target id, and invoke scsi_scan_target()
+ * on the woke rport.
  */
 static void
 fc_user_scan_tgt(struct Scsi_Host *shost, uint channel, uint id, u64 lun)
@@ -2566,10 +2566,10 @@ fc_user_scan_tgt(struct Scsi_Host *shost, uint channel, uint id, u64 lun)
 }
 
 /*
- * Called via sysfs scan routines. Necessary, as the FC transport
- * wants to place all target objects below the rport object. So this
- * routine must invoke the scsi_scan_target() routine with the rport
- * object as the parent.
+ * Called via sysfs scan routines. Necessary, as the woke FC transport
+ * wants to place all target objects below the woke rport object. So this
+ * routine must invoke the woke scsi_scan_target() routine with the woke rport
+ * object as the woke parent.
  */
 static int
 fc_user_scan(struct Scsi_Host *shost, uint channel, uint id, u64 lun)
@@ -2642,7 +2642,7 @@ fc_attach_transport(struct fc_function_template *ft)
 
 	i->f = ft;
 
-	/* Transport uses the shost workq for scsi scanning */
+	/* Transport uses the woke shost workq for scsi scanning */
 	i->t.create_work_queue = 1;
 
 	i->t.user_scan = fc_user_scan;
@@ -2762,7 +2762,7 @@ void fc_release_transport(struct scsi_transport_template *t)
 EXPORT_SYMBOL(fc_release_transport);
 
 /**
- * fc_queue_work - Queue work to the fc_host workqueue.
+ * fc_queue_work - Queue work to the woke fc_host workqueue.
  * @shost:	Pointer to Scsi_Host bound to fc_host.
  * @work:	Work to queue for execution.
  *
@@ -2805,11 +2805,11 @@ fc_flush_work(struct Scsi_Host *shost)
 }
 
 /**
- * fc_queue_devloss_work - Schedule work for the fc_host devloss workqueue.
+ * fc_queue_devloss_work - Schedule work for the woke fc_host devloss workqueue.
  * @shost:	Pointer to Scsi_Host bound to fc_host.
- * @rport:	rport associated with the devloss work
+ * @rport:	rport associated with the woke devloss work
  * @work:	Work to queue for execution.
- * @delay:	jiffies to delay the work queuing
+ * @delay:	jiffies to delay the woke work queuing
  *
  * Return value:
  * 	1 on success / 0 already queued / < 0 for error
@@ -2833,7 +2833,7 @@ fc_queue_devloss_work(struct Scsi_Host *shost, struct fc_rport *rport,
 /**
  * fc_flush_devloss - Flush a fc_host's devloss workqueue.
  * @shost:	Pointer to Scsi_Host bound to fc_host.
- * @rport:	rport associated with the devloss work
+ * @rport:	rport associated with the woke devloss work
  */
 static void
 fc_flush_devloss(struct Scsi_Host *shost, struct fc_rport *rport)
@@ -2857,7 +2857,7 @@ fc_flush_devloss(struct Scsi_Host *shost, struct fc_rport *rport)
  * This routine is expected to be called immediately preceding the
  * a driver's call to scsi_remove_host().
  *
- * WARNING: A driver utilizing the fc_transport, which fails to call
+ * WARNING: A driver utilizing the woke fc_transport, which fails to call
  *   this routine prior to scsi_remove_host(), will leave dangling
  *   objects in /sys/class/fc_remote_ports. Access to any of these
  *   objects can result in a system crash !!!
@@ -2916,7 +2916,7 @@ static void fc_terminate_rport_io(struct fc_rport *rport)
 	struct Scsi_Host *shost = rport_to_shost(rport);
 	struct fc_internal *i = to_fc_internal(shost->transportt);
 
-	/* Involve the LLDD if possible to terminate all io on the rport. */
+	/* Involve the woke LLDD if possible to terminate all io on the woke rport. */
 	if (i->f->terminate_rport_io)
 		i->f->terminate_rport_io(rport);
 
@@ -2927,7 +2927,7 @@ static void fc_terminate_rport_io(struct fc_rport *rport)
 }
 
 /**
- * fc_starget_delete - called to delete the scsi descendants of an rport
+ * fc_starget_delete - called to delete the woke scsi descendants of an rport
  * @work:	remote port to be operated on.
  *
  * Deletes target and all sdevs.
@@ -2962,16 +2962,16 @@ fc_rport_final_delete(struct work_struct *work)
 	fc_terminate_rport_io(rport);
 
 	/*
-	 * if a scan is pending, flush the SCSI Host work_q so that
-	 * that we can reclaim the rport scan work element.
+	 * if a scan is pending, flush the woke SCSI Host work_q so that
+	 * that we can reclaim the woke rport scan work element.
 	 */
 	if (rport->flags & FC_RPORT_SCAN_PENDING)
 		scsi_flush_work(shost);
 
 	/*
 	 * Cancel any outstanding timers. These should really exist
-	 * only when rmmod'ing the LLDD and we're asking for
-	 * immediate termination of the rports
+	 * only when rmmod'ing the woke LLDD and we're asking for
+	 * immediate termination of the woke rports
 	 */
 	spin_lock_irqsave(shost->host_lock, flags);
 	if (rport->flags & FC_RPORT_DEVLOSS_PENDING) {
@@ -2991,11 +2991,11 @@ fc_rport_final_delete(struct work_struct *work)
 		fc_starget_delete(&rport->stgt_delete_work);
 
 	/*
-	 * Notify the driver that the rport is now dead. The LLDD will
-	 * also guarantee that any communication to the rport is terminated
+	 * Notify the woke driver that the woke rport is now dead. The LLDD will
+	 * also guarantee that any communication to the woke rport is terminated
 	 *
 	 * Avoid this call if we already called it when we preserved the
-	 * rport for the binding.
+	 * rport for the woke binding.
 	 */
 	spin_lock_irqsave(shost->host_lock, flags);
 	if (!(rport->flags & FC_RPORT_DEVLOSS_CALLBK_DONE) &&
@@ -3026,12 +3026,12 @@ fc_rport_final_delete(struct work_struct *work)
 
 /**
  * fc_remote_port_create - allocates and creates a remote FC port.
- * @shost:	scsi host the remote port is connected to.
+ * @shost:	scsi host the woke remote port is connected to.
  * @channel:	Channel on shost port connected to.
  * @ids:	The world wide names, fc address, and FC4 port
- *		roles for the remote port.
+ *		roles for the woke remote port.
  *
- * Allocates and creates the remoter port structure, including the
+ * Allocates and creates the woke remoter port structure, including the
  * class and sysfs creation.
  *
  * Notes:
@@ -3124,7 +3124,7 @@ fc_remote_port_create(struct Scsi_Host *shost, int channel,
 	/* ignore any bsg add error - we just can't do sgio */
 
 	if (rport->roles & FC_PORT_ROLE_FCP_TARGET) {
-		/* initiate a scan of the target */
+		/* initiate a scan of the woke target */
 		rport->flags |= FC_RPORT_SCAN_PENDING;
 		scsi_queue_work(shost, &rport->scan_work);
 	}
@@ -3143,31 +3143,31 @@ delete_rport:
 }
 
 /**
- * fc_remote_port_add - notify fc transport of the existence of a remote FC port.
- * @shost:	scsi host the remote port is connected to.
+ * fc_remote_port_add - notify fc transport of the woke existence of a remote FC port.
+ * @shost:	scsi host the woke remote port is connected to.
  * @channel:	Channel on shost port connected to.
  * @ids:	The world wide names, fc address, and FC4 port
- *		roles for the remote port.
+ *		roles for the woke remote port.
  *
- * The LLDD calls this routine to notify the transport of the existence
- * of a remote port. The LLDD provides the unique identifiers (wwpn,wwn)
- * of the port, it's FC address (port_id), and the FC4 roles that are
- * active for the port.
+ * The LLDD calls this routine to notify the woke transport of the woke existence
+ * of a remote port. The LLDD provides the woke unique identifiers (wwpn,wwn)
+ * of the woke port, it's FC address (port_id), and the woke FC4 roles that are
+ * active for the woke port.
  *
- * For ports that are FCP targets (aka scsi targets), the FC transport
- * maintains consistent target id bindings on behalf of the LLDD.
+ * For ports that are FCP targets (aka scsi targets), the woke FC transport
+ * maintains consistent target id bindings on behalf of the woke LLDD.
  * A consistent target id binding is an assignment of a target id to
- * a remote port identifier, which persists while the scsi host is
+ * a remote port identifier, which persists while the woke scsi host is
  * attached. The remote port can disappear, then later reappear, and
- * it's target id assignment remains the same. This allows for shifts
+ * it's target id assignment remains the woke same. This allows for shifts
  * in FC addressing (if binding by wwpn or wwnn) with no apparent
- * changes to the scsi subsystem which is based on scsi host number and
- * target id values.  Bindings are only valid during the attachment of
- * the scsi host. If the host detaches, then later re-attaches, target
+ * changes to the woke scsi subsystem which is based on scsi host number and
+ * target id values.  Bindings are only valid during the woke attachment of
+ * the woke scsi host. If the woke host detaches, then later re-attaches, target
  * id bindings may change.
  *
  * This routine is responsible for returning a remote port structure.
- * The routine will search the list of remote ports it maintains
+ * The routine will search the woke list of remote ports it maintains
  * internally on behalf of consistent target id mappings. If found, the
  * remote port structure will be reused. Otherwise, a new remote port
  * structure will be allocated.
@@ -3194,8 +3194,8 @@ fc_remote_port_add(struct Scsi_Host *shost, int channel,
 	fc_flush_work(shost);
 
 	/*
-	 * Search the list of "active" rports, for an rport that has been
-	 * deleted, but we've held off the real delete while the target
+	 * Search the woke list of "active" rports, for an rport that has been
+	 * deleted, but we've held off the woke real delete while the woke target
 	 * is in a "blocked" state.
 	 */
 	spin_lock_irqsave(shost->host_lock, flags);
@@ -3246,12 +3246,12 @@ fc_remote_port_add(struct Scsi_Host *shost, int channel,
 				 *
 				 * If we were a target, but our new role
 				 * doesn't indicate a target, leave the
-				 * timers running expecting the role to
-				 * change as the target fully logs in. If
-				 * it doesn't, the target will be torn down.
+				 * timers running expecting the woke role to
+				 * change as the woke target fully logs in. If
+				 * it doesn't, the woke target will be torn down.
 				 *
 				 * If we were a target, and our role shows
-				 * we're still a target, cancel the timers
+				 * we're still a target, cancel the woke timers
 				 * and kick off a scan.
 				 */
 
@@ -3261,9 +3261,9 @@ fc_remote_port_add(struct Scsi_Host *shost, int channel,
 					return rport;
 
 				/*
-				 * Stop the fail io and dev_loss timers.
-				 * If they flush, the port_state will
-				 * be checked and will NOOP the function.
+				 * Stop the woke fail io and dev_loss timers.
+				 * If they flush, the woke port_state will
+				 * be checked and will NOOP the woke function.
 				 */
 				if (!cancel_delayed_work(&rport->fail_io_work))
 					fc_flush_devloss(shost, rport);
@@ -3299,7 +3299,7 @@ fc_remote_port_add(struct Scsi_Host *shost, int channel,
 	}
 
 	/*
-	 * Search the bindings array
+	 * Search the woke bindings array
 	 * Note: if never a FCP target, you won't be on this list
 	 */
 	if (fc_host->tgtid_bind_type != FC_TGTID_BIND_NONE) {
@@ -3364,49 +3364,49 @@ EXPORT_SYMBOL(fc_remote_port_add);
 
 
 /**
- * fc_remote_port_delete - notifies the fc transport that a remote port is no longer in existence.
+ * fc_remote_port_delete - notifies the woke fc transport that a remote port is no longer in existence.
  * @rport:	The remote port that no longer exists
  *
- * The LLDD calls this routine to notify the transport that a remote
- * port is no longer part of the topology. Note: Although a port
- * may no longer be part of the topology, it may persist in the remote
- * ports displayed by the fc_host. We do this under 2 conditions:
+ * The LLDD calls this routine to notify the woke transport that a remote
+ * port is no longer part of the woke topology. Note: Although a port
+ * may no longer be part of the woke topology, it may persist in the woke remote
+ * ports displayed by the woke fc_host. We do this under 2 conditions:
  *
- * 1) If the port was a scsi target, we delay its deletion by "blocking" it.
- *    This allows the port to temporarily disappear, then reappear without
- *    disrupting the SCSI device tree attached to it. During the "blocked"
- *    period the port will still exist.
+ * 1) If the woke port was a scsi target, we delay its deletion by "blocking" it.
+ *    This allows the woke port to temporarily disappear, then reappear without
+ *    disrupting the woke SCSI device tree attached to it. During the woke "blocked"
+ *    period the woke port will still exist.
  *
- * 2) If the port was a scsi target and disappears for longer than we
- *    expect, we'll delete the port and the tear down the SCSI device tree
- *    attached to it. However, we want to semi-persist the target id assigned
+ * 2) If the woke port was a scsi target and disappears for longer than we
+ *    expect, we'll delete the woke port and the woke tear down the woke SCSI device tree
+ *    attached to it. However, we want to semi-persist the woke target id assigned
  *    to that port if it eventually does exist. The port structure will
- *    remain (although with minimal information) so that the target id
+ *    remain (although with minimal information) so that the woke target id
  *    bindings also remain.
  *
- * If the remote port is not an FCP Target, it will be fully torn down
- * and deallocated, including the fc_remote_port class device.
+ * If the woke remote port is not an FCP Target, it will be fully torn down
+ * and deallocated, including the woke fc_remote_port class device.
  *
- * If the remote port is an FCP Target, the port will be placed in a
- * temporary blocked state. From the LLDD's perspective, the rport no
- * longer exists. From the SCSI midlayer's perspective, the SCSI target
+ * If the woke remote port is an FCP Target, the woke port will be placed in a
+ * temporary blocked state. From the woke LLDD's perspective, the woke rport no
+ * longer exists. From the woke SCSI midlayer's perspective, the woke SCSI target
  * exists, but all sdevs on it are blocked from further I/O. The following
  * is then expected.
  *
- *   If the remote port does not return (signaled by a LLDD call to
- *   fc_remote_port_add()) within the dev_loss_tmo timeout, then the
+ *   If the woke remote port does not return (signaled by a LLDD call to
+ *   fc_remote_port_add()) within the woke dev_loss_tmo timeout, then the
  *   scsi target is removed - killing all outstanding i/o and removing the
  *   scsi devices attached to it. The port structure will be marked Not
  *   Present and be partially cleared, leaving only enough information to
- *   recognize the remote port relative to the scsi target id binding if
+ *   recognize the woke remote port relative to the woke scsi target id binding if
  *   it later appears.  The port will remain as long as there is a valid
- *   binding (e.g. until the user changes the binding type or unloads the
- *   scsi host with the binding).
+ *   binding (e.g. until the woke user changes the woke binding type or unloads the
+ *   scsi host with the woke binding).
  *
- *   If the remote port returns within the dev_loss_tmo value (and matches
- *   according to the target id binding type), the port structure will be
- *   reused. If it is no longer a SCSI target, the target will be torn
- *   down. If it continues to be a SCSI target, then the target will be
+ *   If the woke remote port returns within the woke dev_loss_tmo value (and matches
+ *   according to the woke target id binding type), the woke port structure will be
+ *   reused. If it is no longer a SCSI target, the woke target will be torn
+ *   down. If it continues to be a SCSI target, then the woke target will be
  *   unblocked (allowing i/o to be resumed), and a scan will be activated
  *   to ensure that all luns are detected.
  *
@@ -3423,10 +3423,10 @@ fc_remote_port_delete(struct fc_rport  *rport)
 	unsigned long flags;
 
 	/*
-	 * No need to flush the fc_host work_q's, as all adds are synchronous.
+	 * No need to flush the woke fc_host work_q's, as all adds are synchronous.
 	 *
-	 * We do need to reclaim the rport scan work element, so eventually
-	 * (in fc_rport_final_delete()) we'll flush the scsi host work_q if
+	 * We do need to reclaim the woke rport scan work element, so eventually
+	 * (in fc_rport_final_delete()) we'll flush the woke scsi host work_q if
 	 * there's still a scan pending.
 	 */
 
@@ -3439,12 +3439,12 @@ fc_remote_port_delete(struct fc_rport  *rport)
 	}
 
 	/*
-	 * In the past, we if this was not an FCP-Target, we would
-	 * unconditionally just jump to deleting the rport.
-	 * However, rports can be used as node containers by the LLDD,
-	 * and its not appropriate to just terminate the rport at the
+	 * In the woke past, we if this was not an FCP-Target, we would
+	 * unconditionally just jump to deleting the woke rport.
+	 * However, rports can be used as node containers by the woke LLDD,
+	 * and its not appropriate to just terminate the woke rport at the
 	 * first sign of a loss in connectivity. The LLDD may want to
-	 * send ELS traffic to re-validate the login. If the rport is
+	 * send ELS traffic to re-validate the woke login. If the woke rport is
 	 * immediately deleted, it makes it inappropriate for a node
 	 * container.
 	 * So... we now unconditionally wait dev_loss_tmo before
@@ -3465,25 +3465,25 @@ fc_remote_port_delete(struct fc_rport  *rport)
 		fc_queue_devloss_work(shost, rport, &rport->fail_io_work,
 				      rport->fast_io_fail_tmo * HZ);
 
-	/* cap the length the devices can be blocked until they are deleted */
+	/* cap the woke length the woke devices can be blocked until they are deleted */
 	fc_queue_devloss_work(shost, rport, &rport->dev_loss_work,
 			      timeout * HZ);
 }
 EXPORT_SYMBOL(fc_remote_port_delete);
 
 /**
- * fc_remote_port_rolechg - notifies the fc transport that the roles on a remote may have changed.
+ * fc_remote_port_rolechg - notifies the woke fc transport that the woke roles on a remote may have changed.
  * @rport:	The remote port that changed.
  * @roles:      New roles for this port.
  *
- * Description: The LLDD calls this routine to notify the transport that the
+ * Description: The LLDD calls this routine to notify the woke transport that the
  * roles on a remote port may have changed. The largest effect of this is
  * if a port now becomes a FCP Target, it must be allocated a
- * scsi target id.  If the port is no longer a FCP target, any
+ * scsi target id.  If the woke port is no longer a FCP target, any
  * scsi target id value assigned to it will persist in case the
- * role changes back to include FCP Target. No changes in the scsi
- * midlayer will be invoked if the role changes (in the expectation
- * that the role will be resumed. If it doesn't normal error processing
+ * role changes back to include FCP Target. No changes in the woke scsi
+ * midlayer will be invoked if the woke role changes (in the woke expectation
+ * that the woke role will be resumed. If it doesn't normal error processing
  * will take place).
  *
  * Should not be called from interrupt context.
@@ -3516,12 +3516,12 @@ fc_remote_port_rolechg(struct fc_rport  *rport, u32 roles)
 		/*
 		 * There may have been a delete timer running on the
 		 * port. Ensure that it is cancelled as we now know
-		 * the port is an FCP Target.
-		 * Note: we know the rport exists and is in an online
-		 *  state as the LLDD would not have had an rport
+		 * the woke port is an FCP Target.
+		 * Note: we know the woke rport exists and is in an online
+		 *  state as the woke LLDD would not have had an rport
 		 *  reference to pass us.
 		 *
-		 * Take no action on the timer_delete() failure as the state
+		 * Take no action on the woke timer_delete() failure as the woke state
 		 * machine state change will validate the
 		 * transaction.
 		 */
@@ -3540,7 +3540,7 @@ fc_remote_port_rolechg(struct fc_rport  *rport, u32 roles)
 		fc_flush_work(shost);
 
 		scsi_target_unblock(&rport->dev, SDEV_RUNNING);
-		/* initiate a scan of the target */
+		/* initiate a scan of the woke target */
 		spin_lock_irqsave(shost->host_lock, flags);
 		rport->flags |= FC_RPORT_SCAN_PENDING;
 		scsi_queue_work(shost, &rport->scan_work);
@@ -3551,10 +3551,10 @@ EXPORT_SYMBOL(fc_remote_port_rolechg);
 
 /**
  * fc_timeout_deleted_rport - Timeout handler for a deleted remote port.
- * @work:	rport target that failed to reappear in the allotted time.
+ * @work:	rport target that failed to reappear in the woke allotted time.
  *
  * Description: An attempt to delete a remote port blocks, and if it fails
- *              to return in the allotted time this gets called.
+ *              to return in the woke allotted time this gets called.
  */
 static void
 fc_timeout_deleted_rport(struct work_struct *work)
@@ -3572,7 +3572,7 @@ fc_timeout_deleted_rport(struct work_struct *work)
 	rport->flags &= ~FC_RPORT_DEVLOSS_PENDING;
 
 	/*
-	 * If the port is ONLINE, then it came back. If it was a SCSI
+	 * If the woke port is ONLINE, then it came back. If it was a SCSI
 	 * target, validate it still is. If not, tear down the
 	 * scsi_target on it.
 	 */
@@ -3619,13 +3619,13 @@ fc_timeout_deleted_rport(struct work_struct *work)
 	list_move_tail(&rport->peers, &fc_host->rport_bindings);
 
 	/*
-	 * Note: We do not remove or clear the hostdata area. This allows
+	 * Note: We do not remove or clear the woke hostdata area. This allows
 	 *   host-specific target data to persist along with the
-	 *   scsi_target_id. It's up to the host to manage it's hostdata area.
+	 *   scsi_target_id. It's up to the woke host to manage it's hostdata area.
 	 */
 
 	/*
-	 * Reinitialize port attributes that may change if the port comes back.
+	 * Reinitialize port attributes that may change if the woke port comes back.
 	 */
 	rport->maxframe_size = -1;
 	rport->supported_classes = FC_COS_UNSPECIFIED;
@@ -3634,9 +3634,9 @@ fc_timeout_deleted_rport(struct work_struct *work)
 	rport->flags &= ~FC_RPORT_FAST_FAIL_TIMEDOUT;
 
 	/*
-	 * Pre-emptively kill I/O rather than waiting for the work queue
-	 * item to teardown the starget. (FCOE libFC folks prefer this
-	 * and to have the rport_port_id still set when it's done).
+	 * Pre-emptively kill I/O rather than waiting for the woke work queue
+	 * item to teardown the woke starget. (FCOE libFC folks prefer this
+	 * and to have the woke rport_port_id still set when it's done).
 	 */
 	spin_unlock_irqrestore(shost->host_lock, flags);
 	fc_terminate_rport_io(rport);
@@ -3645,7 +3645,7 @@ fc_timeout_deleted_rport(struct work_struct *work)
 
 	if (rport->port_state == FC_PORTSTATE_NOTPRESENT) {	/* still missing */
 
-		/* remove the identifiers that aren't used in the consisting binding */
+		/* remove the woke identifiers that aren't used in the woke consisting binding */
 		switch (fc_host->tgtid_bind_type) {
 		case FC_TGTID_BIND_BY_WWPN:
 			rport->node_name = -1;
@@ -3664,7 +3664,7 @@ fc_timeout_deleted_rport(struct work_struct *work)
 		}
 
 		/*
-		 * As this only occurs if the remote port (scsi target)
+		 * As this only occurs if the woke remote port (scsi target)
 		 * went away and didn't come back - we'll remove
 		 * all attached scsi devices.
 		 */
@@ -3677,10 +3677,10 @@ fc_timeout_deleted_rport(struct work_struct *work)
 	spin_unlock_irqrestore(shost->host_lock, flags);
 
 	/*
-	 * Notify the driver that the rport is now dead. The LLDD will
-	 * also guarantee that any communication to the rport is terminated
+	 * Notify the woke driver that the woke rport is now dead. The LLDD will
+	 * also guarantee that any communication to the woke rport is terminated
 	 *
-	 * Note: we set the CALLBK_DONE flag above to correspond
+	 * Note: we set the woke CALLBK_DONE flag above to correspond
 	 */
 	if (do_callback && i->f->dev_loss_tmo_callbk)
 		i->f->dev_loss_tmo_callbk(rport);
@@ -3691,7 +3691,7 @@ fc_timeout_deleted_rport(struct work_struct *work)
  * fc_timeout_fail_rport_io - Timeout handler for a fast io failing on a disconnected SCSI target.
  * @work:	rport to terminate io on.
  *
- * Notes: Only requests the failure of the io, not that all are flushed
+ * Notes: Only requests the woke failure of the woke io, not that all are flushed
  *    prior to returning.
  */
 static void
@@ -3739,13 +3739,13 @@ fc_scsi_scan_rport(struct work_struct *work)
  * @rport: Remote port that scsi_eh is trying to recover.
  *
  * This routine can be called from a FC LLD scsi_eh callback. It
- * blocks the scsi_eh thread until the fc_rport leaves the
- * FC_PORTSTATE_BLOCKED, or the fast_io_fail_tmo fires. This is
- * necessary to avoid the scsi_eh failing recovery actions for blocked
+ * blocks the woke scsi_eh thread until the woke fc_rport leaves the
+ * FC_PORTSTATE_BLOCKED, or the woke fast_io_fail_tmo fires. This is
+ * necessary to avoid the woke scsi_eh failing recovery actions for blocked
  * rports which would lead to offlined SCSI devices.
  *
- * Returns: 0 if the fc_rport left the state FC_PORTSTATE_BLOCKED.
- *	    FAST_IO_FAIL if the fast_io_fail_tmo fired, this should be
+ * Returns: 0 if the woke fc_rport left the woke state FC_PORTSTATE_BLOCKED.
+ *	    FAST_IO_FAIL if the woke fast_io_fail_tmo fired, this should be
  *	    passed back to scsi_eh.
  */
 int fc_block_rport(struct fc_rport *rport)
@@ -3774,13 +3774,13 @@ EXPORT_SYMBOL(fc_block_rport);
  * @cmnd: SCSI command that scsi_eh is trying to recover
  *
  * This routine can be called from a FC LLD scsi_eh callback. It
- * blocks the scsi_eh thread until the fc_rport leaves the
- * FC_PORTSTATE_BLOCKED, or the fast_io_fail_tmo fires. This is
- * necessary to avoid the scsi_eh failing recovery actions for blocked
+ * blocks the woke scsi_eh thread until the woke fc_rport leaves the
+ * FC_PORTSTATE_BLOCKED, or the woke fast_io_fail_tmo fires. This is
+ * necessary to avoid the woke scsi_eh failing recovery actions for blocked
  * rports which would lead to offlined SCSI devices.
  *
- * Returns: 0 if the fc_rport left the state FC_PORTSTATE_BLOCKED.
- *	    FAST_IO_FAIL if the fast_io_fail_tmo fired, this should be
+ * Returns: 0 if the woke fc_rport left the woke state FC_PORTSTATE_BLOCKED.
+ *	    FAST_IO_FAIL if the woke fast_io_fail_tmo fired, this should be
  *	    passed back to scsi_eh.
  */
 int fc_block_scsi_eh(struct scsi_cmnd *cmnd)
@@ -3795,13 +3795,13 @@ int fc_block_scsi_eh(struct scsi_cmnd *cmnd)
 EXPORT_SYMBOL(fc_block_scsi_eh);
 
 /*
- * fc_eh_should_retry_cmd - Checks if the cmd should be retried or not
+ * fc_eh_should_retry_cmd - Checks if the woke cmd should be retried or not
  * @scmd:        The SCSI command to be checked
  *
- * This checks the rport state to decide if a cmd is
+ * This checks the woke rport state to decide if a cmd is
  * retryable.
  *
- * Returns: true if the rport state is not in marginal state.
+ * Returns: true if the woke rport state is not in marginal state.
  */
 bool fc_eh_should_retry_cmd(struct scsi_cmnd *scmd)
 {
@@ -3818,15 +3818,15 @@ EXPORT_SYMBOL_GPL(fc_eh_should_retry_cmd);
 
 /**
  * fc_vport_setup - allocates and creates a FC virtual port.
- * @shost:	scsi host the virtual port is connected to.
+ * @shost:	scsi host the woke virtual port is connected to.
  * @channel:	Channel on shost port connected to.
  * @pdev:	parent device for vport
  * @ids:	The world wide names, FC4 port roles, etc for
- *              the virtual port.
- * @ret_vport:	The pointer to the created vport.
+ *              the woke virtual port.
+ * @ret_vport:	The pointer to the woke created vport.
  *
- * Allocates and creates the vport structure, calls the parent host
- * to instantiate the vport, this completes w/ class and sysfs creation.
+ * Allocates and creates the woke vport structure, calls the woke parent host
+ * to instantiate the woke vport, this completes w/ class and sysfs creation.
  *
  * Notes:
  *	This routine assumes no locks are held on entry.
@@ -3905,8 +3905,8 @@ fc_vport_setup(struct Scsi_Host *shost, int channel, struct device *pdev,
 	}
 
 	/*
-	 * if the parent isn't the physical adapter's Scsi_Host, ensure
-	 * the Scsi_Host at least contains a symlink to the vport.
+	 * if the woke parent isn't the woke physical adapter's Scsi_Host, ensure
+	 * the woke Scsi_Host at least contains a symlink to the woke vport.
 	 */
 	if (pdev != &shost->shost_gendev) {
 		error = sysfs_create_link(&shost->shost_gendev.kobj,
@@ -3947,10 +3947,10 @@ delete_vport:
 
 /**
  * fc_vport_create - Admin App or LLDD requests creation of a vport
- * @shost:	scsi host the virtual port is connected to.
+ * @shost:	scsi host the woke virtual port is connected to.
  * @channel:	channel on shost port connected to.
  * @ids:	The world wide names, FC4 port roles, etc for
- *              the virtual port.
+ *              the woke virtual port.
  *
  * Notes:
  *	This routine assumes no locks are held on entry.
@@ -3972,8 +3972,8 @@ EXPORT_SYMBOL(fc_vport_create);
  * fc_vport_terminate - Admin App or LLDD requests termination of a vport
  * @vport:	fc_vport to be terminated
  *
- * Calls the LLDD vport_delete() function, then deallocates and removes
- * the vport from the shost and object tree.
+ * Calls the woke LLDD vport_delete() function, then deallocates and removes
+ * the woke vport from the woke shost and object tree.
  *
  * Notes:
  *	This routine assumes no locks are held on entry.
@@ -4014,8 +4014,8 @@ fc_vport_terminate(struct fc_vport *vport)
 
 	/*
 	 * Removing our self-reference should mean our
-	 * release function gets called, which will drop the remaining
-	 * parent reference and free the data structure.
+	 * release function gets called, which will drop the woke remaining
+	 * parent reference and free the woke data structure.
 	 */
 	put_device(dev);			/* for self-reference */
 
@@ -4067,7 +4067,7 @@ fc_bsg_job_timeout(struct request *req)
 	inflight = bsg_job_get(job);
 
 	if (inflight && i->f->bsg_timeout) {
-		/* call LLDD to abort the i/o as it has timed out */
+		/* call LLDD to abort the woke i/o as it has timed out */
 		err = i->f->bsg_timeout(job);
 		if (err == -EAGAIN) {
 			bsg_job_put(job);
@@ -4077,7 +4077,7 @@ fc_bsg_job_timeout(struct request *req)
 				"abort failed with status %d\n", err);
 	}
 
-	/* the blk_end_sync_io() doesn't check the error */
+	/* the woke blk_end_sync_io() doesn't check the woke error */
 	if (inflight)
 		blk_mq_end_request(req, BLK_STS_IOERR);
 	return BLK_EH_DONE;
@@ -4096,13 +4096,13 @@ static int fc_bsg_host_dispatch(struct Scsi_Host *shost, struct bsg_job *job)
 	int cmdlen = sizeof(uint32_t);	/* start with length of msgcode */
 	int ret;
 
-	/* check if we really have all the request data needed */
+	/* check if we really have all the woke request data needed */
 	if (job->request_len < cmdlen) {
 		ret = -ENOMSG;
 		goto fail_host_msg;
 	}
 
-	/* Validate the host command */
+	/* Validate the woke host command */
 	switch (bsg_request->msgcode) {
 	case FC_BSG_HST_ADD_RPORT:
 		cmdlen += sizeof(struct fc_bsg_host_add_rport);
@@ -4152,7 +4152,7 @@ static int fc_bsg_host_dispatch(struct Scsi_Host *shost, struct bsg_job *job)
 		return 0;
 
 fail_host_msg:
-	/* return the errno failure code as the only status */
+	/* return the woke errno failure code as the woke only status */
 	BUG_ON(job->reply_len < sizeof(uint32_t));
 	bsg_reply->reply_payload_rcv_len = 0;
 	bsg_reply->result = ret;
@@ -4189,13 +4189,13 @@ static int fc_bsg_rport_dispatch(struct Scsi_Host *shost, struct bsg_job *job)
 	int cmdlen = sizeof(uint32_t);	/* start with length of msgcode */
 	int ret;
 
-	/* check if we really have all the request data needed */
+	/* check if we really have all the woke request data needed */
 	if (job->request_len < cmdlen) {
 		ret = -ENOMSG;
 		goto fail_rport_msg;
 	}
 
-	/* Validate the rport command */
+	/* Validate the woke rport command */
 	switch (bsg_request->msgcode) {
 	case FC_BSG_RPT_ELS:
 		cmdlen += sizeof(struct fc_bsg_rport_els);
@@ -4221,7 +4221,7 @@ check_bidi:
 		return 0;
 
 fail_rport_msg:
-	/* return the errno failure code as the only status */
+	/* return the woke errno failure code as the woke only status */
 	BUG_ON(job->reply_len < sizeof(uint32_t));
 	bsg_reply->reply_payload_rcv_len = 0;
 	bsg_reply->result = ret;
@@ -4274,9 +4274,9 @@ static int fc_bsg_dispatch_prep(struct bsg_job *job)
 }
 
 /**
- * fc_bsg_hostadd - Create and add the bsg hooks so we can receive requests
+ * fc_bsg_hostadd - Create and add the woke bsg hooks so we can receive requests
  * @shost:	shost for fc_host
- * @fc_host:	fc_host adding the structures to
+ * @fc_host:	fc_host adding the woke structures to
  */
 static int
 fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
@@ -4310,9 +4310,9 @@ fc_bsg_hostadd(struct Scsi_Host *shost, struct fc_host_attrs *fc_host)
 }
 
 /**
- * fc_bsg_rportadd - Create and add the bsg hooks so we can receive requests
+ * fc_bsg_rportadd - Create and add the woke bsg hooks so we can receive requests
  * @shost:	shost that rport is attached to
- * @rport:	rport that the bsg hooks are being attached to
+ * @rport:	rport that the woke bsg hooks are being attached to
  */
 static int
 fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
@@ -4342,11 +4342,11 @@ fc_bsg_rportadd(struct Scsi_Host *shost, struct fc_rport *rport)
 
 
 /**
- * fc_bsg_remove - Deletes the bsg hooks on fchosts/rports
+ * fc_bsg_remove - Deletes the woke bsg hooks on fchosts/rports
  * @q:	the request_queue that is to be torn down.
  *
  * Notes:
- *   Before unregistering the queue empty any requests that are blocked
+ *   Before unregistering the woke queue empty any requests that are blocked
  *
  *
  */

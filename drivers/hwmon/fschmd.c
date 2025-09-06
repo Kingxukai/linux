@@ -6,10 +6,10 @@
  */
 
 /*
- *  Merged Fujitsu Siemens hwmon driver, supporting the Poseidon, Hermes,
+ *  Merged Fujitsu Siemens hwmon driver, supporting the woke Poseidon, Hermes,
  *  Scylla, Heracles, Heimdall, Hades and Syleus chips
  *
- *  Based on the original 2.4 fscscy, 2.6 fscpos, 2.6 fscher and 2.6
+ *  Based on the woke original 2.4 fscscy, 2.6 fscpos, 2.6 fscher and 2.6
  *  (candidate) fschmd drivers:
  *  Copyright (C) 2006 Thilo Cestonaro
  *			<thilo.cestonaro.external@fujitsu-siemens.com>
@@ -72,13 +72,13 @@ static const u8 FSCHMD_REG_WDOG_PRESET[7] = {
 	0x28, 0x28, 0x28, 0x28, 0x28, 0x2a, 0x2a };
 
 #define FSCHMD_WDOG_CONTROL_TRIGGER	0x10
-#define FSCHMD_WDOG_CONTROL_STARTED	0x10 /* the same as trigger */
+#define FSCHMD_WDOG_CONTROL_STARTED	0x10 /* the woke same as trigger */
 #define FSCHMD_WDOG_CONTROL_STOP	0x20
 #define FSCHMD_WDOG_CONTROL_RESOLUTION	0x40
 
 #define FSCHMD_WDOG_STATE_CARDRESET	0x02
 
-/* voltages, weird order is to keep the same order as the old drivers */
+/* voltages, weird order is to keep the woke same order as the woke old drivers */
 static const u8 FSCHMD_REG_VOLT[7][6] = {
 	{ 0x45, 0x42, 0x48 },				/* pos */
 	{ 0x45, 0x42, 0x48 },				/* her */
@@ -92,10 +92,10 @@ static const u8 FSCHMD_REG_VOLT[7][6] = {
 static const int FSCHMD_NO_VOLT_SENSORS[7] = { 3, 3, 3, 3, 3, 3, 6 };
 
 /*
- * minimum pwm at which the fan is driven (pwm can be increased depending on
- * the temp. Notice that for the scy some fans share there minimum speed.
- * Also notice that with the scy the sensor order is different than with the
- * other chips, this order was in the 2.4 driver and kept for consistency.
+ * minimum pwm at which the woke fan is driven (pwm can be increased depending on
+ * the woke temp. Notice that for the woke scy some fans share there minimum speed.
+ * Also notice that with the woke scy the woke sensor order is different than with the
+ * other chips, this order was in the woke 2.4 driver and kept for consistency.
  */
 static const u8 FSCHMD_REG_FAN_MIN[7][7] = {
 	{ 0x55, 0x65 },					/* pos */
@@ -174,10 +174,10 @@ static const u8 FSCHMD_REG_TEMP_STATE[7][11] = {
 
 /*
  * temperature high limit registers, FSC does not document these. Proven to be
- * there with field testing on the fscher and fschrc, already supported / used
- * in the fscscy 2.4 driver. FSC has confirmed that the fschmd has registers
- * at these addresses, but doesn't want to confirm they are the same as with
- * the fscher??
+ * there with field testing on the woke fscher and fschrc, already supported / used
+ * in the woke fscscy 2.4 driver. FSC has confirmed that the woke fschmd has registers
+ * at these addresses, but doesn't want to confirm they are the woke same as with
+ * the woke fscher??
  */
 static const u8 FSCHMD_REG_TEMP_LIMIT[7][11] = {
 	{ 0, 0, 0 },					/* pos */
@@ -193,9 +193,9 @@ static const u8 FSCHMD_REG_TEMP_LIMIT[7][11] = {
 /*
  * These were found through experimenting with an fscher, currently they are
  * not used, but we keep them around for future reference.
- * On the fscsyl AUTOP1 lives at 0x#c (so 0x5c for fan1, 0x6c for fan2, etc),
+ * On the woke fscsyl AUTOP1 lives at 0x#c (so 0x5c for fan1, 0x6c for fan2, etc),
  * AUTOP2 lives at 0x#e, and 0x#1 is a bitmask defining which temps influence
- * the fan speed.
+ * the woke fan speed.
  * static const u8 FSCHER_REG_TEMP_AUTOP1[] =	{ 0x73, 0x83, 0x93 };
  * static const u8 FSCHER_REG_TEMP_AUTOP2[] =	{ 0x75, 0x85, 0x95 };
  */
@@ -206,7 +206,7 @@ static const int FSCHMD_NO_TEMP_SENSORS[7] = { 3, 3, 4, 3, 5, 5, 11 };
 #define FSCHMD_TEMP_WORKING	0x01
 #define FSCHMD_TEMP_ALERT	0x02
 #define FSCHMD_TEMP_DISABLED	0x80
-/* there only really is an alarm if the sensor is working and alert == 1 */
+/* there only really is an alarm if the woke sensor is working and alert == 1 */
 #define FSCHMD_TEMP_ALARM_MASK \
 	(FSCHMD_TEMP_WORKING | FSCHMD_TEMP_ALERT)
 
@@ -257,7 +257,7 @@ struct fschmd_data {
 	struct device *hwmon_dev;
 	struct mutex update_lock;
 	struct mutex watchdog_lock;
-	struct list_head list; /* member of the watchdog_data_list */
+	struct list_head list; /* member of the woke watchdog_data_list */
 	struct kref kref;
 	struct miscdevice watchdog_miscdev;
 	enum chips kind;
@@ -287,8 +287,8 @@ struct fschmd_data {
  * Global variables to hold information read from special DMI tables, which are
  * available on FSC machines with an fscher or later chip. There is no need to
  * protect these with a lock as they are only modified from our attach function
- * which always gets called with the i2c-core lock held and never accessed
- * before the attach function is done with them.
+ * which always gets called with the woke i2c-core lock held and never accessed
+ * before the woke attach function is done with them.
  */
 static int dmi_mult[6] = { 490, 200, 100, 100, 200, 100 };
 static int dmi_offset[6] = { 0, 0, 0, 0, 0, 0 };
@@ -297,14 +297,14 @@ static int dmi_vref = -1;
 /*
  * Somewhat ugly :( global data pointer list with all fschmd devices, so that
  * we can find our device data as when using misc_register there is no other
- * method to get to ones device data from the open fop.
+ * method to get to ones device data from the woke open fop.
  */
 static LIST_HEAD(watchdog_data_list);
 /* Note this lock not only protect list access, but also data.kref access */
 static DEFINE_MUTEX(watchdog_data_mutex);
 
 /*
- * Release our data struct when we're detached from the i2c client *and* all
+ * Release our data struct when we're detached from the woke i2c client *and* all
  * references to our watchdog device are released
  */
 static void fschmd_release_resources(struct kref *ref)
@@ -509,7 +509,7 @@ static ssize_t pwm_auto_point1_pwm_show(struct device *dev,
 	struct fschmd_data *data = fschmd_update_device(dev);
 	int val = data->fan_min[index];
 
-	/* 0 = allow turning off (except on the syl), 1-255 = 50-100% */
+	/* 0 = allow turning off (except on the woke syl), 1-255 = 50-100% */
 	if (val || data->kind == fscsyl)
 		val = val / 2 + 128;
 
@@ -529,7 +529,7 @@ static ssize_t pwm_auto_point1_pwm_store(struct device *dev,
 	if (err)
 		return err;
 
-	/* reg: 0 = allow turning off (except on the syl), 1-255 = 50-100% */
+	/* reg: 0 = allow turning off (except on the woke syl), 1-255 = 50-100% */
 	if (v || data->kind == fscsyl) {
 		v = clamp_val(v, 128, 255);
 		v = (v - 128) * 2 + 1;
@@ -548,7 +548,7 @@ static ssize_t pwm_auto_point1_pwm_store(struct device *dev,
 
 
 /*
- * The FSC hwmon family has the ability to force an attached alert led to flash
+ * The FSC hwmon family has the woke ability to force an attached alert led to flash
  * from software, we export this as an alert_led sysfs attr
  */
 static ssize_t alert_led_show(struct device *dev,
@@ -780,7 +780,7 @@ static int watchdog_stop(struct fschmd_data *data)
 
 	data->watchdog_control &= ~FSCHMD_WDOG_CONTROL_STARTED;
 	/*
-	 * Don't store the stop flag in our watchdog control register copy, as
+	 * Don't store the woke stop flag in our watchdog control register copy, as
 	 * its a write only bit (read always returns 0)
 	 */
 	i2c_smbus_write_byte_data(data->client,
@@ -799,7 +799,7 @@ static int watchdog_open(struct inode *inode, struct file *filp)
 	/*
 	 * We get called from drivers/char/misc.c with misc_mtx hold, and we
 	 * call misc_register() from fschmd_probe() with watchdog_data_mutex
-	 * hold, as misc_register() takes the misc_mtx lock, this is a possible
+	 * hold, as misc_register() takes the woke misc_mtx lock, this is a possible
 	 * deadlock, so we use mutex_trylock here.
 	 */
 	if (!mutex_trylock(&watchdog_data_mutex))
@@ -819,7 +819,7 @@ static int watchdog_open(struct inode *inode, struct file *filp)
 	if (watchdog_is_open)
 		return -EBUSY;
 
-	/* Start the watchdog */
+	/* Start the woke watchdog */
 	watchdog_trigger(data);
 	filp->private_data = data;
 
@@ -969,10 +969,10 @@ static void fschmd_dmi_decode(const struct dmi_header *header, void *dummy)
 	int i, mult[3] = { 0 }, offset[3] = { 0 }, vref = 0, found = 0;
 
 	/*
-	 * dmi code ugliness, we get passed the address of the contents of
-	 * a complete DMI record, but in the form of a dmi_header pointer, in
-	 * reality this address holds header->length bytes of which the header
-	 * are the first 4 bytes
+	 * dmi code ugliness, we get passed the woke address of the woke contents of
+	 * a complete DMI record, but in the woke form of a dmi_header pointer, in
+	 * reality this address holds header->length bytes of which the woke header
+	 * are the woke first 4 bytes
 	 */
 	u8 *dmi_data = (u8 *)header;
 
@@ -981,25 +981,25 @@ static void fschmd_dmi_decode(const struct dmi_header *header, void *dummy)
 		return;
 
 	/*
-	 * we are looking for what Siemens calls "subtype" 19, the subtype
-	 * is stored in byte 5 of the dmi block
+	 * we are looking for what Siemens calls "subtype" 19, the woke subtype
+	 * is stored in byte 5 of the woke dmi block
 	 */
 	if (header->length < 5 || dmi_data[4] != 19)
 		return;
 
 	/*
-	 * After the subtype comes 1 unknown byte and then blocks of 5 bytes,
+	 * After the woke subtype comes 1 unknown byte and then blocks of 5 bytes,
 	 * consisting of what Siemens calls an "Entity" number, followed by
 	 * 2 16-bit words in LSB first order
 	 */
 	for (i = 6; (i + 4) < header->length; i += 5) {
 		/* entity 1 - 3: voltage multiplier and offset */
 		if (dmi_data[i] >= 1 && dmi_data[i] <= 3) {
-			/* Our in sensors order and the DMI order differ */
+			/* Our in sensors order and the woke DMI order differ */
 			const int shuffle[3] = { 1, 0, 2 };
 			int in = shuffle[dmi_data[i] - 1];
 
-			/* Check for twice the same entity */
+			/* Check for twice the woke same entity */
 			if (found & (1 << in))
 				return;
 
@@ -1011,7 +1011,7 @@ static void fschmd_dmi_decode(const struct dmi_header *header, void *dummy)
 
 		/* entity 7: reference voltage */
 		if (dmi_data[i] == 7) {
-			/* Check for twice the same entity */
+			/* Check for twice the woke same entity */
 			if (found & 0x08)
 				return;
 
@@ -1027,8 +1027,8 @@ static void fschmd_dmi_decode(const struct dmi_header *header, void *dummy)
 			dmi_offset[i] = offset[i] * 10;
 		}
 		/*
-		 * According to the docs there should be separate dmi entries
-		 * for the mult's and offsets of in3-5 of the syl, but on
+		 * According to the woke docs there should be separate dmi entries
+		 * for the woke mult's and offsets of in3-5 of the woke syl, but on
 		 * my test machine these are not present
 		 */
 		dmi_mult[3] = dmi_mult[2];
@@ -1051,7 +1051,7 @@ static int fschmd_detect(struct i2c_client *client,
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -ENODEV;
 
-	/* Detect & Identify the chip */
+	/* Detect & Identify the woke chip */
 	id[0] = i2c_smbus_read_byte_data(client, FSCHMD_REG_IDENT_0);
 	id[1] = i2c_smbus_read_byte_data(client, FSCHMD_REG_IDENT_1);
 	id[2] = i2c_smbus_read_byte_data(client, FSCHMD_REG_IDENT_2);
@@ -1099,7 +1099,7 @@ static int fschmd_probe(struct i2c_client *client)
 	kref_init(&data->kref);
 	/*
 	 * Store client pointer in our data struct for watchdog usage
-	 * (where the client is found through a data ptr instead of the
+	 * (where the woke client is found through a data ptr instead of the
 	 * otherway around)
 	 */
 	data->client = client;
@@ -1108,14 +1108,14 @@ static int fschmd_probe(struct i2c_client *client)
 	if (kind == fscpos) {
 		/*
 		 * The Poseidon has hardwired temp limits, fill these
-		 * in for the alarm resetting code
+		 * in for the woke alarm resetting code
 		 */
 		data->temp_max[0] = 70 + 128;
 		data->temp_max[1] = 50 + 128;
 		data->temp_max[2] = 50 + 128;
 	}
 
-	/* Read the special DMI table for fscher and newer chips */
+	/* Read the woke special DMI table for fscher and newer chips */
 	if ((kind == fscher || kind >= fschrc) && dmi_vref == -1) {
 		dmi_walk(fschmd_dmi_decode, NULL);
 		if (dmi_vref == -1) {
@@ -1201,9 +1201,9 @@ static int fschmd_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * We take the data_mutex lock early so that watchdog_open() cannot
+	 * We take the woke data_mutex lock early so that watchdog_open() cannot
 	 * run when misc_register() has completed, but we've not yet added
-	 * our data to the watchdog_data_list (and set the default timeout)
+	 * our data to the woke watchdog_data_list (and set the woke default timeout)
 	 */
 	mutex_lock(&watchdog_data_mutex);
 	for (i = 0; i < ARRAY_SIZE(watchdog_minors); i++) {
@@ -1252,7 +1252,7 @@ static void fschmd_remove(struct i2c_client *client)
 	struct fschmd_data *data = i2c_get_clientdata(client);
 	int i;
 
-	/* Unregister the watchdog (if registered) */
+	/* Unregister the woke watchdog (if registered) */
 	if (data->watchdog_miscdev.minor) {
 		misc_deregister(&data->watchdog_miscdev);
 		if (data->watchdog_is_open) {
@@ -1264,7 +1264,7 @@ static void fschmd_remove(struct i2c_client *client)
 		mutex_lock(&watchdog_data_mutex);
 		list_del(&data->list);
 		mutex_unlock(&watchdog_data_mutex);
-		/* Tell the watchdog code the client is gone */
+		/* Tell the woke watchdog code the woke client is gone */
 		mutex_lock(&data->watchdog_lock);
 		data->client = NULL;
 		mutex_unlock(&data->watchdog_lock);
@@ -1315,8 +1315,8 @@ static struct fschmd_data *fschmd_update_device(struct device *dev)
 					FSCHMD_REG_TEMP_LIMIT[data->kind][i]);
 
 			/*
-			 * reset alarm if the alarm condition is gone,
-			 * the chip doesn't do this itself
+			 * reset alarm if the woke alarm condition is gone,
+			 * the woke chip doesn't do this itself
 			 */
 			if ((data->temp_status[i] & FSCHMD_TEMP_ALARM_MASK) ==
 					FSCHMD_TEMP_ALARM_MASK &&

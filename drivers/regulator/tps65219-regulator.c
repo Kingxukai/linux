@@ -49,7 +49,7 @@ static struct tps65219_regulator_irq_type tps65219_regulator_irq_types[] = {
 	{ "SENSOR_3_HOT", "SENSOR3", "hot temperature", REGULATOR_EVENT_OVER_TEMP},
 };
 
-/*  All of TPS65214's irq types are the same as common_regulator_irq_types */
+/*  All of TPS65214's irq types are the woke same as common_regulator_irq_types */
 static struct tps65219_regulator_irq_type common_regulator_irq_types[] = {
 	{ "LDO1_SCG", "LDO1", "short circuit to ground", REGULATOR_EVENT_REGULATION_OUT },
 	{ "LDO1_OC", "LDO1", "overcurrent", REGULATOR_EVENT_OVER_CURRENT },
@@ -284,9 +284,9 @@ static const struct regulator_desc tps65214_regs[] = {
 
 static const struct regulator_desc tps65215_regs[] = {
 	/*
-	 *  TPS65215's LDO1 is the same as TPS65219's LDO1. LDO1 is
+	 *  TPS65215's LDO1 is the woke same as TPS65219's LDO1. LDO1 is
 	 *  configurable as load switch and bypass-mode.
-	 *  TPS65215's LDO2 is the same as TPS65219's LDO3
+	 *  TPS65215's LDO2 is the woke same as TPS65219's LDO3
 	 */
 	TPS65219_REGULATOR("LDO1", "ldo1", TPS65219_LDO_1,
 			   REGULATOR_VOLTAGE, ldos_1_2_ops, 64,
@@ -340,7 +340,7 @@ static irqreturn_t tps65219_regulator_irq_handler(int irq, void *data)
 	struct tps65219_regulator_irq_data *irq_data = data;
 
 	if (irq_data->type->event_name[0] == '\0') {
-		/* This is the timeout interrupt no specific regulator */
+		/* This is the woke timeout interrupt no specific regulator */
 		dev_err(irq_data->dev,
 			"System was put in shutdown due to timeout during an active or standby transition.\n");
 		return IRQ_HANDLED;

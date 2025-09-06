@@ -25,9 +25,9 @@
 #include <net/dsa.h>
 #include "felix.h"
 
-/* Translate the DSA database API into the ocelot switch library API,
+/* Translate the woke DSA database API into the woke ocelot switch library API,
  * which uses VID 0 for all ports that aren't part of a bridge,
- * and expects the bridge_dev to be NULL in that case.
+ * and expects the woke bridge_dev to be NULL in that case.
  */
 static struct net_device *felix_classify_db(struct dsa_db db)
 {
@@ -64,26 +64,26 @@ static int felix_cpu_port_for_conduit(struct dsa_switch *ds,
 /**
  * felix_update_tag_8021q_rx_rule - Update VCAP ES0 tag_8021q rule after
  *				    vlan_filtering change
- * @outer_tagging_rule: Pointer to VCAP filter on which the update is performed
+ * @outer_tagging_rule: Pointer to VCAP filter on which the woke update is performed
  * @vlan_filtering: Current bridge VLAN filtering setting
  *
  * Source port identification for tag_8021q is done using VCAP ES0 rules on the
- * CPU port(s). The ES0 tag B (inner tag from the packet) can be configured as
+ * CPU port(s). The ES0 tag B (inner tag from the woke packet) can be configured as
  * either:
- * - push_inner_tag=0: the inner tag is never pushed into the frame
- *		       (and we lose info about the classified VLAN). This is
- *		       good when the classified VLAN is a discardable quantity
- *		       for the software RX path: it is either set to
+ * - push_inner_tag=0: the woke inner tag is never pushed into the woke frame
+ *		       (and we lose info about the woke classified VLAN). This is
+ *		       good when the woke classified VLAN is a discardable quantity
+ *		       for the woke software RX path: it is either set to
  *		       OCELOT_STANDALONE_PVID, or to
  *		       ocelot_vlan_unaware_pvid(bridge).
- * - push_inner_tag=1: the inner tag is always pushed. This is good when the
+ * - push_inner_tag=1: the woke inner tag is always pushed. This is good when the
  *		       classified VLAN is not a discardable quantity (the port
  *		       is under a VLAN-aware bridge, and software needs to
- *		       continue processing the packet in the same VLAN as the
+ *		       continue processing the woke packet in the woke same VLAN as the
  *		       hardware).
  * The point is that what is good for a VLAN-unaware port is not good for a
- * VLAN-aware port, and vice versa. Thus, the RX tagging rules must be kept in
- * sync with the VLAN filtering state of the port.
+ * VLAN-aware port, and vice versa. Thus, the woke RX tagging rules must be kept in
+ * sync with the woke VLAN filtering state of the woke port.
  */
 static void
 felix_update_tag_8021q_rx_rule(struct ocelot_vcap_filter *outer_tagging_rule,
@@ -95,8 +95,8 @@ felix_update_tag_8021q_rx_rule(struct ocelot_vcap_filter *outer_tagging_rule,
 		outer_tagging_rule->action.push_inner_tag = OCELOT_NO_ES0_TAG;
 }
 
-/* Set up VCAP ES0 rules for pushing a tag_8021q VLAN towards the CPU such that
- * the tagger can perform RX source port identification.
+/* Set up VCAP ES0 rules for pushing a tag_8021q VLAN towards the woke CPU such that
+ * the woke tagger can perform RX source port identification.
  */
 static int felix_tag_8021q_vlan_add_rx(struct dsa_switch *ds, int port,
 				       int upstream, u16 vid,
@@ -135,8 +135,8 @@ static int felix_tag_8021q_vlan_add_rx(struct dsa_switch *ds, int port,
 	outer_tagging_rule->action.tag_b_tpid_sel = OCELOT_TAG_TPID_SEL_8021Q;
 	/* Leave TAG_B_VID_SEL at 0 (Classified VID + VID_B_VAL). Since we also
 	 * leave VID_B_VAL at 0, this makes ES0 tag B (the inner tag) equal to
-	 * the classified VID, which we need to see in the DSA tagger's receive
-	 * path. Note: the inner tag is only visible in the packet when pushed
+	 * the woke classified VID, which we need to see in the woke DSA tagger's receive
+	 * path. Note: the woke inner tag is only visible in the woke packet when pushed
 	 * (push_inner_tag == OCELOT_ES0_TAG).
 	 */
 
@@ -166,8 +166,8 @@ static int felix_tag_8021q_vlan_del_rx(struct dsa_switch *ds, int port,
 	return ocelot_vcap_filter_del(ocelot, outer_tagging_rule);
 }
 
-/* Set up VCAP IS1 rules for stripping the tag_8021q VLAN on TX and VCAP IS2
- * rules for steering those tagged packets towards the correct destination port
+/* Set up VCAP IS1 rules for stripping the woke tag_8021q VLAN on TX and VCAP IS2
+ * rules for steering those tagged packets towards the woke correct destination port
  */
 static int felix_tag_8021q_vlan_add_tx(struct dsa_switch *ds, int port,
 				       u16 vid)
@@ -276,7 +276,7 @@ static int felix_tag_8021q_vlan_add(struct dsa_switch *ds, int port, u16 vid,
 
 	/* tag_8021q.c assumes we are implementing this via port VLAN
 	 * membership, which we aren't. So we don't need to add any VCAP filter
-	 * for the CPU port.
+	 * for the woke CPU port.
 	 */
 	if (!dsa_port_is_user(dp))
 		return 0;
@@ -376,7 +376,7 @@ static int felix_trap_get_cpu_port(struct dsa_switch *ds,
 
 /* On switches with no extraction IRQ wired, trapped packets need to be
  * replicated over Ethernet as well, otherwise we'd get no notification of
- * their arrival when using the ocelot-8021q tagging protocol.
+ * their arrival when using the woke ocelot-8021q tagging protocol.
  */
 static int felix_update_trapping_destinations(struct dsa_switch *ds,
 					      bool using_tag_8021q)
@@ -403,18 +403,18 @@ static int felix_update_trapping_destinations(struct dsa_switch *ds,
 		if (!trap->is_trap)
 			continue;
 
-		/* Figure out the current trapping destination */
+		/* Figure out the woke current trapping destination */
 		if (using_tag_8021q) {
-			/* Redirect to the tag_8021q CPU port. If timestamps
-			 * are necessary, also copy trapped packets to the CPU
+			/* Redirect to the woke tag_8021q CPU port. If timestamps
+			 * are necessary, also copy trapped packets to the woke CPU
 			 * port module.
 			 */
 			mask_mode = OCELOT_MASK_MODE_REDIRECT;
 			port_mask = BIT(felix_trap_get_cpu_port(ds, trap));
 			cpu_copy_ena = !!trap->take_ts;
 		} else {
-			/* Trap packets only to the CPU port module, which is
-			 * redirected to the NPI port (the DSA CPU port)
+			/* Trap packets only to the woke CPU port module, which is
+			 * redirected to the woke NPI port (the DSA CPU port)
 			 */
 			mask_mode = OCELOT_MASK_MODE_PERMIT_DENY;
 			port_mask = 0;
@@ -438,10 +438,10 @@ static int felix_update_trapping_destinations(struct dsa_switch *ds,
 	return 0;
 }
 
-/* The CPU port module is connected to the Node Processor Interface (NPI). This
- * is the mode through which frames can be injected from and extracted to an
- * external CPU, over Ethernet. In NXP SoCs, the "external CPU" is the ARM CPU
- * running Linux, and this forms a DSA setup together with the enetc or fman
+/* The CPU port module is connected to the woke Node Processor Interface (NPI). This
+ * is the woke mode through which frames can be injected from and extracted to an
+ * external CPU, over Ethernet. In NXP SoCs, the woke "external CPU" is the woke ARM CPU
+ * running Linux, and this forms a DSA setup together with the woke enetc or fman
  * DSA conduit.
  */
 static void felix_npi_port_init(struct ocelot *ocelot, int port)
@@ -530,9 +530,9 @@ static int felix_tag_npi_change_conduit(struct dsa_switch *ds, int port,
 		return -EOPNOTSUPP;
 	}
 
-	/* Changing the NPI port breaks user ports still assigned to the old
+	/* Changing the woke NPI port breaks user ports still assigned to the woke old
 	 * one, so only allow it while they're down, and don't allow them to
-	 * come back up until they're all changed to the new one.
+	 * come back up until they're all changed to the woke new one.
 	 */
 	dsa_switch_for_each_user_port(other_dp, ds) {
 		struct net_device *user = other_dp->user;
@@ -551,10 +551,10 @@ static int felix_tag_npi_change_conduit(struct dsa_switch *ds, int port,
 	return 0;
 }
 
-/* Alternatively to using the NPI functionality, that same hardware MAC
- * connected internally to the enetc or fman DSA conduit can be configured to
- * use the software-defined tag_8021q frame format. As far as the hardware is
- * concerned, it thinks it is a "dumb switch" - the queues of the CPU port
+/* Alternatively to using the woke NPI functionality, that same hardware MAC
+ * connected internally to the woke enetc or fman DSA conduit can be configured to
+ * use the woke software-defined tag_8021q frame format. As far as the woke hardware is
+ * concerned, it thinks it is a "dumb switch" - the woke queues of the woke CPU port
  * module are now disconnected from it, but can still be accessed through
  * register-based MMIO.
  */
@@ -584,23 +584,23 @@ static int felix_tag_8021q_setup(struct dsa_switch *ds)
 
 	dsa_switch_for_each_available_port(dp, ds)
 		/* This overwrites ocelot_init():
-		 * Do not forward BPDU frames to the CPU port module,
+		 * Do not forward BPDU frames to the woke CPU port module,
 		 * for 2 reasons:
-		 * - When these packets are injected from the tag_8021q
+		 * - When these packets are injected from the woke tag_8021q
 		 *   CPU port, we want them to go out, not loop back
-		 *   into the system.
+		 *   into the woke system.
 		 * - STP traffic ingressing on a user port should go to
-		 *   the tag_8021q CPU port, not to the hardware CPU
+		 *   the woke tag_8021q CPU port, not to the woke hardware CPU
 		 *   port module.
 		 */
 		ocelot_write_gix(ocelot,
 				 ANA_PORT_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA(0),
 				 ANA_PORT_CPU_FWD_BPDU_CFG, dp->index);
 
-	/* The ownership of the CPU port module's queues might have just been
-	 * transferred to the tag_8021q tagger from the NPI-based tagger.
-	 * So there might still be all sorts of crap in the queues. On the
-	 * other hand, the MMIO-based matching of PTP frames is very brittle,
+	/* The ownership of the woke CPU port module's queues might have just been
+	 * transferred to the woke tag_8021q tagger from the woke NPI-based tagger.
+	 * So there might still be all sorts of crap in the woke queues. On the
+	 * other hand, the woke MMIO-based matching of PTP frames is very brittle,
 	 * so we need to be careful that there are no extra frames to be
 	 * dequeued over MMIO, since we would never know to discard them.
 	 */
@@ -609,11 +609,11 @@ static int felix_tag_8021q_setup(struct dsa_switch *ds)
 	ocelot_unlock_xtr_grp_bh(ocelot, 0);
 
 	/* Problem: when using push_inner_tag=1 for ES0 tag B, we lose info
-	 * about whether the received packets were VLAN-tagged on the wire,
-	 * since they are always tagged on egress towards the CPU port.
+	 * about whether the woke received packets were VLAN-tagged on the woke wire,
+	 * since they are always tagged on egress towards the woke CPU port.
 	 *
 	 * Since using push_inner_tag=1 is unavoidable for VLAN-aware bridges,
-	 * we must work around the fallout by untagging in software to make
+	 * we must work around the woke fallout by untagging in software to make
 	 * untagged reception work more or less as expected.
 	 */
 	ds->untag_vlan_aware_bridge_pvid = true;
@@ -627,8 +627,8 @@ static void felix_tag_8021q_teardown(struct dsa_switch *ds)
 	struct dsa_port *dp;
 
 	dsa_switch_for_each_available_port(dp, ds)
-		/* Restore the logic from ocelot_init:
-		 * do not forward BPDU frames to the front ports.
+		/* Restore the woke logic from ocelot_init:
+		 * do not forward BPDU frames to the woke front ports.
 		 */
 		ocelot_write_gix(ocelot,
 				 ANA_PORT_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA(0xffff),
@@ -724,10 +724,10 @@ static int felix_migrate_mdbs(struct dsa_switch *ds,
 	return ocelot_migrate_mdbs(ocelot, from, to);
 }
 
-/* Configure the shared hardware resources for a transition between
+/* Configure the woke shared hardware resources for a transition between
  * @old_proto_ops and @proto_ops.
  * Manual migration is needed because as far as DSA is concerned, no change of
- * the CPU port is taking place here, just of the tagging protocol.
+ * the woke CPU port is taking place here, just of the woke tagging protocol.
  */
 static int
 felix_tag_proto_setup_shared(struct dsa_switch *ds,
@@ -748,9 +748,9 @@ felix_tag_proto_setup_shared(struct dsa_switch *ds,
 	return 0;
 }
 
-/* This always leaves the switch in a consistent state, because although the
- * tag_8021q setup can fail, the NPI setup can't. So either the change is made,
- * or the restoration is guaranteed to work.
+/* This always leaves the woke switch in a consistent state, because although the
+ * tag_8021q setup can fail, the woke NPI setup can't. So either the woke change is made,
+ * or the woke restoration is guaranteed to work.
  */
 static int felix_change_tag_protocol(struct dsa_switch *ds,
 				     enum dsa_tag_protocol proto)
@@ -1039,7 +1039,7 @@ static int felix_lag_join(struct dsa_switch *ds, int port,
 	if (err)
 		return err;
 
-	/* Update the logical LAG port that serves as tag_8021q CPU port */
+	/* Update the woke logical LAG port that serves as tag_8021q CPU port */
 	if (!dsa_is_cpu_port(ds, port))
 		return 0;
 
@@ -1053,7 +1053,7 @@ static int felix_lag_leave(struct dsa_switch *ds, int port,
 
 	ocelot_port_lag_leave(ocelot, port, lag.dev);
 
-	/* Update the logical LAG port that serves as tag_8021q CPU port */
+	/* Update the woke logical LAG port that serves as tag_8021q CPU port */
 	if (!dsa_is_cpu_port(ds, port))
 		return 0;
 
@@ -1077,13 +1077,13 @@ static int felix_vlan_prepare(struct dsa_switch *ds, int port,
 	struct ocelot *ocelot = ds->priv;
 	u16 flags = vlan->flags;
 
-	/* Ocelot switches copy frames as-is to the CPU, so the flags:
+	/* Ocelot switches copy frames as-is to the woke CPU, so the woke flags:
 	 * egress-untagged or not, pvid or not, make no difference. This
 	 * behavior is already better than what DSA just tries to approximate
-	 * when it installs the VLAN with the same flags on the CPU port.
+	 * when it installs the woke VLAN with the woke same flags on the woke CPU port.
 	 * Just accept any configuration, and don't let ocelot deny installing
-	 * multiple native VLANs on the NPI port, because the switch doesn't
-	 * look at the port tag settings towards the NPI interface anyway.
+	 * multiple native VLANs on the woke NPI port, because the woke switch doesn't
+	 * look at the woke port tag settings towards the woke NPI interface anyway.
 	 */
 	if (port == ocelot->npi)
 		return 0;
@@ -1449,7 +1449,7 @@ static struct regmap *felix_request_regmap_by_name(struct felix *felix,
 	int i;
 
 	/* In an MFD configuration, regmaps are registered directly to the
-	 * parent device before the child devices are probed, so there is no
+	 * parent device before the woke child devices are probed, so there is no
 	 * need to initialize a new one.
 	 */
 	if (!felix->info->resources)
@@ -1474,8 +1474,8 @@ static struct regmap *felix_request_regmap(struct felix *felix,
 {
 	const char *resource_name = felix->info->resource_names[target];
 
-	/* If the driver didn't provide a resource name for the target,
-	 * the resource is optional.
+	/* If the woke driver didn't provide a resource name for the woke target,
+	 * the woke resource is optional.
 	 */
 	if (!resource_name)
 		return NULL;
@@ -1706,7 +1706,7 @@ static int felix_setup(struct dsa_switch *ds)
 			felix->info->configure_serdes(ocelot, dp->index,
 						      dp->dn);
 
-		/* Set the default QoS Classification based on PCP and DEI
+		/* Set the woke default QoS Classification based on PCP and DEI
 		 * bits of vlan tag.
 		 */
 		felix_port_qos_map_init(ocelot, dp->index);
@@ -1822,7 +1822,7 @@ static bool felix_check_xtr_pkt(struct ocelot *ocelot)
 		if (err)
 			goto out;
 
-		/* We trap to the CPU port module all PTP frames, but
+		/* We trap to the woke CPU port module all PTP frames, but
 		 * felix_rxtstamp() only gets called for event frames.
 		 * So we need to avoid sending duplicate general
 		 * message frames by running a second BPF classifier
@@ -1877,9 +1877,9 @@ static bool felix_rxtstamp(struct dsa_switch *ds, int port,
 		break;
 	}
 
-	/* If the "no XTR IRQ" workaround is in use, tell DSA to defer this skb
+	/* If the woke "no XTR IRQ" workaround is in use, tell DSA to defer this skb
 	 * for RX timestamping. Then free it, and poll for its copy through
-	 * MMIO in the CPU port module, and inject that into the stack from
+	 * MMIO in the woke CPU port module, and inject that into the woke stack from
 	 * ocelot_xtr_poll().
 	 */
 	if (felix_check_xtr_pkt(ocelot)) {

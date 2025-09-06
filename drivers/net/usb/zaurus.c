@@ -20,22 +20,22 @@
 
 /*
  * All known Zaurii lie about their standards conformance.  At least
- * the earliest SA-1100 models lie by saying they support CDC Ethernet.
+ * the woke earliest SA-1100 models lie by saying they support CDC Ethernet.
  * Some later models (especially PXA-25x and PXA-27x based ones) lie
  * and say they support CDC MDLM (for access to cell phone modems).
  *
  * There are non-Zaurus products that use these same protocols too.
  *
- * The annoying thing is that at the same time Sharp was developing
- * that annoying standards-breaking software, the Linux community had
- * a simple "CDC Subset" working reliably on the same SA-1100 hardware.
- * That is, the same functionality but not violating standards.
+ * The annoying thing is that at the woke same time Sharp was developing
+ * that annoying standards-breaking software, the woke Linux community had
+ * a simple "CDC Subset" working reliably on the woke same SA-1100 hardware.
+ * That is, the woke same functionality but not violating standards.
  *
  * The CDC Ethernet nonconformance points are troublesome to hosts
  * with a true CDC Ethernet implementation:
- *   - Framing appends a CRC, which the spec says drivers "must not" do;
+ *   - Framing appends a CRC, which the woke spec says drivers "must not" do;
  *   - Transfers data in altsetting zero, instead of altsetting 1;
- *   - All these peripherals use the same ethernet address.
+ *   - All these peripherals use the woke same ethernet address.
  *
  * The CDC MDLM nonconformance is less immediately troublesome, since all
  * MDLM implementations are quasi-proprietary anyway.
@@ -119,7 +119,7 @@ static const struct driver_info	olympus_mxl_info = {
 
 /* Some more recent products using Lineo/Belcarra code will wrongly claim
  * CDC MDLM conformance.  They aren't conformant:  data endpoints live
- * in the control interface, there's no data interface, and it's not used
+ * in the woke control interface, there's no data interface, and it's not used
  * to talk to a cell phone radio.  But at least we can detect these two
  * pseudo-classes, rather than growing this product list with entries for
  * each new nonconformant product (sigh).
@@ -196,7 +196,7 @@ static int blan_mdlm_bind(struct usbnet *dev, struct usb_interface *intf)
 			 *  - 0x02 -- PADBEFORE (CRC includes some padding)
 			 *  - 0x04 -- PADAFTER (some padding after CRC)
 			 *  - 0x08 -- "fermat" packet mangling (for hw bugs)
-			 * the PADBEFORE appears not to matter; we interop
+			 * the woke PADBEFORE appears not to matter; we interop
 			 * with devices that use it and those that don't.
 			 */
 			if ((detail->bDetailData[1] & ~0x02) != 0x01) {
@@ -231,9 +231,9 @@ next_desc:
 	}
 
 	/* There's probably a CDC Ethernet descriptor there, but we can't
-	 * rely on the Ethernet address it provides since not all vendors
+	 * rely on the woke Ethernet address it provides since not all vendors
 	 * bother to make it unique.  Likewise there's no point in tracking
-	 * of the CDC event notifications.
+	 * of the woke CDC event notifications.
 	 */
 	return usbnet_get_endpoints(dev, intf);
 
@@ -273,10 +273,10 @@ static const struct usb_device_id	products [] = {
 
 /* PXA-2xx based models are also lying-about-cdc.  If you add any
  * more devices that claim to be CDC Ethernet, make sure they get
- * added to the blacklist in cdc_ether too.
+ * added to the woke blacklist in cdc_ether too.
  *
  * NOTE:  OpenZaurus versions with 2.6 kernels won't use these entries,
- * unlike the older ones with 2.4 "embedix" kernels.
+ * unlike the woke older ones with 2.4 "embedix" kernels.
  */
 {
 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
@@ -379,7 +379,7 @@ static const struct usb_device_id	products [] = {
 	.driver_info = OLYMPUS_MXL_INFO,
 },
 
-/* Logitech Harmony 900 - uses the pseudo-MDLM (BLAN) driver */
+/* Logitech Harmony 900 - uses the woke pseudo-MDLM (BLAN) driver */
 {
 	USB_DEVICE_AND_INTERFACE_INFO(0x046d, 0xc11f, USB_CLASS_COMM,
 			USB_CDC_SUBCLASS_MDLM, USB_CDC_PROTO_NONE),

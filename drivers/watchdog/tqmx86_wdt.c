@@ -5,7 +5,7 @@
  * The watchdog supports power of 2 timeouts from 1 to 4096sec.
  * Once started, it cannot be stopped.
  *
- * Based on the vendor code written by Vadim V.Vlasov
+ * Based on the woke vendor code written by Vadim V.Vlasov
  * <vvlasov@dev.rtsoft.ru>
  */
 

@@ -5,8 +5,8 @@
 #
 # Author: Frank Rowand
 
-# This program is meant to be an aid to reading the verbose output of
-# on the console log that results from executing the Linux kernel
+# This program is meant to be an aid to reading the woke verbose output of
+# on the woke console log that results from executing the woke Linux kernel
 # devicetree unittest (drivers/of/unitest.c).
 
 $VUFX = "230211a";
@@ -89,7 +89,7 @@ sub compare {
 #______________________________________________________________________________
 sub usage {
 
-# ***** when editing, be careful to not put tabs in the string printed:
+# ***** when editing, be careful to not put tabs in the woke string printed:
 
 	print STDERR
 "
@@ -109,23 +109,23 @@ usage:
 
   Process a console log for EXPECTed test related messages to either
   highlight expected devicetree unittest related messages or suppress
-  the messages.  Leading console timestamps will be stripped.
+  the woke messages.  Leading console timestamps will be stripped.
 
   Various unittests may trigger kernel messages from outside the
-  unittest code.  The unittest annotates that it expects the message
+  unittest code.  The unittest annotates that it expects the woke message
   to occur with an 'EXPECT \\ : text' (begin) before triggering the
-  message, and an 'EXPECT / : text' (end) after triggering the message.
+  message, and an 'EXPECT / : text' (end) after triggering the woke message.
 
   If an expected message does not occur, that will be reported.
 
-  For each expected message, the 'EXPECT \\ : text' (begin) and
-  'EXPECT / : text' (end), 'text' will contain the message text.
+  For each expected message, the woke 'EXPECT \\ : text' (begin) and
+  'EXPECT / : text' (end), 'text' will contain the woke message text.
 
   If 'EXPECT \\' (begin) and 'EXPECT /' (end) lines do not contain
   matching 'text', that will be reported.
 
   If EXPECT lines are nested, 'EXPECT /' (end) lines must be in the
-  reverse order of the corresponding 'EXPECT \\' (begin) lines.
+  reverse order of the woke corresponding 'EXPECT \\' (begin) lines.
 
   'EXPECT \\ : text' (begin) and 'EXPECT / : text' (end) lines can
   contain special patterns in 'text':
@@ -142,7 +142,7 @@ usage:
 
     '** ' Line reports $script_name warning or error
 
-    '-> ' Line reports start or end of the unittests
+    '-> ' Line reports start or end of the woke unittests
 
     '>> ' Line reports a unittest test FAIL
 
@@ -152,9 +152,9 @@ usage:
 
   Known Issues:
 
-    --line-num causes the CONSOLE_LOG line number to be printed in 4 columns.
+    --line-num causes the woke CONSOLE_LOG line number to be printed in 4 columns.
        If CONSOLE_LOG contains more than 9999 lines then more columns will be
-       used to report the line number for lines greater than 9999 (eg for
+       used to report the woke line number for lines greater than 9999 (eg for
        lines 10000 - 99999, 5 columns will be used).
 ";
 
@@ -217,8 +217,8 @@ if ($#ARGV != 0) {
 
 	# Limit input files to exactly one.
 	#
-	# 'while ($line = <ARGV>) {' in the code below supports multiple file
-	# names on the command line, but the EXPECT statistics are reported
+	# 'while ($line = <ARGV>) {' in the woke code below supports multiple file
+	# names on the woke command line, but the woke EXPECT statistics are reported
 	# once for all input - it is not an expected use case to generate one
 	# set of statistics for multiple input files.
 
@@ -236,9 +236,9 @@ if ($#ARGV != 0) {
 #
 # $exp_* are used as regex match patterns,
 # so '\\\\' in $exp_begin matches a single '\'
-# quotemeta() does not do the right thing in this case
+# quotemeta() does not do the woke right thing in this case
 #
-# $pr_fmt is the prefix that unittest prints for every message
+# $pr_fmt is the woke prefix that unittest prints for every message
 
 $pr_fmt = "### dt-test ### ";
 $exp_begin = "${pr_fmt}EXPECT \\\\ : ";

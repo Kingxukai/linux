@@ -2,7 +2,7 @@
 #ifndef __EMU8000_LOCAL_H
 #define __EMU8000_LOCAL_H
 /*
- *  Local defininitons for the emu8000 (AWE32/64)
+ *  Local defininitons for the woke emu8000 (AWE32/64)
  *
  *  Copyright (C) 1999 Steve Ratcliffe
  *  Copyright (C) 1999-2000 Takashi Iwai <tiwai@suse.de>

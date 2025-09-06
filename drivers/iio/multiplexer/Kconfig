@@ -2,7 +2,7 @@
 #
 # Multiplexer drivers
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 menu "Multiplexers"
 
@@ -10,7 +10,7 @@ config IIO_MUX
 	tristate "IIO multiplexer driver"
 	select MULTIPLEXER
 	help
-	  Say yes here to build support for the IIO multiplexer.
+	  Say yes here to build support for the woke IIO multiplexer.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called iio-mux.

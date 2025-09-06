@@ -108,9 +108,9 @@
 };
 
 /*
- * Enable port A as device (via the virtual hub) and port B as
- * host by default on the eval board. This can be easily changed
- * by replacing the override below with &ehci0 { ... } to enable
+ * Enable port A as device (via the woke virtual hub) and port B as
+ * host by default on the woke eval board. This can be easily changed
+ * by replacing the woke override below with &ehci0 { ... } to enable
  * host on both ports.
  */
 &vhub {

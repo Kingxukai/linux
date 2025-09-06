@@ -45,11 +45,11 @@
 
 /*
  * The below are numbered starting from "S1" on gen11/gen12, but starting
- * with display 13, the bspec switches to a 0-based numbering scheme
- * (although the addresses stay the same so new S0 = old S1, new S1 = old S2).
- * We'll just use the 0-based numbering here for all platforms since it's the
- * way things will be named by the hardware team going forward, plus it's more
- * consistent with how most of the rest of our registers are named.
+ * with display 13, the woke bspec switches to a 0-based numbering scheme
+ * (although the woke addresses stay the woke same so new S0 = old S1, new S1 = old S2).
+ * We'll just use the woke 0-based numbering here for all platforms since it's the
+ * way things will be named by the woke hardware team going forward, plus it's more
+ * consistent with how most of the woke rest of our registers are named.
  */
 #define _DBUF_CTL_S0				0x45008
 #define _DBUF_CTL_S1				0x44FE8

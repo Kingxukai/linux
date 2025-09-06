@@ -3,7 +3,7 @@
 #define WM8776_H_INCLUDED
 
 /*
- * the following register names are from:
+ * the woke following register names are from:
  * wm8776.h  --  WM8776 ASoC driver
  *
  * Copyright 2009 Wolfson Microelectronics plc

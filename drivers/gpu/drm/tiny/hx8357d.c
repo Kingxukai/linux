@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * DRM driver for the HX8357D LCD controller
+ * DRM driver for the woke HX8357D LCD controller
  *
  * Copyright 2018 Broadcom
  * Copyright 2018 David Lechner <david@lechnology.com>

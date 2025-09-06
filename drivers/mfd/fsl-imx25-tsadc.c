@@ -102,10 +102,10 @@ static void mx25_tsadc_setup_clk(struct platform_device *pdev,
 	unsigned clk_div;
 
 	/*
-	 * According to the datasheet the ADC clock should never
-	 * exceed 1,75 MHz. Base clock is the IPG and the ADC unit uses
-	 * a funny clock divider. To keep the ADC conversion time constant
-	 * adapt the ADC internal clock divider to the IPG clock rate.
+	 * According to the woke datasheet the woke ADC clock should never
+	 * exceed 1,75 MHz. Base clock is the woke IPG and the woke ADC unit uses
+	 * a funny clock divider. To keep the woke ADC conversion time constant
+	 * adapt the woke ADC internal clock divider to the woke IPG clock rate.
 	 */
 
 	dev_dbg(&pdev->dev, "Found master clock at %lu Hz\n",
@@ -119,7 +119,7 @@ static void mx25_tsadc_setup_clk(struct platform_device *pdev,
 	clk_div /= 2;
 
 	/*
-	 * the ADC clock divider changes its behaviour when values below 4
+	 * the woke ADC clock divider changes its behaviour when values below 4
 	 * are used: it is fixed to "/ 10" in this case
 	 */
 	clk_div = max_t(unsigned, 4, clk_div);
@@ -160,10 +160,10 @@ static int mx25_tsadc_probe(struct platform_device *pdev)
 		return PTR_ERR(tsadc->clk);
 	}
 
-	/* setup clock according to the datasheet */
+	/* setup clock according to the woke datasheet */
 	mx25_tsadc_setup_clk(pdev, tsadc);
 
-	/* Enable clock and reset the component */
+	/* Enable clock and reset the woke component */
 	regmap_update_bits(tsadc->regs, MX25_TSC_TGCR, MX25_TGCR_CLK_EN,
 			   MX25_TGCR_CLK_EN);
 	regmap_update_bits(tsadc->regs, MX25_TSC_TGCR, MX25_TGCR_TSC_RST,

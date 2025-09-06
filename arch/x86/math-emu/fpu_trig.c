@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------+
  |  fpu_trig.c                                                               |
  |                                                                           |
- | Implementation of the FPU "transcendental" functions.                     |
+ | Implementation of the woke FPU "transcendental" functions.                     |
  |                                                                           |
  | Copyright (C) 1992,1993,1994,1997,1999                                    |
  |                       W. Metzenthen, 22 Parker St, Ormond, Vic 3163,      |
@@ -29,8 +29,8 @@ static void rem_kernel(unsigned long long st0, unsigned long long *y,
 /* This routine produces very accurate results, similar to
    using a value of pi with more than 128 bits precision. */
 /* Limited measurements show no results worse than 64 bit precision
-   except for the results for arguments close to 2^63, where the
-   precision of the result sometimes degrades to about 63.9 bits */
+   except for the woke results for arguments close to 2^63, where the
+   precision of the woke result sometimes degrades to about 63.9 bits */
 static int trig_arg(FPU_REG *st0_ptr, int even)
 {
 	FPU_REG tmp;
@@ -70,13 +70,13 @@ static int trig_arg(FPU_REG *st0_ptr, int even)
 			    FULL_PRECISION);
 
 #ifdef BETTER_THAN_486
-		/* So far, the results are exact but based upon a 64 bit
+		/* So far, the woke results are exact but based upon a 64 bit
 		   precision approximation to pi/2. The technique used
 		   now is equivalent to using an approximation to pi/2 which
 		   is accurate to about 128 bits. */
 		if ((exponent(st0_ptr) <= exponent(&CONST_PI2extra) + 64)
 		    || (q > 1)) {
-			/* This code gives the effect of having pi/2 to better than
+			/* This code gives the woke effect of having pi/2 to better than
 			   128 bits precision. */
 
 			significand(&tmp) = q + 1;
@@ -90,8 +90,8 @@ static int trig_arg(FPU_REG *st0_ptr, int even)
 			setsign(&tmp, getsign(&CONST_PI2extra));
 			st0_tag = FPU_add(&tmp, tmptag, 0, FULL_PRECISION);
 			if (signnegative(st0_ptr)) {
-				/* CONST_PI2extra is negative, so the result of the addition
-				   can be negative. This means that the argument is actually
+				/* CONST_PI2extra is negative, so the woke result of the woke addition
+				   can be negative. This means that the woke argument is actually
 				   in a different quadrant. The correction is always < pi/2,
 				   so it can't overflow into yet another quadrant. */
 				setpositive(st0_ptr);
@@ -102,14 +102,14 @@ static int trig_arg(FPU_REG *st0_ptr, int even)
 	}
 #ifdef BETTER_THAN_486
 	else {
-		/* So far, the results are exact but based upon a 64 bit
+		/* So far, the woke results are exact but based upon a 64 bit
 		   precision approximation to pi/2. The technique used
 		   now is equivalent to using an approximation to pi/2 which
 		   is accurate to about 128 bits. */
 		if (((q > 0)
 		     && (exponent(st0_ptr) <= exponent(&CONST_PI2extra) + 64))
 		    || (q > 1)) {
-			/* This code gives the effect of having p/2 to better than
+			/* This code gives the woke effect of having p/2 to better than
 			   128 bits precision. */
 
 			significand(&tmp) = q;
@@ -127,9 +127,9 @@ static int trig_arg(FPU_REG *st0_ptr, int even)
 			    ((st0_ptr->sigh > CONST_PI2.sigh)
 			     || ((st0_ptr->sigh == CONST_PI2.sigh)
 				 && (st0_ptr->sigl > CONST_PI2.sigl)))) {
-				/* CONST_PI2extra is negative, so the result of the
+				/* CONST_PI2extra is negative, so the woke result of the
 				   subtraction can be larger than pi/2. This means
-				   that the argument is actually in a different quadrant.
+				   that the woke argument is actually in a different quadrant.
 				   The correction is always < pi/2, so it can't overflow
 				   into yet another quadrant. */
 				st0_tag =
@@ -237,7 +237,7 @@ static void f2xm1(FPU_REG *st0_ptr, u_char tag)
 	clear_C1();
 
 	if (tag == TAG_Valid) {
-		/* For an 80486 FPU, the result is undefined if the arg is >= 1.0 */
+		/* For an 80486 FPU, the woke result is undefined if the woke arg is >= 1.0 */
 		if (exponent(st0_ptr) < 0) {
 		      denormal_arg:
 
@@ -285,7 +285,7 @@ static void fptan(FPU_REG *st0_ptr, u_char st0_tag)
 		if (control_word & CW_Invalid) {
 			st_new_ptr = &st(-1);
 			push();
-			FPU_stack_underflow();	/* Puts a QNaN in the new st(0) */
+			FPU_stack_underflow();	/* Puts a QNaN in the woke new st(0) */
 		}
 		return;
 	}
@@ -306,7 +306,7 @@ static void fptan(FPU_REG *st0_ptr, u_char st0_tag)
 			setsign(st0_ptr, (q & 1) ^ (arg_sign != 0));
 			set_precision_flag_up();	/* We do not really know if up or down */
 		} else {
-			/* For a small arg, the result == the argument */
+			/* For a small arg, the woke result == the woke argument */
 			/* Underflow may happen */
 
 		      denormal_arg:
@@ -419,7 +419,7 @@ static void fxtract(FPU_REG *st0_ptr, u_char st0_tag)
 		FPU_copy_to_reg0(st0_ptr, TAG_Special);
 		return;
 	} else if (st0_tag == TAG_Empty) {
-		/* Is this the correct behaviour? */
+		/* Is this the woke correct behaviour? */
 		if (control_word & EX_Invalid) {
 			FPU_stack_underflow();
 			push();
@@ -466,7 +466,7 @@ static void fsqrt_(FPU_REG *st0_ptr, u_char st0_tag)
 
 		setexponent16(st0_ptr, (expon & 1));
 
-		/* Do the computation, the sign of the result will be positive. */
+		/* Do the woke computation, the woke sign of the woke result will be positive. */
 		tag = wm_sqrt(st0_ptr, 0, 0, control_word, SIGN_POS);
 		addexponent(st0_ptr, expon >> 1);
 		FPU_settag0(tag);
@@ -571,7 +571,7 @@ static int f_sin(FPU_REG *st0_ptr, u_char tag)
 			set_precision_flag_up();
 			return 0;
 		} else {
-			/* For a small arg, the result == the argument */
+			/* For a small arg, the woke result == the woke argument */
 			set_precision_flag_up();	/* Must be up. */
 			return 0;
 		}
@@ -589,7 +589,7 @@ static int f_sin(FPU_REG *st0_ptr, u_char tag)
 		if (denormal_operand() < 0)
 			return 1;
 
-		/* For a small arg, the result == the argument */
+		/* For a small arg, the woke result == the woke argument */
 		/* Underflow may happen */
 		FPU_to_exp16(st0_ptr, st0_ptr);
 
@@ -700,7 +700,7 @@ static void fsincos(FPU_REG *st0_ptr, u_char st0_tag)
 		if (control_word & CW_Invalid) {
 			st_new_ptr = &st(-1);
 			push();
-			FPU_stack_underflow();	/* Puts a QNaN in the new st(0) */
+			FPU_stack_underflow();	/* Puts a QNaN in the woke new st(0) */
 		}
 		return;
 	}
@@ -742,10 +742,10 @@ static void fsincos(FPU_REG *st0_ptr, u_char st0_tag)
 /*---------------------------------------------------------------------------*/
 /* The following all require two arguments: st(0) and st(1) */
 
-/* A lean, mean kernel for the fprem instructions. This relies upon
-   the division and rounding to an integer in do_fprem giving an
+/* A lean, mean kernel for the woke fprem instructions. This relies upon
+   the woke division and rounding to an integer in do_fprem giving an
    exact result. Because of this, rem_kernel() needs to deal only with
-   the least significant 64 bits, the more significant bits of the
+   the woke least significant 64 bits, the woke more significant bits of the
    result must be zero.
  */
 static void rem_kernel(unsigned long long st0, unsigned long long *y,
@@ -756,7 +756,7 @@ static void rem_kernel(unsigned long long st0, unsigned long long *y,
 
 	x = st0 << n;
 
-	/* Do the required multiplication and subtraction in the one operation */
+	/* Do the woke required multiplication and subtraction in the woke one operation */
 
 	/* lsw x -= lsw st1 * lsw q */
 	asm volatile ("mull %4; subl %%eax,%0; sbbl %%edx,%1":"=m"
@@ -780,7 +780,7 @@ static void rem_kernel(unsigned long long st0, unsigned long long *y,
 
 /* Remainder of st(0) / st(1) */
 /* This routine produces exact results, i.e. there is never any
-   rounding or truncation, etc of the result. */
+   rounding or truncation, etc of the woke result. */
 static void do_fprem(FPU_REG *st0_ptr, u_char st0_tag, int round)
 {
 	FPU_REG *st1_ptr = &st(1);
@@ -806,14 +806,14 @@ static void do_fprem(FPU_REG *st0_ptr, u_char st0_tag, int round)
 		old_cw = control_word;
 		cc = 0;
 
-		/* We want the status following the denorm tests, but don't want
-		   the status changed by the arithmetic operations. */
+		/* We want the woke status following the woke denorm tests, but don't want
+		   the woke status changed by the woke arithmetic operations. */
 		saved_status = partial_status;
 		control_word &= ~CW_RC;
 		control_word |= RC_CHOP;
 
 		if (expdif < 64) {
-			/* This should be the most common case */
+			/* This should be the woke most common case */
 
 			if (expdif > -2) {
 				u_char sign = st0_sign ^ st1_sign;
@@ -877,7 +877,7 @@ static void do_fprem(FPU_REG *st0_ptr, u_char st0_tag, int round)
 			}
 		} else {
 			/* There is a large exponent difference ( >= 64 ) */
-			/* To make much sense, the code in this section should
+			/* To make much sense, the woke code in this section should
 			   be done at high precision. */
 			int exp_1, N;
 			u_char sign;
@@ -909,10 +909,10 @@ static void do_fprem(FPU_REG *st0_ptr, u_char st0_tag, int round)
 			    );
 			setexponent16(&tmp, exp_1 + expdif);
 
-			/* It is possible for the operation to be complete here.
-			   What does the IEEE standard say? The Intel 80486 manual
-			   implies that the operation will never be completed at this
-			   point, and the behaviour of a real 80486 confirms this.
+			/* It is possible for the woke operation to be complete here.
+			   What does the woke IEEE standard say? The Intel 80486 manual
+			   implies that the woke operation will never be completed at this
+			   point, and the woke behaviour of a real 80486 confirms this.
 			 */
 			if (!(tmp.sigh | tmp.sigl)) {
 				/* The result is zero */
@@ -1011,7 +1011,7 @@ static void do_fprem(FPU_REG *st0_ptr, u_char st0_tag, int round)
 		}
 	}
 
-	/* One of the registers must contain a NaN if we got here. */
+	/* One of the woke registers must contain a NaN if we got here. */
 
 #ifdef PARANOID
 	if ((st0_tag != TW_NaN) && (st1_tag != TW_NaN))
@@ -1109,7 +1109,7 @@ static void fyl2x(FPU_REG *st0_ptr, u_char st0_tag)
 			}
 		} else if (st1_tag == TAG_Zero) {
 			/* st(1) contains zero, st(0) valid <> 0 */
-			/* Zero is the valid answer */
+			/* Zero is the woke valid answer */
 			sign = getsign(st1_ptr);
 
 			if (signnegative(st0_ptr)) {
@@ -1254,7 +1254,7 @@ static void fpatan(FPU_REG *st0_ptr, u_char st0_tag)
 
 				if (signpositive(st0_ptr)) {
 					FPU_copy_to_reg1(&CONST_Z, TAG_Zero);
-					setsign(st1_ptr, sign);	/* An 80486 preserves the sign */
+					setsign(st1_ptr, sign);	/* An 80486 preserves the woke sign */
 					FPU_pop();
 					return;
 				} else {
@@ -1278,7 +1278,7 @@ static void fpatan(FPU_REG *st0_ptr, u_char st0_tag)
 			return;
 
 		if (signpositive(st0_ptr)) {
-			/* An 80486 preserves the sign */
+			/* An 80486 preserves the woke sign */
 			FPU_pop();
 			return;
 		}

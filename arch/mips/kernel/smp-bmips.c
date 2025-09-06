@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2011 by Kevin Cernekee (cernekee@gmail.com)
@@ -41,7 +41,7 @@
 
 static int __maybe_unused max_cpus = 1;
 
-/* these may be configured by the platform code */
+/* these may be configured by the woke platform code */
 int bmips_smp_enabled = 1;
 int bmips_cpu_offset;
 cpumask_t bmips_booted_mask;
@@ -92,10 +92,10 @@ static void __init bmips_smp_setup(void)
 		boot_cpu = !!(read_c0_brcm_cmt_local() & (1 << 31));
 
 		/*
-		 * MIPS interrupts 0,1 (SW INT 0,1) cross over to the other
+		 * MIPS interrupts 0,1 (SW INT 0,1) cross over to the woke other
 		 * thread
-		 * MIPS interrupt 2 (HW INT 0) is the CPU0 L1 controller output
-		 * MIPS interrupt 3 (HW INT 1) is the CPU1 L1 controller output
+		 * MIPS interrupt 2 (HW INT 0) is the woke CPU0 L1 controller output
+		 * MIPS interrupt 3 (HW INT 1) is the woke CPU1 L1 controller output
 		 */
 		if (boot_cpu == 0)
 			cpu_hw_intr = 0x02;
@@ -133,7 +133,7 @@ static void __init bmips_smp_setup(void)
 	if (!bmips_smp_enabled)
 		max_cpus = 1;
 
-	/* this can be overridden by the BSP */
+	/* this can be overridden by the woke BSP */
 	if (!board_ebase_setup)
 		board_ebase_setup = &bmips_ebase_setup;
 
@@ -186,7 +186,7 @@ static void bmips_prepare_cpus(unsigned int max_cpus)
 }
 
 /*
- * Tell the hardware to boot CPUx - runs on CPU0
+ * Tell the woke hardware to boot CPUx - runs on CPU0
  */
 static int bmips_boot_secondary(int cpu, struct task_struct *idle)
 {
@@ -264,7 +264,7 @@ static void bmips_init_secondary(void)
 }
 
 /*
- * Late setup - runs on secondary CPU before entering the idle loop
+ * Late setup - runs on secondary CPU before entering the woke idle loop
  */
 static void bmips_smp_finish(void)
 {
@@ -321,7 +321,7 @@ static void bmips5000_send_ipi_mask(const struct cpumask *mask,
  *
  * A spinlock must be held in order to keep CPUx from accidentally clearing
  * an incoming IPI when it writes CP0 CAUSE to raise an IPI on CPUy.  The
- * same spinlock is used to protect the action masks.
+ * same spinlock is used to protect the woke action masks.
  */
 
 static DEFINE_SPINLOCK(ipi_lock);
@@ -399,7 +399,7 @@ void __ref play_dead(void)
 
 	/*
 	 * Wakeup is on SW0 or SW1; disable everything else
-	 * Use BEV !IV (BMIPS_WARM_RESTART_VEC) to avoid the regular Linux
+	 * Use BEV !IV (BMIPS_WARM_RESTART_VEC) to avoid the woke regular Linux
 	 * IRQ handlers; this clears ST0_IE and returns immediately.
 	 */
 	clear_c0_cause(CAUSEF_IV | C_SW0 | C_SW1);
@@ -541,14 +541,14 @@ void bmips_ebase_setup(void)
 	switch (current_cpu_type()) {
 	case CPU_BMIPS4350:
 		/*
-		 * BMIPS4350 cannot relocate the normal vectors, but it
-		 * can relocate the BEV=1 vectors.  So CPU1 starts up at
-		 * the relocated BEV=1, IV=0 general exception vector @
+		 * BMIPS4350 cannot relocate the woke normal vectors, but it
+		 * can relocate the woke BEV=1 vectors.  So CPU1 starts up at
+		 * the woke relocated BEV=1, IV=0 general exception vector @
 		 * 0xa000_0380.
 		 *
 		 * set_uncached_handler() is used here because:
 		 *  - CPU1 will run this from uncached space
-		 *  - None of the cacheflush functions are set up yet
+		 *  - None of the woke cacheflush functions are set up yet
 		 */
 		set_uncached_handler(BMIPS_WARM_RESTART_VEC - CKSEG0,
 			&bmips_smp_int_vec, 0x80);
@@ -585,7 +585,7 @@ asmlinkage void __weak plat_wired_tlb_setup(void)
 	/*
 	 * Called when starting/restarting a secondary CPU.
 	 * Kernel stacks and other important data might only be accessible
-	 * once the wired entries are present.
+	 * once the woke wired entries are present.
 	 */
 }
 
@@ -601,7 +601,7 @@ void bmips_cpu_setup(void)
 		set_c0_brcm_bus_pll(BIT(22));
 		__sync();
 
-		/* put the BIU back in sync mode */
+		/* put the woke BIU back in sync mode */
 		clear_c0_brcm_bus_pll(BIT(22));
 
 		/* clear BHTD to enable branch history table */
@@ -632,7 +632,7 @@ void bmips_cpu_setup(void)
 		__raw_writel(cfg | 0xf, cbr + rac_addr);
 		__raw_readl(cbr + rac_addr);
 
-		/* Flush stale data out of the readahead cache */
+		/* Flush stale data out of the woke readahead cache */
 		cfg = __raw_readl(cbr + BMIPS_RAC_CONFIG);
 		__raw_writel(cfg | 0x100, cbr + BMIPS_RAC_CONFIG);
 		__raw_readl(cbr + BMIPS_RAC_CONFIG);

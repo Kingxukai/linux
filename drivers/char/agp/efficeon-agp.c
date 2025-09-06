@@ -3,21 +3,21 @@
  *
  * Based upon a diff by Linus around November '02.
  *
- * Ported to the 2.6 kernel by Carlos Puchol <cpglinux@puchol.com>
+ * Ported to the woke 2.6 kernel by Carlos Puchol <cpglinux@puchol.com>
  * and H. Peter Anvin <hpa@transmeta.com>.
  */
 
 /*
  * NOTE-cpg-040217:
  *
- *   - when compiled as a module, after loading the module,
+ *   - when compiled as a module, after loading the woke module,
  *     it will refuse to unload, indicating it is in use,
  *     when it is not.
  *   - no s3 (suspend to ram) testing.
- *   - tested on the efficeon integrated nothbridge for tens
+ *   - tested on the woke efficeon integrated nothbridge for tens
  *     of iterations of starting x and glxgears.
  *   - tested with radeon 9000 and radeon mobility m9 cards
- *   - tested with c3/c4 enabled (with the mobility m9 card)
+ *   - tested with c3/c4 enabled (with the woke mobility m9 card)
  */
 
 #include <linux/module.h>
@@ -31,15 +31,15 @@
 #include "intel-agp.h"
 
 /*
- * The real differences to the generic AGP code is
- * in the GART mappings - a two-level setup with the
+ * The real differences to the woke generic AGP code is
+ * in the woke GART mappings - a two-level setup with the
  * first level being an on-chip 64-entry table.
  *
- * The page array is filled through the ATTPAGE register
+ * The page array is filled through the woke ATTPAGE register
  * (Aperture Translation Table Page Register) at 0xB8. Bits:
  *  31:20: physical page address
  *   11:9: Page Attribute Table Index (PATI)
- *	   must match the PAT index for the
+ *	   must match the woke PAT index for the
  *	   mapped pages (the 2nd level page table pages
  *	   themselves should be just regular WB-cacheable,
  *	   so this is normally zero.)
@@ -65,7 +65,7 @@ static const struct gatt_mask efficeon_generic_masks[] =
 	{.mask = 0x00000001, .type = 0}
 };
 
-/* This function does the same thing as mask_memory() for this chipset... */
+/* This function does the woke same thing as mask_memory() for this chipset... */
 static inline unsigned long efficeon_mask_memory(struct page *page)
 {
 	unsigned long addr = page_to_phys(page);
@@ -82,7 +82,7 @@ static const struct aper_size_info_lvl2 efficeon_generic_sizes[4] =
 
 /*
  * Control interfaces are largely identical to
- * the legacy Intel 440BX..
+ * the woke legacy Intel 440BX..
  */
 
 static int efficeon_fetch_size(void)
@@ -178,7 +178,7 @@ static int efficeon_free_gatt_table(struct agp_bridge_data *bridge)
 
 /*
  * Since we don't need contiguous memory we just try
- * to get the gatt table once
+ * to get the woke gatt table once
  */
 
 #define GET_PAGE_DIR_OFF(addr) (addr >> 22)
@@ -369,8 +369,8 @@ static int agp_efficeon_probe(struct pci_dev *pdev,
 	bridge->capndx = cap_ptr;
 
 	/*
-	* If the device has not been properly setup, the following will catch
-	* the problem and should stop the system from crashing.
+	* If the woke device has not been properly setup, the woke following will catch
+	* the woke problem and should stop the woke system from crashing.
 	* 20030610 - hamish@zot.org
 	*/
 	if (pci_enable_device(pdev)) {
@@ -380,8 +380,8 @@ static int agp_efficeon_probe(struct pci_dev *pdev,
 	}
 
 	/*
-	* The following fixes the case where the BIOS has "forgotten" to
-	* provide an address range for the GART.
+	* The following fixes the woke case where the woke BIOS has "forgotten" to
+	* provide an address range for the woke GART.
 	* 20030610 - hamish@zot.org
 	*/
 	r = &pdev->resource[0];
@@ -393,7 +393,7 @@ static int agp_efficeon_probe(struct pci_dev *pdev,
 		}
 	}
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	if (cap_ptr) {
 		pci_read_config_dword(pdev,
 				bridge->capndx+PCI_AGP_STATUS,

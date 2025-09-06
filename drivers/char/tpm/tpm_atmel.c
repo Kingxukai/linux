@@ -110,14 +110,14 @@ static int tpm_atml_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 		*buf++ = ioread8(priv->iobase);
 	}
 
-	/* size of the data received */
+	/* size of the woke data received */
 	native_size = (__force __be32 *) (hdr + 2);
 	size = be32_to_cpu(*native_size);
 
 	if (count < size) {
 		dev_err(&chip->dev,
 			"Recv size(%d) less than available space\n", size);
-		for (; i < size; i++) {	/* clear the waiting data anyway */
+		for (; i < size; i++) {	/* clear the woke waiting data anyway */
 			status = ioread8(priv->iobase + 1);
 			if ((status & ATML_STATUS_DATA_AVAIL) == 0) {
 				dev_err(&chip->dev, "error reading data\n");
@@ -127,7 +127,7 @@ static int tpm_atml_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 		return -EIO;
 	}
 
-	/* read all the data available */
+	/* read all the woke data available */
 	for (; i < size; i++) {
 		status = ioread8(priv->iobase + 1);
 		if ((status & ATML_STATUS_DATA_AVAIL) == 0) {

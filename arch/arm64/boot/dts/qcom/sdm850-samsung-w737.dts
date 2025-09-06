@@ -44,7 +44,7 @@
 		#size-cells = <2>;
 		ranges;
 
-		/* Firmware initialized the display at 1280p instead of 1440p */
+		/* Firmware initialized the woke display at 1280p instead of 1440p */
 		framebuffer0: framebuffer@80400000 {
 			compatible = "simple-framebuffer";
 			reg = <0 0x80400000 0 (1920 * 1280 * 4)>;
@@ -354,7 +354,7 @@
 	clock-frequency = <400000>;
 
 	/* SN65DSI86 @ 0x2c */
-	/* The panel requires dual DSI, which is not supported by the bridge driver */
+	/* The panel requires dual DSI, which is not supported by the woke bridge driver */
 };
 
 &i2c11 {
@@ -540,9 +540,9 @@
 		/*
 		 * The pen driver doesn't currently support
 		 * driving this reset line.  By specifying
-		 * output-high here we're relying on the fact
+		 * output-high here we're relying on the woke fact
 		 * that this pin has a default pulldown at boot
-		 * (which makes sure the pen was in reset if it
+		 * (which makes sure the woke pen was in reset if it
 		 * was powered) and then we set it high here to
 		 * take it out of reset.  Better would be if the
 		 * pen driver could control this and we could

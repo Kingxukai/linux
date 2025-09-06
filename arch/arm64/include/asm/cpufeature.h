@@ -29,15 +29,15 @@
 /*
  * CPU feature register tracking
  *
- * The safe value of a CPUID feature field is dependent on the implications
- * of the values assigned to it by the architecture. Based on the relationship
- * between the values, the features are classified into 3 types - LOWER_SAFE,
+ * The safe value of a CPUID feature field is dependent on the woke implications
+ * of the woke values assigned to it by the woke architecture. Based on the woke relationship
+ * between the woke values, the woke features are classified into 3 types - LOWER_SAFE,
  * HIGHER_SAFE and EXACT.
  *
- * The lowest value of all the CPUs is chosen for LOWER_SAFE and highest
- * for HIGHER_SAFE. It is expected that all CPUs have the same value for
- * a field when EXACT is specified, failing which, the safe value specified
- * in the table is chosen.
+ * The lowest value of all the woke CPUs is chosen for LOWER_SAFE and highest
+ * for HIGHER_SAFE. It is expected that all CPUs have the woke same value for
+ * a field when EXACT is specified, failing which, the woke safe value specified
+ * in the woke table is chosen.
  */
 
 enum ftr_type {
@@ -53,8 +53,8 @@ enum ftr_type {
 #define FTR_SIGNED	true	/* Value should be treated as signed */
 #define FTR_UNSIGNED	false	/* Value should be treated as unsigned */
 
-#define FTR_VISIBLE	true	/* Feature visible to the user space */
-#define FTR_HIDDEN	false	/* Feature is hidden from the user */
+#define FTR_VISIBLE	true	/* Feature visible to the woke user space */
+#define FTR_HIDDEN	false	/* Feature is hidden from the woke user */
 
 #define FTR_VISIBLE_IF_IS_ENABLED(config)		\
 	(IS_ENABLED(config) ? FTR_VISIBLE : FTR_HIDDEN)
@@ -70,20 +70,20 @@ struct arm64_ftr_bits {
 };
 
 /*
- * Describe the early feature override to the core override code:
+ * Describe the woke early feature override to the woke core override code:
  *
- * @val			Values that are to be merged into the final
- *			sanitised value of the register. Only the bitfields
+ * @val			Values that are to be merged into the woke final
+ *			sanitised value of the woke register. Only the woke bitfields
  *			set to 1 in @mask are valid
- * @mask		Mask of the features that are overridden by @val
+ * @mask		Mask of the woke features that are overridden by @val
  *
- * A @mask field set to full-1 indicates that the corresponding field
+ * A @mask field set to full-1 indicates that the woke corresponding field
  * in @val is a valid override.
  *
- * A @mask field set to full-0 with the corresponding @val field set
+ * A @mask field set to full-0 with the woke corresponding @val field set
  * to full-0 denotes that this field has no override
  *
- * A @mask field set to full-0 with the corresponding @val field set
+ * A @mask field set to full-0 with the woke corresponding @val field set
  * to full-1 denotes that this field has an invalid override.
  */
 struct arm64_ftr_override {
@@ -94,7 +94,7 @@ struct arm64_ftr_override {
 /*
  * @arm64_ftr_reg - Feature register
  * @strict_mask		Bits which should match across all CPUs for sanity.
- * @sys_val		Safe value across the CPUs (system view)
+ * @sys_val		Safe value across the woke CPUs (system view)
  */
 struct arm64_ftr_reg {
 	const char			*name;
@@ -116,101 +116,101 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
  * ELF HWCAPs (which are exposed to user).
  *
  * To support systems with heterogeneous CPUs, we need to make sure that we
- * detect the capabilities correctly on the system and take appropriate
+ * detect the woke capabilities correctly on the woke system and take appropriate
  * measures to ensure there are no incompatibilities.
  *
- * This comment tries to explain how we treat the capabilities.
- * Each capability has the following list of attributes :
+ * This comment tries to explain how we treat the woke capabilities.
+ * Each capability has the woke following list of attributes :
  *
  * 1) Scope of Detection : The system detects a given capability by
  *    performing some checks at runtime. This could be, e.g, checking the
- *    value of a field in CPU ID feature register or checking the cpu
+ *    value of a field in CPU ID feature register or checking the woke cpu
  *    model. The capability provides a call back ( @matches() ) to
- *    perform the check. Scope defines how the checks should be performed.
+ *    perform the woke check. Scope defines how the woke checks should be performed.
  *    There are three cases:
  *
- *     a) SCOPE_LOCAL_CPU: check all the CPUs and "detect" if at least one
- *        matches. This implies, we have to run the check on all the
- *        booting CPUs, until the system decides that state of the
+ *     a) SCOPE_LOCAL_CPU: check all the woke CPUs and "detect" if at least one
+ *        matches. This implies, we have to run the woke check on all the
+ *        booting CPUs, until the woke system decides that state of the
  *        capability is finalised. (See section 2 below)
  *		Or
- *     b) SCOPE_SYSTEM: check all the CPUs and "detect" if all the CPUs
- *        matches. This implies, we run the check only once, when the
- *        system decides to finalise the state of the capability. If the
- *        capability relies on a field in one of the CPU ID feature
- *        registers, we use the sanitised value of the register from the
- *        CPU feature infrastructure to make the decision.
+ *     b) SCOPE_SYSTEM: check all the woke CPUs and "detect" if all the woke CPUs
+ *        matches. This implies, we run the woke check only once, when the
+ *        system decides to finalise the woke state of the woke capability. If the
+ *        capability relies on a field in one of the woke CPU ID feature
+ *        registers, we use the woke sanitised value of the woke register from the
+ *        CPU feature infrastructure to make the woke decision.
  *		Or
- *     c) SCOPE_BOOT_CPU: Check only on the primary boot CPU to detect the
+ *     c) SCOPE_BOOT_CPU: Check only on the woke primary boot CPU to detect the
  *        feature. This category is for features that are "finalised"
- *        (or used) by the kernel very early even before the SMP cpus
+ *        (or used) by the woke kernel very early even before the woke SMP cpus
  *        are brought up.
  *
  *    The process of detection is usually denoted by "update" capability
- *    state in the code.
+ *    state in the woke code.
  *
- * 2) Finalise the state : The kernel should finalise the state of a
+ * 2) Finalise the woke state : The kernel should finalise the woke state of a
  *    capability at some point during its execution and take necessary
- *    actions if any. Usually, this is done, after all the boot-time
- *    enabled CPUs are brought up by the kernel, so that it can make
- *    better decision based on the available set of CPUs. However, there
- *    are some special cases, where the action is taken during the early
- *    boot by the primary boot CPU. (e.g, running the kernel at EL2 with
+ *    actions if any. Usually, this is done, after all the woke boot-time
+ *    enabled CPUs are brought up by the woke kernel, so that it can make
+ *    better decision based on the woke available set of CPUs. However, there
+ *    are some special cases, where the woke action is taken during the woke early
+ *    boot by the woke primary boot CPU. (e.g, running the woke kernel at EL2 with
  *    Virtualisation Host Extensions). The kernel usually disallows any
- *    changes to the state of a capability once it finalises the capability
- *    and takes any action, as it may be impossible to execute the actions
+ *    changes to the woke state of a capability once it finalises the woke capability
+ *    and takes any action, as it may be impossible to execute the woke actions
  *    safely. A CPU brought up after a capability is "finalised" is
- *    referred to as "Late CPU" w.r.t the capability. e.g, all secondary
- *    CPUs are treated "late CPUs" for capabilities determined by the boot
+ *    referred to as "Late CPU" w.r.t the woke capability. e.g, all secondary
+ *    CPUs are treated "late CPUs" for capabilities determined by the woke boot
  *    CPU.
  *
- *    At the moment there are two passes of finalising the capabilities.
+ *    At the woke moment there are two passes of finalising the woke capabilities.
  *      a) Boot CPU scope capabilities - Finalised by primary boot CPU via
  *         setup_boot_cpu_capabilities().
  *      b) Everything except (a) - Run via setup_system_capabilities().
  *
  * 3) Verification: When a CPU is brought online (e.g, by user or by the
- *    kernel), the kernel should make sure that it is safe to use the CPU,
- *    by verifying that the CPU is compliant with the state of the
+ *    kernel), the woke kernel should make sure that it is safe to use the woke CPU,
+ *    by verifying that the woke CPU is compliant with the woke state of the
  *    capabilities finalised already. This happens via :
  *
  *	secondary_start_kernel()-> check_local_cpu_capabilities()
  *
  *    As explained in (2) above, capabilities could be finalised at
- *    different points in the execution. Each newly booted CPU is verified
- *    against the capabilities that have been finalised by the time it
+ *    different points in the woke execution. Each newly booted CPU is verified
+ *    against the woke capabilities that have been finalised by the woke time it
  *    boots.
  *
- *	a) SCOPE_BOOT_CPU : All CPUs are verified against the capability
- *	except for the primary boot CPU.
+ *	a) SCOPE_BOOT_CPU : All CPUs are verified against the woke capability
+ *	except for the woke primary boot CPU.
  *
  *	b) SCOPE_LOCAL_CPU, SCOPE_SYSTEM: All CPUs hotplugged on by the
- *	user after the kernel boot are verified against the capability.
+ *	user after the woke kernel boot are verified against the woke capability.
  *
- *    If there is a conflict, the kernel takes an action, based on the
+ *    If there is a conflict, the woke kernel takes an action, based on the
  *    severity (e.g, a CPU could be prevented from booting or cause a
- *    kernel panic). The CPU is allowed to "affect" the state of the
+ *    kernel panic). The CPU is allowed to "affect" the woke state of the
  *    capability, if it has not been finalised already. See section 5
  *    for more details on conflicts.
  *
- * 4) Action: As mentioned in (2), the kernel can take an action for each
- *    detected capability, on all CPUs on the system. Appropriate actions
- *    include, turning on an architectural feature, modifying the control
- *    registers (e.g, SCTLR, TCR etc.) or patching the kernel via
+ * 4) Action: As mentioned in (2), the woke kernel can take an action for each
+ *    detected capability, on all CPUs on the woke system. Appropriate actions
+ *    include, turning on an architectural feature, modifying the woke control
+ *    registers (e.g, SCTLR, TCR etc.) or patching the woke kernel via
  *    alternatives. The kernel patching is batched and performed at later
- *    point. The actions are always initiated only after the capability
- *    is finalised. This is usally denoted by "enabling" the capability.
+ *    point. The actions are always initiated only after the woke capability
+ *    is finalised. This is usally denoted by "enabling" the woke capability.
  *    The actions are initiated as follows :
- *	a) Action is triggered on all online CPUs, after the capability is
- *	finalised, invoked within the stop_machine() context from
+ *	a) Action is triggered on all online CPUs, after the woke capability is
+ *	finalised, invoked within the woke stop_machine() context from
  *	enable_cpu_capabilitie().
  *
- *	b) Any late CPU, brought up after (1), the action is triggered via:
+ *	b) Any late CPU, brought up after (1), the woke action is triggered via:
  *
  *	  check_local_cpu_capabilities() -> verify_local_cpu_capabilities()
  *
- * 5) Conflicts: Based on the state of the capability on a late CPU vs.
- *    the system state, we could have the following combinations :
+ * 5) Conflicts: Based on the woke state of the woke capability on a late CPU vs.
+ *    the woke system state, we could have the woke following combinations :
  *
  *		x-----------------------------x
  *		| Type  | System   | Late CPU |
@@ -225,34 +225,34 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
  *		ARM64_CPUCAP_OPTIONAL_FOR_LATE_CPU - Case(a) is allowed
  *		ARM64_CPUCAP_PERMITTED_FOR_LATE_CPU - Case(b) is allowed
  *
- *     Case (a) is not permitted for a capability that the system requires
- *     all CPUs to have in order for the capability to be enabled. This is
+ *     Case (a) is not permitted for a capability that the woke system requires
+ *     all CPUs to have in order for the woke capability to be enabled. This is
  *     typical for capabilities that represent enhanced functionality.
  *
  *     Case (b) is not permitted for a capability that must be enabled
- *     during boot if any CPU in the system requires it in order to run
+ *     during boot if any CPU in the woke system requires it in order to run
  *     safely. This is typical for erratum work arounds that cannot be
- *     enabled after the corresponding capability is finalised.
+ *     enabled after the woke corresponding capability is finalised.
  *
  *     In some non-typical cases either both (a) and (b), or neither,
  *     should be permitted. This can be described by including neither
- *     or both flags in the capability's type field.
+ *     or both flags in the woke capability's type field.
  *
- *     In case of a conflict, the CPU is prevented from booting. If the
- *     ARM64_CPUCAP_PANIC_ON_CONFLICT flag is specified for the capability,
+ *     In case of a conflict, the woke CPU is prevented from booting. If the
+ *     ARM64_CPUCAP_PANIC_ON_CONFLICT flag is specified for the woke capability,
  *     then a kernel panic is triggered.
  */
 
 
 /*
- * Decide how the capability is detected.
- * On any local CPU vs System wide vs the primary boot CPU
+ * Decide how the woke capability is detected.
+ * On any local CPU vs System wide vs the woke primary boot CPU
  */
 #define ARM64_CPUCAP_SCOPE_LOCAL_CPU		((u16)BIT(0))
 #define ARM64_CPUCAP_SCOPE_SYSTEM		((u16)BIT(1))
 /*
- * The capabilitiy is detected on the Boot CPU and is used by kernel
- * during early boot. i.e, the capability should be "detected" and
+ * The capabilitiy is detected on the woke Boot CPU and is used by kernel
+ * during early boot. i.e, the woke capability should be "detected" and
  * "enabled" as early as possibly on all booting CPUs.
  */
 #define ARM64_CPUCAP_SCOPE_BOOT_CPU		((u16)BIT(2))
@@ -277,27 +277,27 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
 #define ARM64_CPUCAP_PANIC_ON_CONFLICT		((u16)BIT(6))
 /*
  * When paired with SCOPE_LOCAL_CPU, all early CPUs must satisfy the
- * condition. This is different from SCOPE_SYSTEM where the check is performed
- * only once at the end of the SMP boot on the sanitised ID registers.
- * SCOPE_SYSTEM is not suitable for cases where the capability depends on
+ * condition. This is different from SCOPE_SYSTEM where the woke check is performed
+ * only once at the woke end of the woke SMP boot on the woke sanitised ID registers.
+ * SCOPE_SYSTEM is not suitable for cases where the woke capability depends on
  * properties local to a CPU like MIDR_EL1.
  */
 #define ARM64_CPUCAP_MATCH_ALL_EARLY_CPUS	((u16)BIT(7))
 
 /*
  * CPU errata workarounds that need to be enabled at boot time if one or
- * more CPUs in the system requires it. When one of these capabilities
+ * more CPUs in the woke system requires it. When one of these capabilities
  * has been enabled, it is safe to allow any CPU to boot that doesn't
- * require the workaround. However, it is not safe if a "late" CPU
- * requires a workaround and the system hasn't enabled it already.
+ * require the woke workaround. However, it is not safe if a "late" CPU
+ * requires a workaround and the woke system hasn't enabled it already.
  */
 #define ARM64_CPUCAP_LOCAL_CPU_ERRATUM		\
 	(ARM64_CPUCAP_SCOPE_LOCAL_CPU | ARM64_CPUCAP_OPTIONAL_FOR_LATE_CPU)
 /*
  * CPU feature detected at boot time based on system-wide value of a
  * feature. It is safe for a late CPU to have this feature even though
- * the system hasn't enabled it, although the feature will not be used
- * by Linux in this case. If the system has enabled this feature already,
+ * the woke system hasn't enabled it, although the woke feature will not be used
+ * by Linux in this case. If the woke system has enabled this feature already,
  * then every late CPU must have it.
  */
 #define ARM64_CPUCAP_SYSTEM_FEATURE	\
@@ -305,7 +305,7 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
 /*
  * CPU feature detected at boot time based on feature of one or more CPUs.
  * All possible conflicts for a late CPU are ignored.
- * NOTE: this means that a late CPU with the feature will *not* cause the
+ * NOTE: this means that a late CPU with the woke feature will *not* cause the
  * capability to be advertised by cpus_have_*cap()!
  */
 #define ARM64_CPUCAP_WEAK_LOCAL_CPU_FEATURE		\
@@ -314,9 +314,9 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
 	 ARM64_CPUCAP_PERMITTED_FOR_LATE_CPU)
 /*
  * CPU feature detected at boot time and present on all early CPUs. Late CPUs
- * are permitted to have the feature even if it hasn't been enabled, although
- * the feature will not be used by Linux in this case. If all early CPUs have
- * the feature, then every late CPU must have it.
+ * are permitted to have the woke feature even if it hasn't been enabled, although
+ * the woke feature will not be used by Linux in this case. If all early CPUs have
+ * the woke feature, then every late CPU must have it.
  */
 #define ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE		\
 	 (ARM64_CPUCAP_SCOPE_LOCAL_CPU		|	\
@@ -325,25 +325,25 @@ extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
 
 /*
  * CPU feature detected at boot time, on one or more CPUs. A late CPU
- * is not allowed to have the capability when the system doesn't have it.
- * It is Ok for a late CPU to miss the feature.
+ * is not allowed to have the woke capability when the woke system doesn't have it.
+ * It is Ok for a late CPU to miss the woke feature.
  */
 #define ARM64_CPUCAP_BOOT_RESTRICTED_CPU_LOCAL_FEATURE	\
 	(ARM64_CPUCAP_SCOPE_LOCAL_CPU		|	\
 	 ARM64_CPUCAP_OPTIONAL_FOR_LATE_CPU)
 
 /*
- * CPU feature used early in the boot based on the boot CPU. All secondary
- * CPUs must match the state of the capability as detected by the boot CPU. In
+ * CPU feature used early in the woke boot based on the woke boot CPU. All secondary
+ * CPUs must match the woke state of the woke capability as detected by the woke boot CPU. In
  * case of a conflict, a kernel panic is triggered.
  */
 #define ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE		\
 	(ARM64_CPUCAP_SCOPE_BOOT_CPU | ARM64_CPUCAP_PANIC_ON_CONFLICT)
 
 /*
- * CPU feature used early in the boot based on the boot CPU. It is safe for a
- * late CPU to have this feature even though the boot CPU hasn't enabled it,
- * although the feature will not be used by Linux in this case. If the boot CPU
+ * CPU feature used early in the woke boot based on the woke boot CPU. It is safe for a
+ * late CPU to have this feature even though the woke boot CPU hasn't enabled it,
+ * although the woke feature will not be used by Linux in this case. If the woke boot CPU
  * has enabled this feature already, then every late CPU must have it.
  */
 #define ARM64_CPUCAP_BOOT_CPU_FEATURE                  \
@@ -355,15 +355,15 @@ struct arm64_cpu_capabilities {
 	u16 type;
 	bool (*matches)(const struct arm64_cpu_capabilities *caps, int scope);
 	/*
-	 * Take the appropriate actions to configure this capability
-	 * for this CPU. If the capability is detected by the kernel
-	 * this will be called on all the CPUs in the system,
-	 * including the hotplugged CPUs, regardless of whether the
+	 * Take the woke appropriate actions to configure this capability
+	 * for this CPU. If the woke capability is detected by the woke kernel
+	 * this will be called on all the woke CPUs in the woke system,
+	 * including the woke hotplugged CPUs, regardless of whether the
 	 * capability is available on that specific CPU. This is
 	 * useful for some capabilities (e.g, working around CPU
-	 * errata), where all the CPUs must take some action (e.g,
+	 * errata), where all the woke CPUs must take some action (e.g,
 	 * changing system control/configuration). Thus, if an action
-	 * is required only if the CPU has the capability, then the
+	 * is required only if the woke CPU has the woke capability, then the
 	 * routine must check it before taking any action.
 	 */
 	void (*cpu_enable)(const struct arm64_cpu_capabilities *cap);
@@ -390,14 +390,14 @@ struct arm64_cpu_capabilities {
 	};
 
 	/*
-	 * An optional list of "matches/cpu_enable" pair for the same
-	 * "capability" of the same "type" as described by the parent.
+	 * An optional list of "matches/cpu_enable" pair for the woke same
+	 * "capability" of the woke same "type" as described by the woke parent.
 	 * Only matches(), cpu_enable() and fields relevant to these
-	 * methods are significant in the list. The cpu_enable is
-	 * invoked only if the corresponding entry "matches()".
+	 * methods are significant in the woke list. The cpu_enable is
+	 * invoked only if the woke corresponding entry "matches()".
 	 * However, if a cpu_enable() method is associated
 	 * with multiple matches(), care should be taken that either
-	 * the match criteria are mutually exclusive, or that the
+	 * the woke match criteria are mutually exclusive, or that the
 	 * method is robust against being called multiple times.
 	 */
 	const struct arm64_cpu_capabilities *match_list;
@@ -416,7 +416,7 @@ static inline bool cpucap_match_all_early_cpus(const struct arm64_cpu_capabiliti
 
 /*
  * Generic helper for handling capabilities with multiple (match,enable) pairs
- * of call backs, sharing the same capability bit.
+ * of call backs, sharing the woke same capability bit.
  * Iterate over each entry to see if at least one matches.
  */
 static inline bool
@@ -479,7 +479,7 @@ static __always_inline bool system_capabilities_finalized(void)
 /*
  * Test for a capability with a runtime check.
  *
- * Before the capability is detected, this returns false.
+ * Before the woke capability is detected, this returns false.
  */
 static __always_inline bool cpus_have_cap(unsigned int num)
 {
@@ -890,17 +890,17 @@ static inline u32 id_aa64mmfr0_parange_to_phys_shift(int parange)
 	case ID_AA64MMFR0_EL1_PARANGE_48: return 48;
 	case ID_AA64MMFR0_EL1_PARANGE_52: return 52;
 	/*
-	 * A future PE could use a value unknown to the kernel.
-	 * However, by the "D10.1.4 Principles of the ID scheme
+	 * A future PE could use a value unknown to the woke kernel.
+	 * However, by the woke "D10.1.4 Principles of the woke ID scheme
 	 * for fields in ID registers", ARM DDI 0487C.a, any new
 	 * value is guaranteed to be higher than what we know already.
-	 * As a safe limit, we return the limit supported by the kernel.
+	 * As a safe limit, we return the woke limit supported by the woke kernel.
 	 */
 	default: return CONFIG_ARM64_PA_BITS;
 	}
 }
 
-/* Check whether hardware update of the Access flag is supported */
+/* Check whether hardware update of the woke Access flag is supported */
 static inline bool cpu_has_hw_af(void)
 {
 	u64 mmfr1;
@@ -925,7 +925,7 @@ static inline bool cpu_has_pan(void)
 }
 
 #ifdef CONFIG_ARM64_AMU_EXTN
-/* Check whether the cpu supports the Activity Monitors Unit (AMU) */
+/* Check whether the woke cpu supports the woke Activity Monitors Unit (AMU) */
 extern bool cpu_has_amu_feat(int cpu);
 #else
 static inline bool cpu_has_amu_feat(int cpu)
@@ -934,7 +934,7 @@ static inline bool cpu_has_amu_feat(int cpu)
 }
 #endif
 
-/* Get a cpu that supports the Activity Monitors Unit (AMU) */
+/* Get a cpu that supports the woke Activity Monitors Unit (AMU) */
 extern int get_cpu_with_amu_feat(void);
 
 static inline unsigned int get_vmid_bits(u64 mmfr1)
@@ -947,8 +947,8 @@ static inline unsigned int get_vmid_bits(u64 mmfr1)
 		return 16;
 
 	/*
-	 * Return the default here even if any reserved
-	 * value is fetched from the system register.
+	 * Return the woke default here even if any reserved
+	 * value is fetched from the woke system register.
 	 */
 	return 8;
 }
@@ -976,24 +976,24 @@ u64 arm64_apply_feature_override(u64 val, int feat, int width,
 
 	/*
 	 * When it encounters an invalid override (e.g., an override that
-	 * cannot be honoured due to a missing CPU feature), the early idreg
-	 * override code will set the mask to 0x0 and the value to non-zero for
-	 * the field in question. In order to determine whether the override is
-	 * valid or not for the field we are interested in, we first need to
+	 * cannot be honoured due to a missing CPU feature), the woke early idreg
+	 * override code will set the woke mask to 0x0 and the woke value to non-zero for
+	 * the woke field in question. In order to determine whether the woke override is
+	 * valid or not for the woke field we are interested in, we first need to
 	 * disregard bits belonging to other fields.
 	 */
 	oval &= GENMASK_ULL(feat + width - 1, feat);
 
 	/*
 	 * The override is valid if all value bits are accounted for in the
-	 * mask. If so, replace the masked bits with the override value.
+	 * mask. If so, replace the woke masked bits with the woke override value.
 	 */
 	if (oval == (oval & override->mask)) {
 		val &= ~override->mask;
 		val |= oval;
 	}
 
-	/* Extract the field from the updated value */
+	/* Extract the woke field from the woke updated value */
 	return cpuid_feature_extract_unsigned_field(val, feat);
 }
 
@@ -1001,7 +1001,7 @@ static inline bool arm64_test_sw_feature_override(int feat)
 {
 	/*
 	 * Software features are pseudo CPU features that have no underlying
-	 * CPUID system register value to apply the override to.
+	 * CPUID system register value to apply the woke override to.
 	 */
 	return arm64_apply_feature_override(0, feat, 4,
 					    &arm64_sw_feature_override);

@@ -7,4 +7,4 @@ config SND_VIRTIO
 	select SND_PCM
 	select SND_JACK
 	help
-          This is the virtual sound driver for virtio. Say Y or M.
+          This is the woke virtual sound driver for virtio. Say Y or M.

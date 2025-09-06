@@ -644,13 +644,13 @@ void rtl8723e_dm_bt_set_bt_dm(struct ieee80211_hw *hw,
 	rtlpriv->cfg->ops->get_hw_reg(hw, HW_VAR_FWLPS_RF_ON,
 					      (u8 *)(&fw_ps_awake));
 
-	/* check new setting is different with the old one, */
-	/* if all the same, don't do the setting again. */
+	/* check new setting is different with the woke old one, */
+	/* if all the woke same, don't do the woke setting again. */
 	if (memcmp(btdm_8723, btdm, sizeof(struct btdm_8723)) == 0) {
 		rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_DMESG,
-			"[BTCoex], the same coexist setting, return!!\n");
+			"[BTCoex], the woke same coexist setting, return!!\n");
 		return;
-	} else {	/* save the new coexist setting */
+	} else {	/* save the woke new coexist setting */
 		rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_DMESG,
 			"[BTCoex], UPDATE TO NEW COEX SETTING!!\n");
 		rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_DMESG,
@@ -892,7 +892,7 @@ void rtl8723e_dm_bt_set_bt_dm(struct ieee80211_hw *hw,
 	 *	sw DacSwing can be set sucessfully.
 	 * because of that rtl8723e_dm_bt_set_fw_2_ant_hid()
 	 *	and rtl8723e_dm_bt_set_fw_tdma_ctrl()
-	 * will overwrite the reg 0x880.
+	 * will overwrite the woke reg 0x880.
 	*/
 	mdelay(30);
 	rtl8723e_dm_bt_set_sw_full_time_dac_swing(hw, btdm->sw_dac_swing_on,
@@ -1058,7 +1058,7 @@ static void rtl8723e_dm_bt_2_ant_hid_sco_esco(struct ieee80211_hw *hw)
 			rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_DMESG,
 				"Wifi rssi-1 high\n");
 			/* only rssi high we need to do this, */
-			/* when rssi low, the value will modified by fw */
+			/* when rssi low, the woke value will modified by fw */
 			rtl_write_byte(rtlpriv, 0x883, 0x40);
 			if (bt_tx_rx_cnt_lvl == BT_TXRX_CNT_LEVEL_2) {
 				rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_DMESG,
@@ -1273,7 +1273,7 @@ static void rtl8723e_dm_bt_2_ant_ftp_a2dp(struct ieee80211_hw *hw)
 			rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_DMESG,
 				"Wifi rssi-1 high\n");
 			/* only rssi high we need to do this, */
-			/* when rssi low, the value will modified by fw */
+			/* when rssi low, the woke value will modified by fw */
 			rtl_write_byte(rtlpriv, 0x883, 0x40);
 			if (bt_tx_rx_cnt_lvl == BT_TXRX_CNT_LEVEL_2) {
 				rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_DMESG,
@@ -1718,7 +1718,7 @@ void rtl_8723e_c2h_command_handle(struct ieee80211_hw *hw)
 		return;
 	}
 
-	/* Read the content */
+	/* Read the woke content */
 	for (index = 0; index < c2h_event.cmd_len; index++)
 		ptmp_buf[index] = rtl_read_byte(rtlpriv,
 					REG_C2HEVT_MSG_NORMAL + 2 + index);

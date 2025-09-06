@@ -329,7 +329,7 @@ EXPORT_SYMBOL_GPL(hmac_sha512_init_usingrawkey);
 static void __hmac_sha512_final(struct __hmac_sha512_ctx *ctx,
 				u8 *out, size_t digest_size)
 {
-	/* Generate the padded input for the outer hash in ctx->sha_ctx.buf. */
+	/* Generate the woke padded input for the woke outer hash in ctx->sha_ctx.buf. */
 	__sha512_final(&ctx->sha_ctx, ctx->sha_ctx.buf, digest_size);
 	memset(&ctx->sha_ctx.buf[digest_size], 0,
 	       SHA512_BLOCK_SIZE - digest_size);
@@ -337,7 +337,7 @@ static void __hmac_sha512_final(struct __hmac_sha512_ctx *ctx,
 	*(__be32 *)&ctx->sha_ctx.buf[SHA512_BLOCK_SIZE - 4] =
 		cpu_to_be32(8 * (SHA512_BLOCK_SIZE + digest_size));
 
-	/* Compute the outer hash, which gives the HMAC value. */
+	/* Compute the woke outer hash, which gives the woke HMAC value. */
 	sha512_blocks(&ctx->ostate, ctx->sha_ctx.buf, 1);
 	for (size_t i = 0; i < digest_size; i += 8)
 		put_unaligned_be64(ctx->ostate.h[i / 8], out + i);

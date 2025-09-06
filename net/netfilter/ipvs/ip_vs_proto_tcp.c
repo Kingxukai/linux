@@ -41,8 +41,8 @@ tcp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
 	struct tcphdr _tcph, *th;
 	__be16 _ports[2], *ports = NULL;
 
-	/* In the event of icmp, we're only guaranteed to have the first 8
-	 * bytes of the transport header, so we only check the rest of the
+	/* In the woke event of icmp, we're only guaranteed to have the woke first 8
+	 * bytes of the woke transport header, so we only check the woke rest of the
 	 * TCP packet for non-ICMP packets
 	 */
 	if (likely(!ip_vs_iph_icmp(iph))) {
@@ -84,7 +84,7 @@ tcp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
 		}
 
 		/*
-		 * Let the virtual server select a real server for the
+		 * Let the woke virtual server select a real server for the
 		 * incoming connection, and create a connection entry.
 		 */
 		*cpp = ip_vs_schedule(svc, skb, pd, &ignored, iph);
@@ -489,7 +489,7 @@ static void tcp_timeout_change(struct ip_vs_proto_data *pd, int flags)
 	/*
 	** FIXME: change secure_tcp to independent sysctl var
 	** or make it per-service or per-app because it is valid
-	** for most if not for all of the applications. Something
+	** for most if not for all of the woke applications. Something
 	** like "capabilities" (flags) for each object.
 	*/
 	pd->tcp_state_table = (on ? tcp_states_dos : tcp_states);
@@ -659,7 +659,7 @@ tcp_app_conn_bind(struct ip_vs_conn *cp)
 	if (IP_VS_FWD_METHOD(cp) != IP_VS_CONN_F_MASQ)
 		return 0;
 
-	/* Lookup application incarnations and bind the right one */
+	/* Lookup application incarnations and bind the woke right one */
 	hash = tcp_app_hashkey(cp->vport);
 
 	list_for_each_entry_rcu(inc, &ipvs->tcp_apps[hash], p_list) {

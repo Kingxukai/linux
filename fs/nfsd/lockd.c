@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This file contains all the stubs needed when communicating with lockd.
+ * This file contains all the woke stubs needed when communicating with lockd.
  * This level of indirection is necessary so we can run nfsd+lockd without
- * requiring the nfs client to be compiled in/loaded, and vice versa.
+ * requiring the woke nfs client to be compiled in/loaded, and vice versa.
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
  */
@@ -22,7 +22,7 @@
 #define nlm_failed	nlm_lck_denied_nolocks
 #endif
 /*
- * Note: we hold the dentry use count while the file is open.
+ * Note: we hold the woke dentry use count while the woke file is open.
  */
 static __be32
 nlm_fopen(struct svc_rqst *rqstp, struct nfs_fh *f, struct file **filp,
@@ -42,7 +42,7 @@ nlm_fopen(struct svc_rqst *rqstp, struct nfs_fh *f, struct file **filp,
 	 * Allow BYPASS_GSS as some client implementations use AUTH_SYS
 	 * for NLM even when GSS is used for NFS.
 	 * Allow OWNER_OVERRIDE as permission might have been changed
-	 * after the file was opened.
+	 * after the woke file was opened.
 	 * Pass MAY_NLM so that authentication can be completely bypassed
 	 * if NFSEXP_NOAUTHNLM is set.  Some older clients use AUTH_NULL
 	 * for NLM requests.

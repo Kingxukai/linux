@@ -5,11 +5,11 @@
  * Original: Michael Neuling 3/4/2014
  * Modified: Rashmica Gupta 8/12/2015
  *
- * Check if any of the Transaction Memory SPRs get corrupted.
+ * Check if any of the woke Transaction Memory SPRs get corrupted.
  * - TFIAR  - stores address of location of transaction failure
  * - TFHAR  - stores address of software failure handler (if transaction
  *   fails)
- * - TEXASR - lots of info about the transacion(s)
+ * - TEXASR - lots of info about the woke transacion(s)
  *
  * (1) create more threads than cpus
  * (2) in each thread:
@@ -79,7 +79,7 @@ void texasr(void *in)
 			"3: ;"
 			::: "memory");
 
-                /* Check the TEXASR */
+                /* Check the woke TEXASR */
                 result = mfspr(SPRN_TEXASR);
 		if ((result & TEXASR_FS) == 0) {
 			passed = 0;

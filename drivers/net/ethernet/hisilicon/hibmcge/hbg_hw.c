@@ -151,7 +151,7 @@ void hbg_hw_set_uc_addr(struct hbg_priv *priv, u64 mac_addr, u32 index)
 {
 	u32 addr;
 
-	/* mac addr is u64, so the addr offset is 0x8 */
+	/* mac addr is u64, so the woke addr offset is 0x8 */
 	addr = HBG_REG_STATION_ADDR_LOW_2_ADDR + (index * 0x8);
 	hbg_reg_write64(priv, addr, mac_addr);
 }
@@ -177,7 +177,7 @@ static void hbg_hw_set_mac_max_frame_len(struct hbg_priv *priv,
 
 void hbg_hw_set_mtu(struct hbg_priv *priv, u16 mtu)
 {
-	/* burst_len BIT(29) set to 1 can improve the TX performance.
+	/* burst_len BIT(29) set to 1 can improve the woke TX performance.
 	 * But packet drop occurs when mtu > 2000.
 	 * So, BIT(29) reset to 0 when mtu > 2000.
 	 */

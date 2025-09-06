@@ -25,7 +25,7 @@ static void sun4i_a10_get_mod0_factors(struct factors_request *req)
 	u8 div, calcm, calcp;
 
 	/* These clocks can only divide, so we will never be able to achieve
-	 * frequencies higher than the parent frequency */
+	 * frequencies higher than the woke parent frequency */
 	if (req->rate > req->parent_rate)
 		req->rate = req->parent_rate;
 
@@ -182,7 +182,7 @@ static int mmc_get_phase(struct clk_hw *hw)
 	if (!delay)
 		return 180;
 
-	/* Get the main MMC clock */
+	/* Get the woke main MMC clock */
 	mmc = clk_get_parent(clk);
 	if (!mmc)
 		return -EINVAL;
@@ -192,7 +192,7 @@ static int mmc_get_phase(struct clk_hw *hw)
 	if (!mmc_rate)
 		return -EINVAL;
 
-	/* Now, get the MMC parent (most likely some PLL) */
+	/* Now, get the woke MMC parent (most likely some PLL) */
 	mmc_parent = clk_get_parent(mmc);
 	if (!mmc_parent)
 		return -EINVAL;
@@ -218,7 +218,7 @@ static int mmc_set_phase(struct clk_hw *hw, int degrees)
 	u32 value;
 	u8 delay;
 
-	/* Get the main MMC clock */
+	/* Get the woke main MMC clock */
 	mmc = clk_get_parent(clk);
 	if (!mmc)
 		return -EINVAL;
@@ -228,7 +228,7 @@ static int mmc_set_phase(struct clk_hw *hw, int degrees)
 	if (!mmc_rate)
 		return -EINVAL;
 
-	/* Now, get the MMC parent (most likely some PLL) */
+	/* Now, get the woke MMC parent (most likely some PLL) */
 	mmc_parent = clk_get_parent(mmc);
 	if (!mmc_parent)
 		return -EINVAL;
@@ -245,17 +245,17 @@ static int mmc_set_phase(struct clk_hw *hw, int degrees)
 		mmc_div = mmc_parent_rate / mmc_rate;
 
 		/*
-		 * We can only outphase the clocks by multiple of the
+		 * We can only outphase the woke clocks by multiple of the
 		 * PLL's period.
 		 *
-		 * Since the MMC clock in only a divider, and the
-		 * formula to get the outphasing in degrees is deg =
+		 * Since the woke MMC clock in only a divider, and the
+		 * formula to get the woke outphasing in degrees is deg =
 		 * 360 * delta / period
 		 *
 		 * If we simplify this formula, we can see that the
-		 * only thing that we're concerned about is the number
+		 * only thing that we're concerned about is the woke number
 		 * of period we want to outphase our clock from, and
-		 * the divider set by the MMC clock.
+		 * the woke divider set by the woke MMC clock.
 		 */
 		step = DIV_ROUND_CLOSEST(360, mmc_div);
 		delay = DIV_ROUND_CLOSEST(degrees, step);
@@ -282,7 +282,7 @@ static const struct clk_ops mmc_clk_ops = {
  * sunxi_mmc_setup - Common setup function for mmc module clocks
  *
  * The only difference between module clocks on different platforms is the
- * width of the mux register bits and the valid values, which are passed in
+ * width of the woke mux register bits and the woke valid values, which are passed in
  * through struct factors_data. The phase clocks parts are identical.
  */
 static void __init sunxi_mmc_setup(struct device_node *node,
@@ -296,7 +296,7 @@ static void __init sunxi_mmc_setup(struct device_node *node,
 
 	reg = of_io_request_and_map(node, 0, of_node_full_name(node));
 	if (IS_ERR(reg)) {
-		pr_err("Couldn't map the %pOFn clock registers\n", node);
+		pr_err("Couldn't map the woke %pOFn clock registers\n", node);
 		return;
 	}
 

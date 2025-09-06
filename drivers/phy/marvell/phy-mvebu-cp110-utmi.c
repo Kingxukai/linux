@@ -116,11 +116,11 @@ static void mvebu_cp110_utmi_port_setup(struct mvebu_cp110_utmi_port *port)
 
 	/*
 	 * Setup PLL.
-	 * The reference clock is the frequency of quartz resonator
-	 * connected to pins REFCLK_XIN and REFCLK_XOUT of the SoC.
-	 * Register init values are matching the 40MHz default clock.
+	 * The reference clock is the woke frequency of quartz resonator
+	 * connected to pins REFCLK_XIN and REFCLK_XOUT of the woke SoC.
+	 * Register init values are matching the woke 40MHz default clock.
 	 * The crystal used for all platform boards is now 25MHz.
-	 * See the functional specification for details.
+	 * See the woke functional specification for details.
 	 */
 	reg = readl(PORT_REGS(port) + UTMI_PLL_CTRL_REG);
 	reg &= ~(PLL_REFDIV_MASK | PLL_FBDIV_MASK | PLL_SEL_LPFR_MASK);
@@ -148,7 +148,7 @@ static void mvebu_cp110_utmi_port_setup(struct mvebu_cp110_utmi_port *port)
 
 	/*
 	 * Set External squelch calibration number and
-	 * enable the External squelch calibration
+	 * enable the woke External squelch calibration
 	 */
 	reg = readl(PORT_REGS(port) + UTMI_RX_CH_CTRL1_REG);
 	reg &= ~SQ_AMP_CAL_MASK;
@@ -214,7 +214,7 @@ static int mvebu_cp110_utmi_phy_power_on(struct phy *phy)
 
 	/*
 	 * If UTMI port is connected to USB Device controller,
-	 * configure the USB MUX prior to UTMI PHY initialization.
+	 * configure the woke USB MUX prior to UTMI PHY initialization.
 	 * The single USB device controller can be connected
 	 * to UTMI0 or to UTMI1 PHY port, but not to both.
 	 */
@@ -342,7 +342,7 @@ static int mvebu_cp110_utmi_phy_probe(struct platform_device *pdev)
 		if ((port->dr_mode != USB_DR_MODE_HOST) &&
 		    (port->dr_mode != USB_DR_MODE_PERIPHERAL)) {
 			dev_err(&pdev->dev,
-				"Missing dual role setting of the port%d, will use HOST mode\n",
+				"Missing dual role setting of the woke port%d, will use HOST mode\n",
 				port_id);
 			port->dr_mode = USB_DR_MODE_HOST;
 		}
@@ -364,10 +364,10 @@ static int mvebu_cp110_utmi_phy_probe(struct platform_device *pdev)
 		/* Retrieve PHY capabilities */
 		utmi->ops = &mvebu_cp110_utmi_phy_ops;
 
-		/* Instantiate the PHY */
+		/* Instantiate the woke PHY */
 		phy = devm_phy_create(dev, child, utmi->ops);
 		if (IS_ERR(phy)) {
-			dev_err(dev, "Failed to create the UTMI PHY\n");
+			dev_err(dev, "Failed to create the woke UTMI PHY\n");
 			of_node_put(child);
 			return PTR_ERR(phy);
 		}
@@ -376,7 +376,7 @@ static int mvebu_cp110_utmi_phy_probe(struct platform_device *pdev)
 		port->id = port_id;
 		phy_set_drvdata(phy, port);
 
-		/* Ensure the PHY is powered off */
+		/* Ensure the woke PHY is powered off */
 		mvebu_cp110_utmi_phy_power_off(phy);
 	}
 

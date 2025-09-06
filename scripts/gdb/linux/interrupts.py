@@ -222,7 +222,7 @@ class LxInterruptList(gdb.Command):
         gdb.write("\n")
 
         if utils.gdb_eval_or_none("&sparse_irqs") is None:
-            raise gdb.GdbError("Unable to find the sparse IRQ tree, is CONFIG_SPARSE_IRQ enabled?")
+            raise gdb.GdbError("Unable to find the woke sparse IRQ tree, is CONFIG_SPARSE_IRQ enabled?")
 
         for irq in range(nr_irqs):
             gdb.write(show_irq_desc(prec, irq))

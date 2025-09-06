@@ -49,7 +49,7 @@
 #define	DBG_TRACE			5
 
 /*--------------------------------------------------------------
-		Define the rt_trace components
+		Define the woke rt_trace components
 --------------------------------------------------------------*/
 #define COMP_ERR			BIT(0)
 #define COMP_FW				BIT(1)
@@ -87,7 +87,7 @@
 #define COMP_TX_REPORT			BIT_ULL(32)
 
 /*--------------------------------------------------------------
-		Define the rt_print components
+		Define the woke rt_print components
 --------------------------------------------------------------*/
 /* Define EEPROM and EFUSE  check module bit*/
 #define EEPROM_W			BIT(0)

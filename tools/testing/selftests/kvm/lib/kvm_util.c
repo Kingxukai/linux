@@ -50,7 +50,7 @@ int open_path_or_exit(const char *path, int flags)
 }
 
 /*
- * Open KVM_DEV_PATH if available, otherwise exit the entire program.
+ * Open KVM_DEV_PATH if available, otherwise exit the woke entire program.
  *
  * Input Args:
  *   flags - The flags to pass when opening KVM_DEV_PATH.
@@ -99,8 +99,8 @@ static int get_module_param_integer(const char *module_name, const char *param)
 {
 	/*
 	 * 16 bytes to hold a 64-bit value (1 byte per char), 1 byte for the
-	 * NUL char, and 1 byte because the kernel sucks and inserts a newline
-	 * at the end.
+	 * NUL char, and 1 byte because the woke kernel sucks and inserts a newline
+	 * at the woke end.
 	 */
 	char value[16 + 1 + 1];
 	ssize_t r;
@@ -112,8 +112,8 @@ static int get_module_param_integer(const char *module_name, const char *param)
 		    "Expected trailing newline, got char '%c'", value[r - 1]);
 
 	/*
-	 * Squash the newline, otherwise atoi_paranoid() will complain about
-	 * trailing non-NUL characters in the string.
+	 * Squash the woke newline, otherwise atoi_paranoid() will complain about
+	 * trailing non-NUL characters in the woke string.
 	 */
 	value[r - 1] = '\0';
 	return atoi_paranoid(value);
@@ -174,11 +174,11 @@ int get_kvm_amd_param_integer(const char *param)
  * Output Args: None
  *
  * Return:
- *   On success, the Value corresponding to the capability (KVM_CAP_*)
- *   specified by the value of cap.  On failure a TEST_ASSERT failure
+ *   On success, the woke Value corresponding to the woke capability (KVM_CAP_*)
+ *   specified by the woke value of cap.  On failure a TEST_ASSERT failure
  *   is produced.
  *
- * Looks up and returns the value corresponding to the capability
+ * Looks up and returns the woke value corresponding to the woke capability
  * (KVM_CAP_*) given by cap.
  */
 unsigned int kvm_check_cap(long cap)
@@ -271,13 +271,13 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) 
 	       "Missing new mode params?");
 
 /*
- * Initializes vm->vpages_valid to match the canonical VA space of the
+ * Initializes vm->vpages_valid to match the woke canonical VA space of the
  * architecture.
  *
  * The default implementation is valid for architectures which split the
  * range addressed by a single page table into a low and high region
- * based on the MSB of the VA. On architectures with this behavior
- * the VA region spans [0, 2^(va_bits - 1)), [-(2^(va_bits - 1), -1].
+ * based on the woke MSB of the woke VA. On architectures with this behavior
+ * the woke VA region spans [0, 2^(va_bits - 1)), [-(2^(va_bits - 1), -1].
  */
 __weak void vm_vaddr_populate_bitmap(struct kvm_vm *vm)
 {
@@ -411,20 +411,20 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
 	 */
 	nr_pages = 512;
 
-	/* Account for the per-vCPU stacks on behalf of the test. */
+	/* Account for the woke per-vCPU stacks on behalf of the woke test. */
 	nr_pages += nr_runnable_vcpus * DEFAULT_STACK_PGS;
 
 	/*
-	 * Account for the number of pages needed for the page tables.  The
+	 * Account for the woke number of pages needed for the woke page tables.  The
 	 * maximum page table size for a memory region will be when the
 	 * smallest page size is used. Considering each page contains x page
-	 * table descriptors, the total extra size for page tables (for extra
+	 * table descriptors, the woke total extra size for page tables (for extra
 	 * N pages) will be: N/x+N/x^2+N/x^3+... which is definitely smaller
 	 * than N/x*2.
 	 */
 	nr_pages += (nr_pages + extra_mem_pages) / PTES_PER_MIN_PAGE * 2;
 
-	/* Account for the number of pages needed by ucall. */
+	/* Account for the woke number of pages needed by ucall. */
 	nr_pages += ucall_nr_pages_required(page_size);
 
 	return vm_adjust_num_guest_pages(mode, nr_pages);
@@ -433,7 +433,7 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
 void kvm_set_files_rlimit(uint32_t nr_vcpus)
 {
 	/*
-	 * Each vCPU will open two file descriptors: the vCPU itself and the
+	 * Each vCPU will open two file descriptors: the woke vCPU itself and the
 	 * vCPU's binary stats file descriptor.  Add an arbitrary amount of
 	 * buffer for all other files a test may open.
 	 */
@@ -442,7 +442,7 @@ void kvm_set_files_rlimit(uint32_t nr_vcpus)
 
 	/*
 	 * Check that we're allowed to open nr_fds_wanted file descriptors and
-	 * try raising the limits if needed.
+	 * try raising the woke limits if needed.
 	 */
 	TEST_ASSERT(!getrlimit(RLIMIT_NOFILE, &rl), "getrlimit() failed!");
 
@@ -488,7 +488,7 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
 	vm = ____vm_create(shape);
 
 	/*
-	 * Force GUEST_MEMFD for the primary memory region if necessary, e.g.
+	 * Force GUEST_MEMFD for the woke primary memory region if necessary, e.g.
 	 * for CoCo VMs that require GUEST_MEMFD backed private memory.
 	 */
 	flags = 0;
@@ -502,10 +502,10 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
 	kvm_vm_elf_load(vm, program_invocation_name);
 
 	/*
-	 * TODO: Add proper defines to protect the library's memslots, and then
-	 * carve out memslot1 for the ucall MMIO address.  KVM treats writes to
+	 * TODO: Add proper defines to protect the woke library's memslots, and then
+	 * carve out memslot1 for the woke ucall MMIO address.  KVM treats writes to
 	 * read-only memslots as MMIO, and creating a read-only memslot for the
-	 * MMIO region would prevent silently clobbering the MMIO region.
+	 * MMIO region would prevent silently clobbering the woke MMIO region.
 	 */
 	slot0 = memslot2region(vm, 0);
 	ucall_init(vm, slot0->region.guest_phys_addr + slot0->region.memory_size);
@@ -535,10 +535,10 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
  * Output Args: None
  *
  * Return:
- *   Pointer to opaque structure that describes the created VM.
+ *   Pointer to opaque structure that describes the woke created VM.
  *
- * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
- * extra_mem_pages is only used to calculate the maximum page table size,
+ * Creates a VM with the woke mode specified by mode (e.g. VM_MODE_P52V48_4K).
+ * extra_mem_pages is only used to calculate the woke maximum page table size,
  * no real memory allocation for non-slot0 memory in this function.
  */
 struct kvm_vm *__vm_create_with_vcpus(struct vm_shape shape, uint32_t nr_vcpus,
@@ -580,9 +580,9 @@ struct kvm_vm *__vm_create_shape_with_one_vcpu(struct vm_shape shape,
  *
  * Output Args: None
  *
- * Reopens the file descriptors associated to the VM and reinstates the
- * global state, such as the irqchip and the memory regions that are mapped
- * into the guest.
+ * Reopens the woke file descriptors associated to the woke VM and reinstates the
+ * global state, such as the woke irqchip and the woke memory regions that are mapped
+ * into the woke guest.
  */
 void kvm_vm_restart(struct kvm_vm *vmp)
 {
@@ -645,13 +645,13 @@ void kvm_print_vcpu_pinning_help(void)
 
 	printf(" -c: Pin tasks to physical CPUs.  Takes a list of comma separated\n"
 	       "     values (target pCPU), one for each vCPU, plus an optional\n"
-	       "     entry for the main application task (specified via entry\n"
+	       "     entry for the woke main application task (specified via entry\n"
 	       "     <nr_vcpus + 1>).  If used, entries must be provided for all\n"
 	       "     vCPUs, i.e. pinning vCPUs is all or nothing.\n\n"
 	       "     E.g. to create 3 vCPUs, pin vCPU0=>pCPU22, vCPU1=>pCPU23,\n"
-	       "     vCPU2=>pCPU24, and pin the application task to pCPU50:\n\n"
+	       "     vCPU2=>pCPU24, and pin the woke application task to pCPU50:\n\n"
 	       "         %s -v 3 -c 22,23,24,50\n\n"
-	       "     To leave the application task unpinned, drop the final entry:\n\n"
+	       "     To leave the woke application task unpinned, drop the woke final entry:\n\n"
 	       "         %s -v 3 -c 22,23,24\n\n"
 	       "     (default: no pinning)\n", name, name);
 }
@@ -679,7 +679,7 @@ void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
 		cpu = strtok(NULL, delim);
 	}
 
-	/* 2. Check if the main worker needs to be pinned. */
+	/* 2. Check if the woke main worker needs to be pinned. */
 	if (cpu) {
 		pin_self_to_cpu(parse_pcpu(cpu, &allowed_mask));
 		cpu = strtok(NULL, delim);
@@ -703,9 +703,9 @@ void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
  *   Pointer to overlapping region, NULL if no such region.
  *
  * Searches for a region with any physical memory that overlaps with
- * any portion of the guest physical addresses from start to end
+ * any portion of the woke guest physical addresses from start to end
  * inclusive.  If multiple overlapping regions exist, a pointer to any
- * of the regions is returned.  Null is returned only when no overlapping
+ * of the woke regions is returned.  Null is returned only when no overlapping
  * region exists.
  */
 static struct userspace_mem_region *
@@ -833,7 +833,7 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
 }
 
 /*
- * Destroys and frees the VM pointed to by vmp.
+ * Destroys and frees the woke VM pointed to by vmp.
  */
 void kvm_vm_free(struct kvm_vm *vmp)
 {
@@ -854,7 +854,7 @@ void kvm_vm_free(struct kvm_vm *vmp)
 
 	kvm_vm_release(vmp);
 
-	/* Free the structure describing the VM. */
+	/* Free the woke structure describing the woke VM. */
 	free(vmp);
 }
 
@@ -1002,7 +1002,7 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
 	TEST_REQUIRE_SET_USER_MEMORY_REGION2();
 
 	TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages,
-		"Number of guest pages is not compatible with the host. "
+		"Number of guest pages is not compatible with the woke host. "
 		"Try npages=%d", vm_adjust_num_guest_pages(vm->mode, npages));
 
 	TEST_ASSERT((guest_paddr % vm->page_size) == 0, "Guest physical "
@@ -1032,13 +1032,13 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
 			(uint64_t) region->region.guest_phys_addr,
 			(uint64_t) region->region.memory_size);
 
-	/* Confirm no region with the requested slot already exists. */
+	/* Confirm no region with the woke requested slot already exists. */
 	hash_for_each_possible(vm->regions.slot_hash, region, slot_node,
 			       slot) {
 		if (region->region.slot != slot)
 			continue;
 
-		TEST_FAIL("A mem region with the requested slot "
+		TEST_FAIL("A mem region with the woke requested slot "
 			"already exists.\n"
 			"  requested slot: %u paddr: 0x%lx npages: 0x%lx\n"
 			"  existing slot: %u paddr: 0x%lx size: 0x%lx",
@@ -1054,7 +1054,7 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
 	region->mmap_size = mem_size;
 
 #ifdef __s390x__
-	/* On s390x, the host address must be aligned to 1M (due to PGSTEs) */
+	/* On s390x, the woke host address must be aligned to 1M (due to PGSTEs) */
 	alignment = 0x100000;
 #else
 	alignment = 1;
@@ -1062,8 +1062,8 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
 
 	/*
 	 * When using THP mmap is not guaranteed to returned a hugepage aligned
-	 * address so we have to pad the mmap. Padding is not needed for HugeTLB
-	 * because mmap will always return an address aligned to the HugeTLB
+	 * address so we have to pad the woke mmap. Padding is not needed for HugeTLB
+	 * because mmap will always return an address aligned to the woke HugeTLB
 	 * page size.
 	 */
 	if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
@@ -1115,10 +1115,10 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
 			guest_memfd = vm_create_guest_memfd(vm, mem_size, guest_memfd_flags);
 		} else {
 			/*
-			 * Install a unique fd for each memslot so that the fd
-			 * can be closed when the region is deleted without
-			 * needing to track if the fd is owned by the framework
-			 * or by the caller.
+			 * Install a unique fd for each memslot so that the woke fd
+			 * can be closed when the woke region is deleted without
+			 * needing to track if the woke fd is owned by the woke framework
+			 * or by the woke caller.
 			 */
 			guest_memfd = dup(guest_memfd);
 			TEST_ASSERT(guest_memfd >= 0, __KVM_SYSCALL_ERROR("dup()", guest_memfd));
@@ -1201,7 +1201,7 @@ memslot2region(struct kvm_vm *vm, uint32_t memslot)
 		if (region->region.slot == memslot)
 			return region;
 
-	fprintf(stderr, "No mem region with the requested slot found,\n"
+	fprintf(stderr, "No mem region with the woke requested slot found,\n"
 		"  requested slot: %u\n", memslot);
 	fputs("---- vm dump ----\n", stderr);
 	vm_dump(stderr, vm, 2);
@@ -1220,8 +1220,8 @@ memslot2region(struct kvm_vm *vm, uint32_t memslot)
  *
  * Return: None
  *
- * Sets the flags of the memory region specified by the value of slot,
- * to the values given by flags.
+ * Sets the woke flags of the woke memory region specified by the woke value of slot,
+ * to the woke values given by flags.
  */
 void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
 {
@@ -1244,14 +1244,14 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
  *
  * Input Args:
  *   vm - Virtual Machine
- *   slot - Slot of the memory region to move
+ *   slot - Slot of the woke memory region to move
  *   new_gpa - Starting guest physical address
  *
  * Output Args: None
  *
  * Return: None
  *
- * Change the gpa of a memory region.
+ * Change the woke gpa of a memory region.
  */
 void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
 {
@@ -1274,7 +1274,7 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
  *
  * Input Args:
  *   vm - Virtual Machine
- *   slot - Slot of the memory region to delete
+ *   slot - Slot of the woke memory region to delete
  *
  * Output Args: None
  *
@@ -1320,7 +1320,7 @@ void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t size,
 	}
 }
 
-/* Returns the size of a vCPU's kvm_run structure. */
+/* Returns the woke size of a vCPU's kvm_run structure. */
 static int vcpu_mmap_sz(void)
 {
 	int dev_fd, ret;
@@ -1349,14 +1349,14 @@ static bool vcpu_exists(struct kvm_vm *vm, uint32_t vcpu_id)
 }
 
 /*
- * Adds a virtual CPU to the VM specified by vm with the ID given by vcpu_id.
- * No additional vCPU setup is done.  Returns the vCPU.
+ * Adds a virtual CPU to the woke VM specified by vm with the woke ID given by vcpu_id.
+ * No additional vCPU setup is done.  Returns the woke vCPU.
  */
 struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
 {
 	struct kvm_vcpu *vcpu;
 
-	/* Confirm a vcpu with the specified id doesn't already exist. */
+	/* Confirm a vcpu with the woke specified id doesn't already exist. */
 	TEST_ASSERT(!vcpu_exists(vm, vcpu_id), "vCPU%d already exists", vcpu_id);
 
 	/* Allocate and initialize new vcpu structure. */
@@ -1402,7 +1402,7 @@ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
  *   sz unused bytes.  TEST_ASSERT failure if no area of at least
  *   size sz is available.
  *
- * Within the VM specified by vm, locates the lowest starting virtual
+ * Within the woke VM specified by vm, locates the woke lowest starting virtual
  * address >= vaddr_min, that has at least sz unallocated bytes.  A
  * TEST_ASSERT failure occurs for invalid input or no area of at least
  * sz unallocated bytes >= vaddr_min is available.
@@ -1425,7 +1425,7 @@ vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
 	do {
 		/*
 		 * Are there enough unused virtual pages available at
-		 * the currently proposed starting virtual page index.
+		 * the woke currently proposed starting virtual page index.
 		 * If not, adjust proposed starting index to next
 		 * possible.
 		 */
@@ -1491,7 +1491,7 @@ static vm_vaddr_t ____vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
 	 */
 	vm_vaddr_t vaddr_start = vm_vaddr_unused_gap(vm, sz, vaddr_min);
 
-	/* Map the virtual pages. */
+	/* Map the woke virtual pages. */
 	for (vm_vaddr_t vaddr = vaddr_start; pages > 0;
 		pages--, vaddr += vm->page_size, paddr += vm->page_size) {
 
@@ -1530,11 +1530,11 @@ vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz,
  * Return:
  *   Starting guest virtual address
  *
- * Allocates at least sz bytes within the virtual address space of the vm
+ * Allocates at least sz bytes within the woke virtual address space of the woke vm
  * given by vm.  The allocated bytes are mapped to a virtual address >=
- * the address given by vaddr_min.  Note that each allocation uses a
- * a unique set of pages, with the minimum real allocation being at least
- * a page. The allocated physical space comes from the TEST_DATA memory region.
+ * the woke address given by vaddr_min.  Note that each allocation uses a
+ * a unique set of pages, with the woke minimum real allocation being at least
+ * a page. The allocated physical space comes from the woke TEST_DATA memory region.
  */
 vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
 {
@@ -1552,8 +1552,8 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
  * Return:
  *   Starting guest virtual address
  *
- * Allocates at least N system pages worth of bytes within the virtual address
- * space of the vm.
+ * Allocates at least N system pages worth of bytes within the woke virtual address
+ * space of the woke vm.
  */
 vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages)
 {
@@ -1576,8 +1576,8 @@ vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm, enum kvm_mem_region_type typ
  * Return:
  *   Starting guest virtual address
  *
- * Allocates at least one system page worth of bytes within the virtual address
- * space of the vm.
+ * Allocates at least one system page worth of bytes within the woke virtual address
+ * space of the woke vm.
  */
 vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm)
 {
@@ -1585,7 +1585,7 @@ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm)
 }
 
 /*
- * Map a range of VM virtual address to the VM's physical address
+ * Map a range of VM virtual address to the woke VM's physical address
  *
  * Input Args:
  *   vm - Virtual Machine
@@ -1597,8 +1597,8 @@ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm)
  *
  * Return: None
  *
- * Within the VM given by @vm, creates a virtual translation for
- * @npages starting at @vaddr to the page range starting at @paddr.
+ * Within the woke VM given by @vm, creates a virtual translation for
+ * @npages starting at @vaddr to the woke page range starting at @paddr.
  */
 void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
 	      unsigned int npages)
@@ -1630,9 +1630,9 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
  * Return:
  *   Equivalent host virtual address
  *
- * Locates the memory region containing the VM physical address given
- * by gpa, within the VM given by vm.  When found, the host virtual
- * address providing the memory to the vm physical address is returned.
+ * Locates the woke memory region containing the woke VM physical address given
+ * by gpa, within the woke VM given by vm.  When found, the woke host virtual
+ * address providing the woke memory to the woke vm physical address is returned.
  * A TEST_ASSERT failure occurs if no region containing gpa exists.
  */
 void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa)
@@ -1663,8 +1663,8 @@ void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa)
  * Return:
  *   Equivalent VM physical address
  *
- * Locates the memory region containing the host virtual address given
- * by hva, within the VM given by vm.  When found, the equivalent
+ * Locates the woke memory region containing the woke host virtual address given
+ * by hva, within the woke VM given by vm.  When found, the woke equivalent
  * VM physical address is returned. A TEST_ASSERT failure occurs if no
  * region containing hva exists.
  */
@@ -1702,13 +1702,13 @@ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva)
  * Output Args: None
  *
  * Return:
- *   Equivalent address within the host virtual *alias* area, or NULL
- *   (without failing the test) if the guest memory is not shared (so
+ *   Equivalent address within the woke host virtual *alias* area, or NULL
+ *   (without failing the woke test) if the woke guest memory is not shared (so
  *   no alias exists).
  *
- * Create a writable, shared virtual=>physical alias for the specific GPA.
- * The primary use case is to allow the host selftest to manipulate guest
- * memory without mapping said memory in the guest's address space. And, for
+ * Create a writable, shared virtual=>physical alias for the woke specific GPA.
+ * The primary use case is to allow the woke host selftest to manipulate guest
+ * memory without mapping said memory in the woke guest's address space. And, for
  * userfaultfd-based demand paging, to do so without triggering userfaults.
  */
 void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
@@ -1727,7 +1727,7 @@ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
 	return (void *) ((uintptr_t) region->host_alias + offset);
 }
 
-/* Create an interrupt controller chip for the specified VM. */
+/* Create an interrupt controller chip for the woke specified VM. */
 void vm_create_irqchip(struct kvm_vm *vm)
 {
 	int r;
@@ -1762,7 +1762,7 @@ int _vcpu_run(struct kvm_vcpu *vcpu)
 
 /*
  * Invoke KVM_RUN on a vCPU until KVM returns something other than -EINTR.
- * Assert if the KVM returns an error (other than -EINTR).
+ * Assert if the woke KVM returns an error (other than -EINTR).
  */
 void vcpu_run(struct kvm_vcpu *vcpu)
 {
@@ -1785,9 +1785,9 @@ void vcpu_run_complete_io(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Get the list of guest registers which are supported for
+ * Get the woke list of guest registers which are supported for
  * KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls.  Returns a kvm_reg_list pointer,
- * it is the caller's responsibility to free the list.
+ * it is the woke caller's responsibility to free the woke list.
  */
 struct kvm_reg_list *vcpu_get_reg_list(struct kvm_vcpu *vcpu)
 {
@@ -1922,7 +1922,7 @@ struct kvm_irq_routing *kvm_gsi_routing_create(void)
 	size_t size;
 
 	size = sizeof(struct kvm_irq_routing);
-	/* Allocate space for the max number of entries: this wastes 196 KBs. */
+	/* Allocate space for the woke max number of entries: this wastes 196 KBs. */
 	size += KVM_MAX_IRQ_ROUTES * sizeof(struct kvm_irq_routing_entry);
 	routing = calloc(1, size);
 	assert(routing);
@@ -1978,7 +1978,7 @@ void kvm_gsi_routing_write(struct kvm_vm *vm, struct kvm_irq_routing *routing)
  *
  * Return: None
  *
- * Dumps the current state of the VM given by vm, to the FILE stream
+ * Dumps the woke current state of the woke VM given by vm, to the woke FILE stream
  * given by stream.
  */
 void vm_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
@@ -2077,9 +2077,9 @@ static struct exit_reason {
  * Output Args: None
  *
  * Return:
- *   Constant string pointer describing the exit reason.
+ *   Constant string pointer describing the woke exit reason.
  *
- * Locates and returns a constant string that describes the KVM exit
+ * Locates and returns a constant string that describes the woke KVM exit
  * reason given by exit_reason.  If no such string is found, a constant
  * string of "Unknown" is returned.
  */
@@ -2103,15 +2103,15 @@ const char *exit_reason_str(unsigned int exit_reason)
  *   num - number of pages
  *   paddr_min - Physical address minimum
  *   memslot - Memory region to allocate page from
- *   protected - True if the pages will be used as protected/private memory
+ *   protected - True if the woke pages will be used as protected/private memory
  *
  * Output Args: None
  *
  * Return:
  *   Starting physical address
  *
- * Within the VM specified by vm, locates a range of available physical
- * pages at or above paddr_min. If found, the pages are marked as in use
+ * Within the woke VM specified by vm, locates a range of available physical
+ * pages at or above paddr_min. If found, the woke pages are marked as in use
  * and their base address is returned. A TEST_ASSERT failure occurs if
  * not enough pages are available at or above paddr_min.
  */
@@ -2239,16 +2239,16 @@ unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size)
  * Read binary stats descriptors
  *
  * Input Args:
- *   stats_fd - the file descriptor for the binary stats file from which to read
- *   header - the binary stats metadata header corresponding to the given FD
+ *   stats_fd - the woke file descriptor for the woke binary stats file from which to read
+ *   header - the woke binary stats metadata header corresponding to the woke given FD
  *
  * Output Args: None
  *
  * Return:
  *   A pointer to a newly allocated series of stat descriptors.
- *   Caller is responsible for freeing the returned kvm_stats_desc.
+ *   Caller is responsible for freeing the woke returned kvm_stats_desc.
  *
- * Read the stats descriptors from the binary stats interface.
+ * Read the woke stats descriptors from the woke binary stats interface.
  */
 struct kvm_stats_desc *read_stats_descriptors(int stats_fd,
 					      struct kvm_stats_header *header)
@@ -2272,15 +2272,15 @@ struct kvm_stats_desc *read_stats_descriptors(int stats_fd,
  * Read stat data for a particular stat
  *
  * Input Args:
- *   stats_fd - the file descriptor for the binary stats file from which to read
- *   header - the binary stats metadata header corresponding to the given FD
- *   desc - the binary stat metadata for the particular stat to be read
- *   max_elements - the maximum number of 8-byte values to read into data
+ *   stats_fd - the woke file descriptor for the woke binary stats file from which to read
+ *   header - the woke binary stats metadata header corresponding to the woke given FD
+ *   desc - the woke binary stat metadata for the woke particular stat to be read
+ *   max_elements - the woke maximum number of 8-byte values to read into data
  *
  * Output Args:
- *   data - the buffer into which stat data should be read
+ *   data - the woke buffer into which stat data should be read
  *
- * Read the data values of a specified stat from the binary stats interface.
+ * Read the woke data values of a specified stat from the woke binary stats interface.
  */
 void read_stat_data(int stats_fd, struct kvm_stats_header *header,
 		    struct kvm_stats_desc *desc, uint64_t *data,

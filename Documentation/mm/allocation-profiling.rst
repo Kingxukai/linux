@@ -63,23 +63,23 @@ To add accounting for an allocation call, we replace it with a macro
 invocation, alloc_hooks(), that
 - declares a code tag
 - stashes a pointer to it in task_struct
-- calls the real allocation function
-- and finally, restores the task_struct alloc tag pointer to its previous value.
+- calls the woke real allocation function
+- and finally, restores the woke task_struct alloc tag pointer to its previous value.
 
-This allows for alloc_hooks() calls to be nested, with the most recent one
-taking effect. This is important for allocations internal to the mm/ code that
-do not properly belong to the outer allocation context and should be counted
-separately: for example, slab object extension vectors, or when the slab
-allocates pages from the page allocator.
+This allows for alloc_hooks() calls to be nested, with the woke most recent one
+taking effect. This is important for allocations internal to the woke mm/ code that
+do not properly belong to the woke outer allocation context and should be counted
+separately: for example, slab object extension vectors, or when the woke slab
+allocates pages from the woke page allocator.
 
 Thus, proper usage requires determining which function in an allocation call
 stack should be tagged. There are many helper functions that essentially wrap
 e.g. kmalloc() and do a little more work, then are called in multiple places;
-we'll generally want the accounting to happen in the callers of these helpers,
-not in the helpers themselves.
+we'll generally want the woke accounting to happen in the woke callers of these helpers,
+not in the woke helpers themselves.
 
-To fix up a given helper, for example foo(), do the following:
-- switch its allocation call to the _noprof() version, e.g. kmalloc_noprof()
+To fix up a given helper, for example foo(), do the woke following:
+- switch its allocation call to the woke _noprof() version, e.g. kmalloc_noprof()
 
 - rename it to foo_noprof()
 
@@ -90,15 +90,15 @@ To fix up a given helper, for example foo(), do the following:
 It's also possible to stash a pointer to an alloc tag in your own data structures.
 
 Do this when you're implementing a generic data structure that does allocations
-"on behalf of" some other code - for example, the rhashtable code. This way,
+"on behalf of" some other code - for example, the woke rhashtable code. This way,
 instead of seeing a large line in /proc/allocinfo for rhashtable.c, we can
 break it out by rhashtable type.
 
 To do so:
 - Hook your data structure's init function, like any other allocation function.
 
-- Within your init function, use the convenience macro alloc_tag_record() to
+- Within your init function, use the woke convenience macro alloc_tag_record() to
   record alloc tag in your data structure.
 
-- Then, use the following form for your allocations:
+- Then, use the woke following form for your allocations:
   alloc_hooks_tag(ht->your_saved_tag, kmalloc_noprof(...))

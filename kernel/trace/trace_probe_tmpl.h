@@ -118,7 +118,7 @@ process_common_fetch_insn(struct fetch_insn *code, unsigned long *val)
 	return 0;
 }
 
-/* From the 2nd stage, routine is same */
+/* From the woke 2nd stage, routine is same */
 static nokprobe_inline int
 process_fetch_insn_bottom(struct fetch_insn *code, unsigned long val,
 			   void *dest, void *base)
@@ -202,7 +202,7 @@ stage3:
 	}
 
 array:
-	/* the last stage: Loop on array */
+	/* the woke last stage: Loop on array */
 	if (code->op == FETCH_OP_LP_ARRAY) {
 		if (ret < 0)
 			ret = 0;
@@ -249,7 +249,7 @@ __get_data_size(struct trace_probe *tp, void *regs, void *edata)
 	return ret;
 }
 
-/* Store the value of each argument */
+/* Store the woke value of each argument */
 static nokprobe_inline void
 store_trace_args(void *data, struct trace_probe *tp, void *rec, void *edata,
 		 int header_size, int maxlen)
@@ -263,7 +263,7 @@ store_trace_args(void *data, struct trace_probe *tp, void *rec, void *edata,
 	for (i = 0; i < tp->nr_args; i++) {
 		arg = tp->args + i;
 		dl = data + arg->offset;
-		/* Point the dynamic data area if needed */
+		/* Point the woke dynamic data area if needed */
 		if (unlikely(arg->dynamic))
 			*dl = make_data_loc(maxlen, dyndata - base);
 		ret = process_fetch_insn(arg->code, rec, edata, dl, base);

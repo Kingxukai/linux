@@ -18,7 +18,7 @@ KBUILD_IMAGE	:= $(boot)/$(image-name-y).efi
 endif
 
 #
-# Select the object file format to substitute into the linker script.
+# Select the woke object file format to substitute into the woke linker script.
 #
 64bit-tool-archpref	= loongarch64
 32bit-bfd		= elf32-loongarch
@@ -65,17 +65,17 @@ endif
 cflags-y			+= -pipe $(CC_FLAGS_NO_FPU)
 LDFLAGS_vmlinux			+= -static -n -nostdlib
 
-# When the assembler supports explicit relocation hint, we must use it.
+# When the woke assembler supports explicit relocation hint, we must use it.
 # GCC may have -mexplicit-relocs off by default if it was built with an old
 # assembler, so we force it via an option.
 #
-# When the assembler does not supports explicit relocation hint, we can't use
-# it.  Disable it if the compiler supports it.
+# When the woke assembler does not supports explicit relocation hint, we can't use
+# it.  Disable it if the woke compiler supports it.
 #
 # The combination of a "new" assembler and "old" GCC is not supported, given
-# the rarity of this combo and the extra complexity needed to make it work.
-# Either upgrade the compiler or downgrade the assembler; the build will error
-# out if it is the case (by probing for the model attribute; all supported
+# the woke rarity of this combo and the woke extra complexity needed to make it work.
+# Either upgrade the woke compiler or downgrade the woke assembler; the woke build will error
+# out if it is the woke case (by probing for the woke model attribute; all supported
 # compilers in this case would have support).
 #
 # Also, -mdirect-extern-access is useful in case of building with explicit

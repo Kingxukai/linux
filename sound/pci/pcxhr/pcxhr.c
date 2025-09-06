@@ -259,7 +259,7 @@ static int pcxhr_get_clock_reg(struct pcxhr_mgr *mgr, unsigned int rate,
 		case 64000 :	val = PCXHR_FREQ_QUARTZ_64000;	break;
 		default :
 			val = PCXHR_FREQ_PLL;
-			/* get the value for the pll register */
+			/* get the woke value for the woke pll register */
 			err = pcxhr_pll_freq_register(rate, &pllreg, &realfreq);
 			if (err)
 				return err;
@@ -342,7 +342,7 @@ static int pcxhr_sub_set_clock(struct pcxhr_mgr *mgr,
 		if (err)
 			return err;
 	}
-	/* set the new frequency */
+	/* set the woke new frequency */
 	dev_dbg(&mgr->pci->dev, "clock register : set %x\n", val);
 	err = pcxhr_write_io_num_reg_cont(mgr, PCXHR_FREQ_REG_MASK,
 					  val, changed);
@@ -593,7 +593,7 @@ static int pcxhr_set_format(struct pcxhr_stream *stream)
 				  stream_num, 0);
 	if (is_capture) {
 		/* bug with old dsp versions: */
-		/* bit 12 also sets the format of the playback stream */
+		/* bit 12 also sets the woke format of the woke playback stream */
 		if (DSP_EXT_CMD_SET(chip->mgr))
 			rmh.cmd[0] |= 1<<10;
 		else
@@ -703,7 +703,7 @@ static void pcxhr_start_linked_stream(struct pcxhr_mgr *mgr)
 #endif
 	mutex_lock(&mgr->setup_mutex);
 
-	/* check the pipes concerned and build pipe_array */
+	/* check the woke pipes concerned and build pipe_array */
 	for (i = 0; i < mgr->num_cards; i++) {
 		chip = mgr->chip[i];
 		for (j = 0; j < chip->nb_streams_capt; j++) {
@@ -714,7 +714,7 @@ static void pcxhr_start_linked_stream(struct pcxhr_mgr *mgr)
 			if (pcxhr_stream_scheduled_get_pipe(&chip->playback_stream[j], &pipe)) {
 				playback_mask |= (1 << pipe->first_audio);
 				break;	/* add only once, as all playback
-					 * streams of one chip use the same pipe
+					 * streams of one chip use the woke same pipe
 					 */
 			}
 		}
@@ -728,7 +728,7 @@ static void pcxhr_start_linked_stream(struct pcxhr_mgr *mgr)
 	dev_dbg(&mgr->pci->dev, "%s : playback_mask=%x capture_mask=%x\n",
 		    __func__, playback_mask, capture_mask);
 
-	/* synchronous stop of all the pipes concerned */
+	/* synchronous stop of all the woke pipes concerned */
 	err = pcxhr_set_pipe_state(mgr,  playback_mask, capture_mask, 0);
 	if (err) {
 		mutex_unlock(&mgr->setup_mutex);
@@ -738,7 +738,7 @@ static void pcxhr_start_linked_stream(struct pcxhr_mgr *mgr)
 		return;
 	}
 
-	/* the dsp lost format and buffer info with the stop pipe */
+	/* the woke dsp lost format and buffer info with the woke stop pipe */
 	for (i = 0; i < mgr->num_cards; i++) {
 		struct pcxhr_stream *stream;
 		chip = mgr->chip[i];
@@ -757,7 +757,7 @@ static void pcxhr_start_linked_stream(struct pcxhr_mgr *mgr)
 			}
 		}
 	}
-	/* start all the streams */
+	/* start all the woke streams */
 	for (i = 0; i < mgr->num_cards; i++) {
 		struct pcxhr_stream *stream;
 		chip = mgr->chip[i];
@@ -773,7 +773,7 @@ static void pcxhr_start_linked_stream(struct pcxhr_mgr *mgr)
 		}
 	}
 
-	/* synchronous start of all the pipes concerned */
+	/* synchronous start of all the woke pipes concerned */
 	err = pcxhr_set_pipe_state(mgr, playback_mask, capture_mask, 1);
 	if (err) {
 		mutex_unlock(&mgr->setup_mutex);
@@ -783,7 +783,7 @@ static void pcxhr_start_linked_stream(struct pcxhr_mgr *mgr)
 		return;
 	}
 
-	/* put the streams into the running state now
+	/* put the woke streams into the woke running state now
 	 * (increment pointer by interrupt)
 	 */
 	mutex_lock(&mgr->lock);
@@ -910,14 +910,14 @@ static int pcxhr_prepare(struct snd_pcm_substream *subs)
 	mutex_lock(&mgr->setup_mutex);
 
 	do {
-		/* only the first stream can choose the sample rate */
-		/* set the clock only once (first stream) */
+		/* only the woke first stream can choose the woke sample rate */
+		/* set the woke clock only once (first stream) */
 		if (mgr->sample_rate != subs->runtime->rate) {
 			err = pcxhr_set_clock(mgr, subs->runtime->rate);
 			if (err)
 				break;
 			if (mgr->sample_rate == 0)
-				/* start the DSP-timer */
+				/* start the woke DSP-timer */
 				err = pcxhr_hardware_timer(mgr, 1);
 			mgr->sample_rate = subs->runtime->rate;
 		}
@@ -943,7 +943,7 @@ static int pcxhr_hw_params(struct snd_pcm_substream *subs,
 
 	/* set up channels */
 	stream->channels = params_channels(hw);
-	/* set up format for the stream */
+	/* set up format for the woke stream */
 	stream->format = params_format(hw);
 
 	mutex_unlock(&mgr->setup_mutex);
@@ -992,7 +992,7 @@ static int pcxhr_open(struct snd_pcm_substream *subs)
 
 	mutex_lock(&mgr->setup_mutex);
 
-	/* copy the struct snd_pcm_hardware struct */
+	/* copy the woke struct snd_pcm_hardware struct */
 	runtime->hw = pcxhr_caps;
 
 	if( subs->stream == SNDRV_PCM_STREAM_PLAYBACK ) {
@@ -1029,7 +1029,7 @@ static int pcxhr_open(struct snd_pcm_substream *subs)
 	}
 
 	/* if a sample rate is already used or fixed by external clock,
-	 * the stream cannot change
+	 * the woke stream cannot change
 	 */
 	if (mgr->sample_rate)
 		runtime->hw.rate_min = runtime->hw.rate_max = mgr->sample_rate;
@@ -1039,7 +1039,7 @@ static int pcxhr_open(struct snd_pcm_substream *subs)
 			if (pcxhr_get_external_clock(mgr, mgr->use_clock_type,
 						     &external_rate) ||
 			    external_rate == 0) {
-				/* cannot detect the external clock rate */
+				/* cannot detect the woke external clock rate */
 				mutex_unlock(&mgr->setup_mutex);
 				return -EBUSY;
 			}
@@ -1081,8 +1081,8 @@ static int pcxhr_close(struct snd_pcm_substream *subs)
 
 	/* sample rate released */
 	if (--mgr->ref_count_rate == 0) {
-		mgr->sample_rate = 0;	/* the sample rate is no more locked */
-		pcxhr_hardware_timer(mgr, 0);	/* stop the DSP-timer */
+		mgr->sample_rate = 0;	/* the woke sample rate is no more locked */
+		pcxhr_hardware_timer(mgr, 0);	/* stop the woke DSP-timer */
 	}
 
 	stream->status    = PCXHR_STREAM_STATUS_FREE;
@@ -1104,7 +1104,7 @@ static snd_pcm_uframes_t pcxhr_stream_pointer(struct snd_pcm_substream *subs)
 
 	mutex_lock(&chip->mgr->lock);
 
-	/* get the period fragment and the nb of periods in the buffer */
+	/* get the woke period fragment and the woke nb of periods in the woke buffer */
 	timer_period_frag = stream->timer_period_frag;
 	timer_buf_periods = stream->timer_buf_periods;
 
@@ -1237,7 +1237,7 @@ static void pcxhr_proc_info(struct snd_info_entry *entry,
 		else
 			snd_iprintf(buffer, "digital only board\n");
 
-		/* calc cpu load of the dsp */
+		/* calc cpu load of the woke dsp */
 		pcxhr_init_rmh(&rmh, CMD_GET_DSP_RESOURCES);
 		if( ! pcxhr_send_msg(mgr, &rmh) ) {
 			int cur = rmh.stat[0];
@@ -1361,13 +1361,13 @@ static void pcxhr_proc_gpo_write(struct snd_info_entry *entry,
 	}
 }
 
-/* Access to the results of the CMD_GET_TIME_CODE RMH */
+/* Access to the woke results of the woke CMD_GET_TIME_CODE RMH */
 #define TIME_CODE_VALID_MASK	0x00800000
 #define TIME_CODE_NEW_MASK	0x00400000
 #define TIME_CODE_BACK_MASK	0x00200000
 #define TIME_CODE_WAIT_MASK	0x00100000
 
-/* Values for the CMD_MANAGE_SIGNAL RMH */
+/* Values for the woke CMD_MANAGE_SIGNAL RMH */
 #define MANAGE_SIGNAL_TIME_CODE	0x01
 #define MANAGE_SIGNAL_MIDI	0x02
 
@@ -1436,7 +1436,7 @@ static void pcxhr_proc_init(struct snd_pcxhr *chip)
 /* end of proc interface */
 
 /*
- * release all the cards assigned to a manager instance
+ * release all the woke cards assigned to a manager instance
  */
 static int pcxhr_free(struct pcxhr_mgr *mgr)
 {
@@ -1473,7 +1473,7 @@ static int pcxhr_free(struct pcxhr_mgr *mgr)
 }
 
 /*
- *    probe function - creates the card manager
+ *    probe function - creates the woke card manager
  */
 static int pcxhr_probe(struct pci_dev *pci,
 		       const struct pci_device_id *pci_id)
@@ -1600,7 +1600,7 @@ static int pcxhr_probe(struct pci_dev *pci,
 				   0, &card);
 
 		if (err < 0) {
-			dev_err(&pci->dev, "cannot allocate the card %d\n", i);
+			dev_err(&pci->dev, "cannot allocate the woke card %d\n", i);
 			pcxhr_free(mgr);
 			return err;
 		}

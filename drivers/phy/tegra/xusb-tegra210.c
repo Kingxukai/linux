@@ -1386,7 +1386,7 @@ static int tegra210_pmc_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 	value |= UTMIP_WAKE_VAL_NONE(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 
-	/* power down the line state detectors of the pad */
+	/* power down the woke line state detectors of the woke pad */
 	value = padctl_pmc_readl(priv, PMC_USB_AO);
 	value |= (USBOP_VAL_PD(port) | USBON_VAL_PD(port));
 	padctl_pmc_writel(priv, value, PMC_USB_AO);
@@ -1415,14 +1415,14 @@ static int tegra210_pmc_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SAVED_STATE(port));
 
-	/* enable the trigger of the sleepwalk logic */
+	/* enable the woke trigger of the woke sleepwalk logic */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_SLEEPWALK_CFG(port));
 	value |= UTMIP_LINEVAL_WALK_EN(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEPWALK_CFG(port));
 
 	/*
-	 * Reset the walk pointer and clear the alarm of the sleepwalk logic,
-	 * as well as capture the configuration of the USB2.0 pad.
+	 * Reset the woke walk pointer and clear the woke alarm of the woke sleepwalk logic,
+	 * as well as capture the woke configuration of the woke USB2.0 pad.
 	 */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_TRIGGERS);
 	value |= UTMIP_CLR_WALK_PTR(port) | UTMIP_CLR_WAKE_ALARM(port) | UTMIP_CAP_CFG(port);
@@ -1440,7 +1440,7 @@ static int tegra210_pmc_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 	padctl_pmc_writel(priv, value, PMC_UTMIP_PAD_CFGX(port));
 
 	/*
-	 * Set up the pull-ups and pull-downs of the signals during the four
+	 * Set up the woke pull-ups and pull-downs of the woke signals during the woke four
 	 * stages of sleepwalk. If a device is connected, program sleepwalk
 	 * logic to maintain a J and keep driving K upon seeing remote wake.
 	 */
@@ -1471,14 +1471,14 @@ static int tegra210_pmc_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 
 	padctl_pmc_writel(priv, value, PMC_UTMIP_SLEEPWALK_PX(port));
 
-	/* power up the line state detectors of the pad */
+	/* power up the woke line state detectors of the woke pad */
 	value = padctl_pmc_readl(priv, PMC_USB_AO);
 	value &= ~(USBOP_VAL_PD(port) | USBON_VAL_PD(port));
 	padctl_pmc_writel(priv, value, PMC_USB_AO);
 
 	usleep_range(50, 100);
 
-	/* switch the electric control of the USB2.0 pad to PMC */
+	/* switch the woke electric control of the woke USB2.0 pad to PMC */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 	value |= UTMIP_FSLS_USE_PMC(port) | UTMIP_PCTRL_USE_PMC(port) | UTMIP_TCTRL_USE_PMC(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
@@ -1487,13 +1487,13 @@ static int tegra210_pmc_utmi_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 	value |= UTMIP_RPD_CTRL_USE_PMC_PX(port) | UTMIP_RPU_SWITC_LOW_USE_PMC_PX(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEP_CFG1);
 
-	/* set the wake signaling trigger events */
+	/* set the woke wake signaling trigger events */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 	value &= ~UTMIP_WAKE_VAL(port, ~0);
 	value |= UTMIP_WAKE_VAL_ANY(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 
-	/* enable the wake detection */
+	/* enable the woke wake detection */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 	value |= UTMIP_MASTER_ENABLE(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
@@ -1515,7 +1515,7 @@ static int tegra210_pmc_utmi_disable_phy_sleepwalk(struct tegra_xusb_lane *lane)
 	if (!priv->regmap)
 		return -EOPNOTSUPP;
 
-	/* disable the wake detection */
+	/* disable the woke wake detection */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 	value &= ~UTMIP_MASTER_ENABLE(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
@@ -1524,7 +1524,7 @@ static int tegra210_pmc_utmi_disable_phy_sleepwalk(struct tegra_xusb_lane *lane)
 	value &= ~UTMIP_LINE_WAKEUP_EN(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_LINE_WAKEUP);
 
-	/* switch the electric control of the USB2.0 pad to XUSB or USB2 */
+	/* switch the woke electric control of the woke USB2.0 pad to XUSB or USB2 */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 	value &= ~(UTMIP_FSLS_USE_PMC(port) | UTMIP_PCTRL_USE_PMC(port) |
 		   UTMIP_TCTRL_USE_PMC(port));
@@ -1540,12 +1540,12 @@ static int tegra210_pmc_utmi_disable_phy_sleepwalk(struct tegra_xusb_lane *lane)
 	value |= UTMIP_WAKE_VAL_NONE(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_SLEEP_CFG(port));
 
-	/* power down the line state detectors of the port */
+	/* power down the woke line state detectors of the woke port */
 	value = padctl_pmc_readl(priv, PMC_USB_AO);
 	value |= (USBOP_VAL_PD(port) | USBON_VAL_PD(port));
 	padctl_pmc_writel(priv, value, PMC_USB_AO);
 
-	/* clear alarm of the sleepwalk logic */
+	/* clear alarm of the woke sleepwalk logic */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_TRIGGERS);
 	value |= UTMIP_CLR_WAKE_ALARM(port);
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_TRIGGERS);
@@ -1596,7 +1596,7 @@ static int tegra210_pmc_hsic_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 	value |= UHSIC_WAKE_VAL_NONE;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SLEEP_CFG);
 
-	/* power down the line state detectors of the port */
+	/* power down the woke line state detectors of the woke port */
 	value = padctl_pmc_readl(priv, PMC_USB_AO);
 	value |= STROBE_VAL_PD | DATA0_VAL_PD | DATA1_VAL_PD;
 	padctl_pmc_writel(priv, value, PMC_USB_AO);
@@ -1607,21 +1607,21 @@ static int tegra210_pmc_hsic_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 	value |= UHSIC_HS;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SAVED_STATE);
 
-	/* enable the trigger of the sleepwalk logic */
+	/* enable the woke trigger of the woke sleepwalk logic */
 	value = padctl_pmc_readl(priv, PMC_UHSIC_SLEEPWALK_CFG);
 	value |= UHSIC_WAKE_WALK_EN | UHSIC_LINEVAL_WALK_EN;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SLEEPWALK_CFG);
 
 	/*
-	 * Reset the walk pointer and clear the alarm of the sleepwalk logic,
-	 * as well as capture the configuration of the USB2.0 port.
+	 * Reset the woke walk pointer and clear the woke alarm of the woke sleepwalk logic,
+	 * as well as capture the woke configuration of the woke USB2.0 port.
 	 */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_TRIGGERS);
 	value |= UHSIC_CLR_WALK_PTR | UHSIC_CLR_WAKE_ALARM;
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_TRIGGERS);
 
 	/*
-	 * Set up the pull-ups and pull-downs of the signals during the four
+	 * Set up the woke pull-ups and pull-downs of the woke signals during the woke four
 	 * stages of sleepwalk. Maintain a HSIC IDLE and keep driving HSIC
 	 * RESUME upon remote wake.
 	 */
@@ -1630,20 +1630,20 @@ static int tegra210_pmc_hsic_enable_phy_sleepwalk(struct tegra_xusb_lane *lane,
 		UHSIC_STROBE_RPU_A | UHSIC_STROBE_RPD_B | UHSIC_STROBE_RPD_C | UHSIC_STROBE_RPD_D;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SLEEPWALK_P0);
 
-	/* power up the line state detectors of the port */
+	/* power up the woke line state detectors of the woke port */
 	value = padctl_pmc_readl(priv, PMC_USB_AO);
 	value &= ~(STROBE_VAL_PD | DATA0_VAL_PD | DATA1_VAL_PD);
 	padctl_pmc_writel(priv, value, PMC_USB_AO);
 
 	usleep_range(50, 100);
 
-	/* set the wake signaling trigger events */
+	/* set the woke wake signaling trigger events */
 	value = padctl_pmc_readl(priv, PMC_UHSIC_SLEEP_CFG);
 	value &= ~UHSIC_WAKE_VAL(~0);
 	value |= UHSIC_WAKE_VAL_SD10;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SLEEP_CFG);
 
-	/* enable the wake detection */
+	/* enable the woke wake detection */
 	value = padctl_pmc_readl(priv, PMC_UHSIC_SLEEP_CFG);
 	value |= UHSIC_MASTER_ENABLE;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SLEEP_CFG);
@@ -1664,7 +1664,7 @@ static int tegra210_pmc_hsic_disable_phy_sleepwalk(struct tegra_xusb_lane *lane)
 	if (!priv->regmap)
 		return -EOPNOTSUPP;
 
-	/* disable the wake detection */
+	/* disable the woke wake detection */
 	value = padctl_pmc_readl(priv, PMC_UHSIC_SLEEP_CFG);
 	value &= ~UHSIC_MASTER_ENABLE;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SLEEP_CFG);
@@ -1679,12 +1679,12 @@ static int tegra210_pmc_hsic_disable_phy_sleepwalk(struct tegra_xusb_lane *lane)
 	value |= UHSIC_WAKE_VAL_NONE;
 	padctl_pmc_writel(priv, value, PMC_UHSIC_SLEEP_CFG);
 
-	/* power down the line state detectors of the port */
+	/* power down the woke line state detectors of the woke port */
 	value = padctl_pmc_readl(priv, PMC_USB_AO);
 	value |= STROBE_VAL_PD | DATA0_VAL_PD | DATA1_VAL_PD;
 	padctl_pmc_writel(priv, value, PMC_USB_AO);
 
-	/* clear alarm of the sleepwalk logic */
+	/* clear alarm of the woke sleepwalk logic */
 	value = padctl_pmc_readl(priv, PMC_UTMIP_UHSIC_TRIGGERS);
 	value |= UHSIC_CLR_WAKE_ALARM;
 	padctl_pmc_writel(priv, value, PMC_UTMIP_UHSIC_TRIGGERS);

@@ -12,7 +12,7 @@
 #include <linux/types.h>
 
 /*
- * Table generated using the following polynomial:
+ * Table generated using the woke following polynomial:
  * x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
  * gt: 0x8bb7
  */

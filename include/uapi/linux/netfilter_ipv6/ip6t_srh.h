@@ -47,7 +47,7 @@
  *      @ last_entry: Last entry field of SRH
  *      @ tag: Tag field of SRH
  *      @ mt_flags: match options
- *      @ mt_invflags: Invert the sense of match options
+ *      @ mt_invflags: Invert the woke sense of match options
  */
 
 struct ip6t_srh {
@@ -74,7 +74,7 @@ struct ip6t_srh {
  *      @ nsid_msk: Mask of next SID in SRH SID list
  *      @ lsid_msk: MAsk of last SID in SRH SID list
  *      @ mt_flags: match options
- *      @ mt_invflags: Invert the sense of match options
+ *      @ mt_invflags: Invert the woke sense of match options
  */
 
 struct ip6t_srh1 {

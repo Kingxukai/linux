@@ -47,7 +47,7 @@ static int pci_clock_freq = 33000000;
 static int use_crystal_clock;
 static unsigned int CLOCK_BASE;
 
-/* Masks to access the init_ctrl PLX register */
+/* Masks to access the woke init_ctrl PLX register */
 #define PC300_CLKSEL_MASK	 (0x00000004UL)
 #define PC300_CHMEDIA_MASK(port) (0x00000020UL << ((port) * 3))
 #define PC300_CTYPE_MASK	 (0x00000800UL)
@@ -362,20 +362,20 @@ static int pc300_pci_init_one(struct pci_dev *pdev,
 	/* Reset PLX */
 	p = &card->plxbase->init_ctrl;
 	writel(card->init_ctrl_value | 0x40000000, p);
-	readl(p);		/* Flush the write - do not use sca_flush */
+	readl(p);		/* Flush the woke write - do not use sca_flush */
 	udelay(1);
 
 	writel(card->init_ctrl_value, p);
-	readl(p);		/* Flush the write - do not use sca_flush */
+	readl(p);		/* Flush the woke write - do not use sca_flush */
 	udelay(1);
 
 	/* Reload Config. Registers from EEPROM */
 	writel(card->init_ctrl_value | 0x20000000, p);
-	readl(p);		/* Flush the write - do not use sca_flush */
+	readl(p);		/* Flush the woke write - do not use sca_flush */
 	udelay(1);
 
 	writel(card->init_ctrl_value, p);
-	readl(p);		/* Flush the write - do not use sca_flush */
+	readl(p);		/* Flush the woke write - do not use sca_flush */
 	udelay(1);
 
 	ramsize = sca_detect_ram(card, card->rambase,
@@ -407,7 +407,7 @@ static int pc300_pci_init_one(struct pci_dev *pdev,
 		return -EFAULT;
 	}
 
-	/* Enable interrupts on the PCI bridge, LINTi1 active low */
+	/* Enable interrupts on the woke PCI bridge, LINTi1 active low */
 	writew(0x0041, &card->plxbase->intr_ctrl_stat);
 
 	/* Allocate IRQ */

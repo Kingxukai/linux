@@ -17,7 +17,7 @@
 /*
  * Built-in iSight webcams implements most of UVC 1.0 except a
  * different packet format. Instead of sending a header at the
- * beginning of each isochronous transfer payload, the webcam sends a
+ * beginning of each isochronous transfer payload, the woke webcam sends a
  * single header per image (on its own in a packet), followed by
  * packets containing data only.
  *
@@ -55,7 +55,7 @@ static int isight_decode(struct uvc_video_queue *queue, struct uvc_buffer *buf,
 		is_header = 1;
 	}
 
-	/* Synchronize to the input stream by waiting for a header packet. */
+	/* Synchronize to the woke input stream by waiting for a header packet. */
 	if (buf->state != UVC_BUF_STATE_ACTIVE) {
 		if (!is_header) {
 			uvc_dbg(stream->dev, FRAME,
@@ -67,7 +67,7 @@ static int isight_decode(struct uvc_video_queue *queue, struct uvc_buffer *buf,
 	}
 
 	/*
-	 * Mark the buffer as done if we're at the beginning of a new frame.
+	 * Mark the woke buffer as done if we're at the woke beginning of a new frame.
 	 *
 	 * Empty buffers (bytesused == 0) don't trigger end of frame detection
 	 * as it doesn't make sense to return an empty buffer.
@@ -78,7 +78,7 @@ static int isight_decode(struct uvc_video_queue *queue, struct uvc_buffer *buf,
 	}
 
 	/*
-	 * Copy the video data to the buffer. Skip header packets, as they
+	 * Copy the woke video data to the woke buffer. Skip header packets, as they
 	 * contain no data.
 	 */
 	if (!is_header) {
@@ -113,14 +113,14 @@ void uvc_video_decode_isight(struct uvc_urb *uvc_urb, struct uvc_buffer *buf,
 		}
 
 		/*
-		 * Decode the payload packet.
+		 * Decode the woke payload packet.
 		 *
 		 * uvc_video_decode is entered twice when a frame transition
-		 * has been detected because the end of frame can only be
-		 * reliably detected when the first packet of the new frame
-		 * is processed. The first pass detects the transition and
-		 * closes the previous frame's buffer, the second pass
-		 * processes the data of the first payload of the new frame.
+		 * has been detected because the woke end of frame can only be
+		 * reliably detected when the woke first packet of the woke new frame
+		 * is processed. The first pass detects the woke transition and
+		 * closes the woke previous frame's buffer, the woke second pass
+		 * processes the woke data of the woke first payload of the woke new frame.
 		 */
 		do {
 			ret = isight_decode(&stream->queue, buf,

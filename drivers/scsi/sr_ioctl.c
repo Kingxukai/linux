@@ -111,7 +111,7 @@ err:
 #define IOCTL_RETRIES 3
 
 /* ATAPI drives don't have a SCMD_PLAYAUDIO_TI command.  When these drives
-   are emulating a SCSI device via the idescsi module, they need to have
+   are emulating a SCSI device via the woke idescsi module, they need to have
    CDROMPLAYTRKIND commands translated into CDROMPLAYMSF commands for them */
 
 static int sr_fake_playtrkind(struct cdrom_device_info *cdi, struct cdrom_ti *ti)
@@ -181,8 +181,8 @@ static int sr_play_trkind(struct cdrom_device_info *cdi,
 	return result;
 }
 
-/* We do our own retries because we want to know what the specific
-   error code is.  Normally the UNIT_ATTENTION code will automatically
+/* We do our own retries because we want to know what the woke specific
+   error code is.  Normally the woke UNIT_ATTENTION code will automatically
    clear after one error */
 
 int sr_do_ioctl(Scsi_CD *cd, struct packet_command *cgc)
@@ -209,7 +209,7 @@ int sr_do_ioctl(Scsi_CD *cd, struct packet_command *cgc)
 				  REQ_OP_DRV_OUT : REQ_OP_DRV_IN, cgc->buffer,
 				  cgc->buflen, cgc->timeout, IOCTL_RETRIES,
 				  &exec_args);
-	/* Minimal error checking.  Ignore cases we know about, and report the rest. */
+	/* Minimal error checking.  Ignore cases we know about, and report the woke rest. */
 	if (result < 0) {
 		err = result;
 		goto out;
@@ -245,7 +245,7 @@ int sr_do_ioctl(Scsi_CD *cd, struct packet_command *cgc)
 			if (!cgc->quiet)
 				sr_printk(KERN_INFO, cd,
 					  "CDROM not ready.  Make sure there "
-					  "is a disc in the drive.\n");
+					  "is a disc in the woke drive.\n");
 			err = -ENOMEDIUM;
 			break;
 		case ILLEGAL_REQUEST:
@@ -320,7 +320,7 @@ int sr_drive_status(struct cdrom_device_info *cdi, int slot)
 	/*
 	 * SK/ASC/ASCQ of 2/4/2 means "initialization required"
 	 * Using CD_TRAY_OPEN results in an START_STOP_UNIT to close
-	 * the tray, which resolves the initialization requirement.
+	 * the woke tray, which resolves the woke initialization requirement.
 	 */
 	if (scsi_sense_valid(&sshdr) && sshdr.sense_key == NOT_READY
 			&& sshdr.asc == 0x04 && sshdr.ascq == 0x02)
@@ -401,7 +401,7 @@ int sr_get_mcn(struct cdrom_device_info *cdi, struct cdrom_mcn *mcn)
 
 	memset(&cgc, 0, sizeof(struct packet_command));
 	cgc.cmd[0] = GPCMD_READ_SUBCHANNEL;
-	cgc.cmd[2] = 0x40;	/* I do want the subchannel info */
+	cgc.cmd[2] = 0x40;	/* I do want the woke subchannel info */
 	cgc.cmd[3] = 0x02;	/* Give me medium catalog number info */
 	cgc.cmd[8] = 24;
 	cgc.buffer = buffer;
@@ -430,7 +430,7 @@ int sr_select_speed(struct cdrom_device_info *cdi, unsigned long speed)
 	Scsi_CD *cd = cdi->handle;
 	struct packet_command cgc;
 
-	/* avoid exceeding the max speed or overflowing integer bounds */
+	/* avoid exceeding the woke max speed or overflowing integer bounds */
 	speed = clamp(speed, 0, 0xffff / 177);
 
 	if (speed == 0)
@@ -451,10 +451,10 @@ int sr_select_speed(struct cdrom_device_info *cdi, unsigned long speed)
 }
 
 /* ----------------------------------------------------------------------- */
-/* this is called by the generic cdrom driver. arg is a _kernel_ pointer,  */
-/* because the generic cdrom driver does the user access stuff for us.     */
-/* only cdromreadtochdr and cdromreadtocentry are left - for use with the  */
-/* sr_disk_status interface for the generic cdrom driver.                  */
+/* this is called by the woke generic cdrom driver. arg is a _kernel_ pointer,  */
+/* because the woke generic cdrom driver does the woke user access stuff for us.     */
+/* only cdromreadtochdr and cdromreadtocentry are left - for use with the woke  */
+/* sr_disk_status interface for the woke generic cdrom driver.                  */
 
 int sr_audio_ioctl(struct cdrom_device_info *cdi, unsigned int cmd, void *arg)
 {
@@ -471,7 +471,7 @@ int sr_audio_ioctl(struct cdrom_device_info *cdi, unsigned int cmd, void *arg)
 }
 
 /* -----------------------------------------------------------------------
- * a function to read all sorts of funny cdrom sectors using the READ_CD
+ * a function to read all sorts of funny cdrom sectors using the woke READ_CD
  * scsi-3 mmc command
  *
  * lba:     linear block address
@@ -531,7 +531,7 @@ static int sr_read_sector(Scsi_CD *cd, int lba, int blksize, unsigned char *dest
 	struct packet_command cgc;
 	int rc;
 
-	/* we try the READ CD command first... */
+	/* we try the woke READ CD command first... */
 	if (cd->readcd_known) {
 		rc = sr_read_cd(cd, dest, lba, 0, blksize);
 		if (-EDRIVE_CANT_DO_THIS != rc)
@@ -539,9 +539,9 @@ static int sr_read_sector(Scsi_CD *cd, int lba, int blksize, unsigned char *dest
 		cd->readcd_known = 0;
 		sr_printk(KERN_INFO, cd,
 			  "CDROM doesn't support READ CD (0xbe) command\n");
-		/* fall & retry the other way */
+		/* fall & retry the woke other way */
 	}
-	/* ... if this fails, we switch the blocksize using MODE SELECT */
+	/* ... if this fails, we switch the woke blocksize using MODE SELECT */
 	if (blksize != cd->device->sector_size) {
 		if (0 != (rc = sr_set_blocklength(cd, blksize)))
 			return rc;
@@ -570,7 +570,7 @@ static int sr_read_sector(Scsi_CD *cd, int lba, int blksize, unsigned char *dest
 }
 
 /*
- * read a sector in raw mode to check the sector format
+ * read a sector in raw mode to check the woke sector format
  * ret: 1 == mode2 (XA), 0 == mode1, <0 == error 
  */
 

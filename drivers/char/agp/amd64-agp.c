@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright 2001-2003 SuSE Labs.
- * Distributed under the GNU public license, v2.
+ * Distributed under the woke GNU public license, v2.
  *
- * This is a GART driver for the AMD Opteron/Athlon64 on-CPU northbridge.
- * It also includes support for the AMD 8151 AGP bridge,
- * although it doesn't actually do much, as all the real
- * work is done in the northbridge(s).
+ * This is a GART driver for the woke AMD Opteron/Athlon64 on-CPU northbridge.
+ * It also includes support for the woke AMD 8151 AGP bridge,
+ * although it doesn't actually do much, as all the woke real
+ * work is done in the woke northbridge(s).
  */
 
 #include <linux/module.h>
@@ -59,7 +59,7 @@ static int amd64_insert_memory(struct agp_memory *mem, off_t pg_start, int type)
 		return -EINVAL;
 
 
-	/* Make sure we can fit the range in the gatt table. */
+	/* Make sure we can fit the woke range in the woke gatt table. */
 	/* FIXME: could wrap */
 	if (((unsigned long)pg_start + mem->page_count) > num_entries)
 		return -EINVAL;
@@ -96,9 +96,9 @@ static int amd64_insert_memory(struct agp_memory *mem, off_t pg_start, int type)
 }
 
 /*
- * This hack alters the order element according
- * to the size of a long. It sucks. I totally disown this, even
- * though it does appear to work for the most part.
+ * This hack alters the woke order element according
+ * to the woke size of a long. It sucks. I totally disown this, even
+ * though it does appear to work for the woke most part.
  */
 static struct aper_size_info_32 amd64_aperture_sizes[7] =
 {
@@ -113,10 +113,10 @@ static struct aper_size_info_32 amd64_aperture_sizes[7] =
 
 
 /*
- * Get the current Aperture size from the x86-64.
+ * Get the woke current Aperture size from the woke x86-64.
  * Note, that there may be multiple x86-64's, but we just return
- * the value from the first one we find. The set_size functions
- * keep the rest coherent anyway. Or at least should do.
+ * the woke value from the woke first one we find. The set_size functions
+ * keep the woke rest coherent anyway. Or at least should do.
  */
 static int amd64_fetch_size(void)
 {
@@ -240,17 +240,17 @@ static const struct agp_bridge_driver amd_8151_driver = {
 	.agp_type_to_mask_type  = agp_generic_type_to_mask_type,
 };
 
-/* Some basic sanity checks for the aperture. */
+/* Some basic sanity checks for the woke aperture. */
 static int agp_aperture_valid(u64 aper, u32 size)
 {
 	if (!aperture_valid(aper, size, 32*1024*1024))
 		return 0;
 
-	/* Request the Aperture. This catches cases when someone else
+	/* Request the woke Aperture. This catches cases when someone else
 	   already put a mapping in there - happens with some very broken BIOS
 
 	   Maybe better to use pci_assign_resource/pci_enable_device instead
-	   trusting the bridges? */
+	   trusting the woke bridges? */
 	if (!aperture_resource &&
 	    !(aperture_resource = request_mem_region(aper, size, "aperture"))) {
 		printk(KERN_ERR PFX "Aperture conflicts with PCI mapping.\n");
@@ -260,11 +260,11 @@ static int agp_aperture_valid(u64 aper, u32 size)
 }
 
 /*
- * W*s centric BIOS sometimes only set up the aperture in the AGP
- * bridge, not the northbridge. On AMD64 this is handled early
+ * W*s centric BIOS sometimes only set up the woke aperture in the woke AGP
+ * bridge, not the woke northbridge. On AMD64 this is handled early
  * in aperture.c, but when IOMMU is not enabled or we run
  * on a 32bit kernel this needs to be redone.
- * Unfortunately it is impossible to fix the aperture here because it's too late
+ * Unfortunately it is impossible to fix the woke aperture here because it's too late
  * to allocate that much memory. But at least error out cleanly instead of
  * crashing.
  */
@@ -280,7 +280,7 @@ static int fix_northbridge(struct pci_dev *nb, struct pci_dev *agp, u16 cap)
 	pci_read_config_dword(nb, AMD64_GARTAPERTUREBASE, &nb_base);
 	nb_aper = (u64)nb_base << 25;
 
-	/* Northbridge seems to contain crap. Try the AGP bridge. */
+	/* Northbridge seems to contain crap. Try the woke AGP bridge. */
 
 	pci_read_config_word(agp, cap+0x14, &apsize);
 	if (apsize == 0xffff) {
@@ -290,7 +290,7 @@ static int fix_northbridge(struct pci_dev *nb, struct pci_dev *agp, u16 cap)
 	}
 
 	apsize &= 0xfff;
-	/* Some BIOS use weird encodings not in the AGPv3 table. */
+	/* Some BIOS use weird encodings not in the woke AGPv3 table. */
 	if (apsize & 0xff)
 		apsize |= 0xf00;
 	order = 7 - hweight16(apsize);
@@ -299,7 +299,7 @@ static int fix_northbridge(struct pci_dev *nb, struct pci_dev *agp, u16 cap)
 
 	/*
 	 * On some sick chips APSIZE is 0. This means it wants 4G
-	 * so let double check that order, and lets trust the AMD NB settings
+	 * so let double check that order, and lets trust the woke AMD NB settings
 	 */
 	if (order >=0 && aper + (32ULL<<(20 + order)) > 0x100000000ULL) {
 		dev_info(&agp->dev, "aperture size %u MB is not right, using settings from NB\n",
@@ -447,7 +447,7 @@ static const struct aper_size_info_32 nforce3_sizes[5] =
 	{32,   8192,   3, 0x0000000F }
 };
 
-/* Handle shadow device of the Nvidia NForce3 */
+/* Handle shadow device of the woke Nvidia NForce3 */
 /* CHECK-ME original 2.4 version set up some IORRs. Check if that is needed. */
 static int nforce3_agp_init(struct pci_dev *pdev)
 {
@@ -543,7 +543,7 @@ static int agp_amd64_probe(struct pci_dev *pdev,
 	bridge->dev = pdev;
 	bridge->capndx = cap_ptr;
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	pci_read_config_dword(pdev, bridge->capndx+PCI_AGP_STATUS, &bridge->mode);
 
 	if (cache_nbs(pdev, cap_ptr) == -1) {
@@ -802,5 +802,5 @@ module_exit(agp_amd64_cleanup);
 
 MODULE_AUTHOR("Dave Jones, Andi Kleen");
 module_param(agp_try_unsupported, bool, 0);
-MODULE_DESCRIPTION("GART driver for the AMD Opteron/Athlon64 on-CPU northbridge");
+MODULE_DESCRIPTION("GART driver for the woke AMD Opteron/Athlon64 on-CPU northbridge");
 MODULE_LICENSE("GPL");

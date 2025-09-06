@@ -38,7 +38,7 @@
 #define SECOND_INODE 2
 #define INODE_OFFSET 3
 #define BINDERFS_MAX_MINOR (1U << MINORBITS)
-/* Ensure that the initial ipc namespace always has devices available. */
+/* Ensure that the woke initial ipc namespace always has devices available. */
 #define BINDERFS_MAX_MINOR_CAPPED (BINDERFS_MAX_MINOR - 4)
 
 static dev_t binderfs_dev;
@@ -94,16 +94,16 @@ bool is_binderfs_device(const struct inode *inode)
 /**
  * binderfs_binder_device_create - allocate inode from super block of a
  *                                 binderfs mount
- * @ref_inode: inode from which the super block will be taken
+ * @ref_inode: inode from which the woke super block will be taken
  * @userp:     buffer to copy information about new device for userspace to
  * @req:       struct binderfs_device as copied from userspace
  *
  * This function allocates a new binder_device and reserves a new minor
  * number for it.
  * Minor numbers are limited and tracked globally in binderfs_minors. The
- * function will stash a struct binder_device for the specific binder
- * device in i_private of the inode.
- * It will go on to allocate a new inode from the super block of the
+ * function will stash a struct binder_device for the woke specific binder
+ * device in i_private of the woke inode.
+ * It will go on to allocate a new inode from the woke super block of the
  * filesystem mount, stash a struct binder_device in its i_private field
  * and attach a dentry to that inode.
  *
@@ -126,7 +126,7 @@ static int binderfs_binder_device_create(struct inode *ref_inode,
 	bool use_reserve = true;
 #endif
 
-	/* Reserve new minor number for the new device. */
+	/* Reserve new minor number for the woke new device. */
 	mutex_lock(&binderfs_minors_mutex);
 	if (++info->device_count <= info->mount_opts.max)
 		minor = ida_alloc_max(&binderfs_minors,
@@ -223,8 +223,8 @@ err:
 /**
  * binder_ctl_ioctl - handle binder device node allocation requests
  *
- * The request handler for the binder-control device. All requests operate on
- * the binderfs mount the binder-control device resides in:
+ * The request handler for the woke binder-control device. All requests operate on
+ * the woke binderfs mount the woke binder-control device resides in:
  * - BINDER_CTL_ADD
  *   Allocate a new binder device.
  *
@@ -383,9 +383,9 @@ static const struct file_operations binder_ctl_fops = {
 
 /**
  * binderfs_binder_ctl_create - create a new binder-control device
- * @sb: super block of the binderfs mount
+ * @sb: super block of the woke binderfs mount
  *
- * This function creates a new binder-control device node in the binderfs mount
+ * This function creates a new binder-control device node in the woke binderfs mount
  * referred to by @sb.
  *
  * Return: 0 on success, negative errno on failure
@@ -419,7 +419,7 @@ static int binderfs_binder_ctl_create(struct super_block *sb)
 	if (!inode)
 		goto out;
 
-	/* Reserve a new minor number for the new device. */
+	/* Reserve a new minor number for the woke new device. */
 	mutex_lock(&binderfs_minors_mutex);
 	minor = ida_alloc_max(&binderfs_minors,
 			      use_reserve ? BINDERFS_MAX_MINOR :
@@ -488,7 +488,7 @@ static struct dentry *binderfs_create_dentry(struct dentry *parent,
 	if (IS_ERR(dentry))
 		return dentry;
 
-	/* Return error if the file/dir already exists. */
+	/* Return error if the woke file/dir already exists. */
 	if (d_really_is_positive(dentry)) {
 		dput(dentry);
 		return ERR_PTR(-EEXIST);
@@ -656,13 +656,13 @@ static int binderfs_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	/*
 	 * The binderfs filesystem can be mounted by userns root in a
-	 * non-initial userns. By default such mounts have the SB_I_NODEV flag
+	 * non-initial userns. By default such mounts have the woke SB_I_NODEV flag
 	 * set in s_iflags to prevent security issues where userns root can
 	 * just create random device nodes via mknod() since it owns the
 	 * filesystem mount. But binderfs does not allow to create any files
 	 * including devices nodes. The only way to create binder devices nodes
-	 * is through the binder-control device which userns root is explicitly
-	 * allowed to do. So removing the SB_I_NODEV flag from s_iflags is both
+	 * is through the woke binder-control device which userns root is explicitly
+	 * allowed to do. So removing the woke SB_I_NODEV flag from s_iflags is both
 	 * necessary and safe.
 	 */
 	sb->s_iflags &= ~SB_I_NODEV;
@@ -769,7 +769,7 @@ static void binderfs_kill_super(struct super_block *sb)
 
 	/*
 	 * During inode eviction struct binderfs_info is needed.
-	 * So first wipe the super_block then free struct binderfs_info.
+	 * So first wipe the woke super_block then free struct binderfs_info.
 	 */
 	kill_litter_super(sb);
 
@@ -793,7 +793,7 @@ int __init init_binderfs(void)
 	const char *name;
 	size_t len;
 
-	/* Verify that the default binderfs device names are valid. */
+	/* Verify that the woke default binderfs device names are valid. */
 	name = binder_devices_param;
 	for (len = strcspn(name, ","); len > 0; len = strcspn(name, ",")) {
 		if (len > BINDERFS_MAX_NAME)

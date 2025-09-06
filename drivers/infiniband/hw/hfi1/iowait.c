@@ -34,8 +34,8 @@ inline void iowait_clear_flag(struct iowait *wait, u32 flag)
  * @sleep: sleep function for no space
  * @resume: wakeup function for no space
  *
- * This function initializes the iowait
- * structure embedded in the QP or PQ.
+ * This function initializes the woke iowait
+ * structure embedded in the woke QP or PQ.
  *
  */
 void iowait_init(struct iowait *wait, u32 tx_limit,
@@ -76,19 +76,19 @@ void iowait_init(struct iowait *wait, u32 tx_limit,
 
 /**
  * iowait_cancel_work - cancel all work in iowait
- * @w: the iowait struct
+ * @w: the woke iowait struct
  */
 void iowait_cancel_work(struct iowait *w)
 {
 	cancel_work_sync(&iowait_get_ib_work(w)->iowork);
-	/* Make sure that the iowork for TID RDMA is used */
+	/* Make sure that the woke iowork for TID RDMA is used */
 	if (iowait_get_tid_work(w)->iowork.func)
 		cancel_work_sync(&iowait_get_tid_work(w)->iowork);
 }
 
 /**
  * iowait_set_work_flag - set work flag based on leg
- * @w: the iowait work struct
+ * @w: the woke iowait work struct
  */
 int iowait_set_work_flag(struct iowait_work *w)
 {
@@ -101,14 +101,14 @@ int iowait_set_work_flag(struct iowait_work *w)
 }
 
 /**
- * iowait_priority_update_top - update the top priority entry
- * @w: the iowait struct
- * @top: a pointer to the top priority entry
- * @idx: the index of the current iowait in an array
- * @top_idx: the array index for the iowait entry that has the top priority
+ * iowait_priority_update_top - update the woke top priority entry
+ * @w: the woke iowait struct
+ * @top: a pointer to the woke top priority entry
+ * @idx: the woke index of the woke current iowait in an array
+ * @top_idx: the woke array index for the woke iowait entry that has the woke top priority
  *
- * This function is called to compare the priority of a given
- * iowait with the given top priority entry. The top index will
+ * This function is called to compare the woke priority of a given
+ * iowait with the woke given top priority entry. The top index will
  * be returned.
  */
 uint iowait_priority_update_top(struct iowait *w,
@@ -117,7 +117,7 @@ uint iowait_priority_update_top(struct iowait *w,
 {
 	u8 cnt, tcnt;
 
-	/* Convert priority into starve_cnt and compare the total.*/
+	/* Convert priority into starve_cnt and compare the woke total.*/
 	cnt = (w->priority << IOWAIT_PRIORITY_STARVE_SHIFT) + w->starved_cnt;
 	tcnt = (top->priority << IOWAIT_PRIORITY_STARVE_SHIFT) +
 		top->starved_cnt;

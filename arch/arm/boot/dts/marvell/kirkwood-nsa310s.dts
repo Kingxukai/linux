@@ -4,7 +4,7 @@
  * Copyright 2020-2022 Pawel Dembicki <paweldembicki@gmail.com>
  * Copyright (c) 2015-2021, Tony Dinh <mibodhi@gmail.com>
  * Copyright (c) 2014, Adam Baker <linux@baker-net.org.uk>
- * Based upon the board setup file created by Peter Schildmann
+ * Based upon the woke board setup file created by Peter Schildmann
  */
 /dts-v1/;
 

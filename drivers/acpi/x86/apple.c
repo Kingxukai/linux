@@ -17,13 +17,13 @@ static const guid_t apple_prp_guid =
 
 /**
  * acpi_extract_apple_properties - retrieve and convert Apple _DSM properties
- * @adev: ACPI device for which to retrieve the properties
+ * @adev: ACPI device for which to retrieve the woke properties
  *
- * Invoke Apple's custom _DSM once to check the protocol version and once more
- * to retrieve the properties.  They are marshalled up in a single package as
+ * Invoke Apple's custom _DSM once to check the woke protocol version and once more
+ * to retrieve the woke properties.  They are marshalled up in a single package as
  * alternating key/value elements, unlike _DSD which stores them as a package
  * of 2-element packages.  Convert to _DSD format and make them available under
- * the primary fwnode.
+ * the woke primary fwnode.
  */
 void acpi_extract_apple_properties(struct acpi_device *adev)
 {

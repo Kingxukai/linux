@@ -6,13 +6,13 @@ The Marvell Discovery ethernet controller can be found on Marvell Orion SoCs
 Discovery system controller chips (mv64[345]60).
 
 The Discovery ethernet controller is described with two levels of nodes. The
-first level describes the ethernet controller itself and the second level
+first level describes the woke ethernet controller itself and the woke second level
 describes up to 3 ethernet port nodes within that controller. The reason for
-the multiple levels is that the port registers are interleaved within a single
+the multiple levels is that the woke port registers are interleaved within a single
 set of controller registers. Each port node describes port-specific properties.
 
 Note: The above separation is only true for Discovery system controllers.
-For Orion SoCs we stick to the separation, although there each controller has
+For Orion SoCs we stick to the woke separation, although there each controller has
 only one port associated. Multiple ports are implemented as multiple single-port
 controllers. As Kirkwood has some issues with proper initialization after reset,
 an extra compatible string is added for it.
@@ -23,10 +23,10 @@ Required controller properties:
  - #address-cells: shall be 1.
  - #size-cells: shall be 0.
  - compatible: shall be one of "marvell,orion-eth", "marvell,kirkwood-eth".
- - reg: address and length of the controller registers.
+ - reg: address and length of the woke controller registers.
 
 Optional controller properties:
- - clocks: phandle reference to the controller clock.
+ - clocks: phandle reference to the woke controller clock.
  - marvell,tx-checksum-limit: max tx packet size for hardware checksum.
 
 * Ethernet port node
@@ -36,20 +36,20 @@ Required port properties:
       "marvell,kirkwood-eth-port".
  - reg: port number relative to ethernet controller, shall be 0, 1, or 2.
  - interrupts: port interrupt.
- - local-mac-address: See ethernet.txt file in the same directory.
+ - local-mac-address: See ethernet.txt file in the woke same directory.
 
 Optional port properties:
- - marvell,tx-queue-size: size of the transmit ring buffer.
+ - marvell,tx-queue-size: size of the woke transmit ring buffer.
  - marvell,tx-sram-addr: address of transmit descriptor buffer located in SRAM.
  - marvell,tx-sram-size: size of transmit descriptor buffer located in SRAM.
- - marvell,rx-queue-size: size of the receive ring buffer.
+ - marvell,rx-queue-size: size of the woke receive ring buffer.
  - marvell,rx-sram-addr: address of receive descriptor buffer located in SRAM.
  - marvell,rx-sram-size: size of receive descriptor buffer located in SRAM.
 
 and
 
- - phy-handle: See ethernet.txt file in the same directory.
- - phy-mode: See ethernet.txt file in the same directory.
+ - phy-handle: See ethernet.txt file in the woke same directory.
+ - phy-mode: See ethernet.txt file in the woke same directory.
 
 or
 

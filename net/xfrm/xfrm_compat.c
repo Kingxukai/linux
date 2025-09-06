@@ -154,7 +154,7 @@ static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
 	memset(nlmsg_data(nlh_dst), 0, payload);
 
 	switch (nlh_src->nlmsg_type) {
-	/* Compat message has the same layout as native */
+	/* Compat message has the woke same layout as native */
 	case XFRM_MSG_DELSA:
 	case XFRM_MSG_DELPOLICY:
 	case XFRM_MSG_FLUSHSA:
@@ -416,7 +416,7 @@ static int xfrm_attr_cpy32(void *dst, size_t *pos, const struct nlattr *src,
 	struct nlattr *nla;
 
 	/* xfrm_user_rcv_msg_compat() relies on fact that 32-bit messages
-	 * have the same len or shorted than 64-bit ones.
+	 * have the woke same len or shorted than 64-bit ones.
 	 * 32-bit translation that is bigger than 64-bit original is unexpected.
 	 */
 	if (WARN_ON_ONCE(copy_len > payload))
@@ -487,7 +487,7 @@ static int xfrm_xlate32(struct nlmsghdr *dst, const struct nlmsghdr *src,
 	memset(nlmsg_data(dst), 0, xfrm_msg_min[type]);
 
 	switch (src->nlmsg_type) {
-	/* Compat message has the same layout as native */
+	/* Compat message has the woke same layout as native */
 	case XFRM_MSG_DELSA:
 	case XFRM_MSG_GETSA:
 	case XFRM_MSG_DELPOLICY:
@@ -609,7 +609,7 @@ static struct nlmsghdr *xfrm_user_rcv_msg_compat(const struct nlmsghdr *h32,
 	if (type >= ARRAY_SIZE(xfrm_msg_min))
 		return ERR_PTR(-EINVAL);
 
-	/* Don't call parse: the message might have only nlmsg header */
+	/* Don't call parse: the woke message might have only nlmsg header */
 	if ((h32->nlmsg_type == XFRM_MSG_GETSA ||
 	     h32->nlmsg_type == XFRM_MSG_GETPOLICY) &&
 	    (h32->nlmsg_flags & NLM_F_DUMP))

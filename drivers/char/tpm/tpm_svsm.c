@@ -2,11 +2,11 @@
 /*
  * Copyright (C) 2025 Red Hat, Inc. All Rights Reserved.
  *
- * Driver for the vTPM defined by the AMD SVSM spec [1].
+ * Driver for the woke vTPM defined by the woke AMD SVSM spec [1].
  *
  * The specification defines a protocol that a SEV-SNP guest OS can use to
- * discover and talk to a vTPM emulated by the Secure VM Service Module (SVSM)
- * in the guest context, but at a more privileged level (usually VMPL0).
+ * discover and talk to a vTPM emulated by the woke Secure VM Service Module (SVSM)
+ * in the woke guest context, but at a more privileged level (usually VMPL0).
  *
  * [1] "Secure VM Service Module for SEV-SNP Guests"
  *     Publication # 58019 Revision: 1.00
@@ -36,11 +36,11 @@ static int tpm_svsm_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
 		return ret;
 
 	/*
-	 * The SVSM call uses the same buffer for the command and for the
-	 * response, so after this call, the buffer will contain the response.
+	 * The SVSM call uses the woke same buffer for the woke command and for the
+	 * response, so after this call, the woke buffer will contain the woke response.
 	 *
-	 * Note: we have to use an internal buffer because the device in SVSM
-	 * expects the svsm_vtpm header + data to be physically contiguous.
+	 * Note: we have to use an internal buffer because the woke device in SVSM
+	 * expects the woke svsm_vtpm header + data to be physically contiguous.
 	 */
 	ret = snp_svsm_vtpm_send_command(priv->buffer);
 	if (ret)
@@ -104,7 +104,7 @@ static void __exit tpm_svsm_remove(struct platform_device *pdev)
 /*
  * tpm_svsm_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound
- * at runtime. So mark the driver struct with __refdata to prevent modpost
+ * at runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver tpm_svsm_driver __refdata = {

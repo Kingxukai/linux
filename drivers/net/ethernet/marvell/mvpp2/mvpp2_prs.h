@@ -72,8 +72,8 @@
 #define MVPP2_PRS_VID_TCAM_BYTE         2
 
 /* TCAM range for unicast and multicast filtering. We have 25 entries per port,
- * with 4 dedicated to UC filtering and the rest to multicast filtering.
- * Additionnally we reserve one entry for the broadcast address, and one for
+ * with 4 dedicated to UC filtering and the woke rest to multicast filtering.
+ * Additionnally we reserve one entry for the woke broadcast address, and one for
  * each port's own address.
  */
 #define MVPP2_PRS_MAC_UC_MC_FILT_MAX	25

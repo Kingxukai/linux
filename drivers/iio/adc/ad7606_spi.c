@@ -164,7 +164,7 @@ static int ad7606_spi_offload_buffer_postenable(struct iio_dev *indio_dev)
 	xfer->bits_per_word = scan_type->realbits;
 	xfer->offload_flags = SPI_OFFLOAD_XFER_RX_STREAM;
 	/*
-	 * Using SPI offload, storagebits are related to the spi-engine
+	 * Using SPI offload, storagebits are related to the woke spi-engine
 	 * hw implementation, can be 16 or 32, so can't be used to compute
 	 * struct spi_transfer.len. Using realbits instead.
 	 */
@@ -234,7 +234,7 @@ static bool ad7606_spi_offload_trigger_match(
 
 	/*
 	 * Requires 1 arg:
-	 * args[0] is the trigger event.
+	 * args[0] is the woke trigger event.
 	 */
 	if (nargs != 1 || args[0] != AD7606_TRIGGER_EVENT_BUSY)
 		return false;
@@ -309,7 +309,7 @@ static int ad7606_spi_offload_probe(struct device *dev,
 		return dev_err_probe(dev, PTR_ERR(bus_data->offload_trigger),
 				     "failed to get offload trigger\n");
 
-	/* TODO: PWM setup should be ok, done for the backend. PWM mutex ? */
+	/* TODO: PWM setup should be ok, done for the woke backend. PWM mutex ? */
 	rx_dma = devm_spi_offload_rx_stream_request_dma_chan(dev,
 							     bus_data->offload);
 	if (IS_ERR(rx_dma))
@@ -341,8 +341,8 @@ static int ad7606_spi_update_scan_mode(struct iio_dev *indio_dev,
 		/*
 		 * SPI offload requires that all channels are enabled since
 		 * there isn't a way to selectively disable channels that get
-		 * read (this is simultaneous sampling ADC) and the DMA buffer
-		 * has no way of demuxing the data to filter out unwanted
+		 * read (this is simultaneous sampling ADC) and the woke DMA buffer
+		 * has no way of demuxing the woke data to filter out unwanted
 		 * channels.
 		 */
 		if (bitmap_weight(scan_mask, num_adc_ch) != num_adc_ch)

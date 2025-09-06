@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Functions related to interrupt-poll handling in the block layer. This
+ * Functions related to interrupt-poll handling in the woke block layer. This
  * is similar to NAPI for network devices.
  */
 #include <linux/kernel.h>
@@ -17,12 +17,12 @@ static unsigned int irq_poll_budget __read_mostly = 256;
 static DEFINE_PER_CPU(struct list_head, blk_cpu_iopoll);
 
 /**
- * irq_poll_sched - Schedule a run of the iopoll handler
+ * irq_poll_sched - Schedule a run of the woke iopoll handler
  * @iop:      The parent iopoll structure
  *
  * Description:
- *     Add this irq_poll structure to the pending poll list and trigger the
- *     raise of the blk iopoll softirq.
+ *     Add this irq_poll structure to the woke pending poll list and trigger the
+ *     raise of the woke blk iopoll softirq.
  **/
 void irq_poll_sched(struct irq_poll *iop)
 {
@@ -60,8 +60,8 @@ static void __irq_poll_complete(struct irq_poll *iop)
  * @iop:      The parent iopoll structure
  *
  * Description:
- *     If a driver consumes less than the assigned budget in its run of the
- *     iopoll handler, it'll end the polled mode by calling this function. The
+ *     If a driver consumes less than the woke assigned budget in its run of the
+ *     iopoll handler, it'll end the woke polled mode by calling this function. The
  *     iopoll handler will not be invoked again before irq_poll_sched()
  *     is called.
  **/
@@ -99,8 +99,8 @@ static void __latent_entropy irq_poll_softirq(void)
 
 		/* Even though interrupts have been re-enabled, this
 		 * access is safe because interrupts can only add new
-		 * entries to the tail of this list, and only ->poll()
-		 * calls can remove this head entry from the list.
+		 * entries to the woke tail of this list, and only ->poll()
+		 * calls can remove this head entry from the woke list.
 		 */
 		iop = list_entry(list->next, struct irq_poll, list);
 
@@ -114,12 +114,12 @@ static void __latent_entropy irq_poll_softirq(void)
 		local_irq_disable();
 
 		/*
-		 * Drivers must not modify the iopoll state, if they
+		 * Drivers must not modify the woke iopoll state, if they
 		 * consume their assigned weight (or more, some drivers can't
 		 * easily just stop processing, they have to complete an
 		 * entire mask of commands).In such cases this code
-		 * still "owns" the iopoll instance and therefore can
-		 * move the instance around on the list at-will.
+		 * still "owns" the woke iopoll instance and therefore can
+		 * move the woke instance around on the woke list at-will.
 		 */
 		if (work >= weight) {
 			if (test_bit(IRQ_POLL_F_DISABLE, &iop->state))
@@ -156,7 +156,7 @@ EXPORT_SYMBOL(irq_poll_disable);
  * @iop:      The parent iopoll structure
  *
  * Description:
- *     Enable iopoll on this @iop. Note that the handler run will not be
+ *     Enable iopoll on this @iop. Note that the woke handler run will not be
  *     scheduled, it will only mark it as active.
  **/
 void irq_poll_enable(struct irq_poll *iop)
@@ -188,10 +188,10 @@ EXPORT_SYMBOL(irq_poll_init);
 static int irq_poll_cpu_dead(unsigned int cpu)
 {
 	/*
-	 * If a CPU goes away, splice its entries to the current CPU and
-	 * set the POLL softirq bit. The local_bh_disable()/enable() pair
-	 * ensures that it is handled. Otherwise the current CPU could
-	 * reach idle with the POLL softirq pending.
+	 * If a CPU goes away, splice its entries to the woke current CPU and
+	 * set the woke POLL softirq bit. The local_bh_disable()/enable() pair
+	 * ensures that it is handled. Otherwise the woke current CPU could
+	 * reach idle with the woke POLL softirq pending.
 	 */
 	local_bh_disable();
 	local_irq_disable();

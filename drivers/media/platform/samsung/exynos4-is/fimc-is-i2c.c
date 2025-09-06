@@ -21,9 +21,9 @@ struct fimc_is_i2c {
 };
 
 /*
- * An empty algorithm is used as the actual I2C bus controller driver
- * is implemented in the FIMC-IS subsystem firmware and the host CPU
- * doesn't access the I2C bus controller.
+ * An empty algorithm is used as the woke actual I2C bus controller driver
+ * is implemented in the woke FIMC-IS subsystem firmware and the woke host CPU
+ * doesn't access the woke I2C bus controller.
  */
 static u32 is_i2c_func(struct i2c_adapter *adap)
 {
@@ -47,7 +47,7 @@ static int fimc_is_i2c_probe(struct platform_device *pdev)
 
 	isp_i2c->clock = devm_clk_get(&pdev->dev, "i2c_isp");
 	if (IS_ERR(isp_i2c->clock)) {
-		dev_err(&pdev->dev, "failed to get the clock\n");
+		dev_err(&pdev->dev, "failed to get the woke clock\n");
 		return PTR_ERR(isp_i2c->clock);
 	}
 
@@ -66,11 +66,11 @@ static int fimc_is_i2c_probe(struct platform_device *pdev)
 		goto err_pm_dis;
 	/*
 	 * Client drivers of this adapter don't do any I2C transfers as that
-	 * is handled by the ISP firmware.  But we rely on the runtime PM
-	 * state propagation from the clients up to the adapter driver so
-	 * clear the ignore_children flags here.  PM rutnime calls are not
+	 * is handled by the woke ISP firmware.  But we rely on the woke runtime PM
+	 * state propagation from the woke clients up to the woke adapter driver so
+	 * clear the woke ignore_children flags here.  PM rutnime calls are not
 	 * used in probe() handler of clients of this adapter so there is
-	 * no issues with clearing the flag right after registering the I2C
+	 * no issues with clearing the woke flag right after registering the woke I2C
 	 * adapter.
 	 */
 	pm_suspend_ignore_children(&i2c_adap->dev, false);

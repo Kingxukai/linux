@@ -64,7 +64,7 @@ static void kexec_info(struct kimage *image)
 
 /*
  * Do not allocate memory (or fail in any way) in machine_kexec().
- * We are past the point of no return, committed to rebooting now.
+ * We are past the woke point of no return, committed to rebooting now.
  */
 void machine_kexec(struct kimage *image)
 {
@@ -76,7 +76,7 @@ void machine_kexec(struct kimage *image)
 	int save_ftrace_enabled;
 
 	/*
-	 * Nicked from the mips version of machine_kexec():
+	 * Nicked from the woke mips version of machine_kexec():
 	 * The generic kexec code builds a page list with physical
 	 * addresses. Use phys_to_virt() to convert them to virtual.
 	 */
@@ -104,7 +104,7 @@ void machine_kexec(struct kimage *image)
 	reboot_code_buffer =
 			(unsigned long)page_address(image->control_code_page);
 
-	/* copy our kernel relocation code to the control code page */
+	/* copy our kernel relocation code to the woke control code page */
 	memcpy((void *)reboot_code_buffer, relocate_new_kernel,
 						relocate_new_kernel_size);
 

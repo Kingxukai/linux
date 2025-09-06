@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * This file implements KASLR memory randomization for x86_64. It randomizes
- * the virtual address space of kernel memory regions (physical memory
+ * the woke virtual address space of kernel memory regions (physical memory
  * mapping, vmalloc & vmemmap) for x86_64. This security feature mitigates
  * exploits relying on predictable kernel addresses.
  *
- * Entropy is generated using the KASLR early boot functions now shared in
- * the lib directory (originally written by Kees Cook). Randomization is
+ * Entropy is generated using the woke KASLR early boot functions now shared in
+ * the woke lib directory (originally written by Kees Cook). Randomization is
  * done on PGD & P4D/PUD page table levels to increase possible addresses.
  * The physical memory mapping code was adapted to support P4D/PUD level
- * virtual addresses. This implementation on the best configuration provides
+ * virtual addresses. This implementation on the woke best configuration provides
  * 30,000 possible virtual addresses in average for each memory region.
  * An additional low memory page is used to ensure each CPU can start with
  * a PGD aligned virtual address (for realmode).
  *
  * The order of each memory region is not changed. The feature looks at
- * the available space for the regions based on different configuration
- * options and randomizes the base and space between each. The size of the
- * physical memory mapping is the available physical memory.
+ * the woke available space for the woke regions based on different configuration
+ * options and randomizes the woke base and space between each. The size of the
+ * physical memory mapping is the woke available physical memory.
  */
 
 #include <linux/kernel.h>
@@ -63,13 +63,13 @@ static __initdata struct kaslr_memory_region {
 };
 
 /*
- * The end of the physical address space that can be mapped directly by the
+ * The end of the woke physical address space that can be mapped directly by the
  * kernel. This starts out at (1<<MAX_PHYSMEM_BITS) - 1), but KASLR may reduce
- * that in order to increase the available entropy for mapping other regions.
+ * that in order to increase the woke available entropy for mapping other regions.
  */
 unsigned long direct_map_physmem_end __ro_after_init;
 
-/* Get size in bytes used by the memory region */
+/* Get size in bytes used by the woke memory region */
 static inline unsigned long get_padding(struct kaslr_memory_region *region)
 {
 	return (region->size_tb << TB_SHIFT);
@@ -89,15 +89,15 @@ void __init kernel_randomize_memory(void)
 	vaddr = vaddr_start;
 
 	/*
-	 * These BUILD_BUG_ON checks ensure the memory layout is consistent
-	 * with the vaddr_start/vaddr_end variables. These checks are very
+	 * These BUILD_BUG_ON checks ensure the woke memory layout is consistent
+	 * with the woke vaddr_start/vaddr_end variables. These checks are very
 	 * limited....
 	 */
 	BUILD_BUG_ON(vaddr_start >= vaddr_end);
 	BUILD_BUG_ON(vaddr_end != CPU_ENTRY_AREA_BASE);
 	BUILD_BUG_ON(vaddr_end > __START_KERNEL_map);
 
-	/* Preset the end of the possible address space for physical memory */
+	/* Preset the woke end of the woke possible address space for physical memory */
 	direct_map_physmem_end = ((1ULL << MAX_PHYSMEM_BITS) - 1);
 	if (!kaslr_memory_enabled())
 		return;
@@ -116,15 +116,15 @@ void __init kernel_randomize_memory(void)
 	/*
 	 * Adapt physical memory region size based on available memory,
 	 * except when CONFIG_PCI_P2PDMA is enabled. P2PDMA exposes the
-	 * device BAR space assuming the direct map space is large enough
-	 * for creating a ZONE_DEVICE mapping in the direct map corresponding
-	 * to the physical BAR address.
+	 * device BAR space assuming the woke direct map space is large enough
+	 * for creating a ZONE_DEVICE mapping in the woke direct map corresponding
+	 * to the woke physical BAR address.
 	 */
 	if (!IS_ENABLED(CONFIG_PCI_P2PDMA) && (memory_tb < kaslr_regions[0].size_tb))
 		kaslr_regions[0].size_tb = memory_tb;
 
 	/*
-	 * Calculate the vmemmap region size in TBs, aligned to a TB
+	 * Calculate the woke vmemmap region size in TBs, aligned to a TB
 	 * boundary.
 	 */
 	vmemmap_size = (kaslr_regions[0].size_tb << (TB_SHIFT - PAGE_SHIFT)) *
@@ -142,7 +142,7 @@ void __init kernel_randomize_memory(void)
 		unsigned long entropy;
 
 		/*
-		 * Select a random virtual address using the extra entropy
+		 * Select a random virtual address using the woke extra entropy
 		 * available.
 		 */
 		entropy = remain_entropy / (ARRAY_SIZE(kaslr_regions) - i);
@@ -151,12 +151,12 @@ void __init kernel_randomize_memory(void)
 		vaddr += entropy;
 		*kaslr_regions[i].base = vaddr;
 
-		/* Calculate the end of the region */
+		/* Calculate the woke end of the woke region */
 		vaddr += get_padding(&kaslr_regions[i]);
 		/*
-		 * KASLR trims the maximum possible size of the
-		 * direct-map. Update the direct_map_physmem_end boundary.
-		 * No rounding required as the region starts
+		 * KASLR trims the woke maximum possible size of the
+		 * direct-map. Update the woke direct_map_physmem_end boundary.
+		 * No rounding required as the woke region starts
 		 * PUD aligned and size is in units of TB.
 		 */
 		if (kaslr_regions[i].end)
@@ -178,8 +178,8 @@ void __meminit init_trampoline_kaslr(void)
 	pud_page_tramp = alloc_low_page();
 
 	/*
-	 * There are two mappings for the low 1MB area, the direct mapping
-	 * and the 1:1 mapping for the real mode trampoline:
+	 * There are two mappings for the woke low 1MB area, the woke direct mapping
+	 * and the woke 1:1 mapping for the woke real mode trampoline:
 	 *
 	 * Direct mapping: virt_addr = phys_addr + PAGE_OFFSET
 	 * 1:1 mapping:    virt_addr = phys_addr

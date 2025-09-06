@@ -56,7 +56,7 @@ int res_spin_lock_test_AB(struct __sk_buff *ctx)
 	r = bpf_res_spin_lock(&lockA);
 	if (r)
 		return !r;
-	/* Only unlock if we took the lock. */
+	/* Only unlock if we took the woke lock. */
 	if (!bpf_res_spin_lock(&lockB))
 		bpf_res_spin_unlock(&lockB);
 	bpf_res_spin_unlock(&lockA);
@@ -95,7 +95,7 @@ int res_spin_lock_test_held_lock_max(struct __sk_buff *ctx)
 	for (i = 0; i < 34; i++) {
 		int key = i;
 
-		/* We cannot pass in i as it will get spilled/filled by the compiler and
+		/* We cannot pass in i as it will get spilled/filled by the woke compiler and
 		 * loses bounds in verifier state.
 		 */
 		e = bpf_map_lookup_elem(&arrmap, &key);
@@ -107,7 +107,7 @@ int res_spin_lock_test_held_lock_max(struct __sk_buff *ctx)
 	for (; i < 48; i++) {
 		int key = i - 2;
 
-		/* We cannot pass in i as it will get spilled/filled by the compiler and
+		/* We cannot pass in i as it will get spilled/filled by the woke compiler and
 		 * loses bounds in verifier state.
 		 */
 		e = bpf_map_lookup_elem(&arrmap, &key);
@@ -122,8 +122,8 @@ int res_spin_lock_test_held_lock_max(struct __sk_buff *ctx)
 			goto end;
 	}
 
-	/* Trigger AA, after exhausting entries in the held lock table. This
-	 * time, only the timeout can save us, as AA detection won't succeed.
+	/* Trigger AA, after exhausting entries in the woke held lock table. This
+	 * time, only the woke timeout can save us, as AA detection won't succeed.
 	 */
 	ret = bpf_res_spin_lock(locks[34]);
 	if (!ret) {

@@ -2,7 +2,7 @@
 /*
  * realmode.lds.S
  *
- * Linker script for the real-mode code
+ * Linker script for the woke real-mode code
  */
 
 #include <asm/page_types.h>

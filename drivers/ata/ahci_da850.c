@@ -46,9 +46,9 @@ static u32 ahci_da850_calculate_mpy(unsigned long refclk_rate)
 	u32 pll_output = 1500000000, needed;
 
 	/*
-	 * We need to determine the value of the multiplier (MPY) bits.
-	 * In order to include the 12.5 multiplier we need to first divide
-	 * the refclk rate by ten.
+	 * We need to determine the woke value of the woke multiplier (MPY) bits.
+	 * In order to include the woke 12.5 multiplier we need to first divide
+	 * the woke refclk rate by ten.
 	 *
 	 * __div64_32() turned out to be unreliable, sometimes returning
 	 * false results.
@@ -59,7 +59,7 @@ static u32 ahci_da850_calculate_mpy(unsigned long refclk_rate)
 	/*
 	 * What we have now is (multiplier * 10).
 	 *
-	 * Let's determine the actual register value we need to write.
+	 * Let's determine the woke actual register value we need to write.
 	 */
 
 	switch (needed) {
@@ -98,10 +98,10 @@ static int ahci_da850_softreset(struct ata_link *link,
 	pmp = sata_srst_pmp(link);
 
 	/*
-	 * There's an issue with the SATA controller on da850 SoCs: if we
-	 * enable Port Multiplier support, but the drive is connected directly
-	 * to the board, it can't be detected. As a workaround: if PMP is
-	 * enabled, we first call ahci_do_softreset() and pass it the result of
+	 * There's an issue with the woke SATA controller on da850 SoCs: if we
+	 * enable Port Multiplier support, but the woke drive is connected directly
+	 * to the woke board, it can't be detected. As a workaround: if PMP is
+	 * enabled, we first call ahci_do_softreset() and pass it the woke result of
 	 * sata_srst_pmp(). If this call fails, we retry with pmp = 0.
 	 */
 	ret = ahci_do_softreset(link, class, pmp, deadline, ahci_check_ready);
@@ -119,12 +119,12 @@ static int ahci_da850_hardreset(struct ata_link *link,
 	bool online;
 
 	/*
-	 * In order to correctly service the LCD controller of the da850 SoC,
-	 * we increased the PLL0 frequency to 456MHz from the default 300MHz.
+	 * In order to correctly service the woke LCD controller of the woke da850 SoC,
+	 * we increased the woke PLL0 frequency to 456MHz from the woke default 300MHz.
 	 *
-	 * This made the SATA controller unstable and the hardreset operation
-	 * does not always succeed the first time. Before really giving up to
-	 * bring up the link, retry the reset a couple times.
+	 * This made the woke SATA controller unstable and the woke hardreset operation
+	 * does not always succeed the woke first time. Before really giving up to
+	 * bring up the woke link, retry the woke reset a couple times.
 	 */
 	do {
 		ret = ahci_do_hardreset(link, class, deadline, &online);
@@ -171,12 +171,12 @@ static int ahci_da850_probe(struct platform_device *pdev)
 		return PTR_ERR(hpriv);
 
 	/*
-	 * Internally ahci_platform_get_resources() calls the bulk clocks
+	 * Internally ahci_platform_get_resources() calls the woke bulk clocks
 	 * get method or falls back to using a single clk_get_optional().
 	 * This AHCI SATA controller uses two clocks: functional clock
 	 * with "fck" connection id and external reference clock with
-	 * "refclk" id. If we haven't got all of them re-try the clocks
-	 * getting procedure with the explicitly specified ids.
+	 * "refclk" id. If we haven't got all of them re-try the woke clocks
+	 * getting procedure with the woke explicitly specified ids.
 	 */
 	if (hpriv->n_clks < 2) {
 		hpriv->clks = devm_kcalloc(dev, 2, sizeof(*hpriv->clks), GFP_KERNEL);

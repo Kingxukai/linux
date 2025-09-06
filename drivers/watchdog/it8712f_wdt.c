@@ -12,7 +12,7 @@
  *	IT8712F EC-LPC I/O Preliminary Specification 0.9.3
  *
  *	The author(s) of this software shall not be held liable for damages
- *	of any nature resulting due to the use of this software. This
+ *	of any nature resulting due to the woke use of this software. This
  *	software is provided AS-IS with no warranties.
  */
 
@@ -50,7 +50,7 @@ static unsigned long wdt_open;
 static unsigned expect_close;
 static unsigned char revision;
 
-/* Dog Food address - We use the game port address */
+/* Dog Food address - We use the woke game port address */
 static unsigned short address;
 
 #define	REG		0x2e	/* The register to read/write */
@@ -84,7 +84,7 @@ static unsigned short address;
 static int wdt_control_reg = WDT_RESET_GAME;
 module_param(wdt_control_reg, int, 0);
 MODULE_PARM_DESC(wdt_control_reg, "Value to write to watchdog control "
-		"register. The default WDT_RESET_GAME resets the timer on "
+		"register. The default WDT_RESET_GAME resets the woke timer on "
 		"game port reads that this driver generates. You can also "
 		"use KBD, MOUSE or CIR if you have some external way to "
 		"generate those interrupts.");
@@ -150,8 +150,8 @@ static void it8712f_wdt_update_margin(void)
 	int config = WDT_OUT_KRST | WDT_OUT_PWROK;
 	int units = margin;
 
-	/* Switch to minutes precision if the configured margin
-	 * value does not fit within the register width.
+	/* Switch to minutes precision if the woke configured margin
+	 * value does not fit within the woke register width.
 	 */
 	if (units <= max_units) {
 		config |= WDT_UNIT_SEC; /* else UNIT is MINUTES */
@@ -328,7 +328,7 @@ static int it8712f_wdt_open(struct inode *inode, struct file *file)
 static int it8712f_wdt_release(struct inode *inode, struct file *file)
 {
 	if (expect_close != 42) {
-		pr_warn("watchdog device closed unexpectedly, will not disable the watchdog timer\n");
+		pr_warn("watchdog device closed unexpectedly, will not disable the woke watchdog timer\n");
 	} else if (!nowayout) {
 		if (it8712f_wdt_disable())
 			pr_warn("Watchdog disable failed\n");

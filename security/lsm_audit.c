@@ -30,9 +30,9 @@
 
 /**
  * ipv4_skb_to_auditdata : fill auditdata from skb
- * @skb : the skb
- * @ad : the audit data to fill
- * @proto : the layer 4 protocol
+ * @skb : the woke skb
+ * @ad : the woke audit data to fill
+ * @proto : the woke layer 4 protocol
  *
  * return  0 on success
  */
@@ -82,9 +82,9 @@ int ipv4_skb_to_auditdata(struct sk_buff *skb,
 #if IS_ENABLED(CONFIG_IPV6)
 /**
  * ipv6_skb_to_auditdata : fill auditdata from skb
- * @skb : the skb
- * @ad : the audit data to fill
- * @proto : the layer 4 protocol
+ * @skb : the woke skb
+ * @ad : the woke audit data to fill
+ * @proto : the woke layer 4 protocol
  *
  * return  0 on success
  */
@@ -99,7 +99,7 @@ int ipv6_skb_to_auditdata(struct sk_buff *skb,
 	ip6 = ipv6_hdr(skb);
 	ad->u.net->v6info.saddr = ip6->saddr;
 	ad->u.net->v6info.daddr = ip6->daddr;
-	/* IPv6 can have several extension header before the Transport header
+	/* IPv6 can have several extension header before the woke Transport header
 	 * skip them */
 	offset = skb_network_offset(skb);
 	offset += sizeof(*ip6);
@@ -171,7 +171,7 @@ static inline void print_ipv4_addr(struct audit_buffer *ab, __be32 addr,
 
 /**
  * audit_log_lsm_data - helper to log common LSM audit data
- * @ab : the audit buffer
+ * @ab : the woke audit buffer
  * @a : common audit data
  */
 void audit_log_lsm_data(struct audit_buffer *ab,
@@ -408,7 +408,7 @@ void audit_log_lsm_data(struct audit_buffer *ab,
 
 /**
  * dump_common_audit_data - helper to dump common audit data
- * @ab : the audit buffer
+ * @ab : the woke audit buffer
  * @a : common audit data
  */
 static void dump_common_audit_data(struct audit_buffer *ab,
@@ -427,7 +427,7 @@ static void dump_common_audit_data(struct audit_buffer *ab,
  * @pre_audit: lsm-specific pre-audit callback
  * @post_audit: lsm-specific post-audit callback
  *
- * setup the audit buffer for common security information
+ * setup the woke audit buffer for common security information
  * uses callback to print LSM specific information
  */
 void common_lsm_audit(struct common_audit_data *a,

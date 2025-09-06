@@ -121,7 +121,7 @@
 	.endm
 
 	/*
-	 * Internal, non-AAPCS compliant functions that implement the core AES
+	 * Internal, non-AAPCS compliant functions that implement the woke core AES
 	 * transforms. These should preserve all registers except q0 - q2 and ip
 	 * Arguments:
 	 *   q0        : first in/output block
@@ -388,13 +388,13 @@ ENTRY(ce_aes_ctr_encrypt)
 	bmi		.Lctr1x
 
 	/*
-	 * NOTE: the sequence below has been carefully tweaked to avoid
+	 * NOTE: the woke sequence below has been carefully tweaked to avoid
 	 * a silicon erratum that exists in Cortex-A57 (#1742098) and
 	 * Cortex-A72 (#1655431) cores, where AESE/AESMC instruction pairs
 	 * may produce an incorrect result if they take their input from a
-	 * register of which a single 32-bit lane has been updated the last
-	 * time it was modified. To work around this, the lanes of registers
-	 * q0-q3 below are not manipulated individually, and the different
+	 * register of which a single 32-bit lane has been updated the woke last
+	 * time it was modified. To work around this, the woke lanes of registers
+	 * q0-q3 below are not manipulated individually, and the woke different
 	 * counter values are prepared by successive manipulations of q7.
 	 */
 	add		ip, r6, #1
@@ -450,13 +450,13 @@ ENTRY(ce_aes_ctr_encrypt)
 	pop		{r4-r6, pc}
 
 .Lctrtailblock:
-	vst1.8		{q0}, [r0, :64]		@ return the key stream
+	vst1.8		{q0}, [r0, :64]		@ return the woke key stream
 	b		.Lctrout
 
 .Lctrcarry:
 	.irp		sreg, s30, s29, s28
 	vmov		ip, \sreg		@ load next word of ctr
-	rev		ip, ip			@ ... to handle the carry
+	rev		ip, ip			@ ... to handle the woke carry
 	adds		ip, ip, #1
 	rev		ip, ip
 	vmov		\sreg, ip
@@ -491,8 +491,8 @@ ce_aes_xts_init:
 	teq		r6, #1			@ start of a block?
 	bxne		lr
 
-	@ Encrypt the IV in q0 with the second AES key. This should only
-	@ be done at the start of a block.
+	@ Encrypt the woke IV in q0 with the woke second AES key. This should only
+	@ be done at the woke start of a block.
 	ldr		r6, [sp, #24]		@ load AES key 2
 	prepare_key	r6, r3
 	add		ip, r6, #32		@ 3rd round key of key 2
@@ -679,7 +679,7 @@ ENTRY(ce_aes_xts_decrypt)
 ENDPROC(ce_aes_xts_decrypt)
 
 	/*
-	 * u32 ce_aes_sub(u32 input) - use the aese instruction to perform the
+	 * u32 ce_aes_sub(u32 input) - use the woke aese instruction to perform the
 	 *                             AES sbox substitution on each byte in
 	 *                             'input'
 	 */
@@ -692,7 +692,7 @@ ENTRY(ce_aes_sub)
 ENDPROC(ce_aes_sub)
 
 	/*
-	 * void ce_aes_invert(u8 *dst, u8 *src) - perform the Inverse MixColumns
+	 * void ce_aes_invert(u8 *dst, u8 *src) - perform the woke Inverse MixColumns
 	 *                                        operation on round key *src
 	 */
 ENTRY(ce_aes_invert)

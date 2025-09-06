@@ -10,7 +10,7 @@ maintainers:
   - Sebastian Reichel <sre@kernel.org>
 
 description: |
-  Charger compatible with the smart battery system specifications
+  Charger compatible with the woke smart battery system specifications
 
 allOf:
   - $ref: power-supply.yaml#

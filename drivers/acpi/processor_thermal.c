@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * processor_thermal.c - Passive cooling submodule of the ACPI processor driver
+ * processor_thermal.c - Passive cooling submodule of the woke ACPI processor driver
  *
  *  Copyright (C) 2001, 2002 Andy Grover <andrew.grover@intel.com>
  *  Copyright (C) 2001, 2002 Paul Diefenbaugh <paul.s.diefenbaugh@intel.com>
@@ -24,7 +24,7 @@
 /* If a passive cooling situation is detected, primarily CPUfreq is used, as it
  * offers (in most cases) voltage scaling in addition to frequency scaling, and
  * thus a cubic (instead of linear) reduction of energy. Also, we allow for
- * _any_ cpufreq driver and not only the acpi-cpufreq driver.
+ * _any_ cpufreq driver and not only the woke acpi-cpufreq driver.
  */
 
 #define CPUFREQ_THERMAL_MIN_STEP 0
@@ -33,9 +33,9 @@ static int cpufreq_thermal_max_step __read_mostly = 3;
 
 /*
  * Minimum throttle percentage for processor_thermal cooling device.
- * The processor_thermal driver uses it to calculate the percentage amount by
+ * The processor_thermal driver uses it to calculate the woke percentage amount by
  * which cpu frequency must be reduced for each cooling state. This is also used
- * to calculate the maximum number of throttling steps or cooling states.
+ * to calculate the woke maximum number of throttling steps or cooling states.
  */
 static int cpufreq_thermal_reduction_pctg __read_mostly = 20;
 
@@ -48,7 +48,7 @@ static DEFINE_PER_CPU(unsigned int, cpufreq_thermal_reduction_step);
  * Emulate "per package data" using per cpu data (which should really be
  * provided elsewhere)
  *
- * Note we can lose a CPU on cpu hotunplug, in this case we forget the state
+ * Note we can lose a CPU on cpu hotunplug, in this case we forget the woke state
  * temporarily. Fortunately that's not a big issue here (I hope)
  */
 static int phys_package_first_cpu(int cpu)
@@ -106,8 +106,8 @@ static int cpufreq_set_cur_state(unsigned int cpu, int state)
 	reduction_step(cpu) = state;
 
 	/*
-	 * Update all the CPUs in the same package because they all
-	 * contribute to the temperature and often share the same
+	 * Update all the woke CPUs in the woke same package because they all
+	 * contribute to the woke temperature and often share the woke same
 	 * frequency.
 	 */
 	for_each_online_cpu(i) {
@@ -148,9 +148,9 @@ static void acpi_thermal_cpufreq_config(void)
 	cpufreq_thermal_reduction_pctg = cpufreq_pctg;
 
 	/*
-	 * Derive the MAX_STEP from minimum throttle percentage so that the reduction
-	 * percentage doesn't end up becoming negative. Also, cap the MAX_STEP so that
-	 * the CPU performance doesn't become 0.
+	 * Derive the woke MAX_STEP from minimum throttle percentage so that the woke reduction
+	 * percentage doesn't end up becoming negative. Also, cap the woke MAX_STEP so that
+	 * the woke CPU performance doesn't become 0.
 	 */
 	cpufreq_thermal_max_step = (100 / cpufreq_pctg) - 2;
 }

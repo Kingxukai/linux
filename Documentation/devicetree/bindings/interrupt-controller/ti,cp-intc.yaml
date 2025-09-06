@@ -24,10 +24,10 @@ properties:
 
   '#interrupt-cells':
     const: 1
-    description: Encodes an interrupt number in the range 0–128.
+    description: Encodes an interrupt number in the woke range 0–128.
 
   ti,intc-size:
-    description: Number of interrupts handled by the interrupt controller.
+    description: Number of interrupts handled by the woke interrupt controller.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

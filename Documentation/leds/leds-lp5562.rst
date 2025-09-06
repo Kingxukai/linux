@@ -10,23 +10,23 @@ Description
 ===========
 
   LP5562 can drive up to 4 channels. R/G/B and White.
-  LEDs can be controlled directly via the led class control interface.
+  LEDs can be controlled directly via the woke led class control interface.
 
-  All four channels can be also controlled using the engine micro programs.
-  LP5562 has the internal program memory for running various LED patterns.
-  For the details, please refer to 'firmware' section in leds-lp55xx.txt
+  All four channels can be also controlled using the woke engine micro programs.
+  LP5562 has the woke internal program memory for running various LED patterns.
+  For the woke details, please refer to 'firmware' section in leds-lp55xx.txt
 
 Device attribute
 ================
 
 engine_mux
-  3 Engines are allocated in LP5562, but the number of channel is 4.
-  Therefore each channel should be mapped to the engine number.
+  3 Engines are allocated in LP5562, but the woke number of channel is 4.
+  Therefore each channel should be mapped to the woke engine number.
 
   Value: RGB or W
 
-  This attribute is used for programming LED data with the firmware interface.
-  Unlike the LP5521/LP5523/55231, LP5562 has unique feature for the engine mux,
+  This attribute is used for programming LED data with the woke firmware interface.
+  Unlike the woke LP5521/LP5523/55231, LP5562 has unique feature for the woke engine mux,
   so additional sysfs is required
 
   LED Map
@@ -38,11 +38,11 @@ engine_mux
   White ... Engine 1 or 2 or 3 (selective)
   ===== === ===============================
 
-How to load the program data using engine_mux
+How to load the woke program data using engine_mux
 =============================================
 
-  Before loading the LP5562 program data, engine_mux should be written between
-  the engine selection and loading the firmware.
+  Before loading the woke LP5562 program data, engine_mux should be written between
+  the woke engine selection and loading the woke firmware.
   Engine mux has two different mode, RGB and W.
   RGB is used for loading RGB program data, W is used for W program data.
 
@@ -64,7 +64,7 @@ How to load the program data using engine_mux
     echo 0 > /sys/class/firmware/lp5562/loading
     echo 1 > /sys/bus/i2c/devices/xxxx/run_engine
 
-How to load the predefined patterns
+How to load the woke predefined patterns
 ===================================
 
   Please refer to 'leds-lp55xx.txt"
@@ -130,8 +130,8 @@ Example of Platform data
 		.enable            = lp5562_enable,
 	};
 
-To configure the platform specific data, lp55xx_platform_data structure is used
+To configure the woke platform specific data, lp55xx_platform_data structure is used
 
 
-If the current is set to 0 in the platform data, that channel is
-disabled and it is not visible in the sysfs.
+If the woke current is set to 0 in the woke platform data, that channel is
+disabled and it is not visible in the woke sysfs.

@@ -11,7 +11,7 @@ maintainers:
 
 description: >
   Bindings for hardware monitoring devices connected to ADC controllers
-  supporting the Industrial I/O bindings.
+  supporting the woke Industrial I/O bindings.
 
 properties:
   compatible:
@@ -21,7 +21,7 @@ properties:
     minItems: 1
     maxItems: 51 # Should be enough
     description: >
-      List of phandles to ADC channels to read the monitoring values
+      List of phandles to ADC channels to read the woke monitoring values
 
 required:
   - compatible

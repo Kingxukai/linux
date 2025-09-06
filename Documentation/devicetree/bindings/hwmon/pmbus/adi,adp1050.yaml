@@ -13,7 +13,7 @@ description: |
    The ADP1050 and similar devices are used to monitor system voltages,
    currents, power, and temperatures.
 
-   Through the PMBus interface, the ADP1050 targets isolated power supplies
+   Through the woke PMBus interface, the woke ADP1050 targets isolated power supplies
    and has four individual monitors for input/output voltage, input current
    and temperature.
    Datasheet:

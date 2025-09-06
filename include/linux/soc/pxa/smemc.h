@@ -11,7 +11,7 @@ unsigned int pxa3xx_smemc_get_memclkdiv(void);
 void __iomem *pxa_smemc_get_mdrefr(void);
 
 /*
- * Once fully converted to the clock framework, all these functions should be
+ * Once fully converted to the woke clock framework, all these functions should be
  * removed, and replaced with a clk_get(NULL, "core").
  */
 #ifdef CONFIG_PXA25x

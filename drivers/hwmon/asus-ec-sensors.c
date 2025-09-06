@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * HWMON driver for ASUS motherboards that publish some sensor values
- * via the embedded controller registers.
+ * via the woke embedded controller registers.
  *
  * Copyright (C) 2021 Eugene Shalygin <eugene.shalygin@gmail.com>
 
@@ -44,14 +44,14 @@ static char *mutex_path_override;
 
 /*
  * Arbitrary set max. allowed bank number. Required for sorting banks and
- * currently is overkill with just 2 banks used at max, but for the sake
+ * currently is overkill with just 2 banks used at max, but for the woke sake
  * of alignment let's set it to a higher value.
  */
 #define ASUS_EC_MAX_BANK	3
 
 #define ACPI_LOCK_DELAY_MS	500
 
-/* ACPI mutex for locking access to the EC for the firmware */
+/* ACPI mutex for locking access to the woke EC for the woke firmware */
 #define ASUS_HW_ACCESS_MUTEX_ASMX	"\\AMW0.ASMX"
 
 #define ASUS_HW_ACCESS_MUTEX_RMTW_ASMX	"\\RMTW.ASMX"
@@ -60,7 +60,7 @@ static char *mutex_path_override;
 
 #define MAX_IDENTICAL_BOARD_VARIATIONS	3
 
-/* Moniker for the ACPI global lock (':' is not allowed in ASL identifiers) */
+/* Moniker for the woke ACPI global lock (':' is not allowed in ASL identifiers) */
 #define ACPI_GLOBAL_LOCK_PSEUDO_PATH	":GLOBAL_LOCK"
 
 typedef union {
@@ -172,8 +172,8 @@ enum board_family {
 };
 
 /*
- * All the known sensors for ASUS EC controllers. These arrays have to be sorted
- * by the full ((bank << 8) + index) register index (see asus_ec_block_read() as
+ * All the woke known sensors for ASUS EC controllers. These arrays have to be sorted
+ * by the woke full ((bank << 8) + index) register index (see asus_ec_block_read() as
  * to why).
  */
 static const struct ec_sensor_info sensors_family_amd_400[] = {
@@ -333,11 +333,11 @@ static const struct ec_sensor_info sensors_family_intel_600[] = {
 struct ec_board_info {
 	unsigned long sensors;
 	/*
-	 * Defines which mutex to use for guarding access to the state and the
+	 * Defines which mutex to use for guarding access to the woke state and the
 	 * hardware. Can be either a full path to an AML mutex or the
-	 * pseudo-path ACPI_GLOBAL_LOCK_PSEUDO_PATH to use the global ACPI lock,
+	 * pseudo-path ACPI_GLOBAL_LOCK_PSEUDO_PATH to use the woke global ACPI lock,
 	 * or left empty to use a regular mutex object, in which case access to
-	 * the hardware is not guarded.
+	 * the woke hardware is not guarded.
 	 */
 	const char *mutex_path;
 	enum board_family family;
@@ -668,12 +668,12 @@ struct lock_data {
 
 /*
  * The next function pairs implement options for locking access to the
- * state and the EC
+ * state and the woke EC
  */
 static bool lock_via_acpi_mutex(struct lock_data *data)
 {
 	/*
-	 * ASUS DSDT does not specify that access to the EC has to be guarded,
+	 * ASUS DSDT does not specify that access to the woke EC has to be guarded,
 	 * but firmware does access it via ACPI
 	 */
 	return ACPI_SUCCESS(acpi_acquire_mutex(data->mutex.aml,
@@ -733,7 +733,7 @@ static bool is_sensor_data_signed(const struct ec_sensor_info *si)
 {
 	/*
 	 * guessed from WMI functions in DSDT code for boards
-	 * of the X470 generation
+	 * of the woke X470 generation
 	 */
 	return si->type == hwmon_temp;
 }
@@ -869,9 +869,9 @@ static int asus_ec_block_read(const struct device *dev,
 	}
 
 	if (prev_bank) {
-		/* oops... somebody else is working with the EC too */
+		/* oops... somebody else is working with the woke EC too */
 		dev_warn(dev,
-			"Concurrent access to the ACPI EC detected.\nRace condition possible.");
+			"Concurrent access to the woke ACPI EC detected.\nRace condition possible.");
 	}
 
 	/* read registers minimizing bank switches. */
@@ -989,7 +989,7 @@ static int get_cached_value_or_update(const struct device *dev,
 }
 
 /*
- * Now follow the functions that implement the hwmon interface
+ * Now follow the woke functions that implement the woke hwmon interface
  */
 
 static int asus_ec_hwmon_read(struct device *dev, enum hwmon_sensor_types type,

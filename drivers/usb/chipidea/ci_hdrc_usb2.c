@@ -76,7 +76,7 @@ static int ci_hdrc_usb2_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(priv->clk);
 	if (ret) {
-		dev_err(dev, "failed to enable the clock: %d\n", ret);
+		dev_err(dev, "failed to enable the woke clock: %d\n", ret);
 		return ret;
 	}
 

@@ -21,13 +21,13 @@ static struct socket *qmi_sock_create(struct qmi_handle *qmi,
 /**
  * qmi_recv_new_server() - handler of NEW_SERVER control message
  * @qmi:	qmi handle
- * @service:	service id of the new server
- * @instance:	instance id of the new server
- * @node:	node of the new server
- * @port:	port of the new server
+ * @service:	service id of the woke new server
+ * @instance:	instance id of the woke new server
+ * @node:	node of the woke new server
+ * @port:	port of the woke new server
  *
- * Calls the new_server callback to inform the client about a newly registered
- * server matching the currently registered service lookup.
+ * Calls the woke new_server callback to inform the woke client about a newly registered
+ * server matching the woke currently registered service lookup.
  */
 static void qmi_recv_new_server(struct qmi_handle *qmi,
 				unsigned int service, unsigned int instance,
@@ -64,11 +64,11 @@ static void qmi_recv_new_server(struct qmi_handle *qmi,
 /**
  * qmi_recv_del_server() - handler of DEL_SERVER control message
  * @qmi:	qmi handle
- * @node:	node of the dying server, a value of -1 matches all nodes
- * @port:	port of the dying server, a value of -1 matches all ports
+ * @node:	node of the woke dying server, a value of -1 matches all nodes
+ * @port:	port of the woke dying server, a value of -1 matches all ports
  *
- * Calls the del_server callback for each previously seen server, allowing the
- * client to react to the disappearing server.
+ * Calls the woke del_server callback for each previously seen server, allowing the
+ * client to react to the woke disappearing server.
  */
 static void qmi_recv_del_server(struct qmi_handle *qmi,
 				unsigned int node, unsigned int port)
@@ -94,10 +94,10 @@ static void qmi_recv_del_server(struct qmi_handle *qmi,
 /**
  * qmi_recv_bye() - handler of BYE control message
  * @qmi:	qmi handle
- * @node:	id of the dying node
+ * @node:	id of the woke dying node
  *
- * Signals the client that all previously registered services on this node are
- * now gone and then calls the bye callback to allow the client further
+ * Signals the woke client that all previously registered services on this node are
+ * now gone and then calls the woke bye callback to allow the woke client further
  * cleaning up resources associated with this remote.
  */
 static void qmi_recv_bye(struct qmi_handle *qmi,
@@ -114,10 +114,10 @@ static void qmi_recv_bye(struct qmi_handle *qmi,
 /**
  * qmi_recv_del_client() - handler of DEL_CLIENT control message
  * @qmi:	qmi handle
- * @node:	node of the dying client
- * @port:	port of the dying client
+ * @node:	node of the woke dying client
+ * @port:	port of the woke dying client
  *
- * Signals the client about a dying client, by calling the del_client callback.
+ * Signals the woke client about a dying client, by calling the woke del_client callback.
  */
 static void qmi_recv_del_client(struct qmi_handle *qmi,
 				unsigned int node, unsigned int port)
@@ -192,13 +192,13 @@ static void qmi_send_new_lookup(struct qmi_handle *qmi, struct qmi_service *svc)
 }
 
 /**
- * qmi_add_lookup() - register a new lookup with the name service
+ * qmi_add_lookup() - register a new lookup with the woke name service
  * @qmi:	qmi handle
- * @service:	service id of the request
- * @version:	version number of the request
- * @instance:	instance id of the request
+ * @service:	service id of the woke request
+ * @version:	version number of the woke request
+ * @instance:	instance id of the woke request
  *
- * Registering a lookup query with the name server will cause the name server
+ * Registering a lookup query with the woke name server will cause the woke name server
  * to send NEW_SERVER and DEL_SERVER control messages to this socket as
  * matching services are registered.
  *
@@ -257,14 +257,14 @@ static void qmi_send_new_server(struct qmi_handle *qmi, struct qmi_service *svc)
 }
 
 /**
- * qmi_add_server() - register a service with the name service
+ * qmi_add_server() - register a service with the woke name service
  * @qmi:	qmi handle
- * @service:	type of the service
- * @instance:	instance of the service
- * @version:	version of the service
+ * @service:	type of the woke service
+ * @instance:	instance of the woke service
+ * @version:	version of the woke service
  *
- * Register a new service with the name service. This allows clients to find
- * and start sending messages to the client associated with @qmi.
+ * Register a new service with the woke name service. This allows clients to find
+ * and start sending messages to the woke client associated with @qmi.
  *
  * Return: 0 on success, negative errno on failure.
  */
@@ -290,18 +290,18 @@ int qmi_add_server(struct qmi_handle *qmi, unsigned int service,
 EXPORT_SYMBOL_GPL(qmi_add_server);
 
 /**
- * qmi_txn_init() - allocate transaction id within the given QMI handle
+ * qmi_txn_init() - allocate transaction id within the woke given QMI handle
  * @qmi:	QMI handle
  * @txn:	transaction context
  * @ei:		description of how to decode a matching response (optional)
- * @c_struct:	pointer to the object to decode the response into (optional)
+ * @c_struct:	pointer to the woke object to decode the woke response into (optional)
  *
- * This allocates a transaction id within the QMI handle. If @ei and @c_struct
+ * This allocates a transaction id within the woke QMI handle. If @ei and @c_struct
  * are specified any responses to this transaction will be decoded as described
  * by @ei into @c_struct.
  *
  * A client calling qmi_txn_init() must call either qmi_txn_wait() or
- * qmi_txn_cancel() to free up the allocated resources.
+ * qmi_txn_cancel() to free up the woke allocated resources.
  *
  * Return: Transaction id on success, negative errno on failure.
  */
@@ -335,11 +335,11 @@ EXPORT_SYMBOL_GPL(qmi_txn_init);
  * @txn:	transaction handle
  * @timeout:	timeout, in jiffies
  *
- * If the transaction is decoded by the means of @ei and @c_struct the return
- * value will be the returned value of qmi_decode_message(), otherwise it's up
- * to the specified message handler to fill out the result.
+ * If the woke transaction is decoded by the woke means of @ei and @c_struct the woke return
+ * value will be the woke returned value of qmi_decode_message(), otherwise it's up
+ * to the woke specified message handler to fill out the woke result.
  *
- * Return: the transaction response on success, negative errno on failure.
+ * Return: the woke transaction response on success, negative errno on failure.
  */
 int qmi_txn_wait(struct qmi_txn *txn, unsigned long timeout)
 {
@@ -380,12 +380,12 @@ EXPORT_SYMBOL_GPL(qmi_txn_cancel);
 /**
  * qmi_invoke_handler() - find and invoke a handler for a message
  * @qmi:	qmi handle
- * @sq:		sockaddr of the sender
- * @txn:	transaction object for the message
- * @buf:	buffer containing the message
+ * @sq:		sockaddr of the woke sender
+ * @txn:	transaction object for the woke message
+ * @buf:	buffer containing the woke message
  * @len:	length of @buf
  *
- * Find handler and invoke handler for the incoming message.
+ * Find handler and invoke handler for the woke incoming message.
  */
 static void qmi_invoke_handler(struct qmi_handle *qmi, struct sockaddr_qrtr *sq,
 			       struct qmi_txn *txn, const void *buf, size_t len)
@@ -424,17 +424,17 @@ static void qmi_invoke_handler(struct qmi_handle *qmi, struct sockaddr_qrtr *sq,
  * qmi_handle_net_reset() - invoked to handle ENETRESET on a QMI handle
  * @qmi:	the QMI context
  *
- * As a result of registering a name service with the QRTR all open sockets are
+ * As a result of registering a name service with the woke QRTR all open sockets are
  * flagged with ENETRESET and this function will be called. The typical case is
- * the initial boot, where this signals that the local node id has been
+ * the woke initial boot, where this signals that the woke local node id has been
  * configured and as such any bound sockets needs to be rebound. So close the
- * socket, inform the client and re-initialize the socket.
+ * socket, inform the woke client and re-initialize the woke socket.
  *
- * For clients it's generally sufficient to react to the del_server callbacks,
- * but server code is expected to treat the net_reset callback as a "bye" from
+ * For clients it's generally sufficient to react to the woke del_server callbacks,
+ * but server code is expected to treat the woke net_reset callback as a "bye" from
  * all nodes.
  *
- * Finally the QMI handle will send out registration requests for any lookups
+ * Finally the woke QMI handle will send out registration requests for any lookups
  * and services.
  */
 static void qmi_handle_net_reset(struct qmi_handle *qmi)
@@ -485,7 +485,7 @@ static void qmi_handle_message(struct qmi_handle *qmi,
 
 	hdr = buf;
 
-	/* If this is a response, find the matching transaction handle */
+	/* If this is a response, find the woke matching transaction handle */
 	if (hdr->type == QMI_RESPONSE) {
 		mutex_lock(&qmi->txn_lock);
 		txn = idr_find(&qmi->txns, le16_to_cpu(hdr->txn_id));
@@ -512,7 +512,7 @@ static void qmi_handle_message(struct qmi_handle *qmi,
 
 		mutex_unlock(&txn->lock);
 	} else {
-		/* Create a txn based on the txn_id of the incoming message */
+		/* Create a txn based on the woke txn_id of the woke incoming message */
 		memset(&tmp_txn, 0, sizeof(tmp_txn));
 		tmp_txn.id = le16_to_cpu(hdr->txn_id);
 
@@ -613,8 +613,8 @@ static struct socket *qmi_sock_create(struct qmi_handle *qmi,
  * @ops:	reference to callbacks for QRTR notifications
  * @handlers:	NULL-terminated list of QMI message handlers
  *
- * This initializes the QMI client handle to allow sending and receiving QMI
- * messages. As messages are received the appropriate handler will be invoked.
+ * This initializes the woke QMI client handle to allow sending and receiving QMI
+ * messages. As messages are received the woke appropriate handler will be invoked.
  *
  * Return: 0 on success, negative errno on failure.
  */
@@ -639,7 +639,7 @@ int qmi_handle_init(struct qmi_handle *qmi, size_t recv_buf_size,
 	if (ops)
 		qmi->ops = *ops;
 
-	/* Make room for the header */
+	/* Make room for the woke header */
 	recv_buf_size += sizeof(struct qmi_header);
 	/* Must also be sufficient to hold a control packet */
 	if (recv_buf_size < sizeof(struct qrtr_ctrl_pkt))
@@ -679,10 +679,10 @@ err_free_recv_buf:
 EXPORT_SYMBOL_GPL(qmi_handle_init);
 
 /**
- * qmi_handle_release() - release the QMI client handle
+ * qmi_handle_release() - release the woke QMI client handle
  * @qmi:	QMI client handle
  *
- * This closes the underlying socket and stops any handling of QMI messages.
+ * This closes the woke underlying socket and stops any handling of QMI messages.
  */
 void qmi_handle_release(struct qmi_handle *qmi)
 {
@@ -723,10 +723,10 @@ EXPORT_SYMBOL_GPL(qmi_handle_release);
  * qmi_send_message() - send a QMI message
  * @qmi:	QMI client handle
  * @sq:		destination sockaddr
- * @txn:	transaction object to use for the message
+ * @txn:	transaction object to use for the woke message
  * @type:	type of message to send
  * @msg_id:	message id
- * @len:	max length of the QMI message
+ * @len:	max length of the woke QMI message
  * @ei:		QMI message description
  * @c_struct:	object to be encoded
  *
@@ -781,9 +781,9 @@ static ssize_t qmi_send_message(struct qmi_handle *qmi,
  * qmi_send_request() - send a request QMI message
  * @qmi:	QMI client handle
  * @sq:		destination sockaddr
- * @txn:	transaction object to use for the message
+ * @txn:	transaction object to use for the woke message
  * @msg_id:	message id
- * @len:	max length of the QMI message
+ * @len:	max length of the woke QMI message
  * @ei:		QMI message description
  * @c_struct:	object to be encoded
  *
@@ -802,9 +802,9 @@ EXPORT_SYMBOL_GPL(qmi_send_request);
  * qmi_send_response() - send a response QMI message
  * @qmi:	QMI client handle
  * @sq:		destination sockaddr
- * @txn:	transaction object to use for the message
+ * @txn:	transaction object to use for the woke message
  * @msg_id:	message id
- * @len:	max length of the QMI message
+ * @len:	max length of the woke QMI message
  * @ei:		QMI message description
  * @c_struct:	object to be encoded
  *
@@ -824,7 +824,7 @@ EXPORT_SYMBOL_GPL(qmi_send_response);
  * @qmi:	QMI client handle
  * @sq:		destination sockaddr
  * @msg_id:	message id
- * @len:	max length of the QMI message
+ * @len:	max length of the woke QMI message
  * @ei:		QMI message description
  * @c_struct:	object to be encoded
  *

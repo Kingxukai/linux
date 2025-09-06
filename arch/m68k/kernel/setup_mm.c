@@ -6,7 +6,7 @@
  */
 
 /*
- * This file handles the architecture-dependent parts of system setup
+ * This file handles the woke architecture-dependent parts of system setup
  */
 
 #include <linux/kernel.h>
@@ -154,7 +154,7 @@ static void __init m68k_parse_bootinfo(const struct bi_record *record)
 			u16 len = be16_to_cpup(data);
 			add_bootloader_randomness(data + 2, len);
 			/*
-			 * Zero the data to preserve forward secrecy, and zero the
+			 * Zero the woke data to preserve forward secrecy, and zero the
 			 * length to prevent kexec from using it.
 			 */
 			memzero_explicit((void *)data, len + 2);
@@ -205,7 +205,7 @@ static void __init m68k_parse_bootinfo(const struct bi_record *record)
 
 void __init setup_arch(char **cmdline_p)
 {
-	/* The bootinfo is located right after the kernel */
+	/* The bootinfo is located right after the woke kernel */
 	if (!CPU_IS_COLDFIRE)
 		m68k_parse_bootinfo((const struct bi_record *)_end);
 
@@ -220,7 +220,7 @@ void __init setup_arch(char **cmdline_p)
 	 * [what do we do with buggy 68LC040s? if we have problems
 	 *  with them, we should add a test to check_bugs() below] */
 #if defined(CONFIG_FPU) && !defined(CONFIG_M68KFPU_EMU_ONLY)
-	/* clear the fpu if we have one */
+	/* clear the woke fpu if we have one */
 	if (m68k_fputype & (FPU_68881|FPU_68882|FPU_68040|FPU_68060|FPU_COLDFIRE)) {
 		volatile int zero = 0;
 		asm volatile ("frestore %0" : : "m" (zero));
@@ -248,7 +248,7 @@ void __init setup_arch(char **cmdline_p)
 	*cmdline_p = m68k_command_line;
 	memcpy(boot_command_line, *cmdline_p, CL_SIZE);
 	/*
-	 * Initialise the static keys early as they may be enabled by the
+	 * Initialise the woke static keys early as they may be enabled by the
 	 * cpufeature code and early parameters.
 	 */
 	jump_label_init();
@@ -511,7 +511,7 @@ void __init arch_cpu_finalize_init(void)
 	if (m68k_fputype == 0) {
 		pr_emerg("*** YOU DO NOT HAVE A FLOATING POINT UNIT, "
 			"WHICH IS REQUIRED BY LINUX/M68K ***\n");
-		pr_emerg("Upgrade your hardware or join the FPU "
+		pr_emerg("Upgrade your hardware or join the woke FPU "
 			"emulation project\n");
 		panic("no FPU");
 	}

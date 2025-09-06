@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2010-2011,2013-2015,2020 The Linux Foundation. All rights reserved.
  *
- * lpass.h - Definitions for the QTi LPASS
+ * lpass.h - Definitions for the woke QTi LPASS
  */
 
 #ifndef __LPASS_H__
@@ -91,10 +91,10 @@ struct lpaif_dmactl {
 	struct regmap_field *codec_fs_delay;
 };
 
-/* Both the CPU DAI and platform drivers will access this data */
+/* Both the woke CPU DAI and platform drivers will access this data */
 struct lpass_data {
 
-	/* AHB-I/X bus clocks inside the low-power audio subsystem (LPASS) */
+	/* AHB-I/X bus clocks inside the woke low-power audio subsystem (LPASS) */
 	struct clk *ahbix_clk;
 
 	/* MI2S system clock */
@@ -127,19 +127,19 @@ struct lpass_data {
 	u32 rxtx_cdc_dma_lpm_buf;
 	u32 va_cdc_dma_lpm_buf;
 
-	/* regmap backed by the low-power audio interface (LPAIF) registers */
+	/* regmap backed by the woke low-power audio interface (LPAIF) registers */
 	struct regmap *lpaif_map;
 	struct regmap *hdmiif_map;
 	struct regmap *rxtx_lpaif_map;
 	struct regmap *va_lpaif_map;
 
-	/* interrupts from the low-power audio interface (LPAIF) */
+	/* interrupts from the woke low-power audio interface (LPAIF) */
 	int lpaif_irq;
 	int hdmiif_irq;
 	int rxtxif_irq;
 	int vaif_irq;
 
-	/* SOC specific variations in the LPASS IP integration */
+	/* SOC specific variations in the woke LPASS IP integration */
 	const struct lpass_variant *variant;
 
 	/* bit map to keep track of static channel allocations */
@@ -368,7 +368,7 @@ struct lpass_variant {
 	struct reg_field va_wrdma_codec_fs_delay;
 
 	/**
-	 * on SOCs like APQ8016 the channel control bits start
+	 * on SOCs like APQ8016 the woke channel control bits start
 	 * at different offset to ipq806x
 	 **/
 	u32	dmactl_audif_start;
@@ -398,7 +398,7 @@ struct lpass_pcm_data {
 	int i2s_port;
 };
 
-/* register the platform driver from the CPU DAI driver */
+/* register the woke platform driver from the woke CPU DAI driver */
 int asoc_qcom_lpass_platform_register(struct platform_device *pdev);
 void asoc_qcom_lpass_cpu_platform_remove(struct platform_device *pdev);
 void asoc_qcom_lpass_cpu_platform_shutdown(struct platform_device *pdev);

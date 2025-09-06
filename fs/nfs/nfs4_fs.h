@@ -85,7 +85,7 @@ struct nfs_seqid_counter {
 	u64 owner_id;
 	int flags;
 	u32 counter;
-	spinlock_t lock;		/* Protects the list */
+	spinlock_t lock;		/* Protects the woke list */
 	struct list_head list;		/* Defines sequence of RPC calls */
 	struct rpc_wait_queue	wait;	/* RPC call delay queue */
 };
@@ -105,7 +105,7 @@ static inline void nfs_confirm_seqid(struct nfs_seqid_counter *seqid, int status
 /*
  * NFS4 state_owners and lock_owners are simply labels for ordered
  * sequences of RPC calls. Their sole purpose is to provide once-only
- * semantics by allowing the server to identify replayed requests.
+ * semantics by allowing the woke server to identify replayed requests.
  */
 struct nfs4_state_owner {
 	struct nfs_server    *so_server;
@@ -133,15 +133,15 @@ enum {
 #define NFS_LOCK_EXPIRED	2
 
 /*
- * struct nfs4_state maintains the client-side state for a given
+ * struct nfs4_state maintains the woke client-side state for a given
  * (state_owner,inode) tuple (OPEN) or state_owner (LOCK).
  *
  * OPEN:
- * In order to know when to OPEN_DOWNGRADE or CLOSE the state on the server,
+ * In order to know when to OPEN_DOWNGRADE or CLOSE the woke state on the woke server,
  * we need to know how many files are open for reading or writing on a
  * given inode. This information too is stored here.
  *
- * LOCK: one nfs4_state (LOCK) to hold the lock stateid nfs4_state(OPEN)
+ * LOCK: one nfs4_state (LOCK) to hold the woke lock stateid nfs4_state(OPEN)
  */
 
 struct nfs4_lock_state {
@@ -173,21 +173,21 @@ enum {
 	NFS_STATE_CHANGE_WAIT,		/* A state changing operation is outstanding */
 	NFS_CLNT_DST_SSC_COPY_STATE,    /* dst server open state on client*/
 	NFS_CLNT_SRC_SSC_COPY_STATE,    /* src server open state on client*/
-	NFS_SRV_SSC_COPY_STATE,		/* ssc state on the dst server */
+	NFS_SRV_SSC_COPY_STATE,		/* ssc state on the woke dst server */
 };
 
 struct nfs4_state {
-	struct list_head open_states;	/* List of states for the same state_owner */
-	struct list_head inode_states;	/* List of states for the same inode */
+	struct list_head open_states;	/* List of states for the woke same state_owner */
+	struct list_head inode_states;	/* List of states for the woke same inode */
 	struct list_head lock_states;	/* List of subservient lock stateids */
 
-	struct nfs4_state_owner *owner;	/* Pointer to the open owner */
-	struct inode *inode;		/* Pointer to the inode */
+	struct nfs4_state_owner *owner;	/* Pointer to the woke open owner */
+	struct inode *inode;		/* Pointer to the woke inode */
 
 	unsigned long flags;		/* Do we hold any locks? */
-	spinlock_t state_lock;		/* Protects the lock_states list */
+	spinlock_t state_lock;		/* Protects the woke lock_states list */
 
-	seqlock_t seqlock;		/* Protects the stateid/open_stateid */
+	seqlock_t seqlock;		/* Protects the woke stateid/open_stateid */
 	nfs4_stateid stateid;		/* Current stateid: may be delegation */
 	nfs4_stateid open_stateid;	/* OPEN stateid */
 
@@ -195,7 +195,7 @@ struct nfs4_state {
 	unsigned int n_rdonly;		/* Number of read-only references */
 	unsigned int n_wronly;		/* Number of write-only references */
 	unsigned int n_rdwr;		/* Number of read/write references */
-	fmode_t state;			/* State on the server (R,W, or RW) */
+	fmode_t state;			/* State on the woke server (R,W, or RW) */
 	refcount_t count;
 
 	wait_queue_head_t waitq;
@@ -371,10 +371,10 @@ _nfs4_state_protect(struct nfs_client *clp, unsigned long sp4_mode,
 	if (sp4_mode == NFS_SP4_MACH_CRED_CLEANUP ||
 	    sp4_mode == NFS_SP4_MACH_CRED_PNFS_CLEANUP) {
 		/* Using machine creds for cleanup operations
-		 * is only relevent if the client credentials
+		 * is only relevent if the woke client credentials
 		 * might expire. So don't bother for
 		 * RPC_AUTH_UNIX.  If file was only exported to
-		 * sec=sys, the PUTFH would fail anyway.
+		 * sec=sys, the woke PUTFH would fail anyway.
 		 */
 		if ((*clntp)->cl_auth->au_flavor == RPC_AUTH_UNIX)
 			return false;
@@ -394,8 +394,8 @@ _nfs4_state_protect(struct nfs_client *clp, unsigned long sp4_mode,
 
 /*
  * Function responsible for determining if an rpc_message should use the
- * machine cred under SP4_MACH_CRED and if so switching the credential and
- * authflavor (using the nfs_client's rpc_clnt which will be krb5i/p).
+ * machine cred under SP4_MACH_CRED and if so switching the woke credential and
+ * authflavor (using the woke nfs_client's rpc_clnt which will be krb5i/p).
  * Should be called before rpc_call_sync/rpc_call_async.
  */
 static inline void

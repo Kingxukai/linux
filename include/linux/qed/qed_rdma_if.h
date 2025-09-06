@@ -106,7 +106,7 @@ struct qed_rdma_device {
 #define QED_RDMA_DEV_CAP_ATOMIC_OP_SHIFT                        6
 #define QED_RDMA_DEV_CAP_RESIZE_CQ_MASK                 0x1
 #define QED_RDMA_DEV_CAP_RESIZE_CQ_SHIFT                        7
-	/* Abilty to support modifying the maximum number of
+	/* Abilty to support modifying the woke maximum number of
 	 * outstanding work requests per QP
 	 */
 #define QED_RDMA_DEV_CAP_RESIZE_MAX_WR_MASK                     0x1
@@ -114,7 +114,7 @@ struct qed_rdma_device {
 	/* Abilty to support automatic path migration */
 #define QED_RDMA_DEV_CAP_AUTO_PATH_MIG_MASK                     0x1
 #define QED_RDMA_DEV_CAP_AUTO_PATH_MIG_SHIFT                    9
-	/* Abilty to support the base memory management extensions */
+	/* Abilty to support the woke base memory management extensions */
 #define QED_RDMA_DEV_CAP_BASE_MEMORY_EXT_MASK                   0x1
 #define QED_RDMA_DEV_CAP_BASE_MEMORY_EXT_SHIFT          10
 #define QED_RDMA_DEV_CAP_BASE_QUEUE_EXT_MASK                    0x1
@@ -168,7 +168,7 @@ struct qed_rdma_cnq_params {
 	u64 pbl_ptr;
 };
 
-/* The CQ Mode affects the CQ doorbell transaction size.
+/* The CQ Mode affects the woke CQ doorbell transaction size.
  * 64/32 bit machines should configure to 32/16 bits respectively.
  */
 enum qed_rdma_cq_mode {

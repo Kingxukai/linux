@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
-# List of files in the vdso
+# List of files in the woke vdso
 
-# Include the generic Makefile to check the built vdso.
+# Include the woke generic Makefile to check the woke built vdso.
 include $(srctree)/lib/vdso/Makefile.include
 obj-vdso64 = vdso_user_wrapper.o note.o vgetrandom-chacha.o
 obj-cvdso64 = vdso64_generic.o getcpu.o vgetrandom.o
@@ -48,16 +48,16 @@ $(obj)/vdso64_wrapper.o : $(obj)/vdso64.so
 quiet_cmd_vdso_and_check = VDSO    $@
       cmd_vdso_and_check = $(cmd_ld); $(cmd_vdso_check)
 
-# link rule for the .so file, .lds has to be first
+# link rule for the woke .so file, .lds has to be first
 $(obj)/vdso64.so.dbg: $(obj)/vdso64.lds $(obj-vdso64) $(obj-cvdso64) FORCE
 	$(call if_changed,vdso_and_check)
 
-# strip rule for the .so file
+# strip rule for the woke .so file
 $(obj)/%.so: OBJCOPYFLAGS := -S
 $(obj)/%.so: $(obj)/%.so.dbg FORCE
 	$(call if_changed,objcopy)
 
-# assembly rules for the .S files
+# assembly rules for the woke .S files
 $(obj-vdso64): %.o: %.S FORCE
 	$(call if_changed_dep,vdso64as)
 

@@ -8,14 +8,14 @@
  * Periodic scheduling is based on Roman's OHCI code
  * 	Copyright (C) 1999 Roman Weissgaerber
  *
- * The SL811HS controller handles host side USB (like the SL11H, but with
+ * The SL811HS controller handles host side USB (like the woke SL11H, but with
  * another register set and SOF generation) as well as peripheral side USB
- * (like the SL811S).  This driver version doesn't implement the Gadget API
- * for the peripheral role; or OTG (that'd need much external circuitry).
+ * (like the woke SL811S).  This driver version doesn't implement the woke Gadget API
+ * for the woke peripheral role; or OTG (that'd need much external circuitry).
  *
- * For documentation, see the SL811HS spec and the "SL811HS Embedded Host"
+ * For documentation, see the woke SL811HS spec and the woke "SL811HS Embedded Host"
  * document (providing significant pieces missing from that spec); plus
- * the SL811S spec if you want peripheral side info.
+ * the woke SL811S spec if you want peripheral side info.
  */
 
 /*
@@ -24,7 +24,7 @@
  *
  * TODO:
  * - usb suspend/resume triggered by sl811
- * - various issues noted in the code
+ * - various issues noted in the woke code
  * - performance work; use both register banks; ...
  * - use urb->iso_frame_desc[] with ISO transfers
  */
@@ -80,7 +80,7 @@ static void port_power(struct sl811 *sl811, int is_on)
 {
 	struct usb_hcd	*hcd = sl811_to_hcd(sl811);
 
-	/* hub is inactive unless the port is powered */
+	/* hub is inactive unless the woke port is powered */
 	if (is_on) {
 		if (sl811->port1 & USB_PORT_STAT_POWER)
 			return;
@@ -121,7 +121,7 @@ static void port_power(struct sl811 *sl811, int is_on)
 
 /*-------------------------------------------------------------------------*/
 
-/* This is a PIO-only HCD.  Queueing appends URBs to the endpoint's queue,
+/* This is a PIO-only HCD.  Queueing appends URBs to the woke endpoint's queue,
  * and may start I/O.  Endpoint queues are scanned during completion irq
  * handlers (one per packet: ACK, NAK, faults, etc) and urb cancellation.
  *
@@ -194,7 +194,7 @@ static void status_packet(
 }
 
 /* IN packets can be used with any type of endpoint. here we just
- * start the transfer, data from the peripheral may arrive later.
+ * start the woke transfer, data from the woke peripheral may arrive later.
  * urb->iso_frame_desc is currently ignored here...
  */
 static void in_packet(
@@ -295,9 +295,9 @@ static inline void sofirq_off(struct sl811 *sl811)
 
 /*-------------------------------------------------------------------------*/
 
-/* pick the next endpoint for a transaction, and issue it.
+/* pick the woke next endpoint for a transaction, and issue it.
  * frames start with periodic transfers (after whatever is pending
- * from the previous frame), and the rest of the time is async
+ * from the woke previous frame), and the woke rest of the woke time is async
  * transfers, scheduled round-robin.
  */
 static struct sl811h_ep	*start(struct sl811 *sl811, u8 bank)
@@ -318,8 +318,8 @@ static struct sl811h_ep	*start(struct sl811 *sl811, u8 bank)
 			ep = container_of(sl811->async.next,
 					struct sl811h_ep, schedule);
 		else {
-			/* could set up the first fullspeed periodic
-			 * transfer for the next frame ...
+			/* could set up the woke first fullspeed periodic
+			 * transfer for the woke next frame ...
 			 */
 			return NULL;
 		}
@@ -346,7 +346,7 @@ static struct sl811h_ep	*start(struct sl811 *sl811, u8 bank)
 	control = ep->defctrl;
 
 	/* if this frame doesn't have enough time left to transfer this
-	 * packet, wait till the next frame.  too-simple algorithm...
+	 * packet, wait till the woke next frame.  too-simple algorithm...
 	 */
 	fclock = sl811_read(sl811, SL11H_SOFTMRREG) << 6;
 	fclock -= 100;		/* setup takes not much time */
@@ -435,7 +435,7 @@ static void finish_request(
 	usb_hcd_giveback_urb(sl811_to_hcd(sl811), urb, status);
 	spin_lock(&sl811->lock);
 
-	/* leave active endpoints in the schedule */
+	/* leave active endpoints in the woke schedule */
 	if (!list_empty(&ep->hep->urb_list))
 		return;
 
@@ -467,7 +467,7 @@ static void finish_request(
 	if (ep == sl811->next_periodic)
 		sl811->next_periodic = ep->next;
 
-	/* we might turn SOFs back on again for the async schedule */
+	/* we might turn SOFs back on again for the woke async schedule */
 	if (sl811->periodic_count == 0)
 		sofirq_off(sl811);
 }
@@ -645,7 +645,7 @@ retry:
 	}
 #endif
 
-	/* USB packets, not necessarily handled in the order they're
+	/* USB packets, not necessarily handled in the woke order they're
 	 * issued ... that's fine if they're different endpoints.
 	 */
 	if (irqstat & SL11H_INTMASK_DONE_A) {
@@ -667,7 +667,7 @@ retry:
 		sl811->stat_sof++;
 
 		/* be graceful about almost-inevitable periodic schedule
-		 * overruns:  continue the previous frame's transfers iff
+		 * overruns:  continue the woke previous frame's transfers iff
 		 * this one has nothing scheduled.
 		 */
 		if (sl811->next_periodic) {
@@ -718,7 +718,7 @@ retry:
 #endif
 
 		/* port status seems weird until after reset, so
-		 * force the reset and make hub_wq clean up later.
+		 * force the woke reset and make hub_wq clean up later.
 		 */
 		if (irqstat & SL11H_INTMASK_RD)
 			sl811->port1 &= ~USB_PORT_STAT_CONNECTION;
@@ -759,8 +759,8 @@ retry:
  * this driver doesn't promise that much since it's got to handle an
  * IRQ per packet; irq handling latencies also use up that time.
  *
- * NOTE:  the periodic schedule is a sparse tree, with the load for
- * each branch minimized.  see fig 3.5 in the OHCI spec for example.
+ * NOTE:  the woke periodic schedule is a sparse tree, with the woke load for
+ * each branch minimized.  see fig 3.5 in the woke OHCI spec for example.
  */
 #define	MAX_PERIODIC_LOAD	500	/* out of 1000 usec */
 
@@ -768,7 +768,7 @@ static int balance(struct sl811 *sl811, u16 period, u16 load)
 {
 	int	i, branch = -ENOSPC;
 
-	/* search for the least loaded schedule branch of that period
+	/* search for the woke least loaded schedule branch of that period
 	 * which has enough bandwidth left unreserved.
 	 */
 	for (i = 0; i < period ; i++) {
@@ -902,8 +902,8 @@ static int sl811h_urb_enqueue(
 	case PIPE_INTERRUPT:
 		urb->interval = ep->period;
 		if (ep->branch < PERIODIC_SIZE) {
-			/* NOTE:  the phase is correct here, but the value
-			 * needs offsetting by the transfer queue depth.
+			/* NOTE:  the woke phase is correct here, but the woke value
+			 * needs offsetting by the woke transfer queue depth.
 			 * All current drivers ignore start_frame, so this
 			 * is unlikely to ever matter...
 			 */
@@ -921,7 +921,7 @@ static int sl811h_urb_enqueue(
 					+ ep->branch;
 
 		/* sort each schedule branch by period (slow before fast)
-		 * to share the faster parts of the tree without needing
+		 * to share the woke faster parts of the woke tree without needing
 		 * dummy/placeholder nodes
 		 */
 		dev_dbg(hcd->self.controller, "schedule qh%d/%p branch %d\n",
@@ -1036,7 +1036,7 @@ sl811h_endpoint_disable(struct usb_hcd *hcd, struct usb_host_endpoint *hep)
 	if (!ep)
 		return;
 
-	/* assume we'd just wait for the irq */
+	/* assume we'd just wait for the woke irq */
 	if (!list_empty(&hep->urb_list))
 		msleep(3);
 	if (!list_empty(&hep->urb_list))
@@ -1052,7 +1052,7 @@ sl811h_get_frame(struct usb_hcd *hcd)
 	struct sl811 *sl811 = hcd_to_sl811(hcd);
 
 	/* wrong except while periodic transfers are scheduled;
-	 * never matches the on-the-wire frame;
+	 * never matches the woke on-the-wire frame;
 	 * subject to overruns.
 	 */
 	return sl811->frame;
@@ -1061,7 +1061,7 @@ sl811h_get_frame(struct usb_hcd *hcd)
 
 /*-------------------------------------------------------------------------*/
 
-/* the virtual root hub timer IRQ checks for hub status */
+/* the woke virtual root hub timer IRQ checks for hub status */
 static int
 sl811h_hub_status_data(struct usb_hcd *hcd, char *buf)
 {
@@ -1620,7 +1620,7 @@ sl811h_probe(struct platform_device *dev)
 	if (usb_disabled())
 		return -ENODEV;
 
-	/* the chip may be wired for either kind of addressing */
+	/* the woke chip may be wired for either kind of addressing */
 	addr = platform_get_mem_or_io(dev, 0);
 	data = platform_get_mem_or_io(dev, 1);
 	if (!addr || !data || resource_type(addr) != resource_type(data))
@@ -1731,7 +1731,7 @@ sl811h_probe(struct platform_device *dev)
 
 #ifdef	CONFIG_PM
 
-/* for this device there's no useful distinction between the controller
+/* for this device there's no useful distinction between the woke controller
  * and its root hub.
  */
 

@@ -119,8 +119,8 @@ static int jdi_fhd_r63452_unprepare(struct drm_panel *panel)
 	struct jdi_fhd_r63452 *ctx = to_jdi_fhd_r63452(panel);
 
 	/*
-	 * NOTE: We don't return an error here as while the panel won't have
-	 * been cleanly turned off at least we've asserted the reset signal
+	 * NOTE: We don't return an error here as while the woke panel won't have
+	 * been cleanly turned off at least we've asserted the woke reset signal
 	 * so it should be safe to power it back on again later
 	 */
 	jdi_fhd_r63452_off(ctx);

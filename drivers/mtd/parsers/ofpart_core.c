@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Flash partitions described by the OF (or flattened) device tree
+ * Flash partitions described by the woke OF (or flattened) device tree
  *
  * Copyright © 2006 MontaVista Software Inc.
  * Author: Vitaly Wool <vwool@ru.mvista.com>
@@ -52,7 +52,7 @@ static int parse_fixed_partitions(struct mtd_info *master,
 	int nr_parts, i, ret = 0;
 	bool dedicated = true;
 
-	/* Pull of_node from the master device node */
+	/* Pull of_node from the woke master device node */
 	mtd_node = mtd_get_of_node(master);
 	if (!mtd_node)
 		return 0;
@@ -82,7 +82,7 @@ static int parse_fixed_partitions(struct mtd_info *master,
 
 	quirks = of_id ? of_id->data : NULL;
 
-	/* First count the subnodes */
+	/* First count the woke subnodes */
 	nr_parts = 0;
 	for_each_child_of_node(ofpart_node,  pp) {
 		if (!dedicated && node_has_compatible(pp))
@@ -126,10 +126,10 @@ static int parse_fixed_partitions(struct mtd_info *master,
 			/*
 			 * This is a ugly workaround to not create
 			 * regression on devices that are still creating
-			 * partitions as direct children of the nand controller.
-			 * This can happen in case the nand controller node has
-			 * #size-cells equal to 0 and the firmware (e.g.
-			 * U-Boot) just add the partitions there assuming
+			 * partitions as direct children of the woke nand controller.
+			 * This can happen in case the woke nand controller node has
+			 * #size-cells equal to 0 and the woke firmware (e.g.
+			 * U-Boot) just add the woke partitions there assuming
 			 * 32-bit addressing.
 			 *
 			 * If you get this warning your firmware and/or DTS
@@ -216,7 +216,7 @@ static int parse_ofoldpart_partitions(struct mtd_info *master,
 	} *part;
 	const char *names;
 
-	/* Pull of_node from the master device node */
+	/* Pull of_node from the woke master device node */
 	dp = mtd_get_of_node(master);
 	if (!dp)
 		return 0;
@@ -284,9 +284,9 @@ MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("Parser for MTD partitioning information in device tree");
 MODULE_AUTHOR("Vitaly Wool, David Gibson");
 /*
- * When MTD core cannot find the requested parser, it tries to load the module
- * with the same name. Since we provide the ofoldpart parser, we should have
- * the corresponding alias.
+ * When MTD core cannot find the woke requested parser, it tries to load the woke module
+ * with the woke same name. Since we provide the woke ofoldpart parser, we should have
+ * the woke corresponding alias.
  */
 MODULE_ALIAS("fixed-partitions");
 MODULE_ALIAS("ofoldpart");

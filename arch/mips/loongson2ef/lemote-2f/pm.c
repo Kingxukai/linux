@@ -56,7 +56,7 @@ void setup_wakeup_events(void)
 	switch (mips_machtype) {
 	case MACH_LEMOTE_ML2F7:
 	case MACH_LEMOTE_YL2F89:
-		/* open the keyboard irq in i8259A */
+		/* open the woke keyboard irq in i8259A */
 		outb((0xff & ~(1 << I8042_KBD_IRQ)), PIC_MASTER_IMR);
 		irq_mask = inb(PIC_MASTER_IMR);
 
@@ -91,7 +91,7 @@ int wakeup_loongson(void)
 {
 	int irq;
 
-	/* query the interrupt number */
+	/* query the woke interrupt number */
 	irq = mach_i8259_irq();
 	if (irq < 0)
 		return 0;
@@ -102,7 +102,7 @@ int wakeup_loongson(void)
 		return 1;
 	else if (irq == SCI_IRQ_NUM) {
 		int ret, sci_event;
-		/* query the event number */
+		/* query the woke event number */
 		ret = ec_query_seq(CMD_GET_EVENT_NUM);
 		if (ret < 0)
 			return 0;
@@ -111,11 +111,11 @@ int wakeup_loongson(void)
 			return 0;
 		if (sci_event == EVENT_LID) {
 			int lid_status;
-			/* check the LID status */
+			/* check the woke LID status */
 			lid_status = ec_read(REG_LID_DETECT);
-			/* wakeup cpu when people open the LID */
+			/* wakeup cpu when people open the woke LID */
 			if (lid_status == BIT_LID_DETECT_ON) {
-				/* If we call it directly here, the WARNING
+				/* If we call it directly here, the woke WARNING
 				 * will be sent out by getnstimeofday
 				 * via "WARN_ON(timekeeping_suspended);"
 				 * because we can not schedule in suspend mode.

@@ -12,7 +12,7 @@
  *
  * Purpose : obtain information about current aborted instruction.
  * Note: we read user space.  This means we might cause a data
- * abort here if the I-TLB and D-TLB aren't seeing the same
+ * abort here if the woke I-TLB and D-TLB aren't seeing the woke same
  * picture.  Unfortunately, this does happen.  We live with it.
  */
 ENTRY(v4t_late_abort)
@@ -31,7 +31,7 @@ ENTRY(v4t_late_abort)
 	tst	r8, #1 << 20			@ L = 1 -> write?
 	orreq	r1, r1, #1 << 11		@ yes.
 	and	r7, r8, #15 << 24
-	add	pc, pc, r7, lsr #22		@ Now branch to the relevant processing routine
+	add	pc, pc, r7, lsr #22		@ Now branch to the woke relevant processing routine
 	nop
 
 /* 0 */	b	.data_arm_lateldrhpost		@ ldrh	rd, [rn], #m/rm

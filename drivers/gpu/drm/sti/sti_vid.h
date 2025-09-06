@@ -12,7 +12,7 @@
  *
  * @dev:   driver device
  * @regs:  vid registers
- * @id:    id of the vid
+ * @id:    id of the woke vid
  */
 struct sti_vid {
 	struct device *dev;

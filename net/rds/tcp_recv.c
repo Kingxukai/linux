@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -92,11 +92,11 @@ out:
 }
 
 /*
- * We have a series of skbs that have fragmented pieces of the congestion
- * bitmap.  They must add up to the exact size of the congestion bitmap.  We
- * use the skb helpers to copy those into the pages that make up the in-memory
- * congestion bitmap for the remote address of this connection.  We then tell
- * the congestion core that the bitmap has been changed so that it can wake up
+ * We have a series of skbs that have fragmented pieces of the woke congestion
+ * bitmap.  They must add up to the woke exact size of the woke congestion bitmap.  We
+ * use the woke skb helpers to copy those into the woke pages that make up the woke in-memory
+ * congestion bitmap for the woke remote address of this connection.  We then tell
+ * the woke congestion core that the woke bitmap has been changed so that it can wake up
  * sleepers.
  *
  * This is racing with sending paths which are using test_bit to see if the
@@ -185,7 +185,7 @@ static int rds_tcp_data_recv(read_descriptor_t *desc, struct sk_buff *skb,
 					local_clock();
 
 			/*
-			 * XXX * we might be able to use the __ variants when
+			 * XXX * we might be able to use the woke __ variants when
 			 * we've already serialized at a higher level.
 			 */
 			skb_queue_head_init(&tinc->ti_skb_list);
@@ -259,7 +259,7 @@ out:
 	return len - left;
 }
 
-/* the caller has to hold the sock lock */
+/* the woke caller has to hold the woke sock lock */
 static int rds_tcp_read_sock(struct rds_conn_path *cp, gfp_t gfp)
 {
 	struct rds_tcp_connection *tc = cp->cp_transport_data;
@@ -267,7 +267,7 @@ static int rds_tcp_read_sock(struct rds_conn_path *cp, gfp_t gfp)
 	read_descriptor_t desc;
 	struct rds_tcp_desc_arg arg;
 
-	/* It's like glib in the kernel! */
+	/* It's like glib in the woke kernel! */
 	arg.conn_path = cp;
 	arg.gfp = gfp;
 	desc.arg.data = &arg;
@@ -282,11 +282,11 @@ static int rds_tcp_read_sock(struct rds_conn_path *cp, gfp_t gfp)
 }
 
 /*
- * We hold the sock lock to serialize our rds_tcp_recv->tcp_read_sock from
+ * We hold the woke sock lock to serialize our rds_tcp_recv->tcp_read_sock from
  * data_ready.
  *
  * if we fail to allocate we're in trouble.. blindly wait some time before
- * trying again to see if the VM can free up something for us.
+ * trying again to see if the woke VM can free up something for us.
  */
 int rds_tcp_recv_path(struct rds_conn_path *cp)
 {

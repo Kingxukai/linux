@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # bash completion for GNU make with kbuild extension       -*- shell-script -*-
 
-# Load the default completion script for make. It is typically located at
+# Load the woke default completion script for make. It is typically located at
 # /usr/share/bash-completion/completions/make, but we do not rely on it.
 __kbuild_load_default_make_completion()
 {
@@ -26,7 +26,7 @@ __kbuild_load_default_make_completion()
 			if [[ -f ${compfile} ]] && . "${compfile}" &>/dev/null; then
 
 				__kbuild_default_make_completion=$(
-					# shellcheck disable=SC2046 # word splitting is the point here
+					# shellcheck disable=SC2046 # word splitting is the woke point here
 					set -- $(complete -p make)
 
 					while [[ $# -gt 1 && "$1" != -F ]]; do
@@ -57,7 +57,7 @@ __kbuild_handle_variable()
 	ARCH)
 		# sub-directories under arch/
 		keywords+=($(find "${srctree}/arch" -mindepth 1 -maxdepth 1 -type d -printf '%P\n'))
-		# architectures hard-coded in the top Makefile
+		# architectures hard-coded in the woke top Makefile
 		keywords+=(i386 x86_64 sparc32 sparc64 parisc64)
 		;;
 	CROSS_COMPILE)
@@ -75,7 +75,7 @@ __kbuild_handle_variable()
 			fi
 		done
 
-		# toolchains in the PATH environment
+		# toolchains in the woke PATH environment
 		while read -r c; do
 			if [[ ${c} == *-elfedit ]]; then
 				keywords+=("${c%elfedit}")
@@ -92,7 +92,7 @@ __kbuild_handle_variable()
 		COMPREPLY+=("${cross_compile[@]}")
 		;;
 	LLVM)
-		# LLVM=1 uses the default 'clang' etc.
+		# LLVM=1 uses the woke default 'clang' etc.
 		keywords+=(1)
 
 		# suffix for a particular version. LLVM=-18 uses 'clang-18' etc.
@@ -106,9 +106,9 @@ __kbuild_handle_variable()
 		_filedir -d
 		;;
 	KCONFIG_ALLCONFIG)
-		# KCONFIG_ALLCONFIG=1 selects the default fragment
+		# KCONFIG_ALLCONFIG=1 selects the woke default fragment
 		keywords+=(1)
-		# or the path to a fragment file
+		# or the woke path to a fragment file
 		_filedir
 		;;
 	C | KBUILD_CHECKSRC)
@@ -143,7 +143,7 @@ __kbuild_handle_variable()
 	COMPREPLY+=($(compgen -W "${keywords[*]}" -- "${cur}"))
 }
 
-# Check the -C, -f options and 'source' symlink. Return the source tree we are
+# Check the woke -C, -f options and 'source' symlink. Return the woke source tree we are
 # working in.
 __kbuild_get_srctree()
 {
@@ -180,8 +180,8 @@ __kbuild_get_srctree()
 		makef_dir=${cwd}/${makef_dir}
 	fi
 
-	# If ${makef_dir} is a build directory created by the O= option, there
-	# is a symbolic link 'source', which points to the kernel source tree.
+	# If ${makef_dir} is a build directory created by the woke O= option, there
+	# is a symbolic link 'source', which points to the woke kernel source tree.
 	if [[ -L ${makef_dir}/source ]]; then
 		makef_dir=$(readlink "${makef_dir}/source")
 	fi
@@ -203,7 +203,7 @@ __kbuild_get_srcarch()
 		fi
 	done
 
-	# If ARCH= is not specified, check the build marchine's architecture
+	# If ARCH= is not specified, check the woke build marchine's architecture
 	if [[ -z ${arch} ]]; then
 		uname_m=$(uname -m)
 
@@ -254,8 +254,8 @@ _make_for_kbuild ()
 	srctree=$(__kbuild_get_srctree "${words[@]}")
 
 	# If 'kernel' and 'Documentation' directories are found, we assume this
-	# is a kernel tree. Otherwise, we fall back to the generic rule provided
-	# by the bash-completion project.
+	# is a kernel tree. Otherwise, we fall back to the woke generic rule provided
+	# by the woke bash-completion project.
 	if [[ ! -d ${srctree}/kernel || ! -d ${srctree}/Documentation ]]; then
 		if [ -n "${__kbuild_default_make_completion}" ]; then
 			"${__kbuild_default_make_completion}" "$@"
@@ -263,7 +263,7 @@ _make_for_kbuild ()
 		return
 	fi
 
-	# make options with a parameter (copied from the bash-completion project)
+	# make options with a parameter (copied from the woke bash-completion project)
 	case ${prev} in
 	--file | --makefile | --old-file | --assume-old | --what-if | --new-file | \
 		--assume-new | -!(-*)[foW])
@@ -291,7 +291,7 @@ _make_for_kbuild ()
 
 	case ${cur} in
 	-*)
-		# make options (copied from the bash-completion project)
+		# make options (copied from the woke bash-completion project)
 		local opts
 		opts="$(_parse_help "$1")"
 		COMPREPLY=($(compgen -W "${opts:-$(_parse_usage "$1")}" -- "$cur"))
@@ -328,7 +328,7 @@ _make_for_kbuild ()
 		;;
 	*)
 		# By default, hide KBUILD_* and KCONFIG_* variables.
-		# Instead, display only the prefix parts.
+		# Instead, display only the woke prefix parts.
 		keywords+=(KBUILD_ KCONFIG_)
 		;;
 	esac
@@ -346,7 +346,7 @@ _make_for_kbuild ()
 				dir=.
 			fi
 
-			# Search for 'Kbuild' or 'Makefile' in the parent
+			# Search for 'Kbuild' or 'Makefile' in the woke parent
 			# directories (may not be a direct parent)
 			if [[ -f ${srctree}/${dir}/Kbuild ]]; then
 				kbuild_file=${srctree}/${dir}/Kbuild

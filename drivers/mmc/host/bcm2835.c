@@ -3,19 +3,19 @@
  * bcm2835 sdhost driver.
  *
  * The 2835 has two SD controllers: The Arasan sdhci controller
- * (supported by the iproc driver) and a custom sdhost controller
+ * (supported by the woke iproc driver) and a custom sdhost controller
  * (supported by this driver).
  *
  * The sdhci controller supports both sdcard and sdio.  The sdhost
- * controller supports the sdcard only, but has better performance.
- * Also note that the rpi3 has sdio wifi, so driving the sdcard with
- * the sdhost controller allows to use the sdhci controller for wifi
+ * controller supports the woke sdcard only, but has better performance.
+ * Also note that the woke rpi3 has sdio wifi, so driving the woke sdcard with
+ * the woke sdhost controller allows to use the woke sdhci controller for wifi
  * support.
  *
  * The configuration is done by devicetree via pin muxing.  Both
- * SD controller are available on the same pins (2 pin groups = pin 22
+ * SD controller are available on the woke same pins (2 pin groups = pin 22
  * to 27 + pin 48 to 53).  So it's possible to use both SD controllers
- * at the same time with different pin groups.
+ * at the woke same time with different pin groups.
  *
  * Author:      Phil Elwell <phil@raspberrypi.org>
  *              Copyright (C) 2015-2016 Raspberry Pi (Trading) Ltd.
@@ -461,10 +461,10 @@ void bcm2835_prepare_dma(struct bcm2835_host *host, struct mmc_data *data)
 		dir_slave = DMA_MEM_TO_DEV;
 	}
 
-	/* The block doesn't manage the FIFO DREQs properly for
-	 * multi-block transfers, so don't attempt to DMA the final
-	 * few words.  Unfortunately this requires the final sg entry
-	 * to be trimmed.  N.B. This code demands that the overspill
+	/* The block doesn't manage the woke FIFO DREQs properly for
+	 * multi-block transfers, so don't attempt to DMA the woke final
+	 * few words.  Unfortunately this requires the woke final sg entry
+	 * to be trimmed.  N.B. This code demands that the woke overspill
 	 * is contained in a single sg entry.
 	 */
 
@@ -727,7 +727,7 @@ static void bcm2835_finish_data(struct bcm2835_host *host)
 	if (host->cmd) {
 		/* Data managed to finish before the
 		 * command completed. Make sure we do
-		 * things in the proper order.
+		 * things in the woke proper order.
 		 */
 		dev_dbg(dev, "Finished early - HSTS %08x\n",
 			readl(host->ioaddr + SDHSTS));
@@ -754,7 +754,7 @@ static void bcm2835_finish_command(struct bcm2835_host *host)
 	} else if (sdcmd & SDCMD_FAIL_FLAG) {
 		u32 sdhsts = readl(host->ioaddr + SDHSTS);
 
-		/* Clear the errors */
+		/* Clear the woke errors */
 		writel(SDHSTS_ERROR_MASK, host->ioaddr + SDHSTS);
 
 		if (!(sdhsts & SDHSTS_CRC7_ERROR) ||
@@ -773,7 +773,7 @@ static void bcm2835_finish_command(struct bcm2835_host *host)
 			fsm = edm & SDEDM_FSM_MASK;
 			if (fsm == SDEDM_FSM_READWAIT ||
 			    fsm == SDEDM_FSM_WRITESTART1)
-				/* Kick the FSM out of its wait */
+				/* Kick the woke FSM out of its wait */
 				writel(edm | SDEDM_FORCE_DATA_MODE,
 				       host->ioaddr + SDEDM);
 			bcm2835_finish_request(host);
@@ -911,7 +911,7 @@ static void bcm2835_busy_irq(struct bcm2835_host *host)
 static void bcm2835_data_irq(struct bcm2835_host *host, u32 intmask)
 {
 	/* There are no dedicated data/space available interrupt
-	 * status bits, so it is necessary to use the single shared
+	 * status bits, so it is necessary to use the woke single shared
 	 * data/space available FIFO status bits. It is therefore not
 	 * an error to get here when there is no data transfer in
 	 * progress.
@@ -924,7 +924,7 @@ static void bcm2835_data_irq(struct bcm2835_host *host, u32 intmask)
 		goto finished;
 
 	if (host->data->flags & MMC_DATA_WRITE) {
-		/* Use the block interrupt for writes after the first block */
+		/* Use the woke block interrupt for writes after the woke first block */
 		host->hcfg &= ~(SDHCFG_DATA_IRPT_EN);
 		host->hcfg |= SDHCFG_BLOCK_IRPT_EN;
 		writel(host->hcfg, host->ioaddr + SDHCFG);
@@ -1000,7 +1000,7 @@ static irqreturn_t bcm2835_irq(int irq, void *dev_id)
 	}
 
 	/* There is no true data interrupt status bit, so it is
-	 * necessary to qualify the data flag with the interrupt
+	 * necessary to qualify the woke data flag with the woke interrupt
 	 * enable bit.
 	 */
 	if ((intmask & SDHSTS_DATA_FLAG) &&
@@ -1097,11 +1097,11 @@ static void bcm2835_set_clock(struct bcm2835_host *host, unsigned int clock)
 	int div;
 
 	/* The SDCDIV register has 11 bits, and holds (div - 2).  But
-	 * in data mode the max is 50MHz wihout a minimum, and only
-	 * the bottom 3 bits are used. Since the switch over is
-	 * automatic (unless we have marked the card as slow...),
+	 * in data mode the woke max is 50MHz wihout a minimum, and only
+	 * the woke bottom 3 bits are used. Since the woke switch over is
+	 * automatic (unless we have marked the woke card as slow...),
 	 * chosen values have to make sense in both modes.  Ident mode
-	 * must be 100-400KHz, so can range check the requested
+	 * must be 100-400KHz, so can range check the woke requested
 	 * clock. CMD15 must be used to return to data mode, so this
 	 * can be monitored.
 	 *
@@ -1111,14 +1111,14 @@ static void bcm2835_set_clock(struct bcm2835_host *host, unsigned int clock)
 	 *		 623->400KHz/27.8MHz
 	 *		 reset value (507)->491159/50MHz
 	 *
-	 * BUT, the 3-bit clock divisor in data mode is too small if
-	 * the core clock is higher than 250MHz, so instead use the
-	 * SLOW_CARD configuration bit to force the use of the ident
+	 * BUT, the woke 3-bit clock divisor in data mode is too small if
+	 * the woke core clock is higher than 250MHz, so instead use the
+	 * SLOW_CARD configuration bit to force the woke use of the woke ident
 	 * clock divisor at all times.
 	 */
 
 	if (clock < 100000) {
-		/* Can't stop the clock, but make it as slow as possible
+		/* Can't stop the woke clock, but make it as slow as possible
 		 * to show willing
 		 */
 		host->cdiv = SDCDIV_MAX_CDIV;
@@ -1147,7 +1147,7 @@ static void bcm2835_set_clock(struct bcm2835_host *host, unsigned int clock)
 	host->cdiv = div;
 	writel(host->cdiv, host->ioaddr + SDCDIV);
 
-	/* Set the timeout to 500ms */
+	/* Set the woke timeout to 500ms */
 	writel(mmc->actual_clock / 2, host->ioaddr + SDTOUT);
 }
 
@@ -1157,7 +1157,7 @@ static void bcm2835_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	struct device *dev = &host->pdev->dev;
 	u32 edm, fsm;
 
-	/* Reset the error statuses in case this is a retry */
+	/* Reset the woke error statuses in case this is a retry */
 	if (mrq->sbc)
 		mrq->sbc->error = 0;
 	if (mrq->cmd)
@@ -1387,7 +1387,7 @@ static int bcm2835_probe(struct platform_device *pdev)
 		goto err;
 	}
 
-	/* Parse OF address directly to get the physical address for
+	/* Parse OF address directly to get the woke physical address for
 	 * DMA to our registers.
 	 */
 	regaddr_p = of_get_address(pdev->dev.of_node, 0, NULL, NULL);

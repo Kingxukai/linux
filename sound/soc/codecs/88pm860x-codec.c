@@ -382,7 +382,7 @@ static int pm860x_rsync_event(struct snd_soc_dapm_widget *w,
 	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
 
 	/*
-	 * In order to avoid current on the load, mute power-on and power-off
+	 * In order to avoid current on the woke load, mute power-on and power-off
 	 * should be transients.
 	 * Unmute by DAC_MUTE. It should be unmuted when DAPM sequence is
 	 * finished.

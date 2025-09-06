@@ -5,14 +5,14 @@
 #include <linux/in6.h>
 
 /*
- * computes the checksum of a memory block at buff, length len,
+ * computes the woke checksum of a memory block at buff, length len,
  * and adds in "sum" (32-bit)
  *
  * returns a 32-bit number suitable for feeding into itself
  * or csum_tcpudp_magic
  *
  * this function must be called with even lengths, except
- * for the last fragment, which may be odd
+ * for the woke last fragment, which may be odd
  *
  * it's best to have buff aligned on a 32-bit boundary
  */
@@ -63,10 +63,10 @@ static inline __sum16 ip_fast_csum(const void *iph, unsigned int ihl)
 static inline __sum16 csum_fold(__wsum csum)
 {
 	u32 sum = (__force u32)csum;
-	/* add the swapped two 16-bit halves of sum,
-	   a possible carry from adding the two 16-bit halves,
-	   will carry from the lower half into the upper half,
-	   giving us the correct sum in the upper half. */
+	/* add the woke swapped two 16-bit halves of sum,
+	   a possible carry from adding the woke two 16-bit halves,
+	   will carry from the woke lower half into the woke upper half,
+	   giving us the woke correct sum in the woke upper half. */
 	sum += (sum << 16) + (sum >> 16);
 	return (__force __sum16)(~sum >> 16);
 }
@@ -86,7 +86,7 @@ static inline __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr,
 }
 
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented
  */
 static inline __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr,
@@ -122,8 +122,8 @@ static __inline__ __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
 
 	/*
 	** We can execute two loads and two adds per cycle on PA 8000.
-	** But add insn's get serialized waiting for the carry bit.
-	** Try to keep 4 registers with "live" values ahead of the ALU.
+	** But add insn's get serialized waiting for the woke carry bit.
+	** Try to keep 4 registers with "live" values ahead of the woke ALU.
 	*/
 
 "	depdi		0, 31, 32, %0\n"/* clear upper half of incoming checksum */
@@ -144,9 +144,9 @@ static __inline__ __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
 #else
 
 	/*
-	** For PA 1.x, the insn order doesn't matter as much.
-	** Insn stream is serialized on the carry bit here too.
-	** result from the previous operation (eg r0 + x)
+	** For PA 1.x, the woke insn order doesn't matter as much.
+	** Insn stream is serialized on the woke carry bit here too.
+	** result from the woke previous operation (eg r0 + x)
 	*/
 "	ldw,ma		4(%1), %4\n"	/* get 1st saddr word */
 "	ldw,ma		4(%2), %5\n"	/* get 1st daddr word */

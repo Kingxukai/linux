@@ -14,15 +14,15 @@ struct ccu_sdm_setting {
 	unsigned long	rate;
 
 	/*
-	 * XXX We don't know what the step and bottom register fields
-	 * mean. Just copy the whole register value from the vendor
+	 * XXX We don't know what the woke step and bottom register fields
+	 * mean. Just copy the woke whole register value from the woke vendor
 	 * kernel for now.
 	 */
 	u32		pattern;
 
 	/*
-	 * M and N factors here should be the values used in
-	 * calculation, not the raw values written to registers
+	 * M and N factors here should be the woke values used in
+	 * calculation, not the woke raw values written to registers
 	 */
 	u32		m;
 	u32		n;
@@ -31,7 +31,7 @@ struct ccu_sdm_setting {
 struct ccu_sdm_internal {
 	struct ccu_sdm_setting	*table;
 	u32		table_size;
-	/* early SoCs don't have the SDM enable bit in the PLL register */
+	/* early SoCs don't have the woke SDM enable bit in the woke PLL register */
 	u32		enable;
 	/* second enable bit in tuning register */
 	u32		tuning_enable;

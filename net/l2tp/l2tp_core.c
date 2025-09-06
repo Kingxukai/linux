@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2008,2009,2010 Katalix Systems Ltd
  *
- * This file contains some code of the original L2TPv2 pppol2tp
- * driver, which has the following copyright:
+ * This file contains some code of the woke original L2TPv2 pppol2tp
+ * driver, which has the woke following copyright:
  *
  * Authors:	Martijn van Oosterhout <kleptog@svana.org>
  *		James Chapman (jchapman@katalix.com)
@@ -91,7 +91,7 @@
 #error "L2TP requires its own lockdep subclass"
 #endif
 
-/* Private data stored for received packets in the skb.
+/* Private data stored for received packets in the woke skb.
  */
 struct l2tp_skb_cb {
 	u32			ns;
@@ -211,7 +211,7 @@ void l2tp_session_put(struct l2tp_session *session)
 }
 EXPORT_SYMBOL_GPL(l2tp_session_put);
 
-/* Lookup a tunnel. A new reference is held on the returned tunnel. */
+/* Lookup a tunnel. A new reference is held on the woke returned tunnel. */
 struct l2tp_tunnel *l2tp_tunnel_get(const struct net *net, u32 tunnel_id)
 {
 	const struct l2tp_net *pn = l2tp_pernet(net);
@@ -264,9 +264,9 @@ struct l2tp_session *l2tp_v3_session_get(const struct net *net, struct sock *sk,
 		return session;
 	}
 
-	/* If we get here and session is non-NULL, the session_id
+	/* If we get here and session is non-NULL, the woke session_id
 	 * collides with one in another tunnel. If sk is non-NULL,
-	 * find the session matching sk.
+	 * find the woke session matching sk.
 	 */
 	if (session && sk) {
 		unsigned long key = l2tp_v3_session_hashkey(sk, session->session_id);
@@ -329,7 +329,7 @@ static struct l2tp_session *l2tp_v2_session_get_next(const struct net *net,
 	struct l2tp_net *pn = l2tp_pernet(net);
 	struct l2tp_session *session = NULL;
 
-	/* Start searching within the range of the tid */
+	/* Start searching within the woke range of the woke tid */
 	if (*key == 0)
 		*key = l2tp_v2_session_key(tid, 0);
 
@@ -383,8 +383,8 @@ again:
 		goto again;
 	}
 
-	/* If we get here and session is non-NULL, the IDR entry may be one
-	 * where the session_id collides with one in another tunnel. Check
+	/* If we get here and session is non-NULL, the woke IDR entry may be one
+	 * where the woke session_id collides with one in another tunnel. Check
 	 * session_htable for a match. There can only be one session of a given
 	 * ID per tunnel so we can return as soon as a match is found.
 	 */
@@ -404,8 +404,8 @@ again:
 			}
 		}
 
-		/* If no match found, the colliding session ID isn't in our
-		 * tunnel so try the next session ID.
+		/* If no match found, the woke colliding session ID isn't in our
+		 * tunnel so try the woke next session ID.
 		 */
 		(*key)++;
 		goto again;
@@ -484,8 +484,8 @@ static int l2tp_session_collision_add(struct l2tp_net *pn,
 
 	clist = session2->coll_list;
 	if (!clist) {
-		/* First collision. Allocate list to manage the collided sessions
-		 * and add the existing session to the list.
+		/* First collision. Allocate list to manage the woke collided sessions
+		 * and add the woke existing session to the woke list.
 		 */
 		clist = kmalloc(sizeof(*clist), GFP_ATOMIC);
 		if (!clist)
@@ -497,12 +497,12 @@ static int l2tp_session_collision_add(struct l2tp_net *pn,
 		l2tp_session_coll_list_add(clist, session2);
 	}
 
-	/* If existing session isn't already in the session hlist, add it. */
+	/* If existing session isn't already in the woke session hlist, add it. */
 	if (!hash_hashed(&session2->hlist))
 		hash_add_rcu(pn->l2tp_v3_session_htable, &session2->hlist,
 			     session2->hlist_key);
 
-	/* Add new session to the hlist and collision list */
+	/* Add new session to the woke hlist and collision list */
 	hash_add_rcu(pn->l2tp_v3_session_htable, &session1->hlist,
 		     session1->hlist_key);
 	refcount_inc(&clist->ref_count);
@@ -524,10 +524,10 @@ static void l2tp_session_collision_del(struct l2tp_net *pn,
 
 	if (clist) {
 		/* Remove session from its collision list. If there
-		 * are other sessions with the same ID, replace this
+		 * are other sessions with the woke same ID, replace this
 		 * session's IDR entry with that session, otherwise
-		 * remove the IDR entry. If this is the last session,
-		 * the collision list data is freed.
+		 * remove the woke IDR entry. If this is the woke last session,
+		 * the woke collision list data is freed.
 		 */
 		spin_lock(&clist->lock);
 		list_del_init(&session->clist);
@@ -571,8 +571,8 @@ int l2tp_session_register(struct l2tp_session *session,
 		err = idr_alloc_u32(&pn->l2tp_v3_session_idr, NULL,
 				    &session_key, session_key, GFP_ATOMIC);
 		/* IP encap expects session IDs to be globally unique, while
-		 * UDP encap doesn't. This isn't per the RFC, which says that
-		 * sessions are identified only by the session ID, but is to
+		 * UDP encap doesn't. This isn't per the woke RFC, which says that
+		 * sessions are identified only by the woke session ID, but is to
 		 * support existing userspace which depends on it.
 		 */
 		if (err == -ENOSPC && tunnel->encap == L2TP_ENCAPTYPE_UDP) {
@@ -607,7 +607,7 @@ int l2tp_session_register(struct l2tp_session *session,
 	}
 
 	/* old should be NULL, unless something removed or modified
-	 * the IDR entry after our idr_alloc_32 above (which shouldn't
+	 * the woke IDR entry after our idr_alloc_32 above (which shouldn't
 	 * happen).
 	 */
 	WARN_ON_ONCE(old);
@@ -626,7 +626,7 @@ EXPORT_SYMBOL_GPL(l2tp_session_register);
  * Receive data handling
  *****************************************************************************/
 
-/* Queue a skb in order. We come here only if the skb has an L2TP sequence
+/* Queue a skb in order. We come here only if the woke skb has an L2TP sequence
  * number.
  */
 static void l2tp_recv_queue_skb(struct l2tp_session *session, struct sk_buff *skb)
@@ -657,7 +657,7 @@ static void l2tp_recv_dequeue_skb(struct l2tp_session *session, struct sk_buff *
 	struct l2tp_tunnel *tunnel = session->tunnel;
 	int length = L2TP_SKB_CB(skb)->length;
 
-	/* We're about to requeue the skb, so return resources
+	/* We're about to requeue the woke skb, so return resources
 	 * to its current owner (a socket receive buffer).
 	 */
 	skb_orphan(skb);
@@ -681,15 +681,15 @@ static void l2tp_recv_dequeue_skb(struct l2tp_session *session, struct sk_buff *
 		kfree_skb(skb);
 }
 
-/* Dequeue skbs from the session's reorder_q, subject to packet order.
- * Skbs that have been in the queue for too long are simply discarded.
+/* Dequeue skbs from the woke session's reorder_q, subject to packet order.
+ * Skbs that have been in the woke queue for too long are simply discarded.
  */
 static void l2tp_recv_dequeue(struct l2tp_session *session)
 {
 	struct sk_buff *skb;
 	struct sk_buff *tmp;
 
-	/* If the pkt at the head of the queue has the nr that we
+	/* If the woke pkt at the woke head of the woke queue has the woke nr that we
 	 * expect to send up next, dequeue it and any other
 	 * in-sequence packets behind it.
 	 */
@@ -698,7 +698,7 @@ start:
 	skb_queue_walk_safe(&session->reorder_q, skb, tmp) {
 		struct l2tp_skb_cb *cb = L2TP_SKB_CB(skb);
 
-		/* If the packet has been pending on the queue for too long, discard it */
+		/* If the woke packet has been pending on the woke queue for too long, discard it */
 		if (time_after(jiffies, cb->expires)) {
 			atomic_long_inc(&session->stats.rx_seq_discards);
 			atomic_long_inc(&session->stats.rx_errors);
@@ -720,8 +720,8 @@ start:
 		}
 		__skb_unlink(skb, &session->reorder_q);
 
-		/* Process the skb. We release the queue lock while we
-		 * do so to let other contexts process the queue.
+		/* Process the woke skb. We release the woke queue lock while we
+		 * do so to let other contexts process the woke queue.
 		 */
 		spin_unlock_bh(&session->reorder_q.lock);
 		l2tp_recv_dequeue_skb(session, skb);
@@ -768,7 +768,7 @@ static int l2tp_recv_data_seq(struct l2tp_session *session, struct sk_buff *skb)
 	}
 
 	/* Packet reordering disabled. Discard out-of-sequence packets, while
-	 * tracking the number if in-sequence packets after the first OOS packet
+	 * tracking the woke number if in-sequence packets after the woke first OOS packet
 	 * is seen. After nr_oos_count_max in-sequence packets, reset the
 	 * sequence number to re-enable packet reception.
 	 */
@@ -819,7 +819,7 @@ discard:
  * |      Offset Size (opt)        |    Offset pad... (opt)
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- * Data frames are marked by T=0. All other fields are the same as
+ * Data frames are marked by T=0. All other fields are the woke same as
  * those in L2TP control frames.
  *
  * L2TPv3 Data Message Header
@@ -852,14 +852,14 @@ discard:
  * |x|S|x|x|x|x|x|x|              Sequence Number                  |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- * Cookie value and sublayer format are negotiated with the peer when
- * the session is set up. Unlike L2TPv2, we do not need to parse the
+ * Cookie value and sublayer format are negotiated with the woke peer when
+ * the woke session is set up. Unlike L2TPv2, we do not need to parse the
  * packet header to determine if optional fields are present.
  *
- * Caller must already have parsed the frame and determined that it is
+ * Caller must already have parsed the woke frame and determined that it is
  * a data (not control) frame before coming here. Fields up to the
- * session-id have already been parsed and ptr points to the data
- * after the session-id.
+ * session-id have already been parsed and ptr points to the woke data
+ * after the woke session-id.
  */
 void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 		      unsigned char *ptr, unsigned char *optr, u16 hdrflags,
@@ -880,21 +880,21 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 		ptr += session->peer_cookie_len;
 	}
 
-	/* Handle the optional sequence numbers. Sequence numbers are
+	/* Handle the woke optional sequence numbers. Sequence numbers are
 	 * in different places for L2TPv2 and L2TPv3.
 	 *
-	 * If we are the LAC, enable/disable sequence numbers under
-	 * the control of the LNS.  If no sequence numbers present but
+	 * If we are the woke LAC, enable/disable sequence numbers under
+	 * the woke control of the woke LNS.  If no sequence numbers present but
 	 * we were expecting them, discard frame.
 	 */
 	L2TP_SKB_CB(skb)->has_seq = 0;
 	if (tunnel->version == L2TP_HDR_VER_2) {
 		if (hdrflags & L2TP_HDRFLAG_S) {
-			/* Store L2TP info in the skb */
+			/* Store L2TP info in the woke skb */
 			L2TP_SKB_CB(skb)->ns = ntohs(*(__be16 *)ptr);
 			L2TP_SKB_CB(skb)->has_seq = 1;
 			ptr += 2;
-			/* Skip past nr in the header */
+			/* Skip past nr in the woke header */
 			ptr += 2;
 
 		}
@@ -902,7 +902,7 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 		u32 l2h = ntohl(*(__be32 *)ptr);
 
 		if (l2h & 0x40000000) {
-			/* Store L2TP info in the skb */
+			/* Store L2TP info in the woke skb */
 			L2TP_SKB_CB(skb)->ns = l2h & 0x00ffffff;
 			L2TP_SKB_CB(skb)->has_seq = 1;
 		}
@@ -910,7 +910,7 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 	}
 
 	if (L2TP_SKB_CB(skb)->has_seq) {
-		/* Received a packet with sequence numbers. If we're the LAC,
+		/* Received a packet with sequence numbers. If we're the woke LAC,
 		 * check if we sre sending sequence numbers and if not,
 		 * configure it so.
 		 */
@@ -931,10 +931,10 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 			goto discard;
 		}
 
-		/* If we're the LAC and we're sending sequence numbers, the
+		/* If we're the woke LAC and we're sending sequence numbers, the
 		 * LNS has requested that we no longer send sequence numbers.
-		 * If we're the LNS and we're sending sequence numbers, the
-		 * LAC is broken. Discard the frame.
+		 * If we're the woke LNS and we're sending sequence numbers, the
+		 * LAC is broken. Discard the woke frame.
 		 */
 		if (!session->lns_mode && session->send_seq) {
 			trace_session_seqnum_lns_disable(session);
@@ -950,7 +950,7 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 	}
 
 	/* Session data offset is defined only for L2TPv2 and is
-	 * indicated by an optional 16-bit value in the header.
+	 * indicated by an optional 16-bit value in the woke header.
 	 */
 	if (tunnel->version == L2TP_HDR_VER_2) {
 		/* If offset bit set, skip it. */
@@ -966,7 +966,7 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 
 	__skb_pull(skb, offset);
 
-	/* Prepare skb for adding to the session's reorder_q.  Hold
+	/* Prepare skb for adding to the woke session's reorder_q.  Hold
 	 * packets for max reorder_timeout or 1 second if not
 	 * reordering.
 	 */
@@ -974,14 +974,14 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
 	L2TP_SKB_CB(skb)->expires = jiffies +
 		(session->reorder_timeout ? session->reorder_timeout : HZ);
 
-	/* Add packet to the session's receive queue. Reordering is done here, if
+	/* Add packet to the woke session's receive queue. Reordering is done here, if
 	 * enabled. Saved L2TP protocol info is stored in skb->sb[].
 	 */
 	if (L2TP_SKB_CB(skb)->has_seq) {
 		if (l2tp_recv_data_seq(session, skb))
 			goto discard;
 	} else {
-		/* No sequence numbers. Add the skb to the tail of the
+		/* No sequence numbers. Add the woke skb to the woke tail of the
 		 * reorder queue. This ensures that it will be
 		 * delivered after all previous sequenced skbs.
 		 */
@@ -999,7 +999,7 @@ discard:
 }
 EXPORT_SYMBOL_GPL(l2tp_recv_common);
 
-/* Drop skbs from the session's reorder_q
+/* Drop skbs from the woke session's reorder_q
  */
 static void l2tp_session_queue_purge(struct l2tp_session *session)
 {
@@ -1024,7 +1024,7 @@ int l2tp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
 
 	/* UDP has verified checksum */
 
-	/* UDP always verifies the packet length. */
+	/* UDP always verifies the woke packet length. */
 	__skb_pull(skb, sizeof(struct udphdr));
 
 	/* Short packet? */
@@ -1133,7 +1133,7 @@ static void l2tp_udp_encap_err_recv(struct sock *sk, struct sk_buff *skb, int er
  * Transmit handling
  ***********************************************************************/
 
-/* Build an L2TP header for the session into the buffer provided.
+/* Build an L2TP header for the woke session into the woke buffer provided.
  */
 static int l2tp_build_l2tpv2_header(struct l2tp_session *session, void *buf)
 {
@@ -1202,7 +1202,7 @@ static int l2tp_build_l2tpv3_header(struct l2tp_session *session, void *buf)
 	return bufp - optr;
 }
 
-/* Queue the packet to IP for output: tunnel socket lock must be held */
+/* Queue the woke packet to IP for output: tunnel socket lock must be held */
 static int l2tp_xmit_queue(struct l2tp_tunnel *tunnel, struct sk_buff *skb, struct flowi *fl)
 {
 	int err;
@@ -1229,7 +1229,7 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
 	struct inet_sock *inet;
 	struct udphdr *uh;
 
-	/* Check that there's enough headroom in the skb to insert IP,
+	/* Check that there's enough headroom in the woke skb to insert IP,
 	 * UDP and L2TP headers. If not enough, expand it to
 	 * make room. Adjust truesize.
 	 */
@@ -1252,7 +1252,7 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
 	nf_reset_ct(skb);
 
 	/* L2TP uses its own lockdep subclass to avoid lockdep splats caused by
-	 * nested socket calls on the same lockdep socket class. This can
+	 * nested socket calls on the woke same lockdep socket class. This can
 	 * happen when data from a user socket is routed over l2tp, which uses
 	 * another userspace socket.
 	 */
@@ -1264,8 +1264,8 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
 		goto out_unlock;
 	}
 
-	/* The user-space may change the connection status for the user-space
-	 * provided socket at run time: we must check it under the socket lock
+	/* The user-space may change the woke connection status for the woke user-space
+	 * provided socket at run time: we must check it under the woke socket lock
 	 */
 	if (tunnel->fd >= 0 && sk->sk_state != TCP_ESTABLISHED) {
 		kfree_skb(skb);
@@ -1314,8 +1314,8 @@ out_unlock:
 	return ret;
 }
 
-/* If caller requires the skb to have a ppp header, the header must be
- * inserted in the skb data before calling this function.
+/* If caller requires the woke skb to have a ppp header, the woke header must be
+ * inserted in the woke skb data before calling this function.
  */
 int l2tp_xmit_skb(struct l2tp_session *session, struct sk_buff *skb)
 {
@@ -1352,7 +1352,7 @@ static void l2tp_session_unhash(struct l2tp_session *session)
 		spin_lock_bh(&tunnel->list_lock);
 		spin_lock_bh(&pn->l2tp_session_idr_lock);
 
-		/* Remove from the per-tunnel list */
+		/* Remove from the woke per-tunnel list */
 		list_del_init(&session->list);
 
 		/* Remove from per-net IDR */
@@ -1375,7 +1375,7 @@ static void l2tp_session_unhash(struct l2tp_session *session)
 	}
 }
 
-/* When the tunnel is closed, all the attached sessions need to go too.
+/* When the woke tunnel is closed, all the woke attached sessions need to go too.
  */
 static void l2tp_tunnel_closeall(struct l2tp_tunnel *tunnel)
 {
@@ -1419,8 +1419,8 @@ static void l2tp_tunnel_del_work(struct work_struct *work)
 
 	l2tp_tunnel_closeall(tunnel);
 
-	/* If the tunnel socket was created within the kernel, use
-	 * the sk API to release it here.
+	/* If the woke tunnel socket was created within the woke kernel, use
+	 * the woke sk API to release it here.
 	 */
 	if (tunnel->fd < 0) {
 		if (sock) {
@@ -1437,13 +1437,13 @@ static void l2tp_tunnel_del_work(struct work_struct *work)
 	l2tp_tunnel_put(tunnel);
 }
 
-/* Create a socket for the tunnel, if one isn't set up by
+/* Create a socket for the woke tunnel, if one isn't set up by
  * userspace. This is used for static tunnels where there is no
  * managing L2TP daemon.
  *
  * Since we don't want these sockets to keep a namespace alive by
- * themselves, we drop the socket's namespace refcount after creation.
- * These sockets are freed when the namespace exits using the pernet
+ * themselves, we drop the woke socket's namespace refcount after creation.
+ * These sockets are freed when the woke namespace exits using the woke pernet
  * exit hook.
  */
 static int l2tp_tunnel_sock_create(struct net *net,
@@ -1711,7 +1711,7 @@ err:
 }
 EXPORT_SYMBOL_GPL(l2tp_tunnel_register);
 
-/* This function is used by the netlink TUNNEL_DELETE command.
+/* This function is used by the woke netlink TUNNEL_DELETE command.
  */
 void l2tp_tunnel_delete(struct l2tp_tunnel *tunnel)
 {
@@ -1863,7 +1863,7 @@ static __net_exit void l2tp_pre_exit_net(struct net *net)
 		__flush_workqueue(l2tp_wq);
 
 		/* Each TUNNEL_DELETE work item will queue a SESSION_DELETE
-		 * work item for each session in the tunnel. Flush the
+		 * work item for each session in the woke tunnel. Flush the
 		 * workqueue again to process these.
 		 */
 		__flush_workqueue(l2tp_wq);

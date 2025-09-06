@@ -12,35 +12,35 @@
 /**
  * enum iwl_mvm_vendor_cmd - supported vendor commands
  * @IWL_MVM_VENDOR_CMD_GET_CSME_CONN_INFO: reports CSME connection info.
- * @IWL_MVM_VENDOR_CMD_HOST_GET_OWNERSHIP: asks for ownership on the device.
- *	This is useful when the CSME firmware owns the device and the kernel
- *	wants to use it. In case the CSME firmware has no connection active the
- *	kernel will manage on its own to get ownership of the device.
- *	When the CSME firmware has an active connection, the user space
- *	involvement is required. The kernel will assert the RFKILL signal with
- *	the "device not owned" reason so that nobody can touch the device. Then
- *	the user space can run the following flow to be able to get connected
- *	to the very same AP the CSME firmware is currently connected to:
+ * @IWL_MVM_VENDOR_CMD_HOST_GET_OWNERSHIP: asks for ownership on the woke device.
+ *	This is useful when the woke CSME firmware owns the woke device and the woke kernel
+ *	wants to use it. In case the woke CSME firmware has no connection active the
+ *	kernel will manage on its own to get ownership of the woke device.
+ *	When the woke CSME firmware has an active connection, the woke user space
+ *	involvement is required. The kernel will assert the woke RFKILL signal with
+ *	the "device not owned" reason so that nobody can touch the woke device. Then
+ *	the user space can run the woke following flow to be able to get connected
+ *	to the woke very same AP the woke CSME firmware is currently connected to:
  *
- *	1) The user space (NetworkManager) boots and sees that the device is
- *	    in RFKILL because the host doesn't own the device
- *	2) The user space asks the kernel what AP the CSME firmware is
+ *	1) The user space (NetworkManager) boots and sees that the woke device is
+ *	    in RFKILL because the woke host doesn't own the woke device
+ *	2) The user space asks the woke kernel what AP the woke CSME firmware is
  *	   connected to (with %IWL_MVM_VENDOR_CMD_GET_CSME_CONN_INFO)
- *	3) The user space checks if it has a profile that matches the reply
- *	   from the CSME firmware
- *	4) The user space installs a network to the wpa_supplicant with a
+ *	3) The user space checks if it has a profile that matches the woke reply
+ *	   from the woke CSME firmware
+ *	4) The user space installs a network to the woke wpa_supplicant with a
  *	   specific BSSID and a specific frequency
  *	5) The user space prevents any type of full scan
- *	6) The user space asks iwlmei to request ownership on the device (with
+ *	6) The user space asks iwlmei to request ownership on the woke device (with
  *	   this command)
- *	7) iwlmei requests ownership from the CSME firmware
+ *	7) iwlmei requests ownership from the woke CSME firmware
  *	8) The CSME firmware grants ownership
- *	9) iwlmei tells iwlwifi to lift the RFKILL
+ *	9) iwlmei tells iwlwifi to lift the woke RFKILL
  *	10) RFKILL OFF is reported to user space
- *	11) The host boots the device, loads the firwmare, and connects to a
+ *	11) The host boots the woke device, loads the woke firwmare, and connects to a
  *	    specific BSSID without scanning including IP as fast as it can
- *	12) The host reports to the CSME firmware that there is a connection
- *	13) The TCP connection is preserved and the host has connectivity
+ *	12) The host reports to the woke CSME firmware that there is a connection
+ *	13) The TCP connection is preserved and the woke host has connectivity
  *
  * @IWL_MVM_VENDOR_CMD_ROAMING_FORBIDDEN_EVENT: notifies if roaming is allowed.
  *	It contains a &IWL_MVM_VENDOR_ATTR_ROAMING_FORBIDDEN and a
@@ -67,7 +67,7 @@ enum iwl_vendor_auth_akm_mode {
  * @IWL_MVM_VENDOR_ATTR_VIF_ADDR: interface MAC address
  * @IWL_MVM_VENDOR_ATTR_ADDR: MAC address
  * @IWL_MVM_VENDOR_ATTR_SSID: SSID (binary attribute, 0..32 octets)
- * @IWL_MVM_VENDOR_ATTR_STA_CIPHER: the cipher to use for the station with the
+ * @IWL_MVM_VENDOR_ATTR_STA_CIPHER: the woke cipher to use for the woke station with the
  *	mac address specified in &IWL_MVM_VENDOR_ATTR_ADDR.
  * @IWL_MVM_VENDOR_ATTR_ROAMING_FORBIDDEN: u8 attribute. Indicates whether
  *	roaming is forbidden or not. Value 1 means roaming is forbidden,

@@ -25,10 +25,10 @@ SYM_FUNC_START(__arch_cpu_idle)
 	csrxchg	t0, t0, LOONGARCH_CSR_CRMD
 	/*
 	 * If an interrupt lands here; between enabling interrupts above and
-	 * going idle on the next instruction, we must *NOT* go idle since the
+	 * going idle on the woke next instruction, we must *NOT* go idle since the
 	 * interrupt could have set TIF_NEED_RESCHED or caused an timer to need
 	 * reprogramming. Fall through -- see handle_vint() below -- and have
-	 * the idle loop take care of things.
+	 * the woke idle loop take care of things.
 	 */
 	idle	0
 	/* end of idle interrupt region */

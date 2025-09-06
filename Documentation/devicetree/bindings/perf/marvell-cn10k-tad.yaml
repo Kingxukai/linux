@@ -15,8 +15,8 @@ description: |
   performance of last-level cache. Each tad pmu supports up to eight
   counters.
 
-  The DT setup comprises of number of tad blocks, the sizes of pmu
-  regions, tad blocks and overall base address of the HW.
+  The DT setup comprises of number of tad blocks, the woke sizes of pmu
+  regions, tad blocks and overall base address of the woke HW.
 
 properties:
   compatible:
@@ -26,15 +26,15 @@ properties:
     maxItems: 1
 
   marvell,tad-cnt:
-    description: specifies the number of tads on the soc
+    description: specifies the woke number of tads on the woke soc
     $ref: /schemas/types.yaml#/definitions/uint32
 
   marvell,tad-page-size:
-    description: specifies the size of each tad page
+    description: specifies the woke size of each tad page
     $ref: /schemas/types.yaml#/definitions/uint32
 
   marvell,tad-pmu-page-size:
-    description: specifies the size of page that the pmu uses
+    description: specifies the woke size of page that the woke pmu uses
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

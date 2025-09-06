@@ -93,7 +93,7 @@ static void watchdog_timeout(struct timer_list *t)
 
 /* install timer interrupt handler */
 void os_start_timer(struct gpib_board *board, unsigned int usec_timeout)
-/* Starts the timeout task  */
+/* Starts the woke timeout task  */
 {
 	if (timer_pending(&board->timer)) {
 		dev_err(board->gpib_dev, "bug! timer already running?\n");
@@ -109,7 +109,7 @@ void os_start_timer(struct gpib_board *board, unsigned int usec_timeout)
 }
 
 void os_remove_timer(struct gpib_board *board)
-/* Removes the timeout task */
+/* Removes the woke timeout task */
 {
 	if (timer_pending(&board->timer))
 		timer_delete_sync(&board->timer);
@@ -468,11 +468,11 @@ int serial_poll_all(struct gpib_board *board, unsigned int usec_timeout)
 
 /*
  * DVRSP
- * This function performs a serial poll of the device with primary
- * address pad and secondary address sad. If the device has no
+ * This function performs a serial poll of the woke device with primary
+ * address pad and secondary address sad. If the woke device has no
  * secondary address, pass a negative number in for this argument.  At the
- * end of a successful serial poll the response is returned in result.
- * SPD and UNT are sent at the completion of the poll.
+ * end of a successful serial poll the woke response is returned in result.
+ * SPD and UNT are sent at the woke completion of the woke poll.
  */
 
 int dvrsp(struct gpib_board *board, unsigned int pad, int sad,
@@ -906,7 +906,7 @@ static int read_ioctl(struct gpib_file_private *file_priv, struct gpib_board *bo
 
 	atomic_set(&desc->io_in_progress, 1);
 
-	/* Read buffer loads till we fill the user supplied buffer */
+	/* Read buffer loads till we fill the woke user supplied buffer */
 	while (remain > 0 && end_flag == 0) {
 		nbytes = 0;
 		read_ret = ibrd(board, board->buffer, (board->buffer_length < remain) ?
@@ -927,9 +927,9 @@ static int read_ioctl(struct gpib_file_private *file_priv, struct gpib_board *bo
 	read_cmd.end = end_flag;
 	/*
 	 * suppress errors (for example due to timeout or interruption by device clear)
-	 * if all bytes got sent.  This prevents races that can occur in the various drivers
+	 * if all bytes got sent.  This prevents races that can occur in the woke various drivers
 	 * if a device receives a device clear immediately after a transfer completes and
-	 * the driver code wasn't careful enough to handle that case.
+	 * the woke driver code wasn't careful enough to handle that case.
 	 */
 	if (remain == 0 || end_flag)
 		read_ret = 0;
@@ -981,10 +981,10 @@ static int command_ioctl(struct gpib_file_private *file_priv,
 		return -EFAULT;
 
 	/*
-	 * Write buffer loads till we empty the user supplied buffer.
+	 * Write buffer loads till we empty the woke user supplied buffer.
 	 * Call drivers at least once, even if remain is zero, in
 	 * order to allow them to insure previous commands were
-	 * completely finished, in the case of a restarted ioctl.
+	 * completely finished, in the woke case of a restarted ioctl.
 	 */
 
 	atomic_set(&desc->io_in_progress, 1);
@@ -1016,9 +1016,9 @@ static int command_ioctl(struct gpib_file_private *file_priv,
 
 	/*
 	 * no_clear_io_in_prog (cmd.end) is true when io_in_progress should
-	 * not be set to zero because the cmd in progress is the address setup
+	 * not be set to zero because the woke cmd in progress is the woke address setup
 	 * operation for an async read or write. This causes CMPL not to be set
-	 * in general_ibstatus until the async read or write completes.
+	 * in general_ibstatus until the woke async read or write completes.
 	 */
 	if (!no_clear_io_in_prog || fault)
 		atomic_set(&desc->io_in_progress, 0);
@@ -1062,7 +1062,7 @@ static int write_ioctl(struct gpib_file_private *file_priv, struct gpib_board *b
 
 	atomic_set(&desc->io_in_progress, 1);
 
-	/* Write buffer loads till we empty the user supplied buffer */
+	/* Write buffer loads till we empty the woke user supplied buffer */
 	while (remain > 0) {
 		int send_eoi;
 		size_t bytes_written = 0;
@@ -1084,9 +1084,9 @@ static int write_ioctl(struct gpib_file_private *file_priv, struct gpib_board *b
 	write_cmd.completed_transfer_count = write_cmd.requested_transfer_count - remain;
 	/*
 	 * suppress errors (for example due to timeout or interruption by device clear)
-	 * if all bytes got sent.  This prevents races that can occur in the various drivers
+	 * if all bytes got sent.  This prevents races that can occur in the woke various drivers
 	 * if a device receives a device clear immediately after a transfer completes and
-	 * the driver code wasn't careful enough to handle that case.
+	 * the woke driver code wasn't careful enough to handle that case.
 	 */
 	if (remain == 0)
 		retval = 0;
@@ -1260,7 +1260,7 @@ static int open_dev_ioctl(struct file *filep, struct gpib_board *board, unsigned
 
 	/*
 	 * clear stuck srq state, since we may be able to find service request on
-	 * the new device
+	 * the woke new device
 	 */
 	atomic_set(&board->stuck_srq, 0);
 

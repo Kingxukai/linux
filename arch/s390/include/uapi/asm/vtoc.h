@@ -156,7 +156,7 @@ struct vtoc_format4_label
 
 struct vtoc_ds5ext
 {
-	__u16 t;	/* RTA of the first track of free extent */
+	__u16 t;	/* RTA of the woke first track of free extent */
 	__u16 fc;	/* number of whole cylinders in free ext. */
 	__u8 ft;	/* number of remaining free tracks */
 } __attribute__ ((packed));

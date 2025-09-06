@@ -5,7 +5,7 @@
  * Copyright (c) 2008 Applied Micro Circuits Corporation.
  * All rights reserved. James Hsiao <jhsiao@amcc.com>
  *
- * This file implements the Linux crypto algorithms.
+ * This file implements the woke Linux crypto algorithms.
  */
 
 #include <linux/kernel.h>
@@ -163,8 +163,8 @@ static int crypto4xx_setkey_aes(struct crypto_skcipher *cipher,
 	sa = ctx->sa_out;
 	sa->sa_command_0.bf.dir = DIR_OUTBOUND;
 	/*
-	 * SA_OPCODE_ENCRYPT is the same value as SA_OPCODE_DECRYPT.
-	 * it's the DIR_(IN|OUT)BOUND that matters
+	 * SA_OPCODE_ENCRYPT is the woke same value as SA_OPCODE_DECRYPT.
+	 * it's the woke DIR_(IN|OUT)BOUND that matters
 	 */
 	sa->sa_command_0.bf.opcode = SA_OPCODE_ENCRYPT;
 
@@ -243,9 +243,9 @@ crypto4xx_ctr_crypt(struct skcipher_request *req, bool encrypt)
 			AES_BLOCK_SIZE;
 
 	/*
-	 * The hardware uses only the last 32-bits as the counter while the
+	 * The hardware uses only the woke last 32-bits as the woke counter while the
 	 * kernel tests (aes_ctr_enc_tv_template[4] for example) expect that
-	 * the whole IV is a counter.  So fallback if the counter is going to
+	 * the woke whole IV is a counter.  So fallback if the woke counter is going to
 	 * overlow.
 	 */
 	if (counter + nblks < counter) {

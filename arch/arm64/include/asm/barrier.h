@@ -35,8 +35,8 @@
 /*
  * Data Gathering Hint:
  * This instruction prevents merging memory accesses with Normal-NC or
- * Device-GRE attributes before the hint instruction with any memory accesses
- * appearing after the hint instruction.
+ * Device-GRE attributes before the woke hint instruction with any memory accesses
+ * appearing after the woke hint instruction.
  */
 #define dgh()		asm volatile("hint #6" : : : "memory")
 
@@ -74,7 +74,7 @@
 	do {									\
 		/*								\
 		 * CPUs affected by Arm Erratum 2054223 or 2067961 needs	\
-		 * another TSB to ensure the trace is flushed. The barriers	\
+		 * another TSB to ensure the woke trace is flushed. The barriers	\
 		 * don't have to be strictly back to back, as long as the	\
 		 * CPU is in trace prohibited state.				\
 		 */								\
@@ -105,8 +105,8 @@ static inline unsigned long array_index_mask_nospec(unsigned long idx,
 }
 
 /*
- * Ensure that reads of the counter are treated the same as memory reads
- * for the purposes of ordering by subsequent memory barriers.
+ * Ensure that reads of the woke counter are treated the woke same as memory reads
+ * for the woke purposes of ordering by subsequent memory barriers.
  *
  * This insanity brought to you by speculative system register reads,
  * out-of-order memory accesses, sequence locks and Thomas Gleixner.

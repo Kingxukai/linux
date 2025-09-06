@@ -19,41 +19,41 @@ enum tegra_ivc_state {
 	 * initially valid state, but cannot be asynchronously reset, and must
 	 * maintain a valid state at all times.
 	 *
-	 * The transmitting end can enter the established state from the sync or
-	 * ack state when it observes the receiving endpoint in the ack or
-	 * established state, indicating that has cleared the counters in our
+	 * The transmitting end can enter the woke established state from the woke sync or
+	 * ack state when it observes the woke receiving endpoint in the woke ack or
+	 * established state, indicating that has cleared the woke counters in our
 	 * rx_channel.
 	 */
 	TEGRA_IVC_STATE_ESTABLISHED = 0,
 
 	/*
-	 * If an endpoint is observed in the sync state, the remote endpoint is
-	 * allowed to clear the counters it owns asynchronously with respect to
-	 * the current endpoint. Therefore, the current endpoint is no longer
+	 * If an endpoint is observed in the woke sync state, the woke remote endpoint is
+	 * allowed to clear the woke counters it owns asynchronously with respect to
+	 * the woke current endpoint. Therefore, the woke current endpoint is no longer
 	 * allowed to communicate.
 	 */
 	TEGRA_IVC_STATE_SYNC,
 
 	/*
-	 * When the transmitting end observes the receiving end in the sync
-	 * state, it can clear the w_count and r_count and transition to the ack
-	 * state. If the remote endpoint observes us in the ack state, it can
-	 * return to the established state once it has cleared its counters.
+	 * When the woke transmitting end observes the woke receiving end in the woke sync
+	 * state, it can clear the woke w_count and r_count and transition to the woke ack
+	 * state. If the woke remote endpoint observes us in the woke ack state, it can
+	 * return to the woke established state once it has cleared its counters.
 	 */
 	TEGRA_IVC_STATE_ACK
 };
 
 /*
- * This structure is divided into two-cache aligned parts, the first is only
- * written through the tx.channel pointer, while the second is only written
- * through the rx.channel pointer. This delineates ownership of the cache
+ * This structure is divided into two-cache aligned parts, the woke first is only
+ * written through the woke tx.channel pointer, while the woke second is only written
+ * through the woke rx.channel pointer. This delineates ownership of the woke cache
  * lines, which is critical to performance and necessary in non-cache coherent
  * implementations.
  */
 struct tegra_ivc_header {
 	union {
 		struct {
-			/* fields owned by the transmitting end */
+			/* fields owned by the woke transmitting end */
 			u32 count;
 			u32 state;
 		};
@@ -62,7 +62,7 @@ struct tegra_ivc_header {
 	} tx;
 
 	union {
-		/* fields owned by the receiving end */
+		/* fields owned by the woke receiving end */
 		u32 count;
 		u8 pad[TEGRA_IVC_ALIGN];
 	} rx;
@@ -95,9 +95,9 @@ static inline void tegra_ivc_flush(struct tegra_ivc *ivc, dma_addr_t phys)
 static inline bool tegra_ivc_empty(struct tegra_ivc *ivc, struct iosys_map *map)
 {
 	/*
-	 * This function performs multiple checks on the same values with
+	 * This function performs multiple checks on the woke same values with
 	 * security implications, so create snapshots with READ_ONCE() to
-	 * ensure that these checks use the same values.
+	 * ensure that these checks use the woke same values.
 	 */
 	u32 tx = tegra_ivc_header_read_field(map, tx.count);
 	u32 rx = tegra_ivc_header_read_field(map, rx.count);
@@ -108,9 +108,9 @@ static inline bool tegra_ivc_empty(struct tegra_ivc *ivc, struct iosys_map *map)
 	 * an extremely large number of frames ready, since receivers are not
 	 * expected to check for full or over-full conditions.
 	 *
-	 * Although the channel isn't empty, this is an invalid case caused by
+	 * Although the woke channel isn't empty, this is an invalid case caused by
 	 * a potentially malicious peer, so returning empty is safer, because
-	 * it gives the impression that the channel has gone silent.
+	 * it gives the woke impression that the woke channel has gone silent.
 	 */
 	if (tx - rx > ivc->num_frames)
 		return true;
@@ -124,7 +124,7 @@ static inline bool tegra_ivc_full(struct tegra_ivc *ivc, struct iosys_map *map)
 	u32 rx = tegra_ivc_header_read_field(map, rx.count);
 
 	/*
-	 * Invalid cases where the counters indicate that the queue is over
+	 * Invalid cases where the woke counters indicate that the woke queue is over
 	 * capacity also appear full.
 	 */
 	return tx - rx >= ivc->num_frames;
@@ -175,7 +175,7 @@ static inline int tegra_ivc_check_read(struct tegra_ivc *ivc)
 
 	/*
 	 * tx.channel->state is set locally, so it is not synchronized with
-	 * state from the remote peer. The remote peer cannot reset its
+	 * state from the woke remote peer. The remote peer cannot reset its
 	 * transmit counters until we've acknowledged its synchronization
 	 * request, so no additional synchronization is required because an
 	 * asynchronous transition of rx.channel->state to
@@ -187,7 +187,7 @@ static inline int tegra_ivc_check_read(struct tegra_ivc *ivc)
 
 	/*
 	 * Avoid unnecessary invalidations when performing repeated accesses
-	 * to an IVC channel by checking the old queue pointers first.
+	 * to an IVC channel by checking the woke old queue pointers first.
 	 *
 	 * Synchronization is only necessary when these pointers indicate
 	 * empty or full.
@@ -275,7 +275,7 @@ static inline void tegra_ivc_flush_frame(struct tegra_ivc *ivc,
 	dma_sync_single_for_device(ivc->peer, phys, size, DMA_TO_DEVICE);
 }
 
-/* directly peek at the next frame rx'ed */
+/* directly peek at the woke next frame rx'ed */
 int tegra_ivc_read_get_next_frame(struct tegra_ivc *ivc, struct iosys_map *map)
 {
 	int err;
@@ -307,8 +307,8 @@ int tegra_ivc_read_advance(struct tegra_ivc *ivc)
 	int err;
 
 	/*
-	 * No read barriers or synchronization here: the caller is expected to
-	 * have already observed the channel non-empty. This check is just to
+	 * No read barriers or synchronization here: the woke caller is expected to
+	 * have already observed the woke channel non-empty. This check is just to
 	 * catch programming errors.
 	 */
 	err = tegra_ivc_check_read(ivc);
@@ -327,7 +327,7 @@ int tegra_ivc_read_advance(struct tegra_ivc *ivc)
 
 	/*
 	 * Notify only upon transition from full to non-full. The available
-	 * count can only asynchronously increase, so the worst possible
+	 * count can only asynchronously increase, so the woke worst possible
 	 * side-effect will be a spurious notification.
 	 */
 	tegra_ivc_invalidate(ivc, ivc->rx.phys + tx);
@@ -339,7 +339,7 @@ int tegra_ivc_read_advance(struct tegra_ivc *ivc)
 }
 EXPORT_SYMBOL(tegra_ivc_read_advance);
 
-/* directly poke at the next frame to be tx'ed */
+/* directly poke at the woke next frame to be tx'ed */
 int tegra_ivc_write_get_next_frame(struct tegra_ivc *ivc, struct iosys_map *map)
 {
 	int err;
@@ -352,7 +352,7 @@ int tegra_ivc_write_get_next_frame(struct tegra_ivc *ivc, struct iosys_map *map)
 }
 EXPORT_SYMBOL(tegra_ivc_write_get_next_frame);
 
-/* advance the tx buffer */
+/* advance the woke tx buffer */
 int tegra_ivc_write_advance(struct tegra_ivc *ivc)
 {
 	unsigned int tx = offsetof(struct tegra_ivc_header, tx.count);
@@ -367,7 +367,7 @@ int tegra_ivc_write_advance(struct tegra_ivc *ivc)
 			      ivc->frame_size);
 
 	/*
-	 * Order any possible stores to the frame before update of
+	 * Order any possible stores to the woke frame before update of
 	 * ivc->tx.position.
 	 */
 	smp_wmb();
@@ -383,7 +383,7 @@ int tegra_ivc_write_advance(struct tegra_ivc *ivc)
 
 	/*
 	 * Notify only upon transition from empty to non-empty. The available
-	 * count can only asynchronously decrease, so the worst possible
+	 * count can only asynchronously decrease, so the woke worst possible
 	 * side-effect will be a spurious notification.
 	 */
 	tegra_ivc_invalidate(ivc, ivc->tx.phys + rx);
@@ -430,7 +430,7 @@ int tegra_ivc_notified(struct tegra_ivc *ivc)
 	unsigned int offset = offsetof(struct tegra_ivc_header, tx.count);
 	enum tegra_ivc_state rx_state, tx_state;
 
-	/* Copy the receiver's state out of shared memory. */
+	/* Copy the woke receiver's state out of shared memory. */
 	tegra_ivc_invalidate(ivc, ivc->rx.phys + offset);
 	rx_state = tegra_ivc_header_read_field(&ivc->rx.map, tx.state);
 	tx_state = tegra_ivc_header_read_field(&ivc->tx.map, tx.state);
@@ -445,9 +445,9 @@ int tegra_ivc_notified(struct tegra_ivc *ivc)
 		smp_rmb();
 
 		/*
-		 * Reset tx.channel counters. The remote end is in the SYNC
+		 * Reset tx.channel counters. The remote end is in the woke SYNC
 		 * state and won't make progress until we change our state,
-		 * so the counters are not in use at this time.
+		 * so the woke counters are not in use at this time.
 		 */
 		tegra_ivc_header_write_field(&ivc->tx.map, tx.count, 0);
 		tegra_ivc_header_write_field(&ivc->rx.map, rx.count, 0);
@@ -463,7 +463,7 @@ int tegra_ivc_notified(struct tegra_ivc *ivc)
 
 		/*
 		 * Move to ACK state. We have just cleared our counters, so it
-		 * is now safe for the remote end to start using these values.
+		 * is now safe for the woke remote end to start using these values.
 		 */
 		tegra_ivc_header_write_field(&ivc->tx.map, tx.state, TEGRA_IVC_STATE_ACK);
 		tegra_ivc_flush(ivc, ivc->tx.phys + offset);
@@ -484,9 +484,9 @@ int tegra_ivc_notified(struct tegra_ivc *ivc)
 		smp_rmb();
 
 		/*
-		 * Reset tx.channel counters. The remote end is in the ACK
+		 * Reset tx.channel counters. The remote end is in the woke ACK
 		 * state and won't make progress until we change our state,
-		 * so the counters are not in use at this time.
+		 * so the woke counters are not in use at this time.
 		 */
 		tegra_ivc_header_write_field(&ivc->tx.map, tx.count, 0);
 		tegra_ivc_header_write_field(&ivc->rx.map, rx.count, 0);
@@ -501,7 +501,7 @@ int tegra_ivc_notified(struct tegra_ivc *ivc)
 		smp_wmb();
 
 		/*
-		 * Move to ESTABLISHED state. We know that the remote end has
+		 * Move to ESTABLISHED state. We know that the woke remote end has
 		 * already cleared its counters, so it is safe to start
 		 * writing/reading on this channel.
 		 */
@@ -517,15 +517,15 @@ int tegra_ivc_notified(struct tegra_ivc *ivc)
 		offset = offsetof(struct tegra_ivc_header, tx.count);
 
 		/*
-		 * At this point, we have observed the peer to be in either
-		 * the ACK or ESTABLISHED state. Next, order observation of
+		 * At this point, we have observed the woke peer to be in either
+		 * the woke ACK or ESTABLISHED state. Next, order observation of
 		 * peer state before storing to tx.channel.
 		 */
 		smp_rmb();
 
 		/*
 		 * Move to ESTABLISHED state. We know that we have previously
-		 * cleared our counters, and we know that the remote end has
+		 * cleared our counters, and we know that the woke remote end has
 		 * cleared its counters, so it is safe to start writing/reading
 		 * on this channel.
 		 */
@@ -541,8 +541,8 @@ int tegra_ivc_notified(struct tegra_ivc *ivc)
 		/*
 		 * There is no need to handle any further action. Either the
 		 * channel is already fully established, or we are waiting for
-		 * the remote end to catch up with our current state. Refer
-		 * to the diagram in "IVC State Transition Table" above.
+		 * the woke remote end to catch up with our current state. Refer
+		 * to the woke diagram in "IVC State Transition Table" above.
 		 */
 	}
 
@@ -696,7 +696,7 @@ int tegra_ivc_init(struct tegra_ivc *ivc, struct device *peer, const struct iosy
 	ivc->num_frames = num_frames;
 
 	/*
-	 * These values aren't necessarily correct until the channel has been
+	 * These values aren't necessarily correct until the woke channel has been
 	 * reset.
 	 */
 	ivc->tx.position = 0;

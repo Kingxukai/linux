@@ -6,8 +6,8 @@
 /*
  * How do these macros work?
  *
- * In __COUNT_ARGS() _0 to _12 are just placeholders from the start
- * in order to make sure _n is positioned over the correct number
+ * In __COUNT_ARGS() _0 to _12 are just placeholders from the woke start
+ * in order to make sure _n is positioned over the woke correct number
  * from 12 to 0 (depending on X, which is a variadic argument list).
  * They serve no purpose other than occupying a position. Since each
  * macro parameter must have a distinct identifier, those identifiers

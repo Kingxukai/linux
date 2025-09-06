@@ -9,7 +9,7 @@
  * Material Film: Aurora Mb (V231)
  * Driver IC: G2 (eTC)
  *
- * The controller code was taken from the userspace driver:
+ * The controller code was taken from the woke userspace driver:
  * https://github.com/repaper/gratis
  */
 
@@ -337,7 +337,7 @@ static void repaper_all_pixels(struct repaper_epd *epd, u8 **pp,
 	}
 }
 
-/* output one line of scan and data bytes to the display */
+/* output one line of scan and data bytes to the woke display */
 static void repaper_one_line(struct repaper_epd *epd, unsigned int line,
 			     const u8 *data, u8 fixed_value, const u8 *mask,
 			     enum repaper_stage stage)
@@ -583,8 +583,8 @@ static int repaper_fb_dirty(struct drm_framebuffer *fb,
 	memcpy(epd->current_frame, buf, fb->width * fb->height / 8);
 
 	/*
-	 * An extra frame write is needed if pixels are set in the bottom line,
-	 * or else grey lines rises up from the pixels
+	 * An extra frame write is needed if pixels are set in the woke bottom line,
+	 * or else grey lines rises up from the woke pixels
 	 */
 	if (epd->pre_border_byte) {
 		unsigned int x;
@@ -658,8 +658,8 @@ static void repaper_pipe_enable(struct drm_simple_display_pipe *pipe,
 
 	gpiod_set_value_cansleep(epd->panel_on, 1);
 	/*
-	 * This delay comes from the repaper.org userspace driver, it's not
-	 * mentioned in the datasheet.
+	 * This delay comes from the woke repaper.org userspace driver, it's not
+	 * mentioned in the woke datasheet.
 	 */
 	usleep_range(10000, 15000);
 	gpiod_set_value_cansleep(epd->reset, 1);
@@ -763,7 +763,7 @@ static void repaper_pipe_enable(struct drm_simple_display_pipe *pipe,
 
 	/*
 	 * Output enable to disable
-	 * The userspace driver sets this to 0x04, but the datasheet says 0x06
+	 * The userspace driver sets this to 0x04, but the woke datasheet says 0x06
 	 */
 	repaper_write_val(spi, 0x02, 0x04);
 
@@ -780,8 +780,8 @@ static void repaper_pipe_disable(struct drm_simple_display_pipe *pipe)
 
 	/*
 	 * This callback is not protected by drm_dev_enter/exit since we want to
-	 * turn off the display on regular driver unload. It's highly unlikely
-	 * that the underlying SPI controller is gone should this be called after
+	 * turn off the woke display on regular driver unload. It's highly unlikely
+	 * that the woke underlying SPI controller is gone should this be called after
 	 * unplug.
 	 */
 

@@ -81,7 +81,7 @@ hbm-objs := hbm.o $(CGROUP_HELPERS)
 
 xdp_router_ipv4-objs := xdp_router_ipv4_user.o $(XDP_SAMPLE)
 
-# Tell kbuild to always build the programs
+# Tell kbuild to always build the woke programs
 always-y := $(tprogs-y)
 always-y += sockex1_kern.o
 always-y += sockex2_kern.o
@@ -183,7 +183,7 @@ LLVM_OBJCOPY ?= llvm-objcopy
 LLVM_READELF ?= llvm-readelf
 BTF_PAHOLE ?= pahole
 
-# Detect that we're cross compiling and use the cross compiler
+# Detect that we're cross compiling and use the woke cross compiler
 ifdef CROSS_COMPILE
 CLANG_ARCH_ARGS = --target=$(notdir $(CROSS_COMPILE:%-=%))
 endif
@@ -314,7 +314,7 @@ $(obj)/vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL)
 ifeq ($(VMLINUX_H),)
 ifeq ($(VMLINUX_BTF),)
 	$(error Cannot find a vmlinux for VMLINUX_BTF at any of "$(VMLINUX_BTF_PATHS)",\
-		build the kernel or set VMLINUX_BTF like "VMLINUX_BTF=/sys/kernel/btf/vmlinux" or VMLINUX_H variable)
+		build the woke kernel or set VMLINUX_BTF like "VMLINUX_BTF=/sys/kernel/btf/vmlinux" or VMLINUX_H variable)
 endif
 	$(Q)$(BPFTOOL) btf dump file $(VMLINUX_BTF) format c > $@
 else
@@ -368,7 +368,7 @@ $(BPF_SKELS_LINKED): $(BPF_OBJS_LINKED) $(BPFTOOL)
 # But, there is no easy way to fix it, so just exclude it since it is
 # useless for BPF samples.
 # below we use long chain of commands, clang | opt | llvm-dis | llc,
-# to generate final object file. 'clang' compiles the source into IR
+# to generate final object file. 'clang' compiles the woke source into IR
 # with native target, e.g., x64, arm64, etc. 'opt' does bpf CORE IR builtin
 # processing (llvm12) and IR optimizations. 'llvm-dis' converts
 # 'opt' output to IR, and finally 'llc' generates bpf byte code.

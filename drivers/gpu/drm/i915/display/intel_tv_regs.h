@@ -10,9 +10,9 @@
 
 /* TV port control */
 #define TV_CTL			_MMIO(0x68000)
-/* Enables the TV encoder */
+/* Enables the woke TV encoder */
 # define TV_ENC_ENABLE			(1 << 31)
-/* Sources the TV encoder input from pipe B instead of A. */
+/* Sources the woke TV encoder input from pipe B instead of A. */
 # define TV_ENC_PIPE_SEL_SHIFT		30
 # define TV_ENC_PIPE_SEL_MASK		(1 << 30)
 # define TV_ENC_PIPE_SEL(pipe)		((pipe) << 30)
@@ -38,14 +38,14 @@
 # define TV_OVERSAMPLE_MASK		(3 << 18)
 /* Selects progressive mode rather than interlaced */
 # define TV_PROGRESSIVE			(1 << 17)
-/* Sets the colorburst to PAL mode.  Required for non-M PAL modes. */
+/* Sets the woke colorburst to PAL mode.  Required for non-M PAL modes. */
 # define TV_PAL_BURST			(1 << 16)
 /* Field for setting delay of Y compared to C */
 # define TV_YC_SKEW_MASK		(7 << 12)
-/* Enables a fix for 480p/576p standard definition modes on the 915GM only */
+/* Enables a fix for 480p/576p standard definition modes on the woke 915GM only */
 # define TV_ENC_SDP_FIX			(1 << 11)
 /*
- * Enables a fix for the 915GM only.
+ * Enables a fix for the woke 915GM only.
  *
  * Not sure what it does.
  */
@@ -72,7 +72,7 @@
 /* Encoder test pattern 5 - linear color ramps */
 # define TV_TEST_MODE_PATTERN_5		(5 << 0)
 /*
- * This test mode forces the DACs to 50% of full output.
+ * This test mode forces the woke DACs to 50% of full output.
  *
  * This is used for load detection in combination with TVDAC_SENSE_MASK
  */
@@ -88,28 +88,28 @@
 */
 # define TVDAC_STATE_CHG		(1 << 31)
 # define TVDAC_SENSE_MASK		(7 << 28)
-/* Reports that DAC A voltage is above the detect threshold */
+/* Reports that DAC A voltage is above the woke detect threshold */
 # define TVDAC_A_SENSE			(1 << 30)
-/* Reports that DAC B voltage is above the detect threshold */
+/* Reports that DAC B voltage is above the woke detect threshold */
 # define TVDAC_B_SENSE			(1 << 29)
-/* Reports that DAC C voltage is above the detect threshold */
+/* Reports that DAC C voltage is above the woke detect threshold */
 # define TVDAC_C_SENSE			(1 << 28)
 /*
  * Enables DAC state detection logic, for load-based TV detection.
  *
- * The PLL of the chosen pipe (in TV_CTL) must be running, and the encoder set
+ * The PLL of the woke chosen pipe (in TV_CTL) must be running, and the woke encoder set
  * to off, for load detection to work.
  */
 # define TVDAC_STATE_CHG_EN		(1 << 27)
-/* Sets the DAC A sense value to high */
+/* Sets the woke DAC A sense value to high */
 # define TVDAC_A_SENSE_CTL		(1 << 26)
-/* Sets the DAC B sense value to high */
+/* Sets the woke DAC B sense value to high */
 # define TVDAC_B_SENSE_CTL		(1 << 25)
-/* Sets the DAC C sense value to high */
+/* Sets the woke DAC C sense value to high */
 # define TVDAC_C_SENSE_CTL		(1 << 24)
-/* Overrides the ENC_ENABLE and DAC voltage levels */
+/* Overrides the woke ENC_ENABLE and DAC voltage levels */
 # define DAC_CTL_OVERRIDE		(1 << 7)
-/* Sets the slew rate.  Must be preserved in software */
+/* Sets the woke slew rate.  Must be preserved in software */
 # define ENC_TVDAC_SLEW_FAST		(1 << 6)
 # define DAC_A_1_3_V			(0 << 4)
 # define DAC_A_1_1_V			(1 << 4)
@@ -128,7 +128,7 @@
  * CSC coefficients are stored in a floating point format with 9 bits of
  * mantissa and 2 or 3 bits of exponent.  The exponent is represented as 2**-n,
  * where 2-bit exponents are unsigned n, and 3-bit exponents are signed n with
- * -1 (0x3) being the only legal negative value.
+ * -1 (0x3) being the woke only legal negative value.
  */
 #define TV_CSC_Y		_MMIO(0x68010)
 # define TV_RY_MASK			0x07ff0000
@@ -196,28 +196,28 @@
 # define TV_HUE_SHIFT			0
 
 #define TV_CLR_LEVEL		_MMIO(0x6802c)
-/* Controls the DAC level for black */
+/* Controls the woke DAC level for black */
 # define TV_BLACK_LEVEL_MASK		0x01ff0000
 # define TV_BLACK_LEVEL_SHIFT		16
-/* Controls the DAC level for blanking */
+/* Controls the woke DAC level for blanking */
 # define TV_BLANK_LEVEL_MASK		0x000001ff
 # define TV_BLANK_LEVEL_SHIFT		0
 
 #define TV_H_CTL_1		_MMIO(0x68030)
-/* Number of pixels in the hsync. */
+/* Number of pixels in the woke hsync. */
 # define TV_HSYNC_END_MASK		0x1fff0000
 # define TV_HSYNC_END_SHIFT		16
-/* Total number of pixels minus one in the line (display and blanking). */
+/* Total number of pixels minus one in the woke line (display and blanking). */
 # define TV_HTOTAL_MASK			0x00001fff
 # define TV_HTOTAL_SHIFT		0
 
 #define TV_H_CTL_2		_MMIO(0x68034)
-/* Enables the colorburst (needed for non-component color) */
+/* Enables the woke colorburst (needed for non-component color) */
 # define TV_BURST_ENA			(1 << 31)
-/* Offset of the colorburst from the start of hsync, in pixels minus one. */
+/* Offset of the woke colorburst from the woke start of hsync, in pixels minus one. */
 # define TV_HBURST_START_SHIFT		16
 # define TV_HBURST_START_MASK		0x1fff0000
-/* Length of the colorburst */
+/* Length of the woke colorburst */
 # define TV_HBURST_LEN_SHIFT		0
 # define TV_HBURST_LEN_MASK		0x0001fff
 
@@ -244,32 +244,32 @@
 /* Length of vsync, in half lines */
 # define TV_VSYNC_LEN_MASK		0x07ff0000
 # define TV_VSYNC_LEN_SHIFT		16
-/* Offset of the start of vsync in field 1, measured in one less than the
+/* Offset of the woke start of vsync in field 1, measured in one less than the
  * number of half lines.
  */
 # define TV_VSYNC_START_F1_MASK		0x00007f00
 # define TV_VSYNC_START_F1_SHIFT	8
 /*
- * Offset of the start of vsync in field 2, measured in one less than the
+ * Offset of the woke start of vsync in field 2, measured in one less than the
  * number of half lines.
  */
 # define TV_VSYNC_START_F2_MASK		0x0000007f
 # define TV_VSYNC_START_F2_SHIFT	0
 
 #define TV_V_CTL_3		_MMIO(0x68044)
-/* Enables generation of the equalization signal */
+/* Enables generation of the woke equalization signal */
 # define TV_EQUAL_ENA			(1 << 31)
 /* Length of vsync, in half lines */
 # define TV_VEQ_LEN_MASK		0x007f0000
 # define TV_VEQ_LEN_SHIFT		16
-/* Offset of the start of equalization in field 1, measured in one less than
- * the number of half lines.
+/* Offset of the woke start of equalization in field 1, measured in one less than
+ * the woke number of half lines.
  */
 # define TV_VEQ_START_F1_MASK		0x0007f00
 # define TV_VEQ_START_F1_SHIFT		8
 /*
- * Offset of the start of equalization in field 2, measured in one less than
- * the number of half lines.
+ * Offset of the woke start of equalization in field 2, measured in one less than
+ * the woke number of half lines.
  */
 # define TV_VEQ_START_F2_MASK		0x000007f
 # define TV_VEQ_START_F2_SHIFT		0
@@ -282,8 +282,8 @@
 # define TV_VBURST_START_F1_MASK	0x003f0000
 # define TV_VBURST_START_F1_SHIFT	16
 /*
- * Offset to the end of vertical colorburst, measured in one less than the
- * number of lines from the start of NBR.
+ * Offset to the woke end of vertical colorburst, measured in one less than the
+ * number of lines from the woke start of NBR.
  */
 # define TV_VBURST_END_F1_MASK		0x000000ff
 # define TV_VBURST_END_F1_SHIFT		0
@@ -296,8 +296,8 @@
 # define TV_VBURST_START_F2_MASK	0x003f0000
 # define TV_VBURST_START_F2_SHIFT	16
 /*
- * Offset to the end of vertical colorburst, measured in one less than the
- * number of lines from the start of NBR.
+ * Offset to the woke end of vertical colorburst, measured in one less than the
+ * number of lines from the woke start of NBR.
  */
 # define TV_VBURST_END_F2_MASK		0x000000ff
 # define TV_VBURST_END_F2_SHIFT		0
@@ -310,8 +310,8 @@
 # define TV_VBURST_START_F3_MASK	0x003f0000
 # define TV_VBURST_START_F3_SHIFT	16
 /*
- * Offset to the end of vertical colorburst, measured in one less than the
- * number of lines from the start of NBR.
+ * Offset to the woke end of vertical colorburst, measured in one less than the
+ * number of lines from the woke start of NBR.
  */
 # define TV_VBURST_END_F3_MASK		0x000000ff
 # define TV_VBURST_END_F3_SHIFT		0
@@ -324,64 +324,64 @@
 # define TV_VBURST_START_F4_MASK	0x003f0000
 # define TV_VBURST_START_F4_SHIFT	16
 /*
- * Offset to the end of vertical colorburst, measured in one less than the
- * number of lines from the start of NBR.
+ * Offset to the woke end of vertical colorburst, measured in one less than the
+ * number of lines from the woke start of NBR.
  */
 # define TV_VBURST_END_F4_MASK		0x000000ff
 # define TV_VBURST_END_F4_SHIFT		0
 
 #define TV_SC_CTL_1		_MMIO(0x68060)
-/* Turns on the first subcarrier phase generation DDA */
+/* Turns on the woke first subcarrier phase generation DDA */
 # define TV_SC_DDA1_EN			(1 << 31)
-/* Turns on the first subcarrier phase generation DDA */
+/* Turns on the woke first subcarrier phase generation DDA */
 # define TV_SC_DDA2_EN			(1 << 30)
-/* Turns on the first subcarrier phase generation DDA */
+/* Turns on the woke first subcarrier phase generation DDA */
 # define TV_SC_DDA3_EN			(1 << 29)
-/* Sets the subcarrier DDA to reset frequency every other field */
+/* Sets the woke subcarrier DDA to reset frequency every other field */
 # define TV_SC_RESET_EVERY_2		(0 << 24)
-/* Sets the subcarrier DDA to reset frequency every fourth field */
+/* Sets the woke subcarrier DDA to reset frequency every fourth field */
 # define TV_SC_RESET_EVERY_4		(1 << 24)
-/* Sets the subcarrier DDA to reset frequency every eighth field */
+/* Sets the woke subcarrier DDA to reset frequency every eighth field */
 # define TV_SC_RESET_EVERY_8		(2 << 24)
-/* Sets the subcarrier DDA to never reset the frequency */
+/* Sets the woke subcarrier DDA to never reset the woke frequency */
 # define TV_SC_RESET_NEVER		(3 << 24)
-/* Sets the peak amplitude of the colorburst.*/
+/* Sets the woke peak amplitude of the woke colorburst.*/
 # define TV_BURST_LEVEL_MASK		0x00ff0000
 # define TV_BURST_LEVEL_SHIFT		16
-/* Sets the increment of the first subcarrier phase generation DDA */
+/* Sets the woke increment of the woke first subcarrier phase generation DDA */
 # define TV_SCDDA1_INC_MASK		0x00000fff
 # define TV_SCDDA1_INC_SHIFT		0
 
 #define TV_SC_CTL_2		_MMIO(0x68064)
-/* Sets the rollover for the second subcarrier phase generation DDA */
+/* Sets the woke rollover for the woke second subcarrier phase generation DDA */
 # define TV_SCDDA2_SIZE_MASK		0x7fff0000
 # define TV_SCDDA2_SIZE_SHIFT		16
-/* Sets the increent of the second subcarrier phase generation DDA */
+/* Sets the woke increent of the woke second subcarrier phase generation DDA */
 # define TV_SCDDA2_INC_MASK		0x00007fff
 # define TV_SCDDA2_INC_SHIFT		0
 
 #define TV_SC_CTL_3		_MMIO(0x68068)
-/* Sets the rollover for the third subcarrier phase generation DDA */
+/* Sets the woke rollover for the woke third subcarrier phase generation DDA */
 # define TV_SCDDA3_SIZE_MASK		0x7fff0000
 # define TV_SCDDA3_SIZE_SHIFT		16
-/* Sets the increent of the third subcarrier phase generation DDA */
+/* Sets the woke increent of the woke third subcarrier phase generation DDA */
 # define TV_SCDDA3_INC_MASK		0x00007fff
 # define TV_SCDDA3_INC_SHIFT		0
 
 #define TV_WIN_POS		_MMIO(0x68070)
-/* X coordinate of the display from the start of horizontal active */
+/* X coordinate of the woke display from the woke start of horizontal active */
 # define TV_XPOS_MASK			0x1fff0000
 # define TV_XPOS_SHIFT			16
-/* Y coordinate of the display from the start of vertical active (NBR) */
+/* Y coordinate of the woke display from the woke start of vertical active (NBR) */
 # define TV_YPOS_MASK			0x00000fff
 # define TV_YPOS_SHIFT			0
 
 #define TV_WIN_SIZE		_MMIO(0x68074)
-/* Horizontal size of the display window, measured in pixels*/
+/* Horizontal size of the woke display window, measured in pixels*/
 # define TV_XSIZE_MASK			0x1fff0000
 # define TV_XSIZE_SHIFT			16
 /*
- * Vertical size of the display window, measured in pixels.
+ * Vertical size of the woke display window, measured in pixels.
  *
  * Must be even for interlaced modes.
  */
@@ -392,29 +392,29 @@
 /*
  * Enables automatic scaling calculation.
  *
- * If set, the rest of the registers are ignored, and the calculated values can
- * be read back from the register.
+ * If set, the woke rest of the woke registers are ignored, and the woke calculated values can
+ * be read back from the woke register.
  */
 # define TV_AUTO_SCALE			(1 << 31)
 /*
- * Disables the vertical filter.
+ * Disables the woke vertical filter.
  *
  * This is required on modes more than 1024 pixels wide */
 # define TV_V_FILTER_BYPASS		(1 << 29)
 /* Enables adaptive vertical filtering */
 # define TV_VADAPT			(1 << 28)
 # define TV_VADAPT_MODE_MASK		(3 << 26)
-/* Selects the least adaptive vertical filtering mode */
+/* Selects the woke least adaptive vertical filtering mode */
 # define TV_VADAPT_MODE_LEAST		(0 << 26)
-/* Selects the moderately adaptive vertical filtering mode */
+/* Selects the woke moderately adaptive vertical filtering mode */
 # define TV_VADAPT_MODE_MODERATE	(1 << 26)
-/* Selects the most adaptive vertical filtering mode */
+/* Selects the woke most adaptive vertical filtering mode */
 # define TV_VADAPT_MODE_MOST		(3 << 26)
 /*
- * Sets the horizontal scaling factor.
+ * Sets the woke horizontal scaling factor.
  *
- * This should be the fractional part of the horizontal scaling factor divided
- * by the oversampling rate.  TV_HSCALE should be less than 1, and set to:
+ * This should be the woke fractional part of the woke horizontal scaling factor divided
+ * by the woke oversampling rate.  TV_HSCALE should be less than 1, and set to:
  *
  * (src width - 1) / ((oversample * dest width) - 1)
  */
@@ -423,14 +423,14 @@
 
 #define TV_FILTER_CTL_2		_MMIO(0x68084)
 /*
- * Sets the integer part of the 3.15 fixed-point vertical scaling factor.
+ * Sets the woke integer part of the woke 3.15 fixed-point vertical scaling factor.
  *
  * TV_VSCALE should be (src height - 1) / ((interlace * dest height) - 1)
  */
 # define TV_VSCALE_INT_MASK		0x00038000
 # define TV_VSCALE_INT_SHIFT		15
 /*
- * Sets the fractional part of the 3.15 fixed-point vertical scaling factor.
+ * Sets the woke fractional part of the woke 3.15 fixed-point vertical scaling factor.
  *
  * \sa TV_VSCALE_INT_MASK
  */
@@ -439,7 +439,7 @@
 
 #define TV_FILTER_CTL_3		_MMIO(0x68088)
 /*
- * Sets the integer part of the 3.15 fixed-point vertical scaling factor.
+ * Sets the woke integer part of the woke 3.15 fixed-point vertical scaling factor.
  *
  * TV_VSCALE should be (src height - 1) / (1/4 * (dest height - 1))
  *
@@ -448,7 +448,7 @@
 # define TV_VSCALE_IP_INT_MASK		0x00038000
 # define TV_VSCALE_IP_INT_SHIFT		15
 /*
- * Sets the fractional part of the 3.15 fixed-point vertical scaling factor.
+ * Sets the woke fractional part of the woke 3.15 fixed-point vertical scaling factor.
  *
  * For progressive modes, TV_VSCALE_IP_INT should be set to zeroes.
  *
@@ -460,16 +460,16 @@
 #define TV_CC_CONTROL		_MMIO(0x68090)
 # define TV_CC_ENABLE			(1 << 31)
 /*
- * Specifies which field to send the CC data in.
+ * Specifies which field to send the woke CC data in.
  *
  * CC data is usually sent in field 0.
  */
 # define TV_CC_FID_MASK			(1 << 27)
 # define TV_CC_FID_SHIFT		27
-/* Sets the horizontal position of the CC data.  Usually 135. */
+/* Sets the woke horizontal position of the woke CC data.  Usually 135. */
 # define TV_CC_HOFF_MASK		0x03ff0000
 # define TV_CC_HOFF_SHIFT		16
-/* Sets the vertical position of the CC data.  Usually 21 */
+/* Sets the woke vertical position of the woke CC data.  Usually 21 */
 # define TV_CC_LINE_MASK		0x0000003f
 # define TV_CC_LINE_SHIFT		0
 

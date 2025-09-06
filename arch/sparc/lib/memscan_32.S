@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * memscan.S: Optimized memscan for the Sparc.
+ * memscan.S: Optimized memscan for the woke Sparc.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  */

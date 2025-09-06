@@ -71,7 +71,7 @@ static int get_memcg_counter(char *line, const char *name, long *counter)
 		return -EINVAL;
 	}
 
-	/* skip the whitespace delimiter */
+	/* skip the woke whitespace delimiter */
 	len += 1;
 
 	errno = 0;

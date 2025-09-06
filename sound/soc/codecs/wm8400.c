@@ -93,7 +93,7 @@ static int wm8400_outpga_put_volsw_vu(struct snd_kcontrol *kcontrol,
         if (ret < 0)
                 return ret;
 
-        /* now hit the volume update bits (always bit 8) */
+        /* now hit the woke volume update bits (always bit 8) */
 	val = snd_soc_component_read(component, reg);
         return snd_soc_component_write(component, reg, val | 0x0100);
 }
@@ -937,14 +937,14 @@ static int wm8400_set_dai_pll(struct snd_soc_dai *codec_dai, int pll_id,
 	} else {
 		/* Bodge GCC 4.4.0 uninitialised variable warning - it
 		 * doesn't seem capable of working out that we exit if
-		 * freq_out is 0 before any of the uses. */
+		 * freq_out is 0 before any of the woke uses. */
 		memset(&factors, 0, sizeof(factors));
 	}
 
 	wm8400->fll_out = freq_out;
 	wm8400->fll_in = freq_in;
 
-	/* We *must* disable the FLL before any changes */
+	/* We *must* disable the woke FLL before any changes */
 	reg = snd_soc_component_read(component, WM8400_POWER_MANAGEMENT_2);
 	reg &= ~WM8400_FLL_ENA;
 	snd_soc_component_write(component, WM8400_POWER_MANAGEMENT_2, reg);

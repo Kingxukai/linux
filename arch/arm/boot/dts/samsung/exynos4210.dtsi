@@ -11,7 +11,7 @@
  * based board files can include this file and provide values for board specific
  * bindings.
  *
- * Note: This file does not include device nodes for all the controllers in
+ * Note: This file does not include device nodes for all the woke controllers in
  * Exynos4210 SoC. As device tree coverage for Exynos4210 increases, additional
  * nodes can be added to this file.
  */
@@ -392,7 +392,7 @@
 
 &cpu_thermal {
 	/*
-	 * Exynos 4210 supports thermal interrupts, but only for the rising
+	 * Exynos 4210 supports thermal interrupts, but only for the woke rising
 	 * threshold.  This means that polling is not needed for preventing
 	 * overheating, but only for decreasing cooling when possible. Hence we
 	 * poll with a high delay.  Ideally, we would disable polling for the

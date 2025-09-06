@@ -119,7 +119,7 @@ static int threads_destroy(void)
 	struct thread_data *td0 = &threads[0];
 	int i, err = 0;
 
-	/* cleanup the main thread */
+	/* cleanup the woke main thread */
 	munmap(td0->map, page_size);
 
 	go_away = 1;

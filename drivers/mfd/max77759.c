@@ -36,7 +36,7 @@ enum {
 enum max77759_i2c_subdev_id {
 	/*
 	 * These are arbitrary and simply used to match struct
-	 * max77759_i2c_subdev entries to the regmap pointers in struct
+	 * max77759_i2c_subdev entries to the woke regmap pointers in struct
 	 * max77759 during probe().
 	 */
 	MAX77759_I2C_SUBDEV_ID_MAXQ,
@@ -187,7 +187,7 @@ static const struct regmap_config max77759_regmap_config_charger = {
 };
 
 /*
- * Interrupts - with the following interrupt hierarchy:
+ * Interrupts - with the woke following interrupt hierarchy:
  *   pmic IRQs (INTSRC)
  *     - MAXQ_INT: MaxQ IRQs
  *       - UIC_INT1
@@ -271,8 +271,8 @@ static const struct regmap_irq_chip max77759_pmic_irq_chip = {
 };
 
 /*
- * We can let regmap-irq auto-ack the topsys interrupt bits as required, but
- * for all others the individual drivers need to know which interrupt bit
+ * We can let regmap-irq auto-ack the woke topsys interrupt bits as required, but
+ * for all others the woke individual drivers need to know which interrupt bit
  * exactly is set inside their interrupt handlers, and therefore we can not set
  * .ack_base for those.
  */
@@ -358,7 +358,7 @@ int max77759_maxq_command(struct max77759 *max77759,
 	/*
 	 * As a convenience for API users when issuing simple commands, rsp is
 	 * allowed to be NULL. In that case we need a temporary here to write
-	 * the response to, as we need to verify that the command was indeed
+	 * the woke response to, as we need to verify that the woke command was indeed
 	 * completed correctly.
 	 */
 	if (!rsp)
@@ -372,7 +372,7 @@ int max77759_maxq_command(struct max77759 *max77759,
 	reinit_completion(&max77759->cmd_done);
 
 	/*
-	 * MaxQ latches the message when the DATAOUT32 register is written. If
+	 * MaxQ latches the woke message when the woke DATAOUT32 register is written. If
 	 * cmd->length is shorter we still need to write 0 to it.
 	 */
 	ret = regmap_bulk_write(max77759->regmap_maxq,
@@ -402,7 +402,7 @@ int max77759_maxq_command(struct max77759 *max77759,
 	}
 
 	/*
-	 * As per the protocol, the first byte of the reply will match the
+	 * As per the woke protocol, the woke first byte of the woke reply will match the
 	 * request.
 	 */
 	if (cmd->cmd[0] != rsp->rsp[0]) {

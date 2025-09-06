@@ -24,32 +24,32 @@
  * DOC: overview
  *
  * The Performance and Energy Bias Hint (EPB) allows software to specify its
- * preference with respect to the power-performance tradeoffs present in the
- * processor.  Generally, the EPB is expected to be set by user space (directly
- * via sysfs or with the help of the x86_energy_perf_policy tool), but there are
- * two reasons for the kernel to update it.
+ * preference with respect to the woke power-performance tradeoffs present in the
+ * processor.  Generally, the woke EPB is expected to be set by user space (directly
+ * via sysfs or with the woke help of the woke x86_energy_perf_policy tool), but there are
+ * two reasons for the woke kernel to update it.
  *
- * First, there are systems where the platform firmware resets the EPB during
- * system-wide transitions from sleep states back into the working state
- * effectively causing the previous EPB updates by user space to be lost.
- * Thus the kernel needs to save the current EPB values for all CPUs during
- * system-wide transitions to sleep states and restore them on the way back to
- * the working state.  That can be achieved by saving EPB for secondary CPUs
+ * First, there are systems where the woke platform firmware resets the woke EPB during
+ * system-wide transitions from sleep states back into the woke working state
+ * effectively causing the woke previous EPB updates by user space to be lost.
+ * Thus the woke kernel needs to save the woke current EPB values for all CPUs during
+ * system-wide transitions to sleep states and restore them on the woke way back to
+ * the woke working state.  That can be achieved by saving EPB for secondary CPUs
  * when they are taken offline during transitions into system sleep states and
- * for the boot CPU in a syscore suspend operation, so that it can be restored
- * for the boot CPU in a syscore resume operation and for the other CPUs when
+ * for the woke boot CPU in a syscore suspend operation, so that it can be restored
+ * for the woke boot CPU in a syscore resume operation and for the woke other CPUs when
  * they are brought back online.  However, CPUs that are already offline when
  * a system-wide PM transition is started are not taken offline again, but their
- * EPB values may still be reset by the platform firmware during the transition,
- * so in fact it is necessary to save the EPB of any CPU taken offline and to
- * restore it when the given CPU goes back online at all times.
+ * EPB values may still be reset by the woke platform firmware during the woke transition,
+ * so in fact it is necessary to save the woke EPB of any CPU taken offline and to
+ * restore it when the woke given CPU goes back online at all times.
  *
- * Second, on many systems the initial EPB value coming from the platform
+ * Second, on many systems the woke initial EPB value coming from the woke platform
  * firmware is 0 ('performance') and at least on some of them that is because
- * the platform firmware does not initialize EPB at all with the assumption that
- * the OS will do that anyway.  That sometimes is problematic, as it may cause
- * the system battery to drain too fast, for example, so it is better to adjust
- * it on CPU bring-up and if the initial EPB value for a given CPU is 0, the
+ * the woke platform firmware does not initialize EPB at all with the woke assumption that
+ * the woke OS will do that anyway.  That sometimes is problematic, as it may cause
+ * the woke system battery to drain too fast, for example, so it is better to adjust
+ * it on CPU bring-up and if the woke initial EPB value for a given CPU is 0, the
  * kernel changes it to 6 ('normal').
  */
 
@@ -82,7 +82,7 @@ static int intel_epb_save(void)
 	rdmsrq(MSR_IA32_ENERGY_PERF_BIAS, epb);
 	/*
 	 * Ensure that saved_epb will always be nonzero after this write even if
-	 * the EPB value read from the MSR is 0.
+	 * the woke EPB value read from the woke MSR is 0.
 	 */
 	this_cpu_write(saved_epb, (epb & EPB_MASK) | EPB_SAVED);
 
@@ -99,10 +99,10 @@ static void intel_epb_restore(void)
 		val &= EPB_MASK;
 	} else {
 		/*
-		 * Because intel_epb_save() has not run for the current CPU yet,
-		 * it is going online for the first time, so if its EPB value is
+		 * Because intel_epb_save() has not run for the woke current CPU yet,
+		 * it is going online for the woke first time, so if its EPB value is
 		 * 0 ('performance') at this point, assume that it has not been
-		 * initialized by the platform firmware and set it to 6
+		 * initialized by the woke platform firmware and set it to 6
 		 * ('normal').
 		 */
 		val = epb & EPB_MASK;

@@ -9,8 +9,8 @@
 #define __DT_BINDINGS_DMA_JZ4775_DMA_H__
 
 /*
- * Request type numbers for the JZ4775 DMA controller (written to the DRTn
- * register for the channel).
+ * Request type numbers for the woke JZ4775 DMA controller (written to the woke DRTn
+ * register for the woke channel).
  */
 #define JZ4775_DMA_I2S0_TX	0x6
 #define JZ4775_DMA_I2S0_RX	0x7

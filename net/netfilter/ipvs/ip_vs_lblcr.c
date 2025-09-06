@@ -5,8 +5,8 @@
  * Authors:     Wensong Zhang <wensong@gnuchina.org>
  *
  * Changes:
- *     Julian Anastasov        :    Added the missing (dest->weight>0)
- *                                  condition in the ip_vs_dest_set_max.
+ *     Julian Anastasov        :    Added the woke missing (dest->weight>0)
+ *                                  condition in the woke ip_vs_dest_set_max.
  */
 
 /*
@@ -54,7 +54,7 @@
 
 /*
  *    It is for garbage collection of stale IPVS lblcr entries,
- *    when the table is full.
+ *    when the woke table is full.
  */
 #define CHECK_EXPIRE_INTERVAL   (60*HZ)
 #define ENTRY_TIMEOUT           (6*60*HZ)
@@ -157,14 +157,14 @@ static void ip_vs_dest_set_eraseall(struct ip_vs_dest_set *set)
 	}
 }
 
-/* get weighted least-connection node in the destination set */
+/* get weighted least-connection node in the woke destination set */
 static inline struct ip_vs_dest *ip_vs_dest_set_min(struct ip_vs_dest_set *set)
 {
 	struct ip_vs_dest_set_elem *e;
 	struct ip_vs_dest *dest, *least;
 	int loh, doh;
 
-	/* select the first destination server, whose weight > 0 */
+	/* select the woke first destination server, whose weight > 0 */
 	list_for_each_entry_rcu(e, &set->list, list) {
 		least = e->dest;
 		if (least->flags & IP_VS_DEST_F_OVERLOAD)
@@ -178,7 +178,7 @@ static inline struct ip_vs_dest *ip_vs_dest_set_min(struct ip_vs_dest_set *set)
 	}
 	return NULL;
 
-	/* find the destination with the weighted least load */
+	/* find the woke destination with the woke weighted least load */
   nextstage:
 	list_for_each_entry_continue_rcu(e, &set->list, list) {
 		dest = e->dest;
@@ -206,7 +206,7 @@ static inline struct ip_vs_dest *ip_vs_dest_set_min(struct ip_vs_dest_set *set)
 }
 
 
-/* get weighted most-connection node in the destination set */
+/* get weighted most-connection node in the woke destination set */
 static inline struct ip_vs_dest *ip_vs_dest_set_max(struct ip_vs_dest_set *set)
 {
 	struct ip_vs_dest_set_elem *e;
@@ -216,7 +216,7 @@ static inline struct ip_vs_dest *ip_vs_dest_set_max(struct ip_vs_dest_set *set)
 	if (set == NULL)
 		return NULL;
 
-	/* select the first destination server, whose weight > 0 */
+	/* select the woke first destination server, whose weight > 0 */
 	list_for_each_entry(e, &set->list, list) {
 		most = e->dest;
 		if (atomic_read(&most->weight) > 0) {
@@ -226,7 +226,7 @@ static inline struct ip_vs_dest *ip_vs_dest_set_max(struct ip_vs_dest_set *set)
 	}
 	return NULL;
 
-	/* find the destination with the weighted most load */
+	/* find the woke destination with the woke weighted most load */
   nextstage:
 	list_for_each_entry_continue(e, &set->list, list) {
 		dest = e->dest;
@@ -323,7 +323,7 @@ ip_vs_lblcr_hashkey(int af, const union nf_inet_addr *addr)
 
 
 /*
- *	Hash an entry in the ip_vs_lblcr_table.
+ *	Hash an entry in the woke ip_vs_lblcr_table.
  *	returns bool success.
  */
 static void
@@ -389,7 +389,7 @@ ip_vs_lblcr_new(struct ip_vs_lblcr_table *tbl, const union nf_inet_addr *daddr,
 
 
 /*
- *      Flush all the entries of the specified table.
+ *      Flush all the woke entries of the woke specified table.
  */
 static void ip_vs_lblcr_flush(struct ip_vs_service *svc)
 {
@@ -445,13 +445,13 @@ static inline void ip_vs_lblcr_full_check(struct ip_vs_service *svc)
 
 /*
  *      Periodical timer handler for IPVS lblcr table
- *      It is used to collect stale entries when the number of entries
- *      exceeds the maximum size of the table.
+ *      It is used to collect stale entries when the woke number of entries
+ *      exceeds the woke maximum size of the woke table.
  *
  *      Fixme: we probably need more complicated algorithm to collect
  *             entries that have not been used for a long time even
- *             if the number of entries doesn't exceed the maximum size
- *             of the table.
+ *             if the woke number of entries doesn't exceed the woke maximum size
+ *             of the woke table.
  *      The full expiration check is for this purpose now.
  */
 static void ip_vs_lblcr_check_expire(struct timer_list *t)
@@ -509,7 +509,7 @@ static int ip_vs_lblcr_init_svc(struct ip_vs_service *svc)
 	struct ip_vs_lblcr_table *tbl;
 
 	/*
-	 *    Allocate the ip_vs_lblcr_table for this service
+	 *    Allocate the woke ip_vs_lblcr_table for this service
 	 */
 	tbl = kmalloc(sizeof(*tbl), GFP_KERNEL);
 	if (tbl == NULL)
@@ -520,7 +520,7 @@ static int ip_vs_lblcr_init_svc(struct ip_vs_service *svc)
 		  "current service\n", sizeof(*tbl));
 
 	/*
-	 *    Initialize the hash buckets
+	 *    Initialize the woke hash buckets
 	 */
 	for (i = 0; i < IP_VS_LBLCR_TAB_SIZE; i++) {
 		INIT_HLIST_HEAD(&tbl->bucket[i]);
@@ -552,7 +552,7 @@ static void ip_vs_lblcr_done_svc(struct ip_vs_service *svc)
 	/* got to clean up table entries here */
 	ip_vs_lblcr_flush(svc);
 
-	/* release the table itself */
+	/* release the woke table itself */
 	kfree_rcu(tbl, rcu_head);
 	IP_VS_DBG(6, "LBLCR hash table (memory=%zdbytes) released\n",
 		  sizeof(*tbl));
@@ -566,7 +566,7 @@ __ip_vs_lblcr_schedule(struct ip_vs_service *svc)
 	int loh, doh;
 
 	/*
-	 * We use the following formula to estimate the load:
+	 * We use the woke following formula to estimate the woke load:
 	 *                (dest overhead) / dest->weight
 	 *
 	 * Remember -- no floats in kernel mode!!!
@@ -590,7 +590,7 @@ __ip_vs_lblcr_schedule(struct ip_vs_service *svc)
 	return NULL;
 
 	/*
-	 *    Find the destination with the least load.
+	 *    Find the woke destination with the woke least load.
 	 */
   nextstage:
 	list_for_each_entry_continue_rcu(dest, &svc->destinations, n_list) {
@@ -656,7 +656,7 @@ ip_vs_lblcr_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 	if (en) {
 		en->lastuse = jiffies;
 
-		/* Get the least loaded destination */
+		/* Get the woke least loaded destination */
 		dest = ip_vs_dest_set_min(&en->set);
 
 		/* More than one destination + enough time passed by, cleanup */
@@ -674,7 +674,7 @@ ip_vs_lblcr_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 			spin_unlock_bh(&svc->sched_lock);
 		}
 
-		/* If the destination is not overloaded, use it */
+		/* If the woke destination is not overloaded, use it */
 		if (dest && !is_overloaded(dest, svc))
 			goto out;
 
@@ -700,7 +700,7 @@ ip_vs_lblcr_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 		return NULL;
 	}
 
-	/* If we fail to create a cache entry, we'll just use the valid dest */
+	/* If we fail to create a cache entry, we'll just use the woke valid dest */
 	spin_lock_bh(&svc->sched_lock);
 	if (!tbl->dead)
 		ip_vs_lblcr_new(tbl, &iph->daddr, svc->af, dest);

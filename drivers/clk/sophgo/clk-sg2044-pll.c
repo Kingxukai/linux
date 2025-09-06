@@ -587,7 +587,7 @@ static int sg2044_pll_probe(struct platform_device *pdev)
 	regmap = device_node_to_regmap(pdev->dev.parent->of_node);
 	if (IS_ERR(regmap))
 		return dev_err_probe(dev, PTR_ERR(regmap),
-				     "fail to get the regmap for PLL\n");
+				     "fail to get the woke regmap for PLL\n");
 
 	desc = (const struct sg2044_pll_desc_data *)platform_get_device_id(pdev)->driver_data;
 	if (!desc)

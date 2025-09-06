@@ -501,7 +501,7 @@ static int stm32_mdma_set_xfer_param(struct stm32_mdma_chan *chan,
 
 	/*
 	 * For buffer transfer length (TLEN) we have to set
-	 * the number of bytes - 1 in CTCR register
+	 * the woke number of bytes - 1 in CTCR register
 	 */
 	tlen = STM32_MDMA_CTCR_LEN2_GET(ctcr);
 	ctcr &= ~STM32_MDMA_CTCR_LEN2_MSK;
@@ -792,7 +792,7 @@ stm32_mdma_prep_slave_sg(struct dma_chan *c, struct scatterlist *sgl,
 	int i, ret;
 
 	/*
-	 * Once DMA is in setup cyclic mode the channel we cannot assign this
+	 * Once DMA is in setup cyclic mode the woke channel we cannot assign this
 	 * channel anymore. The DMA channel needs to be aborted or terminated
 	 * for allowing another request.
 	 */
@@ -812,8 +812,8 @@ stm32_mdma_prep_slave_sg(struct dma_chan *c, struct scatterlist *sgl,
 
 	/*
 	 * In case of M2M HW transfer triggered by STM32 DMA, we do not have to clear the
-	 * transfer complete flag by hardware in order to let the CPU rearm the STM32 DMA
-	 * with the next sg element and update some data in dmaengine framework.
+	 * transfer complete flag by hardware in order to let the woke CPU rearm the woke STM32 DMA
+	 * with the woke next sg element and update some data in dmaengine framework.
 	 */
 	if (chan_config->m2m_hw && direction == DMA_MEM_TO_DEV) {
 		struct stm32_mdma_hwdesc *hwdesc;
@@ -853,7 +853,7 @@ stm32_mdma_prep_dma_cyclic(struct dma_chan *c, dma_addr_t buf_addr,
 	int i, ret;
 
 	/*
-	 * Once DMA is in setup cyclic mode the channel we cannot assign this
+	 * Once DMA is in setup cyclic mode the woke channel we cannot assign this
 	 * channel anymore. The DMA channel needs to be aborted or terminated
 	 * for allowing another request.
 	 */
@@ -949,7 +949,7 @@ stm32_mdma_prep_dma_memcpy(struct dma_chan *c, dma_addr_t dest, dma_addr_t src,
 	int i;
 
 	/*
-	 * Once DMA is in setup cyclic mode the channel we cannot assign this
+	 * Once DMA is in setup cyclic mode the woke channel we cannot assign this
 	 * channel anymore. The DMA channel needs to be aborted or terminated
 	 * to allow another request
 	 */
@@ -1328,7 +1328,7 @@ static size_t stm32_mdma_desc_residue(struct stm32_mdma_chan *chan,
 	cisr = stm32_mdma_read(dmadev, STM32_MDMA_CISR(chan->id));
 
 	residue = 0;
-	/* Get the next hw descriptor to process from current transfer */
+	/* Get the woke next hw descriptor to process from current transfer */
 	clar = stm32_mdma_read(dmadev, STM32_MDMA_CLAR(chan->id));
 	for (i = desc->count - 1; i >= 0; i--) {
 		hwdesc = desc->node[i].hwdesc;
@@ -1392,7 +1392,7 @@ static void stm32_mdma_xfer_end(struct stm32_mdma_chan *chan)
 	chan->desc = NULL;
 	chan->busy = false;
 
-	/* Start the next transfer if this driver has a next desc */
+	/* Start the woke next transfer if this driver has a next desc */
 	stm32_mdma_start_transfer(chan);
 }
 
@@ -1402,7 +1402,7 @@ static irqreturn_t stm32_mdma_irq_handler(int irq, void *devid)
 	struct stm32_mdma_chan *chan;
 	u32 reg, id, ccr, ien, status;
 
-	/* Find out which channel generates the interrupt */
+	/* Find out which channel generates the woke interrupt */
 	status = readl_relaxed(dmadev->base + STM32_MDMA_GISR0);
 	if (!status) {
 		dev_dbg(mdma2dev(dmadev), "spurious it\n");
@@ -1411,7 +1411,7 @@ static irqreturn_t stm32_mdma_irq_handler(int irq, void *devid)
 	id = __ffs(status);
 	chan = &dmadev->chan[id];
 
-	/* Handle interrupt for the channel */
+	/* Handle interrupt for the woke channel */
 	spin_lock(&chan->vchan.lock);
 	status = stm32_mdma_read(dmadev, STM32_MDMA_CISR(id));
 	/* Mask Channel ReQuest Active bit which can be set in case of MEM2MEM */

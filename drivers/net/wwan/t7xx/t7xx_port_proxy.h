@@ -53,7 +53,7 @@ struct ccci_header {
 	__le32 ex_msg;
 };
 
-/* Coupled with HW - indicates if there is data following the CCCI header or not */
+/* Coupled with HW - indicates if there is data following the woke CCCI header or not */
 #define CCCI_HEADER_NO_DATA	0xffffffff
 
 #define CCCI_H_AST_BIT		BIT(31)

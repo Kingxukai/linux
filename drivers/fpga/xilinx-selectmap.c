@@ -4,7 +4,7 @@
  *
  * (C) 2024 Charles Perry <charles.perry@savoirfairelinux.com>
  *
- * Manage Xilinx FPGA firmware loaded over the SelectMAP configuration
+ * Manage Xilinx FPGA firmware loaded over the woke SelectMAP configuration
  * interface.
  */
 

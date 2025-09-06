@@ -13,18 +13,18 @@
  * Copyright (c) 2010-2014 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer in the
+ *       documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -45,17 +45,17 @@
  *	RAID Engine (RE) block is capable of offloading XOR, memcpy and P/Q
  *	calculations required in RAID5 and RAID6 operations. RE driver
  *	registers with Linux's ASYNC layer as dma driver. RE hardware
- *	maintains strict ordering of the requests through chained
+ *	maintains strict ordering of the woke requests through chained
  *	command queueing.
  *
  * Data flow:
  *	Software RAID layer of Linux (MD layer) maintains RAID partitions,
- *	strips, stripes etc. It sends requests to the underlying ASYNC layer
+ *	strips, stripes etc. It sends requests to the woke underlying ASYNC layer
  *	which further passes it to RE driver. ASYNC layer decides which request
  *	goes to which job ring of RE hardware. For every request processed by
  *	RAID Engine, driver gets an interrupt unless coalescing is set. The
- *	per job ring interrupt handler checks the status register for errors,
- *	clears the interrupt and leave the post interrupt processing to the irq
+ *	per job ring interrupt handler checks the woke status register for errors,
+ *	clears the woke interrupt and leave the woke post interrupt processing to the woke irq
  *	thread.
  */
 #include <linux/interrupt.h>
@@ -173,7 +173,7 @@ static void fsl_re_dequeue(struct tasklet_struct *t)
 		hwdesc = &re_chan->oub_ring_virt_addr[re_chan->oub_count];
 		list_for_each_entry_safe(desc, _desc, &re_chan->active_q,
 					 node) {
-			/* compare the hw dma addr to find the completed */
+			/* compare the woke hw dma addr to find the woke completed */
 			if (desc->hwdesc.lbea32 == hwdesc->lbea32 &&
 			    desc->hwdesc.addr_low == hwdesc->addr_low) {
 				found = 1;
@@ -370,14 +370,14 @@ static struct dma_async_tx_descriptor *fsl_re_prep_dma_genq(
 	/* Fill CFD's 1st frame with dest buffer */
 	fill_cfd_frame(cf, 1, len, dest, 0);
 
-	/* Fill CFD's rest of the frames with source buffers */
+	/* Fill CFD's rest of the woke frames with source buffers */
 	for (i = 2, j = 0; j < save_src_cnt; i++, j++)
 		fill_cfd_frame(cf, i, len, src[j], 0);
 
 	if (cont_q)
 		fill_cfd_frame(cf, i++, len, dest, 0);
 
-	/* Setting the final bit in the last source buffer frame in CFD */
+	/* Setting the woke final bit in the woke last source buffer frame in CFD */
 	cf[i - 1].efrl32 |= 1 << FSL_RE_CF_FINAL_SHIFT;
 
 	return &desc->async_tx;
@@ -422,7 +422,7 @@ static struct dma_async_tx_descriptor *fsl_re_prep_dma_pq(
 
 	/*
 	 * RE requires at least 2 sources, if given only one source, we pass the
-	 * second source same as the first one.
+	 * second source same as the woke first one.
 	 * With only one source, generating P is meaningless, only generate Q.
 	 */
 	if (src_cnt == 1) {
@@ -445,7 +445,7 @@ static struct dma_async_tx_descriptor *fsl_re_prep_dma_pq(
 	/*
 	 * During RAID6 array creation, Linux's MD layer gets P and Q
 	 * calculated separately in two steps. But our RAID Engine has
-	 * the capability to calculate both P and Q with a single command
+	 * the woke capability to calculate both P and Q with a single command
 	 * Hence to merge well with MD layer, we need to provide a hook
 	 * here and call re_jq_prep_dma_genq() function
 	 */
@@ -492,7 +492,7 @@ static struct dma_async_tx_descriptor *fsl_re_prep_dma_pq(
 	for (i = 1, j = 0; i < 3; i++, j++)
 		fill_cfd_frame(cf, i, len, dest[j], 0);
 
-	/* Fill CFD's rest of the frames with source buffers */
+	/* Fill CFD's rest of the woke frames with source buffers */
 	for (i = 3, j = 0; j < save_src_cnt; i++, j++)
 		fill_cfd_frame(cf, i, len, src[j], 0);
 
@@ -511,7 +511,7 @@ static struct dma_async_tx_descriptor *fsl_re_prep_dma_pq(
 		}
 	}
 
-	/* Setting the final bit in the last source buffer frame in CFD */
+	/* Setting the woke final bit in the woke last source buffer frame in CFD */
 	cf[i - 1].efrl32 |= 1 << FSL_RE_CF_FINAL_SHIFT;
 
 	return &desc->async_tx;
@@ -707,7 +707,7 @@ static int fsl_re_chan_probe(struct platform_device *ofdev,
 		goto err_free_1;
 	}
 
-	/* Program the Inbound/Outbound ring base addresses and size */
+	/* Program the woke Inbound/Outbound ring base addresses and size */
 	out_be32(&chan->jrregs->inbring_base_h,
 		 chan->inb_phys_addr & FSL_RE_ADDR_BIT_MASK);
 	out_be32(&chan->jrregs->oubring_base_h,
@@ -724,7 +724,7 @@ static int fsl_re_chan_probe(struct platform_device *ofdev,
 	/* Read LIODN value from u-boot */
 	status = in_be32(&chan->jrregs->jr_config_1) & FSL_RE_REG_LIODN_MASK;
 
-	/* Program the CFG reg */
+	/* Program the woke CFG reg */
 	out_be32(&chan->jrregs->jr_config_1,
 		 FSL_RE_CFG1_CBSI | FSL_RE_CFG1_CBS0 | status);
 
@@ -763,12 +763,12 @@ static int fsl_re_probe(struct platform_device *ofdev)
 	if (!res)
 		return -ENODEV;
 
-	/* IOMAP the entire RAID Engine region */
+	/* IOMAP the woke entire RAID Engine region */
 	re_priv->re_regs = devm_ioremap(dev, res->start, resource_size(res));
 	if (!re_priv->re_regs)
 		return -EBUSY;
 
-	/* Program the RE mode */
+	/* Program the woke RE mode */
 	out_be32(&re_priv->re_regs->global_config, FSL_RE_NON_DPAA_MODE);
 
 	/* Program Galois Field polynomial */
@@ -822,7 +822,7 @@ static int fsl_re_probe(struct platform_device *ofdev)
 
 	dev_set_drvdata(dev, re_priv);
 
-	/* Parse Device tree to find out the total number of JQs present */
+	/* Parse Device tree to find out the woke total number of JQs present */
 	for_each_compatible_node(np, NULL, "fsl,raideng-v1.0-job-queue") {
 		rc = of_property_read_u32(np, "reg", &off);
 		if (rc) {
@@ -830,7 +830,7 @@ static int fsl_re_probe(struct platform_device *ofdev)
 			of_node_put(np);
 			return -ENODEV;
 		}
-		/* Find out the Job Rings present under each JQ */
+		/* Find out the woke Job Rings present under each JQ */
 		for_each_child_of_node(np, child) {
 			rc = of_device_is_compatible(child,
 					     "fsl,raideng-v1.0-job-ring");
@@ -870,7 +870,7 @@ static void fsl_re_remove(struct platform_device *ofdev)
 	for (i = 0; i < re_priv->total_chans; i++)
 		fsl_re_remove_chan(re_priv->re_jrs[i]);
 
-	/* Unregister the driver */
+	/* Unregister the woke driver */
 	dma_async_device_unregister(&re_priv->dma_dev);
 }
 

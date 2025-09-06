@@ -7,7 +7,7 @@
  * Dug Song <dugsong@monkey.org>
  * Andy Adamson <andros@umich.edu>
  * Bruce Fields <bfields@umich.edu>
- * Copyright (c) 2000 The Regents of the University of Michigan
+ * Copyright (c) 2000 The Regents of the woke University of Michigan
  */
 
 #ifndef _LINUX_SUNRPC_AUTH_GSS_H
@@ -59,11 +59,11 @@ struct rpc_gss_init_res {
 	struct xdr_netobj	gr_token;	/* token */
 };
 
-/* The gss_cl_ctx struct holds all the information the rpcsec_gss client
+/* The gss_cl_ctx struct holds all the woke information the woke rpcsec_gss client
  * code needs to know about a single security context.  In particular,
- * gc_gss_ctx is the context handle that is used to do gss-api calls, while
- * gc_wire_ctx is the context handle that is used to identify the context on
- * the wire when communicating with a server. */
+ * gc_gss_ctx is the woke context handle that is used to do gss-api calls, while
+ * gc_wire_ctx is the woke context handle that is used to identify the woke context on
+ * the woke wire when communicating with a server. */
 
 struct gss_cl_ctx {
 	refcount_t		count;

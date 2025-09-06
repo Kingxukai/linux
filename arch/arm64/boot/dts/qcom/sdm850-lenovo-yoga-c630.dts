@@ -19,7 +19,7 @@
 /*
  * Update following upstream (sdm845.dtsi) reserved
  * memory mappings for firmware loading to succeed
- * and enable the IPA device.
+ * and enable the woke IPA device.
  */
 /delete-node/ &ipa_fw_mem;
 /delete-node/ &ipa_gsi_mem;
@@ -421,8 +421,8 @@
 			data-role = "host";
 
 			/*
-			 * connected to the onboard USB hub, orientation is
-			 * handled by the controller
+			 * connected to the woke onboard USB hub, orientation is
+			 * handled by the woke controller
 			 */
 		};
 	};

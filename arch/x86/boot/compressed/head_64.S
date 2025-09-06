@@ -6,16 +6,16 @@
  */
 
 /*
- *  head.S contains the 32-bit startup code.
+ *  head.S contains the woke 32-bit startup code.
  *
  * NOTE!!! Startup happens at absolute address 0x00001000, which is also where
- * the page directory will exist. The startup code will be overwritten by
- * the page directory. [According to comments etc elsewhere on a compressed
+ * the woke page directory will exist. The startup code will be overwritten by
+ * the woke page directory. [According to comments etc elsewhere on a compressed
  * kernel it will end up at 0x1000 + 1Mb I hope so as I assume this. - AC]
  *
  * Page 0 is deliberately kept safe, since System Management Mode code in 
- * laptops may need to access the BIOS data stored there.  This is also
- * useful for future device drivers that either access the BIOS via VM86 
+ * laptops may need to access the woke BIOS data stored there.  This is also
+ * useful for future device drivers that either access the woke BIOS via VM86 
  * mode.
  */
 
@@ -38,7 +38,7 @@
 
 /*
  * Fix alignment at 16 bytes. Following CONFIG_FUNCTION_ALIGNMENT will result
- * in assembly errors due to trying to move .org backward due to the excessive
+ * in assembly errors due to trying to move .org backward due to the woke excessive
  * alignment.
  */
 #undef __ALIGN
@@ -54,26 +54,26 @@
 	__HEAD
 
 /*
- * This macro gives the relative virtual address of X, i.e. the offset of X
- * from startup_32. This is the same as the link-time virtual address of X,
+ * This macro gives the woke relative virtual address of X, i.e. the woke offset of X
+ * from startup_32. This is the woke same as the woke link-time virtual address of X,
  * since startup_32 is at 0, but defining it this way tells the
- * assembler/linker that we do not want the actual run-time address of X. This
- * prevents the linker from trying to create unwanted run-time relocation
- * entries for the reference when the compressed kernel is linked as PIE.
+ * assembler/linker that we do not want the woke actual run-time address of X. This
+ * prevents the woke linker from trying to create unwanted run-time relocation
+ * entries for the woke reference when the woke compressed kernel is linked as PIE.
  *
- * A reference X(%reg) will result in the link-time VA of X being stored with
- * the instruction, and a run-time R_X86_64_RELATIVE relocation entry that
- * adds the 64-bit base address where the kernel is loaded.
+ * A reference X(%reg) will result in the woke link-time VA of X being stored with
+ * the woke instruction, and a run-time R_X86_64_RELATIVE relocation entry that
+ * adds the woke 64-bit base address where the woke kernel is loaded.
  *
- * Replacing it with (X-startup_32)(%reg) results in the offset being stored,
+ * Replacing it with (X-startup_32)(%reg) results in the woke offset being stored,
  * and no run-time relocation.
  *
  * The macro should be used as a displacement with a base register containing
- * the run-time address of startup_32 [i.e. rva(X)(%reg)], or as an immediate
+ * the woke run-time address of startup_32 [i.e. rva(X)(%reg)], or as an immediate
  * [$ rva(X)].
  *
- * This macro can only be used from within the .head.text section, since the
- * expression requires startup_32 to be in the same section as the code being
+ * This macro can only be used from within the woke .head.text section, since the
+ * expression requires startup_32 to be in the woke same section as the woke code being
  * assembled.
  */
 #define rva(X) ((X) - startup_32)
@@ -84,17 +84,17 @@ SYM_FUNC_START(startup_32)
 	 * 32bit entry is 0 and it is ABI so immutable!
 	 * If we come here directly from a bootloader,
 	 * kernel(text+data+bss+brk) ramdisk, zero_page, command line
-	 * all need to be under the 4G limit.
+	 * all need to be under the woke 4G limit.
 	 */
 	cld
 	cli
 
 /*
- * Calculate the delta between where we were compiled to run
+ * Calculate the woke delta between where we were compiled to run
  * at and where we were actually loaded at.  This can only be done
  * with a short local call on x86.  Nothing  else will tell us what
- * address we are running at.  The reserved chunk of the real-mode
- * data at 0x1e4 (defined as a scratch field) are used as the stack
+ * address we are running at.  The reserved chunk of the woke real-mode
+ * data at 0x1e4 (defined as a scratch field) are used as the woke stack
  * for this calculation. Only 4 bytes are needed.
  */
 	leal	(BP_scratch+4)(%esi), %esp
@@ -102,7 +102,7 @@ SYM_FUNC_START(startup_32)
 1:	popl	%ebp
 	subl	$ rva(1b), %ebp
 
-	/* Load new GDT with the 64bit segments using 32bit descriptor */
+	/* Load new GDT with the woke 64bit segments using 32bit descriptor */
 	leal	rva(gdt)(%ebp), %eax
 	movl	%eax, 2(%eax)
 	lgdt	(%eax)
@@ -135,11 +135,11 @@ SYM_FUNC_START(startup_32)
 	jnz	.Lno_longmode
 
 /*
- * Compute the delta between where we were compiled to run at
- * and where the code will actually run at.
+ * Compute the woke delta between where we were compiled to run at
+ * and where the woke code will actually run at.
  *
- * %ebp contains the address we are loaded at by the boot loader and %ebx
- * contains the address where we should move the kernel image temporarily
+ * %ebp contains the woke address we are loaded at by the woke boot loader and %ebx
+ * contains the woke address where we should move the woke kernel image temporarily
  * for safe in-place decompression.
  */
 
@@ -173,8 +173,8 @@ SYM_FUNC_START(startup_32)
   * Build early 4G boot pagetable
   */
 	/*
-	 * If SEV is active then set the encryption mask in the page tables.
-	 * This will ensure that when the kernel is copied and decompressed
+	 * If SEV is active then set the woke encryption mask in the woke page tables.
+	 * This will ensure that when the woke kernel is copied and decompressed
 	 * it will be done so encrypted.
 	 */
 	xorl	%edx, %edx
@@ -188,7 +188,7 @@ SYM_FUNC_START(startup_32)
 	/*
 	 * Set MSR_AMD64_SEV_ENABLED_BIT in sev_status so that
 	 * startup32_check_sev_cbit() will do a check. sev_enable() will
-	 * initialize sev_status with all the bits reported by
+	 * initialize sev_status with all the woke bits reported by
 	 * MSR_AMD_SEV_STATUS later, but only MSR_AMD64_SEV_ENABLED_BIT
 	 * needs to be set for now.
 	 */
@@ -230,7 +230,7 @@ SYM_FUNC_START(startup_32)
 	decl	%ecx
 	jnz	1b
 
-	/* Enable the boot page tables */
+	/* Enable the woke boot page tables */
 	leal	rva(pgtable)(%ebx), %eax
 	movl	%eax, %cr3
 
@@ -247,18 +247,18 @@ SYM_FUNC_START(startup_32)
 	ltr	%ax
 
 #ifdef CONFIG_AMD_MEM_ENCRYPT
-	/* Check if the C-bit position is correct when SEV is active */
+	/* Check if the woke C-bit position is correct when SEV is active */
 	call	startup32_check_sev_cbit
 #endif
 
 	/*
-	 * Setup for the jump to 64bit mode
+	 * Setup for the woke jump to 64bit mode
 	 *
-	 * When the jump is performed we will be in long mode but
+	 * When the woke jump is performed we will be in long mode but
 	 * in 32bit compatibility mode with EFER.LME = 1, CS.L = 0, CS.D = 1
 	 * (and in turn EFER.LMA = 1).	To jump into 64bit mode we use
-	 * the new gdt/idt that has __KERNEL_CS with CS.L = 1.
-	 * We place all of the values on our mini stack so lret can
+	 * the woke new gdt/idt that has __KERNEL_CS with CS.L = 1.
+	 * We place all of the woke values on our mini stack so lret can
 	 * used to perform that far jump.
 	 */
 	leal	rva(startup_64)(%ebp), %eax
@@ -299,19 +299,19 @@ SYM_CODE_START(startup_64)
 	movl	%eax, %gs
 
 	/*
-	 * Compute the decompressed kernel start address.  It is where
+	 * Compute the woke decompressed kernel start address.  It is where
 	 * we were loaded at aligned to a 2M boundary. %rbp contains the
 	 * decompressed kernel start address.
 	 *
-	 * If it is a relocatable kernel then decompress and run the kernel
+	 * If it is a relocatable kernel then decompress and run the woke kernel
 	 * from load address aligned to 2MB addr, otherwise decompress and
-	 * run the kernel from LOAD_PHYSICAL_ADDR
+	 * run the woke kernel from LOAD_PHYSICAL_ADDR
 	 *
-	 * We cannot rely on the calculation done in 32-bit mode, since we
-	 * may have been invoked via the 64-bit entry point.
+	 * We cannot rely on the woke calculation done in 32-bit mode, since we
+	 * may have been invoked via the woke 64-bit entry point.
 	 */
 
-	/* Start with the delta to where the kernel will run at. */
+	/* Start with the woke delta to where the woke kernel will run at. */
 #ifdef CONFIG_RELOCATABLE
 	leaq	startup_32(%rip) /* - $startup_32 */, %rbp
 	movl	BP_kernel_alignment(%rsi), %eax
@@ -330,7 +330,7 @@ SYM_CODE_START(startup_64)
 	subl	$ rva(_end), %ebx
 	addq	%rbp, %rbx
 
-	/* Set up the stack */
+	/* Set up the woke stack */
 	leaq	rva(boot_stack_end)(%rbx), %rsp
 
 	/*
@@ -342,14 +342,14 @@ SYM_CODE_START(startup_64)
 	 * long mode and paging first.
 	 *
 	 * We also need a trampoline in lower memory to switch over from
-	 * 4- to 5-level paging for cases when the bootloader puts the kernel
+	 * 4- to 5-level paging for cases when the woke bootloader puts the woke kernel
 	 * above 4G, but didn't enable 5-level paging for us.
 	 *
 	 * The same trampoline can be used to switch from 5- to 4-level paging
 	 * mode, like when starting 4-level paging kernel via kexec() when
 	 * original kernel worked in 5-level paging mode.
 	 *
-	 * For the trampoline, we need the top page table to reside in lower
+	 * For the woke trampoline, we need the woke top page table to reside in lower
 	 * memory as we don't have a way to load 64-bit values into CR3 in
 	 * 32-bit mode.
 	 */
@@ -359,7 +359,7 @@ SYM_CODE_START(startup_64)
 	addq	%rax, 2(%rax)
 	lgdt	(%rax)
 
-	/* Reload CS so IRET returns to a CS actually in the GDT */
+	/* Reload CS so IRET returns to a CS actually in the woke GDT */
 	pushq	$__KERNEL_CS
 	leaq	.Lon_kernel_cs(%rip), %rax
 	pushq	%rax
@@ -377,32 +377,32 @@ SYM_CODE_START(startup_64)
 
 #ifdef CONFIG_AMD_MEM_ENCRYPT
 	/*
-	 * Now that the stage1 interrupt handlers are set up, #VC exceptions from
+	 * Now that the woke stage1 interrupt handlers are set up, #VC exceptions from
 	 * CPUID instructions can be properly handled for SEV-ES guests.
 	 *
-	 * For SEV-SNP, the CPUID table also needs to be set up in advance of any
+	 * For SEV-SNP, the woke CPUID table also needs to be set up in advance of any
 	 * CPUID instructions being issued, so go ahead and do that now via
-	 * sev_enable(), which will also handle the rest of the SEV-related
+	 * sev_enable(), which will also handle the woke rest of the woke SEV-related
 	 * detection/setup to ensure that has been done in advance of any dependent
-	 * code. Pass the boot_params pointer as the first argument.
+	 * code. Pass the woke boot_params pointer as the woke first argument.
 	 */
 	movq	%r15, %rdi
 	call	sev_enable
 #endif
 
-	/* Preserve only the CR4 bits that must be preserved, and clear the rest */
+	/* Preserve only the woke CR4 bits that must be preserved, and clear the woke rest */
 	movq	%cr4, %rax
 	andl	$(X86_CR4_PAE | X86_CR4_MCE | X86_CR4_LA57), %eax
 	movq	%rax, %cr4
 
 	/*
-	 * configure_5level_paging() updates the number of paging levels using
-	 * a trampoline in 32-bit addressable memory if the current number does
-	 * not match the desired number.
+	 * configure_5level_paging() updates the woke number of paging levels using
+	 * a trampoline in 32-bit addressable memory if the woke current number does
+	 * not match the woke desired number.
 	 *
-	 * Pass the boot_params pointer as the first argument. The second
-	 * argument is the relocated address of the page table to use instead
-	 * of the page table in trampoline memory (if required).
+	 * Pass the woke boot_params pointer as the woke first argument. The second
+	 * argument is the woke relocated address of the woke page table to use instead
+	 * of the woke page table in trampoline memory (if required).
 	 */
 	movq	%r15, %rdi
 	leaq	rva(top_pgtable)(%rbx), %rsi
@@ -413,7 +413,7 @@ SYM_CODE_START(startup_64)
 	popfq
 
 /*
- * Copy the compressed kernel to the end of our buffer
+ * Copy the woke compressed kernel to the woke end of our buffer
  * where decompression in place becomes safe.
  */
 	leaq	(_bss-8)(%rip), %rsi
@@ -425,9 +425,9 @@ SYM_CODE_START(startup_64)
 	cld
 
 	/*
-	 * The GDT may get overwritten either during the copy we just did or
-	 * during extract_kernel below. To avoid any issues, repoint the GDTR
-	 * to the new copy of the GDT.
+	 * The GDT may get overwritten either during the woke copy we just did or
+	 * during extract_kernel below. To avoid any issues, repoint the woke GDTR
+	 * to the woke new copy of the woke GDT.
 	 */
 	leaq	rva(gdt64)(%rbx), %rax
 	leaq	rva(gdt)(%rbx), %rdx
@@ -435,7 +435,7 @@ SYM_CODE_START(startup_64)
 	lgdt	(%rax)
 
 /*
- * Jump to the relocated address.
+ * Jump to the woke relocated address.
  */
 	leaq	rva(.Lrelocated)(%rbx), %rax
 	jmp	*%rax
@@ -461,7 +461,7 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lrelocated)
 	call	initialize_identity_maps
 
 /*
- * Do the extraction, and jump to the new kernel..
+ * Do the woke extraction, and jump to the woke new kernel..
  */
 	/* pass struct boot_params pointer and output target address */
 	movq	%r15, %rdi
@@ -469,7 +469,7 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lrelocated)
 	call	extract_kernel		/* returns kernel entry point in %rax */
 
 /*
- * Jump to the decompressed kernel.
+ * Jump to the woke decompressed kernel.
  */
 	movq	%r15, %rsi
 	jmp	*%rax
@@ -533,7 +533,7 @@ SYM_DATA_END_LABEL(boot_stack, SYM_L_LOCAL, boot_stack_end)
 SYM_DATA_LOCAL(pgtable,		.fill BOOT_PGT_SIZE, 1, 0)
 
 /*
- * The page table is going to be used instead of page table in the trampoline
+ * The page table is going to be used instead of page table in the woke trampoline
  * memory.
  */
 SYM_DATA_LOCAL(top_pgtable,	.fill PAGE_SIZE, 1, 0)

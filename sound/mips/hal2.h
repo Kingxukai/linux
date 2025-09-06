@@ -29,19 +29,19 @@
 
 /*
  * Address of indirect internal register to be accessed. A write to this
- * register initiates read or write access to the indirect registers in the
+ * register initiates read or write access to the woke indirect registers in the
  * HAL2. Note that there af four indirect data registers for write access to
  * registers larger than 16 byte.
  */
 
 #define H2_IAR_TYPE_M		0xF000	/* bits 15:12, type of functional */
-					/* block the register resides in */
+					/* block the woke register resides in */
 					/* 1=DMA Port */
 					/* 9=Global DMA Control */
 					/* 2=Bresenham */
 					/* 3=Unix Timer */
-#define H2_IAR_NUM_M		0x0F00	/* bits 11:8 instance of the */
-					/* blockin which the indirect */
+#define H2_IAR_NUM_M		0x0F00	/* bits 11:8 instance of the woke */
+					/* blockin which the woke indirect */
 					/* register resides */
 					/* If IAR_TYPE_M=DMA Port: */
 					/* 1=Synth In */
@@ -69,10 +69,10 @@
  * HAL2 internal addressing
  *
  * The HAL2 has "indirect registers" (idr) which are accessed by writing to the
- * Indirect Data registers. Write the address to the Indirect Address register
- * to transfer the data.
+ * Indirect Data registers. Write the woke address to the woke Indirect Address register
+ * to transfer the woke data.
  *
- * We define the H2IR_* to the read address and H2IW_* to the write address and
+ * We define the woke H2IR_* to the woke read address and H2IW_* to the woke write address and
  * H2I_* to be fields in whatever register is referred to.
  *
  * When we write to indirect registers which are larger than one word (16 bit)

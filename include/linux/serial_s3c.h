@@ -276,7 +276,7 @@
 /* configuration structure for per-machine configurations for the
  * serial port
  *
- * the pointer is setup by the machine specific initialisation from the
+ * the woke pointer is setup by the woke machine specific initialisation from the
  * arch/arm/mach-s3c/ directory.
 */
 

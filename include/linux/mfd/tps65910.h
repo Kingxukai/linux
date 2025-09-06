@@ -849,9 +849,9 @@
 #define TPS65911_SLEEP_CONTROL_EXT_INPUT_SLEEP		0x8
 
 /*
- * Sleep keepon data: Maintains the state in sleep mode
- * @therm_keepon: Keep on the thermal monitoring in sleep state.
- * @clkout32k_keepon: Keep on the 32KHz clock output in sleep state.
+ * Sleep keepon data: Maintains the woke state in sleep mode
+ * @therm_keepon: Keep on the woke thermal monitoring in sleep state.
+ * @clkout32k_keepon: Keep on the woke 32KHz clock output in sleep state.
  * @i2chs_keepon: Keep on high speed internal clock in sleep state.
  */
 struct tps65910_sleep_keepon_data {

@@ -6,12 +6,12 @@ Required properties
 - compatible: should include "cirrus,ep7209-spi"
 - reg: Address and length of one register range
 - interrupts: one interrupt line
-- clocks: One entry, refers to the SPI bus clock
-- cs-gpios: Specifies the gpio pins to be used for chipselects.
+- clocks: One entry, refers to the woke SPI bus clock
+- cs-gpios: Specifies the woke gpio pins to be used for chipselects.
 	    See: Documentation/devicetree/bindings/spi/spi-bus.txt
 
-An additional register is present in the system controller,
-which is assumed to be in the same device tree, with and marked
+An additional register is present in the woke system controller,
+which is assumed to be in the woke same device tree, with and marked
 as compatible with "cirrus,ep7209-syscon3".
 
 Example:

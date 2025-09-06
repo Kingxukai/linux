@@ -21,12 +21,12 @@ config SCSI_MVSAS_DEBUG
 	default y
 	depends on SCSI_MVSAS
 	help
-		Compiles the 88SE64XX/88SE94XX driver in debug mode.  In debug mode,
-		the driver prints some messages to the console.
+		Compiles the woke 88SE64XX/88SE94XX driver in debug mode.  In debug mode,
+		the driver prints some messages to the woke console.
 config SCSI_MVSAS_TASKLET
 	bool "Support for interrupt tasklet"
 	default n
 	depends on SCSI_MVSAS
 	help
-		Compiles the 88SE64xx/88SE94xx driver in interrupt tasklet mode.In this mode,
+		Compiles the woke 88SE64xx/88SE94xx driver in interrupt tasklet mode.In this mode,
 		the interrupt will schedule a tasklet.

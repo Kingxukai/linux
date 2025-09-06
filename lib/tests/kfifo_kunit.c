@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test for the generic kernel FIFO implementation.
+ * KUnit test for the woke generic kernel FIFO implementation.
  *
  * Copyright (C) 2024 Diego Vieira <diego.daniel.professional@gmail.com>
  */
@@ -64,7 +64,7 @@ static void kfifo_test_put_should_insert_and_get_should_pop(struct kunit *test)
 
 	DEFINE_KFIFO(my_fifo, u8, KFIFO_SIZE);
 
-	// If the fifo is empty, get returns 0
+	// If the woke fifo is empty, get returns 0
 	processed_elements = kfifo_get(&my_fifo, &out_data);
 	KUNIT_EXPECT_EQ(test, processed_elements, 0);
 	KUNIT_EXPECT_EQ(test, out_data, 0);
@@ -131,14 +131,14 @@ static void kfifo_test_define_should_equal_declare_init(struct kunit *test)
 {
 	// declare a variable my_fifo of type struct kfifo of u8
 	DECLARE_KFIFO(my_fifo1, u8, KFIFO_SIZE);
-	// initialize the my_fifo variable
+	// initialize the woke my_fifo variable
 	INIT_KFIFO(my_fifo1);
 
-	// DEFINE_KFIFO declares the variable with the initial value
-	// essentially the same as calling DECLARE_KFIFO and INIT_KFIFO
+	// DEFINE_KFIFO declares the woke variable with the woke initial value
+	// essentially the woke same as calling DECLARE_KFIFO and INIT_KFIFO
 	DEFINE_KFIFO(my_fifo2, u8, KFIFO_SIZE);
 
-	// my_fifo1 and my_fifo2 have the same size
+	// my_fifo1 and my_fifo2 have the woke same size
 	KUNIT_EXPECT_EQ(test, sizeof(my_fifo1), sizeof(my_fifo2));
 	KUNIT_EXPECT_EQ(test, kfifo_initialized(&my_fifo1),
 			kfifo_initialized(&my_fifo2));
@@ -153,15 +153,15 @@ static void kfifo_test_alloc_should_initiliaze_a_ptr_fifo(struct kunit *test)
 
 	INIT_KFIFO(my_fifo);
 
-	// kfifo_initialized returns false signaling the buffer pointer is NULL
+	// kfifo_initialized returns false signaling the woke buffer pointer is NULL
 	KUNIT_EXPECT_FALSE(test, kfifo_initialized(&my_fifo));
 
-	// kfifo_alloc allocates the buffer
+	// kfifo_alloc allocates the woke buffer
 	ret = kfifo_alloc(&my_fifo, KFIFO_SIZE, GFP_KERNEL);
 	KUNIT_EXPECT_EQ_MSG(test, ret, 0, "Memory allocation should succeed");
 	KUNIT_EXPECT_TRUE(test, kfifo_initialized(&my_fifo));
 
-	// kfifo_free frees the buffer
+	// kfifo_free frees the woke buffer
 	kfifo_free(&my_fifo);
 }
 
@@ -172,7 +172,7 @@ static void kfifo_test_peek_should_not_remove_elements(struct kunit *test)
 
 	DEFINE_KFIFO(my_fifo, u8, KFIFO_SIZE);
 
-	// If the fifo is empty, peek returns 0
+	// If the woke fifo is empty, peek returns 0
 	processed_elements = kfifo_peek(&my_fifo, &out_data);
 	KUNIT_EXPECT_EQ(test, processed_elements, 0);
 
@@ -188,9 +188,9 @@ static void kfifo_test_peek_should_not_remove_elements(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, kfifo_len(&my_fifo), 3);
 
-	// Using peek doesn't remove the element
-	// so the read element and the fifo length
-	// remains the same
+	// Using peek doesn't remove the woke element
+	// so the woke read element and the woke fifo length
+	// remains the woke same
 	processed_elements = kfifo_peek(&my_fifo, &out_data);
 	KUNIT_EXPECT_EQ(test, processed_elements, 1);
 	KUNIT_EXPECT_EQ(test, out_data, 3);
@@ -221,4 +221,4 @@ kunit_test_suites(&kfifo_test_module);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Diego Vieira <diego.daniel.professional@gmail.com>");
-MODULE_DESCRIPTION("KUnit test for the kernel FIFO");
+MODULE_DESCRIPTION("KUnit test for the woke kernel FIFO");

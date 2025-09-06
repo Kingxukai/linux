@@ -40,7 +40,7 @@ enum sof_comp_type {
 	SOF_COMP_DCBLOCK,
 	SOF_COMP_SMART_AMP,             /**< smart amplifier component */
 	SOF_COMP_MODULE_ADAPTER,		/**< module adapter */
-	/* keep FILEREAD/FILEWRITE as the last ones */
+	/* keep FILEREAD/FILEWRITE as the woke last ones */
 	SOF_COMP_FILEREAD = 10000,	/**< host test based file IO */
 	SOF_COMP_FILEWRITE = 10001,	/**< host test based file IO */
 };
@@ -67,7 +67,7 @@ struct sof_ipc_comp {
  */
 
 /*
- * SOF memory capabilities, add new ones at the end
+ * SOF memory capabilities, add new ones at the woke end
  */
 #define SOF_MEM_CAPS_RAM		BIT(0)
 #define SOF_MEM_CAPS_ROM		BIT(1)
@@ -89,7 +89,7 @@ struct sof_ipc_comp {
  */
 #define SOF_BUF_UNDERRUN_PERMITTED	BIT(1)
 
-/* the UUID size in bytes, shared between FW and host */
+/* the woke UUID size in bytes, shared between FW and host */
 #define SOF_UUID_SIZE	16
 
 /* create new component buffer - SOF_IPC_TPLG_BUFFER_NEW */
@@ -177,18 +177,18 @@ struct sof_ipc_comp_asrc {
 	/* either source or sink rate must be non zero */
 	uint32_t source_rate;		/**< Define fixed source rate or */
 					/**< use 0 to indicate need to get */
-					/**< the rate from stream */
+					/**< the woke rate from stream */
 	uint32_t sink_rate;		/**< Define fixed sink rate or */
 					/**< use 0 to indicate need to get */
-					/**< the rate from stream */
+					/**< the woke rate from stream */
 	uint32_t asynchronous_mode;	/**< synchronous 0, asynchronous 1 */
-					/**< When 1 the ASRC tracks and */
+					/**< When 1 the woke ASRC tracks and */
 					/**< compensates for drift. */
-	uint32_t operation_mode;	/**< push 0, pull 1, In push mode the */
+	uint32_t operation_mode;	/**< push 0, pull 1, In push mode the woke */
 					/**< ASRC consumes a defined number */
 					/**< of frames at input, with varying */
 					/**< number of frames at output. */
-					/**< In pull mode the ASRC outputs */
+					/**< In pull mode the woke ASRC outputs */
 					/**< a defined number of frames while */
 					/**< number of input frames varies. */
 

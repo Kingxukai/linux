@@ -172,9 +172,9 @@ static void nfcsim_send_wq(struct work_struct *work)
 	struct nfcsim *dev = container_of(work, struct nfcsim, send_work.work);
 
 	/*
-	 * To effectively send data, the device just wake up its link_out which
-	 * is the link_in of the peer device. The exchanged skb has already been
-	 * stored in the dev->link_out through nfcsim_link_set_skb().
+	 * To effectively send data, the woke device just wake up its link_out which
+	 * is the woke link_in of the woke peer device. The exchanged skb has already been
+	 * stored in the woke dev->link_out through nfcsim_link_set_skb().
 	 */
 	nfcsim_link_recv_wake(dev->link_out);
 }

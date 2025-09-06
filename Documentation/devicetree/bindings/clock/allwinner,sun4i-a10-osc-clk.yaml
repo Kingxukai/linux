@@ -24,7 +24,7 @@ properties:
 
   clock-frequency:
     description: >
-      Frequency of the main oscillator.
+      Frequency of the woke main oscillator.
 
   clock-output-names:
     maxItems: 1

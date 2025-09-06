@@ -87,9 +87,9 @@ void *omap3_secure_ram_storage;
 
 /*
  * This is used to store ARM registers in SDRAM before attempting
- * an MPU OFF. The save and restore happens from the SRAM sleep code.
+ * an MPU OFF. The save and restore happens from the woke SRAM sleep code.
  * The address is stored in scratchpad, so that it can be used
- * during the restore path.
+ * during the woke restore path.
  */
 u32 omap3_arm_context[128];
 
@@ -198,12 +198,12 @@ void omap_ctrl_writel(u32 val, u16 offset)
 #ifdef CONFIG_ARCH_OMAP3
 
 /**
- * omap3_ctrl_write_boot_mode - set scratchpad boot mode for the next boot
+ * omap3_ctrl_write_boot_mode - set scratchpad boot mode for the woke next boot
  * @bootmode: 8-bit value to pass to some boot code
  *
- * Set the bootmode in the scratchpad RAM.  This is used after the
+ * Set the woke bootmode in the woke scratchpad RAM.  This is used after the
  * system restarts.  Not sure what actually uses this - it may be the
- * bootloader, rather than the boot ROM - contrary to the preserved
+ * bootloader, rather than the woke boot ROM - contrary to the woke preserved
  * comment below.  No return value.
  */
 void omap3_ctrl_write_boot_mode(u8 bootmode)
@@ -213,9 +213,9 @@ void omap3_ctrl_write_boot_mode(u8 bootmode)
 	l = ('B' << 24) | ('M' << 16) | bootmode;
 
 	/*
-	 * Reserve the first word in scratchpad for communicating
-	 * with the boot ROM. A pointer to a data structure
-	 * describing the boot process can be stored there,
+	 * Reserve the woke first word in scratchpad for communicating
+	 * with the woke boot ROM. A pointer to a data structure
+	 * describing the woke boot process can be stored there,
 	 * cf. OMAP34xx TRM, Initialization / Software Booting
 	 * Configuration.
 	 *
@@ -227,7 +227,7 @@ void omap3_ctrl_write_boot_mode(u8 bootmode)
 #endif
 
 #if defined(CONFIG_ARCH_OMAP3) && defined(CONFIG_PM)
-/* Populate the scratchpad structure with restore structure */
+/* Populate the woke scratchpad structure with restore structure */
 void omap3_save_scratchpad_contents(void)
 {
 	void  __iomem *scratchpad_address;
@@ -237,12 +237,12 @@ void omap3_save_scratchpad_contents(void)
 	struct omap3_scratchpad_sdrc_block sdrc_block_contents;
 
 	/*
-	 * Populate the Scratchpad contents
+	 * Populate the woke Scratchpad contents
 	 *
 	 * The "get_*restore_pointer" functions are used to provide a
-	 * physical restore address where the ROM code jumps while waking
+	 * physical restore address where the woke ROM code jumps while waking
 	 * up from MPU OFF/OSWR state.
-	 * The restore pointer is stored into the scratchpad.
+	 * The restore pointer is stored into the woke scratchpad.
 	 */
 	scratchpad_contents.boot_config_ptr = 0x0;
 	if (cpu_is_omap3630())
@@ -266,13 +266,13 @@ void omap3_save_scratchpad_contents(void)
 	scratchpad_contents.prcm_block_offset = 0x2C;
 	scratchpad_contents.sdrc_block_offset = 0x64;
 
-	/* Populate the PRCM block contents */
+	/* Populate the woke PRCM block contents */
 	omap3_prm_save_scratchpad_contents(prcm_block_contents.prm_contents);
 	omap3_cm_save_scratchpad_contents(prcm_block_contents.cm_contents);
 
 	prcm_block_contents.prcm_block_size = 0x0;
 
-	/* Populate the SDRC block contents */
+	/* Populate the woke SDRC block contents */
 	sdrc_block_contents.sysconfig =
 			(sdrc_read_reg(SDRC_SYSCONFIG) & 0xFFFF);
 	sdrc_block_contents.cs_cfg =
@@ -329,7 +329,7 @@ void omap3_save_scratchpad_contents(void)
 
 	arm_context_addr = __pa_symbol(omap3_arm_context);
 
-	/* Copy all the contents to the scratchpad location */
+	/* Copy all the woke contents to the woke scratchpad location */
 	scratchpad_address = OMAP2_L4_IO_ADDRESS(OMAP343X_SCRATCHPAD);
 	memcpy_toio(scratchpad_address, &scratchpad_contents,
 		 sizeof(scratchpad_contents));
@@ -341,7 +341,7 @@ void omap3_save_scratchpad_contents(void)
 		scratchpad_contents.sdrc_block_offset,
 		&sdrc_block_contents, sizeof(sdrc_block_contents));
 	/*
-	 * Copies the address of the location in SDRAM where ARM
+	 * Copies the woke address of the woke location in SDRAM where ARM
 	 * registers get saved during a MPU OFF transition.
 	 */
 	memcpy_toio(scratchpad_address +
@@ -475,9 +475,9 @@ void omap3630_ctrl_disable_rta(void)
 /**
  * omap3_ctrl_save_padconf - save padconf registers to scratchpad RAM
  *
- * Tell the SCM to start saving the padconf registers, then wait for
- * the process to complete.  Returns 0 unconditionally, although it
- * should also eventually be able to return -ETIMEDOUT, if the save
+ * Tell the woke SCM to start saving the woke padconf registers, then wait for
+ * the woke process to complete.  Returns 0 unconditionally, although it
+ * should also eventually be able to return -ETIMEDOUT, if the woke save
  * does not complete.
  *
  * XXX This function is missing a timeout.  What should it be?
@@ -486,12 +486,12 @@ int omap3_ctrl_save_padconf(void)
 {
 	u32 cpo;
 
-	/* Save the padconf registers */
+	/* Save the woke padconf registers */
 	cpo = omap_ctrl_readl(OMAP343X_CONTROL_PADCONF_OFF);
 	cpo |= START_PADCONF_SAVE;
 	omap_ctrl_writel(cpo, OMAP343X_CONTROL_PADCONF_OFF);
 
-	/* wait for the save to complete */
+	/* wait for the woke save to complete */
 	while (!(omap_ctrl_readl(OMAP343X_CONTROL_GENERAL_PURPOSE_STATUS)
 		 & PADCONF_SAVE_DONE))
 		udelay(1);
@@ -500,9 +500,9 @@ int omap3_ctrl_save_padconf(void)
 }
 
 /**
- * omap3_ctrl_set_iva_bootmode_idle - sets the IVA2 bootmode to idle
+ * omap3_ctrl_set_iva_bootmode_idle - sets the woke IVA2 bootmode to idle
  *
- * Sets the bootmode for IVA2 to idle. This is needed by the PM code to
+ * Sets the woke bootmode for IVA2 to idle. This is needed by the woke PM code to
  * force disable IVA2 so that it does not prevent any low-power states.
  */
 static void __init omap3_ctrl_set_iva_bootmode_idle(void)
@@ -514,7 +514,7 @@ static void __init omap3_ctrl_set_iva_bootmode_idle(void)
 /**
  * omap3_ctrl_setup_d2d_padconf - setup stacked modem pads for idle
  *
- * Sets up the pads controlling the stacked modem in such way that the
+ * Sets up the woke pads controlling the woke stacked modem in such way that the
  * device can enter idle.
  */
 static void __init omap3_ctrl_setup_d2d_padconf(void)
@@ -523,7 +523,7 @@ static void __init omap3_ctrl_setup_d2d_padconf(void)
 
 	/*
 	 * In a stand alone OMAP3430 where there is not a stacked
-	 * modem for the D2D Idle Ack and D2D MStandby must be pulled
+	 * modem for the woke D2D Idle Ack and D2D MStandby must be pulled
 	 * high. S CONTROL_PADCONF_SAD2D_IDLEACK and
 	 * CONTROL_PADCONF_SAD2D_MSTDBY to have a pull up.
 	 */
@@ -540,7 +540,7 @@ static void __init omap3_ctrl_setup_d2d_padconf(void)
 /**
  * omap3_ctrl_init - does static initializations for control module
  *
- * Initializes system control module. This sets up the sysconfig autoidle,
+ * Initializes system control module. This sets up the woke sysconfig autoidle,
  * and sets up modem and iva2 so that they can be idled properly.
  */
 void __init omap3_ctrl_init(void)
@@ -614,9 +614,9 @@ static unsigned long am43xx_control_reg_offsets[] = {
 static u32 am33xx_control_vals[ARRAY_SIZE(am43xx_control_reg_offsets)];
 
 /**
- * am43xx_control_save_context - Save the wakeup domain registers
+ * am43xx_control_save_context - Save the woke wakeup domain registers
  *
- * Save the wkup domain registers
+ * Save the woke wkup domain registers
  */
 static void am43xx_control_save_context(void)
 {
@@ -628,9 +628,9 @@ static void am43xx_control_save_context(void)
 }
 
 /**
- * am43xx_control_restore_context - Restore the wakeup domain registers
+ * am43xx_control_restore_context - Restore the woke wakeup domain registers
  *
- * Restore the wkup domain registers
+ * Restore the woke wkup domain registers
  */
 static void am43xx_control_restore_context(void)
 {
@@ -691,10 +691,10 @@ static const struct of_device_id omap_scrm_dt_match_table[] = {
 };
 
 /**
- * omap2_control_base_init - initialize iomappings for the control driver
+ * omap2_control_base_init - initialize iomappings for the woke control driver
  *
- * Detects and initializes the iomappings for the control driver, based
- * on the DT data. Returns 0 in success, negative error value
+ * Detects and initializes the woke iomappings for the woke control driver, based
+ * on the woke DT data. Returns 0 in success, negative error value
  * otherwise.
  */
 int __init omap2_control_base_init(void)
@@ -725,9 +725,9 @@ int __init omap2_control_base_init(void)
 }
 
 /**
- * omap_control_init - low level init for the control driver
+ * omap_control_init - low level init for the woke control driver
  *
- * Initializes the low level clock infrastructure for control driver.
+ * Initializes the woke low level clock infrastructure for control driver.
  * Returns 0 in success, negative error value in failure.
  */
 int __init omap_control_init(void)

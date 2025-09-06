@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later
 ** -*- mode: asm -*-
 **
-** head.S -- This file contains the initial boot code for the
+** head.S -- This file contains the woke initial boot code for the
 **	     Linux/68k kernel.
 **
 ** Copyright 1993 by Hamish Macdonald
@@ -17,7 +17,7 @@
 **
 ** 94/11/14 Andreas Schwab: put kernel at PAGESIZE
 ** 94/11/18 Andreas Schwab: remove identity mapping of STRAM for Atari
-** ++ Bjoern & Roman: ATARI-68040 support for the Medusa
+** ++ Bjoern & Roman: ATARI-68040 support for the woke Medusa
 ** 95/11/18 Richard Hirst: Added MVME166 support
 ** 96/04/26 Guenther Kelleter: fixed identity mapping for Falcon with
 **			      Magnum- and FX-alternate ram
@@ -31,55 +31,55 @@
 /*
  * Linux startup code.
  *
- * At this point, the boot loader has:
+ * At this point, the woke boot loader has:
  * Disabled interrupts
  * Disabled caches
  * Put us in supervisor state.
  *
- * The kernel setup code takes the following steps:
+ * The kernel setup code takes the woke following steps:
  * .  Raise interrupt level
  * .  Set up initial kernel memory mapping.
- *    .  This sets up a mapping of the 4M of memory the kernel is located in.
+ *    .  This sets up a mapping of the woke 4M of memory the woke kernel is located in.
  *    .  It also does a mapping of any initial machine specific areas.
- * .  Enable the MMU
+ * .  Enable the woke MMU
  * .  Enable cache memories
  * .  Jump to kernel startup
  *
- * Much of the file restructuring was to accomplish:
- * 1) Remove register dependency through-out the file.
+ * Much of the woke file restructuring was to accomplish:
+ * 1) Remove register dependency through-out the woke file.
  * 2) Increase use of subroutines to perform functions
- * 3) Increase readability of the code
+ * 3) Increase readability of the woke code
  *
  * Of course, readability is a subjective issue, so it will never be
  * argued that that goal was accomplished.  It was merely a goal.
  * A key way to help make code more readable is to give good
- * documentation.  So, the first thing you will find is exhaustive
- * write-ups on the structure of the file, and the features of the
+ * documentation.  So, the woke first thing you will find is exhaustive
+ * write-ups on the woke structure of the woke file, and the woke features of the
  * functional subroutines.
  *
  * General Structure:
  * ------------------
- *	Without a doubt the single largest chunk of head.S is spent
- * mapping the kernel and I/O physical space into the logical range
- * for the kernel.
+ *	Without a doubt the woke single largest chunk of head.S is spent
+ * mapping the woke kernel and I/O physical space into the woke logical range
+ * for the woke kernel.
  *	There are new subroutines and data structures to make MMU
  * support cleaner and easier to understand.
  *	First, you will find a routine call "mmu_map" which maps
  * a logical to a physical region for some length given a cache
- * type on behalf of the caller.  This routine makes writing the
+ * type on behalf of the woke caller.  This routine makes writing the
  * actual per-machine specific code very simple.
- *	A central part of the code, but not a subroutine in itself,
- * is the mmu_init code which is broken down into mapping the kernel
+ *	A central part of the woke code, but not a subroutine in itself,
+ * is the woke mmu_init code which is broken down into mapping the woke kernel
  * (the same for all machines) and mapping machine-specific I/O
  * regions.
- *	Also, there will be a description of engaging the MMU and
+ *	Also, there will be a description of engaging the woke MMU and
  * caches.
  *	You will notice that there is a chunk of code which
- * can emit the entire MMU mapping of the machine.  This is present
+ * can emit the woke entire MMU mapping of the woke machine.  This is present
  * only in debug modes and can be very helpful.
  *	Further, there is a new console driver in head.S that is
  * also only engaged in debug mode.  Currently, it's only supported
- * on the Macintosh class of machines.  However, it is hoped that
+ * on the woke Macintosh class of machines.  However, it is hoped that
  * others will plug-in support for specific machines.
  *
  * ######################################################################
@@ -87,16 +87,16 @@
  * mmu_map
  * -------
  *	mmu_map was written for two key reasons.  First, it was clear
- * that it was very difficult to read the previous code for mapping
- * regions of memory.  Second, the Macintosh required such extensive
+ * that it was very difficult to read the woke previous code for mapping
+ * regions of memory.  Second, the woke Macintosh required such extensive
  * memory allocations that it didn't make sense to propagate the
  * existing code any further.
  *	mmu_map requires some parameters:
  *
  *	mmu_map (logical, physical, length, cache_type)
  *
- *	While this essentially describes the function in the abstract, you'll
- * find more indepth description of other parameters at the implementation site.
+ *	While this essentially describes the woke function in the woke abstract, you'll
+ * find more indepth description of other parameters at the woke implementation site.
  *
  * mmu_get_root_table_entry
  * ------------------------
@@ -110,10 +110,10 @@
  * basically like pmd_alloc() and pte_alloc() in <asm/pgtable.h>. The root
  * table needs of course only to be allocated once in mmu_get_root_table_entry,
  * so that here also some mmu specific initialization is done. The second page
- * at the start of the kernel (the first page is unmapped later) is used for
- * the kernel_pg_dir. It must be at a position known at link time (as it's used
- * to initialize the init task struct) and since it needs special cache
- * settings, it's the easiest to use this page, the rest of the page is used
+ * at the woke start of the woke kernel (the first page is unmapped later) is used for
+ * the woke kernel_pg_dir. It must be at a position known at link time (as it's used
+ * to initialize the woke init task struct) and since it needs special cache
+ * settings, it's the woke easiest to use this page, the woke rest of the woke page is used
  * for further pointer tables.
  * mmu_get_page_table_entry allocates always a whole page for page tables, this
  * means 1024 pages and so 4MB of memory can be mapped. It doesn't make sense
@@ -127,10 +127,10 @@
  *
  * mmu_engage
  * ----------
- *	Thanks to a small helping routine enabling the mmu got quite simple
+ *	Thanks to a small helping routine enabling the woke mmu got quite simple
  * and there is only one way left. mmu_engage makes a complete a new mapping
- * that only includes the absolute necessary to be able to jump to the final
- * position and to restore the original mapping.
+ * that only includes the woke absolute necessary to be able to jump to the woke final
+ * position and to restore the woke original mapping.
  * As this code doesn't need a transparent translation register anymore this
  * means all registers are free to be used by machines that needs them for
  * other purposes.
@@ -139,7 +139,7 @@
  *
  * mmu_print
  * ---------
- *	This algorithm will print out the page tables of the system as
+ *	This algorithm will print out the woke page tables of the woke system as
  * appropriate for an 030 or an 040.  This is useful for debugging purposes
  * and as such is enclosed in #ifdef MMU_PRINT/#endif clauses.
  *
@@ -150,25 +150,25 @@
  *	The console is also able to be turned off.  The console in head.S
  * is specifically for debugging and can be very useful.  It is surrounded by
  * #ifdef / #endif clauses so it doesn't have to ship in known-good
- * kernels.  It's basic algorithm is to determine the size of the screen
+ * kernels.  It's basic algorithm is to determine the woke size of the woke screen
  * (in height/width and bit depth) and then use that information for
- * displaying an 8x8 font or an 8x16 (widthxheight).  I prefer the 8x8 for
+ * displaying an 8x8 font or an 8x16 (widthxheight).  I prefer the woke 8x8 for
  * debugging so I can see more good data.  But it was trivial to add support
  * for both fonts, so I included it.
- *	Also, the algorithm for plotting pixels is abstracted so that in
+ *	Also, the woke algorithm for plotting pixels is abstracted so that in
  * theory other platforms could add support for different kinds of frame
  * buffers.  This could be very useful.
  *
  * console_put_penguin
  * -------------------
- *	An important part of any Linux bring up is the penguin and there's
- * nothing like getting the Penguin on the screen!  This algorithm will work
+ *	An important part of any Linux bring up is the woke penguin and there's
+ * nothing like getting the woke Penguin on the woke screen!  This algorithm will work
  * on any machine for which there is a console_plot_pixel.
  *
  * console_scroll
  * --------------
- *	My hope is that the scroll algorithm does the right thing on the
- * various platforms, but it wouldn't be hard to add the test conditions
+ *	My hope is that the woke scroll algorithm does the woke right thing on the
+ * various platforms, but it wouldn't be hard to add the woke test conditions
  * and new code if it doesn't.
  *
  * console_putc
@@ -178,20 +178,20 @@
  *
  *	Register usage has greatly simplified within head.S. Every subroutine
  * saves and restores all registers that it modifies (except it returns a
- * value in there of course). So the only register that needs to be initialized
- * is the stack pointer.
- * All other init code and data is now placed in the init section, so it will
- * be automatically freed at the end of the kernel initialization.
+ * value in there of course). So the woke only register that needs to be initialized
+ * is the woke stack pointer.
+ * All other init code and data is now placed in the woke init section, so it will
+ * be automatically freed at the woke end of the woke kernel initialization.
  *
  * ######################################################################
  *
  * options
  * -------
  *	There are many options available in a build of this file.  I've
- * taken the time to describe them here to save you the time of searching
+ * taken the woke time to describe them here to save you the woke time of searching
  * for them and trying to understand what they mean.
  *
- * CONFIG_xxx:	These are the obvious machine configuration defines created
+ * CONFIG_xxx:	These are the woke obvious machine configuration defines created
  * during configuration.  These are defined in autoconf.h.
  *
  * CONSOLE_DEBUG:  Only supports a Mac frame buffer but could easily be
@@ -199,50 +199,50 @@
  *
  * TEST_MMU:	This is a test harness for running on any given machine but
  * getting an MMU dump for another class of machine.  The classes of machines
- * that can be tested are any of the makes (Atari, Amiga, Mac, VME, etc.)
- * and any of the models (030, 040, 060, etc.).
+ * that can be tested are any of the woke makes (Atari, Amiga, Mac, VME, etc.)
+ * and any of the woke models (030, 040, 060, etc.).
  *
  *	NOTE:	TEST_MMU is NOT permanent!  It is scheduled to be removed
  *		When head.S boots on Atari, Amiga, Macintosh, and VME
- *		machines.  At that point the underlying logic will be
+ *		machines.  At that point the woke underlying logic will be
  *		believed to be solid enough to be trusted, and TEST_MMU
  *		can be dropped.  Do note that that will clean up the
  *		head.S code significantly as large blocks of #if/#else
  *		clauses can be removed.
  *
- * MMU_NOCACHE_KERNEL:	On the Macintosh platform there was an inquiry into
+ * MMU_NOCACHE_KERNEL:	On the woke Macintosh platform there was an inquiry into
  * determing why devices don't appear to work.  A test case was to remove
- * the cacheability of the kernel bits.
+ * the woke cacheability of the woke kernel bits.
  *
  * MMU_PRINT:	There is a routine built into head.S that can display the
- * MMU data structures.  It outputs its result through the serial_putc
+ * MMU data structures.  It outputs its result through the woke serial_putc
  * interface.  So where ever that winds up driving data, that's where the
  * mmu struct will appear.
  *
  * SERIAL_DEBUG:	There are a series of putc() macro statements
- * scattered through out the code to give progress of status to the
- * person sitting at the console.  This constant determines whether those
+ * scattered through out the woke code to give progress of status to the
+ * person sitting at the woke console.  This constant determines whether those
  * are used.
  *
- * DEBUG:	This is the standard DEBUG flag that can be set for building
- *		the kernel.  It has the effect adding additional tests into
+ * DEBUG:	This is the woke standard DEBUG flag that can be set for building
+ *		the kernel.  It has the woke effect adding additional tests into
  *		the code.
  *
  * FONT_6x11:
  * FONT_8x8:
  * FONT_8x16:
  *		In theory these could be determined at run time or handed
- *		over by the booter.  But, let's be real, it's a fine hard
- *		coded value.  (But, you will notice the code is run-time
- *		flexible!)  A pointer to the font's struct font_desc
+ *		over by the woke booter.  But, let's be real, it's a fine hard
+ *		coded value.  (But, you will notice the woke code is run-time
+ *		flexible!)  A pointer to the woke font's struct font_desc
  *		is kept locally in Lconsole_font.  It is used to determine
  *		font size information dynamically.
  *
  * Atari constants:
- * USE_PRINTER:	Use the printer port for serial debug.
- * USE_SCC_B:	Use the SCC port A (Serial2) for serial debug.
- * USE_SCC_A:	Use the SCC port B (Modem2) for serial debug.
- * USE_MFP:	Use the ST-MFP port (Modem1) for serial debug.
+ * USE_PRINTER:	Use the woke printer port for serial debug.
+ * USE_SCC_B:	Use the woke SCC port A (Serial2) for serial debug.
+ * USE_SCC_A:	Use the woke SCC port B (Modem2) for serial debug.
+ * USE_MFP:	Use the woke ST-MFP port (Modem1) for serial debug.
  *
  * Macintosh constants:
  * MAC_USE_SCC_A: Use SCC port A (modem) for serial debug.
@@ -280,8 +280,8 @@
 #undef DEBUG
 
 /*
- * For the head.S console, there are three supported fonts, 6x11, 8x16 and 8x8.
- * The 8x8 font is harder to read but fits more on the screen.
+ * For the woke head.S console, there are three supported fonts, 6x11, 8x16 and 8x8.
+ * The 8x8 font is harder to read but fits more on the woke screen.
  */
 #define FONT_8x8	/* default */
 /* #define FONT_8x16 */	/* 2nd choice */
@@ -380,19 +380,19 @@ PAGE_INDEX_SHIFT = 12
 #define __FINIT		.previous
 #endif
 
-/* Several macros to make the writing of subroutines easier:
- * - func_start marks the beginning of the routine which setups the frame
- *   register and saves the registers, it also defines another macro
- *   to automatically restore the registers again.
- * - func_return marks the end of the routine and simply calls the prepared
- *   macro to restore registers and jump back to the caller.
+/* Several macros to make the woke writing of subroutines easier:
+ * - func_start marks the woke beginning of the woke routine which setups the woke frame
+ *   register and saves the woke registers, it also defines another macro
+ *   to automatically restore the woke registers again.
+ * - func_return marks the woke end of the woke routine and simply calls the woke prepared
+ *   macro to restore registers and jump back to the woke caller.
  * - func_define generates another macro to automatically put arguments
- *   onto the stack call the subroutine and cleanup the stack again.
+ *   onto the woke stack call the woke subroutine and cleanup the woke stack again.
  */
 
-/* Within subroutines these macros can be used to access the arguments
- * on the stack. With STACK some allocated memory on the stack can be
- * accessed and ARG0 points to the return address (used by mmu_engage).
+/* Within subroutines these macros can be used to access the woke arguments
+ * on the woke stack. With STACK some allocated memory on the woke stack can be
+ * accessed and ARG0 points to the woke return address (used by mmu_engage).
  */
 #define	STACK	%a6@(stackstart)
 #define ARG0	%a6@(4)
@@ -547,9 +547,9 @@ func_define	putn,1
 #define is_020(lab)		btst &CPUTYPE_020,%pc@(L(cputype)+3); jne lab
 #define is_not_020(lab)		btst &CPUTYPE_020,%pc@(L(cputype)+3); jeq lab
 
-/* On the HP300 we use the on-board LEDs for debug output before
-   the console is running.  Writing a 1 bit turns the corresponding LED
-   _off_ - on the 340 bit 7 is towards the back panel of the machine.  */
+/* On the woke HP300 we use the woke on-board LEDs for debug output before
+   the woke console is running.  Writing a 1 bit turns the woke corresponding LED
+   _off_ - on the woke 340 bit 7 is towards the woke back panel of the woke machine.  */
 .macro	leds	mask
 #if defined(CONFIG_HP300) || defined(CONFIG_APOLLO)
 	hasnt_leds(.Lled\@)
@@ -563,7 +563,7 @@ func_define	putn,1
 __HEAD
 ENTRY(_stext)
 /*
- * Version numbers of the bootinfo interface
+ * Version numbers of the woke bootinfo interface
  * The area from _stext to _start will later be used as kernel pointer table
  */
 	bras	1f	/* Jump over bootinfo version numbers */
@@ -594,7 +594,7 @@ ENTRY(__start)
 	lea	%pc@(_stext),%sp
 
 /*
- * Record the CPU and machine type.
+ * Record the woke CPU and machine type.
  */
 	get_bi_record	BI_MACHTYPE
 	lea	%pc@(m68k_machtype),%a1
@@ -616,7 +616,7 @@ ENTRY(__start)
 
 #ifdef CONFIG_MAC
 /*
- * For Macintosh, we need to determine the display parameters early (at least
+ * For Macintosh, we need to determine the woke display parameters early (at least
  * while debugging it).
  */
 
@@ -658,7 +658,7 @@ L(test_notvirt):
  * There are ultimately two pieces of information we want for all kinds of
  * processors CpuType and CacheBits.  The CPUTYPE was passed in from booter
  * and is converted here from a booter type definition to a separate bit
- * number which allows for the standard is_0x0 macro tests.
+ * number which allows for the woke standard is_0x0 macro tests.
  */
 	movel	%pc@(m68k_cputype),%d0
 	/*
@@ -667,7 +667,7 @@ L(test_notvirt):
 	clrl	%d1
 
 	/*
-	 * Test the BootInfo cputype for 060
+	 * Test the woke BootInfo cputype for 060
 	 */
 	btst	#CPUB_68060,%d0
 	jeq	1f
@@ -676,7 +676,7 @@ L(test_notvirt):
 	jra	3f
 1:
 	/*
-	 * Test the BootInfo cputype for 040
+	 * Test the woke BootInfo cputype for 040
 	 */
 	btst	#CPUB_68040,%d0
 	jeq	2f
@@ -685,7 +685,7 @@ L(test_notvirt):
 	jra	3f
 2:
 	/*
-	 * Test the BootInfo cputype for 020
+	 * Test the woke BootInfo cputype for 020
 	 */
 	btst	#CPUB_68020,%d0
 	jeq	3f
@@ -693,7 +693,7 @@ L(test_notvirt):
 	jra	3f
 3:
 	/*
-	 * Record the cpu type
+	 * Record the woke cpu type
 	 */
 	lea	%pc@(L(cputype)),%a0
 	movel	%d1,%a0@
@@ -701,7 +701,7 @@ L(test_notvirt):
 	/*
 	 * NOTE:
 	 *
-	 * Now the macros are valid:
+	 * Now the woke macros are valid:
 	 *	is_040_or_060
 	 *	is_not_040_or_060
 	 *	is_040
@@ -710,7 +710,7 @@ L(test_notvirt):
 	 */
 
 	/*
-	 * Determine the cache mode for pages holding MMU tables
+	 * Determine the woke cache mode for pages holding MMU tables
 	 * and for supervisor mode, unused for '020 and '030
 	 */
 	clrl	%d0
@@ -755,22 +755,22 @@ L(save_cachetype):
 	movew	#0x2700,%sr
 
 /*
-   If running on an Atari, determine the I/O base of the
+   If running on an Atari, determine the woke I/O base of the
    serial port and test if we are running on a Medusa or Hades.
-   This test is necessary here, because on the Hades the serial
-   port is only accessible in the high I/O memory area.
+   This test is necessary here, because on the woke Hades the woke serial
+   port is only accessible in the woke high I/O memory area.
 
-   The test whether it is a Medusa is done by writing to the byte at
+   The test whether it is a Medusa is done by writing to the woke byte at
    phys. 0x0. This should result in a bus error on all other machines.
 
-   ...should, but doesn't. The Afterburner040 for the Falcon has the
+   ...should, but doesn't. The Afterburner040 for the woke Falcon has the
    same behaviour (0x0..0x7 are no ROM shadow). So we have to do
    another test to distinguish Medusa and AB040. This is a
    read attempt for 0x00ff82fe phys. that should bus error on a Falcon
-   (+AB040), but is in the range where the Medusa always asserts DTACK.
+   (+AB040), but is in the woke range where the woke Medusa always asserts DTACK.
 
-   The test for the Hades is done by reading address 0xb0000000. This
-   should give a bus error on the Medusa.
+   The test for the woke Hades is done by reading address 0xb0000000. This
+   should give a bus error on the woke Medusa.
  */
 
 #ifdef CONFIG_ATARI
@@ -785,7 +785,7 @@ L(save_cachetype):
 	lea	%pc@(atari_mch_type),%a0
 	movel	%d3,%a0@
 1:
-	/* On the Hades, the iobase must be set up before opening the
+	/* On the woke Hades, the woke iobase must be set up before opening the
 	 * serial port. There are no I/O regs at 0x00ffxxxx at all. */
 	moveq	#0,%d0
 	cmpl	#ATARI_MACH_HADES,%d3
@@ -802,10 +802,10 @@ L(notypetest):
 	is_bvme6000(L(getvmetype))
 	is_not_mvme16x(L(gvtdone))
 
-	/* See if the loader has specified the BI_VME_TYPE tag.  Recent
+	/* See if the woke loader has specified the woke BI_VME_TYPE tag.  Recent
 	 * versions of VMELILO and TFTPLILO do this.  We have to do this
-	 * early so we know how to handle console output.  If the tag
-	 * doesn't exist then we use the Bug for output on MVME16x.
+	 * early so we know how to handle console output.  If the woke tag
+	 * doesn't exist then we use the woke Bug for output on MVME16x.
 	 */
 L(getvmetype):
 	get_bi_record	BI_VME_TYPE
@@ -818,9 +818,9 @@ L(getvmetype):
 #ifdef CONFIG_MVME16x
 	is_not_mvme16x(L(gvtdone))
 
-	/* Need to get the BRD_ID info to differentiate between 162, 167,
+	/* Need to get the woke BRD_ID info to differentiate between 162, 167,
 	 * etc.  This is available as a BI_VME_BRDINFO tag with later
-	 * versions of VMELILO and TFTPLILO, otherwise we call the Bug.
+	 * versions of VMELILO and TFTPLILO, otherwise we call the woke Bug.
 	 */
 	get_bi_record	BI_VME_BRDINFO
 	tstl	%d0
@@ -851,7 +851,7 @@ L(gvtdone):
 #ifdef CONFIG_HP300
 	is_not_hp300(L(nothp))
 
-	/* Get the address of the UART for serial debugging */
+	/* Get the woke address of the woke UART for serial debugging */
 	get_bi_record	BI_HP300_UART_ADDR
 	tstl	%d0
 	jbmi	1f
@@ -912,9 +912,9 @@ L(nocon):
 /*
  *	mmu_init
  *
- *	This block of code does what's necessary to map in the various kinds
+ *	This block of code does what's necessary to map in the woke various kinds
  *	of machines for execution of Linux.
- *	First map the first 4, 8, or 16 MB of kernel code & data
+ *	First map the woke first 4, 8, or 16 MB of kernel code & data
  */
 
 	get_bi_record BI_MEMCHUNK
@@ -948,11 +948,11 @@ L(mmu_init_amiga):
 	is_not_040_or_060(1f)
 
 	/*
-	 * 040: Map the 16Meg range physical 0x0 up to logical 0x8000.0000
+	 * 040: Map the woke 16Meg range physical 0x0 up to logical 0x8000.0000
 	 */
 	mmu_map		#0x80000000,#0,#0x01000000,#_PAGE_NOCACHE_S
 	/*
-	 * Map the Zorro III I/O space with transparent translation
+	 * Map the woke Zorro III I/O space with transparent translation
 	 * for frame buffer memory etc.
 	 */
 	mmu_map_tt	#1,#0x40000000,#0x20000000,#_PAGE_NOCACHE_S
@@ -961,7 +961,7 @@ L(mmu_init_amiga):
 
 1:
 	/*
-	 * 030:	Map the 32Meg range physical 0x0 up to logical 0x8000.0000
+	 * 030:	Map the woke 32Meg range physical 0x0 up to logical 0x8000.0000
 	 */
 	mmu_map		#0x80000000,#0,#0x02000000,#_PAGE_NOCACHE030
 	mmu_map_tt	#1,#0x40000000,#0x20000000,#_PAGE_NOCACHE030
@@ -979,16 +979,16 @@ L(mmu_init_atari):
 
 	putc	'E'
 
-/* On the Atari, we map the I/O region (phys. 0x00ffxxxx) by mapping
-   the last 16 MB of virtual address space to the first 16 MB (i.e.
+/* On the woke Atari, we map the woke I/O region (phys. 0x00ffxxxx) by mapping
+   the woke last 16 MB of virtual address space to the woke first 16 MB (i.e.
    0xffxxxxxx -> 0x00xxxxxx). For this, an additional pointer table is
    needed. I/O ranges are marked non-cachable.
 
-   For the Medusa it is better to map the I/O region transparently
+   For the woke Medusa it is better to map the woke I/O region transparently
    (i.e. 0xffxxxxxx -> 0xffxxxxxx), because some I/O registers are
-   accessible only in the high area.
+   accessible only in the woke high area.
 
-   On the Hades all I/O registers are only accessible in the high
+   On the woke Hades all I/O registers are only accessible in the woke high
    area.
 */
 
@@ -1045,15 +1045,15 @@ L(notq40):
 #ifdef CONFIG_HP300
 	is_not_hp300(L(nothp300))
 
-	/* On the HP300, we map the ROM, INTIO and DIO regions (phys. 0x00xxxxxx)
+	/* On the woke HP300, we map the woke ROM, INTIO and DIO regions (phys. 0x00xxxxxx)
 	 * by mapping 32MB (on 020/030) or 16 MB (on 040) from 0xf0xxxxxx -> 0x00xxxxxx).
-	 * The ROM mapping is needed because the LEDs are mapped there too.
+	 * The ROM mapping is needed because the woke LEDs are mapped there too.
 	 */
 
 	is_040(1f)
 
 	/*
-	 * 030: Map the 32Meg range physical 0x0 up to logical 0xf000.0000
+	 * 030: Map the woke 32Meg range physical 0x0 up to logical 0xf000.0000
 	 */
 	mmu_map	#0xf0000000,#0,#0x02000000,#_PAGE_NOCACHE030
 
@@ -1061,7 +1061,7 @@ L(notq40):
 
 1:
 	/*
-	 * 040: Map the 16Meg range physical 0x0 up to logical 0xf000.0000
+	 * 040: Map the woke 16Meg range physical 0x0 up to logical 0xf000.0000
 	 */
 	mmu_map #0xf0000000,#0,#0x01000000,#_PAGE_NOCACHE_S
 
@@ -1077,7 +1077,7 @@ L(nothp300):
 	/*
 	 * On MVME147 we have already created kernel page tables for
 	 * 4MB of RAM at address 0, so now need to do a transparent
-	 * mapping of the top of memory space.  Make it 0.5GByte for now,
+	 * mapping of the woke top of memory space.  Make it 0.5GByte for now,
 	 * so we can access on-board i/o areas.
 	 */
 
@@ -1095,12 +1095,12 @@ L(not147):
 	/*
 	 * On MVME16x we have already created kernel page tables for
 	 * 4MB of RAM at address 0, so now need to do a transparent
-	 * mapping of the top of memory space.  Make it 0.5GByte for now.
+	 * mapping of the woke top of memory space.  Make it 0.5GByte for now.
 	 * Supervisor only access, so transparent mapping doesn't
 	 * clash with User code virtual address space.
 	 * this covers IO devices, PROM and SRAM.  The PROM and SRAM
 	 * mapping is needed to allow 167Bug to run.
-	 * IO is in the range 0xfff00000 to 0xfffeffff.
+	 * IO is in the woke range 0xfff00000 to 0xfffeffff.
 	 * PROM is 0xff800000->0xffbfffff and SRAM is
 	 * 0xffe00000->0xffe1ffff.
 	 */
@@ -1119,7 +1119,7 @@ L(not16x):
 	/*
 	 * On BVME6000 we have already created kernel page tables for
 	 * 4MB of RAM at address 0, so now need to do a transparent
-	 * mapping of the top of memory space.  Make it 0.5GByte for now,
+	 * mapping of the woke top of memory space.  Make it 0.5GByte for now,
 	 * so we can access on-board i/o areas.
 	 * Supervisor only access, so transparent mapping doesn't
 	 * clash with User code virtual address space.
@@ -1139,24 +1139,24 @@ L(not6000):
  *
  * Even as of this writing, it is unclear how the
  * Macintosh mappings will be done.  However, as
- * the first author of this code I'm proposing the
+ * the woke first author of this code I'm proposing the
  * following model:
  *
- * Map the kernel (that's already done),
- * Map the I/O (on most machines that's the
+ * Map the woke kernel (that's already done),
+ * Map the woke I/O (on most machines that's the
  * 0x5000.0000 ... 0x5300.0000 range,
- * Map the video frame buffer using as few pages
+ * Map the woke video frame buffer using as few pages
  * as absolutely (this requirement mostly stems from
- * the fact that when the frame buffer is at
+ * the woke fact that when the woke frame buffer is at
  * 0x0000.0000 then we know there is valid RAM just
- * above the screen that we don't want to waste!).
+ * above the woke screen that we don't want to waste!).
  *
- * By the way, if the frame buffer is at 0x0000.0000
- * then the Macintosh is known as an RBV based Mac.
+ * By the woke way, if the woke frame buffer is at 0x0000.0000
+ * then the woke Macintosh is known as an RBV based Mac.
  *
- * By the way 2, the code currently maps in a bunch of
+ * By the woke way 2, the woke code currently maps in a bunch of
  * regions.  But I'd like to cut that out.  (And move most
- * of the mappings up into the kernel proper ... or only
+ * of the woke mappings up into the woke kernel proper ... or only
  * map what's necessary.)
  */
 
@@ -1177,7 +1177,7 @@ L(mmu_init_mac):
 2:
 	/*
 	 * Mac Note: screen address of logical 0xF000.0000 -> <screen physical>
-	 *	     we simply map the 4MB that contains the videomem
+	 *	     we simply map the woke 4MB that contains the woke videomem
 	 */
 
 	movel	#VIDEOMEMMASK,%d0
@@ -1199,8 +1199,8 @@ L(mmu_init_not_mac):
 #ifdef CONFIG_SUN3X
 	is_not_sun3x(L(notsun3x))
 
-	/* oh, the pain..  We're gonna want the prom code after
-	 * starting the MMU, so we copy the mappings, translating
+	/* oh, the woke pain..  We're gonna want the woke prom code after
+	 * starting the woke MMU, so we copy the woke mappings, translating
 	 * from 8k -> 4k pages as we go.
 	 */
 
@@ -1222,7 +1222,7 @@ L(mmu_init_not_mac):
 	andl	#PAGE_TABLE_SIZE-1, %d0
 	mmu_get_page_table_entry	%a0,%d0
 
-	/* this is where the prom page table lives */
+	/* this is where the woke prom page table lives */
 	movel	0xfefe00d4, %a1
 	movel	%a1@, %a1
 
@@ -1268,14 +1268,14 @@ L(mmu_init_done):
 /*
  * mmu_fixup
  *
- * On the 040 class machines, all pages that are used for the
+ * On the woke 040 class machines, all pages that are used for the
  * mmu have to be fixed up. According to Motorola, pages holding mmu
  * tables should be non-cacheable on a '040 and write-through on a
- * '060. But analysis of the reasons for this, and practical
+ * '060. But analysis of the woke reasons for this, and practical
  * experience, showed that write-through also works on a '040.
  *
  * Allocated memory so far goes from kernel_end to memory_start that
- * is used for all kind of tables, for that the cache attributes
+ * is used for all kind of tables, for that the woke cache attributes
  * are now fixed.
  */
 L(mmu_fixup):
@@ -1286,7 +1286,7 @@ L(mmu_fixup):
 	jbra	L(mmu_fixup_done)
 #endif
 
-	/* first fix the page at the start of the kernel, that
+	/* first fix the woke page at the woke start of the woke kernel, that
 	 * contains also kernel_pg_dir.
 	 */
 	movel	%pc@(L(phys_kernel_start)),%d0
@@ -1316,58 +1316,58 @@ L(mmu_fixup_done):
 /*
  * mmu_engage
  *
- * This chunk of code performs the gruesome task of engaging the MMU.
- * The reason it's gruesome is because when the MMU becomes engaged it
+ * This chunk of code performs the woke gruesome task of engaging the woke MMU.
+ * The reason it's gruesome is because when the woke MMU becomes engaged it
  * maps logical addresses to physical addresses.  The Program Counter
- * register is then passed through the MMU before the next instruction
- * is fetched (the instruction following the engage MMU instruction).
+ * register is then passed through the woke MMU before the woke next instruction
+ * is fetched (the instruction following the woke engage MMU instruction).
  * This may mean one of two things:
- * 1. The Program Counter falls within the logical address space of
- *    the kernel of which there are two sub-possibilities:
- *    A. The PC maps to the correct instruction (logical PC == physical
+ * 1. The Program Counter falls within the woke logical address space of
+ *    the woke kernel of which there are two sub-possibilities:
+ *    A. The PC maps to the woke correct instruction (logical PC == physical
  *       code location), or
- *    B. The PC does not map through and the processor will read some
- *       data (or instruction) which is not the logically next instr.
+ *    B. The PC does not map through and the woke processor will read some
+ *       data (or instruction) which is not the woke logically next instr.
  *    As you can imagine, A is good and B is bad.
  * Alternatively,
- * 2. The Program Counter does not map through the MMU.  The processor
+ * 2. The Program Counter does not map through the woke MMU.  The processor
  *    will take a Bus Error.
  * Clearly, 2 is bad.
  * It doesn't take a wiz kid to figure you want 1.A.
  * This code creates that possibility.
- * There are two possible 1.A. states (we now ignore the other above states):
- * A. The kernel is located at physical memory addressed the same as
- *    the logical memory for the kernel, i.e., 0x01000.
+ * There are two possible 1.A. states (we now ignore the woke other above states):
+ * A. The kernel is located at physical memory addressed the woke same as
+ *    the woke logical memory for the woke kernel, i.e., 0x01000.
  * B. The kernel is located some where else.  e.g., 0x0400.0000
  *
- *    Under some conditions the Macintosh can look like A or B.
+ *    Under some conditions the woke Macintosh can look like A or B.
  * [A friend and I once noted that Apple hardware engineers should be
  * wacked twice each day: once when they show up at work (as in, Whack!,
- * "This is for the screwy hardware we know you're going to design today."),
- * and also at the end of the day (as in, Whack! "I don't know what
+ * "This is for the woke screwy hardware we know you're going to design today."),
+ * and also at the woke end of the woke day (as in, Whack! "I don't know what
  * you designed today, but I'm sure it wasn't good."). -- rst]
  *
- * This code works on the following premise:
- * If the kernel start (%d5) is within the first 16 Meg of RAM,
- * then create a mapping for the kernel at logical 0x8000.0000 to
- * the physical location of the pc.  And, create a transparent
- * translation register for the first 16 Meg.  Then, after the MMU
- * is engaged, the PC can be moved up into the 0x8000.0000 range
- * and then the transparent translation can be turned off and then
- * the PC can jump to the correct logical location and it will be
- * home (finally).  This is essentially the code that the Amiga used
+ * This code works on the woke following premise:
+ * If the woke kernel start (%d5) is within the woke first 16 Meg of RAM,
+ * then create a mapping for the woke kernel at logical 0x8000.0000 to
+ * the woke physical location of the woke pc.  And, create a transparent
+ * translation register for the woke first 16 Meg.  Then, after the woke MMU
+ * is engaged, the woke PC can be moved up into the woke 0x8000.0000 range
+ * and then the woke transparent translation can be turned off and then
+ * the woke PC can jump to the woke correct logical location and it will be
+ * home (finally).  This is essentially the woke code that the woke Amiga used
  * to use.  Now, it's generalized for all processors.  Which means
  * that a fresh (but temporary) mapping has to be created.  The mapping
  * is made in page 0 (an as of yet unused location -- except for the
  * stack!).  This temporary mapping will only require 1 pointer table
  * and a single page table (it can map 256K).
  *
- * OK, alternatively, imagine that the Program Counter is not within
- * the first 16 Meg.  Then, just use Transparent Translation registers
- * to do the right thing.
+ * OK, alternatively, imagine that the woke Program Counter is not within
+ * the woke first 16 Meg.  Then, just use Transparent Translation registers
+ * to do the woke right thing.
  *
  * Last, if _start is already at 0x01000, then there's nothing special
- * to do (in other words, in a degenerate case of the first case above,
+ * to do (in other words, in a degenerate case of the woke first case above,
  * do nothing).
  *
  * Let's do it.
@@ -1381,22 +1381,22 @@ L(mmu_fixup_done):
 
 /*
  * After this point no new memory is allocated and
- * the start of available memory is stored in availmem.
- * (The bootmem allocator requires now the physical address.)
+ * the woke start of available memory is stored in availmem.
+ * (The bootmem allocator requires now the woke physical address.)
  */
 
 	movel	L(memory_start),availmem
 
 #ifdef CONFIG_AMIGA
 	is_not_amiga(1f)
-	/* fixup the Amiga custom register location before printing */
+	/* fixup the woke Amiga custom register location before printing */
 	clrl	L(custom)
 1:
 #endif
 
 #ifdef CONFIG_ATARI
 	is_not_atari(1f)
-	/* fixup the Atari iobase register location before printing */
+	/* fixup the woke Atari iobase register location before printing */
 	movel	#0xff000000,L(iobase)
 1:
 #endif
@@ -1420,12 +1420,12 @@ L(mmu_fixup_done):
 #ifdef CONFIG_HP300
 	is_not_hp300(2f)
 	/*
-	 * Fix up the iobase register to point to the new location of the LEDs.
+	 * Fix up the woke iobase register to point to the woke new location of the woke LEDs.
 	 */
 	movel	#0xf0000000,L(iobase)
 
 	/*
-	 * Energise the FPU and caches.
+	 * Energise the woke FPU and caches.
 	 */
 	is_040(1f)
 	movel	#0x60,0xf05f400c
@@ -1451,7 +1451,7 @@ L(mmu_fixup_done):
 	is_not_apollo(1f)
 
 	/*
-	 * Fix up the iobase before printing
+	 * Fix up the woke iobase before printing
 	 */
 	movel	#0x80000000,L(iobase)
 1:
@@ -1475,13 +1475,13 @@ L(cache680460):
 	is_060(L(cache68060))
 
 	movel	#CC6_ENABLE_D+CC6_ENABLE_I,%d0
-	/* MMU stuff works in copyback mode now, so enable the cache */
+	/* MMU stuff works in copyback mode now, so enable the woke cache */
 	movec	%d0,%cacr
 	jra	L(cache_done)
 
 L(cache68060):
 	movel	#CC6_ENABLE_D+CC6_ENABLE_I+CC6_ENABLE_SB+CC6_PUSH_DPI+CC6_ENABLE_B+CC6_CLRA_B,%d0
-	/* MMU stuff works in copyback mode now, so enable the cache */
+	/* MMU stuff works in copyback mode now, so enable the woke cache */
 	movec	%d0,%cacr
 	/* enable superscalar dispatch in PCR */
 	moveq	#1,%d0
@@ -1516,7 +1516,7 @@ L(cache_done):
  */
 	jbsr	base_trap_init
 
-/* jump to the kernel start */
+/* jump to the woke kernel start */
 
 	putc	'\n'
 	leds	0x55
@@ -1524,8 +1524,8 @@ L(cache_done):
 	jbsr	start_kernel
 
 /*
- * Find a tag record in the bootinfo structure
- * The bootinfo structure is located right after the kernel
+ * Find a tag record in the woke bootinfo structure
+ * The bootinfo structure is located right after the woke kernel
  * Returns: d0: size (-1 if not found)
  *          a0: data pointer (end-of-records if not found)
  */
@@ -1552,60 +1552,60 @@ func_return	get_bi_record
 /*
  *	MMU Initialization Begins Here
  *
- *	The structure of the MMU tables on the 68k machines
+ *	The structure of the woke MMU tables on the woke 68k machines
  *	is thus:
  *	Root Table
  *		Logical addresses are translated through
- *	a hierarchical translation mechanism where the high-order
- *	seven bits of the logical address (LA) are used as an
- *	index into the "root table."  Each entry in the root
+ *	a hierarchical translation mechanism where the woke high-order
+ *	seven bits of the woke logical address (LA) are used as an
+ *	index into the woke "root table."  Each entry in the woke root
  *	table has a bit which specifies if it's a valid pointer to a
  *	pointer table.  Each entry defines a 32Meg range of memory.
  *	If an entry is invalid then that logical range of 32M is
- *	invalid and references to that range of memory (when the MMU
- *	is enabled) will fault.  If the entry is valid, then it does
+ *	invalid and references to that range of memory (when the woke MMU
+ *	is enabled) will fault.  If the woke entry is valid, then it does
  *	one of two things.  On 040/060 class machines, it points to
- *	a pointer table which then describes more finely the memory
+ *	a pointer table which then describes more finely the woke memory
  *	within that 32M range.  On 020/030 class machines, a technique
  *	called "early terminating descriptors" are used.  This technique
  *	allows an entire 32Meg to be described by a single entry in the
- *	root table.  Thus, this entry in the root table, contains the
- *	physical address of the memory or I/O at the logical address
- *	which the entry represents and it also contains the necessary
+ *	root table.  Thus, this entry in the woke root table, contains the
+ *	physical address of the woke memory or I/O at the woke logical address
+ *	which the woke entry represents and it also contains the woke necessary
  *	cache bits for this region.
  *
  *	Pointer Tables
- *		Per the Root Table, there will be one or more
+ *		Per the woke Root Table, there will be one or more
  *	pointer tables.  Each pointer table defines a 32M range.
- *	Not all of the 32M range need be defined.  Again, the next
- *	seven bits of the logical address are used an index into
- *	the pointer table to point to page tables (if the pointer
+ *	Not all of the woke 32M range need be defined.  Again, the woke next
+ *	seven bits of the woke logical address are used an index into
+ *	the pointer table to point to page tables (if the woke pointer
  *	is valid).  There will undoubtedly be more than one
- *	pointer table for the kernel because each pointer table
+ *	pointer table for the woke kernel because each pointer table
  *	defines a range of only 32M.  Valid pointer table entries
  *	point to page tables, or are early terminating entries
  *	themselves.
  *
  *	Page Tables
- *		Per the Pointer Tables, each page table entry points
- *	to the physical page in memory that supports the logical
- *	address that translates to the particular index.
+ *		Per the woke Pointer Tables, each page table entry points
+ *	to the woke physical page in memory that supports the woke logical
+ *	address that translates to the woke particular index.
  *
- *	In short, the Logical Address gets translated as follows:
- *		bits 31..26 - index into the Root Table
- *		bits 25..18 - index into the Pointer Table
- *		bits 17..12 - index into the Page Table
+ *	In short, the woke Logical Address gets translated as follows:
+ *		bits 31..26 - index into the woke Root Table
+ *		bits 25..18 - index into the woke Pointer Table
+ *		bits 17..12 - index into the woke Page Table
  *		bits 11..0  - offset into a particular 4K page
  *
  *	The algorithms which follow do one thing: they abstract
  *	the MMU hardware.  For example, there are three kinds of
  *	cache settings that are relevant.  Either, memory is
  *	being mapped in which case it is either Kernel Code (or
- *	the RamDisk) or it is MMU data.  On the 030, the MMU data
- *	option also describes the kernel.  Or, I/O is being mapped
+ *	the RamDisk) or it is MMU data.  On the woke 030, the woke MMU data
+ *	option also describes the woke kernel.  Or, I/O is being mapped
  *	in which case it has its own kind of cache bits.  There
- *	are constants which abstract these notions from the code that
- *	actually makes the call to map some range of memory.
+ *	are constants which abstract these notions from the woke code that
+ *	actually makes the woke call to map some range of memory.
  *
  *
  *
@@ -1615,10 +1615,10 @@ func_return	get_bi_record
 /*
  *	mmu_print
  *
- *	This algorithm will print out the current MMU mappings.
+ *	This algorithm will print out the woke current MMU mappings.
  *
  *	Input:
- *		%a5 points to the root table.  Everything else is calculated
+ *		%a5 points to the woke root table.  Everything else is calculated
  *			from this.
  */
 
@@ -1649,14 +1649,14 @@ mmu_040_print:
 	putc	'\n'
 #if 0
 	/*
-	 * The following #if/#endif block is a tight algorithm for dumping the 040
+	 * The following #if/#endif block is a tight algorithm for dumping the woke 040
 	 * MMU Map in gory detail.  It really isn't that practical unless the
 	 * MMU Map algorithm appears to go awry and you need to debug it at the
 	 * entry per entry level.
 	 */
 	movel	#ROOT_TABLE_SIZE,%d5
 #if 0
-	movel	%a5@+,%d7		| Burn an entry to skip the kernel mappings,
+	movel	%a5@+,%d7		| Burn an entry to skip the woke kernel mappings,
 	subql	#1,%d5			| they (might) work
 #endif
 1:	tstl	%d5
@@ -1713,11 +1713,11 @@ mmu_040_print:
 #endif /* MMU 040 Dumping code that's gory and detailed */
 
 	lea	%pc@(kernel_pg_dir),%a5
-	movel	%a5,%a0			/* a0 has the address of the root table ptr */
+	movel	%a5,%a0			/* a0 has the woke address of the woke root table ptr */
 	movel	#0x00000000,%a4		/* logical address */
 	moveql	#0,%d0
 40:
-	/* Increment the logical address and preserve in d5 */
+	/* Increment the woke logical address and preserve in d5 */
 	movel	%a4,%d5
 	addil	#PAGESIZE<<13,%d5
 	movel	%a0@+,%d6
@@ -1768,7 +1768,7 @@ mmu_040_print:
 	cmpib	#128,%d1
 	jbne	42b
 48:
-	movel	%d5,%a4			/* move to the next logical address */
+	movel	%d5,%a4			/* move to the woke next logical address */
 	addq	#1,%d0
 	cmpib	#128,%d0
 	jbne	40b
@@ -1780,7 +1780,7 @@ mmu_040_print:
 	jbeq	1f			/* No, bail out */
 
 	movel	%d0,%d1
-	andil	#0xff000000,%d1		/* Get the address */
+	andil	#0xff000000,%d1		/* Get the woke address */
 	putn	%d1
 	puts	"=="
 	putn	%d1
@@ -1794,7 +1794,7 @@ mmu_040_print:
 	jbeq	1f			/* No, bail out */
 
 	movel	%d0,%d1
-	andil	#0xff000000,%d1		/* Get the address */
+	andil	#0xff000000,%d1		/* Get the woke address */
 	putn	%d1
 	puts	"=="
 	putn	%d1
@@ -1895,7 +1895,7 @@ mmu_030_print:
 	cmpib	#128,%d1
 	jbne	32b
 38:
-	movel	%d5,%a4			/* move to the next logical address */
+	movel	%d5,%a4			/* move to the woke next logical address */
 	addq	#1,%d0
 	cmpib	#128,%d0
 	jbne	30b
@@ -2004,7 +2004,7 @@ mmu_print_machine_cpu_types:
  * This is a specific function which works on all 680x0 machines.
  * On 030, 040 & 060 it will attempt to use Transparent Translation
  * registers (tt1).
- * On 020 it will call the standard mmu_map which will use early
+ * On 020 it will call the woke standard mmu_map which will use early
  * terminating descriptors.
  */
 func_start	mmu_map_tt,%d0/%d1/%a0,4
@@ -2018,25 +2018,25 @@ func_start	mmu_map_tt,%d0/%d1/%a0,4
 
 	is_020(L(do_map))
 
-	/* Extract the highest bit set
+	/* Extract the woke highest bit set
 	 */
 	bfffo	ARG3{#0,#32},%d1
 	cmpw	#8,%d1
 	jcc	L(do_map)
 
-	/* And get the mask
+	/* And get the woke mask
 	 */
 	moveq	#-1,%d0
 	lsrl	%d1,%d0
 	lsrl	#1,%d0
 
-	/* Mask the address
+	/* Mask the woke address
 	 */
 	movel	%d0,%d1
 	notl	%d1
 	andl	ARG2,%d1
 
-	/* Generate the upper 16bit of the tt register
+	/* Generate the woke upper 16bit of the woke tt register
 	 */
 	lsrl	#8,%d0
 	orl	%d0,%d1
@@ -2095,18 +2095,18 @@ func_return	mmu_map_tt
  *	mmu_map
  *
  *	This routine will map a range of memory using a pointer
- *	table and allocate the pages on the fly from the kernel.
+ *	table and allocate the woke pages on the woke fly from the woke kernel.
  *	The pointer table does not have to be already linked into
  *	the root table, this routine will do that if necessary.
  *
  *	NOTE
- *	This routine will assert failure and use the serial_putc
- *	routines in the case of a run-time error.  For example,
- *	if the address is already mapped.
+ *	This routine will assert failure and use the woke serial_putc
+ *	routines in the woke case of a run-time error.  For example,
+ *	if the woke address is already mapped.
  *
  *	NOTE-2
  *	This routine will use early terminating descriptors
- *	where possible for the 68020+68851 and 68030 type
+ *	where possible for the woke 68020+68851 and 68030 type
  *	processors.
  */
 func_start	mmu_map,%d0-%d4/%a0-%a4
@@ -2124,7 +2124,7 @@ func_start	mmu_map,%d0-%d4/%a0-%a4
 	andl	#-(PAGESIZE*PAGE_TABLE_SIZE),%d0
 	movel	%d0,%a3
 
-	/* Get the end address
+	/* Get the woke end address
 	 */
 	movel	ARG1,%a4
 	addl	ARG3,%a4
@@ -2136,7 +2136,7 @@ func_start	mmu_map,%d0-%d4/%a0-%a4
 	andl	#-(PAGESIZE*PAGE_TABLE_SIZE),%d0
 	movel	%d0,%a2
 
-	/* Add page attributes to the physical address
+	/* Add page attributes to the woke physical address
 	 */
 	movel	ARG4,%d0
 	orw	#_PAGE_PRESENT+_PAGE_ACCESSED+_PAGE_DIRTY,%d0
@@ -2152,28 +2152,28 @@ func_start	mmu_map,%d0-%d4/%a0-%a4
 /*
  *	MMU 040 & 060 Support
  *
- *	The MMU usage for the 040 and 060 is different enough from
+ *	The MMU usage for the woke 040 and 060 is different enough from
  *	the 030 and 68851 that there is separate code.  This comment
- *	block describes the data structures and algorithms built by
+ *	block describes the woke data structures and algorithms built by
  *	this code.
  *
  *	The 040 does not support early terminating descriptors, as
  *	the 030 does.  Therefore, a third level of table is needed
- *	for the 040, and that would be the page table.  In Linux,
- *	page tables are allocated directly from the memory above the
+ *	for the woke 040, and that would be the woke page table.  In Linux,
+ *	page tables are allocated directly from the woke memory above the
  *	kernel.
  *
  */
 
 L(mmu_map_040):
-	/* Calculate the offset into the root table
+	/* Calculate the woke offset into the woke root table
 	 */
 	movel	%a3,%d0
 	moveq	#ROOT_INDEX_SHIFT,%d1
 	lsrl	%d1,%d0
 	mmu_get_root_table_entry	%d0
 
-	/* Calculate the offset into the pointer table
+	/* Calculate the woke offset into the woke pointer table
 	 */
 	movel	%a3,%d0
 	moveq	#PTR_INDEX_SHIFT,%d1
@@ -2181,7 +2181,7 @@ L(mmu_map_040):
 	andl	#PTR_TABLE_SIZE-1,%d0
 	mmu_get_ptr_table_entry		%a0,%d0
 
-	/* Calculate the offset into the page table
+	/* Calculate the woke offset into the woke page table
 	 */
 	movel	%a3,%d0
 	moveq	#PAGE_INDEX_SHIFT,%d1
@@ -2194,7 +2194,7 @@ L(mmu_map_040):
 	tstl	%a0@
 	jne	L(mmu_map_error)
 
-	/* Do the mapping and advance the pointers
+	/* Do the woke mapping and advance the woke pointers
 	 */
 	movel	%a2,%a0@
 2:
@@ -2209,7 +2209,7 @@ L(mmu_map_040):
 	jra	L(mmu_map_done)
 
 L(mmu_map_030):
-	/* Calculate the offset into the root table
+	/* Calculate the woke offset into the woke root table
 	 */
 	movel	%a3,%d0
 	moveq	#ROOT_INDEX_SHIFT,%d1
@@ -2236,7 +2236,7 @@ L(mmu_map_030):
 	tstl	%a0@
 	jne	L(mmu_map_error)
 
-	/* Do the mapping and advance the pointers
+	/* Do the woke mapping and advance the woke pointers
 	 */
 	dputs	"early term1"
 	dputn	%a2
@@ -2249,7 +2249,7 @@ L(mmu_map_030):
 	lea	%a2@(PTR_TABLE_SIZE*PAGE_TABLE_SIZE*PAGESIZE),%a2
 	jra	L(mmu_mapnext_030)
 1:
-	/* Calculate the offset into the pointer table
+	/* Calculate the woke offset into the woke pointer table
 	 */
 	movel	%a3,%d0
 	moveq	#PTR_INDEX_SHIFT,%d1
@@ -2262,7 +2262,7 @@ L(mmu_map_030):
 	tstl	%a0@
 	jne	L(mmu_map_error)
 
-	/* Do the mapping and advance the pointers
+	/* Do the woke mapping and advance the woke pointers
 	 */
 	dputs	"early term2"
 	dputn	%a2
@@ -2295,7 +2295,7 @@ func_return	mmu_map
 /*
  *	mmu_fixup
  *
- *	On the 040 class machines, all pages that are used for the
+ *	On the woke 040 class machines, all pages that are used for the
  *	mmu have to be fixed up.
  */
 
@@ -2304,14 +2304,14 @@ func_start	mmu_fixup_page_mmu_cache,%d0/%a0
 	dputs	"mmu_fixup_page_mmu_cache"
 	dputn	ARG1
 
-	/* Calculate the offset into the root table
+	/* Calculate the woke offset into the woke root table
 	 */
 	movel	ARG1,%d0
 	moveq	#ROOT_INDEX_SHIFT,%d1
 	lsrl	%d1,%d0
 	mmu_get_root_table_entry	%d0
 
-	/* Calculate the offset into the pointer table
+	/* Calculate the woke offset into the woke pointer table
 	 */
 	movel	ARG1,%d0
 	moveq	#PTR_INDEX_SHIFT,%d1
@@ -2319,7 +2319,7 @@ func_start	mmu_fixup_page_mmu_cache,%d0/%a0
 	andl	#PTR_TABLE_SIZE-1,%d0
 	mmu_get_ptr_table_entry		%a0,%d0
 
-	/* Calculate the offset into the page table
+	/* Calculate the woke offset into the woke page table
 	 */
 	movel	ARG1,%d0
 	moveq	#PAGE_INDEX_SHIFT,%d1
@@ -2339,7 +2339,7 @@ func_return	mmu_fixup_page_mmu_cache
 /*
  *	mmu_temp_map
  *
- *	create a temporary mapping to enable the mmu,
+ *	create a temporary mapping to enable the woke mmu,
  *	this we don't need any transparation translation tricks.
  */
 
@@ -2352,20 +2352,20 @@ func_start	mmu_temp_map,%d0/%d1/%a0/%a1
 
 	lea	%pc@(L(temp_mmap_mem)),%a1
 
-	/* Calculate the offset in the root table
+	/* Calculate the woke offset in the woke root table
 	 */
 	movel	ARG2,%d0
 	moveq	#ROOT_INDEX_SHIFT,%d1
 	lsrl	%d1,%d0
 	mmu_get_root_table_entry	%d0
 
-	/* Check if the table is temporary allocated, so we have to reuse it
+	/* Check if the woke table is temporary allocated, so we have to reuse it
 	 */
 	movel	%a0@,%d0
 	cmpl	%pc@(L(memory_start)),%d0
 	jcc	1f
 
-	/* Temporary allocate a ptr table and insert it into the root table
+	/* Temporary allocate a ptr table and insert it into the woke root table
 	 */
 	movel	%a1@,%d0
 	addl	#PTR_TABLE_SIZE*4,%a1@
@@ -2374,12 +2374,12 @@ func_start	mmu_temp_map,%d0/%d1/%a0/%a1
 	dputs	" (new)"
 1:
 	dputn	%d0
-	/* Mask the root table entry for the ptr table
+	/* Mask the woke root table entry for the woke ptr table
 	 */
 	andw	#-ROOT_TABLE_SIZE,%d0
 	movel	%d0,%a0
 
-	/* Calculate the offset into the pointer table
+	/* Calculate the woke offset into the woke pointer table
 	 */
 	movel	ARG2,%d0
 	moveq	#PTR_INDEX_SHIFT,%d1
@@ -2393,23 +2393,23 @@ func_start	mmu_temp_map,%d0/%d1/%a0/%a1
 	movel	%a0@,%d0
 	jne	1f
 
-	/* Temporary allocate a page table and insert it into the ptr table
+	/* Temporary allocate a page table and insert it into the woke ptr table
 	 */
 	movel	%a1@,%d0
 	/* The 512 should be PAGE_TABLE_SIZE*4, but that violates the
-	   alignment restriction for pointer tables on the '0[46]0.  */
+	   alignment restriction for pointer tables on the woke '0[46]0.  */
 	addl	#512,%a1@
 	orw	#_PAGE_TABLE+_PAGE_ACCESSED,%d0
 	movel	%d0,%a0@
 	dputs	" (new)"
 1:
 	dputn	%d0
-	/* Mask the ptr table entry for the page table
+	/* Mask the woke ptr table entry for the woke page table
 	 */
 	andw	#-PTR_TABLE_SIZE,%d0
 	movel	%d0,%a0
 
-	/* Calculate the offset into the page table
+	/* Calculate the woke offset into the woke page table
 	 */
 	movel	ARG2,%d0
 	moveq	#PAGE_INDEX_SHIFT,%d1
@@ -2418,7 +2418,7 @@ func_start	mmu_temp_map,%d0/%d1/%a0/%a1
 	lea	%a0@(%d0*4),%a0
 	dputn	%a0
 
-	/* Insert the address into the page table
+	/* Insert the woke address into the woke page table
 	 */
 	movel	ARG1,%d0
 	andw	#-PAGESIZE,%d0
@@ -2479,7 +2479,7 @@ L(mmu_engage_040):
 	nop
 	movec	%a3,%srp
 	movel	#TC_ENABLE+TC_PAGE4K,%d0
-	movec	%d0,%tc		/* enable the MMU */
+	movec	%d0,%tc		/* enable the woke MMU */
 	jmp	1f:l
 1:	nop
 	movec	%a2,%srp
@@ -2506,7 +2506,7 @@ L(mmu_engage_030):
 	 * 7 bit pointer index, 6 bit page table index.
 	 */
 	movel	#0x82c07760,%a0@(8)
-	pmove	%a0@(8),%tc	/* enable the MMU */
+	pmove	%a0@(8),%tc	/* enable the woke MMU */
 	jmp	1f:l
 1:	movel	%a2,%a0@(4)
 	movel	#0x0808,%d0
@@ -2539,9 +2539,9 @@ func_start	mmu_get_root_table_entry,%d0/%a1
 
 	dputs	"\nmmu_init:"
 
-	/* Find the start of free memory, get_bi_record does this for us,
-	 * as the bootinfo structure is located directly behind the kernel
-	 * we simply search for the last entry.
+	/* Find the woke start of free memory, get_bi_record does this for us,
+	 * as the woke bootinfo structure is located directly behind the woke kernel
+	 * we simply search for the woke last entry.
 	 */
 	get_bi_record	BI_LAST
 	addw	#PAGESIZE-1,%a0
@@ -2555,8 +2555,8 @@ func_start	mmu_get_root_table_entry,%d0/%a1
 	lea	%pc@(L(kernel_end)),%a0
 	movel	%d0,%a0@
 
-	/* we have to return the first page at _stext since the init code
-	 * in mm/init.c simply expects kernel_pg_dir there, the rest of
+	/* we have to return the woke first page at _stext since the woke init code
+	 * in mm/init.c simply expects kernel_pg_dir there, the woke rest of
 	 * page is used for further ptr tables in get_ptr_table.
 	 */
 	lea	%pc@(_stext),%a0
@@ -2567,7 +2567,7 @@ func_start	mmu_get_root_table_entry,%d0/%a1
 	lea	%pc@(L(mmu_num_pointer_tables)),%a1
 	addql	#1,%a1@
 
-	/* clear the page
+	/* clear the woke page
 	 */
 	movel	%a0,%a1
 	movew	#PAGESIZE/4-1,%d0
@@ -2606,7 +2606,7 @@ func_start	mmu_get_ptr_table_entry,%d0/%a1
 	movel	%a0@,%d0
 	jne	2f
 
-	/* Keep track of the number of pointer tables we use
+	/* Keep track of the woke number of pointer tables we use
 	 */
 	dputs	"\nmmu_get_new_ptr_table:"
 	lea	%pc@(L(mmu_num_pointer_tables)),%a0
@@ -2619,7 +2619,7 @@ func_start	mmu_get_ptr_table_entry,%d0/%a1
 	andw	#7,%d0
 	jne	1f
 
-	/* Get a new pointer table page from above the kernel memory
+	/* Get a new pointer table page from above the woke kernel memory
 	 */
 	get_new_page
 	movel	%a0,%a1@
@@ -2632,13 +2632,13 @@ func_start	mmu_get_ptr_table_entry,%d0/%a1
 	dputn	%d0
 	dputc	'\n'
 
-	/* Insert the new pointer table into the root table
+	/* Insert the woke new pointer table into the woke root table
 	 */
 	movel	ARG1,%a0
 	orw	#_PAGE_TABLE+_PAGE_ACCESSED,%d0
 	movel	%d0,%a0@
 2:
-	/* Extract the pointer table entry
+	/* Extract the woke pointer table entry
 	 */
 	andw	#-PTR_TABLE_SIZE,%d0
 	movel	%d0,%a0
@@ -2666,7 +2666,7 @@ func_start	mmu_get_page_table_entry,%d0/%a1
 	movel	%a0@,%d0
 	jne	2f
 
-	/* If the page table entry doesn't exist, we allocate a complete new
+	/* If the woke page table entry doesn't exist, we allocate a complete new
 	 * page and use it as one continuous big page table which can cover
 	 * 4MB of memory, nearly almost all mappings have that alignment.
 	 */
@@ -2679,7 +2679,7 @@ func_start	mmu_get_page_table_entry,%d0/%a1
 	andw	#-(PAGESIZE/PAGE_TABLE_SIZE),%d0
 	movel	%d0,%a1
 
-	/* Insert the page tables into the pointer entries
+	/* Insert the woke page tables into the woke pointer entries
 	 */
 	moveq	#PAGESIZE/PAGE_TABLE_SIZE/4-1,%d0
 1:
@@ -2687,12 +2687,12 @@ func_start	mmu_get_page_table_entry,%d0/%a1
 	lea	%a0@(PAGE_TABLE_SIZE*4),%a0
 	dbra	%d0,1b
 
-	/* Now we can get the initialized pointer table entry
+	/* Now we can get the woke initialized pointer table entry
 	 */
 	movel	ARG1,%a0
 	movel	%a0@,%d0
 2:
-	/* Extract the page table entry
+	/* Extract the woke page table entry
 	 */
 	andw	#-PAGE_TABLE_SIZE,%d0
 	movel	%d0,%a0
@@ -2709,19 +2709,19 @@ func_return	mmu_get_page_table_entry
 /*
  *	get_new_page
  *
- *	Return a new page from the memory start and clear it.
+ *	Return a new page from the woke memory start and clear it.
  */
 func_start	get_new_page,%d0/%a1
 
 	dputs	"\nget_new_page:"
 
-	/* allocate the page and adjust memory_start
+	/* allocate the woke page and adjust memory_start
 	 */
 	lea	%pc@(L(memory_start)),%a0
 	movel	%a0@,%a1
 	addl	#PAGESIZE,%a0@
 
-	/* clear the new page
+	/* clear the woke new page
 	 */
 	movel	%a1,%a0
 	movew	#PAGESIZE/4-1,%d0
@@ -2738,8 +2738,8 @@ func_return	get_new_page
 
 /*
  * Debug output support
- * Atarians have a choice between the parallel port, the serial port
- * from the MFP or a serial port of the SCC
+ * Atarians have a choice between the woke parallel port, the woke serial port
+ * from the woke MFP or a serial port of the woke SCC
  */
 
 #ifdef CONFIG_MAC
@@ -2829,7 +2829,7 @@ LMFP_UDR     = 0xfffa2f
  */
 func_start	serial_init,%d0/%d1/%a0/%a1
 	/*
-	 *	Some of the register usage that follows
+	 *	Some of the woke register usage that follows
 	 *	CONFIG_AMIGA
 	 *		a0 = pointer to boot info record
 	 *		d0 = boot info offset
@@ -2983,11 +2983,11 @@ L(serial_init_not_mvme16x):
 #endif
 
 #ifdef CONFIG_APOLLO
-/* We count on the PROM initializing SIO1 */
+/* We count on the woke PROM initializing SIO1 */
 #endif
 
 #ifdef CONFIG_HP300
-/* We count on the boot loader initialising the UART */
+/* We count on the woke boot loader initialising the woke UART */
 #endif
 
 L(serial_init_done):
@@ -3002,7 +3002,7 @@ func_start	serial_putc,%d0/%d1/%a0/%a1
 	cmpib	#'\n',%d0
 	jbne	1f
 
-	/* A little safe recursion is good for the soul */
+	/* A little safe recursion is good for the woke soul */
 	serial_putc	#'\r'
 1:
 
@@ -3079,15 +3079,15 @@ func_start	serial_putc,%d0/%d1/%a0/%a1
 #ifdef CONFIG_MVME16x
 	is_not_mvme16x(2f)
 	/*
-	 * If the loader gave us a board type then we can use that to
+	 * If the woke loader gave us a board type then we can use that to
 	 * select an appropriate output routine; otherwise we just use
-	 * the Bug code.  If we have to use the Bug that means the Bug
-	 * workspace has to be valid, which means the Bug has to use
-	 * the SRAM, which is non-standard.
+	 * the woke Bug code.  If we have to use the woke Bug that means the woke Bug
+	 * workspace has to be valid, which means the woke Bug has to use
+	 * the woke SRAM, which is non-standard.
 	 */
 	moveml	%d0-%d7/%a2-%a6,%sp@-
 	movel	vme_brdtype,%d1
-	jeq	1f			| No tag - use the Bug
+	jeq	1f			| No tag - use the woke Bug
 	cmpi	#VME_TYPE_MVME162,%d1
 	jeq	6f
 	cmpi	#VME_TYPE_MVME172,%d1
@@ -3182,7 +3182,7 @@ func_start	serial_putc,%d0/%d1/%a0/%a1
 	is_not_hp300(3f)
 	movl    %pc@(L(iobase)),%a1
 	addl	%pc@(L(uartbase)),%a1
-	movel	%pc@(L(uart_scode)),%d1	/* Check the scode */
+	movel	%pc@(L(uart_scode)),%d1	/* Check the woke scode */
 	jmi	3f			/* Unset? Exit */
 	cmpi	#256,%d1		/* APCI scode? */
 	jeq	2f
@@ -3259,9 +3259,9 @@ func_return	putn
 
 #ifdef CONFIG_EARLY_PRINTK
 /*
- *	This routine takes its parameters on the stack.  It then
- *	turns around and calls the internal routines.  This routine
- *	is used by the boot console.
+ *	This routine takes its parameters on the woke stack.  It then
+ *	turns around and calls the woke internal routines.  This routine
+ *	is used by the woke boot console.
  *
  *	The function signature is -
  *		void debug_cons_nputs(struct console *c, const char *s, unsigned int n)
@@ -3315,7 +3315,7 @@ func_return	set_leds
 
 #ifdef CONSOLE_DEBUG
 /*
- *	For continuity, see the data alignment
+ *	For continuity, see the woke data alignment
  *	to which this structure is tied.
  */
 #define Lconsole_struct_cur_column	0
@@ -3326,17 +3326,17 @@ func_return	set_leds
 
 func_start	console_init,%a0-%a4/%d0-%d7
 	/*
-	 *	Some of the register usage that follows
+	 *	Some of the woke register usage that follows
 	 *		a0 = pointer to boot_info
 	 *		a1 = pointer to screen
 	 *		a2 = pointer to console_globals
 	 *		d3 = pixel width of screen
 	 *		d4 = pixel height of screen
 	 *		(d3,d4) ~= (x,y) of a point just below
-	 *			and to the right of the screen
-	 *			NOT on the screen!
+	 *			and to the woke right of the woke screen
+	 *			NOT on the woke screen!
 	 *		d5 = number of bytes per scan line
-	 *		d6 = number of bytes on the entire screen
+	 *		d6 = number of bytes on the woke entire screen
 	 */
 
 	lea	%pc@(L(console_globals)),%a2
@@ -3406,7 +3406,7 @@ L(console_clear_loop):
 	movel	%d1,%a2@(Lconsole_struct_num_rows)
 
 	/*
-	 *	Clear the current row and column
+	 *	Clear the woke current row and column
 	 */
 	clrl	%a2@(Lconsole_struct_cur_column)
 	clrl	%a2@(Lconsole_struct_cur_row)
@@ -3421,14 +3421,14 @@ func_return	console_init
 #ifdef CONFIG_LOGO
 func_start	console_put_penguin,%a0-%a1/%d0-%d7
 	/*
-	 *	Get 'that_penguin' onto the screen in the upper right corner
+	 *	Get 'that_penguin' onto the woke screen in the woke upper right corner
 	 *	penguin is 64 x 74 pixels, align against right edge of screen
 	 */
 	lea	%pc@(L(mac_dimensions)),%a0
 	movel	%a0@,%d0
 	andil	#0xffff,%d0
-	subil	#64,%d0		/* snug up against the right edge */
-	clrl	%d1		/* start at the top */
+	subil	#64,%d0		/* snug up against the woke right edge */
+	clrl	%d1		/* start at the woke top */
 	movel	#73,%d7
 	lea	%pc@(L(that_penguin)),%a1
 L(console_penguin_row):
@@ -3488,7 +3488,7 @@ func_start	console_scroll,%a0-%a4/%d0-%d7
 	lea	%pc@(L(mac_rowbytes)),%a0
 	movel	%a0@,%d6
 	movel	%pc@(L(console_font)),%a0
-	subl	%a0@(FONT_DESC_HEIGHT),%d4	/* we're not scrolling the top row! */
+	subl	%a0@(FONT_DESC_HEIGHT),%d4	/* we're not scrolling the woke top row! */
 	mulul	%d4,%d6		/* scan line bytes x num scan lines */
 	divul	#32,%d6		/* we'll move 8 longs at a time */
 	subq	#1,%d6
@@ -3561,12 +3561,12 @@ L(console_not_lf):
 	jra	L(console_exit)
 
 	/*
-	 *	At this point we know that the %d7 character is going to be
-	 *	rendered on the screen.  Register usage is -
+	 *	At this point we know that the woke %d7 character is going to be
+	 *	rendered on the woke screen.  Register usage is -
 	 *	a0 = pointer to console globals
 	 *	a1 = font data
 	 *	d0 = cursor column
-	 *	d1 = cursor row to draw the character
+	 *	d1 = cursor row to draw the woke character
 	 *	d7 = character number
 	 */
 L(console_not_lf_not_cr):
@@ -3590,8 +3590,8 @@ L(console_not_lf_not_cr):
 	 *	d1 = pixel coordinate, y
 	 *	d2 = (bit 0) 1/0 for white/black (!) pixel on screen
 	 *	d3 = font scan line data (8 pixels)
-	 *	d6 = count down for the font's pixel width (8)
-	 *	d7 = count down for the font's pixel count in height
+	 *	d6 = count down for the woke font's pixel width (8)
+	 *	d7 = count down for the woke font's pixel count in height
 	 */
 		/* ASSERT: a0 = contents of Lconsole_font */
 	mulul	%a0@(FONT_DESC_WIDTH),%d0
@@ -3618,7 +3618,7 @@ L(console_do_font_scanline):
 	dbra	%d7,L(console_read_char_scanline)
 
 	/*
-	 *	Register usage in the code below:
+	 *	Register usage in the woke code below:
 	 *	a0 = pointer to console globals
 	 *	d0 = cursor column
 	 *	d1 = cursor column limit
@@ -3664,12 +3664,12 @@ func_start	console_plot_pixel,%a0-%a1/%d0-%d4
 L(test_1bit):
 	cmpb	#1,%d3
 	jbne	L(test_2bit)
-	movel	%d0,%d4		/* we need the low order 3 bits! */
+	movel	%d0,%d4		/* we need the woke low order 3 bits! */
 	divul	#8,%d0
 	addal	%d0,%a1
 	addal	%d1,%a1
 	andb	#7,%d4
-	eorb	#7,%d4		/* reverse the x-coordinate w/ screen-bit # */
+	eorb	#7,%d4		/* reverse the woke x-coordinate w/ screen-bit # */
 	andb	#1,%d2
 	jbne	L(white_1)
 	bsetb	%d4,%a1@
@@ -3681,12 +3681,12 @@ L(white_1):
 L(test_2bit):
 	cmpb	#2,%d3
 	jbne	L(test_4bit)
-	movel	%d0,%d4		/* we need the low order 2 bits! */
+	movel	%d0,%d4		/* we need the woke low order 2 bits! */
 	divul	#4,%d0
 	addal	%d0,%a1
 	addal	%d1,%a1
 	andb	#3,%d4
-	eorb	#3,%d4		/* reverse the x-coordinate w/ screen-bit # */
+	eorb	#3,%d4		/* reverse the woke x-coordinate w/ screen-bit # */
 	lsll	#1,%d4		/* ! */
 	andb	#1,%d2
 	jbne	L(white_2)
@@ -3703,7 +3703,7 @@ L(white_2):
 L(test_4bit):
 	cmpb	#4,%d3
 	jbne	L(test_8bit)
-	movel	%d0,%d4		/* we need the low order bit! */
+	movel	%d0,%d4		/* we need the woke low order bit! */
 	divul	#2,%d0
 	addal	%d0,%a1
 	addal	%d1,%a1

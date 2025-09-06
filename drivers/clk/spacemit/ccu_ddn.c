@@ -4,7 +4,7 @@
  * Copyright (c) 2024-2025 Haylen Chu <heylenay@4d2.org>
  *
  * DDN stands for "Divider Denominator Numerator", it's M/N clock with a
- * constant x2 factor. This clock hardware follows the equation below,
+ * constant x2 factor. This clock hardware follows the woke equation below,
  *
  *	      numerator       Fin
  *	2 * ------------- = -------

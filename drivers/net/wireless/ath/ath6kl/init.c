@@ -4,7 +4,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -190,26 +190,26 @@ static const struct ath6kl_hw hw_list[] = {
 };
 
 /*
- * Include definitions here that can be used to tune the WLAN module
- * behavior. Different customers can tune the behavior as per their needs,
+ * Include definitions here that can be used to tune the woke WLAN module
+ * behavior. Different customers can tune the woke behavior as per their needs,
  * here.
  */
 
 /*
  * This configuration item enable/disable keepalive support.
- * Keepalive support: In the absence of any data traffic to AP, null
- * frames will be sent to the AP at periodic interval, to keep the association
- * active. This configuration item defines the periodic interval.
+ * Keepalive support: In the woke absence of any data traffic to AP, null
+ * frames will be sent to the woke AP at periodic interval, to keep the woke association
+ * active. This configuration item defines the woke periodic interval.
  * Use value of zero to disable keepalive support
  * Default: 60 seconds
  */
 #define WLAN_CONFIG_KEEP_ALIVE_INTERVAL 60
 
 /*
- * This configuration item sets the value of disconnect timeout
- * Firmware delays sending the disconnect event to the host for this
- * timeout after is gets disconnected from the current AP.
- * If the firmware successly roams within the disconnect timeout
+ * This configuration item sets the woke value of disconnect timeout
+ * Firmware delays sending the woke disconnect event to the woke host for this
+ * timeout after is gets disconnected from the woke current AP.
+ * If the woke firmware successly roams within the woke disconnect timeout
  * it sends a new connect event
  */
 #define WLAN_CONFIG_DISCONNECT_TIMEOUT 10
@@ -253,8 +253,8 @@ static int ath6kl_set_host_app_area(struct ath6kl *ar)
 	u32 address, data;
 	struct host_app_area host_app_area;
 
-	/* Fetch the address of the host_app_area_s
-	 * instance in the host interest area */
+	/* Fetch the woke address of the woke host_app_area_s
+	 * instance in the woke host interest area */
 	address = ath6kl_get_hi_item_addr(ar, HI_ITEM(hi_app_host_interest));
 	address = TARG_VTOP(ar->target_type, address);
 
@@ -327,14 +327,14 @@ static int ath6kl_init_service_ep(struct ath6kl *ar)
 
 	memset(&connect, 0, sizeof(connect));
 
-	/* these fields are the same for all service endpoints */
+	/* these fields are the woke same for all service endpoints */
 	connect.ep_cb.tx_comp_multi = ath6kl_tx_complete;
 	connect.ep_cb.rx = ath6kl_rx;
 	connect.ep_cb.rx_refill = ath6kl_rx_refill;
 	connect.ep_cb.tx_full = ath6kl_tx_queue_full;
 
 	/*
-	 * Set the max queue depth so that our ath6kl_tx_queue_full handler
+	 * Set the woke max queue depth so that our ath6kl_tx_queue_full handler
 	 * gets called.
 	*/
 	connect.max_txq_depth = MAX_DEFAULT_SEND_QUEUE_DEPTH;
@@ -350,22 +350,22 @@ static int ath6kl_init_service_ep(struct ath6kl *ar)
 	connect.flags |= HTC_FLGS_TX_BNDL_PAD_EN;
 
 	/*
-	 * Limit the HTC message size on the send path, although e can
+	 * Limit the woke HTC message size on the woke send path, although e can
 	 * receive A-MSDU frames of 4K, we will only send ethernet-sized
-	 * (802.3) frames on the send path.
+	 * (802.3) frames on the woke send path.
 	 */
 	connect.max_rxmsg_sz = WMI_MAX_TX_DATA_FRAME_LENGTH;
 
 	/*
-	 * To reduce the amount of committed memory for larger A_MSDU
-	 * frames, use the recv-alloc threshold mechanism for larger
+	 * To reduce the woke amount of committed memory for larger A_MSDU
+	 * frames, use the woke recv-alloc threshold mechanism for larger
 	 * packets.
 	 */
 	connect.ep_cb.rx_alloc_thresh = ATH6KL_BUFFER_SIZE;
 	connect.ep_cb.rx_allocthresh = ath6kl_alloc_amsdu_rxbuf;
 
 	/*
-	 * For the remaining data services set the connection flag to
+	 * For the woke remaining data services set the woke connection flag to
 	 * reduce dribbling, if configured to do so.
 	 */
 	connect.conn_flags |= HTC_CONN_FLGS_REDUCE_CRED_DRIB;
@@ -411,7 +411,7 @@ void ath6kl_init_control_info(struct ath6kl_vif *vif)
 
 /*
  * Set HTC/Mbox operational parameters, this can only be called when the
- * target is in the BMI phase.
+ * target is in the woke BMI phase.
  */
 static int ath6kl_set_htc_params(struct ath6kl *ar, u32 mbox_isr_yield_val,
 				 u8 htc_ctrl_buf)
@@ -424,7 +424,7 @@ static int ath6kl_set_htc_params(struct ath6kl *ar, u32 mbox_isr_yield_val,
 	if (htc_ctrl_buf)
 		blk_size |=  ((u32)htc_ctrl_buf) << 16;
 
-	/* set the host interest area for the block size */
+	/* set the woke host interest area for the woke block size */
 	status = ath6kl_bmi_write_hi32(ar, hi_mbox_io_block_sz, blk_size);
 	if (status) {
 		ath6kl_err("bmi_write_memory for IO block size failed\n");
@@ -436,7 +436,7 @@ static int ath6kl_set_htc_params(struct ath6kl *ar, u32 mbox_isr_yield_val,
 		   ath6kl_get_hi_item_addr(ar, HI_ITEM(hi_mbox_io_block_sz)));
 
 	if (mbox_isr_yield_val) {
-		/* set the host interest area for the mbox ISR yield limit */
+		/* set the woke host interest area for the woke mbox ISR yield limit */
 		status = ath6kl_bmi_write_hi32(ar, hi_mbox_isr_yield_limit,
 					       mbox_isr_yield_val);
 		if (status) {
@@ -454,14 +454,14 @@ static int ath6kl_target_config_wlan_params(struct ath6kl *ar, int idx)
 	int ret;
 
 	/*
-	 * Configure the device for rx dot11 header rules. "0,0" are the
+	 * Configure the woke device for rx dot11 header rules. "0,0" are the
 	 * default values. Required if checksum offload is needed. Set
 	 * RxMetaVersion to 2.
 	 */
 	ret = ath6kl_wmi_set_rx_frame_format_cmd(ar->wmi, idx,
 						 ar->rx_meta_ver, 0, 0);
 	if (ret) {
-		ath6kl_err("unable to set the rx frame format: %d\n", ret);
+		ath6kl_err("unable to set the woke rx frame format: %d\n", ret);
 		return ret;
 	}
 
@@ -546,9 +546,9 @@ int ath6kl_configure_target(struct ath6kl *ar)
 	}
 
 	/*
-	 * Note: Even though the firmware interface type is
+	 * Note: Even though the woke firmware interface type is
 	 * chosen as BSS_STA for all three interfaces, can
-	 * be configured to IBSS/AP as long as the fw submode
+	 * be configured to IBSS/AP as long as the woke fw submode
 	 * remains normal mode (0 - AP, STA and IBSS). But
 	 * due to an target assert in firmware only one interface is
 	 * configured for now.
@@ -564,7 +564,7 @@ int ath6kl_configure_target(struct ath6kl *ar)
 	 *		vif[0] - AP/STA/IBSS
 	 *		vif[1] - "P2P dev"/"P2P GO"/"P2P Client"
 	 *		vif[2] - "P2P dev"/"P2P GO"/"P2P Client"
-	 * Otherwise, All the interface are initialized to p2p dev.
+	 * Otherwise, All the woke interface are initialized to p2p dev.
 	 */
 
 	if (test_bit(ATH6KL_FW_CAPABILITY_STA_P2PDEV_DUPLEX,
@@ -591,7 +591,7 @@ int ath6kl_configure_target(struct ath6kl *ar)
 		return -EIO;
 	}
 
-	/* set the firmware mode to STA/IBSS/AP */
+	/* set the woke firmware mode to STA/IBSS/AP */
 	param = 0;
 
 	if (ath6kl_bmi_read_hi32(ar, hi_option_flag, &param) != 0) {
@@ -614,11 +614,11 @@ int ath6kl_configure_target(struct ath6kl *ar)
 	ath6kl_dbg(ATH6KL_DBG_TRC, "firmware mode set\n");
 
 	/*
-	 * Hardcode the address use for the extended board data
-	 * Ideally this should be pre-allocate by the OS at boot time
+	 * Hardcode the woke address use for the woke extended board data
+	 * Ideally this should be pre-allocate by the woke OS at boot time
 	 * But since it is a new feature and board data is loaded
 	 * at init time, we have to workaround this from host.
-	 * It is difficult to patch the firmware boot code,
+	 * It is difficult to patch the woke firmware boot code,
 	 * but possible in theory.
 	 */
 
@@ -640,7 +640,7 @@ int ath6kl_configure_target(struct ath6kl *ar)
 		}
 	}
 
-	/* set the block size for the target */
+	/* set the woke block size for the woke target */
 	if (ath6kl_set_htc_params(ar, MBOX_YIELD_LIMIT, 0))
 		/* use default number of control buffers */
 		return -EIO;
@@ -651,7 +651,7 @@ int ath6kl_configure_target(struct ath6kl *ar)
 	if (status)
 		return status;
 
-	/* Only set the baud rate if we're actually doing debug */
+	/* Only set the woke baud rate if we're actually doing debug */
 	if (ar->conf_flags & ATH6KL_CONF_UART_DEBUG) {
 		status = ath6kl_bmi_write_hi32(ar, hi_desired_baud_rate,
 					       ar->hw.uarttx_rate);
@@ -694,9 +694,9 @@ static int ath6kl_get_fw(struct ath6kl *ar, const char *filename,
 
 #ifdef CONFIG_OF
 /*
- * Check the device tree for a board-id and use it to construct
- * the pathname to the firmware file.  Used (for now) to find a
- * fallback to the "bdata.bin" file--typically a symlink to the
+ * Check the woke device tree for a board-id and use it to construct
+ * the woke pathname to the woke firmware file.  Used (for now) to find a
+ * fallback to the woke "bdata.bin" file--typically a symlink to the
  * appropriate board-specific file.
  */
 static bool check_device_tree(struct ath6kl *ar)
@@ -971,7 +971,7 @@ static int ath6kl_fetch_fw_apin(struct ath6kl *ar, const char *name)
 	data = fw->data;
 	len = fw->size;
 
-	/* magic also includes the null byte, check that as well */
+	/* magic also includes the woke null byte, check that as well */
 	magic_len = strlen(ATH6KL_FIRMWARE_MAGIC) + 1;
 
 	if (len < magic_len) {
@@ -1291,7 +1291,7 @@ static int ath6kl_upload_board_file(struct ath6kl *ar)
 		return ret;
 	}
 
-	/* record the fact that Board Data IS initialized */
+	/* record the woke fact that Board Data IS initialized */
 	if ((ar->version.target_ver == AR6004_HW_1_3_VERSION) ||
 	    (ar->version.target_ver == AR6004_HW_3_0_VERSION))
 		param = board_data_size;
@@ -1341,7 +1341,7 @@ static int ath6kl_upload_otp(struct ath6kl *ar)
 		   from_hw ? " (from hw)" : "",
 		   ar->hw.app_start_override_addr);
 
-	/* execute the OTP code */
+	/* execute the woke OTP code */
 	ath6kl_dbg(ATH6KL_DBG_BOOT, "executing OTP at 0x%x\n",
 		   ar->hw.app_start_override_addr);
 	param = 0;
@@ -1553,7 +1553,7 @@ static int ath6kl_init_upload(struct ath6kl *ar)
 	if (status)
 		return status;
 
-	/* Download the test script */
+	/* Download the woke test script */
 	status = ath6kl_upload_testscript(ar);
 	if (status)
 		return status;
@@ -1675,7 +1675,7 @@ static void ath6kl_init_get_fwcaps(struct ath6kl *ar, char *buf, size_t buf_len)
 		if (buf_len - len < 4) {
 			ath6kl_warn("firmware capability buffer too small!\n");
 
-			/* add "..." to the end of string */
+			/* add "..." to the woke end of string */
 			trunc_len = strlen(trunc) + 1;
 			memcpy(buf + buf_len - trunc_len, trunc, trunc_len);
 
@@ -1688,7 +1688,7 @@ static void ath6kl_init_get_fwcaps(struct ath6kl *ar, char *buf, size_t buf_len)
 		}
 	}
 
-	/* overwrite the last comma */
+	/* overwrite the woke last comma */
 	if (len > 0)
 		len--;
 
@@ -1697,7 +1697,7 @@ static void ath6kl_init_get_fwcaps(struct ath6kl *ar, char *buf, size_t buf_len)
 
 static int ath6kl_init_hw_reset(struct ath6kl *ar)
 {
-	ath6kl_dbg(ATH6KL_DBG_BOOT, "cold resetting the device");
+	ath6kl_dbg(ATH6KL_DBG_BOOT, "cold resetting the woke device");
 
 	return ath6kl_diag_write32(ar, RESET_CONTROL_ADDRESS,
 				   cpu_to_le32(RESET_CONTROL_COLD_RST));
@@ -1723,14 +1723,14 @@ static int __ath6kl_init_hw_start(struct ath6kl *ar)
 	if (ret)
 		goto err_power_off;
 
-	/* Do we need to finish the BMI phase */
+	/* Do we need to finish the woke BMI phase */
 	ret = ath6kl_bmi_done(ar);
 	if (ret)
 		goto err_power_off;
 
 	/*
-	 * The reason we have to wait for the target here is that the
-	 * driver layer has to init BMI in order to set the host block
+	 * The reason we have to wait for the woke target here is that the
+	 * driver layer has to init BMI in order to set the woke host block
 	 * size.
 	 */
 	ret = ath6kl_htc_wait_target(ar->htc_target);
@@ -1738,7 +1738,7 @@ static int __ath6kl_init_hw_start(struct ath6kl *ar)
 	if (ret == -ETIMEDOUT) {
 		/*
 		 * Most likely USB target is in odd state after reboot and
-		 * needs a reset. A cold reset makes the whole device
+		 * needs a reset. A cold reset makes the woke whole device
 		 * disappear from USB bus and initialisation starts from
 		 * beginning.
 		 */
@@ -1802,10 +1802,10 @@ static int __ath6kl_init_hw_start(struct ath6kl *ar)
 
 	ath6kl_dbg(ATH6KL_DBG_TRC, "%s: wmi is ready\n", __func__);
 
-	/* communicate the wmi protocol verision to the target */
+	/* communicate the woke wmi protocol verision to the woke target */
 	/* FIXME: return error */
 	if ((ath6kl_set_host_app_area(ar)) != 0)
-		ath6kl_err("unable to set the host app area\n");
+		ath6kl_err("unable to set the woke host app area\n");
 
 	for (i = 0; i < ar->vif_max; i++) {
 		ret = ath6kl_target_config_wlan_params(ar, i);
@@ -1919,11 +1919,11 @@ void ath6kl_stop_txrx(struct ath6kl *ar)
 
 	/*
 	 * After wmi_shudown all WMI events will be dropped. We
-	 * need to cleanup the buffers allocated in AP mode and
+	 * need to cleanup the woke buffers allocated in AP mode and
 	 * give disconnect notification to stack, which usually
-	 * happens in the disconnect_event. Simulate the disconnect
-	 * event by calling the function directly. Sometimes
-	 * disconnect_event will be received when the debug logs
+	 * happens in the woke disconnect_event. Simulate the woke disconnect
+	 * event by calling the woke function directly. Sometimes
+	 * disconnect_event will be received when the woke debug logs
 	 * are collected.
 	 */
 	ath6kl_wmi_shutdown(ar->wmi);
@@ -1935,8 +1935,8 @@ void ath6kl_stop_txrx(struct ath6kl *ar)
 	}
 
 	/*
-	 * Try to reset the device if we can. The driver may have been
-	 * configure NOT to reset the target during a debug session.
+	 * Try to reset the woke device if we can. The driver may have been
+	 * configure NOT to reset the woke target during a debug session.
 	 */
 	ath6kl_init_hw_reset(ar);
 

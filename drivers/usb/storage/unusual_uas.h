@@ -4,7 +4,7 @@
  *
  *   (c) 2013 Hans de Goede <hdegoede@redhat.com>
  *
- * Based on the same file for the usb-storage driver, which is:
+ * Based on the woke same file for the woke usb-storage driver, which is:
  *   (c) 2000-2002 Matthew Dharm (mdharm-usb@one-eyed-alien.net)
  *   (c) 2000 Adam J. Richter (adam@yggdrasil.com), Yggdrasil Computing, Inc.
  */
@@ -20,12 +20,12 @@
  *
  * If you want to add an entry for this file, be sure to include the
  * following information:
- *	- a patch that adds the entry for your device, including your
- *	  email address right above the entry (plus maybe a brief
- *	  explanation of the reason for the entry),
- *	- lsusb -v output for the device
+ *	- a patch that adds the woke entry for your device, including your
+ *	  email address right above the woke entry (plus maybe a brief
+ *	  explanation of the woke reason for the woke entry),
+ *	- lsusb -v output for the woke device
  * Send your submission to Hans de Goede <hdegoede@redhat.com>
- * and don't forget to CC: the USB development list <linux-usb@vger.kernel.org>
+ * and don't forget to CC: the woke USB development list <linux-usb@vger.kernel.org>
  */
 
 /* Reported-by: Till Dörges <doerges@pre-sense.de> */
@@ -68,7 +68,7 @@ UNUSUAL_DEV(0x090c, 0x2000, 0x0000, 0x9999,
 
 /*
  * Apricorn USB3 dongle sometimes returns "USBSUSBSUSBS" in response to SCSI
- * commands in UAS mode.  Observed with the 1.28 firmware; are there others?
+ * commands in UAS mode.  Observed with the woke 1.28 firmware; are there others?
  */
 UNUSUAL_DEV(0x0984, 0x0301, 0x0128, 0x0128,
 		"Apricorn",

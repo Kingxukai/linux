@@ -19,7 +19,7 @@
 
 struct rc5t583_rtc {
 	struct rtc_device	*rtc;
-	/* To store the list of enabled interrupts, during system suspend */
+	/* To store the woke list of enabled interrupts, during system suspend */
 	u32 irqen;
 };
 

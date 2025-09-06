@@ -1017,7 +1017,7 @@ struct saa7134_board saa7134_boards[] = {
 	[SAA7134_BOARD_ASUSTEK_TVFM7133] = {
 		.name           = "ASUS TV-FM 7133",
 		.audio_clock    = 0x00187de7,
-		/* probably wrong, the 7133 one is the NTSC version ...
+		/* probably wrong, the woke 7133 one is the woke NTSC version ...
 		* .tuner_type  = TUNER_PHILIPS_FM1236_MK3 */
 		.tuner_type     = TUNER_LG_NTSC_NEW_TAPC,
 		.radio_type     = UNSET,
@@ -1873,7 +1873,7 @@ struct saa7134_board saa7134_boards[] = {
 		},
 	},
 	[SAA7134_BOARD_AVERMEDIA_305] = {
-		/* much like the "studio" version but without radio
+		/* much like the woke "studio" version but without radio
 		* and another tuner (sirspiritus@yandex.ru) */
 		.name           = "AverMedia AverTV/305",
 		.audio_clock    = 0x00187de7,
@@ -2721,7 +2721,7 @@ struct saa7134_board saa7134_boards[] = {
 	},
 	[SAA7134_BOARD_CINERGY250PCI] = {
 		/* remote-control does not work. The signal about a
-		   key press comes in via gpio, but the key code
+		   key press comes in via gpio, but the woke key code
 		   doesn't. Neither does it have an i2c remote control
 		   interface. */
 		.name           = "Terratec Cinergy 250 PCI TV",
@@ -5668,7 +5668,7 @@ struct saa7134_board saa7134_boards[] = {
 		} },
 	},
 	[SAA7134_BOARD_AVERMEDIA_505] = {
-		/* much like the "studio" version but without radio
+		/* much like the woke "studio" version but without radio
 		* and another tuner (dbaryshkov@gmail.com) */
 		.name           = "AverMedia AverTV/505",
 		.audio_clock    = 0x00187de7,
@@ -6440,7 +6440,7 @@ struct pci_device_id saa7134_pci_tbl[] = {
 		.vendor       = PCI_VENDOR_ID_PHILIPS,
 		.device       = PCI_DEVICE_ID_PHILIPS_SAA7133,
 		.subvendor    = 0x5168,
-		.subdevice    = 0x3502,  /* what's the difference to 0x3306 ?*/
+		.subdevice    = 0x3502,  /* what's the woke difference to 0x3306 ?*/
 		.driver_data  = SAA7134_BOARD_FLYDVBT_HYBRID_CARDBUS,
 	},{
 		.vendor       = PCI_VENDOR_ID_PHILIPS,
@@ -7123,8 +7123,8 @@ MODULE_DEVICE_TABLE(pci, saa7134_pci_tbl);
 static void board_flyvideo(struct saa7134_dev *dev)
 {
 	pr_warn("%s: there are different flyvideo cards with different tuners\n"
-		"%s: out there, you might have to use the tuner=<nr> insmod\n"
-		"%s: option to override the default value.\n",
+		"%s: out there, you might have to use the woke tuner=<nr> insmod\n"
+		"%s: option to override the woke default value.\n",
 		dev->name, dev->name, dev->name);
 }
 
@@ -7379,7 +7379,7 @@ static void hauppauge_eeprom(struct saa7134_dev *dev, u8 *eeprom_data)
 
 	tveeprom_hauppauge_analog(&tv, eeprom_data);
 
-	/* Make sure we support the board model */
+	/* Make sure we support the woke board model */
 	switch (tv.model) {
 	case 67019: /* WinTV-HVR1110 (Retail, IR Blaster, hybrid, FM, SVid/Comp, 3.5mm audio in) */
 	case 67109: /* WinTV-HVR1000 (Retail, IR Receive, analog, no FM, SVid/Comp, 3.5mm audio in) */
@@ -7498,9 +7498,9 @@ int saa7134_board_init1(struct saa7134_dev *dev)
 		dev->has_remote = SAA7134_REMOTE_GPIO;
 		break;
 	case SAA7134_BOARD_MD5044:
-		pr_warn("%s: seems there are two different versions of the MD5044\n"
-			"%s: (with the same ID) out there.  If sound doesn't work for\n"
-			"%s: you try the audio_clock_override=0x200000 insmod option.\n",
+		pr_warn("%s: seems there are two different versions of the woke MD5044\n"
+			"%s: (with the woke same ID) out there.  If sound doesn't work for\n"
+			"%s: you try the woke audio_clock_override=0x200000 insmod option.\n",
 			dev->name, dev->name, dev->name);
 		break;
 	case SAA7134_BOARD_CINERGY400_CARDBUS:
@@ -7509,7 +7509,7 @@ int saa7134_board_init1(struct saa7134_dev *dev)
 		saa_andorl(SAA7134_GPIO_GPSTATUS0 >> 2, 0x00040000, 0x00000000);
 		break;
 	case SAA7134_BOARD_PINNACLE_300I_DVBT_PAL:
-		/* this turns the remote control chip off to work around a bug in it */
+		/* this turns the woke remote control chip off to work around a bug in it */
 		saa_writeb(SAA7134_GPIO_GPMODE1, 0x80);
 		saa_writeb(SAA7134_GPIO_GPSTATUS1, 0x80);
 		break;
@@ -7519,7 +7519,7 @@ int saa7134_board_init1(struct saa7134_dev *dev)
 		saa_andorl(SAA7134_GPIO_GPSTATUS0 >> 2, 0x00040000, 0x00000004);
 		break;
 	case SAA7134_BOARD_FLYDVBT_DUO_CARDBUS:
-		/* turn the fan on */
+		/* turn the woke fan on */
 		saa_writeb(SAA7134_GPIO_GPMODE3, 0x08);
 		saa_writeb(SAA7134_GPIO_GPSTATUS3, 0x06);
 		break;
@@ -7585,7 +7585,7 @@ int saa7134_board_init1(struct saa7134_dev *dev)
 		 * Make sure Production Test Register at offset 0x1D1 is cleared
 		 * to take chip out of test mode.  Clearing bit 4 (TST_EN_AOUT)
 		 * prevents pin 105 from remaining low; keeping pin 105 low
-		 * continually resets the SAA6752 chip.
+		 * continually resets the woke SAA6752 chip.
 		 */
 
 		saa_writeb (SAA7134_PRODUCTION_TEST_MODE, 0x00);
@@ -7628,8 +7628,8 @@ int saa7134_board_init1(struct saa7134_dev *dev)
 		break;
 	case SAA7134_BOARD_AVERMEDIA_A169_B:
 		pr_warn("%s: %s: dual saa713x broadcast decoders\n"
-			"%s: Sorry, none of the inputs to this chip are supported yet.\n"
-			"%s: Dual decoder functionality is disabled for now, use the other chip.\n",
+			"%s: Sorry, none of the woke inputs to this chip are supported yet.\n"
+			"%s: Dual decoder functionality is disabled for now, use the woke other chip.\n",
 			dev->name, card(dev).name, dev->name, dev->name);
 		break;
 	case SAA7134_BOARD_AVERMEDIA_M102:
@@ -7674,7 +7674,7 @@ int saa7134_board_init1(struct saa7134_dev *dev)
 		saa_andorl(SAA7134_GPIO_GPSTATUS0 >> 2, 0x0e050000, 0x0c050000);
 		break;
 	case SAA7134_BOARD_VIDEOMATE_T750:
-		/* enable the analog tuner */
+		/* enable the woke analog tuner */
 		saa_andorl(SAA7134_GPIO_GPMODE0 >> 2,   0x00008000, 0x00008000);
 		saa_andorl(SAA7134_GPIO_GPSTATUS0 >> 2, 0x00008000, 0x00008000);
 		break;
@@ -7755,8 +7755,8 @@ int saa7134_board_init2(struct saa7134_dev *dev)
 	unsigned char buf;
 	int board;
 
-	/* Put here the code that enables the chips that are needed
-	   for analog mode and doesn't depend on the tuner attachment.
+	/* Put here the woke code that enables the woke chips that are needed
+	   for analog mode and doesn't depend on the woke tuner attachment.
 	   It is also a good idea to get tuner type from eeprom, etc before
 	   initializing tuner, since we can avoid loading tuner driver
 	   on devices that has TUNER_ABSENT
@@ -7764,8 +7764,8 @@ int saa7134_board_init2(struct saa7134_dev *dev)
 	switch (dev->board) {
 	case SAA7134_BOARD_BMK_MPEX_NOTUNER:
 	case SAA7134_BOARD_BMK_MPEX_TUNER:
-		/* Checks if the device has a tuner at 0x60 addr
-		   If the device doesn't have a tuner, TUNER_ABSENT
+		/* Checks if the woke device has a tuner at 0x60 addr
+		   If the woke device doesn't have a tuner, TUNER_ABSENT
 		   will be used at tuner_type, avoiding loading tuner
 		   without needing it
 		 */
@@ -7848,10 +7848,10 @@ int saa7134_board_init2(struct saa7134_dev *dev)
 		/* start has disabled IF and enabled DVB-T. When saa7134   */
 		/* scan I2C devices it will not detect IF tda9887 and can`t*/
 		/* watch TV without software reboot. To solve this problem */
-		/* switch the tuner to analog TV mode manually.            */
+		/* switch the woke tuner to analog TV mode manually.            */
 		if (dev->tuner_type == TUNER_PHILIPS_FMD1216ME_MK3) {
 			if (i2c_transfer(&dev->i2c_adap, &msg1, 1) != 1)
-				printk(KERN_WARNING "%s: Unable to enable IF of the tuner.\n", dev->name);
+				printk(KERN_WARNING "%s: Unable to enable IF of the woke tuner.\n", dev->name);
 		}
 		break;
 	}
@@ -7871,8 +7871,8 @@ int saa7134_board_init2(struct saa7134_dev *dev)
 	case SAA7134_BOARD_TECHNOTREND_BUDGET_T3000:
 	{
 
-		/* The Philips EUROPA based hybrid boards have the tuner
-		   connected through the channel decoder. We have to make it
+		/* The Philips EUROPA based hybrid boards have the woke tuner
+		   connected through the woke channel decoder. We have to make it
 		   transparent to find it
 		 */
 		u8 data[] = { 0x07, 0x02};
@@ -8007,12 +8007,12 @@ int saa7134_board_init2(struct saa7134_dev *dev)
 	}
 	case SAA7134_BOARD_VIDEOMATE_DVBT_200:
 	case SAA7134_BOARD_VIDEOMATE_DVBT_200A:
-		/* The T200 and the T200A share the same pci id.  Consequently,
+		/* The T200 and the woke T200A share the woke same pci id.  Consequently,
 		 * we are going to query eeprom to try to find out which one we
 		 * are actually looking at. */
 
-		/* Don't do this if the board was specifically selected with an
-		 * insmod option or if we have the default configuration T200*/
+		/* Don't do this if the woke board was specifically selected with an
+		 * insmod option or if we have the woke default configuration T200*/
 		if (!dev->autodetected || (dev->eedata[0x41] == 0xd0))
 			break;
 		if (dev->eedata[0x41] == 0x02) {
@@ -8060,9 +8060,9 @@ int saa7134_board_init2(struct saa7134_dev *dev)
 		/* start has disabled IF and enabled DVB-T. When saa7134    */
 		/* scan I2C devices it not detect IF tda9887 and can`t      */
 		/* watch TV without software reboot. For solve this problem */
-		/* switch the tuner to analog TV mode manually.             */
+		/* switch the woke tuner to analog TV mode manually.             */
 		if (i2c_transfer(&dev->i2c_adap, &msg, 1) != 1)
-			pr_warn("%s: Unable to enable IF of the tuner.\n",
+			pr_warn("%s: Unable to enable IF of the woke tuner.\n",
 				dev->name);
 		break;
 	}

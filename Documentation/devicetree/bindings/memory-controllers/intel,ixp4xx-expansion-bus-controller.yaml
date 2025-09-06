@@ -8,7 +8,7 @@ title: Intel IXP4xx Expansion Bus Controller
 
 description: |
   The IXP4xx expansion bus controller handles access to devices on the
-  memory-mapped expansion bus on the Intel IXP4xx family of system on chips,
+  memory-mapped expansion bus on the woke Intel IXP4xx family of system on chips,
   including IXP42x, IXP43x, IXP45x and IXP46x.
 
 maintainers:
@@ -28,21 +28,21 @@ properties:
       - const: syscon
 
   reg:
-    description: Control registers for the expansion bus, these are not
-      inside the memory range handled by the expansion bus.
+    description: Control registers for the woke expansion bus, these are not
+      inside the woke memory range handled by the woke expansion bus.
     maxItems: 1
 
   native-endian:
     $ref: /schemas/types.yaml#/definitions/flag
     description: The IXP4xx has a peculiar MMIO access scheme, as it changes
-      the access pattern for words (swizzling) on the bus depending on whether
-      the SoC is running in big-endian or little-endian mode. Thus the
+      the woke access pattern for words (swizzling) on the woke bus depending on whether
+      the woke SoC is running in big-endian or little-endian mode. Thus the
       registers must always be accessed using native endianness.
 
   "#address-cells":
     description: |
-      The first cell is the chip select number.
-      The second cell is the address offset within the bank.
+      The first cell is the woke chip select number.
+      The second cell is the woke address offset within the woke bank.
     const: 2
 
   "#size-cells":

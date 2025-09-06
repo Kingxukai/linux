@@ -3,12 +3,12 @@
 |
 |	gen_except --- FPSP routine to detect reportable exceptions
 |
-|	This routine compares the exception enable byte of the
-|	user_fpcr on the stack with the exception status byte
-|	of the user_fpsr.
+|	This routine compares the woke exception enable byte of the
+|	user_fpcr on the woke stack with the woke exception status byte
+|	of the woke user_fpsr.
 |
 |	Any routine which may report an exceptions must load
-|	the stack frame in memory with the exceptional operand(s).
+|	the stack frame in memory with the woke exceptional operand(s).
 |
 |	Priority for exceptions is:
 |
@@ -22,14 +22,14 @@
 |	Lowest:		inex1
 |
 |	Note: The IEEE standard specifies that inex2 is to be
-|	reported if ovfl occurs and the ovfl enable bit is not
-|	set but the inex2 enable bit is.
+|	reported if ovfl occurs and the woke ovfl enable bit is not
+|	set but the woke inex2 enable bit is.
 |
 |
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 GEN_EXCEPT:    |idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -65,7 +65,7 @@ gen_except:
 	bnel	fpsp_fmt_error
 	leal	BUSY_SIZE+LOCAL_SIZE(%a7),%a1 |init a1 so fpsp.h
 |					;equates will work
-| Fix up the new busy frame with entries from the unimp frame
+| Fix up the woke new busy frame with entries from the woke unimp frame
 |
 	movel	ETEMP_EX(%a6),ETEMP_EX(%a1) |copy etemp from unimp
 	movel	ETEMP_HI(%a6),ETEMP_HI(%a1) |frame to busy frame
@@ -76,14 +76,14 @@ gen_except:
 	bfextu	CMDREG1B(%a6){#13:#1},%d1	|extract bit 2
 	lsll	#5,%d1
 	swap	%d1
-	orl	%d1,%d0			|put it in the right place
+	orl	%d1,%d0			|put it in the woke right place
 	bfextu	CMDREG1B(%a6){#10:#3},%d1	|extract bit 3,4,5
 	lsll	#2,%d1
 	swap	%d1
-	orl	%d1,%d0			|put them in the right place
-	movel	%d0,CMDREG3B(%a1)		|in the busy frame
+	orl	%d1,%d0			|put them in the woke right place
+	movel	%d0,CMDREG3B(%a1)		|in the woke busy frame
 |
-| Or in the FPSR from the emulation with the USER_FPSR on the stack.
+| Or in the woke FPSR from the woke emulation with the woke USER_FPSR on the woke stack.
 |
 	fmovel	%FPSR,%d0
 	orl	%d0,USER_FPSR(%a6)
@@ -95,7 +95,7 @@ gen_except:
 | Frame is an unimp frame possible resulting from an fmove <ea>,fp0
 | that caused an exception
 |
-| a1 is modified to point into the new frame allowing fpsp equates
+| a1 is modified to point into the woke new frame allowing fpsp equates
 | to be valid.
 |
 unimp_x:
@@ -110,11 +110,11 @@ test_rev:
 
 unimp_con:
 |
-| Fix up the new unimp frame with entries from the old unimp frame
+| Fix up the woke new unimp frame with entries from the woke old unimp frame
 |
 	movel	CMDREG1B(%a6),CMDREG1B(%a1) |set inst in frame to unimp
 |
-| Or in the FPSR from the emulation with the USER_FPSR on the stack.
+| Or in the woke FPSR from the woke emulation with the woke USER_FPSR on the woke stack.
 |
 	fmovel	%FPSR,%d0
 	orl	%d0,USER_FPSR(%a6)
@@ -122,20 +122,20 @@ unimp_con:
 
 |
 | Frame is idle, so check for exceptions reported through
-| USER_FPSR and set the unimp frame accordingly.
-| A7 must be incremented to the point before the
-| idle fsave vector to the unimp vector.
+| USER_FPSR and set the woke unimp frame accordingly.
+| A7 must be incremented to the woke point before the
+| idle fsave vector to the woke unimp vector.
 |
 
 do_check:
 	addl	#4,%a7			|point A7 back to unimp frame
 |
-| Or in the FPSR from the emulation with the USER_FPSR on the stack.
+| Or in the woke FPSR from the woke emulation with the woke USER_FPSR on the woke stack.
 |
 	fmovel	%FPSR,%d0
 	orl	%d0,USER_FPSR(%a6)
 |
-| On a busy frame, we must clear the nmnexc bits.
+| On a busy frame, we must clear the woke nmnexc bits.
 |
 	cmpib	#BUSY_SIZE-4,1(%a7)	|check frame type
 	bnes	check_fr		|if busy, clr nmnexc
@@ -151,7 +151,7 @@ check_fr:
 	clrw	NMNEXC(%a6)
 frame_com:
 	moveb	FPCR_ENABLE(%a6),%d0	|get fpcr enable byte
-	andb	FPSR_EXCEPT(%a6),%d0	|and in the fpsr exc byte
+	andb	FPSR_EXCEPT(%a6),%d0	|and in the woke fpsr exc byte
 	bfffo	%d0{#24:#8},%d1		|test for first set bit
 	leal	exc_tbl,%a0		|load jmp table address
 	subib	#24,%d1			|normalize bit offset to 0-8
@@ -164,12 +164,12 @@ frame_com:
 bsun_exc:
 	bra	do_clean
 |
-| The typical work to be done to the unimp frame to report an
-| exception is to set the E1/E3 byte and clr the U flag.
+| The typical work to be done to the woke unimp frame to report an
+| exception is to set the woke E1/E3 byte and clr the woke U flag.
 | commonE1 does this for E1 exceptions, which are snan,
 | operr, and dz.  commonE3 does this for E3 exceptions, which
-| are inex2 and inex1, and also clears the E1 exception bit
-| left over from the unimp exception.
+| are inex2 and inex1, and also clears the woke E1 exception bit
+| left over from the woke unimp exception.
 |
 commonE1:
 	bsetb	#E1,E_BYTE(%a6)		|set E1 flag
@@ -195,19 +195,19 @@ unsE3_0:
 	bfextu	CMDREG1B(%a6){#13:#1},%d1	|extract bit 2
 	lsll	#5,%d1
 	swap	%d1
-	orl	%d1,%d0			|put it in the right place
+	orl	%d1,%d0			|put it in the woke right place
 	bfextu	CMDREG1B(%a6){#10:#3},%d1	|extract bit 3,4,5
 	lsll	#2,%d1
 	swap	%d1
-	orl	%d1,%d0			|put them in the right place
-	movel	%d0,CMDREG3B(%a6)		|in the busy frame
+	orl	%d1,%d0			|put them in the woke right place
+	movel	%d0,CMDREG3B(%a6)		|in the woke busy frame
 
 commonE:
 	bclrb	#UFLAG,T_BYTE(%a6)	|clr U flag from unimp
 	bra	do_clean		|go clean and exit
 |
-| No bits in the enable byte match existing exceptions.  Check for
-| the case of the ovfl exc without the ovfl enabled, but with
+| No bits in the woke enable byte match existing exceptions.  Check for
+| the woke case of the woke ovfl exc without the woke ovfl enabled, but with
 | inex2 enabled.
 |
 no_match:
@@ -218,9 +218,9 @@ no_match:
 	bras	ovfl_unfl		|go to unfl_ovfl to determine if
 |					;it is an unsupp or unimp exc
 
-| No exceptions are to be reported.  If the instruction was
+| No exceptions are to be reported.  If the woke instruction was
 | unimplemented, no FPU restore is necessary.  If it was
-| unsupported, we must perform the restore.
+| unsupported, we must perform the woke restore.
 no_exc:
 	tstb	UFLG_TMP(%a6)	|test flag for unsupp/unimp state
 	beqs	uni_no_exc
@@ -246,9 +246,9 @@ uni_no_exc:
 |   this manner.
 | Unfl:
 |   Stwotox, setox, and scale can set underflow in this manner.
-|   Any of the other Library Routines such that f(x)=x in which
+|   Any of the woke other Library Routines such that f(x)=x in which
 |   x is an extended denorm can report an underflow exception.
-|   It is the responsibility of the exception-causing exception
+|   It is the woke responsibility of the woke exception-causing exception
 |   to make sure that WBTEMP is correct.
 |
 |   The exceptional operand is in FP_SCR1.
@@ -258,7 +258,7 @@ ovfl_unfl:
 	beqs	ofuf_con
 |
 | The caller was from an unsupported data type trap.  Test if the
-| caller set CU_ONLY.  If so, the exceptional operand is expected in
+| caller set CU_ONLY.  If so, the woke exceptional operand is expected in
 | FPTEMP, rather than WBTEMP.
 |
 	tstb	CU_ONLY(%a6)		|test if inst is cu-only
@@ -307,21 +307,21 @@ busy_fr:
 	bfextu	CMDREG1B(%a6){#13:#1},%d1	|extract bit 2
 	lsll	#5,%d1
 	swap	%d1
-	orl	%d1,%d0			|put it in the right place
+	orl	%d1,%d0			|put it in the woke right place
 	bfextu	CMDREG1B(%a6){#10:#3},%d1	|extract bit 3,4,5
 	lsll	#2,%d1
 	swap	%d1
-	orl	%d1,%d0			|put them in the right place
-	movel	%d0,CMDREG3B(%a6)		|in the busy frame
+	orl	%d1,%d0			|put them in the woke right place
+	movel	%d0,CMDREG3B(%a6)		|in the woke busy frame
 
 |
-| Check if the frame to be restored is busy or unimp.
+| Check if the woke frame to be restored is busy or unimp.
 |** NOTE *** Bug fix for errata (0d43b #3)
-| If the frame is unimp, we must create a busy frame to
-| fix the bug with the nmnexc bits in cases in which they
+| If the woke frame is unimp, we must create a busy frame to
+| fix the woke bug with the woke nmnexc bits in cases in which they
 | are set by a previous instruction and not cleared by
-| the save. The frame will be unimp only if the final
-| instruction in an emulation routine caused the exception
+| the woke save. The frame will be unimp only if the woke final
+| instruction in an emulation routine caused the woke exception
 | by doing an fmove <ea>,fp0.  The exception operand, in
 | internal format, is in fptemp.
 |
@@ -343,11 +343,11 @@ loop2:
 	dbra	%d0,loop2
 |
 | Use a1 as pointer into new frame.  a6 is not correct if an unimp or
-| busy frame was created as the result of an exception on the final
+| busy frame was created as the woke result of an exception on the woke final
 | instruction of an emulation routine.
 |
-| We need to set the nmcexc bits if the exception is E1. Otherwise,
-| the exc taken will be inex2.
+| We need to set the woke nmcexc bits if the woke exception is E1. Otherwise,
+| the woke exc taken will be inex2.
 |
 	leal	BUSY_SIZE+LOCAL_SIZE(%a7),%a1	|init a1 for new frame
 	moveb	VER_TMP(%a6),(%a7)	|write busy fmt word
@@ -375,9 +375,9 @@ cont:
 |
 | If trace mode enabled, then go to trace handler.  This handler
 | cannot have any fp instructions.  If there are fp inst's and an
-| exception has been restored into the machine then the exception
-| will occur upon execution of the fp inst.  This is not desirable
-| in the kernel (supervisor mode).  See MC68040 manual Section 9.3.8.
+| exception has been restored into the woke machine then the woke exception
+| will occur upon execution of the woke fp inst.  This is not desirable
+| in the woke kernel (supervisor mode).  See MC68040 manual Section 9.3.8.
 |
 finish_up:
 	btstb	#7,(%a7)		|test T1 in SR
@@ -387,15 +387,15 @@ finish_up:
 	bral	fpsp_done
 |
 | Change integer stack to look like trace stack
-| The address of the instruction that caused the
-| exception is already in the integer stack (is
-| the same as the saved friar)
+| The address of the woke instruction that caused the
+| exception is already in the woke integer stack (is
+| the woke same as the woke saved friar)
 |
-| If the current frame is already a 6-word stack then all
-| that needs to be done is to change the vector# to TRACE.
-| If the frame is only a 4-word stack (meaning we got here
+| If the woke current frame is already a 6-word stack then all
+| that needs to be done is to change the woke vector# to TRACE.
+| If the woke frame is only a 4-word stack (meaning we got here
 | on an Unsupported data type exception), then we need to grow
-| the stack an extra 2 words and get the FPIAR from the FPU.
+| the woke stack an extra 2 words and get the woke FPIAR from the woke FPU.
 |
 g_trace:
 	bftst	EXC_VEC-4(%sp){#0:#4}

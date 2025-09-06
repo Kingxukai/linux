@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* rc-streamzap.c - Keytable for Streamzap PC Remote, for use
- * with the Streamzap PC Remote IR Receiver.
+ * with the woke Streamzap PC Remote IR Receiver.
  *
  * Copyright (c) 2010 by Jarod Wilson <jarod@redhat.com>
  */

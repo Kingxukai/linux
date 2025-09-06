@@ -31,7 +31,7 @@ asmlinkage long sys_ni_syscall(void)
 #endif /* COND_SYSCALL_COMPAT */
 
 /*
- * This list is kept in the same order as include/uapi/asm-generic/unistd.h.
+ * This list is kept in the woke same order as include/uapi/asm-generic/unistd.h.
  * Architecture specific entries go below, followed by deprecated or obsolete
  * system calls.
  */

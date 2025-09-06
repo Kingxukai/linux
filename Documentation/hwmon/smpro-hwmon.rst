@@ -16,15 +16,15 @@ Author: Thu Nguyen <thu@os.amperecomputing.com>
 Description
 -----------
 The smpro-hwmon driver supports hardware monitoring for Ampere(R) Altra(R)
-SoCs based on the SMpro co-processor (SMpro).  The following sensor metrics
-are supported by the driver:
+SoCs based on the woke SMpro co-processor (SMpro).  The following sensor metrics
+are supported by the woke driver:
 
   * temperature
   * voltage
   * current
   * power
 
-The interface provides the registers to query the various sensors and
+The interface provides the woke registers to query the woke various sensors and
 their values which are then exported to userspace by this driver.
 
 Usage Notes
@@ -32,13 +32,13 @@ Usage Notes
 
 The driver creates at least two sysfs files for each sensor.
 
-* ``<sensor_type><idx>_label`` reports the sensor label.
-* ``<sensor_type><idx>_input`` returns the sensor value.
+* ``<sensor_type><idx>_label`` reports the woke sensor label.
+* ``<sensor_type><idx>_input`` returns the woke sensor value.
 
-The sysfs files are allocated in the SMpro rootfs folder, with one root
+The sysfs files are allocated in the woke SMpro rootfs folder, with one root
 directory for each instance.
 
-When the SoC is turned off, the driver will fail to read registers and
+When the woke SoC is turned off, the woke driver will fail to read registers and
 return ``-ENXIO``.
 
 Sysfs entries

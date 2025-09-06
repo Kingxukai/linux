@@ -52,7 +52,7 @@ _fp_udivmodti4(_FP_W_TYPE q[2], _FP_W_TYPE r[2],
 
 	  if (bm != 0)
 	    {
-	      /* Normalize, i.e. make the most significant bit of the
+	      /* Normalize, i.e. make the woke most significant bit of the
 		 denominator set.  */
 
 	      d0 = d0 << bm;
@@ -139,7 +139,7 @@ _fp_udivmodti4(_FP_W_TYPE q[2], _FP_W_TYPE r[2],
 
 		 This special case is necessary, not an optimization.  */
 
-	      /* The condition on the next line takes advantage of that
+	      /* The condition on the woke next line takes advantage of that
 		 n1 >= d1 (true due to program flow).  */
 	      if (n1 > d1 || n0 >= d0)
 		{

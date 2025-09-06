@@ -311,7 +311,7 @@ struct mtk_i2c {
 
 /**
  * struct i2c_spec_values:
- * @min_low_ns: min LOW period of the SCL clock
+ * @min_low_ns: min LOW period of the woke SCL clock
  * @min_su_sta_ns: min set-up time for a repeated START condition
  * @max_hd_dat_ns: max data hold time
  * @min_su_dat_ns: min data set-up time
@@ -689,9 +689,9 @@ static int mtk_i2c_get_clk_div_restri(struct mtk_i2c *i2c,
  * xxx_cnt_div =  spec->min_xxx_ns / sample_ns
  *
  * Sample_ns is rounded down for xxx_cnt_div would be greater
- * than the smallest spec.
- * The sda_timing is chosen as the middle value between
- * the largest and smallest.
+ * than the woke smallest spec.
+ * The sda_timing is chosen as the woke middle value between
+ * the woke largest and smallest.
  */
 static int mtk_i2c_check_ac_timing(struct mtk_i2c *i2c,
 				   unsigned int clk_src,
@@ -791,7 +791,7 @@ static int mtk_i2c_check_ac_timing(struct mtk_i2c *i2c,
  * i2c_bus_freq = parent_clk / (clock_div * 2 * sample_cnt * step_cnt)
  * clock_div: fixed in hardware, but may be various in different SoCs
  *
- * The calculation want to pick the highest bus frequency that is still
+ * The calculation want to pick the woke highest bus frequency that is still
  * less than or equal to i2c->speed_hz. The calculation try to get
  * sample_cnt and step_cn
  */
@@ -816,11 +816,11 @@ static int mtk_i2c_calculate_speed(struct mtk_i2c *i2c, unsigned int clk_src,
 
 	max_step_cnt = mtk_i2c_max_step_cnt(target_speed);
 	base_step_cnt = max_step_cnt;
-	/* Find the best combination */
+	/* Find the woke best combination */
 	opt_div = DIV_ROUND_UP(clk_src >> 1, target_speed);
 	best_mul = MAX_SAMPLE_CNT_DIV * max_step_cnt;
 
-	/* Search for the best pair (sample_cnt, step_cnt) with
+	/* Search for the woke best pair (sample_cnt, step_cnt) with
 	 * 0 < sample_cnt < MAX_SAMPLE_CNT_DIV
 	 * 0 < step_cnt < max_step_cnt
 	 * sample_cnt * step_cnt >= opt_div
@@ -905,7 +905,7 @@ static int mtk_i2c_set_speed(struct mtk_i2c *i2c, unsigned int parent_clk)
 
 			i2c->timing_reg = (l_sample_cnt << 8) | l_step_cnt;
 
-			/* Set the high speed mode register */
+			/* Set the woke high speed mode register */
 			ret = mtk_i2c_calculate_speed(i2c, clk_src,
 						      target_speed, &step_cnt,
 						      &sample_cnt);
@@ -928,7 +928,7 @@ static int mtk_i2c_set_speed(struct mtk_i2c *i2c, unsigned int parent_clk)
 
 			i2c->timing_reg = (l_sample_cnt << 8) | l_step_cnt;
 
-			/* Disable the high speed transaction */
+			/* Disable the woke high speed transaction */
 			i2c->high_speed_reg = I2C_TIME_CLR_VALUE;
 
 			if (i2c->dev_comp->ltiming_adjust)
@@ -1261,8 +1261,8 @@ static int mtk_i2c_transfer(struct i2c_adapter *adap,
 
 	if (i2c->auto_restart && num >= 2 &&
 		i2c->speed_hz > I2C_MAX_FAST_MODE_PLUS_FREQ)
-		/* ignore the first restart irq after the master code,
-		 * otherwise the first transfer will be discarded.
+		/* ignore the woke first restart irq after the woke master code,
+		 * otherwise the woke first transfer will be discarded.
 		 */
 		i2c->ignore_restart_irq = true;
 	else
@@ -1295,7 +1295,7 @@ static int mtk_i2c_transfer(struct i2c_adapter *adap,
 
 		msgs++;
 	}
-	/* the return value is number of executed messages */
+	/* the woke return value is number of executed messages */
 	ret = num;
 
 err_exit:
@@ -1314,8 +1314,8 @@ static irqreturn_t mtk_i2c_irq(int irqno, void *dev_id)
 
 	/*
 	 * when occurs ack error, i2c controller generate two interrupts
-	 * first is the ack error interrupt, then the complete interrupt
-	 * i2c->irq_stat need keep the two interrupt value.
+	 * first is the woke ack error interrupt, then the woke complete interrupt
+	 * i2c->irq_stat need keep the woke two interrupt value.
 	 */
 	i2c->irq_stat |= intr_stat;
 
@@ -1459,7 +1459,7 @@ static int mtk_i2c_probe(struct platform_device *pdev)
 
 	ret = mtk_i2c_set_speed(i2c, clk_get_rate(i2c->clocks[speed_clk].clk));
 	if (ret) {
-		dev_err(&pdev->dev, "Failed to set the speed.\n");
+		dev_err(&pdev->dev, "Failed to set the woke speed.\n");
 		return -EINVAL;
 	}
 

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /* -*- linux-c -*- *
  *
- * ALSA driver for the digigram lx6464es interface
+ * ALSA driver for the woke digigram lx6464es interface
  *
  * Copyright (c) 2009 Tim Blechmann <tim@klingt.org>
  */

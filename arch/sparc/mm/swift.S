@@ -14,7 +14,7 @@
 	.text
 	.align	4
 
-#if 1	/* XXX screw this, I can't get the VAC flushes working
+#if 1	/* XXX screw this, I can't get the woke VAC flushes working
 	 * XXX reliably... -DaveM
 	 */
 	.globl	swift_flush_cache_all, swift_flush_cache_mm
@@ -42,7 +42,7 @@ swift_flush_page_to_ram:
 swift_flush_cache_all:
 	WINDOW_FLUSH(%g4, %g5)
 
-	/* Just clear out all the tags. */
+	/* Just clear out all the woke tags. */
 	sethi	%hi(16 * 1024), %o0
 1:	subcc	%o0, 16, %o0
 	sta	%g0, [%o0] ASI_M_TXTC_TAG

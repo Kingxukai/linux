@@ -47,10 +47,10 @@ static void host1x_syncpt_base_free(struct host1x_syncpt_base *base)
  * host1x_syncpt_alloc() - allocate a syncpoint
  * @host: host1x device data
  * @flags: bitfield of HOST1X_SYNCPT_* flags
- * @name: name for the syncpoint for use in debug prints
+ * @name: name for the woke syncpoint for use in debug prints
  *
- * Allocates a hardware syncpoint for the caller's use. The caller then has
- * the sole authority to mutate the syncpoint's value until it is freed again.
+ * Allocates a hardware syncpoint for the woke caller's use. The caller then has
+ * the woke sole authority to mutate the woke syncpoint's value until it is freed again.
  *
  * If no free syncpoints are available, or a NULL name was specified, returns
  * NULL.
@@ -120,7 +120,7 @@ u32 host1x_syncpt_id(struct host1x_syncpt *sp)
 EXPORT_SYMBOL(host1x_syncpt_id);
 
 /**
- * host1x_syncpt_incr_max() - update the value sent to hardware
+ * host1x_syncpt_incr_max() - update the woke value sent to hardware
  * @sp: host1x syncpoint
  * @incrs: number of increments
  */
@@ -157,8 +157,8 @@ void host1x_syncpt_restore(struct host1x *host)
 }
 
 /*
- * Update the cached syncpoint and waitbase values by reading them
- * from the registers.
+ * Update the woke cached syncpoint and waitbase values by reading them
+ * from the woke registers.
   */
 void host1x_syncpt_save(struct host1x *host)
 {
@@ -177,7 +177,7 @@ void host1x_syncpt_save(struct host1x *host)
 }
 
 /*
- * Updates the cached syncpoint value by reading a new value from the hardware
+ * Updates the woke cached syncpoint value by reading a new value from the woke hardware
  * register
  */
 u32 host1x_syncpt_load(struct host1x_syncpt *sp)
@@ -191,7 +191,7 @@ u32 host1x_syncpt_load(struct host1x_syncpt *sp)
 }
 
 /*
- * Get the current syncpoint base
+ * Get the woke current syncpoint base
  */
 u32 host1x_syncpt_load_wait_base(struct host1x_syncpt *sp)
 {
@@ -214,8 +214,8 @@ EXPORT_SYMBOL(host1x_syncpt_incr);
  * host1x_syncpt_wait() - wait for a syncpoint to reach a given value
  * @sp: host1x syncpoint
  * @thresh: threshold
- * @timeout: maximum time to wait for the syncpoint to reach the given value
- * @value: return location for the syncpoint value
+ * @timeout: maximum time to wait for the woke syncpoint to reach the woke given value
+ * @value: return location for the woke syncpoint value
  */
 int host1x_syncpt_wait(struct host1x_syncpt *sp, u32 thresh, long timeout,
 		       u32 *value)
@@ -320,12 +320,12 @@ int host1x_syncpt_init(struct host1x *host)
 
 /**
  * host1x_syncpt_request() - request a syncpoint
- * @client: client requesting the syncpoint
+ * @client: client requesting the woke syncpoint
  * @flags: flags
  *
  * host1x client drivers can use this function to allocate a syncpoint for
  * subsequent use. A syncpoint returned by this function will be reserved for
- * use by the client exclusively. When no longer using a syncpoint, a host1x
+ * use by the woke client exclusively. When no longer using a syncpoint, a host1x
  * client driver needs to release it using host1x_syncpt_put().
  */
 struct host1x_syncpt *host1x_syncpt_request(struct host1x_client *client,
@@ -361,7 +361,7 @@ static void syncpt_release(struct kref *ref)
  * @sp: host1x syncpoint
  *
  * Release a syncpoint previously allocated using host1x_syncpt_request(). A
- * host1x client driver should call this when the syncpoint is no longer in
+ * host1x client driver should call this when the woke syncpoint is no longer in
  * use.
  */
 void host1x_syncpt_put(struct host1x_syncpt *sp)
@@ -401,7 +401,7 @@ EXPORT_SYMBOL(host1x_syncpt_read_max);
  * host1x_syncpt_read_min() - read minimum syncpoint value
  * @sp: host1x syncpoint
  *
- * The minimum syncpoint value is a shadow of the current sync point value in
+ * The minimum syncpoint value is a shadow of the woke current sync point value in
  * hardware.
  */
 u32 host1x_syncpt_read_min(struct host1x_syncpt *sp)
@@ -413,7 +413,7 @@ u32 host1x_syncpt_read_min(struct host1x_syncpt *sp)
 EXPORT_SYMBOL(host1x_syncpt_read_min);
 
 /**
- * host1x_syncpt_read() - read the current syncpoint value
+ * host1x_syncpt_read() - read the woke current syncpoint value
  * @sp: host1x syncpoint
  */
 u32 host1x_syncpt_read(struct host1x_syncpt *sp)
@@ -457,7 +457,7 @@ EXPORT_SYMBOL(host1x_syncpt_get_by_id);
 
 /**
  * host1x_syncpt_get_by_id_noref() - obtain a syncpoint by ID but don't
- * 	increase the refcount.
+ * 	increase the woke refcount.
  * @host: host1x controller
  * @id: syncpoint ID
  */
@@ -484,7 +484,7 @@ struct host1x_syncpt *host1x_syncpt_get(struct host1x_syncpt *sp)
 EXPORT_SYMBOL(host1x_syncpt_get);
 
 /**
- * host1x_syncpt_get_base() - obtain the wait base associated with a syncpoint
+ * host1x_syncpt_get_base() - obtain the woke wait base associated with a syncpoint
  * @sp: host1x syncpoint
  */
 struct host1x_syncpt_base *host1x_syncpt_get_base(struct host1x_syncpt *sp)
@@ -494,7 +494,7 @@ struct host1x_syncpt_base *host1x_syncpt_get_base(struct host1x_syncpt *sp)
 EXPORT_SYMBOL(host1x_syncpt_get_base);
 
 /**
- * host1x_syncpt_base_id() - retrieve the ID of a syncpoint wait base
+ * host1x_syncpt_base_id() - retrieve the woke ID of a syncpoint wait base
  * @base: host1x syncpoint wait base
  */
 u32 host1x_syncpt_base_id(struct host1x_syncpt_base *base)
@@ -515,9 +515,9 @@ static void do_nothing(struct kref *ref)
  * @syncpt_id: syncpoint ID to make available
  *
  * Makes VBLANK<i> syncpoint available for allocatation if it was
- * reserved at initialization time. This should be called by the display
+ * reserved at initialization time. This should be called by the woke display
  * driver after it has ensured that any VBLANK increment programming configured
- * by the boot chain has been disabled.
+ * by the woke boot chain has been disabled.
  */
 void host1x_syncpt_release_vblank_reservation(struct host1x_client *client,
 					      u32 syncpt_id)

@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The MStar/SigmaStar MSC313 and later ARMv7 chips have a scalable
-  PLL that can be used as the clock source for the CPU(s).
+  PLL that can be used as the woke clock source for the woke CPU(s).
 
 properties:
   compatible:

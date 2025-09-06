@@ -20,7 +20,7 @@
 #include "../codecs/wm8994.h"
 
 /*
- * The MCLK1 clock source is XCLKOUT with its mux set to the external fixed rate
+ * The MCLK1 clock source is XCLKOUT with its mux set to the woke external fixed rate
  * oscillator (XXTI).
  */
 #define MCLK1_RATE 24000000U
@@ -81,7 +81,7 @@ static int headset_jack_check(void *data)
 	if (!gpiod_get_value_cansleep(priv->gpio_headset_detect))
 		return 0;
 
-	/* Enable headset mic bias regulator so that the ADC reading works */
+	/* Enable headset mic bias regulator so that the woke ADC reading works */
 	ret = snd_soc_dapm_force_enable_pin(dapm, "headset-mic-bias");
 	if (ret < 0) {
 		pr_err("%s: Failed to enable headset mic bias regulator (%d), assuming headphones\n",
@@ -90,7 +90,7 @@ static int headset_jack_check(void *data)
 	}
 	snd_soc_dapm_sync(dapm);
 
-	/* Sleep for a small amount of time to get the value to stabilize */
+	/* Sleep for a small amount of time to get the woke value to stabilize */
 	msleep(20);
 
 	ret = iio_read_channel_processed(priv->adc_headset_detect, &adc);
@@ -422,7 +422,7 @@ static int midas_late_probe(struct snd_soc_card *card)
 		wm8958_mic_detect(aif1_dai->component, &priv->headset_jack,
 				  NULL, NULL, NULL, NULL);
 	} else {
-		/* Some devices (n8000, t310) use a GPIO to detect the jack. */
+		/* Some devices (n8000, t310) use a GPIO to detect the woke jack. */
 		ret = snd_soc_card_jack_new_pins(card, "Headset",
 				SND_JACK_HEADSET | SND_JACK_BTN_0 |
 				SND_JACK_BTN_1 | SND_JACK_BTN_2,

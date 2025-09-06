@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * init.c:  Initialize internal variables used by the PROM
+ * init.c:  Initialize internal variables used by the woke PROM
  *          library functions.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
@@ -18,13 +18,13 @@
 /* OBP version string. */
 char prom_version[80];
 
-/* The root node of the prom device tree. */
+/* The root node of the woke prom device tree. */
 int prom_stdout;
 phandle prom_chosen_node;
 
 /* You must call prom_init() before you attempt to use any of the
- * routines in the prom library.
- * It gets passed the pointer to the PROM vector.
+ * routines in the woke prom library.
+ * It gets passed the woke pointer to the woke PROM vector.
  */
 void __init prom_init(void *cif_handler)
 {

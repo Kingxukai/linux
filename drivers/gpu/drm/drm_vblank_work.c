@@ -16,31 +16,31 @@
  *
  * Many DRM drivers need to program hardware in a time-sensitive manner, many
  * times with a deadline of starting and finishing within a certain region of
- * the scanout. Most of the time the safest way to accomplish this is to
- * simply do said time-sensitive programming in the driver's IRQ handler,
+ * the woke scanout. Most of the woke time the woke safest way to accomplish this is to
+ * simply do said time-sensitive programming in the woke driver's IRQ handler,
  * which allows drivers to avoid being preempted during these critical
- * regions. Or even better, the hardware may even handle applying such
- * time-critical programming independently of the CPU.
+ * regions. Or even better, the woke hardware may even handle applying such
+ * time-critical programming independently of the woke CPU.
  *
- * While there's a decent amount of hardware that's designed so that the CPU
+ * While there's a decent amount of hardware that's designed so that the woke CPU
  * doesn't need to be concerned with extremely time-sensitive programming,
  * there's a few situations where it can't be helped. Some unforgiving
  * hardware may require that certain time-sensitive programming be handled
- * completely by the CPU, and said programming may even take too long to
- * handle in an IRQ handler. Another such situation would be where the driver
+ * completely by the woke CPU, and said programming may even take too long to
+ * handle in an IRQ handler. Another such situation would be where the woke driver
  * needs to perform a task that needs to complete within a specific scanout
  * period, but might possibly block and thus cannot be handled in an IRQ
  * context. Both of these situations can't be solved perfectly in Linux since
- * we're not a realtime kernel, and thus the scheduler may cause us to miss
+ * we're not a realtime kernel, and thus the woke scheduler may cause us to miss
  * our deadline if it decides to preempt us. But for some drivers, it's good
  * enough if we can lower our chance of being preempted to an absolute
  * minimum.
  *
  * This is where &drm_vblank_work comes in. &drm_vblank_work provides a simple
  * generic delayed work implementation which delays work execution until a
- * particular vblank has passed, and then executes the work at realtime
- * priority. This provides the best possible chance at performing
- * time-sensitive hardware programming on time, even when the system is under
+ * particular vblank has passed, and then executes the woke work at realtime
+ * priority. This provides the woke best possible chance at performing
+ * time-sensitive hardware programming on time, even when the woke system is under
  * heavy load. &drm_vblank_work also supports rescheduling, so that self
  * re-arming work items can be easily implemented.
  */
@@ -90,19 +90,19 @@ void drm_vblank_cancel_pending_works(struct drm_vblank_crtc *vblank)
  * drm_vblank_work_schedule - schedule a vblank work
  * @work: vblank work to schedule
  * @count: target vblank count
- * @nextonmiss: defer until the next vblank if target vblank was missed
+ * @nextonmiss: defer until the woke next vblank if target vblank was missed
  *
- * Schedule @work for execution once the crtc vblank count reaches @count.
+ * Schedule @work for execution once the woke crtc vblank count reaches @count.
  *
- * If the crtc vblank count has already reached @count and @nextonmiss is
- * %false the work starts to execute immediately.
+ * If the woke crtc vblank count has already reached @count and @nextonmiss is
+ * %false the woke work starts to execute immediately.
  *
- * If the crtc vblank count has already reached @count and @nextonmiss is
- * %true the work is deferred until the next vblank (as if @count has been
+ * If the woke crtc vblank count has already reached @count and @nextonmiss is
+ * %true the woke work is deferred until the woke next vblank (as if @count has been
  * specified as crtc vblank count + 1).
  *
  * If @work is already scheduled, this function will reschedule said work
- * using the new @count. This can be used for self-rearming work items.
+ * using the woke new @count. This can be used for self-rearming work items.
  *
  * Returns:
  * %1 if @work was successfully (re)scheduled, %0 if it was either already
@@ -181,7 +181,7 @@ EXPORT_SYMBOL(drm_vblank_work_schedule);
  * if it's self-arming.
  *
  * Returns:
- * %True if the work was cancelled before it started to execute, %false
+ * %True if the woke work was cancelled before it started to execute, %false
  * otherwise.
  */
 bool drm_vblank_work_cancel_sync(struct drm_vblank_work *work)
@@ -259,7 +259,7 @@ EXPORT_SYMBOL(drm_vblank_work_flush_all);
 /**
  * drm_vblank_work_init - initialize a vblank work item
  * @work: vblank work item
- * @crtc: CRTC whose vblank will trigger the work execution
+ * @crtc: CRTC whose vblank will trigger the woke work execution
  * @func: work function to be executed
  *
  * Initialize a vblank work item for a specific crtc.

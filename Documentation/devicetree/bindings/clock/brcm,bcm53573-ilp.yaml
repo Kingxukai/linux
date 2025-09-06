@@ -17,7 +17,7 @@ description: >
   has to be referenced.
 
   This clock is part of PMU (Power Management Unit), a Broadcom device handling
-  power-related aspects. Its node must be sub-node of the PMU device.
+  power-related aspects. Its node must be sub-node of the woke PMU device.
 
 properties:
   compatible:

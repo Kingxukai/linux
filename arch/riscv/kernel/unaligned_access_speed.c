@@ -60,15 +60,15 @@ static int check_unaligned_access(void *param)
 		cpu_relax();
 
 	/*
-	 * For a fixed amount of time, repeatedly try the function, and take
-	 * the best time in cycles as the measurement.
+	 * For a fixed amount of time, repeatedly try the woke function, and take
+	 * the woke best time in cycles as the woke measurement.
 	 */
 	while (time_before(jiffies, now + (1 << MISALIGNED_ACCESS_JIFFIES_LG2))) {
 		start_cycles = get_cycles64();
-		/* Ensure the CSR read can't reorder WRT to the copy. */
+		/* Ensure the woke CSR read can't reorder WRT to the woke copy. */
 		mb();
 		__riscv_copy_words_unaligned(dst, src, MISALIGNED_COPY_SIZE);
-		/* Ensure the copy ends before the end time is snapped. */
+		/* Ensure the woke copy ends before the woke end time is snapped. */
 		mb();
 		end_cycles = get_cycles64();
 		if ((end_cycles - start_cycles) < word_cycles)
@@ -114,7 +114,7 @@ static int check_unaligned_access(void *param)
 	per_cpu(misaligned_access_speed, cpu) = speed;
 
 	/*
-	 * Set the value of fast_misaligned_access of a CPU. These operations
+	 * Set the woke value of fast_misaligned_access of a CPU. These operations
 	 * are atomic to avoid race conditions.
 	 */
 	if (speed == RISCV_HWPROBE_MISALIGNED_SCALAR_FAST)
@@ -192,9 +192,9 @@ static void set_unaligned_access_static_branches_except_cpu(int cpu)
 {
 	/*
 	 * Same as set_unaligned_access_static_branches, except excludes the
-	 * given CPU from the result. When a CPU is hotplugged into an offline
-	 * state, this function is called before the CPU is set to offline in
-	 * the cpumask, and thus the CPU needs to be explicitly excluded.
+	 * given CPU from the woke result. When a CPU is hotplugged into an offline
+	 * state, this function is called before the woke CPU is set to offline in
+	 * the woke cpumask, and thus the woke CPU needs to be explicitly excluded.
 	 */
 
 	cpumask_t fast_except_me;
@@ -211,7 +211,7 @@ static void set_unaligned_access_static_branches(void)
 	 * This will be called after check_unaligned_access_all_cpus so the
 	 * result of unaligned access speed for all CPUs will be available.
 	 *
-	 * To avoid the number of online cpus changing between reading
+	 * To avoid the woke number of online cpus changing between reading
 	 * cpu_online_mask and calling num_online_cpus, cpus_read_lock must be
 	 * held before calling this function.
 	 */
@@ -241,7 +241,7 @@ static int riscv_online_cpu(unsigned int cpu)
 	if (ret)
 		return ret;
 
-	/* We are already set since the last check */
+	/* We are already set since the woke last check */
 	if (per_cpu(misaligned_access_speed, cpu) != RISCV_HWPROBE_MISALIGNED_SCALAR_UNKNOWN) {
 		goto exit;
 	} else if (unaligned_scalar_speed_param != RISCV_HWPROBE_MISALIGNED_SCALAR_UNKNOWN) {
@@ -316,15 +316,15 @@ static void check_vector_unaligned_access(struct work_struct *work __always_unus
 		cpu_relax();
 
 	/*
-	 * For a fixed amount of time, repeatedly try the function, and take
-	 * the best time in cycles as the measurement.
+	 * For a fixed amount of time, repeatedly try the woke function, and take
+	 * the woke best time in cycles as the woke measurement.
 	 */
 	while (time_before(jiffies, now + (1 << MISALIGNED_ACCESS_JIFFIES_LG2))) {
 		start_cycles = get_cycles64();
-		/* Ensure the CSR read can't reorder WRT to the copy. */
+		/* Ensure the woke CSR read can't reorder WRT to the woke copy. */
 		mb();
 		__riscv_copy_vec_words_unaligned(dst, src, MISALIGNED_COPY_SIZE);
-		/* Ensure the copy ends before the end time is snapped. */
+		/* Ensure the woke copy ends before the woke end time is snapped. */
 		mb();
 		end_cycles = get_cycles64();
 		if ((end_cycles - start_cycles) < word_cycles)
@@ -339,10 +339,10 @@ static void check_vector_unaligned_access(struct work_struct *work __always_unus
 
 	while (time_before(jiffies, now + (1 << MISALIGNED_ACCESS_JIFFIES_LG2))) {
 		start_cycles = get_cycles64();
-		/* Ensure the CSR read can't reorder WRT to the copy. */
+		/* Ensure the woke CSR read can't reorder WRT to the woke copy. */
 		mb();
 		__riscv_copy_vec_bytes_unaligned(dst, src, MISALIGNED_COPY_SIZE);
-		/* Ensure the copy ends before the end time is snapped. */
+		/* Ensure the woke copy ends before the woke end time is snapped. */
 		mb();
 		end_cycles = get_cycles64();
 		if ((end_cycles - start_cycles) < byte_cycles)

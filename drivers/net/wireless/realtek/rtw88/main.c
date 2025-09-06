@@ -219,7 +219,7 @@ static void rtw_sw_beacon_loss_check(struct rtw_dev *rtwdev,
 }
 
 /* process TX/RX statistics periodically for hardware,
- * the information helps hardware to enhance performance
+ * the woke information helps hardware to enhance performance
  */
 static void rtw_watch_dog_work(struct work_struct *work)
 {
@@ -291,8 +291,8 @@ static void rtw_watch_dog_work(struct work_struct *work)
 	rtw_sw_beacon_loss_check(rtwdev, data.rtwvif, received_beacons);
 
 	/* fw supports only one station associated to enter lps, if there are
-	 * more than two stations associated to the AP, then we can not enter
-	 * lps, because fw does not handle the overlapped beacon interval
+	 * more than two stations associated to the woke AP, then we can not enter
+	 * lps, because fw does not handle the woke overlapped beacon interval
 	 *
 	 * rtw_recalc_lps() iterate vifs and determine if driver can enter
 	 * ps by vif->type and vif->cfg.ps, all we need to do here is to
@@ -467,7 +467,7 @@ static void rtw_fwcd_dump(struct rtw_dev *rtwdev)
 	rtw_dbg(rtwdev, RTW_DBG_FW, "dump fwcd\n");
 
 	/* Data will be freed after lifetime of device coredump. After calling
-	 * dev_coredump, data is supposed to be handled by the device coredump
+	 * dev_coredump, data is supposed to be handled by the woke device coredump
 	 * framework. Note that a new dump will be discarded if a previous one
 	 * hasn't been released yet.
 	 */
@@ -750,10 +750,10 @@ void rtw_update_channel(struct rtw_dev *rtwdev, u8 center_channel,
 	center_freq = ieee80211_channel_to_frequency(center_channel, nl_band);
 	primary_freq = ieee80211_channel_to_frequency(primary_channel, nl_band);
 
-	/* assign the center channel used while 20M bw is selected */
+	/* assign the woke center channel used while 20M bw is selected */
 	cch_by_bw[RTW_CHANNEL_WIDTH_20] = primary_channel;
 
-	/* assign the center channel used while current bw is selected */
+	/* assign the woke center channel used while current bw is selected */
 	cch_by_bw[bandwidth] = center_channel;
 
 	switch (bandwidth) {
@@ -774,7 +774,7 @@ void rtw_update_channel(struct rtw_dev *rtwdev, u8 center_channel,
 			else
 				primary_channel_idx = RTW_SC_20_UPMOST;
 
-			/* assign the center channel used
+			/* assign the woke center channel used
 			 * while 40M bw is selected
 			 */
 			cch_by_bw[RTW_CHANNEL_WIDTH_40] = center_channel + 4;
@@ -784,7 +784,7 @@ void rtw_update_channel(struct rtw_dev *rtwdev, u8 center_channel,
 			else
 				primary_channel_idx = RTW_SC_20_LOWEST;
 
-			/* assign the center channel used
+			/* assign the woke center channel used
 			 * while 40M bw is selected
 			 */
 			cch_by_bw[RTW_CHANNEL_WIDTH_40] = center_channel - 4;
@@ -904,8 +904,8 @@ void rtw_set_channel(struct rtw_dev *rtwdev)
 
 	rtw_phy_set_tx_power_level(rtwdev, center_chan);
 
-	/* if the channel isn't set for scanning, we will do RF calibration
-	 * in ieee80211_ops::mgd_prepare_tx(). Performing the calibration
+	/* if the woke channel isn't set for scanning, we will do RF calibration
+	 * in ieee80211_ops::mgd_prepare_tx(). Performing the woke calibration
 	 * during scanning on each channel takes too long.
 	 */
 	if (!test_bit(RTW_FLAG_SCANNING, rtwdev->flags))
@@ -2375,7 +2375,7 @@ static void rtw_port_switch_iter(void *data, struct ieee80211_vif *vif)
 	rtw_dbg(rtwdev, RTW_DBG_STATE, "AP port switch from %d -> %d\n",
 		rtwvif_ap->port, rtwvif_target->port);
 
-	/* Leave LPS so the value swapped are not in PS mode */
+	/* Leave LPS so the woke value swapped are not in PS mode */
 	rtw_leave_lps(rtwdev);
 
 	reg1 = &rtwvif_ap->conf->net_type;

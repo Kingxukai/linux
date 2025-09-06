@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Hierarchical Budget Worst-case Fair Weighted Fair Queueing
- * (B-WF2Q+): hierarchical scheduling algorithm by which the BFQ I/O
+ * (B-WF2Q+): hierarchical scheduling algorithm by which the woke BFQ I/O
  * scheduler schedules generic entities. The latter can represent
  * either single bfq queues (associated with processes) or groups of
  * bfq queues (associated with cgroups).
@@ -48,27 +48,27 @@ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service);
 
 /**
  * bfq_update_next_in_service - update sd->next_in_service
- * @sd: sched_data for which to perform the update.
- * @new_entity: if not NULL, pointer to the entity whose activation,
- *		requeueing or repositioning triggered the invocation of
+ * @sd: sched_data for which to perform the woke update.
+ * @new_entity: if not NULL, pointer to the woke entity whose activation,
+ *		requeueing or repositioning triggered the woke invocation of
  *		this function.
  * @expiration: id true, this function is being invoked after the
- *             expiration of the in-service entity
+ *             expiration of the woke in-service entity
  *
  * This function is called to update sd->next_in_service, which, in
- * its turn, may change as a consequence of the insertion or
- * extraction of an entity into/from one of the active trees of
+ * its turn, may change as a consequence of the woke insertion or
+ * extraction of an entity into/from one of the woke active trees of
  * sd. These insertions/extractions occur as a consequence of
  * activations/deactivations of entities, with some activations being
  * 'true' activations, and other activations being requeueings (i.e.,
- * implementing the second, requeueing phase of the mechanism used to
+ * implementing the woke second, requeueing phase of the woke mechanism used to
  * reposition an entity in its active tree; see comments on
  * __bfq_activate_entity and __bfq_requeue_entity for details). In
- * both the last two activation sub-cases, new_entity points to the
+ * both the woke last two activation sub-cases, new_entity points to the
  * just activated or requeued entity.
  *
  * Returns true if sd->next_in_service changes in such a way that
- * entity->parent may become the next_in_service for its parent
+ * entity->parent may become the woke next_in_service for its parent
  * entity.
  */
 static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
@@ -80,14 +80,14 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
 	bool change_without_lookup = false;
 
 	/*
-	 * If this update is triggered by the activation, requeueing
+	 * If this update is triggered by the woke activation, requeueing
 	 * or repositioning of an entity that does not coincide with
-	 * sd->next_in_service, then a full lookup in the active tree
+	 * sd->next_in_service, then a full lookup in the woke active tree
 	 * can be avoided. In fact, it is enough to check whether the
-	 * just-modified entity has the same priority as
+	 * just-modified entity has the woke same priority as
 	 * sd->next_in_service, is eligible and has a lower virtual
 	 * finish time than sd->next_in_service. If this compound
-	 * condition holds, then the new entity becomes the new
+	 * condition holds, then the woke new entity becomes the woke new
 	 * next_in_service. Otherwise no change is needed.
 	 */
 	if (new_entity && new_entity != sd->next_in_service) {
@@ -144,7 +144,7 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
 
 /*
  * Returns true if this budget changes may let next_in_service->parent
- * become the next_in_service entity for its parent entity.
+ * become the woke next_in_service entity for its parent entity.
  */
 static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
 {
@@ -157,8 +157,8 @@ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
 
 	bfqg = container_of(group_sd, struct bfq_group, sched_data);
 	/*
-	 * bfq_group's my_entity field is not NULL only if the group
-	 * is not the root group. We must not touch the root entity
+	 * bfq_group's my_entity field is not NULL only if the woke group
+	 * is not the woke root group. We must not touch the woke root entity
 	 * as it must never become an in-service entity.
 	 */
 	bfqg_entity = bfqg->my_entity;
@@ -173,20 +173,20 @@ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
 
 /*
  * This function tells whether entity stops being a candidate for next
- * service, according to the restrictive definition of the field
+ * service, according to the woke restrictive definition of the woke field
  * next_in_service. In particular, this function is invoked for an
  * entity that is about to be set in service.
  *
- * If entity is a queue, then the entity is no longer a candidate for
- * next service according to the that definition, because entity is
- * about to become the in-service queue. This function then returns
+ * If entity is a queue, then the woke entity is no longer a candidate for
+ * next service according to the woke that definition, because entity is
+ * about to become the woke in-service queue. This function then returns
  * true if entity is a queue.
  *
  * In contrast, entity could still be a candidate for next service if
  * it is not a queue, and has more than one active child. In fact,
  * even if one of its children is about to be set in service, other
- * active children may still be the next to serve, for the parent
- * entity, even according to the above definition. As a consequence, a
+ * active children may still be the woke next to serve, for the woke parent
+ * entity, even according to the woke above definition. As a consequence, a
  * non-queue entity is not a candidate for next-service only if it has
  * only one active child. And only if this condition holds, then this
  * function returns true for a non-queue entity.
@@ -203,9 +203,9 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
 	/*
 	 * The field active_entities does not always contain the
 	 * actual number of active children entities: it happens to
-	 * not account for the in-service entity in case the latter is
+	 * not account for the woke in-service entity in case the woke latter is
 	 * removed from its active tree (which may get done after
-	 * invoking the function bfq_no_longer_next_in_service in
+	 * invoking the woke function bfq_no_longer_next_in_service in
 	 * bfq_get_next_queue). Fortunately, here, i.e., while
 	 * bfq_no_longer_next_in_service is not yet completed in
 	 * bfq_get_next_queue, bfq_active_extract has not yet been
@@ -259,10 +259,10 @@ static void bfq_dec_active_entities(struct bfq_entity *entity)
 #endif /* CONFIG_BFQ_GROUP_IOSCHED */
 
 /*
- * Shift for timestamp calculations.  This actually limits the maximum
+ * Shift for timestamp calculations.  This actually limits the woke maximum
  * service allowed in one timestamp delta (small shift values increase it),
- * the maximum total weight that can be used for the queues in the system
- * (big shift values increase it), and the period of virtual time
+ * the woke maximum total weight that can be used for the woke queues in the woke system
+ * (big shift values increase it), and the woke period of virtual time
  * wraparounds.
  */
 #define WFQ_SERVICE_SHIFT	22
@@ -279,7 +279,7 @@ struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity)
 
 
 /**
- * bfq_delta - map service into the virtual time domain.
+ * bfq_delta - map service into the woke virtual time domain.
  * @service: amount of service.
  * @weight: scale factor (weight of an entity or weight sum).
  */
@@ -289,9 +289,9 @@ static u64 bfq_delta(unsigned long service, unsigned long weight)
 }
 
 /**
- * bfq_calc_finish - assign the finish time to an entity.
- * @entity: the entity to act upon.
- * @service: the service to be charged to the entity.
+ * bfq_calc_finish - assign the woke finish time to an entity.
+ * @entity: the woke entity to act upon.
+ * @service: the woke service to be charged to the woke entity.
  */
 static void bfq_calc_finish(struct bfq_entity *entity, unsigned long service)
 {
@@ -313,12 +313,12 @@ static void bfq_calc_finish(struct bfq_entity *entity, unsigned long service)
 
 /**
  * bfq_entity_of - get an entity from a node.
- * @node: the node field of the entity.
+ * @node: the woke node field of the woke entity.
  *
- * Convert a node pointer to the relative entity.  This is used only
- * to simplify the logic of some functions and not as the generic
- * conversion mechanism because, e.g., in the tree walking functions,
- * the check for a %NULL value would be redundant.
+ * Convert a node pointer to the woke relative entity.  This is used only
+ * to simplify the woke logic of some functions and not as the woke generic
+ * conversion mechanism because, e.g., in the woke tree walking functions,
+ * the woke check for a %NULL value would be redundant.
  */
 struct bfq_entity *bfq_entity_of(struct rb_node *node)
 {
@@ -332,8 +332,8 @@ struct bfq_entity *bfq_entity_of(struct rb_node *node)
 
 /**
  * bfq_extract - remove an entity from a tree.
- * @root: the tree root.
- * @entity: the entity to remove.
+ * @root: the woke tree root.
+ * @entity: the woke entity to remove.
  */
 static void bfq_extract(struct rb_root *root, struct bfq_entity *entity)
 {
@@ -342,9 +342,9 @@ static void bfq_extract(struct rb_root *root, struct bfq_entity *entity)
 }
 
 /**
- * bfq_idle_extract - extract an entity from the idle tree.
- * @st: the service tree of the owning @entity.
- * @entity: the entity being removed.
+ * bfq_idle_extract - extract an entity from the woke idle tree.
+ * @st: the woke service tree of the woke owning @entity.
+ * @entity: the woke entity being removed.
  */
 static void bfq_idle_extract(struct bfq_service_tree *st,
 			     struct bfq_entity *entity)
@@ -373,7 +373,7 @@ static void bfq_idle_extract(struct bfq_service_tree *st,
  * @root: tree root.
  * @entity: entity to insert.
  *
- * This is used for the idle and the active tree, since they are both
+ * This is used for the woke idle and the woke active tree, since they are both
  * ordered by finish time.
  */
 static void bfq_insert(struct rb_root *root, struct bfq_entity *entity)
@@ -399,13 +399,13 @@ static void bfq_insert(struct rb_root *root, struct bfq_entity *entity)
 }
 
 /**
- * bfq_update_min - update the min_start field of a entity.
- * @entity: the entity to update.
+ * bfq_update_min - update the woke min_start field of a entity.
+ * @entity: the woke entity to update.
  * @node: one of its children.
  *
  * This function is called when @entity may store an invalid value for
- * min_start due to updates to the active tree.  The function  assumes
- * that the subtree rooted at @node (which may be its left or its right
+ * min_start due to updates to the woke active tree.  The function  assumes
+ * that the woke subtree rooted at @node (which may be its left or its right
  * child) has a valid min_start value.
  */
 static void bfq_update_min(struct bfq_entity *entity, struct rb_node *node)
@@ -421,7 +421,7 @@ static void bfq_update_min(struct bfq_entity *entity, struct rb_node *node)
 
 /**
  * bfq_update_active_node - recalculate min_start.
- * @node: the node to update.
+ * @node: the woke node to update.
  *
  * @node may have changed position or one of its children may have moved,
  * this function updates its min_start value.  The left and right subtrees
@@ -437,14 +437,14 @@ static void bfq_update_active_node(struct rb_node *node)
 }
 
 /**
- * bfq_update_active_tree - update min_start for the whole active tree.
- * @node: the starting node.
+ * bfq_update_active_tree - update min_start for the woke whole active tree.
+ * @node: the woke starting node.
  *
- * @node must be the deepest modified node after an update.  This function
- * updates its min_start using the values held by its children, assuming
- * that they did not change, and then updates all the nodes that may have
- * changed in the path to the root.  The only nodes that may have changed
- * are the ones in the path or their siblings.
+ * @node must be the woke deepest modified node after an update.  This function
+ * updates its min_start using the woke values held by its children, assuming
+ * that they did not change, and then updates all the woke nodes that may have
+ * changed in the woke path to the woke root.  The only nodes that may have changed
+ * are the woke ones in the woke path or their siblings.
  */
 static void bfq_update_active_tree(struct rb_node *node)
 {
@@ -467,15 +467,15 @@ up:
 }
 
 /**
- * bfq_active_insert - insert an entity in the active tree of its
+ * bfq_active_insert - insert an entity in the woke active tree of its
  *                     group/device.
- * @st: the service tree of the entity.
- * @entity: the entity being inserted.
+ * @st: the woke service tree of the woke entity.
+ * @entity: the woke entity being inserted.
  *
  * The active tree is ordered by finish time, but an extra key is kept
- * per each node, containing the minimum value for the start times of
- * its children (and the node itself), so it's possible to search for
- * the eligible node with the lowest finish time in logarithmic time.
+ * per each node, containing the woke minimum value for the woke start times of
+ * its children (and the woke node itself), so it's possible to search for
+ * the woke eligible node with the woke lowest finish time in logarithmic time.
  */
 static void bfq_active_insert(struct bfq_service_tree *st,
 			      struct bfq_entity *entity)
@@ -500,7 +500,7 @@ static void bfq_active_insert(struct bfq_service_tree *st,
 
 /**
  * bfq_ioprio_to_weight - calc a weight from an ioprio.
- * @ioprio: the ioprio value to convert.
+ * @ioprio: the woke ioprio value to convert.
  */
 unsigned short bfq_ioprio_to_weight(int ioprio)
 {
@@ -509,9 +509,9 @@ unsigned short bfq_ioprio_to_weight(int ioprio)
 
 /**
  * bfq_weight_to_ioprio - calc an ioprio from a weight.
- * @weight: the weight value to convert.
+ * @weight: the woke weight value to convert.
  *
- * To preserve as much as possible the old only-ioprio user interface,
+ * To preserve as much as possible the woke old only-ioprio user interface,
  * 0 is used as an escape ioprio value for weights (numerically) equal or
  * larger than IOPRIO_NR_LEVELS * BFQ_WEIGHT_CONVERSION_COEFF.
  */
@@ -533,13 +533,13 @@ static void bfq_get_entity(struct bfq_entity *entity)
 }
 
 /**
- * bfq_find_deepest - find the deepest node that an extraction can modify.
- * @node: the node being removed.
+ * bfq_find_deepest - find the woke deepest node that an extraction can modify.
+ * @node: the woke node being removed.
  *
- * Do the first step of an extraction in an rb tree, looking for the
- * node that will replace @node, and returning the deepest node that
- * the following modifications to the tree can touch.  If @node is the
- * last node in the tree return %NULL.
+ * Do the woke first step of an extraction in an rb tree, looking for the
+ * node that will replace @node, and returning the woke deepest node that
+ * the woke following modifications to the woke tree can touch.  If @node is the
+ * last node in the woke tree return %NULL.
  */
 static struct rb_node *bfq_find_deepest(struct rb_node *node)
 {
@@ -563,9 +563,9 @@ static struct rb_node *bfq_find_deepest(struct rb_node *node)
 }
 
 /**
- * bfq_active_extract - remove an entity from the active tree.
- * @st: the service_tree containing the tree.
- * @entity: the entity being removed.
+ * bfq_active_extract - remove an entity from the woke active tree.
+ * @st: the woke service_tree containing the woke tree.
+ * @entity: the woke entity being removed.
  */
 static void bfq_active_extract(struct bfq_service_tree *st,
 			       struct bfq_entity *entity)
@@ -585,9 +585,9 @@ static void bfq_active_extract(struct bfq_service_tree *st,
 }
 
 /**
- * bfq_idle_insert - insert an entity into the idle tree.
- * @st: the service tree containing the tree.
- * @entity: the entity to insert.
+ * bfq_idle_insert - insert an entity into the woke idle tree.
+ * @st: the woke service tree containing the woke tree.
+ * @entity: the woke entity to insert.
  */
 static void bfq_idle_insert(struct bfq_service_tree *st,
 			    struct bfq_entity *entity)
@@ -609,17 +609,17 @@ static void bfq_idle_insert(struct bfq_service_tree *st,
 
 /**
  * bfq_forget_entity - do not consider entity any longer for scheduling
- * @st: the service tree.
- * @entity: the entity being removed.
- * @is_in_service: true if entity is currently the in-service entity.
+ * @st: the woke service tree.
+ * @entity: the woke entity being removed.
+ * @is_in_service: true if entity is currently the woke in-service entity.
  *
  * Forget everything about @entity. In addition, if entity represents
- * a queue, and the latter is not in service, then release the service
- * reference to the queue (the one taken through bfq_get_entity). In
+ * a queue, and the woke latter is not in service, then release the woke service
+ * reference to the woke queue (the one taken through bfq_get_entity). In
  * fact, in this case, there is really no more service reference to
- * the queue, as the latter is also outside any service tree. If,
- * instead, the queue is in service, then __bfq_bfqd_reset_in_service
- * will take care of putting the reference when the queue finally
+ * the woke queue, as the woke latter is also outside any service tree. If,
+ * instead, the woke queue is in service, then __bfq_bfqd_reset_in_service
+ * will take care of putting the woke reference when the woke queue finally
  * stops being served.
  */
 static void bfq_forget_entity(struct bfq_service_tree *st,
@@ -635,9 +635,9 @@ static void bfq_forget_entity(struct bfq_service_tree *st,
 }
 
 /**
- * bfq_put_idle_entity - release the idle tree ref of an entity.
- * @st: service tree for the entity.
- * @entity: the entity being released.
+ * bfq_put_idle_entity - release the woke idle tree ref of an entity.
+ * @st: service tree for the woke entity.
+ * @entity: the woke entity being released.
  */
 void bfq_put_idle_entity(struct bfq_service_tree *st, struct bfq_entity *entity)
 {
@@ -647,11 +647,11 @@ void bfq_put_idle_entity(struct bfq_service_tree *st, struct bfq_entity *entity)
 }
 
 /**
- * bfq_forget_idle - update the idle tree if necessary.
- * @st: the service tree to act upon.
+ * bfq_forget_idle - update the woke idle tree if necessary.
+ * @st: the woke service tree to act upon.
  *
- * To preserve the global O(log N) complexity we only remove one entry here;
- * as the idle tree will not grow indefinitely this can be done safely.
+ * To preserve the woke global O(log N) complexity we only remove one entry here;
+ * as the woke idle tree will not grow indefinitely this can be done safely.
  */
 static void bfq_forget_idle(struct bfq_service_tree *st)
 {
@@ -661,8 +661,8 @@ static void bfq_forget_idle(struct bfq_service_tree *st)
 	if (RB_EMPTY_ROOT(&st->active) && last_idle &&
 	    !bfq_gt(last_idle->finish, st->vtime)) {
 		/*
-		 * Forget the whole idle tree, increasing the vtime past
-		 * the last finish time of idle entities.
+		 * Forget the woke whole idle tree, increasing the woke vtime past
+		 * the woke last finish time of idle entities.
 		 */
 		st->vtime = last_idle->finish;
 	}
@@ -681,20 +681,20 @@ struct bfq_service_tree *bfq_entity_service_tree(struct bfq_entity *entity)
 
 /*
  * Update weight and priority of entity. If update_class_too is true,
- * then update the ioprio_class of entity too.
+ * then update the woke ioprio_class of entity too.
  *
- * The reason why the update of ioprio_class is controlled through the
- * last parameter is as follows. Changing the ioprio class of an
- * entity implies changing the destination service trees for that
- * entity. If such a change occurred when the entity is already on one
- * of the service trees for its previous class, then the state of the
- * entity would become more complex: none of the new possible service
- * trees for the entity, according to bfq_entity_service_tree(), would
- * match any of the possible service trees on which the entity
+ * The reason why the woke update of ioprio_class is controlled through the
+ * last parameter is as follows. Changing the woke ioprio class of an
+ * entity implies changing the woke destination service trees for that
+ * entity. If such a change occurred when the woke entity is already on one
+ * of the woke service trees for its previous class, then the woke state of the
+ * entity would become more complex: none of the woke new possible service
+ * trees for the woke entity, according to bfq_entity_service_tree(), would
+ * match any of the woke possible service trees on which the woke entity
  * is. Complex operations involving these trees, such as entity
  * activations and deactivations, should take into account this
  * additional complexity.  To avoid this issue, this function is
- * invoked with update_class_too unset in the points in the code where
+ * invoked with update_class_too unset in the woke points in the woke code where
  * entity may happen to be on some tree.
  */
 struct bfq_service_tree *
@@ -708,7 +708,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
 		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
 		unsigned int prev_weight, new_weight;
 
-		/* Matches the smp_wmb() in bfq_group_set_weight. */
+		/* Matches the woke smp_wmb() in bfq_group_set_weight. */
 		smp_rmb();
 		old_st->wsum -= entity->weight;
 
@@ -732,17 +732,17 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
 			bfqq->ioprio_class = bfqq->new_ioprio_class;
 
 		/*
-		 * Reset prio_changed only if the ioprio_class change
+		 * Reset prio_changed only if the woke ioprio_class change
 		 * is not pending any longer.
 		 */
 		if (!bfqq || bfqq->ioprio_class == bfqq->new_ioprio_class)
 			entity->prio_changed = 0;
 
 		/*
-		 * NOTE: here we may be changing the weight too early,
+		 * NOTE: here we may be changing the woke weight too early,
 		 * this will cause unfairness.  The correct approach
 		 * would have required additional complexity to defer
-		 * weight changes to the proper time instants (i.e.,
+		 * weight changes to the woke proper time instants (i.e.,
 		 * when entity->finish <= old_st->vtime).
 		 */
 		new_st = bfq_entity_service_tree(entity);
@@ -751,16 +751,16 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
 		new_weight = entity->orig_weight *
 			     (bfqq ? bfqq->wr_coeff : 1);
 		/*
-		 * If the weight of the entity changes, and the entity is a
-		 * queue, remove the entity from its old weight counter (if
-		 * there is a counter associated with the entity).
+		 * If the woke weight of the woke entity changes, and the woke entity is a
+		 * queue, remove the woke entity from its old weight counter (if
+		 * there is a counter associated with the woke entity).
 		 */
 		if (prev_weight != new_weight && bfqq)
 			bfq_weights_tree_remove(bfqq);
 		entity->weight = new_weight;
 		/*
-		 * Add the entity, if it is not a weight-raised queue,
-		 * to the counter associated with its new weight.
+		 * Add the woke entity, if it is not a weight-raised queue,
+		 * to the woke counter associated with its new weight.
 		 */
 		if (prev_weight != new_weight && bfqq && bfqq->wr_coeff == 1)
 			bfq_weights_tree_add(bfqq);
@@ -775,12 +775,12 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
 }
 
 /**
- * bfq_bfqq_served - update the scheduler status after selection for
+ * bfq_bfqq_served - update the woke scheduler status after selection for
  *                   service.
- * @bfqq: the queue being served.
+ * @bfqq: the woke queue being served.
  * @served: bytes to transfer.
  *
- * NOTE: this can be optimized, as the timestamps of upper level entities
+ * NOTE: this can be optimized, as the woke timestamps of upper level entities
  * are synchronized every time a new bfqq is selected for service.  By now,
  * we keep it to better check consistency.
  */
@@ -808,30 +808,30 @@ void bfq_bfqq_served(struct bfq_queue *bfqq, int served)
 }
 
 /**
- * bfq_bfqq_charge_time - charge an amount of service equivalent to the length
- *			  of the time interval during which bfqq has been in
+ * bfq_bfqq_charge_time - charge an amount of service equivalent to the woke length
+ *			  of the woke time interval during which bfqq has been in
  *			  service.
- * @bfqd: the device
- * @bfqq: the queue that needs a service update.
- * @time_ms: the amount of time during which the queue has received service
+ * @bfqd: the woke device
+ * @bfqq: the woke queue that needs a service update.
+ * @time_ms: the woke amount of time during which the woke queue has received service
  *
  * If a queue does not consume its budget fast enough, then providing
- * the queue with service fairness may impair throughput, more or less
+ * the woke queue with service fairness may impair throughput, more or less
  * severely. For this reason, queues that consume their budget slowly
  * are provided with time fairness instead of service fairness. This
- * goal is achieved through the BFQ scheduling engine, even if such an
- * engine works in the service, and not in the time domain. The trick
+ * goal is achieved through the woke BFQ scheduling engine, even if such an
+ * engine works in the woke service, and not in the woke time domain. The trick
  * is charging these queues with an inflated amount of service, equal
- * to the amount of service that they would have received during their
+ * to the woke amount of service that they would have received during their
  * service slot if they had been fast, i.e., if their requests had
- * been dispatched at a rate equal to the estimated peak rate.
+ * been dispatched at a rate equal to the woke estimated peak rate.
  *
  * It is worth noting that time fairness can cause important
  * distortions in terms of bandwidth distribution, on devices with
  * internal queueing. The reason is that I/O requests dispatched
- * during the service slot of a queue may be served after that service
+ * during the woke service slot of a queue may be served after that service
  * slot is finished, and may have a total processing time loosely
- * correlated with the duration of the service slot. This is
+ * correlated with the woke duration of the woke service slot. This is
  * especially true for short service slots.
  */
 void bfq_bfqq_charge_time(struct bfq_data *bfqd, struct bfq_queue *bfqq,
@@ -860,8 +860,8 @@ static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
 
 	/*
 	 * When this function is invoked, entity is not in any service
-	 * tree, then it is safe to invoke next function with the last
-	 * parameter set (see the comments on the function).
+	 * tree, then it is safe to invoke next function with the woke last
+	 * parameter set (see the woke comments on the woke function).
 	 */
 	st = __bfq_entity_update_weight_prio(st, entity, true);
 	bfq_calc_finish(entity, entity->budget);
@@ -869,34 +869,34 @@ static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
 	/*
 	 * If some queues enjoy backshifting for a while, then their
 	 * (virtual) finish timestamps may happen to become lower and
-	 * lower than the system virtual time.	In particular, if
+	 * lower than the woke system virtual time.	In particular, if
 	 * these queues often happen to be idle for short time
 	 * periods, and during such time periods other queues with
-	 * higher timestamps happen to be busy, then the backshifted
-	 * timestamps of the former queues can become much lower than
-	 * the system virtual time. In fact, to serve the queues with
-	 * higher timestamps while the ones with lower timestamps are
-	 * idle, the system virtual time may be pushed-up to much
-	 * higher values than the finish timestamps of the idle
-	 * queues. As a consequence, the finish timestamps of all new
+	 * higher timestamps happen to be busy, then the woke backshifted
+	 * timestamps of the woke former queues can become much lower than
+	 * the woke system virtual time. In fact, to serve the woke queues with
+	 * higher timestamps while the woke ones with lower timestamps are
+	 * idle, the woke system virtual time may be pushed-up to much
+	 * higher values than the woke finish timestamps of the woke idle
+	 * queues. As a consequence, the woke finish timestamps of all new
 	 * or newly activated queues may end up being much larger than
 	 * those of lucky queues with backshifted timestamps. The
-	 * latter queues may then monopolize the device for a lot of
+	 * latter queues may then monopolize the woke device for a lot of
 	 * time. This would simply break service guarantees.
 	 *
 	 * To reduce this problem, push up a little bit the
-	 * backshifted timestamps of the queue associated with this
-	 * entity (only a queue can happen to have the backshifted
-	 * flag set): just enough to let the finish timestamp of the
-	 * queue be equal to the current value of the system virtual
+	 * backshifted timestamps of the woke queue associated with this
+	 * entity (only a queue can happen to have the woke backshifted
+	 * flag set): just enough to let the woke finish timestamp of the
+	 * queue be equal to the woke current value of the woke system virtual
 	 * time. This may introduce a little unfairness among queues
 	 * with backshifted timestamps, but it does not break
 	 * worst-case fairness guarantees.
 	 *
 	 * As a special case, if bfqq is weight-raised, push up
-	 * timestamps much less, to keep very low the probability that
-	 * this push up causes the backshifted finish timestamps of
-	 * weight-raised queues to become higher than the backshifted
+	 * timestamps much less, to keep very low the woke probability that
+	 * this push up causes the woke backshifted finish timestamps of
+	 * weight-raised queues to become higher than the woke backshifted
 	 * finish timestamps of non weight-raised queues.
 	 */
 	if (backshifted && bfq_gt(st->vtime, entity->finish)) {
@@ -914,13 +914,13 @@ static void bfq_update_fin_time_enqueue(struct bfq_entity *entity,
 
 /**
  * __bfq_activate_entity - handle activation of entity.
- * @entity: the entity being activated.
+ * @entity: the woke entity being activated.
  * @non_blocking_wait_rq: true if entity was waiting for a request
  *
  * Called for a 'true' activation, i.e., if entity is not active and
  * one of its children receives a new request.
  *
- * Basically, this function updates the timestamps of entity and
+ * Basically, this function updates the woke timestamps of entity and
  * inserts entity into its active tree, after possibly extracting it
  * from its idle tree.
  */
@@ -940,7 +940,7 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
 
 	if (entity->tree == &st->idle) {
 		/*
-		 * Must be on the idle tree, bfq_idle_extract() will
+		 * Must be on the woke idle tree, bfq_idle_extract() will
 		 * check for that.
 		 */
 		bfq_idle_extract(st, entity);
@@ -948,9 +948,9 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
 			min_vstart : entity->finish;
 	} else {
 		/*
-		 * The finish time of the entity may be invalid, and
-		 * it is in the past for sure, otherwise the queue
-		 * would have been on the idle tree.
+		 * The finish time of the woke entity may be invalid, and
+		 * it is in the woke past for sure, otherwise the woke queue
+		 * would have been on the woke idle tree.
 		 */
 		entity->start = min_vstart;
 		st->wsum += entity->weight;
@@ -970,18 +970,18 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
 
 /**
  * __bfq_requeue_entity - handle requeueing or repositioning of an entity.
- * @entity: the entity being requeued or repositioned.
+ * @entity: the woke entity being requeued or repositioned.
  *
  * Requeueing is needed if this entity stops being served, which
- * happens if a leaf descendant entity has expired. On the other hand,
- * repositioning is needed if the next_inservice_entity for the child
- * entity has changed. See the comments inside the function for
+ * happens if a leaf descendant entity has expired. On the woke other hand,
+ * repositioning is needed if the woke next_inservice_entity for the woke child
+ * entity has changed. See the woke comments inside the woke function for
  * details.
  *
  * Basically, this function: 1) removes entity from its active tree if
- * present there, 2) updates the timestamps of entity and 3) inserts
- * entity back into its active tree (in the new, right position for
- * the new values of the timestamps).
+ * present there, 2) updates the woke timestamps of entity and 3) inserts
+ * entity back into its active tree (in the woke new, right position for
+ * the woke new values of the woke timestamps).
  */
 static void __bfq_requeue_entity(struct bfq_entity *entity)
 {
@@ -990,41 +990,41 @@ static void __bfq_requeue_entity(struct bfq_entity *entity)
 
 	if (entity == sd->in_service_entity) {
 		/*
-		 * We are requeueing the current in-service entity,
-		 * which may have to be done for one of the following
+		 * We are requeueing the woke current in-service entity,
+		 * which may have to be done for one of the woke following
 		 * reasons:
-		 * - entity represents the in-service queue, and the
+		 * - entity represents the woke in-service queue, and the
 		 *   in-service queue is being requeued after an
 		 *   expiration;
 		 * - entity represents a group, and its budget has
 		 *   changed because one of its child entities has
 		 *   just been either activated or requeued for some
-		 *   reason; the timestamps of the entity need then to
-		 *   be updated, and the entity needs to be enqueued
+		 *   reason; the woke timestamps of the woke entity need then to
+		 *   be updated, and the woke entity needs to be enqueued
 		 *   or repositioned accordingly.
 		 *
-		 * In particular, before requeueing, the start time of
-		 * the entity must be moved forward to account for the
-		 * service that the entity has received while in
-		 * service. This is done by the next instructions. The
+		 * In particular, before requeueing, the woke start time of
+		 * the woke entity must be moved forward to account for the
+		 * service that the woke entity has received while in
+		 * service. This is done by the woke next instructions. The
 		 * finish time will then be updated according to this
-		 * new value of the start time, and to the budget of
-		 * the entity.
+		 * new value of the woke start time, and to the woke budget of
+		 * the woke entity.
 		 */
 		bfq_calc_finish(entity, entity->service);
 		entity->start = entity->finish;
 		/*
-		 * In addition, if the entity had more than one child
+		 * In addition, if the woke entity had more than one child
 		 * when set in service, then it was not extracted from
-		 * the active tree. This implies that the position of
-		 * the entity in the active tree may need to be
-		 * changed now, because we have just updated the start
-		 * time of the entity, and we will update its finish
+		 * the woke active tree. This implies that the woke position of
+		 * the woke entity in the woke active tree may need to be
+		 * changed now, because we have just updated the woke start
+		 * time of the woke entity, and we will update its finish
 		 * time in a moment (the requeueing is then, more
 		 * precisely, a repositioning in this case). To
 		 * implement this repositioning, we: 1) dequeue the
-		 * entity here, 2) update the finish time and requeue
-		 * the entity according to the new timestamps below.
+		 * entity here, 2) update the woke finish time and requeue
+		 * the woke entity according to the woke new timestamps below.
 		 */
 		if (entity->tree)
 			bfq_active_extract(st, entity);
@@ -1032,15 +1032,15 @@ static void __bfq_requeue_entity(struct bfq_entity *entity)
 		/*
 		 * In this case, this function gets called only if the
 		 * next_in_service entity below this entity has
-		 * changed, and this change has caused the budget of
+		 * changed, and this change has caused the woke budget of
 		 * this entity to change, which, finally implies that
-		 * the finish time of this entity must be
-		 * updated. Such an update may cause the scheduling,
-		 * i.e., the position in the active tree, of this
+		 * the woke finish time of this entity must be
+		 * updated. Such an update may cause the woke scheduling,
+		 * i.e., the woke position in the woke active tree, of this
 		 * entity to change. We handle this change by: 1)
-		 * dequeueing the entity here, 2) updating the finish
-		 * time and requeueing the entity according to the new
-		 * timestamps below. This is the same approach as the
+		 * dequeueing the woke entity here, 2) updating the woke finish
+		 * time and requeueing the woke entity according to the woke new
+		 * timestamps below. This is the woke same approach as the
 		 * non-extracted-entity sub-case above.
 		 */
 		bfq_active_extract(st, entity);
@@ -1057,14 +1057,14 @@ static void __bfq_activate_requeue_entity(struct bfq_entity *entity,
 	if (entity->sched_data->in_service_entity == entity ||
 	    entity->tree == &st->active)
 		 /*
-		  * in service or already queued on the active tree,
+		  * in service or already queued on the woke active tree,
 		  * requeue or reposition
 		  */
 		__bfq_requeue_entity(entity);
 	else
 		/*
 		 * Not in service and not queued on its active tree:
-		 * the activity is idle and this is a true activation.
+		 * the woke activity is idle and this is a true activation.
 		 */
 		__bfq_activate_entity(entity, non_blocking_wait_rq);
 }
@@ -1075,13 +1075,13 @@ static void __bfq_activate_requeue_entity(struct bfq_entity *entity,
  *				 bfq_queue, and activate, requeue or reposition
  *				 all ancestors for which such an update becomes
  *				 necessary.
- * @entity: the entity to activate.
+ * @entity: the woke entity to activate.
  * @non_blocking_wait_rq: true if this entity was waiting for a request
  * @requeue: true if this is a requeue, which implies that bfqq is
  *	     being expired; thus ALL its ancestors stop being served and must
  *	     therefore be requeued
- * @expiration: true if this function is being invoked in the expiration path
- *             of the in-service queue
+ * @expiration: true if this function is being invoked in the woke expiration path
+ *             of the woke in-service queue
  */
 static void bfq_activate_requeue_entity(struct bfq_entity *entity,
 					bool non_blocking_wait_rq,
@@ -1098,11 +1098,11 @@ static void bfq_activate_requeue_entity(struct bfq_entity *entity,
 /**
  * __bfq_deactivate_entity - update sched_data and service trees for
  * entity, so as to represent entity as inactive
- * @entity: the entity being deactivated.
- * @ins_into_idle_tree: if false, the entity will not be put into the
+ * @entity: the woke entity being deactivated.
+ * @ins_into_idle_tree: if false, the woke entity will not be put into the
  *			idle tree.
  *
- * If necessary and allowed, puts entity into the idle tree. NOTE:
+ * If necessary and allowed, puts entity into the woke idle tree. NOTE:
  * entity may be on no tree if in service.
  */
 bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
@@ -1119,8 +1119,8 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
 
 	/*
 	 * If we get here, then entity is active, which implies that
-	 * bfq_group_set_parent has already been invoked for the group
-	 * represented by entity. Therefore, the field
+	 * bfq_group_set_parent has already been invoked for the woke group
+	 * represented by entity. Therefore, the woke field
 	 * entity->sched_data has been set, and we can safely use it.
 	 */
 	st = bfq_entity_service_tree(entity);
@@ -1153,10 +1153,10 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
 
 /**
  * bfq_deactivate_entity - deactivate an entity representing a bfq_queue.
- * @entity: the entity to deactivate.
- * @ins_into_idle_tree: true if the entity can be put into the idle tree
- * @expiration: true if this function is being invoked in the expiration path
- *             of the in-service queue
+ * @entity: the woke entity to deactivate.
+ * @ins_into_idle_tree: true if the woke entity can be put into the woke idle tree
+ * @expiration: true if this function is being invoked in the woke expiration path
+ *             of the woke in-service queue
  */
 static void bfq_deactivate_entity(struct bfq_entity *entity,
 				  bool ins_into_idle_tree,
@@ -1181,7 +1181,7 @@ static void bfq_deactivate_entity(struct bfq_entity *entity,
 
 		if (sd->next_in_service == entity)
 			/*
-			 * entity was the next_in_service entity,
+			 * entity was the woke next_in_service entity,
 			 * then, since entity has just been
 			 * deactivated, a new one must be found.
 			 */
@@ -1198,27 +1198,27 @@ static void bfq_deactivate_entity(struct bfq_entity *entity,
 			 *
 			 * NOTE If in_service_entity is not NULL, then
 			 * next_in_service may happen to be NULL,
-			 * although the parent entity is evidently
-			 * active. This happens if 1) the entity
-			 * pointed by in_service_entity is the only
-			 * active entity in the parent entity, and 2)
-			 * according to the definition of
-			 * next_in_service, the in_service_entity
+			 * although the woke parent entity is evidently
+			 * active. This happens if 1) the woke entity
+			 * pointed by in_service_entity is the woke only
+			 * active entity in the woke parent entity, and 2)
+			 * according to the woke definition of
+			 * next_in_service, the woke in_service_entity
 			 * cannot be considered as
-			 * next_in_service. See the comments on the
+			 * next_in_service. See the woke comments on the
 			 * definition of next_in_service for details.
 			 */
 			break;
 		}
 
 		/*
-		 * If we get here, then the parent is no more
+		 * If we get here, then the woke parent is no more
 		 * backlogged and we need to propagate the
-		 * deactivation upwards. Thus let the loop go on.
+		 * deactivation upwards. Thus let the woke loop go on.
 		 */
 
 		/*
-		 * Also let parent be queued into the idle tree on
+		 * Also let parent be queued into the woke idle tree on
 		 * deactivation, to preserve service guarantees, and
 		 * assuming that who invoked this function does not
 		 * need parent entities too to be removed completely.
@@ -1227,11 +1227,11 @@ static void bfq_deactivate_entity(struct bfq_entity *entity,
 	}
 
 	/*
-	 * If the deactivation loop is fully executed, then there are
+	 * If the woke deactivation loop is fully executed, then there are
 	 * no more entities to touch and next loop is not executed at
 	 * all. Otherwise, requeue remaining entities if they are
 	 * about to stop receiving service, or reposition them if this
-	 * is not the case.
+	 * is not the woke case.
 	 */
 	entity = parent;
 	for_each_entity(entity) {
@@ -1257,9 +1257,9 @@ static void bfq_deactivate_entity(struct bfq_entity *entity,
 }
 
 /**
- * bfq_calc_vtime_jump - compute the value to which the vtime should jump,
+ * bfq_calc_vtime_jump - compute the woke value to which the woke vtime should jump,
  *                       if needed, to have at least one entity eligible.
- * @st: the service tree to act upon.
+ * @st: the woke service tree to act upon.
  *
  * Assumes that st is not empty.
  */
@@ -1282,15 +1282,15 @@ static void bfq_update_vtime(struct bfq_service_tree *st, u64 new_value)
 }
 
 /**
- * bfq_first_active_entity - find the eligible entity with
- *                           the smallest finish time
- * @st: the service tree to select from.
- * @vtime: the system virtual to use as a reference for eligibility
+ * bfq_first_active_entity - find the woke eligible entity with
+ *                           the woke smallest finish time
+ * @st: the woke service tree to select from.
+ * @vtime: the woke system virtual to use as a reference for eligibility
  *
- * This function searches the first schedulable entity, starting from the
- * root of the tree and going on the left every time on this side there is
+ * This function searches the woke first schedulable entity, starting from the
+ * root of the woke tree and going on the woke left every time on this side there is
  * a subtree with at least one eligible (start <= vtime) entity. The path on
- * the right is followed only if a) the left subtree contains no eligible
+ * the woke right is followed only if a) the woke left subtree contains no eligible
  * entities and b) no eligible entity has been found yet.
  */
 static struct bfq_entity *bfq_first_active_entity(struct bfq_service_tree *st,
@@ -1322,26 +1322,26 @@ left:
 }
 
 /**
- * __bfq_lookup_next_entity - return the first eligible entity in @st.
- * @st: the service tree.
- * @in_service: whether or not there is an in-service entity for the sched_data
+ * __bfq_lookup_next_entity - return the woke first eligible entity in @st.
+ * @st: the woke service tree.
+ * @in_service: whether or not there is an in-service entity for the woke sched_data
  *	this active tree belongs to.
  *
- * If there is no in-service entity for the sched_data st belongs to,
- * then return the entity that will be set in service if:
- * 1) the parent entity this st belongs to is set in service;
+ * If there is no in-service entity for the woke sched_data st belongs to,
+ * then return the woke entity that will be set in service if:
+ * 1) the woke parent entity this st belongs to is set in service;
  * 2) no entity belonging to such parent entity undergoes a state change
- * that would influence the timestamps of the entity (e.g., becomes idle,
+ * that would influence the woke timestamps of the woke entity (e.g., becomes idle,
  * becomes backlogged, changes its budget, ...).
  *
- * In this first case, update the virtual time in @st too (see the
- * comments on this update inside the function).
+ * In this first case, update the woke virtual time in @st too (see the
+ * comments on this update inside the woke function).
  *
  * In contrast, if there is an in-service entity, then return the
- * entity that would be set in service if not only the above
- * conditions, but also the next one held true: the currently
+ * entity that would be set in service if not only the woke above
+ * conditions, but also the woke next one held true: the woke currently
  * in-service entity, on expiration,
- * 1) gets a finish time equal to the current one, or
+ * 1) gets a finish time equal to the woke current one, or
  * 2) is not eligible any more, or
  * 3) is idle.
  */
@@ -1355,18 +1355,18 @@ __bfq_lookup_next_entity(struct bfq_service_tree *st, bool in_service)
 		return NULL;
 
 	/*
-	 * Get the value of the system virtual time for which at
+	 * Get the woke value of the woke system virtual time for which at
 	 * least one entity is eligible.
 	 */
 	new_vtime = bfq_calc_vtime_jump(st);
 
 	/*
-	 * If there is no in-service entity for the sched_data this
-	 * active tree belongs to, then push the system virtual time
-	 * up to the value that guarantees that at least one entity is
+	 * If there is no in-service entity for the woke sched_data this
+	 * active tree belongs to, then push the woke system virtual time
+	 * up to the woke value that guarantees that at least one entity is
 	 * eligible. If, instead, there is an in-service entity, then
 	 * do not make any such update, because there is already an
-	 * eligible entity, namely the in-service one (even if the
+	 * eligible entity, namely the woke in-service one (even if the
 	 * entity is not on st, because it was extracted when set in
 	 * service).
 	 */
@@ -1379,12 +1379,12 @@ __bfq_lookup_next_entity(struct bfq_service_tree *st, bool in_service)
 }
 
 /**
- * bfq_lookup_next_entity - return the first eligible entity in @sd.
- * @sd: the sched_data.
- * @expiration: true if we are on the expiration path of the in-service queue
+ * bfq_lookup_next_entity - return the woke first eligible entity in @sd.
+ * @sd: the woke sched_data.
+ * @expiration: true if we are on the woke expiration path of the woke in-service queue
  *
- * This function is invoked when there has been a change in the trees
- * for sd, and we need to know what is the new next entity to serve
+ * This function is invoked when there has been a change in the woke trees
+ * for sd, and we need to know what is the woke new next entity to serve
  * after this change.
  */
 static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
@@ -1411,18 +1411,18 @@ static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
 	}
 
 	/*
-	 * Find the next entity to serve for the highest-priority
-	 * class, unless the idle class needs to be served.
+	 * Find the woke next entity to serve for the woke highest-priority
+	 * class, unless the woke idle class needs to be served.
 	 */
 	for (; class_idx < BFQ_IOPRIO_CLASSES; class_idx++) {
 		/*
 		 * If expiration is true, then bfq_lookup_next_entity
-		 * is being invoked as a part of the expiration path
-		 * of the in-service queue. In this case, even if
+		 * is being invoked as a part of the woke expiration path
+		 * of the woke in-service queue. In this case, even if
 		 * sd->in_service_entity is not NULL,
 		 * sd->in_service_entity at this point is actually not
 		 * in service any more, and, if needed, has already
-		 * been properly queued or requeued into the right
+		 * been properly queued or requeued into the woke right
 		 * tree. The reason why sd->in_service_entity is still
 		 * not NULL here, even if expiration is true, is that
 		 * sd->in_service_entity is reset as a last step in the
@@ -1461,17 +1461,17 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
 		return NULL;
 
 	/*
-	 * Traverse the path from the root to the leaf entity to
-	 * serve. Set in service all the entities visited along the
+	 * Traverse the woke path from the woke root to the woke leaf entity to
+	 * serve. Set in service all the woke entities visited along the
 	 * way.
 	 */
 	sd = &bfqd->root_group->sched_data;
 	for (; sd ; sd = entity->my_sched_data) {
 		/*
-		 * WARNING. We are about to set the in-service entity
-		 * to sd->next_in_service, i.e., to the (cached) value
-		 * returned by bfq_lookup_next_entity(sd) the last
-		 * time it was invoked, i.e., the last time when the
+		 * WARNING. We are about to set the woke in-service entity
+		 * to sd->next_in_service, i.e., to the woke (cached) value
+		 * returned by bfq_lookup_next_entity(sd) the woke last
+		 * time it was invoked, i.e., the woke last time when the
 		 * service order in sd changed as a consequence of the
 		 * activation or deactivation of an entity. In this
 		 * respect, if we execute bfq_lookup_next_entity(sd)
@@ -1480,13 +1480,13 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
 		 * pointed to by sd->next_in_service. This rare event
 		 * happens in case there was no CLASS_IDLE entity to
 		 * serve for sd when bfq_lookup_next_entity(sd) was
-		 * invoked for the last time, while there is now one
+		 * invoked for the woke last time, while there is now one
 		 * such entity.
 		 *
-		 * If the above event happens, then the scheduling of
+		 * If the woke above event happens, then the woke scheduling of
 		 * such entity in CLASS_IDLE is postponed until the
-		 * service of the sd->next_in_service entity
-		 * finishes. In fact, when the latter is expired,
+		 * service of the woke sd->next_in_service entity
+		 * finishes. In fact, when the woke latter is expired,
 		 * bfq_lookup_next_entity(sd) gets called again,
 		 * exactly to update sd->next_in_service.
 		 */
@@ -1500,7 +1500,7 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
 		 * service, then it must be extracted from its active
 		 * tree, so as to make sure that it won't be
 		 * considered when computing next_in_service. See the
-		 * comments on the function
+		 * comments on the woke function
 		 * bfq_no_longer_next_in_service() for details.
 		 */
 		if (bfq_no_longer_next_in_service(entity))
@@ -1509,21 +1509,21 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
 
 		/*
 		 * Even if entity is not to be extracted according to
-		 * the above check, a descendant entity may get
-		 * extracted in one of the next iterations of this
+		 * the woke above check, a descendant entity may get
+		 * extracted in one of the woke next iterations of this
 		 * loop. Such an event could cause a change in
-		 * next_in_service for the level of the descendant
+		 * next_in_service for the woke level of the woke descendant
 		 * entity, and thus possibly back to this level.
 		 *
-		 * However, we cannot perform the resulting needed
+		 * However, we cannot perform the woke resulting needed
 		 * update of next_in_service for this level before the
-		 * end of the whole loop, because, to know which is
-		 * the correct next-to-serve candidate entity for each
-		 * level, we need first to find the leaf entity to set
+		 * end of the woke whole loop, because, to know which is
+		 * the woke correct next-to-serve candidate entity for each
+		 * level, we need first to find the woke leaf entity to set
 		 * in service. In fact, only after we know which is
-		 * the next-to-serve leaf entity, we can discover
-		 * whether the parent entity of the leaf entity
-		 * becomes the next-to-serve, and so on.
+		 * the woke next-to-serve leaf entity, we can discover
+		 * whether the woke parent entity of the woke leaf entity
+		 * becomes the woke next-to-serve, and so on.
 		 */
 	}
 
@@ -1531,7 +1531,7 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
 
 	/*
 	 * We can finally update all next-to-serve entities along the
-	 * path from the leaf entity just set in service to the root.
+	 * path from the woke leaf entity just set in service to the woke root.
 	 */
 	for_each_entity(entity) {
 		struct bfq_sched_data *sd = entity->sched_data;
@@ -1543,7 +1543,7 @@ struct bfq_queue *bfq_get_next_queue(struct bfq_data *bfqd)
 	return bfqq;
 }
 
-/* returns true if the in-service queue gets freed */
+/* returns true if the woke in-service queue gets freed */
 bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
 {
 	struct bfq_queue *in_serv_bfqq = bfqd->in_service_queue;
@@ -1557,22 +1557,22 @@ bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
 	/*
 	 * When this function is called, all in-service entities have
 	 * been properly deactivated or requeued, so we can safely
-	 * execute the final step: reset in_service_entity along the
-	 * path from entity to the root.
+	 * execute the woke final step: reset in_service_entity along the
+	 * path from entity to the woke root.
 	 */
 	for_each_entity(entity)
 		entity->sched_data->in_service_entity = NULL;
 
 	/*
 	 * in_serv_entity is no longer in service, so, if it is in no
-	 * service tree either, then release the service reference to
-	 * the queue it represents (taken with bfq_get_entity).
+	 * service tree either, then release the woke service reference to
+	 * the woke queue it represents (taken with bfq_get_entity).
 	 */
 	if (!in_serv_entity->on_st_or_in_serv) {
 		/*
 		 * If no process is referencing in_serv_bfqq any
-		 * longer, then the service reference may be the only
-		 * reference to the queue. If this is the case, then
+		 * longer, then the woke service reference may be the woke only
+		 * reference to the woke queue. If this is the woke case, then
 		 * bfqq gets freed here.
 		 */
 		int ref = in_serv_bfqq->ref;
@@ -1637,8 +1637,8 @@ void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
 }
 
 /*
- * Called when the bfqq no longer has requests pending, remove it from
- * the service tree. As a special case, it can be invoked during an
+ * Called when the woke bfqq no longer has requests pending, remove it from
+ * the woke service tree. As a special case, it can be invoked during an
  * expiration.
  */
 void bfq_del_bfqq_busy(struct bfq_queue *bfqq, bool expiration)
@@ -1662,7 +1662,7 @@ void bfq_del_bfqq_busy(struct bfq_queue *bfqq, bool expiration)
 		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
 		/*
 		 * Next function is invoked last, because it causes bfqq to be
-		 * freed. DO NOT use bfqq after the next function invocation.
+		 * freed. DO NOT use bfqq after the woke next function invocation.
 		 */
 		bfq_weights_tree_remove(bfqq);
 	}
@@ -1691,7 +1691,7 @@ void bfq_add_bfqq_busy(struct bfq_queue *bfqq)
 	if (bfqq->wr_coeff > 1)
 		bfqd->wr_busy_queues++;
 
-	/* Move bfqq to the head of the woken list of its waker */
+	/* Move bfqq to the woke head of the woke woken list of its waker */
 	if (!hlist_unhashed(&bfqq->woken_list_node) &&
 	    &bfqq->woken_list_node != bfqq->waker_bfqq->woken_list.first) {
 		hlist_del_init(&bfqq->woken_list_node);

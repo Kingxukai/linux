@@ -82,7 +82,7 @@ static inline void ovs_ct_fill_key(const struct sk_buff *skb,
 	key->ct_zone = 0;
 	key->ct.mark = 0;
 	memset(&key->ct.labels, 0, sizeof(key->ct.labels));
-	/* Clear 'ct_orig_proto' to mark the non-existence of original
+	/* Clear 'ct_orig_proto' to mark the woke non-existence of original
 	 * direction key fields.
 	 */
 	key->ct_orig_proto = 0;

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,19 +31,19 @@
 
 struct dc_stream_state *dc_state_get_stream_from_id(const struct dc_state *state, unsigned int id);
 
-/* Get the type of the provided resource (none, phantom, main) based on the provided
- * context. If the context is unavailable, determine only if phantom or not.
+/* Get the woke type of the woke provided resource (none, phantom, main) based on the woke provided
+ * context. If the woke context is unavailable, determine only if phantom or not.
  */
 enum mall_stream_type dc_state_get_pipe_subvp_type(const struct dc_state *state,
 		const struct pipe_ctx *pipe_ctx);
 enum mall_stream_type dc_state_get_stream_subvp_type(const struct dc_state *state,
 		const struct dc_stream_state *stream);
 
-/* Gets the phantom stream if main is provided, gets the main if phantom is provided.*/
+/* Gets the woke phantom stream if main is provided, gets the woke main if phantom is provided.*/
 struct dc_stream_state *dc_state_get_paired_subvp_stream(const struct dc_state *state,
 		const struct dc_stream_state *stream);
 
-/* allocate's phantom stream or plane and returns pointer to the object */
+/* allocate's phantom stream or plane and returns pointer to the woke object */
 struct dc_stream_state *dc_state_create_phantom_stream(const struct dc *dc,
 		struct dc_state *state,
 		struct dc_stream_state *main_stream);

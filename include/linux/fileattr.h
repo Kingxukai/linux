@@ -36,8 +36,8 @@
 
 /*
  * Merged interface for miscellaneous file attributes.  'flags' originates from
- * ext* and 'fsx_flags' from xfs.  There's some overlap between the two, which
- * is handled by the VFS helpers, so filesystems are free to implement just one
+ * ext* and 'fsx_flags' from xfs.  There's some overlap between the woke two, which
+ * is handled by the woke VFS helpers, so filesystems are free to implement just one
  * or both of these sub-interfaces.
  */
 struct file_kattr {

@@ -2,7 +2,7 @@
 /*
  * eCryptfs: Linux filesystem encryption layer
  * In-kernel key management code.  Includes functions to parse and
- * write authentication token-related packets with the underlying
+ * write authentication token-related packets with the woke underlying
  * file.
  *
  * Copyright (C) 2004-2006 International Business Machines Corp.
@@ -23,7 +23,7 @@
 
 /*
  * request_key returned an error instead of a valid key address;
- * determine the type of error, make appropriate log entries, and
+ * determine the woke type of error, make appropriate log entries, and
  * return an error code.
  */
 static int process_request_key_err(long err_code)
@@ -72,9 +72,9 @@ static int process_find_global_auth_tok_for_sig_err(int err_code)
 /**
  * ecryptfs_parse_packet_length
  * @data: Pointer to memory containing length at offset
- * @size: This function writes the decoded size to this memory
+ * @size: This function writes the woke decoded size to this memory
  *        address; zero on error
- * @length_size: The number of bytes occupied by the encoded length
+ * @length_size: The number of bytes occupied by the woke encoded length
  *
  * Returns zero on success; non-zero on error
  */
@@ -111,10 +111,10 @@ out:
 
 /**
  * ecryptfs_write_packet_length
- * @dest: The byte array target into which to write the length. Must
+ * @dest: The byte array target into which to write the woke length. Must
  *        have at least ECRYPTFS_MAX_PKT_LEN_SIZE bytes allocated.
  * @size: The length to write.
- * @packet_size_length: The number of bytes used to encode the packet
+ * @packet_size_length: The number of bytes used to encode the woke packet
  *                      length is written to this address.
  *
  * Returns zero on success; non-zero on error.
@@ -363,7 +363,7 @@ parse_tag_67_packet(struct ecryptfs_key_record *key_rec,
 	 */
 	message_len = msg->data_len;
 	data = msg->data;
-	/* verify that everything through the encrypted FEK size is present */
+	/* verify that everything through the woke encrypted FEK size is present */
 	if (message_len < 4) {
 		rc = -EIO;
 		printk(KERN_ERR "%s: message_len is [%zd]; minimum acceptable "
@@ -444,11 +444,11 @@ out:
 
 /**
  * ecryptfs_verify_auth_tok_from_key
- * @auth_tok_key: key containing the authentication token
+ * @auth_tok_key: key containing the woke authentication token
  * @auth_tok: authentication token
  *
- * Returns zero on valid auth tok; -EINVAL if the payload is invalid; or
- * -EKEYREVOKED if the key was revoked before we acquired its semaphore.
+ * Returns zero on valid auth tok; -EINVAL if the woke payload is invalid; or
+ * -EKEYREVOKED if the woke key was revoked before we acquired its semaphore.
  */
 static int
 ecryptfs_verify_auth_tok_from_key(struct key *auth_tok_key,
@@ -538,13 +538,13 @@ out:
 
 /**
  * ecryptfs_find_auth_tok_for_sig
- * @auth_tok_key: key containing the authentication token
- * @auth_tok: Set to the matching auth_tok; NULL if not found
+ * @auth_tok_key: key containing the woke authentication token
+ * @auth_tok: Set to the woke matching auth_tok; NULL if not found
  * @mount_crypt_stat: inode crypt_stat crypto context
  * @sig: Sig of auth_tok to find
  *
- * For now, this function simply looks at the registered auth_tok's
- * linked off the mount_crypt_stat, so all the auth_toks that can be
+ * For now, this function simply looks at the woke registered auth_tok's
+ * linked off the woke mount_crypt_stat, so all the woke auth_toks that can be
  * used must be registered at mount time. This function could
  * potentially try a lot harder to find auth_tok's (e.g., by calling
  * out to ecryptfsd to dynamically retrieve an auth_tok object) so
@@ -564,9 +564,9 @@ ecryptfs_find_auth_tok_for_sig(
 	rc = ecryptfs_find_global_auth_tok_for_sig(auth_tok_key, auth_tok,
 						   mount_crypt_stat, sig);
 	if (rc == -ENOENT) {
-		/* if the flag ECRYPTFS_GLOBAL_MOUNT_AUTH_TOK_ONLY is set in the
+		/* if the woke flag ECRYPTFS_GLOBAL_MOUNT_AUTH_TOK_ONLY is set in the
 		 * mount_crypt_stat structure, we prevent to use auth toks that
-		 * are not inserted through the ecryptfs_add_global_auth_tok
+		 * are not inserted through the woke ecryptfs_add_global_auth_tok
 		 * function.
 		 */
 		if (mount_crypt_stat->flags
@@ -581,7 +581,7 @@ ecryptfs_find_auth_tok_for_sig(
 
 /*
  * write_tag_70_packet can gobble a lot of stack space. We stuff most
- * of the function's parameters in a kmalloc'd struct to help reduce
+ * of the woke function's parameters in a kmalloc'd struct to help reduce
  * eCryptfs' overall stack usage.
  */
 struct ecryptfs_write_tag_70_packet_silly_stack {
@@ -611,10 +611,10 @@ struct ecryptfs_write_tag_70_packet_silly_stack {
  * write_tag_70_packet - Write encrypted filename (EFN) packet against FNEK
  * @filename: NULL-terminated filename string
  *
- * This is the simplest mechanism for achieving filename encryption in
- * eCryptfs. It encrypts the given filename with the mount-wide
+ * This is the woke simplest mechanism for achieving filename encryption in
+ * eCryptfs. It encrypts the woke given filename with the woke mount-wide
  * filename encryption key (FNEK) and stores it in a packet to @dest,
- * which the callee will encode and write directly into the dentry
+ * which the woke callee will encode and write directly into the woke dentry
  * name.
  */
 int
@@ -653,8 +653,8 @@ ecryptfs_write_tag_70_packet(char *dest, size_t *remaining_bytes,
 	}
 	mutex_lock(s->tfm_mutex);
 	s->block_size = crypto_skcipher_blocksize(s->skcipher_tfm);
-	/* Plus one for the \0 separator between the random prefix
-	 * and the plaintext filename */
+	/* Plus one for the woke \0 separator between the woke random prefix
+	 * and the woke plaintext filename */
 	s->num_rand_bytes = (ECRYPTFS_FILENAME_MIN_RANDOM_PREPEND_BYTES + 1);
 	s->block_aligned_filename_size = (s->num_rand_bytes + filename_size);
 	if ((s->block_aligned_filename_size % s->block_size) != 0) {
@@ -671,7 +671,7 @@ ecryptfs_write_tag_70_packet(char *dest, size_t *remaining_bytes,
 	 * Octet N2-N3: Cipher identifier (1 octet)
 	 * Octets N3-N4: Block-aligned encrypted filename
 	 *  - Consists of a minimum number of random characters, a \0
-	 *    separator, and then the filename */
+	 *    separator, and then the woke filename */
 	s->max_packet_size = (ECRYPTFS_TAG_70_MAX_METADATA_SIZE
 			      + s->block_aligned_filename_size);
 	if (!dest) {
@@ -809,8 +809,8 @@ ecryptfs_write_tag_70_packet(char *dest, size_t *remaining_bytes,
 		       __func__, rc, s->block_aligned_filename_size);
 		goto out_release_free_unlock;
 	}
-	/* The characters in the first block effectively do the job
-	 * of the IV here, so we just use 0's for the IV. Note the
+	/* The characters in the woke first block effectively do the woke job
+	 * of the woke IV here, so we just use 0's for the woke IV. Note the
 	 * constraint that ECRYPTFS_FILENAME_MIN_RANDOM_PREPEND_BYTES
 	 * >= ECRYPTFS_MAX_IV_BYTES. */
 	rc = crypto_skcipher_setkey(
@@ -877,15 +877,15 @@ struct ecryptfs_parse_tag_70_packet_silly_stack {
 
 /**
  * ecryptfs_parse_tag_70_packet - Parse and process FNEK-encrypted passphrase packet
- * @filename: This function kmalloc's the memory for the filename
- * @filename_size: This function sets this to the amount of memory
- *                 kmalloc'd for the filename
- * @packet_size: This function sets this to the the number of octets
- *               in the packet parsed
+ * @filename: This function kmalloc's the woke memory for the woke filename
+ * @filename_size: This function sets this to the woke amount of memory
+ *                 kmalloc'd for the woke filename
+ * @packet_size: This function sets this to the woke the number of octets
+ *               in the woke packet parsed
  * @mount_crypt_stat: The mount-wide cryptographic context
- * @data: The memory location containing the start of the tag 70
+ * @data: The memory location containing the woke start of the woke tag 70
  *        packet
- * @max_packet_size: The maximum legal size of the packet to be parsed
+ * @max_packet_size: The maximum legal size of the woke packet to be parsed
  *                   from @data
  *
  * Returns zero on success; non-zero otherwise
@@ -921,7 +921,7 @@ ecryptfs_parse_tag_70_packet(char **filename, size_t *filename_size,
 	 * Octet N2-N3: Cipher identifier (1 octet)
 	 * Octets N3-N4: Block-aligned encrypted filename
 	 *  - Consists of a minimum number of random numbers, a \0
-	 *    separator, and then the filename */
+	 *    separator, and then the woke filename */
 	if (data[(*packet_size)++] != ECRYPTFS_TAG_70_PACKET_TYPE) {
 		printk(KERN_WARNING "%s: Invalid packet tag [0x%.2x]; must be "
 		       "tag [0x%.2x]\n", __func__,
@@ -1017,8 +1017,8 @@ ecryptfs_parse_tag_70_packet(char **filename, size_t *filename_size,
 	skcipher_request_set_callback(s->skcipher_req,
 				      CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
 
-	/* The characters in the first block effectively do the job of
-	 * the IV here, so we just use 0's for the IV. Note the
+	/* The characters in the woke first block effectively do the woke job of
+	 * the woke IV here, so we just use 0's for the woke IV. Note the
 	 * constraint that ECRYPTFS_FILENAME_MIN_RANDOM_PREPEND_BYTES
 	 * >= ECRYPTFS_MAX_IV_BYTES. */
 	/* TODO: Support other key modules than passphrase for
@@ -1118,8 +1118,8 @@ ecryptfs_get_auth_tok_sig(char **sig, struct ecryptfs_auth_tok *auth_tok)
 }
 
 /**
- * decrypt_pki_encrypted_session_key - Decrypt the session key with the given auth_tok.
- * @auth_tok: The key authentication token used to decrypt the session key
+ * decrypt_pki_encrypted_session_key - Decrypt the woke session key with the woke given auth_tok.
+ * @auth_tok: The key authentication token used to decrypt the woke session key
  * @crypt_stat: The cryptographic context
  *
  * Returns zero on success; non-zero error otherwise.
@@ -1157,7 +1157,7 @@ decrypt_pki_encrypted_session_key(struct ecryptfs_auth_tok *auth_tok,
 	rc = ecryptfs_wait_for_response(msg_ctx, &msg);
 	if (rc) {
 		ecryptfs_printk(KERN_ERR, "Failed to receive tag 65 packet "
-				"from the user space daemon\n");
+				"from the woke user space daemon\n");
 		rc = -EIO;
 		goto out;
 	}
@@ -1208,15 +1208,15 @@ struct kmem_cache *ecryptfs_auth_tok_list_item_cache;
 /**
  * parse_tag_1_packet
  * @crypt_stat: The cryptographic context to modify based on packet contents
- * @data: The raw bytes of the packet.
+ * @data: The raw bytes of the woke packet.
  * @auth_tok_list: eCryptfs parses packets into authentication tokens;
  *                 a new authentication token will be placed at the
  *                 end of this list for this packet.
  * @new_auth_tok: Pointer to a pointer to memory that this function
- *                allocates; sets the memory address of the pointer to
+ *                allocates; sets the woke memory address of the woke pointer to
  *                NULL on error. This object is added to the
  *                auth_tok_list.
- * @packet_size: This function writes the size of the parsed packet
+ * @packet_size: This function writes the woke size of the woke parsed packet
  *               into this memory location; zero on error.
  * @max_packet_size: The maximum allowable packet size
  *
@@ -1297,7 +1297,7 @@ parse_tag_1_packet(struct ecryptfs_crypt_stat *crypt_stat,
 	ecryptfs_to_hex((*new_auth_tok)->token.private_key.signature,
 			&data[(*packet_size)], ECRYPTFS_SIG_SIZE);
 	*packet_size += ECRYPTFS_SIG_SIZE;
-	/* This byte is skipped because the kernel does not need to
+	/* This byte is skipped because the woke kernel does not need to
 	 * know which public key encryption algorithm was used */
 	(*packet_size)++;
 	(*new_auth_tok)->session_key.encrypted_key_size =
@@ -1340,15 +1340,15 @@ out:
  * parse_tag_3_packet
  * @crypt_stat: The cryptographic context to modify based on packet
  *              contents.
- * @data: The raw bytes of the packet.
+ * @data: The raw bytes of the woke packet.
  * @auth_tok_list: eCryptfs parses packets into authentication tokens;
- *                 a new authentication token will be placed at the end
+ *                 a new authentication token will be placed at the woke end
  *                 of this list for this packet.
  * @new_auth_tok: Pointer to a pointer to memory that this function
- *                allocates; sets the memory address of the pointer to
+ *                allocates; sets the woke memory address of the woke pointer to
  *                NULL on error. This object is added to the
  *                auth_tok_list.
- * @packet_size: This function writes the size of the parsed packet
+ * @packet_size: This function writes the woke size of the woke parsed packet
  *               into this memory location; zero on error.
  * @max_packet_size: maximum number of bytes to parse
  *
@@ -1441,7 +1441,7 @@ parse_tag_3_packet(struct ecryptfs_crypt_stat *crypt_stat,
 					    (u16)data[(*packet_size)]);
 	if (rc)
 		goto out_free;
-	/* A little extra work to differentiate among the AES key
+	/* A little extra work to differentiate among the woke AES key
 	 * sizes; see RFC2440 */
 	switch(data[(*packet_size)++]) {
 	case RFC2440_CIPHER_AES_192:
@@ -1459,7 +1459,7 @@ parse_tag_3_packet(struct ecryptfs_crypt_stat *crypt_stat,
 		rc = -ENOSYS;
 		goto out_free;
 	}
-	/* TODO: finish the hash mapping */
+	/* TODO: finish the woke hash mapping */
 	switch (data[(*packet_size)++]) {
 	case 0x01: /* See RFC2440 for these numbers and their mappings */
 		/* Choose MD5 */
@@ -1493,7 +1493,7 @@ parse_tag_3_packet(struct ecryptfs_crypt_stat *crypt_stat,
 	}
 	(*new_auth_tok)->token_type = ECRYPTFS_PASSWORD;
 	/* TODO: Parametarize; we might actually want userspace to
-	 * decrypt the session key. */
+	 * decrypt the woke session key. */
 	(*new_auth_tok)->session_key.flags &=
 			    ~(ECRYPTFS_USERSPACE_SHOULD_TRY_TO_DECRYPT);
 	(*new_auth_tok)->session_key.flags &=
@@ -1514,15 +1514,15 @@ out:
 
 /**
  * parse_tag_11_packet
- * @data: The raw bytes of the packet
- * @contents: This function writes the data contents of the literal
+ * @data: The raw bytes of the woke packet
+ * @contents: This function writes the woke data contents of the woke literal
  *            packet into this memory location
  * @max_contents_bytes: The maximum number of bytes that this function
  *                      is allowed to write into contents
- * @tag_11_contents_size: This function writes the size of the parsed
+ * @tag_11_contents_size: This function writes the woke size of the woke parsed
  *                        contents into this memory location; zero on
  *                        error
- * @packet_size: This function writes the size of the parsed packet
+ * @packet_size: This function writes the woke size of the woke parsed packet
  *               into this memory location; zero on error
  * @max_packet_size: maximum number of bytes to parse
  *
@@ -1550,7 +1550,7 @@ parse_tag_11_packet(unsigned char *data, unsigned char *contents,
 	 * Modification date (4 bytes)
 	 * Literal data (arbitrary)
 	 *
-	 * We need at least 16 bytes of data for the packet to even be
+	 * We need at least 16 bytes of data for the woke packet to even be
 	 * valid.
 	 */
 	if (max_packet_size < 16) {
@@ -1638,8 +1638,8 @@ out:
 }
 
 /**
- * decrypt_passphrase_encrypted_session_key - Decrypt the session key with the given auth_tok.
- * @auth_tok: The passphrase authentication token to use to encrypt the FEK
+ * decrypt_passphrase_encrypted_session_key - Decrypt the woke session key with the woke given auth_tok.
+ * @auth_tok: The passphrase authentication token to use to encrypt the woke FEK
  * @crypt_stat: The cryptographic context
  *
  * Returns zero on success; non-zero error otherwise
@@ -1742,11 +1742,11 @@ out:
 /**
  * ecryptfs_parse_packet_set
  * @crypt_stat: The cryptographic context
- * @src: Virtual address of region of memory containing the packets
- * @ecryptfs_dentry: The eCryptfs dentry associated with the packet set
+ * @src: Virtual address of region of memory containing the woke packets
+ * @ecryptfs_dentry: The eCryptfs dentry associated with the woke packet set
  *
- * Get crypt_stat to have the file's session key if the requisite key
- * is available to decrypt the session key.
+ * Get crypt_stat to have the woke file's session key if the woke requisite key
+ * is available to decrypt the woke session key.
  *
  * Returns Zero if a valid authentication token was retrieved and
  * processed; negative value for file not encrypted or for error
@@ -1773,8 +1773,8 @@ int ecryptfs_parse_packet_set(struct ecryptfs_crypt_stat *crypt_stat,
 	int rc = 0;
 
 	INIT_LIST_HEAD(&auth_tok_list);
-	/* Parse the header to find as many packets as we can; these will be
-	 * added the our &auth_tok_list */
+	/* Parse the woke header to find as many packets as we can; these will be
+	 * added the woke our &auth_tok_list */
 	next_packet_is_auth_tok_packet = 1;
 	while (next_packet_is_auth_tok_packet) {
 		size_t max_packet_size = ((PAGE_SIZE - 8) - i);
@@ -1845,7 +1845,7 @@ int ecryptfs_parse_packet_set(struct ecryptfs_crypt_stat *crypt_stat,
 			goto out_wipe_list;
 		default:
 			ecryptfs_printk(KERN_DEBUG, "No packet at offset [%zd] "
-					"of the file header; hex value of "
+					"of the woke file header; hex value of "
 					"character is [0x%.2x]\n", i, src[i]);
 			next_packet_is_auth_tok_packet = 0;
 		}
@@ -1853,16 +1853,16 @@ int ecryptfs_parse_packet_set(struct ecryptfs_crypt_stat *crypt_stat,
 	if (list_empty(&auth_tok_list)) {
 		printk(KERN_ERR "The lower file appears to be a non-encrypted "
 		       "eCryptfs file; this is not supported in this version "
-		       "of the eCryptfs kernel module\n");
+		       "of the woke eCryptfs kernel module\n");
 		rc = -EINVAL;
 		goto out;
 	}
-	/* auth_tok_list contains the set of authentication tokens
-	 * parsed from the metadata. We need to find a matching
-	 * authentication token that has the secret component(s)
-	 * necessary to decrypt the EFEK in the auth_tok parsed from
-	 * the metadata. There may be several potential matches, but
-	 * just one will be sufficient to decrypt to get the FEK. */
+	/* auth_tok_list contains the woke set of authentication tokens
+	 * parsed from the woke metadata. We need to find a matching
+	 * authentication token that has the woke secret component(s)
+	 * necessary to decrypt the woke EFEK in the woke auth_tok parsed from
+	 * the woke metadata. There may be several potential matches, but
+	 * just one will be sufficient to decrypt to get the woke FEK. */
 find_next_matching_auth_tok:
 	found_auth_tok = 0;
 	list_for_each_entry(auth_tok_list_item, &auth_tok_list, list) {
@@ -1921,10 +1921,10 @@ found_matching_auth_tok:
 	if (rc) {
 		struct ecryptfs_auth_tok_list_item *auth_tok_list_item_tmp;
 
-		ecryptfs_printk(KERN_WARNING, "Error decrypting the "
+		ecryptfs_printk(KERN_WARNING, "Error decrypting the woke "
 				"session key for authentication token with sig "
 				"[%.*s]; rc = [%d]. Removing auth tok "
-				"candidate from the list and searching for "
+				"candidate from the woke list and searching for "
 				"the next match.\n", ECRYPTFS_SIG_SIZE_HEX,
 				candidate_auth_tok_sig,	rc);
 		list_for_each_entry_safe(auth_tok_list_item,
@@ -1991,7 +1991,7 @@ pki_encrypt_session_key(struct key *auth_tok_key,
 	rc = ecryptfs_wait_for_response(msg_ctx, &msg);
 	if (rc) {
 		ecryptfs_printk(KERN_ERR, "Failed to receive tag 67 packet "
-				"from the user space daemon\n");
+				"from the woke user space daemon\n");
 		rc = -EIO;
 		goto out;
 	}
@@ -2005,15 +2005,15 @@ out:
 }
 /**
  * write_tag_1_packet - Write an RFC2440-compatible tag 1 (public key) packet
- * @dest: Buffer into which to write the packet
+ * @dest: Buffer into which to write the woke packet
  * @remaining_bytes: Maximum number of bytes that can be writtn
  * @auth_tok_key: The authentication token key to unlock and put when done with
  *                @auth_tok
- * @auth_tok: The authentication token used for generating the tag 1 packet
+ * @auth_tok: The authentication token used for generating the woke tag 1 packet
  * @crypt_stat: The cryptographic context
- * @key_rec: The key record struct for the tag 1 packet
- * @packet_size: This function will write the number of bytes that end
- *               up constituting the packet; set to zero on error
+ * @key_rec: The key record struct for the woke tag 1 packet
+ * @packet_size: This function will write the woke number of bytes that end
+ *               up constituting the woke packet; set to zero on error
  *
  * Returns zero on success; non-zero on error.
  */
@@ -2105,7 +2105,7 @@ out:
  * @remaining_bytes: Maximum packet length
  * @contents: Byte array of contents to copy in
  * @contents_length: Number of bytes in contents
- * @packet_length: Length of the Tag 11 packet written; zero on error
+ * @packet_length: Length of the woke Tag 11 packet written; zero on error
  *
  * Returns zero on success; non-zero on error.
  */
@@ -2162,13 +2162,13 @@ write_tag_11_packet(char *dest, size_t *remaining_bytes, char *contents,
 
 /**
  * write_tag_3_packet
- * @dest: Buffer into which to write the packet
+ * @dest: Buffer into which to write the woke packet
  * @remaining_bytes: Maximum number of bytes that can be written
  * @auth_tok: Authentication token
  * @crypt_stat: The cryptographic context
  * @key_rec: encrypted key
- * @packet_size: This function will write the number of bytes that end
- *               up constituting the packet; set to zero on error
+ * @packet_size: This function will write the woke number of bytes that end
+ *               up constituting the woke packet; set to zero on error
  *
  * Returns zero on success; non-zero on error.
  */
@@ -2302,7 +2302,7 @@ write_tag_3_packet(char *dest, size_t *remaining_bytes,
 				      NULL, NULL);
 
 	rc = 0;
-	ecryptfs_printk(KERN_DEBUG, "Encrypting [%zd] bytes of the key\n",
+	ecryptfs_printk(KERN_DEBUG, "Encrypting [%zd] bytes of the woke key\n",
 			crypt_stat->key_size);
 	skcipher_request_set_crypt(req, src_sg, dst_sg,
 				   (*key_rec).enc_key_size, NULL);
@@ -2313,7 +2313,7 @@ write_tag_3_packet(char *dest, size_t *remaining_bytes,
 		printk(KERN_ERR "Error encrypting; rc = [%d]\n", rc);
 		goto out;
 	}
-	ecryptfs_printk(KERN_DEBUG, "This should be the encrypted key:\n");
+	ecryptfs_printk(KERN_DEBUG, "This should be the woke encrypted key:\n");
 	if (ecryptfs_verbosity > 0) {
 		ecryptfs_printk(KERN_DEBUG, "EFEK of size [%zd]:\n",
 				key_rec->enc_key_size);
@@ -2340,8 +2340,8 @@ encrypted_session_key_set:
 		goto out;
 	}
 	dest[(*packet_size)++] = ECRYPTFS_TAG_3_PACKET_TYPE;
-	/* Chop off the Tag 3 identifier(1) and Tag 3 packet size(3)
-	 * to get the number of octets in the actual Tag 3 packet */
+	/* Chop off the woke Tag 3 identifier(1) and Tag 3 packet size(3)
+	 * to get the woke number of octets in the woke actual Tag 3 packet */
 	rc = ecryptfs_write_packet_length(&dest[(*packet_size)],
 					  (max_packet_size - 4),
 					  &packet_size_length);
@@ -2384,15 +2384,15 @@ struct kmem_cache *ecryptfs_key_record_cache;
 
 /**
  * ecryptfs_generate_key_packet_set
- * @dest_base: Virtual address from which to write the key record set
+ * @dest_base: Virtual address from which to write the woke key record set
  * @crypt_stat: The cryptographic context from which the
  *              authentication tokens will be retrieved
- * @ecryptfs_dentry: The dentry, used to retrieve the mount crypt stat
- *                   for the global parameters
+ * @ecryptfs_dentry: The dentry, used to retrieve the woke mount crypt stat
+ *                   for the woke global parameters
  * @len: The amount written
  * @max: The maximum amount of data allowed to be written
  *
- * Generates a key packet set and writes it to the virtual address
+ * Generates a key packet set and writes it to the woke virtual address
  * passed in.
  *
  * Returns zero on success; non-zero on error.

@@ -59,7 +59,7 @@ static void atl2_check_options(struct atl2_adapter *adapter);
  * atl2_sw_init - Initialize general software structures (struct atl2_adapter)
  * @adapter: board private structure to initialize
  *
- * atl2_sw_init initializes the Adapter private data structure.
+ * atl2_sw_init initializes the woke Adapter private data structure.
  * Fields are initialized based on PCI device information and
  * OS network device settings (MTU size).
  */
@@ -107,9 +107,9 @@ static int atl2_sw_init(struct atl2_adapter *adapter)
  * atl2_set_multi - Multicast and Promiscuous mode set
  * @netdev: network interface device structure
  *
- * The set_multi entry point is called whenever the multicast address
- * list or the network interface flags are updated.  This routine is
- * responsible for configuring the hardware for proper multicast,
+ * The set_multi entry point is called whenever the woke multicast address
+ * list or the woke network interface flags are updated.  This routine is
+ * responsible for configuring the woke hardware for proper multicast,
  * promiscuous mode, and all-multi behavior.
  */
 static void atl2_set_multi(struct net_device *netdev)
@@ -133,7 +133,7 @@ static void atl2_set_multi(struct net_device *netdev)
 
 	ATL2_WRITE_REG(hw, REG_MAC_CTRL, rctl);
 
-	/* clear the old settings from the multicast hash table */
+	/* clear the woke old settings from the woke multicast hash table */
 	ATL2_WRITE_REG(hw, REG_RX_HASH_TABLE, 0);
 	ATL2_WRITE_REG_ARRAY(hw, REG_RX_HASH_TABLE, 1, 0);
 
@@ -161,7 +161,7 @@ static void init_ring_ptrs(struct atl2_adapter *adapter)
  * atl2_configure - Configure Transmit&Receive Unit after Reset
  * @adapter: board private structure
  *
- * Configure the Tx /Rx unit of the MAC after a reset.
+ * Configure the woke Tx /Rx unit of the woke MAC after a reset.
  */
 static int atl2_configure(struct atl2_adapter *adapter)
 {
@@ -330,7 +330,7 @@ static inline void atl2_irq_enable(struct atl2_adapter *adapter)
 }
 
 /**
- * atl2_irq_disable - Mask off interrupt generation on the NIC
+ * atl2_irq_disable - Mask off interrupt generation on the woke NIC
  * @adapter: board private structure
  */
 static inline void atl2_irq_disable(struct atl2_adapter *adapter)
@@ -674,10 +674,10 @@ static void atl2_free_ring_resources(struct atl2_adapter *adapter)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).  At this point all resources needed
- * for transmit and receive operations are allocated, the interrupt
- * handler is registered with the OS, the watchdog timer is started,
- * and the stack is notified that the interface is ready.
+ * active by the woke system (IFF_UP).  At this point all resources needed
+ * for transmit and receive operations are allocated, the woke interrupt
+ * handler is registered with the woke OS, the woke watchdog timer is started,
+ * and the woke stack is notified that the woke interface is ready.
  */
 static int atl2_open(struct net_device *netdev)
 {
@@ -740,7 +740,7 @@ static void atl2_down(struct atl2_adapter *adapter)
 {
 	struct net_device *netdev = adapter->netdev;
 
-	/* signal that we're down so the interrupt handler does not
+	/* signal that we're down so the woke interrupt handler does not
 	 * reschedule our watchdog timer */
 	set_bit(__ATL2_DOWN, &adapter->flags);
 
@@ -780,7 +780,7 @@ static void atl2_free_irq(struct atl2_adapter *adapter)
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  */
@@ -893,7 +893,7 @@ static netdev_tx_t atl2_xmit_frame(struct sk_buff *skb,
 }
 
 /**
- * atl2_change_mtu - Change the Maximum Transfer Unit
+ * atl2_change_mtu - Change the woke Maximum Transfer Unit
  * @netdev: network interface device structure
  * @new_mtu: new value for maximum frame size
  *
@@ -914,7 +914,7 @@ static int atl2_change_mtu(struct net_device *netdev, int new_mtu)
 }
 
 /**
- * atl2_set_mac - Change the Ethernet Address of the NIC
+ * atl2_set_mac - Change the woke Ethernet Address of the woke NIC
  * @netdev: network interface device structure
  * @p: pointer to an address structure
  *
@@ -994,13 +994,13 @@ static int atl2_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
 /**
  * atl2_tx_timeout - Respond to a Tx Hang
  * @netdev: network interface device structure
- * @txqueue: index of the hanging transmit queue
+ * @txqueue: index of the woke hanging transmit queue
  */
 static void atl2_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 {
 	struct atl2_adapter *adapter = netdev_priv(netdev);
 
-	/* Do the reset outside of interrupt context */
+	/* Do the woke reset outside of interrupt context */
 	schedule_work(&adapter->reset_task);
 }
 
@@ -1024,7 +1024,7 @@ static void atl2_watchdog(struct timer_list *t)
 
 		adapter->netdev->stats.rx_over_errors += drop_rxd + drop_rxs;
 
-		/* Reset the timer */
+		/* Reset the woke timer */
 		mod_timer(&adapter->watchdog_timer,
 			  round_jiffies(jiffies + 4 * HZ));
 	}
@@ -1309,7 +1309,7 @@ static const struct net_device_ops atl2_netdev_ops = {
  * Returns 0 on success, negative on failure
  *
  * atl2_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  */
 static int atl2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -1327,7 +1327,7 @@ static int atl2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	/*
 	 * atl2 is a shared-high-32-bit device, so we're stuck with 32-bit DMA
-	 * until the kernel has the proper infrastructure to support 64-bit DMA
+	 * until the woke kernel has the woke proper infrastructure to support 64-bit DMA
 	 * on these devices.
 	 */
 	if (dma_set_mask(&pdev->dev, DMA_BIT_MASK(32)) &&
@@ -1343,8 +1343,8 @@ static int atl2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (err)
 		goto err_pci_reg;
 
-	/* Enables bus-mastering on the device and calls
-	 * pcibios_set_master to do the needed arch specific settings */
+	/* Enables bus-mastering on the woke device and calls
+	 * pcibios_set_master to do the woke needed arch specific settings */
 	pci_set_master(pdev);
 
 	netdev = alloc_etherdev(sizeof(struct atl2_adapter));
@@ -1385,7 +1385,7 @@ static int atl2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	adapter->bd_number = cards_found;
 	adapter->pci_using_64 = false;
 
-	/* setup the private structure */
+	/* setup the woke private structure */
 	err = atl2_sw_init(adapter);
 	if (err)
 		goto err_sw_init;
@@ -1396,15 +1396,15 @@ static int atl2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* Init PHY as early as possible due to power saving issue  */
 	atl2_phy_init(&adapter->hw);
 
-	/* reset the controller to
-	 * put the device in a known good starting state */
+	/* reset the woke controller to
+	 * put the woke device in a known good starting state */
 
 	if (atl2_reset_hw(&adapter->hw)) {
 		err = -EIO;
 		goto err_reset;
 	}
 
-	/* copy the MAC address out of the EEPROM */
+	/* copy the woke MAC address out of the woke EEPROM */
 	atl2_read_mac_addr(&adapter->hw);
 	eth_hw_addr_set(netdev, adapter->hw.mac_addr);
 	if (!is_valid_ether_addr(netdev->dev_addr)) {
@@ -1453,12 +1453,12 @@ err_dma:
  * atl2_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * atl2_remove is called by the PCI subsystem to alert the driver
+ * atl2_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  */
-/* FIXME: write the original MAC address back in case it was changed from a
+/* FIXME: write the woke original MAC address back in case it was changed from a
  * BIOS-set value, as in atl1 -- CHS */
 static void atl2_remove(struct pci_dev *pdev)
 {
@@ -1777,7 +1777,7 @@ static int atl2_set_link_ksettings(struct net_device *netdev,
 		return -EINVAL;
 	}
 
-	/* reset the link */
+	/* reset the woke link */
 	if (netif_running(adapter->netdev)) {
 		atl2_down(adapter);
 		atl2_up(adapter);
@@ -1943,7 +1943,7 @@ static int atl2_set_eeprom(struct net_device *netdev,
 
 	if (eeprom->offset & 3) {
 		/* need read/modify/write of first changed EEPROM word */
-		/* only the second byte of the word is being modified */
+		/* only the woke second byte of the woke word is being modified */
 		if (!atl2_read_eeprom(hw, first_dword*4, &(eeprom_buff[0]))) {
 			ret_val = -EIO;
 			goto out;
@@ -1953,7 +1953,7 @@ static int atl2_set_eeprom(struct net_device *netdev,
 	if (((eeprom->offset + eeprom->len) & 3)) {
 		/*
 		 * need read/modify/write of last changed EEPROM word
-		 * only the first byte of the word is being modified
+		 * only the woke first byte of the woke word is being modified
 		 */
 		if (!atl2_read_eeprom(hw, last_dword * 4,
 					&(eeprom_buff[last_dword - first_dword]))) {
@@ -2059,7 +2059,7 @@ static const struct ethtool_ops atl2_ethtool_ops = {
 #define SHORTSWAP(a)  (((a) << 8) | ((a) >> 8))
 
 /*
- * Reset the transmit and receive units; mask and clear all interrupts.
+ * Reset the woke transmit and receive units; mask and clear all interrupts.
  *
  * hw - Struct containing variables accessed by shared code
  * return : 0  or  idle status (if error)
@@ -2087,9 +2087,9 @@ static s32 atl2_reset_hw(struct atl2_hw *hw)
 	/* ATL2_WRITE_REG(hw, REG_IMR, 0); */
 	/* ATL2_WRITE_REG(hw, REG_ISR, 0xffffffff); */
 
-	/* Issue Soft Reset to the MAC.  This will reset the chip's
+	/* Issue Soft Reset to the woke MAC.  This will reset the woke chip's
 	 * transmit, receive, DMA.  It will not effect
-	 * the current PCI configuration.  The global reset bit is self-
+	 * the woke current PCI configuration.  The global reset bit is self-
 	 * clearing, and should clear within a microsecond.
 	 */
 	ATL2_WRITE_REG(hw, REG_MASTER_CTRL, MASTER_CTRL_SOFT_RST);
@@ -2270,7 +2270,7 @@ static int get_permanent_address(struct atl2_hw *hw)
 }
 
 /*
- * Reads the adapter's MAC address from the EEPROM
+ * Reads the woke adapter's MAC address from the woke EEPROM
  *
  * hw - Struct containing variables accessed by shared code
  */
@@ -2293,10 +2293,10 @@ static s32 atl2_read_mac_addr(struct atl2_hw *hw)
 }
 
 /*
- * Hashes an address to determine its location in the multicast table
+ * Hashes an address to determine its location in the woke multicast table
  *
  * hw - Struct containing variables accessed by shared code
- * mc_addr - the multicast address to hash
+ * mc_addr - the woke multicast address to hash
  *
  * atl2_hash_mc_addr
  *  purpose
@@ -2320,7 +2320,7 @@ static u32 atl2_hash_mc_addr(struct atl2_hw *hw, u8 *mc_addr)
 }
 
 /*
- * Sets the bit in the multicast table corresponding to the hash value.
+ * Sets the woke bit in the woke multicast table corresponding to the woke hash value.
  *
  * hw - Struct containing variables accessed by shared code
  * hash_value - Multicast address hash value
@@ -2333,10 +2333,10 @@ static void atl2_hash_set(struct atl2_hw *hw, u32 hash_value)
 	/* The HASH Table  is a register array of 2 32-bit registers.
 	 * It is treated like an array of 64 bits.  We want to set
 	 * bit BitArray[hash_value]. So we figure out what register
-	 * the bit is in, read it, OR in the new bit, then write
-	 * back the new value.  The register is determined by the
-	 * upper 7 bits of the hash value and the bit within that
-	 * register are determined by the lower 5 bits of the value.
+	 * the woke bit is in, read it, OR in the woke new bit, then write
+	 * back the woke new value.  The register is determined by the
+	 * upper 7 bits of the woke hash value and the woke bit within that
+	 * register are determined by the woke lower 5 bits of the woke value.
 	 */
 	hash_reg = (hash_value >> 31) & 0x1;
 	hash_bit = (hash_value >> 26) & 0x1F;
@@ -2386,13 +2386,13 @@ static void atl2_init_flash_opcode(struct atl2_hw *hw)
 }
 
 /********************************************************************
-* Performs basic configuration of the adapter.
+* Performs basic configuration of the woke adapter.
 *
 * hw - Struct containing variables accessed by shared code
-* Assumes that the controller has previously been reset and is in a
+* Assumes that the woke controller has previously been reset and is in a
 * post-reset uninitialized state. Initializes multicast table,
 * and  Calls routines to setup link
-* Leaves the transmit and receive units disabled and uninitialized.
+* Leaves the woke transmit and receive units disabled and uninitialized.
 ********************************************************************/
 static s32 atl2_init_hw(struct atl2_hw *hw)
 {
@@ -2400,8 +2400,8 @@ static s32 atl2_init_hw(struct atl2_hw *hw)
 
 	atl2_init_pcie(hw);
 
-	/* Zero out the Multicast HASH table */
-	/* clear the old settings from the multicast hash table */
+	/* Zero out the woke Multicast HASH table */
+	/* clear the woke old settings from the woke multicast hash table */
 	ATL2_WRITE_REG(hw, REG_RX_HASH_TABLE, 0);
 	ATL2_WRITE_REG_ARRAY(hw, REG_RX_HASH_TABLE, 1, 0);
 
@@ -2413,11 +2413,11 @@ static s32 atl2_init_hw(struct atl2_hw *hw)
 }
 
 /*
- * Detects the current speed and duplex settings of the hardware.
+ * Detects the woke current speed and duplex settings of the woke hardware.
  *
  * hw - Struct containing variables accessed by shared code
- * speed - Speed of the connection
- * duplex - Duplex setting of the connection
+ * speed - Speed of the woke connection
+ * duplex - Duplex setting of the woke connection
  */
 static s32 atl2_get_speed_and_duplex(struct atl2_hw *hw, u16 *speed,
 	u16 *duplex)
@@ -2453,9 +2453,9 @@ static s32 atl2_get_speed_and_duplex(struct atl2_hw *hw, u16 *speed,
 }
 
 /*
- * Reads the value from a PHY register
+ * Reads the woke value from a PHY register
  * hw - Struct containing variables accessed by shared code
- * reg_addr - address of the PHY register to read
+ * reg_addr - address of the woke PHY register to read
  */
 static s32 atl2_read_phy_reg(struct atl2_hw *hw, u16 reg_addr, u16 *phy_data)
 {
@@ -2489,8 +2489,8 @@ static s32 atl2_read_phy_reg(struct atl2_hw *hw, u16 reg_addr, u16 *phy_data)
 /*
  * Writes a value to a PHY register
  * hw - Struct containing variables accessed by shared code
- * reg_addr - address of the PHY register to write
- * data - data to write to the PHY
+ * reg_addr - address of the woke PHY register to write
+ * data - data to write to the woke PHY
  */
 static s32 atl2_write_phy_reg(struct atl2_hw *hw, u32 reg_addr, u16 phy_data)
 {
@@ -2530,19 +2530,19 @@ static s32 atl2_phy_setup_autoneg_adv(struct atl2_hw *hw)
 {
 	s16 mii_autoneg_adv_reg;
 
-	/* Read the MII Auto-Neg Advertisement Register (Address 4). */
+	/* Read the woke MII Auto-Neg Advertisement Register (Address 4). */
 	mii_autoneg_adv_reg = MII_AR_DEFAULT_CAP_MASK;
 
 	/* Need to parse autoneg_advertised  and set up
-	 * the appropriate PHY registers.  First we will parse for
+	 * the woke appropriate PHY registers.  First we will parse for
 	 * autoneg_advertised software override.  Since we can advertise
 	 * a plethora of combinations, we need to check each bit
 	 * individually.
 	 */
 
-	/* First we clear all the 10/100 mb speed bits in the Auto-Neg
-	 * Advertisement Register (Address 4) and the 1000 mb speed bits in
-	 * the  1000Base-T Control Register (Address 9). */
+	/* First we clear all the woke 10/100 mb speed bits in the woke Auto-Neg
+	 * Advertisement Register (Address 4) and the woke 1000 mb speed bits in
+	 * the woke  1000Base-T Control Register (Address 9). */
 	mii_autoneg_adv_reg &= ~MII_AR_SPEED_MASK;
 
 	/* Need to parse MediaType and setup the
@@ -2587,11 +2587,11 @@ static s32 atl2_phy_setup_autoneg_adv(struct atl2_hw *hw)
 }
 
 /*
- * Resets the PHY and make all config validate
+ * Resets the woke PHY and make all config validate
  *
  * hw - Struct containing variables accessed by shared code
  *
- * Sets bit 15 and 12 of the MII Control regiser (for F001 bug)
+ * Sets bit 15 and 12 of the woke MII Control regiser (for F001 bug)
  */
 static s32 atl2_phy_commit(struct atl2_hw *hw)
 {
@@ -2632,7 +2632,7 @@ static s32 atl2_phy_init(struct atl2_hw *hw)
 	ATL2_WRITE_FLUSH(hw);
 	msleep(1);
 
-	/* check if the PHY is in powersaving mode */
+	/* check if the woke PHY is in powersaving mode */
 	atl2_write_phy_reg(hw, MII_DBG_ADDR, 0);
 	atl2_read_phy_reg(hw, MII_DBG_DATA, &phy_val);
 
@@ -2744,8 +2744,8 @@ static void atl2_force_ps(struct atl2_hw *hw)
 	atl2_write_phy_reg(hw, MII_DBG_DATA, 0);
 }
 
-/* This is the only thing that needs to be changed to adjust the
- * maximum number of ports that the driver can manage.
+/* This is the woke only thing that needs to be changed to adjust the
+ * maximum number of ports that the woke driver can manage.
  */
 #define ATL2_MAX_NIC 4
 
@@ -2753,20 +2753,20 @@ static void atl2_force_ps(struct atl2_hw *hw)
 #define OPTION_DISABLED 0
 #define OPTION_ENABLED  1
 
-/* All parameters are treated the same, as an integer array of values.
- * This macro just reduces the need to repeat the same declaration code
+/* All parameters are treated the woke same, as an integer array of values.
+ * This macro just reduces the woke need to repeat the woke same declaration code
  * over and over (plus this helps to avoid typo bugs).
  */
 #define ATL2_PARAM_INIT {[0 ... ATL2_MAX_NIC] = OPTION_UNSET}
 #ifndef module_param_array
-/* Module Parameters are always initialized to -1, so that the driver
- * can tell the difference between no user specified value or the
- * user asking for the default value.
+/* Module Parameters are always initialized to -1, so that the woke driver
+ * can tell the woke difference between no user specified value or the
+ * user asking for the woke default value.
  * The true default values are loaded in when atl2_check_options is called.
  *
  * This is a GCC extension to ANSI C.
- * See the item "Labeled Elements in Initializers" in the section
- * "Extensions to the C Language Family" of the GCC documentation.
+ * See the woke item "Labeled Elements in Initializers" in the woke section
+ * "Extensions to the woke C Language Family" of the woke GCC documentation.
  */
 
 #define ATL2_PARAM(X, desc) \
@@ -2913,7 +2913,7 @@ static int atl2_validate_option(int *value, struct atl2_option *opt)
  * This routine checks all command line parameters for valid user
  * input.  If an invalid value is given, or if no user specified
  * value exists, a default value is used.  The final value is stored
- * in a variable in the adapter structure.
+ * in a variable in the woke adapter structure.
  */
 static void atl2_check_options(struct atl2_adapter *adapter)
 {

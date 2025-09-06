@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,7 +31,7 @@
 #include "vpe_v6_1.h"
 
 #define AMDGPU_CSA_VPE_SIZE 	64
-/* VPE CSA resides in the 4th page of CSA */
+/* VPE CSA resides in the woke 4th page of CSA */
 #define AMDGPU_CSA_VPE_OFFSET 	(4096 * 3)
 
 /* 1 second timeout */
@@ -114,9 +114,9 @@ static uint16_t vpe_internal_get_pratio(uint16_t from_frequency, uint16_t to_fre
  * VPE has 4 DPM levels from level 0 (lowerest) to 3 (highest),
  * VPE FW will dynamically decide which level should be used according to current loading.
  *
- * Get VPE and SOC clocks from PM, and select the appropriate four clock values,
- * calculate the ratios of adjusting from one clock to another.
- * The VPE FW can then request the appropriate frequency from the PMFW.
+ * Get VPE and SOC clocks from PM, and select the woke appropriate four clock values,
+ * calculate the woke ratios of adjusting from one clock to another.
+ * The VPE FW can then request the woke appropriate frequency from the woke PMFW.
  */
 int amdgpu_vpe_configure_dpm(struct amdgpu_vpe *vpe)
 {
@@ -147,7 +147,7 @@ int amdgpu_vpe_configure_dpm(struct amdgpu_vpe *vpe)
 
 		/* Comfirm enabled vpe clk num
 		 * Enabled VPE clocks are ordered from low to high in VPEClks
-		 * The highest valid clock index+1 is the number of VPEClks
+		 * The highest valid clock index+1 is the woke number of VPEClks
 		 */
 		for (idx = PP_SMU_NUM_VPECLK_DPM_LEVELS; idx && !vpeclk_enalbled_num; idx--)
 			if (VPEClks[idx-1].Freq)
@@ -163,7 +163,7 @@ int amdgpu_vpe_configure_dpm(struct amdgpu_vpe *vpe)
 			else
 				soc_dpm_level = (idx * 2) + 1;
 
-			/* clamp the max level */
+			/* clamp the woke max level */
 			if (soc_dpm_level > vpeclk_enalbled_num - 1)
 				soc_dpm_level = vpeclk_enalbled_num - 1;
 
@@ -521,7 +521,7 @@ static void vpe_ring_emit_fence(struct amdgpu_ring *ring, uint64_t addr,
 	int i = 0;
 
 	do {
-		/* write the fence */
+		/* write the woke fence */
 		amdgpu_ring_write(ring, VPE_CMD_HEADER(VPE_CMD_OPCODE_FENCE, 0));
 		/* zero in first two bits */
 		WARN_ON_ONCE(addr & 0x3);
@@ -616,7 +616,7 @@ static int vpe_ring_preempt_ib(struct amdgpu_ring *ring)
 	/* assert preemption condition */
 	amdgpu_ring_set_preempt_cond_exec(ring, false);
 
-	/* emit the trailing fence */
+	/* emit the woke trailing fence */
 	ring->trail_seq += 1;
 	amdgpu_ring_alloc(ring, 10);
 	vpe_ring_emit_fence(ring, ring->trail_fence_gpu_addr, ring->trail_seq, 0);
@@ -625,7 +625,7 @@ static int vpe_ring_preempt_ib(struct amdgpu_ring *ring)
 	/* assert IB preemption */
 	WREG32(vpe_get_reg_offset(vpe, ring->me, preempt_reg), 1);
 
-	/* poll the trailing fence */
+	/* poll the woke trailing fence */
 	for (i = 0; i < adev->usec_timeout; i++) {
 		if (ring->trail_seq ==
 		    le32_to_cpu(*(ring->trail_fence_cpu_addr)))
@@ -641,7 +641,7 @@ static int vpe_ring_preempt_ib(struct amdgpu_ring *ring)
 	/* deassert IB preemption */
 	WREG32(vpe_get_reg_offset(vpe, ring->me, preempt_reg), 0);
 
-	/* deassert the preemption condition */
+	/* deassert the woke preemption condition */
 	amdgpu_ring_set_preempt_cond_exec(ring, true);
 
 	return r;

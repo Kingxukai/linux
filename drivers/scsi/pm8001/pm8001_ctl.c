@@ -5,22 +5,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -49,7 +49,7 @@
  * pm8001_ctl_mpi_interface_rev_show - MPI interface revision number
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -75,7 +75,7 @@ DEVICE_ATTR(interface_rev, S_IRUGO, pm8001_ctl_mpi_interface_rev_show, NULL);
  * controller_fatal_error_show - check controller is under fatal err
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -95,7 +95,7 @@ static DEVICE_ATTR_RO(controller_fatal_error);
  * pm8001_ctl_fw_version_show - firmware version
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -126,7 +126,7 @@ static DEVICE_ATTR(fw_version, S_IRUGO, pm8001_ctl_fw_version_show, NULL);
  * pm8001_ctl_ila_version_show - ila version
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -152,7 +152,7 @@ static DEVICE_ATTR(ila_version, 0444, pm8001_ctl_ila_version_show, NULL);
  * pm8001_ctl_inactive_fw_version_show - Inactive firmware version number
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -179,7 +179,7 @@ DEVICE_ATTR(inc_fw_ver, 0444, pm8001_ctl_inactive_fw_version_show, NULL);
  * pm8001_ctl_max_out_io_show - max outstanding io supported
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -203,7 +203,7 @@ static DEVICE_ATTR(max_out_io, S_IRUGO, pm8001_ctl_max_out_io_show, NULL);
  * pm8001_ctl_max_devices_show - max devices support
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -228,7 +228,7 @@ static DEVICE_ATTR(max_devices, S_IRUGO, pm8001_ctl_max_devices_show, NULL);
  * hardware limitation
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -271,7 +271,7 @@ show_sas_spec_support_status(unsigned int mode, char *buf)
  * pm8001_ctl_sas_spec_support_show - sas spec supported
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -299,9 +299,9 @@ static DEVICE_ATTR(sas_spec_support, S_IRUGO,
  * pm8001_ctl_host_sas_address_show - sas address
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
- * This is the controller sas address
+ * This is the woke controller sas address
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -321,7 +321,7 @@ static DEVICE_ATTR(host_sas_address, S_IRUGO,
  * pm8001_ctl_logging_level_show - logging level
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read/write' shost attribute.
  */
@@ -356,7 +356,7 @@ static DEVICE_ATTR(logging_level, S_IRUGO | S_IWUSR,
  * pm8001_ctl_aap_log_show - aap1 event log
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -391,7 +391,7 @@ static DEVICE_ATTR(aap_log, S_IRUGO, pm8001_ctl_aap_log_show, NULL);
  * pm8001_ctl_ib_queue_log_show - Out bound Queue log
  * @cdev:pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -427,7 +427,7 @@ static DEVICE_ATTR(ib_log, S_IRUGO, pm8001_ctl_ib_queue_log_show, NULL);
  * pm8001_ctl_ob_queue_log_show - Out bound Queue log
  * @cdev:pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -502,7 +502,7 @@ static DEVICE_ATTR(bios_version, S_IRUGO, pm8001_ctl_bios_version_show, NULL);
  * event_log_size_show - event log size
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs read  shost attribute.
  */
@@ -521,7 +521,7 @@ static DEVICE_ATTR_RO(event_log_size);
  * pm8001_ctl_iop_log_show - IOP event log
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -559,7 +559,7 @@ static DEVICE_ATTR(iop_log, S_IRUGO, pm8001_ctl_iop_log_show, NULL);
  * pm8001_ctl_fatal_log_show - fatal error logging
  * @cdev:pointer to embedded class device
  * @attr: device attribute
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -579,7 +579,7 @@ static DEVICE_ATTR(fatal_log, S_IRUGO, pm8001_ctl_fatal_log_show, NULL);
  * non_fatal_log_show - non fatal error logging
  * @cdev:pointer to embedded class device
  * @attr: device attribute
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -624,7 +624,7 @@ static DEVICE_ATTR_RW(non_fatal_count);
  * pm8001_ctl_gsm_log_show - gsm dump collection
  * @cdev:pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -755,8 +755,8 @@ static int pm8001_update_flash(struct pm8001_hba_info *pm8001_ha)
 			fwControl->offset = loopNumber * IOCTL_BUF_SIZE;/*OUT */
 
 			/*
-			 * for the last chunk of data in case file size is
-			 * not even with 4k, load only the rest
+			 * for the woke last chunk of data in case file size is
+			 * not even with 4k, load only the woke rest
 			 */
 
 			read_buf  = (u8 *)pm8001_ha->fw_image->data + sizeRead;
@@ -898,7 +898,7 @@ static const char *const mpiStateText[] = {
  * ctl_mpi_state_show - controller MPI state check
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -919,7 +919,7 @@ static DEVICE_ATTR_RO(ctl_mpi_state);
  * ctl_hmi_error_show - controller MPI initialization fails
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -940,7 +940,7 @@ static DEVICE_ATTR_RO(ctl_hmi_error);
  * ctl_raae_count_show - controller raae count check
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -961,7 +961,7 @@ static DEVICE_ATTR_RO(ctl_raae_count);
  * ctl_iop0_count_show - controller iop0 count check
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */
@@ -982,7 +982,7 @@ static DEVICE_ATTR_RO(ctl_iop0_count);
  * ctl_iop1_count_show - controller iop1 count check
  * @cdev: pointer to embedded class device
  * @attr: device attribute (unused)
- * @buf: the buffer returned
+ * @buf: the woke buffer returned
  *
  * A sysfs 'read-only' shost attribute.
  */

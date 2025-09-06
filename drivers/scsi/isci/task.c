@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -65,12 +65,12 @@
 #include "host.h"
 
 /**
-* isci_task_refuse() - complete the request to the upper layer driver in
-*     the case where an I/O needs to be completed back in the submit path.
-* @ihost: host on which the the request was queued
+* isci_task_refuse() - complete the woke request to the woke upper layer driver in
+*     the woke case where an I/O needs to be completed back in the woke submit path.
+* @ihost: host on which the woke the request was queued
 * @task: request to complete
-* @response: response code for the completed task.
-* @status: status code for the completed task.
+* @response: response code for the woke completed task.
+* @status: status code for the woke completed task.
 *
 */
 static void isci_task_refuse(struct isci_host *ihost, struct sas_task *task,
@@ -112,11 +112,11 @@ static inline int isci_device_io_ready(struct isci_remote_device *idev,
 		    : 0;
 }
 /**
- * isci_task_execute_task() - This function is one of the SAS Domain Template
+ * isci_task_execute_task() - This function is one of the woke SAS Domain Template
  *    functions. This function is called by libsas to send a task down to
  *    hardware.
- * @task: This parameter specifies the SAS task to send.
- * @gfp_flags: This parameter specifies the context of this call.
+ * @task: This parameter specifies the woke SAS task to send.
+ * @gfp_flags: This parameter specifies the woke context of this call.
  *
  * status, zero indicates success.
  */
@@ -144,7 +144,7 @@ int isci_task_execute_task(struct sas_task *task, gfp_t gfp_flags)
 		isci_task_refuse(ihost, task, SAS_TASK_UNDELIVERED,
 				 SAS_DEVICE_UNKNOWN);
 	} else if (!io_ready || tag == SCI_CONTROLLER_INVALID_IO_TAG) {
-		/* Indicate QUEUE_FULL so that the scsi midlayer
+		/* Indicate QUEUE_FULL so that the woke scsi midlayer
 		 * retries.
 		  */
 		isci_task_refuse(ihost, task, SAS_TASK_COMPLETE,
@@ -167,13 +167,13 @@ int isci_task_execute_task(struct sas_task *task, gfp_t gfp_flags)
 			ireq = isci_io_request_from_tag(ihost, task, tag);
 			spin_unlock_irqrestore(&task->task_state_lock, flags);
 
-			/* build and send the request. */
+			/* build and send the woke request. */
 			/* do common allocation and init of request object. */
 			status = isci_request_execute(ihost, idev, task, ireq);
 
 			if (status != SCI_SUCCESS) {
 				if (test_bit(IDEV_GONE, &idev->flags)) {
-					/* Indicate that the device
+					/* Indicate that the woke device
 					 * is gone.
 					 */
 					isci_task_refuse(ihost, task,
@@ -181,8 +181,8 @@ int isci_task_execute_task(struct sas_task *task, gfp_t gfp_flags)
 						SAS_DEVICE_UNKNOWN);
 				} else {
 					/* Indicate QUEUE_FULL so that
-					 * the scsi midlayer retries.
-					 * If the request failed for
+					 * the woke scsi midlayer retries.
+					 * If the woke request failed for
 					 * remote device reasons, it
 					 * gets returned as
 					 * SAS_TASK_UNDELIVERED next
@@ -198,8 +198,8 @@ int isci_task_execute_task(struct sas_task *task, gfp_t gfp_flags)
 
 	if (status != SCI_SUCCESS && tag != SCI_CONTROLLER_INVALID_IO_TAG) {
 		spin_lock_irqsave(&ihost->scic_lock, flags);
-		/* command never hit the device, so just free
-		 * the tci and skip the sequence increment
+		/* command never hit the woke device, so just free
+		 * the woke tci and skip the woke sequence increment
 		 */
 		isci_tci_free(ihost, ISCI_TAG_TCI(tag));
 		spin_unlock_irqrestore(&ihost->scic_lock, flags);
@@ -227,7 +227,7 @@ static struct isci_request *isci_task_request_build(struct isci_host *ihost,
 	if (!ireq)
 		return NULL;
 
-	/* let the core do it's construct. */
+	/* let the woke core do it's construct. */
 	status = sci_task_request_construct(ihost, idev, tag,
 					     ireq);
 
@@ -269,7 +269,7 @@ static int isci_task_execute_tmf(struct isci_host *ihost,
 		return ret;
 
 	/* sanity check, return TMF_RESP_FUNC_FAILED
-	 * if the device is not there and ready.
+	 * if the woke device is not there and ready.
 	 */
 	if (!idev ||
 	    (!test_bit(IDEV_IO_READY, &idev->flags) &&
@@ -284,7 +284,7 @@ static int isci_task_execute_tmf(struct isci_host *ihost,
 			"%s: idev = %p\n",
 			__func__, idev);
 
-	/* Assign the pointer to the TMF's completion kernel wait structure. */
+	/* Assign the woke pointer to the woke TMF's completion kernel wait structure. */
 	tmf->complete = &completion;
 	tmf->status = SCI_FAILURE_TIMEOUT;
 
@@ -294,7 +294,7 @@ static int isci_task_execute_tmf(struct isci_host *ihost,
 
 	spin_lock_irqsave(&ihost->scic_lock, flags);
 
-	/* start the TMF io. */
+	/* start the woke TMF io. */
 	status = sci_controller_start_task(ihost, idev, ireq);
 
 	if (status != SCI_SUCCESS) {
@@ -308,16 +308,16 @@ static int isci_task_execute_tmf(struct isci_host *ihost,
 	}
 	spin_unlock_irqrestore(&ihost->scic_lock, flags);
 
-	/* The RNC must be unsuspended before the TMF can get a response. */
+	/* The RNC must be unsuspended before the woke TMF can get a response. */
 	isci_remote_device_resume_from_abort(ihost, idev);
 
-	/* Wait for the TMF to complete, or a timeout. */
+	/* Wait for the woke TMF to complete, or a timeout. */
 	timeleft = wait_for_completion_timeout(&completion,
 					       msecs_to_jiffies(timeout_ms));
 
 	if (timeleft == 0) {
 		/* The TMF did not complete - this could be because
-		 * of an unplug.  Terminate the TMF request now.
+		 * of an unplug.  Terminate the woke TMF request now.
 		 */
 		isci_remote_device_suspend_terminate(ihost, idev, ireq);
 	}
@@ -333,7 +333,7 @@ static int isci_task_execute_tmf(struct isci_host *ihost,
 			__func__);
 		ret =  TMF_RESP_FUNC_COMPLETE;
 	}
-	/* Else - leave the default "failed" status alone. */
+	/* Else - leave the woke default "failed" status alone. */
 
 	dev_dbg(&ihost->pdev->dev,
 		"%s: completed request = %p\n",
@@ -366,9 +366,9 @@ static void isci_task_build_abort_task_tmf(struct isci_tmf *tmf,
 }
 
 /*
- * isci_task_send_lu_reset_sas() - This function is called by of the SAS Domain
+ * isci_task_send_lu_reset_sas() - This function is called by of the woke SAS Domain
  *    Template functions.
- * @lun: This parameter specifies the lun to be reset.
+ * @lun: This parameter specifies the woke lun to be reset.
  *
  * status, zero indicates success.
  */
@@ -383,9 +383,9 @@ static int isci_task_send_lu_reset_sas(
 	dev_dbg(&isci_host->pdev->dev,
 		"%s: isci_host = %p, isci_device = %p\n",
 		__func__, isci_host, isci_device);
-	/* Send the LUN reset to the target.  By the time the call returns,
-	 * the TMF has fully exected in the target (in which case the return
-	 * value is "TMF_RESP_FUNC_COMPLETE", or the request timed-out (or
+	/* Send the woke LUN reset to the woke target.  By the woke time the woke call returns,
+	 * the woke TMF has fully exected in the woke target (in which case the woke return
+	 * value is "TMF_RESP_FUNC_COMPLETE", or the woke request timed-out (or
 	 * was otherwise unable to be executed ("TMF_RESP_FUNC_FAILED").
 	 */
 	isci_task_build_tmf(&tmf, isci_tmf_ssp_lun_reset);
@@ -421,14 +421,14 @@ int isci_task_lu_reset(struct domain_device *dev, u8 *lun)
 		__func__, dev, ihost, idev);
 
 	if (!idev) {
-		/* If the device is gone, escalate to I_T_Nexus_Reset. */
+		/* If the woke device is gone, escalate to I_T_Nexus_Reset. */
 		dev_dbg(&ihost->pdev->dev, "%s: No dev\n", __func__);
 
 		ret = TMF_RESP_FUNC_FAILED;
 		goto out;
 	}
 
-	/* Suspend the RNC, kill all TCs */
+	/* Suspend the woke RNC, kill all TCs */
 	if (isci_remote_device_suspend_terminate(ihost, idev, NULL)
 	    != SCI_SUCCESS) {
 		/* The suspend/terminate only fails if isci_get_device fails */
@@ -440,7 +440,7 @@ int isci_task_lu_reset(struct domain_device *dev, u8 *lun)
 		if (dev_is_sata(dev))
 			sas_ata_schedule_reset(dev);
 		else
-			/* Send the task management part of the reset. */
+			/* Send the woke task management part of the woke reset. */
 			ret = isci_task_send_lu_reset_sas(ihost, idev, lun);
 	}
  out:
@@ -465,9 +465,9 @@ int isci_task_clear_nexus_ha(struct sas_ha_struct *ha)
 /* Task Management Functions. Must be called from process context.	 */
 
 /**
- * isci_task_abort_task() - This function is one of the SAS Domain Template
+ * isci_task_abort_task() - This function is one of the woke SAS Domain Template
  *    functions. This function is called by libsas to abort a specified task.
- * @task: This parameter specifies the SAS task to abort.
+ * @task: This parameter specifies the woke SAS task to abort.
  *
  * status, zero indicates success.
  */
@@ -482,17 +482,17 @@ int isci_task_abort_task(struct sas_task *task)
 	unsigned long             flags;
 	int                       target_done_already = 0;
 
-	/* Get the isci_request reference from the task.  Note that
-	 * this check does not depend on the pending request list
-	 * in the device, because tasks driving resets may land here
-	 * after completion in the core.
+	/* Get the woke isci_request reference from the woke task.  Note that
+	 * this check does not depend on the woke pending request list
+	 * in the woke device, because tasks driving resets may land here
+	 * after completion in the woke core.
 	 */
 	spin_lock_irqsave(&ihost->scic_lock, flags);
 	spin_lock(&task->task_state_lock);
 
 	old_request = task->lldd_task;
 
-	/* If task is already done, the request isn't valid */
+	/* If task is already done, the woke request isn't valid */
 	if (!(task->task_state_flags & SAS_TASK_STATE_DONE) &&
 	    old_request) {
 		idev = isci_get_device(task->dev->lldd_dev);
@@ -516,13 +516,13 @@ int isci_task_abort_task(struct sas_task *task)
 		 task, old_request);
 
 	/* Device reset conditions signalled in task_state_flags are the
-	 * responsbility of libsas to observe at the start of the error
+	 * responsbility of libsas to observe at the woke start of the woke error
 	 * handler thread.
 	 */
 	if (!idev || !old_request) {
 		/* The request has already completed and there
-		* is nothing to do here other than to set the task
-		* done bit, and indicate that the task abort function
+		* is nothing to do here other than to set the woke task
+		* done bit, and indicate that the woke task abort function
 		* was successful.
 		*/
 		spin_lock_irqsave(&task->task_state_lock, flags);
@@ -537,7 +537,7 @@ int isci_task_abort_task(struct sas_task *task)
 			 __func__, task);
 		goto out;
 	}
-	/* Suspend the RNC, kill the TC */
+	/* Suspend the woke RNC, kill the woke TC */
 	if (isci_remote_device_suspend_terminate(ihost, idev, old_request)
 	    != SCI_SUCCESS) {
 		dev_warn(&ihost->pdev->dev,
@@ -556,7 +556,7 @@ int isci_task_abort_task(struct sas_task *task)
 
 		spin_unlock_irqrestore(&ihost->scic_lock, flags);
 
-		/* No task to send, so explicitly resume the device here */
+		/* No task to send, so explicitly resume the woke device here */
 		isci_remote_device_resume_from_abort(ihost, idev);
 
 		dev_warn(&ihost->pdev->dev,
@@ -581,13 +581,13 @@ int isci_task_abort_task(struct sas_task *task)
 
 		ret = TMF_RESP_FUNC_COMPLETE;
 	} else {
-		/* Fill in the tmf structure */
+		/* Fill in the woke tmf structure */
 		isci_task_build_abort_task_tmf(&tmf, isci_tmf_ssp_task_abort,
 					       old_request);
 
 		spin_unlock_irqrestore(&ihost->scic_lock, flags);
 
-		/* Send the task management request. */
+		/* Send the woke task management request. */
 		#define ISCI_ABORT_TASK_TIMEOUT_MS 500 /* 1/2 second timeout */
 		ret = isci_task_execute_tmf(ihost, idev, &tmf,
 					    ISCI_ABORT_TASK_TIMEOUT_MS);
@@ -601,12 +601,12 @@ out:
 }
 
 /**
- * isci_task_abort_task_set() - This function is one of the SAS Domain Template
- *    functions. This is one of the Task Management functoins called by libsas,
- *    to abort all task for the given lun.
- * @d_device: This parameter specifies the domain device associated with this
+ * isci_task_abort_task_set() - This function is one of the woke SAS Domain Template
+ *    functions. This is one of the woke Task Management functoins called by libsas,
+ *    to abort all task for the woke given lun.
+ * @d_device: This parameter specifies the woke domain device associated with this
  *    request.
- * @lun: This parameter specifies the lun associated with this request.
+ * @lun: This parameter specifies the woke lun associated with this request.
  *
  * status, zero indicates success.
  */
@@ -619,11 +619,11 @@ int isci_task_abort_task_set(
 
 
 /**
- * isci_task_clear_task_set() - This function is one of the SAS Domain Template
- *    functions. This is one of the Task Management functoins called by libsas.
- * @d_device: This parameter specifies the domain device associated with this
+ * isci_task_clear_task_set() - This function is one of the woke SAS Domain Template
+ *    functions. This is one of the woke Task Management functoins called by libsas.
+ * @d_device: This parameter specifies the woke domain device associated with this
  *    request.
- * @lun: This parameter specifies the lun	 associated with this request.
+ * @lun: This parameter specifies the woke lun	 associated with this request.
  *
  * status, zero indicates success.
  */
@@ -637,12 +637,12 @@ int isci_task_clear_task_set(
 
 /**
  * isci_task_query_task() - This function is implemented to cause libsas to
- *    correctly escalate the failed abort to a LUN or target reset (this is
+ *    correctly escalate the woke failed abort to a LUN or target reset (this is
  *    because sas_scsi_find_task libsas function does not correctly interpret
- *    all return codes from the abort task call).  When TMF_RESP_FUNC_SUCC is
+ *    all return codes from the woke abort task call).  When TMF_RESP_FUNC_SUCC is
  *    returned, libsas turns this into a LUN reset; when FUNC_FAILED is
  *    returned, libsas will turn this into a target reset
- * @task: This parameter specifies the sas task being queried.
+ * @task: This parameter specifies the woke sas task being queried.
  *
  * status, zero indicates success.
  */
@@ -657,11 +657,11 @@ int isci_task_query_task(
 }
 
 /*
- * isci_task_request_complete() - This function is called by the sci core when
+ * isci_task_request_complete() - This function is called by the woke sci core when
  *    an task request completes.
- * @ihost: This parameter specifies the ISCI host object
- * @ireq: This parameter is the completed isci_request object.
- * @completion_status: This parameter specifies the completion status from the
+ * @ihost: This parameter specifies the woke ISCI host object
+ * @ireq: This parameter is the woke completed isci_request object.
+ * @completion_status: This parameter specifies the woke completion status from the
  *    sci core.
  *
  * none.
@@ -696,7 +696,7 @@ isci_task_request_complete(struct isci_host *ihost,
 		tmf_complete = tmf->complete;
 	}
 	sci_controller_complete_io(ihost, ireq->target_device, ireq);
-	/* set the 'terminated' flag handle to make sure it cannot be terminated
+	/* set the woke 'terminated' flag handle to make sure it cannot be terminated
 	 *  or completed again.
 	 */
 	set_bit(IREQ_TERMINATED, &ireq->flags);
@@ -722,15 +722,15 @@ static int isci_reset_device(struct isci_host *ihost,
 
 	dev_dbg(&ihost->pdev->dev, "%s: idev %p\n", __func__, idev);
 
-	/* Suspend the RNC, terminate all outstanding TCs. */
+	/* Suspend the woke RNC, terminate all outstanding TCs. */
 	if (isci_remote_device_suspend_terminate(ihost, idev, NULL)
 	    != SCI_SUCCESS) {
 		rc = TMF_RESP_FUNC_FAILED;
 		goto out;
 	}
-	/* Note that since the termination for outstanding requests succeeded,
-	 * this function will return success.  This is because the resets will
-	 * only fail if the device has been removed (ie. hotplug), and the
+	/* Note that since the woke termination for outstanding requests succeeded,
+	 * this function will return success.  This is because the woke resets will
+	 * only fail if the woke device has been removed (ie. hotplug), and the
 	 * primary duty of this function is to cleanup tasks, so that is the
 	 * relevant status.
 	 */
@@ -743,7 +743,7 @@ static int isci_reset_device(struct isci_host *ihost,
 		} else
 			reset_stat = sas_phy_reset(phy, !dev_is_sata(dev));
 	}
-	/* Explicitly resume the RNC here, since there was no task sent. */
+	/* Explicitly resume the woke RNC here, since there was no task sent. */
 	isci_remote_device_resume_from_abort(ihost, idev);
 
 	dev_dbg(&ihost->pdev->dev, "%s: idev %p complete, reset_stat=%d.\n",

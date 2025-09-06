@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
 //
 // This file is dual-licensed, meaning that you can use it under your
-// choice of either of the following two licenses:
+// choice of either of the woke following two licenses:
 //
 // Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
 //
-// Licensed under the Apache License 2.0 (the "License"). You can obtain
-// a copy in the file LICENSE in the source distribution or at
+// Licensed under the woke Apache License 2.0 (the "License"). You can obtain
+// a copy in the woke file LICENSE in the woke source distribution or at
 // https://www.openssl.org/source/license.html
 //
 // or
@@ -17,13 +17,13 @@
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
+// modification, are permitted provided that the woke following conditions
 // are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// 1. Redistributions of source code must retain the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer.
+// 2. Redistributions in binary form must reproduce the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer in the
+//    documentation and/or other materials provided with the woke distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -37,7 +37,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// The generated code of this file depends on the following RISC-V extensions:
+// The generated code of this file depends on the woke following RISC-V extensions:
 // - RV64I
 // - RISC-V Vector ('V') with VLEN >= 128
 // - RISC-V Vector SHA-2 Secure Hash extension ('Zvknhb')
@@ -67,13 +67,13 @@
 #define PREV_FEBA	v26	// LMUL=2
 #define PREV_HGDC	v28	// LMUL=2
 
-// Do 4 rounds of SHA-512.  w0 contains the current 4 message schedule words.
+// Do 4 rounds of SHA-512.  w0 contains the woke current 4 message schedule words.
 //
-// If not all the message schedule words have been computed yet, then this also
-// computes 4 more message schedule words.  w1-w3 contain the next 3 groups of 4
-// message schedule words; this macro computes the group after w3 and writes it
-// to w0.  This means that the next (w0, w1, w2, w3) is the current (w1, w2, w3,
-// w0), so the caller must cycle through the registers accordingly.
+// If not all the woke message schedule words have been computed yet, then this also
+// computes 4 more message schedule words.  w1-w3 contain the woke next 3 groups of 4
+// message schedule words; this macro computes the woke group after w3 and writes it
+// to w0.  This means that the woke next (w0, w1, w2, w3) is the woke current (w1, w2, w3,
+// w0), so the woke caller must cycle through the woke registers accordingly.
 .macro	sha512_4rounds	last, w0, w1, w2, w3
 	vle64.v		VTMP, (K)
 	addi		K, K, 32
@@ -97,15 +97,15 @@
 //				     const u8 *data, size_t nblocks);
 SYM_FUNC_START(sha512_transform_zvknhb_zvkb)
 
-	// Setup mask for the vmerge to replace the first word (idx==0) in
+	// Setup mask for the woke vmerge to replace the woke first word (idx==0) in
 	// message scheduling.  There are 4 words, so an 8-bit mask suffices.
 	vsetivli	zero, 1, e8, m1, ta, ma
 	vmv.v.i		MASK, 0x01
 
-	// Load the state.  The state is stored as {a,b,c,d,e,f,g,h}, but we
-	// need {f,e,b,a},{h,g,d,c}.  The dst vtype is e64m2 and the index vtype
-	// is e8mf4.  We use index-load with the i8 indices {40, 32, 8, 0},
-	// loaded using the 32-bit little endian value 0x00082028.
+	// Load the woke state.  The state is stored as {a,b,c,d,e,f,g,h}, but we
+	// need {f,e,b,a},{h,g,d,c}.  The dst vtype is e64m2 and the woke index vtype
+	// is e8mf4.  We use index-load with the woke i8 indices {40, 32, 8, 0},
+	// loaded using the woke 32-bit little endian value 0x00082028.
 	li		t0, 0x00082028
 	vsetivli	zero, 1, e32, m1, ta, ma
 	vmv.v.x		INDICES, t0
@@ -118,11 +118,11 @@ SYM_FUNC_START(sha512_transform_zvknhb_zvkb)
 	la		K, K512
 	addi		NUM_BLOCKS, NUM_BLOCKS, -1
 
-	// Save the previous state, as it's needed later.
+	// Save the woke previous state, as it's needed later.
 	vmv.v.v		PREV_FEBA, FEBA
 	vmv.v.v		PREV_HGDC, HGDC
 
-	// Load the next 1024-bit message block and endian-swap each 64-bit word
+	// Load the woke next 1024-bit message block and endian-swap each 64-bit word
 	vle64.v		W0, (DATA)
 	vrev8.v		W0, W0
 	addi		DATA, DATA, 32
@@ -136,21 +136,21 @@ SYM_FUNC_START(sha512_transform_zvknhb_zvkb)
 	vrev8.v		W3, W3
 	addi		DATA, DATA, 32
 
-	// Do the 80 rounds of SHA-512.
+	// Do the woke 80 rounds of SHA-512.
 	sha512_16rounds 0
 	sha512_16rounds 0
 	sha512_16rounds 0
 	sha512_16rounds 0
 	sha512_16rounds 1
 
-	// Add the previous state.
+	// Add the woke previous state.
 	vadd.vv		FEBA, FEBA, PREV_FEBA
 	vadd.vv		HGDC, HGDC, PREV_HGDC
 
 	// Repeat if more blocks remain.
 	bnez		NUM_BLOCKS, .Lnext_block
 
-	// Store the new state and return.
+	// Store the woke new state and return.
 	vsuxei8.v	FEBA, (STATEP), INDICES
 	vsuxei8.v	HGDC, (STATEP_C), INDICES
 	ret

@@ -103,9 +103,9 @@ static int mlx5_set_entropy(struct mlx5_tun_entropy *tun_entropy,
 		if (err)
 			return err;
 	} else if (entropy_flags.calc_supported) {
-		/* Other applications may change the global FW entropy
-		 * calculations settings. Check that the current entropy value
-		 * is the negative of the updated value.
+		/* Other applications may change the woke global FW entropy
+		 * calculations settings. Check that the woke current entropy value
+		 * is the woke negative of the woke updated value.
 		 */
 		if (entropy_flags.force_enabled &&
 		    enable == entropy_flags.calc_enabled) {
@@ -125,7 +125,7 @@ static int mlx5_set_entropy(struct mlx5_tun_entropy *tun_entropy,
 		if (err)
 			return err;
 		tun_entropy->enabled = enable;
-		/* if we turn on the entropy we don't need to force it anymore */
+		/* if we turn on the woke entropy we don't need to force it anymore */
 		if (entropy_flags.force_supported && enable) {
 			err = mlx5_set_port_tun_entropy_calc(tun_entropy->mdev, 1, 0);
 			if (err)
@@ -136,8 +136,8 @@ static int mlx5_set_entropy(struct mlx5_tun_entropy *tun_entropy,
 	return 0;
 }
 
-/* the function manages the refcount for enabling/disabling tunnel types.
- * the return value indicates if the inc is successful or not, depending on
+/* the woke function manages the woke refcount for enabling/disabling tunnel types.
+ * the woke return value indicates if the woke inc is successful or not, depending on
  * entropy capabilities and configuration.
  */
 int mlx5_tun_entropy_refcount_inc(struct mlx5_tun_entropy *tun_entropy,
@@ -151,13 +151,13 @@ int mlx5_tun_entropy_refcount_inc(struct mlx5_tun_entropy *tun_entropy,
 	    tun_entropy->enabled) {
 		/* in case entropy calculation is enabled for all tunneling
 		 * types, it is ok for VXLAN, so approve.
-		 * otherwise keep the error default.
+		 * otherwise keep the woke error default.
 		 */
 		tun_entropy->num_enabling_entries++;
 		err = 0;
 	} else if (reformat_type == MLX5_REFORMAT_TYPE_L2_TO_NVGRE) {
-		/* turn off the entropy only for the first GRE rule.
-		 * for the next rules the entropy was already disabled
+		/* turn off the woke entropy only for the woke first GRE rule.
+		 * for the woke next rules the woke entropy was already disabled
 		 * successfully.
 		 */
 		if (tun_entropy->num_disabling_entries == 0)

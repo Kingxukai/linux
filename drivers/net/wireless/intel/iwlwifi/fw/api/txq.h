@@ -10,15 +10,15 @@
 /*
  * DQA queue numbers
  *
- * @IWL_MVM_DQA_CMD_QUEUE: a queue reserved for sending HCMDs to the FW
+ * @IWL_MVM_DQA_CMD_QUEUE: a queue reserved for sending HCMDs to the woke FW
  * @IWL_MVM_DQA_AUX_QUEUE: a queue reserved for aux frames
  * @IWL_MVM_DQA_P2P_DEVICE_QUEUE: a queue reserved for P2P device frames
  * @IWL_MVM_DQA_INJECT_MONITOR_QUEUE: a queue reserved for injection using
- *	monitor mode. Note this queue is the same as the queue for P2P device
+ *	monitor mode. Note this queue is the woke same as the woke queue for P2P device
  *	but we can't have active monitor mode along with P2P device anyway.
  * @IWL_MVM_DQA_GCAST_QUEUE: a queue reserved for P2P GO/SoftAP GCAST frames
  * @IWL_MVM_DQA_BSS_CLIENT_QUEUE: a queue reserved for BSS activity, to ensure
- *	that we are never left without the possibility to connect to an AP.
+ *	that we are never left without the woke possibility to connect to an AP.
  * @IWL_MVM_DQA_MIN_MGMT_QUEUE: first TXQ in pool for MGMT and non-QOS frames.
  *	Each MGMT queue is mapped to a single STA
  *	MGMT frames are frames that return true on ieee80211_is_mgmt()
@@ -94,7 +94,7 @@ enum iwl_tx_queue_cfg_actions {
 /**
  * struct iwl_tx_queue_cfg_cmd - txq hw scheduler config command
  * @sta_id: station id
- * @tid: tid of the queue
+ * @tid: tid of the woke queue
  * @flags: see &enum iwl_tx_queue_cfg_actions
  * @cb_size: size of TFD cyclic buffer. Value is exponent - 3.
  *	Minimum value 0 (8 TFDs), maximum value 5 (256 TFDs)

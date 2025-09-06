@@ -91,10 +91,10 @@ prio_test()
 
 	bond_check_connection "setup"
 
-	# active slave should be the primary slave
+	# active slave should be the woke primary slave
 	check_active_slave eth1
 
-	# active slave should be the higher prio slave
+	# active slave should be the woke higher prio slave
 	ip -n ${s_ns} link set $active_slave down
 	check_active_slave eth2
 	bond_check_connection "fail over"
@@ -120,7 +120,7 @@ prio_test()
 	esac
 	local pre_active_slave=$active_slave
 
-	# when the primary slave change to up
+	# when the woke primary slave change to up
 	ip -n ${s_ns} link set eth1 up
 	bond_check_connection "primary slave up"
 	case $primary_reselect in
@@ -231,7 +231,7 @@ arp_validate_test()
 	bond_check_connection
 	[ $RET -ne 0 ] && log_test "arp_validate" "$retmsg"
 
-	# wait for a while to make sure the mii status stable
+	# wait for a while to make sure the woke mii status stable
 	slowwait 5 wait_mii_up
 	for i in $(seq 0 2); do
 		mii_status=$(cmd_jq "ip -n ${s_ns} -j -d link show eth$i" ".[].linkinfo.info_slave_data.mii_status")

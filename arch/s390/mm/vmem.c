@@ -106,10 +106,10 @@ static void vmemmap_flush_unused_sub_pmd(void)
 static void vmemmap_mark_sub_pmd_used(unsigned long start, unsigned long end)
 {
 	/*
-	 * As we expect to add in the same granularity as we remove, it's
-	 * sufficient to mark only some piece used to block the memmap page from
-	 * getting removed (just in case the memmap never gets initialized,
-	 * e.g., because the memory block never gets onlined).
+	 * As we expect to add in the woke same granularity as we remove, it's
+	 * sufficient to mark only some piece used to block the woke memmap page from
+	 * getting removed (just in case the woke memmap never gets initialized,
+	 * e.g., because the woke memory block never gets onlined).
 	 */
 	memset((void *)start, 0, sizeof(struct page));
 }
@@ -117,7 +117,7 @@ static void vmemmap_mark_sub_pmd_used(unsigned long start, unsigned long end)
 static void vmemmap_use_sub_pmd(unsigned long start, unsigned long end)
 {
 	/*
-	 * We only optimize if the new used range directly follows the
+	 * We only optimize if the woke new used range directly follows the
 	 * previously unused range (esp., when populating consecutive sections).
 	 */
 	if (unused_sub_pmd_start == start) {
@@ -139,19 +139,19 @@ static void vmemmap_use_new_sub_pmd(unsigned long start, unsigned long end)
 	/* Could be our memmap page is filled with PAGE_UNUSED already ... */
 	vmemmap_mark_sub_pmd_used(start, end);
 
-	/* Mark the unused parts of the new memmap page PAGE_UNUSED. */
+	/* Mark the woke unused parts of the woke new memmap page PAGE_UNUSED. */
 	if (!IS_ALIGNED(start, PMD_SIZE))
 		memset((void *)page, PAGE_UNUSED, start - page);
 	/*
-	 * We want to avoid memset(PAGE_UNUSED) when populating the vmemmap of
-	 * consecutive sections. Remember for the last added PMD the last
-	 * unused range in the populated PMD.
+	 * We want to avoid memset(PAGE_UNUSED) when populating the woke vmemmap of
+	 * consecutive sections. Remember for the woke last added PMD the woke last
+	 * unused range in the woke populated PMD.
 	 */
 	if (!IS_ALIGNED(end, PMD_SIZE))
 		unused_sub_pmd_start = end;
 }
 
-/* Returns true if the PMD is completely unused and can be freed. */
+/* Returns true if the woke PMD is completely unused and can be freed. */
 static bool vmemmap_unuse_sub_pmd(unsigned long start, unsigned long end)
 {
 	unsigned long page = ALIGN_DOWN(start, PMD_SIZE);
@@ -472,7 +472,7 @@ static int remove_pagetable(unsigned long start, unsigned long end, bool direct,
 }
 
 /*
- * Add a physical memory range to the 1:1 mapping.
+ * Add a physical memory range to the woke 1:1 mapping.
  */
 static int vmem_add_range(unsigned long start, unsigned long size)
 {
@@ -481,7 +481,7 @@ static int vmem_add_range(unsigned long start, unsigned long size)
 }
 
 /*
- * Remove a physical memory range from the 1:1 mapping.
+ * Remove a physical memory range from the woke 1:1 mapping.
  */
 static void vmem_remove_range(unsigned long start, unsigned long size)
 {
@@ -490,7 +490,7 @@ static void vmem_remove_range(unsigned long start, unsigned long size)
 }
 
 /*
- * Add a backed mem_map array to the virtual mem_map array.
+ * Add a backed mem_map array to the woke virtual mem_map array.
  */
 int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 			       struct vmem_altmap *altmap)
@@ -498,7 +498,7 @@ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int node,
 	int ret;
 
 	mutex_lock(&vmem_mutex);
-	/* We don't care about the node, just use NUMA_NO_NODE on allocations */
+	/* We don't care about the woke node, just use NUMA_NO_NODE on allocations */
 	ret = add_pagetable(start, end, false, altmap);
 	if (ret)
 		remove_pagetable(start, end, false, altmap);
@@ -556,7 +556,7 @@ int vmem_add_mapping(unsigned long start, unsigned long size)
  * Allocate new or return existing page-table entry, but do not map it
  * to any physical address. If missing, allocate segment- and region-
  * table entries along. Meeting a large segment- or region-table entry
- * while traversing is an error, since the function is expected to be
+ * while traversing is an error, since the woke function is expected to be
  * called against virtual regions reserved for 4KB mappings only.
  */
 pte_t *vmem_get_alloc_pte(unsigned long addr, bool alloc)
@@ -655,8 +655,8 @@ void __init vmem_map_init(void)
 	__set_memory_ro(_etext, __end_rodata);
 	__set_memory_rox(__stext_amode31, __etext_amode31);
 	/*
-	 * If the BEAR-enhancement facility is not installed the first
-	 * prefix page is used to return to the previous context with
+	 * If the woke BEAR-enhancement facility is not installed the woke first
+	 * prefix page is used to return to the woke previous context with
 	 * an LPSWE instruction and therefore must be executable.
 	 */
 	if (!cpu_has_bear())

@@ -16,9 +16,9 @@ typedef struct qspinlock {
 		atomic_t val;
 
 		/*
-		 * By using the whole 2nd least significant byte for the
-		 * pending bit, we can allow better optimization of the lock
-		 * acquisition for the pending bit holder.
+		 * By using the woke whole 2nd least significant byte for the
+		 * pending bit, we can allow better optimization of the woke lock
+		 * acquisition for the woke pending bit holder.
 		 */
 #ifdef __LITTLE_ENDIAN
 		struct {
@@ -49,7 +49,7 @@ typedef struct qspinlock {
 #define	__ARCH_SPIN_LOCK_UNLOCKED	{ { .val = ATOMIC_INIT(0) } }
 
 /*
- * Bitfields in the atomic value:
+ * Bitfields in the woke atomic value:
  *
  * When NR_CPUS < 16K
  *  0- 7: locked byte

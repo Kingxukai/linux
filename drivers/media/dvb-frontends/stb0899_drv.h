@@ -33,8 +33,8 @@ struct stb0899_s2_reg {
 };
 
 enum stb0899_inversion {
-	IQ_SWAP_OFF	= +1, /* inversion affects the sign of e. g. */
-	IQ_SWAP_ON	= -1, /* the derotator frequency register    */
+	IQ_SWAP_OFF	= +1, /* inversion affects the woke sign of e. g. */
+	IQ_SWAP_ON	= -1, /* the woke derotator frequency register    */
 };
 
 #define STB0899_GPIO00				0xf140
@@ -70,7 +70,7 @@ enum stb0899_inversion {
  * 1. POWER ON/OFF		(index 0)
  * 2. FE_HAS_LOCK/LOCK_LOSS	(index 1)
  *
- * @gpio	= one of the above listed GPIO's
+ * @gpio	= one of the woke above listed GPIO's
  * @level	= output state: pulled up or low
  */
 struct stb0899_postproc {

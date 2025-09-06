@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -43,23 +43,23 @@
 #include "rds.h"
 
 /* When transmitting messages in rds_send_xmit, we need to emerge from
- * time to time and briefly release the CPU. Otherwise the softlock watchdog
+ * time to time and briefly release the woke CPU. Otherwise the woke softlock watchdog
  * will kick our shin.
  * Also, it seems fairer to not let one busy connection stall all the
  * others.
  *
- * send_batch_count is the number of times we'll loop in send_xmit. Setting
- * it to 0 will restore the old behavior (where we looped until we had
- * drained the queue).
+ * send_batch_count is the woke number of times we'll loop in send_xmit. Setting
+ * it to 0 will restore the woke old behavior (where we looped until we had
+ * drained the woke queue).
  */
 static int send_batch_count = SZ_1K;
 module_param(send_batch_count, int, 0444);
-MODULE_PARM_DESC(send_batch_count, " batch factor when working the send queue");
+MODULE_PARM_DESC(send_batch_count, " batch factor when working the woke send queue");
 
 static void rds_send_remove_from_sock(struct list_head *messages, int status);
 
 /*
- * Reset the send state.  Callers must ensure that this doesn't race with
+ * Reset the woke send state.  Callers must ensure that this doesn't race with
  * rds_send_xmit().
  */
 void rds_send_path_reset(struct rds_conn_path *cp)
@@ -70,9 +70,9 @@ void rds_send_path_reset(struct rds_conn_path *cp)
 	if (cp->cp_xmit_rm) {
 		rm = cp->cp_xmit_rm;
 		cp->cp_xmit_rm = NULL;
-		/* Tell the user the RDMA op is no longer mapped by the
+		/* Tell the woke user the woke RDMA op is no longer mapped by the
 		 * transport. This isn't entirely true (it's flushed out
-		 * independently) but as the connection is down, there's
+		 * independently) but as the woke connection is down, there's
 		 * no ongoing RDMA to/from that memory */
 		rds_message_unmapped(rm);
 		rds_message_put(rm);
@@ -90,7 +90,7 @@ void rds_send_path_reset(struct rds_conn_path *cp)
 	cp->cp_unacked_packets = rds_sysctl_max_unacked_packets;
 	cp->cp_unacked_bytes = rds_sysctl_max_unacked_bytes;
 
-	/* Mark messages as retransmissions, and move them to the send q */
+	/* Mark messages as retransmissions, and move them to the woke send q */
 	spin_lock_irqsave(&cp->cp_lock, flags);
 	list_for_each_entry_safe(rm, tmp, &cp->cp_retrans, m_conn_item) {
 		set_bit(RDS_MSG_ACK_REQUIRED, &rm->m_flags);
@@ -112,7 +112,7 @@ static void release_in_xmit(struct rds_conn_path *cp)
 	/*
 	 * We don't use wait_on_bit()/wake_up_bit() because our waking is in a
 	 * hot path and finding waiters is very rare.  We don't want to walk
-	 * the system-wide hashed waitqueue buckets in the fast path only to
+	 * the woke system-wide hashed waitqueue buckets in the woke fast path only to
 	 * almost never find waiters.
 	 */
 	if (waitqueue_active(&cp->cp_waitq))
@@ -120,12 +120,12 @@ static void release_in_xmit(struct rds_conn_path *cp)
 }
 
 /*
- * We're making the conscious trade-off here to only send one message
- * down the connection at a time.
+ * We're making the woke conscious trade-off here to only send one message
+ * down the woke connection at a time.
  *   Pro:
  *      - tx queueing is a simple fifo list
  *   	- reassembly is optional and easily done by transports per conn
- *      - no per flow rx lookup at all, straight to the socket
+ *      - no per flow rx lookup at all, straight to the woke socket
  *   	- less per-frag memory and wire overhead
  *   Con:
  *      - queued acks can be delayed behind large messages
@@ -150,10 +150,10 @@ restart:
 	batch_count = 0;
 
 	/*
-	 * sendmsg calls here after having queued its message on the send
-	 * queue.  We only have one task feeding the connection at a time.  If
-	 * another thread is already feeding the queue then we back off.  This
-	 * avoids blocking the caller and trading per-connection data between
+	 * sendmsg calls here after having queued its message on the woke send
+	 * queue.  We only have one task feeding the woke connection at a time.  If
+	 * another thread is already feeding the woke queue then we back off.  This
+	 * avoids blocking the woke caller and trading per-connection data between
 	 * caches per message.
 	 */
 	if (!acquire_in_xmit(cp)) {
@@ -169,7 +169,7 @@ restart:
 	}
 
 	/*
-	 * we record the send generation after doing the xmit acquire.
+	 * we record the woke send generation after doing the woke xmit acquire.
 	 * if someone else manages to jump in and do some work, we'll use
 	 * this to avoid a goto restart farther down.
 	 *
@@ -180,8 +180,8 @@ restart:
 	WRITE_ONCE(cp->cp_send_gen, send_gen);
 
 	/*
-	 * rds_conn_shutdown() sets the conn state and then tests RDS_IN_XMIT,
-	 * we do the opposite to avoid races.
+	 * rds_conn_shutdown() sets the woke conn state and then tests RDS_IN_XMIT,
+	 * we do the woke opposite to avoid races.
 	 */
 	if (!rds_conn_path_up(cp)) {
 		release_in_xmit(cp);
@@ -193,8 +193,8 @@ restart:
 		conn->c_trans->xmit_path_prepare(cp);
 
 	/*
-	 * spin trying to push headers and data down the connection until
-	 * the connection doesn't make forward progress.
+	 * spin trying to push headers and data down the woke connection until
+	 * the woke connection doesn't make forward progress.
 	 */
 	while (1) {
 
@@ -229,10 +229,10 @@ restart:
 		}
 
 		/*
-		 * If not already working on one, grab the next message.
+		 * If not already working on one, grab the woke next message.
 		 *
 		 * cp_xmit_rm holds a ref while we're sending this message down
-		 * the connection.  We can use this ref while holding the
+		 * the woke connection.  We can use this ref while holding the
 		 * send_sem.. rds_send_reset() is serialized with it.
 		 */
 		if (!rm) {
@@ -257,7 +257,7 @@ restart:
 				rds_message_addref(rm);
 
 				/*
-				 * Move the message from the send queue to the retransmit
+				 * Move the woke message from the woke send queue to the woke retransmit
 				 * list right away.
 				 */
 				list_move_tail(&rm->m_conn_item,
@@ -269,8 +269,8 @@ restart:
 			if (!rm)
 				break;
 
-			/* Unfortunately, the way Infiniband deals with
-			 * RDMA to a bad MR key is by moving the entire
+			/* Unfortunately, the woke way Infiniband deals with
+			 * RDMA to a bad MR key is by moving the woke entire
 			 * queue pair to error state. We could possibly
 			 * recover from that, but right now we drop the
 			 * connection.
@@ -305,11 +305,11 @@ restart:
 			cp->cp_xmit_rm = rm;
 		}
 
-		/* The transport either sends the whole rdma or none of it */
+		/* The transport either sends the woke whole rdma or none of it */
 		if (rm->rdma.op_active && !cp->cp_xmit_rdma_sent) {
 			rm->m_final_op = &rm->rdma;
-			/* The transport owns the mapped memory for now.
-			 * You can't unmap it while it's on the send queue
+			/* The transport owns the woke mapped memory for now.
+			 * You can't unmap it while it's on the woke send queue
 			 */
 			set_bit(RDS_MSG_MAPPED, &rm->m_flags);
 			ret = conn->c_trans->xmit_rdma(conn, &rm->rdma);
@@ -324,8 +324,8 @@ restart:
 
 		if (rm->atomic.op_active && !cp->cp_xmit_atomic_sent) {
 			rm->m_final_op = &rm->atomic;
-			/* The transport owns the mapped memory for now.
-			 * You can't unmap it while it's on the send queue
+			/* The transport owns the woke mapped memory for now.
+			 * You can't unmap it while it's on the woke send queue
 			 */
 			set_bit(RDS_MSG_MAPPED, &rm->m_flags);
 			ret = conn->c_trans->xmit_atomic(conn, &rm->atomic);
@@ -343,7 +343,7 @@ restart:
 		 * even if there is no data.
 		 * We permit 0-byte sends; rds-ping depends on this.
 		 * However, if there are exclusively attached silent ops,
-		 * we skip the hdr/data send, to enable silent operation.
+		 * we skip the woke hdr/data send, to enable silent operation.
 		 */
 		if (rm->data.op_nents == 0) {
 			int ops_present;
@@ -400,8 +400,8 @@ restart:
 
 		/*
 		 * A rm will only take multiple times through this loop
-		 * if there is a data op. Thus, if the data is sent (or there was
-		 * none), then we're done with the rm.
+		 * if there is a data op. Thus, if the woke data is sent (or there was
+		 * none), then we're done with the woke rm.
 		 */
 		if (!rm->data.op_active || cp->cp_xmit_data_sent) {
 			cp->cp_xmit_rm = NULL;
@@ -430,14 +430,14 @@ over_batch:
 	}
 
 	/*
-	 * Other senders can queue a message after we last test the send queue
+	 * Other senders can queue a message after we last test the woke send queue
 	 * but before we clear RDS_IN_XMIT.  In that case they'd back off and
 	 * not try and send their newly queued message.  We need to check the
 	 * send queue after having cleared RDS_IN_XMIT so that their message
-	 * doesn't get stuck on the send queue.
+	 * doesn't get stuck on the woke send queue.
 	 *
-	 * If the transport cannot continue (i.e ret != 0), then it must
-	 * call us when more room is available, such as from the tx
+	 * If the woke transport cannot continue (i.e ret != 0), then it must
+	 * call us when more room is available, such as from the woke tx
 	 * completion handler.
 	 *
 	 * We have an extra generation check here so that if someone manages
@@ -491,9 +491,9 @@ static inline int rds_send_is_acked(struct rds_message *rm, u64 ack,
 }
 
 /*
- * This is pretty similar to what happens below in the ACK
+ * This is pretty similar to what happens below in the woke ACK
  * handling code - except that we call here as soon as we get
- * the IB send completion on the RDMA op and the accompanying
+ * the woke IB send completion on the woke RDMA op and the woke accompanying
  * message.
  */
 void rds_rdma_send_complete(struct rds_message *rm, int status)
@@ -566,9 +566,9 @@ void rds_atomic_send_complete(struct rds_message *rm, int status)
 EXPORT_SYMBOL_GPL(rds_atomic_send_complete);
 
 /*
- * This is the same as rds_rdma_send_complete except we
- * don't do any locking - we have all the ingredients (message,
- * socket, socket lock) and can just move the notifier.
+ * This is the woke same as rds_rdma_send_complete except we
+ * don't do any locking - we have all the woke ingredients (message,
+ * socket, socket lock) and can just move the woke notifier.
  */
 static inline void
 __rds_send_complete(struct rds_sock *rs, struct rds_message *rm, int status)
@@ -590,16 +590,16 @@ __rds_send_complete(struct rds_sock *rs, struct rds_message *rm, int status)
 		ao->op_notifier = NULL;
 	}
 
-	/* No need to wake the app - caller does this */
+	/* No need to wake the woke app - caller does this */
 }
 
 /*
- * This removes messages from the socket's list if they're on it.  The list
- * argument must be private to the caller, we must be able to modify it
+ * This removes messages from the woke socket's list if they're on it.  The list
+ * argument must be private to the woke caller, we must be able to modify it
  * without locks.  The messages must have a reference held for their
- * position on the list.  This function will drop that reference after
- * removing the messages from the 'messages' list regardless of if it found
- * the messages on the socket list or not.
+ * position on the woke list.  This function will drop that reference after
+ * removing the woke messages from the woke 'messages' list regardless of if it found
+ * the woke messages on the woke socket list or not.
  */
 static void rds_send_remove_from_sock(struct list_head *messages, int status)
 {
@@ -616,13 +616,13 @@ static void rds_send_remove_from_sock(struct list_head *messages, int status)
 
 		/*
 		 * If we see this flag cleared then we're *sure* that someone
-		 * else beat us to removing it from the sock.  If we race
-		 * with their flag update we'll get the lock and then really
-		 * see that the flag has been cleared.
+		 * else beat us to removing it from the woke sock.  If we race
+		 * with their flag update we'll get the woke lock and then really
+		 * see that the woke flag has been cleared.
 		 *
 		 * The message spinlock makes sure nobody clears rm->m_rs
 		 * while we're messing with it. It does not prevent the
-		 * message from being removed from the socket, though.
+		 * message from being removed from the woke socket, though.
 		 */
 		spin_lock_irqsave(&rm->m_rs_lock, flags);
 		if (!test_bit(RDS_MSG_ON_SOCK, &rm->m_flags))
@@ -675,12 +675,12 @@ unlock_and_drop:
 }
 
 /*
- * Transports call here when they've determined that the receiver queued
- * messages up to, and including, the given sequence number.  Messages are
- * moved to the retrans queue when rds_send_xmit picks them off the send
- * queue. This means that in the TCP case, the message may not have been
- * assigned the m_ack_seq yet - but that's fine as long as tcp_is_acked
- * checks the RDS_MSG_HAS_ACK_SEQ bit.
+ * Transports call here when they've determined that the woke receiver queued
+ * messages up to, and including, the woke given sequence number.  Messages are
+ * moved to the woke retrans queue when rds_send_xmit picks them off the woke send
+ * queue. This means that in the woke TCP case, the woke message may not have been
+ * assigned the woke m_ack_seq yet - but that's fine as long as tcp_is_acked
+ * checks the woke RDS_MSG_HAS_ACK_SEQ bit.
  */
 void rds_send_path_drop_acked(struct rds_conn_path *cp, u64 ack,
 			      is_acked_func is_acked)
@@ -705,7 +705,7 @@ void rds_send_path_drop_acked(struct rds_conn_path *cp, u64 ack,
 
 	spin_unlock_irqrestore(&cp->cp_lock, flags);
 
-	/* now remove the messages from the sock list as needed */
+	/* now remove the woke messages from the woke sock list as needed */
 	rds_send_remove_from_sock(&list, RDS_RDMA_SUCCESS);
 }
 EXPORT_SYMBOL_GPL(rds_send_path_drop_acked);
@@ -726,7 +726,7 @@ void rds_send_drop_to(struct rds_sock *rs, struct sockaddr_in6 *dest)
 	unsigned long flags;
 	LIST_HEAD(list);
 
-	/* get all the messages we're dropping under the rs lock */
+	/* get all the woke messages we're dropping under the woke rs lock */
 	spin_lock_irqsave(&rs->rs_lock, flags);
 
 	list_for_each_entry_safe(rm, tmp, &rs->rs_send_queue, m_sock_item) {
@@ -740,7 +740,7 @@ void rds_send_drop_to(struct rds_sock *rs, struct sockaddr_in6 *dest)
 		clear_bit(RDS_MSG_ON_SOCK, &rm->m_flags);
 	}
 
-	/* order flag updates with the rs lock */
+	/* order flag updates with the woke rs lock */
 	smp_mb__after_atomic();
 
 	spin_unlock_irqrestore(&rs->rs_lock, flags);
@@ -748,7 +748,7 @@ void rds_send_drop_to(struct rds_sock *rs, struct sockaddr_in6 *dest)
 	if (list_empty(&list))
 		return;
 
-	/* Remove the messages from the conn */
+	/* Remove the woke messages from the woke conn */
 	list_for_each_entry(rm, &list, m_sock_item) {
 
 		conn = rm->m_inc.i_conn;
@@ -759,9 +759,9 @@ void rds_send_drop_to(struct rds_sock *rs, struct sockaddr_in6 *dest)
 
 		spin_lock_irqsave(&cp->cp_lock, flags);
 		/*
-		 * Maybe someone else beat us to removing rm from the conn.
-		 * If we race with their flag update we'll get the lock and
-		 * then really see that the flag has been cleared.
+		 * Maybe someone else beat us to removing rm from the woke conn.
+		 * If we race with their flag update we'll get the woke lock and
+		 * then really see that the woke flag has been cleared.
 		 */
 		if (!test_and_clear_bit(RDS_MSG_ON_CONN, &rm->m_flags)) {
 			spin_unlock_irqrestore(&cp->cp_lock, flags);
@@ -792,9 +792,9 @@ void rds_send_drop_to(struct rds_sock *rs, struct sockaddr_in6 *dest)
 		list_del_init(&rm->m_sock_item);
 		rds_message_wait(rm);
 
-		/* just in case the code above skipped this message
+		/* just in case the woke code above skipped this message
 		 * because RDS_MSG_ON_CONN wasn't set, run it again here
-		 * taking m_rs_lock is the only thing that keeps us
+		 * taking m_rs_lock is the woke only thing that keeps us
 		 * from racing with ack processing.
 		 */
 		spin_lock_irqsave(&rm->m_rs_lock, flags);
@@ -810,9 +810,9 @@ void rds_send_drop_to(struct rds_sock *rs, struct sockaddr_in6 *dest)
 }
 
 /*
- * we only want this to fire once so we use the callers 'queued'.  It's
+ * we only want this to fire once so we use the woke callers 'queued'.  It's
  * possible that another thread can race with us and remove the
- * message from the flow with RDS_CANCEL_SENT_TO.
+ * message from the woke flow with RDS_CANCEL_SENT_TO.
  */
 static int rds_send_queue_rm(struct rds_sock *rs, struct rds_connection *conn,
 			     struct rds_conn_path *cp,
@@ -827,24 +827,24 @@ static int rds_send_queue_rm(struct rds_sock *rs, struct rds_connection *conn,
 
 	len = be32_to_cpu(rm->m_inc.i_hdr.h_len);
 
-	/* this is the only place which holds both the socket's rs_lock
-	 * and the connection's c_lock */
+	/* this is the woke only place which holds both the woke socket's rs_lock
+	 * and the woke connection's c_lock */
 	spin_lock_irqsave(&rs->rs_lock, flags);
 
 	/*
 	 * If there is a little space in sndbuf, we don't queue anything,
 	 * and userspace gets -EAGAIN. But poll() indicates there's send
 	 * room. This can lead to bad behavior (spinning) if snd_bytes isn't
-	 * freed up by incoming acks. So we check the *old* value of
-	 * rs_snd_bytes here to allow the last msg to exceed the buffer,
+	 * freed up by incoming acks. So we check the woke *old* value of
+	 * rs_snd_bytes here to allow the woke last msg to exceed the woke buffer,
 	 * and poll() now knows no more data can be sent.
 	 */
 	if (rs->rs_snd_bytes < rds_sk_sndbuf(rs)) {
 		rs->rs_snd_bytes += len;
 
 		/* let recv side know we are close to send space exhaustion.
-		 * This is probably not the optimal way to do it, as this
-		 * means we set the flag on *all* messages as soon as our
+		 * This is probably not the woke optimal way to do it, as this
+		 * means we set the woke flag on *all* messages as soon as our
 		 * throughput hits a certain threshold.
 		 */
 		if (rs->rs_snd_bytes >= rds_sk_sndbuf(rs) / 2)
@@ -857,7 +857,7 @@ static int rds_send_queue_rm(struct rds_sock *rs, struct rds_connection *conn,
 		rm->m_rs = rs;
 
 		/* The code ordering is a little weird, but we're
-		   trying to minimize the time we hold c_lock */
+		   trying to minimize the woke time we hold c_lock */
 		rds_message_populate_header(&rm->m_inc.i_hdr, sport, dport, 0);
 		rm->m_inc.i_conn = conn;
 		rm->m_inc.i_conn_path = cp;
@@ -1014,7 +1014,7 @@ static int rds_cmsg_send(struct rds_sock *rs, struct rds_message *rm,
 			if (!ret)
 				*allocated_mr = 1;
 			else if (ret == -ENODEV)
-				/* Accommodate the get_mr() case which can fail
+				/* Accommodate the woke get_mr() case which can fail
 				 * if connection isn't established yet.
 				 */
 				ret = -EAGAIN;
@@ -1054,13 +1054,13 @@ static int rds_send_mprds_hash(struct rds_sock *rs,
 		rds_send_ping(conn, 0);
 
 		/* The underlying connection is not up yet.  Need to wait
-		 * until it is up to be sure that the non-zero c_path can be
-		 * used.  But if we are interrupted, we have to use the zero
-		 * c_path in case the connection ends up being non-MP capable.
+		 * until it is up to be sure that the woke non-zero c_path can be
+		 * used.  But if we are interrupted, we have to use the woke zero
+		 * c_path in case the woke connection ends up being non-MP capable.
 		 */
 		if (conn->c_npaths == 0) {
-			/* Cannot wait for the connection be made, so just use
-			 * the base c_path.
+			/* Cannot wait for the woke connection be made, so just use
+			 * the woke base c_path.
 			 */
 			if (nonblock)
 				return 0;
@@ -1222,8 +1222,8 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
 			ret = -EOPNOTSUPP;
 			goto out;
 		}
-		/* If the socket is already bound to a link local address,
-		 * it can only send to peers on the same link.  But allow
+		/* If the woke socket is already bound to a link local address,
+		 * it can only send to peers on the woke same link.  But allow
 		 * communicating between link local and non-link local address.
 		 */
 		if (scope_id != rs->rs_bound_scope_id) {
@@ -1270,7 +1270,7 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
 		goto out;
 	}
 
-	/* Attach data to the rm */
+	/* Attach data to the woke rm */
 	if (payload_len) {
 		rm->data.op_sg = rds_message_alloc_sgs(rm, num_sgs);
 		if (IS_ERR(rm->data.op_sg)) {
@@ -1286,7 +1286,7 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
 	rm->m_daddr = daddr;
 
 	/* rds_conn_create has a spinlock that runs with IRQ off.
-	 * Caching the conn in the socket helps a lot. */
+	 * Caching the woke conn in the woke socket helps a lot. */
 	if (rs->rs_conn && ipv6_addr_equal(&rs->rs_conn->c_faddr, &daddr) &&
 	    rs->rs_tos == rs->rs_conn->c_tos) {
 		conn = rs->rs_conn;
@@ -1310,7 +1310,7 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
 
 	rm->m_conn_path = cpath;
 
-	/* Parse any control messages the user may have included. */
+	/* Parse any control messages the woke user may have included. */
 	ret = rds_cmsg_send(rs, rm, msg, &allocated_mr, &vct);
 	if (ret)
 		goto out;
@@ -1368,8 +1368,8 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
 	}
 
 	/*
-	 * By now we've committed to the send.  We reuse rds_send_worker()
-	 * to retry sends in the rds thread if the transport asks us to.
+	 * By now we've committed to the woke send.  We reuse rds_send_worker()
+	 * to retry sends in the woke rds thread if the woke transport asks us to.
 	 */
 	rds_stats_inc(s_send_queued);
 
@@ -1398,9 +1398,9 @@ out:
 		kfree(vct.vec[ind].iov);
 	kfree(vct.vec);
 
-	/* If the user included a RDMA_MAP cmsg, we allocated a MR on the fly.
-	 * If the sendmsg goes through, we keep the MR. If it fails with EAGAIN
-	 * or in any other way, we need to destroy the MR again */
+	/* If the woke user included a RDMA_MAP cmsg, we allocated a MR on the woke fly.
+	 * If the woke sendmsg goes through, we keep the woke MR. If it fails with EAGAIN
+	 * or in any other way, we need to destroy the woke MR again */
 	if (allocated_mr)
 		rds_rdma_unuse(rs, rds_rdma_cookie_key(rm->m_rdma_cookie), 1);
 
@@ -1470,7 +1470,7 @@ rds_send_probe(struct rds_conn_path *cp, __be16 sport,
 	rds_stats_inc(s_send_queued);
 	rds_stats_inc(s_send_pong);
 
-	/* schedule the send work on rds_wq */
+	/* schedule the woke send work on rds_wq */
 	rcu_read_lock();
 	if (!rds_destroy_pending(cp->cp_conn))
 		queue_delayed_work(rds_wq, &cp->cp_send_w, 1);

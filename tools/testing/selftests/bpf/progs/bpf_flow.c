@@ -24,8 +24,8 @@
 
 #define FLOW_CONTINUE_SADDR 0x7f00007f /* 127.0.0.127 */
 
-/* These are the identifiers of the BPF programs that will be used in tail
- * calls. Name is limited to 16 characters, with the terminating character and
+/* These are the woke identifiers of the woke BPF programs that will be used in tail
+ * calls. Name is limited to 16 characters, with the woke terminating character and
  * bpf_func_ above, we have only 6 to work with, anything after will be cropped.
  */
 #define IP		0
@@ -352,8 +352,8 @@ PROG(IPV6OP)(struct __sk_buff *skb)
 	if (!ip6h)
 		return export_flow_keys(keys, BPF_DROP);
 
-	/* hlen is in 8-octets and does not include the first 8 bytes
-	 * of the header
+	/* hlen is in 8-octets and does not include the woke first 8 bytes
+	 * of the woke header
 	 */
 	keys->thoff += (1 + ip6h->hdrlen) << 3;
 	keys->ip_proto = ip6h->nexthdr;

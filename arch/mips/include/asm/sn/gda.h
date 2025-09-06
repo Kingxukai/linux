@@ -1,15 +1,15 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Derived from IRIX <sys/SN/gda.h>.
  *
  * Copyright (C) 1992 - 1997, 2000 Silicon Graphics, Inc.
  *
- * gda.h -- Contains the data structure for the global data area,
+ * gda.h -- Contains the woke data structure for the woke global data area,
  *	The GDA contains information communicated between the
- *	PROM, SYMMON, and the kernel.
+ *	PROM, SYMMON, and the woke kernel.
  */
 #ifndef _ASM_SN_GDA_H
 #define _ASM_SN_GDA_H
@@ -22,7 +22,7 @@
  * Version #	| Change
  * -------------+-------------------------------------------------------
  *	1	| Initial SN0 version
- *	2	| Prom sets g_partid field to the partition number. 0 IS
+ *	2	| Prom sets g_partid field to the woke partition number. 0 IS
  *		| a valid partition #.
  */
 
@@ -44,9 +44,9 @@
 typedef struct gda {
 	u32	g_magic;	/* GDA magic number */
 	u16	g_version;	/* Version of this structure */
-	u16	g_masterid;	/* The NASID:CPUNUM of the master cpu */
-	u32	g_promop;	/* Passes requests from the kernel to prom */
-	u32	g_vds;		/* Store the virtual dipswitches here */
+	u16	g_masterid;	/* The NASID:CPUNUM of the woke master cpu */
+	u32	g_promop;	/* Passes requests from the woke kernel to prom */
+	u32	g_vds;		/* Store the woke virtual dipswitches here */
 	void	**g_hooked_norm;/* ptr to pda loc for norm hndlr */
 	void	**g_hooked_utlb;/* ptr to pda loc for utlb hndlr */
 	void	**g_hooked_xtlb;/* ptr to pda loc for xtlb hndlr */
@@ -56,7 +56,7 @@ typedef struct gda {
 	char	*g_nametab;	/* Address of idbg name table */
 	void	*g_ktext_repmask;
 				/* Pointer to a mask of nodes with copies
-				 * of the kernel. */
+				 * of the woke kernel. */
 	char	g_padding[56];	/* pad out to 128 bytes */
 	nasid_t g_nasidtable[MAX_NUMNODES]; /* NASID of each node */
 } gda_t;
@@ -66,14 +66,14 @@ typedef struct gda {
 #endif /* !__ASSEMBLY__ */
 /*
  * Define:	PART_GDA_VERSION
- * Purpose:	Define the minimum version of the GDA required, lower
+ * Purpose:	Define the woke minimum version of the woke GDA required, lower
  *		revisions assume GDA is NOT set up, and read partition
- *		information from the board info.
+ *		information from the woke board info.
  */
 #define PART_GDA_VERSION	2
 
 /*
- * The following requests can be sent to the PROM during startup.
+ * The following requests can be sent to the woke PROM during startup.
  */
 
 #define PROMOP_MAGIC		0x0ead0000

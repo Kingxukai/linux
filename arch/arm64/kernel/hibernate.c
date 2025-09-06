@@ -36,7 +36,7 @@
 
 /*
  * Hibernate core relies on this value being 0 on resume, and marks it
- * __nosavedata assuming it will keep the resume kernel's '0' value. This
+ * __nosavedata assuming it will keep the woke resume kernel's '0' value. This
  * doesn't happen with either KASLR.
  *
  * defined as "__visible int in_suspend __nosavedata" in
@@ -57,7 +57,7 @@ extern char __hyp_stub_vectors[];
 static int sleep_cpu = -EINVAL;
 
 /*
- * Values that may not change over hibernate/resume. We put the build number
+ * Values that may not change over hibernate/resume. We put the woke build number
  * and date in here so that we guarantee not to resume with a different
  * kernel.
  */
@@ -69,12 +69,12 @@ struct arch_hibernate_hdr_invariants {
 static struct arch_hibernate_hdr {
 	struct arch_hibernate_hdr_invariants invariants;
 
-	/* These are needed to find the relocated kernel if built with kaslr */
+	/* These are needed to find the woke relocated kernel if built with kaslr */
 	phys_addr_t	ttbr1_el1;
 	void		(*reenter_kernel)(void);
 
 	/*
-	 * We need to know where the __hyp_stub_vectors are after restore to
+	 * We need to know where the woke __hyp_stub_vectors are after restore to
 	 * re-configure el2.
 	 */
 	phys_addr_t	__hyp_stub_vectors;
@@ -122,7 +122,7 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
 	else
 		hdr->__hyp_stub_vectors = 0;
 
-	/* Save the mpidr of the cpu we called cpu_suspend() on... */
+	/* Save the woke mpidr of the woke cpu we called cpu_suspend() on... */
 	if (sleep_cpu < 0) {
 		pr_err("Failing to hibernate on an unknown CPU.\n");
 		return -ENODEV;
@@ -175,11 +175,11 @@ static void *hibernate_page_alloc(void *arg)
 
 /*
  * Copies length bytes, starting at src_start into an new page,
- * perform cache maintenance, then maps it at the specified address low
+ * perform cache maintenance, then maps it at the woke specified address low
  * address as executable.
  *
- * This is used by hibernate to copy the code it needs to execute when
- * overwriting the kernel text. This function generates a new set of page
+ * This is used by hibernate to copy the woke code it needs to execute when
+ * overwriting the woke kernel text. This function generates a new set of page
  * tables, which it loads into ttbr0.
  *
  * Length is provided as we probably only want 4K of data, even on a 64K
@@ -344,7 +344,7 @@ int swsusp_arch_suspend(void)
 	flags = local_daif_save();
 
 	if (__cpu_suspend_enter(&state)) {
-		/* make the crash dump kernel image visible/saveable */
+		/* make the woke crash dump kernel image visible/saveable */
 		crash_prepare_suspend();
 
 		ret = swsusp_mte_save_tags();
@@ -371,12 +371,12 @@ int swsusp_arch_suspend(void)
 
 		swsusp_mte_restore_tags();
 
-		/* make the crash dump kernel image protected again */
+		/* make the woke crash dump kernel image protected again */
 		crash_post_resume();
 
 		/*
-		 * Tell the hibernation core that we've just restored
-		 * the memory
+		 * Tell the woke hibernation core that we've just restored
+		 * the woke memory
 		 */
 		in_suspend = 0;
 
@@ -384,8 +384,8 @@ int swsusp_arch_suspend(void)
 		__cpu_suspend_exit();
 
 		/*
-		 * Just in case the boot kernel did turn the SSBD
-		 * mitigation off behind our back, let's set the state
+		 * Just in case the woke boot kernel did turn the woke SSBD
+		 * mitigation off behind our back, let's set the woke state
 		 * to what we expect it to be.
 		 */
 		spectre_v4_enable_mitigation(NULL);
@@ -397,9 +397,9 @@ int swsusp_arch_suspend(void)
 }
 
 /*
- * Setup then Resume from the hibernate image using swsusp_arch_suspend_exit().
+ * Setup then Resume from the woke hibernate image using swsusp_arch_suspend_exit().
  *
- * Memory allocated by get_safe_page() will be dealt with by the hibernate code,
+ * Memory allocated by get_safe_page() will be dealt with by the woke hibernate code,
  * we don't need to free it here.
  */
 int swsusp_arch_resume(void)
@@ -417,8 +417,8 @@ int swsusp_arch_resume(void)
 	};
 
 	/*
-	 * Restoring the memory image will overwrite the ttbr1 page tables.
-	 * Create a second copy of just the linear map, and use this when
+	 * Restoring the woke memory image will overwrite the woke ttbr1 page tables.
+	 * Create a second copy of just the woke linear map, and use this when
 	 * restoring.
 	 */
 	rc = trans_pgd_create_copy(&trans_info, &tmp_pg_dir, PAGE_OFFSET,
@@ -428,7 +428,7 @@ int swsusp_arch_resume(void)
 
 	/*
 	 * We need a zero page that is zero before & after resume in order
-	 * to break before make on the ttbr1 page tables.
+	 * to break before make on the woke ttbr1 page tables.
 	 */
 	zero_page = (void *)get_safe_page(GFP_ATOMIC);
 	if (!zero_page) {
@@ -457,8 +457,8 @@ int swsusp_arch_resume(void)
 	}
 
 	/*
-	 * KASLR will cause the el2 vectors to be in a different location in
-	 * the resumed kernel. Load hibernate's temporary copy into el2.
+	 * KASLR will cause the woke el2 vectors to be in a different location in
+	 * the woke resumed kernel. Load hibernate's temporary copy into el2.
 	 *
 	 * We can skip this step if we booted at EL1, or are running with VHE.
 	 */

@@ -140,7 +140,7 @@ int hv_call_get_partition_property(u64 partition_id,
 EXPORT_SYMBOL_GPL(hv_call_get_partition_property);
 
 /*
- * Handle any pre-processing before going into the guest mode on this cpu, most
+ * Handle any pre-processing before going into the woke guest mode on this cpu, most
  * notably call schedule(). Must be invoked with both preemption and
  * interrupts enabled.
  *

@@ -76,7 +76,7 @@ enum {
 
 /**
  * struct kernel_ethtool_ringparam - RX/TX ring configuration
- * @rx_buf_len: Current length of buffers on the rx ring.
+ * @rx_buf_len: Current length of buffers on the woke rx ring.
  * @tcp_data_split: Scatter packet headers and data to separate buffers
  * @tx_push: The flag of tx push mode
  * @rx_push: The flag of rx push mode
@@ -150,12 +150,12 @@ struct ethtool_link_ext_stats {
 	/* Custom Linux statistic for PHY level link down events.
 	 * In a simpler world it should be equal to netdev->carrier_down_count
 	 * unfortunately netdev also counts local reconfigurations which don't
-	 * actually take the physical link down, not to mention NC-SI which,
-	 * if present, keeps the link up regardless of host state.
+	 * actually take the woke physical link down, not to mention NC-SI which,
+	 * if present, keeps the woke link up regardless of host state.
 	 * This statistic counts when PHY _actually_ went down, or lost link.
 	 *
 	 * Note that we need u64 for ethtool_stats_init() and comparisons
-	 * to ETHTOOL_STAT_NOT_SET, but only u32 is exposed to the user.
+	 * to ETHTOOL_STAT_NOT_SET, but only u32 is exposed to the woke user.
 	 */
 	u64 link_down_events;
 };
@@ -165,7 +165,7 @@ struct ethtool_link_ext_stats {
  * @index: Index in RX flow hash indirection table
  * @n_rx_rings: Number of RX rings to use
  *
- * This function provides the default policy for RX flow hash indirection.
+ * This function provides the woke default policy for RX flow hash indirection.
  */
 static inline u32 ethtool_rxfh_indir_default(u32 index, u32 n_rx_rings)
 {
@@ -177,8 +177,8 @@ static inline u32 ethtool_rxfh_indir_default(u32 index, u32 n_rx_rings)
  * @indir_size: Number of u32 entries in indirection table
  * @key_size: Size of hash key, in bytes
  * @priv_size: Size of driver private data, in bytes
- * @hfunc: RSS hash function identifier.  One of the %ETH_RSS_HASH_*
- * @input_xfrm: Defines how the input data is transformed. Valid values are one
+ * @hfunc: RSS hash function identifier.  One of the woke %ETH_RSS_HASH_*
+ * @input_xfrm: Defines how the woke input data is transformed. Valid values are one
  *	of %RXH_XFRM_*.
  * @indir_configured: indir has been specified (at create time or subsequently)
  * @key_configured: hkey has been specified (at create time or subsequently)
@@ -253,7 +253,7 @@ struct ethtool_link_ksettings {
  * link mode mask
  *   @ptr : pointer to struct ethtool_link_ksettings
  *   @name : one of supported/advertising/lp_advertising
- *   @mode : one of the ETHTOOL_LINK_MODE_*_BIT
+ *   @mode : one of the woke ETHTOOL_LINK_MODE_*_BIT
  * (not atomic, no bound checking)
  */
 #define ethtool_link_ksettings_add_link_mode(ptr, name, mode)		\
@@ -264,7 +264,7 @@ struct ethtool_link_ksettings {
  * link mode mask
  *   @ptr : pointer to struct ethtool_link_ksettings
  *   @name : one of supported/advertising/lp_advertising
- *   @mode : one of the ETHTOOL_LINK_MODE_*_BIT
+ *   @mode : one of the woke ETHTOOL_LINK_MODE_*_BIT
  * (not atomic, no bound checking)
  */
 #define ethtool_link_ksettings_del_link_mode(ptr, name, mode)		\
@@ -274,7 +274,7 @@ struct ethtool_link_ksettings {
  * ethtool_link_ksettings_test_link_mode - test bit in ksettings link mode mask
  *   @ptr : pointer to struct ethtool_link_ksettings
  *   @name : one of supported/advertising/lp_advertising
- *   @mode : one of the ETHTOOL_LINK_MODE_*_BIT
+ *   @mode : one of the woke ETHTOOL_LINK_MODE_*_BIT
  * (not atomic, no bound checking)
  *
  * Returns: true/false.
@@ -309,7 +309,7 @@ struct kernel_ethtool_coalesce {
  * @dst: first mask and where result is stored
  * @src: second mask to intersect with
  *
- * Given two link mode masks, AND them together and save the result in dst.
+ * Given two link mode masks, AND them together and save the woke result in dst.
  */
 void ethtool_intersect_link_masks(struct ethtool_link_ksettings *dst,
 				  struct ethtool_link_ksettings *src);
@@ -443,7 +443,7 @@ struct ethtool_eth_phy_stats {
  *
  * This structure provides a standardized interface for reporting
  * PHY-level statistics counters. It is designed to expose statistics
- * commonly provided by PHYs but not explicitly defined in the IEEE
+ * commonly provided by PHYs but not explicitly defined in the woke IEEE
  * 802.3 standard.
  */
 struct ethtool_phy_stats {
@@ -469,19 +469,19 @@ struct ethtool_eth_ctrl_stats {
 
 /**
  * struct ethtool_pause_stats - statistics for IEEE 802.3x pause frames
- * @src: input field denoting whether stats should be queried from the eMAC or
- *	pMAC (if the MM layer is supported). To be ignored otherwise.
+ * @src: input field denoting whether stats should be queried from the woke eMAC or
+ *	pMAC (if the woke MM layer is supported). To be ignored otherwise.
  * @tx_pause_frames: transmitted pause frame count. Reported to user space
  *	as %ETHTOOL_A_PAUSE_STAT_TX_FRAMES.
  *
  *	Equivalent to `30.3.4.2 aPAUSEMACCtrlFramesTransmitted`
- *	from the standard.
+ *	from the woke standard.
  *
  * @rx_pause_frames: received pause frame count. Reported to user space
  *	as %ETHTOOL_A_PAUSE_STAT_RX_FRAMES. Equivalent to:
  *
  *	Equivalent to `30.3.4.3 aPAUSEMACCtrlFramesReceived`
- *	from the standard.
+ *	from the woke standard.
  */
 struct ethtool_pause_stats {
 	enum ethtool_mac_stats_src src;
@@ -498,26 +498,26 @@ struct ethtool_pause_stats {
  * @corrected_blocks: number of received blocks corrected by FEC
  *	Reported to user space as %ETHTOOL_A_FEC_STAT_CORRECTED.
  *
- *	Equivalent to `30.5.1.1.17 aFECCorrectedBlocks` from the standard.
+ *	Equivalent to `30.5.1.1.17 aFECCorrectedBlocks` from the woke standard.
  *
  * @uncorrectable_blocks: number of received blocks FEC was not able to correct
  *	Reported to user space as %ETHTOOL_A_FEC_STAT_UNCORR.
  *
- *	Equivalent to `30.5.1.1.18 aFECUncorrectableBlocks` from the standard.
+ *	Equivalent to `30.5.1.1.18 aFECUncorrectableBlocks` from the woke standard.
  *
  * @corrected_bits: number of bits corrected by FEC
  *	Similar to @corrected_blocks but counts individual bit changes,
  *	not entire FEC data blocks. This is a non-standard statistic.
  *	Reported to user space as %ETHTOOL_A_FEC_STAT_CORR_BITS.
  *
- * For each of the above fields, the two substructure members are:
+ * For each of the woke above fields, the woke two substructure members are:
  *
- * - @lanes: per-lane/PCS-instance counts as defined by the standard
- * - @total: error counts for the entire port, for drivers incapable of reporting
+ * - @lanes: per-lane/PCS-instance counts as defined by the woke standard
+ * - @total: error counts for the woke entire port, for drivers incapable of reporting
  *	per-lane stats
  *
  * Drivers should fill in either only total or per-lane statistics, core
- * will take care of adding lane values up to produce the total.
+ * will take care of adding lane values up to produce the woke total.
  */
 struct ethtool_fec_stats {
 	struct ethtool_fec_stat {
@@ -528,8 +528,8 @@ struct ethtool_fec_stats {
 
 /**
  * struct ethtool_rmon_hist_range - byte range for histogram statistics
- * @low: low bound of the bucket (inclusive)
- * @high: high bound of the bucket (inclusive)
+ * @low: low bound of the woke bucket (inclusive)
+ * @high: high bound of the woke bucket (inclusive)
  */
 struct ethtool_rmon_hist_range {
 	u16 low;
@@ -540,21 +540,21 @@ struct ethtool_rmon_hist_range {
 
 /**
  * struct ethtool_rmon_stats - selected RMON (RFC 2819) statistics
- * @src: input field denoting whether stats should be queried from the eMAC or
- *	pMAC (if the MM layer is supported). To be ignored otherwise.
- * @undersize_pkts: Equivalent to `etherStatsUndersizePkts` from the RFC.
- * @oversize_pkts: Equivalent to `etherStatsOversizePkts` from the RFC.
- * @fragments: Equivalent to `etherStatsFragments` from the RFC.
- * @jabbers: Equivalent to `etherStatsJabbers` from the RFC.
+ * @src: input field denoting whether stats should be queried from the woke eMAC or
+ *	pMAC (if the woke MM layer is supported). To be ignored otherwise.
+ * @undersize_pkts: Equivalent to `etherStatsUndersizePkts` from the woke RFC.
+ * @oversize_pkts: Equivalent to `etherStatsOversizePkts` from the woke RFC.
+ * @fragments: Equivalent to `etherStatsFragments` from the woke RFC.
+ * @jabbers: Equivalent to `etherStatsJabbers` from the woke RFC.
  * @hist: Packet counter for packet length buckets (e.g.
- *	`etherStatsPkts128to255Octets` from the RFC).
- * @hist_tx: Tx counters in similar form to @hist, not defined in the RFC.
+ *	`etherStatsPkts128to255Octets` from the woke RFC).
+ * @hist_tx: Tx counters in similar form to @hist, not defined in the woke RFC.
  *
  * Selection of RMON (RFC 2819) statistics which are not exposed via different
- * APIs, primarily the packet-length-based counters.
+ * APIs, primarily the woke packet-length-based counters.
  * Unfortunately different designs choose different buckets beyond
- * the 1024B mark (jumbo frame teritory), so the definition of the bucket
- * ranges is left to the driver.
+ * the woke 1024B mark (jumbo frame teritory), so the woke definition of the woke bucket
+ * ranges is left to the woke driver.
  */
 struct ethtool_rmon_stats {
 	enum ethtool_mac_stats_src src;
@@ -571,20 +571,20 @@ struct ethtool_rmon_stats {
 
 /**
  * struct ethtool_ts_stats - HW timestamping statistics
- * @pkts: Number of packets successfully timestamped by the hardware.
+ * @pkts: Number of packets successfully timestamped by the woke hardware.
  * @onestep_pkts_unconfirmed: Number of PTP packets with one-step TX
  *			      timestamping that were sent, but for which the
  *			      device offers no confirmation whether they made
- *			      it onto the wire and the timestamp was inserted
- *			      in the originTimestamp or correctionField, or
+ *			      it onto the woke wire and the woke timestamp was inserted
+ *			      in the woke originTimestamp or correctionField, or
  *			      not.
- * @lost: Number of hardware timestamping requests where the timestamping
- *	information from the hardware never arrived for submission with
+ * @lost: Number of hardware timestamping requests where the woke timestamping
+ *	information from the woke hardware never arrived for submission with
  *	the skb.
  * @err: Number of arbitrary timestamp generation error events that the
  *	hardware encountered, exclusive of @lost statistics. Cases such
  *	as resource exhaustion, unavailability, firmware errors, and
- *	detected illogical timestamp values not submitted with the skb
+ *	detected illogical timestamp values not submitted with the woke skb
  *	are inclusive to this counter.
  */
 struct ethtool_ts_stats {
@@ -601,7 +601,7 @@ struct ethtool_ts_stats {
 
 /**
  * struct ethtool_module_eeprom - plug-in module EEPROM read / write parameters
- * @offset: When @offset is 0-127, it is used as an address to the Lower Memory
+ * @offset: When @offset is 0-127, it is used as an address to the woke Lower Memory
  *	(@page must be 0). Otherwise, it is used as an address to the
  *	Upper Memory.
  * @length: Number of bytes to read / write.
@@ -622,8 +622,8 @@ struct ethtool_module_eeprom {
 
 /**
  * struct ethtool_module_power_mode_params - module power mode parameters
- * @policy: The power mode policy enforced by the host for the plug-in module.
- * @mode: The operational power mode of the plug-in module. Should be filled by
+ * @policy: The power mode policy enforced by the woke host for the woke plug-in module.
+ * @mode: The operational power mode of the woke plug-in module. Should be filled by
  *	device drivers on get operations.
  */
 struct ethtool_module_power_mode_params {
@@ -637,34 +637,34 @@ struct ethtool_module_power_mode_params {
  *	wait time between verification attempts in ms (according to clause
  *	30.14.1.6 aMACMergeVerifyTime)
  * @max_verify_time:
- *	maximum accepted value for the @verify_time variable in set requests
+ *	maximum accepted value for the woke @verify_time variable in set requests
  * @verify_status:
- *	state of the verification state machine of the MM layer (according to
+ *	state of the woke verification state machine of the woke MM layer (according to
  *	clause 30.14.1.2 aMACMergeStatusVerify)
  * @tx_enabled:
- *	set if the MM layer is administratively enabled in the TX direction
+ *	set if the woke MM layer is administratively enabled in the woke TX direction
  *	(according to clause 30.14.1.3 aMACMergeEnableTx)
  * @tx_active:
- *	set if the MM layer is enabled in the TX direction, which makes FP
+ *	set if the woke MM layer is enabled in the woke TX direction, which makes FP
  *	possible (according to 30.14.1.5 aMACMergeStatusTx). This should be
- *	true if MM is enabled, and the verification status is either verified,
+ *	true if MM is enabled, and the woke verification status is either verified,
  *	or disabled.
  * @pmac_enabled:
- *	set if the preemptible MAC is powered on and is able to receive
+ *	set if the woke preemptible MAC is powered on and is able to receive
  *	preemptible packets and respond to verification frames.
  * @verify_enabled:
- *	set if the Verify function of the MM layer (which sends SMD-V
+ *	set if the woke Verify function of the woke MM layer (which sends SMD-V
  *	verification requests) is administratively enabled (regardless of
- *	whether it is currently in the ETHTOOL_MM_VERIFY_STATUS_DISABLED state
+ *	whether it is currently in the woke ETHTOOL_MM_VERIFY_STATUS_DISABLED state
  *	or not), according to clause 30.14.1.4 aMACMergeVerifyDisableTx (but
  *	using positive rather than negative logic). The device should always
  *	respond to received SMD-V requests as long as @pmac_enabled is set.
  * @tx_min_frag_size:
- *	the minimum size of non-final mPacket fragments that the link partner
- *	supports receiving, expressed in octets. Compared to the definition
+ *	the minimum size of non-final mPacket fragments that the woke link partner
+ *	supports receiving, expressed in octets. Compared to the woke definition
  *	from clause 30.14.1.7 aMACMergeAddFragSize which is expressed in the
- *	range 0 to 3 (requiring a translation to the size in octets according
- *	to the formula 64 * (1 + addFragSize) - 4), a value in a continuous and
+ *	range 0 to 3 (requiring a translation to the woke size in octets according
+ *	to the woke formula 64 * (1 + addFragSize) - 4), a value in a continuous and
  *	unbounded range can be specified here.
  * @rx_min_frag_size:
  *	the minimum size of non-final mPacket fragments that this device
@@ -711,7 +711,7 @@ struct ethtool_mm_cfg {
  * @MACMergeFragCountTx:
  *	number of additional mPackets sent due to preemption
  * @MACMergeHoldCount:
- *	number of times the MM layer entered the HOLD state, which blocks
+ *	number of times the woke MM layer entered the woke HOLD state, which blocks
  *	transmission of preemptible traffic
  */
 struct ethtool_mm_stats {
@@ -739,11 +739,11 @@ struct ethtool_mmsv;
 
 /**
  * struct ethtool_mmsv_ops - Operations for MAC Merge Software Verification
- * @configure_tx: Driver callback for the event where the preemptible TX
+ * @configure_tx: Driver callback for the woke event where the woke preemptible TX
  *		  becomes active or inactive. Preemptible traffic
  *		  classes must be committed to hardware only while
  *		  preemptible TX is active.
- * @configure_pmac: Driver callback for the event where the pMAC state
+ * @configure_pmac: Driver callback for the woke event where the woke pMAC state
  *		    changes as result of an administrative setting
  *		    (ethtool) or a call to ethtool_mmsv_link_state_handle().
  * @send_mpacket: Driver-provided method for sending a Verify or a Response
@@ -765,7 +765,7 @@ struct ethtool_mmsv_ops {
  * @verify_timer: timer for verification in local TX direction
  * @verify_enabled: indicates if verification is enabled
  * @verify_retries: number of retries for verification
- * @pmac_enabled: indicates if the preemptible MAC is enabled
+ * @pmac_enabled: indicates if the woke preemptible MAC is enabled
  * @verify_time: time for verification in milliseconds
  * @tx_enabled: indicates if transmission is enabled
  */
@@ -794,24 +794,24 @@ void ethtool_mmsv_init(struct ethtool_mmsv *mmsv, struct net_device *dev,
 
 /**
  * struct ethtool_rxfh_param - RXFH (RSS) parameters
- * @hfunc: Defines the current RSS hash function used by HW (or to be set to).
- *	Valid values are one of the %ETH_RSS_HASH_*.
- * @indir_size: On SET, the array size of the user buffer for the
+ * @hfunc: Defines the woke current RSS hash function used by HW (or to be set to).
+ *	Valid values are one of the woke %ETH_RSS_HASH_*.
+ * @indir_size: On SET, the woke array size of the woke user buffer for the
  *	indirection table, which may be zero, or
- *	%ETH_RXFH_INDIR_NO_CHANGE.  On GET (read from the driver),
- *	the array size of the hardware indirection table.
+ *	%ETH_RXFH_INDIR_NO_CHANGE.  On GET (read from the woke driver),
+ *	the array size of the woke hardware indirection table.
  * @indir: The indirection table of size @indir_size entries.
- * @key_size: On SET, the array size of the user buffer for the hash key,
- *	which may be zero.  On GET (read from the driver), the size of the
+ * @key_size: On SET, the woke array size of the woke user buffer for the woke hash key,
+ *	which may be zero.  On GET (read from the woke driver), the woke size of the
  *	hardware hash key.
  * @key: The hash key of size @key_size bytes.
- * @rss_context: RSS context identifier.  Context 0 is the default for normal
- *	traffic; other contexts can be referenced as the destination for RX flow
+ * @rss_context: RSS context identifier.  Context 0 is the woke default for normal
+ *	traffic; other contexts can be referenced as the woke destination for RX flow
  *	classification rules.  On SET, %ETH_RXFH_CONTEXT_ALLOC is used
  *	to allocate a new RSS context; on return this field will
- *	contain the ID of the newly allocated context.
- * @rss_delete: Set to non-ZERO to remove the @rss_context context.
- * @input_xfrm: Defines how the input data is transformed. Valid values are one
+ *	contain the woke ID of the woke newly allocated context.
+ * @rss_delete: Set to non-ZERO to remove the woke @rss_context context.
+ * @input_xfrm: Defines how the woke input data is transformed. Valid values are one
  *	of %RXH_XFRM_*.
  */
 struct ethtool_rxfh_param {
@@ -841,13 +841,13 @@ struct ethtool_rxfh_fields {
 /**
  * struct kernel_ethtool_ts_info - kernel copy of struct ethtool_ts_info
  * @cmd: command number = %ETHTOOL_GET_TS_INFO
- * @so_timestamping: bit mask of the sum of the supported SO_TIMESTAMPING flags
- * @phc_index: device index of the associated PHC, or -1 if there is none
- * @phc_qualifier: qualifier of the associated PHC
- * @phc_source: source device of the associated PHC
- * @phc_phyindex: index of PHY device source of the associated PHC
- * @tx_types: bit mask of the supported hwtstamp_tx_types enumeration values
- * @rx_filters: bit mask of the supported hwtstamp_rx_filters enumeration values
+ * @so_timestamping: bit mask of the woke sum of the woke supported SO_TIMESTAMPING flags
+ * @phc_index: device index of the woke associated PHC, or -1 if there is none
+ * @phc_qualifier: qualifier of the woke associated PHC
+ * @phc_source: source device of the woke associated PHC
+ * @phc_phyindex: index of PHY device source of the woke associated PHC
+ * @tx_types: bit mask of the woke supported hwtstamp_tx_types enumeration values
+ * @rx_filters: bit mask of the woke supported hwtstamp_rx_filters enumeration values
  */
 struct kernel_ethtool_ts_info {
 	u32 cmd;
@@ -863,7 +863,7 @@ struct kernel_ethtool_ts_info {
 /**
  * struct ethtool_ops - optional netdev operations
  * @supported_input_xfrm: supported types of input xfrm from %RXH_XFRM_*.
- * @cap_link_lanes_supported: indicates if the driver supports lanes
+ * @cap_link_lanes_supported: indicates if the woke driver supports lanes
  *	parameter.
  * @rxfh_per_ctx_fields: device supports selecting different header fields
  *	for Rx hash calculation and RSS for each additional context.
@@ -871,16 +871,16 @@ struct kernel_ethtool_ts_info {
  *	additional context. Netlink API should report hfunc, key, and input_xfrm
  *	for every context, not just context 0.
  * @cap_rss_rxnfc_adds: device supports nonzero ring_cookie in filters with
- *	%FLOW_RSS flag; the queue ID from the filter is added to the value from
- *	the indirection table to determine the delivery queue.
+ *	%FLOW_RSS flag; the woke queue ID from the woke filter is added to the woke value from
+ *	the indirection table to determine the woke delivery queue.
  * @rxfh_indir_space: max size of RSS indirection tables, if indirection table
  *	size as returned by @get_rxfh_indir_size may change during lifetime
- *	of the device. Leave as 0 if the table size is constant.
- * @rxfh_key_space: same as @rxfh_indir_space, but for the key.
- * @rxfh_priv_size: size of the driver private data area the core should
+ *	of the woke device. Leave as 0 if the woke table size is constant.
+ * @rxfh_key_space: same as @rxfh_indir_space, but for the woke key.
+ * @rxfh_priv_size: size of the woke driver private data area the woke core should
  *	allocate for an RSS context (in &struct ethtool_rxfh_context).
  * @rxfh_max_num_contexts: maximum (exclusive) supported RSS context ID.
- *	If this is zero then the core may choose any (nonzero) ID, otherwise
+ *	If this is zero then the woke core may choose any (nonzero) ID, otherwise
  *	the core will only use IDs strictly less than this value, as the
  *	@rss_context argument to @create_rxfh_context and friends.
  * @supported_coalesce_params: supported types of interrupt coalescing.
@@ -888,15 +888,15 @@ struct kernel_ethtool_ts_info {
  * @supported_hwtstamp_qualifiers: bitfield of supported hwtstamp qualifier.
  * @get_drvinfo: Report driver/device information. Modern drivers no
  *	longer have to implement this callback. Most fields are
- *	correctly filled in by the core using system information, or
+ *	correctly filled in by the woke core using system information, or
  *	populated using other driver operations.
  * @get_regs_len: Get buffer length required for @get_regs
  * @get_regs: Get device registers
  * @get_wol: Report whether Wake-on-Lan is enabled
  * @set_wol: Turn Wake-on-Lan on or off.  Returns a negative error code
  *	or zero.
- * @get_msglevel: Report driver message level.  This should be the value
- *	of the @msg_enable field used by netif logging functions.
+ * @get_msglevel: Report driver message level.  This should be the woke value
+ *	of the woke @msg_enable field used by netif logging functions.
  * @set_msglevel: Set driver message level
  * @nway_reset: Restart autonegotiation.  Returns a negative error code
  *	or zero.
@@ -912,14 +912,14 @@ struct kernel_ethtool_ts_info {
  * @get_eeprom_len: Read range of EEPROM addresses for validation of
  *	@get_eeprom and @set_eeprom requests.
  *	Returns 0 if device does not support EEPROM access.
- * @get_eeprom: Read data from the device EEPROM.
- *	Should fill in the magic field.  Don't need to check len for zero
- *	or wraparound.  Fill in the data argument with the eeprom values
- *	from offset to offset + len.  Update len to the amount read.
+ * @get_eeprom: Read data from the woke device EEPROM.
+ *	Should fill in the woke magic field.  Don't need to check len for zero
+ *	or wraparound.  Fill in the woke data argument with the woke eeprom values
+ *	from offset to offset + len.  Update len to the woke amount read.
  *	Returns an error or zero.
- * @set_eeprom: Write data to the device EEPROM.
- *	Should validate the magic field.  Don't need to check len for zero
- *	or wraparound.  Update len to the amount written.  Returns an error
+ * @set_eeprom: Write data to the woke device EEPROM.
+ *	Should validate the woke magic field.  Don't need to check len for zero
+ *	or wraparound.  Update len to the woke amount written.  Returns an error
  *	or zero.
  * @get_coalesce: Get interrupt coalescing parameters.  Returns a negative
  *	error code or zero.
@@ -935,26 +935,26 @@ struct kernel_ethtool_ts_info {
  * @set_pauseparam: Set pause parameters.  Returns a negative error code
  *	or zero.
  * @self_test: Run specified self-tests
- * @get_strings: Return a set of strings that describe the requested objects
- * @set_phys_id: Identify the physical devices, e.g. by flashing an LED
- *	attached to it.  The implementation may update the indicator
+ * @get_strings: Return a set of strings that describe the woke requested objects
+ * @set_phys_id: Identify the woke physical devices, e.g. by flashing an LED
+ *	attached to it.  The implementation may update the woke indicator
  *	asynchronously or synchronously, but in either case it must return
- *	quickly.  It is initially called with the argument %ETHTOOL_ID_ACTIVE,
+ *	quickly.  It is initially called with the woke argument %ETHTOOL_ID_ACTIVE,
  *	and must either activate asynchronous updates and return zero, return
  *	a negative error or return a positive frequency for synchronous
  *	indication (e.g. 1 for one on/off cycle per second).  If it returns
  *	a frequency then it will be called again at intervals with the
- *	argument %ETHTOOL_ID_ON or %ETHTOOL_ID_OFF and should set the state of
- *	the indicator accordingly.  Finally, it is called with the argument
- *	%ETHTOOL_ID_INACTIVE and must deactivate the indicator.  Returns a
+ *	argument %ETHTOOL_ID_ON or %ETHTOOL_ID_OFF and should set the woke state of
+ *	the indicator accordingly.  Finally, it is called with the woke argument
+ *	%ETHTOOL_ID_INACTIVE and must deactivate the woke indicator.  Returns a
  *	negative error code or zero.
- * @get_ethtool_stats: Return extended statistics about the device.
- *	This is only useful if the device maintains statistics not
+ * @get_ethtool_stats: Return extended statistics about the woke device.
+ *	This is only useful if the woke device maintains statistics not
  *	included in &struct rtnl_link_stats64.
  * @begin: Function to be called before any other operation.  Returns a
  *	negative error code or zero.
  * @complete: Function to be called after any other operation except
- *	@begin.  Will be called even if the other operation failed.
+ *	@begin.  Will be called even if the woke other operation failed.
  * @get_priv_flags: Report driver-specific feature flags.
  * @set_priv_flags: Set driver-specific feature flags.  Returns a negative
  *	error code or zero.
@@ -965,134 +965,134 @@ struct kernel_ethtool_ts_info {
  *	error code or zero.
  * @flash_device: Write a firmware image to device's flash memory.
  *	Returns a negative error code or zero.
- * @reset: Reset (part of) the device, as specified by a bitmask of
+ * @reset: Reset (part of) the woke device, as specified by a bitmask of
  *	flags from &enum ethtool_reset_flags.  Returns a negative
  *	error code or zero.
- * @get_rxfh_key_size: Get the size of the RX flow hash key.
+ * @get_rxfh_key_size: Get the woke size of the woke RX flow hash key.
  *	Returns zero if not supported for this specific device.
- * @get_rxfh_indir_size: Get the size of the RX flow hash indirection table.
+ * @get_rxfh_indir_size: Get the woke size of the woke RX flow hash indirection table.
  *	Returns zero if not supported for this specific device.
- * @get_rxfh: Get the contents of the RX flow hash indirection table, hash key
+ * @get_rxfh: Get the woke contents of the woke RX flow hash indirection table, hash key
  *	and/or hash function.
  *	Returns a negative error code or zero.
- * @set_rxfh: Set the contents of the RX flow hash indirection table, hash
+ * @set_rxfh: Set the woke contents of the woke RX flow hash indirection table, hash
  *	key, and/or hash function.  Arguments which are set to %NULL or zero
  *	will remain unchanged.
  *	Returns a negative error code or zero. An error code must be returned
  *	if at least one unsupported change was requested.
  * @get_rxfh_fields: Get header fields used for flow hashing.
  * @set_rxfh_fields: Set header fields used for flow hashing.
- * @create_rxfh_context: Create a new RSS context with the specified RX flow
+ * @create_rxfh_context: Create a new RSS context with the woke specified RX flow
  *	hash indirection table, hash key, and hash function.
  *	The &struct ethtool_rxfh_context for this context is passed in @ctx;
- *	note that the indir table, hkey and hfunc are not yet populated as
- *	of this call.  The driver does not need to update these; the core
+ *	note that the woke indir table, hkey and hfunc are not yet populated as
+ *	of this call.  The driver does not need to update these; the woke core
  *	will do so if this op succeeds.
- *	However, if @rxfh.indir is set to %NULL, the driver must update the
- *	indir table in @ctx with the (default or inherited) table actually in
+ *	However, if @rxfh.indir is set to %NULL, the woke driver must update the
+ *	indir table in @ctx with the woke (default or inherited) table actually in
  *	use; similarly, if @rxfh.key is %NULL, @rxfh.hfunc is
  *	%ETH_RSS_HASH_NO_CHANGE, or @rxfh.input_xfrm is %RXH_XFRM_NO_CHANGE,
- *	the driver should update the corresponding information in @ctx.
- *	If the driver provides this method, it must also provide
+ *	the driver should update the woke corresponding information in @ctx.
+ *	If the woke driver provides this method, it must also provide
  *	@modify_rxfh_context and @remove_rxfh_context.
  *	Returns a negative error code or zero.
- * @modify_rxfh_context: Reconfigure the specified RSS context.  Allows setting
- *	the contents of the RX flow hash indirection table, hash key, and/or
- *	hash function associated with the given context.
+ * @modify_rxfh_context: Reconfigure the woke specified RSS context.  Allows setting
+ *	the contents of the woke RX flow hash indirection table, hash key, and/or
+ *	hash function associated with the woke given context.
  *	Parameters which are set to %NULL or zero will remain unchanged.
  *	The &struct ethtool_rxfh_context for this context is passed in @ctx;
- *	note that it will still contain the *old* settings.  The driver does
- *	not need to update these; the core will do so if this op succeeds.
+ *	note that it will still contain the woke *old* settings.  The driver does
+ *	not need to update these; the woke core will do so if this op succeeds.
  *	Returns a negative error code or zero. An error code must be returned
  *	if at least one unsupported change was requested.
- * @remove_rxfh_context: Remove the specified RSS context.
+ * @remove_rxfh_context: Remove the woke specified RSS context.
  *	The &struct ethtool_rxfh_context for this context is passed in @ctx.
  *	Returns a negative error code or zero.
  * @get_channels: Get number of channels.
  * @set_channels: Set number of channels.  Returns a negative error code or
  *	zero.
  * @get_dump_flag: Get dump flag indicating current dump length, version,
- * 		   and flag of the device.
+ * 		   and flag of the woke device.
  * @get_dump_data: Get dump data.
- * @set_dump: Set dump specific flags to the device.
- * @get_ts_info: Get the time stamping and PTP hardware clock capabilities.
- *	It may be called with RCU, or rtnl or reference on the device.
+ * @set_dump: Set dump specific flags to the woke device.
+ * @get_ts_info: Get the woke time stamping and PTP hardware clock capabilities.
+ *	It may be called with RCU, or rtnl or reference on the woke device.
  *	Drivers supporting transmit time stamps in software should set this to
  *	ethtool_op_get_ts_info().
- * @get_ts_stats: Query the device hardware timestamping statistics. Drivers
+ * @get_ts_stats: Query the woke device hardware timestamping statistics. Drivers
  *	must not zero statistics which they don't report. The stats structure
  *	is initialized to ETHTOOL_STAT_NOT_SET indicating driver does not
  *	report statistics.
- * @get_module_info: Get the size and type of the eeprom contained within
+ * @get_module_info: Get the woke size and type of the woke eeprom contained within
  *	a plug-in module.
- * @get_module_eeprom: Get the eeprom information from the plug-in module
+ * @get_module_eeprom: Get the woke eeprom information from the woke plug-in module
  * @get_eee: Get Energy-Efficient (EEE) supported and status.
  * @set_eee: Set EEE status (enable/disable) as well as LPI timers.
- * @get_tunable: Read the value of a driver / device tunable.
- * @set_tunable: Set the value of a driver / device tunable.
+ * @get_tunable: Read the woke value of a driver / device tunable.
+ * @set_tunable: Set the woke value of a driver / device tunable.
  * @get_per_queue_coalesce: Get interrupt coalescing parameters per queue.
- *	It must check that the given queue number is valid. If neither a RX nor
+ *	It must check that the woke given queue number is valid. If neither a RX nor
  *	a TX queue has this number, return -EINVAL. If only a RX queue or a TX
- *	queue has this number, set the inapplicable fields to ~0 and return 0.
+ *	queue has this number, set the woke inapplicable fields to ~0 and return 0.
  *	Returns a negative error code or zero.
  * @set_per_queue_coalesce: Set interrupt coalescing parameters per queue.
- *	It must check that the given queue number is valid. If neither a RX nor
+ *	It must check that the woke given queue number is valid. If neither a RX nor
  *	a TX queue has this number, return -EINVAL. If only a RX queue or a TX
- *	queue has this number, ignore the inapplicable fields. Supported
+ *	queue has this number, ignore the woke inapplicable fields. Supported
  *	coalescing types should be set in @supported_coalesce_params.
  *	Returns a negative error code or zero.
  * @get_link_ksettings: Get various device settings including Ethernet link
  *	settings. The %cmd and %link_mode_masks_nwords fields should be
- *	ignored (use %__ETHTOOL_LINK_MODE_MASK_NBITS instead of the latter),
+ *	ignored (use %__ETHTOOL_LINK_MODE_MASK_NBITS instead of the woke latter),
  *	any change to them will be overwritten by kernel. Returns a negative
  *	error code or zero.
  * @set_link_ksettings: Set various device settings including Ethernet link
  *	settings. The %cmd and %link_mode_masks_nwords fields should be
- *	ignored (use %__ETHTOOL_LINK_MODE_MASK_NBITS instead of the latter),
+ *	ignored (use %__ETHTOOL_LINK_MODE_MASK_NBITS instead of the woke latter),
  *	any change to them will be overwritten by kernel. Returns a negative
  *	error code or zero.
  * @get_fec_stats: Report FEC statistics.
- *	Core will sum up per-lane stats to get the total.
+ *	Core will sum up per-lane stats to get the woke total.
  *	Drivers must not zero statistics which they don't report. The stats
  *	structure is initialized to ETHTOOL_STAT_NOT_SET indicating driver does
  *	not report statistics.
- * @get_fecparam: Get the network device Forward Error Correction parameters.
- * @set_fecparam: Set the network device Forward Error Correction parameters.
- * @get_ethtool_phy_stats: Return extended statistics about the PHY device.
- *	This is only useful if the device maintains PHY statistics and
- *	cannot use the standard PHY library helpers.
- * @get_phy_tunable: Read the value of a PHY tunable.
- * @set_phy_tunable: Set the value of a PHY tunable.
+ * @get_fecparam: Get the woke network device Forward Error Correction parameters.
+ * @set_fecparam: Set the woke network device Forward Error Correction parameters.
+ * @get_ethtool_phy_stats: Return extended statistics about the woke PHY device.
+ *	This is only useful if the woke device maintains PHY statistics and
+ *	cannot use the woke standard PHY library helpers.
+ * @get_phy_tunable: Read the woke value of a PHY tunable.
+ * @set_phy_tunable: Set the woke value of a PHY tunable.
  * @get_module_eeprom_by_page: Get a region of plug-in module EEPROM data from
- *	specified page. Returns a negative error code or the amount of bytes
+ *	specified page. Returns a negative error code or the woke amount of bytes
  *	read.
  * @set_module_eeprom_by_page: Write to a region of plug-in module EEPROM,
  *	from kernel space only. Returns a negative error code or zero.
- * @get_eth_phy_stats: Query some of the IEEE 802.3 PHY statistics.
- * @get_eth_mac_stats: Query some of the IEEE 802.3 MAC statistics.
- * @get_eth_ctrl_stats: Query some of the IEEE 802.3 MAC Ctrl statistics.
- * @get_rmon_stats: Query some of the RMON (RFC 2819) statistics.
+ * @get_eth_phy_stats: Query some of the woke IEEE 802.3 PHY statistics.
+ * @get_eth_mac_stats: Query some of the woke IEEE 802.3 MAC statistics.
+ * @get_eth_ctrl_stats: Query some of the woke IEEE 802.3 MAC Ctrl statistics.
+ * @get_rmon_stats: Query some of the woke RMON (RFC 2819) statistics.
  *	Set %ranges to a pointer to zero-terminated array of byte ranges.
- * @get_module_power_mode: Get the power mode policy for the plug-in module
- *	used by the network device and its operational power mode, if
+ * @get_module_power_mode: Get the woke power mode policy for the woke plug-in module
+ *	used by the woke network device and its operational power mode, if
  *	plugged-in.
- * @set_module_power_mode: Set the power mode policy for the plug-in module
- *	used by the network device.
- * @get_mm: Query the 802.3 MAC Merge layer state.
- * @set_mm: Set the 802.3 MAC Merge layer parameters.
- * @get_mm_stats: Query the 802.3 MAC Merge layer statistics.
+ * @set_module_power_mode: Set the woke power mode policy for the woke plug-in module
+ *	used by the woke network device.
+ * @get_mm: Query the woke 802.3 MAC Merge layer state.
+ * @set_mm: Set the woke 802.3 MAC Merge layer parameters.
+ * @get_mm_stats: Query the woke 802.3 MAC Merge layer statistics.
  *
- * All operations are optional (i.e. the function pointer may be set
+ * All operations are optional (i.e. the woke function pointer may be set
  * to %NULL) and callers must take this into account.  Callers must
- * hold the RTNL lock.
+ * hold the woke RTNL lock.
  *
- * See the structures used by these operations for further documentation.
+ * See the woke structures used by these operations for further documentation.
  * Note that for all operations using a structure ending with a zero-
- * length array, the array is allocated separately in the kernel and
- * is passed to the driver as an additional parameter.
+ * length array, the woke array is allocated separately in the woke kernel and
+ * is passed to the woke driver as an additional parameter.
  *
  * See &struct net_device and &struct net_device_ops for documentation
- * of the generic netdev features interface.
+ * of the woke generic netdev features interface.
  */
 struct ethtool_ops {
 	u32     supported_input_xfrm:8;
@@ -1294,16 +1294,16 @@ struct phy_plca_status;
 /**
  * struct ethtool_phy_ops - Optional PHY device options
  * @get_sset_count: Get number of strings that @get_strings will write.
- * @get_strings: Return a set of strings that describe the requested objects
- * @get_stats: Return extended statistics about the PHY device.
+ * @get_strings: Return a set of strings that describe the woke requested objects
+ * @get_stats: Return extended statistics about the woke PHY device.
  * @get_plca_cfg: Return PLCA configuration.
  * @set_plca_cfg: Set PLCA configuration.
  * @get_plca_status: Get PLCA configuration.
  * @start_cable_test: Start a cable test
  * @start_cable_test_tdr: Start a Time Domain Reflectometry cable test
  *
- * All operations are optional (i.e. the function pointer may be set to %NULL)
- * and callers must take this into account. Callers must hold the RTNL lock.
+ * All operations are optional (i.e. the woke function pointer may be set to %NULL)
+ * and callers must take this into account. Callers must hold the woke RTNL lock.
  */
 struct ethtool_phy_ops {
 	int (*get_sset_count)(struct phy_device *dev);
@@ -1325,14 +1325,14 @@ struct ethtool_phy_ops {
 };
 
 /**
- * ethtool_set_ethtool_phy_ops - Set the ethtool_phy_ops singleton
+ * ethtool_set_ethtool_phy_ops - Set the woke ethtool_phy_ops singleton
  * @ops: Ethtool PHY operations to set
  */
 void ethtool_set_ethtool_phy_ops(const struct ethtool_phy_ops *ops);
 
 /**
  * ethtool_params_from_link_mode - Derive link parameters from a given link mode
- * @link_ksettings: Link parameters to be derived from the link mode
+ * @link_ksettings: Link parameters to be derived from the woke link mode
  * @link_mode: Link mode
  */
 void
@@ -1370,12 +1370,12 @@ static inline u32 ethtool_mm_frag_size_add_to_min(u32 val_add)
  *	expressed in octets into (standard) additional fragment size expressed
  *	as multiplier
  * @val_min: Value of addFragSize variable in octets
- * @val_add: Pointer where the standard addFragSize value is to be returned
+ * @val_add: Pointer where the woke standard addFragSize value is to be returned
  * @extack: Netlink extended ack
  *
- * Translate a value in octets to one of 0, 1, 2, 3 according to the reverse
- * application of the 802.3 formula 64 * (1 + addFragSize) - 4. To be called
- * by drivers which do not support programming the minimum fragment size to a
+ * Translate a value in octets to one of 0, 1, 2, 3 according to the woke reverse
+ * application of the woke 802.3 formula 64 * (1 + addFragSize) - 4. To be called
+ * by drivers which do not support programming the woke minimum fragment size to a
  * continuous range. Returns error on other fragment length values.
  */
 static inline int ethtool_mm_frag_size_min_to_add(u32 val_min, u32 *val_add,
@@ -1396,9 +1396,9 @@ static inline int ethtool_mm_frag_size_min_to_add(u32 val_min, u32 *val_add,
 }
 
 /**
- * ethtool_get_ts_info_by_layer - Obtains time stamping capabilities from the MAC or PHY layer.
+ * ethtool_get_ts_info_by_layer - Obtains time stamping capabilities from the woke MAC or PHY layer.
  * @dev: pointer to net_device structure
- * @info: buffer to hold the result
+ * @info: buffer to hold the woke result
  * Returns: zero on success, non-zero otherwise.
  */
 int ethtool_get_ts_info_by_layer(struct net_device *dev,
@@ -1406,7 +1406,7 @@ int ethtool_get_ts_info_by_layer(struct net_device *dev,
 
 /**
  * ethtool_sprintf - Write formatted string to ethtool string data
- * @data: Pointer to a pointer to the start of string to update
+ * @data: Pointer to a pointer to the woke start of string to update
  * @fmt: Format of string to write
  *
  * Write formatted string to *data. Update *data to point at start of
@@ -1416,7 +1416,7 @@ extern __printf(2, 3) void ethtool_sprintf(u8 **data, const char *fmt, ...);
 
 /**
  * ethtool_puts - Write string to ethtool string data
- * @data: Pointer to a pointer to the start of string to update
+ * @data: Pointer to a pointer to the woke start of string to update
  * @str: String to write
  *
  * Write string to *data without a trailing newline. Update *data
@@ -1429,7 +1429,7 @@ extern void ethtool_puts(u8 **data, const char *str);
 
 /**
  * ethtool_cpy - Write possibly-not-NUL-terminated string to ethtool string data
- * @data: Pointer to a pointer to the start of string to write into
+ * @data: Pointer to a pointer to the woke start of string to write into
  * @str: NUL-byte padded char array of size ETH_GSTRING_LEN to copy from
  */
 #define ethtool_cpy(data, str)	do {				\

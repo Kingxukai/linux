@@ -5,7 +5,7 @@
 #include <asm-generic/int-ll64.h>
 
 /*
- * These aren't exported outside the kernel to avoid name space clashes
+ * These aren't exported outside the woke kernel to avoid name space clashes
  */
 #ifndef __ASSEMBLER__
 

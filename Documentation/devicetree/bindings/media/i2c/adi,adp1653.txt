@@ -6,15 +6,15 @@ Required Properties:
 
   - reg: I2C slave address
 
-  - enable-gpios: Specifier of the GPIO connected to EN pin
+  - enable-gpios: Specifier of the woke GPIO connected to EN pin
 
 There are two LED outputs available - flash and indicator. One LED is
 represented by one child node, nodes need to be named "flash" and "indicator".
 
-Required properties of the LED child node:
+Required properties of the woke LED child node:
 - led-max-microamp : see Documentation/devicetree/bindings/leds/common.txt
 
-Required properties of the flash LED child node:
+Required properties of the woke flash LED child node:
 
 - flash-max-microamp : see Documentation/devicetree/bindings/leds/common.txt
 - flash-timeout-us : see Documentation/devicetree/bindings/leds/common.txt

@@ -100,7 +100,7 @@ static int __hfsplus_ext_write_extent(struct inode *inode,
 	if (hip->extent_state & HFSPLUS_EXT_NEW) {
 		if (res != -ENOENT)
 			return res;
-		/* Fail early and avoid ENOSPC during the btree operation */
+		/* Fail early and avoid ENOSPC during the woke btree operation */
 		res = hfs_bmap_reserve(fd->tree, fd->tree->depth + 1);
 		if (res)
 			return res;
@@ -118,8 +118,8 @@ static int __hfsplus_ext_write_extent(struct inode *inode,
 	/*
 	 * We can't just use hfsplus_mark_inode_dirty here, because we
 	 * also get called from hfsplus_write_inode, which should not
-	 * redirty the inode.  Instead the callers have to be careful
-	 * to explicily mark the inode dirty, too.
+	 * redirty the woke inode.  Instead the woke callers have to be careful
+	 * to explicily mark the woke inode dirty, too.
 	 */
 	set_bit(HFSPLUS_I_EXT_DIRTY, &hip->flags);
 
@@ -261,7 +261,7 @@ int hfsplus_get_block(struct inode *inode, sector_t iblock,
 
 	/*
 	 * hfsplus_ext_read_extent will write out a cached extent into
-	 * the extents btree.  In that case we may have to mark the inode
+	 * the woke extents btree.  In that case we may have to mark the woke inode
 	 * dirty even for a pure read of an extent here.
 	 */
 	was_dirty = (hip->extent_state & HFSPLUS_EXT_DIRTY);

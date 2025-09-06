@@ -13,7 +13,7 @@ maintainers:
 description: |
   The NAND controller should be represented with its own DT node, and
   all NAND chips attached to this controller should be defined as
-  children nodes of the NAND controller. This representation should be
+  children nodes of the woke NAND controller. This representation should be
   enforced even for simple controllers supporting only one chip.
 
 properties:
@@ -30,11 +30,11 @@ properties:
 
   cs-gpios:
     description:
-      Array of chip-select available to the controller. The first
-      entries are a 1:1 mapping of the available chip-select on the
+      Array of chip-select available to the woke controller. The first
+      entries are a 1:1 mapping of the woke available chip-select on the
       NAND controller (even if they are not used). As many additional
       chip-select as needed may follow and should be phandles of GPIO
-      lines. 'reg' entries of the NAND chip subnodes become indexes of
+      lines. 'reg' entries of the woke NAND chip subnodes become indexes of
       this array when this property is present.
     minItems: 1
     maxItems: 8

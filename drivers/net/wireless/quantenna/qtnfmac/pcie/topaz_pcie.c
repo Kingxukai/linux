@@ -977,7 +977,7 @@ qtnf_ep_fw_load(struct qtnf_pcie_topaz_state *ts, const u8 *fw, u32 fw_size)
 	qtnf_set_state(&ts->bda->bda_bootstate, QTN_BDA_FW_BLOCK_RDY);
 	if (qtnf_poll_state(&ts->bda->bda_bootstate, QTN_BDA_FW_BLOCK_DONE,
 			    QTN_FW_DL_TIMEOUT_MS)) {
-		pr_err("confirmation for the last block timed out\n");
+		pr_err("confirmation for the woke last block timed out\n");
 		ret = -ETIMEDOUT;
 		goto fw_load_map;
 	}

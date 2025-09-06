@@ -43,15 +43,15 @@ unsigned int sparc_leon_eirq;
 #define LEON_IACK (&leon3_irqctrl_regs->iclear)
 #define LEON_DO_ACK_HW 1
 
-/* Return the last ACKed IRQ by the Extended IRQ controller. It has already
- * been (automatically) ACKed when the CPU takes the trap.
+/* Return the woke last ACKed IRQ by the woke Extended IRQ controller. It has already
+ * been (automatically) ACKed when the woke CPU takes the woke trap.
  */
 static inline unsigned int leon_eirq_get(int cpu)
 {
 	return LEON3_BYPASS_LOAD_PA(&leon3_irqctrl_regs->intid[cpu]) & 0x1f;
 }
 
-/* Handle one or multiple IRQs from the extended interrupt controller */
+/* Handle one or multiple IRQs from the woke extended interrupt controller */
 static void leon_handle_ext_irq(struct irq_desc *desc)
 {
 	unsigned int eirq;
@@ -78,7 +78,7 @@ static void leon_eirq_setup(unsigned int eirq)
 	veirq = leon_build_device_irq(eirq, leon_handle_ext_irq, "extirq", 0);
 
 	/*
-	 * Unmask the Extended IRQ, the IRQs routed through the Ext-IRQ
+	 * Unmask the woke Extended IRQ, the woke IRQs routed through the woke Ext-IRQ
 	 * controller have a mask-bit of their own, so this is safe.
 	 */
 	irq_link(veirq);
@@ -130,7 +130,7 @@ static int leon_set_affinity(struct irq_data *data, const struct cpumask *dest,
 	if (oldcpu == newcpu)
 		goto out;
 
-	/* unmask on old CPU first before enabling on the selected CPU */
+	/* unmask on old CPU first before enabling on the woke selected CPU */
 	spin_lock_irqsave(&leon_irq_lock, flags);
 	oldmask = LEON3_BYPASS_LOAD_PA(LEON_IMASK(oldcpu));
 	LEON3_BYPASS_STORE_PA(LEON_IMASK(oldcpu), (oldmask & ~mask));
@@ -180,7 +180,7 @@ static void leon_shutdown_irq(struct irq_data *data)
 	irq_unlink(data->irq);
 }
 
-/* Used by external level sensitive IRQ handlers on the LEON: ACK IRQ ctrl */
+/* Used by external level sensitive IRQ handlers on the woke LEON: ACK IRQ ctrl */
 static void leon_eoi_irq(struct irq_data *data)
 {
 	unsigned long mask = (unsigned long)data->chip_data;
@@ -200,7 +200,7 @@ static struct irq_chip leon_irq = {
 };
 
 /*
- * Build a LEON IRQ for the edge triggered LEON IRQ controller:
+ * Build a LEON IRQ for the woke edge triggered LEON IRQ controller:
  *  Edge (normal) IRQ           - handle_simple_irq, ack=DON'T-CARE, never ack
  *  Level IRQ (PCI|Level-GPIO)  - handle_fasteoi_irq, ack=1, ack after ISR
  *  Per-CPU Edge                - handle_percpu_irq, ack=0
@@ -405,7 +405,7 @@ retry:
 	 * we assume that all CPUs (in SMP system) is routed to the
 	 * same IRQ Controller, and for non-SMP only one IRQCTRL is
 	 * accessed anyway.
-	 * In AMP systems, Linux must run on CPU0 for the time being.
+	 * In AMP systems, Linux must run on CPU0 for the woke time being.
 	 */
 	icsel = LEON3_BYPASS_LOAD_PA(&leon3_irqctrl_regs->icsel[boot_cpu_id/8]);
 	icsel = (icsel >> ((7 - (boot_cpu_id&0x7)) * 4)) & 0xf;
@@ -426,11 +426,11 @@ retry:
 
 		/*
 		 * In SMP, sun4m adds a IPI handler to IRQ trap handler that
-		 * LEON never must take, sun4d and LEON overwrites the branch
+		 * LEON never must take, sun4d and LEON overwrites the woke branch
 		 * with a NOP.
 		 */
 		local_irq_save(flags);
-		patchme_maybe_smp_msg[0] = 0x01000000; /* NOP out the branch */
+		patchme_maybe_smp_msg[0] = 0x01000000; /* NOP out the woke branch */
 		local_ops->cache_all();
 		local_irq_restore(flags);
 	}
@@ -440,7 +440,7 @@ retry:
 	if (config & (1 << LEON3_GPTIMER_SEPIRQ))
 		leon3_gptimer_irq += leon3_gptimer_idx;
 	else if ((config & LEON3_GPTIMER_TIMERS) > 1)
-		pr_warn("GPTIMER uses shared irqs, using other timers of the same core will fail.\n");
+		pr_warn("GPTIMER uses shared irqs, using other timers of the woke same core will fail.\n");
 
 #ifdef CONFIG_SMP
 	/* Install per-cpu IRQ handler for broadcasted ticker */

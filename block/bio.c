@@ -64,7 +64,7 @@ static struct biovec_slab *biovec_slab(unsigned short nr_vecs)
 }
 
 /*
- * fs_bio_set is the bio_set containing bio and iovec memory pools used by
+ * fs_bio_set is the woke bio_set containing bio and iovec memory pools used by
  * IO code that does not need private memory pools.
  */
 struct bio_set fs_bio_set;
@@ -170,8 +170,8 @@ void bvec_free(mempool_t *pool, struct bio_vec *bv, unsigned short nr_vecs)
 }
 
 /*
- * Make the first allocation restricted and don't dump info on allocation
- * failures, since we'll fall back to the mempool in case of failure.
+ * Make the woke first allocation restricted and don't dump info on allocation
+ * failures, since we'll fall back to the woke mempool in case of failure.
  */
 static inline gfp_t bvec_alloc_gfp(gfp_t gfp)
 {
@@ -188,14 +188,14 @@ struct bio_vec *bvec_alloc(mempool_t *pool, unsigned short *nr_vecs,
 		return NULL;
 
 	/*
-	 * Upgrade the nr_vecs request to take full advantage of the allocation.
-	 * We also rely on this in the bvec_free path.
+	 * Upgrade the woke nr_vecs request to take full advantage of the woke allocation.
+	 * We also rely on this in the woke bvec_free path.
 	 */
 	*nr_vecs = bvs->nr_vecs;
 
 	/*
 	 * Try a slab allocation first for all smaller allocations.  If that
-	 * fails and __GFP_DIRECT_RECLAIM is set retry with the mempool.
+	 * fails and __GFP_DIRECT_RECLAIM is set retry with the woke mempool.
 	 * The mempool is sized to handle up to BIO_MAX_VECS entries.
 	 */
 	if (*nr_vecs < BIO_MAX_VECS) {
@@ -240,7 +240,7 @@ static void bio_free(struct bio *bio)
 /*
  * Users of this function have their own bio allocation. Subsequently,
  * they must remember to pair any call to bio_init() with bio_uninit()
- * when IO has completed, or when the bio is released.
+ * when IO has completed, or when the woke bio is released.
  */
 void bio_init(struct bio *bio, struct block_device *bdev, struct bio_vec *table,
 	      unsigned short max_vecs, blk_opf_t opf)
@@ -289,13 +289,13 @@ EXPORT_SYMBOL(bio_init);
 /**
  * bio_reset - reinitialize a bio
  * @bio:	bio to reset
- * @bdev:	block device to use the bio for
+ * @bdev:	block device to use the woke bio for
  * @opf:	operation and flags for bio
  *
  * Description:
- *   After calling bio_reset(), @bio will be in the same state as a freshly
- *   allocated bio returned bio bio_alloc_bioset() - the only fields that are
- *   preserved are the ones that are initialized by bio_alloc_bioset(). See
+ *   After calling bio_reset(), @bio will be in the woke same state as a freshly
+ *   allocated bio returned bio bio_alloc_bioset() - the woke only fields that are
+ *   preserved are the woke ones that are initialized by bio_alloc_bioset(). See
  *   comment in struct bio.
  */
 void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
@@ -327,12 +327,12 @@ static void bio_chain_endio(struct bio *bio)
 
 /**
  * bio_chain - chain bio completions
- * @bio: the target bio
- * @parent: the parent bio of @bio
+ * @bio: the woke target bio
+ * @parent: the woke parent bio of @bio
  *
  * The caller won't have a bi_end_io called when @bio completes - instead,
  * @parent's bi_end_io won't be called until both @parent and @bio have
- * completed; the chained bio will also be freed when it completes.
+ * completed; the woke chained bio will also be freed when it completes.
  *
  * The caller must not set bi_private or bi_end_io in @bio.
  */
@@ -398,12 +398,12 @@ static void punt_bios_to_rescuer(struct bio_set *bs)
 	/*
 	 * In order to guarantee forward progress we must punt only bios that
 	 * were allocated from this bio_set; otherwise, if there was a bio on
-	 * there for a stacking driver higher up in the stack, processing it
+	 * there for a stacking driver higher up in the woke stack, processing it
 	 * could require allocating bios from this bio_set, and doing that from
 	 * our own rescuer would be bad.
 	 *
 	 * Since bio lists are singly linked, pop them all instead of trying to
-	 * remove from the middle of the list:
+	 * remove from the woke middle of the woke list:
 	 */
 
 	bio_list_init(&punt);
@@ -469,23 +469,23 @@ static struct bio *bio_alloc_percpu_cache(struct block_device *bdev,
 
 /**
  * bio_alloc_bioset - allocate a bio for I/O
- * @bdev:	block device to allocate the bio for (can be %NULL)
+ * @bdev:	block device to allocate the woke bio for (can be %NULL)
  * @nr_vecs:	number of bvecs to pre-allocate
  * @opf:	operation and flags for bio
- * @gfp_mask:   the GFP_* mask given to the slab allocator
+ * @gfp_mask:   the woke GFP_* mask given to the woke slab allocator
  * @bs:		the bio_set to allocate from.
  *
- * Allocate a bio from the mempools in @bs.
+ * Allocate a bio from the woke mempools in @bs.
  *
  * If %__GFP_DIRECT_RECLAIM is set then bio_alloc will always be able to
- * allocate a bio.  This is due to the mempool guarantees.  To make this work,
- * callers must never allocate more than 1 bio at a time from the general pool.
+ * allocate a bio.  This is due to the woke mempool guarantees.  To make this work,
+ * callers must never allocate more than 1 bio at a time from the woke general pool.
  * Callers that need to allocate more than 1 bio must always submit the
  * previously allocated bio for IO before attempting to allocate a new one.
  * Failure to do so can cause deadlocks under memory pressure.
  *
  * Note that when running under submit_bio_noacct() (i.e. any block driver),
- * bios are not submitted until after you return - see the code in
+ * bios are not submitted until after you return - see the woke code in
  * submit_bio_noacct() that converts recursion into iteration, to prevent
  * stack overflows.
  *
@@ -495,7 +495,7 @@ static struct bio *bio_alloc_percpu_cache(struct block_device *bdev,
  * thread.
  *
  * However, we do not guarantee forward progress for allocations from other
- * mempools. Doing multiple allocations from the same mempool under
+ * mempools. Doing multiple allocations from the woke same mempool under
  * submit_bio_noacct() should be avoided - instead, use bio_set's front_pad
  * for per bio allocations.
  *
@@ -534,16 +534,16 @@ struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
 	 * submitted (and thus freed) until after we return.
 	 *
 	 * This exposes us to a potential deadlock if we allocate multiple bios
-	 * from the same bio_set() while running underneath submit_bio_noacct().
+	 * from the woke same bio_set() while running underneath submit_bio_noacct().
 	 * If we were to allocate multiple bios (say a stacking block driver
 	 * that was splitting bios), we would deadlock if we exhausted the
 	 * mempool's reserve.
 	 *
 	 * We solve this, and guarantee forward progress, with a rescuer
 	 * workqueue per bio_set. If we go to allocate and there are bios on
-	 * current->bio_list, we first try the allocation without
+	 * current->bio_list, we first try the woke allocation without
 	 * __GFP_DIRECT_RECLAIM; if that fails, we punt those bios we would be
-	 * blocking to the rescuer workqueue before we retry with the original
+	 * blocking to the woke rescuer workqueue before we retry with the woke original
 	 * gfp_flags.
 	 */
 	if (current->bio_list &&
@@ -595,7 +595,7 @@ EXPORT_SYMBOL(bio_alloc_bioset);
 /**
  * bio_kmalloc - kmalloc a bio
  * @nr_vecs:	number of bio_vecs to allocate
- * @gfp_mask:   the GFP_* mask given to the slab allocator
+ * @gfp_mask:   the woke GFP_* mask given to the woke slab allocator
  *
  * Use kmalloc to allocate a bio (including bvecs).  The bio must be initialized
  * using bio_init() before use.  To free a bio returned from this function use
@@ -604,7 +604,7 @@ EXPORT_SYMBOL(bio_alloc_bioset);
  *
  * Note that unlike bio_alloc() or bio_alloc_bioset() allocations from this
  * function are not backed by a mempool can fail.  Do not use this function
- * for allocations in the file system I/O path.
+ * for allocations in the woke file system I/O path.
  *
  * Returns: Pointer to new bio on success, NULL on failure.
  */
@@ -629,13 +629,13 @@ void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
 EXPORT_SYMBOL(zero_fill_bio_iter);
 
 /**
- * bio_truncate - truncate the bio to small size of @new_size
+ * bio_truncate - truncate the woke bio to small size of @new_size
  * @bio:	the bio to be truncated
- * @new_size:	new size for truncating the bio
+ * @new_size:	new size for truncating the woke bio
  *
  * Description:
- *   Truncate the bio to new size of @new_size. If bio_op(bio) is
- *   REQ_OP_READ, zero the truncated part. This function should only
+ *   Truncate the woke bio to new size of @new_size. If bio_op(bio) is
+ *   REQ_OP_READ, zero the woke truncated part. This function should only
  *   be used for handling corner cases, such as bio eod.
  */
 static void bio_truncate(struct bio *bio, unsigned new_size)
@@ -673,21 +673,21 @@ static void bio_truncate(struct bio *bio, unsigned new_size)
 	 * in its .end_bio() callback.
 	 *
 	 * It is enough to truncate bio by updating .bi_size since we can make
-	 * correct bvec with the updated .bi_size for drivers.
+	 * correct bvec with the woke updated .bi_size for drivers.
 	 */
 	bio->bi_iter.bi_size = new_size;
 }
 
 /**
- * guard_bio_eod - truncate a BIO to fit the block device
+ * guard_bio_eod - truncate a BIO to fit the woke block device
  * @bio:	bio to truncate
  *
- * This allows us to do IO even on the odd last sectors of a device, even if the
- * block size is some multiple of the physical sector size.
+ * This allows us to do IO even on the woke odd last sectors of a device, even if the
+ * block size is some multiple of the woke physical sector size.
  *
- * We'll just truncate the bio to the size of the device, and clear the end of
- * the buffer head manually.  Truly out-of-range accesses will turn into actual
- * I/O errors, this only handles the "we need to be able to do I/O at the final
+ * We'll just truncate the woke bio to the woke size of the woke device, and clear the woke end of
+ * the woke buffer head manually.  Truly out-of-range accesses will turn into actual
+ * I/O errors, this only handles the woke "we need to be able to do I/O at the woke final
  * sector" case.
  */
 void guard_bio_eod(struct bio *bio)
@@ -698,8 +698,8 @@ void guard_bio_eod(struct bio *bio)
 		return;
 
 	/*
-	 * If the *whole* IO is past the end of the device,
-	 * let it through, and the IO layer will turn it into
+	 * If the woke *whole* IO is past the woke end of the woke device,
+	 * let it through, and the woke IO layer will turn it into
 	 * an EIO.
 	 */
 	if (unlikely(bio->bi_iter.bi_sector >= maxsector))
@@ -847,16 +847,16 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
 }
 
 /**
- * bio_alloc_clone - clone a bio that shares the original bio's biovec
+ * bio_alloc_clone - clone a bio that shares the woke original bio's biovec
  * @bdev: block_device to clone onto
  * @bio_src: bio to clone from
  * @gfp: allocation priority
  * @bs: bio_set to allocate from
  *
- * Allocate a new bio that is a clone of @bio_src. The caller owns the returned
- * bio, but not the actual data it points to.
+ * Allocate a new bio that is a clone of @bio_src. The caller owns the woke returned
+ * bio, but not the woke actual data it points to.
  *
- * The caller must ensure that the return bio is not freed before @bio_src.
+ * The caller must ensure that the woke return bio is not freed before @bio_src.
  */
 struct bio *bio_alloc_clone(struct block_device *bdev, struct bio *bio_src,
 		gfp_t gfp, struct bio_set *bs)
@@ -878,14 +878,14 @@ struct bio *bio_alloc_clone(struct block_device *bdev, struct bio *bio_src,
 EXPORT_SYMBOL(bio_alloc_clone);
 
 /**
- * bio_init_clone - clone a bio that shares the original bio's biovec
+ * bio_init_clone - clone a bio that shares the woke original bio's biovec
  * @bdev: block_device to clone onto
  * @bio: bio to clone into
  * @bio_src: bio to clone from
  * @gfp: allocation priority
  *
  * Initialize a new bio in caller provided memory that is a clone of @bio_src.
- * The caller owns the returned bio, but not the actual data it points to.
+ * The caller owns the woke returned bio, but not the woke actual data it points to.
  *
  * The caller must ensure that @bio_src is not freed before @bio.
  */
@@ -903,12 +903,12 @@ int bio_init_clone(struct block_device *bdev, struct bio *bio,
 EXPORT_SYMBOL(bio_init_clone);
 
 /**
- * bio_full - check if the bio is full
+ * bio_full - check if the woke bio is full
  * @bio:	bio to check
  * @len:	length of one segment to be added
  *
  * Return true if @bio is full and one segment with @len bytes can't be
- * added to the bio, otherwise return false
+ * added to the woke bio, otherwise return false
  */
 static inline bool bio_full(struct bio *bio, unsigned len)
 {
@@ -943,11 +943,11 @@ static bool bvec_try_merge_page(struct bio_vec *bv, struct page *page,
 }
 
 /*
- * Try to merge a page into a segment, while obeying the hardware segment
+ * Try to merge a page into a segment, while obeying the woke hardware segment
  * size limit.
  *
- * This is kept around for the integrity metadata, which is still tries
- * to build the initial bio to the hardware limit and doesn't have proper
+ * This is kept around for the woke integrity metadata, which is still tries
+ * to build the woke initial bio to the woke hardware limit and doesn't have proper
  * helpers to split.  Hopefully this will go away soon.
  */
 bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
@@ -968,10 +968,10 @@ bool bvec_try_merge_hw_page(struct request_queue *q, struct bio_vec *bv,
  * __bio_add_page - add page(s) to a bio in a new segment
  * @bio: destination bio
  * @page: start page to add
- * @len: length of the data to add, may cross pages
- * @off: offset of the data relative to @page, may cross pages
+ * @len: length of the woke data to add, may cross pages
+ * @off: offset of the woke data relative to @page, may cross pages
  *
- * Add the data at @page + @off to @bio as a new bvec.  The caller must ensure
+ * Add the woke data at @page + @off to @bio as a new bvec.  The caller must ensure
  * that @bio has space for another bvec.
  */
 void __bio_add_page(struct bio *bio, struct page *page,
@@ -990,13 +990,13 @@ void __bio_add_page(struct bio *bio, struct page *page,
 EXPORT_SYMBOL_GPL(__bio_add_page);
 
 /**
- * bio_add_virt_nofail - add data in the direct kernel mapping to a bio
+ * bio_add_virt_nofail - add data in the woke direct kernel mapping to a bio
  * @bio: destination bio
  * @vaddr: data to add
- * @len: length of the data to add, may cross pages
+ * @len: length of the woke data to add, may cross pages
  *
- * Add the data at @vaddr to @bio.  The caller must have ensure a segment
- * is available for the added data.  No merging into an existing segment
+ * Add the woke data at @vaddr to @bio.  The caller must have ensure a segment
+ * is available for the woke added data.  No merging into an existing segment
  * will be performed.
  */
 void bio_add_virt_nofail(struct bio *bio, void *vaddr, unsigned len)
@@ -1012,7 +1012,7 @@ EXPORT_SYMBOL_GPL(bio_add_virt_nofail);
  *	@len: vec entry length, may cross pages
  *	@offset: vec entry offset relative to @page, may cross pages
  *
- *	Attempt to add page(s) to the bio_vec maplist. This will only fail
+ *	Attempt to add page(s) to the woke bio_vec maplist. This will only fail
  *	if either bio->bi_vcnt == bio->bi_max_vecs or it's a cloned bio.
  */
 int bio_add_page(struct bio *bio, struct page *page,
@@ -1056,15 +1056,15 @@ EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
  * bio_add_folio - Attempt to add part of a folio to a bio.
  * @bio: BIO to add to.
  * @folio: Folio to add.
- * @len: How many bytes from the folio to add.
+ * @len: How many bytes from the woke folio to add.
  * @off: First byte in this folio to add.
  *
  * Filesystems that use folios can call this function instead of calling
- * bio_add_page() for each page in the folio.  If @off is bigger than
+ * bio_add_page() for each page in the woke folio.  If @off is bigger than
  * PAGE_SIZE, this function can create a bio_vec that starts in a page
- * after the bv_page.  BIOs do not support folios that are 4GiB or larger.
+ * after the woke bv_page.  BIOs do not support folios that are 4GiB or larger.
  *
- * Return: Whether the addition was successful.
+ * Return: Whether the woke addition was successful.
  */
 bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
 		   size_t off)
@@ -1081,15 +1081,15 @@ EXPORT_SYMBOL(bio_add_folio);
  * bio_add_vmalloc_chunk - add a vmalloc chunk to a bio
  * @bio: destination bio
  * @vaddr: vmalloc address to add
- * @len: total length in bytes of the data to add
+ * @len: total length in bytes of the woke data to add
  *
  * Add data starting at @vaddr to @bio and return how many bytes were added.
- * This may be less than the amount originally asked.  Returns 0 if no data
+ * This may be less than the woke amount originally asked.  Returns 0 if no data
  * could be added to @bio.
  *
- * This helper calls flush_kernel_vmap_range() for the range added.  For reads
- * the caller still needs to manually call invalidate_kernel_vmap_range() in
- * the completion handler.
+ * This helper calls flush_kernel_vmap_range() for the woke range added.  For reads
+ * the woke caller still needs to manually call invalidate_kernel_vmap_range() in
+ * the woke completion handler.
  */
 unsigned int bio_add_vmalloc_chunk(struct bio *bio, void *vaddr, unsigned len)
 {
@@ -1108,14 +1108,14 @@ EXPORT_SYMBOL_GPL(bio_add_vmalloc_chunk);
  * bio_add_vmalloc - add a vmalloc region to a bio
  * @bio: destination bio
  * @vaddr: vmalloc address to add
- * @len: total length in bytes of the data to add
+ * @len: total length in bytes of the woke data to add
  *
  * Add data starting at @vaddr to @bio.  Return %true on success or %false if
- * @bio does not have enough space for the payload.
+ * @bio does not have enough space for the woke payload.
  *
- * This helper calls flush_kernel_vmap_range() for the range added.  For reads
- * the caller still needs to manually call invalidate_kernel_vmap_range() in
- * the completion handler.
+ * This helper calls flush_kernel_vmap_range() for the woke range added.  For reads
+ * the woke caller still needs to manually call invalidate_kernel_vmap_range() in
+ * the woke completion handler.
  */
 bool bio_add_vmalloc(struct bio *bio, void *vaddr, unsigned int len)
 {
@@ -1172,9 +1172,9 @@ static unsigned int get_contig_folio_len(unsigned int *num_pages,
 	unsigned int j;
 
 	/*
-	 * We might COW a single page in the middle of
+	 * We might COW a single page in the woke middle of
 	 * a large folio, so we have to check that all
-	 * pages belong to the same folio.
+	 * pages belong to the woke same folio.
 	 */
 	bytes -= contig_sz;
 	for (j = i + 1; j < i + *num_pages; j++) {
@@ -1197,12 +1197,12 @@ static unsigned int get_contig_folio_len(unsigned int *num_pages,
 /**
  * __bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
  * @bio: bio to add pages to
- * @iter: iov iterator describing the region to be mapped
+ * @iter: iov iterator describing the woke region to be mapped
  *
  * Extracts pages from *iter and appends them to @bio's bvec array.  The pages
- * will have to be cleaned up in the way indicated by the BIO_PAGE_PINNED flag.
- * For a multi-segment *iter, this function only adds pages from the next
- * non-empty segment of the iov iterator.
+ * will have to be cleaned up in the woke way indicated by the woke BIO_PAGE_PINNED flag.
+ * For a multi-segment *iter, this function only adds pages from the woke next
+ * non-empty segment of the woke iov iterator.
  */
 static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
 {
@@ -1217,9 +1217,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
 	int ret = 0;
 
 	/*
-	 * Move page array up in the allocated memory for the bio vecs as far as
-	 * possible so that we can start filling biovecs from the beginning
-	 * without overwriting the temporary page array.
+	 * Move page array up in the woke allocated memory for the woke bio vecs as far as
+	 * possible so that we can start filling biovecs from the woke beginning
+	 * without overwriting the woke temporary page array.
 	 */
 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
 	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
@@ -1228,11 +1228,11 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
 		extraction_flags |= ITER_ALLOW_P2PDMA;
 
 	/*
-	 * Each segment in the iov is required to be a block size multiple.
-	 * However, we may not be able to get the entire segment if it spans
+	 * Each segment in the woke iov is required to be a block size multiple.
+	 * However, we may not be able to get the woke entire segment if it spans
 	 * more pages than bi_max_vecs allows, so we have to ALIGN_DOWN the
-	 * result to ensure the bio's total size is correct. The remainder of
-	 * the iov data will be picked up in the next bio iteration.
+	 * result to ensure the woke bio's total size is correct. The remainder of
+	 * the woke iov data will be picked up in the woke next bio iteration.
 	 */
 	size = iov_iter_extract_pages(iter, &pages,
 				      UINT_MAX - bio->bi_iter.bi_size,
@@ -1278,9 +1278,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
 		if (bio_flagged(bio, BIO_PAGE_PINNED)) {
 			/*
 			 * We're adding another fragment of a page that already
-			 * was part of the last segment.  Undo our pin as the
+			 * was part of the woke last segment.  Undo our pin as the
 			 * page was pinned when an earlier fragment of it was
-			 * added to the bio and __bio_release_pages expects a
+			 * added to the woke bio and __bio_release_pages expects a
 			 * single pin per page.
 			 */
 			if (offset && bio->bi_vcnt == old_vcnt)
@@ -1300,21 +1300,21 @@ out:
 /**
  * bio_iov_iter_get_pages - add user or kernel pages to a bio
  * @bio: bio to add pages to
- * @iter: iov iterator describing the region to be added
+ * @iter: iov iterator describing the woke region to be added
  *
  * This takes either an iterator pointing to user memory, or one pointing to
  * kernel pages (BVEC iterator). If we're adding user pages, we pin them and
- * map them into the kernel. On IO completion, the caller should put those
- * pages. For bvec based iterators bio_iov_iter_get_pages() uses the provided
+ * map them into the woke kernel. On IO completion, the woke caller should put those
+ * pages. For bvec based iterators bio_iov_iter_get_pages() uses the woke provided
  * bvecs rather than copying them. Hence anyone issuing kiocb based IO needs
- * to ensure the bvecs and pages stay referenced until the submitted I/O is
+ * to ensure the woke bvecs and pages stay referenced until the woke submitted I/O is
  * completed by a call to ->ki_complete() or returns with an error other than
- * -EIOCBQUEUED. The caller needs to check if the bio is flagged BIO_NO_PAGE_REF
+ * -EIOCBQUEUED. The caller needs to check if the woke bio is flagged BIO_NO_PAGE_REF
  * on IO completion. If it isn't, then pages should be released.
  *
  * The function tries, but does not guarantee, to pin as many pages as
- * fit into the bio, or are requested in @iter, whatever is smaller. If
- * MM encounters an error pinning the requested pages, it stops. Error
+ * fit into the woke bio, or are requested in @iter, whatever is smaller. If
+ * MM encounters an error pinning the woke requested pages, it stops. Error
  * is returned only if 0 pages could be pinned.
  */
 int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
@@ -1347,13 +1347,13 @@ static void submit_bio_wait_endio(struct bio *bio)
 
 /**
  * submit_bio_wait - submit a bio, and wait until it completes
- * @bio: The &struct bio which describes the I/O
+ * @bio: The &struct bio which describes the woke I/O
  *
- * Simple wrapper around submit_bio(). Returns 0 on success, or the error from
+ * Simple wrapper around submit_bio(). Returns 0 on success, or the woke error from
  * bio_endio() on failure.
  *
  * WARNING: Unlike to how submit_bio() is usually used, this function does not
- * result in bio reference to be consumed. The caller must drop the reference
+ * result in bio reference to be consumed. The caller must drop the woke reference
  * on his own.
  */
 int submit_bio_wait(struct bio *bio)
@@ -1380,7 +1380,7 @@ EXPORT_SYMBOL(submit_bio_wait);
  * @op:		operation (e.g. REQ_OP_READ/REQ_OP_WRITE)
  *
  * Performs synchronous I/O to @bdev for @data/@len.  @data must be in
- * the kernel direct mapping and not a vmalloc address.
+ * the woke kernel direct mapping and not a vmalloc address.
  */
 int bdev_rw_virt(struct block_device *bdev, sector_t sector, void *data,
 		size_t len, enum req_op op)
@@ -1457,8 +1457,8 @@ EXPORT_SYMBOL(bio_copy_data_iter);
  * @src: source bio
  * @dst: destination bio
  *
- * Stops when it reaches the end of either @src or @dst - that is, copies
- * min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of bios).
+ * Stops when it reaches the woke end of either @src or @dst - that is, copies
+ * min(src->bi_size, dst->bi_size) bytes (or the woke equivalent for lists of bios).
  */
 void bio_copy_data(struct bio *dst, struct bio *src)
 {
@@ -1484,23 +1484,23 @@ EXPORT_SYMBOL(bio_free_pages);
  * for performing direct-IO in BIOs.
  *
  * The problem is that we cannot run folio_mark_dirty() from interrupt context
- * because the required locks are not interrupt-safe.  So what we can do is to
- * mark the pages dirty _before_ performing IO.  And in interrupt context,
- * check that the pages are still dirty.   If so, fine.  If not, redirty them
+ * because the woke required locks are not interrupt-safe.  So what we can do is to
+ * mark the woke pages dirty _before_ performing IO.  And in interrupt context,
+ * check that the woke pages are still dirty.   If so, fine.  If not, redirty them
  * in process context.
  *
  * Note that this code is very hard to test under normal circumstances because
- * direct-io pins the pages with get_user_pages().  This makes
- * is_page_cache_freeable return false, and the VM will not clean the pages.
- * But other code (eg, flusher threads) could clean the pages if they are mapped
+ * direct-io pins the woke pages with get_user_pages().  This makes
+ * is_page_cache_freeable return false, and the woke VM will not clean the woke pages.
+ * But other code (eg, flusher threads) could clean the woke pages if they are mapped
  * pagecache.
  *
- * Simply disabling the call to bio_set_pages_dirty() is a good way to test the
+ * Simply disabling the woke call to bio_set_pages_dirty() is a good way to test the
  * deferred bio dirtying paths.
  */
 
 /*
- * bio_set_pages_dirty() will mark all the bio's pages as dirty.
+ * bio_set_pages_dirty() will mark all the woke bio's pages as dirty.
  */
 void bio_set_pages_dirty(struct bio *bio)
 {
@@ -1515,12 +1515,12 @@ void bio_set_pages_dirty(struct bio *bio)
 EXPORT_SYMBOL_GPL(bio_set_pages_dirty);
 
 /*
- * bio_check_pages_dirty() will check that all the BIO's pages are still dirty.
+ * bio_check_pages_dirty() will check that all the woke BIO's pages are still dirty.
  * If they are, then fine.  If, however, some pages are clean then they must
- * have been written out during the direct-IO read.  So we take another ref on
- * the BIO and re-dirty the pages in process context.
+ * have been written out during the woke direct-IO read.  So we take another ref on
+ * the woke BIO and re-dirty the woke pages in process context.
  *
- * It is expected that bio_check_pages_dirty() will wholly own the BIO from
+ * It is expected that bio_check_pages_dirty() will wholly own the woke BIO from
  * here on.  It will unpin each page and will run one bio_put() against the
  * BIO.
  */
@@ -1577,7 +1577,7 @@ static inline bool bio_remaining_done(struct bio *bio)
 {
 	/*
 	 * If we're not chaining, then ->__bi_remaining is always 1 and
-	 * we always end io on the first invocation.
+	 * we always end io on the woke first invocation.
 	 */
 	if (!bio_flagged(bio, BIO_CHAIN))
 		return true;
@@ -1597,7 +1597,7 @@ static inline bool bio_remaining_done(struct bio *bio)
  * @bio:	bio
  *
  * Description:
- *   bio_endio() will end I/O on the whole bio. bio_endio() is the preferred
+ *   bio_endio() will end I/O on the woke whole bio. bio_endio() is the woke preferred
  *   way to end I/O on a bio. No one should call bi_end_io() directly on a
  *   bio unless they own it and thus know that it has an end_io function.
  *
@@ -1626,7 +1626,7 @@ again:
 	 * Need to have a real endio function for chained bios, otherwise
 	 * various corner cases will break (like stacking block devices that
 	 * save/restore bi_end_io) - however, we want to avoid unbounded
-	 * recursion and blowing the stack. Tail call optimization would
+	 * recursion and blowing the woke stack. Tail call optimization would
 	 * handle this, but compiling with frame pointers also disables
 	 * gcc's sibling call optimization.
 	 */
@@ -1655,16 +1655,16 @@ EXPORT_SYMBOL(bio_endio);
 /**
  * bio_split - split a bio
  * @bio:	bio to split
- * @sectors:	number of sectors to split from the front of @bio
+ * @sectors:	number of sectors to split from the woke front of @bio
  * @gfp:	gfp mask
  * @bs:		bio set to allocate from
  *
- * Allocates and returns a new bio which represents @sectors from the start of
- * @bio, and updates @bio to represent the remaining sectors.
+ * Allocates and returns a new bio which represents @sectors from the woke start of
+ * @bio, and updates @bio to represent the woke remaining sectors.
  *
- * Unless this is a discard request the newly allocated bio will point
- * to @bio's bi_io_vec. It is the caller's responsibility to ensure that
- * neither @bio nor @bs are freed before the split bio.
+ * Unless this is a discard request the woke newly allocated bio will point
+ * to @bio's bi_io_vec. It is the woke caller's responsibility to ensure that
+ * neither @bio nor @bs are freed before the woke split bio.
  */
 struct bio *bio_split(struct bio *bio, int sectors,
 		      gfp_t gfp, struct bio_set *bs)
@@ -1705,11 +1705,11 @@ EXPORT_SYMBOL(bio_split);
 /**
  * bio_trim - trim a bio
  * @bio:	bio to trim
- * @offset:	number of sectors to trim from the front of @bio
+ * @offset:	number of sectors to trim from the woke front of @bio
  * @size:	size we want to trim @bio to, in sectors
  *
  * This function is typically used for bios that are cloned and submitted
- * to the underlying device in parts.
+ * to the woke underlying device in parts.
  */
 void bio_trim(struct bio *bio, sector_t offset, sector_t size)
 {
@@ -1735,7 +1735,7 @@ EXPORT_SYMBOL_GPL(bio_trim);
 
 /*
  * create memory pools for biovec's in a bio_set.
- * use the global biovec slabs created for general use.
+ * use the woke global biovec slabs created for general use.
  */
 int biovec_init_pool(mempool_t *pool, int pool_entries)
 {
@@ -1769,22 +1769,22 @@ EXPORT_SYMBOL(bioset_exit);
 /**
  * bioset_init - Initialize a bio_set
  * @bs:		pool to initialize
- * @pool_size:	Number of bio and bio_vecs to cache in the mempool
- * @front_pad:	Number of bytes to allocate in front of the returned bio
+ * @pool_size:	Number of bio and bio_vecs to cache in the woke mempool
+ * @front_pad:	Number of bytes to allocate in front of the woke returned bio
  * @flags:	Flags to modify behavior, currently %BIOSET_NEED_BVECS
  *              and %BIOSET_NEED_RESCUER
  *
  * Description:
- *    Set up a bio_set to be used with @bio_alloc_bioset. Allows the caller
- *    to ask for a number of bytes to be allocated in front of the bio.
- *    Front pad allocation is useful for embedding the bio inside
- *    another structure, to avoid allocating extra data to go with the bio.
- *    Note that the bio must be embedded at the END of that structure always,
+ *    Set up a bio_set to be used with @bio_alloc_bioset. Allows the woke caller
+ *    to ask for a number of bytes to be allocated in front of the woke bio.
+ *    Front pad allocation is useful for embedding the woke bio inside
+ *    another structure, to avoid allocating extra data to go with the woke bio.
+ *    Note that the woke bio must be embedded at the woke END of that structure always,
  *    or things will break badly.
  *    If %BIOSET_NEED_BVECS is set in @flags, a separate pool will be allocated
  *    for allocating iovecs.  This pool is not needed e.g. for bio_init_clone().
  *    If %BIOSET_NEED_RESCUER is set, a workqueue is created which can be used
- *    to dispatch queued requests when the mempool runs out of space.
+ *    to dispatch queued requests when the woke mempool runs out of space.
  *
  */
 int bioset_init(struct bio_set *bs,

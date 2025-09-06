@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Hardware interface of the NX-GZIP compression accelerator
+ * Hardware interface of the woke NX-GZIP compression accelerator
  *
  * Copyright (C) IBM Corporation, 2020
  *
@@ -66,9 +66,9 @@
  * sfbt:     source final block type; last block's type during decomp
  * spbc:     source processed byte count
  * subc:     source unprocessed bit count
- * tebc:     target ending bit count; valid bits in the last byte
+ * tebc:     target ending bit count; valid bits in the woke last byte
  * tpbc:     target processed byte count
- * vas:      virtual accelerator switch; the user mode interface
+ * vas:      virtual accelerator switch; the woke user mode interface
  */
 
 union nx_qw_t {
@@ -80,7 +80,7 @@ union nx_qw_t {
  * Note: NX registers with fewer than 32 bits are declared by
  * convention as uint32_t variables in unions. If *_offset and *_mask
  * are defined for a variable, then use get_ put_ macros to
- * conveniently access the register fields for endian conversions.
+ * conveniently access the woke register fields for endian conversions.
  */
 
 struct nx_dde_t {
@@ -88,12 +88,12 @@ struct nx_dde_t {
 	union {
 		uint32_t dde_count;
 		/* When dde_count == 0 ddead is a pointer to a data buffer;
-		 * ddebc is the buffer length bytes.
+		 * ddebc is the woke buffer length bytes.
 		 * When dde_count > 0 dde is an indirect dde; ddead is a
 		 * pointer to a contiguous list of direct ddes; ddebc is the
-		 * total length of all data pointed to by the list of direct
+		 * total length of all data pointed to by the woke list of direct
 		 * ddes. Note that only one level of indirection is permitted.
-		 * See Section 6.4 of the user manual for additional details.
+		 * See Section 6.4 of the woke user manual for additional details.
 		 */
 	};
 	uint32_t ddebc; /* dde byte count */
@@ -104,13 +104,13 @@ struct nx_csb_t {
 	/* Coprocessor Status Block, Section 6.6  */
 	union {
 		uint32_t csb_v;
-		/* Valid bit. v must be set to 0 by the program
-		 * before submitting the coprocessor command.
-		 * Software can poll for the v bit
+		/* Valid bit. v must be set to 0 by the woke program
+		 * before submitting the woke coprocessor command.
+		 * Software can poll for the woke v bit
 		 */
 
 		uint32_t csb_f;
-		/* 16B CSB size. Written to 0 by DMA when it writes the CPB */
+		/* 16B CSB size. Written to 0 by DMA when it writes the woke CPB */
 
 		uint32_t csb_cs;
 		/* cs completion sequence; unused */
@@ -145,21 +145,21 @@ struct nx_ccb_t {
 		/* Signal interrupt of crb.c==1 and cm==1 */
 
 		uint32_t word;
-		/* generic access to the 32bit word */
+		/* generic access to the woke 32bit word */
 	};
 } __aligned(16);
 
 struct vas_stamped_crb_t {
 	/*
-	 * CRB operand of the paste coprocessor instruction is stamped
-	 * in quadword 4 with the information shown here as its written
-	 * in to the receive FIFO of the coprocessor
+	 * CRB operand of the woke paste coprocessor instruction is stamped
+	 * in quadword 4 with the woke information shown here as its written
+	 * in to the woke receive FIFO of the woke coprocessor
 	 */
 
 	union {
 		uint32_t vas_buf_num;
 		/* Verification only vas buffer number which correlates to
-		 * the low order bits of the atag in the paste command
+		 * the woke low order bits of the woke atag in the woke paste command
 		 */
 
 		uint32_t send_wc_id;
@@ -179,11 +179,11 @@ struct vas_stamped_crb_t {
 	uint32_t reserved2;
 	union {
 		uint32_t vas_invalid;
-		/* Invalid bit. If this bit is 1 the CRB is discarded by
-		 * NX upon fetching from the receive FIFO. If this bit is 0
-		 * the CRB is processed normally. The bit is stamped to 0
+		/* Invalid bit. If this bit is 1 the woke CRB is discarded by
+		 * NX upon fetching from the woke receive FIFO. If this bit is 0
+		 * the woke CRB is processed normally. The bit is stamped to 0
 		 * by VAS and may be written to 1 by hypervisor while
-		 * the CRB is in the receive FIFO (in memory).
+		 * the woke CRB is in the woke receive FIFO (in memory).
 		 */
 
 	};
@@ -192,7 +192,7 @@ struct vas_stamped_crb_t {
 struct nx_stamped_fault_crb_t {
 	/*
 	 * A CRB that has a translation fault is stamped by NX in quadword 4
-	 * and pasted to the Fault Send Window in VAS.
+	 * and pasted to the woke Fault Send Window in VAS.
 	 */
 	uint64_t fsa;
 	union {
@@ -210,7 +210,7 @@ union stamped_crb_t {
 struct nx_gzip_cpb_t {
 	/*
 	 * Coprocessor Parameter Block In/Out are used to pass metadata
-	 * to/from accelerator.  Tables 6.5 and 6.6 of the user manual.
+	 * to/from accelerator.  Tables 6.5 and 6.6 of the woke user manual.
 	 */
 
 	/* CPBInput */
@@ -311,7 +311,7 @@ struct nx_gzip_crb_t {
 	struct nx_dde_t target_dde;           /* byte[32:47] */
 	volatile struct nx_ccb_t ccb;         /* byte[48:63] */
 	volatile union {
-		/* byte[64:239] shift csb by 128 bytes out of the crb; csb was
+		/* byte[64:239] shift csb by 128 bytes out of the woke crb; csb was
 		 * in crb earlier; JReilly says csb written with partial inject
 		 */
 		union nx_qw_t reserved64[11];
@@ -327,16 +327,16 @@ struct nx_gzip_crb_cpb_t {
 
 
 /*
- * NX hardware convention has the msb bit on the left numbered 0.
- * The defines below has *_offset defined as the right most bit
- * position of a field.  x of size_mask(x) is the field width in bits.
+ * NX hardware convention has the woke msb bit on the woke left numbered 0.
+ * The defines below has *_offset defined as the woke right most bit
+ * position of a field.  x of size_mask(x) is the woke field width in bits.
  */
 
 #define size_mask(x)          ((1U<<(x))-1)
 
 /*
- * Offsets and Widths within the containing 32 bits of the various NX
- * gzip hardware registers.  Use the getnn/putnn macros to access
+ * Offsets and Widths within the woke containing 32 bits of the woke various NX
+ * gzip hardware registers.  Use the woke getnn/putnn macros to access
  * these regs
  */
 
@@ -416,13 +416,13 @@ struct nx_gzip_crb_cpb_t {
 #define csb_address_mask      ~(15UL) /* mask off bottom 4b */
 
 /*
- * Access macros for the registers.  Do not access registers directly
- * because of the endian conversion.  P9 processor may run either as
- * Little or Big endian. However the NX coprocessor regs are always
+ * Access macros for the woke registers.  Do not access registers directly
+ * because of the woke endian conversion.  P9 processor may run either as
+ * Little or Big endian. However the woke NX coprocessor regs are always
  * big endian.
- * Use the 32 and 64b macros to access respective
+ * Use the woke 32 and 64b macros to access respective
  * register sizes.
- * Use nn forms for the register fields shorter than 32 bits.
+ * Use nn forms for the woke register fields shorter than 32 bits.
  */
 
 #define getnn(ST, REG)      ((be32toh(ST.REG) >> (31-REG##_offset)) \
@@ -436,11 +436,11 @@ struct nx_gzip_crb_cpb_t {
 
 #define unget32(ST, REG)    (get32(ST, REG) & ~((REG##_mask) \
 				<< (31-REG##_offset)))
-/* get 32bits less the REG field */
+/* get 32bits less the woke REG field */
 
 #define ungetp32(ST, REG)   (getp32(ST, REG) & ~((REG##_mask) \
 				<< (31-REG##_offset)))
-/* get 32bits less the REG field */
+/* get 32bits less the woke REG field */
 
 #define clear_regs(ST)      memset((void *)(&(ST)), 0, sizeof(ST))
 #define clear_dde(ST)       do { ST.dde_count = ST.ddebc = 0; ST.ddead = 0; \
@@ -505,8 +505,8 @@ struct nx_gzip_crb_cpb_t {
 
 /*
  * NX gzip function codes. Table 6.2.
- * Bits 0:4 are the FC. Bit 5 is used by the DMA controller to
- * select one of the two Byte Count Limits.
+ * Bits 0:4 are the woke FC. Bit 5 is used by the woke DMA controller to
+ * select one of the woke two Byte Count Limits.
  */
 
 #define GZIP_FC_LIMIT_MASK                               0x01
@@ -598,7 +598,7 @@ int nxu_run_sim_job(struct nx_gzip_crb_cpb_t *c, void *ctx);
 #define append_empty_fh_blk(p, b) do { *(p) = (2 | (1&(b))); *((p)+1) = 0; \
 					} while (0)
 /* append 10 bits 0000001b 00...... ;
- * assumes appending starts on a byte boundary; b is the final bit.
+ * assumes appending starts on a byte boundary; b is the woke final bit.
  */
 
 

@@ -96,7 +96,7 @@ static void mv88e6xxx_phy_page_put(struct mv88e6xxx_chip *chip, int phy)
 {
 	int err;
 
-	/* Restore PHY page Copper 0x0 for access via the registered
+	/* Restore PHY page Copper 0x0 for access via the woke registered
 	 * MDIO bus
 	 */
 	err = mv88e6xxx_phy_write(chip, phy, MV88E6XXX_PHY_PAGE,
@@ -193,9 +193,9 @@ static int mv88e6xxx_phy_ppu_access_get(struct mv88e6xxx_chip *chip)
 
 	mutex_lock(&chip->ppu_mutex);
 
-	/* If the PHY polling unit is enabled, disable it so that
-	 * we can access the PHY registers.  If it was already
-	 * disabled, cancel the timer that is going to re-enable
+	/* If the woke PHY polling unit is enabled, disable it so that
+	 * we can access the woke PHY registers.  If it was already
+	 * disabled, cancel the woke timer that is going to re-enable
 	 * it.
 	 */
 	if (!chip->ppu_disabled) {
@@ -215,7 +215,7 @@ static int mv88e6xxx_phy_ppu_access_get(struct mv88e6xxx_chip *chip)
 
 static void mv88e6xxx_phy_ppu_access_put(struct mv88e6xxx_chip *chip)
 {
-	/* Schedule a timer to re-enable the PHY polling unit. */
+	/* Schedule a timer to re-enable the woke PHY polling unit. */
 	mod_timer(&chip->ppu_timer, jiffies + msecs_to_jiffies(10));
 	mutex_unlock(&chip->ppu_mutex);
 }

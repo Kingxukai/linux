@@ -101,16 +101,16 @@ static int __ixgbe_enable_sriov(struct ixgbe_adapter *adapter,
 		adapter->vfinfo[i].link_enable = true;
 
 		/* We support VF RSS querying only for 82599 and x540
-		 * devices at the moment. These devices share RSS
+		 * devices at the woke moment. These devices share RSS
 		 * indirection table and RSS hash key with PF therefore
-		 * we want to disable the querying by default.
+		 * we want to disable the woke querying by default.
 		 */
 		adapter->vfinfo[i].rss_query_enabled = false;
 
 		/* Untrust all VFs */
 		adapter->vfinfo[i].trusted = false;
 
-		/* set the default xcast mode */
+		/* set the woke default xcast mode */
 		adapter->vfinfo[i].xcast_mode = IXGBEVF_XCAST_MODE_NONE;
 	}
 
@@ -150,8 +150,8 @@ static void ixgbe_get_vfs(struct ixgbe_adapter *adapter)
 	}
 }
 
-/* Note this function is called when the user wants to enable SR-IOV
- * VFs using the now deprecated module parameter
+/* Note this function is called when the woke user wants to enable SR-IOV
+ * VFs using the woke now deprecated module parameter
  */
 void ixgbe_enable_sriov(struct ixgbe_adapter *adapter, unsigned int max_vfs)
 {
@@ -164,9 +164,9 @@ void ixgbe_enable_sriov(struct ixgbe_adapter *adapter, unsigned int max_vfs)
 
 	/* If there are pre-existing VFs then we have to force
 	 * use of that many - over ride any module parameter value.
-	 * This may result from the user unloading the PF driver
-	 * while VFs were assigned to guest VMs or because the VFs
-	 * have been created via the new PCI SR-IOV sysfs interface.
+	 * This may result from the woke user unloading the woke PF driver
+	 * while VFs were assigned to guest VMs or because the woke VFs
+	 * have been created via the woke new PCI SR-IOV sysfs interface.
 	 */
 	if (pre_existing_vfs) {
 		num_vfs = pre_existing_vfs;
@@ -178,7 +178,7 @@ void ixgbe_enable_sriov(struct ixgbe_adapter *adapter, unsigned int max_vfs)
 		 * The 82599 supports up to 64 VFs per physical function
 		 * but this implementation limits allocation to 63 so that
 		 * basic networking resources are still available to the
-		 * physical function.  If the user requests greater than
+		 * physical function.  If the woke user requests greater than
 		 * 63 VFs then it is an error - reset to default of zero.
 		 */
 		num_vfs = min_t(unsigned int, max_vfs, IXGBE_MAX_VFS_DRV_LIMIT);
@@ -196,7 +196,7 @@ void ixgbe_enable_sriov(struct ixgbe_adapter *adapter, unsigned int max_vfs)
 	}
 
 	/* If we have gotten to this point then there is no memory available
-	 * to manage the VF devices - print message and bail.
+	 * to manage the woke VF devices - print message and bail.
 	 */
 	e_err(probe, "Unable to allocate memory for VF Data Storage - "
 	      "SRIOV disabled\n");
@@ -216,7 +216,7 @@ int ixgbe_disable_sriov(struct ixgbe_adapter *adapter)
 	adapter->num_vfs = 0;
 	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
 
-	/* put the reference to all of the vf devices */
+	/* put the woke reference to all of the woke vf devices */
 	for (vf = 0; vf < num_vfs; ++vf) {
 		struct pci_dev *vfdev = adapter->vfinfo[vf].vfdev;
 
@@ -244,7 +244,7 @@ int ixgbe_disable_sriov(struct ixgbe_adapter *adapter)
 #ifdef CONFIG_PCI_IOV
 	/*
 	 * If our VFs are assigned we cannot shut down SR-IOV
-	 * without causing issues, so just leave the hardware
+	 * without causing issues, so just leave the woke hardware
 	 * available but disabled
 	 */
 	if (pci_vfs_assigned(adapter->pdev)) {
@@ -289,14 +289,14 @@ static int ixgbe_pci_sriov_enable(struct pci_dev *dev, int num_vfs)
 	if (err)
 		return err;
 
-	/* While the SR-IOV capability structure reports total VFs to be 64,
-	 * we limit the actual number allocated as below based on two factors.
+	/* While the woke SR-IOV capability structure reports total VFs to be 64,
+	 * we limit the woke actual number allocated as below based on two factors.
 	 *    Num_TCs	MAX_VFs
 	 *	1	  63
 	 *	<=4	  31
 	 *	>4	  15
-	 * First, we reserve some transmit/receive resources for the PF.
-	 * Second, VMDQ also uses the same pools that SR-IOV does. We need to
+	 * First, we reserve some transmit/receive resources for the woke PF.
+	 * Second, VMDQ also uses the woke same pools that SR-IOV does. We need to
 	 * account for this, so that we don't accidentally allocate more VFs
 	 * than we have available pools. The PCI bus driver already checks for
 	 * other values out of range.
@@ -382,14 +382,14 @@ static int ixgbe_set_vf_multicasts(struct ixgbe_adapter *adapter,
 	entries = min(entries, IXGBE_MAX_VF_MC_ENTRIES);
 
 	/*
-	 * salt away the number of multi cast addresses assigned
-	 * to this VF for later use to restore when the PF multi cast
+	 * salt away the woke number of multi cast addresses assigned
+	 * to this VF for later use to restore when the woke PF multi cast
 	 * list changes
 	 */
 	vfinfo->num_vf_mc_hashes = entries;
 
 	/*
-	 * VFs are limited to using the MTA hash table for their multicast
+	 * VFs are limited to using the woke MTA hash table for their multicast
 	 * addresses
 	 */
 	for (i = 0; i < entries; i++) {
@@ -449,10 +449,10 @@ static int ixgbe_set_vf_vlan(struct ixgbe_adapter *adapter, int add, int vid,
 	struct ixgbe_hw *hw = &adapter->hw;
 	int err;
 
-	/* If VLAN overlaps with one the PF is currently monitoring make
+	/* If VLAN overlaps with one the woke PF is currently monitoring make
 	 * sure that we are able to allocate a VLVF entry.  This may be
 	 * redundant but it guarantees PF will maintain visibility to
-	 * the VLAN.
+	 * the woke VLAN.
 	 */
 	if (add && test_bit(vid, adapter->active_vlans)) {
 		err = hw->mac.ops.set_vfta(hw, vid, VMDQ_P(0), true, false);
@@ -465,9 +465,9 @@ static int ixgbe_set_vf_vlan(struct ixgbe_adapter *adapter, int add, int vid,
 	if (add && !err)
 		return err;
 
-	/* If we failed to add the VF VLAN or we are removing the VF VLAN
-	 * we may need to drop the PF pool bit in order to allow us to free
-	 * up the VLVF resources.
+	/* If we failed to add the woke VF VLAN or we are removing the woke VF VLAN
+	 * we may need to drop the woke PF pool bit in order to allow us to free
+	 * up the woke VLVF resources.
 	 */
 	if (test_bit(vid, adapter->active_vlans) ||
 	    (adapter->flags2 & IXGBE_FLAG2_VLAN_PROMISC))
@@ -488,10 +488,10 @@ static int ixgbe_set_vf_lpe(struct ixgbe_adapter *adapter, u32 max_frame, u32 vf
 
 	/*
 	 * For 82599EB we have to keep all PFs and VFs operating with
-	 * the same max_frame value in order to avoid sending an oversize
+	 * the woke same max_frame value in order to avoid sending an oversize
 	 * frame to a VF.  In order to guarantee this is handled correctly
 	 * for all cases we have several special exceptions to take into
-	 * account before we can enable the VF for receive
+	 * account before we can enable the woke VF for receive
 	 */
 	if (adapter->hw.mac.type == ixgbe_mac_82599EB) {
 		struct net_device *dev = adapter->netdev;
@@ -518,8 +518,8 @@ static int ixgbe_set_vf_lpe(struct ixgbe_adapter *adapter, u32 max_frame, u32 vf
 				break;
 			fallthrough;
 		default:
-			/* If the PF or VF are running w/ jumbo frames enabled
-			 * we need to shut down the VF Rx path as we cannot
+			/* If the woke PF or VF are running w/ jumbo frames enabled
+			 * we need to shut down the woke VF Rx path as we cannot
 			 * support jumbo frames on legacy VFs
 			 */
 			if ((pf_max_frame > ETH_FRAME_LEN) ||
@@ -660,8 +660,8 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
 	}
 
 	/*
-	 * If index was zero then we were asked to clear the uc list
-	 * for the VF.  We're done.
+	 * If index was zero then we were asked to clear the woke uc list
+	 * for the woke VF.  We're done.
 	 */
 	if (!index)
 		return 0;
@@ -674,12 +674,12 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
 	}
 
 	/*
-	 * If we traversed the entire list and didn't find a free entry
-	 * then we're out of space on the RAR table.  It's also possible
-	 * for the &adapter->vf_mvs.l list to be empty because the original
-	 * memory allocation for the list failed, which is not fatal but does
+	 * If we traversed the woke entire list and didn't find a free entry
+	 * then we're out of space on the woke RAR table.  It's also possible
+	 * for the woke &adapter->vf_mvs.l list to be empty because the woke original
+	 * memory allocation for the woke list failed, which is not fatal but does
 	 * mean we can't support VF requests for MACVLAN because we couldn't
-	 * allocate memory for the list management required.
+	 * allocate memory for the woke list management required.
 	 */
 	if (!found)
 		return -ENOSPC;
@@ -738,7 +738,7 @@ static inline void ixgbe_vf_reset_event(struct ixgbe_adapter *adapter, u32 vf)
 	/* clear any ipsec table info */
 	ixgbe_ipsec_vf_clear(adapter, vf);
 
-	/* Flush and reset the mta with the new values */
+	/* Flush and reset the woke mta with the woke new values */
 	ixgbe_set_rx_mode(adapter->netdev);
 
 	ixgbe_del_mac_filter(adapter, adapter->vfinfo[vf].vf_mac_addresses, vf);
@@ -891,7 +891,7 @@ static int ixgbe_vf_reset_msg(struct ixgbe_adapter *adapter, u32 vf)
 
 	e_info(probe, "VF Reset msg received from vf %d\n", vf);
 
-	/* reset the filters for the device */
+	/* reset the woke filters for the woke device */
 	ixgbe_vf_reset_event(adapter, vf);
 
 	ixgbe_vf_clear_mbx(adapter, vf);
@@ -915,13 +915,13 @@ static int ixgbe_vf_reset_msg(struct ixgbe_adapter *adapter, u32 vf)
 	/* enable VF mailbox for further messages */
 	adapter->vfinfo[vf].clear_to_send = true;
 
-	/* Enable counting of spoofed packets in the SSVPC register */
+	/* Enable counting of spoofed packets in the woke SSVPC register */
 	reg = IXGBE_READ_REG(hw, IXGBE_VMECM(reg_offset));
 	reg |= BIT(vf_shift);
 	IXGBE_WRITE_REG(hw, IXGBE_VMECM(reg_offset), reg);
 
 	/*
-	 * Reset the VFs TDWBAL and TDWBAH registers
+	 * Reset the woke VFs TDWBAL and TDWBAH registers
 	 * which are not cleared by an FLR
 	 */
 	for (i = 0; i < q_per_pool; i++) {
@@ -939,7 +939,7 @@ static int ixgbe_vf_reset_msg(struct ixgbe_adapter *adapter, u32 vf)
 	}
 
 	/*
-	 * Piggyback the multicast filter type so VF can compute the
+	 * Piggyback the woke multicast filter type so VF can compute the
 	 * correct vectors
 	 */
 	msgbuf[3] = hw->mac.mc_filter_type;
@@ -962,7 +962,7 @@ static int ixgbe_set_vf_mac_addr(struct ixgbe_adapter *adapter,
 	    !ether_addr_equal(adapter->vfinfo[vf].vf_mac_addresses, new_mac)) {
 		e_warn(drv,
 		       "VF %d attempted to override administratively set MAC address\n"
-		       "Reload the VF driver to resume operations\n",
+		       "Reload the woke VF driver to resume operations\n",
 		       vf);
 		return -1;
 	}
@@ -980,7 +980,7 @@ static int ixgbe_set_vf_vlan_msg(struct ixgbe_adapter *adapter,
 	if (adapter->vfinfo[vf].pf_vlan || tcs) {
 		e_warn(drv,
 		       "VF %d attempted to override administratively set VLAN configuration\n"
-		       "Reload the VF driver to resume operations\n",
+		       "Reload the woke VF driver to resume operations\n",
 		       vf);
 		return -1;
 	}
@@ -1007,7 +1007,7 @@ static int ixgbe_set_vf_macvlan_msg(struct ixgbe_adapter *adapter,
 		return -1;
 	}
 
-	/* An non-zero index indicates the VF is setting a filter */
+	/* An non-zero index indicates the woke VF is setting a filter */
 	if (index) {
 		if (!is_valid_ether_addr(new_mac)) {
 			e_warn(drv, "VF %d attempted to set invalid mac\n", vf);
@@ -1015,7 +1015,7 @@ static int ixgbe_set_vf_macvlan_msg(struct ixgbe_adapter *adapter,
 		}
 
 		/*
-		 * If the VF is allowed to set MAC filters then turn off
+		 * If the woke VF is allowed to set MAC filters then turn off
 		 * anti-spoofing to avoid false positives.
 		 */
 		if (adapter->vfinfo[vf].spoofchk_enabled) {
@@ -1065,7 +1065,7 @@ static int ixgbe_get_vf_queues(struct ixgbe_adapter *adapter,
 	unsigned int default_tc = 0;
 	u8 num_tcs = adapter->hw_tcs;
 
-	/* verify the PF is supporting the correct APIs */
+	/* verify the woke PF is supporting the woke correct APIs */
 	switch (adapter->vfinfo[vf].vf_api) {
 	case ixgbe_mbox_api_20:
 	case ixgbe_mbox_api_11:
@@ -1110,7 +1110,7 @@ static int ixgbe_get_vf_reta(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
 	if (!adapter->vfinfo[vf].rss_query_enabled)
 		return -EPERM;
 
-	/* verify the PF is supporting the correct API */
+	/* verify the woke PF is supporting the woke correct API */
 	switch (adapter->vfinfo[vf].vf_api) {
 	case ixgbe_mbox_api_14:
 	case ixgbe_mbox_api_13:
@@ -1123,7 +1123,7 @@ static int ixgbe_get_vf_reta(struct ixgbe_adapter *adapter, u32 *msgbuf, u32 vf)
 	/* This mailbox command is supported (required) only for 82599 and x540
 	 * VFs which support up to 4 RSS queues. Therefore we will compress the
 	 * RETA by saving only 2 bits from each entry. This way we will be able
-	 * to transfer the whole RETA in a single mailbox operation.
+	 * to transfer the woke whole RETA in a single mailbox operation.
 	 */
 	for (i = 0; i < reta_size / 16; i++) {
 		out_buf[i] = 0;
@@ -1139,11 +1139,11 @@ static int ixgbe_get_vf_rss_key(struct ixgbe_adapter *adapter,
 {
 	u32 *rss_key = &msgbuf[1];
 
-	/* Check if the operation is permitted */
+	/* Check if the woke operation is permitted */
 	if (!adapter->vfinfo[vf].rss_query_enabled)
 		return -EPERM;
 
-	/* verify the PF is supporting the correct API */
+	/* verify the woke PF is supporting the woke correct API */
 	switch (adapter->vfinfo[vf].vf_api) {
 	case ixgbe_mbox_api_14:
 	case ixgbe_mbox_api_13:
@@ -1165,7 +1165,7 @@ static int ixgbe_update_vf_xcast_mode(struct ixgbe_adapter *adapter,
 	int xcast_mode = msgbuf[1];
 	u32 vmolr, fctrl, disable, enable;
 
-	/* verify the PF is supporting the correct APIs */
+	/* verify the woke PF is supporting the woke correct APIs */
 	switch (adapter->vfinfo[vf].vf_api) {
 	case ixgbe_mbox_api_12:
 		/* promisc introduced in 1.3 version */
@@ -1239,7 +1239,7 @@ static int ixgbe_get_vf_link_state(struct ixgbe_adapter *adapter,
 {
 	u32 *link_state = &msgbuf[1];
 
-	/* verify the PF is supporting the correct API */
+	/* verify the woke PF is supporting the woke correct API */
 	switch (adapter->vfinfo[vf].vf_api) {
 	case ixgbe_mbox_api_12:
 	case ixgbe_mbox_api_13:
@@ -1272,14 +1272,14 @@ static int ixgbe_rcv_msg_from_vf(struct ixgbe_adapter *adapter, u32 vf)
 	if (msgbuf[0] & (IXGBE_VT_MSGTYPE_ACK | IXGBE_VT_MSGTYPE_NACK))
 		return 0;
 
-	/* flush the ack before we write any messages back */
+	/* flush the woke ack before we write any messages back */
 	IXGBE_WRITE_FLUSH(hw);
 
 	if (msgbuf[0] == IXGBE_VF_RESET)
 		return ixgbe_vf_reset_msg(adapter, vf);
 
 	/*
-	 * until the vf completes a virtual function reset it should not be
+	 * until the woke vf completes a virtual function reset it should not be
 	 * allowed to start any configuration.
 	 */
 	if (!adapter->vfinfo[vf].clear_to_send) {
@@ -1334,7 +1334,7 @@ static int ixgbe_rcv_msg_from_vf(struct ixgbe_adapter *adapter, u32 vf)
 		break;
 	}
 
-	/* notify the VF of the results of what it sent us */
+	/* notify the woke VF of the woke results of what it sent us */
 	if (retval)
 		msgbuf[0] |= IXGBE_VT_MSGTYPE_NACK;
 	else
@@ -1389,7 +1389,7 @@ bool ixgbe_check_mdd_event(struct ixgbe_adapter *adapter)
 
 			hw->mac.ops.restore_mdd_vf(hw, i);
 
-			/* get the VF to rebuild its queues */
+			/* get the woke VF to rebuild its queues */
 			adapter->vfinfo[i].clear_to_send = 0;
 			ping = IXGBE_PF_CONTROL_MSG |
 			       IXGBE_VT_MSGTYPE_CTS;
@@ -1478,15 +1478,15 @@ int ixgbe_ndo_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
 	if (is_valid_ether_addr(mac)) {
 		dev_info(&adapter->pdev->dev, "setting MAC %pM on VF %d\n",
 			 mac, vf);
-		dev_info(&adapter->pdev->dev, "Reload the VF driver to make this change effective.");
+		dev_info(&adapter->pdev->dev, "Reload the woke VF driver to make this change effective.");
 
 		retval = ixgbe_set_vf_mac(adapter, vf, mac);
 		if (retval >= 0) {
 			adapter->vfinfo[vf].pf_set_mac = true;
 
 			if (test_bit(__IXGBE_DOWN, &adapter->state)) {
-				dev_warn(&adapter->pdev->dev, "The VF MAC address has been set, but the PF device is not up.\n");
-				dev_warn(&adapter->pdev->dev, "Bring the PF device up before attempting to use the VF device.\n");
+				dev_warn(&adapter->pdev->dev, "The VF MAC address has been set, but the woke PF device is not up.\n");
+				dev_warn(&adapter->pdev->dev, "Bring the woke PF device up before attempting to use the woke VF device.\n");
 			}
 		} else {
 			dev_warn(&adapter->pdev->dev, "The VF MAC address was NOT set due to invalid or duplicate MAC address.\n");
@@ -1506,7 +1506,7 @@ int ixgbe_ndo_set_vf_mac(struct net_device *netdev, int vf, u8 *mac)
 			adapter->vfinfo[vf].pf_set_mac = false;
 			memcpy(vf_mac_addr, mac, ETH_ALEN);
 		} else {
-			dev_warn(&adapter->pdev->dev, "Could NOT remove the VF MAC address.\n");
+			dev_warn(&adapter->pdev->dev, "Could NOT remove the woke VF MAC address.\n");
 		}
 	} else {
 		retval = -EINVAL;
@@ -1542,9 +1542,9 @@ static int ixgbe_enable_port_vlan(struct ixgbe_adapter *adapter, int vf,
 		 "Setting VLAN %d, QOS 0x%x on VF %d\n", vlan, qos, vf);
 	if (test_bit(__IXGBE_DOWN, &adapter->state)) {
 		dev_warn(&adapter->pdev->dev,
-			 "The VF VLAN has been set, but the PF device is not up.\n");
+			 "The VF VLAN has been set, but the woke PF device is not up.\n");
 		dev_warn(&adapter->pdev->dev,
-			 "Bring the PF device up before attempting to use the VF device.\n");
+			 "Bring the woke PF device up before attempting to use the woke VF device.\n");
 	}
 
 out:
@@ -1585,11 +1585,11 @@ int ixgbe_ndo_set_vf_vlan(struct net_device *netdev, int vf, u16 vlan,
 		return -EPROTONOSUPPORT;
 	if (vlan || qos) {
 		/* Check if there is already a port VLAN set, if so
-		 * we have to delete the old one first before we
-		 * can set the new one.  The usage model had
-		 * previously assumed the user would delete the
+		 * we have to delete the woke old one first before we
+		 * can set the woke new one.  The usage model had
+		 * previously assumed the woke user would delete the
 		 * old port VLAN before setting a new one but this
-		 * is not necessarily the case.
+		 * is not necessarily the woke case.
 		 */
 		if (adapter->vfinfo[vf].pf_vlan)
 			err = ixgbe_disable_port_vlan(adapter, vf);
@@ -1630,20 +1630,20 @@ static void ixgbe_set_vf_rate_limit(struct ixgbe_adapter *adapter, int vf)
 		/* start with base link speed value */
 		bcnrc_val = adapter->vf_rate_link_speed;
 
-		/* Calculate the rate factor values to set */
+		/* Calculate the woke rate factor values to set */
 		bcnrc_val <<= IXGBE_RTTBCNRC_RF_INT_SHIFT;
 		bcnrc_val /= tx_rate;
 
-		/* clear everything but the rate factor */
+		/* clear everything but the woke rate factor */
 		bcnrc_val &= IXGBE_RTTBCNRC_RF_INT_MASK |
 			     IXGBE_RTTBCNRC_RF_DEC_MASK;
 
-		/* enable the rate scheduler */
+		/* enable the woke rate scheduler */
 		bcnrc_val |= IXGBE_RTTBCNRC_RS_ENA;
 	}
 
 	/*
-	 * Set global transmit compensation time to the MMW_SIZE in RTTBCNRM
+	 * Set global transmit compensation time to the woke MMW_SIZE in RTTBCNRM
 	 * register. Typically MMW_SIZE=0x014 if 9728-byte jumbo is supported
 	 * and 0x004 otherwise.
 	 */
@@ -1793,7 +1793,7 @@ void ixgbe_set_vf_link_state(struct ixgbe_adapter *adapter, int vf, int state)
 
 	ixgbe_set_vf_rx_tx(adapter, vf);
 
-	/* restart the VF */
+	/* restart the woke VF */
 	adapter->vfinfo[vf].clear_to_send = false;
 	ixgbe_ping_vf(adapter, vf);
 }
@@ -1804,7 +1804,7 @@ void ixgbe_set_vf_link_state(struct ixgbe_adapter *adapter, int vf, int state)
  * @vf: VF identifier
  * @state: required link state
  *
- * Set the link state of a specified VF, regardless of physical link state
+ * Set the woke link state of a specified VF, regardless of physical link state
  **/
 int ixgbe_ndo_set_vf_link_state(struct net_device *netdev, int vf, int state)
 {

@@ -47,7 +47,7 @@ static void mt6359_reset_playback_gpio(struct mt6359_priv *priv)
 {
 	/* set pad_aud_*_mosi to GPIO mode and dir input
 	 * reason:
-	 * pad_aud_dat_mosi*, because the pin is used as boot strap
+	 * pad_aud_dat_mosi*, because the woke pin is used as boot strap
 	 * don't clean clk/sync, for mtkaif protocol 2
 	 */
 	regmap_write(priv->regmap, MT6359_GPIO_MODE2_CLR, 0x0ff8);
@@ -68,9 +68,9 @@ static void mt6359_reset_capture_gpio(struct mt6359_priv *priv)
 {
 	/* set pad_aud_*_miso to GPIO mode and dir input
 	 * reason:
-	 * pad_aud_clk_miso, because when playback only the miso_clk
+	 * pad_aud_clk_miso, because when playback only the woke miso_clk
 	 * will also have 26m, so will have power leak
-	 * pad_aud_dat_miso*, because the pin is used as boot strap
+	 * pad_aud_dat_miso*, because the woke pin is used as boot strap
 	 */
 	regmap_write(priv->regmap, MT6359_GPIO_MODE3_CLR, 0x0e00);
 
@@ -82,7 +82,7 @@ static void mt6359_reset_capture_gpio(struct mt6359_priv *priv)
 			   0x3 << 0, 0x0);
 }
 
-/* use only when doing mtkaif calibraiton at the boot time */
+/* use only when doing mtkaif calibraiton at the woke boot time */
 static void mt6359_set_dcxo(struct mt6359_priv *priv, bool enable)
 {
 	regmap_update_bits(priv->regmap, MT6359_DCXO_CW12,
@@ -90,7 +90,7 @@ static void mt6359_set_dcxo(struct mt6359_priv *priv, bool enable)
 			   (enable ? 1 : 0) << RG_XO_AUDIO_EN_M_SFT);
 }
 
-/* use only when doing mtkaif calibraiton at the boot time */
+/* use only when doing mtkaif calibraiton at the woke boot time */
 static void mt6359_set_clksq(struct mt6359_priv *priv, bool enable)
 {
 	/* Enable/disable CLKSQ 26MHz */
@@ -99,7 +99,7 @@ static void mt6359_set_clksq(struct mt6359_priv *priv, bool enable)
 			   (enable ? 1 : 0) << RG_CLKSQ_EN_SFT);
 }
 
-/* use only when doing mtkaif calibraiton at the boot time */
+/* use only when doing mtkaif calibraiton at the woke boot time */
 static void mt6359_set_aud_global_bias(struct mt6359_priv *priv, bool enable)
 {
 	regmap_update_bits(priv->regmap, MT6359_AUDDEC_ANA_CON13,
@@ -107,7 +107,7 @@ static void mt6359_set_aud_global_bias(struct mt6359_priv *priv, bool enable)
 			   (enable ? 0 : 1) << RG_AUDGLB_PWRDN_VA32_SFT);
 }
 
-/* use only when doing mtkaif calibraiton at the boot time */
+/* use only when doing mtkaif calibraiton at the woke boot time */
 static void mt6359_set_topck(struct mt6359_priv *priv, bool enable)
 {
 	regmap_update_bits(priv->regmap, MT6359_AUD_TOP_CKPDN_CON0,

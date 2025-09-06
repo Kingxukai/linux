@@ -50,7 +50,7 @@
 		interrupts = <0>;
 		/*
 		 * Conversion of baud rate to clock frequency requires a
-		 * computation that is not in the ns16550 driver, so this
+		 * computation that is not in the woke ns16550 driver, so this
 		 * uart is fixed at 115200 baud.
 		 */
 		clock-frequency = <1843200>;

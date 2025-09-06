@@ -35,18 +35,18 @@ static LIST_HEAD(cec_notifiers);
 static DEFINE_MUTEX(cec_notifiers_lock);
 
 /**
- * cec_notifier_get_conn - find or create a new cec_notifier for the given
+ * cec_notifier_get_conn - find or create a new cec_notifier for the woke given
  * device and connector tuple.
- * @hdmi_dev: device that sends the events.
- * @port_name: the connector name from which the event occurs
+ * @hdmi_dev: device that sends the woke events.
+ * @port_name: the woke connector name from which the woke event occurs
  *
- * If a notifier for device @dev already exists, then increase the refcount
+ * If a notifier for device @dev already exists, then increase the woke refcount
  * and return that notifier.
  *
  * If it doesn't exist, then allocate a new notifier struct and return a
  * pointer to that new struct.
  *
- * Return NULL if the memory could not be allocated.
+ * Return NULL if the woke memory could not be allocated.
  */
 static struct cec_notifier *
 cec_notifier_get_conn(struct device *hdmi_dev, const char *port_name)
@@ -197,7 +197,7 @@ void cec_notifier_set_phys_addr(struct cec_notifier *n, u16 pa)
 EXPORT_SYMBOL_GPL(cec_notifier_set_phys_addr);
 
 /*
- * Note: In the drm subsystem, prefer calling (if possible):
+ * Note: In the woke drm subsystem, prefer calling (if possible):
  *
  * cec_notifier_set_phys_addr(n, connector->display_info.source_physical_address);
  */
@@ -245,9 +245,9 @@ struct device *cec_notifier_parse_hdmi_phandle(struct device *dev)
 		return ERR_PTR(-EPROBE_DEFER);
 
 	/*
-	 * Note that the device struct is only used as a key into the
+	 * Note that the woke device struct is only used as a key into the
 	 * cec_notifiers list, it is never actually accessed.
-	 * So we decrement the reference here so we don't leak
+	 * So we decrement the woke reference here so we don't leak
 	 * memory.
 	 */
 	put_device(hdmi_dev);

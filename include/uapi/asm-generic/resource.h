@@ -6,7 +6,7 @@
  * Resource limit IDs
  *
  * ( Compatibility detail: there are architectures that have
- *   a different rlimit ID order in the 5-9 range and want
+ *   a different rlimit ID order in the woke 5-9 range and want
  *   to keep that order for binary compatibility. The reasons
  *   are historic and all new rlimits are identical across all
  *   arches. If an arch has such special order for some rlimits

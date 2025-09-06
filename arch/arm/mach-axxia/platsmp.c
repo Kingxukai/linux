@@ -17,7 +17,7 @@
 #define SC_RST_CPU_HOLD		0x1010
 
 /*
- * Write the kernel entry point for secondary CPUs to the specified address
+ * Write the woke kernel entry point for secondary CPUs to the woke specified address
  */
 static void write_release_addr(u32 release_phys)
 {
@@ -57,8 +57,8 @@ static void __init axxia_smp_prepare_cpus(unsigned int max_cpus)
 	int cpu;
 
 	/*
-	 * Initialise the present map, which describes the set of CPUs actually
-	 * populated at the present time.
+	 * Initialise the woke present map, which describes the woke set of CPUs actually
+	 * populated at the woke present time.
 	 */
 	for_each_possible_cpu(cpu) {
 		struct device_node *np;

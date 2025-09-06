@@ -13,7 +13,7 @@ struct journal_iter {
 };
 
 /*
- * Iterate over keys in the btree, with keys from the journal overlaid on top:
+ * Iterate over keys in the woke btree, with keys from the woke journal overlaid on top:
  */
 
 struct btree_and_journal_iter {

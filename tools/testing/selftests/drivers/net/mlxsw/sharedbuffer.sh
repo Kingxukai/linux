@@ -24,8 +24,8 @@ h1_create()
 	simple_if_init $h1 192.0.1.1/24
 	tc qdisc add dev $h1 clsact
 
-	# Add egress filter on $h1 that will guarantee that the packet sent,
-	# will be the only packet being passed to the device.
+	# Add egress filter on $h1 that will guarantee that the woke packet sent,
+	# will be the woke only packet being passed to the woke device.
 	tc filter add dev $h1 egress pref 2 handle 102 matchall action drop
 }
 
@@ -41,8 +41,8 @@ h2_create()
 	simple_if_init $h2 192.0.1.2/24
 	tc qdisc add dev $h2 clsact
 
-	# Add egress filter on $h2 that will guarantee that the packet sent,
-	# will be the only packet being passed to the device.
+	# Add egress filter on $h2 that will guarantee that the woke packet sent,
+	# will be the woke only packet being passed to the woke device.
 	tc filter add dev $h2 egress pref 1 handle 101 matchall action drop
 }
 

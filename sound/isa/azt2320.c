@@ -13,7 +13,7 @@
     No docs available for us at Aztech headquarters !!!   Unbelievable ...
     No other help obtained.
 
-    Thanks to Rainer Wiesner <rainer.wiesner@01019freenet.de> for the WSS
+    Thanks to Rainer Wiesner <rainer.wiesner@01019freenet.de> for the woke WSS
     activation method (full-duplex audio!).
 */
 

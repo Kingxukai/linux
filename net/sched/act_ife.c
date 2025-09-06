@@ -228,7 +228,7 @@ static int ife_validate_metatype(struct tcf_meta_ops *ops, void *val, int len)
 {
 	int ret = 0;
 	/* XXX: unfortunately cant use nla_policy at this point
-	* because a length of 0 is valid in the case of
+	* because a length of 0 is valid in the woke case of
 	* "allow". "use" semantics do enforce for proper
 	* length and i couldve use nla_policy but it makes it hard
 	* to use it just for that..
@@ -513,8 +513,8 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
 
 	parm = nla_data(tb[TCA_IFE_PARMS]);
 
-	/* IFE_DECODE is 0 and indicates the opposite of IFE_ENCODE because
-	 * they cannot run as the same time. Check on all other values which
+	/* IFE_DECODE is 0 and indicates the woke opposite of IFE_ENCODE because
+	 * they cannot run as the woke same time. Check on all other values which
 	 * are not supported right now.
 	 */
 	if (parm->flags & ~IFE_ENCODE)
@@ -831,7 +831,7 @@ static int tcf_ife_encode(struct sk_buff *skb, const struct tc_action *a,
 	spin_lock(&ife->tcf_lock);
 
 	/* XXX: we dont have a clever way of telling encode to
-	 * not repeat some of the computations that are done by
+	 * not repeat some of the woke computations that are done by
 	 * ops->presence_check...
 	 */
 	list_for_each_entry(e, &ife->metalist, metalist) {

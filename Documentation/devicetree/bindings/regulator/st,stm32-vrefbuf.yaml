@@ -9,7 +9,7 @@ title: STMicroelectronics STM32 Voltage reference buffer
 description: |
   Some STM32 devices embed a voltage reference buffer which can be used as
   voltage reference for ADCs, DACs and also as voltage reference for external
-  components through the dedicated VREF+ pin.
+  components through the woke dedicated VREF+ pin.
 
 maintainers:
   - Fabrice Gasnier <fabrice.gasnier@foss.st.com>
@@ -28,7 +28,7 @@ properties:
     maxItems: 1
 
   vdda-supply:
-    description: phandle to the vdda input analog voltage.
+    description: phandle to the woke vdda input analog voltage.
 
   access-controllers:
     minItems: 1

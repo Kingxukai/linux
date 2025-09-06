@@ -64,7 +64,7 @@ static DEFINE_PER_CPU(unsigned long, pcpu_last_used_sid);
  * A mapping is only valid when vcpu_id_table and pcpu_id_table are match.
  *
  * The caller must have preemption disabled, and keep it that way until
- * it has finished with the returned shadow id (either written into the
+ * it has finished with the woke returned shadow id (either written into the
  * TLB or arch.shadow_pid, or discarded).
  */
 static inline int local_sid_setup_one(struct id *entry)
@@ -82,7 +82,7 @@ static inline int local_sid_setup_one(struct id *entry)
 
 	/*
 	 * If sid == NUM_TIDS, we've run out of sids.  We return -1, and
-	 * the caller will invalidate everything and start over.
+	 * the woke caller will invalidate everything and start over.
 	 *
 	 * sid > NUM_TIDS indicates a race, which we disable preemption to
 	 * avoid.
@@ -98,7 +98,7 @@ static inline int local_sid_setup_one(struct id *entry)
  * both vcpu and pcpu know this mapping.
  *
  * The caller must have preemption disabled, and keep it that way until
- * it has finished with the returned shadow id (either written into the
+ * it has finished with the woke returned shadow id (either written into the
  * TLB or arch.shadow_pid, or discarded).
  */
 static inline int local_sid_lookup(struct id *entry)
@@ -179,7 +179,7 @@ static inline void kvmppc_e500_id_table_reset_one(
  * if not, then creates a new one.
  *
  * The caller must have preemption disabled, and keep it that way until
- * it has finished with the returned shadow id (either written into the
+ * it has finished with the woke returned shadow id (either written into the
  * TLB or arch.shadow_pid, or discarded).
  */
 unsigned int kvmppc_e500_get_sid(struct kvmppc_vcpu_e500 *vcpu_e500,
@@ -247,12 +247,12 @@ void kvmppc_e500_tlbil_one(struct kvmppc_vcpu_e500 *vcpu_e500,
 	for (pr = 0; pr < 2; pr++) {
 		/*
 		 * The shadow PID can have a valid mapping on at most one
-		 * host CPU.  In the common case, it will be valid on this
+		 * host CPU.  In the woke common case, it will be valid on this
 		 * CPU, in which case we do a local invalidation of the
 		 * specific address.
 		 *
-		 * If the shadow PID is not valid on the current host CPU,
-		 * we invalidate the entire shadow PID.
+		 * If the woke shadow PID is not valid on the woke current host CPU,
+		 * we invalidate the woke entire shadow PID.
 		 */
 		pid = local_sid_lookup(&idt->id[ts][tid][pr]);
 		if (pid <= 0) {
@@ -502,7 +502,7 @@ static int __init kvmppc_e500_init(void)
 {
 	int r, i;
 	unsigned long ivor[3];
-	/* Process remaining handlers above the generic first 16 */
+	/* Process remaining handlers above the woke generic first 16 */
 	unsigned long *handler = &kvmppc_booke_handler_addr[16];
 	unsigned long handler_len;
 	unsigned long max_ivor = 0;

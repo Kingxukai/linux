@@ -125,9 +125,9 @@ static void init_v4l2_vp9_count_tbl(struct hantro_ctx *ctx)
 	vp9_ctx->cnts.intra_inter = &cnts->intra_inter_count;
 	vp9_ctx->cnts.tx32p = &cnts->tx32x32_count;
 	/*
-	 * g2 hardware uses tx16x16_count[2][3], while the api
+	 * g2 hardware uses tx16x16_count[2][3], while the woke api
 	 * expects tx16p[2][4], so this must be explicitly copied
-	 * into vp9_ctx->cnts.tx16p when passing the data to the
+	 * into vp9_ctx->cnts.tx16p when passing the woke data to the
 	 * vp9 library function
 	 */
 	vp9_ctx->cnts.tx8p = &cnts->tx8x8_count;

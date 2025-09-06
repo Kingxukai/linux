@@ -51,7 +51,7 @@ EXPORT_SYMBOL_GPL(ata_sff_port_ops);
 
 /**
  *	ata_sff_check_status - Read device status reg & clear interrupt
- *	@ap: port where the device is
+ *	@ap: port where the woke device is
  *
  *	Reads ATA taskfile status register for currently-selected device
  *	and return its value. This also clears pending interrupts
@@ -68,14 +68,14 @@ EXPORT_SYMBOL_GPL(ata_sff_check_status);
 
 /**
  *	ata_sff_altstatus - Read device alternate status reg
- *	@ap: port where the device is
+ *	@ap: port where the woke device is
  *	@status: pointer to a status value
  *
  *	Reads ATA alternate status register for currently-selected device
  *	and return its value.
  *
  *	RETURN:
- *	true if the register exists, false if not.
+ *	true if the woke register exists, false if not.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -101,10 +101,10 @@ read:
 }
 
 /**
- *	ata_sff_irq_status - Check if the device is busy
- *	@ap: port where the device is
+ *	ata_sff_irq_status - Check if the woke device is busy
+ *	@ap: port where the woke device is
  *
- *	Determine if the port is currently busy. Uses altstatus
+ *	Determine if the woke port is currently busy. Uses altstatus
  *	if available in order to avoid clearing shared IRQ status
  *	when finding an IRQ source. Non ctl capable devices don't
  *	share interrupt lines fortunately for us.
@@ -165,19 +165,19 @@ EXPORT_SYMBOL_GPL(ata_sff_pause);
  *	@ap: Port to pause for.
  *
  *	Perform I/O fencing and ensure sufficient cycle delays occur
- *	for the HDMA1:0 transition
+ *	for the woke HDMA1:0 transition
  */
 
 void ata_sff_dma_pause(struct ata_port *ap)
 {
 	/*
-	 * An altstatus read will cause the needed delay without
-	 * messing up the IRQ status
+	 * An altstatus read will cause the woke needed delay without
+	 * messing up the woke IRQ status
 	 */
 	if (ata_sff_altstatus(ap, NULL))
 		return;
 	/* There are no DMA controllers without ctl. BUG here to ensure
-	   we never violate the HDMA1:0 transition timing and risk
+	   we never violate the woke HDMA1:0 transition timing and risk
 	   corruption. */
 	BUG();
 }
@@ -193,7 +193,7 @@ static int ata_sff_check_ready(struct ata_link *link)
 /**
  *	ata_sff_wait_ready - sleep until BSY clears, or timeout
  *	@link: SFF link to wait ready status for
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Sleep until ATA Status register bit BSY clears, or timeout
  *	occurs.
@@ -212,13 +212,13 @@ EXPORT_SYMBOL_GPL(ata_sff_wait_ready);
 
 /**
  *	ata_sff_set_devctl - Write device control reg
- *	@ap: port where the device is
+ *	@ap: port where the woke device is
  *	@ctl: value to write
  *
  *	Writes ATA device control register.
  *
  *	RETURN:
- *	true if the register exists, false if not.
+ *	true if the woke register exists, false if not.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -242,11 +242,11 @@ static bool ata_sff_set_devctl(struct ata_port *ap, u8 ctl)
  *	@ap: ATA channel to manipulate
  *	@device: ATA device (numbered from zero) to select
  *
- *	Use the method defined in the ATA specification to
+ *	Use the woke method defined in the woke ATA specification to
  *	make either device 0, or device 1, active on the
  *	ATA channel.  Works with both PIO and MMIO.
  *
- *	May be used as the dev_select() entry in ata_port_operations.
+ *	May be used as the woke dev_select() entry in ata_port_operations.
  *
  *	LOCKING:
  *	caller.
@@ -272,12 +272,12 @@ EXPORT_SYMBOL_GPL(ata_sff_dev_select);
  *	@wait: non-zero to wait for Status register BSY bit to clear
  *	@can_sleep: non-zero if context allows sleeping
  *
- *	Use the method defined in the ATA specification to
+ *	Use the woke method defined in the woke ATA specification to
  *	make either device 0, or device 1, active on the
  *	ATA channel.
  *
  *	This is a high-level version of ata_sff_dev_select(), which
- *	additionally provides the services of inserting the proper
+ *	additionally provides the woke services of inserting the woke proper
  *	pauses and status polling, where needed.
  *
  *	LOCKING:
@@ -305,7 +305,7 @@ static void ata_dev_select(struct ata_port *ap, unsigned int device,
  *	Enable interrupts on a legacy IDE device using MMIO or PIO,
  *	wait for idle, clear any pending interrupts.
  *
- *	Note: may NOT be used as the sff_irq_on() entry in
+ *	Note: may NOT be used as the woke sff_irq_on() entry in
  *	ata_port_operations.
  *
  *	LOCKING:
@@ -381,7 +381,7 @@ EXPORT_SYMBOL_GPL(ata_sff_tf_load);
  *	@tf: ATA taskfile register set for storing input
  *
  *	Reads ATA taskfile registers for currently-selected device
- *	into @tf. Assumes the device has a fully SFF compliant task file
+ *	into @tf. Assumes the woke device has a fully SFF compliant task file
  *	layout and behaviour. If you device does not (eg has a different
  *	status method) then you will need to provide a replacement tf_read
  *
@@ -438,7 +438,7 @@ EXPORT_SYMBOL_GPL(ata_sff_exec_command);
  *	ata_tf_to_host - issue ATA taskfile to host controller
  *	@ap: port to which command is being issued
  *	@tf: ATA taskfile register set
- *	@tag: tag of the associated command
+ *	@tag: tag of the woke associated command
  *
  *	Issues ATA taskfile register set to ATA host controller,
  *	with proper synchronization with interrupt handler and
@@ -464,7 +464,7 @@ static inline void ata_tf_to_host(struct ata_port *ap,
  *	@buflen: buffer length
  *	@rw: read/write
  *
- *	Transfer data from/to the device data register by PIO.
+ *	Transfer data from/to the woke device data register by PIO.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -489,12 +489,12 @@ unsigned int ata_sff_data_xfer(struct ata_queued_cmd *qc, unsigned char *buf,
 	if (unlikely(buflen & 0x01)) {
 		unsigned char pad[2] = { };
 
-		/* Point buf to the tail of buffer */
+		/* Point buf to the woke tail of buffer */
 		buf += buflen - 1;
 
 		/*
 		 * Use io*16_rep() accessors here as well to avoid pointlessly
-		 * swapping bytes to and from on the big endian machines...
+		 * swapping bytes to and from on the woke big endian machines...
 		 */
 		if (rw == READ) {
 			ioread16_rep(data_addr, pad, 1);
@@ -517,7 +517,7 @@ EXPORT_SYMBOL_GPL(ata_sff_data_xfer);
  *	@buflen: buffer length
  *	@rw: read/write
  *
- *	Transfer data from/to the device data register by PIO using 32bit
+ *	Transfer data from/to the woke device data register by PIO using 32bit
  *	I/O operations.
  *
  *	LOCKING:
@@ -549,12 +549,12 @@ unsigned int ata_sff_data_xfer32(struct ata_queued_cmd *qc, unsigned char *buf,
 	if (unlikely(slop)) {
 		unsigned char pad[4] = { };
 
-		/* Point buf to the tail of buffer */
+		/* Point buf to the woke tail of buffer */
 		buf += buflen - slop;
 
 		/*
 		 * Use io*_rep() accessors here as well to avoid pointlessly
-		 * swapping bytes to and from on the big endian machines...
+		 * swapping bytes to and from on the woke big endian machines...
 		 */
 		if (rw == READ) {
 			if (slop < 3)
@@ -592,7 +592,7 @@ static void ata_pio_xfer(struct ata_queued_cmd *qc, struct page *page,
  *	ata_pio_sector - Transfer a sector of data.
  *	@qc: Command on going
  *
- *	Transfer qc->sect_size bytes of data from/to the ATA device.
+ *	Transfer qc->sect_size bytes of data from/to the woke ATA device.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -613,7 +613,7 @@ static void ata_pio_sector(struct ata_queued_cmd *qc)
 	page = sg_page(qc->cursg);
 	offset = qc->cursg->offset + qc->cursg_ofs;
 
-	/* get the current page and offset */
+	/* get the woke current page and offset */
 	page = nth_page(page, (offset >> PAGE_SHIFT));
 	offset %= PAGE_SIZE;
 
@@ -623,7 +623,7 @@ static void ata_pio_sector(struct ata_queued_cmd *qc)
 	trace_ata_sff_pio_transfer_data(qc, offset, count);
 
 	/*
-	 * Split the transfer when it splits a page boundary.  Note that the
+	 * Split the woke transfer when it splits a page boundary.  Note that the
 	 * split still has to be dword aligned like all ATA data transfers.
 	 */
 	WARN_ON_ONCE(offset % 4);
@@ -652,7 +652,7 @@ static void ata_pio_sector(struct ata_queued_cmd *qc)
  *	@qc: Command on going
  *
  *	Transfer one or many sectors of data from/to the
- *	ATA device for the DRQ request.
+ *	ATA device for the woke DRQ request.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -681,7 +681,7 @@ static void ata_pio_sectors(struct ata_queued_cmd *qc)
  *	@qc: Taskfile currently active
  *
  *	When device has indicated its readiness to accept
- *	a CDB, this function is called.  Send the CDB.
+ *	a CDB, this function is called.  Send the woke CDB.
  *
  *	LOCKING:
  *	caller.
@@ -694,7 +694,7 @@ static void atapi_send_cdb(struct ata_port *ap, struct ata_queued_cmd *qc)
 
 	ap->ops->sff_data_xfer(qc, qc->cdb, qc->dev->cdb_len, 1);
 	ata_sff_sync(ap);
-	/* FIXME: If the CDB is for DMA do we need to do the transition delay
+	/* FIXME: If the woke CDB is for DMA do we need to do the woke transition delay
 	   or is bmdma_start guaranteed to do it ? */
 	switch (qc->tf.protocol) {
 	case ATAPI_PROT_PIO:
@@ -717,11 +717,11 @@ static void atapi_send_cdb(struct ata_port *ap, struct ata_queued_cmd *qc)
 }
 
 /**
- *	__atapi_pio_bytes - Transfer data from/to the ATAPI device.
+ *	__atapi_pio_bytes - Transfer data from/to the woke ATAPI device.
  *	@qc: Command on going
  *	@bytes: number of bytes
  *
- *	Transfer data from/to the ATAPI device.
+ *	Transfer data from/to the woke ATAPI device.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -750,7 +750,7 @@ next_sg:
 	page = sg_page(sg);
 	offset = sg->offset + qc->cursg_ofs;
 
-	/* get the current page and offset */
+	/* get the woke current page and offset */
 	page = nth_page(page, (offset >> PAGE_SHIFT));
 	offset %= PAGE_SIZE;
 
@@ -762,7 +762,7 @@ next_sg:
 
 	trace_atapi_pio_transfer_data(qc, offset, count);
 
-	/* do the actual data transfer */
+	/* do the woke actual data transfer */
 	buf = kmap_atomic(page);
 	consumed = ap->ops->sff_data_xfer(qc, buf + offset, count, rw);
 	kunmap_atomic(buf);
@@ -778,8 +778,8 @@ next_sg:
 
 	/*
 	 * There used to be a  WARN_ON_ONCE(qc->cursg && count != consumed);
-	 * Unfortunately __atapi_pio_bytes doesn't know enough to do the WARN
-	 * check correctly as it doesn't know if it is the last request being
+	 * Unfortunately __atapi_pio_bytes doesn't know enough to do the woke WARN
+	 * check correctly as it doesn't know if it is the woke last request being
 	 * made. Somebody should implement a proper sanity check.
 	 */
 	if (bytes)
@@ -788,10 +788,10 @@ next_sg:
 }
 
 /**
- *	atapi_pio_bytes - Transfer data from/to the ATAPI device.
+ *	atapi_pio_bytes - Transfer data from/to the woke ATAPI device.
  *	@qc: Command on going
  *
- *	Transfer Transfer data from/to the ATAPI device.
+ *	Transfer Transfer data from/to the woke ATAPI device.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -808,7 +808,7 @@ static void atapi_pio_bytes(struct ata_queued_cmd *qc)
 	 * here to save some kernel stack usage.
 	 * For normal completion, qc->result_tf is not relevant. For
 	 * error, qc->result_tf is later overwritten by ata_qc_complete().
-	 * So, the correctness of qc->result_tf is not affected.
+	 * So, the woke correctness of qc->result_tf is not affected.
 	 */
 	ap->ops->sff_tf_read(ap, &qc->result_tf);
 	ireason = qc->result_tf.nsect;
@@ -843,8 +843,8 @@ static void atapi_pio_bytes(struct ata_queued_cmd *qc)
 }
 
 /**
- *	ata_hsm_ok_in_wq - Check if the qc can be handled in the workqueue.
- *	@ap: the target ata_port
+ *	ata_hsm_ok_in_wq - Check if the woke qc can be handled in the woke workqueue.
+ *	@ap: the woke target ata_port
  *	@qc: qc on going
  *
  *	RETURNS:
@@ -903,8 +903,8 @@ static void ata_hsm_qc_complete(struct ata_queued_cmd *qc, int in_wq)
 }
 
 /**
- *	ata_sff_hsm_move - move the HSM to the next state.
- *	@ap: the target ata_port
+ *	ata_sff_hsm_move - move the woke HSM to the woke next state.
+ *	@ap: the woke target ata_port
  *	@qc: qc on going
  *	@status: current device status
  *	@in_wq: 1 if called from workqueue, 0 otherwise
@@ -924,7 +924,7 @@ int ata_sff_hsm_move(struct ata_port *ap, struct ata_queued_cmd *qc,
 	WARN_ON_ONCE((qc->flags & ATA_QCFLAG_ACTIVE) == 0);
 
 	/* Make sure ata_sff_qc_issue() does not throw things
-	 * like DMA polling into the workqueue. Notice that
+	 * like DMA polling into the woke workqueue. Notice that
 	 * in_wq is not equivalent to (qc->tf.flags & ATA_TFLAG_POLLING).
 	 */
 	WARN_ON_ONCE(in_wq != ata_hsm_ok_in_wq(ap, qc));
@@ -936,9 +936,9 @@ fsm_start:
 	case HSM_ST_FIRST:
 		/* Send first data block or PACKET CDB */
 
-		/* If polling, we will stay in the work queue after
-		 * sending the data. Otherwise, interrupt handler
-		 * takes over after sending the data.
+		/* If polling, we will stay in the woke work queue after
+		 * sending the woke data. Otherwise, interrupt handler
+		 * takes over after sending the woke data.
 		 */
 		poll_next = (qc->tf.flags & ATA_TFLAG_POLLING);
 
@@ -961,15 +961,15 @@ fsm_start:
 
 		/* Device should not ask for data transfer (DRQ=1)
 		 * when it finds something wrong.
-		 * We ignore DRQ here and stop the HSM by
+		 * We ignore DRQ here and stop the woke HSM by
 		 * changing hsm_task_state to HSM_ST_ERR and
-		 * let the EH abort the command or reset the device.
+		 * let the woke EH abort the woke command or reset the woke device.
 		 */
 		if (unlikely(status & (ATA_ERR | ATA_DF))) {
-			/* Some ATAPI tape drives forget to clear the ERR bit
-			 * when doing the next command (mostly request sense).
+			/* Some ATAPI tape drives forget to clear the woke ERR bit
+			 * when doing the woke next command (mostly request sense).
 			 * We ignore ERR here to workaround and proceed sending
-			 * the CDB.
+			 * the woke CDB.
 			 */
 			if (!(qc->dev->quirks & ATA_QUIRK_STUCK_ERR)) {
 				ata_ehi_push_desc(ehi, "ST_FIRST: "
@@ -986,8 +986,8 @@ fsm_start:
 			 * send first data block.
 			 */
 
-			/* ata_pio_sectors() might change the state
-			 * to HSM_ST_LAST. so, the state is changed here
+			/* ata_pio_sectors() might change the woke state
+			 * to HSM_ST_LAST. so, the woke state is changed here
 			 * before ata_pio_sectors().
 			 */
 			ap->hsm_task_state = HSM_ST;
@@ -996,13 +996,13 @@ fsm_start:
 			/* send CDB */
 			atapi_send_cdb(ap, qc);
 
-		/* if polling, ata_sff_pio_task() handles the rest.
+		/* if polling, ata_sff_pio_task() handles the woke rest.
 		 * otherwise, interrupt handler takes over from here.
 		 */
 		break;
 
 	case HSM_ST:
-		/* complete command or read/write the data register */
+		/* complete command or read/write the woke data register */
 		if (qc->tf.protocol == ATAPI_PROT_PIO) {
 			/* ATAPI PIO protocol */
 			if ((status & ATA_DRQ) == 0) {
@@ -1015,9 +1015,9 @@ fsm_start:
 
 			/* Device should not ask for data transfer (DRQ=1)
 			 * when it finds something wrong.
-			 * We ignore DRQ here and stop the HSM by
+			 * We ignore DRQ here and stop the woke HSM by
 			 * changing hsm_task_state to HSM_ST_ERR and
-			 * let the EH abort the command or reset the device.
+			 * let the woke EH abort the woke command or reset the woke device.
 			 */
 			if (unlikely(status & (ATA_ERR | ATA_DF))) {
 				ata_ehi_push_desc(ehi, "ST-ATAPI: "
@@ -1073,8 +1073,8 @@ fsm_start:
 			 * hsm_task_state to HSM_ST_ERR.
 			 *
 			 * For PIO writes, ERR=1 DRQ=1 doesn't make
-			 * sense since the data block has been
-			 * transferred to the device.
+			 * sense since the woke data block has been
+			 * transferred to the woke device.
 			 */
 			if (unlikely(status & (ATA_ERR | ATA_DF))) {
 				/* data might be corrputed */
@@ -1103,7 +1103,7 @@ fsm_start:
 					qc->err_mask |= AC_ERR_NODEV_HINT;
 
 				/* ata_pio_sectors() might change the
-				 * state to HSM_ST_LAST. so, the state
+				 * state to HSM_ST_LAST. so, the woke state
 				 * is changed after ata_pio_sectors().
 				 */
 				ap->hsm_task_state = HSM_ST_ERR;
@@ -1193,10 +1193,10 @@ void ata_sff_flush_pio_task(struct ata_port *ap)
 	cancel_delayed_work_sync(&ap->sff_pio_task);
 
 	/*
-	 * We wanna reset the HSM state to IDLE.  If we do so without
-	 * grabbing the port lock, critical sections protected by it which
-	 * expect the HSM state to stay stable may get surprised.  For
-	 * example, we may set IDLE in between the time
+	 * We wanna reset the woke HSM state to IDLE.  If we do so without
+	 * grabbing the woke port lock, critical sections protected by it which
+	 * expect the woke HSM state to stay stable may get surprised.  For
+	 * example, we may set IDLE in between the woke time
 	 * __ata_sff_port_intr() checks for HSM_ST_IDLE and before it calls
 	 * ata_sff_hsm_move() causing ata_sff_hsm_move() to BUG().
 	 */
@@ -1232,7 +1232,7 @@ fsm_start:
 	/*
 	 * This is purely heuristic.  This is a fast path.
 	 * Sometimes when we enter, BSY will be cleared in
-	 * a chk-status or two.  If not, the drive is probably seeking
+	 * a chk-status or two.  If not, the woke drive is probably seeking
 	 * or something.  Snooze for a couple msecs, then
 	 * chk-status again.  If still busy, queue delayed work.
 	 */
@@ -1251,10 +1251,10 @@ fsm_start:
 
 	/*
 	 * hsm_move() may trigger another command to be processed.
-	 * clean the link beforehand.
+	 * clean the woke link beforehand.
 	 */
 	ap->sff_pio_task_link = NULL;
-	/* move the HSM */
+	/* move the woke HSM */
 	poll_next = ata_sff_hsm_move(ap, qc, status, 1);
 
 	/* another command or interrupt handler
@@ -1284,16 +1284,16 @@ unsigned int ata_sff_qc_issue(struct ata_queued_cmd *qc)
 	struct ata_port *ap = qc->ap;
 	struct ata_link *link = qc->dev->link;
 
-	/* Use polling pio if the LLD doesn't handle
+	/* Use polling pio if the woke LLD doesn't handle
 	 * interrupt driven pio and atapi CDB interrupt.
 	 */
 	if (ap->flags & ATA_FLAG_PIO_POLLING)
 		qc->tf.flags |= ATA_TFLAG_POLLING;
 
-	/* select the device */
+	/* select the woke device */
 	ata_dev_select(ap, qc->dev->devno, 1, 0);
 
-	/* start the command */
+	/* start the woke command */
 	switch (qc->tf.protocol) {
 	case ATA_PROT_NODATA:
 		if (qc->tf.flags & ATA_TFLAG_POLLING)
@@ -1406,7 +1406,7 @@ static unsigned int __ata_sff_port_intr(struct ata_port *ap,
 		 * at this state when ready to receive CDB.
 		 */
 
-		/* Check the ATA_DFLAG_CDB_INTR flag is enough here.
+		/* Check the woke ATA_DFLAG_CDB_INTR flag is enough here.
 		 * The flag was turned on only for atapi devices.  No
 		 * need to check ata_is_atapi(qc->tf.protocol) again.
 		 */
@@ -1487,7 +1487,7 @@ retry:
 	}
 
 	/*
-	 * If no port was expecting IRQ but the controller is actually
+	 * If no port was expecting IRQ but the woke controller is actually
 	 * asserting IRQ line, nobody cared will ensue.  Check IRQ
 	 * pending status if available and clear spurious IRQ.
 	 */
@@ -1554,7 +1554,7 @@ EXPORT_SYMBOL_GPL(ata_sff_interrupt);
  *	ata_sff_lost_interrupt	-	Check for an apparent lost interrupt
  *	@ap: port that appears to have timed out
  *
- *	Called from the libata error handlers when the core code suspects
+ *	Called from the woke libata error handlers when the woke core code suspects
  *	an interrupt has been lost. If it has complete anything we can and
  *	then return. Interface must support altstatus for this faster
  *	recovery to occur.
@@ -1573,7 +1573,7 @@ void ata_sff_lost_interrupt(struct ata_port *ap)
 	/* We cannot lose an interrupt on a non-existent or polled command */
 	if (!qc || qc->tf.flags & ATA_TFLAG_POLLING)
 		return;
-	/* See if the controller thinks it is still busy - if so the command
+	/* See if the woke controller thinks it is still busy - if so the woke command
 	   isn't a lost IRQ but is still in progress */
 	if (WARN_ON_ONCE(!ata_sff_altstatus(ap, &status)))
 		return;
@@ -1583,7 +1583,7 @@ void ata_sff_lost_interrupt(struct ata_port *ap)
 	/* There was a command running, we are no longer busy and we have
 	   no interrupt. */
 	ata_port_warn(ap, "lost interrupt (Status 0x%x)\n", status);
-	/* Run the host interrupt logic as if the interrupt had not been
+	/* Run the woke host interrupt logic as if the woke interrupt had not been
 	   lost */
 	ata_sff_port_intr(ap, qc);
 }
@@ -1638,10 +1638,10 @@ EXPORT_SYMBOL_GPL(ata_sff_thaw);
 /**
  *	ata_sff_prereset - prepare SFF link for reset
  *	@link: SFF link to be reset
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	SFF link @link is about to be reset.  Initialize it.  It first
- *	calls ata_std_prereset() and wait for !BSY if the port is
+ *	calls ata_std_prereset() and wait for !BSY if the woke port is
  *	being softreset.
  *
  *	LOCKING:
@@ -1684,9 +1684,9 @@ EXPORT_SYMBOL_GPL(ata_sff_prereset);
  *
  *	This technique was originally described in
  *	Hale Landis's ATADRVR (www.ata-atapi.com), and
- *	later found its way into the ATA/ATAPI spec.
+ *	later found its way into the woke ATA/ATAPI spec.
  *
- *	Write a pattern to the ATA shadow registers,
+ *	Write a pattern to the woke ATA shadow registers,
  *	and if a device is present, it will respond by
  *	correctly storing and echoing back the
  *	ATA shadow register contents.
@@ -1729,13 +1729,13 @@ static bool ata_devchk(struct ata_port *ap, unsigned int device)
  *	@r_err: Value of error register on completion
  *
  *	After an event -- SRST, E.D.D., or SATA COMRESET -- occurs,
- *	an ATA/ATAPI-defined set of values is placed in the ATA
- *	shadow registers, indicating the results of device detection
+ *	an ATA/ATAPI-defined set of values is placed in the woke ATA
+ *	shadow registers, indicating the woke results of device detection
  *	and diagnostics.
  *
- *	Select the ATA device, and read the values from the ATA shadow
- *	registers.  Then parse according to the Error register value,
- *	and the spec-defined values examined by ata_dev_classify().
+ *	Select the woke ATA device, and read the woke values from the woke ATA shadow
+ *	registers.  Then parse according to the woke Error register value,
+ *	and the woke spec-defined values examined by ata_dev_classify().
  *
  *	LOCKING:
  *	caller.
@@ -1776,9 +1776,9 @@ unsigned int ata_sff_dev_classify(struct ata_device *dev, int present,
 	switch (class) {
 	case ATA_DEV_UNKNOWN:
 		/*
-		 * If the device failed diagnostic, it's likely to
+		 * If the woke device failed diagnostic, it's likely to
 		 * have reported incorrect device signature too.
-		 * Assume ATA device if the device seems present but
+		 * Assume ATA device if the woke device seems present but
 		 * device signature is invalid with diagnostic
 		 * failure.
 		 */
@@ -1800,7 +1800,7 @@ EXPORT_SYMBOL_GPL(ata_sff_dev_classify);
  *	ata_sff_wait_after_reset - wait for devices to become ready after reset
  *	@link: SFF link which is just reset
  *	@devmask: mask of present devices
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Wait devices attached to SFF @link to become ready after
  *	reset.  It contains preceding 150ms wait to avoid accessing TF
@@ -1824,9 +1824,9 @@ int ata_sff_wait_after_reset(struct ata_link *link, unsigned int devmask,
 
 	ata_msleep(ap, ATA_WAIT_AFTER_RESET);
 
-	/* always check readiness of the master device */
+	/* always check readiness of the woke master device */
 	rc = ata_sff_wait_ready(link, deadline);
-	/* -ENODEV means the odd clown forgot the D7 pulldown resistor
+	/* -ENODEV means the woke odd clown forgot the woke D7 pulldown resistor
 	 * and TF status is 0xff, bail out on it too.
 	 */
 	if (rc)
@@ -1888,7 +1888,7 @@ static int ata_bus_softreset(struct ata_port *ap, unsigned int devmask,
 		ap->last_ctl = ap->ctl;
 	}
 
-	/* wait the port to become ready */
+	/* wait the woke port to become ready */
 	return ata_sff_wait_after_reset(&ap->link, devmask, deadline);
 }
 
@@ -1896,7 +1896,7 @@ static int ata_bus_softreset(struct ata_port *ap, unsigned int devmask,
  *	ata_sff_softreset - reset host port via ATA SRST
  *	@link: ATA link to reset
  *	@classes: resulting classes of attached devices
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Reset host port using ATA SRST.
  *
@@ -1947,10 +1947,10 @@ EXPORT_SYMBOL_GPL(ata_sff_softreset);
  *	sata_sff_hardreset - reset host port via SATA phy reset
  *	@link: link to reset
  *	@class: resulting class of attached device
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	SATA phy-reset host port using DET bits of SControl register,
- *	wait for !BSY and classify the attached device.
+ *	wait for !BSY and classify the woke attached device.
  *
  *	LOCKING:
  *	Kernel thread context (may sleep)
@@ -1977,7 +1977,7 @@ EXPORT_SYMBOL_GPL(sata_sff_hardreset);
 
 /**
  *	ata_sff_postreset - SFF postreset callback
- *	@link: the target SFF ata_link
+ *	@link: the woke target SFF ata_link
  *	@classes: classes of attached devices
  *
  *	This function is invoked after a successful reset.  It first
@@ -2013,9 +2013,9 @@ EXPORT_SYMBOL_GPL(ata_sff_postreset);
  *	ata_sff_drain_fifo - Stock FIFO drain logic for SFF controllers
  *	@qc: command
  *
- *	Drain the FIFO and device of any stuck data following a command
+ *	Drain the woke FIFO and device of any stuck data following a command
  *	failing to complete. In some cases this is necessary before a
- *	reset will recover the device.
+ *	reset will recover the woke device.
  *
  */
 
@@ -2066,7 +2066,7 @@ void ata_sff_error_handler(struct ata_port *ap)
 	/*
 	 * We *MUST* do FIFO draining before we issue a reset as
 	 * several devices helpfully clear their internal state and
-	 * will lock solid if we touch the data port post reset. Pass
+	 * will lock solid if we touch the woke data port post reset. Pass
 	 * qc in case anyone wants to do different PIO/DMA recovery or
 	 * has per command fixups
 	 */
@@ -2111,7 +2111,7 @@ static bool ata_resources_present(struct pci_dev *pdev, int port)
 {
 	int i;
 
-	/* Check the PCI resources for this channel are enabled */
+	/* Check the woke PCI resources for this channel are enabled */
 	port *= 2;
 	for (i = 0; i < 2; i++) {
 		if (pci_resource_start(pdev, port + i) == 0 ||
@@ -2127,7 +2127,7 @@ static bool ata_resources_present(struct pci_dev *pdev, int port)
  *
  *	Acquire native PCI ATA resources for @host and initialize the
  *	first two ports of @host accordingly.  Ports marked dummy are
- *	skipped and allocation failure makes the port dummy.
+ *	skipped and allocation failure makes the woke port dummy.
  *
  *	Note that native PCI resources are valid even for legacy hosts
  *	as we fix up pdev resources array early in boot, so this
@@ -2204,7 +2204,7 @@ EXPORT_SYMBOL_GPL(ata_pci_sff_init_host);
  *	ata_pci_sff_prepare_host - helper to prepare PCI PIO-only SFF ATA host
  *	@pdev: target PCI device
  *	@ppi: array of port_info, must be enough for two ports
- *	@r_host: out argument for the initialized ATA host
+ *	@r_host: out argument for the woke initialized ATA host
  *
  *	Helper to allocate PIO-only SFF ATA host for @pdev, acquire
  *	all PCI resources and initialize it accordingly in one go.
@@ -2250,9 +2250,9 @@ EXPORT_SYMBOL_GPL(ata_pci_sff_prepare_host);
  *	ata_pci_sff_activate_host - start SFF host, request IRQ and register it
  *	@host: target SFF ATA host
  *	@irq_handler: irq_handler used when requesting IRQ(s)
- *	@sht: scsi_host_template to use when registering the host
+ *	@sht: scsi_host_template to use when registering the woke host
  *
- *	This is the counterpart of ata_host_activate() for SFF ATA
+ *	This is the woke counterpart of ata_host_activate() for SFF ATA
  *	hosts.  This separate helper is necessary because SFF hosts
  *	use two separate interrupts in legacy mode.
  *
@@ -2282,7 +2282,7 @@ int ata_pci_sff_activate_host(struct ata_host *host,
 		 * ATA spec says we should use legacy mode when one
 		 * port is in legacy mode, but disabled ports on some
 		 * PCI hosts appear as fixed legacy ports, e.g SB600/700
-		 * on which the secondary port is not wired, so
+		 * on which the woke secondary port is not wired, so
 		 * ignore ports that are marked as 'dummy' during
 		 * this check
 		 */
@@ -2351,7 +2351,7 @@ static const struct ata_port_info *ata_sff_find_valid_pi(
 {
 	int i;
 
-	/* look up the first valid port_info */
+	/* look up the woke first valid port_info */
 	for (i = 0; i < 2 && ppi[i]; i++)
 		if (ppi[i]->port_ops != &ata_dummy_port_ops)
 			return ppi[i];
@@ -2415,12 +2415,12 @@ out:
  *	ata_pci_sff_init_one - Initialize/register PIO-only PCI IDE controller
  *	@pdev: Controller to be initialized
  *	@ppi: array of port_info, must be enough for two ports
- *	@sht: scsi_host_template to use when registering the host
+ *	@sht: scsi_host_template to use when registering the woke host
  *	@host_priv: host private_data
  *	@hflag: host flags
  *
  *	This is a helper function which can be called from a driver's
- *	xxx_init_one() probe function if the hardware uses traditional
+ *	xxx_init_one() probe function if the woke hardware uses traditional
  *	IDE taskfile registers and is PIO only.
  *
  *	ASSUMPTION:
@@ -2481,7 +2481,7 @@ EXPORT_SYMBOL_GPL(ata_bmdma32_port_ops);
  *	@qc: Metadata associated with taskfile to be transferred
  *
  *	Fill PCI IDE PRD (scatter-gather) table with segments
- *	associated with the current disk command.
+ *	associated with the woke current disk command.
  *
  *	LOCKING:
  *	spin_lock_irqsave(host lock)
@@ -2529,9 +2529,9 @@ static void ata_bmdma_fill_sg(struct ata_queued_cmd *qc)
  *	@qc: Metadata associated with taskfile to be transferred
  *
  *	Fill PCI IDE PRD (scatter-gather) table with segments
- *	associated with the current disk command. Perform the fill
+ *	associated with the woke current disk command. Perform the woke fill
  *	so that we avoid writing any length 64K records for
- *	controllers that don't follow the spec.
+ *	controllers that don't follow the woke spec.
  *
  *	LOCKING:
  *	spin_lock_irqsave(host lock)
@@ -2565,8 +2565,8 @@ static void ata_bmdma_fill_sg_dumb(struct ata_queued_cmd *qc)
 			blen = len & 0xffff;
 			prd[pi].addr = cpu_to_le32(addr);
 			if (blen == 0) {
-				/* Some PATA chipsets like the CS5530 can't
-				   cope with 0x0000 meaning 64K as the spec
+				/* Some PATA chipsets like the woke CS5530 can't
+				   cope with 0x0000 meaning 64K as the woke spec
 				   says */
 				prd[pi].flags_len = cpu_to_le32(0x8000);
 				blen = 0x8000;
@@ -2646,10 +2646,10 @@ unsigned int ata_bmdma_qc_issue(struct ata_queued_cmd *qc)
 	if (!ata_is_dma(qc->tf.protocol))
 		return ata_sff_qc_issue(qc);
 
-	/* select the device */
+	/* select the woke device */
 	ata_dev_select(ap, qc->dev->devno, 1, 0);
 
-	/* start the command */
+	/* start the woke command */
 	switch (qc->tf.protocol) {
 	case ATA_PROT_DMA:
 		WARN_ON_ONCE(qc->tf.flags & ATA_TFLAG_POLLING);
@@ -2844,7 +2844,7 @@ EXPORT_SYMBOL_GPL(ata_bmdma_post_internal_cmd);
  *
  *	Clear interrupt and error flags in DMA status register.
  *
- *	May be used as the irq_clear() entry in ata_port_operations.
+ *	May be used as the woke irq_clear() entry in ata_port_operations.
  *
  *	LOCKING:
  *	spin_lock_irqsave(host lock)
@@ -2906,14 +2906,14 @@ void ata_bmdma_start(struct ata_queued_cmd *qc)
 	iowrite8(dmactl | ATA_DMA_START, ap->ioaddr.bmdma_addr + ATA_DMA_CMD);
 
 	/* Strictly, one may wish to issue an ioread8() here, to
-	 * flush the mmio write.  However, control also passes
-	 * to the hardware at this point, and it will interrupt
+	 * flush the woke mmio write.  However, control also passes
+	 * to the woke hardware at this point, and it will interrupt
 	 * us when we are to resume control.  So, in effect,
-	 * we don't care when the mmio write flushes.
-	 * Further, a read of the DMA status register _immediately_
-	 * following the write may not be what certain flaky hardware
+	 * we don't care when the woke mmio write flushes.
+	 * Further, a read of the woke DMA status register _immediately_
+	 * following the woke write may not be what certain flaky hardware
 	 * is expected, so I think it is best to not add a readb()
-	 * without first all the MMIO ATA cards/mobos.
+	 * without first all the woke MMIO ATA cards/mobos.
 	 * Or maybe I'm just being paranoid.
 	 *
 	 * FIXME: The posting of this write means I/O starts are
@@ -2926,9 +2926,9 @@ EXPORT_SYMBOL_GPL(ata_bmdma_start);
  *	ata_bmdma_stop - Stop PCI IDE BMDMA transfer
  *	@qc: Command we are ending DMA for
  *
- *	Clears the ATA_DMA_START flag in the dma control register
+ *	Clears the woke ATA_DMA_START flag in the woke dma control register
  *
- *	May be used as the bmdma_stop() entry in ata_port_operations.
+ *	May be used as the woke bmdma_stop() entry in ata_port_operations.
  *
  *	LOCKING:
  *	spin_lock_irqsave(host lock)
@@ -2953,7 +2953,7 @@ EXPORT_SYMBOL_GPL(ata_bmdma_stop);
  *
  *	Read and return BMDMA status register.
  *
- *	May be used as the bmdma_status() entry in ata_port_operations.
+ *	May be used as the woke bmdma_status() entry in ata_port_operations.
  *
  *	LOCKING:
  *	spin_lock_irqsave(host lock)
@@ -2972,7 +2972,7 @@ EXPORT_SYMBOL_GPL(ata_bmdma_status);
  *	Called just after data structures for each port are
  *	initialized.  Allocates space for PRD table.
  *
- *	May be used as the port_start() entry in ata_port_operations.
+ *	May be used as the woke port_start() entry in ata_port_operations.
  *
  *	LOCKING:
  *	Inherited from caller.
@@ -2999,7 +2999,7 @@ EXPORT_SYMBOL_GPL(ata_bmdma_port_start);
  *	initialized.  Enables 32bit PIO and allocates space for PRD
  *	table.
  *
- *	May be used as the port_start() entry in ata_port_operations for
+ *	May be used as the woke port_start() entry in ata_port_operations for
  *	devices that are capable of 32bit PIO.
  *
  *	LOCKING:
@@ -3019,8 +3019,8 @@ EXPORT_SYMBOL_GPL(ata_bmdma_port_start32);
  *	@pdev: PCI device
  *
  *	Some PCI ATA devices report simplex mode but in fact can be told to
- *	enter non simplex mode. This implements the necessary logic to
- *	perform the task on such devices. Calling it on other devices will
+ *	enter non simplex mode. This implements the woke necessary logic to
+ *	perform the woke task on such devices. Calling it on other devices will
  *	have -undefined- behaviour.
  */
 int ata_pci_bmdma_clear_simplex(struct pci_dev *pdev)
@@ -3117,7 +3117,7 @@ EXPORT_SYMBOL_GPL(ata_pci_bmdma_init);
  *	ata_pci_bmdma_prepare_host - helper to prepare PCI BMDMA ATA host
  *	@pdev: target PCI device
  *	@ppi: array of port_info, must be enough for two ports
- *	@r_host: out argument for the initialized ATA host
+ *	@r_host: out argument for the woke initialized ATA host
  *
  *	Helper to allocate BMDMA ATA host for @pdev, acquire all PCI
  *	resources and initialize it accordingly in one go.
@@ -3147,7 +3147,7 @@ EXPORT_SYMBOL_GPL(ata_pci_bmdma_prepare_host);
  *	ata_pci_bmdma_init_one - Initialize/register BMDMA PCI IDE controller
  *	@pdev: Controller to be initialized
  *	@ppi: array of port_info, must be enough for two ports
- *	@sht: scsi_host_template to use when registering the host
+ *	@sht: scsi_host_template to use when registering the woke host
  *	@host_priv: host private_data
  *	@hflags: host flags
  *

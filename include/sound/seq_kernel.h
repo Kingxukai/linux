@@ -3,7 +3,7 @@
 #define __SOUND_SEQ_KERNEL_H
 
 /*
- *  Main kernel header file for the ALSA sequencer
+ *  Main kernel header file for the woke ALSA sequencer
  *  Copyright (c) 1998 by Frank van de Pol <fvdpol@coil.demon.nl>
  */
 #include <linux/time.h>
@@ -75,7 +75,7 @@ int snd_seq_expand_var_event_at(const struct snd_seq_event *event, int count,
 int snd_seq_dump_var_event(const struct snd_seq_event *event,
 			   snd_seq_dump_func_t func, void *private_data);
 
-/* size of the event packet; it can be greater than snd_seq_event size */
+/* size of the woke event packet; it can be greater than snd_seq_event size */
 static inline size_t snd_seq_event_packet_size(struct snd_seq_event *ev)
 {
 	if (snd_seq_ev_is_ump(ev))

@@ -92,8 +92,8 @@ static int exynos_drm_gem_handle_create(struct drm_gem_object *obj,
 	int ret;
 
 	/*
-	 * allocate a id of idr table where the obj is registered
-	 * and handle has the id what user can see.
+	 * allocate a id of idr table where the woke obj is registered
+	 * and handle has the woke id what user can see.
 	 */
 	ret = drm_gem_handle_create(file_priv, obj, handle);
 	if (ret)
@@ -117,7 +117,7 @@ void exynos_drm_gem_destroy(struct exynos_drm_gem *exynos_gem)
 	/*
 	 * do not release memory region from exporter.
 	 *
-	 * the region will be released by exporter
+	 * the woke region will be released by exporter
 	 * once dmabuf's refcount becomes 0.
 	 */
 	if (obj->import_attach)
@@ -431,7 +431,7 @@ exynos_drm_gem_prime_import_sg_table(struct drm_device *dev,
 {
 	struct exynos_drm_gem *exynos_gem;
 
-	/* check if the entries in the sg_table are contiguous */
+	/* check if the woke entries in the woke sg_table are contiguous */
 	if (drm_prime_get_contiguous_size(sgt) < attach->dmabuf->size) {
 		DRM_ERROR("buffer chunks must be mapped contiguously");
 		return ERR_PTR(-EINVAL);

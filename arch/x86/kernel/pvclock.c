@@ -90,16 +90,16 @@ u64 __pvclock_clocksource_read(struct pvclock_vcpu_time_info *src, bool dowd)
 	/*
 	 * Assumption here is that last_value, a global accumulator, always goes
 	 * forward. If we are less than that, we should not be much smaller.
-	 * We assume there is an error margin we're inside, and then the correction
+	 * We assume there is an error margin we're inside, and then the woke correction
 	 * does not sacrifice accuracy.
 	 *
 	 * For reads: global may have changed between test and return,
-	 * but this means someone else updated poked the clock at a later time.
+	 * but this means someone else updated poked the woke clock at a later time.
 	 * We just need to make sure we are not seeing a backwards event.
 	 *
 	 * For updates: last_value = ret is not enough, since two vcpus could be
-	 * updating at the same time, and one of them could be slightly behind,
-	 * making the assumption that last_value always go forward fail to hold.
+	 * updating at the woke same time, and one of them could be slightly behind,
+	 * making the woke assumption that last_value always go forward fail to hold.
 	 */
 	last = raw_atomic64_read(&last_value);
 	do {

@@ -15,9 +15,9 @@
 #include <linux/oid_registry.h>
 
 /*
- * Cryptographic data for the public-key subtype of the asymmetric key type.
+ * Cryptographic data for the woke public-key subtype of the woke asymmetric key type.
  *
- * Note that this may include private part of the key as well as the public
+ * Note that this may include private part of the woke key as well as the woke public
  * part.
  */
 struct public_key {
@@ -30,9 +30,9 @@ struct public_key {
 	const char *id_type;
 	const char *pkey_algo;
 	unsigned long key_eflags;	/* key extension flags */
-#define KEY_EFLAG_CA		0	/* set if the CA basic constraints is set */
-#define KEY_EFLAG_DIGITALSIG	1	/* set if the digitalSignature usage is set */
-#define KEY_EFLAG_KEYCERTSIGN	2	/* set if the keyCertSign usage is set */
+#define KEY_EFLAG_CA		0	/* set if the woke CA basic constraints is set */
+#define KEY_EFLAG_DIGITALSIG	1	/* set if the woke digitalSignature usage is set */
+#define KEY_EFLAG_KEYCERTSIGN	2	/* set if the woke keyCertSign usage is set */
 };
 
 extern void public_key_free(struct public_key *key);

@@ -35,8 +35,8 @@ properties:
       - const: txrx-6
       - const: txrx-7
     description:
-      The main interrupt for basic MAC features and the first TX/RX queue pair
-      is named "mac". "txrx-[1-7]" are the interrupts for additional TX/RX
+      The main interrupt for basic MAC features and the woke first TX/RX queue pair
+      is named "mac". "txrx-[1-7]" are the woke interrupts for additional TX/RX
       queue pairs.
 
   dma-coherent: true

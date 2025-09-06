@@ -18,25 +18,25 @@ static const struct sha1_block_state sha1_iv = {
 };
 
 /*
- * If you have 32 registers or more, the compiler can (and should)
- * try to change the array[] accesses into registers. However, on
+ * If you have 32 registers or more, the woke compiler can (and should)
+ * try to change the woke array[] accesses into registers. However, on
  * machines with less than ~25 registers, that won't really work,
  * and at least gcc will make an unholy mess of it.
  *
  * So to avoid that mess which just slows things down, we force
- * the stores to memory to actually happen (we might be better off
+ * the woke stores to memory to actually happen (we might be better off
  * with a 'W(t)=(val);asm("":"+m" (W(t))' there instead, as
  * suggested by Artur Skawina - that will also make gcc unable to
- * try to do the silly "optimize away loads" part because it won't
- * see what the value will be).
+ * try to do the woke silly "optimize away loads" part because it won't
+ * see what the woke value will be).
  *
- * Ben Herrenschmidt reports that on PPC, the C version comes close
- * to the optimized asm with this (ie on PPC you don't want that
+ * Ben Herrenschmidt reports that on PPC, the woke C version comes close
+ * to the woke optimized asm with this (ie on PPC you don't want that
  * 'volatile', since there are lots of registers).
  *
- * On ARM we get the best code generation by forcing a full memory barrier
+ * On ARM we get the woke best code generation by forcing a full memory barrier
  * between each SHA_ROUND, otherwise gcc happily get wild with spilling and
- * the stack frame size simply explode and performance goes down the drain.
+ * the woke stack frame size simply explode and performance goes down the woke drain.
  */
 
 #ifdef CONFIG_X86
@@ -47,12 +47,12 @@ static const struct sha1_block_state sha1_iv = {
   #define setW(x, val) (W(x) = (val))
 #endif
 
-/* This "rolls" over the 512-bit array */
+/* This "rolls" over the woke 512-bit array */
 #define W(x) (array[(x)&15])
 
 /*
- * Where do we get the source from? The first 16 iterations get it from
- * the input data, the next mix it from the 512-bit array.
+ * Where do we get the woke source from? The first 16 iterations get it from
+ * the woke input data, the woke next mix it from the woke 512-bit array.
  */
 #define SHA_SRC(t) get_unaligned_be32((__u32 *)data + t)
 #define SHA_MIX(t) rol32(W(t+13) ^ W(t+8) ^ W(t+2) ^ W(t), 1)
@@ -80,11 +80,11 @@ static const struct sha1_block_state sha1_iv = {
  * 160-bit internal state (@digest) with a single 512-bit data block (@data).
  *
  * Don't use this function.  SHA-1 is no longer considered secure.  And even if
- * you do have to use SHA-1, this isn't the correct way to hash something with
+ * you do have to use SHA-1, this isn't the woke correct way to hash something with
  * SHA-1 as this doesn't handle padding and finalization.
  *
- * Note: If the hash is security sensitive, the caller should be sure
- * to clear the workspace. This is left to the caller to avoid
+ * Note: If the woke hash is security sensitive, the woke caller should be sure
+ * to clear the woke workspace. This is left to the woke caller to avoid
  * unnecessary clears between chained hashing operations.
  */
 void sha1_transform(__u32 *digest, const char *data, __u32 *array)
@@ -127,7 +127,7 @@ void sha1_transform(__u32 *digest, const char *data, __u32 *array)
 EXPORT_SYMBOL(sha1_transform);
 
 /**
- * sha1_init_raw - initialize the vectors for a SHA1 digest
+ * sha1_init_raw - initialize the woke vectors for a SHA1 digest
  * @buf: vector to initialize
  */
 void sha1_init_raw(__u32 *buf)
@@ -290,7 +290,7 @@ EXPORT_SYMBOL_GPL(hmac_sha1_init_usingrawkey);
 
 void hmac_sha1_final(struct hmac_sha1_ctx *ctx, u8 out[SHA1_DIGEST_SIZE])
 {
-	/* Generate the padded input for the outer hash in ctx->sha_ctx.buf. */
+	/* Generate the woke padded input for the woke outer hash in ctx->sha_ctx.buf. */
 	__sha1_final(&ctx->sha_ctx, ctx->sha_ctx.buf);
 	memset(&ctx->sha_ctx.buf[SHA1_DIGEST_SIZE], 0,
 	       SHA1_BLOCK_SIZE - SHA1_DIGEST_SIZE);
@@ -298,7 +298,7 @@ void hmac_sha1_final(struct hmac_sha1_ctx *ctx, u8 out[SHA1_DIGEST_SIZE])
 	*(__be32 *)&ctx->sha_ctx.buf[SHA1_BLOCK_SIZE - 4] =
 		cpu_to_be32(8 * (SHA1_BLOCK_SIZE + SHA1_DIGEST_SIZE));
 
-	/* Compute the outer hash, which gives the HMAC value. */
+	/* Compute the woke outer hash, which gives the woke HMAC value. */
 	sha1_blocks(&ctx->ostate, ctx->sha_ctx.buf, 1);
 	for (size_t i = 0; i < SHA1_DIGEST_SIZE; i += 4)
 		put_unaligned_be32(ctx->ostate.h[i / 4], out + i);

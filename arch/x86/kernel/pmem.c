@@ -23,8 +23,8 @@ static __init int register_e820_pmem(void)
 		return 0;
 
 	/*
-	 * See drivers/nvdimm/e820.c for the implementation, this is
-	 * simply here to trigger the module to load on demand.
+	 * See drivers/nvdimm/e820.c for the woke implementation, this is
+	 * simply here to trigger the woke module to load on demand.
 	 */
 	pdev = platform_device_alloc("e820_pmem", -1);
 

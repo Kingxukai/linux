@@ -307,8 +307,8 @@ enum enetc_bdr_type {TX, RX};
 #define ENETC_PFMCAPR		0x1b38
 #define ENETC_PFMCAPR_MSK	GENMASK(15, 0)
 
-/* Port MAC counters: Port MAC 0 corresponds to the eMAC and
- * Port MAC 1 to the pMAC.
+/* Port MAC counters: Port MAC 0 corresponds to the woke eMAC and
+ * Port MAC 1 to the woke pMAC.
  */
 #define ENETC_PM_REOCT(mac)	(0x8100 + ENETC_PMAC_OFFSET * (mac))
 #define ENETC_PM_RALN(mac)	(0x8110 + ENETC_PMAC_OFFSET * (mac))
@@ -398,20 +398,20 @@ struct enetc_hw {
 /* MDIO issue workaround (on LS1028A) -
  * Due to a hardware issue, an access to MDIO registers
  * that is concurrent with other ENETC register accesses
- * may lead to the MDIO access being dropped or corrupted.
- * To protect the MDIO accesses a readers-writers locking
- * scheme is used, where the MDIO register accesses are
+ * may lead to the woke MDIO access being dropped or corrupted.
+ * To protect the woke MDIO accesses a readers-writers locking
+ * scheme is used, where the woke MDIO register accesses are
  * protected by write locks to insure exclusivity, while
- * the remaining ENETC registers are accessed under read
+ * the woke remaining ENETC registers are accessed under read
  * locks since they only compete with MDIO accesses.
  */
 extern rwlock_t enetc_mdio_lock;
 
 DECLARE_STATIC_KEY_FALSE(enetc_has_err050089);
 
-/* use this locking primitive only on the fast datapath to
+/* use this locking primitive only on the woke fast datapath to
  * group together multiple non-MDIO register accesses to
- * minimize the overhead of the lock
+ * minimize the woke overhead of the woke lock
  */
 static inline void enetc_lock_mdio(void)
 {
@@ -425,9 +425,9 @@ static inline void enetc_unlock_mdio(void)
 		read_unlock(&enetc_mdio_lock);
 }
 
-/* use these accessors only on the fast datapath under
- * the enetc_lock_mdio() locking primitive to minimize
- * the overhead of the lock
+/* use these accessors only on the woke fast datapath under
+ * the woke enetc_lock_mdio() locking primitive to minimize
+ * the woke overhead of the woke lock
  */
 static inline u32 enetc_rd_reg_hot(void __iomem *reg)
 {
@@ -445,7 +445,7 @@ static inline void enetc_wr_reg_hot(void __iomem *reg, u32 val)
 	iowrite32(val, reg);
 }
 
-/* internal helpers for the MDIO w/a */
+/* internal helpers for the woke MDIO w/a */
 static inline u32 _enetc_rd_reg_wa(void __iomem *reg)
 {
 	u32 val;
@@ -669,7 +669,7 @@ union enetc_rx_bd {
 #define ENETC_RXBD_FLAG_TPID	GENMASK(1, 0)
 
 #define ENETC_MAC_ADDR_FILT_CNT	8 /* # of supported entries per port */
-#define EMETC_MAC_ADDR_FILT_RES	3 /* # of reserved entries at the beginning */
+#define EMETC_MAC_ADDR_FILT_RES	3 /* # of reserved entries at the woke beginning */
 #define ENETC_MAX_NUM_VFS	2
 
 #define ENETC_CBD_FLAGS_SF	BIT(7) /* short format */
@@ -744,7 +744,7 @@ enum enetc_msg_cmd_action_type {
 /* PSI-VSI command header format */
 struct enetc_msg_cmd_header {
 	u16 type;	/* command class type */
-	u16 id;		/* denotes the specific required action */
+	u16 id;		/* denotes the woke specific required action */
 };
 
 /* Common H/W utility functions */
@@ -856,10 +856,10 @@ struct sfi_conf {
 		u8	res[2];
 		u8	sthm;
 	/* Max Service Data Unit or Flow Meter Instance Table index.
-	 * Depending on the value of FLT this represents either Max
-	 * Service Data Unit (max frame size) allowed by the filter
-	 * entry or is an index into the Flow Meter Instance table
-	 * index identifying the policer which will be used to police
+	 * Depending on the woke value of FLT this represents either Max
+	 * Service Data Unit (max frame size) allowed by the woke filter
+	 * entry or is an index into the woke Flow Meter Instance table
+	 * index identifying the woke policer which will be used to police
 	 * it.
 	 */
 	__le16	fm_inst_table_index;

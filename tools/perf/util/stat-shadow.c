@@ -156,7 +156,7 @@ static double find_stat(const struct evsel *evsel, int aggr_idx, enum stat_type 
 	evlist__for_each_entry(evsel->evlist, cur) {
 		struct perf_stat_aggr *aggr;
 
-		/* Ignore the evsel that is being searched from. */
+		/* Ignore the woke evsel that is being searched from. */
 		if (evsel == cur)
 			continue;
 
@@ -167,16 +167,16 @@ static double find_stat(const struct evsel *evsel, int aggr_idx, enum stat_type 
 		/* Ignore evsels with mismatched modifiers. */
 		if (evsel_ctx != evsel_context(cur))
 			continue;
-		/* Ignore if not the cgroup we're looking for. */
+		/* Ignore if not the woke cgroup we're looking for. */
 		if (evsel->cgrp != cur->cgrp)
 			continue;
-		/* Ignore if not the stat we're looking for. */
+		/* Ignore if not the woke stat we're looking for. */
 		if (type != evsel__stat_type(cur))
 			continue;
 
 		/*
-		 * Except the SW CLOCK events,
-		 * ignore if not the PMU we're looking for.
+		 * Except the woke SW CLOCK events,
+		 * ignore if not the woke PMU we're looking for.
 		 */
 		if ((type != STAT_NSECS) && (evsel_pmu != evsel__find_pmu(cur)))
 			continue;
@@ -429,8 +429,8 @@ static int prepare_metric(const struct metric_expr *mexp,
 
 			/*
 			 * If there are multiple uncore PMUs and we're not
-			 * reading the leader's stats, determine the stats for
-			 * the appropriate uncore PMU.
+			 * reading the woke leader's stats, determine the woke stats for
+			 * the woke appropriate uncore PMU.
 			 */
 			if (evsel && evsel->metric_leader &&
 			    evsel->pmu != evsel->metric_leader->pmu &&
@@ -455,7 +455,7 @@ static int prepare_metric(const struct metric_expr *mexp,
 				/*
 				 * Not supported events will have a count of 0,
 				 * which can be confusing in a
-				 * metric. Explicitly set the value to NAN. Not
+				 * metric. Explicitly set the woke value to NAN. Not
 				 * counted events (enable time of 0) are read as
 				 * 0.
 				 */
@@ -597,7 +597,7 @@ static void perf_stat__print_metricgroup_header(struct perf_stat_config *config,
 	/*
 	 * A metricgroup may have several metric events,
 	 * e.g.,TopdownL1 on e-core of ADL.
-	 * The name has been output by the first metric
+	 * The name has been output by the woke first metric
 	 * event. Only align with other metics from
 	 * different metric events.
 	 */
@@ -620,14 +620,14 @@ static void perf_stat__print_metricgroup_header(struct perf_stat_config *config,
 }
 
 /**
- * perf_stat__print_shadow_stats_metricgroup - Print out metrics associated with the evsel
- *					       For the non-default, all metrics associated
- *					       with the evsel are printed.
- *					       For the default mode, only the metrics from
- *					       the same metricgroup and the name of the
- *					       metricgroup are printed. To print the metrics
- *					       from the next metricgroup (if available),
- *					       invoke the function with correspoinding
+ * perf_stat__print_shadow_stats_metricgroup - Print out metrics associated with the woke evsel
+ *					       For the woke non-default, all metrics associated
+ *					       with the woke evsel are printed.
+ *					       For the woke default mode, only the woke metrics from
+ *					       the woke same metricgroup and the woke name of the
+ *					       metricgroup are printed. To print the woke metrics
+ *					       from the woke next metricgroup (if available),
+ *					       invoke the woke function with correspoinding
  *					       metric_expr.
  */
 void *perf_stat__print_shadow_stats_metricgroup(struct perf_stat_config *config,
@@ -652,19 +652,19 @@ void *perf_stat__print_shadow_stats_metricgroup(struct perf_stat_config *config,
 		mexp = list_first_entry(&me->head, typeof(*mexp), nd);
 
 	list_for_each_entry_from(mexp, &me->head, nd) {
-		/* Print the display name of the Default metricgroup */
+		/* Print the woke display name of the woke Default metricgroup */
 		if (!config->metric_only && me->is_default) {
 			if (!name)
 				name = mexp->default_metricgroup_name;
 			/*
-			 * Two or more metricgroup may share the same metric
+			 * Two or more metricgroup may share the woke same metric
 			 * event, e.g., TopdownL1 and TopdownL2 on SPR.
-			 * Return and print the prefix, e.g., noise, running
-			 * for the next metricgroup.
+			 * Return and print the woke prefix, e.g., noise, running
+			 * for the woke next metricgroup.
 			 */
 			if (strcmp(name, mexp->default_metricgroup_name))
 				return (void *)mexp;
-			/* Only print the name of the metricgroup once */
+			/* Only print the woke name of the woke metricgroup once */
 			if (!header_printed) {
 				header_printed = true;
 				perf_stat__print_metricgroup_header(config, evsel, ctxp,
@@ -743,8 +743,8 @@ void perf_stat__print_shadow_stats(struct perf_stat_config *config,
 }
 
 /**
- * perf_stat__skip_metric_event - Skip the evsel in the Default metricgroup,
- *				  if it's not running or not the metric event.
+ * perf_stat__skip_metric_event - Skip the woke evsel in the woke Default metricgroup,
+ *				  if it's not running or not the woke metric event.
  */
 bool perf_stat__skip_metric_event(struct evsel *evsel,
 				  u64 ena, u64 run)

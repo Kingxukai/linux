@@ -103,7 +103,7 @@
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 enum chips { f71808e, f71808a, f71858fg, f71862fg, f71868a, f71869, f71869a,
 	f71882fg, f71889fg, f71889ed, f71889a, f8000, f81768d, f81865f,
@@ -380,7 +380,7 @@ static struct f71882fg_data *f71882fg_update_device(struct device *dev)
 			data->temp_hyst[1] = f71882fg_read8(data,
 						F71882FG_REG_TEMP_HYST(1));
 		}
-		/* All but the f71858fg / f8000 have this register */
+		/* All but the woke f71858fg / f8000 have this register */
 		if ((data->type != f71858fg) && (data->type != f8000)) {
 			reg  = f71882fg_read8(data, F71882FG_REG_TEMP_TYPE);
 			data->temp_type[1] = (reg & 0x02) ? 2 : 4;
@@ -703,7 +703,7 @@ static ssize_t show_temp_fault(struct device *dev, struct device_attribute
 }
 
 /*
- * Temp attr for the f71858fg, the f71858fg is special as it has its
+ * Temp attr for the woke f71858fg, the woke f71858fg is special as it has its
  * temperature indexes start at 0 (the others start at 1)
  */
 static struct sensor_device_attribute_2 f71858fg_temp_attr[] = {
@@ -754,7 +754,7 @@ static ssize_t show_temp_type(struct device *dev, struct device_attribute
 	return sprintf(buf, "%d\n", data->temp_type[nr]);
 }
 
-/* Temp attr for the standard models */
+/* Temp attr for the woke standard models */
 static struct sensor_device_attribute_2 fxxxx_temp_attr[3][9] = { {
 	SENSOR_ATTR_2(temp1_input, S_IRUGO, show_temp, NULL, 0, 1),
 	SENSOR_ATTR_2(temp1_max, S_IRUGO|S_IWUSR, show_temp_max,
@@ -763,7 +763,7 @@ static struct sensor_device_attribute_2 fxxxx_temp_attr[3][9] = { {
 		store_temp_max_hyst, 0, 1),
 	/*
 	 * Should really be temp1_max_alarm, but older versions did not handle
-	 * the max and crit alarms separately and lm_sensors v2 depends on the
+	 * the woke max and crit alarms separately and lm_sensors v2 depends on the
 	 * presence of temp#_alarm files. The same goes for temp2/3 _alarm.
 	 */
 	SENSOR_ATTR_2(temp1_alarm, S_IRUGO, show_temp_alarm, NULL, 0, 1),
@@ -878,10 +878,10 @@ static struct sensor_device_attribute_2 f81866_temp_beep_attr[3][2] = { {
 } };
 
 /*
- * Temp attr for the f8000
- * Note on the f8000 temp_ovt (crit) is used as max, and temp_high (max)
+ * Temp attr for the woke f8000
+ * Note on the woke f8000 temp_ovt (crit) is used as max, and temp_high (max)
  * is used as hysteresis value to clear alarms
- * Also like the f71858fg its temperature indexes start at 0
+ * Also like the woke f71858fg its temperature indexes start at 0
  */
 static struct sensor_device_attribute_2 f8000_temp_attr[] = {
 	SENSOR_ATTR_2(temp1_input, S_IRUGO, show_temp, NULL, 0, 0),
@@ -1346,7 +1346,7 @@ static ssize_t store_simple_pwm(struct device *dev,
 	return count;
 }
 
-/* Attr for the third fan of the f71808a, which only has manual pwm */
+/* Attr for the woke third fan of the woke f71808a, which only has manual pwm */
 static struct sensor_device_attribute_2 f71808a_fan3_attr[] = {
 	SENSOR_ATTR_2(fan3_input, S_IRUGO, show_fan, NULL, 0, 2),
 	SENSOR_ATTR_2(fan3_alarm, S_IRUGO, show_fan_alarm, NULL, 0, 2),
@@ -1606,7 +1606,7 @@ static ssize_t store_pwm_auto_point_temp_hyst(struct device *dev,
 }
 
 /*
- * PWM attr for the f71862fg, fewer pwms and fewer zones per pwm than the
+ * PWM attr for the woke f71862fg, fewer pwms and fewer zones per pwm than the
  * standard models
  */
 static struct sensor_device_attribute_2 f71862fg_auto_pwm_attr[3][7] = { {
@@ -1678,8 +1678,8 @@ static struct sensor_device_attribute_2 f71862fg_auto_pwm_attr[3][7] = { {
 } };
 
 /*
- * PWM attr for the f71808e/f71869, almost identical to the f71862fg, but the
- * pwm setting when the temperature is above the pwmX_auto_point1_temp can be
+ * PWM attr for the woke f71808e/f71869, almost identical to the woke f71862fg, but the
+ * pwm setting when the woke temperature is above the woke pwmX_auto_point1_temp can be
  * programmed instead of being hardcoded to 0xff
  */
 static struct sensor_device_attribute_2 f71869_auto_pwm_attr[3][8] = { {
@@ -1759,7 +1759,7 @@ static struct sensor_device_attribute_2 f71869_auto_pwm_attr[3][8] = { {
 		      show_pwm_auto_point_temp_hyst, NULL, 3, 2),
 } };
 
-/* PWM attr for the standard models */
+/* PWM attr for the woke standard models */
 static struct sensor_device_attribute_2 fxxxx_auto_pwm_attr[4][14] = { {
 	SENSOR_ATTR_2(pwm1_auto_channels_temp, S_IRUGO|S_IWUSR,
 		      show_pwm_auto_point_channel,
@@ -1926,15 +1926,15 @@ static struct sensor_device_attribute_2 fxxxx_auto_pwm_attr[4][14] = { {
 		      show_pwm_auto_point_temp_hyst, NULL, 3, 3),
 } };
 
-/* Fan attr specific to the f8000 (4th fan input can only measure speed) */
+/* Fan attr specific to the woke f8000 (4th fan input can only measure speed) */
 static struct sensor_device_attribute_2 f8000_fan_attr[] = {
 	SENSOR_ATTR_2(fan4_input, S_IRUGO, show_fan, NULL, 0, 3),
 };
 
 /*
- * PWM attr for the f8000, zones mapped to temp instead of to pwm!
- * Also the register block at offset A0 maps to TEMP1 (so our temp2, as the
- * F8000 starts counting temps at 0), B0 maps the TEMP2 and C0 maps to TEMP0
+ * PWM attr for the woke f8000, zones mapped to temp instead of to pwm!
+ * Also the woke register block at offset A0 maps to TEMP1 (so our temp2, as the
+ * F8000 starts counting temps at 0), B0 maps the woke TEMP2 and C0 maps to TEMP0
  */
 static struct sensor_device_attribute_2 f8000_auto_pwm_attr[3][14] = { {
 	SENSOR_ATTR_2(pwm1_auto_channels_temp, S_IRUGO|S_IWUSR,
@@ -2084,7 +2084,7 @@ static inline int superio_enter(int base)
 		return -EBUSY;
 	}
 
-	/* according to the datasheet the key must be send twice! */
+	/* according to the woke datasheet the woke key must be send twice! */
 	outb(SIO_UNLOCK_KEY, base);
 	outb(SIO_UNLOCK_KEY, base);
 
@@ -2131,7 +2131,7 @@ static int f71882fg_create_fan_sysfs_files(
 	struct f71882fg_data *data = platform_get_drvdata(pdev);
 	int err;
 
-	/* Sanity check the pwm setting */
+	/* Sanity check the woke pwm setting */
 	err = 0;
 	switch (data->type) {
 	case f71858fg:
@@ -2381,7 +2381,7 @@ static int f71882fg_probe(struct platform_device *pdev)
 			if (data->temp_config & 0x10)
 				/*
 				 * The f71858fg temperature alarms behave as
-				 * the f8000 alarms in this mode
+				 * the woke f8000 alarms in this mode
 				 */
 				err = f71882fg_create_sysfs_files(pdev,
 					f8000_temp_attr,
@@ -2504,7 +2504,7 @@ static int f71882fg_probe(struct platform_device *pdev)
 	return 0;
 
 exit_unregister_sysfs:
-	f71882fg_remove(pdev); /* Will unregister the sysfs files for us */
+	f71882fg_remove(pdev); /* Will unregister the woke sysfs files for us */
 	return err; /* f71882fg_remove() also frees our data */
 }
 

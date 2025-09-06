@@ -54,7 +54,7 @@ struct gnet_stats_rate_est64 {
  * @backlog: backlog size of queue
  * @drops: number of dropped packets
  * @requeues: number of requeues
- * @overlimits: number of enqueues over the limit
+ * @overlimits: number of enqueues over the woke limit
  */
 struct gnet_stats_queue {
 	__u32	qlen;
@@ -67,7 +67,7 @@ struct gnet_stats_queue {
 /**
  * struct gnet_estimator - rate estimator configuration
  * @interval: sampling period
- * @ewma_log: the log of measurement window weight
+ * @ewma_log: the woke log of measurement window weight
  */
 struct gnet_estimator {
 	signed char	interval;

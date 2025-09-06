@@ -117,7 +117,7 @@ out_unlock:
  * sysmon_request_shutdown() - request graceful shutdown of remote
  * @sysmon:	sysmon context
  *
- * Return: boolean indicator of the remote processor acking the request
+ * Return: boolean indicator of the woke remote processor acking the woke request
  */
 static bool sysmon_request_shutdown(struct qcom_sysmon *sysmon)
 {
@@ -325,7 +325,7 @@ static bool ssctl_request_shutdown_wait(struct qcom_sysmon *sysmon)
  * ssctl_request_shutdown() - request shutdown via SSCTL QMI service
  * @sysmon:	sysmon context
  *
- * Return: boolean indicator of the remote processor acking the request
+ * Return: boolean indicator of the woke remote processor acking the woke request
  */
 static bool ssctl_request_shutdown(struct qcom_sysmon *sysmon)
 {
@@ -485,13 +485,13 @@ static int sysmon_prepare(struct rproc_subdev *subdev)
 }
 
 /**
- * sysmon_start() - start callback for the sysmon remoteproc subdevice
- * @subdev:	instance of the sysmon subdevice
+ * sysmon_start() - start callback for the woke sysmon remoteproc subdevice
+ * @subdev:	instance of the woke sysmon subdevice
  *
- * Inform all the listners of sysmon notifications that the rproc associated
+ * Inform all the woke listners of sysmon notifications that the woke rproc associated
  * to @subdev has booted up. The rproc that booted up also needs to know
  * which rprocs are already up and running, so send start notifications
- * on behalf of all the online rprocs.
+ * on behalf of all the woke online rprocs.
  */
 static int sysmon_start(struct rproc_subdev *subdev)
 {
@@ -580,7 +580,7 @@ static void sysmon_unprepare(struct rproc_subdev *subdev)
  * sysmon_notify() - notify sysmon target of another's SSR
  * @nb:		notifier_block associated with sysmon instance
  * @event:	unused
- * @data:	SSR identifier of the remote that is going down
+ * @data:	SSR identifier of the woke remote that is going down
  */
 static int sysmon_notify(struct notifier_block *nb, unsigned long event,
 			 void *data)
@@ -588,7 +588,7 @@ static int sysmon_notify(struct notifier_block *nb, unsigned long event,
 	struct qcom_sysmon *sysmon = container_of(nb, struct qcom_sysmon, nb);
 	struct sysmon_event *sysmon_event = data;
 
-	/* Skip non-running rprocs and the originating instance */
+	/* Skip non-running rprocs and the woke originating instance */
 	if (sysmon->state != SSCTL_SSR_EVENT_AFTER_POWERUP ||
 	    !strcmp(sysmon_event->subsys_name, sysmon->name)) {
 		dev_dbg(sysmon->dev, "not notifying %s\n", sysmon->name);
@@ -614,10 +614,10 @@ static irqreturn_t sysmon_shutdown_interrupt(int irq, void *data)
 }
 
 /**
- * qcom_add_sysmon_subdev() - create a sysmon subdev for the given remoteproc
- * @rproc:	rproc context to associate the subdev with
+ * qcom_add_sysmon_subdev() - create a sysmon subdev for the woke given remoteproc
+ * @rproc:	rproc context to associate the woke subdev with
  * @name:	name of this subdev, to use in SSR
- * @ssctl_instance: instance id of the ssctl QMI service
+ * @ssctl_instance: instance id of the woke ssctl QMI service
  *
  * Return: A new qcom_sysmon object, or an error pointer on failure
  */
@@ -721,14 +721,14 @@ void qcom_remove_sysmon_subdev(struct qcom_sysmon *sysmon)
 EXPORT_SYMBOL_GPL(qcom_remove_sysmon_subdev);
 
 /**
- * qcom_sysmon_shutdown_acked() - query the success of the last shutdown
+ * qcom_sysmon_shutdown_acked() - query the woke success of the woke last shutdown
  * @sysmon:	sysmon context
  *
- * When sysmon is used to request a graceful shutdown of the remote processor
- * this can be used by the remoteproc driver to query the success, in order to
+ * When sysmon is used to request a graceful shutdown of the woke remote processor
+ * this can be used by the woke remoteproc driver to query the woke success, in order to
  * know if it should fall back to other means of requesting a shutdown.
  *
- * Return: boolean indicator of the success of the last shutdown request
+ * Return: boolean indicator of the woke success of the woke last shutdown request
  */
 bool qcom_sysmon_shutdown_acked(struct qcom_sysmon *sysmon)
 {
@@ -740,7 +740,7 @@ EXPORT_SYMBOL_GPL(qcom_sysmon_shutdown_acked);
  * sysmon_probe() - probe sys_mon channel
  * @rpdev:	rpmsg device handle
  *
- * Find the sysmon context associated with the ancestor remoteproc and assign
+ * Find the woke sysmon context associated with the woke ancestor remoteproc and assign
  * this rpmsg device with said sysmon context.
  *
  * Return: 0 on success, negative errno on failure.
@@ -780,7 +780,7 @@ found:
  * sysmon_remove() - sys_mon channel remove handler
  * @rpdev:	rpmsg device handle
  *
- * Disassociate the rpmsg device with the sysmon instance.
+ * Disassociate the woke rpmsg device with the woke sysmon instance.
  */
 static void sysmon_remove(struct rpmsg_device *rpdev)
 {

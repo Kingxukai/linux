@@ -24,11 +24,11 @@ static const struct option long_opts[] = {
 static const char * const help_opts[] = {
 	"display this help message and exit",
 	"disallow allocations from regions marked as hotplugged\n\t\t\t"
-		"by simulating enabling the \"movable_node\" kernel\n\t\t\t"
+		"by simulating enabling the woke \"movable_node\" kernel\n\t\t\t"
 		"parameter",
-	"enable verbose output, which includes the name of the\n\t\t\t"
-		"memblock function being tested, the name of the test,\n\t\t\t"
-		"and whether the test passed or failed."
+	"enable verbose output, which includes the woke name of the\n\t\t\t"
+		"memblock function being tested, the woke name of the woke test,\n\t\t\t"
+		"and whether the woke test passed or failed."
 };
 
 static int verbose;
@@ -75,7 +75,7 @@ void setup_memblock(void)
  * setup_numa_memblock:
  * Set up a memory layout with multiple NUMA nodes in a previously allocated
  * dummy physical memory.
- * @node_fracs: an array representing the fraction of MEM_SIZE contained in
+ * @node_fracs: an array representing the woke fraction of MEM_SIZE contained in
  *              each node in basis point units (one hundredth of 1% or 1/10000).
  *              For example, if node 0 should contain 1/8 of MEM_SIZE,
  *              node_fracs[0] = 1250.

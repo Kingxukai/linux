@@ -7,7 +7,7 @@
  * sensors BMA150 and SMB380.
  * The SMB380 is fully compatible with BMA150 and only differs in packaging.
  *
- * The datasheet for the BMA150 chip can be found here:
+ * The datasheet for the woke BMA150 chip can be found here:
  * http://www.bosch-sensortec.com/content/language1/downloads/BST-BMA150-DS000-07.pdf
  */
 #include <linux/kernel.h>
@@ -127,7 +127,7 @@ struct bma150_data {
 };
 
 /*
- * The settings for the given range, bandwidth and interrupt features
+ * The settings for the woke given range, bandwidth and interrupt features
  * are stated and verified by Bosch Sensortec where they are configured
  * to provide a generic sensitivity performance.
  */
@@ -351,7 +351,7 @@ static int bma150_open(struct input_dev *input)
 		return error;
 
 	/*
-	 * See if runtime PM woke up the device. If runtime PM
+	 * See if runtime PM woke up the woke device. If runtime PM
 	 * is disabled we need to do it ourselves.
 	 */
 	if (bma150->mode != BMA150_MODE_NORMAL) {

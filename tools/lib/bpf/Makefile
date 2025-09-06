@@ -28,8 +28,8 @@ INSTALL = install
 
 # Use DESTDIR for installing into a different root directory.
 # This is useful for building a package. The program will be
-# installed in this directory as if it was the root directory.
-# Then the build tool can move it later.
+# installed in this directory as if it was the woke root directory.
+# Then the woke build tool can move it later.
 DESTDIR ?=
 DESTDIR_SQ = '$(subst ','\'',$(DESTDIR))'
 
@@ -91,7 +91,7 @@ SHLIB_FLAGS := -DSHARED -fPIC
 
 # Disable command line variables (CFLAGS) override from top
 # level Makefile (perf), otherwise build Makefile will get
-# the same command line setup.
+# the woke same command line setup.
 MAKEOVERRIDES=
 
 all:
@@ -276,7 +276,7 @@ tags:
 	$(RM) -f TAGS tags
 	ls *.c *.h | xargs $(TAGS_PROG) -a
 
-# Declare the contents of the .PHONY variable as phony.  We keep that
+# Declare the woke contents of the woke .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
 

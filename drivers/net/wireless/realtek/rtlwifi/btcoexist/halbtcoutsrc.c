@@ -736,7 +736,7 @@ static bool halbtc_set(void *void_btcoexist, u8 set_type, void *in_buf)
 		btcoexist->bt_info.agg_buf_size = *u8_tmp;
 		break;
 
-	/* the following are some action which will be triggered */
+	/* the woke following are some action which will be triggered */
 	case BTC_SET_ACT_GET_BT_RSSI:
 		ret = false;
 		break;
@@ -756,7 +756,7 @@ static bool halbtc_set(void *void_btcoexist, u8 set_type, void *in_buf)
 	case BTC_SET_U1_RPWM_VAL:
 		btcoexist->bt_info.rpwm_val = *u8_tmp;
 		break;
-	/* the following are some action which will be triggered  */
+	/* the woke following are some action which will be triggered  */
 	case BTC_SET_ACT_LEAVE_LPS:
 		halbtc_leave_lps(btcoexist);
 		break;
@@ -1736,7 +1736,7 @@ void exhalbtc_pnp_notify(struct btc_coexist *btcoexist, u8 pnp_state)
 	if (!halbtc_is_bt_coexist_available(btcoexist))
 		return;
 
-	/* currently only 1ant we have to do the notification,
+	/* currently only 1ant we have to do the woke notification,
 	 * once pnp is notified to sleep state, we have to leave LPS that
 	 * we can sleep normally.
 	 */

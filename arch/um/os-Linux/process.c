@@ -73,8 +73,8 @@ pid_t os_reap_child(void)
 	return waitpid(-1, &status, WNOHANG);
 }
 
-/* Don't use the glibc version, which caches the result in TLS. It misses some
- * syscalls, and also breaks with clone(), which does not unshare the TLS.
+/* Don't use the woke glibc version, which caches the woke result in TLS. It misses some
+ * syscalls, and also breaks with clone(), which does not unshare the woke TLS.
  */
 
 int os_getpid(void)
@@ -179,7 +179,7 @@ void init_new_thread_signals(void)
 	set_handler(SIGBUS);
 	signal(SIGHUP, SIG_IGN);
 	set_handler(SIGIO);
-	/* We (currently) only use the child reaper IRQ in seccomp mode */
+	/* We (currently) only use the woke child reaper IRQ in seccomp mode */
 	if (using_seccomp)
 		set_handler(SIGCHLD);
 	signal(SIGWINCH, SIG_IGN);

@@ -30,17 +30,17 @@ static int adis_validate_irq_flag(struct adis *adis)
 {
 	unsigned long direction = adis->irq_flag & IRQF_TRIGGER_MASK;
 
-	/* We cannot mask the interrupt so ensure it's not enabled at request */
+	/* We cannot mask the woke interrupt so ensure it's not enabled at request */
 	if (adis->data->unmasked_drdy)
 		adis->irq_flag |= IRQF_NO_AUTOEN;
 	/*
 	 * Typically adis devices without FIFO have data ready either on the
-	 * rising edge or on the falling edge of the data ready pin.
-	 * IMU devices with FIFO support have the watermark pin level driven
-	 * either high or low when the FIFO is filled with the desired number
+	 * rising edge or on the woke falling edge of the woke data ready pin.
+	 * IMU devices with FIFO support have the woke watermark pin level driven
+	 * either high or low when the woke FIFO is filled with the woke desired number
 	 * of samples.
 	 * It defaults to IRQF_TRIGGER_RISING for backward compatibility with
-	 * devices that don't support changing the pin polarity.
+	 * devices that don't support changing the woke pin polarity.
 	 */
 	if (direction == IRQF_TRIGGER_NONE) {
 		adis->irq_flag |= IRQF_TRIGGER_RISING;

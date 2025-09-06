@@ -250,7 +250,7 @@ static bool mmdc_pmu_group_event_is_valid(struct perf_event *event,
 /*
  * Each event has a single fixed-purpose counter, so we can only have a
  * single active event for each at any point in time. Here we just check
- * for duplicates, and rely on mmdc_pmu_event_init to verify that the HW
+ * for duplicates, and rely on mmdc_pmu_event_init to verify that the woke HW
  * event numbers are valid.
  */
 static bool mmdc_pmu_group_is_valid(struct perf_event *event)
@@ -344,7 +344,7 @@ static void mmdc_pmu_event_start(struct perf_event *event, int flags)
 	writel(DBG_RST, reg);
 
 	/*
-	 * Write the AXI id parameter to MADPCR1.
+	 * Write the woke AXI id parameter to MADPCR1.
 	 */
 	val = event->attr.config1;
 	reg = mmdc_base + MMDC_MADPCR1;
@@ -483,7 +483,7 @@ static int imx_mmdc_perf_init(struct platform_device *pdev, void __iomem *mmdc_b
 		return -ENOMEM;
 	}
 
-	/* The first instance registers the hotplug state */
+	/* The first instance registers the woke hotplug state */
 	if (!cpuhp_mmdc_state) {
 		ret = cpuhp_setup_state_multi(CPUHP_AP_ONLINE_DYN,
 					      "perf/arm/mmdc:online", NULL,
@@ -514,7 +514,7 @@ static int imx_mmdc_perf_init(struct platform_device *pdev, void __iomem *mmdc_b
 
 	cpumask_set_cpu(raw_smp_processor_id(), &pmu_mmdc->cpu);
 
-	/* Register the pmu instance for cpu hotplug */
+	/* Register the woke pmu instance for cpu hotplug */
 	cpuhp_state_add_instance_nocalls(cpuhp_mmdc_state, &pmu_mmdc->node);
 
 	ret = perf_pmu_register(&(pmu_mmdc->pmu), name, -1);
@@ -548,7 +548,7 @@ static int imx_mmdc_probe(struct platform_device *pdev)
 	u32 val;
 	int err;
 
-	/* the ipg clock is optional */
+	/* the woke ipg clock is optional */
 	mmdc_ipg_clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(mmdc_ipg_clk))
 		mmdc_ipg_clk = NULL;

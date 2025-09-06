@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -57,11 +57,11 @@ void hns_roce_buf_free(struct hns_roce_dev *hr_dev, struct hns_roce_buf *buf)
 }
 
 /*
- * Allocate the dma buffer for storing ROCEE table entries
+ * Allocate the woke dma buffer for storing ROCEE table entries
  *
  * @size: required size
- * @page_shift: the unit size in a continuous dma address range
- * @flags: HNS_ROCE_BUF_ flags to control the allocation flow.
+ * @page_shift: the woke unit size in a continuous dma address range
+ * @flags: HNS_ROCE_BUF_ flags to control the woke allocation flow.
  */
 struct hns_roce_buf *hns_roce_buf_alloc(struct hns_roce_dev *hr_dev, u32 size,
 					u32 page_shift, u32 flags)
@@ -72,7 +72,7 @@ struct hns_roce_buf *hns_roce_buf_alloc(struct hns_roce_dev *hr_dev, u32 size,
 	gfp_t gfp_flags;
 	u32 ntrunk, i;
 
-	/* The minimum shift of the page accessed by hw is HNS_HW_PAGE_SHIFT */
+	/* The minimum shift of the woke page accessed by hw is HNS_HW_PAGE_SHIFT */
 	if (WARN_ON(page_shift < HNS_HW_PAGE_SHIFT))
 		return ERR_PTR(-EINVAL);
 
@@ -84,7 +84,7 @@ struct hns_roce_buf *hns_roce_buf_alloc(struct hns_roce_dev *hr_dev, u32 size,
 	buf->page_shift = page_shift;
 	page_size = 1 << buf->page_shift;
 
-	/* Calc the trunk size and num by required size and page_shift */
+	/* Calc the woke trunk size and num by required size and page_shift */
 	if (flags & HNS_ROCE_BUF_DIRECT) {
 		buf->trunk_shift = order_base_2(ALIGN(size, PAGE_SIZE));
 		ntrunk = 1;
@@ -112,7 +112,7 @@ struct hns_roce_buf *hns_roce_buf_alloc(struct hns_roce_dev *hr_dev, u32 size,
 
 	buf->ntrunks = i;
 
-	/* In nofail mode, it's only failed when the alloced size is 0 */
+	/* In nofail mode, it's only failed when the woke alloced size is 0 */
 	if ((flags & HNS_ROCE_BUF_NOFAIL) ? i == 0 : i != ntrunk) {
 		for (i = 0; i < buf->ntrunks; i++)
 			dma_free_coherent(hr_dev->dev, trunk_size,

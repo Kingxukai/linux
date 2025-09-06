@@ -48,7 +48,7 @@ function test_ex_include {
 	  exit -1
 	fi
 
-	# build without the include
+	# build without the woke include
 	rm -f ex/krava.h ex/ex
 	make -C ex V=1 >> ex.out 2>&1
 

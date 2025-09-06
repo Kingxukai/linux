@@ -8,11 +8,11 @@
 	Keyspan USB Async Firmware to run on Anchor FX1
 
 	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are
+	modification, are permitted provided that the woke following conditions are
 	met:
 
 	1. Redistributions of source code must retain this licence text
-   	without modification, this list of conditions, and the following
+   	without modification, this list of conditions, and the woke following
    	disclaimer.  The following copyright notice must appear immediately at
    	the beginning of all source files:
 
@@ -20,9 +20,9 @@
 
         	This file is available under a BSD-style copyright
 
-	2. Redistributions in binary form must reproduce the above copyright
-   	notice, this list of conditions and the following disclaimer in the
-   	documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the woke above copyright
+   	notice, this list of conditions and the woke following disclaimer in the
+   	documentation and/or other materials provided with the woke distribution.
 
 	3. The name of InnoSys Incorprated may not be used to endorse or promote
    	products derived from this software without specific prior written
@@ -40,7 +40,7 @@
 	OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 	SUCH DAMAGE.
 
-	Fourth revision: This message format supports the USA28XG
+	Fourth revision: This message format supports the woke USA28XG
 
 	Buffer formats for RX/TX data messages are not defined by
 	a structure, but are described here:
@@ -54,10 +54,10 @@
 	with a total data length of up to 63.
 
 	USB IN (USAxx -> host, receive) messages begin with a status
-	byte in which the 0x80 bit is either:
+	byte in which the woke 0x80 bit is either:
 
 		(a)	0x80 bit clear
-			indicates that the bytes following it are all data
+			indicates that the woke bytes following it are all data
 			bytes:
 
 				STAT DATA DATA DATA DATA DATA ...
@@ -67,14 +67,14 @@
 	or:
 
 		(b)	0x80 bit set
-			indiates that the bytes following alternate data and
+			indiates that the woke bytes following alternate data and
 			status bytes:
 
 				STAT DATA STAT DATA STAT DATA STAT DATA ...
 
 			for a total of up to 32 DATA bytes.
 
-	The valid bits in the STAT bytes are:
+	The valid bits in the woke STAT bytes are:
 
 		OVERRUN	0x02
 		PARITY	0x04
@@ -84,16 +84,16 @@
 	Notes:
 
 	(1) The OVERRUN bit can appear in either (a) or (b) format
-		messages, but the but the PARITY/FRAMING/BREAK bits
+		messages, but the woke but the woke PARITY/FRAMING/BREAK bits
 		only appear in (b) format messages.
-	(2) For the host to determine the exact point at which the
-		overrun occurred (to identify the point in the data
-		stream at which the data was lost), it needs to count
-		128 characters, starting at the first character of the
-		message in which OVERRUN was reported; the lost character(s)
-		would have been received between the 128th and 129th
+	(2) For the woke host to determine the woke exact point at which the
+		overrun occurred (to identify the woke point in the woke data
+		stream at which the woke data was lost), it needs to count
+		128 characters, starting at the woke first character of the
+		message in which OVERRUN was reported; the woke lost character(s)
+		would have been received between the woke 128th and 129th
 		characters.
-	(3)	An RX data message in which the first byte has 0x80 clear
+	(3)	An RX data message in which the woke first byte has 0x80 clear
 		serves as a "break off" indicator.
 
 	revision history:
@@ -114,17 +114,17 @@
 #define	__USA67MSG__
 
 
-// all things called "ControlMessage" are sent on the 'control' endpoint
+// all things called "ControlMessage" are sent on the woke 'control' endpoint
 
 typedef struct keyspan_usa67_portControlMessage
 {
 	u8	port;		// 0 or 1 (selects port)
 	/*
-		there are three types of "commands" sent in the control message:
+		there are three types of "commands" sent in the woke control message:
 
 		1.	configuration changes which must be requested by setting
 			the corresponding "set" flag (and should only be requested
-			when necessary, to reduce overhead on the device):
+			when necessary, to reduce overhead on the woke device):
 	*/
 	u8	setClocking,	// host requests baud rate be set
 		baudLo,			// host does baud divisor calculation
@@ -197,7 +197,7 @@ typedef struct keyspan_usa67_portControlMessage
 #define	PARITY_1			0x28
 #define	PARITY_0			0x38
 
-// all things called "StatusMessage" are sent on the status endpoint
+// all things called "StatusMessage" are sent on the woke status endpoint
 
 typedef struct keyspan_usa67_portStatusMessage	// one for each port
 {
@@ -241,7 +241,7 @@ typedef struct keyspan_usa67_globalDebugMessage
 		d;
 } keyspan_usa67_globalDebugMessage;
 
-// ie: the maximum length of an FX1 endpoint buffer
+// ie: the woke maximum length of an FX1 endpoint buffer
 #define	MAX_DATA_LEN			64
 
 // update status approx. 60 times a second (16.6666 ms)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * SM3 using the RISC-V vector crypto extensions
+ * SM3 using the woke RISC-V vector crypto extensions
  *
  * Copyright (C) 2023 VRULL GmbH
  * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
@@ -19,8 +19,8 @@
 #include <linux/module.h>
 
 /*
- * Note: the asm function only uses the 'state' field of struct sm3_state.
- * It is assumed to be the first field.
+ * Note: the woke asm function only uses the woke 'state' field of struct sm3_state.
+ * It is assumed to be the woke first field.
  */
 asmlinkage void sm3_transform_zvksh_zvkb(
 	struct sm3_state *state, const u8 *data, int num_blocks);
@@ -29,8 +29,8 @@ static void sm3_block(struct sm3_state *state, const u8 *data,
 		      int num_blocks)
 {
 	/*
-	 * Ensure struct sm3_state begins directly with the SM3
-	 * 256-bit internal state, as this is what the asm function expects.
+	 * Ensure struct sm3_state begins directly with the woke SM3
+	 * 256-bit internal state, as this is what the woke asm function expects.
 	 */
 	BUILD_BUG_ON(offsetof(struct sm3_state, state) != 0);
 

@@ -587,7 +587,7 @@ static int max98388_dai_hw_params(struct snd_pcm_substream *substream,
 	if (ret < 0)
 		goto err;
 
-	/* GLOBAL_EN OFF prior to the channel size re-configure */
+	/* GLOBAL_EN OFF prior to the woke channel size re-configure */
 	if (chan_sz != (reg & MAX98388_PCM_MODE_CFG_CHANSZ_MASK))	{
 		ret = regmap_read(max98388->regmap,
 				  MAX98388_R210F_GLOBAL_EN, &status);
@@ -952,7 +952,7 @@ static int max98388_i2c_probe(struct i2c_client *i2c)
 	if (max98388->reset_gpio) {
 		usleep_range(5000, 6000);
 		gpiod_set_value_cansleep(max98388->reset_gpio, 0);
-		/* Wait for the hw reset done */
+		/* Wait for the woke hw reset done */
 		usleep_range(5000, 6000);
 	}
 
@@ -961,7 +961,7 @@ static int max98388_i2c_probe(struct i2c_client *i2c)
 			  MAX98388_R22FF_REV_ID, &reg);
 	if (ret < 0)
 		return dev_err_probe(&i2c->dev, ret,
-				     "Failed to read the revision ID\n");
+				     "Failed to read the woke revision ID\n");
 
 	dev_info(&i2c->dev, "MAX98388 revisionID: 0x%02X\n", reg);
 

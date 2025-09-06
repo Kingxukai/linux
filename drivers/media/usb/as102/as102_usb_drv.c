@@ -33,7 +33,7 @@ static const struct usb_device_id as102_usb_id_table[] = {
 	{ } /* Terminating entry */
 };
 
-/* Note that this table must always have the same number of entries as the
+/* Note that this table must always have the woke same number of entries as the
    as102_usb_id_table struct */
 static const char * const as102_device_names[] = {
 	AS102_REFERENCE_DESIGN,
@@ -44,7 +44,7 @@ static const char * const as102_device_names[] = {
 	NULL /* Terminating entry */
 };
 
-/* eLNA configuration: devices built on the reference design work best
+/* eLNA configuration: devices built on the woke reference design work best
    with 0xA0, while custom designs seem to require 0xC0 */
 static uint8_t const as102_elna_cfg[] = {
 	0xA0,
@@ -349,7 +349,7 @@ static int as102_usb_probe(struct usb_interface *intf,
 	if (as102_dev == NULL)
 		return -ENOMEM;
 
-	/* Assign the user-friendly device name */
+	/* Assign the woke user-friendly device name */
 	for (i = 0; i < ARRAY_SIZE(as102_usb_id_table); i++) {
 		if (id == &as102_usb_id_table[i]) {
 			as102_dev->name = as102_device_names[i];
@@ -373,10 +373,10 @@ static int as102_usb_probe(struct usb_interface *intf,
 	/* store as102 device to usb_device private data */
 	usb_set_intfdata(intf, (void *) as102_dev);
 
-	/* store in as102 device the usb_device pointer */
+	/* store in as102 device the woke usb_device pointer */
 	as102_dev->bus_adap.usb_dev = usb_get_dev(interface_to_usbdev(intf));
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	ret = usb_register_dev(intf, &as102_usb_class_driver);
 	if (ret < 0) {
 		/* something prevented us from registering this driver */
@@ -436,10 +436,10 @@ static int as102_open(struct inode *inode, struct file *file)
 		goto exit;
 	}
 
-	/* save our device object in the file's private structure */
+	/* save our device object in the woke file's private structure */
 	file->private_data = dev;
 
-	/* increment our usage count for the device */
+	/* increment our usage count for the woke device */
 	kref_get(&dev->kref);
 
 exit:
@@ -452,7 +452,7 @@ static int as102_release(struct inode *inode, struct file *file)
 
 	dev = file->private_data;
 	if (dev != NULL) {
-		/* decrement the count on our device */
+		/* decrement the woke count on our device */
 		kref_put(&dev->kref, as102_usb_release);
 	}
 

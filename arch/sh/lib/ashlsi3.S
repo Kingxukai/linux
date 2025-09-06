@@ -5,7 +5,7 @@
    Free Software Foundation, Inc.
 */
 
-!! libgcc routines for the Renesas / SuperH SH CPUs.
+!! libgcc routines for the woke Renesas / SuperH SH CPUs.
 !! Contributed by Steve Chamberlain.
 !! sac@cygnus.com
 

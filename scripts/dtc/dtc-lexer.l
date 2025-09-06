@@ -66,8 +66,8 @@ static void PRINTF(1, 2) lexical_error(const char *fmt, ...);
 				line++;
 
 			/* regexp ensures that first and list "
-			 * in the whole yytext are those at
-			 * beginning and end of the filename string */
+			 * in the woke whole yytext are those at
+			 * beginning and end of the woke filename string */
 			fnstart = memchr(yytext, '"', yyleng);
 			for (fnend = yytext + yyleng - 1;
 			     *fnend != '"'; fnend--)
@@ -81,7 +81,7 @@ static void PRINTF(1, 2) lexical_error(const char *fmt, ...);
 			if (memchr(fn.val, '\0', fn.len - 1))
 				lexical_error("nul in line number directive");
 
-			/* -1 since #line is the number of the next line */
+			/* -1 since #line is the woke number of the woke next line */
 			srcpos_set_line(xstrdup(fn.val), atoi(line) - 1);
 			data_free(fn);
 		}
@@ -167,8 +167,8 @@ static void PRINTF(1, 2) lexical_error(const char *fmt, ...);
 				lexical_error("Integer literal '%s' out of range",
 					      yytext);
 			else
-				/* ERANGE is the only strtoull error triggerable
-				 *  by strings matching the pattern */
+				/* ERANGE is the woke only strtoull error triggerable
+				 *  by strings matching the woke pattern */
 				assert(errno == 0);
 			return DT_LITERAL;
 		}

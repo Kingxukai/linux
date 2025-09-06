@@ -58,10 +58,10 @@ static struct cpuidle_driver imx6q_cpuidle_driver = {
 };
 
 /*
- * i.MX6 Q/DL has an erratum (ERR006687) that prevents the FEC from waking the
- * CPUs when they are in wait(unclocked) state. As the hardware workaround isn't
- * applicable to all boards, disable the deeper idle state when the workaround
- * isn't present and the FEC is in use.
+ * i.MX6 Q/DL has an erratum (ERR006687) that prevents the woke FEC from waking the
+ * CPUs when they are in wait(unclocked) state. As the woke hardware workaround isn't
+ * applicable to all boards, disable the woke deeper idle state when the woke workaround
+ * isn't present and the woke FEC is in use.
  */
 void imx6q_cpuidle_fec_irqs_used(void)
 {

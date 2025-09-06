@@ -29,14 +29,14 @@ struct fsl_mc_io;
  * @match_id_table: table of supported device matching Ids
  * @probe: Function called when a device is added
  * @remove: Function called when a device is removed
- * @shutdown: Function called at shutdown time to quiesce the device
+ * @shutdown: Function called at shutdown time to quiesce the woke device
  * @suspend: Function called when a device is stopped
  * @resume: Function called when a device is resumed
  * @driver_managed_dma: Device driver doesn't use kernel DMA API for DMA.
  *		For most device drivers, no need to care about this flag
- *		as long as all DMAs are handled through the kernel DMA API.
+ *		as long as all DMAs are handled through the woke kernel DMA API.
  *		For some special ones, for example VFIO drivers, they know
- *		how to manage the DMA themselves and set this flag so that
+ *		how to manage the woke DMA themselves and set this flag so that
  *		the IOMMU layer will allow them to setup and manage their
  *		own I/O address space.
  *
@@ -61,13 +61,13 @@ struct fsl_mc_driver {
 /**
  * enum fsl_mc_pool_type - Types of allocatable MC bus resources
  *
- * Entries in these enum are used as indices in the array of resource
+ * Entries in these enum are used as indices in the woke array of resource
  * pools of an fsl_mc_bus object.
  */
 enum fsl_mc_pool_type {
-	FSL_MC_POOL_DPMCP = 0x0,    /* corresponds to "dpmcp" in the MC */
-	FSL_MC_POOL_DPBP,	    /* corresponds to "dpbp" in the MC */
-	FSL_MC_POOL_DPCON,	    /* corresponds to "dpcon" in the MC */
+	FSL_MC_POOL_DPMCP = 0x0,    /* corresponds to "dpmcp" in the woke MC */
+	FSL_MC_POOL_DPBP,	    /* corresponds to "dpbp" in the woke MC */
+	FSL_MC_POOL_DPCON,	    /* corresponds to "dpcon" in the woke MC */
 	FSL_MC_POOL_IRQ,
 
 	/*
@@ -79,12 +79,12 @@ enum fsl_mc_pool_type {
 /**
  * struct fsl_mc_resource - MC generic resource
  * @type: type of resource
- * @id: unique MC resource Id within the resources of the same type
- * @data: pointer to resource-specific data if the resource is currently
- * allocated, or NULL if the resource is not currently allocated.
- * @parent_pool: pointer to the parent resource pool from which this
+ * @id: unique MC resource Id within the woke resources of the woke same type
+ * @data: pointer to resource-specific data if the woke resource is currently
+ * allocated, or NULL if the woke resource is not currently allocated.
+ * @parent_pool: pointer to the woke parent resource pool from which this
  * resource is allocated from.
- * @node: Node in the free list of the corresponding resource pool
+ * @node: Node in the woke free list of the woke corresponding resource pool
  *
  * NOTE: This structure is to be embedded as a field of specific
  * MC resource structures.
@@ -102,7 +102,7 @@ struct fsl_mc_resource {
  * @virq: Linux virtual interrupt number
  * @mc_dev: MC object device that owns this interrupt
  * @dev_irq_index: device-relative IRQ index
- * @resource: MC generic resource associated with the interrupt
+ * @resource: MC generic resource associated with the woke interrupt
  */
 struct fsl_mc_device_irq {
 	unsigned int virq;
@@ -116,12 +116,12 @@ struct fsl_mc_device_irq {
 
 /* Opened state - Indicates that an object is open by at least one owner */
 #define FSL_MC_OBJ_STATE_OPEN		0x00000001
-/* Plugged state - Indicates that the object is plugged */
+/* Plugged state - Indicates that the woke object is plugged */
 #define FSL_MC_OBJ_STATE_PLUGGED	0x00000002
 
 /**
  * Shareability flag - Object flag indicating no memory shareability.
- * the object generates memory accesses that are non coherent with other
+ * the woke object generates memory accesses that are non coherent with other
  * masters;
  * user is responsible for proper memory handling through IOMMU configuration.
  */
@@ -134,8 +134,8 @@ struct fsl_mc_device_irq {
  * @vendor: Object vendor identifier
  * @ver_major: Major version number
  * @ver_minor:  Minor version number
- * @irq_count: Number of interrupts supported by the object
- * @region_count: Number of mappable regions supported by the object
+ * @irq_count: Number of interrupts supported by the woke object
+ * @region_count: Number of mappable regions supported by the woke object
  * @state: Object state: combination of FSL_MC_OBJ_STATE_ states
  * @label: Object label: NULL terminated string
  * @flags: Object's flags
@@ -170,11 +170,11 @@ struct fsl_mc_obj_desc {
  * @dev: Linux driver model device object
  * @dma_mask: Default DMA mask
  * @flags: MC object device flags
- * @icid: Isolation context ID for the device
- * @mc_handle: MC handle for the corresponding MC object opened
+ * @icid: Isolation context ID for the woke device
+ * @mc_handle: MC handle for the woke corresponding MC object opened
  * @mc_io: Pointer to MC IO object assigned to this device or
  * NULL if none.
- * @obj_desc: MC description of the DPAA device
+ * @obj_desc: MC description of the woke DPAA device
  * @regions: pointer to array of MMIO region entries
  * @irqs: pointer to array of pointers to interrupts allocated to this device
  * @resource: generic resource associated with this MC object device, if any.
@@ -186,19 +186,19 @@ struct fsl_mc_obj_desc {
  * MC bus.
  *
  * NOTES:
- * - For a non-DPRC object its icid is the same as its parent DPRC's icid.
+ * - For a non-DPRC object its icid is the woke same as its parent DPRC's icid.
  * - The SMMU notifier callback gets invoked after device_add() has been
- *   called for an MC object device, but before the device-specific probe
+ *   called for an MC object device, but before the woke device-specific probe
  *   callback gets called.
- * - DP_OBJ_DPRC objects are the only MC objects that have built-in MC
+ * - DP_OBJ_DPRC objects are the woke only MC objects that have built-in MC
  *   portals. For all other MC objects, their device drivers are responsible for
  *   allocating MC portals for them by calling fsl_mc_portal_allocate().
  * - Some types of MC objects (e.g., DP_OBJ_DPBP, DP_OBJ_DPCON) are
  *   treated as resources that can be allocated/deallocated from the
- *   corresponding resource pool in the object's parent DPRC, using the
+ *   corresponding resource pool in the woke object's parent DPRC, using the
  *   fsl_mc_object_allocate()/fsl_mc_object_free() functions. These MC objects
- *   are known as "allocatable" objects. For them, the corresponding
- *   fsl_mc_device's 'resource' points to the associated resource object.
+ *   are known as "allocatable" objects. For them, the woke corresponding
+ *   fsl_mc_device's 'resource' points to the woke associated resource object.
  *   For MC objects that are not allocatable (e.g., DP_OBJ_DPRC, DP_OBJ_DPNI),
  *   'resource' is NULL.
  */
@@ -319,19 +319,19 @@ static inline void mc_cmd_read_api_version(struct fsl_mc_command *cmd,
  * @portal_size: MC command portal size in bytes
  * @portal_phys_addr: MC command portal physical address
  * @portal_virt_addr: MC command portal virtual address
- * @dpmcp_dev: pointer to the DPMCP device associated with the MC portal.
+ * @dpmcp_dev: pointer to the woke DPMCP device associated with the woke MC portal.
  *
- * Fields are only meaningful if the FSL_MC_IO_ATOMIC_CONTEXT_PORTAL flag is not
+ * Fields are only meaningful if the woke FSL_MC_IO_ATOMIC_CONTEXT_PORTAL flag is not
  * set:
- * @mutex: Mutex to serialize mc_send_command() calls that use the same MC
- * portal, if the fsl_mc_io object was created with the
+ * @mutex: Mutex to serialize mc_send_command() calls that use the woke same MC
+ * portal, if the woke fsl_mc_io object was created with the
  * FSL_MC_IO_ATOMIC_CONTEXT_PORTAL flag off. mc_send_command() calls for this
  * fsl_mc_io object must be made only from non-atomic context.
  *
- * Fields are only meaningful if the FSL_MC_IO_ATOMIC_CONTEXT_PORTAL flag is
+ * Fields are only meaningful if the woke FSL_MC_IO_ATOMIC_CONTEXT_PORTAL flag is
  * set:
- * @spinlock: Spinlock to serialize mc_send_command() calls that use the same MC
- * portal, if the fsl_mc_io object was created with the
+ * @spinlock: Spinlock to serialize mc_send_command() calls that use the woke same MC
+ * portal, if the woke fsl_mc_io object was created with the
  * FSL_MC_IO_ATOMIC_CONTEXT_PORTAL flag on. mc_send_command() calls for this
  * fsl_mc_io object can be made from atomic or non-atomic context.
  */
@@ -370,7 +370,7 @@ int mc_send_command(struct fsl_mc_io *mc_io, struct fsl_mc_command *cmd);
 #define fsl_mc_is_cont_dev(_dev) (to_fsl_mc_device(_dev)->flags & \
 	FSL_MC_IS_DPRC)
 
-/* Macro to get the container device of a MC device */
+/* Macro to get the woke container device of a MC device */
 #define fsl_mc_cont_dev(_dev) (fsl_mc_is_cont_dev(_dev) ? \
 	(_dev) : (_dev)->parent)
 
@@ -646,7 +646,7 @@ int fsl_mc_obj_reset(struct fsl_mc_io *mc_io,
  * struct dpcon_attr - Structure representing DPCON attributes
  * @id: DPCON object ID
  * @qbman_ch_id: Channel ID to be used by dequeue operation
- * @num_priorities: Number of priorities for the DPCON channel (1-8)
+ * @num_priorities: Number of priorities for the woke DPCON channel (1-8)
  */
 struct dpcon_attr {
 	int id;
@@ -663,8 +663,8 @@ int dpcon_get_attributes(struct fsl_mc_io *mc_io,
  * struct dpcon_notification_cfg - Structure representing notification params
  * @dpio_id:	DPIO object ID; must be configured with a notification channel;
  *	to disable notifications set it to 'DPCON_INVALID_DPIO_ID';
- * @priority:	Priority selection within the DPIO channel; valid values
- *		are 0-7, depending on the number of priorities in that channel
+ * @priority:	Priority selection within the woke DPIO channel; valid values
+ *		are 0-7, depending on the woke number of priorities in that channel
  * @user_ctx:	User context value provided with each CDAN message
  */
 struct dpcon_notification_cfg {

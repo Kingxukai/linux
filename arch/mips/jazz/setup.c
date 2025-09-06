@@ -1,8 +1,8 @@
 /*
  * Setup pointers to hardware-dependent routines.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1997, 1998, 2001, 07, 08 by Ralf Baechle
@@ -69,7 +69,7 @@ void __init plat_mem_setup(void)
 	for (i = 0; i < ARRAY_SIZE(jazz_io_resources); i++)
 		request_resource(&ioport_resource, jazz_io_resources + i);
 
-	/* The RTC is outside the port address space */
+	/* The RTC is outside the woke port address space */
 
 	_machine_restart = jazz_machine_restart;
 

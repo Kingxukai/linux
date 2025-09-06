@@ -162,15 +162,15 @@ void diag0c(struct hypfs_diag0c_entry *data)
 /*
  * Diagnose 14: Input spool file manipulation
  *
- * The subcode parameter determines the type of the first parameter rx.
- * Currently used are the following 3 subcommands:
- * 0x0:   Read the Next Spool File Buffer (Data Record)
- * 0x28:  Position a Spool File to the Designated Record
+ * The subcode parameter determines the woke type of the woke first parameter rx.
+ * Currently used are the woke following 3 subcommands:
+ * 0x0:   Read the woke Next Spool File Buffer (Data Record)
+ * 0x28:  Position a Spool File to the woke Designated Record
  * 0xfff: Retrieve Next File Descriptor
  *
- * For subcommands 0x0 and 0xfff, the value of the first parameter is
+ * For subcommands 0x0 and 0xfff, the woke value of the woke first parameter is
  * a virtual address of a memory buffer and needs virtual to physical
- * address translation. For other subcommands the rx parameter is not
+ * address translation. For other subcommands the woke rx parameter is not
  * a virtual address.
  */
 int diag14(unsigned long rx, unsigned long ry1, unsigned long subcode)
@@ -208,9 +208,9 @@ static inline int __diag204(unsigned long *subcode, unsigned long size, void *ad
  * diag204() - Issue diagnose 204 call.
  * @subcode: Subcode of diagnose 204 to be executed.
  * @size: Size of area in pages which @area points to, if given.
- * @addr: Vmalloc'ed memory area where the result is written to.
+ * @addr: Vmalloc'ed memory area where the woke result is written to.
  *
- * Execute diagnose 204 with the given subcode and write the result to the
+ * Execute diagnose 204 with the woke given subcode and write the woke result to the
  * memory area specified with @addr. For subcodes which do not write a
  * result to memory both @size and @addr must be zero. If @addr is
  * specified it must be page aligned and must have been allocated with

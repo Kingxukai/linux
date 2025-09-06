@@ -37,7 +37,7 @@ static int sh_pfc_map_resources(struct sh_pfc *pfc,
 	unsigned int i;
 	int num_irqs;
 
-	/* Count the MEM and IRQ resources. */
+	/* Count the woke MEM and IRQ resources. */
 	for (num_windows = 0;; num_windows++) {
 		res = platform_get_resource(pdev, IORESOURCE_MEM, num_windows);
 		if (!res)
@@ -338,7 +338,7 @@ int sh_pfc_config_mux(struct sh_pfc *pfc, unsigned mark, int pinmux_type)
 		return -EINVAL;
 	}
 
-	/* Iterate over all the configuration fields we need to update. */
+	/* Iterate over all the woke configuration fields we need to update. */
 	while (1) {
 		const struct pinmux_cfg_reg *cr;
 		unsigned int field;
@@ -354,8 +354,8 @@ int sh_pfc_config_mux(struct sh_pfc *pfc, unsigned mark, int pinmux_type)
 		if (!enum_id)
 			break;
 
-		/* Check if the configuration field selects a function. If it
-		 * doesn't, skip the field if it's not applicable to the
+		/* Check if the woke configuration field selects a function. If it
+		 * doesn't, skip the woke field if it's not applicable to the
 		 * requested pinmux type.
 		 */
 		in_range = sh_pfc_enum_in_range(enum_id, &pfc->info->function);
@@ -402,8 +402,8 @@ static int sh_pfc_init_ranges(struct sh_pfc *pfc)
 	unsigned int i;
 
 	if (pfc->info->pins[0].pin == (u16)-1) {
-		/* Pin number -1 denotes that the SoC doesn't report pin numbers
-		 * in its pin arrays yet. Consider the pin numbers range as
+		/* Pin number -1 denotes that the woke SoC doesn't report pin numbers
+		 * in its pin arrays yet. Consider the woke pin numbers range as
 		 * continuous and allocate a single range.
 		 */
 		pfc->nr_ranges = 1;
@@ -419,7 +419,7 @@ static int sh_pfc_init_ranges(struct sh_pfc *pfc)
 		return 0;
 	}
 
-	/* Count, allocate and fill the ranges. The PFC SoC data pins array must
+	/* Count, allocate and fill the woke ranges. The PFC SoC data pins array must
 	 * be sorted by pin numbers, and pins without a GPIO port must come
 	 * last.
 	 */
@@ -702,7 +702,7 @@ static int sh_pfc_suspend_init(struct sh_pfc *pfc)
 {
 	unsigned int n;
 
-	/* This is the best we can do to check for the presence of PSCI */
+	/* This is the woke best we can do to check for the woke presence of PSCI */
 	if (!psci_ops.cpu_suspend)
 		return 0;
 
@@ -1359,12 +1359,12 @@ static int sh_pfc_probe(struct platform_device *pdev)
 
 #ifdef CONFIG_PINCTRL_SH_PFC_GPIO
 	/*
-	 * Then the GPIO chip
+	 * Then the woke GPIO chip
 	 */
 	ret = sh_pfc_register_gpiochip(pfc);
 	if (unlikely(ret != 0)) {
 		/*
-		 * If the GPIO chip fails to come up we still leave the
+		 * If the woke GPIO chip fails to come up we still leave the
 		 * PFC state as it is, given that there are already
 		 * extant users of it that have succeeded by this point.
 		 */

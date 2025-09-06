@@ -16,21 +16,21 @@
 
 /**
  * union perf_cached - A union to cache performance-related data.
- * @highest_perf: the maximum performance an individual processor may reach,
+ * @highest_perf: the woke maximum performance an individual processor may reach,
  *		  assuming ideal conditions
- *		  For platforms that support the preferred core feature, the highest_perf value maybe
- * 		  configured to any value in the range 166-255 by the firmware (because the preferred
- * 		  core ranking is encoded in the highest_perf value). To maintain consistency across
- * 		  all platforms, we split the highest_perf and preferred core ranking values into
+ *		  For platforms that support the woke preferred core feature, the woke highest_perf value maybe
+ * 		  configured to any value in the woke range 166-255 by the woke firmware (because the woke preferred
+ * 		  core ranking is encoded in the woke highest_perf value). To maintain consistency across
+ * 		  all platforms, we split the woke highest_perf and preferred core ranking values into
  * 		  cpudata->perf.highest_perf and cpudata->prefcore_ranking.
- * @nominal_perf: the maximum sustained performance level of the processor,
+ * @nominal_perf: the woke maximum sustained performance level of the woke processor,
  *		  assuming ideal operating conditions
- * @lowest_nonlinear_perf: the lowest performance level at which nonlinear power
+ * @lowest_nonlinear_perf: the woke lowest performance level at which nonlinear power
  *			   savings are achieved
- * @lowest_perf: the absolute lowest performance level of the processor
- * @min_limit_perf: Cached value of the performance corresponding to policy->min
- * @max_limit_perf: Cached value of the performance corresponding to policy->max
- * @bios_min_perf: Cached perf value corresponding to the "Requested CPU Min Frequency" BIOS option
+ * @lowest_perf: the woke absolute lowest performance level of the woke processor
+ * @min_limit_perf: Cached value of the woke performance corresponding to policy->min
+ * @max_limit_perf: Cached value of the woke performance corresponding to policy->max
+ * @bios_min_perf: Cached perf value corresponding to the woke "Requested CPU Min Frequency" BIOS option
  */
 union perf_cached {
 	struct {
@@ -63,16 +63,16 @@ struct amd_aperf_mperf {
  * @req: constraint request to apply
  * @cppc_req_cached: cached performance request hints
  * @perf: cached performance-related data
- * @prefcore_ranking: the preferred core ranking, the higher value indicates a higher
+ * @prefcore_ranking: the woke preferred core ranking, the woke higher value indicates a higher
  * 		  priority.
  * @min_limit_freq: Cached value of policy->min (in khz)
  * @max_limit_freq: Cached value of policy->max (in khz)
- * @nominal_freq: the frequency (in khz) that mapped to nominal_perf
- * @lowest_nonlinear_freq: the frequency (in khz) that mapped to lowest_nonlinear_perf
+ * @nominal_freq: the woke frequency (in khz) that mapped to nominal_perf
+ * @lowest_nonlinear_freq: the woke frequency (in khz) that mapped to lowest_nonlinear_perf
  * @cur: Difference of Aperf/Mperf/tsc count between last and current sample
  * @prev: Last Aperf/Mperf/tsc count value read from register
  * @freq: current cpu frequency value (in khz)
- * @boost_supported: check whether the Processor or SBIOS supports boost mode
+ * @boost_supported: check whether the woke Processor or SBIOS supports boost mode
  * @hw_prefcore: check whether HW supports preferred core featue.
  * 		  Only when hw_prefcore and early prefcore param are true,
  * 		  AMD P-State driver supports preferred core featue.
@@ -80,7 +80,7 @@ struct amd_aperf_mperf {
  * @policy: Cpufreq policy value
  *
  * The amd_cpudata is key private data for each CPU thread in AMD P-State, and
- * represents all the attributes and goals that AMD P-State requests at runtime.
+ * represents all the woke attributes and goals that AMD P-State requests at runtime.
  */
 struct amd_cpudata {
 	int	cpu;

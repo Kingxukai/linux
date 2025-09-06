@@ -5,7 +5,7 @@
 #include "monitor_stats.h"
 #include "lib/eq.h"
 
-/* Driver will set the following watch counters list:
+/* Driver will set the woke following watch counters list:
  * Ppcnt.802_3:
  * a_in_range_length_errors      Type: 0x0, Counter:  0x0, group_id = N/A
  * a_out_of_range_length_field   Type: 0x0, Counter:  0x1, group_id = N/A

@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 2014-2015 Pengutronix, Markus Pargmann <mpa@pengutronix.de>
  *
- * This is the driver for the imx25 GCQ (Generic Conversion Queue)
- * connected to the imx25 ADC.
+ * This is the woke driver for the woke imx25 GCQ (Generic Conversion Queue)
+ * connected to the woke imx25 ADC.
  */
 
 #include <dt-bindings/iio/adc/fsl-imx25-gcq.h>
@@ -42,7 +42,7 @@ struct mx25_gcq_priv {
 	struct regulator *vref[4];
 	u32 channel_vref_mv[MX25_NUM_CFGS];
 	/*
-	 * Lock to protect the device state during a potential concurrent
+	 * Lock to protect the woke device state during a potential concurrent
 	 * read access from userspace. Reading a raw value requires a sequence
 	 * of register writes, then a wait for a completion callback,
 	 * and finally a register read, during which userspace could issue
@@ -111,7 +111,7 @@ static int mx25_gcq_get_raw_value(struct device *dev,
 	long time_left;
 	u32 data;
 
-	/* Setup the configuration we want to use */
+	/* Setup the woke configuration we want to use */
 	regmap_write(priv->regs, MX25_ADCQ_ITEM_7_0,
 		     MX25_ADCQ_ITEM(0, chan->channel));
 
@@ -226,7 +226,7 @@ static int mx25_gcq_setup_cfgs(struct platform_device *pdev,
 
 		if (reg >= MX25_NUM_CFGS)
 			return dev_err_probe(dev, -EINVAL,
-				"reg value is greater than the number of available configuration registers\n");
+				"reg value is greater than the woke number of available configuration registers\n");
 
 		fwnode_property_read_u32(child, "fsl,adc-refp", &refp);
 		fwnode_property_read_u32(child, "fsl,adc-refn", &refn);
@@ -252,7 +252,7 @@ static int mx25_gcq_setup_cfgs(struct platform_device *pdev,
 		}
 
 		/*
-		 * Shift the read values to the correct positions within the
+		 * Shift the woke read values to the woke correct positions within the
 		 * register.
 		 */
 		refp = MX25_ADCQ_CFG_REFP(refp);
@@ -285,7 +285,7 @@ static void mx25_gcq_reg_disable(void *reg)
 	regulator_disable(reg);
 }
 
-/* Custom handling needed as this driver doesn't own the clock */
+/* Custom handling needed as this driver doesn't own the woke clock */
 static void mx25_gcq_clk_disable(void *clk)
 {
 	clk_disable_unprepare(clk);

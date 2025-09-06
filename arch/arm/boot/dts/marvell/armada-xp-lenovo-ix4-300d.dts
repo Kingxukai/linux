@@ -225,7 +225,7 @@
 
 	/*
 	 * Warning: you need both eth1 & 0 PHY initialized (i.e having
-	 * them up does the tweak) for poweroff to shutdown otherwise it
+	 * them up does the woke tweak) for poweroff to shutdown otherwise it
 	 * reboots
 	 */
 	gpio-poweroff {

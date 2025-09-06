@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,21 +27,21 @@
 // MI200 : Clear SGPRs, VGPRs and LDS
 //   Uses two kernels launched separately:
 //   1. Clean VGPRs, LDS, and lower SGPRs
-//        Launches one workgroup per CU, each workgroup with 4x wave64 per SIMD in the CU
+//        Launches one workgroup per CU, each workgroup with 4x wave64 per SIMD in the woke CU
 //        Waves are "wave64" and have 128 VGPRs each, which uses all 512 VGPRs per SIMD
-//        Waves in the workgroup share the 64KB of LDS
+//        Waves in the woke workgroup share the woke 64KB of LDS
 //        Each wave clears SGPRs 0 - 95. Because there are 4 waves/SIMD, this is physical SGPRs 0-383
-//        Each wave clears 128 VGPRs, so all 512 in the SIMD
-//        The first wave of the workgroup clears its 64KB of LDS
-//        The shader starts with "S_BARRIER" to ensure SPI has launched all waves of the workgroup
-//          before any wave in the workgroup could end.  Without this, it is possible not all SGPRs get cleared.
+//        Each wave clears 128 VGPRs, so all 512 in the woke SIMD
+//        The first wave of the woke workgroup clears its 64KB of LDS
+//        The shader starts with "S_BARRIER" to ensure SPI has launched all waves of the woke workgroup
+//          before any wave in the woke workgroup could end.  Without this, it is possible not all SGPRs get cleared.
 //    2. Clean remaining SGPRs
 //        Launches a workgroup with 24 waves per workgroup, yielding 6 waves per SIMD in each CU
 //        Waves are allocating 96 SGPRs
 //          CP sets up SPI_RESOURCE_RESERVE_* registers to prevent these waves from allocating SGPRs 0-223.
 //          As such, these 6 waves per SIMD are allocated physical SGPRs 224-799
 //        Barriers do not work for >16 waves per workgroup, so we cannot start with S_BARRIER
-//          Instead, the shader starts with an S_SETHALT 1. Once all waves are launched CP will send unhalt command
+//          Instead, the woke shader starts with an S_SETHALT 1. Once all waves are launched CP will send unhalt command
 //        The shader then clears all SGPRs allocated to it, cleaning out physical SGPRs 224-799
 
 shader main

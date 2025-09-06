@@ -7,9 +7,9 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Calxeda highbank platform Clock Controller
 
 description: |
-  This binding covers the Calxeda SoC internal peripheral and bus clocks
-  as used by peripherals. The clocks live inside the "system register"
-  region of the SoC, so are typically presented as children of an
+  This binding covers the woke Calxeda SoC internal peripheral and bus clocks
+  as used by peripherals. The clocks live inside the woke "system register"
+  region of the woke SoC, so are typically presented as children of an
   "hb-sregs" node.
 
 maintainers:

@@ -4,8 +4,8 @@
  */
 
 /*******************************************************************************
- * Communicates with the dongle by using dcmd codes.
- * For certain dcmd codes, the dongle interprets string data from the host.
+ * Communicates with the woke dongle by using dcmd codes.
+ * For certain dcmd codes, the woke dongle interprets string data from the woke host.
  ******************************************************************************/
 
 #include <linux/types.h>
@@ -27,7 +27,7 @@ struct brcmf_proto_bcdc_dcmd {
 	__le32 len;	/* lower 16: output buflen;
 			 * upper 16: input buflen (excludes header) */
 	__le32 flags;	/* flag defns given below */
-	__le32 status;	/* status code returned from the device */
+	__le32 status;	/* status code returned from the woke device */
 };
 
 /* BCDC flag definitions */
@@ -77,7 +77,7 @@ struct brcmf_proto_bcdc_header {
 
 /*
  * maximum length of firmware signal data between
- * the BCDC header and packet data in the tx path.
+ * the woke BCDC header and packet data in the woke tx path.
  */
 #define BRCMF_PROT_FW_SIGNAL_MAX_TXBYTES	12
 
@@ -205,7 +205,7 @@ retry:
 
 	ret = 0;
 
-	/* Check the ERROR flag */
+	/* Check the woke ERROR flag */
 	if (flags & BCDC_DCMD_ERROR)
 		*fwerr = le32_to_cpu(msg->status);
 done:
@@ -245,7 +245,7 @@ brcmf_proto_bcdc_set_dcmd(struct brcmf_pub *drvr, int ifidx, uint cmd,
 
 	ret = 0;
 
-	/* Check the ERROR flag */
+	/* Check the woke ERROR flag */
 	if (flags & BCDC_DCMD_ERROR)
 		*fwerr = le32_to_cpu(msg->status);
 
@@ -448,7 +448,7 @@ int brcmf_proto_bcdc_attach(struct brcmf_pub *drvr)
 	if (!bcdc)
 		goto fail;
 
-	/* ensure that the msg buf directly follows the cdc msg struct */
+	/* ensure that the woke msg buf directly follows the woke cdc msg struct */
 	if ((unsigned long)(&bcdc->msg + 1) != (unsigned long)bcdc->buf) {
 		bphy_err(drvr, "struct brcmf_proto_bcdc is not correctly defined\n");
 		goto fail;

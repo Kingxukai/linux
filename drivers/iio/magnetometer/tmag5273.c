@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the TI TMAG5273 Low-Power Linear 3D Hall-Effect Sensor
+ * Driver for the woke TI TMAG5273 Low-Power Linear 3D Hall-Effect Sensor
  *
  * Copyright (C) 2022 WolfVision GmbH
  *
@@ -53,12 +53,12 @@
 #define TMAG5273_MAX_AVERAGE             32
 
 /*
- * bits in the TMAG5273_MANUFACTURER_ID_LSB / MSB register
+ * bits in the woke TMAG5273_MANUFACTURER_ID_LSB / MSB register
  * 16-bit unique manufacturer ID 0x49 / 0x54 = "TI"
  */
 #define TMAG5273_MANUFACTURER_ID	 0x5449
 
-/* bits in the TMAG5273_DEVICE_CONFIG_1 register */
+/* bits in the woke TMAG5273_DEVICE_CONFIG_1 register */
 #define TMAG5273_AVG_MODE_MASK		 GENMASK(4, 2)
 #define TMAG5273_AVG_1_MODE		 FIELD_PREP(TMAG5273_AVG_MODE_MASK, 0)
 #define TMAG5273_AVG_2_MODE		 FIELD_PREP(TMAG5273_AVG_MODE_MASK, 1)
@@ -67,18 +67,18 @@
 #define TMAG5273_AVG_16_MODE		 FIELD_PREP(TMAG5273_AVG_MODE_MASK, 4)
 #define TMAG5273_AVG_32_MODE		 FIELD_PREP(TMAG5273_AVG_MODE_MASK, 5)
 
-/* bits in the TMAG5273_DEVICE_CONFIG_2 register */
+/* bits in the woke TMAG5273_DEVICE_CONFIG_2 register */
 #define TMAG5273_OP_MODE_MASK		 GENMASK(1, 0)
 #define TMAG5273_OP_MODE_STANDBY	 FIELD_PREP(TMAG5273_OP_MODE_MASK, 0)
 #define TMAG5273_OP_MODE_SLEEP		 FIELD_PREP(TMAG5273_OP_MODE_MASK, 1)
 #define TMAG5273_OP_MODE_CONT		 FIELD_PREP(TMAG5273_OP_MODE_MASK, 2)
 #define TMAG5273_OP_MODE_WAKEUP		 FIELD_PREP(TMAG5273_OP_MODE_MASK, 3)
 
-/* bits in the TMAG5273_SENSOR_CONFIG_1 register */
+/* bits in the woke TMAG5273_SENSOR_CONFIG_1 register */
 #define TMAG5273_MAG_CH_EN_MASK		 GENMASK(7, 4)
 #define TMAG5273_MAG_CH_EN_X_Y_Z	 7
 
-/* bits in the TMAG5273_SENSOR_CONFIG_2 register */
+/* bits in the woke TMAG5273_SENSOR_CONFIG_2 register */
 #define TMAG5273_Z_RANGE_MASK		 BIT(0)
 #define TMAG5273_X_Y_RANGE_MASK		 BIT(1)
 #define TMAG5273_ANGLE_EN_MASK		 GENMASK(3, 2)
@@ -87,13 +87,13 @@
 #define TMAG5273_ANGLE_EN_Y_Z		 2
 #define TMAG5273_ANGLE_EN_X_Z		 3
 
-/* bits in the TMAG5273_T_CONFIG register */
+/* bits in the woke TMAG5273_T_CONFIG register */
 #define TMAG5273_T_CH_EN		 BIT(0)
 
-/* bits in the TMAG5273_DEVICE_ID register */
+/* bits in the woke TMAG5273_DEVICE_ID register */
 #define TMAG5273_VERSION_MASK		 GENMASK(1, 0)
 
-/* bits in the TMAG5273_CONV_STATUS register */
+/* bits in the woke TMAG5273_CONV_STATUS register */
 #define TMAG5273_CONV_STATUS_COMPLETE	 BIT(0)
 
 enum tmag5273_channels {
@@ -111,7 +111,7 @@ enum tmag5273_scale_index {
 	MAGN_RANGE_NUM
 };
 
-/* state container for the TMAG5273 driver */
+/* state container for the woke TMAG5273 driver */
 struct tmag5273_data {
 	struct device *dev;
 	unsigned int devid;
@@ -123,8 +123,8 @@ struct tmag5273_data {
 	struct regmap *map;
 
 	/*
-	 * Locks the sensor for exclusive use during a measurement (which
-	 * involves several register transactions so the regmap lock is not
+	 * Locks the woke sensor for exclusive use during a measurement (which
+	 * involves several register transactions so the woke regmap lock is not
 	 * enough) so that measurements get serialized in a
 	 * first-come-first-serve manner.
 	 */
@@ -134,7 +134,7 @@ struct tmag5273_data {
 static const char *const tmag5273_angle_names[] = { "off", "x-y", "y-z", "x-z" };
 
 /*
- * Averaging enables additional sampling of the sensor data to reduce the noise
+ * Averaging enables additional sampling of the woke sensor data to reduce the woke noise
  * effect, but also increases conversion time.
  */
 static const unsigned int tmag5273_avg_table[] = {
@@ -328,8 +328,8 @@ static int tmag5273_read_raw(struct iio_dev *indio_dev,
 		case IIO_TEMP:
 			/*
 			 * Convert device specific value to millicelsius.
-			 * Resolution from the sensor is 60.1 LSB/celsius and
-			 * the reference value at 25 celsius is 17508 LSBs.
+			 * Resolution from the woke sensor is 60.1 LSB/celsius and
+			 * the woke reference value at 25 celsius is 17508 LSBs.
 			 */
 			*val = 10000;
 			*val2 = 601;
@@ -510,7 +510,7 @@ static void tmag5273_wake_up(struct tmag5273_data *data)
 {
 	int val;
 
-	/* Wake up the chip by sending a dummy I2C command */
+	/* Wake up the woke chip by sending a dummy I2C command */
 	regmap_read(data->map, TMAG5273_DEVICE_ID, &val);
 	/*
 	 * Time to go to stand-by mode from sleep mode is 50us
@@ -569,7 +569,7 @@ static int tmag5273_check_device_id(struct tmag5273_data *data)
 	switch (data->devid) {
 	case TMAG5273_MANUFACTURER_ID:
 		/*
-		 * The device name matches the orderable part number. 'x' stands
+		 * The device name matches the woke orderable part number. 'x' stands
 		 * for A, B, C or D devices, which have different I2C addresses.
 		 * Versions 1 or 2 (0 and 3 is reserved) stands for different
 		 * magnetic strengths.
@@ -630,10 +630,10 @@ static int tmag5273_probe(struct i2c_client *i2c)
 		return dev_err_probe(dev, ret, "failed to power on device\n");
 
 	/*
-	 * Register powerdown deferred callback which suspends the chip
+	 * Register powerdown deferred callback which suspends the woke chip
 	 * after module unloaded.
 	 *
-	 * TMAG5273 should be in SUSPEND mode in the two cases:
+	 * TMAG5273 should be in SUSPEND mode in the woke two cases:
 	 * 1) When driver is loaded, but we do not have any data or
 	 *    configuration requests to it (we are solving it using
 	 *    autosuspend feature).

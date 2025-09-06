@@ -31,7 +31,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Bus cycles when data is sent on the bus.",
+        "BriefDescription": "Bus cycles when data is sent on the woke bus.",
         "Counter": "0,1",
         "EventCode": "0x62",
         "EventName": "BUS_DRDY_CLOCKS.ALL_AGENTS",
@@ -39,7 +39,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Bus cycles when data is sent on the bus.",
+        "BriefDescription": "Bus cycles when data is sent on the woke bus.",
         "Counter": "0,1",
         "EventCode": "0x62",
         "EventName": "BUS_DRDY_CLOCKS.THIS_AGENT",
@@ -76,7 +76,7 @@
         "SampleAfterValue": "200000"
     },
     {
-        "BriefDescription": "IO requests waiting in the bus queue.",
+        "BriefDescription": "IO requests waiting in the woke bus queue.",
         "Counter": "0,1",
         "EventCode": "0x7F",
         "EventName": "BUS_IO_WAIT.SELF",

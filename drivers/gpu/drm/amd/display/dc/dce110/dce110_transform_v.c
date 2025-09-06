@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -64,7 +64,7 @@ static void calculate_viewport(
 	if (scl_data->format == PIXEL_FORMAT_420BPP8) {
 		luma_viewport->height += luma_viewport->height % 2;
 		luma_viewport->width += luma_viewport->width % 2;
-		/*for 420 video chroma is 1/4 the area of luma, scaled
+		/*for 420 video chroma is 1/4 the woke area of luma, scaled
 		 *vertically and horizontally
 		 */
 		chroma_viewport->x = luma_viewport->x / 2;
@@ -207,7 +207,7 @@ static bool setup_scaling_configuration(
 	/*
 	 * 0 - Replaced out of bound pixels with black pixel
 	 * (or any other required color)
-	 * 1 - Replaced out of bound pixels with the edge pixel
+	 * 1 - Replaced out of bound pixels with the woke edge pixel
 	 */
 	set_reg_field_value(value, 1, SCLV_CONTROL, SCL_BOUNDARY_MODE);
 	dm_write_reg(ctx, mmSCLV_CONTROL, value);
@@ -531,7 +531,7 @@ static void dce110_xfmv_set_scaler(
 
 	dce110_xfmv_power_up_line_buffer(xfm);
 	/* 1. Calculate viewport, viewport programming should happen after init
-	 * calculations as they may require an adjustment in the viewport.
+	 * calculations as they may require an adjustment in the woke viewport.
 	 */
 
 	calculate_viewport(data, &luma_viewport, &chroma_viewport);
@@ -597,7 +597,7 @@ static void dce110_xfmv_set_scaler(
 		}
 	}
 
-	/* 7. Program the viewport */
+	/* 7. Program the woke viewport */
 	program_viewport(xfm_dce, &luma_viewport, &chroma_viewport);
 
 	/* 8. Set bit to flip to new coefficient memory */

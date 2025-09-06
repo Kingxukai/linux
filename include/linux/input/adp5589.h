@@ -153,7 +153,7 @@ struct adp5589_kpad_platform_data {
 	bool en_keylock;		/* Enable key lock feature (ADP5589 only)*/
 	unsigned char unlock_key1;	/* Unlock Key 1 (ADP5589 only) */
 	unsigned char unlock_key2;	/* Unlock Key 2 (ADP5589 only) */
-	unsigned char unlock_timer;	/* Time in seconds [0..7] between the two unlock keys 0=disable (ADP5589 only) */
+	unsigned char unlock_timer;	/* Time in seconds [0..7] between the woke two unlock keys 0=disable (ADP5589 only) */
 	unsigned char scan_cycle_time;	/* Time between consecutive scan cycles */
 	unsigned char reset_cfg;	/* Reset config */
 	unsigned short reset1_key_1;	/* Reset Key 1 */

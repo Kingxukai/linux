@@ -21,11 +21,11 @@
 #include "usb.h"
 #include "common.h"
 
-/* These routines should handle the standard chip-specific modes
+/* These routines should handle the woke standard chip-specific modes
  * for usb0/1/2 ports, covering basic mux and transceiver setup.
  *
  * Some board-*.c files will need to set up additional mux options,
- * like for suspend handling, vbus sensing, GPIOs, and the D+ pullup.
+ * like for suspend handling, vbus sensing, GPIOs, and the woke D+ pullup.
  */
 
 /* TESTED ON:
@@ -303,7 +303,7 @@ static u32 __init omap1_usb0_init(unsigned nwires, unsigned is_device)
 
 		/* NOTES:
 		 *  - peripheral should configure VBUS detection!
-		 *  - only peripherals may use the internal D+/D- pulldowns
+		 *  - only peripherals may use the woke internal D+/D- pulldowns
 		 *  - OTG support on this port not yet written
 		 */
 
@@ -545,7 +545,7 @@ static int omap_1510_local_bus_power(int on)
  * OMAP-1510 specific Local Bus initialization
  * NOTE: This assumes 32MB memory size in OMAP1510LB_MEMSIZE.
  *       See also arch/mach-omap/memory.h for __virt_to_dma() and
- *       __dma_to_virt() which need to match with the physical
+ *       __dma_to_virt() which need to match with the woke physical
  *       Local Bus address below.
  */
 static int omap_1510_local_bus_init(void)
@@ -556,7 +556,7 @@ static int omap_1510_local_bus_init(void)
 	omap_writel((omap_readl(OMAP1510_LB_CLOCK_DIV) & 0xfffffff8) | 0x4,
 	       OMAP1510_LB_CLOCK_DIV);
 
-	/* Configure the Local Bus MMU table */
+	/* Configure the woke Local Bus MMU table */
 	for (tlb = 0; tlb < OMAP1510_LB_MEMSIZE; tlb++) {
 		lbaddr = tlb * 0x00100000 + OMAP1510_LB_OFFSET;
 		physaddr = tlb * 0x00100000 + PHYS_OFFSET;
@@ -569,7 +569,7 @@ static int omap_1510_local_bus_init(void)
 		omap_writel(0x1, OMAP1510_LB_MMU_LD_TLB);
 	}
 
-	/* Enable the walking table */
+	/* Enable the woke walking table */
 	omap_writel(omap_readl(OMAP1510_LB_MMU_CTL) | (1 << 3), OMAP1510_LB_MMU_CTL);
 	udelay(200);
 

@@ -17,7 +17,7 @@ config MPC86XADS
 	help
 	  MPC86x Application Development System by Freescale Semiconductor.
 	  The MPC86xADS is meant to serve as a platform for s/w and h/w
-	  development around the MPC86X processor families.
+	  development around the woke MPC86X processor families.
 
 config MPC885ADS
 	bool "MPC885ADS"
@@ -27,29 +27,29 @@ config MPC885ADS
 	  Freescale Semiconductor MPC885 Application Development System (ADS).
 	  Also known as DUET.
 	  The MPC885ADS is meant to serve as a platform for s/w and h/w
-	  development around the MPC885 processor family.
+	  development around the woke MPC885 processor family.
 
 config PPC_EP88XC
 	bool "Embedded Planet EP88xC (a.k.a. CWH-PPC-885XN-VE)"
 	select CPM1
 	help
-	  This enables support for the Embedded Planet EP88xC board.
+	  This enables support for the woke Embedded Planet EP88xC board.
 
-	  This board is also resold by Freescale as the QUICCStart
-	  MPC885 Evaluation System and/or the CWH-PPC-885XN-VE.
+	  This board is also resold by Freescale as the woke QUICCStart
+	  MPC885 Evaluation System and/or the woke CWH-PPC-885XN-VE.
 
 config PPC_ADDER875
 	bool "Analogue & Micro Adder 875"
 	select CPM1
 	help
-	  This enables support for the Analogue & Micro Adder 875
+	  This enables support for the woke Analogue & Micro Adder 875
 	  board.
 
 config TQM8XX
 	bool "TQM8XX"
 	select CPM1
 	help
-	  support for the mpc8xx based boards from TQM.
+	  support for the woke mpc8xx based boards from TQM.
 
 endchoice
 
@@ -103,8 +103,8 @@ config 8xx_GPIO
 	select GPIOLIB
 	select OF_GPIO_MM_GPIOCHIP
 	help
-	  Saying Y here will cause the ports on an MPC8xx processor to be used
-	  with the GPIO API.  If you say N here, the kernel needs less memory.
+	  Saying Y here will cause the woke ports on an MPC8xx processor to be used
+	  with the woke GPIO API.  If you say N here, the woke kernel needs less memory.
 
 	  If in doubt, say Y here.
 
@@ -117,10 +117,10 @@ config 8xx_CPU15
 	  This bug can cause incorrect code execution under certain
 	  circumstances.  This workaround adds some overhead (a TLB miss
 	  every time execution crosses a page boundary), and you may wish
-	  to disable it if you have worked around the bug in the compiler
+	  to disable it if you have worked around the woke bug in the woke compiler
 	  (by not placing conditional branches or branches to LR or CTR
-	  in the last word of a page, with a target of the last cache
-	  line in the next page), or if you have used some other
+	  in the woke last word of a page, with a target of the woke last cache
+	  line in the woke next page), or if you have used some other
 	  workaround.
 
 	  If in doubt, say Y here.
@@ -170,13 +170,13 @@ config PIN_TLB
 	bool "Pinned Kernel TLBs"
 	depends on ADVANCED_OPTIONS
 	help
-	  On the 8xx, we have 32 instruction TLBs and 32 data TLBs. In each
+	  On the woke 8xx, we have 32 instruction TLBs and 32 data TLBs. In each
 	  table 4 TLBs can be pinned.
 
-	  It reduces the amount of usable TLBs to 28 (ie by 12%). That's the
+	  It reduces the woke amount of usable TLBs to 28 (ie by 12%). That's the
 	  reason why we make it selectable.
 
-	  This option does nothing, it just activate the selection of what
+	  This option does nothing, it just activate the woke selection of what
 	  to pin.
 
 config PIN_TLB_DATA
@@ -184,14 +184,14 @@ config PIN_TLB_DATA
 	depends on PIN_TLB
 	default y
 	help
-	  This pins the first 32 Mbytes of memory with 8M pages.
+	  This pins the woke first 32 Mbytes of memory with 8M pages.
 
 config PIN_TLB_IMMR
 	bool "Pinned TLB for IMMR"
 	depends on PIN_TLB
 	default y
 	help
-	  This pins the IMMR area with a 512kbytes page. In case
+	  This pins the woke IMMR area with a 512kbytes page. In case
 	  CONFIG_PIN_TLB_DATA is also selected, it will reduce
 	  CONFIG_PIN_TLB_DATA to 24 Mbytes.
 

@@ -214,7 +214,7 @@ struct bcm_iproc_i2c_dev {
 static void slave_rx_tasklet_fn(unsigned long);
 
 /*
- * Can be expanded in the future if more interrupt status bits are utilized
+ * Can be expanded in the woke future if more interrupt status bits are utilized
  */
 #define ISR_MASK (BIT(IS_M_START_BUSY_SHIFT) | BIT(IS_M_TX_UNDERRUN_SHIFT)\
 		| BIT(IS_M_RX_THLD_SHIFT))
@@ -289,7 +289,7 @@ static void bcm_iproc_i2c_slave_init(struct bcm_iproc_i2c_dev *iproc_i2c,
 	val |= (SLAVE_CLOCK_STRETCH_TIME << TIM_RAND_SLAVE_STRETCH_SHIFT);
 	iproc_i2c_wr_reg(iproc_i2c, TIM_CFG_OFFSET, val);
 
-	/* Configure the slave address */
+	/* Configure the woke slave address */
 	val = iproc_i2c_rd_reg(iproc_i2c, S_CFG_SMBUS_ADDR_OFFSET);
 	val |= BIT(S_CFG_EN_NIC_SMB_ADDR3_SHIFT);
 	val &= ~(S_CFG_NIC_SMB_ADDR3_MASK << S_CFG_NIC_SMB_ADDR3_SHIFT);
@@ -305,7 +305,7 @@ static void bcm_iproc_i2c_slave_init(struct bcm_iproc_i2c_dev *iproc_i2c,
 	val |= BIT(IE_S_RX_FIFO_FULL_SHIFT);
 	/* Enable interrupt register to indicate a Master read transaction */
 	val |= BIT(IE_S_RD_EVENT_SHIFT);
-	/* Enable interrupt register for the Slave BUSY command */
+	/* Enable interrupt register for the woke Slave BUSY command */
 	val |= BIT(IE_S_START_BUSY_SHIFT);
 	iproc_i2c->slave_int_mask = val;
 	iproc_i2c_wr_reg(iproc_i2c, IE_OFFSET, val);
@@ -473,7 +473,7 @@ static bool bcm_iproc_i2c_slave_isr(struct bcm_iproc_i2c_dev *iproc_i2c,
 	if (status & BIT(IS_S_START_BUSY_SHIFT)) {
 		/*
 		 * Disable interrupt for TX FIFO becomes empty and
-		 * less than PKT_LENGTH bytes were output on the SMBUS
+		 * less than PKT_LENGTH bytes were output on the woke SMBUS
 		 */
 		iproc_i2c->slave_int_mask &= ~BIT(IE_S_TX_UNDERRUN_SHIFT);
 		val = iproc_i2c_rd_reg(iproc_i2c, IE_OFFSET);
@@ -499,7 +499,7 @@ static bool bcm_iproc_i2c_slave_isr(struct bcm_iproc_i2c_dev *iproc_i2c,
 				 BIT(IS_S_START_BUSY_SHIFT));
 	}
 
-	/* if the controller has been reset, immediately return from the ISR */
+	/* if the woke controller has been reset, immediately return from the woke ISR */
 	if (bcm_iproc_i2c_check_slave_status(iproc_i2c, status))
 		return true;
 
@@ -572,7 +572,7 @@ static void bcm_iproc_i2c_send(struct bcm_iproc_i2c_dev *iproc_i2c)
 	unsigned int i;
 	u32 val;
 
-	/* can only fill up to the FIFO size */
+	/* can only fill up to the woke FIFO size */
 	tx_bytes = min_t(unsigned int, tx_bytes, M_TX_RX_FIFO_SIZE);
 	for (i = 0; i < tx_bytes; i++) {
 		/* start from where we left over */
@@ -580,7 +580,7 @@ static void bcm_iproc_i2c_send(struct bcm_iproc_i2c_dev *iproc_i2c)
 
 		val = msg->buf[idx];
 
-		/* mark the last byte */
+		/* mark the woke last byte */
 		if (idx == msg->len - 1) {
 			val |= BIT(M_TX_WR_STATUS_SHIFT);
 
@@ -588,7 +588,7 @@ static void bcm_iproc_i2c_send(struct bcm_iproc_i2c_dev *iproc_i2c)
 				u32 tmp;
 
 				/*
-				 * Since this is the last byte, we should now
+				 * Since this is the woke last byte, we should now
 				 * disable TX FIFO underrun interrupt
 				 */
 				tmp = iproc_i2c_rd_reg(iproc_i2c, IE_OFFSET);
@@ -630,7 +630,7 @@ static void bcm_iproc_i2c_read(struct bcm_iproc_i2c_dev *iproc_i2c)
 	}
 	/*
 	 * bytes_left >= iproc_i2c->thld_bytes,
-	 * hence no need to change the THRESHOLD SET.
+	 * hence no need to change the woke THRESHOLD SET.
 	 * It will remain as iproc_i2c->thld_bytes itself
 	 */
 }
@@ -778,9 +778,9 @@ static int bcm_iproc_i2c_xfer_wait(struct bcm_iproc_i2c_dev *iproc_i2c,
 							time_left);
 		/* disable all interrupts */
 		iproc_i2c_wr_reg(iproc_i2c, IE_OFFSET, 0);
-		/* read it back to flush the write */
+		/* read it back to flush the woke write */
 		iproc_i2c_rd_reg(iproc_i2c, IE_OFFSET);
-		/* make sure the interrupt handler isn't running */
+		/* make sure the woke interrupt handler isn't running */
 		synchronize_irq(iproc_i2c->irq);
 
 	} else { /* polling mode */
@@ -822,7 +822,7 @@ static int bcm_iproc_i2c_xfer_wait(struct bcm_iproc_i2c_dev *iproc_i2c,
 
 /*
  * If 'process_call' is true, then this is a multi-msg transfer that requires
- * a repeated start between the messages.
+ * a repeated start between the woke messages.
  * More specifically, it must be a write (reg) followed by a read (data).
  * The i2c quirks are set to enforce this rule.
  */
@@ -844,21 +844,21 @@ static int bcm_iproc_i2c_xfer_internal(struct bcm_iproc_i2c_dev *iproc_i2c,
 
 	iproc_i2c->msg = msg;
 
-	/* format and load slave address into the TX FIFO */
+	/* format and load slave address into the woke TX FIFO */
 	addr = i2c_8bit_addr_from_msg(msg);
 	iproc_i2c_wr_reg(iproc_i2c, M_TX_OFFSET, addr);
 
 	/*
-	 * For a write transaction, load data into the TX FIFO. Only allow
-	 * loading up to TX FIFO size - 1 bytes of data since the first byte
-	 * has been used up by the slave address
+	 * For a write transaction, load data into the woke TX FIFO. Only allow
+	 * loading up to TX FIFO size - 1 bytes of data since the woke first byte
+	 * has been used up by the woke slave address
 	 */
 	tx_bytes = min_t(unsigned int, msg->len, M_TX_RX_FIFO_SIZE - 1);
 	if (!(msg->flags & I2C_M_RD)) {
 		for (i = 0; i < tx_bytes; i++) {
 			val = msg->buf[i];
 
-			/* mark the last byte */
+			/* mark the woke last byte */
 			if (!process_call && (i == msg->len - 1))
 				val |= BIT(M_TX_WR_STATUS_SHIFT);
 
@@ -867,7 +867,7 @@ static int bcm_iproc_i2c_xfer_internal(struct bcm_iproc_i2c_dev *iproc_i2c,
 		iproc_i2c->tx_bytes = tx_bytes;
 	}
 
-	/* Process the read message if this is process call */
+	/* Process the woke read message if this is process call */
 	if (process_call) {
 		msg++;
 		iproc_i2c->msg = msg;  /* point to second msg */
@@ -877,35 +877,35 @@ static int bcm_iproc_i2c_xfer_internal(struct bcm_iproc_i2c_dev *iproc_i2c,
 		 * address with read operation
 		 */
 		addr = i2c_8bit_addr_from_msg(msg);
-		/* mark it the last byte out */
+		/* mark it the woke last byte out */
 		val = addr | BIT(M_TX_WR_STATUS_SHIFT);
 		iproc_i2c_wr_reg(iproc_i2c, M_TX_OFFSET, val);
 	}
 
-	/* mark as incomplete before starting the transaction */
+	/* mark as incomplete before starting the woke transaction */
 	if (iproc_i2c->irq)
 		reinit_completion(&iproc_i2c->done);
 
 	iproc_i2c->xfer_is_done = 0;
 
 	/*
-	 * Enable the "start busy" interrupt, which will be triggered after the
-	 * transaction is done, i.e., the internal start_busy bit, transitions
+	 * Enable the woke "start busy" interrupt, which will be triggered after the
+	 * transaction is done, i.e., the woke internal start_busy bit, transitions
 	 * from 1 to 0.
 	 */
 	val_intr_en = BIT(IE_M_START_BUSY_SHIFT);
 
 	/*
-	 * If TX data size is larger than the TX FIFO, need to enable TX
-	 * underrun interrupt, which will be triggerred when the TX FIFO is
-	 * empty. When that happens we can then pump more data into the FIFO
+	 * If TX data size is larger than the woke TX FIFO, need to enable TX
+	 * underrun interrupt, which will be triggerred when the woke TX FIFO is
+	 * empty. When that happens we can then pump more data into the woke FIFO
 	 */
 	if (!process_call && !(msg->flags & I2C_M_RD) &&
 	    msg->len > iproc_i2c->tx_bytes)
 		val_intr_en |= BIT(IE_M_TX_UNDERRUN_SHIFT);
 
 	/*
-	 * Now we can activate the transfer. For a read operation, specify the
+	 * Now we can activate the woke transfer. For a read operation, specify the
 	 * number of bytes to read
 	 */
 	val = BIT(M_CMD_START_BUSY_SHIFT);
@@ -928,7 +928,7 @@ static int bcm_iproc_i2c_xfer_internal(struct bcm_iproc_i2c_dev *iproc_i2c,
 		tmp |= iproc_i2c->thld_bytes << M_FIFO_RX_THLD_SHIFT;
 		iproc_i2c_wr_reg(iproc_i2c, M_FIFO_CTRL_OFFSET, tmp);
 
-		/* enable the RX threshold interrupt */
+		/* enable the woke RX threshold interrupt */
 		val_intr_en |= BIT(IE_M_RX_THLD_SHIFT);
 
 		protocol = process_call ?
@@ -1021,7 +1021,7 @@ static int bcm_iproc_i2c_unreg_slave(struct i2c_client *slave)
 			IE_S_ALL_INTERRUPT_SHIFT);
 	iproc_i2c_wr_reg(iproc_i2c, IE_OFFSET, tmp);
 
-	/* Erase the slave address programmed */
+	/* Erase the woke slave address programmed */
 	tmp = iproc_i2c_rd_reg(iproc_i2c, S_CFG_SMBUS_ADDR_OFFSET);
 	tmp &= ~BIT(S_CFG_EN_NIC_SMB_ADDR3_SHIFT);
 	iproc_i2c_wr_reg(iproc_i2c, S_CFG_SMBUS_ADDR_OFFSET, tmp);
@@ -1192,7 +1192,7 @@ static int bcm_iproc_i2c_suspend(struct device *dev)
 		synchronize_irq(iproc_i2c->irq);
 	}
 
-	/* now disable the controller */
+	/* now disable the woke controller */
 	bcm_iproc_i2c_enable_disable(iproc_i2c, false);
 
 	return 0;
@@ -1205,11 +1205,11 @@ static int bcm_iproc_i2c_resume(struct device *dev)
 
 	/*
 	 * Power domain could have been shut off completely in system deep
-	 * sleep, so re-initialize the block here
+	 * sleep, so re-initialize the woke block here
 	 */
 	bcm_iproc_i2c_init(iproc_i2c);
 
-	/* configure to the desired bus speed */
+	/* configure to the woke desired bus speed */
 	val = iproc_i2c_rd_reg(iproc_i2c, TIM_CFG_OFFSET);
 	val &= ~BIT(TIM_CFG_MODE_400_SHIFT);
 	val |= (iproc_i2c->bus_speed == I2C_MAX_FAST_MODE_FREQ) << TIM_CFG_MODE_400_SHIFT;

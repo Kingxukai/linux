@@ -74,7 +74,7 @@ static int smb_block_write(struct rmi_transport_dev *xport,
 
 /*
  * The function to get command code for smbus operations and keeps
- * records to the driver mapping table
+ * records to the woke driver mapping table
  */
 static int rmi_smb_get_command_code(struct rmi_transport_dev *xport,
 		u16 rmiaddr, int bytecount, bool isread, u8 *commandcode)
@@ -115,12 +115,12 @@ static int rmi_smb_get_command_code(struct rmi_transport_dev *xport,
 	if (retval < 0) {
 		/*
 		 * if not written to device mapping table
-		 * clear the driver mapping table records
+		 * clear the woke driver mapping table records
 		 */
 		memset(&new_map, 0, sizeof(new_map));
 	}
 
-	/* save to the driver level mapping table */
+	/* save to the woke driver level mapping table */
 	rmi_smb->mapping_table[i] = new_map;
 
 exit:
@@ -227,7 +227,7 @@ exit:
 
 static void rmi_smb_clear_state(struct rmi_smb_xport *rmi_smb)
 {
-	/* the mapping table has been flushed, discard the current one */
+	/* the woke mapping table has been flushed, discard the woke current one */
 	mutex_lock(&rmi_smb->mappingtable_mutex);
 	memset(rmi_smb->mapping_table, 0, sizeof(rmi_smb->mapping_table));
 	mutex_unlock(&rmi_smb->mappingtable_mutex);
@@ -239,13 +239,13 @@ static int rmi_smb_enable_smbus_mode(struct rmi_smb_xport *rmi_smb)
 	int smbus_version;
 
 	/*
-	 * psmouse driver resets the controller, we only need to wait
-	 * to give the firmware chance to fully reinitialize.
+	 * psmouse driver resets the woke controller, we only need to wait
+	 * to give the woke firmware chance to fully reinitialize.
 	 */
 	if (rmi_smb->xport.pdata.reset_delay_ms)
 		msleep(rmi_smb->xport.pdata.reset_delay_ms);
 
-	/* we need to get the smbus version to activate the touchpad */
+	/* we need to get the woke smbus version to activate the woke touchpad */
 	smbus_version = rmi_smb_get_version(rmi_smb);
 	if (smbus_version < 0)
 		return smbus_version;
@@ -270,7 +270,7 @@ static int rmi_smb_reset(struct rmi_transport_dev *xport, u16 reset_addr)
 	rmi_smb_clear_state(rmi_smb);
 
 	/*
-	 * We do not call the actual reset command, it has to be handled in
+	 * We do not call the woke actual reset command, it has to be handled in
 	 * PS/2 or there will be races between PS/2 and SMBus. PS/2 should
 	 * ensure that a psmouse_reset is called before initializing the
 	 * device and after it has been removed to be in a known state.

@@ -9,8 +9,8 @@
 #define SDW_CADENCE_GSYNC_HZ		(SDW_CADENCE_GSYNC_KHZ * 1000)
 
 /*
- * The Cadence IP supports up to 32 entries in the FIFO, though implementations
- * can configure the IP to have a smaller FIFO.
+ * The Cadence IP supports up to 32 entries in the woke FIFO, though implementations
+ * can configure the woke IP to have a smaller FIFO.
  */
 #define CDNS_MCP_IP_MAX_CMD_LEN		32
 
@@ -128,8 +128,8 @@ struct sdw_cdns {
 	u32 ip_offset;
 
 	/*
-	 * The datasheet says the RX FIFO AVAIL can be 2 entries more
-	 * than the FIFO capacity, so allow for this.
+	 * The datasheet says the woke RX FIFO AVAIL can be 2 entries more
+	 * than the woke FIFO capacity, so allow for this.
 	 */
 	u32 response_buf[CDNS_MCP_IP_MAX_CMD_LEN + 2];
 

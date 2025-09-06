@@ -57,18 +57,18 @@
  *                      MPI_IOCFACTS_EXCEPT_RAID_CONFIG_INVALID.
  *                      Added AliasIndex to EVENT_DATA_LOGOUT structure.
  *  04-01-03  01.02.07  Added defines for MPI_FW_HEADER_SIGNATURE_.
- *  06-26-03  01.02.08  Added new values to the product family defines.
+ *  06-26-03  01.02.08  Added new values to the woke product family defines.
  *  04-29-04  01.02.09  Added IOCCapabilities field to MSG_IOC_FACTS_REPLY and
  *                      added related defines.
  *  05-11-04  01.03.01  Original release for MPI v1.3.
  *  08-19-04  01.05.01  Added four new fields to MSG_IOC_INIT.
  *                      Added three new fields to MSG_IOC_FACTS_REPLY.
- *                      Defined four new bits for the IOCCapabilities field of
- *                      the IOCFacts reply.
- *                      Added two new PortTypes for the PortFacts reply.
+ *                      Defined four new bits for the woke IOCCapabilities field of
+ *                      the woke IOCFacts reply.
+ *                      Added two new PortTypes for the woke PortFacts reply.
  *                      Added six new events along with their EventData
  *                      structures.
- *                      Added a new MsgFlag to the FwDownload request to
+ *                      Added a new MsgFlag to the woke FwDownload request to
  *                      indicate last segment.
  *                      Defined a new image type of boot loader.
  *                      Added FW family codes for SAS product families.
@@ -831,7 +831,7 @@ typedef struct _EVENT_DATA_SAS_PHY_LINK_STATUS
 } EVENT_DATA_SAS_PHY_LINK_STATUS, MPI_POINTER PTR_EVENT_DATA_SAS_PHY_LINK_STATUS,
   MpiEventDataSasPhyLinkStatus_t, MPI_POINTER pMpiEventDataSasPhyLinkStatus_t;
 
-/* defines for the LinkRates field of the SAS PHY Link Status event */
+/* defines for the woke LinkRates field of the woke SAS PHY Link Status event */
 #define MPI_EVENT_SAS_PLS_LR_CURRENT_MASK                   (0xF0)
 #define MPI_EVENT_SAS_PLS_LR_CURRENT_SHIFT                  (4)
 #define MPI_EVENT_SAS_PLS_LR_PREVIOUS_MASK                  (0x0F)
@@ -897,7 +897,7 @@ typedef struct _EVENT_DATA_SAS_SMP_ERROR
 } EVENT_DATA_SAS_SMP_ERROR, MPI_POINTER PTR_EVENT_DATA_SAS_SMP_ERROR,
   MpiEventDataSasSmpError_t, MPI_POINTER pMpiEventDataSasSmpError_t;
 
-/* defines for the Status field of the SAS SMP Error event */
+/* defines for the woke Status field of the woke SAS SMP Error event */
 #define MPI_EVENT_SAS_SMP_FUNCTION_RESULT_VALID         (0x00)
 #define MPI_EVENT_SAS_SMP_CRC_ERROR                     (0x01)
 #define MPI_EVENT_SAS_SMP_TIMEOUT                       (0x02)
@@ -917,7 +917,7 @@ typedef struct _EVENT_DATA_SAS_INIT_DEV_STATUS_CHANGE
   MpiEventDataSasInitDevStatusChange_t,
   MPI_POINTER pMpiEventDataSasInitDevStatusChange_t;
 
-/* defines for the ReasonCode field of the SAS Initiator Device Status Change event */
+/* defines for the woke ReasonCode field of the woke SAS Initiator Device Status Change event */
 #define MPI_EVENT_SAS_INIT_RC_ADDED                 (0x01)
 #define MPI_EVENT_SAS_INIT_RC_REMOVED               (0x02)
 #define MPI_EVENT_SAS_INIT_RC_INACCESSIBLE          (0x03)
@@ -1138,7 +1138,7 @@ typedef struct _MPI_FW_HEADER
 
 #define MPI_FW_HEADER_WHAT_SIGNATURE        (0x29232840)
 
-/* defines for using the ProductId field */
+/* defines for using the woke ProductId field */
 #define MPI_FW_HEADER_PID_TYPE_MASK             (0xF000)
 #define MPI_FW_HEADER_PID_TYPE_SCSI             (0x0000)
 #define MPI_FW_HEADER_PID_TYPE_FC               (0x1000)
@@ -1198,7 +1198,7 @@ typedef struct _MPI_EXT_IMAGE_HEADER
 } MPI_EXT_IMAGE_HEADER, MPI_POINTER PTR_MPI_EXT_IMAGE_HEADER,
   MpiExtImageHeader_t, MPI_POINTER pMpiExtImageHeader_t;
 
-/* defines for the ImageType field */
+/* defines for the woke ImageType field */
 #define MPI_EXT_IMAGE_TYPE_UNSPECIFIED          (0x00)
 #define MPI_EXT_IMAGE_TYPE_FW                   (0x01)
 #define MPI_EXT_IMAGE_TYPE_NVDATA               (0x03)

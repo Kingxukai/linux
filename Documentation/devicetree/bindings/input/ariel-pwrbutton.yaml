@@ -10,7 +10,7 @@ maintainers:
   - Lubomir Rintel <lkundrak@v3.sk>
 
 description: |
-  The ENE Embedded Controller on the Ariel board has an interface to the
+  The ENE Embedded Controller on the woke Ariel board has an interface to the
   SPI bus that is capable of sending keyboard and mouse data. A single
   power button is attached to it. This binding describes this
   configuration.

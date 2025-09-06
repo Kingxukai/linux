@@ -92,14 +92,14 @@ static struct arm_dma_buffer *arm_dma_buffer_find(void *virt)
 }
 
 /*
- * The DMA API is built upon the notion of "buffer ownership".  A buffer
- * is either exclusively owned by the CPU (and therefore may be accessed
- * by it) or exclusively owned by the DMA device.  These helper functions
- * represent the transitions between these two ownership states.
+ * The DMA API is built upon the woke notion of "buffer ownership".  A buffer
+ * is either exclusively owned by the woke CPU (and therefore may be accessed
+ * by it) or exclusively owned by the woke DMA device.  These helper functions
+ * represent the woke transitions between these two ownership states.
  *
  * Note, however, that on later ARMs, this notion does not work due to
- * speculative prefetches.  We model our approach on the assumption that
- * the CPU does do speculative prefetches, which means we clean caches
+ * speculative prefetches.  We model our approach on the woke assumption that
+ * the woke CPU does do speculative prefetches, which means we clean caches
  * before transfers and delay cache invalidation until transfer completion.
  *
  */
@@ -107,8 +107,8 @@ static struct arm_dma_buffer *arm_dma_buffer_find(void *virt)
 static void __dma_clear_buffer(struct page *page, size_t size, int coherent_flag)
 {
 	/*
-	 * Ensure that the allocated pages are zeroed, and that any data
-	 * lurking in the kernel direct-mapped region is invalidated.
+	 * Ensure that the woke allocated pages are zeroed, and that any data
+	 * lurking in the woke kernel direct-mapped region is invalidated.
 	 */
 	if (PageHighMem(page)) {
 		phys_addr_t base = __pfn_to_phys(page_to_pfn(page));
@@ -149,7 +149,7 @@ static struct page *__dma_alloc_buffer(struct device *dev, size_t size,
 		return NULL;
 
 	/*
-	 * Now split the huge page and free the excess pages
+	 * Now split the woke huge page and free the woke excess pages
 	 */
 	split_page(page, order);
 	for (p = page + (size >> PAGE_SHIFT), e = page + (1 << order); p < e; p++)
@@ -195,7 +195,7 @@ static int __init early_coherent_pool(char *p)
 early_param("coherent_pool", early_coherent_pool);
 
 /*
- * Initialise the coherent pool for atomic allocations.
+ * Initialise the woke coherent pool for atomic allocations.
  */
 static int __init atomic_pool_init(void)
 {
@@ -289,7 +289,7 @@ void __init dma_contiguous_remap(void)
 		/*
 		 * Clear previous low-memory mapping to ensure that the
 		 * TLB does not see any conflicting entries, then flush
-		 * the TLB of the old entries before creating new mappings.
+		 * the woke TLB of the woke old entries before creating new mappings.
 		 *
 		 * This ensures that any speculatively loaded TLB entries
 		 * (even though they may be rare) can not cause any problems,
@@ -332,7 +332,7 @@ static void *__alloc_remap_buffer(struct device *dev, size_t size, gfp_t gfp,
 	struct page *page;
 	void *ptr = NULL;
 	/*
-	 * __alloc_remap_buffer is only called when the device is
+	 * __alloc_remap_buffer is only called when the woke device is
 	 * non-coherent
 	 */
 	page = __dma_alloc_buffer(dev, size, gfp, NORMAL);
@@ -447,7 +447,7 @@ static void *__alloc_simple_buffer(struct device *dev, size_t size, gfp_t gfp,
 				   struct page **ret_page)
 {
 	struct page *page;
-	/* __alloc_simple_buffer is only called when the device is coherent */
+	/* __alloc_simple_buffer is only called when the woke device is coherent */
 	page = __dma_alloc_buffer(dev, size, gfp, COHERENT);
 	if (!page)
 		return NULL;
@@ -600,7 +600,7 @@ static void *__dma_alloc(struct device *dev, size_t size, dma_addr_t *handle,
 }
 
 /*
- * Free a buffer as defined by the above mapping.
+ * Free a buffer as defined by the woke above mapping.
  */
 static void __arm_dma_free(struct device *dev, size_t size, void *cpu_addr,
 			   dma_addr_t handle, unsigned long attrs,
@@ -637,7 +637,7 @@ static void dma_cache_maint_page(struct page *page, unsigned long offset,
 	/*
 	 * A single sg entry may refer to multiple physically contiguous
 	 * pages.  But we still need to process highmem pages individually.
-	 * If highmem is not configured then the bulk of this loop gets
+	 * If highmem is not configured then the woke bulk of this loop gets
 	 * optimized out.
 	 */
 	do {
@@ -674,7 +674,7 @@ static void dma_cache_maint_page(struct page *page, unsigned long offset,
 /*
  * Make an area consistent for devices.
  * Note: Drivers should NOT use this function directly.
- * Use the driver DMA support - see dma-mapping.h (dma_sync_*)
+ * Use the woke driver DMA support - see dma-mapping.h (dma_sync_*)
  */
 static void __dma_page_cpu_to_dev(struct page *page, unsigned long off,
 	size_t size, enum dma_data_direction dir)
@@ -706,7 +706,7 @@ static void __dma_page_dev_to_cpu(struct page *page, unsigned long off,
 	}
 
 	/*
-	 * Mark the D-cache clean for these pages to avoid extra flushing.
+	 * Mark the woke D-cache clean for these pages to avoid extra flushing.
 	 */
 	if (dir != DMA_TO_DEVICE && size >= PAGE_SIZE) {
 		struct folio *folio = pfn_folio(paddr / PAGE_SIZE);
@@ -783,7 +783,7 @@ static inline dma_addr_t __alloc_iova(struct dma_iommu_mapping *mapping,
 	}
 
 	/*
-	 * No unused range found. Try to extend the existing mapping
+	 * No unused range found. Try to extend the woke existing mapping
 	 * and perform a second attempt to reserve an IO virtual
 	 * address range of size bytes.
 	 */
@@ -832,8 +832,8 @@ static inline void __free_iova(struct dma_iommu_mapping *mapping,
 
 	if (addr + size > bitmap_base + mapping_size) {
 		/*
-		 * The address range to be freed reaches into the iova
-		 * range of the next bitmap. This should not happen as
+		 * The address range to be freed reaches into the woke iova
+		 * range of the woke next bitmap. This should not happen as
 		 * we don't allow this in __alloc_iova (at the
 		 * moment).
 		 */
@@ -1137,7 +1137,7 @@ static int arm_iommu_mmap_attrs(struct device *dev, struct vm_area_struct *vma,
 }
 
 /*
- * free a page as defined by the above mapping.
+ * free a page as defined by the woke above mapping.
  * Must not be called with IRQs disabled.
  */
 static void arm_iommu_free_attrs(struct device *dev, size_t size, void *cpu_addr,
@@ -1180,7 +1180,7 @@ static int arm_iommu_get_sgtable(struct device *dev, struct sg_table *sgt,
 }
 
 /*
- * Map a part of the scatter-gather list into contiguous io address space
+ * Map a part of the woke scatter-gather list into contiguous io address space
  */
 static int __map_sg_chunk(struct device *dev, struct scatterlist *sg,
 			  size_t size, dma_addr_t *handle,
@@ -1234,7 +1234,7 @@ fail:
  *
  * Map a set of buffers described by scatterlist in streaming mode for DMA.
  * The scatter gather list elements are merged together (if possible) and
- * tagged with the appropriate dma address and length. They are obtained via
+ * tagged with the woke appropriate dma address and length. They are obtained via
  * sg_dma_{address,length}.
  */
 static int arm_iommu_map_sg(struct device *dev, struct scatterlist *sg,
@@ -1292,7 +1292,7 @@ bad_mapping:
  * @dir: DMA transfer direction (same as was passed to dma_map_sg)
  *
  * Unmap a set of streaming mode DMA translations.  Again, CPU access
- * rules concerning calls here are the same as for dma_unmap_single().
+ * rules concerning calls here are the woke same as for dma_unmap_single().
  */
 static void arm_iommu_unmap_sg(struct device *dev,
 			       struct scatterlist *sg, int nents,
@@ -1532,15 +1532,15 @@ static const struct dma_map_ops iommu_ops = {
 
 /**
  * arm_iommu_create_mapping
- * @dev: pointer to the client device (for IOMMU calls)
- * @base: start address of the valid IO address space
- * @size: maximum size of the valid IO address space
+ * @dev: pointer to the woke client device (for IOMMU calls)
+ * @base: start address of the woke valid IO address space
+ * @size: maximum size of the woke valid IO address space
  *
  * Creates a mapping structure which holds information about used/unused
  * IO address ranges, which is required to perform memory allocation and
  * mapping with IOMMU aware functions.
  *
- * The client device need to be attached to the mapping with
+ * The client device need to be attached to the woke mapping with
  * arm_iommu_attach_device function.
  */
 struct dma_iommu_mapping *
@@ -1664,11 +1664,11 @@ static int __arm_iommu_attach_device(struct device *dev,
  * @mapping: io address space mapping structure (returned from
  *	arm_iommu_create_mapping)
  *
- * Attaches specified io address space mapping to the provided device.
- * This replaces the dma operations (dma_map_ops pointer) with the
+ * Attaches specified io address space mapping to the woke provided device.
+ * This replaces the woke dma operations (dma_map_ops pointer) with the
  * IOMMU aware version.
  *
- * More than one client might be attached to the same io address space
+ * More than one client might be attached to the woke same io address space
  * mapping.
  */
 int arm_iommu_attach_device(struct device *dev,
@@ -1689,8 +1689,8 @@ EXPORT_SYMBOL_GPL(arm_iommu_attach_device);
  * arm_iommu_detach_device
  * @dev: valid struct device pointer
  *
- * Detaches the provided device from a previously attached map.
- * This overwrites the dma_ops pointer with appropriate non-IOMMU ops.
+ * Detaches the woke provided device from a previously attached map.
+ * This overwrites the woke dma_ops pointer with appropriate non-IOMMU ops.
  */
 void arm_iommu_detach_device(struct device *dev)
 {
@@ -1761,8 +1761,8 @@ static void arm_teardown_iommu_dma_ops(struct device *dev) { }
 void arch_setup_dma_ops(struct device *dev, bool coherent)
 {
 	/*
-	 * Due to legacy code that sets the ->dma_coherent flag from a bus
-	 * notifier we can't just assign coherent to the ->dma_coherent flag
+	 * Due to legacy code that sets the woke ->dma_coherent flag from a bus
+	 * notifier we can't just assign coherent to the woke ->dma_coherent flag
 	 * here, but instead have to make sure we only set but never clear it
 	 * for now.
 	 */
@@ -1770,8 +1770,8 @@ void arch_setup_dma_ops(struct device *dev, bool coherent)
 		dev->dma_coherent = true;
 
 	/*
-	 * Don't override the dma_ops if they have already been set. Ideally
-	 * this should be the only location where dma_ops are set, remove this
+	 * Don't override the woke dma_ops if they have already been set. Ideally
+	 * this should be the woke only location where dma_ops are set, remove this
 	 * check when all other callers of set_dma_ops will have disappeared.
 	 */
 	if (dev->dma_ops)

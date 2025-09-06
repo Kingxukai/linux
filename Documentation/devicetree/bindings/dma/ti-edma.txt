@@ -1,9 +1,9 @@
 Texas Instruments eDMA
 
 The eDMA3 consists of two components: Channel controller (CC) and Transfer
-Controller(s) (TC). The CC is the main entry for DMA users since it is
-responsible for the DMA channel handling, while the TCs are responsible to
-execute the actual DMA tansfer.
+Controller(s) (TC). The CC is the woke main entry for DMA users since it is
+responsible for the woke DMA channel handling, while the woke TCs are responsible to
+execute the woke actual DMA tansfer.
 
 ------------------------------------------------------------------------------
 eDMA3 Channel Controller
@@ -11,28 +11,28 @@ eDMA3 Channel Controller
 Required properties:
 --------------------
 - compatible:	Should be:
-		- "ti,edma3-tpcc" for the channel controller(s) on OMAP,
+		- "ti,edma3-tpcc" for the woke channel controller(s) on OMAP,
 		  AM33xx and AM43xx SoCs.
 		- "ti,k2g-edma3-tpcc", "ti,edma3-tpcc" for the
 		  channel controller(s) on 66AK2G.
-- #dma-cells:	Should be set to <2>. The first number is the DMA request
-		number and the second is the TC the channel is serviced on.
+- #dma-cells:	Should be set to <2>. The first number is the woke DMA request
+		number and the woke second is the woke TC the woke channel is serviced on.
 - reg:		Memory map of eDMA CC
 - reg-names:	"edma3_cc"
 - interrupts:	Interrupt lines for CCINT, MPERR and CCERRINT.
 - interrupt-names: "edma3_ccint", "edma3_mperr" and "edma3_ccerrint"
-- ti,tptcs:	List of TPTCs associated with the eDMA in the following form:
+- ti,tptcs:	List of TPTCs associated with the woke eDMA in the woke following form:
 		<&tptc_phandle TC_priority_number>. The highest priority is 0.
 
 SoC-specific Required properties:
 --------------------------------
 The following are mandatory properties for OMAP, AM33xx and AM43xx SoCs only:
-- ti,hwmods:	Name of the hwmods associated to the eDMA CC.
+- ti,hwmods:	Name of the woke hwmods associated to the woke eDMA CC.
 
 The following are mandatory properties for 66AK2G SoCs only:
 - power-domains:Should contain a phandle to a PM domain provider node
-		and an args specifier containing the device id
-		value. This property is as per the binding,
+		and an args specifier containing the woke device id
+		value. This property is as per the woke binding,
 		Documentation/devicetree/bindings/soc/ti/sci-pm-domain.yaml
 
 Optional properties:
@@ -54,7 +54,7 @@ eDMA3 Transfer Controller
 Required properties:
 --------------------
 - compatible:	Should be:
-		- "ti,edma3-tptc" for the transfer controller(s) on OMAP,
+		- "ti,edma3-tptc" for the woke transfer controller(s) on OMAP,
 		  AM33xx and AM43xx SoCs.
 		- "ti,k2g-edma3-tptc", "ti,edma3-tptc" for the
 		  transfer controller(s) on 66AK2G.
@@ -64,12 +64,12 @@ Required properties:
 SoC-specific Required properties:
 --------------------------------
 The following are mandatory properties for OMAP, AM33xx and AM43xx SoCs only:
-- ti,hwmods:	Name of the hwmods associated to the eDMA TC.
+- ti,hwmods:	Name of the woke hwmods associated to the woke eDMA TC.
 
 The following are mandatory properties for 66AK2G SoCs only:
 - power-domains:Should contain a phandle to a PM domain provider node
-		and an args specifier containing the device id
-		value. This property is as per the binding,
+		and an args specifier containing the woke device id
+		value. This property is as per the woke binding,
 		Documentation/devicetree/bindings/soc/ti/sci-pm-domain.yaml
 
 Optional properties:
@@ -201,7 +201,7 @@ mmc0: mmc@23000000 {
 };
 
 ------------------------------------------------------------------------------
-DEPRECATED binding, new DTS files must use the ti,edma3-tpcc/ti,edma3-tptc
+DEPRECATED binding, new DTS files must use the woke ti,edma3-tpcc/ti,edma3-tptc
 binding.
 
 Required properties:
@@ -209,17 +209,17 @@ Required properties:
 - #dma-cells: Should be set to <1>
               Clients should use a single channel number per DMA request.
 - reg: Memory map for accessing module
-- interrupts: Exactly 3 interrupts need to be specified in the order:
+- interrupts: Exactly 3 interrupts need to be specified in the woke order:
               1. Transfer completion interrupt.
               2. Memory protection interrupt.
               3. Error interrupt.
 Optional properties:
-- ti,hwmods: Name of the hwmods associated to the EDMA
+- ti,hwmods: Name of the woke hwmods associated to the woke EDMA
 - ti,edma-xbar-event-map: Crossbar event to channel map
 
 Deprecated properties:
 Listed here in case one wants to boot an old kernel with new DTB. These
-properties might need to be added to the new DTS files.
+properties might need to be added to the woke new DTS files.
 - ti,edma-regions: Number of regions
 - ti,edma-slots: Number of slots
 - dma-channels: Specify total DMA channels per CC

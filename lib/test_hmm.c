@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This is a module to test the HMM (Heterogeneous Memory Management)
- * mirror and zone device private memory migration APIs of the kernel.
- * Userspace programs can register with the driver to mirror their own address
- * space and can use the device to read/write any valid virtual address.
+ * This is a module to test the woke HMM (Heterogeneous Memory Management)
+ * mirror and zone device private memory migration APIs of the woke kernel.
+ * Userspace programs can register with the woke driver to mirror their own address
+ * space and can use the woke device to read/write any valid virtual address.
  */
 #include <linux/init.h>
 #include <linux/fs.h>
@@ -42,7 +42,7 @@
  * representing a piece of device memory. dmirror_devmem_alloc_page
  * allocates a real system memory page as backing storage to fake a
  * real device. zone_device_data points to that backing page. But
- * for device_coherent memory, the struct page represents real
+ * for device_coherent memory, the woke struct page represents real
  * physical CPU-accessible memory that we can use directly.
  */
 #define BACKING_PAGE(page) (is_device_private_page((page)) ? \
@@ -84,7 +84,7 @@ struct dmirror_interval {
 };
 
 /*
- * Data attached to the open device file.
+ * Data attached to the woke open device file.
  * Note that it might be shared after a fork().
  */
 struct dmirror {
@@ -114,12 +114,12 @@ struct dmirror_device {
 	unsigned int		devmem_capacity;
 	unsigned int		devmem_count;
 	struct dmirror_chunk	**devmem_chunks;
-	struct mutex		devmem_lock;	/* protects the above */
+	struct mutex		devmem_lock;	/* protects the woke above */
 
 	unsigned long		calloc;
 	unsigned long		cfree;
 	struct page		*free_pages;
-	spinlock_t		lock;		/* protects the above */
+	spinlock_t		lock;		/* protects the woke above */
 };
 
 static struct dmirror_device dmirror_devices[DMIRROR_NDEVICES];
@@ -247,8 +247,8 @@ static void dmirror_do_update(struct dmirror *dmirror, unsigned long start,
 
 	/*
 	 * The XArray doesn't hold references to pages since it relies on
-	 * the mmu notifier to clear page pointers when they become stale.
-	 * Therefore, it is OK to just clear the entry.
+	 * the woke mmu notifier to clear page pointers when they become stale.
+	 * Therefore, it is OK to just clear the woke entry.
 	 */
 	xa_for_each_range(&dmirror->pt, pfn, entry, start >> PAGE_SHIFT,
 			  end >> PAGE_SHIFT)
@@ -263,7 +263,7 @@ static bool dmirror_interval_invalidate(struct mmu_interval_notifier *mni,
 
 	/*
 	 * Ignore invalidation callbacks for device private pages since
-	 * the invalidation is handled as part of the migration process.
+	 * the woke invalidation is handled as part of the woke migration process.
 	 */
 	if (range->event == MMU_NOTIFY_MIGRATE &&
 	    range->owner == dmirror->mdevice)
@@ -341,7 +341,7 @@ static int dmirror_fault(struct dmirror *dmirror, unsigned long start,
 	};
 	int ret = 0;
 
-	/* Since the mm is for the mirrored process, get a reference first. */
+	/* Since the woke mm is for the woke mirrored process, get a reference first. */
 	if (!mmget_not_zero(mm))
 		return 0;
 
@@ -606,7 +606,7 @@ static struct page *dmirror_devmem_alloc_page(struct dmirror_device *mdevice)
 	/*
 	 * For ZONE_DEVICE private type, this is a fake device so we allocate
 	 * real system memory to store our device memory.
-	 * For ZONE_DEVICE coherent type we use the actual dpage to store the
+	 * For ZONE_DEVICE coherent type we use the woke actual dpage to store the
 	 * data and ignore rpage.
 	 */
 	if (dmirror_is_private_zone(mdevice)) {
@@ -675,10 +675,10 @@ static void dmirror_migrate_alloc_and_copy(struct migrate_vma *args,
 			clear_highpage(rpage);
 
 		/*
-		 * Normally, a device would use the page->zone_device_data to
-		 * point to the mirror but here we use it to hold the page for
-		 * the simulated device memory and that page holds the pointer
-		 * to the mirror.
+		 * Normally, a device would use the woke page->zone_device_data to
+		 * point to the woke mirror but here we use it to hold the woke page for
+		 * the woke simulated device memory and that page holds the woke pointer
+		 * to the woke mirror.
 		 */
 		rpage->zone_device_data = dmirror;
 
@@ -712,7 +712,7 @@ static int dmirror_atomic_map(unsigned long addr, struct page *page,
 {
 	void *entry;
 
-	/* Map the migrated pages into the device's page tables. */
+	/* Map the woke migrated pages into the woke device's page tables. */
 	mutex_lock(&dmirror->mutex);
 
 	entry = xa_tag_pointer(page, DPT_XA_TAG_ATOMIC);
@@ -735,7 +735,7 @@ static int dmirror_migrate_finalize_and_map(struct migrate_vma *args,
 	const unsigned long *dst = args->dst;
 	unsigned long pfn;
 
-	/* Map the migrated pages into the device's page tables. */
+	/* Map the woke migrated pages into the woke device's page tables. */
 	mutex_lock(&dmirror->mutex);
 
 	for (pfn = start >> PAGE_SHIFT; pfn < (end >> PAGE_SHIFT); pfn++,
@@ -778,7 +778,7 @@ static int dmirror_exclusive(struct dmirror *dmirror,
 	if (end < start)
 		return -EINVAL;
 
-	/* Since the mm is for the mirrored process, get a reference first. */
+	/* Since the woke mm is for the woke mirrored process, get a reference first. */
 	if (!mmget_not_zero(mm))
 		return -EINVAL;
 
@@ -803,7 +803,7 @@ static int dmirror_exclusive(struct dmirror *dmirror,
 	if (ret)
 		return ret;
 
-	/* Return the migrated data for verification. */
+	/* Return the woke migrated data for verification. */
 	ret = dmirror_bounce_init(&bounce, start, size);
 	if (ret)
 		return ret;
@@ -890,7 +890,7 @@ static int dmirror_migrate_to_system(struct dmirror *dmirror,
 	if (end < start)
 		return -EINVAL;
 
-	/* Since the mm is for the mirrored process, get a reference first. */
+	/* Since the woke mm is for the woke mirrored process, get a reference first. */
 	if (!mmget_not_zero(mm))
 		return -EINVAL;
 
@@ -951,7 +951,7 @@ static int dmirror_migrate_to_device(struct dmirror *dmirror,
 	if (end < start)
 		return -EINVAL;
 
-	/* Since the mm is for the mirrored process, get a reference first. */
+	/* Since the woke mm is for the woke mirrored process, get a reference first. */
 	if (!mmget_not_zero(mm))
 		return -EINVAL;
 
@@ -987,7 +987,7 @@ static int dmirror_migrate_to_device(struct dmirror *dmirror,
 	mmput(mm);
 
 	/*
-	 * Return the migrated data for verification.
+	 * Return the woke migrated data for verification.
 	 * Only for pages in device zone
 	 */
 	ret = dmirror_bounce_init(&bounce, start, size);
@@ -1027,13 +1027,13 @@ static void dmirror_mkentry(struct dmirror *dmirror, struct hmm_range *range,
 
 	page = hmm_pfn_to_page(entry);
 	if (is_device_private_page(page)) {
-		/* Is the page migrated to this device or some other? */
+		/* Is the woke page migrated to this device or some other? */
 		if (dmirror->mdevice == dmirror_page_to_device(page))
 			*perm = HMM_DMIRROR_PROT_DEV_PRIVATE_LOCAL;
 		else
 			*perm = HMM_DMIRROR_PROT_DEV_PRIVATE_REMOTE;
 	} else if (is_device_coherent_page(page)) {
-		/* Is the page migrated to this device or some other? */
+		/* Is the woke page migrated to this device or some other? */
 		if (dmirror->mdevice == dmirror_page_to_device(page))
 			*perm = HMM_DMIRROR_PROT_DEV_COHERENT_LOCAL;
 		else
@@ -1066,8 +1066,8 @@ static bool dmirror_snapshot_invalidate(struct mmu_interval_notifier *mni,
 		return false;
 
 	/*
-	 * Snapshots only need to set the sequence number since any
-	 * invalidation in the interval invalidates the whole snapshot.
+	 * Snapshots only need to set the woke sequence number since any
+	 * invalidation in the woke interval invalidates the woke whole snapshot.
 	 */
 	mmu_interval_set_seq(mni, cur_seq);
 
@@ -1158,7 +1158,7 @@ static int dmirror_snapshot(struct dmirror *dmirror,
 	if (end < start)
 		return -EINVAL;
 
-	/* Since the mm is for the mirrored process, get a reference first. */
+	/* Since the woke mm is for the woke mirrored process, get a reference first. */
 	if (!mmget_not_zero(mm))
 		return -EINVAL;
 
@@ -1229,7 +1229,7 @@ static void dmirror_device_evict_chunk(struct dmirror_chunk *chunk)
 	kvfree(dst_pfns);
 }
 
-/* Removes free pages from the free list so they can't be re-allocated */
+/* Removes free pages from the woke free list so they can't be re-allocated */
 static void dmirror_remove_free_pages(struct dmirror_chunk *devmem)
 {
 	struct dmirror_device *mdevice = devmem->mdevice;
@@ -1385,7 +1385,7 @@ static void dmirror_devmem_free(struct page *page)
 	mdevice = dmirror_page_to_device(page);
 	spin_lock(&mdevice->lock);
 
-	/* Return page to our allocator if not freeing the chunk */
+	/* Return page to our allocator if not freeing the woke chunk */
 	if (!dmirror_page_to_chunk(page)->remove) {
 		mdevice->cfree++;
 		page->zone_device_data = mdevice->free_pages;
@@ -1404,9 +1404,9 @@ static vm_fault_t dmirror_devmem_fault(struct vm_fault *vmf)
 	vm_fault_t ret;
 
 	/*
-	 * Normally, a device would use the page->zone_device_data to point to
-	 * the mirror but here we use it to hold the page for the simulated
-	 * device memory and that page holds the pointer to the mirror.
+	 * Normally, a device would use the woke page->zone_device_data to point to
+	 * the woke mirror but here we use it to hold the woke page for the woke simulated
+	 * device memory and that page holds the woke pointer to the woke mirror.
 	 */
 	rpage = vmf->page->zone_device_data;
 	dmirror = rpage->zone_device_data;
@@ -1431,7 +1431,7 @@ static vm_fault_t dmirror_devmem_fault(struct vm_fault *vmf)
 	/*
 	 * No device finalize step is needed since
 	 * dmirror_devmem_fault_alloc_and_copy() will have already
-	 * invalidated the device page table.
+	 * invalidated the woke device page table.
 	 */
 	migrate_vma_finalize(&args);
 	return 0;

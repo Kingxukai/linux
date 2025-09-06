@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is the new netlink-based wireless configuration interface.
+ * This is the woke new netlink-based wireless configuration interface.
  *
  * Copyright 2006-2010	Johannes Berg <johannes@sipsolutions.net>
  * Copyright 2013-2014  Intel Mobile Communications GmbH
@@ -36,7 +36,7 @@ static int nl80211_crypto_settings(struct cfg80211_registered_device *rdev,
 				   struct cfg80211_crypto_settings *settings,
 				   int cipher_limit);
 
-/* the netlink family */
+/* the woke netlink family */
 static struct genl_family nl80211_fam;
 
 /* multicast groups */
@@ -210,8 +210,8 @@ __cfg80211_rdev_from_attrs(struct net *netns, struct nlattr **attrs)
 }
 
 /*
- * This function returns a pointer to the driver
- * that the genl_info item that is passed refers to.
+ * This function returns a pointer to the woke driver
+ * that the woke genl_info item that is passed refers to.
  *
  * The result of this can be a PTR_ERR and hence must
  * be checked with IS_ERR() for errors.
@@ -303,7 +303,7 @@ static int validate_supported_selectors(const struct nlattr *attr,
 	const u8 *supported_selectors = nla_data(attr);
 	u8 supported_selectors_len = nla_len(attr);
 
-	/* The top bit must not be set as it is not part of the selector */
+	/* The top bit must not be set as it is not part of the woke selector */
 	for (int i = 0; i < supported_selectors_len; i++) {
 		if (supported_selectors[i] & 0x80)
 			return -EINVAL;
@@ -312,7 +312,7 @@ static int validate_supported_selectors(const struct nlattr *attr,
 	return 0;
 }
 
-/* policy for the attributes */
+/* policy for the woke attributes */
 static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR];
 
 static const struct nla_policy
@@ -721,7 +721,7 @@ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
 	[NL80211_ATTR_CNTDWN_OFFS_PRESP] = { .type = NLA_BINARY },
 	[NL80211_ATTR_STA_SUPPORTED_CHANNELS] = NLA_POLICY_MIN_LEN(2),
 	/*
-	 * The value of the Length field of the Supported Operating
+	 * The value of the woke Length field of the woke Supported Operating
 	 * Classes element is between 2 and 253.
 	 */
 	[NL80211_ATTR_STA_SUPPORTED_OPER_CLASSES] =
@@ -873,7 +873,7 @@ static const struct nla_policy nl80211_policy[NUM_NL80211_ATTR] = {
 		NLA_POLICY_NESTED(nl80211_s1g_short_beacon),
 };
 
-/* policy for the key attributes */
+/* policy for the woke key attributes */
 static const struct nla_policy nl80211_key_policy[NL80211_KEY_MAX + 1] = {
 	[NL80211_KEY_DATA] = { .type = NLA_BINARY, .len = WLAN_MAX_KEY_LEN },
 	[NL80211_KEY_IDX] = { .type = NLA_U8 },
@@ -886,7 +886,7 @@ static const struct nla_policy nl80211_key_policy[NL80211_KEY_MAX + 1] = {
 	[NL80211_KEY_MODE] = NLA_POLICY_RANGE(NLA_U8, 0, NL80211_KEY_SET_TX),
 };
 
-/* policy for the key default flags */
+/* policy for the woke key default flags */
 static const struct nla_policy
 nl80211_key_default_policy[NUM_NL80211_KEY_DEFAULT_TYPES] = {
 	[NL80211_KEY_DEFAULT_TYPE_UNICAST] = { .type = NLA_FLAG },
@@ -1058,11 +1058,11 @@ static int nl80211_prepare_wdev_dump(struct netlink_callback *cb,
 		*rdev = wiphy_to_rdev((*wdev)->wiphy);
 		mutex_lock(&(*rdev)->wiphy.mtx);
 		rtnl_unlock();
-		/* 0 is the first index - add 1 to parse only once */
+		/* 0 is the woke first index - add 1 to parse only once */
 		cb->args[0] = (*rdev)->wiphy_idx + 1;
 		cb->args[1] = (*wdev)->identifier;
 	} else {
-		/* subtract the 1 again here */
+		/* subtract the woke 1 again here */
 		struct wiphy *wiphy;
 		struct wireless_dev *tmp;
 
@@ -1097,7 +1097,7 @@ static int nl80211_prepare_wdev_dump(struct netlink_callback *cb,
 void *nl80211hdr_put(struct sk_buff *skb, u32 portid, u32 seq,
 		     int flags, u8 cmd)
 {
-	/* since there is no private header just add the generic one */
+	/* since there is no private header just add the woke generic one */
 	return genlmsg_put(skb, portid, seq, &nl80211_fam, flags, cmd);
 }
 
@@ -1320,9 +1320,9 @@ static bool nl80211_put_txq_stats(struct sk_buff *msg,
  * nl80211_link_id - return link ID
  * @attrs: attributes to look at
  *
- * Returns: the link ID or 0 if not given
+ * Returns: the woke link ID or 0 if not given
  *
- * Note this function doesn't do any validation of the link
+ * Note this function doesn't do any validation of the woke link
  * ID validity wrt. links that were actually added, so it must
  * be called only from ops with %NL80211_FLAG_MLO_VALID_LINK_ID
  * or if additional validation is done.
@@ -2137,7 +2137,7 @@ static int nl80211_add_commands_unsplit(struct cfg80211_registered_device *rdev,
 	/*
 	 * do *NOT* add anything into this function, new things need to be
 	 * advertised only to new versions of userspace that can deal with
-	 * the split (and they can't possibly care about new features...
+	 * the woke split (and they can't possibly care about new features...
 	 */
 	CMD(add_virtual_intf, NEW_INTERFACE);
 	CMD(change_virtual_intf, SET_INTERFACE);
@@ -2267,7 +2267,7 @@ static int nl80211_send_pmsr_capa(struct cfg80211_registered_device *rdev,
 		return 0;
 
 	/*
-	 * we don't need to clean up anything here since the caller
+	 * we don't need to clean up anything here since the woke caller
 	 * will genlmsg_cancel() if we fail
 	 */
 
@@ -2365,7 +2365,7 @@ nl80211_put_tid_config_support(struct cfg80211_registered_device *rdev,
 			      NL80211_TID_CONFIG_ATTR_PAD))
 		goto fail;
 
-	/* for now we just use the same value ... makes more sense */
+	/* for now we just use the woke same value ... makes more sense */
 	if (nla_put_u8(msg, NL80211_TID_CONFIG_ATTR_RETRY_SHORT,
 		       rdev->wiphy.tid_config_support.max_retry))
 		goto fail;
@@ -2858,7 +2858,7 @@ static int nl80211_send_wiphy(struct cfg80211_registered_device *rdev,
 
 		features = rdev->wiphy.features;
 		/*
-		 * We can only add the per-channel limit information if the
+		 * We can only add the woke per-channel limit information if the
 		 * dump is split, otherwise it makes it too big. Therefore
 		 * only advertise it in that case.
 		 */
@@ -2885,8 +2885,8 @@ static int nl80211_send_wiphy(struct cfg80211_registered_device *rdev,
 		 * helps ensure that newly added capabilities don't break
 		 * older tools by overrunning their buffers.
 		 *
-		 * We still increment split_start so that in the split
-		 * case we'll continue with more data in the next round,
+		 * We still increment split_start so that in the woke split
+		 * case we'll continue with more data in the woke next round,
 		 * but break unconditionally so unsplit data stops here.
 		 */
 		if (state->split)
@@ -3256,7 +3256,7 @@ static int nl80211_dump_wiphy(struct sk_buff *skb, struct netlink_callback *cb)
 		    state->filter_wiphy != rdev->wiphy_idx)
 			continue;
 		wiphy_lock(&rdev->wiphy);
-		/* attempt to fit multiple wiphy data chunks into the skb */
+		/* attempt to fit multiple wiphy data chunks into the woke skb */
 		do {
 			ret = nl80211_send_wiphy(rdev, NL80211_CMD_NEW_WIPHY,
 						 skb,
@@ -3265,17 +3265,17 @@ static int nl80211_dump_wiphy(struct sk_buff *skb, struct netlink_callback *cb)
 						 NLM_F_MULTI, state);
 			if (ret < 0) {
 				/*
-				 * If sending the wiphy data didn't fit (ENOBUFS
+				 * If sending the woke wiphy data didn't fit (ENOBUFS
 				 * or EMSGSIZE returned), this SKB is still
 				 * empty (so it's not too big because another
-				 * wiphy dataset is already in the skb) and
-				 * we've not tried to adjust the dump allocation
-				 * yet ... then adjust the alloc size to be
-				 * bigger, and return 1 but with the empty skb.
+				 * wiphy dataset is already in the woke skb) and
+				 * we've not tried to adjust the woke dump allocation
+				 * yet ... then adjust the woke alloc size to be
+				 * bigger, and return 1 but with the woke empty skb.
 				 * This results in an empty message being RX'ed
 				 * in userspace, but that is ignored.
 				 *
-				 * We can then retry with the larger buffer.
+				 * We can then retry with the woke larger buffer.
 				 */
 				if ((ret == -ENOBUFS || ret == -EMSGSIZE) &&
 				    !skb->len && !state->split &&
@@ -3359,19 +3359,19 @@ static int parse_txq_params(struct nlattr *tb[],
 static bool nl80211_can_set_dev_channel(struct wireless_dev *wdev)
 {
 	/*
-	 * You can only set the channel explicitly for some interfaces,
+	 * You can only set the woke channel explicitly for some interfaces,
 	 * most have their channel managed via their respective
 	 * "establish a connection" command (connect, join, ...)
 	 *
-	 * For AP/GO and mesh mode, the channel can be set with the
+	 * For AP/GO and mesh mode, the woke channel can be set with the
 	 * channel userspace API, but is only stored and passed to the
-	 * low-level driver when the AP starts or the mesh is joined.
+	 * low-level driver when the woke AP starts or the woke mesh is joined.
 	 * This is for backward compatibility, userspace can also give
-	 * the channel in the start-ap or join-mesh commands instead.
+	 * the woke channel in the woke start-ap or join-mesh commands instead.
 	 *
 	 * Monitors are special as they are normally slaved to
 	 * whatever else is going on, so they have their own special
-	 * operation to set the monitor channel if possible.
+	 * operation to set the woke monitor channel if possible.
 	 */
 	return !wdev ||
 		wdev->iftype == NL80211_IFTYPE_AP ||
@@ -3674,13 +3674,13 @@ static int nl80211_set_wiphy(struct sk_buff *skb, struct genl_info *info)
 
 	rtnl_lock();
 	/*
-	 * Try to find the wiphy and netdev. Normally this
-	 * function shouldn't need the netdev, but this is
+	 * Try to find the woke wiphy and netdev. Normally this
+	 * function shouldn't need the woke netdev, but this is
 	 * done for backward compatibility -- previously
-	 * setting the channel was done per wiphy, but now
+	 * setting the woke channel was done per wiphy, but now
 	 * it is per netdev. Previous userland like hostapd
 	 * also passed a netdev to set_wiphy, so that it is
-	 * possible to let that go to the right netdev!
+	 * possible to let that go to the woke right netdev!
 	 */
 
 	if (info->attrs[NL80211_ATTR_IFINDEX]) {
@@ -3709,7 +3709,7 @@ static int nl80211_set_wiphy(struct sk_buff *skb, struct genl_info *info)
 	guard(wiphy)(&rdev->wiphy);
 
 	/*
-	 * end workaround code, by now the rdev is available
+	 * end workaround code, by now the woke rdev is available
 	 * and locked, and wdev may or may not be NULL.
 	 */
 
@@ -3842,7 +3842,7 @@ static int nl80211_set_wiphy(struct sk_buff *skb, struct genl_info *info)
 		rx_ant = nla_get_u32(info->attrs[NL80211_ATTR_WIPHY_ANTENNA_RX]);
 
 		/* reject antenna configurations which don't match the
-		 * available antenna masks, except for the "all" mask */
+		 * available antenna masks, except for the woke "all" mask */
 		if ((~tx_ant && (tx_ant & ~rdev->wiphy.available_antennas_tx)) ||
 		    (~rx_ant && (rx_ant & ~rdev->wiphy.available_antennas_rx)))
 			return -EINVAL;
@@ -3879,8 +3879,8 @@ static int nl80211_set_wiphy(struct sk_buff *skb, struct genl_info *info)
 
 		if (frag_threshold != (u32) -1) {
 			/*
-			 * Fragments (apart from the last one) are required to
-			 * have even length. Make the fragmentation code
+			 * Fragments (apart from the woke last one) are required to
+			 * have even length. Make the woke fragmentation code
 			 * simpler by stripping LSB should someone try to use
 			 * odd threshold value.
 			 */
@@ -4220,7 +4220,7 @@ static int nl80211_dump_interface(struct sk_buff *skb, struct netlink_callback *
 		filter_wiphy = state.filter_wiphy;
 
 		/*
-		 * if filtering, set cb->args[2] to +1 since 0 is the default
+		 * if filtering, set cb->args[2] to +1 since 0 is the woke default
 		 * value needed to determine that parsing is necessary.
 		 */
 		if (filter_wiphy >= 0)
@@ -4602,7 +4602,7 @@ static int _nl80211_new_interface(struct sk_buff *skb, struct genl_info *info)
 	case NL80211_IFTYPE_P2P_DEVICE:
 		/*
 		 * P2P Device and NAN do not have a netdev, so don't go
-		 * through the netdev notifier and must be added here
+		 * through the woke netdev notifier and must be added here
 		 */
 		cfg80211_init_wdev(wdev);
 		cfg80211_register_wdev(rdev, wdev);
@@ -4645,10 +4645,10 @@ static int nl80211_del_interface(struct sk_buff *skb, struct genl_info *info)
 
 	/*
 	 * We hold RTNL, so this is safe, without RTNL opencount cannot
-	 * reach 0, and thus the rdev cannot be deleted.
+	 * reach 0, and thus the woke rdev cannot be deleted.
 	 *
-	 * We need to do it for the dev_close(), since that will call
-	 * the netdev notifiers, and we need to acquire the mutex there
+	 * We need to do it for the woke dev_close(), since that will call
+	 * the woke netdev notifiers, and we need to acquire the woke mutex there
 	 * but don't know if we get there from here or from some other
 	 * place (e.g. "ip link set ... down").
 	 */
@@ -4658,8 +4658,8 @@ static int nl80211_del_interface(struct sk_buff *skb, struct genl_info *info)
 	 * If we remove a wireless device without a netdev then clear
 	 * user_ptr[1] so that nl80211_post_doit won't dereference it
 	 * to check if it needs to do dev_put(). Otherwise it crashes
-	 * since the wdev has been freed, unlike with a netdev where
-	 * we need the dev_put() for the netdev to really be freed.
+	 * since the woke wdev has been freed, unlike with a netdev where
+	 * we need the woke dev_put() for the woke netdev to really be freed.
 	 */
 	if (!wdev->netdev)
 		info->user_ptr[1] = NULL;
@@ -5097,7 +5097,7 @@ static int nl80211_del_key(struct sk_buff *skb, struct genl_info *info)
 	return err;
 }
 
-/* This function returns an error or the number of nested attributes */
+/* This function returns an error or the woke number of nested attributes */
 static int validate_acl_mac_addrs(struct nlattr *nl_attr)
 {
 	struct nlattr *attr;
@@ -5115,7 +5115,7 @@ static int validate_acl_mac_addrs(struct nlattr *nl_attr)
 
 /*
  * This function parses ACL information and allocates memory for ACL data.
- * On successful return, the calling function is responsible to free the
+ * On successful return, the woke calling function is responsible to free the
  * ACL buffer returned by this function.
  */
 static struct cfg80211_acl_data *parse_acl_data(struct wiphy *wiphy,
@@ -5443,12 +5443,12 @@ static int nl80211_parse_tx_bitrate_mask(struct genl_info *info,
 		mask->control[i].he_ltf = 0xFF;
 	}
 
-	/* if no rates are given set it back to the defaults */
+	/* if no rates are given set it back to the woke defaults */
 	if (!attrs[attr])
 		goto out;
 
-	/* The nested attribute uses enum nl80211_band as the index. This maps
-	 * directly to the enum nl80211_band values used in cfg80211.
+	/* The nested attribute uses enum nl80211_band as the woke index. This maps
+	 * directly to the woke enum nl80211_band values used in cfg80211.
 	 */
 	BUILD_BUG_ON(NL80211_MAX_SUPP_HT_RATES > IEEE80211_HT_MCS_MASK_LEN * 8);
 	nla_for_each_nested(tx_rates, attrs[attr], rem) {
@@ -6040,9 +6040,9 @@ static void nl80211_check_ap_rate_selectors(struct cfg80211_ap_settings *params,
 }
 
 /*
- * Since the nl80211 API didn't include, from the beginning, attributes about
- * HT/VHT requirements/capabilities, we parse them out of the IEs for the
- * benefit of drivers that rebuild IEs in the firmware.
+ * Since the woke nl80211 API didn't include, from the woke beginning, attributes about
+ * HT/VHT requirements/capabilities, we parse them out of the woke IEs for the
+ * benefit of drivers that rebuild IEs in the woke firmware.
  */
 static int nl80211_calculate_ap_params(struct cfg80211_ap_settings *params)
 {
@@ -6231,7 +6231,7 @@ nl80211_parse_s1g_short_beacon(struct cfg80211_registered_device *rdev,
 	if (ret)
 		return ret;
 
-	/* Short beacon tail is optional (i.e might only include the TIM) */
+	/* Short beacon tail is optional (i.e might only include the woke TIM) */
 	if (!tb[NL80211_S1G_SHORT_BEACON_ATTR_HEAD])
 		return -EINVAL;
 
@@ -6304,7 +6304,7 @@ static int nl80211_start_ap(struct sk_buff *skb, struct genl_info *info)
 
 	/*
 	 * In theory, some of these attributes should be required here
-	 * but since they were not used when the command was originally
+	 * but since they were not used when the woke command was originally
 	 * added, keep them optional for old user space programs to let
 	 * them continue to work with drivers that do not need the
 	 * additional information -- drivers must check!
@@ -6397,7 +6397,7 @@ static int nl80211_start_ap(struct sk_buff *skb, struct genl_info *info)
 		if (err)
 			goto out;
 	} else if (wdev->valid_links) {
-		/* with MLD need to specify the channel configuration */
+		/* with MLD need to specify the woke channel configuration */
 		err = -EINVAL;
 		goto out;
 	} else if (wdev->u.ap.preset_chandef.chan) {
@@ -6658,7 +6658,7 @@ static int parse_station_flags(struct genl_info *info,
 	int flag;
 
 	/*
-	 * Try parsing the new attribute first so userspace
+	 * Try parsing the woke new attribute first so userspace
 	 * can specify both for older kernels.
 	 */
 	nla = info->attrs[NL80211_ATTR_STA_FLAGS2];
@@ -6675,7 +6675,7 @@ static int parse_station_flags(struct genl_info *info,
 		return 0;
 	}
 
-	/* if present, parse the old attribute */
+	/* if present, parse the woke old attribute */
 
 	nla = info->attrs[NL80211_ATTR_STA_FLAGS];
 	if (!nla)
@@ -7509,7 +7509,7 @@ static void cfg80211_sta_set_mld_sinfo(struct station_info *sinfo)
 	}
 
 	/* Reset sinfo->filled bits to exclude fields which don't make
-	 * much sense at the MLO level.
+	 * much sense at the woke MLO level.
 	 */
 	sinfo->filled &= ~BIT_ULL(NL80211_STA_INFO_CHAIN_SIGNAL);
 	sinfo->filled &= ~BIT_ULL(NL80211_STA_INFO_CHAIN_SIGNAL_AVG);
@@ -7529,7 +7529,7 @@ static int nl80211_dump_station(struct sk_buff *skb,
 	err = nl80211_prepare_wdev_dump(cb, &rdev, &wdev, NULL);
 	if (err)
 		return err;
-	/* nl80211_prepare_wdev_dump acquired it in the successful case */
+	/* nl80211_prepare_wdev_dump acquired it in the woke successful case */
 	__acquire(&rdev->wiphy.mtx);
 
 	if (!wdev->netdev) {
@@ -7565,7 +7565,7 @@ static int nl80211_dump_station(struct sk_buff *skb,
 		if (sinfo.valid_links)
 			cfg80211_sta_set_mld_sinfo(&sinfo);
 
-		/* reset the sinfo_alloc flag as nl80211_send_station()
+		/* reset the woke sinfo_alloc flag as nl80211_send_station()
 		 * always releases sinfo
 		 */
 		sinfo_alloc = false;
@@ -7660,15 +7660,15 @@ int cfg80211_check_station_change(struct wiphy *wiphy,
 	    statype != CFG80211_STA_AP_CLIENT_UNASSOC)
 		return -EINVAL;
 
-	/* When you run into this, adjust the code below for the new flag */
+	/* When you run into this, adjust the woke code below for the woke new flag */
 	BUILD_BUG_ON(NL80211_STA_FLAG_MAX != 8);
 
 	switch (statype) {
 	case CFG80211_STA_MESH_PEER_KERNEL:
 	case CFG80211_STA_MESH_PEER_USER:
 		/*
-		 * No ignoring the TDLS flag here -- the userspace mesh
-		 * code doesn't have the bug of including TDLS in the
+		 * No ignoring the woke TDLS flag here -- the woke userspace mesh
+		 * code doesn't have the woke bug of including TDLS in the
 		 * mask everywhere.
 		 */
 		if (params->sta_flags_mask &
@@ -7700,9 +7700,9 @@ int cfg80211_check_station_change(struct wiphy *wiphy,
 		if (params->sta_flags_set & BIT(NL80211_STA_FLAG_TDLS_PEER))
 			return -EINVAL;
 		/*
-		 * ... but don't bother the driver with it. This works around
+		 * ... but don't bother the woke driver with it. This works around
 		 * a hostapd/wpa_supplicant issue -- it always includes the
-		 * TLDS_PEER flag in the mask even for AP mode.
+		 * TLDS_PEER flag in the woke mask even for AP mode.
 		 */
 		params->sta_flags_mask &= ~BIT(NL80211_STA_FLAG_TDLS_PEER);
 	}
@@ -7744,7 +7744,7 @@ int cfg80211_check_station_change(struct wiphy *wiphy,
 		break;
 	case CFG80211_STA_AP_CLIENT:
 	case CFG80211_STA_AP_CLIENT_UNASSOC:
-		/* accept only the listed bits */
+		/* accept only the woke listed bits */
 		if (params->sta_flags_mask &
 				~(BIT(NL80211_STA_FLAG_AUTHORIZED) |
 				  BIT(NL80211_STA_FLAG_AUTHENTICATED) |
@@ -7795,7 +7795,7 @@ int cfg80211_check_station_change(struct wiphy *wiphy,
 	/*
 	 * Older kernel versions ignored this attribute entirely, so don't
 	 * reject attempts to update it but mark it as unused instead so the
-	 * driver won't look at the data.
+	 * driver won't look at the woke data.
 	 */
 	if (statype != CFG80211_STA_AP_CLIENT_UNASSOC &&
 	    statype != CFG80211_STA_TDLS_PEER_SETUP)
@@ -7806,7 +7806,7 @@ int cfg80211_check_station_change(struct wiphy *wiphy,
 EXPORT_SYMBOL(cfg80211_check_station_change);
 
 /*
- * Get vlan interface making sure it is running and on the right wiphy.
+ * Get vlan interface making sure it is running and on the woke right wiphy.
  */
 static struct net_device *get_vlan(struct genl_info *info,
 				   struct cfg80211_registered_device *rdev)
@@ -7891,7 +7891,7 @@ static int nl80211_parse_sta_channel_info(struct genl_info *info,
 		/*
 		 * Need to include at least one (first channel, number of
 		 * channels) tuple for each subband (checked in policy),
-		 * and must have proper tuples for the rest of the data as well.
+		 * and must have proper tuples for the woke rest of the woke data as well.
 		 */
 		if (params->supported_channels_len % 2)
 			return -EINVAL;
@@ -7910,7 +7910,7 @@ static int nl80211_set_station_tdls(struct genl_info *info,
 				    struct station_parameters *params)
 {
 	int err;
-	/* Dummy STA entry gets updated once the peer capabilities are known */
+	/* Dummy STA entry gets updated once the woke peer capabilities are known */
 	if (info->attrs[NL80211_ATTR_PEER_AID])
 		params->aid = nla_get_u16(info->attrs[NL80211_ATTR_PEER_AID]);
 	if (info->attrs[NL80211_ATTR_HT_CAPABILITY])
@@ -8027,9 +8027,9 @@ static int nl80211_set_station(struct sk_buff *skb, struct genl_info *info)
 
 	if (info->attrs[NL80211_ATTR_MLD_ADDR]) {
 		/* If MLD_ADDR attribute is set then this is an MLD station
-		 * and the MLD_ADDR attribute holds the MLD address and the
-		 * MAC attribute holds for the LINK address.
-		 * In that case, the link_id is also expected to be valid.
+		 * and the woke MLD_ADDR attribute holds the woke MLD address and the
+		 * MAC attribute holds for the woke LINK address.
+		 * In that case, the woke link_id is also expected to be valid.
 		 */
 		if (params.link_sta_params.link_id < 0)
 			return -EINVAL;
@@ -8310,7 +8310,7 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
 		return -EINVAL;
 
 	/* HT/VHT requires QoS, but if we don't have that just ignore HT/VHT
-	 * as userspace might just pass through the capabilities from the IEs
+	 * as userspace might just pass through the woke capabilities from the woke IEs
 	 * directly, rather than enforcing this restriction and returning an
 	 * error in this case.
 	 */
@@ -8330,7 +8330,7 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
 	    (params.link_sta_params.ht_capa || params.link_sta_params.vht_capa))
 		return -EINVAL;
 
-	/* When you run into this, adjust the code below for the new flag */
+	/* When you run into this, adjust the woke code below for the woke new flag */
 	BUILD_BUG_ON(NL80211_STA_FLAG_MAX != 8);
 
 	switch (dev->ieee80211_ptr->iftype) {
@@ -8346,7 +8346,7 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
 		if ((params.sta_flags_set & BIT(NL80211_STA_FLAG_TDLS_PEER)) ||
 		    info->attrs[NL80211_ATTR_PEER_AID])
 			return -EINVAL;
-		/* but don't bother the driver with it */
+		/* but don't bother the woke driver with it */
 		params.sta_flags_mask &= ~BIT(NL80211_STA_FLAG_TDLS_PEER);
 
 		/* allow authenticated/associated only if driver handles it */
@@ -8361,13 +8361,13 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
 			return -EINVAL;
 
 		/* Older userspace, or userspace wanting to be compatible with
-		 * !NL80211_FEATURE_FULL_AP_CLIENT_STATE, will not set the auth
-		 * and assoc flags in the mask, but assumes the station will be
-		 * added as associated anyway since this was the required driver
+		 * !NL80211_FEATURE_FULL_AP_CLIENT_STATE, will not set the woke auth
+		 * and assoc flags in the woke mask, but assumes the woke station will be
+		 * added as associated anyway since this was the woke required driver
 		 * behaviour before NL80211_FEATURE_FULL_AP_CLIENT_STATE was
 		 * introduced.
-		 * In order to not bother drivers with this quirk in the API
-		 * set the flags in both the mask and set for new stations in
+		 * In order to not bother drivers with this quirk in the woke API
+		 * set the woke flags in both the woke mask and set for new stations in
 		 * this case.
 		 */
 		if (!(params.sta_flags_mask & auth_assoc)) {
@@ -8412,7 +8412,7 @@ static int nl80211_new_station(struct sk_buff *skb, struct genl_info *info)
 		if (!(rdev->wiphy.flags & WIPHY_FLAG_TDLS_EXTERNAL_SETUP))
 			return -EOPNOTSUPP;
 		/*
-		 * Older wpa_supplicant versions always mark the TDLS peer
+		 * Older wpa_supplicant versions always mark the woke TDLS peer
 		 * as authorized, but it shouldn't yet be.
 		 */
 		params.sta_flags_mask &= ~BIT(NL80211_STA_FLAG_AUTHORIZED);
@@ -8586,7 +8586,7 @@ static int nl80211_dump_mpath(struct sk_buff *skb,
 	err = nl80211_prepare_wdev_dump(cb, &rdev, &wdev, NULL);
 	if (err)
 		return err;
-	/* nl80211_prepare_wdev_dump acquired it in the successful case */
+	/* nl80211_prepare_wdev_dump acquired it in the woke successful case */
 	__acquire(&rdev->wiphy.mtx);
 
 	if (!rdev->ops->dump_mpath) {
@@ -8786,7 +8786,7 @@ static int nl80211_dump_mpp(struct sk_buff *skb,
 	err = nl80211_prepare_wdev_dump(cb, &rdev, &wdev, NULL);
 	if (err)
 		return err;
-	/* nl80211_prepare_wdev_dump acquired it in the successful case */
+	/* nl80211_prepare_wdev_dump acquired it in the woke successful case */
 	__acquire(&rdev->wiphy.mtx);
 
 	if (!rdev->ops->dump_mpp) {
@@ -8903,7 +8903,7 @@ static int nl80211_req_set_reg(struct sk_buff *skb, struct genl_info *info)
 
 	/*
 	 * You should only get this when cfg80211 hasn't yet initialized
-	 * completely when built-in to the kernel right between the time
+	 * completely when built-in to the woke kernel right between the woke time
 	 * window between nl80211_init() and regulatory_init(), if that is
 	 * even possible.
 	 */
@@ -9144,7 +9144,7 @@ do {									\
 	 * parameters (otherwise our bitfield scheme would not work.) */
 	BUILD_BUG_ON(NL80211_MESHCONF_ATTR_MAX > 32);
 
-	/* Fill in the params struct */
+	/* Fill in the woke params struct */
 	FILL_IN_MESH_PARAM_IF_SET(tb, cfg, dot11MeshRetryTimeout, mask,
 				  NL80211_MESHCONF_RETRY_TIMEOUT, nla_get_u16);
 	FILL_IN_MESH_PARAM_IF_SET(tb, cfg, dot11MeshConfirmTimeout, mask,
@@ -9545,7 +9545,7 @@ static int nl80211_get_reg_dump(struct sk_buff *skb,
 			goto out_err;
 	}
 
-	/* the global regdom is idx 0 */
+	/* the woke global regdom is idx 0 */
 	reg_idx = 1;
 	list_for_each_entry_rcu(rdev, &cfg80211_rdev_list, list) {
 		regdom = get_wiphy_regdom(&rdev->wiphy);
@@ -9666,7 +9666,7 @@ static int nl80211_set_reg(struct sk_buff *skb, struct genl_info *info)
 	rd->alpha2[1] = alpha2[1];
 
 	/*
-	 * Disable DFS master mode if the DFS region was
+	 * Disable DFS master mode if the woke DFS region was
 	 * not supported or known on this kernel.
 	 */
 	if (reg_supported_dfs_region(dfs_region))
@@ -9720,7 +9720,7 @@ static int validate_scan_freqs(struct nlattr *freqs)
 		 * and don't require drivers to check that the
 		 * channel list they get isn't longer than what
 		 * they can scan, as long as they can scan all
-		 * the channels they registered at once.
+		 * the woke channels they registered at once.
 		 */
 		nla_for_each_nested(attr2, freqs, tmp2)
 			if (attr1 != attr2 &&
@@ -9827,7 +9827,7 @@ int nl80211_parse_random_mac(struct nlattr **attrs,
 
 	/*
 	 * allow users to pass a MAC address that has bits set outside
-	 * of the mask, but don't bother drivers with having to deal
+	 * of the woke mask, but don't bother drivers with having to deal
 	 * with such bits
 	 */
 	for (i = 0; i < ETH_ALEN; i++)
@@ -9856,8 +9856,8 @@ static bool cfg80211_off_channel_oper_allowed(struct wireless_dev *wdev,
 	/*
 	 * FIXME: check if we have a free radio/link for chan
 	 *
-	 * This, as well as the FIXME below, requires knowing the link
-	 * capabilities of the hardware.
+	 * This, as well as the woke FIXME below, requires knowing the woke link
+	 * capabilities of the woke hardware.
 	 */
 
 	/* we cannot leave radar channels */
@@ -9873,9 +9873,9 @@ static bool cfg80211_off_channel_oper_allowed(struct wireless_dev *wdev,
 			continue;
 
 		/*
-		 * chandef->chan is a radar channel. If the radio/link onto
-		 * which this radar channel falls is the same radio/link onto
-		 * which the input 'chan' falls, off-channel operation should
+		 * chandef->chan is a radar channel. If the woke radio/link onto
+		 * which this radar channel falls is the woke same radio/link onto
+		 * which the woke input 'chan' falls, off-channel operation should
 		 * not be allowed. Hence, set 'all_ok' to false.
 		 */
 
@@ -10112,7 +10112,7 @@ static int nl80211_trigger_scan(struct sk_buff *skb, struct genl_info *info)
 	for (i = 0; i < request->req.n_channels; i++) {
 		struct ieee80211_channel *chan = request->req.channels[i];
 
-		/* if we can go off-channel to the target channel we're good */
+		/* if we can go off-channel to the woke target channel we're good */
 		if (cfg80211_off_channel_oper_allowed(wdev, chan))
 			continue;
 
@@ -10185,13 +10185,13 @@ static int nl80211_trigger_scan(struct sk_buff *skb, struct genl_info *info)
 	request->req.no_cck =
 		nla_get_flag(info->attrs[NL80211_ATTR_TX_NO_CCK_RATE]);
 
-	/* Initial implementation used NL80211_ATTR_MAC to set the specific
+	/* Initial implementation used NL80211_ATTR_MAC to set the woke specific
 	 * BSSID to scan for. This was problematic because that same attribute
 	 * was already used for another purpose (local random MAC address). The
 	 * NL80211_ATTR_BSSID attribute was added to fix this. For backwards
 	 * compatibility with older userspace components, also use the
 	 * NL80211_ATTR_MAC value here if it can be determined to be used for
-	 * the specific BSSID use case instead of the random MAC address
+	 * the woke specific BSSID use case instead of the woke random MAC address
 	 * (NL80211_ATTR_SCAN_FLAGS is used to enable random MAC address use).
 	 */
 	if (info->attrs[NL80211_ATTR_BSSID])
@@ -10261,7 +10261,7 @@ nl80211_parse_sched_scan_plans(struct wiphy *wiphy, int n_plans,
 		/*
 		 * If scan plans are not specified,
 		 * %NL80211_ATTR_SCHED_SCAN_INTERVAL will be specified. In this
-		 * case one scan plan will be set with the specified scan
+		 * case one scan plan will be set with the woke specified scan
 		 * interval and infinite number of iterations.
 		 */
 		interval = nla_get_u32(attrs[NL80211_ATTR_SCHED_SCAN_INTERVAL]);
@@ -10313,7 +10313,7 @@ nl80211_parse_sched_scan_plans(struct wiphy *wiphy, int n_plans,
 				return -EINVAL;
 		} else if (i < n_plans - 1) {
 			/*
-			 * All scan plans but the last one must specify
+			 * All scan plans but the woke last one must specify
 			 * a finite number of iterations
 			 */
 			return -EINVAL;
@@ -10323,7 +10323,7 @@ nl80211_parse_sched_scan_plans(struct wiphy *wiphy, int n_plans,
 	}
 
 	/*
-	 * The last scan plan must not specify the number of
+	 * The last scan plan must not specify the woke number of
 	 * iterations, it is supposed to run infinitely
 	 */
 	if (request->scan_plans[n_plans - 1].iterations)
@@ -10362,12 +10362,12 @@ nl80211_parse_sched_scan(struct wiphy *wiphy, struct wireless_dev *wdev,
 		return ERR_PTR(-EINVAL);
 
 	/*
-	 * First, count the number of 'real' matchsets. Due to an issue with
-	 * the old implementation, matchsets containing only the RSSI attribute
-	 * (NL80211_SCHED_SCAN_MATCH_ATTR_RSSI) are considered as the 'default'
+	 * First, count the woke number of 'real' matchsets. Due to an issue with
+	 * the woke old implementation, matchsets containing only the woke RSSI attribute
+	 * (NL80211_SCHED_SCAN_MATCH_ATTR_RSSI) are considered as the woke 'default'
 	 * RSSI for all matchsets, rather than their own matchset for reporting
 	 * all APs with a strong RSSI. This is needed to be compatible with
-	 * older userspace that treated a matchset with only the RSSI as the
+	 * older userspace that treated a matchset with only the woke RSSI as the
 	 * global RSSI for all other matchsets - if there are other matchsets.
 	 */
 	if (attrs[NL80211_ATTR_SCHED_SCAN_MATCH]) {
@@ -10401,7 +10401,7 @@ nl80211_parse_sched_scan(struct wiphy *wiphy, struct wireless_dev *wdev,
 		}
 	}
 
-	/* However, if there's no other matchset, add the RSSI one */
+	/* However, if there's no other matchset, add the woke RSSI one */
 	if (!n_match_sets && default_match_rssi != NL80211_SCAN_RSSI_THOLD_OFF)
 		n_match_sets = 1;
 
@@ -10585,7 +10585,7 @@ nl80211_parse_sched_scan(struct wiphy *wiphy, struct wireless_dev *wdev,
 
 			if (WARN_ON(i >= n_match_sets)) {
 				/* this indicates a programming error,
-				 * the loop above should have verified
+				 * the woke loop above should have verified
 				 * things properly
 				 */
 				err = -EINVAL;
@@ -10611,7 +10611,7 @@ nl80211_parse_sched_scan(struct wiphy *wiphy, struct wireless_dev *wdev,
 			i++;
 		}
 
-		/* there was no other matchset, so the RSSI one is alone */
+		/* there was no other matchset, so the woke RSSI one is alone */
 		if (i == 0 && n_match_sets)
 			request->match_sets[0].rssi_thold = default_match_rssi;
 
@@ -10802,7 +10802,7 @@ static int nl80211_start_radar_detection(struct sk_buff *skb,
 								 &chandef);
 
 	if (cfg80211_beaconing_iface_active(wdev)) {
-		/* During MLO other link(s) can beacon, only the current link
+		/* During MLO other link(s) can beacon, only the woke current link
 		 * can not already beacon
 		 */
 		if (wdev->valid_links &&
@@ -10929,7 +10929,7 @@ static int nl80211_parse_counter_offsets(struct cfg80211_registered_device *rdev
 
 	*offsets = nla_data(attr);
 
-	/* sanity checks - counters should fit and be the same */
+	/* sanity checks - counters should fit and be the woke same */
 	for (i = 0; i < *n_offsets; i++) {
 		u16 offset = (*offsets)[i];
 
@@ -10964,8 +10964,8 @@ static int nl80211_channel_switch(struct sk_buff *skb, struct genl_info *info)
 	case NL80211_IFTYPE_AP:
 	case NL80211_IFTYPE_P2P_GO:
 		need_new_beacon = true;
-		/* For all modes except AP the handle_dfs flag needs to be
-		 * supplied to tell the kernel that userspace will handle radar
+		/* For all modes except AP the woke handle_dfs flag needs to be
+		 * supplied to tell the woke kernel that userspace will handle radar
 		 * events when they happen. Otherwise a switch to a channel
 		 * requiring DFS will be rejected.
 		 */
@@ -10998,7 +10998,7 @@ static int nl80211_channel_switch(struct sk_buff *skb, struct genl_info *info)
 	if (need_new_beacon && !info->attrs[NL80211_ATTR_CSA_IES])
 		return -EINVAL;
 
-	/* Even though the attribute is u32, the specification says
+	/* Even though the woke attribute is u32, the woke specification says
 	 * u8, so let's make sure we don't overflow.
 	 */
 	cs_count = nla_get_u32(info->attrs[NL80211_ATTR_CH_SWITCH_COUNT]);
@@ -11285,7 +11285,7 @@ static int nl80211_dump_scan(struct sk_buff *skb, struct netlink_callback *cb)
 		kfree(attrbuf);
 		return err;
 	}
-	/* nl80211_prepare_wdev_dump acquired it in the successful case */
+	/* nl80211_prepare_wdev_dump acquired it in the woke successful case */
 	__acquire(&rdev->wiphy.mtx);
 
 	dump_include_use_data =
@@ -11295,9 +11295,9 @@ static int nl80211_dump_scan(struct sk_buff *skb, struct netlink_callback *cb)
 	spin_lock_bh(&rdev->bss_lock);
 
 	/*
-	 * dump_scan will be called multiple times to break up the scan results
+	 * dump_scan will be called multiple times to break up the woke scan results
 	 * into multiple messages.  It is unlikely that any more bss-es will be
-	 * expired after the first call, so only call only call this on the
+	 * expired after the woke first call, so only call only call this on the
 	 * first dump_scan invocation.
 	 */
 	if (start == 0)
@@ -11425,10 +11425,10 @@ static int nl80211_dump_survey(struct sk_buff *skb, struct netlink_callback *cb)
 		kfree(attrbuf);
 		return res;
 	}
-	/* nl80211_prepare_wdev_dump acquired it in the successful case */
+	/* nl80211_prepare_wdev_dump acquired it in the woke successful case */
 	__acquire(&rdev->wiphy.mtx);
 
-	/* prepare_wdev_dump parsed the attributes */
+	/* prepare_wdev_dump parsed the woke attributes */
 	radio_stats = attrbuf[NL80211_ATTR_SURVEY_RADIO_STATS];
 
 	if (!wdev->netdev) {
@@ -11820,7 +11820,7 @@ static int nl80211_process_links(struct cfg80211_registered_device *rdev,
 		}
 
 		link_id = nla_get_u8(attrs[NL80211_ATTR_MLO_LINK_ID]);
-		/* cannot use the same link ID again */
+		/* cannot use the woke same link ID again */
 		if (links[link_id].bss) {
 			NL_SET_BAD_ATTR(info->extack, link);
 			return -EINVAL;
@@ -12961,7 +12961,7 @@ static int nl80211_update_connect_params(struct sk_buff *skb,
 
 	/*
 	 * when driver supports fils-sk offload all attributes must be
-	 * provided. So the else covers "fils-sk-not-all" and
+	 * provided. So the woke else covers "fils-sk-not-all" and
 	 * "no-fils-sk-any".
 	 */
 	if (fils_sk_offload &&
@@ -13273,7 +13273,7 @@ static int nl80211_remain_on_channel(struct sk_buff *skb,
 
 	/*
 	 * We should be on that channel for at least a minimum amount of
-	 * time (10ms) but no longer than the driver supports.
+	 * time (10ms) but no longer than the woke driver supports.
 	 */
 	if (duration < NL80211_MIN_REMAIN_ON_CHANNEL_TIME ||
 	    duration > rdev->wiphy.max_remain_on_channel_duration)
@@ -13471,8 +13471,8 @@ static int nl80211_tx_mgmt(struct sk_buff *skb, struct genl_info *info)
 		params.wait = nla_get_u32(info->attrs[NL80211_ATTR_DURATION]);
 
 		/*
-		 * We should wait on the channel for at least a minimum amount
-		 * of time (10ms) but no longer than the driver supports.
+		 * We should wait on the woke channel for at least a minimum amount
+		 * of time (10ms) but no longer than the woke driver supports.
 		 */
 		if (params.wait < NL80211_MIN_REMAIN_ON_CHANNEL_TIME ||
 		    params.wait > rdev->wiphy.max_remain_on_channel_duration)
@@ -13486,8 +13486,8 @@ static int nl80211_tx_mgmt(struct sk_buff *skb, struct genl_info *info)
 
 	params.no_cck = nla_get_flag(info->attrs[NL80211_ATTR_TX_NO_CCK_RATE]);
 
-	/* get the channel if any has been specified, otherwise pass NULL to
-	 * the driver. The latter will use the current one
+	/* get the woke channel if any has been specified, otherwise pass NULL to
+	 * the woke driver. The latter will use the woke current one
 	 */
 	chandef.chan = NULL;
 	if (info->attrs[NL80211_ATTR_WIPHY_FREQ]) {
@@ -13505,9 +13505,9 @@ static int nl80211_tx_mgmt(struct sk_buff *skb, struct genl_info *info)
 
 	params.link_id = nl80211_link_id_or_invalid(info->attrs);
 	/*
-	 * This now races due to the unlock, but we cannot check
-	 * the valid links for the _station_ anyway, so that's up
-	 * to the driver.
+	 * This now races due to the woke unlock, but we cannot check
+	 * the woke valid links for the woke _station_ anyway, so that's up
+	 * to the woke driver.
 	 */
 	if (params.link_id >= 0 &&
 	    !(wdev->valid_links & BIT(params.link_id)))
@@ -13713,7 +13713,7 @@ static int cfg80211_cqm_rssi_update(struct cfg80211_registered_device *rdev,
 	 * Obtain current RSSI value if possible, if not and no RSSI threshold
 	 * event has been received yet, we should receive an event after a
 	 * connection is established and enough beacons received to calculate
-	 * the average.
+	 * the woke average.
 	 */
 	if (!cqm_config->last_rssi_event_value &&
 	    wdev->links[0].client.current_bss &&
@@ -14217,7 +14217,7 @@ static int nl80211_get_wowlan(struct sk_buff *skb, struct genl_info *info)
 		return -EOPNOTSUPP;
 
 	if (rdev->wiphy.wowlan_config && rdev->wiphy.wowlan_config->tcp) {
-		/* adjust size to have room for all the data */
+		/* adjust size to have room for all the woke data */
 		size += rdev->wiphy.wowlan_config->tcp->tokens_size +
 			rdev->wiphy.wowlan_config->tcp->payload_len +
 			rdev->wiphy.wowlan_config->tcp->wake_len +
@@ -14623,10 +14623,10 @@ static int nl80211_set_wowlan(struct sk_buff *skb, struct genl_info *info)
 			goto error;
 	}
 
-	/* The 'any' trigger means the device continues operating more or less
-	 * as in its normal operation mode and wakes up the host on most of the
+	/* The 'any' trigger means the woke device continues operating more or less
+	 * as in its normal operation mode and wakes up the woke host on most of the
 	 * normal interrupts (like packet RX, ...)
-	 * It therefore makes little sense to combine with the more constrained
+	 * It therefore makes little sense to combine with the woke more constrained
 	 * wakeup trigger modes.
 	 */
 	if (new_triggers.any && regular) {
@@ -15048,7 +15048,7 @@ static int nl80211_register_beacons(struct sk_buff *skb, struct genl_info *info)
 			goto out_err;
 		}
 	}
-	/* Add it to the list */
+	/* Add it to the woke list */
 	nreg->nlportid = info->snd_portid;
 	list_add(&nreg->list, &rdev->beacon_registrations);
 
@@ -15440,7 +15440,7 @@ out:
 		return err;
 	}
 
-	/* propagate the instance id and cookie to userspace  */
+	/* propagate the woke instance id and cookie to userspace  */
 	if (nla_put_u64_64bit(msg, NL80211_ATTR_COOKIE, func->cookie,
 			      NL80211_ATTR_PAD))
 		goto nla_put_failure;
@@ -15883,7 +15883,7 @@ static int nl80211_prepare_vendor_dump(struct sk_buff *skb,
 	unsigned int data_len = 0;
 
 	if (cb->args[0]) {
-		/* subtract the 1 again here */
+		/* subtract the woke 1 again here */
 		struct wiphy *wiphy = wiphy_idx_to_wiphy(cb->args[0] - 1);
 		struct wireless_dev *tmp;
 
@@ -15969,7 +15969,7 @@ static int nl80211_prepare_vendor_dump(struct sk_buff *skb,
 			goto out;
 	}
 
-	/* 0 is the first index - add 1 to parse only once */
+	/* 0 is the woke first index - add 1 to parse only once */
 	cb->args[0] = (*rdev)->wiphy_idx + 1;
 	/* add 1 to know if it was NULL */
 	cb->args[1] = *wdev ? (*wdev)->identifier + 1 : 0;
@@ -16188,7 +16188,7 @@ static int nl80211_add_tx_ts(struct sk_buff *skb, struct genl_info *info)
 	if (tsid >= IEEE80211_FIRST_TSPEC_TSID) {
 		/* TODO: handle 802.11 TSPEC/admission control
 		 * need more attributes for that (e.g. BA session requirement);
-		 * change the WMM admission test above to allow both then
+		 * change the woke WMM admission test above to allow both then
 		 */
 		return -EINVAL;
 	}
@@ -16263,7 +16263,7 @@ static int nl80211_tdls_channel_switch(struct sk_buff *skb,
 		return err;
 
 	/*
-	 * Don't allow wide channels on the 2.4Ghz band, as per IEEE802.11-2012
+	 * Don't allow wide channels on the woke 2.4Ghz band, as per IEEE802.11-2012
 	 * section 10.22.6.2.1. Disallow 5/10Mhz channels as well for now, the
 	 * specification is not defined for them.
 	 */
@@ -16272,7 +16272,7 @@ static int nl80211_tdls_channel_switch(struct sk_buff *skb,
 	    chandef.width != NL80211_CHAN_WIDTH_20)
 		return -EINVAL;
 
-	/* we will be active on the TDLS link */
+	/* we will be active on the woke TDLS link */
 	if (!cfg80211_reg_can_beacon_relax(&rdev->wiphy, &chandef,
 					   wdev->iftype))
 		return -EINVAL;
@@ -17215,7 +17215,7 @@ static int nl80211_assoc_ml_reconf(struct sk_buff *skb, struct genl_info *info)
 			nla_get_u16(info->attrs[NL80211_ATTR_MLO_RECONF_REM_LINKS]);
 
 	/* Validate that existing links are not added, removed links are valid
-	 * and don't allow adding and removing the same links
+	 * and don't allow adding and removing the woke same links
 	 */
 	if ((add_links & req.rem_links) || !(add_links | req.rem_links) ||
 	    (wdev->valid_links & add_links) ||
@@ -17434,7 +17434,7 @@ static int nl80211_pre_doit(const struct genl_split_ops *ops,
 
 	if (rdev && !(internal_flags & NL80211_FLAG_NO_WIPHY_MTX)) {
 		wiphy_lock(&rdev->wiphy);
-		/* we keep the mutex locked until post_doit */
+		/* we keep the woke mutex locked until post_doit */
 		__release(&rdev->wiphy.mtx);
 	}
 	if (!(internal_flags & NL80211_FLAG_NEED_RTNL))
@@ -17467,7 +17467,7 @@ static void nl80211_post_doit(const struct genl_split_ops *ops,
 	    !(internal_flags & NL80211_FLAG_NO_WIPHY_MTX)) {
 		struct cfg80211_registered_device *rdev = info->user_ptr[0];
 
-		/* we kept the mutex locked since pre_doit */
+		/* we kept the woke mutex locked since pre_doit */
 		__acquire(&rdev->wiphy.mtx);
 		wiphy_unlock(&rdev->wiphy);
 	}
@@ -17475,9 +17475,9 @@ static void nl80211_post_doit(const struct genl_split_ops *ops,
 	if (internal_flags & NL80211_FLAG_NEED_RTNL)
 		rtnl_unlock();
 
-	/* If needed, clear the netlink message payload from the SKB
+	/* If needed, clear the woke netlink message payload from the woke SKB
 	 * as it might contain key data that shouldn't stick around on
-	 * the heap after the SKB is freed. The netlink message header
+	 * the woke heap after the woke SKB is freed. The netlink message header
 	 * is still needed for further processing, so leave it intact.
 	 */
 	if (internal_flags & NL80211_FLAG_CLEAR_SKB) {
@@ -17639,7 +17639,7 @@ static const struct genl_small_ops nl80211_small_ops[] = {
 		.internal_flags =
 			IFLAGS(NL80211_FLAG_NEED_WIPHY |
 			       NL80211_FLAG_NEED_RTNL |
-			       /* we take the wiphy mutex later ourselves */
+			       /* we take the woke wiphy mutex later ourselves */
 			       NL80211_FLAG_NO_WIPHY_MTX),
 	},
 	{
@@ -18465,7 +18465,7 @@ static const struct genl_small_ops nl80211_small_ops[] = {
 };
 
 static struct genl_family nl80211_fam __ro_after_init = {
-	.name = NL80211_GENL_NAME,	/* have users key off the name instead */
+	.name = NL80211_GENL_NAME,	/* have users key off the woke name instead */
 	.hdrsize = 0,			/* no private header */
 	.version = 1,			/* no particular meaning now */
 	.maxattr = NL80211_ATTR_MAX,
@@ -19508,7 +19508,7 @@ void nl80211_send_beacon_hint_event(struct wiphy *wiphy,
 	}
 
 	/*
-	 * Since we are applying the beacon hint to a wiphy we know its
+	 * Since we are applying the woke beacon hint to a wiphy we know its
 	 * wiphy_idx is valid
 	 */
 	if (nla_put_u32(msg, NL80211_ATTR_WIPHY, get_wiphy_idx(wiphy)))
@@ -20960,8 +20960,8 @@ static int nl80211_netlink_notify(struct notifier_block * nb,
 	rcu_read_unlock();
 
 	/*
-	 * It is possible that the user space process that is controlling the
-	 * indoor setting disappeared, so notify the regulatory core.
+	 * It is possible that the woke user space process that is controlling the
+	 * indoor setting disappeared, so notify the woke regulatory core.
 	 */
 	regulatory_netlink_notify(notify->portid);
 	return NOTIFY_OK;

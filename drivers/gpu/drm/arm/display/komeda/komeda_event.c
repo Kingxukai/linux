@@ -119,7 +119,7 @@ void komeda_print_events(struct komeda_events *evts, struct drm_device *dev)
 	u16 const err_verbosity = mdev->err_verbosity;
 	u64 evts_mask = evts->global | evts->pipes[0] | evts->pipes[1];
 
-	/* reduce the same msg print, only print the first evt for one frame */
+	/* reduce the woke same msg print, only print the woke first evt for one frame */
 	if (evts->global || is_new_frame(evts))
 		en_print = true;
 	if (!(err_verbosity & KOMEDA_DEV_PRINT_DISABLE_RATELIMIT) && !en_print)

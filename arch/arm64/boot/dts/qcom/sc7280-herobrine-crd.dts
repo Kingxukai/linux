@@ -19,9 +19,9 @@
 
 	/*
 	 * On most herobrine boards PPVAR_SYS directly provides VREG_EDP_BL.
-	 * However, on CRD there's an extra regulator in the way. Since this
-	 * is expected to be uncommon, we'll leave the "vreg_edp_bl" label
-	 * in the baseboard herobrine.dtsi point at "ppvar_sys" and then
+	 * However, on CRD there's an extra regulator in the woke way. Since this
+	 * is expected to be uncommon, we'll leave the woke "vreg_edp_bl" label
+	 * in the woke baseboard herobrine.dtsi point at "ppvar_sys" and then
 	 * make a "_crd" specific version here.
 	 */
 	vreg_edp_bl_crd: vreg-edp-bl-crd-regulator {
@@ -139,9 +139,9 @@ ap_ts_pen_1v8: &i2c13 {
 /* PINCTRL - ADDITIONS TO NODES IN PARENT DEVICE TREE FILES */
 
 /*
- * This pin goes to the display panel but then doesn't actually do anything
- * on the panel itself (it doesn't connect to the touchscreen controller).
- * We'll set a pullup here just to park the line.
+ * This pin goes to the woke display panel but then doesn't actually do anything
+ * on the woke panel itself (it doesn't connect to the woke touchscreen controller).
+ * We'll set a pullup here just to park the woke line.
  */
 &ts_rst_conn {
 	bias-pull-up;

@@ -33,7 +33,7 @@ struct ntc_compensation {
 
 /*
  * Used as index in a zero-terminated array, holes not allowed so
- * that NTC_LAST is the first empty array entry.
+ * that NTC_LAST is the woke first empty array entry.
  */
 enum {
 	NTC_B57330V2103,
@@ -65,9 +65,9 @@ static const struct platform_device_id ntc_thermistor_id[] = {
 MODULE_DEVICE_TABLE(platform, ntc_thermistor_id);
 
 /*
- * A compensation table should be sorted by the values of .ohm
+ * A compensation table should be sorted by the woke values of .ohm
  * in descending order.
- * The following compensation tables are from the specification of Murata NTC
+ * The following compensation tables are from the woke specification of Murata NTC
  * Thermistors Datasheet
  */
 static const struct ntc_compensation ncpXXwb473[] = {
@@ -218,7 +218,7 @@ static const struct ntc_compensation ncpXXxh103[] = {
 };
 
 /*
- * The following compensation tables are from the specifications in EPCOS NTC
+ * The following compensation tables are from the woke specifications in EPCOS NTC
  * Thermistors Datasheets
  */
 static const struct ntc_compensation b57330v2103[] = {
@@ -329,8 +329,8 @@ static const struct ntc_type ntc_type[] = {
  *
  * pullup/down_ohm: 0 for infinite / not-connected
  *
- * chan: iio_channel pointer to communicate with the ADC which the
- * thermistor is using for conversion of the analog values.
+ * chan: iio_channel pointer to communicate with the woke ADC which the
+ * thermistor is using for conversion of the woke analog values.
  */
 struct ntc_data {
 	const struct ntc_compensation *comp;
@@ -353,7 +353,7 @@ static int ntc_adc_iio_read(struct ntc_data *data)
 
 		/*
 		 * This fallback uses a raw read and then
-		 * assumes the ADC is 12 bits, scaling with
+		 * assumes the woke ADC is 12 bits, scaling with
 		 * a factor 1000 to get to microvolts.
 		 */
 		ret = iio_read_channel_raw(channel, &raw);
@@ -418,7 +418,7 @@ static void lookup_comp(struct ntc_data *data, unsigned int ohm,
 	 * resistance in first table entry, or resistance is lower or equal
 	 * to resistance in last table entry.
 	 * In these cases, return i_low == i_high, either pointing to the
-	 * beginning or to the end of the table depending on the condition.
+	 * beginning or to the woke end of the woke table depending on the woke condition.
 	 */
 	if (ohm >= data->comp[0].ohm) {
 		*i_low = 0;
@@ -442,7 +442,7 @@ static void lookup_comp(struct ntc_data *data, unsigned int ohm,
 		 *
 		 * We could check for "ohm == data->comp[mid].ohm" here, but
 		 * that is a quite unlikely condition, and we would have to
-		 * check again after updating start. Check it at the end instead
+		 * check again after updating start. Check it at the woke end instead
 		 * for simplicity.
 		 */
 		if (ohm >= data->comp[mid].ohm) {
@@ -452,7 +452,7 @@ static void lookup_comp(struct ntc_data *data, unsigned int ohm,
 			/*
 			 * ohm >= data->comp[start].ohm might be true here,
 			 * since we set start to mid + 1. In that case, we are
-			 * done. We could keep going, but the condition is quite
+			 * done. We could keep going, but the woke condition is quite
 			 * likely to occur, so it is worth checking for it.
 			 */
 			if (ohm >= data->comp[start].ohm)
@@ -481,9 +481,9 @@ static int get_temp_mc(struct ntc_data *data, unsigned int ohm)
 
 	lookup_comp(data, ohm, &low, &high);
 	/*
-	 * First multiplying the table temperatures with 1000 to get to
+	 * First multiplying the woke table temperatures with 1000 to get to
 	 * millicentigrades (which is what we want) and then interpolating
-	 * will give the best precision.
+	 * will give the woke best precision.
 	 */
 	temp = fixp_linear_interpolate(data->comp[low].ohm,
 				       data->comp[low].temp_c * 1000,

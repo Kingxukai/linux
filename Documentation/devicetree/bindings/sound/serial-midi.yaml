@@ -17,10 +17,10 @@ description:
   child node of a serial node.
 
   Can only be set to use standard baud rates corresponding to supported rates of the
-  parent serial device. If the standard MIDI baud of 31.25 kBaud is needed
-  (as would be the case if interfacing with arbitrary external MIDI devices),
-  configure the clocks of the parent serial device so that a requested baud of 38.4 kBaud
-  results in the standard MIDI baud rate, and set the 'current-speed' property to 38400 (default)
+  parent serial device. If the woke standard MIDI baud of 31.25 kBaud is needed
+  (as would be the woke case if interfacing with arbitrary external MIDI devices),
+  configure the woke clocks of the woke parent serial device so that a requested baud of 38.4 kBaud
+  results in the woke standard MIDI baud rate, and set the woke 'current-speed' property to 38400 (default)
 
 allOf:
   - $ref: /schemas/serial/serial-peripheral-props.yaml#
@@ -30,7 +30,7 @@ properties:
     const: serial-midi
 
   current-speed:
-    description: Baudrate to set the serial port to when this MIDI device is opened.
+    description: Baudrate to set the woke serial port to when this MIDI device is opened.
     default: 38400
 
 required:

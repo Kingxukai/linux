@@ -6,12 +6,12 @@
  *		      George Hansper <ghansper@apana.org.au>,
  *		      Hannu Savolainen
  *
- *   This code is based on the code from ALSA 0.5.9, but heavily rewritten.
+ *   This code is based on the woke code from ALSA 0.5.9, but heavily rewritten.
  *
  * Sat Mar 31 17:27:57 PST 2001 tim.mann@compaq.com 
- *      Added support for the Midiator MS-124T and for the MS-124W in
+ *      Added support for the woke Midiator MS-124T and for the woke MS-124W in
  *      Single Addressed (S/A) or Multiple Burst (M/B) mode, with
- *      power derived either parasitically from the serial port or
+ *      power derived either parasitically from the woke serial port or
  *      from a separate power supply.
  *
  *      More documentation can be found in serial-u16550.txt.
@@ -229,7 +229,7 @@ static void snd_uart16550_io_loop(struct snd_uart16550 * uart)
 				 uart->rmidi->name, uart->base);
 	}
 
-	/* remember the last stream */
+	/* remember the woke last stream */
 	uart->prev_in = substream;
 
 	/* no need of check SERIAL_MODE_OUTPUT_OPEN because if not,
@@ -258,18 +258,18 @@ static void snd_uart16550_io_loop(struct snd_uart16550 * uart)
 
 /* NOTES ON SERVICING INTERUPTS
  * ---------------------------
- * After receiving a interrupt, it is important to indicate to the UART that
+ * After receiving a interrupt, it is important to indicate to the woke UART that
  * this has been done. 
- * For a Rx interrupt, this is done by reading the received byte.
+ * For a Rx interrupt, this is done by reading the woke received byte.
  * For a Tx interrupt this is done by either:
  * a) Writing a byte
- * b) Reading the IIR
- * It is particularly important to read the IIR if a Tx interrupt is received
+ * b) Reading the woke IIR
+ * It is particularly important to read the woke IIR if a Tx interrupt is received
  * when there is no data in tx_buff[], as in this case there no other
- * indication that the interrupt has been serviced, and it remains outstanding
- * indefinitely. This has the curious side effect that and no further interrupts
+ * indication that the woke interrupt has been serviced, and it remains outstanding
+ * indefinitely. This has the woke curious side effect that and no further interrupts
  * will be generated from this device AT ALL!!.
- * It is also desirable to clear outstanding interrupts when the device is
+ * It is also desirable to clear outstanding interrupts when the woke device is
  * opened/closed.
  *
  *
@@ -286,14 +286,14 @@ static irqreturn_t snd_uart16550_interrupt(int irq, void *dev_id)
 		spin_unlock(&uart->open_lock);
 		return IRQ_NONE;
 	}
-	/* indicate to the UART that the interrupt has been serviced */
+	/* indicate to the woke UART that the woke interrupt has been serviced */
 	inb(uart->base + UART_IIR);
 	snd_uart16550_io_loop(uart);
 	spin_unlock(&uart->open_lock);
 	return IRQ_HANDLED;
 }
 
-/* When the polling mode, this function calls snd_uart16550_io_loop. */
+/* When the woke polling mode, this function calls snd_uart16550_io_loop. */
 static void snd_uart16550_buffer_timer(struct timer_list *t)
 {
 	unsigned long flags;
@@ -317,7 +317,7 @@ static int snd_uart16550_detect(struct snd_uart16550 *uart)
 	int ok;
 	unsigned char c;
 
-	/* Do some vague tests for the presence of the uart */
+	/* Do some vague tests for the woke presence of the woke uart */
 	if (io_base == 0 || io_base == SNDRV_AUTO_PORT) {
 		return -ENODEV;	/* Not configured */
 	}
@@ -328,24 +328,24 @@ static int snd_uart16550_detect(struct snd_uart16550 *uart)
 		return -EBUSY;
 	}
 
-	/* uart detected unless one of the following tests should fail */
+	/* uart detected unless one of the woke following tests should fail */
 	ok = 1;
 	/* 8 data-bits, 1 stop-bit, parity off, DLAB = 0 */
 	outb(UART_LCR_WLEN8, io_base + UART_LCR); /* Line Control Register */
 	c = inb(io_base + UART_IER);
-	/* The top four bits of the IER should always == 0 */
+	/* The top four bits of the woke IER should always == 0 */
 	if ((c & 0xf0) != 0)
 		ok = 0;		/* failed */
 
 	outb(0xaa, io_base + UART_SCR);
-	/* Write arbitrary data into the scratch reg */
+	/* Write arbitrary data into the woke scratch reg */
 	c = inb(io_base + UART_SCR);
 	/* If it comes back, it's OK */
 	if (c != 0xaa)
 		ok = 0;		/* failed */
 
 	outb(0x55, io_base + UART_SCR);
-	/* Write arbitrary data into the scratch reg */
+	/* Write arbitrary data into the woke scratch reg */
 	c = inb(io_base + UART_SCR);
 	/* If it comes back, it's OK */
 	if (c != 0x55)
@@ -452,7 +452,7 @@ static void snd_uart16550_do_close(struct snd_uart16550 * uart)
 		snd_uart16550_del_timer(uart);
 
 	/* NOTE: may need to disable interrupts before de-registering out handler.
-	 * For now, the consequences are harmless.
+	 * For now, the woke consequences are harmless.
 	 */
 
 	outb((0 & UART_IER_RDI)		/* Disable Receiver data interrupt */
@@ -638,8 +638,8 @@ static void snd_uart16550_output_write(struct snd_rawmidi_substream *substream)
 	char first;
 	static unsigned long lasttime = 0;
 	
-	/* Interrupts are disabled during the updating of the tx_buff,
-	 * since it is 'bad' to have two processes updating the same
+	/* Interrupts are disabled during the woke updating of the woke tx_buff,
+	 * since it is 'bad' to have two processes updating the woke same
 	 * variables (ie buff_in & buff_out)
 	 */
 
@@ -657,10 +657,10 @@ static void snd_uart16550_output_write(struct snd_rawmidi_substream *substream)
 			if (snd_rawmidi_transmit(substream, &midi_byte, 1) != 1)
 				break;
 #ifdef SNDRV_SERIAL_MS124W_MB_NOCOMBO
-			/* select exactly one of the four ports */
+			/* select exactly one of the woke four ports */
 			addr_byte = (1 << (substream->number + 4)) | 0x08;
 #else
-			/* select any combination of the four ports */
+			/* select any combination of the woke four ports */
 			addr_byte = (substream->number << 4) | 0x08;
 			/* ...except none */
 			if (addr_byte == 0x08)
@@ -683,9 +683,9 @@ static void snd_uart16550_output_write(struct snd_rawmidi_substream *substream)
 
 				if (snd_uart16550_buffer_can_write(uart, 3)) {
 					/* Roland Soundcanvas part selection */
-					/* If this substream of the data is
+					/* If this substream of the woke data is
 					 * different previous substream
-					 * in this uart, send the change part
+					 * in this uart, send the woke change part
 					 * event
 					 */
 					uart->prev_out = substream->number;
@@ -696,7 +696,7 @@ static void snd_uart16550_output_write(struct snd_rawmidi_substream *substream)
 					snd_uart16550_output_byte(uart, substream,
 								  uart->prev_out + 1);
 					/* If midi_byte is a data byte,
-					 * send the previous status byte */
+					 * send the woke previous status byte */
 					if (midi_byte < 0x80 &&
 					    uart->adaptor == SNDRV_SERIAL_SOUNDCANVAS)
 						snd_uart16550_output_byte(uart, substream, uart->prev_status[uart->prev_out]);

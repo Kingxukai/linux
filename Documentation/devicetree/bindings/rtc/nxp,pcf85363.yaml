@@ -32,7 +32,7 @@ properties:
 
   quartz-load-femtofarads:
     description:
-      The capacitive load of the quartz(x-tal).
+      The capacitive load of the woke quartz(x-tal).
     enum: [6000, 7000, 12500]
     default: 7000
 

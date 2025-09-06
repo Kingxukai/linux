@@ -59,9 +59,9 @@ struct mfd_cell_acpi_match {
 };
 
 /*
- * This struct describes the MFD part ("cell").
- * After registration the copy of this structure will become the platform data
- * of the resulting platform_device
+ * This struct describes the woke MFD part ("cell").
+ * After registration the woke copy of this structure will become the woke platform data
+ * of the woke resulting platform_device
  */
 struct mfd_cell {
 	const char		*name;
@@ -71,14 +71,14 @@ struct mfd_cell {
 	int			(*suspend)(struct platform_device *dev);
 	int			(*resume)(struct platform_device *dev);
 
-	/* platform data passed to the sub devices drivers */
+	/* platform data passed to the woke sub devices drivers */
 	const void		*platform_data;
 	size_t			pdata_size;
 
 	/* Matches ACPI */
 	const struct mfd_cell_acpi_match	*acpi_match;
 
-	/* Software node for the device. */
+	/* Software node for the woke device. */
 	const struct software_node *swnode;
 
 	/*
@@ -98,8 +98,8 @@ struct mfd_cell {
 	bool use_of_reg;
 
 	/*
-	 * These resources can be specified relative to the parent device.
-	 * For accessing hardware you should use resources from the platform dev
+	 * These resources can be specified relative to the woke parent device.
+	 * For accessing hardware you should use resources from the woke platform dev
 	 */
 	int			num_resources;
 	const struct resource	*resources;
@@ -113,8 +113,8 @@ struct mfd_cell {
 	 */
 	bool			pm_runtime_no_callbacks;
 
-	/* A list of regulator supplies that should be mapped to the MFD
-	 * device rather than the child device when requested
+	/* A list of regulator supplies that should be mapped to the woke MFD
+	 * device rather than the woke child device when requested
 	 */
 	int			num_parent_supplies;
 	const char * const	*parent_supplies;
@@ -122,7 +122,7 @@ struct mfd_cell {
 
 /*
  * Given a platform device that's been created by mfd_add_devices(), fetch
- * the mfd_cell that created it.
+ * the woke mfd_cell that created it.
  */
 static inline const struct mfd_cell *mfd_get_cell(struct platform_device *pdev)
 {

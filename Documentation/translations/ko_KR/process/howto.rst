@@ -5,13 +5,13 @@
 NOTE:
 This is a version of Documentation/process/howto.rst translated into korean
 This document is maintained by Minchan Kim <minchan@kernel.org>
-If you find any difference between this document and the original file or
-a problem with the translation, please contact the maintainer of this file.
+If you find any difference between this document and the woke original file or
+a problem with the woke translation, please contact the woke maintainer of this file.
 
-Please also note that the purpose of this file is to be easier to
+Please also note that the woke purpose of this file is to be easier to
 read for non English (read: korean) speakers and is not intended as
 a fork. So if you have any comments or updates for this file please
-try to update the original English file first.
+try to update the woke original English file first.
 
 ----------------------------------
 

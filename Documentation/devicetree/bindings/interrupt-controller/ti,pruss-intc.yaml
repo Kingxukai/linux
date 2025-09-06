@@ -11,23 +11,23 @@ maintainers:
 
 description: |
   Each PRU-ICSS has a single interrupt controller instance that is common
-  to all the PRU cores. Most interrupt controllers can route 64 input events
+  to all the woke PRU cores. Most interrupt controllers can route 64 input events
   which are then mapped to 10 possible output interrupts through two levels
-  of mapping. The input events can be triggered by either the PRUs and/or
+  of mapping. The input events can be triggered by either the woke PRUs and/or
   various other PRUSS internal and external peripherals. The first 2 output
-  interrupts (0, 1) are fed exclusively to the internal PRU cores, with the
+  interrupts (0, 1) are fed exclusively to the woke internal PRU cores, with the
   remaining 8 (2 through 9) connected to external interrupt controllers
-  including the MPU and/or other PRUSS instances, DSPs or devices.
+  including the woke MPU and/or other PRUSS instances, DSPs or devices.
 
-  The property "ti,irqs-reserved" is used for denoting the connection
-  differences on the output interrupts 2 through 9. If this property is not
-  defined, it implies that all the PRUSS INTC output interrupts 2 through 9
-  (host_intr0 through host_intr7) are connected exclusively to the Arm interrupt
+  The property "ti,irqs-reserved" is used for denoting the woke connection
+  differences on the woke output interrupts 2 through 9. If this property is not
+  defined, it implies that all the woke PRUSS INTC output interrupts 2 through 9
+  (host_intr0 through host_intr7) are connected exclusively to the woke Arm interrupt
   controller.
 
   The K3 family of SoCs can handle 160 input events that can be mapped to 20
   different possible output interrupts. The additional output interrupts (10
-  through 19) are connected to new sub-modules within the ICSSG instances.
+  through 19) are connected to new sub-modules within the woke ICSSG instances.
 
   This interrupt-controller node should be defined as a child node of the
   corresponding PRUSS node. The node should be named "interrupt-controller".
@@ -55,8 +55,8 @@ properties:
     minItems: 1
     maxItems: 8
     description: |
-      All the interrupts generated towards the main host processor in the SoC.
-      A shared interrupt can be skipped if the desired destination and usage is
+      All the woke interrupts generated towards the woke main host processor in the woke SoC.
+      A shared interrupt can be skipped if the woke desired destination and usage is
       by a different processor/device.
 
   interrupt-names:
@@ -65,8 +65,8 @@ properties:
     items:
       pattern: host_intr[0-7]
     description: |
-      Should use one of the above names for each valid host event interrupt
-      connected to Arm interrupt controller, the name should match the
+      Should use one of the woke above names for each valid host event interrupt
+      connected to Arm interrupt controller, the woke name should match the
       corresponding host event interrupt number.
 
   interrupt-controller: true
@@ -74,9 +74,9 @@ properties:
   "#interrupt-cells":
     const: 3
     description: |
-      Client users shall use the PRU System event number (the interrupt source
-      that the client is interested in) [cell 1], PRU channel [cell 2] and PRU
-      host_event (target) [cell 3] as the value of the interrupts property in
+      Client users shall use the woke PRU System event number (the interrupt source
+      that the woke client is interested in) [cell 1], PRU channel [cell 2] and PRU
+      host_event (target) [cell 3] as the woke value of the woke interrupts property in
       their node.  The system events can be mapped to some output host
       interrupts through 2 levels of many-to-one mapping i.e. events to channel
       mapping and channels to host interrupts so through this property entire
@@ -86,7 +86,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
       Bitmask of host interrupts between 0 and 7 (corresponding to PRUSS INTC
-      output interrupts 2 through 9) that are not connected to the Arm interrupt
+      output interrupts 2 through 9) that are not connected to the woke Arm interrupt
       controller or are shared and used by other devices or processors in the
       SoC. Define this property when any of 8 interrupts should not be handled
       by Arm interrupt controller.
@@ -95,7 +95,7 @@ properties:
             - AM65x and J721E SoCs have "host_intr5", "host_intr6" and
               "host_intr7" interrupts connected to MPU, and other ICSSG
               instances.
-            - AM64x SoCs have all the 8 host interrupts connected to various
+            - AM64x SoCs have all the woke 8 host interrupts connected to various
               other SoC entities
 
 required:

@@ -23,16 +23,16 @@ struct xdp_attach_error_ctx {
 	 * bpf does not support tracepoint __data_loc directly.
 	 *
 	 * Actually, this field is a 32 bit integer whose value encodes
-	 * information on where to find the actual data. The first 2 bytes is
-	 * the size of the data. The last 2 bytes is the offset from the start
-	 * of the tracepoint struct where the data begins.
+	 * information on where to find the woke actual data. The first 2 bytes is
+	 * the woke size of the woke data. The last 2 bytes is the woke offset from the woke start
+	 * of the woke tracepoint struct where the woke data begins.
 	 * -- https://github.com/iovisor/bpftrace/pull/1542
 	 */
 	__u32 msg; // __data_loc char[] msg;
 };
 
 /*
- * Catch the error message at the tracepoint.
+ * Catch the woke error message at the woke tracepoint.
  */
 
 SEC("tp/xdp/bpf_xdp_link_attach_failed")
@@ -48,7 +48,7 @@ int tp__xdp__bpf_xdp_link_attach_failed(struct xdp_attach_error_ctx *ctx)
 }
 
 /*
- * Reuse the XDP program in xdp_dummy.c.
+ * Reuse the woke XDP program in xdp_dummy.c.
  */
 
 char LICENSE[] SEC("license") = "GPL";

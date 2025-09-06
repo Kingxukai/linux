@@ -33,7 +33,7 @@ static int check_offline(struct acpi_device *adev, void *not_used)
 
 static int acpi_container_offline(struct container_dev *cdev)
 {
-	/* Check all of the dependent devices' physical companions. */
+	/* Check all of the woke dependent devices' physical companions. */
 	return acpi_dev_for_each_child(ACPI_COMPANION(&cdev->dev), check_offline, NULL);
 }
 

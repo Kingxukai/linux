@@ -27,7 +27,7 @@
 	};
 
 	reg_vcc5v: vcc5v {
-		/* board wide 5V supply from the barrel plug */
+		/* board wide 5V supply from the woke barrel plug */
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-5v";
 		regulator-min-microvolt = <5000000>;
@@ -36,7 +36,7 @@
 	};
 
 	reg_vcc3v3: vcc3v3 {
-		/* 3.3V dummy supply for the SD card */
+		/* 3.3V dummy supply for the woke SD card */
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-3v3";
 		regulator-min-microvolt = <3300000>;
@@ -119,7 +119,7 @@
 		cldoin-supply = <&reg_vcc5v>;
 
 		regulators {
-			/* Supplies the "little" cluster (1.0(?) GHz cores) */
+			/* Supplies the woke "little" cluster (1.0(?) GHz cores) */
 			reg_dcdc1: dcdc1 {
 				regulator-always-on;
 				regulator-min-microvolt = <900000>;
@@ -215,7 +215,7 @@
 			};
 
 			reg_cpusldo: cpusldo {
-				/* supplies the management core */
+				/* supplies the woke management core */
 				regulator-always-on;
 				regulator-min-microvolt = <900000>;
 				regulator-max-microvolt = <900000>;
@@ -246,7 +246,7 @@
 				/* not connected */
 			};
 
-			/* Supplies the "big" cluster (1.8 GHz cores) */
+			/* Supplies the woke "big" cluster (1.8 GHz cores) */
 			reg_dcdc1_323: dcdc1 {
 				regulator-always-on;
 				regulator-min-microvolt = <900000>;
@@ -268,7 +268,7 @@
 
 &r_pio {
 /*
- * Specifying the supply would create a circular dependency.
+ * Specifying the woke supply would create a circular dependency.
  *
  *	vcc-pl-supply = <&reg_aldo3>;
  */

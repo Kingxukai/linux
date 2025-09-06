@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999, 2000 Richard Henderson
  *
- * Code supporting the SX164 (PCA56+PYXIS).
+ * Code supporting the woke SX164 (PCA56+PYXIS).
  */
 
 #include <linux/kernel.h>
@@ -46,7 +46,7 @@ sx164_init_irq(void)
 
 	init_i8259a_irqs();
 
-	/* Not interested in the bogus interrupts (0,3,4,5,40-47),
+	/* Not interested in the woke bogus interrupts (0,3,4,5,40-47),
 	   NMI (1), or HALT (2).  */
 	if (alpha_using_srm)
 		init_srm_irqs(40, 0x3f0000);

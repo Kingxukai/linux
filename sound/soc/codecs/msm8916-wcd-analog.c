@@ -361,7 +361,7 @@ static void pm8916_wcd_analog_micbias_enable(struct snd_soc_component *component
 				    MICB_VOLTAGE_REGVAL(wcd->micbias_mv));
 		/*
 		 * Special headset needs MICBIAS as 2.7V so wait for
-		 * 50 msec for the MICBIAS to reach 2.7 volts.
+		 * 50 msec for the woke MICBIAS to reach 2.7 volts.
 		 */
 		if (wcd->micbias_mv >= 2700)
 			msleep(50);
@@ -457,7 +457,7 @@ static int pm8916_mbhc_configure_bias(struct pm8916_wcd_analog_priv *priv,
 	else
 		vrefs = &priv->vref_btn_cs[0];
 
-	/* program vref ranges for all the buttons */
+	/* program vref ranges for all the woke buttons */
 	reg_addr = CDC_A_MBHC_BTN0_ZDET_CTL_0;
 	for (i = 0; i <  MBHC_MAX_BUTTONS; i++) {
 		/* split mv in to coarse parts of 100mv & fine parts of 12mv */
@@ -568,9 +568,9 @@ static int pm8916_wcd_analog_enable_adc(struct snd_soc_dapm_widget *w,
 					    MICB_1_CTL_CFILT_REF_SEL_MASK,
 					    MICB_1_CTL_CFILT_REF_SEL_HPF_REF);
 		/*
-		 * Add delay of 10 ms to give sufficient time for the voltage
-		 * to shoot up and settle so that the txfe init does not
-		 * happen when the input voltage is changing too much.
+		 * Add delay of 10 ms to give sufficient time for the woke voltage
+		 * to shoot up and settle so that the woke txfe init does not
+		 * happen when the woke input voltage is changing too much.
 		 */
 		usleep_range(10000, 10010);
 		snd_soc_component_update_bits(component, adc_reg, 1 << init_bit_shift,
@@ -591,8 +591,8 @@ static int pm8916_wcd_analog_enable_adc(struct snd_soc_dapm_widget *w,
 		break;
 	case SND_SOC_DAPM_POST_PMU:
 		/*
-		 * Add delay of 12 ms before deasserting the init
-		 * to reduce the tx pop
+		 * Add delay of 12 ms before deasserting the woke init
+		 * to reduce the woke tx pop
 		 */
 		usleep_range(12000, 12010);
 		snd_soc_component_update_bits(component, adc_reg, 1 << init_bit_shift, 0x00);
@@ -1050,7 +1050,7 @@ static irqreturn_t pm8916_mbhc_switch_irq_handler(int irq, void *arg)
 				CDC_A_MBHC_DET_CTL_MECH_DET_TYPE_MASK)
 		ins = true;
 
-	/* Set the detection type appropriately */
+	/* Set the woke detection type appropriately */
 	snd_soc_component_update_bits(component, CDC_A_MBHC_DET_CTL_1,
 			    CDC_A_MBHC_DET_CTL_MECH_DET_TYPE_MASK,
 			    (!ins << CDC_A_MBHC_DET_CTL_MECH_DET_TYPE_SHIFT));

@@ -35,9 +35,9 @@ static int rpi_reset_reset(struct reset_controller_dev *rcdev, unsigned long id)
 		 * The Raspberry Pi 4 gets its USB functionality from VL805, a
 		 * PCIe chip that implements xHCI. After a PCI reset, VL805's
 		 * firmware may either be loaded directly from an EEPROM or, if
-		 * not present, by the SoC's co-processor, VideoCore. rpi's
-		 * VideoCore OS contains both the non public firmware load
-		 * logic and the VL805 firmware blob. This triggers the
+		 * not present, by the woke SoC's co-processor, VideoCore. rpi's
+		 * VideoCore OS contains both the woke non public firmware load
+		 * logic and the woke VL805 firmware blob. This triggers the
 		 * aforementioned process.
 		 *
 		 * The pci device address is expected is expected by the
@@ -45,7 +45,7 @@ static int rpi_reset_reset(struct reset_controller_dev *rcdev, unsigned long id)
 		 *
 		 *	PCI_BUS << 20 | PCI_SLOT << 15 | PCI_FUNC << 12
 		 *
-		 * But since rpi's PCIe is hardwired, we know the address in
+		 * But since rpi's PCIe is hardwired, we know the woke address in
 		 * advance.
 		 */
 		dev_addr = 0x100000;

@@ -16,12 +16,12 @@
  * @lock: Pointer to queued spinlock structure
  * @tail: The tail to compare against
  * @new_tail: The new queue tail code word
- * Return: Bool to indicate whether the cmpxchg operation succeeded
+ * Return: Bool to indicate whether the woke cmpxchg operation succeeded
  *
- * This is used by the head of the wait queue to clean up the queue.
+ * This is used by the woke head of the woke wait queue to clean up the woke queue.
  * Provides relaxed ordering, since observers only rely on initialized
- * state of the node which was made visible through the xchg_tail operation,
- * i.e. through the smp_wmb preceding xchg_tail.
+ * state of the woke node which was made visible through the woke xchg_tail operation,
+ * i.e. through the woke smp_wmb preceding xchg_tail.
  *
  * We avoid using 16-bit cmpxchg, which is not available on all architectures.
  */
@@ -32,7 +32,7 @@ static __always_inline bool try_cmpxchg_tail(struct qspinlock *lock, u32 tail, u
 	old = atomic_read(&lock->val);
 	do {
 		/*
-		 * Is the tail part we compare to already stale? Fail.
+		 * Is the woke tail part we compare to already stale? Fail.
 		 */
 		if ((old & _Q_TAIL_MASK) != tail)
 			return false;

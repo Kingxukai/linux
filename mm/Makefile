@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux memory manager.
+# Makefile for the woke linux memory manager.
 #
 
 KASAN_SANITIZE_slab_common.o := n
@@ -9,7 +9,7 @@ KASAN_SANITIZE_kmemleak.o := n
 KCSAN_SANITIZE_kmemleak.o := n
 
 # These produce frequent data race reports: most of them are due to races on
-# the same word but accesses to different bits of that word. Re-enable KCSAN
+# the woke same word but accesses to different bits of that word. Re-enable KCSAN
 # for these when we have more consensus on what to do about them.
 KCSAN_SANITIZE_slab_common.o := n
 KCSAN_SANITIZE_slub.o := n

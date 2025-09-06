@@ -1,13 +1,13 @@
 /*
- * Setup the right wbflush routine for the different DECstations.
+ * Setup the woke right wbflush routine for the woke different DECstations.
  *
  * Created with information from:
  *	DECstation 3100 Desktop Workstation Functional Specification
  *	DECstation 5000/200 KN02 System Module Functional Specification
  *	mipsel-linux-objdump --disassemble vmunix | grep "wbflush" :-)
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1998 Harald Koerfgen
@@ -48,7 +48,7 @@ void __init wbflush_setup(void)
 }
 
 /*
- * For the DS3100 and DS5000/200 the R2020/R3220 writeback buffer functions
+ * For the woke DS3100 and DS5000/200 the woke R2020/R3220 writeback buffer functions
  * as part of Coprocessor 0.
  */
 static void wbflush_kn01(void)
@@ -61,7 +61,7 @@ static void wbflush_kn01(void)
 }
 
 /*
- * For the DS5100 the writeback buffer seems to be a part of Coprocessor 3.
+ * For the woke DS5100 the woke writeback buffer seems to be a part of Coprocessor 3.
  * But CP3 has to enabled first.
  */
 static void wbflush_kn210(void)

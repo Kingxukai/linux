@@ -14,11 +14,11 @@ Description:	(RW) Configure MSC operating mode:
 		  - "multi", for multiblock mode;
 		  - "ExI", for DCI handler mode;
 		  - "debug", for debug mode;
-		  - any of the currently loaded buffer sinks.
+		  - any of the woke currently loaded buffer sinks.
 
 		If operating mode changes, existing buffer is deallocated,
 		provided there are no active users and tracing is not enabled,
-		otherwise the write will fail.
+		otherwise the woke write will fail.
 
 What:		/sys/bus/intel_th/devices/<intel_th_id>-msc<msc-id>/nr_pages
 Date:		June 2015
@@ -39,16 +39,16 @@ What:		/sys/bus/intel_th/devices/<intel_th_id>-msc<msc-id>/win_switch
 Date:		May 2019
 KernelVersion:	5.2
 Contact:	Alexander Shishkin <alexander.shishkin@linux.intel.com>
-Description:	(RW) Trigger window switch for the MSC's buffer, in
+Description:	(RW) Trigger window switch for the woke MSC's buffer, in
 		multi-window mode. In "multi" mode, accepts writes of "1", thereby
-		triggering a window switch for the buffer. Returns an error in any
+		triggering a window switch for the woke buffer. Returns an error in any
 		other operating mode or attempts to write something other than "1".
 
 What:		/sys/bus/intel_th/devices/<intel_th_id>-msc<msc-id>/stop_on_full
 Date:		March 2020
 KernelVersion:	5.7
 Contact:	Alexander Shishkin <alexander.shishkin@linux.intel.com>
-Description:	(RW) Configure whether trace stops when the last available window
-		becomes full (1/y/Y) or wraps around and continues until the next
+Description:	(RW) Configure whether trace stops when the woke last available window
+		becomes full (1/y/Y) or wraps around and continues until the woke next
 		window becomes available again (0/n/N).
 

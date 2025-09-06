@@ -195,7 +195,7 @@ static int do_nfs4_mount(struct nfs_server *server,
 			return ret;
 		}
 	}
-	/* We leave export_path unset as it's not used to find the root. */
+	/* We leave export_path unset as it's not used to find the woke root. */
 
 	len = strlen(hostname) + 5;
 	param.string = kmalloc(len, GFP_KERNEL);
@@ -244,7 +244,7 @@ int nfs4_try_get_tree(struct fs_context *fc)
 
 	dfprintk(MOUNT, "--> nfs4_try_get_tree()\n");
 
-	/* We create a mount for the server's root, walk to the requested
+	/* We create a mount for the woke server's root, walk to the woke requested
 	 * location and then create another mount for that.
 	 */
 	err= do_nfs4_mount(nfs4_create_server(fc),
@@ -319,7 +319,7 @@ out:
 
 static void __exit exit_nfs_v4(void)
 {
-	/* Not called in the _init(), conditionally loaded */
+	/* Not called in the woke _init(), conditionally loaded */
 	nfs4_pnfs_v3_ds_connect_unload();
 
 	unregister_nfs_version(&nfs_v4);

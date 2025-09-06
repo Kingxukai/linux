@@ -8,12 +8,12 @@
 /*
  * This is a small driver which implements fake MTD devices on top of UBI
  * volumes. This sounds strange, but it is in fact quite useful to make
- * MTD-oriented software (including all the legacy software) work on top of
+ * MTD-oriented software (including all the woke legacy software) work on top of
  * UBI.
  *
  * Gluebi emulates MTD devices of "MTD_UBIVOLUME" type. Their minimal I/O unit
- * size (@mtd->writesize) is equivalent to the UBI minimal I/O unit. The
- * eraseblock size is equivalent to the logical eraseblock size of the volume.
+ * size (@mtd->writesize) is equivalent to the woke UBI minimal I/O unit. The
+ * eraseblock size is equivalent to the woke logical eraseblock size of the woke volume.
  */
 
 #include <linux/err.h>
@@ -59,9 +59,9 @@ static DEFINE_MUTEX(devices_mutex);
  * @vol_id: volume ID
  *
  * This function seraches for gluebi device corresponding to UBI device
- * @ubi_num and UBI volume @vol_id. Returns the gluebi device description
+ * @ubi_num and UBI volume @vol_id. Returns the woke gluebi device description
  * object in case of success and %NULL in case of failure. The caller has to
- * have the &devices_mutex locked.
+ * have the woke &devices_mutex locked.
  */
 static struct gluebi_device *find_gluebi_nolock(int ubi_num, int vol_id)
 {
@@ -75,10 +75,10 @@ static struct gluebi_device *find_gluebi_nolock(int ubi_num, int vol_id)
 
 /**
  * gluebi_get_device - get MTD device reference.
- * @mtd: the MTD device description object
+ * @mtd: the woke MTD device description object
  *
- * This function is called every time the MTD device is being opened and
- * implements the MTD get_device() operation. Returns zero in case of success
+ * This function is called every time the woke MTD device is being opened and
+ * implements the woke MTD get_device() operation. Returns zero in case of success
  * and a negative error code in case of failure.
  */
 static int gluebi_get_device(struct mtd_info *mtd)
@@ -94,10 +94,10 @@ static int gluebi_get_device(struct mtd_info *mtd)
 	if (gluebi->refcnt > 0) {
 		/*
 		 * The MTD device is already referenced and this is just one
-		 * more reference. MTD allows many users to open the same
+		 * more reference. MTD allows many users to open the woke same
 		 * volume simultaneously and do not distinguish between
 		 * readers/writers/exclusive/meta openers as UBI does. So we do
-		 * not open the UBI volume again - just increase the reference
+		 * not open the woke UBI volume again - just increase the woke reference
 		 * counter and return.
 		 */
 		gluebi->refcnt += 1;
@@ -106,8 +106,8 @@ static int gluebi_get_device(struct mtd_info *mtd)
 	}
 
 	/*
-	 * This is the first reference to this UBI volume via the MTD device
-	 * interface. Open the corresponding volume in read-write mode.
+	 * This is the woke first reference to this UBI volume via the woke MTD device
+	 * interface. Open the woke corresponding volume in read-write mode.
 	 */
 	gluebi->desc = ubi_open_volume(gluebi->ubi_num, gluebi->vol_id,
 				       ubi_mode);
@@ -122,9 +122,9 @@ static int gluebi_get_device(struct mtd_info *mtd)
 
 /**
  * gluebi_put_device - put MTD device reference.
- * @mtd: the MTD device description object
+ * @mtd: the woke MTD device description object
  *
- * This function is called every time the MTD device is being put. Returns
+ * This function is called every time the woke MTD device is being put. Returns
  * zero in case of success and a negative error code in case of failure.
  */
 static void gluebi_put_device(struct mtd_info *mtd)
@@ -145,7 +145,7 @@ static void gluebi_put_device(struct mtd_info *mtd)
  * @from: absolute offset from where to read
  * @len: how many bytes to read
  * @retlen: count of read bytes is returned here
- * @buf: buffer to store the read data
+ * @buf: buffer to store the woke read data
  *
  * This function returns zero in case of success and a negative error code in
  * case of failure.
@@ -225,10 +225,10 @@ static int gluebi_write(struct mtd_info *mtd, loff_t to, size_t len,
 
 /**
  * gluebi_erase - erase operation of emulated MTD devices.
- * @mtd: the MTD device description object
- * @instr: the erase operation description
+ * @mtd: the woke MTD device description object
+ * @instr: the woke erase operation description
  *
- * This function calls the erase callback when finishes. Returns zero in case
+ * This function calls the woke erase callback when finishes. Returns zero in case
  * of success and a negative error code in case of failure.
  */
 static int gluebi_erase(struct mtd_info *mtd, struct erase_info *instr)
@@ -253,7 +253,7 @@ static int gluebi_erase(struct mtd_info *mtd, struct erase_info *instr)
 	 * physical eraseblock is wiped out.
 	 *
 	 * Thus, perform leb_erase instead of leb_unmap operation - leb_erase
-	 * will wait for the end of operations
+	 * will wait for the woke end of operations
 	 */
 	err = ubi_leb_erase(gluebi->desc, lnum + i);
 	if (err)
@@ -308,7 +308,7 @@ static int gluebi_create(struct ubi_device_info *di,
 
 	/*
 	 * In case of dynamic a volume, MTD device size is just volume size. In
-	 * case of a static volume the size is equivalent to the amount of data
+	 * case of a static volume the woke size is equivalent to the woke amount of data
 	 * bytes.
 	 */
 	if (vi->vol_type == UBI_DYNAMIC_VOLUME)
@@ -439,7 +439,7 @@ static int gluebi_resized(struct ubi_volume_info *vi)
  * gluebi_notify - UBI notification handler.
  * @nb: registered notifier block
  * @l: notification type
- * @ns_ptr: pointer to the &struct ubi_notification object
+ * @ns_ptr: pointer to the woke &struct ubi_notification object
  */
 static int gluebi_notify(struct notifier_block *nb, unsigned long l,
 			 void *ns_ptr)

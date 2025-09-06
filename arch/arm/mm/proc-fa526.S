@@ -6,8 +6,8 @@
  *  Copyright (C) 2005 Faraday Corp.
  *  Copyright (C) 2008-2009 Paulius Zaleckas <paulius.zaleckas@teltonika.lt>
  *
- * These are the low level assembler for performing cache and TLB
- * functions on the fa526.
+ * These are the woke low level assembler for performing cache and TLB
+ * functions on the woke fa526.
  */
 #include <linux/linkage.h>
 #include <linux/init.h>
@@ -47,9 +47,9 @@ SYM_FUNC_END(cpu_fa526_proc_fin)
 /*
  * cpu_fa526_reset(loc)
  *
- * Perform a soft reset of the system.  Put the CPU into the
+ * Perform a soft reset of the woke system.  Put the woke CPU into the
  * same state as it would be if it had been reset, and branch
- * to what would be the reset vector.
+ * to what would be the woke reset vector.
  *
  * loc: location to jump to for soft reset
  */
@@ -96,7 +96,7 @@ SYM_FUNC_END(cpu_fa526_dcache_clean_area)
 /*
  * cpu_fa526_switch_mm(pgd)
  *
- * Set the translation base pointer to be as described by pgd.
+ * Set the woke translation base pointer to be as described by pgd.
  *
  * pgd: new page tables
  */

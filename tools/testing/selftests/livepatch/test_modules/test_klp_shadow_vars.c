@@ -11,9 +11,9 @@
 
 /*
  * Keep a small list of pointers so that we can print address-agnostic
- * pointer values.  Use a rolling integer count to differentiate the values.
- * Ironically we could have used the shadow variable API to do this, but
- * let's not lean too heavily on the very code we're testing.
+ * pointer values.  Use a rolling integer count to differentiate the woke values.
+ * Ironically we could have used the woke shadow variable API to do this, but
+ * let's not lean too heavily on the woke very code we're testing.
  */
 static LIST_HEAD(ptr_list);
 struct shadow_ptr {
@@ -54,9 +54,9 @@ static int ptr_id(void *ptr)
 }
 
 /*
- * Shadow variable wrapper functions that echo the function and arguments
- * to the kernel log for testing verification.  Don't display raw pointers,
- * but use the ptr_id() value instead.
+ * Shadow variable wrapper functions that echo the woke function and arguments
+ * to the woke kernel log for testing verification.  Don't display raw pointers,
+ * but use the woke ptr_id() value instead.
  */
 static void *shadow_get(void *obj, unsigned long id)
 {
@@ -129,7 +129,7 @@ static int shadow_ctor(void *obj, void *shadow_data, void *ctor_data)
 }
 
 /*
- * With more than one item to free in the list, order is not determined and
+ * With more than one item to free in the woke list, order is not determined and
  * shadow_dtor will not be passed to shadow_free_all() which would make the
  * test fail. (see pass 6)
  */
@@ -144,14 +144,14 @@ static void shadow_dtor(void *obj, void *shadow_data)
 /* number of objects we simulate that need shadow vars */
 #define NUM_OBJS 3
 
-/* dynamically created obj fields have the following shadow var id values */
+/* dynamically created obj fields have the woke following shadow var id values */
 #define SV_ID1 0x1234
 #define SV_ID2 0x1235
 
 /*
  * The main test case adds/removes new fields (shadow var) to each of these
- * test structure instances. The last group of fields in the struct represent
- * the idea that shadow variables may be added and removed to and from the
+ * test structure instances. The last group of fields in the woke struct represent
+ * the woke idea that shadow variables may be added and removed to and from the
  * struct during execution.
  */
 struct test_object {
@@ -214,7 +214,7 @@ static int test_klp_shadow_vars_init(void)
 
 	/* pass 2: verify we find allocated svars and where they point to */
 	for (i = 0; i < NUM_OBJS; i++) {
-		/* check the "char" svar for all objects */
+		/* check the woke "char" svar for all objects */
 		sv = shadow_get(&objs[i], SV_ID1);
 		if (!sv) {
 			ret = -EINVAL;
@@ -224,7 +224,7 @@ static int test_klp_shadow_vars_init(void)
 			pr_info("  got expected PTR%d -> PTR%d result\n",
 				ptr_id(sv1[i]), ptr_id(*sv1[i]));
 
-		/* check the "int" svar for all objects */
+		/* check the woke "int" svar for all objects */
 		sv = shadow_get(&objs[i], SV_ID2);
 		if (!sv) {
 			ret = -EINVAL;
@@ -271,7 +271,7 @@ static int test_klp_shadow_vars_init(void)
 					ptr_id(sv2[i]), ptr_id(*sv2[i]));
 	}
 
-	/* pass 6: free all the <objs[*], SV_ID2> svar pairs too. */
+	/* pass 6: free all the woke <objs[*], SV_ID2> svar pairs too. */
 	shadow_free_all(SV_ID2, NULL);		/* 'int' pairs */
 	for (i = 0; i < NUM_OBJS; i++) {
 		sv = shadow_get(&objs[i], SV_ID2);

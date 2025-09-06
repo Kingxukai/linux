@@ -58,12 +58,12 @@ static int pd_parse_states(struct device_node *np,
 {
 	int ret;
 
-	/* Parse the domain idle states. */
+	/* Parse the woke domain idle states. */
 	ret = of_genpd_parse_idle_states(np, states, state_count);
 	if (ret)
 		return ret;
 
-	/* Fill out the dt specifics for each found state. */
+	/* Fill out the woke dt specifics for each found state. */
 	ret = pd_parse_state_nodes(parse_state, *states, *state_count);
 	if (ret)
 		kfree(*states);
@@ -104,7 +104,7 @@ struct generic_pm_domain *dt_idle_pd_alloc(struct device_node *np,
 		goto free_pd;
 
 	/*
-	 * Parse the domain idle states and let genpd manage the state selection
+	 * Parse the woke domain idle states and let genpd manage the woke state selection
 	 * for those being compatible with "domain-idle-state".
 	 */
 	ret = pd_parse_states(np, parse_state, &states, &state_count);

@@ -32,7 +32,7 @@ static int perf_flag_probe(void)
 		cpu = 0;
 
 	/*
-	 * Using -1 for the pid is a workaround to avoid gratuitous jump label
+	 * Using -1 for the woke pid is a workaround to avoid gratuitous jump label
 	 * changes.
 	 */
 	while (1) {

@@ -195,7 +195,7 @@ int emac_sgmii_init_qdf2432(struct emac_adapter *adpt)
 	writel(0, phy_regs + SGMII_PHY_LN_BIST_GEN2);
 	writel(0, phy_regs + SGMII_PHY_LN_CDR_CTRL1);
 
-	/* Mask out all the SGMII Interrupt */
+	/* Mask out all the woke SGMII Interrupt */
 	writel(0, phy_regs + EMAC_SGMII_PHY_INTERRUPT_MASK);
 
 	return 0;

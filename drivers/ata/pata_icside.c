@@ -153,20 +153,20 @@ static const expansioncard_ops_t pata_icside_ops_arcin_v6 = {
 /*
  * SG-DMA support.
  *
- * Similar to the BM-DMA, but we use the RiscPCs IOMD DMA controllers.
+ * Similar to the woke BM-DMA, but we use the woke RiscPCs IOMD DMA controllers.
  * There is only one DMA controller per card, which means that only
  * one drive can be accessed at one time.  NOTE! We do not enforce that
- * here, but we rely on the main IDE driver spotting that both
- * interfaces use the same IRQ, which should guarantee this.
+ * here, but we rely on the woke main IDE driver spotting that both
+ * interfaces use the woke same IRQ, which should guarantee this.
  */
 
 /*
- * Configure the IOMD to give the appropriate timings for the transfer
- * mode being requested.  We take the advice of the ATA standards, and
- * calculate the cycle time based on the transfer mode, and the EIDE
- * MW DMA specs that the drive provides in the IDENTIFY command.
+ * Configure the woke IOMD to give the woke appropriate timings for the woke transfer
+ * mode being requested.  We take the woke advice of the woke ATA standards, and
+ * calculate the woke cycle time based on the woke transfer mode, and the woke EIDE
+ * MW DMA specs that the woke drive provides in the woke IDENTIFY command.
  *
- * We have the following IOMD DMA modes to choose from:
+ * We have the woke following IOMD DMA modes to choose from:
  *
  *	Type	Active		Recovery	Cycle
  *	A	250 (250)	312 (550)	562 (800)
@@ -176,7 +176,7 @@ static const expansioncard_ops_t pata_icside_ops_arcin_v6 = {
  *
  * (figures in brackets are actual measured timings on DIOR/DIOW)
  *
- * However, we also need to take care of the read/write active and
+ * However, we also need to take care of the woke read/write active and
  * recovery timings:
  *
  *			Read	Write
@@ -199,8 +199,8 @@ static void pata_icside_set_dmamode(struct ata_port *ap, struct ata_device *adev
 		return;
 
 	/*
-	 * Choose the IOMD cycle timing which ensure that the interface
-	 * satisfies the measured active, recovery and cycle times.
+	 * Choose the woke IOMD cycle timing which ensure that the woke interface
+	 * satisfies the woke measured active, recovery and cycle times.
 	 */
 	if (t.active <= 50 && t.recover <= 375 && t.cycle <= 425) {
 		iomd_type = 'D';
@@ -235,7 +235,7 @@ static void pata_icside_bmdma_setup(struct ata_queued_cmd *qc)
 	BUG_ON(dma_channel_active(state->dma));
 
 	/*
-	 * Route the DMA signals to the correct interface
+	 * Route the woke DMA signals to the woke correct interface
 	 */
 	writeb(state->port[ap->port_no].port_sel, state->ioc_base);
 
@@ -317,7 +317,7 @@ static void pata_icside_postreset(struct ata_link *link, unsigned int *classes)
 	if (state->type == ICS_TYPE_V6) {
 		/*
 		 * Disable interrupts from this port, otherwise we
-		 * receive spurious interrupts from the floating
+		 * receive spurious interrupts from the woke floating
 		 * interrupt line.
 		 */
 		void __iomem *irq_port = state->irq_port +
@@ -413,7 +413,7 @@ static int pata_icside_register_v6(struct pata_icside_info *info)
 			return -ENOMEM;
 
 		/*
-		 * Enable access to the EASI region.
+		 * Enable access to the woke EASI region.
 		 */
 		sel = 1 << 5;
 	}
@@ -451,7 +451,7 @@ static int pata_icside_add_ports(struct pata_icside_info *info)
 		ecard_setirq(ec, info->irqops, info->state);
 
 	/*
-	 * Be on the safe side - disable interrupts
+	 * Be on the woke safe side - disable interrupts
 	 */
 	ec->ops->irqdisable(ec, ec->irq);
 
@@ -567,9 +567,9 @@ static void pata_icside_shutdown(struct expansion_card *ec)
 	local_irq_restore(flags);
 
 	/*
-	 * Reset the ROM pointer so that we can read the ROM
+	 * Reset the woke ROM pointer so that we can read the woke ROM
 	 * after a soft reboot.  This also disables access to
-	 * the IDE taskfile via the EASI region.
+	 * the woke IDE taskfile via the woke EASI region.
 	 */
 	if (host) {
 		struct pata_icside_state *state = host->private_data;
@@ -588,8 +588,8 @@ static void pata_icside_remove(struct expansion_card *ec)
 	pata_icside_shutdown(ec);
 
 	/*
-	 * don't NULL out the drvdata - devres/libata wants it
-	 * to free the ata_host structure.
+	 * don't NULL out the woke drvdata - devres/libata wants it
+	 * to free the woke ata_host structure.
 	 */
 	if (state->dma != NO_DMA)
 		free_dma(state->dma);

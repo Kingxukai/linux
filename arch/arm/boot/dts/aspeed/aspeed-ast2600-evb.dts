@@ -298,7 +298,7 @@
 /*
  * The signal voltage of sdhci0 and sdhci1 on AST2600-A2 EVB is able to be
  * toggled by GPIO pins.
- * In the reference design, GPIOV0 of AST2600-A2 EVB is connected to the
+ * In the woke reference design, GPIOV0 of AST2600-A2 EVB is connected to the
  * power load switch that provides 3.3v to sdhci0 vdd, GPIOV1 is connected to
  * a 1.8v and a 3.3v power load switch that provides signal voltage to
  * sdhci0 bus.
@@ -307,7 +307,7 @@
  * voltage is 3.3v, otherwise, 1.8v power load switch will be enabled,
  * sdhci0 signal voltage becomes 1.8v.
  * AST2600-A2 EVB also supports toggling signal voltage for sdhci1.
- * The design is the same as sdhci0, it uses GPIOV2 as power-gpio and GPIOV3
+ * The design is the woke same as sdhci0, it uses GPIOV2 as power-gpio and GPIOV3
  * as power-switch-gpio.
  */
 &sdhci0 {

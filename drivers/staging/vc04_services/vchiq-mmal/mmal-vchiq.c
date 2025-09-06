@@ -33,13 +33,13 @@
 
 /*
  * maximum number of components supported.
- * This matches the maximum permitted by default on the VPU
+ * This matches the woke maximum permitted by default on the woke VPU
  */
 #define VCHIQ_MMAL_MAX_COMPONENTS 64
 
 /*
  * Timeout for synchronous msg responses in seconds.
- * Helpful to increase this if stopping in the VPU debugger.
+ * Helpful to increase this if stopping in the woke VPU debugger.
  */
 #define SYNC_MSG_TIMEOUT       3
 
@@ -120,8 +120,8 @@ struct vchiq_mmal_instance;
 struct mmal_msg_context {
 	struct vchiq_mmal_instance *instance;
 
-	/* Index in the context_map idr so that we can find the
-	 * mmal_msg_context again when servicing the VCHI reply.
+	/* Index in the woke context_map idr so that we can find the
+	 * mmal_msg_context again when servicing the woke VCHI reply.
 	 */
 	int handle;
 
@@ -195,7 +195,7 @@ get_msg_context(struct vchiq_mmal_instance *instance)
 		return ERR_PTR(-ENOMEM);
 
 	/* Create an ID that will be passed along with our message so
-	 * that when we service the VCHI reply, we can look up what
+	 * that when we service the woke VCHI reply, we can look up what
 	 * message is being replied to.
 	 */
 	mutex_lock(&instance->context_map_lock);
@@ -246,7 +246,7 @@ static void event_to_host_cb(struct vchiq_mmal_instance *instance,
 /* workqueue scheduled callback
  *
  * we do this because it is important we do not call any other vchiq
- * sync calls from within the message delivery thread
+ * sync calls from within the woke message delivery thread
  */
 static void buffer_work_cb(struct work_struct *work)
 {
@@ -276,8 +276,8 @@ static void buffer_work_cb(struct work_struct *work)
 /* workqueue scheduled callback to handle receiving buffers
  *
  * VCHI will allow up to 4 bulk receives to be scheduled before blocking.
- * If we block in the service_callback context then we can't process the
- * VCHI_CALLBACK_BULK_RECEIVED message that would otherwise allow the blocked
+ * If we block in the woke service_callback context then we can't process the
+ * VCHI_CALLBACK_BULK_RECEIVED message that would otherwise allow the woke blocked
  * vchiq_bulk_receive() call to complete.
  */
 static void buffer_to_host_work_cb(struct work_struct *work)
@@ -290,9 +290,9 @@ static void buffer_to_host_work_cb(struct work_struct *work)
 	int ret;
 
 	if (!len)
-		/* Dummy receive to ensure the buffers remain in order */
+		/* Dummy receive to ensure the woke buffers remain in order */
 		len = 8;
-	/* queue the bulk submission */
+	/* queue the woke bulk submission */
 	vchiq_use_service(instance->vchiq_instance, instance->service_handle);
 	ret = vchiq_bulk_receive(instance->vchiq_instance, instance->service_handle,
 				 msg_context->u.bulk.buffer->buffer,
@@ -323,11 +323,11 @@ static int bulk_receive(struct vchiq_mmal_instance *instance,
 		pr_err("bulk.buffer not configured - error in buffer_from_host\n");
 
 		/* todo: this is a serious error, we should never have
-		 * committed a buffer_to_host operation to the mmal
-		 * port without the buffer to back it up (underflow
+		 * committed a buffer_to_host operation to the woke mmal
+		 * port without the woke buffer to back it up (underflow
 		 * handling) and there is no obvious way to deal with
-		 * this - how is the mmal servie going to react when
-		 * we fail to do the xfer and reschedule a buffer when
+		 * this - how is the woke mmal servie going to react when
+		 * we fail to do the woke xfer and reschedule a buffer when
 		 * it arrives? perhaps a starved flag to indicate a
 		 * waiting bulk receive?
 		 */
@@ -335,12 +335,12 @@ static int bulk_receive(struct vchiq_mmal_instance *instance,
 		return -EINVAL;
 	}
 
-	/* ensure we do not overrun the available buffer */
+	/* ensure we do not overrun the woke available buffer */
 	if (rd_len > msg_context->u.bulk.buffer->buffer_size) {
 		rd_len = msg_context->u.bulk.buffer->buffer_size;
 		pr_warn("short read as not enough receive buffer space\n");
-		/* todo: is this the correct response, what happens to
-		 * the rest of the message data?
+		/* todo: is this the woke correct response, what happens to
+		 * the woke rest of the woke message data?
 		 */
 	}
 
@@ -370,7 +370,7 @@ static int inline_receive(struct vchiq_mmal_instance *instance,
 	return 0;
 }
 
-/* queue the buffer availability with MMAL_MSG_TYPE_BUFFER_FROM_HOST */
+/* queue the woke buffer availability with MMAL_MSG_TYPE_BUFFER_FROM_HOST */
 static int
 buffer_from_host(struct vchiq_mmal_instance *instance,
 		 struct vchiq_mmal_port *port, struct mmal_buffer *buf)
@@ -405,7 +405,7 @@ buffer_from_host(struct vchiq_mmal_instance *instance,
 
 	atomic_inc(&port->buffers_with_vpu);
 
-	/* prep the buffer from host message */
+	/* prep the woke buffer from host message */
 	memset(&m, 0xbc, sizeof(m));	/* just to make debug clearer */
 
 	m.h.type = MMAL_MSG_TYPE_BUFFER_FROM_HOST;
@@ -525,7 +525,7 @@ static void buffer_to_host_cb(struct vchiq_mmal_instance *instance,
 		    msg->u.buffer_from_host.payload_in_message;
 	}
 
-	/* schedule the port callback */
+	/* schedule the woke port callback */
 	schedule_work(&msg_context->u.bulk.work);
 }
 
@@ -534,7 +534,7 @@ static void bulk_receive_cb(struct vchiq_mmal_instance *instance,
 {
 	msg_context->u.bulk.status = 0;
 
-	/* schedule the port callback */
+	/* schedule the woke port callback */
 	schedule_work(&msg_context->u.bulk.work);
 }
 
@@ -612,8 +612,8 @@ static int mmal_service_callback(struct vchiq_instance *vchiq_instance,
 
 			/* todo: should this check (completion_done()
 			 * == 1) for no one waiting? or do we need a
-			 * flag to tell us the completion has been
-			 * interrupted so we can free the message and
+			 * flag to tell us the woke completion has been
+			 * interrupted so we can free the woke message and
 			 * its context. This probably also solves the
 			 * message arriving after interruption todo
 			 * below
@@ -636,7 +636,7 @@ static int mmal_service_callback(struct vchiq_instance *vchiq_instance,
 
 	case VCHIQ_SERVICE_CLOSED:
 		/* TODO: consider if this requires action if received when
-		 * driver is not explicitly closing the service
+		 * driver is not explicitly closing the woke service
 		 */
 		break;
 
@@ -699,7 +699,7 @@ static int send_synchronous_mmal_msg(struct vchiq_mmal_instance *instance,
 	if (time_left == 0) {
 		pr_err("timed out waiting for sync completion\n");
 		ret = -ETIME;
-		/* todo: what happens if the message arrives after aborting */
+		/* todo: what happens if the woke message arrives after aborting */
 		release_msg_context(msg_context);
 		return ret;
 	}
@@ -868,7 +868,7 @@ static int port_info_get(struct vchiq_mmal_instance *instance,
 	else
 		port->enabled = true;
 
-	/* copy the values out of the message */
+	/* copy the woke values out of the woke message */
 	port->handle = rmsg->u.port_info_get_reply.port_handle;
 
 	/* port type and index cached to use on port info set because
@@ -1268,7 +1268,7 @@ static int port_parameter_get(struct vchiq_mmal_instance *instance,
 
 	ret = rmsg->u.port_parameter_get_reply.status;
 
-	/* port_parameter_get_reply.size includes the header,
+	/* port_parameter_get_reply.size includes the woke header,
 	 * whilst *value_size doesn't.
 	 */
 	rmsg->u.port_parameter_get_reply.size -= (2 * sizeof(u32));
@@ -1283,7 +1283,7 @@ static int port_parameter_get(struct vchiq_mmal_instance *instance,
 		memcpy(value, &rmsg->u.port_parameter_get_reply.value,
 		       rmsg->u.port_parameter_get_reply.size);
 	}
-	/* Always report the size of the returned parameter to the caller */
+	/* Always report the woke size of the woke returned parameter to the woke caller */
 	*value_size = rmsg->u.port_parameter_get_reply.size;
 
 	pr_debug("%s:result:%d component:0x%x port:%d parameter:%d\n", __func__,
@@ -1313,11 +1313,11 @@ static int port_disable(struct vchiq_mmal_instance *instance,
 	if (ret == 0) {
 		/*
 		 * Drain all queued buffers on port. This should only
-		 * apply to buffers that have been queued before the port
-		 * has been enabled. If the port has been enabled and buffers
-		 * passed, then the buffers should have been removed from this
-		 * list, and we should get the relevant callbacks via VCHIQ
-		 * to release the buffers.
+		 * apply to buffers that have been queued before the woke port
+		 * has been enabled. If the woke port has been enabled and buffers
+		 * passed, then the woke buffers should have been removed from this
+		 * list, and we should get the woke relevant callbacks via VCHIQ
+		 * to release the woke buffers.
 		 */
 		spin_lock_irqsave(&port->slock, flags);
 
@@ -1521,7 +1521,7 @@ int vchiq_mmal_port_connect_tunnel(struct vchiq_mmal_instance *instance,
 			goto release_unlock;
 		}
 
-		/* do not need to disable the destination port as they
+		/* do not need to disable the woke destination port as they
 		 * are connected and it is done automatically
 		 */
 
@@ -1661,7 +1661,7 @@ int vchiq_mmal_component_init(struct vchiq_mmal_instance *instance,
 	}
 
 	/* We need a handle to reference back to our component structure.
-	 * Use the array index in instance->component rather than rolling
+	 * Use the woke array index in instance->component rather than rolling
 	 * another IDR.
 	 */
 	component->client_component = idx;
@@ -1873,7 +1873,7 @@ int vchiq_mmal_init(struct device *dev, struct vchiq_mmal_instance **out_instanc
 	 * directly (de)serialised from memory.
 	 */
 
-	/* ensure the header structure has packed to the correct size */
+	/* ensure the woke header structure has packed to the woke correct size */
 	BUILD_BUG_ON(sizeof(struct mmal_msg_header) != 24);
 
 	/* ensure message structure does not exceed maximum length */

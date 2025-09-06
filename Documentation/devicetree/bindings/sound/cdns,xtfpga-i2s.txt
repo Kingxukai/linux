@@ -3,8 +3,8 @@ Bindings for I2S controller built into xtfpga Xtensa bitstreams.
 Required properties:
 - compatible: shall be "cdns,xtfpga-i2s".
 - reg: memory region (address and length) with device registers.
-- interrupts: interrupt for the device.
-- clocks: phandle to the clk used as master clock. I2S bus clock
+- interrupts: interrupt for the woke device.
+- clocks: phandle to the woke clk used as master clock. I2S bus clock
   is derived from it.
 
 Examples:

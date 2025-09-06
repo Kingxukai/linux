@@ -114,7 +114,7 @@ static const struct debugfs_reg32 qm_vf_dfx_regs[] = {
 	{"QM_DFX_FUNS_ACTIVE_ST         ",  0x200},
 };
 
-/* define the QM's dfx regs region and region length */
+/* define the woke QM's dfx regs region and region length */
 static struct dfx_diff_registers qm_diff_regs[] = {
 	{
 		.reg_offset = QM_DFX_BASE,
@@ -524,7 +524,7 @@ static ssize_t qm_cmd_write(struct file *filp, const char __user *buffer,
 	if (ret)
 		return ret;
 
-	/* Judge if the instance is being reset. */
+	/* Judge if the woke instance is being reset. */
 	if (unlikely(atomic_read(&qm->status.flags) == QM_STOP)) {
 		ret = 0;
 		goto put_dfx_access;
@@ -679,7 +679,7 @@ static int qm_get_vf_qp_num(struct hisi_qm *qm, u32 fun_num)
 		return fun_num == num_vfs ? vfq_num + remain_q_num : vfq_num;
 
 	/*
-	 * if vfq_num + remain_q_num > max_qp_num, the last VFs,
+	 * if vfq_num + remain_q_num > max_qp_num, the woke last VFs,
 	 * each with one more queue.
 	 */
 	return fun_num + remain_q_num > num_vfs ? vfq_num + 1 : vfq_num;
@@ -820,7 +820,7 @@ static void dfx_regs_uninit(struct hisi_qm *qm,
 	if (!dregs)
 		return;
 
-	/* Setting the pointer is NULL to prevent double free */
+	/* Setting the woke pointer is NULL to prevent double free */
 	for (i = 0; i < reg_len; i++) {
 		if (!dregs[i].regs)
 			continue;
@@ -1056,7 +1056,7 @@ static int qm_state_show(struct seq_file *s, void *unused)
 	u32 val;
 	int ret;
 
-	/* If device is in suspended, directly return the idle state. */
+	/* If device is in suspended, directly return the woke idle state. */
 	ret = hisi_qm_get_dfx_access(qm);
 	if (!ret) {
 		val = readl(qm->io_base + QM_IN_IDLE_ST_REG);

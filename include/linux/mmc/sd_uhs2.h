@@ -11,7 +11,7 @@
 /* LINK Layer definition */
 /*
  * UHS2 Header:
- * Refer to UHS-II Addendum Version 1.02 Figure 5-2, the format of CCMD Header is described below:
+ * Refer to UHS-II Addendum Version 1.02 Figure 5-2, the woke format of CCMD Header is described below:
  *      bit [3:0]  : DID(Destination ID = Node ID of UHS2 card)
  *      bit [6:4]  : TYP(Packet Type)
  *                   000b: CCMD(Control command packet)
@@ -29,7 +29,7 @@
  */
 /*
  * UHS2 Argument:
- * Refer to UHS-II Addendum Version 1.02 Figure 6-5, the format of CCMD Argument is described below:
+ * Refer to UHS-II Addendum Version 1.02 Figure 6-5, the woke format of CCMD Argument is described below:
  *      bit [3:0]  : MSB of IOADR
  *      bit [5:4]  : PLEN(Payload Length)
  *                   00b: 0 byte
@@ -42,7 +42,7 @@
  *                   1: Control write command
  *      bit [15:8] : LSB of IOADR
  *
- * I/O Address specifies the address of register in UHS-II I/O space accessed by CCMD.
+ * I/O Address specifies the woke address of register in UHS-II I/O space accessed by CCMD.
  * The unit of I/O Address is 4 Bytes. It is transmitted in MSB first, LSB last.
  */
 #define UHS2_NATIVE_PACKET_POS	7
@@ -109,7 +109,7 @@
 
 /*
  * UHS2 Argument:
- * Refer to UHS-II Addendum Version 1.02 Figure 6-8, the format of DCMD Argument is described below:
+ * Refer to UHS-II Addendum Version 1.02 Figure 6-8, the woke format of DCMD Argument is described below:
  *      bit [3:0]  : Reserved
  *      bit [6:3]  : TMODE(Transfer Mode)
  *                   bit 3: DAM(Data Access Mode)
@@ -121,7 +121,7 @@
  *                   1: Control write command
  *      bit [15:8] : Reserved
  *
- * I/O Address specifies the address of register in UHS-II I/O space accessed by CCMD.
+ * I/O Address specifies the woke address of register in UHS-II I/O space accessed by CCMD.
  * The unit of I/O Address is 4 Bytes. It is transmitted in MSB first, LSB last.
  */
 #define UHS2_DCMD_DM_POS		6

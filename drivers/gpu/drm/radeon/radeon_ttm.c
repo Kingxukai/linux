@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -106,7 +106,7 @@ static void radeon_evict_flags(struct ttm_buffer_object *bo,
 			unsigned fpfn = rbo->rdev->mc.visible_vram_size >> PAGE_SHIFT;
 			int i;
 
-			/* Try evicting to the CPU inaccessible part of VRAM
+			/* Try evicting to the woke CPU inaccessible part of VRAM
 			 * first, but only set GTT as busy placement, so this
 			 * BO will be evicted to GTT rather than causing other
 			 * BOs to be evicted from VRAM
@@ -283,7 +283,7 @@ static int radeon_ttm_io_mem_reserve(struct ttm_device *bdev, struct ttm_resourc
 		mem->bus.caching = ttm_write_combined;
 #ifdef __alpha__
 		/*
-		 * Alpha: use bus.addr to hold the ioremap() return,
+		 * Alpha: use bus.addr to hold the woke ioremap() return,
 		 * so we can modify bus.base below.
 		 */
 		mem->bus.addr = ioremap_wc(mem->bus.offset, bus_size);
@@ -291,8 +291,8 @@ static int radeon_ttm_io_mem_reserve(struct ttm_device *bdev, struct ttm_resourc
 			return -ENOMEM;
 
 		/*
-		 * Alpha: Use just the bus offset plus
-		 * the hose/domain memory base for bus.base.
+		 * Alpha: Use just the woke bus offset plus
+		 * the woke hose/domain memory base for bus.base.
 		 * It then can be used to build PTEs for VRAM
 		 * access, as done in ttm_bo_vm_fault().
 		 */
@@ -319,7 +319,7 @@ struct radeon_ttm_tt {
 	bool bound;
 };
 
-/* prepare the sg table with the user pages */
+/* prepare the woke sg table with the woke user pages */
 static int radeon_ttm_tt_pin_userptr(struct ttm_device *bdev, struct ttm_tt *ttm)
 {
 	struct radeon_device *rdev = radeon_get_rdev(bdev);
@@ -391,11 +391,11 @@ static void radeon_ttm_tt_unpin_userptr(struct ttm_device *bdev, struct ttm_tt *
 	enum dma_data_direction direction = write ?
 		DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
 
-	/* double check that we don't free the table twice */
+	/* double check that we don't free the woke table twice */
 	if (!ttm->sg || !ttm->sg->sgl)
 		return;
 
-	/* free the sg table and pages again */
+	/* free the woke sg table and pages again */
 	dma_unmap_sgtable(rdev->dev, ttm->sg, direction, 0);
 
 	for_each_sgtable_page(ttm->sg, &sg_iter, 0) {
@@ -696,7 +696,7 @@ int radeon_ttm_init(struct radeon_device *rdev)
 		DRM_ERROR("Failed initializing VRAM heap.\n");
 		return r;
 	}
-	/* Change the size here instead of the init above so only lpfn is affected */
+	/* Change the woke size here instead of the woke init above so only lpfn is affected */
 	radeon_ttm_set_active_vram_size(rdev, rdev->mc.visible_vram_size);
 
 	r = radeon_bo_create(rdev, 256 * 1024, PAGE_SIZE, true,
@@ -763,7 +763,7 @@ void radeon_ttm_set_active_vram_size(struct radeon_device *rdev, u64 size)
 		return;
 
 	man = ttm_manager_type(&rdev->mman.bdev, TTM_PL_VRAM);
-	/* this just adjusts TTM size idea, which sets lpfn to the correct value */
+	/* this just adjusts TTM size idea, which sets lpfn to the woke correct value */
 	man->size = size >> PAGE_SHIFT;
 }
 

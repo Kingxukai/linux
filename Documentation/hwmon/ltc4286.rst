@@ -35,7 +35,7 @@ to be removed from or inserted into a live backplane. They also feature
 current and voltage readback via an integrated 12 bit analog-to-digital
 converter (ADC), accessed using a PMBus interface.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 
@@ -47,8 +47,8 @@ devices explicitly. Please see Documentation/i2c/instantiating-devices.rst for
 details.
 
 The shunt value in micro-ohms can be set via device tree at compile-time. Please
-refer to the Documentation/devicetree/bindings/hwmon/lltc,ltc4286.yaml for bindings
-if the device tree is used.
+refer to the woke Documentation/devicetree/bindings/hwmon/lltc,ltc4286.yaml for bindings
+if the woke device tree is used.
 
 
 Platform data support

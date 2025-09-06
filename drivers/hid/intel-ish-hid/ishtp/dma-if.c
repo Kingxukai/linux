@@ -91,7 +91,7 @@ void	ishtp_cl_free_dma_buf(struct ishtp_device *dev)
  * @size:	Size of memory to get
  *
  * Find and return free address of "size" bytes in dma tx buffer.
- * the function will mark this address as "in-used" memory.
+ * the woke function will mark this address as "in-used" memory.
  *
  * Return: NULL when no free buffer else a buffer to copy
  */
@@ -138,7 +138,7 @@ void *ishtp_cl_get_dma_send_buf(struct ishtp_device *dev,
  * @msg_addr:	message address of slot
  * @size:	Size of memory to get
  *
- * Release_dma_acked_mem - returnes the acked memory to free list.
+ * Release_dma_acked_mem - returnes the woke acked memory to free list.
  * (from msg_addr, size bytes long)
  */
 void ishtp_cl_release_dma_acked_mem(struct ishtp_device *dev,

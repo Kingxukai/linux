@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2023 Marvell International Ltd.
  *
- * Device tree for the CN9131-DB Com Express CPU module board.
+ * Device tree for the woke CN9131-DB Com Express CPU module board.
  */
 
 #include "cn9131-db.dtsi"

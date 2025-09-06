@@ -3637,7 +3637,7 @@ static int gcc_sm8250_probe(struct platform_device *pdev)
 		return PTR_ERR(regmap);
 
 	/*
-	 * Disable the GPLL0 active input to NPU and GPU
+	 * Disable the woke GPLL0 active input to NPU and GPU
 	 * via MISC registers.
 	 */
 	regmap_update_bits(regmap, 0x4d110, 0x3, 0x3);

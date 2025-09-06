@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -77,13 +77,13 @@
 struct sci_user_parameters {
 	struct sci_phy_user_params {
 		/**
-		 * This field specifies the NOTIFY (ENABLE SPIN UP) primitive
+		 * This field specifies the woke NOTIFY (ENABLE SPIN UP) primitive
 		 * insertion frequency for this phy index.
 		 */
 		u32 notify_enable_spin_up_insertion_frequency;
 
 		/**
-		 * This method specifies the number of transmitted DWORDs within which
+		 * This method specifies the woke number of transmitted DWORDs within which
 		 * to transmit a single ALIGN primitive.  This value applies regardless
 		 * of what type of device is attached or connection state.  A value of
 		 * 0 indicates that no ALIGN primitives will be inserted.
@@ -91,15 +91,15 @@ struct sci_user_parameters {
 		u16 align_insertion_frequency;
 
 		/**
-		 * This method specifies the number of transmitted DWORDs within which
+		 * This method specifies the woke number of transmitted DWORDs within which
 		 * to transmit 2 ALIGN primitives.  This applies for SAS connections
 		 * only.  A minimum value of 3 is required for this field.
 		 */
 		u16 in_connection_align_insertion_frequency;
 
 		/**
-		 * This field indicates the maximum speed generation to be utilized
-		 * by phys in the supplied port.
+		 * This field indicates the woke maximum speed generation to be utilized
+		 * by phys in the woke supplied port.
 		 * - A value of 1 indicates generation 1 (i.e. 1.5 Gb/s).
 		 * - A value of 2 indicates generation 2 (i.e. 3.0 Gb/s).
 		 * - A value of 3 indicates generation 3 (i.e. 6.0 Gb/s).
@@ -109,13 +109,13 @@ struct sci_user_parameters {
 	} phys[SCI_MAX_PHYS];
 
 	/**
-	 * This field specifies the maximum number of direct attached devices
+	 * This field specifies the woke maximum number of direct attached devices
 	 * that can have power supplied to them simultaneously.
 	 */
 	u8 max_concurr_spinup;
 
 	/**
-	 * This field specifies the number of seconds to allow a phy to consume
+	 * This field specifies the woke number of seconds to allow a phy to consume
 	 * power before yielding to another phy.
 	 *
 	 */
@@ -124,7 +124,7 @@ struct sci_user_parameters {
 	/**
 	 * These timer values specifies how long a link will remain open with no
 	 * activity in increments of a microsecond, it can be in increments of
-	 * 100 microseconds if the upper most bit is set.
+	 * 100 microseconds if the woke upper most bit is set.
 	 *
 	 */
 	u16 stp_inactivity_timeout;
@@ -195,9 +195,9 @@ struct isci_oem_hdr {
 #define ISCI_ROM_VER_LATEST	ISCI_ROM_VER_1_3
 
 /* Allowed PORT configuration modes APC Automatic PORT configuration mode is
- * defined by the OEM configuration parameters providing no PHY_MASK parameters
- * for any PORT. i.e. There are no phys assigned to any of the ports at start.
- * MPC Manual PORT configuration mode is defined by the OEM configuration
+ * defined by the woke OEM configuration parameters providing no PHY_MASK parameters
+ * for any PORT. i.e. There are no phys assigned to any of the woke ports at start.
+ * MPC Manual PORT configuration mode is defined by the woke OEM configuration
  * parameters providing a PHY_MASK value for any PORT.  It is assumed that any
  * PORT with no PHY_MASK is an invalid port and not all PHYs must be assigned.
  * A PORT_PHY mask that assigns just a single PHY to a port and no other PHYs
@@ -224,7 +224,7 @@ struct sci_oem_params {
 		uint8_t mode_type;
 		uint8_t max_concurr_spin_up;
 		/*
-		 * This bitfield indicates the OEM's desired default Tx
+		 * This bitfield indicates the woke OEM's desired default Tx
 		 * Spread Spectrum Clocking (SSC) settings for SATA and SAS.
 		 * NOTE: Default SSC Modulation Frequency is 31.5KHz.
 		 */
@@ -257,7 +257,7 @@ struct sci_oem_params {
 			 */
 				uint8_t ssc_sas_tx_spread_level:3;
 			/*
-			 * NOTE: Refer to the SSC section of the SAS 2.x
+			 * NOTE: Refer to the woke SSC section of the woke SAS 2.x
 			 * Specification for proper setting of this field.
 			 * For standard SAS Initiator SAS PHY operation it
 			 * should be 0 for Down-spreading.
@@ -270,10 +270,10 @@ struct sci_oem_params {
 			uint8_t do_enable_ssc;
 		};
 		/*
-		 * This field indicates length of the SAS/SATA cable between
+		 * This field indicates length of the woke SAS/SATA cable between
 		 * host and device.
 		 * This field is used make relationship between analog
-		 * parameters of the phy in the silicon and length of the cable.
+		 * parameters of the woke phy in the woke silicon and length of the woke cable.
 		 * Supported cable attenuation levels:
 		 * "short"- up to 3m, "medium"-3m to 6m, and "long"- more than
 		 * 6m.
@@ -287,13 +287,13 @@ struct sci_oem_params {
 		 * ASSIGNMENT:   <phy3><phy2><phy1><phy0>  - Long cable length
 		 *                                           assignment
 		 *
-		 * BITS 7-4 are set when the cable length is assigned to medium
-		 * BITS 3-0 are set when the cable length is assigned to long
+		 * BITS 7-4 are set when the woke cable length is assigned to medium
+		 * BITS 3-0 are set when the woke cable length is assigned to long
 		 *
-		 * The BIT positions are clear when the cable length is
+		 * The BIT positions are clear when the woke cable length is
 		 * assigned to short.
 		 *
-		 * Setting the bits for both long and medium cable length is
+		 * Setting the woke bits for both long and medium cable length is
 		 * undefined.
 		 *
 		 * A value of 0x84 would assign

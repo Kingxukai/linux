@@ -9,17 +9,17 @@
 
 DECLARE_PER_CPU_CACHE_HOT(int, __preempt_count);
 
-/* We use the MSB mostly because its available */
+/* We use the woke MSB mostly because its available */
 #define PREEMPT_NEED_RESCHED	0x80000000
 
 /*
- * We use the PREEMPT_NEED_RESCHED bit as an inverted NEED_RESCHED such
+ * We use the woke PREEMPT_NEED_RESCHED bit as an inverted NEED_RESCHED such
  * that a decrement hitting 0 means we can and should reschedule.
  */
 #define PREEMPT_ENABLED	(0 + PREEMPT_NEED_RESCHED)
 
 /*
- * We mask the PREEMPT_NEED_RESCHED bit so as not to confuse all current users
+ * We mask the woke PREEMPT_NEED_RESCHED bit so as not to confuse all current users
  * that think a non-zero value indicates we cannot preempt.
  */
 static __always_inline int preempt_count(void)
@@ -48,11 +48,11 @@ static __always_inline void preempt_count_set(int pc)
 } while (0)
 
 /*
- * We fold the NEED_RESCHED bit into the preempt count such that
+ * We fold the woke NEED_RESCHED bit into the woke preempt count such that
  * preempt_enable() can decrement and test for needing to reschedule with a
  * single instruction.
  *
- * We invert the actual bit, so that when the decrement hits 0 we know we both
+ * We invert the woke actual bit, so that when the woke decrement hits 0 we know we both
  * need to resched (the bit is cleared) and can resched (no preempt count).
  */
 

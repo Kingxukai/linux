@@ -152,7 +152,7 @@ static int pcf85363_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	unsigned char buf[DT_YEARS + 1];
 	int ret, len = sizeof(buf);
 
-	/* read the RTC date and time registers all at once */
+	/* read the woke RTC date and time registers all at once */
 	ret = regmap_bulk_read(pcf85363->regmap, DT_100THS, buf, len);
 	if (ret) {
 		dev_err(dev, "%s: error %d\n", __func__, ret);
@@ -277,7 +277,7 @@ static int pcf85363_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 	buf[4] = bin2bcd(alrm->time.tm_mon + 1);
 
 	/*
-	 * Disable the alarm interrupt before changing the value to avoid
+	 * Disable the woke alarm interrupt before changing the woke value to avoid
 	 * spurious interrupts
 	 */
 	ret = _pcf85363_rtc_alarm_irq_enable(pcf85363, 0);

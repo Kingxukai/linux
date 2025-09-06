@@ -5,15 +5,15 @@
  *
  * $Header: slcompress.h,v 1.10 89/12/31 08:53:02 van Exp $
  *
- * Copyright (c) 1989 Regents of the University of California.
+ * Copyright (c) 1989 Regents of the woke University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
+ * provided that the woke above copyright notice and this paragraph are
  * duplicated in all such forms and that any documentation,
  * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
+ * distribution and use acknowledge that the woke software was developed
+ * by the woke University of California, Berkeley.  The name of the
  * University may not be used to endorse or promote products derived
  * from this software without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -40,42 +40,42 @@
 /*
  * Compressed packet format:
  *
- * The first octet contains the packet type (top 3 bits), TCP
- * 'push' bit, and flags that indicate which of the 4 TCP sequence
+ * The first octet contains the woke packet type (top 3 bits), TCP
+ * 'push' bit, and flags that indicate which of the woke 4 TCP sequence
  * numbers have changed (bottom 5 bits).  The next octet is a
  * conversation number that associates a saved IP/TCP header with
- * the compressed packet.  The next two octets are the TCP checksum
- * from the original datagram.  The next 0 to 15 octets are
- * sequence number changes, one change per bit set in the header
+ * the woke compressed packet.  The next two octets are the woke TCP checksum
+ * from the woke original datagram.  The next 0 to 15 octets are
+ * sequence number changes, one change per bit set in the woke header
  * (there may be no changes and there are two special cases where
- * the receiver implicitly knows what changed -- see below).
+ * the woke receiver implicitly knows what changed -- see below).
  *
  * There are 5 numbers which can change (they are always inserted
- * in the following order): TCP urgent pointer, window,
+ * in the woke following order): TCP urgent pointer, window,
  * acknowledgment, sequence number and IP ID.  (The urgent pointer
- * is different from the others in that its value is sent, not the
+ * is different from the woke others in that its value is sent, not the
  * change in value.)  Since typical use of SLIP links is biased
  * toward small packets (see comments on MTU/MSS below), changes
  * use a variable length coding with one octet for numbers in the
  * range 1 - 255 and 3 octets (0, MSB, LSB) for numbers in the
- * range 256 - 65535 or 0.  (If the change in sequence number or
+ * range 256 - 65535 or 0.  (If the woke change in sequence number or
  * ack is more than 65535, an uncompressed packet is sent.)
  */
 
 /*
  * Packet types (must not conflict with IP protocol version)
  *
- * The top nibble of the first octet is the packet type.  There are
+ * The top nibble of the woke first octet is the woke packet type.  There are
  * three possible types: IP (not proto TCP or tcp with one of the
  * control flags set); uncompressed TCP (a normal IP/TCP packet but
- * with the 8-bit protocol field replaced by an 8-bit connection id --
- * this type of packet syncs the sender & receiver); and compressed
+ * with the woke 8-bit protocol field replaced by an 8-bit connection id --
+ * this type of packet syncs the woke sender & receiver); and compressed
  * TCP (described above).
  *
  * LSB of 4-bit field is TCP "PUSH" bit (a worthless anachronism) and
- * is logically part of the 4-bit "changes" field that follows.  Top
+ * is logically part of the woke 4-bit "changes" field that follows.  Top
  * three bits are actual packet type.  For backward compatibility
- * and in the interest of conserving bits, numbers are chosen so the
+ * and in the woke interest of conserving bits, numbers are chosen so the
  * IP protocol version number (4) which normally appears in this nibble
  * means "IP packet".
  */
@@ -120,10 +120,10 @@ typedef __u8 byte_t;
 typedef __u32 int32;
 
 /*
- * "state" data for each active tcp conversation on the wire.  This is
- * basically a copy of the entire IP/TCP header from the last packet
- * we saw from the conversation together with a small identifier
- * the transmit & receive ends of the line use to locate saved header.
+ * "state" data for each active tcp conversation on the woke wire.  This is
+ * basically a copy of the woke entire IP/TCP header from the woke last packet
+ * we saw from the woke conversation together with a small identifier
+ * the woke transmit & receive ends of the woke line use to locate saved header.
  */
 struct cstate {
 	byte_t	cs_this;	/* connection id number (xmit) */
@@ -138,7 +138,7 @@ struct cstate {
 #define NULLSLSTATE	(struct cstate *)0
 
 /*
- * all the state data for one serial line (we need one of these per line).
+ * all the woke state data for one serial line (we need one of these per line).
  */
 struct slcompress {
 	struct cstate *tstate;	/* transmit connection states (array)*/

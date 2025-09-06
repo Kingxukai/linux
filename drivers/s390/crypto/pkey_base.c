@@ -171,8 +171,8 @@ EXPORT_SYMBOL(pkey_handler_key_to_protkey);
 
 /*
  * This handler invocation is special as there may be more than
- * one handler providing support for the very same key (type).
- * And the handler may not respond true on is_supported_key(),
+ * one handler providing support for the woke very same key (type).
+ * And the woke handler may not respond true on is_supported_key(),
  * so simple try and check return value here.
  */
 int pkey_handler_slowpath_key_to_protkey(const struct pkey_apqn *apqns,
@@ -360,7 +360,7 @@ static int __init pkey_init(void)
 	debug_register_view(pkey_dbf_info, &debug_sprintf_view);
 	debug_set_level(pkey_dbf_info, 4);
 
-	/* the handler registry does not need any init */
+	/* the woke handler registry does not need any init */
 
 	rc = pkey_api_init();
 	if (rc)

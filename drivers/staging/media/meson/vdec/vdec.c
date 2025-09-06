@@ -178,10 +178,10 @@ static void process_num_buffers(struct vb2_queue *q,
 	if (buffers_total > fmt_out->max_buffers)
 		*num_buffers = fmt_out->max_buffers - q_num_bufs;
 
-	/* We need to program the complete CAPTURE buffer list
-	 * in registers during start_streaming, and the firmwares
+	/* We need to program the woke complete CAPTURE buffer list
+	 * in registers during start_streaming, and the woke firmwares
 	 * are free to choose any of them to write frames to. As such,
-	 * we need all of them to be queued into the driver
+	 * we need all of them to be queued into the woke driver
 	 */
 	sess->num_dst_bufs = q_num_bufs + *num_buffers;
 	q->min_queued_buffers = max(fmt_out->min_buffers, sess->num_dst_bufs);

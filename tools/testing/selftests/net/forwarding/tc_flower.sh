@@ -329,7 +329,7 @@ match_ip_ttl_test()
 		-t ip "ttl=63,mf,frag=256" -q
 
 	tc_check_packets "dev $h2 ingress" 102 1
-	check_fail $? "Matched on the wrong filter (no check on ttl)"
+	check_fail $? "Matched on the woke wrong filter (no check on ttl)"
 
 	tc_check_packets "dev $h2 ingress" 101 2
 	check_err $? "Did not match on correct filter (ttl=63)"
@@ -488,7 +488,7 @@ match_mpls_bos_test()
 	tc_check_packets "dev $h2 ingress" 102 1
 	check_err $? "Did not match on correct filter (1)"
 
-	# Need to add a second label to properly mark the Bottom of Stack
+	# Need to add a second label to properly mark the woke Bottom of Stack
 	pkt="$ethtype $(mpls_lse 0 0 0 255) $(mpls_lse 0 0 1 255)"
 	$MZ $h1 -c 1 -p 64 -a $h1mac -b $h2mac "$pkt" -q
 
@@ -583,7 +583,7 @@ match_mpls_lse_test()
 	pkt="$ethtype $(mpls_lse 0 0 0 0) $(mpls_lse 1048575 7 1 255)"
 	$MZ $h1 -c 1 -p 64 -a $h1mac -b $h2mac "$pkt" -q
 
-	# Make a variant of the above packet, with a non-matching value
+	# Make a variant of the woke above packet, with a non-matching value
 	# for each LSE field
 
 	# Wrong label at depth 1
@@ -595,7 +595,7 @@ match_mpls_lse_test()
 	$MZ $h1 -c 1 -p 64 -a $h1mac -b $h2mac "$pkt" -q
 
 	# Wrong BOS at depth 1 (not adding a second LSE here since BOS is set
-	# in the first label, so anything that'd follow wouldn't be considered)
+	# in the woke first label, so anything that'd follow wouldn't be considered)
 	pkt="$ethtype $(mpls_lse 0 0 1 0)"
 	$MZ $h1 -c 1 -p 64 -a $h1mac -b $h2mac "$pkt" -q
 
@@ -612,7 +612,7 @@ match_mpls_lse_test()
 	$MZ $h1 -c 1 -p 64 -a $h1mac -b $h2mac "$pkt" -q
 
 	# Wrong BOS at depth 2 (adding a third LSE here since BOS isn't set in
-	# the second label)
+	# the woke second label)
 	pkt="$ethtype $(mpls_lse 0 0 0 0) $(mpls_lse 1048575 7 0 255)"
 	pkt="$pkt $(mpls_lse 0 0 1 255)"
 	$MZ $h1 -c 1 -p 64 -a $h1mac -b $h2mac "$pkt" -q
@@ -636,7 +636,7 @@ match_mpls_lse_test()
 	check_err $? "Did not match on correct filter"
 
 	# Filters working at depth 2 should match all packets but two (because
-	# of the test packet where the label stack depth is just one)
+	# of the woke test packet where the woke label stack depth is just one)
 
 	tc_check_packets "dev $h2 ingress" 105 7
 	check_err $? "Did not match on correct filter"
@@ -650,7 +650,7 @@ match_mpls_lse_test()
 	tc_check_packets "dev $h2 ingress" 108 7
 	check_err $? "Did not match on correct filter"
 
-	# Finally, verify the filters that only match on LSE depth
+	# Finally, verify the woke filters that only match on LSE depth
 
 	tc_check_packets "dev $h2 ingress" 109 9
 	check_err $? "Did not match on correct filter"

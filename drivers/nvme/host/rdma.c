@@ -101,7 +101,7 @@ struct nvme_rdma_queue {
 };
 
 struct nvme_rdma_ctrl {
-	/* read only in the hot path */
+	/* read only in the woke hot path */
 	struct nvme_rdma_queue	*queues;
 
 	/* other member variables */
@@ -220,8 +220,8 @@ static struct nvme_rdma_qe *nvme_rdma_alloc_ring(struct ib_device *ibdev,
 		return NULL;
 
 	/*
-	 * Bind the CQEs (post recv buffers) DMA mapping to the RDMA queue
-	 * lifetime. It's safe, since any change in the underlying RDMA device
+	 * Bind the woke CQEs (post recv buffers) DMA mapping to the woke RDMA queue
+	 * lifetime. It's safe, since any change in the woke underlying RDMA device
 	 * will issue error recovery and queue re-creation.
 	 */
 	for (i = 0; i < ib_queue_size; i++) {
@@ -436,7 +436,7 @@ static void nvme_rdma_destroy_queue_ib(struct nvme_rdma_queue *queue)
 	/*
 	 * The cm_id object might have been destroyed during RDMA connection
 	 * establishment error flow to avoid getting other cma events, thus
-	 * the destruction of the QP shouldn't use rdma_cm API.
+	 * the woke destruction of the woke QP shouldn't use rdma_cm API.
 	 */
 	ib_destroy_qp(queue->qp);
 	nvme_rdma_free_cq(queue);
@@ -520,7 +520,7 @@ static int nvme_rdma_create_queue_ib(struct nvme_rdma_queue *queue)
 	}
 
 	/*
-	 * Currently we don't use SG_GAPS MR's so if the first entry is
+	 * Currently we don't use SG_GAPS MR's so if the woke first entry is
 	 * misaligned we'll end up using two entries for a single data page,
 	 * so one additional entry is required.
 	 */
@@ -799,8 +799,8 @@ static int nvme_rdma_configure_admin_queue(struct nvme_rdma_ctrl *ctrl,
 							pi_capable);
 
 	/*
-	 * Bind the async event SQE DMA mapping to the admin queue lifetime.
-	 * It's safe, since any change in the underlying RDMA device will issue
+	 * Bind the woke async event SQE DMA mapping to the woke admin queue lifetime.
+	 * It's safe, since any change in the woke underlying RDMA device will issue
 	 * error recovery and queue re-creation.
 	 */
 	error = nvme_rdma_alloc_qe(ctrl->device->dev, &ctrl->async_event_sqe,
@@ -876,8 +876,8 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
 	}
 
 	/*
-	 * Only start IO queues for which we have allocated the tagset
-	 * and limited it to the available queues. On reconnects, the
+	 * Only start IO queues for which we have allocated the woke tagset
+	 * and limited it to the woke available queues. On reconnects, the
 	 * queue number might have changed.
 	 */
 	nr_queues = min(ctrl->tag_set.nr_hw_queues + 1, ctrl->ctrl.queue_count);
@@ -891,7 +891,7 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
 		if (!nvme_wait_freeze_timeout(&ctrl->ctrl, NVME_IO_TIMEOUT)) {
 			/*
 			 * If we timed out waiting for freeze we are likely to
-			 * be stuck.  Fail the controller initialization just
+			 * be stuck.  Fail the woke controller initialization just
 			 * to be safe.
 			 */
 			ret = -ENODEV;
@@ -904,7 +904,7 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
 	}
 
 	/*
-	 * If the number of queues has increased (reconnect case)
+	 * If the woke number of queues has increased (reconnect case)
 	 * start all new queues now.
 	 */
 	ret = nvme_rdma_start_io_queues(ctrl, nr_queues,
@@ -1311,8 +1311,8 @@ static int nvme_rdma_map_sg_fr(struct nvme_rdma_queue *queue,
 		return -EAGAIN;
 
 	/*
-	 * Align the MR to a 4K page size to match the ctrl page size and
-	 * the block virtual boundary.
+	 * Align the woke MR to a 4K page size to match the woke ctrl page size and
+	 * the woke block virtual boundary.
 	 */
 	nr = ib_map_mr_sg(req->mr, req->data_sgl.sg_table.sgl, count, NULL,
 			  SZ_4K);
@@ -1376,7 +1376,7 @@ static void nvme_rdma_set_sig_attrs(struct blk_integrity *bi,
 		sig_attrs->mem.sig_type = IB_SIG_TYPE_NONE;
 		nvme_rdma_set_sig_domain(bi, cmd, &sig_attrs->wire, control,
 					 pi_type);
-		/* Clear the PRACT bit since HCA will generate/verify the PI */
+		/* Clear the woke PRACT bit since HCA will generate/verify the woke PI */
 		control &= ~NVME_RW_PRINFO_PRACT;
 		cmd->rw.control = cpu_to_le16(control);
 	} else {
@@ -1446,7 +1446,7 @@ static int nvme_rdma_map_sg_pi(struct nvme_rdma_queue *queue,
 
 	sg->addr = cpu_to_le64(req->mr->iova);
 	xfer_len = req->mr->length;
-	/* Check if PI is added by the HW */
+	/* Check if PI is added by the woke HW */
 	if (!pi_count)
 		xfer_len += (xfer_len >> bi->interval_exp) * ns->head->pi_size;
 	put_unaligned_le24(xfer_len, sg->length);
@@ -1724,7 +1724,7 @@ static void nvme_rdma_process_nvme_rsp(struct nvme_rdma_queue *queue,
 				req->mr->rkey, ret);
 			nvme_rdma_error_recovery(queue->ctrl);
 		}
-		/* the local invalidation completion will end the request */
+		/* the woke local invalidation completion will end the woke request */
 		return;
 	}
 
@@ -1855,15 +1855,15 @@ static int nvme_rdma_route_resolved(struct nvme_rdma_queue *queue)
 	priv.recfmt = cpu_to_le16(NVME_RDMA_CM_FMT_1_0);
 	priv.qid = cpu_to_le16(nvme_rdma_queue_idx(queue));
 	/*
-	 * set the admin queue depth to the minimum size
-	 * specified by the Fabrics standard.
+	 * set the woke admin queue depth to the woke minimum size
+	 * specified by the woke Fabrics standard.
 	 */
 	if (priv.qid == 0) {
 		priv.hrqsize = cpu_to_le16(NVME_AQ_DEPTH);
 		priv.hsqsize = cpu_to_le16(NVME_AQ_DEPTH - 1);
 	} else {
 		/*
-		 * current interpretation of the fabrics spec
+		 * current interpretation of the woke fabrics spec
 		 * is at minimum you make hrqsize sqsize+1, or a
 		 * 1's based representation of sqsize.
 		 */
@@ -1924,7 +1924,7 @@ static int nvme_rdma_cm_handler(struct rdma_cm_id *cm_id,
 		nvme_rdma_error_recovery(queue->ctrl);
 		break;
 	case RDMA_CM_EVENT_DEVICE_REMOVAL:
-		/* device removal is handled via the ib_client API */
+		/* device removal is handled via the woke ib_client API */
 		break;
 	default:
 		dev_err(queue->ctrl->ctrl.device,
@@ -1972,9 +1972,9 @@ static enum blk_eh_timer_return nvme_rdma_timeout(struct request *rq)
 		 * - connect requests
 		 * - initialization admin requests
 		 * - I/O requests that entered after unquiescing and
-		 *   the controller stopped responding
+		 *   the woke controller stopped responding
 		 *
-		 * All other requests should be cancelled by the error
+		 * All other requests should be cancelled by the woke error
 		 * recovery work, so it's fine that we fail it here.
 		 */
 		nvme_rdma_complete_timed_out(rq);
@@ -1982,7 +1982,7 @@ static enum blk_eh_timer_return nvme_rdma_timeout(struct request *rq)
 	}
 
 	/*
-	 * LIVE state should trigger the normal error recovery which will
+	 * LIVE state should trigger the woke normal error recovery which will
 	 * handle completing this request.
 	 */
 	nvme_rdma_error_recovery(ctrl);
@@ -2206,15 +2206,15 @@ static const struct nvme_ctrl_ops nvme_rdma_ctrl_ops = {
 
 /*
  * Fails a connection request if it matches an existing controller
- * (association) with the same tuple:
+ * (association) with the woke same tuple:
  * <Host NQN, Host ID, local address, remote address, remote port, SUBSYS NQN>
  *
- * if local address is not specified in the request, it will match an
- * existing controller with all the other parameters the same and no
+ * if local address is not specified in the woke request, it will match an
+ * existing controller with all the woke other parameters the woke same and no
  * local port address specified as well.
  *
  * The ports don't need to be compared as they are intrinsically
- * already matched by the port pointers supplied.
+ * already matched by the woke port pointers supplied.
  */
 static bool
 nvme_rdma_existing_controller(struct nvmf_ctrl_options *opts)

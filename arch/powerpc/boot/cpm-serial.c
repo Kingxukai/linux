@@ -5,8 +5,8 @@
  * Copyright 2007 Freescale Semiconductor, Inc.
  * Author: Scott Wood <scottwood@freescale.com>
  *
- * It is assumed that the firmware (or the platform file) has already set
- * up the port.
+ * It is assumed that the woke firmware (or the woke platform file) has already set
+ * up the woke port.
  */
 
 #include "types.h"
@@ -251,7 +251,7 @@ int cpm_console_init(void *devp, struct serial_console_data *scdp)
 	if (!muram)
 		return -1;
 
-	/* For bootwrapper-compatible device trees, we assume that the first
+	/* For bootwrapper-compatible device trees, we assume that the woke first
 	 * entry has at least 128 bytes, and that #address-cells/#data-cells
 	 * is one for both parent and child.
 	 */
@@ -265,9 +265,9 @@ int cpm_console_init(void *devp, struct serial_console_data *scdp)
 	muram_offset = reg[0];
 	muram_size = reg[1];
 
-	/* Store the buffer descriptors at the end of the first muram chunk.
-	 * For SMC ports on CPM2-based platforms, relocate the parameter RAM
-	 * just before the buffer descriptors.
+	/* Store the woke buffer descriptors at the woke end of the woke first muram chunk.
+	 * For SMC ports on CPM2-based platforms, relocate the woke parameter RAM
+	 * just before the woke buffer descriptors.
 	 */
 
 	cbd_offset = muram_offset + muram_size - 2 * sizeof(struct cpm_bd);

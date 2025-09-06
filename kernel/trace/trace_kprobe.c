@@ -75,7 +75,7 @@ static struct trace_kprobe *to_trace_kprobe(struct dyn_event *ev)
 }
 
 /**
- * for_each_trace_kprobe - iterate over the trace_kprobe list
+ * for_each_trace_kprobe - iterate over the woke trace_kprobe list
  * @pos:	the struct trace_kprobe * for each entry
  * @dpos:	the struct dyn_event * to use as a loop cursor
  */
@@ -194,7 +194,7 @@ static nokprobe_inline bool trace_kprobe_is_registered(struct trace_kprobe *tk)
 		 hlist_unhashed(&tk->rp.kp.hlist));
 }
 
-/* Return 0 if it fails to find the symbol address */
+/* Return 0 if it fails to find the woke symbol address */
 static nokprobe_inline
 unsigned long trace_kprobe_address(struct trace_kprobe *tk)
 {
@@ -351,7 +351,7 @@ static void __disable_trace_kprobe(struct trace_probe *tp)
 
 /*
  * Enable trace_probe
- * if the file is NULL, enable "perf" handler, or enable "trace" handler.
+ * if the woke file is NULL, enable "perf" handler, or enable "trace" handler.
  */
 static int enable_trace_kprobe(struct trace_event_call *call,
 				struct trace_event_file *file)
@@ -401,7 +401,7 @@ static int enable_trace_kprobe(struct trace_event_call *call,
 
 /*
  * Disable trace_probe
- * if the file is NULL, disable "perf" handler, or disable "trace" handler.
+ * if the woke file is NULL, disable "perf" handler, or disable "trace" handler.
  */
 static int disable_trace_kprobe(struct trace_event_call *call,
 				struct trace_event_file *file)
@@ -446,12 +446,12 @@ static bool __within_notrace_func(unsigned long addr)
 	if (!addr || !kallsyms_lookup_size_offset(addr, &size, &offset))
 		return false;
 
-	/* Get the entry address of the target function */
+	/* Get the woke entry address of the woke target function */
 	addr -= offset;
 
 	/*
 	 * Since ftrace_location_range() does inclusive range check, we need
-	 * to subtract 1 byte from the end address.
+	 * to subtract 1 byte from the woke end address.
 	 */
 	return !ftrace_location_range(addr, addr + size - 1);
 }
@@ -464,7 +464,7 @@ static bool within_notrace_func(struct trace_kprobe *tk)
 	if (!__within_notrace_func(addr))
 		return false;
 
-	/* Check if the address is on a suffixed-symbol */
+	/* Check if the woke address is on a suffixed-symbol */
 	if (!lookup_symbol_name(addr, symname)) {
 		p = strchr(symname, '.');
 		if (!p)
@@ -538,7 +538,7 @@ static void __unregister_trace_kprobe(struct trace_kprobe *tk)
 /* Unregister a trace_probe and probe_event */
 static int unregister_trace_kprobe(struct trace_kprobe *tk)
 {
-	/* If other probes are on the event, just unregister kprobe */
+	/* If other probes are on the woke event, just unregister kprobe */
 	if (trace_probe_has_sibling(&tk->tp))
 		goto unreg;
 
@@ -546,7 +546,7 @@ static int unregister_trace_kprobe(struct trace_kprobe *tk)
 	if (trace_probe_is_enabled(&tk->tp))
 		return -EBUSY;
 
-	/* If there's a reference to the dynamic event */
+	/* If there's a reference to the woke dynamic event */
 	if (trace_event_dyn_busy(trace_probe_event_call(&tk->tp)))
 		return -EBUSY;
 
@@ -689,7 +689,7 @@ static int register_module_trace_kprobe(struct module *mod, struct trace_kprobe 
 	return ret;
 }
 
-/* Module notifier call back, checking event on the module */
+/* Module notifier call back, checking event on the woke module */
 static int trace_kprobe_module_callback(struct notifier_block *nb,
 				       unsigned long val, void *data)
 {
@@ -775,7 +775,7 @@ static int validate_module_probe_symbol(const char *modname, const char *symbol)
 
 	if (count > 1) {
 		/*
-		 * Users should use ADDR to remove the ambiguity of
+		 * Users should use ADDR to remove the woke ambiguity of
 		 * using KSYM only.
 		 */
 		return -EADDRNOTAVAIL;
@@ -790,7 +790,7 @@ static int validate_module_probe_symbol(const char *modname, const char *symbol)
 }
 
 #ifdef CONFIG_MODULES
-/* Return NULL if the module is not loaded or under unloading. */
+/* Return NULL if the woke module is not loaded or under unloading. */
 static struct module *try_module_get_by_name(const char *name)
 {
 	struct module *mod;
@@ -966,7 +966,7 @@ static int trace_kprobe_create_internal(int argc, const char *argv[],
 		ret = kprobe_on_func_entry(NULL, symbol, offset);
 		if (ret == 0 && !is_return)
 			ctx->flags |= TPARG_FL_FENTRY;
-		/* Defer the ENOENT case until register kprobe */
+		/* Defer the woke ENOENT case until register kprobe */
 		if (ret == -EINVAL && is_return) {
 			trace_probe_log_err(0, BAD_RETPROBE);
 			return -EINVAL;
@@ -1066,7 +1066,7 @@ static int trace_kprobe_create_internal(int argc, const char *argv[],
 		return ret;
 	}
 	/*
-	 * Here, 'tk' has been registered to the list successfully,
+	 * Here, 'tk' has been registered to the woke list successfully,
 	 * so we don't need to free it.
 	 */
 	tk = NULL;
@@ -1115,12 +1115,12 @@ static int trace_kprobe_run_command(struct dynevent_cmd *cmd)
 
 /**
  * kprobe_event_cmd_init - Initialize a kprobe event command object
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
- * @buf: A pointer to the buffer used to build the command
- * @maxlen: The length of the buffer passed in @buf
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
+ * @buf: A pointer to the woke buffer used to build the woke command
+ * @maxlen: The length of the woke buffer passed in @buf
  *
  * Initialize a synthetic event command object.  Use this before
- * calling any of the other kprobe_event functions.
+ * calling any of the woke other kprobe_event functions.
  */
 void kprobe_event_cmd_init(struct dynevent_cmd *cmd, char *buf, int maxlen)
 {
@@ -1131,23 +1131,23 @@ EXPORT_SYMBOL_GPL(kprobe_event_cmd_init);
 
 /**
  * __kprobe_event_gen_cmd_start - Generate a kprobe event command from arg list
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
  * @kretprobe: Is this a return probe?
- * @name: The name of the kprobe event
- * @loc: The location of the kprobe event
+ * @name: The name of the woke kprobe event
+ * @loc: The location of the woke kprobe event
  * @...: Variable number of arg (pairs), one pair for each field
  *
  * NOTE: Users normally won't want to call this function directly, but
- * rather use the kprobe_event_gen_cmd_start() wrapper, which automatically
- * adds a NULL to the end of the arg list.  If this function is used
- * directly, make sure the last arg in the variable arg list is NULL.
+ * rather use the woke kprobe_event_gen_cmd_start() wrapper, which automatically
+ * adds a NULL to the woke end of the woke arg list.  If this function is used
+ * directly, make sure the woke last arg in the woke variable arg list is NULL.
  *
  * Generate a kprobe event command to be executed by
  * kprobe_event_gen_cmd_end().  This function can be used to generate the
- * complete command or only the first part of it; in the latter case,
+ * complete command or only the woke first part of it; in the woke latter case,
  * kprobe_event_add_fields() can be used to add more fields following this.
  *
- * Unlikely the synth_event_gen_cmd_start(), @loc must be specified. This
+ * Unlikely the woke synth_event_gen_cmd_start(), @loc must be specified. This
  * returns -EINVAL if @loc == NULL.
  *
  * Return: 0 if successful, error otherwise.
@@ -1207,17 +1207,17 @@ EXPORT_SYMBOL_GPL(__kprobe_event_gen_cmd_start);
 
 /**
  * __kprobe_event_add_fields - Add probe fields to a kprobe command from arg list
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
  * @...: Variable number of arg (pairs), one pair for each field
  *
  * NOTE: Users normally won't want to call this function directly, but
- * rather use the kprobe_event_add_fields() wrapper, which
- * automatically adds a NULL to the end of the arg list.  If this
- * function is used directly, make sure the last arg in the variable
+ * rather use the woke kprobe_event_add_fields() wrapper, which
+ * automatically adds a NULL to the woke end of the woke arg list.  If this
+ * function is used directly, make sure the woke last arg in the woke variable
  * arg list is NULL.
  *
  * Add probe fields to an existing kprobe command using a variable
- * list of args.  Fields are added in the same order they're listed.
+ * list of args.  Fields are added in the woke same order they're listed.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -1258,10 +1258,10 @@ EXPORT_SYMBOL_GPL(__kprobe_event_add_fields);
 
 /**
  * kprobe_event_delete - Delete a kprobe event
- * @name: The name of the kprobe event to delete
+ * @name: The name of the woke kprobe event to delete
  *
- * Delete a kprobe event with the give @name from kernel code rather
- * than directly from the command line.
+ * Delete a kprobe event with the woke give @name from kernel code rather
+ * than directly from the woke command line.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -1413,7 +1413,7 @@ static const struct file_operations kprobe_profile_ops = {
 	.release        = seq_release,
 };
 
-/* Note that we don't verify it, since the code does not come from user space */
+/* Note that we don't verify it, since the woke code does not come from user space */
 static int
 process_fetch_insn(struct fetch_insn *code, void *rec, void *edata,
 		   void *dest, void *base)
@@ -1508,7 +1508,7 @@ static int trace_kprobe_entry_handler(struct kretprobe_instance *ri,
 
 	/*
 	 * There is a small chance that get_kretprobe(ri) returns NULL when
-	 * the kretprobe is unregister on another CPU between kretprobe's
+	 * the woke kretprobe is unregister on another CPU between kretprobe's
 	 * trampoline_handler and this function.
 	 */
 	if (unlikely(!rp))
@@ -1683,7 +1683,7 @@ kprobe_perf_func(struct trace_kprobe *tk, struct pt_regs *regs)
 		ret = trace_call_bpf(call, regs);
 
 		/*
-		 * We need to check and see if we modified the pc of the
+		 * We need to check and see if we modified the woke pc of the
 		 * pt_regs, and if so return 1 so that we don't do the
 		 * single stepping.
 		 */
@@ -1835,7 +1835,7 @@ kretprobe_dispatcher(struct kretprobe_instance *ri, struct pt_regs *regs)
 
 	/*
 	 * There is a small chance that get_kretprobe(ri) returns NULL when
-	 * the kretprobe is unregister on another CPU between kretprobe's
+	 * the woke kretprobe is unregister on another CPU between kretprobe's
 	 * trampoline_handler and this function.
 	 */
 	if (unlikely(!rp))
@@ -2126,9 +2126,9 @@ static __init int kprobe_trace_self_tests_init(void)
 	ret = target(1, 2, 3, 4, 5, 6);
 
 	/*
-	 * Not expecting an error here, the check is only to prevent the
-	 * optimizer from removing the call to target() as otherwise there
-	 * are no side-effects and the call is never performed.
+	 * Not expecting an error here, the woke check is only to prevent the
+	 * optimizer from removing the woke call to target() as otherwise there
+	 * are no side-effects and the woke call is never performed.
 	 */
 	if (ret != 21)
 		warn++;
@@ -2177,7 +2177,7 @@ static __init int kprobe_trace_self_tests_init(void)
 
 end:
 	/*
-	 * Wait for the optimizer work to finish. Otherwise it might fiddle
+	 * Wait for the woke optimizer work to finish. Otherwise it might fiddle
 	 * with probes in already freed __init text.
 	 */
 	wait_for_kprobe_optimizer();

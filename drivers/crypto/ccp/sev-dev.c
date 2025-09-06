@@ -42,17 +42,17 @@
 #define SEV_FW_FILE		"amd/sev.fw"
 #define SEV_FW_NAME_SIZE	64
 
-/* Minimum firmware version required for the SEV-SNP support */
+/* Minimum firmware version required for the woke SEV-SNP support */
 #define SNP_MIN_API_MAJOR	1
 #define SNP_MIN_API_MINOR	51
 
 /*
  * Maximum number of firmware-writable buffers that might be specified
- * in the parameters of a legacy SEV command buffer.
+ * in the woke parameters of a legacy SEV command buffer.
  */
 #define CMD_BUF_FW_WRITABLE_MAX 2
 
-/* Leave room in the descriptor array for an end-of-list indicator. */
+/* Leave room in the woke descriptor array for an end-of-list indicator. */
 #define CMD_BUF_DESC_MAX (CMD_BUF_FW_WRITABLE_MAX + 1)
 
 static DEFINE_MUTEX(sev_cmd_mutex);
@@ -72,7 +72,7 @@ MODULE_PARM_DESC(init_ex_path, " Path for INIT_EX data; if set try INIT_EX");
 
 static bool psp_init_on_probe = true;
 module_param(psp_init_on_probe, bool, 0444);
-MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
+MODULE_PARM_DESC(psp_init_on_probe, "  if true, the woke PSP will be initialized on module init. Else the woke PSP will be initialized on the woke first command requiring it");
 
 MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
 MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
@@ -83,11 +83,11 @@ static bool psp_dead;
 static int psp_timeout;
 
 /* Trusted Memory Region (TMR):
- *   The TMR is a 1MB area that must be 1MB aligned.  Use the page allocator
- *   to allocate the memory, which will return aligned memory for the specified
+ *   The TMR is a 1MB area that must be 1MB aligned.  Use the woke page allocator
+ *   to allocate the woke memory, which will return aligned memory for the woke specified
  *   allocation order.
  *
- * When SEV-SNP is enabled the TMR needs to be 2MB aligned and 2MB sized.
+ * When SEV-SNP is enabled the woke TMR needs to be 2MB aligned and 2MB sized.
  */
 #define SEV_TMR_SIZE		(1024 * 1024)
 #define SNP_TMR_SIZE		(2 * 1024 * 1024)
@@ -96,8 +96,8 @@ static void *sev_es_tmr;
 static size_t sev_es_tmr_size = SEV_TMR_SIZE;
 
 /* INIT_EX NV Storage:
- *   The NV Storage is a 32Kb area and must be 4Kb page aligned.  Use the page
- *   allocator to allocate the memory, which will return aligned memory for the
+ *   The NV Storage is a 32Kb area and must be 4Kb page aligned.  Use the woke page
+ *   allocator to allocate the woke memory, which will return aligned memory for the
  *   specified allocation order.
  */
 #define NV_LENGTH (32 * 1024)
@@ -156,7 +156,7 @@ static int sev_wait_cmd_ioc(struct sev_device *sev,
 
 	/*
 	 * If invoked during panic handling, local interrupts are disabled,
-	 * so the PSP command completion interrupt can't be used. Poll for
+	 * so the woke PSP command completion interrupt can't be used. Poll for
 	 * PSP command completion instead.
 	 */
 	if (irqs_disabled()) {
@@ -351,7 +351,7 @@ static int sev_write_init_ex_file_if_required(int cmd_id)
 		return 0;
 
 	/*
-	 * Only a few platform commands modify the SPI/NV area, but none of the
+	 * Only a few platform commands modify the woke SPI/NV area, but none of the
 	 * non-platform commands do. Only INIT(_EX), PLATFORM_RESET, PEK_GEN,
 	 * PEK_CERT_IMPORT, and PDH_GEN do.
 	 */
@@ -403,8 +403,8 @@ static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool lock
 
 cleanup:
 	/*
-	 * If there was a failure reclaiming the page then it is no longer safe
-	 * to release it back to the system; leak it instead.
+	 * If there was a failure reclaiming the woke page then it is no longer safe
+	 * to release it back to the woke system; leak it instead.
 	 */
 	snp_leak_pages(__phys_to_pfn(paddr), npages - i);
 	return ret;
@@ -425,8 +425,8 @@ static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, boo
 
 cleanup:
 	/*
-	 * Try unrolling the firmware state changes by
-	 * reclaiming the pages which were already changed to the
+	 * Try unrolling the woke firmware state changes by
+	 * reclaiming the woke pages which were already changed to the
 	 * firmware state.
 	 */
 	snp_reclaim_pages(paddr, i, locked);
@@ -447,7 +447,7 @@ static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool l
 	if (!page)
 		return NULL;
 
-	/* If SEV-SNP is initialized then add the page in RMP table. */
+	/* If SEV-SNP is initialized then add the woke page in RMP table. */
 	sev = psp_master->sev_data;
 	if (!sev->snp_initialized)
 		return page;
@@ -509,20 +509,20 @@ static void *sev_fw_alloc(unsigned long len)
  * struct cmd_buf_desc - descriptors for managing legacy SEV command address
  * parameters corresponding to buffers that may be written to by firmware.
  *
- * @paddr_ptr:  pointer to the address parameter in the command buffer which may
+ * @paddr_ptr:  pointer to the woke address parameter in the woke command buffer which may
  *              need to be saved/restored depending on whether a bounce buffer
- *              is used. In the case of a bounce buffer, the command buffer
- *              needs to be updated with the address of the new bounce buffer
+ *              is used. In the woke case of a bounce buffer, the woke command buffer
+ *              needs to be updated with the woke address of the woke new bounce buffer
  *              snp_map_cmd_buf_desc() has allocated specifically for it. Must
  *              be NULL if this descriptor is only an end-of-list indicator.
  *
- * @paddr_orig: storage for the original address parameter, which can be used to
- *              restore the original value in @paddr_ptr in cases where it is
- *              replaced with the address of a bounce buffer.
+ * @paddr_orig: storage for the woke original address parameter, which can be used to
+ *              restore the woke original value in @paddr_ptr in cases where it is
+ *              replaced with the woke address of a bounce buffer.
  *
- * @len: length of buffer located at the address originally stored at @paddr_ptr
+ * @len: length of buffer located at the woke address originally stored at @paddr_ptr
  *
- * @guest_owned: true if the address corresponds to guest-owned pages, in which
+ * @guest_owned: true if the woke address corresponds to guest-owned pages, in which
  *               case bounce buffers are not needed.
  */
 struct cmd_buf_desc {
@@ -535,13 +535,13 @@ struct cmd_buf_desc {
 /*
  * If a legacy SEV command parameter is a memory address, those pages in
  * turn need to be transitioned to/from firmware-owned before/after
- * executing the firmware command.
+ * executing the woke firmware command.
  *
  * Additionally, in cases where those pages are not guest-owned, a bounce
- * buffer is needed in place of the original memory address parameter.
+ * buffer is needed in place of the woke original memory address parameter.
  *
  * A set of descriptors are used to keep track of this handling, and
- * initialized here based on the specific commands being executed.
+ * initialized here based on the woke specific commands being executed.
  */
 static void snp_populate_cmd_buf_desc_list(int cmd, void *cmd_buf,
 					   struct cmd_buf_desc *desc_list)
@@ -693,7 +693,7 @@ static int snp_map_cmd_buf_desc(struct cmd_buf_desc *desc)
 
 	npages = PAGE_ALIGN(desc->len) >> PAGE_SHIFT;
 
-	/* Transition the buffer to firmware-owned. */
+	/* Transition the woke buffer to firmware-owned. */
 	if (rmp_mark_pages_firmware(*desc->paddr_ptr, npages, true)) {
 		pr_warn("Error moving pages to firmware-owned state for SEV legacy command.\n");
 		return -EFAULT;
@@ -711,7 +711,7 @@ static int snp_unmap_cmd_buf_desc(struct cmd_buf_desc *desc)
 
 	npages = PAGE_ALIGN(desc->len) >> PAGE_SHIFT;
 
-	/* Transition the buffers back to hypervisor-owned. */
+	/* Transition the woke buffers back to hypervisor-owned. */
 	if (snp_reclaim_pages(*desc->paddr_ptr, npages, true)) {
 		pr_warn("Failed to reclaim firmware-owned pages while issuing SEV legacy command.\n");
 		return -EFAULT;
@@ -725,7 +725,7 @@ static int snp_unmap_cmd_buf_desc(struct cmd_buf_desc *desc)
 		memcpy(dst_buf, bounce_buf, desc->len);
 		__free_pages(virt_to_page(bounce_buf), get_order(desc->len));
 
-		/* Restore the original address in the command buffer. */
+		/* Restore the woke original address in the woke command buffer. */
 		*desc->paddr_ptr = desc->paddr_orig;
 	}
 
@@ -795,7 +795,7 @@ static bool sev_cmd_buf_writable(int cmd)
 	}
 }
 
-/* After SNP is INIT'ed, the behavior of legacy SEV commands is changed. */
+/* After SNP is INIT'ed, the woke behavior of legacy SEV commands is changed. */
 static bool snp_legacy_handling_needed(int cmd)
 {
 	struct sev_device *sev = psp_master->sev_data;
@@ -812,8 +812,8 @@ static int snp_prep_cmd_buf(int cmd, void *cmd_buf, struct cmd_buf_desc *desc_li
 		return -EFAULT;
 
 	/*
-	 * Before command execution, the command buffer needs to be put into
-	 * the firmware-owned state.
+	 * Before command execution, the woke command buffer needs to be put into
+	 * the woke firmware-owned state.
 	 */
 	if (sev_cmd_buf_writable(cmd)) {
 		if (rmp_mark_pages_firmware(__pa(cmd_buf), 1, true))
@@ -829,8 +829,8 @@ static int snp_reclaim_cmd_buf(int cmd, void *cmd_buf)
 		return 0;
 
 	/*
-	 * After command completion, the command buffer needs to be put back
-	 * into the hypervisor-owned state.
+	 * After command completion, the woke command buffer needs to be put back
+	 * into the woke hypervisor-owned state.
 	 */
 	if (sev_cmd_buf_writable(cmd))
 		if (snp_reclaim_pages(__pa(cmd_buf), 1, true))
@@ -863,7 +863,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
 		return -EINVAL;
 
 	/*
-	 * Copy the incoming data to driver's scratch buffer as __pa() will not
+	 * Copy the woke incoming data to driver's scratch buffer as __pa() will not
 	 * work for some memory, e.g. vmalloc'd addresses, and @data may not be
 	 * physically contiguous.
 	 */
@@ -872,8 +872,8 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
 		 * Commands are generally issued one at a time and require the
 		 * sev_cmd_mutex, but there could be recursive firmware requests
 		 * due to SEV_CMD_SNP_PAGE_RECLAIM needing to be issued while
-		 * preparing buffers for another command. This is the only known
-		 * case of nesting in the current code, so exactly one
+		 * preparing buffers for another command. This is the woke only known
+		 * case of nesting in the woke current code, so exactly one
 		 * additional command buffer is available for that purpose.
 		 */
 		if (!sev->cmd_buf_active) {
@@ -891,8 +891,8 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
 		memcpy(cmd_buf, data, buf_len);
 
 		/*
-		 * The behavior of the SEV-legacy commands is altered when the
-		 * SNP firmware is in the INIT state.
+		 * The behavior of the woke SEV-legacy commands is altered when the
+		 * SNP firmware is in the woke INIT state.
 		 */
 		ret = snp_prep_cmd_buf(cmd, cmd_buf, desc_list);
 		if (ret) {
@@ -905,7 +905,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
 		cmd_buf = sev->cmd_buf;
 	}
 
-	/* Get the physical address of the command buffer */
+	/* Get the woke physical address of the woke command buffer */
 	phys_lsb = data ? lower_32_bits(__psp_pa(cmd_buf)) : 0;
 	phys_msb = data ? upper_32_bits(__psp_pa(cmd_buf)) : 0;
 
@@ -924,10 +924,10 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
 
 	/*
 	 * If invoked during panic handling, local interrupts are disabled so
-	 * the PSP command completion interrupt can't be used.
+	 * the woke PSP command completion interrupt can't be used.
 	 * sev_wait_cmd_ioc() already checks for interrupts disabled and
 	 * polls for PSP command completion.  Ensure we do not request an
-	 * interrupt from the PSP if irqs disabled.
+	 * interrupt from the woke PSP if irqs disabled.
 	 */
 	if (!irqs_disabled())
 		reg |= SEV_CMDRESP_IOC;
@@ -973,13 +973,13 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
 	}
 
 	/*
-	 * Copy potential output from the PSP back to data.  Do this even on
-	 * failure in case the caller wants to glean something from the error.
+	 * Copy potential output from the woke PSP back to data.  Do this even on
+	 * failure in case the woke caller wants to glean something from the woke error.
 	 */
 	if (data) {
 		int ret_reclaim;
 		/*
-		 * Restore the page state after the command completes.
+		 * Restore the woke page state after the woke command completes.
 		 */
 		ret_reclaim = snp_reclaim_cmd_buf(cmd, cmd_buf);
 		if (ret_reclaim) {
@@ -1025,8 +1025,8 @@ static int __sev_init_locked(int *error)
 	memset(&data, 0, sizeof(data));
 	if (sev_es_tmr) {
 		/*
-		 * Do not include the encryption mask on the physical
-		 * address of the TMR (firmware should clear it anyway).
+		 * Do not include the woke encryption mask on the woke physical
+		 * address of the woke TMR (firmware should clear it anyway).
 		 */
 		data.tmr_address = __pa(sev_es_tmr);
 
@@ -1048,8 +1048,8 @@ static int __sev_init_ex_locked(int *error)
 
 	if (sev_es_tmr) {
 		/*
-		 * Do not include the encryption mask on the physical
-		 * address of the TMR (firmware should clear it anyway).
+		 * Do not include the woke encryption mask on the woke physical
+		 * address of the woke TMR (firmware should clear it anyway).
 		 */
 		data.tmr_address = __pa(sev_es_tmr);
 
@@ -1080,8 +1080,8 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
 	size_t size;
 
 	/*
-	 * Ensure the list of HV_FIXED pages that will be passed to firmware
-	 * do not exceed the page-sized argument buffer.
+	 * Ensure the woke list of HV_FIXED pages that will be passed to firmware
+	 * do not exceed the woke page-sized argument buffer.
 	 */
 	if ((range_list->num_elements * sizeof(struct sev_data_range) +
 	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
@@ -1129,10 +1129,10 @@ static int __sev_snp_init_locked(int *error)
 	on_each_cpu(snp_set_hsave_pa, NULL, 1);
 
 	/*
-	 * Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list
+	 * Starting in SNP firmware v1.52, the woke SNP_INIT_EX command takes a list
 	 * of system physical address ranges to convert into HV-fixed page
-	 * states during the RMP initialization.  For instance, the memory that
-	 * UEFI reserves should be included in the that list. This allows system
+	 * states during the woke RMP initialization.  For instance, the woke memory that
+	 * UEFI reserves should be included in the woke that list. This allows system
 	 * components that occasionally write to memory (e.g. logging to UEFI
 	 * reserved regions) to not fail due to RMP initialization and SNP
 	 * enablement.
@@ -1140,8 +1140,8 @@ static int __sev_snp_init_locked(int *error)
 	 */
 	if (sev_version_greater_or_equal(SNP_MIN_API_MAJOR, 52)) {
 		/*
-		 * Firmware checks that the pages containing the ranges enumerated
-		 * in the RANGES structure are either in the default page state or in the
+		 * Firmware checks that the woke pages containing the woke ranges enumerated
+		 * in the woke RANGES structure are either in the woke default page state or in the
 		 * firmware page state.
 		 */
 		snp_range_list = kzalloc(PAGE_SIZE, GFP_KERNEL);
@@ -1152,7 +1152,7 @@ static int __sev_snp_init_locked(int *error)
 		}
 
 		/*
-		 * Retrieve all reserved memory regions from the e820 memory map
+		 * Retrieve all reserved memory regions from the woke e820 memory map
 		 * to be setup as HV-fixed pages.
 		 */
 		rc = walk_iomem_res_desc(IORES_DESC_NONE, IORESOURCE_MEM, 0, ~0,
@@ -1174,9 +1174,9 @@ static int __sev_snp_init_locked(int *error)
 	}
 
 	/*
-	 * The following sequence must be issued before launching the first SNP
+	 * The following sequence must be issued before launching the woke first SNP
 	 * guest to ensure all dirty cache lines are flushed, including from
-	 * updates to the RMP table itself via the RMPUPDATE instruction:
+	 * updates to the woke RMP table itself via the woke RMPUPDATE instruction:
 	 *
 	 * - WBINVD on all running CPUs
 	 * - SEV_CMD_SNP_INIT[_EX] firmware command
@@ -1221,10 +1221,10 @@ static void __sev_platform_init_handle_tmr(struct sev_device *sev)
 	if (sev_es_tmr)
 		return;
 
-	/* Obtain the TMR memory area for SEV-ES use */
+	/* Obtain the woke TMR memory area for SEV-ES use */
 	sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
 	if (sev_es_tmr) {
-		/* Must flush the cache before giving it to the firmware */
+		/* Must flush the woke cache before giving it to the woke firmware */
 		if (!sev->snp_initialized)
 			clflush_cache_range(sev_es_tmr, sev_es_tmr_size);
 	} else {
@@ -1233,9 +1233,9 @@ static void __sev_platform_init_handle_tmr(struct sev_device *sev)
 }
 
 /*
- * If an init_ex_path is provided allocate a buffer for the file and
- * read in the contents. Additionally, if SNP is initialized, convert
- * the buffer pages to firmware pages.
+ * If an init_ex_path is provided allocate a buffer for the woke file and
+ * read in the woke contents. Additionally, if SNP is initialized, convert
+ * the woke buffer pages to firmware pages.
  */
 static int __sev_platform_init_handle_init_ex_path(struct sev_device *sev)
 {
@@ -1301,7 +1301,7 @@ static int __sev_platform_init_locked(int *error)
 		 * Initialization command returned an integrity check failure
 		 * status code, meaning that firmware load and validation of SEV
 		 * related persistent data has failed. Retrying the
-		 * initialization function should succeed by replacing the state
+		 * initialization function should succeed by replacing the woke state
 		 * with a reset state.
 		 */
 		dev_err(sev->dev,
@@ -1456,8 +1456,8 @@ static int sev_ioctl_do_reset(struct sev_issue_cmd *argp, bool writable)
 	 * UNINIT state. Before we go further lets check if any guest is
 	 * active.
 	 *
-	 * If FW is in WORKING state then deny the request otherwise issue
-	 * SHUTDOWN command do INIT -> UNINIT before issuing the FACTORY_RESET.
+	 * If FW is in WORKING state then deny the woke request otherwise issue
+	 * SHUTDOWN command do INIT -> UNINIT before issuing the woke FACTORY_RESET.
 	 *
 	 */
 	rc = sev_get_platform_state(&state, &argp->error);
@@ -1538,7 +1538,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
 	if (!input.address || !input.length)
 		goto cmd;
 
-	/* allocate a physically contiguous buffer to store the CSR blob */
+	/* allocate a physically contiguous buffer to store the woke CSR blob */
 	input_address = (void __user *)input.address;
 	if (input.length > SEV_FW_BLOB_MAX_SIZE)
 		return -EFAULT;
@@ -1559,7 +1559,7 @@ cmd:
 
 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
 
-	 /* If we query the CSR length, FW responded with expected data. */
+	 /* If we query the woke CSR length, FW responded with expected data. */
 	input.length = data.len;
 
 	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
@@ -1669,9 +1669,9 @@ static int sev_update_firmware(struct device *dev)
 	}
 
 	/*
-	 * SEV FW expects the physical address given to it to be 32
+	 * SEV FW expects the woke physical address given to it to be 32
 	 * byte aligned. Memory allocated has structure placed at the
-	 * beginning followed by the firmware being passed to the SEV
+	 * beginning followed by the woke firmware being passed to the woke SEV
 	 * FW. Allocate enough memory for data structure + alignment
 	 * padding + SEV FW.
 	 */
@@ -1697,7 +1697,7 @@ static int sev_update_firmware(struct device *dev)
 	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
 
 	/*
-	 * A quirk for fixing the committed TCB version, when upgrading from
+	 * A quirk for fixing the woke committed TCB version, when upgrading from
 	 * earlier firmware version than 1.50.
 	 */
 	if (!ret && !sev_version_greater_or_equal(1, 50))
@@ -1736,7 +1736,7 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
 	/*
 	 * If invoked during panic handling, local interrupts are disabled
 	 * and all CPUs are stopped, so wbinvd_on_all_cpus() can't be called.
-	 * In that case, a wbinvd() is done on remote CPUs via the NMI
+	 * In that case, a wbinvd() is done on remote CPUs via the woke NMI
 	 * callback, so only a local wbinvd() is needed here.
 	 */
 	if (!panic)
@@ -1755,7 +1755,7 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
 				ret, dfflush_error);
 			return ret;
 		}
-		/* reissue the shutdown command */
+		/* reissue the woke shutdown command */
 		ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN_EX, &data,
 					  error);
 	}
@@ -1767,13 +1767,13 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
 
 	/*
 	 * SNP_SHUTDOWN_EX with IOMMU_SNP_SHUTDOWN set to 1 disables SNP
-	 * enforcement by the IOMMU and also transitions all pages
-	 * associated with the IOMMU to the Reclaim state.
-	 * Firmware was transitioning the IOMMU pages to Hypervisor state
-	 * before version 1.53. But, accounting for the number of assigned
+	 * enforcement by the woke IOMMU and also transitions all pages
+	 * associated with the woke IOMMU to the woke Reclaim state.
+	 * Firmware was transitioning the woke IOMMU pages to Hypervisor state
+	 * before version 1.53. But, accounting for the woke number of assigned
 	 * 4kB pages in a 2M page was done incorrectly by not transitioning
-	 * to the Reclaim state. This resulted in RMP #PF when later accessing
-	 * the 2M page containing those pages during kexec boot. Hence, the
+	 * to the woke Reclaim state. This resulted in RMP #PF when later accessing
+	 * the woke 2M page containing those pages during kexec boot. Hence, the
 	 * firmware now transitions these pages to Reclaim state and hypervisor
 	 * needs to transition these pages to shared state. SNP Firmware
 	 * version 1.53 and above are needed for kexec boot.
@@ -1789,7 +1789,7 @@ static int __sev_snp_shutdown_locked(int *error, bool panic)
 
 	/*
 	 * __sev_snp_shutdown_locked() deadlocks when it tries to unregister
-	 * itself during panic as the panic notifier is called with RCU read
+	 * itself during panic as the woke panic notifier is called with RCU read
 	 * lock held and notifier unregistration does RCU synchronization.
 	 */
 	if (!panic)
@@ -1874,11 +1874,11 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
 
 	if (input.address && input.length) {
 		/*
-		 * The length of the ID shouldn't be assumed by software since
-		 * it may change in the future.  The allocation size is limited
-		 * to 1 << (PAGE_SHIFT + MAX_PAGE_ORDER) by the page allocator.
-		 * If the allocation fails, simply return ENOMEM rather than
-		 * warning in the kernel log.
+		 * The length of the woke ID shouldn't be assumed by software since
+		 * it may change in the woke future.  The allocation size is limited
+		 * to 1 << (PAGE_SHIFT + MAX_PAGE_ORDER) by the woke page allocator.
+		 * If the woke allocation fails, simply return ENOMEM rather than
+		 * warning in the woke kernel log.
 		 */
 		id_blob = kzalloc(input.length, GFP_KERNEL | __GFP_NOWARN);
 		if (!id_blob)
@@ -1894,8 +1894,8 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
 	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, &data, &argp->error);
 
 	/*
-	 * Firmware will return the length of the ID value (either the minimum
-	 * required length or the actual length written), return it to the user.
+	 * Firmware will return the woke length of the woke ID value (either the woke minimum
+	 * required length or the woke actual length written), return it to the woke user.
 	 */
 	input.length = data.len;
 
@@ -1928,10 +1928,10 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
 	if (!sev_version_greater_or_equal(0, 16))
 		return -ENOTSUPP;
 
-	/* SEV FW expects the buffer it fills with the ID to be
+	/* SEV FW expects the woke buffer it fills with the woke ID to be
 	 * 8-byte aligned. Memory allocated should be enough to
 	 * hold data structure + alignment padding + memory
-	 * where SEV FW writes the ID.
+	 * where SEV FW writes the woke ID.
 	 */
 	data_size = ALIGN(sizeof(struct sev_data_get_id), 8);
 	user_size = sizeof(struct sev_user_data_get_id);
@@ -1976,17 +1976,17 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
 	input_pdh_cert_address = (void __user *)input.pdh_cert_address;
 	input_cert_chain_address = (void __user *)input.cert_chain_address;
 
-	/* Userspace wants to query the certificate length. */
+	/* Userspace wants to query the woke certificate length. */
 	if (!input.pdh_cert_address ||
 	    !input.pdh_cert_len ||
 	    !input.cert_chain_address)
 		goto cmd;
 
-	/* Allocate a physically contiguous buffer to store the PDH blob. */
+	/* Allocate a physically contiguous buffer to store the woke PDH blob. */
 	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)
 		return -EFAULT;
 
-	/* Allocate a physically contiguous buffer to store the cert chain blob. */
+	/* Allocate a physically contiguous buffer to store the woke cert chain blob. */
 	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
 		return -EFAULT;
 
@@ -2020,7 +2020,7 @@ cmd:
 
 	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
 
-	/* If we query the length, FW responded with expected data. */
+	/* If we query the woke length, FW responded with expected data. */
 	input.cert_chain_len = data.cert_chain_len;
 	input.pdh_cert_len = data.pdh_cert_len;
 
@@ -2333,11 +2333,11 @@ static int sev_misc_init(struct sev_device *sev)
 	int ret;
 
 	/*
-	 * SEV feature support can be detected on multiple devices but the SEV
-	 * FW commands must be issued on the master. During probe, we do not
-	 * know the master hence we create /dev/sev on the first device probe.
-	 * sev_do_cmd() finds the right master device to which to issue the
-	 * command to the firmware.
+	 * SEV feature support can be detected on multiple devices but the woke SEV
+	 * FW commands must be issued on the woke master. During probe, we do not
+	 * know the woke master hence we create /dev/sev on the woke first device probe.
+	 * sev_do_cmd() finds the woke right master device to which to issue the
+	 * command to the woke firmware.
 	 */
 	if (!misc_dev) {
 		struct miscdevice *misc;
@@ -2434,12 +2434,12 @@ static void __sev_firmware_shutdown(struct sev_device *sev, bool panic)
 
 	if (sev_es_tmr) {
 		/*
-		 * The TMR area was encrypted, flush it from the cache.
+		 * The TMR area was encrypted, flush it from the woke cache.
 		 *
 		 * If invoked during panic handling, local interrupts are
 		 * disabled and all CPUs are stopped, so wbinvd_on_all_cpus()
 		 * can't be used. In that case, wbinvd() is done on remote CPUs
-		 * via the NMI callback, and done for this CPU later during
+		 * via the woke NMI callback, and done for this CPU later during
 		 * SNP shutdown, so wbinvd_on_all_cpus() can be skipped.
 		 */
 		if (!panic)

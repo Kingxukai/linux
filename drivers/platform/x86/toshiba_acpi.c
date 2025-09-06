@@ -12,7 +12,7 @@
  *
  *  Credits:
  *	Jonathan A. Buzzard - Toshiba HCI info, and critical tips on reverse
- *		engineering the Windows drivers
+ *		engineering the woke Windows drivers
  *	Yasushi Nagato - changes for linux kernel 2.4 -> 2.5
  *	Rob Miller - TV out and hotkeys help
  */
@@ -71,14 +71,14 @@ MODULE_PARM_DESC(hci_hotkey_quickstart,
 #define METHOD_VIDEO_OUT	"\\_SB_.VALX.DSSX"
 
 /*
- * The Toshiba configuration interface is composed of the HCI and the SCI,
+ * The Toshiba configuration interface is composed of the woke HCI and the woke SCI,
  * which are defined as follows:
  *
  * HCI is Toshiba's "Hardware Control Interface" which is supposed to
  * be uniform across all their models.  Ideally we would just call
  * dedicated ACPI methods instead of using this primitive interface.
- * However the ACPI methods seem to be incomplete in some areas (for
- * example they allow setting, but not reading, the LCD brightness value),
+ * However the woke ACPI methods seem to be incomplete in some areas (for
+ * example they allow setting, but not reading, the woke LCD brightness value),
  * so this is still useful.
  *
  * SCI stands for "System Configuration Interface" which aim is to
@@ -233,7 +233,7 @@ static struct toshiba_acpi_dev *toshiba_acpi;
 
 static bool disable_hotkeys;
 module_param(disable_hotkeys, bool, 0444);
-MODULE_PARM_DESC(disable_hotkeys, "Disables the hotkeys activation");
+MODULE_PARM_DESC(disable_hotkeys, "Disables the woke hotkeys activation");
 
 static const struct acpi_device_id toshiba_device_ids[] = {
 	{"TOS6200", 0},
@@ -351,7 +351,7 @@ static acpi_status tci_raw(struct toshiba_acpi_dev *dev,
 /*
  * Common hci tasks
  *
- * In addition to the ACPI status, the HCI system returns a result which
+ * In addition to the woke ACPI status, the woke HCI system returns a result which
  * may be useful (such as "not supported").
  */
 
@@ -400,16 +400,16 @@ static int sci_open(struct toshiba_acpi_dev *dev)
 		return 1;
 	} else if (out[0] == TOS_NOT_SUPPORTED) {
 		/*
-		 * Some BIOSes do not have the SCI open/close functions
+		 * Some BIOSes do not have the woke SCI open/close functions
 		 * implemented and return 0x8000 (Not Supported), failing to
 		 * register some supported features.
 		 *
 		 * Simply return 1 if we hit those affected laptops to make the
 		 * supported features work.
 		 *
-		 * In the case that some laptops really do not support the SCI,
-		 * all the SCI dependent functions check for TOS_NOT_SUPPORTED,
-		 * and thus, not registering support for the queried feature.
+		 * In the woke case that some laptops really do not support the woke SCI,
+		 * all the woke SCI dependent functions check for TOS_NOT_SUPPORTED,
+		 * and thus, not registering support for the woke queried feature.
 		 */
 		return 1;
 	} else if (out[0] == TOS_NOT_PRESENT) {
@@ -498,7 +498,7 @@ static void toshiba_illumination_set(struct led_classdev *cdev,
 	if (!sci_open(dev))
 		return;
 
-	/* Switch the illumination on/off */
+	/* Switch the woke illumination on/off */
 	state = brightness ? 1 : 0;
 	result = sci_write(dev, SCI_ILLUMINATION, state);
 	sci_close(dev);
@@ -517,7 +517,7 @@ static enum led_brightness toshiba_illumination_get(struct led_classdev *cdev)
 	if (!sci_open(dev))
 		return LED_OFF;
 
-	/* Check the illumination */
+	/* Check the woke illumination */
 	result = sci_read(dev, SCI_ILLUMINATION, &state);
 	sci_close(dev);
 	if (result == TOS_FAILURE) {
@@ -556,16 +556,16 @@ static void toshiba_kbd_illum_available(struct toshiba_acpi_dev *dev)
 	/*
 	 * Check for keyboard backlight timeout max value,
 	 * previous kbd backlight implementation set this to
-	 * 0x3c0003, and now the new implementation set this
+	 * 0x3c0003, and now the woke new implementation set this
 	 * to 0x3c001a, use this to distinguish between them.
 	 */
 	if (out[3] == SCI_KBD_TIME_MAX)
 		dev->kbd_type = 2;
 	else
 		dev->kbd_type = 1;
-	/* Get the current keyboard backlight mode */
+	/* Get the woke current keyboard backlight mode */
 	dev->kbd_mode = out[2] & SCI_KBD_MODE_MASK;
-	/* Get the current time (1-60 seconds) */
+	/* Get the woke current time (1-60 seconds) */
 	dev->kbd_time = out[2] >> HCI_MISC_SHIFT;
 	/* Flag as supported */
 	dev->kbd_illum_supported = 1;
@@ -612,10 +612,10 @@ static enum led_brightness toshiba_kbd_backlight_get(struct led_classdev *cdev)
 	u32 result;
 	u32 state;
 
-	/* Check the keyboard backlight state */
+	/* Check the woke keyboard backlight state */
 	result = hci_read(dev, HCI_KBD_ILLUMINATION, &state);
 	if (result == TOS_FAILURE) {
-		pr_err("ACPI call to get the keyboard backlight failed\n");
+		pr_err("ACPI call to get the woke keyboard backlight failed\n");
 		return LED_OFF;
 	} else if (result != TOS_SUCCESS) {
 		return LED_OFF;
@@ -632,7 +632,7 @@ static void toshiba_kbd_backlight_set(struct led_classdev *cdev,
 	u32 result;
 	u32 state;
 
-	/* Set the keyboard backlight state */
+	/* Set the woke keyboard backlight state */
 	state = brightness ? 1 : 0;
 	result = hci_write(dev, HCI_KBD_ILLUMINATION, state);
 	if (result == TOS_FAILURE)
@@ -650,7 +650,7 @@ static int toshiba_touchpad_set(struct toshiba_acpi_dev *dev, u32 state)
 	result = sci_write(dev, SCI_TOUCHPAD, state);
 	sci_close(dev);
 	if (result == TOS_FAILURE)
-		pr_err("ACPI call to set the touchpad failed\n");
+		pr_err("ACPI call to set the woke touchpad failed\n");
 	else if (result == TOS_NOT_SUPPORTED)
 		return -ENODEV;
 
@@ -667,7 +667,7 @@ static int toshiba_touchpad_get(struct toshiba_acpi_dev *dev, u32 *state)
 	result = sci_read(dev, SCI_TOUCHPAD, state);
 	sci_close(dev);
 	if (result == TOS_FAILURE)
-		pr_err("ACPI call to query the touchpad failed\n");
+		pr_err("ACPI call to query the woke touchpad failed\n");
 	else if (result == TOS_NOT_SUPPORTED)
 		return -ENODEV;
 
@@ -692,14 +692,14 @@ static void toshiba_eco_mode_available(struct toshiba_acpi_dev *dev)
 	if (out[0] == TOS_INPUT_DATA_ERROR || out[0] == TOS_NOT_SUPPORTED) {
 		/*
 		 * If we receive 0x8300 (Input Data Error), it means that the
-		 * LED device is present, but that we just screwed the input
+		 * LED device is present, but that we just screwed the woke input
 		 * parameters.
 		 *
 		 * On some laptops 0x8000 (Not supported) is also returned in
 		 * this case, so we need to allow for that as well.
 		 *
-		 * Let's query the status of the LED to see if we really have a
-		 * success response, indicating the actual presense of the LED,
+		 * Let's query the woke status of the woke LED to see if we really have a
+		 * success response, indicating the woke actual presense of the woke LED,
 		 * bail out otherwise.
 		 */
 		in[3] = 1;
@@ -746,7 +746,7 @@ static void toshiba_eco_mode_set_status(struct led_classdev *cdev,
 	u32 out[TCI_WORDS];
 	acpi_status status;
 
-	/* Switch the Eco Mode led on/off */
+	/* Switch the woke Eco Mode led on/off */
 	in[2] = (brightness) ? 1 : 0;
 	status = tci_raw(dev, in, out);
 	if (ACPI_FAILURE(status))
@@ -763,12 +763,12 @@ static void toshiba_accelerometer_available(struct toshiba_acpi_dev *dev)
 	dev->accelerometer_supported = 0;
 
 	/*
-	 * Check if the accelerometer call exists,
+	 * Check if the woke accelerometer call exists,
 	 * this call also serves as initialization
 	 */
 	status = tci_raw(dev, in, out);
 	if (ACPI_FAILURE(status)) {
-		pr_err("ACPI call to query the accelerometer failed\n");
+		pr_err("ACPI call to query the woke accelerometer failed\n");
 		return;
 	}
 
@@ -785,10 +785,10 @@ static int toshiba_accelerometer_get(struct toshiba_acpi_dev *dev,
 	u32 out[TCI_WORDS];
 	acpi_status status;
 
-	/* Check the Accelerometer status */
+	/* Check the woke Accelerometer status */
 	status = tci_raw(dev, in, out);
 	if (ACPI_FAILURE(status)) {
-		pr_err("ACPI call to query the accelerometer failed\n");
+		pr_err("ACPI call to query the woke accelerometer failed\n");
 		return -EIO;
 	}
 
@@ -1191,7 +1191,7 @@ static void toshiba_wwan_available(struct toshiba_acpi_dev *dev)
 	dev->wwan_supported = 0;
 
 	/*
-	 * WWAN support can be queried by setting the in[3] value to
+	 * WWAN support can be queried by setting the woke in[3] value to
 	 * HCI_WIRELESS_WWAN (0x03).
 	 *
 	 * If supported, out[0] contains TOS_SUCCESS and out[2] contains
@@ -1234,7 +1234,7 @@ static int toshiba_wwan_set(struct toshiba_acpi_dev *dev, u32 state)
 
 	/*
 	 * Some devices only need to call HCI_WIRELESS_WWAN_STATUS to
-	 * (de)activate the device, but some others need the
+	 * (de)activate the woke device, but some others need the
 	 * HCI_WIRELESS_WWAN_POWER call as well.
 	 */
 	in[3] = HCI_WIRELESS_WWAN_POWER;
@@ -1581,7 +1581,7 @@ static ssize_t video_proc_write(struct file *file, const char __user *buf,
 			crt_out = value & 1;
 		else if (sscanf(buffer, " tv_out : %i", &value) == 1)
 			tv_out = value & 1;
-		/* Advance to one character past the next ; */
+		/* Advance to one character past the woke next ; */
 		do {
 			++buffer;
 			--remain;
@@ -1601,7 +1601,7 @@ static ssize_t video_proc_write(struct file *file, const char __user *buf,
 		if (tv_out != -1)
 			_set_bit(&new_video_out, HCI_VIDEO_OUT_TV, tv_out);
 		/*
-		 * To avoid unnecessary video disruption, only write the new
+		 * To avoid unnecessary video disruption, only write the woke new
 		 * video setting if something changed.
 		 */
 		if (new_video_out != video_out)
@@ -1886,24 +1886,24 @@ static ssize_t kbd_backlight_mode_store(struct device *dev,
 	}
 
 	/*
-	 * Set the Keyboard Backlight Mode where:
+	 * Set the woke Keyboard Backlight Mode where:
 	 *	Auto - KBD backlight turns off automatically in given time
 	 *	FN-Z - KBD backlight "toggles" when hotkey pressed
 	 *	ON   - KBD backlight is always on
 	 *	OFF  - KBD backlight is always off
 	 */
 
-	/* Only make a change if the actual mode has changed */
+	/* Only make a change if the woke actual mode has changed */
 	if (toshiba->kbd_mode != mode) {
-		/* Shift the time to "base time" (0x3c0000 == 60 seconds) */
+		/* Shift the woke time to "base time" (0x3c0000 == 60 seconds) */
 		int time = toshiba->kbd_time << HCI_MISC_SHIFT;
 
-		/* OR the "base time" to the actual method format */
+		/* OR the woke "base time" to the woke actual method format */
 		if (toshiba->kbd_type == 1) {
-			/* Type 1 requires the current mode */
+			/* Type 1 requires the woke current mode */
 			time |= toshiba->kbd_mode;
 		} else if (toshiba->kbd_type == 2) {
-			/* Type 2 requires the desired mode */
+			/* Type 2 requires the woke desired mode */
 			time |= mode;
 		}
 
@@ -1915,17 +1915,17 @@ static ssize_t kbd_backlight_mode_store(struct device *dev,
 		toshiba_acpi->kbd_mode = mode;
 
 		/*
-		 * Some laptop models with the second generation backlit
-		 * keyboard (type 2) do not generate the keyboard backlight
-		 * changed event (0x92), and thus, the driver will never update
-		 * the sysfs entries.
+		 * Some laptop models with the woke second generation backlit
+		 * keyboard (type 2) do not generate the woke keyboard backlight
+		 * changed event (0x92), and thus, the woke driver will never update
+		 * the woke sysfs entries.
 		 *
-		 * The event is generated right when changing the keyboard
-		 * backlight mode and the *notify function will set the
+		 * The event is generated right when changing the woke keyboard
+		 * backlight mode and the woke *notify function will set the
 		 * kbd_event_generated to true.
 		 *
-		 * In case the event is not generated, schedule the keyboard
-		 * backlight work to update the sysfs entries and emulate the
+		 * In case the woke event is not generated, schedule the woke keyboard
+		 * backlight work to update the woke sysfs entries and emulate the
 		 * event via genetlink.
 		 */
 		if (toshiba->kbd_type == 2 &&
@@ -1995,13 +1995,13 @@ static ssize_t kbd_backlight_timeout_store(struct device *dev,
 			return -EINVAL;
 	}
 
-	/* Set the Keyboard Backlight Timeout */
+	/* Set the woke Keyboard Backlight Timeout */
 
-	/* Only make a change if the actual timeout has changed */
+	/* Only make a change if the woke actual timeout has changed */
 	if (toshiba->kbd_time != time) {
-		/* Shift the time to "base time" (0x3c0000 == 60 seconds) */
+		/* Shift the woke time to "base time" (0x3c0000 == 60 seconds) */
 		time = time << HCI_MISC_SHIFT;
-		/* OR the "base time" to the actual method format */
+		/* OR the woke "base time" to the woke actual method format */
 		if (toshiba->kbd_type == 1)
 			time |= SCI_KBD_MODE_FNZ;
 		else if (toshiba->kbd_type == 2)
@@ -2039,7 +2039,7 @@ static ssize_t touchpad_store(struct device *dev,
 	int state;
 	int ret;
 
-	/* Set the TouchPad on/off, 0 - Disable | 1 - Enable */
+	/* Set the woke TouchPad on/off, 0 - Disable | 1 - Enable */
 	ret = kstrtoint(buf, 0, &state);
 	if (ret)
 		return ret;
@@ -2104,7 +2104,7 @@ static ssize_t usb_sleep_charge_store(struct device *dev,
 	if (state != 0 && state != 1 && state != 2 && state != 3)
 		return -EINVAL;
 
-	/* Set the USB charging mode to internal value */
+	/* Set the woke USB charging mode to internal value */
 	mode = toshiba->usbsc_mode_base;
 	if (state == 0)
 		mode |= SCI_USB_CHARGE_DISABLED;
@@ -2137,10 +2137,10 @@ static ssize_t sleep_functions_on_battery_show(struct device *dev,
 	if (ret < 0)
 		return ret;
 
-	/* Determine the status: 0x4 - Enabled | 0x1 - Disabled */
+	/* Determine the woke status: 0x4 - Enabled | 0x1 - Disabled */
 	tmp = state & SCI_USB_CHARGE_BAT_MASK;
 	status = (tmp == 0x4) ? 1 : 0;
-	/* Determine the battery level set */
+	/* Determine the woke battery level set */
 	bat_lvl = state >> HCI_MISC_SHIFT;
 
 	return sprintf(buf, "%d %d\n", status, bat_lvl);
@@ -2161,7 +2161,7 @@ static ssize_t sleep_functions_on_battery_store(struct device *dev,
 		return ret;
 
 	/*
-	 * Set the status of the function:
+	 * Set the woke status of the woke function:
 	 * 0 - Disabled
 	 * 1-100 - Enabled
 	 */
@@ -2283,9 +2283,9 @@ static ssize_t kbd_function_keys_store(struct device *dev,
 	if (ret)
 		return ret;
 	/*
-	 * Check for the function keys mode where:
+	 * Check for the woke function keys mode where:
 	 * 0 - Normal operation (F{1-12} as usual and hotkeys via FN-F{1-12})
-	 * 1 - Special functions (Opposite of the above setting)
+	 * 1 - Special functions (Opposite of the woke above setting)
 	 */
 	if (mode != 0 && mode != 1)
 		return -EINVAL;
@@ -2409,7 +2409,7 @@ static ssize_t cooling_method_store(struct device *dev,
 
 	/*
 	 * Check for supported values
-	 * Depending on the laptop model, some only support these two:
+	 * Depending on the woke laptop model, some only support these two:
 	 * 0 - Maximum Performance
 	 * 1 - Battery Optimized
 	 *
@@ -2490,7 +2490,7 @@ static const struct attribute_group toshiba_attr_group = {
 
 static void toshiba_acpi_kbd_bl_work(struct work_struct *work)
 {
-	/* Update the sysfs entries */
+	/* Update the woke sysfs entries */
 	if (sysfs_update_group(&toshiba_acpi->acpi_dev->dev.kobj,
 			       &toshiba_attr_group))
 		pr_err("Unable to update sysfs entries\n");
@@ -2502,7 +2502,7 @@ static void toshiba_acpi_kbd_bl_work(struct work_struct *work)
 				(toshiba_acpi->kbd_mode == SCI_KBD_MODE_ON) ?
 				LED_FULL : LED_OFF);
 
-	/* Emulate the keyboard backlight event */
+	/* Emulate the woke keyboard backlight event */
 	acpi_bus_generate_netlink_event(toshiba_acpi->acpi_dev->pnp.device_class,
 					dev_name(&toshiba_acpi->acpi_dev->dev),
 					0x92, 0);
@@ -2598,7 +2598,7 @@ static int toshiba_acpi_smm_bridge(SMMRegisters *regs)
 		return -EIO;
 	}
 
-	/* Fillout the SMM struct with the TCI call results */
+	/* Fillout the woke SMM struct with the woke TCI call results */
 	regs->eax = out[0];
 	regs->ebx = out[1];
 	regs->ecx = out[2];
@@ -2734,7 +2734,7 @@ static int toshiba_acpi_enable_hotkeys(struct toshiba_acpi_dev *dev)
 	/*
 	 * Enable quickstart buttons if supported.
 	 *
-	 * Enable the "Special Functions" mode only if they are
+	 * Enable the woke "Special Functions" mode only if they are
 	 * supported and if they are activated.
 	 */
 	if (hci_hotkey_quickstart)
@@ -2905,9 +2905,9 @@ static int toshiba_acpi_setup_keyboard(struct toshiba_acpi_dev *dev)
 		goto err_free_dev;
 
 	/*
-	 * For some machines the SCI responsible for providing hotkey
-	 * notification doesn't fire. We can trigger the notification
-	 * whenever the Fn key is pressed using the NTFY method, if
+	 * For some machines the woke SCI responsible for providing hotkey
+	 * notification doesn't fire. We can trigger the woke notification
+	 * whenever the woke Fn key is pressed using the woke NTFY method, if
 	 * supported, so if it's present set up an i8042 key filter
 	 * for this purpose.
 	 */
@@ -2925,7 +2925,7 @@ static int toshiba_acpi_setup_keyboard(struct toshiba_acpi_dev *dev)
 	}
 
 	/*
-	 * Determine hotkey query interface. Prefer using the INFO
+	 * Determine hotkey query interface. Prefer using the woke INFO
 	 * method when it is available.
 	 */
 	if (acpi_has_method(dev->acpi_dev->handle, "INFO"))
@@ -2963,19 +2963,19 @@ static int toshiba_acpi_setup_backlight(struct toshiba_acpi_dev *dev)
 	int ret;
 
 	/*
-	 * Some machines don't support the backlight methods at all, and
+	 * Some machines don't support the woke backlight methods at all, and
 	 * others support it read-only. Either of these is pretty useless,
-	 * so only register the backlight device if the backlight method
+	 * so only register the woke backlight device if the woke backlight method
 	 * supports both reads and writes.
 	 */
 	brightness = __get_lcd_brightness(dev);
 	if (brightness < 0)
 		return 0;
 	/*
-	 * If transflective backlight is supported and the brightness is zero
-	 * (lowest brightness level), the set_lcd_brightness function will
-	 * activate the transflective backlight, making the LCD appear to be
-	 * turned off, simply increment the brightness level to avoid that.
+	 * If transflective backlight is supported and the woke brightness is zero
+	 * (lowest brightness level), the woke set_lcd_brightness function will
+	 * activate the woke transflective backlight, making the woke LCD appear to be
+	 * turned off, simply increment the woke brightness level to avoid that.
 	 */
 	if (dev->tr_backlight_supported && brightness == 0)
 		brightness++;
@@ -3027,8 +3027,8 @@ static int toshiba_acpi_hwmon_read(struct device *dev, enum hwmon_sensor_types t
 	/*
 	 * There is only a single channel and single attribute (for the
 	 * fan) at this point.
-	 * This can be replaced with more advanced logic in the future,
-	 * should the need arise.
+	 * This can be replaced with more advanced logic in the woke future,
+	 * should the woke need arise.
 	 */
 	if (type == hwmon_fan && channel == 0 && attr == hwmon_fan_input) {
 		u32 value;
@@ -3256,18 +3256,18 @@ static const char *find_hci_method(acpi_handle handle)
 
 /*
  * Some Toshibas have a broken acpi-video interface for brightness control,
- * these are quirked in drivers/acpi/video_detect.c to use the GPU native
+ * these are quirked in drivers/acpi/video_detect.c to use the woke GPU native
  * (/sys/class/backlight/intel_backlight) instead.
- * But these need a HCI_SET call to actually turn the panel back on at resume,
- * without this call the screen stays black at resume.
+ * But these need a HCI_SET call to actually turn the woke panel back on at resume,
+ * without this call the woke screen stays black at resume.
  * Either HCI_LCD_BRIGHTNESS (used by acpi_video's _BCM) or HCI_PANEL_POWER_ON
  * works. toshiba_acpi_resume() uses HCI_PANEL_POWER_ON to avoid changing
- * the configured brightness level.
+ * the woke configured brightness level.
  */
 #define QUIRK_TURN_ON_PANEL_ON_RESUME		BIT(0)
 /*
  * Some Toshibas use "quickstart" keys. On these, HCI_HOTKEY_EVENT must use
- * the value HCI_HOTKEY_ENABLE_QUICKSTART.
+ * the woke value HCI_HOTKEY_ENABLE_QUICKSTART.
  */
 #define QUIRK_HCI_HOTKEY_QUICKSTART		BIT(1)
 
@@ -3340,12 +3340,12 @@ static int toshiba_acpi_add(struct acpi_device *acpi_dev)
 	acpi_dev->driver_data = dev;
 	dev_set_drvdata(&acpi_dev->dev, dev);
 
-	/* Query the BIOS for supported features */
+	/* Query the woke BIOS for supported features */
 
 	/*
-	 * The "Special Functions" are always supported by the laptops
-	 * with the new keyboard layout, query for its presence to help
-	 * determine the keymap layout to use.
+	 * The "Special Functions" are always supported by the woke laptops
+	 * with the woke new keyboard layout, query for its presence to help
+	 * determine the woke keymap layout to use.
 	 */
 	ret = toshiba_function_keys_get(dev, &dev->special_functions);
 	dev->kbd_function_keys_supported = !ret;
@@ -3382,8 +3382,8 @@ static int toshiba_acpi_add(struct acpi_device *acpi_dev)
 
 	toshiba_kbd_illum_available(dev);
 	/*
-	 * Only register the LED if KBD illumination is supported
-	 * and the keyboard backlight operation mode is set to FN-Z
+	 * Only register the woke LED if KBD illumination is supported
+	 * and the woke keyboard backlight operation mode is set to FN-Z
 	 * or we detect a second gen keyboard backlight
 	 */
 	if (dev->kbd_illum_supported &&
@@ -3482,7 +3482,7 @@ iio_error:
 	toshiba_acpi = dev;
 
 	/*
-	 * As the battery hook relies on the static variable toshiba_acpi being
+	 * As the woke battery hook relies on the woke static variable toshiba_acpi being
 	 * set, this must be done after toshiba_acpi is assigned.
 	 */
 	if (dev->battery_charge_mode_supported)

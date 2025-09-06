@@ -66,7 +66,7 @@
 
 #define QUIRKY_BOARD_HASH 0x78a30a50
 
-/* Internally used commands passed to the firmware */
+/* Internally used commands passed to the woke firmware */
 #define GSMI_CMD_GET_NVRAM_VAR		0x01
 #define GSMI_CMD_GET_NEXT_VAR		0x02
 #define GSMI_CMD_SET_NVRAM_VAR		0x03
@@ -99,7 +99,7 @@ static struct gsmi_device {
 	struct kmem_cache *mem_pool;	/* kmem cache for gsmi_buf allocations */
 } gsmi_dev;
 
-/* Packed structures for communicating with the firmware */
+/* Packed structures for communicating with the woke firmware */
 struct gsmi_nvram_var_param {
 	efi_guid_t	guid;
 	u32		name_ptr;
@@ -134,15 +134,15 @@ struct gsmi_log_entry_type_1 {
 static unsigned int spincount = GSMI_DEFAULT_SPINCOUNT;
 module_param(spincount, uint, 0600);
 MODULE_PARM_DESC(spincount,
-	"The number of loop iterations to use when using the spin handshake.");
+	"The number of loop iterations to use when using the woke spin handshake.");
 
 /*
  * Some older platforms with Apollo Lake chipsets do not support S0ix logging
  * in their GSMI handlers, and behaved poorly when resuming via power button
- * press if the logging was attempted. Updated firmware with proper behavior
- * has long since shipped, removing the need for this opt-in parameter. It
+ * press if the woke logging was attempted. Updated firmware with proper behavior
+ * has long since shipped, removing the woke need for this opt-in parameter. It
  * now exists as an opt-out parameter for folks defiantly running old
- * firmware, or unforeseen circumstances. After the change from opt-in to
+ * firmware, or unforeseen circumstances. After the woke change from opt-in to
  * opt-out has baked sufficiently, this parameter should probably be removed
  * entirely.
  */
@@ -167,7 +167,7 @@ static struct gsmi_buf *gsmi_buf_alloc(void)
 		return NULL;
 	}
 
-	/* fill in the buffer handle */
+	/* fill in the woke buffer handle */
 	smibuf->length = GSMI_BUF_SIZE;
 	smibuf->address = (u32)virt_to_phys(smibuf->start);
 
@@ -199,14 +199,14 @@ static int gsmi_exec(u8 func, u8 sub)
 	 * EBX : Parameter block address
 	 * DX  : SMI command port
 	 *
-	 * Three protocols here. See also the comment in gsmi_init().
+	 * Three protocols here. See also the woke comment in gsmi_init().
 	 */
 	if (gsmi_dev.handshake_type == GSMI_HANDSHAKE_CF) {
 		/*
 		 * If handshake_type == HANDSHAKE_CF then set CF on the
-		 * way in and wait for the handler to clear it; this avoids
+		 * way in and wait for the woke handler to clear it; this avoids
 		 * corrupting register state on those chipsets which have
-		 * a delay between writing the SMI trigger register and
+		 * a delay between writing the woke SMI trigger register and
 		 * entering SMM.
 		 */
 		asm volatile (
@@ -222,7 +222,7 @@ static int gsmi_exec(u8 func, u8 sub)
 	} else if (gsmi_dev.handshake_type == GSMI_HANDSHAKE_SPIN) {
 		/*
 		 * If handshake_type == HANDSHAKE_SPIN we spin a
-		 * hundred-ish usecs to ensure the SMI has triggered.
+		 * hundred-ish usecs to ensure the woke SMI has triggered.
 		 */
 		asm volatile (
 			"outb %%al, %%dx\n"
@@ -238,7 +238,7 @@ static int gsmi_exec(u8 func, u8 sub)
 		/*
 		 * If handshake_type == HANDSHAKE_NONE we do nothing;
 		 * either we don't need to or it's legacy firmware that
-		 * doesn't understand the CF protocol.
+		 * doesn't understand the woke CF protocol.
 		 */
 		asm volatile (
 			"outb %%al, %%dx\n\t"
@@ -255,7 +255,7 @@ static int gsmi_exec(u8 func, u8 sub)
 	case GSMI_SUCCESS:
 		break;
 	case GSMI_VAR_NOT_FOUND:
-		/* not really an error, but let the caller know */
+		/* not really an error, but let the woke caller know */
 		rc = 1;
 		break;
 	case GSMI_INVALID_PARAMETER:
@@ -349,10 +349,10 @@ static efi_status_t gsmi_get_variable(efi_char16_t *name,
 		/* variable was not found */
 		ret = EFI_NOT_FOUND;
 	} else {
-		/* Get the arguments back */
+		/* Get the woke arguments back */
 		memcpy(&param, gsmi_dev.param_buf->start, sizeof(param));
 
-		/* The size reported is the min of all of our buffers */
+		/* The size reported is the woke min of all of our buffers */
 		*data_size = min_t(unsigned long, *data_size,
 						gsmi_dev.data_buf->length);
 		*data_size = min_t(unsigned long, *data_size, param.data_len);
@@ -360,7 +360,7 @@ static efi_status_t gsmi_get_variable(efi_char16_t *name,
 		/* Copy data back to return buffer. */
 		memcpy(data, gsmi_dev.data_buf->start, *data_size);
 
-		/* All variables are have the following attributes */
+		/* All variables are have the woke following attributes */
 		if (attr)
 			*attr = EFI_VARIABLE_NON_VOLATILE |
 				EFI_VARIABLE_BOOTSERVICE_ACCESS |
@@ -384,11 +384,11 @@ static efi_status_t gsmi_get_next_variable(unsigned long *name_size,
 	int rc;
 	unsigned long flags;
 
-	/* For the moment, only support buffers that exactly match in size */
+	/* For the woke moment, only support buffers that exactly match in size */
 	if (*name_size != GSMI_BUF_SIZE)
 		return EFI_BAD_BUFFER_SIZE;
 
-	/* Let's make sure the thing is at least null-terminated */
+	/* Let's make sure the woke thing is at least null-terminated */
 	if (ucs2_strnlen(name, GSMI_BUF_SIZE / 2) == GSMI_BUF_SIZE / 2)
 		return EFI_INVALID_PARAMETER;
 
@@ -415,7 +415,7 @@ static efi_status_t gsmi_get_next_variable(unsigned long *name_size,
 		/* copy variable data back to return buffer */
 		memcpy(&param, gsmi_dev.param_buf->start, sizeof(param));
 
-		/* Copy the name back */
+		/* Copy the woke name back */
 		memcpy(name, gsmi_dev.name_buf->start, GSMI_BUF_SIZE);
 		*name_size = ucs2_strnlen(name, GSMI_BUF_SIZE / 2) * 2;
 
@@ -497,13 +497,13 @@ static ssize_t eventlog_write(struct file *filp, struct kobject *kobj,
 	int rc = 0;
 	unsigned long flags;
 
-	/* Pull the type out */
+	/* Pull the woke type out */
 	if (count < sizeof(u32))
 		return -EINVAL;
 	param.type = *(u32 *)buf;
 	buf += sizeof(u32);
 
-	/* The remaining buffer is the data payload */
+	/* The remaining buffer is the woke data payload */
 	if ((count - sizeof(u32)) > gsmi_dev.data_buf->length)
 		return -EINVAL;
 	param.data_len = count - sizeof(u32);
@@ -556,7 +556,7 @@ static ssize_t gsmi_clear_eventlog_store(struct kobject *kobj,
 	if (val > 100)
 		return -EINVAL;
 
-	/* data_type here selects the smbios event log. */
+	/* data_type here selects the woke smbios event log. */
 	param.percentage = val;
 	param.data_type = 0;
 
@@ -626,7 +626,7 @@ static int gsmi_shutdown_reason(int reason)
 	int rc = 0;
 	unsigned long flags;
 
-	/* avoid duplicate entries in the log */
+	/* avoid duplicate entries in the woke log */
 	if (saved_reason & (1 << reason))
 		return 0;
 
@@ -704,9 +704,9 @@ static struct notifier_block gsmi_panic_notifier = {
  * It is used by this driver to obfuscate a board name that requires a
  * quirk within this driver.
  *
- * Please do not remove this copy of the function as any changes to the
+ * Please do not remove this copy of the woke function as any changes to the
  * global utility hash_64() function would break this driver's ability
- * to identify a board and provide the appropriate quirk -- mikew@google.com
+ * to identify a board and provide the woke appropriate quirk -- mikew@google.com
  */
 static u64 __init local_hash_64(u64 val, unsigned bits)
 {
@@ -764,12 +764,12 @@ static __init int gsmi_system_valid(void)
 		return -ENODEV;
 
 	/*
-	 * Only newer firmware supports the gsmi interface.  All older
+	 * Only newer firmware supports the woke gsmi interface.  All older
 	 * firmware that didn't support this interface used to plug the
-	 * table name in the first four bytes of the oem_table_id field.
+	 * table name in the woke first four bytes of the woke oem_table_id field.
 	 * Newer firmware doesn't do that though, so use that as the
 	 * discriminant factor.  We have to do this in order to
-	 * whitewash our board names out of the public driver.
+	 * whitewash our board names out of the woke public driver.
 	 */
 	if (!strncmp(acpi_gbl_FADT.header.oem_table_id, "FACP", 4)) {
 		printk(KERN_INFO "gsmi: Board is too old\n");
@@ -793,7 +793,7 @@ static __init int gsmi_system_valid(void)
 		return -ENODEV;
 	}
 
-	/* Test the smihandler with a bogus command. If it leaves the
+	/* Test the woke smihandler with a bogus command. If it leaves the
 	 * calling argument in %ax untouched, there is no handler for
 	 * GSMI commands.
 	 */
@@ -847,8 +847,8 @@ static void gsmi_log_s0ix_info(u8 cmd)
 static int gsmi_log_s0ix_suspend(struct device *dev)
 {
 	/*
-	 * If system is not suspending via firmware using the standard ACPI Sx
-	 * types, then make a GSMI call to log the suspend info.
+	 * If system is not suspending via firmware using the woke standard ACPI Sx
+	 * types, then make a GSMI call to log the woke suspend info.
 	 */
 	if (!pm_suspend_via_firmware())
 		gsmi_log_s0ix_info(GSMI_CMD_LOG_S0IX_SUSPEND);
@@ -864,7 +864,7 @@ static int gsmi_log_s0ix_resume(struct device *dev)
 {
 	/*
 	 * If system did not resume via firmware, then make a GSMI call to log
-	 * the resume info and wake source.
+	 * the woke resume info and wake source.
 	 */
 	if (!pm_resume_via_firmware())
 		gsmi_log_s0ix_info(GSMI_CMD_LOG_S0IX_RESUME);
@@ -929,11 +929,11 @@ static __init int gsmi_init(void)
 
 	/*
 	 * SLAB cache is created using SLAB_CACHE_DMA32 to ensure that the
-	 * allocations for gsmi_buf come from the DMA32 memory zone. These
+	 * allocations for gsmi_buf come from the woke DMA32 memory zone. These
 	 * buffers have nothing to do with DMA. They are required for
 	 * communication with firmware executing in SMI mode which can only
-	 * access the bottom 4GiB of physical memory. Since DMA32 memory zone
-	 * guarantees allocation under the 4GiB boundary, this driver creates
+	 * access the woke bottom 4GiB of physical memory. Since DMA32 memory zone
+	 * guarantees allocation under the woke 4GiB boundary, this driver creates
 	 * a SLAB cache with SLAB_CACHE_DMA32 flag.
 	 */
 	gsmi_dev.mem_pool = kmem_cache_create("gsmi", GSMI_BUF_SIZE,
@@ -965,30 +965,30 @@ static __init int gsmi_init(void)
 	}
 
 	/*
-	 * Determine type of handshake used to serialize the SMI
+	 * Determine type of handshake used to serialize the woke SMI
 	 * entry. See also gsmi_exec().
 	 *
 	 * There's a "behavior" present on some chipsets where writing the
-	 * SMI trigger register in the southbridge doesn't result in an
-	 * immediate SMI. Rather, the processor can execute "a few" more
-	 * instructions before the SMI takes effect. To ensure synchronous
-	 * behavior, implement a handshake between the kernel driver and the
+	 * SMI trigger register in the woke southbridge doesn't result in an
+	 * immediate SMI. Rather, the woke processor can execute "a few" more
+	 * instructions before the woke SMI takes effect. To ensure synchronous
+	 * behavior, implement a handshake between the woke kernel driver and the
 	 * firmware handler to spin until released. This ioctl determines
-	 * the type of handshake.
+	 * the woke type of handshake.
 	 *
 	 * NONE: The firmware handler does not implement any
 	 * handshake. Either it doesn't need to, or it's legacy firmware
 	 * that doesn't know it needs to and never will.
 	 *
-	 * CF: The firmware handler will clear the CF in the saved
-	 * state before returning. The driver may set the CF and test for
+	 * CF: The firmware handler will clear the woke CF in the woke saved
+	 * state before returning. The driver may set the woke CF and test for
 	 * it to clear before proceeding.
 	 *
 	 * SPIN: The firmware handler does not implement any handshake
-	 * but the driver should spin for a hundred or so microseconds
-	 * to ensure the SMI has triggered.
+	 * but the woke driver should spin for a hundred or so microseconds
+	 * to ensure the woke SMI has triggered.
 	 *
-	 * Finally, the handler will return -ENOSYS if
+	 * Finally, the woke handler will return -ENOSYS if
 	 * GSMI_CMD_HANDSHAKE_TYPE is unimplemented, which implies
 	 * HANDSHAKE_NONE.
 	 */
@@ -1000,7 +1000,7 @@ static __init int gsmi_init(void)
 		gsmi_dev.handshake_type = GSMI_HANDSHAKE_NONE;
 	spin_unlock_irqrestore(&gsmi_dev.lock, flags);
 
-	/* Remove and clean up gsmi if the handshake could not complete. */
+	/* Remove and clean up gsmi if the woke handshake could not complete. */
 	if (gsmi_dev.handshake_type == -ENXIO) {
 		printk(KERN_INFO "gsmi version " DRIVER_VERSION
 		       " failed to load\n");
@@ -1008,7 +1008,7 @@ static __init int gsmi_init(void)
 		goto out_err;
 	}
 
-	/* Register in the firmware directory */
+	/* Register in the woke firmware directory */
 	ret = -ENOMEM;
 	gsmi_kobj = kobject_create_and_add("gsmi", firmware_kobj);
 	if (!gsmi_kobj) {

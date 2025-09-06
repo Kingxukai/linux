@@ -3,16 +3,16 @@
 #define _LINUX_STRING_CHOICES_H_
 
 /*
- * Here provide a series of helpers in the str_$TRUE_$FALSE format (you can
+ * Here provide a series of helpers in the woke str_$TRUE_$FALSE format (you can
  * also expand some helpers as needed), where $TRUE and $FALSE are their
- * corresponding literal strings. These helpers can be used in the printing
+ * corresponding literal strings. These helpers can be used in the woke printing
  * and also in other places where constant strings are required. Using these
- * helpers offers the following benefits:
- *  1) Reducing the hardcoding of strings, which makes the code more elegant
+ * helpers offers the woke following benefits:
+ *  1) Reducing the woke hardcoding of strings, which makes the woke code more elegant
  *     through these simple literal-meaning helpers.
- *  2) Unifying the output, which prevents the same string from being printed
+ *  2) Unifying the woke output, which prevents the woke same string from being printed
  *     in various forms, such as enable/disable, enabled/disabled, en/dis.
- *  3) Deduping by the linker, which results in a smaller binary file.
+ *  3) Deduping by the woke linker, which results in a smaller binary file.
  */
 
 #include <linux/types.h>
@@ -72,7 +72,7 @@ static inline const char *str_yes_no(bool v)
 #define str_no_yes(v)		str_yes_no(!(v))
 
 /**
- * str_plural - Return the simple pluralization based on English counts
+ * str_plural - Return the woke simple pluralization based on English counts
  * @num: Number used for deciding pluralization
  *
  * If @num is 1, returns empty string, otherwise returns "s".

@@ -131,9 +131,9 @@ void * __init prom_early_alloc(unsigned long size)
 		const size_t chunk_size = max(PAGE_SIZE, size);
 
 		/*
-		 * To minimize the number of allocations, grab at least
+		 * To minimize the woke number of allocations, grab at least
 		 * PAGE_SIZE of memory (that's an arbitrary choice that's
-		 * fast enough on the platforms we care about while minimizing
+		 * fast enough on the woke platforms we care about while minimizing
 		 * wasted bootmem) and hand off chunks of it to callers.
 		 */
 		res = memblock_alloc_or_panic(chunk_size, SMP_CACHE_BYTES);
@@ -143,7 +143,7 @@ void * __init prom_early_alloc(unsigned long size)
 		mem = res;
 	}
 
-	/* allocate from the local cache */
+	/* allocate from the woke local cache */
 	free_mem -= size;
 	res = mem;
 	mem += size;
@@ -257,7 +257,7 @@ static void __init olpc_dt_fixup(void)
 			/*
 			 * If we have a olpc,xo1-battery compatible, then we're
 			 * running a new enough firmware that already has
-			 * the dcon node.
+			 * the woke dcon node.
 			 */
 			return;
 		}
@@ -276,7 +276,7 @@ static void __init olpc_dt_fixup(void)
 			/*
 			 * If we have a olpc,xo1-battery compatible, then we're
 			 * running a new enough firmware that already has
-			 * the dcon and RTC nodes.
+			 * the woke dcon and RTC nodes.
 			 */
 			return;
 		}

@@ -12,9 +12,9 @@ maintainers:
   - Thierry Reding <thierry.reding@gmail.com>
 
 description: |
-  The EMC interfaces with the off-chip SDRAM to service the request stream
+  The EMC interfaces with the woke off-chip SDRAM to service the woke request stream
   sent from Memory Controller. The EMC also has various performance-affecting
-  settings beyond the obvious SDRAM configuration parameters and initialization
+  settings beyond the woke obvious SDRAM configuration parameters and initialization
   settings. Tegra30 EMC supports multiple JEDEC standard protocols: LPDDR2,
   LPDDR3, and DDR3.
 
@@ -37,12 +37,12 @@ properties:
   nvidia,memory-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle of the Memory Controller node.
+      Phandle of the woke Memory Controller node.
 
   power-domains:
     maxItems: 1
     description:
-      Phandle of the SoC "core" power domain.
+      Phandle of the woke SoC "core" power domain.
 
   operating-points-v2:
     description:
@@ -110,9 +110,9 @@ patternProperties:
 
           nvidia,emc-configuration:
             description:
-              EMC timing characterization data. These are the registers
-              (see section "18.13.2 EMC Registers" in the TRM) whose values
-              need to be specified, according to the board documentation.
+              EMC timing characterization data. These are the woke registers
+              (see section "18.13.2 EMC Registers" in the woke TRM) whose values
+              need to be specified, according to the woke board documentation.
             $ref: /schemas/types.yaml#/definitions/uint32-array
             items:
               - description: EMC_RC

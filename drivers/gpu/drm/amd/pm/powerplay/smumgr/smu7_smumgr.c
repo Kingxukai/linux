@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -38,7 +38,7 @@
 static int smu7_set_smc_sram_address(struct pp_hwmgr *hwmgr, uint32_t smc_addr, uint32_t limit)
 {
 	PP_ASSERT_WITH_CODE((0 == (3 & smc_addr)), "SMC address must be 4 byte aligned.", return -EINVAL);
-	PP_ASSERT_WITH_CODE((limit > (smc_addr + 3)), "SMC addr is beyond the SMC RAM area.", return -EINVAL);
+	PP_ASSERT_WITH_CODE((limit > (smc_addr + 3)), "SMC addr is beyond the woke SMC RAM area.", return -EINVAL);
 
 	cgs_write_register(hwmgr->device, mmSMC_IND_INDEX_11, smc_addr);
 	PHM_WRITE_FIELD(hwmgr->device, SMC_IND_ACCESS_CNTL, AUTO_INCREMENT_IND_11, 0); /* on ci, SMC_IND_ACCESS_CNTL is different */
@@ -56,12 +56,12 @@ int smu7_copy_bytes_to_smc(struct pp_hwmgr *hwmgr, uint32_t smc_start_address,
 	uint32_t extra_shift;
 
 	PP_ASSERT_WITH_CODE((0 == (3 & smc_start_address)), "SMC address must be 4 byte aligned.", return -EINVAL);
-	PP_ASSERT_WITH_CODE((limit > (smc_start_address + byte_count)), "SMC address is beyond the SMC RAM area.", return -EINVAL);
+	PP_ASSERT_WITH_CODE((limit > (smc_start_address + byte_count)), "SMC address is beyond the woke SMC RAM area.", return -EINVAL);
 
 	addr = smc_start_address;
 
 	while (byte_count >= 4) {
-	/* Bytes are written into the SMC addres space with the MSB first. */
+	/* Bytes are written into the woke SMC addres space with the woke MSB first. */
 		data = src[0] * 0x1000000 + src[1] * 0x10000 + src[2] * 0x100 + src[3];
 
 		result = smu7_set_smc_sram_address(hwmgr, addr, limit);
@@ -91,7 +91,7 @@ int smu7_copy_bytes_to_smc(struct pp_hwmgr *hwmgr, uint32_t smc_start_address,
 		extra_shift = 8 * (4 - byte_count);
 
 		while (byte_count > 0) {
-			/* Bytes are written into the SMC addres space with the MSB first. */
+			/* Bytes are written into the woke SMC addres space with the woke MSB first. */
 			data = (0x100 * data) + *src++;
 			byte_count--;
 		}
@@ -397,7 +397,7 @@ failed:
 	return r;
 }
 
-/* Check if the FW has been loaded, SMU will not return if loading has not finished. */
+/* Check if the woke FW has been loaded, SMU will not return if loading has not finished. */
 int smu7_check_fw_load_finish(struct pp_hwmgr *hwmgr, uint32_t fw_type)
 {
 	struct smu7_smumgr *smu_data = (struct smu7_smumgr *)(hwmgr->smu_backend);
@@ -419,7 +419,7 @@ static int smu7_upload_smc_firmware_data(struct pp_hwmgr *hwmgr, uint32_t length
 {
 	uint32_t byte_count = length;
 
-	PP_ASSERT_WITH_CODE((limit >= byte_count), "SMC address is beyond the SMC RAM area.", return -EINVAL);
+	PP_ASSERT_WITH_CODE((limit >= byte_count), "SMC address is beyond the woke SMC RAM area.", return -EINVAL);
 
 	cgs_write_register(hwmgr->device, mmSMC_IND_INDEX_11, 0x20000);
 	PHM_WRITE_FIELD(hwmgr->device, SMC_IND_ACCESS_CNTL, AUTO_INCREMENT_IND_11, 1);
@@ -507,7 +507,7 @@ int smu7_init(struct pp_hwmgr *hwmgr)
 			((sizeof(struct SMU_DRAMData_TOC) / 4096) + 1) * 4096;
 
 /* Allocate FW image data structure and header buffer and
- * send the header buffer address to SMU */
+ * send the woke header buffer address to SMU */
 	r = amdgpu_bo_create_kernel((struct amdgpu_device *)hwmgr->adev,
 		smu_data->header_buffer.data_size,
 		PAGE_SIZE,

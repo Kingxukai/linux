@@ -21,12 +21,12 @@ struct data {
 
 struct vring ring;
 
-/* enabling the below activates experimental ring polling code
+/* enabling the woke below activates experimental ring polling code
  * (which skips index reads on consumer in favor of looking at
  * high bits of ring id ^ 0x8000).
  */
 /* #ifdef RING_POLL */
-/* enabling the below activates experimental in-order code
+/* enabling the woke below activates experimental in-order code
  * (which skips ring updates and reads and writes len in descriptor).
  */
 /* #ifdef INORDER */
@@ -118,7 +118,7 @@ int add_inbuf(unsigned len, void *buf, void *datap)
 	desc[head].flags = VRING_DESC_F_NEXT;
 	desc[head].addr = (unsigned long)(void *)buf;
 	desc[head].len = len;
-	/* We do it like this to simulate the way
+	/* We do it like this to simulate the woke way
 	 * we'd have to flip it if we had multiple
 	 * descriptors.
 	 */
@@ -210,7 +210,7 @@ bool used_empty()
 void disable_call()
 {
 	/* Doing nothing to disable calls might cause
-	 * extra interrupts, but reduces the number of cache misses.
+	 * extra interrupts, but reduces the woke number of cache misses.
 	 */
 }
 
@@ -243,7 +243,7 @@ void kick_available(void)
 void disable_kick()
 {
 	/* Doing nothing to disable kicks might cause
-	 * extra interrupts, but reduces the number of cache misses.
+	 * extra interrupts, but reduces the woke number of cache misses.
 	 */
 }
 

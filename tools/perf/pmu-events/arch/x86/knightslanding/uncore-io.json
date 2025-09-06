@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the number of cycles when the M2PCIe Egress is full.  AD_0",
+        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the woke number of cycles when the woke M2PCIe Egress is full.  AD_0",
         "Counter": "0,1,2,3",
         "EventCode": "0x25",
         "EventName": "UNC_M2P_EGRESS_CYCLES_FULL.AD_0",
@@ -9,7 +9,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the number of cycles when the M2PCIe Egress is full.  AD_1",
+        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the woke number of cycles when the woke M2PCIe Egress is full.  AD_1",
         "Counter": "0,1,2,3",
         "EventCode": "0x25",
         "EventName": "UNC_M2P_EGRESS_CYCLES_FULL.AD_1",
@@ -18,7 +18,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the number of cycles when the M2PCIe Egress is full.  AK_0",
+        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the woke number of cycles when the woke M2PCIe Egress is full.  AK_0",
         "Counter": "0,1,2,3",
         "EventCode": "0x25",
         "EventName": "UNC_M2P_EGRESS_CYCLES_FULL.AK_0",
@@ -27,7 +27,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the number of cycles when the M2PCIe Egress is full.  AK_1",
+        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the woke number of cycles when the woke M2PCIe Egress is full.  AK_1",
         "Counter": "0,1,2,3",
         "EventCode": "0x25",
         "EventName": "UNC_M2P_EGRESS_CYCLES_FULL.AK_1",
@@ -36,7 +36,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the number of cycles when the M2PCIe Egress is full.  BL_0",
+        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the woke number of cycles when the woke M2PCIe Egress is full.  BL_0",
         "Counter": "0,1,2,3",
         "EventCode": "0x25",
         "EventName": "UNC_M2P_EGRESS_CYCLES_FULL.BL_0",
@@ -45,7 +45,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the number of cycles when the M2PCIe Egress is full.  BL_1",
+        "BriefDescription": "Egress (to CMS) Cycles Full. Counts the woke number of cycles when the woke M2PCIe Egress is full.  BL_1",
         "Counter": "0,1,2,3",
         "EventCode": "0x25",
         "EventName": "UNC_M2P_EGRESS_CYCLES_FULL.BL_1",
@@ -54,7 +54,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the number of cycles when the M2PCIe Egress is not empty.  AD_0",
+        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Egress is not empty.  AD_0",
         "Counter": "0,1",
         "EventCode": "0x23",
         "EventName": "UNC_M2P_EGRESS_CYCLES_NE.AD_0",
@@ -63,7 +63,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the number of cycles when the M2PCIe Egress is not empty.  AD_1",
+        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Egress is not empty.  AD_1",
         "Counter": "0,1",
         "EventCode": "0x23",
         "EventName": "UNC_M2P_EGRESS_CYCLES_NE.AD_1",
@@ -72,7 +72,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the number of cycles when the M2PCIe Egress is not empty.  AK_0",
+        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Egress is not empty.  AK_0",
         "Counter": "0,1",
         "EventCode": "0x23",
         "EventName": "UNC_M2P_EGRESS_CYCLES_NE.AK_0",
@@ -81,7 +81,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the number of cycles when the M2PCIe Egress is not empty.  AK_1",
+        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Egress is not empty.  AK_1",
         "Counter": "0,1",
         "EventCode": "0x23",
         "EventName": "UNC_M2P_EGRESS_CYCLES_NE.AK_1",
@@ -90,7 +90,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the number of cycles when the M2PCIe Egress is not empty.  BL_0",
+        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Egress is not empty.  BL_0",
         "Counter": "0,1",
         "EventCode": "0x23",
         "EventName": "UNC_M2P_EGRESS_CYCLES_NE.BL_0",
@@ -99,7 +99,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the number of cycles when the M2PCIe Egress is not empty.  BL_1",
+        "BriefDescription": "Egress (to CMS) Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Egress is not empty.  BL_1",
         "Counter": "0,1",
         "EventCode": "0x23",
         "EventName": "UNC_M2P_EGRESS_CYCLES_NE.BL_1",
@@ -108,7 +108,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. AD_0",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. AD_0",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.AD_0",
@@ -117,7 +117,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. AD_1",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. AD_1",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.AD_1",
@@ -126,7 +126,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. AK_0",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. AK_0",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.AK_0",
@@ -135,7 +135,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. AK_1",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. AK_1",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.AK_1",
@@ -144,7 +144,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. AK_CRD_0",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. AK_CRD_0",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.AK_CRD_0",
@@ -153,7 +153,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. AK_CRD_1",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. AK_CRD_1",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.AK_CRD_1",
@@ -162,7 +162,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. BL_0",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. BL_0",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.BL_0",
@@ -171,7 +171,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Egress (to CMS) Ingress. Counts the number of number of messages inserted into the  the M2PCIe Egress queue. BL_1",
+        "BriefDescription": "Egress (to CMS) Ingress. Counts the woke number of number of messages inserted into the woke  the woke M2PCIe Egress queue. BL_1",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "UNC_M2P_EGRESS_INSERTS.BL_1",
@@ -180,7 +180,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the number of cycles when the M2PCIe Ingress is not empty.ALL",
+        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Ingress is not empty.ALL",
         "Counter": "0,1,2,3",
         "EventCode": "0x10",
         "EventName": "UNC_M2P_INGRESS_CYCLES_NE.ALL",
@@ -189,7 +189,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the number of cycles when the M2PCIe Ingress is not empty.CBO_IDI",
+        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Ingress is not empty.CBO_IDI",
         "Counter": "0,1,2,3",
         "EventCode": "0x10",
         "EventName": "UNC_M2P_INGRESS_CYCLES_NE.CBO_IDI",
@@ -198,7 +198,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the number of cycles when the M2PCIe Ingress is not empty.CBO_NCB",
+        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Ingress is not empty.CBO_NCB",
         "Counter": "0,1,2,3",
         "EventCode": "0x10",
         "EventName": "UNC_M2P_INGRESS_CYCLES_NE.CBO_NCB",
@@ -207,7 +207,7 @@
         "Unit": "M2PCIe"
     },
     {
-        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the number of cycles when the M2PCIe Ingress is not empty.CBO_NCS",
+        "BriefDescription": "Ingress Queue Cycles Not Empty. Counts the woke number of cycles when the woke M2PCIe Ingress is not empty.CBO_NCS",
         "Counter": "0,1,2,3",
         "EventCode": "0x10",
         "EventName": "UNC_M2P_INGRESS_CYCLES_NE.CBO_NCS",

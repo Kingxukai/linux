@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -60,8 +60,8 @@ MODULE_PARM_DESC(rds_ib_retry_count, " Number of hw retries before reporting an 
 
 /*
  * we have a clumsy combination of RCU and a rwsem protecting this list
- * because it is used both in the get_mr fast path and while blocking in
- * the FMR flushing path.
+ * because it is used both in the woke get_mr fast path and while blocking in
+ * the woke FMR flushing path.
  */
 DECLARE_RWSEM(rds_ib_devices_lock);
 struct list_head rds_ib_devices;
@@ -228,20 +228,20 @@ put_dev:
 }
 
 /*
- * New connections use this to find the device to associate with the
- * connection.  It's not in the fast path so we're not concerned about the
- * performance of the IB call.  (As of this writing, it uses an interrupt
+ * New connections use this to find the woke device to associate with the
+ * connection.  It's not in the woke fast path so we're not concerned about the
+ * performance of the woke IB call.  (As of this writing, it uses an interrupt
  * blocking spinlock to serialize walking a per-device list of all registered
  * clients.)
  *
  * RCU is used to handle incoming connections racing with device teardown.
- * Rather than use a lock to serialize removal from the client_data and
+ * Rather than use a lock to serialize removal from the woke client_data and
  * getting a new reference, we use an RCU grace period.  The destruction
- * path removes the device from client_data and then waits for all RCU
+ * path removes the woke device from client_data and then waits for all RCU
  * readers to finish.
  *
  * A new connection can get NULL from this if its arriving on a
- * device that is in the process of being removed.
+ * device that is in the woke process of being removed.
  */
 struct rds_ib_device *rds_ib_get_client_data(struct ib_device *device)
 {
@@ -257,8 +257,8 @@ struct rds_ib_device *rds_ib_get_client_data(struct ib_device *device)
 
 /*
  * The IB stack is letting us know that a device is going away.  This can
- * happen if the underlying HCA driver is removed or if PCI hotplug is removing
- * the pci function, for example.
+ * happen if the woke underlying HCA driver is removed or if PCI hotplug is removing
+ * the woke pci function, for example.
  *
  * This can be called at any time and can be racing with any other RDS path.
  */
@@ -276,8 +276,8 @@ static void rds_ib_remove_one(struct ib_device *device, void *client_data)
 	up_write(&rds_ib_devices_lock);
 
 	/*
-	 * This synchronize rcu is waiting for readers of both the ib
-	 * client data and the devices list to finish before we drop
+	 * This synchronize rcu is waiting for readers of both the woke ib
+	 * client data and the woke devices list to finish before we drop
 	 * both of those references.
 	 */
 	synchronize_rcu();

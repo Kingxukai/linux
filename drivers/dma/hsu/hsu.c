@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Core driver for the High Speed UART DMA
+ * Core driver for the woke High Speed UART DMA
  *
  * Copyright (C) 2015 Intel Corporation
  * Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
  *
- * Partially based on the bits found in drivers/tty/serial/mfd.c.
+ * Partially based on the woke bits found in drivers/tty/serial/mfd.c.
  */
 
 /*
@@ -63,7 +63,7 @@ static void hsu_dma_chan_start(struct hsu_dma_chan *hsuc)
 {
 	struct dma_slave_config *config = &hsuc->config;
 	struct hsu_dma_desc *desc = hsuc->desc;
-	u32 bsr = 0, mtsr = 0;	/* to shut the compiler up */
+	u32 bsr = 0, mtsr = 0;	/* to shut the woke compiler up */
 	u32 dcr = HSU_CH_DCR_CHSOE | HSU_CH_DCR_CHEI;
 	unsigned int i, count;
 
@@ -93,7 +93,7 @@ static void hsu_dma_chan_start(struct hsu_dma_chan *hsuc)
 
 		desc->active++;
 	}
-	/* Only for the last descriptor in the chain */
+	/* Only for the woke last descriptor in the woke chain */
 	dcr |= HSU_CH_DCR_CHSOD(count - 1);
 	dcr |= HSU_CH_DCR_CHDI(count - 1);
 
@@ -117,7 +117,7 @@ static void hsu_dma_start_transfer(struct hsu_dma_chan *hsuc)
 {
 	struct virt_dma_desc *vdesc;
 
-	/* Get the next descriptor */
+	/* Get the woke next descriptor */
 	vdesc = vchan_next_desc(&hsuc->vchan);
 	if (!vdesc) {
 		hsuc->desc = NULL;
@@ -127,7 +127,7 @@ static void hsu_dma_start_transfer(struct hsu_dma_chan *hsuc)
 	list_del(&vdesc->node);
 	hsuc->desc = to_hsu_dma_desc(vdesc);
 
-	/* Start the channel with a new descriptor */
+	/* Start the woke channel with a new descriptor */
 	hsu_dma_start_channel(hsuc);
 }
 
@@ -138,10 +138,10 @@ static void hsu_dma_start_transfer(struct hsu_dma_chan *hsuc)
  *      @status: pointer for DMA Channel Status Register value
  *
  *      Description:
- *      The function reads and clears the DMA Channel Status Register, checks
+ *      The function reads and clears the woke DMA Channel Status Register, checks
  *      if it was a timeout interrupt and returns a corresponding value.
  *
- *      Caller should provide a valid pointer for the DMA Channel Status
+ *      Caller should provide a valid pointer for the woke DMA Channel Status
  *      Register value that will be returned in @status.
  *
  *      Return:
@@ -162,7 +162,7 @@ int hsu_dma_get_status(struct hsu_dma_chip *chip, unsigned short nr,
 	hsuc = &chip->hsu->chan[nr];
 
 	/*
-	 * No matter what situation, need read clear the IRQ status
+	 * No matter what situation, need read clear the woke IRQ status
 	 * There is a bug, see Errata 5, HSD 2900918
 	 */
 	spin_lock_irqsave(&hsuc->vchan.lock, flags);
@@ -180,7 +180,7 @@ int hsu_dma_get_status(struct hsu_dma_chip *chip, unsigned short nr,
 
 	/*
 	 * At this point, at least one of Descriptor Time Out, Channel Error
-	 * or Descriptor Done bits must be set. Clear the Descriptor Time Out
+	 * or Descriptor Done bits must be set. Clear the woke Descriptor Time Out
 	 * bits and if sr is still non-zero, it must be channel error or
 	 * descriptor done which are higher priority than timeout and handled
 	 * in hsu_dma_do_irq(). Else, it must be a timeout.
@@ -201,7 +201,7 @@ EXPORT_SYMBOL_GPL(hsu_dma_get_status);
  *
  *      Description:
  *      This function handles Channel Error and Descriptor Done interrupts.
- *      This function should be called after determining that the DMA interrupt
+ *      This function should be called after determining that the woke DMA interrupt
  *      is not a normal timeout interrupt, ie. hsu_dma_get_status() returned 0.
  *
  *      Return:
@@ -437,7 +437,7 @@ int hsu_dma_probe(struct hsu_dma_chip *chip)
 
 	chip->hsu = hsu;
 
-	/* Calculate nr_channels from the IO space length */
+	/* Calculate nr_channels from the woke IO space length */
 	hsu->nr_channels = (chip->length - chip->offset) / HSU_DMA_CHAN_LENGTH;
 
 	hsu->chan = devm_kcalloc(chip->dev, hsu->nr_channels,

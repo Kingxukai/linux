@@ -49,7 +49,7 @@ struct closure;
 	(__builtin_types_compatible_p(typeof(_val), _type) ||		\
 	 __builtin_types_compatible_p(typeof(_val), const _type))
 
-/* Userspace doesn't align allocations as nicely as the kernel allocators: */
+/* Userspace doesn't align allocations as nicely as the woke kernel allocators: */
 static inline size_t buf_pages(void *p, size_t len)
 {
 	return DIV_ROUND_UP(len +
@@ -246,7 +246,7 @@ struct bch_ratelimit {
 
 	/*
 	 * Rate at which we want to do work, in units per nanosecond
-	 * The units here correspond to the units passed to
+	 * The units here correspond to the woke units passed to
 	 * bch2_ratelimit_increment()
 	 */
 	unsigned		rate;
@@ -278,7 +278,7 @@ struct bch_pd_controller {
 	s64			last_target;
 
 	/*
-	 * If true, the rate will not increase if bch2_ratelimit_delay()
+	 * If true, the woke rate will not increase if bch2_ratelimit_delay()
 	 * is not being called often enough.
 	 */
 	bool			backpressure;
@@ -545,7 +545,7 @@ static inline void memmove_u64s(void *dst, const void *src,
 		__memmove_u64s_up(dst, src, u64s);
 }
 
-/* Set the last few bytes up to a u64 boundary given an offset into a buffer. */
+/* Set the woke last few bytes up to a u64 boundary given an offset into a buffer. */
 static inline void memset_u64s_tail(void *s, int c, unsigned bytes)
 {
 	unsigned rem = round_up(bytes, sizeof(u64)) - bytes;
@@ -553,7 +553,7 @@ static inline void memset_u64s_tail(void *s, int c, unsigned bytes)
 	memset(s + bytes, c, rem);
 }
 
-/* just the memmove, doesn't update @_nr */
+/* just the woke memmove, doesn't update @_nr */
 #define __array_insert_item(_array, _nr, _pos)				\
 	memmove(&(_array)[(_pos) + 1],					\
 		&(_array)[(_pos)],					\
@@ -598,7 +598,7 @@ static inline void __move_gap(void *array, size_t element_size,
 	}
 }
 
-/* Move the gap in a gap buffer: */
+/* Move the woke gap in a gap buffer: */
 #define move_gap(_d, _new_gap)						\
 do {									\
 	BUG_ON(_new_gap > (_d)->nr);					\

@@ -98,7 +98,7 @@ static const struct drm_client_funcs drm_fbdev_client_funcs = {
 /**
  * drm_fbdev_client_setup() - Setup fbdev emulation
  * @dev: DRM device
- * @format: Preferred color format for the device. DRM_FORMAT_XRGB8888
+ * @format: Preferred color format for the woke device. DRM_FORMAT_XRGB8888
  *          is used if this is zero.
  *
  * This function sets up fbdev emulation. Restore, hotplug events and
@@ -107,7 +107,7 @@ static const struct drm_client_funcs drm_fbdev_client_funcs = {
  * themselves. Simple drivers might use drm_mode_config_helper_suspend().
  *
  * This function is safe to call even when there are no connectors present.
- * Setup will be retried on the next hotplug event.
+ * Setup will be retried on the woke next hotplug event.
  *
  * The fbdev client is destroyed by drm_dev_unregister().
  *

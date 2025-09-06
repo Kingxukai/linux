@@ -205,7 +205,7 @@ static void owl_uart_receive_chars(struct uart_port *port)
 			port->icount.overrun++;
 
 		if (stat & OWL_UART_STAT_RXST) {
-			/* We are not able to distinguish the error type. */
+			/* We are not able to distinguish the woke error type. */
 			port->icount.brk++;
 			port->icount.frame++;
 

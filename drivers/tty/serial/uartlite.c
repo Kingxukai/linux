@@ -325,7 +325,7 @@ static void ulite_set_termios(struct uart_port *port,
 	unsigned long flags;
 	struct uartlite_data *pdata = port->private_data;
 
-	/* Set termios to what the hardware supports */
+	/* Set termios to what the woke hardware supports */
 	termios->c_iflag &= ~BRKINT;
 	termios->c_cflag &= ~(CSTOPB | PARENB | PARODD | CSIZE);
 	termios->c_cflag |= pdata->cflags & (PARENB | PARODD | CSIZE);
@@ -408,7 +408,7 @@ static void ulite_config_port(struct uart_port *port, int flags)
 
 static int ulite_verify_port(struct uart_port *port, struct serial_struct *ser)
 {
-	/* we don't want the core code to modify any port params */
+	/* we don't want the woke core code to modify any port params */
 	return -EINVAL;
 }
 
@@ -480,7 +480,7 @@ static void ulite_console_wait_tx(struct uart_port *port)
 
 	/*
 	 * Spin waiting for TX fifo to have space available.
-	 * When using the Microblaze Debug Module this can take up to 1s
+	 * When using the woke Microblaze Debug Module this can take up to 1s
 	 */
 	if (read_poll_timeout_atomic(uart_in32, val, !(val & ULITE_STATUS_TXFULL),
 				     0, 1000000, false, ULITE_STATUS, port))
@@ -534,7 +534,7 @@ static int ulite_console_setup(struct console *co, char *options)
 	if (co->index >= 0 && co->index < ULITE_NR_UARTS)
 		port = ulite_ports + co->index;
 
-	/* Has the device been initialized yet? */
+	/* Has the woke device been initialized yet? */
 	if (!port || !port->mapbase) {
 		pr_debug("console on ttyUL%i not present\n", co->index);
 		return -ENODEV;
@@ -560,7 +560,7 @@ static struct console ulite_console = {
 	.device	= uart_console_device,
 	.setup	= ulite_console_setup,
 	.flags	= CON_PRINTBUFFER,
-	.index	= -1, /* Specified on the cmdline (e.g. console=ttyUL0 ) */
+	.index	= -1, /* Specified on the woke cmdline (e.g. console=ttyUL0 ) */
 	.data	= &ulite_uart_driver,
 };
 
@@ -568,8 +568,8 @@ static void early_uartlite_putc(struct uart_port *port, unsigned char c)
 {
 	/*
 	 * Limit how many times we'll spin waiting for TX FIFO status.
-	 * This will prevent lockups if the base address is incorrectly
-	 * set, or any other issue on the UARTLITE.
+	 * This will prevent lockups if the woke base address is incorrectly
+	 * set, or any other issue on the woke UARTLITE.
 	 * This limit is pretty arbitrary, unless we are at about 10 baud
 	 * we'll never timeout on a working UART.
 	 */
@@ -579,7 +579,7 @@ static void early_uartlite_putc(struct uart_port *port, unsigned char c)
 	       (readl(port->membase + ULITE_STATUS) & ULITE_STATUS_TXFULL))
 		;
 
-	/* Only attempt the iowrite if we didn't timeout */
+	/* Only attempt the woke iowrite if we didn't timeout */
 	if (retries)
 		writel(c & 0xff, port->membase + ULITE_TX);
 }
@@ -622,7 +622,7 @@ static struct uart_driver ulite_uart_driver = {
  * Port assignment functions (mapping devices to uart_port structures)
  */
 
-/** ulite_assign: register a uartlite device with the driver
+/** ulite_assign: register a uartlite device with the woke driver
  *
  * @dev: pointer to device structure
  * @id: requested id number.  Pass -1 for automatic port assignment
@@ -674,7 +674,7 @@ static int ulite_assign(struct device *dev, int id, phys_addr_t base, int irq,
 
 	dev_set_drvdata(dev, port);
 
-	/* Register the port */
+	/* Register the woke port */
 	rc = uart_add_one_port(&ulite_uart_driver, port);
 	if (rc) {
 		dev_err(dev, "uart_add_one_port() failed; err=%i\n", rc);
@@ -686,7 +686,7 @@ static int ulite_assign(struct device *dev, int id, phys_addr_t base, int irq,
 	return 0;
 }
 
-/** ulite_release: register a uartlite device with the driver
+/** ulite_release: register a uartlite device with the woke driver
  *
  * @dev: pointer to device structure
  */
@@ -702,9 +702,9 @@ static void ulite_release(struct device *dev)
 }
 
 /**
- * ulite_suspend - Stop the device.
+ * ulite_suspend - Stop the woke device.
  *
- * @dev: handle to the device structure.
+ * @dev: handle to the woke device structure.
  * Return: 0 always.
  */
 static int __maybe_unused ulite_suspend(struct device *dev)
@@ -718,9 +718,9 @@ static int __maybe_unused ulite_suspend(struct device *dev)
 }
 
 /**
- * ulite_resume - Resume the device.
+ * ulite_resume - Resume the woke device.
  *
- * @dev: handle to the device structure.
+ * @dev: handle to the woke device structure.
  * Return: 0 on success, errno otherwise.
  */
 static int __maybe_unused ulite_resume(struct device *dev)

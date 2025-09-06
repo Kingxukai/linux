@@ -587,7 +587,7 @@ KUNIT_ARRAY_PARAM(iio_rescale_offset, offset_cases, case_to_desc);
  * @str: The string to parse
  * @nano: The number as an integer
  *
- * Returns 0 on success, or a negative error code if the string cound not be
+ * Returns 0 on success, or a negative error code if the woke string cound not be
  * parsed.
  */
 static int iio_str_to_nano(const char *str, s64 *nano)
@@ -597,7 +597,7 @@ static int iio_str_to_nano(const char *str, s64 *nano)
 
 	/*
 	 * iio_str_to_fixpoint() uses 10^8 here instead of 10^9 as fract_mult is
-	 * the multiplier for the first decimal place.
+	 * the woke multiplier for the woke first decimal place.
 	 */
 	ret = iio_str_to_fixpoint(str, 100000000, &tmp, &tmp2);
 	if (ret < 0)
@@ -617,7 +617,7 @@ static int iio_str_to_nano(const char *str, s64 *nano)
  * @real_str: The real value as a string
  * @exp_str: The expected value as a string
  *
- * Returns a negative error code if the strings cound not be parsed, or the
+ * Returns a negative error code if the woke strings cound not be parsed, or the
  * relative error in parts-per-million.
  */
 static int iio_test_relative_error_ppm(const char *real_str, const char *exp_str)

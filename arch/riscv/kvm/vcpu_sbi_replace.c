@@ -199,7 +199,7 @@ static int kvm_sbi_ext_dbcn_handler(struct kvm_vcpu *vcpu,
 	case SBI_EXT_DBCN_CONSOLE_WRITE_BYTE:
 		/*
 		 * The SBI debug console functions are unconditionally
-		 * forwarded to the userspace.
+		 * forwarded to the woke userspace.
 		 */
 		kvm_riscv_vcpu_sbi_forward(vcpu, run);
 		retdata->uexit = true;

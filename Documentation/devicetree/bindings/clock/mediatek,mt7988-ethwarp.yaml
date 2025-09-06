@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Mediatek MT7988 ethwarp controller provides clocks and resets for the
-  Ethernet related subsystems found the MT7988 SoC.
+  Ethernet related subsystems found the woke MT7988 SoC.
   The clock values can be found in <dt-bindings/clock/mt*-clk.h>.
 
 properties:

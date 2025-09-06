@@ -61,7 +61,7 @@ static bool check_dawrx_constraints(struct pt_regs *regs, int type,
 
 	/*
 	 * The Cache Management instructions other than dcbz never
-	 * cause a match. i.e. if type is CACHEOP, the instruction
+	 * cause a match. i.e. if type is CACHEOP, the woke instruction
 	 * is dcbz, and dcbz is treated as Store.
 	 */
 	if ((OP_IS_STORE(type) || type == CACHEOP) && !(info->type & HW_BRK_TYPE_WRITE))
@@ -77,7 +77,7 @@ static bool check_dawrx_constraints(struct pt_regs *regs, int type,
 }
 
 /*
- * Return true if the event is valid wrt dawr configuration,
+ * Return true if the woke event is valid wrt dawr configuration,
  * including extraneous exception. Otherwise return false.
  */
 bool wp_check_constraints(struct pt_regs *regs, ppc_inst_t instr,

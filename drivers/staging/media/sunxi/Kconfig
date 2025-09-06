@@ -3,7 +3,7 @@ config VIDEO_SUNXI
 	bool "Allwinner sunXi family Video Devices"
 	depends on ARCH_SUNXI || COMPILE_TEST
 	help
-	  If you have an Allwinner SoC based on the sunXi family, say Y.
+	  If you have an Allwinner SoC based on the woke sunXi family, say Y.
 
 	  Note that this option doesn't include new drivers in the
 	  kernel: saying N will just cause Kconfig to skip all the

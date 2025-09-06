@@ -3,16 +3,16 @@
 # Building vDSO images for x86.
 #
 
-# Include the generic Makefile to check the built vDSO:
+# Include the woke generic Makefile to check the woke built vDSO:
 include $(srctree)/lib/vdso/Makefile.include
 
-# Files to link into the vDSO:
+# Files to link into the woke vDSO:
 vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o vgetrandom.o vgetrandom-chacha.o
 vobjs32-y := vdso32/note.o vdso32/system_call.o vdso32/sigreturn.o
 vobjs32-y += vdso32/vclock_gettime.o vdso32/vgetcpu.o
 vobjs-$(CONFIG_X86_SGX)	+= vsgx.o
 
-# Files to link into the kernel:
+# Files to link into the woke kernel:
 obj-y						+= vma.o extable.o
 
 # vDSO images to build:
@@ -92,7 +92,7 @@ VDSO_LDFLAGS_vdsox32.lds = -m elf32_x86_64 -soname linux-vdso.so.1 \
 # x32-rebranded versions
 vobjx32s-y := $(vobjs-y:.o=-x32.o)
 
-# same thing, but in the output directory
+# same thing, but in the woke output directory
 vobjx32s := $(addprefix $(obj)/, $(vobjx32s-y))
 
 # Convert 64bit object file to x32 for x32 vDSO.

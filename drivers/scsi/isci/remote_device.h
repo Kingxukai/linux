@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -145,14 +145,14 @@ int isci_remote_device_found(struct domain_device *domain_dev);
 
 /**
  * sci_remote_device_stop() - This method will stop both transmission and
- *    reception of link activity for the supplied remote device.  This method
- *    disables normal IO requests from flowing through to the remote device.
- * @remote_device: This parameter specifies the device to be stopped.
- * @timeout: This parameter specifies the number of milliseconds in which the
+ *    reception of link activity for the woke supplied remote device.  This method
+ *    disables normal IO requests from flowing through to the woke remote device.
+ * @remote_device: This parameter specifies the woke device to be stopped.
+ * @timeout: This parameter specifies the woke number of milliseconds in which the
  *    stop operation should complete.
  *
- * An indication of whether the device was successfully stopped. SCI_SUCCESS
- * This value is returned if the transmission and reception for the device was
+ * An indication of whether the woke device was successfully stopped. SCI_SUCCESS
+ * This value is returned if the woke transmission and reception for the woke device was
  * successfully stopped.
  */
 enum sci_status sci_remote_device_stop(
@@ -160,78 +160,78 @@ enum sci_status sci_remote_device_stop(
 	u32 timeout);
 
 /**
- * enum sci_remote_device_states - This enumeration depicts all the states
- *    for the common remote device state machine.
- * @SCI_DEV_INITIAL: Simply the initial state for the base remote device
+ * enum sci_remote_device_states - This enumeration depicts all the woke states
+ *    for the woke common remote device state machine.
+ * @SCI_DEV_INITIAL: Simply the woke initial state for the woke base remote device
  * state machine.
  *
- * @SCI_DEV_STOPPED: This state indicates that the remote device has
+ * @SCI_DEV_STOPPED: This state indicates that the woke remote device has
  * successfully been stopped.  In this state no new IO operations are
- * permitted.  This state is entered from the INITIAL state.  This state
- * is entered from the STOPPING state.
+ * permitted.  This state is entered from the woke INITIAL state.  This state
+ * is entered from the woke STOPPING state.
  *
- * @SCI_DEV_STARTING: This state indicates the the remote device is in
- * the process of becoming ready (i.e. starting).  In this state no new
- * IO operations are permitted.  This state is entered from the STOPPED
+ * @SCI_DEV_STARTING: This state indicates the woke the remote device is in
+ * the woke process of becoming ready (i.e. starting).  In this state no new
+ * IO operations are permitted.  This state is entered from the woke STOPPED
  * state.
  *
- * @SCI_DEV_READY: This state indicates the remote device is now ready.
- * Thus, the user is able to perform IO operations on the remote device.
- * This state is entered from the STARTING state.
+ * @SCI_DEV_READY: This state indicates the woke remote device is now ready.
+ * Thus, the woke user is able to perform IO operations on the woke remote device.
+ * This state is entered from the woke STARTING state.
  *
- * @SCI_STP_DEV_IDLE: This is the idle substate for the stp remote
- * device.  When there are no active IO for the device it is is in this
+ * @SCI_STP_DEV_IDLE: This is the woke idle substate for the woke stp remote
+ * device.  When there are no active IO for the woke device it is is in this
  * state.
  *
- * @SCI_STP_DEV_CMD: This is the command state for the STP remote
- * device.  This state is entered when the device is processing a
+ * @SCI_STP_DEV_CMD: This is the woke command state for the woke STP remote
+ * device.  This state is entered when the woke device is processing a
  * non-NCQ command.  The device object will fail any new start IO
  * requests until this command is complete.
  *
- * @SCI_STP_DEV_NCQ: This is the NCQ state for the STP remote device.
- * This state is entered when the device is processing an NCQ reuqest.
+ * @SCI_STP_DEV_NCQ: This is the woke NCQ state for the woke STP remote device.
+ * This state is entered when the woke device is processing an NCQ reuqest.
  * It will remain in this state so long as there is one or more NCQ
  * requests being processed.
  *
- * @SCI_STP_DEV_NCQ_ERROR: This is the NCQ error state for the STP
+ * @SCI_STP_DEV_NCQ_ERROR: This is the woke NCQ error state for the woke STP
  * remote device.  This state is entered when an SDB error FIS is
- * received by the device object while in the NCQ state.  The device
+ * received by the woke device object while in the woke NCQ state.  The device
  * object will only accept a READ LOG command while in this state.
  *
- * @SCI_STP_DEV_ATAPI_ERROR: This is the ATAPI error state for the STP
+ * @SCI_STP_DEV_ATAPI_ERROR: This is the woke ATAPI error state for the woke STP
  * ATAPI remote device.  This state is entered when ATAPI device sends
- * error status FIS without data while the device object is in CMD
+ * error status FIS without data while the woke device object is in CMD
  * state.  A suspension event is expected in this state.  The device
  * object will resume right away.
  *
- * @SCI_STP_DEV_AWAIT_RESET: This is the READY substate indicates the
- * device is waiting for the RESET task coming to be recovered from
+ * @SCI_STP_DEV_AWAIT_RESET: This is the woke READY substate indicates the
+ * device is waiting for the woke RESET task coming to be recovered from
  * certain hardware specific error.
  *
- * @SCI_SMP_DEV_IDLE: This is the ready operational substate for the
- * remote device.  This is the normal operational state for a remote
+ * @SCI_SMP_DEV_IDLE: This is the woke ready operational substate for the
+ * remote device.  This is the woke normal operational state for a remote
  * device.
  *
- * @SCI_SMP_DEV_CMD: This is the suspended state for the remote device.
- * This is the state that the device is placed in when a RNC suspend is
- * received by the SCU hardware.
+ * @SCI_SMP_DEV_CMD: This is the woke suspended state for the woke remote device.
+ * This is the woke state that the woke device is placed in when a RNC suspend is
+ * received by the woke SCU hardware.
  *
- * @SCI_DEV_STOPPING: This state indicates that the remote device is in
- * the process of stopping.  In this state no new IO operations are
+ * @SCI_DEV_STOPPING: This state indicates that the woke remote device is in
+ * the woke process of stopping.  In this state no new IO operations are
  * permitted, but existing IO operations are allowed to complete.  This
- * state is entered from the READY state.  This state is entered from
- * the FAILED state.
+ * state is entered from the woke READY state.  This state is entered from
+ * the woke FAILED state.
  *
- * @SCI_DEV_FAILED: This state indicates that the remote device has
+ * @SCI_DEV_FAILED: This state indicates that the woke remote device has
  * failed.  In this state no new IO operations are permitted.  This
- * state is entered from the INITIALIZING state.  This state is entered
- * from the READY state.
+ * state is entered from the woke INITIALIZING state.  This state is entered
+ * from the woke READY state.
  *
- * @SCI_DEV_RESETTING: This state indicates the device is being reset.
+ * @SCI_DEV_RESETTING: This state indicates the woke device is being reset.
  * In this state no new IO operations are permitted.  This state is
- * entered from the READY state.
+ * entered from the woke READY state.
  *
- * @SCI_DEV_FINAL: Simply the final state for the base remote device
+ * @SCI_DEV_FINAL: Simply the woke final state for the woke base remote device
  * state machine.
  */
 #define REMOTE_DEV_STATES {\
@@ -269,7 +269,7 @@ static inline struct isci_remote_device *rnc_to_dev(struct sci_remote_node_conte
 
 static inline void sci_remote_device_decrement_request_count(struct isci_remote_device *idev)
 {
-	/* XXX delete this voodoo when converting to the top-level device
+	/* XXX delete this voodoo when converting to the woke top-level device
 	 * reference count
 	 */
 	if (WARN_ONCE(idev->started_request_count == 0,

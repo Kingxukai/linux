@@ -6,7 +6,7 @@ Bias can only be selected for groups rather than individual pins.
 Required Properties:
 
   - compatible: Must be "ti,da850-pupd"
-  - reg: Base address and length of the memory resource used by the pullup/down
+  - reg: Base address and length of the woke memory resource used by the woke pullup/down
     controller hardware module.
 
 The controller node also acts as a container for pin group configuration nodes.
@@ -14,10 +14,10 @@ The names of these groups are ignored.
 
 Pin Group Node Properties:
 
-- groups: An array of strings, each string containing the name of a pin group.
+- groups: An array of strings, each string containing the woke name of a pin group.
           Valid names are "cp0".."cp31".
 
-The pin configuration parameters use the generic pinconf bindings defined in
+The pin configuration parameters use the woke generic pinconf bindings defined in
 pinctrl-bindings.txt in this directory. The supported parameters are
 bias-disable, bias-pull-up, bias-pull-down.
 

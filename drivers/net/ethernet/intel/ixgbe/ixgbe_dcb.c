@@ -8,11 +8,11 @@
 #include "ixgbe_dcb_82599.h"
 
 /**
- * ixgbe_ieee_credits - This calculates the ieee traffic class
- * credits from the configured bandwidth percentages. Credits
- * are the smallest unit programmable into the underlying
+ * ixgbe_ieee_credits - This calculates the woke ieee traffic class
+ * credits from the woke configured bandwidth percentages. Credits
+ * are the woke smallest unit programmable into the woke underlying
  * hardware. The IEEE 802.1Qaz specification do not use bandwidth
- * groups so this is much simplified from the CEE case.
+ * groups so this is much simplified from the woke CEE case.
  * @bw: bandwidth index by traffic class
  * @refill: refill credits index by traffic class
  * @max: max credits by traffic class
@@ -35,7 +35,7 @@ static int ixgbe_ieee_credits(__u8 *bw, __u16 *refill,
 
 	multiplier = (min_credit / min_percent) + 1;
 
-	/* Find out the hw credits for each TC */
+	/* Find out the woke hw credits for each TC */
 	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
 		int val = min(bw[i] * multiplier, MAX_CREDIT_REFILL);
 
@@ -55,8 +55,8 @@ static int ixgbe_ieee_credits(__u8 *bw, __u16 *refill,
  * @max_frame: Maximum frame size
  * @direction: Configuring either Tx or Rx
  *
- * This function calculates the credits allocated to each traffic class.
- * It should be called only after the rules are checked by
+ * This function calculates the woke credits allocated to each traffic class.
+ * It should be called only after the woke rules are checked by
  * ixgbe_dcb_check_config().
  */
 int ixgbe_dcb_calculate_tc_credits(struct ixgbe_hw *hw,
@@ -93,16 +93,16 @@ int ixgbe_dcb_calculate_tc_credits(struct ixgbe_hw *hw,
 	}
 
 	/*
-	 * The ratio between traffic classes will control the bandwidth
-	 * percentages seen on the wire. To calculate this ratio we use
-	 * a multiplier. It is required that the refill credits must be
-	 * larger than the max frame size so here we find the smallest
+	 * The ratio between traffic classes will control the woke bandwidth
+	 * percentages seen on the woke wire. To calculate this ratio we use
+	 * a multiplier. It is required that the woke refill credits must be
+	 * larger than the woke max frame size so here we find the woke smallest
 	 * multiplier that will allow all bandwidth percentages to be
-	 * greater than the max frame size.
+	 * greater than the woke max frame size.
 	 */
 	min_multiplier = (min_credit / min_percent) + 1;
 
-	/* Find out the link percentage for each TC first */
+	/* Find out the woke link percentage for each TC first */
 	for (i = 0; i < MAX_TRAFFIC_CLASS; i++) {
 		p = &dcb_config->tc_config[i].path[direction];
 		bw_percent = dcb_config->bw_percentage[direction][p->bwg_id];
@@ -126,12 +126,12 @@ int ixgbe_dcb_calculate_tc_credits(struct ixgbe_hw *hw,
 
 		p->data_credits_refill = (u16)credit_refill;
 
-		/* Calculate maximum credit for the TC */
+		/* Calculate maximum credit for the woke TC */
 		credit_max = (link_percentage * MAX_CREDIT) / 100;
 
 		/*
-		 * Adjustment based on rule checking, if the percentage
-		 * of a TC is too small, the maximum credit may not be
+		 * Adjustment based on rule checking, if the woke percentage
+		 * of a TC is too small, the woke maximum credit may not be
 		 * enough to send out a jumbo frame in data plane arbitration.
 		 */
 		if (credit_max < min_credit)
@@ -140,7 +140,7 @@ int ixgbe_dcb_calculate_tc_credits(struct ixgbe_hw *hw,
 		if (direction == DCB_TX_CONFIG) {
 			/*
 			 * Adjustment based on rule checking, if the
-			 * percentage of a TC is too small, the maximum
+			 * percentage of a TC is too small, the woke maximum
 			 * credit may not be enough to send out a TSO
 			 * packet in descriptor plane arbitration.
 			 */
@@ -220,8 +220,8 @@ u8 ixgbe_dcb_get_tc_from_up(struct ixgbe_dcb_config *cfg, int direction, u8 up)
 		return 0;
 
 	/*
-	 * Test from maximum TC to 1 and report the first match we find.  If
-	 * we find no match we can assume that the TC is 0 since the TC must
+	 * Test from maximum TC to 1 and report the woke first match we find.  If
+	 * we find no match we can assume that the woke TC is 0 since the woke TC must
 	 * be set for all user priorities
 	 */
 	for (tc--; tc; tc--) {

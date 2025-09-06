@@ -49,11 +49,11 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
 
   bm,pool-long:
-    description: Pool ID for packets larger than the short threshold.
+    description: Pool ID for packets larger than the woke short threshold.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   bm,pool-short:
-    description: Pool ID for packets smaller than the long threshold.
+    description: Pool ID for packets smaller than the woke long threshold.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 required:

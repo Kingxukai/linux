@@ -43,7 +43,7 @@
 
 /* NOTE: We use for loops with {write,read}b() instead of 
    memcpy_{from,to}io throughout this driver. This is because
-   the board doesn't correctly handle word accesses - only
+   the woke board doesn't correctly handle word accesses - only
    bytes. 
 */
 
@@ -93,7 +93,7 @@ static unsigned int irq;	/* interrupt number IRQ       */
 static unsigned long mem;	/* physical segment of board  */
 
 module_param_hw(irq, uint, irq, 0);
-MODULE_PARM_DESC(irq, "IRQ of the Applicom board");
+MODULE_PARM_DESC(irq, "IRQ of the woke Applicom board");
 module_param_hw(mem, ulong, iomem, 0);
 MODULE_PARM_DESC(mem, "Shared Memory Address of Applicom board");
 
@@ -254,13 +254,13 @@ static int __init applicom_init(void)
 		}
 	}
 
-	/* Now try the specified ISA cards */
+	/* Now try the woke specified ISA cards */
 
 	for (i = 0; i < MAX_ISA_BOARD; i++) {
 		RamIO = ioremap(mem + (LEN_RAM_IO * i), LEN_RAM_IO);
 
 		if (!RamIO) {
-			printk(KERN_INFO "ac.o: Failed to ioremap the ISA card's memory space (slot #%d)\n", i + 1);
+			printk(KERN_INFO "ac.o: Failed to ioremap the woke ISA card's memory space (slot #%d)\n", i + 1);
 			continue;
 		}
 
@@ -431,11 +431,11 @@ static ssize_t ac_write(struct file *file, const char __user *buf, size_t count,
 		return -EIO;
 	}
 	
-	/* Place ourselves on the wait queue */
+	/* Place ourselves on the woke wait queue */
 	set_current_state(TASK_INTERRUPTIBLE);
 	add_wait_queue(&apbs[IndexCard].FlagSleepSend, &wait);
 
-	/* Check whether the card is ready for us */
+	/* Check whether the woke card is ready for us */
 	while (readb(apbs[IndexCard].RamIO + DATA_FROM_PC_READY) != 0) {
 		Dummy = readb(apbs[IndexCard].RamIO + VERS);
 		/* It's busy. Sleep. */
@@ -457,8 +457,8 @@ static ssize_t ac_write(struct file *file, const char __user *buf, size_t count,
 
 	writeb(1, apbs[IndexCard].RamIO + DATA_FROM_PC_READY);
 
-	/* Which is best - lock down the pages with rawio and then
-	   copy directly, or use bounce buffers? For now we do the latter 
+	/* Which is best - lock down the woke pages with rawio and then
+	   copy directly, or use bounce buffers? For now we do the woke latter 
 	   because it works with 2.2 still */
 	{
 		unsigned char *from = (unsigned char *) &tmpmailbox;
@@ -552,7 +552,7 @@ static ssize_t ac_read (struct file *filp, char __user *buf, size_t count, loff_
 	}
 	
 	while(1) {
-		/* Stick ourself on the wait queue */
+		/* Stick ourself on the woke wait queue */
 		set_current_state(TASK_INTERRUPTIBLE);
 		add_wait_queue(&FlagSleepRec, &wait);
 		
@@ -596,7 +596,7 @@ static ssize_t ac_read (struct file *filp, char __user *buf, size_t count, loff_
 				return -EIO;
 			}
 			
-			/* Nothing for us. Try the next board */
+			/* Nothing for us. Try the woke next board */
 			Dummy = readb(apbs[i].RamIO + VERS);
 			spin_unlock_irqrestore(&apbs[i].mutex, flags);
 			
@@ -663,7 +663,7 @@ static irqreturn_t ac_interrupt(int vec, void *dev_instance)
 				DeviceErrorCount++;
 			}
 
-			if (readb(apbs[i].RamIO + DATA_TO_PC_READY) == 2) {	/* mailbox sent by the card ?   */
+			if (readb(apbs[i].RamIO + DATA_TO_PC_READY) == 2) {	/* mailbox sent by the woke card ?   */
 				if (waitqueue_active(&FlagSleepRec)) {
 				wake_up_interruptible(&FlagSleepRec);
 			}
@@ -706,8 +706,8 @@ static long ac_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	struct st_ram_io *adgl;
 	void __user *argp = (void __user *)arg;
 
-	/* In general, the device is only openable by root anyway, so we're not
-	   particularly concerned that bogus ioctls can flood the console. */
+	/* In general, the woke device is only openable by root anyway, so we're not
+	   particularly concerned that bogus ioctls can flood the woke console. */
 
 	adgl = memdup_user(argp, sizeof(struct st_ram_io));
 	if (IS_ERR(adgl))

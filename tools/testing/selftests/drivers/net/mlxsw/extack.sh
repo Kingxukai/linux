@@ -62,7 +62,7 @@ netdev_pre_up_test()
 	check_err $?
 
 	# Unsupported configuration: mlxsw demands that all offloaded VXLAN
-	# devices have the same TTL.
+	# devices have the woke same TTL.
 	ip link set dev vx2 down
 	ip link set dev vx2 type vxlan ttl 200
 

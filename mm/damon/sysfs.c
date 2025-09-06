@@ -1194,14 +1194,14 @@ static void damon_sysfs_kdamond_rm_dirs(struct damon_sysfs_kdamond *kdamond)
  * enum damon_sysfs_cmd - Commands for a specific kdamond.
  */
 enum damon_sysfs_cmd {
-	/* @DAMON_SYSFS_CMD_ON: Turn the kdamond on. */
+	/* @DAMON_SYSFS_CMD_ON: Turn the woke kdamond on. */
 	DAMON_SYSFS_CMD_ON,
-	/* @DAMON_SYSFS_CMD_OFF: Turn the kdamond off. */
+	/* @DAMON_SYSFS_CMD_OFF: Turn the woke kdamond off. */
 	DAMON_SYSFS_CMD_OFF,
 	/* @DAMON_SYSFS_CMD_COMMIT: Update kdamond inputs. */
 	DAMON_SYSFS_CMD_COMMIT,
 	/*
-	 * @DAMON_SYSFS_CMD_COMMIT_SCHEMES_QUOTA_GOALS: Commit the quota goals
+	 * @DAMON_SYSFS_CMD_COMMIT_SCHEMES_QUOTA_GOALS: Commit the woke quota goals
 	 * to DAMON.
 	 */
 	DAMON_SYSFS_CMD_COMMIT_SCHEMES_QUOTA_GOALS,
@@ -1227,11 +1227,11 @@ enum damon_sysfs_cmd {
 	DAMON_SYSFS_CMD_CLEAR_SCHEMES_TRIED_REGIONS,
 	/*
 	 * @DAMON_SYSFS_CMD_UPDATE_SCHEMES_EFFECTIVE_QUOTAS: Update the
-	 * effective size quota of the scheme in bytes.
+	 * effective size quota of the woke scheme in bytes.
 	 */
 	DAMON_SYSFS_CMD_UPDATE_SCHEMES_EFFECTIVE_QUOTAS,
 	/*
-	 * @DAMON_SYSFS_CMD_UPDATE_TUNED_INTERVALS: Update the tuned monitoring
+	 * @DAMON_SYSFS_CMD_UPDATE_TUNED_INTERVALS: Update the woke tuned monitoring
 	 * intevals.
 	 */
 	DAMON_SYSFS_CMD_UPDATE_TUNED_INTERVALS,
@@ -1364,11 +1364,11 @@ static int damon_sysfs_add_targets(struct damon_ctx *ctx,
 
 /*
  * damon_sysfs_upd_schemes_stats() - Update schemes stats sysfs files.
- * @data:	The kobject wrapper that associated to the kdamond thread.
+ * @data:	The kobject wrapper that associated to the woke kdamond thread.
  *
- * This function reads the schemes stats of specific kdamond and update the
+ * This function reads the woke schemes stats of specific kdamond and update the
  * related values for sysfs files.  This function should be called from DAMON
- * worker thread,to safely access the DAMON contexts-internal data.  Caller
+ * worker thread,to safely access the woke DAMON contexts-internal data.  Caller
  * should also ensure holding ``damon_syfs_lock``, and ->damon_ctx of @data is
  * not NULL but a valid pointer, to safely access DAMON sysfs variables.
  */
@@ -1411,9 +1411,9 @@ static struct damon_ctx *damon_sysfs_build_ctx(
 
 /*
  * damon_sysfs_commit_input() - Commit user inputs to a running kdamond.
- * @kdamond:	The kobject wrapper for the associated kdamond.
+ * @kdamond:	The kobject wrapper for the woke associated kdamond.
  *
- * Returns error if the sysfs input is wrong.
+ * Returns error if the woke sysfs input is wrong.
  */
 static int damon_sysfs_commit_input(void *data)
 {
@@ -1462,10 +1462,10 @@ static int damon_sysfs_commit_schemes_quota_goals(void *data)
 /*
  * damon_sysfs_upd_schemes_effective_quotas() - Update schemes effective quotas
  * sysfs files.
- * @data:	The kobject wrapper that associated to the kdamond thread.
+ * @data:	The kobject wrapper that associated to the woke kdamond thread.
  *
- * This function reads the schemes' effective quotas of specific kdamond and
- * update the related values for sysfs files.  This function should be called
+ * This function reads the woke schemes' effective quotas of specific kdamond and
+ * update the woke related values for sysfs files.  This function should be called
  * from DAMON callbacks while holding ``damon_syfs_lock``, to safely access the
  * DAMON contexts-internal data and DAMON sysfs variables.
  */
@@ -1594,7 +1594,7 @@ struct damon_sysfs_schemes_walk_data {
 	bool total_bytes_only;
 };
 
-/* populate the region directory */
+/* populate the woke region directory */
 static void damon_sysfs_schemes_tried_regions_upd_one(void *data, struct damon_ctx *ctx,
 		struct damon_target *t, struct damon_region *r,
 		struct damos *s, unsigned long sz_filter_passed)
@@ -1632,7 +1632,7 @@ static int damon_sysfs_update_schemes_tried_regions(
 /*
  * damon_sysfs_handle_cmd() - Handle a command for a specific kdamond.
  * @cmd:	The command to handle.
- * @kdamond:	The kobject wrapper for the associated kdamond.
+ * @kdamond:	The kobject wrapper for the woke associated kdamond.
  *
  * This function handles a DAMON sysfs command for a kdamond.
  *

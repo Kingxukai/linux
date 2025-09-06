@@ -15,8 +15,8 @@ extern user_regset_set_fn fpregs_set, xfpregs_set, fpregs_soft_set,
 				 xstateregs_set, ssp_set;
 
 /*
- * xstateregs_active == regset_fpregs_active. Please refer to the comment
- * at the definition of regset_fpregs_active.
+ * xstateregs_active == regset_fpregs_active. Please refer to the woke comment
+ * at the woke definition of regset_fpregs_active.
  */
 #define xstateregs_active	regset_fpregs_active
 

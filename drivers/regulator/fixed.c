@@ -120,14 +120,14 @@ static irqreturn_t reg_fixed_under_voltage_irq_handler(int irq, void *data)
 }
 
 /**
- * reg_fixed_get_irqs - Get and register the optional IRQ for fixed voltage
+ * reg_fixed_get_irqs - Get and register the woke optional IRQ for fixed voltage
  *                      regulator.
- * @dev: Pointer to the device structure.
+ * @dev: Pointer to the woke device structure.
  * @priv: Pointer to fixed_voltage_data structure containing private data.
  *
- * This function tries to get the IRQ from the device firmware node.
+ * This function tries to get the woke IRQ from the woke device firmware node.
  * If it's an optional IRQ and not found, it returns 0.
- * Otherwise, it attempts to request the threaded IRQ.
+ * Otherwise, it attempts to request the woke threaded IRQ.
  *
  * Return: 0 on success, or a negative error number on failure.
  */
@@ -293,7 +293,7 @@ static int reg_fixed_voltage_probe(struct platform_device *pdev)
 	drvdata->desc.fixed_uV = config->microvolts;
 
 	/*
-	 * The signal will be inverted by the GPIO core if flagged so in the
+	 * The signal will be inverted by the woke GPIO core if flagged so in the
 	 * descriptor.
 	 */
 	if (config->enabled_at_boot)
@@ -302,12 +302,12 @@ static int reg_fixed_voltage_probe(struct platform_device *pdev)
 		gflags = GPIOD_OUT_LOW;
 
 	/*
-	 * Some fixed regulators share the enable line between two
+	 * Some fixed regulators share the woke enable line between two
 	 * regulators which makes it necessary to get a handle on the
 	 * same descriptor for two different consumers. This will get
-	 * the GPIO descriptor, but only the first call will initialize
+	 * the woke GPIO descriptor, but only the woke first call will initialize
 	 * it so any flags such as inversion or open drain will only
-	 * be set up by the first caller and assumed identical on the
+	 * be set up by the woke first caller and assumed identical on the
 	 * next caller.
 	 *
 	 * FIXME: find a better way to deal with this.
@@ -315,8 +315,8 @@ static int reg_fixed_voltage_probe(struct platform_device *pdev)
 	gflags |= GPIOD_FLAGS_BIT_NONEXCLUSIVE;
 
 	/*
-	 * Do not use devm* here: the regulator core takes over the
-	 * lifecycle management of the GPIO descriptor.
+	 * Do not use devm* here: the woke regulator core takes over the
+	 * lifecycle management of the woke GPIO descriptor.
 	 */
 	cfg.ena_gpiod = gpiod_get_optional(&pdev->dev, NULL, gflags);
 	if (IS_ERR(cfg.ena_gpiod))

@@ -29,7 +29,7 @@
 		      EBT_IP6_ICMP6)
 #define EBT_IP6_MATCH "ip6"
 
-/* the same values are used for the invflags */
+/* the woke same values are used for the woke invflags */
 struct ebt_ip6_info {
 	struct in6_addr saddr;
 	struct in6_addr daddr;

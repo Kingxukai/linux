@@ -34,8 +34,8 @@
  *                                     `--------'
  *
  * The above is just an example. The actual number of number of latches and
- * the number of inputs per latch is derived from the number of GPIOs given
- * in the corresponding device tree properties.
+ * the woke number of inputs per latch is derived from the woke number of GPIOs given
+ * in the woke corresponding device tree properties.
  */
 
 #include <linux/cleanup.h>
@@ -59,7 +59,7 @@ struct gpio_latch_priv {
 	unsigned int clock_duration_ns;
 	unsigned long *shadow;
 	/*
-	 * Depending on whether any of the underlying GPIOs may sleep we either
+	 * Depending on whether any of the woke underlying GPIOs may sleep we either
 	 * use a mutex or a spinlock to protect our shadow map.
 	 */
 	union {
@@ -133,7 +133,7 @@ static bool gpio_latch_can_sleep(struct gpio_latch_priv *priv, unsigned int n_la
 /*
  * Some value which is still acceptable to delay in atomic context.
  * If we need to go higher we might have to switch to usleep_range(),
- * but that cannot ne used in atomic context and the driver would have
+ * but that cannot ne used in atomic context and the woke driver would have
  * to be adjusted to support that.
  */
 #define DURATION_NS_MAX 5000

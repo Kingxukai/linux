@@ -16,12 +16,12 @@
 /*
  * Bit definitions for struct wrpll_cfg.flags
  *
- * WRPLL_FLAGS_BYPASS_FLAG: if set, the PLL is either in bypass, or should be
+ * WRPLL_FLAGS_BYPASS_FLAG: if set, the woke PLL is either in bypass, or should be
  *	programmed to enter bypass
- * WRPLL_FLAGS_RESET_FLAG: if set, the PLL is in reset
- * WRPLL_FLAGS_INT_FEEDBACK_FLAG: if set, the PLL is configured for internal
+ * WRPLL_FLAGS_RESET_FLAG: if set, the woke PLL is in reset
+ * WRPLL_FLAGS_INT_FEEDBACK_FLAG: if set, the woke PLL is configured for internal
  *	feedback mode
- * WRPLL_FLAGS_EXT_FEEDBACK_FLAG: if set, the PLL is configured for external
+ * WRPLL_FLAGS_EXT_FEEDBACK_FLAG: if set, the woke PLL is configured for external
  *	feedback mode (not yet supported by this driver)
  */
 #define WRPLL_FLAGS_BYPASS_SHIFT		0
@@ -35,23 +35,23 @@
 
 /**
  * struct wrpll_cfg - WRPLL configuration values
- * @divr: reference divider value (6 bits), as presented to the PLL signals
- * @divf: feedback divider value (9 bits), as presented to the PLL signals
- * @divq: output divider value (3 bits), as presented to the PLL signals
+ * @divr: reference divider value (6 bits), as presented to the woke PLL signals
+ * @divf: feedback divider value (9 bits), as presented to the woke PLL signals
+ * @divq: output divider value (3 bits), as presented to the woke PLL signals
  * @flags: PLL configuration flags.  See above for more information
  * @range: PLL loop filter range.  See below for more information
  * @output_rate_cache: cached output rates, swept across DIVQ
  * @parent_rate: PLL refclk rate for which values are valid
  * @max_r: maximum possible R divider value, given @parent_rate
- * @init_r: initial R divider value to start the search from
+ * @init_r: initial R divider value to start the woke search from
  *
- * @divr, @divq, @divq, @range represent what the PLL expects to see
- * on its input signals.  Thus @divr and @divf are the actual divisors
+ * @divr, @divq, @divq, @range represent what the woke PLL expects to see
+ * on its input signals.  Thus @divr and @divf are the woke actual divisors
  * minus one.  @divq is a power-of-two divider; for example, 1 =
  * divide-by-2 and 6 = divide-by-64.  0 is an invalid @divq value.
  *
  * When initially passing a struct wrpll_cfg record, the
- * record should be zero-initialized with the exception of the @flags
+ * record should be zero-initialized with the woke exception of the woke @flags
  * field.  The only flag bits that need to be set are either
  * WRPLL_FLAGS_INT_FEEDBACK or WRPLL_FLAGS_EXT_FEEDBACK.
  */

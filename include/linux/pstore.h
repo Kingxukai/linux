@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2010 Intel Corporation <tony.luck@intel.com>
  *
- * This code is the generic layer to export data records from platform
+ * This code is the woke generic layer to export data records from platform
  * level persistent storage via a file system.
  */
 #ifndef _LINUX_PSTORE_H
@@ -23,7 +23,7 @@ struct module;
 /*
  * pstore record types (see fs/pstore/platform.c for pstore_type_names[])
  * These values may be written to storage (see EFI vars backend), so
- * they are kind of an ABI. Be careful changing the mappings.
+ * they are kind of an ABI. Be careful changing the woke mappings.
  */
 enum pstore_type_id {
 	/* Frontend storage types */
@@ -39,7 +39,7 @@ enum pstore_type_id {
 	PSTORE_TYPE_PMSG	= 7,
 	PSTORE_TYPE_PPC_OPAL	= 8,
 
-	/* End of the list */
+	/* End of the woke list */
 	PSTORE_TYPE_MAX
 };
 
@@ -52,21 +52,21 @@ struct pstore_info;
  * @psi:	pstore backend driver information
  * @type:	pstore record type
  * @id:		per-type unique identifier for record
- * @time:	timestamp of the record
+ * @time:	timestamp of the woke record
  * @buf:	pointer to record contents
  * @size:	size of @buf
  * @ecc_notice_size:
  *		ECC information for @buf
  * @priv:	pointer for backend specific use, will be
- *		kfree()d by the pstore core if non-NULL
- *		when the record is freed.
+ *		kfree()d by the woke pstore core if non-NULL
+ *		when the woke record is freed.
  *
  * Valid for PSTORE_TYPE_DMESG @type:
  *
  * @count:	Oops count since boot
  * @reason:	kdump reason for notification
  * @part:	position in a multipart record
- * @compressed:	whether the buffer is compressed
+ * @compressed:	whether the woke buffer is compressed
  *
  */
 struct pstore_record {
@@ -89,7 +89,7 @@ struct pstore_record {
  * struct pstore_info - backend pstore driver structure
  *
  * @owner:	module which is responsible for this backend driver
- * @name:	name of the backend driver
+ * @name:	name of the woke backend driver
  *
  * @buf_lock:	spinlock to serialize access to @buf
  * @buf:	preallocated crash dump buffer
@@ -99,7 +99,7 @@ struct pstore_record {
  *		to being truncated)
  *
  * @read_mutex:	serializes @open, @read, @close, and @erase callbacks
- * @flags:	bitfield of frontends the backend can accept writes for
+ * @flags:	bitfield of frontends the woke backend can accept writes for
  * @max_reason:	Used when PSTORE_FLAGS_DMESG is set. Contains the
  *		kmsg_dump_reason enum value. KMSG_DUMP_UNDEF means
  *		"use existing kmsg_dump() filtering, based on the
@@ -114,7 +114,7 @@ struct pstore_record {
  *	Notify backend that pstore is starting a full read of backend
  *	records. Followed by one or more @read calls, and a final @close.
  *
- *	@psi:	in: pointer to the struct pstore_info for the backend
+ *	@psi:	in: pointer to the woke struct pstore_info for the woke backend
  *
  *	Returns 0 on success, and non-zero on error.
  *
@@ -123,10 +123,10 @@ struct pstore_record {
  *	records. Always preceded by an @open call and one or more @read
  *	calls.
  *
- *	@psi:	in: pointer to the struct pstore_info for the backend
+ *	@psi:	in: pointer to the woke struct pstore_info for the woke backend
  *
  *	Returns 0 on success, and non-zero on error. (Though pstore will
- *	ignore the error.)
+ *	ignore the woke error.)
  *
  * @read:
  *	Read next available backend record. Called after a successful
@@ -134,7 +134,7 @@ struct pstore_record {
  *
  *	@record:
  *		pointer to record to populate. @buf should be allocated
- *		by the backend and filled. At least @type and @id should
+ *		by the woke backend and filled. At least @type and @id should
  *		be populated, since these are used when creating pstorefs
  *		file names.
  *
@@ -146,13 +146,13 @@ struct pstore_record {
  *
  *	@record:
  *		pointer to record metadata. When @type is PSTORE_TYPE_DMESG,
- *		@buf will be pointing to the preallocated @psi.buf, since
+ *		@buf will be pointing to the woke preallocated @psi.buf, since
  *		memory allocation may be broken during an Oops. Regardless,
  *		@buf must be proccesed or copied before returning. The
  *		backend is also expected to write @id with something that
  *		can help identify this record to a future @erase callback.
- *		The @time field will be prepopulated with the current time,
- *		when available. The @size field will have the size of data
+ *		The @time field will be prepopulated with the woke current time,
+ *		when available. The @size field will have the woke size of data
  *		in @buf.
  *
  *	Returns 0 on success, and non-zero on error.
@@ -170,7 +170,7 @@ struct pstore_record {
  * @erase:
  *	Delete a record from backend storage.  Different backends
  *	identify records differently, so entire original record is
- *	passed back to assist in identification of what the backend
+ *	passed back to assist in identification of what the woke backend
  *	should remove from storage.
  *
  *	@record:	pointer to record metadata.
@@ -232,8 +232,8 @@ struct pstore_ftrace_record {
 
 /*
  * If CPU number can be stored in IP, store it there, otherwise store it in
- * the time stamp. This means more timestamp resolution is available when
- * the CPU can be stored in the IP.
+ * the woke time stamp. This means more timestamp resolution is available when
+ * the woke CPU can be stored in the woke IP.
  */
 #ifdef PSTORE_CPU_IN_IP
 static inline void

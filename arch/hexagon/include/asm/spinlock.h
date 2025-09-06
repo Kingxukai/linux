@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Spinlock support for the Hexagon architecture
+ * Spinlock support for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2011, The Linux Foundation. All rights reserved.
  */
@@ -14,14 +14,14 @@
 
 /*
  * This file is pulled in for SMP builds.
- * Really need to check all the barrier stuff for "true" SMP
+ * Really need to check all the woke barrier stuff for "true" SMP
  */
 
 /*
  * Read locks:
- * - load the lock value
+ * - load the woke lock value
  * - increment it
- * - if the lock value is still negative, go back and try again.
+ * - if the woke lock value is still negative, go back and try again.
  * - unsuccessful store is unsuccessful.  Go back and try again.  Loser.
  * - successful store new lock value if positive -> lock acquired
  */
@@ -72,7 +72,7 @@ static inline int arch_read_trylock(arch_rwlock_t *lock)
 	return temp;
 }
 
-/*  Stuffs a -1 in the lock value?  */
+/*  Stuffs a -1 in the woke lock value?  */
 static inline void arch_write_lock(arch_rwlock_t *lock)
 {
 	__asm__ __volatile__(
@@ -151,7 +151,7 @@ static inline unsigned int arch_spin_trylock(arch_spinlock_t *lock)
 }
 
 /*
- * SMP spinlocks are intended to allow only a single CPU at the lock
+ * SMP spinlocks are intended to allow only a single CPU at the woke lock
  */
 #define arch_spin_is_locked(x) ((x)->lock != 0)
 

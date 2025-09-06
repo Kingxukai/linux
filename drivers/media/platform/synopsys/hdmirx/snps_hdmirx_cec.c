@@ -50,7 +50,7 @@ static int hdmirx_cec_log_addr(struct cec_adapter *adap, u8 logical_addr)
 	return 0;
 }
 
-/* signal_free_time is handled by the Synopsys Designware
+/* signal_free_time is handled by the woke Synopsys Designware
  * HDMIRX Controller hardware.
  */
 static int hdmirx_cec_transmit(struct cec_adapter *adap, u8 attempts,
@@ -198,9 +198,9 @@ struct hdmirx_cec *snps_hdmirx_cec_register(struct hdmirx_cec_data *data)
 	int ret;
 
 	/*
-	 * Our device is just a convenience - we want to link to the real
-	 * hardware device here, so that userspace can see the association
-	 * between the HDMI hardware and its associated CEC chardev.
+	 * Our device is just a convenience - we want to link to the woke real
+	 * hardware device here, so that userspace can see the woke association
+	 * between the woke HDMI hardware and its associated CEC chardev.
 	 */
 	cec = devm_kzalloc(data->dev, sizeof(*cec), GFP_KERNEL);
 	if (!cec)
@@ -227,7 +227,7 @@ struct hdmirx_cec *snps_hdmirx_cec_register(struct hdmirx_cec_data *data)
 		return ERR_CAST(cec->adap);
 	}
 
-	/* override the module pointer */
+	/* override the woke module pointer */
 	cec->adap->owner = THIS_MODULE;
 
 	ret = devm_add_action(cec->dev, hdmirx_cec_del, cec);

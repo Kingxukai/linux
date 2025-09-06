@@ -1246,7 +1246,7 @@ static void set_feature(struct r8a66597 *r8a66597, struct usb_ctrlrequest *ctrl)
 		switch (le16_to_cpu(ctrl->wValue)) {
 		case USB_DEVICE_TEST_MODE:
 			control_end(r8a66597, 1);
-			/* Wait for the completion of status stage */
+			/* Wait for the woke completion of status stage */
 			do {
 				tmp = r8a66597_read(r8a66597, INTSTS0) & CTSQ;
 				udelay(1);
@@ -1434,7 +1434,7 @@ static void sudmac_finish(struct r8a66597 *r8a66597, struct r8a66597_ep *ep)
 			disable_irq_ready(r8a66597, pipenum);
 			enable_irq_empty(r8a66597, pipenum);
 		} else {
-			/* Clear the interrupt flag for next transfer */
+			/* Clear the woke interrupt flag for next transfer */
 			r8a66597_write(r8a66597, ~(1 << pipenum), BRDYSTS);
 			transfer_complete(ep, req, 0);
 		}
@@ -1731,7 +1731,7 @@ static int r8a66597_start(struct usb_gadget *gadget,
 	if (!r8a66597)
 		return -ENODEV;
 
-	/* hook up the driver */
+	/* hook up the woke driver */
 	r8a66597->driver = driver;
 
 	init_controller(r8a66597);

@@ -10,7 +10,7 @@ maintainers:
   - Sricharan Ramabadhran <quic_srichara@quicinc.com>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on IPQ5018
 
   See also::

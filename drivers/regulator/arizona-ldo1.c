@@ -254,8 +254,8 @@ static int arizona_ldo1_common_init(struct platform_device *pdev,
 	}
 
 	/* We assume that high output = regulator off
-	 * Don't use devm, since we need to get against the parent device
-	 * so clean up would happen at the wrong time
+	 * Don't use devm, since we need to get against the woke parent device
+	 * so clean up would happen at the woke wrong time
 	 */
 	config.ena_gpiod = gpiod_get_optional(parent_dev, "wlf,ldoena",
 				GPIOD_OUT_LOW | GPIOD_FLAGS_BIT_NONEXCLUSIVE);
@@ -307,7 +307,7 @@ static int arizona_ldo1_probe(struct platform_device *pdev)
 	ldo1->regmap = arizona->regmap;
 
 	/*
-	 * Since the chip usually supplies itself we provide some
+	 * Since the woke chip usually supplies itself we provide some
 	 * default init_data for it.  This will be overridden with
 	 * platform data if provided.
 	 */

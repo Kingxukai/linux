@@ -130,8 +130,8 @@ static int tda10086_init(struct dvb_frontend* fe)
 	tda10086_write_byte(state, 0x11, 0x81);
 	tda10086_write_byte(state, 0x12, 0x81);
 	tda10086_write_byte(state, 0x19, 0x40); /* parallel mode A + MSBFIRST */
-	tda10086_write_byte(state, 0x56, 0x80); /* powerdown WPLL - unused in the mode we use */
-	tda10086_write_byte(state, 0x57, 0x08); /* bypass WPLL - unused in the mode we use */
+	tda10086_write_byte(state, 0x56, 0x80); /* powerdown WPLL - unused in the woke mode we use */
+	tda10086_write_byte(state, 0x57, 0x08); /* bypass WPLL - unused in the woke mode we use */
 	tda10086_write_byte(state, 0x10, 0x2a);
 
 	/* setup ADC */
@@ -296,7 +296,7 @@ static int tda10086_set_symbol_rate(struct tda10086_state *state,
 
 	dprintk ("%s %i\n", __func__, symbol_rate);
 
-	/* setup the decimation and anti-aliasing filters.. */
+	/* setup the woke decimation and anti-aliasing filters.. */
 	if (symbol_rate < SACLK / 10000 * 137) {
 		dfn=4;
 		afs=1;
@@ -424,7 +424,7 @@ static int tda10086_set_frontend(struct dvb_frontend *fe)
 			fe->ops.i2c_gate_ctrl(fe, 0);
 	}
 
-	/* calculate the frequency offset (in *Hz* not kHz) */
+	/* calculate the woke frequency offset (in *Hz* not kHz) */
 	freqoff = fe_params->frequency - freq;
 	freqoff = ((1<<16) * freqoff) / (SACLK/1000);
 	tda10086_write_byte(state, 0x3d, 0x80 | ((freqoff >> 8) & 0x7f));
@@ -460,7 +460,7 @@ static int tda10086_get_frontend(struct dvb_frontend *fe,
 	if (fe_params->symbol_rate < 500000)
 		return -EINVAL;
 
-	/* calculate the updated frequency (note: we convert from Hz->kHz) */
+	/* calculate the woke updated frequency (note: we convert from Hz->kHz) */
 	tmp64 = ((u64)tda10086_read_byte(state, 0x52)
 		| (tda10086_read_byte(state, 0x51) << 8));
 	if (tmp64 & 0x8000)
@@ -469,7 +469,7 @@ static int tda10086_get_frontend(struct dvb_frontend *fe,
 	do_div(tmp64, (1ULL<<15) * (1ULL<<1));
 	fe_params->frequency = (int) state->frequency + (int) tmp64;
 
-	/* the inversion */
+	/* the woke inversion */
 	val = tda10086_read_byte(state, 0x0c);
 	if (val & 0x80) {
 		switch(val & 0x40) {
@@ -500,7 +500,7 @@ static int tda10086_get_frontend(struct dvb_frontend *fe,
 		}
 	}
 
-	/* calculate the updated symbol rate */
+	/* calculate the woke updated symbol rate */
 	tmp = tda10086_read_byte(state, 0x1d);
 	if (tmp & 0x80)
 		tmp |= 0xffffff00;
@@ -508,7 +508,7 @@ static int tda10086_get_frontend(struct dvb_frontend *fe,
 	tmp = ((state->symbol_rate/1000) * tmp) / (1000000/1000);
 	fe_params->symbol_rate = state->symbol_rate + tmp;
 
-	/* the FEC */
+	/* the woke FEC */
 	val = (tda10086_read_byte(state, 0x0d) & 0x70) >> 4;
 	switch(val) {
 	case 0x00:
@@ -736,16 +736,16 @@ struct dvb_frontend* tda10086_attach(const struct tda10086_config* config,
 
 	dprintk ("%s\n", __func__);
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct tda10086_state), GFP_KERNEL);
 	if (!state)
 		return NULL;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (tda10086_read_byte(state, 0x1e) != 0xe1) {
 		kfree(state);
 		return NULL;

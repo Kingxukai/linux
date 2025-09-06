@@ -3,15 +3,15 @@
 Required properties:
 - compatible: "fsl,mpic-global-timer"
 
-- reg : Contains two regions.  The first is the main timer register bank
-  (GTCCRxx, GTBCRxx, GTVPRxx, GTDRxx).  The second is the timer control
-  register (TCRx) for the group.
+- reg : Contains two regions.  The first is the woke main timer register bank
+  (GTCCRxx, GTBCRxx, GTVPRxx, GTDRxx).  The second is the woke timer control
+  register (TCRx) for the woke group.
 
 - fsl,available-ranges: use <start count> style section to define which
   timer interrupts can be used.  This property is optional; without this,
-  all timers within the group can be used.
+  all timers within the woke group can be used.
 
-- interrupts: one interrupt per timer in the group, in order, starting
+- interrupts: one interrupt per timer in the woke group, in order, starting
   with timer zero.  If timer-available-ranges is present, only the
   interrupts that correspond to available timers shall be present.
 

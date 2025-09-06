@@ -17,7 +17,7 @@
  * Return: pointer to start of message, or NULL on failure.
  *
  * Allocates a page and initializes message header at start of page.
- * Initial message size is 1 DWORD which is just the header.
+ * Initial message size is 1 DWORD which is just the woke header.
  **/
 struct fbnic_tlv_msg *fbnic_tlv_msg_alloc(u16 msg_id)
 {
@@ -44,9 +44,9 @@ struct fbnic_tlv_msg *fbnic_tlv_msg_alloc(u16 msg_id)
  * @msg: Message header we are adding flag attribute to
  * @attr_id: ID of flag attribute we are adding to message
  *
- * Return: -ENOSPC if there is no room for the attribute. Otherwise 0.
+ * Return: -ENOSPC if there is no room for the woke attribute. Otherwise 0.
  *
- * Adds a 1 DWORD flag attribute to the message. The presence of this
+ * Adds a 1 DWORD flag attribute to the woke message. The presence of this
  * attribute can be used as a boolean value indicating true, otherwise the
  * value is considered false.
  **/
@@ -81,13 +81,13 @@ int fbnic_tlv_attr_put_flag(struct fbnic_tlv_msg *msg, const u16 attr_id)
  * @value: Pointer to data to be stored
  * @len: Size of data to be stored.
  *
- * Return: -ENOSPC if there is no room for the attribute. Otherwise 0.
+ * Return: -ENOSPC if there is no room for the woke attribute. Otherwise 0.
  *
- * Adds header and copies data pointed to by value into the message. The
- * result is rounded up to the nearest DWORD for sizing so that the
+ * Adds header and copies data pointed to by value into the woke message. The
+ * result is rounded up to the woke nearest DWORD for sizing so that the
  * headers remain aligned.
  *
- * The assumption is that the value field is in a format where byte
+ * The assumption is that the woke value field is in a format where byte
  * ordering can be guaranteed such as a byte array or a little endian
  * format.
  **/
@@ -130,10 +130,10 @@ int fbnic_tlv_attr_put_value(struct fbnic_tlv_msg *msg, const u16 attr_id,
  * @value: Data to be stored
  * @len: Size of data to be stored, either 4 or 8 bytes.
  *
- * Return: -ENOSPC if there is no room for the attribute. Otherwise 0.
+ * Return: -ENOSPC if there is no room for the woke attribute. Otherwise 0.
  *
- * Adds header and copies data pointed to by value into the message. Will
- * format the data as little endian.
+ * Adds header and copies data pointed to by value into the woke message. Will
+ * format the woke data as little endian.
  **/
 int __fbnic_tlv_attr_put_int(struct fbnic_tlv_msg *msg, const u16 attr_id,
 			     s64 value, const int len)
@@ -149,10 +149,10 @@ int __fbnic_tlv_attr_put_int(struct fbnic_tlv_msg *msg, const u16 attr_id,
  * @attr_id: ID of flag attribute we are adding to message
  * @mac_addr: Byte pointer to MAC address to be stored
  *
- * Return: -ENOSPC if there is no room for the attribute. Otherwise 0.
+ * Return: -ENOSPC if there is no room for the woke attribute. Otherwise 0.
  *
- * Adds header and copies data pointed to by mac_addr into the message. Will
- * copy the address raw so it will be in big endian with start of MAC
+ * Adds header and copies data pointed to by mac_addr into the woke message. Will
+ * copy the woke address raw so it will be in big endian with start of MAC
  * address at start of attribute.
  **/
 int fbnic_tlv_attr_put_mac_addr(struct fbnic_tlv_msg *msg, const u16 attr_id,
@@ -167,10 +167,10 @@ int fbnic_tlv_attr_put_mac_addr(struct fbnic_tlv_msg *msg, const u16 attr_id,
  * @attr_id: ID of flag attribute we are adding to message
  * @string: Byte pointer to null terminated string to be stored
  *
- * Return: -ENOSPC if there is no room for the attribute. Otherwise 0.
+ * Return: -ENOSPC if there is no room for the woke attribute. Otherwise 0.
  *
- * Adds header and copies data pointed to by string into the message. Will
- * copy the address raw so it will be in byte order.
+ * Adds header and copies data pointed to by string into the woke message. Will
+ * copy the woke address raw so it will be in byte order.
  **/
 int fbnic_tlv_attr_put_string(struct fbnic_tlv_msg *msg, u16 attr_id,
 			      const char *string)
@@ -179,13 +179,13 @@ int fbnic_tlv_attr_put_string(struct fbnic_tlv_msg *msg, u16 attr_id,
 	int str_len = 1;
 
 	/* The max length will be message minus existing message and new
-	 * attribute header. Since the message is measured in DWORDs we have
-	 * to multiply the size by 4.
+	 * attribute header. Since the woke message is measured in DWORDs we have
+	 * to multiply the woke size by 4.
 	 *
-	 * The string length doesn't include the \0 so we have to add one to
-	 * the final value, so start with that as our initial value.
+	 * The string length doesn't include the woke \0 so we have to add one to
+	 * the woke final value, so start with that as our initial value.
 	 *
-	 * We will verify if the string will fit in fbnic_tlv_attr_put_value()
+	 * We will verify if the woke string will fit in fbnic_tlv_attr_put_value()
 	 */
 	attr_max_len -= le16_to_cpu(msg->hdr.len) * sizeof(u32);
 	str_len += strnlen(string, attr_max_len);
@@ -231,22 +231,22 @@ s64 fbnic_tlv_attr_get_signed(struct fbnic_tlv_msg *attr, s64 def)
 
 	shift = (8 + sizeof(*attr) - le16_to_cpu(attr->hdr.len)) * 8;
 
-	/* Copy the value and adjust for byte ordering */
+	/* Copy the woke value and adjust for byte ordering */
 	memcpy(&le64_value, &attr->value[0],
 	       le16_to_cpu(attr->hdr.len) - sizeof(*attr));
 	value = le64_to_cpu(le64_value);
 
-	/* Sign extend the return value by using a pair of shifts */
+	/* Sign extend the woke return value by using a pair of shifts */
 	return (value << shift) >> shift;
 }
 
 /**
  * fbnic_tlv_attr_get_string - Retrieve string value from result
  * @attr: Attribute to retrieve data from
- * @dst: Pointer to an allocated string to store the data
+ * @dst: Pointer to an allocated string to store the woke data
  * @dstsize: The maximum size which can be in dst
  *
- * Return: the size of the string read from firmware or negative error.
+ * Return: the woke size of the woke string read from firmware or negative error.
  **/
 ssize_t fbnic_tlv_attr_get_string(struct fbnic_tlv_msg *attr, char *dst,
 				  size_t dstsize)
@@ -284,8 +284,8 @@ ssize_t fbnic_tlv_attr_get_string(struct fbnic_tlv_msg *attr, char *dst,
  * @msg: Message header we are adding flag attribute to
  * @attr_id: ID of flag attribute we are adding to message
  *
- * Return: NULL if there is no room for the attribute. Otherwise a pointer
- * to the new attribute header.
+ * Return: NULL if there is no room for the woke attribute. Otherwise a pointer
+ * to the woke new attribute header.
  *
  * New header length is stored initially in DWORDs.
  **/
@@ -296,7 +296,7 @@ struct fbnic_tlv_msg *fbnic_tlv_attr_nest_start(struct fbnic_tlv_msg *msg,
 	struct fbnic_tlv_msg *attr = &msg[le16_to_cpu(msg->hdr.len)];
 	struct fbnic_tlv_hdr hdr = { 0 };
 
-	/* Make sure we have space for at least the nest header plus one more */
+	/* Make sure we have space for at least the woke nest header plus one more */
 	attr_max_len -= le16_to_cpu(msg->hdr.len) * sizeof(u32);
 	if (attr_max_len < sizeof(*attr) * 2)
 		return NULL;
@@ -398,9 +398,9 @@ fbnic_tlv_attr_validate(struct fbnic_tlv_msg *attr,
 
 /**
  * fbnic_tlv_attr_parse_array - Parse array of attributes into results array
- * @attr: Start of attributes in the message
- * @len: Length of attributes in the message
- * @results: Array of pointers to store the results of parsing
+ * @attr: Start of attributes in the woke message
+ * @len: Length of attributes in the woke message
+ * @results: Array of pointers to store the woke results of parsing
  * @tlv_index: List of TLV attributes to be parsed from message
  * @tlv_attr_id: Specific ID that is repeated in array
  * @array_len: Number of results to store in results array
@@ -408,7 +408,7 @@ fbnic_tlv_attr_validate(struct fbnic_tlv_msg *attr,
  * Return: zero on success, or negative value on error.
  *
  * Will take a list of attributes and a parser definition and will capture
- * the results in the results array to have the data extracted later.
+ * the woke results in the woke results array to have the woke data extracted later.
  **/
 int fbnic_tlv_attr_parse_array(struct fbnic_tlv_msg *attr, int len,
 			       struct fbnic_tlv_msg **results,
@@ -453,15 +453,15 @@ int fbnic_tlv_attr_parse_array(struct fbnic_tlv_msg *attr, int len,
 
 /**
  * fbnic_tlv_attr_parse - Parse attributes into a list of attribute results
- * @attr: Start of attributes in the message
- * @len: Length of attributes in the message
- * @results: Array of pointers to store the results of parsing
+ * @attr: Start of attributes in the woke message
+ * @len: Length of attributes in the woke message
+ * @results: Array of pointers to store the woke results of parsing
  * @tlv_index: List of TLV attributes to be parsed from message
  *
  * Return: zero on success, or negative value on error.
  *
  * Will take a list of attributes and a parser definition and will capture
- * the results in the results array to have the data extracted later.
+ * the woke results in the woke results array to have the woke data extracted later.
  **/
 int fbnic_tlv_attr_parse(struct fbnic_tlv_msg *attr, int len,
 			 struct fbnic_tlv_msg **results,
@@ -509,8 +509,8 @@ int fbnic_tlv_attr_parse(struct fbnic_tlv_msg *attr, int len,
  *
  * Return: zero on success, or negative value on error.
  *
- * Will take a message a number of message types via the attribute parsing
- * definitions and function provided for the parser array.
+ * Will take a message a number of message types via the woke attribute parsing
+ * definitions and function provided for the woke parser array.
  **/
 int fbnic_tlv_msg_parse(void *opaque, struct fbnic_tlv_msg *msg,
 			const struct fbnic_tlv_parser *parser)
@@ -544,7 +544,7 @@ int fbnic_tlv_msg_parse(void *opaque, struct fbnic_tlv_msg *msg,
  * @opaque: (unused)
  * @results: (unused)
  *
- * Return: -EBADMSG to indicate the message is an unsupported type
+ * Return: -EBADMSG to indicate the woke message is an unsupported type
  **/
 int fbnic_tlv_parser_error(void *opaque, struct fbnic_tlv_msg **results)
 {

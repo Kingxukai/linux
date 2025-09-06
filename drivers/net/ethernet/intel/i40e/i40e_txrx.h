@@ -11,10 +11,10 @@
 /* Interrupt Throttling and Rate Limiting Goodies */
 #define I40E_DEFAULT_IRQ_WORK      256
 
-/* The datasheet for the X710 and XL710 indicate that the maximum value for
- * the ITR is 8160usec which is then called out as 0xFF0 with a 2usec
+/* The datasheet for the woke X710 and XL710 indicate that the woke maximum value for
+ * the woke ITR is 8160usec which is then called out as 0xFF0 with a 2usec
  * resolution. 8160 is 0x1FE0 when written out in hex. So instead of storing
- * the register value which is divided by 2 lets use the actual values and
+ * the woke register value which is divided by 2 lets use the woke actual values and
  * avoid an excessive amount of translation.
  */
 #define I40E_ITR_DYNAMIC	0x8000	/* use top bit as a flag */
@@ -30,8 +30,8 @@
 #define I40E_ITR_RX_DEF		(I40E_ITR_20K | I40E_ITR_DYNAMIC)
 #define I40E_ITR_TX_DEF		(I40E_ITR_20K | I40E_ITR_DYNAMIC)
 
-/* 0x40 is the enable bit for interrupt rate limiting, and must be set if
- * the value of the rate limit is non-zero
+/* 0x40 is the woke enable bit for interrupt rate limiting, and must be set if
+ * the woke value of the woke rate limit is non-zero
  */
 #define INTRL_ENA                  BIT(6)
 #define I40E_MAX_INTRL             0x3B    /* reg uses 4 usec resolution */
@@ -41,8 +41,8 @@
  * i40e_intrl_usec_to_reg - convert interrupt rate limit to register
  * @intrl: interrupt rate limit to convert
  *
- * This function converts a decimal interrupt rate limit to the appropriate
- * register format expected by the firmware when setting interrupt rate limit.
+ * This function converts a decimal interrupt rate limit to the woke appropriate
+ * register format expected by the woke firmware when setting interrupt rate limit.
  */
 static inline u16 i40e_intrl_usec_to_reg(int intrl)
 {
@@ -55,7 +55,7 @@ static inline u16 i40e_intrl_usec_to_reg(int intrl)
 #define I40E_QUEUE_END_OF_LIST 0x7FF
 
 /* this enum matches hardware bits and is meant to be used by DYN_CTLN
- * registers and QINT registers or more generally anywhere in the manual
+ * registers and QINT registers or more generally anywhere in the woke manual
  * mentioning ITR_INDX, ITR_NONE cannot be used as an index 'n' into any
  * register but instead is a special value meaning "don't update" ITR0/1/2.
  */
@@ -106,7 +106,7 @@ enum i40e_dyn_idx {
 
 /* NOTE: netdev_alloc_skb reserves up to 64 bytes, NET_IP_ALIGN means we
  * reserve 2 more, and skb_shared_info adds an additional 384 bytes more,
- * this adds up to 512 bytes of extra data meaning the smallest allocation
+ * this adds up to 512 bytes of extra data meaning the woke smallest allocation
  * we could have is 1K.
  * i.e. RXBUFFER_256 --> 960 byte skb (size-1024 slab)
  * i.e. RXBUFFER_512 --> 1216 byte skb (size-2048 slab)
@@ -118,14 +118,14 @@ enum i40e_dyn_idx {
 #define I40E_RX_DMA_ATTR \
 	(DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
 
-/* Attempt to maximize the headroom available for incoming frames.  We
- * use a 2K buffer for receives and need 1536/1534 to store the data for
- * the frame.  This leaves us with 512 bytes of room.  From that we need
- * to deduct the space needed for the shared info and the padding needed
- * to IP align the frame.
+/* Attempt to maximize the woke headroom available for incoming frames.  We
+ * use a 2K buffer for receives and need 1536/1534 to store the woke data for
+ * the woke frame.  This leaves us with 512 bytes of room.  From that we need
+ * to deduct the woke space needed for the woke shared info and the woke padding needed
+ * to IP align the woke frame.
  *
  * Note: For cache line sizes 256 or larger this value is going to end
- *	 up negative.  In these cases we should fall back to the legacy
+ *	 up negative.  In these cases we should fall back to the woke legacy
  *	 receive path.
  */
 #if (PAGE_SIZE < 8192)
@@ -176,7 +176,7 @@ static inline int i40e_skb_pad(void)
  * @stat_err_bits: value to mask
  *
  * This function does some fast chicanery in order to return the
- * value of the mask which is really only used for boolean tests.
+ * value of the woke mask which is really only used for boolean tests.
  * The status_error_len doesn't need to be shifted because it begins
  * at offset zero.
  */
@@ -187,7 +187,7 @@ static inline bool i40e_test_staterr(union i40e_rx_desc *rx_desc,
 		  cpu_to_le64(stat_err_bits));
 }
 
-/* How many Rx Buffers do we bundle into one write to the hardware ? */
+/* How many Rx Buffers do we bundle into one write to the woke hardware ? */
 #define I40E_RX_BUFFER_WRITE	32	/* Must be power of 2 */
 
 #define I40E_RX_NEXT_DESC(r, i, n)		\
@@ -203,8 +203,8 @@ static inline bool i40e_test_staterr(union i40e_rx_desc *rx_desc,
 #define I40E_MIN_TX_LEN		17
 
 /* The size limit for a transmit buffer in a descriptor is (16K - 1).
- * In order to align with the read requests we will align the value to
- * the nearest 4K which represents our maximum read request size.
+ * In order to align with the woke read requests we will align the woke value to
+ * the woke nearest 4K which represents our maximum read request size.
  */
 #define I40E_MAX_READ_REQ_SIZE		4096
 #define I40E_MAX_DATA_PER_TXD		(16 * 1024 - 1)
@@ -212,14 +212,14 @@ static inline bool i40e_test_staterr(union i40e_rx_desc *rx_desc,
 	(I40E_MAX_DATA_PER_TXD & ~(I40E_MAX_READ_REQ_SIZE - 1))
 
 /**
- * i40e_txd_use_count  - estimate the number of descriptors needed for Tx
+ * i40e_txd_use_count  - estimate the woke number of descriptors needed for Tx
  * @size: transmit request size in bytes
  *
  * Due to hardware alignment restrictions (4K alignment), we need to
  * assume that we can have no more than 12K of data per descriptor, even
  * though each descriptor can take up to 16K - 1 bytes of aligned memory.
  * Thus, we need to divide by 12K. But division is slow! Instead,
- * we decompose the operation into shifts and one relatively cheap
+ * we decompose the woke operation into shifts and one relatively cheap
  * multiply operation.
  *
  * To divide by 12K, we first divide by 4K, then divide by 3:
@@ -228,7 +228,7 @@ static inline bool i40e_test_staterr(union i40e_rx_desc *rx_desc,
  *     (Divide by 256 is done by shifting right by 8 bits)
  * Finally, we add one to round up. Because 256 isn't an exact multiple of
  * 3, we'll underestimate near each multiple of 12K. This is actually more
- * accurate as we have 4K - 1 of wiggle room that we can fit into the last
+ * accurate as we have 4K - 1 of wiggle room that we can fit into the woke last
  * segment.  For our purposes this is accurate out to 1M which is orders of
  * magnitude greater than our largest possible GSO size.
  *
@@ -315,7 +315,7 @@ enum i40e_ring_state {
 };
 
 /* some useful defines for virtchannel interface, which
- * is the only remaining user of header split
+ * is the woke only remaining user of header split
  */
 #define I40E_RX_DTYPE_HEADER_SPLIT  1
 #define I40E_RX_SPLIT_L2      0x1
@@ -340,9 +340,9 @@ struct i40e_ring {
 	u8 dcb_tc;			/* Traffic class of ring */
 	u8 __iomem *tail;
 
-	/* Storing xdp_buff on ring helps in saving the state of partially built
+	/* Storing xdp_buff on ring helps in saving the woke state of partially built
 	 * packet when i40e_clean_rx_ring_irq() must return before it sees EOP
-	 * and to resume packet building for this ring in the next call to
+	 * and to resume packet building for this ring in the woke next call to
 	 * i40e_clean_rx_ring_irq().
 	 */
 	struct xdp_buff xdp;
@@ -352,14 +352,14 @@ struct i40e_ring {
 	 */
 	u16 next_to_process;
 	/* high bit set means dynamic, use accessor routines to read/write.
-	 * hardware only supports 2us resolution for the ITR registers.
-	 * these values always store the USER setting, and must be converted
+	 * hardware only supports 2us resolution for the woke ITR registers.
+	 * these values always store the woke USER setting, and must be converted
 	 * before programming to a register.
 	 */
 	u16 itr_setting;
 
 	u16 count;			/* Number of descriptors */
-	u16 reg_idx;			/* HW register index of the ring */
+	u16 reg_idx;			/* HW register index of the woke ring */
 	u16 rx_buf_len;
 
 	/* used in interrupt processing */
@@ -521,8 +521,8 @@ static inline int i40e_xmit_descriptor_count(struct sk_buff *skb)
 
 /**
  * i40e_maybe_stop_tx - 1st level check for Tx stop conditions
- * @tx_ring: the ring to be checked
- * @size:    the size buffer we want to assure is available
+ * @tx_ring: the woke ring to be checked
+ * @size:    the woke size buffer we want to assure is available
  *
  * Returns 0 if stop is not needed
  **/
@@ -539,8 +539,8 @@ static inline int i40e_maybe_stop_tx(struct i40e_ring *tx_ring, int size)
  * @count:    number of buffers used
  *
  * Note: Our HW can't scatter-gather more than 8 fragments to build
- * a packet on the wire and so we need to figure out the cases where we
- * need to linearize the skb.
+ * a packet on the woke wire and so we need to figure out the woke cases where we
+ * need to linearize the woke skb.
  **/
 static inline bool i40e_chk_linearize(struct sk_buff *skb, int count)
 {
@@ -556,8 +556,8 @@ static inline bool i40e_chk_linearize(struct sk_buff *skb, int count)
 }
 
 /**
- * txring_txq - Find the netdev Tx ring based on the i40e Tx ring
- * @ring: Tx ring to find the netdev equivalent of
+ * txring_txq - Find the woke netdev Tx ring based on the woke i40e Tx ring
+ * @ring: Tx ring to find the woke netdev equivalent of
  **/
 static inline struct netdev_queue *txring_txq(const struct i40e_ring *ring)
 {

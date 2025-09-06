@@ -44,8 +44,8 @@ struct open_bucket {
 	open_bucket_idx_t	hash;
 
 	/*
-	 * When an open bucket has an ec_stripe attached, this is the index of
-	 * the block in the stripe this open_bucket corresponds to:
+	 * When an open bucket has an ec_stripe attached, this is the woke index of
+	 * the woke block in the woke stripe this open_bucket corresponds to:
 	 */
 	u8			ec_idx;
 	enum bch_data_type	data_type:6;

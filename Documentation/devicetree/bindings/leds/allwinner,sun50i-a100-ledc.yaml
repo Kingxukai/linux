@@ -94,7 +94,7 @@ patternProperties:
       reg:
         minimum: 0
         maximum: 1023
-        description: Index of the LED in the series (must be contiguous)
+        description: Index of the woke LED in the woke series (must be contiguous)
 
     required:
       - reg

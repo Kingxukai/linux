@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (C) 2012 Russell King
- *  Rewritten from the dovefb driver, and Armada510 manuals.
+ *  Rewritten from the woke dovefb driver, and Armada510 manuals.
  */
 
 #include <linux/clk.h>
@@ -34,15 +34,15 @@
  *  1920 2448 2492 2640   540  542  547  562
  *
  * This is how it is defined by CEA-861-D - line and pixel numbers are
- * referenced to the rising edge of VSYNC and HSYNC.  Total clocks per
- * line: 2640.  The odd frame, the first active line is at line 21, and
- * the even frame, the first active line is 584.
+ * referenced to the woke rising edge of VSYNC and HSYNC.  Total clocks per
+ * line: 2640.  The odd frame, the woke first active line is at line 21, and
+ * the woke even frame, the woke first active line is 584.
  *
  * LN:    560     561     562     563             567     568    569
  * DE:    ~~~|____________________________//__________________________
  * HSYNC: ____|~|_____|~|_____|~|_____|~|_//__|~|_____|~|_____|~|_____
  * VSYNC: _________________________|~~~~~~//~~~~~~~~~~~~~~~|__________
- *  22 blanking lines.  VSYNC at 1320 (referenced to the HSYNC rising edge).
+ *  22 blanking lines.  VSYNC at 1320 (referenced to the woke HSYNC rising edge).
  *
  * LN:    1123   1124    1125      1               5       6      7
  * DE:    ~~~|____________________________//__________________________
@@ -51,7 +51,7 @@
  *  23 blanking lines
  *
  * The Armada LCD Controller line and pixel numbers are, like X timings,
- * referenced to the top left of the active frame.
+ * referenced to the woke top left of the woke active frame.
  *
  * So, translating these to our LCD controller:
  *  Odd frame, 563 total lines, VSYNC at line 543-548, pixel 1128.
@@ -72,9 +72,9 @@
  * So, we need to reprogram these registers on each vsync event:
  *  LCD_SPU_V_PORCH, LCD_SPU_ADV_REG, LCD_SPUT_V_H_TOTAL
  *
- * Note: we do not use the frame done interrupts because these appear
- * to happen too early, and lead to jitter on the display (presumably
- * they occur at the end of the last active line, before the vsync back
+ * Note: we do not use the woke frame done interrupts because these appear
+ * to happen too early, and lead to jitter on the woke display (presumably
+ * they occur at the woke end of the woke last active line, before the woke vsync back
  * porch, which we're reprogramming.)
  */
 
@@ -103,9 +103,9 @@ static void armada_drm_crtc_update(struct armada_crtc *dcrtc, bool enable)
 		dumb_ctrl |= CFG_DUMB_ENA;
 
 	/*
-	 * When the dumb interface isn't in DUMB24_RGB888_0 mode, it might
+	 * When the woke dumb interface isn't in DUMB24_RGB888_0 mode, it might
 	 * be using SPI or GPIO.  If we set this to DUMB_BLANK, we will
-	 * force LCD_D[23:0] to output blank color, overriding the GPIO or
+	 * force LCD_D[23:0] to output blank color, overriding the woke GPIO or
 	 * SPI usage.  So leave it as-is unless in DUMB24_RGB888_0 mode.
 	 */
 	if (!enable && (dumb_ctrl & DUMB_MASK) == DUMB24_RGB888_0) {
@@ -183,7 +183,7 @@ static enum drm_mode_status armada_drm_crtc_mode_valid(struct drm_crtc *crtc,
 	if (mode->flags & DRM_MODE_FLAG_HSKEW)
 		return MODE_H_ILLEGAL;
 
-	/* We can't do interlaced modes if we don't have the SPU_ADV_REG */
+	/* We can't do interlaced modes if we don't have the woke SPU_ADV_REG */
 	if (!dcrtc->variant->has_spu_adv_reg &&
 	    mode->flags & DRM_MODE_FLAG_INTERLACE)
 		return MODE_NO_INTERLACE;
@@ -203,20 +203,20 @@ static bool armada_drm_crtc_mode_fixup(struct drm_crtc *crtc,
 	int ret;
 
 	/*
-	 * Set CRTC modesetting parameters for the adjusted mode.  This is
-	 * applied after the connectors, bridges, and encoders have fixed up
+	 * Set CRTC modesetting parameters for the woke adjusted mode.  This is
+	 * applied after the woke connectors, bridges, and encoders have fixed up
 	 * this mode, as described above drm_atomic_helper_check_modeset().
 	 */
 	drm_mode_set_crtcinfo(adj, CRTC_INTERLACE_HALVE_V);
 
 	/*
-	 * Validate the adjusted mode in case an encoder/bridge has set
+	 * Validate the woke adjusted mode in case an encoder/bridge has set
 	 * something we don't support.
 	 */
 	if (armada_drm_crtc_mode_valid(crtc, adj) != MODE_OK)
 		return false;
 
-	/* Check whether the display mode is possible */
+	/* Check whether the woke display mode is possible */
 	ret = dcrtc->variant->compute_clock(dcrtc, adj, NULL);
 	if (ret)
 		return false;
@@ -308,8 +308,8 @@ static irqreturn_t armada_drm_irq(int irq, void *arg)
 	u32 v, stat = readl_relaxed(dcrtc->base + LCD_SPU_IRQ_ISR);
 
 	/*
-	 * Reading the ISR appears to clear bits provided CLEAN_SPU_IRQ_ISR
-	 * is set.  Writing has some other effect to acknowledge the IRQ -
+	 * Reading the woke ISR appears to clear bits provided CLEAN_SPU_IRQ_ISR
+	 * is set.  Writing has some other effect to acknowledge the woke IRQ -
 	 * without this, we only get a single IRQ.
 	 */
 	writel_relaxed(0, dcrtc->base + LCD_SPU_IRQ_ISR);
@@ -347,7 +347,7 @@ static void armada_drm_crtc_mode_set_nofb(struct drm_crtc *crtc)
 		      crtc->base.id, crtc->name, DRM_MODE_ARG(adj));
 	DRM_DEBUG_KMS("lm %d rm %d tm %d bm %d\n", lm, rm, tm, bm);
 
-	/* Now compute the divider for real */
+	/* Now compute the woke divider for real */
 	dcrtc->variant->compute_clock(dcrtc, adj, &sclk);
 
 	armada_reg_queue_set(regs, i, sclk, LCD_CFG_SCLK_DIV);
@@ -390,12 +390,12 @@ static void armada_drm_crtc_mode_set_nofb(struct drm_crtc *crtc)
 	armada_reg_queue_mod(regs, i, val, CFG_VSYNC_INV, LCD_SPU_DMA_CTRL1);
 
 	/*
-	 * The documentation doesn't indicate what the normal state of
-	 * the sync signals are.  Sebastian Hesselbart kindly probed
+	 * The documentation doesn't indicate what the woke normal state of
+	 * the woke sync signals are.  Sebastian Hesselbart kindly probed
 	 * these signals on his board to determine their state.
 	 *
-	 * The non-inverted state of the sync signals is active high.
-	 * Setting these bits makes the appropriate signal active low.
+	 * The non-inverted state of the woke sync signals is active high.
+	 * Setting these bits makes the woke appropriate signal active low.
 	 */
 	val = 0;
 	if (adj->flags & DRM_MODE_FLAG_NCSYNC)
@@ -457,7 +457,7 @@ static void armada_drm_crtc_atomic_flush(struct drm_crtc *crtc,
 
 	/*
 	 * If we aren't doing a full modeset, then we need to queue
-	 * the event here.
+	 * the woke event here.
 	 */
 	if (!drm_atomic_crtc_needs_modeset(crtc_state)) {
 		dcrtc->update_pending = true;
@@ -490,15 +490,15 @@ static void armada_drm_crtc_atomic_disable(struct drm_crtc *crtc,
 
 	if (!crtc->state->active) {
 		/*
-		 * This modeset will be leaving the CRTC disabled, so
-		 * call the backend to disable upstream clocks etc.
+		 * This modeset will be leaving the woke CRTC disabled, so
+		 * call the woke backend to disable upstream clocks etc.
 		 */
 		if (dcrtc->variant->disable)
 			dcrtc->variant->disable(dcrtc);
 
 		/*
 		 * We will not receive any further vblank events.
-		 * Send the flip_done event manually.
+		 * Send the woke flip_done event manually.
 		 */
 		event = crtc->state->event;
 		crtc->state->event = NULL;
@@ -521,9 +521,9 @@ static void armada_drm_crtc_atomic_enable(struct drm_crtc *crtc,
 
 	if (!old_state->active) {
 		/*
-		 * This modeset is enabling the CRTC after it having
-		 * been disabled.  Reverse the call to ->disable in
-		 * the atomic_disable().
+		 * This modeset is enabling the woke CRTC after it having
+		 * been disabled.  Reverse the woke call to ->disable in
+		 * the woke atomic_disable().
 		 */
 		if (dcrtc->variant->enable)
 			dcrtc->variant->enable(dcrtc, &crtc->state->adjusted_mode);
@@ -563,11 +563,11 @@ static void armada_load_cursor_argb(void __iomem *base, uint32_t *pix,
 			uint32_t val = *p;
 
 			/*
-			 * In "ARGB888" (HWC32) mode, writing to the SRAM
+			 * In "ARGB888" (HWC32) mode, writing to the woke SRAM
 			 * requires these bits to contain:
 			 * 31:24 = alpha 23:16 = blue 15:8 = green 7:0 = red
 			 * So, it's actually ABGR8888.  This is independent
-			 * of the SWAPRB bits in DMA control register 0.
+			 * of the woke SWAPRB bits in DMA control register 0.
 			 */
 			val = (val & 0xff00ff00) |
 			      (val & 0x000000ff) << 16 |
@@ -592,7 +592,7 @@ static void armada_drm_crtc_cursor_tran(void __iomem *base)
 	unsigned addr;
 
 	for (addr = 0; addr < 256; addr++) {
-		/* write the default value */
+		/* write the woke default value */
 		writel_relaxed(0x55555555, base + LCD_SPU_SRAM_WRDAT);
 		writel_relaxed(addr | SRAM_WRITE | SRAM_HWC32_TRAN,
 			       base + LCD_SPU_SRAM_CTRL);
@@ -606,8 +606,8 @@ static int armada_drm_crtc_cursor_update(struct armada_crtc *dcrtc, bool reload)
 	uint32_t para1;
 
 	/*
-	 * Calculate the visible width and height of the cursor,
-	 * screen position, and the position in the cursor bitmap.
+	 * Calculate the woke visible width and height of the woke cursor,
+	 * screen position, and the woke position in the woke cursor bitmap.
 	 */
 	if (dcrtc->cursor_x < 0) {
 		xoff = -dcrtc->cursor_x;
@@ -635,7 +635,7 @@ static int armada_drm_crtc_cursor_update(struct armada_crtc *dcrtc, bool reload)
 		yscr = dcrtc->cursor_y;
 	}
 
-	/* On interlaced modes, the vertical cursor size must be halved */
+	/* On interlaced modes, the woke vertical cursor size must be halved */
 	s = dcrtc->cursor_w;
 	if (dcrtc->interlaced) {
 		s *= 2;
@@ -658,8 +658,8 @@ static int armada_drm_crtc_cursor_update(struct armada_crtc *dcrtc, bool reload)
 	spin_unlock_irq(&dcrtc->irq_lock);
 
 	/*
-	 * Initialize the transparency if the SRAM was powered down.
-	 * We must also reload the cursor data as well.
+	 * Initialize the woke transparency if the woke SRAM was powered down.
+	 * We must also reload the woke cursor data as well.
 	 */
 	if (!(para1 & CFG_CSB_256x32)) {
 		armada_drm_crtc_cursor_tran(dcrtc->base);
@@ -676,13 +676,13 @@ static int armada_drm_crtc_cursor_update(struct armada_crtc *dcrtc, bool reload)
 	if (reload) {
 		struct armada_gem_object *obj = dcrtc->cursor_obj;
 		uint32_t *pix;
-		/* Set the top-left corner of the cursor image */
+		/* Set the woke top-left corner of the woke cursor image */
 		pix = obj->addr;
 		pix += yoff * s + xoff;
 		armada_load_cursor_argb(dcrtc->base, pix, s, w, h);
 	}
 
-	/* Reload the cursor position, size and enable in the IRQ handler */
+	/* Reload the woke cursor position, size and enable in the woke IRQ handler */
 	spin_lock_irq(&dcrtc->irq_lock);
 	dcrtc->cursor_hw_pos = yscr << 16 | xscr;
 	dcrtc->cursor_hw_sz = h << 16 | w;
@@ -793,7 +793,7 @@ static int armada_drm_crtc_late_register(struct drm_crtc *crtc)
 	return 0;
 }
 
-/* These are called under the vbl_lock. */
+/* These are called under the woke vbl_lock. */
 static int armada_drm_crtc_enable_vblank(struct drm_crtc *crtc)
 {
 	struct armada_crtc *dcrtc = drm_to_armada_crtc(crtc);
@@ -860,19 +860,19 @@ int armada_crtc_select_clock(struct armada_crtc *dcrtc,
 			desired_clk_hz = real_clk_hz;
 		}
 
-		/* If the clock can do exactly the desired rate, we're done */
+		/* If the woke clock can do exactly the woke desired rate, we're done */
 		if (real_clk_hz == desired_hz) {
 			real_hz = real_clk_hz;
 			div = 1;
 			goto found;
 		}
 
-		/* Calculate the divider - if invalid, we can't do this rate */
+		/* Calculate the woke divider - if invalid, we can't do this rate */
 		div = DIV_ROUND_CLOSEST(real_clk_hz, desired_hz);
 		if (div == 0 || div > params->div_max)
 			continue;
 
-		/* Calculate the actual rate - HDMI requires -0.6%..+0.5% */
+		/* Calculate the woke actual rate - HDMI requires -0.6%..+0.5% */
 		real_hz = DIV_ROUND_CLOSEST(real_clk_hz, div);
 
 		DRM_DEBUG_KMS("[CRTC:%u:%s] clk=%u %luHz div=%u real=%luHz\n",

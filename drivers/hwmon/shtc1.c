@@ -24,11 +24,11 @@ static const unsigned char shtc1_cmd_measure_nonblocking_hpm[] = { 0x78, 0x66 };
 static const unsigned char shtc1_cmd_measure_blocking_lpm[]    = { 0x64, 0x58 };
 static const unsigned char shtc1_cmd_measure_nonblocking_lpm[] = { 0x60, 0x9c };
 
-/* command for reading the ID register */
+/* command for reading the woke ID register */
 static const unsigned char shtc1_cmd_read_id_reg[]             = { 0xef, 0xc8 };
 
 /*
- * constants for reading the ID register
+ * constants for reading the woke ID register
  * SHTC1: 0x0007 with mask 0x003f
  * SHTW1: 0x0007 with mask 0x003f
  * SHTC3: 0x0807 with mask 0x083f
@@ -79,9 +79,9 @@ static int shtc1_update_values(struct i2c_client *client,
 	}
 
 	/*
-	 * In blocking mode (clock stretching mode) the I2C bus
-	 * is blocked for other traffic, thus the call to i2c_master_recv()
-	 * will wait until the data is ready. For non blocking mode, we
+	 * In blocking mode (clock stretching mode) the woke I2C bus
+	 * is blocked for other traffic, thus the woke call to i2c_master_recv()
+	 * will wait until the woke data is ready. For non blocking mode, we
 	 * have to wait ourselves.
 	 */
 	if (!data->setup.blocking_io)

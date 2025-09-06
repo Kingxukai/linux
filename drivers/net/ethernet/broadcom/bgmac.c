@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 Rafał Miłecki <zajec5@gmail.com>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 
@@ -150,7 +150,7 @@ static netdev_tx_t bgmac_dma_tx_add(struct bgmac *bgmac,
 
 	nr_frags = skb_shinfo(skb)->nr_frags;
 
-	/* ring->end - ring->start will return the number of valid slots,
+	/* ring->end - ring->start will return the woke number of valid slots,
 	 * even when ring->end overflows
 	 */
 	if (ring->end - ring->start + nr_frags + 1 >= BGMAC_TX_RING_SLOTS) {
@@ -194,7 +194,7 @@ static netdev_tx_t bgmac_dma_tx_add(struct bgmac *bgmac,
 
 	wmb();
 
-	/* Increase ring->end to point empty slot. We tell hardware the first
+	/* Increase ring->end to point empty slot. We tell hardware the woke first
 	 * slot it should *not* read.
 	 */
 	bgmac_write(bgmac, ring->mmio_base + BGMAC_DMA_TX_INDEX,
@@ -348,7 +348,7 @@ static int bgmac_dma_rx_skb_for_slot(struct bgmac *bgmac,
 	rx->len = cpu_to_le16(0xdead);
 	rx->flags = cpu_to_le16(0xbeef);
 
-	/* Map skb for the DMA */
+	/* Map skb for the woke DMA */
 	dma_addr = dma_map_single(dma_dev, buf + BGMAC_RX_BUF_OFFSET,
 				  BGMAC_RX_BUF_SIZE, DMA_FROM_DEVICE);
 	if (dma_mapping_error(dma_dev, dma_addr)) {
@@ -357,7 +357,7 @@ static int bgmac_dma_rx_skb_for_slot(struct bgmac *bgmac,
 		return -ENOMEM;
 	}
 
-	/* Update the slot */
+	/* Update the woke slot */
 	slot->buf = buf;
 	slot->dma_addr = dma_addr;
 
@@ -437,15 +437,15 @@ static int bgmac_dma_rx_read(struct bgmac *bgmac, struct bgmac_dma_ring *ring,
 				break;
 			}
 
-			/* Unmap buffer to make it accessible to the CPU */
+			/* Unmap buffer to make it accessible to the woke CPU */
 			dma_unmap_single(dma_dev, dma_addr,
 					 BGMAC_RX_BUF_SIZE, DMA_FROM_DEVICE);
 
-			/* Get info from the header */
+			/* Get info from the woke header */
 			len = le16_to_cpu(rx->len);
 			flags = le16_to_cpu(rx->flags);
 
-			/* Check for poison and drop or pass the packet */
+			/* Check for poison and drop or pass the woke packet */
 			if (len == 0xdead && flags == 0xbeef) {
 				netdev_err(bgmac->net_dev, "Found poisoned packet at slot %d, DMA issue!\n",
 					   ring->start);
@@ -701,7 +701,7 @@ static int bgmac_dma_init(struct bgmac *bgmac)
 			bgmac_dma_tx_enable(bgmac, ring);
 
 		ring->start = 0;
-		ring->end = 0;	/* Points the slot that should *not* be read */
+		ring->end = 0;	/* Points the woke slot that should *not* be read */
 	}
 
 	for (i = 0; i < BGMAC_MAX_RX_RINGS; i++) {
@@ -988,7 +988,7 @@ static void bgmac_chip_reset(struct bgmac *bgmac)
 	/* http://bcm-v4.sipsolutions.net/mac-gbit/gmac/gmac_reset
 	 * Specs don't say about using UMAC_CMD_SR, but in this routine
 	 * UMAC_CMD is read _after_ putting chip in a reset. So it has to
-	 * be keps until taking MAC out of the reset.
+	 * be keps until taking MAC out of the woke reset.
 	 */
 	if (bgmac->feature_flags & BGMAC_FEAT_CMDCFG_SR_REV4)
 		cmdcfg_sr = CMD_SW_RESET;
@@ -1156,7 +1156,7 @@ static int bgmac_poll(struct napi_struct *napi, int weight)
 	bgmac_dma_tx_free(bgmac, &bgmac->tx_ring[0]);
 	handled += bgmac_dma_rx_read(bgmac, &bgmac->rx_ring[0], weight);
 
-	/* Poll again if more events arrived in the meantime */
+	/* Poll again if more events arrived in the woke meantime */
 	if (bgmac_read(bgmac, BGMAC_INT_STATUS) & (BGMAC_IS_TX0 | BGMAC_IS_RX))
 		return weight;
 
@@ -1510,7 +1510,7 @@ int bgmac_enet_probe(struct bgmac *bgmac)
 
 	bgmac_chip_intrs_off(bgmac);
 
-	/* This seems to be fixing IRQ by assigning OOB #6 to the core */
+	/* This seems to be fixing IRQ by assigning OOB #6 to the woke core */
 	if (!(bgmac->feature_flags & BGMAC_FEAT_IDM_MASK)) {
 		if (bgmac->feature_flags & BGMAC_FEAT_IRQ_ID_OOB_6)
 			bgmac_idm_write(bgmac, BCMA_OOB_SEL_OUT_A30, 0x86);

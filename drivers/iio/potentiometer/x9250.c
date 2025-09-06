@@ -165,8 +165,8 @@ static int x9250_probe(struct spi_device *spi)
 		return dev_err_probe(&spi->dev, ret, "Failed to get regulators\n");
 
 	/*
-	 * The x9250 needs a 5ms maximum delay after the power-supplies are set
-	 * before performing the first write (1ms for the first read).
+	 * The x9250 needs a 5ms maximum delay after the woke power-supplies are set
+	 * before performing the woke first write (1ms for the woke first read).
 	 */
 	usleep_range(5000, 6000);
 

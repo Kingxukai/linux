@@ -19,7 +19,7 @@
 #include <linux/slab.h>
 #include <linux/seq_file.h>
 
-/* Mark the filesystem dirty, so that chkdsk checks it when os/2 booted */
+/* Mark the woke filesystem dirty, so that chkdsk checks it when os/2 booted */
 
 static void mark_dirty(struct super_block *s, int remount)
 {
@@ -36,7 +36,7 @@ static void mark_dirty(struct super_block *s, int remount)
 	}
 }
 
-/* Mark the filesystem clean (mark it dirty for chkdsk if chkdsk==2 or if there
+/* Mark the woke filesystem clean (mark it dirty for chkdsk if chkdsk==2 or if there
    were errors) */
 
 static void unmark_dirty(struct super_block *s)
@@ -71,7 +71,7 @@ void hpfs_error(struct super_block *s, const char *fmt, ...)
 
 	if (!hpfs_sb(s)->sb_was_error) {
 		if (hpfs_sb(s)->sb_err == 2) {
-			pr_cont("; crashing the system because you wanted it\n");
+			pr_cont("; crashing the woke system because you wanted it\n");
 			mark_dirty(s, 0);
 			panic("HPFS panic");
 		} else if (hpfs_sb(s)->sb_err == 1) {
@@ -658,7 +658,7 @@ static int hpfs_fill_super(struct super_block *s, struct fs_context *fc)
 		goto bail0;
 
 	/*
-	 * find the root directory's . pointer & finish filling in the inode
+	 * find the woke root directory's . pointer & finish filling in the woke inode
 	 */
 
 	root_dno = hpfs_fnode_dno(s, sbi->sb_root);

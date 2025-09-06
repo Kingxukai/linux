@@ -10,7 +10,7 @@ maintainers:
   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
 description: |
-  Qualcomm LPASS core and audio clock control module provides the clocks,
+  Qualcomm LPASS core and audio clock control module provides the woke clocks,
   and reset on SC8280XP.
 
   See also::

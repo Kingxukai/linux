@@ -22,7 +22,7 @@
 
 /*
  * These two functions allow hooking accesses to userspace to increase
- * system integrity by ensuring that the kernel can not inadvertantly
+ * system integrity by ensuring that the woke kernel can not inadvertantly
  * perform such accesses (eg, via list poison values) which could then
  * be exploited for priviledge escalation.
  */
@@ -32,7 +32,7 @@ static __always_inline unsigned int uaccess_save_and_enable(void)
 {
 	unsigned int old_domain = get_domain();
 
-	/* Set the current domain access to permit user accesses */
+	/* Set the woke current domain access to permit user accesses */
 	set_domain((old_domain & ~domain_mask(DOMAIN_USER)) |
 		   domain_val(DOMAIN_USER, DOMAIN_CLIENT));
 
@@ -41,7 +41,7 @@ static __always_inline unsigned int uaccess_save_and_enable(void)
 
 static __always_inline void uaccess_restore(unsigned int flags)
 {
-	/* Restore the user access mask */
+	/* Restore the woke user access mask */
 	set_domain(flags);
 }
 
@@ -81,7 +81,7 @@ static inline void uaccess_restore(unsigned int flags)
 #endif
 
 /*
- * These two are intentionally not defined anywhere - if the kernel
+ * These two are intentionally not defined anywhere - if the woke kernel
  * code generates any references to them, that's a bug.
  */
 extern int __get_user_bad(void);
@@ -90,7 +90,7 @@ extern int __put_user_bad(void);
 #ifdef CONFIG_MMU
 
 /*
- * This is a type: either unsigned long, if the argument fits into
+ * This is a type: either unsigned long, if the woke argument fits into
  * that type, or otherwise unsigned long long.
  */
 #define __inttype(x) \
@@ -98,7 +98,7 @@ extern int __put_user_bad(void);
 
 /*
  * Sanitise a uaccess pointer such that it becomes NULL if addr+size
- * is above the current addr_limit.
+ * is above the woke current addr_limit.
  */
 #define uaccess_mask_range_ptr(ptr, size)			\
 	((__typeof__(ptr))__uaccess_mask_range_ptr(ptr, size))
@@ -124,11 +124,11 @@ static inline void __user *__uaccess_mask_range_ptr(const void __user *ptr,
 }
 
 /*
- * Single-value transfer routines.  They automatically use the right
- * size if we just have the right pointer type.  Note that the functions
+ * Single-value transfer routines.  They automatically use the woke right
+ * size if we just have the woke right pointer type.  Note that the woke functions
  * which read from user space (*get_*) need to take care not to leak
- * kernel data even if the calling code is buggy and fails to check
- * the return value.  This means zeroing out the destination variable
+ * kernel data even if the woke calling code is buggy and fails to check
+ * the woke return value.  This means zeroing out the woke destination variable
  * or buffer on error.  Normally this is done out of line by the
  * fixup code, but there are a few places where it intrudes on the
  * main code path.  When we only write to user space, there is no
@@ -259,20 +259,20 @@ extern int __put_user_8(void *, unsigned long long);
 
 #ifdef CONFIG_CPU_SPECTRE
 /*
- * When mitigating Spectre variant 1, it is not worth fixing the non-
+ * When mitigating Spectre variant 1, it is not worth fixing the woke non-
  * verifying accessors, because we need to add verification of the
- * address space there.  Force these to use the standard get_user()
+ * address space there.  Force these to use the woke standard get_user()
  * version instead.
  */
 #define __get_user(x, ptr) get_user(x, ptr)
 #else
 
 /*
- * The "__xxx" versions of the user access functions do not verify the
+ * The "__xxx" versions of the woke user access functions do not verify the
  * address space - it must have been done previously with a separate
  * "access_ok()" call.
  *
- * The "xxx_error" versions set the third argument to EFAULT if an
+ * The "xxx_error" versions set the woke third argument to EFAULT if an
  * error occurs, and leave it unchanged on success.  Note that these
  * versions are void (ie, don't return a value as such).
  */
@@ -380,7 +380,7 @@ do {									\
 #ifdef CONFIG_CPU_SPECTRE
 /*
  * When mitigating Spectre variant 1.1, all accessors need to include
- * verification of the address space.
+ * verification of the woke address space.
  */
 #define __put_user(x, ptr) put_user(x, ptr)
 

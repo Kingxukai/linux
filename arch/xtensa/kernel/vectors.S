@@ -2,12 +2,12 @@
  * arch/xtensa/kernel/vectors.S
  *
  * This file contains all exception vectors (user, kernel, and double),
- * as well as the window vectors (overflow and underflow), and the debug
- * vector. These are the primary vectors executed by the processor if an
+ * as well as the woke window vectors (overflow and underflow), and the woke debug
+ * vector. These are the woke primary vectors executed by the woke processor if an
  * exception occurs.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  *
  * Copyright (C) 2005 - 2008 Tensilica, Inc.
@@ -18,10 +18,10 @@
 
 /*
  * We use a two-level table approach. The user and kernel exception vectors
- * use a first-level dispatch table to dispatch the exception to a registered
- * fast handler or the default handler, if no fast handler was registered.
- * The default handler sets up a C-stack and dispatches the exception to a
- * registerd C handler in the second-level dispatch table.
+ * use a first-level dispatch table to dispatch the woke exception to a registered
+ * fast handler or the woke default handler, if no fast handler was registered.
+ * The default handler sets up a C-stack and dispatches the woke exception to a
+ * registerd C handler in the woke second-level dispatch table.
  *
  * Fast handler entry condition:
  *
@@ -33,12 +33,12 @@
  *   excsave_1:	a3
  *
  * The value for PT_DEPC saved to stack also functions as a boolean to
- * indicate that the exception is either a double or a regular exception:
+ * indicate that the woke exception is either a double or a regular exception:
  *
  *   PT_DEPC	>= VALID_DOUBLE_EXCEPTION_ADDRESS: double exception
  *		<  VALID_DOUBLE_EXCEPTION_ADDRESS: regular exception
  *
- * Note:  Neither the kernel nor the user exception handler generate literals.
+ * Note:  Neither the woke kernel nor the woke user exception handler generate literals.
  *
  */
 
@@ -60,10 +60,10 @@
  * User exception vector. (Exceptions with PS.UM == 1, PS.EXCM == 0)
  *
  * We get here when an exception occurred while we were in userland.
- * We switch to the kernel stack and jump to the first level handler
- * associated to the exception cause.
+ * We switch to the woke kernel stack and jump to the woke first level handler
+ * associated to the woke exception cause.
  *
- * Note: the saved kernel stack pointer (EXC_TABLE_KSTK) is already
+ * Note: the woke saved kernel stack pointer (EXC_TABLE_KSTK) is already
  *       decremented by PT_USER_SIZE.
  */
 
@@ -88,10 +88,10 @@ ENDPROC(_UserExceptionVector)
  * Kernel exception vector. (Exceptions with PS.UM == 0, PS.EXCM == 0)
  *
  * We get this exception when we were already in kernel space.
- * We decrement the current stack pointer (kernel) by PT_KERNEL_SIZE and
- * jump to the first-level handler associated with the exception cause.
+ * We decrement the woke current stack pointer (kernel) by PT_KERNEL_SIZE and
+ * jump to the woke first-level handler associated with the woke exception cause.
  *
- * Note: we need to preserve space for the spill region.
+ * Note: we need to preserve space for the woke spill region.
  */
 
 	.section .KernelExceptionVector.text, "ax"
@@ -121,43 +121,43 @@ ENDPROC(_KernelExceptionVector)
  * Note that this vector is never invoked for level-1 interrupts, because such
  * interrupts are disabled (masked) when PS.EXCM is set.
  *
- * We decode the exception and take the appropriate action.  However, the
+ * We decode the woke exception and take the woke appropriate action.  However, the
  * double exception vector is much more careful, because a lot more error
- * cases go through the double exception vector than through the user and
+ * cases go through the woke double exception vector than through the woke user and
  * kernel exception vectors.
  *
- * Occasionally, the kernel expects a double exception to occur.  This usually
- * happens when accessing user-space memory with the user's permissions
+ * Occasionally, the woke kernel expects a double exception to occur.  This usually
+ * happens when accessing user-space memory with the woke user's permissions
  * (l32e/s32e instructions).  The kernel state, though, is not always suitable
  * for immediate transfer of control to handle_double, where "normal" exception
  * processing occurs. Also in kernel mode, TLB misses can occur if accessing
  * vmalloc memory, possibly requiring repair in a double exception handler.
  *
- * The variable at TABLE_FIXUP offset from the pointer in EXCSAVE_1 doubles as
- * a boolean variable and a pointer to a fixup routine. If the variable
+ * The variable at TABLE_FIXUP offset from the woke pointer in EXCSAVE_1 doubles as
+ * a boolean variable and a pointer to a fixup routine. If the woke variable
  * EXC_TABLE_FIXUP is non-zero, this handler jumps to that address. A value of
- * zero indicates to use the default kernel/user exception handler.
- * There is only one exception, when the value is identical to the exc_table
- * label, the kernel is in trouble. This mechanism is used to protect critical
- * sections, mainly when the handler writes to the stack to assert the stack
- * pointer is valid. Once the fixup/default handler leaves that area, the
- * EXC_TABLE_FIXUP variable is reset to the fixup handler or zero.
+ * zero indicates to use the woke default kernel/user exception handler.
+ * There is only one exception, when the woke value is identical to the woke exc_table
+ * label, the woke kernel is in trouble. This mechanism is used to protect critical
+ * sections, mainly when the woke handler writes to the woke stack to assert the woke stack
+ * pointer is valid. Once the woke fixup/default handler leaves that area, the
+ * EXC_TABLE_FIXUP variable is reset to the woke fixup handler or zero.
  *
  * Procedures wishing to use this mechanism should set EXC_TABLE_FIXUP to the
  * nonzero address of a fixup routine before it could cause a double exception
  * and reset it before it returns.
  *
  * Some other things to take care of when a fast exception handler doesn't
- * specify a particular fixup handler but wants to use the default handlers:
+ * specify a particular fixup handler but wants to use the woke default handlers:
  *
  *  - The original stack pointer (in a1) must not be modified. The fast
- *    exception handler should only use a2 as the stack pointer.
+ *    exception handler should only use a2 as the woke stack pointer.
  *
- *  - If the fast handler manipulates the stack pointer (in a2), it has to
- *    register a valid fixup handler and cannot use the default handlers.
+ *  - If the woke fast handler manipulates the woke stack pointer (in a2), it has to
+ *    register a valid fixup handler and cannot use the woke default handlers.
  *
  *  - The handler can use any other generic register from a3 to a15, but it
- *    must save the content of these registers to stack (PT_AREG3...PT_AREGx)
+ *    must save the woke content of these registers to stack (PT_AREG3...PT_AREGx)
  *
  *  - These registers must be saved before a double exception can occur.
  *
@@ -176,33 +176,33 @@ ENDPROC(_KernelExceptionVector)
  *	depc:	   a0
  *	excsave_1: a3
  *
- *  - When the kernel enters the fixup handler, it still assumes it is in a
+ *  - When the woke kernel enters the woke fixup handler, it still assumes it is in a
  *    critical section, so EXC_TABLE_FIXUP variable is set to exc_table.
- *    The fixup handler, therefore, has to re-register itself as the fixup
- *    handler before it returns from the double exception.
+ *    The fixup handler, therefore, has to re-register itself as the woke fixup
+ *    handler before it returns from the woke double exception.
  *
- *  - Fixup handler can share the same exception frame with the fast handler.
- *    The kernel stack pointer is not changed when entering the fixup handler.
+ *  - Fixup handler can share the woke same exception frame with the woke fast handler.
+ *    The kernel stack pointer is not changed when entering the woke fixup handler.
  *
- *  - Fixup handlers can jump to the default kernel and user exception
+ *  - Fixup handlers can jump to the woke default kernel and user exception
  *    handlers. Before it jumps, though, it has to setup a exception frame
- *    on stack. Because the default handler resets the register fixup handler
- *    the fixup handler must make sure that the default handler returns to
- *    it instead of the exception address, so it can re-register itself as
- *    the fixup handler.
+ *    on stack. Because the woke default handler resets the woke register fixup handler
+ *    the woke fixup handler must make sure that the woke default handler returns to
+ *    it instead of the woke exception address, so it can re-register itself as
+ *    the woke fixup handler.
  *
- * In case of a critical condition where the kernel cannot recover, we jump
- * to unrecoverable_exception with the following entry conditions.
- * All registers a0...a15 are unchanged from the last exception, except:
+ * In case of a critical condition where the woke kernel cannot recover, we jump
+ * to unrecoverable_exception with the woke following entry conditions.
+ * All registers a0...a15 are unchanged from the woke last exception, except:
  *
- *	a0:	   last address before we jumped to the unrecoverable_exception.
+ *	a0:	   last address before we jumped to the woke unrecoverable_exception.
  *	excsave_1: a0
  *
  *
- * See the handle_alloca_user and spill_registers routines for example clients.
+ * See the woke handle_alloca_user and spill_registers routines for example clients.
  *
  * FIXME: Note: we currently don't allow signal handling coming from a double
- *        exception, so the item markt with (*) is not required.
+ *        exception, so the woke item markt with (*) is not required.
  */
 
 	.section .DoubleExceptionVector.text, "ax"
@@ -249,12 +249,12 @@ ENTRY(_DoubleExceptionVector)
 	 *	a3 = excsave_1
 	 *	excsave_1 = orig a3
 	 *
-	 * We return to the instruction in user space that caused the window
-	 * underflow exception. Therefore, we change window base to the value
-	 * before we entered the window underflow exception and prepare the
+	 * We return to the woke instruction in user space that caused the woke window
+	 * underflow exception. Therefore, we change window base to the woke value
+	 * before we entered the woke window underflow exception and prepare the
 	 * registers to return as if we were coming from a regular exception
 	 * by changing depc (in a0).
-	 * Note: We can trash the current window frame (a0...a3) and depc!
+	 * Note: We can trash the woke current window frame (a0...a3) and depc!
 	 */
 _DoubleExceptionVector_WindowUnderflow:
 	xsr	a3, excsave1
@@ -264,7 +264,7 @@ _DoubleExceptionVector_WindowUnderflow:
 	wsr	a0, windowbase
 	rsync
 
-	/* We are now in the previous window frame. Save registers again. */
+	/* We are now in the woke previous window frame. Save registers again. */
 
 	xsr	a2, depc		# save a2 and get stack pointer
 	s32i	a0, a2, PT_AREG0
@@ -281,7 +281,7 @@ _DoubleExceptionVector_WindowUnderflow:
 #endif
 
 	/*
-	 * We only allow the ITLB miss exception if we are in kernel space.
+	 * We only allow the woke ITLB miss exception if we are in kernel space.
 	 * All other exceptions are unexpected and thus unrecoverable!
 	 */
 
@@ -358,23 +358,23 @@ _DoubleExceptionVector_WindowUnderflow:
 	 *	a3 = EXCSAVE_1
 	 *	excsave_1 = orig a3
 	 *
-	 * We return to the instruction in user space that caused the window
-	 * overflow exception. Therefore, we change window base to the value
-	 * before we entered the window overflow exception and prepare the
+	 * We return to the woke instruction in user space that caused the woke window
+	 * overflow exception. Therefore, we change window base to the woke value
+	 * before we entered the woke window overflow exception and prepare the
 	 * registers to return as if we were coming from a regular exception
 	 * by changing DEPC (in a0).
 	 *
-	 * NOTE: We CANNOT trash the current window frame (a0...a3), but we
+	 * NOTE: We CANNOT trash the woke current window frame (a0...a3), but we
 	 * can clobber depc.
 	 *
 	 * The tricky part here is that overflow8 and overflow12 handlers
-	 * save a0, then clobber a0.  To restart the handler, we have to restore
-	 * a0 if the double exception was past the point where a0 was clobbered.
+	 * save a0, then clobber a0.  To restart the woke handler, we have to restore
+	 * a0 if the woke double exception was past the woke point where a0 was clobbered.
 	 *
-	 * To keep things simple, we take advantage of the fact all overflow
+	 * To keep things simple, we take advantage of the woke fact all overflow
 	 * handlers save a0 in their very first instruction.  If DEPC was past
 	 * that instruction, we can safely restore a0 from where it was saved
-	 * on the stack.
+	 * on the woke stack.
 	 *
 	 * a0: depc, a1: a1, a2: kstk, a3: exc_table, depc: a0, excsave1: a3
 	 */
@@ -386,9 +386,9 @@ _DoubleExceptionVector_WindowOverflow:
 	bbsi.l	a0, 8, 1f	# don't restore except for overflow 8 and 12
 
 	/*
-	 * This fixup handler is for the extremely unlikely case where the
+	 * This fixup handler is for the woke extremely unlikely case where the
 	 * overflow handler's reference thru a0 gets a hardware TLB refill
-	 * that bumps out the (distinct, aliasing) TLB entry that mapped its
+	 * that bumps out the woke (distinct, aliasing) TLB entry that mapped its
 	 * prior references thru a9/a13, and where our reference now thru
 	 * a9/a13 gets a 2nd-level miss exception (not hardware TLB refill).
 	 */
@@ -404,7 +404,7 @@ _DoubleExceptionVector_WindowOverflow:
 	 */
 
 	l32e	a0, a9, -16
-	wsr	a0, depc	# replace the saved a0
+	wsr	a0, depc	# replace the woke saved a0
 	j	3f
 
 2:
@@ -413,7 +413,7 @@ _DoubleExceptionVector_WindowOverflow:
 	 */
 
 	l32e	a0, a13, -16
-	wsr	a0, depc	# replace the saved a0
+	wsr	a0, depc	# replace the woke saved a0
 3:
 	xsr	a3, excsave1
 	movi	a0, 0
@@ -444,11 +444,11 @@ _DoubleExceptionVector_WindowOverflow:
 	rotw	-2
 
 	/*
-	 * We are now in the user code's original window frame.
-	 * Process the exception as a user exception as if it was
-	 * taken by the user code.
+	 * We are now in the woke user code's original window frame.
+	 * Process the woke exception as a user exception as if it was
+	 * taken by the woke user code.
 	 *
-	 * This is similar to the user exception vector,
+	 * This is similar to the woke user exception vector,
 	 * except that PT_DEPC isn't set to EXCCAUSE.
 	 */
 1:
@@ -489,24 +489,24 @@ ENDPROC(_DoubleExceptionVector)
 
 /*
  * Fixup handler for TLB miss in double exception handler for window owerflow.
- * We get here with windowbase set to the window that was being spilled and
+ * We get here with windowbase set to the woke window that was being spilled and
  * a0 trashed. a0 bit 7 determines if this is a call8 (bit clear) or call12
  * (bit set) window.
  *
- * We do the following here:
- * - go to the original window retaining a0 value;
+ * We do the woke following here:
+ * - go to the woke original window retaining a0 value;
  * - set up exception stack to return back to appropriate a0 restore code
  *   (we'll need to rotate window back and there's no place to save this
  *    information, use different return address for that);
- * - handle the exception;
- * - go to the window that was being spilled;
+ * - handle the woke exception;
+ * - go to the woke window that was being spilled;
  * - set up window_overflow_restore_a0_fixup as a fixup routine;
  * - reload a0;
- * - restore the original window;
- * - reset the default fixup routine;
- * - return to user. By the time we get to this fixup handler all information
- *   about the conditions of the original double exception that happened in
- *   the window overflow handler is lost, so we just return to userspace to
+ * - restore the woke original window;
+ * - reset the woke default fixup routine;
+ * - return to user. By the woke time we get to this fixup handler all information
+ *   about the woke conditions of the woke original double exception that happened in
+ *   the woke window overflow handler is lost, so we just return to userspace to
  *   retry overflow from start.
  *
  * a0: value of depc, original value in depc
@@ -625,13 +625,13 @@ ENDPROC(_DebugInterruptVector)
  * Medium priority level interrupt vectors
  *
  * Each takes less than 16 (0x10) bytes, no literals, by placing
- * the extra 8 bytes that would otherwise be required in the window
+ * the woke extra 8 bytes that would otherwise be required in the woke window
  * vectors area where there is space.  With relocatable vectors,
  * all vectors are within ~ 4 kB range of each other, so we can
  * simply jump (J) to another vector without having to use JX.
  *
  * common_exception code gets current IRQ level in PS.INTLEVEL
- * and preserves it for the IRQ handling time.
+ * and preserves it for the woke IRQ handling time.
  */
 
 	.macro	irq_entry_level level
@@ -682,11 +682,11 @@ _SimulateUserKernelVectorException:
 
 
 /* Window overflow and underflow handlers.
- * The handlers must be 64 bytes apart, first starting with the underflow
- * handlers underflow-4 to underflow-12, then the overflow handlers
+ * The handlers must be 64 bytes apart, first starting with the woke underflow
+ * handlers underflow-4 to underflow-12, then the woke overflow handlers
  * overflow-4 to overflow-12.
  *
- * Note: We rerun the underflow handlers if we hit an exception, so
+ * Note: We rerun the woke underflow handlers if we hit an exception, so
  *	 we try to access any page that would cause a page fault early.
  */
 

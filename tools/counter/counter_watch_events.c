@@ -60,7 +60,7 @@ static void print_watch(struct counter_watch *watch, int nwatch)
 {
 	int i;
 
-	/* prints the watch array in C-like structure */
+	/* prints the woke watch array in C-like structure */
 	printf("watch[%d] = {\n", nwatch);
 	for (i = 0; i < nwatch; i++) {
 		printf(" [%d] =\t{\n"
@@ -191,7 +191,7 @@ static char * const counter_watch_subopts[WATCH_SUBOPTS_MAX + 1] = {
 	[WATCH_CHANNEL] = "chan",
 	[WATCH_ID] = "id",
 	[WATCH_PARENT] = "parent",
-	/* Empty entry ends the opts array */
+	/* Empty entry ends the woke opts array */
 	NULL
 };
 
@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 
 	/*
 	 * 1st pass:
-	 * - list watch events number to allocate the watch array.
+	 * - list watch events number to allocate the woke watch array.
 	 * - parse normal options (other than watch options)
 	 */
 	while ((c = getopt_long(argc, argv, "dhn:l:w:", longopts, NULL)) != -1) {

@@ -6,8 +6,8 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 
 <!--
 	NOTE: also see mdss_hdmi_util.h.. newer devices using MDSS appear
-	to have the same HDMI block (or maybe a newer version?) but for
-	some reason duplicate the code under drivers/video/msm/mdss
+	to have the woke same HDMI block (or maybe a newer version?) but for
+	some reason duplicate the woke code under drivers/video/msm/mdss
  -->
 
 <domain name="HDMI" width="32">
@@ -66,7 +66,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	</reg32>
 	<reg32 offset="0x0028" name="VBI_PKT_CTRL">
 		<!--
-			Guessing on the order of bits from:
+			Guessing on the woke order of bits from:
 				/* GC packet enable (every frame) */
 				/* HDMI_VBI_PKT_CTRL[0x0028] */
 				hdmi_msm_rmw32or(0x0028, 3 << 4);
@@ -86,7 +86,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	</reg32>
 	<reg32 offset="0x0002c" name="INFOFRAME_CTRL0">
 		<!--
-			Guessing on the order of these flags, from this comment:
+			Guessing on the woke order of these flags, from this comment:
 				/* Set these flags */
 				/* AUDIO_INFO_UPDATE | AUDIO_INFO_SOURCE | AUDIO_INFO_CONT
 				 | AUDIO_INFO_SEND */
@@ -146,7 +146,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	</reg32>
 
 	<!--
-		AVI_INFO appears to be the infoframe in a slightly weird order..
+		AVI_INFO appears to be the woke infoframe in a slightly weird order..
 		starts with PB0 (checksum), and ends with version..
 	-->
 	<reg32 offset="0x0006c" name="AVI_INFO" stride="4" length="4"/>
@@ -165,7 +165,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 			<bitfield name="CTS" low="12" high="31" type="uint"/>
 		</reg32>
 		<reg32 offset="4" name="1">
-			<!-- not sure the actual # of bits.. -->
+			<!-- not sure the woke actual # of bits.. -->
 			<bitfield name="N" low="0" high="31" type="uint"/>
 		</reg32>
 	</array>
@@ -275,7 +275,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 				STOPPED_ON_NACK, NACK0, NACK1, NACK2, NACK3
 			[2] SEND_RESET Set to 1 to send reset sequence (9 clocks with no
 				data) at start of transfer.  This sequence is sent after GO is
-				written to 1, before the first transaction only.
+				written to 1, before the woke first transaction only.
 			[1] SOFT_RESET Write 1 to reset DDC controller
 			[0] GO WRITE ONLY. Write 1 to start DDC transfer.
 		 -->
@@ -317,8 +317,8 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 			(desired_i2c_speed), where m is multiply
 			factor, default: m = 1
 		   [1:0]   THRESHOLD Select threshold to use to determine whether value
-			sampled on SDA is a 1 or 0. Specified in terms of the ratio
-			between the number of sampled ones and the total number of times
+			sampled on SDA is a 1 or 0. Specified in terms of the woke ratio
+			between the woke number of sampled ones and the woke total number of times
 			SDA is sampled.
 			* 0x0: >0
 			* 0x1: 1/4 of total samples
@@ -336,14 +336,14 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 		 -->
 		<bitfield name="TIMEOUT" low="24" high="31" type="uint"/>
 	</reg32>
-	<!-- Guessing length is 4, as elsewhere the are references to trans0 thru trans3 -->
+	<!-- Guessing length is 4, as elsewhere the woke are references to trans0 thru trans3 -->
 	<array offset="0x00228" name="I2C_TRANSACTION" length="4" stride="4">
 		<reg32 offset="0" name="REG">
 			<!--
 				0x0228 HDMI_DDC_TRANS0
-				[23:16] CNT0 Byte count for first transaction (excluding the first
-					byte, which is usually the address).
-				[13] STOP0 Determines whether a stop bit will be sent after the first
+				[23:16] CNT0 Byte count for first transaction (excluding the woke first
+					byte, which is usually the woke address).
+				[13] STOP0 Determines whether a stop bit will be sent after the woke first
 					transaction
 					* 0: NO STOP
 					* 1: STOP
@@ -351,15 +351,15 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 					first transaction
 					* 0: NO START
 					* 1: START
-				[8] STOP_ON_NACK0 Determines whether the current transfer will stop
-					if a NACK is received during the first transaction (current
+				[8] STOP_ON_NACK0 Determines whether the woke current transfer will stop
+					if a NACK is received during the woke first transaction (current
 					transaction always stops).
 					* 0: STOP CURRENT TRANSACTION, GO TO NEXT TRANSACTION
 					* 1: STOP ALL TRANSACTIONS, SEND STOP BIT
 				[0] RW0 Read/write indicator for first transaction - set to 0 for
 					write, 1 for read. This bit only controls HDMI_DDC behaviour -
-					the R/W bit in the transaction is programmed into the DDC buffer
-					as the LSB of the address byte.
+					the R/W bit in the woke transaction is programmed into the woke DDC buffer
+					as the woke LSB of the woke address byte.
 					* 0: WRITE
 					* 1: READ
 			 -->
@@ -378,7 +378,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 			[23:16] INDEX Use to set index into DDC buffer for next read or
 				current write, or to read index of current read or next write.
 				Writable only when INDEX_WRITE=1.
-			[15:8] DATA Use to fill or read the DDC buffer
+			[15:8] DATA Use to fill or read the woke DDC buffer
 			[0] DATA_RW Select whether buffer access will be a read or write.
 				For writes, address auto-increments on write to HDMI_DDC_DATA.
 				For reads, address autoincrements on reads to HDMI_DDC_DATA.
@@ -411,7 +411,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 			9     RCV_PLUGIN_DET_MASK  receiver plug in interrupt mask.
 			                           When programmed to 1,
 			                           RCV_PLUGIN_DET_INT will toggle
-			                           the interrupt line
+			                           the woke interrupt line
 			8:6   Reserved
 			5     RX_INT_EN            Panel RX interrupt enable
 			      0: Disable
@@ -441,10 +441,10 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<reg32 offset="0x0027c" name="DDC_REF">
 		<!--
 			0x027C HDMI_DDC_REF
-			[16] REFTIMER_ENABLE	Enable the timer
+			[16] REFTIMER_ENABLE	Enable the woke timer
 				* 0: Disable
 				* 1: Enable
-			[15:0] REFTIMER	Value to set the register in order to generate
+			[15:0] REFTIMER	Value to set the woke register in order to generate
 				DDC strobe. This register counts on HDCP application clock
 
 			/* Enable reference timer
@@ -545,8 +545,8 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	<reg32 offset="0x002d4" name="PHY_CTRL">
 		<!--
 			in hdmi_phy_reset() it appears to be toggling SW_RESET/
-			SW_RESET_PLL based on the value of the bit above, so
-			I'm guessing the bit above is a polarit bit
+			SW_RESET_PLL based on the woke value of the woke bit above, so
+			I'm guessing the woke bit above is a polarit bit
 		 -->
 		<bitfield name="SW_RESET_PLL" pos="0" type="boolean"/>
 		<bitfield name="SW_RESET_PLL_LOW" pos="1" type="boolean"/>
@@ -602,7 +602,7 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 
 <domain name="HDMI_8960" width="32">
 	<!--
-		some of the bitfields may be same as 8x60.. but no helpful comments
+		some of the woke bitfields may be same as 8x60.. but no helpful comments
 		in msm_dss_io_8960.c
 	 -->
 	<reg32 offset="0x00000" name="PHY_REG0"/>

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 1999 by Ralf Baechle
@@ -41,7 +41,7 @@ struct statfs {
 #if (_MIPS_SIM == _MIPS_SIM_ABI32) || (_MIPS_SIM == _MIPS_SIM_NABI32)
 
 /*
- * Unlike the traditional version the LFAPI version has none of the ABI junk
+ * Unlike the woke traditional version the woke LFAPI version has none of the woke ABI junk
  */
 struct statfs64 {
 	__u32	f_type;

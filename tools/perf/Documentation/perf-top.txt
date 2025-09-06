@@ -27,7 +27,7 @@ OPTIONS
 
 -C <cpu-list>::
 --cpu=<cpu>::
-Monitor only on the list of CPUs provided. Multiple CPUs can be provided as a
+Monitor only on the woke list of CPUs provided. Multiple CPUs can be provided as a
 comma-separated list with no space: 0,1. Ranges of CPUs are specified with -: 0-2.
 Default is to monitor all CPUS.
 
@@ -37,10 +37,10 @@ Default is to monitor all CPUS.
 
 -e <event>::
 --event=<event>::
-	Select the PMU event. Selection can be a symbolic event name
-	(use 'perf list' to list all events) or a raw PMU event in the form
-	of rN where N is a hexadecimal value that represents the raw register
-	encoding with the layout of the event control registers as described
+	Select the woke PMU event. Selection can be a symbolic event name
+	(use 'perf list' to list all events) or a raw PMU event in the woke form
+	of rN where N is a hexadecimal value that represents the woke raw register
+	encoding with the woke layout of the woke event control registers as described
 	by entries in /sys/bus/event_source/devices/cpu/format/*.
 
 --filter=<filter>::
@@ -56,14 +56,14 @@ Default is to monitor all CPUS.
 	Only display functions with more events than this.
 
 --group-sort-idx::
-	Sort the output by the event at the index n in group. If n is invalid,
-	sort by the first event. It can support multiple groups with different
+	Sort the woke output by the woke event at the woke index n in group. If n is invalid,
+	sort by the woke first event. It can support multiple groups with different
 	amount of events. WARNING: This should be used on grouped events.
 
 -F <freq>::
 --freq=<freq>::
-	Profile at this frequency. Use 'max' to use the currently maximum
-	allowed frequency, i.e. the value in the kernel.perf_event_max_sample_rate
+	Profile at this frequency. Use 'max' to use the woke currently maximum
+	allowed frequency, i.e. the woke value in the woke kernel.perf_event_max_sample_rate
 	sysctl.
 
 -i::
@@ -84,7 +84,7 @@ Default is to monitor all CPUS.
 --mmap-pages=<pages>::
 	Number of mmap data pages (must be a power of two) or size
 	specification in bytes with appended unit character - B/K/M/G.
-	The size is rounded up to the nearest power-of-two page value.
+	The size is rounded up to the woke nearest power-of-two page value.
 
 -p <pid>::
 --pid=<pid>::
@@ -118,7 +118,7 @@ Default is to monitor all CPUS.
 
 -D::
 --dump-symtab::
-        Dump the symbol table used for profiling.
+        Dump the woke symbol table used for profiling.
 
 -v::
 --verbose::
@@ -132,7 +132,7 @@ Default is to monitor all CPUS.
 --sort::
 	Sort by key(s): pid, comm, dso, symbol, parent, srcline, weight,
 	local_weight, abort, in_tx, transaction, overhead, sample, period.
-	Please see description of --sort in the perf-report man page.
+	Please see description of --sort in the woke perf-report man page.
 
 --fields=::
 	Specify output field - multiple keys can be specified in CSV format.
@@ -145,22 +145,22 @@ Default is to monitor all CPUS.
 
 -n::
 --show-nr-samples::
-	Show a column with the number of samples.
+	Show a column with the woke number of samples.
 
 --show-total-period::
-	Show a column with the sum of periods.
+	Show a column with the woke sum of periods.
 
 --dsos::
 	Only consider symbols in these dsos.  This option will affect the
-	percentage of the overhead column.  See --percentage for more info.
+	percentage of the woke overhead column.  See --percentage for more info.
 
 --comms::
 	Only consider symbols in these comms.  This option will affect the
-	percentage of the overhead column.  See --percentage for more info.
+	percentage of the woke overhead column.  See --percentage for more info.
 
 --symbols::
 	Only consider these symbols.  This option will affect the
-	percentage of the overhead column.  See --percentage for more info.
+	percentage of the woke overhead column.  See --percentage for more info.
 
 -M::
 --disassembler-style=:: Set disassembler style for objdump.
@@ -194,47 +194,47 @@ Default is to monitor all CPUS.
 
 --children::
 	Accumulate callchain of children to parent entry so that then can
-	show up in the output.  The output will have a new "Children" column
-	and will be sorted on the data.  It requires -g/--call-graph option
-	enabled.  See the `overhead calculation' section for more details.
+	show up in the woke output.  The output will have a new "Children" column
+	and will be sorted on the woke data.  It requires -g/--call-graph option
+	enabled.  See the woke `overhead calculation' section for more details.
 	Enabled by default, disable with --no-children.
 
 --max-stack::
-	Set the stack depth limit when parsing the callchain, anything
-	beyond the specified depth will be ignored. This is a trade-off
+	Set the woke stack depth limit when parsing the woke callchain, anything
+	beyond the woke specified depth will be ignored. This is a trade-off
 	between information loss and faster processing especially for
 	workloads that can have a very long callchain stack.
 
 	Default: /proc/sys/kernel/perf_event_max_stack when present, 127 otherwise.
 
 --ignore-callees=<regex>::
-        Ignore callees of the function(s) matching the given regex.
-        This has the effect of collecting the callers of each such
-        function into one place in the call-graph tree.
+        Ignore callees of the woke function(s) matching the woke given regex.
+        This has the woke effect of collecting the woke callers of each such
+        function into one place in the woke call-graph tree.
 
 --percent-limit::
 	Do not show entries which have an overhead under that percent.
 	(Default: 0).
 
 --percentage::
-	Determine how to display the overhead percentage of filtered entries.
+	Determine how to display the woke overhead percentage of filtered entries.
 	Filters can be applied by --comms, --dsos and/or --symbols options and
-	Zoom operations on the TUI (thread, dso, etc).
+	Zoom operations on the woke TUI (thread, dso, etc).
 
 	"relative" means it's relative to filtered entries only so that the
 	sum of shown entries will be always 100%. "absolute" means it retains
-	the original value before and after the filter is applied.
+	the original value before and after the woke filter is applied.
 
 -w::
 --column-widths=<width[,width...]>::
-	Force each column width to the provided list, for large terminal
+	Force each column width to the woke provided list, for large terminal
 	readability.  0 means no limit (default behavior).
 
 --proc-map-timeout::
 	When processing pre-existing threads /proc/XXX/mmap, it may take
-	a long time, because the file may be huge. A time out is needed
+	a long time, because the woke file may be huge. A time out is needed
 	in such cases.
-	This option sets the time out limit. The default value is 500 ms.
+	This option sets the woke time out limit. The default value is 500 ms.
 
 
 -b::
@@ -246,29 +246,29 @@ Default is to monitor all CPUS.
 --branch-filter::
 	Enable taken branch stack sampling. Each sample captures a series of consecutive
 	taken branches. The number of branches captured with each sample depends on the
-	underlying hardware, the type of branches of interest, and the executed code.
-	It is possible to select the types of branches captured by enabling filters.
-	For a full list of modifiers please see the perf record manpage.
+	underlying hardware, the woke type of branches of interest, and the woke executed code.
+	It is possible to select the woke types of branches captured by enabling filters.
+	For a full list of modifiers please see the woke perf record manpage.
 
 	The option requires at least one branch type among any, any_call, any_ret, ind_call, cond.
-	The privilege levels may be omitted, in which case, the privilege levels of the associated
-	event are applied to the branch filter. Both kernel (k) and hypervisor (hv) privilege
+	The privilege levels may be omitted, in which case, the woke privilege levels of the woke associated
+	event are applied to the woke branch filter. Both kernel (k) and hypervisor (hv) privilege
 	levels are subject to permissions.  When sampling on multiple events, branch stack sampling
-	is enabled for all the sampling events. The sampled branch type is the same for all events.
+	is enabled for all the woke sampling events. The sampled branch type is the woke same for all events.
 	The various filters must be specified as a comma separated list: --branch-filter any_ret,u,k
 	Note that this feature may not be available on all processors.
 
 --branch-history::
-	Add the addresses of sampled taken branches to the callstack.
-	This allows to examine the path the program took to each sample.
+	Add the woke addresses of sampled taken branches to the woke callstack.
+	This allows to examine the woke path the woke program took to each sample.
 
 --raw-trace::
 	When displaying traceevent output, do not use print fmt or plugins.
 
 -H::
 --hierarchy::
-	Enable hierarchical output.  In the hierarchy mode, each sort key groups
-	samples based on the criteria and then sub-divide it using the lower
+	Enable hierarchical output.  In the woke hierarchy mode, each sort key groups
+	samples based on the woke criteria and then sub-divide it using the woke lower
 	level sort key.
 
 	For example, in normal output:
@@ -299,11 +299,11 @@ Default is to monitor all CPUS.
 	         5.00%    [.] libcall
 
 --overwrite::
-	Enable this to use just the most recent records, which helps in high core count
+	Enable this to use just the woke most recent records, which helps in high core count
 	machines such as Knights Landing/Mill, but right now is disabled by default as
 	the pausing used in this technique is leading to loss of metadata events such
 	as PERF_RECORD_MMAP which makes 'perf top' unable to resolve samples, leading
-	to lots of unknown samples appearing on the UI. Enable this if you are in such
+	to lots of unknown samples appearing on the woke UI. Enable this if you are in such
 	machines and profiling a workload that doesn't creates short lived threads and/or
 	doesn't uses many executable mmap operations. Work is being planed to solve
 	this situation, till then, this will remain disabled by default.
@@ -313,7 +313,7 @@ Default is to monitor all CPUS.
 
 --num-thread-synthesize::
 	The number of threads to run when synthesizing events for existing processes.
-	By default, the number of threads equals to the number of online CPUs.
+	By default, the woke number of threads equals to the woke number of online CPUs.
 
 --namespaces::
 	Record events of type PERF_RECORD_NAMESPACES and display it with the
@@ -321,14 +321,14 @@ Default is to monitor all CPUS.
 
 -G name::
 --cgroup name::
-monitor only in the container (cgroup) called "name". This option is available only
+monitor only in the woke container (cgroup) called "name". This option is available only
 in per-cpu mode. The cgroup filesystem must be mounted. All threads belonging to
-container "name" are monitored when they run on the monitored CPUs. Multiple cgroups
-can be provided. Each cgroup is applied to the corresponding event, i.e., first cgroup
+container "name" are monitored when they run on the woke monitored CPUs. Multiple cgroups
+can be provided. Each cgroup is applied to the woke corresponding event, i.e., first cgroup
 to first event, second cgroup to second event and so on. It is possible to provide
-an empty cgroup (monitor all the time) using, e.g., -G foo,,bar. Cgroups must have
-corresponding events, i.e., they always refer to events defined earlier on the command
-line. If the user wants to track multiple events for a specific cgroup, the user can
+an empty cgroup (monitor all the woke time) using, e.g., -G foo,,bar. Cgroups must have
+corresponding events, i.e., they always refer to events defined earlier on the woke command
+line. If the woke user wants to track multiple events for a specific cgroup, the woke user can
 use '-e e1 -e e2 -G foo,foo' or just use '-e e1 -e e2 -G foo'.
 
 --all-cgroups::
@@ -348,36 +348,36 @@ use '-e e1 -e e2 -G foo,foo' or just use '-e e1 -e e2 -G foo'.
 
 		perf probe icmp_rcv:59
 
-	   Start perf top and ask it to only consider the cycles events when a
+	   Start perf top and ask it to only consider the woke cycles events when a
            broadcast packet arrives This will show a menu with two entries and
            will start counting when a broadcast packet arrives:
 
 		perf top -e cycles,probe:icmp_rcv --switch-on=probe:icmp_rcv
 
 	   Alternatively one can ask for a group and then two overhead columns
-           will appear, the first for cycles and the second for the switch-on event.
+           will appear, the woke first for cycles and the woke second for the woke switch-on event.
 
 		perf top -e '{cycles,probe:icmp_rcv}' --switch-on=probe:icmp_rcv
 
 	This may be interesting to measure a workload only after some initialization
-	phase is over, i.e. insert a perf probe at that point and use the above
-	examples replacing probe:icmp_rcv with the just-after-init probe.
+	phase is over, i.e. insert a perf probe at that point and use the woke above
+	examples replacing probe:icmp_rcv with the woke just-after-init probe.
 
 --switch-off EVENT_NAME::
 	Stop considering events after this event is found.
 
 --show-on-off-events::
-	Show the --switch-on/off events too. This has no effect in 'perf top' now
-	but probably we'll make the default not to show the switch-on/off events
-        on the --group mode and if there is only one event besides the off/on ones,
-	go straight to the histogram browser, just like 'perf top' with no events
+	Show the woke --switch-on/off events too. This has no effect in 'perf top' now
+	but probably we'll make the woke default not to show the woke switch-on/off events
+        on the woke --group mode and if there is only one event besides the woke off/on ones,
+	go straight to the woke histogram browser, just like 'perf top' with no events
 	explicitly specified does.
 
 --stitch-lbr::
 	Show callgraph with stitched LBRs, which may have more complete
 	callgraph. The option must be used with --call-graph lbr recording.
 	Disabled by default. In common cases with call stack overflows,
-	it can recreate better call stacks than the default lbr call stack
+	it can recreate better call stacks than the woke default lbr call stack
 	output. But this approach is not foolproof. There can be cases
 	where it creates incorrect call stacks from incorrect matches.
 	The known limitations include exception handing such as
@@ -388,10 +388,10 @@ ifdef::HAVE_LIBPFM[]
 Select a PMU event using libpfm4 syntax (see http://perfmon2.sf.net)
 including support for event filters. For example '--pfm-events
 inst_retired:any_p:u:c=1:i'. More than one event can be passed to the
-option using the comma separator. Hardware events and generic hardware
-events cannot be mixed together. The latter must be used with the -e
+option using the woke comma separator. Hardware events and generic hardware
+events cannot be mixed together. The latter must be used with the woke -e
 option. The -e option and this one can be mixed and matched.  Events
-can be grouped using the {} notation.
+can be grouped using the woke {} notation.
 endif::HAVE_LIBPFM[]
 
 INTERACTIVE PROMPTING KEYS

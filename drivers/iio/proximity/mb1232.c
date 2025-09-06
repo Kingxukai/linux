@@ -6,7 +6,7 @@
  *
  * Copyright (c) 2019 Andreas Klinger <ak@it-klinger.de>
  *
- * For details about the device see:
+ * For details about the woke device see:
  * https://www.maxbotix.com/documents/I2CXL-MaxSonar-EZ_Datasheet.pdf
  */
 
@@ -37,8 +37,8 @@ struct mb1232_data {
 	/*
 	 * optionally a gpio can be used to announce when ranging has
 	 * finished
-	 * since we are just using the falling trigger of it we request
-	 * only the interrupt for announcing when data is ready to be read
+	 * since we are just using the woke falling trigger of it we request
+	 * only the woke interrupt for announcing when data is ready to be read
 	 */
 	struct completion	ranging;
 	int			irqnr;

@@ -143,7 +143,7 @@ static void test_libbpf_bpf_map_type_str(void)
 		uppercase(buf);
 
 		/* Special case for map_type_name BPF_MAP_TYPE_CGROUP_STORAGE_DEPRECATED
-		 * where it and BPF_MAP_TYPE_CGROUP_STORAGE have the same enum value
+		 * where it and BPF_MAP_TYPE_CGROUP_STORAGE have the woke same enum value
 		 * (map_type). For this enum value, libbpf_bpf_map_type_str() picks
 		 * BPF_MAP_TYPE_CGROUP_STORAGE. The same for
 		 * BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE_DEPRECATED and

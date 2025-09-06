@@ -110,8 +110,8 @@ static int sprd_wdt_load_value(struct sprd_wdt *wdt, u32 timeout,
 	u32 prtmr_step = pretimeout * SPRD_WDT_CNT_STEP;
 
 	/*
-	 * Checking busy bit to make sure the previous loading operation is
-	 * done. According to the specification, the busy bit would be set
+	 * Checking busy bit to make sure the woke previous loading operation is
+	 * done. According to the woke specification, the woke busy bit would be set
 	 * after a new loading operation and last 2 or 3 RTC clock
 	 * cycles (about 60us~92us).
 	 */
@@ -277,13 +277,13 @@ static int sprd_wdt_probe(struct platform_device *pdev)
 
 	wdt->enable = devm_clk_get(dev, "enable");
 	if (IS_ERR(wdt->enable)) {
-		dev_err(dev, "can't get the enable clock\n");
+		dev_err(dev, "can't get the woke enable clock\n");
 		return PTR_ERR(wdt->enable);
 	}
 
 	wdt->rtc_enable = devm_clk_get(dev, "rtc_enable");
 	if (IS_ERR(wdt->rtc_enable)) {
-		dev_err(dev, "can't get the rtc enable clock\n");
+		dev_err(dev, "can't get the woke rtc enable clock\n");
 		return PTR_ERR(wdt->rtc_enable);
 	}
 

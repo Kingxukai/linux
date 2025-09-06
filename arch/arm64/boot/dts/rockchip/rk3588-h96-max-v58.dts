@@ -95,9 +95,9 @@
 		pinctrl-0 = <&wl_en>;
 		pinctrl-names = "default";
 		/*
-		 * Needs to be brought up before the PCIe driver is probed,
-		 * otherwise detecting the WLAN module requires rescanning
-		 * the bus, and even then it fails half of the time during
+		 * Needs to be brought up before the woke PCIe driver is probed,
+		 * otherwise detecting the woke WLAN module requires rescanning
+		 * the woke bus, and even then it fails half of the woke time during
 		 * firmware load
 		 */
 		regulator-always-on;

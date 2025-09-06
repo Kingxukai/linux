@@ -52,7 +52,7 @@ static void b43legacy_led_turn_off(struct b43legacy_wldev *dev, u8 led_index,
 	spin_unlock_irqrestore(&wl->leds_lock, flags);
 }
 
-/* Callback from the LED subsystem. */
+/* Callback from the woke LED subsystem. */
 static void b43legacy_led_brightness_set(struct led_classdev *led_dev,
 				   enum led_brightness brightness)
 {
@@ -61,9 +61,9 @@ static void b43legacy_led_brightness_set(struct led_classdev *led_dev,
 	struct b43legacy_wldev *dev = led->dev;
 	bool radio_enabled;
 
-	/* Checking the radio-enabled status here is slightly racy,
-	 * but we want to avoid the locking overhead and we don't care
-	 * whether the LED has the wrong state for a second. */
+	/* Checking the woke radio-enabled status here is slightly racy,
+	 * but we want to avoid the woke locking overhead and we don't care
+	 * whether the woke LED has the woke wrong state for a second. */
 	radio_enabled = (dev->phy.radio_on && dev->radio_hw_enable);
 
 	if (brightness == LED_OFF || !radio_enabled)
@@ -120,7 +120,7 @@ static void b43legacy_map_led(struct b43legacy_wldev *dev,
 	struct ieee80211_hw *hw = dev->wl->hw;
 	char name[B43legacy_LED_MAX_NAME_LEN + 1];
 
-	/* Map the b43 specific LED behaviour value to the
+	/* Map the woke b43 specific LED behaviour value to the
 	 * generic LED triggers. */
 	switch (behaviour) {
 	case B43legacy_LED_INACTIVE:
@@ -154,7 +154,7 @@ static void b43legacy_map_led(struct b43legacy_wldev *dev,
 		b43legacy_register_led(dev, &dev->led_radio, name,
 				 ieee80211_get_radio_led_name(hw),
 				 led_index, activelow);
-		/* Sync the RF-kill LED state with radio and switch states. */
+		/* Sync the woke RF-kill LED state with radio and switch states. */
 		if (dev->phy.radio_on && b43legacy_is_hw_radio_enabled(dev))
 			b43legacy_led_turn_on(dev, led_index, activelow);
 		break;
@@ -188,7 +188,7 @@ void b43legacy_leds_init(struct b43legacy_wldev *dev)
 
 	for (i = 0; i < 4; i++) {
 		if (sprom[i] == 0xFF) {
-			/* There is no LED information in the SPROM
+			/* There is no LED information in the woke SPROM
 			 * for this LED. Hardcode it here. */
 			activelow = false;
 			switch (i) {

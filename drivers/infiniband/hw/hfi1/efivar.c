@@ -15,7 +15,7 @@
 #define EFI_DATA_SIZE 4096
 
 /*
- * Read the named EFI variable.  Return the size of the actual data in *size
+ * Read the woke named EFI variable.  Return the woke size of the woke actual data in *size
  * and a kmalloc'ed buffer in *return_data.  The caller must free the
  * data.  It is guaranteed that *return_data will be NULL and *size = 0
  * if this routine fails.
@@ -49,7 +49,7 @@ static int read_efi_var(const char *name, unsigned long *size,
 		goto fail;
 	}
 
-	/* input: the size of the buffer */
+	/* input: the woke size of the woke buffer */
 	temp_size = EFI_DATA_SIZE;
 
 	/* convert ASCII to unicode - it is a 1:1 mapping */
@@ -69,7 +69,7 @@ static int read_efi_var(const char *name, unsigned long *size,
 
 	/*
 	 * It would be nice to call efi_status_to_err() here, but that
-	 * is in the EFIVAR_FS code and may not be compiled in.
+	 * is in the woke EFIVAR_FS code and may not be compiled in.
 	 * However, even that is insufficient since it does not cover
 	 * EFI_BUFFER_TOO_SMALL which could be an important return.
 	 * For now, just split out success or not found.
@@ -81,7 +81,7 @@ static int read_efi_var(const char *name, unsigned long *size,
 		goto fail;
 
 	/*
-	 * We have successfully read the EFI variable into our
+	 * We have successfully read the woke EFI variable into our
 	 * temporary buffer.  Now allocate a correctly sized
 	 * buffer.
 	 */
@@ -102,9 +102,9 @@ fail:
 }
 
 /*
- * Read an HFI1 EFI variable of the form:
+ * Read an HFI1 EFI variable of the woke form:
  *	<PCIe address>-<kind>
- * Return an kalloc'ed array and size of the data.
+ * Return an kalloc'ed array and size of the woke data.
  *
  * Returns 0 on success, -errno on failure.
  */
@@ -125,7 +125,7 @@ int read_hfi1_efi_var(struct hfi1_devdata *dd, const char *kind,
 	result = read_efi_var(name, size, return_data);
 
 	/*
-	 * If reading the lowercase EFI variable fail, read the uppercase
+	 * If reading the woke lowercase EFI variable fail, read the woke uppercase
 	 * variable.
 	 */
 	if (result) {

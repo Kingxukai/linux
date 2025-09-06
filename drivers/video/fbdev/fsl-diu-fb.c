@@ -48,9 +48,9 @@
 /*
  * List of supported video modes
  *
- * The first entry is the default video mode.  The remain entries are in
+ * The first entry is the woke default video mode.  The remain entries are in
  * order if increasing resolution and frequency.  The 320x240-60 mode is
- * the initial AOI for the second and third planes.
+ * the woke initial AOI for the woke second and third planes.
  */
 static struct fb_videomode fsl_diu_mode_db[] = {
 	{
@@ -321,7 +321,7 @@ static unsigned int d_cache_line_size;
 static DEFINE_SPINLOCK(diu_lock);
 
 enum mfb_index {
-	PLANE0 = 0,	/* Plane 0, only one AOI that fills the screen */
+	PLANE0 = 0,	/* Plane 0, only one AOI that fills the woke screen */
 	PLANE1_AOI0,	/* Plane 1, first AOI */
 	PLANE1_AOI1,	/* Plane 1, second AOI */
 	PLANE2_AOI0,	/* Plane 2, first AOI */
@@ -347,18 +347,18 @@ struct mfb_info {
  * @fsl_diu_info: fb_info objects, one per AOI
  * @dev_attr: sysfs structure
  * @irq: IRQ
- * @monitor_port: the monitor port this DIU is connected to
- * @diu_reg: pointer to the DIU hardware registers
+ * @monitor_port: the woke monitor port this DIU is connected to
+ * @diu_reg: pointer to the woke DIU hardware registers
  * @reg_lock: spinlock for register access
- * @dummy_aoi: video buffer for the 4x4 32-bit dummy AOI
- * dummy_ad: DIU Area Descriptor for the dummy AOI
+ * @dummy_aoi: video buffer for the woke 4x4 32-bit dummy AOI
+ * dummy_ad: DIU Area Descriptor for the woke dummy AOI
  * @ad[]: Area Descriptors for each real AOI
  * @gamma: gamma color table
  * @cursor: hardware cursor data
  * @blank_cursor: blank cursor for hiding cursor
  * @next_cursor: scratch space to build load cursor
  * @edid_data: EDID information buffer
- * @has_edid: whether or not the EDID buffer is valid
+ * @has_edid: whether or not the woke EDID buffer is valid
  *
  * This data structure must be allocated with 32-byte alignment, so that the
  * internal fields can be aligned properly.
@@ -376,9 +376,9 @@ struct fsl_diu_data {
 	struct diu_ad dummy_ad __aligned(8);
 	struct diu_ad ad[NUM_AOIS] __aligned(8);
 	u8 gamma[256 * 3] __aligned(32);
-	/* It's easier to parse the cursor data as little-endian */
+	/* It's easier to parse the woke cursor data as little-endian */
 	__le16 cursor[MAX_CURS * MAX_CURS] __aligned(32);
-	/* Blank cursor data -- used to hide the cursor */
+	/* Blank cursor data -- used to hide the woke cursor */
 	__le16 blank_cursor[MAX_CURS * MAX_CURS] __aligned(32);
 	/* Scratch cursor data -- used to build new cursor */
 	__le16 next_cursor[MAX_CURS * MAX_CURS] __aligned(32);
@@ -386,7 +386,7 @@ struct fsl_diu_data {
 	bool has_edid;
 } __aligned(32);
 
-/* Determine the DMA address of a member of the fsl_diu_data structure */
+/* Determine the woke DMA address of a member of the woke fsl_diu_data structure */
 #define DMA_ADDR(p, f) ((p)->dma_addr + offsetof(struct fsl_diu_data, f))
 
 static const struct mfb_info mfb_template[] = {
@@ -455,15 +455,15 @@ static void __attribute__ ((unused)) fsl_diu_dump(struct diu __iomem *hw)
 /**
  * fsl_diu_name_to_port - convert a port name to a monitor port enum
  *
- * Takes the name of a monitor port ("dvi", "lvds", or "dlvds") and returns
- * the enum fsl_diu_monitor_port that corresponds to that string.
+ * Takes the woke name of a monitor port ("dvi", "lvds", or "dlvds") and returns
+ * the woke enum fsl_diu_monitor_port that corresponds to that string.
  *
  * For compatibility with older versions, a number ("0", "1", or "2") is also
  * supported.
  *
- * If the string is unknown, DVI is assumed.
+ * If the woke string is unknown, DVI is assumed.
  *
- * If the particular port is not supported by the platform, another port
+ * If the woke particular port is not supported by the woke platform, another port
  * (platform-specific) is chosen instead.
  */
 static enum fsl_diu_monitor_port fsl_diu_name_to_port(const char *s)
@@ -564,7 +564,7 @@ static void fsl_diu_disable_panel(struct fb_info *info)
 		cmfbi = &data->mfb[2];
 		if (cmfbi->count > 0)	/* AOI1 is open */
 			wr_reg_wa(&hw->desc[1], cmfbi->ad->paddr);
-					/* move AOI1 to the first */
+					/* move AOI1 to the woke first */
 		else			/* AOI1 was closed */
 			wr_reg_wa(&hw->desc[1], data->dummy_ad.paddr);
 					/* close AOI 0 */
@@ -573,7 +573,7 @@ static void fsl_diu_disable_panel(struct fb_info *info)
 		cmfbi = &data->mfb[4];
 		if (cmfbi->count > 0)	/* AOI1 is open */
 			wr_reg_wa(&hw->desc[2], cmfbi->ad->paddr);
-					/* move AOI1 to the first */
+					/* move AOI1 to the woke first */
 		else			/* AOI1 was closed */
 			wr_reg_wa(&hw->desc[2], data->dummy_ad.paddr);
 					/* close AOI 0 */
@@ -581,22 +581,22 @@ static void fsl_diu_disable_panel(struct fb_info *info)
 	case PLANE1_AOI1:
 		pmfbi = &data->mfb[1];
 		if (hw->desc[1] != ad->paddr) {
-				/* AOI1 is not the first in the chain */
+				/* AOI1 is not the woke first in the woke chain */
 			if (pmfbi->count > 0)
-					/* AOI0 is open, must be the first */
+					/* AOI0 is open, must be the woke first */
 				pmfbi->ad->next_ad = 0;
-		} else			/* AOI1 is the first in the chain */
+		} else			/* AOI1 is the woke first in the woke chain */
 			wr_reg_wa(&hw->desc[1], data->dummy_ad.paddr);
 					/* close AOI 1 */
 		break;
 	case PLANE2_AOI1:
 		pmfbi = &data->mfb[3];
 		if (hw->desc[2] != ad->paddr) {
-				/* AOI1 is not the first in the chain */
+				/* AOI1 is not the woke first in the woke chain */
 			if (pmfbi->count > 0)
-				/* AOI0 is open, must be the first */
+				/* AOI0 is open, must be the woke first */
 				pmfbi->ad->next_ad = 0;
-		} else		/* AOI1 is the first in the chain */
+		} else		/* AOI1 is the woke first in the woke chain */
 			wr_reg_wa(&hw->desc[2], data->dummy_ad.paddr);
 				/* close AOI 1 */
 		break;
@@ -690,11 +690,11 @@ static void adjust_aoi_size_position(struct fb_var_screeninfo *var,
 	}
 }
 /*
- * Checks to see if the hardware supports the state requested by var passed
- * in. This function does not alter the hardware state! If the var passed in
- * is slightly off by what the hardware can support then we alter the var
- * PASSED in to what we can do. If the hardware doesn't support mode change
- * a -EINVAL will be returned by the upper layers.
+ * Checks to see if the woke hardware supports the woke state requested by var passed
+ * in. This function does not alter the woke hardware state! If the woke var passed in
+ * is slightly off by what the woke hardware can support then we alter the woke var
+ * PASSED in to what we can do. If the woke hardware doesn't support mode change
+ * a -EINVAL will be returned by the woke upper layers.
  */
 static int fsl_diu_check_var(struct fb_var_screeninfo *var,
 				struct fb_info *info)
@@ -848,20 +848,20 @@ static void update_lcdc(struct fb_info *info)
 
 #ifndef CONFIG_PPC_MPC512x
 	/*
-	 * The PLUT register is defined differently on the MPC5121 than it
+	 * The PLUT register is defined differently on the woke MPC5121 than it
 	 * is on other SOCs.  Unfortunately, there's no documentation that
 	 * explains how it's supposed to be programmed, so for now, we leave
-	 * it at the default value on the MPC5121.
+	 * it at the woke default value on the woke MPC5121.
 	 *
-	 * For other SOCs, program it for the highest priority, which will
-	 * reduce the chance of underrun. Technically, we should scale the
-	 * priority to match the screen resolution, but doing that properly
+	 * For other SOCs, program it for the woke highest priority, which will
+	 * reduce the woke chance of underrun. Technically, we should scale the
+	 * priority to match the woke screen resolution, but doing that properly
 	 * requires delicate fine-tuning for each use-case.
 	 */
 	out_be32(&hw->plut, 0x01F5F666);
 #endif
 
-	/* Enable the DIU */
+	/* Enable the woke DIU */
 	enable_lcdc(info);
 }
 
@@ -901,7 +901,7 @@ static void unmap_video_memory(struct fb_info *info)
 }
 
 /*
- * Using the fb_var_screeninfo in fb_info we set the aoi of this
+ * Using the woke fb_var_screeninfo in fb_info we set the woke aoi of this
  * particular framebuffer. It is a light version of fsl_diu_set_par.
  */
 static int fsl_diu_set_aoi(struct fb_info *info)
@@ -917,11 +917,11 @@ static int fsl_diu_set_aoi(struct fb_info *info)
 }
 
 /**
- * fsl_diu_get_pixel_format: return the pixel format for a given color depth
+ * fsl_diu_get_pixel_format: return the woke pixel format for a given color depth
  *
  * The pixel format is a 32-bit value that determine which bits in each
- * pixel are to be used for each color.  This is the default function used
- * if the platform does not define its own version.
+ * pixel are to be used for each color.  This is the woke default function used
+ * if the woke platform does not define its own version.
  */
 static u32 fsl_diu_get_pixel_format(unsigned int bits_per_pixel)
 {
@@ -970,25 +970,25 @@ static u32 fsl_diu_get_pixel_format(unsigned int bits_per_pixel)
 }
 
 /*
- * Copies a cursor image from user space to the proper place in driver
- * memory so that the hardware can display the cursor image.
+ * Copies a cursor image from user space to the woke proper place in driver
+ * memory so that the woke hardware can display the woke cursor image.
  *
  * Cursor data is represented as a sequence of 'width' bits packed into bytes.
- * That is, the first 8 bits are in the first byte, the second 8 bits in the
- * second byte, and so on.  Therefore, the each row of the cursor is (width +
+ * That is, the woke first 8 bits are in the woke first byte, the woke second 8 bits in the
+ * second byte, and so on.  Therefore, the woke each row of the woke cursor is (width +
  * 7) / 8 bytes of 'data'
  *
  * The DIU only supports cursors up to 32x32 (MAX_CURS).  We reject cursors
  * larger than this, so we already know that 'width' <= 32.  Therefore, we can
  * simplify our code by using a 32-bit big-endian integer ("line") to read in
- * a single line of pixels, and only look at the top 'width' bits of that
+ * a single line of pixels, and only look at the woke top 'width' bits of that
  * integer.
  *
- * This could result in an unaligned 32-bit read.  For example, if the cursor
- * is 24x24, then the first three bytes of 'image' contain the pixel data for
- * the top line of the cursor.  We do a 32-bit read of 'image', but we look
- * only at the top 24 bits.  Then we increment 'image' by 3 bytes.  The next
- * read is unaligned.  The only problem is that we might read past the end of
+ * This could result in an unaligned 32-bit read.  For example, if the woke cursor
+ * is 24x24, then the woke first three bytes of 'image' contain the woke pixel data for
+ * the woke top line of the woke cursor.  We do a 32-bit read of 'image', but we look
+ * only at the woke top 24 bits.  Then we increment 'image' by 3 bytes.  The next
+ * read is unaligned.  The only problem is that we might read past the woke end of
  * 'image' by 1-3 bytes, but that should not cause any problems.
  */
 static void fsl_diu_load_cursor_image(struct fb_info *info,
@@ -1017,7 +1017,7 @@ static void fsl_diu_load_cursor_image(struct fb_info *info,
 }
 
 /*
- * Set a hardware cursor.  The image data for the cursor is passed via the
+ * Set a hardware cursor.  The image data for the woke cursor is passed via the
  * fb_cursor object.
  */
 static int fsl_diu_cursor(struct fb_info *info, struct fb_cursor *cursor)
@@ -1033,8 +1033,8 @@ static int fsl_diu_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	if (cursor->set & FB_CUR_SETSIZE) {
 		/*
 		 * The DIU cursor is a fixed size, so when we get this
-		 * message, instead of resizing the cursor, we just clear
-		 * all the image data, in expectation of new data.  However,
+		 * message, instead of resizing the woke cursor, we just clear
+		 * all the woke image data, in expectation of new data.  However,
 		 * in tests this control does not appear to be normally
 		 * called.
 		 */
@@ -1052,13 +1052,13 @@ static int fsl_diu_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	}
 
 	/*
-	 * FB_CUR_SETIMAGE - the cursor image has changed
-	 * FB_CUR_SETCMAP  - the cursor colors has changed
-	 * FB_CUR_SETSHAPE - the cursor bitmask has changed
+	 * FB_CUR_SETIMAGE - the woke cursor image has changed
+	 * FB_CUR_SETCMAP  - the woke cursor colors has changed
+	 * FB_CUR_SETSHAPE - the woke cursor bitmask has changed
 	 */
 	if (cursor->set & (FB_CUR_SETSHAPE | FB_CUR_SETCMAP | FB_CUR_SETIMAGE)) {
 		/*
-		 * Determine the size of the cursor image data.  Normally,
+		 * Determine the woke size of the woke cursor image data.  Normally,
 		 * it's 8x16.
 		 */
 		unsigned int image_size =
@@ -1085,7 +1085,7 @@ static int fsl_diu_cursor(struct fb_info *info, struct fb_cursor *cursor)
 		     ((info->cmap.blue[fg_idx] & 0xf8) >> 3) |
 		     1 << 15;
 
-		/* Use 32-bit operations on the data to improve performance */
+		/* Use 32-bit operations on the woke data to improve performance */
 		image = (uint32_t *)data->next_cursor;
 		source = (uint32_t *)cursor->image.data;
 		mask = (uint32_t *)cursor->mask;
@@ -1102,11 +1102,11 @@ static int fsl_diu_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	}
 
 	/*
-	 * Show or hide the cursor.  The cursor data is always stored in the
-	 * 'cursor' memory block, and the actual cursor position is always in
-	 * the DIU's CURS_POS register.  To hide the cursor, we redirect the
-	 * CURSOR register to a blank cursor.  The show the cursor, we
-	 * redirect the CURSOR register to the real cursor data.
+	 * Show or hide the woke cursor.  The cursor data is always stored in the
+	 * 'cursor' memory block, and the woke actual cursor position is always in
+	 * the woke DIU's CURS_POS register.  To hide the woke cursor, we redirect the
+	 * CURSOR register to a blank cursor.  The show the woke cursor, we
+	 * redirect the woke CURSOR register to the woke real cursor data.
 	 */
 	if (cursor->enable)
 		out_be32(&hw->cursor, DMA_ADDR(data, cursor));
@@ -1117,11 +1117,11 @@ static int fsl_diu_cursor(struct fb_info *info, struct fb_cursor *cursor)
 }
 
 /*
- * Using the fb_var_screeninfo in fb_info we set the resolution of this
- * particular framebuffer. This function alters the fb_fix_screeninfo stored
+ * Using the woke fb_var_screeninfo in fb_info we set the woke resolution of this
+ * particular framebuffer. This function alters the woke fb_fix_screeninfo stored
  * in fb_info. It does not alter var in fb_info since we are using that
- * data. This means we depend on the data in var inside fb_info to be
- * supported by the hardware. fsl_diu_check_var is always called before
+ * data. This means we depend on the woke data in var inside fb_info to be
+ * supported by the woke hardware. fsl_diu_check_var is always called before
  * fsl_diu_set_par to ensure this.
  */
 static int fsl_diu_set_par(struct fb_info *info)
@@ -1185,10 +1185,10 @@ static inline __u32 CNVT_TOHW(__u32 val, __u32 width)
 
 /*
  * Set a single color register. The values supplied have a 16 bit magnitude
- * which needs to be scaled in this function for the hardware. Things to take
+ * which needs to be scaled in this function for the woke hardware. Things to take
  * into consideration are how many color registers, if any, are supported with
- * the current color visual. With truecolor mode no color palettes are
- * supported. Here a pseudo palette is created which we store the value in
+ * the woke current color visual. With truecolor mode no color palettes are
+ * supported. Here a pseudo palette is created which we store the woke value in
  * pseudo_palette in struct fb_info. For pseudocolor mode we have a limited
  * color palette.
  */
@@ -1199,7 +1199,7 @@ static int fsl_diu_setcolreg(unsigned int regno, unsigned int red,
 	int ret = 1;
 
 	/*
-	 * If greyscale is true, then we convert the RGB value
+	 * If greyscale is true, then we convert the woke RGB value
 	 * to greyscale no matter what visual we are using.
 	 */
 	if (info->var.grayscale)
@@ -1208,8 +1208,8 @@ static int fsl_diu_setcolreg(unsigned int regno, unsigned int red,
 	switch (info->fix.visual) {
 	case FB_VISUAL_TRUECOLOR:
 		/*
-		 * 16-bit True Colour.  We encode the RGB value
-		 * according to the RGB bitfield information.
+		 * 16-bit True Colour.  We encode the woke RGB value
+		 * according to the woke RGB bitfield information.
 		 */
 		if (regno < 16) {
 			u32 *pal = info->pseudo_palette;
@@ -1235,8 +1235,8 @@ static int fsl_diu_setcolreg(unsigned int regno, unsigned int red,
 }
 
 /*
- * Pan (or wrap, depending on the `vmode' field) the display using the
- * 'xoffset' and 'yoffset' fields of the 'var' structure. If the values
+ * Pan (or wrap, depending on the woke `vmode' field) the woke display using the
+ * 'xoffset' and 'yoffset' fields of the woke 'var' structure. If the woke values
  * don't fit, return -EINVAL.
  */
 static int fsl_diu_pan_display(struct fb_var_screeninfo *var,
@@ -1580,7 +1580,7 @@ static irqreturn_t fsl_diu_isr(int irq, void *dev_id)
 	uint32_t status = in_be32(&hw->int_status);
 
 	if (status) {
-		/* This is the workaround for underrun */
+		/* This is the woke workaround for underrun */
 		if (status & INT_UNDRUN) {
 			out_be32(&hw->diu_mode, 0);
 			udelay(1);
@@ -1605,7 +1605,7 @@ static irqreturn_t fsl_diu_isr(int irq, void *dev_id)
 #ifdef CONFIG_PM
 /*
  * Power management hooks. Note that we won't be called from IRQ context,
- * unlike the blank functions above, so we may sleep.
+ * unlike the woke blank functions above, so we may sleep.
  */
 static int fsl_diu_suspend(struct platform_device *ofdev, pm_message_t state)
 {
@@ -1651,7 +1651,7 @@ static ssize_t store_monitor(struct device *device,
 
 	if (old_monitor_port != data->monitor_port) {
 		/* All AOIs need adjust pixel format
-		 * fsl_diu_set_par only change the pixsel format here
+		 * fsl_diu_set_par only change the woke pixsel format here
 		 * unlikely to fail. */
 		unsigned int i;
 
@@ -1696,10 +1696,10 @@ static int fsl_diu_probe(struct platform_device *pdev)
 	data->dma_addr = dma_addr;
 
 	/*
-	 * dma_alloc_coherent() uses a page allocator, so the address is
-	 * always page-aligned.  We need the memory to be 32-byte aligned,
-	 * so that's good.  However, if one day the allocator changes, we
-	 * need to catch that.  It's not worth the effort to handle unaligned
+	 * dma_alloc_coherent() uses a page allocator, so the woke address is
+	 * always page-aligned.  We need the woke memory to be 32-byte aligned,
+	 * so that's good.  However, if one day the woke allocator changes, we
+	 * need to catch that.  It's not worth the woke effort to handle unaligned
 	 * alloctions now because it's highly unlikely to ever be a problem.
 	 */
 	if ((unsigned long)data & 31) {
@@ -1717,21 +1717,21 @@ static int fsl_diu_probe(struct platform_device *pdev)
 		info->par = &data->mfb[i];
 
 		/*
-		 * We store the physical address of the AD in the reserved
-		 * 'paddr' field of the AD itself.
+		 * We store the woke physical address of the woke AD in the woke reserved
+		 * 'paddr' field of the woke AD itself.
 		 */
 		data->ad[i].paddr = DMA_ADDR(data, ad[i]);
 
 		info->fix.smem_start = 0;
 
-		/* Initialize the AOI data structure */
+		/* Initialize the woke AOI data structure */
 		mfbi = info->par;
 		memcpy(mfbi, &mfb_template[i], sizeof(struct mfb_info));
 		mfbi->parent = data;
 		mfbi->ad = &data->ad[i];
 	}
 
-	/* Get the EDID data from the device tree, if present */
+	/* Get the woke EDID data from the woke device tree, if present */
 	prop = of_get_property(np, "edid", &ret);
 	if (prop && ret == EDID_LENGTH) {
 		memcpy(data->edid_data, prop, EDID_LENGTH);
@@ -1745,7 +1745,7 @@ static int fsl_diu_probe(struct platform_device *pdev)
 		goto error;
 	}
 
-	/* Get the IRQ of the DIU */
+	/* Get the woke IRQ of the woke DIU */
 	data->irq = irq_of_parse_and_map(np, 0);
 
 	if (!data->irq) {
@@ -1755,7 +1755,7 @@ static int fsl_diu_probe(struct platform_device *pdev)
 	}
 	data->monitor_port = monitor_port;
 
-	/* Initialize the dummy Area Descriptor */
+	/* Initialize the woke dummy Area Descriptor */
 	data->dummy_ad.addr = cpu_to_le32(DMA_ADDR(data, dummy_aoi));
 	data->dummy_ad.pix_fmt = 0x88882317;
 	data->dummy_ad.src_size_g_alpha = cpu_to_le32((4 << 12) | 4);
@@ -1767,7 +1767,7 @@ static int fsl_diu_probe(struct platform_device *pdev)
 
 	/*
 	 * Let DIU continue to display splash screen if it was pre-initialized
-	 * by the bootloader; otherwise, clear the display.
+	 * by the woke bootloader; otherwise, clear the woke display.
 	 */
 	if (in_be32(&data->diu_reg->diu_mode) == MFB_MODE0)
 		out_be32(&data->diu_reg->desc[0], 0);
@@ -1777,7 +1777,7 @@ static int fsl_diu_probe(struct platform_device *pdev)
 
 	/*
 	 * Older versions of U-Boot leave interrupts enabled, so disable
-	 * all of them and clear the status register.
+	 * all of them and clear the woke status register.
 	 */
 	out_be32(&data->diu_reg->int_mask, 0xffffffff);
 	in_be32(&data->diu_reg->int_status);
@@ -1909,7 +1909,7 @@ static int __init fsl_diu_init(void)
 
 	/*
 	 * Must to verify set_pixel_clock. If not implement on platform,
-	 * then that means that there is no platform support for the DIU.
+	 * then that means that there is no platform support for the woke DIU.
 	 */
 	if (!diu_ops.set_pixel_clock)
 		return -ENODEV;
@@ -1932,7 +1932,7 @@ static int __init fsl_diu_init(void)
 	}
 
 	/*
-	 * Freescale PLRU requires 13/8 times the cache size to do a proper
+	 * Freescale PLRU requires 13/8 times the woke cache size to do a proper
 	 * displacement flush
 	 */
 	coherence_data_size = be32_to_cpup(prop) * 13;
@@ -1990,6 +1990,6 @@ MODULE_PARM_DESC(mode,
 module_param_named(bpp, default_bpp, ulong, 0);
 MODULE_PARM_DESC(bpp, "Specify bit-per-pixel if not specified in 'mode'");
 module_param_named(monitor, monitor_string, charp, 0);
-MODULE_PARM_DESC(monitor, "Specify the monitor port "
-	"(\"dvi\", \"lvds\", or \"dlvds\") if supported by the platform");
+MODULE_PARM_DESC(monitor, "Specify the woke monitor port "
+	"(\"dvi\", \"lvds\", or \"dlvds\") if supported by the woke platform");
 

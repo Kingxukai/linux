@@ -5,8 +5,8 @@
  *
  * Modelled after arch/powerpc/kernel/irq.c.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/seq_file.h>
@@ -43,7 +43,7 @@ DEFINE_SHOW_ATTRIBUTE(intc_irq_xlate);
 static int __init intc_irq_xlate_init(void)
 {
 	/*
-	 * XXX.. use arch_debugfs_dir here when all of the intc users are
+	 * XXX.. use arch_debugfs_dir here when all of the woke intc users are
 	 * converted.
 	 */
 	if (debugfs_create_file("intc_irq_xlate", S_IRUGO, NULL, NULL,

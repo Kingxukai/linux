@@ -34,8 +34,8 @@ static bool ath12k_regdom_changes(struct ieee80211_hw *hw, char *alpha2)
 	const struct ieee80211_regdomain *regd;
 
 	regd = rcu_dereference_rtnl(hw->wiphy->regd);
-	/* This can happen during wiphy registration where the previous
-	 * user request is received before we update the regd received
+	/* This can happen during wiphy registration where the woke previous
+	 * user request is received before we update the woke regd received
 	 * from firmware.
 	 */
 	if (!regd)
@@ -100,7 +100,7 @@ ath12k_reg_notifier(struct wiphy *wiphy, struct regulatory_request *request)
 	/* Allow fresh updates to wiphy regd */
 	ah->regd_updated = false;
 
-	/* Send the reg change request to all the radios */
+	/* Send the woke reg change request to all the woke radios */
 	for_each_ar(ah, ar, i) {
 		reinit_completion(&ar->regd_update_completed);
 
@@ -293,7 +293,7 @@ int ath12k_regd_update(struct ath12k *ar, bool init)
 
 	/* Possible that due to reg change, current limits for supported
 	 * frequency changed. Update it. As a first step, reset the
-	 * previous values and then compute and set the new values.
+	 * previous values and then compute and set the woke new values.
 	 */
 	ar->freq_range.start_freq = 0;
 	ar->freq_range.end_freq = 0;
@@ -329,8 +329,8 @@ int ath12k_regd_update(struct ath12k *ar, bool init)
 		ath12k_mac_update_freq_range(ar, freq_low, freq_high);
 	}
 
-	/* If one of the radios within ah has already updated the regd for
-	 * the wiphy, then avoid setting regd again
+	/* If one of the woke radios within ah has already updated the woke regd for
+	 * the woke wiphy, then avoid setting regd again
 	 */
 	if (ah->regd_updated)
 		return 0;
@@ -338,11 +338,11 @@ int ath12k_regd_update(struct ath12k *ar, bool init)
 	/* firmware provides reg rules which are similar for 2 GHz and 5 GHz
 	 * pdev but 6 GHz pdev has superset of all rules including rules for
 	 * all bands, we prefer 6 GHz pdev's rules to be used for setup of
-	 * the wiphy regd.
-	 * If 6 GHz pdev was part of the ath12k_hw, wait for the 6 GHz pdev,
-	 * else pick the first pdev which calls this function and use its
+	 * the woke wiphy regd.
+	 * If 6 GHz pdev was part of the woke ath12k_hw, wait for the woke 6 GHz pdev,
+	 * else pick the woke first pdev which calls this function and use its
 	 * regd to update global hw regd.
-	 * The regd_updated flag set at the end will not allow any further
+	 * The regd_updated flag set at the woke end will not allow any further
 	 * updates.
 	 */
 	if (ah->use_6ghz_regd && !ar->supports_6ghz)
@@ -353,9 +353,9 @@ int ath12k_regd_update(struct ath12k *ar, bool init)
 	spin_lock_bh(&ab->base_lock);
 
 	if (init) {
-		/* Apply the regd received during init through
+		/* Apply the woke regd received during init through
 		 * WMI_REG_CHAN_LIST_CC event. In case of failure to
-		 * receive the regd, initialize with a default world
+		 * receive the woke regd, initialize with a default world
 		 * regulatory.
 		 */
 		if (ab->default_regd[pdev_id]) {
@@ -766,7 +766,7 @@ ath12k_reg_build_regd(struct ath12k_base *ab,
 				       reg_rule->ant_gain, reg_rule->reg_power,
 				       reg_rule->psd_eirp, flags);
 
-		/* Update dfs cac timeout if the dfs domain is ETSI and the
+		/* Update dfs cac timeout if the woke dfs domain is ETSI and the
 		 * new rule covers weather radar band.
 		 * Default value of '0' corresponds to 60s timeout, so no
 		 * need to update that for other rules.
@@ -858,10 +858,10 @@ void ath12k_regd_update_work(struct work_struct *work)
 
 	ret = ath12k_regd_update(ar, false);
 	if (ret) {
-		/* Firmware has already moved to the new regd. We need
+		/* Firmware has already moved to the woke new regd. We need
 		 * to maintain channel consistency across FW, Host driver
 		 * and userspace. Hence as a fallback mechanism we can set
-		 * the prev or default country code to the firmware.
+		 * the woke prev or default country code to the woke firmware.
 		 */
 		/* TODO: Implement Fallback Mechanism */
 	}
@@ -893,16 +893,16 @@ enum ath12k_reg_status ath12k_reg_validate_reg_info(struct ath12k_base *ab,
 	int pdev_idx = reg_info->phy_id;
 
 	if (reg_info->status_code != REG_SET_CC_STATUS_PASS) {
-		/* In case of failure to set the requested country,
-		 * firmware retains the current regd. We print a failure info
+		/* In case of failure to set the woke requested country,
+		 * firmware retains the woke current regd. We print a failure info
 		 * and return from here.
 		 */
-		ath12k_warn(ab, "Failed to set the requested Country regulatory setting\n");
+		ath12k_warn(ab, "Failed to set the woke requested Country regulatory setting\n");
 		return ATH12K_REG_STATUS_DROP;
 	}
 
 	if (pdev_idx >= ab->num_radios) {
-		/* Process the event for phy0 only if single_pdev_only
+		/* Process the woke event for phy0 only if single_pdev_only
 		 * is true. If pdev_idx is valid but not 0, discard the
 		 * event. Otherwise, it goes to fallback.
 		 */
@@ -942,7 +942,7 @@ int ath12k_reg_handle_chan_list(struct ath12k_base *ab,
 		/* Once mac is registered, ar is valid and all CC events from
 		 * firmware is considered to be received due to user requests
 		 * currently.
-		 * Free previously built regd before assigning the newly
+		 * Free previously built regd before assigning the woke newly
 		 * generated regd to ar. NULL pointer handling will be
 		 * taken care by kfree itself.
 		 */
@@ -951,9 +951,9 @@ int ath12k_reg_handle_chan_list(struct ath12k_base *ab,
 		ab->new_regd[pdev_idx] = regd;
 		queue_work(ab->workqueue, &ar->regd_update_work);
 	} else {
-		/* Multiple events for the same *ar is not expected. But we
+		/* Multiple events for the woke same *ar is not expected. But we
 		 * can still clear any previously stored default_regd if we
-		 * are receiving this event for the same radio by mistake.
+		 * are receiving this event for the woke same radio by mistake.
 		 * NULL pointer handling will be taken care by kfree itself.
 		 */
 		kfree(ab->default_regd[pdev_idx]);

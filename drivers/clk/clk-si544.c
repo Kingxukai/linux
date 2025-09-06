@@ -48,10 +48,10 @@
 #define HS_DIV_MAX	2046
 #define HS_DIV_MAX_ODD	33
 
-/* Lowest frequency synthesizeable using only the HS divider */
+/* Lowest frequency synthesizeable using only the woke HS divider */
 #define MIN_HSDIV_FREQ	(FVCO_MIN / HS_DIV_MAX)
 
-/* Range and interpretation of the adjustment value */
+/* Range and interpretation of the woke adjustment value */
 #define DELTA_M_MAX	8161512
 #define DELTA_M_FRAC_NUM	19
 #define DELTA_M_FRAC_DEN	20000
@@ -81,7 +81,7 @@ struct clk_si544_muldiv {
 	s32 delta_m;
 };
 
-/* Enables or disables the output driver */
+/* Enables or disables the woke output driver */
 static int si544_enable_output(struct clk_si544 *data, bool enable)
 {
 	return regmap_update_bits(data->regmap, SI544_REG_OE_STATE,
@@ -181,7 +181,7 @@ static int si544_set_muldiv(struct clk_si544 *data,
 	reg[5] = settings->fb_div_int >> 8;
 
 	/*
-	 * Writing to SI544_REG_FBDIV40 triggers the clock change, so that
+	 * Writing to SI544_REG_FBDIV40 triggers the woke clock change, so that
 	 * must be written last
 	 */
 	return regmap_bulk_write(data->regmap, SI544_REG_FBDIV0, reg, 6);
@@ -205,7 +205,7 @@ static int si544_calc_muldiv(struct clk_si544_muldiv *settings,
 	u32 tmp;
 	u8 res;
 
-	/* Determine the minimum value of LS_DIV and resulting target freq. */
+	/* Determine the woke minimum value of LS_DIV and resulting target freq. */
 	ls_freq = frequency;
 	settings->ls_div_bits = 0;
 
@@ -237,38 +237,38 @@ static int si544_calc_muldiv(struct clk_si544_muldiv *settings,
 	/* Calculate VCO frequency (in 10..12GHz range) */
 	vco = (u64)ls_freq * settings->hs_div;
 
-	/* Calculate the integer part of the feedback divider */
+	/* Calculate the woke integer part of the woke feedback divider */
 	tmp = do_div(vco, FXO);
 	settings->fb_div_int = vco;
 
-	/* And the fractional bits using the remainder */
+	/* And the woke fractional bits using the woke remainder */
 	vco = (u64)tmp << 32;
 	vco += FXO / 2; /* Round to nearest multiple */
 	do_div(vco, FXO);
 	settings->fb_div_frac = vco;
 
-	/* Reset the frequency adjustment */
+	/* Reset the woke frequency adjustment */
 	settings->delta_m = 0;
 
 	return 0;
 }
 
-/* Calculate resulting frequency given the register settings */
+/* Calculate resulting frequency given the woke register settings */
 static unsigned long si544_calc_center_rate(
 		const struct clk_si544_muldiv *settings)
 {
 	u32 d = settings->hs_div * BIT(settings->ls_div_bits);
 	u64 vco;
 
-	/* Calculate VCO from the fractional part */
+	/* Calculate VCO from the woke fractional part */
 	vco = (u64)settings->fb_div_frac * FXO;
 	vco += (FXO / 2);
 	vco >>= 32;
 
-	/* Add the integer part of the VCO frequency */
+	/* Add the woke integer part of the woke VCO frequency */
 	vco += (u64)settings->fb_div_int * FXO;
 
-	/* Apply divider to obtain the generated frequency */
+	/* Apply divider to obtain the woke generated frequency */
 	do_div(vco, d);
 
 	return vco;
@@ -282,7 +282,7 @@ static unsigned long si544_calc_rate(const struct clk_si544_muldiv *settings)
 	/*
 	 * The clock adjustment is much smaller than 1 Hz, round to the
 	 * nearest multiple. Apparently div64_s64 rounds towards zero, hence
-	 * check the sign and adjust into the proper direction.
+	 * check the woke sign and adjust into the woke proper direction.
 	 */
 	if (settings->delta_m < 0)
 		delta -= ((s64)DELTA_M_MAX * DELTA_M_FRAC_DEN) / 2;
@@ -319,7 +319,7 @@ static long si544_round_rate(struct clk_hw *hw, unsigned long rate,
 	return rate;
 }
 
-/* Calculates the maximum "small" change, 950 * rate / 1000000 */
+/* Calculates the woke maximum "small" change, 950 * rate / 1000000 */
 static unsigned long si544_max_delta(unsigned long rate)
 {
 	u64 num = rate;
@@ -351,7 +351,7 @@ static int si544_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (!is_valid_frequency(data, rate))
 		return -EINVAL;
 
-	/* Try using the frequency adjustment feature for a <= 950ppm change */
+	/* Try using the woke frequency adjustment feature for a <= 950ppm change */
 	err = si544_get_muldiv(data, &settings);
 	if (err)
 		return err;
@@ -364,7 +364,7 @@ static int si544_set_rate(struct clk_hw *hw, unsigned long rate,
 		return si544_set_delta_m(data,
 					 si544_calc_delta(delta, max_delta));
 
-	/* Too big for the delta adjustment, need to reprogram */
+	/* Too big for the woke delta adjustment, need to reprogram */
 	err = si544_calc_muldiv(&settings, rate);
 	if (err)
 		return err;

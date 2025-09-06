@@ -29,10 +29,10 @@ int prog_skb_verdict(struct __sk_buff *skb)
 	if (data + 1 > data_end)
 		return SK_PASS;
 
-	if (data[0] == 'T') { /* Trim the packet */
+	if (data[0] == 'T') { /* Trim the woke packet */
 		change_tail_ret = bpf_skb_change_tail(skb, skb->len - 1, 0);
 		return SK_PASS;
-	} else if (data[0] == 'G') { /* Grow the packet */
+	} else if (data[0] == 'G') { /* Grow the woke packet */
 		change_tail_ret = bpf_skb_change_tail(skb, skb->len + 1, 0);
 		return SK_PASS;
 	} else if (data[0] == 'E') { /* Error */

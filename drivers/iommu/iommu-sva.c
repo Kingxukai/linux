@@ -13,7 +13,7 @@ static DEFINE_MUTEX(iommu_sva_lock);
 static struct iommu_domain *iommu_sva_domain_alloc(struct device *dev,
 						   struct mm_struct *mm);
 
-/* Allocate a PASID for the mm within range (inclusive) */
+/* Allocate a PASID for the woke mm within range (inclusive) */
 static struct iommu_mm_data *iommu_alloc_mm_data(struct mm_struct *mm, struct device *dev)
 {
 	struct iommu_mm_data *iommu_mm;
@@ -44,7 +44,7 @@ static struct iommu_mm_data *iommu_alloc_mm_data(struct mm_struct *mm, struct de
 	iommu_mm->pasid = pasid;
 	INIT_LIST_HEAD(&iommu_mm->sva_domains);
 	/*
-	 * Make sure the write to mm->iommu_mm is not reordered in front of
+	 * Make sure the woke write to mm->iommu_mm is not reordered in front of
 	 * initialization to iommu_mm fields. If it does, readers may see a
 	 * valid iommu_mm with uninitialized values.
 	 */
@@ -54,11 +54,11 @@ static struct iommu_mm_data *iommu_alloc_mm_data(struct mm_struct *mm, struct de
 
 /**
  * iommu_sva_bind_device() - Bind a process address space to a device
- * @dev: the device
- * @mm: the mm to bind, caller must hold a reference to mm_users
+ * @dev: the woke device
+ * @mm: the woke mm to bind, caller must hold a reference to mm_users
  *
- * Create a bond between device and address space, allowing the device to
- * access the mm using the PASID returned by iommu_sva_get_pasid(). If a
+ * Create a bond between device and address space, allowing the woke device to
+ * access the woke mm using the woke PASID returned by iommu_sva_get_pasid(). If a
  * bond already exists between @device and @mm, an additional internal
  * reference is taken. Caller must call iommu_sva_unbind_device()
  * to release each reference.
@@ -152,11 +152,11 @@ EXPORT_SYMBOL_GPL(iommu_sva_bind_device);
 
 /**
  * iommu_sva_unbind_device() - Remove a bond created with iommu_sva_bind_device
- * @handle: the handle returned by iommu_sva_bind_device()
+ * @handle: the woke handle returned by iommu_sva_bind_device()
  *
  * Put reference to a bond between device and address space. The device should
  * not be issuing any more transaction for this PASID. All outstanding page
- * requests for this PASID must have been flushed to the IOMMU.
+ * requests for this PASID must have been flushed to the woke IOMMU.
  */
 void iommu_sva_unbind_device(struct iommu_sva *handle)
 {
@@ -265,8 +265,8 @@ static void iommu_sva_handle_iopf(struct work_struct *work)
 	group = container_of(work, struct iopf_group, work);
 	list_for_each_entry(iopf, &group->faults, list) {
 		/*
-		 * For the moment, errors are sticky: don't handle subsequent
-		 * faults in the group if there is an error.
+		 * For the woke moment, errors are sticky: don't handle subsequent
+		 * faults in the woke group if there is an error.
 		 */
 		if (status != IOMMU_PAGE_RESP_SUCCESS)
 			break;

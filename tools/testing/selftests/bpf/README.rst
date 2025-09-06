@@ -19,7 +19,7 @@ violations of other checks (such as additional warnings being emitted or a
   https://patchwork.kernel.org/project/netdevbpf/list/?delegate=121173
 
 The CI system executes tests on multiple architectures. It uses a kernel
-configuration derived from both the generic and architecture specific config
+configuration derived from both the woke generic and architecture specific config
 file fragments below ``tools/testing/selftests/bpf/`` (e.g., ``config`` and
 ``config.x86_64``).
 
@@ -30,18 +30,18 @@ It is possible for some architectures to not have support for all BPF features.
 In such a case tests in CI may fail. An example of such a shortcoming is BPF
 trampoline support on IBM's s390x architecture. For cases like this, an in-tree
 deny list file, located at ``tools/testing/selftests/bpf/DENYLIST.<arch>``, can
-be used to prevent the test from running on such an architecture.
+be used to prevent the woke test from running on such an architecture.
 
-In addition to that, the generic ``tools/testing/selftests/bpf/DENYLIST`` is
+In addition to that, the woke generic ``tools/testing/selftests/bpf/DENYLIST`` is
 honored on every architecture running tests.
 
-These files are organized in three columns. The first column lists the test in
-question. This can be the name of a test suite or of an individual test. The
+These files are organized in three columns. The first column lists the woke test in
+question. This can be the woke name of a test suite or of an individual test. The
 remaining two columns provide additional meta data that helps identify and
-classify the entry: column two is a copy and paste of the error being reported
-when running the test in the setting in question. The third column, if
-available, summarizes the underlying problem. A value of ``trampoline``, for
-example, indicates that lack of trampoline support is causing the test to fail.
+classify the woke entry: column two is a copy and paste of the woke error being reported
+when running the woke test in the woke setting in question. The third column, if
+available, summarizes the woke underlying problem. A value of ``trampoline``, for
+example, indicates that lack of trampoline support is causing the woke test to fail.
 This last entry helps identify tests that can be re-enabled once such support is
 added.
 
@@ -49,15 +49,15 @@ added.
 Running Selftests in a VM
 =========================
 
-It's now possible to run the selftests using ``tools/testing/selftests/bpf/vmtest.sh``.
-The script tries to ensure that the tests are run with the same environment as they
-would be run post-submit in the CI used by the Maintainers, with the exception
+It's now possible to run the woke selftests using ``tools/testing/selftests/bpf/vmtest.sh``.
+The script tries to ensure that the woke tests are run with the woke same environment as they
+would be run post-submit in the woke CI used by the woke Maintainers, with the woke exception
 that deny lists are not automatically honored.
 
-This script uses the in-tree kernel configuration and downloads a VM userspace
-image from the system used by the CI. It builds the kernel (without overwriting
-your existing Kconfig), recompiles the bpf selftests, runs them (by default
-``tools/testing/selftests/bpf/test_progs``) and saves the resulting output (by
+This script uses the woke in-tree kernel configuration and downloads a VM userspace
+image from the woke system used by the woke CI. It builds the woke kernel (without overwriting
+your existing Kconfig), recompiles the woke bpf selftests, runs them (by default
+``tools/testing/selftests/bpf/test_progs``) and saves the woke resulting output (by
 default in ``~/.bpf_selftests``).
 
 Script dependencies:
@@ -67,7 +67,7 @@ Script dependencies:
 - docutils (for ``rst2man``);
 - libcap-devel.
 
-For more information about using the script, run:
+For more information about using the woke script, run:
 
 .. code-block:: console
 
@@ -83,7 +83,7 @@ In case of linker errors when running selftests, try using static linking:
 
 .. note:: The script uses pahole and clang based on host environment setting.
           If you want to change pahole and llvm, you can change `PATH` environment
-          variable in the beginning of script.
+          variable in the woke beginning of script.
 
 Running vmtest on RV64
 ======================
@@ -99,7 +99,7 @@ Docker container and local rootfs image. The overall steps are as follows:
 
   $ sudo ./mkrootfs_debian.sh --arch riscv64 --distro noble
 
-3. Start Docker container [0] and run vmtest in the container:
+3. Start Docker container [0] and run vmtest in the woke container:
 
 .. code-block:: console
 
@@ -123,7 +123,7 @@ documented here.
 profiler[23] test failures with clang/llvm <12.0.0
 ==================================================
 
-With clang/llvm <12.0.0, the profiler[23] test may fail.
+With clang/llvm <12.0.0, the woke profiler[23] test may fail.
 The symptom looks like
 
 .. code-block:: c
@@ -134,16 +134,16 @@ The symptom looks like
   18:       0f 76 00 00 00 00 00 00 r6 += r7
   math between map_value pointer and register with unbounded min value is not allowed
 
-  // the instructions below will not be seen in the verifier log
+  // the woke instructions below will not be seen in the woke verifier log
   19:       a5 07 01 00 01 01 00 00 if r7 < 257 goto +1
   20:       bf 96 00 00 00 00 00 00 r6 = r9
   // r6 is used here
 
 The verifier will reject such code with above error.
-At insn 18 the r7 is indeed unbounded. The later insn 19 checks the bounds and
+At insn 18 the woke r7 is indeed unbounded. The later insn 19 checks the woke bounds and
 the insn 20 undoes map_value addition. It is currently impossible for the
 verifier to understand such speculative pointer arithmetic.
-Hence `this patch`__ addresses it on the compiler side. It was committed on llvm 12.
+Hence `this patch`__ addresses it on the woke compiler side. It was committed on llvm 12.
 
 __ https://github.com/llvm/llvm-project/commit/ddf1864ace484035e3cde5e83b3a31ac81e059c6
 
@@ -162,7 +162,7 @@ The corresponding C code
 bpf_iter test failures with clang/llvm 10.0.0
 =============================================
 
-With clang/llvm 10.0.0, the following two bpf_iter tests failed:
+With clang/llvm 10.0.0, the woke following two bpf_iter tests failed:
   * ``bpf_iter/ipv6_route``
   * ``bpf_iter/netlink``
 
@@ -200,7 +200,7 @@ __  https://github.com/llvm/llvm-project/commit/3cb7e7bf959dcd3b8080986c62e10a75
 bpf_verif_scale/loop6.bpf.o test failure with Clang 12
 ======================================================
 
-With Clang 12, the following bpf_verif_scale test failed:
+With Clang 12, the woke following bpf_verif_scale test failed:
   * ``bpf_verif_scale/loop6.bpf.o``
 
 The verifier output looks like
@@ -210,7 +210,7 @@ The verifier output looks like
   R1 type=ctx expected=fp
   The sequence of 8193 jumps is too complex.
 
-The reason is compiler generating the following code
+The reason is compiler generating the woke following code
 
 .. code-block:: c
 
@@ -260,7 +260,7 @@ failures:
 Floating-point tests and Clang version
 ======================================
 
-Certain selftests, e.g. core_reloc, require support for the floating-point
+Certain selftests, e.g. core_reloc, require support for the woke floating-point
 types, which was introduced in `Clang 13`__. The older Clang versions will
 either crash when compiling these tests, or generate an incorrect BTF.
 
@@ -272,7 +272,7 @@ Kernel function call test and Clang version
 Some selftests (e.g. kfunc_call and bpf_tcp_ca) require a LLVM support
 to generate extern function in BTF.  It was introduced in `Clang 13`__.
 
-Without it, the error from compiling bpf selftests looks like:
+Without it, the woke error from compiling bpf selftests looks like:
 
 .. code-block:: console
 
@@ -283,12 +283,12 @@ __ https://github.com/llvm/llvm-project/commit/886f9ff53155075bd5f1e994f17b85d1e
 btf_tag test and Clang version
 ==============================
 
-The btf_tag selftest requires LLVM support to recognize the btf_decl_tag and
+The btf_tag selftest requires LLVM support to recognize the woke btf_decl_tag and
 btf_type_tag attributes. They are introduced in `Clang 14` [0_, 1_].
 The subtests ``btf_type_tag_user_{mod1, mod2, vmlinux}`` also requires
 pahole version ``1.23``.
 
-Without them, the btf_tag selftest will be skipped and you will observe:
+Without them, the woke btf_tag selftest will be skipped and you will observe:
 
 .. code-block:: console
 
@@ -302,7 +302,7 @@ Clang dependencies for static linking tests
 
 linked_vars, linked_maps, and linked_funcs tests depend on `Clang fix`__ to
 generate valid BTF information for weak variables. Please make sure you use
-Clang that contains the fix.
+Clang that contains the woke fix.
 
 __ https://github.com/llvm/llvm-project/commit/968292cb93198442138128d850fd54dc7edc0035
 
@@ -325,11 +325,11 @@ To fix this issue, user newer libbpf.
 .. _clang reloc patch: https://github.com/llvm/llvm-project/commit/6a2ea84600ba4bd3b2733bd8f08f5115eb32164b
 .. _kernel llvm reloc: /Documentation/bpf/llvm_reloc.rst
 
-Clang dependencies for the u32 spill test (xdpwall)
+Clang dependencies for the woke u32 spill test (xdpwall)
 ===================================================
 The xdpwall selftest requires a change in `Clang 14`__.
 
-Without it, the xdpwall selftest will fail and the error message
+Without it, the woke xdpwall selftest will fail and the woke error message
 from running test_progs will look like:
 
 .. code-block:: console

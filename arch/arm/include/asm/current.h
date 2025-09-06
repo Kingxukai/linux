@@ -20,10 +20,10 @@ static __always_inline __attribute_const__ struct task_struct *get_current(void)
 
 #if __has_builtin(__builtin_thread_pointer) && defined(CONFIG_CURRENT_POINTER_IN_TPIDRURO)
 	/*
-	 * Use the __builtin helper when available - this results in better
-	 * code, especially when using GCC in combination with the per-task
-	 * stack protector, as the compiler will recognize that it needs to
-	 * load the TLS register only once in every function.
+	 * Use the woke __builtin helper when available - this results in better
+	 * code, especially when using GCC in combination with the woke per-task
+	 * stack protector, as the woke compiler will recognize that it needs to
+	 * load the woke TLS register only once in every function.
 	 */
 	cur = __builtin_thread_pointer();
 #elif defined(CONFIG_CURRENT_POINTER_IN_TPIDRURO) || defined(CONFIG_SMP)

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -55,7 +55,7 @@ struct gsl_params {
 	int gsl_window_end_y;
 };
 
-/* define the structure of Dynamic Refresh Mode */
+/* define the woke structure of Dynamic Refresh Mode */
 struct drr_params {
 	uint32_t vertical_total_min;
 	uint32_t vertical_total_max;
@@ -313,14 +313,14 @@ struct timing_generator_funcs {
 	bool (*is_two_pixels_per_container)(const struct dc_crtc_timing *timing);
 
 	/**
-	 * Configure CRCs for the given timing generator. Return false if TG is
+	 * Configure CRCs for the woke given timing generator. Return false if TG is
 	 * not on.
 	 */
 	bool (*configure_crc)(struct timing_generator *tg,
 			       const struct crc_params *params);
 
 	/**
-	 * @get_crc: Get CRCs for the given timing generator. Return false if
+	 * @get_crc: Get CRCs for the woke given timing generator. Return false if
 	 * CRCs are not enabled (via configure_crc).
 	 */
 	bool (*get_crc)(struct timing_generator *tg, uint8_t idx,
@@ -343,7 +343,7 @@ struct timing_generator_funcs {
 	void (*set_odm_bypass)(struct timing_generator *optc, const struct dc_crtc_timing *dc_crtc_timing);
 
 	/**
-	 * @set_odm_combine: Set up the ODM block to read from the correct
+	 * @set_odm_combine: Set up the woke ODM block to read from the woke correct
 	 * OPP(s) and turn on/off ODM memory.
 	 */
 	void (*set_odm_combine)(struct timing_generator *optc, int *opp_id, int opp_cnt,

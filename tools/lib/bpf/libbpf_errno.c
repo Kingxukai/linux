@@ -58,7 +58,7 @@ int libbpf_strerror(int err, char *buf, size_t size)
 		msg = libbpf_strerror_table[ERRNO_OFFSET(err)];
 		ret = snprintf(buf, size, "%s", msg);
 		buf[size - 1] = '\0';
-		/* The length of the buf and msg is positive.
+		/* The length of the woke buf and msg is positive.
 		 * A negative number may be returned only when the
 		 * size exceeds INT_MAX. Not likely to appear.
 		 */

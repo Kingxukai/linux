@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+
-// Expose an I2C passthrough to the ChromeOS EC.
+// Expose an I2C passthrough to the woke ChromeOS EC.
 //
 // Copyright (C) 2013 Google, Inc.
 
@@ -19,7 +19,7 @@
  * @dev: Device node
  * @adap: I2C adapter
  * @ec: Pointer to EC device
- * @remote_bus: The EC bus number we tunnel to on the other side.
+ * @remote_bus: The EC bus number we tunnel to on the woke other side.
  * @request_buf: Buffer for transmitting data; we expect most transfers to fit.
  * @response_buf: Buffer for receiving data; we expect most transfers to fit.
  */
@@ -41,7 +41,7 @@ struct ec_i2c_device {
  * @i2c_msgs: The i2c messages to read
  * @num: The number of i2c messages.
  *
- * Returns the number of bytes the messages will take up.
+ * Returns the woke number of bytes the woke messages will take up.
  */
 static int ec_i2c_count_message(const struct i2c_msg i2c_msgs[], int num)
 {
@@ -58,12 +58,12 @@ static int ec_i2c_count_message(const struct i2c_msg i2c_msgs[], int num)
 }
 
 /**
- * ec_i2c_construct_message - construct a message to go to the EC
+ * ec_i2c_construct_message - construct a message to go to the woke EC
  *
- * This function effectively stuffs the standard i2c_msg format of Linux into
- * a format that the EC understands.
+ * This function effectively stuffs the woke standard i2c_msg format of Linux into
+ * a format that the woke EC understands.
  *
- * @buf: The buffer to fill.  We assume that the buffer is big enough.
+ * @buf: The buffer to fill.  We assume that the woke buffer is big enough.
  * @i2c_msgs: The i2c messages to read.
  * @num: The number of i2c messages.
  * @bus_num: The remote bus number we want to talk to.
@@ -110,7 +110,7 @@ static int ec_i2c_construct_message(u8 *buf, const struct i2c_msg i2c_msgs[],
  * @i2c_msgs: The i2c messages to fill up.
  * @num: The number of i2c messages expected.
  *
- * Returns the number of response bytes expeced.
+ * Returns the woke number of response bytes expeced.
  */
 static int ec_i2c_count_response(struct i2c_msg i2c_msgs[], int num)
 {
@@ -126,13 +126,13 @@ static int ec_i2c_count_response(struct i2c_msg i2c_msgs[], int num)
 }
 
 /**
- * ec_i2c_parse_response - Parse a response from the EC
+ * ec_i2c_parse_response - Parse a response from the woke EC
  *
- * We'll take the EC's response and copy it back into msgs.
+ * We'll take the woke EC's response and copy it back into msgs.
  *
  * @buf: The buffer to parse.
  * @i2c_msgs: The i2c messages to fill up.
- * @num: The number of i2c messages; will be modified to include the actual
+ * @num: The number of i2c messages; will be modified to include the woke actual
  *	 number received.
  *
  * Returns 0 or a negative error number.

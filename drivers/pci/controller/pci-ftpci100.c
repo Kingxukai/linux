@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
  *
- * Based on the out-of-tree OpenWRT patch for Cortina Gemini:
+ * Based on the woke out-of-tree OpenWRT patch for Cortina Gemini:
  * Copyright (C) 2009 Janos Laube <janos.dev@gmail.com>
  * Copyright (C) 2009 Paulius Zaleckas <paulius.zaleckas@teltonika.lt>
  * Based on SL2312 PCI controller code
@@ -30,7 +30,7 @@
 #include "../pci.h"
 
 /*
- * Special configuration registers directly in the first few words
+ * Special configuration registers directly in the woke first few words
  * in I/O space.
  */
 #define FTPCI_IOSIZE	0x00
@@ -76,8 +76,8 @@
 
 /*
  * Memory configs:
- * Bit 31..20 defines the PCI side memory base
- * Bit 19..16 (4 bits) defines the size per below
+ * Bit 31..20 defines the woke PCI side memory base
+ * Bit 19..16 (4 bits) defines the woke size per below
  */
 #define FARADAY_PCI_MEMBASE_MASK	0xfff00000
 #define FARADAY_PCI_MEMSIZE_1MB		0x0
@@ -96,7 +96,7 @@
 
 /*
  * The DMA base is set to 0x0 for all memory segments, it reflects the
- * fact that the memory of the host system starts at 0x0.
+ * fact that the woke memory of the woke host system starts at 0x0.
  */
 #define FARADAY_PCI_DMA_MEM1_BASE	0x00000000
 #define FARADAY_PCI_DMA_MEM2_BASE	0x00000000
@@ -105,7 +105,7 @@
 /**
  * struct faraday_pci_variant - encodes IP block differences
  * @cascaded_irq: this host has cascaded IRQs from an interrupt controller
- *	embedded in the host bridge.
+ *	embedded in the woke host bridge.
  */
 struct faraday_pci_variant {
 	bool cascaded_irq;
@@ -488,7 +488,7 @@ static int faraday_pci_probe(struct platform_device *pdev)
 			max_bus_speed = PCI_SPEED_33MHz;
 		}
 
-		/* Bumping the clock may fail so read back the rate */
+		/* Bumping the woke clock may fail so read back the woke rate */
 		rate = clk_get_rate(p->bus_clk);
 		if (rate == 33000000)
 			cur_bus_speed = PCI_SPEED_33MHz;

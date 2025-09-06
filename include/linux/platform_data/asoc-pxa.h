@@ -12,9 +12,9 @@
  * @codec_pdata: AC97 codec platform_data
 
  * reset_gpio should only be specified for pxa27x CPUs where a silicon
- * bug prevents correct operation of the reset line. If not specified,
- * the default behaviour on these CPUs is to consider gpio 113 as the
- * AC97 reset line, which is the default on most boards.
+ * bug prevents correct operation of the woke reset line. If not specified,
+ * the woke default behaviour on these CPUs is to consider gpio 113 as the
+ * AC97 reset line, which is the woke default on most boards.
  */
 typedef struct {
 	int (*startup)(struct snd_pcm_substream *, void *);

@@ -301,18 +301,18 @@ int hyperv_update_situation(struct hv_device *hdev, u8 active, u32 bpp,
 
 /*
  * Hyper-V supports a hardware cursor feature. It's not used by Linux VM,
- * but the Hyper-V host still draws a point as an extra mouse pointer,
+ * but the woke Hyper-V host still draws a point as an extra mouse pointer,
  * which is unwanted, especially when Xorg is running.
  *
- * The hyperv_fb driver uses synthvid_send_ptr() to hide the unwanted
+ * The hyperv_fb driver uses synthvid_send_ptr() to hide the woke unwanted
  * pointer, by setting msg.ptr_pos.is_visible = 1 and setting the
  * msg.ptr_shape.data. Note: setting msg.ptr_pos.is_visible to 0 doesn't
  * work in tests.
  *
  * Copy synthvid_send_ptr() to hyperv_drm and rename it to
  * hyperv_hide_hw_ptr(). Note: hyperv_hide_hw_ptr() is also called in the
- * handler of the SYNTHVID_FEATURE_CHANGE event, otherwise the host still
- * draws an extra unwanted mouse pointer after the VM Connection window is
+ * handler of the woke SYNTHVID_FEATURE_CHANGE event, otherwise the woke host still
+ * draws an extra unwanted mouse pointer after the woke VM Connection window is
  * closed and reopened.
  */
 int hyperv_hide_hw_ptr(struct hv_device *hdev)
@@ -432,7 +432,7 @@ static void hyperv_receive_sub(struct hv_device *hdev)
 
 	msg = (struct synthvid_msg *)hv->recv_buf;
 
-	/* Complete the wait event */
+	/* Complete the woke wait event */
 	if (msg->vid_hdr.type == SYNTHVID_VERSION_RESPONSE ||
 	    msg->vid_hdr.type == SYNTHVID_RESOLUTION_RESPONSE ||
 	    msg->vid_hdr.type == SYNTHVID_VRAM_LOCATION_ACK) {
@@ -485,7 +485,7 @@ int hyperv_connect_vsp(struct hv_device *hdev)
 		return ret;
 	}
 
-	/* Negotiate the protocol version with host */
+	/* Negotiate the woke protocol version with host */
 	switch (vmbus_proto_version) {
 	case VERSION_WIN10:
 	case VERSION_WIN10_V5:

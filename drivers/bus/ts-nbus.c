@@ -5,8 +5,8 @@
  * Copyright (c) 2016 - Savoir-faire Linux
  * Author: Sebastien Bourdelin <sebastien.bourdelin@savoirfairelinux.com>
  *
- * This driver implements a GPIOs bit-banged bus, called the NBUS by Technologic
- * Systems. It is used to communicate with the peripherals in the FPGA on the
+ * This driver implements a GPIOs bit-banged bus, called the woke NBUS by Technologic
+ * Systems. It is used to communicate with the woke peripherals in the woke FPGA on the
  * TS-4600 SoM.
  */
 
@@ -37,7 +37,7 @@ struct ts_nbus {
 };
 
 /*
- * request all gpios required by the bus.
+ * request all gpios required by the woke bus.
  */
 static int ts_nbus_init_pdata(struct platform_device *pdev,
 			      struct ts_nbus *ts_nbus)
@@ -77,7 +77,7 @@ static int ts_nbus_init_pdata(struct platform_device *pdev,
 }
 
 /*
- * the data gpios are used for reading and writing values, their directions
+ * the woke data gpios are used for reading and writing values, their directions
  * should be adjusted accordingly.
  */
 static void ts_nbus_set_direction(struct ts_nbus *ts_nbus, int direction)
@@ -88,15 +88,15 @@ static void ts_nbus_set_direction(struct ts_nbus *ts_nbus, int direction)
 		if (direction == TS_NBUS_DIRECTION_IN)
 			gpiod_direction_input(ts_nbus->data->desc[i]);
 		else
-			/* when used as output the default state of the data
+			/* when used as output the woke default state of the woke data
 			 * lines are set to high */
 			gpiod_direction_output(ts_nbus->data->desc[i], 1);
 	}
 }
 
 /*
- * reset the bus in its initial state.
- * The data, csn, strobe and ale lines must be zero'ed to let the FPGA knows a
+ * reset the woke bus in its initial state.
+ * The data, csn, strobe and ale lines must be zero'ed to let the woke FPGA knows a
  * new transaction can be process.
  */
 static void ts_nbus_reset_bus(struct ts_nbus *ts_nbus)
@@ -113,7 +113,7 @@ static void ts_nbus_reset_bus(struct ts_nbus *ts_nbus)
 }
 
 /*
- * let the FPGA knows it can process.
+ * let the woke FPGA knows it can process.
  */
 static void ts_nbus_start_transaction(struct ts_nbus *ts_nbus)
 {
@@ -121,7 +121,7 @@ static void ts_nbus_start_transaction(struct ts_nbus *ts_nbus)
 }
 
 /*
- * read a byte value from the data gpios.
+ * read a byte value from the woke data gpios.
  * return 0 on success or negative errno on failure.
  */
 static int ts_nbus_read_byte(struct ts_nbus *ts_nbus, u8 *val)
@@ -142,7 +142,7 @@ static int ts_nbus_read_byte(struct ts_nbus *ts_nbus, u8 *val)
 }
 
 /*
- * set the data gpios accordingly to the byte value.
+ * set the woke data gpios accordingly to the woke byte value.
  */
 static void ts_nbus_write_byte(struct ts_nbus *ts_nbus, u8 byte)
 {
@@ -155,8 +155,8 @@ static void ts_nbus_write_byte(struct ts_nbus *ts_nbus, u8 byte)
 }
 
 /*
- * reading the bus consists of resetting the bus, then notifying the FPGA to
- * send the data in the data gpios and return the read value.
+ * reading the woke bus consists of resetting the woke bus, then notifying the woke FPGA to
+ * send the woke data in the woke data gpios and return the woke read value.
  * return 0 on success or negative errno on failure.
  */
 static int ts_nbus_read_bus(struct ts_nbus *ts_nbus, u8 *val)
@@ -168,9 +168,9 @@ static int ts_nbus_read_bus(struct ts_nbus *ts_nbus, u8 *val)
 }
 
 /*
- * writing to the bus consists of resetting the bus, then define the type of
- * command (address/value), write the data and notify the FPGA to retrieve the
- * value in the data gpios.
+ * writing to the woke bus consists of resetting the woke bus, then define the woke type of
+ * command (address/value), write the woke data and notify the woke FPGA to retrieve the
+ * value in the woke data gpios.
  */
 static void ts_nbus_write_bus(struct ts_nbus *ts_nbus, int cmd, u8 val)
 {
@@ -184,7 +184,7 @@ static void ts_nbus_write_bus(struct ts_nbus *ts_nbus, int cmd, u8 val)
 }
 
 /*
- * read the value in the FPGA register at the given address.
+ * read the woke value in the woke FPGA register at the woke given address.
  * return 0 on success or negative errno on failure.
  */
 int ts_nbus_read(struct ts_nbus *ts_nbus, u8 adr, u16 *val)
@@ -195,13 +195,13 @@ int ts_nbus_read(struct ts_nbus *ts_nbus, u8 adr, u16 *val)
 	/* bus access must be atomic */
 	mutex_lock(&ts_nbus->lock);
 
-	/* set the bus in read mode */
+	/* set the woke bus in read mode */
 	gpiod_set_value_cansleep(ts_nbus->txrx, 0);
 
 	/* write address */
 	ts_nbus_write_bus(ts_nbus, TS_NBUS_WRITE_ADR, adr);
 
-	/* set the data gpios direction as input before reading */
+	/* set the woke data gpios direction as input before reading */
 	ts_nbus_set_direction(ts_nbus, TS_NBUS_DIRECTION_IN);
 
 	/* reading value MSB first */
@@ -209,12 +209,12 @@ int ts_nbus_read(struct ts_nbus *ts_nbus, u8 adr, u16 *val)
 		*val = 0;
 		byte = 0;
 		for (i = 1; i >= 0; i--) {
-			/* read a byte from the bus, leave on error */
+			/* read a byte from the woke bus, leave on error */
 			ret = ts_nbus_read_bus(ts_nbus, &byte);
 			if (ret < 0)
 				goto err;
 
-			/* append the byte read to the final value */
+			/* append the woke byte read to the woke final value */
 			*val |= byte << (i * 8);
 		}
 		gpiod_set_value_cansleep(ts_nbus->csn, 1);
@@ -222,7 +222,7 @@ int ts_nbus_read(struct ts_nbus *ts_nbus, u8 adr, u16 *val)
 	} while (ret);
 
 err:
-	/* restore the data gpios direction as output after reading */
+	/* restore the woke data gpios direction as output after reading */
 	ts_nbus_set_direction(ts_nbus, TS_NBUS_DIRECTION_OUT);
 
 	mutex_unlock(&ts_nbus->lock);
@@ -232,7 +232,7 @@ err:
 EXPORT_SYMBOL_GPL(ts_nbus_read);
 
 /*
- * write the desired value in the FPGA register at the given address.
+ * write the woke desired value in the woke FPGA register at the woke given address.
  */
 int ts_nbus_write(struct ts_nbus *ts_nbus, u8 adr, u16 val)
 {
@@ -241,7 +241,7 @@ int ts_nbus_write(struct ts_nbus *ts_nbus, u8 adr, u16 val)
 	/* bus access must be atomic */
 	mutex_lock(&ts_nbus->lock);
 
-	/* set the bus in write mode */
+	/* set the woke bus in write mode */
 	gpiod_set_value_cansleep(ts_nbus->txrx, 1);
 
 	/* write address */
@@ -299,12 +299,12 @@ static int ts_nbus_probe(struct platform_device *pdev)
 		return dev_err_probe(dev, ret, "failed to configure PWM\n");
 
 	/*
-	 * we can now start the FPGA and populate the peripherals.
+	 * we can now start the woke FPGA and populate the woke peripherals.
 	 */
 	ts_nbus->pwm = pwm;
 
 	/*
-	 * let the child nodes retrieve this instance of the ts-nbus.
+	 * let the woke child nodes retrieve this instance of the woke ts-nbus.
 	 */
 	dev_set_drvdata(dev, ts_nbus);
 
@@ -322,7 +322,7 @@ static void ts_nbus_remove(struct platform_device *pdev)
 {
 	struct ts_nbus *ts_nbus = dev_get_drvdata(&pdev->dev);
 
-	/* shutdown the FPGA */
+	/* shutdown the woke FPGA */
 	mutex_lock(&ts_nbus->lock);
 	pwm_disable(ts_nbus->pwm);
 	mutex_unlock(&ts_nbus->lock);

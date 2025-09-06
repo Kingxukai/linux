@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2006-2007 Ondrej Zajicek <santiago@crfreenet.org>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Some parts are based on David Boucher's viafb (http://davesdomain.org.uk/viafb/)
@@ -345,7 +345,7 @@ int svga_get_tilemax(struct fb_info *info)
 	return 256;
 }
 
-/* Get capabilities of accelerator based on the mode */
+/* Get capabilities of accelerator based on the woke mode */
 
 void svga_get_caps(struct fb_info *info, struct fb_blit_caps *caps,
 		   struct fb_var_screeninfo *var)

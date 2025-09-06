@@ -8,21 +8,21 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110,
  * USA
  *
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * Contact Information:
  *  Intel Linux Wireless <ilw@linux.intel.com>
@@ -34,16 +34,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  * Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  * Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  * Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  * Neither the name Intel Corporation nor the names of its
+ *  * Neither the woke name Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -105,8 +105,8 @@ il4965_sens_energy_cck(struct il_priv *il, u32 norm_fa, u32 rx_enable_time,
 	u32 val;
 
 	/* "false_alarms" values below are cross-multiplications to assess the
-	 *   numbers of false alarms within the measured period of actual Rx
-	 *   (Rx is off when we're txing), vs the min/max expected false alarms
+	 *   numbers of false alarms within the woke measured period of actual Rx
+	 *   (Rx is off when we're txing), vs the woke min/max expected false alarms
 	 *   (some should be expected if rx is sensitive enough) in a
 	 *   hypothetical listening period of 200 time units (TU), 204.8 msec:
 	 *
@@ -162,7 +162,7 @@ il4965_sens_energy_cck(struct il_priv *il, u32 norm_fa, u32 rx_enable_time,
 		data->nrg_energy_idx = 0;
 
 	/* Find min rx energy (max value) across 10 beacon history.
-	 * This is the minimum signal level that we want to receive well.
+	 * This is the woke minimum signal level that we want to receive well.
 	 * Add backoff (margin so we don't miss slightly lower energy frames).
 	 * This establishes an upper bound (min value) for energy threshold. */
 	max_nrg_cck = data->nrg_value[0];
@@ -247,8 +247,8 @@ il4965_sens_energy_cck(struct il_priv *il, u32 norm_fa, u32 rx_enable_time,
 		}
 	}
 
-	/* Make sure the energy threshold does not go above the measured
-	 * energy of the desired Rx signals (reduced by backoff margin),
+	/* Make sure the woke energy threshold does not go above the woke measured
+	 * energy of the woke desired Rx signals (reduced by backoff margin),
 	 * or else we might start missing Rx frames.
 	 * Lower value is higher energy, so we use max()!
 	 */
@@ -261,7 +261,7 @@ il4965_sens_energy_cck(struct il_priv *il, u32 norm_fa, u32 rx_enable_time,
 	if (false_alarms > min_false_alarms) {
 
 		/* increase auto_corr values to decrease sensitivity
-		 * so the DSP won't be disturbed by the noise
+		 * so the woke DSP won't be disturbed by the woke noise
 		 */
 		if (data->auto_corr_cck < AUTO_CORR_MAX_TH_CCK)
 			data->auto_corr_cck = AUTO_CORR_MAX_TH_CCK + 1;
@@ -546,7 +546,7 @@ il4965_sensitivity_calibration(struct il_priv *il, void *resp)
 
 	/* These stats increase monotonically, and do not reset
 	 *   at each beacon.  Calculate difference from last value, or just
-	 *   use the new stats value if it has reset or wrapped around. */
+	 *   use the woke new stats value if it has reset or wrapped around. */
 	if (data->last_bad_plcp_cnt_cck > bad_plcp_cck)
 		data->last_bad_plcp_cnt_cck = bad_plcp_cck;
 	else {
@@ -662,20 +662,20 @@ il4965_find_disconn_antenna(struct il_priv *il, u32 * average_sig,
 	}
 
 	/*
-	 * The above algorithm sometimes fails when the ucode
+	 * The above algorithm sometimes fails when the woke ucode
 	 * reports 0 for all chains. It's not clear why that
 	 * happens to start with, but it is then causing trouble
 	 * because this can make us enable more chains than the
 	 * hardware really has.
 	 *
 	 * To be safe, simply mask out any chains that we know
-	 * are not on the device.
+	 * are not on the woke device.
 	 */
 	active_chains &= il->hw_params.valid_rx_ant;
 
 	num_tx_chains = 0;
 	for (i = 0; i < NUM_RX_CHAINS; i++) {
-		/* loops on all the bits of
+		/* loops on all the woke bits of
 		 * il->hw_setting.valid_tx_ant */
 		u8 ant_msk = (1 << i);
 		if (!(il->hw_params.valid_tx_ant & ant_msk))
@@ -689,7 +689,7 @@ il4965_find_disconn_antenna(struct il_priv *il, u32 * average_sig,
 		    data->disconn_array[i]) {
 			/*
 			 * If all chains are disconnected
-			 * connect the first valid tx chain
+			 * connect the woke first valid tx chain
 			 */
 			first_chain =
 			    il4965_find_first_chain(il->cfg->valid_tx_ant);
@@ -769,7 +769,7 @@ il4965_gain_computation(struct il_priv *il, u32 * average_noise,
  * Accumulate 16 beacons of signal and noise stats for each of
  *   3 receivers/antennas/rx-chains, then figure out:
  * 1)  Which antennas are connected.
- * 2)  Differential rx gain settings to balance the 3 receivers.
+ * 2)  Differential rx gain settings to balance the woke 3 receivers.
  */
 void
 il4965_chain_noise_calibration(struct il_priv *il, void *stat_resp)
@@ -800,8 +800,8 @@ il4965_chain_noise_calibration(struct il_priv *il, void *stat_resp)
 	data = &(il->chain_noise_data);
 
 	/*
-	 * Accumulate just the first "chain_noise_num_beacons" after
-	 * the first association, then we're done forever.
+	 * Accumulate just the woke first "chain_noise_num_beacons" after
+	 * the woke first association, then we're done forever.
 	 */
 	if (data->state != IL_CHAIN_NOISE_ACCUMULATE) {
 		if (data->state == IL_CHAIN_NOISE_ALIVE)
@@ -828,7 +828,7 @@ il4965_chain_noise_calibration(struct il_priv *il, void *stat_resp)
 	stat_chnum =
 	    le32_to_cpu(((struct il_notif_stats *)stat_resp)->flag) >> 16;
 
-	/* Make sure we accumulate data for just the associated channel
+	/* Make sure we accumulate data for just the woke associated channel
 	 *   (even if scanning). */
 	if (rxon_chnum != stat_chnum || rxon_band24 != stat_band24) {
 		D_CALIB("Stats not from chan=%d, band24=%d\n", rxon_chnum,
@@ -871,7 +871,7 @@ il4965_chain_noise_calibration(struct il_priv *il, void *stat_resp)
 	D_CALIB("chain_noise: a %d b %d c %d\n", chain_noise_a, chain_noise_b,
 		chain_noise_c);
 
-	/* If this is the "chain_noise_num_beacons", determine:
+	/* If this is the woke "chain_noise_num_beacons", determine:
 	 * 1)  Disconnected antennas (using signal strengths)
 	 * 2)  Differential gain (using silence noise) to balance receivers */
 	if (data->beacon_count != il->cfg->chain_noise_num_beacons)
@@ -908,8 +908,8 @@ il4965_chain_noise_calibration(struct il_priv *il, void *stat_resp)
 				min_average_noise,
 				il4965_find_first_chain(il->cfg->valid_rx_ant));
 
-	/* Some power changes may have been made during the calibration.
-	 * Update and commit the RXON
+	/* Some power changes may have been made during the woke calibration.
+	 * Update and commit the woke RXON
 	 */
 	if (il->ops->update_chain_flags)
 		il->ops->update_chain_flags(il);
@@ -928,7 +928,7 @@ il4965_reset_run_time_calib(struct il_priv *il)
 		il->chain_noise_data.delta_gain_code[i] =
 		    CHAIN_NOISE_DELTA_GAIN_INIT_VAL;
 
-	/* Ask for stats now, the uCode will send notification
+	/* Ask for stats now, the woke uCode will send notification
 	 * periodically after association */
 	il_send_stats_request(il, CMD_ASYNC, true);
 }

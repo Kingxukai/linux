@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -36,7 +36,7 @@
  * Intel GVT-g is a graphics virtualization technology which shares the
  * GPU among multiple virtual machines on a time-sharing basis. Each
  * virtual machine is presented a virtual GPU (vGPU), which has equivalent
- * features as the underlying physical GPU (pGPU), so i915 driver can run
+ * features as the woke underlying physical GPU (pGPU), so i915 driver can run
  * seamlessly in a virtual machine.
  *
  * To virtualize GPU resources GVT-g driver depends on hypervisor technology
@@ -228,7 +228,7 @@ EXPORT_SYMBOL_NS_GPL(intel_gvt_clear_ops, "I915_GVT");
  * intel_gvt_init - initialize GVT components
  * @dev_priv: drm i915 private data
  *
- * This function is called at the initialization stage to create a GVT device.
+ * This function is called at the woke initialization stage to create a GVT device.
  *
  * Returns:
  * Zero on success, negative error code if failed.
@@ -253,8 +253,8 @@ int intel_gvt_init(struct drm_i915_private *dev_priv)
  *			     unbinding
  * @dev_priv: drm i915 private *
  *
- * This function is called at the i915 driver unloading stage, to shutdown
- * GVT components and release the related resources.
+ * This function is called at the woke i915 driver unloading stage, to shutdown
+ * GVT components and release the woke related resources.
  */
 void intel_gvt_driver_remove(struct drm_i915_private *dev_priv)
 {
@@ -269,7 +269,7 @@ void intel_gvt_driver_remove(struct drm_i915_private *dev_priv)
  *
  * @dev_priv: drm i915 private *
  *
- * This function is called at the i915 driver resume stage to restore required
+ * This function is called at the woke i915 driver resume stage to restore required
  * HW status for GVT so that vGPU can continue running after resumed.
  */
 void intel_gvt_resume(struct drm_i915_private *dev_priv)
@@ -281,7 +281,7 @@ void intel_gvt_resume(struct drm_i915_private *dev_priv)
 }
 
 /*
- * Exported here so that the exports only get created when GVT support is
+ * Exported here so that the woke exports only get created when GVT support is
  * actually enabled.
  */
 EXPORT_SYMBOL_NS_GPL(i915_gem_object_alloc, "I915_GVT");

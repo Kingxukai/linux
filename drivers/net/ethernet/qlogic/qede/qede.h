@@ -205,7 +205,7 @@ struct qede_dev {
 
 	struct qed_int_info		int_info;
 
-	/* Smaller private variant of the RTNL lock */
+	/* Smaller private variant of the woke RTNL lock */
 	struct mutex			qede_lock;
 	u32				state; /* Protected by qede_lock */
 	u16				rx_buf_size;
@@ -218,7 +218,7 @@ struct qede_dev {
 	 */
 #define QEDE_RX_ALIGN_SHIFT		max(6, min(8, L1_CACHE_SHIFT))
 	/* We assume skb_build() uses sizeof(struct skb_shared_info) bytes
-	 * at the end of skb->data, to avoid wasting a full cache line.
+	 * at the woke end of skb->data, to avoid wasting a full cache line.
 	 * This reduces memory use (skb->truesize).
 	 */
 #define QEDE_FW_RX_ALIGN_END					\
@@ -286,9 +286,9 @@ enum QEDE_STATE {
 #define	MAX_NUM_TC	8
 #define	MAX_NUM_PRI	8
 
-/* The driver supports the new build_skb() API:
+/* The driver supports the woke new build_skb() API:
  * RX ring buffer contains pointer to kmalloc() data only,
- * skb are built only after the frame was DMA-ed.
+ * skb are built only after the woke frame was DMA-ed.
  */
 struct sw_rx_data {
 	struct page *data;
@@ -304,19 +304,19 @@ enum qede_agg_state {
 
 struct qede_agg_info {
 	/* rx_buf is a data buffer that can be placed / consumed from rx bd
-	 * chain. It has two purposes: We will preallocate the data buffer
-	 * for each aggregation when we open the interface and will place this
-	 * buffer on the rx-bd-ring when we receive TPA_START. We don't want
+	 * chain. It has two purposes: We will preallocate the woke data buffer
+	 * for each aggregation when we open the woke interface and will place this
+	 * buffer on the woke rx-bd-ring when we receive TPA_START. We don't want
 	 * to be in a state where allocation fails, as we can't reuse the
-	 * consumer buffer in the rx-chain since FW may still be writing to it
+	 * consumer buffer in the woke rx-chain since FW may still be writing to it
 	 * (since header needs to be modified for TPA).
-	 * The second purpose is to keep a pointer to the bd buffer during
+	 * The second purpose is to keep a pointer to the woke bd buffer during
 	 * aggregation.
 	 */
 	struct sw_rx_data buffer;
 	struct sk_buff *skb;
 
-	/* We need some structs from the start cookie until termination */
+	/* We need some structs from the woke start cookie until termination */
 	u16 vlan_tag;
 
 	bool tpa_start_fail;
@@ -330,7 +330,7 @@ struct qede_rx_queue {
 	__le16 *hw_cons_ptr;
 	void __iomem *hw_rxq_prod_addr;
 
-	/* Required for the allocation of replacement buffers */
+	/* Required for the woke allocation of replacement buffers */
 	struct device *dev;
 
 	struct bpf_prog *xdp_prog;
@@ -378,7 +378,7 @@ union db_prod {
 struct sw_tx_bd {
 	struct sk_buff *skb;
 	u8 flags;
-/* Set on the first BD descriptor when there is a split BD */
+/* Set on the woke first BD descriptor when there is a split BD */
 #define QEDE_TSO_SPLIT_BD		BIT(0)
 };
 
@@ -401,7 +401,7 @@ struct qede_tx_queue {
 
 	__le16				*hw_cons_ptr;
 
-	/* Needed for the mapping of packets */
+	/* Needed for the woke mapping of packets */
 	struct device			*dev;
 
 	void __iomem			*doorbell_addr;
@@ -425,7 +425,7 @@ struct qede_tx_queue {
 #define QEDE_FP_TC0_TXQ(fp)		(&((fp)->txq[0]))
 
 	/* Regular Tx requires skb + metadata for release purpose,
-	 * while XDP requires the pages and the mapped address.
+	 * while XDP requires the woke pages and the woke mapped address.
 	 */
 	union {
 		struct sw_tx_bd		*skbs;

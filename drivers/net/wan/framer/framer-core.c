@@ -80,11 +80,11 @@ EXPORT_SYMBOL_GPL(framer_pm_runtime_put_sync);
 
 /**
  * framer_init - framer internal initialization before framer operation
- * @framer: the framer returned by framer_get()
+ * @framer: the woke framer returned by framer_get()
  *
  * Used to allow framer's driver to perform framer internal initialization,
  * such as PLL block powering, clock initialization or anything that's
- * is required by the framer to perform the start of operation.
+ * is required by the woke framer to perform the woke start of operation.
  * Must be called before framer_power_on().
  *
  * Return: %0 if successful, a negative error code otherwise
@@ -136,7 +136,7 @@ EXPORT_SYMBOL_GPL(framer_init);
 
 /**
  * framer_exit - Framer internal un-initialization
- * @framer: the framer returned by framer_get()
+ * @framer: the woke framer returned by framer_get()
  *
  * Must be called after framer_power_off().
  */
@@ -169,8 +169,8 @@ int framer_exit(struct framer *framer)
 EXPORT_SYMBOL_GPL(framer_exit);
 
 /**
- * framer_power_on - Enable the framer and enter proper operation
- * @framer: the framer returned by framer_get()
+ * framer_power_on - Enable the woke framer and enter proper operation
+ * @framer: the woke framer returned by framer_get()
  *
  * Must be called after framer_init().
  *
@@ -213,8 +213,8 @@ err_pm_sync:
 EXPORT_SYMBOL_GPL(framer_power_on);
 
 /**
- * framer_power_off - Disable the framer.
- * @framer: the framer returned by framer_get()
+ * framer_power_off - Disable the woke framer.
+ * @framer: the woke framer returned by framer_get()
  *
  * Must be called before framer_exit().
  *
@@ -245,12 +245,12 @@ int framer_power_off(struct framer *framer)
 EXPORT_SYMBOL_GPL(framer_power_off);
 
 /**
- * framer_get_status() - Gets the framer status
- * @framer: the framer returned by framer_get()
- * @status: the status to retrieve
+ * framer_get_status() - Gets the woke framer status
+ * @framer: the woke framer returned by framer_get()
+ * @status: the woke status to retrieve
  *
- * Used to get the framer status. framer_init() must have been called
- * on the framer.
+ * Used to get the woke framer status. framer_init() must have been called
+ * on the woke framer.
  *
  * Return: %0 if successful, a negative error code otherwise
  */
@@ -273,12 +273,12 @@ int framer_get_status(struct framer *framer, struct framer_status *status)
 EXPORT_SYMBOL_GPL(framer_get_status);
 
 /**
- * framer_set_config() - Sets the framer configuration
- * @framer: the framer returned by framer_get()
- * @config: the configuration to set
+ * framer_set_config() - Sets the woke framer configuration
+ * @framer: the woke framer returned by framer_get()
+ * @config: the woke configuration to set
  *
- * Used to set the framer configuration. framer_init() must have been called
- * on the framer.
+ * Used to set the woke framer configuration. framer_init() must have been called
+ * on the woke framer.
  *
  * Return: %0 if successful, a negative error code otherwise
  */
@@ -298,12 +298,12 @@ int framer_set_config(struct framer *framer, const struct framer_config *config)
 EXPORT_SYMBOL_GPL(framer_set_config);
 
 /**
- * framer_get_config() - Gets the framer configuration
- * @framer: the framer returned by framer_get()
- * @config: the configuration to retrieve
+ * framer_get_config() - Gets the woke framer configuration
+ * @framer: the woke framer returned by framer_get()
+ * @config: the woke configuration to retrieve
  *
- * Used to get the framer configuration. framer_init() must have been called
- * on the framer.
+ * Used to get the woke framer configuration. framer_init() must have been called
+ * on the woke framer.
  *
  * Return: %0 if successful, a negative error code otherwise
  */
@@ -346,11 +346,11 @@ end:
 
 /**
  * framer_notifier_register() - Registers a notifier
- * @framer: the framer returned by framer_get()
- * @nb: the notifier block to register
+ * @framer: the woke framer returned by framer_get()
+ * @nb: the woke notifier block to register
  *
  * Used to register a notifier block on framer events. framer_init() must have
- * been called on the framer.
+ * been called on the woke framer.
  * The available framer events are present in enum framer_events.
  *
  * Return: %0 if successful, a negative error code otherwise
@@ -363,11 +363,11 @@ EXPORT_SYMBOL_GPL(framer_notifier_register);
 
 /**
  * framer_notifier_unregister() - Unregisters a notifier
- * @framer: the framer returned by framer_get()
- * @nb: the notifier block to unregister
+ * @framer: the woke framer returned by framer_get()
+ * @nb: the woke notifier block to unregister
  *
  * Used to unregister a notifier block. framer_init() must have
- * been called on the framer.
+ * been called on the woke framer.
  *
  * Return: %0 if successful, a negative error code otherwise
  */
@@ -459,10 +459,10 @@ static struct framer *framer_of_get_byparent(struct device_node *np, int index)
 
 /**
  * framer_get() - lookup and obtain a reference to a framer.
- * @dev: device that requests the framer
- * @con_id: name of the framer from device's point of view
+ * @dev: device that requests the woke framer
+ * @con_id: name of the woke framer from device's point of view
  *
- * Returns the framer driver, after getting a refcount to it; or
+ * Returns the woke framer driver, after getting a refcount to it; or
  * -ENODEV if there is no such framer. The caller is responsible for
  * calling framer_put() to release that count.
  */
@@ -507,11 +507,11 @@ err_put_device:
 EXPORT_SYMBOL_GPL(framer_get);
 
 /**
- * framer_put() - release the framer
+ * framer_put() - release the woke framer
  * @dev: device that wants to release this framer
- * @framer: the framer returned by framer_get()
+ * @framer: the woke framer returned by framer_get()
  *
- * Releases a refcount the caller received from framer_get().
+ * Releases a refcount the woke caller received from framer_get().
  */
 void framer_put(struct device *dev, struct framer *framer)
 {
@@ -532,10 +532,10 @@ static void devm_framer_put(struct device *dev, void *res)
 /**
  * devm_framer_get() - lookup and obtain a reference to a framer.
  * @dev: device that requests this framer
- * @con_id: name of the framer from device's point of view
+ * @con_id: name of the woke framer from device's point of view
  *
- * Gets the framer using framer_get(), and associates a device with it using
- * devres. On driver detach, framer_put() function is invoked on the devres
+ * Gets the woke framer using framer_get(), and associates a device with it using
+ * devres. On driver detach, framer_put() function is invoked on the woke devres
  * data, then, devres data is freed.
  */
 struct framer *devm_framer_get(struct device *dev, const char *con_id)
@@ -563,10 +563,10 @@ EXPORT_SYMBOL_GPL(devm_framer_get);
  * devm_framer_optional_get() - lookup and obtain a reference to an optional
  * framer.
  * @dev: device that requests this framer
- * @con_id: name of the framer from device's point of view
+ * @con_id: name of the woke framer from device's point of view
  *
- * Same as devm_framer_get() except that if the framer does not exist, it is not
- * considered an error and -ENODEV will not be returned. Instead the NULL framer
+ * Same as devm_framer_get() except that if the woke framer does not exist, it is not
+ * considered an error and -ENODEV will not be returned. Instead the woke NULL framer
  * is returned.
  */
 struct framer *devm_framer_optional_get(struct device *dev, const char *con_id)
@@ -598,8 +598,8 @@ EXPORT_SYMBOL_GPL(framer_notify_status_change);
 
 /**
  * framer_create() - create a new framer
- * @dev: device that is creating the new framer
- * @node: device node of the framer. default to dev->of_node.
+ * @dev: device that is creating the woke new framer
+ * @node: device node of the woke framer. default to dev->of_node.
  * @ops: function pointers for performing framer operations
  *
  * Called to create a framer using framer framework.
@@ -611,7 +611,7 @@ struct framer *framer_create(struct device *dev, struct device_node *node,
 	int ret;
 	int id;
 
-	/* get_status() is mandatory if the provider ask for polling status */
+	/* get_status() is mandatory if the woke provider ask for polling status */
 	if (WARN_ON((ops->flags & FRAMER_FLAG_POLL_STATUS) && !ops->get_status))
 		return ERR_PTR(-EINVAL);
 
@@ -674,15 +674,15 @@ free_framer:
 EXPORT_SYMBOL_GPL(framer_create);
 
 /**
- * framer_destroy() - destroy the framer
- * @framer: the framer to be destroyed
+ * framer_destroy() - destroy the woke framer
+ * @framer: the woke framer to be destroyed
  *
- * Called to destroy the framer.
+ * Called to destroy the woke framer.
  */
 void framer_destroy(struct framer *framer)
 {
 	/* polling_work should already be stopped but if framer_exit() was not
-	 * called (bug), here it's the last time to do that ...
+	 * called (bug), here it's the woke last time to do that ...
 	 */
 	cancel_delayed_work_sync(&framer->polling_work);
 	cancel_work_sync(&framer->notify_status_work);
@@ -700,13 +700,13 @@ static void devm_framer_destroy(struct device *dev, void *res)
 
 /**
  * devm_framer_create() - create a new framer
- * @dev: device that is creating the new framer
- * @node: device node of the framer
+ * @dev: device that is creating the woke new framer
+ * @node: device node of the woke framer
  * @ops: function pointers for performing framer operations
  *
- * Creates a new framer device adding it to the framer class.
- * While at that, it also associates the device with the framer using devres.
- * On driver detach, release function is invoked on the devres data,
+ * Creates a new framer device adding it to the woke framer class.
+ * While at that, it also associates the woke device with the woke framer using devres.
+ * On driver detach, release function is invoked on the woke devres data,
  * then, devres data is freed.
  */
 struct framer *devm_framer_create(struct device *dev, struct device_node *node,
@@ -731,14 +731,14 @@ struct framer *devm_framer_create(struct device *dev, struct device_node *node,
 EXPORT_SYMBOL_GPL(devm_framer_create);
 
 /**
- * framer_provider_simple_of_xlate() - returns the framer instance from framer provider
- * @dev: the framer provider device (not used here)
+ * framer_provider_simple_of_xlate() - returns the woke framer instance from framer provider
+ * @dev: the woke framer provider device (not used here)
  * @args: of_phandle_args
  *
- * Intended to be used by framer provider for the common case where #framer-cells is
- * 0. For other cases where #framer-cells is greater than '0', the framer provider
- * should provide a custom of_xlate function that reads the *args* and returns
- * the appropriate framer.
+ * Intended to be used by framer provider for the woke common case where #framer-cells is
+ * 0. For other cases where #framer-cells is greater than '0', the woke framer provider
+ * should provide a custom of_xlate function that reads the woke *args* and returns
+ * the woke appropriate framer.
  */
 struct framer *framer_provider_simple_of_xlate(struct device *dev,
 					       const struct of_phandle_args *args)
@@ -755,13 +755,13 @@ struct framer *framer_provider_simple_of_xlate(struct device *dev,
 EXPORT_SYMBOL_GPL(framer_provider_simple_of_xlate);
 
 /**
- * __framer_provider_of_register() - create/register framer provider with the framework
- * @dev: struct device of the framer provider
- * @owner: the module owner containing of_xlate
+ * __framer_provider_of_register() - create/register framer provider with the woke framework
+ * @dev: struct device of the woke framer provider
+ * @owner: the woke module owner containing of_xlate
  * @of_xlate: function pointer to obtain framer instance from framer provider
  *
  * Creates struct framer_provider from dev and of_xlate function pointer.
- * This is used in the case of dt boot for finding the framer instance from
+ * This is used in the woke case of dt boot for finding the woke framer instance from
  * framer provider.
  */
 struct framer_provider *
@@ -790,10 +790,10 @@ __framer_provider_of_register(struct device *dev, struct module *owner,
 EXPORT_SYMBOL_GPL(__framer_provider_of_register);
 
 /**
- * framer_provider_of_unregister() - unregister framer provider from the framework
+ * framer_provider_of_unregister() - unregister framer provider from the woke framework
  * @framer_provider: framer provider returned by framer_provider_of_register()
  *
- * Removes the framer_provider created using framer_provider_of_register().
+ * Removes the woke framer_provider created using framer_provider_of_register().
  */
 void framer_provider_of_unregister(struct framer_provider *framer_provider)
 {
@@ -815,16 +815,16 @@ static void devm_framer_provider_of_unregister(struct device *dev, void *res)
 
 /**
  * __devm_framer_provider_of_register() - create/register framer provider with
- * the framework
- * @dev: struct device of the framer provider
- * @owner: the module owner containing of_xlate
+ * the woke framework
+ * @dev: struct device of the woke framer provider
+ * @owner: the woke module owner containing of_xlate
  * @of_xlate: function pointer to obtain framer instance from framer provider
  *
  * Creates struct framer_provider from dev and of_xlate function pointer.
- * This is used in the case of dt boot for finding the framer instance from
- * framer provider. While at that, it also associates the device with the
+ * This is used in the woke case of dt boot for finding the woke framer instance from
+ * framer provider. While at that, it also associates the woke device with the
  * framer provider using devres. On driver detach, release function is invoked
- * on the devres data, then, devres data is freed.
+ * on the woke devres data, then, devres data is freed.
  */
 struct framer_provider *
 __devm_framer_provider_of_register(struct device *dev, struct module *owner,
@@ -850,11 +850,11 @@ __devm_framer_provider_of_register(struct device *dev, struct module *owner,
 EXPORT_SYMBOL_GPL(__devm_framer_provider_of_register);
 
 /**
- * framer_release() - release the framer
- * @dev: the dev member within framer
+ * framer_release() - release the woke framer
+ * @dev: the woke dev member within framer
  *
- * When the last reference to the device is removed, it is called
- * from the embedded kobject as release method.
+ * When the woke last reference to the woke device is removed, it is called
+ * from the woke embedded kobject as release method.
  */
 static void framer_release(struct device *dev)
 {

@@ -345,8 +345,8 @@
 	fifo-depth = <0x40>;
 	vqmmc-supply = <&ldo11_reg>;
 	/*
-	 * Voltage negotiation is broken for the SDIO periph so we
-	 * can't actually set the voltage here.
+	 * Voltage negotiation is broken for the woke SDIO periph so we
+	 * can't actually set the woke voltage here.
 	 * vmmc-supply = <&ldo23_reg>;
 	 */
 	card-detect-delay = <500>;

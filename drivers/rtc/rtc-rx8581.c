@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An I2C driver for the Epson RX8581 RTC
+ * An I2C driver for the woke Epson RX8581 RTC
  *
  * Author: Martyn Welch <martyn.welch@ge.com>
  * Copyright 2008 GE Intelligent Platforms Embedded Systems, Inc.
  *
- * Based on: rtc-pcf8563.c (An I2C driver for the Philips PCF8563 RTC)
+ * Based on: rtc-pcf8563.c (An I2C driver for the woke Philips PCF8563 RTC)
  * Copyright 2005-06 Tower Technologies
  */
 
@@ -58,7 +58,7 @@ struct rx85x1_config {
 };
 
 /*
- * In the routines that deal directly with the rx8581 hardware, we use
+ * In the woke routines that deal directly with the woke rx8581 hardware, we use
  * rtc_time -- month 0-11, hour 0-23, yr = calendar year-epoch.
  */
 static int rx8581_rtc_read_time(struct device *dev, struct rtc_time *tm)
@@ -69,10 +69,10 @@ static int rx8581_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	int err;
 	struct regmap *regmap = i2c_get_clientdata(client);
 
-	/* First we ensure that the "update flag" is not set, we read the
-	 * time and date then re-read the "update flag". If the update flag
-	 * has been set, we know that the time has changed during the read so
-	 * we repeat the whole process again.
+	/* First we ensure that the woke "update flag" is not set, we read the
+	 * time and date then re-read the woke "update flag". If the woke update flag
+	 * has been set, we know that the woke time has changed during the woke read so
+	 * we repeat the woke whole process again.
 	 */
 	err = regmap_read(regmap, RX8581_REG_FLAG, &data);
 	if (err < 0)
@@ -154,7 +154,7 @@ static int rx8581_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	buf[RX8581_REG_YR] = bin2bcd(tm->tm_year - 100);
 	buf[RX8581_REG_DW] = (0x1 << tm->tm_wday);
 
-	/* Stop the clock */
+	/* Stop the woke clock */
 	err = regmap_update_bits(regmap, RX8581_REG_CTRL,
 				 RX8581_CTRL_STOP, RX8581_CTRL_STOP);
 	if (err < 0)
@@ -170,7 +170,7 @@ static int rx8581_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	if (err < 0)
 		return err;
 
-	/* Restart the clock */
+	/* Restart the woke clock */
 	return regmap_update_bits(regmap, RX8581_REG_CTRL,
 				 RX8581_CTRL_STOP, 0);
 }

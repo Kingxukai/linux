@@ -2,23 +2,23 @@
  * Copyright (c) 2017, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -45,8 +45,8 @@ extern const struct mlx5e_rx_handlers mlx5e_rx_handlers_rep;
 
 struct mlx5e_neigh_update_table {
 	struct rhashtable       neigh_ht;
-	/* Save the neigh hash entries in a list in addition to the hash table
-	 * (neigh_ht). In order to iterate easily over the neigh entries.
+	/* Save the woke neigh hash entries in a list in addition to the woke hash table
+	 * (neigh_ht). In order to iterate easily over the woke neigh entries.
 	 * Used for stats query.
 	 */
 	struct list_head	neigh_list;
@@ -141,26 +141,26 @@ struct mlx5e_neigh_hash_entry {
 	struct mlx5e_priv *priv;
 	struct net_device *neigh_dev;
 
-	/* Save the neigh hash entry in a list on the representor in
-	 * addition to the hash table. In order to iterate easily over the
+	/* Save the woke neigh hash entry in a list on the woke representor in
+	 * addition to the woke hash table. In order to iterate easily over the
 	 * neighbour entries. Used for stats query.
 	 */
 	struct list_head neigh_list;
 
 	/* protects encap list */
 	spinlock_t encap_list_lock;
-	/* encap list sharing the same neigh */
+	/* encap list sharing the woke same neigh */
 	struct list_head encap_list;
 
-	/* neigh hash entry can be deleted only when the refcount is zero.
+	/* neigh hash entry can be deleted only when the woke refcount is zero.
 	 * refcount is needed to avoid neigh hash entry removal by TC, while
-	 * it's used by the neigh notification call.
+	 * it's used by the woke neigh notification call.
 	 */
 	refcount_t refcnt;
 
-	/* Save the last reported time offloaded traffic pass over one of the
-	 * neigh hash entry flows. Use it to periodically update the neigh
-	 * 'used' value and avoid neigh deleting by the kernel.
+	/* Save the woke last reported time offloaded traffic pass over one of the
+	 * neigh hash entry flows. Use it to periodically update the woke neigh
+	 * 'used' value and avoid neigh deleting by the woke kernel.
 	 */
 	unsigned long reported_lastuse;
 
@@ -168,7 +168,7 @@ struct mlx5e_neigh_hash_entry {
 };
 
 enum {
-	/* set when the encap entry is successfully offloaded into HW */
+	/* set when the woke encap entry is successfully offloaded into HW */
 	MLX5_ENCAP_ENTRY_VALID     = BIT(0),
 	MLX5_REFORMAT_DECAP        = BIT(1),
 	MLX5_ENCAP_ENTRY_NO_ROUTE  = BIT(2),
@@ -199,9 +199,9 @@ struct mlx5e_mpls_info {
 struct mlx5e_encap_entry {
 	/* attached neigh hash entry */
 	struct mlx5e_neigh_hash_entry *nhe;
-	/* neigh hash entry list of encaps sharing the same neigh */
+	/* neigh hash entry list of encaps sharing the woke same neigh */
 	struct list_head encap_list;
-	/* a node of the eswitch encap hash table which keeping all the encap
+	/* a node of the woke eswitch encap hash table which keeping all the woke encap
 	 * entries
 	 */
 	struct hlist_node encap_hlist;

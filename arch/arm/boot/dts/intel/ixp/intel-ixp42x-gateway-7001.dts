@@ -27,7 +27,7 @@
 	};
 
 	aliases {
-		/* second UART is the primary console */
+		/* second UART is the woke primary console */
 		serial0 = &uart1;
 	};
 

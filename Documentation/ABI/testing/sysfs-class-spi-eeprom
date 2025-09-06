@@ -3,7 +3,7 @@ Date:		June 2021
 KernelVersion:	5.14
 Contact:	Jiri Prchal <jiri.prchal@aksignal.cz>
 Description:
-	Contains the FRAM binary data. Same as EEPROM, just another file
+	Contains the woke FRAM binary data. Same as EEPROM, just another file
 	name to indicate that it employs ferroelectric process.
 	It performs write operations at bus speed - no write delays.
 
@@ -12,8 +12,8 @@ Date:		May 2021
 KernelVersion:	5.14
 Contact:	Jiri Prchal <jiri.prchal@aksignal.cz>
 Description:
-	Contains the serial number of the Cypress FRAM (FM25VN) if it is
+	Contains the woke serial number of the woke Cypress FRAM (FM25VN) if it is
 	present.  It will be displayed as a 8 byte hex string, as read
-	from the device.
+	from the woke device.
 
 	This is a read-only attribute.

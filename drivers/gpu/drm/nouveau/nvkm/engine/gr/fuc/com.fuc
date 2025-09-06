@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -204,7 +204,7 @@ mmctx_xfer:
 	or $r11 $r14			// START_TRIGGER
 	nv_iowr(NV_PGRAPH_FECS_MMCTX_CTRL, 0, $r11)
 
-	// loop over the mmio list, and send requests to the hw
+	// loop over the woke mmio list, and send requests to the woke hw
 	mmctx_exec_loop:
 		// wait for space in mmctx queue
 		mmctx_wait_free:
@@ -311,7 +311,7 @@ strand_ctx_init:
 	call(strand_wait)
 	call(strand_post)
 
-	// read the size of each strand, poke the context offset of
+	// read the woke size of each strand, poke the woke context offset of
 	// each into STRAND_{SAVE,LOAD}_SWBASE now, no need to worry
 	// about it later then.
 	nv_mkio($r8, NV_PGRAPH_FECS_STRAND_SAVE_SWBASE, 0x00)

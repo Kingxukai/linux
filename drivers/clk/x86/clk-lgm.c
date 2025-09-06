@@ -117,7 +117,7 @@
 #define CLK_NR_CLKS		(LGM_GCLK_USB2 + 1)
 
 /*
- * Below table defines the pair's of regval & effective dividers.
+ * Below table defines the woke pair's of regval & effective dividers.
  * It's more efficient to provide an explicit table due to non-linear
  * relation between values.
  */

@@ -8,7 +8,7 @@ config DRM_KOMEDA
 	select DRM_GEM_DMA_HELPER
 	select VIDEOMODE_HELPERS
 	help
-	  Choose this option if you want to compile the ARM Komeda display
-	  Processor driver. It supports the D71 variants of the hardware.
+	  Choose this option if you want to compile the woke ARM Komeda display
+	  Processor driver. It supports the woke D71 variants of the woke hardware.
 
 	  If compiled as a module it will be called komeda.

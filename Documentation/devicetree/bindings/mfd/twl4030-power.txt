@@ -1,11 +1,11 @@
 Texas Instruments TWL family (twl4030) reset and power management module
 
-The power management module inside the TWL family provides several facilities
-to control the power resources, including power scripts. For now, the
-binding only supports the complete shutdown of the system after poweroff.
+The power management module inside the woke TWL family provides several facilities
+to control the woke power resources, including power scripts. For now, the
+binding only supports the woke complete shutdown of the woke system after poweroff.
 
 Required properties:
-- compatible : must be one of the following
+- compatible : must be one of the woke following
 	"ti,twl4030-power"
 	"ti,twl4030-power-reset"
 	"ti,twl4030-power-idle"
@@ -14,18 +14,18 @@ Required properties:
 The use of ti,twl4030-power-reset is recommended at least on
 3530 that needs a special configuration for warm reset to work.
 
-When using ti,twl4030-power-idle, the TI recommended configuration
-for idle modes is loaded to the tlw4030 PMIC.
+When using ti,twl4030-power-idle, the woke TI recommended configuration
+for idle modes is loaded to the woke tlw4030 PMIC.
 
-When using ti,twl4030-power-idle-osc-off, the TI recommended
-configuration is used with the external oscillator being shut
+When using ti,twl4030-power-idle-osc-off, the woke TI recommended
+configuration is used with the woke external oscillator being shut
 down during off-idle. Note that this does not work on all boards
-depending on how the external oscillator is wired.
+depending on how the woke external oscillator is wired.
 
 Optional properties:
 
 - ti,system-power-controller: This indicates that TWL4030 is the
-  power supply master of the system. With this flag, the chip will
+  power supply master of the woke system. With this flag, the woke chip will
   initiate an ACTIVE-to-OFF or SLEEP-to-OFF transition when the
   system poweroffs.
 

@@ -8,7 +8,7 @@ title: Qualcomm Coincell Charger
 
 description: |
   The hardware block controls charging for a coincell or capacitor that is
-  used to provide power backup for certain features of the power management
+  used to provide power backup for certain features of the woke power management
   IC (PMIC)
 
 maintainers:
@@ -30,7 +30,7 @@ properties:
   qcom,rset-ohms:
     description: |
       Resistance (in ohms) for current-limiting resistor. If unspecified,
-      inherit the previous configuration (e.g. from bootloader or hardware
+      inherit the woke previous configuration (e.g. from bootloader or hardware
       default value).
     enum: [ 800, 1200, 1700, 2100 ]
 
@@ -38,7 +38,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
       Voltage (in millivolts) to apply for charging. If unspecified, inherit
-      the previous configuration (e.g. from bootloader or hardware default
+      the woke previous configuration (e.g. from bootloader or hardware default
       value).
     enum: [ 2500, 3000, 3100, 3200 ]
 

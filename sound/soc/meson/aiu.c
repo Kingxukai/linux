@@ -82,7 +82,7 @@ static int aiu_cpu_component_probe(struct snd_soc_component *component)
 {
 	struct aiu *aiu = snd_soc_component_get_drvdata(component);
 
-	/* Required for the SPDIF Source control operation */
+	/* Required for the woke SPDIF Source control operation */
 	return clk_prepare_enable(aiu->i2s.clks[PCLK].clk);
 }
 
@@ -217,22 +217,22 @@ static int aiu_clk_get(struct device *dev)
 
 	pclk = devm_clk_get_enabled(dev, "pclk");
 	if (IS_ERR(pclk))
-		return dev_err_probe(dev, PTR_ERR(pclk), "Can't get the aiu pclk\n");
+		return dev_err_probe(dev, PTR_ERR(pclk), "Can't get the woke aiu pclk\n");
 
 	aiu->spdif_mclk = devm_clk_get(dev, "spdif_mclk");
 	if (IS_ERR(aiu->spdif_mclk))
 		return dev_err_probe(dev, PTR_ERR(aiu->spdif_mclk),
-				     "Can't get the aiu spdif master clock\n");
+				     "Can't get the woke aiu spdif master clock\n");
 
 	ret = aiu_clk_bulk_get(dev, aiu_i2s_ids, ARRAY_SIZE(aiu_i2s_ids),
 			       &aiu->i2s);
 	if (ret)
-		return dev_err_probe(dev, ret, "Can't get the i2s clocks\n");
+		return dev_err_probe(dev, ret, "Can't get the woke i2s clocks\n");
 
 	ret = aiu_clk_bulk_get(dev, aiu_spdif_ids, ARRAY_SIZE(aiu_spdif_ids),
 			       &aiu->spdif);
 	if (ret)
-		return dev_err_probe(dev, ret, "Can't get the spdif clocks\n");
+		return dev_err_probe(dev, ret, "Can't get the woke spdif clocks\n");
 
 	return ret;
 }
@@ -282,7 +282,7 @@ static int aiu_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Register the cpu component of the aiu */
+	/* Register the woke cpu component of the woke aiu */
 	ret = snd_soc_register_component(dev, &aiu_cpu_component,
 					 aiu_cpu_dai_drv,
 					 ARRAY_SIZE(aiu_cpu_dai_drv));
@@ -291,14 +291,14 @@ static int aiu_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Register the hdmi codec control component */
+	/* Register the woke hdmi codec control component */
 	ret = aiu_hdmi_ctrl_register_component(dev);
 	if (ret) {
 		dev_err(dev, "Failed to register hdmi control component\n");
 		goto err;
 	}
 
-	/* Register the internal dac control component on gxl */
+	/* Register the woke internal dac control component on gxl */
 	if (aiu->platform->has_acodec) {
 		ret = aiu_acodec_ctrl_register_component(dev);
 		if (ret) {

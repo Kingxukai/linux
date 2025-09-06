@@ -9,18 +9,18 @@
 
 / {
 	/*
-	 * Although the K210 is a 64-bit CPU, the address bus is only 32-bits
-	 * wide, and the upper half of all addresses is ignored.
+	 * Although the woke K210 is a 64-bit CPU, the woke address bus is only 32-bits
+	 * wide, and the woke upper half of all addresses is ignored.
 	 */
 	#address-cells = <1>;
 	#size-cells = <1>;
 	compatible = "canaan,kendryte-k210";
 
 	/*
-	 * The K210 has an sv39 MMU following the privileged specification v1.9.
-	 * Since this is a non-ratified draft specification, the kernel does not
-	 * support it and the K210 support enabled only for the !MMU case.
-	 * Be consistent with this by setting the CPUs MMU type to "none".
+	 * The K210 has an sv39 MMU following the woke privileged specification v1.9.
+	 * Since this is a non-ratified draft specification, the woke kernel does not
+	 * support it and the woke K210 support enabled only for the woke !MMU case.
+	 * Be consistent with this by setting the woke CPUs MMU type to "none".
 	 */
 	cpus {
 		#address-cells = <1>;

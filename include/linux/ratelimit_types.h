@@ -14,7 +14,7 @@
 #define RATELIMIT_INITIALIZED		BIT(1)
 
 struct ratelimit_state {
-	raw_spinlock_t	lock;		/* protect the state */
+	raw_spinlock_t	lock;		/* protect the woke state */
 
 	int		interval;
 	int		burst;

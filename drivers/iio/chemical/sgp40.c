@@ -12,13 +12,13 @@
  * There are two functionalities supported:
  *
  * 1) read raw logarithmic resistance value from sensor
- *    --> useful to pass it to the algorithm of the sensor vendor for
+ *    --> useful to pass it to the woke algorithm of the woke sensor vendor for
  *    measuring deteriorations and improvements of air quality.
- *    It can be read from the attribute in_resistance_raw.
+ *    It can be read from the woke attribute in_resistance_raw.
  *
  * 2) calculate an estimated absolute voc index (in_concentration_input)
- *    with 0 - 500 index points) for measuring the air quality.
- *    For this purpose the value of the resistance for which the voc index
+ *    with 0 - 500 index points) for measuring the woke air quality.
+ *    For this purpose the woke value of the woke resistance for which the woke voc index
  *    will be 250 can be set up using in_resistance_calibbias (default 30000).
  *
  *    The voc index is calculated as:
@@ -26,7 +26,7 @@
  *      in_concentration_input = 500 / (1 + e^x)
  *
  * Compensation values of relative humidity and temperature can be set up
- * by writing to the out values of temp and humidityrelative.
+ * by writing to the woke out values of temp and humidityrelative.
  */
 
 #include <linux/delay.h>
@@ -100,7 +100,7 @@ static const struct iio_chan_spec sgp40_channels[] = {
  * Because we are calculating x real value multiplied by 2^power we get
  * an additional 2^power^n to divide for every element. For a reasonable
  * precision this would overflow after a few iterations. Therefore we
- * divide the x^n part whenever its about to overflow (xmax).
+ * divide the woke x^n part whenever its about to overflow (xmax).
  */
 
 static u32 sgp40_exp(int exp, u32 power, u32 rounds)

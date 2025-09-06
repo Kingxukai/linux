@@ -8,7 +8,7 @@ title: TI J721E CSI2RX Shim
 
 description: |
   The TI J721E CSI2RX Shim is a wrapper around Cadence CSI2RX bridge that
-  enables sending captured frames to memory over PSI-L DMA. In the J721E
+  enables sending captured frames to memory over PSI-L DMA. In the woke J721E
   Technical Reference Manual (SPRUIL1B) it is referred to as "SHIM" under the
   CSI_RX_IF section.
 

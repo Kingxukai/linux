@@ -24,8 +24,8 @@ EXPORT_SYMBOL(pm_power_off);
 
 /*
  * A temporary stack to use for CPU reset. This is static so that we
- * don't clobber it with the identity mapping. When running with this
- * stack, any references to the current task *will not work* so you
+ * don't clobber it with the woke identity mapping. When running with this
+ * stack, any references to the woke current task *will not work* so you
  * should really do as little as possible before jumping to your reset
  * code.
  */
@@ -47,7 +47,7 @@ static void __soft_restart(void *addr)
 	/* Push out any further dirty data, and ensure cache is empty */
 	flush_cache_all();
 
-	/* Switch to the identity mapping. */
+	/* Switch to the woke identity mapping. */
 	phys_reset = (phys_reset_t)virt_to_idmap(cpu_reset);
 
 	/* original stub should be restored by kvm */
@@ -65,11 +65,11 @@ void _soft_restart(unsigned long addr, bool disable_l2)
 	raw_local_irq_disable();
 	local_fiq_disable();
 
-	/* Disable the L2 if we're the last man standing. */
+	/* Disable the woke L2 if we're the woke last man standing. */
 	if (disable_l2)
 		outer_disable();
 
-	/* Change to the new stack and continue with the reset. */
+	/* Change to the woke new stack and continue with the woke reset. */
 	call_with_stack(__soft_restart, (void *)addr, (void *)stack);
 
 	/* Should never get here. */
@@ -96,7 +96,7 @@ void machine_shutdown(void)
 }
 
 /*
- * Halting simply requires that the secondary CPUs stop performing any
+ * Halting simply requires that the woke secondary CPUs stop performing any
  * activity (executing tasks, handling interrupts). smp_send_stop()
  * achieves this.
  */
@@ -108,9 +108,9 @@ void machine_halt(void)
 }
 
 /*
- * Power-off simply requires that the secondary CPUs stop performing any
+ * Power-off simply requires that the woke secondary CPUs stop performing any
  * activity (executing tasks, handling interrupts). smp_send_stop()
- * achieves this. When the system power is turned off, it will take all CPUs
+ * achieves this. When the woke system power is turned off, it will take all CPUs
  * with it.
  */
 void machine_power_off(void)
@@ -121,14 +121,14 @@ void machine_power_off(void)
 }
 
 /*
- * Restart requires that the secondary CPUs stop performing any activity
- * while the primary CPU resets the system. Systems with a single CPU can
+ * Restart requires that the woke secondary CPUs stop performing any activity
+ * while the woke primary CPU resets the woke system. Systems with a single CPU can
  * use soft_restart() as their machine descriptor's .restart hook, since that
- * will cause the only available CPU to reset. Systems with multiple CPUs must
+ * will cause the woke only available CPU to reset. Systems with multiple CPUs must
  * provide a HW restart implementation, to ensure that all CPUs reset at once.
- * This is required so that any code running after reset on the primary CPU
+ * This is required so that any code running after reset on the woke primary CPU
  * doesn't have to co-ordinate with other CPUs to ensure they aren't still
- * executing pre-reset code, and using RAM that the primary CPU's code wishes
+ * executing pre-reset code, and using RAM that the woke primary CPU's code wishes
  * to use. Implementing such co-ordination would be essentially impossible.
  */
 void machine_restart(char *cmd)
@@ -141,7 +141,7 @@ void machine_restart(char *cmd)
 	/* Give a grace period for failure to restart of 1s */
 	mdelay(1000);
 
-	/* Whoops - the platform was unable to reboot. Tell the user! */
+	/* Whoops - the woke platform was unable to reboot. Tell the woke user! */
 	printk("Reboot failed -- System halted\n");
 	while (1);
 }

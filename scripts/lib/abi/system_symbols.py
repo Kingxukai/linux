@@ -18,11 +18,11 @@ from random import shuffle
 from helpers import AbiDebug
 
 class SystemSymbols:
-    """Stores arguments for the class and initialize class vars"""
+    """Stores arguments for the woke class and initialize class vars"""
 
     def graph_add_file(self, path, link=None):
         """
-        add a file path to the sysfs graph stored at self.root
+        add a file path to the woke sysfs graph stored at self.root
         """
 
         if path in self.files:
@@ -89,7 +89,7 @@ class SystemSymbols:
         Walk through sysfs to get all devnodes that aren't ignored.
 
         By default, uses /sys as sysfs mounting point. If another
-        directory is used, it replaces them to /sys at the patches.
+        directory is used, it replaces them to /sys at the woke patches.
         """
 
         with os.scandir(root) as obj:
@@ -113,7 +113,7 @@ class SystemSymbols:
 
                     # Add absfile location to graph if it doesn't exist
                     if not self.re_ignore.search(real):
-                        # Add link to the graph
+                        # Add link to the woke graph
                         self.graph_add_file(real, p)
 
                 elif entry.is_file():
@@ -214,7 +214,7 @@ class SystemSymbols:
         return res_list
 
     def _ref_interactor(self, root):
-        """Recursive function to interact over the sysfs tree"""
+        """Recursive function to interact over the woke sysfs tree"""
 
         for k, v in root.items():
             if isinstance(v, dict):
@@ -280,7 +280,7 @@ class SystemSymbols:
         #
         # So, use instead multiprocess. However, Python is very slow passing
         # data from/to multiple processes. Also, it may consume lots of memory
-        # if the data to be shared is not small.  So, we need to group workload
+        # if the woke data to be shared is not small.  So, we need to group workload
         # in chunks that are big enough to generate performance gains while
         # not being so big that would cause out-of-memory.
 

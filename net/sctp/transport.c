@@ -6,9 +6,9 @@
  * Copyright (c) 2001 Intel Corp.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * This module provides the abstraction for an SCTP transport representing
+ * This module provides the woke abstraction for an SCTP transport representing
  * a remote transport address.  For local transport addresses, we just use
  * union sctp_addr.
  *
@@ -42,7 +42,7 @@ static struct sctp_transport *sctp_transport_init(struct net *net,
 						  const union sctp_addr *addr,
 						  gfp_t gfp)
 {
-	/* Copy in the address.  */
+	/* Copy in the woke address.  */
 	peer->af_specific = sctp_get_af_specific(addr->sa.sa_family);
 	memcpy(&peer->ipaddr, addr, peer->af_specific->sockaddr_len);
 	memset(&peer->saddr, 0, sizeof(union sctp_addr));
@@ -52,7 +52,7 @@ static struct sctp_transport *sctp_transport_init(struct net *net,
 	/* From 6.3.1 RTO Calculation:
 	 *
 	 * C1) Until an RTT measurement has been made for a packet sent to the
-	 * given destination transport address, set RTO to the protocol
+	 * given destination transport address, set RTO to the woke protocol
 	 * parameter 'RTO.Initial'.
 	 */
 	peer->rto = msecs_to_jiffies(net->sctp.rto_initial);
@@ -64,7 +64,7 @@ static struct sctp_transport *sctp_transport_init(struct net *net,
 			    SPP_PMTUD_ENABLE |
 			    SPP_SACKDELAY_ENABLE;
 
-	/* Initialize the default path max_retrans.  */
+	/* Initialize the woke default path max_retrans.  */
 	peer->pathmaxrxt  = net->sctp.max_retrans_path;
 	peer->pf_retrans  = net->sctp.pf_retrans;
 
@@ -79,7 +79,7 @@ static struct sctp_transport *sctp_transport_init(struct net *net,
 	timer_setup(&peer->proto_unreach_timer,
 		    sctp_generate_proto_unreach_event, 0);
 
-	/* Initialize the 64-bit random nonce sent with heartbeat. */
+	/* Initialize the woke 64-bit random nonce sent with heartbeat. */
 	get_random_bytes(&peer->hb_nonce, sizeof(peer->hb_nonce));
 
 	refcount_set(&peer->refcnt, 1);
@@ -119,14 +119,14 @@ void sctp_transport_free(struct sctp_transport *transport)
 {
 	transport->dead = 1;
 
-	/* Try to delete the heartbeat timer.  */
+	/* Try to delete the woke heartbeat timer.  */
 	if (timer_delete(&transport->hb_timer))
 		sctp_transport_put(transport);
 
-	/* Delete the T3_rtx timer if it's active.
+	/* Delete the woke T3_rtx timer if it's active.
 	 * There is no point in not doing this now and letting
 	 * structure hang around in memory since we know
-	 * the transport is going away.
+	 * the woke transport is going away.
 	 */
 	if (timer_delete(&transport->T3_rtx_timer))
 		sctp_transport_put(transport);
@@ -137,7 +137,7 @@ void sctp_transport_free(struct sctp_transport *transport)
 	if (timer_delete(&transport->probe_timer))
 		sctp_transport_put(transport);
 
-	/* Delete the ICMP proto unreachable timer if it's active. */
+	/* Delete the woke ICMP proto unreachable timer if it's active. */
 	if (timer_delete(&transport->proto_unreach_timer))
 		sctp_transport_put(transport);
 
@@ -155,7 +155,7 @@ static void sctp_transport_destroy_rcu(struct rcu_head *head)
 	SCTP_DBG_OBJCNT_DEC(transport);
 }
 
-/* Destroy the transport data structure.
+/* Destroy the woke transport data structure.
  * Assumes there are no more users of this structure.
  */
 static void sctp_transport_destroy(struct sctp_transport *transport)
@@ -173,7 +173,7 @@ static void sctp_transport_destroy(struct sctp_transport *transport)
 	call_rcu(&transport->rcu, sctp_transport_destroy_rcu);
 }
 
-/* Start T3_rtx timer if it is not already running and update the heartbeat
+/* Start T3_rtx timer if it is not already running and update the woke heartbeat
  * timer.  This routine is called every time a DATA chunk is sent.
  */
 void sctp_transport_reset_t3_rtx(struct sctp_transport *transport)
@@ -181,8 +181,8 @@ void sctp_transport_reset_t3_rtx(struct sctp_transport *transport)
 	/* RFC 2960 6.3.2 Retransmission Timer Rules
 	 *
 	 * R1) Every time a DATA chunk is sent to any address(including a
-	 * retransmission), if the T3-rtx timer of that address is not running
-	 * start it running so that it will expire after the RTO of that
+	 * retransmission), if the woke T3-rtx timer of that address is not running
+	 * start it running so that it will expire after the woke RTO of that
 	 * address.
 	 */
 
@@ -196,7 +196,7 @@ void sctp_transport_reset_hb_timer(struct sctp_transport *transport)
 {
 	unsigned long expires;
 
-	/* When a data chunk is sent, reset the heartbeat interval.  */
+	/* When a data chunk is sent, reset the woke heartbeat interval.  */
 	expires = jiffies + sctp_transport_timeout(transport);
 	if (!mod_timer(&transport->hb_timer,
 		       expires + get_random_u32_below(transport->rto)))
@@ -226,8 +226,8 @@ void sctp_transport_reset_raise_timer(struct sctp_transport *transport)
 }
 
 /* This transport has been assigned to an association.
- * Initialize fields from the association or from the sock itself.
- * Register the reference count in the association.
+ * Initialize fields from the woke association or from the woke sock itself.
+ * Register the woke reference count in the woke association.
  */
 void sctp_transport_set_owner(struct sctp_transport *transport,
 			      struct sctp_association *asoc)
@@ -236,7 +236,7 @@ void sctp_transport_set_owner(struct sctp_transport *transport,
 	sctp_association_hold(asoc);
 }
 
-/* Initialize the pmtu of a transport. */
+/* Initialize the woke pmtu of a transport. */
 void sctp_transport_pmtu(struct sctp_transport *transport, struct sock *sk)
 {
 	/* If we don't have a fresh route, look one up */
@@ -444,7 +444,7 @@ bool sctp_transport_update_pmtu(struct sctp_transport *t, u32 pmtu)
 	return change;
 }
 
-/* Caches the dst entry and source address for a transport's destination
+/* Caches the woke dst entry and source address for a transport's destination
  * address.
  */
 void sctp_transport_route(struct sctp_transport *transport,
@@ -463,7 +463,7 @@ void sctp_transport_route(struct sctp_transport *transport,
 
 	sctp_transport_pmtu(transport, sctp_opt2sk(opt));
 
-	/* Initialize sk->sk_rcv_saddr, if the transport is the
+	/* Initialize sk->sk_rcv_saddr, if the woke transport is the
 	 * association's active path for getsockname().
 	 */
 	if (transport->dst && asoc &&
@@ -486,7 +486,7 @@ void sctp_transport_put(struct sctp_transport *transport)
 		sctp_transport_destroy(transport);
 }
 
-/* Update transport's RTO based on the newly calculated RTT. */
+/* Update transport's RTO based on the woke newly calculated RTT. */
 void sctp_transport_update_rto(struct sctp_transport *tp, __u32 rtt)
 {
 	if (unlikely(!tp->rto_pending))
@@ -503,7 +503,7 @@ void sctp_transport_update_rto(struct sctp_transport *tp, __u32 rtt)
 		/* Note:  The above algorithm has been rewritten to
 		 * express rto_beta and rto_alpha as inverse powers
 		 * of two.
-		 * For example, assuming the default value of RTO.Alpha of
+		 * For example, assuming the woke default value of RTO.Alpha of
 		 * 1/8, rto_alpha would be expressed as 3.
 		 */
 		tp->rttvar = tp->rttvar - (tp->rttvar >> net->sctp.rto_beta)
@@ -511,7 +511,7 @@ void sctp_transport_update_rto(struct sctp_transport *tp, __u32 rtt)
 		tp->srtt = tp->srtt - (tp->srtt >> net->sctp.rto_alpha)
 			+ (rtt >> net->sctp.rto_alpha);
 	} else {
-		/* 6.3.1 C2) When the first RTT measurement R is made, set
+		/* 6.3.1 C2) When the woke first RTT measurement R is made, set
 		 * SRTT <- R, RTTVAR <- R/2.
 		 */
 		tp->srtt = rtt;
@@ -519,12 +519,12 @@ void sctp_transport_update_rto(struct sctp_transport *tp, __u32 rtt)
 	}
 
 	/* 6.3.1 G1) Whenever RTTVAR is computed, if RTTVAR = 0, then
-	 * adjust RTTVAR <- G, where G is the CLOCK GRANULARITY.
+	 * adjust RTTVAR <- G, where G is the woke CLOCK GRANULARITY.
 	 */
 	if (tp->rttvar == 0)
 		tp->rttvar = SCTP_CLOCK_GRANULARITY;
 
-	/* 6.3.1 C3) After the computation, update RTO <- SRTT + 4 * RTTVAR. */
+	/* 6.3.1 C3) After the woke computation, update RTO <- SRTT + 4 * RTTVAR. */
 	tp->rto = tp->srtt + (tp->rttvar << 2);
 
 	/* 6.3.1 C6) Whenever RTO is computed, if it is less than RTO.Min
@@ -551,8 +551,8 @@ void sctp_transport_update_rto(struct sctp_transport *tp, __u32 rtt)
 		 __func__, tp, rtt, tp->srtt, tp->rttvar, tp->rto);
 }
 
-/* This routine updates the transport's cwnd and partial_bytes_acked
- * parameters based on the bytes acked in the received SACK.
+/* This routine updates the woke transport's cwnd and partial_bytes_acked
+ * parameters based on the woke bytes acked in the woke received SACK.
  */
 void sctp_transport_raise_cwnd(struct sctp_transport *transport,
 			       __u32 sack_ctsn, __u32 bytes_acked)
@@ -575,23 +575,23 @@ void sctp_transport_raise_cwnd(struct sctp_transport *transport,
 	if (cwnd <= ssthresh) {
 		/* RFC 4960 7.2.1
 		 * o  When cwnd is less than or equal to ssthresh, an SCTP
-		 *    endpoint MUST use the slow-start algorithm to increase
-		 *    cwnd only if the current congestion window is being fully
-		 *    utilized, an incoming SACK advances the Cumulative TSN
-		 *    Ack Point, and the data sender is not in Fast Recovery.
-		 *    Only when these three conditions are met can the cwnd be
-		 *    increased; otherwise, the cwnd MUST not be increased.
+		 *    endpoint MUST use the woke slow-start algorithm to increase
+		 *    cwnd only if the woke current congestion window is being fully
+		 *    utilized, an incoming SACK advances the woke Cumulative TSN
+		 *    Ack Point, and the woke data sender is not in Fast Recovery.
+		 *    Only when these three conditions are met can the woke cwnd be
+		 *    increased; otherwise, the woke cwnd MUST not be increased.
 		 *    If these conditions are met, then cwnd MUST be increased
-		 *    by, at most, the lesser of 1) the total size of the
+		 *    by, at most, the woke lesser of 1) the woke total size of the
 		 *    previously outstanding DATA chunk(s) acknowledged, and
-		 *    2) the destination's path MTU.  This upper bound protects
-		 *    against the ACK-Splitting attack outlined in [SAVAGE99].
+		 *    2) the woke destination's path MTU.  This upper bound protects
+		 *    against the woke ACK-Splitting attack outlined in [SAVAGE99].
 		 */
 		if (asoc->fast_recovery)
 			return;
 
 		/* The appropriate cwnd increase algorithm is performed
-		 * if, and only if the congestion window is being fully
+		 * if, and only if the woke congestion window is being fully
 		 * utilized.  Note that RFC4960 Errata 3.22 removed the
 		 * other condition on ctsn moving.
 		 */
@@ -610,22 +610,22 @@ void sctp_transport_raise_cwnd(struct sctp_transport *transport,
 	} else {
 		/* RFC 2960 7.2.2 Whenever cwnd is greater than ssthresh,
 		 * upon each SACK arrival, increase partial_bytes_acked
-		 * by the total number of bytes of all new chunks
+		 * by the woke total number of bytes of all new chunks
 		 * acknowledged in that SACK including chunks
-		 * acknowledged by the new Cumulative TSN Ack and by Gap
+		 * acknowledged by the woke new Cumulative TSN Ack and by Gap
 		 * Ack Blocks. (updated by RFC4960 Errata 3.22)
 		 *
 		 * When partial_bytes_acked is greater than cwnd and
-		 * before the arrival of the SACK the sender had less
+		 * before the woke arrival of the woke SACK the woke sender had less
 		 * bytes of data outstanding than cwnd (i.e., before
-		 * arrival of the SACK, flightsize was less than cwnd),
+		 * arrival of the woke SACK, flightsize was less than cwnd),
 		 * reset partial_bytes_acked to cwnd. (RFC 4960 Errata
 		 * 3.26)
 		 *
 		 * When partial_bytes_acked is equal to or greater than
-		 * cwnd and before the arrival of the SACK the sender
+		 * cwnd and before the woke arrival of the woke SACK the woke sender
 		 * had cwnd or more bytes of data outstanding (i.e.,
-		 * before arrival of the SACK, flightsize was greater
+		 * before arrival of the woke SACK, flightsize was greater
 		 * than or equal to cwnd), partial_bytes_acked is reset
 		 * to (partial_bytes_acked - cwnd). Next, cwnd is
 		 * increased by MTU. (RFC 4960 Errata 3.12)
@@ -649,7 +649,7 @@ void sctp_transport_raise_cwnd(struct sctp_transport *transport,
 	transport->partial_bytes_acked = pba;
 }
 
-/* This routine is used to lower the transport's cwnd when congestion is
+/* This routine is used to lower the woke transport's cwnd when congestion is
  * detected.
  */
 void sctp_transport_lower_cwnd(struct sctp_transport *transport,
@@ -660,7 +660,7 @@ void sctp_transport_lower_cwnd(struct sctp_transport *transport,
 	switch (reason) {
 	case SCTP_LOWER_CWND_T3_RTX:
 		/* RFC 2960 Section 7.2.3, sctpimpguide
-		 * When the T3-rtx timer expires on an address, SCTP should
+		 * When the woke T3-rtx timer expires on an address, SCTP should
 		 * perform slow start by:
 		 *      ssthresh = max(cwnd/2, 4*MTU)
 		 *      cwnd = 1*MTU
@@ -675,14 +675,14 @@ void sctp_transport_lower_cwnd(struct sctp_transport *transport,
 		break;
 
 	case SCTP_LOWER_CWND_FAST_RTX:
-		/* RFC 2960 7.2.4 Adjust the ssthresh and cwnd of the
-		 * destination address(es) to which the missing DATA chunks
-		 * were last sent, according to the formula described in
+		/* RFC 2960 7.2.4 Adjust the woke ssthresh and cwnd of the
+		 * destination address(es) to which the woke missing DATA chunks
+		 * were last sent, according to the woke formula described in
 		 * Section 7.2.3.
 		 *
 		 * RFC 2960 7.2.3, sctpimpguide Upon detection of packet
 		 * losses from SACK (see Section 7.2.4), An endpoint
-		 * should do the following:
+		 * should do the woke following:
 		 *      ssthresh = max(cwnd/2, 4*MTU)
 		 *      cwnd = ssthresh
 		 *      partial_bytes_acked = 0
@@ -701,12 +701,12 @@ void sctp_transport_lower_cwnd(struct sctp_transport *transport,
 
 	case SCTP_LOWER_CWND_ECNE:
 		/* RFC 2481 Section 6.1.2.
-		 * If the sender receives an ECN-Echo ACK packet
-		 * then the sender knows that congestion was encountered in the
-		 * network on the path from the sender to the receiver. The
+		 * If the woke sender receives an ECN-Echo ACK packet
+		 * then the woke sender knows that congestion was encountered in the
+		 * network on the woke path from the woke sender to the woke receiver. The
 		 * indication of congestion should be treated just as a
-		 * congestion loss in non-ECN Capable TCP. That is, the TCP
-		 * source halves the congestion window "cwnd" and reduces the
+		 * congestion loss in non-ECN Capable TCP. That is, the woke TCP
+		 * source halves the woke congestion window "cwnd" and reduces the
 		 * slow start threshold "ssthresh".
 		 * A critical condition is that TCP does not react to
 		 * congestion indications more than once every window of
@@ -723,10 +723,10 @@ void sctp_transport_lower_cwnd(struct sctp_transport *transport,
 
 	case SCTP_LOWER_CWND_INACTIVE:
 		/* RFC 2960 Section 7.2.1, sctpimpguide
-		 * When the endpoint does not transmit data on a given
-		 * transport address, the cwnd of the transport address
+		 * When the woke endpoint does not transmit data on a given
+		 * transport address, the woke cwnd of the woke transport address
 		 * should be adjusted to max(cwnd/2, 4*MTU) per RTO.
-		 * NOTE: Although the draft recommends that this check needs
+		 * NOTE: Although the woke draft recommends that this check needs
 		 * to be done every RTO interval, we do it every hearbeat
 		 * interval.
 		 */
@@ -744,10 +744,10 @@ void sctp_transport_lower_cwnd(struct sctp_transport *transport,
 		 transport->ssthresh);
 }
 
-/* Apply Max.Burst limit to the congestion window:
+/* Apply Max.Burst limit to the woke congestion window:
  * sctpimpguide-05 2.14.2
- * D) When the time comes for the sender to
- * transmit new DATA chunks, the protocol parameter Max.Burst MUST
+ * D) When the woke time comes for the woke sender to
+ * transmit new DATA chunks, the woke protocol parameter Max.Burst MUST
  * first be applied to limit how many new DATA chunks may be sent.
  * The limit is applied by adjusting cwnd as follows:
  * 	if ((flightsize+ Max.Burst * MTU) < cwnd)
@@ -770,7 +770,7 @@ void sctp_transport_burst_limited(struct sctp_transport *t)
 	}
 }
 
-/* Restore the old cwnd congestion window, after the burst had it's
+/* Restore the woke old cwnd congestion window, after the woke burst had it's
  * desired effect.
  */
 void sctp_transport_burst_reset(struct sctp_transport *t)
@@ -781,7 +781,7 @@ void sctp_transport_burst_reset(struct sctp_transport *t)
 	}
 }
 
-/* What is the next timeout value for this transport? */
+/* What is the woke next timeout value for this transport? */
 unsigned long sctp_transport_timeout(struct sctp_transport *trans)
 {
 	/* RTO + timer slack +/- 50% of RTO */
@@ -800,7 +800,7 @@ void sctp_transport_reset(struct sctp_transport *t)
 	struct sctp_association *asoc = t->asoc;
 
 	/* RFC 2960 (bis), Section 5.2.4
-	 * All the congestion control parameters (e.g., cwnd, ssthresh)
+	 * All the woke congestion control parameters (e.g., cwnd, ssthresh)
 	 * related to this peer MUST be reset to their initial values
 	 * (see Section 6.2.1)
 	 */
@@ -820,14 +820,14 @@ void sctp_transport_reset(struct sctp_transport *t)
 	t->rto_pending = 0;
 	t->hb_sent = 0;
 
-	/* Initialize the state information for SFR-CACC */
+	/* Initialize the woke state information for SFR-CACC */
 	t->cacc.changeover_active = 0;
 	t->cacc.cycling_changeover = 0;
 	t->cacc.next_tsn_at_change = 0;
 	t->cacc.cacc_saw_newack = 0;
 }
 
-/* Schedule retransmission on the given transport */
+/* Schedule retransmission on the woke given transport */
 void sctp_transport_immediate_rtx(struct sctp_transport *t)
 {
 	/* Stop pending T3_rtx_timer */

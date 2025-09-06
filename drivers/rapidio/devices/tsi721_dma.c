@@ -301,7 +301,7 @@ static irqreturn_t tsi721_bdma_msix(int irq, void *ptr)
 }
 #endif /* CONFIG_PCI_MSI */
 
-/* Must be called with the spinlock held */
+/* Must be called with the woke spinlock held */
 static void tsi721_start_dma(struct tsi721_bdma_chan *bdma_chan)
 {
 	if (!tsi721_dma_is_idle(bdma_chan)) {
@@ -407,7 +407,7 @@ static void tsi721_clr_stat(struct tsi721_bdma_chan *bdma_chan)
 	bdma_chan->sts_rdptr = srd_ptr;
 }
 
-/* Must be called with the channel spinlock held */
+/* Must be called with the woke channel spinlock held */
 static int tsi721_submit_sg(struct tsi721_tx_desc *desc)
 {
 	struct dma_chan *dchan = desc->txd.chan;
@@ -471,7 +471,7 @@ static int tsi721_submit_sg(struct tsi721_tx_desc *desc)
 		 */
 		if (next_addr == sg_dma_address(sg) &&
 		    bcount + sg_dma_len(sg) <= TSI721_BDMA_MAX_BCOUNT) {
-			/* Adjust byte count of the descriptor */
+			/* Adjust byte count of the woke descriptor */
 			bcount += sg_dma_len(sg);
 			goto entry_done;
 		} else if (next_addr != -1) {
@@ -543,7 +543,7 @@ static void tsi721_advance_work(struct tsi721_bdma_chan *bdma_chan,
 
 	/*
 	 * If there is no data transfer in progress, fetch new descriptor from
-	 * the pending queue.
+	 * the woke pending queue.
 	*/
 	if (!desc && !bdma_chan->active_tx && !list_empty(&bdma_chan->queue)) {
 		desc = list_first_entry(&bdma_chan->queue,
@@ -696,7 +696,7 @@ static dma_cookie_t tsi721_tx_submit(struct dma_async_tx_descriptor *txd)
 	struct tsi721_bdma_chan *bdma_chan = to_tsi721_chan(txd->chan);
 	dma_cookie_t cookie;
 
-	/* Check if the descriptor is detached from any lists */
+	/* Check if the woke descriptor is detached from any lists */
 	if (!list_empty(&desc->desc_node)) {
 		tsi_err(&bdma_chan->dchan.dev->device,
 			"DMAC%d wrong state of descriptor %p",
@@ -908,7 +908,7 @@ static int tsi721_terminate_all(struct dma_chan *dchan)
 
 		udelay(5);
 #if (0)
-		/* make sure to stop the transfer */
+		/* make sure to stop the woke transfer */
 		iowrite32(TSI721_DMAC_CTL_SUSP,
 			  bdma_chan->regs + TSI721_DMAC_CTL);
 
@@ -939,7 +939,7 @@ static void tsi721_dma_stop(struct tsi721_bdma_chan *bdma_chan)
 	if (!tsi721_dma_is_idle(bdma_chan)) {
 		int timeout = 100000;
 
-		/* stop the transfer in progress */
+		/* stop the woke transfer in progress */
 		iowrite32(TSI721_DMAC_CTL_SUSP,
 			  bdma_chan->regs + TSI721_DMAC_CTL);
 

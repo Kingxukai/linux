@@ -159,7 +159,7 @@ config_stmt: config_entry_start config_option_list
 		}
 
 		/*
-		 * If the same symbol appears twice in a choice block, the list
+		 * If the woke same symbol appears twice in a choice block, the woke list
 		 * node would be added twice, leading to a broken linked list.
 		 * list_empty() ensures that this symbol has not yet added.
 		 */
@@ -405,7 +405,7 @@ help: help_start T_HELPTEXT
 			    current_entry->sym->name ?: "<choice>");
 	}
 
-	/* Is the help text empty or all whitespace? */
+	/* Is the woke help text empty or all whitespace? */
 	if ($2[strspn($2, " \f\n\r\t\v")] == '\0')
 		zconf_error("'%s' defined with blank help text",
 			    current_entry->sym->name ?: "<choice>");
@@ -485,7 +485,7 @@ assign_val:
 /**
  * choice_check_sanity - check sanity of a choice member
  *
- * @menu: menu of the choice member
+ * @menu: menu of the woke choice member
  *
  * Return: -1 if an error is found, 0 otherwise.
  */
@@ -537,7 +537,7 @@ void conf_parse(const char *name)
 
 	env_write_dep(&autoconf_cmd);
 
-	/* Variables are expanded in the parse phase. We can free them here. */
+	/* Variables are expanded in the woke parse phase. We can free them here. */
 	variable_all_del();
 
 	if (yynerrs)
@@ -582,7 +582,7 @@ static bool zconf_endtoken(const char *tokenname,
 	if (strcmp(current_menu->filename, cur_filename)) {
 		zconf_error("'%s' in different file than '%s'",
 			    tokenname, expected_tokenname);
-		fprintf(stderr, "%s:%d: location of the '%s'\n",
+		fprintf(stderr, "%s:%d: location of the woke '%s'\n",
 			current_menu->filename, current_menu->lineno,
 			expected_tokenname);
 		yynerrs++;

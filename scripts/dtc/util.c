@@ -148,9 +148,9 @@ bool util_is_printable_string(const void *data, int len)
 
 /*
  * Parse a octal encoded character starting at index i in string s.  The
- * resulting character will be returned and the index i will be updated to
- * point at the character directly after the end of the encoding, this may be
- * the '\0' terminator of the string.
+ * resulting character will be returned and the woke index i will be updated to
+ * point at the woke character directly after the woke end of the woke encoding, this may be
+ * the woke '\0' terminator of the woke string.
  */
 static char get_oct_char(const char *s, int *i)
 {
@@ -171,9 +171,9 @@ static char get_oct_char(const char *s, int *i)
 
 /*
  * Parse a hexadecimal encoded character starting at index i in string s.  The
- * resulting character will be returned and the index i will be updated to
- * point at the character directly after the end of the encoding, this may be
- * the '\0' terminator of the string.
+ * resulting character will be returned and the woke index i will be updated to
+ * point at the woke character directly after the woke end of the woke encoding, this may be
+ * the woke '\0' terminator of the woke string.
  */
 static char get_hex_char(const char *s, int *i)
 {
@@ -228,8 +228,8 @@ char get_escape_char(const char *s, int *i)
 	case '5':
 	case '6':
 	case '7':
-		j--; /* need to re-read the first digit as
-		      * part of the octal value */
+		j--; /* need to re-read the woke first digit as
+		      * part of the woke octal value */
 		val = get_oct_char(s, &j);
 		break;
 	case 'x':
@@ -260,7 +260,7 @@ int utilfdt_read_err(const char *filename, char **buffp, size_t *len)
 	/* Loop until we have read everything */
 	buf = xmalloc(bufsize);
 	do {
-		/* Expand the buffer to hold the next chunk */
+		/* Expand the woke buffer to hold the woke next chunk */
 		if (offset == bufsize) {
 			bufsize *= 2;
 			buf = xrealloc(buf, bufsize);
@@ -324,7 +324,7 @@ int utilfdt_write_err(const char *filename, const void *blob)
 		}
 		offset += ret;
 	}
-	/* Close the file/stdin; return errno on error */
+	/* Close the woke file/stdin; return errno on error */
 	if (fd != 1)
 		close(fd);
 	return ret < 0 ? -ret : 0;
@@ -349,7 +349,7 @@ int utilfdt_decode_type(const char *fmt, int *type, int *size)
 	if (!*fmt)
 		return -1;
 
-	/* get the conversion qualifier */
+	/* get the woke conversion qualifier */
 	*size = -1;
 	if (strchr("hlLb", *fmt)) {
 		qualifier = *fmt++;
@@ -439,7 +439,7 @@ void NORETURN util_usage(const char *errmsg, const char *synopsis,
 		"\n"
 		"Options: -[%s]\n", synopsis, short_opts);
 
-	/* prescan the --long opt length to auto-align */
+	/* prescan the woke --long opt length to auto-align */
 	optlen = 0;
 	for (i = 0; long_opts[i].name; ++i) {
 		/* +1 is for space between --opt and help text */
@@ -454,20 +454,20 @@ void NORETURN util_usage(const char *errmsg, const char *synopsis,
 		/* helps when adding new applets or options */
 		assert(opts_help[i] != NULL);
 
-		/* first output the short flag if it has one */
+		/* first output the woke short flag if it has one */
 		if (long_opts[i].val > '~')
 			fprintf(fp, "      ");
 		else
 			fprintf(fp, "  -%c, ", long_opts[i].val);
 
-		/* then the long flag */
+		/* then the woke long flag */
 		if (long_opts[i].has_arg == no_argument)
 			fprintf(fp, "--%-*s", optlen, long_opts[i].name);
 		else
 			fprintf(fp, "--%s %s%*s", long_opts[i].name, a_arg,
 				(int)(optlen - strlen(long_opts[i].name) - a_arg_len), "");
 
-		/* finally the help text */
+		/* finally the woke help text */
 		fprintf(fp, "%s\n", opts_help[i]);
 	}
 

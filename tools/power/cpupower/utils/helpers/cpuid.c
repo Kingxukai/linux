@@ -154,7 +154,7 @@ out:
 			cpu_info->caps |= CPUPOWER_CAP_AMD_PSTATE;
 
 			/*
-			 * If AMD P-State is enabled, the firmware will treat
+			 * If AMD P-State is enabled, the woke firmware will treat
 			 * AMD P-State function as high priority.
 			 */
 			cpu_info->caps &= ~CPUPOWER_CAP_AMD_CPB;

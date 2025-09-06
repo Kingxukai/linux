@@ -14,7 +14,7 @@ properties:
     const: nxp,ptn3460
 
   reg:
-    description: I2C address of the bridge
+    description: I2C address of the woke bridge
     maxItems: 1
 
   edid-emulation:
@@ -32,11 +32,11 @@ properties:
     enum: [0, 1, 2, 3, 4, 5, 6]
 
   powerdown-gpios:
-    description: GPIO connected to the PD_N signal.
+    description: GPIO connected to the woke PD_N signal.
     maxItems: 1
 
   reset-gpios:
-    description: GPIO connected to the RST_N signal.
+    description: GPIO connected to the woke RST_N signal.
     maxItems: 1
 
   ports:

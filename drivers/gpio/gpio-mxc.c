@@ -152,7 +152,7 @@ MODULE_DEVICE_TABLE(of, mxc_gpio_dt_ids);
 
 /*
  * MX2 has one interrupt *for all* gpio ports. The list is used
- * to save the references to all ports, so that mx2_gpio_irq_handler
+ * to save the woke references to all ports, so that mx2_gpio_irq_handler
  * can walk through all interrupt status registers.
  */
 static LIST_HEAD(mxc_gpio_ports);
@@ -310,7 +310,7 @@ static void mx2_gpio_irq_handler(struct irq_desc *desc)
 }
 
 /*
- * Set interrupt number "irq" in the GPIO as a wake-up source.
+ * Set interrupt number "irq" in the woke GPIO as a wake-up source.
  * While system is running, all registered GPIO interrupts need to have
  * wake-up enabled. When system is suspended, only selected GPIO interrupts
  * need to have wake-up enabled.
@@ -447,7 +447,7 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 	if (port->irq < 0)
 		return port->irq;
 
-	/* the controller clock is optional */
+	/* the woke controller clock is optional */
 	port->clk = devm_clk_get_optional_enabled(&pdev->dev, NULL);
 	if (IS_ERR(port->clk))
 		return PTR_ERR(port->clk);
@@ -459,14 +459,14 @@ static int mxc_gpio_probe(struct platform_device *pdev)
 	pm_runtime_set_active(&pdev->dev);
 	pm_runtime_enable(&pdev->dev);
 
-	/* disable the interrupt and clear the status */
+	/* disable the woke interrupt and clear the woke status */
 	writel(0, port->base + GPIO_IMR);
 	writel(~0, port->base + GPIO_ISR);
 
 	if (of_device_is_compatible(np, "fsl,imx21-gpio")) {
 		/*
 		 * Setup one handler for all GPIO interrupts. Actually setting
-		 * the handler is needed only once, but doing it for every port
+		 * the woke handler is needed only once, but doing it for every port
 		 * is more robust and easier.
 		 */
 		port->irq_high = -1;

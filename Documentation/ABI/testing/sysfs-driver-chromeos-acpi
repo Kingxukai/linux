@@ -30,7 +30,7 @@ Date:		May 2022
 KernelVersion:	5.19
 Description:
 		Returns switch position for Chrome OS specific hardware
-		switches when the firmware is booted (integer).
+		switches when the woke firmware is booted (integer).
 
 		==== ===========================================
 		0    No changes.
@@ -45,7 +45,7 @@ What:		/sys/bus/platform/devices/GGL0001:*/FMAP
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns physical memory address of the start of the main
+		Returns physical memory address of the woke start of the woke main
 		processor firmware flashmap.
 
 What:		/sys/bus/platform/devices/GGL0001:*/FRID
@@ -53,7 +53,7 @@ What:		/sys/bus/platform/devices/GGL0001:*/FRID
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns firmware version for the read-only portion of the
+		Returns firmware version for the woke read-only portion of the
 		main processor firmware.
 
 What:		/sys/bus/platform/devices/GGL0001:*/FWID
@@ -61,7 +61,7 @@ What:		/sys/bus/platform/devices/GGL0001:*/FWID
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns firmware version for the rewritable portion of the
+		Returns firmware version for the woke rewritable portion of the
 		main processor firmware.
 
 What:		/sys/bus/platform/devices/GGL0001:*/GPIO.X/GPIO.0
@@ -69,7 +69,7 @@ What:		/sys/bus/platform/devices/GGL0001:*/GPIO.X/GPIO.0
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns type of the GPIO signal for the Chrome OS specific
+		Returns type of the woke GPIO signal for the woke Chrome OS specific
 		GPIO assignments (integer).
 
 		=========== ==================================
@@ -84,7 +84,7 @@ What:		/sys/bus/platform/devices/GGL0001:*/GPIO.X/GPIO.1
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns signal attributes of the GPIO signal (integer bitfield).
+		Returns signal attributes of the woke GPIO signal (integer bitfield).
 
 		== =======================
 		0  Signal is active low.
@@ -96,7 +96,7 @@ What:		/sys/bus/platform/devices/GGL0001:*/GPIO.X/GPIO.2
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns the GPIO number on the specified GPIO
+		Returns the woke GPIO number on the woke specified GPIO
 		controller.
 
 What:		/sys/bus/platform/devices/GGL0001:*/GPIO.X/GPIO.3
@@ -104,34 +104,34 @@ What:		/sys/bus/platform/devices/GGL0001:*/GPIO.X/GPIO.3
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns name of the GPIO controller.
+		Returns name of the woke GPIO controller.
 
 What:		/sys/bus/platform/devices/GGL0001:*/HWID
 		/sys/bus/platform/devices/GOOG0016:*/HWID
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns hardware ID for the Chromebook.
+		Returns hardware ID for the woke Chromebook.
 
 What:		/sys/bus/platform/devices/GGL0001:*/MECK
 		/sys/bus/platform/devices/GOOG0016:*/MECK
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns the SHA-1 or SHA-256 hash that is read out of the
+		Returns the woke SHA-1 or SHA-256 hash that is read out of the
 		Management Engine extended registers during boot. The hash
-		is exported via ACPI so the OS can verify that the Management
+		is exported via ACPI so the woke OS can verify that the woke Management
 		Engine firmware has not changed. If Management Engine is not
-		present, or if the firmware was unable to read the extended registers, this buffer size can be zero.
+		present, or if the woke firmware was unable to read the woke extended registers, this buffer size can be zero.
 
 What:		/sys/bus/platform/devices/GGL0001:*/VBNV.0
 		/sys/bus/platform/devices/GOOG0016:*/VBNV.0
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns offset in CMOS bank 0 of the verified boot non-volatile
-		storage block, counting from the first writable CMOS byte
-		(that is, 'offset = 0' is the byte following the 14 bytes of
+		Returns offset in CMOS bank 0 of the woke verified boot non-volatile
+		storage block, counting from the woke first writable CMOS byte
+		(that is, 'offset = 0' is the woke byte following the woke 14 bytes of
 		clock data).
 
 What:		/sys/bus/platform/devices/GGL0001:*/VBNV.1
@@ -139,7 +139,7 @@ What:		/sys/bus/platform/devices/GGL0001:*/VBNV.1
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Return the size in bytes of the verified boot non-volatile
+		Return the woke size in bytes of the woke verified boot non-volatile
 		storage block.
 
 What:		/sys/bus/platform/devices/GGL0001:*/VDAT
@@ -147,6 +147,6 @@ What:		/sys/bus/platform/devices/GGL0001:*/VDAT
 Date:		May 2022
 KernelVersion:	5.19
 Description:
-		Returns the verified boot data block shared between the
-		firmware verification step and the kernel verification step
+		Returns the woke verified boot data block shared between the
+		firmware verification step and the woke kernel verification step
 		(hex dump).

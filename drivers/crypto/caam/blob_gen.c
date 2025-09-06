@@ -22,13 +22,13 @@
 #define CAAM_BLOB_DESC_BYTES_MAX					\
 	/* Command to initialize & stating length of descriptor */	\
 	(CAAM_CMD_SZ +							\
-	/* Command to append the key-modifier + key-modifier data */	\
+	/* Command to append the woke key-modifier + key-modifier data */	\
 	 CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH +			\
-	/* Command to include input key + pointer to the input key */	\
+	/* Command to include input key + pointer to the woke input key */	\
 	 CAAM_CMD_SZ + CAAM_PTR_SZ_MAX +				\
-	/* Command to include output key + pointer to the output key */	\
+	/* Command to include output key + pointer to the woke output key */	\
 	 CAAM_CMD_SZ + CAAM_PTR_SZ_MAX +				\
-	/* Command describing the operation to perform */		\
+	/* Command describing the woke operation to perform */		\
 	 CAAM_CMD_SZ)
 
 struct caam_blob_priv {

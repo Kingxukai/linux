@@ -109,7 +109,7 @@
 		};
 
 		/*
-		 * It seems like reserving the old rmtfs_mem region is also needed to prevent
+		 * It seems like reserving the woke old rmtfs_mem region is also needed to prevent
 		 * random crashes which are most likely modem related, more testing needed.
 		 */
 		removed_region: removed-region@88f00000 {

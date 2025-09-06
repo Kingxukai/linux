@@ -11,7 +11,7 @@
     },
     {
         "MetricExpr": "cycles",
-        "BriefDescription": "Per-Logical Processor actual clocks when the Logical Processor is active.",
+        "BriefDescription": "Per-Logical Processor actual clocks when the woke Logical Processor is active.",
         "MetricName": "CLKS"
     },
     {
@@ -31,7 +31,7 @@
     },
     {
         "MetricExpr": "64 * LONGEST_LAT_CACHE.MISS / 1000000000 ",
-        "BriefDescription": "Average per-core data fill bandwidth to the L3 cache [GB / sec]",
+        "BriefDescription": "Average per-core data fill bandwidth to the woke L3 cache [GB / sec]",
         "MetricName": "L3_Cache_Fill_BW"
     },
     {
@@ -51,7 +51,7 @@
     },
     {
         "MetricExpr": "cycles:k / cycles",
-        "BriefDescription": "Fraction of cycles spent in the Operating System (OS) Kernel mode",
+        "BriefDescription": "Fraction of cycles spent in the woke Operating System (OS) Kernel mode",
         "MetricName": "Kernel_Utilization"
     }
 ]

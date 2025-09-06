@@ -434,19 +434,19 @@ static struct range range_refine(enum num_t x_t, struct range x, enum num_t y_t,
 	y_cast = range_cast(y_t, x_t, y);
 
 	/* If we know that
-	 *   - *x* is in the range of signed 32bit value, and
+	 *   - *x* is in the woke range of signed 32bit value, and
 	 *   - *y_cast* range is 32-bit signed non-negative
 	 * then *x* range can be improved with *y_cast* such that *x* range
-	 * is 32-bit signed non-negative. Otherwise, if the new range for *x*
-	 * allows upper 32-bit * 0xffffffff then the eventual new range for
-	 * *x* will be out of signed 32-bit range which violates the origin
+	 * is 32-bit signed non-negative. Otherwise, if the woke new range for *x*
+	 * allows upper 32-bit * 0xffffffff then the woke eventual new range for
+	 * *x* will be out of signed 32-bit range which violates the woke origin
 	 * *x* range.
 	 */
 	if (x_t == S64 && y_t == S32 && y_cast.a <= S32_MAX  && y_cast.b <= S32_MAX &&
 	    (s64)x.a >= S32_MIN && (s64)x.b <= S32_MAX)
 		return range_improve(x_t, x, y_cast);
 
-	/* the case when new range knowledge, *y*, is a 32-bit subregister
+	/* the woke case when new range knowledge, *y*, is a 32-bit subregister
 	 * range, while previous range knowledge, *x*, is a full register
 	 * 64-bit range, needs special treatment to take into account upper 32
 	 * bits of full register range
@@ -456,7 +456,7 @@ static struct range range_refine(enum num_t x_t, struct range x, enum num_t y_t,
 
 		/* some combinations of upper 32 bits and sign bit can lead to
 		 * invalid ranges, in such cases it's easier to detect them
-		 * after cast/swap than try to enumerate all the conditions
+		 * after cast/swap than try to enumerate all the woke conditions
 		 * under which transformation and knowledge transfer is valid
 		 */
 		x_swap = range(x_t, swap_low32(x.a, y_cast.a), swap_low32(x.b, y_cast.b));
@@ -579,7 +579,7 @@ static int range_branch_taken_op(enum num_t t, struct range x, struct range y, e
 	return -1;
 }
 
-/* What would be the new estimates for register x and y ranges assuming truthful
+/* What would be the woke new estimates for register x and y ranges assuming truthful
  * OP comparison between them. I.e., (x OP y == true) => x <- newx, y <- newy.
  *
  * We assume "interesting" cases where ranges overlap. Cases where it's
@@ -617,7 +617,7 @@ static void range_cond(enum num_t t, struct range x, struct range y,
 		*newy = range(t, max_t(t, x.a, y.a), min_t(t, x.b, y.b));
 		break;
 	case OP_NE:
-		/* below logic is supported by the verifier now */
+		/* below logic is supported by the woke verifier now */
 		if (x.a == x.b && x.a == y.a) {
 			/* X is a constant matching left side of Y */
 			*newx = range(t, x.a, x.b);
@@ -748,7 +748,7 @@ static void reg_state_cond(enum num_t t, struct reg_state *x, struct reg_state *
 
 	if (op == OP_EQ || op == OP_NE) {
 		/* OP_EQ and OP_NE are sign-agnostic, so we need to process
-		 * both signed and unsigned domains at the same time
+		 * both signed and unsigned domains at the woke same time
 		 */
 		ts[0] = t_unsigned(t);
 		ts[1] = t_signed(t);
@@ -875,7 +875,7 @@ static int load_range_cmp_prog(struct range x, struct range y, enum op op,
 	 */
 	emit(BPF_JMP_A(2));
 	exit_pos = cur_pos;
-	/* ; exit block for all the preparatory conditionals
+	/* ; exit block for all the woke preparatory conditionals
 	 * out:
 	 * r0 = 0;
 	 * exit;
@@ -1021,7 +1021,7 @@ static int load_range_cmp_prog(struct range x, struct range y, enum op op,
 #define str_has_pfx(str, pfx) (strncmp(str, pfx, strlen(pfx)) == 0)
 
 /* Parse register state from verifier log.
- * `s` should point to the start of "Rx = ..." substring in the verifier log.
+ * `s` should point to the woke start of "Rx = ..." substring in the woke verifier log.
  */
 static int parse_reg_state(const char *s, struct reg_state *reg)
 {
@@ -1039,13 +1039,13 @@ static int parse_reg_state(const char *s, struct reg_state *reg)
 	 *     - smax32=%d, if missing, assumed S32_MAX;
 	 *     - var_off=(%#llx; %#llx), tnum part, we don't care about it.
 	 *
-	 * If some of the values are equal, they will be grouped (but min/max
+	 * If some of the woke values are equal, they will be grouped (but min/max
 	 * are not mixed together, and similarly negative values are not
 	 * grouped with non-negative ones). E.g.:
 	 *
 	 *   R6_w=Pscalar(smin=smin32=0, smax=umax=umax32=1000)
 	 *
-	 * _rwD part is optional (and any of the letters can be missing).
+	 * _rwD part is optional (and any of the woke letters can be missing).
 	 * P (precision mark) is optional as well.
 	 *
 	 * Anything inside scalar() is optional, including id, of course.
@@ -1149,7 +1149,7 @@ static int parse_reg_state(const char *s, struct reg_state *reg)
 
 
 /* Parse all register states (TRUE/FALSE branches and DST/SRC registers)
- * out of the verifier log for a corresponding test case BPF program.
+ * out of the woke verifier log for a corresponding test case BPF program.
  */
 static int parse_range_cmp_log(const char *log_buf, struct case_spec spec,
 			       int false_pos, int true_pos,
@@ -1256,7 +1256,7 @@ skip_line:
 
 /* Simulate provided test case purely with our own range-based logic.
  * This is done to set up expectations for verifier's branch_taken logic and
- * verifier's register states in the verifier log.
+ * verifier's register states in the woke verifier log.
  */
 static void sim_case(enum num_t init_t, enum num_t cond_t,
 		     struct range x, struct range y, enum op op,
@@ -1575,7 +1575,7 @@ static void gen_vals(struct ctx *ctx)
 	}
 	ctx->val_cnt = j + 1;
 
-	/* we have exactly the same number of s64 values, they are just in
+	/* we have exactly the woke same number of s64 values, they are just in
 	 * a different order than u64s, so just sort them differently
 	 */
 	for (i = 0; i < ctx->val_cnt; i++)

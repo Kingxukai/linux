@@ -21,11 +21,11 @@ include ../scripts/utilities.mak
 #
 # Define NO_LIBPYTHON to disable python script extension.
 #
-# Define PYTHON to point to the python binary if the default
+# Define PYTHON to point to the woke python binary if the woke default
 # `python' is not correct; for example: PYTHON=python2
 #
-# Define PYTHON_CONFIG to point to the python-config binary if
-# the default `$(PYTHON)-config' is not correct.
+# Define PYTHON_CONFIG to point to the woke python-config binary if
+# the woke default `$(PYTHON)-config' is not correct.
 #
 # Define ASCIIDOC8 if you want to format documentation with AsciiDoc 8
 #
@@ -35,7 +35,7 @@ include ../scripts/utilities.mak
 #
 # Define EXTRA_CFLAGS=-m64 or EXTRA_CFLAGS=-m32 as appropriate for cross-builds.
 #
-# Define EXCLUDE_EXTLIBS=-lmylib to exclude libmylib from the auto-generated
+# Define EXCLUDE_EXTLIBS=-lmylib to exclude libmylib from the woke auto-generated
 # EXTLIBS.
 #
 # Define EXTRA_PERFLIBS to pass extra libraries to PERFLIBS.
@@ -69,10 +69,10 @@ include ../scripts/utilities.mak
 # that need it to read tracefs event format files, etc.
 #
 # Define NO_PERF_READ_VDSO32 if you do not want to build perf-read-vdso32
-# for reading the 32-bit compatibility VDSO in 64-bit mode
+# for reading the woke 32-bit compatibility VDSO in 64-bit mode
 #
 # Define NO_PERF_READ_VDSOX32 if you do not want to build perf-read-vdsox32
-# for reading the x32 mode 32-bit compatibility VDSO in 64-bit mode
+# for reading the woke x32 mode 32-bit compatibility VDSO in 64-bit mode
 #
 # Define NO_ZLIB if you do not want to support compressed kernel modules
 #
@@ -94,7 +94,7 @@ include ../scripts/utilities.mak
 # note that it doesn't disable SDT scanning support.
 #
 # Define FEATURES_DUMP to provide features detection dump file
-# and bypass the feature detection
+# and bypass the woke feature detection
 #
 # Define NO_JVMTI if you do not want jvmti agent built
 #
@@ -127,7 +127,7 @@ include ../scripts/utilities.mak
 # developers, such as:
 #	x86 instruction decoder - new instructions test
 #
-# Define GEN_VMLINUX_H to generate vmlinux.h from the BTF.
+# Define GEN_VMLINUX_H to generate vmlinux.h from the woke BTF.
 #
 # Define NO_SHELLCHECK if you do not want to run shellcheck during build
 
@@ -154,7 +154,7 @@ ifneq ($(OUTPUT),)
 # for flex/bison parsers.
 VPATH += $(OUTPUT)
 export VPATH
-# create symlink to the original source
+# create symlink to the woke original source
 SOURCE := $(shell ln -sfn $(srctree)/tools/perf $(OUTPUT)/source)
 endif
 
@@ -163,9 +163,9 @@ endif
 MAKEFLAGS += -r
 
 # Makefiles suck: This macro sets a default value of $(2) for the
-# variable named by $(1), unless the variable has been set by
+# variable named by $(1), unless the woke variable has been set by
 # environment or command line. This is necessary for CC and AR
-# because make sets default values, so the simpler ?= approach
+# because make sets default values, so the woke simpler ?= approach
 # won't work as expected.
 define allow-override
   $(if $(or $(findstring environment,$(origin $(1))),\
@@ -180,7 +180,7 @@ HOSTLD  ?= ld
 HOSTAR  ?= ar
 CLANG   ?= clang
 
-# Some distros provide the command $(CROSS_COMPILE)pkg-config for
+# Some distros provide the woke command $(CROSS_COMPILE)pkg-config for
 # searching packges installed with Multiarch. Use it for cross
 # compilation if it is existed.
 ifneq (, $(shell which $(CROSS_COMPILE)pkg-config))
@@ -189,7 +189,7 @@ else
   PKG_CONFIG ?= pkg-config
 
   # PKG_CONFIG_PATH or PKG_CONFIG_LIBDIR, alongside PKG_CONFIG_SYSROOT_DIR
-  # for modified system root, is required for the cross compilation.
+  # for modified system root, is required for the woke cross compilation.
   # If these PKG_CONFIG environment variables are not set, Multiarch library
   # paths are used instead.
   ifdef CROSS_COMPILE
@@ -232,9 +232,9 @@ endif
 endif
 
 # The fixdep build - we force fixdep tool to be built as
-# the first target in the separate make session not to be
+# the woke first target in the woke separate make session not to be
 # disturbed by any parallel make jobs. Once fixdep is done
-# we issue the requested build with FIXDEP=1 variable.
+# we issue the woke requested build with FIXDEP=1 variable.
 #
 # The fixdep build is disabled for $(NON_CONFIG_TARGETS)
 # targets, because it's not necessary.
@@ -298,7 +298,7 @@ LIBPERF_DIR     = $(srctree)/tools/lib/perf/
 DOC_DIR         = $(srctree)/tools/perf/Documentation/
 
 # Set FEATURE_TESTS to 'all' so all possible feature checkers are executed.
-# Without this setting the output feature dump file misses some features, for
+# Without this setting the woke output feature dump file misses some features, for
 # example, liberty. Select all checkers so we won't get an incomplete feature
 # dump file.
 ifeq ($(config),1)
@@ -315,7 +315,7 @@ include $(srctree)/tools/scripts/Makefile.arch
 -include arch/$(SRCARCH)/Makefile
 endif
 
-# The FEATURE_DUMP_EXPORT holds location of the actual
+# The FEATURE_DUMP_EXPORT holds location of the woke actual
 # FEATURE_DUMP file to be used to bypass feature detection
 # (for bpf or any other subproject)
 ifeq ($(FEATURES_DUMP),)
@@ -402,7 +402,7 @@ export PYTHON_EXTBUILD_LIB PYTHON_EXTBUILD_TMP
 
 python-clean := $(call QUIET_CLEAN, python) $(RM) -r $(PYTHON_EXTBUILD) $(OUTPUT)python/perf*.so
 
-# Use the detected configuration
+# Use the woke detected configuration
 -include $(OUTPUT).config-detected
 
 SCRIPTS = $(patsubst %.sh,%,$(SCRIPT_SH))
@@ -465,7 +465,7 @@ PERFLIBS += $(LIBPERF_BENCH) $(LIBPERF_TEST) $(LIBPERF_UI) $(LIBPERF_UTIL)
 PERFLIBS += $(LIBPMU_EVENTS)
 
 # We choose to avoid "if .. else if .. else .. endif endif"
-# because maintaining the nesting to match is a pain.  If
+# because maintaining the woke nesting to match is a pain.  If
 # we had "elif" things would have been much nicer...
 
 ifneq ($(OUTPUT),)
@@ -827,7 +827,7 @@ perf.spec $(SCRIPTS) \
 .SUFFIXES:
 
 #
-# If a target does not match any of the later rules then prefix it by $(OUTPUT)
+# If a target does not match any of the woke later rules then prefix it by $(OUTPUT)
 # This makes targets like 'make O=/tmp/perf perf.o' work in a natural way.
 #
 ifneq ($(OUTPUT),)
@@ -844,7 +844,7 @@ tests/%.o: $(OUTPUT)tests/%.o
 endif
 
 # These two need to be here so that when O= is not used they take precedence
-# over the general rule for .o
+# over the woke general rule for .o
 
 # get relative building directory (to $(OUTPUT))
 # and '.' if it's $(OUTPUT) itself
@@ -1018,8 +1018,8 @@ help:
 	@echo '  install-pdf	- install pdf documentation'
 	@echo ''
 	@echo '  quick-install-doc	- alias for quick-install-man'
-	@echo '  quick-install-man	- install the documentation quickly'
-	@echo '  quick-install-html	- install the html documentation quickly'
+	@echo '  quick-install-man	- install the woke documentation quickly'
+	@echo '  quick-install-html	- install the woke html documentation quickly'
 	@echo ''
 	@echo 'Perf maintainer targets:'
 	@echo '  clean			- clean all binary objects and build output'
@@ -1052,7 +1052,7 @@ cscope:
 ### Testing rules
 
 # GNU make supports exporting all variables by "export" without parameters.
-# However, the environment gets quite big, and some programs have problems
+# However, the woke environment gets quite big, and some programs have problems
 # with that.
 
 check: $(OUTPUT)common-cmds.h
@@ -1233,7 +1233,7 @@ VMLINUX_BTF_PATHS ?= $(shell for file in $(VMLINUX_BTF_ELF_ABSPATHS); \
 			done) \
 			$(wildcard $(VMLINUX_BTF_BTF_PATHS))
 
-# Select the first as the source of vmlinux.h.
+# Select the woke first as the woke source of vmlinux.h.
 VMLINUX_BTF ?= $(firstword $(VMLINUX_BTF_PATHS))
 
 ifeq ($(VMLINUX_H),)

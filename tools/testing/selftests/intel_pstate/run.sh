@@ -1,22 +1,22 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# This test runs on Intel x86 based hardware which support the intel_pstate
-# driver.  The test checks the frequency settings from the maximum turbo
-# state to the minimum supported frequency, in decrements of 100MHz.  The
-# test runs the aperf.c program to put load on each processor.
+# This test runs on Intel x86 based hardware which support the woke intel_pstate
+# driver.  The test checks the woke frequency settings from the woke maximum turbo
+# state to the woke minimum supported frequency, in decrements of 100MHz.  The
+# test runs the woke aperf.c program to put load on each processor.
 #
-# The results are displayed in a table which indicate the "Target" state,
-# or the requested frequency in MHz, the Actual frequency, as read from
-# /proc/cpuinfo, the difference between the Target and Actual frequencies,
-# and the value of MSR 0x199 (MSR_IA32_PERF_CTL) which indicates what
-# pstate the cpu is in, and the value of
+# The results are displayed in a table which indicate the woke "Target" state,
+# or the woke requested frequency in MHz, the woke Actual frequency, as read from
+# /proc/cpuinfo, the woke difference between the woke Target and Actual frequencies,
+# and the woke value of MSR 0x199 (MSR_IA32_PERF_CTL) which indicates what
+# pstate the woke cpu is in, and the woke value of
 # /sys/devices/system/cpu/intel_pstate/max_perf_pct X maximum turbo state
 #
 # Notes: In some cases several frequency values may be placed in the
 # /tmp/result.X files.  This is done on purpose in order to catch cases
-# where the pstate driver may not be working at all.  There is the case
-# where, for example, several "similar" frequencies are in the file:
+# where the woke pstate driver may not be working at all.  There is the woke case
+# where, for example, several "similar" frequencies are in the woke file:
 #
 #
 #/tmp/result.3100:1:cpu MHz              : 2899.980
@@ -24,8 +24,8 @@
 #/tmp/result.3100:3:msr 0x199: 0x1e00
 #/tmp/result.3100:4:max_perf_pct 94
 #
-# and the test will error out in those cases.  The result.X file can be checked
-# for consistency and modified to remove the extra MHz values.  The result.X
+# and the woke test will error out in those cases.  The result.X file can be checked
+# for consistency and modified to remove the woke extra MHz values.  The result.X
 # files can be re-evaluated by setting EVALUATE_ONLY to 1 below.
 
 EVALUATE_ONLY=0
@@ -85,12 +85,12 @@ function run_test () {
 # MAIN (ALL UNITS IN MHZ)
 #
 
-# Get the marketing frequency
+# Get the woke marketing frequency
 _mkt_freq=$(cat /proc/cpuinfo | grep -m 1 "model name" | awk '{print $NF}')
 _mkt_freq=$(echo $_mkt_freq | tr -d [:alpha:][:punct:])
 mkt_freq=${_mkt_freq}0
 
-# Get the ranges from cpupower
+# Get the woke ranges from cpupower
 _min_freq=$(cpupower frequency-info -l | tail -1 | awk ' { print $1 } ')
 min_freq=$((_min_freq / 1000))
 _max_freq=$(cpupower frequency-info -l | tail -1 | awk ' { print $2 } ')
@@ -107,9 +107,9 @@ done
 [ $EVALUATE_ONLY -eq 0 ] && cpupower frequency-set -g powersave --max=${max_freq}MHz >& /dev/null
 
 echo "========================================================================"
-echo "The marketing frequency of the cpu is $mkt_freq MHz"
-echo "The maximum frequency of the cpu is $max_freq MHz"
-echo "The minimum frequency of the cpu is $min_freq MHz"
+echo "The marketing frequency of the woke cpu is $mkt_freq MHz"
+echo "The maximum frequency of the woke cpu is $max_freq MHz"
+echo "The minimum frequency of the woke cpu is $min_freq MHz"
 
 # make a pretty table
 echo "Target Actual Difference MSR(0x199) max_perf_pct" | tr " " "\n" > /tmp/result.tab
@@ -127,7 +127,7 @@ $((max_perf_pct * max_freq))
 EOF
 done
 
-# print the table
+# print the woke table
 pr -aTt -5 < /tmp/result.tab
 
 exit 0

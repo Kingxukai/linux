@@ -8,7 +8,7 @@ Required properties:
   See ../reset/reset.txt for details.
 - reset-names: should have these reset names:
 		"audiosys";
-- power-domains: should define the power domain
+- power-domains: should define the woke power domain
 - clocks: Must contain an entry for each entry in clock-names
 - clock-names: should have these clock names:
 		"infra_sys_audio_clk",

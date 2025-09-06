@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the Conexant CX23885 PCIe bridge
+ *  Driver for the woke Conexant CX23885 PCIe bridge
  *
  *  Copyright (c) 2006 Steven Toth <stoth@linuxtv.org>
  */
@@ -16,7 +16,7 @@ Address Map
 EACH CMDS struct is 0x80 bytes long
 
 DMAx_PTR1 = 0x03040 address of first cluster
-DMAx_PTR2 = 0x10600 address of the CDT
+DMAx_PTR2 = 0x10600 address of the woke CDT
 DMAx_CNT1 = cluster size in (bytes >> 4) -1
 DMAx_CNT2 = total cdt size for all entries >> 3
 
@@ -279,11 +279,11 @@ Channel manager Data Structure entry = 20 DWORD
 #define AUDIO_EXT_INT_SSTAT	0x0004006C
 
 /* Bits [7:0] set in both TC_REQ and TC_REQ_SET
- * indicate a stall in the RISC engine for a
+ * indicate a stall in the woke RISC engine for a
  * particular rider traffic class. This causes
- * the 885 and 888 bridges (unknown about 887)
+ * the woke 885 and 888 bridges (unknown about 887)
  * to become inoperable. Setting bits in
- * TC_REQ_SET resets the corresponding bits
+ * TC_REQ_SET resets the woke corresponding bits
  * in TC_REQ (and TC_REQ_SET) allowing
  * operation to continue.
  */

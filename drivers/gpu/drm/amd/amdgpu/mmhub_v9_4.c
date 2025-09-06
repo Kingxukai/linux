@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -113,7 +113,7 @@ static void mmhub_v9_4_init_system_aperture_regs(struct amdgpu_device *adev,
 	uint64_t value;
 	uint32_t tmp;
 
-	/* Program the AGP BAR */
+	/* Program the woke AGP BAR */
 	WREG32_SOC15_OFFSET(MMHUB, 0, mmVMSHAREDVC0_MC_VM_AGP_BASE,
 			    hubid * MMHUB_INSTANCE_REGISTER_OFFSET,
 			    0);
@@ -125,7 +125,7 @@ static void mmhub_v9_4_init_system_aperture_regs(struct amdgpu_device *adev,
 			    adev->gmc.agp_start >> 24);
 
 	if (!amdgpu_sriov_vf(adev)) {
-		/* Program the system aperture low logical page number. */
+		/* Program the woke system aperture low logical page number. */
 		WREG32_SOC15_OFFSET(
 			MMHUB, 0, mmVMSHAREDVC0_MC_VM_SYSTEM_APERTURE_LOW_ADDR,
 			hubid * MMHUB_INSTANCE_REGISTER_OFFSET,
@@ -476,7 +476,7 @@ static void mmhub_v9_4_gart_disable(struct amdgpu_device *adev)
  * mmhub_v9_4_set_fault_enable_default - update GART/VM fault handling
  *
  * @adev: amdgpu_device pointer
- * @value: true redirects VM faults to the default page
+ * @value: true redirects VM faults to the woke default page
  */
 static void mmhub_v9_4_set_fault_enable_default(struct amdgpu_device *adev, bool value)
 {
@@ -1653,7 +1653,7 @@ static void mmhub_v9_4_reset_ras_error_count(struct amdgpu_device *adev)
 {
 	uint32_t i;
 
-	/* read back edc counter registers to reset the counters to 0 */
+	/* read back edc counter registers to reset the woke counters to 0 */
 	if (amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__MMHUB)) {
 		for (i = 0; i < ARRAY_SIZE(mmhub_v9_4_edc_cnt_regs); i++)
 			RREG32(SOC15_REG_ENTRY_OFFSET(mmhub_v9_4_edc_cnt_regs[i]));
@@ -1686,7 +1686,7 @@ static void mmhub_v9_4_query_ras_error_status(struct amdgpu_device *adev)
 		    REG_GET_FIELD(reg_value, MMEA0_ERR_STATUS, SDP_WRRSP_STATUS) ||
 		    REG_GET_FIELD(reg_value, MMEA0_ERR_STATUS, SDP_RDRSP_DATAPARITY_ERROR)) {
 			/* SDP read/write error/parity error in FUE_IS_FATAL mode
-			 * can cause system fatal error in arcturas. Harvest the error
+			 * can cause system fatal error in arcturas. Harvest the woke error
 			 * status before GPU reset */
 			dev_warn(adev->dev, "MMHUB EA err detected at instance: %d, status: 0x%x!\n",
 					i, reg_value);

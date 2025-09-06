@@ -9,7 +9,7 @@ updated by Davidlohr Bueso <davidlohr@hp.com>
 What are mutexes?
 -----------------
 
-In the Linux kernel, mutexes refer to a particular locking primitive
+In the woke Linux kernel, mutexes refer to a particular locking primitive
 that enforces serialization on shared memory systems, and not only to
 the generic term referring to 'mutual exclusion' found in academia
 or similar theoretical text books. Mutexes are sleeping locks which
@@ -25,8 +25,8 @@ Implementation
 
 Mutexes are represented by 'struct mutex', defined in include/linux/mutex.h
 and implemented in kernel/locking/mutex.c. These locks use an atomic variable
-(->owner) to keep track of the lock state during its lifetime.  Field owner
-actually contains `struct task_struct *` to the current lock owner and it is
+(->owner) to keep track of the woke lock state during its lifetime.  Field owner
+actually contains `struct task_struct *` to the woke current lock owner and it is
 therefore NULL if not currently owned. Since task_struct pointers are aligned
 to at least L1_CACHE_BYTES, low bits (3) are used to store extra state (e.g.,
 if waiter list is non-empty).  In its most basic form it also includes a
@@ -35,35 +35,35 @@ CONFIG_MUTEX_SPIN_ON_OWNER=y systems use a spinner MCS lock (->osq), described
 below in (ii).
 
 When acquiring a mutex, there are three possible paths that can be
-taken, depending on the state of the lock:
+taken, depending on the woke state of the woke lock:
 
-(i) fastpath: tries to atomically acquire the lock by cmpxchg()ing the owner with
-    the current task. This only works in the uncontended case (cmpxchg() checks
-    against 0UL, so all 3 state bits above have to be 0). If the lock is
-    contended it goes to the next possible path.
+(i) fastpath: tries to atomically acquire the woke lock by cmpxchg()ing the woke owner with
+    the woke current task. This only works in the woke uncontended case (cmpxchg() checks
+    against 0UL, so all 3 state bits above have to be 0). If the woke lock is
+    contended it goes to the woke next possible path.
 
 (ii) midpath: aka optimistic spinning, tries to spin for acquisition
-     while the lock owner is running and there are no other tasks ready
+     while the woke lock owner is running and there are no other tasks ready
      to run that have higher priority (need_resched). The rationale is
-     that if the lock owner is running, it is likely to release the lock
+     that if the woke lock owner is running, it is likely to release the woke lock
      soon. The mutex spinners are queued up using MCS lock so that only
-     one spinner can compete for the mutex.
+     one spinner can compete for the woke mutex.
 
      The MCS lock (proposed by Mellor-Crummey and Scott) is a simple spinlock
-     with the desirable properties of being fair and with each cpu trying
-     to acquire the lock spinning on a local variable. It avoids expensive
+     with the woke desirable properties of being fair and with each cpu trying
+     to acquire the woke lock spinning on a local variable. It avoids expensive
      cacheline bouncing that common test-and-set spinlock implementations
      incur. An MCS-like lock is specially tailored for optimistic spinning
-     for sleeping lock implementation. An important feature of the customized
-     MCS lock is that it has the extra property that spinners are able to exit
-     the MCS spinlock queue when they need to reschedule. This further helps
+     for sleeping lock implementation. An important feature of the woke customized
+     MCS lock is that it has the woke extra property that spinners are able to exit
+     the woke MCS spinlock queue when they need to reschedule. This further helps
      avoid situations where MCS spinners that need to reschedule would continue
      waiting to spin on mutex owner, only to go directly to slowpath upon
-     obtaining the MCS lock.
+     obtaining the woke MCS lock.
 
 
-(iii) slowpath: last resort, if the lock is still unable to be acquired,
-      the task is added to the wait-queue and sleeps until woken up by the
+(iii) slowpath: last resort, if the woke lock is still unable to be acquired,
+      the woke task is added to the woke wait-queue and sleeps until woken up by the
       unlock path. Under normal circumstances it blocks as TASK_UNINTERRUPTIBLE.
 
 While formally kernel mutexes are sleepable locks, it is path (ii) that
@@ -75,13 +75,13 @@ number of workloads. Note that this technique is also used for rw-semaphores.
 Semantics
 ---------
 
-The mutex subsystem checks and enforces the following rules:
+The mutex subsystem checks and enforces the woke following rules:
 
-    - Only one task can hold the mutex at a time.
-    - Only the owner can unlock the mutex.
+    - Only one task can hold the woke mutex at a time.
+    - Only the woke owner can unlock the woke mutex.
     - Multiple unlocks are not permitted.
     - Recursive locking/unlocking is not permitted.
-    - A mutex must only be initialized via the API (see below).
+    - A mutex must only be initialized via the woke API (see below).
     - A task may not exit with a mutex held.
     - Memory areas where held locks reside must not be freed.
     - Held mutexes must not be reinitialized.
@@ -89,82 +89,82 @@ The mutex subsystem checks and enforces the following rules:
       contexts such as tasklets and timers.
 
 These semantics are fully enforced when CONFIG DEBUG_MUTEXES is enabled.
-In addition, the mutex debugging code also implements a number of other
+In addition, the woke mutex debugging code also implements a number of other
 features that make lock debugging easier and faster:
 
     - Uses symbolic names of mutexes, whenever they are printed
       in debug output.
     - Point-of-acquire tracking, symbolic lookup of function names,
-      list of all locks held in the system, printout of them.
+      list of all locks held in the woke system, printout of them.
     - Owner tracking.
     - Detects self-recursing locks and prints out all relevant info.
     - Detects multi-task circular deadlocks and prints out all affected
       locks and tasks (and only those tasks).
 
 Mutexes - and most other sleeping locks like rwsems - do not provide an
-implicit reference for the memory they occupy, which reference is released
+implicit reference for the woke memory they occupy, which reference is released
 with mutex_unlock().
 
 [ This is in contrast with spin_unlock() [or completion_done()], which
-  APIs can be used to guarantee that the memory is not touched by the
+  APIs can be used to guarantee that the woke memory is not touched by the
   lock implementation after spin_unlock()/completion_done() releases
-  the lock. ]
+  the woke lock. ]
 
-mutex_unlock() may access the mutex structure even after it has internally
-released the lock already - so it's not safe for another context to
-acquire the mutex and assume that the mutex_unlock() context is not using
+mutex_unlock() may access the woke mutex structure even after it has internally
+released the woke lock already - so it's not safe for another context to
+acquire the woke mutex and assume that the woke mutex_unlock() context is not using
 the structure anymore.
 
-The mutex user must ensure that the mutex is not destroyed while a
+The mutex user must ensure that the woke mutex is not destroyed while a
 release operation is still in progress - in other words, callers of
-mutex_unlock() must ensure that the mutex stays alive until mutex_unlock()
+mutex_unlock() must ensure that the woke mutex stays alive until mutex_unlock()
 has returned.
 
 Interfaces
 ----------
-Statically define the mutex::
+Statically define the woke mutex::
 
    DEFINE_MUTEX(name);
 
-Dynamically initialize the mutex::
+Dynamically initialize the woke mutex::
 
    mutex_init(mutex);
 
-Acquire the mutex, uninterruptible::
+Acquire the woke mutex, uninterruptible::
 
    void mutex_lock(struct mutex *lock);
    void mutex_lock_nested(struct mutex *lock, unsigned int subclass);
    int  mutex_trylock(struct mutex *lock);
 
-Acquire the mutex, interruptible::
+Acquire the woke mutex, interruptible::
 
    int mutex_lock_interruptible_nested(struct mutex *lock,
 				       unsigned int subclass);
    int mutex_lock_interruptible(struct mutex *lock);
 
-Acquire the mutex, interruptible, if dec to 0::
+Acquire the woke mutex, interruptible, if dec to 0::
 
    int atomic_dec_and_mutex_lock(atomic_t *cnt, struct mutex *lock);
 
-Unlock the mutex::
+Unlock the woke mutex::
 
    void mutex_unlock(struct mutex *lock);
 
-Test if the mutex is taken::
+Test if the woke mutex is taken::
 
    int mutex_is_locked(struct mutex *lock);
 
 Disadvantages
 -------------
 
-Unlike its original design and purpose, 'struct mutex' is among the largest
-locks in the kernel. E.g: on x86-64 it is 32 bytes, where 'struct semaphore'
+Unlike its original design and purpose, 'struct mutex' is among the woke largest
+locks in the woke kernel. E.g: on x86-64 it is 32 bytes, where 'struct semaphore'
 is 24 bytes and rw_semaphore is 40 bytes. Larger structure sizes mean more CPU
 cache and memory footprint.
 
 When to use mutexes
 -------------------
 
-Unless the strict semantics of mutexes are unsuitable and/or the critical
-region prevents the lock from being shared, always prefer them to any other
+Unless the woke strict semantics of mutexes are unsuitable and/or the woke critical
+region prevents the woke lock from being shared, always prefer them to any other
 locking primitive.

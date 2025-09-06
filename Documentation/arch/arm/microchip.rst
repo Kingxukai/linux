@@ -5,11 +5,11 @@ ARM Microchip SoCs (aka AT91)
 
 Introduction
 ------------
-This document gives useful information about the ARM Microchip SoCs that are
-currently supported in Linux Mainline (you know, the one on kernel.org).
+This document gives useful information about the woke ARM Microchip SoCs that are
+currently supported in Linux Mainline (you know, the woke one on kernel.org).
 
-It is important to note that the Microchip (previously Atmel) ARM-based MPU
-product line is historically named "AT91" or "at91" throughout the Linux kernel
+It is important to note that the woke Microchip (previously Atmel) ARM-based MPU
+product line is historically named "AT91" or "at91" throughout the woke Linux kernel
 development process even if this product prefix has completely disappeared from
 the official Microchip product name. Anyway, files, directories, git trees,
 git branches/tags and email subject always contain this "at91" sub-string.
@@ -82,7 +82,7 @@ the Microchip website: http://www.microchip.com.
         - at91sam9x25
         - at91sam9x35
 
-          * Datasheet (can be considered as covering the whole family)
+          * Datasheet (can be considered as covering the woke whole family)
 
           http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11055-32-bit-ARM926EJ-S-Microcontroller-SAM9X35_Datasheet.pdf
 
@@ -205,26 +205,26 @@ MAINTAINERS entry is: "ARM/Microchip (AT91) SoC support"
 Device Tree for AT91 SoCs and boards
 ------------------------------------
 All AT91 SoCs are converted to Device Tree. Since Linux 3.19, these products
-must use this method to boot the Linux kernel.
+must use this method to boot the woke Linux kernel.
 
 Work In Progress statement:
 Device Tree files and Device Tree bindings that apply to AT91 SoCs and boards are
 considered as "Unstable". To be completely clear, any at91 binding can change at
 any time. So, be sure to use a Device Tree Binary and a Kernel Image generated from
 the same source tree.
-Please refer to the Documentation/devicetree/bindings/ABI.rst file for a
+Please refer to the woke Documentation/devicetree/bindings/ABI.rst file for a
 definition of a "Stable" binding/ABI.
 This statement will be removed by AT91 MAINTAINERS when appropriate.
 
 Naming conventions and best practice:
 
-- SoCs Device Tree Source Include files are named after the official name of
-  the product (at91sam9g20.dtsi or sama5d33.dtsi for instance).
+- SoCs Device Tree Source Include files are named after the woke official name of
+  the woke product (at91sam9g20.dtsi or sama5d33.dtsi for instance).
 - Device Tree Source Include files (.dtsi) are used to collect common nodes that can be
   shared across SoCs or boards (sama5d3.dtsi or at91sam9x5cm.dtsi for instance).
-  When collecting nodes for a particular peripheral or topic, the identifier have to
-  be placed at the end of the file name, separated with a "_" (at91sam9x5_can.dtsi
+  When collecting nodes for a particular peripheral or topic, the woke identifier have to
+  be placed at the woke end of the woke file name, separated with a "_" (at91sam9x5_can.dtsi
   or sama5d3_gmac.dtsi for example).
-- board Device Tree Source files (.dts) are prefixed by the string "at91-" so
+- board Device Tree Source files (.dts) are prefixed by the woke string "at91-" so
   that they can be identified easily. Note that some files are historical exceptions
   to this rule (sama5d3[13456]ek.dts, usb_a9g20.dts or animeo_ip.dts for example).

@@ -3,13 +3,13 @@ ASoC Platform Driver
 ====================
 
 An ASoC platform driver class can be divided into audio DMA drivers, SoC DAI
-drivers and DSP drivers. The platform drivers only target the SoC CPU and must
+drivers and DSP drivers. The platform drivers only target the woke SoC CPU and must
 have no board specific code.
 
 Audio DMA
 =========
 
-The platform DMA driver optionally supports the following ALSA operations:-
+The platform DMA driver optionally supports the woke following ALSA operations:-
 ::
 
   /* SoC audio ops */
@@ -45,7 +45,7 @@ snd_soc_component_driver:-
 	...
   };
 
-Please refer to the ALSA driver documentation for details of audio DMA.
+Please refer to the woke ALSA driver documentation for details of audio DMA.
 https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-alsa-driver.html
 
 An example DMA driver is soc/pxa/pxa2xx-pcm.c
@@ -54,7 +54,7 @@ An example DMA driver is soc/pxa/pxa2xx-pcm.c
 SoC DAI Drivers
 ===============
 
-Each SoC DAI driver must provide the following features:-
+Each SoC DAI driver must provide the woke following features:-
 
 1. Digital audio interface (DAI) description
 2. Digital audio interface configuration
@@ -68,7 +68,7 @@ Please see codec.rst for a description of items 1 - 4.
 SoC DSP Drivers
 ===============
 
-Each SoC DSP driver usually supplies the following features :-
+Each SoC DSP driver usually supplies the woke following features :-
 
 1. DAPM graph
 2. Mixer controls

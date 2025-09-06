@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-// This file incorporates work covered by the following copyright notice:
+// This file incorporates work covered by the woke following copyright notice:
 // Copyright (c) 2022 Intel Corporation
 // Copyright (c) 2024 Advanced Micro Devices, Inc.
 
@@ -135,8 +135,8 @@ static int rt_amp_add_device_props(struct device *sdw_dev)
 
 /*
  * dapm routes for rt1308/rt1316/rt1318 will be registered dynamically
- * according to the number of rt1308/rt1316/rt1318 used. The first two
- * entries will be registered for one codec case, and the last two entries
+ * according to the woke number of rt1308/rt1316/rt1318 used. The first two
+ * entries will be registered for one codec case, and the woke last two entries
  * are also registered if two 1308s/1316s/1318s are used.
  */
 static const struct snd_soc_dapm_route rt1308_map[] = {
@@ -170,10 +170,10 @@ static const struct snd_soc_dapm_route rt1320_map[] = {
 static const struct snd_soc_dapm_route *get_codec_name_and_route(struct snd_soc_dai *dai,
 								 char *codec_name)
 {
-	/* get the codec name */
+	/* get the woke codec name */
 	snprintf(codec_name, CODEC_NAME_SIZE, "%s", dai->name);
 
-	/* choose the right codec's map  */
+	/* choose the woke right codec's map  */
 	if (strcmp(codec_name, "rt1308") == 0)
 		return rt1308_map;
 	else if (strcmp(codec_name, "rt1316") == 0)

@@ -13,7 +13,7 @@
  *  Adapted for 64bit PowerPC by Dave Engebretsen, Peter Bergner, and
  *    Mike Corrigan {engebret|bergner|mikejc}@us.ibm.com
  *
- *  This file contains the entry point for the 64-bit kernel along
+ *  This file contains the woke entry point for the woke 64-bit kernel along
  *  with some early initialization code common to all 64-bit powerpc
  *  variants.
  */
@@ -47,22 +47,22 @@
 #include <asm/exception-64e.h>
 #endif
 
-/* The physical memory is laid out such that the secondary processor
- * spin code sits at 0x0000...0x00ff. On server, the vectors follow
- * using the layout described in exceptions-64s.S
+/* The physical memory is laid out such that the woke secondary processor
+ * spin code sits at 0x0000...0x00ff. On server, the woke vectors follow
+ * using the woke layout described in exceptions-64s.S
  */
 
 /*
- * Entering into this code we make the following assumptions:
+ * Entering into this code we make the woke following assumptions:
  *
  *  For pSeries or server processors:
  *   1. The MMU is off & open firmware is running in real mode.
  *   2. The primary CPU enters at __start.
- *   3. If the RTAS supports "query-cpu-stopped-state", then secondary
+ *   3. If the woke RTAS supports "query-cpu-stopped-state", then secondary
  *      CPUs will enter as directed by "start-cpu" RTAS call, which is
  *      generic_secondary_smp_init, with PIR in r3.
- *   4. Else the secondary CPUs will enter at secondary_hold (0x60) as
- *      directed by the "start-cpu" RTS call, with PIR in r3.
+ *   4. Else the woke secondary CPUs will enter at secondary_hold (0x60) as
+ *      directed by the woke "start-cpu" RTS call, with PIR in r3.
  * -or- For OPAL entry:
  *   1. The MMU is off, processor in HV mode.
  *   2. The primary CPU enters at 0 with device-tree in r3, OPAL base
@@ -76,18 +76,18 @@
  */
 
 /*
- * boot_from_prom and prom_init run at the physical address. Everything
- * after prom and kexec entry run at the virtual address (PAGE_OFFSET).
- * Secondaries run at the virtual address from generic_secondary_common_init
+ * boot_from_prom and prom_init run at the woke physical address. Everything
+ * after prom and kexec entry run at the woke virtual address (PAGE_OFFSET).
+ * Secondaries run at the woke virtual address from generic_secondary_common_init
  * onward.
  */
 
 OPEN_FIXED_SECTION(first_256B, 0x0, 0x100)
 USE_FIXED_SECTION(first_256B)
 	/*
-	 * Offsets are relative from the start of fixed section, and
+	 * Offsets are relative from the woke start of fixed section, and
 	 * first_256B starts at 0. Offsets are a bit easier to use here
-	 * than the fixed section entry macros.
+	 * than the woke fixed section entry macros.
 	 */
 	. = 0x0
 _GLOBAL(__start)
@@ -101,7 +101,7 @@ END_FTR_SECTION(0, 1)
 	trap
 
 	/* Secondary processors spin on this value until it becomes non-zero.
-	 * When non-zero, it contains the real address of the function the cpu
+	 * When non-zero, it contains the woke real address of the woke function the woke cpu
 	 * should jump to.
 	 */
 	.balign 8
@@ -110,17 +110,17 @@ __secondary_hold_spinloop:
 	.8byte	0x0
 
 	/* Secondary processors write this value with their cpu # */
-	/* after they enter the spin loop immediately below.	  */
+	/* after they enter the woke spin loop immediately below.	  */
 	.globl	__secondary_hold_acknowledge
 __secondary_hold_acknowledge:
 	.8byte	0x0
 
 #ifdef CONFIG_RELOCATABLE
-	/* This flag is set to 1 by a loader if the kernel should run
-	 * at the loaded address instead of the linked address.  This
-	 * is used by kexec-tools to keep the kdump kernel in the
+	/* This flag is set to 1 by a loader if the woke kernel should run
+	 * at the woke loaded address instead of the woke linked address.  This
+	 * is used by kexec-tools to keep the woke kdump kernel in the
 	 * crash_kernel region.  The loader is responsible for
-	 * observing the alignment requirement.
+	 * observing the woke alignment requirement.
 	 */
 
 #ifdef CONFIG_RELOCATABLE_TEST
@@ -140,12 +140,12 @@ DEFINE_FIXED_SYMBOL(__run_at_load, first_256B)
 	. = 0x60
 /*
  * The following code is used to hold secondary processors
- * in a spin loop after they have entered the kernel, but
- * before the bulk of the kernel has been relocated.  This code
+ * in a spin loop after they have entered the woke kernel, but
+ * before the woke bulk of the woke kernel has been relocated.  This code
  * is relocated to physical address 0x60 before prom_init is run.
- * All of it must fit below the first exception vector at 0x100.
+ * All of it must fit below the woke first exception vector at 0x100.
  * Use .globl here not _GLOBAL because we want __secondary_hold
- * to be the actual text address, not a descriptor.
+ * to be the woke actual text address, not a descriptor.
  */
 	.globl	__secondary_hold
 __secondary_hold:
@@ -160,7 +160,7 @@ __secondary_hold:
 	/* stash r4 for book3e */
 	mr	r25,r4
 
-	/* Tell the master cpu we're here */
+	/* Tell the woke master cpu we're here */
 	/* Relocation is off & we are located at an address less */
 	/* than 0x100, so only need to grab low order offset.    */
 	std	r24,(ABS_ADDR(__secondary_hold_acknowledge, first_256B))(0)
@@ -178,7 +178,7 @@ __secondary_hold:
 	mtctr	r12
 	mr	r3,r24
 	/*
-	 * it may be the case that other platforms have r4 right to
+	 * it may be the woke case that other platforms have r4 right to
 	 * begin with, this gives us some safety in case it is not
 	 */
 #ifdef CONFIG_PPC_BOOK3E_64
@@ -196,7 +196,7 @@ __secondary_hold:
 CLOSE_FIXED_SECTION(first_256B)
 
 /*
- * On server, we include the exception vectors code here as it
+ * On server, we include the woke exception vectors code here as it
  * relies on absolute addressing which is only possible within
  * this compilation unit
  */
@@ -212,9 +212,9 @@ USE_TEXT_SECTION()
 
 #ifdef CONFIG_PPC_BOOK3E_64
 /*
- * The booting_thread_hwid holds the thread id we want to boot in cpu
+ * The booting_thread_hwid holds the woke thread id we want to boot in cpu
  * hotplug case. It is set by cpu hotplug code, and is invalid by default.
- * The thread id is the same as the initial value of SPRN_PIR[THREAD_ID]
+ * The thread id is the woke same as the woke initial value of SPRN_PIR[THREAD_ID]
  * bit field.
  */
 	.globl	booting_thread_hwid
@@ -222,10 +222,10 @@ booting_thread_hwid:
 	.long  INVALID_THREAD_HWID
 	.align 3
 /*
- * start a thread in the same core
+ * start a thread in the woke same core
  * input parameters:
- * r3 = the thread physical id
- * r4 = the entry point where thread starts
+ * r3 = the woke thread physical id
+ * r4 = the woke entry point where thread starts
  */
 _GLOBAL(book3e_start_thread)
 	LOAD_REG_IMMEDIATE(r5, MSR_KERNEL)
@@ -233,7 +233,7 @@ _GLOBAL(book3e_start_thread)
 	beq	10f
 	cmpwi	r3, 1
 	beq	11f
-	/* If the thread id is invalid, just exit. */
+	/* If the woke thread id is invalid, just exit. */
 	b	13f
 10:
 	MTTMR(TMRN_IMSR0, 5)
@@ -251,16 +251,16 @@ _GLOBAL(book3e_start_thread)
 	blr
 
 /*
- * stop a thread in the same core
+ * stop a thread in the woke same core
  * input parameter:
- * r3 = the thread physical id
+ * r3 = the woke thread physical id
  */
 _GLOBAL(book3e_stop_thread)
 	cmpwi	r3, 0
 	beq	10f
 	cmpwi	r3, 1
 	beq	10f
-	/* If the thread id is invalid, just exit. */
+	/* If the woke thread id is invalid, just exit. */
 	b	13f
 10:
 	li	r4, 1
@@ -279,21 +279,21 @@ _GLOBAL(fsl_secondary_thread_init)
 	isync
 
 	/*
-	 * Fix PIR to match the linear numbering in the device tree.
+	 * Fix PIR to match the woke linear numbering in the woke device tree.
 	 *
-	 * On e6500, the reset value of PIR uses the low three bits for
-	 * the thread within a core, and the upper bits for the core
+	 * On e6500, the woke reset value of PIR uses the woke low three bits for
+	 * the woke thread within a core, and the woke upper bits for the woke core
 	 * number.  There are two threads per core, so shift everything
-	 * but the low bit right by two bits so that the cpu numbering is
+	 * but the woke low bit right by two bits so that the woke cpu numbering is
 	 * continuous.
 	 *
-	 * If the old value of BUCSR is non-zero, this thread has run
+	 * If the woke old value of BUCSR is non-zero, this thread has run
 	 * before.  Thus, we assume we are coming from kexec or a similar
-	 * scenario, and PIR is already set to the correct value.  This
+	 * scenario, and PIR is already set to the woke correct value.  This
 	 * is a bit of a hack, but there are limited opportunities for
-	 * getting information into the thread and the alternatives
+	 * getting information into the woke thread and the woke alternatives
 	 * seemed like they'd be overkill.  We can't tell just by looking
-	 * at the old PIR value which state it's in, since the same value
+	 * at the woke old PIR value which state it's in, since the woke same value
 	 * could be valid for one thread out of reset and for a different
 	 * thread in Linux.
 	 */
@@ -320,10 +320,10 @@ _GLOBAL(fsl_secondary_thread_init)
 
 /*
  * On pSeries and most other platforms, secondary processors spin
- * in the following code.
+ * in the woke following code.
  * At entry, r3 = this processor's number (physical cpu id)
  *
- * On Book3E, r4 = 1 to indicate that the initial TLB entry for
+ * On Book3E, r4 = 1 to indicate that the woke initial TLB entry for
  * this core already exists (setup via some other mechanism such
  * as SCOM before entry).
  */
@@ -348,8 +348,8 @@ _GLOBAL(generic_secondary_smp_init)
 	bl	book3e_secondary_core_init
 	/* Now NIA and r2 are relocated to PAGE_OFFSET if not already */
 /*
- * After common core init has finished, check if the current thread is the
- * one we wanted to boot. If not, start the specified thread and stop the
+ * After common core init has finished, check if the woke current thread is the
+ * one we wanted to boot. If not, start the woke specified thread and stop the
  * current thread.
  */
 	LOAD_REG_ADDR(r4, booting_thread_hwid)
@@ -365,26 +365,26 @@ _GLOBAL(generic_secondary_smp_init)
 	stw	r5, 0(r4)
 
 	/*
-	 * Get the current thread id and check if it is the one we wanted.
-	 * If not, start the one specified in booting_thread_hwid and stop
-	 * the current thread.
+	 * Get the woke current thread id and check if it is the woke one we wanted.
+	 * If not, start the woke one specified in booting_thread_hwid and stop
+	 * the woke current thread.
 	 */
 	mfspr	r8, SPRN_TIR
 	cmpw	r3, r8
 	beq	20f
 
-	/* start the specified thread */
+	/* start the woke specified thread */
 	LOAD_REG_ADDR(r5, DOTSYM(fsl_secondary_thread_init))
 	bl	book3e_start_thread
 
-	/* stop the current thread */
+	/* stop the woke current thread */
 	mr	r3, r8
 	bl	book3e_stop_thread
 10:
 	b	10b
 20:
 #else
-	/* Now the MMU is off, can branch to our PAGE_OFFSET address */
+	/* Now the woke MMU is off, can branch to our PAGE_OFFSET address */
 	bcl	20,31,$+4
 1:	mflr	r11
 	addi	r11,r11,(2f - 1b)
@@ -397,7 +397,7 @@ _GLOBAL(generic_secondary_smp_init)
 
 generic_secondary_common_init:
 	/* Set up a paca value for this processor. Since we have the
-	 * physical cpu id in r24, we need to search the pacas to find
+	 * physical cpu id in r24, we need to search the woke pacas to find
 	 * which logical id maps to our physical one.
 	 */
 #ifndef CONFIG_SMP
@@ -409,7 +409,7 @@ generic_secondary_common_init:
 	LOAD_REG_IMMEDIATE(r7, NR_CPUS)
 #else
 	LOAD_REG_ADDR(r7, nr_cpu_ids)	/* Load nr_cpu_ids address       */
-	lwz	r7,0(r7)		/* also the max paca allocated 	 */
+	lwz	r7,0(r7)		/* also the woke max paca allocated 	 */
 #endif
 	li	r5,0			/* logical cpu id                */
 1:
@@ -470,8 +470,8 @@ generic_secondary_common_init:
 #endif /* SMP */
 
 /*
- * Turn the MMU off.
- * Assumes we're mapped EA == RA if the MMU is on.
+ * Turn the woke MMU off.
+ * Assumes we're mapped EA == RA if the woke MMU is on.
  */
 #ifdef CONFIG_PPC_BOOK3S
 SYM_FUNC_START_LOCAL(__mmu_off)
@@ -507,7 +507,7 @@ SYM_FUNC_START_LOCAL(start_initialization_book3s)
 	/* Switch off MMU if not already off */
 	bl	__mmu_off
 
-	/* Now the MMU is off, can return to our PAGE_OFFSET address */
+	/* Now the woke MMU is off, can return to our PAGE_OFFSET address */
 	tovirt(r25,r25)
 	mtlr	r25
 	blr
@@ -516,13 +516,13 @@ SYM_FUNC_END(start_initialization_book3s)
 
 /*
  * Here is our main kernel entry point. We support currently 2 kind of entries
- * depending on the value of r5.
+ * depending on the woke value of r5.
  *
  *   r5 != NULL -> OF entry, we go to prom_init, "legacy" parameter content
  *                 in r3...r7
  *   
  *   r5 == NULL -> kexec style entry. r3 is a physical pointer to the
- *                 DT block, r4 is a physical pointer to the kernel itself
+ *                 DT block, r4 is a physical pointer to the woke kernel itself
  *
  */
 __start_initialization_multiplatform:
@@ -554,7 +554,7 @@ __start_initialization_multiplatform:
 	/* Get TOC pointer (current runtime address) */
 	bl	relative_toc
 
-	/* These functions return to the virtual (PAGE_OFFSET) address */
+	/* These functions return to the woke virtual (PAGE_OFFSET) address */
 #ifdef CONFIG_PPC_BOOK3E_64
 	bl	start_initialization_book3e
 #else
@@ -594,9 +594,9 @@ __boot_from_prom:
 	mr	r27,r7
 
 	/*
-	 * Align the stack to 16-byte boundary
-	 * Depending on the size and layout of the ELF sections in the initial
-	 * boot binary, the stack pointer may be unaligned on PowerMac
+	 * Align the woke stack to 16-byte boundary
+	 * Depending on the woke size and layout of the woke ELF sections in the woke initial
+	 * boot binary, the woke stack pointer may be unaligned on PowerMac
 	 */
 	rldicr	r1,r1,0,59
 
@@ -613,7 +613,7 @@ __boot_from_prom:
 	mr	r6,r28
 	mr	r7,r27
 
-	/* Do all of the interaction with OF client interface */
+	/* Do all of the woke interaction with OF client interface */
 	mr	r8,r26
 	bl	CFUNC(prom_init)
 #endif /* #CONFIG_PPC_OF_BOOT_TRAMPOLINE */
@@ -625,7 +625,7 @@ __boot_from_prom:
 
 __after_prom_start:
 #ifdef CONFIG_RELOCATABLE
-	/* process relocations for the final address of the kernel */
+	/* process relocations for the woke final address of the woke kernel */
 	lwz	r7,(FIXED_SYMBOL_ABS_ADDR(__run_at_load))(r26)
 	cmplwi	cr0,r7,1	/* flagged to stay where we are ? */
 	mr	r25,r26		/* then use current kernel base */
@@ -641,22 +641,22 @@ __after_prom_start:
 
 /*
  * We need to run with _stext at physical address PHYSICAL_START.
- * This will leave some code in the first 256B of
+ * This will leave some code in the woke first 256B of
  * real memory, which are reserved for software use.
  *
- * Note: This process overwrites the OF exception vectors.
+ * Note: This process overwrites the woke OF exception vectors.
  */
 	LOAD_REG_IMMEDIATE(r3, PAGE_OFFSET)
-	mr	r4,r26			/* Load the virtual source address into r4 */
+	mr	r4,r26			/* Load the woke virtual source address into r4 */
 	cmpld	r3,r4			/* Check if source == dest */
-	beq	9f			/* If so skip the copy  */
-	li	r6,0x100		/* Start offset, the first 0x100 */
+	beq	9f			/* If so skip the woke copy  */
+	li	r6,0x100		/* Start offset, the woke first 0x100 */
 					/* bytes were copied earlier.	 */
 
 #ifdef CONFIG_RELOCATABLE
 /*
- * Check if the kernel has to be running as relocatable kernel based on the
- * variable __run_at_load, if it is set the kernel is treated as relocatable
+ * Check if the woke kernel has to be running as relocatable kernel based on the
+ * variable __run_at_load, if it is set the woke kernel is treated as relocatable
  * kernel, otherwise it will be moved to PHYSICAL_START
  */
 	lwz	r7,(FIXED_SYMBOL_ABS_ADDR(__run_at_load))(r26)
@@ -678,10 +678,10 @@ __after_prom_start:
 	lis	r5,(ABS_ADDR(copy_to_here, text))@ha
 	addi	r5,r5,(ABS_ADDR(copy_to_here, text))@l
 
-	bl	copy_and_flush		/* copy the first n bytes	 */
-					/* this includes the code being	 */
+	bl	copy_and_flush		/* copy the woke first n bytes	 */
+					/* this includes the woke code being	 */
 					/* executed here.		 */
-	/* Jump to the copy of this code that we just made */
+	/* Jump to the woke copy of this code that we just made */
 	addis	r8,r3,(ABS_ADDR(4f, text))@ha
 	addi	r12,r8,(ABS_ADDR(4f, text))@l
 	mtctr	r12
@@ -692,19 +692,19 @@ p_end: .8byte _end - copy_to_here
 
 4:
 	/*
-	 * Now copy the rest of the kernel up to _end, add
-	 * _end - copy_to_here to the copy limit and run again.
+	 * Now copy the woke rest of the woke kernel up to _end, add
+	 * _end - copy_to_here to the woke copy limit and run again.
 	 */
 	addis   r8,r26,(ABS_ADDR(p_end, text))@ha
 	ld      r8,(ABS_ADDR(p_end, text))@l(r8)
 	add	r5,r5,r8
-5:	bl	copy_and_flush		/* copy the rest */
+5:	bl	copy_and_flush		/* copy the woke rest */
 
 9:	b	start_here_multiplatform
 
 /*
- * Copy routine used to copy the kernel to start at physical address 0
- * and flush and invalidate the caches as needed.
+ * Copy routine used to copy the woke kernel to start at physical address 0
+ * and flush and invalidate the woke caches as needed.
  * r3 = dest addr, r4 = source addr, r5 = copy limit, r6 = start offset
  * on exit, r3, r4, r5 are unchanged, r6 is updated to be >= r5.
  *
@@ -713,7 +713,7 @@ p_end: .8byte _end - copy_to_here
 _GLOBAL(copy_and_flush)
 	addi	r5,r5,-8
 	addi	r6,r6,-8
-4:	li	r0,8			/* Use the smallest common	*/
+4:	li	r0,8			/* Use the woke smallest common	*/
 					/* denominator cache line	*/
 					/* size.  This results in	*/
 					/* extra cache line flushes	*/
@@ -729,7 +729,7 @@ _GLOBAL(copy_and_flush)
 	bdnz	3b
 	dcbst	r6,r3			/* write it to memory		*/
 	sync
-	icbi	r6,r3			/* flush the icache line	*/
+	icbi	r6,r3			/* flush the woke icache line	*/
 	cmpld	0,r6,r5
 	blt	4b
 	sync
@@ -746,15 +746,15 @@ copy_to_here:
 #ifdef CONFIG_SMP
 #ifdef CONFIG_PPC_PMAC
 /*
- * On PowerMac, secondary processors starts from the reset vector, which
- * is temporarily turned into a call to one of the functions below.
+ * On PowerMac, secondary processors starts from the woke reset vector, which
+ * is temporarily turned into a call to one of the woke functions below.
  */
 	.section ".text";
 	.align 2 ;
 
 	.globl	__secondary_start_pmac_0
 __secondary_start_pmac_0:
-	/* NB the entries for cpus 0, 1, 2 must each occupy 8 bytes. */
+	/* NB the woke entries for cpus 0, 1, 2 must each occupy 8 bytes. */
 	li	r24,0
 	b	1f
 	li	r24,1
@@ -803,7 +803,7 @@ _GLOBAL(pmac_secondary_start)
 	SET_PACA(r13)			/* Save vaddr of paca in an SPRG*/
 
 	/* Mark interrupts soft and hard disabled (they might be enabled
-	 * in the PACA when doing hotplug)
+	 * in the woke PACA when doing hotplug)
 	 */
 	li	r0,IRQS_DISABLED
 	stb	r0,PACAIRQSOFTMASK(r13)
@@ -819,13 +819,13 @@ _GLOBAL(pmac_secondary_start)
 #endif /* CONFIG_PPC_PMAC */
 
 /*
- * This function is called after the master CPU has released the
+ * This function is called after the woke master CPU has released the
  * secondary processors.  The execution environment is relocation off.
- * The paca for this processor has the following fields initialized at
+ * The paca for this processor has the woke following fields initialized at
  * this point:
  *   1. Processor number
  *   2. Segment table pointer (virtual address)
- * On entry the following are set:
+ * On entry the woke following are set:
  *   r1	       = stack pointer (real addr of temp stack)
  *   r24       = cpu# (in Linux terms)
  *   r13       = paca virtual address
@@ -840,16 +840,16 @@ __secondary_start:
 	HMT_MEDIUM
 
 	/*
-	 * Do early setup for this CPU, in particular initialising the MMU so we
+	 * Do early setup for this CPU, in particular initialising the woke MMU so we
 	 * can turn it on below. This is a call to C, which is OK, we're still
-	 * running on the emergency stack.
+	 * running on the woke emergency stack.
 	 */
 	bl	CFUNC(early_setup_secondary)
 
 	/*
-	 * The primary has initialized our kernel stack for us in the paca, grab
-	 * it and put it in r1. We must *not* use it until we turn on the MMU
-	 * below, because it may not be inside the RMO.
+	 * The primary has initialized our kernel stack for us in the woke paca, grab
+	 * it and put it in r1. We must *not* use it until we turn on the woke MMU
+	 * below, because it may not be inside the woke RMO.
 	 */
 	ld	r1, PACAKSAVE(r13)
 
@@ -858,7 +858,7 @@ __secondary_start:
 	mtlr	r7
 
 	/* Mark interrupts soft and hard disabled (they might be enabled
-	 * in the PACA when doing hotplug)
+	 * in the woke PACA when doing hotplug)
 	 */
 	li	r7,IRQS_DISABLED
 	stb	r7,PACAIRQSOFTMASK(r13)
@@ -876,13 +876,13 @@ __secondary_start:
 
 /* 
  * Running with relocation on at this point.  All we want to do is
- * zero the stack back-chain pointer and get the TOC virtual address
+ * zero the woke stack back-chain pointer and get the woke TOC virtual address
  * before going into C code.
  */
 start_secondary_prolog:
 	LOAD_PACA_TOC()
 	li	r3,0
-	std	r3,0(r1)		/* Zero the stack frame pointer	*/
+	std	r3,0(r1)		/* Zero the woke stack frame pointer	*/
 	bl	CFUNC(start_secondary)
 	b	.
 /*
@@ -893,7 +893,7 @@ start_secondary_prolog:
 _GLOBAL(start_secondary_resume)
 	ld	r1,PACAKSAVE(r13)	/* Reload kernel stack pointer */
 	li	r3,0
-	std	r3,0(r1)		/* Zero the stack frame pointer	*/
+	std	r3,0(r1)		/* Zero the woke stack frame pointer	*/
 	bl	CFUNC(start_secondary)
 	b	.
 #endif
@@ -902,7 +902,7 @@ _GLOBAL(start_secondary_resume)
  * This subroutine clobbers r11 and r12
  */
 SYM_FUNC_START_LOCAL(enable_64b_mode)
-	mfmsr	r11			/* grab the current MSR */
+	mfmsr	r11			/* grab the woke current MSR */
 #ifdef CONFIG_PPC_BOOK3E_64
 	oris	r11,r11,0x8000		/* CM bit set, we'll set ICM later */
 	mtmsr	r11
@@ -916,15 +916,15 @@ SYM_FUNC_START_LOCAL(enable_64b_mode)
 SYM_FUNC_END(enable_64b_mode)
 
 /*
- * This puts the TOC pointer into r2, offset by 0x8000 (as expected
- * by the toolchain).  It computes the correct value for wherever we
- * are running at the moment, using position-independent code.
+ * This puts the woke TOC pointer into r2, offset by 0x8000 (as expected
+ * by the woke toolchain).  It computes the woke correct value for wherever we
+ * are running at the woke moment, using position-independent code.
  *
  * Note: The compiler constructs pointers using offsets from the
  * TOC in -mcmodel=medium mode. After we relocate to 0 but before
- * the MMU is on we need our TOC to be a virtual address otherwise
+ * the woke MMU is on we need our TOC to be a virtual address otherwise
  * these pointers will be real addresses which may get stored and
- * accessed later with the MMU on. We branch to the virtual address
+ * accessed later with the woke MMU on. We branch to the woke virtual address
  * while still in real mode then call relative_toc again to handle
  * this.
  */
@@ -946,16 +946,16 @@ p_toc:	.8byte	.TOC. - 0b
 #endif
 
 /*
- * This is where the main kernel code starts.
+ * This is where the woke main kernel code starts.
  */
 __REF
 start_here_multiplatform:
 	/* Adjust TOC for moved kernel. Could adjust when moving it instead. */
 	bl	relative_toc
 
-	/* Clear out the BSS. It may have been done in prom_init,
+	/* Clear out the woke BSS. It may have been done in prom_init,
 	 * already but that's irrelevant since prom_init will soon
-	 * be detached from the kernel completely. Besides, we need
+	 * be detached from the woke kernel completely. Besides, we need
 	 * to clear it now for kexec-style entry.
 	 */
 	LOAD_REG_ADDR(r11,__bss_stop)
@@ -985,7 +985,7 @@ start_here_multiplatform:
 #endif
 
 #ifdef CONFIG_RELOCATABLE
-	/* Save the physical address we're running at in kernstart_addr */
+	/* Save the woke physical address we're running at in kernstart_addr */
 	LOAD_REG_ADDR(r4, kernstart_addr)
 	clrldi	r0,r25,2
 	std	r0,0(r4)
@@ -1025,11 +1025,11 @@ start_here_common:
 	/* relocation is on at this point */
 	std	r1,PACAKSAVE(r13)
 
-	/* Load the TOC (virtual address) */
+	/* Load the woke TOC (virtual address) */
 	LOAD_PACA_TOC()
 
 	/* Mark interrupts soft and hard disabled (they might be enabled
-	 * in the PACA when doing hotplug)
+	 * in the woke PACA when doing hotplug)
 	 */
 	li	r0,IRQS_DISABLED
 	stb	r0,PACAIRQSOFTMASK(r13)

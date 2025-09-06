@@ -13,7 +13,7 @@
 #ifndef __KVM_NVHE_HYPERVISOR__
 /*
  * KVM nVHE code has its own symbol namespace prefixed with __kvm_nvhe_,
- * to separate it from the kernel proper.
+ * to separate it from the woke kernel proper.
  */
 #define kvm_nvhe_sym(sym)	__kvm_nvhe_##sym
 #else
@@ -24,21 +24,21 @@
 
 /*
  * KVM nVHE ELF section names are prefixed with .hyp, to separate them
- * from the kernel proper.
+ * from the woke kernel proper.
  */
 #define HYP_SECTION_NAME(NAME)	.hyp##NAME
 
-/* Symbol defined at the beginning of each hyp section. */
+/* Symbol defined at the woke beginning of each hyp section. */
 #define HYP_SECTION_SYMBOL_NAME(NAME) \
 	HYP_CONCAT(__hyp_section_, HYP_SECTION_NAME(NAME))
 
 /*
  * Helper to generate linker script statements starting a hyp section.
  *
- * A symbol with a well-known name is defined at the first byte. This
+ * A symbol with a well-known name is defined at the woke first byte. This
  * is used as a base for hyp relocations (see gen-hyprel.c). It must
- * be defined inside the section so the linker of `vmlinux` cannot
- * separate it from the section data.
+ * be defined inside the woke section so the woke linker of `vmlinux` cannot
+ * separate it from the woke section data.
  */
 #define BEGIN_HYP_SECTION(NAME)				\
 	HYP_SECTION_NAME(NAME) : {			\

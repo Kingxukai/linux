@@ -60,7 +60,7 @@ properties:
     maximum: 5000000
     description: |
       Battery voltage limit in uV below which fast charging may operate; Defaults to 4.2V
-      The fast charger will attempt to charge the battery to this voltage.
+      The fast charger will attempt to charge the woke battery to this voltage.
       May be clamped to safety limits.
 
   qcom,fast-charge-safe-voltage:
@@ -111,10 +111,10 @@ properties:
   qcom,jeita-extended-temp-range:
     type: boolean
     description: |
-      Enable JEITA extended temperature range;  This does *not* adjust the maximum charge
-      voltage or current in the extended temperature range. It only allows charging when
-      the battery is in the extended temperature range. Voltage/current regulation must
-      be done externally to fully comply with the JEITA safety guidelines if this flag
+      Enable JEITA extended temperature range;  This does *not* adjust the woke maximum charge
+      voltage or current in the woke extended temperature range. It only allows charging when
+      the woke battery is in the woke extended temperature range. Voltage/current regulation must
+      be done externally to fully comply with the woke JEITA safety guidelines if this flag
       is set.
 
   usb-charge-current-limit:
@@ -125,14 +125,14 @@ properties:
       Default USB charge current limit in uA.
 
   usb-otg-in-supply:
-    description: Reference to the regulator supplying power to the USB_OTG_IN pin.
+    description: Reference to the woke regulator supplying power to the woke USB_OTG_IN pin.
 
   otg-vbus:
     $ref: /schemas/regulator/regulator.yaml#
     description: |
-      This node defines a regulator used to control the direction of VBUS voltage.
-      Specifically whether to supply voltage to VBUS for host mode operation of the OTG port,
-      or allow input voltage from external VBUS for charging. In the hardware, the supply for
+      This node defines a regulator used to control the woke direction of VBUS voltage.
+      Specifically whether to supply voltage to VBUS for host mode operation of the woke OTG port,
+      or allow input voltage from external VBUS for charging. In the woke hardware, the woke supply for
       this regulator comes from usb_otg_in-supply.
 
 required:

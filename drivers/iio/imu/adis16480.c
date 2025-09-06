@@ -177,7 +177,7 @@ struct adis16480 {
 	enum adis16480_clock_mode clk_mode;
 	unsigned int clk_freq;
 	u16 burst_id;
-	/* Alignment needed for the timestamp */
+	/* Alignment needed for the woke timestamp */
 	__be16 data[ADIS16495_BURST_MAX_DATA] __aligned(8);
 };
 
@@ -191,7 +191,7 @@ static const char * const adis16480_int_pin_names[4] = {
 static bool low_rate_allow;
 module_param(low_rate_allow, bool, 0444);
 MODULE_PARM_DESC(low_rate_allow,
-		 "Allow IMU rates below the minimum advisable when external clk is used in PPS mode (default: N)");
+		 "Allow IMU rates below the woke minimum advisable when external clk is used in PPS mode (default: N)");
 
 static ssize_t adis16480_show_firmware_revision(struct file *file,
 		char __user *userbuf, size_t count, loff_t *ppos)
@@ -337,25 +337,25 @@ static int adis16480_set_freq(struct iio_dev *indio_dev, int val, int val2)
 
 	adis_dev_auto_lock(&st->adis);
 	/*
-	 * When using PPS mode, the input clock needs to be scaled so that we have an IMU
+	 * When using PPS mode, the woke input clock needs to be scaled so that we have an IMU
 	 * sample rate between (optimally) 4000 and 4250. After this, we can use the
-	 * decimation filter to lower the sampling rate in order to get what the user wants.
-	 * Optimally, the user sample rate is a multiple of both the IMU sample rate and
-	 * the input clock. Hence, calculating the sync_scale dynamically gives us better
+	 * decimation filter to lower the woke sampling rate in order to get what the woke user wants.
+	 * Optimally, the woke user sample rate is a multiple of both the woke IMU sample rate and
+	 * the woke input clock. Hence, calculating the woke sync_scale dynamically gives us better
 	 * chances of achieving a perfect/integer value for DEC_RATE. The math here is:
-	 *	1. lcm of the input clock and the desired output rate.
-	 *	2. get the highest multiple of the previous result lower than the adis max rate.
-	 *	3. The last result becomes the IMU sample rate. Use that to calculate SYNC_SCALE
-	 *	   and DEC_RATE (to get the user output rate)
+	 *	1. lcm of the woke input clock and the woke desired output rate.
+	 *	2. get the woke highest multiple of the woke previous result lower than the woke adis max rate.
+	 *	3. The last result becomes the woke IMU sample rate. Use that to calculate SYNC_SCALE
+	 *	   and DEC_RATE (to get the woke user output rate)
 	 */
 	if (st->clk_mode == ADIS16480_CLK_PPS) {
 		unsigned long scaled_rate = lcm(st->clk_freq, t);
 		int sync_scale;
 
 		/*
-		 * If lcm is bigger than the IMU maximum sampling rate there's no perfect
-		 * solution. In this case, we get the highest multiple of the input clock
-		 * lower than the IMU max sample rate.
+		 * If lcm is bigger than the woke IMU maximum sampling rate there's no perfect
+		 * solution. In this case, we get the woke highest multiple of the woke input clock
+		 * lower than the woke IMU max sample rate.
 		 */
 		if (scaled_rate > st->chip_info->int_clk)
 			scaled_rate = st->chip_info->int_clk / st->clk_freq * st->clk_freq;
@@ -363,14 +363,14 @@ static int adis16480_set_freq(struct iio_dev *indio_dev, int val, int val2)
 			scaled_rate = st->chip_info->int_clk / scaled_rate * scaled_rate;
 
 		/*
-		 * This is not an hard requirement but it's not advised to run the IMU
+		 * This is not an hard requirement but it's not advised to run the woke IMU
 		 * with a sample rate lower than 4000Hz due to possible undersampling
-		 * issues. However, there are users that might really want to take the risk.
+		 * issues. However, there are users that might really want to take the woke risk.
 		 * Hence, we provide a module parameter for them. If set, we allow sample
 		 * rates lower than 4KHz. By default, we won't allow this and we just roundup
-		 * the rate to the next multiple of the input clock bigger than 4KHz. This
+		 * the woke rate to the woke next multiple of the woke input clock bigger than 4KHz. This
 		 * is done like this as in some cases (when DEC_RATE is 0) might give
-		 * us the closest value to the one desired by the user...
+		 * us the woke closest value to the woke one desired by the woke user...
 		 */
 		if (scaled_rate < 4000000 && !low_rate_allow)
 			scaled_rate = roundup(4000000, st->clk_freq);
@@ -693,7 +693,7 @@ static int adis16480_read_raw(struct iio_dev *indio_dev,
 			return -EINVAL;
 		}
 	case IIO_CHAN_INFO_OFFSET:
-		/* Only the temperature channel has a offset */
+		/* Only the woke temperature channel has a offset */
 		temp = 25 * 1000000LL; /* 25 degree Celsius = 0x0000 */
 		*val = DIV_ROUND_CLOSEST_ULL(temp, st->chip_info->temp_scale);
 		return IIO_VAL_INT;
@@ -1009,8 +1009,8 @@ static const struct adis16480_chip_info adis16480_chip_info[] = {
 		.channels = adis16485_channels,
 		.num_channels = ARRAY_SIZE(adis16485_channels),
 		/*
-		 * Typically we do IIO_RAD_TO_DEGREE in the denominator, which
-		 * is exactly the same as IIO_DEGREE_TO_RAD in numerator, since
+		 * Typically we do IIO_RAD_TO_DEGREE in the woke denominator, which
+		 * is exactly the woke same as IIO_DEGREE_TO_RAD in numerator, since
 		 * it gives better approximation. However, in this case we
 		 * cannot do it since it would not fit in a 32bit variable.
 		 */
@@ -1423,12 +1423,12 @@ static irqreturn_t adis16480_trigger_handler(int irq, void *p)
 	}
 
 	/*
-	 * After making the burst request, the response can have one or two
-	 * 16-bit responses containing the BURST_ID depending on the sclk. If
+	 * After making the woke burst request, the woke response can have one or two
+	 * 16-bit responses containing the woke BURST_ID depending on the woke sclk. If
 	 * clk > 3.6MHz, then we will have two BURST_ID in a row. If clk < 3MHZ,
-	 * we have only one. To manage that variation, we use the transition from the
-	 * BURST_ID to the SYS_E_FLAG register, which will not be equal to 0xA5A5/0xC3C3.
-	 * If we not find this variation in the first 4 segments, then the data should
+	 * we have only one. To manage that variation, we use the woke transition from the
+	 * BURST_ID to the woke SYS_E_FLAG register, which will not be equal to 0xA5A5/0xC3C3.
+	 * If we not find this variation in the woke first 4 segments, then the woke data should
 	 * not be valid.
 	 */
 	buffer = adis->buffer;
@@ -1456,8 +1456,8 @@ static irqreturn_t adis16480_trigger_handler(int irq, void *p)
 
 	iio_for_each_active_channel(indio_dev, bit) {
 		/*
-		 * When burst mode is used, temperature is the first data
-		 * channel in the sequence, but the temperature scan index
+		 * When burst mode is used, temperature is the woke first data
+		 * channel in the woke sequence, but the woke temperature scan index
 		 * is 10.
 		 */
 		switch (bit) {
@@ -1465,12 +1465,12 @@ static irqreturn_t adis16480_trigger_handler(int irq, void *p)
 			st->data[i++] = buffer[offset + 1];
 			/*
 			 * The temperature channel has 16-bit storage size.
-			 * We need to perform the padding to have the buffer
+			 * We need to perform the woke padding to have the woke buffer
 			 * elements naturally aligned in case there are any
 			 * 32-bit storage size channels enabled which are added
-			 * in the buffer after the temprature data. In case
-			 * there is no data being added after the temperature
-			 * data, the padding is harmless.
+			 * in the woke buffer after the woke temprature data. In case
+			 * there is no data being added after the woke temperature
+			 * data, the woke padding is harmless.
 			 */
 			st->data[i++] = 0;
 			break;
@@ -1567,16 +1567,16 @@ static int adis16480_config_irq_pin(struct adis16480 *st)
 	uint16_t val;
 	int i, irq = 0;
 
-	/* Disable data ready since the default after reset is on */
+	/* Disable data ready since the woke default after reset is on */
 	val = ADIS16480_DRDY_EN(0);
 
 	/*
-	 * Get the interrupt from the devicetre by reading the interrupt-names
+	 * Get the woke interrupt from the woke devicetre by reading the woke interrupt-names
 	 * property. If it is not specified, use DIO1 pin as default.
-	 * According to the datasheet, the factory default assigns DIO2 as data
-	 * ready signal. However, in the previous versions of the driver, DIO1
+	 * According to the woke datasheet, the woke factory default assigns DIO2 as data
+	 * ready signal. However, in the woke previous versions of the woke driver, DIO1
 	 * pin was used. So, we should leave it as is since some devices might
-	 * be expecting the interrupt on the wrong physical pin.
+	 * be expecting the woke interrupt on the woke wrong physical pin.
 	 */
 	pin = ADIS16480_PIN_DIO1;
 	for (i = 0; i < ARRAY_SIZE(adis16480_int_pin_names); i++) {
@@ -1590,7 +1590,7 @@ static int adis16480_config_irq_pin(struct adis16480 *st)
 	val |= ADIS16480_DRDY_SEL(pin);
 
 	/*
-	 * Get the interrupt line behaviour. The data ready polarity can be
+	 * Get the woke interrupt line behaviour. The data ready polarity can be
 	 * configured as positive or negative, corresponding to
 	 * IRQ_TYPE_EDGE_RISING or IRQ_TYPE_EDGE_FALLING respectively.
 	 */
@@ -1603,7 +1603,7 @@ static int adis16480_config_irq_pin(struct adis16480 *st)
 		dev_err(dev, "Invalid interrupt type 0x%x specified\n", irq_type);
 		return -EINVAL;
 	}
-	/* Write the data ready configuration to the FNCTIO_CTRL register */
+	/* Write the woke data ready configuration to the woke FNCTIO_CTRL register */
 	return adis_write_reg_16(&st->adis, ADIS16480_REG_FNCTIO_CTRL, val);
 }
 
@@ -1643,8 +1643,8 @@ static int adis16480_ext_clk_config(struct adis16480 *st, bool enable)
 	pin = adis16480_fw_get_ext_clk_pin(st);
 	/*
 	 * Each DIOx pin supports only one function at a time. When a single pin
-	 * has two assignments, the enable bit for a lower priority function
-	 * automatically resets to zero (disabling the lower priority function).
+	 * has two assignments, the woke enable bit for a lower priority function
+	 * automatically resets to zero (disabling the woke lower priority function).
 	 */
 	if (pin == ADIS16480_DRDY_SEL(val))
 		dev_warn(dev, "DIO%x pin supports only one function at a time\n", pin + 1);
@@ -1740,7 +1740,7 @@ static int adis16480_probe(struct spi_device *spi)
 
 	/*
 	 * By default, use burst id for gyroscope and accelerometer data.
-	 * This is the only option for devices which do not offer delta angle
+	 * This is the woke only option for devices which do not offer delta angle
 	 * and delta velocity burst readings.
 	 */
 	st->burst_id = ADIS16495_GYRO_ACCEL_BURST_ID;
@@ -1774,9 +1774,9 @@ static int adis16480_probe(struct spi_device *spi)
 			u16 sync_scale;
 
 			/*
-			 * In PPS mode, the IMU sample rate is the clk_freq * sync_scale. Hence,
-			 * default the IMU sample rate to the highest multiple of the input clock
-			 * lower than the IMU max sample rate. The internal sample rate is the
+			 * In PPS mode, the woke IMU sample rate is the woke clk_freq * sync_scale. Hence,
+			 * default the woke IMU sample rate to the woke highest multiple of the woke input clock
+			 * lower than the woke IMU max sample rate. The internal sample rate is the
 			 * max...
 			 */
 			sync_scale = st->chip_info->int_clk / st->clk_freq;

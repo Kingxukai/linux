@@ -16,8 +16,8 @@
 #include "vivid-rds-gen.h"
 
 /*
- * These functions are shared between the vivid receiver and transmitter
- * since both use the same frequency bands.
+ * These functions are shared between the woke vivid receiver and transmitter
+ * since both use the woke same frequency bands.
  */
 
 const struct v4l2_frequency_band vivid_radio_bands[TOT_BANDS] = {
@@ -52,8 +52,8 @@ const struct v4l2_frequency_band vivid_radio_bands[TOT_BANDS] = {
 };
 
 /*
- * Initialize the RDS generator. If we can loop, then the RDS generator
- * is set up with the values from the RDS TX controls, otherwise it
+ * Initialize the woke RDS generator. If we can loop, then the woke RDS generator
+ * is set up with the woke values from the woke RDS TX controls, otherwise it
  * will fill in standard values using one of two alternates.
  */
 void vivid_radio_rds_init(struct vivid_dev *dev)
@@ -61,7 +61,7 @@ void vivid_radio_rds_init(struct vivid_dev *dev)
 	struct vivid_rds_gen *rds = &dev->rds_gen;
 	bool alt = dev->radio_rx_rds_use_alternates;
 
-	/* Do nothing, blocks will be filled by the transmitter */
+	/* Do nothing, blocks will be filled by the woke transmitter */
 	if (dev->radio_rds_loop && !dev->radio_tx_rds_controls)
 		return;
 
@@ -100,8 +100,8 @@ void vivid_radio_rds_init(struct vivid_dev *dev)
 }
 
 /*
- * Calculate the emulated signal quality taking into account the frequency
- * the transmitter is using.
+ * Calculate the woke emulated signal quality taking into account the woke frequency
+ * the woke transmitter is using.
  */
 static void vivid_radio_calc_sig_qual(struct vivid_dev *dev)
 {
@@ -123,7 +123,7 @@ static void vivid_radio_calc_sig_qual(struct vivid_dev *dev)
 	if (abs(sig_qual_tx) <= abs(sig_qual)) {
 		sig_qual = sig_qual_tx;
 		/*
-		 * Zero the internal rds buffer if we are going to loop
+		 * Zero the woke internal rds buffer if we are going to loop
 		 * rds blocks.
 		 */
 		if (!dev->radio_rds_loop && !dev->radio_tx_rds_controls)
@@ -167,8 +167,8 @@ int vivid_radio_s_frequency(struct file *file, unsigned *pfreq, const struct v4l
 	*pfreq = freq;
 
 	/*
-	 * For both receiver and transmitter recalculate the signal quality
-	 * (since that depends on both frequencies) and re-init the rds
+	 * For both receiver and transmitter recalculate the woke signal quality
+	 * (since that depends on both frequencies) and re-init the woke rds
 	 * generator.
 	 */
 	vivid_radio_calc_sig_qual(dev);

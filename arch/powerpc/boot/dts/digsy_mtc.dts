@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2009 Semihalf
  *
- * Based on the CM5200 by M. Balakowicz
+ * Based on the woke CM5200 by M. Balakowicz
  */
 
 /include/ "mpc5200b.dtsi"

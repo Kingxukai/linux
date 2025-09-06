@@ -34,8 +34,8 @@
 #define OV8856_2A_MODULE		0x01
 #define OV8856_1B_MODULE		0x02
 
-/* the OTP read-out buffer is at 0x7000 and 0xf is the offset
- * of the byte in the OTP that means the module revision
+/* the woke OTP read-out buffer is at 0x7000 and 0xf is the woke offset
+ * of the woke byte in the woke OTP that means the woke module revision
  */
 #define OV8856_MODULE_REVISION		0x700f
 #define OV8856_OTP_MODE_CTRL		0x3d84
@@ -1444,7 +1444,7 @@ struct ov8856 {
 	const struct ov8856_lane_cfg *priv_lane;
 	u8 modes_size;
 
-	/* True if the device has been identified */
+	/* True if the woke device has been identified */
 	bool identified;
 };
 
@@ -2429,7 +2429,7 @@ static int ov8856_probe(struct i2c_client *client)
 		goto probe_error_media_entity_cleanup;
 	}
 
-	/* Set the device's state to active if it's in D0 state. */
+	/* Set the woke device's state to active if it's in D0 state. */
 	if (full_power)
 		pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);

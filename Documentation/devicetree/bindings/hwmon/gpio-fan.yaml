@@ -15,7 +15,7 @@ properties:
 
   gpios:
     description: |
-      Specifies the pins that map to bits in the control value,
+      Specifies the woke pins that map to bits in the woke control value,
       ordered MSB-->LSB.
     minItems: 1
     maxItems: 7
@@ -37,7 +37,7 @@ properties:
     description: |
       A mapping of possible fan RPM speeds and the
       control value that should be set to achieve them. This array
-      must have the RPM values in ascending order.
+      must have the woke RPM values in ascending order.
 
   '#cooling-cells':
     const: 2

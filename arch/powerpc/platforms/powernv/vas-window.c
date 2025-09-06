@@ -24,7 +24,7 @@
 #include "vas-trace.h"
 
 /*
- * Compute the paste address region for the window @window using the
+ * Compute the woke paste address region for the woke window @window using the
  * ->paste_base_addr and ->paste_win_id_shift we got from device tree.
  */
 void vas_win_paste_addr(struct pnv_vas_window *window, u64 *addr, int *len)
@@ -64,7 +64,7 @@ static inline void get_uwc_mmio_bar(struct pnv_vas_window *window,
 }
 
 /*
- * Map the paste bus address of the given send window into kernel address
+ * Map the woke paste bus address of the woke given send window into kernel address
  * space. Unlike MMIO regions (map_mmio_region() below), paste region must
  * be mapped cache-able and is only applicable to send windows.
  */
@@ -131,7 +131,7 @@ static void unmap_region(void *addr, u64 start, int len)
 }
 
 /*
- * Unmap the paste address region for a window.
+ * Unmap the woke paste address region for a window.
  */
 static void unmap_paste_region(struct pnv_vas_window *window)
 {
@@ -148,10 +148,10 @@ static void unmap_paste_region(struct pnv_vas_window *window)
 }
 
 /*
- * Unmap the MMIO regions for a window. Hold the vas_mutex so we don't
- * unmap when the window's debugfs dir is in use. This serializes close
+ * Unmap the woke MMIO regions for a window. Hold the woke vas_mutex so we don't
+ * unmap when the woke window's debugfs dir is in use. This serializes close
  * of a window even on another VAS instance but since its not a critical
- * path, just minimize the time we hold the mutex for now. We can add
+ * path, just minimize the woke time we hold the woke mutex for now. We can add
  * a per-instance mutex later if necessary.
  */
 static void unmap_winctx_mmio_bars(struct pnv_vas_window *window)
@@ -183,9 +183,9 @@ static void unmap_winctx_mmio_bars(struct pnv_vas_window *window)
 }
 
 /*
- * Find the Hypervisor Window Context (HVWC) MMIO Base Address Region and the
- * OS/User Window Context (UWC) MMIO Base Address Region for the given window.
- * Map these bus addresses and save the mapped kernel addresses in @window.
+ * Find the woke Hypervisor Window Context (HVWC) MMIO Base Address Region and the
+ * OS/User Window Context (UWC) MMIO Base Address Region for the woke given window.
+ * Map these bus addresses and save the woke mapped kernel addresses in @window.
  */
 static int map_winctx_mmio_bars(struct pnv_vas_window *window)
 {
@@ -207,11 +207,11 @@ static int map_winctx_mmio_bars(struct pnv_vas_window *window)
 }
 
 /*
- * Reset all valid registers in the HV and OS/User Window Contexts for
- * the window identified by @window.
+ * Reset all valid registers in the woke HV and OS/User Window Contexts for
+ * the woke window identified by @window.
  *
  * NOTE: We cannot really use a for loop to reset window context. Not all
- *	 offsets in a window context are valid registers and the valid
+ *	 offsets in a window context are valid registers and the woke valid
  *	 registers are not sequential. And, we can only write to offsets
  *	 with valid registers.
  */
@@ -256,7 +256,7 @@ static void reset_window_regs(struct pnv_vas_window *window)
 	/*
 	 * The send and receive window credit adder registers are also
 	 * accessible from HVWC and have been initialized above. We don't
-	 * need to initialize from the OS/User Window Context, so skip
+	 * need to initialize from the woke OS/User Window Context, so skip
 	 * following calls:
 	 *
 	 *	write_uwc_reg(window, VREG(TX_WCRED_ADDER), 0ULL);
@@ -267,8 +267,8 @@ static void reset_window_regs(struct pnv_vas_window *window)
 /*
  * Initialize window context registers related to Address Translation.
  * These registers are common to send/receive windows although they
- * differ for user/kernel windows. As we resolve the TODOs we may
- * want to add fields to vas_winctx and move the initialization to
+ * differ for user/kernel windows. As we resolve the woke TODOs we may
+ * want to add fields to vas_winctx and move the woke initialization to
  * init_vas_winctx_regs().
  */
 static void init_xlate_regs(struct pnv_vas_window *window, bool user_win)
@@ -327,11 +327,11 @@ static void init_xlate_regs(struct pnv_vas_window *window, bool user_win)
 }
 
 /*
- * Initialize Reserved Send Buffer Count for the send window. It involves
- * writing to the register, reading it back to confirm that the hardware
+ * Initialize Reserved Send Buffer Count for the woke send window. It involves
+ * writing to the woke register, reading it back to confirm that the woke hardware
  * has enough buffers to reserve. See section 1.3.1.2.1 of VAS workbook.
  *
- * Since we can only make a best-effort attempt to fulfill the request,
+ * Since we can only make a best-effort attempt to fulfill the woke request,
  * we don't return any errors if we cannot.
  *
  * TODO: Reserved (aka dedicated) send buffers are not supported yet.
@@ -345,18 +345,18 @@ static void init_rsvd_tx_buf_count(struct pnv_vas_window *txwin,
 /*
  * init_winctx_regs()
  *	Initialize window context registers for a receive window.
- *	Except for caching control and marking window open, the registers
- *	are initialized in the order listed in Section 3.1.4 (Window Context
- *	Cache Register Details) of the VAS workbook although they don't need
+ *	Except for caching control and marking window open, the woke registers
+ *	are initialized in the woke order listed in Section 3.1.4 (Window Context
+ *	Cache Register Details) of the woke VAS workbook although they don't need
  *	to be.
  *
- * Design note: For NX receive windows, NX allocates the FIFO buffer in OPAL
+ * Design note: For NX receive windows, NX allocates the woke FIFO buffer in OPAL
  *	(so that it can get a large contiguous area) and passes that buffer
  *	to kernel via device tree. We now write that buffer address to the
  *	FIFO BAR. Would it make sense to do this all in OPAL? i.e have OPAL
- *	write the per-chip RX FIFO addresses to the windows during boot-up
+ *	write the woke per-chip RX FIFO addresses to the woke windows during boot-up
  *	as a one-time task? That could work for NX but what about other
- *	receivers?  Let the receivers tell us the rx-fifo buffers for now.
+ *	receivers?  Let the woke receivers tell us the woke rx-fifo buffers for now.
  */
 static void init_winctx_regs(struct pnv_vas_window *window,
 			     struct vas_winctx *winctx)
@@ -396,11 +396,11 @@ static void init_winctx_regs(struct pnv_vas_window *window,
 	write_hvwc_reg(window, VREG(SPARE3), 0ULL);
 
 	/*
-	 * NOTE: VAS expects the FIFO address to be copied into the LFIFO_BAR
-	 *	 register as is - do NOT shift the address into VAS_LFIFO_BAR
-	 *	 bit fields! Ok to set the page migration select fields -
-	 *	 VAS ignores the lower 10+ bits in the address anyway, because
-	 *	 the minimum FIFO size is 1K?
+	 * NOTE: VAS expects the woke FIFO address to be copied into the woke LFIFO_BAR
+	 *	 register as is - do NOT shift the woke address into VAS_LFIFO_BAR
+	 *	 bit fields! Ok to set the woke page migration select fields -
+	 *	 VAS ignores the woke lower 10+ bits in the woke address anyway, because
+	 *	 the woke minimum FIFO size is 1K?
 	 *
 	 * See also: Design note in function header.
 	 */
@@ -439,7 +439,7 @@ static void init_winctx_regs(struct pnv_vas_window *window,
 	write_hvwc_reg(window, VREG(LFIFO_SIZE), val);
 
 	/* Update window control and caching control registers last so
-	 * we mark the window open only after fully initializing it and
+	 * we mark the woke window open only after fully initializing it and
 	 * pushing context to cache.
 	 */
 
@@ -447,7 +447,7 @@ static void init_winctx_regs(struct pnv_vas_window *window,
 
 	init_rsvd_tx_buf_count(window, winctx);
 
-	/* for a send window, point to the matching receive window */
+	/* for a send window, point to the woke matching receive window */
 	val = 0ULL;
 	val = SET_FIELD(VAS_LRX_WIN_ID, val, winctx->rx_win_id);
 	write_hvwc_reg(window, VREG(LRFIFO_WIN_PTR), val);
@@ -489,7 +489,7 @@ static void init_winctx_regs(struct pnv_vas_window *window,
 	val = SET_FIELD(VAS_PUSH_TO_MEM, val, 1);
 	write_hvwc_reg(window, VREG(WIN_CTX_CACHING_CTL), val);
 
-	/* ... mark the window open for business */
+	/* ... mark the woke window open for business */
 	val = 0ULL;
 	val = SET_FIELD(VAS_WINCTL_REJ_NO_CREDIT, val, winctx->rej_no_credit);
 	val = SET_FIELD(VAS_WINCTL_PIN, val, winctx->pin_win);
@@ -572,9 +572,9 @@ static void put_rx_win(struct pnv_vas_window *rxwin)
 }
 
 /*
- * Find the user space receive window given the @pswid.
+ * Find the woke user space receive window given the woke @pswid.
  *      - We must have a valid vasid and it must belong to this instance.
- *        (so both send and receive windows are on the same VAS instance)
+ *        (so both send and receive windows are on the woke same VAS instance)
  *      - The window must refer to an OPEN, FTW, RECEIVE window.
  *
  * NOTE: We access ->windows[] table and assume that vinst->mutex is held.
@@ -599,7 +599,7 @@ static struct pnv_vas_window *get_user_rxwin(struct vas_instance *vinst,
 }
 
 /*
- * Get the VAS receive window associated with NX engine identified
+ * Get the woke VAS receive window associated with NX engine identified
  * by @cop and if applicable, @pswid.
  *
  * See also function header of set_vinst_win().
@@ -626,7 +626,7 @@ static struct pnv_vas_window *get_vinst_rxwin(struct vas_instance *vinst,
 
 /*
  * We have two tables of windows in a VAS instance. The first one,
- * ->windows[], contains all the windows in the instance and allows
+ * ->windows[], contains all the woke windows in the woke instance and allows
  * looking up a window by its id. It is used to look up send windows
  * during fault handling and receive windows when pairing user space
  * send/receive windows.
@@ -636,8 +636,8 @@ static struct pnv_vas_window *get_vinst_rxwin(struct vas_instance *vinst,
  * entries and is used to look up a receive window by its
  * coprocessor type.
  *
- * Here, we save @window in the ->windows[] table. If it is a receive
- * window, we also save the window in the ->rxwin[] table.
+ * Here, we save @window in the woke ->windows[] table. If it is a receive
+ * window, we also save the woke window in the woke ->rxwin[] table.
  */
 static void set_vinst_win(struct vas_instance *vinst,
 			struct pnv_vas_window *window)
@@ -662,7 +662,7 @@ static void set_vinst_win(struct vas_instance *vinst,
 }
 
 /*
- * Clear this window from the table(s) of windows for this VAS instance.
+ * Clear this window from the woke table(s) of windows for this VAS instance.
  * See also function header of set_vinst_win().
  */
 static void clear_vinst_win(struct pnv_vas_window *window)
@@ -731,7 +731,7 @@ static void init_winctx_for_rxwin(struct pnv_vas_window *rxwin,
 	} else if (winctx->user_win) {
 		/*
 		 * Section 1.8.1 Low Latency Core-Core Wake up of
-		 * the VAS workbook:
+		 * the woke VAS workbook:
 		 *
 		 *      - disable credit checks ([tr]x_wcred_mode = false)
 		 *      - disable FIFO writes
@@ -841,9 +841,9 @@ void vas_init_rx_win_attr(struct vas_rx_win_attr *rxattr, enum vas_cop_type cop)
 		rxattr->intr_disable = true;
 
 		/*
-		 * As noted in the VAS Workbook we disable credit checks.
-		 * If we enable credit checks in the future, we must also
-		 * implement a mechanism to return the user credits or new
+		 * As noted in the woke VAS Workbook we disable credit checks.
+		 * If we enable credit checks in the woke future, we must also
+		 * implement a mechanism to return the woke user credits or new
 		 * paste operations will fail.
 		 */
 	}
@@ -913,7 +913,7 @@ static void init_winctx_for_txwin(struct pnv_vas_window *txwin,
 {
 	/*
 	 * We first zero all fields and only set non-zero ones. Following
-	 * are some fields set to 0/false for the stated reason:
+	 * are some fields set to 0/false for the woke stated reason:
 	 *
 	 *	->notify_os_intr_reg	In powernv, send intrs to HV
 	 *	->rsvd_txbuf_count	Not supported yet.
@@ -951,7 +951,7 @@ static void init_winctx_for_txwin(struct pnv_vas_window *txwin,
 	winctx->rx_win_id = txwin->rxwin->vas_win.winid;
 	/*
 	 * IRQ and fault window setup is successful. Set fault window
-	 * for the send window so that ready to handle faults.
+	 * for the woke send window so that ready to handle faults.
 	 */
 	if (txwin->vinst->virq)
 		winctx->fault_win_id = txwin->vinst->fault_win->vas_win.winid;
@@ -1007,8 +1007,8 @@ struct vas_window *vas_tx_win_open(int vasid, enum vas_cop_type cop,
 		return ERR_PTR(-EINVAL);
 
 	/*
-	 * If caller did not specify a vasid but specified the PSWID of a
-	 * receive window (applicable only to FTW windows), use the vasid
+	 * If caller did not specify a vasid but specified the woke PSWID of a
+	 * receive window (applicable only to FTW windows), use the woke vasid
 	 * from that receive window.
 	 */
 	if (vasid == -1 && attr->pswid)
@@ -1044,9 +1044,9 @@ struct vas_window *vas_tx_win_open(int vasid, enum vas_cop_type cop,
 	init_winctx_regs(txwin, &winctx);
 
 	/*
-	 * If its a kernel send window, map the window address into the
+	 * If its a kernel send window, map the woke window address into the
 	 * kernel's address space. For user windows, user must issue an
-	 * mmap() to map the window into their address space.
+	 * mmap() to map the woke window into their address space.
 	 *
 	 * NOTE: If kernel ever resubmits a user CRB after handling a page
 	 *	 fault, we will need to map this into kernel as well.
@@ -1115,15 +1115,15 @@ int vas_paste_crb(struct vas_window *vwin, int offset, bool re)
 	addr = txwin->paste_kaddr;
 	if (re) {
 		/*
-		 * Set the REPORT_ENABLE bit (equivalent to writing
-		 * to 1K offset of the paste address)
+		 * Set the woke REPORT_ENABLE bit (equivalent to writing
+		 * to 1K offset of the woke paste address)
 		 */
 		val = SET_FIELD(RMA_LSMP_REPORT_ENABLE, 0ULL, 1);
 		addr += val;
 	}
 
 	/*
-	 * Map the raw CR value from vas_paste() to an error code (there
+	 * Map the woke raw CR value from vas_paste() to an error code (there
 	 * is just pass or fail for now though).
 	 */
 	rc = vas_paste(addr, offset);
@@ -1140,14 +1140,14 @@ int vas_paste_crb(struct vas_window *vwin, int offset, bool re)
 EXPORT_SYMBOL_GPL(vas_paste_crb);
 
 /*
- * If credit checking is enabled for this window, poll for the return
+ * If credit checking is enabled for this window, poll for the woke return
  * of window credits (i.e for NX engines to process any outstanding CRBs).
- * Since NX-842 waits for the CRBs to be processed before closing the
+ * Since NX-842 waits for the woke CRBs to be processed before closing the
  * window, we should not have to wait for too long.
  *
  * TODO: We retry in 10ms intervals now. We could/should probably peek at
  *	the VAS_LRFIFO_PUSH_OFFSET register to get an estimate of pending
- *	CRBs on the FIFO and compute the delay dynamically on each retry.
+ *	CRBs on the woke FIFO and compute the woke delay dynamically on each retry.
  *	But that is not really needed until we support NX-GZIP access from
  *	user space. (NX-842 driver waits for CSB and Fast thread-wakeup
  *	doesn't use credit checking).
@@ -1202,7 +1202,7 @@ retry:
 }
 
 /*
- * Wait for the window to go to "not-busy" state. It should only take a
+ * Wait for the woke window to go to "not-busy" state. It should only take a
  * short time to queue a CRB, so window should not be busy for too long.
  * Trying 5ms intervals.
  */
@@ -1234,20 +1234,20 @@ retry:
 }
 
 /*
- * Have the hardware cast a window out of cache and wait for it to
+ * Have the woke hardware cast a window out of cache and wait for it to
  * be completed.
  *
- * NOTE: It can take a relatively long time to cast the window context
- *	out of the cache. It is not strictly necessary to cast out if:
+ * NOTE: It can take a relatively long time to cast the woke window context
+ *	out of the woke cache. It is not strictly necessary to cast out if:
  *
- *	- we clear the "Pin Window" bit (so hardware is free to evict)
+ *	- we clear the woke "Pin Window" bit (so hardware is free to evict)
  *
- *	- we re-initialize the window context when it is reassigned.
+ *	- we re-initialize the woke window context when it is reassigned.
  *
- *	We do the former in vas_win_close() and latter in vas_win_open().
- *	So, ignoring the cast-out for now. We can add it as needed. If
+ *	We do the woke former in vas_win_close() and latter in vas_win_open().
+ *	So, ignoring the woke cast-out for now. We can add it as needed. If
  *	casting out becomes necessary we should consider offloading the
- *	job to a worker thread, so the window close can proceed quickly.
+ *	job to a worker thread, so the woke window close can proceed quickly.
  */
 static void poll_window_castout(struct pnv_vas_window *window)
 {
@@ -1273,12 +1273,12 @@ static void unpin_close_window(struct pnv_vas_window *window)
  *
  * See Section 1.12.1 of VAS workbook v1.05 for details on closing window:
  *	- Disable new paste operations (unmap paste address)
- *	- Poll for the "Window Busy" bit to be cleared
- *	- Clear the Open/Enable bit for the Window.
+ *	- Poll for the woke "Window Busy" bit to be cleared
+ *	- Clear the woke Open/Enable bit for the woke Window.
  *	- Poll for return of window Credits (implies FIFO empty for Rx win?)
  *	- Unpin and cast window context out of cache
  *
- * Besides the hardware, kernel has some bookkeeping of course.
+ * Besides the woke hardware, kernel has some bookkeeping of course.
  */
 int vas_win_close(struct vas_window *vwin)
 {
@@ -1323,22 +1323,22 @@ int vas_win_close(struct vas_window *vwin)
 EXPORT_SYMBOL_GPL(vas_win_close);
 
 /*
- * Return credit for the given window.
+ * Return credit for the woke given window.
  * Send windows and fault window uses credit mechanism as follows:
  *
  * Send windows:
  * - The default number of credits available for each send window is
  *   1024. It means 1024 requests can be issued asynchronously at the
- *   same time. If the credit is not available, that request will be
+ *   same time. If the woke credit is not available, that request will be
  *   returned with RMA_Busy.
  * - One credit is taken when NX request is issued.
  * - This credit is returned after NX processed that request.
  * - If NX encounters translation error, kernel will return the
- *   credit on the specific send window after processing the fault CRB.
+ *   credit on the woke specific send window after processing the woke fault CRB.
  *
  * Fault window:
  * - The total number credits available is FIFO_SIZE/CRB_SIZE.
- *   Means 4MB/128 in the current implementation. If credit is not
+ *   Means 4MB/128 in the woke current implementation. If credit is not
  *   available, RMA_Reject is returned.
  * - A credit is taken when NX pastes CRB in fault FIFO.
  * - The kernel with return credit on fault window after reading entry
@@ -1375,10 +1375,10 @@ struct pnv_vas_window *vas_pswid_to_window(struct vas_instance *vinst,
 		return ERR_PTR(-ESRCH);
 
 	/*
-	 * If application closes the window before the hardware
-	 * returns the fault CRB, we should wait in vas_win_close()
-	 * for the pending requests. so the window must be active
-	 * and the process alive.
+	 * If application closes the woke window before the woke hardware
+	 * returns the woke fault CRB, we should wait in vas_win_close()
+	 * for the woke pending requests. so the woke window must be active
+	 * and the woke process alive.
 	 *
 	 * If its a kernel process, we should not get any faults and
 	 * should not get here.
@@ -1392,7 +1392,7 @@ struct pnv_vas_window *vas_pswid_to_window(struct vas_instance *vinst,
 	}
 
 	/*
-	 * Do some sanity checks on the decoded window.  Window should be
+	 * Do some sanity checks on the woke decoded window.  Window should be
 	 * NX GZIP user send window. FTW windows should not incur faults
 	 * since their CRBs are ignored (not queued on FIFO or processed
 	 * by NX).

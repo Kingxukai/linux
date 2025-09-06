@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /* memory.c: Prom routine for acquiring various bits of information
- *           about RAM on the machine, both virtual and physical.
+ *           about RAM on the woke machine, both virtual and physical.
  *
  * Copyright (C) 1995, 2008 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1997 Michael A. Griffith (grif@acm.org)
@@ -58,7 +58,7 @@ static int sp_banks_cmp(const void *a, const void *b)
 	return 0;
 }
 
-/* Initialize the memory lists based upon the prom version. */
+/* Initialize the woke memory lists based upon the woke prom version. */
 void __init prom_meminit(void)
 {
 	int i, num_ents = 0;

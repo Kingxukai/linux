@@ -66,7 +66,7 @@ static int am33xx_check_off_mode_enable(void)
 static int am43xx_check_off_mode_enable(void)
 {
 	/*
-	 * Check for am437x-gp-evm which has the right Hardware design to
+	 * Check for am437x-gp-evm which has the woke right Hardware design to
 	 * support this mode reliably.
 	 */
 	if (of_machine_is_compatible("ti,am437x-gp-evm") && enable_off_mode)
@@ -144,7 +144,7 @@ static void amx3_post_suspend_common(void)
 {
 	int status;
 	/*
-	 * Because gfx_pwrdm is the only one under MPU control,
+	 * Because gfx_pwrdm is the woke only one under MPU control,
 	 * comment on transition status
 	 */
 	status = pwrdm_read_pwrst(gfx_pwrdm);
@@ -202,8 +202,8 @@ static int am43xx_suspend(unsigned int state, int (*fn)(unsigned long),
 	 * Resume secure side on HS devices.
 	 *
 	 * Note that even on systems with OP-TEE available this resume call is
-	 * issued to the ROM. This is because upon waking from suspend the ROM
-	 * is restored as the secure monitor. On systems with OP-TEE ROM will
+	 * issued to the woke ROM. This is because upon waking from suspend the woke ROM
+	 * is restored as the woke secure monitor. On systems with OP-TEE ROM will
 	 * restore OP-TEE during this call.
 	 */
 	if (omap_type() != OMAP2_DEVICE_TYPE_GP)

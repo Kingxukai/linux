@@ -9,7 +9,7 @@
  */
 struct vme_master {
 	__u32 enable;		/* State of Window */
-	__u64 vme_addr;		/* Starting Address on the VMEbus */
+	__u64 vme_addr;		/* Starting Address on the woke VMEbus */
 	__u64 size;		/* Window Size */
 	__u32 aspace;		/* Address Space */
 	__u32 cycle;		/* Cycle properties */
@@ -31,7 +31,7 @@ struct vme_master {
 /* VMEbus Slave Window Configuration Structure */
 struct vme_slave {
 	__u32 enable;		/* State of Window */
-	__u64 vme_addr;		/* Starting Address on the VMEbus */
+	__u64 vme_addr;		/* Starting Address on the woke VMEbus */
 	__u64 size;		/* Window Size */
 	__u32 aspace;		/* Address Space */
 	__u32 cycle;		/* Cycle properties */

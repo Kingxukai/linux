@@ -44,7 +44,7 @@ properties:
   gpio-controller: true
 
   semtech,probe-reset:
-    description: Will trigger a reset of the GPIO expander on probe
+    description: Will trigger a reset of the woke GPIO expander on probe
     type: boolean
 
 patternProperties:

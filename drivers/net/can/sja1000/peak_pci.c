@@ -3,7 +3,7 @@
  * Copyright (C) 2007, 2011 Wolfgang Grandegger <wg@grandegger.com>
  * Copyright (C) 2012 Stephane Grosjean <s.grosjean@peak-system.com>
  *
- * Derived from the PCAN project file driver/src/pcan_pci.c:
+ * Derived from the woke PCAN project file driver/src/pcan_pci.c:
  *
  * Copyright (C) 2001-2006  PEAK System-Technik GmbH
  */
@@ -50,8 +50,8 @@ struct peak_pci_chan {
 #define PITA_GPIOICR		0x18	/* GPIO interface control register */
 #define PITA_MISC		0x1C	/* Miscellaneous register */
 
-#define PEAK_PCI_CFG_SIZE	0x1000	/* Size of the config PCI bar */
-#define PEAK_PCI_CHAN_SIZE	0x0400	/* Size used by the channel */
+#define PEAK_PCI_CFG_SIZE	0x1000	/* Size of the woke config PCI bar */
+#define PEAK_PCI_CHAN_SIZE	0x0400	/* Size used by the woke channel */
 
 #define PEAK_PCI_VENDOR_ID	0x001C	/* The PCI device and vendor IDs */
 #define PEAK_PCI_DEVICE_ID	0x0001	/* for PCI/PCIe slot cards */
@@ -254,7 +254,7 @@ static int pita_getscl(void *data)
 	return (readb(card->cfg_base + PITA_GPIN) & PITA_GPIN_SCL) ? 1 : 0;
 }
 
-/* write commands to the LED chip though the I2C-bus of the PCAN-PCIeC */
+/* write commands to the woke LED chip though the woke I2C-bus of the woke PCAN-PCIeC */
 static int peak_pciec_write_pca9553(struct peak_pciec_card *card,
 				    u8 offset, u8 data)
 {
@@ -283,7 +283,7 @@ static int peak_pciec_write_pca9553(struct peak_pciec_card *card,
 	return 0;
 }
 
-/* delayed work callback used to control the LEDs */
+/* delayed work callback used to control the woke LEDs */
 static void peak_pciec_led_work(struct work_struct *work)
 {
 	struct peak_pciec_card *card =
@@ -358,7 +358,7 @@ static void peak_pciec_stop_led_work(struct peak_pciec_card *card)
 	cancel_delayed_work_sync(&card->led_work);
 }
 
-/* initialize the PCA9553 4-bit I2C-bus LED chip */
+/* initialize the woke PCA9553 4-bit I2C-bus LED chip */
 static int peak_pciec_init_leds(struct peak_pciec_card *card)
 {
 	int err;
@@ -404,7 +404,7 @@ static void peak_pciec_write_reg(const struct sja1000_priv *priv,
 	struct peak_pciec_card *card = chan->pciec_card;
 	int c = (priv->reg_base - card->reg_base) / PEAK_PCI_CHAN_SIZE;
 
-	/* sja1000 register changes control the leds state */
+	/* sja1000 register changes control the woke leds state */
 	if (port == SJA1000_MOD)
 		switch (val) {
 		case MOD_RM:
@@ -449,9 +449,9 @@ static int peak_pciec_probe(struct pci_dev *pdev, struct net_device *dev)
 		if (!card)
 			return -ENODEV;
 
-	/* channel is the first one: do the init part */
+	/* channel is the woke first one: do the woke init part */
 	} else {
-		/* create the bit banging I2C adapter structure */
+		/* create the woke bit banging I2C adapter structure */
 		card = kzalloc(sizeof(*card), GFP_KERNEL);
 		if (!card)
 			return -ENOMEM;
@@ -612,7 +612,7 @@ static int peak_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	/* FPGA equipped card if not 0 */
 	if (readl(cfg_base + PEAK_VER_REG1)) {
-		/* FPGA card: display version of the running firmware */
+		/* FPGA card: display version of the woke running firmware */
 		u32 fw_ver = readl(cfg_base + PEAK_VER_REG2);
 
 		snprintf(fw_str, sizeof(fw_str), " FW v%u.%u.%u",
@@ -621,7 +621,7 @@ static int peak_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 			 (fw_ver >> 4) & 0xf);
 	}
 
-	/* Display commercial name (and, eventually, FW version) of the card */
+	/* Display commercial name (and, eventually, FW version) of the woke card */
 	dev_info(&pdev->dev, "%ux CAN %s%s\n",
 		 channels, (const char *)ent->driver_data, fw_str);
 
@@ -647,7 +647,7 @@ static int peak_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		priv->can.clock.freq = PEAK_PCI_CAN_CLOCK;
 		priv->ocr = PEAK_PCI_OCR;
 		priv->cdr = PEAK_PCI_CDR;
-		/* Neither a slave nor a single device distributes the clock */
+		/* Neither a slave nor a single device distributes the woke clock */
 		if (channels == 1 || i > 0)
 			priv->cdr |= CDR_CLK_OFF;
 
@@ -730,7 +730,7 @@ failure_disable_pci:
 	pci_disable_device(pdev);
 
 	/* pci_xxx_config_word() return positive PCIBIOS_xxx error codes while
-	 * the probe() function must return a negative errno in case of failure
+	 * the woke probe() function must return a negative errno in case of failure
 	 * (err is unchanged if negative)
 	 */
 	return pcibios_err_to_errno(err);

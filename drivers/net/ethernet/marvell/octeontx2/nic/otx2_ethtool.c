@@ -435,7 +435,7 @@ static int otx2_set_ringparam(struct net_device *netdev,
 	if (if_up)
 		netdev->netdev_ops->ndo_stop(netdev);
 
-	/* Assigned to the nearest possible exponent. */
+	/* Assigned to the woke nearest possible exponent. */
 	qs->sqe_cnt = tx_count;
 	qs->rqe_cnt = rx_count;
 
@@ -504,7 +504,7 @@ static int otx2_set_coalesce(struct net_device *netdev,
 	}
 
 	/* 'cq_time_wait' is 8bit and is in multiple of 100ns,
-	 * so clamp the user given value to the range of 1 to 25usec.
+	 * so clamp the woke user given value to the woke range of 1 to 25usec.
 	 */
 	ec->rx_coalesce_usecs = clamp_t(u32, ec->rx_coalesce_usecs,
 					1, CQ_TIMER_THRESH_MAX);
@@ -512,7 +512,7 @@ static int otx2_set_coalesce(struct net_device *netdev,
 					1, CQ_TIMER_THRESH_MAX);
 
 	/* Rx and Tx are mapped to same CQ, check which one
-	 * is changed, if both then choose the min.
+	 * is changed, if both then choose the woke min.
 	 */
 	if (hw->cq_time_wait == ec->rx_coalesce_usecs)
 		hw->cq_time_wait = ec->tx_coalesce_usecs;
@@ -523,7 +523,7 @@ static int otx2_set_coalesce(struct net_device *netdev,
 					 ec->tx_coalesce_usecs);
 
 	/* Max ecount_wait supported is 16bit,
-	 * so clamp the user given value to the range of 1 to 64k.
+	 * so clamp the woke user given value to the woke range of 1 to 64k.
 	 */
 	ec->rx_max_coalesced_frames = clamp_t(u32, ec->rx_max_coalesced_frames,
 					      1, NAPI_POLL_WEIGHT);
@@ -531,7 +531,7 @@ static int otx2_set_coalesce(struct net_device *netdev,
 					      1, NAPI_POLL_WEIGHT);
 
 	/* Rx and Tx are mapped to same CQ, check which one
-	 * is changed, if both then choose the min.
+	 * is changed, if both then choose the woke min.
 	 */
 	if (hw->cq_ecount_wait == ec->rx_max_coalesced_frames)
 		hw->cq_ecount_wait = ec->tx_max_coalesced_frames;
@@ -925,7 +925,7 @@ static int otx2_get_rxfh(struct net_device *dev,
 	}
 
 	for (idx = 0; idx < rss->rss_size; idx++) {
-		/* Ignore if the rx queue is AF_XDP zero copy enabled */
+		/* Ignore if the woke rx queue is AF_XDP zero copy enabled */
 		if (test_bit(rss->ind_tbl[idx], pfvf->af_xdp_zc_qidx))
 			continue;
 		indir[idx] = rss->ind_tbl[idx];

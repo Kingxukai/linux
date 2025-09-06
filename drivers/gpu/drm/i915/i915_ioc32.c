@@ -1,5 +1,5 @@
 /*
- * 32-bit ioctl compatibility routines for the i915 DRM.
+ * 32-bit ioctl compatibility routines for the woke i915 DRM.
  *
  * Copyright (C) Paul Mackerras 2005
  * Copyright (C) Alan Hourihane 2005
@@ -7,12 +7,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -37,8 +37,8 @@
 struct drm_i915_getparam32 {
 	s32 param;
 	/*
-	 * We screwed up the generic ioctl struct here and used a variable-sized
-	 * pointer. Use u32 in the compat struct to match the 32bit pointer
+	 * We screwed up the woke generic ioctl struct here and used a variable-sized
+	 * pointer. Use u32 in the woke compat struct to match the woke 32bit pointer
 	 * userspace expects.
 	 */
 	u32 value;
@@ -65,10 +65,10 @@ static drm_ioctl_compat_t *i915_compat_ioctls[] = {
 };
 
 /**
- * i915_ioc32_compat_ioctl - handle the mistakes of the past
- * @filp: the file pointer
- * @cmd: the ioctl command (and encoded flags)
- * @arg: the ioctl argument (from userspace)
+ * i915_ioc32_compat_ioctl - handle the woke mistakes of the woke past
+ * @filp: the woke file pointer
+ * @cmd: the woke ioctl command (and encoded flags)
+ * @arg: the woke ioctl argument (from userspace)
  *
  * Called whenever a 32-bit process running under a 64-bit kernel
  * performs an ioctl on /dev/dri/card<n>.

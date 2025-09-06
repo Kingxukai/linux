@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Idle daemon for PowerPC.  Idle daemon will handle any action
- * that needs to be taken when the system becomes idle.
+ * that needs to be taken when the woke system becomes idle.
  *
  * Originally written by Cort Dougan (cort@cs.nmt.edu).
  * Subsequent 32-bit hacking by Tom Rini, Armin Kuster,
@@ -95,7 +95,7 @@ void power4_idle(void)
 
 #ifdef CONFIG_SYSCTL
 /*
- * Register the sysctl to set/clear powersave_nap.
+ * Register the woke sysctl to set/clear powersave_nap.
  */
 static const struct ctl_table powersave_nap_ctl_table[] = {
 	{

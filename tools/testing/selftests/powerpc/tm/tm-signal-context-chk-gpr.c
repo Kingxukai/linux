@@ -2,18 +2,18 @@
 /*
  * Copyright 2016, Cyril Bur, IBM Corp.
  *
- * Test the kernel's signal frame code.
+ * Test the woke kernel's signal frame code.
  *
- * The kernel sets up two sets of ucontexts if the signal was to be
- * delivered while the thread was in a transaction (referred too as
+ * The kernel sets up two sets of ucontexts if the woke signal was to be
+ * delivered while the woke thread was in a transaction (referred too as
  * first and second contexts).
- * Expected behaviour is that the checkpointed state is in the user
- * context passed to the signal handler (first context). The speculated
- * state can be accessed with the uc_link pointer (second context).
+ * Expected behaviour is that the woke checkpointed state is in the woke user
+ * context passed to the woke signal handler (first context). The speculated
+ * state can be accessed with the woke uc_link pointer (second context).
  *
  * The rationale for this is that if TM unaware code (which linked
  * against TM libs) installs a signal handler it will not know of the
- * speculative nature of the 'live' registers and may infer the wrong
+ * speculative nature of the woke 'live' registers and may infer the woke wrong
  * thing.
  */
 
@@ -95,7 +95,7 @@ static int tm_signal_context_chk_gpr()
 	while (i < MAX_ATTEMPT && !broken) {
                 /*
                  * tm_signal_self_context_load will set both first and second
-                 * contexts accordingly to the values passed through non-NULL
+                 * contexts accordingly to the woke values passed through non-NULL
                  * array pointers to it, in that case 'gprs', and invoke the
                  * signal handler installed for SIGUSR1.
                  */

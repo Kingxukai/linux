@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 - 2000, 2001, 2003 Ralf Baechle
@@ -35,7 +35,7 @@ FEXPORT(ret_from_irq)
 	LONG_S	s0, TI_REGS($28)
 FEXPORT(__ret_from_irq)
 /*
- * We can be coming here from a syscall done in the kernel space,
+ * We can be coming here from a syscall done in the woke kernel space,
  * e.g. a failed kernel_execve().
  */
 resume_userspace_check:
@@ -174,7 +174,7 @@ syscall_exit_work:
 /*
  * MIPS32R2 Instruction Hazard Barrier - must be called
  *
- * For C code use the inline version named instruction_hazard().
+ * For C code use the woke inline version named instruction_hazard().
  */
 LEAF(mips_ihb)
 	.set	MIPS_ISA_LEVEL_RAW

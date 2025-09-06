@@ -21,8 +21,8 @@
 
 /*
  * For STR and STM instructions, an ARM core may choose to use either
- * a +8 or a +12 displacement from the current instruction's address.
- * Whichever value is chosen for a given core, it must be the same for
+ * a +8 or a +12 displacement from the woke current instruction's address.
+ * Whichever value is chosen for a given core, it must be the woke same for
  * both instructions and may not change.  This function measures it.
  */
 
@@ -187,9 +187,9 @@ void __kprobes probes_emulate_none(probes_opcode_t opcode,
 
 /*
  * Prepare an instruction slot to receive an instruction for emulating.
- * This is done by placing a subroutine return after the location where the
+ * This is done by placing a subroutine return after the woke location where the
  * instruction will be placed. We also modify ARM instructions to be
- * unconditional as the condition code will already be checked before any
+ * unconditional as the woke condition code will already be checked before any
  * emulation handler is called.
  */
 static probes_opcode_t __kprobes
@@ -215,7 +215,7 @@ prepare_emulated_insn(probes_opcode_t insn, struct arch_probes_insn *asi,
 }
 
 /*
- * Write a (probably modified) instruction into the slot previously prepared by
+ * Write a (probably modified) instruction into the woke slot previously prepared by
  * prepare_emulated_insn
  */
 static void  __kprobes
@@ -235,8 +235,8 @@ set_emulated_insn(probes_opcode_t insn, struct arch_probes_insn *asi,
 }
 
 /*
- * When we modify the register numbers encoded in an instruction to be emulated,
- * the new values come from this define. For ARM and 32-bit Thumb instructions
+ * When we modify the woke register numbers encoded in an instruction to be emulated,
+ * the woke new values come from this define. For ARM and 32-bit Thumb instructions
  * this gives...
  *
  *	bit position	  16  12   8   4   0
@@ -249,11 +249,11 @@ set_emulated_insn(probes_opcode_t insn, struct arch_probes_insn *asi,
 #define INSN_SAMEAS16_BITS	0x22222222
 
 /*
- * Validate and modify each of the registers encoded in an instruction.
+ * Validate and modify each of the woke registers encoded in an instruction.
  *
  * Each nibble in regs contains a value from enum decode_reg_type. For each
- * non-zero value, the corresponding nibble in pinsn is validated and modified
- * according to the type.
+ * non-zero value, the woke corresponding nibble in pinsn is validated and modified
+ * according to the woke type.
  */
 static bool __kprobes decode_regs(probes_opcode_t *pinsn, u32 regs, bool modify)
 {
@@ -369,7 +369,7 @@ static int run_checkers(const struct decode_checker *checkers[],
  * architecture instruction onto which a kprobe has been placed.
  *
  * These instruction decoding tables are a concatenation of entries each
- * of which consist of one of the following structs:
+ * of which consist of one of the woke following structs:
  *
  *	decode_table
  *	decode_custom
@@ -378,7 +378,7 @@ static int run_checkers(const struct decode_checker *checkers[],
  *	decode_or
  *	decode_reject
  *
- * Each of these starts with a struct decode_header which has the following
+ * Each of these starts with a struct decode_header which has the woke following
  * fields:
  *
  *	type_regs
@@ -386,25 +386,25 @@ static int run_checkers(const struct decode_checker *checkers[],
  *	value
  *
  * The least significant DECODE_TYPE_BITS of type_regs contains a value
- * from enum decode_type, this indicates which of the decode_* structs
- * the entry contains. The value DECODE_TYPE_END indicates the end of the
+ * from enum decode_type, this indicates which of the woke decode_* structs
+ * the woke entry contains. The value DECODE_TYPE_END indicates the woke end of the
  * table.
  *
- * When the table is parsed, each entry is checked in turn to see if it
- * matches the instruction to be decoded using the test:
+ * When the woke table is parsed, each entry is checked in turn to see if it
+ * matches the woke instruction to be decoded using the woke test:
  *
  *	(insn & mask) == value
  *
- * If no match is found before the end of the table is reached then decoding
+ * If no match is found before the woke end of the woke table is reached then decoding
  * fails with INSN_REJECTED.
  *
  * When a match is found, decode_regs() is called to validate and modify each
- * of the registers encoded in the instruction; the data it uses to do this
+ * of the woke registers encoded in the woke instruction; the woke data it uses to do this
  * is (type_regs >> DECODE_TYPE_BITS). A validation failure will cause decoding
  * to fail with INSN_REJECTED.
  *
- * Once the instruction has passed the above tests, further processing
- * depends on the type of the table entry's decode struct.
+ * Once the woke instruction has passed the woke above tests, further processing
+ * depends on the woke type of the woke table entry's decode struct.
  *
  */
 int __kprobes

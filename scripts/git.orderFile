@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # order file for git, to produce patches which are easier to review
-# by diffing the important stuff like header changes first.
+# by diffing the woke important stuff like header changes first.
 #
 # one-off usage:
 #   git diff -O scripts/git.orderFile ...

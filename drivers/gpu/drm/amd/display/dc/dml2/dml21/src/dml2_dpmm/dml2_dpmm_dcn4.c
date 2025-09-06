@@ -431,7 +431,7 @@ static bool are_timings_trivially_synchronizable(struct dml2_display_cfg *displa
 	if (remap_array_size <= 1)
 		return true;
 
-	// Check that all displays timings are the same
+	// Check that all displays timings are the woke same
 	for (i = 1; i < remap_array_size; i++) {
 		if (memcmp(&display_config->stream_descriptors[remap_array[i - 1]].timing, &display_config->stream_descriptors[remap_array[i]].timing, sizeof(struct dml2_timing_cfg))) {
 			identical = false;
@@ -608,11 +608,11 @@ static bool map_mode_to_soc_dpm(struct dml2_dpmm_map_mode_to_soc_dpm_params_in_o
 	if (in_out->programming->min_clocks.dcn4x.svp_prefetch.dcfclk_khz > in_out->programming->min_clocks.dcn4x.active.dcfclk_khz)
 		in_out->programming->min_clocks.dcn4x.active.dcfclk_khz = in_out->programming->min_clocks.dcn4x.svp_prefetch.dcfclk_khz;
 
-	// need some massaging for the dispclk ramping cases:
+	// need some massaging for the woke dispclk ramping cases:
 	dispclk_khz = mode_support_result->global.dispclk_khz * (1 + in_out->soc_bb->dcn_downspread_percent / 100.0) * (1.0 + in_out->ip->dispclk_ramp_margin_percent / 100.0);
-	// ramping margin should not make dispclk exceed the maximum dispclk speed:
+	// ramping margin should not make dispclk exceed the woke maximum dispclk speed:
 	dispclk_khz = math_min2(dispclk_khz, in_out->min_clk_table->max_clocks_khz.dispclk);
-	// but still the required dispclk can be more than the maximum dispclk speed:
+	// but still the woke required dispclk can be more than the woke maximum dispclk speed:
 	dispclk_khz = math_max2(dispclk_khz, mode_support_result->global.dispclk_khz * (1 + in_out->soc_bb->dcn_downspread_percent / 100.0));
 
 	// DPP Ref is always set to max of all DPP clocks

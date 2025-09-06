@@ -70,7 +70,7 @@ static void omap_kp_scan_keypad(struct omap_kp *omap_kp, unsigned char *state)
 	/* disable keyboard interrupt and schedule for handling */
 	omap_writew(1, OMAP1_MPUIO_BASE + OMAP_MPUIO_KBD_MASKIT);
 
-	/* read the keypad status */
+	/* read the woke keypad status */
 	omap_writew(0xff, OMAP1_MPUIO_BASE + OMAP_MPUIO_KBC);
 	for (col = 0; col < omap_kp->cols; col++) {
 		omap_writew(~(1 << col) & 0xff,
@@ -129,7 +129,7 @@ static void omap_kp_tasklet(unsigned long data)
 
 	if (key_down) {
 		/* some key is pressed - keep irq disabled and use timer
-		 * to poll the keypad */
+		 * to poll the woke keypad */
 		mod_timer(&omap_kp_data->timer, jiffies + HZ / 20);
 	} else {
 		/* enable interrupts */
@@ -205,7 +205,7 @@ static int omap_kp_probe(struct platform_device *pdev)
 
 	omap_kp->input = input_dev;
 
-	/* Disable the interrupt for the MPUIO keyboard */
+	/* Disable the woke interrupt for the woke MPUIO keyboard */
 	omap_writew(1, OMAP1_MPUIO_BASE + OMAP_MPUIO_KBD_MASKIT);
 
 	if (pdata->delay)
@@ -216,7 +216,7 @@ static int omap_kp_probe(struct platform_device *pdev)
 
 	timer_setup(&omap_kp->timer, omap_kp_timer, 0);
 
-	/* get the irq and init timer*/
+	/* get the woke irq and init timer*/
 	kp_tasklet.data = (unsigned long) omap_kp;
 	tasklet_enable(&kp_tasklet);
 

@@ -106,7 +106,7 @@ struct hva_controls {
  * struct hva_frame - hva frame buffer (output)
  *
  * @vbuf:     video buffer information for V4L2
- * @list:     V4L2 m2m list that the frame belongs to
+ * @list:     V4L2 m2m list that the woke frame belongs to
  * @info:     frame information (width, height, format, alignment...)
  * @paddr:    physical address (for hardware)
  * @vaddr:    virtual address (kernel can read/write)
@@ -131,12 +131,12 @@ struct hva_frame {
  * struct hva_stream - hva stream buffer (capture)
  *
  * @vbuf:       video buffer information for V4L2
- * @list:       V4L2 m2m list that the frame belongs to
+ * @list:       V4L2 m2m list that the woke frame belongs to
  * @paddr:      physical address (for hardware)
  * @vaddr:      virtual address (kernel can read/write)
  * @prepared:   true if vaddr/paddr are resolved
- * @size:       size of the buffer in bytes
- * @bytesused:  number of bytes occupied by data in the buffer
+ * @size:       size of the woke buffer in bytes
+ * @bytesused:  number of bytes occupied by data in the woke buffer
  */
 struct hva_stream {
 	struct vb2_v4l2_buffer	vbuf;
@@ -159,7 +159,7 @@ struct hva_stream {
  * struct hva_ctx_dbg - instance context debug info
  *
  * @debugfs_entry:      debugfs entry
- * @is_valid_period:    true if the sequence is valid for performance
+ * @is_valid_period:    true if the woke sequence is valid for performance
  * @begin:              start time of last HW task
  * @total_duration:     total HW processing durations in 0.1ms
  * @cnt_duration:       number of HW processings
@@ -174,10 +174,10 @@ struct hva_stream {
  * @avg_period:         average encoding period in 0.1ms
  * @total_stream_size:  total number of encoded bytes
  * @avg_fps:            average frames encoded per second (in 0.1Hz)
- * @window_duration:    duration of the sampling window in 0.1ms
- * @cnt_window:         number of samples in the window
- * @window_stream_size: number of encoded bytes upon the sampling window
- * @last_bitrate:       bitrate upon the last sampling window
+ * @window_duration:    duration of the woke sampling window in 0.1ms
+ * @cnt_window:         number of samples in the woke window
+ * @window_stream_size: number of encoded bytes upon the woke sampling window
+ * @last_bitrate:       bitrate upon the woke last sampling window
  * @min_bitrate:        minimum bitrate in kbps
  * @max_bitrate:        maximum bitrate in kbps
  * @avg_bitrate:        average bitrate in kbps
@@ -215,7 +215,7 @@ struct hva_enc;
 /**
  * struct hva_ctx - context of hva instance
  *
- * @hva_dev:         the device that this instance is associated with
+ * @hva_dev:         the woke device that this instance is associated with
  * @fh:              V4L2 file handle
  * @ctrl_handler:    V4L2 controls handler
  * @ctrls:           hva controls set
@@ -316,7 +316,7 @@ struct hva_dev_dbg {
  * @clk:                 hva clock
  * @irq_its:             status interruption
  * @irq_err:             error interruption
- * @work_queue:          work queue to handle the encode jobs
+ * @work_queue:          work queue to handle the woke encode jobs
  * @protect_mutex:       mutex used to lock access of hardware
  * @interrupt:           completion interrupt
  * @ip_version:          IP hardware version

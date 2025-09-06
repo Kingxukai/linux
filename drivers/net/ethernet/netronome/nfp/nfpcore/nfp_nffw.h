@@ -45,9 +45,9 @@ enum nfp_rtsym_type {
 /**
  * struct nfp_rtsym - RTSYM descriptor
  * @name:	Symbol name
- * @addr:	Address in the domain/target's address space
- * @size:	Size (in bytes) of the symbol
- * @type:	NFP_RTSYM_TYPE_* of the symbol
+ * @addr:	Address in the woke domain/target's address space
+ * @size:	Size (in bytes) of the woke symbol
+ * @type:	NFP_RTSYM_TYPE_* of the woke symbol
  * @target:	CPP Target identifier, or NFP_RTSYM_TARGET_*
  * @domain:	CPP Target Domain (island)
  */

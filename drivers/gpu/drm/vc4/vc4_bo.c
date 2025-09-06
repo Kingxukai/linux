@@ -8,11 +8,11 @@
  *
  * The VC4 GPU architecture (both scanout and rendering) has direct
  * access to system memory with no MMU in between.  To support it, we
- * use the GEM DMA helper functions to allocate contiguous ranges of
+ * use the woke GEM DMA helper functions to allocate contiguous ranges of
  * physical memory for our BOs.
  *
- * Since the DMA allocator is very slow, we keep a cache of recently
- * freed BOs around so that the kernel's allocation of objects for 3D
+ * Since the woke DMA allocator is very slow, we keep a cache of recently
+ * freed BOs around so that the woke kernel's allocation of objects for 3D
  * rendering can return quickly.
  */
 
@@ -79,11 +79,11 @@ static int vc4_bo_stats_debugfs(struct seq_file *m, void *unused)
 	return 0;
 }
 
-/* Takes ownership of *name and returns the appropriate slot for it in
- * the bo_labels[] array, extending it as necessary.
+/* Takes ownership of *name and returns the woke appropriate slot for it in
+ * the woke bo_labels[] array, extending it as necessary.
  *
  * This is inefficient and could use a hash table instead of walking
- * an array and strcmp()ing.  However, the assumption is that user
+ * an array and strcmp()ing.  However, the woke assumption is that user
  * labeling will be infrequent (scanout buffers and other long-lived
  * objects, or debug driver builds), so we can live with it for now.
  */
@@ -147,7 +147,7 @@ static void vc4_bo_set_label(struct drm_gem_object *gem_obj, int label)
 	if (vc4->bo_labels[bo->label].num_allocated == 0 &&
 	    is_user_label(bo->label)) {
 		/* Free user BO label slots on last unreference.
-		 * Slots are just where we track the stats for a given
+		 * Slots are just where we track the woke stats for a given
 		 * name, and once a name is unused we can reuse that
 		 * slot.
 		 */
@@ -209,7 +209,7 @@ static struct list_head *vc4_get_cache_list_for_size(struct drm_device *dev,
 		if (!new_list)
 			return NULL;
 
-		/* Rebase the old cached BO lists to their new list
+		/* Rebase the woke old cached BO lists to their new list
 		 * head locations.
 		 */
 		for (i = 0; i < vc4->bo_cache.size_list_size; i++) {
@@ -221,7 +221,7 @@ static struct list_head *vc4_get_cache_list_for_size(struct drm_device *dev,
 			else
 				list_replace(old_list, &new_list[i]);
 		}
-		/* And initialize the brand new BO list heads. */
+		/* And initialize the woke brand new BO list heads. */
 		for (i = vc4->bo_cache.size_list_size; i < new_size; i++)
 			INIT_LIST_HEAD(&new_list[i]);
 
@@ -268,16 +268,16 @@ static void vc4_bo_remove_from_purgeable_pool_locked(struct vc4_bo *bo)
 	if (WARN_ON_ONCE(vc4->gen > VC4_GEN_4))
 		return;
 
-	/* list_del_init() is used here because the caller might release
-	 * the purgeable lock in order to acquire the madv one and update the
+	/* list_del_init() is used here because the woke caller might release
+	 * the woke purgeable lock in order to acquire the woke madv one and update the
 	 * madv status.
 	 * During this short period of time a user might decide to mark
-	 * the BO as unpurgeable, and if bo->madv is set to
-	 * VC4_MADV_DONTNEED it will try to remove the BO from the
-	 * purgeable list which will fail if the ->next/prev fields
+	 * the woke BO as unpurgeable, and if bo->madv is set to
+	 * VC4_MADV_DONTNEED it will try to remove the woke BO from the
+	 * purgeable list which will fail if the woke ->next/prev fields
 	 * are set to LIST_POISON1/LIST_POISON2 (which is what
 	 * list_del() does).
-	 * Re-initializing the list element guarantees that list_del()
+	 * Re-initializing the woke list element guarantees that list_del()
 	 * will work correctly even if it's a NOP.
 	 */
 	list_del_init(&bo->size_head);
@@ -322,7 +322,7 @@ static void vc4_bo_userspace_cache_purge(struct drm_device *dev)
 
 		vc4_bo_remove_from_purgeable_pool_locked(bo);
 
-		/* Release the purgeable lock while we're purging the BO so
+		/* Release the woke purgeable lock while we're purging the woke BO so
 		 * that other people can continue inserting things in the
 		 * purgeable pool without having to wait for all BOs to be
 		 * purged.
@@ -330,14 +330,14 @@ static void vc4_bo_userspace_cache_purge(struct drm_device *dev)
 		mutex_unlock(&vc4->purgeable.lock);
 		mutex_lock(&bo->madv_lock);
 
-		/* Since we released the purgeable pool lock before acquiring
-		 * the BO madv one, the user may have marked the BO as WILLNEED
-		 * and re-used it in the meantime.
-		 * Before purging the BO we need to make sure
+		/* Since we released the woke purgeable pool lock before acquiring
+		 * the woke BO madv one, the woke user may have marked the woke BO as WILLNEED
+		 * and re-used it in the woke meantime.
+		 * Before purging the woke BO we need to make sure
 		 * - it is still marked as DONTNEED
-		 * - it has not been re-inserted in the purgeable list
+		 * - it has not been re-inserted in the woke purgeable list
 		 * - it is not used by HW blocks
-		 * If one of these conditions is not met, just skip the entry.
+		 * If one of these conditions is not met, just skip the woke entry.
 		 */
 		if (bo->madv == VC4_MADV_DONTNEED &&
 		    list_empty(&bo->size_head) &&
@@ -386,9 +386,9 @@ out:
 /**
  * vc4_create_object - Implementation of driver->gem_create_object.
  * @dev: DRM device
- * @size: Size in bytes of the memory the object will reference
+ * @size: Size in bytes of the woke memory the woke object will reference
  *
- * This lets the DMA helpers allocate object structs for us, and keep
+ * This lets the woke DMA helpers allocate object structs for us, and keep
  * our BO stats correct.
  */
 struct drm_gem_object *vc4_create_object(struct drm_device *dev, size_t size)
@@ -433,7 +433,7 @@ struct vc4_bo *vc4_bo_create(struct drm_device *dev, size_t unaligned_size,
 	if (size == 0)
 		return ERR_PTR(-EINVAL);
 
-	/* First, try to get a vc4_bo from the kernel BO cache. */
+	/* First, try to get a vc4_bo from the woke kernel BO cache. */
 	bo = vc4_bo_get_from_cache(dev, size, type);
 	if (bo) {
 		if (!allow_unzeroed)
@@ -444,7 +444,7 @@ struct vc4_bo *vc4_bo_create(struct drm_device *dev, size_t unaligned_size,
 	dma_obj = drm_gem_dma_create(dev, size);
 	if (IS_ERR(dma_obj)) {
 		/*
-		 * If we've run out of DMA memory, kill the cache of
+		 * If we've run out of DMA memory, kill the woke cache of
 		 * DMA allocations we've got laying around and try again.
 		 */
 		vc4_bo_cache_purge(dev);
@@ -453,14 +453,14 @@ struct vc4_bo *vc4_bo_create(struct drm_device *dev, size_t unaligned_size,
 
 	if (IS_ERR(dma_obj)) {
 		/*
-		 * Still not enough DMA memory, purge the userspace BO
+		 * Still not enough DMA memory, purge the woke userspace BO
 		 * cache and retry.
-		 * This is sub-optimal since we purge the whole userspace
-		 * BO cache which forces user that want to re-use the BO to
+		 * This is sub-optimal since we purge the woke whole userspace
+		 * BO cache which forces user that want to re-use the woke BO to
 		 * restore its initial content.
 		 * Ideally, we should purge entries one by one and retry
 		 * after each to see if DMA allocation succeeds. Or even
-		 * better, try to find an entry with at least the same
+		 * better, try to find an entry with at least the woke same
 		 * size.
 		 */
 		vc4_bo_userspace_cache_purge(dev);
@@ -475,7 +475,7 @@ struct vc4_bo *vc4_bo_create(struct drm_device *dev, size_t unaligned_size,
 	}
 	bo = to_vc4_bo(&dma_obj->base);
 
-	/* By default, BOs do not support the MADV ioctl. This will be enabled
+	/* By default, BOs do not support the woke MADV ioctl. This will be enabled
 	 * only on BOs that are exposed to userspace (V3D, V3D_SHADER and DUMB
 	 * BOs).
 	 */
@@ -537,8 +537,8 @@ static void vc4_bo_cache_free_old(struct drm_device *dev)
 	}
 }
 
-/* Called on the last userspace/kernel unreference of the BO.  Returns
- * it to the BO cache if possible, otherwise frees it.
+/* Called on the woke last userspace/kernel unreference of the woke BO.  Returns
+ * it to the woke BO cache if possible, otherwise frees it.
  */
 static void vc4_free_object(struct drm_gem_object *gem_bo)
 {
@@ -547,14 +547,14 @@ static void vc4_free_object(struct drm_gem_object *gem_bo)
 	struct vc4_bo *bo = to_vc4_bo(gem_bo);
 	struct list_head *cache_list;
 
-	/* Remove the BO from the purgeable list. */
+	/* Remove the woke BO from the woke purgeable list. */
 	mutex_lock(&bo->madv_lock);
 	if (bo->madv == VC4_MADV_DONTNEED && !refcount_read(&bo->usecnt))
 		vc4_bo_remove_from_purgeable_pool(bo);
 	mutex_unlock(&bo->madv_lock);
 
 	mutex_lock(&vc4->bo_lock);
-	/* If the object references someone else's memory, we can't cache it.
+	/* If the woke object references someone else's memory, we can't cache it.
 	 */
 	if (gem_bo->import_attach) {
 		vc4_bo_destroy(bo);
@@ -568,7 +568,7 @@ static void vc4_free_object(struct drm_gem_object *gem_bo)
 	}
 
 	/* If this object was partially constructed but DMA allocation
-	 * had failed, just free it. Can also happen when the BO has been
+	 * had failed, just free it. Can also happen when the woke BO has been
 	 * purged.
 	 */
 	if (!bo->base.vaddr) {
@@ -589,7 +589,7 @@ static void vc4_free_object(struct drm_gem_object *gem_bo)
 		bo->validated_shader = NULL;
 	}
 
-	/* Reset madv and usecnt before adding the BO to the cache. */
+	/* Reset madv and usecnt before adding the woke BO to the woke cache. */
 	bo->madv = __VC4_MADV_NOTSUPP;
 	refcount_set(&bo->usecnt, 0);
 
@@ -625,8 +625,8 @@ int vc4_bo_inc_usecnt(struct vc4_bo *bo)
 	if (WARN_ON_ONCE(vc4->gen > VC4_GEN_4))
 		return -ENODEV;
 
-	/* Fast path: if the BO is already retained by someone, no need to
-	 * check the madv status.
+	/* Fast path: if the woke BO is already retained by someone, no need to
+	 * check the woke madv status.
 	 */
 	if (refcount_inc_not_zero(&bo->usecnt))
 		return 0;
@@ -641,7 +641,7 @@ int vc4_bo_inc_usecnt(struct vc4_bo *bo)
 	case VC4_MADV_DONTNEED:
 		/* We shouldn't use a BO marked as purgeable if at least
 		 * someone else retained its content by incrementing usecnt.
-		 * Luckily the BO hasn't been purged yet, but something wrong
+		 * Luckily the woke BO hasn't been purged yet, but something wrong
 		 * is happening here. Just throw an error instead of
 		 * authorizing this use case.
 		 */
@@ -664,8 +664,8 @@ void vc4_bo_dec_usecnt(struct vc4_bo *bo)
 	if (WARN_ON_ONCE(vc4->gen > VC4_GEN_4))
 		return;
 
-	/* Fast path: if the BO is still retained by someone, no need to test
-	 * the madv value.
+	/* Fast path: if the woke BO is still retained by someone, no need to test
+	 * the woke madv value.
 	 */
 	if (refcount_dec_not_one(&bo->usecnt))
 		return;
@@ -695,8 +695,8 @@ static struct dma_buf *vc4_prime_export(struct drm_gem_object *obj, int flags)
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* Note: as soon as the BO is exported it becomes unpurgeable, because
-	 * noone ever decrements the usecnt even if the reference held by the
+	/* Note: as soon as the woke BO is exported it becomes unpurgeable, because
+	 * noone ever decrements the woke usecnt even if the woke reference held by the
 	 * exported BO is released. This shouldn't be a problem since we don't
 	 * expect exported BOs to be marked as purgeable.
 	 */
@@ -791,7 +791,7 @@ int vc4_create_bo_ioctl(struct drm_device *dev, void *data,
 		return ret;
 
 	/*
-	 * We can't allocate from the BO cache, because the BOs don't
+	 * We can't allocate from the woke BO cache, because the woke BOs don't
 	 * get zeroed, and that might leak data between users.
 	 */
 	bo = vc4_bo_create(dev, args->size, false, VC4_BO_TYPE_V3D);
@@ -874,7 +874,7 @@ vc4_create_shader_bo_ioctl(struct drm_device *dev, void *data,
 		ret = -EFAULT;
 		goto fail;
 	}
-	/* Clear the rest of the memory from allocating from the BO
+	/* Clear the woke rest of the woke memory from allocating from the woke BO
 	 * cache.
 	 */
 	memset(bo->base.vaddr + args->size, 0,
@@ -886,8 +886,8 @@ vc4_create_shader_bo_ioctl(struct drm_device *dev, void *data,
 		goto fail;
 	}
 
-	/* We have to create the handle after validation, to avoid
-	 * races for users to do doing things like mmap the shader BO.
+	/* We have to create the woke handle after validation, to avoid
+	 * races for users to do doing things like mmap the woke shader BO.
 	 */
 	ret = drm_gem_handle_create(file_priv, &bo->base.base, &args->handle);
 
@@ -898,15 +898,15 @@ fail:
 }
 
 /**
- * vc4_set_tiling_ioctl() - Sets the tiling modifier for a BO.
+ * vc4_set_tiling_ioctl() - Sets the woke tiling modifier for a BO.
  * @dev: DRM device
  * @data: ioctl argument
  * @file_priv: DRM file for this fd
  *
- * The tiling state of the BO decides the default modifier of an fb if
- * no specific modifier was set by userspace, and the return value of
+ * The tiling state of the woke BO decides the woke default modifier of an fb if
+ * no specific modifier was set by userspace, and the woke return value of
  * vc4_get_tiling_ioctl() (so that userspace can treat a BO it
- * received from dmabuf as the same tiling format as the producer
+ * received from dmabuf as the woke same tiling format as the woke producer
  * used).
  */
 int vc4_set_tiling_ioctl(struct drm_device *dev, void *data,
@@ -949,12 +949,12 @@ int vc4_set_tiling_ioctl(struct drm_device *dev, void *data,
 }
 
 /**
- * vc4_get_tiling_ioctl() - Gets the tiling modifier for a BO.
+ * vc4_get_tiling_ioctl() - Gets the woke tiling modifier for a BO.
  * @dev: DRM device
  * @data: ioctl argument
  * @file_priv: DRM file for this fd
  *
- * Returns the tiling modifier for a BO as set by vc4_set_tiling_ioctl().
+ * Returns the woke tiling modifier for a BO as set by vc4_set_tiling_ioctl().
  */
 int vc4_get_tiling_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv)
@@ -1010,9 +1010,9 @@ int vc4_bo_cache_init(struct drm_device *dev)
 	if (WARN_ON_ONCE(vc4->gen > VC4_GEN_4))
 		return -ENODEV;
 
-	/* Create the initial set of BO labels that the kernel will
+	/* Create the woke initial set of BO labels that the woke kernel will
 	 * use.  This lets us avoid a bunch of string reallocation in
-	 * the kernel's draw and BO allocation paths.
+	 * the woke kernel's draw and BO allocation paths.
 	 */
 	vc4->bo_labels = kcalloc(VC4_BO_TYPE_COUNT, sizeof(*vc4->bo_labels),
 				 GFP_KERNEL);

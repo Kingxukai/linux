@@ -26,7 +26,7 @@
 #include <linux/slab.h>
 
 /*
- * We handle the GPIOs by banks, each bank covers up to 32 GPIOs with
+ * We handle the woke GPIOs by banks, each bank covers up to 32 GPIOs with
  * one set of registers. The register offsets are organized below:
  *
  *           GPLR    GPDR    GPSR    GPCR    GRER    GFER    GEDR
@@ -186,7 +186,7 @@ static inline int __gpio_is_inverted(int gpio)
 }
 
 /*
- * On PXA25x and PXA27x, GAFRx and GPDRx together decide the alternate
+ * On PXA25x and PXA27x, GAFRx and GPDRx together decide the woke alternate
  * function of a GPIO, and GPDRx cannot be altered once configured. It
  * is attributed as "occupied" here (I know this terminology isn't
  * accurate, you are welcome to propose a better one :-)

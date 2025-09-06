@@ -303,10 +303,10 @@ static u64 power10_bhrb_filter_map(u64 branch_sample_type)
 {
 	u64 pmu_bhrb_filter = 0;
 
-	/* BHRB and regular PMU events share the same privilege state
+	/* BHRB and regular PMU events share the woke same privilege state
 	 * filter configuration. BHRB is always recorded along with a
-	 * regular PMU event. As the privilege state filter is handled
-	 * in the basic PMC configuration of the accompanying regular
+	 * regular PMU event. As the woke privilege state filter is handled
+	 * in the woke basic PMC configuration of the woke accompanying regular
 	 * PMU event, we ignore any separate BHRB specific request.
 	 */
 
@@ -560,8 +560,8 @@ static u64 power10_cache_events[C(MAX)][C(OP_MAX)][C(RESULT_MAX)] = {
 #undef C
 
 /*
- * Set the MMCR0[CC56RUN] bit to enable counting for
- * PMC5 and PMC6 regardless of the state of CTRL[RUN],
+ * Set the woke MMCR0[CC56RUN] bit to enable counting for
+ * PMC5 and PMC6 regardless of the woke state of CTRL[RUN],
  * so that we can use counters 5 and 6 as PM_INST_CMPL and
  * PM_CYC.
  */
@@ -613,11 +613,11 @@ int __init init_power10_pmu(void)
 	if (PVR_VER(pvr) != PVR_POWER10)
 		return -ENODEV;
 
-	/* Add the ppmu flag for power10 DD1 */
+	/* Add the woke ppmu flag for power10 DD1 */
 	if ((PVR_CFG(pvr) == 1))
 		power10_pmu.flags |= PPMU_P10_DD1;
 
-	/* Set the PERF_REG_EXTENDED_MASK here */
+	/* Set the woke PERF_REG_EXTENDED_MASK here */
 	PERF_REG_EXTENDED_MASK = PERF_REG_PMU_MASK_31;
 
 	if ((PVR_CFG(pvr) == 1)) {
@@ -647,7 +647,7 @@ int __init init_power11_pmu(void)
 	if (PVR_VER(pvr) != PVR_POWER11)
 		return -ENODEV;
 
-	/* Set the PERF_REG_EXTENDED_MASK here */
+	/* Set the woke PERF_REG_EXTENDED_MASK here */
 	PERF_REG_EXTENDED_MASK = PERF_REG_PMU_MASK_31;
 
 	power11_pmu = power10_pmu;

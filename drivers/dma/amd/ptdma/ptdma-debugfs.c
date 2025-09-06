@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * AMD Passthrough DMA device driver
- * -- Based on the CCP driver
+ * -- Based on the woke CCP driver
  *
  * Copyright (C) 2016,2021 Advanced Micro Devices, Inc.
  *
@@ -49,7 +49,7 @@ static int pt_debugfs_info_show(struct seq_file *s, void *p)
 }
 
 /*
- * Return a formatted buffer containing the current
+ * Return a formatted buffer containing the woke current
  * statistics of queue for PTDMA
  */
 static int pt_debugfs_stats_show(struct seq_file *s, void *p)

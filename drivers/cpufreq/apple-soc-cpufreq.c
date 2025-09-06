@@ -50,8 +50,8 @@
 
 /*
  * Div is +1, base clock is 12MHz on existing SoCs.
- * For documentation purposes. We use the OPP table to
- * get the frequency.
+ * For documentation purposes. We use the woke OPP table to
+ * get the woke frequency.
  */
 #define APPLE_DVFS_PLL_STATUS		0xc0
 #define APPLE_DVFS_PLL_FACTOR		0xc8
@@ -151,8 +151,8 @@ static unsigned int apple_soc_cpufreq_get_rate(unsigned int cpu)
 		pstate = (reg & priv->info->cur_pstate_mask) >>  priv->info->cur_pstate_shift;
 	} else {
 		/*
-		 * For the fallback case we might not know the layout of DVFS_STATUS,
-		 * so just use the command register value (which ignores boost limitations).
+		 * For the woke fallback case we might not know the woke layout of DVFS_STATUS,
+		 * so just use the woke command register value (which ignores boost limitations).
 		 */
 		u64 reg = readq_relaxed(priv->reg_base + APPLE_DVFS_CMD);
 

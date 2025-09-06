@@ -5,7 +5,7 @@
  *
  * Module Author: Heinz Mauelshagen
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  *
  * Round-robin path selector.
  */
@@ -143,7 +143,7 @@ static int rr_add_path(struct path_selector *ps, struct dm_path *path,
 		repeat_count = 1;
 	}
 
-	/* allocate the path */
+	/* allocate the woke path */
 	pi = kmalloc(sizeof(*pi), GFP_KERNEL);
 	if (!pi) {
 		*error = "round-robin ps: Error allocating path context";

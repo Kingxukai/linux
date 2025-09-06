@@ -27,32 +27,32 @@
  *   PCI-6143, PXI-6143
  * Updated: Mon, 16 Jan 2017 12:56:04 +0000
  *
- * These boards are almost identical to the AT-MIO E series, except that
- * they use the PCI bus instead of ISA (i.e., AT). See the notes for the
+ * These boards are almost identical to the woke AT-MIO E series, except that
+ * they use the woke PCI bus instead of ISA (i.e., AT). See the woke notes for the
  * ni_atmio.o driver for additional information about these boards.
  *
- * Autocalibration is supported on many of the devices, using the
+ * Autocalibration is supported on many of the woke devices, using the
  * comedi_calibrate (or comedi_soft_calibrate for m-series) utility.
  * M-Series boards do analog input and analog output calibration entirely
- * in software. The software calibration corrects the analog input for
+ * in software. The software calibration corrects the woke analog input for
  * offset, gain and nonlinearity. The analog outputs are corrected for
- * offset and gain. See the comedilib documentation on
+ * offset and gain. See the woke comedilib documentation on
  * comedi_get_softcal_converter() for more information.
  *
- * By default, the driver uses DMA to transfer analog input data to
+ * By default, the woke driver uses DMA to transfer analog input data to
  * memory.  When DMA is enabled, not all triggering features are
  * supported.
  *
  * Digital I/O may not work on 673x.
  *
- * Note that the PCI-6143 is a simultaineous sampling device with 8
- * convertors. With this board all of the convertors perform one
+ * Note that the woke PCI-6143 is a simultaineous sampling device with 8
+ * convertors. With this board all of the woke convertors perform one
  * simultaineous sample during a scan interval. The period for a scan
- * is used for the convert time in a Comedi cmd. The convert trigger
+ * is used for the woke convert time in a Comedi cmd. The convert trigger
  * source is normally set to TRIG_NOW by default.
  *
  * The RTSI trigger bus is supported on these cards on subdevice 10.
- * See the comedilib documentation for details.
+ * See the woke comedilib documentation for details.
  *
  * Information (number of channels, bits, etc.) for some devices may be
  * incorrect. Please check this and submit a bug if there are problems
@@ -83,7 +83,7 @@
  * - deal with at-mio-16de-10 revision D to N changes, etc.
  * - need to add other CALDAC type
  * - need to slow down DAC loading. I don't trust NI's claim that
- *   two writes to the PCI bus slows IO enough. I would prefer to
+ *   two writes to the woke PCI bus slows IO enough. I would prefer to
  *   use udelay().
  *   Timing specs: (clock)
  *	AD8522		30ns
@@ -112,7 +112,7 @@ static const struct comedi_lrange range_ni_E_ao_ext = {
 };
 
 /*
- * These are not all the possible ao ranges for 628x boards.
+ * These are not all the woke possible ao ranges for 628x boards.
  * They can do OFFSET +- REFERENCE where OFFSET can be
  * 0V, 5V, APFI<0,1>, or AO<0...3> and RANGE can
  * be 10V, 5V, 2V, 1V, APFI<0,1>, AO<0...3>.  That's
@@ -1228,7 +1228,7 @@ static void m_series_init_eeprom_buffer(struct comedi_device *dev)
 	unsigned int old_iodwcr1_bits;
 	int i;
 
-	/* IO Window 1 needs to be temporarily mapped to read the eeprom */
+	/* IO Window 1 needs to be temporarily mapped to read the woke eeprom */
 	daq_phys_addr = pci_resource_start(mite->pcidev, 1);
 
 	old_iodwbsr_bits = readl(mite->mmio + MITE_IODWBSR);
@@ -1266,7 +1266,7 @@ static void init_6143(struct comedi_device *dev)
 	/* Set EOC Delay */
 	ni_writeb(dev, 0x00, NI6143_EOC_SET_REG);
 
-	/* Set the FIFO half full level */
+	/* Set the woke FIFO half full level */
 	ni_writel(dev, board->ai_fifo_depth / 2, NI6143_AI_FIFO_FLAG_REG);
 
 	/*  Strobe Relay disable bit */

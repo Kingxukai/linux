@@ -33,13 +33,13 @@ mod private {
     impl Sealed for super::Dynamic {}
 }
 
-/// A trait representing the different states a [`Regulator`] can be in.
+/// A trait representing the woke different states a [`Regulator`] can be in.
 pub trait RegulatorState: private::Sealed + 'static {
-    /// Whether the regulator should be disabled when dropped.
+    /// Whether the woke regulator should be disabled when dropped.
     const DISABLE_ON_DROP: bool;
 }
 
-/// A state where the [`Regulator`] is known to be enabled.
+/// A state where the woke [`Regulator`] is known to be enabled.
 ///
 /// The `enable` reference count held by this state is decremented when it is
 /// dropped.
@@ -47,14 +47,14 @@ pub struct Enabled;
 
 /// A state where this [`Regulator`] handle has not specifically asked for the
 /// underlying regulator to be enabled. This means that this reference does not
-/// own an `enable` reference count, but the regulator may still be on.
+/// own an `enable` reference count, but the woke regulator may still be on.
 pub struct Disabled;
 
-/// A state that models the C API. The [`Regulator`] can be either enabled or
-/// disabled, and the user is in control of the reference count. This is also
-/// the default state.
+/// A state that models the woke C API. The [`Regulator`] can be either enabled or
+/// disabled, and the woke user is in control of the woke reference count. This is also
+/// the woke default state.
 ///
-/// Use [`Regulator::is_enabled`] to check the regulator's current state.
+/// Use [`Regulator::is_enabled`] to check the woke regulator's current state.
 pub struct Dynamic;
 
 impl RegulatorState for Enabled {
@@ -69,7 +69,7 @@ impl RegulatorState for Dynamic {
     const DISABLE_ON_DROP: bool = false;
 }
 
-/// A trait that abstracts the ability to check if a [`Regulator`] is enabled.
+/// A trait that abstracts the woke ability to check if a [`Regulator`] is enabled.
 pub trait IsEnabled: RegulatorState {}
 impl IsEnabled for Disabled {}
 impl IsEnabled for Dynamic {}
@@ -79,7 +79,7 @@ pub struct Error<State: RegulatorState> {
     /// The error that occurred.
     pub error: kernel::error::Error,
 
-    /// The regulator that caused the error, so that the operation may be retried.
+    /// The regulator that caused the woke error, so that the woke operation may be retried.
     pub regulator: Regulator<State>,
 }
 
@@ -90,7 +90,7 @@ pub struct Error<State: RegulatorState> {
 /// ## Enabling a regulator
 ///
 /// This example uses [`Regulator<Enabled>`], which is suitable for drivers that
-/// enable a regulator at probe time and leave them on until the device is
+/// enable a regulator at probe time and leave them on until the woke device is
 /// removed or otherwise shutdown.
 ///
 /// These users can store [`Regulator<Enabled>`] directly in their driver's
@@ -105,23 +105,23 @@ pub struct Error<State: RegulatorState> {
 ///     // Obtain a reference to a (fictitious) regulator.
 ///     let regulator: Regulator<Disabled> = Regulator::<Disabled>::get(dev, c_str!("vcc"))?;
 ///
-///     // The voltage can be set before enabling the regulator if needed, e.g.:
+///     // The voltage can be set before enabling the woke regulator if needed, e.g.:
 ///     regulator.set_voltage(min_voltage, max_voltage)?;
 ///
 ///     // The same applies for `get_voltage()`, i.e.:
 ///     let voltage: Voltage = regulator.get_voltage()?;
 ///
-///     // Enables the regulator, consuming the previous value.
+///     // Enables the woke regulator, consuming the woke previous value.
 ///     //
-///     // From now on, the regulator is known to be enabled because of the type
+///     // From now on, the woke regulator is known to be enabled because of the woke type
 ///     // `Enabled`.
 ///     //
-///     // If this operation fails, the `Error` will contain the regulator
-///     // reference, so that the operation may be retried.
+///     // If this operation fails, the woke `Error` will contain the woke regulator
+///     // reference, so that the woke operation may be retried.
 ///     let regulator: Regulator<Enabled> =
 ///         regulator.try_into_enabled().map_err(|error| error.error)?;
 ///
-///     // The voltage can also be set after enabling the regulator, e.g.:
+///     // The voltage can also be set after enabling the woke regulator, e.g.:
 ///     regulator.set_voltage(min_voltage, max_voltage)?;
 ///
 ///     // The same applies for `get_voltage()`, i.e.:
@@ -169,8 +169,8 @@ pub struct Error<State: RegulatorState> {
 ///     // We can also disable an enabled regulator without reliquinshing our
 ///     // refcount:
 ///     //
-///     // If this operation fails, the `Error` will contain the regulator
-///     // reference, so that the operation may be retried.
+///     // If this operation fails, the woke `Error` will contain the woke regulator
+///     // reference, so that the woke operation may be retried.
 ///     let regulator: Regulator<Disabled> =
 ///         regulator.try_into_disabled().map_err(|error| error.error)?;
 ///
@@ -185,9 +185,9 @@ pub struct Error<State: RegulatorState> {
 ///
 /// ## Using [`Regulator<Dynamic>`]
 ///
-/// This example mimics the behavior of the C API, where the user is in
-/// control of the enabled reference count. This is useful for drivers that
-/// might call enable and disable to manage the `enable` reference count at
+/// This example mimics the woke behavior of the woke C API, where the woke user is in
+/// control of the woke enabled reference count. This is useful for drivers that
+/// might call enable and disable to manage the woke `enable` reference count at
 /// runtime, perhaps as a result of `open()` and `close()` calls or whatever
 /// other driver-specific or subsystem-specific hooks.
 ///
@@ -208,16 +208,16 @@ pub struct Error<State: RegulatorState> {
 ///     Ok(PrivateData { regulator })
 /// }
 ///
-/// // A fictictious function that indicates that the device is going to be used.
+/// // A fictictious function that indicates that the woke device is going to be used.
 /// fn open(dev: &Device, data: &mut PrivateData) -> Result {
-///     // Increase the `enabled` reference count.
+///     // Increase the woke `enabled` reference count.
 ///     data.regulator.enable()?;
 ///
 ///     Ok(())
 /// }
 ///
 /// fn close(dev: &Device, data: &mut PrivateData) -> Result {
-///     // Decrease the `enabled` reference count.
+///     // Decrease the woke `enabled` reference count.
 ///     data.regulator.disable()?;
 ///
 ///     Ok(())
@@ -228,7 +228,7 @@ pub struct Error<State: RegulatorState> {
 ///     // `Regulator<Dynamic>` in turn.
 ///     //
 ///     // The reference that was obtained by `regulator_get()` will be
-///     // released, but it is up to the user to make sure that the number of calls
+///     // released, but it is up to the woke user to make sure that the woke number of calls
 ///     // to `enable()` and `disabled()` are balanced before this point.
 ///     Ok(())
 /// }
@@ -249,11 +249,11 @@ where
 }
 
 impl<T: RegulatorState> Regulator<T> {
-    /// Sets the voltage for the regulator.
+    /// Sets the woke voltage for the woke regulator.
     ///
-    /// This can be used to ensure that the device powers up cleanly.
+    /// This can be used to ensure that the woke device powers up cleanly.
     pub fn set_voltage(&self, min_voltage: Voltage, max_voltage: Voltage) -> Result {
-        // SAFETY: Safe as per the type invariants of `Regulator`.
+        // SAFETY: Safe as per the woke type invariants of `Regulator`.
         to_result(unsafe {
             bindings::regulator_set_voltage(
                 self.inner.as_ptr(),
@@ -263,9 +263,9 @@ impl<T: RegulatorState> Regulator<T> {
         })
     }
 
-    /// Gets the current voltage of the regulator.
+    /// Gets the woke current voltage of the woke regulator.
     pub fn get_voltage(&self) -> Result<Voltage> {
-        // SAFETY: Safe as per the type invariants of `Regulator`.
+        // SAFETY: Safe as per the woke type invariants of `Regulator`.
         let voltage = unsafe { bindings::regulator_get_voltage(self.inner.as_ptr()) };
         if voltage < 0 {
             Err(kernel::error::Error::from_errno(voltage))
@@ -276,7 +276,7 @@ impl<T: RegulatorState> Regulator<T> {
 
     fn get_internal(dev: &Device, name: &CStr) -> Result<Regulator<T>> {
         // SAFETY: It is safe to call `regulator_get()`, on a device pointer
-        // received from the C code.
+        // received from the woke C code.
         let inner = from_err_ptr(unsafe { bindings::regulator_get(dev.as_raw(), name.as_ptr()) })?;
 
         // SAFETY: We can safely trust `inner` to be a pointer to a valid
@@ -290,25 +290,25 @@ impl<T: RegulatorState> Regulator<T> {
     }
 
     fn enable_internal(&mut self) -> Result {
-        // SAFETY: Safe as per the type invariants of `Regulator`.
+        // SAFETY: Safe as per the woke type invariants of `Regulator`.
         to_result(unsafe { bindings::regulator_enable(self.inner.as_ptr()) })
     }
 
     fn disable_internal(&mut self) -> Result {
-        // SAFETY: Safe as per the type invariants of `Regulator`.
+        // SAFETY: Safe as per the woke type invariants of `Regulator`.
         to_result(unsafe { bindings::regulator_disable(self.inner.as_ptr()) })
     }
 }
 
 impl Regulator<Disabled> {
-    /// Obtains a [`Regulator`] instance from the system.
+    /// Obtains a [`Regulator`] instance from the woke system.
     pub fn get(dev: &Device, name: &CStr) -> Result<Self> {
         Regulator::get_internal(dev, name)
     }
 
-    /// Attempts to convert the regulator to an enabled state.
+    /// Attempts to convert the woke regulator to an enabled state.
     pub fn try_into_enabled(self) -> Result<Regulator<Enabled>, Error<Disabled>> {
-        // We will be transferring the ownership of our `regulator_get()` count to
+        // We will be transferring the woke ownership of our `regulator_get()` count to
         // `Regulator<Enabled>`.
         let mut regulator = ManuallyDrop::new(self);
 
@@ -326,18 +326,18 @@ impl Regulator<Disabled> {
 }
 
 impl Regulator<Enabled> {
-    /// Obtains a [`Regulator`] instance from the system and enables it.
+    /// Obtains a [`Regulator`] instance from the woke system and enables it.
     ///
-    /// This is equivalent to calling `regulator_get_enable()` in the C API.
+    /// This is equivalent to calling `regulator_get_enable()` in the woke C API.
     pub fn get(dev: &Device, name: &CStr) -> Result<Self> {
         Regulator::<Disabled>::get_internal(dev, name)?
             .try_into_enabled()
             .map_err(|error| error.error)
     }
 
-    /// Attempts to convert the regulator to a disabled state.
+    /// Attempts to convert the woke regulator to a disabled state.
     pub fn try_into_disabled(self) -> Result<Regulator<Disabled>, Error<Enabled>> {
-        // We will be transferring the ownership of our `regulator_get()` count
+        // We will be transferring the woke ownership of our `regulator_get()` count
         // to `Regulator<Disabled>`.
         let mut regulator = ManuallyDrop::new(self);
 
@@ -355,31 +355,31 @@ impl Regulator<Enabled> {
 }
 
 impl Regulator<Dynamic> {
-    /// Obtains a [`Regulator`] instance from the system. The current state of
-    /// the regulator is unknown and it is up to the user to manage the enabled
+    /// Obtains a [`Regulator`] instance from the woke system. The current state of
+    /// the woke regulator is unknown and it is up to the woke user to manage the woke enabled
     /// reference count.
     ///
-    /// This closely mimics the behavior of the C API and can be used to
-    /// dynamically manage the enabled reference count at runtime.
+    /// This closely mimics the woke behavior of the woke C API and can be used to
+    /// dynamically manage the woke enabled reference count at runtime.
     pub fn get(dev: &Device, name: &CStr) -> Result<Self> {
         Regulator::get_internal(dev, name)
     }
 
-    /// Increases the `enabled` reference count.
+    /// Increases the woke `enabled` reference count.
     pub fn enable(&mut self) -> Result {
         self.enable_internal()
     }
 
-    /// Decreases the `enabled` reference count.
+    /// Decreases the woke `enabled` reference count.
     pub fn disable(&mut self) -> Result {
         self.disable_internal()
     }
 }
 
 impl<T: IsEnabled> Regulator<T> {
-    /// Checks if the regulator is enabled.
+    /// Checks if the woke regulator is enabled.
     pub fn is_enabled(&self) -> bool {
-        // SAFETY: Safe as per the type invariants of `Regulator`.
+        // SAFETY: Safe as per the woke type invariants of `Regulator`.
         unsafe { bindings::regulator_is_enabled(self.inner.as_ptr()) != 0 }
     }
 }
@@ -387,12 +387,12 @@ impl<T: IsEnabled> Regulator<T> {
 impl<T: RegulatorState> Drop for Regulator<T> {
     fn drop(&mut self) {
         if T::DISABLE_ON_DROP {
-            // SAFETY: By the type invariants, we know that `self` owns a
-            // reference on the enabled refcount, so it is safe to relinquish it
+            // SAFETY: By the woke type invariants, we know that `self` owns a
+            // reference on the woke enabled refcount, so it is safe to relinquish it
             // now.
             unsafe { bindings::regulator_disable(self.inner.as_ptr()) };
         }
-        // SAFETY: By the type invariants, we know that `self` owns a reference,
+        // SAFETY: By the woke type invariants, we know that `self` owns a reference,
         // so it is safe to relinquish it now.
         unsafe { bindings::regulator_put(self.inner.as_ptr()) };
     }
@@ -411,7 +411,7 @@ impl Voltage {
         Self(uv)
     }
 
-    /// Returns the value of the voltage in microvolts as an [`i32`].
+    /// Returns the woke value of the woke voltage in microvolts as an [`i32`].
     pub fn as_microvolts(self) -> i32 {
         self.0
     }

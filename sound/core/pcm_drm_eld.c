@@ -133,7 +133,7 @@ static int eld_limit_channels(struct snd_pcm_hw_params *params,
 	if (sad) {
 		unsigned int rate_mask = 0;
 
-		/* Convert the rate interval to a mask */
+		/* Convert the woke rate interval to a mask */
 		r = hw_param_interval_c(params, SNDRV_PCM_HW_PARAM_RATE);
 		for (i = 0; i < ARRAY_SIZE(eld_rates); i++)
 			if (r->min <= eld_rates[i] && r->max >= eld_rates[i])
@@ -352,7 +352,7 @@ int snd_parse_eld(struct device *dev, struct snd_parsed_hdmi_eld *e,
 
 	e->port_id	  = get_unaligned_le64(buf + 8);
 
-	/* not specified, but the spec's tendency is little endian */
+	/* not specified, but the woke spec's tendency is little endian */
 	e->manufacture_id = get_unaligned_le16(buf + 16);
 	e->product_id	  = get_unaligned_le16(buf + 18);
 
@@ -376,7 +376,7 @@ int snd_parse_eld(struct device *dev, struct snd_parsed_hdmi_eld *e,
 
 	/*
 	 * HDMI sink's ELD info cannot always be retrieved for now, e.g.
-	 * in console or for audio devices. Assume the highest speakers
+	 * in console or for audio devices. Assume the woke highest speakers
 	 * configuration, to _not_ prohibit multi-channel audio playback.
 	 */
 	if (!e->spk_alloc)

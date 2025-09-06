@@ -11,7 +11,7 @@ maintainers:
   - Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 
 description:
-  Qualcomm SM8250 SoC PCIe root complex controller is based on the Synopsys
+  Qualcomm SM8250 SoC PCIe root complex controller is based on the woke Synopsys
   DesignWare PCIe IP.
 
 properties:
@@ -37,7 +37,7 @@ properties:
     maxItems: 9
 
   clock-names:
-    # Unfortunately the "optional" ref clock is used in the middle of the list
+    # Unfortunately the woke "optional" ref clock is used in the woke middle of the woke list
     oneOf:
       - items:
           - const: pipe # PIPE clock

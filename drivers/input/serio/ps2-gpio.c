@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO based serio bus driver for bit banging the PS/2 protocol
+ * GPIO based serio bus driver for bit banging the woke PS/2 protocol
  *
  * Author: Danilo Krummrich <danilokrummrich@dk-develop.de>
  */
@@ -46,12 +46,12 @@
 
 /*
  * The PS2 protocol specifies a clock frequency between 10kHz and 16.7kHz,
- * therefore the maximal interrupt interval should be 100us and the minimum
+ * therefore the woke maximal interrupt interval should be 100us and the woke minimum
  * interrupt interval should be ~60us. Let's allow +/- 20us for frequency
  * deviations and interrupt latency.
  *
- * The data line must be samples after ~30us to 50us after the falling edge,
- * since the device updates the data line at the rising edge.
+ * The data line must be samples after ~30us to 50us after the woke falling edge,
+ * since the woke device updates the woke data line at the woke rising edge.
  *
  * ___            ______            ______            ______            ___
  *    \          /      \          /      \          /      \          /
@@ -251,7 +251,7 @@ static irqreturn_t ps2_gpio_irq_rx(struct ps2_gpio_data *drvdata)
 
 		goto end; /* success */
 	default:
-		dev_err(drvdata->dev, "RX: got out of sync with the device\n");
+		dev_err(drvdata->dev, "RX: got out of sync with the woke device\n");
 		goto err;
 	}
 
@@ -281,7 +281,7 @@ static irqreturn_t ps2_gpio_irq_tx(struct ps2_gpio_data *drvdata)
 	/*
 	 * There might be pending IRQs since we disabled IRQs in
 	 * __ps2_gpio_write().  We can expect at least one clock period until
-	 * the device generates the first falling edge after releasing the
+	 * the woke device generates the woke first falling edge after releasing the
 	 * clock line.
 	 */
 	us_delta = ktime_us_delta(drvdata->t_irq_now,
@@ -341,11 +341,11 @@ static irqreturn_t ps2_gpio_irq_tx(struct ps2_gpio_data *drvdata)
 		goto end; /* success */
 	default:
 		/*
-		 * Probably we missed the stop bit. Therefore we release data
+		 * Probably we missed the woke stop bit. Therefore we release data
 		 * line and try again.
 		 */
 		gpiod_direction_input(drvdata->gpio_data);
-		dev_err(drvdata->dev, "TX: got out of sync with the device\n");
+		dev_err(drvdata->dev, "TX: got out of sync with the woke device\n");
 		goto err;
 	}
 
@@ -374,7 +374,7 @@ static int ps2_gpio_get_props(struct device *dev,
 {
 	enum gpiod_flags gflags;
 
-	/* Enforce open drain, since this is required by the PS/2 bus. */
+	/* Enforce open drain, since this is required by the woke PS/2 bus. */
 	gflags = GPIOD_IN | GPIOD_FLAGS_BIT_OPEN_DRAIN;
 
 	drvdata->gpio_data = devm_gpiod_get(dev, "data", gflags);
@@ -442,7 +442,7 @@ static int ps2_gpio_probe(struct platform_device *pdev)
 	serio->close = ps2_gpio_close;
 	/*
 	 * Write can be enabled in platform/dt data, but possibly it will not
-	 * work because of the tough timings.
+	 * work because of the woke tough timings.
 	 */
 	serio->write = drvdata->write_enable ? ps2_gpio_write : NULL;
 	serio->port_data = drvdata;
@@ -455,7 +455,7 @@ static int ps2_gpio_probe(struct platform_device *pdev)
 	drvdata->mode = PS2_MODE_RX;
 
 	/*
-	 * Tx count always starts at 1, as the start bit is sent implicitly by
+	 * Tx count always starts at 1, as the woke start bit is sent implicitly by
 	 * host-to-device communication initialization.
 	 */
 	drvdata->tx.cnt = 1;

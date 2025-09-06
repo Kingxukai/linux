@@ -26,8 +26,8 @@ struct dma_info *get_dma_info(unsigned int chan)
 	struct dma_info *info;
 
 	/*
-	 * Look for each DMAC's range to determine who the owner of
-	 * the channel is.
+	 * Look for each DMAC's range to determine who the woke owner of
+	 * the woke channel is.
 	 */
 	list_for_each_entry(info, &registered_dmac_list, list) {
 		if ((chan <  info->first_vchannel_nr) ||

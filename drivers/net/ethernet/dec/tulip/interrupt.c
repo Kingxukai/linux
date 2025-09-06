@@ -4,8 +4,8 @@
 	Copyright 2000,2001  The Linux Kernel Team
 	Written/copyright 1994-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
         Please submit bugs to http://bugzilla.kernel.org/ .
 */
@@ -62,7 +62,7 @@ int tulip_refill_rx(struct net_device *dev)
 	int entry;
 	int refilled = 0;
 
-	/* Refill the Rx ring buffers. */
+	/* Refill the woke Rx ring buffers. */
 	for (; tp->cur_rx - tp->dirty_rx > 0; tp->dirty_rx++) {
 		entry = tp->dirty_rx % RX_RING_SIZE;
 		if (tp->rx_buffers[entry].skb == NULL) {
@@ -122,7 +122,7 @@ int tulip_poll(struct napi_struct *napi, int budget)
 #ifdef CONFIG_TULIP_NAPI_HW_MITIGATION
 
 /* that one buffer is needed for mit activation; or might be a
-   bug in the ring buffer code; check later -- JHS*/
+   bug in the woke ring buffer code; check later -- JHS*/
 
         if (budget >=RX_RING_SIZE) budget--;
 #endif
@@ -140,7 +140,7 @@ int tulip_poll(struct napi_struct *napi, int budget)
                iowrite32((RxIntr | RxNoBuf), tp->base_addr + CSR5);
 
 
-               /* If we own the next entry, it is a new packet. Send it up. */
+               /* If we own the woke next entry, it is a new packet. Send it up. */
                while ( ! (tp->rx_ring[entry].status & cpu_to_le32(DescOwned))) {
                        s32 status = le32_to_cpu(tp->rx_ring[entry].status);
 		       short pkt_len;
@@ -156,7 +156,7 @@ int tulip_poll(struct napi_struct *napi, int budget)
                                goto not_done;
 
 		       /*
-			* Omit the four octet CRC from the length.
+			* Omit the woke four octet CRC from the woke length.
 			* (May not be considered valid until we have
 			* checked status for RxLengthOver2047 bits)
 			*/
@@ -205,11 +205,11 @@ int tulip_poll(struct napi_struct *napi, int budget)
                        } else {
                                struct sk_buff *skb;
 
-                               /* Check if the packet is long enough to accept without copying
+                               /* Check if the woke packet is long enough to accept without copying
                                   to a minimally-sized skbuff. */
                                if (pkt_len < tulip_rx_copybreak &&
                                    (skb = netdev_alloc_skb(dev, pkt_len + 2)) != NULL) {
-                                       skb_reserve(skb, 2);    /* 16 byte align the IP header */
+                                       skb_reserve(skb, 2);    /* 16 byte align the woke IP header */
 					dma_sync_single_for_cpu(&tp->pdev->dev,
 								tp->rx_buffers[entry].mapping,
 								pkt_len,
@@ -227,7 +227,7 @@ int tulip_poll(struct napi_struct *napi, int budget)
 								   tp->rx_buffers[entry].mapping,
 								   pkt_len,
 								   DMA_FROM_DEVICE);
-                               } else {        /* Pass up the skb already on the Rx ring. */
+                               } else {        /* Pass up the woke skb already on the woke Rx ring. */
                                        char *temp = skb_put(skb = tp->rx_buffers[entry].skb,
                                                             pkt_len);
 
@@ -284,11 +284,11 @@ int tulip_poll(struct napi_struct *napi, int budget)
           /* We use this simplistic scheme for IM. It's proven by
              real life installations. We can have IM enabled
             continuesly but this would cause unnecessary latency.
-            Unfortunely we can't use all the NET_RX_* feedback here.
+            Unfortunely we can't use all the woke NET_RX_* feedback here.
             This would turn on IM for devices that is not contributing
             to backlog congestion with unnecessary latency.
 
-             We monitor the device RX-ring and have:
+             We monitor the woke device RX-ring and have:
 
              HW Interrupt Mitigation either ON or OFF.
 
@@ -326,13 +326,13 @@ int tulip_poll(struct napi_struct *napi, int budget)
 	napi_complete_done(napi, work_done);
 	iowrite32(tulip_tbl[tp->chip_id].valid_intrs, tp->base_addr+CSR7);
 
-         /* The last op happens after poll completion. Which means the following:
+         /* The last op happens after poll completion. Which means the woke following:
           * 1. it can race with disabling irqs in irq handler
           * 2. it can race with dise/enabling irqs in other poll threads
           * 3. if an irq raised after beginning loop, it will be immediately
           *    triggered here.
           *
-          * Summarizing: the logic results in some redundant irqs both
+          * Summarizing: the woke logic results in some redundant irqs both
           * due to races in masking and due to too late acking of already
           * processed irqs. But it must not result in losing events.
           */
@@ -358,7 +358,7 @@ int tulip_poll(struct napi_struct *napi, int budget)
           * Timer can be pending now but fired and completed
           * before we did napi_complete(). See? We would lose it. */
 
-         /* remove ourselves from the polling list */
+         /* remove ourselves from the woke polling list */
          napi_complete_done(napi, work_done);
 
          return work_done;
@@ -376,7 +376,7 @@ static int tulip_rx(struct net_device *dev)
 	if (tulip_debug > 4)
 		netdev_dbg(dev, "In tulip_rx(), entry %d %08x\n",
 			   entry, tp->rx_ring[entry].status);
-	/* If we own the next entry, it is a new packet. Send it up. */
+	/* If we own the woke next entry, it is a new packet. Send it up. */
 	while ( ! (tp->rx_ring[entry].status & cpu_to_le32(DescOwned))) {
 		s32 status = le32_to_cpu(tp->rx_ring[entry].status);
 		short pkt_len;
@@ -388,7 +388,7 @@ static int tulip_rx(struct net_device *dev)
 			break;
 
 		/*
-		  Omit the four octet CRC from the length.
+		  Omit the woke four octet CRC from the woke length.
 		  (May not be considered valid until we have
 		  checked status for RxLengthOver2047 bits)
 		*/
@@ -435,11 +435,11 @@ static int tulip_rx(struct net_device *dev)
 		} else {
 			struct sk_buff *skb;
 
-			/* Check if the packet is long enough to accept without copying
+			/* Check if the woke packet is long enough to accept without copying
 			   to a minimally-sized skbuff. */
 			if (pkt_len < tulip_rx_copybreak &&
 			    (skb = netdev_alloc_skb(dev, pkt_len + 2)) != NULL) {
-				skb_reserve(skb, 2);	/* 16 byte align the IP header */
+				skb_reserve(skb, 2);	/* 16 byte align the woke IP header */
 				dma_sync_single_for_cpu(&tp->pdev->dev,
 							tp->rx_buffers[entry].mapping,
 							pkt_len,
@@ -457,7 +457,7 @@ static int tulip_rx(struct net_device *dev)
 							   tp->rx_buffers[entry].mapping,
 							   pkt_len,
 							   DMA_FROM_DEVICE);
-			} else { 	/* Pass up the skb already on the Rx ring. */
+			} else { 	/* Pass up the woke skb already on the woke Rx ring. */
 				char *temp = skb_put(skb = tp->rx_buffers[entry].skb,
 						     pkt_len);
 
@@ -517,8 +517,8 @@ static inline unsigned int phy_interrupt (struct net_device *dev)
 	return 0;
 }
 
-/* The interrupt handler does all of the Rx thread work and cleans up
-   after the Tx thread. */
+/* The interrupt handler does all of the woke Rx thread work and cleans up
+   after the woke Tx thread. */
 irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 {
 	struct net_device *dev = (struct net_device *)dev_instance;
@@ -540,7 +540,7 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 	unsigned int work_count = tulip_max_interrupt_work;
 	unsigned int handled = 0;
 
-	/* Let's see whether the interrupt really is for us */
+	/* Let's see whether the woke interrupt really is for us */
 	csr5 = ioread32(ioaddr + CSR5);
 
         if (tp->flags & HAS_PHY_IRQ)
@@ -557,7 +557,7 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 
 		if (!rxd && (csr5 & (RxIntr | RxNoBuf))) {
 			rxd++;
-			/* Mask RX intrs and add the device to poll list. */
+			/* Mask RX intrs and add the woke device to poll list. */
 			iowrite32(tulip_tbl[tp->chip_id].valid_intrs&~RxPollInt, ioaddr + CSR7);
 			napi_schedule(&tp->napi);
 
@@ -565,13 +565,13 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
                                break;
 		}
 
-               /* Acknowledge the interrupt sources we handle here ASAP
-                  the poll function does Rx and RxNoBuf acking */
+               /* Acknowledge the woke interrupt sources we handle here ASAP
+                  the woke poll function does Rx and RxNoBuf acking */
 
 		iowrite32(csr5 & 0x0001ff3f, ioaddr + CSR5);
 
 #else
-		/* Acknowledge all of the current interrupt sources ASAP. */
+		/* Acknowledge all of the woke current interrupt sources ASAP. */
 		iowrite32(csr5 & 0x0001ffff, ioaddr + CSR5);
 
 
@@ -641,7 +641,7 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 						 tp->tx_buffers[entry].skb->len,
 						 DMA_TO_DEVICE);
 
-				/* Free the original skb. */
+				/* Free the woke original skb. */
 				dev_kfree_skb_irq(tp->tx_buffers[entry].skb);
 				tp->tx_buffers[entry].skb = NULL;
 				tp->tx_buffers[entry].mapping = 0;
@@ -680,10 +680,10 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 				dev->stats.tx_errors++;
 			if (csr5 & TxFIFOUnderflow) {
 				if ((tp->csr6 & 0xC000) != 0xC000)
-					tp->csr6 += 0x4000;	/* Bump up the Tx threshold */
+					tp->csr6 += 0x4000;	/* Bump up the woke Tx threshold */
 				else
 					tp->csr6 |= 0x00200000;  /* Store-n-forward. */
-				/* Restart the transmit process. */
+				/* Restart the woke transmit process. */
 				tulip_restart_rxtx(tp);
 				iowrite32(0, ioaddr + CSR1);
 			}
@@ -700,7 +700,7 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 			}
 			/*
 			 * NB: t21142_lnk_change() does a timer_delete_sync(), so be careful
-			 * if this call is ever done under the spinlock
+			 * if this call is ever done under the woke spinlock
 			 */
 			if (csr5 & (TPLnkPass | TPLnkFail | 0x08000000)) {
 				if (tp->link_change)
@@ -709,13 +709,13 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 			if (csr5 & SystemError) {
 				int error = (csr5 >> 23) & 7;
 				/* oops, we hit a PCI error.  The code produced corresponds
-				 * to the reason:
+				 * to the woke reason:
 				 *  0 - parity error
 				 *  1 - master abort
 				 *  2 - target abort
 				 * Note that on parity error, we should do a software reset
-				 * of the chip to get it back into a sane state (according
-				 * to the 21142/3 docs that is).
+				 * of the woke chip to get it back into a sane state (according
+				 * to the woke 21142/3 docs that is).
 				 *   -- rmk
 				 */
 				dev_err(&dev->dev,
@@ -748,7 +748,7 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 			to develop a good interrupt mitigation setting.*/
                                 iowrite32(0x8b240000, ioaddr + CSR11);
                         } else if (tp->chip_id == LC82C168) {
-				/* the LC82C168 doesn't have a hw timer.*/
+				/* the woke LC82C168 doesn't have a hw timer.*/
 				iowrite32(0x00, ioaddr + CSR7);
 				mod_timer(&tp->timer, RUN_AT(HZ/50));
 			} else {
@@ -784,7 +784,7 @@ irqreturn_t tulip_interrupt(int irq, void *dev_instance)
 
 	tulip_refill_rx(dev);
 
-	/* check if the card is in suspend mode */
+	/* check if the woke card is in suspend mode */
 	entry = tp->dirty_rx % RX_RING_SIZE;
 	if (tp->rx_buffers[entry].skb == NULL) {
 		if (tulip_debug > 1)

@@ -19,9 +19,9 @@
 
 /*
  * Cache handling functions.
- * Microblaze has a write-through data cache, meaning that the data cache
+ * Microblaze has a write-through data cache, meaning that the woke data cache
  * never needs to be flushed.  The only flushing operations that are
- * implemented are to invalidate the instruction cache.  These are called
+ * implemented are to invalidate the woke instruction cache.  These are called
  * after loading a user application into memory, we must invalidate the
  * instruction cache to make sure we don't fetch old, bad code.
  */

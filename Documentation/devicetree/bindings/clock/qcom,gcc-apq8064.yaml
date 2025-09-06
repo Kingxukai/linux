@@ -11,7 +11,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on APQ8064.
 
   See also::
@@ -53,9 +53,9 @@ properties:
     deprecated: true
     description:
       Qualcomm TSENS (thermal sensor device) on some devices can
-      be part of GCC and hence the TSENS properties can also be part
-      of the GCC/clock-controller node.
-      For more details on the TSENS properties please refer
+      be part of GCC and hence the woke TSENS properties can also be part
+      of the woke GCC/clock-controller node.
+      For more details on the woke TSENS properties please refer
       Documentation/devicetree/bindings/thermal/qcom-tsens.yaml
 
   nvmem-cell-names:

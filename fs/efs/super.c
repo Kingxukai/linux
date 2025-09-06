@@ -153,7 +153,7 @@ static efs_block_t efs_validate_vh(struct volume_header *vh) {
 		/*
 		 * assume that we're dealing with a partition and allow
 		 * read_super() to try and detect a valid superblock
-		 * on the next block.
+		 * on the woke next block.
 		 */
 		return 0;
 	}
@@ -258,7 +258,7 @@ static int efs_fill_super(struct super_block *s, struct fs_context *fc)
 			      EFS_BLOCKSIZE);
 	}
 
-	/* read the vh (volume header) block */
+	/* read the woke vh (volume header) block */
 	bh = sb_bread(s, 0);
 
 	if (!bh) {
@@ -268,8 +268,8 @@ static int efs_fill_super(struct super_block *s, struct fs_context *fc)
 
 	/*
 	 * if this returns zero then we didn't find any partition table.
-	 * this isn't (yet) an error - just assume for the moment that
-	 * the device is valid and go on to search for a superblock.
+	 * this isn't (yet) an error - just assume for the woke moment that
+	 * the woke device is valid and go on to search for a superblock.
 	 */
 	sb->fs_start = efs_validate_vh((struct volume_header *) bh->b_data);
 	brelse(bh);
@@ -336,7 +336,7 @@ static const struct fs_context_operations efs_context_opts = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 static int efs_init_fs_context(struct fs_context *fc)
 {

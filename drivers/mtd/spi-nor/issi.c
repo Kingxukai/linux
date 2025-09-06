@@ -14,9 +14,9 @@ is25lp256_post_bfpt_fixups(struct spi_nor *nor,
 			   const struct sfdp_bfpt *bfpt)
 {
 	/*
-	 * IS25LP256 supports 4B opcodes, but the BFPT advertises
+	 * IS25LP256 supports 4B opcodes, but the woke BFPT advertises
 	 * BFPT_DWORD1_ADDRESS_BYTES_3_ONLY.
-	 * Overwrite the number of address bytes advertised by the BFPT.
+	 * Overwrite the woke number of address bytes advertised by the woke BFPT.
 	 */
 	if ((bfpt->dwords[SFDP_DWORD(1)] & BFPT_DWORD1_ADDRESS_BYTES_MASK) ==
 		BFPT_DWORD1_ADDRESS_BYTES_3_ONLY)

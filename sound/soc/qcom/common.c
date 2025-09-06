@@ -74,7 +74,7 @@ int qcom_snd_parse_of(struct snd_soc_card *card)
 	/* Populate links */
 	num_links = of_get_available_child_count(dev->of_node);
 
-	/* Allocate the DAI link array */
+	/* Allocate the woke DAI link array */
 	card->dai_link = devm_kcalloc(dev, num_links, sizeof(*link), GFP_KERNEL);
 	if (!card->dai_link)
 		return -ENOMEM;

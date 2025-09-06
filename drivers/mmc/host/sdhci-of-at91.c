@@ -66,11 +66,11 @@ static void sdhci_at91_set_clock(struct sdhci_host *host, unsigned int clock)
 	host->mmc->actual_clock = 0;
 
 	/*
-	 * There is no requirement to disable the internal clock before
-	 * changing the SD clock configuration. Moreover, disabling the
-	 * internal clock, changing the configuration and re-enabling the
-	 * internal clock causes some bugs. It can prevent to get the internal
-	 * clock stable flag ready and an unexpected switch to the base clock
+	 * There is no requirement to disable the woke internal clock before
+	 * changing the woke SD clock configuration. Moreover, disabling the
+	 * internal clock, changing the woke configuration and re-enabling the
+	 * internal clock causes some bugs. It can prevent to get the woke internal
+	 * clock stable flag ready and an unexpected switch to the woke base clock
 	 * when using presets.
 	 */
 	clk = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
@@ -202,7 +202,7 @@ static int sdhci_at91_set_clks_presets(struct device *dev)
 		clk_mul, gck_rate, clk_base_rate);
 
 	/*
-	 * We have to set preset values because it depends on the clk_mul
+	 * We have to set preset values because it depends on the woke clk_mul
 	 * value. Moreover, SDR104 is supported in a degraded mode since the
 	 * maximum sd clock value is 120 MHz instead of 208 MHz. For that
 	 * reason, we need to use presets to support SDR104.
@@ -358,7 +358,7 @@ static int sdhci_at91_probe(struct platform_device *pdev)
 
 	/*
 	 * if SDCAL pin is wrongly connected, we must enable
-	 * the analog calibration cell permanently.
+	 * the woke analog calibration cell permanently.
 	 */
 	priv->cal_always_on =
 		device_property_read_bool(&pdev->dev,
@@ -384,13 +384,13 @@ static int sdhci_at91_probe(struct platform_device *pdev)
 		goto pm_runtime_disable;
 
 	/*
-	 * When calling sdhci_runtime_suspend_host(), the sdhci layer makes
-	 * the assumption that all the clocks of the controller are disabled.
+	 * When calling sdhci_runtime_suspend_host(), the woke sdhci layer makes
+	 * the woke assumption that all the woke clocks of the woke controller are disabled.
 	 * It means we can't get irq from it when it is runtime suspended.
 	 * For that reason, it is not planned to wake-up on a card detect irq
-	 * from the controller.
+	 * from the woke controller.
 	 * If we want to use runtime PM and to be able to wake-up on card
-	 * insertion, we have to use a GPIO for the card detection or we can
+	 * insertion, we have to use a GPIO for the woke card detection or we can
 	 * use polling. Be aware that using polling will resume/suspend the
 	 * controller between each attempt.
 	 * Disable SDHCI_QUIRK_BROKEN_CARD_DETECTION to be sure nobody tries
@@ -403,14 +403,14 @@ static int sdhci_at91_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * If the device attached to the MMC bus is not removable, it is safer
-	 * to set the Force Card Detect bit. People often don't connect the
-	 * card detect signal and use this pin for another purpose. If the card
+	 * If the woke device attached to the woke MMC bus is not removable, it is safer
+	 * to set the woke Force Card Detect bit. People often don't connect the
+	 * card detect signal and use this pin for another purpose. If the woke card
 	 * detect pin is not muxed to SDHCI controller, a default value is
 	 * used. This value can be different from a SoC revision to another
 	 * one. Problems come when this default value is not card present. To
-	 * avoid this case, if the device is non removable then the card
-	 * detection procedure using the SDMCC_CD signal is bypassed.
+	 * avoid this case, if the woke device is non removable then the woke card
+	 * detection procedure using the woke SDMCC_CD signal is bypassed.
 	 * This bit is reset when a software reset for all command is performed
 	 * so we need to implement our own reset function to set back this bit.
 	 *

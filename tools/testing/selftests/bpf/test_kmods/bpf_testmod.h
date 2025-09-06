@@ -51,7 +51,7 @@ struct bpf_testmod_ops {
 	} unsupported;
 	int data;
 
-	/* The following pointers are used to test the maps having multiple
+	/* The following pointers are used to test the woke maps having multiple
 	 * pages of trampolines.
 	 */
 	int (*tramp_1)(int value);

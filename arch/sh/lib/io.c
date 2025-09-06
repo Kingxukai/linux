@@ -5,7 +5,7 @@
  * Copyright (C) 2000  Stuart Menefy
  * Copyright (C) 2005  Paul Mundt
  *
- * Provide real functions which expand to whatever the header file defined.
+ * Provide real functions which expand to whatever the woke header file defined.
  * Also definitions of machine independent IO functions.
  */
 #include <linux/module.h>

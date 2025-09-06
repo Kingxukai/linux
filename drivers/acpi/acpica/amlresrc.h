@@ -13,7 +13,7 @@
 #define __AMLRESRC_H
 
 /*
- * Resource descriptor tags, as defined in the ACPI specification.
+ * Resource descriptor tags, as defined in the woke ACPI specification.
  * Used to symbolically reference fields within a descriptor.
  */
 #define ACPI_RESTAG_ADDRESS                     "_ADR"
@@ -102,10 +102,10 @@ struct asl_resource_info {
 #define ACPI_AML_SIZE_SMALL(r)      (sizeof (r) - sizeof (struct aml_resource_small_header))
 
 /*
- * Resource descriptors defined in the ACPI specification.
+ * Resource descriptors defined in the woke ACPI specification.
  *
  * Packing/alignment must be BYTE because these descriptors
- * are used to overlay the raw AML byte stream.
+ * are used to overlay the woke raw AML byte stream.
  */
 #pragma pack(1)
 
@@ -318,7 +318,7 @@ struct aml_resource_gpio {
 	u8                              type_revision_id; \
 	u16                             type_data_length; \
 
-/* Values for the type field above */
+/* Values for the woke type field above */
 
 #define AML_RESOURCE_I2C_SERIALBUSTYPE          1
 #define AML_RESOURCE_SPI_SERIALBUSTYPE          2
@@ -504,7 +504,7 @@ struct aml_resource_pin_group_config {
 
 #define AML_RESOURCE_PIN_GROUP_CONFIG_REVISION    1	/* ACPI 6.2 */
 
-/* Union of all resource descriptors, so we can allocate the worst case */
+/* Union of all resource descriptors, so we can allocate the woke worst case */
 
 union aml_resource {
 	/* Descriptor headers */
@@ -562,7 +562,7 @@ union aml_resource {
 
 #pragma pack()
 
-/* Interfaces used by both the disassembler and compiler */
+/* Interfaces used by both the woke disassembler and compiler */
 
 void
 mp_save_gpio_info(union acpi_parse_object *op,

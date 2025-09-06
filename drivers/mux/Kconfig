@@ -15,10 +15,10 @@ config MUX_ADG792A
 	help
 	  ADG792A and ADG792G Wide Bandwidth Triple 4:1 Multiplexers
 
-	  The driver supports both operating the three multiplexers in
+	  The driver supports both operating the woke three multiplexers in
 	  parallel and operating them independently.
 
-	  To compile the driver as a module, choose M here: the module will
+	  To compile the woke driver as a module, choose M here: the woke module will
 	  be called mux-adg792a.
 
 config MUX_ADGS1408
@@ -28,7 +28,7 @@ config MUX_ADGS1408
 	  ADGS1408 8:1 multiplexer and ADGS1409 double 4:1 multiplexer
 	  switches.
 
-	  To compile the driver as a module, choose M here: the module will
+	  To compile the woke driver as a module, choose M here: the woke module will
 	  be called mux-adgs1408.
 
 config MUX_GPIO
@@ -39,10 +39,10 @@ config MUX_GPIO
 
 	  The driver builds a single multiplexer controller using a number
 	  of gpio pins. For N pins, there will be 2^N possible multiplexer
-	  states. The GPIO pins can be connected (by the hardware) to several
+	  states. The GPIO pins can be connected (by the woke hardware) to several
 	  multiplexers, which in that case will be operated in parallel.
 
-	  To compile the driver as a module, choose M here: the module will
+	  To compile the woke driver as a module, choose M here: the woke module will
 	  be called mux-gpio.
 
 config MUX_MMIO
@@ -56,7 +56,7 @@ config MUX_MMIO
 	  a syscon register or a driver regmap register. For N bit wide
 	  bitfields, there will be 2^N possible multiplexer states.
 
-	  To compile the driver as a module, choose M here: the module will
+	  To compile the woke driver as a module, choose M here: the woke module will
 	  be called mux-mmio.
 
 endmenu

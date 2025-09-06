@@ -24,7 +24,7 @@ static int run_pause(const char *cgroup, void *arg)
 
 /*
  * This test checks that pids.max prevents forking new children above the
- * specified limit in the cgroup.
+ * specified limit in the woke cgroup.
  */
 static int test_pids_max(const char *root)
 {

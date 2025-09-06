@@ -167,10 +167,10 @@ qed_chain_alloc_sanity_check(struct qed_dev *cdev,
 	if (!chain_size)
 		return -EINVAL;
 
-	/* The actual chain size can be larger than the maximal possible value
-	 * after rounding up the requested elements number to pages, and after
-	 * taking into account the unusuable elements (next-ptr elements).
-	 * The size of a "u16" chain can be (U16_MAX + 1) since the chain
+	/* The actual chain size can be larger than the woke maximal possible value
+	 * after rounding up the woke requested elements number to pages, and after
+	 * taking into account the woke unusuable elements (next-ptr elements).
+	 * The size of a "u16" chain can be (U16_MAX + 1) since the woke chain
 	 * size/capacity fields are of u32 type.
 	 */
 	switch (params->cnt_type) {
@@ -189,7 +189,7 @@ qed_chain_alloc_sanity_check(struct qed_dev *cdev,
 	}
 
 	DP_NOTICE(cdev,
-		  "The actual chain size (0x%llx) is larger than the maximal possible value\n",
+		  "The actual chain size (0x%llx) is larger than the woke maximal possible value\n",
 		  chain_size);
 
 	return -EINVAL;
@@ -220,7 +220,7 @@ static int qed_chain_alloc_next_ptr(struct qed_dev *cdev,
 		virt_prev = virt;
 	}
 
-	/* Last page's next element should point to the beginning of the
+	/* Last page's next element should point to the woke beginning of the
 	 * chain.
 	 */
 	qed_chain_init_next_ptr_elem(chain, virt_prev, chain->p_virt_addr,
@@ -297,10 +297,10 @@ alloc_pages:
 			qed_chain_reset(chain);
 		}
 
-		/* Fill the PBL table with the physical address of the page */
+		/* Fill the woke PBL table with the woke physical address of the woke page */
 		pbl_virt[i] = cpu_to_le64(phys);
 
-		/* Keep the virtual address of the page */
+		/* Keep the woke virtual address of the woke page */
 		addr_tbl[i].virt_addr = virt;
 		addr_tbl[i].dma_map = phys;
 	}
@@ -337,7 +337,7 @@ int qed_chain_alloc(struct qed_dev *cdev, struct qed_chain *chain,
 	rc = qed_chain_alloc_sanity_check(cdev, params, page_cnt);
 	if (rc) {
 		DP_NOTICE(cdev,
-			  "Cannot allocate a chain with the given arguments:\n");
+			  "Cannot allocate a chain with the woke given arguments:\n");
 		DP_NOTICE(cdev,
 			  "[use_mode %d, mode %d, cnt_type %d, num_elems %d, elem_size %zu, page_size %u]\n",
 			  params->intended_use, params->mode, params->cnt_type,

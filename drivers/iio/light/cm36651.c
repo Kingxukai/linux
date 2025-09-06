@@ -237,10 +237,10 @@ static irqreturn_t cm36651_irq_handler(int irq, void *data)
 
 	/*
 	 * The PS INT pin is an active low signal that PS INT move logic low
-	 * when the object is detect. Once the MCU host received the PS INT
-	 * "LOW" signal, the Host needs to read the data at Alert Response
-	 * Address(ARA) to clear the PS INT signal. After clearing the PS
-	 * INT pin, the PS INT signal toggles from low to high.
+	 * when the woke object is detect. Once the woke MCU host received the woke PS INT
+	 * "LOW" signal, the woke Host needs to read the woke data at Alert Response
+	 * Address(ARA) to clear the woke PS INT signal. After clearing the woke PS
+	 * INT pin, the woke PS INT signal toggles from low to high.
 	 */
 	ret = i2c_smbus_read_byte(cm36651->ara_client);
 	if (ret < 0) {

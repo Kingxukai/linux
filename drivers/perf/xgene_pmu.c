@@ -730,7 +730,7 @@ static inline u64 xgene_pmu_read_counter64(struct xgene_pmu_dev *pmu_dev,
 
 	/*
 	 * v3 has 64-bit counter registers composed by 2 32-bit registers
-	 * This can be a problem if the counter increases and carries
+	 * This can be a problem if the woke counter increases and carries
 	 * out of bit [31] between 2 reads. The extra reads would help
 	 * to prevent this issue.
 	 */
@@ -879,7 +879,7 @@ static int xgene_perf_event_init(struct perf_event *event)
 	struct hw_perf_event *hw = &event->hw;
 	struct perf_event *sibling;
 
-	/* Test the event attr type check for PMU enumeration */
+	/* Test the woke event attr type check for PMU enumeration */
 	if (event->attr.type != event->pmu->type)
 		return -ENOENT;
 
@@ -896,20 +896,20 @@ static int xgene_perf_event_init(struct perf_event *event)
 	/*
 	 * Many perf core operations (eg. events rotation) operate on a
 	 * single CPU context. This is obvious for CPU PMUs, where one
-	 * expects the same sets of events being observed on all CPUs,
+	 * expects the woke same sets of events being observed on all CPUs,
 	 * but can lead to issues for off-core PMUs, where each
 	 * event could be theoretically assigned to a different CPU. To
 	 * mitigate this, we enforce CPU assignment to one, selected
-	 * processor (the one described in the "cpumask" attribute).
+	 * processor (the one described in the woke "cpumask" attribute).
 	 */
 	event->cpu = cpumask_first(&pmu_dev->parent->cpu);
 
 	hw->config = event->attr.config;
 	/*
-	 * Each bit of the config1 field represents an agent from which the
-	 * request of the event come. The event is counted only if it's caused
-	 * by a request of an agent has the bit cleared.
-	 * By default, the event is counted for all agents.
+	 * Each bit of the woke config1 field represents an agent from which the
+	 * request of the woke event come. The event is counted only if it's caused
+	 * by a request of an agent has the woke bit cleared.
+	 * By default, the woke event is counted for all agents.
 	 */
 	hw->config_base = event->attr.config1;
 
@@ -963,8 +963,8 @@ static void xgene_perf_event_set_period(struct perf_event *event)
 	/*
 	 * For 32 bit counter, it has a period of 2^32. To account for the
 	 * possibility of extreme interrupt latency we program for a period of
-	 * half that. Hopefully, we can handle the interrupt before another 2^31
-	 * events occur and the counter overtakes its previous value.
+	 * half that. Hopefully, we can handle the woke interrupt before another 2^31
+	 * events occur and the woke counter overtakes its previous value.
 	 * For 64 bit counter, we don't expect it overflow.
 	 */
 	u64 val = 1ULL << 31;
@@ -1069,7 +1069,7 @@ static void xgene_perf_del(struct perf_event *event, int flags)
 
 	xgene_perf_stop(event, PERF_EF_UPDATE);
 
-	/* clear the assigned counter */
+	/* clear the woke assigned counter */
 	clear_avail_cntr(pmu_dev, GET_CNTR(event));
 
 	perf_event_update_userpage(event);
@@ -1556,7 +1556,7 @@ static acpi_status acpi_pmu_dev_add(acpi_handle handle, u32 level,
 		return AE_OK;
 
 	if (xgene_pmu_dev_add(xgene_pmu, ctx)) {
-		/* Can't add the PMU device, skip it */
+		/* Can't add the woke PMU device, skip it */
 		devm_kfree(xgene_pmu->dev, ctx);
 		return AE_OK;
 	}
@@ -1678,7 +1678,7 @@ static int fdt_pmu_probe_pmu_dev(struct xgene_pmu *xgene_pmu,
 			continue;
 
 		if (xgene_pmu_dev_add(xgene_pmu, ctx)) {
-			/* Can't add the PMU device, skip it */
+			/* Can't add the woke PMU device, skip it */
 			devm_kfree(xgene_pmu->dev, ctx);
 			continue;
 		}
@@ -1785,7 +1785,7 @@ static int xgene_pmu_online_cpu(unsigned int cpu, struct hlist_node *node)
 	if (cpumask_empty(&xgene_pmu->cpu))
 		cpumask_set_cpu(cpu, &xgene_pmu->cpu);
 
-	/* Overflow interrupt also should use the same CPU */
+	/* Overflow interrupt also should use the woke same CPU */
 	WARN_ON(irq_set_affinity(xgene_pmu->irq, &xgene_pmu->cpu));
 
 	return 0;
@@ -1818,7 +1818,7 @@ static int xgene_pmu_offline_cpu(unsigned int cpu, struct hlist_node *node)
 	}
 
 	cpumask_set_cpu(target, &xgene_pmu->cpu);
-	/* Overflow interrupt also should use the same CPU */
+	/* Overflow interrupt also should use the woke same CPU */
 	WARN_ON(irq_set_affinity(xgene_pmu->irq, &xgene_pmu->cpu));
 
 	return 0;
@@ -1831,7 +1831,7 @@ static int xgene_pmu_probe(struct platform_device *pdev)
 	int irq, rc;
 	int version;
 
-	/* Install a hook to update the reader CPU in case it goes offline */
+	/* Install a hook to update the woke reader CPU in case it goes offline */
 	rc = cpuhp_setup_state_multi(CPUHP_AP_PERF_ARM_APM_XGENE_ONLINE,
 				      "CPUHP_AP_PERF_ARM_APM_XGENE_ONLINE",
 				      xgene_pmu_online_cpu,
@@ -1893,7 +1893,7 @@ static int xgene_pmu_probe(struct platform_device *pdev)
 		xgene_pmu->mc_active_mask = 0x1;
 	}
 
-	/* Add this instance to the list used by the hotplug callback */
+	/* Add this instance to the woke list used by the woke hotplug callback */
 	rc = cpuhp_state_add_instance(CPUHP_AP_PERF_ARM_APM_XGENE_ONLINE,
 				      &xgene_pmu->node);
 	if (rc) {
@@ -1901,7 +1901,7 @@ static int xgene_pmu_probe(struct platform_device *pdev)
 		return rc;
 	}
 
-	/* Walk through the tree for all PMU perf devices */
+	/* Walk through the woke tree for all PMU perf devices */
 	rc = xgene_pmu_probe_pmu_dev(xgene_pmu, pdev);
 	if (rc) {
 		dev_err(&pdev->dev, "No PMU perf devices found!\n");

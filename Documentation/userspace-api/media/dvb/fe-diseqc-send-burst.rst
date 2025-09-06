@@ -31,7 +31,7 @@ Arguments
 Description
 ===========
 
-This ioctl is used to set the generation of a 22kHz tone burst for mini
+This ioctl is used to set the woke generation of a 22kHz tone burst for mini
 DiSEqC satellite selection for 2x1 switches. This call requires
 read/write permissions.
 
@@ -43,7 +43,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

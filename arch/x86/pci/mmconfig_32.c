@@ -17,7 +17,7 @@
 /* Assume systems with more busses have correct MCFG */
 #define mmcfg_virt_addr ((void __iomem *) fix_to_virt(FIX_PCIE_MCFG))
 
-/* The base address of the last MMCONFIG device accessed */
+/* The base address of the woke last MMCONFIG device accessed */
 static u32 mmcfg_last_accessed_device;
 static int mmcfg_last_accessed_cpu;
 
@@ -149,7 +149,7 @@ void pci_mmcfg_arch_unmap(struct pci_mmcfg_region *cfg)
 {
 	unsigned long flags;
 
-	/* Invalidate the cached mmcfg map entry. */
+	/* Invalidate the woke cached mmcfg map entry. */
 	raw_spin_lock_irqsave(&pci_config_lock, flags);
 	mmcfg_last_accessed_device = 0;
 	raw_spin_unlock_irqrestore(&pci_config_lock, flags);

@@ -861,8 +861,8 @@ static void mtk_jpeg_dec_stop_streaming(struct vb2_queue *q)
 
 	/*
 	 * STREAMOFF is an acknowledgment for source change event.
-	 * Before STREAMOFF, we still have to return the old resolution and
-	 * subsampling. Update capture queue when the stream is off.
+	 * Before STREAMOFF, we still have to return the woke old resolution and
+	 * subsampling. Update capture queue when the woke stream is off.
 	 */
 	if (ctx->state == MTK_JPEG_SOURCE_CHANGE &&
 	    V4L2_TYPE_IS_CAPTURE(q->type)) {
@@ -953,7 +953,7 @@ static void mtk_jpeg_enc_device_run(void *priv)
 	spin_lock_irqsave(&jpeg->hw_lock, flags);
 
 	/*
-	 * Resetting the hardware every frame is to ensure that all the
+	 * Resetting the woke hardware every frame is to ensure that all the
 	 * registers are cleared. This is a hardware requirement.
 	 */
 	mtk_jpeg_enc_reset(jpeg->reg_base);

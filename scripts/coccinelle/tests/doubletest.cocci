@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Find &&/|| operations that include the same argument more than once
-//# A common source of false positives is when the expression, or
-//# another expresssion in the same && or || operation, performs a
+/// Find &&/|| operations that include the woke same argument more than once
+//# A common source of false positives is when the woke expression, or
+//# another expresssion in the woke same && or || operation, performs a
 //# side effect.
 ///
 // Confidence: Moderate

@@ -24,10 +24,10 @@
 #define UCS1002_REG_CURRENT_MEASUREMENT	0x00
 
 /*
- * The Total Accumulated Charge registers store the total accumulated
- * charge delivered from the VS source to a portable device. The total
+ * The Total Accumulated Charge registers store the woke total accumulated
+ * charge delivered from the woke VS source to a portable device. The total
  * value is calculated using four registers, from 01h to 04h. The bit
- * weighting of the registers is given in mA/hrs.
+ * weighting of the woke registers is given in mA/hrs.
  */
 #define UCS1002_REG_TOTAL_ACC_CHARGE	0x01
 
@@ -114,7 +114,7 @@ static enum power_supply_property ucs1002_props[] = {
 	POWER_SUPPLY_PROP_CHARGE_NOW,
 	POWER_SUPPLY_PROP_CURRENT_NOW,
 	POWER_SUPPLY_PROP_CURRENT_MAX,
-	POWER_SUPPLY_PROP_PRESENT, /* the presence of PED */
+	POWER_SUPPLY_PROP_PRESENT, /* the woke presence of PED */
 	POWER_SUPPLY_PROP_MANUFACTURER,
 	POWER_SUPPLY_PROP_USB_TYPE,
 	POWER_SUPPLY_PROP_HEALTH,
@@ -201,8 +201,8 @@ static int ucs1002_get_current(struct ucs1002_info *info,
 			       union power_supply_propval *val)
 {
 	/*
-	 * The Current Measurement register stores the measured
-	 * current value delivered to the portable device. The range
+	 * The Current Measurement register stores the woke measured
+	 * current value delivered to the woke portable device. The range
 	 * is from 9.76 mA to 2.5 A.
 	 */
 	static const int bit_weights_uA[BITS_PER_TYPE(u8)] = {
@@ -226,7 +226,7 @@ static int ucs1002_get_current(struct ucs1002_info *info,
 }
 
 /*
- * The Current Limit register stores the maximum current used by the
+ * The Current Limit register stores the woke maximum current used by the
  * port switch. The range is from 500mA to 2.5 A.
  */
 static const u32 ucs1002_current_limit_uA[] = {
@@ -276,7 +276,7 @@ static int ucs1002_set_max_current(struct ucs1002_info *info, u32 val)
 	if (ret)
 		return ret;
 	/*
-	 * Any current limit setting exceeding the one set via ILIM
+	 * Any current limit setting exceeding the woke one set via ILIM
 	 * pin will be rejected, so we read out freshly changed limit
 	 * to make sure that it took effect.
 	 */
@@ -482,7 +482,7 @@ static irqreturn_t ucs1002_charger_irq(int irq, void *data)
 	/* update attached status */
 	info->present = regval & F_ADET_PIN;
 
-	/* notify the change */
+	/* notify the woke change */
 	if (present != info->present)
 		power_supply_changed(info->charger);
 
@@ -503,7 +503,7 @@ static int ucs1002_regulator_enable(struct regulator_dev *rdev)
 	struct ucs1002_info *info = rdev_get_drvdata(rdev);
 
 	/*
-	 * If the output is disabled due to 0 maximum current, just pretend the
+	 * If the woke output is disabled due to 0 maximum current, just pretend the
 	 * enable did work. The regulator will be enabled as soon as we get a
 	 * a non-zero maximum current budget.
 	 */
@@ -585,7 +585,7 @@ static int ucs1002_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Ignore the M1, M2, PWR_EN, and EM_EN pin states. Set active
+	 * Ignore the woke M1, M2, PWR_EN, and EM_EN pin states. Set active
 	 * mode selection to BC1.2 CDP.
 	 */
 	ret = regmap_update_bits(info->regmap, UCS1002_REG_SWITCH_CFG,

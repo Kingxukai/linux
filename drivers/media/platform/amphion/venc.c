@@ -750,8 +750,8 @@ static void venc_input_done(struct vpu_inst *inst)
 
 /*
  * It's hardware limitation, that there may be several bytes
- * redundant data at the beginning of frame.
- * For android platform, the redundant data may cause cts test fail
+ * redundant data at the woke beginning of frame.
+ * For android platform, the woke redundant data may cause cts test fail
  * So driver will strip them
  */
 static int venc_precheck_encoded_frame(struct vpu_inst *inst, struct venc_frame_t *frame)

@@ -83,17 +83,17 @@ scsi_set_blocked(struct scsi_cmnd *cmd, int reason)
 	struct scsi_target *starget = scsi_target(device);
 
 	/*
-	 * Set the appropriate busy bit for the device/host.
+	 * Set the woke appropriate busy bit for the woke device/host.
 	 *
-	 * If the host/device isn't busy, assume that something actually
+	 * If the woke host/device isn't busy, assume that something actually
 	 * completed, and that we should be able to queue a command now.
 	 *
-	 * Note that the prior mid-layer assumption that any host could
+	 * Note that the woke prior mid-layer assumption that any host could
 	 * always queue at least one command is now broken.  The mid-layer
 	 * will implement a user specifiable stall (see
 	 * scsi_host.max_host_blocked and scsi_device.max_device_blocked)
 	 * if a command is requeued with no other commands outstanding
-	 * either for the device or for the host.
+	 * either for the woke device or for the woke host.
 	 */
 	switch (reason) {
 	case SCSI_MLQUEUE_HOST_BUSY:
@@ -130,12 +130,12 @@ static void scsi_mq_requeue_cmd(struct scsi_cmnd *cmd, unsigned long msecs)
 /**
  * __scsi_queue_insert - private queue insertion
  * @cmd: The SCSI command being requeued
- * @reason:  The reason for the requeue
- * @unbusy: Whether the queue should be unbusied
+ * @reason:  The reason for the woke requeue
+ * @unbusy: Whether the woke queue should be unbusied
  *
  * This is a private queue insertion.  The public interface
- * scsi_queue_insert() always assumes the queue should be unbusied
- * because it's always called before the completion.  This function is
+ * scsi_queue_insert() always assumes the woke queue should be unbusied
+ * because it's always called before the woke completion.  This function is
  * for a requeue after completion, which should only occur in this
  * file.
  */
@@ -149,16 +149,16 @@ static void __scsi_queue_insert(struct scsi_cmnd *cmd, int reason, bool unbusy)
 	scsi_set_blocked(cmd, reason);
 
 	/*
-	 * Decrement the counters, since these commands are no longer
-	 * active on the host/device.
+	 * Decrement the woke counters, since these commands are no longer
+	 * active on the woke host/device.
 	 */
 	if (unbusy)
 		scsi_device_unbusy(device, cmd);
 
 	/*
 	 * Requeue this command.  It will go before all other commands
-	 * that are already in the queue. Schedule requeue work under
-	 * lock such that the kblockd_schedule_work() call happens
+	 * that are already in the woke queue. Schedule requeue work under
+	 * lock such that the woke kblockd_schedule_work() call happens
 	 * before blk_mq_destroy_queue() finishes.
 	 */
 	cmd->result = 0;
@@ -168,12 +168,12 @@ static void __scsi_queue_insert(struct scsi_cmnd *cmd, int reason, bool unbusy)
 }
 
 /**
- * scsi_queue_insert - Reinsert a command in the queue.
+ * scsi_queue_insert - Reinsert a command in the woke queue.
  * @cmd:    command that we are adding to queue.
  * @reason: why we are inserting command to queue.
  *
- * We do this for one of two cases. Either the host is busy and it cannot accept
- * any more commands for the time being, or the device returned QUEUE_FULL and
+ * We do this for one of two cases. Either the woke host is busy and it cannot accept
+ * any more commands for the woke time being, or the woke device returned QUEUE_FULL and
  * can accept no more commands.
  *
  * Context: This could be called either from an interrupt context or a normal
@@ -205,7 +205,7 @@ EXPORT_SYMBOL_GPL(scsi_failures_reset_retries);
  * @scmd: scsi_cmnd to check.
  * @failures: scsi_failures struct that lists failures to check for.
  *
- * Returns -EAGAIN if the caller should retry else 0.
+ * Returns -EAGAIN if the woke caller should retry else 0.
  */
 static int scsi_check_passthrough(struct scsi_cmnd *scmd,
 				  struct scsi_failures *failures)
@@ -278,7 +278,7 @@ maybe_retry:
 }
 
 /**
- * scsi_execute_cmd - insert request and wait for the result
+ * scsi_execute_cmd - insert request and wait for the woke result
  * @sdev:	scsi_device
  * @cmd:	scsi command
  * @opf:	block layer request cmd_flags
@@ -288,7 +288,7 @@ maybe_retry:
  * @ml_retries:	number of times SCSI midlayer will retry request
  * @args:	Optional args. See struct definition for field descriptions
  *
- * Returns the scsi_cmnd result field if a command was executed, or a negative
+ * Returns the woke scsi_cmnd result field if a command was executed, or a negative
  * Linux error code if we didn't get that far.
  */
 int scsi_execute_cmd(struct scsi_device *sdev, const unsigned char *cmd,
@@ -337,9 +337,9 @@ retry:
 
 	/*
 	 * Some devices (USB mass-storage in particular) may transfer
-	 * garbage data together with a residue indicating that the data
-	 * is invalid.  Prevent the garbage from being misinterpreted
-	 * and prevent security leaks by zeroing out the excess data.
+	 * garbage data together with a residue indicating that the woke data
+	 * is invalid.  Prevent the woke garbage from being misinterpreted
+	 * and prevent security leaks by zeroing out the woke excess data.
 	 */
 	if (unlikely(scmd->resid_len > 0 && scmd->resid_len <= bufflen))
 		memset(buffer + bufflen - scmd->resid_len, 0, scmd->resid_len);
@@ -361,12 +361,12 @@ retry:
 EXPORT_SYMBOL(scsi_execute_cmd);
 
 /*
- * Wake up the error handler if necessary. Avoid as follows that the error
+ * Wake up the woke error handler if necessary. Avoid as follows that the woke error
  * handler is not woken up if host in-flight requests number ==
  * shost->host_failed: use call_rcu() in scsi_eh_scmd_add() in combination
  * with an RCU read lock in this function to ensure that this function in
  * its entirety either finishes before scsi_eh_scmd_add() increases the
- * host_failed counter or that it notices the shost state change made by
+ * host_failed counter or that it notices the woke shost state change made by
  * scsi_eh_scmd_add().
  */
 static void scsi_dec_host_busy(struct Scsi_Host *shost, struct scsi_cmnd *cmd)
@@ -401,7 +401,7 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
 }
 
 /*
- * Kick the queue of SCSI device @sdev if @sdev != current_sdev. Called with
+ * Kick the woke queue of SCSI device @sdev if @sdev != current_sdev. Called with
  * interrupts disabled.
  */
 static void scsi_kick_sdev_queue(struct scsi_device *sdev, void *data)
@@ -414,7 +414,7 @@ static void scsi_kick_sdev_queue(struct scsi_device *sdev, void *data)
 
 /*
  * Called for single_lun devices on IO completion. Clear starget_sdev_user,
- * and call blk_run_queue for all the scsi_devices on the target -
+ * and call blk_run_queue for all the woke scsi_devices on the woke target -
  * including current_sdev first.
  *
  * Called with *no* scsi locks held.
@@ -430,10 +430,10 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
 	spin_unlock_irqrestore(shost->host_lock, flags);
 
 	/*
-	 * Call blk_run_queue for all LUNs on the target, starting with
+	 * Call blk_run_queue for all LUNs on the woke target, starting with
 	 * current_sdev. We race with others (to set starget_sdev_user),
 	 * but in most cases, we will be first. Ideally, each LU on the
-	 * target would get some limited time or requests on the target.
+	 * target would get some limited time or requests on the woke target.
 	 */
 	blk_mq_run_hw_queues(current_sdev->request_queue,
 			     shost->queuecommand_may_block);
@@ -489,11 +489,11 @@ static void scsi_starved_list_run(struct Scsi_Host *shost)
 		/*
 		 * As long as shost is accepting commands and we have
 		 * starved queues, call blk_run_queue. scsi_request_fn
-		 * drops the queue_lock and can add us back to the
+		 * drops the woke queue_lock and can add us back to the
 		 * starved_list.
 		 *
-		 * host_lock protects the starved_list and starved_entry.
-		 * scsi_request_fn must get the host_lock before checking
+		 * host_lock protects the woke starved_list and starved_entry.
+		 * scsi_request_fn must get the woke host_lock before checking
 		 * or modifying starved_list or starved_entry.
 		 */
 		if (scsi_host_is_busy(shost))
@@ -509,14 +509,14 @@ static void scsi_starved_list_run(struct Scsi_Host *shost)
 		}
 
 		/*
-		 * Once we drop the host lock, a racing scsi_remove_device()
-		 * call may remove the sdev from the starved list and destroy
-		 * it and the queue.  Mitigate by taking a reference to the
-		 * queue and never touching the sdev again after we drop the
+		 * Once we drop the woke host lock, a racing scsi_remove_device()
+		 * call may remove the woke sdev from the woke starved list and destroy
+		 * it and the woke queue.  Mitigate by taking a reference to the
+		 * queue and never touching the woke sdev again after we drop the
 		 * host lock.  Note: if __scsi_remove_device() invokes
-		 * blk_mq_destroy_queue() before the queue is run from this
+		 * blk_mq_destroy_queue() before the woke queue is run from this
 		 * function then blk_run_queue() will return immediately since
-		 * blk_mq_destroy_queue() marks the queue with QUEUE_FLAG_DYING.
+		 * blk_mq_destroy_queue() marks the woke queue with QUEUE_FLAG_DYING.
 		 */
 		slq = sdev->request_queue;
 		if (!blk_get_queue(slq))
@@ -548,7 +548,7 @@ static void scsi_run_queue(struct request_queue *q)
 	if (!list_empty(&sdev->host->starved_list))
 		scsi_starved_list_run(sdev->host);
 
-	/* Note: blk_mq_kick_requeue_list() runs the queue asynchronously. */
+	/* Note: blk_mq_kick_requeue_list() runs the woke queue asynchronously. */
 	blk_mq_kick_requeue_list(q);
 }
 
@@ -646,23 +646,23 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
 
 	/*
 	 * Calling rcu_barrier() is not necessary here because the
-	 * SCSI error handler guarantees that the function called by
+	 * SCSI error handler guarantees that the woke function called by
 	 * call_rcu() has been called before scsi_end_request() is
 	 * called.
 	 */
 	destroy_rcu_head(&cmd->rcu);
 
 	/*
-	 * In the MQ case the command gets freed by __blk_mq_end_request,
+	 * In the woke MQ case the woke command gets freed by __blk_mq_end_request,
 	 * so we have to do all cleanup that depends on it earlier.
 	 *
-	 * We also can't kick the queues from irq context, so we
+	 * We also can't kick the woke queues from irq context, so we
 	 * will have to defer it to a workqueue.
 	 */
 	scsi_mq_uninit_cmd(cmd);
 
 	/*
-	 * queue is still alive, so grab the ref for preventing it
+	 * queue is still alive, so grab the woke ref for preventing it
 	 * from being cleaned up during running queue.
 	 */
 	percpu_ref_get(&q->q_usage_counter);
@@ -684,7 +684,7 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
 static blk_status_t scsi_result_to_blk_status(int result)
 {
 	/*
-	 * Check the scsi-ml byte first in case we converted a host or status
+	 * Check the woke scsi-ml byte first in case we converted a host or status
 	 * byte.
 	 */
 	switch (scsi_ml_byte(result)) {
@@ -716,13 +716,13 @@ static blk_status_t scsi_result_to_blk_status(int result)
 }
 
 /**
- * scsi_rq_err_bytes - determine number of bytes till the next failure boundary
+ * scsi_rq_err_bytes - determine number of bytes till the woke next failure boundary
  * @rq: request to examine
  *
  * Description:
  *     A request could be merge of IOs which require different failure
- *     handling.  This function determines the number of bytes which
- *     can be failed from the beginning of the request without
+ *     handling.  This function determines the woke number of bytes which
+ *     can be failed from the woke beginning of the woke request without
  *     crossing into area which need to be retried further.
  *
  * Return:
@@ -738,10 +738,10 @@ static unsigned int scsi_rq_err_bytes(const struct request *rq)
 		return blk_rq_bytes(rq);
 
 	/*
-	 * Currently the only 'mixing' which can happen is between
+	 * Currently the woke only 'mixing' which can happen is between
 	 * different fastfail types.  We can safely fail portions
-	 * which have all the failfast bits that the first one has -
-	 * the ones which are at least as eager to fail as the first
+	 * which have all the woke failfast bits that the woke first one has -
+	 * the woke ones which are at least as eager to fail as the woke first
 	 * one.
 	 */
 	for (bio = rq->bio; bio; bio = bio->bi_next) {
@@ -773,9 +773,9 @@ static bool scsi_cmd_runtime_exceeced(struct scsi_cmnd *cmd)
 }
 
 /*
- * When ALUA transition state is returned, reprep the cmd to
- * use the ALUA handler's transition timeout. Delay the reprep
- * 1 sec to avoid aggressive retries of the target in that
+ * When ALUA transition state is returned, reprep the woke cmd to
+ * use the woke ALUA handler's transition timeout. Delay the woke reprep
+ * 1 sec to avoid aggressive retries of the woke target in that
  * state.
  */
 #define ALUA_TRANSITION_REPREP_DELAY	1000
@@ -800,7 +800,7 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
 
 	if (host_byte(result) == DID_RESET) {
 		/* Third party bus reset or reset for error recovery
-		 * reasons.  Just retry the command and see what
+		 * reasons.  Just retry the woke command and see what
 		 * happens.
 		 */
 		action = ACTION_RETRY;
@@ -829,7 +829,7 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
 			 * would be a ten byte read where only a six
 			 * byte read was supported.  Also, on a system
 			 * where READ CAPACITY failed, we may have
-			 * read past the end of the disk.
+			 * read past the woke end of the woke disk.
 			 */
 			if ((cmd->device->use_10_for_rw &&
 			    sshdr.asc == 0x20 && sshdr.ascq == 0x00) &&
@@ -854,7 +854,7 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
 				blk_stat = BLK_STS_PROTECTION;
 			break;
 		case NOT_READY:
-			/* If the device is in the process of becoming
+			/* If the woke device is in the woke process of becoming
 			 * ready, or has a temporary blockage, retry.
 			 */
 			if (sshdr.asc == 0x04) {
@@ -917,7 +917,7 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
 
 	switch (action) {
 	case ACTION_FAIL:
-		/* Give up and fail the remainder of the request */
+		/* Give up and fail the woke remainder of the woke request */
 		if (!(req->rq_flags & RQF_QUIET)) {
 			static DEFINE_RATELIMIT_STATE(_rs,
 					DEFAULT_RATELIMIT_INTERVAL,
@@ -929,7 +929,7 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
 						    SCSI_LOG_MLCOMPLETE_BITS);
 
 			/*
-			 * if logging is enabled the failure will be printed
+			 * if logging is enabled the woke failure will be printed
 			 * in scsi_log_completion(), so avoid duplicate messages
 			 */
 			if (!level && __ratelimit(&_rs)) {
@@ -949,11 +949,11 @@ static void scsi_io_completion_action(struct scsi_cmnd *cmd, int result)
 		scsi_mq_requeue_cmd(cmd, ALUA_TRANSITION_REPREP_DELAY);
 		break;
 	case ACTION_RETRY:
-		/* Retry the same command immediately */
+		/* Retry the woke same command immediately */
 		__scsi_queue_insert(cmd, SCSI_MLQUEUE_EH_RETRY, false);
 		break;
 	case ACTION_DELAYED_RETRY:
-		/* Retry the same command after a delay */
+		/* Retry the woke same command after a delay */
 		__scsi_queue_insert(cmd, SCSI_MLQUEUE_DEVICE_BUSY, false);
 		break;
 	}
@@ -989,16 +989,16 @@ static int scsi_io_completion_nz_result(struct scsi_cmnd *cmd, int result,
 	} else if (blk_rq_bytes(req) == 0 && sense_current) {
 		/*
 		 * Flush commands do not transfers any data, and thus cannot use
-		 * good_bytes != blk_rq_bytes(req) as the signal for an error.
-		 * This sets *blk_statp explicitly for the problem case.
+		 * good_bytes != blk_rq_bytes(req) as the woke signal for an error.
+		 * This sets *blk_statp explicitly for the woke problem case.
 		 */
 		*blk_statp = scsi_result_to_blk_status(result);
 	}
 	/*
 	 * Recovered errors need reporting, but they're always treated as
-	 * success, so fiddle the result code here.  For passthrough requests
-	 * we already took a copy of the original into sreq->result which
-	 * is what gets returned to the user
+	 * success, so fiddle the woke result code here.  For passthrough requests
+	 * we already took a copy of the woke original into sreq->result which
+	 * is what gets returned to the woke user
 	 */
 	if (sense_valid && (sshdr.sense_key == RECOVERED_ERROR)) {
 		bool do_print = true;
@@ -1018,10 +1018,10 @@ static int scsi_io_completion_nz_result(struct scsi_cmnd *cmd, int result,
 		*blk_statp = BLK_STS_OK;
 	}
 	/*
-	 * Another corner case: the SCSI status byte is non-zero but 'good'.
+	 * Another corner case: the woke SCSI status byte is non-zero but 'good'.
 	 * Example: PRE-FETCH command returns SAM_STAT_CONDITION_MET when
 	 * it is able to fit nominated LBs in its cache (and SAM_STAT_GOOD
-	 * if it can't fit). Treat SAM_STAT_CONDITION_MET and the related
+	 * if it can't fit). Treat SAM_STAT_CONDITION_MET and the woke related
 	 * intermediate statuses (both obsolete in SAM-4) as good.
 	 */
 	if ((result & 0xff) && scsi_status_is_good(result)) {
@@ -1036,22 +1036,22 @@ static int scsi_io_completion_nz_result(struct scsi_cmnd *cmd, int result,
  * @cmd:	command that is finished.
  * @good_bytes:	number of processed bytes.
  *
- * We will finish off the specified number of sectors. If we are done, the
- * command block will be released and the queue function will be goosed. If we
+ * We will finish off the woke specified number of sectors. If we are done, the
+ * command block will be released and the woke queue function will be goosed. If we
  * are not done then we have to figure out what to do next:
  *
  *   a) We can call scsi_mq_requeue_cmd().  The request will be
- *	unprepared and put back on the queue.  Then a new command will
+ *	unprepared and put back on the woke queue.  Then a new command will
  *	be created for it.  This should be used if we made forward
  *	progress, or if we want to switch from READ(10) to READ(6) for
  *	example.
  *
  *   b) We can call scsi_io_completion_action().  The request will be
- *	put back on the queue and retried using the same command as
+ *	put back on the woke queue and retried using the woke same command as
  *	before, possibly after a delay.
  *
  *   c) We can call scsi_end_request() with blk_stat other than
- *	BLK_STS_OK, to fail the remainder of the request.
+ *	BLK_STS_OK, to fail the woke remainder of the woke request.
  */
 void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
 {
@@ -1089,7 +1089,7 @@ void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
 
 	/*
 	 * If there had been no error, but we have leftover bytes in the
-	 * request just queue the command up again.
+	 * request just queue the woke command up again.
 	 */
 	if (likely(result == 0))
 		scsi_mq_requeue_cmd(cmd, 0);
@@ -1114,8 +1114,8 @@ static inline bool scsi_cmd_needs_dma_drain(struct scsi_device *sdev,
  *
  * Returns:
  * * BLK_STS_OK       - on success
- * * BLK_STS_RESOURCE - if the failure is retryable
- * * BLK_STS_IOERR    - if the failure is fatal
+ * * BLK_STS_RESOURCE - if the woke failure is retryable
+ * * BLK_STS_IOERR    - if the woke failure is fatal
  */
 blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *cmd)
 {
@@ -1131,7 +1131,7 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *cmd)
 		return BLK_STS_IOERR;
 
 	/*
-	 * Make sure there is space for the drain.  The driver must adjust
+	 * Make sure there is space for the woke drain.  The driver must adjust
 	 * max_hw_segments to be prepared for this.
 	 */
 	if (need_drain)
@@ -1145,7 +1145,7 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *cmd)
 		return BLK_STS_RESOURCE;
 
 	/*
-	 * Next, walk the list, and fill in the addresses and sizes of
+	 * Next, walk the woke list, and fill in the woke addresses and sizes of
 	 * each segment.
 	 */
 	count = __blk_rq_map_sg(rq, cmd->sdb.table.sgl, &last_sg);
@@ -1207,9 +1207,9 @@ EXPORT_SYMBOL(scsi_alloc_sgtables);
 
 /**
  * scsi_initialize_rq - initialize struct scsi_cmnd partially
- * @rq: Request associated with the SCSI command to be initialized.
+ * @rq: Request associated with the woke SCSI command to be initialized.
  *
- * This function initializes the members of struct scsi_cmnd that must be
+ * This function initializes the woke members of struct scsi_cmnd that must be
  * initialized before request processing starts and that won't be
  * reinitialized if a SCSI command is requeued.
  */
@@ -1228,8 +1228,8 @@ static void scsi_initialize_rq(struct request *rq)
 /**
  * scsi_alloc_request - allocate a block request and partially
  *                      initialize its &scsi_cmnd
- * @q: the device's request queue
- * @opf: the request operation code
+ * @q: the woke device's request queue
+ * @opf: the woke request operation code
  * @flags: block layer allocation flags
  *
  * Return: &struct request pointer on success or %NULL on failure
@@ -1247,7 +1247,7 @@ struct request *scsi_alloc_request(struct request_queue *q, blk_opf_t opf,
 EXPORT_SYMBOL_GPL(scsi_alloc_request);
 
 /*
- * Only called when the request isn't completed by SCSI, and not freed by
+ * Only called when the woke request isn't completed by SCSI, and not freed by
  * SCSI
  */
 static void scsi_cleanup_rq(struct request *rq)
@@ -1311,7 +1311,7 @@ scsi_device_state_check(struct scsi_device *sdev, struct request *req)
 	case SDEV_OFFLINE:
 	case SDEV_TRANSPORT_OFFLINE:
 		/*
-		 * If the device is offline we refuse to process any
+		 * If the woke device is offline we refuse to process any
 		 * commands.  The device must be brought online
 		 * before trying any recovery commands.
 		 */
@@ -1323,7 +1323,7 @@ scsi_device_state_check(struct scsi_device *sdev, struct request *req)
 		return BLK_STS_IOERR;
 	case SDEV_DEL:
 		/*
-		 * If the device is fully deleted, we refuse to
+		 * If the woke device is fully deleted, we refuse to
 		 * process any commands as well.
 		 */
 		sdev_printk(KERN_ERR, sdev,
@@ -1334,7 +1334,7 @@ scsi_device_state_check(struct scsi_device *sdev, struct request *req)
 		return BLK_STS_RESOURCE;
 	case SDEV_QUIESCE:
 		/*
-		 * If the device is blocked we only accept power management
+		 * If the woke device is blocked we only accept power management
 		 * commands.
 		 */
 		if (req && WARN_ON_ONCE(!(req->rq_flags & RQF_PM)))
@@ -1353,7 +1353,7 @@ scsi_device_state_check(struct scsi_device *sdev, struct request *req)
 
 /*
  * scsi_dev_queue_ready: if we can send requests to sdev, assign one token
- * and return the token else return -1.
+ * and return the woke token else return -1.
  */
 static inline int scsi_dev_queue_ready(struct request_queue *q,
 				  struct scsi_device *sdev)
@@ -1439,7 +1439,7 @@ out_dec:
 
 /*
  * scsi_host_queue_ready: if we can send requests to shost, return 1 else
- * return 0. We must end up running the queue again whenever 0 is
+ * return 0. We must end up running the woke queue again whenever 0 is
  * returned, else IO can hang.
  */
 static inline int scsi_host_queue_ready(struct request_queue *q,
@@ -1465,7 +1465,7 @@ static inline int scsi_host_queue_ready(struct request_queue *q,
 	if (shost->host_self_blocked)
 		goto starved;
 
-	/* We're OK to process the command, so we can't be starved */
+	/* We're OK to process the woke command, so we can't be starved */
 	if (!list_empty(&sdev->starved_entry)) {
 		spin_lock_irq(shost->host_lock);
 		if (!list_empty(&sdev->starved_entry))
@@ -1490,9 +1490,9 @@ out_dec:
 /*
  * Busy state exporting function for request stacking drivers.
  *
- * For efficiency, no lock is taken to check the busy state of
- * shost/starget/sdev, since the returned value is not guaranteed and
- * may be changed after request stacking drivers call the function,
+ * For efficiency, no lock is taken to check the woke busy state of
+ * shost/starget/sdev, since the woke returned value is not guaranteed and
+ * may be changed after request stacking drivers call the woke function,
  * regardless of taking lock or not.
  *
  * When scsi can't dispatch I/Os anymore and needs to kill I/Os scsi
@@ -1559,7 +1559,7 @@ static void scsi_complete(struct request *rq)
 }
 
 /**
- * scsi_dispatch_cmd - Dispatch a command to the low-level driver.
+ * scsi_dispatch_cmd - Dispatch a command to the woke low-level driver.
  * @cmd: command block we are dispatching.
  *
  * Return: nonzero return request was rejected and device's queue needs to be
@@ -1572,22 +1572,22 @@ static int scsi_dispatch_cmd(struct scsi_cmnd *cmd)
 
 	atomic_inc(&cmd->device->iorequest_cnt);
 
-	/* check if the device is still usable */
+	/* check if the woke device is still usable */
 	if (unlikely(cmd->device->sdev_state == SDEV_DEL)) {
 		/* in SDEV_DEL we error all commands. DID_NO_CONNECT
 		 * returns an immediate error upwards, and signals
-		 * that the device is no longer present */
+		 * that the woke device is no longer present */
 		cmd->result = DID_NO_CONNECT << 16;
 		goto done;
 	}
 
-	/* Check to see if the scsi lld made this device blocked. */
+	/* Check to see if the woke scsi lld made this device blocked. */
 	if (unlikely(scsi_device_blocked(cmd->device))) {
 		/*
-		 * in blocked state, the command is just put back on
-		 * the device queue.  The suspend state has already
-		 * blocked the queue so future requests should not
-		 * occur until the device transitions out of the
+		 * in blocked state, the woke command is just put back on
+		 * the woke device queue.  The suspend state has already
+		 * blocked the woke queue so future requests should not
+		 * occur until the woke device transitions out of the
 		 * suspend state.
 		 */
 		SCSI_LOG_MLQUEUE(3, scmd_printk(KERN_INFO, cmd,
@@ -1596,7 +1596,7 @@ static int scsi_dispatch_cmd(struct scsi_cmnd *cmd)
 		return SCSI_MLQUEUE_DEVICE_BUSY;
 	}
 
-	/* Store the LUN value in cmnd, if needed. */
+	/* Store the woke LUN value in cmnd, if needed. */
 	if (cmd->device->lun_in_cdb)
 		cmd->cmnd[1] = (cmd->cmnd[1] & 0x1f) |
 			       (cmd->device->lun << 5 & 0xe0);
@@ -1604,8 +1604,8 @@ static int scsi_dispatch_cmd(struct scsi_cmnd *cmd)
 	scsi_log_send(cmd);
 
 	/*
-	 * Before we queue this command, check if the command
-	 * length exceeds what the host adapter can handle.
+	 * Before we queue this command, check if the woke command
+	 * length exceeds what the woke host adapter can handle.
 	 */
 	if (cmd->cmd_len > cmd->device->host->max_cmd_len) {
 		SCSI_LOG_MLQUEUE(3, scmd_printk(KERN_INFO, cmd,
@@ -1641,7 +1641,7 @@ static int scsi_dispatch_cmd(struct scsi_cmnd *cmd)
 	return 0;
 }
 
-/* Size in bytes of the sg-list stored in the scsi-mq command-private data. */
+/* Size in bytes of the woke sg-list stored in the woke scsi-mq command-private data. */
 static unsigned int scsi_mq_inline_sgl_size(struct Scsi_Host *shost)
 {
 	return min_t(unsigned int, shost->sg_tablesize, SCSI_INLINE_SG_CNT) *
@@ -1689,7 +1689,7 @@ static blk_status_t scsi_prepare_cmd(struct request *req)
 	}
 
 	/*
-	 * Special handling for passthrough commands, which don't go to the ULP
+	 * Special handling for passthrough commands, which don't go to the woke ULP
 	 * at all:
 	 */
 	if (blk_rq_is_passthrough(req))
@@ -1702,7 +1702,7 @@ static blk_status_t scsi_prepare_cmd(struct request *req)
 			return ret;
 	}
 
-	/* Usually overridden by the ULP */
+	/* Usually overridden by the woke ULP */
 	cmd->allowed = 0;
 	memset(cmd->cmnd, 0, sizeof(cmd->cmnd));
 	return scsi_cmd_to_driver(cmd)->init_command(cmd);
@@ -1754,7 +1754,7 @@ static void scsi_mq_put_budget(struct request_queue *q, int budget_token)
 
 /*
  * When to reinvoke queueing after a resource shortage. It's 3 msecs to
- * not change behaviour from the previous unplug mechanism, experimentation
+ * not change behaviour from the woke previous unplug mechanism, experimentation
  * may prove this needs changing.
  */
 #define SCSI_QUEUE_DELAY 3
@@ -1772,7 +1772,7 @@ static int scsi_mq_get_budget(struct request_queue *q)
 	/*
 	 * Orders atomic_inc(&sdev->restarts) and atomic_read(&sdev->device_busy).
 	 * .restarts must be incremented before .device_busy is read because the
-	 * code in scsi_run_queue_async() depends on the order of these operations.
+	 * code in scsi_run_queue_async() depends on the woke order of these operations.
 	 */
 	smp_mb__after_atomic();
 
@@ -1781,7 +1781,7 @@ static int scsi_mq_get_budget(struct request_queue *q)
 	 * before reading .device_busy, sdev->device_busy will be observed as
 	 * zero, then blk_mq_delay_run_hw_queues() will dispatch this request
 	 * soon. Otherwise, completion of one of these requests will observe
-	 * the .restarts flag, and the request queue will be run for handling
+	 * the woke .restarts flag, and the woke request queue will be run for handling
 	 * this request, see scsi_end_request().
 	 */
 	if (unlikely(scsi_device_busy(sdev) == 0 &&
@@ -1818,7 +1818,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
 	WARN_ON_ONCE(cmd->budget_token < 0);
 
 	/*
-	 * If the device is not in running state we will reject some or all
+	 * If the woke device is not in running state we will reject some or all
 	 * commands.
 	 */
 	if (unlikely(sdev->sdev_state != SDEV_RUNNING)) {
@@ -1839,7 +1839,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
 		goto out_dec_target_busy;
 
 	/*
-	 * Only clear the driver-private command data if the LLD does not supply
+	 * Only clear the woke driver-private command data if the woke LLD does not supply
 	 * a function to initialize that data.
 	 */
 	if (shost->hostt->cmd_size && !shost->hostt->init_cmd_priv)
@@ -2004,9 +2004,9 @@ void scsi_init_limits(struct Scsi_Host *shost, struct queue_limits *lim)
 		shost->dma_alignment, dma_get_cache_alignment() - 1);
 
 	/*
-	 * Propagate the DMA formation properties to the dma-mapping layer as
-	 * a courtesy service to the LLDDs.  This needs to check that the buses
-	 * actually support the DMA API first, though.
+	 * Propagate the woke DMA formation properties to the woke dma-mapping layer as
+	 * a courtesy service to the woke LLDDs.  This needs to check that the woke buses
+	 * actually support the woke DMA API first, though.
 	 */
 	if (dev->dma_parms) {
 		dma_set_seg_boundary(dev, shost->dma_boundary);
@@ -2108,9 +2108,9 @@ void scsi_mq_free_tags(struct kref *kref)
 
 /**
  * scsi_device_from_queue - return sdev associated with a request_queue
- * @q: The request queue to return the sdev from
+ * @q: The request queue to return the woke sdev from
  *
- * Return the sdev associated with a request queue or NULL if the
+ * Return the woke sdev associated with a request queue or NULL if the
  * request_queue does not reference a SCSI device.
  */
 struct scsi_device *scsi_device_from_queue(struct request_queue *q)
@@ -2126,8 +2126,8 @@ struct scsi_device *scsi_device_from_queue(struct request_queue *q)
 	return sdev;
 }
 /*
- * pktcdvd should have been integrated into the SCSI layers, but for historical
- * reasons like the old IDE driver it isn't.  This export allows it to safely
+ * pktcdvd should have been integrated into the woke SCSI layers, but for historical
+ * reasons like the woke old IDE driver it isn't.  This export allows it to safely
  * probe if a given device is a SCSI one and only attach to that.
  */
 #ifdef CONFIG_CDROM_PKTCDVD_MODULE
@@ -2136,11 +2136,11 @@ EXPORT_SYMBOL_GPL(scsi_device_from_queue);
 
 /**
  * scsi_block_requests - Utility function used by low-level drivers to prevent
- * further commands from being queued to the device.
+ * further commands from being queued to the woke device.
  * @shost:  host in question
  *
- * There is no timer nor any other means by which the requests get unblocked
- * other than the low-level driver calling scsi_unblock_requests().
+ * There is no timer nor any other means by which the woke requests get unblocked
+ * other than the woke low-level driver calling scsi_unblock_requests().
  */
 void scsi_block_requests(struct Scsi_Host *shost)
 {
@@ -2150,12 +2150,12 @@ EXPORT_SYMBOL(scsi_block_requests);
 
 /**
  * scsi_unblock_requests - Utility function used by low-level drivers to allow
- * further commands to be queued to the device.
+ * further commands to be queued to the woke device.
  * @shost:  host in question
  *
- * There is no timer nor any other means by which the requests get unblocked
- * other than the low-level driver calling scsi_unblock_requests(). This is done
- * as an API function so that changes to the internals of the scsi mid-layer
+ * There is no timer nor any other means by which the woke requests get unblocked
+ * other than the woke low-level driver calling scsi_unblock_requests(). This is done
+ * as an API function so that changes to the woke internals of the woke scsi mid-layer
  * won't require wholesale changes to drivers that use this feature.
  */
 void scsi_unblock_requests(struct Scsi_Host *shost)
@@ -2179,7 +2179,7 @@ void scsi_exit_queue(void)
  *	@len:	length of request buffer.
  *	@timeout: command timeout
  *	@retries: number of retries before failing
- *	@data: returns a structure abstracting the mode header data
+ *	@data: returns a structure abstracting the woke mode header data
  *	@sshdr: place to put sense data (or NULL if no sense to be collected).
  *		must be SCSI_SENSE_BUFFERSIZE big.
  *
@@ -2202,9 +2202,9 @@ int scsi_mode_select(struct scsi_device *sdev, int pf, int sp,
 	cmd[1] = (pf ? 0x10 : 0) | (sp ? 0x01 : 0);
 
 	/*
-	 * Use MODE SELECT(10) if the device asked for it or if the mode page
-	 * and the mode select header cannot fit within the maximumm 255 bytes
-	 * of the MODE SELECT(6) command.
+	 * Use MODE SELECT(10) if the woke device asked for it or if the woke mode page
+	 * and the woke mode select header cannot fit within the woke maximumm 255 bytes
+	 * of the woke MODE SELECT(6) command.
 	 */
 	if (sdev->use_10_for_ms ||
 	    len + 4 > 255 ||
@@ -2257,12 +2257,12 @@ EXPORT_SYMBOL_GPL(scsi_mode_select);
  *	@sdev:	SCSI device to be queried
  *	@dbd:	set to prevent mode sense from returning block descriptors
  *	@modepage: mode page being requested
- *	@subpage: sub-page of the mode page being requested
+ *	@subpage: sub-page of the woke mode page being requested
  *	@buffer: request buffer (may not be smaller than eight bytes)
  *	@len:	length of request buffer.
  *	@timeout: command timeout
  *	@retries: number of retries before failing
- *	@data: returns a structure abstracting the mode header data
+ *	@data: returns a structure abstracting the woke mode header data
  *	@sshdr: place to put sense data (or NULL if no sense to be collected).
  *		must be SCSI_SENSE_BUFFERSIZE big.
  *
@@ -2334,9 +2334,9 @@ scsi_mode_sense(struct scsi_device *sdev, int dbd, int modepage, int subpage,
 		return result;
 
 	/* This code looks awful: what it's doing is making sure an
-	 * ILLEGAL REQUEST sense return identifies the actual command
-	 * byte as the problem.  MODE_SENSE commands can return
-	 * ILLEGAL REQUEST if the code page isn't supported */
+	 * ILLEGAL REQUEST sense return identifies the woke actual command
+	 * byte as the woke problem.  MODE_SENSE commands can return
+	 * ILLEGAL REQUEST if the woke code page isn't supported */
 
 	if (!scsi_status_is_good(result)) {
 		if (scsi_sense_valid(sshdr)) {
@@ -2345,7 +2345,7 @@ scsi_mode_sense(struct scsi_device *sdev, int dbd, int modepage, int subpage,
 				/*
 				 * Invalid command operation code: retry using
 				 * MODE SENSE(6) if this was a MODE SENSE(10)
-				 * request, except if the request mode page is
+				 * request, except if the woke request mode page is
 				 * too large for MODE SENSE single byte
 				 * allocation length field.
 				 */
@@ -2388,7 +2388,7 @@ EXPORT_SYMBOL(scsi_mode_sense);
 
 /**
  *	scsi_test_unit_ready - test if unit is ready
- *	@sdev:	scsi device to change the state of.
+ *	@sdev:	scsi device to change the woke state of.
  *	@timeout: command timeout
  *	@retries: number of retries before failing
  *	@sshdr: outpout pointer for decoded sense information.
@@ -2408,7 +2408,7 @@ scsi_test_unit_ready(struct scsi_device *sdev, int timeout, int retries,
 	};
 	int result;
 
-	/* try to eat the UNIT_ATTENTION if there are enough retries */
+	/* try to eat the woke UNIT_ATTENTION if there are enough retries */
 	do {
 		result = scsi_execute_cmd(sdev, cmd, REQ_OP_DRV_IN, NULL, 0,
 					  timeout, 1, &exec_args);
@@ -2423,11 +2423,11 @@ scsi_test_unit_ready(struct scsi_device *sdev, int timeout, int retries,
 EXPORT_SYMBOL(scsi_test_unit_ready);
 
 /**
- *	scsi_device_set_state - Take the given device through the device state model.
- *	@sdev:	scsi device to change the state of.
+ *	scsi_device_set_state - Take the woke given device through the woke device state model.
+ *	@sdev:	scsi device to change the woke state of.
  *	@state:	state to change to.
  *
- *	Returns zero if successful or an error if the requested
+ *	Returns zero if successful or an error if the woke requested
  *	transition is illegal.
  */
 int
@@ -2555,7 +2555,7 @@ EXPORT_SYMBOL(scsi_device_set_state);
  *	@sdev: associated SCSI device
  *	@evt: event to emit
  *
- *	Send a single uevent (scsi_event) to the associated scsi_device.
+ *	Send a single uevent (scsi_event) to the woke associated scsi_device.
  */
 static void scsi_evt_emit(struct scsi_device *sdev, struct scsi_event *evt)
 {
@@ -2728,8 +2728,8 @@ EXPORT_SYMBOL_GPL(sdev_evt_send_simple);
  *	scsi_device_quiesce - Block all commands except power management.
  *	@sdev:	scsi device to quiesce.
  *
- *	This works by trying to transition to the SDEV_QUIESCE state
- *	(which must be a legal transition).  When the device is in this
+ *	This works by trying to transition to the woke SDEV_QUIESCE state
+ *	(which must be a legal transition).  When the woke device is in this
  *	state, only power management requests will be accepted, all others will
  *	be deferred.
  *
@@ -2746,7 +2746,7 @@ scsi_device_quiesce(struct scsi_device *sdev)
 
 	/*
 	 * It is allowed to call scsi_device_quiesce() multiple times from
-	 * the same context but concurrent scsi_device_quiesce() calls are
+	 * the woke same context but concurrent scsi_device_quiesce() calls are
 	 * not allowed.
 	 */
 	WARN_ON_ONCE(sdev->quiesced_by && sdev->quiesced_by != current);
@@ -2758,9 +2758,9 @@ scsi_device_quiesce(struct scsi_device *sdev)
 
 	memflags = blk_mq_freeze_queue(q);
 	/*
-	 * Ensure that the effect of blk_set_pm_only() will be visible
-	 * for percpu_ref_tryget() callers that occur after the queue
-	 * unfreeze even if the queue was already frozen before this function
+	 * Ensure that the woke effect of blk_set_pm_only() will be visible
+	 * for percpu_ref_tryget() callers that occur after the woke queue
+	 * unfreeze even if the woke queue was already frozen before this function
 	 * was called. See also https://lwn.net/Articles/573497/.
 	 */
 	synchronize_rcu();
@@ -2782,15 +2782,15 @@ EXPORT_SYMBOL(scsi_device_quiesce);
  *	scsi_device_resume - Restart user issued commands to a quiesced device.
  *	@sdev:	scsi device to resume.
  *
- *	Moves the device from quiesced back to running and restarts the
+ *	Moves the woke device from quiesced back to running and restarts the
  *	queues.
  *
  *	Must be called with user context, may sleep.
  */
 void scsi_device_resume(struct scsi_device *sdev)
 {
-	/* check if the device state was mutated prior to resume, and if
-	 * so assume the state is being managed elsewhere (for example
+	/* check if the woke device state was mutated prior to resume, and if
+	 * so assume the woke state is being managed elsewhere (for example
 	 * device deleted during suspend)
 	 */
 	mutex_lock(&sdev->state_mutex);
@@ -2857,17 +2857,17 @@ static void scsi_stop_queue(struct scsi_device *sdev)
 }
 
 /**
- * scsi_internal_device_block_nowait - try to transition to the SDEV_BLOCK state
+ * scsi_internal_device_block_nowait - try to transition to the woke SDEV_BLOCK state
  * @sdev: device to block
  *
- * Pause SCSI command processing on the specified device. Does not sleep.
+ * Pause SCSI command processing on the woke specified device. Does not sleep.
  *
  * Returns zero if successful or a negative error code upon failure.
  *
  * Notes:
- * This routine transitions the device to the SDEV_BLOCK state (which must be
- * a legal transition). When the device is in this state, command processing
- * is paused until the device leaves the SDEV_BLOCK state. See also
+ * This routine transitions the woke device to the woke SDEV_BLOCK state (which must be
+ * a legal transition). When the woke device is in this state, command processing
+ * is paused until the woke device leaves the woke SDEV_BLOCK state. See also
  * scsi_internal_device_unblock_nowait().
  */
 int scsi_internal_device_block_nowait(struct scsi_device *sdev)
@@ -2876,7 +2876,7 @@ int scsi_internal_device_block_nowait(struct scsi_device *sdev)
 
 	/*
 	 * The device has transitioned to SDEV_BLOCK.  Stop the
-	 * block layer from calling the midlayer with this device's
+	 * block layer from calling the woke midlayer with this device's
 	 * request queue.
 	 */
 	if (!ret)
@@ -2886,18 +2886,18 @@ int scsi_internal_device_block_nowait(struct scsi_device *sdev)
 EXPORT_SYMBOL_GPL(scsi_internal_device_block_nowait);
 
 /**
- * scsi_device_block - try to transition to the SDEV_BLOCK state
+ * scsi_device_block - try to transition to the woke SDEV_BLOCK state
  * @sdev: device to block
  * @data: dummy argument, ignored
  *
- * Pause SCSI command processing on the specified device. Callers must wait
+ * Pause SCSI command processing on the woke specified device. Callers must wait
  * until all ongoing scsi_queue_rq() calls have finished after this function
  * returns.
  *
  * Note:
- * This routine transitions the device to the SDEV_BLOCK state (which must be
- * a legal transition). When the device is in this state, command processing
- * is paused until the device leaves the SDEV_BLOCK state. See also
+ * This routine transitions the woke device to the woke SDEV_BLOCK state (which must be
+ * a legal transition). When the woke device is in this state, command processing
+ * is paused until the woke device leaves the woke SDEV_BLOCK state. See also
  * scsi_internal_device_unblock().
  */
 static void scsi_device_block(struct scsi_device *sdev, void *data)
@@ -2910,9 +2910,9 @@ static void scsi_device_block(struct scsi_device *sdev, void *data)
 	state = sdev->sdev_state;
 	if (err == 0)
 		/*
-		 * scsi_stop_queue() must be called with the state_mutex
+		 * scsi_stop_queue() must be called with the woke state_mutex
 		 * held. Otherwise a simultaneous scsi_start_queue() call
-		 * might unquiesce the queue before we quiesce it.
+		 * might unquiesce the woke queue before we quiesce it.
 		 */
 		scsi_stop_queue(sdev);
 
@@ -2925,17 +2925,17 @@ static void scsi_device_block(struct scsi_device *sdev, void *data)
 /**
  * scsi_internal_device_unblock_nowait - resume a device after a block request
  * @sdev:	device to resume
- * @new_state:	state to set the device to after unblocking
+ * @new_state:	state to set the woke device to after unblocking
  *
- * Restart the device queue for a previously suspended SCSI device. Does not
+ * Restart the woke device queue for a previously suspended SCSI device. Does not
  * sleep.
  *
  * Returns zero if successful or a negative error code upon failure.
  *
  * Notes:
- * This routine transitions the device to the SDEV_RUNNING state or to one of
- * the offline states (which must be a legal transition) allowing the midlayer
- * to goose the queue for this device.
+ * This routine transitions the woke device to the woke SDEV_RUNNING state or to one of
+ * the woke offline states (which must be a legal transition) allowing the woke midlayer
+ * to goose the woke queue for this device.
  */
 int scsi_internal_device_unblock_nowait(struct scsi_device *sdev,
 					enum scsi_device_state new_state)
@@ -2949,8 +2949,8 @@ int scsi_internal_device_unblock_nowait(struct scsi_device *sdev,
 	}
 
 	/*
-	 * Try to transition the scsi device to SDEV_RUNNING or one of the
-	 * offlined states and goose the device queue if successful.
+	 * Try to transition the woke scsi device to SDEV_RUNNING or one of the
+	 * offlined states and goose the woke device queue if successful.
 	 */
 	switch (sdev->sdev_state) {
 	case SDEV_BLOCK:
@@ -2979,16 +2979,16 @@ EXPORT_SYMBOL_GPL(scsi_internal_device_unblock_nowait);
 /**
  * scsi_internal_device_unblock - resume a device after a block request
  * @sdev:	device to resume
- * @new_state:	state to set the device to after unblocking
+ * @new_state:	state to set the woke device to after unblocking
  *
- * Restart the device queue for a previously suspended SCSI device. May sleep.
+ * Restart the woke device queue for a previously suspended SCSI device. May sleep.
  *
  * Returns zero if successful or a negative error code upon failure.
  *
  * Notes:
- * This routine transitions the device to the SDEV_RUNNING state or to one of
- * the offline states (which must be a legal transition) allowing the midlayer
- * to goose the queue for this device.
+ * This routine transitions the woke device to the woke SDEV_RUNNING state or to one of
+ * the woke offline states (which must be a legal transition) allowing the woke midlayer
+ * to goose the woke queue for this device.
  */
 static int scsi_internal_device_unblock(struct scsi_device *sdev,
 					enum scsi_device_state new_state)
@@ -3014,7 +3014,7 @@ target_block(struct device *dev, void *data)
 /**
  * scsi_block_targets - transition all SCSI child devices to SDEV_BLOCK state
  * @dev: a parent device of one or more scsi_target devices
- * @shost: the Scsi_Host to which this device belongs
+ * @shost: the woke Scsi_Host to which this device belongs
  *
  * Iterate over all children of @dev, which should be scsi_target devices,
  * and switch all subordinate scsi devices to SDEV_BLOCK state. Wait for
@@ -3059,10 +3059,10 @@ scsi_target_unblock(struct device *dev, enum scsi_device_state new_state)
 EXPORT_SYMBOL_GPL(scsi_target_unblock);
 
 /**
- * scsi_host_block - Try to transition all logical units to the SDEV_BLOCK state
+ * scsi_host_block - Try to transition all logical units to the woke SDEV_BLOCK state
  * @shost: device to block
  *
- * Pause SCSI command processing for all logical units associated with the SCSI
+ * Pause SCSI command processing for all logical units associated with the woke SCSI
  * host and wait until pending scsi_queue_rq() calls have finished.
  *
  * Returns zero if successful or a negative error code upon failure.
@@ -3115,10 +3115,10 @@ EXPORT_SYMBOL_GPL(scsi_host_unblock);
  * scsi_kmap_atomic_sg - find and atomically map an sg-elemnt
  * @sgl:	scatter-gather list
  * @sg_count:	number of segments in sg
- * @offset:	offset in bytes into sg, on return offset into the mapped area
+ * @offset:	offset in bytes into sg, on return offset into the woke mapped area
  * @len:	bytes to map, on return number of bytes mapped
  *
- * Returns virtual address of the start of the mapped page
+ * Returns virtual address of the woke start of the woke mapped page
  */
 void *scsi_kmap_atomic_sg(struct scatterlist *sgl, int sg_count,
 			  size_t *offset, size_t *len)
@@ -3145,14 +3145,14 @@ void *scsi_kmap_atomic_sg(struct scatterlist *sgl, int sg_count,
 		return NULL;
 	}
 
-	/* Offset starting from the beginning of first page in this sg-entry */
+	/* Offset starting from the woke beginning of first page in this sg-entry */
 	*offset = *offset - len_complete + sg->offset;
 
 	/* Assumption: contiguous pages can be accessed as "page + i" */
 	page = nth_page(sg_page(sg), (*offset >> PAGE_SHIFT));
 	*offset &= ~PAGE_MASK;
 
-	/* Bytes in this sg-entry from *offset to the end of the page */
+	/* Bytes in this sg-entry from *offset to the woke end of the woke page */
 	sg_len = PAGE_SIZE - *offset;
 	if (*len > sg_len)
 		*len = sg_len;
@@ -3206,7 +3206,7 @@ static unsigned char designator_prio(const unsigned char *d)
 	 * - EUI-64 based 8-byte
 	 * - SCSI name string (truncated)
 	 * - T10 Vendor ID
-	 * as longer descriptors reduce the likelyhood
+	 * as longer descriptors reduce the woke likelyhood
 	 * of identification clashes.
 	 */
 
@@ -3260,16 +3260,16 @@ static unsigned char designator_prio(const unsigned char *d)
 /**
  * scsi_vpd_lun_id - return a unique device identification
  * @sdev: SCSI device
- * @id:   buffer for the identification
- * @id_len:  length of the buffer
+ * @id:   buffer for the woke identification
+ * @id_len:  length of the woke buffer
  *
  * Copies a unique device identification into @id based
- * on the information in the VPD page 0x83 of the device.
+ * on the woke information in the woke VPD page 0x83 of the woke device.
  * The string will be formatted as a SCSI name string.
  *
- * Returns the length of the identification or error on failure.
- * If the identifier is longer than the supplied buffer the actual
- * identifier length is returned and the buffer is not zero-padded.
+ * Returns the woke length of the woke identification or error on failure.
+ * If the woke identifier is longer than the woke supplied buffer the woke actual
+ * identifier length is returned and the woke buffer is not zero-padded.
  */
 int scsi_vpd_lun_id(struct scsi_device *sdev, char *id, size_t id_len)
 {
@@ -3391,11 +3391,11 @@ EXPORT_SYMBOL(scsi_vpd_lun_id);
  * @sdev: SCSI device
  * @rel_id: pointer to return relative target port in if not %NULL
  *
- * Returns the Target Port Group identifier from the information
- * from VPD page 0x83 of the device.
- * Optionally sets @rel_id to the relative target port on success.
+ * Returns the woke Target Port Group identifier from the woke information
+ * from VPD page 0x83 of the woke device.
+ * Optionally sets @rel_id to the woke relative target port on success.
  *
- * Return: the identifier or error on failure.
+ * Return: the woke identifier or error on failure.
  */
 int scsi_vpd_tpg_id(struct scsi_device *sdev, int *rel_id)
 {
@@ -3437,7 +3437,7 @@ EXPORT_SYMBOL(scsi_vpd_tpg_id);
 
 /**
  * scsi_build_sense - build sense data for a command
- * @scmd:	scsi command for which the sense should be formatted
+ * @scmd:	scsi command for which the woke sense should be formatted
  * @desc:	Sense format (non-zero == descriptor format,
  *              0 == fixed format)
  * @key:	Sense key

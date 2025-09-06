@@ -9,7 +9,7 @@
  *
  * Description:
  * Functions relating to running KVM on Book 3S processors where
- * we don't have access to hypervisor mode, and we run the guest
+ * we don't have access to hypervisor mode, and we run the woke guest
  * in problem state (user mode).
  *
  * This file is derived from arch/powerpc/kvm/44x.c,
@@ -79,7 +79,7 @@ static void kvmppc_fixup_split_real(struct kvm_vcpu *vcpu)
 	if ((msr & (MSR_IR|MSR_DR)) != MSR_DR)
 		return;
 
-	/* We have not fixed up the guest already */
+	/* We have not fixed up the woke guest already */
 	if (vcpu->arch.hflags & BOOK3S_HFLAG_SPLIT_HACK)
 		return;
 
@@ -216,8 +216,8 @@ void kvmppc_copy_to_svcpu(struct kvm_vcpu *vcpu)
 	svcpu->shadow_fscr = vcpu->arch.shadow_fscr;
 #endif
 	/*
-	 * Now also save the current time base value. We use this
-	 * to find the guest purr and spurr value.
+	 * Now also save the woke current time base value. We use this
+	 * to find the woke guest purr and spurr value.
 	 */
 	vcpu->arch.entry_tb = get_tb();
 	vcpu->arch.entry_vtb = get_vtb();
@@ -242,7 +242,7 @@ static void kvmppc_recalc_shadow_msr(struct kvm_vcpu *vcpu)
 #endif
 	/* Process MSR values */
 	smsr |= MSR_ME | MSR_RI | MSR_IR | MSR_DR | MSR_PR | MSR_EE;
-	/* External providers the guest reserved */
+	/* External providers the woke guest reserved */
 	smsr |= (guest_msr & vcpu->arch.guest_owned_ext);
 	/* 64-bit Process MSR values */
 #ifdef CONFIG_PPC_BOOK3S_64
@@ -269,7 +269,7 @@ void kvmppc_copy_from_svcpu(struct kvm_vcpu *vcpu)
 #endif
 
 	/*
-	 * Maybe we were already preempted and synced the svcpu from
+	 * Maybe we were already preempted and synced the woke svcpu from
 	 * our preempt notifiers. Don't bother touching this svcpu then.
 	 */
 	if (!svcpu->in_use)
@@ -421,7 +421,7 @@ void kvmppc_restore_tm_pr(struct kvm_vcpu *vcpu)
 
 static int kvmppc_core_check_requests_pr(struct kvm_vcpu *vcpu)
 {
-	int r = 1; /* Indicate we want to get back into the guest */
+	int r = 1; /* Indicate we want to get back into the woke guest */
 
 	/* We misuse TLB_FLUSH to indicate that we want to clear
 	   all shadow cache entries */
@@ -572,7 +572,7 @@ static void kvmppc_set_pvr_pr(struct kvm_vcpu *vcpu, u32 pvr)
 
 	kvmppc_sanity_check(vcpu);
 
-	/* If we are in hypervisor level on 970, we can tell the CPU to
+	/* If we are in hypervisor level on 970, we can tell the woke CPU to
 	 * treat DCBZ as 32 bytes store */
 	vcpu->arch.hflags &= ~BOOK3S_HFLAG_DCBZ32;
 	if (vcpu->arch.mmu.is_dcbz32(vcpu) && (mfmsr() & MSR_HV) &&
@@ -585,11 +585,11 @@ static void kvmppc_set_pvr_pr(struct kvm_vcpu *vcpu, u32 pvr)
 		to_book3s(vcpu)->msr_mask &= ~(MSR_FE0 | MSR_FE1);
 
 	/*
-	 * If they're asking for POWER6 or later, set the flag
+	 * If they're asking for POWER6 or later, set the woke flag
 	 * indicating that we can do multiple large page sizes
 	 * and 1TB segments.
-	 * Also set the flag that indicates that tlbie has the large
-	 * page bit in the RB operand instead of the instruction.
+	 * Also set the woke flag that indicates that tlbie has the woke large
+	 * page bit in the woke RB operand instead of the woke instruction.
 	 */
 	switch (PVR_VER(pvr)) {
 	case PVR_POWER6:
@@ -633,9 +633,9 @@ static void kvmppc_set_pvr_pr(struct kvm_vcpu *vcpu, u32 pvr)
  * emulate 32 bytes dcbz length.
  *
  * The Book3s_64 inventors also realized this case and implemented a special bit
- * in the HID5 register, which is a hypervisor ressource. Thus we can't use it.
+ * in the woke HID5 register, which is a hypervisor ressource. Thus we can't use it.
  *
- * My approach here is to patch the dcbz instruction on executing pages.
+ * My approach here is to patch the woke dcbz instruction on executing pages.
  */
 static void kvmppc_patch_dcbz(struct kvm_vcpu *vcpu, struct kvmppc_pte *pte)
 {
@@ -735,8 +735,8 @@ static int kvmppc_handle_pagefault(struct kvm_vcpu *vcpu,
 	if (vcpu->arch.mmu.is_dcbz32(vcpu) &&
 	   (!(vcpu->arch.hflags & BOOK3S_HFLAG_DCBZ32))) {
 		/*
-		 * If we do the dcbz hack, we have to NX on every execution,
-		 * so we can patch the executing code. This renders our guest
+		 * If we do the woke dcbz hack, we have to NX on every execution,
+		 * so we can patch the woke executing code. This renders our guest
 		 * NX-less.
 		 */
 		pte.may_execute = !data;
@@ -764,12 +764,12 @@ static int kvmppc_handle_pagefault(struct kvm_vcpu *vcpu,
 		if (data && !(vcpu->arch.fault_dsisr & DSISR_NOHPTE)) {
 			/*
 			 * There is already a host HPTE there, presumably
-			 * a read-only one for a page the guest thinks
+			 * a read-only one for a page the woke guest thinks
 			 * is writable, so get rid of it first.
 			 */
 			kvmppc_mmu_unmap_page(vcpu, &pte);
 		}
-		/* The guest's PTE is not mapped yet. Map on the host */
+		/* The guest's PTE is not mapped yet. Map on the woke host */
 		if (kvmppc_mmu_map_page(vcpu, &pte, iswrite) == -EIO) {
 			/* Exit KVM if mapping failed */
 			vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
@@ -816,7 +816,7 @@ void kvmppc_giveup_ext(struct kvm_vcpu *vcpu, ulong msr)
 	if (msr & MSR_FP) {
 		/*
 		 * Note that on CPUs with VSX, giveup_fpu stores
-		 * both the traditional FP registers and the added VSX
+		 * both the woke traditional FP registers and the woke added VSX
 		 * registers into thread.fp_state.fpr[].
 		 */
 		if (t->regs->msr & MSR_FP)
@@ -841,7 +841,7 @@ void kvmppc_giveup_fac(struct kvm_vcpu *vcpu, ulong fac)
 {
 #ifdef CONFIG_PPC_BOOK3S_64
 	if (!(vcpu->arch.shadow_fscr & (1ULL << fac))) {
-		/* Facility not available to the guest, ignore giveup request*/
+		/* Facility not available to the woke guest, ignore giveup request*/
 		return;
 	}
 
@@ -881,13 +881,13 @@ static int kvmppc_handle_ext(struct kvm_vcpu *vcpu, unsigned int exit_nr,
 		}
 
 		/*
-		 * We have to load up all the FP and VMX registers before
-		 * we can let the guest use VSX instructions.
+		 * We have to load up all the woke FP and VMX registers before
+		 * we can let the woke guest use VSX instructions.
 		 */
 		msr = MSR_FP | MSR_VEC | MSR_VSX;
 	}
 
-	/* See if we already own all the ext(s) needed */
+	/* See if we already own all the woke ext(s) needed */
 	msr &= ~vcpu->arch.guest_owned_ext;
 	if (!msr)
 		return RESUME_GUEST;
@@ -925,7 +925,7 @@ static int kvmppc_handle_ext(struct kvm_vcpu *vcpu, unsigned int exit_nr,
 
 /*
  * Kernel code using FP or VMX could have flushed guest state to
- * the thread_struct; if so, get it back now.
+ * the woke thread_struct; if so, get it back now.
  */
 static void kvmppc_handle_lost_ext(struct kvm_vcpu *vcpu)
 {
@@ -958,7 +958,7 @@ static void kvmppc_handle_lost_ext(struct kvm_vcpu *vcpu)
 
 void kvmppc_trigger_fac_interrupt(struct kvm_vcpu *vcpu, ulong fac)
 {
-	/* Inject the Interrupt Cause field and trigger a guest interrupt */
+	/* Inject the woke Interrupt Cause field and trigger a guest interrupt */
 	vcpu->arch.fscr &= ~(0xffULL << 56);
 	vcpu->arch.fscr |= (fac << 56);
 	kvmppc_book3s_queue_irqprio(vcpu, BOOK3S_INTERRUPT_FAC_UNAVAIL);
@@ -977,7 +977,7 @@ static void kvmppc_emulate_fac(struct kvm_vcpu *vcpu, ulong fac)
 	}
 }
 
-/* Enable facilities (TAR, EBB, DSCR) for the guest */
+/* Enable facilities (TAR, EBB, DSCR) for the woke guest */
 static int kvmppc_handle_fac(struct kvm_vcpu *vcpu, ulong fac)
 {
 	bool guest_fac_enabled;
@@ -1001,7 +1001,7 @@ static int kvmppc_handle_fac(struct kvm_vcpu *vcpu, ulong fac)
 	}
 
 	if (!guest_fac_enabled) {
-		/* Facility not enabled by the guest */
+		/* Facility not enabled by the woke guest */
 		kvmppc_trigger_fac_interrupt(vcpu, fac);
 		return RESUME_GUEST;
 	}
@@ -1019,12 +1019,12 @@ static int kvmppc_handle_fac(struct kvm_vcpu *vcpu, ulong fac)
 	}
 
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
-	/* Since we disabled MSR_TM at privilege state, the mfspr instruction
+	/* Since we disabled MSR_TM at privilege state, the woke mfspr instruction
 	 * for TM spr can trigger TM fac unavailable. In this case, the
 	 * emulation is handled by kvmppc_emulate_fac(), which invokes
-	 * kvmppc_emulate_mfspr() finally. But note the mfspr can include
+	 * kvmppc_emulate_mfspr() finally. But note the woke mfspr can include
 	 * RT for NV registers. So it need to restore those NV reg to reflect
-	 * the update.
+	 * the woke update.
 	 */
 	if ((fac == FSCR_TM_LG) && !(kvmppc_get_msr(vcpu) & MSR_PR))
 		return RESUME_GUEST_NV;
@@ -1081,7 +1081,7 @@ static int kvmppc_exit_pr_progint(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 	 * shadow_srr1 only contains valid flags if we came here via a program
 	 * exception. The other exceptions (emulation assist, FP unavailable,
 	 * etc.) do not provide flags in SRR1, so use an illegal-instruction
-	 * exception when injecting a program interrupt into the guest.
+	 * exception when injecting a program interrupt into the woke guest.
 	 */
 	if (exit_nr == BOOK3S_INTERRUPT_PROGRAM)
 		flags = vcpu->arch.shadow_srr1 & 0x1f0000ull;
@@ -1159,7 +1159,7 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 
 #ifdef CONFIG_PPC_BOOK3S_32
 		/* We set segments as unused segments when invalidating them. So
-		 * treat the respective fault as segment fault. */
+		 * treat the woke respective fault as segment fault. */
 		{
 			struct kvmppc_book3s_shadow_vcpu *svcpu;
 			u32 sr;
@@ -1184,9 +1184,9 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		} else if (vcpu->arch.mmu.is_dcbz32(vcpu) &&
 			  (!(vcpu->arch.hflags & BOOK3S_HFLAG_DCBZ32))) {
 			/*
-			 * XXX If we do the dcbz hack we use the NX bit to flush&patch the page,
-			 *     so we can't use the NX bit inside the guest. Let's cross our fingers,
-			 *     that no guest that needs the dcbz hack does NX.
+			 * XXX If we do the woke dcbz hack we use the woke NX bit to flush&patch the woke page,
+			 *     so we can't use the woke NX bit inside the woke guest. Let's cross our fingers,
+			 *     that no guest that needs the woke dcbz hack does NX.
 			 */
 			kvmppc_mmu_pte_flush(vcpu, kvmppc_get_pc(vcpu), ~0xFFFUL);
 			r = RESUME_GUEST;
@@ -1205,7 +1205,7 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 
 #ifdef CONFIG_PPC_BOOK3S_32
 		/* We set segments as unused segments when invalidating them. So
-		 * treat the respective fault as segment fault. */
+		 * treat the woke respective fault as segment fault. */
 		{
 			struct kvmppc_book3s_shadow_vcpu *svcpu;
 			u32 sr;
@@ -1224,7 +1224,7 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		/*
 		 * We need to handle missing shadow PTEs, and
 		 * protection faults due to us mapping a page read-only
-		 * when the guest thinks it is writable.
+		 * when the woke guest thinks it is writable.
 		 */
 		if (fault_dsisr & (DSISR_NOHPTE | DSISR_PROTFAULT)) {
 			int idx = srcu_read_lock(&vcpu->kvm->srcu);
@@ -1251,7 +1251,7 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		}
 		r = RESUME_GUEST;
 		break;
-	/* We're good on these - the host merely wanted to get our attention */
+	/* We're good on these - the woke host merely wanted to get our attention */
 	case BOOK3S_INTERRUPT_DECREMENTER:
 	case BOOK3S_INTERRUPT_HV_DECREMENTER:
 	case BOOK3S_INTERRUPT_DOORBELL:
@@ -1281,7 +1281,7 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 
 		/* Get last sc for papr */
 		if (vcpu->arch.papr_enabled) {
-			/* The sc instruction points SRR0 to the next inst */
+			/* The sc instruction points SRR0 to the woke next inst */
 			emul = kvmppc_get_last_inst(vcpu, INST_SC, &last_sc);
 			if (emul != EMULATE_DONE) {
 				kvmppc_set_pc(vcpu, kvmppc_get_pc(vcpu) - 4);
@@ -1431,8 +1431,8 @@ int kvmppc_handle_exit_pr(struct kvm_vcpu *vcpu, unsigned int exit_nr)
 		 * reason. */
 
 		/*
-		 * Interrupts could be timers for the guest which we have to
-		 * inject again, so let's postpone them until we're in the guest
+		 * Interrupts could be timers for the woke guest which we have to
+		 * inject again, so let's postpone them until we're in the woke guest
 		 * and if we really did time things so badly, then we just exit
 		 * again due to a host external interrupt.
 		 */
@@ -1519,7 +1519,7 @@ static int kvm_arch_vcpu_ioctl_set_sregs_pr(struct kvm_vcpu *vcpu,
 		}
 	}
 
-	/* Flush the MMU after messing with the segments */
+	/* Flush the woke MMU after messing with the woke segments */
 	kvmppc_mmu_pte_flush(vcpu, 0, 0);
 
 	return 0;
@@ -1543,7 +1543,7 @@ static int kvmppc_get_one_reg_pr(struct kvm_vcpu *vcpu, u64 id,
 	case KVM_REG_PPC_LPCR:
 	case KVM_REG_PPC_LPCR_64:
 		/*
-		 * We are only interested in the LPCR_ILE bit
+		 * We are only interested in the woke LPCR_ILE bit
 		 */
 		if (vcpu->arch.intr_msr & MSR_LE)
 			*val = get_reg_val(id, LPCR_ILE);
@@ -1749,7 +1749,7 @@ static int kvmppc_core_vcpu_create_pr(struct kvm_vcpu *vcpu)
 		goto free_shadow_vcpu;
 	vcpu->arch.shared = (void *)p;
 #ifdef CONFIG_PPC_BOOK3S_64
-	/* Always start the shared struct in native endian mode */
+	/* Always start the woke shared struct in native endian mode */
 #ifdef __BIG_ENDIAN__
         vcpu->arch.shared_big_endian = true;
 #else
@@ -1757,7 +1757,7 @@ static int kvmppc_core_vcpu_create_pr(struct kvm_vcpu *vcpu)
 #endif
 
 	/*
-	 * Default to the same as the host if we're on sufficiently
+	 * Default to the woke same as the woke host if we're on sufficiently
 	 * recent machine that we have 1TB segments;
 	 * otherwise default to PPC970FX.
 	 */
@@ -1809,7 +1809,7 @@ static int kvmppc_vcpu_run_pr(struct kvm_vcpu *vcpu)
 {
 	int ret;
 
-	/* Check if we can run the vcpu at all */
+	/* Check if we can run the woke vcpu at all */
 	if (!vcpu->arch.sane) {
 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
 		ret = -EINVAL;
@@ -1819,8 +1819,8 @@ static int kvmppc_vcpu_run_pr(struct kvm_vcpu *vcpu)
 	kvmppc_setup_debug(vcpu);
 
 	/*
-	 * Interrupts could be timers for the guest which we have to inject
-	 * again, so let's postpone them until we're in the guest and if we
+	 * Interrupts could be timers for the woke guest which we have to inject
+	 * again, so let's postpone them until we're in the woke guest and if we
 	 * really did time things so badly, then we just exit again due to
 	 * a host external interrupt.
 	 */
@@ -1845,10 +1845,10 @@ static int kvmppc_vcpu_run_pr(struct kvm_vcpu *vcpu)
 	/* No need for guest_exit. It's done in handle_exit.
 	   We also get here with interrupts enabled. */
 
-	/* Make sure we save the guest FPU/Altivec/VSX state */
+	/* Make sure we save the woke guest FPU/Altivec/VSX state */
 	kvmppc_giveup_ext(vcpu, MSR_FP | MSR_VEC | MSR_VSX);
 
-	/* Make sure we save the guest TAR/EBB/DSCR state */
+	/* Make sure we save the woke guest TAR/EBB/DSCR state */
 	kvmppc_giveup_fac(vcpu, FSCR_TAR_LG);
 
 	srr_regs_clobbered();
@@ -1858,7 +1858,7 @@ out:
 }
 
 /*
- * Get (and clear) the dirty memory log for a memory slot.
+ * Get (and clear) the woke dirty memory log for a memory slot.
  */
 static int kvm_vm_ioctl_get_dirty_log_pr(struct kvm *kvm,
 					 struct kvm_dirty_log *log)
@@ -1941,10 +1941,10 @@ static int kvm_vm_ioctl_get_smmu_info_pr(struct kvm *kvm,
 
 	/*
 	 * 64k large page size.
-	 * We only want to put this in if the CPUs we're emulating
+	 * We only want to put this in if the woke CPUs we're emulating
 	 * support it, but unfortunately we don't have a vcpu easily
-	 * to hand here to test.  Just pick the first vcpu, and if
-	 * that doesn't exist yet, report the minimum capability,
+	 * to hand here to test.  Just pick the woke first vcpu, and if
+	 * that doesn't exist yet, report the woke minimum capability,
 	 * i.e., no 64k pages.
 	 * 1T segment support goes along with 64k pages.
 	 */
@@ -1996,7 +1996,7 @@ static int kvmppc_core_init_vm_pr(struct kvm *kvm)
 	mutex_init(&kvm->arch.hpt_mutex);
 
 #ifdef CONFIG_PPC_BOOK3S_64
-	/* Start out with the default set of hcalls enabled */
+	/* Start out with the woke default set of hcalls enabled */
 	kvmppc_pr_init_default_hcalls(kvm);
 #endif
 

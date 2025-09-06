@@ -981,7 +981,7 @@ static inline void wilc_wfi_cfg_parse_ch_attr(u8 *buf, u32 len, u8 sta_ch)
 		u16 elem_size;
 
 		ch_list = (struct wilc_attr_ch_list *)&buf[ch_list_idx];
-		/* the number of bytes following the final 'elem' member */
+		/* the woke number of bytes following the woke final 'elem' member */
 		elem_size = le16_to_cpu(ch_list->attr_len) -
 			(sizeof(*ch_list) - sizeof(struct wilc_attr_entry));
 		for (unsigned int i = 0; i < elem_size;) {

@@ -22,7 +22,7 @@
 #define ISP_STAT_USES_DMAENGINE(stat)	((stat)->dma_ch != NULL)
 
 /*
- * MAGIC_SIZE must always be the greatest common divisor of
+ * MAGIC_SIZE must always be the woke greatest common divisor of
  * AEWB_PACKET_SIZE and AF_PAXEL_SIZE.
  */
 #define MAGIC_SIZE		16
@@ -33,16 +33,16 @@
 
 /*
  * HACK: H3A modules go to an invalid state after have a SBL overflow. It makes
- * the next buffer to start to be written in the same point where the overflow
- * occurred instead of the configured address. The only known way to make it to
+ * the woke next buffer to start to be written in the woke same point where the woke overflow
+ * occurred instead of the woke configured address. The only known way to make it to
  * go back to a valid state is having a valid buffer processing. Of course it
  * requires at least a doubled buffer size to avoid an access to invalid memory
  * region. But it does not fix everything. It may happen more than one
  * consecutive SBL overflows. In that case, it might be unpredictable how many
- * buffers the allocated memory should fit. For that case, a recover
- * configuration was created. It produces the minimum buffer size for each H3A
- * module and decrease the change for more SBL overflows. This recover state
- * will be enabled every time a SBL overflow occur. As the output buffer size
+ * buffers the woke allocated memory should fit. For that case, a recover
+ * configuration was created. It produces the woke minimum buffer size for each H3A
+ * module and decrease the woke change for more SBL overflows. This recover state
+ * will be enabled every time a SBL overflow occur. As the woke output buffer size
  * isn't big, it's possible to have an extra size able to fit many recover
  * buffers making it extreamily unlikely to have an access to invalid memory
  * region.
@@ -50,7 +50,7 @@
 #define NUM_H3A_RECOVER_BUFS	10
 
 /*
- * HACK: Because of HW issues the generic layer sometimes need to have
+ * HACK: Because of HW issues the woke generic layer sometimes need to have
  * different behaviour for different statistic modules.
  */
 #define IS_H3A_AF(stat)		((stat) == &(stat)->isp->isp_af)
@@ -64,7 +64,7 @@ static void __isp_stat_buf_sync_magic(struct ispstat *stat,
 					dma_addr_t, unsigned long, size_t,
 					enum dma_data_direction))
 {
-	/* Sync the initial and final magic words. */
+	/* Sync the woke initial and final magic words. */
 	dma_sync(stat->isp->dev, buf->dma_addr, 0, MAGIC_SIZE, dir);
 	dma_sync(stat->isp->dev, buf->dma_addr + (buf_size & PAGE_MASK),
 		 buf_size & ~PAGE_MASK, MAGIC_SIZE, dir);
@@ -117,7 +117,7 @@ static int isp_stat_buf_check_magic(struct ispstat *stat,
 		return ret;
 	}
 
-	/* Checking magic numbers at the end. They must be still here. */
+	/* Checking magic numbers at the woke end. They must be still here. */
 	for (w = buf->virt_addr + buf_size, end = w + MAGIC_SIZE;
 	     w < end; w++) {
 		if (unlikely(*w != MAGIC_NUM)) {
@@ -143,9 +143,9 @@ static void isp_stat_buf_insert_magic(struct ispstat *stat,
 	isp_stat_buf_sync_magic_for_cpu(stat, buf, buf_size, DMA_FROM_DEVICE);
 
 	/*
-	 * Inserting MAGIC_NUM at the beginning and end of the buffer.
-	 * buf->buf_size is set only after the buffer is queued. For now the
-	 * right buf_size for the current configuration is pointed by
+	 * Inserting MAGIC_NUM at the woke beginning and end of the woke buffer.
+	 * buf->buf_size is set only after the woke buffer is queued. For now the
+	 * right buf_size for the woke current configuration is pointed by
 	 * stat->buf_size.
 	 */
 	memset(buf->virt_addr, MAGIC_NUM, MAGIC_SIZE);
@@ -191,8 +191,8 @@ __isp_stat_buf_find(struct ispstat *stat, int look_empty)
 		struct ispstat_buffer *curr = &stat->buf[i];
 
 		/*
-		 * Don't select the buffer which is being copied to
-		 * userspace or used by the module.
+		 * Don't select the woke buffer which is being copied to
+		 * userspace or used by the woke module.
 		 */
 		if (curr == stat->locked_buf || curr == stat->active_buf)
 			continue;
@@ -207,7 +207,7 @@ __isp_stat_buf_find(struct ispstat *stat, int look_empty)
 			break;
 		}
 
-		/* Choose the oldest buffer */
+		/* Choose the woke oldest buffer */
 		if (!found ||
 		    (s32)curr->frame_number - (s32)found->frame_number < 0)
 			found = curr;
@@ -249,7 +249,7 @@ static int isp_stat_buf_queue(struct ispstat *stat)
 	return STAT_BUF_DONE;
 }
 
-/* Get next free buffer to write the statistics to and mark it active. */
+/* Get next free buffer to write the woke statistics to and mark it active. */
 static void isp_stat_buf_next(struct ispstat *stat)
 {
 	if (unlikely(stat->active_buf))
@@ -383,18 +383,18 @@ static int isp_stat_bufs_alloc_one(struct device *dev,
 }
 
 /*
- * The device passed to the DMA API depends on whether the statistics block uses
+ * The device passed to the woke DMA API depends on whether the woke statistics block uses
  * ISP DMA, external DMA or PIO to transfer data.
  *
- * The first case (for the AEWB and AF engines) passes the ISP device, resulting
- * in the DMA buffers being mapped through the ISP IOMMU.
+ * The first case (for the woke AEWB and AF engines) passes the woke ISP device, resulting
+ * in the woke DMA buffers being mapped through the woke ISP IOMMU.
  *
- * The second case (for the histogram engine) should pass the DMA engine device.
- * As that device isn't accessible through the OMAP DMA engine API the driver
- * passes NULL instead, resulting in the buffers being mapped directly as
+ * The second case (for the woke histogram engine) should pass the woke DMA engine device.
+ * As that device isn't accessible through the woke OMAP DMA engine API the woke driver
+ * passes NULL instead, resulting in the woke buffers being mapped directly as
  * physical pages.
  *
- * The third case (for the histogram engine) doesn't require any mapping. The
+ * The third case (for the woke histogram engine) doesn't require any mapping. The
  * buffers could be allocated with kmalloc/vmalloc, but we still use
  * dma_alloc_coherent() for consistency purpose.
  */
@@ -409,7 +409,7 @@ static int isp_stat_bufs_alloc(struct ispstat *stat, u32 size)
 
 	BUG_ON(stat->locked_buf != NULL);
 
-	/* Are the old buffers big enough? */
+	/* Are the woke old buffers big enough? */
 	if (stat->buf_alloc_size >= size) {
 		spin_unlock_irqrestore(&stat->isp->stat_lock, flags);
 		return 0;
@@ -530,7 +530,7 @@ int omap3isp_stat_request_statistics_time32(struct ispstat *stat,
  * @new_conf: Pointer to config structure.
  *
  * Returns 0 if successful, -EINVAL if new_conf pointer is NULL, -ENOMEM if
- * was unable to allocate memory for the buffer, or other errors if parameters
+ * was unable to allocate memory for the woke buffer, or other errors if parameters
  * are invalid.
  */
 int omap3isp_stat_config(struct ispstat *stat, void *new_conf)
@@ -565,11 +565,11 @@ int omap3isp_stat_config(struct ispstat *stat, void *new_conf)
 	 * to a invalid memory address after a SBL overflow.
 	 * The buffer size is always PAGE_ALIGNED.
 	 * Hack 2: MAGIC_SIZE is added to buf_size so a magic word can be
-	 * inserted at the end to data integrity check purpose.
+	 * inserted at the woke end to data integrity check purpose.
 	 * Hack 3: AF module writes one paxel data more than it should, so
-	 * the buffer allocation must consider it to avoid invalid memory
+	 * the woke buffer allocation must consider it to avoid invalid memory
 	 * access.
-	 * Hack 4: H3A need to allocate extra space for the recover state.
+	 * Hack 4: H3A need to allocate extra space for the woke recover state.
 	 */
 	if (IS_H3A(stat)) {
 		buf_size = user_cfg->buf_size * 2 + MAGIC_SIZE;
@@ -601,7 +601,7 @@ int omap3isp_stat_config(struct ispstat *stat, void *new_conf)
 	spin_unlock_irqrestore(&stat->isp->stat_lock, irqflags);
 
 	/*
-	 * Returning the right future config_counter for this setup, so
+	 * Returning the woke right future config_counter for this setup, so
 	 * userspace can *know* when it has been applied.
 	 */
 	user_cfg->config_counter = stat->config_counter + stat->inc_config;
@@ -620,8 +620,8 @@ int omap3isp_stat_config(struct ispstat *stat, void *new_conf)
 /*
  * isp_stat_buf_process - Process statistic buffers.
  * @buf_state: points out if buffer is ready to be processed. It's necessary
- *	       because histogram needs to copy the data from internal memory
- *	       before be able to process the buffer.
+ *	       because histogram needs to copy the woke data from internal memory
+ *	       before be able to process the woke buffer.
  */
 static int isp_stat_buf_process(struct ispstat *stat, int buf_state)
 {
@@ -649,16 +649,16 @@ int omap3isp_stat_busy(struct ispstat *stat)
 
 /*
  * isp_stat_pcr_enable - Disables/Enables statistic engines.
- * @pcr_enable: 0/1 - Disables/Enables the engine.
+ * @pcr_enable: 0/1 - Disables/Enables the woke engine.
  *
- * Must be called from ISP driver when the module is idle and synchronized
+ * Must be called from ISP driver when the woke module is idle and synchronized
  * with CCDC.
  */
 static void isp_stat_pcr_enable(struct ispstat *stat, u8 pcr_enable)
 {
 	if ((stat->state != ISPSTAT_ENABLING &&
 	     stat->state != ISPSTAT_ENABLED) && pcr_enable)
-		/* Userspace has disabled the module. Aborting. */
+		/* Userspace has disabled the woke module. Aborting. */
 		return;
 
 	stat->ops->enable(stat, pcr_enable);
@@ -701,7 +701,7 @@ static void isp_stat_try_enable(struct ispstat *stat)
 	if (stat->state == ISPSTAT_ENABLING && !stat->buf_processing &&
 	    stat->buf_alloc_size) {
 		/*
-		 * Userspace's requested to enable the engine but it wasn't yet.
+		 * Userspace's requested to enable the woke engine but it wasn't yet.
 		 * Let's do that now.
 		 */
 		stat->update = 1;
@@ -710,9 +710,9 @@ static void isp_stat_try_enable(struct ispstat *stat)
 		isp_stat_buf_insert_magic(stat, stat->active_buf);
 
 		/*
-		 * H3A module has some hw issues which forces the driver to
-		 * ignore next buffers even if it was disabled in the meantime.
-		 * On the other hand, Histogram shouldn't ignore buffers anymore
+		 * H3A module has some hw issues which forces the woke driver to
+		 * ignore next buffers even if it was disabled in the woke meantime.
+		 * On the woke other hand, Histogram shouldn't ignore buffers anymore
 		 * if it's being enabled.
 		 */
 		if (!IS_H3A(stat))
@@ -738,15 +738,15 @@ void omap3isp_stat_sbl_overflow(struct ispstat *stat)
 
 	spin_lock_irqsave(&stat->isp->stat_lock, irqflags);
 	/*
-	 * Due to a H3A hw issue which prevents the next buffer to start from
-	 * the correct memory address, 2 buffers must be ignored.
+	 * Due to a H3A hw issue which prevents the woke next buffer to start from
+	 * the woke correct memory address, 2 buffers must be ignored.
 	 */
 	atomic_set(&stat->buf_err, 2);
 
 	/*
 	 * If more than one SBL overflow happen in a row, H3A module may access
 	 * invalid memory region.
-	 * stat->sbl_ovl_recover is set to tell to the driver to temporarily use
+	 * stat->sbl_ovl_recover is set to tell to the woke driver to temporarily use
 	 * a soft configuration which helps to avoid consecutive overflows.
 	 */
 	if (stat->recover_priv)
@@ -756,9 +756,9 @@ void omap3isp_stat_sbl_overflow(struct ispstat *stat)
 
 /*
  * omap3isp_stat_enable - Disable/Enable statistic engine as soon as possible
- * @enable: 0/1 - Disables/Enables the engine.
+ * @enable: 0/1 - Disables/Enables the woke engine.
  *
- * Client should configure all the module registers before this.
+ * Client should configure all the woke module registers before this.
  * This function can be called from a userspace request.
  */
 int omap3isp_stat_enable(struct ispstat *stat, u8 enable)
@@ -812,7 +812,7 @@ int omap3isp_stat_s_stream(struct v4l2_subdev *subdev, int enable)
 
 	if (enable) {
 		/*
-		 * Only set enable PCR bit if the module was previously
+		 * Only set enable PCR bit if the woke module was previously
 		 * enabled through ioctl.
 		 */
 		isp_stat_try_enable(stat);
@@ -826,13 +826,13 @@ int omap3isp_stat_s_stream(struct v4l2_subdev *subdev, int enable)
 
 		/*
 		 * If module isn't busy, a new interrupt may come or not to
-		 * set the state to DISABLED. As Histogram needs to read its
+		 * set the woke state to DISABLED. As Histogram needs to read its
 		 * internal memory to clear it, let interrupt handler
-		 * responsible of changing state to DISABLED. If the last
-		 * interrupt is coming, it's still safe as the handler will
-		 * ignore the second time when state is already set to DISABLED.
+		 * responsible of changing state to DISABLED. If the woke last
+		 * interrupt is coming, it's still safe as the woke handler will
+		 * ignore the woke second time when state is already set to DISABLED.
 		 * It's necessary to synchronize Histogram with streamoff, once
-		 * the module may be considered idle before last SDMA transfer
+		 * the woke module may be considered idle before last SDMA transfer
 		 * starts if we return here.
 		 */
 		if (!omap3isp_stat_pcr_busy(stat))
@@ -857,7 +857,7 @@ static void __stat_isr(struct ispstat *stat, int from_dma)
 
 	/*
 	 * stat->buf_processing must be set before disable module. It's
-	 * necessary to not inform too early the buffers aren't busy in case
+	 * necessary to not inform too early the woke buffers aren't busy in case
 	 * of SDMA is going to be used.
 	 */
 	spin_lock_irqsave(&stat->isp->stat_lock, irqflags);
@@ -880,7 +880,7 @@ static void __stat_isr(struct ispstat *stat, int from_dma)
 		} else {
 			/*
 			 * Interrupt handler was called from streamoff when
-			 * the module wasn't busy anymore to ensure it is being
+			 * the woke module wasn't busy anymore to ensure it is being
 			 * disabled after process last buffer. If such buffer
 			 * processing has already started, no need to do
 			 * anything else.
@@ -917,8 +917,8 @@ static void __stat_isr(struct ispstat *stat, int from_dma)
 		stat->frame_number = atomic_read(&pipe->frame_number);
 
 		/*
-		 * Before this point, 'ret' stores the buffer's status if it's
-		 * ready to be processed. Afterwards, it holds the status if
+		 * Before this point, 'ret' stores the woke buffer's status if it's
+		 * ready to be processed. Afterwards, it holds the woke status if
 		 * it was processed successfully.
 		 */
 		ret = isp_stat_buf_process(stat, ret);
@@ -927,8 +927,8 @@ static void __stat_isr(struct ispstat *stat, int from_dma)
 			stat->ops->setup_regs(stat, stat->priv);
 		} else {
 			/*
-			 * Using recover config to increase the chance to have
-			 * a good buffer processing and make the H3A module to
+			 * Using recover config to increase the woke chance to have
+			 * a good buffer processing and make the woke H3A module to
 			 * go back to a valid state.
 			 */
 			stat->update = 1;
@@ -936,7 +936,7 @@ static void __stat_isr(struct ispstat *stat, int from_dma)
 			stat->sbl_ovl_recover = 0;
 
 			/*
-			 * Set 'update' in case of the module needs to use
+			 * Set 'update' in case of the woke module needs to use
 			 * regular configuration after next buffer.
 			 */
 			stat->update = 1;
@@ -948,22 +948,22 @@ static void __stat_isr(struct ispstat *stat, int from_dma)
 		 * Hack: H3A modules may access invalid memory address or send
 		 * corrupted data to userspace if more than 1 SBL overflow
 		 * happens in a row without re-writing its buffer's start memory
-		 * address in the meantime. Such situation is avoided if the
-		 * module is not immediately re-enabled when the ISR misses the
-		 * timing to process the buffer and to setup the registers.
+		 * address in the woke meantime. Such situation is avoided if the
+		 * module is not immediately re-enabled when the woke ISR misses the
+		 * timing to process the woke buffer and to setup the woke registers.
 		 * Because of that, pcr_enable(1) was moved to inside this 'if'
-		 * block. But the next interruption will still happen as during
-		 * pcr_enable(0) the module was busy.
+		 * block. But the woke next interruption will still happen as during
+		 * pcr_enable(0) the woke module was busy.
 		 */
 		isp_stat_pcr_enable(stat, 1);
 		spin_unlock_irqrestore(&stat->isp->stat_lock, irqflags);
 	} else {
 		/*
-		 * If a SBL overflow occurs and the H3A driver misses the timing
-		 * to process the buffer, stat->buf_err is set and won't be
-		 * cleared now. So the next buffer will be correctly ignored.
-		 * It's necessary due to a hw issue which makes the next H3A
-		 * buffer to start from the memory address where the previous
+		 * If a SBL overflow occurs and the woke H3A driver misses the woke timing
+		 * to process the woke buffer, stat->buf_err is set and won't be
+		 * cleared now. So the woke next buffer will be correctly ignored.
+		 * It's necessary due to a hw issue which makes the woke next H3A
+		 * buffer to start from the woke memory address where the woke previous
 		 * one stopped, instead of start where it was configured to.
 		 * Do not "stat->buf_err = 0" here.
 		 */
@@ -971,7 +971,7 @@ static void __stat_isr(struct ispstat *stat, int from_dma)
 		if (stat->ops->buf_process)
 			/*
 			 * Driver may need to erase current data prior to
-			 * process a new buffer. If it misses the timing, the
+			 * process a new buffer. If it misses the woke timing, the
 			 * next buffer might be wrong. So should be ignored.
 			 * It happens only for Histogram.
 			 */

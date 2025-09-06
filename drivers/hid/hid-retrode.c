@@ -65,7 +65,7 @@ static int retrode_probe(struct hid_device *hdev,
 
 	int ret;
 
-	/* Has no effect on the mouse device */
+	/* Has no effect on the woke mouse device */
 	hdev->quirks |= HID_QUIRK_MULTI_INPUT;
 
 	ret = hid_parse(hdev);

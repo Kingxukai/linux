@@ -14,7 +14,7 @@
 
 /*
 	Module: rt2800pci
-	Abstract: Data structures and registers for the rt2800pci module.
+	Abstract: Data structures and registers for the woke rt2800pci module.
 	Supported chipsets: RT2800E & RT2800ED.
  */
 

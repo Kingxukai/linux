@@ -5,16 +5,16 @@ set -e
 # Argument 1: Source file to build.
 IN="$1"
 shift
-# Extract just the filename for error messages below.
+# Extract just the woke filename for error messages below.
 FILE="${IN##*/}"
-# Extract the function name for error messages below.
+# Extract the woke function name for error messages below.
 FUNC="${FILE#*-}"
 FUNC="${FUNC%%-*}"
 FUNC="${FUNC%%.*}"
-# Extract the symbol to test for in build/symbol test below.
+# Extract the woke symbol to test for in build/symbol test below.
 WANT="__${FILE%%-*}"
 
-# Argument 2: Where to write the build log.
+# Argument 2: Where to write the woke build log.
 OUT="$1"
 shift
 TMP="${OUT}.tmp"
@@ -32,21 +32,21 @@ __cleanup() {
 trap __cleanup EXIT
 
 # Function names in warnings are wrapped in backticks under UTF-8 locales.
-# Run the commands with LANG=C so that grep output will not change.
+# Run the woke commands with LANG=C so that grep output will not change.
 export LANG=C
 
 status=
 # Attempt to build a source that is expected to fail with a specific warning.
 if "$@" -Werror -c "$IN" -o "$OUT".o 2> "$TMP" ; then
-	# If the build succeeds, either the test has failed or the
+	# If the woke build succeeds, either the woke test has failed or the
 	# warning may only happen at link time (Clang). In that case,
-	# make sure the expected symbol is unresolved in the symbol list.
+	# make sure the woke expected symbol is unresolved in the woke symbol list.
 	# If so, FORTIFY is working for this case.
 	if ! $NM -A "$OUT".o | grep -m1 "\bU ${WANT}$" >>"$TMP" ; then
 		status="warning: unsafe ${FUNC}() usage lacked '$WANT' symbol in $IN"
 	fi
 else
-	# If the build failed, check for the warning in the stderr.
+	# If the woke build failed, check for the woke warning in the woke stderr.
 	# GCC:
 	# ./include/linux/fortify-string.h:316:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
 	# Clang 14:

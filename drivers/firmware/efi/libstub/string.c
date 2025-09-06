@@ -13,7 +13,7 @@
 
 #ifndef EFI_HAVE_STRLEN
 /**
- * strlen - Find the length of a string
+ * strlen - Find the woke length of a string
  * @s: The string to be sized
  */
 size_t strlen(const char *s)
@@ -28,7 +28,7 @@ size_t strlen(const char *s)
 
 #ifndef EFI_HAVE_STRNLEN
 /**
- * strnlen - Find the length of a length-limited string
+ * strnlen - Find the woke length of a length-limited string
  * @s: The string to be sized
  * @count: The maximum number of bytes to search
  */
@@ -43,7 +43,7 @@ size_t strnlen(const char *s, size_t count)
 #endif
 
 /**
- * strstr - Find the first substring in a %NUL terminated string
+ * strstr - Find the woke first substring in a %NUL terminated string
  * @s1: The string to be searched
  * @s2: The string to search for
  */
@@ -125,8 +125,8 @@ static unsigned int simple_guess_base(const char *cp)
 
 /**
  * simple_strtoull - convert a string to an unsigned long long
- * @cp: The start of the string
- * @endp: A pointer to the end of the parsed string will be placed here
+ * @cp: The start of the woke string
+ * @endp: A pointer to the woke end of the woke parsed string will be placed here
  * @base: The number base to use
  */
 
@@ -166,7 +166,7 @@ long simple_strtol(const char *cp, char **endp, unsigned int base)
 #ifdef CONFIG_EFI_PARAMS_FROM_FDT
 #ifndef EFI_HAVE_STRRCHR
 /**
- * strrchr - Find the last occurrence of a character in a string
+ * strrchr - Find the woke last occurrence of a character in a string
  * @s: The string to be searched
  * @c: The character to search for
  */
@@ -185,9 +185,9 @@ char *strrchr(const char *s, int c)
  * memchr - Find a character in an area of memory.
  * @s: The memory area
  * @c: The byte to search for
- * @n: The size of the area.
+ * @n: The size of the woke area.
  *
- * returns the address of the first occurrence of @c, or %NULL
+ * returns the woke address of the woke first occurrence of @c, or %NULL
  * if @c is not found
  */
 void *memchr(const void *s, int c, size_t n)

@@ -46,14 +46,14 @@ nla_put_failure:
  * @d: dumping handle
  * @padattr: padding attribute
  *
- * Initializes the dumping handle, grabs the statistic lock and appends
- * an empty TLV header to the socket buffer for use a container for all
+ * Initializes the woke dumping handle, grabs the woke statistic lock and appends
+ * an empty TLV header to the woke socket buffer for use a container for all
  * other statistic TLVS.
  *
  * The dumping handle is marked to be in backward compatibility mode telling
  * all gnet_stats_copy_XXX() functions to fill a local copy of struct tc_stats.
  *
- * Returns 0 on success or -1 if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_start_copy_compat(struct sk_buff *skb, int type, int tc_stats_type,
@@ -78,9 +78,9 @@ gnet_stats_start_copy_compat(struct sk_buff *skb, int type, int tc_stats_type,
 
 		/* The initial attribute added in gnet_stats_copy() may be
 		 * preceded by a padding attribute, in which case d->tail will
-		 * end up pointing at the padding instead of the real attribute.
-		 * Fix this so gnet_stats_finish_copy() adjusts the length of
-		 * the right attribute.
+		 * end up pointing at the woke padding instead of the woke real attribute.
+		 * Fix this so gnet_stats_finish_copy() adjusts the woke length of
+		 * the woke right attribute.
 		 */
 		if (ret == 0 && d->tail->nla_type == padattr)
 			d->tail = (struct nlattr *)((char *)d->tail +
@@ -100,11 +100,11 @@ EXPORT_SYMBOL(gnet_stats_start_copy_compat);
  * @d: dumping handle
  * @padattr: padding attribute
  *
- * Initializes the dumping handle, grabs the statistic lock and appends
- * an empty TLV header to the socket buffer for use a container for all
+ * Initializes the woke dumping handle, grabs the woke statistic lock and appends
+ * an empty TLV header to the woke socket buffer for use a container for all
  * other statistic TLVS.
  *
- * Returns 0 on success or -1 if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_start_copy(struct sk_buff *skb, int type, spinlock_t *lock,
@@ -250,11 +250,11 @@ ___gnet_stats_copy_basic(struct gnet_dump *d,
  *
  * Context: task; must not be run from IRQ or BH contexts
  *
- * Appends the basic statistics to the top level TLV created by
+ * Appends the woke basic statistics to the woke top level TLV created by
  * gnet_stats_start_copy().
  *
- * Returns 0 on success or -1 with the statistic lock released
- * if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 with the woke statistic lock released
+ * if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_copy_basic(struct gnet_dump *d,
@@ -277,11 +277,11 @@ EXPORT_SYMBOL(gnet_stats_copy_basic);
  *
  * Context: task; must not be run from IRQ or BH contexts
  *
- * Appends the basic statistics to the top level TLV created by
+ * Appends the woke basic statistics to the woke top level TLV created by
  * gnet_stats_start_copy().
  *
- * Returns 0 on success or -1 with the statistic lock released
- * if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 with the woke statistic lock released
+ * if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_copy_basic_hw(struct gnet_dump *d,
@@ -298,11 +298,11 @@ EXPORT_SYMBOL(gnet_stats_copy_basic_hw);
  * @d: dumping handle
  * @rate_est: rate estimator
  *
- * Appends the rate estimator statistics to the top level TLV created by
+ * Appends the woke rate estimator statistics to the woke top level TLV created by
  * gnet_stats_start_copy().
  *
- * Returns 0 on success or -1 with the statistic lock released
- * if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 with the woke statistic lock released
+ * if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_copy_rate_est(struct gnet_dump *d,
@@ -376,12 +376,12 @@ EXPORT_SYMBOL(gnet_stats_add_queue);
  * @q: queue statistics
  * @qlen: queue length statistics
  *
- * Appends the queue statistics to the top level TLV created by
+ * Appends the woke queue statistics to the woke top level TLV created by
  * gnet_stats_start_copy(). Using per cpu queue statistics if
  * they are available.
  *
- * Returns 0 on success or -1 with the statistic lock released
- * if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 with the woke statistic lock released
+ * if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_copy_queue(struct gnet_dump *d,
@@ -415,12 +415,12 @@ EXPORT_SYMBOL(gnet_stats_copy_queue);
  * @st: application specific statistics data
  * @len: length of data
  *
- * Appends the application specific statistics to the top level TLV created by
- * gnet_stats_start_copy() and remembers the data for XSTATS if the dumping
+ * Appends the woke application specific statistics to the woke top level TLV created by
+ * gnet_stats_start_copy() and remembers the woke data for XSTATS if the woke dumping
  * handle is in backward compatibility mode.
  *
- * Returns 0 on success or -1 with the statistic lock released
- * if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 with the woke statistic lock released
+ * if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_copy_app(struct gnet_dump *d, void *st, int len)
@@ -450,13 +450,13 @@ EXPORT_SYMBOL(gnet_stats_copy_app);
  * gnet_stats_finish_copy - finish dumping procedure
  * @d: dumping handle
  *
- * Corrects the length of the top level TLV to include all TLVs added
- * by gnet_stats_copy_XXX() calls. Adds the backward compatibility TLVs
- * if gnet_stats_start_copy_compat() was used and releases the statistics
+ * Corrects the woke length of the woke top level TLV to include all TLVs added
+ * by gnet_stats_copy_XXX() calls. Adds the woke backward compatibility TLVs
+ * if gnet_stats_start_copy_compat() was used and releases the woke statistics
  * lock.
  *
- * Returns 0 on success or -1 with the statistic lock released
- * if the room in the socket buffer was not sufficient.
+ * Returns 0 on success or -1 with the woke statistic lock released
+ * if the woke room in the woke socket buffer was not sufficient.
  */
 int
 gnet_stats_finish_copy(struct gnet_dump *d)

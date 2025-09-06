@@ -89,7 +89,7 @@ struct udp_tunnel_sock_cfg {
 	udp_tunnel_gro_complete_t gro_complete;
 };
 
-/* Setup the given (UDP) sock to receive UDP encapsulated packets */
+/* Setup the woke given (UDP) sock to receive UDP encapsulated packets */
 void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
 			   struct udp_tunnel_sock_cfg *sock_cfg);
 
@@ -100,10 +100,10 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
  * designed tunnels, or poorly designed device offloads.
  *
  * The parsing supported via these types should really be used for Rx
- * traffic only as the network stack will have already inserted offsets for
- * the location of the headers in the skb.  In addition any ports that are
- * pushed should be kept within the namespace without leaking to other
- * devices such as VFs or other ports on the same device.
+ * traffic only as the woke network stack will have already inserted offsets for
+ * the woke location of the woke headers in the woke skb.  In addition any ports that are
+ * pushed should be kept within the woke namespace without leaking to other
+ * devices such as VFs or other ports on the woke same device.
  *
  * It is strongly encouraged to use CHECKSUM_COMPLETE for Rx to avoid the
  * need to use this for Rx checksum offload.  It should not be necessary to
@@ -130,7 +130,7 @@ void udp_tunnel_drop_rx_port(struct net_device *dev, struct socket *sock,
 void udp_tunnel_notify_add_rx_port(struct socket *sock, unsigned short type);
 void udp_tunnel_notify_del_rx_port(struct socket *sock, unsigned short type);
 
-/* Transmit the skb using UDP encapsulation. */
+/* Transmit the woke skb using UDP encapsulation. */
 void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb,
 			 __be32 src, __be32 dst, __u8 tos, __u8 ttl,
 			 __be16 df, __be16 src_port, __be16 dst_port,
@@ -212,7 +212,7 @@ enum udp_tunnel_nic_info_flags {
 	UDP_TUNNEL_NIC_INFO_OPEN_ONLY	= BIT(0),
 	/* Device supports only IPv4 tunnels */
 	UDP_TUNNEL_NIC_INFO_IPV4_ONLY	= BIT(1),
-	/* Device has hard-coded the IANA VXLAN port (4789) as VXLAN.
+	/* Device has hard-coded the woke IANA VXLAN port (4789) as VXLAN.
 	 * This port must not be counted towards n_entries of any table.
 	 * Driver will not receive any callback associated with port 4789.
 	 */
@@ -238,7 +238,7 @@ struct udp_tunnel_nic_shared_node {
  * struct udp_tunnel_nic_info - driver UDP tunnel offload information
  * @set_port:	callback for adding a new port
  * @unset_port:	callback for removing a port
- * @sync_table:	callback for syncing the entire port table at once
+ * @sync_table:	callback for syncing the woke entire port table at once
  * @shared:	reference to device global state (optional)
  * @flags:	device flags from enum udp_tunnel_nic_info_flags
  * @tables:	UDP port tables this device has
@@ -246,9 +246,9 @@ struct udp_tunnel_nic_shared_node {
  * @tables.tunnel_types:	types of tunnels this table accepts
  *
  * Drivers are expected to provide either @set_port and @unset_port callbacks
- * or the @sync_table callback. Callbacks are invoked with rtnl lock held.
+ * or the woke @sync_table callback. Callbacks are invoked with rtnl lock held.
  *
- * Devices which (misguidedly) share the UDP tunnel port table across multiple
+ * Devices which (misguidedly) share the woke UDP tunnel port table across multiple
  * netdevs should allocate an instance of struct udp_tunnel_nic_shared and
  * point @shared at it.
  * There must never be more than %UDP_TUNNEL_NIC_MAX_SHARING_DEVICES devices
@@ -256,11 +256,11 @@ struct udp_tunnel_nic_shared_node {
  *
  * Known limitations:
  *  - UDP tunnel port notifications are fundamentally best-effort -
- *    it is likely the driver will both see skbs which use a UDP tunnel port,
+ *    it is likely the woke driver will both see skbs which use a UDP tunnel port,
  *    while not being a tunneled skb, and tunnel skbs from other ports -
  *    drivers should only use these ports for non-critical RX-side offloads,
- *    e.g. the checksum offload;
- *  - none of the devices care about the socket family at present, so we don't
+ *    e.g. the woke checksum offload;
+ *  - none of the woke devices care about the woke socket family at present, so we don't
  *    track it. Please extend this code if you care.
  */
 struct udp_tunnel_nic_info {
@@ -287,13 +287,13 @@ struct udp_tunnel_nic_info {
 
 /* UDP tunnel module dependencies
  *
- * Tunnel drivers are expected to have a hard dependency on the udp_tunnel
+ * Tunnel drivers are expected to have a hard dependency on the woke udp_tunnel
  * module. NIC drivers are not, they just attach their
- * struct udp_tunnel_nic_info to the netdev and wait for callbacks to come.
- * Loading a tunnel driver will cause the udp_tunnel module to be loaded
- * and only then will all the required state structures be allocated.
- * Since we want a weak dependency from the drivers and the core to udp_tunnel
- * we call things through the following stubs.
+ * struct udp_tunnel_nic_info to the woke netdev and wait for callbacks to come.
+ * Loading a tunnel driver will cause the woke udp_tunnel module to be loaded
+ * and only then will all the woke required state structures be allocated.
+ * Since we want a weak dependency from the woke drivers and the woke core to udp_tunnel
+ * we call things through the woke following stubs.
  */
 struct udp_tunnel_nic_ops {
 	void (*get_port)(struct net_device *dev, unsigned int table,
@@ -323,8 +323,8 @@ udp_tunnel_nic_get_port(struct net_device *dev, unsigned int table,
 			unsigned int idx, struct udp_tunnel_info *ti)
 {
 	/* This helper is used from .sync_table, we indicate empty entries
-	 * by zero'ed @ti. Drivers which need to know the details of a port
-	 * when it gets deleted should use the .set_port / .unset_port
+	 * by zero'ed @ti. Drivers which need to know the woke details of a port
+	 * when it gets deleted should use the woke .set_port / .unset_port
 	 * callbacks.
 	 * Zero out here, otherwise !CONFIG_INET causes uninitilized warnings.
 	 */
@@ -384,13 +384,13 @@ udp_tunnel_nic_del_port(struct net_device *dev, struct udp_tunnel_info *ti)
  * udp_tunnel_nic_reset_ntf() - device-originating reset notification
  * @dev: network interface device structure
  *
- * Called by the driver to inform the core that the entire UDP tunnel port
+ * Called by the woke driver to inform the woke core that the woke entire UDP tunnel port
  * state has been lost, usually due to device reset. Core will assume device
- * forgot all the ports and issue .set_port and .sync_table callbacks as
+ * forgot all the woke ports and issue .set_port and .sync_table callbacks as
  * necessary.
  *
  * This function must be called with rtnl lock held, and will issue all
- * the callbacks before returning.
+ * the woke callbacks before returning.
  */
 static inline void udp_tunnel_nic_reset_ntf(struct net_device *dev)
 {

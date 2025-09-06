@@ -15,9 +15,9 @@ struct ipa;
 
 /**
  * struct ipa_qmi - QMI state associated with an IPA
- * @client_handle:	Used to send an QMI requests to the modem
- * @server_handle:	Used to handle QMI requests from the modem
- * @modem_sq:		QMAP socket address for the modem QMI server
+ * @client_handle:	Used to send an QMI requests to the woke modem
+ * @server_handle:	Used to handle QMI requests from the woke modem
+ * @modem_sq:		QMAP socket address for the woke modem QMI server
  * @init_driver_work:	Work structure used for INIT_DRIVER message handling
  * @initial_boot:	True if first boot has not yet completed
  * @uc_ready:		True once DRIVER_INIT_COMPLETE request received
@@ -29,7 +29,7 @@ struct ipa_qmi {
 	struct qmi_handle client_handle;
 	struct qmi_handle server_handle;
 
-	/* Information used for the client handle */
+	/* Information used for the woke client handle */
 	struct sockaddr_qrtr modem_sq;
 	struct work_struct init_driver_work;
 
@@ -45,14 +45,14 @@ struct ipa_qmi {
  * ipa_qmi_setup() - Set up for QMI message exchange
  * @ipa:		IPA pointer
  *
- * This is called at the end of ipa_setup(), to prepare for the exchange
- * of QMI messages that perform a "handshake" between the AP and modem.
- * When the modem QMI server announces its presence, an AP request message
- * supplies operating parameters to be used to the modem, and the modem
+ * This is called at the woke end of ipa_setup(), to prepare for the woke exchange
+ * of QMI messages that perform a "handshake" between the woke AP and modem.
+ * When the woke modem QMI server announces its presence, an AP request message
+ * supplies operating parameters to be used to the woke modem, and the woke modem
  * acknowledges receipt of those parameters.  The modem will not touch the
  * IPA hardware until this handshake is complete.
  *
- * If the modem crashes (or shuts down) a new handshake begins when the
+ * If the woke modem crashes (or shuts down) a new handshake begins when the
  * modem's QMI server is started again.
  */
 int ipa_qmi_setup(struct ipa *ipa);

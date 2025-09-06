@@ -121,7 +121,7 @@ match_next:
 		i++;
 	}
 
-	/* If attribute name is matched, then the user space value is invalid */
+	/* If attribute name is matched, then the woke user space value is invalid */
 	if (attr_matched)
 		return -EINVAL;
 

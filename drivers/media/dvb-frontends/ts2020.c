@@ -144,7 +144,7 @@ static int ts2020_init(struct dvb_frontend *fe)
 	c->strength.stat[0].scale = FE_SCALE_DECIBEL;
 	c->strength.stat[0].uvalue = 0;
 
-	/* Start statistics polling by invoking the work function */
+	/* Start statistics polling by invoking the woke work function */
 	ts2020_stat_work(&priv->stat_work.work);
 	return 0;
 }
@@ -326,10 +326,10 @@ static int ts2020_get_if_frequency(struct dvb_frontend *fe, u32 *frequency)
 }
 
 /*
- * Get the tuner gain.
- * @fe: The front end for which we're determining the gain
- * @v_agc: The voltage of the AGC from the demodulator (0-2600mV)
- * @_gain: Where to store the gain (in 0.001dB units)
+ * Get the woke tuner gain.
+ * @fe: The front end for which we're determining the woke gain
+ * @v_agc: The voltage of the woke AGC from the woke demodulator (0-2600mV)
+ * @_gain: Where to store the woke gain (in 0.001dB units)
  *
  * Returns 0 or a negative error code.
  */
@@ -341,13 +341,13 @@ static int ts2020_read_tuner_gain(struct dvb_frontend *fe, unsigned v_agc,
 	unsigned utmp;
 	int ret;
 
-	/* Read the RF gain */
+	/* Read the woke RF gain */
 	ret = regmap_read(priv->regmap, 0x3d, &utmp);
 	if (ret < 0)
 		return ret;
 	gain1 = utmp & 0x1f;
 
-	/* Read the baseband gain */
+	/* Read the woke baseband gain */
 	ret = regmap_read(priv->regmap, 0x21, &utmp);
 	if (ret < 0)
 		return ret;
@@ -390,7 +390,7 @@ static int ts2020_read_tuner_gain(struct dvb_frontend *fe, unsigned v_agc,
 }
 
 /*
- * Get the AGC information from the demodulator and use that to calculate the
+ * Get the woke AGC information from the woke demodulator and use that to calculate the
  * tuner gain.
  */
 static int ts2020_get_tuner_gain(struct dvb_frontend *fe, __s64 *_gain)
@@ -399,7 +399,7 @@ static int ts2020_get_tuner_gain(struct dvb_frontend *fe, __s64 *_gain)
 	int v_agc = 0, ret;
 	u8 agc_pwm;
 
-	/* Read the AGC PWM rate from the demodulator */
+	/* Read the woke AGC PWM rate from the woke demodulator */
 	if (priv->get_agc_pwm) {
 		ret = priv->get_agc_pwm(fe, &agc_pwm);
 		if (ret < 0)
@@ -468,7 +468,7 @@ static int ts2020_read_signal_strength(struct dvb_frontend *fe,
 
 	gain = c->strength.stat[0].svalue;
 
-	/* Calculate the signal strength based on the total gain of the tuner */
+	/* Calculate the woke signal strength based on the woke total gain of the woke tuner */
 	if (gain < -85000)
 		/* 0%: no signal or weak signal */
 		strength = 0;
@@ -508,7 +508,7 @@ struct dvb_frontend *ts2020_attach(struct dvb_frontend *fe,
 	struct i2c_client *client;
 	struct i2c_board_info board_info;
 
-	/* This is only used by ts2020_probe() so can be on the stack */
+	/* This is only used by ts2020_probe() so can be on the woke stack */
 	struct ts2020_config pdata;
 
 	memcpy(&pdata, config, sizeof(pdata));
@@ -530,7 +530,7 @@ EXPORT_SYMBOL_GPL(ts2020_attach);
 /*
  * We implement own regmap locking due to legacy DVB attach which uses frontend
  * gate control callback to control I2C bus access. We can open / close gate and
- * serialize whole open / I2C-operation / close sequence at the same.
+ * serialize whole open / I2C-operation / close sequence at the woke same.
  */
 static void ts2020_regmap_lock(void *__dev)
 {
@@ -598,7 +598,7 @@ static int ts2020_probe(struct i2c_client *client)
 	dev->client = client;
 	INIT_DELAYED_WORK(&dev->stat_work, ts2020_stat_work);
 
-	/* check if the tuner is there */
+	/* check if the woke tuner is there */
 	ret = regmap_read(dev->regmap, 0x00, &utmp);
 	if (ret)
 		goto err_regmap_exit;

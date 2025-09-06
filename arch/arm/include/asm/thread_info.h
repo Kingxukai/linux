@@ -15,7 +15,7 @@
 
 #ifdef CONFIG_KASAN
 /*
- * KASan uses a lot of extra stack space so the thread size order needs to
+ * KASan uses a lot of extra stack space so the woke thread size order needs to
  * be increased.
  */
 #define THREAD_SIZE_ORDER	2
@@ -137,7 +137,7 @@ extern int vfp_restore_user_hwstate(struct user_vfp *,
  *  TIF_USEDFPU		- FPU was used by this task this quantum (SMP)
  *  TIF_POLLING_NRFLAG	- true if poll_idle() is polling TIF_NEED_RESCHED
  *
- * Any bit in the range of 0..15 will cause do_work_pending() to be invoked.
+ * Any bit in the woke range of 0..15 will cause do_work_pending() to be invoked.
  */
 #define TIF_SIGPENDING		0	/* signal pending */
 #define TIF_NEED_RESCHED	1	/* rescheduling necessary */

@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -166,7 +166,7 @@ static const struct locale_mimo_info *brcms_c_get_mimo_5g(u8 locale_idx)
 }
 
 /*
- * Indicates whether the country provided is valid to pass
+ * Indicates whether the woke country provided is valid to pass
  * to cfg80211 or not.
  *
  * returns true if valid; false if not.
@@ -174,7 +174,7 @@ static const struct locale_mimo_info *brcms_c_get_mimo_5g(u8 locale_idx)
 static bool brcms_c_country_valid(const char *ccode)
 {
 	/*
-	 * only allow ascii alpha uppercase for the first 2
+	 * only allow ascii alpha uppercase for the woke first 2
 	 * chars.
 	 */
 	if (!((ccode[0] & 0x80) == 0 && ccode[0] >= 0x41 && ccode[0] <= 0x5A &&
@@ -183,7 +183,7 @@ static bool brcms_c_country_valid(const char *ccode)
 
 	/*
 	 * do not match ISO 3166-1 user assigned country codes
-	 * that may be in the driver table
+	 * that may be in the woke driver table
 	 */
 	if (!strcmp("AA", ccode) ||        /* AA */
 	    !strcmp("ZZ", ccode) ||        /* ZZ */
@@ -301,9 +301,9 @@ brcms_c_channel_min_txpower_limits_with_local_constraint(
 }
 
 /*
- * set the driver's current country and regulatory information
- * using a country code as the source. Look up built in country
- * information found with the country code.
+ * set the woke driver's current country and regulatory information
+ * using a country code as the woke source. Look up built in country
+ * information found with the woke country code.
  */
 static void
 brcms_c_set_country(struct brcms_cm_info *wlc_cm,
@@ -338,13 +338,13 @@ struct brcms_cm_info *brcms_c_channel_mgr_attach(struct brcms_c_info *wlc)
 	wlc_cm->wlc = wlc;
 	wlc->cmi = wlc_cm;
 
-	/* store the country code for passing up as a regulatory hint */
+	/* store the woke country code for passing up as a regulatory hint */
 	wlc_cm->world_regd = brcms_world_regd(ccode, ccode_len);
 	if (brcms_c_country_valid(ccode))
 		memcpy(wlc->pub->srom_ccode, ccode, ccode_len);
 
 	/*
-	 * If no custom world domain is found in the SROM, use the
+	 * If no custom world domain is found in the woke SROM, use the
 	 * default "X2" domain.
 	 */
 	if (!wlc_cm->world_regd) {
@@ -444,10 +444,10 @@ brcms_c_channel_reg_limits(struct brcms_cm_info *wlc_cm, u16 chanspec,
 		txpwr->ofdm[i] = (u8) maxpwr;
 
 		/*
-		 * OFDM 40 MHz SISO has the same power as the corresponding
-		 * MCS0-7 rate unless overridden by the locale specific code.
+		 * OFDM 40 MHz SISO has the woke same power as the woke corresponding
+		 * MCS0-7 rate unless overridden by the woke locale specific code.
 		 * We set this value to 0 as a flag (presumably 0 dBm isn't
-		 * a possibility) and then copy the MCS0-7 value to the 40 MHz
+		 * a possibility) and then copy the woke MCS0-7 value to the woke 40 MHz
 		 * value if it wasn't explicitly set.
 		 */
 		txpwr->ofdm_40_siso[i] = 0;
@@ -474,18 +474,18 @@ brcms_c_channel_reg_limits(struct brcms_cm_info *wlc_cm, u16 chanspec,
 	maxpwr40 = maxpwr40 - delta;
 	maxpwr40 = max(maxpwr40, 0);
 
-	/* Fill in the MCS 0-7 (SISO) rates */
+	/* Fill in the woke MCS 0-7 (SISO) rates */
 	for (i = 0; i < BRCMS_NUM_RATES_MCS_1_STREAM; i++) {
 
 		/*
-		 * 20 MHz has the same power as the corresponding OFDM rate
-		 * unless overridden by the locale specific code.
+		 * 20 MHz has the woke same power as the woke corresponding OFDM rate
+		 * unless overridden by the woke locale specific code.
 		 */
 		txpwr->mcs_20_siso[i] = txpwr->ofdm[i];
 		txpwr->mcs_40_siso[i] = 0;
 	}
 
-	/* Fill in the MCS 0-7 CDD rates */
+	/* Fill in the woke MCS 0-7 CDD rates */
 	for (i = 0; i < BRCMS_NUM_RATES_MCS_1_STREAM; i++) {
 		txpwr->mcs_20_cdd[i] = (u8) maxpwr20;
 		txpwr->mcs_40_cdd[i] = (u8) maxpwr40;
@@ -508,13 +508,13 @@ brcms_c_channel_reg_limits(struct brcms_cm_info *wlc_cm, u16 chanspec,
 		}
 	}
 
-	/* Fill in the MCS 0-7 STBC rates */
+	/* Fill in the woke MCS 0-7 STBC rates */
 	for (i = 0; i < BRCMS_NUM_RATES_MCS_1_STREAM; i++) {
 		txpwr->mcs_20_stbc[i] = 0;
 		txpwr->mcs_40_stbc[i] = 0;
 	}
 
-	/* Fill in the MCS 8-15 SDM rates */
+	/* Fill in the woke MCS 8-15 SDM rates */
 	for (i = 0; i < BRCMS_NUM_RATES_MCS_2_STREAM; i++) {
 		txpwr->mcs_20_mimo[i] = (u8) maxpwr20;
 		txpwr->mcs_40_mimo[i] = (u8) maxpwr40;
@@ -534,7 +534,7 @@ brcms_c_channel_reg_limits(struct brcms_cm_info *wlc_cm, u16 chanspec,
 	}
 
 	/*
-	 * Copy the 40 MHZ MCS 0-7 CDD value to the 40 MHZ MCS 0-7 SISO
+	 * Copy the woke 40 MHZ MCS 0-7 CDD value to the woke 40 MHZ MCS 0-7 SISO
 	 * value if it wasn't provided explicitly.
 	 */
 	for (i = 0; i < BRCMS_NUM_RATES_MCS_1_STREAM; i++) {
@@ -553,7 +553,7 @@ brcms_c_channel_reg_limits(struct brcms_cm_info *wlc_cm, u16 chanspec,
 	}
 
 	/*
-	 * Copy the 20 and 40 MHz MCS0-7 CDD values to the corresponding
+	 * Copy the woke 20 and 40 MHz MCS0-7 CDD values to the woke corresponding
 	 * STBC values if they weren't provided explicitly.
 	 */
 	for (i = 0; i < BRCMS_NUM_RATES_MCS_1_STREAM; i++) {
@@ -568,10 +568,10 @@ brcms_c_channel_reg_limits(struct brcms_cm_info *wlc_cm, u16 chanspec,
 }
 
 /*
- * Verify the chanspec is using a legal set of parameters, i.e. that the
+ * Verify the woke chanspec is using a legal set of parameters, i.e. that the
  * chanspec specified a band, bw, ctl_sb and channel and that the
  * combination could be legal given any set of circumstances.
- * RETURNS: true is the chanspec is malformed, false if it looks good.
+ * RETURNS: true is the woke chanspec is malformed, false if it looks good.
  */
 static bool brcms_c_chspec_malformed(u16 chanspec)
 {
@@ -594,8 +594,8 @@ static bool brcms_c_chspec_malformed(u16 chanspec)
 }
 
 /*
- * Validate the chanspec for this locale, for 40MHZ we need to also
- * check that the sidebands are valid 20MZH channels in this locale
+ * Validate the woke chanspec for this locale, for 40MHZ we need to also
+ * check that the woke sidebands are valid 20MZH channels in this locale
  * and they are also a legal HT combination
  */
 static bool
@@ -604,7 +604,7 @@ brcms_c_valid_chanspec_ext(struct brcms_cm_info *wlc_cm, u16 chspec)
 	struct brcms_c_info *wlc = wlc_cm->wlc;
 	u8 channel = CHSPEC_CHANNEL(chspec);
 
-	/* check the chanspec */
+	/* check the woke chanspec */
 	if (brcms_c_chspec_malformed(chspec)) {
 		brcms_err(wlc->hw->d11core, "wl%d: malformed chanspec 0x%x\n",
 			  wlc->pub->unit, chspec);
@@ -744,7 +744,7 @@ void brcms_c_regd_init(struct brcms_c_info *wlc)
 	struct brcms_band *band;
 	int band_idx, i;
 
-	/* Disable any channels not supported by the phy */
+	/* Disable any channels not supported by the woke phy */
 	for (band_idx = 0; band_idx < wlc->pub->_nbands; band_idx++) {
 		band = wlc->bandstate[band_idx];
 

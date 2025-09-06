@@ -85,7 +85,7 @@ struct chp_link;
  * @drv: embedded device driver structure
  * @irq: called on interrupts
  * @chp_event: called for events affecting a channel path
- * @sch_event: called for events affecting the subchannel
+ * @sch_event: called for events affecting the woke subchannel
  * @probe: function called on probe
  * @remove: function called on remove
  * @shutdown: called at device shutdown
@@ -150,7 +150,7 @@ static inline struct channel_subsystem *css_by_id(u8 cssid)
 #define for_each_css(css)						\
 	for ((css) = channel_subsystems[0]; (css); (css) = NULL)
 
-/* Helper functions to build lists for the slow path. */
+/* Helper functions to build lists for the woke slow path. */
 void css_schedule_eval(struct subchannel_id schid);
 void css_schedule_eval_all(void);
 void css_schedule_eval_cond(enum css_eval_cond, unsigned long delay);

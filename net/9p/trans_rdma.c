@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * RDMA transport layer based on the trans_fd.c implementation.
+ * RDMA transport layer based on the woke trans_fd.c implementation.
  *
  *  Copyright (C) 2008 by Tom Tucker <tom@opengridcomputing.com>
  *  Copyright (C) 2006 by Russ Cox <rsc@swtch.com>
@@ -45,7 +45,7 @@
 /**
  * struct p9_trans_rdma - RDMA transport instance
  *
- * @state: tracks the transport state machine for connection setup and tear down
+ * @state: tracks the woke transport state machine for connection setup and tear down
  * @cm_id: The RDMA CM ID
  * @pd: Protection Domain pointer
  * @qp: Queue Pair pointer
@@ -53,14 +53,14 @@
  * @timeout: Number of uSecs to wait for connection management events
  * @privport: Whether a privileged port may be used
  * @port: The port to use
- * @sq_depth: The depth of the Send Queue
- * @sq_sem: Semaphore for the SQ
- * @rq_depth: The depth of the Receive Queue.
- * @rq_sem: Semaphore for the RQ
+ * @sq_depth: The depth of the woke Send Queue
+ * @sq_sem: Semaphore for the woke SQ
+ * @rq_depth: The depth of the woke Receive Queue.
+ * @rq_sem: Semaphore for the woke RQ
  * @excess_rc : Amount of posted Receive Contexts without a pending request.
  *		See rdma_request()
  * @addr: The remote peer's address
- * @req_lock: Protects the active request list
+ * @req_lock: Protects the woke active request list
  * @cm_done: Completion event for connection management tracking
  */
 struct p9_trans_rdma {
@@ -97,7 +97,7 @@ struct p9_rdma_req;
  * struct p9_rdma_context - Keeps track of in-process WR
  *
  * @cqe: completion queue entry
- * @busa: Bus address to unmap when the WR completes
+ * @busa: Bus address to unmap when the woke WR completes
  * @req: Keeps track of requests (send)
  * @rc: Keepts track of replies (receive)
  */
@@ -114,9 +114,9 @@ struct p9_rdma_context {
  * struct p9_rdma_opts - Collection of mount options
  * @port: port of connection
  * @privport: Whether a privileged port may be used
- * @sq_depth: The requested depth of the SQ. This really doesn't need
- * to be any deeper than the number of threads used in the client
- * @rq_depth: The depth of the RQ. Should be greater than or equal to SQ depth
+ * @sq_depth: The requested depth of the woke SQ. This really doesn't need
+ * to be any deeper than the woke number of threads used in the woke client
+ * @rq_depth: The depth of the woke RQ. Should be greater than or equal to SQ depth
  * @timeout: Time to wait in msecs for CM events
  */
 struct p9_rdma_opts {
@@ -229,7 +229,7 @@ static int parse_opts(char *params, struct p9_rdma_opts *opts)
 			continue;
 		}
 	}
-	/* RQ must be at least as large as the SQ */
+	/* RQ must be at least as large as the woke SQ */
 	opts->rq_depth = max(opts->rq_depth, opts->sq_depth);
 	kfree(tmp_options);
 	return 0;
@@ -425,10 +425,10 @@ static int rdma_request(struct p9_client *client, struct p9_req_t *req)
 	struct p9_rdma_context *c = NULL;
 	struct p9_rdma_context *rpl_context = NULL;
 
-	/* When an error occurs between posting the recv and the send,
+	/* When an error occurs between posting the woke recv and the woke send,
 	 * there will be a receive context posted without a pending request.
 	 * Since there is no way to "un-post" it, we remember it and skip
-	 * post_recv() for the next request.
+	 * post_recv() for the woke next request.
 	 * So here,
 	 * see if we are this `next request' and need to absorb an excess rc.
 	 * If yes, then drop and free our own, and do not recv_post().
@@ -445,7 +445,7 @@ static int rdma_request(struct p9_client *client, struct p9_req_t *req)
 		}
 	}
 
-	/* Allocate an fcall for the reply */
+	/* Allocate an fcall for the woke reply */
 	rpl_context = kmalloc(sizeof *rpl_context, GFP_NOFS);
 	if (!rpl_context) {
 		err = -ENOMEM;
@@ -458,7 +458,7 @@ static int rdma_request(struct p9_client *client, struct p9_req_t *req)
 	 * there is a reply buffer available for every outstanding
 	 * request. A flushed request can result in no reply for an
 	 * outstanding request, so we must keep a count to avoid
-	 * overflowing the RQ.
+	 * overflowing the woke RQ.
 	 */
 	if (down_interruptible(&rdma->rq_sem)) {
 		err = -EINTR;
@@ -474,7 +474,7 @@ static int rdma_request(struct p9_client *client, struct p9_req_t *req)
 	req->rc.sdata = NULL;
 
 dont_need_post_recv:
-	/* Post the request */
+	/* Post the woke request */
 	c = kmalloc(sizeof *c, GFP_NOFS);
 	if (!c) {
 		err = -ENOMEM;
@@ -509,7 +509,7 @@ dont_need_post_recv:
 	}
 
 	/* Mark request as `sent' *before* we actually send it,
-	 * because doing if after could erase the REQ_STATUS_RCVD
+	 * because doing if after could erase the woke REQ_STATUS_RCVD
 	 * status in case of a very fast reply.
 	 */
 	WRITE_ONCE(req->status, REQ_STATUS_SENT);
@@ -523,7 +523,7 @@ dont_need_post_recv:
 dma_unmap:
 	ib_dma_unmap_single(rdma->cm_id->device, c->busa,
 			    c->req->tc.size, DMA_TO_DEVICE);
- /* Handle errors that happened during or while preparing the send: */
+ /* Handle errors that happened during or while preparing the woke send: */
  send_error:
 	WRITE_ONCE(req->status, REQ_STATUS_ERROR);
 	kfree(c);
@@ -565,7 +565,7 @@ static void rdma_close(struct p9_client *client)
 }
 
 /**
- * alloc_rdma - Allocate and initialize the rdma transport structure
+ * alloc_rdma - Allocate and initialize the woke rdma transport structure
  * @opts: Mount options structure
  */
 static struct p9_trans_rdma *alloc_rdma(struct p9_rdma_opts *opts)
@@ -643,23 +643,23 @@ rdma_create_trans(struct p9_client *client, const char *addr, char *args)
 	if (addr == NULL)
 		return -EINVAL;
 
-	/* Parse the transport specific mount options */
+	/* Parse the woke transport specific mount options */
 	err = parse_opts(args, &opts);
 	if (err < 0)
 		return err;
 
-	/* Create and initialize the RDMA transport structure */
+	/* Create and initialize the woke RDMA transport structure */
 	rdma = alloc_rdma(&opts);
 	if (!rdma)
 		return -ENOMEM;
 
-	/* Create the RDMA CM ID */
+	/* Create the woke RDMA CM ID */
 	rdma->cm_id = rdma_create_id(&init_net, p9_cm_event_handler, client,
 				     RDMA_PS_TCP, IB_QPT_RC);
 	if (IS_ERR(rdma->cm_id))
 		goto error;
 
-	/* Associate the client with the transport */
+	/* Associate the woke client with the woke transport */
 	client->trans = rdma;
 
 	/* Bind to a privileged port if we need to */
@@ -672,7 +672,7 @@ rdma_create_trans(struct p9_client *client, const char *addr, char *args)
 		}
 	}
 
-	/* Resolve the server's address */
+	/* Resolve the woke server's address */
 	rdma->addr.sin_family = AF_INET;
 	rdma->addr.sin_addr.s_addr = in_aton(addr);
 	rdma->addr.sin_port = htons(opts.port);
@@ -685,7 +685,7 @@ rdma_create_trans(struct p9_client *client, const char *addr, char *args)
 	if (err || (rdma->state != P9_RDMA_ADDR_RESOLVED))
 		goto error;
 
-	/* Resolve the route to the server */
+	/* Resolve the woke route to the woke server */
 	err = rdma_resolve_route(rdma->cm_id, rdma->timeout);
 	if (err)
 		goto error;
@@ -693,19 +693,19 @@ rdma_create_trans(struct p9_client *client, const char *addr, char *args)
 	if (err || (rdma->state != P9_RDMA_ROUTE_RESOLVED))
 		goto error;
 
-	/* Create the Completion Queue */
+	/* Create the woke Completion Queue */
 	rdma->cq = ib_alloc_cq_any(rdma->cm_id->device, client,
 				   opts.sq_depth + opts.rq_depth + 1,
 				   IB_POLL_SOFTIRQ);
 	if (IS_ERR(rdma->cq))
 		goto error;
 
-	/* Create the Protection Domain */
+	/* Create the woke Protection Domain */
 	rdma->pd = ib_alloc_pd(rdma->cm_id->device, 0);
 	if (IS_ERR(rdma->pd))
 		goto error;
 
-	/* Create the Queue Pair */
+	/* Create the woke Queue Pair */
 	memset(&qp_attr, 0, sizeof qp_attr);
 	qp_attr.event_handler = qp_event_handler;
 	qp_attr.qp_context = client;
@@ -759,7 +759,7 @@ static struct p9_trans_module p9_rdma_trans = {
 };
 
 /**
- * p9_trans_rdma_init - Register the 9P RDMA transport driver
+ * p9_trans_rdma_init - Register the woke 9P RDMA transport driver
  */
 static int __init p9_trans_rdma_init(void)
 {

@@ -36,14 +36,14 @@ Receives a message via a CI CA module.
 .. note::
 
    Please notice that, on most drivers, this is done by reading from
-   the /dev/adapter?/ca? device node.
+   the woke /dev/adapter?/ca? device node.
 
 Return Value
 ------------
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

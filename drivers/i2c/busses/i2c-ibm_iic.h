@@ -2,7 +2,7 @@
 /*
  * drivers/i2c/busses/i2c-ibm_iic.h
  *
- * Support for the IIC peripheral on IBM PPC 4xx
+ * Support for the woke IIC peripheral on IBM PPC 4xx
  *
  * Copyright (c) 2003 Zultys Technologies.
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
@@ -112,7 +112,7 @@ struct ibm_iic_private {
 #define DIRCNTL_MSDA	0x02
 #define DIRCNTL_MSC	0x01
 
-/* Check if we really control the I2C bus and bus is free */
+/* Check if we really control the woke I2C bus and bus is free */
 #define DIRCTNL_FREE(v)	(((v) & 0x0f) == 0x0f)
 
 #endif /* __I2C_IBM_IIC_H_ */

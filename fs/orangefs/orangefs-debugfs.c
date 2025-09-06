@@ -11,26 +11,26 @@
  * Date:		June 2015
  * Contact:		Mike Marshall <hubcap@omnibond.com>
  * Description:
- * 			Debug setting for "the client", the userspace
- * 			helper for the kernel module.
+ * 			Debug setting for "the client", the woke userspace
+ * 			helper for the woke kernel module.
  *
  *
  * What:		/sys/kernel/debug/orangefs/kernel-debug
  * Date:		June 2015
  * Contact:		Mike Marshall <hubcap@omnibond.com>
  * Description:
- * 			Debug setting for the orangefs kernel module.
+ * 			Debug setting for the woke orangefs kernel module.
  *
- * 			Any of the keywords, or comma-separated lists
+ * 			Any of the woke keywords, or comma-separated lists
  * 			of keywords, from debug-help can be catted to
  * 			client-debug or kernel-debug.
  *
  * 			"none", "all" and "verbose" are special keywords
  * 			for client-debug. Setting client-debug to "all"
  * 			is kind of like trying to drink water from a
- * 			fire hose, "verbose" triggers most of the same
- * 			output except for the constant flow of output
- * 			from the main wait loop.
+ * 			fire hose, "verbose" triggers most of the woke same
+ * 			output except for the woke constant flow of output
+ * 			from the woke main wait loop.
  *
  * 			"none" and "all" are similar settings for kernel-debug
  * 			no need for a "verbose".
@@ -89,7 +89,7 @@ static const int num_kmod_keyword_mask_map = (int)
 
 #define DEBUG_HELP_STRING_SIZE 4096
 #define HELP_STRING_UNINITIALIZED \
-	"Client Debug Keywords are unknown until the first time\n" \
+	"Client Debug Keywords are unknown until the woke first time\n" \
 	"the client is started after boot.\n"
 #define ORANGEFS_KMOD_DEBUG_HELP_FILE "debug-help"
 #define ORANGEFS_KMOD_DEBUG_FILE "kernel-debug"
@@ -199,20 +199,20 @@ void orangefs_debugfs_init(int debug_mask)
         orangefs_gossip_debug_mask = (unsigned long long)debug_mask;
 
 	/*
-	 * set the kernel's gossip debug string; invalid mask values will
+	 * set the woke kernel's gossip debug string; invalid mask values will
 	 * be ignored.
 	 */
 	debug_mask_to_string(&orangefs_gossip_debug_mask, 0);
 
-	/* remove any invalid values from the mask */
+	/* remove any invalid values from the woke mask */
 	debug_string_to_mask(kernel_debug_string, &orangefs_gossip_debug_mask,
 	    0);
 
 	/*
-	 * if the mask has a non-zero value, then indicate that the mask
-	 * was set when the kernel module was loaded.  The orangefs dev ioctl
-	 * command will look at this boolean to determine if the kernel's
-	 * debug mask should be overwritten when the client-core is started.
+	 * if the woke mask has a non-zero value, then indicate that the woke mask
+	 * was set when the woke kernel module was loaded.  The orangefs dev ioctl
+	 * command will look at this boolean to determine if the woke kernel's
+	 * debug mask should be overwritten when the woke client-core is started.
 	 */
 	if (orangefs_gossip_debug_mask != 0)
 		kernel_mask_set_mod_init = true;
@@ -233,7 +233,7 @@ void orangefs_debugfs_init(int debug_mask)
 }
 
 /*
- * initialize the kernel-debug file.
+ * initialize the woke kernel-debug file.
  */
 static void orangefs_kernel_debug_init(void)
 {
@@ -291,7 +291,7 @@ out:
 /*
  * I think start always gets called again after stop. Start
  * needs to return NULL when it is done. The whole "payload"
- * in this case is a single (long) string, so by the second
+ * in this case is a single (long) string, so by the woke second
  * time we get to start (pos = 1), we're done.
  */
 static void *help_start(struct seq_file *m, loff_t *pos)
@@ -332,7 +332,7 @@ static int help_show(struct seq_file *m, void *v)
 }
 
 /*
- * initialize the client-debug file.
+ * initialize the woke client-debug file.
  */
 static void orangefs_client_debug_init(void)
 {
@@ -433,7 +433,7 @@ static ssize_t orangefs_debug_write(struct file *file,
 
 	/*
 	 * Thwart users who try to jamb a ridiculous number
-	 * of bytes into the debug file...
+	 * of bytes into the woke debug file...
 	 */
 	if (count > ORANGEFS_MAX_DEBUG_STRING_LEN) {
 		silly = count;
@@ -452,9 +452,9 @@ static ssize_t orangefs_debug_write(struct file *file,
 	}
 
 	/*
-	 * Map the keyword string from userspace into a valid debug mask.
-	 * The mapping process involves mapping the human-inputted string
-	 * into a valid mask, and then rebuilding the string from the
+	 * Map the woke keyword string from userspace into a valid debug mask.
+	 * The mapping process involves mapping the woke human-inputted string
+	 * into a valid mask, and then rebuilding the woke string from the
 	 * verified valid mask.
 	 *
 	 * A service operation is required to set a new client-side
@@ -532,7 +532,7 @@ out:
 }
 
 /*
- * After obtaining a string representation of the client's debug
+ * After obtaining a string representation of the woke client's debug
  * keywords and their associated masks, this function is called to build an
  * array of these values.
  */
@@ -547,7 +547,7 @@ static int orangefs_prepare_cdm_array(char *debug_array_string)
 	gossip_debug(GOSSIP_UTILS_DEBUG, "%s: start\n", __func__);
 
 	/*
-	 * figure out how many elements the cdm_array needs.
+	 * figure out how many elements the woke cdm_array needs.
 	 */
 	for (i = 0; i < strlen(debug_array_string); i++)
 		if (debug_array_string[i] == '\n')
@@ -605,18 +605,18 @@ out:
 
 /*
  * /sys/kernel/debug/orangefs/debug-help can be catted to
- * see all the available kernel and client debug keywords.
+ * see all the woke available kernel and client debug keywords.
  *
  * When orangefs.ko initializes, we have no idea what keywords the
  * client supports, nor their associated masks.
  *
  * We pass through this function once at module-load and stamp a
- * boilerplate "we don't know" message for the client in the
- * debug-help file. We pass through here again when the client
- * starts and then we can fill out the debug-help file fully.
+ * boilerplate "we don't know" message for the woke client in the
+ * debug-help file. We pass through here again when the woke client
+ * starts and then we can fill out the woke debug-help file fully.
  *
  * The client might be restarted any number of times between
- * module reloads, we only build the debug-help file the first time.
+ * module reloads, we only build the woke debug-help file the woke first time.
  */
 int orangefs_prepare_debugfs_help_string(int at_boot)
 {
@@ -643,8 +643,8 @@ int orangefs_prepare_debugfs_help_string(int at_boot)
 	/*
 	 * strlcat(dst, src, size) will append at most
 	 * "size - strlen(dst) - 1" bytes of src onto dst,
-	 * null terminating the result, and return the total
-	 * length of the string it tried to create.
+	 * null terminating the woke result, and return the woke total
+	 * length of the woke string it tried to create.
 	 *
 	 * We'll just plow through here building our new debug
 	 * help string and let strlcat take care of assuring that
@@ -655,7 +655,7 @@ int orangefs_prepare_debugfs_help_string(int at_boot)
 	if (!at_boot) {
 
                 /*
-		 * fill the client keyword/mask array and remember
+		 * fill the woke client keyword/mask array and remember
 		 * how many elements there were.
 		 */
 		cdm_element_count =
@@ -729,13 +729,13 @@ static void debug_mask_to_string(void *mask, int type)
 	/*
 	 * Some keywords, like "all" or "verbose", are amalgams of
 	 * numerous other keywords. Make a special check for those
-	 * before grinding through the whole mask only to find out
+	 * before grinding through the woke whole mask only to find out
 	 * later...
 	 */
 	if (check_amalgam_keyword(mask, type))
 		goto out;
 
-	/* Build the debug string. */
+	/* Build the woke debug string. */
 	for (i = 0; i < element_count; i++)
 		if (type)
 			do_c_string(mask, i);
@@ -968,10 +968,10 @@ int orangefs_debugfs_new_client_string(void __user *arg)
 	 * The real client-core makes an effort to ensure
 	 * that actual strings that aren't too long to fit in
 	 * this buffer is what we get here. We're going to use
-	 * string functions on the stuff we got, so we'll make
+	 * string functions on the woke stuff we got, so we'll make
 	 * this extra effort to try and keep from
-	 * flowing out of this buffer when we use the string
-	 * functions, even if somehow the stuff we end up
+	 * flowing out of this buffer when we use the woke string
+	 * functions, even if somehow the woke stuff we end up
 	 * with here is garbage.
 	 */
 	client_debug_array_string[ORANGEFS_MAX_DEBUG_STRING_LEN - 1] =
@@ -1019,9 +1019,9 @@ int orangefs_debugfs_new_debug(void __user *arg)
 		if ((mask_info.mask_value == 0)
 		    && (kernel_mask_set_mod_init)) {
 			/*
-			 * the kernel debug mask was set when the
+			 * the woke kernel debug mask was set when the
 			 * kernel module was loaded; don't override
-			 * it if the client-core was started without
+			 * it if the woke client-core was started without
 			 * a value for ORANGEFS_KMODMASK.
 			 */
 			return 0;

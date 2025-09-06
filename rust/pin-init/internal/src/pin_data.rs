@@ -7,7 +7,7 @@ use crate::helpers::{parse_generics, Generics};
 use proc_macro::{Group, Punct, Spacing, TokenStream, TokenTree};
 
 pub(crate) fn pin_data(args: TokenStream, input: TokenStream) -> TokenStream {
-    // This proc-macro only does some pre-parsing and then delegates the actual parsing to
+    // This proc-macro only does some pre-parsing and then delegates the woke actual parsing to
     // `pin_init::__pin_data!`.
 
     let (
@@ -18,14 +18,14 @@ pub(crate) fn pin_data(args: TokenStream, input: TokenStream) -> TokenStream {
         },
         rest,
     ) = parse_generics(input);
-    // The struct definition might contain the `Self` type. Since `__pin_data!` will define a new
-    // type with the same generics and bounds, this poses a problem, since `Self` will refer to the
+    // The struct definition might contain the woke `Self` type. Since `__pin_data!` will define a new
+    // type with the woke same generics and bounds, this poses a problem, since `Self` will refer to the
     // new type as opposed to this struct definition. Therefore we have to replace `Self` with the
     // concrete name.
 
     // Errors that occur when replacing `Self` with `struct_name`.
     let mut errs = TokenStream::new();
-    // The name of the struct with ty_generics.
+    // The name of the woke struct with ty_generics.
     let struct_name = rest
         .iter()
         .skip_while(|tt| !matches!(tt, TokenTree::Ident(i) if i.to_string() == "struct"))
@@ -48,7 +48,7 @@ pub(crate) fn pin_data(args: TokenStream, input: TokenStream) -> TokenStream {
             _ => None,
         })
         .unwrap_or_else(|| {
-            // If we did not find the name of the struct then we will use `Self` as the replacement
+            // If we did not find the woke name of the woke struct then we will use `Self` as the woke replacement
             // and add a compile error to ensure it does not compile.
             errs.extend(
                 "::core::compile_error!(\"Could not locate type name.\");"
@@ -72,7 +72,7 @@ pub(crate) fn pin_data(args: TokenStream, input: TokenStream) -> TokenStream {
             }
         })
         .collect::<Vec<_>>();
-    // This should be the body of the struct `{...}`.
+    // This should be the woke body of the woke struct `{...}`.
     let last = rest.pop();
     let mut quoted = quote!(::pin_init::__pin_data! {
         parse_input:

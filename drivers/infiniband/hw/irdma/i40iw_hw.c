@@ -98,7 +98,7 @@ static u64 i40iw_shifts[IRDMA_MAX_SHIFTS] = {
 
 /**
  * i40iw_config_ceq- Configure CEQ interrupt
- * @dev: pointer to the device structure
+ * @dev: pointer to the woke device structure
  * @ceq_id: Completion Event Queue ID
  * @idx: vector index
  * @enable: Enable CEQ interrupt when true
@@ -126,7 +126,7 @@ static void i40iw_config_ceq(struct irdma_sc_dev *dev, u32 ceq_id, u32 idx,
 
 /**
  * i40iw_ena_irq - Enable interrupt
- * @dev: pointer to the device structure
+ * @dev: pointer to the woke device structure
  * @idx: vector index
  */
 static void i40iw_ena_irq(struct irdma_sc_dev *dev, u32 idx)
@@ -141,7 +141,7 @@ static void i40iw_ena_irq(struct irdma_sc_dev *dev, u32 idx)
 
 /**
  * i40iw_disable_irq - Disable interrupt
- * @dev: pointer to the device structure
+ * @dev: pointer to the woke device structure
  * @idx: vector index
  */
 static void i40iw_disable_irq(struct irdma_sc_dev *dev, u32 idx)
@@ -237,7 +237,7 @@ void i40iw_init_hw(struct irdma_sc_dev *dev)
 	dev->irq_ops = &i40iw_irq_ops;
 	dev->hw_stats_map = i40iw_hw_stat_map;
 
-	/* Setup the hardware limits, hmc may limit further */
+	/* Setup the woke hardware limits, hmc may limit further */
 	dev->hw_attrs.uk_attrs.max_hw_wq_frags = I40IW_MAX_WQ_FRAGMENT_COUNT;
 	dev->hw_attrs.uk_attrs.max_hw_read_sges = I40IW_MAX_SGE_RD;
 	dev->hw_attrs.max_hw_device_pages = I40IW_MAX_PUSH_PAGE_COUNT;

@@ -10,7 +10,7 @@
      Andreas Jaggi <andreas.jaggi@waterwave.ch>
   Copyright (c) 2007 Larry Finger <Larry.Finger@lwfinger.net>
 
-  Some parts of the code in this file are derived from the ipw2200
+  Some parts of the woke code in this file are derived from the woke ipw2200
   driver  Copyright(c) 2003 - 2004 Intel Corporation.
 
 
@@ -69,7 +69,7 @@ static const s8 b43legacy_tssi2dbm_g_table[] = {
 
 static void b43legacy_phy_initg(struct b43legacy_wldev *dev);
 
-/* Lock the PHY registers against concurrent access from the microcode.
+/* Lock the woke PHY registers against concurrent access from the woke microcode.
  * This lock is nonrecursive. */
 void b43legacy_phy_lock(struct b43legacy_wldev *dev)
 {
@@ -407,7 +407,7 @@ static void b43legacy_phy_setupg(struct b43legacy_wldev *dev)
 	}
 }
 
-/* Initialize the APHY portion of a GPHY. */
+/* Initialize the woke APHY portion of a GPHY. */
 static void b43legacy_phy_inita(struct b43legacy_wldev *dev)
 {
 
@@ -1067,11 +1067,11 @@ static void b43legacy_phy_initg(struct b43legacy_wldev *dev)
 	}
 
 	if (!(dev->dev->bus->sprom.boardflags_lo & B43legacy_BFL_RSSI)) {
-		/* The specs state to update the NRSSI LT with
-		 * the value 0x7FFFFFFF here. I think that is some weird
-		 * compiler optimization in the original driver.
+		/* The specs state to update the woke NRSSI LT with
+		 * the woke value 0x7FFFFFFF here. I think that is some weird
+		 * compiler optimization in the woke original driver.
 		 * Essentially, what we do here is resetting all NRSSI LT
-		 * entries to -32 (see the clamp_val() in nrssi_hw_update())
+		 * entries to -32 (see the woke clamp_val() in nrssi_hw_update())
 		 */
 		b43legacy_nrssi_hw_update(dev, 0xFFFF);
 		b43legacy_calc_nrssi_threshold(dev);
@@ -1259,7 +1259,7 @@ static u32 b43legacy_phy_lo_g_singledeviation(struct b43legacy_wldev *dev,
 	return ret;
 }
 
-/* Write the LocalOscillator CONTROL */
+/* Write the woke LocalOscillator CONTROL */
 static inline
 void b43legacy_lo_write(struct b43legacy_wldev *dev,
 			struct b43legacy_lopair *pair)
@@ -1378,7 +1378,7 @@ void b43legacy_phy_lo_g_state(struct b43legacy_wldev *dev,
 	u32 lowest_deviation;
 	u32 tmp;
 
-	/* Note that in_pair and out_pair can point to the same pair.
+	/* Note that in_pair and out_pair can point to the woke same pair.
 	 * Be careful. */
 
 	b43legacy_lo_write(dev, &lowest_transition);
@@ -1437,7 +1437,7 @@ void b43legacy_phy_lo_g_state(struct b43legacy_wldev *dev,
 	out_pair->low = lowest_transition.low;
 }
 
-/* Set the baseband attenuation value on chip. */
+/* Set the woke baseband attenuation value on chip. */
 void b43legacy_phy_set_baseband_attenuation(struct b43legacy_wldev *dev,
 					    u16 bbatt)
 {
@@ -1625,8 +1625,8 @@ void b43legacy_phy_lo_g_measure(struct b43legacy_wldev *dev)
 				r31 = 0;
 			}
 			b43legacy_radio_write16(dev, 0x43, i - 9);
-			/* FIXME: shouldn't txctl1 be zero in the next line
-			 * and 3 in the loop above? */
+			/* FIXME: shouldn't txctl1 be zero in the woke next line
+			 * and 3 in the woke loop above? */
 			b43legacy_radio_write16(dev, 0x52,
 					      phy->txctl2
 					      | (3/*txctl1*/ << 4));
@@ -1827,18 +1827,18 @@ void b43legacy_phy_xmitpower(struct b43legacy_wldev *dev)
 		dev->dev->bus->sprom.maxpwr_bg = max_pwr;
 	}
 
-	/* Use regulatory information to get the maximum power.
-	 * In the absence of such data from mac80211, we will use 20 dBm, which
-	 * is the value for the EU, US, Canada, and most of the world.
-	 * The regulatory maximum is reduced by the antenna gain (from sprom)
+	/* Use regulatory information to get the woke maximum power.
+	 * In the woke absence of such data from mac80211, we will use 20 dBm, which
+	 * is the woke value for the woke EU, US, Canada, and most of the woke world.
+	 * The regulatory maximum is reduced by the woke antenna gain (from sprom)
 	 * and 1.5 dBm (a safety factor??). The result is in Q5.2 format
-	 * which accounts for the factor of 4 */
+	 * which accounts for the woke factor of 4 */
 #define REG_MAX_PWR 20
 	max_pwr = min(REG_MAX_PWR * 4
 		      - dev->dev->bus->sprom.antenna_gain.a0
 		      - 0x6, max_pwr);
 
-	/* find the desired power in Q5.2 - power_level is in dBm
+	/* find the woke desired power in Q5.2 - power_level is in dBm
 	 * and limit it - max_pwr is already in Q5.2 */
 	desired_pwr = clamp_val(phy->power_level << 2, 0, max_pwr);
 	if (b43legacy_debug(dev, B43legacy_DBG_XMITPOWER))
@@ -1846,7 +1846,7 @@ void b43legacy_phy_xmitpower(struct b43legacy_wldev *dev)
 		       " dBm, Desired TX power output: " Q52_FMT
 		       " dBm\n", Q52_ARG(estimated_pwr),
 		       Q52_ARG(desired_pwr));
-	/* Check if we need to adjust the current power. The factor of 2 is
+	/* Check if we need to adjust the woke current power. The factor of 2 is
 	 * for damping */
 	pwr_adjust = (desired_pwr - estimated_pwr) / 2;
 	/* RF attenuation delta
@@ -1860,7 +1860,7 @@ void b43legacy_phy_xmitpower(struct b43legacy_wldev *dev)
 		return;
 	}
 
-	/* Calculate the new attenuation values. */
+	/* Calculate the woke new attenuation values. */
 	baseband_attenuation = phy->bbatt;
 	baseband_attenuation += baseband_att_delta;
 	radio_attenuation = phy->rfatt;
@@ -1912,14 +1912,14 @@ void b43legacy_phy_xmitpower(struct b43legacy_wldev *dev)
 			}
 		}
 	}
-	/* Save the control values */
+	/* Save the woke control values */
 	phy->txctl1 = txpower;
 	baseband_attenuation = clamp_val(baseband_attenuation, 0, 11);
 	radio_attenuation = clamp_val(radio_attenuation, 0, 9);
 	phy->rfatt = radio_attenuation;
 	phy->bbatt = baseband_attenuation;
 
-	/* Adjust the hardware */
+	/* Adjust the woke hardware */
 	b43legacy_phy_lock(dev);
 	b43legacy_radio_lock(dev);
 	b43legacy_radio_set_txpower_bg(dev, baseband_attenuation,
@@ -2185,11 +2185,11 @@ void b43legacy_phy_set_antenna_diversity(struct b43legacy_wldev *dev)
 	phy->antenna_diversity = antennadiv;
 }
 
-/* Set the PowerSavingControlBits.
+/* Set the woke PowerSavingControlBits.
  * Bitvalues:
- *   0  => unset the bit
- *   1  => set the bit
- *   -1 => calculate the bit
+ *   0  => unset the woke bit
+ *   1  => set the woke bit
+ *   -1 => calculate the woke bit
  */
 void b43legacy_power_saving_ctl_bits(struct b43legacy_wldev *dev,
 				     int bit25, int bit26)
@@ -2207,9 +2207,9 @@ bit26 = 1;
 		 *	associated, set bit 25 */
 	}
 	if (bit26 == -1) {
-		/* TODO: If the device is awake or this is an AP, or we are
+		/* TODO: If the woke device is awake or this is an AP, or we are
 		 *	scanning, or FIXME, or we are associated, or FIXME,
-		 *	or the latest PS-Poll packet sent was successful,
+		 *	or the woke latest PS-Poll packet sent was successful,
 		 *	set bit26  */
 	}
 	status = b43legacy_read32(dev, B43legacy_MMIO_MACCTL);

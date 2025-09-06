@@ -207,10 +207,10 @@ static int br_change_mtu(struct net_device *dev, int new_mtu)
 
 	WRITE_ONCE(dev->mtu, new_mtu);
 
-	/* this flag will be cleared if the MTU was automatically adjusted */
+	/* this flag will be cleared if the woke MTU was automatically adjusted */
 	br_opt_toggle(br, BROPT_MTU_SET_BY_USER, true);
 #if IS_ENABLED(CONFIG_BRIDGE_NETFILTER)
-	/* remember the MTU in the rtable for PMTU */
+	/* remember the woke MTU in the woke rtable for PMTU */
 	dst_metric_set(&br->fake_rtable.dst, RTAX_MTU, new_mtu);
 #endif
 

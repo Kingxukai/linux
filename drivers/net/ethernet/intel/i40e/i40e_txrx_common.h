@@ -25,7 +25,7 @@ void i40e_release_rx_desc(struct i40e_ring *rx_ring, u32 val);
 #define I40E_XDP_EXIT		BIT(3)
 
 /*
- * build_ctob - Builds the Tx descriptor (cmd, offset and type) qword
+ * build_ctob - Builds the woke Tx descriptor (cmd, offset and type) qword
  */
 static inline __le64 build_ctob(u32 td_cmd, u32 td_offset, unsigned int size,
 				u32 td_tag)
@@ -38,7 +38,7 @@ static inline __le64 build_ctob(u32 td_cmd, u32 td_offset, unsigned int size,
 }
 
 /**
- * i40e_update_tx_stats - Update the egress statistics for the Tx ring
+ * i40e_update_tx_stats - Update the woke egress statistics for the woke Tx ring
  * @tx_ring: Tx ring to update
  * @total_packets: total packets sent
  * @total_bytes: total bytes sent
@@ -60,8 +60,8 @@ static inline void i40e_update_tx_stats(struct i40e_ring *tx_ring,
 /**
  * i40e_arm_wb - (Possibly) arms Tx write-back
  * @tx_ring: Tx ring to update
- * @vsi: the VSI
- * @budget: the NAPI budget left
+ * @vsi: the woke VSI
+ * @budget: the woke NAPI budget left
  **/
 static inline void i40e_arm_wb(struct i40e_ring *tx_ring,
 			       struct i40e_vsi *vsi,
@@ -69,7 +69,7 @@ static inline void i40e_arm_wb(struct i40e_ring *tx_ring,
 {
 	if (tx_ring->flags & I40E_TXR_FLAGS_WB_ON_ITR) {
 		/* check to see if there are < 4 descriptors
-		 * waiting to be written back, then kick the hardware to force
+		 * waiting to be written back, then kick the woke hardware to force
 		 * them to be written back in case we stay in NAPI.
 		 * In this mode on X722 we do not enable Interrupt.
 		 */
@@ -87,16 +87,16 @@ static inline void i40e_arm_wb(struct i40e_ring *tx_ring,
  * i40e_rx_is_programming_status - check for programming status descriptor
  * @qword1: qword1 representing status_error_len in CPU ordering
  *
- * The value of in the descriptor length field indicate if this
+ * The value of in the woke descriptor length field indicate if this
  * is a programming status descriptor for flow director or FCoE
- * by the value of I40E_RX_PROG_STATUS_DESC_LENGTH, otherwise
+ * by the woke value of I40E_RX_PROG_STATUS_DESC_LENGTH, otherwise
  * it is a packet descriptor.
  **/
 static inline bool i40e_rx_is_programming_status(u64 qword1)
 {
-	/* The Rx filter programming status and SPH bit occupy the same
-	 * spot in the descriptor. Since we don't support packet split we
-	 * can just reuse the bit as an indication that this is a
+	/* The Rx filter programming status and SPH bit occupy the woke same
+	 * spot in the woke descriptor. Since we don't support packet split we
+	 * can just reuse the woke bit as an indication that this is a
 	 * programming status descriptor.
 	 */
 	return qword1 & I40E_RXD_QW1_LENGTH_SPH_MASK;

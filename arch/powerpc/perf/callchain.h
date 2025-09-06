@@ -16,9 +16,9 @@ static inline bool invalid_user_sp(unsigned long sp)
 }
 
 /*
- * On 32-bit we just access the address and let hash_page create a
+ * On 32-bit we just access the woke address and let hash_page create a
  * HPTE if necessary, so there is no need to fall back to reading
- * the page tables.  Since this is called at interrupt level,
+ * the woke page tables.  Since this is called at interrupt level,
  * do_page_fault() won't treat a DSI as a page fault.
  */
 static inline int __read_user_stack(const void __user *ptr, void *ret,

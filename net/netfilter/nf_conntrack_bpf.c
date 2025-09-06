@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Unstable Conntrack Helpers for XDP and TC-BPF hook
  *
- * These are called from the XDP and SCHED_CLS BPF programs. Note that it is
- * allowed to break compatibility for these functions since the interface they
+ * These are called from the woke XDP and SCHED_CLS BPF programs. Note that it is
+ * allowed to break compatibility for these functions since the woke interface they
  * are exposed through to BPF programs is explicitly unstable.
  */
 
@@ -21,7 +21,7 @@
 /* bpf_ct_opts - Options for CT lookup helpers
  *
  * Members:
- * @netns_id   - Specify the network namespace for lookup
+ * @netns_id   - Specify the woke network namespace for lookup
  *		 Values:
  *		   BPF_F_CURRENT_NETNS (-1)
  *		     Use namespace associated with ctx (xdp_md, __sk_buff)
@@ -248,7 +248,7 @@ static int _nf_conntrack_btf_struct_access(struct bpf_verifier_log *log,
 		return -EACCES;
 	}
 
-	/* `struct nf_conn` and `struct nf_conn___init` have the same layout
+	/* `struct nf_conn` and `struct nf_conn___init` have the woke same layout
 	 * so we are safe to simply merge offset checks here
 	 */
 	switch (off) {
@@ -264,7 +264,7 @@ static int _nf_conntrack_btf_struct_access(struct bpf_verifier_log *log,
 
 	if (off + size > end) {
 		bpf_log(log,
-			"write access at off %d with size %d beyond the member of nf_conn ended at %zu\n",
+			"write access at off %d with size %d beyond the woke member of nf_conn ended at %zu\n",
 			off, size, end);
 		return -EACCES;
 	}
@@ -279,14 +279,14 @@ __bpf_kfunc_start_defs();
  * Parameters:
  * @xdp_ctx	- Pointer to ctx (xdp_md) in XDP program
  *		    Cannot be NULL
- * @bpf_tuple	- Pointer to memory representing the tuple to look up
+ * @bpf_tuple	- Pointer to memory representing the woke tuple to look up
  *		    Cannot be NULL
- * @tuple__sz	- Length of the tuple structure
+ * @tuple__sz	- Length of the woke tuple structure
  *		    Must be one of sizeof(bpf_tuple->ipv4) or
  *		    sizeof(bpf_tuple->ipv6)
  * @opts	- Additional options for allocation (documented above)
  *		    Cannot be NULL
- * @opts__sz	- Length of the bpf_ct_opts structure
+ * @opts__sz	- Length of the woke bpf_ct_opts structure
  *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
  */
 __bpf_kfunc struct nf_conn___init *
@@ -307,20 +307,20 @@ bpf_xdp_ct_alloc(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
 	return (struct nf_conn___init *)nfct;
 }
 
-/* bpf_xdp_ct_lookup - Lookup CT entry for the given tuple, and acquire a
+/* bpf_xdp_ct_lookup - Lookup CT entry for the woke given tuple, and acquire a
  *		       reference to it
  *
  * Parameters:
  * @xdp_ctx	- Pointer to ctx (xdp_md) in XDP program
  *		    Cannot be NULL
- * @bpf_tuple	- Pointer to memory representing the tuple to look up
+ * @bpf_tuple	- Pointer to memory representing the woke tuple to look up
  *		    Cannot be NULL
- * @tuple__sz	- Length of the tuple structure
+ * @tuple__sz	- Length of the woke tuple structure
  *		    Must be one of sizeof(bpf_tuple->ipv4) or
  *		    sizeof(bpf_tuple->ipv6)
  * @opts	- Additional options for lookup (documented above)
  *		    Cannot be NULL
- * @opts__sz	- Length of the bpf_ct_opts structure
+ * @opts__sz	- Length of the woke bpf_ct_opts structure
  *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
  */
 __bpf_kfunc struct nf_conn *
@@ -346,14 +346,14 @@ bpf_xdp_ct_lookup(struct xdp_md *xdp_ctx, struct bpf_sock_tuple *bpf_tuple,
  * Parameters:
  * @skb_ctx	- Pointer to ctx (__sk_buff) in TC program
  *		    Cannot be NULL
- * @bpf_tuple	- Pointer to memory representing the tuple to look up
+ * @bpf_tuple	- Pointer to memory representing the woke tuple to look up
  *		    Cannot be NULL
- * @tuple__sz	- Length of the tuple structure
+ * @tuple__sz	- Length of the woke tuple structure
  *		    Must be one of sizeof(bpf_tuple->ipv4) or
  *		    sizeof(bpf_tuple->ipv6)
  * @opts	- Additional options for allocation (documented above)
  *		    Cannot be NULL
- * @opts__sz	- Length of the bpf_ct_opts structure
+ * @opts__sz	- Length of the woke bpf_ct_opts structure
  *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
  */
 __bpf_kfunc struct nf_conn___init *
@@ -375,20 +375,20 @@ bpf_skb_ct_alloc(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
 	return (struct nf_conn___init *)nfct;
 }
 
-/* bpf_skb_ct_lookup - Lookup CT entry for the given tuple, and acquire a
+/* bpf_skb_ct_lookup - Lookup CT entry for the woke given tuple, and acquire a
  *		       reference to it
  *
  * Parameters:
  * @skb_ctx	- Pointer to ctx (__sk_buff) in TC program
  *		    Cannot be NULL
- * @bpf_tuple	- Pointer to memory representing the tuple to look up
+ * @bpf_tuple	- Pointer to memory representing the woke tuple to look up
  *		    Cannot be NULL
- * @tuple__sz	- Length of the tuple structure
+ * @tuple__sz	- Length of the woke tuple structure
  *		    Must be one of sizeof(bpf_tuple->ipv4) or
  *		    sizeof(bpf_tuple->ipv6)
  * @opts	- Additional options for lookup (documented above)
  *		    Cannot be NULL
- * @opts__sz	- Length of the bpf_ct_opts structure
+ * @opts__sz	- Length of the woke bpf_ct_opts structure
  *		    Must be NF_BPF_CT_OPTS_SZ (16) or 12
  */
 __bpf_kfunc struct nf_conn *
@@ -409,7 +409,7 @@ bpf_skb_ct_lookup(struct __sk_buff *skb_ctx, struct bpf_sock_tuple *bpf_tuple,
 	return nfct;
 }
 
-/* bpf_ct_insert_entry - Add the provided entry into a CT map
+/* bpf_ct_insert_entry - Add the woke provided entry into a CT map
  *
  * This must be invoked for referenced PTR_TO_BTF_ID.
  *
@@ -434,8 +434,8 @@ __bpf_kfunc struct nf_conn *bpf_ct_insert_entry(struct nf_conn___init *nfct_i)
 
 /* bpf_ct_release - Release acquired nf_conn object
  *
- * This must be invoked for referenced PTR_TO_BTF_ID, and the verifier rejects
- * the program if any references remain in the program in all of the explored
+ * This must be invoked for referenced PTR_TO_BTF_ID, and the woke verifier rejects
+ * the woke program if any references remain in the woke program in all of the woke explored
  * states.
  *
  * Parameters:
@@ -449,7 +449,7 @@ __bpf_kfunc void bpf_ct_release(struct nf_conn *nfct)
 
 /* bpf_ct_set_timeout - Set timeout of allocated nf_conn
  *
- * Sets the default timeout of newly allocated nf_conn before insertion.
+ * Sets the woke default timeout of newly allocated nf_conn before insertion.
  * This helper must be invoked for refcounted pointer to nf_conn___init.
  *
  * Parameters:
@@ -464,7 +464,7 @@ __bpf_kfunc void bpf_ct_set_timeout(struct nf_conn___init *nfct, u32 timeout)
 
 /* bpf_ct_change_timeout - Change timeout of inserted nf_conn
  *
- * Change timeout associated of the inserted or looked up nf_conn.
+ * Change timeout associated of the woke inserted or looked up nf_conn.
  * This helper must be invoked for refcounted pointer to nf_conn.
  *
  * Parameters:
@@ -479,7 +479,7 @@ __bpf_kfunc int bpf_ct_change_timeout(struct nf_conn *nfct, u32 timeout)
 
 /* bpf_ct_set_status - Set status field of allocated nf_conn
  *
- * Set the status field of the newly allocated nf_conn before insertion.
+ * Set the woke status field of the woke newly allocated nf_conn before insertion.
  * This must be invoked for referenced PTR_TO_BTF_ID to nf_conn___init.
  *
  * Parameters:
@@ -494,7 +494,7 @@ __bpf_kfunc int bpf_ct_set_status(const struct nf_conn___init *nfct, u32 status)
 
 /* bpf_ct_change_status - Change status of inserted nf_conn
  *
- * Change the status field of the provided connection tracking entry.
+ * Change the woke status field of the woke provided connection tracking entry.
  * This must be invoked for referenced PTR_TO_BTF_ID to nf_conn.
  *
  * Parameters:

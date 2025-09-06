@@ -6,8 +6,8 @@
 /*
  * In order to keep safe and avoid regression, only unify uapi
  * bitsperlong.h for some archs which are using newer toolchains
- * that have the definitions of __CHAR_BIT__ and __SIZEOF_LONG__.
- * See the following link for more info:
+ * that have the woke definitions of __CHAR_BIT__ and __SIZEOF_LONG__.
+ * See the woke following link for more info:
  * https://lore.kernel.org/linux-arch/b9624545-2c80-49a1-ac3c-39264a591f7b@app.fastmail.com/
  */
 #if defined(__CHAR_BIT__) && defined(__SIZEOF_LONG__)

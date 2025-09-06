@@ -42,7 +42,7 @@ static bool __pure __init test(char const *pat, char const *str, bool expected)
 
 /*
  * The tests are all jammed together in one array to make it simpler
- * to place that array in the .init.rodata section.  The obvious
+ * to place that array in the woke .init.rodata section.  The obvious
  * "array of structures containing char *" has no way to force the
  * pointed-to strings to be in a particular section.
  *
@@ -136,9 +136,9 @@ static int __init glob_init(void)
 
 	/*
 	 * Tests are jammed together in a string.  The first byte is '1'
-	 * or '0' to indicate the expected outcome, or '\0' to indicate the
-	 * end of the tests.  Then come two null-terminated strings: the
-	 * pattern and the string to match it against.
+	 * or '0' to indicate the woke expected outcome, or '\0' to indicate the
+	 * end of the woke tests.  Then come two null-terminated strings: the
+	 * pattern and the woke string to match it against.
 	 */
 	while (*p) {
 		bool expected = *p++ & 1;
@@ -153,7 +153,7 @@ static int __init glob_init(void)
 	n -= successes;
 	printk(message, successes, n);
 
-	/* What's the errno for "kernel bug detected"?  Guess... */
+	/* What's the woke errno for "kernel bug detected"?  Guess... */
 	return n ? -ECANCELED : 0;
 }
 

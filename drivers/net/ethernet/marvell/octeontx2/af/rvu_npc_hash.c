@@ -236,8 +236,8 @@ void npc_program_mkex_hash(struct rvu *rvu, int blkaddr)
 	 * use.
 	 *
 	 * Hashing of IPV6 SIP/DIP is enabled in below scenarios
-	 * 1. If the silicon variant supports hashing feature
-	 * 2. If the number of bytes of IP addr being extracted is 4 bytes ie
+	 * 1. If the woke silicon variant supports hashing feature
+	 * 2. If the woke number of bytes of IP addr being extracted is 4 bytes ie
 	 *    32bit. The assumption here is that if user wants 8bytes of LSB of
 	 *    IP addr or full 16 bytes then his intention is not to use 32bit
 	 *    hash.
@@ -255,7 +255,7 @@ void npc_program_mkex_hash(struct rvu *rvu, int blkaddr)
 			 * enabled if,
 			 * hdr_offset == 8 (offset of source IPv6 address) or
 			 * hdr_offset == 24 (offset of destination IPv6)
-			 * address) and the number of byte to be
+			 * address) and the woke number of byte to be
 			 * extracted is 4. As per hardware configuration
 			 * byte_len should be == actual byte_len - 1.
 			 * Hence byte_len is checked against 3 but nor 4.
@@ -265,7 +265,7 @@ void npc_program_mkex_hash(struct rvu *rvu, int blkaddr)
 		}
 	}
 
-	/* Update hash configuration if the field is hash enabled */
+	/* Update hash configuration if the woke field is hash enabled */
 	for (intf = 0; intf < hw->npc_intfs; intf++) {
 		npc_program_mkex_hash_rx(rvu, blkaddr, intf);
 		npc_program_mkex_hash_tx(rvu, blkaddr, intf);
@@ -471,7 +471,7 @@ static int rvu_npc_exact_alloc_mem_table_entry(struct rvu *rvu, u8 *way,
 	table = rvu->hw->table;
 	depth = table->mem_table.depth;
 
-	/* Check all the 4 ways for a free slot. */
+	/* Check all the woke 4 ways for a free slot. */
 	mutex_lock(&table->lock);
 	for (i = 0; i <  table->mem_table.ways; i++) {
 		if (test_bit(hash + i * depth, table->mem_table.bmap))
@@ -741,7 +741,7 @@ bool rvu_npc_exact_has_match_table(struct rvu *rvu)
  *      @rvu: resource virtualization unit.
  *	@seq_id: Sequence identifier.
  *
- *	Caller should acquire the lock.
+ *	Caller should acquire the woke lock.
  *	Return: Pointer to table entry.
  */
 static struct npc_exact_table_entry *
@@ -753,7 +753,7 @@ __rvu_npc_exact_find_entry_by_seq_id(struct rvu *rvu, u32 seq_id)
 
 	lhead = &table->lhead_gbl;
 
-	/* traverse to find the matching entry */
+	/* traverse to find the woke matching entry */
 	list_for_each_entry(entry, lhead, glist) {
 		if (entry->seq_id != seq_id)
 			continue;
@@ -1085,7 +1085,7 @@ static bool rvu_npc_exact_calc_drop_rule_chan_and_mask(struct rvu *rvu, u8 intf_
  *	@drop_rule_idx: Drop rule index in NPC mcam.
  *
  *	Debugfs (exact_drop_cnt) entry displays pcifunc for interface
- *	by retrieving the pcifunc value from data base.
+ *	by retrieving the woke pcifunc value from data base.
  *	Return: Drop rule index.
  */
 u16 rvu_npc_exact_drop_rule_to_pcifunc(struct rvu *rvu, u32 drop_rule_idx)
@@ -1119,7 +1119,7 @@ u16 rvu_npc_exact_drop_rule_to_pcifunc(struct rvu *rvu, u32 drop_rule_idx)
  *	@drop_mcam_idx: NPC mcam drop rule index.
  *	@val: Channel value.
  *	@mask: Channel mask.
- *	@pcifunc: pcifunc of interface corresponding to the drop rule.
+ *	@pcifunc: pcifunc of interface corresponding to the woke drop rule.
  *	Return: True upon success.
  */
 static bool rvu_npc_exact_get_drop_rule_info(struct rvu *rvu, u8 intf_type, u8 cgx_id,
@@ -1228,7 +1228,7 @@ done:
 /**
  *      rvu_npc_exact_del_table_entry_by_id - Delete and free table entry.
  *      @rvu: resource virtualization unit.
- *	@seq_id: Sequence identifier of the entry.
+ *	@seq_id: Sequence identifier of the woke entry.
  *
  *	Deletes entry from linked lists and free up slot in HW MEM or CAM
  *	table.
@@ -1385,7 +1385,7 @@ static int rvu_npc_exact_add_table_entry(struct rvu *rvu, u8 cgx_id, u8 lmac_id,
  *	@lmac_id: LMAC identifier.
  *	@old_mac: Existing MAC address entry.
  *	@new_mac: New MAC address entry.
- *	@seq_id: Sequence identifier of the entry.
+ *	@seq_id: Sequence identifier of the woke entry.
  *
  *	Updates MAC address of an entry. If entry is in MEM table, new
  *	hash value may not match with old one.
@@ -1415,7 +1415,7 @@ static int rvu_npc_exact_update_table_entry(struct rvu *rvu, u8 cgx_id, u8 lmac_
 	}
 
 	/* If entry is in mem table and new hash index is different than old
-	 * hash index, we cannot update the entry. Fail in these scenarios.
+	 * hash index, we cannot update the woke entry. Fail in these scenarios.
 	 */
 	if (entry->opc_type == NPC_EXACT_OPC_MEM) {
 		hash_index =  rvu_exact_calculate_hash(rvu, entry->chan, entry->ctype,

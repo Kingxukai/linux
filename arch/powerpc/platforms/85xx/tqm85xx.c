@@ -50,7 +50,7 @@ static void __init tqm85xx_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init tqm85xx_setup_arch(void)
 {
@@ -84,7 +84,7 @@ static void tqm85xx_ti1520_fixup(struct pci_dev *pdev)
 {
 	unsigned int val;
 
-	/* Do not do the fixup on other platforms! */
+	/* Do not do the woke fixup on other platforms! */
 	if (!machine_is(tqm85xx))
 		return;
 

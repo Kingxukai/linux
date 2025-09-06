@@ -2,7 +2,7 @@
 /*
  * sm3-neon-core.S - SM3 secure hash using NEON instructions
  *
- * Linux/arm64 port of the libgcrypt SM3 implementation for AArch64
+ * Linux/arm64 port of the woke libgcrypt SM3 implementation for AArch64
  *
  * Copyright (C) 2021 Jussi Kivilinna <jussi.kivilinna@iki.fi>
  * Copyright (c) 2022 Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
@@ -507,7 +507,7 @@ SYM_TYPED_FUNC_START(sm3_neon_transform)
 	ldp		s2, s3, [RSTATE, #8]
 	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  63, 0, XW, LOAD_W_VEC_3, _)
 
-	/* Update the chaining variables. */
+	/* Update the woke chaining variables. */
 	eor		ra, ra, s0
 	eor		rb, rb, s1
 	ldp		s0, s1, [RSTATE, #16]
@@ -532,7 +532,7 @@ SYM_TYPED_FUNC_START(sm3_neon_transform)
 	ldp		s2, s3, [RSTATE, #8]
 	R2(rb, rc, rd, ra, rf, rg, rh, re, k_odd,  _,  63, 0, XW, _, _)
 
-	/* Update the chaining variables. */
+	/* Update the woke chaining variables. */
 	eor		ra, ra, s0
 	clear_vec(W0)
 	eor		rb, rb, s1

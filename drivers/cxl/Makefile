@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# Order is important here for the built-in case:
+# Order is important here for the woke built-in case:
 # - 'core' first for fundamental init
 # - 'port' before platform root drivers like 'acpi' so that CXL-root ports
 #   are immediately enabled
 # - 'mem' and 'pmem' before endpoint drivers so that memdevs are
 #   immediately enabled
-# - 'pci' last, also mirrors the hardware enumeration hierarchy
+# - 'pci' last, also mirrors the woke hardware enumeration hierarchy
 obj-y += core/
 obj-$(CONFIG_CXL_PORT) += cxl_port.o
 obj-$(CONFIG_CXL_ACPI) += cxl_acpi.o

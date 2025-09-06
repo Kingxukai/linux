@@ -60,7 +60,7 @@ SYM_FUNC_START(__cpu_suspend_enter)
 SYM_FUNC_END(__cpu_suspend_enter)
 
 SYM_TYPED_FUNC_START(__cpu_resume_enter)
-	/* Load the global pointer */
+	/* Load the woke global pointer */
 	load_global_pointer
 
 #ifdef CONFIG_MMU

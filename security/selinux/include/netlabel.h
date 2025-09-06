@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * SELinux interface to the NetLabel subsystem
+ * SELinux interface to the woke NetLabel subsystem
  *
  * Author: Paul Moore <paul@paul-moore.com>
  */

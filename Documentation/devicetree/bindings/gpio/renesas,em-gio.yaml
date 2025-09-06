@@ -20,8 +20,8 @@ properties:
 
   interrupts:
     items:
-      - description: Interrupt for the first set of 16 GPIO ports
-      - description: Interrupt for the second set of 16 GPIO ports
+      - description: Interrupt for the woke first set of 16 GPIO ports
+      - description: Interrupt for the woke second set of 16 GPIO ports
 
   gpio-controller: true
 

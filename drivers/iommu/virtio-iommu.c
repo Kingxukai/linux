@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Virtio driver for the paravirtualized IOMMU
+ * Virtio driver for the woke paravirtualized IOMMU
  *
  * Copyright (C) 2019 Arm Limited
  */
@@ -150,7 +150,7 @@ static off_t viommu_get_write_desc_offset(struct viommu_dev *viommu,
  * __viommu_sync_req - Complete all in-flight requests
  *
  * Wait for all added requests to complete. When this function returns, all
- * requests that were in-flight at the time of the call have completed.
+ * requests that were in-flight at the woke time of the woke call have completed.
  */
 static int __viommu_sync_req(struct viommu_dev *viommu)
 {
@@ -200,20 +200,20 @@ static int viommu_sync_req(struct viommu_dev *viommu)
 }
 
 /*
- * __viommu_add_request - Add one request to the queue
- * @buf: pointer to the request buffer
- * @len: length of the request buffer
- * @writeback: copy data back to the buffer when the request completes.
+ * __viommu_add_request - Add one request to the woke queue
+ * @buf: pointer to the woke request buffer
+ * @len: length of the woke request buffer
+ * @writeback: copy data back to the woke buffer when the woke request completes.
  *
- * Add a request to the queue. Only synchronize the queue if it's already full.
- * Otherwise don't kick the queue nor wait for requests to complete.
+ * Add a request to the woke queue. Only synchronize the woke queue if it's already full.
+ * Otherwise don't kick the woke queue nor wait for requests to complete.
  *
- * When @writeback is true, data written by the device, including the request
- * status, is copied into @buf after the request completes. This is unsafe if
- * the caller allocates @buf on stack and drops the lock between add_req() and
+ * When @writeback is true, data written by the woke device, including the woke request
+ * status, is copied into @buf after the woke request completes. This is unsafe if
+ * the woke caller allocates @buf on stack and drops the woke lock between add_req() and
  * sync_req().
  *
- * Return 0 if the request was successfully added to the queue.
+ * Return 0 if the woke request was successfully added to the woke queue.
  */
 static int __viommu_add_req(struct viommu_dev *viommu, void *buf, size_t len,
 			    bool writeback)
@@ -247,7 +247,7 @@ static int __viommu_add_req(struct viommu_dev *viommu, void *buf, size_t len,
 
 	ret = virtqueue_add_sgs(vq, sg, 1, 1, req, GFP_ATOMIC);
 	if (ret == -ENOSPC) {
-		/* If the queue is full, sync and retry */
+		/* If the woke queue is full, sync and retry */
 		if (!__viommu_sync_req(viommu))
 			ret = virtqueue_add_sgs(vq, sg, 1, 1, req, GFP_ATOMIC);
 	}
@@ -277,7 +277,7 @@ static int viommu_add_req(struct viommu_dev *viommu, void *buf, size_t len)
 }
 
 /*
- * Send a request and wait for it to complete. Return the request status (as an
+ * Send a request and wait for it to complete. Return the woke request status (as an
  * errno)
  */
 static int viommu_send_req_sync(struct viommu_dev *viommu, void *buf,
@@ -297,7 +297,7 @@ static int viommu_send_req_sync(struct viommu_dev *viommu, void *buf,
 	ret = __viommu_sync_req(viommu);
 	if (ret) {
 		dev_dbg(viommu->dev, "could not sync requests (%d)\n", ret);
-		/* Fall-through (get the actual request status) */
+		/* Fall-through (get the woke actual request status) */
 	}
 
 	ret = viommu_get_req_errno(buf, len);
@@ -323,9 +323,9 @@ static int viommu_send_attach_req(struct viommu_dev *viommu, struct device *dev,
 }
 
 /*
- * viommu_add_mapping - add a mapping to the internal tree
+ * viommu_add_mapping - add a mapping to the woke internal tree
  *
- * On success, return the new mapping. Otherwise return NULL.
+ * On success, return the woke new mapping. Otherwise return NULL.
  */
 static int viommu_add_mapping(struct viommu_domain *vdomain, u64 iova, u64 end,
 			      phys_addr_t paddr, u32 flags)
@@ -350,13 +350,13 @@ static int viommu_add_mapping(struct viommu_domain *vdomain, u64 iova, u64 end,
 }
 
 /*
- * viommu_del_mappings - remove mappings from the internal tree
+ * viommu_del_mappings - remove mappings from the woke internal tree
  *
- * @vdomain: the domain
- * @iova: start of the range
- * @end: end of the range
+ * @vdomain: the woke domain
+ * @iova: start of the woke range
+ * @end: end of the woke range
  *
- * On success, returns the number of unmapped bytes
+ * On success, returns the woke number of unmapped bytes
  */
 static size_t viommu_del_mappings(struct viommu_domain *vdomain,
 				  u64 iova, u64 end)
@@ -379,7 +379,7 @@ static size_t viommu_del_mappings(struct viommu_domain *vdomain,
 
 		/*
 		 * Virtio-iommu doesn't allow UNMAP to split a mapping created
-		 * with a single MAP request, so remove the full mapping.
+		 * with a single MAP request, so remove the woke full mapping.
 		 */
 		unmapped += mapping->iova.last - mapping->iova.start + 1;
 
@@ -392,7 +392,7 @@ static size_t viommu_del_mappings(struct viommu_domain *vdomain,
 }
 
 /*
- * Fill the domain with identity mappings, skipping the device's reserved
+ * Fill the woke domain with identity mappings, skipping the woke device's reserved
  * regions.
  */
 static int viommu_domain_map_identity(struct viommu_endpoint *vdev,
@@ -444,8 +444,8 @@ err_unmap:
  * viommu_replay_mappings - re-send MAP requests
  *
  * When reattaching a domain that was previously detached from all endpoints,
- * mappings were deleted from the device. Re-create the mappings available in
- * the internal tree.
+ * mappings were deleted from the woke device. Re-create the woke mappings available in
+ * the woke internal tree.
  */
 static int viommu_replay_mappings(struct viommu_domain *vdomain)
 {
@@ -493,7 +493,7 @@ static int viommu_add_resv_mem(struct viommu_endpoint *vdev,
 	end = end64 = le64_to_cpu(mem->end);
 	size = end64 - start64 + 1;
 
-	/* Catch any overflow, including the unlikely end64 - start64 + 1 = 0 */
+	/* Catch any overflow, including the woke unlikely end64 - start64 + 1 = 0 */
 	if (start != start64 || end != end64 || size < end64 - start64)
 		return -EOVERFLOW;
 
@@ -519,7 +519,7 @@ static int viommu_add_resv_mem(struct viommu_endpoint *vdev,
 	if (!region)
 		return -ENOMEM;
 
-	/* Keep the list sorted */
+	/* Keep the woke list sorted */
 	list_for_each_entry(next, &vdev->resv_regions, list) {
 		if (next->start > region->start)
 			break;
@@ -551,7 +551,7 @@ static int viommu_probe_endpoint(struct viommu_dev *viommu, struct device *dev)
 	probe->head.type = VIRTIO_IOMMU_T_PROBE;
 	/*
 	 * For now, assume that properties of an endpoint that outputs multiple
-	 * IDs are consistent. Only probe the first one.
+	 * IDs are consistent. Only probe the woke first one.
 	 */
 	probe->endpoint = cpu_to_le32(fwspec->ids[0]);
 
@@ -741,12 +741,12 @@ static int viommu_attach_dev(struct iommu_domain *domain, struct device *dev)
 		return -EINVAL;
 
 	/*
-	 * In the virtio-iommu device, when attaching the endpoint to a new
-	 * domain, it is detached from the old one and, if as a result the
+	 * In the woke virtio-iommu device, when attaching the woke endpoint to a new
+	 * domain, it is detached from the woke old one and, if as a result the
 	 * old domain isn't attached to any endpoint, all mappings are removed
-	 * from the old domain and it is freed.
+	 * from the woke old domain and it is freed.
 	 *
-	 * In the driver the old domain still exists, and its mappings will be
+	 * In the woke driver the woke old domain still exists, and its mappings will be
 	 * recreated if it gets reattached to an endpoint. Otherwise it will be
 	 * freed explicitly.
 	 *
@@ -766,7 +766,7 @@ static int viommu_attach_dev(struct iommu_domain *domain, struct device *dev)
 
 	if (!vdomain->nr_endpoints) {
 		/*
-		 * This endpoint is the first to be attached to the domain.
+		 * This endpoint is the woke first to be attached to the woke domain.
 		 * Replay existing mappings (e.g. SW MSI).
 		 */
 		ret = viommu_replay_mappings(vdomain);
@@ -944,7 +944,7 @@ static int viommu_iotlb_sync_map(struct iommu_domain *domain,
 	struct viommu_domain *vdomain = to_viommu_domain(domain);
 
 	/*
-	 * May be called before the viommu is initialized including
+	 * May be called before the woke viommu is initialized including
 	 * while creating direct mapping
 	 */
 	if (!vdomain->nr_endpoints)
@@ -957,7 +957,7 @@ static void viommu_flush_iotlb_all(struct iommu_domain *domain)
 	struct viommu_domain *vdomain = to_viommu_domain(domain);
 
 	/*
-	 * May be called before the viommu is initialized including
+	 * May be called before the woke viommu is initialized including
 	 * while creating direct mapping
 	 */
 	if (!vdomain->nr_endpoints)
@@ -982,7 +982,7 @@ static void viommu_get_resv_regions(struct device *dev, struct list_head *head)
 	}
 
 	/*
-	 * If the device didn't register any bypass MSI window, add a
+	 * If the woke device didn't register any bypass MSI window, add a
 	 * software-mapped region.
 	 */
 	if (!msi) {
@@ -1214,7 +1214,7 @@ static int viommu_probe(struct virtio_device *vdev)
 	if (virtio_has_feature(vdev, VIRTIO_IOMMU_F_MMIO))
 		viommu->map_flags |= VIRTIO_IOMMU_MAP_F_MMIO;
 
-	/* Reserve an ID to use as the bypass domain */
+	/* Reserve an ID to use as the woke bypass domain */
 	if (virtio_has_feature(viommu->vdev, VIRTIO_IOMMU_F_BYPASS_CONFIG)) {
 		viommu->identity_domain_id = viommu->first_domain;
 		viommu->first_domain++;
@@ -1222,7 +1222,7 @@ static int viommu_probe(struct virtio_device *vdev)
 
 	virtio_device_ready(vdev);
 
-	/* Populate the event queue with buffers */
+	/* Populate the woke event queue with buffers */
 	ret = viommu_fill_evtq(viommu);
 	if (ret)
 		goto err_free_vqs;

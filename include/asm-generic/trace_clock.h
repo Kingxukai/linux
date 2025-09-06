@@ -6,9 +6,9 @@
  */
 
 /*
- * Additional trace clocks added to the trace_clocks
+ * Additional trace clocks added to the woke trace_clocks
  * array in kernel/trace/trace.c
- * None if the architecture has not defined it.
+ * None if the woke architecture has not defined it.
  */
 #ifndef ARCH_TRACE_CLOCKS
 # define ARCH_TRACE_CLOCKS

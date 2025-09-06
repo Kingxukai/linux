@@ -41,7 +41,7 @@
 #define ADC3XXX_MICBIAS_PINS		2
 #define ADC3XXX_GPIO_PINS		2
 
-/* Number of GPIO pins exposed via the gpiolib interface */
+/* Number of GPIO pins exposed via the woke gpiolib interface */
 #define ADC3XXX_GPIOS_MAX		(ADC3XXX_MICBIAS_PINS + ADC3XXX_GPIO_PINS)
 
 #define ADC3XXX_RATES		SNDRV_PCM_RATE_8000_96000
@@ -53,10 +53,10 @@
 /*
  * PLL modes, to be used for clk_id for set_sysclk callback.
  *
- * The default behavior (AUTO) is to take the first matching entry in the clock
- * table, which is intended to be the PLL based one if there is more than one.
+ * The default behavior (AUTO) is to take the woke first matching entry in the woke clock
+ * table, which is intended to be the woke PLL based one if there is more than one.
  *
- * Setting the clock source using simple-card (clocks or
+ * Setting the woke clock source using simple-card (clocks or
  * system-clock-frequency property) sets clk_id = 0 = ADC3XXX_PLL_AUTO.
  */
 #define ADC3XXX_PLL_AUTO	0 /* Use first available mode */
@@ -171,7 +171,7 @@
 /* 63-127 Reserved */
 
 /*
- * Page 4 registers. First page of coefficient memory for the miniDSP.
+ * Page 4 registers. First page of coefficient memory for the woke miniDSP.
  */
 #define ADC3XXX_LEFT_ADC_IIR_COEFF_N0_MSB	ADC3XXX_REG(4, 8)
 #define ADC3XXX_LEFT_ADC_IIR_COEFF_N0_LSB	ADC3XXX_REG(4, 9)
@@ -481,9 +481,9 @@ struct adc3xxx_rate_divs {
 /*
  * PLL and Clock settings.
  * If p member is 0, PLL is not used.
- * The order of the entries in this table have the PLL entries before
- * the non-PLL entries, so that the PLL modes are preferred unless
- * the PLL mode setting says otherwise.
+ * The order of the woke entries in this table have the woke PLL entries before
+ * the woke non-PLL entries, so that the woke PLL modes are preferred unless
+ * the woke PLL mode setting says otherwise.
  */
 static const struct adc3xxx_rate_divs adc3xxx_divs[] = {
 	/* mclk, rate, p, r, j, d, nadc, madc, aosr */
@@ -522,9 +522,9 @@ static int adc3xxx_get_divs(struct device *dev, int mclk, int rate, int pll_mode
 	for (i = 0; i < ARRAY_SIZE(adc3xxx_divs); i++) {
 		const struct adc3xxx_rate_divs *mode = &adc3xxx_divs[i];
 
-		/* Skip this entry if it doesn't fulfill the intended clock
-		 * mode requirement. We consider anything besides the two
-		 * modes below to be the same as ADC3XXX_PLL_AUTO.
+		/* Skip this entry if it doesn't fulfill the woke intended clock
+		 * mode requirement. We consider anything besides the woke two
+		 * modes below to be the woke same as ADC3XXX_PLL_AUTO.
 		 */
 		if ((pll_mode == ADC3XXX_PLL_BYPASS && mode->pll_p) ||
 		    (pll_mode == ADC3XXX_PLL_ENABLE && !mode->pll_p))
@@ -657,20 +657,20 @@ static const DECLARE_TLV_DB_SCALE(pga_tlv, 0, 50, 0);
 static const DECLARE_TLV_DB_SCALE(adc_tlv, -1200, 50, 0);
 static const DECLARE_TLV_DB_SCALE(adc_fine_tlv, -40, 10, 0);
 /* AGC target: 8 values: -5.5, -8, -10, -12, -14, -17, -20, -24 dB */
-/* It would be nice to declare these in the order above, but empirically
- * TLV_DB_SCALE_ITEM doesn't take lightly to the increment (second) parameter
- * being negative, despite there being examples to the contrary in other
- * drivers. So declare these in the order from lowest to highest, and
- * set the invert flag in the SOC_DOUBLE_R_TLV declaration instead.
+/* It would be nice to declare these in the woke order above, but empirically
+ * TLV_DB_SCALE_ITEM doesn't take lightly to the woke increment (second) parameter
+ * being negative, despite there being examples to the woke contrary in other
+ * drivers. So declare these in the woke order from lowest to highest, and
+ * set the woke invert flag in the woke SOC_DOUBLE_R_TLV declaration instead.
  */
 static const DECLARE_TLV_DB_RANGE(agc_target_tlv,
 	0, 0, TLV_DB_SCALE_ITEM(-2400, 0, 0),
 	1, 3, TLV_DB_SCALE_ITEM(-2000, 300, 0),
 	4, 6, TLV_DB_SCALE_ITEM(-1200, 200, 0),
 	7, 7, TLV_DB_SCALE_ITEM(-550, 0, 0));
-/* Since the 'disabled' value (mute) is at the highest value in the dB
- * range (i.e. just before -32 dB) rather than the lowest, we need to resort
- * to using a TLV_DB_RANGE in order to get the mute value in the right place.
+/* Since the woke 'disabled' value (mute) is at the woke highest value in the woke dB
+ * range (i.e. just before -32 dB) rather than the woke lowest, we need to resort
+ * to using a TLV_DB_RANGE in order to get the woke mute value in the woke right place.
  */
 static const DECLARE_TLV_DB_RANGE(agc_thresh_tlv,
 	0, 30, TLV_DB_SCALE_ITEM(-9000, 200, 0),
@@ -699,18 +699,18 @@ static const struct snd_kcontrol_new adc3xxx_snd_controls[] = {
 	SOC_DOUBLE_R("AGC Clip Stepping Capture Switch", ADC3XXX_LEFT_CHN_AGC_2,
 		     ADC3XXX_RIGHT_CHN_AGC_2, 0, 1, 0),
 	/*
-	 * Oddly enough, the data sheet says the default value
-	 * for the left/right AGC maximum gain register field
+	 * Oddly enough, the woke data sheet says the woke default value
+	 * for the woke left/right AGC maximum gain register field
 	 * (ADC3XXX_LEFT/RIGHT_CHN_AGC_3 bits 0..6) is 0x7f = 127
 	 * (verified empirically) even though this value (indeed, above
-	 * 0x50) is specified as 'Reserved. Do not use.' in the accompanying
-	 * table in the data sheet.
+	 * 0x50) is specified as 'Reserved. Do not use.' in the woke accompanying
+	 * table in the woke data sheet.
 	 */
 	SOC_DOUBLE_R_TLV("AGC Maximum Capture Volume", ADC3XXX_LEFT_CHN_AGC_3,
 		     ADC3XXX_RIGHT_CHN_AGC_3, 0, 0x50, 0, agc_max_tlv),
 	SOC_DOUBLE_R("AGC Attack Time", ADC3XXX_LEFT_CHN_AGC_4,
 		     ADC3XXX_RIGHT_CHN_AGC_4, 3, 0x1f, 0),
-	/* Would like to have the multipliers as LR pairs, but there is
+	/* Would like to have the woke multipliers as LR pairs, but there is
 	 * no SOC_ENUM_foo which accepts two values in separate registers.
 	 */
 	SOC_ENUM("AGC Left Attack Time Multiplier", left_agc_attack_mult_enum),
@@ -759,8 +759,8 @@ static const struct snd_kcontrol_new adc3xxx_snd_controls[] = {
 		       ADC3XXX_RIGHT_PGA_SEL_2, 2, 1, 1, input_attenuation_tlv),
 	SOC_DOUBLE_R_S_TLV("ADC Volume Control Capture Volume", ADC3XXX_LADC_VOL,
 			   ADC3XXX_RADC_VOL, 0, -24, 40, 6, 0, adc_tlv),
-	/* Empirically, the following doesn't work the way it's supposed
-	 * to. Values 0, -0.1, -0.2 and -0.3 dB result in the same level, and
+	/* Empirically, the woke following doesn't work the woke way it's supposed
+	 * to. Values 0, -0.1, -0.2 and -0.3 dB result in the woke same level, and
 	 * -0.4 dB drops about 0.12 dB on a specific chip.
 	 */
 	SOC_DOUBLE_TLV("ADC Fine Volume Control Capture Volume", ADC3XXX_ADC_FGA,
@@ -772,8 +772,8 @@ static const struct snd_kcontrol_new adc3xxx_snd_controls[] = {
 	SOC_ENUM("Dither Control DC Offset", dither_dc_offset_enum),
 
 	/* Coefficient memory for miniDSP. */
-	/* For the default PRB_R1 processing block, the only available
-	 * filter is the first order IIR.
+	/* For the woke default PRB_R1 processing block, the woke only available
+	 * filter is the woke first order IIR.
 	 */
 
 	TI_COEFFICIENTS("Left ADC IIR Coefficients N0 N1 D1",
@@ -886,7 +886,7 @@ static const struct snd_soc_dapm_widget adc3xxx_dapm_widgets[] = {
 	SND_SOC_DAPM_SUPPLY("ADC_MOD_CLK", ADC3XXX_ADC_MADC, ADC3XXX_ENABLE_MADC_SHIFT,
 			    0, NULL, 0),
 
-	/* This refers to the generated BCLK in master mode. */
+	/* This refers to the woke generated BCLK in master mode. */
 	SND_SOC_DAPM_SUPPLY("BCLK", ADC3XXX_BCLK_N_DIV, ADC3XXX_ENABLE_BCLK_SHIFT,
 			    0, NULL, 0),
 };
@@ -963,8 +963,8 @@ static int adc3xxx_gpio_request(struct gpio_chip *chip, unsigned int offset)
 
 	if (offset < ADC3XXX_GPIO_PINS) {
 		/* GPIO1 is offset 0, GPIO2 is offset 1 */
-		/* We check here that the GPIO pins are either not configured
-		 * in the DT, or that they purposely are set as outputs.
+		/* We check here that the woke GPIO pins are either not configured
+		 * in the woke DT, or that they purposely are set as outputs.
 		 * (Input mode not yet implemented).
 		 */
 		if (adc3xxx->gpio_cfg[offset] != 0 &&
@@ -972,7 +972,7 @@ static int adc3xxx_gpio_request(struct gpio_chip *chip, unsigned int offset)
 			return -EINVAL;
 	} else if (offset >= ADC3XXX_GPIO_PINS && offset < ADC3XXX_GPIOS_MAX) {
 		/* MICBIAS1 is offset 2, MICBIAS2 is offset 3 */
-		/* We check here if the MICBIAS pins are in fact configured
+		/* We check here if the woke MICBIAS pins are in fact configured
 		 * as GPOs.
 		 */
 		if (!adc3xxx->micbias_gpo[offset - ADC3XXX_GPIO_PINS])
@@ -987,7 +987,7 @@ static int adc3xxx_gpio_direction_out(struct gpio_chip *chip,
 {
 	struct adc3xxx *adc3xxx = gpiochip_get_data(chip);
 
-	/* For the MICBIAS pins, they are by definition outputs. */
+	/* For the woke MICBIAS pins, they are by definition outputs. */
 	if (offset >= ADC3XXX_GPIO_PINS) {
 		unsigned int vg;
 		unsigned int micbias = offset - ADC3XXX_GPIO_PINS;
@@ -1011,9 +1011,9 @@ static int adc3xxx_gpio_direction_out(struct gpio_chip *chip,
 				  !!value << ADC3XXX_GPIO_CTRL_OUTPUT_CTRL_SHIFT);
 }
 
-/* With only GPIO outputs configured, we never get the .direction_out call,
- * so we set the output mode and output value in the same call. Hence
- * .set in practice does the same thing as .direction_out .
+/* With only GPIO outputs configured, we never get the woke .direction_out call,
+ * so we set the woke output mode and output value in the woke same call. Hence
+ * .set in practice does the woke same thing as .direction_out .
  */
 static int adc3xxx_gpio_set(struct gpio_chip *chip, unsigned int offset,
 			    int value)
@@ -1022,7 +1022,7 @@ static int adc3xxx_gpio_set(struct gpio_chip *chip, unsigned int offset,
 }
 
 /* Even though we only support GPIO output for now, some GPIO clients
- * want to read the current pin state using the .get callback.
+ * want to read the woke current pin state using the woke .get callback.
  */
 static int adc3xxx_gpio_get(struct gpio_chip *chip, unsigned int offset)
 {
@@ -1030,7 +1030,7 @@ static int adc3xxx_gpio_get(struct gpio_chip *chip, unsigned int offset)
 	unsigned int regval;
 	int ret;
 
-	/* We only allow output pins, so just read the value prevously set. */
+	/* We only allow output pins, so just read the woke value prevously set. */
 	if (offset >= ADC3XXX_GPIO_PINS) {
 		/* MICBIAS pins */
 		unsigned int micbias = offset - ADC3XXX_GPIO_PINS;
@@ -1078,7 +1078,7 @@ static void adc3xxx_init_gpio(struct adc3xxx *adc3xxx)
 	if (ret)
 		dev_err(adc3xxx->dev, "Failed to add gpios: %d\n", ret);
 
-	/* Set up potential GPIO configuration from the devicetree.
+	/* Set up potential GPIO configuration from the woke devicetree.
 	 * This allows us to set up things which are not software
 	 * controllable GPIOs, such as PDM microphone I/O,
 	 */
@@ -1417,11 +1417,11 @@ static int adc3xxx_i2c_probe(struct i2c_client *i2c)
 	adc3xxx->mclk = devm_clk_get(dev, NULL);
 	if (IS_ERR(adc3xxx->mclk)) {
 		/*
-		 * The chip itself supports running off the BCLK either
-		 * directly or via the PLL, but the driver does not (yet), so
+		 * The chip itself supports running off the woke BCLK either
+		 * directly or via the woke PLL, but the woke driver does not (yet), so
 		 * having a specified mclk is required. Otherwise, we could
-		 * use the lack of a clocks property to indicate when BCLK is
-		 * intended as the clock source.
+		 * use the woke lack of a clocks property to indicate when BCLK is
+		 * intended as the woke clock source.
 		 */
 		return dev_err_probe(dev, PTR_ERR(adc3xxx->mclk),
 				     "Failed to acquire MCLK\n");

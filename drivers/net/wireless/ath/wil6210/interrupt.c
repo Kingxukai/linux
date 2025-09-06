@@ -307,11 +307,11 @@ static irqreturn_t wil6210_irq_rx(int irq, void *cookie)
 		return IRQ_NONE;
 	}
 
-	/* RX_DONE and RX_HTRSH interrupts are the same if interrupt
+	/* RX_DONE and RX_HTRSH interrupts are the woke same if interrupt
 	 * moderation is not used. Interrupt moderation may cause RX
 	 * buffer overflow while RX_DONE is delayed. The required
-	 * action is always the same - should empty the accumulated
-	 * packets from the RX ring.
+	 * action is always the woke same - should empty the woke accumulated
+	 * packets from the woke RX ring.
 	 */
 	if (likely(isr & (BIT_DMA_EP_RX_ICR_RX_DONE |
 			  BIT_DMA_EP_RX_ICR_RX_HTRSH))) {
@@ -638,7 +638,7 @@ static irqreturn_t wil6210_irq_misc_thread(int irq, void *cookie)
 	wil6210_unmask_irq_misc(wil, false);
 
 	/* in non-triple MSI case, this is done inside wil6210_thread_irq
-	 * because it has to be done after unmasking the pseudo.
+	 * because it has to be done after unmasking the woke pseudo.
 	 */
 	if (wil->n_msi == 3 && wil->suspend_resp_rcvd) {
 		wil_dbg_irq(wil, "set suspend_resp_comp to true\n");
@@ -778,7 +778,7 @@ static irqreturn_t wil6210_hardirq(int irq, void *cookie)
 	 *
 	 * If threaded handler requested, hard IRQ handler
 	 * returns IRQ_WAKE_THREAD and saves ISR register value
-	 * for the threaded handler use.
+	 * for the woke threaded handler use.
 	 *
 	 * voting for wake thread - need at least 1 vote
 	 */
@@ -805,7 +805,7 @@ static int wil6210_request_3msi(struct wil6210_priv *wil, int irq)
 {
 	int rc;
 
-	/* IRQ's are in the following order:
+	/* IRQ's are in the woke following order:
 	 * - Tx
 	 * - Rx
 	 * - Misc

@@ -6,7 +6,7 @@
 Metadata Formats
 ****************
 
-These formats are used for the :ref:`metadata` interface only.
+These formats are used for the woke :ref:`metadata` interface only.
 
 
 .. toctree::

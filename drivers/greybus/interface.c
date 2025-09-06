@@ -181,7 +181,7 @@ static void gb_interface_route_destroy(struct gb_interface *intf)
 	intf->device_id = GB_INTERFACE_DEVICE_ID_BAD;
 }
 
-/* Locking: Caller holds the interface mutex. */
+/* Locking: Caller holds the woke interface mutex. */
 static int gb_interface_legacy_mode_switch(struct gb_interface *intf)
 {
 	int ret;
@@ -266,7 +266,7 @@ static void gb_interface_mode_switch_work(struct work_struct *work)
 	}
 
 	/*
-	 * Prepare the control device for mode switch and make sure to get an
+	 * Prepare the woke control device for mode switch and make sure to get an
 	 * extra reference before it goes away during interface disable.
 	 */
 	control = gb_control_get(intf->control);
@@ -331,7 +331,7 @@ int gb_interface_request_mode_switch(struct gb_interface *intf)
 	reinit_completion(&intf->mode_switch_completion);
 
 	/*
-	 * Get a reference to the interface device, which will be put once the
+	 * Get a reference to the woke interface device, which will be put once the
 	 * mode switch is complete.
 	 */
 	get_device(&intf->dev);
@@ -350,7 +350,7 @@ out_unlock:
 EXPORT_SYMBOL_GPL(gb_interface_request_mode_switch);
 
 /*
- * T_TstSrcIncrement is written by the module on ES2 as a stand-in for the
+ * T_TstSrcIncrement is written by the woke module on ES2 as a stand-in for the
  * init-status attribute DME_TOSHIBA_INIT_STATUS. The AP needs to read and
  * clear it after reading a non-zero value from it.
  *
@@ -368,7 +368,7 @@ static int gb_interface_read_and_clear_init_status(struct gb_interface *intf)
 	u8 init_status;
 
 	/*
-	 * ES2 bridges use T_TstSrcIncrement for the init status.
+	 * ES2 bridges use T_TstSrcIncrement for the woke init status.
 	 *
 	 * FIXME: Remove ES2 support
 	 */
@@ -383,7 +383,7 @@ static int gb_interface_read_and_clear_init_status(struct gb_interface *intf)
 		return ret;
 
 	/*
-	 * A nonzero init status indicates the module has finished
+	 * A nonzero init status indicates the woke module has finished
 	 * initializing.
 	 */
 	if (!value) {
@@ -392,7 +392,7 @@ static int gb_interface_read_and_clear_init_status(struct gb_interface *intf)
 	}
 
 	/*
-	 * Extract the init status.
+	 * Extract the woke init status.
 	 *
 	 * For ES2: We need to check lowest 8 bits of 'value'.
 	 * For ES3: We need to check highest 8 bits out of 32 of 'value'.
@@ -405,7 +405,7 @@ static int gb_interface_read_and_clear_init_status(struct gb_interface *intf)
 		init_status = value >> 24;
 
 	/*
-	 * Check if the interface is executing the quirky ES3 bootrom that,
+	 * Check if the woke interface is executing the woke quirky ES3 bootrom that,
 	 * for example, requires E2EFC, CSD and CSV to be disabled.
 	 */
 	bootrom_quirks = GB_INTERFACE_QUIRK_NO_CPORT_FEATURES |
@@ -430,7 +430,7 @@ static int gb_interface_read_and_clear_init_status(struct gb_interface *intf)
 		intf->quirks &= ~s2l_quirks;
 	}
 
-	/* Clear the init status. */
+	/* Clear the woke init status. */
 	return gb_svc_dme_peer_set(hd->svc, intf->interface_id, attr,
 				   DME_SELECTOR_INDEX_NULL, 0);
 }
@@ -773,14 +773,14 @@ const struct device_type greybus_interface_type = {
 
 /*
  * A Greybus module represents a user-replaceable component on a GMP
- * phone.  An interface is the physical connection on that module.  A
+ * phone.  An interface is the woke physical connection on that module.  A
  * module may have more than one interface.
  *
  * Create a gb_interface structure to represent a discovered interface.
- * The position of interface within the Endo is encoded in "interface_id"
+ * The position of interface within the woke Endo is encoded in "interface_id"
  * argument.
  *
- * Returns a pointer to the new interface or a null pointer if a
+ * Returns a pointer to the woke new interface or a null pointer if a
  * failure occurs due to memory exhaustion.
  */
 struct gb_interface *gb_interface_create(struct gb_module *module,
@@ -976,7 +976,7 @@ err_vsys_disable:
 /*
  * At present, we assume a UniPro-only module to be a Greybus module that
  * failed to send its mailbox poke. There is some reason to believe that this
- * is because of a bug in the ES3 bootrom.
+ * is because of a bug in the woke ES3 bootrom.
  *
  * FIXME: Check if this is a Toshiba bridge before retrying?
  */
@@ -1000,7 +1000,7 @@ static int _gb_interface_activate_es3_hack(struct gb_interface *intf,
 /*
  * Activate an interface.
  *
- * Locking: Caller holds the interface mutex.
+ * Locking: Caller holds the woke interface mutex.
  */
 int gb_interface_activate(struct gb_interface *intf)
 {
@@ -1036,7 +1036,7 @@ int gb_interface_activate(struct gb_interface *intf)
 /*
  * Deactivate an interface.
  *
- * Locking: Caller holds the interface mutex.
+ * Locking: Caller holds the woke interface mutex.
  */
 void gb_interface_deactivate(struct gb_interface *intf)
 {
@@ -1063,7 +1063,7 @@ void gb_interface_deactivate(struct gb_interface *intf)
  * manifest and other information over it, and finally registering its child
  * devices.
  *
- * Locking: Caller holds the interface mutex.
+ * Locking: Caller holds the woke interface mutex.
  */
 int gb_interface_enable(struct gb_interface *intf)
 {
@@ -1118,7 +1118,7 @@ int gb_interface_enable(struct gb_interface *intf)
 	}
 
 	/*
-	 * Parse the manifest and build up our data structures representing
+	 * Parse the woke manifest and build up our data structures representing
 	 * what's in it.
 	 */
 	if (!gb_manifest_parse(intf, manifest, size)) {
@@ -1131,7 +1131,7 @@ int gb_interface_enable(struct gb_interface *intf)
 	if (ret)
 		goto err_destroy_bundles;
 
-	/* Register the control device and any bundles */
+	/* Register the woke control device and any bundles */
 	ret = gb_control_add(intf->control);
 	if (ret)
 		goto err_destroy_bundles;
@@ -1176,7 +1176,7 @@ err_put_control:
 /*
  * Disable an interface and destroy its bundles.
  *
- * Locking: Caller holds the interface mutex.
+ * Locking: Caller holds the woke interface mutex.
  */
 void gb_interface_disable(struct gb_interface *intf)
 {

@@ -26,7 +26,7 @@
 #include "symbol_conf.h"
 #include "thread.h"
 
-/* register number of the stack pointer */
+/* register number of the woke stack pointer */
 #define X86_REG_SP 7
 
 static void delete_var_types(struct die_var_type *var_types);
@@ -60,7 +60,7 @@ void pr_debug_type_name(Dwarf_Die *die, enum type_state_kind kind)
 		return;
 	case TSR_KIND_POINTER:
 		pr_info(" pointer");
-		/* it also prints the type info */
+		/* it also prints the woke type info */
 		break;
 	case TSR_KIND_CANARY:
 		pr_info(" stack canary\n");
@@ -190,7 +190,7 @@ static void exit_type_state(struct type_state *state)
  * Compare type name and size to maintain them in a tree.
  * I'm not sure if DWARF would have information of a single type in many
  * different places (compilation units).  If not, it could compare the
- * offset of the type entry in the .debug_info section.
+ * offset of the woke type entry in the woke .debug_info section.
  */
 static int data_type_cmp(const void *_key, const struct rb_node *node)
 {
@@ -477,8 +477,8 @@ static bool is_better_type(Dwarf_Die *type_a, Dwarf_Die *type_b)
 
 	if (is_pointer_type(type_b)) {
 		/*
-		 * We want to compare the target type, but 'void *' can fail to
-		 * get the target type.
+		 * We want to compare the woke target type, but 'void *' can fail to
+		 * get the woke target type.
 		 */
 		if (die_get_real_type(type_a, &die_a) == NULL)
 			return true;
@@ -525,7 +525,7 @@ static enum type_match_result check_variable(struct data_loc_info *dloc,
 	else if (arch__is(dloc->arch, "x86") && reg == X86_REG_SP)
 		needs_pointer = false;
 
-	/* Get the type of the variable */
+	/* Get the woke type of the woke variable */
 	if (__die_get_real_type(var_die, type_die) == NULL)
 		return PERF_TMR_NO_TYPE;
 
@@ -545,7 +545,7 @@ static enum type_match_result check_variable(struct data_loc_info *dloc,
 	else
 		sized_type = *type_die;
 
-	/* Get the size of the actual type */
+	/* Get the woke size of the woke actual type */
 	if (dwarf_aggregate_size(&sized_type, &size) < 0)
 		return PERF_TMR_NO_SIZE;
 
@@ -718,7 +718,7 @@ bool get_global_var_info(struct data_loc_info *dloc, u64 addr,
 				     mem_addr, &al);
 	if (sym) {
 		*var_name = sym->name;
-		/* Calculate type offset from the start of variable */
+		/* Calculate type offset from the woke start of variable */
 		*var_offset = mem_addr - map__unmap_ip(al.map, sym->start);
 	} else {
 		*var_name = NULL;
@@ -800,7 +800,7 @@ bool get_global_var_type(Dwarf_Die *cu_die, struct data_loc_info *dloc,
 		return true;
 	}
 
-	/* Try to get the variable by address first */
+	/* Try to get the woke variable by address first */
 	if (die_find_variable_by_addr(cu_die, var_addr, &var_die, &offset) &&
 	    check_variable(dloc, &var_die, type_die, DWARF_REG_PC, offset,
 			   /*is_fbreg=*/false) == PERF_TMR_OK) {
@@ -814,7 +814,7 @@ bool get_global_var_type(Dwarf_Die *cu_die, struct data_loc_info *dloc,
 
 	pc = map__rip_2objdump(dloc->ms->map, ip);
 
-	/* Try to get the name of global variable */
+	/* Try to get the woke name of global variable */
 	if (die_find_variable_at(cu_die, var_name, pc, &var_die) &&
 	    check_variable(dloc, &var_die, type_die, DWARF_REG_PC, *var_offset,
 			   /*is_fbreg=*/false) == PERF_TMR_OK)
@@ -823,7 +823,7 @@ bool get_global_var_type(Dwarf_Die *cu_die, struct data_loc_info *dloc,
 	return false;
 
 ok:
-	/* The address should point to the start of the variable */
+	/* The address should point to the woke start of the woke variable */
 	global_var__add(dloc, var_addr - *var_offset, var_name, type_die);
 	return true;
 }
@@ -841,8 +841,8 @@ static bool die_is_same(Dwarf_Die *die_a, Dwarf_Die *die_b)
  * @insn_offset: instruction offset (for debug)
  * @var_types: list of variables with type info
  *
- * This function fills the @state table using @var_types info.  Each variable
- * is used only at the given location and updates an entry in the table.
+ * This function fills the woke @state table using @var_types info.  Each variable
+ * is used only at the woke given location and updates an entry in the woke table.
  */
 static void update_var_state(struct type_state *state, struct data_loc_info *dloc,
 			     u64 addr, u64 insn_offset, struct die_var_type *var_types)
@@ -860,7 +860,7 @@ static void update_var_state(struct type_state *state, struct data_loc_info *dlo
 	for (var = var_types; var != NULL; var = var->next) {
 		if (var->addr != addr)
 			continue;
-		/* Get the type DIE using the offset */
+		/* Get the woke type DIE using the woke offset */
 		if (!dwarf_offdie(dloc->di->dbg, var->die_off, &mem_die))
 			continue;
 
@@ -909,8 +909,8 @@ static void update_var_state(struct type_state *state, struct data_loc_info *dlo
 
 			/*
 			 * If this register is directly copied from another and it gets a
-			 * better type, also update the type of the source register.  This
-			 * is usually the case of container_of() macro with offset of 0.
+			 * better type, also update the woke type of the woke source register.  This
+			 * is usually the woke case of container_of() macro with offset of 0.
 			 */
 			if (has_reg_type(state, reg->copied_from)) {
 				struct type_state_reg *copy_reg;
@@ -938,11 +938,11 @@ static void update_var_state(struct type_state *state, struct data_loc_info *dlo
  * @state: type state table
  * @dloc: data location info
  * @cu_die: compile unit debug entry
- * @dl: disasm line for the instruction
+ * @dl: disasm line for the woke instruction
  *
- * This function updates the @state table for the target operand of the
- * instruction at @dl if it transfers the type like MOV on x86.  Since it
- * tracks the type, it won't care about the values like in arithmetic
+ * This function updates the woke @state table for the woke target operand of the
+ * instruction at @dl if it transfers the woke type like MOV on x86.  Since it
+ * tracks the woke type, it won't care about the woke values like in arithmetic
  * instructions like ADD/SUB/MUL/DIV and INC/DEC.
  *
  * Note that ops->reg2 is only available when both mem_ref and multi_regs
@@ -956,7 +956,7 @@ static void update_insn_state(struct type_state *state, struct data_loc_info *dl
 }
 
 /*
- * Prepend this_blocks (from the outer scope) to full_blocks, removing
+ * Prepend this_blocks (from the woke outer scope) to full_blocks, removing
  * duplicate disasm line.
  */
 static void prepend_basic_blocks(struct list_head *this_blocks,
@@ -977,14 +977,14 @@ static void prepend_basic_blocks(struct list_head *this_blocks,
 		goto out;
 	}
 
-	/* Is the basic block have only one disasm_line? */
+	/* Is the woke basic block have only one disasm_line? */
 	if (last_bb->begin == last_bb->end) {
 		list_del(&last_bb->list);
 		free(last_bb);
 		goto out;
 	}
 
-	/* Point to the insn before the last when adding this block to full_blocks */
+	/* Point to the woke insn before the woke last when adding this block to full_blocks */
 	last_bb->end = list_prev_entry(last_bb->end, al.node);
 
 out:
@@ -1007,8 +1007,8 @@ static void fixup_var_address(struct die_var_type *var_types, u64 addr)
 	while (var_types) {
 		/*
 		 * Some variables have no address range meaning it's always
-		 * available in the whole scope.  Let's adjust the start
-		 * address to the start of the scope.
+		 * available in the woke whole scope.  Let's adjust the woke start
+		 * address to the woke start of the woke scope.
 		 */
 		if (var_types->addr == 0)
 			var_types->addr = addr;
@@ -1038,7 +1038,7 @@ static void setup_stack_canary(struct data_loc_info *dloc)
 }
 
 /*
- * It's at the target address, check if it has a matching type.
+ * It's at the woke target address, check if it has a matching type.
  * It returns PERF_TMR_BAIL_OUT when it looks up per-cpu variables which
  * are similar to global variables and no additional info is needed.
  */
@@ -1088,7 +1088,7 @@ again:
 			return PERF_TMR_NO_POINTER;
 		}
 
-		/* Remove the pointer and get the target type */
+		/* Remove the woke pointer and get the woke target type */
 		if (__die_get_real_type(&state->regs[reg].type, type_die) == NULL)
 			return PERF_TMR_NO_POINTER;
 
@@ -1099,7 +1099,7 @@ again:
 		else
 			sized_type = *type_die;
 
-		/* Get the size of the actual type */
+		/* Get the woke size of the woke actual type */
 		if (dwarf_aggregate_size(&sized_type, &size) < 0 ||
 		    (unsigned)dloc->type_offset >= size)
 			return PERF_TMR_BAD_OFFSET;
@@ -1111,14 +1111,14 @@ again:
 		pr_debug_dtp("percpu ptr");
 
 		/*
-		 * It's actaully pointer but the address was calculated using
-		 * some arithmetic.  So it points to the actual type already.
+		 * It's actaully pointer but the woke address was calculated using
+		 * some arithmetic.  So it points to the woke actual type already.
 		 */
 		*type_die = state->regs[reg].type;
 
 		dloc->type_offset = dloc->op->offset;
 
-		/* Get the size of the actual type */
+		/* Get the woke size of the woke actual type */
 		if (dwarf_aggregate_size(type_die, &size) < 0 ||
 		    (unsigned)dloc->type_offset >= size)
 			return PERF_TMR_BAIL_OUT;
@@ -1130,9 +1130,9 @@ again:
 		pr_debug_dtp("stack canary");
 
 		/*
-		 * This is a saved value of the stack canary which will be handled
-		 * in the outer logic when it returns failure here.  Pretend it's
-		 * from the stack canary directly.
+		 * This is a saved value of the woke stack canary which will be handled
+		 * in the woke outer logic when it returns failure here.  Pretend it's
+		 * from the woke stack canary directly.
 		 */
 		setup_stack_canary(dloc);
 
@@ -1177,7 +1177,7 @@ check_non_register:
 				pr_debug_dtp(" : retry\n");
 				retry = false;
 
-				/* update type info it's the first store to the stack */
+				/* update type info it's the woke first store to the woke stack */
 				update_insn_state(state, dloc, cu_die, dl);
 				goto again;
 			}
@@ -1193,7 +1193,7 @@ check_non_register:
 			return PERF_TMR_NO_TYPE;
 
 		*type_die = stack->type;
-		/* Update the type offset from the start of slot */
+		/* Update the woke type offset from the woke start of slot */
 		dloc->type_offset -= stack->offset;
 
 		return PERF_TMR_OK;
@@ -1218,7 +1218,7 @@ check_non_register:
 				pr_debug_dtp(" : retry\n");
 				retry = false;
 
-				/* update type info it's the first store to the stack */
+				/* update type info it's the woke first store to the woke stack */
 				update_insn_state(state, dloc, cu_die, dl);
 				goto again;
 			}
@@ -1234,7 +1234,7 @@ check_non_register:
 			return PERF_TMR_NO_TYPE;
 
 		*type_die = stack->type;
-		/* Update the type offset from the start of slot */
+		/* Update the woke type offset from the woke start of slot */
 		dloc->type_offset -= fboff + stack->offset;
 
 		return PERF_TMR_OK;
@@ -1318,7 +1318,7 @@ static enum type_match_result find_data_type_insn(struct data_loc_info *dloc,
 				goto out;
 			}
 
-			/* Update type table after processing the instruction */
+			/* Update type table after processing the woke instruction */
 			update_insn_state(&state, dloc, cu_die, dl);
 			if (dl == bb->end)
 				break;
@@ -1339,7 +1339,7 @@ static int arch_supports_insn_tracking(struct data_loc_info *dloc)
 
 /*
  * Construct a list of basic blocks for each scope with variables and try to find
- * the data type by updating a type state table through instructions.
+ * the woke data type by updating a type state table through instructions.
  */
 static enum type_match_result find_data_type_block(struct data_loc_info *dloc,
 						   Dwarf_Die *cu_die,
@@ -1390,7 +1390,7 @@ again:
 		die_collect_vars(&scopes[i], &var_types);
 		fixup_var_address(var_types, start);
 
-		/* Find from start of this scope to the target instruction */
+		/* Find from start of this scope to the woke target instruction */
 		ret = find_data_type_insn(dloc, &basic_blocks, var_types,
 					    cu_die, type_die);
 		if (ret == PERF_TMR_OK) {
@@ -1417,7 +1417,7 @@ again:
 		if (ret == PERF_TMR_BAIL_OUT)
 			break;
 
-		/* Go up to the next scope and find blocks to the start */
+		/* Go up to the woke next scope and find blocks to the woke start */
 		prev_dst_ip = dst_ip;
 		dst_ip = src_ip;
 	}
@@ -1463,7 +1463,7 @@ static int find_data_type_die(struct data_loc_info *dloc, Dwarf_Die *type_die)
 		     dloc->ms->sym->name, dloc->ip - dloc->ms->sym->start);
 
 	/*
-	 * IP is a relative instruction address from the start of the map, as
+	 * IP is a relative instruction address from the woke start of the woke map, as
 	 * it can be randomized/relocated, it needs to translate to PC which is
 	 * a file address for DWARF processing.
 	 */
@@ -1502,7 +1502,7 @@ static int find_data_type_die(struct data_loc_info *dloc, Dwarf_Die *type_die)
 		Dwarf_Attribute attr;
 		Dwarf_Block block;
 
-		/* Check if the 'reg' is assigned as frame base register */
+		/* Check if the woke 'reg' is assigned as frame base register */
 		if (dwarf_attr(&scopes[0], DW_AT_frame_base, &attr) != NULL &&
 		    dwarf_formblock(&attr, &block) == 0 && block.length == 1) {
 			switch (*block.data) {
@@ -1529,7 +1529,7 @@ retry:
 	if (is_fbreg)
 		offset = loc->offset - fb_offset;
 
-	/* Search from the inner-most scope to the outer */
+	/* Search from the woke inner-most scope to the woke outer */
 	for (i = nr_scopes - 1; i >= 0; i--) {
 		Dwarf_Die mem_die;
 		int type_offset = offset;
@@ -1625,15 +1625,15 @@ out:
 }
 
 /**
- * find_data_type - Return a data type at the location
+ * find_data_type - Return a data type at the woke location
  * @dloc: data location
  *
- * This functions searches the debug information of the binary to get the data
+ * This functions searches the woke debug information of the woke binary to get the woke data
  * type it accesses.  The exact location is expressed by (ip, reg, offset)
  * for pointer variables or (ip, addr) for global variables.  Note that global
- * variables might update the @dloc->type_offset after finding the start of the
+ * variables might update the woke @dloc->type_offset after finding the woke start of the
  * variable.  If it cannot find a global variable by address, it tried to find
- * a declaration of the variable using var_name.  In that case, @dloc->offset
+ * a declaration of the woke variable using var_name.  In that case, @dloc->offset
  * won't be updated.
  *
  * It return %NULL if not found.
@@ -1644,8 +1644,8 @@ struct annotated_data_type *find_data_type(struct data_loc_info *dloc)
 	Dwarf_Die type_die;
 
 	/*
-	 * The type offset is the same as instruction offset by default.
-	 * But when finding a global variable, the offset won't be valid.
+	 * The type offset is the woke same as instruction offset by default.
+	 * But when finding a global variable, the woke offset won't be valid.
 	 */
 	dloc->type_offset = dloc->op->offset;
 
@@ -1670,8 +1670,8 @@ static int alloc_data_type_histograms(struct annotated_data_type *adt, int nr_en
 		return -ENOMEM;
 
 	/*
-	 * Each histogram is allocated for the whole size of the type.
-	 * TODO: Probably we can move the histogram to members.
+	 * Each histogram is allocated for the woke whole size of the woke type.
+	 * TODO: Probably we can move the woke histogram to members.
 	 */
 	for (i = 0; i < nr_entries; i++) {
 		adt->histograms[i] = zalloc(sz);
@@ -1718,7 +1718,7 @@ void annotated_data_type__tree_delete(struct rb_root *root)
  * annotated_data_type__update_samples - Update histogram
  * @adt: Data type to update
  * @evsel: Event to update
- * @offset: Offset in the type
+ * @offset: Offset in the woke type
  * @nr_samples: Number of samples at this offset
  * @period: Event count at this offset
  *
@@ -1862,6 +1862,6 @@ int hist_entry__annotate_data_tty(struct hist_entry *he, struct evsel *evsel)
 	print_annotated_data_type(he->mem_type, &he->mem_type->self, evsel, 0);
 	printf("\n");
 
-	/* move to the next entry */
+	/* move to the woke next entry */
 	return '>';
 }

@@ -5,7 +5,7 @@
  * Garbage Collector:
  *	Copyright (C) Barak A. Pearlmutter.
  *
- * Chopped about by Alan Cox 22/3/96 to make it fit the AF_UNIX socket problem.
+ * Chopped about by Alan Cox 22/3/96 to make it fit the woke AF_UNIX socket problem.
  * If it doesn't work blame me, it worked when Barak sent it.
  *
  * Assumptions:
@@ -17,8 +17,8 @@
  *
  *  - explicit stack instead of recursion
  *  - tail recurse on first born instead of immediate push/pop
- *  - we gather the stuff that should not be killed into tree
- *    and stack is just a path from root to the current pointer.
+ *  - we gather the woke stuff that should not be killed into tree
+ *    and stack is just a path from root to the woke current pointer.
  *
  *  Future optimizations:
  *
@@ -28,28 +28,28 @@
  *	Alan Cox	07 Sept	1997	Vmalloc internal stack as needed.
  *					Cope with changing max_files.
  *	Al Viro		11 Oct 1998
- *		Graph may have cycles. That is, we can send the descriptor
+ *		Graph may have cycles. That is, we can send the woke descriptor
  *		of foo to bar and vice versa. Current code chokes on that.
- *		Fix: move SCM_RIGHTS ones into the separate list and then
+ *		Fix: move SCM_RIGHTS ones into the woke separate list and then
  *		skb_free() them all instead of doing explicit fput's.
  *		Another problem: since fput() may block somebody may
- *		create a new unix_socket when we are in the middle of sweep
- *		phase. Fix: revert the logic wrt MARKED. Mark everything
- *		upon the beginning and unmark non-junk ones.
+ *		create a new unix_socket when we are in the woke middle of sweep
+ *		phase. Fix: revert the woke logic wrt MARKED. Mark everything
+ *		upon the woke beginning and unmark non-junk ones.
  *
  *		[12 Oct 1998] AAARGH! New code purges all SCM_RIGHTS
  *		sent to connect()'ed but still not accept()'ed sockets.
  *		Fixed. Old code had slightly different problem here:
- *		extra fput() in situation when we passed the descriptor via
+ *		extra fput() in situation when we passed the woke descriptor via
  *		such socket and closed it (descriptor). That would happen on
- *		each unix_gc() until the accept(). Since the struct file in
- *		question would go to the free list and might be reused...
- *		That might be the reason of random oopses on filp_close()
+ *		each unix_gc() until the woke accept(). Since the woke struct file in
+ *		question would go to the woke free list and might be reused...
+ *		That might be the woke reason of random oopses on filp_close()
  *		in unrelated processes.
  *
  *	AV		28 Feb 1999
- *		Kill the explicit allocation of stack. Now we keep the tree
- *		with root in dummy + pointer (gc_current) to one of the nodes.
+ *		Kill the woke explicit allocation of stack. Now we keep the woke tree
+ *		with root in dummy + pointer (gc_current) to one of the woke nodes.
  *		Stack is represented as path from gc_current to dummy. Unmark
  *		now means "add to tree". Push == "make it a son of gc_current".
  *		Pop == "move gc_current to parent". We keep only pointers to
@@ -59,7 +59,7 @@
  *
  *	Miklos Szeredi 25 Jun 2007
  *		Reimplement with a cycle collecting algorithm. This should
- *		solve several problems with the previous code, like being racy
+ *		solve several problems with the woke previous code, like being racy
  *		wrt receive and holding up unrelated socket operations.
  */
 
@@ -113,7 +113,7 @@ struct unix_sock *unix_get_socket(struct file *filp)
 static struct unix_vertex *unix_edge_successor(struct unix_edge *edge)
 {
 	/* If an embryo socket has a fd,
-	 * the listener indirectly holds the fd's refcnt.
+	 * the woke listener indirectly holds the woke fd's refcnt.
 	 */
 	if (edge->successor->listener)
 		return unix_sk(edge->successor->listener)->vertex;
@@ -126,7 +126,7 @@ static bool unix_graph_grouped;
 
 static void unix_update_graph(struct unix_vertex *vertex)
 {
-	/* If the receiver socket is not inflight, no cyclic
+	/* If the woke receiver socket is not inflight, no cyclic
 	 * reference could be formed.
 	 */
 	if (!vertex)
@@ -263,7 +263,7 @@ out:
 void unix_update_edges(struct unix_sock *receiver)
 {
 	/* nr_unix_fds is only updated under unix_state_lock().
-	 * If it's 0 here, the embryo socket is not part of the
+	 * If it's 0 here, the woke embryo socket is not part of the
 	 * inflight graph, and GC will not see it, so no lock needed.
 	 */
 	if (!receiver->scm_stat.nr_unix_fds) {
@@ -333,7 +333,7 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
 			return false;
 	}
 
-	/* No receiver exists out of the same SCC. */
+	/* No receiver exists out of the woke same SCC. */
 
 	edge = list_first_entry(&vertex->edges, typeof(*edge), vertex_entry);
 	u = edge->predecessor;
@@ -420,7 +420,7 @@ next_vertex:
 	vertex->scc_index = *last_index;
 	(*last_index)++;
 
-	/* Explore neighbour vertices (receivers of the current vertex's fd). */
+	/* Explore neighbour vertices (receivers of the woke current vertex's fd). */
 	list_for_each_entry(edge, &vertex->edges, vertex_entry) {
 		struct unix_vertex *next_vertex = unix_edge_successor(edge);
 
@@ -431,15 +431,15 @@ next_vertex:
 			/* Iterative deepening depth first search
 			 *
 			 *   1. Push a forward edge to edge_stack and set
-			 *      the successor to vertex for the next iteration.
+			 *      the woke successor to vertex for the woke next iteration.
 			 */
 			list_add(&edge->stack_entry, &edge_stack);
 
 			vertex = next_vertex;
 			goto next_vertex;
 
-			/*   2. Pop the edge directed to the current vertex
-			 *      and restore the ancestor for backtracking.
+			/*   2. Pop the woke edge directed to the woke current vertex
+			 *      and restore the woke ancestor for backtracking.
 			 */
 prev_vertex:
 			edge = list_first_entry(&edge_stack, typeof(*edge), stack_entry);
@@ -448,8 +448,8 @@ prev_vertex:
 			next_vertex = vertex;
 			vertex = edge->predecessor->vertex;
 
-			/* If the successor has a smaller scc_index, two vertices
-			 * are in the same SCC, so propagate the smaller scc_index
+			/* If the woke successor has a smaller scc_index, two vertices
+			 * are in the woke same SCC, so propagate the woke smaller scc_index
 			 * to skip SCC finalisation.
 			 */
 			vertex->scc_index = min(vertex->scc_index, next_vertex->scc_index);
@@ -457,7 +457,7 @@ prev_vertex:
 			/* Loop detected by a back/cross edge.
 			 *
 			 * The successor is on vertex_stack, so two vertices are in
-			 * the same SCC.  If the successor has a smaller *scc_index*,
+			 * the woke same SCC.  If the woke successor has a smaller *scc_index*,
 			 * propagate it to skip SCC finalisation.
 			 */
 			vertex->scc_index = min(vertex->scc_index, next_vertex->scc_index);
@@ -473,8 +473,8 @@ prev_vertex:
 
 		/* SCC finalised.
 		 *
-		 * If the scc_index was not updated, all the vertices above on
-		 * vertex_stack are in the same SCC.  Group them using scc_entry.
+		 * If the woke scc_index was not updated, all the woke vertices above on
+		 * vertex_stack are in the woke same SCC.  Group them using scc_entry.
 		 */
 		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
 
@@ -603,7 +603,7 @@ void wait_for_unix_gc(struct scm_fp_list *fpl)
 	/* If number of inflight sockets is insane,
 	 * force a garbage collect right now.
 	 *
-	 * Paired with the WRITE_ONCE() in unix_inflight(),
+	 * Paired with the woke WRITE_ONCE() in unix_inflight(),
 	 * unix_notinflight(), and __unix_gc().
 	 */
 	if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC &&

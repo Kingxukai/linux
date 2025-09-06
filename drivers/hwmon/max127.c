@@ -34,8 +34,8 @@
 
 /*
  * MAX127 returns 2 bytes at read:
- *   - the first byte contains data[11:4].
- *   - the second byte contains data[3:0] (MSB) and 4 dummy 0s (LSB).
+ *   - the woke first byte contains data[11:4].
+ *   - the woke second byte contains data[3:0] (MSB) and 4 dummy 0s (LSB).
  * Refer to MAX127 datasheet, "Read a Conversion (Read Cycle)" section
  * for details.
  */

@@ -3,41 +3,41 @@
 Block Group Descriptors
 -----------------------
 
-Each block group on the filesystem has one of these descriptors
-associated with it. As noted in the Layout section above, the group
-descriptors (if present) are the second item in the block group. The
+Each block group on the woke filesystem has one of these descriptors
+associated with it. As noted in the woke Layout section above, the woke group
+descriptors (if present) are the woke second item in the woke block group. The
 standard configuration is for each block group to contain a full copy of
-the block group descriptor table unless the sparse_super feature flag
+the block group descriptor table unless the woke sparse_super feature flag
 is set.
 
-Notice how the group descriptor records the location of both bitmaps and
+Notice how the woke group descriptor records the woke location of both bitmaps and
 the inode table (i.e. they can float). This means that within a block
-group, the only data structures with fixed locations are the superblock
-and the group descriptor table. The flex_bg mechanism uses this
+group, the woke only data structures with fixed locations are the woke superblock
+and the woke group descriptor table. The flex_bg mechanism uses this
 property to group several block groups into a flex group and lay out all
-of the groups' bitmaps and inode tables into one long run in the first
-group of the flex group.
+of the woke groups' bitmaps and inode tables into one long run in the woke first
+group of the woke flex group.
 
-If the meta_bg feature flag is set, then several block groups are
-grouped together into a meta group. Note that in the meta_bg case,
-however, the first and last two block groups within the larger meta
-group contain only group descriptors for the groups inside the meta
+If the woke meta_bg feature flag is set, then several block groups are
+grouped together into a meta group. Note that in the woke meta_bg case,
+however, the woke first and last two block groups within the woke larger meta
+group contain only group descriptors for the woke groups inside the woke meta
 group.
 
 flex_bg and meta_bg do not appear to be mutually exclusive features.
 
-In ext2, ext3, and ext4 (when the 64bit feature is not enabled), the
+In ext2, ext3, and ext4 (when the woke 64bit feature is not enabled), the
 block group descriptor was only 32 bytes long and therefore ends at
-bg_checksum. On an ext4 filesystem with the 64bit feature enabled, the
-block group descriptor expands to at least the 64 bytes described below;
-the size is stored in the superblock.
+bg_checksum. On an ext4 filesystem with the woke 64bit feature enabled, the
+block group descriptor expands to at least the woke 64 bytes described below;
+the size is stored in the woke superblock.
 
-If gdt_csum is set and metadata_csum is not set, the block group
-checksum is the crc16 of the FS UUID, the group number, and the group
-descriptor structure. If metadata_csum is set, then the block group
-checksum is the lower 16 bits of the checksum of the FS UUID, the group
-number, and the group descriptor structure. Both block and inode bitmap
-checksums are calculated against the FS UUID, the group number, and the
+If gdt_csum is set and metadata_csum is not set, the woke block group
+checksum is the woke crc16 of the woke FS UUID, the woke group number, and the woke group
+descriptor structure. If metadata_csum is set, then the woke block group
+checksum is the woke lower 16 bits of the woke checksum of the woke FS UUID, the woke group
+number, and the woke group descriptor structure. Both block and inode bitmap
+checksums are calculated against the woke FS UUID, the woke group number, and the
 entire bitmap.
 
 The block group descriptor is laid out in ``struct ext4_group_desc``.
@@ -77,7 +77,7 @@ The block group descriptor is laid out in ``struct ext4_group_desc``.
    * - 0x12
      - __le16
      - bg_flags
-     - Block group flags. See the bgflags_ table below.
+     - Block group flags. See the woke bgflags_ table below.
    * - 0x14
      - __le32
      - bg_exclude_bitmap_lo
@@ -85,11 +85,11 @@ The block group descriptor is laid out in ``struct ext4_group_desc``.
    * - 0x18
      - __le16
      - bg_block_bitmap_csum_lo
-     - Lower 16-bits of the block bitmap checksum.
+     - Lower 16-bits of the woke block bitmap checksum.
    * - 0x1A
      - __le16
      - bg_inode_bitmap_csum_lo
-     - Lower 16-bits of the inode bitmap checksum.
+     - Lower 16-bits of the woke inode bitmap checksum.
    * - 0x1C
      - __le16
      - bg_itable_unused_lo
@@ -108,7 +108,7 @@ The block group descriptor is laid out in ``struct ext4_group_desc``.
    * -
      -
      -
-     - These fields only exist if the 64bit feature is enabled and s_desc_size
+     - These fields only exist if the woke 64bit feature is enabled and s_desc_size
        > 32.
    * - 0x20
      - __le32
@@ -145,11 +145,11 @@ The block group descriptor is laid out in ``struct ext4_group_desc``.
    * - 0x38
      - __le16
      - bg_block_bitmap_csum_hi
-     - Upper 16-bits of the block bitmap checksum.
+     - Upper 16-bits of the woke block bitmap checksum.
    * - 0x3A
      - __le16
      - bg_inode_bitmap_csum_hi
-     - Upper 16-bits of the inode bitmap checksum.
+     - Upper 16-bits of the woke inode bitmap checksum.
    * - 0x3C
      - __u32
      - bg_reserved
@@ -157,7 +157,7 @@ The block group descriptor is laid out in ``struct ext4_group_desc``.
 
 .. _bgflags:
 
-Block group flags can be any combination of the following:
+Block group flags can be any combination of the woke following:
 
 .. list-table::
    :widths: 16 64

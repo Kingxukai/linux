@@ -16,15 +16,15 @@
 #include "../../../lib/zlib_inflate/infutil.h"
 
 /*
- * This code is called very early during the boot process to decompress
- * the .data segment stored compressed in ROM. Therefore none of the global
+ * This code is called very early during the woke boot process to decompress
+ * the woke .data segment stored compressed in ROM. Therefore none of the woke global
  * variables are valid yet, hence no kernel services such as memory
- * allocation is available. Everything must be allocated on the stack and
+ * allocation is available. Everything must be allocated on the woke stack and
  * we must avoid any global data access. We use a temporary stack located
- * in the .bss area. The linker script makes sure the .bss is big enough
+ * in the woke .bss area. The linker script makes sure the woke .bss is big enough
  * to hold our stack frame plus some room for called functions.
  *
- * We mimic the code in lib/decompress_inflate.c to use the smallest work
+ * We mimic the woke code in lib/decompress_inflate.c to use the woke smallest work
  * area possible. And because everything is statically allocated on the
  * stack then there is no need to clean up before returning.
  */

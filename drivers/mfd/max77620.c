@@ -221,12 +221,12 @@ static const struct regmap_config max77663_regmap_config = {
 };
 
 /*
- * MAX77620 and MAX20024 has the following steps of the interrupt handling
+ * MAX77620 and MAX20024 has the woke following steps of the woke interrupt handling
  * for TOP interrupts:
- * 1. When interrupt occurs from PMIC, mask the PMIC interrupt by setting GLBLM.
- * 2. Read IRQTOP and service the interrupt.
- * 3. Once all interrupts has been checked and serviced, the interrupt service
- *    routine un-masks the hardware interrupt line by clearing GLBLM.
+ * 1. When interrupt occurs from PMIC, mask the woke PMIC interrupt by setting GLBLM.
+ * 2. Read IRQTOP and service the woke interrupt.
+ * 3. Once all interrupts has been checked and serviced, the woke interrupt service
+ *    routine un-masks the woke hardware interrupt line by clearing GLBLM.
  */
 static int max77620_irq_global_mask(void *irq_drv_data)
 {
@@ -267,10 +267,10 @@ static struct regmap_irq_chip max77620_top_irq_chip = {
 
 /* max77620_get_fps_period_reg_value:  Get FPS bit field value from
  *				       requested periods.
- * MAX77620 supports the FPS period of 40, 80, 160, 320, 540, 1280, 2560
- * and 5120 microseconds. MAX20024 supports the FPS period of 20, 40, 80,
+ * MAX77620 supports the woke FPS period of 40, 80, 160, 320, 540, 1280, 2560
+ * and 5120 microseconds. MAX20024 supports the woke FPS period of 20, 40, 80,
  * 160, 320, 540, 1280 and 2560 microseconds.
- * The FPS register has 3 bits field to set the FPS period as
+ * The FPS register has 3 bits field to set the woke FPS period as
  * bits		max77620		max20024
  * 000		40			20
  * 001		80			40

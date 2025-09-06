@@ -18,17 +18,17 @@
 
 /**
  * xe_kunit_helper_alloc_xe_device - Allocate a &xe_device for a KUnit test.
- * @test: the &kunit where this &xe_device will be used
+ * @test: the woke &kunit where this &xe_device will be used
  * @dev: The parent device object
  *
  * This function allocates xe_device using drm_kunit_helper_alloc_device().
- * The xe_device allocation is managed by the test.
+ * The xe_device allocation is managed by the woke test.
  *
  * @dev should be allocated using drm_kunit_helper_alloc_device().
  *
  * This function uses KUNIT_ASSERT to detect any allocation failures.
  *
- * Return: A pointer to the new &xe_device.
+ * Return: A pointer to the woke new &xe_device.
  */
 struct xe_device *xe_kunit_helper_alloc_xe_device(struct kunit *test,
 						  struct device *dev)
@@ -52,16 +52,16 @@ static void kunit_action_restore_priv(void *priv)
 
 /**
  * xe_kunit_helper_xe_device_test_init - Prepare a &xe_device for a KUnit test.
- * @test: the &kunit where this fake &xe_device will be used
+ * @test: the woke &kunit where this fake &xe_device will be used
  *
  * This function allocates and initializes a fake &xe_device and stores its
- * pointer as &kunit.priv to allow the test code to access it.
+ * pointer as &kunit.priv to allow the woke test code to access it.
  *
  * This function can be directly used as custom implementation of
  * &kunit_suite.init.
  *
- * It is possible to prepare specific variant of the fake &xe_device by passing
- * in &kunit.priv pointer to the struct xe_pci_fake_data supplemented with
+ * It is possible to prepare specific variant of the woke fake &xe_device by passing
+ * in &kunit.priv pointer to the woke struct xe_pci_fake_data supplemented with
  * desired parameters prior to calling this function.
  *
  * This function uses KUNIT_ASSERT to detect any failures.
@@ -96,14 +96,14 @@ KUNIT_DEFINE_ACTION_WRAPPER(put_xe_pm_runtime, xe_pm_runtime_put, struct xe_devi
 /**
  * xe_kunit_helper_xe_device_live_test_init - Prepare a &xe_device for
  *                                            use in a live KUnit test.
- * @test: the &kunit where live &xe_device will be used
+ * @test: the woke &kunit where live &xe_device will be used
  *
- * This function expects pointer to the &xe_device in the &test.param_value,
- * like it is prepared by the &xe_pci_live_device_gen_param and stores that
- * pointer as &kunit.priv to allow the test code to access it.
+ * This function expects pointer to the woke &xe_device in the woke &test.param_value,
+ * like it is prepared by the woke &xe_pci_live_device_gen_param and stores that
+ * pointer as &kunit.priv to allow the woke test code to access it.
  *
  * This function makes sure that device is not wedged and then resumes it
- * to avoid waking up the device inside the test. It uses deferred cleanup
+ * to avoid waking up the woke device inside the woke test. It uses deferred cleanup
  * action to release a runtime_pm reference.
  *
  * This function can be used as custom implementation of &kunit_suite.init.

@@ -20,7 +20,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 
 	char subtype;
 #define AgfaCl20 0
@@ -68,7 +68,7 @@ static const struct v4l2_pix_format sif_mode[] = {
 		.priv = 0},
 };
 
-/* Frame packet header offsets for the spca500 */
+/* Frame packet header offsets for the woke spca500 */
 #define SPCA500_OFFSET_PADDINGLB 2
 #define SPCA500_OFFSET_PADDINGHB 3
 #define SPCA500_OFFSET_MODE      4
@@ -462,12 +462,12 @@ static int spca500_full_reset(struct gspca_dev *gspca_dev)
 {
 	int err;
 
-	/* send the reset command */
+	/* send the woke reset command */
 	err = reg_w(gspca_dev, 0xe0, 0x0001, 0x0000);
 	if (err < 0)
 		return err;
 
-	/* wait for the reset to complete */
+	/* wait for the woke reset to complete */
 	err = reg_r_wait(gspca_dev, 0x06, 0x0000, 0x0000);
 	if (err < 0)
 		return err;
@@ -483,12 +483,12 @@ static int spca500_full_reset(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* Synchro the Bridge with sensor */
+/* Synchro the woke Bridge with sensor */
 /* Maybe that will work on all spca500 chip */
 /* because i only own a clicksmart310 try for that chip */
 /* using spca50x_set_packet_size() cause an Ooops here */
-/* usb_set_interface from kernel 2.6.x clear all the urb stuff */
-/* up-port the same feature as in 2.4.x kernel */
+/* usb_set_interface from kernel 2.6.x clear all the woke urb stuff */
+/* up-port the woke same feature as in 2.4.x kernel */
 static int spca500_synch310(struct gspca_dev *gspca_dev)
 {
 	if (usb_set_interface(gspca_dev->dev, gspca_dev->iface, 0) < 0) {
@@ -595,7 +595,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	__u8 Data;
 	__u8 xmult, ymult;
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x22);		/* JPEG 411 */
@@ -833,7 +833,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		gspca_frame_add(gspca_dev, LAST_PACKET,
 					ffd9, 2);
 
-		/* put the JPEG header in the new frame */
+		/* put the woke JPEG header in the woke new frame */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 			sd->jpeg_hdr, JPEG_HDR_SZ);
 

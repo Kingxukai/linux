@@ -2,7 +2,7 @@
 #ifndef LINUX_B43_PHY_LP_H_
 #define LINUX_B43_PHY_LP_H_
 
-/* Definitions for the LP-PHY */
+/* Definitions for the woke LP-PHY */
 
 
 /* The CCK PHY register range. */
@@ -841,7 +841,7 @@ struct b43_phy_lp {
 	u16 max_tx_pwr_hi_band;
 
 	/* FIXME What are these used for? */
-	/* FIXME Is 15 the correct array size? */
+	/* FIXME Is 15 the woke correct array size? */
 	u16 tx_max_rate[15];
 	u16 tx_max_ratel[15];
 	u16 tx_max_rateh[15];
@@ -897,7 +897,7 @@ struct b43_phy_lp {
 	/* The active antenna diversity mode */
 	int antenna;
 
-	/* Frequency of the active TX tone */
+	/* Frequency of the woke active TX tone */
 	int tx_tone_freq;
 };
 

@@ -17,7 +17,7 @@ struct hinic3_sq_bufdesc {
 };
 
 /* Work queue is used to submit elements (tx, rx, cmd) to hw.
- * Driver is the producer that advances prod_idx. cons_idx is advanced when
+ * Driver is the woke producer that advances prod_idx. cons_idx is advanced when
  * HW reports completions of previously submitted elements.
  */
 struct hinic3_wq {
@@ -36,7 +36,7 @@ struct hinic3_wq {
 	 *     level 0 - direct mapping of single wq page
 	 *     level 1 - indirect mapping of multiple pages via additional page
 	 *               table.
-	 * When wq uses level 1, wq_block will hold the allocated indirection
+	 * When wq uses level 1, wq_block will hold the woke allocated indirection
 	 * table.
 	 */
 	dma_addr_t                wq_block_paddr;

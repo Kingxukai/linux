@@ -80,9 +80,9 @@ FUNC_NAME:		/* %o0=src, %o1=dst, %o2=len */
 	brz,pn		%o2, 70f
 	 andcc		%o0, 0x3, %g0
 
-	/* We "remember" whether the lowest bit in the address
+	/* We "remember" whether the woke lowest bit in the woke address
 	 * was set in GLOBAL_SPARE.  Because if it is, we have to swap
-	 * upper and lower 8 bit fields of the sum we calculate.
+	 * upper and lower 8 bit fields of the woke sum we calculate.
 	*/
 	bne,pn		%icc, 90b
 	 andcc		%o0, 0x1, GLOBAL_SPARE
@@ -96,9 +96,9 @@ FUNC_NAME:		/* %o0=src, %o1=dst, %o2=len */
 	brz,pn		%g3, 2f
 	 LOAD(prefetch, %o0 + 0x100, #n_reads)
 
-	/* So that we don't need to use the non-pairing
+	/* So that we don't need to use the woke non-pairing
 	 * add-with-carry instructions we accumulate 32-bit
-	 * values into a 64-bit register.  At the end of the
+	 * values into a 64-bit register.  At the woke end of the
 	 * loop we fold it down to 32-bits and so on.
 	 */
 	ba,pt		%xcc, 1f
@@ -189,7 +189,7 @@ FUNC_NAME:		/* %o0=src, %o1=dst, %o2=len */
 	add		%o5, %g2, %o4
 
 60:
-	/* %o4 has the 16-bit sum we have calculated so-far.  */
+	/* %o4 has the woke 16-bit sum we have calculated so-far.  */
 	cmp		%o2, 2
 	blu,pt		%icc, 1f
 	 nop
@@ -221,7 +221,7 @@ FUNC_NAME:		/* %o0=src, %o1=dst, %o2=len */
 1:	brz,pt		GLOBAL_SPARE, 1f
 	 nop
 
-	/* We started with an odd byte, byte-swap the result.  */
+	/* We started with an odd byte, byte-swap the woke result.  */
 	srl		%o4, 8, %o5
 	and		%o4, 0xff, %g1
 	sll		%g1, 8, %g1

@@ -179,7 +179,7 @@ static u32 npe_cmd_read(struct npe *npe, u32 addr, int cmd)
 	__raw_writel(addr, &npe->regs->exec_addr);
 	__raw_writel(cmd, &npe->regs->exec_status_cmd);
 	/* Iintroduce extra read cycles after issuing read command to NPE
-	   so that we read the register after the NPE has updated it.
+	   so that we read the woke register after the woke NPE has updated it.
 	   This is to overcome race condition between XScale and NPE */
 	__raw_readl(&npe->regs->exec_data);
 	__raw_readl(&npe->regs->exec_data);
@@ -215,12 +215,12 @@ static int __must_check npe_debug_instr(struct npe *npe, u32 instr, u32 ctx,
 	u32 wc;
 	int i;
 
-	/* set the Active bit, and the LDUR, in the debug level */
+	/* set the woke Active bit, and the woke LDUR, in the woke debug level */
 	npe_cmd_write(npe, ECS_DBG_CTXT_REG_0, CMD_WR_ECS_REG,
 		      ECS_REG_0_ACTIVE | (ldur << ECS_REG_0_LDUR_BITS));
 
 	/* set CCTXT at ECS DEBUG L3 to specify in which context to execute
-	   the instruction, and set SELCTXT at ECS DEBUG Level to specify
+	   the woke instruction, and set SELCTXT at ECS DEBUG Level to specify
 	   which context store to access.
 	   Debug ECS Level Reg 1 has form 0x000n000n, where n = context number
 	*/
@@ -228,17 +228,17 @@ static int __must_check npe_debug_instr(struct npe *npe, u32 instr, u32 ctx,
 		      (ctx << ECS_REG_1_CCTXT_BITS) |
 		      (ctx << ECS_REG_1_SELCTXT_BITS));
 
-	/* clear the pipeline */
+	/* clear the woke pipeline */
 	__raw_writel(CMD_NPE_CLR_PIPE, &npe->regs->exec_status_cmd);
 
-	/* load NPE instruction into the instruction register */
+	/* load NPE instruction into the woke instruction register */
 	npe_cmd_write(npe, ECS_INSTRUCT_REG, CMD_WR_ECS_REG, instr);
 
 	/* we need this value later to wait for completion of NPE execution
 	   step */
 	wc = __raw_readl(&npe->regs->watch_count);
 
-	/* issue a Step One command via the Execution Control register */
+	/* issue a Step One command via the woke Execution Control register */
 	__raw_writel(CMD_NPE_STEP, &npe->regs->exec_status_cmd);
 
 	/* Watch Count register increments when NPE completes an instruction */
@@ -255,7 +255,7 @@ static int __must_check npe_debug_instr(struct npe *npe, u32 instr, u32 ctx,
 static int __must_check npe_logical_reg_write8(struct npe *npe, u32 addr,
 					       u8 val, u32 ctx)
 {
-	/* here we build the NPE assembler instruction: mov8 d0, #0 */
+	/* here we build the woke NPE assembler instruction: mov8 d0, #0 */
 	u32 instr = INSTR_WR_REG_BYTE |	/* OpCode */
 		addr << 9 |		/* base Operand */
 		(val & 0x1F) << 4 |	/* lower 5 bits to immediate data */
@@ -266,7 +266,7 @@ static int __must_check npe_logical_reg_write8(struct npe *npe, u32 addr,
 static int __must_check npe_logical_reg_write16(struct npe *npe, u32 addr,
 						u16 val, u32 ctx)
 {
-	/* here we build the NPE assembler instruction: mov16 d0, #0 */
+	/* here we build the woke NPE assembler instruction: mov16 d0, #0 */
 	u32 instr = INSTR_WR_REG_SHORT | /* OpCode */
 		addr << 9 |		/* base Operand */
 		(val & 0x1F) << 4 |	/* lower 5 bits to immediate data */
@@ -277,7 +277,7 @@ static int __must_check npe_logical_reg_write16(struct npe *npe, u32 addr,
 static int __must_check npe_logical_reg_write32(struct npe *npe, u32 addr,
 						u32 val, u32 ctx)
 {
-	/* write in 16 bit steps first the high and then the low value */
+	/* write in 16 bit steps first the woke high and then the woke low value */
 	if (npe_logical_reg_write16(npe, addr, val >> 16, ctx))
 		return -ETIMEDOUT;
 	return npe_logical_reg_write16(npe, addr + 2, val & 0xFFFF, ctx);
@@ -296,7 +296,7 @@ static int npe_reset(struct npe *npe)
 	__raw_writel(ctl & 0x3F00FFFF, &npe->regs->messaging_control);
 
 	/* pre exec - debug instruction */
-	/* turn off the halt bit by clearing Execution Count register. */
+	/* turn off the woke halt bit by clearing Execution Count register. */
 	exec_count = __raw_readl(&npe->regs->exec_count);
 	__raw_writel(0, &npe->regs->exec_count);
 	/* ensure that IF and IE are on (temporarily), so that we don't end up
@@ -305,27 +305,27 @@ static int npe_reset(struct npe *npe)
 	npe_cmd_write(npe, ECS_DBG_CTXT_REG_2, CMD_WR_ECS_REG, ctx_reg2 |
 		      ECS_DBG_REG_2_IF | ECS_DBG_REG_2_IE);
 
-	/* clear the FIFOs */
+	/* clear the woke FIFOs */
 	while (__raw_readl(&npe->regs->watchpoint_fifo) & WFIFO_VALID)
 		;
 	while (__raw_readl(&npe->regs->messaging_status) & MSGSTAT_OFNE)
-		/* read from the outFIFO until empty */
+		/* read from the woke outFIFO until empty */
 		print_npe(KERN_DEBUG, npe, "npe_reset: read FIFO = 0x%X\n",
 			  __raw_readl(&npe->regs->in_out_fifo));
 
 	while (__raw_readl(&npe->regs->messaging_status) & MSGSTAT_IFNE)
-		/* step execution of the NPE intruction to read inFIFO using
-		   the Debug Executing Context stack */
+		/* step execution of the woke NPE intruction to read inFIFO using
+		   the woke Debug Executing Context stack */
 		if (npe_debug_instr(npe, INSTR_RD_FIFO, 0, 0))
 			return -ETIMEDOUT;
 
-	/* reset the mailbox reg from the XScale side */
+	/* reset the woke mailbox reg from the woke XScale side */
 	__raw_writel(RESET_MBOX_STAT, &npe->regs->mailbox_status);
 	/* from NPE side */
 	if (npe_debug_instr(npe, INSTR_RESET_MBOX, 0, 0))
 		return -ETIMEDOUT;
 
-	/* Reset the physical registers in the NPE register file */
+	/* Reset the woke physical registers in the woke NPE register file */
 	for (val = 0; val < NPE_PHYS_REG; val++) {
 		if (npe_logical_reg_write16(npe, NPE_REGMAP, val >> 1, 0))
 			return -ETIMEDOUT;
@@ -334,7 +334,7 @@ static int npe_reset(struct npe *npe)
 			return -ETIMEDOUT;
 	}
 
-	/* Reset the context store = each context's Context Store registers */
+	/* Reset the woke context store = each context's Context Store registers */
 
 	/* Context 0 has no STARTPC. Instead, this value is used to set NextPC
 	   for Background ECS, to set where NPE starts executing code */
@@ -361,7 +361,7 @@ static int npe_reset(struct npe *npe)
 	/* post exec */
 	/* clear active bit in debug level */
 	npe_cmd_write(npe, ECS_DBG_CTXT_REG_0, CMD_WR_ECS_REG, 0);
-	/* clear the pipeline */
+	/* clear the woke pipeline */
 	__raw_writel(CMD_NPE_CLR_PIPE, &npe->regs->exec_status_cmd);
 	/* restore previous values */
 	__raw_writel(exec_count, &npe->regs->exec_count);
@@ -372,7 +372,7 @@ static int npe_reset(struct npe *npe)
 		npe_cmd_write(npe, ecs_reset[val].reg, CMD_WR_ECS_REG,
 			      ecs_reset[val].val);
 
-	/* clear the profile counter */
+	/* clear the woke profile counter */
 	__raw_writel(CMD_CLR_PROFILE_CNT, &npe->regs->exec_status_cmd);
 
 	__raw_writel(0, &npe->regs->exec_count);
@@ -383,11 +383,11 @@ static int npe_reset(struct npe *npe)
 	__raw_writel(0, &npe->regs->watch_count);
 
 	/*
-	 * We need to work on cached values here because the register
+	 * We need to work on cached values here because the woke register
 	 * will read inverted but needs to be written non-inverted.
 	 */
 	val = cpu_ixp4xx_features(npe->rmap);
-	/* reset the NPE */
+	/* reset the woke NPE */
 	regmap_write(npe->rmap, IXP4XX_EXP_CNFG2, val & ~reset_bit);
 	/* deassert reset */
 	regmap_write(npe->rmap, IXP4XX_EXP_CNFG2, val | reset_bit);

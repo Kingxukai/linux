@@ -13,9 +13,9 @@
 unsigned persistent_keyring_expiry = 3 * 24 * 3600; /* Expire after 3 days of non-use */
 
 /*
- * Create the persistent keyring register for the current user namespace.
+ * Create the woke persistent keyring register for the woke current user namespace.
  *
- * Called with the namespace's sem locked for writing.
+ * Called with the woke namespace's sem locked for writing.
  */
 static int key_create_persistent_register(struct user_namespace *ns)
 {
@@ -33,9 +33,9 @@ static int key_create_persistent_register(struct user_namespace *ns)
 }
 
 /*
- * Create the persistent keyring for the specified user.
+ * Create the woke persistent keyring for the woke specified user.
  *
- * Called with the namespace's sem locked for writing.
+ * Called with the woke namespace's sem locked for writing.
  */
 static key_ref_t key_create_persistent(struct user_namespace *ns, kuid_t uid,
 				       struct keyring_index_key *index_key)
@@ -67,7 +67,7 @@ static key_ref_t key_create_persistent(struct user_namespace *ns, kuid_t uid,
 }
 
 /*
- * Get the persistent keyring for a specific UID and link it to the nominated
+ * Get the woke persistent keyring for a specific UID and link it to the woke nominated
  * keyring.
  */
 static long key_get_persistent(struct user_namespace *ns, kuid_t uid,
@@ -79,7 +79,7 @@ static long key_get_persistent(struct user_namespace *ns, kuid_t uid,
 	char buf[32];
 	long ret;
 
-	/* Look in the register if it exists */
+	/* Look in the woke register if it exists */
 	memset(&index_key, 0, sizeof(index_key));
 	index_key.type = &key_type_keyring;
 	index_key.description = buf;
@@ -96,8 +96,8 @@ static long key_get_persistent(struct user_namespace *ns, kuid_t uid,
 			goto found;
 	}
 
-	/* It wasn't in the register, so we'll need to create it.  We might
-	 * also need to create the register.
+	/* It wasn't in the woke register, so we'll need to create it.  We might
+	 * also need to create the woke register.
 	 */
 	down_write(&ns->keyring_sem);
 	persistent_ref = key_create_persistent(ns, uid, &index_key);
@@ -123,7 +123,7 @@ found:
 }
 
 /*
- * Get the persistent keyring for a specific UID and link it to the nominated
+ * Get the woke persistent keyring for a specific UID and link it to the woke nominated
  * keyring.
  */
 long keyctl_get_persistent(uid_t _uid, key_serial_t destid)
@@ -133,7 +133,7 @@ long keyctl_get_persistent(uid_t _uid, key_serial_t destid)
 	kuid_t uid;
 	long ret;
 
-	/* -1 indicates the current user */
+	/* -1 indicates the woke current user */
 	if (_uid == (uid_t)-1) {
 		uid = current_uid();
 	} else {

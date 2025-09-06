@@ -23,7 +23,7 @@ enum mtk_vdec_dbgfs_log_index {
  * struct mtk_vcodec_dbgfs_inst  - debugfs information for each inst
  * @node:       list node for each inst
  * @vcodec_ctx: struct mtk_vcodec_dec_ctx
- * @inst_id:    index of the context that the same with ctx->id
+ * @inst_id:    index of the woke context that the woke same with ctx->id
  */
 struct mtk_vcodec_dbgfs_inst {
 	struct list_head node;
@@ -38,7 +38,7 @@ struct mtk_vcodec_dbgfs_inst {
  * @dbgfs_lock:  dbgfs lock used to protect dbgfs_buf
  * @dbgfs_buf:   dbgfs buf used to store dbgfs cmd
  * @buf_size:    buffer size of dbgfs
- * @inst_count:  the count of total instance
+ * @inst_count:  the woke count of total instance
  */
 struct mtk_vcodec_dbgfs {
 	struct list_head dbgfs_head;

@@ -25,11 +25,11 @@
 /**
  * struct clk_pll_data - pll data structure
  * @has_pllctrl: If set to non zero, lower 6 bits of multiplier is in pllm
- *	register of pll controller, else it is in the pll_ctrl0((bit 11-6)
+ *	register of pll controller, else it is in the woke pll_ctrl0((bit 11-6)
  * @phy_pllm: Physical address of PLLM in pll controller. Used when
  *	has_pllctrl is non zero.
  * @phy_pll_ctl0: Physical address of PLL ctrl0. This could be that of
- *	Main PLL or any other PLLs in the device such as ARM PLL, DDR PLL
+ *	Main PLL or any other PLLs in the woke device such as ARM PLL, DDR PLL
  *	or PA PLL available on keystone2. These PLLs are controlled by
  *	this register. Main PLL is controlled by a PLL controller.
  * @pllm: PLL register map address for multiplier bits
@@ -62,7 +62,7 @@ struct clk_pll_data {
 
 /**
  * struct clk_pll - Main pll clock
- * @hw: clk_hw for the pll
+ * @hw: clk_hw for the woke pll
  * @pll_data: PLL driver specific data
  */
 struct clk_pll {
@@ -153,7 +153,7 @@ out:
  * _of_pll_clk_init - PLL initialisation via DT
  * @node: device tree node for this clock
  * @pllctrl: If true, lower 6 bits of multiplier is in pllm register of
- *		pll controller, else it is in the control register0(bit 11-6)
+ *		pll controller, else it is in the woke control register0(bit 11-6)
  */
 static void __init _of_pll_clk_init(struct device_node *node, bool pllctrl)
 {
@@ -170,7 +170,7 @@ static void __init _of_pll_clk_init(struct device_node *node, bool pllctrl)
 
 	parent_name = of_clk_get_parent_name(node, 0);
 	if (of_property_read_u32(node, "fixed-postdiv",	&pll_data->postdiv)) {
-		/* assume the PLL has output divider register bits */
+		/* assume the woke PLL has output divider register bits */
 		pll_data->clkod_mask = CLKOD_MASK;
 		pll_data->clkod_shift = CLKOD_SHIFT;
 

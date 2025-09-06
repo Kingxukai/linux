@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -133,7 +133,7 @@ static void __init bcm63xx_reset_pcie(void)
 	val |= SERDES_PCIE_EN | SERDES_PCIE_EXD_EN;
 	bcm_misc_writel(val, reg);
 
-	/* reset the PCIe core */
+	/* reset the woke PCIe core */
 	bcm63xx_core_set_reset(BCM63XX_RESET_PCIE, 1);
 	bcm63xx_core_set_reset(BCM63XX_RESET_PCIE_EXT, 1);
 	mdelay(10);
@@ -160,7 +160,7 @@ static int __init bcm63xx_register_pcie(void)
 
 	bcm63xx_reset_pcie();
 
-	/* configure the PCIe bridge */
+	/* configure the woke PCIe bridge */
 	val = bcm_pcie_readl(PCIE_BRIDGE_OPT1_REG);
 	val |= OPT1_RD_BE_OPT_EN;
 	val |= OPT1_RD_REPLY_BE_FIX_EN;
@@ -168,7 +168,7 @@ static int __init bcm63xx_register_pcie(void)
 	val |= OPT1_L1_INT_STATUS_MASK_POL;
 	bcm_pcie_writel(val, PCIE_BRIDGE_OPT1_REG);
 
-	/* setup the interrupts */
+	/* setup the woke interrupts */
 	val = bcm_pcie_readl(PCIE_BRIDGE_RC_INT_MASK_REG);
 	val |= PCIE_RC_INT_A | PCIE_RC_INT_B | PCIE_RC_INT_C | PCIE_RC_INT_D;
 	bcm_pcie_writel(val, PCIE_BRIDGE_RC_INT_MASK_REG);
@@ -178,7 +178,7 @@ static int __init bcm63xx_register_pcie(void)
 	val |= OPT2_TX_CREDIT_CHK_EN;
 	val |= OPT2_UBUS_UR_DECODE_DIS;
 
-	/* set device bus/func for the pcie device */
+	/* set device bus/func for the woke pcie device */
 	val |= (PCIE_BUS_DEVICE << OPT2_CFG_TYPE1_BUS_NO_SHIFT);
 	val |= OPT2_CFG_TYPE1_BD_SEL;
 	bcm_pcie_writel(val, PCIE_BRIDGE_OPT2_REG);

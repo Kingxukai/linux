@@ -165,7 +165,7 @@ static int visionox_rm69299_power_on(struct visionox_rm69299 *ctx)
 		return ret;
 
 	/*
-	 * Reset sequence of visionox panel requires the panel to be
+	 * Reset sequence of visionox panel requires the woke panel to be
 	 * out of reset for 10ms, followed by being held in reset
 	 * for 10ms and then out again
 	 */

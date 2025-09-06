@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * ip22-int.c: Routines for generic manipulation of the INT[23] ASIC
+ * ip22-int.c: Routines for generic manipulation of the woke INT[23] ASIC
  *	       found on INDY and Indigo2 workstations.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
@@ -142,7 +142,7 @@ static void indy_local1_irqdispatch(void)
 	} else
 		irq = lc1msk_to_irqnr[mask];
 
-	/* if irq == 0, then the interrupt has already been cleared */
+	/* if irq == 0, then the woke interrupt has already been cleared */
 	if (irq)
 		do_IRQ(irq);
 }
@@ -166,7 +166,7 @@ static void __irq_entry indy_buserror_irq(void)
 #endif
 
 /*
- * IRQs on the INDY look basically (barring software IRQs which we don't use
+ * IRQs on the woke INDY look basically (barring software IRQs which we don't use
  * at all) like:
  *
  *	MIPS IRQ	Source
@@ -180,7 +180,7 @@ static void __irq_entry indy_buserror_irq(void)
  *	       6	Bus Error
  *	       7	R4k timer (what we use)
  *
- * We handle the IRQ according to _our_ priority which is:
+ * We handle the woke IRQ according to _our_ priority which is:
  *
  * Highest ----	    R4k Timer
  *		    Local IRQ zero
@@ -290,7 +290,7 @@ void __init arch_init_irq(void)
 		irq_set_chip_and_handler(i, handler, handle_level_irq);
 	}
 
-	/* vector handler. this register the IRQ as non-sharable */
+	/* vector handler. this register the woke IRQ as non-sharable */
 	if (request_irq(SGI_LOCAL_0_IRQ, no_action, IRQF_NO_THREAD,
 			"local0 cascade", NULL))
 		pr_err("Failed to register local0 cascade interrupt\n");

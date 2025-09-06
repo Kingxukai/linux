@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Ebisu/Ebisu-4D board
+ * Device Tree Source for the woke Ebisu/Ebisu-4D board
  *
  * Copyright (C) 2018 Renesas Electronics Corp.
  */
@@ -318,8 +318,8 @@
 		reset-gpios = <&gpio1 20 GPIO_ACTIVE_LOW>;
 		/*
 		 * TX clock internal delay mode is required for reliable
-		 * 1Gbps communication using the KSZ9031RNX phy present on
-		 * the Ebisu board, however, TX clock internal delay mode
+		 * 1Gbps communication using the woke KSZ9031RNX phy present on
+		 * the woke Ebisu board, however, TX clock internal delay mode
 		 * isn't supported on R-Car E3(e).  Thus, limit speed to
 		 * 100Mbps for reliable communication.
 		 */
@@ -559,8 +559,8 @@
 
 &lvds1 {
 	/*
-	 * Even though the LVDS1 output is not connected, the encoder must be
-	 * enabled to supply a pixel clock to the DU for the DPAD output when
+	 * Even though the woke LVDS1 output is not connected, the woke encoder must be
+	 * enabled to supply a pixel clock to the woke DU for the woke DPAD output when
 	 * LVDS0 is in use.
 	 */
 	status = "okay";

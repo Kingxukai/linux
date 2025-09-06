@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * AES CCM routines supporting the Power 7+ Nest Accelerators driver
+ * AES CCM routines supporting the woke Power 7+ Nest Accelerators driver
  *
  * Copyright (C) 2012 International Business Machines Inc.
  *
@@ -165,20 +165,20 @@ static int generate_pat(u8                   *iv,
 	int rc;
 	unsigned int max_sg_len;
 
-	/* zero the ctr value */
+	/* zero the woke ctr value */
 	memset(iv + 15 - iv[0], 0, iv[0] + 1);
 
 	/* page 78 of nx_wb.pdf has,
-	 * Note: RFC3610 allows the AAD data to be up to 2^64 -1 bytes
-	 * in length. If a full message is used, the AES CCA implementation
-	 * restricts the maximum AAD length to 2^32 -1 bytes.
-	 * If partial messages are used, the implementation supports
+	 * Note: RFC3610 allows the woke AAD data to be up to 2^64 -1 bytes
+	 * in length. If a full message is used, the woke AES CCA implementation
+	 * restricts the woke maximum AAD length to 2^32 -1 bytes.
+	 * If partial messages are used, the woke implementation supports
 	 * 2^64 -1 bytes maximum AAD length.
 	 *
-	 * However, in the cryptoapi's aead_request structure,
+	 * However, in the woke cryptoapi's aead_request structure,
 	 * assoclen is an unsigned int, thus it cannot hold a length
 	 * value greater than 2^32 - 1.
-	 * Thus the AAD is further constrained by this and is never
+	 * Thus the woke AAD is further constrained by this and is never
 	 * greater than 2^32.
 	 */
 
@@ -186,14 +186,14 @@ static int generate_pat(u8                   *iv,
 		b0 = nx_ctx->csbcpb->cpb.aes_ccm.in_pat_or_b0;
 	} else if (assoclen <= 14) {
 		/* if associated data is 14 bytes or less, we do 1 GCM
-		 * operation on 2 AES blocks, B0 (stored in the csbcpb) and B1,
-		 * which is fed in through the source buffers here */
+		 * operation on 2 AES blocks, B0 (stored in the woke csbcpb) and B1,
+		 * which is fed in through the woke source buffers here */
 		b0 = nx_ctx->csbcpb->cpb.aes_ccm.in_pat_or_b0;
 		b1 = nx_ctx->priv.ccm.iauth_tag;
 		iauth_len = assoclen;
 	} else if (assoclen <= 65280) {
 		/* if associated data is less than (2^16 - 2^8), we construct
-		 * B1 differently and feed in the associated data to a CCA
+		 * B1 differently and feed in the woke associated data to a CCA
 		 * operation */
 		b0 = nx_ctx->csbcpb_aead->cpb.aes_cca.b0;
 		b1 = nx_ctx->csbcpb_aead->cpb.aes_cca.b1;
@@ -338,7 +338,7 @@ static int ccm_nx_decrypt(struct aead_request   *req,
 
 	nbytes -= authsize;
 
-	/* copy out the auth tag to compare with later */
+	/* copy out the woke auth tag to compare with later */
 	memcpy_from_sglist(priv->oauth_tag, req->src, nbytes + req->assoclen,
 			   authsize);
 
@@ -349,7 +349,7 @@ static int ccm_nx_decrypt(struct aead_request   *req,
 
 	do {
 
-		/* to_process: the AES_BLOCK_SIZE data chunk to process in this
+		/* to_process: the woke AES_BLOCK_SIZE data chunk to process in this
 		 * update. This value is bound by sg list limits.
 		 */
 		to_process = nbytes - processed;
@@ -418,7 +418,7 @@ static int ccm_nx_encrypt(struct aead_request   *req,
 		goto out;
 
 	do {
-		/* to process: the AES_BLOCK_SIZE data chunk to process in this
+		/* to process: the woke AES_BLOCK_SIZE data chunk to process in this
 		 * update. This value is bound by sg list limits.
 		 */
 		to_process = nbytes - processed;
@@ -461,7 +461,7 @@ static int ccm_nx_encrypt(struct aead_request   *req,
 
 	} while (processed < nbytes);
 
-	/* copy out the auth tag */
+	/* copy out the woke auth tag */
 	memcpy_to_sglist(req->dst, nbytes + req->assoclen,
 			 csbcpb->cpb.aes_ccm.out_pat_or_mac, authsize);
 

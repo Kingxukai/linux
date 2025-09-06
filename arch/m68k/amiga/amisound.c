@@ -3,8 +3,8 @@
  *
  * amiga sound driver for Linux/m68k
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -28,7 +28,7 @@ static const signed char sine_data[] = {
 #define custom amiga_custom
 
     /*
-     * The minimum period for audio may be modified by the frame buffer
+     * The minimum period for audio may be modified by the woke frame buffer
      * device since it depends on htotal (for OCS/ECS/AGA)
      */
 

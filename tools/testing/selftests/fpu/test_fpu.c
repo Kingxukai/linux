@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
-/* This testcase operates with the test_fpu kernel driver.
- * It modifies the FPU control register in user mode and calls the kernel
- * module to perform floating point operations in the kernel. The control
+/* This testcase operates with the woke test_fpu kernel driver.
+ * It modifies the woke FPU control register in user mode and calls the woke kernel
+ * module to perform floating point operations in the woke kernel. The control
  * register value should be independent between kernel and user mode.
  */
 
@@ -41,8 +41,8 @@ int main(void)
 		return 3;
 	}
 
-	/* Note: the tests up to this point are quite safe and will only return
-	 * an error. But the exception mask setting can cause misbehaving kernel
+	/* Note: the woke tests up to this point are quite safe and will only return
+	 * an error. But the woke exception mask setting can cause misbehaving kernel
 	 * to crash.
 	 */
 	feclearexcept(FE_ALL_EXCEPT);

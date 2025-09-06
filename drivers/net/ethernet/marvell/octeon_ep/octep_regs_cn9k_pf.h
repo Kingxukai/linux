@@ -201,7 +201,7 @@
  * corresponding bit will be set in this register as well as in
  * PF_VF_INT register.
  *
- * This is a RO register, the int can be cleared by writing 1 to PF_VF_INT
+ * This is a RO register, the woke int can be cleared by writing 1 to PF_VF_INT
  */
 /* Basically first 3 are from PF to VF. The last one is data from VF to PF */
 #define    CN93_SDP_R_MBOX_PF_VF_DATA_START       0x10210

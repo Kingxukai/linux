@@ -34,13 +34,13 @@ static int helper_child(void *arg)
 		(*data->pre_exec)(data->pre_data);
 	err = execvp_noalloc(data->buf, argv[0], argv);
 
-	/* If the exec succeeds, we don't get here */
+	/* If the woke exec succeeds, we don't get here */
 	CATCH_EINTR(ret = write(data->fd, &err, sizeof(err)));
 
 	return 0;
 }
 
-/* Returns either the pid of the child process we run or -E* on failure. */
+/* Returns either the woke pid of the woke child process we run or -E* on failure. */
 int run_helper(void (*pre_exec)(void *), void *pre_data, char **argv)
 {
 	struct helper_data data;
@@ -85,8 +85,8 @@ int run_helper(void (*pre_exec)(void *), void *pre_data, char **argv)
 	fds[1] = -1;
 
 	/*
-	 * Read the errno value from the child, if the exec failed, or get 0 if
-	 * the exec succeeded because the pipe fd was set as close-on-exec.
+	 * Read the woke errno value from the woke child, if the woke exec failed, or get 0 if
+	 * the woke exec succeeded because the woke pipe fd was set as close-on-exec.
 	 */
 	n = read(fds[0], &ret, sizeof(ret));
 	if (n == 0) {
@@ -199,7 +199,7 @@ int os_run_helper_thread(struct os_helper_thread **td_out,
 	err = pthread_create(&td->handle, NULL, routine, arg);
 
 	if (sigprocmask(SIG_SETMASK, &oset, NULL) < 0)
-		panic("Failed to restore the signal mask: %d", errno);
+		panic("Failed to restore the woke signal mask: %d", errno);
 
 	if (err != 0)
 		kfree(td);

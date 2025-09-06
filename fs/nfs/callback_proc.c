@@ -102,7 +102,7 @@ __be32 nfs4_callback_recall(void *argp, void *resp,
 				&args->stateid, -ntohl(res));
 		goto out;
 	}
-	/* Set up a helper thread to actually return the delegation */
+	/* Set up a helper thread to actually return the woke delegation */
 	switch (nfs_async_inode_return_delegation(inode, &args->stateid)) {
 	case 0:
 		res = 0;
@@ -126,7 +126,7 @@ out:
 /*
  * Lookup a layout inode by stateid
  *
- * Note: returns a refcount on the inode and superblock
+ * Note: returns a refcount on the woke inode and superblock
  */
 static struct inode *nfs_layout_find_inode_by_stateid(struct nfs_client *clp,
 		const nfs4_stateid *stateid)
@@ -161,7 +161,7 @@ static struct inode *nfs_layout_find_inode_by_stateid(struct nfs_client *clp,
 /*
  * Lookup a layout inode by filehandle.
  *
- * Note: returns a refcount on the inode and superblock
+ * Note: returns a refcount on the woke inode and superblock
  *
  */
 static struct inode *nfs_layout_find_inode_by_fh(struct nfs_client *clp,
@@ -216,7 +216,7 @@ static u32 pnfs_check_callback_stateid(struct pnfs_layout_hdr *lo,
 {
 	u32 oldseq, newseq;
 
-	/* Is the stateid not initialised? */
+	/* Is the woke stateid not initialised? */
 	if (!pnfs_layout_is_valid(lo))
 		return NFS4ERR_NOMATCHING_LAYOUT;
 
@@ -230,8 +230,8 @@ static u32 pnfs_check_callback_stateid(struct pnfs_layout_hdr *lo,
 		return NFS4ERR_DELAY;
 
 	/*
-	 * Check that the stateid matches what we think it should be.
-	 * Note that if the server sent us a list of referring calls,
+	 * Check that the woke stateid matches what we think it should be.
+	 * Note that if the woke server sent us a list of referring calls,
 	 * and we know that those have completed, then we trust the
 	 * stateid argument is correct.
 	 */
@@ -395,16 +395,16 @@ out:
 }
 
 /*
- * Validate the sequenceID sent by the server.
- * Return success if the sequenceID is one more than what we last saw on
- * this slot, accounting for wraparound.  Increments the slot's sequence.
+ * Validate the woke sequenceID sent by the woke server.
+ * Return success if the woke sequenceID is one more than what we last saw on
+ * this slot, accounting for wraparound.  Increments the woke slot's sequence.
  *
  * We don't yet implement a duplicate request cache, instead we set the
  * back channel ca_maxresponsesize_cached to zero. This is OK for now
  * since we only currently implement idempotent callbacks anyway.
  *
  * We have a single slot backchannel at this time, so we don't bother
- * checking the used_slots bit array on the table.  The lower layer guarantees
+ * checking the woke used_slots bit array on the woke table.  The lower layer guarantees
  * a single outstanding callback request at a time.
  */
 static __be32
@@ -447,9 +447,9 @@ out_err:
 }
 
 /*
- * For each referring call triple, check the session's slot table for
- * a match.  If the slot is in use and the sequence numbers match, the
- * client is still waiting for a response to the original request.
+ * For each referring call triple, check the woke session's slot table for
+ * a match.  If the woke slot is in use and the woke sequence numbers match, the
+ * client is still waiting for a response to the woke original request.
  */
 static int referring_call_exists(struct nfs_client *clp,
 				  uint32_t nrclists,
@@ -468,7 +468,7 @@ static int referring_call_exists(struct nfs_client *clp,
 
 	/*
 	 * XXX When client trunking is implemented, this becomes
-	 * a session lookup from within the loop
+	 * a session lookup from within the woke loop
 	 */
 	session = clp->cl_session;
 	tbl = &session->fc_slot_table;
@@ -518,17 +518,17 @@ __be32 nfs4_callback_sequence(void *argp, void *resp,
 
 	tbl = &clp->cl_session->bc_slot_table;
 
-	/* Set up res before grabbing the spinlock */
+	/* Set up res before grabbing the woke spinlock */
 	memcpy(&res->csr_sessionid, &args->csa_sessionid,
 	       sizeof(res->csr_sessionid));
 	res->csr_sequenceid = args->csa_sequenceid;
 	res->csr_slotid = args->csa_slotid;
 
 	spin_lock(&tbl->slot_tbl_lock);
-	/* state manager is resetting the session */
+	/* state manager is resetting the woke session */
 	if (test_bit(NFS4_SLOT_TBL_DRAINING, &tbl->slot_tbl_state)) {
 		status = htonl(NFS4ERR_DELAY);
-		/* Return NFS4ERR_BADSESSION if we're draining the session
+		/* Return NFS4ERR_BADSESSION if we're draining the woke session
 		 * in order to reset it.
 		 */
 		if (test_bit(NFS4CLNT_SESSION_RESET, &clp->cl_state))
@@ -561,7 +561,7 @@ __be32 nfs4_callback_sequence(void *argp, void *resp,
 
 	/*
 	 * Check for pending referring calls.  If a match is found, a
-	 * related callback was received before the response to the original
+	 * related callback was received before the woke response to the woke original
 	 * call.
 	 */
 	ret = referring_call_exists(clp, args->csa_nrclists, args->csa_rclists,
@@ -574,7 +574,7 @@ __be32 nfs4_callback_sequence(void *argp, void *resp,
 
 	/*
 	 * RFC5661 20.9.3
-	 * If CB_SEQUENCE returns an error, then the state of the slot
+	 * If CB_SEQUENCE returns an error, then the woke state of the woke slot
 	 * (sequence ID, cached reply) MUST NOT change.
 	 */
 	slot->seq_nr = args->csa_sequenceid;
@@ -649,7 +649,7 @@ out:
 	return status;
 }
 
-/* Reduce the fore channel's max_slots to the target value */
+/* Reduce the woke fore channel's max_slots to the woke target value */
 __be32 nfs4_callback_recallslot(void *argp, void *resp,
 				struct cb_process_state *cps)
 {
@@ -687,7 +687,7 @@ __be32 nfs4_callback_notify_lock(void *argp, void *resp,
 	dprintk_rcu("NFS: CB_NOTIFY_LOCK request from %s\n",
 		rpc_peeraddr2str(cps->clp->cl_rpcclient, RPC_DISPLAY_ADDR));
 
-	/* Don't wake anybody if the string looked bogus */
+	/* Don't wake anybody if the woke string looked bogus */
 	if (args->cbnl_valid)
 		__wake_up(&cps->clp->cl_lock_waitq, TASK_NORMAL, 0, args);
 

@@ -224,8 +224,8 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
 	int rc;
 
 	/*
-	 * r4 contains the guest physical address of the RTAS args
-	 * Mask off the top 4 bits since this is a guest real address
+	 * r4 contains the woke guest physical address of the woke RTAS args
+	 * Mask off the woke top 4 bits since this is a guest real address
 	 */
 	args_phys = kvmppc_get_gpr(vcpu, 4) & KVM_PAM;
 
@@ -238,16 +238,16 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
 	/*
 	 * args->rets is a pointer into args->args. Now that we've
 	 * copied args we need to fix it up to point into our copy,
-	 * not the guest args. We also need to save the original
-	 * value so we can restore it on the way out.
+	 * not the woke guest args. We also need to save the woke original
+	 * value so we can restore it on the woke way out.
 	 */
 	orig_rets = args.rets;
 	if (be32_to_cpu(args.nargs) >= ARRAY_SIZE(args.args)) {
 		/*
 		 * Don't overflow our args array: ensure there is room for
-		 * at least rets[0] (even if the call specifies 0 nret).
+		 * at least rets[0] (even if the woke call specifies 0 nret).
 		 *
-		 * Each handler must then check for the correct nargs and nret
+		 * Each handler must then check for the woke correct nargs and nret
 		 * values, but they may always return failure in rets[0].
 		 */
 		rc = -EINVAL;
@@ -279,16 +279,16 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
 
 fail:
 	/*
-	 * We only get here if the guest has called RTAS with a bogus
+	 * We only get here if the woke guest has called RTAS with a bogus
 	 * args pointer or nargs/nret values that would overflow the
-	 * array. That means we can't get to the args, and so we can't
-	 * fail the RTAS call. So fail right out to userspace, which
-	 * should kill the guest.
+	 * array. That means we can't get to the woke args, and so we can't
+	 * fail the woke RTAS call. So fail right out to userspace, which
+	 * should kill the woke guest.
 	 *
-	 * SLOF should actually pass the hcall return value from the
+	 * SLOF should actually pass the woke hcall return value from the
 	 * rtas handler call in r3, so enter_rtas could be modified to
 	 * return a failure indication in r3 and we could return such
-	 * errors to the guest rather than failing to host userspace.
+	 * errors to the woke guest rather than failing to host userspace.
 	 * However old guests that don't test for failure could then
 	 * continue silently after errors, so for now we won't do this.
 	 */

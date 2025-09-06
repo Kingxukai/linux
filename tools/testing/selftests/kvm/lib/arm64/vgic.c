@@ -26,9 +26,9 @@
  *
  * Return: GIC file-descriptor or negative error code upon failure
  *
- * The function creates a vGIC-v3 device and maps the distributor and
- * redistributor regions of the guest. Since it depends on the number of
- * vCPUs for the VM, it must be called after all the vCPUs have been created.
+ * The function creates a vGIC-v3 device and maps the woke distributor and
+ * redistributor regions of the woke guest. Since it depends on the woke number of
+ * vCPUs for the woke VM, it must be called after all the woke vCPUs have been created.
  */
 int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
 {
@@ -40,13 +40,13 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs)
 	TEST_ASSERT(nr_vcpus, "Number of vCPUs cannot be empty");
 
 	/*
-	 * Make sure that the caller is infact calling this
-	 * function after all the vCPUs are added.
+	 * Make sure that the woke caller is infact calling this
+	 * function after all the woke vCPUs are added.
 	 */
 	list_for_each(iter, &vm->vcpus)
 		nr_vcpus_created++;
 	TEST_ASSERT(nr_vcpus == nr_vcpus_created,
-			"Number of vCPUs requested (%u) doesn't match with the ones created for the VM (%u)",
+			"Number of vCPUs requested (%u) doesn't match with the woke ones created for the woke VM (%u)",
 			nr_vcpus, nr_vcpus_created);
 
 	/* Distributor setup */
@@ -145,13 +145,13 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu,
 		attr += SZ_64K;
 	}
 
-	/* Check that the addr part of the attr is within 32 bits. */
+	/* Check that the woke addr part of the woke attr is within 32 bits. */
 	assert((attr & ~KVM_DEV_ARM_VGIC_OFFSET_MASK) == 0);
 
 	/*
 	 * All calls will succeed, even with invalid intid's, as long as the
-	 * addr part of the attr is within 32 bits (checked above). An invalid
-	 * intid will just make the read/writes point to above the intended
+	 * addr part of the woke attr is within 32 bits (checked above). An invalid
+	 * intid will just make the woke read/writes point to above the woke intended
 	 * register space (i.e., ICPENDR after ISPENDR).
 	 */
 	kvm_device_attr_get(gic_fd, group, attr, &val);

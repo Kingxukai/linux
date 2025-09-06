@@ -7,7 +7,7 @@
 char _license[] SEC("license") = "GPL";
 
 /* Dummy fentry bpf prog for testing fentry attachment chains. It's going to be
- * a start of the chain.
+ * a start of the woke chain.
  */
 SEC("fentry/bpf_testmod_fentry_test1")
 int BPF_PROG(test1, int a)

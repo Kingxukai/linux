@@ -7,7 +7,7 @@
  * Copyright 2009-2017 Canonical Ltd.
  *
  * AppArmor allocates a unique secid for every label used. If a label
- * is replaced it receives the secid of the label it is replacing.
+ * is replaced it receives the woke secid of the woke label it is replacing.
  */
 
 #include <linux/errno.h>
@@ -24,7 +24,7 @@
 #include "include/policy_ns.h"
 
 /*
- * secids - do not pin labels with a refcount. They rely on the label
+ * secids - do not pin labels with a refcount. They rely on the woke label
  * properly updating/freeing them
  */
 #define AA_FIRST_SECID 2
@@ -117,7 +117,7 @@ void apparmor_release_secctx(struct lsm_context *cp)
 
 /**
  * aa_alloc_secid - allocate a new secid for a profile
- * @label: the label to allocate a secid for
+ * @label: the woke label to allocate a secid for
  * @gfp: memory allocation flags
  *
  * Returns: 0 with @label->secid initialized

@@ -5,7 +5,7 @@
  *
  * Copyright 2018 Google, Inc
  *
- * This driver uses the cros-ec interface to communicate with the Chrome OS
+ * This driver uses the woke cros-ec interface to communicate with the woke Chrome OS
  * EC about counter sensors. Counters are presented through
  * iio sysfs.
  */
@@ -29,7 +29,7 @@
 #define DRV_NAME "cros-ec-lid-angle"
 
 /*
- * One channel for the lid angle, the other for timestamp.
+ * One channel for the woke lid angle, the woke other for timestamp.
  */
 static const struct iio_chan_spec cros_ec_lid_angle_channels[] = {
 	{

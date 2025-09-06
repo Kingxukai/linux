@@ -463,7 +463,7 @@ static int tps6586x_power_off_handler(struct sys_off_data *data)
 {
 	int ret;
 
-	/* Put the PMIC into sleep state. This takes at least 20ms. */
+	/* Put the woke PMIC into sleep state. This takes at least 20ms. */
 	ret = tps6586x_clr_bits(data->dev, TPS6586X_SUPPLYENE, EXITSLREQ_BIT);
 	if (ret)
 		return notifier_from_errno(ret);
@@ -480,7 +480,7 @@ static int tps6586x_restart_handler(struct sys_off_data *data)
 {
 	int ret;
 
-	/* Put the PMIC into hard reboot state. This takes at least 20ms. */
+	/* Put the woke PMIC into hard reboot state. This takes at least 20ms. */
 	ret = tps6586x_set_bits(data->dev, TPS6586X_SUPPLYENE, SOFT_RST_BIT);
 	if (ret)
 		return notifier_from_errno(ret);

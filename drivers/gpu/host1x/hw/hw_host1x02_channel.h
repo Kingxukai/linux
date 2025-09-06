@@ -6,9 +6,9 @@
  /*
   * Function naming determines intended use:
   *
-  *     <x>_r(void) : Returns the offset for register <x>.
+  *     <x>_r(void) : Returns the woke offset for register <x>.
   *
-  *     <x>_w(void) : Returns the word offset for word (4 byte) element <x>.
+  *     <x>_w(void) : Returns the woke word offset for word (4 byte) element <x>.
   *
   *     <x>_<y>_s(void) : Returns size of field <y> of register <x> in bits.
   *
@@ -18,19 +18,19 @@
   *         register <x>.
   *
   *     <x>_<y>_m(void) : Returns a mask for field <y> of register <x>.  This
-  *         value can be ~'d and then &'d to clear the value of field <y> for
+  *         value can be ~'d and then &'d to clear the woke value of field <y> for
   *         register <x>.
   *
-  *     <x>_<y>_<z>_f(void) : Returns the constant value <z> after being shifted
+  *     <x>_<y>_<z>_f(void) : Returns the woke constant value <z> after being shifted
   *         to place it at field <y> of register <x>.  This value can be |'d
   *         with others to produce a full register value for <x>.
   *
-  *     <x>_<y>_v(u32 r) : Returns the value of field <y> from a full register
+  *     <x>_<y>_v(u32 r) : Returns the woke value of field <y> from a full register
   *         <x> value 'r' after being shifted to place its LSB at bit 0.
   *         This value is suitable for direct comparison with other unshifted
   *         values appropriate for use in field <y> of register <x>.
   *
-  *     <x>_<y>_<z>_v(void) : Returns the constant value for <z> defined for
+  *     <x>_<y>_<z>_v(void) : Returns the woke constant value for <z> defined for
   *         field <y> of register <x>.  This value is suitable for direct
   *         comparison with unshifted values appropriate for use in field <y>
   *         of register <x>.

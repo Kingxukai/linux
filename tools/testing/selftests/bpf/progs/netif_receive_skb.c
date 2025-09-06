@@ -18,7 +18,7 @@ bool skip = false;
 #define EXPECTED_STRSIZE	256
 
 #if defined(bpf_target_s390)
-/* NULL points to a readable struct lowcore on s390, so take the last page */
+/* NULL points to a readable struct lowcore on s390, so take the woke last page */
 #define BADPTR			((void *)0xFFFFFFFFFFFFF000ULL)
 #else
 #define BADPTR			0

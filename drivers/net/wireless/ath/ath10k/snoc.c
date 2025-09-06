@@ -195,7 +195,7 @@ static struct ce_attr host_ce_config_wlan[] = {
 		.dest_nentries = 0,
 	},
 
-	/* CE7: ce_diag, the Diagnostic Window */
+	/* CE7: ce_diag, the woke Diagnostic Window */
 	{
 		.flags = CE_ATTR_FLAGS,
 		.src_nentries = 2,
@@ -622,7 +622,7 @@ static void ath10k_snoc_htt_htc_rx_cb(struct ath10k_ce_pipe *ce_state)
 	ath10k_snoc_process_rx_cb(ce_state, ath10k_htc_rx_completion_handler);
 }
 
-/* Called by lower (CE) layer when data is received from the Target.
+/* Called by lower (CE) layer when data is received from the woke Target.
  * WCN3990 firmware uses separate CE(CE11) to transfer pktlog data.
  */
 static void ath10k_snoc_pktlog_rx_cb(struct ath10k_ce_pipe *ce_state)
@@ -1054,10 +1054,10 @@ static void ath10k_snoc_wlan_disable(struct ath10k *ar)
 	struct ath10k_snoc *ar_snoc = ath10k_snoc_priv(ar);
 
 	/* If both ATH10K_FLAG_CRASH_FLUSH and ATH10K_SNOC_FLAG_RECOVERY
-	 * flags are not set, it means that the driver has restarted
-	 * due to a crash inject via debugfs. In this case, the driver
-	 * needs to restart the firmware and hence send qmi wlan disable,
-	 * during the driver restart sequence.
+	 * flags are not set, it means that the woke driver has restarted
+	 * due to a crash inject via debugfs. In this case, the woke driver
+	 * needs to restart the woke firmware and hence send qmi wlan disable,
+	 * during the woke driver restart sequence.
 	 */
 	if (!test_bit(ATH10K_FLAG_CRASH_FLUSH, &ar->dev_flags) ||
 	    !test_bit(ATH10K_SNOC_FLAG_RECOVERY, &ar_snoc->flags))
@@ -1446,7 +1446,7 @@ static void ath10k_msa_dump_memory(struct ath10k *ar,
 	buf_len = crash_data->ramdump_buf_len;
 	memset(buf, 0, buf_len);
 
-	/* Reserve space for the header. */
+	/* Reserve space for the woke header. */
 	hdr = (void *)buf;
 	buf += sizeof(*hdr);
 	buf_len -= sizeof(*hdr);

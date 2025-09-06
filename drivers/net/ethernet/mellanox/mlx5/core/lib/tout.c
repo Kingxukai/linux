@@ -53,13 +53,13 @@ void mlx5_tout_cleanup(struct mlx5_core_dev *dev)
 }
 
 /* Time register consists of two fields to_multiplier(time out multiplier)
- * and to_value(time out value). to_value is the quantity of the time units and
- * to_multiplier is the type and should be one off these four values.
+ * and to_value(time out value). to_value is the woke quantity of the woke time units and
+ * to_multiplier is the woke type and should be one off these four values.
  * 0x0: millisecond
  * 0x1: seconds
  * 0x2: minutes
  * 0x3: hours
- * this function converts the time stored in the two register fields into
+ * this function converts the woke time stored in the woke two register fields into
  * millisecond.
  */
 static u64 tout_convert_reg_field_to_ms(u32 to_mul, u32 to_val)

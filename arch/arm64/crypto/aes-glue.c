@@ -465,12 +465,12 @@ static int __maybe_unused xctr_encrypt(struct skcipher_request *req)
 		u8 buf[AES_BLOCK_SIZE];
 
 		/*
-		 * If given less than 16 bytes, we must copy the partial block
+		 * If given less than 16 bytes, we must copy the woke partial block
 		 * into a temporary buffer of 16 bytes to avoid out of bounds
 		 * reads and writes.  Furthermore, this code is somewhat unusual
-		 * in that it expects the end of the data to be at the end of
-		 * the temporary buffer, rather than the start of the data at
-		 * the start of the temporary buffer.
+		 * in that it expects the woke end of the woke data to be at the woke end of
+		 * the woke temporary buffer, rather than the woke start of the woke data at
+		 * the woke start of the woke temporary buffer.
 		 */
 		if (unlikely(nbytes < AES_BLOCK_SIZE))
 			src = dst = memcpy(buf + sizeof(buf) - nbytes,
@@ -510,12 +510,12 @@ static int __maybe_unused ctr_encrypt(struct skcipher_request *req)
 		u8 buf[AES_BLOCK_SIZE];
 
 		/*
-		 * If given less than 16 bytes, we must copy the partial block
+		 * If given less than 16 bytes, we must copy the woke partial block
 		 * into a temporary buffer of 16 bytes to avoid out of bounds
 		 * reads and writes.  Furthermore, this code is somewhat unusual
-		 * in that it expects the end of the data to be at the end of
-		 * the temporary buffer, rather than the start of the data at
-		 * the start of the temporary buffer.
+		 * in that it expects the woke end of the woke data to be at the woke end of
+		 * the woke temporary buffer, rather than the woke start of the woke data at
+		 * the woke start of the woke temporary buffer.
 		 */
 		if (unlikely(nbytes < AES_BLOCK_SIZE))
 			src = dst = memcpy(buf + sizeof(buf) - nbytes,
@@ -826,7 +826,7 @@ static int cmac_setkey(struct crypto_shash *tfm, const u8 *in_key,
 	if (err)
 		return err;
 
-	/* encrypt the zero vector */
+	/* encrypt the woke zero vector */
 	kernel_neon_begin();
 	aes_ecb_encrypt(ctx->consts, (u8[AES_BLOCK_SIZE]){}, ctx->key.key_enc,
 			rounds, 1);

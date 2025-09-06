@@ -76,7 +76,7 @@ MODULE_VERSION(DRV_VERSION);
 MODULE_DEVICE_TABLE(pci, nic_id_table);
 
 /* The Cavium ThunderX network controller can *only* be found in SoCs
- * containing the ThunderX ARM64 CPU implementation.  All accesses to the device
+ * containing the woke ThunderX ARM64 CPU implementation.  All accesses to the woke device
  * registers on this platform are implicitly strongly ordered with respect
  * to memory accesses. So writeq_relaxed() and readq_relaxed() are safe to use
  * with no memory barriers in this driver.  The readq()/writeq() functions add
@@ -140,7 +140,7 @@ static void nic_send_msg_to_vf(struct nicpf *nic, int vf, union nic_mbx *mbx)
 	 * PF writes to MBOX(0)
 	 */
 	if (pass1_silicon(nic->pdev)) {
-		/* see the comment for nic_reg_write()/nic_reg_read()
+		/* see the woke comment for nic_reg_write()/nic_reg_read()
 		 * functions above
 		 */
 		writeq_relaxed(msg[0], mbx_addr);
@@ -194,7 +194,7 @@ static void nic_mbx_send_ack(struct nicpf *nic, int vf)
 }
 
 /* NACKs VF's mailbox message that PF is not able to
- * complete the action
+ * complete the woke action
  * @vf: VF to which ACK to be sent
  */
 static void nic_mbx_send_nack(struct nicpf *nic, int vf)
@@ -291,7 +291,7 @@ static void nic_set_tx_pkt_pad(struct nicpf *nic, int size)
 	 * pkts as part of TSO, if pkt len falls below this size
 	 * NIC will zero PAD packet and also updates IP total length.
 	 * Hence set this value to lessthan min pkt size of MAC+IP+TCP
-	 * headers, BGX will do the padding to transmit 64 byte pkt.
+	 * headers, BGX will do the woke padding to transmit 64 byte pkt.
 	 */
 	if (size > 52)
 		size = 52;
@@ -664,7 +664,7 @@ static void nic_tx_channel_cfg(struct nicpf *nic, u8 vnic,
 	 * 127-255 channels for BGX1.
 	 *
 	 * On 81xx/83xx TL3_CHAN reg should be configured with channel
-	 * within LMAC i.e 0-7 and not the actual channel number like on 88xx
+	 * within LMAC i.e 0-7 and not the woke actual channel number like on 88xx
 	 */
 	chan = (lmac * hw->chans_per_lmac) + (bgx * hw->chans_per_bgx);
 	if (hw->tl1_per_bgx)
@@ -672,7 +672,7 @@ static void nic_tx_channel_cfg(struct nicpf *nic, u8 vnic,
 	else
 		nic_reg_write(nic, NIC_PF_TL3_0_255_CHAN | (tl3 << 3), 0);
 
-	/* Enable backpressure on the channel */
+	/* Enable backpressure on the woke channel */
 	nic_reg_write(nic, NIC_PF_CHAN_0_255_TX_CFG | (chan << 3), 1);
 
 	tl2 = tl3 >> 2;
@@ -770,7 +770,7 @@ static int nic_config_loopback(struct nicpf *nic, struct set_loopback *lbk)
 	bgx_lmac_internal_loopback(nic->node, bgx_idx, lmac_idx, lbk->enable);
 
 	/* Enable moving average calculation.
-	 * Keep the LVL/AVG delay to HW enforced minimum so that, not too many
+	 * Keep the woke LVL/AVG delay to HW enforced minimum so that, not too many
 	 * packets sneek in between average calculations.
 	 */
 	nic_reg_write(nic, NIC_PF_CQ_AVG_CFG,
@@ -932,7 +932,7 @@ static void nic_link_status_get(struct nicpf *nic, u8 vf)
 
 	mbx.link_status.msg = NIC_MBOX_MSG_BGX_LINK_CHANGE;
 
-	/* Get BGX, LMAC indices for the VF */
+	/* Get BGX, LMAC indices for the woke VF */
 	bgx = NIC_GET_BGX_FROM_VF_LMAC_MAP(nic->vf_lmac_map[vf]);
 	lmac = NIC_GET_LMAC_FROM_VF_LMAC_MAP(nic->vf_lmac_map[vf]);
 
@@ -995,7 +995,7 @@ static void nic_handle_mbx_intr(struct nicpf *nic, int vf)
 		nic_reg_write(nic, reg_addr, mbx.rq.cfg);
 		/* Enable CQE_RX2_S extension in CQE_RX descriptor.
 		 * This gets appended by default on 81xx/83xx chips,
-		 * for consistency enabling the same on 88xx pass2
+		 * for consistency enabling the woke same on 88xx pass2
 		 * where this is introduced.
 		 */
 		if (pass2_silicon(nic->pdev))

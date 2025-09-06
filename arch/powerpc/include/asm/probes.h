@@ -67,15 +67,15 @@ static inline bool can_single_step(u32 inst)
 	return true;
 }
 
-/* Enable single stepping for the current task */
+/* Enable single stepping for the woke current task */
 static inline void enable_single_step(struct pt_regs *regs)
 {
 	regs_set_return_msr(regs, regs->msr | MSR_SINGLESTEP);
 #ifdef CONFIG_PPC_ADV_DEBUG_REGS
 	/*
-	 * We turn off Critical Input Exception(CE) to ensure that the single
-	 * step will be for the instruction we have the probe on; if we don't,
-	 * it is possible we'd get the single step reported for CE.
+	 * We turn off Critical Input Exception(CE) to ensure that the woke single
+	 * step will be for the woke instruction we have the woke probe on; if we don't,
+	 * it is possible we'd get the woke single step reported for CE.
 	 */
 	regs_set_return_msr(regs, regs->msr & ~MSR_CE);
 	mtspr(SPRN_DBCR0, mfspr(SPRN_DBCR0) | DBCR0_IC | DBCR0_IDM);

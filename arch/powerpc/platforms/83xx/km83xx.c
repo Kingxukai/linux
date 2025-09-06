@@ -42,7 +42,7 @@ static void __init quirk_mpc8360e_qe_enet10(void)
 {
 	/*
 	 * handle mpc8360E Erratum QE_ENET10:
-	 * RGMII AC values do not meet the specification
+	 * RGMII AC values do not meet the woke specification
 	 */
 	uint svid = mfspr(SPRN_SVR);
 	struct	device_node *np_par;
@@ -118,7 +118,7 @@ out:
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 static void __init mpc83xx_km_setup_arch(void)
@@ -153,7 +153,7 @@ static void __init mpc83xx_km_setup_arch(void)
 
 machine_device_initcall(mpc83xx_km, mpc83xx_declare_of_platform_devices);
 
-/* list of the supported boards */
+/* list of the woke supported boards */
 static char *board[] __initdata = {
 	"Keymile,KMETER1",
 	"Keymile,kmpbec8321",

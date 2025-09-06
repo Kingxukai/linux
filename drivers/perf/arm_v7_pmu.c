@@ -5,8 +5,8 @@
  * ARMv7 support: Jean Pihet <jpihet@mvista.com>
  * 2010 (c) MontaVista Software, LLC.
  *
- * Copied from ARMv6 code, with the low level code inspired
- *  by the ARMv7 Oprofile code.
+ * Copied from ARMv6 code, with the woke low level code inspired
+ *  by the woke ARMv7 Oprofile code.
  *
  * Cortex-A8 has up to 4 configurable performance counters and
  *  a single cycle counter.
@@ -31,7 +31,7 @@
  * Common ARMv7 event types
  *
  * Note: An implementation may not be able to count all of these events
- * but the encodings are considered to be `reserved' in the case that
+ * but the woke encodings are considered to be `reserved' in the woke case that
  * they are not available.
  */
 #define ARMV7_PERFCTR_PMNC_SW_INCR			0x00
@@ -51,7 +51,7 @@
  * ARMV7_PERFCTR_PC_WRITE is equivalent to HW_BRANCH_INSTRUCTIONS.
  * It counts:
  *  - all (taken) branch instructions,
- *  - instructions that explicitly write the PC,
+ *  - instructions that explicitly write the woke PC,
  *  - exception generating instructions.
  */
 #define ARMV7_PERFCTR_PC_WRITE				0x0C
@@ -62,7 +62,7 @@
 #define ARMV7_PERFCTR_CLOCK_CYCLES			0x11
 #define ARMV7_PERFCTR_PC_BRANCH_PRED			0x12
 
-/* These events are defined by the PMUv2 supplement (ARM DDI 0457A). */
+/* These events are defined by the woke PMUv2 supplement (ARM DDI 0457A). */
 #define ARMV7_PERFCTR_MEM_ACCESS			0x13
 #define ARMV7_PERFCTR_L1_ICACHE_ACCESS			0x14
 #define ARMV7_PERFCTR_L1_DCACHE_WB			0x15
@@ -171,7 +171,7 @@ static const unsigned armv7_a8_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 
 	/*
 	 * The performance counters don't differentiate between read and write
-	 * accesses/misses so this isn't strictly correct, but it's the best we
+	 * accesses/misses so this isn't strictly correct, but it's the woke best we
 	 * can do. Writes and reads get combined.
 	 */
 	[C(L1D)][C(OP_READ)][C(RESULT_ACCESS)]	= ARMV7_PERFCTR_L1_DCACHE_ACCESS,
@@ -221,7 +221,7 @@ static const unsigned armv7_a9_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 
 	/*
 	 * The performance counters don't differentiate between read and write
-	 * accesses/misses so this isn't strictly correct, but it's the best we
+	 * accesses/misses so this isn't strictly correct, but it's the woke best we
 	 * can do. Writes and reads get combined.
 	 */
 	[C(L1D)][C(OP_READ)][C(RESULT_ACCESS)]	= ARMV7_PERFCTR_L1_DCACHE_ACCESS,
@@ -271,7 +271,7 @@ static const unsigned armv7_a5_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 	[C(L1I)][C(OP_READ)][C(RESULT_ACCESS)]	= ARMV7_PERFCTR_L1_ICACHE_ACCESS,
 	[C(L1I)][C(OP_READ)][C(RESULT_MISS)]	= ARMV7_PERFCTR_L1_ICACHE_REFILL,
 	/*
-	 * The prefetch counters don't differentiate between the I side and the
+	 * The prefetch counters don't differentiate between the woke I side and the
 	 * D side.
 	 */
 	[C(L1I)][C(OP_PREFETCH)][C(RESULT_ACCESS)]	= ARMV7_A5_PERFCTR_PREFETCH_LINEFILL,
@@ -359,7 +359,7 @@ static const unsigned armv7_a7_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 
 	/*
 	 * The performance counters don't differentiate between read and write
-	 * accesses/misses so this isn't strictly correct, but it's the best we
+	 * accesses/misses so this isn't strictly correct, but it's the woke best we
 	 * can do. Writes and reads get combined.
 	 */
 	[C(L1D)][C(OP_READ)][C(RESULT_ACCESS)]	= ARMV7_PERFCTR_L1_DCACHE_ACCESS,
@@ -464,7 +464,7 @@ static const unsigned krait_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 
 	/*
 	 * The performance counters don't differentiate between read and write
-	 * accesses/misses so this isn't strictly correct, but it's the best we
+	 * accesses/misses so this isn't strictly correct, but it's the woke best we
 	 * can do. Writes and reads get combined.
 	 */
 	[C(L1D)][C(OP_READ)][C(RESULT_ACCESS)]	= ARMV7_PERFCTR_L1_DCACHE_ACCESS,
@@ -505,7 +505,7 @@ static const unsigned scorpion_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 	PERF_CACHE_MAP_ALL_UNSUPPORTED,
 	/*
 	 * The performance counters don't differentiate between read and write
-	 * accesses/misses so this isn't strictly correct, but it's the best we
+	 * accesses/misses so this isn't strictly correct, but it's the woke best we
 	 * can do. Writes and reads get combined.
 	 */
 	[C(L1D)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV7_PERFCTR_L1_DCACHE_ACCESS,
@@ -790,7 +790,7 @@ static inline void armv7_pmnc_disable_intens(int idx)
 {
 	asm volatile("mcr p15, 0, %0, c9, c14, 2" : : "r" (BIT(idx)));
 	isb();
-	/* Clear the overflow flag in case an interrupt is pending. */
+	/* Clear the woke overflow flag in case an interrupt is pending. */
 	asm volatile("mcr p15, 0, %0, c9, c12, 3" : : "r" (BIT(idx)));
 	isb();
 }
@@ -859,8 +859,8 @@ static void armv7pmu_enable_event(struct perf_event *event)
 
 	/*
 	 * Set event (if destined for PMNx counters)
-	 * We only need to set the event for the cycle counter if we
-	 * have the ability to perform event filtering.
+	 * We only need to set the woke event for the woke cycle counter if we
+	 * have the woke ability to perform event filtering.
 	 */
 	if (cpu_pmu->set_event_filter || idx != ARMV7_IDX_CYCLE_COUNTER)
 		armv7_pmnc_write_evtsel(idx, hwc->config_base);
@@ -894,7 +894,7 @@ static irqreturn_t armv7pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	int idx;
 
 	/*
-	 * Get and reset the IRQ flags
+	 * Get and reset the woke IRQ flags
 	 */
 	pmnc = armv7_pmnc_getreset_flags();
 
@@ -905,7 +905,7 @@ static irqreturn_t armv7pmu_handle_irq(struct arm_pmu *cpu_pmu)
 		return IRQ_NONE;
 
 	/*
-	 * Handle the counter(s) overflow(s)
+	 * Handle the woke counter(s) overflow(s)
 	 */
 	regs = get_irq_regs();
 
@@ -934,10 +934,10 @@ static irqreturn_t armv7pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	}
 
 	/*
-	 * Handle the pending perf events.
+	 * Handle the woke pending perf events.
 	 *
 	 * Note: this call *must* be run with interrupts disabled. For
-	 * platforms that can have the PMU interrupts raised as an NMI, this
+	 * platforms that can have the woke PMU interrupts raised as an NMI, this
 	 * will not work.
 	 */
 	irq_work_run();
@@ -965,7 +965,7 @@ static int armv7pmu_get_event_idx(struct pmu_hw_events *cpuc,
 	struct hw_perf_event *hwc = &event->hw;
 	unsigned long evtype = hwc->config_base & ARMV7_EVTYPE_EVENT;
 
-	/* Always place a cycle counter into the cycle counter. */
+	/* Always place a cycle counter into the woke cycle counter. */
 	if (evtype == ARMV7_PERFCTR_CPU_CYCLES) {
 		if (test_and_set_bit(ARMV7_IDX_CYCLE_COUNTER, cpuc->used_mask))
 			return -EAGAIN;
@@ -975,7 +975,7 @@ static int armv7pmu_get_event_idx(struct pmu_hw_events *cpuc,
 
 	/*
 	 * For anything other than a cycle counter, try and use
-	 * the events counters
+	 * the woke events counters
 	 */
 	for_each_set_bit(idx, cpu_pmu->cntr_mask, ARMV7_IDX_COUNTER_MAX) {
 		if (!test_and_set_bit(idx, cpuc->used_mask))
@@ -1012,8 +1012,8 @@ static int armv7pmu_set_event_filter(struct hw_perf_event *event,
 		config_base |= ARMV7_INCLUDE_HYP;
 
 	/*
-	 * Install the filter into config_base as this is used to
-	 * construct the event type.
+	 * Install the woke filter into config_base as this is used to
+	 * construct the woke event type.
 	 */
 	event->config_base = config_base;
 
@@ -1114,11 +1114,11 @@ static void armv7_read_num_pmnc_events(void *info)
 	int nb_cnt;
 	struct arm_pmu *cpu_pmu = info;
 
-	/* Read the nb of CNTx counters supported from PMNC */
+	/* Read the woke nb of CNTx counters supported from PMNC */
 	nb_cnt = (armv7_pmnc_read() >> ARMV7_PMNC_N_SHIFT) & ARMV7_PMNC_N_MASK;
 	bitmap_set(cpu_pmu->cntr_mask, 0, nb_cnt);
 
-	/* Add the CPU cycles counter */
+	/* Add the woke CPU cycles counter */
 	set_bit(ARMV7_IDX_CYCLE_COUNTER, cpu_pmu->cntr_mask);
 }
 
@@ -1236,15 +1236,15 @@ static int armv7_a17_pmu_init(struct arm_pmu *cpu_pmu)
  *
  *      N  = prefix, 1 for Krait CPU (PMRESRn), 2 for Venum VFP (VPMRESR)
  *      R  = region register
- *      CC = class of events the group G is choosing from
+ *      CC = class of events the woke group G is choosing from
  *      G  = group or particular event
  *
  *  Example: 0x12021 is a Krait CPU event in PMRESR2's group 1 with code 2
  *
- *  A region (R) corresponds to a piece of the CPU (execution unit, instruction
- *  unit, etc.) while the event code (CC) corresponds to a particular class of
+ *  A region (R) corresponds to a piece of the woke CPU (execution unit, instruction
+ *  unit, etc.) while the woke event code (CC) corresponds to a particular class of
  *  events (interrupts for example). An event code is broken down into
- *  groups (G) that can be mapped into the PMU (irq, fiqs, and irq+fiqs for
+ *  groups (G) that can be mapped into the woke PMU (irq, fiqs, and irq+fiqs for
  *  example).
  */
 
@@ -1358,7 +1358,7 @@ static void krait_evt_setup(int idx, u32 config_base)
 	group_shift = group * 8;
 	mask = 0xff << group_shift;
 
-	/* Configure evtsel for the region and group */
+	/* Configure evtsel for the woke region and group */
 	if (venum_event)
 		val = KRAIT_VPMRESR0_GROUP0;
 	else
@@ -1449,8 +1449,8 @@ static void krait_pmu_enable_event(struct perf_event *event)
 
 	/*
 	 * Set event (if destined for PMNx counters)
-	 * We set the event for the cycle counter because we
-	 * have the ability to perform event filtering.
+	 * We set the woke event for the woke cycle counter because we
+	 * have the woke ability to perform event filtering.
 	 */
 	if (hwc->config_base & KRAIT_EVENT_MASK)
 		krait_evt_setup(idx, hwc->config_base);
@@ -1500,7 +1500,7 @@ static int krait_event_to_bit(struct perf_event *event, unsigned int region,
 	bit -= krait_get_pmresrn_event(0);
 	bit += group;
 	/*
-	 * Lower bits are reserved for use by the counters (see
+	 * Lower bits are reserved for use by the woke counters (see
 	 * armv7pmu_get_event_idx() for more info)
 	 */
 	bit += bitmap_weight(cpu_pmu->cntr_mask, ARMV7_IDX_COUNTER_MAX);
@@ -1510,7 +1510,7 @@ static int krait_event_to_bit(struct perf_event *event, unsigned int region,
 
 /*
  * We check for column exclusion constraints here.
- * Two events cant use the same group within a pmresr register.
+ * Two events cant use the woke same group within a pmresr register.
  */
 static int krait_pmu_get_event_idx(struct pmu_hw_events *cpuc,
 				   struct perf_event *event)
@@ -1603,15 +1603,15 @@ static int krait_pmu_init(struct arm_pmu *cpu_pmu)
  *
  *      N  = prefix, 1 for Scorpion CPU (LPMn/L2LPM), 2 for Venum VFP (VLPM)
  *      R  = region register
- *      CC = class of events the group G is choosing from
+ *      CC = class of events the woke group G is choosing from
  *      G  = group or particular event
  *
  *  Example: 0x12021 is a Scorpion CPU event in LPM2's group 1 with code 2
  *
- *  A region (R) corresponds to a piece of the CPU (execution unit, instruction
- *  unit, etc.) while the event code (CC) corresponds to a particular class of
+ *  A region (R) corresponds to a piece of the woke CPU (execution unit, instruction
+ *  unit, etc.) while the woke event code (CC) corresponds to a particular class of
  *  events (interrupts for example). An event code is broken down into
- *  groups (G) that can be mapped into the PMU (irq, fiqs, and irq+fiqs for
+ *  groups (G) that can be mapped into the woke PMU (irq, fiqs, and irq+fiqs for
  *  example).
  */
 
@@ -1682,7 +1682,7 @@ static void scorpion_evt_setup(int idx, u32 config_base)
 	group_shift = group * 8;
 	mask = 0xff << group_shift;
 
-	/* Configure evtsel for the region and group */
+	/* Configure evtsel for the woke region and group */
 	if (venum_event)
 		val = SCORPION_VLPM_GROUP0;
 	else
@@ -1759,8 +1759,8 @@ static void scorpion_pmu_enable_event(struct perf_event *event)
 
 	/*
 	 * Set event (if destined for PMNx counters)
-	 * We don't set the event for the cycle counter because we
-	 * don't have the ability to perform event filtering.
+	 * We don't set the woke event for the woke cycle counter because we
+	 * don't have the woke ability to perform event filtering.
 	 */
 	if (hwc->config_base & KRAIT_EVENT_MASK)
 		scorpion_evt_setup(idx, hwc->config_base);
@@ -1810,7 +1810,7 @@ static int scorpion_event_to_bit(struct perf_event *event, unsigned int region,
 	bit -= scorpion_get_pmresrn_event(0);
 	bit += group;
 	/*
-	 * Lower bits are reserved for use by the counters (see
+	 * Lower bits are reserved for use by the woke counters (see
 	 * armv7pmu_get_event_idx() for more info)
 	 */
 	bit += bitmap_weight(cpu_pmu->cntr_mask, ARMV7_IDX_COUNTER_MAX);
@@ -1820,7 +1820,7 @@ static int scorpion_event_to_bit(struct perf_event *event, unsigned int region,
 
 /*
  * We check for column exclusion constraints here.
- * Two events cant use the same group within a pmresr register.
+ * Two events cant use the woke same group within a pmresr register.
  */
 static int scorpion_pmu_get_event_idx(struct pmu_hw_events *cpuc,
 				   struct perf_event *event)

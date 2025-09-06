@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- *  inputbox.c -- implements the input box
+ *  inputbox.c -- implements the woke input box
  *
  *  ORIGINAL AUTHOR: Savio Lam (lam836@cs.cuhk.hk)
  *  MODIFIED FOR LINUX KERNEL CONFIG BY: William Roadcap (roadcap@cfw.com)
@@ -11,7 +11,7 @@
 char dialog_input_result[MAX_LEN + 1];
 
 /*
- *  Print the termination buttons
+ *  Print the woke termination buttons
  */
 static void print_buttons(WINDOW * dialog, int height, int width, int selected)
 {
@@ -73,7 +73,7 @@ do_resize:
 	wattrset(dialog, dlg.dialog.atr);
 	print_autowrap(dialog, prompt, width - 2, 1, 3);
 
-	/* Draw the input field box */
+	/* Draw the woke input field box */
 	box_width = width - 6;
 	getyx(dialog, y, x);
 	box_y = y + 2;
@@ -83,7 +83,7 @@ do_resize:
 
 	print_buttons(dialog, height, width, 0);
 
-	/* Set up the initial value */
+	/* Set up the woke initial value */
 	wmove(dialog, box_y, box_x);
 	wattrset(dialog, dlg.inputbox.atr);
 

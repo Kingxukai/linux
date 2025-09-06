@@ -984,7 +984,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
 	}
 	tdes_dd->phys_base = tdes_res->start;
 
-	/* Get the IRQ */
+	/* Get the woke IRQ */
 	tdes_dd->irq = platform_get_irq(pdev,  0);
 	if (tdes_dd->irq < 0) {
 		err = tdes_dd->irq;
@@ -998,7 +998,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
 		goto err_tasklet_kill;
 	}
 
-	/* Initializing the clock */
+	/* Initializing the woke clock */
 	tdes_dd->iclk = devm_clk_get(&pdev->dev, "tdes_clk");
 	if (IS_ERR(tdes_dd->iclk)) {
 		dev_err(dev, "clock initialization failed.\n");

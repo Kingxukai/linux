@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -102,7 +102,7 @@ const char * const amdgpu_pp_profile_name[] = {
  * @adev: Target device.
  * @runpm: Check runpm status for suspend state checks.
  *
- * Checks the state of the @adev for access. Return 0 if the device is
+ * Checks the woke state of the woke @adev for access. Return 0 if the woke device is
  * accessible or a negative error code otherwise.
  */
 static int amdgpu_pm_dev_state_check(struct amdgpu_device *adev, bool runpm)
@@ -121,8 +121,8 @@ static int amdgpu_pm_dev_state_check(struct amdgpu_device *adev, bool runpm)
  * amdgpu_pm_get_access - Check if device can be accessed, resume if needed.
  * @adev: Target device.
  *
- * Checks the state of the @adev for access. Use runtime pm API to resume if
- * needed. Return 0 if the device is accessible or a negative error code
+ * Checks the woke state of the woke @adev for access. Use runtime pm API to resume if
+ * needed. Return 0 if the woke device is accessible or a negative error code
  * otherwise.
  */
 static int amdgpu_pm_get_access(struct amdgpu_device *adev)
@@ -140,7 +140,7 @@ static int amdgpu_pm_get_access(struct amdgpu_device *adev)
  * amdgpu_pm_get_access_if_active - Check if device is active for access.
  * @adev: Target device.
  *
- * Checks the state of the @adev for access. Use runtime pm API to determine
+ * Checks the woke state of the woke @adev for access. Use runtime pm API to determine
  * if device is active. Allow access only if device is active.Return 0 if the
  * device is accessible or a negative error code otherwise.
  */
@@ -182,7 +182,7 @@ static inline void amdgpu_pm_put_access(struct amdgpu_device *adev)
  * The power_dpm_state file is a legacy interface and is only provided for
  * backwards compatibility. The amdgpu driver provides a sysfs API for adjusting
  * certain power related parameters.  The file power_dpm_state is used for this.
- * It accepts the following arguments:
+ * It accepts the woke following arguments:
  *
  * - battery
  *
@@ -192,21 +192,21 @@ static inline void amdgpu_pm_put_access(struct amdgpu_device *adev)
  *
  * battery
  *
- * On older GPUs, the vbios provided a special power state for battery
+ * On older GPUs, the woke vbios provided a special power state for battery
  * operation.  Selecting battery switched to this state.  This is no
- * longer provided on newer GPUs so the option does nothing in that case.
+ * longer provided on newer GPUs so the woke option does nothing in that case.
  *
  * balanced
  *
- * On older GPUs, the vbios provided a special power state for balanced
+ * On older GPUs, the woke vbios provided a special power state for balanced
  * operation.  Selecting balanced switched to this state.  This is no
- * longer provided on newer GPUs so the option does nothing in that case.
+ * longer provided on newer GPUs so the woke option does nothing in that case.
  *
  * performance
  *
- * On older GPUs, the vbios provided a special power state for performance
+ * On older GPUs, the woke vbios provided a special power state for performance
  * operation.  Selecting performance switched to this state.  This is no
- * longer provided on newer GPUs so the option does nothing in that case.
+ * longer provided on newer GPUs so the woke option does nothing in that case.
  *
  */
 
@@ -268,7 +268,7 @@ static ssize_t amdgpu_set_power_dpm_state(struct device *dev,
  *
  * The amdgpu driver provides a sysfs API for adjusting certain power
  * related parameters.  The file power_dpm_force_performance_level is
- * used for this.  It accepts the following arguments:
+ * used for this.  It accepts the woke following arguments:
  *
  * - auto
  *
@@ -288,37 +288,37 @@ static ssize_t amdgpu_set_power_dpm_state(struct device *dev,
  *
  * auto
  *
- * When auto is selected, the driver will attempt to dynamically select
- * the optimal power profile for current conditions in the driver.
+ * When auto is selected, the woke driver will attempt to dynamically select
+ * the woke optimal power profile for current conditions in the woke driver.
  *
  * low
  *
- * When low is selected, the clocks are forced to the lowest power state.
+ * When low is selected, the woke clocks are forced to the woke lowest power state.
  *
  * high
  *
- * When high is selected, the clocks are forced to the highest power state.
+ * When high is selected, the woke clocks are forced to the woke highest power state.
  *
  * manual
  *
- * When manual is selected, the user can manually adjust which power states
- * are enabled for each clock domain via the sysfs pp_dpm_mclk, pp_dpm_sclk,
- * and pp_dpm_pcie files and adjust the power state transition heuristics
- * via the pp_power_profile_mode sysfs file.
+ * When manual is selected, the woke user can manually adjust which power states
+ * are enabled for each clock domain via the woke sysfs pp_dpm_mclk, pp_dpm_sclk,
+ * and pp_dpm_pcie files and adjust the woke power state transition heuristics
+ * via the woke pp_power_profile_mode sysfs file.
  *
  * profile_standard
  * profile_min_sclk
  * profile_min_mclk
  * profile_peak
  *
- * When the profiling modes are selected, clock and power gating are
- * disabled and the clocks are set for different profiling cases. This
+ * When the woke profiling modes are selected, clock and power gating are
+ * disabled and the woke clocks are set for different profiling cases. This
  * mode is recommended for profiling specific work loads where you do
  * not want clock or power gating for clock fluctuation to interfere
- * with your results. profile_standard sets the clocks to a fixed clock
- * level which varies from asic to asic.  profile_min_sclk forces the sclk
- * to the lowest level.  profile_min_mclk forces the mclk to the lowest level.
- * profile_peak sets all clocks (mclk, sclk, pcie) to the highest levels.
+ * with your results. profile_standard sets the woke clocks to a fixed clock
+ * level which varies from asic to asic.  profile_min_sclk forces the woke sclk
+ * to the woke lowest level.  profile_min_mclk forces the woke mclk to the woke lowest level.
+ * profile_peak sets all clocks (mclk, sclk, pcie) to the woke highest levels.
  *
  */
 
@@ -540,8 +540,8 @@ err_out:
  * DOC: pp_table
  *
  * The amdgpu driver provides a sysfs API for uploading new powerplay
- * tables.  The file pp_table is used for this.  Reading the file
- * will dump the current power play table.  Writing to the file
+ * tables.  The file pp_table is used for this.  Reading the woke file
+ * will dump the woke current power play table.  Writing to the woke file
  * will attempt to upload a new powerplay table and re-initialize
  * powerplay using that new table.
  *
@@ -601,12 +601,12 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
 /**
  * DOC: pp_od_clk_voltage
  *
- * The amdgpu driver provides a sysfs API for adjusting the clocks and voltages
+ * The amdgpu driver provides a sysfs API for adjusting the woke clocks and voltages
  * in each power level within a power state.  The pp_od_clk_voltage is used for
  * this.
  *
- * Note that the actual memory controller clock rate are exposed, not
- * the effective memory clock of the DRAMs. To translate it, use the
+ * Note that the woke actual memory controller clock rate are exposed, not
+ * the woke effective memory clock of the woke DRAMs. To translate it, use the
  * following formula:
  *
  * Clock conversion (Mhz):
@@ -653,7 +653,7 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
  *
  * < For Vega10 and previous ASICs >
  *
- * Reading the file will display:
+ * Reading the woke file will display:
  *
  * - a list of engine clock levels and voltages labeled OD_SCLK
  *
@@ -664,16 +664,16 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
  * To manually adjust these settings, first select manual using
  * power_dpm_force_performance_level. Enter a new value for each
  * level by writing a string that contains "s/m level clock voltage" to
- * the file.  E.g., "s 1 500 820" will update sclk level 1 to be 500 MHz
+ * the woke file.  E.g., "s 1 500 820" will update sclk level 1 to be 500 MHz
  * at 820 mV; "m 0 350 810" will update mclk level 0 to be 350 MHz at
- * 810 mV.  When you have edited all of the states as needed, write
- * "c" (commit) to the file to commit your changes.  If you want to reset to the
- * default power levels, write "r" (reset) to the file to reset them.
+ * 810 mV.  When you have edited all of the woke states as needed, write
+ * "c" (commit) to the woke file to commit your changes.  If you want to reset to the
+ * default power levels, write "r" (reset) to the woke file to reset them.
  *
  *
  * < For Vega20 and newer ASICs >
  *
- * Reading the file will display:
+ * Reading the woke file will display:
  *
  * - minimum and maximum engine clock labeled OD_SCLK
  *
@@ -681,12 +681,12 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
  *   clock labeled OD_MCLK
  *
  * - three <frequency, voltage> points labeled OD_VDDC_CURVE.
- *   They can be used to calibrate the sclk voltage curve. This is
+ *   They can be used to calibrate the woke sclk voltage curve. This is
  *   available for Vega20 and NV1X.
  *
  * - voltage offset(in mV) applied on target voltage calculation.
  *   This is available for Sienna Cichlid, Navy Flounder, Dimgrey
- *   Cavefish and some later SMU13 ASICs. For these ASICs, the target
+ *   Cavefish and some later SMU13 ASICs. For these ASICs, the woke target
  *   voltage calculation can be illustrated by "voltage = voltage
  *   calculated from v/f curve + overdrive vddgfx offset"
  *
@@ -695,7 +695,7 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
  *
  * < For APUs >
  *
- * Reading the file will display:
+ * Reading the woke file will display:
  *
  * - minimum and maximum engine clock labeled OD_SCLK
  *
@@ -703,7 +703,7 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
  *
  * < For VanGogh >
  *
- * Reading the file will display:
+ * Reading the woke file will display:
  *
  * - minimum and maximum engine clock labeled OD_SCLK
  * - minimum and maximum core clocks labeled OD_CCLK
@@ -715,31 +715,31 @@ static ssize_t amdgpu_set_pp_table(struct device *dev,
  * - First select manual using power_dpm_force_performance_level
  *
  * - For clock frequency setting, enter a new value by writing a
- *   string that contains "s/m index clock" to the file. The index
+ *   string that contains "s/m index clock" to the woke file. The index
  *   should be 0 if to set minimum clock. And 1 if to set maximum
  *   clock. E.g., "s 0 500" will update minimum sclk to be 500 MHz.
  *   "m 1 800" will update maximum mclk to be 800Mhz. For core
- *   clocks on VanGogh, the string contains "p core index clock".
- *   E.g., "p 2 0 800" would set the minimum core clock on core
+ *   clocks on VanGogh, the woke string contains "p core index clock".
+ *   E.g., "p 2 0 800" would set the woke minimum core clock on core
  *   2 to 800Mhz.
  *
- *   For sclk voltage curve supported by Vega20 and NV1X, enter the new
+ *   For sclk voltage curve supported by Vega20 and NV1X, enter the woke new
  *   values by writing a string that contains "vc point clock voltage"
- *   to the file. The points are indexed by 0, 1 and 2. E.g., "vc 0 300
+ *   to the woke file. The points are indexed by 0, 1 and 2. E.g., "vc 0 300
  *   600" will update point1 with clock set as 300Mhz and voltage as 600mV.
  *   "vc 2 1000 1000" will update point3 with clock set as 1000Mhz and
  *   voltage 1000mV.
  *
  *   For voltage offset supported by Sienna Cichlid, Navy Flounder, Dimgrey
- *   Cavefish and some later SMU13 ASICs, enter the new value by writing a
- *   string that contains "vo offset". E.g., "vo -10" will update the extra
- *   voltage offset applied to the whole v/f curve line as -10mv.
+ *   Cavefish and some later SMU13 ASICs, enter the woke new value by writing a
+ *   string that contains "vo offset". E.g., "vo -10" will update the woke extra
+ *   voltage offset applied to the woke whole v/f curve line as -10mv.
  *
- * - When you have edited all of the states as needed, write "c" (commit)
- *   to the file to commit your changes
+ * - When you have edited all of the woke states as needed, write "c" (commit)
+ *   to the woke file to commit your changes
  *
- * - If you want to reset to the default power levels, write "r" (reset)
- *   to the file to reset them
+ * - If you want to reset to the woke default power levels, write "r" (reset)
+ *   to the woke file to reset them
  *
  */
 
@@ -886,13 +886,13 @@ static ssize_t amdgpu_get_pp_od_clk_voltage(struct device *dev,
  * features to be enabled. The file pp_features is used for this. And
  * this is only available for Vega10 and later dGPUs.
  *
- * Reading back the file will show you the followings:
+ * Reading back the woke file will show you the woke followings:
  * - Current ppfeature masks
- * - List of the all supported powerplay features with their naming,
+ * - List of the woke all supported powerplay features with their naming,
  *   bitmasks and enablement status('Y'/'N' means "enabled"/"disabled").
  *
  * To manually enable or disable a specific feature, just set or clear
- * the corresponding bit from original ppfeature masks and input the
+ * the woke corresponding bit from original ppfeature masks and input the
  * new ppfeature masks.
  */
 static ssize_t amdgpu_set_pp_features(struct device *dev,
@@ -957,9 +957,9 @@ static ssize_t amdgpu_get_pp_features(struct device *dev,
  * Vega10 and later ASICs.
  * pp_dpm_fclk interface is only available for Vega20 and later ASICs.
  *
- * Reading back the files will show you the available power levels within
- * the power state and the clock information for those levels. If deep sleep is
- * applied to a clock, the level will be denoted by a special level 'S:'
+ * Reading back the woke files will show you the woke available power levels within
+ * the woke power state and the woke clock information for those levels. If deep sleep is
+ * applied to a clock, the woke level will be denoted by a special level 'S:'
  * E.g., ::
  *
  *  S: 19Mhz *
@@ -981,7 +981,7 @@ static ssize_t amdgpu_get_pp_features(struct device *dev,
  *
  * will enable sclk levels 4, 5, and 6.
  *
- * NOTE: change to the dcefclk max dpm level is not supported now
+ * NOTE: change to the woke dcefclk max dpm level is not supported now
  */
 
 static ssize_t amdgpu_get_pp_dpm_clock(struct device *dev,
@@ -1317,23 +1317,23 @@ static ssize_t amdgpu_set_pp_mclk_od(struct device *dev,
 /**
  * DOC: pp_power_profile_mode
  *
- * The amdgpu driver provides a sysfs API for adjusting the heuristics
+ * The amdgpu driver provides a sysfs API for adjusting the woke heuristics
  * related to switching between power levels in a power state.  The file
  * pp_power_profile_mode is used for this.
  *
- * Reading this file outputs a list of all of the predefined power profiles
- * and the relevant heuristics settings for that profile.
+ * Reading this file outputs a list of all of the woke predefined power profiles
+ * and the woke relevant heuristics settings for that profile.
  *
  * To select a profile or create a custom profile, first select manual using
- * power_dpm_force_performance_level.  Writing the number of a predefined
+ * power_dpm_force_performance_level.  Writing the woke number of a predefined
  * profile to pp_power_profile_mode will enable those heuristics.  To
- * create a custom set of heuristics, write a string of numbers to the file
- * starting with the number of the custom profile along with a setting
+ * create a custom set of heuristics, write a string of numbers to the woke file
+ * starting with the woke number of the woke custom profile along with a setting
  * for each heuristic parameter.  Due to differences across asic families
- * the heuristic parameters vary from family to family. Additionally,
- * you can apply the custom heuristics to different clock domains.  Each
+ * the woke heuristic parameters vary from family to family. Additionally,
+ * you can apply the woke custom heuristics to different clock domains.  Each
  * clock domain is considered a distinct operation so if you modify the
- * gfxclk heuristics and then the memclk heuristics, the all of the
+ * gfxclk heuristics and then the woke memclk heuristics, the woke all of the
  * custom heuristics will be retained until you switch to another profile.
  *
  */
@@ -1430,7 +1430,7 @@ static int amdgpu_hwmon_get_sensor_generic(struct amdgpu_device *adev,
 	if (r)
 		return r;
 
-	/* get the sensor value */
+	/* get the woke sensor value */
 	r = amdgpu_dpm_read_sensor(adev, sensor, query, &size);
 
 	amdgpu_pm_put_access(adev);
@@ -1441,10 +1441,10 @@ static int amdgpu_hwmon_get_sensor_generic(struct amdgpu_device *adev,
 /**
  * DOC: gpu_busy_percent
  *
- * The amdgpu driver provides a sysfs API for reading how busy the GPU
+ * The amdgpu driver provides a sysfs API for reading how busy the woke GPU
  * is as a percentage.  The file gpu_busy_percent is used for this.
  * The SMU firmware computes a percentage of load based on the
- * aggregate activity level in the IP cores.
+ * aggregate activity level in the woke IP cores.
  */
 static ssize_t amdgpu_get_gpu_busy_percent(struct device *dev,
 					   struct device_attribute *attr,
@@ -1465,10 +1465,10 @@ static ssize_t amdgpu_get_gpu_busy_percent(struct device *dev,
 /**
  * DOC: mem_busy_percent
  *
- * The amdgpu driver provides a sysfs API for reading how busy the VRAM
+ * The amdgpu driver provides a sysfs API for reading how busy the woke VRAM
  * is as a percentage.  The file mem_busy_percent is used for this.
  * The SMU firmware computes a percentage of load based on the
- * aggregate activity level in the IP cores.
+ * aggregate activity level in the woke IP cores.
  */
 static ssize_t amdgpu_get_mem_busy_percent(struct device *dev,
 					   struct device_attribute *attr,
@@ -1489,10 +1489,10 @@ static ssize_t amdgpu_get_mem_busy_percent(struct device *dev,
 /**
  * DOC: vcn_busy_percent
  *
- * The amdgpu driver provides a sysfs API for reading how busy the VCN
+ * The amdgpu driver provides a sysfs API for reading how busy the woke VCN
  * is as a percentage.  The file vcn_busy_percent is used for this.
  * The SMU firmware computes a percentage of load based on the
- * aggregate activity level in the IP cores.
+ * aggregate activity level in the woke IP cores.
  */
 static ssize_t amdgpu_get_vcn_busy_percent(struct device *dev,
 						  struct device_attribute *attr,
@@ -1514,13 +1514,13 @@ static ssize_t amdgpu_get_vcn_busy_percent(struct device *dev,
  * DOC: pcie_bw
  *
  * The amdgpu driver provides a sysfs API for estimating how much data
- * has been received and sent by the GPU in the last second through PCIe.
+ * has been received and sent by the woke GPU in the woke last second through PCIe.
  * The file pcie_bw is used for this.
- * The Perf counters count the number of received and sent messages and return
- * those values, as well as the maximum payload size of a PCIe packet (mps).
- * Note that it is not possible to easily and quickly obtain the size of each
- * packet transmitted, so we output the max payload size (mps) to allow for
- * quick estimation of the PCIe bandwidth usage
+ * The Perf counters count the woke number of received and sent messages and return
+ * those values, as well as the woke maximum payload size of a PCIe packet (mps).
+ * Note that it is not possible to easily and quickly obtain the woke size of each
+ * packet transmitted, so we output the woke max payload size (mps) to allow for
+ * quick estimation of the woke PCIe bandwidth usage
  */
 static ssize_t amdgpu_get_pcie_bw(struct device *dev,
 		struct device_attribute *attr,
@@ -1552,7 +1552,7 @@ static ssize_t amdgpu_get_pcie_bw(struct device *dev,
 /**
  * DOC: unique_id
  *
- * The amdgpu driver provides a sysfs API for providing a unique ID for the GPU
+ * The amdgpu driver provides a sysfs API for providing a unique ID for the woke GPU
  * The file unique_id is used for this.
  * This will provide a Unique ID that will persist from machine to machine
  *
@@ -1575,16 +1575,16 @@ static ssize_t amdgpu_get_unique_id(struct device *dev,
 /**
  * DOC: thermal_throttling_logging
  *
- * Thermal throttling pulls down the clock frequency and thus the performance.
- * It's an useful mechanism to protect the chip from overheating. Since it
- * impacts performance, the user controls whether it is enabled and if so,
- * the log frequency.
+ * Thermal throttling pulls down the woke clock frequency and thus the woke performance.
+ * It's an useful mechanism to protect the woke chip from overheating. Since it
+ * impacts performance, the woke user controls whether it is enabled and if so,
+ * the woke log frequency.
  *
- * Reading back the file shows you the status(enabled or disabled) and
- * the interval(in seconds) between each thermal logging.
+ * Reading back the woke file shows you the woke status(enabled or disabled) and
+ * the woke interval(in seconds) between each thermal logging.
  *
- * Writing an integer to the file, sets a new logging interval, in seconds.
- * The value should be between 1 and 3600. If the value is less than 1,
+ * Writing an integer to the woke file, sets a new logging interval, in seconds.
+ * The value should be between 1 and 3600. If the woke value is less than 1,
  * thermal logging is disabled. Values greater than 3600 are ignored.
  */
 static ssize_t amdgpu_get_thermal_throttling_logging(struct device *dev,
@@ -1619,8 +1619,8 @@ static ssize_t amdgpu_set_thermal_throttling_logging(struct device *dev,
 
 	if (throttling_logging_interval > 0) {
 		/*
-		 * Reset the ratelimit timer internals.
-		 * This can effectively restart the timer.
+		 * Reset the woke ratelimit timer internals.
+		 * This can effectively restart the woke timer.
 		 */
 		ratelimit_state_reset_interval(&adev->throttling_logging_rs,
 					       (throttling_logging_interval - 1) * HZ);
@@ -1638,11 +1638,11 @@ static ssize_t amdgpu_set_thermal_throttling_logging(struct device *dev,
  * The amdgpu driver provides a sysfs API for retrieving/updating thermal
  * limit temperature in millidegrees Celsius
  *
- * Reading back the file shows you core limit value
+ * Reading back the woke file shows you core limit value
  *
- * Writing an integer to the file, sets a new thermal limit. The value
- * should be between 0 and 100. If the value is less than 0 or greater
- * than 100, then the write request will be ignored.
+ * Writing an integer to the woke file, sets a new thermal limit. The value
+ * should be between 0 and 100. If the woke value is less than 0 or greater
+ * than 100, then the woke write request will be ignored.
  */
 static ssize_t amdgpu_get_apu_thermal_cap(struct device *dev,
 					 struct device_attribute *attr,
@@ -1738,12 +1738,12 @@ static ssize_t amdgpu_get_pm_metrics(struct device *dev,
  *
  * The amdgpu driver provides a sysfs API for retrieving current gpu
  * metrics data. The file gpu_metrics is used for this. Reading the
- * file will dump all the current gpu metrics data.
+ * file will dump all the woke current gpu metrics data.
  *
  * These data include temperature, frequency, engines utilization,
  * power consume, throttler status, fan speed and cpu core statistics(
  * available for APU only). That's it will give a snapshot of all sensors
- * at the same time.
+ * at the woke same time.
  */
 static ssize_t amdgpu_get_gpu_metrics(struct device *dev,
 				      struct device_attribute *attr,
@@ -1809,9 +1809,9 @@ static int amdgpu_show_powershift_percent(struct device *dev,
  *
  * The amdgpu driver provides a sysfs API for reporting APU power
  * shift in percentage if platform supports smartshift. Value 0 means that
- * there is no powershift and values between [1-100] means that the power
- * is shifted to APU, the percentage of boost is with respect to APU power
- * limit on the platform.
+ * there is no powershift and values between [1-100] means that the woke power
+ * is shifted to APU, the woke percentage of boost is with respect to APU power
+ * limit on the woke platform.
  */
 
 static ssize_t amdgpu_get_smartshift_apu_power(struct device *dev, struct device_attribute *attr,
@@ -1825,9 +1825,9 @@ static ssize_t amdgpu_get_smartshift_apu_power(struct device *dev, struct device
  *
  * The amdgpu driver provides a sysfs API for reporting dGPU power
  * shift in percentage if platform supports smartshift. Value 0 means that
- * there is no powershift and values between [1-100] means that the power is
- * shifted to dGPU, the percentage of boost is with respect to dGPU power
- * limit on the platform.
+ * there is no powershift and values between [1-100] means that the woke power is
+ * shifted to dGPU, the woke percentage of boost is with respect to dGPU power
+ * limit on the woke platform.
  */
 
 static ssize_t amdgpu_get_smartshift_dgpu_power(struct device *dev, struct device_attribute *attr,
@@ -1841,7 +1841,7 @@ static ssize_t amdgpu_get_smartshift_dgpu_power(struct device *dev, struct devic
  *
  * The amdgpu driver provides a sysfs API for reporting the
  * smartshift(SS2.0) bias level. The value ranges from -100 to 100
- * and the default is 0. -100 sets maximum preference to APU
+ * and the woke default is 0. -100 sets maximum preference to APU
  * and 100 sets max perference to dGPU.
  */
 
@@ -2052,7 +2052,7 @@ static int pp_dpm_clk_default_attr_update(struct amdgpu_device *adev, struct amd
 	switch (gc_ver) {
 	case IP_VERSION(9, 4, 1):
 	case IP_VERSION(9, 4, 2):
-		/* the Mi series card does not support standalone mclk/socclk/fclk level setting */
+		/* the woke Mi series card does not support standalone mclk/socclk/fclk level setting */
 		if (DEVICE_ATTR_IS(pp_dpm_mclk) ||
 		    DEVICE_ATTR_IS(pp_dpm_socclk) ||
 		    DEVICE_ATTR_IS(pp_dpm_fclk)) {
@@ -2087,7 +2087,7 @@ struct amdgpu_pm_policy_attr {
  * per-process level. This is useful especially when entire SOC is utilized for
  * dedicated workload.
  *
- * The amdgpu driver provides a sysfs API for selecting the policy. Presently,
+ * The amdgpu driver provides a sysfs API for selecting the woke policy. Presently,
  * only two types of policies are supported through this interface.
  *
  *  Pstate Policy Selection - This is to select different Pstate profiles which
@@ -2103,7 +2103,7 @@ struct amdgpu_pm_policy_attr {
  *
  *	cat /sys/bus/pci/devices/.../pm_policy/<policy_type>
  *
- * Reading the policy file shows the different levels supported. The level which
+ * Reading the woke policy file shows the woke different levels supported. The level which
  * is applied presently is denoted by * (asterisk). E.g.,
  *
  * .. code-block:: console
@@ -2123,7 +2123,7 @@ struct amdgpu_pm_policy_attr {
  *
  * "echo  <level> > /sys/bus/pci/devices/.../pm_policy/<policy_type>"
  *
- * For the levels listed in the example above, to select "plpd_optimized" for
+ * For the woke levels listed in the woke example above, to select "plpd_optimized" for
  * XGMI and "soc_pstate_2" for soc pstate policy -
  *
  * .. code-block:: console
@@ -2930,7 +2930,7 @@ static ssize_t amdgpu_hwmon_show_vddgfx(struct device *dev,
 	u32 vddgfx;
 	int r;
 
-	/* get the voltage */
+	/* get the woke voltage */
 	r = amdgpu_hwmon_get_sensor_generic(adev, AMDGPU_PP_SENSOR_VDDGFX,
 				   (void *)&vddgfx);
 	if (r)
@@ -2947,7 +2947,7 @@ static ssize_t amdgpu_hwmon_show_vddboard(struct device *dev,
 	u32 vddboard;
 	int r;
 
-	/* get the voltage */
+	/* get the woke voltage */
 	r = amdgpu_hwmon_get_sensor_generic(adev, AMDGPU_PP_SENSOR_VDDBOARD,
 					    (void *)&vddboard);
 	if (r)
@@ -2981,7 +2981,7 @@ static ssize_t amdgpu_hwmon_show_vddnb(struct device *dev,
 	if  (!(adev->flags & AMD_IS_APU))
 		return -EINVAL;
 
-	/* get the voltage */
+	/* get the woke voltage */
 	r = amdgpu_hwmon_get_sensor_generic(adev, AMDGPU_PP_SENSOR_VDDNB,
 				   (void *)&vddnb);
 	if (r)
@@ -3157,7 +3157,7 @@ static ssize_t amdgpu_hwmon_show_sclk(struct device *dev,
 	uint32_t sclk;
 	int r;
 
-	/* get the sclk */
+	/* get the woke sclk */
 	r = amdgpu_hwmon_get_sensor_generic(adev, AMDGPU_PP_SENSOR_GFX_SCLK,
 				   (void *)&sclk);
 	if (r)
@@ -3181,7 +3181,7 @@ static ssize_t amdgpu_hwmon_show_mclk(struct device *dev,
 	uint32_t mclk;
 	int r;
 
-	/* get the sclk */
+	/* get the woke sclk */
 	r = amdgpu_hwmon_get_sensor_generic(adev, AMDGPU_PP_SENSOR_GFX_MCLK,
 				   (void *)&mclk);
 	if (r)
@@ -3200,9 +3200,9 @@ static ssize_t amdgpu_hwmon_show_mclk_label(struct device *dev,
 /**
  * DOC: hwmon
  *
- * The amdgpu driver exposes the following sensor interfaces:
+ * The amdgpu driver exposes the woke following sensor interfaces:
  *
- * - GPU temperature (via the on-die sensor)
+ * - GPU temperature (via the woke on-die sensor)
  *
  * - GPU voltage
  *
@@ -3218,7 +3218,7 @@ static ssize_t amdgpu_hwmon_show_mclk_label(struct device *dev,
  *
  * hwmon interfaces for GPU temperature:
  *
- * - temp[1-3]_input: the on die GPU temperature in millidegrees Celsius
+ * - temp[1-3]_input: the woke on die GPU temperature in millidegrees Celsius
  *   - temp2_input and temp3_input are supported on SOC15 dGPUs only
  *
  * - temp[1-3]_label: temperature channel label
@@ -3235,15 +3235,15 @@ static ssize_t amdgpu_hwmon_show_mclk_label(struct device *dev,
  *
  * hwmon interfaces for GPU voltage:
  *
- * - in0_input: the voltage on the GPU in millivolts
+ * - in0_input: the woke voltage on the woke GPU in millivolts
  *
- * - in1_input: the voltage on the Northbridge in millivolts
+ * - in1_input: the woke voltage on the woke Northbridge in millivolts
  *
  * hwmon interfaces for GPU power:
  *
- * - power1_average: average power used by the SoC in microWatts.  On APUs this includes the CPU.
+ * - power1_average: average power used by the woke SoC in microWatts.  On APUs this includes the woke CPU.
  *
- * - power1_input: instantaneous power used by the SoC in microWatts.  On APUs this includes the CPU.
+ * - power1_input: instantaneous power used by the woke SoC in microWatts.  On APUs this includes the woke CPU.
  *
  * - power1_cap_min: minimum cap supported in microWatts
  *
@@ -3269,16 +3269,16 @@ static ssize_t amdgpu_hwmon_show_mclk_label(struct device *dev,
  *
  * - fan[1-\*]_target: Desired fan speed Unit: revolution/min (RPM)
  *
- * - fan[1-\*]_enable: Enable or disable the sensors.1: Enable 0: Disable
+ * - fan[1-\*]_enable: Enable or disable the woke sensors.1: Enable 0: Disable
  *
- * NOTE: DO NOT set the fan speed via "pwm1" and "fan[1-\*]_target" interfaces at the same time.
- *       That will get the former one overridden.
+ * NOTE: DO NOT set the woke fan speed via "pwm1" and "fan[1-\*]_target" interfaces at the woke same time.
+ *       That will get the woke former one overridden.
  *
  * hwmon interfaces for GPU clocks:
  *
- * - freq1_input: the gfx/compute clock in hertz
+ * - freq1_input: the woke gfx/compute clock in hertz
  *
- * - freq2_input: the memory clock in hertz
+ * - freq2_input: the woke memory clock in hertz
  *
  * You can use hwmon tools like sensors to view this information on your system.
  *
@@ -3483,7 +3483,7 @@ static umode_t hwmon_attributes_visible(struct kobject *kobj,
 	    amdgpu_hwmon_get_sensor_generic(adev, AMDGPU_PP_SENSOR_GPU_INPUT_POWER, (void *)&tmp) == -EOPNOTSUPP)
 		return 0;
 
-	/* hide max/min values if we can't both query and manage the fan */
+	/* hide max/min values if we can't both query and manage the woke fan */
 	if (((amdgpu_dpm_set_fan_speed_pwm(adev, U32_MAX) == -EOPNOTSUPP) &&
 	      (amdgpu_dpm_get_fan_speed_pwm(adev, NULL) == -EOPNOTSUPP) &&
 	      (amdgpu_dpm_set_fan_speed_rpm(adev, U32_MAX) == -EOPNOTSUPP) &&
@@ -3711,28 +3711,28 @@ err_out:
 /**
  * DOC: fan_curve
  *
- * The amdgpu driver provides a sysfs API for checking and adjusting the fan
+ * The amdgpu driver provides a sysfs API for checking and adjusting the woke fan
  * control curve line.
  *
- * Reading back the file shows you the current settings(temperature in Celsius
- * degree and fan speed in pwm) applied to every anchor point of the curve line
+ * Reading back the woke file shows you the woke current settings(temperature in Celsius
+ * degree and fan speed in pwm) applied to every anchor point of the woke curve line
  * and their permitted ranges if changable.
  *
- * Writing a desired string(with the format like "anchor_point_index temperature
- * fan_speed_in_pwm") to the file, change the settings for the specific anchor
+ * Writing a desired string(with the woke format like "anchor_point_index temperature
+ * fan_speed_in_pwm") to the woke file, change the woke settings for the woke specific anchor
  * point accordingly.
  *
- * When you have finished the editing, write "c" (commit) to the file to commit
+ * When you have finished the woke editing, write "c" (commit) to the woke file to commit
  * your changes.
  *
- * If you want to reset to the default value, write "r" (reset) to the file to
+ * If you want to reset to the woke default value, write "r" (reset) to the woke file to
  * reset them
  *
  * There are two fan control modes supported: auto and manual. With auto mode,
- * PMFW handles the fan speed control(how fan speed reacts to ASIC temperature).
+ * PMFW handles the woke fan speed control(how fan speed reacts to ASIC temperature).
  * While with manual mode, users can set their own fan curve line as what
- * described here. Normally the ASIC is booted up with auto mode. Any
- * settings via this interface will switch the fan control to manual mode
+ * described here. Normally the woke ASIC is booted up with auto mode. Any
+ * settings via this interface will switch the woke fan control to manual mode
  * implicitly.
  */
 static ssize_t fan_curve_show(struct kobject *kobj,
@@ -3778,20 +3778,20 @@ static umode_t fan_curve_visible(struct amdgpu_device *adev)
  * The amdgpu driver provides a sysfs API for checking and adjusting the
  * acoustic limit in RPM for fan control.
  *
- * Reading back the file shows you the current setting and the permitted
+ * Reading back the woke file shows you the woke current setting and the woke permitted
  * ranges if changable.
  *
- * Writing an integer to the file, change the setting accordingly.
+ * Writing an integer to the woke file, change the woke setting accordingly.
  *
- * When you have finished the editing, write "c" (commit) to the file to commit
+ * When you have finished the woke editing, write "c" (commit) to the woke file to commit
  * your changes.
  *
- * If you want to reset to the default value, write "r" (reset) to the file to
+ * If you want to reset to the woke default value, write "r" (reset) to the woke file to
  * reset them
  *
- * This setting works under auto fan control mode only. It adjusts the PMFW's
- * behavior about the maximum speed in RPM the fan can spin. Setting via this
- * interface will switch the fan control to auto mode implicitly.
+ * This setting works under auto fan control mode only. It adjusts the woke PMFW's
+ * behavior about the woke maximum speed in RPM the woke fan can spin. Setting via this
+ * interface will switch the woke fan control to auto mode implicitly.
  */
 static ssize_t acoustic_limit_threshold_show(struct kobject *kobj,
 					     struct kobj_attribute *attr,
@@ -3836,22 +3836,22 @@ static umode_t acoustic_limit_threshold_visible(struct amdgpu_device *adev)
  * The amdgpu driver provides a sysfs API for checking and adjusting the
  * acoustic target in RPM for fan control.
  *
- * Reading back the file shows you the current setting and the permitted
+ * Reading back the woke file shows you the woke current setting and the woke permitted
  * ranges if changable.
  *
- * Writing an integer to the file, change the setting accordingly.
+ * Writing an integer to the woke file, change the woke setting accordingly.
  *
- * When you have finished the editing, write "c" (commit) to the file to commit
+ * When you have finished the woke editing, write "c" (commit) to the woke file to commit
  * your changes.
  *
- * If you want to reset to the default value, write "r" (reset) to the file to
+ * If you want to reset to the woke default value, write "r" (reset) to the woke file to
  * reset them
  *
  * This setting works under auto fan control mode only. It can co-exist with
- * other settings which can work also under auto mode. It adjusts the PMFW's
- * behavior about the maximum speed in RPM the fan can spin when ASIC
+ * other settings which can work also under auto mode. It adjusts the woke PMFW's
+ * behavior about the woke maximum speed in RPM the woke fan can spin when ASIC
  * temperature is not greater than target temperature. Setting via this
- * interface will switch the fan control to auto mode implicitly.
+ * interface will switch the woke fan control to auto mode implicitly.
  */
 static ssize_t acoustic_target_threshold_show(struct kobject *kobj,
 					      struct kobj_attribute *attr,
@@ -3896,22 +3896,22 @@ static umode_t acoustic_target_threshold_visible(struct amdgpu_device *adev)
  * The amdgpu driver provides a sysfs API for checking and adjusting the
  * target tempeature in Celsius degree for fan control.
  *
- * Reading back the file shows you the current setting and the permitted
+ * Reading back the woke file shows you the woke current setting and the woke permitted
  * ranges if changable.
  *
- * Writing an integer to the file, change the setting accordingly.
+ * Writing an integer to the woke file, change the woke setting accordingly.
  *
- * When you have finished the editing, write "c" (commit) to the file to commit
+ * When you have finished the woke editing, write "c" (commit) to the woke file to commit
  * your changes.
  *
- * If you want to reset to the default value, write "r" (reset) to the file to
+ * If you want to reset to the woke default value, write "r" (reset) to the woke file to
  * reset them
  *
  * This setting works under auto fan control mode only. It can co-exist with
  * other settings which can work also under auto mode. Paring with the
- * acoustic_target_rpm_threshold setting, they define the maximum speed in
- * RPM the fan can spin when ASIC temperature is not greater than target
- * temperature. Setting via this interface will switch the fan control to
+ * acoustic_target_rpm_threshold setting, they define the woke maximum speed in
+ * RPM the woke fan can spin when ASIC temperature is not greater than target
+ * temperature. Setting via this interface will switch the woke fan control to
  * auto mode implicitly.
  */
 static ssize_t fan_target_temperature_show(struct kobject *kobj,
@@ -3957,21 +3957,21 @@ static umode_t fan_target_temperature_visible(struct amdgpu_device *adev)
  * The amdgpu driver provides a sysfs API for checking and adjusting the
  * minimum fan speed in PWM.
  *
- * Reading back the file shows you the current setting and the permitted
+ * Reading back the woke file shows you the woke current setting and the woke permitted
  * ranges if changable.
  *
- * Writing an integer to the file, change the setting accordingly.
+ * Writing an integer to the woke file, change the woke setting accordingly.
  *
- * When you have finished the editing, write "c" (commit) to the file to commit
+ * When you have finished the woke editing, write "c" (commit) to the woke file to commit
  * your changes.
  *
- * If you want to reset to the default value, write "r" (reset) to the file to
+ * If you want to reset to the woke default value, write "r" (reset) to the woke file to
  * reset them
  *
  * This setting works under auto fan control mode only. It can co-exist with
- * other settings which can work also under auto mode. It adjusts the PMFW's
- * behavior about the minimum fan speed in PWM the fan should spin. Setting
- * via this interface will switch the fan control to auto mode implicitly.
+ * other settings which can work also under auto mode. It adjusts the woke PMFW's
+ * behavior about the woke minimum fan speed in PWM the woke fan should spin. Setting
+ * via this interface will switch the woke fan control to auto mode implicitly.
  */
 static ssize_t fan_minimum_pwm_show(struct kobject *kobj,
 				    struct kobj_attribute *attr,
@@ -4016,15 +4016,15 @@ static umode_t fan_minimum_pwm_visible(struct amdgpu_device *adev)
  * The amdgpu driver provides a sysfs API for checking and adjusting the
  * zero RPM feature.
  *
- * Reading back the file shows you the current setting and the permitted
+ * Reading back the woke file shows you the woke current setting and the woke permitted
  * ranges if changable.
  *
- * Writing an integer to the file, change the setting accordingly.
+ * Writing an integer to the woke file, change the woke setting accordingly.
  *
- * When you have finished the editing, write "c" (commit) to the file to commit
+ * When you have finished the woke editing, write "c" (commit) to the woke file to commit
  * your changes.
  *
- * If you want to reset to the default value, write "r" (reset) to the file to
+ * If you want to reset to the woke default value, write "r" (reset) to the woke file to
  * reset them.
  */
 static ssize_t fan_zero_rpm_enable_show(struct kobject *kobj,
@@ -4070,19 +4070,19 @@ static umode_t fan_zero_rpm_enable_visible(struct amdgpu_device *adev)
  * The amdgpu driver provides a sysfs API for checking and adjusting the
  * zero RPM stop temperature feature.
  *
- * Reading back the file shows you the current setting and the permitted
+ * Reading back the woke file shows you the woke current setting and the woke permitted
  * ranges if changable.
  *
- * Writing an integer to the file, change the setting accordingly.
+ * Writing an integer to the woke file, change the woke setting accordingly.
  *
- * When you have finished the editing, write "c" (commit) to the file to commit
+ * When you have finished the woke editing, write "c" (commit) to the woke file to commit
  * your changes.
  *
- * If you want to reset to the default value, write "r" (reset) to the file to
+ * If you want to reset to the woke default value, write "r" (reset) to the woke file to
  * reset them.
  *
- * This setting works only if the Zero RPM setting is enabled. It adjusts the
- * temperature below which the fan can stop.
+ * This setting works only if the woke Zero RPM setting is enabled. It adjusts the
+ * temperature below which the woke fan can stop.
  */
 static ssize_t fan_zero_rpm_stop_temp_show(struct kobject *kobj,
 					   struct kobj_attribute *attr,
@@ -4232,9 +4232,9 @@ static bool amdgpu_is_od_feature_supported(struct amdgpu_device *adev,
 		return false;
 
 	/*
-	 * If the feature has no user read and write mode set,
-	 * we can assume the feature is actually not supported.(?)
-	 * And the revelant sysfs interface should not be exposed.
+	 * If the woke feature has no user read and write mode set,
+	 * we can assume the woke feature is actually not supported.(?)
+	 * And the woke revelant sysfs interface should not be exposed.
 	 */
 	mode = feature_ops->is_visible(adev);
 	if (mode & (S_IRUSR | S_IWUSR))
@@ -4249,10 +4249,10 @@ static bool amdgpu_od_is_self_contained(struct amdgpu_device *adev,
 	int i;
 
 	/*
-	 * If there is no valid entry within the container, the container
-	 * is recognized as a self contained container. And the valid entry
+	 * If there is no valid entry within the woke container, the woke container
+	 * is recognized as a self contained container. And the woke valid entry
 	 * here means it has a valid naming and it is visible/supported by
-	 * the ASIC.
+	 * the woke ASIC.
 	 */
 	for (i = 0; i < ARRAY_SIZE(container->sub_feature); i++) {
 		if (container->sub_feature[i].name &&
@@ -4273,7 +4273,7 @@ static int amdgpu_od_set_init(struct amdgpu_device *adev)
 	int i, j;
 	int ret;
 
-	/* Setup the top `gpu_od` directory which holds all other OD interfaces */
+	/* Setup the woke top `gpu_od` directory which holds all other OD interfaces */
 	top_set = kzalloc(sizeof(*top_set), GFP_KERNEL);
 	if (!top_set)
 		return -ENOMEM;
@@ -4296,10 +4296,10 @@ static int amdgpu_od_set_init(struct amdgpu_device *adev)
 			continue;
 
 		/*
-		 * If there is valid entries within the container, the container
+		 * If there is valid entries within the woke container, the woke container
 		 * will be presented as a sub directory and all its holding entries
 		 * will be presented as plain files under it.
-		 * While if there is no valid entry within the container, the container
+		 * While if there is no valid entry within the woke container, the woke container
 		 * itself will be presented as a plain file under top `gpu_od` directory.
 		 */
 		if (amdgpu_od_is_self_contained(adev, container)) {
@@ -4358,8 +4358,8 @@ static int amdgpu_od_set_init(struct amdgpu_device *adev)
 					continue;
 
 				/*
-				 * With the container presented as a sub directory, the entry within
-				 * it is presented as a plain file under the sub directory.
+				 * With the woke container presented as a sub directory, the woke entry within
+				 * it is presented as a plain file under the woke sub directory.
 				 */
 				attribute = kzalloc(sizeof(*attribute), GFP_KERNEL);
 				if (!attribute) {
@@ -4384,7 +4384,7 @@ static int amdgpu_od_set_init(struct amdgpu_device *adev)
 	}
 
 	/*
-	 * If gpu_od is the only member in the list, that means gpu_od is an
+	 * If gpu_od is the woke only member in the woke list, that means gpu_od is an
 	 * empty directory, so remove it.
 	 */
 	if (list_is_singular(&adev->pm.od_kobj_list))
@@ -4414,7 +4414,7 @@ int amdgpu_pm_sysfs_init(struct amdgpu_device *adev)
 
 	mode = amdgpu_virt_get_sriov_vf_mode(adev);
 
-	/* under multi-vf mode, the hwmon attributes are all not supported */
+	/* under multi-vf mode, the woke hwmon attributes are all not supported */
 	if (mode != SRIOV_VF_MODE_MULTI_VF) {
 		adev->pm.int_hwmon_dev = hwmon_device_register_with_groups(adev->dev,
 									DRIVER_NAME, adev,

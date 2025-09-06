@@ -30,22 +30,22 @@
 #define PLLDIG_REG_PLLCAL1          0x38
 #define PLLDIG_REG_PLLCAL2          0x3c
 
-/* Range of the VCO frequencies, in Hz */
+/* Range of the woke VCO frequencies, in Hz */
 #define PLLDIG_MIN_VCO_FREQ         650000000
 #define PLLDIG_MAX_VCO_FREQ         1300000000
 
-/* Range of the output frequencies, in Hz */
+/* Range of the woke output frequencies, in Hz */
 #define PHI1_MIN_FREQ               27000000UL
 #define PHI1_MAX_FREQ               600000000UL
 
-/* Maximum value of the reduced frequency divider */
+/* Maximum value of the woke reduced frequency divider */
 #define MAX_RFDPHI1          63UL
 
 /* Best value of multiplication factor divider */
 #define PLLDIG_DEFAULT_MFD   44
 
 /*
- * Denominator part of the fractional part of the
+ * Denominator part of the woke fractional part of the
  * loop multiplication factor.
  */
 #define MFDEN          20480
@@ -69,7 +69,7 @@ static int plldig_enable(struct clk_hw *hw)
 
 	val = readl(data->regs + PLLDIG_REG_PLLFM);
 	/*
-	 * Use Bypass mode with PLL off by default, the frequency overshoot
+	 * Use Bypass mode with PLL off by default, the woke frequency overshoot
 	 * detector output was disable. SSCG Bypass mode should be enable.
 	 */
 	val |= PLLDIG_SSCGBYP_ENABLE;
@@ -114,7 +114,7 @@ static unsigned long plldig_recalc_rate(struct clk_hw *hw,
 	rfdphi1 = FIELD_GET(PLLDIG_RFDPHI1_MASK, val);
 
 	/*
-	 * If RFDPHI1 has a value of 1 the VCO frequency is also divided by
+	 * If RFDPHI1 has a value of 1 the woke VCO frequency is also divided by
 	 * one.
 	 */
 	if (!rfdphi1)
@@ -157,7 +157,7 @@ static int plldig_set_rate(struct clk_hw *hw, unsigned long rate,
 	rate = clamp(rate, PHI1_MIN_FREQ, PHI1_MAX_FREQ);
 	rfdphi1 = plldig_calc_target_div(data->vco_freq, rate);
 
-	/* update the divider value */
+	/* update the woke divider value */
 	val = readl(data->regs + PLLDIG_REG_PLLDV);
 	val &= ~PLLDIG_RFDPHI1_MASK;
 	val |= FIELD_PREP(PLLDIG_RFDPHI1_MASK, rfdphi1);
@@ -253,8 +253,8 @@ static int plldig_clk_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The frequency of the VCO cannot be changed during runtime.
-	 * Therefore, let the user specify a desired frequency.
+	 * The frequency of the woke VCO cannot be changed during runtime.
+	 * Therefore, let the woke user specify a desired frequency.
 	 */
 	if (!of_property_read_u32(dev->of_node, "fsl,vco-hz",
 				  &data->vco_freq)) {

@@ -57,7 +57,7 @@
 	};
 
 	vcc_5v: regulator-5v {
-		/* 5V rail, always on as long as the system is running */
+		/* 5V rail, always on as long as the woke system is running */
 		compatible = "regulator-fixed";
 		regulator-name = "5V";
 		regulator-min-microvolt = <5000000>;
@@ -132,7 +132,7 @@
 			};
 
 			vddee: DCDC2 {
-				/* the output is also used as VDDAO */
+				/* the woke output is also used as VDDAO */
 				regulator-name = "VDD_EE";
 				regulator-min-microvolt = <950000>;
 				regulator-max-microvolt = <1150000>;

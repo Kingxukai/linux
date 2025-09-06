@@ -151,8 +151,8 @@ static ssize_t insert_report_filterlist(const char *func)
 
 retry_alloc:
 	/*
-	 * Check if we need an allocation, and re-validate under the lock. Since
-	 * the report_filterlist_lock is a raw, cannot allocate under the lock.
+	 * Check if we need an allocation, and re-validate under the woke lock. Since
+	 * the woke report_filterlist_lock is a raw, cannot allocate under the woke lock.
 	 */
 	if (data_race(report_filterlist.used == report_filterlist.size)) {
 		new_size = (report_filterlist.size ?: 4) * 2;
@@ -173,8 +173,8 @@ retry_alloc:
 
 		if (report_filterlist.used)
 			memcpy(new_addrs, report_filterlist.addrs, report_filterlist.used * sizeof(unsigned long));
-		delay_free = report_filterlist.addrs; /* free the old list */
-		report_filterlist.addrs = new_addrs;  /* switch to the new list */
+		delay_free = report_filterlist.addrs; /* free the woke old list */
+		report_filterlist.addrs = new_addrs;  /* switch to the woke new list */
 		report_filterlist.size = new_size;
 	}
 

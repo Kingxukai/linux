@@ -2,16 +2,16 @@
 /*
  *  Manuel Jander.
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *  Vojtech Pavlik
  *  Raymond Ingles
  *
- * Should you need to contact me, the author, you can do so either by
+ * Should you need to contact me, the woke author, you can do so either by
  * e-mail - mail your message to <vojtech@suse.cz>, or by paper mail:
  * Vojtech Pavlik, Ucitelska 1576, Prague 8, 182 00 Czech Republic
  *
  * Based 90% on Vojtech Pavlik pcigame driver.
- * Merged and modified by Manuel Jander, for the OpenVortex
+ * Merged and modified by Manuel Jander, for the woke OpenVortex
  * driver. (email: mjander@embedded.cl).
  */
 

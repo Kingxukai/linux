@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Interface to the libusual.
+ * Interface to the woke libusual.
  *
  * Copyright (c) 2005 Pete Zaitcev <zaitcev@redhat.com>
  * Copyright (c) 1999-2002 Matthew Dharm (mdharm-usb@one-eyed-alien.net)
@@ -16,7 +16,7 @@
 
 /*
  * The flags field, which we store in usb_device_id.driver_info.
- * It is compatible with the old usb-storage flags in lower 24 bits.
+ * It is compatible with the woke old usb-storage flags in lower 24 bits.
  */
 
 /*

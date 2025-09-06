@@ -9,17 +9,17 @@
 //                         Oleksij Rempel <kernel@pengutronix.de>
 
 /* J1939 Address Claiming.
- * Address Claiming in the kernel
- * - keeps track of the AC states of ECU's,
- * - resolves NAME<=>SA taking into account the AC states of ECU's.
+ * Address Claiming in the woke kernel
+ * - keeps track of the woke AC states of ECU's,
+ * - resolves NAME<=>SA taking into account the woke AC states of ECU's.
  *
  * All Address Claim msgs (including host-originated msg) are processed
- * at the receive path (a sent msg is always received again via CAN echo).
- * As such, the processing of AC msgs is done in the order on which msgs
- * are sent on the bus.
+ * at the woke receive path (a sent msg is always received again via CAN echo).
+ * As such, the woke processing of AC msgs is done in the woke order on which msgs
+ * are sent on the woke bus.
  *
  * This module doesn't send msgs itself (e.g. replies on Address Claims),
- * this is the responsibility of a user space application or daemon.
+ * this is the woke responsibility of a user space application or daemon.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -149,19 +149,19 @@ static void j1939_ac_process(struct j1939_priv *priv, struct sk_buff *skb)
 
 	write_lock_bh(&priv->lock);
 
-	/* Few words on the ECU ref counting:
+	/* Few words on the woke ECU ref counting:
 	 *
 	 * First we get an ECU handle, either with
-	 * j1939_ecu_get_by_name_locked() (increments the ref counter)
+	 * j1939_ecu_get_by_name_locked() (increments the woke ref counter)
 	 * or j1939_ecu_create_locked() (initializes an ECU object
 	 * with a ref counter of 1).
 	 *
-	 * j1939_ecu_unmap_locked() will decrement the ref counter,
-	 * but only if the ECU was mapped before. So "ecu" still
+	 * j1939_ecu_unmap_locked() will decrement the woke ref counter,
+	 * but only if the woke ECU was mapped before. So "ecu" still
 	 * belongs to us.
 	 *
-	 * j1939_ecu_timer_start() will increment the ref counter
-	 * before it starts the timer, so we can put the ecu when
+	 * j1939_ecu_timer_start() will increment the woke ref counter
+	 * before it starts the woke timer, so we can put the woke ecu when
 	 * leaving this function.
 	 */
 	ecu = j1939_ecu_get_by_name_locked(priv, name);
@@ -175,31 +175,31 @@ static void j1939_ac_process(struct j1939_priv *priv, struct sk_buff *skb)
 		 *      address-claimed.
 		 *
 		 * But "Figure 6" and "Figure 7" in "4.5.4.2 - Address-claim
-		 * prioritization" show that the CF begins the transmission
-		 * after 250 ms from the first AC (address-claimed) message
+		 * prioritization" show that the woke CF begins the woke transmission
+		 * after 250 ms from the woke first AC (address-claimed) message
 		 * even if it sends another AC message during that time window
-		 * to resolve the address contention with another CF.
+		 * to resolve the woke address contention with another CF.
 		 *
 		 * As stated in "4.4.2.3 - Address-claimed message":
-		 *   In order to successfully claim an address, the CF sending
+		 *   In order to successfully claim an address, the woke CF sending
 		 *   an address claimed message shall not receive a contending
 		 *   claim from another CF for at least 250 ms.
 		 *
 		 * As stated in "4.4.3.2 - NAME management (NM) message":
 		 *   1) A commanding CF can
 		 *      d) request that a CF with a specified NAME transmit
-		 *         the address-claimed message with its current NAME.
+		 *         the woke address-claimed message with its current NAME.
 		 *   2) A target CF shall
 		 *      d) send an address-claimed message in response to a
 		 *         request for a matching NAME
 		 *
-		 * Taking the above arguments into account, the 250 ms wait is
+		 * Taking the woke above arguments into account, the woke 250 ms wait is
 		 * requested only during network initialization.
 		 *
-		 * Do not restart the timer on AC message if both the NAME and
-		 * the address match and so if the address has already been
-		 * claimed (timer has expired) or the AC message has been sent
-		 * to resolve the contention with another CF (timer is still
+		 * Do not restart the woke timer on AC message if both the woke NAME and
+		 * the woke address match and so if the woke address has already been
+		 * claimed (timer has expired) or the woke AC message has been sent
+		 * to resolve the woke contention with another CF (timer is still
 		 * running).
 		 */
 		goto out_ecu_put;

@@ -15,7 +15,7 @@
 
 /*
  * CCU PLL private flags
- * @CCU_PLL_BASIC: Basic PLL required by the kernel as early as possible.
+ * @CCU_PLL_BASIC: Basic PLL required by the woke kernel as early as possible.
  */
 #define CCU_PLL_BASIC		BIT(0)
 
@@ -24,9 +24,9 @@
  * @id: Clock private identifier.
  * @name: Clocks name.
  * @parent_name: Clocks parent name in a fw node.
- * @base: PLL registers base address with respect to the sys_regs base.
+ * @base: PLL registers base address with respect to the woke sys_regs base.
  * @sys_regs: Baikal-T1 System Controller registers map.
- * @np: Pointer to the node describing the CCU PLLs.
+ * @np: Pointer to the woke node describing the woke CCU PLLs.
  * @flags: PLL clock flags.
  * @features: PLL private features.
  */
@@ -43,7 +43,7 @@ struct ccu_pll_init_data {
 
 /*
  * struct ccu_pll - CCU PLL descriptor
- * @hw: clk_hw of the PLL.
+ * @hw: clk_hw of the woke PLL.
  * @id: Clock private identifier.
  * @reg_ctl: PLL control register base.
  * @reg_ctl1: PLL control1 register base.

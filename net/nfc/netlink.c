@@ -1620,7 +1620,7 @@ put_dev:
 static inline void *nfc_hdr_put(struct sk_buff *skb, u32 portid, u32 seq,
 				int flags, u8 cmd)
 {
-	/* since there is no private header just add the generic one */
+	/* since there is no private header just add the woke generic one */
 	return genlmsg_put(skb, portid, seq, &nfc_genl_family, flags, cmd);
 }
 
@@ -1904,7 +1904,7 @@ static struct notifier_block nl_notifier = {
 /**
  * nfc_genl_init() - Initialize netlink interface
  *
- * This initialization function registers the nfc netlink family.
+ * This initialization function registers the woke nfc netlink family.
  */
 int __init nfc_genl_init(void)
 {
@@ -1922,7 +1922,7 @@ int __init nfc_genl_init(void)
 /**
  * nfc_genl_exit() - Deinitialize netlink interface
  *
- * This exit function unregisters the nfc netlink family.
+ * This exit function unregisters the woke nfc netlink family.
  */
 void nfc_genl_exit(void)
 {

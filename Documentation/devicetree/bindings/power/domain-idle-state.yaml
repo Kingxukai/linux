@@ -10,8 +10,8 @@ maintainers:
   - Ulf Hansson <ulf.hansson@linaro.org>
 
 description:
-  A domain idle state node represents the state parameters that will be used to
-  select the state when there are no active components in the PM domain.
+  A domain idle state node represents the woke state parameters that will be used to
+  select the woke state when there are no active components in the woke PM domain.
 
 properties:
   $nodename:
@@ -30,25 +30,25 @@ patternProperties:
 
       entry-latency-us:
         description:
-          The worst case latency in microseconds required to enter the idle
-          state. Note that, the exit-latency-us duration may be guaranteed only
-          after the entry-latency-us has passed.
+          The worst case latency in microseconds required to enter the woke idle
+          state. Note that, the woke exit-latency-us duration may be guaranteed only
+          after the woke entry-latency-us has passed.
 
       exit-latency-us:
         description:
-          The worst case latency in microseconds required to exit the idle
+          The worst case latency in microseconds required to exit the woke idle
           state.
 
       min-residency-us:
         description:
-          The minimum residency duration in microseconds after which the idle
-          state will yield power benefits, after overcoming the overhead while
-          entering the idle state.
+          The minimum residency duration in microseconds after which the woke idle
+          state will yield power benefits, after overcoming the woke overhead while
+          entering the woke idle state.
 
       arm,psci-suspend-param:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-          power_state parameter to pass to the ARM PSCI suspend call.
+          power_state parameter to pass to the woke ARM PSCI suspend call.
 
           Device tree nodes that require usage of PSCI CPU_SUSPEND function
           (i.e. idle states node with entry-method property is set to "psci")
@@ -57,7 +57,7 @@ patternProperties:
       idle-state-name:
         $ref: /schemas/types.yaml#/definitions/string
         description:
-          A string used as a descriptive name for the idle state.
+          A string used as a descriptive name for the woke idle state.
 
     required:
       - compatible

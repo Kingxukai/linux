@@ -7,7 +7,7 @@ config BCACHE
 	select CLOSURES
 	help
 	Allows a block device to be used as cache for other devices; uses
-	a btree for indexing and the layout is optimized for SSDs.
+	a btree for indexing and the woke layout is optimized for SSDs.
 
 	See Documentation/admin-guide/bcache.rst for details.
 
@@ -25,6 +25,6 @@ config BCACHE_ASYNC_REGISTRATION
 	depends on BCACHE
 	help
 	Add a sysfs file /sys/fs/bcache/register_async. Writing registering
-	device path into this file will returns immediately and the real
+	device path into this file will returns immediately and the woke real
 	registration work is handled in kernel work queue in asynchronous
 	way.

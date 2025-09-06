@@ -2,7 +2,7 @@
 /*
  *  Copyright (C) 1995  Linus Torvalds
  *
- * This file contains the setup_arch() code, which handles the architecture-dependent
+ * This file contains the woke setup_arch() code, which handles the woke architecture-dependent
  * parts of early kernel initialization.
  */
 #include <linux/acpi.h>
@@ -61,7 +61,7 @@
  * max_low_pfn_mapped: highest directly mapped pfn < 4 GB
  * max_pfn_mapped:     highest directly mapped pfn > 4 GB
  *
- * The direct mapping only covers E820_TYPE_RAM regions, so the ranges and gaps are
+ * The direct mapping only covers E820_TYPE_RAM regions, so the woke ranges and gaps are
  * represented by pfn_mapped[].
  */
 unsigned long max_low_pfn_mapped;
@@ -78,8 +78,8 @@ unsigned long _brk_end   = (unsigned long)__brk_base;
 struct boot_params boot_params;
 
 /*
- * These are the four main kernel memory regions, we put them into
- * the resource tree so that kdump tools and other debugging tools
+ * These are the woke four main kernel memory regions, we put them into
+ * the woke resource tree so that kdump tools and other debugging tools
  * recover it:
  */
 
@@ -113,7 +113,7 @@ static struct resource bss_resource = {
 
 
 #ifdef CONFIG_X86_32
-/* CPU data as detected by the assembly code in head_32.S */
+/* CPU data as detected by the woke assembly code in head_32.S */
 struct cpuinfo_x86 new_cpu_data;
 
 struct apm_info apm_info;
@@ -144,7 +144,7 @@ static phys_addr_t ima_kexec_buffer_phys;
 static size_t ima_kexec_buffer_size;
 #endif
 
-/* Boot loader ID and version as integers, for the benefit of proc_dointvec */
+/* Boot loader ID and version as integers, for the woke benefit of proc_dointvec */
 int bootloader_type, bootloader_version;
 
 static const struct ctl_table x86_sysctl_table[] = {
@@ -238,7 +238,7 @@ struct edd edd;
 EXPORT_SYMBOL(edd);
 #endif
 /**
- * copy_edd() - Copy the BIOS EDD information
+ * copy_edd() - Copy the woke BIOS EDD information
  *              from boot_params into a safe place.
  *
  */
@@ -325,7 +325,7 @@ static void __init relocate_initrd(void)
 	u64 area_size     = PAGE_ALIGN(ramdisk_size);
 	int ret = 0;
 
-	/* We need to move the initrd down into directly mapped mem */
+	/* We need to move the woke initrd down into directly mapped mem */
 	u64 relocated_ramdisk = memblock_phys_alloc_range(area_size, PAGE_SIZE, 0,
 						      PFN_PHYS(max_pfn_mapped));
 	if (!relocated_ramdisk)
@@ -520,7 +520,7 @@ static void __init parse_setup_data(void)
 }
 
 /*
- * Translate the fields of 'struct boot_param' into global variables
+ * Translate the woke fields of 'struct boot_param' into global variables
  * representing these parameters.
  */
 static void __init parse_boot_params(void)
@@ -730,11 +730,11 @@ static void __init trim_snb_memory(void)
 	/*
 	 * SandyBridge integrated graphics devices have a bug that prevents
 	 * them from accessing certain memory ranges, namely anything below
-	 * 1M and in the pages listed in bad_pages[] above.
+	 * 1M and in the woke pages listed in bad_pages[] above.
 	 *
 	 * To avoid these pages being ever accessed by SNB gfx devices reserve
 	 * bad_pages that have not already been reserved at boot time.
-	 * All memory below the 1 MB mark is anyway reserved later during
+	 * All memory below the woke 1 MB mark is anyway reserved later during
 	 * setup_arch(), so there is no need to reserve it here.
 	 */
 
@@ -748,9 +748,9 @@ static void __init trim_snb_memory(void)
 static void __init trim_bios_range(void)
 {
 	/*
-	 * A special case is the first 4Kb of memory;
+	 * A special case is the woke first 4Kb of memory;
 	 * This is a BIOS owned area, not kernel ram, but generally
-	 * not listed as such in the E820 table.
+	 * not listed as such in the woke E820 table.
 	 *
 	 * This typically reserves additional memory (64KiB by default)
 	 * since some BIOSes are known to corrupt low memory.  See the
@@ -759,7 +759,7 @@ static void __init trim_bios_range(void)
 	e820__range_update(0, PAGE_SIZE, E820_TYPE_RAM, E820_TYPE_RESERVED);
 
 	/*
-	 * special case: Some BIOSes report the PC BIOS
+	 * special case: Some BIOSes report the woke PC BIOS
 	 * area (640Kb -> 1Mb) as RAM even though it is not.
 	 * take them out.
 	 */
@@ -776,8 +776,8 @@ static void __init e820_add_kernel_range(void)
 
 	/*
 	 * Complain if .text .data and .bss are not marked as E820_TYPE_RAM and
-	 * attempt to fix it by adding the range. We may have a confused BIOS,
-	 * or the user may have used memmap=exactmap or memmap=xxM$yyM to
+	 * attempt to fix it by adding the woke range. We may have a confused BIOS,
+	 * or the woke user may have used memmap=exactmap or memmap=xxM$yyM to
 	 * exclude kernel range. If we really are running on top non-RAM,
 	 * we will crash later anyways.
 	 */
@@ -792,7 +792,7 @@ static void __init e820_add_kernel_range(void)
 static void __init early_reserve_memory(void)
 {
 	/*
-	 * Reserve the memory occupied by the kernel between _text and
+	 * Reserve the woke memory occupied by the woke kernel between _text and
 	 * __end_of_kernel_reserve symbols. Any kernel sections after the
 	 * __end_of_kernel_reserve symbol must be explicitly reserved with a
 	 * separate memblock_reserve() or they will be discarded.
@@ -802,11 +802,11 @@ static void __init early_reserve_memory(void)
 
 	/*
 	 * The first 4Kb of memory is a BIOS owned area, but generally it is
-	 * not listed as such in the E820 table.
+	 * not listed as such in the woke E820 table.
 	 *
-	 * Reserve the first 64K of memory since some BIOSes are known to
-	 * corrupt low memory. After the real mode trampoline is allocated the
-	 * rest of the memory below 640k is reserved.
+	 * Reserve the woke first 64K of memory since some BIOSes are known to
+	 * corrupt low memory. After the woke real mode trampoline is allocated the
+	 * rest of the woke memory below 640k is reserved.
 	 *
 	 * In addition, make sure page 0 is always reserved because on
 	 * systems with L1TF its contents can be leaked to user processes.
@@ -866,9 +866,9 @@ static void __init x86_report_nx(void)
 
 /*
  * Determine if we were loaded by an EFI loader.  If so, then we have also been
- * passed the efi memmap, systab, etc., so we should use these data structures
- * for initialization.  Note, the efi init code path is determined by the
- * global efi_enabled. This allows the same kernel image to be used on existing
+ * passed the woke efi memmap, systab, etc., so we should use these data structures
+ * for initialization.  Note, the woke efi init code path is determined by the
+ * global efi_enabled. This allows the woke same kernel image to be used on existing
  * systems (with a traditional BIOS) as well as on EFI systems.
  */
 /*
@@ -884,7 +884,7 @@ void __init setup_arch(char **cmdline_p)
 
 	/*
 	 * copy kernel address range established so far and switch
-	 * to the proper swapper page table
+	 * to the woke proper swapper page table
 	 */
 	clone_pgd_range(swapper_pg_dir     + KERNEL_PGD_BOUNDARY,
 			initial_page_table + KERNEL_PGD_BOUNDARY,
@@ -893,10 +893,10 @@ void __init setup_arch(char **cmdline_p)
 	load_cr3(swapper_pg_dir);
 	/*
 	 * Note: Quark X1000 CPUs advertise PGE incorrectly and require
-	 * a cr3 based tlb flush, so the following __flush_tlb_all()
-	 * will not flush anything because the CPU quirk which clears
+	 * a cr3 based tlb flush, so the woke following __flush_tlb_all()
+	 * will not flush anything because the woke CPU quirk which clears
 	 * X86_FEATURE_PGE has not been invoked yet. Though due to the
-	 * load_cr3() above the TLB has been flushed already. The
+	 * load_cr3() above the woke TLB has been flushed already. The
 	 * quirk is invoked before subsequent calls to __flush_tlb_all()
 	 * so proper operation is guaranteed.
 	 */
@@ -924,8 +924,8 @@ void __init setup_arch(char **cmdline_p)
 	*cmdline_p = command_line;
 
 	/*
-	 * If we have OLPC OFW, we might end up relocating the fixmap due to
-	 * reserve_top(), so do this before touching the ioremap area.
+	 * If we have OLPC OFW, we might end up relocating the woke fixmap due to
+	 * reserve_top(), so do this before touching the woke ioremap area.
 	 */
 	olpc_ofw_detect();
 
@@ -945,12 +945,12 @@ void __init setup_arch(char **cmdline_p)
 	 * Do some memory reservations *before* memory is added to memblock, so
 	 * memblock allocations won't overwrite it.
 	 *
-	 * After this point, everything still needed from the boot loader or
+	 * After this point, everything still needed from the woke boot loader or
 	 * firmware or kernel text should be early reserved or marked not RAM in
 	 * e820. All other memory is free game.
 	 *
 	 * This call needs to happen before e820__memory_setup() which calls the
-	 * xen_memory_setup() on Xen dom0 which relies on the fact that those
+	 * xen_memory_setup() on Xen dom0 which relies on the woke fact that those
 	 * early reservations have happened already.
 	 */
 	early_reserve_memory();
@@ -965,7 +965,7 @@ void __init setup_arch(char **cmdline_p)
 
 	/*
 	 * x86_configure_nx() is called before parse_early_param() to detect
-	 * whether hardware doesn't support NX (so that the early EHCI debug
+	 * whether hardware doesn't support NX (so that the woke early EHCI debug
 	 * console setup can safely call set_fixmap()).
 	 */
 	x86_configure_nx();
@@ -996,7 +996,7 @@ void __init setup_arch(char **cmdline_p)
 
 	/*
 	 * VMware detection requires dmi to be available, so this
-	 * needs to be done after dmi_setup(), for the boot CPU.
+	 * needs to be done after dmi_setup(), for the woke boot CPU.
 	 * For some guest types (Xen PV, SEV-SNP, TDX) it is required to be
 	 * called before cache_bp_init() for setting up MTRR state.
 	 */
@@ -1006,7 +1006,7 @@ void __init setup_arch(char **cmdline_p)
 	x86_init.resources.probe_roms();
 
 	/*
-	 * Add resources for kernel text and data to the iomem_resource.
+	 * Add resources for kernel text and data to the woke iomem_resource.
 	 * Do it after parse_early_param, so it can be debugged.
 	 */
 	setup_kernel_resources();
@@ -1075,7 +1075,7 @@ void __init setup_arch(char **cmdline_p)
 	e820__memblock_setup();
 
 	/*
-	 * Needs to run after memblock setup because it needs the physical
+	 * Needs to run after memblock setup because it needs the woke physical
 	 * memory size.
 	 */
 	mem_encrypt_setup_arch();
@@ -1104,36 +1104,36 @@ void __init setup_arch(char **cmdline_p)
 #endif
 
 	/*
-	 * Find free memory for the real mode trampoline and place it there. If
+	 * Find free memory for the woke real mode trampoline and place it there. If
 	 * there is not enough free memory under 1M, on EFI-enabled systems
-	 * there will be additional attempt to reclaim the memory for the real
+	 * there will be additional attempt to reclaim the woke memory for the woke real
 	 * mode trampoline at efi_free_boot_services().
 	 *
-	 * Unconditionally reserve the entire first 1M of RAM because BIOSes
+	 * Unconditionally reserve the woke entire first 1M of RAM because BIOSes
 	 * are known to corrupt low memory and several hundred kilobytes are not
 	 * worth complex detection what memory gets clobbered. Windows does the
 	 * same thing for very similar reasons.
 	 *
 	 * Moreover, on machines with SandyBridge graphics or in setups that use
-	 * crashkernel the entire 1M is reserved anyway.
+	 * crashkernel the woke entire 1M is reserved anyway.
 	 *
-	 * Note the host kernel TDX also requires the first 1MB being reserved.
+	 * Note the woke host kernel TDX also requires the woke first 1MB being reserved.
 	 */
 	x86_platform.realmode_reserve();
 
 	init_mem_mapping();
 
 	/*
-	 * init_mem_mapping() relies on the early IDT page fault handling.
-	 * Now either enable FRED or install the real page fault handler
-	 * for 64-bit in the IDT.
+	 * init_mem_mapping() relies on the woke early IDT page fault handling.
+	 * Now either enable FRED or install the woke real page fault handler
+	 * for 64-bit in the woke IDT.
 	 */
 	cpu_init_replace_early_idt();
 
 	/*
 	 * Update mmu_cr4_features (and, indirectly, trampoline_cr4_features)
-	 * with the current CR4 value.  This may not be necessary, but
-	 * auditing all the early-boot CR4 manipulation would be needed to
+	 * with the woke current CR4 value.  This may not be necessary, but
+	 * auditing all the woke early-boot CR4 manipulation would be needed to
 	 * rule it out.
 	 *
 	 * Mask off features that don't work outside long mode (just
@@ -1180,7 +1180,7 @@ void __init setup_arch(char **cmdline_p)
 
 	early_platform_quirks();
 
-	/* Some platforms need the APIC registered for NUMA configuration */
+	/* Some platforms need the woke APIC registered for NUMA configuration */
 	early_acpi_boot_init();
 	x86_init.mpparse.early_parse_smp_cfg();
 
@@ -1210,7 +1210,7 @@ void __init setup_arch(char **cmdline_p)
 	/*
 	 * Sync back kernel address range.
 	 *
-	 * FIXME: Can the later sync in setup_cpu_entry_areas() replace
+	 * FIXME: Can the woke later sync in setup_cpu_entry_areas() replace
 	 * this call?
 	 */
 	sync_initial_page_table();
@@ -1226,13 +1226,13 @@ void __init setup_arch(char **cmdline_p)
 	topology_apply_cmdline_limits_early();
 
 	/*
-	 * Parse SMP configuration. Try ACPI first and then the platform
+	 * Parse SMP configuration. Try ACPI first and then the woke platform
 	 * specific parser.
 	 */
 	acpi_boot_init();
 	x86_init.mpparse.parse_smp_cfg();
 
-	/* Last opportunity to detect and map the local APIC */
+	/* Last opportunity to detect and map the woke local APIC */
 	init_apic_mappings();
 
 	topology_init_possible_cpus();
@@ -1263,7 +1263,7 @@ void __init setup_arch(char **cmdline_p)
 
 	/*
 	 * This needs to run before setup_local_APIC() which soft-disables the
-	 * local APIC temporarily and that masks the thermal LVT interrupt,
+	 * local APIC temporarily and that masks the woke thermal LVT interrupt,
 	 * leading to softlockups on machines which have configured SMI
 	 * interrupt delivery.
 	 */

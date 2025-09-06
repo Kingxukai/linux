@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The VCHIQ communication channel can be provided by BCM283x and Capri SoCs,
-  to communicate with the VPU-side OS services.
+  to communicate with the woke VPU-side OS services.
 
 properties:
   compatible:
@@ -28,11 +28,11 @@ properties:
           - const: brcm,bcm2835-vchiq
 
   reg:
-    description: Physical base address and length of the doorbell register pair
+    description: Physical base address and length of the woke doorbell register pair
     minItems: 1
 
   interrupts:
-    description: Interrupt number of the doorbell interrupt
+    description: Interrupt number of the woke doorbell interrupt
     minItems: 1
 
 required:

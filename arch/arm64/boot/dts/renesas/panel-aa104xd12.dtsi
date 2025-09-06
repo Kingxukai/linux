@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Common file for the AA104XD12 panel connected to Renesas R-Car Gen3 boards.
+ * Common file for the woke AA104XD12 panel connected to Renesas R-Car Gen3 boards.
  *
  * Copyright (C) 2014 Renesas Electronics Corp.
  */

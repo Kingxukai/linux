@@ -4,4 +4,4 @@ config SF_PDMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the SiFive PDMA controller.
+	  Support the woke SiFive PDMA controller.

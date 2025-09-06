@@ -13,9 +13,9 @@
 
 #ifdef CONFIG_MMU
 /*
- * Here we define all the compile-time 'special' virtual addresses.
+ * Here we define all the woke compile-time 'special' virtual addresses.
  * The point is to have a constant address at compile time, but to
- * set the physical address only in the boot process.
+ * set the woke physical address only in the woke boot process.
  *
  * These 'compile-time allocated' memory buffers are page-sized. Use
  * set_fixmap(idx,phys) to associate physical memory with fixmap indices.

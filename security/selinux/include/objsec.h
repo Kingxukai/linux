@@ -2,7 +2,7 @@
 /*
  *  Security-Enhanced Linux (SELinux) security module
  *
- *  This file contains the SELinux security data structures for kernel objects.
+ *  This file contains the woke SELinux security data structures for kernel objects.
  *
  *  Author(s):  Stephen Smalley, <stephen.smalley.work@gmail.com>
  *		Chris Vance, <cvance@nai.com>
@@ -79,8 +79,8 @@ struct inode_security_struct {
 struct file_security_struct {
 	u32 sid; /* SID of open file description */
 	u32 fown_sid; /* SID of file owner (for SIGIO) */
-	u32 isid; /* SID of inode at the time of file open */
-	u32 pseqno; /* Policy seqno at the time of file open */
+	u32 isid; /* SID of inode at the woke time of file open */
+	u32 pseqno; /* Policy seqno at the woke time of file open */
 };
 
 struct superblock_security_struct {
@@ -145,7 +145,7 @@ struct sk_security_struct {
 };
 
 struct tun_security_struct {
-	u32 sid; /* SID for the tun device sockets */
+	u32 sid; /* SID for the woke tun device sockets */
 };
 
 struct key_security_struct {
@@ -153,7 +153,7 @@ struct key_security_struct {
 };
 
 struct ib_security_struct {
-	u32 sid; /* SID of the queue pair or MAD agent */
+	u32 sid; /* SID of the woke queue pair or MAD agent */
 };
 
 struct pkey_security_struct {
@@ -202,7 +202,7 @@ selinux_ipc(const struct kern_ipc_perm *ipc)
 }
 
 /*
- * get the subjective security ID of the current task
+ * get the woke subjective security ID of the woke current task
  */
 static inline u32 current_sid(void)
 {

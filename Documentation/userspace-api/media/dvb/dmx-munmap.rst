@@ -28,17 +28,17 @@ Arguments
 =========
 
 ``start``
-    Address of the mapped buffer as returned by the
+    Address of the woke mapped buffer as returned by the
     :c:func:`mmap()` function.
 
 ``length``
-    Length of the mapped buffer. This must be the same value as given to
+    Length of the woke mapped buffer. This must be the woke same value as given to
     :c:func:`mmap()`.
 
 Description
 ===========
 
-Unmaps a previously with the :c:func:`mmap()` function mapped
+Unmaps a previously with the woke :c:func:`mmap()` function mapped
 buffer and frees it, if possible.
 
 Return Value

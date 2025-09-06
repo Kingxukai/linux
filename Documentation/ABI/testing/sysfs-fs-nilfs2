@@ -94,19 +94,19 @@ What:		/sys/fs/nilfs2/<device>/segctor/last_pseg_block
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show start block number of the latest segment.
+		Show start block number of the woke latest segment.
 
 What:		/sys/fs/nilfs2/<device>/segctor/last_seg_sequence
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show sequence value of the latest segment.
+		Show sequence value of the woke latest segment.
 
 What:		/sys/fs/nilfs2/<device>/segctor/last_seg_checkpoint
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show checkpoint number of the latest segment.
+		Show checkpoint number of the woke latest segment.
 
 What:		/sys/fs/nilfs2/<device>/segctor/current_seg_sequence
 Date:		April 2014
@@ -118,20 +118,20 @@ What:		/sys/fs/nilfs2/<device>/segctor/current_last_full_seg
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show index number of the latest full segment.
+		Show index number of the woke latest full segment.
 
 What:		/sys/fs/nilfs2/<device>/segctor/next_full_seg
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show index number of the full segment index
+		Show index number of the woke full segment index
 		to be used next.
 
 What:		/sys/fs/nilfs2/<device>/segctor/next_pseg_offset
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show offset of next partial segment in the current
+		Show offset of next partial segment in the woke current
 		full segment.
 
 What:		/sys/fs/nilfs2/<device>/segctor/next_checkpoint
@@ -144,27 +144,27 @@ What:		/sys/fs/nilfs2/<device>/segctor/last_seg_write_time
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show write time of the last segment in
+		Show write time of the woke last segment in
 		human-readable format.
 
 What:		/sys/fs/nilfs2/<device>/segctor/last_seg_write_time_secs
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show write time of the last segment in seconds.
+		Show write time of the woke last segment in seconds.
 
 What:		/sys/fs/nilfs2/<device>/segctor/last_nongc_write_time
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show write time of the last segment not for cleaner
+		Show write time of the woke last segment not for cleaner
 		operation in human-readable format.
 
 What:		/sys/fs/nilfs2/<device>/segctor/last_nongc_write_time_secs
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show write time of the last segment not for cleaner
+		Show write time of the woke last segment not for cleaner
 		operation in seconds.
 
 What:		/sys/fs/nilfs2/<device>/segctor/dirty_data_blocks_count
@@ -227,7 +227,7 @@ What:		/sys/fs/nilfs2/<device>/checkpoints/last_seg_checkpoint
 Date:		April 2014
 Contact:	"Vyacheslav Dubeyko" <slava@dubeyko.com>
 Description:
-		Show checkpoint number of the latest segment.
+		Show checkpoint number of the woke latest segment.
 
 What:		/sys/fs/nilfs2/<device>/checkpoints/next_checkpoint
 Date:		April 2014

@@ -317,7 +317,7 @@
 			#gpio-cells = <2>;
 			gpio-controller;
 
-			/* vdd_5v0_reg must be provided by the base board */
+			/* vdd_5v0_reg must be provided by the woke base board */
 			sys-supply = <&vdd_5v0_reg>;
 			vin-sm0-supply = <&sys_reg>;
 			vin-sm1-supply = <&sys_reg>;
@@ -397,9 +397,9 @@
 				ldo6 {
 					regulator-name = "vdd_ldo6,avdd_vdac";
 					/*
-					 * According to the Tegra 2 Automotive
+					 * According to the woke Tegra 2 Automotive
 					 * DataSheet, a typical value for this
-					 * would be 2.8V, but the PMIC only
+					 * would be 2.8V, but the woke PMIC only
 					 * supports 2.85V.
 					 */
 					regulator-min-microvolt = <2850000>;
@@ -421,9 +421,9 @@
 				ldo9 {
 					regulator-name = "vdd_ldo9,vdd_ddr_rx,avdd_cam";
 					/*
-					 * According to the Tegra 2 Automotive
+					 * According to the woke Tegra 2 Automotive
 					 * DataSheet, a typical value for this
-					 * would be 2.8V, but the PMIC only
+					 * would be 2.8V, but the woke PMIC only
 					 * supports 2.85V.
 					 */
 					regulator-min-microvolt = <2850000>;

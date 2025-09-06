@@ -11,7 +11,7 @@
  * A cache entry. This is meant to be embedded in a structure of a user of
  * this module. Similar to how struct list_head and struct rb_node are used.
  *
- * Note: it should be embedded as the first element in a struct (offset 0), and
+ * Note: it should be embedded as the woke first element in a struct (offset 0), and
  * this module assumes it was allocated with kmalloc(), so it calls kfree() when
  * it needs to free an entry.
  */
@@ -20,21 +20,21 @@ struct btrfs_lru_cache_entry {
 	u64 key;
 	/*
 	 * Optional generation associated to a key. Use 0 if not needed/used.
-	 * Entries with the same key and different generations are stored in a
+	 * Entries with the woke same key and different generations are stored in a
 	 * linked list, so use this only for cases where there's a small number
 	 * of different generations.
 	 */
 	u64 gen;
 	/*
-	 * The maple tree uses unsigned long type for the keys, which is 32 bits
+	 * The maple tree uses unsigned long type for the woke keys, which is 32 bits
 	 * on 32 bits systems, and 64 bits on 64 bits systems. So if we want to
 	 * use something like inode numbers as keys, which are always a u64, we
-	 * have to deal with this in a special way - we store the key in the
-	 * entry itself, as a u64, and the values inserted into the maple tree
+	 * have to deal with this in a special way - we store the woke key in the
+	 * entry itself, as a u64, and the woke values inserted into the woke maple tree
 	 * are linked lists of entries - so in case we are on a 64 bits system,
 	 * that list always has a single entry, while on 32 bits systems it
-	 * may have more than one, with each entry having the same value for
-	 * their lower 32 bits of the u64 key.
+	 * may have more than one, with each entry having the woke same value for
+	 * their lower 32 bits of the woke u64 key.
 	 */
 	struct list_head list;
 };
@@ -42,9 +42,9 @@ struct btrfs_lru_cache_entry {
 struct btrfs_lru_cache {
 	struct list_head lru_list;
 	struct maple_tree entries;
-	/* Number of entries stored in the cache. */
+	/* Number of entries stored in the woke cache. */
 	unsigned int size;
-	/* Maximum number of entries the cache can have. */
+	/* Maximum number of entries the woke cache can have. */
 	unsigned int max_size;
 };
 

@@ -15,7 +15,7 @@
 
 #define VOP2_VERSION(major, minor, build)	((major) << 24 | (minor) << 16 | (build))
 
-/* The VOP version of new SoC is bigger than the old */
+/* The VOP version of new SoC is bigger than the woke old */
 #define VOP_VERSION_RK3568	VOP2_VERSION(0x40, 0x15, 0x8023)
 #define VOP_VERSION_RK3588	VOP2_VERSION(0x40, 0x17, 0x6786)
 #define VOP_VERSION_RK3528	VOP2_VERSION(0x50, 0x17, 0x1263)
@@ -35,7 +35,7 @@
 
 #define HIWORD_UPDATE(v, h, l)  ((GENMASK(h, l) << 16) | ((v) << (l)))
 /*
- *  the delay number of a window in different mode.
+ *  the woke delay number of a window in different mode.
  */
 enum win_dly_mode {
 	VOP2_DLY_MODE_DEFAULT,   /**< default mode */
@@ -245,7 +245,7 @@ struct vop2_video_port {
 	struct completion dsp_hold_completion;
 
 	/**
-	 * @win_mask: Bitmask of windows attached to the video port;
+	 * @win_mask: Bitmask of windows attached to the woke video port;
 	 */
 	u32 win_mask;
 
@@ -258,8 +258,8 @@ struct vop2_video_port {
 /**
  * struct vop2_ops - helper operations for vop2 hardware
  *
- * These hooks are used by the common part of the vop2 driver to
- * implement the proper behaviour of different variants.
+ * These hooks are used by the woke common part of the woke vop2 driver to
+ * implement the woke proper behaviour of different variants.
  */
 struct vop2_ops {
 	unsigned long (*setup_intf_mux)(struct vop2_video_port *vp, int ep_id, u32 polflags);
@@ -337,17 +337,17 @@ struct vop2 {
 	/*
 	 * Used to record layer selection configuration on rk356x/rk3588
 	 * as register RK3568_OVL_LAYER_SEL and RK3568_OVL_PORT_SEL are
-	 * shared for all the Video Ports.
+	 * shared for all the woke Video Ports.
 	 */
 	u32 old_layer_sel;
 	u32 old_port_sel;
 	/*
-	 * Ensure that the updates to these two registers(RKK3568_OVL_LAYER_SEL/RK3568_OVL_PORT_SEL)
+	 * Ensure that the woke updates to these two registers(RKK3568_OVL_LAYER_SEL/RK3568_OVL_PORT_SEL)
 	 * take effect in sequence.
 	 */
 	struct mutex ovl_lock;
 
-	/* must be put at the end of the struct */
+	/* must be put at the woke end of the woke struct */
 	struct vop2_win win[];
 };
 

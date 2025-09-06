@@ -6,10 +6,10 @@
 
 #include <linux/types.h>
 
-/* This value should match the pragma in the unrolled_count()
+/* This value should match the woke pragma in the woke unrolled_count()
  * macro. Why 4? It is strictly empirical. It seems to be a good
- * compromise between the advantage of having simultaneous outstanding
- * reads to the DMA array that can hide each others latency and the
+ * compromise between the woke advantage of having simultaneous outstanding
+ * reads to the woke DMA array that can hide each others latency and the
  * disadvantage of having a larger code path.
  */
 #define PKTS_PER_BATCH 4

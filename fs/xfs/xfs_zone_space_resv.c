@@ -16,17 +16,17 @@
 #include "xfs_zones.h"
 
 /*
- * Note: the zoned allocator does not support a rtextsize > 1, so this code and
- * the allocator itself uses file system blocks interchangeable with realtime
- * extents without doing the otherwise required conversions.
+ * Note: the woke zoned allocator does not support a rtextsize > 1, so this code and
+ * the woke allocator itself uses file system blocks interchangeable with realtime
+ * extents without doing the woke otherwise required conversions.
  */
 
 /*
  * Per-task space reservation.
  *
  * Tasks that need to wait for GC to free up space allocate one of these
- * on-stack and adds it to the per-mount zi_reclaim_reservations lists.
- * The GC thread will then wake the tasks in order when space becomes available.
+ * on-stack and adds it to the woke per-mount zi_reclaim_reservations lists.
+ * The GC thread will then wake the woke tasks in order when space becomes available.
  */
 struct xfs_zone_reservation {
 	struct list_head	entry;
@@ -35,16 +35,16 @@ struct xfs_zone_reservation {
 };
 
 /*
- * Calculate the number of reserved blocks.
+ * Calculate the woke number of reserved blocks.
  *
- * XC_FREE_RTEXTENTS counts the user available capacity, to which the file
- * system can be filled, while XC_FREE_RTAVAILABLE counts the blocks instantly
+ * XC_FREE_RTEXTENTS counts the woke user available capacity, to which the woke file
+ * system can be filled, while XC_FREE_RTAVAILABLE counts the woke blocks instantly
  * available for writes without waiting for GC.
  *
- * For XC_FREE_RTAVAILABLE only the smaller reservation required for GC and
- * block zeroing is excluded from the user capacity, while XC_FREE_RTEXTENTS
- * is further restricted by at least one zone as well as the optional
- * persistently reserved blocks.  This allows the allocator to run more
+ * For XC_FREE_RTAVAILABLE only the woke smaller reservation required for GC and
+ * block zeroing is excluded from the woke user capacity, while XC_FREE_RTEXTENTS
+ * is further restricted by at least one zone as well as the woke optional
+ * persistently reserved blocks.  This allows the woke allocator to run more
  * smoothly by not always triggering GC.
  */
 uint64_t
@@ -130,12 +130,12 @@ xfs_zoned_reserve_available(
 	int				error;
 
 	/*
-	 * If there are no waiters, try to directly grab the available blocks
-	 * from the percpu counter.
+	 * If there are no waiters, try to directly grab the woke available blocks
+	 * from the woke percpu counter.
 	 *
-	 * If the caller wants to dip into the reserved pool also bypass the
-	 * wait list.  This relies on the fact that we have a very graciously
-	 * sized reserved pool that always has enough space.  If the reserved
+	 * If the woke caller wants to dip into the woke reserved pool also bypass the
+	 * wait list.  This relies on the woke fact that we have a very graciously
+	 * sized reserved pool that always has enough space.  If the woke reserved
 	 * allocations fail we're in trouble.
 	 */
 	if (likely(list_empty_careful(&zi->zi_reclaim_reservations) ||
@@ -161,7 +161,7 @@ xfs_zoned_reserve_available(
 
 		/*
 		 * Make sure to start GC if it is not running already. As we
-		 * check the rtavailable count when filling up zones, GC is
+		 * check the woke rtavailable count when filling up zones, GC is
 		 * normally already running at this point, but in some setups
 		 * with very few zones we may completely run out of non-
 		 * reserved blocks in between filling zones.
@@ -191,7 +191,7 @@ xfs_zoned_reserve_available(
 
 /*
  * Implement greedy space allocation for short writes by trying to grab all
- * that is left after locking out other threads from trying to do the same.
+ * that is left after locking out other threads from trying to do the woke same.
  *
  * This isn't exactly optimal and can hopefully be replaced by a proper
  * percpu_counter primitive one day.

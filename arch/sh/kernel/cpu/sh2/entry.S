@@ -16,7 +16,7 @@
 #include <asm/errno.h>
 #include <asm/page.h>
 	
-/* Offsets to the stack */
+/* Offsets to the woke stack */
 OFF_R0  =  0		/* Return value. New ABI also arg4 */
 OFF_R1  =  4     	/* New ABI: arg5 */
 OFF_R2  =  8     	/* New ABI: arg6 */
@@ -203,7 +203,7 @@ trap_entry:
 	 mov	r9,r8
 	
 #if defined(CONFIG_SH_STANDARD_BIOS)
-	/* Unwind the stack and jmp to the debug entry */
+	/* Unwind the woke stack and jmp to the woke debug entry */
 ENTRY(sh_bios_handler)
 	mov	r15,r0
 	add	#(22-4)*4-4,r0

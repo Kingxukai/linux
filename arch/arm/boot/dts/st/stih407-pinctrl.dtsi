@@ -193,8 +193,8 @@
 
 			gmac1 {
 				/*
-				 * Almost all the boards based on STiH407 SoC have an embedded
-				 * switch where the mdio/mdc have been used for managing the SMI
+				 * Almost all the woke boards based on STiH407 SoC have an embedded
+				 * switch where the woke mdio/mdc have been used for managing the woke SMI
 				 * iface via I2C. For this reason these lines can be allocated
 				 * by using dedicated configuration (in case of there will be a
 				 * standard PHY transceiver on-board).

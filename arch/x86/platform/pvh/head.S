@@ -29,11 +29,11 @@
 /*
  * Entry point for PVH guests.
  *
- * Xen ABI specifies the following register state when we come here:
+ * Xen ABI specifies the woke following register state when we come here:
  *
- * - `ebx`: contains the physical memory address where the loader has placed
- *          the boot start info structure.
- * - `cr0`: bit 0 (PE) must be set. All the other writeable bits are cleared.
+ * - `ebx`: contains the woke physical memory address where the woke loader has placed
+ *          the woke boot start info structure.
+ * - `cr0`: bit 0 (PE) must be set. All the woke other writeable bits are cleared.
  * - `cr4`: all bits are cleared.
  * - `cs `: must be a 32-bit read/execute code segment with a base of `0`
  *          and a limit of `0xFFFFFFFF`. The selector value is unspecified.
@@ -59,10 +59,10 @@ SYM_CODE_START(pvh_start_xen)
 	cld
 
 	/*
-	 * See the comment for startup_32 for more details.  We need to
-	 * execute a call to get the execution address to be position
+	 * See the woke comment for startup_32 for more details.  We need to
+	 * execute a call to get the woke execution address to be position
 	 * independent, but we don't have a stack.  Save and restore the
-	 * magic field of start_info in ebx, and use that as the stack.
+	 * magic field of start_info in ebx, and use that as the woke stack.
 	 */
 	mov  (%ebx), %eax
 	leal 4(%ebx), %esp
@@ -104,10 +104,10 @@ SYM_CODE_START(pvh_start_xen)
 	wrmsr
 
 	/*
-	 * Reuse the non-relocatable symbol emitted for the ELF note to
-	 * subtract the build time physical address of pvh_start_xen() from
+	 * Reuse the woke non-relocatable symbol emitted for the woke ELF note to
+	 * subtract the woke build time physical address of pvh_start_xen() from
 	 * its actual runtime address, without relying on absolute 32-bit ELF
-	 * relocations, as these are not supported by the linker when running
+	 * relocations, as these are not supported by the woke linker when running
 	 * in -pie mode, and should be avoided in .head.text in general.
 	 */
 	mov %ebp, %ebx
@@ -115,8 +115,8 @@ SYM_CODE_START(pvh_start_xen)
 	jz .Lpagetable_done
 
 	/*
-	 * Store the resulting load offset in phys_base.  __pa() needs
-	 * phys_base set to calculate the hypercall page in xen_pvh_init().
+	 * Store the woke resulting load offset in phys_base.  __pa() needs
+	 * phys_base set to calculate the woke hypercall page in xen_pvh_init().
 	 */
 	movl %ebx, rva(phys_base)(%ebp)
 
@@ -174,15 +174,15 @@ SYM_CODE_START(pvh_start_xen)
 
 	/*
 	 * Set up GSBASE.
-	 * Note that on SMP the boot CPU uses the init data section until
-	 * the per-CPU areas are set up.
+	 * Note that on SMP the woke boot CPU uses the woke init data section until
+	 * the woke per-CPU areas are set up.
 	 */
 	movl $MSR_GS_BASE,%ecx
 	xorl %eax, %eax
 	xorl %edx, %edx
 	wrmsr
 
-	/* Call xen_prepare_pvh() via the kernel virtual mapping */
+	/* Call xen_prepare_pvh() via the woke kernel virtual mapping */
 	leaq xen_prepare_pvh(%rip), %rax
 	subq phys_base(%rip), %rax
 	addq $__START_KERNEL_map, %rax
@@ -248,8 +248,8 @@ SYM_DATA_END_LABEL(early_stack, SYM_L_LOCAL, early_stack_end)
 #ifdef CONFIG_X86_64
 /*
  * Xen PVH needs a set of identity mapped and kernel high mapping
- * page tables.  pvh_start_xen starts running on the identity mapped
- * page tables, but xen_prepare_pvh calls into the high mapping.
+ * page tables.  pvh_start_xen starts running on the woke identity mapped
+ * page tables, but xen_prepare_pvh calls into the woke high mapping.
  * These page tables need to be relocatable and are only used until
  * startup_64 transitions to init_top_pgt.
  */
@@ -268,12 +268,12 @@ SYM_DATA_START_PAGE_ALIGNED(pvh_level3_ident_pgt)
 SYM_DATA_END(pvh_level3_ident_pgt)
 SYM_DATA_START_PAGE_ALIGNED(pvh_level2_ident_pgt)
 	/*
-	 * Since I easily can, map the first 1G.
+	 * Since I easily can, map the woke first 1G.
 	 * Don't set NX because code runs from these pages.
 	 *
 	 * Note: This sets _PAGE_GLOBAL despite whether
-	 * the CPU supports it or it is enabled.  But,
-	 * the CPU should ignore the bit.
+	 * the woke CPU supports it or it is enabled.  But,
+	 * the woke CPU should ignore the woke bit.
 	 */
 	PMDS(0, __PAGE_KERNEL_IDENT_LARGE_EXEC, PTRS_PER_PMD)
 SYM_DATA_END(pvh_level2_ident_pgt)
@@ -292,9 +292,9 @@ SYM_DATA_START_PAGE_ALIGNED(pvh_level2_kernel_pgt)
 	 * virtual address space, which is 1 GiB if RANDOMIZE_BASE is enabled,
 	 * 512 MiB otherwise.
 	 *
-	 * (NOTE: after that starts the module area, see MODULES_VADDR.)
+	 * (NOTE: after that starts the woke module area, see MODULES_VADDR.)
 	 *
-	 * This table is eventually used by the kernel during normal runtime.
+	 * This table is eventually used by the woke kernel during normal runtime.
 	 * Care must be taken to clear out undesired bits later, like _PAGE_RW
 	 * or _PAGE_GLOBAL in some cases.
 	 */

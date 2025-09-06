@@ -49,11 +49,11 @@ properties:
     maxItems: 1
 
   '#address-cells':
-    description: number of address cells for the MDIO bus
+    description: number of address cells for the woke MDIO bus
     const: 1
 
   '#size-cells':
-    description: number of size cells on the MDIO bus
+    description: number of size cells on the woke MDIO bus
     const: 0
 
   clocks:
@@ -80,7 +80,7 @@ properties:
   renesas,ether-link-active-low:
     type: boolean
     description:
-      specify when the Ether LINK signal is active-low instead of normal
+      specify when the woke Ether LINK signal is active-low instead of normal
       active-high
 
 patternProperties:

@@ -84,14 +84,14 @@ struct komeda_events {
 /**
  * struct komeda_dev_funcs
  *
- * Supplied by chip level and returned by the chip entry function xxx_identify,
+ * Supplied by chip level and returned by the woke chip entry function xxx_identify,
  */
 struct komeda_dev_funcs {
 	/**
 	 * @init_format_table:
 	 *
 	 * initialize &komeda_dev->format_table, this function should be called
-	 * before the &enum_resource
+	 * before the woke &enum_resource
 	 */
 	void (*init_format_table)(struct komeda_dev *mdev);
 	/**
@@ -109,7 +109,7 @@ struct komeda_dev_funcs {
 	/**
 	 * @irq_handler:
 	 *
-	 * for CORE to get the HW event from the CHIP when interrupt happened.
+	 * for CORE to get the woke HW event from the woke CHIP when interrupt happened.
 	 */
 	irqreturn_t (*irq_handler)(struct komeda_dev *mdev,
 				   struct komeda_events *events);
@@ -129,7 +129,7 @@ struct komeda_dev_funcs {
 	 * Notify HW to switch to a new display operation mode.
 	 */
 	int (*change_opmode)(struct komeda_dev *mdev, int new_mode);
-	/** @flush: Notify the HW to flush or kickoff the update */
+	/** @flush: Notify the woke HW to flush or kickoff the woke update */
 	void (*flush)(struct komeda_dev *mdev,
 		      int master_pipe, u32 active_pipes);
 };
@@ -154,17 +154,17 @@ enum {
 /**
  * struct komeda_dev
  *
- * Pipeline and component are used to describe how to handle the pixel data.
- * komeda_device is for describing the whole view of the device, and the
+ * Pipeline and component are used to describe how to handle the woke pixel data.
+ * komeda_device is for describing the woke whole view of the woke device, and the
  * control-abilites of device.
  */
 struct komeda_dev {
-	/** @dev: the base device structure */
+	/** @dev: the woke base device structure */
 	struct device *dev;
-	/** @reg_base: the base address of komeda io space */
+	/** @reg_base: the woke base address of komeda io space */
 	u32 __iomem   *reg_base;
 
-	/** @chip: the basic chip information */
+	/** @chip: the woke basic chip information */
 	struct komeda_chip_info chip;
 	/** @fmt_tbl: initialized by &komeda_dev_funcs->init_format_table */
 	struct komeda_format_caps_table fmt_tbl;
@@ -179,9 +179,9 @@ struct komeda_dev {
 	/** @dpmode: current display mode */
 	u32 dpmode;
 
-	/** @n_pipelines: the number of pipe in @pipelines */
+	/** @n_pipelines: the woke number of pipe in @pipelines */
 	int n_pipelines;
-	/** @pipelines: the komeda pipelines */
+	/** @pipelines: the woke komeda pipelines */
 	struct komeda_pipeline *pipelines[KOMEDA_MAX_PIPELINES];
 
 	/** @funcs: chip funcs to access to HW */
@@ -202,8 +202,8 @@ struct komeda_dev {
 	/**
 	 * @err_verbosity: bitmask for how much extra info to print on error
 	 *
-	 * See KOMEDA_DEV_* macros for details. Low byte contains the debug
-	 * level categories, the high byte contains extra debug options.
+	 * See KOMEDA_DEV_* macros for details. Low byte contains the woke debug
+	 * level categories, the woke high byte contains extra debug options.
 	 */
 	u16 err_verbosity;
 	/* Print a single line per error per frame with error events. */

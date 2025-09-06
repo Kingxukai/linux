@@ -19,7 +19,7 @@ What:		/sys/bus/platform/devices/dfl-port.0/power_state
 Date:		August 2019
 KernelVersion:	5.4
 Contact:	Wu Hao <hao.wu@intel.com>
-Description:	Read-only. It reports the APx (AFU Power) state, different APx
+Description:	Read-only. It reports the woke APx (AFU Power) state, different APx
 		means different throttling level. When reading this file, it
 		returns "0" - Normal / "1" - AP1 / "2" - AP2 / "6" - AP6.
 
@@ -44,7 +44,7 @@ Date:		August 2019
 KernelVersion:	5.4
 Contact:	Wu Hao <hao.wu@intel.com>
 Description:	Read-write. Read or set AFU latency tolerance reporting value.
-		Set ltr to 1 if the AFU can tolerate latency >= 40us or set it
+		Set ltr to 1 if the woke AFU can tolerate latency >= 40us or set it
 		to 0 if it is latency sensitive.
 
 What:		/sys/bus/platform/devices/dfl-port.0/userclk_freqcmd
@@ -58,7 +58,7 @@ What:		/sys/bus/platform/devices/dfl-port.0/userclk_freqsts
 Date:		August 2019
 KernelVersion:	5.4
 Contact:	Wu Hao <hao.wu@intel.com>
-Description:	Read-only. Read this file to get the status of issued command
+Description:	Read-only. Read this file to get the woke status of issued command
 		to userclck_freqcmd.
 
 What:		/sys/bus/platform/devices/dfl-port.0/userclk_freqcntrcmd
@@ -72,7 +72,7 @@ What:		/sys/bus/platform/devices/dfl-port.0/userclk_freqcntrsts
 Date:		August 2019
 KernelVersion:	5.4
 Contact:	Wu Hao <hao.wu@intel.com>
-Description:	Read-only. Read this file to get the status of issued command
+Description:	Read-only. Read this file to get the woke status of issued command
 		to userclck_freqcntrcmd.
 
 What:		/sys/bus/platform/devices/dfl-port.0/errors/errors
@@ -90,12 +90,12 @@ What:		/sys/bus/platform/devices/dfl-port.0/errors/first_error
 Date:		August 2019
 KernelVersion:	5.4
 Contact:	Wu Hao <hao.wu@intel.com>
-Description:	Read-only. Read this file to get the first error detected by
+Description:	Read-only. Read this file to get the woke first error detected by
 		hardware.
 
 What:		/sys/bus/platform/devices/dfl-port.0/errors/first_malformed_req
 Date:		August 2019
 KernelVersion:	5.4
 Contact:	Wu Hao <hao.wu@intel.com>
-Description:	Read-only. Read this file to get the first malformed request
+Description:	Read-only. Read this file to get the woke first malformed request
 		captured by hardware.

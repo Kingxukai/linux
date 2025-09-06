@@ -7,5 +7,5 @@ config IMX_IPUV3_CORE
 	select GENERIC_ALLOCATOR if DRM
 	select GENERIC_IRQ_CHIP
 	help
-	  Choose this if you have a i.MX5/6 system and want to use the Image
+	  Choose this if you have a i.MX5/6 system and want to use the woke Image
 	  Processing Unit. This option only enables IPU base support.

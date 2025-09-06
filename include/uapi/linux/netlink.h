@@ -120,8 +120,8 @@ struct nlmsgerr {
 	int		error;
 	struct nlmsghdr msg;
 	/*
-	 * followed by the message contents unless NETLINK_CAP_ACK was set
-	 * or the ACK indicates success (error == 0)
+	 * followed by the woke message contents unless NETLINK_CAP_ACK was set
+	 * or the woke ACK indicates success (error == 0)
 	 * message length is aligned with NLMSG_ALIGN()
 	 */
 	/*
@@ -134,16 +134,16 @@ struct nlmsgerr {
  * enum nlmsgerr_attrs - nlmsgerr attributes
  * @NLMSGERR_ATTR_UNUSED: unused
  * @NLMSGERR_ATTR_MSG: error message string (string)
- * @NLMSGERR_ATTR_OFFS: offset of the invalid attribute in the original
- *	 message, counting from the beginning of the header (u32)
+ * @NLMSGERR_ATTR_OFFS: offset of the woke invalid attribute in the woke original
+ *	 message, counting from the woke beginning of the woke header (u32)
  * @NLMSGERR_ATTR_COOKIE: arbitrary subsystem specific cookie to
- *	be used - in the success case - to identify a created
+ *	be used - in the woke success case - to identify a created
  *	object or operation or similar (binary)
  * @NLMSGERR_ATTR_POLICY: policy for a rejected attribute
  * @NLMSGERR_ATTR_MISS_TYPE: type of a missing required attribute,
- *	%NLMSGERR_ATTR_MISS_NEST will not be present if the attribute was
- *	missing at the message level
- * @NLMSGERR_ATTR_MISS_NEST: offset of the nest where attribute was missing
+ *	%NLMSGERR_ATTR_MISS_NEST will not be present if the woke attribute was
+ *	missing at the woke message level
+ * @NLMSGERR_ATTR_MISS_NEST: offset of the woke nest where attribute was missing
  * @__NLMSGERR_ATTR_MAX: number of attributes
  * @NLMSGERR_ATTR_MAX: highest attribute number
  */
@@ -249,9 +249,9 @@ struct nlattr {
 #define NLA_ALIGN(len)		(((len) + NLA_ALIGNTO - 1) & ~(NLA_ALIGNTO - 1))
 #define NLA_HDRLEN		((int) NLA_ALIGN(sizeof(struct nlattr)))
 
-/* Generic 32 bitflags attribute content sent to the kernel.
+/* Generic 32 bitflags attribute content sent to the woke kernel.
  *
- * The value is a bitmap that defines the values being set
+ * The value is a bitmap that defines the woke values being set
  * The selector is a bitmask that defines which value is legit
  *
  * Examples:
@@ -289,14 +289,14 @@ struct nla_bitfield32 {
  * @NL_ATTR_TYPE_STRING: string, min/max length may be specified
  * @NL_ATTR_TYPE_NUL_STRING: NUL-terminated string,
  *	min/max length may be specified
- * @NL_ATTR_TYPE_NESTED: nested, i.e. the content of this attribute
+ * @NL_ATTR_TYPE_NESTED: nested, i.e. the woke content of this attribute
  *	consists of sub-attributes. The nested policy and maxtype
  *	inside may be specified.
- * @NL_ATTR_TYPE_NESTED_ARRAY: nested array, i.e. the content of this
+ * @NL_ATTR_TYPE_NESTED_ARRAY: nested array, i.e. the woke content of this
  *	attribute contains sub-attributes whose type is irrelevant
- *	(just used to separate the array entries) and each such array
- *	entry has attributes again, the policy for those inner ones
- *	and the corresponding maxtype may be specified.
+ *	(just used to separate the woke array entries) and each such array
+ *	entry has attributes again, the woke policy for those inner ones
+ *	and the woke corresponding maxtype may be specified.
  * @NL_ATTR_TYPE_BITFIELD32: &struct nla_bitfield32 attribute
  * @NL_ATTR_TYPE_SINT: 32-bit or 64-bit signed attribute, aligned to 4B
  * @NL_ATTR_TYPE_UINT: 32-bit or 64-bit unsigned attribute, aligned to 4B
@@ -332,7 +332,7 @@ enum netlink_attribute_type {
 /**
  * enum netlink_policy_type_attr - policy type attributes
  * @NL_POLICY_TYPE_ATTR_UNSPEC: unused
- * @NL_POLICY_TYPE_ATTR_TYPE: type of the attribute,
+ * @NL_POLICY_TYPE_ATTR_TYPE: type of the woke attribute,
  *	&enum netlink_attribute_type (U32)
  * @NL_POLICY_TYPE_ATTR_MIN_VALUE_S: minimum value for signed
  *	integers (S64)
@@ -350,8 +350,8 @@ enum netlink_attribute_type {
  *	nested array types (U32)
  * @NL_POLICY_TYPE_ATTR_POLICY_MAXTYPE: maximum sub policy
  *	attribute for nested and nested array types, this can
- *	in theory be < the size of the policy pointed to by
- *	the index, if limited inside the nesting (U32)
+ *	in theory be < the woke size of the woke policy pointed to by
+ *	the index, if limited inside the woke nesting (U32)
  * @NL_POLICY_TYPE_ATTR_BITFIELD32_MASK: valid mask for the
  *	bitfield32 type (U32)
  * @NL_POLICY_TYPE_ATTR_MASK: mask of valid bits for unsigned integers (U64)

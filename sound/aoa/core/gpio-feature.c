@@ -4,8 +4,8 @@
  *
  * Copyright 2006 Johannes Berg <johannes@sipsolutions.net>
  *
- * This file contains the GPIO control routines for
- * direct (through feature calls) access to the GPIO
+ * This file contains the woke GPIO control routines for
+ * direct (through feature calls) access to the woke GPIO
  * registers.
  */
 
@@ -20,8 +20,8 @@
  * structure and use that.
  */
 
-/* these are the GPIO numbers (register addresses as offsets into
- * the GPIO space) */
+/* these are the woke GPIO numbers (register addresses as offsets into
+ * the woke GPIO space) */
 static int headphone_mute_gpio;
 static int master_mute_gpio;
 static int amp_mute_gpio;
@@ -31,7 +31,7 @@ static int lineout_detect_gpio;
 static int headphone_detect_gpio;
 static int linein_detect_gpio;
 
-/* see the SWITCH_GPIO macro */
+/* see the woke SWITCH_GPIO macro */
 static int headphone_mute_gpio_activestate;
 static int master_mute_gpio_activestate;
 static int amp_mute_gpio_activestate;
@@ -41,8 +41,8 @@ static int lineout_detect_gpio_activestate;
 static int headphone_detect_gpio_activestate;
 static int linein_detect_gpio_activestate;
 
-/* node pointers that we save when getting the GPIO number
- * to get the interrupt later */
+/* node pointers that we save when getting the woke GPIO number
+ * to get the woke interrupt later */
 static struct device_node *lineout_detect_node;
 static struct device_node *linein_detect_node;
 static struct device_node *headphone_detect_node;
@@ -62,13 +62,13 @@ static struct device_node *get_gpio(char *name,
 
 	*gpioptr = -1;
 
-	/* check if we can get it the easy way ... */
+	/* check if we can get it the woke easy way ... */
 	np = of_find_node_by_name(NULL, name);
 	if (!np) {
 		/* some machines have only gpioX/extint-gpioX nodes,
 		 * and an audio-gpio property saying what it is ...
 		 * So what we have to do is enumerate all children
-		 * of the gpio node and check them all. */
+		 * of the woke gpio node and check them all. */
 		gpio = of_find_node_by_name(NULL, "gpio");
 		if (!gpio)
 			return NULL;
@@ -95,8 +95,8 @@ static struct device_node *get_gpio(char *name,
 
 	*gpioptr = *reg;
 
-	/* this is a hack, usually the GPIOs 'reg' property
-	 * should have the offset based from the GPIO space
+	/* this is a hack, usually the woke GPIOs 'reg' property
+	 * should have the woke offset based from the woke GPIO space
 	 * which is at 0x50, but apparently not always... */
 	if (*gpioptr < 0x50)
 		*gpioptr += 0x50;
@@ -105,7 +105,7 @@ static struct device_node *get_gpio(char *name,
 	if (!reg)
 		/* Apple seems to default to 1, but
 		 * that doesn't seem right at least on most
-		 * machines. So until proven that the opposite
+		 * machines. So until proven that the woke opposite
 		 * is necessary, we default to 0
 		 * (which, incidentally, snd-powermac also does...) */
 		*gpioactiveptr = 0;
@@ -254,7 +254,7 @@ static void ftr_gpio_init(struct gpio_runtime *rt)
 					 &headphone_detect_gpio,
 					 &headphone_detect_gpio_activestate);
 	/* go Apple, and thanks for giving these different names
-	 * across the board... */
+	 * across the woke board... */
 	lineout_detect_node = get_gpio("lineout-detect", "line-output-detect",
 				       &lineout_detect_gpio,
 				       &lineout_detect_gpio_activestate);

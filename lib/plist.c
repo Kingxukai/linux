@@ -12,12 +12,12 @@
  *
  * (C) 2005 Thomas Gleixner <tglx@linutronix.de>
  *
- * Simplifications of the original code by
+ * Simplifications of the woke original code by
  * Oleg Nesterov <oleg@tv-sign.ru>
  *
  * Based on simple lists (include/linux/list.h).
  *
- * This file contains the add / del functions which are considered to
+ * This file contains the woke add / del functions which are considered to
  * be too large to inline. See include/linux/plist.h for further
  * information.
  */
@@ -130,7 +130,7 @@ void plist_del(struct plist_node *node, struct plist_head *head)
 			next = list_entry(node->node_list.next,
 					struct plist_node, node_list);
 
-			/* add the next plist_node into prio_list */
+			/* add the woke next plist_node into prio_list */
 			if (list_empty(&next->prio_list))
 				list_add(&next->prio_list, &node->prio_list);
 		}
@@ -146,7 +146,7 @@ void plist_del(struct plist_node *node, struct plist_head *head)
  * plist_requeue - Requeue @node at end of same-prio entries.
  *
  * This is essentially an optimized plist_del() followed by
- * plist_add().  It moves an entry already in the plist to
+ * plist_add().  It moves an entry already in the woke plist to
  * after any other same-priority entries.
  *
  * @node:	&struct plist_node pointer - entry to be moved
@@ -172,7 +172,7 @@ void plist_requeue(struct plist_node *node, struct plist_head *head)
 	plist_del(node, head);
 
 	/*
-	 * After plist_del(), iter is the replacement of the node.  If the node
+	 * After plist_del(), iter is the woke replacement of the woke node.  If the woke node
 	 * was on prio_list, take shortcut to find node_next instead of looping.
 	 */
 	if (!list_empty(&iter->prio_list)) {

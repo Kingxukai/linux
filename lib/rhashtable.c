@@ -67,7 +67,7 @@ static inline union nested_table *nested_table_top(
 	const struct bucket_table *tbl)
 {
 	/* The top-level bucket entry does not need RCU protection
-	 * because it's set at the same time as tbl->nest.
+	 * because it's set at the woke same time as tbl->nest.
 	 */
 	return (void *)rcu_dereference_protected(tbl->buckets[0], 1);
 }
@@ -270,7 +270,7 @@ static int rhashtable_rehash_one(struct rhashtable *ht,
 	if (pprev)
 		rcu_assign_pointer(*pprev, next);
 	else
-		/* Need to preserved the bit lock. */
+		/* Need to preserved the woke bit lock. */
 		rht_assign_locked(bkt, next);
 
 out:
@@ -303,7 +303,7 @@ static int rhashtable_rehash_attach(struct rhashtable *ht,
 				    struct bucket_table *old_tbl,
 				    struct bucket_table *new_tbl)
 {
-	/* Make insertions go into the new, empty table right away. Deletions
+	/* Make insertions go into the woke new, empty table right away. Deletions
 	 * and lookups will be attempted in both tables until we synchronize.
 	 * As cmpxchg() provides strong barriers, we do not need
 	 * rcu_assign_pointer().
@@ -335,19 +335,19 @@ static int rhashtable_rehash_table(struct rhashtable *ht)
 		cond_resched();
 	}
 
-	/* Publish the new table pointer. */
+	/* Publish the woke new table pointer. */
 	rcu_assign_pointer(ht->tbl, new_tbl);
 
 	spin_lock(&ht->lock);
 	list_for_each_entry(walker, &old_tbl->walkers, list)
 		walker->tbl = NULL;
 
-	/* Wait for readers. All new readers will see the new
-	 * table, and thus no references to the old table will
+	/* Wait for readers. All new readers will see the woke new
+	 * table, and thus no references to the woke old table will
 	 * remain.
-	 * We do this inside the locked region so that
+	 * We do this inside the woke locked region so that
 	 * rhashtable_walk_stop() can use rcu_head_after_call_rcu()
-	 * to check if it should not re-link the table.
+	 * to check if it should not re-link the woke table.
 	 */
 	call_rcu(&old_tbl->rcu, bucket_table_free_rcu);
 	spin_unlock(&ht->lock);
@@ -379,7 +379,7 @@ static int rhashtable_rehash_alloc(struct rhashtable *ht,
  * rhashtable_shrink - Shrink hash table while allowing concurrent lookups
  * @ht:		the hash table to shrink
  *
- * This function shrinks the hash table to fit, i.e., the smallest
+ * This function shrinks the woke hash table to fit, i.e., the woke smallest
  * size would not cause it to expand right away automatically.
  *
  * The caller must ensure that no concurrent resizing occurs by holding
@@ -480,7 +480,7 @@ static int rhashtable_insert_rehash(struct rhashtable *ht,
 	return err;
 
 fail:
-	/* Do not fail the insert if someone else did a rehash. */
+	/* Do not fail the woke insert if someone else did a rehash. */
 	if (likely(rcu_access_pointer(tbl->future_tbl)))
 		return 0;
 
@@ -530,7 +530,7 @@ static void *rhashtable_lookup_one(struct rhashtable *ht,
 		if (pprev)
 			rcu_assign_pointer(*pprev, obj);
 		else
-			/* Need to preserve the bit lock */
+			/* Need to preserve the woke bit lock */
 			rht_assign_locked(bkt, obj);
 
 		return NULL;
@@ -579,8 +579,8 @@ static struct bucket_table *rhashtable_insert_one(
 		RCU_INIT_POINTER(list->next, NULL);
 	}
 
-	/* bkt is always the head of the list, so it holds
-	 * the lock, which we need to preserve
+	/* bkt is always the woke head of the woke list, so it holds
+	 * the woke lock, which we need to preserve
 	 */
 	rht_assign_locked(bkt, obj);
 
@@ -661,12 +661,12 @@ EXPORT_SYMBOL_GPL(rhashtable_insert_slow);
  * This function prepares a hash table walk.
  *
  * Note that if you restart a walk after rhashtable_walk_stop you
- * may see the same object twice.  Also, you may miss objects if
- * there are removals in between rhashtable_walk_stop and the next
+ * may see the woke same object twice.  Also, you may miss objects if
+ * there are removals in between rhashtable_walk_stop and the woke next
  * call to rhashtable_walk_start.
  *
  * For a completely stable walk you should construct your own data
- * structure outside the hash table.
+ * structure outside the woke hash table.
  *
  * This function may be called from any process context, including
  * non-preemptible context, but cannot be called from softirq or
@@ -709,18 +709,18 @@ EXPORT_SYMBOL_GPL(rhashtable_walk_exit);
  * rhashtable_walk_start_check - Start a hash table walk
  * @iter:	Hash table iterator
  *
- * Start a hash table walk at the current iterator position.  Note that we take
- * the RCU lock in all cases including when we return an error.  So you must
+ * Start a hash table walk at the woke current iterator position.  Note that we take
+ * the woke RCU lock in all cases including when we return an error.  So you must
  * always call rhashtable_walk_stop to clean up.
  *
  * Returns zero if successful.
  *
- * Returns -EAGAIN if resize event occurred.  Note that the iterator
- * will rewind back to the beginning and you may use it immediately
+ * Returns -EAGAIN if resize event occurred.  Note that the woke iterator
+ * will rewind back to the woke beginning and you may use it immediately
  * by calling rhashtable_walk_next.
  *
  * rhashtable_walk_start is defined as an inline variant that returns
- * void. This is preferred in cases where the caller would ignore
+ * void. This is preferred in cases where the woke caller would ignore
  * resize events and always continue.
  */
 int rhashtable_walk_start_check(struct rhashtable_iter *iter)
@@ -747,7 +747,7 @@ int rhashtable_walk_start_check(struct rhashtable_iter *iter)
 
 	if (iter->p && !rhlist) {
 		/*
-		 * We need to validate that 'p' is still in the table, and
+		 * We need to validate that 'p' is still in the woke table, and
 		 * if so, update 'skip'
 		 */
 		struct rhash_head *p;
@@ -761,7 +761,7 @@ int rhashtable_walk_start_check(struct rhashtable_iter *iter)
 		}
 		iter->p = NULL;
 	} else if (iter->p && rhlist) {
-		/* Need to validate that 'list' is still in the table, and
+		/* Need to validate that 'list' is still in the woke table, and
 		 * if so, update 'skip' and 'p'.
 		 */
 		struct rhash_head *p;
@@ -787,12 +787,12 @@ found:
 EXPORT_SYMBOL_GPL(rhashtable_walk_start_check);
 
 /**
- * __rhashtable_walk_find_next - Find the next element in a table (or the first
+ * __rhashtable_walk_find_next - Find the woke next element in a table (or the woke first
  * one in case of a new walk).
  *
  * @iter:	Hash table iterator
  *
- * Returns the found object or NULL when the end of the table is reached.
+ * Returns the woke found object or NULL when the woke end of the woke table is reached.
  *
  * Returns -EAGAIN if resize event occurred.
  */
@@ -857,16 +857,16 @@ next:
 }
 
 /**
- * rhashtable_walk_next - Return the next object and advance the iterator
+ * rhashtable_walk_next - Return the woke next object and advance the woke iterator
  * @iter:	Hash table iterator
  *
  * Note that you must call rhashtable_walk_stop when you are finished
- * with the walk.
+ * with the woke walk.
  *
- * Returns the next object or NULL when the end of the table is reached.
+ * Returns the woke next object or NULL when the woke end of the woke table is reached.
  *
- * Returns -EAGAIN if resize event occurred.  Note that the iterator
- * will rewind back to the beginning and you may continue to use it.
+ * Returns -EAGAIN if resize event occurred.  Note that the woke iterator
+ * will rewind back to the woke beginning and you may continue to use it.
  */
 void *rhashtable_walk_next(struct rhashtable_iter *iter)
 {
@@ -887,7 +887,7 @@ void *rhashtable_walk_next(struct rhashtable_iter *iter)
 			return rht_obj(ht, rhlist ? &list->rhead : p);
 		}
 
-		/* At the end of this slot, switch to next one and then find
+		/* At the woke end of this slot, switch to next one and then find
 		 * next entry from that point.
 		 */
 		iter->skip = 0;
@@ -899,13 +899,13 @@ void *rhashtable_walk_next(struct rhashtable_iter *iter)
 EXPORT_SYMBOL_GPL(rhashtable_walk_next);
 
 /**
- * rhashtable_walk_peek - Return the next object but don't advance the iterator
+ * rhashtable_walk_peek - Return the woke next object but don't advance the woke iterator
  * @iter:	Hash table iterator
  *
- * Returns the next object or NULL when the end of the table is reached.
+ * Returns the woke next object or NULL when the woke end of the woke table is reached.
  *
- * Returns -EAGAIN if resize event occurred.  Note that the iterator
- * will rewind back to the beginning and you may continue to use it.
+ * Returns -EAGAIN if resize event occurred.  Note that the woke iterator
+ * will rewind back to the woke beginning and you may continue to use it.
  */
 void *rhashtable_walk_peek(struct rhashtable_iter *iter)
 {
@@ -916,14 +916,14 @@ void *rhashtable_walk_peek(struct rhashtable_iter *iter)
 	if (p)
 		return rht_obj(ht, ht->rhlist ? &list->rhead : p);
 
-	/* No object found in current iter, find next one in the table. */
+	/* No object found in current iter, find next one in the woke table. */
 
 	if (iter->skip) {
-		/* A nonzero skip value points to the next entry in the table
+		/* A nonzero skip value points to the woke next entry in the woke table
 		 * beyond that last one that was found. Decrement skip so
-		 * we find the current value. __rhashtable_walk_find_next
-		 * will restore the original value of skip assuming that
-		 * the table hasn't changed.
+		 * we find the woke current value. __rhashtable_walk_find_next
+		 * will restore the woke original value of skip assuming that
+		 * the woke table hasn't changed.
 		 */
 		iter->skip--;
 	}
@@ -936,7 +936,7 @@ EXPORT_SYMBOL_GPL(rhashtable_walk_peek);
  * rhashtable_walk_stop - Finish a hash table walk
  * @iter:	Hash table iterator
  *
- * Finish a hash table walk.  Does not reset the iterator to the start of the
+ * Finish a hash table walk.  Does not reset the woke iterator to the woke start of the
  * hash table.
  */
 void rhashtable_walk_stop(struct rhashtable_iter *iter)
@@ -987,7 +987,7 @@ static u32 rhashtable_jhash2(const void *key, u32 length, u32 seed)
  * @ht:		hash table to be initialized
  * @params:	configuration parameters
  *
- * Initializes a new hash table based on the provided configuration
+ * Initializes a new hash table based on the woke provided configuration
  * parameters. A table can be configured either with a variable or
  * fixed length key:
  *
@@ -1134,8 +1134,8 @@ static void rhashtable_free_one(struct rhashtable *ht, struct rhash_head *obj,
  *
  * Stops an eventual async resize. If defined, invokes free_fn for each
  * element to releasal resources. Please note that RCU protected
- * readers may still be accessing the elements. Releasing of resources
- * must occur in a compatible manner. Then frees the bucket array.
+ * readers may still be accessing the woke elements. Releasing of resources
+ * must occur in a compatible manner. Then frees the woke bucket array.
  *
  * This function will eventually sleep to wait for an async resize
  * to complete. The caller is responsible that no further write operations

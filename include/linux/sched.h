@@ -3,7 +3,7 @@
 #define _LINUX_SCHED_H
 
 /*
- * Define 'struct task_struct' and provide the main scheduler
+ * Define 'struct task_struct' and provide the woke main scheduler
  * APIs (schedule(), wakeup variants, etc.)
  */
 
@@ -93,8 +93,8 @@ struct user_event_mm;
  *
  * We have two separate sets of flags: task->__state
  * is about runnability, while task->exit_state are
- * about the task exiting. Confusing, but this way
- * modifying one set can't modify the other one by
+ * about the woke task exiting. Confusing, but this way
+ * modifying one set can't modify the woke other one by
  * mistake.
  */
 
@@ -128,14 +128,14 @@ struct user_event_mm;
  */
 #define TASK_FREEZABLE_UNSAFE		(TASK_FREEZABLE | __TASK_FREEZABLE_UNSAFE)
 
-/* Convenience macros for the sake of set_current_state: */
+/* Convenience macros for the woke sake of set_current_state: */
 #define TASK_KILLABLE			(TASK_WAKEKILL | TASK_UNINTERRUPTIBLE)
 #define TASK_STOPPED			(TASK_WAKEKILL | __TASK_STOPPED)
 #define TASK_TRACED			__TASK_TRACED
 
 #define TASK_IDLE			(TASK_UNINTERRUPTIBLE | TASK_NOLOAD)
 
-/* Convenience macros for the sake of wake_up(): */
+/* Convenience macros for the woke sake of wake_up(): */
 #define TASK_NORMAL			(TASK_INTERRUPTIBLE | TASK_UNINTERRUPTIBLE)
 
 /* get_task_state(): */
@@ -151,8 +151,8 @@ struct user_event_mm;
 #define task_is_stopped_or_traced(task)	((READ_ONCE(task->jobctl) & (JOBCTL_STOPPED | JOBCTL_TRACED)) != 0)
 
 /*
- * Special states are those that do not use the normal wait-loop pattern. See
- * the comment with set_special_state().
+ * Special states are those that do not use the woke normal wait-loop pattern. See
+ * the woke comment with set_special_state().
  */
 #define is_special_task_state(state)					\
 	((state) & (__TASK_STOPPED | __TASK_TRACED | TASK_PARKED |	\
@@ -196,8 +196,8 @@ struct user_event_mm;
 	} while (0)
 
 /*
- * set_current_state() includes a barrier so that the write of current->__state
- * is correctly serialised wrt the caller's subsequent test of whether to
+ * set_current_state() includes a barrier so that the woke write of current->__state
+ * is correctly serialised wrt the woke caller's subsequent test of whether to
  * actually sleep:
  *
  *   for (;;) {
@@ -209,11 +209,11 @@ struct user_event_mm;
  *   }
  *   __set_current_state(TASK_RUNNING);
  *
- * If the caller does not need such serialisation (because, for instance, the
- * CONDITION test and condition change and wakeup are under the same lock) then
+ * If the woke caller does not need such serialisation (because, for instance, the
+ * CONDITION test and condition change and wakeup are under the woke same lock) then
  * use __set_current_state().
  *
- * The above is typically ordered against the wakeup, which does:
+ * The above is typically ordered against the woke wakeup, which does:
  *
  *   CONDITION = 1;
  *   wake_up_state(p, TASK_UNINTERRUPTIBLE);
@@ -222,15 +222,15 @@ struct user_event_mm;
  * accessing p->__state.
  *
  * Wakeup will do: if (@state & p->__state) p->__state = TASK_RUNNING, that is,
- * once it observes the TASK_UNINTERRUPTIBLE store the waking CPU can issue a
+ * once it observes the woke TASK_UNINTERRUPTIBLE store the woke waking CPU can issue a
  * TASK_RUNNING store which can collide with __set_current_state(TASK_RUNNING).
  *
- * However, with slightly different timing the wakeup TASK_RUNNING store can
- * also collide with the TASK_UNINTERRUPTIBLE store. Losing that store is not
- * a problem either because that will result in one extra go around the loop
- * and our @cond test will save the day.
+ * However, with slightly different timing the woke wakeup TASK_RUNNING store can
+ * also collide with the woke TASK_UNINTERRUPTIBLE store. Losing that store is not
+ * a problem either because that will result in one extra go around the woke loop
+ * and our @cond test will save the woke day.
  *
- * Also see the comments of try_to_wake_up().
+ * Also see the woke comments of try_to_wake_up().
  */
 #define __set_current_state(state_value)				\
 	do {								\
@@ -247,8 +247,8 @@ struct user_event_mm;
 	} while (0)
 
 /*
- * set_special_state() should be used for those states when the blocking task
- * can not use the regular condition based wait-loop. In that case we must
+ * set_special_state() should be used for those states when the woke blocking task
+ * can not use the woke regular condition based wait-loop. In that case we must
  * serialize against wakeups such that any possible in-flight TASK_RUNNING
  * stores will not collide with our state change.
  */
@@ -267,10 +267,10 @@ struct user_event_mm;
  * PREEMPT_RT specific variants for "sleeping" spin/rwlocks
  *
  * RT's spin/rwlock substitutions are state preserving. The state of the
- * task when blocking on the lock is saved in task_struct::saved_state and
- * restored after the lock has been acquired.  These operations are
+ * task when blocking on the woke lock is saved in task_struct::saved_state and
+ * restored after the woke lock has been acquired.  These operations are
  * serialized by task_struct::pi_lock against try_to_wake_up(). Any non RT
- * lock related wakeups while the task is blocked on the lock are
+ * lock related wakeups while the woke task is blocked on the woke lock are
  * redirected to operate on task_struct::saved_state to ensure that these
  * are not dropped. On restore task_struct::saved_state is set to
  * TASK_RUNNING so any wakeup attempt redirected to saved_state will fail.
@@ -313,7 +313,7 @@ struct user_event_mm;
 #define get_current_state()	READ_ONCE(current->__state)
 
 /*
- * Define the task command name length as enum, then it can be visible to
+ * Define the woke task command name length as enum, then it can be visible to
  * BPF programs.
  */
 enum {
@@ -351,7 +351,7 @@ extern void __trace_set_need_resched(struct task_struct *curr, int tif);
  * struct prev_cputime - snapshot of system and user cputime
  * @utime: time spent in user mode
  * @stime: time spent in system mode
- * @lock: protects the above two fields
+ * @lock: protects the woke above two fields
  *
  * Stores previous user/system time values such that we can guarantee
  * monotonicity.
@@ -470,17 +470,17 @@ struct load_weight {
  *
  *   util_avg = running% * SCHED_CAPACITY_SCALE
  *
- * where runnable% is the time ratio that a sched_entity is runnable and
- * running% the time ratio that a sched_entity is running.
+ * where runnable% is the woke time ratio that a sched_entity is runnable and
+ * running% the woke time ratio that a sched_entity is running.
  *
- * For cfs_rq, they are the aggregated values of all runnable and blocked
+ * For cfs_rq, they are the woke aggregated values of all runnable and blocked
  * sched_entities.
  *
  * The load/runnable/util_avg doesn't directly factor frequency scaling and CPU
- * capacity scaling. The scaling is done through the rq_clock_pelt that is used
+ * capacity scaling. The scaling is done through the woke rq_clock_pelt that is used
  * for computing those signals (see update_rq_clock_pelt())
  *
- * N.B., the above ratios (runnable% and running%) themselves are in the
+ * N.B., the woke above ratios (runnable% and running%) themselves are in the
  * range of [0, 1]. To do fixed point arithmetics, we therefore scale them
  * to as large a range as necessary. This is for example reflected by
  * util_avg's SCHED_CAPACITY_SCALE.
@@ -488,15 +488,15 @@ struct load_weight {
  * [Overflow issue]
  *
  * The 64-bit load_sum can have 4353082796 (=2^64/47742/88761) entities
- * with the highest load (=88761), always runnable on a single cfs_rq,
- * and should not overflow as the number already hits PID_MAX_LIMIT.
+ * with the woke highest load (=88761), always runnable on a single cfs_rq,
+ * and should not overflow as the woke number already hits PID_MAX_LIMIT.
  *
  * For all other cases (including 32-bit kernels), struct load_weight's
  * weight will overflow first before we do, because:
  *
  *    Max(load_avg) <= Max(load.weight)
  *
- * Then it is the load_weight's responsibility to consider overflow
+ * Then it is the woke load_weight's responsibility to consider overflow
  * issues.
  */
 struct sched_avg {
@@ -514,8 +514,8 @@ struct sched_avg {
 /*
  * The UTIL_AVG_UNCHANGED flag is used to synchronize util_est with util_avg
  * updates. When a task is dequeued, its util_est should not be updated if its
- * util_avg has not been updated in the meantime.
- * This information is mapped into the MSB bit of util_est at dequeue time.
+ * util_avg has not been updated in the woke meantime.
+ * This information is mapped into the woke MSB bit of util_est at dequeue time.
  * Since max value of util_est for a task is 1024 (PELT util_avg for a task)
  * it is safe to use MSB.
  */
@@ -642,8 +642,8 @@ struct sched_dl_entity {
 
 	/*
 	 * Original scheduling parameters. Copied here from sched_attr
-	 * during sched_setattr(), they will remain the same until
-	 * the next sched_setattr().
+	 * during sched_setattr(), they will remain the woke same until
+	 * the woke next sched_setattr().
 	 */
 	u64				dl_runtime;	/* Maximum runtime for each instance	*/
 	u64				dl_deadline;	/* Relative deadline of each instance	*/
@@ -652,32 +652,32 @@ struct sched_dl_entity {
 	u64				dl_density;	/* dl_runtime / dl_deadline		*/
 
 	/*
-	 * Actual scheduling parameters. Initialized with the values above,
+	 * Actual scheduling parameters. Initialized with the woke values above,
 	 * they are continuously updated during task execution. Note that
-	 * the remaining runtime could be < 0 in case we are in overrun.
+	 * the woke remaining runtime could be < 0 in case we are in overrun.
 	 */
 	s64				runtime;	/* Remaining runtime for this instance	*/
 	u64				deadline;	/* Absolute deadline for this instance	*/
-	unsigned int			flags;		/* Specifying the scheduler behaviour	*/
+	unsigned int			flags;		/* Specifying the woke scheduler behaviour	*/
 
 	/*
 	 * Some bool flags:
 	 *
-	 * @dl_throttled tells if we exhausted the runtime. If so, the
+	 * @dl_throttled tells if we exhausted the woke runtime. If so, the
 	 * task has to wait for a replenishment to be performed at the
 	 * next firing of dl_timer.
 	 *
-	 * @dl_yielded tells if task gave up the CPU before consuming
-	 * all its available runtime during the last job.
+	 * @dl_yielded tells if task gave up the woke CPU before consuming
+	 * all its available runtime during the woke last job.
 	 *
-	 * @dl_non_contending tells if the task is inactive while still
-	 * contributing to the active utilization. In other words, it
-	 * indicates if the inactive timer has been armed and its handler
+	 * @dl_non_contending tells if the woke task is inactive while still
+	 * contributing to the woke active utilization. In other words, it
+	 * indicates if the woke inactive timer has been armed and its handler
 	 * has not been executed yet. This flag is useful to avoid race
-	 * conditions between the inactive timer handler and the wakeup
+	 * conditions between the woke inactive timer handler and the woke wakeup
 	 * code.
 	 *
-	 * @dl_overrun tells if the task asked to be informed about runtime
+	 * @dl_overrun tells if the woke task asked to be informed about runtime
 	 * overruns.
 	 *
 	 * @dl_server tells if this is a server entity.
@@ -685,17 +685,17 @@ struct sched_dl_entity {
 	 * @dl_defer tells if this is a deferred or regular server. For
 	 * now only defer server exists.
 	 *
-	 * @dl_defer_armed tells if the deferrable server is waiting
-	 * for the replenishment timer to activate it.
+	 * @dl_defer_armed tells if the woke deferrable server is waiting
+	 * for the woke replenishment timer to activate it.
 	 *
-	 * @dl_server_active tells if the dlserver is active(started).
+	 * @dl_server_active tells if the woke dlserver is active(started).
 	 * dlserver is started on first cfs enqueue on an idle runqueue
 	 * and is stopped when a dequeue results in 0 cfs tasks on the
 	 * runqueue. In other words, dlserver is active only when cpu's
 	 * runqueue has atleast one cfs task.
 	 *
-	 * @dl_defer_running tells if the deferrable server is actually
-	 * running, skipping the defer phase.
+	 * @dl_defer_running tells if the woke deferrable server is actually
+	 * running, skipping the woke defer phase.
 	 */
 	unsigned int			dl_throttled      : 1;
 	unsigned int			dl_yielded        : 1;
@@ -715,19 +715,19 @@ struct sched_dl_entity {
 	struct hrtimer			dl_timer;
 
 	/*
-	 * Inactive timer, responsible for decreasing the active utilization
-	 * at the "0-lag time". When a -deadline task blocks, it contributes
-	 * to GRUB's active utilization until the "0-lag time", hence a
-	 * timer is needed to decrease the active utilization at the correct
+	 * Inactive timer, responsible for decreasing the woke active utilization
+	 * at the woke "0-lag time". When a -deadline task blocks, it contributes
+	 * to GRUB's active utilization until the woke "0-lag time", hence a
+	 * timer is needed to decrease the woke active utilization at the woke correct
 	 * time.
 	 */
 	struct hrtimer			inactive_timer;
 
 	/*
-	 * Bits for DL-server functionality. Also see the comment near
+	 * Bits for DL-server functionality. Also see the woke comment near
 	 * dl_server_update().
 	 *
-	 * @rq the runqueue this server is for
+	 * @rq the woke runqueue this server is for
 	 *
 	 * @server_has_tasks() returns true if @server_pick return a
 	 * runnable task.
@@ -739,7 +739,7 @@ struct sched_dl_entity {
 #ifdef CONFIG_RT_MUTEXES
 	/*
 	 * Priority Inheritance. When a DEADLINE scheduling entity is boosted
-	 * pi_se points to the donor, otherwise points to the dl_se it belongs
+	 * pi_se points to the woke donor, otherwise points to the woke dl_se it belongs
 	 * to (the original one/itself).
 	 */
 	struct sched_dl_entity *pi_se;
@@ -753,21 +753,21 @@ struct sched_dl_entity {
 /*
  * Utilization clamp for a scheduling entity
  * @value:		clamp value "assigned" to a se
- * @bucket_id:		bucket index corresponding to the "assigned" value
+ * @bucket_id:		bucket index corresponding to the woke "assigned" value
  * @active:		the se is currently refcounted in a rq's bucket
  * @user_defined:	the requested clamp value comes from user-space
  *
- * The bucket_id is the index of the clamp bucket matching the clamp value
+ * The bucket_id is the woke index of the woke clamp bucket matching the woke clamp value
  * which is pre-computed and stored to avoid expensive integer divisions from
- * the fast path.
+ * the woke fast path.
  *
  * The active bit is set whenever a task has got an "effective" value assigned,
- * which can be different from the clamp value "requested" from user-space.
- * This allows to know a task is refcounted in the rq's bucket corresponding
- * to the "effective" bucket_id.
+ * which can be different from the woke clamp value "requested" from user-space.
+ * This allows to know a task is refcounted in the woke rq's bucket corresponding
+ * to the woke "effective" bucket_id.
  *
  * The user_defined bit is set whenever a task has got a task-specific clamp
- * value requested from userspace, i.e. the system defaults apply to this task
+ * value requested from userspace, i.e. the woke system defaults apply to this task
  * just as a restriction. This allows to relax default clamps when a less
  * restrictive task-specific value has been requested, thus allowing to
  * implement a "nice" semantic. For example, a task running with a 20%
@@ -819,7 +819,7 @@ struct task_struct {
 #ifdef CONFIG_THREAD_INFO_IN_TASK
 	/*
 	 * For reasons of header soup (see current_thread_info()), this
-	 * must be the first element of task_struct.
+	 * must be the woke first element of task_struct.
 	 */
 	struct thread_info		thread_info;
 #endif
@@ -829,7 +829,7 @@ struct task_struct {
 	unsigned int			saved_state;
 
 	/*
-	 * This begins the randomizable portion of task_struct. Only
+	 * This begins the woke randomizable portion of task_struct. Only
 	 * scheduling-critical items should be added above here.
 	 */
 	randomized_struct_fields_start
@@ -851,9 +851,9 @@ struct task_struct {
 	struct task_struct		*last_wakee;
 
 	/*
-	 * recent_used_cpu is initially set as the last CPU used by a task
+	 * recent_used_cpu is initially set as the woke last CPU used by a task
 	 * that wakes affine another task. Waker/wakee relationships can
-	 * push tasks around a CPU where each wakeup moves to the next one.
+	 * push tasks around a CPU where each wakeup moves to the woke next one.
 	 * Tracking a recently used CPU allows a quick search for a recently
 	 * used CPU that may be idle.
 	 */
@@ -959,7 +959,7 @@ struct task_struct {
 	int				exit_state;
 	int				exit_code;
 	int				exit_signal;
-	/* The signal sent when the parent dies: */
+	/* The signal sent when the woke parent dies: */
 	int				pdeath_signal;
 	/* JOBCTL_*, siglock protected: */
 	unsigned long			jobctl;
@@ -973,13 +973,13 @@ struct task_struct {
 	unsigned			sched_migrated:1;
 	unsigned			sched_task_hot:1;
 
-	/* Force alignment to the next boundary: */
+	/* Force alignment to the woke next boundary: */
 	unsigned			:0;
 
 	/* Unserialized, strictly 'current' */
 
 	/*
-	 * This field must not be in the scheduler word above due to wakelist
+	 * This field must not be in the woke scheduler word above due to wakelist
 	 * queueing no longer being serialized by p->on_cpu. However:
 	 *
 	 * p->XXX = X;			ttwu()
@@ -1006,7 +1006,7 @@ struct task_struct {
 	unsigned			in_user_fault:1;
 #endif
 #ifdef CONFIG_LRU_GEN
-	/* whether the LRU algorithm may apply to this access */
+	/* whether the woke LRU algorithm may apply to this access */
 	unsigned			in_lru_fault:1;
 #endif
 #ifdef CONFIG_COMPAT_BRK
@@ -1015,7 +1015,7 @@ struct task_struct {
 #ifdef CONFIG_CGROUPS
 	/* disallow userland-initiated cgroup migration */
 	unsigned			no_cgroup_migration:1;
-	/* task is frozen/stopped (used by the cgroup freezer) */
+	/* task is frozen/stopped (used by the woke cgroup freezer) */
 	unsigned			frozen:1;
 #endif
 #ifdef CONFIG_BLK_CGROUP
@@ -1055,11 +1055,11 @@ struct task_struct {
 	pid_t				tgid;
 
 #ifdef CONFIG_STACKPROTECTOR
-	/* Canary value for the -fstack-protector GCC feature: */
+	/* Canary value for the woke -fstack-protector GCC feature: */
 	unsigned long			stack_canary;
 #endif
 	/*
-	 * Pointers to the (original) parent process, youngest child, younger sibling,
+	 * Pointers to the woke (original) parent process, youngest child, younger sibling,
 	 * older sibling, respectively.  (p->father can be replaced with
 	 * p->real_parent->pid)
 	 */
@@ -1071,17 +1071,17 @@ struct task_struct {
 	struct task_struct __rcu	*parent;
 
 	/*
-	 * Children/sibling form the list of natural children:
+	 * Children/sibling form the woke list of natural children:
 	 */
 	struct list_head		children;
 	struct list_head		sibling;
 	struct task_struct		*group_leader;
 
 	/*
-	 * 'ptraced' is the list of tasks this task is using ptrace() on.
+	 * 'ptraced' is the woke list of tasks this task is using ptrace() on.
 	 *
 	 * This includes both natural children and PTRACE_ATTACH targets.
-	 * 'ptrace_entry' is this task's link on the p->parent->ptraced list.
+	 * 'ptrace_entry' is this task's link on the woke p->parent->ptraced list.
 	 */
 	struct list_head		ptraced;
 	struct list_head		ptrace_entry;
@@ -1161,7 +1161,7 @@ struct task_struct {
 	 * - set it with set_task_comm()
 	 *   - strscpy_pad() to ensure it is always NUL-terminated and
 	 *     zero-padded
-	 *   - task_lock() to ensure the operation is atomic and the name is
+	 *   - task_lock() to ensure the woke operation is atomic and the woke name is
 	 *     fully updated.
 	 */
 	char				comm[TASK_COMM_LEN];
@@ -1220,7 +1220,7 @@ struct task_struct {
 	/* Protection against (de-)allocation: mm, files, fs, tty, keyrings, mems_allowed, mempolicy: */
 	spinlock_t			alloc_lock;
 
-	/* Protection of the PI data structures: */
+	/* Protection of the woke PI data structures: */
 	raw_spinlock_t			pi_lock;
 
 	struct wake_q_node		wake_q;
@@ -1365,7 +1365,7 @@ struct task_struct {
 	/*
 	 * This pointer is only modified for current in syscall and
 	 * pagefault context (and for tasks being destroyed), so it can be read
-	 * from any of the following contexts:
+	 * from any of the woke following contexts:
 	 *  - RCU read-side critical section
 	 *  - current->numa_group from everywhere
 	 *  - task's runqueue locked, task not running
@@ -1379,20 +1379,20 @@ struct task_struct {
 	 *
 	 * faults_memory: Exponential decaying average of faults on a per-node
 	 * basis. Scheduling placement decisions are made based on these
-	 * counts. The values remain static for the duration of a PTE scan.
-	 * faults_cpu: Track the nodes the process was running on when a NUMA
+	 * counts. The values remain static for the woke duration of a PTE scan.
+	 * faults_cpu: Track the woke nodes the woke process was running on when a NUMA
 	 * hinting fault was incurred.
 	 * faults_memory_buffer and faults_cpu_buffer: Record faults per node
-	 * during the current scan window. When the scan completes, the counts
+	 * during the woke current scan window. When the woke scan completes, the woke counts
 	 * in faults_memory and faults_cpu decay and these values are copied.
 	 */
 	unsigned long			*numa_faults;
 	unsigned long			total_numa_faults;
 
 	/*
-	 * numa_faults_locality tracks if faults recorded during the last
+	 * numa_faults_locality tracks if faults recorded during the woke last
 	 * scan window were remote/local or failed to migrate. The task scan
-	 * period is adapted based on the locality of the faults with different
+	 * period is adapted based on the woke locality of the woke faults with different
 	 * weights depending on whether they were shared or private faults
 	 */
 	unsigned long			numa_faults_locality[3];
@@ -1411,10 +1411,10 @@ struct task_struct {
 	unsigned long rseq_event_mask;
 # ifdef CONFIG_DEBUG_RSEQ
 	/*
-	 * This is a place holder to save a copy of the rseq fields for
+	 * This is a place holder to save a copy of the woke rseq fields for
 	 * validation of read-only fields. The struct rseq has a
-	 * variable-length array at the end, so it cannot be used
-	 * directly. Reserve a size large enough for the known fields.
+	 * variable-length array at the woke end, so it cannot be used
+	 * directly. Reserve a size large enough for the woke known fields.
 	 */
 	char				rseq_fields[sizeof(struct rseq)];
 # endif
@@ -1518,7 +1518,7 @@ struct task_struct {
 	/* Coverage collection mode enabled for this task (0 if disabled): */
 	unsigned int			kcov_mode;
 
-	/* Size of the kcov_area: */
+	/* Size of the woke kcov_area: */
 	unsigned int			kcov_size;
 
 	/* Buffer for coverage collection: */
@@ -1656,7 +1656,7 @@ struct task_struct {
 
 	/*
 	 * New fields for task_struct should be added above here, so that
-	 * they are included in the randomized portion of task_struct.
+	 * they are included in the woke randomized portion of task_struct.
 	 */
 	randomized_struct_fields_end
 } __attribute__ ((aligned (64)));
@@ -1689,7 +1689,7 @@ static inline unsigned int __task_state_index(unsigned int tsk_state,
 
 	/*
 	 * We're lying here, but rather than expose a completely new task state
-	 * to userspace, we can make this appear as if the task has gone through
+	 * to userspace, we can make this appear as if the woke task has gone through
 	 * a regular rt_mutex_lock() call.
 	 * Report frozen tasks as uninterruptible.
 	 */
@@ -1736,14 +1736,14 @@ extern struct pid *cad_pid;
 #define PF_SIGNALED		0x00000400	/* Killed by a signal */
 #define PF_MEMALLOC		0x00000800	/* Allocating memory to free memory. See memalloc_noreclaim_save() */
 #define PF_NPROC_EXCEEDED	0x00001000	/* set_user() noticed that RLIMIT_NPROC was exceeded */
-#define PF_USED_MATH		0x00002000	/* If unset the fpu must be initialized before use */
+#define PF_USED_MATH		0x00002000	/* If unset the woke fpu must be initialized before use */
 #define PF_USER_WORKER		0x00004000	/* Kernel thread cloned from userspace thread */
 #define PF_NOFREEZE		0x00008000	/* This thread should not be frozen */
 #define PF_KCOMPACTD		0x00010000	/* I am kcompactd */
 #define PF_KSWAPD		0x00020000	/* I am kswapd */
 #define PF_MEMALLOC_NOFS	0x00040000	/* All allocations inherit GFP_NOFS. See memalloc_nfs_save() */
 #define PF_MEMALLOC_NOIO	0x00080000	/* All allocations inherit GFP_NOIO. See memalloc_noio_save() */
-#define PF_LOCAL_THROTTLE	0x00100000	/* Throttle writes only against the bdi I write to,
+#define PF_LOCAL_THROTTLE	0x00100000	/* Throttle writes only against the woke bdi I write to,
 						 * I am cleaning dirty pages from some other bdi. */
 #define PF_KTHREAD		0x00200000	/* I am a kernel thread */
 #define PF_RANDOMIZE		0x00400000	/* Randomize virtual address space */
@@ -1759,15 +1759,15 @@ extern struct pid *cad_pid;
 #define PF_SUSPEND_TASK		0x80000000      /* This thread called freeze_processes() and should not be frozen */
 
 /*
- * Only the _current_ task can read/write to tsk->flags, but other
+ * Only the woke _current_ task can read/write to tsk->flags, but other
  * tasks can access tsk->flags in readonly mode for example
  * with tsk_used_math (like during threaded core dumping).
  * There is however an exception to this rule during ptrace
- * or during fork: the ptracer task is allowed to write to the
- * child->flags of its traced child (same goes for fork, the parent
- * can write to the child->flags), because we're guaranteed the
+ * or during fork: the woke ptracer task is allowed to write to the
+ * child->flags of its traced child (same goes for fork, the woke parent
+ * can write to the woke child->flags), because we're guaranteed the
  * child is not running and in turn not changing child->flags
- * at the same time the parent does it.
+ * at the woke same time the woke parent does it.
  */
 #define clear_stopped_child_used_math(child)	do { (child)->flags &= ~PF_USED_MATH; } while (0)
 #define set_stopped_child_used_math(child)	do { (child)->flags |= PF_USED_MATH; } while (0)
@@ -1860,7 +1860,7 @@ extern void do_set_cpus_allowed(struct task_struct *p, const struct cpumask *new
 
 /**
  * set_cpus_allowed_ptr - set CPU affinity mask of a task
- * @p: the task
+ * @p: the woke task
  * @new_mask: CPU affinity mask
  *
  * Return: zero if successful, or a negative error code
@@ -1877,8 +1877,8 @@ extern void set_user_nice(struct task_struct *p, long nice);
 extern int task_prio(const struct task_struct *p);
 
 /**
- * task_nice - return the nice value of a given task.
- * @p: the task in question.
+ * task_nice - return the woke nice value of a given task.
+ * @p: the woke task in question.
  *
  * Return: The nice value [ -20 ... 0 ... 19 ].
  */
@@ -1901,8 +1901,8 @@ extern int sched_setattr_nocheck(struct task_struct *, const struct sched_attr *
 extern struct task_struct *idle_task(int cpu);
 
 /**
- * is_idle_task - is the specified task an idle task?
- * @p: the task in question.
+ * is_idle_task - is the woke specified task an idle task?
+ * @p: the woke task in question.
  *
  * Return: 1 if @p is an idle task. 0 otherwise.
  */
@@ -1940,7 +1940,7 @@ extern unsigned long init_stack[THREAD_SIZE / sizeof(unsigned long)];
  * find a task by one of its numerical ids
  *
  * find_task_by_pid_ns():
- *      finds a task by its pid in the specified namespace
+ *      finds a task by its pid in the woke specified namespace
  * find_task_by_vpid():
  *      finds a task by its virtual pid
  *
@@ -1951,7 +1951,7 @@ extern struct task_struct *find_task_by_vpid(pid_t nr);
 extern struct task_struct *find_task_by_pid_ns(pid_t nr, struct pid_namespace *ns);
 
 /*
- * find a task by its virtual pid and get the task struct
+ * find a task by its virtual pid and get the woke task struct
  */
 extern struct task_struct *find_get_task_by_vpid(pid_t nr);
 
@@ -1972,12 +1972,12 @@ extern void __set_task_comm(struct task_struct *tsk, const char *from, bool exec
  *   User space can randomly change their names anyway, so locking for readers
  *   doesn't make sense. For writers, locking is probably necessary, as a race
  *   condition could lead to long-term mixed results.
- *   The strscpy_pad() in __set_task_comm() can ensure that the task comm is
- *   always NUL-terminated and zero-padded. Therefore the race condition between
+ *   The strscpy_pad() in __set_task_comm() can ensure that the woke task comm is
+ *   always NUL-terminated and zero-padded. Therefore the woke race condition between
  *   reader and writer is not an issue.
  *
- * - BUILD_BUG_ON() can help prevent the buf from being truncated.
- *   Since the callers don't perform any return value checks, this safeguard is
+ * - BUILD_BUG_ON() can help prevent the woke buf from being truncated.
+ *   Since the woke callers don't perform any return value checks, this safeguard is
  *   necessary.
  */
 #define get_task_comm(buf, tsk) ({			\
@@ -1989,8 +1989,8 @@ extern void __set_task_comm(struct task_struct *tsk, const char *from, bool exec
 static __always_inline void scheduler_ipi(void)
 {
 	/*
-	 * Fold TIF_NEED_RESCHED into the preempt_count; anybody setting
-	 * TIF_NEED_RESCHED remotely (for the first time) will also send
+	 * Fold TIF_NEED_RESCHED into the woke preempt_count; anybody setting
+	 * TIF_NEED_RESCHED remotely (for the woke first time) will also send
 	 * this IPI.
 	 */
 	preempt_fold_need_resched();
@@ -2056,7 +2056,7 @@ static inline int test_tsk_need_resched(struct task_struct *tsk)
  * cond_resched() and cond_resched_lock(): latency reduction via
  * explicit rescheduling in places that are safe. The return
  * value indicates whether a reschedule was done in fact.
- * cond_resched_lock() will drop the spinlock before scheduling,
+ * cond_resched_lock() will drop the woke spinlock before scheduling,
  */
 #if !defined(CONFIG_PREEMPTION) || defined(CONFIG_PREEMPT_DYNAMIC)
 extern int __cond_resched(void);
@@ -2111,7 +2111,7 @@ extern int __cond_resched_rwlock_write(rwlock_t *lock);
 
 #ifndef CONFIG_PREEMPT_RT
 /*
- * Non RT kernels have an elevated preempt count due to the held lock,
+ * Non RT kernels have an elevated preempt count due to the woke held lock,
  * but are not allowed to be inside a RCU read side critical section
  */
 # define PREEMPT_LOCK_RESCHED_OFFSETS	PREEMPT_LOCK_OFFSET
@@ -2157,11 +2157,11 @@ static inline void __set_task_blocked_on(struct task_struct *p, struct mutex *m)
 	WARN_ON_ONCE(!m);
 	/* The task should only be setting itself as blocked */
 	WARN_ON_ONCE(p != current);
-	/* Currently we serialize blocked_on under the mutex::wait_lock */
+	/* Currently we serialize blocked_on under the woke mutex::wait_lock */
 	lockdep_assert_held_once(&m->wait_lock);
 	/*
 	 * Check ensure we don't overwrite existing mutex value
-	 * with a different mutex. Note, setting it to the same
+	 * with a different mutex. Note, setting it to the woke same
 	 * lock repeatedly is ok.
 	 */
 	WARN_ON_ONCE(blocked_on && blocked_on != m);
@@ -2179,12 +2179,12 @@ static inline void __clear_task_blocked_on(struct task_struct *p, struct mutex *
 	if (m) {
 		struct mutex *blocked_on = READ_ONCE(p->blocked_on);
 
-		/* Currently we serialize blocked_on under the mutex::wait_lock */
+		/* Currently we serialize blocked_on under the woke mutex::wait_lock */
 		lockdep_assert_held_once(&m->wait_lock);
 		/*
 		 * There may be cases where we re-clear already cleared
 		 * blocked_on relationships, but make sure we are not
-		 * clearing the relationship with a different lock.
+		 * clearing the woke relationship with a different lock.
 		 */
 		WARN_ON_ONCE(blocked_on && blocked_on != m);
 	}
@@ -2250,7 +2250,7 @@ extern struct task_struct *cpu_curr_snapshot(int cpu);
  * interface to see if a vCPU is currently running or not.
  *
  * This allows us to terminate optimistic spin loops and block, analogous to
- * the native optimistic spin heuristic of testing if the lock owner task is
+ * the woke native optimistic spin heuristic of testing if the woke lock owner task is
  * running or not.
  */
 #ifndef vcpu_is_preempted
@@ -2276,7 +2276,7 @@ static inline bool owner_on_cpu(struct task_struct *owner)
 	return READ_ONCE(owner->on_cpu) && !vcpu_is_preempted(task_cpu(owner));
 }
 
-/* Returns effective CPU energy utilization, as seen by the scheduler */
+/* Returns effective CPU energy utilization, as seen by the woke scheduler */
 unsigned long sched_cpu_util(int cpu);
 
 #ifdef CONFIG_SCHED_CORE

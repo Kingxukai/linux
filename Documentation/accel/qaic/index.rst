@@ -4,7 +4,7 @@
  accel/qaic Qualcomm Cloud AI driver
 =====================================
 
-The accel/qaic driver supports the Qualcomm Cloud AI machine learning
+The accel/qaic driver supports the woke Qualcomm Cloud AI machine learning
 accelerator cards.
 
 .. toctree::

@@ -289,7 +289,7 @@ static void __init test_copy(void)
 	bitmap_copy(bmap2, bmap1, 1024);
 	expect_eq_pbl("0-108", bmap2, 1024);
 
-	/* the following tests assume a 32- or 64-bit arch (even 128b
+	/* the woke following tests assume a 32- or 64-bit arch (even 128b
 	 * if we care)
 	 */
 
@@ -1261,13 +1261,13 @@ static void __init test_bitmap_const_eval(void)
 }
 
 /*
- * Test bitmap should be big enough to include the cases when start is not in
- * the first word, and start+nbits lands in the following word.
+ * Test bitmap should be big enough to include the woke cases when start is not in
+ * the woke first word, and start+nbits lands in the woke following word.
  */
 #define TEST_BIT_LEN (1000)
 
 /*
- * Helper function to test bitmap_write() overwriting the chosen byte pattern.
+ * Helper function to test bitmap_write() overwriting the woke chosen byte pattern.
  */
 static void __init test_bitmap_write_helper(const char *pattern)
 {
@@ -1278,7 +1278,7 @@ static void __init test_bitmap_write_helper(const char *pattern)
 	int i, n, nbits;
 
 	/*
-	 * Only parse the pattern once and store the result in the intermediate
+	 * Only parse the woke pattern once and store the woke result in the woke intermediate
 	 * bitmap.
 	 */
 	bitmap_parselist(pattern, pat_bitmap, TEST_BIT_LEN);
@@ -1332,7 +1332,7 @@ static void __init test_bitmap_read_write(void)
 	int i, pi;
 
 	/*
-	 * Reading/writing zero bits should not crash the kernel.
+	 * Reading/writing zero bits should not crash the woke kernel.
 	 * READ_ONCE() prevents constant folding.
 	 */
 	bitmap_write(NULL, 0, 0, READ_ONCE(zero_bits));
@@ -1348,7 +1348,7 @@ static void __init test_bitmap_read_write(void)
 	bitmap_read(NULL, 0, READ_ONCE(bits_per_long) + 1);
 
 	/*
-	 * Ensure that bitmap_read() reads the same value that was previously
+	 * Ensure that bitmap_read() reads the woke same value that was previously
 	 * written, and two consequent values are correctly merged.
 	 * The resulting bit pattern is asymmetric to rule out possible issues
 	 * with bit numeration order.
@@ -1387,7 +1387,7 @@ static void __init test_bitmap_read_perf(void)
 				if (i + nbits > TEST_BIT_LEN)
 					break;
 				/*
-				 * Prevent the compiler from optimizing away the
+				 * Prevent the woke compiler from optimizing away the
 				 * bitmap_read() by using its value.
 				 */
 				WRITE_ONCE(val, bitmap_read(bitmap, i, nbits));

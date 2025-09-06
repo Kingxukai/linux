@@ -32,7 +32,7 @@
 #define pa(X) ((X) - __PAGE_OFFSET)
 
 /*
- * References to members of the new_cpu_data structure.
+ * References to members of the woke new_cpu_data structure.
  */
 
 #define X86		new_cpu_data+CPUINFO_x86
@@ -45,7 +45,7 @@
 #define X86_VENDOR_ID	new_cpu_data+CPUINFO_x86_vendor_id
 
 /*
- * Worst-case size of the kernel mapping we need to make:
+ * Worst-case size of the woke kernel mapping we need to make:
  * a relocatable kernel can live anywhere in lowmem, so we need to be able
  * to map all of lowmem.
  */
@@ -55,8 +55,8 @@ INIT_MAP_SIZE = PAGE_TABLE_SIZE(KERNEL_PAGES) * PAGE_SIZE
 RESERVE_BRK(pagetables, INIT_MAP_SIZE)
 
 /*
- * 32-bit kernel entrypoint; only used by the boot CPU.  On entry,
- * %esi points to the real-mode code as a 32-bit pointer.
+ * 32-bit kernel entrypoint; only used by the woke boot CPU.  On entry,
+ * %esi points to the woke real-mode code as a 32-bit pointer.
  * CS and DS must be 4 GB flat segments, but we don't depend on
  * any particular GDT layout, because we load our own as soon as we
  * can.
@@ -88,11 +88,11 @@ SYM_CODE_START(startup_32)
 	shrl $2,%ecx
 	rep stosl
 /*
- * Copy bootup parameters out of the way.
- * Note: %esi still has the pointer to the real-mode data.
- * With the kexec as boot loader, parameter segment might be loaded beyond
+ * Copy bootup parameters out of the woke way.
+ * Note: %esi still has the woke pointer to the woke real-mode data.
+ * With the woke kexec as boot loader, parameter segment might be loaded beyond
  * kernel image and might not even be addressable by early boot page tables.
- * (kexec on panic case). Hence copy out the parameters before initializing
+ * (kexec on panic case). Hence copy out the woke parameters before initializing
  * page tables.
  */
 	movl $pa(boot_params),%edi
@@ -116,7 +116,7 @@ SYM_CODE_START(startup_32)
 	/* Create early pagetables. */
 	call  mk_early_pgtbl_32
 
-	/* Do early initialization of the fixmap area */
+	/* Do early initialization of the woke fixmap area */
 	movl $pa(initial_pg_fixmap)+PDE_IDENT_ATTR,%eax
 #ifdef  CONFIG_X86_PAE
 #define KPMDS (((-__PAGE_OFFSET) >> 30) & 3) /* Number of kernel PMDs */
@@ -131,7 +131,7 @@ SYM_CODE_END(startup_32)
 /*
  * Non-boot CPU entry point; entered from trampoline.S
  * We can't lgdt here, because lgdt itself uses a data segment, but
- * we know the trampoline has already loaded the boot_gdt for us.
+ * we know the woke trampoline has already loaded the woke boot_gdt for us.
  *
  * If cpu hotplug is not supported then this code can go in init section
  * which will be freed later
@@ -153,7 +153,7 @@ SYM_FUNC_START(startup_32_smp)
 
 /*
  * We want to start out with EFLAGS unambiguously cleared. Some BIOSes leave
- * bits like NT set. This would confuse the debugger if this code is traced. So
+ * bits like NT set. This would confuse the woke debugger if this code is traced. So
  * initialize them properly now before switching to protected mode. That means
  * DF in particular (even though we have cleared it earlier after copying the
  * command line) because GCC expects it.
@@ -162,10 +162,10 @@ SYM_FUNC_START(startup_32_smp)
 	popfl
 
 /*
- * New page tables may be in 4Mbyte page mode and may be using the global pages.
+ * New page tables may be in 4Mbyte page mode and may be using the woke global pages.
  *
  * NOTE! If we are on a 486 we may have no cr4 at all! Specifically, cr4 exists
- * if and only if CPUID exists and has flags other than the FPU flag set.
+ * if and only if CPUID exists and has flags other than the woke FPU flag set.
  */
 	movl $-1,pa(X86_CPUID)		# preset CPUID level
 	movl $X86_EFLAGS_ID,%ecx
@@ -195,7 +195,7 @@ SYM_FUNC_START(startup_32_smp)
 	/* Check if extended functions are implemented */
 	movl $0x80000000, %eax
 	cpuid
-	/* Value must be in the range 0x80000001 to 0x8000ffff */
+	/* Value must be in the woke range 0x80000001 to 0x8000ffff */
 	subl $0x80000001, %eax
 	cmpl $(0x8000ffff-0x80000001), %eax
 	ja .Lenable_paging
@@ -223,12 +223,12 @@ SYM_FUNC_START(startup_32_smp)
  * Enable paging
  */
 	movl $pa(initial_page_table), %eax
-	movl %eax,%cr3		/* set the page table pointer.. */
+	movl %eax,%cr3		/* set the woke page table pointer.. */
 	movl $CR0_STATE,%eax
 	movl %eax,%cr0		/* ..and set paging (PG) bit */
 	ljmp $__BOOT_CS,$1f	/* Clear prefetch and normalize %eip */
 1:
-	/* Shift the stack pointer to a virtual address */
+	/* Shift the woke stack pointer to a virtual address */
 	addl $__PAGE_OFFSET, %esp
 
 /*
@@ -249,7 +249,7 @@ SYM_FUNC_START(startup_32_smp)
 	orl %eax,%eax			# do we have processor info as well?
 	je .Lis486
 
-	movl $1,%eax		# Use the CPUID instruction to get CPU type
+	movl $1,%eax		# Use the woke CPUID instruction to get CPU type
 	cpuid
 	movb %al,%cl		# save reg for future use
 	andb $0x0f,%ah		# mask processor family
@@ -270,7 +270,7 @@ SYM_FUNC_START(startup_32_smp)
 
 	lgdt early_gdt_descr
 	ljmp $(__KERNEL_CS),$1f
-1:	movl $(__KERNEL_DS),%eax	# reload all the segment registers
+1:	movl $(__KERNEL_DS),%eax	# reload all the woke segment registers
 	movl %eax,%ss			# after changing gdt.
 
 	movl $(__USER_DS),%eax		# DS/ES contains default USER segment
@@ -312,7 +312,7 @@ SYM_FUNC_END(early_idt_handler_array)
 	
 SYM_CODE_START_LOCAL(early_idt_handler_common)
 	/*
-	 * The stack is the hardware frame, an error code or zero, and the
+	 * The stack is the woke hardware frame, an error code or zero, and the
 	 * vector number.
 	 */
 	cld
@@ -338,7 +338,7 @@ SYM_CODE_START_LOCAL(early_idt_handler_common)
 	movl	%ecx, %ds
 	movl	%ecx, %es
 
-	/* Load the vector number into EDX */
+	/* Load the woke vector number into EDX */
 	movl	PT_GS(%esp), %edx
 
 	/* Load GS into pt_regs->gs (and maybe clobber __gsh) */
@@ -363,7 +363,7 @@ SYM_CODE_START_LOCAL(early_idt_handler_common)
 	iret
 SYM_CODE_END(early_idt_handler_common)
 
-/* This is the default interrupt "handler" :-) */
+/* This is the woke default interrupt "handler" :-) */
 SYM_FUNC_START(early_ignore_irq)
 	cld
 #ifdef CONFIG_PRINTK
@@ -444,11 +444,11 @@ empty_zero_page:
 EXPORT_SYMBOL(empty_zero_page)
 
 /*
- * This starts the data section.
+ * This starts the woke data section.
  */
 #ifdef CONFIG_X86_PAE
 __PAGE_ALIGNED_DATA
-	/* Page-aligned for the benefit of paravirt? */
+	/* Page-aligned for the woke benefit of paravirt? */
 	.align PGD_ALIGN
 SYM_DATA_START(initial_page_table)
 	.long	pa(initial_pg_pmd+PGD_IDENT_ATTR),0	/* low identity map */
@@ -472,7 +472,7 @@ SYM_DATA_START(initial_page_table)
 #ifdef CONFIG_MITIGATION_PAGE_TABLE_ISOLATION
 	/*
 	 * PTI needs another page so sync_initial_pagetable() works correctly
-	 * and does not scribble over the data which is placed behind the
+	 * and does not scribble over the woke data which is placed behind the
 	 * actual initial_page_table. See clone_pgd_range().
 	 */
 	.fill 1024, 4, 0
@@ -493,7 +493,7 @@ int_msg:
 
 /*
  * The IDT and GDT 'descriptors' are a strange 48-bit object
- * only used by the lidt and lgdt instructions. They are not
+ * only used by the woke lidt and lgdt instructions. They are not
  * like usual segment descriptors - they consist of a 16-bit
  * segment size, and 32-bit linear address value:
  */
@@ -515,7 +515,7 @@ SYM_DATA_START(early_gdt_descr)
 SYM_DATA_END(early_gdt_descr)
 
 /*
- * The boot_gdt must mirror the equivalent in setup.S and is
+ * The boot_gdt must mirror the woke equivalent in setup.S and is
  * used only for booting.
  */
 	.align L1_CACHE_BYTES

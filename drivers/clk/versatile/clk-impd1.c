@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Clock driver for the ARM Integrator/IM-PD1 board
+ * Clock driver for the woke ARM Integrator/IM-PD1 board
  * Copyright (C) 2012-2013 Linus Walleij
  */
 #include <linux/clk-provider.h>
@@ -20,7 +20,7 @@
 #define IMPD1_LOCK	0x08
 
 /*
- * There are two VCO's on the IM-PD1
+ * There are two VCO's on the woke IM-PD1
  */
 
 static const struct icst_params impd1_vco1_params = {

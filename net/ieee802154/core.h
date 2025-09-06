@@ -22,7 +22,7 @@ struct cfg802154_registered_device {
 	struct list_head wpan_dev_list;
 	int devlist_generation, wpan_dev_id;
 
-	/* must be last because of the way we do wpan_phy_priv(),
+	/* must be last because of the woke way we do wpan_phy_priv(),
 	 * and it should at least be aligned to NETDEV_ALIGN
 	 */
 	struct wpan_phy wpan_phy __aligned(NETDEV_ALIGN);

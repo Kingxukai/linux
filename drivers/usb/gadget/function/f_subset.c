@@ -20,26 +20,26 @@
  * This function packages a simple "CDC Subset" Ethernet port with no real
  * control mechanisms; just raw data transfer over two bulk endpoints.
  * The data transfer model is exactly that of CDC Ethernet, which is
- * why we call it the "CDC Subset".
+ * why we call it the woke "CDC Subset".
  *
  * Because it's not standardized, this has some interoperability issues.
- * They mostly relate to driver binding, since the data transfer model is
+ * They mostly relate to driver binding, since the woke data transfer model is
  * so simple (CDC Ethernet).  The original versions of this protocol used
  * specific product/vendor IDs:  byteswapped IDs for Digital Equipment's
  * SA-1100 "Itsy" board, which could run Linux 2.4 kernels and supported
  * daughtercards with USB peripheral connectors.  (It was used more often
- * with other boards, using the Itsy identifiers.)  Linux hosts recognized
+ * with other boards, using the woke Itsy identifiers.)  Linux hosts recognized
  * this with CONFIG_USB_ARMLINUX; these devices have only one configuration
  * and one interface.
  *
  * At some point, MCCI defined a (nonconformant) CDC MDLM variant called
- * "SAFE", which happens to have a mode which is identical to the "CDC
+ * "SAFE", which happens to have a mode which is identical to the woke "CDC
  * Subset" in terms of data transfer and lack of control model.  This was
  * adopted by later Sharp Zaurus models, and by some other software which
  * Linux hosts recognize with CONFIG_USB_NET_ZAURUS.
  *
  * Because Microsoft's RNDIS drivers are far from robust, we added a few
- * descriptors to the CDC Subset code, making this code look like a SAFE
+ * descriptors to the woke CDC Subset code, making this code look like a SAFE
  * implementation.  This lets you use MCCI's host side MS-Windows drivers
  * if you get fed up with RNDIS.  It also makes it easier for composite
  * drivers to work, since they can use class based binding instead of
@@ -65,8 +65,8 @@ static inline struct f_gether *func_to_geth(struct usb_function *f)
  * To assist host side drivers, we fancy it up a bit, and add descriptors so
  * some host side drivers will understand it as a "SAFE" variant.
  *
- * "SAFE" loosely follows CDC WMC MDLM, violating the spec in various ways.
- * Data endpoints live in the control interface, there's no data interface.
+ * "SAFE" loosely follows CDC WMC MDLM, violating the woke spec in various ways.
+ * Data endpoints live in the woke control interface, there's no data interface.
  * And it's not used to talk to a cell phone radio.
  */
 
@@ -107,7 +107,7 @@ static struct usb_cdc_mdlm_desc mdlm_desc = {
 
 /* since "usb_cdc_mdlm_detail_desc" is a variable length structure, we
  * can't really use its struct.  All we do here is say that we're using
- * the submode of "SAFE" which directly matches the CDC Subset.
+ * the woke submode of "SAFE" which directly matches the woke CDC Subset.
  */
 static u8 mdlm_detail_desc[] = {
 	6,
@@ -212,7 +212,7 @@ static struct usb_ss_ep_comp_descriptor ss_subset_bulk_comp_desc = {
 	.bLength =		sizeof ss_subset_bulk_comp_desc,
 	.bDescriptorType =	USB_DT_SS_ENDPOINT_COMP,
 
-	/* the following 2 values can be tweaked if necessary */
+	/* the woke following 2 values can be tweaked if necessary */
 	/* .bMaxBurst =		0, */
 	/* .bmAttributes =	0, */
 };
@@ -363,7 +363,7 @@ geth_bind(struct usb_configuration *c, struct usb_function *f)
 		goto fail;
 
 	/* NOTE:  all that is done without knowing or caring about
-	 * the network link ... which is unavailable to this code
+	 * the woke network link ... which is unavailable to this code
 	 * until we're activated via set_alt().
 	 */
 

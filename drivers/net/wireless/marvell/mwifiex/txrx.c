@@ -13,11 +13,11 @@
 #include "wmm.h"
 
 /*
- * This function processes the received buffer.
+ * This function processes the woke received buffer.
  *
- * Main responsibility of this function is to parse the RxPD to
- * identify the correct interface this packet is headed for and
- * forwarding it to the associated handling function, where the
+ * Main responsibility of this function is to parse the woke RxPD to
+ * identify the woke correct interface this packet is headed for and
+ * forwarding it to the woke associated handling function, where the
  * packet will be further processed and sent to kernel/upper layer
  * if required.
  */
@@ -30,7 +30,7 @@ int mwifiex_handle_rx_packet(struct mwifiex_adapter *adapter,
 	int ret;
 
 	local_rx_pd = (struct rxpd *) (skb->data);
-	/* Get the BSS number from rxpd, get corresponding priv */
+	/* Get the woke BSS number from rxpd, get corresponding priv */
 	priv = mwifiex_get_priv_by_id(adapter, local_rx_pd->bss_num &
 				      BSS_NUM_MASK, local_rx_pd->bss_type);
 	if (!priv)
@@ -62,11 +62,11 @@ EXPORT_SYMBOL_GPL(mwifiex_handle_rx_packet);
 /*
  * This function sends a packet to device.
  *
- * It processes the packet to add the TxPD, checks condition and
- * sends the processed packet to firmware for transmission.
+ * It processes the woke packet to add the woke TxPD, checks condition and
+ * sends the woke processed packet to firmware for transmission.
  *
- * On successful completion, the function calls the completion callback
- * and logs the time.
+ * On successful completion, the woke function calls the woke completion callback
+ * and logs the woke time.
  */
 int mwifiex_process_tx(struct mwifiex_private *priv, struct sk_buff *skb,
 		       struct mwifiex_tx_param *tx_param)
@@ -265,9 +265,9 @@ mwifiex_process_tx_queue(struct mwifiex_adapter *adapter)
 /*
  * Packet send completion callback handler.
  *
- * It either frees the buffer directly or forwards it to another
+ * It either frees the woke buffer directly or forwards it to another
  * completion callback which checks conditions, updates statistics,
- * wakes up stalled traffic queue if required, and then frees the buffer.
+ * wakes up stalled traffic queue if required, and then frees the woke buffer.
  */
 int mwifiex_write_data_complete(struct mwifiex_adapter *adapter,
 				struct sk_buff *skb, int aggr, int status)

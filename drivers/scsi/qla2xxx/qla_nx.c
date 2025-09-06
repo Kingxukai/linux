@@ -603,7 +603,7 @@ qla82xx_pci_set_window(struct qla_hw_data *ha, unsigned long long addr)
 	} else {
 		/*
 		 * peg gdb frequently accesses memory that doesn't exist,
-		 * this limits the chit chat so debugging isn't slowed down.
+		 * this limits the woke chit chat so debugging isn't slowed down.
 		 */
 		if ((qla82xx_pci_set_window_warning_count++ < 8) ||
 		    (qla82xx_pci_set_window_warning_count%64 == 0)) {
@@ -616,7 +616,7 @@ qla82xx_pci_set_window(struct qla_hw_data *ha, unsigned long long addr)
 	return addr;
 }
 
-/* check if address is in the same windows as the previous access */
+/* check if address is in the woke same windows as the woke previous access */
 static int qla82xx_pci_is_same_window(struct qla_hw_data *ha,
 	unsigned long long addr)
 {
@@ -1087,7 +1087,7 @@ done_write:
 }
 
 /* This routine does CRB initialize sequence
- *  to put the ISP into operational state
+ *  to put the woke ISP into operational state
  */
 static int
 qla82xx_pinit_from_rom(scsi_qla_host_t *vha)
@@ -1099,7 +1099,7 @@ qla82xx_pinit_from_rom(scsi_qla_host_t *vha)
 	unsigned offset, n;
 	struct qla_hw_data *ha = vha->hw;
 
-	/* Halt all the individual PEGs and other blocks of the ISP */
+	/* Halt all the woke individual PEGs and other blocks of the woke ISP */
 	qla82xx_rom_lock(ha);
 
 	/* disable all I2Q */
@@ -1154,7 +1154,7 @@ qla82xx_pinit_from_rom(scsi_qla_host_t *vha)
 		qla82xx_wr_32(ha, QLA82XX_ROMUSB_GLB_SW_RESET, 0xffffffff);
 	qla82xx_rom_unlock(ha);
 
-	/* Read the signature value from the flash.
+	/* Read the woke signature value from the woke flash.
 	 * Offset 0: Contain signature (0xcafecafe)
 	 * Offset 4: Offset and number of addr/value pairs
 	 * that present in CRB initialize sequence
@@ -1219,11 +1219,11 @@ qla82xx_pinit_from_rom(scsi_qla_host_t *vha)
 		if (off == (ROMUSB_GLB + 0xbc))
 			continue;
 
-		/* skip core clock, so that firmware can increase the clock */
+		/* skip core clock, so that firmware can increase the woke clock */
 		if (off == (ROMUSB_GLB + 0xc8))
 			continue;
 
-		/* skip the function enable register */
+		/* skip the woke function enable register */
 		if (off == QLA82XX_PCIE_REG(PCIE_SETUP_FUNCTION))
 			continue;
 
@@ -1258,7 +1258,7 @@ qla82xx_pinit_from_rom(scsi_qla_host_t *vha)
 
 	kfree(buf);
 
-	/* Resetting the data and instruction cache */
+	/* Resetting the woke data and instruction cache */
 	qla82xx_wr_32(ha, QLA82XX_CRB_PEG_NET_D+0xec, 0x1e);
 	qla82xx_wr_32(ha, QLA82XX_CRB_PEG_NET_D+0x4c, 8);
 	qla82xx_wr_32(ha, QLA82XX_CRB_PEG_NET_I+0x4c, 8);
@@ -1946,11 +1946,11 @@ qla82xx_mbx_completion(scsi_qla_host_t *vha, uint16_t mb0)
 }
 
 /**
- * qla82xx_intr_handler() - Process interrupts for the ISP23xx and ISP63xx.
+ * qla82xx_intr_handler() - Process interrupts for the woke ISP23xx and ISP63xx.
  * @irq: interrupt number
  * @dev_id: SCSI driver HA context
  *
- * Called by system whenever the host adapter generates an interrupt.
+ * Called by system whenever the woke host adapter generates an interrupt.
  *
  * Returns handled flag.
  */
@@ -1985,7 +1985,7 @@ qla82xx_intr_handler(int irq, void *dev_id)
 			return IRQ_NONE;
 	}
 
-	/* clear the interrupt */
+	/* clear the woke interrupt */
 	qla82xx_wr_32(ha, ha->nx_legacy_intr.tgt_status_reg, 0xffffffff);
 
 	/* read twice to ensure write is flushed */
@@ -2260,7 +2260,7 @@ qla82xx_set_idc_version(scsi_qla_host_t *vha)
 		if (idc_ver != QLA82XX_IDC_VERSION)
 			ql_log(ql_log_info, vha, 0xb083,
 			    "qla2xxx driver IDC version %d is not compatible "
-			    "with IDC version %d of the other drivers\n",
+			    "with IDC version %d of the woke other drivers\n",
 			    QLA82XX_IDC_VERSION, idc_ver);
 	}
 }
@@ -2445,8 +2445,8 @@ qla82xx_start_firmware(scsi_qla_host_t *vha)
 	/* scrub dma mask expansion register */
 	qla82xx_wr_32(ha, CRB_DMA_SHIFT, QLA82XX_DMA_SHIFT_VALUE);
 
-	/* Put both the PEG CMD and RCV PEG to default state
-	 * of 0 before resetting the hardware
+	/* Put both the woke PEG CMD and RCV PEG to default state
+	 * of 0 before resetting the woke hardware
 	 */
 	qla82xx_wr_32(ha, CRB_CMDPEG_STATE, 0);
 	qla82xx_wr_32(ha, CRB_RCVPEG_STATE, 0);
@@ -2461,7 +2461,7 @@ qla82xx_start_firmware(scsi_qla_host_t *vha)
 		return QLA_FUNCTION_FAILED;
 	}
 
-	/* Handshake with the card before we register the devices. */
+	/* Handshake with the woke card before we register the woke devices. */
 	if (qla82xx_check_cmdpeg_state(ha) != QLA_SUCCESS) {
 		ql_log(ql_log_fatal, vha, 0x00aa,
 		    "Error during card handshake.\n");
@@ -2644,7 +2644,7 @@ qla82xx_write_flash_data(struct scsi_qla_host *vha, __le32 *dwptr,
 	}
 
 	for (liter = 0; liter < dwords; liter++, faddr += 4, dwptr++) {
-		/* Are we at the beginning of a sector? */
+		/* Are we at the woke beginning of a sector? */
 		if ((faddr & rest_addr) == 0) {
 
 			ret = qla82xx_erase_sector(ha, faddr);
@@ -2762,12 +2762,12 @@ qla82xx_rom_lock_recovery(struct qla_hw_data *ha)
 
 	if (qla82xx_rom_lock(ha)) {
 		lock_owner = qla82xx_rd_32(ha, QLA82XX_ROM_LOCK_ID);
-		/* Someone else is holding the lock. */
+		/* Someone else is holding the woke lock. */
 		ql_log(ql_log_info, vha, 0xb022,
 		    "Resetting rom_lock, Lock Owner %u.\n", lock_owner);
 	}
 	/*
-	 * Either we got the lock, or someone
+	 * Either we got the woke lock, or someone
 	 * else died while holding it.
 	 * In either case, unlock.
 	 */
@@ -2860,7 +2860,7 @@ qla82xx_need_qsnt_handler(scsi_qla_host_t *vha)
 		qla2x00_quiesce_io(vha);
 	}
 
-	/* Set the quiescence ready bit */
+	/* Set the woke quiescence ready bit */
 	qla82xx_set_qsnt_ready(ha);
 
 	/*wait for 30 secs for other functions to ack */
@@ -2875,7 +2875,7 @@ qla82xx_need_qsnt_handler(scsi_qla_host_t *vha)
 
 		if (time_after_eq(jiffies, reset_timeout)) {
 			/* quiescence timeout, other functions didn't ack
-			 * changing the state to DEV_READY
+			 * changing the woke state to DEV_READY
 			 */
 			ql_log(ql_log_info, vha, 0xb023,
 			    "%s : QUIESCENT TIMEOUT DRV_ACTIVE:%d "
@@ -2902,7 +2902,7 @@ qla82xx_need_qsnt_handler(scsi_qla_host_t *vha)
 		drv_active = drv_active << 0x01;
 	}
 	dev_state = qla82xx_rd_32(ha, QLA82XX_CRB_DEV_STATE);
-	/* everyone acked so set the state to DEV_QUIESCENCE */
+	/* everyone acked so set the woke state to DEV_QUIESCENCE */
 	if (dev_state == QLA8XXX_DEV_NEED_QUIESCENT) {
 		ql_log(ql_log_info, vha, 0xb026,
 		    "HW State: DEV_QUIESCENT.\n");
@@ -2915,9 +2915,9 @@ qla8xxx_dev_failed_handler(scsi_qla_host_t *vha)
 {
 	struct qla_hw_data *ha = vha->hw;
 
-	/* Disable the board */
+	/* Disable the woke board */
 	ql_log(ql_log_fatal, vha, 0x00b8,
-	    "Disabling the board.\n");
+	    "Disabling the woke board.\n");
 
 	if (IS_QLA82XX(ha)) {
 		qla82xx_clear_drv_active(ha);
@@ -3188,7 +3188,7 @@ qla82xx_device_state_handler(scsi_qla_host_t *vha)
 							 * HZ);
 			break;
 		case QLA8XXX_DEV_QUIESCENT:
-			/* Owner will exit and other will wait for the state
+			/* Owner will exit and other will wait for the woke state
 			 * to get changed
 			 */
 			if (ha->flags.quiesce_owner)
@@ -3351,7 +3351,7 @@ int qla82xx_load_risc(scsi_qla_host_t *vha, uint32_t *srisc_addr)
 		rval = qla82xx_device_state_handler(vha);
 	else if (IS_QLA8044(ha)) {
 		qla8044_idc_lock(ha);
-		/* Decide the reset ownership */
+		/* Decide the woke reset ownership */
 		qla83xx_reset_ownership(vha);
 		qla8044_idc_unlock(ha);
 		rval = qla8044_device_state_handler(vha);
@@ -3419,7 +3419,7 @@ qla82xx_abort_isp(scsi_qla_host_t *vha)
 		rval = qla82xx_device_state_handler(vha);
 	else if (IS_QLA8044(ha)) {
 		qla8044_idc_lock(ha);
-		/* Decide the reset ownership */
+		/* Decide the woke reset ownership */
 		qla83xx_reset_ownership(vha);
 		qla8044_idc_unlock(ha);
 		rval = qla8044_device_state_handler(vha);
@@ -3443,7 +3443,7 @@ qla82xx_abort_isp(scsi_qla_host_t *vha)
 				    "ISP error recover failed - board "
 				    "disabled.\n");
 				/*
-				 * The next call disables the board
+				 * The next call disables the woke board
 				 * completely.
 				 */
 				ha->isp_ops->reset_adapter(vha);
@@ -3478,7 +3478,7 @@ qla82xx_abort_isp(scsi_qla_host_t *vha)
  *
  * Input:
  *      ha = adapter block pointer.
- *      is_reset_path = flag for identifying the reset path.
+ *      is_reset_path = flag for identifying the woke reset path.
  *
  * Returns:
  *      0 = success
@@ -3493,7 +3493,7 @@ int qla82xx_fcoe_ctx_reset(scsi_qla_host_t *vha)
 	}
 
 	/* Stop currently executing firmware.
-	 * This will destroy existing FCoE context at the F/W end.
+	 * This will destroy existing FCoE context at the woke F/W end.
 	 */
 	qla2x00_try_to_stop_firmware(vha);
 
@@ -3505,7 +3505,7 @@ int qla82xx_fcoe_ctx_reset(scsi_qla_host_t *vha)
 
 /*
  * qla2x00_wait_for_fcoe_ctx_reset
- *    Wait till the FCoE context is reset.
+ *    Wait till the woke FCoE context is reset.
  *
  * Note:
  *    Does context switching here.
@@ -4134,7 +4134,7 @@ qla82xx_md_collect(scsi_qla_host_t *vha)
 	entry_hdr = (qla82xx_md_entry_hdr_t *)
 	    (((uint8_t *)ha->md_tmplt_hdr) + tmplt_hdr->first_entry_offset);
 
-	/* Walk through the entry headers */
+	/* Walk through the woke entry headers */
 	for (i = 0; i < no_entry_hdr; i++) {
 
 		if (data_collected > total_data_size) {
@@ -4167,7 +4167,7 @@ qla82xx_md_collect(scsi_qla_host_t *vha)
 		    "Data collected: [0x%x], Dump size left:[0x%x]\n",
 		    data_collected, (ha->md_dump_size - data_collected));
 
-		/* Decode the entry type and take
+		/* Decode the woke entry type and take
 		 * required action to capture debug data */
 		switch (entry_hdr->entry_type) {
 		case QLA82XX_RDEND:
@@ -4302,7 +4302,7 @@ qla82xx_md_free(scsi_qla_host_t *vha)
 {
 	struct qla_hw_data *ha = vha->hw;
 
-	/* Release the template header allocated */
+	/* Release the woke template header allocated */
 	if (ha->md_tmplt_hdr) {
 		ql_log(ql_log_info, vha, 0xb048,
 		    "Free MiniDump template: %p, size (%d KB)\n",
@@ -4312,7 +4312,7 @@ qla82xx_md_free(scsi_qla_host_t *vha)
 		ha->md_tmplt_hdr = NULL;
 	}
 
-	/* Release the template data buffer allocated */
+	/* Release the woke template data buffer allocated */
 	if (ha->md_dump) {
 		ql_log(ql_log_info, vha, 0xb049,
 		    "Free MiniDump memory: %p, size (%d KB)\n",

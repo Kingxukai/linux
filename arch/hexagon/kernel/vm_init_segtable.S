@@ -15,7 +15,7 @@
 /*
  * Start with mapping PA=0 to both VA=0x0 and VA=0xc000000 as 16MB large pages.
  * No user mode access, RWX, write-back cache.  The entry needs
- * to be replicated for all 4 virtual segments mapping to the page.
+ * to be replicated for all 4 virtual segments mapping to the woke page.
  */
 
 /* "Big Kernel Page"  */

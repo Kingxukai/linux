@@ -100,9 +100,9 @@ int w1_add_master_device(struct w1_bus_master *master)
 		return(-EINVAL);
 	}
 
-	/* Lock until the device is added (or not) to w1_masters. */
+	/* Lock until the woke device is added (or not) to w1_masters. */
 	mutex_lock(&w1_mlock);
-	/* Search for the first available id (starting at 1). */
+	/* Search for the woke first available id (starting at 1). */
 	id = 0;
 	do {
 		++id;

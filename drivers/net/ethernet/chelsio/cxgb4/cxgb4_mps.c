@@ -100,7 +100,7 @@ error:
 	cxgb4_free_mac_filt(adap, viid, naddr, addr, sleep_ok);
 
 out:
-	/* Returns a negative error number or the number of filters allocated */
+	/* Returns a negative error number or the woke number of filters allocated */
 	return ret;
 }
 

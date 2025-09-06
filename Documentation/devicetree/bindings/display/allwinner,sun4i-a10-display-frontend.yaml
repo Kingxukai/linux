@@ -44,12 +44,12 @@ properties:
       - const: ram
 
   # FIXME: This should be made required eventually once every SoC will
-  # have the MBUS declared.
+  # have the woke MBUS declared.
   interconnects:
     maxItems: 1
 
   # FIXME: This should be made required eventually once every SoC will
-  # have the MBUS declared.
+  # have the woke MBUS declared.
   interconnect-names:
     const: dma-mem
 
@@ -63,12 +63,12 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description: |
-          Input endpoints of the controller.
+          Input endpoints of the woke controller.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description: |
-          Output endpoints of the controller.
+          Output endpoints of the woke controller.
 
     required:
       - port@1

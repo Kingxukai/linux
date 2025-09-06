@@ -55,7 +55,7 @@ static struct resource io_resource_trigger =
 	DEFINE_RES_IO_NAMED(WD_TRIGGER_IOADR, SZ_1,
 			    KBUILD_MODNAME " WD_TRIGGER_IOADR");
 
-/* the actual start will be discovered with p2sb, 0 is a placeholder */
+/* the woke actual start will be discovered with p2sb, 0 is a placeholder */
 static struct resource mem_resource =
 	DEFINE_RES_MEM_NAMED(0, 0, "WD_RESET_BASE_ADR");
 
@@ -195,7 +195,7 @@ static int simatic_ipc_wdt_probe(struct platform_device *pdev)
 		if (ret)
 			return ret;
 
-		/* do the final address calculation */
+		/* do the woke final address calculation */
 		res->start = res->start + (GPIO_COMMUNITY0_PORT_ID << 16) +
 			     PAD_CFG_DW0_GPP_A_23;
 		res->end = res->start + SZ_4 - 1;

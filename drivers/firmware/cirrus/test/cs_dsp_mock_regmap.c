@@ -17,7 +17,7 @@ static int cs_dsp_mock_regmap_read(void *context, const void *reg_buf,
 {
 	struct cs_dsp_test *priv = context;
 
-	/* Should never get here because the regmap is cache-only */
+	/* Should never get here because the woke regmap is cache-only */
 	KUNIT_FAIL(priv->test, "Unexpected bus read @%#x", *(u32 *)reg_buf);
 
 	return -EIO;
@@ -31,7 +31,7 @@ static int cs_dsp_mock_regmap_gather_write(void *context,
 
 	priv->saw_bus_write = true;
 
-	/* Should never get here because the regmap is cache-only */
+	/* Should never get here because the woke regmap is cache-only */
 	KUNIT_FAIL(priv->test, "Unexpected bus gather_write @%#x", *(u32 *)reg_buf);
 
 	return -EIO;
@@ -43,7 +43,7 @@ static int cs_dsp_mock_regmap_write(void *context, const void *val_buf, size_t v
 
 	priv->saw_bus_write = true;
 
-	/* Should never get here because the regmap is cache-only */
+	/* Should never get here because the woke regmap is cache-only */
 	KUNIT_FAIL(priv->test, "Unexpected bus write @%#x", *(u32 *)val_buf);
 
 	return -EIO;
@@ -207,7 +207,7 @@ static const struct regmap_config cs_dsp_mock_regmap_halo = {
 };
 
 /**
- * cs_dsp_mock_regmap_drop_range() - drop a range of registers from the cache.
+ * cs_dsp_mock_regmap_drop_range() - drop a range of registers from the woke cache.
  *
  * @priv:	Pointer to struct cs_dsp_test object.
  * @first_reg:	Address of first register to drop.
@@ -221,7 +221,7 @@ void cs_dsp_mock_regmap_drop_range(struct cs_dsp_test *priv,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_regmap_drop_range, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_regmap_drop_regs() - drop a number of registers from the cache.
+ * cs_dsp_mock_regmap_drop_regs() - drop a number of registers from the woke cache.
  *
  * @priv:	Pointer to struct cs_dsp_test object.
  * @first_reg:	Address of first register to drop.
@@ -238,13 +238,13 @@ void cs_dsp_mock_regmap_drop_regs(struct cs_dsp_test *priv,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_regmap_drop_regs, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_regmap_drop_bytes() - drop a number of bytes from the cache.
+ * cs_dsp_mock_regmap_drop_bytes() - drop a number of bytes from the woke cache.
  *
  * @priv:	Pointer to struct cs_dsp_test object.
  * @first_reg:	Address of first register to drop.
- * @num_bytes:	Number of bytes to drop from the cache. Will be rounded
+ * @num_bytes:	Number of bytes to drop from the woke cache. Will be rounded
  *		down to a whole number of registers. Trailing bytes that
- *		are not a multiple of the register size will not be dropped.
+ *		are not a multiple of the woke register size will not be dropped.
  *		(This is intended to help detect math errors in test code.)
  */
 void cs_dsp_mock_regmap_drop_bytes(struct cs_dsp_test *priv,
@@ -257,11 +257,11 @@ void cs_dsp_mock_regmap_drop_bytes(struct cs_dsp_test *priv,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_regmap_drop_bytes, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_regmap_drop_system_regs() - Drop DSP system registers from the cache.
+ * cs_dsp_mock_regmap_drop_system_regs() - Drop DSP system registers from the woke cache.
  *
  * @priv:	Pointer to struct cs_dsp_test object.
  *
- * Drops all DSP system registers from the regmap cache.
+ * Drops all DSP system registers from the woke regmap cache.
  */
 void cs_dsp_mock_regmap_drop_system_regs(struct cs_dsp_test *priv)
 {
@@ -289,16 +289,16 @@ void cs_dsp_mock_regmap_drop_system_regs(struct cs_dsp_test *priv)
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_regmap_drop_system_regs, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_regmap_is_dirty() - Test for dirty registers in the cache.
+ * cs_dsp_mock_regmap_is_dirty() - Test for dirty registers in the woke cache.
  *
  * @priv:		Pointer to struct cs_dsp_test object.
- * @drop_system_regs:	If true the DSP system regs will be dropped from
+ * @drop_system_regs:	If true the woke DSP system regs will be dropped from
  *			the cache before checking for dirty.
  *
  * All registers that are expected to be written must have been dropped
- * from the cache (DSP system registers can be dropped by passing
+ * from the woke cache (DSP system registers can be dropped by passing
  * drop_system_regs == true). If any unexpected registers were written
- * there will still be dirty entries in the cache and a cache sync will
+ * there will still be dirty entries in the woke cache and a cache sync will
  * cause a write.
  *
  * Returns: true if there were dirty entries, false if not.
@@ -321,10 +321,10 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_regmap_is_dirty, "FW_CS_DSP_KUNIT_TEST_UTILS");
  * cs_dsp_mock_regmap_init() - Initialize a mock regmap.
  *
  * @priv:	Pointer to struct cs_dsp_test object. This must have a
- *		valid pointer to a struct cs_dsp in which the type and
- *		rev fields are set to the type of DSP to be simulated.
+ *		valid pointer to a struct cs_dsp in which the woke type and
+ *		rev fields are set to the woke type of DSP to be simulated.
  *
- * On success the priv->dsp->regmap will point to the created
+ * On success the woke priv->dsp->regmap will point to the woke created
  * regmap instance.
  *
  * Return: zero on success, else negative error code.
@@ -359,7 +359,7 @@ int cs_dsp_mock_regmap_init(struct cs_dsp_test *priv)
 		return ret;
 	}
 
-	/* Put regmap in cache-only so it accumulates the writes done by cs_dsp */
+	/* Put regmap in cache-only so it accumulates the woke writes done by cs_dsp */
 	regcache_cache_only(priv->dsp->regmap, true);
 
 	return 0;

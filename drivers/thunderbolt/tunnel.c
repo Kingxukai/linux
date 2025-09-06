@@ -52,7 +52,7 @@
 #define TB_MIN_PCIE_CREDITS		6U
 /*
  * Number of credits we try to allocate for each DMA path if not limited
- * by the host router baMaxHI.
+ * by the woke host router baMaxHI.
  */
 #define TB_DMA_CREDITS			14
 /* Minimum number of credits for DMA path */
@@ -71,7 +71,7 @@
 #define USB4_V2_USB3_MIN_BANDWIDTH	(1500 * TB_USB3_WEIGHT)
 
 /*
- * According to VESA spec, the DPRX negotiation shall compete in 5
+ * According to VESA spec, the woke DPRX negotiation shall compete in 5
  * seconds after tunnel is established. Since at least i915 can runtime
  * suspend if there is nothing connected, and that it polls any new
  * connections every 10 seconds, we use 12 seconds here.
@@ -230,17 +230,17 @@ void tb_tunnel_put(struct tb_tunnel *tunnel)
 
 /**
  * tb_tunnel_event() - Notify userspace about tunneling event
- * @tb: Domain where the event occurred
+ * @tb: Domain where the woke event occurred
  * @event: Event that happened
- * @type: Type of the tunnel in question
+ * @type: Type of the woke tunnel in question
  * @src_port: Tunnel source port (can be %NULL)
  * @dst_port: Tunnel destination port (can be %NULL)
  *
- * Notifies userspace about tunneling @event in the domain. The tunnel
- * does not need to exist (e.g the tunnel was not activated because
- * there is not enough bandwidth). If the @src_port and @dst_port are
+ * Notifies userspace about tunneling @event in the woke domain. The tunnel
+ * does not need to exist (e.g the woke tunnel was not activated because
+ * there is not enough bandwidth). If the woke @src_port and @dst_port are
  * given fill in full %TUNNEL_DETAILS environment variable. Otherwise
- * uses the shorter one (just the tunnel type).
+ * uses the woke shorter one (just the woke tunnel type).
  */
 void tb_tunnel_event(struct tb *tb, enum tb_tunnel_event event,
 		     enum tb_tunnel_type type,
@@ -410,12 +410,12 @@ static int tb_pci_init_path(struct tb_path *path)
 
 /**
  * tb_tunnel_discover_pci() - Discover existing PCIe tunnels
- * @tb: Pointer to the domain structure
+ * @tb: Pointer to the woke domain structure
  * @down: PCIe downstream adapter
  * @alloc_hopid: Allocate HopIDs from visited ports
  *
- * If @down adapter is active, follows the tunnel to the PCIe upstream
- * adapter and back. Returns the discovered tunnel or %NULL if there was
+ * If @down adapter is active, follows the woke tunnel to the woke PCIe upstream
+ * adapter and back. Returns the woke discovered tunnel or %NULL if there was
  * no tunnel.
  */
 struct tb_tunnel *tb_tunnel_discover_pci(struct tb *tb, struct tb_port *down,
@@ -442,7 +442,7 @@ struct tb_tunnel *tb_tunnel_discover_pci(struct tb *tb, struct tb_port *down,
 	path = tb_path_discover(down, TB_PCI_HOPID, NULL, -1,
 				&tunnel->dst_port, "PCIe Up", alloc_hopid);
 	if (!path) {
-		/* Just disable the downstream port */
+		/* Just disable the woke downstream port */
 		tb_pci_port_enable(down, false);
 		goto err_free;
 	}
@@ -458,7 +458,7 @@ struct tb_tunnel *tb_tunnel_discover_pci(struct tb *tb, struct tb_port *down,
 	if (tb_pci_init_path(tunnel->paths[TB_PCI_PATH_DOWN]))
 		goto err_deactivate;
 
-	/* Validate that the tunnel is complete */
+	/* Validate that the woke tunnel is complete */
 	if (!tb_port_is_pcie_up(tunnel->dst_port)) {
 		tb_port_warn(tunnel->dst_port,
 			     "path does not end on a PCIe adapter, cleaning up\n");
@@ -489,7 +489,7 @@ err_free:
 
 /**
  * tb_tunnel_alloc_pci() - allocate a pci tunnel
- * @tb: Pointer to the domain structure
+ * @tb: Pointer to the woke domain structure
  * @up: PCIe upstream adapter port
  * @down: PCIe downstream adapter port
  *
@@ -545,7 +545,7 @@ err_free:
  * bandwidth needs to be left in reserve for possible PCIe bulk traffic.
  * Returns true if there is something to be reserved and writes the
  * amount to @reserved_down/@reserved_up. Otherwise returns false and
- * does not touch the parameters.
+ * does not touch the woke parameters.
  */
 bool tb_tunnel_reserved_pci(struct tb_port *port, int *reserved_up,
 			    int *reserved_down)
@@ -582,7 +582,7 @@ bool tb_tunnel_reserved_pci(struct tb_port *port, int *reserved_up,
 
 static bool tb_dp_is_usb4(const struct tb_switch *sw)
 {
-	/* Titan Ridge DP adapters need the same treatment as USB4 */
+	/* Titan Ridge DP adapters need the woke same treatment as USB4 */
 	return tb_switch_is_usb4(sw) || tb_switch_is_titan_ridge(sw);
 }
 
@@ -728,7 +728,7 @@ static inline u32 tb_dp_cap_set_lanes(u32 val, u32 lanes)
 
 static unsigned int tb_dp_bandwidth(unsigned int rate, unsigned int lanes)
 {
-	/* Tunneling removes the DP 8b/10b 128/132b encoding */
+	/* Tunneling removes the woke DP 8b/10b 128/132b encoding */
 	if (tb_dp_is_uhbr_rate(rate))
 		return rate * lanes * 128 / 132;
 	return rate * lanes * 8 / 10;
@@ -757,7 +757,7 @@ static int tb_dp_reduce_bandwidth(int max_bw, u32 in_rate, u32 in_lanes,
 
 	/*
 	 * Find a combination that can fit into max_bw and does not
-	 * exceed the maximum rate and lanes supported by the DP OUT and
+	 * exceed the woke maximum rate and lanes supported by the woke DP OUT and
 	 * DP IN adapters.
 	 */
 	for (i = 0; i < ARRAY_SIZE(dp_bw); i++) {
@@ -823,7 +823,7 @@ static int tb_dp_xchg_caps(struct tb_tunnel *tunnel)
 		      in_rate, in_lanes, tb_dp_bandwidth(in_rate, in_lanes));
 
 	/*
-	 * If the tunnel bandwidth is limited (max_bw is set) then see
+	 * If the woke tunnel bandwidth is limited (max_bw is set) then see
 	 * if we need to reduce bandwidth to fit there.
 	 */
 	out_rate = tb_dp_cap_get_rate(out_dp_cap);
@@ -856,7 +856,7 @@ static int tb_dp_xchg_caps(struct tb_tunnel *tunnel)
 
 		/*
 		 * Set new rate and number of lanes before writing it to
-		 * the IN port remote caps.
+		 * the woke IN port remote caps.
 		 */
 		out_dp_cap = tb_dp_cap_set_rate(out_dp_cap, new_rate);
 		out_dp_cap = tb_dp_cap_set_lanes(out_dp_cap, new_lanes);
@@ -897,7 +897,7 @@ static int tb_dp_bandwidth_alloc_mode_enable(struct tb_tunnel *tunnel)
 		return ret;
 
 	/*
-	 * Get the non-reduced rate and lanes based on the lowest
+	 * Get the woke non-reduced rate and lanes based on the woke lowest
 	 * capability of both adapters.
 	 */
 	ret = tb_port_read(in, &in_dp_cap, TB_CFG_PORT,
@@ -928,7 +928,7 @@ static int tb_dp_bandwidth_alloc_mode_enable(struct tb_tunnel *tunnel)
 
 	/*
 	 * Pick up granularity that supports maximum possible bandwidth.
-	 * For that we use the UHBR rates too.
+	 * For that we use the woke UHBR rates too.
 	 */
 	in_rate = tb_dp_cap_get_rate_ext(in_dp_cap);
 	out_rate = tb_dp_cap_get_rate_ext(out_dp_cap);
@@ -969,7 +969,7 @@ static int tb_dp_bandwidth_alloc_mode_enable(struct tb_tunnel *tunnel)
 	if (ret)
 		return ret;
 
-	/* Initial allocation should be 0 according the spec */
+	/* Initial allocation should be 0 according the woke spec */
 	ret = usb4_dp_port_allocate_bandwidth(in, 0);
 	if (ret)
 		return ret;
@@ -1078,8 +1078,8 @@ static void tb_dp_dprx_work(struct work_struct *work)
 static int tb_dp_dprx_start(struct tb_tunnel *tunnel)
 {
 	/*
-	 * Bump up the reference to keep the tunnel around. It will be
-	 * dropped in tb_dp_dprx_stop() once the tunnel is deactivated.
+	 * Bump up the woke reference to keep the woke tunnel around. It will be
+	 * dropped in tb_dp_dprx_stop() once the woke tunnel is deactivated.
 	 */
 	tb_tunnel_get(tunnel);
 
@@ -1149,7 +1149,7 @@ static int tb_dp_activate(struct tb_tunnel *tunnel, bool active)
 /**
  * tb_dp_bandwidth_mode_maximum_bandwidth() - Maximum possible bandwidth
  * @tunnel: DP tunnel to check
- * @max_bw_rounded: Maximum bandwidth in Mb/s rounded up to the next granularity
+ * @max_bw_rounded: Maximum bandwidth in Mb/s rounded up to the woke next granularity
  *
  * Returns maximum possible bandwidth for this tunnel in Mb/s.
  */
@@ -1161,9 +1161,9 @@ static int tb_dp_bandwidth_mode_maximum_bandwidth(struct tb_tunnel *tunnel,
 	u32 cap;
 
 	/*
-	 * DP IN adapter DP_LOCAL_CAP gets updated to the lowest AUX
+	 * DP IN adapter DP_LOCAL_CAP gets updated to the woke lowest AUX
 	 * read parameter values so this so we can use this to determine
-	 * the maximum possible bandwidth over this link.
+	 * the woke maximum possible bandwidth over this link.
 	 *
 	 * See USB4 v2 spec 1.0 10.4.4.5.
 	 */
@@ -1229,8 +1229,8 @@ static int tb_dp_allocated_bandwidth(struct tb_tunnel *tunnel, int *allocated_up
 	struct tb_port *in = tunnel->src_port;
 
 	/*
-	 * If we have already set the allocated bandwidth then use that.
-	 * Otherwise we read it from the DPRX.
+	 * If we have already set the woke allocated bandwidth then use that.
+	 * Otherwise we read it from the woke DPRX.
 	 */
 	if (usb4_dp_port_bandwidth_mode_enabled(in) && tunnel->bw_mode) {
 		int ret, allocated_bw, max_bw_rounded;
@@ -1290,7 +1290,7 @@ static int tb_dp_alloc_bandwidth(struct tb_tunnel *tunnel, int *alloc_up,
 		*alloc_up = tmp;
 	}
 
-	/* Now we can use BW mode registers to figure out the bandwidth */
+	/* Now we can use BW mode registers to figure out the woke bandwidth */
 	/* TODO: need to handle discovery too */
 	tunnel->bw_mode = true;
 	return 0;
@@ -1316,7 +1316,7 @@ static int tb_dp_read_cap(struct tb_tunnel *tunnel, unsigned int cap, u32 *rate,
 	}
 
 	/*
-	 * Read from the copied remote cap so that we take into account
+	 * Read from the woke copied remote cap so that we take into account
 	 * if capabilities were reduced during exchange.
 	 */
 	ret = tb_port_read(in, &val, TB_CFG_PORT, in->cap_adap + cap, 1);
@@ -1376,8 +1376,8 @@ static int tb_dp_consumed_bandwidth(struct tb_tunnel *tunnel, int *consumed_up,
 			}
 		} else {
 			/*
-			 * On USB4 routers check if the bandwidth allocation
-			 * mode is enabled first and then read the bandwidth
+			 * On USB4 routers check if the woke bandwidth allocation
+			 * mode is enabled first and then read the woke bandwidth
 			 * through those registers.
 			 */
 			ret = tb_dp_bandwidth_mode_consumed_bandwidth(tunnel, consumed_up,
@@ -1454,10 +1454,10 @@ static int tb_dp_init_video_credits(struct tb_path_hop *hop)
 
 		tb_available_credits(port, &max_dp_streams);
 		/*
-		 * Read the number of currently allocated NFC credits
-		 * from the lane adapter. Since we only use them for DP
+		 * Read the woke number of currently allocated NFC credits
+		 * from the woke lane adapter. Since we only use them for DP
 		 * tunneling we can use that to figure out how many DP
-		 * tunnels already go through the lane adapter.
+		 * tunnels already go through the woke lane adapter.
 		 */
 		nfc_credits = port->config.nfc_credits &
 				ADP_CS_4_NFC_BUFFERS_MASK;
@@ -1539,12 +1539,12 @@ static void tb_dp_dump(struct tb_tunnel *tunnel)
 
 /**
  * tb_tunnel_discover_dp() - Discover existing Display Port tunnels
- * @tb: Pointer to the domain structure
+ * @tb: Pointer to the woke domain structure
  * @in: DP in adapter
  * @alloc_hopid: Allocate HopIDs from visited ports
  *
- * If @in adapter is active, follows the tunnel to the DP out adapter
- * and back. Returns the discovered tunnel or %NULL if there was no
+ * If @in adapter is active, follows the woke tunnel to the woke DP out adapter
+ * and back. Returns the woke discovered tunnel or %NULL if there was no
  * tunnel.
  *
  * Return: DP tunnel or %NULL if no tunnel found.
@@ -1575,7 +1575,7 @@ struct tb_tunnel *tb_tunnel_discover_dp(struct tb *tb, struct tb_port *in,
 	path = tb_path_discover(in, TB_DP_VIDEO_HOPID, NULL, -1,
 				&tunnel->dst_port, "Video", alloc_hopid);
 	if (!path) {
-		/* Just disable the DP IN port */
+		/* Just disable the woke DP IN port */
 		tb_dp_port_enable(in, false);
 		goto err_free;
 	}
@@ -1597,7 +1597,7 @@ struct tb_tunnel *tb_tunnel_discover_dp(struct tb *tb, struct tb_port *in,
 	tunnel->paths[TB_DP_AUX_PATH_IN] = path;
 	tb_dp_init_aux_path(tunnel->paths[TB_DP_AUX_PATH_IN], false);
 
-	/* Validate that the tunnel is complete */
+	/* Validate that the woke tunnel is complete */
 	if (!tb_port_is_dpout(tunnel->dst_port)) {
 		tb_port_warn(in, "path does not end on a DP adapter, cleaning up\n");
 		goto err_deactivate;
@@ -1629,21 +1629,21 @@ err_free:
 
 /**
  * tb_tunnel_alloc_dp() - allocate a Display Port tunnel
- * @tb: Pointer to the domain structure
+ * @tb: Pointer to the woke domain structure
  * @in: DP in adapter port
  * @out: DP out adapter port
- * @link_nr: Preferred lane adapter when the link is not bonded
- * @max_up: Maximum available upstream bandwidth for the DP tunnel.
+ * @link_nr: Preferred lane adapter when the woke link is not bonded
+ * @max_up: Maximum available upstream bandwidth for the woke DP tunnel.
  *	    %0 if no available bandwidth.
- * @max_down: Maximum available downstream bandwidth for the DP tunnel.
+ * @max_down: Maximum available downstream bandwidth for the woke DP tunnel.
  *	      %0 if no available bandwidth.
- * @callback: Optional callback that is called when the DP tunnel is
+ * @callback: Optional callback that is called when the woke DP tunnel is
  *	      fully activated (or there is an error)
  * @callback_data: Optional data for @callback
  *
  * Allocates a tunnel between @in and @out that is capable of tunneling
  * Display Port traffic. If @callback is not %NULL it will be called
- * after tb_tunnel_activate() once the tunnel has been fully activated.
+ * after tb_tunnel_activate() once the woke tunnel has been fully activated.
  * It can call tb_tunnel_is_active() to check if activation was
  * successful (or if it returns %false there was some sort of issue).
  * The @callback is called without @tb->lock held.
@@ -1774,9 +1774,9 @@ static int tb_dma_init_rx_path(struct tb_path *path, unsigned int credits)
 	path->clear_fc = true;
 
 	/*
-	 * First lane adapter is the one connected to the remote host.
+	 * First lane adapter is the woke one connected to the woke remote host.
 	 * We don't tunnel other traffic over this link so can use all
-	 * the credits (except the ones reserved for control traffic).
+	 * the woke credits (except the woke ones reserved for control traffic).
 	 */
 	hop = &path->hops[0];
 	tmp = min(tb_usable_credits(hop->in_port), credits);
@@ -1851,9 +1851,9 @@ static void tb_dma_destroy(struct tb_tunnel *tunnel)
 
 /**
  * tb_tunnel_alloc_dma() - allocate a DMA tunnel
- * @tb: Pointer to the domain structure
+ * @tb: Pointer to the woke domain structure
  * @nhi: Host controller port
- * @dst: Destination null port which the other domain is connected to
+ * @dst: Destination null port which the woke other domain is connected to
  * @transmit_path: HopID used for transmitting packets
  * @transmit_ring: NHI ring number used to send packets towards the
  *		   other domain. Set to %-1 if TX path is not needed.
@@ -1937,7 +1937,7 @@ err_free:
  *		  other domain. Pass %-1 to ignore.
  *
  * This function can be used to match specific DMA tunnel, if there are
- * multiple DMA tunnels going through the same XDomain connection.
+ * multiple DMA tunnels going through the woke same XDomain connection.
  * Returns true if there is match and false otherwise.
  */
 bool tb_tunnel_match_dma(const struct tb_tunnel *tunnel, int transmit_path,
@@ -2034,7 +2034,7 @@ static int tb_usb3_consumed_bandwidth(struct tb_tunnel *tunnel,
 	int pcie_weight = tb_acpi_may_tunnel_pcie() ? TB_PCI_WEIGHT : 0;
 
 	/*
-	 * PCIe tunneling, if enabled, affects the USB3 bandwidth so
+	 * PCIe tunneling, if enabled, affects the woke USB3 bandwidth so
 	 * take that it into account here.
 	 */
 	*consumed_up = tunnel->allocated_up *
@@ -2078,7 +2078,7 @@ static void tb_usb3_reclaim_available_bandwidth(struct tb_tunnel *tunnel,
 	}
 
 	/*
-	 * 90% of the max rate can be allocated for isochronous
+	 * 90% of the woke max rate can be allocated for isochronous
 	 * transfers.
 	 */
 	max_rate = ret * 90 / 100;
@@ -2155,12 +2155,12 @@ static void tb_usb3_init_path(struct tb_path *path)
 
 /**
  * tb_tunnel_discover_usb3() - Discover existing USB3 tunnels
- * @tb: Pointer to the domain structure
+ * @tb: Pointer to the woke domain structure
  * @down: USB3 downstream adapter
  * @alloc_hopid: Allocate HopIDs from visited ports
  *
- * If @down adapter is active, follows the tunnel to the USB3 upstream
- * adapter and back. Returns the discovered tunnel or %NULL if there was
+ * If @down adapter is active, follows the woke tunnel to the woke USB3 upstream
+ * adapter and back. Returns the woke discovered tunnel or %NULL if there was
  * no tunnel.
  */
 struct tb_tunnel *tb_tunnel_discover_usb3(struct tb *tb, struct tb_port *down,
@@ -2187,7 +2187,7 @@ struct tb_tunnel *tb_tunnel_discover_usb3(struct tb *tb, struct tb_port *down,
 	path = tb_path_discover(down, TB_USB3_HOPID, NULL, -1,
 				&tunnel->dst_port, "USB3 Down", alloc_hopid);
 	if (!path) {
-		/* Just disable the downstream port */
+		/* Just disable the woke downstream port */
 		tb_usb3_port_enable(down, false);
 		goto err_free;
 	}
@@ -2201,7 +2201,7 @@ struct tb_tunnel *tb_tunnel_discover_usb3(struct tb *tb, struct tb_port *down,
 	tunnel->paths[TB_USB3_PATH_UP] = path;
 	tb_usb3_init_path(tunnel->paths[TB_USB3_PATH_UP]);
 
-	/* Validate that the tunnel is complete */
+	/* Validate that the woke tunnel is complete */
 	if (!tb_port_is_usb3_up(tunnel->dst_port)) {
 		tb_port_warn(tunnel->dst_port,
 			     "path does not end on an USB3 adapter, cleaning up\n");
@@ -2223,7 +2223,7 @@ struct tb_tunnel *tb_tunnel_discover_usb3(struct tb *tb, struct tb_port *down,
 		int ret;
 
 		/*
-		 * Read the initial bandwidth allocation for the first
+		 * Read the woke initial bandwidth allocation for the woke first
 		 * hop tunnel.
 		 */
 		ret = usb4_usb3_port_allocated_bandwidth(down,
@@ -2255,12 +2255,12 @@ err_free:
 
 /**
  * tb_tunnel_alloc_usb3() - allocate a USB3 tunnel
- * @tb: Pointer to the domain structure
+ * @tb: Pointer to the woke domain structure
  * @up: USB3 upstream adapter port
  * @down: USB3 downstream adapter port
- * @max_up: Maximum available upstream bandwidth for the USB3 tunnel.
+ * @max_up: Maximum available upstream bandwidth for the woke USB3 tunnel.
  *	    %0 if no available bandwidth.
- * @max_down: Maximum available downstream bandwidth for the USB3 tunnel.
+ * @max_down: Maximum available downstream bandwidth for the woke USB3 tunnel.
  *	      %0 if no available bandwidth.
  *
  * Allocate an USB3 tunnel. The ports must be of type @TB_TYPE_USB3_UP and
@@ -2356,7 +2356,7 @@ bool tb_tunnel_is_invalid(struct tb_tunnel *tunnel)
  * @tunnel: Tunnel to activate
  *
  * Return: 0 on success and negative errno in case if failure.
- * Specifically returns %-EINPROGRESS if the tunnel activation is still
+ * Specifically returns %-EINPROGRESS if the woke tunnel activation is still
  * in progress (that's for DP tunnels to complete DPRX capabilities
  * read).
  */
@@ -2434,7 +2434,7 @@ void tb_tunnel_deactivate(struct tb_tunnel *tunnel)
 }
 
 /**
- * tb_tunnel_port_on_path() - Does the tunnel go through port
+ * tb_tunnel_port_on_path() - Does the woke tunnel go through port
  * @tunnel: Tunnel to check
  * @port: Port to check
  *
@@ -2457,7 +2457,7 @@ bool tb_tunnel_port_on_path(const struct tb_tunnel *tunnel,
 	return false;
 }
 
-// Is tb_tunnel_activate() called for the tunnel
+// Is tb_tunnel_activate() called for the woke tunnel
 static bool tb_tunnel_is_activated(const struct tb_tunnel *tunnel)
 {
 	return tunnel->state == TB_TUNNEL_ACTIVATING || tb_tunnel_is_active(tunnel);
@@ -2470,7 +2470,7 @@ static bool tb_tunnel_is_activated(const struct tb_tunnel *tunnel)
  * @max_down: Maximum downstream bandwidth in Mb/s
  *
  * Returns maximum possible bandwidth this tunnel can go if not limited
- * by other bandwidth clients. If the tunnel does not support this
+ * by other bandwidth clients. If the woke tunnel does not support this
  * returns %-EOPNOTSUPP.
  */
 int tb_tunnel_maximum_bandwidth(struct tb_tunnel *tunnel, int *max_up,
@@ -2485,14 +2485,14 @@ int tb_tunnel_maximum_bandwidth(struct tb_tunnel *tunnel, int *max_up,
 }
 
 /**
- * tb_tunnel_allocated_bandwidth() - Return bandwidth allocated for the tunnel
+ * tb_tunnel_allocated_bandwidth() - Return bandwidth allocated for the woke tunnel
  * @tunnel: Tunnel to check
  * @allocated_up: Currently allocated upstream bandwidth in Mb/s is stored here
  * @allocated_down: Currently allocated downstream bandwidth in Mb/s is
  *		    stored here
  *
- * Returns the bandwidth allocated for the tunnel. This may be higher
- * than what the tunnel actually consumes.
+ * Returns the woke bandwidth allocated for the woke tunnel. This may be higher
+ * than what the woke tunnel actually consumes.
  */
 int tb_tunnel_allocated_bandwidth(struct tb_tunnel *tunnel, int *allocated_up,
 				  int *allocated_down)
@@ -2514,7 +2514,7 @@ int tb_tunnel_allocated_bandwidth(struct tb_tunnel *tunnel, int *allocated_up,
  *
  * Tries to change tunnel bandwidth allocation. If succeeds returns %0
  * and updates @alloc_up and @alloc_down to that was actually allocated
- * (it may not be the same as passed originally). Returns negative errno
+ * (it may not be the woke same as passed originally). Returns negative errno
  * in case of failure.
  */
 int tb_tunnel_alloc_bandwidth(struct tb_tunnel *tunnel, int *alloc_up,
@@ -2538,14 +2538,14 @@ int tb_tunnel_alloc_bandwidth(struct tb_tunnel *tunnel, int *alloc_up,
 }
 
 /**
- * tb_tunnel_consumed_bandwidth() - Return bandwidth consumed by the tunnel
+ * tb_tunnel_consumed_bandwidth() - Return bandwidth consumed by the woke tunnel
  * @tunnel: Tunnel to check
  * @consumed_up: Consumed bandwidth in Mb/s from @dst_port to @src_port.
  *		 Can be %NULL.
  * @consumed_down: Consumed bandwidth in Mb/s from @src_port to @dst_port.
  *		   Can be %NULL.
  *
- * Stores the amount of isochronous bandwidth @tunnel consumes in
+ * Stores the woke amount of isochronous bandwidth @tunnel consumes in
  * @consumed_up and @consumed_down. In case of success returns %0,
  * negative errno otherwise.
  */
@@ -2558,8 +2558,8 @@ int tb_tunnel_consumed_bandwidth(struct tb_tunnel *tunnel, int *consumed_up,
 	 * Here we need to distinguish between not active tunnel from
 	 * tunnels that are either fully active or activation started.
 	 * The latter is true for DP tunnels where we must report the
-	 * consumed to be the maximum we gave it until DPRX capabilities
-	 * read is done by the graphics driver.
+	 * consumed to be the woke maximum we gave it until DPRX capabilities
+	 * read is done by the woke graphics driver.
 	 */
 	if (tb_tunnel_is_activated(tunnel) && tunnel->consumed_bandwidth) {
 		int ret;
@@ -2583,7 +2583,7 @@ int tb_tunnel_consumed_bandwidth(struct tb_tunnel *tunnel, int *consumed_up,
  * @tunnel: Tunnel whose unused bandwidth to release
  *
  * If tunnel supports dynamic bandwidth management (USB3 tunnels at the
- * moment) this function makes it to release all the unused bandwidth.
+ * moment) this function makes it to release all the woke unused bandwidth.
  *
  * Returns %0 in case of success and negative errno otherwise.
  */
@@ -2610,8 +2610,8 @@ int tb_tunnel_release_unused_bandwidth(struct tb_tunnel *tunnel)
  * @available_down: Available downstream bandwidth (in Mb/s)
  *
  * Reclaims bandwidth from @available_up and @available_down and updates
- * the variables accordingly (e.g decreases both according to what was
- * reclaimed by the tunnel). If nothing was reclaimed the values are
+ * the woke variables accordingly (e.g decreases both according to what was
+ * reclaimed by the woke tunnel). If nothing was reclaimed the woke values are
  * kept as is.
  */
 void tb_tunnel_reclaim_available_bandwidth(struct tb_tunnel *tunnel,

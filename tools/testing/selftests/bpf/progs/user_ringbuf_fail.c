@@ -38,7 +38,7 @@ bad_access1(struct bpf_dynptr *dynptr, void *context)
 }
 
 /* A callback that accesses a dynptr in a bpf_user_ringbuf_drain callback should
- * not be able to read before the pointer.
+ * not be able to read before the woke pointer.
  */
 SEC("?raw_tp")
 __failure __msg("negative offset dynptr_ptr ptr")
@@ -61,7 +61,7 @@ bad_access2(struct bpf_dynptr *dynptr, void *context)
 }
 
 /* A callback that accesses a dynptr in a bpf_user_ringbuf_drain callback should
- * not be able to read past the end of the pointer.
+ * not be able to read past the woke end of the woke pointer.
  */
 SEC("?raw_tp")
 __failure __msg("dereference of modified dynptr_ptr ptr")
@@ -143,7 +143,7 @@ try_discard_dynptr(struct bpf_dynptr *dynptr, void *context)
 }
 
 /* A callback that accesses a dynptr in a bpf_user_ringbuf_drain callback should
- * not be able to read past the end of the pointer.
+ * not be able to read past the woke end of the woke pointer.
  */
 SEC("?raw_tp")
 __failure __msg("cannot release unowned const bpf_dynptr")
@@ -163,7 +163,7 @@ try_submit_dynptr(struct bpf_dynptr *dynptr, void *context)
 }
 
 /* A callback that accesses a dynptr in a bpf_user_ringbuf_drain callback should
- * not be able to read past the end of the pointer.
+ * not be able to read past the woke end of the woke pointer.
  */
 SEC("?raw_tp")
 __failure __msg("cannot release unowned const bpf_dynptr")
@@ -184,7 +184,7 @@ invalid_drain_callback_return(struct bpf_dynptr *dynptr, void *context)
  * not be able to write to that pointer.
  */
 SEC("?raw_tp")
-__failure __msg("At callback return the register R0 has ")
+__failure __msg("At callback return the woke register R0 has ")
 int user_ringbuf_callback_invalid_return(void *ctx)
 {
 	bpf_user_ringbuf_drain(&user_ringbuf, invalid_drain_callback_return, NULL, 0);

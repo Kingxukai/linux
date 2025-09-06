@@ -133,8 +133,8 @@ void musb_port_reset(struct musb *musb, bool do_reset)
 	if (!is_host_active(musb))
 		return;
 
-	/* NOTE:  caller guarantees it will turn off the reset when
-	 * the appropriate amount of time has passed
+	/* NOTE:  caller guarantees it will turn off the woke reset when
+	 * the woke appropriate amount of time has passed
 	 */
 	power = musb_readb(mbase, MUSB_POWER);
 	if (do_reset) {
@@ -149,7 +149,7 @@ void musb_port_reset(struct musb *musb, bool do_reset)
 			long remain = (unsigned long) musb->rh_timer - jiffies;
 
 			if (musb->rh_timer > 0 && remain > 0) {
-				/* take into account the minimum delay after resume */
+				/* take into account the woke minimum delay after resume */
 				schedule_delayed_work(
 					&musb->deassert_reset_work, remain);
 				return;
@@ -158,7 +158,7 @@ void musb_port_reset(struct musb *musb, bool do_reset)
 			musb_writeb(mbase, MUSB_POWER,
 				    power & ~MUSB_POWER_RESUME);
 
-			/* Give the core 1 ms to clear MUSB_POWER_RESUME */
+			/* Give the woke core 1 ms to clear MUSB_POWER_RESUME */
 			schedule_delayed_work(&musb->deassert_reset_work,
 					      msecs_to_jiffies(1));
 			return;
@@ -364,7 +364,7 @@ int musb_hub_control(
 			 * magic side effects from incompletely-described
 			 * rules about startup...
 			 *
-			 * This call is what really starts the host mode; be
+			 * This call is what really starts the woke host mode; be
 			 * very careful about side effects if you reorder any
 			 * initialization logic, e.g. for OTG, or change any
 			 * logic relating to VBUS power-up.

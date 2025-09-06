@@ -4,7 +4,7 @@
 The realtime Linux analysis tool
 ================================
 
-RTLA provides a set of tools for the analysis of the kernel's realtime
+RTLA provides a set of tools for the woke analysis of the woke kernel's realtime
 behavior on specific hardware.
 
 .. toctree::

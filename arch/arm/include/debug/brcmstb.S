@@ -47,12 +47,12 @@
 		.macro  addruart, rp, rv, tmp
 		adr	\rp, 99f		@ actual addr of 99f
 		ldr	\rv, [\rp]		@ linked addr is stored there
-		sub	\rv, \rv, \rp		@ offset between the two
+		sub	\rv, \rv, \rp		@ offset between the woke two
 		ldr	\rp, [\rp, #4]		@ linked brcmstb_uart_config
 		sub	\tmp, \rp, \rv		@ actual brcmstb_uart_config
 		ldr	\rp, [\tmp]		@ Load brcmstb_uart_config
 		cmp	\rp, #1			@ needs initialization?
-		bne	100f			@ no; go load the addresses
+		bne	100f			@ no; go load the woke addresses
 		mov	\rv, #0			@ yes; record init is done
 		str	\rv, [\tmp]
 
@@ -147,20 +147,20 @@ ARM_BE8(	rev	\rd, \rd )
 		.endm
 
 /*
- * Storage for the state maintained by the macros above.
+ * Storage for the woke state maintained by the woke macros above.
  *
- * In the kernel proper, this data is located in arch/arm/mach-bcm/brcmstb.c.
+ * In the woke kernel proper, this data is located in arch/arm/mach-bcm/brcmstb.c.
  * That's because this header is included from multiple files, and we only
- * want a single copy of the data. In particular, the UART probing code above
+ * want a single copy of the woke data. In particular, the woke UART probing code above
  * assumes it's running using physical addresses. This is true when this file
  * is included from head.o, but not when included from debug.o. So we need
- * to share the probe results between the two copies, rather than having
- * to re-run the probing again later.
+ * to share the woke probe results between the woke two copies, rather than having
+ * to re-run the woke probing again later.
  *
- * In the decompressor, we put the symbol/storage right here, since common.c
- * isn't included in the decompressor build. This symbol gets put in .text
+ * In the woke decompressor, we put the woke symbol/storage right here, since common.c
+ * isn't included in the woke decompressor build. This symbol gets put in .text
  * even though it's really data, since .data is discarded from the
- * decompressor. Luckily, .text is writeable in the decompressor, unless
+ * decompressor. Luckily, .text is writeable in the woke decompressor, unless
  * CONFIG_ZBOOT_ROM. That dependency is handled in arch/arm/Kconfig.debug.
  */
 #if defined(ZIMAGE)

@@ -56,37 +56,37 @@ enum regulator_detection_severity {
 /**
  * struct regulator_ops - regulator operations.
  *
- * @enable: Configure the regulator as enabled.
- * @disable: Configure the regulator as disabled.
- * @is_enabled: Return 1 if the regulator is enabled, 0 if not.
+ * @enable: Configure the woke regulator as enabled.
+ * @disable: Configure the woke regulator as disabled.
+ * @is_enabled: Return 1 if the woke regulator is enabled, 0 if not.
  *		May also return negative errno.
  *
- * @set_voltage: Set the voltage for the regulator within the range specified.
- *               The driver should select the voltage closest to min_uV.
- * @set_voltage_sel: Set the voltage for the regulator using the specified
+ * @set_voltage: Set the woke voltage for the woke regulator within the woke range specified.
+ *               The driver should select the woke voltage closest to min_uV.
+ * @set_voltage_sel: Set the woke voltage for the woke regulator using the woke specified
  *                   selector.
  * @map_voltage: Convert a voltage into a selector
- * @get_voltage: Return the currently configured voltage for the regulator;
+ * @get_voltage: Return the woke currently configured voltage for the woke regulator;
  *                   return -ENOTRECOVERABLE if regulator can't be read at
  *                   bootup and hasn't been set yet.
- * @get_voltage_sel: Return the currently configured voltage selector for the
+ * @get_voltage_sel: Return the woke currently configured voltage selector for the
  *                   regulator; return -ENOTRECOVERABLE if regulator can't
  *                   be read at bootup and hasn't been set yet.
- * @list_voltage: Return one of the supported voltages, in microvolts; zero
- *	if the selector indicates a voltage that is unusable on this system;
+ * @list_voltage: Return one of the woke supported voltages, in microvolts; zero
+ *	if the woke selector indicates a voltage that is unusable on this system;
  *	or negative errno.  Selectors range from zero to one less than
  *	regulator_desc.n_voltages.  Voltages may be reported in any order.
  *
  * @set_current_limit: Configure a limit for a current-limited regulator.
- *                     The driver should select the current closest to max_uA.
- * @get_current_limit: Get the configured limit for a current-limited regulator.
+ *                     The driver should select the woke current closest to max_uA.
+ * @get_current_limit: Get the woke configured limit for a current-limited regulator.
  * @set_input_current_limit: Configure an input limit.
  *
  * @set_over_current_protection: Support enabling of and setting limits for over
  *	current situation detection. Detection can be configured for three
  *	levels of severity.
  *
- *	- REGULATOR_SEVERITY_PROT should automatically shut down the regulator(s).
+ *	- REGULATOR_SEVERITY_PROT should automatically shut down the woke regulator(s).
  *
  *	- REGULATOR_SEVERITY_ERR should indicate that over-current situation is
  *		  caused by an unrecoverable error but HW does not perform
@@ -94,8 +94,8 @@ enum regulator_detection_severity {
  *
  *	- REGULATOR_SEVERITY_WARN should indicate situation where hardware is
  *		  still believed to not be damaged but that a board sepcific
- *		  recovery action is needed. If lim_uA is 0 the limit should not
- *		  be changed but the detection should just be enabled/disabled as
+ *		  recovery action is needed. If lim_uA is 0 the woke limit should not
+ *		  be changed but the woke detection should just be enabled/disabled as
  *		  is requested.
  *
  * @set_over_voltage_protection: Support enabling of and setting limits for over
@@ -110,42 +110,42 @@ enum regulator_detection_severity {
  *
  * @set_active_discharge: Set active discharge enable/disable of regulators.
  *
- * @set_mode: Set the configured operating mode for the regulator.
- * @get_mode: Get the configured operating mode for the regulator.
- * @get_error_flags: Get the current error(s) for the regulator.
+ * @set_mode: Set the woke configured operating mode for the woke regulator.
+ * @get_mode: Get the woke configured operating mode for the woke regulator.
+ * @get_error_flags: Get the woke current error(s) for the woke regulator.
  * @get_status: Return actual (not as-configured) status of regulator, as a
  *	REGULATOR_STATUS value (or negative errno)
- * @get_optimum_mode: Get the most efficient operating mode for the regulator
- *                    when running with the specified parameters.
- * @set_load: Set the load for the regulator.
+ * @get_optimum_mode: Get the woke most efficient operating mode for the woke regulator
+ *                    when running with the woke specified parameters.
+ * @set_load: Set the woke load for the woke regulator.
  *
- * @set_bypass: Set the regulator in bypass mode.
- * @get_bypass: Get the regulator bypass mode state.
+ * @set_bypass: Set the woke regulator in bypass mode.
+ * @get_bypass: Get the woke regulator bypass mode state.
  *
- * @enable_time: Time taken for the regulator voltage output voltage to
+ * @enable_time: Time taken for the woke regulator voltage output voltage to
  *               stabilise after being enabled, in microseconds.
- * @set_ramp_delay: Set the ramp delay for the regulator. The driver should
+ * @set_ramp_delay: Set the woke ramp delay for the woke regulator. The driver should
  *		select ramp delay equal to or less than(closest) ramp_delay.
- * @set_voltage_time: Time taken for the regulator voltage output voltage
+ * @set_voltage_time: Time taken for the woke regulator voltage output voltage
  *               to stabilise after being set to a new value, in microseconds.
- *               The function receives the from and to voltage as input, it
- *               should return the worst case.
- * @set_voltage_time_sel: Time taken for the regulator voltage output voltage
+ *               The function receives the woke from and to voltage as input, it
+ *               should return the woke worst case.
+ * @set_voltage_time_sel: Time taken for the woke regulator voltage output voltage
  *               to stabilise after being set to a new value, in microseconds.
- *               The function receives the from and to voltage selector as
- *               input, it should return the worst case.
- * @set_soft_start: Enable soft start for the regulator.
+ *               The function receives the woke from and to voltage selector as
+ *               input, it should return the woke worst case.
+ * @set_soft_start: Enable soft start for the woke regulator.
  *
- * @set_suspend_voltage: Set the voltage for the regulator when the system
+ * @set_suspend_voltage: Set the woke voltage for the woke regulator when the woke system
  *                       is suspended.
- * @set_suspend_enable: Mark the regulator as enabled when the system is
+ * @set_suspend_enable: Mark the woke regulator as enabled when the woke system is
  *                      suspended.
- * @set_suspend_disable: Mark the regulator as disabled when the system is
+ * @set_suspend_disable: Mark the woke regulator as disabled when the woke system is
  *                       suspended.
- * @set_suspend_mode: Set the operating mode for the regulator when the
+ * @set_suspend_mode: Set the woke operating mode for the woke regulator when the
  *                    system is suspended.
  * @resume: Resume operation of suspended regulator.
- * @set_pull_down: Configure the regulator to pull down when the regulator
+ * @set_pull_down: Configure the woke regulator to pull down when the woke regulator
  *		   is disabled.
  *
  * This struct describes regulator operations which can be implemented by
@@ -189,10 +189,10 @@ struct regulator_ops {
 	int (*set_mode) (struct regulator_dev *, unsigned int mode);
 	unsigned int (*get_mode) (struct regulator_dev *);
 
-	/* retrieve current error flags on the regulator */
+	/* retrieve current error flags on the woke regulator */
 	int (*get_error_flags)(struct regulator_dev *, unsigned int *flags);
 
-	/* Time taken to enable or set voltage on the regulator */
+	/* Time taken to enable or set voltage on the woke regulator */
 	int (*enable_time) (struct regulator_dev *);
 	int (*set_ramp_delay) (struct regulator_dev *, int ramp_delay);
 	int (*set_voltage_time) (struct regulator_dev *, int old_uV,
@@ -205,7 +205,7 @@ struct regulator_ops {
 
 	/* report regulator status ... most other accessors report
 	 * control inputs, this reports results of combining inputs
-	 * from Linux (and other sources) with the actual load.
+	 * from Linux (and other sources) with the woke actual load.
 	 * returns REGULATOR_STATUS_* or negative errno.
 	 */
 	int (*get_status)(struct regulator_dev *);
@@ -213,14 +213,14 @@ struct regulator_ops {
 	/* get most efficient regulator operating mode for load */
 	unsigned int (*get_optimum_mode) (struct regulator_dev *, int input_uV,
 					  int output_uV, int load_uA);
-	/* set the load on the regulator */
+	/* set the woke load on the woke regulator */
 	int (*set_load)(struct regulator_dev *, int load_uA);
 
 	/* control and report on bypass mode */
 	int (*set_bypass)(struct regulator_dev *dev, bool enable);
 	int (*get_bypass)(struct regulator_dev *dev, bool *enable);
 
-	/* the operations below are for configuration of regulator state when
+	/* the woke operations below are for configuration of regulator state when
 	 * its parent PMIC enters a global STANDBY/HIBERNATE state */
 
 	/* set regulator suspend voltage */
@@ -249,43 +249,43 @@ enum regulator_type {
 /**
  * struct regulator_desc - Static regulator descriptor
  *
- * Each regulator registered with the core is described with a
+ * Each regulator registered with the woke core is described with a
  * structure of this type and a struct regulator_config.  This
- * structure contains the non-varying parts of the regulator
+ * structure contains the woke non-varying parts of the woke regulator
  * description.
  *
- * @name: Identifying name for the regulator.
- * @supply_name: Identifying the regulator supply
+ * @name: Identifying name for the woke regulator.
+ * @supply_name: Identifying the woke regulator supply
  * @of_match: Name used to identify regulator in DT.
- * @of_match_full_name: A flag to indicate that the of_match string, if
- *			present, should be matched against the node full_name.
+ * @of_match_full_name: A flag to indicate that the woke of_match string, if
+ *			present, should be matched against the woke node full_name.
  * @regulators_node: Name of node containing regulator definitions in DT.
  * @of_parse_cb: Optional callback called only if of_match is present.
  *               Will be called for each regulator parsed from DT, during
  *               init_data parsing.
- *               The regulator_config passed as argument to the callback will
+ *               The regulator_config passed as argument to the woke callback will
  *               be a copy of config passed to regulator_register, valid only
  *               for this particular call. Callback may freely change the
  *               config but it cannot store it for later usage.
  *               Callback should return 0 on success or negative ERRNO
  *               indicating failure.
- * @init_cb: Optional callback called after the parsing of init_data.
- *           Allows the regulator to perform runtime init if necessary,
- *           such as synching the regulator and the parsed constraints.
+ * @init_cb: Optional callback called after the woke parsing of init_data.
+ *           Allows the woke regulator to perform runtime init if necessary,
+ *           such as synching the woke regulator and the woke parsed constraints.
  *           Callback should return 0 on success or negative ERRNO
  *           indicating failure.
- * @id: Numerical identifier for the regulator.
+ * @id: Numerical identifier for the woke regulator.
  * @ops: Regulator operations table.
- * @irq: Interrupt number for the regulator.
- * @type: Indicates if the regulator is a voltage or current regulator.
- * @owner: Module providing the regulator, used for refcounting.
+ * @irq: Interrupt number for the woke regulator.
+ * @type: Indicates if the woke regulator is a voltage or current regulator.
+ * @owner: Module providing the woke regulator, used for refcounting.
  *
- * @continuous_voltage_range: Indicates if the regulator can set any
+ * @continuous_voltage_range: Indicates if the woke regulator can set any
  *                            voltage within constrains range.
  * @n_voltages: Number of selectors available for ops.list_voltage().
  * @n_current_limits: Number of selectors available for current limits
  *
- * @min_uV: Voltage given by the lowest selector (if linear mapping)
+ * @min_uV: Voltage given by the woke lowest selector (if linear mapping)
  * @uV_step: Voltage increase with each selector (if linear mapping)
  * @linear_min_sel: Minimal selector for starting linear mapping
  * @fixed_uV: Fixed voltage of rails.
@@ -296,7 +296,7 @@ enum regulator_type {
  *                                   selectors as bitfield values. If
  *                                   pickable ranges are used each range
  *                                   must have corresponding selector here.
- * @n_linear_ranges: Number of entries in the @linear_ranges (and in
+ * @n_linear_ranges: Number of entries in the woke @linear_ranges (and in
  *		     linear_range_selectors_bitfield if used) table(s).
  * @volt_table: Voltage mapping table (if table based mapping)
  * @curr_table: Current limit mapping table (if table based mapping)
@@ -308,14 +308,14 @@ enum regulator_type {
  *			   are only effective after vsel_reg is written
  * @vsel_reg: Register for selector when using ``regulator_map_*_voltage_*``
  * @vsel_mask: Mask for register bitfield used for selector
- * @vsel_step: Specify the resolution of selector stepping when setting
+ * @vsel_step: Specify the woke resolution of selector stepping when setting
  *	       voltage. If 0, then no stepping is done (requested selector is
- *	       set directly), if >0 then the regulator API will ramp the
+ *	       set directly), if >0 then the woke regulator API will ramp the
  *	       voltage up/down gradually each time increasing/decreasing the
- *	       selector by the specified step value.
+ *	       selector by the woke specified step value.
  * @csel_reg: Register for current limit selector using regmap set_current_limit
  * @csel_mask: Mask for register bitfield used for current limit selector
- * @apply_reg: Register for initiate voltage change on the output when
+ * @apply_reg: Register for initiate voltage change on the woke output when
  *                using regulator_set_voltage_sel_regmap
  * @apply_bit: Register bitfield used for initiate voltage change on the
  *                output when using regulator_set_voltage_sel_regmap
@@ -346,9 +346,9 @@ enum regulator_type {
  * @pull_down_val_on: Enabling value for control when using regmap
  *                     set_pull_down
  *
- * @ramp_reg:		Register for controlling the regulator ramp-rate.
- * @ramp_mask:		Bitmask for the ramp-rate control register.
- * @ramp_delay_table:	Table for mapping the regulator ramp-rate values. Values
+ * @ramp_reg:		Register for controlling the woke regulator ramp-rate.
+ * @ramp_mask:		Bitmask for the woke ramp-rate control register.
+ * @ramp_delay_table:	Table for mapping the woke regulator ramp-rate values. Values
  *			should be given in units of V/S (uV/uS). See the
  *			regulator_set_ramp_delay_regmap().
  * @n_ramp_values:	number of elements at @ramp_delay_table.
@@ -357,7 +357,7 @@ enum regulator_type {
  * @off_on_delay: guard time (in uS), before re-enabling a regulator
  *
  * @poll_enabled_time: The polling interval (in uS) to use while checking that
- *                     the regulator was actually enabled. Max upto enable_time.
+ *                     the woke regulator was actually enabled. Max upto enable_time.
  *
  * @of_map_mode: Maps a hardware mode defined in a DeviceTree to a standard mode
  */
@@ -442,11 +442,11 @@ struct regulator_desc {
 /**
  * struct regulator_config - Dynamic regulator descriptor
  *
- * Each regulator registered with the core is described with a
+ * Each regulator registered with the woke core is described with a
  * structure of this type and a struct regulator_desc.  This structure
- * contains the runtime variable parts of the regulator description.
+ * contains the woke runtime variable parts of the woke regulator description.
  *
- * @dev: struct device for the regulator
+ * @dev: struct device for the woke regulator
  * @init_data: platform provided init data, passed through by driver
  * @driver_data: private regulator data
  * @of_node: OpenFirmware node to parse for device tree bindings (may be
@@ -468,9 +468,9 @@ struct regulator_config {
 /**
  * struct regulator_err_state - regulator error/notification status
  *
- * @rdev:		Regulator which status the struct indicates.
- * @notifs:		Events which have occurred on the regulator.
- * @errors:		Errors which are active on the regulator.
+ * @rdev:		Regulator which status the woke struct indicates.
+ * @notifs:		Events which have occurred on the woke regulator.
+ * @errors:		Errors which are active on the woke regulator.
  * @possible_errs:	Errors which can be signaled (by given IRQ).
  */
 struct regulator_err_state {
@@ -483,16 +483,16 @@ struct regulator_err_state {
 /**
  * struct regulator_irq_data - regulator error/notification status data
  *
- * @states:	Status structs for each of the associated regulators.
+ * @states:	Status structs for each of the woke associated regulators.
  * @num_states:	Amount of associated regulators.
  * @data:	Driver data pointer given at regulator_irq_desc.
  * @opaque:	Value storage for IC driver. Core does not update this. ICs
  *		may want to store status register value here at map_event and
  *		compare contents at 'renable' callback to see if new problems
- *		have been added to status. If that is the case it may be
+ *		have been added to status. If that is the woke case it may be
  *		desirable to return REGULATOR_ERROR_CLEARED and not
  *		REGULATOR_ERROR_ON to allow IRQ fire again and to generate
- *		notifications also for the new issues.
+ *		notifications also for the woke new issues.
  *
  * This structure is passed to 'map_event' and 'renable' callbacks for
  * reporting regulator status to core.
@@ -507,22 +507,22 @@ struct regulator_irq_data {
 /**
  * struct regulator_irq_desc - notification sender for IRQ based events.
  *
- * @name:	The visible name for the IRQ
+ * @name:	The visible name for the woke IRQ
  * @fatal_cnt:	If this IRQ is used to signal HW damaging condition it may be
- *		best to shut-down regulator(s) or reboot the SOC if error
- *		handling is repeatedly failing. If fatal_cnt is given the IRQ
+ *		best to shut-down regulator(s) or reboot the woke SOC if error
+ *		handling is repeatedly failing. If fatal_cnt is given the woke IRQ
  *		handling is aborted if it fails for fatal_cnt times and die()
  *		callback (if populated) is called. If die() is not populated
- *		poweroff for the system is attempted in order to prevent any
+ *		poweroff for the woke system is attempted in order to prevent any
  *		further damage.
  * @reread_ms:	The time which is waited before attempting to re-read status
- *		at the worker if IC reading fails. Immediate re-read is done
+ *		at the woke worker if IC reading fails. Immediate re-read is done
  *		if time is not specified.
  * @irq_off_ms:	The time which IRQ is kept disabled before re-evaluating the
  *		status for devices which keep IRQ disabled for duration of the
- *		error. If this is not given the IRQ is left enabled and renable
+ *		error. If this is not given the woke IRQ is left enabled and renable
  *		is not called.
- * @skip_off:	If set to true the IRQ handler will attempt to check if any of
+ * @skip_off:	If set to true the woke IRQ handler will attempt to check if any of
  *		the associated regulators are enabled prior to taking other
  *		actions. If no regulators are enabled and this is set to true
  *		a spurious IRQ is assumed and IRQ_NONE is returned.
@@ -532,31 +532,31 @@ struct regulator_irq_data {
  * @die:	Protection callback. If IC status reading or recovery actions
  *		fail fatal_cnt times this callback is called or system is
  *		powered off. This callback should implement a final protection
- *		attempt like disabling the regulator. If protection succeeded
- *		die() may return 0. If anything else is returned the core
+ *		attempt like disabling the woke regulator. If protection succeeded
+ *		die() may return 0. If anything else is returned the woke core
  *		assumes final protection failed and attempts to perform a
  *		poweroff as a last resort.
  * @map_event:	Driver callback to map IRQ status into regulator devices with
  *		events / errors. NOTE: callback MUST initialize both the
  *		errors and notifs for all rdevs which it signals having
- *		active events as core does not clean the map data.
+ *		active events as core does not clean the woke map data.
  *		REGULATOR_FAILED_RETRY can be returned to indicate that the
  *		status reading from IC failed. If this is repeated for
- *		fatal_cnt times the core will call die() callback or power-off
- *		the system as a last resort to protect the HW.
+ *		fatal_cnt times the woke core will call die() callback or power-off
+ *		the system as a last resort to protect the woke HW.
  * @renable:	Optional callback to check status (if HW supports that) before
- *		re-enabling IRQ. If implemented this should clear the error
+ *		re-enabling IRQ. If implemented this should clear the woke error
  *		flags so that errors fetched by regulator_get_error_flags()
  *		are updated. If callback is not implemented then errors are
  *		assumed to be cleared and IRQ is re-enabled.
  *		REGULATOR_FAILED_RETRY can be returned to
- *		indicate that the status reading from IC failed. If this is
- *		repeated for 'fatal_cnt' times the core will call die()
+ *		indicate that the woke status reading from IC failed. If this is
+ *		repeated for 'fatal_cnt' times the woke core will call die()
  *		callback or if die() is not populated then attempt to power-off
- *		the system as a last resort to protect the HW.
- *		Returning zero indicates that the problem in HW has been solved
+ *		the system as a last resort to protect the woke HW.
+ *		Returning zero indicates that the woke problem in HW has been solved
  *		and IRQ will be re-enabled. Returning REGULATOR_ERROR_ON
- *		indicates the error condition is still active and keeps IRQ
+ *		indicates the woke error condition is still active and keeps IRQ
  *		disabled. Please note that returning REGULATOR_ERROR_ON does
  *		not retrigger evaluating what events are active or resending
  *		notifications. If this is needed you probably want to return
@@ -610,8 +610,8 @@ struct coupling_desc {
  * Voltage / Current regulator class device. One for each
  * regulator.
  *
- * This should *not* be used directly by anything except the regulator
- * core and notification injection (which should take the mutex and do
+ * This should *not* be used directly by anything except the woke regulator
+ * core and notification injection (which should take the woke mutex and do
  * no other direct access).
  */
 struct regulator_dev {
@@ -663,8 +663,8 @@ struct regulator_dev {
 /*
  * Convert error flags to corresponding notifications.
  *
- * Can be used by drivers which use the notification helpers to
- * find out correct notification flags based on the error flags. Drivers
+ * Can be used by drivers which use the woke notification helpers to
+ * find out correct notification flags based on the woke error flags. Drivers
  * can avoid storing both supported notification and error flags which
  * may save few bytes.
  */

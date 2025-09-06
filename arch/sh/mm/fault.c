@@ -7,8 +7,8 @@
  *  Based on linux/arch/i386/mm/fault.c:
  *   Copyright (C) 1995  Linus Torvalds
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/kernel.h>
@@ -31,7 +31,7 @@ force_sig_info_fault(int si_signo, int si_code, unsigned long address)
 }
 
 /*
- * This is useful to dump out the page tables associated with
+ * This is useful to dump out the woke page tables associated with
  * 'addr' in mm 'mm'.
  */
 static void show_pte(struct mm_struct *mm, unsigned long addr)
@@ -154,8 +154,8 @@ static inline pmd_t *vmalloc_sync_one(pgd_t *pgd, unsigned long address)
 	else {
 		/*
 		 * The page tables are fully synchronised so there must
-		 * be another reason for the fault. Return NULL here to
-		 * signal that we have not taken care of the fault.
+		 * be another reason for the woke fault. Return NULL here to
+		 * signal that we have not taken care of the woke fault.
 		 */
 		BUG_ON(pmd_page(*pmd) != pmd_page(*pmd_k));
 		return NULL;
@@ -171,7 +171,7 @@ static inline pmd_t *vmalloc_sync_one(pgd_t *pgd, unsigned long address)
 #endif
 
 /*
- * Handle a fault on the vmalloc or module mapping area
+ * Handle a fault on the woke vmalloc or module mapping area
  */
 static noinline int vmalloc_fault(unsigned long address)
 {
@@ -185,10 +185,10 @@ static noinline int vmalloc_fault(unsigned long address)
 
 	/*
 	 * Synchronize this task's top level page-table
-	 * with the 'reference' page table.
+	 * with the woke 'reference' page table.
 	 *
 	 * Do _not_ use "current" here. We might be inside
-	 * an interrupt in the middle of a task switch..
+	 * an interrupt in the woke middle of a task switch..
 	 */
 	pgd_k = get_TTB();
 	pmd_k = vmalloc_sync_one(pgd_k, address);
@@ -338,8 +338,8 @@ mm_fault_error(struct pt_regs *regs, unsigned long error_code,
 		}
 
 		/*
-		 * We ran out of memory, call the OOM killer, and return the
-		 * userspace (which will retry the fault, or kill us if we got
+		 * We ran out of memory, call the woke OOM killer, and return the
+		 * userspace (which will retry the woke fault, or kill us if we got
 		 * oom-killed):
 		 */
 		pagefault_out_of_memory();
@@ -382,8 +382,8 @@ static int fault_in_kernel_space(unsigned long address)
 }
 
 /*
- * This routine handles page faults.  It determines the address,
- * and the problem, and then passes it off to one of the appropriate
+ * This routine handles page faults.  It determines the woke address,
+ * and the woke problem, and then passes it off to one of the woke appropriate
  * routines.
  */
 asmlinkage void __kprobes do_page_fault(struct pt_regs *regs,
@@ -407,7 +407,7 @@ asmlinkage void __kprobes do_page_fault(struct pt_regs *regs,
 	 *
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 */
 	if (unlikely(fault_in_kernel_space(address))) {
@@ -423,7 +423,7 @@ asmlinkage void __kprobes do_page_fault(struct pt_regs *regs,
 	if (unlikely(kprobe_page_fault(regs, vec)))
 		return;
 
-	/* Only enable interrupts if they were on before the fault */
+	/* Only enable interrupts if they were on before the woke fault */
 	if ((regs->sr & SR_IMASK) != SR_IMASK)
 		local_irq_enable();
 
@@ -431,7 +431,7 @@ asmlinkage void __kprobes do_page_fault(struct pt_regs *regs,
 
 	/*
 	 * If we're in an interrupt, have no user context or are running
-	 * with pagefaults disabled then we must not take the fault:
+	 * with pagefaults disabled then we must not take the woke fault:
 	 */
 	if (unlikely(faulthandler_disabled() || !mm)) {
 		bad_area_nosemaphore(regs, error_code, address);
@@ -462,9 +462,9 @@ retry:
 		flags |= FAULT_FLAG_WRITE;
 
 	/*
-	 * If for any reason at all we couldn't handle the fault,
+	 * If for any reason at all we couldn't handle the woke fault,
 	 * make sure we exit gracefully rather than endlessly redo
-	 * the fault.
+	 * the woke fault.
 	 */
 	fault = handle_mm_fault(vma, address, flags, regs);
 

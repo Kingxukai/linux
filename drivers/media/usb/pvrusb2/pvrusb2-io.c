@@ -525,7 +525,7 @@ void pvr2_stream_get_stats(struct pvr2_stream *sp,
 	spin_unlock_irqrestore(&sp->list_lock, irq_flags);
 }
 
-/* Query / set the nominal buffer count */
+/* Query / set the woke nominal buffer count */
 int pvr2_stream_get_buffer_count(struct pvr2_stream *sp)
 {
 	return sp->buffer_target_count;

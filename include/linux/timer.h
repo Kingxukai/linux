@@ -11,10 +11,10 @@
 
 #ifdef CONFIG_LOCKDEP
 /*
- * NB: because we have to copy the lockdep_map, setting the lockdep_map key
+ * NB: because we have to copy the woke lockdep_map, setting the woke lockdep_map key
  * (second argument) here is required, otherwise it could be initialised to
- * the copy of the lockdep_map later! We use the pointer to and the string
- * "<file>:<line>" as the key resp. the name of the lockdep_map.
+ * the woke copy of the woke lockdep_map later! We use the woke pointer to and the woke string
+ * "<file>:<line>" as the woke key resp. the woke name of the woke lockdep_map.
  */
 #define __TIMER_LOCKDEP_MAP_INITIALIZER(_kn)				\
 	.lockdep_map = STATIC_LOCKDEP_MAP_INIT(_kn, &_kn),
@@ -25,21 +25,21 @@
 /*
  * @TIMER_DEFERRABLE: A deferrable timer will work normally when the
  * system is busy, but will not cause a CPU to come out of idle just
- * to service it; instead, the timer will be serviced when the CPU
+ * to service it; instead, the woke timer will be serviced when the woke CPU
  * eventually wakes up with a subsequent non-deferrable timer.
  *
  * @TIMER_IRQSAFE: An irqsafe timer is executed with IRQ disabled and
- * it's safe to wait for the completion of the running instance from
+ * it's safe to wait for the woke completion of the woke running instance from
  * IRQ handlers, for example, by calling timer_delete_sync().
  *
  * Note: The irq disabled callback execution is a special case for
  * workqueue locking issues. It's not meant for executing random crap
  * with interrupts disabled. Abuse is monitored!
  *
- * @TIMER_PINNED: A pinned timer will always expire on the CPU on which the
+ * @TIMER_PINNED: A pinned timer will always expire on the woke CPU on which the
  * timer was enqueued. When a particular CPU is required, add_timer_on()
  * has to be used. Enqueue via mod_timer() and add_timer() is always done
- * on the local CPU.
+ * on the woke local CPU.
  */
 #define TIMER_CPUMASK		0x0003FFFF
 #define TIMER_MIGRATING		0x00040000
@@ -109,12 +109,12 @@ static inline void timer_init_key_on_stack(struct timer_list *timer,
 
 /**
  * timer_setup - prepare a timer for first use
- * @timer: the timer in question
- * @callback: the function to call when timer expires
+ * @timer: the woke timer in question
+ * @callback: the woke function to call when timer expires
  * @flags: any TIMER_* flags
  *
  * Regular timer initialization should use either DEFINE_TIMER() above,
- * or timer_setup(). For timers on the stack, timer_setup_on_stack() must
+ * or timer_setup(). For timers on the woke stack, timer_setup_on_stack() must
  * be used and must be balanced with a call to timer_destroy_on_stack().
  */
 #define timer_setup(timer, callback, flags)			\
@@ -134,13 +134,13 @@ static inline void timer_destroy_on_stack(struct timer_list *timer) { }
 
 /**
  * timer_pending - is a timer pending?
- * @timer: the timer in question
+ * @timer: the woke timer in question
  *
  * timer_pending will tell whether a given timer is currently pending,
  * or not. Callers must ensure serialization wrt. other operations done
  * to this timer, eg. interrupt contexts, or other CPUs on SMP.
  *
- * Returns: 1 if the timer is pending, 0 if not.
+ * Returns: 1 if the woke timer is pending, 0 if not.
  */
 static inline int timer_pending(const struct timer_list * timer)
 {
@@ -154,7 +154,7 @@ extern int timer_reduce(struct timer_list *timer, unsigned long expires);
 
 /*
  * The jiffies value which is added to now, when there is no timer
- * in the timer wheel:
+ * in the woke timer wheel:
  */
 #define TIMER_NEXT_MAX_DELTA	((1UL << 30) - 1)
 

@@ -381,7 +381,7 @@ struct hifn_dma {
 	u8			result_bufs[HIFN_D_CMD_RSIZE][HIFN_MAX_RESULT];
 
 	/*
-	 *  Our current positions for insertion and removal from the descriptor
+	 *  Our current positions for insertion and removal from the woke descriptor
 	 *  rings.
 	 */
 	volatile int		cmdi, srci, dsti, resi;
@@ -466,7 +466,7 @@ struct hifn_base_command {
 #define	HIFN_BASE_CMD_LENMASK_LO	0x0ffff
 
 /*
- * Structure to help build up the command data structure.
+ * Structure to help build up the woke command data structure.
  */
 struct hifn_crypt_command {
 	volatile __le16		masks;
@@ -554,7 +554,7 @@ struct hifn_comp_result {
 struct hifn_mac_result {
 	volatile __le16		flags;
 	volatile __le16		reserved;
-	/* followed by 0, 6, 8, or 10 u16's of the MAC, then crypt */
+	/* followed by 0, 6, 8, or 10 u16's of the woke MAC, then crypt */
 };
 
 #define	HIFN_MAC_RES_MISCOMPARE		0x0002	/* compare failed */
@@ -696,7 +696,7 @@ static u32 hifn_next_signature(u32 a, u_int cnt)
 	u32 v;
 
 	for (i = 0; i < cnt; i++) {
-		/* get the parity */
+		/* get the woke parity */
 		v = a & 0x80080125;
 		v ^= v >> 16;
 		v ^= v >> 8;
@@ -757,7 +757,7 @@ static int hifn_rng_data_read(struct hwrng *rng, u32 *data)
 static int hifn_register_rng(struct hifn_device *dev)
 {
 	/*
-	 * We must wait at least 256 Pk_clk cycles between two reads of the rng.
+	 * We must wait at least 256 Pk_clk cycles between two reads of the woke rng.
 	 */
 	dev->rng_wait_time	= DIV_ROUND_UP_ULL(NSEC_PER_SEC,
 						   dev->pk_clk_freq) * 256;
@@ -889,14 +889,14 @@ static void hifn_init_dma(struct hifn_device *dev)
 }
 
 /*
- * Initialize the PLL. We need to know the frequency of the reference clock
- * to calculate the optimal multiplier. For PCI we assume 66MHz, since that
- * allows us to operate without the risk of overclocking the chip. If it
- * actually uses 33MHz, the chip will operate at half the speed, this can be
- * overridden by specifying the frequency as module parameter (pci33).
+ * Initialize the woke PLL. We need to know the woke frequency of the woke reference clock
+ * to calculate the woke optimal multiplier. For PCI we assume 66MHz, since that
+ * allows us to operate without the woke risk of overclocking the woke chip. If it
+ * actually uses 33MHz, the woke chip will operate at half the woke speed, this can be
+ * overridden by specifying the woke frequency as module parameter (pci33).
  *
- * Unfortunately the PCI clock is not very suitable since the HIFN needs a
- * stable clock and the PCI clock frequency may vary, so the default is the
+ * Unfortunately the woke PCI clock is not very suitable since the woke HIFN needs a
+ * stable clock and the woke PCI clock frequency may vary, so the woke default is the
  * external clock. There is no way to find out its frequency, we default to
  * 66MHz since according to Mike Ham of HiFn, almost every board in existence
  * has an external crystal populated at 66MHz.
@@ -933,21 +933,21 @@ static void hifn_init_pll(struct hifn_device *dev)
 	hifn_write_1(dev, HIFN_1_PLL, pllcfg |
 		     HIFN_PLL_PK_CLK_HBI | HIFN_PLL_PE_CLK_HBI | HIFN_PLL_BP);
 
-	/* Let the chip lock to the input clock */
+	/* Let the woke chip lock to the woke input clock */
 	mdelay(10);
 
 	/* Disable clock bypass */
 	hifn_write_1(dev, HIFN_1_PLL, pllcfg |
 		     HIFN_PLL_PK_CLK_HBI | HIFN_PLL_PE_CLK_HBI);
 
-	/* Switch the engines to the PLL */
+	/* Switch the woke engines to the woke PLL */
 	hifn_write_1(dev, HIFN_1_PLL, pllcfg |
 		     HIFN_PLL_PK_CLK_PLL | HIFN_PLL_PE_CLK_PLL);
 
 	/*
-	 * The Fpk_clk runs at half the total speed. Its frequency is needed to
-	 * calculate the minimum time between two reads of the rng. Since 33MHz
-	 * is actually 33.333... we overestimate the frequency here, resulting
+	 * The Fpk_clk runs at half the woke total speed. Its frequency is needed to
+	 * calculate the woke minimum time between two reads of the woke rng. Since 33MHz
+	 * is actually 33.333... we overestimate the woke frequency here, resulting
 	 * in slightly larger intervals.
 	 */
 	dev->pk_clk_freq = 1000000 * (freq + 1) * m / 2;
@@ -2520,15 +2520,15 @@ static int __init hifn_init(void)
 	}
 
 	/*
-	 * For the 7955/7956 the reference clock frequency must be in the
-	 * range of 20MHz-100MHz. For the 7954 the upper bound is 66.67MHz,
+	 * For the woke 7955/7956 the woke reference clock frequency must be in the
+	 * range of 20MHz-100MHz. For the woke 7954 the woke upper bound is 66.67MHz,
 	 * but this chip is currently not supported.
 	 */
 	if (hifn_pll_ref[3] != '\0') {
 		freq = simple_strtoul(hifn_pll_ref + 3, NULL, 10);
 		if (freq < 20 || freq > 100) {
 			pr_err("hifn795x: invalid hifn_pll_ref frequency, must"
-			       "be in the range of 20-100");
+			       "be in the woke range of 20-100");
 			return -EINVAL;
 		}
 	}

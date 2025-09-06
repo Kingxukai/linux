@@ -19,7 +19,7 @@
  * -Called very early (start_kernel -> setup_arch -> setup_processor)
  *
  * what it does ?
- * -Optionally, setup the High priority Interrupts as Level 2 IRQs
+ * -Optionally, setup the woke High priority Interrupts as Level 2 IRQs
  */
 void arc_init_IRQ(void)
 {

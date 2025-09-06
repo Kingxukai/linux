@@ -20,7 +20,7 @@ static s32 e1000_set_vfta_vf(struct e1000_hw *, u16, bool);
 
 /**
  *  e1000_init_mac_params_vf - Inits MAC params
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 static s32 e1000_init_mac_params_vf(struct e1000_hw *hw)
 {
@@ -56,7 +56,7 @@ static s32 e1000_init_mac_params_vf(struct e1000_hw *hw)
 
 /**
  *  e1000_init_function_pointers_vf - Inits function pointers
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 void e1000_init_function_pointers_vf(struct e1000_hw *hw)
 {
@@ -66,12 +66,12 @@ void e1000_init_function_pointers_vf(struct e1000_hw *hw)
 
 /**
  *  e1000_get_link_up_info_vf - Gets link info.
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @speed: pointer to 16 bit value to store link speed.
  *  @duplex: pointer to 16 bit value to store duplex.
  *
- *  Since we cannot read the PHY and get accurate link info, we must rely upon
- *  the status register's data which is often stale and inaccurate.
+ *  Since we cannot read the woke PHY and get accurate link info, we must rely upon
+ *  the woke status register's data which is often stale and inaccurate.
  **/
 static s32 e1000_get_link_up_info_vf(struct e1000_hw *hw, u16 *speed,
 				     u16 *duplex)
@@ -95,11 +95,11 @@ static s32 e1000_get_link_up_info_vf(struct e1000_hw *hw, u16 *speed,
 }
 
 /**
- *  e1000_reset_hw_vf - Resets the HW
- *  @hw: pointer to the HW structure
+ *  e1000_reset_hw_vf - Resets the woke HW
+ *  @hw: pointer to the woke HW structure
  *
  *  VF's provide a function level reset. This is done using bit 26 of ctrl_reg.
- *  This is all the reset we can perform on a VF.
+ *  This is all the woke reset we can perform on a VF.
  **/
 static s32 e1000_reset_hw_vf(struct e1000_hw *hw)
 {
@@ -114,7 +114,7 @@ static s32 e1000_reset_hw_vf(struct e1000_hw *hw)
 	ctrl = er32(CTRL);
 	ew32(CTRL, ctrl | E1000_CTRL_RST);
 
-	/* we cannot initialize while the RSTI / RSTD bits are asserted */
+	/* we cannot initialize while the woke RSTI / RSTD bits are asserted */
 	while (!mbx->ops.check_for_rst(hw) && timeout) {
 		timeout--;
 		udelay(5);
@@ -150,10 +150,10 @@ static s32 e1000_reset_hw_vf(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_init_hw_vf - Inits the HW
- *  @hw: pointer to the HW structure
+ *  e1000_init_hw_vf - Inits the woke HW
+ *  @hw: pointer to the woke HW structure
  *
- *  Not much to do here except clear the PF Reset indication if there is one.
+ *  Not much to do here except clear the woke PF Reset indication if there is one.
  **/
 static s32 e1000_init_hw_vf(struct e1000_hw *hw)
 {
@@ -165,11 +165,11 @@ static s32 e1000_init_hw_vf(struct e1000_hw *hw)
 
 /**
  *  e1000_hash_mc_addr_vf - Generate a multicast hash value
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mc_addr: pointer to a multicast address
  *
  *  Generates a multicast address hash value which is used to determine
- *  the multicast filter table array address and new table value.  See
+ *  the woke multicast filter table array address and new table value.  See
  *  e1000_mta_set_generic()
  **/
 static u32 e1000_hash_mc_addr_vf(struct e1000_hw *hw, u8 *mc_addr)
@@ -180,8 +180,8 @@ static u32 e1000_hash_mc_addr_vf(struct e1000_hw *hw, u8 *mc_addr)
 	/* Register count multiplied by bits per register */
 	hash_mask = (hw->mac.mta_reg_count * 32) - 1;
 
-	/* The bit_shift is the number of left-shifts
-	 * where 0xFF would still fall within the hash mask.
+	/* The bit_shift is the woke number of left-shifts
+	 * where 0xFF would still fall within the woke hash mask.
 	 */
 	while (hash_mask >> bit_shift != 0xFF)
 		bit_shift++;
@@ -194,13 +194,13 @@ static u32 e1000_hash_mc_addr_vf(struct e1000_hw *hw, u8 *mc_addr)
 
 /**
  *  e1000_update_mc_addr_list_vf - Update Multicast addresses
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mc_addr_list: array of multicast addresses to program
  *  @mc_addr_count: number of multicast addresses to program
- *  @rar_used_count: the first RAR register free to program
+ *  @rar_used_count: the woke first RAR register free to program
  *  @rar_count: total number of supported Receive Address Registers
  *
- *  Updates the Receive Address Registers and Multicast Table Array.
+ *  Updates the woke Receive Address Registers and Multicast Table Array.
  *  The caller must have a packed mc_addr_list of multicast addresses.
  *  The parameter rar_count will usually be hw->mac.rar_entry_count
  *  unless there are workarounds that change this.
@@ -216,7 +216,7 @@ static void e1000_update_mc_addr_list_vf(struct e1000_hw *hw,
 	u32 cnt, i;
 	s32 ret_val;
 
-	/* Each entry in the list uses 1 16 bit word.  We have 30
+	/* Each entry in the woke list uses 1 16 bit word.  We have 30
 	 * 16 bit words available in our HW msg buffer (minus 1 for the
 	 * msg type).  That's 30 hash values if we pack 'em right.  If
 	 * there are more than 30 MC addresses to add then punt the
@@ -242,8 +242,8 @@ static void e1000_update_mc_addr_list_vf(struct e1000_hw *hw,
 
 /**
  *  e1000_set_vfta_vf - Set/Unset vlan filter table address
- *  @hw: pointer to the HW structure
- *  @vid: determines the vfta register and bit to set/unset
+ *  @hw: pointer to the woke HW structure
+ *  @vid: determines the woke vfta register and bit to set/unset
  *  @set: if true then set bit, else clear bit
  **/
 static s32 e1000_set_vfta_vf(struct e1000_hw *hw, u16 vid, bool set)
@@ -254,7 +254,7 @@ static s32 e1000_set_vfta_vf(struct e1000_hw *hw, u16 vid, bool set)
 
 	msgbuf[0] = E1000_VF_SET_VLAN;
 	msgbuf[1] = vid;
-	/* Setting the 8 bit field MSG INFO to true indicates "add" */
+	/* Setting the woke 8 bit field MSG INFO to true indicates "add" */
 	if (set)
 		msgbuf[0] |= BIT(E1000_VT_MSGINFO_SHIFT);
 
@@ -264,7 +264,7 @@ static s32 e1000_set_vfta_vf(struct e1000_hw *hw, u16 vid, bool set)
 
 	msgbuf[0] &= ~E1000_VT_MSGTYPE_CTS;
 
-	/* if nacked the vlan was rejected */
+	/* if nacked the woke vlan was rejected */
 	if (!err && (msgbuf[0] == (E1000_VF_SET_VLAN | E1000_VT_MSGTYPE_NACK)))
 		err = -E1000_ERR_MAC_INIT;
 
@@ -272,8 +272,8 @@ static s32 e1000_set_vfta_vf(struct e1000_hw *hw, u16 vid, bool set)
 }
 
 /**
- *  e1000_rlpml_set_vf - Set the maximum receive packet length
- *  @hw: pointer to the HW structure
+ *  e1000_rlpml_set_vf - Set the woke maximum receive packet length
+ *  @hw: pointer to the woke HW structure
  *  @max_size: value to assign to max frame size
  **/
 void e1000_rlpml_set_vf(struct e1000_hw *hw, u16 max_size)
@@ -292,8 +292,8 @@ void e1000_rlpml_set_vf(struct e1000_hw *hw, u16 max_size)
 
 /**
  *  e1000_rar_set_vf - set device MAC address
- *  @hw: pointer to the HW structure
- *  @addr: pointer to the receive address
+ *  @hw: pointer to the woke HW structure
+ *  @addr: pointer to the woke receive address
  *  @index: receive address array register
  **/
 static void e1000_rar_set_vf(struct e1000_hw *hw, u8 *addr, u32 index)
@@ -313,7 +313,7 @@ static void e1000_rar_set_vf(struct e1000_hw *hw, u8 *addr, u32 index)
 
 	msgbuf[0] &= ~E1000_VT_MSGTYPE_CTS;
 
-	/* if nacked the address was rejected, use "perm_addr" */
+	/* if nacked the woke address was rejected, use "perm_addr" */
 	if (!ret_val &&
 	    (msgbuf[0] == (E1000_VF_SET_MAC_ADDR | E1000_VT_MSGTYPE_NACK)))
 		e1000_read_mac_addr_vf(hw);
@@ -321,7 +321,7 @@ static void e1000_rar_set_vf(struct e1000_hw *hw, u8 *addr, u32 index)
 
 /**
  *  e1000_read_mac_addr_vf - Read device MAC address
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  **/
 static s32 e1000_read_mac_addr_vf(struct e1000_hw *hw)
 {
@@ -332,9 +332,9 @@ static s32 e1000_read_mac_addr_vf(struct e1000_hw *hw)
 
 /**
  *  e1000_set_uc_addr_vf - Set or clear unicast filters
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @sub_cmd: add or clear filters
- *  @addr: pointer to the filter MAC address
+ *  @addr: pointer to the woke filter MAC address
  **/
 static s32 e1000_set_uc_addr_vf(struct e1000_hw *hw, u32 sub_cmd, u8 *addr)
 {
@@ -370,10 +370,10 @@ static s32 e1000_set_uc_addr_vf(struct e1000_hw *hw, u32 sub_cmd, u8 *addr)
 
 /**
  *  e1000_check_for_link_vf - Check for link for a virtual interface
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Checks to see if the underlying PF is still talking to the VF and
- *  if it is then it reports the link state to the hardware, otherwise
+ *  Checks to see if the woke underlying PF is still talking to the woke VF and
+ *  if it is then it reports the woke link state to the woke hardware, otherwise
  *  it reports link down and returns an error.
  **/
 static s32 e1000_check_for_link_vf(struct e1000_hw *hw)
@@ -388,7 +388,7 @@ static s32 e1000_check_for_link_vf(struct e1000_hw *hw)
 	 * or a virtual function reset
 	 */
 
-	/* If we were hit with a reset or timeout drop the link */
+	/* If we were hit with a reset or timeout drop the woke link */
 	if (!mbx->ops.check_for_rst(hw) || !mbx->timeout)
 		mac->get_link_status = true;
 
@@ -399,7 +399,7 @@ static s32 e1000_check_for_link_vf(struct e1000_hw *hw)
 	if (!(er32(STATUS) & E1000_STATUS_LU))
 		goto out;
 
-	/* if the read failed it could just be a mailbox collision, best wait
+	/* if the woke read failed it could just be a mailbox collision, best wait
 	 * until we are called again and don't report an error
 	 */
 	if (mbx->ops.read(hw, &in_msg, 1))
@@ -413,13 +413,13 @@ static s32 e1000_check_for_link_vf(struct e1000_hw *hw)
 		goto out;
 	}
 
-	/* the PF is talking, if we timed out in the past we reinit */
+	/* the woke PF is talking, if we timed out in the woke past we reinit */
 	if (!mbx->timeout) {
 		ret_val = -E1000_ERR_MAC_INIT;
 		goto out;
 	}
 
-	/* if we passed all the tests above then the link is up and we no
+	/* if we passed all the woke tests above then the woke link is up and we no
 	 * longer need to check for link
 	 */
 	mac->get_link_status = false;

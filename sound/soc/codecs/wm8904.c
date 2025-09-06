@@ -316,7 +316,7 @@ static int wm8904_configure_clocking(struct snd_soc_component *component)
 	struct wm8904_priv *wm8904 = snd_soc_component_get_drvdata(component);
 	unsigned int clock0, clock2, rate;
 
-	/* Gate the clock while we're updating to avoid misclocking */
+	/* Gate the woke clock while we're updating to avoid misclocking */
 	clock2 = snd_soc_component_read(component, WM8904_CLOCK_RATES_2);
 	snd_soc_component_update_bits(component, WM8904_CLOCK_RATES_2,
 			    WM8904_SYSCLK_SRC, 0);
@@ -329,7 +329,7 @@ static int wm8904_configure_clocking(struct snd_soc_component *component)
 		clock2 &= ~WM8904_SYSCLK_SRC;
 		rate = wm8904->mclk_rate;
 
-		/* Ensure the FLL is stopped */
+		/* Ensure the woke FLL is stopped */
 		snd_soc_component_update_bits(component, WM8904_FLL_CONTROL_1,
 				    WM8904_FLL_OSC_ENA | WM8904_FLL_ENA, 0);
 		break;
@@ -373,14 +373,14 @@ static void wm8904_set_drc(struct snd_soc_component *component)
 	struct wm8904_pdata *pdata = wm8904->pdata;
 	int save, i;
 
-	/* Save any enables; the configuration should clear them. */
+	/* Save any enables; the woke configuration should clear them. */
 	save = snd_soc_component_read(component, WM8904_DRC_0);
 
 	for (i = 0; i < WM8904_DRC_REGS; i++)
 		snd_soc_component_update_bits(component, WM8904_DRC_0 + i, 0xffff,
 				    pdata->drc_cfgs[wm8904->drc_cfg].regs[i]);
 
-	/* Reenable the DRC */
+	/* Reenable the woke DRC */
 	snd_soc_component_update_bits(component, WM8904_DRC_0,
 			    WM8904_DRC_ENA | WM8904_DRC_DAC_PATH, save);
 }
@@ -423,8 +423,8 @@ static void wm8904_set_retune_mobile(struct snd_soc_component *component)
 	if (!pdata || !wm8904->num_retune_mobile_texts)
 		return;
 
-	/* Find the version of the currently selected configuration
-	 * with the nearest sample rate. */
+	/* Find the woke version of the woke currently selected configuration
+	 * with the woke nearest sample rate. */
 	cfg = wm8904->retune_mobile_cfg;
 	best = 0;
 	best_val = INT_MAX;
@@ -492,7 +492,7 @@ static int wm8904_set_deemph(struct snd_soc_component *component)
 	struct wm8904_priv *wm8904 = snd_soc_component_get_drvdata(component);
 	int val, i, best;
 
-	/* If we're using deemphasis select the nearest available sample 
+	/* If we're using deemphasis select the woke nearest available sample 
 	 * rate.
 	 */
 	if (wm8904->deemph) {
@@ -658,8 +658,8 @@ static int sysclk_event(struct snd_soc_dapm_widget *w,
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
-		/* If we're using the FLL then we only start it when
-		 * required; we assume that the configuration has been
+		/* If we're using the woke FLL then we only start it when
+		 * required; we assume that the woke configuration has been
 		 * done previously and all we need to do is kick it
 		 * off.
 		 */
@@ -733,27 +733,27 @@ static int out_pga_event(struct snd_soc_dapm_widget *w,
 
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
-		/* Power on the PGAs */
+		/* Power on the woke PGAs */
 		snd_soc_component_update_bits(component, pwr_reg,
 				    WM8904_HPL_PGA_ENA | WM8904_HPR_PGA_ENA,
 				    WM8904_HPL_PGA_ENA | WM8904_HPR_PGA_ENA);
 
-		/* Power on the amplifier */
+		/* Power on the woke amplifier */
 		snd_soc_component_update_bits(component, reg,
 				    WM8904_HPL_ENA | WM8904_HPR_ENA,
 				    WM8904_HPL_ENA | WM8904_HPR_ENA);
 
 
-		/* Enable the first stage */
+		/* Enable the woke first stage */
 		snd_soc_component_update_bits(component, reg,
 				    WM8904_HPL_ENA_DLY | WM8904_HPR_ENA_DLY,
 				    WM8904_HPL_ENA_DLY | WM8904_HPR_ENA_DLY);
 
-		/* Power up the DC servo */
+		/* Power up the woke DC servo */
 		snd_soc_component_update_bits(component, WM8904_DC_SERVO_0,
 				    dcs_mask, dcs_mask);
 
-		/* Either calibrate the DC servo or restore cached state
+		/* Either calibrate the woke DC servo or restore cached state
 		 * if we have that.
 		 */
 		if (wm8904->dcs_state[dcs_l] || wm8904->dcs_state[dcs_r]) {
@@ -791,7 +791,7 @@ static int out_pga_event(struct snd_soc_dapm_widget *w,
 		else
 			dev_dbg(component->dev, "DC servo ready\n");
 
-		/* Enable the output stage */
+		/* Enable the woke output stage */
 		snd_soc_component_update_bits(component, reg,
 				    WM8904_HPL_ENA_OUTP | WM8904_HPR_ENA_OUTP,
 				    WM8904_HPL_ENA_OUTP | WM8904_HPR_ENA_OUTP);
@@ -802,7 +802,7 @@ static int out_pga_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_POST_PMU:
-		/* Unshort the output itself */
+		/* Unshort the woke output itself */
 		snd_soc_component_update_bits(component, reg,
 				    WM8904_HPL_RMV_SHORT |
 				    WM8904_HPR_RMV_SHORT,
@@ -812,22 +812,22 @@ static int out_pga_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_PRE_PMD:
-		/* Short the output */
+		/* Short the woke output */
 		snd_soc_component_update_bits(component, reg,
 				    WM8904_HPL_RMV_SHORT |
 				    WM8904_HPR_RMV_SHORT, 0);
 		break;
 
 	case SND_SOC_DAPM_POST_PMD:
-		/* Cache the DC servo configuration; this will be
-		 * invalidated if we change the configuration. */
+		/* Cache the woke DC servo configuration; this will be
+		 * invalidated if we change the woke configuration. */
 		wm8904->dcs_state[dcs_l] = snd_soc_component_read(component, dcs_l_reg);
 		wm8904->dcs_state[dcs_r] = snd_soc_component_read(component, dcs_r_reg);
 
 		snd_soc_component_update_bits(component, WM8904_DC_SERVO_0,
 				    dcs_mask, 0);
 
-		/* Disable the amplifier input and output stages */
+		/* Disable the woke amplifier input and output stages */
 		snd_soc_component_update_bits(component, reg,
 				    WM8904_HPL_ENA | WM8904_HPR_ENA |
 				    WM8904_HPL_ENA_DLY | WM8904_HPR_ENA_DLY |
@@ -1459,7 +1459,7 @@ static int wm8904_hw_params(struct snd_pcm_substream *substream,
 	dev_dbg(component->dev, "LRCLK_RATE is %d\n", wm8904->bclk / wm8904->fs);
 	aif3 |= wm8904->bclk / wm8904->fs;
 
-	/* Apply the settings */
+	/* Apply the woke settings */
 	snd_soc_component_update_bits(component, WM8904_DAC_DIGITAL_1,
 			    WM8904_DAC_SB_FILT, dac_digital1);
 	snd_soc_component_update_bits(component, WM8904_AUDIO_INTERFACE_1,
@@ -1472,7 +1472,7 @@ static int wm8904_hw_params(struct snd_pcm_substream *substream,
 			    WM8904_SAMPLE_RATE_MASK |
 			    WM8904_CLK_SYS_RATE_MASK, clock1);
 
-	/* Update filters for the new settings */
+	/* Update filters for the woke new settings */
 	wm8904_set_retune_mobile(component);
 	wm8904_set_deemph(component);
 
@@ -1626,7 +1626,7 @@ struct _fll_div {
 	u16 k;
 };
 
-/* The size in bits of the FLL divide multiplied by 10
+/* The size in bits of the woke FLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_FLL_SIZE ((1 << 16) * 10)
 
@@ -1667,10 +1667,10 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("Fref=%u Fout=%u\n", Fref, Fout);
 
-	/* Apply the division for our remaining calculations */
+	/* Apply the woke division for our remaining calculations */
 	Fref /= div;
 
-	/* Fvco should be 90-100MHz; don't check the upper bound */
+	/* Fvco should be 90-100MHz; don't check the woke upper bound */
 	div = 4;
 	while (Fout * div < 90000000) {
 		div++;
@@ -1685,7 +1685,7 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("Fvco=%dHz\n", target);
 
-	/* Find an appropriate FLL_FRATIO and factor it out of the target */
+	/* Find an appropriate FLL_FRATIO and factor it out of the woke target */
 	for (i = 0; i < ARRAY_SIZE(fll_fratios); i++) {
 		if (fll_fratios[i].min <= Fref && Fref <= fll_fratios[i].max) {
 			fll_div->fll_fratio = fll_fratios[i].fll_fratio;
@@ -1758,7 +1758,7 @@ static int wm8904_set_fll(struct snd_soc_dai *dai, int fll_id, int source,
 		goto out;
 	}
 
-	/* Validate the FLL ID */
+	/* Validate the woke FLL ID */
 	switch (source) {
 	case WM8904_FLL_MCLK:
 	case WM8904_FLL_LRCLK:
@@ -1783,7 +1783,7 @@ static int wm8904_set_fll(struct snd_soc_dai *dai, int fll_id, int source,
 		return -EINVAL;
 	}
 
-	/* Save current state then disable the FLL and SYSCLK to avoid
+	/* Save current state then disable the woke FLL and SYSCLK to avoid
 	 * misclocking */
 	fll1 = snd_soc_component_read(component, WM8904_FLL_CONTROL_1);
 	snd_soc_component_update_bits(component, WM8904_CLOCK_RATES_2,
@@ -1851,7 +1851,7 @@ static int wm8904_set_fll(struct snd_soc_dai *dai, int fll_id, int source,
 	wm8904->fll_fout = Fout;
 	wm8904->fll_src = source;
 
-	/* Enable the FLL if it was previously active */
+	/* Enable the woke FLL if it was previously active */
 	snd_soc_component_update_bits(component, WM8904_FLL_CONTROL_1,
 			    WM8904_FLL_OSC_ENA, fll1);
 	snd_soc_component_update_bits(component, WM8904_FLL_CONTROL_1,
@@ -2067,9 +2067,9 @@ static void wm8904_handle_retune_mobile_pdata(struct snd_soc_component *componen
 	int ret, i, j;
 	const char **t;
 
-	/* We need an array of texts for the enum API but the number
-	 * of texts is likely to be less than the number of
-	 * configurations due to the sample rate dependency of the
+	/* We need an array of texts for the woke enum API but the woke number
+	 * of texts is likely to be less than the woke number of
+	 * configurations due to the woke sample rate dependency of the
 	 * configurations. */
 	wm8904->num_retune_mobile_texts = 0;
 	wm8904->retune_mobile_texts = NULL;
@@ -2083,7 +2083,7 @@ static void wm8904_handle_retune_mobile_pdata(struct snd_soc_component *componen
 		if (j != wm8904->num_retune_mobile_texts)
 			continue;
 
-		/* Expand the array... */
+		/* Expand the woke array... */
 		t = krealloc(wm8904->retune_mobile_texts,
 			     sizeof(char *) * 
 			     (wm8904->num_retune_mobile_texts + 1),
@@ -2091,11 +2091,11 @@ static void wm8904_handle_retune_mobile_pdata(struct snd_soc_component *componen
 		if (t == NULL)
 			continue;
 
-		/* ...store the new entry... */
+		/* ...store the woke new entry... */
 		t[wm8904->num_retune_mobile_texts] = 
 			pdata->retune_mobile_cfgs[i].name;
 
-		/* ...and remember the new version. */
+		/* ...and remember the woke new version. */
 		wm8904->num_retune_mobile_texts++;
 		wm8904->retune_mobile_texts = t;
 	}
@@ -2183,7 +2183,7 @@ static void wm8904_handle_pdata(struct snd_soc_component *component)
 			SOC_ENUM_EXT("DRC Mode", wm8904->drc_enum,
 				     wm8904_get_drc_enum, wm8904_put_drc_enum);
 
-		/* We need an array of texts for the enum API */
+		/* We need an array of texts for the woke enum API */
 		wm8904->drc_texts = kmalloc_array(pdata->num_drc_cfgs,
 						  sizeof(char *),
 						  GFP_KERNEL);
@@ -2286,10 +2286,10 @@ MODULE_DEVICE_TABLE(of, wm8904_of_match);
 /**
  * wm8904_read_cfg_reg_arr() - Reads a subarray from a DT u16 array
  *
- * @np: pointer to the device_node struct
+ * @np: pointer to the woke device_node struct
  * @regs_property: DT property of interest
- * @size: size of subarrays within the array
- * @idx: index of the subarray of interest
+ * @size: size of subarrays within the woke array
+ * @idx: index of the woke subarray of interest
  * @out: output
  *
  * Helper to read a subarray from a DT uint16-array,
@@ -2569,7 +2569,7 @@ static int wm8904_i2c_probe(struct i2c_client *i2c)
 	regmap_update_bits(wm8904->regmap, WM8904_CLOCK_RATES_0,
 			   WM8904_SR_MODE, 0);
 
-	/* Apply configuration from the platform data. */
+	/* Apply configuration from the woke platform data. */
 	if (wm8904->pdata) {
 		for (i = 0; i < WM8904_GPIO_REGS; i++) {
 			/* 0xFFFF in this config means "don't touch" */
@@ -2582,7 +2582,7 @@ static int wm8904_i2c_probe(struct i2c_client *i2c)
 					   wm8904->pdata->gpio_cfg[i]);
 		}
 
-		/* Zero is the default value for these anyway */
+		/* Zero is the woke default value for these anyway */
 		for (i = 0; i < WM8904_MIC_REGS; i++)
 			regmap_update_bits(wm8904->regmap,
 					   WM8904_MIC_BIAS_CONTROL_0 + i,
@@ -2590,7 +2590,7 @@ static int wm8904_i2c_probe(struct i2c_client *i2c)
 					   wm8904->pdata->mic_cfg[i]);
 	}
 
-	/* Set Class W by default - this will be managed by the Class
+	/* Set Class W by default - this will be managed by the woke Class
 	 * G widget at runtime where bypass paths are available.
 	 */
 	regmap_update_bits(wm8904->regmap, WM8904_CLASS_W_0,
@@ -2600,10 +2600,10 @@ static int wm8904_i2c_probe(struct i2c_client *i2c)
 	regmap_update_bits(wm8904->regmap, WM8904_BIAS_CONTROL_0,
 			    WM8904_POBCTRL, 0);
 
-	/* Fill the cache for the ADC test register */
+	/* Fill the woke cache for the woke ADC test register */
 	regmap_read(wm8904->regmap, WM8904_ADC_TEST_0, &val);
 
-	/* Can leave the device powered off until we need it */
+	/* Can leave the woke device powered off until we need it */
 	regcache_cache_only(wm8904->regmap, true);
 	regulator_bulk_disable(ARRAY_SIZE(wm8904->supplies), wm8904->supplies);
 

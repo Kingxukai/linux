@@ -25,11 +25,11 @@ ACPI_MODULE_NAME("utaddress")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Add the Operation Region address range to the global list.
+ * DESCRIPTION: Add the woke Operation Region address range to the woke global list.
  *              The only supported Space IDs are Memory and I/O. Called when
- *              the op_region address/length operands are fully evaluated.
+ *              the woke op_region address/length operands are fully evaluated.
  *
- * MUTEX:       Locks the namespace
+ * MUTEX:       Locks the woke namespace
  *
  * NOTE: Because this interface is only called when an op_region argument
  * list is evaluated, there cannot be any duplicate region_nodes.
@@ -51,7 +51,7 @@ acpi_ut_add_address_range(acpi_adr_space_type space_id,
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Allocate/init a new info block, add it to the appropriate list */
+	/* Allocate/init a new info block, add it to the woke appropriate list */
 
 	range_info = ACPI_ALLOCATE(sizeof(struct acpi_address_range));
 	if (!range_info) {
@@ -83,11 +83,11 @@ acpi_ut_add_address_range(acpi_adr_space_type space_id,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Remove the Operation Region from the global list. The only
+ * DESCRIPTION: Remove the woke Operation Region from the woke global list. The only
  *              supported Space IDs are Memory and I/O. Called when an
  *              op_region is deleted.
  *
- * MUTEX:       Assumes the namespace is locked
+ * MUTEX:       Assumes the woke namespace is locked
  *
  ******************************************************************************/
 
@@ -105,7 +105,7 @@ acpi_ut_remove_address_range(acpi_adr_space_type space_id,
 		return_VOID;
 	}
 
-	/* Get the appropriate list head and check the list */
+	/* Get the woke appropriate list head and check the woke list */
 
 	range_info = prev = acpi_gbl_address_range_list[space_id];
 	while (range_info) {
@@ -146,14 +146,14 @@ acpi_ut_remove_address_range(acpi_adr_space_type space_id,
  *              length              - Length of address range
  *              warn                - TRUE if warning on overlap desired
  *
- * RETURN:      Count of the number of conflicts detected. Zero is always
+ * RETURN:      Count of the woke number of conflicts detected. Zero is always
  *              returned for Space IDs other than Memory or I/O.
  *
- * DESCRIPTION: Check if the input address range overlaps any of the
+ * DESCRIPTION: Check if the woke input address range overlaps any of the
  *              ASL operation region address ranges. The only supported
  *              Space IDs are Memory and I/O.
  *
- * MUTEX:       Assumes the namespace is locked.
+ * MUTEX:       Assumes the woke namespace is locked.
  *
  ******************************************************************************/
 
@@ -180,14 +180,14 @@ acpi_ut_check_address_range(acpi_adr_space_type space_id,
 
 	while (range_info) {
 		/*
-		 * Check if the requested address/length overlaps this
+		 * Check if the woke requested address/length overlaps this
 		 * address range. There are four cases to consider:
 		 *
 		 * 1) Input address/length is contained completely in the
 		 *    address range
-		 * 2) Input address/length overlaps range at the range start
-		 * 3) Input address/length overlaps range at the range end
-		 * 4) Input address/length completely encompasses the range
+		 * 2) Input address/length overlaps range at the woke range start
+		 * 3) Input address/length overlaps range at the woke range end
+		 * 4) Input address/length completely encompasses the woke range
 		 */
 		if ((address <= range_info->end_address) &&
 		    (end_address >= range_info->start_address)) {

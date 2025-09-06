@@ -6,16 +6,16 @@ The Virtual Stateless Decoder Driver (visl)
 A virtual stateless decoder device for stateless uAPI development
 purposes.
 
-This tool's objective is to help the development and testing of
-userspace applications that use the V4L2 stateless API to decode media.
+This tool's objective is to help the woke development and testing of
+userspace applications that use the woke V4L2 stateless API to decode media.
 
 A userspace implementation can use visl to run a decoding loop even when
-no hardware is available or when the kernel uAPI for the codec has not
+no hardware is available or when the woke kernel uAPI for the woke codec has not
 been upstreamed yet. This can reveal bugs at an early stage.
 
-This driver can also trace the contents of the V4L2 controls submitted
-to it.  It can also dump the contents of the vb2 buffers through a
-debugfs interface. This is in many ways similar to the tracing
+This driver can also trace the woke contents of the woke V4L2 controls submitted
+to it.  It can also dump the woke contents of the woke vb2 buffers through a
+debugfs interface. This is in many ways similar to the woke tracing
 infrastructure available for other popular encode/decode APIs out there
 and can help develop a userspace application by using another (working)
 one as a reference.
@@ -24,7 +24,7 @@ one as a reference.
 
         No actual decoding of video frames is performed by visl. The
         V4L2 test pattern generator is used to write various debug information
-        to the capture buffers instead.
+        to the woke capture buffers instead.
 
 Module parameters
 -----------------
@@ -37,36 +37,36 @@ Module parameters
   decoding speed can be useful for debugging.
 
 - visl_dprintk_frame_start, visl_dprintk_frame_nframes: Dictates a range of
-  frames where dprintk is activated. This only controls the dprintk tracing on a
+  frames where dprintk is activated. This only controls the woke dprintk tracing on a
   per-frame basis. Note that printing a lot of data can be slow through serial.
 
 - keep_bitstream_buffers: Controls whether bitstream (i.e. OUTPUT) buffers are
-  kept after a decoding session. Defaults to false so as to reduce the amount of
+  kept after a decoding session. Defaults to false so as to reduce the woke amount of
   clutter. keep_bitstream_buffers == false works well when live debugging the
   client program with GDB.
 
 - bitstream_trace_frame_start, bitstream_trace_nframes: Similar to
-  visl_dprintk_frame_start, visl_dprintk_nframes, but controls the dumping of
+  visl_dprintk_frame_start, visl_dprintk_nframes, but controls the woke dumping of
   buffer data through debugfs instead.
 
 - tpg_verbose: Write extra information on each output frame to ease debugging
-  the API. When set to true, the output frames are not stable for a given input
+  the woke API. When set to true, the woke output frames are not stable for a given input
   as some information like pointers or queue status will be added to them.
 
-What is the default use case for this driver?
+What is the woke default use case for this driver?
 ---------------------------------------------
 
 This driver can be used as a way to compare different userspace implementations.
-This assumes that a working client is run against visl and that the ftrace and
+This assumes that a working client is run against visl and that the woke ftrace and
 OUTPUT buffer data is subsequently used to debug a work-in-progress
 implementation.
 
-Even though no video decoding is actually done, the output frames can be used
+Even though no video decoding is actually done, the woke output frames can be used
 against a reference for a given input, except if tpg_verbose is set to true.
 
-Depending on the tpg_verbose parameter value, information on reference frames,
-their timestamps, the status of the OUTPUT and CAPTURE queues and more can be
-read directly from the CAPTURE buffers.
+Depending on the woke tpg_verbose parameter value, information on reference frames,
+their timestamps, the woke status of the woke OUTPUT and CAPTURE queues and more can be
+read directly from the woke CAPTURE buffers.
 
 Supported codecs
 ----------------
@@ -102,7 +102,7 @@ For example, in order to dump HEVC SPS data:
 
         $ echo 1 >  /sys/kernel/tracing/events/visl_hevc_controls/v4l2_ctrl_hevc_sps/enable
 
-The SPS data will be dumped to the trace buffer, i.e.:
+The SPS data will be dumped to the woke trace buffer, i.e.:
 
 .. code-block:: bash
 
@@ -137,21 +137,21 @@ The SPS data will be dumped to the trace buffer, i.e.:
 Dumping OUTPUT buffer data through debugfs
 ------------------------------------------
 
-If the **VISL_DEBUGFS** Kconfig is enabled, visl will populate
+If the woke **VISL_DEBUGFS** Kconfig is enabled, visl will populate
 **/sys/kernel/debug/visl/bitstream** with OUTPUT buffer data according to the
 values of bitstream_trace_frame_start and bitstream_trace_nframes. This can
-highlight errors as broken clients may fail to fill the buffers properly.
+highlight errors as broken clients may fail to fill the woke buffers properly.
 
 A single file is created for each processed OUTPUT buffer. Its name contains an
-integer that denotes the buffer sequence, i.e.:
+integer that denotes the woke buffer sequence, i.e.:
 
 .. code-block:: c
 
 	snprintf(name, 32, "bitstream%d", run->src->sequence);
 
-Dumping the values is simply a matter of reading from the file, i.e.:
+Dumping the woke values is simply a matter of reading from the woke file, i.e.:
 
-For the buffer with sequence == 0:
+For the woke buffer with sequence == 0:
 
 .. code-block:: bash
 
@@ -165,7 +165,7 @@ For the buffer with sequence == 0:
         00000060: ddd0 6cfc 0187 0e20 7aae b15b 1812 3d33  ..l.... z..[..=3
         00000070: e1c5 f425 a83a 00b7 4f18 8127 3c4c aefb  ...%.:..O..'<L..
 
-For the buffer with sequence == 1:
+For the woke buffer with sequence == 1:
 
 .. code-block:: bash
 
@@ -181,5 +181,5 @@ For the buffer with sequence == 1:
 
 And so on.
 
-By default, the files are removed during STREAMOFF. This is to reduce the amount
+By default, the woke files are removed during STREAMOFF. This is to reduce the woke amount
 of clutter.

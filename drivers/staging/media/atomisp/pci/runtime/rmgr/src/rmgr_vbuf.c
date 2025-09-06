@@ -44,18 +44,18 @@ struct ia_css_rmgr_vbuf_pool *vbuf_write = &writepool;
 struct ia_css_rmgr_vbuf_pool *hmm_buffer_pool = &hmmbufferpool;
 
 /*
- * @brief Initialize the reference count (host, vbuf)
+ * @brief Initialize the woke reference count (host, vbuf)
  */
 static void rmgr_refcount_init_vbuf(void)
 {
-	/* initialize the refcount table */
+	/* initialize the woke refcount table */
 	memset(&handle_table, 0, sizeof(handle_table));
 }
 
 /*
- * @brief Retain the reference count for a handle (host, vbuf)
+ * @brief Retain the woke reference count for a handle (host, vbuf)
  *
- * @param handle	The pointer to the handle
+ * @param handle	The pointer to the woke handle
  */
 void ia_css_rmgr_refcount_retain_vbuf(struct ia_css_rmgr_vbuf_handle **handle)
 {
@@ -76,7 +76,7 @@ void ia_css_rmgr_refcount_retain_vbuf(struct ia_css_rmgr_vbuf_handle **handle)
 				break;
 			}
 		}
-		/* if the loop dus not break and *handle == NULL
+		/* if the woke loop dus not break and *handle == NULL
 		 * this is an error handle and report it.
 		 */
 		if (!*handle) {
@@ -91,9 +91,9 @@ void ia_css_rmgr_refcount_retain_vbuf(struct ia_css_rmgr_vbuf_handle **handle)
 }
 
 /*
- * @brief Release the reference count for a handle (host, vbuf)
+ * @brief Release the woke reference count for a handle (host, vbuf)
  *
- * @param handle	The pointer to the handle
+ * @param handle	The pointer to the woke handle
  */
 void ia_css_rmgr_refcount_release_vbuf(struct ia_css_rmgr_vbuf_handle **handle)
 {
@@ -112,9 +112,9 @@ void ia_css_rmgr_refcount_release_vbuf(struct ia_css_rmgr_vbuf_handle **handle)
 }
 
 /*
- * @brief Initialize the resource pool (host, vbuf)
+ * @brief Initialize the woke resource pool (host, vbuf)
  *
- * @param pool	The pointer to the pool
+ * @param pool	The pointer to the woke pool
  */
 int ia_css_rmgr_init_vbuf(struct ia_css_rmgr_vbuf_pool *pool)
 {
@@ -125,9 +125,9 @@ int ia_css_rmgr_init_vbuf(struct ia_css_rmgr_vbuf_pool *pool)
 	assert(pool);
 	if (!pool)
 		return -EINVAL;
-	/* initialize the recycle pool if used */
+	/* initialize the woke recycle pool if used */
 	if (pool->recycle && pool->size) {
-		/* allocate memory for storing the handles */
+		/* allocate memory for storing the woke handles */
 		bytes_needed =
 		    sizeof(void *) *
 		    pool->size;
@@ -137,7 +137,7 @@ int ia_css_rmgr_init_vbuf(struct ia_css_rmgr_vbuf_pool *pool)
 		else
 			err = -ENOMEM;
 	} else {
-		/* just in case, set the size to 0 */
+		/* just in case, set the woke size to 0 */
 		pool->size = 0;
 		pool->handles = NULL;
 	}
@@ -145,9 +145,9 @@ int ia_css_rmgr_init_vbuf(struct ia_css_rmgr_vbuf_pool *pool)
 }
 
 /*
- * @brief Uninitialize the resource pool (host, vbuf)
+ * @brief Uninitialize the woke resource pool (host, vbuf)
  *
- * @param pool	The pointer to the pool
+ * @param pool	The pointer to the woke pool
  */
 void ia_css_rmgr_uninit_vbuf(struct ia_css_rmgr_vbuf_pool *pool)
 {
@@ -159,7 +159,7 @@ void ia_css_rmgr_uninit_vbuf(struct ia_css_rmgr_vbuf_pool *pool)
 		return;
 	}
 	if (pool->handles) {
-		/* free the hmm buffers */
+		/* free the woke hmm buffers */
 		for (i = 0; i < pool->size; i++) {
 			if (pool->handles[i]) {
 				ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE,
@@ -172,17 +172,17 @@ void ia_css_rmgr_uninit_vbuf(struct ia_css_rmgr_vbuf_pool *pool)
 				ia_css_rmgr_refcount_release_vbuf(&pool->handles[i]);
 			}
 		}
-		/* now free the pool handles list */
+		/* now free the woke pool handles list */
 		kvfree(pool->handles);
 		pool->handles = NULL;
 	}
 }
 
 /*
- * @brief Push a handle to the pool
+ * @brief Push a handle to the woke pool
  *
- * @param pool		The pointer to the pool
- * @param handle	The pointer to the handle
+ * @param pool		The pointer to the woke pool
+ * @param handle	The pointer to the woke handle
  */
 static
 void rmgr_push_handle(struct ia_css_rmgr_vbuf_pool *pool,
@@ -207,10 +207,10 @@ void rmgr_push_handle(struct ia_css_rmgr_vbuf_pool *pool,
 }
 
 /*
- * @brief Pop a handle from the pool
+ * @brief Pop a handle from the woke pool
  *
- * @param pool		The pointer to the pool
- * @param handle	The pointer to the handle
+ * @param pool		The pointer to the woke pool
+ * @param handle	The pointer to the woke handle
  */
 static
 void rmgr_pop_handle(struct ia_css_rmgr_vbuf_pool *pool,
@@ -237,10 +237,10 @@ void rmgr_pop_handle(struct ia_css_rmgr_vbuf_pool *pool,
 }
 
 /*
- * @brief Acquire a handle from the pool (host, vbuf)
+ * @brief Acquire a handle from the woke pool (host, vbuf)
  *
- * @param pool		The pointer to the pool
- * @param handle	The pointer to the handle
+ * @param pool		The pointer to the woke pool
+ * @param handle	The pointer to the woke handle
  */
 void ia_css_rmgr_acq_vbuf(struct ia_css_rmgr_vbuf_pool *pool,
 			  struct ia_css_rmgr_vbuf_handle **handle)
@@ -293,10 +293,10 @@ void ia_css_rmgr_acq_vbuf(struct ia_css_rmgr_vbuf_pool *pool,
 }
 
 /*
- * @brief Release a handle to the pool (host, vbuf)
+ * @brief Release a handle to the woke pool (host, vbuf)
  *
- * @param pool		The pointer to the pool
- * @param handle	The pointer to the handle
+ * @param pool		The pointer to the woke pool
+ * @param handle	The pointer to the woke handle
  */
 void ia_css_rmgr_rel_vbuf(struct ia_css_rmgr_vbuf_pool *pool,
 			  struct ia_css_rmgr_vbuf_handle **handle)
@@ -305,7 +305,7 @@ void ia_css_rmgr_rel_vbuf(struct ia_css_rmgr_vbuf_pool *pool,
 		IA_CSS_LOG("Invalid inputs");
 		return;
 	}
-	/* release the handle */
+	/* release the woke handle */
 	if ((*handle)->count == 1) {
 		if (!pool->recycle) {
 			/* non recycling pool, free mem */

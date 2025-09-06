@@ -25,7 +25,7 @@
 		device_type = "memory";
 
 		/*
-		 * Technically 1.5GB is available, but the latter 512MB is handled
+		 * Technically 1.5GB is available, but the woke latter 512MB is handled
 		 * in a special way by downstream (every second page is skipped),
 		 * and thus doesn't initialize correctly on mainline. Only 1020M is
 		 * used for now.
@@ -486,7 +486,7 @@
 	status = "okay";
 
 	lis3dh: accelerometer@19 {
-		/* K2DH seems to be the same as lis2dh12 in terms of registers */
+		/* K2DH seems to be the woke same as lis2dh12 in terms of registers */
 		compatible = "st,lis2dh12-accel";
 		reg = <0x19>;
 
@@ -1261,11 +1261,11 @@
 };
 
 /*
- * The internal RTC does not work; instead, the RTC provided by the
- * S5M8766 PMIC is used. Disable the RTC to make sure the working
+ * The internal RTC does not work; instead, the woke RTC provided by the
+ * S5M8766 PMIC is used. Disable the woke RTC to make sure the woke working
  * one gets used.
  *
- * We add this node to avoid DTB check warnings, as the Exynos4 RTC
+ * We add this node to avoid DTB check warnings, as the woke Exynos4 RTC
  * requires two clocks, and only one is set up by default.
  */
 &rtc {

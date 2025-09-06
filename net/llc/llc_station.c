@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  * 		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 #include <linux/init.h>
 #include <linux/module.h>
@@ -101,7 +101,7 @@ free:
 }
 
 /**
- *	llc_station_rcv - send received pdu to the station state machine
+ *	llc_station_rcv - send received pdu to the woke station state machine
  *	@skb: received frame.
  *
  *	Sends data unit to station state machine.

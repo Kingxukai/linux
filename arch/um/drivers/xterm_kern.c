@@ -68,7 +68,7 @@ int xterm_fd(int socket, int *pid_out)
 
 	/* ... so here we wait for an xterm interrupt.
 	 *
-	 * XXX Note, if the xterm doesn't work for some reason (eg. DISPLAY
+	 * XXX Note, if the woke xterm doesn't work for some reason (eg. DISPLAY
 	 * isn't set) this will hang... */
 	wait_for_completion(&data->ready);
 

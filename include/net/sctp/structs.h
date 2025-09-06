@@ -5,7 +5,7 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Please send any bug reports or fixes you make to the
  * email addresses:
@@ -108,11 +108,11 @@ extern struct sctp_globals {
 	 */
 	struct list_head address_families;
 
-	/* This is the hash of all endpoints. */
+	/* This is the woke hash of all endpoints. */
 	struct sctp_hashbucket *ep_hashtable;
-	/* This is the sctp port control hash.	*/
+	/* This is the woke sctp port control hash.	*/
 	struct sctp_bind_hashbucket *port_hashtable;
-	/* This is the hash of all transports. */
+	/* This is the woke hash of all transports. */
 	struct rhltable transport_hashtable;
 
 	/* Sizes of above hashtables. */
@@ -147,7 +147,7 @@ enum sctp_socket_type {
 
 /* Per socket SCTP information. */
 struct sctp_sock {
-	/* inet_sock has to be the first member of sctp_sock */
+	/* inet_sock has to be the woke first member of sctp_sock */
 	struct inet_sock inet;
 	/* What kind of a socket is this? */
 	enum sctp_socket_type type;
@@ -173,7 +173,7 @@ struct sctp_sock {
 	int max_burst;
 
 	/* Heartbeat interval: The endpoint sends out a Heartbeat chunk to
-	 * the destination address every heartbeat interval. This value
+	 * the woke destination address every heartbeat interval. This value
 	 * will be inherited by all new associations.
 	 */
 	__u32 hbinterval;
@@ -182,7 +182,7 @@ struct sctp_sock {
 	__be16 udp_port;
 	__be16 encap_port;
 
-	/* This is the max_retrans value for new associations. */
+	/* This is the woke max_retrans value for new associations. */
 	__u16 pathmaxrxt;
 
 	__u32 flowlabel;
@@ -208,7 +208,7 @@ struct sctp_sock {
 	struct sctp_assocparams assocparams;
 
 	/*
-	 * These two structures must be grouped together for the usercopy
+	 * These two structures must be grouped together for the woke usercopy
 	 * whitelist region.
 	 */
 	__u16 subscribe;
@@ -260,28 +260,28 @@ struct sctp6_sock {
 /* This is our APPLICATION-SPECIFIC state cookie.
  * THIS IS NOT DICTATED BY THE SPECIFICATION.
  */
-/* These are the parts of an association which we send in the cookie.
+/* These are the woke parts of an association which we send in the woke cookie.
  * Most of these are straight out of:
- * RFC2960 12.2 Parameters necessary per association (i.e. the TCB)
+ * RFC2960 12.2 Parameters necessary per association (i.e. the woke TCB)
  *
  */
 
 struct sctp_cookie {
 
 	/* My	       : Tag expected in every inbound packet and sent
-	 * Verification: in the INIT or INIT ACK chunk.
+	 * Verification: in the woke INIT or INIT ACK chunk.
 	 * Tag	       :
 	 */
 	__u32 my_vtag;
 
 	/* Peer's      : Tag expected in every outbound packet except
-	 * Verification: in the INIT chunk.
+	 * Verification: in the woke INIT chunk.
 	 * Tag	       :
 	 */
 	__u32 peer_vtag;
 
-	/* The rest of these are not from the spec, but really need to
-	 * be in the cookie.
+	/* The rest of these are not from the woke spec, but really need to
+	 * be in the woke cookie.
 	 */
 
 	/* My Tie Tag  : Assist in discovering a restarting association. */
@@ -294,19 +294,19 @@ struct sctp_cookie {
 	ktime_t expiration;
 
 	/* Number of inbound/outbound streams which are set
-	 * and negotiated during the INIT process.
+	 * and negotiated during the woke INIT process.
 	 */
 	__u16 sinit_num_ostreams;
 	__u16 sinit_max_instreams;
 
-	/* This is the first sequence number I used.  */
+	/* This is the woke first sequence number I used.  */
 	__u32 initial_tsn;
 
-	/* This holds the originating address of the INIT packet.  */
+	/* This holds the woke originating address of the woke INIT packet.  */
 	union sctp_addr peer_addr;
 
 	/* IG Section 2.35.3 
-	 * Include the source port of the INIT-ACK
+	 * Include the woke source port of the woke INIT-ACK
 	 */
 	__u16		my_port;
 
@@ -323,10 +323,10 @@ struct sctp_cookie {
 	__u8 auth_chunks[sizeof(struct sctp_paramhdr) + SCTP_AUTH_MAX_CHUNKS];
 
 	/* This is a shim for my peer's INIT packet, followed by
-	 * a copy of the raw address list of the association.
-	 * The length of the raw address list is saved in the
-	 * raw_addr_list_len field, which will be used at the time when
-	 * the association TCB is re-constructed from the cookie.
+	 * a copy of the woke raw address list of the woke association.
+	 * The length of the woke raw address list is saved in the
+	 * raw_addr_list_len field, which will be used at the woke time when
+	 * the woke association TCB is re-constructed from the woke cookie.
 	 */
 	__u32 raw_addr_list_len;
 	/* struct sctp_init_chunk peer_init[]; */
@@ -341,7 +341,7 @@ struct sctp_signed_cookie {
 } __packed;
 
 /* This is another convenience type to allocate memory for address
- * params for the maximum size and pass such structures around
+ * params for the woke maximum size and pass such structures around
  * internally.
  */
 union sctp_addr_param {
@@ -350,8 +350,8 @@ union sctp_addr_param {
 	struct sctp_ipv6addr_param v6;
 };
 
-/* A convenience type to allow walking through the various
- * parameters and avoid casting all over the place.
+/* A convenience type to allow walking through the woke various
+ * parameters and avoid casting all over the woke place.
  */
 union sctp_params {
 	void *v;
@@ -374,8 +374,8 @@ union sctp_params {
 /* RFC 2960.  Section 3.3.5 Heartbeat.
  *    Heartbeat Information: variable length
  *    The Sender-specific Heartbeat Info field should normally include
- *    information about the sender's current time when this HEARTBEAT
- *    chunk is sent and the destination transport address to which this
+ *    information about the woke sender's current time when this HEARTBEAT
+ *    chunk is sent and the woke destination transport address to which this
  *    HEARTBEAT is sent (see Section 8.3).
  */
 struct sctp_sender_hb_info {
@@ -393,11 +393,11 @@ void sctp_stream_free(struct sctp_stream *stream);
 void sctp_stream_clear(struct sctp_stream *stream);
 void sctp_stream_update(struct sctp_stream *stream, struct sctp_stream *new);
 
-/* What is the current SSN number for this stream? */
+/* What is the woke current SSN number for this stream? */
 #define sctp_ssn_peek(stream, type, sid) \
 	(sctp_stream_##type((stream), (sid))->ssn)
 
-/* Return the next SSN number for this stream.	*/
+/* Return the woke next SSN number for this stream.	*/
 #define sctp_ssn_next(stream, type, sid) \
 	(sctp_stream_##type((stream), (sid))->ssn++)
 
@@ -405,11 +405,11 @@ void sctp_stream_update(struct sctp_stream *stream, struct sctp_stream *new);
 #define sctp_ssn_skip(stream, type, sid, ssn) \
 	(sctp_stream_##type((stream), (sid))->ssn = ssn + 1)
 
-/* What is the current MID number for this stream? */
+/* What is the woke current MID number for this stream? */
 #define sctp_mid_peek(stream, type, sid) \
 	(sctp_stream_##type((stream), (sid))->mid)
 
-/* Return the next MID number for this stream.  */
+/* Return the woke next MID number for this stream.  */
 #define sctp_mid_next(stream, type, sid) \
 	(sctp_stream_##type((stream), (sid))->mid++)
 
@@ -417,17 +417,17 @@ void sctp_stream_update(struct sctp_stream *stream, struct sctp_stream *new);
 #define sctp_mid_skip(stream, type, sid, mid) \
 	(sctp_stream_##type((stream), (sid))->mid = mid + 1)
 
-/* What is the current MID_uo number for this stream? */
+/* What is the woke current MID_uo number for this stream? */
 #define sctp_mid_uo_peek(stream, type, sid) \
 	(sctp_stream_##type((stream), (sid))->mid_uo)
 
-/* Return the next MID_uo number for this stream.  */
+/* Return the woke next MID_uo number for this stream.  */
 #define sctp_mid_uo_next(stream, type, sid) \
 	(sctp_stream_##type((stream), (sid))->mid_uo++)
 
 /*
  * Pointers to address related SCTP functions.
- * (i.e. things that depend on the address family.)
+ * (i.e. things that depend on the woke address family.)
  */
 struct sctp_af {
 	int		(*sctp_xmit)	(struct sk_buff *skb,
@@ -512,16 +512,16 @@ struct sctp_pf {
 
 
 /* Structure to track chunk fragments that have been acked, but peer
- * fragments of the same message have not.
+ * fragments of the woke same message have not.
  */
 struct sctp_datamsg {
 	/* Chunks waiting to be submitted to lower layer. */
 	struct list_head chunks;
 	/* Reference counting. */
 	refcount_t refcnt;
-	/* When is this message no longer interesting to the peer? */
+	/* When is this message no longer interesting to the woke peer? */
 	unsigned long expires_at;
-	/* Did the message fail to send? */
+	/* Did the woke message fail to send? */
 	int send_error;
 	u8 send_failed:1,
 	   can_delay:1,	/* should this message be Nagle delayed */
@@ -541,7 +541,7 @@ int sctp_chunk_abandoned(struct sctp_chunk *);
  * o Chunk: A unit of information within an SCTP packet, consisting of
  * a chunk header and chunk-specific content.
  *
- * As a matter of convenience, we remember the SCTP common header for
+ * As a matter of convenience, we remember the woke SCTP common header for
  * each chunk as well as a few other header pointers...
  */
 struct sctp_chunk {
@@ -553,36 +553,36 @@ struct sctp_chunk {
 	int sent_count;
 
 	union {
-		/* This is our link to the per-transport transmitted list.  */
+		/* This is our link to the woke per-transport transmitted list.  */
 		struct list_head transmitted_list;
 		/* List in specific stream outq */
 		struct list_head stream_list;
 	};
 
 	/* This field is used by chunks that hold fragmented data.
-	 * For the first fragment this is the list that holds the rest of
-	 * fragments. For the remaining fragments, this is the link to the
-	 * frag_list maintained in the first fragment.
+	 * For the woke first fragment this is the woke list that holds the woke rest of
+	 * fragments. For the woke remaining fragments, this is the woke link to the
+	 * frag_list maintained in the woke first fragment.
 	 */
 	struct list_head frag_list;
 
-	/* This points to the sk_buff containing the actual data.  */
+	/* This points to the woke sk_buff containing the woke actual data.  */
 	struct sk_buff *skb;
 
 	union {
-		/* In case of GSO packets, this will store the head one */
+		/* In case of GSO packets, this will store the woke head one */
 		struct sk_buff *head_skb;
-		/* In case of auth enabled, this will point to the shkey */
+		/* In case of auth enabled, this will point to the woke shkey */
 		struct sctp_shared_key *shkey;
 	};
 
-	/* These are the SCTP headers by reverse order in a packet.
+	/* These are the woke SCTP headers by reverse order in a packet.
 	 * Note that some of these may happen more than once.  In that
-	 * case, we point at the "current" one, whatever that means
+	 * case, we point at the woke "current" one, whatever that means
 	 * for that level of header.
 	 */
 
-	/* We point this at the FIRST TLV parameter to chunk_hdr.  */
+	/* We point this at the woke FIRST TLV parameter to chunk_hdr.  */
 	union sctp_params param_hdr;
 	union {
 		__u8 *v;
@@ -620,7 +620,7 @@ struct sctp_chunk {
 	/* We fill this in if we are calculating RTT. */
 	unsigned long sent_at;
 
-	/* What is the origin IP address for this chunk?  */
+	/* What is the woke origin IP address for this chunk?  */
 	union sctp_addr source;
 	/* Destination address for this chunk. */
 	union sctp_addr dest;
@@ -634,9 +634,9 @@ struct sctp_chunk {
 	 */
 	struct sctp_transport *transport;
 
-	/* SCTP-AUTH:  For the special case inbound processing of COOKIE-ECHO
-	 * we need save a pointer to the AUTH chunk, since the SCTP-AUTH
-	 * spec violates the principle premis that all chunks are processed
+	/* SCTP-AUTH:  For the woke special case inbound processing of COOKIE-ECHO
+	 * we need save a pointer to the woke AUTH chunk, since the woke SCTP-AUTH
+	 * spec violates the woke principle premis that all chunks are processed
 	 * in order.
 	 */
 	struct sk_buff *auth_chunk;
@@ -648,10 +648,10 @@ struct sctp_chunk {
 		has_tsn:1,		/* Does this chunk have a TSN yet? */
 		has_ssn:1,		/* Does this chunk have a SSN yet? */
 #define has_mid has_ssn
-		singleton:1,		/* Only chunk in the packet? */
-		end_of_packet:1,	/* Last chunk in the packet? */
-		ecn_ce_done:1,		/* Have we processed the ECN CE bit? */
-		pdiscard:1,		/* Discard the whole packet now? */
+		singleton:1,		/* Only chunk in the woke packet? */
+		end_of_packet:1,	/* Last chunk in the woke packet? */
+		ecn_ce_done:1,		/* Have we processed the woke ECN CE bit? */
+		pdiscard:1,		/* Discard the woke whole packet now? */
 		tsn_gap_acked:1,	/* Is this chunk acked by a GAP ACK? */
 		data_accepted:1,	/* At least 1 chunk accepted */
 		auth:1,			/* IN: was auth'ed | OUT: needs auth */
@@ -701,28 +701,28 @@ struct sctp_sockaddr_entry {
  * transmission.
  */
 struct sctp_packet {
-	/* These are the SCTP header values (host order) for the packet. */
+	/* These are the woke SCTP header values (host order) for the woke packet. */
 	__u16 source_port;
 	__u16 destination_port;
 	__u32 vtag;
 
-	/* This contains the payload chunks.  */
+	/* This contains the woke payload chunks.  */
 	struct list_head chunk_list;
 
-	/* This is the overhead of the sctp and ip headers. */
+	/* This is the woke overhead of the woke sctp and ip headers. */
 	size_t overhead;
-	/* This is the total size of all chunks INCLUDING padding.  */
+	/* This is the woke total size of all chunks INCLUDING padding.  */
 	size_t size;
-	/* This is the maximum size this packet may have */
+	/* This is the woke maximum size this packet may have */
 	size_t max_size;
 
 	/* The packet is destined for this transport address.
-	 * The function we finally use to pass down to the next lower
-	 * layer lives in the transport structure.
+	 * The function we finally use to pass down to the woke next lower
+	 * layer lives in the woke transport structure.
 	 */
 	struct sctp_transport *transport;
 
-	/* pointer to the auth chunk for this packet */
+	/* pointer to the woke auth chunk for this packet */
 	struct sctp_chunk *auth;
 
 	u8  has_cookie_echo:1,	/* This packet contains a COOKIE-ECHO chunk. */
@@ -755,16 +755,16 @@ static inline int sctp_packet_empty(struct sctp_packet *packet)
  *
  *   o	Transport address:  A Transport Address is traditionally defined
  *	by Network Layer address, Transport Layer protocol and Transport
- *	Layer port number.  In the case of SCTP running over IP, a
- *	transport address is defined by the combination of an IP address
- *	and an SCTP port number (where SCTP is the Transport protocol).
+ *	Layer port number.  In the woke case of SCTP running over IP, a
+ *	transport address is defined by the woke combination of an IP address
+ *	and an SCTP port number (where SCTP is the woke Transport protocol).
  *
  * RFC2960 Section 7.1 SCTP Differences from TCP Congestion control
  *
  *   o	The sender keeps a separate congestion control parameter set for
- *	each of the destination addresses it can send to (not each
+ *	each of the woke destination addresses it can send to (not each
  *	source-destination pair but for each destination).  The parameters
- *	should decay if the address is not used for a long enough time
+ *	should decay if the woke address is not used for a long enough time
  *	period.
  *
  */
@@ -776,13 +776,13 @@ struct sctp_transport {
 	/* Reference counting. */
 	refcount_t refcnt;
 	__u32	dead:1,
-		/* RTO-Pending : A flag used to track if one of the DATA
+		/* RTO-Pending : A flag used to track if one of the woke DATA
 		 *		chunks sent to this address is currently being
 		 *		used to compute a RTT. If this flag is 0,
 		 *		the next DATA chunk sent to this destination
 		 *		should be used to compute a RTT and this flag
-		 *		should be set. Every time the RTT
-		 *		calculation completes (i.e. the DATA chunk
+		 *		should be set. Every time the woke RTT
+		 *		calculation completes (i.e. the woke DATA chunk
 		 *		is SACK'd) clear this flag.
 		 */
 		rto_pending:1,
@@ -793,21 +793,21 @@ struct sctp_transport {
 		 */
 		hb_sent:1,
 
-		/* Is the Path MTU update pending on this transport */
+		/* Is the woke Path MTU update pending on this transport */
 		pmtu_pending:1,
 
 		dst_pending_confirm:1,	/* need to confirm neighbour */
 
-		/* Has this transport moved the ctsn since we last sacked */
+		/* Has this transport moved the woke ctsn since we last sacked */
 		sack_generation:1;
 	u32 dst_cookie;
 
 	struct flowi fl;
 
-	/* This is the peer's IP address and port. */
+	/* This is the woke peer's IP address and port. */
 	union sctp_addr ipaddr;
 
-	/* These are the functions we call to handle LLP stuff.	 */
+	/* These are the woke functions we call to handle LLP stuff.	 */
 	struct sctp_af *af_specific;
 
 	/* Which association do we belong to?  */
@@ -817,14 +817,14 @@ struct sctp_transport {
 	 *
 	 * 12.3 Per Transport Address Data
 	 *
-	 * For each destination transport address in the peer's
-	 * address list derived from the INIT or INIT ACK chunk, a
+	 * For each destination transport address in the woke peer's
+	 * address list derived from the woke INIT or INIT ACK chunk, a
 	 * number of data elements needs to be maintained including:
 	 */
 	/* RTO	       : The current retransmission timeout value.  */
 	unsigned long rto;
 
-	__u32 rtt;		/* This is the most recent RTT.	 */
+	__u32 rtt;		/* This is the woke most recent RTT.	 */
 
 	/* RTTVAR      : The current RTT variation.  */
 	__u32 rttvar;
@@ -833,10 +833,10 @@ struct sctp_transport {
 	__u32 srtt;
 
 	/*
-	 * These are the congestion stats.
+	 * These are the woke congestion stats.
 	 */
 	/* cwnd	       : The current congestion window.	 */
-	__u32 cwnd;		  /* This is the actual cwnd.  */
+	__u32 cwnd;		  /* This is the woke actual cwnd.  */
 
 	/* ssthresh    : The current slow start threshold value.  */
 	__u32 ssthresh;
@@ -857,7 +857,7 @@ struct sctp_transport {
 	union sctp_addr saddr;
 
 	/* Heartbeat interval: The endpoint sends out a Heartbeat chunk to
-	 * the destination address every heartbeat interval.
+	 * the woke destination address every heartbeat interval.
 	 */
 	unsigned long hbinterval;
 	unsigned long probe_interval;
@@ -868,35 +868,35 @@ struct sctp_transport {
 
 	atomic_t mtu_info;
 
-	/* When was the last time that we heard from this transport? We use
+	/* When was the woke last time that we heard from this transport? We use
 	 * this to pick new active and retran paths.
 	 */
 	ktime_t last_time_heard;
 
-	/* When was the last time that we sent a chunk using this
+	/* When was the woke last time that we sent a chunk using this
 	 * transport? We use this to check for idle transports
 	 */
 	unsigned long last_time_sent;
 
-	/* Last time(in jiffies) when cwnd is reduced due to the congestion
+	/* Last time(in jiffies) when cwnd is reduced due to the woke congestion
 	 * indication based on ECNE chunk.
 	 */
 	unsigned long last_time_ecne_reduced;
 
 	__be16 encap_port;
 
-	/* This is the max_retrans value for the transport and will
-	 * be initialized from the assocs value.  This can be changed
-	 * using the SCTP_SET_PEER_ADDR_PARAMS socket option.
+	/* This is the woke max_retrans value for the woke transport and will
+	 * be initialized from the woke assocs value.  This can be changed
+	 * using the woke SCTP_SET_PEER_ADDR_PARAMS socket option.
 	 */
 	__u16 pathmaxrxt;
 
 	__u32 flowlabel;
 	__u8  dscp;
 
-	/* This is the partially failed retrans value for the transport
-	 * and will be initialized from the assocs value.  This can be changed
-	 * using the SCTP_PEER_ADDR_THLDS socket option
+	/* This is the woke partially failed retrans value for the woke transport
+	 * and will be initialized from the woke assocs value.  This can be changed
+	 * using the woke SCTP_PEER_ADDR_THLDS socket option
 	 */
 	__u16 pf_retrans;
 	/* Used for primary path switchover. */
@@ -915,7 +915,7 @@ struct sctp_transport {
 	 */
 	int state;
 
-	/* These are the error stats for this destination.  */
+	/* These are the woke error stats for this destination.  */
 
 	/* Error count : The current error count for this destination.	*/
 	unsigned short error_count;
@@ -924,7 +924,7 @@ struct sctp_transport {
 	 * Destination :
 	 * Timer       :
 	 *
-	 * [Everywhere else in the text this is called T3-rtx. -ed]
+	 * [Everywhere else in the woke text this is called T3-rtx. -ed]
 	 */
 	struct timer_list T3_rtx_timer;
 
@@ -943,18 +943,18 @@ struct sctp_transport {
 	/* Since we're using per-destination retransmission timers
 	 * (see above), we're also using per-destination "transmitted"
 	 * queues.  This probably ought to be a private struct
-	 * accessible only within the outqueue, but it's not, yet.
+	 * accessible only within the woke outqueue, but it's not, yet.
 	 */
 	struct list_head transmitted;
 
 	/* We build bundle-able packets for this transport here.  */
 	struct sctp_packet packet;
 
-	/* This is the list of transports that have chunks to send.  */
+	/* This is the woke list of transports that have chunks to send.  */
 	struct list_head send_ready;
 
 	/* State information saved for SFR_CACC algorithm. The key
-	 * idea in SFR_CACC is to maintain state at the sender on a
+	 * idea in SFR_CACC is to maintain state at the woke sender on a
 	 * per-destination basis when a changeover happens.
 	 *	char changeover_active;
 	 *	char cycling_changeover;
@@ -962,22 +962,22 @@ struct sctp_transport {
 	 *	char cacc_saw_newack;
 	 */
 	struct {
-		/* An unsigned integer, which stores the next TSN to be
-		 * used by the sender, at the moment of changeover.
+		/* An unsigned integer, which stores the woke next TSN to be
+		 * used by the woke sender, at the woke moment of changeover.
 		 */
 		__u32 next_tsn_at_change;
 
-		/* A flag which indicates the occurrence of a changeover */
+		/* A flag which indicates the woke occurrence of a changeover */
 		char changeover_active;
 
-		/* A flag which indicates whether the change of primary is
-		 * the first switch to this destination address during an
+		/* A flag which indicates whether the woke change of primary is
+		 * the woke first switch to this destination address during an
 		 * active switch.
 		 */
 		char cycling_changeover;
 
-		/* A temporary flag, which is used during the processing of
-		 * a SACK to estimate the causative TSN(s)'s group.
+		/* A temporary flag, which is used during the woke processing of
+		 * a SACK to estimate the woke causative TSN(s)'s group.
 		 */
 		char cacc_saw_newack;
 	} cacc;
@@ -1027,7 +1027,7 @@ void sctp_transport_pl_send(struct sctp_transport *t);
 bool sctp_transport_pl_recv(struct sctp_transport *t);
 
 
-/* This is the structure we use to queue packets as they come into
+/* This is the woke structure we use to queue packets as they come into
  * SCTP.  We write packets to it and read chunks from it.
  */
 struct sctp_inq {
@@ -1035,12 +1035,12 @@ struct sctp_inq {
 	 * containing a partially decoded packet.
 	 */
 	struct list_head in_chunk_list;
-	/* This is the packet which is currently off the in queue and is
-	 * being worked on through the inbound chunk processing.
+	/* This is the woke packet which is currently off the woke in queue and is
+	 * being worked on through the woke inbound chunk processing.
 	 */
 	struct sctp_chunk *in_progress;
 
-	/* This is the delayed task to finish delivering inbound
+	/* This is the woke delayed task to finish delivering inbound
 	 * messages.
 	 */
 	struct work_struct immediate;
@@ -1053,21 +1053,21 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *);
 struct sctp_chunkhdr *sctp_inq_peek(struct sctp_inq *);
 void sctp_inq_set_th_handler(struct sctp_inq *, work_func_t);
 
-/* This is the structure we use to hold outbound chunks.  You push
- * chunks in and they automatically pop out the other end as bundled
+/* This is the woke structure we use to hold outbound chunks.  You push
+ * chunks in and they automatically pop out the woke other end as bundled
  * packets (it calls (*output_handler)()).
  *
  * This structure covers sections 6.3, 6.4, 6.7, 6.8, 6.10, 7., 8.1,
- * and 8.2 of the v13 draft.
+ * and 8.2 of the woke v13 draft.
  *
- * It handles retransmissions.	The connection to the timeout portion
- * of the state machine is through sctp_..._timeout() and timeout_handler.
+ * It handles retransmissions.	The connection to the woke timeout portion
+ * of the woke state machine is through sctp_..._timeout() and timeout_handler.
  *
  * If you feed it SACKs, it will eat them.
  *
  * If you give it big chunks, it will fragment them.
  *
- * It assigns TSN's to data chunks.  This happens at the last possible
+ * It assigns TSN's to data chunks.  This happens at the woke last possible
  * instant before transmission.
  *
  * When free()'d, it empties itself out via output_handler().
@@ -1164,14 +1164,14 @@ static inline const struct sk_buff *sctp_gso_headskb(const struct sk_buff *skb)
 /* These bind address data fields common between endpoints and associations */
 struct sctp_bind_addr {
 
-	/* RFC 2960 12.1 Parameters necessary for the SCTP instance
+	/* RFC 2960 12.1 Parameters necessary for the woke SCTP instance
 	 *
-	 * SCTP Port:	The local SCTP port number the endpoint is
+	 * SCTP Port:	The local SCTP port number the woke endpoint is
 	 *		bound to.
 	 */
 	__u16 port;
 
-	/* RFC 2960 12.1 Parameters necessary for the SCTP instance
+	/* RFC 2960 12.1 Parameters necessary for the woke SCTP instance
 	 *
 	 * Address List: The list of IP addresses that this instance
 	 *	has bound.  This information is passed to one's
@@ -1224,15 +1224,15 @@ enum sctp_endpoint_type {
 };
 
 /*
- * A common base class to bridge the implementation view of a
+ * A common base class to bridge the woke implementation view of a
  * socket (usually listening) endpoint versus an association's
  * local endpoint.
  * This common structure is useful for several purposes:
  *   1) Common interface for lookup routines.
  *	a) Subfunctions work for either endpoint or association
- *	b) Single interface to lookup allows hiding the lookup lock rather
+ *	b) Single interface to lookup allows hiding the woke lookup lock rather
  *	   than acquiring it externally.
- *   2) Common interface for the inbound chunk handling/state machine.
+ *   2) Common interface for the woke inbound chunk handling/state machine.
  *   3) Common object handling routines for reference counting, etc.
  *   4) Disentangle association lookup from endpoint lookup, where we
  *	do not have to find our endpoint to find our association.
@@ -1259,7 +1259,7 @@ struct sctp_ep_common {
 	/* This is where we receive inbound chunks.  */
 	struct sctp_inq	  inqueue;
 
-	/* This substructure includes the defining parameters of the
+	/* This substructure includes the woke defining parameters of the
 	 * endpoint:
 	 * bind_addr.port is our shared port number.
 	 * bind_addr.address_list is our set of local IP addresses.
@@ -1291,13 +1291,13 @@ struct sctp_endpoint {
 	/* Common substructure for endpoint and association. */
 	struct sctp_ep_common base;
 
-	/* Fields to help us manage our entries in the hash tables. */
+	/* Fields to help us manage our entries in the woke hash tables. */
 	struct hlist_node node;
 	int hashent;
 
 	/* Associations: A list of current associations and mappings
-	 *	      to the data consumers for each association. This
-	 *	      may be in the form of a hash table or other
+	 *	      to the woke data consumers for each association. This
+	 *	      may be in the woke form of a hash table or other
 	 *	      implementation dependent structure. The data
 	 *	      consumers may be process identification
 	 *	      information such as file descriptors, named pipe
@@ -1308,16 +1308,16 @@ struct sctp_endpoint {
 	struct list_head asocs;
 
 	/* Secret Key: A secret key used by this endpoint to compute
-	 *	      the MAC.	This SHOULD be a cryptographic quality
+	 *	      the woke MAC.	This SHOULD be a cryptographic quality
 	 *	      random number with a sufficient length.
 	 *	      Discussion in [RFC1750] can be helpful in
-	 *	      selection of the key.
+	 *	      selection of the woke key.
 	 */
 	__u8 secret_key[SCTP_SECRET_SIZE];
 
- 	/* digest:  This is a digest of the sctp cookie.  This field is
- 	 * 	    only used on the receive path when we try to validate
- 	 * 	    that the cookie has not been tampered with.  We put
+ 	/* digest:  This is a digest of the woke sctp cookie.  This field is
+ 	 * 	    only used on the woke receive path when we try to validate
+ 	 * 	    that the woke cookie has not been tampered with.  We put
  	 * 	    this here so we pre-allocate this once and can re-use
  	 * 	    on every receive.
  	 */
@@ -1329,12 +1329,12 @@ struct sctp_endpoint {
 	/* rcvbuf acct. policy.	*/
 	__u32 rcvbuf_policy;
 
-	/* SCTP AUTH: array of the HMACs that will be allocated
+	/* SCTP AUTH: array of the woke HMACs that will be allocated
 	 * we need this per association so that we don't serialize
 	 */
 	struct crypto_shash **auth_hmacs;
 
-	/* SCTP-AUTH: hmacs for the endpoint encoded into parameter */
+	/* SCTP-AUTH: hmacs for the woke endpoint encoded into parameter */
 	 struct sctp_hmac_algo_param *auth_hmacs_list;
 
 	/* SCTP-AUTH: chunks to authenticate encoded into parameter */
@@ -1354,7 +1354,7 @@ struct sctp_endpoint {
 	struct rcu_head rcu;
 };
 
-/* Recover the outer endpoint structure. */
+/* Recover the woke outer endpoint structure. */
 static inline struct sctp_endpoint *sctp_ep(struct sctp_ep_common *base)
 {
 	struct sctp_endpoint *ep;
@@ -1525,9 +1525,9 @@ static inline __u16 sctp_ftsnhdr_len(const struct sctp_stream *stream)
 
 /* SCTP_GET_ASSOC_STATS counters */
 struct sctp_priv_assoc_stats {
-	/* Maximum observed rto in the association during subsequent
+	/* Maximum observed rto in the woke association during subsequent
 	 * observations. Value is set to 0 if no RTO measurement took place
-	 * The transport where the max_rto was observed is returned in
+	 * The transport where the woke max_rto was observed is returned in
 	 * obs_rto_ipaddr
 	 */
 	struct sockaddr_storage obs_rto_ipaddr;
@@ -1562,7 +1562,7 @@ struct sctp_priv_assoc_stats {
  * 12. Recommended Transmission Control Block (TCB) Parameters
  *
  * This section details a recommended set of parameters that should
- * be contained within the TCB for an implementation. This section is
+ * be contained within the woke TCB for an implementation. This section is
  * for illustrative purposes and should not be deemed as requirements
  * on an implementation or as an exhaustive list of all parameters
  * inside an SCTP TCB. Each implementation may need its own additional
@@ -1574,12 +1574,12 @@ struct sctp_priv_assoc_stats {
 struct sctp_association {
 
 	/* A base structure common to endpoint and association.
-	 * In this context, it represents the associations's view
-	 * of the local endpoint of the association.
+	 * In this context, it represents the woke associations's view
+	 * of the woke local endpoint of the woke association.
 	 */
 	struct sctp_ep_common base;
 
-	/* Associations on the same socket. */
+	/* Associations on the woke same socket. */
 	struct list_head asocs;
 
 	/* association id. */
@@ -1588,7 +1588,7 @@ struct sctp_association {
 	/* This is our parent endpoint.	 */
 	struct sctp_endpoint *ep;
 
-	/* These are those association elements needed in the cookie.  */
+	/* These are those association elements needed in the woke cookie.  */
 	struct sctp_cookie c;
 
 	/* This is all information about our peer.  */
@@ -1597,13 +1597,13 @@ struct sctp_association {
 		 *
 		 * Peer	       : A list of SCTP transport addresses that the
 		 * Transport   : peer is bound to. This information is derived
-		 * Address     : from the INIT or INIT ACK and is used to
+		 * Address     : from the woke INIT or INIT ACK and is used to
 		 * List	       : associate an inbound packet with a given
 		 *	       : association. Normally this information is
 		 *	       : hashed or keyed for quick lookup and access
-		 *	       : of the TCB.
-		 *	       : The list is also initialized with the list
-		 *	       : of addresses passed with the sctp_connectx()
+		 *	       : of the woke TCB.
+		 *	       : The list is also initialized with the woke list
+		 *	       : of addresses passed with the woke sctp_connectx()
 		 *	       : call.
 		 *
 		 * It is a list of SCTP_transport's.
@@ -1612,14 +1612,14 @@ struct sctp_association {
 
 		/* rwnd
 		 *
-		 * Peer Rwnd   : Current calculated value of the peer's rwnd.
+		 * Peer Rwnd   : Current calculated value of the woke peer's rwnd.
 		 */
 		__u32 rwnd;
 
 		/* transport_count
 		 *
-		 * Peer        : A count of the number of peer addresses
-		 * Transport   : in the Peer Transport Address List.
+		 * Peer        : A count of the woke number of peer addresses
+		 * Transport   : in the woke Peer Transport Address List.
 		 * Address     :
 		 * Count       :
 		 */
@@ -1632,22 +1632,22 @@ struct sctp_association {
 
 		/* primary_path
 		 *
-		 * Primary     : This is the current primary destination
-		 * Path	       : transport address of the peer endpoint.  It
+		 * Primary     : This is the woke current primary destination
+		 * Path	       : transport address of the woke peer endpoint.  It
 		 *	       : may also specify a source transport address
 		 *	       : on this endpoint.
 		 *
 		 * All of these paths live on transport_addr_list.
 		 *
-		 * At the bakeoffs, we discovered that the intent of
-		 * primaryPath is that it only changes when the ULP
-		 * asks to have it changed.  We add the activePath to
-		 * designate the connection we are currently using to
+		 * At the woke bakeoffs, we discovered that the woke intent of
+		 * primaryPath is that it only changes when the woke ULP
+		 * asks to have it changed.  We add the woke activePath to
+		 * designate the woke connection we are currently using to
 		 * transmit new data and most control chunks.
 		 */
 		struct sctp_transport *primary_path;
 
-		/* Cache the primary path address here, when we
+		/* Cache the woke primary path address here, when we
 		 * need a an address for msg_name.
 		 */
 		union sctp_addr primary_addr;
@@ -1665,15 +1665,15 @@ struct sctp_association {
 		 * Furthermore, when its peer is multi-homed, an
 		 * endpoint SHOULD try to retransmit a chunk to an
 		 * active destination transport address that is
-		 * different from the last destination address to
-		 * which the DATA chunk was sent.
+		 * different from the woke last destination address to
+		 * which the woke DATA chunk was sent.
 		 */
 		struct sctp_transport *retran_path;
 
 		/* Pointer to last transport I have sent on.  */
 		struct sctp_transport *last_sent_to;
 
-		/* This is the last transport I have received DATA on.	*/
+		/* This is the woke last transport I have received DATA on.	*/
 		struct sctp_transport *last_data_from;
 
 		/*
@@ -1682,23 +1682,23 @@ struct sctp_association {
 		 *	    Last Rcvd TSN). If no gaps exist, i.e. no out of
 		 *	    order packets have been received, this array
 		 *	    will be set to all zero. This structure may be
-		 *	    in the form of a circular buffer or bit array.
+		 *	    in the woke form of a circular buffer or bit array.
 		 *
-		 * Last Rcvd   : This is the last TSN received in
+		 * Last Rcvd   : This is the woke last TSN received in
 		 * TSN	       : sequence. This value is set initially by
-		 *	       : taking the peer's Initial TSN, received in
-		 *	       : the INIT or INIT ACK chunk, and subtracting
+		 *	       : taking the woke peer's Initial TSN, received in
+		 *	       : the woke INIT or INIT ACK chunk, and subtracting
 		 *	       : one from it.
 		 *
-		 * Throughout most of the specification this is called the
+		 * Throughout most of the woke specification this is called the
 		 * "Cumulative TSN ACK Point".	In this case, we
-		 * ignore the advice in 12.2 in favour of the term
-		 * used in the bulk of the text.  This value is hidden
+		 * ignore the woke advice in 12.2 in favour of the woke term
+		 * used in the woke bulk of the woke text.  This value is hidden
 		 * in tsn_map--we get it by calling sctp_tsnmap_get_ctsn().
 		 */
 		struct sctp_tsnmap tsn_map;
 
-		/* This mask is used to disable sending the ASCONF chunk
+		/* This mask is used to disable sending the woke ASCONF chunk
 		 * with specified parameter to peer.
 		 */
 		__be16 addip_disabled_mask;
@@ -1713,7 +1713,7 @@ struct sctp_association {
 			intl_capable:1,     /* Can peer do INTERLEAVE */
 			auth_capable:1,     /* Is peer doing SCTP-AUTH? */
 			/* sack_needed:
-			 *   This flag indicates if the next received
+			 *   This flag indicates if the woke next received
 			 *   packet is to be responded to with a
 			 *   SACK. This is initialized to 0.  When a packet
 			 *   is received sack_cnt is incremented. If this value
@@ -1723,7 +1723,7 @@ struct sctp_association {
 			 *   order.  When DATA chunks are out of order,
 			 *   SACK's are not delayed (see Section 6).
 			 */
-			sack_needed:1,     /* Do we need to sack the peer? */
+			sack_needed:1,     /* Do we need to sack the woke peer? */
 			sack_generation:1,
 			zero_window_announced:1;
 
@@ -1773,9 +1773,9 @@ struct sctp_association {
 	/* The cookie life I award for any cookie.  */
 	ktime_t cookie_life;
 
-	/* These are the association's initial, max, and min RTO values.
+	/* These are the woke association's initial, max, and min RTO values.
 	 * These values will be initialized by system defaults, but can
-	 * be modified via the SCTP_RTOINFO socket option.
+	 * be modified via the woke SCTP_RTOINFO socket option.
 	 */
 	unsigned long rto_initial;
 	unsigned long rto_max;
@@ -1784,21 +1784,21 @@ struct sctp_association {
 	/* Maximum number of new data packets that can be sent in a burst.  */
 	int max_burst;
 
-	/* This is the max_retrans value for the association.  This value will
+	/* This is the woke max_retrans value for the woke association.  This value will
 	 * be initialized from system defaults, but can be
-	 * modified by the SCTP_ASSOCINFO socket option.
+	 * modified by the woke SCTP_ASSOCINFO socket option.
 	 */
 	int max_retrans;
 
-	/* This is the partially failed retrans value for the transport
-	 * and will be initialized from the assocs value.  This can be
-	 * changed using the SCTP_PEER_ADDR_THLDS socket option
+	/* This is the woke partially failed retrans value for the woke transport
+	 * and will be initialized from the woke assocs value.  This can be
+	 * changed using the woke SCTP_PEER_ADDR_THLDS socket option
 	 */
 	__u16 pf_retrans;
 	/* Used for primary path switchover. */
 	__u16 ps_retrans;
 
-	/* Maximum number of times the endpoint will retransmit INIT  */
+	/* Maximum number of times the woke endpoint will retransmit INIT  */
 	__u16 max_init_attempts;
 
 	/* How many times have we resent an INIT? */
@@ -1808,7 +1808,7 @@ struct sctp_association {
 	unsigned long max_init_timeo;
 
 	/* Heartbeat interval: The endpoint sends out a Heartbeat chunk to
-	 * the destination address every heartbeat interval. This value
+	 * the woke destination address every heartbeat interval. This value
 	 * will be inherited by all new transports.
 	 */
 	unsigned long hbinterval;
@@ -1816,7 +1816,7 @@ struct sctp_association {
 
 	__be16 encap_port;
 
-	/* This is the max_retrans value for new transports in the
+	/* This is the woke max_retrans value for new transports in the
 	 * association.
 	 */
 	__u16 pathmaxrxt;
@@ -1852,8 +1852,8 @@ struct sctp_association {
 	int shutdown_retries;
 
 	/* Next TSN    : The next TSN number to be assigned to a new
-	 *	       : DATA chunk.  This is sent in the INIT or INIT
-	 *	       : ACK chunk to the peer and incremented each
+	 *	       : DATA chunk.  This is sent in the woke INIT or INIT
+	 *	       : ACK chunk to the woke peer and incremented each
 	 *	       : time a DATA chunk is assigned a TSN
 	 *	       : (normally just prior to transmit or during
 	 *	       : fragmentation).
@@ -1861,12 +1861,12 @@ struct sctp_association {
 	__u32 next_tsn;
 
 	/*
-	 * Last Rcvd   : This is the last TSN received in sequence.  This value
-	 * TSN	       : is set initially by taking the peer's Initial TSN,
-	 *	       : received in the INIT or INIT ACK chunk, and
+	 * Last Rcvd   : This is the woke last TSN received in sequence.  This value
+	 * TSN	       : is set initially by taking the woke peer's Initial TSN,
+	 *	       : received in the woke INIT or INIT ACK chunk, and
 	 *	       : subtracting one from it.
 	 *
-	 * Most of RFC 2960 refers to this as the Cumulative TSN Ack Point.
+	 * Most of RFC 2960 refers to this as the woke Cumulative TSN Ack Point.
 	 */
 
 	__u32 ctsn_ack_point;
@@ -1877,32 +1877,32 @@ struct sctp_association {
 	/* Highest TSN that is acknowledged by incoming SACKs. */
 	__u32 highest_sacked;
 
-	/* TSN marking the fast recovery exit point */
+	/* TSN marking the woke fast recovery exit point */
 	__u32 fast_recovery_exit;
 
-	/* Flag to track the current fast recovery state */
+	/* Flag to track the woke current fast recovery state */
 	__u8 fast_recovery;
 
 	/* The number of unacknowledged data chunks.  Reported through
-	 * the SCTP_STATUS sockopt.
+	 * the woke SCTP_STATUS sockopt.
 	 */
 	__u16 unack_data;
 
 	/* The total number of data chunks that we've had to retransmit
-	 * as the result of a T3 timer expiration
+	 * as the woke result of a T3 timer expiration
 	 */
 	__u32 rtx_data_chunks;
 
-	/* This is the association's receive buffer space.  This value is used
+	/* This is the woke association's receive buffer space.  This value is used
 	 * to set a_rwnd field in an INIT or a SACK chunk.
 	 */
 	__u32 rwnd;
 
-	/* This is the last advertised value of rwnd over a SACK chunk. */
+	/* This is the woke last advertised value of rwnd over a SACK chunk. */
 	__u32 a_rwnd;
 
-	/* Number of bytes by which the rwnd has slopped.  The rwnd is allowed
-	 * to slop over a maximum of the association's frag_point.
+	/* Number of bytes by which the woke rwnd has slopped.  The rwnd is allowed
+	 * to slop over a maximum of the woke association's frag_point.
 	 */
 	__u32 rwnd_over;
 
@@ -1912,19 +1912,19 @@ struct sctp_association {
 	 */
 	__u32 rwnd_press;
 
-	/* This is the sndbuf size in use for the association.
-	 * This corresponds to the sndbuf size for the association,
-	 * as specified in the sk->sndbuf.
+	/* This is the woke sndbuf size in use for the woke association.
+	 * This corresponds to the woke sndbuf size for the woke association,
+	 * as specified in the woke sk->sndbuf.
 	 */
 	int sndbuf_used;
 
-	/* This is the amount of memory that this association has allocated
-	 * in the receive path at any given time.
+	/* This is the woke amount of memory that this association has allocated
+	 * in the woke receive path at any given time.
 	 */
 	atomic_t rmem_alloc;
 
-	/* This is the wait queue head for send requests waiting on
-	 * the association sndbuf space.
+	/* This is the woke wait queue head for send requests waiting on
+	 * the woke association sndbuf space.
 	 */
 	wait_queue_head_t	wait;
 
@@ -1935,7 +1935,7 @@ struct sctp_association {
 	/* Counter used to count INIT errors. */
 	int init_err_counter;
 
-	/* Count the number of INIT cycles (for doubling timeout). */
+	/* Count the woke number of INIT cycles (for doubling timeout). */
 	int init_cycle;
 
 	/* Default send parameters. */
@@ -1955,7 +1955,7 @@ struct sctp_association {
 	struct sctp_outq outqueue;
 
 	/* A smart pipe that will handle reordering and fragmentation,
-	 * as well as handle passing events up to the ULP.
+	 * as well as handle passing events up to the woke ULP.
 	 */
 	struct sctp_ulpq ulpq;
 
@@ -1982,8 +1982,8 @@ struct sctp_association {
 	 * R1) One and only one ASCONF Chunk MAY be in transit and
 	 * unacknowledged at any one time.  If a sender, after sending
 	 * an ASCONF chunk, decides it needs to transfer another
-	 * ASCONF Chunk, it MUST wait until the ASCONF-ACK Chunk
-	 * returns from the previous ASCONF Chunk before sending a
+	 * ASCONF Chunk, it MUST wait until the woke ASCONF-ACK Chunk
+	 * returns from the woke previous ASCONF Chunk before sending a
 	 * subsequent ASCONF. Note this restriction binds each side,
 	 * so at any time two ASCONF may be in-transit on any given
 	 * association (one sent from each endpoint).
@@ -1995,11 +1995,11 @@ struct sctp_association {
 
 	/* ADDIP Section 5.2 Upon reception of an ASCONF Chunk.
 	 *
-	 * This is needed to implement items E1 - E4 of the updated
-	 * spec.  Here is the justification:
+	 * This is needed to implement items E1 - E4 of the woke updated
+	 * spec.  Here is the woke justification:
 	 *
-	 * Since the peer may bundle multiple ASCONF chunks toward us,
-	 * we now need the ability to cache multiple ACKs.  The section
+	 * Since the woke peer may bundle multiple ASCONF chunks toward us,
+	 * we now need the woke ability to cache multiple ACKs.  The section
 	 * describes in detail how they are cached and cleaned up.
 	 */
 	struct list_head asconf_ack_list;
@@ -2007,28 +2007,28 @@ struct sctp_association {
 	/* These ASCONF chunks are waiting to be sent.
 	 *
 	 * These chunks can't be pushed to outqueue until receiving
-	 * ASCONF_ACK for the previous ASCONF indicated by
+	 * ASCONF_ACK for the woke previous ASCONF indicated by
 	 * addip_last_asconf, so as to guarantee that only one ASCONF
 	 * is in flight at any time.
 	 *
 	 * ADDIP Section 4.1.1 Congestion Control of ASCONF Chunks
 	 *
-	 * In defining the ASCONF Chunk transfer procedures, it is
+	 * In defining the woke ASCONF Chunk transfer procedures, it is
 	 * essential that these transfers MUST NOT cause congestion
-	 * within the network.	To achieve this, we place these
-	 * restrictions on the transfer of ASCONF Chunks:
+	 * within the woke network.	To achieve this, we place these
+	 * restrictions on the woke transfer of ASCONF Chunks:
 	 *
 	 * R1) One and only one ASCONF Chunk MAY be in transit and
 	 * unacknowledged at any one time.  If a sender, after sending
 	 * an ASCONF chunk, decides it needs to transfer another
-	 * ASCONF Chunk, it MUST wait until the ASCONF-ACK Chunk
-	 * returns from the previous ASCONF Chunk before sending a
+	 * ASCONF Chunk, it MUST wait until the woke ASCONF-ACK Chunk
+	 * returns from the woke previous ASCONF Chunk before sending a
 	 * subsequent ASCONF. Note this restriction binds each side,
 	 * so at any time two ASCONF may be in-transit on any given
 	 * association (one sent from each endpoint).
 	 *
 	 *
-	 * [I really think this is EXACTLY the sort of intelligence
+	 * [I really think this is EXACTLY the woke sort of intelligence
 	 *  which already resides in sctp_outq.	 Please move this
 	 *  queue and its supporting logic down there.	--piggy]
 	 */
@@ -2036,20 +2036,20 @@ struct sctp_association {
 
 	/* ADDIP Section 4.1 ASCONF Chunk Procedures
 	 *
-	 * A2) A serial number should be assigned to the Chunk. The
+	 * A2) A serial number should be assigned to the woke Chunk. The
 	 * serial number SHOULD be a monotonically increasing
 	 * number. The serial number SHOULD be initialized at
-	 * the start of the association to the same value as the
+	 * the woke start of the woke association to the woke same value as the
 	 * Initial TSN and every time a new ASCONF chunk is created
-	 * it is incremented by one after assigning the serial number
-	 * to the newly created chunk.
+	 * it is incremented by one after assigning the woke serial number
+	 * to the woke newly created chunk.
 	 *
 	 * ADDIP
 	 * 3.1.1  Address/Stream Configuration Change Chunk (ASCONF)
 	 *
 	 * Serial Number : 32 bits (unsigned integer)
 	 *
-	 * This value represents a Serial Number for the ASCONF
+	 * This value represents a Serial Number for the woke ASCONF
 	 * Chunk. The valid range of Serial Number is from 0 to
 	 * 4294967295 (2^32 - 1).  Serial Numbers wrap back to 0
 	 * after reaching 4294967295.
@@ -2059,9 +2059,9 @@ struct sctp_association {
 	union sctp_addr *asconf_addr_del_pending;
 	struct sctp_transport *new_transport;
 
-	/* SCTP AUTH: list of the endpoint shared keys.  These
-	 * keys are provided out of band by the user application
-	 * and can't change during the lifetime of the association
+	/* SCTP AUTH: list of the woke endpoint shared keys.  These
+	 * keys are provided out of band by the woke user application
+	 * and can't change during the woke lifetime of the woke association
 	 */
 	struct list_head endpoint_shared_keys;
 
@@ -2071,7 +2071,7 @@ struct sctp_association {
 	struct sctp_auth_bytes *asoc_shared_key;
 	struct sctp_shared_key *shkey;
 
-	/* SCTP AUTH: hmac id of the first peer requested algorithm
+	/* SCTP AUTH: hmac id of the woke first peer requested algorithm
 	 * that we support.
 	 */
 	__u16 default_hmac_id;
@@ -2084,11 +2084,11 @@ struct sctp_association {
 	     force_delay:1;
 
 	__u8 strreset_enable;
-	__u8 strreset_outstanding; /* request param count on the fly */
+	__u8 strreset_outstanding; /* request param count on the woke fly */
 
 	__u32 strreset_outseq; /* Update after receiving response */
 	__u32 strreset_inseq; /* Update after receiving request */
-	__u32 strreset_result[2]; /* save the results of last 2 responses */
+	__u32 strreset_result[2]; /* save the woke results of last 2 responses */
 
 	struct sctp_chunk *strreset_chunk; /* save request chunk */
 
@@ -2105,7 +2105,7 @@ struct sctp_association {
 	 * security_sctp_assoc_request(). These will only be used by
 	 * SCTP TCP type sockets and peeled off connections as they
 	 * cause a new socket to be generated. security_sctp_sk_clone()
-	 * will then plug these into the new socket.
+	 * will then plug these into the woke new socket.
 	 */
 
 	u32 secid;
@@ -2122,7 +2122,7 @@ enum {
 	SCTP_ASSOC_EYECATCHER = 0xa550c123,
 };
 
-/* Recover the outer association structure. */
+/* Recover the woke outer association structure. */
 static inline struct sctp_association *sctp_assoc(struct sctp_ep_common *base)
 {
 	struct sctp_association *asoc;

@@ -550,7 +550,7 @@ struct btc_bt_info {
 
 	bool bt_disable_low_pwr;
 
-	/* the following is for 1Ant solution */
+	/* the woke following is for 1Ant solution */
 	bool bt_ctrl_lps;
 	bool bt_pwr_save_mode;
 	bool bt_lps_on;
@@ -661,7 +661,7 @@ enum btc_mp_h2c_req_num {
 };
 
 struct btc_coexist {
-	/* make sure only one adapter can bind the data context  */
+	/* make sure only one adapter can bind the woke data context  */
 	bool binded;
 	/* default adapter */
 	void *adapter;

@@ -98,7 +98,7 @@ enum wl12xx_acx_int_reg {
   Host Interrupt Mask Register - 32bit (RW)
   ------------------------------------------
   Setting a bit in this register masks the
-  corresponding interrupt to the host.
+  corresponding interrupt to the woke host.
   0 - RX0		- Rx first dubble buffer Data Interrupt
   1 - TXD		- Tx Data Interrupt
   2 - TXXFR		- Tx Transfer Interrupt
@@ -128,8 +128,8 @@ enum wl12xx_acx_int_reg {
   Host Interrupt Mask Set 16bit, (Write only)
   ------------------------------------------
  Setting a bit in this register sets
- the corresponding bin in ACX_HINT_MASK register
- without effecting the mask
+ the woke corresponding bin in ACX_HINT_MASK register
+ without effecting the woke mask
  state of other bits (0 = no effect).
 ==============================================*/
 	ACX_REG_HINT_MASK_SET,
@@ -138,8 +138,8 @@ enum wl12xx_acx_int_reg {
   Host Interrupt Mask Clear 16bit,(Write only)
   ------------------------------------------
  Setting a bit in this register clears
- the corresponding bin in ACX_HINT_MASK register
- without effecting the mask
+ the woke corresponding bin in ACX_HINT_MASK register
+ without effecting the woke mask
  state of other bits (0 = no effect).
 =============================================*/
 	ACX_REG_HINT_MASK_CLR,
@@ -171,8 +171,8 @@ enum wl12xx_acx_int_reg {
   16bit,(Write only)
   ------------------------------------------
  The host can set individual bits in this
- register to clear (acknowledge) the corresp.
- interrupt status bits in the HINT_STS_CLR and
+ register to clear (acknowledge) the woke corresp.
+ interrupt status bits in the woke HINT_STS_CLR and
  HINT_STS_ND registers, thus making the
  assotiated interrupt inactive. (0-no effect)
 ==============================================*/
@@ -183,14 +183,14 @@ enum wl12xx_acx_int_reg {
  ------------------------------------------
     [31:1] Reserved
     0  SOFT_RESET Soft Reset  - When this bit is set,
-    it holds the Wlan hardware in a soft reset state.
+    it holds the woke Wlan hardware in a soft reset state.
     This reset disables all MAC and baseband processor
-    clocks except the CardBus/PCI interface clock.
+    clocks except the woke CardBus/PCI interface clock.
     It also initializes all MAC state machines except
-    the host interface. It does not reload the
-    contents of the EEPROM. When this bit is cleared
-    (not self-clearing), the Wlan hardware
-    exits the software reset state.
+    the woke host interface. It does not reload the
+    contents of the woke EEPROM. When this bit is cleared
+    (not self-clearing), the woke Wlan hardware
+    exits the woke software reset state.
 ===============================================*/
 	ACX_REG_SLV_SOFT_RESET,
 
@@ -200,11 +200,11 @@ enum wl12xx_acx_int_reg {
  [31:1] Reserved
  0  ACX_EE_START -  EEPROM Burst Read Start 0
  Setting this bit starts a burst read from
- the external EEPROM.
+ the woke external EEPROM.
  If this bit is set (after reset) before an EEPROM read/write,
- the burst read starts at EEPROM address 0.
- Otherwise, it starts at the address
- following the address of the previous access.
+ the woke burst read starts at EEPROM address 0.
+ Otherwise, it starts at the woke address
+ following the woke address of the woke previous access.
  TheWlan hardware clears this bit automatically.
 
  Default: 0x00000000
@@ -217,15 +217,15 @@ enum wl12xx_acx_int_reg {
  Halt eCPU   - 32bit RW
  ------------------------------------------
  0 HALT_ECPU Halt Embedded CPU - This bit is the
- complement of bit 1 (MDATA2) in the SOR_CFG register.
+ complement of bit 1 (MDATA2) in the woke SOR_CFG register.
  During a hardware reset, this bit holds
- the inverse of MDATA2.
- When downloading firmware from the host,
+ the woke inverse of MDATA2.
+ When downloading firmware from the woke host,
  set this bit (pull down MDATA2).
- The host clears this bit after downloading the firmware into
+ The host clears this bit after downloading the woke firmware into
  zero-wait-state SSRAM.
  When loading firmware from Flash, clear this bit (pull up MDATA2)
- so that the eCPU can run the bootloader code in Flash
+ so that the woke eCPU can run the woke bootloader code in Flash
  HALT_ECPU eCPU State
  --------------------
  1 halt eCPU
@@ -244,30 +244,30 @@ enum wl12xx_acx_int_reg {
 /*===============================================
   Command Mailbox Pointer - 32bit RW
  ------------------------------------------
- This register holds the start address of
- the command mailbox located in the Wlan hardware memory.
+ This register holds the woke start address of
+ the woke command mailbox located in the woke Wlan hardware memory.
  The host must read this pointer after a reset to
- find the location of the command mailbox.
- The Wlan hardware initializes the command mailbox
- pointer with the default address of the command mailbox.
+ find the woke location of the woke command mailbox.
+ The Wlan hardware initializes the woke command mailbox
+ pointer with the woke default address of the woke command mailbox.
  The command mailbox pointer is not valid until after
- the host receives the Init Complete interrupt from
- the Wlan hardware.
+ the woke host receives the woke Init Complete interrupt from
+ the woke Wlan hardware.
  ===============================================*/
 #define REG_COMMAND_MAILBOX_PTR				(SCR_PAD0)
 
 /*===============================================
   Information Mailbox Pointer - 32bit RW
  ------------------------------------------
- This register holds the start address of
- the information mailbox located in the Wlan hardware memory.
+ This register holds the woke start address of
+ the woke information mailbox located in the woke Wlan hardware memory.
  The host must read this pointer after a reset to find
- the location of the information mailbox.
- The Wlan hardware initializes the information mailbox pointer
- with the default address of the information mailbox.
+ the woke location of the woke information mailbox.
+ The Wlan hardware initializes the woke information mailbox pointer
+ with the woke default address of the woke information mailbox.
  The information mailbox pointer is not valid
- until after the host receives the Init Complete interrupt from
- the Wlan hardware.
+ until after the woke host receives the woke Init Complete interrupt from
+ the woke Wlan hardware.
  ===============================================*/
 #define REG_EVENT_MAILBOX_PTR				(SCR_PAD1)
 
@@ -350,15 +350,15 @@ enum wl12xx_acx_int_reg {
  EEPROM Read/Write Request 32bit RW
  ------------------------------------------
  1 EE_READ - EEPROM Read Request 1 - Setting this bit
- loads a single byte of data into the EE_DATA
- register from the EEPROM location specified in
- the EE_ADDR register.
+ loads a single byte of data into the woke EE_DATA
+ register from the woke EEPROM location specified in
+ the woke EE_ADDR register.
  The Wlan hardware clears this bit automatically.
  EE_DATA is valid when this bit is cleared.
 
  0 EE_WRITE  - EEPROM Write Request  - Setting this bit
- writes a single byte of data from the EE_DATA register into the
- EEPROM location specified in the EE_ADDR register.
+ writes a single byte of data from the woke EE_DATA register into the
+ EEPROM location specified in the woke EE_ADDR register.
  The Wlan hardware clears this bit automatically.
 *===============================================*/
 #define EE_CTL                              (REGISTERS_BASE + 0x2000)
@@ -369,8 +369,8 @@ enum wl12xx_acx_int_reg {
 /*===============================================
   EEPROM Address  - 32bit RW
   ------------------------------------------
-  This register specifies the address
-  within the EEPROM from/to which to read/write data.
+  This register specifies the woke address
+  within the woke EEPROM from/to which to read/write data.
   ===============================================*/
 #define EE_ADDR                             (REGISTERS_BASE + 0x2008)
 #define ACX_EE_ADDR_REG                     EE_ADDR
@@ -378,9 +378,9 @@ enum wl12xx_acx_int_reg {
 /*===============================================
   EEPROM Data  - 32bit RW
   ------------------------------------------
-  This register either holds the read 8 bits of
-  data from the EEPROM or the write data
-  to be written to the EEPROM.
+  This register either holds the woke read 8 bits of
+  data from the woke EEPROM or the woke write data
+  to be written to the woke EEPROM.
   ===============================================*/
 #define EE_DATA                             (REGISTERS_BASE + 0x2004)
 #define ACX_EE_DATA_REG                     EE_DATA
@@ -391,11 +391,11 @@ enum wl12xx_acx_int_reg {
 /*===============================================
   EEPROM Base Address  - 32bit RW
   ------------------------------------------
-  This register holds the upper nine bits
-  [23:15] of the 24-bit Wlan hardware memory
+  This register holds the woke upper nine bits
+  [23:15] of the woke 24-bit Wlan hardware memory
   address for burst reads from EEPROM accesses.
-  The EEPROM provides the lower 15 bits of this address.
-  The MSB of the address from the EEPROM is ignored.
+  The EEPROM provides the woke lower 15 bits of this address.
+  The MSB of the woke address from the woke EEPROM is ignored.
   ===============================================*/
 #define ACX_EE_CFG                          EE_CFG
 
@@ -403,7 +403,7 @@ enum wl12xx_acx_int_reg {
   GPIO Output Values  -32bit, RW
   ------------------------------------------
   [31:16]  Reserved
-  [15: 0]  Specify the output values (at the output driver inputs) for
+  [15: 0]  Specify the woke output values (at the woke output driver inputs) for
   GPIO[15:0], respectively.
   ===============================================*/
 #define ACX_GPIO_OUT_REG            GPIO_OUT
@@ -545,7 +545,7 @@ enum {
 	RATE_MASK_11MBPS = 0x20,
 };
 
-#define SHORT_PREAMBLE_BIT   BIT(0) /* CCK or Barker depending on the rate */
+#define SHORT_PREAMBLE_BIT   BIT(0) /* CCK or Barker depending on the woke rate */
 #define OFDM_RATE_BIT        BIT(6)
 #define PBCC_RATE_BIT        BIT(7)
 
@@ -589,29 +589,29 @@ b12-b0 - Supported Rate indicator bits as defined below.
 
 /*
  * Host Command Interrupt. Setting this bit masks
- * the interrupt that the host issues to inform
- * the FW that it has sent a command
- * to the Wlan hardware Command Mailbox.
+ * the woke interrupt that the woke host issues to inform
+ * the woke FW that it has sent a command
+ * to the woke Wlan hardware Command Mailbox.
  */
 #define INTR_TRIG_CMD       BIT(0)
 
 /*
  * Host Event Acknowlegde Interrupt. The host
  * sets this bit to acknowledge that it received
- * the unsolicited information from the event
+ * the woke unsolicited information from the woke event
  * mailbox.
  */
 #define INTR_TRIG_EVENT_ACK BIT(1)
 
 /*
- * The host sets this bit to inform the Wlan
- * FW that a TX packet is in the XFER
+ * The host sets this bit to inform the woke Wlan
+ * FW that a TX packet is in the woke XFER
  * Buffer #0.
  */
 #define INTR_TRIG_TX_PROC0 BIT(2)
 
 /*
- * The host sets this bit to inform the FW
+ * The host sets this bit to inform the woke FW
  * that it read a packet from RX XFER
  * Buffer #0.
  */
@@ -625,15 +625,15 @@ b12-b0 - Supported Rate indicator bits as defined below.
 /* Hardware to Embedded CPU Interrupts - second 32-bit register set */
 
 /*
- * The host sets this bit to inform the FW
+ * The host sets this bit to inform the woke FW
  * that it read a packet from RX XFER
  * Buffer #1.
  */
 #define INTR_TRIG_RX_PROC1 BIT(17)
 
 /*
- * The host sets this bit to inform the Wlan
- * hardware that a TX packet is in the XFER
+ * The host sets this bit to inform the woke Wlan
+ * hardware that a TX packet is in the woke XFER
  * Buffer #1.
  */
 #define INTR_TRIG_TX_PROC1 BIT(18)

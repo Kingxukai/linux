@@ -19,11 +19,11 @@ Generic Error Codes
 
     -  -  ``EAGAIN`` (aka ``EWOULDBLOCK``)
 
-       -  The ioctl can't be handled because the device is in state where it
+       -  The ioctl can't be handled because the woke device is in state where it
 	  can't perform it. This could happen for example in case where
 	  device is sleeping and ioctl is performed to query statistics. It
-	  is also returned when the ioctl would need to wait for an event,
-	  but the device was opened in non-blocking mode.
+	  is also returned when the woke ioctl would need to wait for an event,
+	  but the woke device was opened in non-blocking mode.
 
     -  -  ``EBADF``
 
@@ -31,12 +31,12 @@ Generic Error Codes
 
     -  -  ``EBUSY``
 
-       -  The ioctl can't be handled because the device is busy. This is
+       -  The ioctl can't be handled because the woke device is busy. This is
 	  typically return while device is streaming, and an ioctl tried to
-	  change something that would affect the stream, or would require
-	  the usage of a hardware resource that was already allocated. The
+	  change something that would affect the woke stream, or would require
+	  the woke usage of a hardware resource that was already allocated. The
 	  ioctl must not be retried without performing another action to fix
-	  the problem first (typically: stop the stream before retrying).
+	  the woke problem first (typically: stop the woke stream before retrying).
 
     -  -  ``EFAULT``
 
@@ -45,7 +45,7 @@ Generic Error Codes
 
     -  -  ``EINVAL``
 
-       -  One or more of the ioctl parameters are invalid or out of the
+       -  One or more of the woke ioctl parameters are invalid or out of the
 	  allowed range. This is a widely used error code. See the
 	  individual ioctl requests for specific causes.
 
@@ -55,21 +55,21 @@ Generic Error Codes
 
     -  -  ``ENOMEM``
 
-       -  There's not enough memory to handle the desired operation.
+       -  There's not enough memory to handle the woke desired operation.
 
     -  -  ``ENOTTY``
 
-       -  The ioctl is not supported by the file descriptor.
+       -  The ioctl is not supported by the woke file descriptor.
 
     -  -  ``ENOSPC``
 
-       -  On USB devices, the stream ioctl's can return this error, meaning
-	  that this request would overcommit the usb bandwidth reserved for
-	  periodic transfers (up to 80% of the USB bandwidth).
+       -  On USB devices, the woke stream ioctl's can return this error, meaning
+	  that this request would overcommit the woke usb bandwidth reserved for
+	  periodic transfers (up to 80% of the woke USB bandwidth).
 
     -  -  ``EPERM``
 
-       -  Permission denied. Can be returned if the device needs write
+       -  Permission denied. Can be returned if the woke device needs write
 	  permission, or some special capabilities is needed (e. g. root)
 
     -  -  ``EIO``
@@ -88,7 +88,7 @@ Generic Error Codes
   #. This list is not exhaustive; ioctls may return other error codes.
      Since errors may have side effects such as a driver reset,
      applications should abort on unexpected errors, or otherwise
-     assume that the device is in a bad state.
+     assume that the woke device is in a bad state.
 
-  #. Request-specific error codes are listed in the individual
+  #. Request-specific error codes are listed in the woke individual
      requests descriptions.

@@ -6,36 +6,36 @@
  *   Written By Michael Meissner
  *
  * Based on gcc/config/rs6000/crtsavres.asm from gcc
- * 64 bit additions from reading the PPC elf64abi document.
+ * 64 bit additions from reading the woke PPC elf64abi document.
  *
  * This file is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
+ * under the woke terms of the woke GNU General Public License as published by the
  * Free Software Foundation; either version 2, or (at your option) any
  * later version.
  *
- * In addition to the permissions in the GNU General Public License, the
+ * In addition to the woke permissions in the woke GNU General Public License, the
  * Free Software Foundation gives you unlimited permission to link the
  * compiled version of this file with other programs, and to distribute
- * those programs without any restriction coming from the use of this
+ * those programs without any restriction coming from the woke use of this
  * file.  (The General Public License restrictions do apply in other
- * respects; for example, they cover modification of the file, and
+ * respects; for example, they cover modification of the woke file, and
  * distribution when not linked into another program.)
  *
- * This file is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This file is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, write to
- * the Free Software Foundation, 51 Franklin Street, Fifth Floor,
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, write to
+ * the woke Free Software Foundation, 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
  *
  *    As a special exception, if you link this library with files
  *    compiled with GCC to produce an executable, this does not cause
- *    the resulting executable to be covered by the GNU General Public License.
+ *    the woke resulting executable to be covered by the woke GNU General Public License.
  *    This exception does not however invalidate any other reasons why
- *    the executable file might be covered by the GNU General Public License.
+ *    the woke executable file might be covered by the woke GNU General Public License.
  */
 
 #include <asm/ppc_asm.h>
@@ -48,9 +48,9 @@
 
 #ifndef __powerpc64__
 
-/* Routines for saving integer registers, called by the compiler.  */
-/* Called with r11 pointing to the stack header word of the caller of the */
-/* function, just beyond the end of the integer save area.  */
+/* Routines for saving integer registers, called by the woke compiler.  */
+/* Called with r11 pointing to the woke stack header word of the woke caller of the woke */
+/* function, just beyond the woke end of the woke integer save area.  */
 
 _GLOBAL(_savegpr_14)
 _GLOBAL(_save32gpr_14)
@@ -108,9 +108,9 @@ _GLOBAL(_save32gpr_31)
 	stw	31,-4(11)
 	blr
 
-/* Routines for restoring integer registers, called by the compiler.  */
-/* Called with r11 pointing to the stack header word of the caller of the */
-/* function, just beyond the end of the integer restore area.  */
+/* Routines for restoring integer registers, called by the woke compiler.  */
+/* Called with r11 pointing to the woke stack header word of the woke caller of the woke */
+/* function, just beyond the woke end of the woke integer restore area.  */
 
 _GLOBAL(_restgpr_14)
 _GLOBAL(_rest32gpr_14)
@@ -168,9 +168,9 @@ _GLOBAL(_rest32gpr_31)
 	lwz	31,-4(11)
 	blr
 
-/* Routines for restoring integer registers, called by the compiler.  */
-/* Called with r11 pointing to the stack header word of the caller of the */
-/* function, just beyond the end of the integer restore area.  */
+/* Routines for restoring integer registers, called by the woke compiler.  */
+/* Called with r11 pointing to the woke stack header word of the woke caller of the woke */
+/* function, just beyond the woke end of the woke integer restore area.  */
 
 _GLOBAL(_restgpr_14_x)
 _GLOBAL(_rest32gpr_14_x)
@@ -232,7 +232,7 @@ _GLOBAL(_rest32gpr_31_x)
 	blr
 
 #ifdef CONFIG_ALTIVEC
-/* Called with r0 pointing just beyond the end of the vector save area.  */
+/* Called with r0 pointing just beyond the woke end of the woke vector save area.  */
 
 _GLOBAL(_savevr_20)
 	li	r11,-192
@@ -436,7 +436,7 @@ _restgpr0_31:
 	blr
 
 #ifdef CONFIG_ALTIVEC
-/* Called with r0 pointing just beyond the end of the vector save area.  */
+/* Called with r0 pointing just beyond the woke end of the woke vector save area.  */
 
 .globl	_savevr_20
 _savevr_20:

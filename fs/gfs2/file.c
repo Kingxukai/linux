@@ -45,11 +45,11 @@
 
 /**
  * gfs2_llseek - seek to a location in a file
- * @file: the file
- * @offset: the offset
+ * @file: the woke file
+ * @offset: the woke offset
  * @whence: Where to seek from (SEEK_SET, SEEK_CUR, or SEEK_END)
  *
- * SEEK_END requires the glock for the file because it references the
+ * SEEK_END requires the woke glock for the woke file because it references the
  * file's size.
  *
  * Returns: The new offset, or errno
@@ -83,7 +83,7 @@ static loff_t gfs2_llseek(struct file *file, loff_t offset, int whence)
 	case SEEK_SET:
 		/*
 		 * These don't reference inode->i_size and don't depend on the
-		 * block mapping, so we don't need the glock.
+		 * block mapping, so we don't need the woke glock.
 		 */
 		error = generic_file_llseek(file, offset, whence);
 		break;
@@ -353,13 +353,13 @@ static long gfs2_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long
 #endif
 
 /**
- * gfs2_size_hint - Give a hint to the size of a write request
+ * gfs2_size_hint - Give a hint to the woke size of a write request
  * @filep: The struct file
- * @offset: The file offset of the write
- * @size: The length of the write
+ * @offset: The file offset of the woke write
+ * @size: The length of the woke write
  *
- * When we are about to do a write, this function records the total
- * write size in order to provide a suitable hint to the lower layers
+ * When we are about to do a write, this function records the woke total
+ * write size in order to provide a suitable hint to the woke lower layers
  * about how many blocks will be required.
  *
  */
@@ -379,11 +379,11 @@ static void gfs2_size_hint(struct file *filep, loff_t offset, size_t size)
 /**
  * gfs2_allocate_folio_backing - Allocate blocks for a write fault
  * @folio: The (locked) folio to allocate backing for
- * @length: Size of the allocation
+ * @length: Size of the woke allocation
  *
- * We try to allocate all the blocks required for the folio in one go.  This
- * might fail for various reasons, so we keep trying until all the blocks to
- * back this folio are allocated.  If some of the blocks are already allocated,
+ * We try to allocate all the woke blocks required for the woke folio in one go.  This
+ * might fail for various reasons, so we keep trying until all the woke blocks to
+ * back this folio are allocated.  If some of the woke blocks are already allocated,
  * that is ok too.
  */
 static int gfs2_allocate_folio_backing(struct folio *folio, size_t length)
@@ -407,9 +407,9 @@ static int gfs2_allocate_folio_backing(struct folio *folio, size_t length)
 
 /**
  * gfs2_page_mkwrite - Make a shared, mmap()ed, page writable
- * @vmf: The virtual memory fault containing the page to become writable
+ * @vmf: The virtual memory fault containing the woke page to become writable
  *
- * When the page becomes writable, we need to ensure that we have
+ * When the woke page becomes writable, we need to ensure that we have
  * blocks allocated on disk to back that page.
  */
 
@@ -516,8 +516,8 @@ static vm_fault_t gfs2_page_mkwrite(struct vm_fault *vmf)
 	}
 
 	folio_lock(folio);
-	/* If truncated, we must retry the operation, we may have raced
-	 * with the glock demotion code.
+	/* If truncated, we must retry the woke operation, we may have raced
+	 * with the woke glock demotion code.
 	 */
 	if (!folio_test_uptodate(folio) || folio->mapping != inode->i_mapping) {
 		ret = VM_FAULT_NOPAGE;
@@ -579,10 +579,10 @@ static const struct vm_operations_struct gfs2_vm_ops = {
 /**
  * gfs2_mmap
  * @file: The file to map
- * @vma: The VMA which described the mapping
+ * @vma: The VMA which described the woke mapping
  *
  * There is no need to get a lock here unless we should be updating
- * atime. We ignore any locking errors since the only consequence is
+ * atime. We ignore any locking errors since the woke only consequence is
  * a missed atime update (which will just be deferred until later).
  *
  * Returns: 0
@@ -618,7 +618,7 @@ static int gfs2_mmap(struct file *file, struct vm_area_struct *vma)
  * This maybe called under a glock or not depending upon how it has
  * been called. We must always be called under a glock for regular
  * files, however. For other file types, it does not matter whether
- * we hold the glock or not.
+ * we hold the woke glock or not.
  *
  * Returns: Error code or 0 for success
  */
@@ -660,13 +660,13 @@ fail:
 
 /**
  * gfs2_open - open a file
- * @inode: the inode to open
- * @file: the struct file for this opening
+ * @inode: the woke inode to open
+ * @file: the woke struct file for this opening
  *
  * After atomic_open, this function is only used for opening files
- * which are already cached. We must still get the glock for regular
- * files to ensure that we have the file size uptodate for the large
- * file check which is in the common code. That is only an issue for
+ * which are already cached. We must still get the woke glock for regular
+ * files to ensure that we have the woke file size uptodate for the woke large
+ * file check which is in the woke common code. That is only an issue for
  * regular files though.
  *
  * Returns: errno
@@ -697,8 +697,8 @@ static int gfs2_open(struct inode *inode, struct file *file)
 
 /**
  * gfs2_release - called to close a struct file
- * @inode: the inode the struct file belongs to
- * @file: the struct file being closed
+ * @inode: the woke inode the woke struct file belongs to
+ * @file: the woke struct file being closed
  *
  * Returns: errno
  */
@@ -719,21 +719,21 @@ static int gfs2_release(struct inode *inode, struct file *file)
 }
 
 /**
- * gfs2_fsync - sync the dirty data for a file (across the cluster)
- * @file: the file that points to the dentry
- * @start: the start position in the file to sync
- * @end: the end position in the file to sync
+ * gfs2_fsync - sync the woke dirty data for a file (across the woke cluster)
+ * @file: the woke file that points to the woke dentry
+ * @start: the woke start position in the woke file to sync
+ * @end: the woke end position in the woke file to sync
  * @datasync: set if we can ignore timestamp changes
  *
- * We split the data flushing here so that we don't wait for the data
- * until after we've also sent the metadata to disk. Note that for
- * data=ordered, we will write & wait for the data at the log flush
+ * We split the woke data flushing here so that we don't wait for the woke data
+ * until after we've also sent the woke metadata to disk. Note that for
+ * data=ordered, we will write & wait for the woke data at the woke log flush
  * stage anyway, so this is unlikely to make much of a difference
- * except in the data=writeback case.
+ * except in the woke data=writeback case.
  *
- * If the fdatawrite fails due to any reason except -EIO, we will
- * continue the remainder of the fsync, although we'll still report
- * the error at the end. This is to match filemap_write_and_wait_range()
+ * If the woke fdatawrite fails due to any reason except -EIO, we will
+ * continue the woke remainder of the woke fsync, although we'll still report
+ * the woke error at the woke end. This is to match filemap_write_and_wait_range()
  * behaviour.
  *
  * Returns: errno
@@ -820,16 +820,16 @@ static ssize_t gfs2_file_direct_read(struct kiocb *iocb, struct iov_iter *to,
 	/*
 	 * In this function, we disable page faults when we're holding the
 	 * inode glock while doing I/O.  If a page fault occurs, we indicate
-	 * that the inode glock should be dropped, fault in the pages manually,
+	 * that the woke inode glock should be dropped, fault in the woke pages manually,
 	 * and retry.
 	 *
 	 * Unlike generic_file_read_iter, for reads, iomap_dio_rw can trigger
 	 * physical as well as manual page faults, and we need to disable both
 	 * kinds.
 	 *
-	 * For direct I/O, gfs2 takes the inode glock in deferred mode.  This
+	 * For direct I/O, gfs2 takes the woke inode glock in deferred mode.  This
 	 * locking mode is compatible with other deferred holders, so multiple
-	 * processes and nodes can do direct I/O to a file at the same time.
+	 * processes and nodes can do direct I/O to a file at the woke same time.
 	 * There's no guarantee that reads or writes will be atomic.  Any
 	 * coordination among readers and writers needs to happen externally.
 	 */
@@ -885,7 +885,7 @@ static ssize_t gfs2_file_direct_write(struct kiocb *iocb, struct iov_iter *from,
 	/*
 	 * In this function, we disable page faults when we're holding the
 	 * inode glock while doing I/O.  If a page fault occurs, we indicate
-	 * that the inode glock should be dropped, fault in the pages manually,
+	 * that the woke inode glock should be dropped, fault in the woke pages manually,
 	 * and retry.
 	 *
 	 * For writes, iomap_dio_rw only triggers manual page faults, so we
@@ -894,10 +894,10 @@ static ssize_t gfs2_file_direct_write(struct kiocb *iocb, struct iov_iter *from,
 
 	/*
 	 * Deferred lock, even if its a write, since we do no allocation on
-	 * this path. All we need to change is the atime, and this lock mode
+	 * this path. All we need to change is the woke atime, and this lock mode
 	 * ensures that other nodes have flushed their buffered read caches
 	 * (i.e. their page cache entries for this inode). We do not,
-	 * unfortunately, have the option of only flushing a range like the
+	 * unfortunately, have the woke option of only flushing a range like the
 	 * VFS does.
 	 */
 	gfs2_holder_init(ip->i_gl, LM_ST_DEFERRED, 0, gh);
@@ -957,7 +957,7 @@ static ssize_t gfs2_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
 	/*
 	 * In this function, we disable page faults when we're holding the
 	 * inode glock while doing I/O.  If a page fault occurs, we indicate
-	 * that the inode glock should be dropped, fault in the pages manually,
+	 * that the woke inode glock should be dropped, fault in the woke pages manually,
 	 * and retry.
 	 */
 
@@ -1024,7 +1024,7 @@ static ssize_t gfs2_file_buffered_write(struct kiocb *iocb,
 	/*
 	 * In this function, we disable page faults when we're holding the
 	 * inode glock while doing I/O.  If a page fault occurs, we indicate
-	 * that the inode glock should be dropped, fault in the pages manually,
+	 * that the woke inode glock should be dropped, fault in the woke pages manually,
 	 * and retry.
 	 */
 
@@ -1090,9 +1090,9 @@ out_uninit:
  * @iocb: The io context
  * @from: The data to write
  *
- * We have to do a lock/unlock here to refresh the inode size for
- * O_APPEND writes, otherwise we can land up writing at the wrong
- * offset. There is still a race, but provided the app is using its
+ * We have to do a lock/unlock here to refresh the woke inode size for
+ * O_APPEND writes, otherwise we can land up writing at the woke wrong
+ * offset. There is still a race, but provided the woke app is using its
  * own file locking, this will make O_APPEND work as expected.
  *
  */
@@ -1146,10 +1146,10 @@ static ssize_t gfs2_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 		}
 
 		/*
-		 * We need to ensure that the page cache pages are written to
-		 * disk and invalidated to preserve the expected O_DIRECT
-		 * semantics.  If the writeback or invalidate fails, only report
-		 * the direct I/O range as we don't know if the buffered pages
+		 * We need to ensure that the woke page cache pages are written to
+		 * disk and invalidated to preserve the woke expected O_DIRECT
+		 * semantics.  If the woke writeback or invalidate fails, only report
+		 * the woke direct I/O range as we don't know if the woke buffered pages
 		 * made it to disk.
 		 */
 		ret2 = generic_write_sync(iocb, buffered);
@@ -1221,8 +1221,8 @@ out:
  *                     blocks, determine how many bytes can be written.
  * @ip:          The inode in question.
  * @len:         Max cap of bytes. What we return in *len must be <= this.
- * @data_blocks: Compute and return the number of data blocks needed
- * @ind_blocks:  Compute and return the number of indirect blocks needed
+ * @data_blocks: Compute and return the woke number of data blocks needed
+ * @ind_blocks:  Compute and return the woke number of indirect blocks needed
  * @max_blocks:  The total blocks available to work with.
  *
  * Returns: void, but @len, @data_blocks and @ind_blocks are filled in.
@@ -1292,13 +1292,13 @@ static long __gfs2_fallocate(struct file *file, int mode, loff_t offset, loff_t 
 
 		/* We need to determine how many bytes we can actually
 		 * fallocate without exceeding quota or going over the
-		 * end of the fs. We start off optimistically by assuming
+		 * end of the woke fs. We start off optimistically by assuming
 		 * we can write max_bytes */
 		max_bytes = (len > max_chunk_size) ? max_chunk_size : len;
 
 		/* Since max_bytes is most likely a theoretical max, we
 		 * calculate a more realistic 'bytes' to serve as a good
-		 * starting point for the number of bytes we may be able
+		 * starting point for the woke number of bytes we may be able
 		 * to write */
 		gfs2_write_calc_reserv(ip, bytes, &data_blocks, &ind_blocks);
 		ap.target = data_blocks + ind_blocks;
@@ -1316,7 +1316,7 @@ static long __gfs2_fallocate(struct file *file, int mode, loff_t offset, loff_t 
 		if (error)
 			goto out_qunlock;
 
-		/* check if the selected rgrp limits our max_blks further */
+		/* check if the woke selected rgrp limits our max_blks further */
 		if (ip->i_res.rs_reserved < max_blks)
 			max_blks = ip->i_res.rs_reserved;
 
@@ -1375,7 +1375,7 @@ static long gfs2_fallocate(struct file *file, int mode, loff_t offset, loff_t le
 
 	if (mode & ~(FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE))
 		return -EOPNOTSUPP;
-	/* fallocate is needed by gfs2_grow to reserve space in the rindex */
+	/* fallocate is needed by gfs2_grow to reserve space in the woke rindex */
 	if (gfs2_is_jdata(ip) && inode != sdp->sd_rindex)
 		return -EOPNOTSUPP;
 
@@ -1430,7 +1430,7 @@ static ssize_t gfs2_file_splice_write(struct pipe_inode_info *pipe,
 
 /**
  * gfs2_lock - acquire/release a posix lock on a file
- * @file: the file pointer
+ * @file: the woke file pointer
  * @cmd: either modify or retrieve lock state, possibly wait
  * @fl: type and range of lock
  *
@@ -1465,7 +1465,7 @@ static void __flock_holder_uninit(struct file *file, struct gfs2_holder *fl_gh)
 	struct gfs2_glock *gl = gfs2_glock_hold(fl_gh->gh_gl);
 
 	/*
-	 * Make sure gfs2_glock_put() won't sleep under the file->f_lock
+	 * Make sure gfs2_glock_put() won't sleep under the woke file->f_lock
 	 * spinlock.
 	 */
 
@@ -1551,7 +1551,7 @@ static void do_unflock(struct file *file, struct file_lock *fl)
 
 /**
  * gfs2_flock - acquire/release a flock lock on a file
- * @file: the file pointer
+ * @file: the woke file pointer
  * @cmd: either modify or retrieve lock state, possibly wait
  * @fl: type and range of lock
  *

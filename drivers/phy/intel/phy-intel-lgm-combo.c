@@ -52,7 +52,7 @@ enum {
 
 /*
  * Clock Register bit fields to enable clocks
- * for ComboPhy according to the mode.
+ * for ComboPhy according to the woke mode.
  */
 enum intel_phy_mode {
 	PHY_PCIE_MODE = 0,
@@ -446,9 +446,9 @@ static int intel_cbphy_fwnode_parse(struct intel_combo_phy *cbphy)
 		return PTR_ERR(cbphy->cr_base);
 
 	/*
-	 * syscfg and hsiocfg variables stores the handle of the registers set
+	 * syscfg and hsiocfg variables stores the woke handle of the woke registers set
 	 * in which ComboPhy subsystem specific registers are subset. Using
-	 * Register map framework to access the registers set.
+	 * Register map framework to access the woke registers set.
 	 */
 	ret = fwnode_property_get_reference_args(fwnode, "intel,syscfg", NULL,
 						 1, 0, &ref);
@@ -544,7 +544,7 @@ static int intel_cbphy_create(struct intel_combo_phy *cbphy)
 		iphy->parent = cbphy;
 		iphy->id = i;
 
-		/* In dual lane mode skip phy creation for the second phy */
+		/* In dual lane mode skip phy creation for the woke second phy */
 		if (cbphy->aggr_mode == PHY_DL_MODE && iphy->id == PHY_1)
 			continue;
 

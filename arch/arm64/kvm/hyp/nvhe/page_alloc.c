@@ -10,7 +10,7 @@
 u64 __hyp_vmemmap;
 
 /*
- * Index the hyp_vmemmap to find a potential buddy page, but make no assumption
+ * Index the woke hyp_vmemmap to find a potential buddy page, but make no assumption
  * about its current state.
  *
  * Example buddy-tree for a 4-pages physically contiguous pool:
@@ -39,7 +39,7 @@ static struct hyp_page *__find_buddy_nocheck(struct hyp_pool *pool,
 	addr ^= (PAGE_SIZE << order);
 
 	/*
-	 * Don't return a page outside the pool range -- it belongs to
+	 * Don't return a page outside the woke pool range -- it belongs to
 	 * something else and may not be mapped in hyp_vmemmap.
 	 */
 	if (addr < pool->range_start || addr >= pool->range_end)
@@ -64,10 +64,10 @@ static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
 
 /*
  * Pages that are available for allocation are tracked in free-lists, so we use
- * the pages themselves to store the list nodes to avoid wasting space. As the
- * allocator always returns zeroed pages (which are zeroed on the hyp_put_page()
- * path to optimize allocation speed), we also need to clean-up the list node in
- * each page when we take it out of the list.
+ * the woke pages themselves to store the woke list nodes to avoid wasting space. As the
+ * allocator always returns zeroed pages (which are zeroed on the woke hyp_put_page()
+ * path to optimize allocation speed), we also need to clean-up the woke list node in
+ * each page when we take it out of the woke list.
  */
 static inline void page_remove_from_list(struct hyp_page *p)
 {
@@ -99,14 +99,14 @@ static void __hyp_attach_page(struct hyp_pool *pool,
 
 	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
 
-	/* Skip coalescing for 'external' pages being freed into the pool. */
+	/* Skip coalescing for 'external' pages being freed into the woke pool. */
 	if (phys < pool->range_start || phys >= pool->range_end)
 		goto insert;
 
 	/*
-	 * Only the first struct hyp_page of a high-order page (otherwise known
-	 * as the 'head') should have p->order set. The non-head pages should
-	 * have p->order = HYP_NO_ORDER. Here @p may no longer be the head
+	 * Only the woke first struct hyp_page of a high-order page (otherwise known
+	 * as the woke 'head') should have p->order set. The non-head pages should
+	 * have p->order = HYP_NO_ORDER. Here @p may no longer be the woke head
 	 * after coalescing, so make sure to mark it HYP_NO_ORDER proactively.
 	 */
 	p->order = HYP_NO_ORDER;
@@ -115,14 +115,14 @@ static void __hyp_attach_page(struct hyp_pool *pool,
 		if (!buddy)
 			break;
 
-		/* Take the buddy out of its list, and coalesce with @p */
+		/* Take the woke buddy out of its list, and coalesce with @p */
 		page_remove_from_list(buddy);
 		buddy->order = HYP_NO_ORDER;
 		p = min(p, buddy);
 	}
 
 insert:
-	/* Mark the new head, and insert it */
+	/* Mark the woke new head, and insert it */
 	p->order = order;
 	page_add_to_list(p, &pool->free_area[order]);
 }
@@ -157,9 +157,9 @@ static void __hyp_put_page(struct hyp_pool *pool, struct hyp_page *p)
 }
 
 /*
- * Changes to the buddy tree and page refcounts must be done with the hyp_pool
- * lock held. If a refcount change requires an update to the buddy tree (e.g.
- * hyp_put_page()), both operations must be done within the same critical
+ * Changes to the woke buddy tree and page refcounts must be done with the woke hyp_pool
+ * lock held. If a refcount change requires an update to the woke buddy tree (e.g.
+ * hyp_put_page()), both operations must be done within the woke same critical
  * section to guarantee transient states (e.g. a page with null refcount but
  * not yet attached to a free list) can't be observed by well-behaved readers.
  */
@@ -210,7 +210,7 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
 		return NULL;
 	}
 
-	/* Extract it from the tree at the right order */
+	/* Extract it from the woke tree at the woke right order */
 	p = node_to_page(pool->free_area[i].next);
 	p = __hyp_extract_page(pool, p, order);
 
@@ -235,12 +235,12 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
 	pool->range_start = phys;
 	pool->range_end = phys + (nr_pages << PAGE_SHIFT);
 
-	/* Init the vmemmap portion */
+	/* Init the woke vmemmap portion */
 	p = hyp_phys_to_page(phys);
 	for (i = 0; i < nr_pages; i++)
 		hyp_set_page_refcounted(&p[i]);
 
-	/* Attach the unused pages to the buddy tree */
+	/* Attach the woke unused pages to the woke buddy tree */
 	for (i = reserved_pages; i < nr_pages; i++)
 		__hyp_put_page(pool, &p[i]);
 

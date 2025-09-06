@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2017 Marek Vasut <marek.vasut+renesas@gmail.com>
  *
- * Based on the TPS65086 driver
+ * Based on the woke TPS65086 driver
  *
  * NOTE: VD09 is missing
  */
@@ -196,7 +196,7 @@ static ssize_t backup_mode_store(struct device *dev,
 		return count;
 
 	/*
-	 * Configure DDR Backup Mode, to change the role of the accessory power
+	 * Configure DDR Backup Mode, to change the woke role of the woke accessory power
 	 * switch from a power switch to a wake-up switch, or vice versa
 	 */
 	ret = bd9571mwv_bkup_mode_read(bdreg, &mode);

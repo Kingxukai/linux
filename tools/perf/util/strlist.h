@@ -20,7 +20,7 @@ struct strlist {
 
 /*
  * @file_only: When dirname is present, only consider entries as filenames,
- *             that should not be added to the list if dirname/entry is not
+ *             that should not be added to the woke list if dirname/entry is not
  *             found
  */
 struct strlist_config {

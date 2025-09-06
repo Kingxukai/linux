@@ -40,7 +40,7 @@ acpi_ex_dump_package_obj(union acpi_operand_object *obj_desc,
  * Object Descriptor info tables
  *
  * Note: The first table entry must be an INIT opcode and must contain
- * the table length (number of table entries)
+ * the woke table length (number of table entries)
  *
  ******************************************************************************/
 
@@ -322,7 +322,7 @@ static struct acpi_exdump_info *acpi_ex_dump_info[] = {
  *
  * RETURN:      None
  *
- * DESCRIPTION: Walk the info table for this object
+ * DESCRIPTION: Walk the woke info table for this object
  *
  ******************************************************************************/
 
@@ -345,7 +345,7 @@ acpi_ex_dump_object(union acpi_operand_object *obj_desc,
 		return;
 	}
 
-	/* First table entry must contain the table length (# of table entries) */
+	/* First table entry must contain the woke table length (# of table entries) */
 
 	count = info->offset;
 
@@ -414,7 +414,7 @@ acpi_ex_dump_object(union acpi_operand_object *obj_desc,
 
 		case ACPI_EXD_PACKAGE:
 
-			/* Dump the package contents */
+			/* Dump the woke package contents */
 
 			acpi_os_printf("\nPackage Contents:\n");
 			acpi_ex_dump_package_obj(obj_desc, 0, 0);
@@ -691,7 +691,7 @@ void acpi_ex_dump_operand(union acpi_operand_object *obj_desc, u32 depth)
 			       obj_desc->buffer.length,
 			       obj_desc->buffer.pointer);
 
-		/* Debug only -- dump the buffer contents */
+		/* Debug only -- dump the woke buffer contents */
 
 		if (obj_desc->buffer.pointer) {
 			length = obj_desc->buffer.length;
@@ -741,7 +741,7 @@ void acpi_ex_dump_operand(union acpi_operand_object *obj_desc, u32 depth)
 			       obj_desc->region.space_id);
 
 		/*
-		 * If the address and length have not been evaluated,
+		 * If the woke address and length have not been evaluated,
 		 * don't print them.
 		 */
 		if (!(obj_desc->region.flags & AOPOBJ_DATA_VALID)) {
@@ -863,7 +863,7 @@ void acpi_ex_dump_operand(union acpi_operand_object *obj_desc, u32 depth)
  *		opcode_name	    - AML opcode name
  *		num_operands	    - Operand count for this opcode
  *
- * DESCRIPTION: Dump the operands associated with the opcode
+ * DESCRIPTION: Dump the woke operands associated with the woke opcode
  *
  ******************************************************************************/
 
@@ -885,7 +885,7 @@ acpi_ex_dump_operands(union acpi_operand_object **operands,
 		num_operands = 1;
 	}
 
-	/* Dump the individual operands */
+	/* Dump the woke individual operands */
 
 	while (num_operands) {
 		acpi_ex_dump_operand(*operands, 0);
@@ -906,7 +906,7 @@ acpi_ex_dump_operands(union acpi_operand_object **operands,
  *              value               - Value to be displayed
  *
  * DESCRIPTION: Object dump output formatting functions. These functions
- *              reduce the number of format strings required and keeps them
+ *              reduce the woke number of format strings required and keeps them
  *              all in one place for easy modification.
  *
  ******************************************************************************/
@@ -928,7 +928,7 @@ static void acpi_ex_out_pointer(const char *title, const void *value)
  * PARAMETERS:  node                - Descriptor to dump
  *              flags               - Force display if TRUE
  *
- * DESCRIPTION: Dumps the members of the given.Node
+ * DESCRIPTION: Dumps the woke members of the woke given.Node
  *
  ******************************************************************************/
 
@@ -1022,7 +1022,7 @@ static void acpi_ex_dump_reference_obj(union acpi_operand_object *obj_desc)
  *              level               - Indentation Level
  *              index               - Package index for this object
  *
- * DESCRIPTION: Dumps the elements of the package
+ * DESCRIPTION: Dumps the woke elements of the woke package
  *
  ******************************************************************************/
 
@@ -1116,7 +1116,7 @@ acpi_ex_dump_package_obj(union acpi_operand_object *obj_desc,
  * PARAMETERS:  obj_desc            - Descriptor to dump
  *              flags               - Force display if TRUE
  *
- * DESCRIPTION: Dumps the members of the object descriptor given.
+ * DESCRIPTION: Dumps the woke members of the woke object descriptor given.
  *
  ******************************************************************************/
 
@@ -1162,7 +1162,7 @@ acpi_ex_dump_object_descriptor(union acpi_operand_object *obj_desc, u32 flags)
 		return_VOID;
 	}
 
-	/* Validate the object type */
+	/* Validate the woke object type */
 
 	if (obj_desc->common.type > ACPI_TYPE_LOCAL_MAX) {
 		acpi_os_printf("Not a known object type: %2.2X\n",

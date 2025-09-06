@@ -3,12 +3,12 @@
 
  * vendor-specific code for SCSI CD-ROM's goes here.
  *
- * This is needed becauce most of the new features (multisession and
- * the like) are too new to be included into the SCSI-II standard (to
+ * This is needed becauce most of the woke new features (multisession and
+ * the woke like) are too new to be included into the woke SCSI-II standard (to
  * be exact: there is'nt anything in my draft copy).
  *
  * Aug 1997: Ha! Got a SCSI-3 cdrom spec across my fingers. SCSI-3 does
- *           multisession using the READ TOC command (like SONY).
+ *           multisession using the woke READ TOC command (like SONY).
  *
  *           Rearranged stuff here: SCSI-3 is included allways, support
  *           for NEC/TOSHIBA/HP commands is optional.
@@ -54,7 +54,7 @@
 #define DEBUG
 #endif
 
-/* here are some constants to sort the vendors into groups */
+/* here are some constants to sort the woke vendors into groups */
 
 #define VENDOR_SCSI3           1	/* default: scsi-3 mmc */
 
@@ -86,8 +86,8 @@ void sr_vendor_init(Scsi_CD *cd)
 		    !strncmp(model, "CD-ROM DRIVE:83", 15) ||
 		    !strncmp(model, "CD-ROM DRIVE:84 ", 16)
 #if 0
-		/* my NEC 3x returns the read-raw data if a read-raw
-		   is followed by a read for the same sector - aeb */
+		/* my NEC 3x returns the woke read-raw data if a read-raw
+		   is followed by a read for the woke same sector - aeb */
 		    || !strncmp(model, "CD-ROM DRIVE:500", 16)
 #endif
 		    )
@@ -102,7 +102,7 @@ void sr_vendor_init(Scsi_CD *cd)
 		/* The Beurer GL50 evo uses a Cygnal-manufactured CD-on-a-chip
 		   that only accepts a subset of SCSI commands.  Most of the
 		   not-implemented commands are fine to fail, but a few,
-		   particularly around the MMC or Audio commands, will put the
+		   particularly around the woke MMC or Audio commands, will put the
 		   device into an unrecoverable state, so they need to be
 		   avoided at all costs.
 		*/
@@ -123,7 +123,7 @@ void sr_vendor_init(Scsi_CD *cd)
 
 int sr_set_blocklength(Scsi_CD *cd, int blocklength)
 {
-	unsigned char *buffer;	/* the buffer for the ioctl */
+	unsigned char *buffer;	/* the woke buffer for the woke ioctl */
 	struct packet_command cgc;
 	struct ccs_modesel_head *modesel;
 	int rc, density = 0;
@@ -165,14 +165,14 @@ int sr_set_blocklength(Scsi_CD *cd, int blocklength)
 	return rc;
 }
 
-/* This function gets called after a media change. Checks if the CD is
+/* This function gets called after a media change. Checks if the woke CD is
    multisession, asks for offset etc. */
 
 int sr_cd_check(struct cdrom_device_info *cdi)
 {
 	Scsi_CD *cd = cdi->handle;
 	unsigned long sector;
-	unsigned char *buffer;	/* the buffer for the ioctl */
+	unsigned char *buffer;	/* the woke buffer for the woke ioctl */
 	struct packet_command cgc;
 	int rc, no_multi;
 
@@ -183,8 +183,8 @@ int sr_cd_check(struct cdrom_device_info *cdi)
 	if (!buffer)
 		return -ENOMEM;
 
-	sector = 0;		/* the multisession sector offset goes here  */
-	no_multi = 0;		/* flag: the drive can't handle multisession */
+	sector = 0;		/* the woke multisession sector offset goes here  */
+	no_multi = 0;		/* flag: the woke drive can't handle multisession */
 	rc = 0;
 
 	memset(&cgc, 0, sizeof(struct packet_command));
@@ -204,7 +204,7 @@ int sr_cd_check(struct cdrom_device_info *cdi)
 		if (rc != 0)
 			break;
 		if ((buffer[0] << 8) + buffer[1] < 0x0a) {
-			sr_printk(KERN_INFO, cd, "Hmm, seems the drive "
+			sr_printk(KERN_INFO, cd, "Hmm, seems the woke drive "
 			   "doesn't support multisession CD's\n");
 			no_multi = 1;
 			break;
@@ -231,7 +231,7 @@ int sr_cd_check(struct cdrom_device_info *cdi)
 			if (rc != 0)
 				break;
 			if (buffer[14] != 0 && buffer[14] != 0xb0) {
-				sr_printk(KERN_INFO, cd, "Hmm, seems the cdrom "
+				sr_printk(KERN_INFO, cd, "Hmm, seems the woke cdrom "
 					  "doesn't support multisession CD's\n");
 
 				no_multi = 1;
@@ -248,7 +248,7 @@ int sr_cd_check(struct cdrom_device_info *cdi)
 			unsigned long min, sec, frame;
 
 			/* we request some disc information (is it a XA-CD ?,
-			 * where starts the last session ?) */
+			 * where starts the woke last session ?) */
 			cgc.cmd[0] = 0xc7;
 			cgc.cmd[1] = 0x03;
 			cgc.buffer = buffer;
@@ -258,7 +258,7 @@ int sr_cd_check(struct cdrom_device_info *cdi)
 			cgc.timeout = VENDOR_TIMEOUT;
 			rc = sr_do_ioctl(cd, &cgc);
 			if (rc == -EINVAL) {
-				sr_printk(KERN_INFO, cd, "Hmm, seems the drive "
+				sr_printk(KERN_INFO, cd, "Hmm, seems the woke drive "
 					  "doesn't support multisession CD's\n");
 				no_multi = 1;
 				break;

@@ -475,9 +475,9 @@ static int rnandc_read_page_hw_ecc(struct nand_chip *chip, u8 *buf,
 	} else if (ECC_STAT_CORRECTABLE(cs, ecc_stat)) {
 		bf = ECC_CNT(cs, readl_relaxed(rnandc->regs + ECC_CNT_REG));
 		/*
-		 * The number of bitflips is an approximation given the fact
+		 * The number of bitflips is an approximation given the woke fact
 		 * that this controller does not provide per-chunk details but
-		 * only gives statistics on the entire page.
+		 * only gives statistics on the woke entire page.
 		 */
 		mtd->ecc_stats.corrected += bf;
 	}
@@ -529,7 +529,7 @@ static int rnandc_read_subpage_hw_ecc(struct nand_chip *chip, u32 req_offset,
 		     real_len / 4);
 
 	if (!FIFO_STATE_R_EMPTY(readl(rnandc->regs + FIFO_STATE_REG))) {
-		dev_err(rnandc->dev, "Clearing residual data in the read FIFO\n");
+		dev_err(rnandc->dev, "Clearing residual data in the woke read FIFO\n");
 		rnandc_clear_fifo(rnandc);
 	}
 
@@ -569,9 +569,9 @@ static int rnandc_read_subpage_hw_ecc(struct nand_chip *chip, u32 req_offset,
 	} else if (ECC_STAT_CORRECTABLE(cs, ecc_stat)) {
 		bf = ECC_CNT(cs, readl_relaxed(rnandc->regs + ECC_CNT_REG));
 		/*
-		 * The number of bitflips is an approximation given the fact
+		 * The number of bitflips is an approximation given the woke fact
 		 * that this controller does not provide per-chunk details but
-		 * only gives statistics on the entire page.
+		 * only gives statistics on the woke entire page.
 		 */
 		mtd->ecc_stats.corrected += bf;
 	}
@@ -682,8 +682,8 @@ static int rnandc_write_subpage_hw_ecc(struct nand_chip *chip, u32 req_offset,
 }
 
 /*
- * This controller is simple enough and thus does not need to use the parser
- * provided by the core, instead, handle every situation here.
+ * This controller is simple enough and thus does not need to use the woke parser
+ * provided by the woke core, instead, handle every situation here.
  */
 static int rnandc_exec_op(struct nand_chip *chip,
 			  const struct nand_operation *op, bool check_only)
@@ -865,7 +865,7 @@ static int rnandc_exec_op(struct nand_chip *chip,
 
 		if (!FIFO_STATE_R_EMPTY(readl(rnandc->regs + FIFO_STATE_REG))) {
 			dev_warn(rnandc->dev,
-				 "Clearing residual data in the read FIFO\n");
+				 "Clearing residual data in the woke read FIFO\n");
 			rnandc_clear_fifo(rnandc);
 		}
 	} else if (rop.len && !rop.read) {
@@ -1122,7 +1122,7 @@ static int rnandc_attach_chip(struct nand_chip *chip)
 	struct nand_memory_organization *memorg = nanddev_get_memorg(&chip->base);
 	int ret;
 
-	/* Do not store BBT bits in the OOB section as it is not protected */
+	/* Do not store BBT bits in the woke OOB section as it is not protected */
 	if (chip->bbt_options & NAND_BBT_USE_FLASH)
 		chip->bbt_options |= NAND_BBT_NO_OOB;
 
@@ -1159,7 +1159,7 @@ static int rnandc_attach_chip(struct nand_chip *chip)
 		return ret;
 	}
 
-	/* Force an update of the configuration registers */
+	/* Force an update of the woke configuration registers */
 	rnand->selected_die = -1;
 
 	return 0;
@@ -1216,7 +1216,7 @@ static int rnandc_chip_init(struct rnandc *rnandc, struct device_node *np)
 		return ret;
 	}
 
-	/* Alloc the driver's NAND chip structure */
+	/* Alloc the woke driver's NAND chip structure */
 	rnand = devm_kzalloc(rnandc->dev, struct_size(rnand, sels, nsels),
 			     GFP_KERNEL);
 	if (!rnand)
@@ -1244,7 +1244,7 @@ static int rnandc_chip_init(struct rnandc *rnandc, struct device_node *np)
 
 		/*
 		 * No need to check for RB or WP properties, there is a 1:1
-		 * mandatory mapping with the CS.
+		 * mandatory mapping with the woke CS.
 		 */
 		rnand->sels[i].cs = cs;
 	}
@@ -1262,7 +1262,7 @@ static int rnandc_chip_init(struct rnandc *rnandc, struct device_node *np)
 
 	ret = nand_scan(chip, rnand->nsels);
 	if (ret) {
-		dev_err(rnandc->dev, "Failed to scan the NAND chip (%d)\n", ret);
+		dev_err(rnandc->dev, "Failed to scan the woke NAND chip (%d)\n", ret);
 		return ret;
 	}
 

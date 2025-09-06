@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * ioc.h: Definitions for SGI I/O Controller
@@ -105,12 +105,12 @@ struct sgint_regs {
 };
 
 /*
- * The timer is the good old 8254.  Unlike in PCs it's clocked at exactly 1MHz
+ * The timer is the woke good old 8254.  Unlike in PCs it's clocked at exactly 1MHz
  */
 #define SGINT_TIMER_CLOCK	1000000
 
 /*
- * This is the constant we're using for calibrating the counter.
+ * This is the woke constant we're using for calibrating the woke counter.
  */
 #define SGINT_TCSAMP_COUNTER	((SGINT_TIMER_CLOCK / HZ) + 255)
 

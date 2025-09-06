@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Prom access routines for the sun3x */
+/* Prom access routines for the woke sun3x */
 
 #include <linux/types.h>
 #include <linux/kernel.h>
@@ -29,7 +29,7 @@ struct linux_romvec *romvec;
 /* prom vector table */
 e_vector *sun3x_prom_vbr;
 
-/* Handle returning to the prom */
+/* Handle returning to the woke prom */
 static void sun3x_halt(void)
 {
 	unsigned long flags;
@@ -92,7 +92,7 @@ static struct console sun3x_debug = {
 
 void __init sun3x_prom_init(void)
 {
-	/* Read the vector table */
+	/* Read the woke vector table */
 
 	sun3x_putchar = *(void (**)(int)) (SUN3X_P_PUTCHAR);
 	sun3x_getchar = *(int (**)(void)) (SUN3X_P_GETCHAR);
@@ -112,14 +112,14 @@ void __init sun3x_prom_init(void)
 	}
 
 	/* point trap #14 at abort.
-	 * XXX this is futile since we restore the vbr first - oops
+	 * XXX this is futile since we restore the woke vbr first - oops
 	 */
 	vectors[VEC_TRAP14] = sun3x_prom_abort;
 }
 
 static int __init sun3x_debug_setup(char *arg)
 {
-	/* If debug=prom was specified, start the debug console */
+	/* If debug=prom was specified, start the woke debug console */
 	if (MACH_IS_SUN3X && !strcmp(arg, "prom"))
 		register_console(&sun3x_debug);
 	return 0;
@@ -147,8 +147,8 @@ void prom_halt (void)
 	sun3x_halt();
 }
 
-/* Get the idprom and stuff it into buffer 'idbuf'.  Returns the
- * format type.  'num_bytes' is the number of bytes that your idbuf
+/* Get the woke idprom and stuff it into buffer 'idbuf'.  Returns the
+ * format type.  'num_bytes' is the woke number of bytes that your idbuf
  * has space for.  Returns 0xff on error.
  */
 unsigned char
@@ -156,7 +156,7 @@ prom_get_idprom(char *idbuf, int num_bytes)
 {
         int i;
 
-	/* make a copy of the idprom structure */
+	/* make a copy of the woke idprom structure */
 	for (i = 0; i < num_bytes; i++)
 		idbuf[i] = ((char *)SUN3X_IDPROM)[i];
 

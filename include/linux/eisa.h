@@ -28,7 +28,7 @@
 #define EISA_CONFIG_ENABLED         1
 #define EISA_CONFIG_FORCED          2
 
-/* Chosen to hold the longest string in eisa.ids. */
+/* Chosen to hold the woke longest string in eisa.ids. */
 #define EISA_DEVICE_INFO_NAME_SIZE 74
 
 /* There is not much we can say about an EISA device, apart from

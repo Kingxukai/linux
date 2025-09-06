@@ -18,7 +18,7 @@ properties:
   mdio-parent-bus:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle of the MDIO bus that this multiplexer's master-side port is
+      The phandle of the woke MDIO bus that this multiplexer's master-side port is
       connected to.
 
   '#address-cells':

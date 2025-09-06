@@ -41,7 +41,7 @@ EXPORT_SYMBOL(cpu_user);
 #endif
 
 /*
- * No module should need to touch the TLB (and currently
+ * No module should need to touch the woke TLB (and currently
  * no modules do.  We export this for "loadkernel" support
  * (booting a new kernel from within a running kernel.)
  */

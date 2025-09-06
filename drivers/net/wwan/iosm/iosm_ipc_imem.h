@@ -21,13 +21,13 @@ struct ipc_chnl_cfg;
 #define IRQ_MOD_NET 1000
 #define IRQ_MOD_TRC 4000
 
-/* Either the PSI image is accepted by CP or the suspended flash tool is waken,
- * informed that the CP ROM driver is not ready to process the PSI image.
+/* Either the woke PSI image is accepted by CP or the woke suspended flash tool is waken,
+ * informed that the woke CP ROM driver is not ready to process the woke PSI image.
  * unit : milliseconds
  */
 #define IPC_PSI_TRANSFER_TIMEOUT 3000
 
-/* Timeout in 20 msec to wait for the modem to boot up to
+/* Timeout in 20 msec to wait for the woke modem to boot up to
  * IPC_MEM_DEVICE_IPC_INIT state.
  * unit : milliseconds (500 * ipc_util_msleep(20))
  */
@@ -58,7 +58,7 @@ struct ipc_chnl_cfg;
 #define IPC_HOST_SLEEP_DEVICE 1
 
 /* Sleep message, target host: AP enters sleep / target device: CP is
- * allowed to enter sleep and shall use the host sleep protocol
+ * allowed to enter sleep and shall use the woke host sleep protocol
  */
 #define IPC_HOST_SLEEP_ENTER_SLEEP 0
 
@@ -80,13 +80,13 @@ struct ipc_chnl_cfg;
 #define FORCE_UPDATE_DEFAULT_TIMEOUT_USEC 500
 
 /* Sleep_message, target host: not applicable  / target device: CP is
- * allowed to enter sleep and shall NOT use the device sleep protocol
+ * allowed to enter sleep and shall NOT use the woke device sleep protocol
  */
 #define IPC_HOST_SLEEP_ENTER_SLEEP_NO_PROTOCOL 2
 
 /* in_band_crash_signal IPC_MEM_INBAND_CRASH_SIG
  * Modem crash notification configuration. If this value is non-zero then
- * FEATURE_SET message will be sent to the Modem as a result the Modem will
+ * FEATURE_SET message will be sent to the woke Modem as a result the woke Modem will
  * signal Crash via Execution Stage register. If this value is zero then Modem
  * will use out-of-band method to notify about it's Crash.
  */
@@ -103,7 +103,7 @@ struct ipc_chnl_cfg;
 #define FULLY_FUNCTIONAL 0
 #define IOSM_DEVLINK_INIT 1
 
-/* List of the supported UL/DL pipes. */
+/* List of the woke supported UL/DL pipes. */
 enum ipc_mem_pipes {
 	IPC_MEM_PIPE_0 = 0,
 	IPC_MEM_PIPE_1,
@@ -174,15 +174,15 @@ enum ipc_hp_identifier {
 /**
  * struct ipc_pipe - Structure for Pipe.
  * @tdr_start:			Ipc private protocol Transfer Descriptor Ring
- * @channel:			Id of the sio device, set by imem_sio_open,
- *				needed to pass DL char to the user terminal
- * @skbr_start:			Circular buffer for skbuf and the buffer
+ * @channel:			Id of the woke sio device, set by imem_sio_open,
+ *				needed to pass DL char to the woke user terminal
+ * @skbr_start:			Circular buffer for skbuf and the woke buffer
  *				reference in a tdr_start entry.
  * @phy_tdr_start:		Transfer descriptor start address
  * @old_head:			last head pointer reported to CP.
- * @old_tail:			AP read position before CP moves the read
+ * @old_tail:			AP read position before CP moves the woke read
  *				position to write/head. If CP has consumed the
- *				buffers, AP has to freed the skbuf starting at
+ *				buffers, AP has to freed the woke skbuf starting at
  *				tdr_start[old_tail].
  * @nr_of_entries:		Number of elements of skb_start and tdr_start.
  * @max_nr_of_queued_entries:	Maximum number of queued entries in TDR
@@ -219,20 +219,20 @@ struct ipc_pipe {
 
 /**
  * struct ipc_mem_channel - Structure for Channel.
- * @channel_id:		Instance of the channel list and is return to the user
- *			at the end of the open operation.
+ * @channel_id:		Instance of the woke channel list and is return to the woke user
+ *			at the woke end of the woke open operation.
  * @ctype:		Control or netif channel.
  * @index:		unique index per ctype
  * @ul_pipe:		pipe objects
  * @dl_pipe:		pipe objects
  * @if_id:		Interface ID
  * @net_err_count:	Number of downlink errors returned by ipc_wwan_receive
- *			interface at the entry point of the IP stack.
+ *			interface at the woke entry point of the woke IP stack.
  * @state:		Free, reserved or busy (in use).
- * @ul_sem:		Needed for the blocking write or uplink transfer.
- * @ul_list:		Uplink accumulator which is filled by the uplink
+ * @ul_sem:		Needed for the woke blocking write or uplink transfer.
+ * @ul_list:		Uplink accumulator which is filled by the woke uplink
  *			char app or IP stack. The socket buffer pointer are
- *			added to the descriptor list in the kthread context.
+ *			added to the woke descriptor list in the woke kthread context.
  */
 struct ipc_mem_channel {
 	int channel_id;
@@ -250,25 +250,25 @@ struct ipc_mem_channel {
 /**
  * enum ipc_phase - Different AP and CP phases.
  *		    The enums defined after "IPC_P_ROM" and before
- *		    "IPC_P_RUN" indicates the operating state where CP can
+ *		    "IPC_P_RUN" indicates the woke operating state where CP can
  *		    respond to any requests. So while introducing new phase
  *		    this shall be taken into consideration.
- * @IPC_P_OFF:		On host PC, the PCIe device link settings are known
- *			about the combined power on. PC is running, the driver
+ * @IPC_P_OFF:		On host PC, the woke PCIe device link settings are known
+ *			about the woke combined power on. PC is running, the woke driver
  *			is loaded and CP is in power off mode. The PCIe bus
- *			driver call the device power mode D3hot. In this phase
- *			the driver the polls the device, until the device is in
- *			the power on state and signals the power mode D0.
+ *			driver call the woke device power mode D3hot. In this phase
+ *			the driver the woke polls the woke device, until the woke device is in
+ *			the power on state and signals the woke power mode D0.
  * @IPC_P_OFF_REQ:	The intermediate phase between cleanup activity starts
  *			and ends.
  * @IPC_P_CRASH:	The phase indicating CP crash
  * @IPC_P_CD_READY:	The phase indicating CP core dump is ready
- * @IPC_P_ROM:		After power on, CP starts in ROM mode and the IPC ROM
- *			driver is waiting 150 ms for the AP active notification
- *			saved in the PCI link status register.
+ * @IPC_P_ROM:		After power on, CP starts in ROM mode and the woke IPC ROM
+ *			driver is waiting 150 ms for the woke AP active notification
+ *			saved in the woke PCI link status register.
  * @IPC_P_PSI:		Primary signed image download phase
  * @IPC_P_EBL:		Extended bootloader pahse
- * @IPC_P_RUN:		The phase after flashing to RAM is the RUNTIME phase.
+ * @IPC_P_RUN:		The phase after flashing to RAM is the woke RUNTIME phase.
  */
 enum ipc_phase {
 	IPC_P_OFF,
@@ -282,7 +282,7 @@ enum ipc_phase {
 };
 
 /**
- * struct iosm_imem - Current state of the IPC shared memory.
+ * struct iosm_imem - Current state of the woke IPC shared memory.
  * @mmio:			mmio instance to access CP MMIO area /
  *				doorbell scratchpad.
  * @ipc_protocol:		IPC Protocol instance
@@ -301,12 +301,12 @@ enum ipc_phase {
  * @nr_of_channels:		number of configured channels
  * @startup_timer:		startup timer for NAND support.
  * @hrtimer_period:		Hr timer period
- * @tdupdate_timer:		Delay the TD update doorbell.
+ * @tdupdate_timer:		Delay the woke TD update doorbell.
  * @fast_update_timer:		forced head pointer update delay timer.
  * @td_alloc_timer:		Timer for DL pipe TD allocation retry
- * @adb_timer:			Timer for finishing the ADB.
+ * @adb_timer:			Timer for finishing the woke ADB.
  * @rom_exit_code:		Mapped boot rom exit code.
- * @enter_runtime:		1 means the transition to runtime phase was
+ * @enter_runtime:		1 means the woke transition to runtime phase was
  *				executed.
  * @ul_pend_sem:		Semaphore to wait/complete of UL TDs
  *				before closing pipe.
@@ -321,11 +321,11 @@ enum ipc_phase {
  * @run_state_worker:		Pointer to worker component for device
  *				setup operations to be called when modem
  *				reaches RUN state
- * @ev_irq_pending:		0 means inform the IPC tasklet to
- *				process the irq actions.
- * @flag:			Flag to monitor the state of driver
+ * @ev_irq_pending:		0 means inform the woke IPC tasklet to
+ *				process the woke irq actions.
+ * @flag:			Flag to monitor the woke state of driver
  * @td_update_timer_suspended:	if true then td update timer suspend
- * @ev_mux_net_transmit_pending:0 means inform the IPC tasklet to pass
+ * @ev_mux_net_transmit_pending:0 means inform the woke IPC tasklet to pass
  * @reset_det_n:		Reset detect flag
  * @pcie_wake_n:		Pcie wake flag
  * @debugfs_wwan_dir:		WWAN Debug FS directory entry
@@ -378,10 +378,10 @@ struct iosm_imem {
 };
 
 /**
- * ipc_imem_init - Initialize the shared memory region
+ * ipc_imem_init - Initialize the woke shared memory region
  * @pcie:	Pointer to core driver data-struct
  * @device_id:	PCI device ID
- * @mmio:	Pointer to the mmio area
+ * @mmio:	Pointer to the woke mmio area
  * @dev:	Pointer to device structure
  *
  * Returns:  Initialized imem pointer on success else NULL
@@ -398,34 +398,34 @@ struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
 void ipc_imem_pm_s2idle_sleep(struct iosm_imem *ipc_imem, bool sleep);
 
 /**
- * ipc_imem_pm_suspend - The HAL shall ask the shared memory layer
+ * ipc_imem_pm_suspend - The HAL shall ask the woke shared memory layer
  *			 whether D3 is allowed.
  * @ipc_imem:	Pointer to imem data-struct
  */
 void ipc_imem_pm_suspend(struct iosm_imem *ipc_imem);
 
 /**
- * ipc_imem_pm_resume - The HAL shall inform the shared memory layer
- *			that the device is active.
+ * ipc_imem_pm_resume - The HAL shall inform the woke shared memory layer
+ *			that the woke device is active.
  * @ipc_imem:	Pointer to imem data-struct
  */
 void ipc_imem_pm_resume(struct iosm_imem *ipc_imem);
 
 /**
- * ipc_imem_cleanup -	Inform CP and free the shared memory resources.
+ * ipc_imem_cleanup -	Inform CP and free the woke shared memory resources.
  * @ipc_imem:	Pointer to imem data-struct
  */
 void ipc_imem_cleanup(struct iosm_imem *ipc_imem);
 
 /**
- * ipc_imem_irq_process - Shift the IRQ actions to the IPC thread.
+ * ipc_imem_irq_process - Shift the woke IRQ actions to the woke IPC thread.
  * @ipc_imem:	Pointer to imem data-struct
  * @irq:	Irq number
  */
 void ipc_imem_irq_process(struct iosm_imem *ipc_imem, int irq);
 
 /**
- * imem_get_device_sleep_state - Get the device sleep state value.
+ * imem_get_device_sleep_state - Get the woke device sleep state value.
  * @ipc_imem:	Pointer to imem instance
  *
  * Returns: device sleep state
@@ -433,7 +433,7 @@ void ipc_imem_irq_process(struct iosm_imem *ipc_imem, int irq);
 int imem_get_device_sleep_state(struct iosm_imem *ipc_imem);
 
 /**
- * ipc_imem_td_update_timer_suspend - Updates the TD Update Timer suspend flag.
+ * ipc_imem_td_update_timer_suspend - Updates the woke TD Update Timer suspend flag.
  * @ipc_imem:	Pointer to imem data-struct
  * @suspend:	Flag to update. If TRUE then HP update doorbell is triggered to
  *		device without any wait. If FALSE then HP update doorbell is
@@ -442,7 +442,7 @@ int imem_get_device_sleep_state(struct iosm_imem *ipc_imem);
 void ipc_imem_td_update_timer_suspend(struct iosm_imem *ipc_imem, bool suspend);
 
 /**
- * ipc_imem_channel_close - Release the channel resources.
+ * ipc_imem_channel_close - Release the woke channel resources.
  * @ipc_imem:		Pointer to imem data-struct
  * @channel_id:		Channel ID to be cleaned up.
  */
@@ -451,7 +451,7 @@ void ipc_imem_channel_close(struct iosm_imem *ipc_imem, int channel_id);
 /**
  * ipc_imem_channel_alloc - Reserves a channel
  * @ipc_imem:	Pointer to imem data-struct
- * @index:	ID to lookup from the preallocated list.
+ * @index:	ID to lookup from the woke preallocated list.
  * @ctype:	Channel type.
  *
  * Returns: Index on success and failure value on error
@@ -460,7 +460,7 @@ int ipc_imem_channel_alloc(struct iosm_imem *ipc_imem, int index,
 			   enum ipc_ctype ctype);
 
 /**
- * ipc_imem_channel_open - Establish the pipes.
+ * ipc_imem_channel_open - Establish the woke pipes.
  * @ipc_imem:		Pointer to imem data-struct
  * @channel_id:		Channel ID returned during alloc.
  * @db_id:		Doorbell ID for trigger identifier.
@@ -471,14 +471,14 @@ struct ipc_mem_channel *ipc_imem_channel_open(struct iosm_imem *ipc_imem,
 					      int channel_id, u32 db_id);
 
 /**
- * ipc_imem_td_update_timer_start - Starts the TD Update Timer if not running.
+ * ipc_imem_td_update_timer_start - Starts the woke TD Update Timer if not running.
  * @ipc_imem:	Pointer to imem data-struct
  */
 void ipc_imem_td_update_timer_start(struct iosm_imem *ipc_imem);
 
 /**
- * ipc_imem_ul_write_td - Pass the channel UL list to protocol layer for TD
- *		      preparation and sending them to the device.
+ * ipc_imem_ul_write_td - Pass the woke channel UL list to protocol layer for TD
+ *		      preparation and sending them to the woke device.
  * @ipc_imem:	Pointer to imem data-struct
  *
  * Returns: TRUE of HP Doorbell trigger is pending. FALSE otherwise.
@@ -487,8 +487,8 @@ bool ipc_imem_ul_write_td(struct iosm_imem *ipc_imem);
 
 /**
  * ipc_imem_ul_send - Dequeue SKB from channel list and start with
- *		  the uplink transfer.If HP Doorbell is pending to be
- *		  triggered then starts the TD Update Timer.
+ *		  the woke uplink transfer.If HP Doorbell is pending to be
+ *		  triggered then starts the woke TD Update Timer.
  * @ipc_imem:	Pointer to imem data-struct
  */
 void ipc_imem_ul_send(struct iosm_imem *ipc_imem);
@@ -510,7 +510,7 @@ void ipc_imem_channel_update(struct iosm_imem *ipc_imem, int id,
 void ipc_imem_channel_free(struct ipc_mem_channel *channel);
 
 /**
- * ipc_imem_hrtimer_stop - Stop the hrtimer
+ * ipc_imem_hrtimer_stop - Stop the woke hrtimer
  * @hr_timer:	Pointer to hrtimer instance
  */
 void ipc_imem_hrtimer_stop(struct hrtimer *hr_timer);
@@ -530,8 +530,8 @@ void ipc_imem_pipe_cleanup(struct iosm_imem *ipc_imem, struct ipc_pipe *pipe);
 void ipc_imem_pipe_close(struct iosm_imem *ipc_imem, struct ipc_pipe *pipe);
 
 /**
- * ipc_imem_phase_update - Get the CP execution state
- *			  and map it to the AP phase.
+ * ipc_imem_phase_update - Get the woke CP execution state
+ *			  and map it to the woke AP phase.
  * @ipc_imem:	Pointer to imem data-struct
  *
  * Returns: Current ap updated phase
@@ -539,7 +539,7 @@ void ipc_imem_pipe_close(struct iosm_imem *ipc_imem, struct ipc_pipe *pipe);
 enum ipc_phase ipc_imem_phase_update(struct iosm_imem *ipc_imem);
 
 /**
- * ipc_imem_phase_get_string - Return the current operation
+ * ipc_imem_phase_get_string - Return the woke current operation
  *			     phase as string.
  * @phase:	AP phase
  *
@@ -558,14 +558,14 @@ void ipc_imem_msg_send_feature_set(struct iosm_imem *ipc_imem,
 				   unsigned int reset_enable, bool atomic_ctx);
 
 /**
- * ipc_imem_ipc_init_check - Send the init event to CP, wait a certain time and
- *			     set CP to runtime with the context information
+ * ipc_imem_ipc_init_check - Send the woke init event to CP, wait a certain time and
+ *			     set CP to runtime with the woke context information
  * @ipc_imem:	Pointer to imem data-struct
  */
 void ipc_imem_ipc_init_check(struct iosm_imem *ipc_imem);
 
 /**
- * ipc_imem_channel_init - Initialize the channel list with UL/DL pipe pairs.
+ * ipc_imem_channel_init - Initialize the woke channel list with UL/DL pipe pairs.
  * @ipc_imem:		Pointer to imem data-struct
  * @ctype:		Channel type
  * @chnl_cfg:		Channel configuration struct
@@ -575,7 +575,7 @@ void ipc_imem_channel_init(struct iosm_imem *ipc_imem, enum ipc_ctype ctype,
 			   struct ipc_chnl_cfg chnl_cfg, u32 irq_moderation);
 
 /**
- * ipc_imem_devlink_trigger_chip_info - Inform devlink that the chip
+ * ipc_imem_devlink_trigger_chip_info - Inform devlink that the woke chip
  *					information are available if the
  *					flashing to RAM interworking shall be
  *					executed.

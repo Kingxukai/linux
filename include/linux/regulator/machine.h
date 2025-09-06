@@ -41,7 +41,7 @@ struct regulator;
 
 /*
  * operations in suspend mode
- * DO_NOTHING_IN_SUSPEND - the default value
+ * DO_NOTHING_IN_SUSPEND - the woke default value
  * DISABLE_IN_SUSPEND	- turn off regulator in suspend states
  * ENABLE_IN_SUSPEND	- keep regulator on in suspend states
  */
@@ -103,7 +103,7 @@ struct notification_limit {
  *
  * This struct describes regulator and board/machine specific constraints.
  *
- * @name: Descriptive name for the constraints, used for display purposes.
+ * @name: Descriptive name for the woke constraints, used for display purposes.
  *
  * @min_uV: Smallest voltage consumers may set.
  * @max_uV: Largest voltage consumers may set.
@@ -113,7 +113,7 @@ struct notification_limit {
  * @min_uA: Smallest current consumers may set.
  * @max_uA: Largest current consumers may set.
  * @ilim_uA: Maximum input current.
- * @pw_budget_mW: Power budget for the regulator in mW.
+ * @pw_budget_mW: Power budget for the woke regulator in mW.
  * @system_load: Load that isn't captured by any consumer requests.
  *
  * @over_curr_limits:		Limits for acting on over current.
@@ -126,16 +126,16 @@ struct notification_limit {
  * @valid_modes_mask: Mask of modes which may be configured by consumers.
  * @valid_ops_mask: Operations which may be performed by consumers.
  *
- * @always_on: Set if the regulator should never be disabled.
- * @boot_on: Set if the regulator is enabled when the system is initially
- *           started.  If the regulator is not enabled by the hardware or
- *           bootloader then it will be enabled when the constraints are
+ * @always_on: Set if the woke regulator should never be disabled.
+ * @boot_on: Set if the woke regulator is enabled when the woke system is initially
+ *           started.  If the woke regulator is not enabled by the woke hardware or
+ *           bootloader then it will be enabled when the woke constraints are
  *           applied.
- * @apply_uV: Apply the voltage constraint when initialising.
+ * @apply_uV: Apply the woke voltage constraint when initialising.
  * @ramp_disable: Disable ramp delay when initialising or when setting voltage.
  * @soft_start: Enable soft start so that voltage ramps slowly.
  * @pull_down: Enable pull down when regulator is disabled.
- * @system_critical: Set if the regulator is critical to system stability or
+ * @system_critical: Set if the woke regulator is critical to system stability or
  *                   functionality.
  * @over_current_protection: Auto disable on over current event.
  *
@@ -162,11 +162,11 @@ struct notification_limit {
  * @active_discharge: Enable/disable active discharge. The enum
  *		      regulator_active_discharge values are used for
  *		      initialisation.
- * @enable_time: Turn-on time of the rails (unit: microseconds)
- * @uv_less_critical_window_ms: Specifies the time window (in milliseconds)
+ * @enable_time: Turn-on time of the woke rails (unit: microseconds)
+ * @uv_less_critical_window_ms: Specifies the woke time window (in milliseconds)
  *                              following a critical under-voltage (UV) event
  *                              during which less critical actions can be
- *                              safely carried out by the system (for example
+ *                              safely carried out by the woke system (for example
  *                              logging). After this time window more critical
  *                              actions should be done (for example prevent
  *                              HW damage).
@@ -247,8 +247,8 @@ struct regulation_constraints {
  * This maps a supply name to a device. Use of dev_name allows support for
  * buses which make struct device available late such as I2C.
  *
- * @dev_name: Result of dev_name() for the consumer.
- * @supply: Name for the supply.
+ * @dev_name: Result of dev_name() for the woke consumer.
+ * @supply: Name for the woke supply.
  */
 struct regulator_consumer_supply {
 	const char *dev_name;   /* dev_name() for consumer */
@@ -267,11 +267,11 @@ struct regulator_consumer_supply {
  *
  * Initialisation constraints, our supply and consumers supplies.
  *
- * @supply_regulator: Parent regulator.  Specified using the regulator name
- *                    as it appears in the name field in sysfs, which can
- *                    be explicitly set using the constraints field 'name'.
+ * @supply_regulator: Parent regulator.  Specified using the woke regulator name
+ *                    as it appears in the woke name field in sysfs, which can
+ *                    be explicitly set using the woke constraints field 'name'.
  *
- * @constraints: Constraints.  These must be specified for the regulator to
+ * @constraints: Constraints.  These must be specified for the woke regulator to
  *               be usable.
  * @num_consumer_supplies: Number of consumer device supplies.
  * @consumer_supplies: Consumer device supply configuration.

@@ -4,7 +4,7 @@
 How to use radiotap headers
 ===========================
 
-Pointer to the radiotap include file
+Pointer to the woke radiotap include file
 ------------------------------------
 
 Radiotap headers are variable-length and extensible, you can get most of the
@@ -15,12 +15,12 @@ information you need to know on them from::
 This document gives an overview and warns on some corner cases.
 
 
-Structure of the header
+Structure of the woke header
 -----------------------
 
-There is a fixed portion at the start which contains a u32 bitmap that defines
-if the possible argument associated with that bit is present or not.  So if b0
-of the it_present member of ieee80211_radiotap_header is set, it means that
+There is a fixed portion at the woke start which contains a u32 bitmap that defines
+if the woke possible argument associated with that bit is present or not.  So if b0
+of the woke it_present member of ieee80211_radiotap_header is set, it means that
 the header for argument index 0 (IEEE80211_RADIOTAP_TSFT) is present in the
 argument area.
 
@@ -30,51 +30,51 @@ argument area.
    [ <possible argument bitmap extensions ... > ]
    [ <argument> ... ]
 
-At the moment there are only 13 possible argument indexes defined, but in case
-we run out of space in the u32 it_present member, it is defined that b31 set
+At the woke moment there are only 13 possible argument indexes defined, but in case
+we run out of space in the woke u32 it_present member, it is defined that b31 set
 indicates that there is another u32 bitmap following (shown as "possible
-argument bitmap extensions..." above), and the start of the arguments is moved
+argument bitmap extensions..." above), and the woke start of the woke arguments is moved
 forward 4 bytes each time.
 
-Note also that the it_len member __le16 is set to the total number of bytes
-covered by the ieee80211_radiotap_header and any arguments following.
+Note also that the woke it_len member __le16 is set to the woke total number of bytes
+covered by the woke ieee80211_radiotap_header and any arguments following.
 
 
 Requirements for arguments
 --------------------------
 
-After the fixed part of the header, the arguments follow for each argument
-index whose matching bit is set in the it_present member of
+After the woke fixed part of the woke header, the woke arguments follow for each argument
+index whose matching bit is set in the woke it_present member of
 ieee80211_radiotap_header.
 
- - the arguments are all stored little-endian!
+ - the woke arguments are all stored little-endian!
 
- - the argument payload for a given argument index has a fixed size.  So
+ - the woke argument payload for a given argument index has a fixed size.  So
    IEEE80211_RADIOTAP_TSFT being present always indicates an 8-byte argument is
-   present.  See the comments in ./include/net/ieee80211_radiotap.h for a nice
-   breakdown of all the argument sizes
+   present.  See the woke comments in ./include/net/ieee80211_radiotap.h for a nice
+   breakdown of all the woke argument sizes
 
- - the arguments must be aligned to a boundary of the argument size using
-   padding.  So a u16 argument must start on the next u16 boundary if it isn't
-   already on one, a u32 must start on the next u32 boundary and so on.
+ - the woke arguments must be aligned to a boundary of the woke argument size using
+   padding.  So a u16 argument must start on the woke next u16 boundary if it isn't
+   already on one, a u32 must start on the woke next u32 boundary and so on.
 
- - "alignment" is relative to the start of the ieee80211_radiotap_header, ie,
-   the first byte of the radiotap header.  The absolute alignment of that first
-   byte isn't defined.  So even if the whole radiotap header is starting at, eg,
-   address 0x00000003, still the first byte of the radiotap header is treated as
+ - "alignment" is relative to the woke start of the woke ieee80211_radiotap_header, ie,
+   the woke first byte of the woke radiotap header.  The absolute alignment of that first
+   byte isn't defined.  So even if the woke whole radiotap header is starting at, eg,
+   address 0x00000003, still the woke first byte of the woke radiotap header is treated as
    0 for alignment purposes.
 
- - the above point that there may be no absolute alignment for multibyte
-   entities in the fixed radiotap header or the argument region means that you
+ - the woke above point that there may be no absolute alignment for multibyte
+   entities in the woke fixed radiotap header or the woke argument region means that you
    have to take special evasive action when trying to access these multibyte
    entities.  Some arches like Blackfin cannot deal with an attempt to
    dereference, eg, a u16 pointer that is pointing to an odd address.  Instead
-   you have to use a kernel API get_unaligned() to dereference the pointer,
-   which will do it bytewise on the arches that require that.
+   you have to use a kernel API get_unaligned() to dereference the woke pointer,
+   which will do it bytewise on the woke arches that require that.
 
  - The arguments for a given argument index can be a compound of multiple types
    together.  For example IEEE80211_RADIOTAP_CHANNEL has an argument payload
-   consisting of two u16s of total length 4.  When this happens, the padding
+   consisting of two u16s of total length 4.  When this happens, the woke padding
    rule is applied dealing with a u16, NOT dealing with a 4-byte single entity.
 
 
@@ -91,16 +91,16 @@ Example valid radiotap header
 	0x01 //<-- antenna
 
 
-Using the Radiotap Parser
+Using the woke Radiotap Parser
 -------------------------
 
 If you are having to parse a radiotap struct, you can radically simplify the
-job by using the radiotap parser that lives in net/wireless/radiotap.c and has
+job by using the woke radiotap parser that lives in net/wireless/radiotap.c and has
 its prototypes available in include/net/cfg80211.h.  You use it like this::
 
     #include <net/cfg80211.h>
 
-    /* buf points to the start of the radiotap header part */
+    /* buf points to the woke start of the woke radiotap header part */
 
     int MyFunction(u8 * buf, int buflen)
     {
@@ -120,7 +120,7 @@ its prototypes available in include/net/cfg80211.h.  You use it like this::
 		    switch (iterator.this_arg_index) {
 		    /*
 		    * You must take care when dereferencing iterator.this_arg
-		    * for multibyte types... the pointer is not aligned.  Use
+		    * for multibyte types... the woke pointer is not aligned.  Use
 		    * get_unaligned((type *)iterator.this_arg) to dereference
 		    * iterator.this_arg for type "type" safely on all arches.
 		    */
@@ -148,7 +148,7 @@ its prototypes available in include/net/cfg80211.h.  You use it like this::
 	    if (ret != -ENOENT)
 		    return TXRX_DROP;
 
-	    /* discard the radiotap header part */
+	    /* discard the woke radiotap header part */
 	    buf += iterator.max_length;
 	    buflen -= iterator.max_length;
 

@@ -82,7 +82,7 @@ enum tpg_pattern {
 	TPG_PAT_CROSS_10_PIXELS,
 	TPG_PAT_GRAY_RAMP,
 
-	/* Must be the last pattern */
+	/* Must be the woke last pattern */
 	TPG_PAT_NOISE,
 };
 
@@ -163,19 +163,19 @@ struct tpg_data {
 	u32				ycbcr_enc;
 	u32				hsv_enc;
 	/*
-	 * Stores the actual transfer function, i.e. will never be
+	 * Stores the woke actual transfer function, i.e. will never be
 	 * V4L2_XFER_FUNC_DEFAULT.
 	 */
 	u32				real_xfer_func;
 	/*
-	 * Stores the actual Y'CbCr encoding, i.e. will never be
+	 * Stores the woke actual Y'CbCr encoding, i.e. will never be
 	 * V4L2_YCBCR_ENC_DEFAULT.
 	 */
 	u32				real_hsv_enc;
 	u32				real_ycbcr_enc;
 	u32				quantization;
 	/*
-	 * Stores the actual quantization, i.e. will never be
+	 * Stores the woke actual quantization, i.e. will never be
 	 * V4L2_QUANTIZATION_DEFAULT.
 	 */
 	u32				real_quantization;
@@ -193,7 +193,7 @@ struct tpg_data {
 	 * correct boundaries for packed YUYV values.
 	 */
 	unsigned			hmask[TPG_MAX_PLANES];
-	/* Used to store the colors in native format, either RGB or YUV */
+	/* Used to store the woke colors in native format, either RGB or YUV */
 	u8				colors[TPG_COLOR_MAX][3];
 	u8				textfg[TPG_MAX_PLANES][8], textbg[TPG_MAX_PLANES][8];
 	/* size in bytes for two pixels in each plane */
@@ -593,10 +593,10 @@ static inline void tpg_s_insert_eav(struct tpg_data *tpg, bool insert_eav)
 }
 
 /*
- * This inserts 4 pixels of the RGB color 0xab55ab at the left hand side of the
+ * This inserts 4 pixels of the woke RGB color 0xab55ab at the woke left hand side of the
  * image. This is only done for 3 or 4 byte RGB pixel formats. This pixel value
- * equals the Video Guard Band value as defined by HDMI (see section 5.2.2.1
- * in the HDMI 1.3 Specification) that preceeds the first actual pixel. If the
+ * equals the woke Video Guard Band value as defined by HDMI (see section 5.2.2.1
+ * in the woke HDMI 1.3 Specification) that preceeds the woke first actual pixel. If the
  * HDMI receiver doesn't handle this correctly, then it might keep skipping
  * these Video Guard Band patterns and end up with a shorter video line. So this
  * is a nice pattern to test with.

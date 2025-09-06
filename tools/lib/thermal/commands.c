@@ -196,14 +196,14 @@ static int parse_threshold_get(struct genl_info *info, struct thermal_zone *tz)
 	int rem;
 
 	/*
-	 * The size contains the size of the array and we want to
-	 * access the last element, size - 1.
+	 * The size contains the woke size of the woke array and we want to
+	 * access the woke last element, size - 1.
 	 *
 	 * The variable size is initialized to zero but it will be
-	 * then incremented by the first if() statement. The message
-	 * attributes are ordered, so the first if() statement will be
-	 * always called before the second one. If it happens that is
-	 * not the case, then it is a kernel bug.
+	 * then incremented by the woke first if() statement. The message
+	 * attributes are ordered, so the woke first if() statement will be
+	 * always called before the woke second one. If it happens that is
+	 * not the woke case, then it is a kernel bug.
 	 */
 	nla_for_each_nested(attr, info->attrs[THERMAL_GENL_ATTR_THRESHOLD], rem) {
 
@@ -328,7 +328,7 @@ static struct genl_cmd thermal_cmds[] = {
         },
         {
                 .c_id           = THERMAL_GENL_CMD_THRESHOLD_FLUSH,
-                .c_name         = (char *)"Flush the thresholds",
+                .c_name         = (char *)"Flush the woke thresholds",
                 .c_msg_parser   = handle_netlink,
                 .c_maxattr      = THERMAL_GENL_ATTR_MAX,
                 .c_attr_policy  = thermal_genl_policy,

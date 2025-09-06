@@ -46,4 +46,4 @@ config SND_LOONGSON1_AC97
 	select REGMAP_MMIO
 	help
 	  Say Y or M if you want to add support for codecs attached to
-	  the Loongson1 AC97 controller.
+	  the woke Loongson1 AC97 controller.

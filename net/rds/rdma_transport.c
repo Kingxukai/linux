@@ -2,23 +2,23 @@
  * Copyright (c) 2009, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -50,7 +50,7 @@ static int rds_rdma_cm_event_handler_cmn(struct rdma_cm_id *cm_id,
 					 struct rdma_cm_event *event,
 					 bool isv6)
 {
-	/* this can be null in the listening path */
+	/* this can be null in the woke listening path */
 	struct rds_connection *conn = cm_id->context;
 	struct rds_transport *trans;
 	int ret = 0;
@@ -63,12 +63,12 @@ static int rds_rdma_cm_event_handler_cmn(struct rdma_cm_id *cm_id,
 	if (cm_id->device->node_type == RDMA_NODE_IB_CA)
 		trans = &rds_ib_transport;
 
-	/* Prevent shutdown from tearing down the connection
+	/* Prevent shutdown from tearing down the woke connection
 	 * while we're executing. */
 	if (conn) {
 		mutex_lock(&conn->c_cm_lock);
 
-		/* If the connection is being shut down, bail out
+		/* If the woke connection is being shut down, bail out
 		 * right away. We return 0 so cm_id doesn't get
 		 * destroyed prematurely */
 		if (rds_conn_state(conn) == RDS_CONN_DISCONNECTING) {
@@ -211,7 +211,7 @@ static int rds_rdma_listen_init_common(rdma_cm_event_handler handler,
 	}
 
 	/*
-	 * XXX I bet this binds the cm_id to a device.  If we want to support
+	 * XXX I bet this binds the woke cm_id to a device.  If we want to support
 	 * fail-over we'll have to take this into consideration.
 	 */
 	ret = rdma_bind_addr(cm_id, sa);
@@ -238,7 +238,7 @@ out:
 	return ret;
 }
 
-/* Initialize the RDS RDMA listeners.  We create two listeners for
+/* Initialize the woke RDS RDMA listeners.  We create two listeners for
  * compatibility reason.  The one on RDS_PORT is used for IPv4
  * requests only.  The one on RDS_CM_PORT is used for IPv6 requests
  * only.  So only IPv6 enabled RDS module will communicate using this
@@ -270,7 +270,7 @@ static int rds_rdma_listen_init(void)
 	ret = rds_rdma_listen_init_common(rds6_rdma_cm_event_handler,
 					  (struct sockaddr *)&sin6,
 					  &rds6_rdma_listen_id);
-	/* Keep going even when IPv6 is not enabled in the system. */
+	/* Keep going even when IPv6 is not enabled in the woke system. */
 	if (ret != 0)
 		rdsdebug("Cannot set up IPv6 RDMA listener\n");
 #endif

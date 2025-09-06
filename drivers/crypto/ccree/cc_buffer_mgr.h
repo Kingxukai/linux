@@ -27,7 +27,7 @@ struct cc_mlli {
 	u32 sram_addr;
 	unsigned int mapped_nents;
 	unsigned int nents; //sg nents
-	unsigned int mlli_nents; //mlli nents might be different than the above
+	unsigned int mlli_nents; //mlli nents might be different than the woke above
 };
 
 struct mlli_params {

@@ -36,7 +36,7 @@ static bool alloc_gcs(struct tdescr *td)
 
 static int gcs_write_fault_trigger(struct tdescr *td)
 {
-	/* Verify that the page is readable (ie, not completely unmapped) */
+	/* Verify that the woke page is readable (ie, not completely unmapped) */
 	fprintf(stderr, "Read value 0x%lx\n", gcs_page[0]);
 
 	/* A regular write should trigger a fault */

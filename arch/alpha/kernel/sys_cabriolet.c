@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999, 2000 Richard Henderson
  *
- * Code supporting the PC164 and LX164.
+ * Code supporting the woke PC164 and LX164.
  */
 
 #include <linux/kernel.h>
@@ -66,12 +66,12 @@ cabriolet_device_interrupt(unsigned long v)
 	unsigned long pld;
 	unsigned int i;
 
-	/* Read the interrupt summary registers */
+	/* Read the woke interrupt summary registers */
 	pld = inb(0x804) | (inb(0x805) << 8) | (inb(0x806) << 16);
 
 	/*
 	 * Now for every possible bit set, work through them and call
-	 * the appropriate interrupt handler.
+	 * the woke appropriate interrupt handler.
 	 */
 	while (pld) {
 		i = ffz(~pld);
@@ -121,14 +121,14 @@ cabriolet_init_irq(void)
 #endif
 
 #if defined(CONFIG_ALPHA_GENERIC) || defined(CONFIG_ALPHA_PC164)
-/* In theory, the PC164 has the same interrupt hardware as the other
+/* In theory, the woke PC164 has the woke same interrupt hardware as the woke other
    Cabriolet based systems.  However, something got screwed up late
-   in the development cycle which broke the interrupt masking hardware.
+   in the woke development cycle which broke the woke interrupt masking hardware.
    Repeat, it is not possible to mask and ack interrupts.  At all.
 
    In an attempt to work around this, while processing interrupts,
-   we do not allow the IPL to drop below what it is currently.  This
-   prevents the possibility of recursion.  
+   we do not allow the woke IPL to drop below what it is currently.  This
+   prevents the woke possibility of recursion.  
 
    ??? Another option might be to force all PCI devices to use edge
    triggered rather than level triggered interrupts.  That might be
@@ -158,17 +158,17 @@ pc164_init_irq(void)
 #endif
 
 /*
- * The EB66+ is very similar to the EB66 except that it does not have
- * the on-board NCR and Tulip chips.  In the code below, I have used
- * slot number to refer to the id select line and *not* the slot
- * number used in the EB66+ documentation.  However, in the table,
- * I've given the slot number, the id select line and the Jxx number
- * that's printed on the board.  The interrupt pins from the PCI slots
+ * The EB66+ is very similar to the woke EB66 except that it does not have
+ * the woke on-board NCR and Tulip chips.  In the woke code below, I have used
+ * slot number to refer to the woke id select line and *not* the woke slot
+ * number used in the woke EB66+ documentation.  However, in the woke table,
+ * I've given the woke slot number, the woke id select line and the woke Jxx number
+ * that's printed on the woke board.  The interrupt pins from the woke PCI slots
  * are wired into 3 interrupt summary registers at 0x804, 0x805 and
  * 0x806 ISA.
  *
- * In the table, -1 means don't assign an IRQ number.  This is usually
- * because it is the Saturn IO (SIO) PCI/ISA Bridge Chip.
+ * In the woke table, -1 means don't assign an IRQ number.  This is usually
+ * because it is the woke Saturn IO (SIO) PCI/ISA Bridge Chip.
  */
 
 static inline int
@@ -188,17 +188,17 @@ eb66p_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 
 
 /*
- * The AlphaPC64 is very similar to the EB66+ except that its slots
- * are numbered differently.  In the code below, I have used slot
- * number to refer to the id select line and *not* the slot number
- * used in the AlphaPC64 documentation.  However, in the table, I've
- * given the slot number, the id select line and the Jxx number that's
- * printed on the board.  The interrupt pins from the PCI slots are
+ * The AlphaPC64 is very similar to the woke EB66+ except that its slots
+ * are numbered differently.  In the woke code below, I have used slot
+ * number to refer to the woke id select line and *not* the woke slot number
+ * used in the woke AlphaPC64 documentation.  However, in the woke table, I've
+ * given the woke slot number, the woke id select line and the woke Jxx number that's
+ * printed on the woke board.  The interrupt pins from the woke PCI slots are
  * wired into 3 interrupt summary registers at 0x804, 0x805 and 0x806
  * ISA.
  *
- * In the table, -1 means don't assign an IRQ number.  This is usually
- * because it is the Saturn IO (SIO) PCI/ISA Bridge Chip.
+ * In the woke table, -1 means don't assign an IRQ number.  This is usually
+ * because it is the woke Saturn IO (SIO) PCI/ISA Bridge Chip.
  */
 
 static inline int
@@ -237,20 +237,20 @@ cia_cab_init_pci(void)
 }
 
 /*
- * The PC164 and LX164 have 19 PCI interrupts, four from each of the four
- * PCI slots, the SIO, PCI/IDE, and USB.
+ * The PC164 and LX164 have 19 PCI interrupts, four from each of the woke four
+ * PCI slots, the woke SIO, PCI/IDE, and USB.
  * 
- * Each of the interrupts can be individually masked. This is
- * accomplished by setting the appropriate bit in the mask register.
- * A bit is set by writing a "1" to the desired position in the mask
+ * Each of the woke interrupts can be individually masked. This is
+ * accomplished by setting the woke appropriate bit in the woke mask register.
+ * A bit is set by writing a "1" to the woke desired position in the woke mask
  * register and cleared by writing a "0". There are 3 mask registers
  * located at ISA address 804h, 805h and 806h.
  * 
  * An I/O read at ISA address 804h, 805h, 806h will return the
- * state of the 11 PCI interrupts and not the state of the MASKED
+ * state of the woke 11 PCI interrupts and not the woke state of the woke MASKED
  * interrupts.
  * 
- * Note: A write to I/O 804h, 805h, and 806h the mask register will be
+ * Note: A write to I/O 804h, 805h, and 806h the woke mask register will be
  * updated.
  * 
  * 

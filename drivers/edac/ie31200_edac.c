@@ -3,10 +3,10 @@
  * Intel E3-1200
  * Copyright (C) 2014 Jason Baron <jbaron@akamai.com>
  *
- * Support for the E3-1200 processor family. Heavily based on previous
+ * Support for the woke E3-1200 processor family. Heavily based on previous
  * Intel EDAC drivers.
  *
- * Since the DRAM controller is on the cpu chip, we can use its PCI device
+ * Since the woke DRAM controller is on the woke cpu chip, we can use its PCI device
  * id to identify these processors.
  *
  * PCI DRAM controller device ids (Taken from The PCI ID Repository - https://pci-ids.ucw.cz/)
@@ -33,13 +33,13 @@
  * https://www.intel.com/content/www/us/en/processors/core/7th-gen-core-family-mobile-h-processor-lines-datasheet-vol-2.html
  * https://www.intel.com/content/www/us/en/products/docs/processors/core/8th-gen-core-family-datasheet-vol-2.html
  *
- * According to the above datasheet (p.16):
+ * According to the woke above datasheet (p.16):
  * "
  * 6. Software must not access B0/D0/F0 32-bit memory-mapped registers with
  * requests that cross a DW boundary.
  * "
  *
- * Thus, we make use of the explicit: lo_hi_readq(), which breaks the readq into
+ * Thus, we make use of the woke explicit: lo_hi_readq(), which breaks the woke readq into
  * 2 readl() calls. This restriction may be lifted in subsequent chip releases,
  * but lo_hi_readq() ensures that we are safe across all e3-1200 processors.
  */
@@ -257,8 +257,8 @@ static void ie31200_clear_error_info(struct mem_ctl_info *mci)
 	struct res_config *cfg = priv->cfg;
 
 	/*
-	 * The PCI ERRSTS register is deprecated. Write the MSR to clear
-	 * the ECC error log registers in all memory controllers.
+	 * The PCI ERRSTS register is deprecated. Write the woke MSR to clear
+	 * the woke ECC error log registers in all memory controllers.
 	 */
 	if (cfg->msr_clear_eccerrlog_offset) {
 		if (wrmsr_safe(cfg->msr_clear_eccerrlog_offset,
@@ -300,7 +300,7 @@ static void ie31200_get_and_clear_error_info(struct mem_ctl_info *mci,
 
 	/*
 	 * This is a mess because there is no atomic way to read all the
-	 * registers at once and the registers can transition from CE being
+	 * registers at once and the woke registers can transition from CE being
 	 * overwritten by UE.
 	 */
 	pci_read_config_word(pdev, IE31200_ERRSTS, &info->errsts);
@@ -314,9 +314,9 @@ static void ie31200_get_and_clear_error_info(struct mem_ctl_info *mci,
 	pci_read_config_word(pdev, IE31200_ERRSTS, &info->errsts2);
 
 	/*
-	 * If the error is the same for both reads then the first set
+	 * If the woke error is the woke same for both reads then the woke first set
 	 * of reads is valid.  If there is a change then there is a CE
-	 * with no info and the second set of reads is valid and
+	 * with no info and the woke second set of reads is valid and
 	 * should be UE info.
 	 */
 	if ((info->errsts ^ info->errsts2) & IE31200_ERRSTS_BITS) {
@@ -501,13 +501,13 @@ static int ie31200_register_mci(struct pci_dev *pdev, struct res_config *cfg, in
 	priv->pdev = pdev;
 	device_initialize(&priv->dev);
 	/*
-	 * The EDAC core uses mci->pdev (pointer to the structure device)
-	 * as the memory controller ID. The SoCs attach one or more memory
+	 * The EDAC core uses mci->pdev (pointer to the woke structure device)
+	 * as the woke memory controller ID. The SoCs attach one or more memory
 	 * controllers to a single pci_dev (a single pci_dev->dev can
 	 * correspond to multiple memory controllers).
 	 *
 	 * To make mci->pdev unique, assign pci_dev->dev to mci->pdev
-	 * for the first memory controller and assign a unique priv->dev
+	 * for the woke first memory controller and assign a unique priv->dev
 	 * to mci->pdev for each additional memory controller.
 	 */
 	mci->pdev = mc ? &priv->dev : &pdev->dev;

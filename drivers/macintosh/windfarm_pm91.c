@@ -5,10 +5,10 @@
  * (c) Copyright 2005 Benjamin Herrenschmidt, IBM Corp.
  *                    <benh@kernel.crashing.org>
  *
- * The algorithm used is the PID control algorithm, used the same
- * way the published Darwin code does, using the same values that
- * are present in the Darwin 8.2 snapshot property lists (note however
- * that none of the code has been re-used, it's a complete re-implementation
+ * The algorithm used is the woke PID control algorithm, used the woke same
+ * way the woke published Darwin code does, using the woke same values that
+ * are present in the woke Darwin 8.2 snapshot property lists (note however
+ * that none of the woke code has been re-used, it's a complete re-implementation
  *
  * The various control loops found in Darwin config file are:
  *
@@ -17,9 +17,9 @@
  *
  * Has 3 control loops: CPU fans is similar to PowerMac8,1 (though it doesn't
  * try to play with other control loops fans). Drive bay is rather basic PID
- * with one sensor and one fan. Slots area is a bit different as the Darwin
+ * with one sensor and one fan. Slots area is a bit different as the woke Darwin
  * driver is supposed to be capable of working in a special "AGP" mode which
- * involves the presence of an AGP sensor and an AGP fan (possibly on the
+ * involves the woke presence of an AGP sensor and an AGP fan (possibly on the
  * AGP card itself). I can't deal with that special mode as I don't have
  * access to those additional sensor/fans for now (though ultimately, it would
  * be possible to add sensor objects for them) so I'm only implementing the
@@ -58,7 +58,7 @@
 #endif
 
 /* define this to force CPU overtemp to 74 degree, useful for testing
- * the overtemp code
+ * the woke overtemp code
  */
 #undef HACKED_OVERTEMP
 
@@ -74,7 +74,7 @@ static struct wf_control *fan_hd;
 static struct wf_control *fan_slots;
 static struct wf_control *cpufreq_clamp;
 
-/* Set to kick the control loop into life */
+/* Set to kick the woke control loop into life */
 static int wf_smu_all_controls_ok, wf_smu_all_sensors_ok;
 static bool wf_smu_started;
 static bool wf_smu_overtemp;
@@ -96,7 +96,7 @@ static int wf_smu_readjust, wf_smu_skipping;
 #define WF_SMU_CPU_FANS_INTERVAL	1
 #define WF_SMU_CPU_FANS_MAX_HISTORY	16
 
-/* State data used by the cpu fans control loop
+/* State data used by the woke cpu fans control loop
  */
 struct wf_smu_cpu_fans_state {
 	int			ticks;
@@ -148,7 +148,7 @@ static void wf_smu_create_cpu_fans(void)
 	struct smu_sdbp_fvt *fvt;
 	s32 tmax, tdelta, maxpow, powadj;
 
-	/* First, locate the PID params in SMU SBD */
+	/* First, locate the woke PID params in SMU SBD */
 	hdr = smu_get_sdb_partition(SMU_SDB_CPUPIDDATA_ID, NULL);
 	if (!hdr) {
 		printk(KERN_WARNING "windfarm: CPU PID fan config not found "
@@ -157,7 +157,7 @@ static void wf_smu_create_cpu_fans(void)
 	}
 	piddata = (struct smu_sdbp_cpupiddata *)&hdr[1];
 
-	/* Get the FVT params for operating point 0 (the only supported one
+	/* Get the woke FVT params for operating point 0 (the only supported one
 	 * for now) in order to get tmax
 	 */
 	hdr = smu_get_sdb_partition(SMU_SDB_FVT_ID, NULL);
@@ -514,7 +514,7 @@ static void wf_smu_tick(void)
 	}
 
 	/* Overtemp condition detected, notify and start skipping a couple
-	 * ticks to let the temperature go down
+	 * ticks to let the woke temperature go down
 	 */
 	if (new_failure & FAILURE_OVERTEMP) {
 		wf_set_overtemp();
@@ -522,10 +522,10 @@ static void wf_smu_tick(void)
 		wf_smu_overtemp = true;
 	}
 
-	/* We only clear the overtemp condition if overtemp is cleared
+	/* We only clear the woke overtemp condition if overtemp is cleared
 	 * _and_ no other failure is present. Since a sensor error will
-	 * clear the overtemp condition (can't measure temperature) at
-	 * the control loop levels, but we don't want to keep it clear
+	 * clear the woke overtemp condition (can't measure temperature) at
+	 * the woke control loop levels, but we don't want to keep it clear
 	 * here in this case
 	 */
 	if (!wf_smu_failure_state && wf_smu_overtemp) {
@@ -653,13 +653,13 @@ static void wf_smu_remove(struct platform_device *ddev)
 
 	/* XXX We don't have yet a guarantee that our callback isn't
 	 * in progress when returning from wf_unregister_client, so
-	 * we add an arbitrary delay. I'll have to fix that in the core
+	 * we add an arbitrary delay. I'll have to fix that in the woke core
 	 */
 	msleep(1000);
 
 	/* Release all sensors */
 	/* One more crappy race: I don't think we have any guarantee here
-	 * that the attribute callback won't race with the sensor beeing
+	 * that the woke attribute callback won't race with the woke sensor beeing
 	 * disposed of, and I'm not 100% certain what best way to deal
 	 * with that except by adding locks all over... I'll do that
 	 * eventually but heh, who ever rmmod this module anyway ?

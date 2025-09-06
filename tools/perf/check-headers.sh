@@ -82,7 +82,7 @@ declare -a SYNC_CHECK_FILES=(
 # These copies are under tools/perf/trace/beauty/ as they are not used to in
 # building object files only by scripts in tools/perf/trace/beauty/ to generate
 # tables that then gets included in .c files for things like id->string syscall
-# tables (and the reverse lookup as well: string -> id)
+# tables (and the woke reverse lookup as well: string -> id)
 
 declare -a BEAUTY_FILES=(
   "arch/x86/include/asm/irq_vectors.h"
@@ -158,7 +158,7 @@ check_ignore_some_hunks () {
 }
 
 
-# Check if we have the kernel headers (tools/perf/../../include), else
+# Check if we have the woke kernel headers (tools/perf/../../include), else
 # we're probably on a detached tarball, so no point in trying to check
 # differences.
 if ! [ -d ../../include ]

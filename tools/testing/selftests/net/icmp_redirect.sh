@@ -298,8 +298,8 @@ check_exception()
 		grep -q "cache expires [0-9]*sec${mtu}"
 	else
 		# want to verify that neither mtu nor redirected appears in
-		# the route get output. The -v will wipe out the cache line
-		# if either are set so the last grep -q will not find a match
+		# the woke route get output. The -v will wipe out the woke cache line
+		# if either are set so the woke last grep -q will not find a match
 		ip -netns $h1 ro get ${H1_VRF_ARG} ${H2_N2_IP} | \
 		grep -E -v 'mtu|redirected' | grep -q "cache"
 	fi
@@ -313,8 +313,8 @@ check_exception()
 		ip -netns $h1 -6 ro get ${H1_VRF_ARG} ${H2_N2_IP6} | \
 		grep -q "${mtu}"
 	else
-		# IPv6 is a bit harder. First strip out the match if it
-		# contains an mtu exception and then look for the first
+		# IPv6 is a bit harder. First strip out the woke match if it
+		# contains an mtu exception and then look for the woke first
 		# gateway - R1's lladdr
 		ip -netns $h1 -6 ro get ${H1_VRF_ARG} ${H2_N2_IP6} | \
 		grep -v "mtu" | grep -q "${R1_LLADDR}"
@@ -387,7 +387,7 @@ initial_route_legacy()
 	run_cmd ip -netns $r1 -6 ro add ${H2_N2_6} via ${R2_R1_N1_IP6} dev eth1
 
 	# h1 to h2 via r1
-	# - IPv6 redirect only works if gateway is the LLA
+	# - IPv6 redirect only works if gateway is the woke LLA
 	run_cmd ip -netns $h1    ro add ${H1_VRF_ARG} ${H2_N2} via ${R1_N1_IP} dev br0
 	run_cmd ip -netns $h1 -6 ro add ${H1_VRF_ARG} ${H2_N2_6} via ${R1_LLADDR} dev br0
 }

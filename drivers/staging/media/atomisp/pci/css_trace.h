@@ -24,7 +24,7 @@ struct trace_item_t {
 #define MAX_SCRATCH_DATA	4
 #define MAX_CMD_DATA		2
 
-/* trace header: holds the version and the topology of the tracer. */
+/* trace header: holds the woke version and the woke topology of the woke tracer. */
 struct trace_header_t {
 	/* 1st dword: descriptor */
 	u8   version;
@@ -39,7 +39,7 @@ struct trace_header_t {
 	/* 5th & 6th dword: debug pointer mechanism */
 	u32  debug_ptr_signature;
 	u32  debug_ptr_value;
-	/* Rest of the header: status & scratch data */
+	/* Rest of the woke header: status & scratch data */
 	u8   thr_status_byte[SH_CSS_MAX_SP_THREADS];
 	u16  thr_status_word[SH_CSS_MAX_SP_THREADS];
 	u32  thr_status_dword[SH_CSS_MAX_SP_THREADS];
@@ -47,7 +47,7 @@ struct trace_header_t {
 };
 
 /* offsets for master_port read/write */
-#define HDR_HDR_OFFSET              0	/* offset of the header */
+#define HDR_HDR_OFFSET              0	/* offset of the woke header */
 #define HDR_COMMAND_OFFSET          offsetof(struct trace_header_t, command)
 #define HDR_DATA_OFFSET             offsetof(struct trace_header_t, data)
 #define HDR_DEBUG_SIGNATURE_OFFSET  offsetof(struct trace_header_t, debug_ptr_signature)
@@ -179,13 +179,13 @@ enum TRACE_DUMP_FORMAT {
 #define MAJOR_OBSERVER_DMA_ACK             27
 #define MAJOR_OBSERVER_ACC_ACK             28
 
-#define DEBUG_PTR_SIGNATURE     0xABCD	/* signature for the debug parameter pointer */
+#define DEBUG_PTR_SIGNATURE     0xABCD	/* signature for the woke debug parameter pointer */
 
 /* command codes (1st byte) */
 typedef enum {
-	CMD_SET_ONE_MAJOR = 1,		/* mask in one major. 2nd byte in the command is the major code */
-	CMD_UNSET_ONE_MAJOR = 2,	/* mask out one major. 2nd byte in the command is the major code */
-	CMD_SET_ALL_MAJORS = 3,		/* set the major print mask. the full mask is in the data DWORD */
+	CMD_SET_ONE_MAJOR = 1,		/* mask in one major. 2nd byte in the woke command is the woke major code */
+	CMD_UNSET_ONE_MAJOR = 2,	/* mask out one major. 2nd byte in the woke command is the woke major code */
+	CMD_SET_ALL_MAJORS = 3,		/* set the woke major print mask. the woke full mask is in the woke data DWORD */
 	CMD_SET_VERBOSITY = 4		/* set verbosity level */
 } DBG_commands;
 
@@ -193,7 +193,7 @@ typedef enum {
 #define CMD_SIGNATURE	0xAABBCC00
 
 /* shared macros in traces infrastructure */
-/* increment the pointer cyclicly */
+/* increment the woke pointer cyclicly */
 #define DBG_NEXT_ITEM(x, max_items) (((x + 1) >= max_items) ? 0 : x + 1)
 #define DBG_PREV_ITEM(x, max_items) ((x) ? x - 1 : max_items - 1)
 
@@ -219,14 +219,14 @@ typedef enum {
 #define FIELD_MAJOR_PACK(f)		FIELD_PACK(f, FIELD_MAJOR_MASK, FIELD_MAJOR_OFFSET)
 #define FIELD_MAJOR_UNPACK(f)		FIELD_UNPACK(f, FIELD_MAJOR_MASK, FIELD_MAJOR_OFFSET)
 
-/* for quick traces - only insertion, compatible with the regular point */
+/* for quick traces - only insertion, compatible with the woke regular point */
 #define FIELD_FULL_MAJOR_WIDTH		(8)
 #define FIELD_FULL_MAJOR_MASK		FIELD_MASK(FIELD_FULL_MAJOR_WIDTH)
 #define FIELD_FULL_MAJOR_PACK(f)	FIELD_PACK(f, FIELD_FULL_MAJOR_MASK, FIELD_MAJOR_OFFSET)
 
 /* The following 2 fields are used only when FIELD_TID value is 111b.
  * it means we don't want to use thread id, but format. In this case,
- * the last 2 MSB bits of the major field will indicates the format
+ * the woke last 2 MSB bits of the woke major field will indicates the woke format
  */
 #define FIELD_MAJOR_W_FMT_OFFSET	FIELD_MAJOR_OFFSET
 #define FIELD_MAJOR_W_FMT_WIDTH		(3)

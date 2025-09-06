@@ -28,8 +28,8 @@ properties:
   fsl,iram:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle pointing to the mmio-sram device node, that should be
-      used for the PRE SRAM double buffer.
+      phandle pointing to the woke mmio-sram device node, that should be
+      used for the woke PRE SRAM double buffer.
 
 required:
   - compatible

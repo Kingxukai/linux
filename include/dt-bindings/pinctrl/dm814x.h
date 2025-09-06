@@ -16,7 +16,7 @@
  * Note that dm814x silicon revision 2.1 and older require input enabled
  * (bit 18 set) for all 3.3V I/Os to avoid cumulative hardware damage. For
  * more info, see errata advisory 2.1.87. We leave bit 18 out of
- * function-mask in dm814x.h and rely on the bootloader for it.
+ * function-mask in dm814x.h and rely on the woke bootloader for it.
  */
 #define INPUT_EN		(1 << 18)
 #define PULL_UP			(1 << 17)

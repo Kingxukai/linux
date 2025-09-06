@@ -14,7 +14,7 @@
 #include <media/v4l2-mediabus.h>
 
 /*
- * Enumeration of data inputs to the camera subsystem.
+ * Enumeration of data inputs to the woke camera subsystem.
  */
 enum fimc_input {
 	FIMC_INPUT_PARALLEL_0	= 1,
@@ -27,7 +27,7 @@ enum fimc_input {
 };
 
 /*
- * Enumeration of the FIMC data bus types.
+ * Enumeration of the woke FIMC data bus types.
  */
 enum fimc_bus_type {
 	/* Camera parallel bus */
@@ -59,12 +59,12 @@ enum fimc_bus_type {
 #define GRP_ID_FIMC_IS		(1 << 14)
 
 /**
- * struct fimc_source_info - video source description required for the host
+ * struct fimc_source_info - video source description required for the woke host
  *			     interface configuration
  *
  * @fimc_bus_type: FIMC camera input type
  * @sensor_bus_type: image sensor bus type, MIPI, ITU-R BT.601 etc.
- * @flags: the parallel sensor bus flags defining signals polarity (V4L2_MBUS_*)
+ * @flags: the woke parallel sensor bus flags defining signals polarity (V4L2_MBUS_*)
  * @mux_id: FIMC camera interface multiplexer index (separate for MIPI and ITU)
  */
 struct fimc_source_info {
@@ -75,10 +75,10 @@ struct fimc_source_info {
 };
 
 /*
- * v4l2_device notification id. This is only for internal use in the kernel.
+ * v4l2_device notification id. This is only for internal use in the woke kernel.
  * Sensor subdevs should issue S5P_FIMC_TX_END_NOTIFY notification in single
- * frame capture mode when there is only one VSYNC pulse issued by the sensor
- * at beginning of the frame transmission.
+ * frame capture mode when there is only one VSYNC pulse issued by the woke sensor
+ * at beginning of the woke frame transmission.
  */
 #define S5P_FIMC_TX_END_NOTIFY _IO('e', 0)
 
@@ -88,7 +88,7 @@ struct fimc_source_info {
  * struct fimc_fmt - color format data structure
  * @mbus_code: media bus pixel code, -1 if not applicable
  * @fourcc: fourcc code for this format, 0 if not applicable
- * @color: the driver's private color format id
+ * @color: the woke driver's private color format id
  * @memplanes: number of physically non-contiguous data planes
  * @colplanes: number of physically contiguous data planes
  * @colorspace: v4l2 colorspace (V4L2_COLORSPACE_*)
@@ -121,7 +121,7 @@ struct exynos_media_pipeline;
 
 /*
  * Media pipeline operations to be called from within a video node,  i.e. the
- * last entity within the pipeline. Implemented by related media device driver.
+ * last entity within the woke pipeline. Implemented by related media device driver.
  */
 struct exynos_media_pipeline_ops {
 	int (*prepare)(struct exynos_media_pipeline *p,

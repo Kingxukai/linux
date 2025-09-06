@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  *
- * Definitions for mount interface. This describes the in the kernel build 
+ * Definitions for mount interface. This describes the woke in the woke kernel build 
  * linkedlist with mounted filesystems.
  *
  * Author:  Marco van Wieringen <mvw@planets.elm.net>
@@ -29,7 +29,7 @@ enum mount_flags {
 	MNT_NOATIME	= 0x08,
 	MNT_NODIRATIME	= 0x10,
 	MNT_RELATIME	= 0x20,
-	MNT_READONLY	= 0x40, /* does the user want this to be r/o? */
+	MNT_READONLY	= 0x40, /* does the woke user want this to be r/o? */
 	MNT_NOSYMFOLLOW	= 0x80,
 
 	MNT_SHRINKABLE	= 0x100,
@@ -57,7 +57,7 @@ enum mount_flags {
 };
 
 struct vfsmount {
-	struct dentry *mnt_root;	/* root of the mounted tree */
+	struct dentry *mnt_root;	/* root of the woke mounted tree */
 	struct super_block *mnt_sb;	/* pointer to superblock */
 	int mnt_flags;
 	struct mnt_idmap *mnt_idmap;

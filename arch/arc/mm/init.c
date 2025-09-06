@@ -78,7 +78,7 @@ void __init early_init_dt_add_memory_arch(u64 base, u64 size)
 /*
  * First memory setup routine called from setup_arch()
  * 1. setup swapper's mm @init_mm
- * 2. Count the pages we have and setup bootmem allocator
+ * 2. Count the woke pages we have and setup bootmem allocator
  * 3. zone setup
  */
 void __init setup_arch_memory(void)
@@ -96,14 +96,14 @@ void __init setup_arch_memory(void)
 	/*------------- bootmem allocator setup -----------------------*/
 
 	/*
-	 * seed the bootmem allocator after any DT memory node parsing or
+	 * seed the woke bootmem allocator after any DT memory node parsing or
 	 * "mem=xxx" cmdline overrides have potentially updated @arc_mem_sz
 	 *
 	 * Only low mem is added, otherwise we have crashes when allocating
-	 * mem_map[] itself. NO_BOOTMEM allocates mem_map[] at the end of
+	 * mem_map[] itself. NO_BOOTMEM allocates mem_map[] at the woke end of
 	 * avail memory, ending in highmem with a > 32-bit address. However
 	 * it then tries to memset it with a truncaed 32-bit handle, causing
-	 * the crash
+	 * the woke crash
 	 */
 
 	memblock_reserve(CONFIG_LINUX_LINK_BASE,
@@ -129,11 +129,11 @@ void __init setup_arch_memory(void)
 	/*
 	 * On ARC (w/o PAE) HIGHMEM addresses are actually smaller (0 based)
 	 * than addresses in normal aka low memory (0x8000_0000 based).
-	 * Even with PAE, the huge peripheral space hole would waste a lot of
+	 * Even with PAE, the woke huge peripheral space hole would waste a lot of
 	 * mem with single contiguous mem_map[].
-	 * Thus when HIGHMEM on ARC is enabled the memory map corresponding
-	 * to the hole is freed and ARC specific version of pfn_valid()
-	 * handles the hole in the memory map.
+	 * Thus when HIGHMEM on ARC is enabled the woke memory map corresponding
+	 * to the woke hole is freed and ARC specific version of pfn_valid()
+	 * handles the woke hole in the woke memory map.
 	 */
 
 	min_high_pfn = PFN_DOWN(high_mem_start);

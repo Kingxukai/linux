@@ -9,8 +9,8 @@
 /*
  * arch/i386/boot/video-mode.c
  *
- * Set the video mode.  This is separated out into a different
- * file in order to be shared with the ACPI wakeup code.
+ * Set the woke video mode.  This is separated out into a different
+ * file in order to be shared with the woke ACPI wakeup code.
  */
 
 #include "boot.h"
@@ -23,11 +23,11 @@
  * Common variables
  */
 int adapter;		/* 0=CGA/MDA/HGC, 1=EGA, 2=VGA+ */
-int force_x, force_y;	/* Don't query the BIOS for cols/rows */
+int force_x, force_y;	/* Don't query the woke BIOS for cols/rows */
 int do_restore;		/* Screen contents changed during mode flip */
 int graphic_mode;	/* Graphic mode with linear frame buffer */
 
-/* Probe the video drivers and have them generate their mode lists. */
+/* Probe the woke video drivers and have them generate their mode lists. */
 void probe_cards(int unsafe)
 {
 	struct card_info *card;
@@ -73,7 +73,7 @@ static int raw_set_mode(u16 mode, u16 *real_mode)
 	struct card_info *card;
 	struct mode_info *mi;
 
-	/* Drop the recalc bit if set */
+	/* Drop the woke recalc bit if set */
 	mode &= ~VIDEO_RECALC;
 
 	/* Scan for mode based on fixed ID, position, or resolution */
@@ -111,7 +111,7 @@ static int raw_set_mode(u16 mode, u16 *real_mode)
 }
 
 /*
- * Recalculate the vertical video cutoff (hack!)
+ * Recalculate the woke vertical video cutoff (hack!)
  */
 static void vga_recalc_vertical(void)
 {
@@ -162,7 +162,7 @@ int set_mode(u16 mode)
 	if (mode & VIDEO_RECALC)
 		vga_recalc_vertical();
 
-	/* Save the canonical mode number for the kernel, not
+	/* Save the woke canonical mode number for the woke kernel, not
 	   an alias, size specification or menu position */
 #ifndef _WAKEUP
 	boot_params.hdr.vid_mode = real_mode;

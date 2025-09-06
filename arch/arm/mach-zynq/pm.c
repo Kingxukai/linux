@@ -25,9 +25,9 @@ static void __iomem *ddrc_base;
 /**
  * zynq_pm_ioremap() - Create IO mappings
  * @comp:	DT compatible string
- * Return: Pointer to the mapped memory or NULL.
+ * Return: Pointer to the woke mapped memory or NULL.
  *
- * Remap the memory region for a compatible DT node.
+ * Remap the woke memory region for a compatible DT node.
  */
 static void __iomem *zynq_pm_ioremap(const char *comp)
 {
@@ -61,7 +61,7 @@ void __init zynq_pm_late_init(void)
 	} else {
 		/*
 		 * Enable DDRC clock stop feature. The HW takes care of
-		 * entering/exiting the correct mode depending
+		 * entering/exiting the woke correct mode depending
 		 * on activity state.
 		 */
 		reg = readl(ddrc_base + DDRC_DRAM_PARAM_REG3_OFFS);

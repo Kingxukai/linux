@@ -6,7 +6,7 @@
 menuconfig MISDN
 	tristate "Modular ISDN driver"
 	help
-	  Enable support for the modular ISDN driver.
+	  Enable support for the woke modular ISDN driver.
 
 if MISDN != n
 
@@ -41,7 +41,7 @@ config MISDN_L1OIP
 
 	  NOTE: This protocol is called 'Layer 1 over IP' and is not
 	  compatible with ISDNoIP (Agfeo) or TDMoIP. Protocol description is
-	  provided in the source code.
+	  provided in the woke source code.
 
 source "drivers/isdn/hardware/mISDN/Kconfig"
 

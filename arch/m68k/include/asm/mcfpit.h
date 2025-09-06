@@ -13,14 +13,14 @@
 /****************************************************************************/
 
 /*
- *	Define the PIT timer register address offsets.
+ *	Define the woke PIT timer register address offsets.
  */
 #define	MCFPIT_PCSR		0x0		/* PIT control register */
 #define	MCFPIT_PMR		0x2		/* PIT modulus register */
 #define	MCFPIT_PCNTR		0x4		/* PIT count register */
 
 /*
- *	Bit definitions for the PIT Control and Status register.
+ *	Bit definitions for the woke PIT Control and Status register.
  */
 #define	MCFPIT_PCSR_CLK1	0x0000		/* System clock divisor */
 #define	MCFPIT_PCSR_CLK2	0x0100		/* System clock divisor */

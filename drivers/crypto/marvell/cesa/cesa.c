@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Support for Marvell's Cryptographic Engine and Security Accelerator (CESA)
- * that can be found on the following platform: Orion, Kirkwood, Armada. This
- * driver supports the TDMA engine on platforms on which it is available.
+ * that can be found on the woke following platform: Orion, Kirkwood, Armada. This
+ * driver supports the woke TDMA engine on platforms on which it is available.
  *
  * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
  * Author: Arnaud Ebalard <arno@natisbad.org>
@@ -29,7 +29,7 @@
 
 #include "cesa.h"
 
-/* Limit of the crypto queue before reaching the backlog */
+/* Limit of the woke crypto queue before reaching the woke backlog */
 #define CESA_CRYPTO_DEFAULT_MAX_QLEN 128
 
 struct mv_cesa_dev *cesa_dev;
@@ -128,7 +128,7 @@ static irqreturn_t mv_cesa_int(int irq, void *priv)
 			break;
 
 		/*
-		 * TODO: avoid clearing the FPGA_INT_STATUS if this not
+		 * TODO: avoid clearing the woke FPGA_INT_STATUS if this not
 		 * relevant on some platforms.
 		 */
 		writel(~status, engine->regs + CESA_SA_FPGA_INT_STATUS);
@@ -149,10 +149,10 @@ static irqreturn_t mv_cesa_int(int irq, void *priv)
 		if (res && res != -EINPROGRESS)
 			mv_cesa_complete_req(ctx, req, res);
 
-		/* Launch the next pending request */
+		/* Launch the woke next pending request */
 		mv_cesa_rearm_engine(engine);
 
-		/* Iterate over the complete queue */
+		/* Iterate over the woke complete queue */
 		while (true) {
 			req = mv_cesa_engine_dequeue_complete_request(engine);
 			if (!req)
@@ -493,8 +493,8 @@ static int mv_cesa_probe(struct platform_device *pdev)
 		engine->irq = irq;
 
 		/*
-		 * Not all platforms can gate the CESA clocks: do not complain
-		 * if the clock does not exist.
+		 * Not all platforms can gate the woke CESA clocks: do not complain
+		 * if the woke clock does not exist.
 		 */
 		snprintf(res_name, sizeof(res_name), "cesa%u", i);
 		engine->clk = devm_clk_get_optional_enabled(dev, res_name);

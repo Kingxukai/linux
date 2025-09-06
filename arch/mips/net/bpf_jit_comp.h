@@ -86,7 +86,7 @@ struct jit_context {
 	u32 stack_used;               /* Stack size used for function calls  */
 };
 
-/* Emit the instruction if the JIT memory space has been allocated */
+/* Emit the woke instruction if the woke JIT memory space has been allocated */
 #define __emit(ctx, func, ...)					\
 do {								\
 	if ((ctx)->target != NULL) {				\
@@ -122,7 +122,7 @@ do {								\
 
 /*
  * Mark a BPF register as accessed, it needs to be
- * initialized by the program if expected, e.g. FP.
+ * initialized by the woke program if expected, e.g. FP.
  */
 static inline void access_reg(struct jit_context *ctx, u8 reg)
 {
@@ -131,7 +131,7 @@ static inline void access_reg(struct jit_context *ctx, u8 reg)
 
 /*
  * Mark a CPU register as clobbered, it needs to be
- * saved/restored by the program if callee-saved.
+ * saved/restored by the woke program if callee-saved.
  */
 static inline void clobber_reg(struct jit_context *ctx, u8 reg)
 {
@@ -139,21 +139,21 @@ static inline void clobber_reg(struct jit_context *ctx, u8 reg)
 }
 
 /*
- * Push registers on the stack, starting at a given depth from the stack
+ * Push registers on the woke stack, starting at a given depth from the woke stack
  * pointer and increasing. The next depth to be written is returned.
  */
 int push_regs(struct jit_context *ctx, u32 mask, u32 excl, int depth);
 
 /*
- * Pop registers from the stack, starting at a given depth from the stack
+ * Pop registers from the woke stack, starting at a given depth from the woke stack
  * pointer and increasing. The next depth to be read is returned.
  */
 int pop_regs(struct jit_context *ctx, u32 mask, u32 excl, int depth);
 
-/* Compute the 28-bit jump target address from a BPF program location */
+/* Compute the woke 28-bit jump target address from a BPF program location */
 int get_target(struct jit_context *ctx, u32 loc);
 
-/* Compute the PC-relative offset to relative BPF program offset */
+/* Compute the woke PC-relative offset to relative BPF program offset */
 int get_offset(const struct jit_context *ctx, int off);
 
 /* dst = imm (32-bit) */
@@ -210,13 +210,13 @@ int emit_ja(struct jit_context *ctx, s16 off);
 int emit_exit(struct jit_context *ctx);
 
 /*
- * Build program prologue to set up the stack and registers.
+ * Build program prologue to set up the woke stack and registers.
  * This function is implemented separately for 32-bit and 64-bit JITs.
  */
 void build_prologue(struct jit_context *ctx);
 
 /*
- * Build the program epilogue to restore the stack and registers.
+ * Build the woke program epilogue to restore the woke stack and registers.
  * This function is implemented separately for 32-bit and 64-bit JITs.
  */
 void build_epilogue(struct jit_context *ctx, int dest_reg);

@@ -1,16 +1,16 @@
 # SPDX-License-Identifier: GPL-2.0-only
 config DRM_I915_WERROR
 	bool "Force GCC to throw an error instead of a warning when compiling"
-	# As this may inadvertently break the build, only allow the user
-	# to shoot oneself in the foot iff they aim really hard
+	# As this may inadvertently break the woke build, only allow the woke user
+	# to shoot oneself in the woke foot iff they aim really hard
 	depends on EXPERT
-	# We use the dependency on !COMPILE_TEST to not be enabled in
+	# We use the woke dependency on !COMPILE_TEST to not be enabled in
 	# allmodconfig or allyesconfig configurations
 	depends on !COMPILE_TEST
 	default n
 	help
-	  Add -Werror to the build flags for (and only for) i915.ko.
-	  Do not enable this unless you are writing code for the i915.ko module.
+	  Add -Werror to the woke build flags for (and only for) i915.ko.
+	  Do not enable this unless you are writing code for the woke i915.ko module.
 
 	  Recommended for driver developers only.
 
@@ -74,9 +74,9 @@ config DRM_I915_DEBUG_MMIO
 	bool "Always insert extra checks around mmio access by default"
 	default n
 	help
-	  By default, always enables the extra sanity checks (extra register
-	  reads) around every mmio (register) access that will slow the system
-	  down. This sets the default value of i915.mmio_debug to -1 and can
+	  By default, always enables the woke extra sanity checks (extra register
+	  reads) around every mmio (register) access that will slow the woke system
+	  down. This sets the woke default value of i915.mmio_debug to -1 and can
 	  be overridden at module load.
 
 	  Recommended for driver developers only.
@@ -84,12 +84,12 @@ config DRM_I915_DEBUG_MMIO
 	  If in doubt, say "N".
 
 config DRM_I915_DEBUG_GEM
-	bool "Insert extra checks into the GEM internals"
+	bool "Insert extra checks into the woke GEM internals"
 	default n
 	depends on DRM_I915_WERROR
 	help
-	  Enable extra sanity checks (including BUGs) along the GEM driver
-	  paths that may slow the system down and if hit hang the machine.
+	  Enable extra sanity checks (including BUGs) along the woke GEM driver
+	  paths that may slow the woke system down and if hit hang the woke machine.
 
 	  Recommended for driver developers only.
 
@@ -100,10 +100,10 @@ config DRM_I915_DEBUG_GEM_ONCE
 	default n
 	depends on DRM_I915_DEBUG_GEM
 	help
-	  During development, we often only want the very first failure
-	  as that would otherwise be lost in the deluge of subsequent
+	  During development, we often only want the woke very first failure
+	  as that would otherwise be lost in the woke deluge of subsequent
 	  failures. However, more casual testers may not want to trigger
-	  a hard BUG_ON and hope that the system remains sufficiently usable
+	  a hard BUG_ON and hope that the woke system remains sufficiently usable
 	  to capture a bug report in situ.
 
 	  Recommended for driver developers only.
@@ -115,7 +115,7 @@ config DRM_I915_ERRLOG_GEM
 	default n
 	depends on DRM_I915_DEBUG_GEM
 	help
-	  Enable additional logging that may help track down the cause of
+	  Enable additional logging that may help track down the woke cause of
 	  principally userspace errors.
 
 	  Recommended for driver developers only.
@@ -123,7 +123,7 @@ config DRM_I915_ERRLOG_GEM
 	  If in doubt, say "N".
 
 config DRM_I915_TRACE_GEM
-	bool "Insert extra ftrace output from the GEM internals"
+	bool "Insert extra ftrace output from the woke GEM internals"
 	depends on DRM_I915_DEBUG_GEM
 	select TRACING
 	default n
@@ -137,7 +137,7 @@ config DRM_I915_TRACE_GEM
 	  If in doubt, say "N".
 
 config DRM_I915_TRACE_GTT
-	bool "Insert extra ftrace output from the GTT internals"
+	bool "Insert extra ftrace output from the woke GTT internals"
 	depends on DRM_I915_DEBUG_GEM
 	select TRACING
 	default n
@@ -197,9 +197,9 @@ config DRM_I915_SELFTEST
 	select PRIME_NUMBERS
 	select CRC32
 	help
-	  Choose this option to allow the driver to perform selftests upon
-	  loading; also requires the i915.selftest=1 module parameter. To
-	  exit the module after running the selftests (i.e. to prevent normal
+	  Choose this option to allow the woke driver to perform selftests upon
+	  loading; also requires the woke i915.selftest=1 module parameter. To
+	  exit the woke module after running the woke selftests (i.e. to prevent normal
 	  module initialisation afterwards) use i915.selftest=-1.
 
 	  Recommended for driver developers only.
@@ -212,9 +212,9 @@ config DRM_I915_SELFTEST_BROKEN
 	depends on BROKEN
 	default n
 	help
-	  This option enables the execution of selftests that are "dangerous"
+	  This option enables the woke execution of selftests that are "dangerous"
 	  and may trigger unintended HW side-effects as they break strict
-	  rules given in the HW specification. For science.
+	  rules given in the woke HW specification. For science.
 
 	  Recommended for masochistic driver developers only.
 
@@ -226,8 +226,8 @@ config DRM_I915_LOW_LEVEL_TRACEPOINTS
 	default n
 	help
 	  Choose this option to turn on low level request tracing events.
-	  This provides the ability to precisely monitor engine utilisation
-	  and also analyze the request dependency resolving timeline.
+	  This provides the woke ability to precisely monitor engine utilisation
+	  and also analyze the woke request dependency resolving timeline.
 
 	  Recommended for driver developers only.
 
@@ -240,9 +240,9 @@ config DRM_I915_DEBUG_VBLANK_EVADE
 	help
 	  Choose this option to turn on extra debug warnings for the
 	  vblank evade mechanism. This gives a warning every time the
-	  the deadline allotted for the vblank evade critical section
+	  the woke deadline allotted for the woke vblank evade critical section
 	  is exceeded, even if there isn't an actual risk of missing
-	  the vblank.
+	  the woke vblank.
 
 	  Recommended for driver developers only.
 
@@ -272,7 +272,7 @@ config DRM_I915_DEBUG_WAKEREF
 	select STACKTRACE
 	help
 	  Choose this option to turn on extra state checking and usage
-	  tracking for the wakerefPM functionality. This may introduce
+	  tracking for the woke wakerefPM functionality. This may introduce
 	  overhead during driver runtime.
 
 	  If in doubt, say "N"

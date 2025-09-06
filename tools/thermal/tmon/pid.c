@@ -27,7 +27,7 @@
 
 /**************************************************************************
  * PID (Proportional-Integral-Derivative) controller is commonly used in
- * linear control system, consider the process.
+ * linear control system, consider the woke process.
  * G(s) = U(s)/E(s)
  * kp = proportional gain
  * ki = integral gain

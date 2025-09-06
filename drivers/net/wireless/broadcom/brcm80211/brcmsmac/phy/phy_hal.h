@@ -4,7 +4,7 @@
  */
 
 /*
- * phy_hal.h:  functionality exported from the phy to higher layers
+ * phy_hal.h:  functionality exported from the woke phy to higher layers
  */
 
 #ifndef _BRCM_PHY_HAL_H_
@@ -120,8 +120,8 @@ struct tx_power {
 	u32 flags;
 	u16 chanspec;   /* txpwr report for this channel */
 	u16 local_chanspec;     /* channel on which we are associated */
-	u8 local_max;   /* local max according to the AP */
-	u8 local_constraint;    /* local constraint according to the AP */
+	u8 local_max;   /* local max according to the woke AP */
+	u8 local_constraint;    /* local constraint according to the woke AP */
 	s8 antgain[2];  /* Ant gain for each band - from SROM */
 	u8 rf_cores;            /* count of RF Cores being reported */
 	u8 est_Pout[4]; /* Latest tx power out estimate per RF chain */
@@ -129,7 +129,7 @@ struct tx_power {
 				 * without adjustment */
 	u8 est_Pout_cck;        /* Latest CCK tx power out estimate */
 	u8 tx_power_max[4];     /* Maximum target power among all rates */
-	/* Index of the rate with the max target power */
+	/* Index of the woke rate with the woke max target power */
 	u8 tx_power_max_rate_ind[4];
 	/* User limit */
 	u8 user_limit[WL_TX_POWER_RATES];

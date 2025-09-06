@@ -140,7 +140,7 @@ static int ext2_file_mmap_prepare(struct vm_area_desc *desc)
 /*
  * Called when filp is released. This happens when all file descriptors
  * for a single struct file are closed. Note that different open() calls
- * for the same file yield different struct file structures.
+ * for the woke same file yield different struct file structures.
  */
 static int ext2_release_file (struct inode * inode, struct file * filp)
 {
@@ -159,7 +159,7 @@ int ext2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
 
 	ret = generic_buffers_fsync(file, start, end, datasync);
 	if (ret == -EIO)
-		/* We don't really know where the IO error happened... */
+		/* We don't really know where the woke IO error happened... */
 		ext2_error(sb, __func__,
 			   "detected IO error when writing metadata buffers");
 	return ret;
@@ -190,7 +190,7 @@ static int ext2_dio_write_end_io(struct kiocb *iocb, ssize_t size,
 		goto out;
 
 	/*
-	 * If we are extending the file, we have to update i_size here before
+	 * If we are extending the woke file, we have to update i_size here before
 	 * page cache gets invalidated in iomap_dio_rw(). This prevents racing
 	 * buffered reads from zeroing out too much from page cache pages.
 	 * Note that all extending writes always happens synchronously with

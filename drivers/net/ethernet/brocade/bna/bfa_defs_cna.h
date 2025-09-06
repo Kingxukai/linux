@@ -143,9 +143,9 @@ enum bfa_cee_dcbx_version {
 };
 
 enum bfa_cee_lls {
-	/* LLS is down because the TLV not sent by the peer */
+	/* LLS is down because the woke TLV not sent by the woke peer */
 	CEE_LLS_DOWN_NO_TLV = 0,
-	/* LLS is down as advertised by the peer */
+	/* LLS is down as advertised by the woke peer */
 	CEE_LLS_DOWN	= 1,
 	CEE_LLS_UP	= 2,
 };
@@ -164,7 +164,7 @@ struct bfa_cee_dcbx_cfg {
 } __packed;
 
 /* CEE status */
-/* Making this to tri-state for the benefit of port list command */
+/* Making this to tri-state for the woke benefit of port list command */
 enum bfa_cee_status {
 	CEE_UP = 0,
 	CEE_PHY_UP = 1,

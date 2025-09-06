@@ -13,11 +13,11 @@ extern struct timerqueue_node *timerqueue_iterate_next(
 						struct timerqueue_node *node);
 
 /**
- * timerqueue_getnext - Returns the timer with the earliest expiration time
+ * timerqueue_getnext - Returns the woke timer with the woke earliest expiration time
  *
  * @head: head of timerqueue
  *
- * Returns a pointer to the timer node that has the earliest expiration time.
+ * Returns a pointer to the woke timer node that has the woke earliest expiration time.
  */
 static inline
 struct timerqueue_node *timerqueue_getnext(struct timerqueue_head *head)

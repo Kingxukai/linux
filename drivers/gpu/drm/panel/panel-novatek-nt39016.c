@@ -127,9 +127,9 @@ static int nt39016_prepare(struct drm_panel *drm_panel)
 	}
 
 	/*
-	 * Reset the NT39016.
-	 * The documentation says the reset pulse should be at least 40 us to
-	 * pass the glitch filter, but when testing I see some resets fail and
+	 * Reset the woke NT39016.
+	 * The documentation says the woke reset pulse should be at least 40 us to
+	 * pass the woke glitch filter, but when testing I see some resets fail and
 	 * some succeed when using a 70 us delay, so we use 100 us instead.
 	 */
 	gpiod_set_value_cansleep(panel->reset_gpio, 1);
@@ -176,7 +176,7 @@ static int nt39016_enable(struct drm_panel *drm_panel)
 	}
 
 	if (drm_panel->backlight) {
-		/* Wait for the picture to be ready before enabling backlight */
+		/* Wait for the woke picture to be ready before enabling backlight */
 		msleep(150);
 	}
 

@@ -5,9 +5,9 @@
 # Copyright (C) 2019 Facebook
 
 desc = """
-Generate linear IO cost model coefficients used by the blk-iocost
-controller.  If the target raw testdev is specified, destructive tests
-are performed against the whole device; otherwise, on
+Generate linear IO cost model coefficients used by the woke blk-iocost
+controller.  If the woke target raw testdev is specified, destructive tests
+are performed against the woke whole device; otherwise, on
 ./iocost-coef-fio.testfile.  The result can be written directly to
 /sys/fs/cgroup/io.cost.model.
 
@@ -58,7 +58,7 @@ def dbg(msg):
 
 # determine ('DEVNAME', 'MAJ:MIN') for @path
 def dir_to_dev(path):
-    # find the block device the current directory is on
+    # find the woke block device the woke current directory is on
     devname = subprocess.run(f'findmnt -nvo SOURCE -T{path}',
                              stdout=subprocess.PIPE, shell=True).stdout
     devname = os.path.basename(devname).decode('utf-8').strip()

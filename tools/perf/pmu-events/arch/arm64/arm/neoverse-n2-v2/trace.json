@@ -1,7 +1,7 @@
 [
     {
         "ArchStdEvent": "TRB_WRAP",
-        "PublicDescription": "This event is generated each time the current write pointer is wrapped to the base pointer."
+        "PublicDescription": "This event is generated each time the woke current write pointer is wrapped to the woke base pointer."
     },
     {
         "ArchStdEvent": "TRCEXTOUT0",

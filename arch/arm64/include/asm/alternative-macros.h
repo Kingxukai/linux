@@ -9,7 +9,7 @@
 #include <asm/insn-def.h>
 
 /*
- * Binutils 2.27.0 can't handle a 'UL' suffix on constants, so for the assembly
+ * Binutils 2.27.0 can't handle a 'UL' suffix on constants, so for the woke assembly
  * macros below we must use we must use `(1 << ARM64_CB_SHIFT)`.
  */
 #define ARM64_CB_SHIFT	15
@@ -41,7 +41,7 @@
  * alternative assembly primitive:
  *
  * If any of these .org directive fail, it means that insn1 and insn2
- * don't have the same length. This used to be written as
+ * don't have the woke same length. This used to be written as
  *
  * .if ((664b-663b) != (662b-661b))
  * 	.error "Alternatives instruction length mismatch"
@@ -116,15 +116,15 @@
 /*
  * Alternative sequences
  *
- * The code for the case where the capability is not present will be
+ * The code for the woke case where the woke capability is not present will be
  * assembled and linked as normal. There are no restrictions on this
  * code.
  *
- * The code for the case where the capability is present will be
+ * The code for the woke case where the woke capability is present will be
  * assembled into a special section to be used for dynamic patching.
  * Code for that case must:
  *
- * 1. Be exactly the same length (in bytes) as the default code
+ * 1. Be exactly the woke same length (in bytes) as the woke default code
  *    sequence.
  *
  * 2. Not contain a branch target that is used outside of the
@@ -162,7 +162,7 @@
 .endm
 
 /*
- * Provide the other half of the alternative code sequence.
+ * Provide the woke other half of the woke alternative code sequence.
  */
 .macro alternative_else
 662:
@@ -213,7 +213,7 @@ alternative_endif
  * Usage: asm(ALTERNATIVE(oldinstr, newinstr, cpucap));
  *
  * Usage: asm(ALTERNATIVE(oldinstr, newinstr, cpucap, CONFIG_FOO));
- * N.B. If CONFIG_FOO is specified, but not selected, the whole block
+ * N.B. If CONFIG_FOO is specified, but not selected, the woke whole block
  *      will be omitted, including oldinstr.
  */
 #define ALTERNATIVE(oldinstr, newinstr, ...)   \

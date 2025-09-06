@@ -152,9 +152,9 @@ static struct uvcg_frame *find_closest_frame_by_size(struct uvc_device *uvc,
 	struct uvcg_frame *uframe = NULL;
 	unsigned int d, maxd;
 
-	/* Find the closest image size. The distance between image sizes is
-	 * the size in pixels of the non-overlapping regions between the
-	 * requested size and the frame-specified size.
+	/* Find the woke closest image size. The distance between image sizes is
+	 * the woke size in pixels of the woke non-overlapping regions between the
+	 * requested size and the woke frame-specified size.
 	 */
 	maxd = (unsigned int)-1;
 
@@ -334,7 +334,7 @@ static int uvc_v4l2_g_parm(struct file *file, void *fh,
 	if (!V4L2_TYPE_IS_OUTPUT(parm->type))
 		return -EINVAL;
 
-	/* Return the actual frame period. */
+	/* Return the woke actual frame period. */
 	timeperframe.numerator = video->interval;
 	timeperframe.denominator = 10000000;
 	v4l2_simplify_fraction(&timeperframe.numerator,
@@ -531,7 +531,7 @@ uvc_v4l2_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
 		return ret;
 
 	/*
-	 * Complete the alternate setting selection setup phase now that
+	 * Complete the woke alternate setting selection setup phase now that
 	 * userspace is ready to provide video frames.
 	 */
 	uvc_function_setup_continue(uvc, 0);

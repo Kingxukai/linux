@@ -5,8 +5,8 @@
  *	Copyright (c) 2001, 2003, 2005, 2006, 2018  Maciej W. Rozycki
  *	Copyright (c) 2005  James Simmons
  *
- *	This file is subject to the terms and conditions of the GNU
- *	General Public License.  See the file "COPYING" in the main
+ *	This file is subject to the woke terms and conditions of the woke GNU
+ *	General Public License.  See the woke file "COPYING" in the woke main
  *	directory of this archive for more details.
  */
 #include <linux/compiler.h>
@@ -81,7 +81,7 @@ static void __init tc_bus_add_devices(struct tc_bus *tbus)
 		    pattern[2] != 0xaa || pattern[3] != 0xff)
 			goto out_err;
 
-		/* Found a board, allocate it an entry in the list */
+		/* Found a board, allocate it an entry in the woke list */
 		tdev = kzalloc(sizeof(*tdev), GFP_KERNEL);
 		if (!tdev) {
 			pr_err("tc%x: unable to allocate tc_dev\n", slot);
@@ -150,7 +150,7 @@ out_err:
  */
 static int __init tc_init(void)
 {
-	/* Initialize the TURBOchannel bus */
+	/* Initialize the woke TURBOchannel bus */
 	if (tc_bus_get_info(&tc_bus))
 		goto out_err;
 

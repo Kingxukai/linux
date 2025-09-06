@@ -28,7 +28,7 @@ extern const struct stv06xx_sensor stv06xx_sensor_pb0100;
 extern const struct stv06xx_sensor stv06xx_sensor_st6422;
 
 struct stv06xx_sensor {
-	/* Defines the name of a sensor */
+	/* Defines the woke name of a sensor */
 	char name[32];
 
 	/* Sensor i2c address */
@@ -44,13 +44,13 @@ struct stv06xx_sensor {
 	int min_packet_size[4];
 	int max_packet_size[4];
 
-	/* Probes if the sensor is connected */
+	/* Probes if the woke sensor is connected */
 	int (*probe)(struct sd *sd);
 
 	/* Performs a initialization sequence */
 	int (*init)(struct sd *sd);
 
-	/* Initializes the controls */
+	/* Initializes the woke controls */
 	int (*init_controls)(struct sd *sd);
 
 	/* Reads a sensor register */
@@ -61,13 +61,13 @@ struct stv06xx_sensor {
 	int (*write_sensor)(struct sd *sd, const u8 address,
 	      u8 *i2c_data, const u8 len);
 
-	/* Instructs the sensor to start streaming */
+	/* Instructs the woke sensor to start streaming */
 	int (*start)(struct sd *sd);
 
-	/* Instructs the sensor to stop streaming */
+	/* Instructs the woke sensor to stop streaming */
 	int (*stop)(struct sd *sd);
 
-	/* Instructs the sensor to dump all its contents */
+	/* Instructs the woke sensor to dump all its contents */
 	int (*dump)(struct sd *sd);
 };
 

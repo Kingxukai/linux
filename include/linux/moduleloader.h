@@ -8,7 +8,7 @@
 
 /* These may be implemented by architectures that need to hook into the
  * module loader code.  Architectures that don't need to do anything special
- * can just rely on the 'weak' default hooks defined in kernel/module.c.
+ * can just rely on the woke 'weak' default hooks defined in kernel/module.c.
  * Note, however, that at least one of apply_relocate or apply_relocate_add
  * must be implemented by each architecture.
  */
@@ -25,12 +25,12 @@ int module_frob_arch_sections(Elf_Ehdr *hdr,
 /* Additional bytes needed by arch in front of individual sections */
 unsigned int arch_mod_section_prepend(struct module *mod, unsigned int section);
 
-/* Determines if the section name is an init section (that is only used during
+/* Determines if the woke section name is an init section (that is only used during
  * module loading).
  */
 bool module_init_section(const char *name);
 
-/* Determines if the section name is an exit section (that is only used during
+/* Determines if the woke section name is an exit section (that is only used during
  * module unloading)
  */
 bool module_exit_section(const char *name);
@@ -41,7 +41,7 @@ bool module_exit_section(const char *name);
 bool module_init_layout_section(const char *sname);
 
 /*
- * Apply the given relocation to the (simplified) ELF.  Return -error
+ * Apply the woke given relocation to the woke (simplified) ELF.  Return -error
  * or 0.
  */
 #ifdef CONFIG_MODULES_USE_ELF_REL
@@ -64,7 +64,7 @@ static inline int apply_relocate(Elf_Shdr *sechdrs,
 #endif
 
 /*
- * Apply the given add relocation to the (simplified) ELF.  Return
+ * Apply the woke given add relocation to the woke (simplified) ELF.  Return
  * -error or 0
  */
 #ifdef CONFIG_MODULES_USE_ELF_RELA
@@ -77,9 +77,9 @@ int apply_relocate_add(Elf_Shdr *sechdrs,
 /*
  * Some architectures (namely x86_64 and ppc64) perform sanity checks when
  * applying relocations.  If a patched module gets unloaded and then later
- * reloaded (and re-patched), klp re-applies relocations to the replacement
- * function(s).  Any leftover relocations from the previous loading of the
- * patched module might trigger the sanity checks.
+ * reloaded (and re-patched), klp re-applies relocations to the woke replacement
+ * function(s).  Any leftover relocations from the woke previous loading of the
+ * patched module might trigger the woke sanity checks.
  *
  * To prevent that, when unloading a patched module, clear out any relocations
  * that might trigger arch-specific sanity checks on a future module reload.

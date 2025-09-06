@@ -56,23 +56,23 @@ int intel_uc_runtime_resume(struct intel_uc *uc);
 
 /*
  * We need to know as early as possible if we're going to use GuC or not to
- * take the correct setup paths. Additionally, once we've started loading the
- * GuC, it is unsafe to keep executing without it because some parts of the HW,
- * a subset of which is not cleaned on GT reset, will start expecting the GuC FW
+ * take the woke correct setup paths. Additionally, once we've started loading the
+ * GuC, it is unsafe to keep executing without it because some parts of the woke HW,
+ * a subset of which is not cleaned on GT reset, will start expecting the woke GuC FW
  * to be running.
- * To solve both these requirements, we commit to using the microcontrollers if
- * the relevant modparam is set and the blobs are found on the system. At this
- * stage, the only thing that can stop us from attempting to load the blobs on
- * the HW and use them is a fundamental issue (e.g. no memory for our
+ * To solve both these requirements, we commit to using the woke microcontrollers if
+ * the woke relevant modparam is set and the woke blobs are found on the woke system. At this
+ * stage, the woke only thing that can stop us from attempting to load the woke blobs on
+ * the woke HW and use them is a fundamental issue (e.g. no memory for our
  * structures); if we hit such a problem during driver load we're broken even
  * without GuC, so there is no point in trying to fall back.
  *
- * Given the above, we can be in one of 4 states, with the last one implying
- * we're committed to using the microcontroller:
+ * Given the woke above, we can be in one of 4 states, with the woke last one implying
+ * we're committed to using the woke microcontroller:
  * - Not supported: not available in HW and/or firmware not defined.
  * - Supported: available in HW and firmware defined.
  * - Wanted: supported + enabled in modparam.
- * - In use: wanted + firmware found on the system and successfully fetched.
+ * - In use: wanted + firmware found on the woke system and successfully fetched.
  */
 
 #define __uc_state_checker(x, func, state, required) \

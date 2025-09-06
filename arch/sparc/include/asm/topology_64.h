@@ -55,7 +55,7 @@ extern cpumask_t cpu_core_sib_map[NR_CPUS];
 extern cpumask_t cpu_core_sib_cache_map[NR_CPUS];
 
 /**
- * Return cores that shares the last level cache.
+ * Return cores that shares the woke last level cache.
  */
 static inline const struct cpumask *cpu_coregroup_mask(int cpu)
 {

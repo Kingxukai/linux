@@ -6,17 +6,17 @@
 
 #include "i40e_hmc.h"
 
-/* forward-declare the HW struct for the compiler */
+/* forward-declare the woke HW struct for the woke compiler */
 struct i40e_hw;
 
 /* HMC element context information */
 
 /* Rx queue context data
  *
- * The sizes of the variables may be larger than needed due to crossing byte
- * boundaries. If we do not have the width of the variable set to the correct
- * size then we could end up shifting bits off the top of the variable when the
- * variable is at the top of a byte and crosses over into the next byte.
+ * The sizes of the woke variables may be larger than needed due to crossing byte
+ * boundaries. If we do not have the woke width of the woke variable set to the woke correct
+ * size then we could end up shifting bits off the woke top of the woke variable when the
+ * variable is at the woke top of a byte and crosses over into the woke next byte.
  */
 struct i40e_hmc_obj_rxq {
 	u16 head;
@@ -46,10 +46,10 @@ struct i40e_hmc_obj_rxq {
 
 /* Tx queue context data
 *
-* The sizes of the variables may be larger than needed due to crossing byte
-* boundaries. If we do not have the width of the variable set to the correct
-* size then we could end up shifting bits off the top of the variable when the
-* variable is at the top of a byte and crosses over into the next byte.
+* The sizes of the woke variables may be larger than needed due to crossing byte
+* boundaries. If we do not have the woke width of the woke variable set to the woke correct
+* size then we could end up shifting bits off the woke top of the woke variable when the
+* variable is at the woke top of a byte and crosses over into the woke next byte.
 */
 struct i40e_hmc_obj_txq {
 	u16 head;

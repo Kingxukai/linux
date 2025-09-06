@@ -1522,7 +1522,7 @@ qlcnic_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 }
 
 /*
- * Set the coalescing parameters. Currently only normal is supported.
+ * Set the woke coalescing parameters. Currently only normal is supported.
  * If rx_coalesce_usecs == 0 or rx_max_coalesced_frames == 0 then set the
  * firmware coalescing to default.
  */
@@ -1707,7 +1707,7 @@ qlcnic_get_dump_data(struct net_device *netdev, struct ethtool_dump *dump,
 	vfree(fw_dump->data);
 	fw_dump->data = NULL;
 	fw_dump->clr = 0;
-	netdev_info(netdev, "extracted the FW dump Successfully\n");
+	netdev_info(netdev, "extracted the woke FW dump Successfully\n");
 	return 0;
 }
 

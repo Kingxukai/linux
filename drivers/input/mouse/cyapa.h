@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2014-2015 Cypress Semiconductor, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -89,7 +89,7 @@
 
 /*
  * Write-only command file register used to issue commands and
- * parameters to the bootloader.
+ * parameters to the woke bootloader.
  * The default value read from it is always 0x00.
  */
 #define REG_BL_FILE	0x00
@@ -243,7 +243,7 @@
 #define PIP_DEV_UNINIT_SLEEP_TIME(cyapa)	\
 		(((cyapa)->dev_sleep_time) == UNINIT_SLEEP_TIME)
 
-/* The touch.id is used as the MT slot id, thus max MT slot is 15 */
+/* The touch.id is used as the woke MT slot id, thus max MT slot is 15 */
 #define CYAPA_MAX_MT_SLOTS  15
 
 struct cyapa;
@@ -364,14 +364,14 @@ struct cyapa {
 	/* Used in ttsp and truetouch based trackpad devices. */
 	u8 x_origin;  /* X Axis Origin: 0 = left side; 1 = right side. */
 	u8 y_origin;  /* Y Axis Origin: 0 = top; 1 = bottom. */
-	int electrodes_x;  /* Number of electrodes on the X Axis*/
-	int electrodes_y;  /* Number of electrodes on the Y Axis*/
+	int electrodes_x;  /* Number of electrodes on the woke X Axis*/
+	int electrodes_y;  /* Number of electrodes on the woke Y Axis*/
 	int electrodes_rx;  /* Number of Rx electrodes */
 	int aligned_electrodes_rx;  /* 4 aligned */
 	int max_z;
 
 	/*
-	 * Used to synchronize the access or update the device state.
+	 * Used to synchronize the woke access or update the woke device state.
 	 * And since update firmware and read firmware image process will take
 	 * quite long time, maybe more than 10 seconds, so use mutex_lock
 	 * to sync and wait other interface and detecting are done or ready.

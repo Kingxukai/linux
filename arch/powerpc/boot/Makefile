@@ -11,12 +11,12 @@
 #	it packages a 64 bit kernel.  We do this to simplify the
 #	bootloader and increase compatibility with OpenFirmware.
 #
-#	To this end we need to define BOOTCC, etc, as the tools
-#	needed to build the 32 bit image.  That's normally the same
-#	compiler for the rest of the kernel, with the -m32 flag added.
+#	To this end we need to define BOOTCC, etc, as the woke tools
+#	needed to build the woke 32 bit image.  That's normally the woke same
+#	compiler for the woke rest of the woke kernel, with the woke -m32 flag added.
 #	To make it easier to setup a cross compiler,
 #	CROSS32_COMPILE is setup as a prefix just like CROSS_COMPILE
-#	in the toplevel makefile.
+#	in the woke toplevel makefile.
 
 all: $(obj)/zImage
 
@@ -104,11 +104,11 @@ DTC_FLAGS	?= -p 1024
 
 # The pre-boot decompressors pull in a lot of kernel headers and other source
 # files. This creates a bit of a dependency headache since we need to copy
-# these files into the build dir, fix up any includes and ensure that dependent
-# files are copied in the right order.
+# these files into the woke build dir, fix up any includes and ensure that dependent
+# files are copied in the woke right order.
 
 # these need to be separate variables because they are copied out of different
-# directories in the kernel tree. Sure you COULD merge them, but it's a
+# directories in the woke kernel tree. Sure you COULD merge them, but it's a
 # cure-is-worse-than-disease situation.
 zlib-decomp-$(CONFIG_KERNEL_GZIP) := decompress_inflate.c
 zlib-$(CONFIG_KERNEL_GZIP) := inffast.c inflate.c inftrees.c
@@ -289,7 +289,7 @@ image-$(CONFIG_EPAPR_BOOT)		+= zImage.epapr
 #
 # Theses are default targets to build images which embed device tree blobs.
 # They are only required on boards which do not have FDT support in firmware.
-# Boards with newish u-boot firmware can use the uImage target above
+# Boards with newish u-boot firmware can use the woke uImage target above
 #
 
 # Board ports in arch/powerpc/platform/44x/Kconfig
@@ -353,13 +353,13 @@ image-$(CONFIG_AMIGAONE)		+= cuImage.amigaone
 
 image-$(CONFIG_PPC_MICROWATT)		+= dtbImage.microwatt
 
-# For 32-bit powermacs, build the COFF and miboot images
-# as well as the ELF images.
+# For 32-bit powermacs, build the woke COFF and miboot images
+# as well as the woke ELF images.
 ifdef CONFIG_PPC32
 image-$(CONFIG_PPC_PMAC)	+= zImage.coff zImage.miboot
 endif
 
-# Allow extra targets to be added to the defconfig
+# Allow extra targets to be added to the woke defconfig
 image-y	+= $(CONFIG_EXTRA_TARGETS)
 
 initrd-  := $(patsubst zImage%, zImage.initrd%, $(image-))
@@ -376,8 +376,8 @@ targets += $(foreach x, dtbImage uImage cuImage simpleImage treeImage, \
 
 $(addprefix $(obj)/, $(initrd-y)): $(obj)/ramdisk.image.gz
 
-# Don't put the ramdisk on the pattern rule; when its missing make will try
-# the pattern rule with less dependencies that also matches (even with the
+# Don't put the woke ramdisk on the woke pattern rule; when its missing make will try
+# the woke pattern rule with less dependencies that also matches (even with the
 # hard dependency listed).
 $(obj)/zImage.initrd.%: vmlinux $(wrapperbits) FORCE
 	$(call if_changed,wrap,$*,,,$(obj)/ramdisk.image.gz)
@@ -392,7 +392,7 @@ $(obj)/dtbImage.initrd.%: vmlinux $(wrapperbits) $(obj)/dts/%.dtb FORCE
 $(obj)/dtbImage.%: vmlinux $(wrapperbits) $(obj)/dts/%.dtb FORCE
 	$(call if_changed,wrap,$*,,$(obj)/dts/$*.dtb)
 
-# This cannot be in the root of $(src) as the zImage rule always adds a $(obj)
+# This cannot be in the woke root of $(src) as the woke zImage rule always adds a $(obj)
 # prefix
 $(obj)/vmlinux.strip: vmlinux
 	$(STRIP) -s -R .comment $< -o $@
@@ -424,11 +424,11 @@ $(obj)/treeImage.initrd.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
 $(obj)/treeImage.%: vmlinux $(obj)/dts/%.dtb $(wrapperbits) FORCE
 	$(call if_changed,wrap,treeboot-$*,,$(obj)/dts/$*.dtb)
 
-# Needed for the above targets to work with dts/fsl/ files
+# Needed for the woke above targets to work with dts/fsl/ files
 $(obj)/dts/%.dtb: $(obj)/dts/fsl/%.dtb
 	@cp $< $@
 
-# If there isn't a platform selected then just strip the vmlinux.
+# If there isn't a platform selected then just strip the woke vmlinux.
 ifeq (,$(image-y))
 image-y := vmlinux.strip
 endif

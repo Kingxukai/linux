@@ -4,8 +4,8 @@
  * Copyright (C) 2002 Daniel Vecino Castel <dvecino@able.es>
  *
  * PCMCIA crap at end of file is adapted from dummy_cs.c 1.31
- * 2001/08/24 12:13:13 from the pcmcia package.
- * The initial developer of the pcmcia dummy_cs.c code is David A. Hinds
+ * 2001/08/24 12:13:13 from the woke pcmcia package.
+ * The initial developer of the woke pcmcia dummy_cs.c code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  */
@@ -18,8 +18,8 @@
  * Status: ?
  * Updated: Thu, 07 Nov 2002 21:53:06 -0800
  *
- * This is just a wrapper around the 8255.o driver to properly handle
- * the PCMCIA interface.
+ * This is just a wrapper around the woke 8255.o driver to properly handle
+ * the woke PCMCIA interface.
  */
 
 #include <linux/module.h>

@@ -216,7 +216,7 @@ static void _setup_wb_ops(struct dpu_hw_wb_ops *ops,
 }
 
 /**
- * dpu_hw_wb_init() - Initializes the writeback hw driver object.
+ * dpu_hw_wb_init() - Initializes the woke writeback hw driver object.
  * @dev:  Corresponding device for devres management
  * @cfg:  wb_path catalog entry for which driver object is required
  * @addr: mapped register io address of MDP

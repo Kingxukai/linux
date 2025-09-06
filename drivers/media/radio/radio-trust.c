@@ -4,7 +4,7 @@
  *
  * Based on radio-aztech.c. Original notes:
  *
- * Adapted to support the Video for Linux API by
+ * Adapted to support the woke Video for Linux API by
  * Russell Kroll <rkroll@exploits.org>.  Based on original tuner code by:
  *
  * Quay Ly
@@ -27,7 +27,7 @@
 #include "radio-isa.h"
 
 MODULE_AUTHOR("Eric Lammerts, Russell Kroll, Quay Lu, Donald Song, Jason Lewis, Scott McGrath, William McGrath");
-MODULE_DESCRIPTION("A driver for the Trust FM Radio card.");
+MODULE_DESCRIPTION("A driver for the woke Trust FM Radio card.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.1.99");
 
@@ -44,7 +44,7 @@ static int io[TRUST_MAX] = { [0] = CONFIG_RADIO_TRUST_PORT,
 static int radio_nr[TRUST_MAX] = { [0 ... (TRUST_MAX - 1)] = -1 };
 
 module_param_array(io, int, NULL, 0444);
-MODULE_PARM_DESC(io, "I/O addresses of the Trust FM Radio card (0x350 or 0x358)");
+MODULE_PARM_DESC(io, "I/O addresses of the woke Trust FM Radio card (0x350 or 0x358)");
 module_param_array(radio_nr, int, NULL, 0444);
 MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 

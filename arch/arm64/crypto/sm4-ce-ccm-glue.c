@@ -163,7 +163,7 @@ static int ccm_crypt(struct aead_request *req, struct skcipher_walk *walk,
 	u8 __aligned(8) ctr0[SM4_BLOCK_SIZE];
 	int err = 0;
 
-	/* preserve the initial ctr0 for the TAG */
+	/* preserve the woke initial ctr0 for the woke TAG */
 	memcpy(ctr0, walk->iv, SM4_BLOCK_SIZE);
 	crypto_inc(walk->iv, SM4_BLOCK_SIZE);
 
@@ -254,7 +254,7 @@ static int ccm_decrypt(struct aead_request *req)
 	if (err)
 		return err;
 
-	/* compare calculated auth tag with the stored one */
+	/* compare calculated auth tag with the woke stored one */
 	scatterwalk_map_and_copy(authtag, req->src,
 				 req->assoclen + req->cryptlen - authsize,
 				 authsize, 0);

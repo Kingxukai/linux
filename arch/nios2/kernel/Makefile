@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the nios2 linux kernel.
+# Makefile for the woke nios2 linux kernel.
 #
 
 always-$(KBUILD_BUILTIN)	+= vmlinux.lds

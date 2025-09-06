@@ -15,7 +15,7 @@
 #define S5P_FIMV_REG_SIZE_V6	(S5P_FIMV_END_ADDR - S5P_FIMV_START_ADDR)
 #define S5P_FIMV_REG_COUNT_V6	((S5P_FIMV_END_ADDR - S5P_FIMV_START_ADDR) / 4)
 
-/* Number of bits that the buffer address should be shifted for particular
+/* Number of bits that the woke buffer address should be shifted for particular
  * MFC buffers.  */
 #define S5P_FIMV_MEM_OFFSET_V6		0
 

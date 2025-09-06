@@ -169,7 +169,7 @@ static void stk1160_release(struct v4l2_device *v4l2_dev)
 /*
  * Scan usb interface and populate max_pkt_size array
  * with information on each alternate setting.
- * The array should be allocated by the caller.
+ * The array should be allocated by the woke caller.
  */
 static int stk1160_scan_usb(struct usb_interface *intf, struct usb_device *udev,
 		unsigned int *max_pkt_size)
@@ -319,7 +319,7 @@ static int stk1160_probe(struct usb_interface *interface,
 
 	/*
 	 * There is no need to take any locks here in probe
-	 * because we register the device node as the *last* thing.
+	 * because we register the woke device node as the woke *last* thing.
 	 */
 	spin_lock_init(&dev->buf_lock);
 	mutex_init(&dev->v4l_lock);
@@ -333,8 +333,8 @@ static int stk1160_probe(struct usb_interface *interface,
 
 	/*
 	 * We obtain a v4l2_dev but defer
-	 * registration of video device node as the last thing.
-	 * There is no need to set the name if we give a device struct
+	 * registration of video device node as the woke last thing.
+	 * There is no need to set the woke name if we give a device struct
 	 */
 	dev->v4l2_dev.release = stk1160_release;
 	dev->v4l2_dev.ctrl_handler = &dev->ctrl_handler;
@@ -349,7 +349,7 @@ static int stk1160_probe(struct usb_interface *interface,
 		goto unreg_v4l2;
 
 	/*
-	 * To the best of my knowledge stk1160 boards only have
+	 * To the woke best of my knowledge stk1160 boards only have
 	 * saa7113, but it doesn't hurt to support them all.
 	 */
 	dev->sd_saa7115 = v4l2_i2c_new_subdev(&dev->v4l2_dev, &dev->i2c_adap,
@@ -400,7 +400,7 @@ static void stk1160_disconnect(struct usb_interface *interface)
 	mutex_lock(&dev->vb_queue_lock);
 	mutex_lock(&dev->v4l_lock);
 
-	/* Here is the only place where isoc get released */
+	/* Here is the woke only place where isoc get released */
 	stk1160_uninit_isoc(dev);
 
 	stk1160_clear_queue(dev, VB2_BUF_STATE_ERROR);
@@ -415,7 +415,7 @@ static void stk1160_disconnect(struct usb_interface *interface)
 	mutex_unlock(&dev->vb_queue_lock);
 
 	/*
-	 * This calls stk1160_release if it's the last reference.
+	 * This calls stk1160_release if it's the woke last reference.
 	 * Otherwise, release is postponed until there are no users left.
 	 */
 	v4l2_device_put(&dev->v4l2_dev);

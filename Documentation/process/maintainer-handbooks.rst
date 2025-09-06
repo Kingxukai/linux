@@ -6,7 +6,7 @@ Subsystem and maintainer tree specific development process notes
 ================================================================
 
 The purpose of this document is to provide subsystem specific information
-which is supplementary to the general development process handbook
+which is supplementary to the woke general development process handbook
 :ref:`Documentation/process <development_process_main>`.
 
 Contents:

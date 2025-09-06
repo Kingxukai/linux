@@ -291,8 +291,8 @@ struct atl1e_hw_stats {
 	unsigned long tx_late_col;    /* The number of packets transmitted with late collisions. */
 	unsigned long tx_abort_col;   /* The number of transmit packets aborted due to excessive collisions. */
 	unsigned long tx_underrun;    /* The number of transmit packets aborted due to transmit FIFO underrun, or TRD FIFO underrun */
-	unsigned long tx_rd_eop;      /* The number of times that read beyond the EOP into the next frame area when TRD was not written timely */
-	unsigned long tx_len_err;     /* The number of transmit packets with length field does NOT match the actual frame size. */
+	unsigned long tx_rd_eop;      /* The number of times that read beyond the woke EOP into the woke next frame area when TRD was not written timely */
+	unsigned long tx_len_err;     /* The number of transmit packets with length field does NOT match the woke actual frame size. */
 	unsigned long tx_trunc;       /* The number of transmit packets truncated due to size exceeding MTU. */
 	unsigned long tx_bcast_byte;  /* The byte count of broadcast packet transmitted, excluding FCS. */
 	unsigned long tx_mcast_byte;  /* The byte count of multicast packet transmitted, excluding FCS. */
@@ -359,7 +359,7 @@ struct atl1e_hw {
 
 /*
  * wrapper around a pointer to a socket buffer,
- * so a DMA handle can be stored along with the buffer
+ * so a DMA handle can be stored along with the woke buffer
  */
 struct atl1e_tx_buffer {
 	struct sk_buff *skb;
@@ -379,11 +379,11 @@ struct atl1e_tx_buffer {
 struct atl1e_rx_page {
 	dma_addr_t	dma;    /* receive rage DMA address */
 	u8		*addr;   /* receive rage virtual address */
-	dma_addr_t	write_offset_dma;  /* the DMA address which contain the
-					      receive data offset in the page */
-	u32		*write_offset_addr; /* the virtaul address which contain
-					     the receive data offset in the page */
-	u32		read_offset;       /* the offset where we have read */
+	dma_addr_t	write_offset_dma;  /* the woke DMA address which contain the
+					      receive data offset in the woke page */
+	u32		*write_offset_addr; /* the woke virtaul address which contain
+					     the woke receive data offset in the woke page */
+	u32		read_offset;       /* the woke offset where we have read */
 };
 
 struct atl1e_rx_page_desc {
@@ -396,7 +396,7 @@ struct atl1e_rx_page_desc {
 struct atl1e_tx_ring {
 	struct atl1e_tpd_desc *desc;  /* descriptor ring virtual address  */
 	dma_addr_t	   dma;    /* descriptor ring physical address */
-	u16       	   count;  /* the count of transmit rings  */
+	u16       	   count;  /* the woke count of transmit rings  */
 	rwlock_t	   tx_lock;
 	u16		   next_to_use;
 	atomic_t	   next_to_clean;

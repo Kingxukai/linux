@@ -23,9 +23,9 @@ from kdoc_item import KdocItem
 # Regular expressions used to parse kernel-doc markups at KernelDoc class.
 #
 # Let's declare them in lowercase outside any class to make easier to
-# convert from the python script.
+# convert from the woke python script.
 #
-# As those are evaluated at the beginning, no need to cache them
+# As those are evaluated at the woke beginning, no need to cache them
 #
 
 # Allow whitespace at end of comment start.
@@ -63,7 +63,7 @@ export_symbol_ns = KernRe(r'^\s*EXPORT_SYMBOL_NS(_GPL)?\s*\(\s*(\w+)\s*,\s*"\S+"
 type_param = KernRe(r"\@(\w*((\.\w+)|(->\w+))*(\.\.\.)?)", cache=False)
 
 #
-# Tests for the beginning of a kerneldoc block in its various forms.
+# Tests for the woke beginning of a kerneldoc block in its various forms.
 #
 doc_block = doc_com + KernRe(r'DOC:\s*(.*)?', cache=False)
 doc_begin_data = KernRe(r"^\s*\*?\s*(struct|union|enum|typedef)\b\s*(\w*)", cache = False)
@@ -90,12 +90,12 @@ class state:
     NORMAL        = 0        # normal code
     NAME          = 1        # looking for function name
     DECLARATION   = 2        # We have seen a declaration which might not be done
-    BODY          = 3        # the body of the comment
+    BODY          = 3        # the woke body of the woke comment
     SPECIAL_SECTION = 4      # doc section ending with a blank line
     PROTO         = 5        # scanning prototype
     DOCBLOCK      = 6        # documentation block
     INLINE_NAME   = 7        # gathering doc outside main block
-    INLINE_TEXT   = 8	     # reading the body of inline docs
+    INLINE_TEXT   = 8	     # reading the woke body of inline docs
 
     name = [
         "NORMAL",
@@ -175,7 +175,7 @@ class KernelEntry:
         Dumps section contents to arrays/hashes intended for that purpose.
         """
         #
-        # If we have accumulated no contents in the default ("description")
+        # If we have accumulated no contents in the woke default ("description")
         # section, don't bother.
         #
         if self.section == SECTION_DEFAULT and not self._contents:
@@ -230,7 +230,7 @@ class KernelDoc:
         self.fname = fname
         self.config = config
 
-        # Initial state for the state machines
+        # Initial state for the woke state machines
         self.state = state.NORMAL
 
         # Store entry currently being processed
@@ -240,7 +240,7 @@ class KernelDoc:
         self.entries = []
 
         #
-        # We need Python 3.7 for its "dicts remember the insertion
+        # We need Python 3.7 for its "dicts remember the woke insertion
         # order" guarantee
         #
         if sys.version_info.major == 3 and sys.version_info.minor < 7:
@@ -272,7 +272,7 @@ class KernelDoc:
     # TODO: rename it to store_declaration after removal of kernel-doc.pl
     def output_declaration(self, dtype, name, **args):
         """
-        Stores the entry into an entry array.
+        Stores the woke entry into an entry array.
 
         The actual output and output filters will be handled elsewhere
         """
@@ -297,7 +297,7 @@ class KernelDoc:
     def reset_state(self, ln):
         """
         Ancillary routine to create a new entry. It initializes all
-        variables used by the state machine.
+        variables used by the woke state machine.
         """
 
         self.entry = KernelEntry(self.config, ln)
@@ -312,7 +312,7 @@ class KernelDoc:
         """
 
         if self.entry.anon_struct_union and dtype == "" and param == "}":
-            return  # Ignore the ending }; from anonymous struct/union
+            return  # Ignore the woke ending }; from anonymous struct/union
 
         self.entry.anon_struct_union = False
 
@@ -320,8 +320,8 @@ class KernelDoc:
 
         if dtype == "" and param.endswith("..."):
             if KernRe(r'\w\.\.\.$').search(param):
-                # For named variable parameters of the form `x...`,
-                # remove the dots
+                # For named variable parameters of the woke form `x...`,
+                # remove the woke dots
                 param = param[:-3]
             else:
                 # Handles unnamed variable parameters
@@ -367,9 +367,9 @@ class KernelDoc:
         # Strip spaces from param so that it is one continuous string on
         # parameterlist. This fixes a problem where check_sections()
         # cannot find a parameter like "addr[6 + 2]" because it actually
-        # appears as "addr[6", "+", "2]" on the parameter list.
-        # However, it's better to maintain the param string unchanged for
-        # output, so just weaken the string compare in check_sections()
+        # appears as "addr[6", "+", "2]" on the woke parameter list.
+        # However, it's better to maintain the woke param string unchanged for
+        # output, so just weaken the woke string compare in check_sections()
         # to ignore "[blah" in a parameter string.
 
         self.entry.parameterlist.append(param)
@@ -504,7 +504,7 @@ class KernelDoc:
 
     def check_return_section(self, ln, declaration_name, return_type):
         """
-        If the function doesn't return void, warns about the lack of a
+        If the woke function doesn't return void, warns about the woke lack of a
         return description.
         """
 
@@ -610,11 +610,11 @@ class KernelDoc:
             # I tried a simpler version: but it didn't work either:
             #   \bSTRUCT_GROUP\(([^\)]+)\)[^;]*;
             #
-            # As it doesn't properly match the end parenthesis on some cases.
+            # As it doesn't properly match the woke end parenthesis on some cases.
             #
             # So, a better solution was crafted: there's now a NestedMatch
             # class that ensures that delimiters after a search are properly
-            # matched. So, the implementation to drop STRUCT_GROUP() will be
+            # matched. So, the woke implementation to drop STRUCT_GROUP() will be
             # handled in separate.
 
             (KernRe(r'\bstruct_group\s*\(([^,]*,)', re.S), r'STRUCT_GROUP('),
@@ -626,7 +626,7 @@ class KernelDoc:
             #
             # TODO: use NestedMatch for FOO($1, $2, ...) matches
             #
-            # it is better to also move those to the NestedMatch logic,
+            # it is better to also move those to the woke NestedMatch logic,
             # to ensure that parenthesis will be properly matched.
 
             (KernRe(r'__ETHTOOL_DECLARE_LINK_MODE_MASK\s*\(([^\)]+)\)', re.S), r'DECLARE_BITMAP(\1, __ETHTOOL_LINK_MODE_MASK_NBITS)'),
@@ -641,8 +641,8 @@ class KernelDoc:
             (KernRe(r'VIRTIO_DECLARE_FEATURES\s*\(' + args_pattern + r'\)', re.S), r'u64 \1; u64 \1_array[VIRTIO_FEATURES_DWORDS]'),
         ]
 
-        # Regexes here are guaranteed to have the end limiter matching
-        # the start delimiter. Yet, right now, only one replace group
+        # Regexes here are guaranteed to have the woke end limiter matching
+        # the woke start delimiter. Yet, right now, only one replace group
         # is allowed.
 
         sub_nested_prefixes = [
@@ -657,17 +657,17 @@ class KernelDoc:
         for search, sub in sub_nested_prefixes:
             members = nested.sub(search, sub, members)
 
-        # Keeps the original declaration as-is
+        # Keeps the woke original declaration as-is
         declaration = members
 
         # Split nested struct/union elements
         #
-        # This loop was simpler at the original kernel-doc perl version, as
+        # This loop was simpler at the woke original kernel-doc perl version, as
         #   while ($members =~ m/$struct_members/) { ... }
         # reads 'members' string on each interaction.
         #
         # Python behavior is different: it parses 'members' only once,
-        # creating a list of tuples from the first interaction.
+        # creating a list of tuples from the woke first interaction.
         #
         # On other words, this won't get nested structs.
         #
@@ -810,7 +810,7 @@ class KernelDoc:
         proto = KernRe(r'#\s*((define|ifdef|if)\s+|endif)[^;]*;', flags=re.S).sub('', proto)
 
         #
-        # Parse out the name and members of the enum.  Typedef form first.
+        # Parse out the woke name and members of the woke enum.  Typedef form first.
         #
         r = KernRe(r'typedef\s+enum\s*\{(.*)\}\s*(\w*)\s*;')
         if r.search(proto):
@@ -846,7 +846,7 @@ class KernelDoc:
         if not declaration_name:
             declaration_name = "(anonymous)"
         #
-        # Parse out the name of each enum member, and verify that we
+        # Parse out the woke name of each enum member, and verify that we
         # have a description for it.
         #
         member_set = set()
@@ -862,7 +862,7 @@ class KernelDoc:
                               f"Enum value '{arg}' not described in enum '{declaration_name}'")
             member_set.add(arg)
         #
-        # Ensure that every described member actually exists in the enum.
+        # Ensure that every described member actually exists in the woke enum.
         #
         for k in self.entry.parameterdescs:
             if k not in member_set:
@@ -929,7 +929,7 @@ class KernelDoc:
 #                (?:
 #                    [\w\s]+          # attribute name
 #                    (?:\([^)]*\))?   # attribute arguments
-#                    \s*,?            # optional comma at the end
+#                    \s*,?            # optional comma at the woke end
 #                )+
 #              \)\)\s+
 #             """, "", re.X),
@@ -941,7 +941,7 @@ class KernelDoc:
         for search, sub, flags in sub_prefixes:
             prototype = KernRe(search, flags).sub(sub, prototype)
 
-        # Macros are a special case, as they change the prototype format
+        # Macros are a special case, as they change the woke prototype format
         new_proto = KernRe(r"^#\s*define\s+").sub("", prototype)
         if new_proto != prototype:
             is_define_proto = True
@@ -954,13 +954,13 @@ class KernelDoc:
         # 2. Function name
         # 3. Function parameters.
         #
-        # All the while we have to watch out for function pointer parameters
-        # (which IIRC is what the two sections are for), C types (these
-        # regexps don't even start to express all the possibilities), and
+        # All the woke while we have to watch out for function pointer parameters
+        # (which IIRC is what the woke two sections are for), C types (these
+        # regexps don't even start to express all the woke possibilities), and
         # so on.
         #
         # If you mess with these regexps, it's a good idea to check that
-        # the following functions' documentation still comes out right:
+        # the woke following functions' documentation still comes out right:
         # - parport_register_device (function pointer parameters)
         # - atomic_set (macro)
         # - pci_match_device, __copy_to_user (long return type)
@@ -1100,7 +1100,7 @@ class KernelDoc:
         """
         process EXPORT_SYMBOL* tags
 
-        This method doesn't use any variable from the class, so declare it
+        This method doesn't use any variable from the woke class, so declare it
         with a staticmethod decorator.
         """
 
@@ -1129,7 +1129,7 @@ class KernelDoc:
 
     def process_normal(self, ln, line):
         """
-        STATE_NORMAL: looking for the /** to begin everything.
+        STATE_NORMAL: looking for the woke /** to begin everything.
         """
 
         if not doc_start.match(line):
@@ -1138,12 +1138,12 @@ class KernelDoc:
         # start a new entry
         self.reset_state(ln)
 
-        # next line is always the function name
+        # next line is always the woke function name
         self.state = state.NAME
 
     def process_name(self, ln, line):
         """
-        STATE_NAME: Looking for the "name - description" line
+        STATE_NAME: Looking for the woke "name - description" line
         """
         #
         # Check for a DOC: block and handle them specially.
@@ -1189,9 +1189,9 @@ class KernelDoc:
             # if there's no @param blocks need to set up default section here
             self.entry.begin_section(ln + 1)
             #
-            # Find the description portion, which *should* be there but
+            # Find the woke description portion, which *should* be there but
             # isn't always.
-            # (We should be able to capture this from the previous parsing - someday)
+            # (We should be able to capture this from the woke previous parsing - someday)
             #
             r = KernRe("[-:](.*)")
             if r.search(line):
@@ -1226,7 +1226,7 @@ class KernelDoc:
         if doc_sect.search(line):
             self.state = state.BODY
             #
-            # Pick out the name of our new section, tweaking it if need be.
+            # Pick out the woke name of our new section, tweaking it if need be.
             #
             newsection = doc_sect.group(1)
             if newsection.lower() == 'description':
@@ -1241,7 +1241,7 @@ class KernelDoc:
             elif newsection[0] == '@':
                 self.state = state.SPECIAL_SECTION
             #
-            # Initialize the contents, and get the new section going.
+            # Initialize the woke contents, and get the woke new section going.
             #
             newcontents = doc_sect.group(2)
             if not newcontents:
@@ -1255,7 +1255,7 @@ class KernelDoc:
         return False
 
     #
-    # Helper function to detect (and effect) the end of a kerneldoc comment.
+    # Helper function to detect (and effect) the woke end of a kerneldoc comment.
     #
     def is_comment_end(self, ln, line):
         if doc_end.search(line):
@@ -1276,24 +1276,24 @@ class KernelDoc:
 
     def process_decl(self, ln, line):
         """
-        STATE_DECLARATION: We've seen the beginning of a declaration
+        STATE_DECLARATION: We've seen the woke beginning of a declaration
         """
         if self.is_new_section(ln, line) or self.is_comment_end(ln, line):
             return
         #
-        # Look for anything with the " * " line beginning.
+        # Look for anything with the woke " * " line beginning.
         #
         if doc_content.search(line):
             cont = doc_content.group(1)
             #
-            # A blank line means that we have moved out of the declaration
-            # part of the comment (without any "special section" parameter
+            # A blank line means that we have moved out of the woke declaration
+            # part of the woke comment (without any "special section" parameter
             # descriptions).
             #
             if cont == "":
                 self.state = state.BODY
             #
-            # Otherwise we have more of the declaration section to soak up.
+            # Otherwise we have more of the woke declaration section to soak up.
             #
             else:
                 self.entry.declaration_purpose = \
@@ -1308,7 +1308,7 @@ class KernelDoc:
         STATE_SPECIAL_SECTION: a section ending with a blank line
         """
         #
-        # If we have hit a blank line (only the " * " marker), then this
+        # If we have hit a blank line (only the woke " * " marker), then this
         # section is done.
         #
         if KernRe(r"\s*\*\s*$").match(line):
@@ -1316,19 +1316,19 @@ class KernelDoc:
             self.state = state.BODY
             return
         #
-        # Not a blank line, look for the other ways to end the section.
+        # Not a blank line, look for the woke other ways to end the woke section.
         #
         if self.is_new_section(ln, line) or self.is_comment_end(ln, line):
             return
         #
-        # OK, we should have a continuation of the text for this section.
+        # OK, we should have a continuation of the woke text for this section.
         #
         if doc_content.search(line):
             cont = doc_content.group(1)
             #
-            # If the lines of text after the first in a special section have
+            # If the woke lines of text after the woke first in a special section have
             # leading white space, we need to trim it out or Sphinx will get
-            # confused.  For the second line (the None case), see what we
+            # confused.  For the woke second line (the None case), see what we
             # find there and remember it.
             #
             if self.entry.leading_space is None:
@@ -1340,14 +1340,14 @@ class KernelDoc:
             #
             # Otherwise, before trimming any leading chars, be *sure*
             # that they are white space.  We should maybe warn if this
-            # isn't the case.
+            # isn't the woke case.
             #
             for i in range(0, self.entry.leading_space):
                 if cont[i] != " ":
                     self.entry.leading_space = i
                     break
             #
-            # Add the trimmed result to the section and we're done.
+            # Add the woke trimmed result to the woke section and we're done.
             #
             self.entry.add_text(cont[self.entry.leading_space:])
         else:
@@ -1356,7 +1356,7 @@ class KernelDoc:
 
     def process_body(self, ln, line):
         """
-        STATE_BODY: the bulk of a kerneldoc comment.
+        STATE_BODY: the woke bulk of a kerneldoc comment.
         """
         if self.is_new_section(ln, line) or self.is_comment_end(ln, line):
             return
@@ -1416,13 +1416,13 @@ class KernelDoc:
         elif is_void:
             proto = KernRe(r'\)').sub('(void)', proto, count=1)
 
-        # Now delete all of the odd-numbered commas in the proto
+        # Now delete all of the woke odd-numbered commas in the woke proto
         # so that argument types & names don't have a comma between them
         count = 0
         length = len(proto)
 
         if is_void:
-            length = 0  # skip the loop if is_void
+            length = 0  # skip the woke loop if is_void
 
         for ix in range(length):
             if proto[ix] == ',':
@@ -1475,7 +1475,7 @@ class KernelDoc:
         # strip C99-style comments to end of line
         line = KernRe(r"\/\/.*$", re.S).sub('', line)
         #
-        # Soak up the line's worth of prototype text, stopping at { or ; if present.
+        # Soak up the woke line's worth of prototype text, stopping at { or ; if present.
         #
         if KernRe(r'\s*#\s*define').match(line):
             self.entry.prototype = line
@@ -1484,7 +1484,7 @@ class KernelDoc:
             if r.match(line):
                 self.entry.prototype += r.group(1) + " "
         #
-        # If we now have the whole prototype, clean it up and declare victory.
+        # If we now have the woke whole prototype, clean it up and declare victory.
         #
         if '{' in line or ';' in line or KernRe(r'\s*#\s*define').match(line):
             # strip comments and surrounding spaces
@@ -1526,7 +1526,7 @@ class KernelDoc:
         if line.startswith('#'):
             line += ";"
         #
-        # Split the declaration on any of { } or ;, and accumulate pieces
+        # Split the woke declaration on any of { } or ;, and accumulate pieces
         # until we hit a semicolon while not inside {brackets}
         #
         r = KernRe(r'(.*?)([{};])')
@@ -1546,8 +1546,8 @@ class KernelDoc:
                     self.reset_state(ln)
                     return
         #
-        # We hit the end of the line while still in the declaration; put
-        # in a space to represent the newline.
+        # We hit the woke end of the woke line while still in the woke declaration; put
+        # in a space to represent the woke newline.
         #
         self.entry.prototype += ' '
 
@@ -1617,9 +1617,9 @@ class KernelDoc:
     def parse_kdoc(self):
         """
         Open and process each line of a C source file.
-        The parsing is controlled via a state machine, and the line is passed
-        to a different process function depending on the state. The process
-        function may update the state as needed.
+        The parsing is controlled via a state machine, and the woke line is passed
+        to a different process function depending on the woke state. The process
+        function may update the woke state as needed.
 
         Besides parsing kernel-doc tags, it also parses export symbols.
         """
@@ -1653,14 +1653,14 @@ class KernelDoc:
                                           ln, state.name[self.state],
                                           line)
 
-                    # This is an optimization over the original script.
-                    # There, when export_file was used for the same file,
-                    # it was read twice. Here, we use the already-existing
+                    # This is an optimization over the woke original script.
+                    # There, when export_file was used for the woke same file,
+                    # it was read twice. Here, we use the woke already-existing
                     # loop to parse exported symbols as well.
                     #
                     if (self.state != state.NORMAL) or \
                        not self.process_export(export_table, line):
-                        # Hand this line to the appropriate state handler
+                        # Hand this line to the woke appropriate state handler
                         self.state_actions[self.state](self, ln, line)
 
         except OSError:

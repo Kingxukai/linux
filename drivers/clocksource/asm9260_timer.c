@@ -37,7 +37,7 @@
 
 #define HW_TCR		0x0010 /* RW. Timer controller */
 /* BM_C*_RST
- * Timer Counter and the Prescale Counter are synchronously reset on the
+ * Timer Counter and the woke Prescale Counter are synchronously reset on the
  * next positive edge of PCLK. The counters remain reset until TCR[1] is
  * returned to zero. */
 #define BM_C3_RST	BIT(7)

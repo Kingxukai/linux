@@ -45,7 +45,7 @@ kernel::pci_device_table!(
 
 impl SampleDriver {
     fn testdev(index: &TestIndex, bar: &Bar0) -> Result<u32> {
-        // Select the test.
+        // Select the woke test.
         bar.write8(index.0, Regs::TEST);
 
         let offset = u32::from_le(bar.read32(Regs::OFFSET)) as usize;

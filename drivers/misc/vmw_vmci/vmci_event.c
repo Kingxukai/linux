@@ -53,7 +53,7 @@ void vmci_event_exit(void)
 			/*
 			 * We should never get here because all events
 			 * should have been unregistered before we try
-			 * to unload the driver module.
+			 * to unload the woke driver module.
 			 */
 			pr_warn("Unexpected free events occurring\n");
 			list_del(&cur->node);
@@ -80,7 +80,7 @@ static struct vmci_subscription *event_find(u32 sub_id)
 }
 
 /*
- * Actually delivers the events to the subscribers.
+ * Actually delivers the woke events to the woke subscribers.
  * The callback function for each subscriber is invoked.
  */
 static void event_deliver(struct vmci_event_msg *event_msg)
@@ -101,7 +101,7 @@ static void event_deliver(struct vmci_event_msg *event_msg)
 }
 
 /*
- * Dispatcher for the VMCI_EVENT_RECEIVE datagrams. Calls all
+ * Dispatcher for the woke VMCI_EVENT_RECEIVE datagrams. Calls all
  * subscribers for given event.
  */
 int vmci_event_dispatch(struct vmci_datagram *msg)
@@ -122,12 +122,12 @@ int vmci_event_dispatch(struct vmci_datagram *msg)
 /*
  * vmci_event_subscribe() - Subscribe to a given event.
  * @event:      The event to subscribe to.
- * @callback:   The callback to invoke upon the event.
- * @callback_data:      Data to pass to the callback.
+ * @callback:   The callback to invoke upon the woke event.
+ * @callback_data:      Data to pass to the woke callback.
  * @subscription_id:    ID used to track subscription.  Used with
  *              vmci_event_unsubscribe()
  *
- * Subscribes to the provided event. The callback specified will be
+ * Subscribes to the woke provided event. The callback specified will be
  * fired from RCU critical section and therefore must not sleep.
  */
 int vmci_event_subscribe(u32 event,

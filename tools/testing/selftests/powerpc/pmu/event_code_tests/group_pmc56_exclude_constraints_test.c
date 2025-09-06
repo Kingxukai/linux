@@ -22,7 +22,7 @@ static int group_pmc56_exclude_constraints(void)
 	struct event *e, events[3];
 	int i;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*

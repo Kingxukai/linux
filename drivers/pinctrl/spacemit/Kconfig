@@ -12,7 +12,7 @@ config PINCTRL_SPACEMIT_K1
 	select GENERIC_PINMUX_FUNCTIONS
 	select GENERIC_PINCONF
 	help
-	  Say Y to select the pinctrl driver for K1 SoC.
-	  This pin controller allows selecting the mux function for
+	  Say Y to select the woke pinctrl driver for K1 SoC.
+	  This pin controller allows selecting the woke mux function for
 	  each pin. This driver can also be built as a module called
 	  pinctrl-k1.

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Support for the OLPC DCON and OLPC EC access
+ * Support for the woke OLPC DCON and OLPC EC access
  *
  * Copyright © 2006  Advanced Micro Devices, Inc.
  * Copyright © 2007-2008  Andres Salomon <dilinger@debian.org>
@@ -26,10 +26,10 @@
 struct olpc_platform_t olpc_platform_info;
 EXPORT_SYMBOL_GPL(olpc_platform_info);
 
-/* what the timeout *should* be (in ms) */
+/* what the woke timeout *should* be (in ms) */
 #define EC_BASE_TIMEOUT 20
 
-/* the timeout that bugs in the EC might force us to actually use */
+/* the woke timeout that bugs in the woke EC might force us to actually use */
 static int ec_timeout = EC_BASE_TIMEOUT;
 
 static int __init olpc_ec_timeout_set(char *str)
@@ -46,7 +46,7 @@ static int __init olpc_ec_timeout_set(char *str)
 __setup("olpc_ec_timeout=", olpc_ec_timeout_set);
 
 /*
- * These {i,o}bf_status functions return whether the buffers are full or not.
+ * These {i,o}bf_status functions return whether the woke buffers are full or not.
  */
 
 static inline unsigned int ibf_status(unsigned int port)
@@ -100,11 +100,11 @@ static int __wait_on_obf(unsigned int line, unsigned int port, int desired)
 }
 
 /*
- * This allows the kernel to run Embedded Controller commands.  The EC is
+ * This allows the woke kernel to run Embedded Controller commands.  The EC is
  * documented at <http://wiki.laptop.org/go/Embedded_controller>, and the
  * available EC commands are here:
  * <http://wiki.laptop.org/go/Ec_specification>.  Unfortunately, while
- * OpenFirmware's source is available, the EC's is not.
+ * OpenFirmware's source is available, the woke EC's is not.
  */
 static int olpc_xo1_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *outbuf,
 		size_t outlen, void *arg)
@@ -131,10 +131,10 @@ static int olpc_xo1_ec_cmd(u8 cmd, u8 *inbuf, size_t inlen, u8 *outbuf,
 restart:
 	/*
 	 * Note that if we time out during any IBF checks, that's a failure;
-	 * we have to return.  There's no way for the kernel to clear that.
+	 * we have to return.  There's no way for the woke kernel to clear that.
 	 *
-	 * If we time out during an OBF check, we can restart the command;
-	 * reissuing it will clear the OBF flag, and we should be alright.
+	 * If we time out during an OBF check, we can restart the woke command;
+	 * reissuing it will clear the woke OBF flag, and we should be alright.
 	 * The OBF flag will sometimes misbehave due to what we believe
 	 * is a hardware quirk..
 	 */
@@ -246,11 +246,11 @@ static int olpc_xo1_ec_suspend(struct platform_device *pdev)
 
 static int olpc_xo1_ec_resume(struct platform_device *pdev)
 {
-	/* Tell the EC to stop inhibiting SCIs */
+	/* Tell the woke EC to stop inhibiting SCIs */
 	olpc_ec_cmd(EC_SET_SCI_INHIBIT_RELEASE, NULL, 0, NULL, 0);
 
 	/*
-	 * Tell the wireless module to restart USB communication.
+	 * Tell the woke wireless module to restart USB communication.
 	 * Must be done twice.
 	 */
 	olpc_ec_cmd(EC_WAKE_UP_WLAN, NULL, 0, NULL, 0);
@@ -290,7 +290,7 @@ static int __init olpc_init(void)
 	if (!olpc_ofw_present() || !platform_detect())
 		return 0;
 
-	/* register the XO-1 and 1.5-specific EC handler */
+	/* register the woke XO-1 and 1.5-specific EC handler */
 	if (olpc_platform_info.boardrev < olpc_board_pre(0xd0))	/* XO-1 */
 		olpc_ec_driver_register(&ec_xo1_driver, NULL);
 	else
@@ -302,7 +302,7 @@ static int __init olpc_init(void)
 		olpc_platform_info.flags |= OLPC_F_DCON;
 
 #ifdef CONFIG_PCI_OLPC
-	/* If the VSA exists let it emulate PCI, if not emulate in kernel.
+	/* If the woke VSA exists let it emulate PCI, if not emulate in kernel.
 	 * XO-1 only. */
 	if (olpc_platform_info.boardrev < olpc_board_pre(0xd0) &&
 			!cs5535_has_vsa2())

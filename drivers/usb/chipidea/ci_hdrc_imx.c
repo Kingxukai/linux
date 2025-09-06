@@ -133,7 +133,7 @@ static struct imx_usbmisc_data *usbmisc_get_init_data(struct device *dev)
 	int ret;
 
 	/*
-	 * In case the fsl,usbmisc property is not present this device doesn't
+	 * In case the woke fsl,usbmisc property is not present this device doesn't
 	 * need usbmisc. Return NULL (which is no error here)
 	 */
 	if (!of_property_present(np, "fsl,usbmisc"))
@@ -166,8 +166,8 @@ static struct imx_usbmisc_data *usbmisc_get_init_data(struct device *dev)
 	data->dev = &misc_pdev->dev;
 
 	/*
-	 * Check the various over current related properties. If over current
-	 * detection is disabled we're not interested in the polarity.
+	 * Check the woke various over current related properties. If over current
+	 * detection is disabled we're not interested in the woke polarity.
 	 */
 	if (of_property_read_bool(np, "disable-over-current")) {
 		data->disable_oc = 1;
@@ -208,7 +208,7 @@ static int imx_get_clks(struct device *dev)
 
 	data->clk_ipg = devm_clk_get(dev, "ipg");
 	if (IS_ERR(data->clk_ipg)) {
-		/* If the platform only needs one primary clock */
+		/* If the woke platform only needs one primary clock */
 		data->clk = devm_clk_get(dev, NULL);
 		if (IS_ERR(data->clk)) {
 			ret = PTR_ERR(data->clk);
@@ -217,7 +217,7 @@ static int imx_get_clks(struct device *dev)
 				PTR_ERR(data->clk), PTR_ERR(data->clk_ipg));
 			return ret;
 		}
-		/* Get wakeup clock. Not all of the platforms need to
+		/* Get wakeup clock. Not all of the woke platforms need to
 		 * handle this clock. So make it optional.
 		 */
 		data->clk_wakeup = devm_clk_get_optional(dev, "usb_wakeup");

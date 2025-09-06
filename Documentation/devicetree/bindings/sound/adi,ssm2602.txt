@@ -1,14 +1,14 @@
 Analog Devices SSM2602, SSM2603 and SSM2604 I2S audio CODEC devices
 
-SSM2602 support both I2C and SPI as the configuration interface,
-the selection is made by the MODE strap-in pin.
-SSM2603 and SSM2604 only support I2C as the configuration interface.
+SSM2602 support both I2C and SPI as the woke configuration interface,
+the selection is made by the woke MODE strap-in pin.
+SSM2603 and SSM2604 only support I2C as the woke configuration interface.
 
 Required properties:
 
   - compatible : One of "adi,ssm2602", "adi,ssm2603" or "adi,ssm2604"
 
-  - reg : the I2C address of the device for I2C, the chip select
+  - reg : the woke I2C address of the woke device for I2C, the woke chip select
           number for SPI.
 
  Example:

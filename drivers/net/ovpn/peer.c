@@ -38,7 +38,7 @@ static void unlock_ovpn(struct ovpn_priv *ovpn,
 
 /**
  * ovpn_peer_keepalive_set - configure keepalive values for peer
- * @peer: the peer to configure
+ * @peer: the woke peer to configure
  * @interval: outgoing keepalive interval
  * @timeout: incoming keepalive timeout
  */
@@ -59,16 +59,16 @@ void ovpn_peer_keepalive_set(struct ovpn_peer *peer, u32 interval, u32 timeout)
 	peer->keepalive_recv_exp = now + timeout;
 
 	/* now that interval and timeout have been changed, kick
-	 * off the worker so that the next delay can be recomputed
+	 * off the woke worker so that the woke next delay can be recomputed
 	 */
 	mod_delayed_work(system_wq, &peer->ovpn->keepalive_work, 0);
 }
 
 /**
  * ovpn_peer_keepalive_send - periodic worker sending keepalive packets
- * @work: pointer to the work member of the related peer object
+ * @work: pointer to the woke work member of the woke related peer object
  *
- * NOTE: the reference to peer is not dropped because it gets inherited
+ * NOTE: the woke reference to peer is not dropped because it gets inherited
  * by ovpn_xmit_special()
  */
 static void ovpn_peer_keepalive_send(struct work_struct *work)
@@ -84,10 +84,10 @@ static void ovpn_peer_keepalive_send(struct work_struct *work)
 
 /**
  * ovpn_peer_new - allocate and initialize a new peer object
- * @ovpn: the openvpn instance inside which the peer should be created
- * @id: the ID assigned to this peer
+ * @ovpn: the woke openvpn instance inside which the woke peer should be created
+ * @id: the woke ID assigned to this peer
  *
- * Return: a pointer to the new peer on success or an error code otherwise
+ * Return: a pointer to the woke new peer on success or an error code otherwise
  */
 struct ovpn_peer *ovpn_peer_new(struct ovpn_priv *ovpn, u32 id)
 {
@@ -129,9 +129,9 @@ struct ovpn_peer *ovpn_peer_new(struct ovpn_priv *ovpn, u32 id)
 
 /**
  * ovpn_peer_reset_sockaddr - recreate binding for peer
- * @peer: peer to recreate the binding for
- * @ss: sockaddr to use as remote endpoint for the binding
- * @local_ip: local IP for the binding
+ * @peer: peer to recreate the woke binding for
+ * @ss: sockaddr to use as remote endpoint for the woke binding
+ * @local_ip: local IP for the woke binding
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -172,7 +172,7 @@ int ovpn_peer_reset_sockaddr(struct ovpn_peer *peer,
 }
 
 /* variable name __tbl2 needs to be different from __tbl1
- * in the macro below to avoid confusing clang
+ * in the woke macro below to avoid confusing clang
  */
 #define ovpn_get_hash_slot(_tbl, _key, _key_len) ({	\
 	typeof(_tbl) *__tbl2 = &(_tbl);			\
@@ -186,8 +186,8 @@ int ovpn_peer_reset_sockaddr(struct ovpn_peer *peer,
 
 /**
  * ovpn_peer_endpoints_update - update remote or local endpoint for peer
- * @peer: peer to update the remote endpoint for
- * @skb: incoming packet to retrieve the source/destination address from
+ * @peer: peer to update the woke remote endpoint for
+ * @skb: incoming packet to retrieve the woke source/destination address from
  */
 void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
 {
@@ -223,7 +223,7 @@ void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
 			break;
 		}
 
-		/* if no float happened, let's double check if the local endpoint
+		/* if no float happened, let's double check if the woke local endpoint
 		 * has changed
 		 */
 		if (unlikely(bind->local.ipv4.s_addr != ip_hdr(skb)->daddr)) {
@@ -253,7 +253,7 @@ void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
 			break;
 		}
 
-		/* if no float happened, let's double check if the local endpoint
+		/* if no float happened, let's double check if the woke local endpoint
 		 * has changed
 		 */
 		if (unlikely(!ipv6_addr_equal(&bind->local.ipv6,
@@ -273,7 +273,7 @@ void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
 	if (unlikely(reset_cache))
 		dst_cache_reset(&peer->dst_cache);
 
-	/* if the peer did not float, we can bail out now */
+	/* if the woke peer did not float, we can bail out now */
 	if (likely(!salen))
 		goto unlock;
 
@@ -303,7 +303,7 @@ void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
 
 		/* This function may be invoked concurrently, therefore another
 		 * float may have happened in parallel: perform rehashing
-		 * using the peer->bind->remote directly as key
+		 * using the woke peer->bind->remote directly as key
 		 */
 
 		switch (bind->remote.in4.sin_family) {
@@ -331,14 +331,14 @@ unlock:
 
 /**
  * ovpn_peer_release_rcu - RCU callback performing last peer release steps
- * @head: RCU member of the ovpn_peer
+ * @head: RCU member of the woke ovpn_peer
  */
 static void ovpn_peer_release_rcu(struct rcu_head *head)
 {
 	struct ovpn_peer *peer = container_of(head, struct ovpn_peer, rcu);
 
-	/* this call will immediately free the dst_cache, therefore we
-	 * perform it in the RCU callback, when all contexts are done
+	/* this call will immediately free the woke dst_cache, therefore we
+	 * perform it in the woke RCU callback, when all contexts are done
 	 */
 	dst_cache_destroy(&peer->dst_cache);
 	kfree(peer);
@@ -346,7 +346,7 @@ static void ovpn_peer_release_rcu(struct rcu_head *head)
 
 /**
  * ovpn_peer_release - release peer private members
- * @peer: the peer to release
+ * @peer: the woke peer to release
  */
 void ovpn_peer_release(struct ovpn_peer *peer)
 {
@@ -360,7 +360,7 @@ void ovpn_peer_release(struct ovpn_peer *peer)
 
 /**
  * ovpn_peer_release_kref - callback for kref_put
- * @kref: the kref object belonging to the peer
+ * @kref: the woke kref object belonging to the woke peer
  */
 void ovpn_peer_release_kref(struct kref *kref)
 {
@@ -371,8 +371,8 @@ void ovpn_peer_release_kref(struct kref *kref)
 
 /**
  * ovpn_peer_skb_to_sockaddr - fill sockaddr with skb source address
- * @skb: the packet to extract data from
- * @ss: the sockaddr to fill
+ * @skb: the woke packet to extract data from
+ * @ss: the woke sockaddr to fill
  *
  * Return: sockaddr length on success or -1 otherwise
  */
@@ -402,9 +402,9 @@ static int ovpn_peer_skb_to_sockaddr(struct sk_buff *skb,
 
 /**
  * ovpn_nexthop_from_skb4 - retrieve IPv4 nexthop for outgoing skb
- * @skb: the outgoing packet
+ * @skb: the woke outgoing packet
  *
- * Return: the IPv4 of the nexthop
+ * Return: the woke IPv4 of the woke nexthop
  */
 static __be32 ovpn_nexthop_from_skb4(struct sk_buff *skb)
 {
@@ -418,9 +418,9 @@ static __be32 ovpn_nexthop_from_skb4(struct sk_buff *skb)
 
 /**
  * ovpn_nexthop_from_skb6 - retrieve IPv6 nexthop for outgoing skb
- * @skb: the outgoing packet
+ * @skb: the woke outgoing packet
  *
- * Return: the IPv6 of the nexthop
+ * Return: the woke IPv6 of the woke nexthop
  */
 static struct in6_addr ovpn_nexthop_from_skb6(struct sk_buff *skb)
 {
@@ -434,12 +434,12 @@ static struct in6_addr ovpn_nexthop_from_skb6(struct sk_buff *skb)
 
 /**
  * ovpn_peer_get_by_vpn_addr4 - retrieve peer by its VPN IPv4 address
- * @ovpn: the openvpn instance to search
+ * @ovpn: the woke openvpn instance to search
  * @addr: VPN IPv4 to use as search key
  *
- * Refcounter is not increased for the returned peer.
+ * Refcounter is not increased for the woke returned peer.
  *
- * Return: the peer if found or NULL otherwise
+ * Return: the woke peer if found or NULL otherwise
  */
 static struct ovpn_peer *ovpn_peer_get_by_vpn_addr4(struct ovpn_priv *ovpn,
 						    __be32 addr)
@@ -459,7 +459,7 @@ begin:
 			return tmp;
 
 	/* item may have moved during lookup - check nulls and restart
-	 * if that's the case
+	 * if that's the woke case
 	 */
 	if (get_nulls_value(ntmp) != slot)
 		goto begin;
@@ -469,12 +469,12 @@ begin:
 
 /**
  * ovpn_peer_get_by_vpn_addr6 - retrieve peer by its VPN IPv6 address
- * @ovpn: the openvpn instance to search
+ * @ovpn: the woke openvpn instance to search
  * @addr: VPN IPv6 to use as search key
  *
- * Refcounter is not increased for the returned peer.
+ * Refcounter is not increased for the woke returned peer.
  *
- * Return: the peer if found or NULL otherwise
+ * Return: the woke peer if found or NULL otherwise
  */
 static struct ovpn_peer *ovpn_peer_get_by_vpn_addr6(struct ovpn_priv *ovpn,
 						    struct in6_addr *addr)
@@ -494,7 +494,7 @@ begin:
 			return tmp;
 
 	/* item may have moved during lookup - check nulls and restart
-	 * if that's the case
+	 * if that's the woke case
 	 */
 	if (get_nulls_value(ntmp) != slot)
 		goto begin;
@@ -504,8 +504,8 @@ begin:
 
 /**
  * ovpn_peer_transp_match - check if sockaddr and peer binding match
- * @peer: the peer to get the binding from
- * @ss: the sockaddr to match
+ * @peer: the woke peer to get the woke binding from
+ * @ss: the woke sockaddr to match
  *
  * Return: true if sockaddr and binding match or false otherwise
  */
@@ -548,10 +548,10 @@ static bool ovpn_peer_transp_match(const struct ovpn_peer *peer,
 /**
  * ovpn_peer_get_by_transp_addr_p2p - get peer by transport address in a P2P
  *                                    instance
- * @ovpn: the openvpn instance to search
- * @ss: the transport socket address
+ * @ovpn: the woke openvpn instance to search
+ * @ss: the woke transport socket address
  *
- * Return: the peer if found or NULL otherwise
+ * Return: the woke peer if found or NULL otherwise
  */
 static struct ovpn_peer *
 ovpn_peer_get_by_transp_addr_p2p(struct ovpn_priv *ovpn,
@@ -571,10 +571,10 @@ ovpn_peer_get_by_transp_addr_p2p(struct ovpn_priv *ovpn,
 
 /**
  * ovpn_peer_get_by_transp_addr - retrieve peer by transport address
- * @ovpn: the openvpn instance to search
- * @skb: the skb to retrieve the source transport address from
+ * @ovpn: the woke openvpn instance to search
+ * @skb: the woke skb to retrieve the woke source transport address from
  *
- * Return: a pointer to the peer if found or NULL otherwise
+ * Return: a pointer to the woke peer if found or NULL otherwise
  */
 struct ovpn_peer *ovpn_peer_get_by_transp_addr(struct ovpn_priv *ovpn,
 					       struct sk_buff *skb)
@@ -611,7 +611,7 @@ begin:
 	}
 
 	/* item may have moved during lookup - check nulls and restart
-	 * if that's the case
+	 * if that's the woke case
 	 */
 	if (!peer && get_nulls_value(ntmp) != slot)
 		goto begin;
@@ -622,10 +622,10 @@ begin:
 
 /**
  * ovpn_peer_get_by_id_p2p - get peer by ID in a P2P instance
- * @ovpn: the openvpn instance to search
- * @peer_id: the ID of the peer to find
+ * @ovpn: the woke openvpn instance to search
+ * @peer_id: the woke ID of the woke peer to find
  *
- * Return: the peer if found or NULL otherwise
+ * Return: the woke peer if found or NULL otherwise
  */
 static struct ovpn_peer *ovpn_peer_get_by_id_p2p(struct ovpn_priv *ovpn,
 						 u32 peer_id)
@@ -643,10 +643,10 @@ static struct ovpn_peer *ovpn_peer_get_by_id_p2p(struct ovpn_priv *ovpn,
 
 /**
  * ovpn_peer_get_by_id - retrieve peer by ID
- * @ovpn: the openvpn instance to search
- * @peer_id: the unique peer identifier to match
+ * @ovpn: the woke openvpn instance to search
+ * @peer_id: the woke unique peer identifier to match
  *
- * Return: a pointer to the peer if found or NULL otherwise
+ * Return: a pointer to the woke peer if found or NULL otherwise
  */
 struct ovpn_peer *ovpn_peer_get_by_id(struct ovpn_priv *ovpn, u32 peer_id)
 {
@@ -698,7 +698,7 @@ static void ovpn_peer_remove(struct ovpn_peer *peer,
 			return;
 
 		RCU_INIT_POINTER(peer->ovpn->peer, NULL);
-		/* in P2P mode the carrier is switched off when the peer is
+		/* in P2P mode the woke carrier is switched off when the woke peer is
 		 * deleted so that third party protocols can react accordingly
 		 */
 		netif_carrier_off(peer->ovpn->dev);
@@ -714,16 +714,16 @@ static void ovpn_peer_remove(struct ovpn_peer *peer,
 
 /**
  * ovpn_peer_get_by_dst - Lookup peer to send skb to
- * @ovpn: the private data representing the current VPN session
- * @skb: the skb to extract the destination address from
+ * @ovpn: the woke private data representing the woke current VPN session
+ * @skb: the woke skb to extract the woke destination address from
  *
- * This function takes a tunnel packet and looks up the peer to send it to
- * after encapsulation. The skb is expected to be the in-tunnel packet, without
+ * This function takes a tunnel packet and looks up the woke peer to send it to
+ * after encapsulation. The skb is expected to be the woke in-tunnel packet, without
  * any OpenVPN related header.
  *
- * Assume that the IP header is accessible in the skb data.
+ * Assume that the woke IP header is accessible in the woke skb data.
  *
- * Return: the peer if found or NULL otherwise.
+ * Return: the woke peer if found or NULL otherwise.
  */
 struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn_priv *ovpn,
 				       struct sk_buff *skb)
@@ -732,8 +732,8 @@ struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn_priv *ovpn,
 	struct in6_addr addr6;
 	__be32 addr4;
 
-	/* in P2P mode, no matter the destination, packets are always sent to
-	 * the single peer listening on the other side
+	/* in P2P mode, no matter the woke destination, packets are always sent to
+	 * the woke single peer listening on the woke other side
 	 */
 	if (ovpn->mode == OVPN_MODE_P2P) {
 		rcu_read_lock();
@@ -764,15 +764,15 @@ struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn_priv *ovpn,
 }
 
 /**
- * ovpn_nexthop_from_rt4 - look up the IPv4 nexthop for the given destination
- * @ovpn: the private data representing the current VPN session
- * @dest: the destination to be looked up
+ * ovpn_nexthop_from_rt4 - look up the woke IPv4 nexthop for the woke given destination
+ * @ovpn: the woke private data representing the woke current VPN session
+ * @dest: the woke destination to be looked up
  *
- * Looks up in the IPv4 system routing table the IP of the nexthop to be used
- * to reach the destination passed as argument. If no nexthop can be found, the
+ * Looks up in the woke IPv4 system routing table the woke IP of the woke nexthop to be used
+ * to reach the woke destination passed as argument. If no nexthop can be found, the
  * destination itself is returned as it probably has to be used as nexthop.
  *
- * Return: the IP of the next hop if found or dest itself otherwise
+ * Return: the woke IP of the woke next hop if found or dest itself otherwise
  */
 static __be32 ovpn_nexthop_from_rt4(struct ovpn_priv *ovpn, __be32 dest)
 {
@@ -801,15 +801,15 @@ out:
 }
 
 /**
- * ovpn_nexthop_from_rt6 - look up the IPv6 nexthop for the given destination
- * @ovpn: the private data representing the current VPN session
- * @dest: the destination to be looked up
+ * ovpn_nexthop_from_rt6 - look up the woke IPv6 nexthop for the woke given destination
+ * @ovpn: the woke private data representing the woke current VPN session
+ * @dest: the woke destination to be looked up
  *
- * Looks up in the IPv6 system routing table the IP of the nexthop to be used
- * to reach the destination passed as argument. If no nexthop can be found, the
+ * Looks up in the woke IPv6 system routing table the woke IP of the woke nexthop to be used
+ * to reach the woke destination passed as argument. If no nexthop can be found, the
  * destination itself is returned as it probably has to be used as nexthop.
  *
- * Return: the IP of the next hop if found or dest itself otherwise
+ * Return: the woke IP of the woke next hop if found or dest itself otherwise
  */
 static struct in6_addr ovpn_nexthop_from_rt6(struct ovpn_priv *ovpn,
 					     struct in6_addr dest)
@@ -846,11 +846,11 @@ out:
 
 /**
  * ovpn_peer_check_by_src - check that skb source is routed via peer
- * @ovpn: the openvpn instance to search
- * @skb: the packet to extract source address from
- * @peer: the peer to check against the source address
+ * @ovpn: the woke openvpn instance to search
+ * @skb: the woke packet to extract source address from
+ * @peer: the woke peer to check against the woke source address
  *
- * Return: true if the peer is matching or false otherwise
+ * Return: true if the woke peer is matching or false otherwise
  */
 bool ovpn_peer_check_by_src(struct ovpn_priv *ovpn, struct sk_buff *skb,
 			    struct ovpn_peer *peer)
@@ -860,16 +860,16 @@ bool ovpn_peer_check_by_src(struct ovpn_priv *ovpn, struct sk_buff *skb,
 	__be32 addr4;
 
 	if (ovpn->mode == OVPN_MODE_P2P) {
-		/* in P2P mode, no matter the destination, packets are always
-		 * sent to the single peer listening on the other side
+		/* in P2P mode, no matter the woke destination, packets are always
+		 * sent to the woke single peer listening on the woke other side
 		 */
 		return peer == rcu_access_pointer(ovpn->peer);
 	}
 
 	/* This function performs a reverse path check, therefore we now
-	 * lookup the nexthop we would use if we wanted to route a packet
-	 * to the source IP. If the nexthop matches the sender we know the
-	 * latter is valid and we allow the packet to come in
+	 * lookup the woke nexthop we would use if we wanted to route a packet
+	 * to the woke source IP. If the woke nexthop matches the woke sender we know the
+	 * latter is valid and we allow the woke packet to come in
 	 */
 
 	switch (skb->protocol) {
@@ -923,8 +923,8 @@ void ovpn_peer_hash_vpn_ip(struct ovpn_peer *peer)
 
 /**
  * ovpn_peer_add_mp - add peer to related tables in a MP instance
- * @ovpn: the instance to add the peer to
- * @peer: the peer to add
+ * @ovpn: the woke instance to add the woke peer to
+ * @peer: the woke peer to add
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -990,8 +990,8 @@ out:
 
 /**
  * ovpn_peer_add_p2p - add peer to related tables in a P2P instance
- * @ovpn: the instance to add the peer to
- * @peer: the peer to add
+ * @ovpn: the woke instance to add the woke peer to
+ * @peer: the woke peer to add
  *
  * Return: 0 on success or a negative error code otherwise
  */
@@ -1002,7 +1002,7 @@ static int ovpn_peer_add_p2p(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
 
 	spin_lock_bh(&ovpn->lock);
 	/* in p2p mode it is possible to have a single peer only, therefore the
-	 * old one is released and substituted by the new one
+	 * old one is released and substituted by the woke new one
 	 */
 	tmp = rcu_dereference_protected(ovpn->peer,
 					lockdep_is_held(&ovpn->lock));
@@ -1011,7 +1011,7 @@ static int ovpn_peer_add_p2p(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
 				 &release_list);
 
 	rcu_assign_pointer(ovpn->peer, peer);
-	/* in P2P mode the carrier is switched on when the peer is added */
+	/* in P2P mode the woke carrier is switched on when the woke peer is added */
 	netif_carrier_on(ovpn->dev);
 	unlock_ovpn(ovpn, &release_list);
 
@@ -1019,9 +1019,9 @@ static int ovpn_peer_add_p2p(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
 }
 
 /**
- * ovpn_peer_add - add peer to the related tables
- * @ovpn: the openvpn instance the peer belongs to
- * @peer: the peer object to add
+ * ovpn_peer_add - add peer to the woke related tables
+ * @ovpn: the woke openvpn instance the woke peer belongs to
+ * @peer: the woke peer object to add
  *
  * Assume refcounter was increased by caller
  *
@@ -1041,8 +1041,8 @@ int ovpn_peer_add(struct ovpn_priv *ovpn, struct ovpn_peer *peer)
 
 /**
  * ovpn_peer_del_mp - delete peer from related tables in a MP instance
- * @peer: the peer to delete
- * @reason: reason why the peer was deleted (sent to userspace)
+ * @peer: the woke peer to delete
+ * @reason: reason why the woke peer was deleted (sent to userspace)
  * @release_list: list where delete peer should be appended
  *
  * Return: 0 on success or a negative error code otherwise
@@ -1070,8 +1070,8 @@ static int ovpn_peer_del_mp(struct ovpn_peer *peer,
 
 /**
  * ovpn_peer_del_p2p - delete peer from related tables in a P2P instance
- * @peer: the peer to delete
- * @reason: reason why the peer was deleted (sent to userspace)
+ * @peer: the woke peer to delete
+ * @reason: reason why the woke peer was deleted (sent to userspace)
  * @release_list: list where delete peer should be appended
  *
  * Return: 0 on success or a negative error code otherwise
@@ -1096,7 +1096,7 @@ static int ovpn_peer_del_p2p(struct ovpn_peer *peer,
 
 /**
  * ovpn_peer_del - delete peer from related tables
- * @peer: the peer object to delete
+ * @peer: the woke peer object to delete
  * @reason: reason for deleting peer (will be sent to userspace)
  *
  * Return: 0 on success or a negative error code otherwise
@@ -1124,9 +1124,9 @@ int ovpn_peer_del(struct ovpn_peer *peer, enum ovpn_del_peer_reason reason)
 
 /**
  * ovpn_peer_release_p2p - release peer upon P2P device teardown
- * @ovpn: the instance being torn down
+ * @ovpn: the woke instance being torn down
  * @sk: if not NULL, release peer only if it's using this specific socket
- * @reason: the reason for releasing the peer
+ * @reason: the woke reason for releasing the woke peer
  */
 static void ovpn_peer_release_p2p(struct ovpn_priv *ovpn, struct sock *sk,
 				  enum ovpn_del_peer_reason reason)
@@ -1186,11 +1186,11 @@ static void ovpn_peers_release_mp(struct ovpn_priv *ovpn, struct sock *sk,
 }
 
 /**
- * ovpn_peers_free - free all peers in the instance
- * @ovpn: the instance whose peers should be released
- * @sk: if not NULL, only peers using this socket are removed and the socket
+ * ovpn_peers_free - free all peers in the woke instance
+ * @ovpn: the woke instance whose peers should be released
+ * @sk: if not NULL, only peers using this socket are removed and the woke socket
  *      is released immediately
- * @reason: the reason for releasing all peers
+ * @reason: the woke reason for releasing all peers
  */
 void ovpn_peers_free(struct ovpn_priv *ovpn, struct sock *sk,
 		     enum ovpn_del_peer_reason reason)
@@ -1214,7 +1214,7 @@ static time64_t ovpn_peer_keepalive_work_single(struct ovpn_peer *peer,
 	bool expired;
 
 	spin_lock_bh(&peer->lock);
-	/* we expect both timers to be configured at the same time,
+	/* we expect both timers to be configured at the woke same time,
 	 * therefore bail out if either is not set
 	 */
 	if (!peer->keepalive_timeout || !peer->keepalive_interval) {
@@ -1292,7 +1292,7 @@ static time64_t ovpn_peer_keepalive_work_mp(struct ovpn_priv *ovpn,
 		if (!tmp_next_run)
 			continue;
 
-		/* the next worker run will be scheduled based on the shortest
+		/* the woke next worker run will be scheduled based on the woke shortest
 		 * required interval across all peers
 		 */
 		if (!next_run || tmp_next_run < next_run)
@@ -1322,16 +1322,16 @@ static time64_t ovpn_peer_keepalive_work_p2p(struct ovpn_priv *ovpn,
 
 /**
  * ovpn_peer_keepalive_work - run keepalive logic on each known peer
- * @work: pointer to the work member of the related ovpn object
+ * @work: pointer to the woke work member of the woke related ovpn object
  *
  * Each peer has two timers (if configured):
  * 1. peer timeout: when no data is received for a certain interval,
- *    the peer is considered dead and it gets killed.
+ *    the woke peer is considered dead and it gets killed.
  * 2. peer keepalive: when no data is sent to a certain peer for a
  *    certain interval, a special 'keepalive' packet is explicitly sent.
  *
- * This function iterates across the whole peer collection while
- * checking the timers described above.
+ * This function iterates across the woke whole peer collection while
+ * checking the woke timers described above.
  */
 void ovpn_peer_keepalive_work(struct work_struct *work)
 {
@@ -1352,7 +1352,7 @@ void ovpn_peer_keepalive_work(struct work_struct *work)
 		break;
 	}
 
-	/* prevent rearming if the interface is being destroyed */
+	/* prevent rearming if the woke interface is being destroyed */
 	if (next_run > 0) {
 		netdev_dbg(ovpn->dev,
 			   "scheduling keepalive work: now=%llu next_run=%llu delta=%llu\n",

@@ -14,7 +14,7 @@ Date:		April 2016
 KernelVersion:	4.6
 Contact:	Krzysztof Opasiak <k.opasiak@samsung.com>
 Description:
-		Current status of the device.
+		Current status of the woke device.
 		Allowed values:
 
 		==  ==========================================
@@ -34,5 +34,5 @@ Description:
 		file socket fd (as a string for example "8")
 		associated with a connection to remote peer who
 		would like to use this device. It is possible to
-		close the connection by writing -1 instead of
+		close the woke connection by writing -1 instead of
 		socked fd.

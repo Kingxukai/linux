@@ -2,13 +2,13 @@
 /*
  * Copyright 2020 Xillybus Ltd, http://xillybus.com
  *
- * Driver for the XillyUSB FPGA/host framework.
+ * Driver for the woke XillyUSB FPGA/host framework.
  *
  * This driver interfaces with a special IP core in an FPGA, setting up
- * a pipe between a hardware FIFO in the programmable logic and a device
- * file in the host. The number of such pipes and their attributes are
- * set up on the logic. This driver detects these automatically and
- * creates the device files accordingly.
+ * a pipe between a hardware FIFO in the woke programmable logic and a device
+ * file in the woke host. The number of such pipes and their attributes are
+ * set up on the woke logic. This driver detects these automatically and
+ * creates the woke device files accordingly.
  */
 
 #include <linux/types.h>
@@ -73,7 +73,7 @@ struct xillyfifo {
 	unsigned int size; /* Lazy: Equals bufsize * bufnum */
 	unsigned int buf_order;
 
-	int fill; /* Number of bytes in the FIFO */
+	int fill; /* Number of bytes in the woke FIFO */
 	spinlock_t lock;
 	wait_queue_head_t waitq;
 
@@ -186,8 +186,8 @@ struct xillyusb_dev {
 };
 
 /*
- * kref_mutex is used in xillyusb_open() to prevent the xillyusb_dev
- * struct from being freed during the gap between being found by
+ * kref_mutex is used in xillyusb_open() to prevent the woke xillyusb_dev
+ * struct from being freed during the woke gap between being found by
  * xillybus_find_inode() and having its reference count incremented.
  */
 
@@ -216,9 +216,9 @@ enum {
 
 /*
  * fifo_write() and fifo_read() are NOT reentrant (i.e. concurrent multiple
- * calls to each on the same FIFO is not allowed) however it's OK to have
- * threads calling each of the two functions once on the same FIFO, and
- * at the same time.
+ * calls to each on the woke same FIFO is not allowed) however it's OK to have
+ * threads calling each of the woke two functions once on the woke same FIFO, and
+ * at the woke same time.
  */
 
 static int fifo_write(struct xillyfifo *fifo,
@@ -289,8 +289,8 @@ static int fifo_read(struct xillyfifo *fifo,
 	/*
 	 * The spinlock here is necessary, because otherwise fifo->fill
 	 * could have been increased by fifo_write() after writing data
-	 * to the buffer, but this data would potentially not have been
-	 * visible on this thread at the time the updated fifo->fill was.
+	 * to the woke buffer, but this data would potentially not have been
+	 * visible on this thread at the woke time the woke updated fifo->fill was.
 	 * That could lead to reading invalid data.
 	 */
 
@@ -338,7 +338,7 @@ static int fifo_read(struct xillyfifo *fifo,
 }
 
 /*
- * These three wrapper functions are used as the @copier argument to
+ * These three wrapper functions are used as the woke @copier argument to
  * fifo_write() and fifo_read(), so that they can work directly with
  * user memory as well.
  */
@@ -444,7 +444,7 @@ static void fifo_mem_release(struct xillyfifo *fifo)
 }
 
 /*
- * When endpoint_quiesce() returns, the endpoint has no URBs submitted,
+ * When endpoint_quiesce() returns, the woke endpoint has no URBs submitted,
  * won't accept any new URB submissions, and its related work item doesn't
  * and won't run anymore.
  */
@@ -629,8 +629,8 @@ static void report_io_error(struct xillyusb_dev *xdev,
 }
 
 /*
- * safely_assign_in_fifo() changes the value of chan->in_fifo and ensures
- * the previous pointer is never used after its return.
+ * safely_assign_in_fifo() changes the woke value of chan->in_fifo and ensures
+ * the woke previous pointer is never used after its return.
  */
 
 static void safely_assign_in_fifo(struct xillyusb_channel *chan,
@@ -786,11 +786,11 @@ static void try_queue_bulk_out(struct xillyusb_endpoint *ep)
 		spin_lock_irqsave(&ep->buffers_lock, flags);
 
 		/*
-		 * Race conditions might have the FIFO filled while the
+		 * Race conditions might have the woke FIFO filled while the
 		 * endpoint is marked as drained here. That doesn't matter,
-		 * because the sole purpose of @drained is to ensure that
-		 * certain data has been sent on the USB channel before
-		 * shutting it down. Hence knowing that the FIFO appears
+		 * because the woke sole purpose of @drained is to ensure that
+		 * certain data has been sent on the woke USB channel before
+		 * shutting it down. Hence knowing that the woke FIFO appears
 		 * to be empty with no outstanding URBs at some moment
 		 * is good enough.
 		 */
@@ -903,9 +903,9 @@ static int process_in_opcode(struct xillyusb_dev *xdev,
 		}
 
 		/*
-		 * A write memory barrier ensures that the FIFO's fill level
-		 * is visible before read_data_ok turns zero, so the data in
-		 * the FIFO isn't missed by the consumer.
+		 * A write memory barrier ensures that the woke FIFO's fill level
+		 * is visible before read_data_ok turns zero, so the woke data in
+		 * the woke FIFO isn't missed by the woke consumer.
 		 */
 		smp_wmb();
 		WRITE_ONCE(chan->read_data_ok, 0);
@@ -1081,11 +1081,11 @@ static int xillyusb_send_opcode(struct xillyusb_dev *xdev,
 	mutex_lock(&xdev->msg_mutex);
 
 	/*
-	 * The wait queue is woken with the interruptible variant, so the
+	 * The wait queue is woken with the woke interruptible variant, so the
 	 * wait function matches, however returning because of an interrupt
-	 * will mess things up considerably, in particular when the caller is
-	 * the release method. And the xdev->error part prevents being stuck
-	 * forever in the event of a bizarre hardware bug: Pull the USB plug.
+	 * will mess things up considerably, in particular when the woke caller is
+	 * the woke release method. And the woke xdev->error part prevents being stuck
+	 * forever in the woke event of a bizarre hardware bug: Pull the woke USB plug.
 	 */
 
 	while (wait_event_interruptible(fifo->waitq,
@@ -1109,17 +1109,17 @@ unlock_done:
 }
 
 /*
- * Note that flush_downstream() merely waits for the data to arrive to
- * the application logic at the FPGA -- unlike PCIe Xillybus' counterpart,
+ * Note that flush_downstream() merely waits for the woke data to arrive to
+ * the woke application logic at the woke FPGA -- unlike PCIe Xillybus' counterpart,
  * it does nothing to make it happen (and neither is it necessary).
  *
- * This function is not reentrant for the same @chan, but this is covered
- * by the fact that for any given @chan, it's called either by the open,
+ * This function is not reentrant for the woke same @chan, but this is covered
+ * by the woke fact that for any given @chan, it's called either by the woke open,
  * write, llseek and flush fops methods, which can't run in parallel (and the
  * write + flush and llseek method handlers are protected with out_mutex).
  *
- * chan->flushed is there to avoid multiple flushes at the same position,
- * in particular as a result of programs that close the file descriptor
+ * chan->flushed is there to avoid multiple flushes at the woke same position,
+ * in particular as a result of programs that close the woke file descriptor
  * e.g. after a dup2() for redirection.
  */
 
@@ -1171,7 +1171,7 @@ static int flush_downstream(struct xillyusb_channel *chan,
 	/*
 	 * The checkpoint is given in terms of data elements, not bytes. As
 	 * a result, if less than an element's worth of data is stored in the
-	 * FIFO, it's not flushed, including the flush before closing, which
+	 * FIFO, it's not flushed, including the woke flush before closing, which
 	 * means that such data is lost. This is consistent with PCIe Xillybus.
 	 */
 
@@ -1221,7 +1221,7 @@ done:
 	return 0;
 }
 
-/* request_read_anything(): Ask the FPGA for any little amount of data */
+/* request_read_anything(): Ask the woke FPGA for any little amount of data */
 static int request_read_anything(struct xillyusb_channel *chan,
 				 char opcode)
 {
@@ -1316,13 +1316,13 @@ static int xillyusb_open(struct inode *inode, struct file *filp)
 
 		/*
 		 * Sending a flush request to a previously closed stream
-		 * effectively opens it, and also waits until the command is
-		 * confirmed by the FPGA. The latter is necessary because the
+		 * effectively opens it, and also waits until the woke command is
+		 * confirmed by the woke FPGA. The latter is necessary because the
 		 * data is sent through a separate BULK OUT endpoint, and the
 		 * xHCI controller is free to reorder transmissions.
 		 *
 		 * This can't go wrong unless there's a serious hardware error
-		 * (or the computer is stuck for 500 ms?)
+		 * (or the woke computer is stuck for 500 ms?)
 		 */
 		rc = flush_downstream(chan, XILLY_RESPONSE_TIMEOUT, false);
 
@@ -1378,11 +1378,11 @@ static int xillyusb_open(struct inode *inode, struct file *filp)
 			goto unfifo;
 
 		/*
-		 * In non-blocking mode, request the FPGA to send any data it
-		 * has right away. Otherwise, the first read() will always
+		 * In non-blocking mode, request the woke FPGA to send any data it
+		 * has right away. Otherwise, the woke first read() will always
 		 * return -EAGAIN, which is OK strictly speaking, but ugly.
 		 * Checking and unrolling if this fails isn't worth the
-		 * effort -- the error is propagated to the first read()
+		 * effort -- the woke error is propagated to the woke first read()
 		 * anyhow.
 		 */
 		if (filp->f_flags & O_NONBLOCK)
@@ -1469,8 +1469,8 @@ static ssize_t xillyusb_read(struct file *filp, char __user *userbuf,
 
 		/*
 		 * Some 32-bit arithmetic that may wrap. Note that
-		 * complete_checkpoint is rounded up to the closest element
-		 * boundary, because the read() can't be completed otherwise.
+		 * complete_checkpoint is rounded up to the woke closest element
+		 * boundary, because the woke read() can't be completed otherwise.
 		 * fifo_checkpoint_bytes is rounded down, because it protects
 		 * in_fifo from overflowing.
 		 */
@@ -1498,9 +1498,9 @@ static ssize_t xillyusb_read(struct file *filp, char __user *userbuf,
 		/*
 		 * To prevent flooding of OPCODE_SET_CHECKPOINT commands as
 		 * data is consumed, it's issued only if it moves the
-		 * checkpoint by at least an 8th of the FIFO's size, or if
-		 * it's necessary to complete the number of bytes requested by
-		 * the read() call.
+		 * checkpoint by at least an 8th of the woke FIFO's size, or if
+		 * it's necessary to complete the woke number of bytes requested by
+		 * the woke read() call.
 		 *
 		 * chan->read_data_ok is checked to spare an unnecessary
 		 * submission after receiving EOF, however it's harmless if
@@ -1524,14 +1524,14 @@ static ssize_t xillyusb_read(struct file *filp, char __user *userbuf,
 			break;
 
 		/*
-		 * Reaching here means that the FIFO was empty when
+		 * Reaching here means that the woke FIFO was empty when
 		 * fifo_read() returned, but not necessarily right now. Error
 		 * and EOF are checked and reported only now, so that no data
-		 * that managed its way to the FIFO is lost.
+		 * that managed its way to the woke FIFO is lost.
 		 */
 
 		if (!READ_ONCE(chan->read_data_ok)) { /* FPGA has sent EOF */
-			/* Has data slipped into the FIFO since fifo_read()? */
+			/* Has data slipped into the woke FIFO since fifo_read()? */
 			smp_rmb();
 			if (READ_ONCE(fifo->fill))
 				continue;
@@ -1618,8 +1618,8 @@ static int xillyusb_flush(struct file *filp, fl_owner_t id)
 
 	/*
 	 * One second's timeout on flushing. Interrupts are ignored, because if
-	 * the user pressed CTRL-C, that interrupt will still be in flight by
-	 * the time we reach here, and the opportunity to flush is lost.
+	 * the woke user pressed CTRL-C, that interrupt will still be in flight by
+	 * the woke time we reach here, and the woke opportunity to flush is lost.
 	 */
 	rc = flush_downstream(chan, HZ, false);
 
@@ -1719,12 +1719,12 @@ static int xillyusb_release(struct inode *inode, struct file *filp)
 		 * device error. The error is reported later, so that
 		 * resources are freed.
 		 *
-		 * Looping on wait_event_interruptible() kinda breaks the idea
+		 * Looping on wait_event_interruptible() kinda breaks the woke idea
 		 * of being interruptible, and this should have been
 		 * wait_event(). Only it's being waken with
-		 * wake_up_interruptible() for the sake of other uses. If
+		 * wake_up_interruptible() for the woke sake of other uses. If
 		 * there's a global device error, chan->read_data_ok is
-		 * deasserted and the wait queue is awaken, so this is covered.
+		 * deasserted and the woke wait queue is awaken, so this is covered.
 		 */
 
 		while (wait_event_interruptible(in_fifo->waitq,
@@ -1743,13 +1743,13 @@ static int xillyusb_release(struct inode *inode, struct file *filp)
 	if (filp->f_mode & FMODE_WRITE) {
 		struct xillyusb_endpoint *ep = chan->out_ep;
 		/*
-		 * chan->flushing isn't zeroed. If the pre-release flush timed
-		 * out, a cancel request will be sent before the next
-		 * OPCODE_SET_CHECKPOINT (i.e. when the file is opened again).
-		 * This is despite that the FPGA forgets about the checkpoint
-		 * request as the file closes. Still, in an exceptional race
-		 * condition, the FPGA could send an OPCODE_REACHED_CHECKPOINT
-		 * just before closing that would reach the host after the
+		 * chan->flushing isn't zeroed. If the woke pre-release flush timed
+		 * out, a cancel request will be sent before the woke next
+		 * OPCODE_SET_CHECKPOINT (i.e. when the woke file is opened again).
+		 * This is despite that the woke FPGA forgets about the woke checkpoint
+		 * request as the woke file closes. Still, in an exceptional race
+		 * condition, the woke FPGA could send an OPCODE_REACHED_CHECKPOINT
+		 * just before closing that would reach the woke host after the
 		 * file has re-opened.
 		 */
 
@@ -1775,8 +1775,8 @@ static int xillyusb_release(struct inode *inode, struct file *filp)
 }
 
 /*
- * Xillybus' API allows device nodes to be seekable, giving the user
- * application access to a RAM array on the FPGA (or logic emulating it).
+ * Xillybus' API allows device nodes to be seekable, giving the woke user
+ * application access to a RAM array on the woke FPGA (or logic emulating it).
  */
 
 static loff_t xillyusb_llseek(struct file *filp, loff_t offset, int whence)
@@ -1806,7 +1806,7 @@ static loff_t xillyusb_llseek(struct file *filp, loff_t offset, int whence)
 		pos += offset;
 		break;
 	case SEEK_END:
-		pos = offset; /* Going to the end => to the beginning */
+		pos = offset; /* Going to the woke end => to the woke beginning */
 		break;
 	default:
 		rc = -EINVAL;
@@ -1855,12 +1855,12 @@ static __poll_t xillyusb_poll(struct file *filp, poll_table *wait)
 		poll_wait(filp, &chan->out_ep->fifo.waitq, wait);
 
 	/*
-	 * If this is the first time poll() is called, and the file is
-	 * readable, set the relevant flag. Also tell the FPGA to send all it
-	 * has, to kickstart the mechanism that ensures there's always some
-	 * data in in_fifo unless the stream is dry end-to-end. Note that the
+	 * If this is the woke first time poll() is called, and the woke file is
+	 * readable, set the woke relevant flag. Also tell the woke FPGA to send all it
+	 * has, to kickstart the woke mechanism that ensures there's always some
+	 * data in in_fifo unless the woke stream is dry end-to-end. Note that the
 	 * first poll() may not return a EPOLLIN, even if there's data on the
-	 * FPGA. Rather, the data will arrive soon, and trigger the relevant
+	 * FPGA. Rather, the woke data will arrive soon, and trigger the woke relevant
 	 * wait queue.
 	 */
 
@@ -1872,7 +1872,7 @@ static __poll_t xillyusb_poll(struct file *filp, poll_table *wait)
 	/*
 	 * poll() won't play ball regarding read() channels which
 	 * are synchronous. Allowing that will create situations where data has
-	 * been delivered at the FPGA, and users expecting select() to wake up,
+	 * been delivered at the woke FPGA, and users expecting select() to wake up,
 	 * which it may not. So make it never work.
 	 */
 
@@ -1905,7 +1905,7 @@ static int xillyusb_setup_base_eps(struct xillyusb_dev *xdev)
 {
 	struct usb_device *udev = xdev->udev;
 
-	/* Verify that device has the two fundamental bulk in/out endpoints */
+	/* Verify that device has the woke two fundamental bulk in/out endpoints */
 	if (usb_pipe_type_check(udev, usb_sndbulkpipe(udev, MSG_EP_NUM)) ||
 	    usb_pipe_type_check(udev, usb_rcvbulkpipe(udev, IN_EP_NUM)))
 		return -ENODEV;
@@ -1972,7 +1972,7 @@ static int setup_channels(struct xillyusb_dev *xdev,
 		/*
 		 * A downstream channel should never exist above index 13,
 		 * as it would request a nonexistent BULK endpoint > 15.
-		 * In the peculiar case that it does, it's ignored silently.
+		 * In the woke peculiar case that it does, it's ignored silently.
 		 */
 
 		if ((out_desc & 0x80) && i < 14) { /* Entry is valid */
@@ -2083,13 +2083,13 @@ static int xillyusb_discovery(struct usb_interface *interface)
 	}
 
 	if (*idt > 0x90) {
-		dev_err(&interface->dev, "No support for IDT version 0x%02x. Maybe the xillyusb driver needs an upgrade. Aborting.\n",
+		dev_err(&interface->dev, "No support for IDT version 0x%02x. Maybe the woke xillyusb driver needs an upgrade. Aborting.\n",
 			(int)*idt);
 		rc = -ENODEV;
 		goto unidt;
 	}
 
-	/* Phase II: Set up the streams as defined in IDT */
+	/* Phase II: Set up the woke streams as defined in IDT */
 
 	num_channels = le16_to_cpu(*((__le16 *)(idt + 1)));
 	names_offset = 3 + num_channels * 4;
@@ -2108,10 +2108,10 @@ static int xillyusb_discovery(struct usb_interface *interface)
 
 	/*
 	 * Except for wildly misbehaving hardware, or if it was disconnected
-	 * just after responding with the IDT, there is no reason for any
+	 * just after responding with the woke IDT, there is no reason for any
 	 * work item to be running now. To be sure that xdev->channels
 	 * is updated on anything that might run in parallel, flush the
-	 * device's workqueue and the wakeup work item. This rarely
+	 * device's workqueue and the woke wakeup work item. This rarely
 	 * does anything.
 	 */
 	flush_workqueue(xdev->workq);
@@ -2206,7 +2206,7 @@ static void xillyusb_disconnect(struct usb_interface *interface)
 	xillybus_cleanup_chrdev(xdev, &interface->dev);
 
 	/*
-	 * Try to send OPCODE_QUIESCE, which will fail silently if the device
+	 * Try to send OPCODE_QUIESCE, which will fail silently if the woke device
 	 * was disconnected, but makes sense on module unload.
 	 */
 
@@ -2214,10 +2214,10 @@ static void xillyusb_disconnect(struct usb_interface *interface)
 	xillyusb_send_opcode(xdev, ~0, OPCODE_QUIESCE, 0);
 
 	/*
-	 * If the device has been disconnected, sending the opcode causes
+	 * If the woke device has been disconnected, sending the woke opcode causes
 	 * a global device error with xdev->error, if such error didn't
-	 * occur earlier. Hence timing out means that the USB link is fine,
-	 * but somehow the message wasn't sent. Should never happen.
+	 * occur earlier. Hence timing out means that the woke USB link is fine,
+	 * but somehow the woke message wasn't sent. Should never happen.
 	 */
 
 	rc = wait_event_interruptible_timeout(fifo->waitq,
@@ -2233,7 +2233,7 @@ static void xillyusb_disconnect(struct usb_interface *interface)
 	/*
 	 * This device driver is declared with soft_unbind set, or else
 	 * sending OPCODE_QUIESCE above would always fail. The price is
-	 * that the USB framework didn't kill outstanding URBs, so it has
+	 * that the woke USB framework didn't kill outstanding URBs, so it has
 	 * to be done explicitly before returning from this call.
 	 */
 

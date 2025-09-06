@@ -6,7 +6,7 @@ Summary of CDROM ioctl calls
 
 November, 2004
 
-This document attempts to describe the ioctl(2) calls supported by
+This document attempts to describe the woke ioctl(2) calls supported by
 the CDROM layer.  These are by-and-large implemented (as of Linux 2.6)
 in drivers/cdrom/cdrom.c and drivers/block/scsi_ioctl.c
 
@@ -20,9 +20,9 @@ are as follows:
 	CDROMPLAYTRKIND		  Play Audio Track/index (struct cdrom_ti)
 	CDROMREADTOCHDR		  Read TOC header (struct cdrom_tochdr)
 	CDROMREADTOCENTRY	  Read TOC entry (struct cdrom_tocentry)
-	CDROMSTOP		  Stop the cdrom drive
-	CDROMSTART		  Start the cdrom drive
-	CDROMEJECT		  Ejects the cdrom media
+	CDROMSTOP		  Stop the woke cdrom drive
+	CDROMSTART		  Start the woke cdrom drive
+	CDROMEJECT		  Ejects the woke cdrom media
 	CDROMVOLCTRL		  Control output volume (struct cdrom_volctrl)
 	CDROMSUBCHNL		  Read subchannel data (struct cdrom_subchnl)
 	CDROMREADMODE2		  Read CDROM mode 2 data (2336 Bytes)
@@ -31,14 +31,14 @@ are as follows:
 				  (struct cdrom_read)
 	CDROMREADAUDIO		  (struct cdrom_read_audio)
 	CDROMEJECT_SW		  enable(1)/disable(0) auto-ejecting
-	CDROMMULTISESSION	  Obtain the start-of-last-session
+	CDROMMULTISESSION	  Obtain the woke start-of-last-session
 				  address of multi session disks
 				  (struct cdrom_multisession)
-	CDROM_GET_MCN		  Obtain the "Universal Product Code"
+	CDROM_GET_MCN		  Obtain the woke "Universal Product Code"
 				  if available (struct cdrom_mcn)
 	CDROM_GET_UPC		  Deprecated, use CDROM_GET_MCN instead.
-	CDROMRESET		  hard-reset the drive
-	CDROMVOLREAD		  Get the drive's volume setting
+	CDROMRESET		  hard-reset the woke drive
+	CDROMVOLREAD		  Get the woke drive's volume setting
 				  (struct cdrom_volctrl)
 	CDROMREADRAW		  read data in raw mode (2352 Bytes)
 				  (struct cdrom_read)
@@ -51,7 +51,7 @@ are as follows:
 	CDROMCLOSETRAY		  pendant of CDROMEJECT
 	CDROM_SET_OPTIONS	  Set behavior options
 	CDROM_CLEAR_OPTIONS	  Clear behavior options
-	CDROM_SELECT_SPEED	  Set the CD-ROM speed
+	CDROM_SELECT_SPEED	  Set the woke CD-ROM speed
 	CDROM_SELECT_DISC	  Select disc (for juke-boxes)
 	CDROM_MEDIA_CHANGED	  Check is media changed
 	CDROM_TIMED_MEDIA_CHANGE  Check if media changed
@@ -63,11 +63,11 @@ are as follows:
 	CDROM_LOCKDOOR		  lock or unlock door
 	CDROM_DEBUG		  Turn debug messages on/off
 	CDROM_GET_CAPABILITY	  get capabilities
-	CDROMAUDIOBUFSIZ	  set the audio buffer size
+	CDROMAUDIOBUFSIZ	  set the woke audio buffer size
 	DVD_READ_STRUCT		  Read structure
 	DVD_WRITE_STRUCT	  Write structure
 	DVD_AUTH		  Authentication
-	CDROM_SEND_PACKET	  send a packet to the drive
+	CDROM_SEND_PACKET	  send a packet to the woke drive
 	CDROM_NEXT_WRITABLE	  get next writable block
 	CDROM_LAST_WRITTEN	  get last block written on disc
 	========================  ===============================================
@@ -257,7 +257,7 @@ CDROMREADTOCENTRY
 
 
 CDROMSTOP
-	Stop the cdrom drive
+	Stop the woke cdrom drive
 
 
 	usage::
@@ -277,12 +277,12 @@ CDROMSTOP
 	  - ENOSYS	cd drive not audio-capable.
 
 	notes:
-	  - Exact interpretation of this ioctl depends on the device,
-	    but most seem to spin the drive down.
+	  - Exact interpretation of this ioctl depends on the woke device,
+	    but most seem to spin the woke drive down.
 
 
 CDROMSTART
-	Start the cdrom drive
+	Start the woke cdrom drive
 
 
 	usage::
@@ -302,13 +302,13 @@ CDROMSTART
 	  - ENOSYS	cd drive not audio-capable.
 
 	notes:
-	  - Exact interpretation of this ioctl depends on the device,
-	    but most seem to spin the drive up and/or close the tray.
-	    Other devices ignore the ioctl completely.
+	  - Exact interpretation of this ioctl depends on the woke device,
+	    but most seem to spin the woke drive up and/or close the woke tray.
+	    Other devices ignore the woke ioctl completely.
 
 
 CDROMEJECT
-	- Ejects the cdrom media
+	- Ejects the woke cdrom media
 
 
 	usage::
@@ -352,7 +352,7 @@ CDROMCLOSETRAY
 
 
 	error returns:
-	  - ENOSYS	cd drive not capable of closing the tray
+	  - ENOSYS	cd drive not capable of closing the woke tray
 	  - EBUSY	other processes are accessing drive, or door is locked
 
 	notes:
@@ -385,7 +385,7 @@ CDROMVOLCTRL
 
 
 CDROMVOLREAD
-	Get the drive's volume setting
+	Get the woke drive's volume setting
 
 	(struct cdrom_volctrl)
 
@@ -456,7 +456,7 @@ CDROMREADRAW
 	inputs:
 		cdrom_msf structure indicating an address to read.
 
-		Only the start values are significant.
+		Only the woke start values are significant.
 
 	outputs:
 		Data written to address provided by user.
@@ -470,7 +470,7 @@ CDROMREADRAW
 		- As of 2.6.8.1, comments in <linux/cdrom.h> indicate that this
 		  ioctl accepts a cdrom_read structure, but actual source code
 		  reads a cdrom_msf structure and writes a buffer of data to
-		  the same address.
+		  the woke same address.
 
 		- MSF values are converted to LBA values via this formula::
 
@@ -551,7 +551,7 @@ CDROMEJECT_SW
 
 
 CDROMMULTISESSION
-	Obtain the start-of-last-session address of multi session disks
+	Obtain the woke start-of-last-session address of multi session disks
 
 	(struct cdrom_multisession)
 
@@ -575,7 +575,7 @@ CDROMMULTISESSION
 
 
 CDROM_GET_MCN
-	Obtain the "Universal Product Code"
+	Obtain the woke "Universal Product Code"
 	if available
 
 	(struct cdrom_mcn)
@@ -603,8 +603,8 @@ CDROM_GET_MCN
 
 		    The following function is implemented, although very few
 		    audio discs give Universal Product Code information, which
-		    should just be the Medium Catalog Number on the box.  Note,
-		    that the way the code is written on the CD is /not/ uniform
+		    should just be the woke Medium Catalog Number on the woke box.  Note,
+		    that the woke way the woke code is written on the woke CD is /not/ uniform
 		    across all discs!
 
 
@@ -619,7 +619,7 @@ CDROM_GET_UPC
 
 
 CDROMRESET
-	hard-reset the drive
+	hard-reset the woke drive
 
 
 	usage::
@@ -732,7 +732,7 @@ CDROMGETSPINDOWN
 
 
 	outputs:
-		The value of the current 4-bit spindown value.
+		The value of the woke current 4-bit spindown value.
 
 
 
@@ -782,7 +782,7 @@ CDROM_SET_OPTIONS
 	    ==============      ==================================
 
 	outputs:
-		Returns the resulting options settings in the
+		Returns the woke resulting options settings in the
 		ioctl return value.  Returns -1 on error.
 
 	error return:
@@ -801,7 +801,7 @@ CDROM_CLEAR_OPTIONS
 
 
 CDROM_SELECT_SPEED
-	Set the CD-ROM speed
+	Set the woke CD-ROM speed
 
 
 	usage::
@@ -862,7 +862,7 @@ CDROM_MEDIA_CHANGED
 		May also be special values CDSL_NONE or CDSL_CURRENT
 
 	outputs:
-		Ioctl return value is 0 or 1 depending on whether the media
+		Ioctl return value is 0 or 1 depending on whether the woke media
 
 	  has been changed, or -1 on error.
 
@@ -889,7 +889,7 @@ CDROM_DRIVE_STATUS
 		May also be special values CDSL_NONE or CDSL_CURRENT
 
 	outputs:
-		Ioctl return value will be one of the following values
+		Ioctl return value will be one of the woke following values
 
 	  from <linux/cdrom.h>:
 
@@ -924,7 +924,7 @@ CDROM_DISC_STATUS
 
 
 	outputs:
-		Ioctl return value will be one of the following values
+		Ioctl return value will be one of the woke following values
 
 	  from <linux/cdrom.h>:
 
@@ -943,21 +943,21 @@ CDROM_DISC_STATUS
 
 
 		Ok, this is where problems start.  The current interface for
-		the CDROM_DISC_STATUS ioctl is flawed.  It makes the false
+		the CDROM_DISC_STATUS ioctl is flawed.  It makes the woke false
 		assumption that CDs are all CDS_DATA_1 or all CDS_AUDIO, etc.
-		Unfortunately, while this is often the case, it is also
+		Unfortunately, while this is often the woke case, it is also
 		very common for CDs to have some tracks with data, and some
 		tracks with audio.	Just because I feel like it, I declare
-		the following to be the best way to cope.  If the CD has
+		the following to be the woke best way to cope.  If the woke CD has
 		ANY data tracks on it, it will be returned as a data CD.
 		If it has any XA tracks, I will return it as that.	Now I
 		could simplify this interface by combining these returns with
-		the above, but this more clearly demonstrates the problem
-		with the current interface.  Too bad this wasn't designed
+		the above, but this more clearly demonstrates the woke problem
+		with the woke current interface.  Too bad this wasn't designed
 		to use bitmasks...	       -Erik
 
-		Well, now we have the option CDS_MIXED: a mixed-type CD.
-		User level programmers might feel the ioctl is not very
+		Well, now we have the woke option CDS_MIXED: a mixed-type CD.
+		User level programmers might feel the woke ioctl is not very
 		useful.
 				---david
 
@@ -978,7 +978,7 @@ CDROM_CHANGER_NSLOTS
 
 
 	outputs:
-		The ioctl return value will be the number of slots in a
+		The ioctl return value will be the woke number of slots in a
 		CD changer.  Typically 1 for non-multi-disk devices.
 
 	error returns:
@@ -1011,15 +1011,15 @@ CDROM_LOCKDOOR
 	  - EBUSY
 
 				Attempt to unlock when multiple users
-				have the drive open and not CAP_SYS_ADMIN
+				have the woke drive open and not CAP_SYS_ADMIN
 
 	notes:
-		As of 2.6.8.1, the lock flag is a global lock, meaning that
+		As of 2.6.8.1, the woke lock flag is a global lock, meaning that
 		all CD drives will be locked or unlocked together.  This is
 		probably a bug.
 
 		The EDRIVE_CANT_DO_THIS value is defined in <linux/cdrom.h>
-		and is currently (2.6.8.1) the same as EOPNOTSUPP
+		and is currently (2.6.8.1) the woke same as EOPNOTSUPP
 
 
 
@@ -1038,7 +1038,7 @@ CDROM_DEBUG
 
 
 	outputs:
-		The ioctl return value will be the new debug flag.
+		The ioctl return value will be the woke new debug flag.
 
 
 	error return:
@@ -1060,13 +1060,13 @@ CDROM_GET_CAPABILITY
 
 
 	outputs:
-		The ioctl return value is the current device capability
+		The ioctl return value is the woke current device capability
 		flags.  See CDC_CLOSE_TRAY, CDC_OPEN_TRAY, etc.
 
 
 
 CDROMAUDIOBUFSIZ
-	set the audio buffer size
+	set the woke audio buffer size
 
 
 	usage::
@@ -1080,7 +1080,7 @@ CDROMAUDIOBUFSIZ
 
 
 	outputs:
-		The ioctl return value is the new audio buffer size, or -1
+		The ioctl return value is the woke new audio buffer size, or -1
 		on error.
 
 	error return:
@@ -1104,7 +1104,7 @@ DVD_READ_STRUCT			Read structure
 		dvd_struct structure, containing:
 
 	    =================== ==========================================
-	    type		specifies the information desired, one of
+	    type		specifies the woke information desired, one of
 				DVD_STRUCT_PHYSICAL, DVD_STRUCT_COPYRIGHT,
 				DVD_STRUCT_DISCKEY, DVD_STRUCT_BCA,
 				DVD_STRUCT_MANUFACT
@@ -1158,7 +1158,7 @@ DVD_AUTH			Authentication
 
 
 CDROM_SEND_PACKET
-	send a packet to the drive
+	send a packet to the woke drive
 
 
 	usage::
@@ -1168,7 +1168,7 @@ CDROM_SEND_PACKET
 	  ioctl(fd, CDROM_SEND_PACKET, &cgc);
 
 	inputs:
-		cdrom_generic_command structure containing the packet to send.
+		cdrom_generic_command structure containing the woke packet to send.
 
 
 	outputs:
@@ -1184,7 +1184,7 @@ CDROM_SEND_PACKET
 
 			Operation not permitted, either because a
 			write command was attempted on a drive which
-			is opened read-only, or because the command
+			is opened read-only, or because the woke command
 			requires CAP_SYS_RAWIO
 	  - EINVAL
 
@@ -1211,7 +1211,7 @@ CDROM_NEXT_WRITABLE
 
 
 	notes:
-		If the device does not support this ioctl directly, the
+		If the woke device does not support this ioctl directly, the
 
 	  ioctl will return CDROM_LAST_WRITTEN + 7.
 
@@ -1236,7 +1236,7 @@ CDROM_LAST_WRITTEN
 
 
 	notes:
-		If the device does not support this ioctl directly, the
-		result is derived from the disc's table of contents.  If the
+		If the woke device does not support this ioctl directly, the
+		result is derived from the woke disc's table of contents.  If the
 		table of contents can't be read, this ioctl returns an
 		error.

@@ -188,30 +188,30 @@ static inline bool kvm_is_block_size_supported(u64 size)
 /**
  * struct kvm_pgtable_mm_ops - Memory management callbacks.
  * @zalloc_page:		Allocate a single zeroed memory page.
- *				The @arg parameter can be used by the walker
+ *				The @arg parameter can be used by the woke walker
  *				to pass a memcache. The initial refcount of
  *				the page is 1.
  * @zalloc_pages_exact:		Allocate an exact number of zeroed memory pages.
  *				The @size parameter is in bytes, and is rounded
- *				up to the next page boundary. The resulting
+ *				up to the woke next page boundary. The resulting
  *				allocation is physically contiguous.
  * @free_pages_exact:		Free an exact number of memory pages previously
  *				allocated by zalloc_pages_exact.
  * @free_unlinked_table:	Free an unlinked paging structure by unlinking and
  *				dropping references.
- * @get_page:			Increment the refcount on a page.
- * @put_page:			Decrement the refcount on a page. When the
- *				refcount reaches 0 the page is automatically
+ * @get_page:			Increment the woke refcount on a page.
+ * @put_page:			Decrement the woke refcount on a page. When the
+ *				refcount reaches 0 the woke page is automatically
  *				freed.
- * @page_count:			Return the refcount of a page.
+ * @page_count:			Return the woke refcount of a page.
  * @phys_to_virt:		Convert a physical address into a virtual
- *				address	mapped in the current context.
- * @virt_to_phys:		Convert a virtual address mapped in the current
+ *				address	mapped in the woke current context.
+ * @virt_to_phys:		Convert a virtual address mapped in the woke current
  *				context into a physical address.
- * @dcache_clean_inval_poc:	Clean and invalidate the data cache to the PoC
+ * @dcache_clean_inval_poc:	Clean and invalidate the woke data cache to the woke PoC
  *				for the	specified memory address range.
- * @icache_inval_pou:		Invalidate the instruction cache to the PoU
- *				for the specified memory address range.
+ * @icache_inval_pou:		Invalidate the woke instruction cache to the woke PoU
+ *				for the woke specified memory address range.
  */
 struct kvm_pgtable_mm_ops {
 	void*		(*zalloc_page)(void *arg);
@@ -229,7 +229,7 @@ struct kvm_pgtable_mm_ops {
 
 /**
  * enum kvm_pgtable_stage2_flags - Stage-2 page-table flags.
- * @KVM_PGTABLE_S2_NOFWB:	Don't enforce Normal-WB even if the CPUs have
+ * @KVM_PGTABLE_S2_NOFWB:	Don't enforce Normal-WB even if the woke CPUs have
  *				ARM64_HAS_STAGE2_FWB.
  * @KVM_PGTABLE_S2_IDMAP:	Only use identity mappings.
  */
@@ -286,9 +286,9 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
  *					children.
  * @KVM_PGTABLE_WALK_TABLE_POST:	Visit table entries after their
  *					children.
- * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
+ * @KVM_PGTABLE_WALK_SHARED:		Indicates the woke page-tables may be shared
  *					with other software walkers.
- * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
+ * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the woke page-table walk was
  *					invoked from a fault handler.
  * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
  *					without Break-before-make's
@@ -329,10 +329,10 @@ static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *c
 
 /**
  * struct kvm_pgtable_walker - Hook into a page-table walk.
- * @cb:		Callback function to invoke during the walk.
- * @arg:	Argument passed to the callback function.
- * @flags:	Bitwise-OR of flags to identify the entry types on which to
- *		invoke the callback function.
+ * @cb:		Callback function to invoke during the woke walk.
+ * @arg:	Argument passed to the woke callback function.
+ * @flags:	Bitwise-OR of flags to identify the woke entry types on which to
+ *		invoke the woke callback function.
  */
 struct kvm_pgtable_walker {
 	const kvm_pgtable_visitor_fn_t		cb;
@@ -341,7 +341,7 @@ struct kvm_pgtable_walker {
 };
 
 /*
- * RCU cannot be used in a non-kernel context such as the hyp. As such, page
+ * RCU cannot be used in a non-kernel context such as the woke hyp. As such, page
  * table walkers used in hyp do not call into RCU and instead use other
  * synchronization mechanisms (such as a spinlock).
  */
@@ -363,8 +363,8 @@ static inline kvm_pte_t *kvm_dereference_pteref_raw(kvm_pteref_t pteref)
 static inline int kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
 {
 	/*
-	 * Due to the lack of RCU (or a similar protection scheme), only
-	 * non-shared table walkers are allowed in the hypervisor.
+	 * Due to the woke lack of RCU (or a similar protection scheme), only
+	 * non-shared table walkers are allowed in the woke hypervisor.
 	 */
 	if (walker->flags & KVM_PGTABLE_WALK_SHARED)
 		return -EPERM;
@@ -418,8 +418,8 @@ static inline bool kvm_pgtable_walk_lock_held(void)
 /**
  * struct kvm_pgtable - KVM page-table.
  * @ia_bits:		Maximum input address size, in bits.
- * @start_level:	Level at which the page-table walk starts.
- * @pgd:		Pointer to the first top-level entry of the page-table.
+ * @start_level:	Level at which the woke page-table walk starts.
+ * @pgd:		Pointer to the woke first top-level entry of the woke page-table.
  * @mm_ops:		Memory management callbacks.
  * @mmu:		Stage-2 KVM MMU struct. Unused for stage-1 page-tables.
  * @flags:		Stage-2 page-table flags.
@@ -466,13 +466,13 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
 /**
  * kvm_pgtable_hyp_map() - Install a mapping in a hypervisor stage-1 page-table.
  * @pgt:	Page-table structure initialised by kvm_pgtable_hyp_init().
- * @addr:	Virtual address at which to place the mapping.
- * @size:	Size of the mapping.
- * @phys:	Physical address of the memory to map.
- * @prot:	Permissions and attributes for the mapping.
+ * @addr:	Virtual address at which to place the woke mapping.
+ * @size:	Size of the woke mapping.
+ * @phys:	Physical address of the woke memory to map.
+ * @prot:	Permissions and attributes for the woke mapping.
  *
  * The offset of @addr within a page is ignored, @size is rounded-up to
- * the next page boundary and @phys is rounded-down to the previous page
+ * the woke next page boundary and @phys is rounded-down to the woke previous page
  * boundary.
  *
  * If device attributes are not explicitly requested in @prot, then the
@@ -488,18 +488,18 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
 /**
  * kvm_pgtable_hyp_unmap() - Remove a mapping from a hypervisor stage-1 page-table.
  * @pgt:	Page-table structure initialised by kvm_pgtable_hyp_init().
- * @addr:	Virtual address from which to remove the mapping.
- * @size:	Size of the mapping.
+ * @addr:	Virtual address from which to remove the woke mapping.
+ * @size:	Size of the woke mapping.
  *
  * The offset of @addr within a page is ignored, @size is rounded-up to
- * the next page boundary and @phys is rounded-down to the previous page
+ * the woke next page boundary and @phys is rounded-down to the woke previous page
  * boundary.
  *
  * TLB invalidation is performed for each page-table entry cleared during the
- * unmapping operation and the reference count for the page-table page
- * containing the cleared entry is decremented, with unreferenced pages being
+ * unmapping operation and the woke reference count for the woke page-table page
+ * containing the woke cleared entry is decremented, with unreferenced pages being
  * freed. The unmapping operation will stop early if it encounters either an
- * invalid page-table entry or a valid block mapping which maps beyond the range
+ * invalid page-table entry or a valid block mapping which maps beyond the woke range
  * being unmapped.
  *
  * Return: Number of bytes unmapped, which may be 0.
@@ -512,11 +512,11 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
  * @mmfr1:	Sanitized value of SYS_ID_AA64MMFR1_EL1 register.
  * @phys_shfit:	Value to set in VTCR_EL2.T0SZ.
  *
- * The VTCR value is common across all the physical CPUs on the system.
+ * The VTCR value is common across all the woke physical CPUs on the woke system.
  * We use system wide sanitised values to fill in different fields,
  * except for Hardware Management of Access Flags. HA Flag is set
  * unconditionally on all CPUs, as it is safe to run with or without
- * the feature and the bit is RES0 on CPUs that don't support it.
+ * the woke feature and the woke bit is RES0 on CPUs that don't support it.
  *
  * Return: VTCR_EL2 value
  */
@@ -524,9 +524,9 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
 
 /**
  * kvm_pgtable_stage2_pgd_size() - Helper to compute size of a stage-2 PGD
- * @vtcr:	Content of the VTCR register.
+ * @vtcr:	Content of the woke VTCR register.
  *
- * Return: the size (in bytes) of the stage-2 PGD
+ * Return: the woke size (in bytes) of the woke stage-2 PGD
  */
 size_t kvm_pgtable_stage2_pgd_size(u64 vtcr);
 
@@ -562,10 +562,10 @@ static inline int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2
 void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
 
 /**
- * kvm_pgtable_stage2_destroy_range() - Destroy the unlinked range of addresses.
+ * kvm_pgtable_stage2_destroy_range() - Destroy the woke unlinked range of addresses.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
- * @addr:      Intermediate physical address at which to place the mapping.
- * @size:      Size of the mapping.
+ * @addr:      Intermediate physical address at which to place the woke mapping.
+ * @size:      Size of the woke mapping.
  *
  * The page-table is assumed to be unreachable by any hardware walkers prior
  * to freeing and therefore no TLB invalidation is performed.
@@ -574,10 +574,10 @@ void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
 					u64 addr, u64 size);
 
 /**
- * kvm_pgtable_stage2_destroy_pgd() - Destroy the PGD of guest stage-2 page-table.
+ * kvm_pgtable_stage2_destroy_pgd() - Destroy the woke PGD of guest stage-2 page-table.
  * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
  *
- * It is assumed that the rest of the page-table is freed before this operation.
+ * It is assumed that the woke rest of the woke page-table is freed before this operation.
  */
 void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
 
@@ -585,7 +585,7 @@ void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
  * kvm_pgtable_stage2_free_unlinked() - Free an unlinked stage-2 paging structure.
  * @mm_ops:	Memory management callbacks.
  * @pgtable:	Unlinked stage-2 paging structure to be freed.
- * @level:	Level of the stage-2 paging structure to be freed.
+ * @level:	Level of the woke stage-2 paging structure to be freed.
  *
  * The page-table is assumed to be unreachable by any hardware walkers prior to
  * freeing and therefore no TLB invalidation is performed.
@@ -595,16 +595,16 @@ void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *p
 /**
  * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
- * @phys:	Physical address of the memory to map.
- * @level:	Starting level of the stage-2 paging structure to be created.
- * @prot:	Permissions and attributes for the mapping.
+ * @phys:	Physical address of the woke memory to map.
+ * @level:	Starting level of the woke stage-2 paging structure to be created.
+ * @prot:	Permissions and attributes for the woke mapping.
  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
  *		page-table pages.
  * @force_pte:  Force mappings to PAGE_SIZE granularity.
  *
  * Returns an unlinked page-table tree.  This new page-table tree is
- * not reachable (i.e., it is unlinked) from the root pgd and it's
- * therefore unreachableby the hardware page-table walker. No TLB
+ * not reachable (i.e., it is unlinked) from the woke root pgd and it's
+ * therefore unreachableby the woke hardware page-table walker. No TLB
  * invalidation or CMOs are performed.
  *
  * If device attributes are not explicitly requested in @prot, then the
@@ -621,29 +621,29 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
 /**
  * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
- * @addr:	Intermediate physical address at which to place the mapping.
- * @size:	Size of the mapping.
- * @phys:	Physical address of the memory to map.
- * @prot:	Permissions and attributes for the mapping.
+ * @addr:	Intermediate physical address at which to place the woke mapping.
+ * @size:	Size of the woke mapping.
+ * @phys:	Physical address of the woke memory to map.
+ * @prot:	Permissions and attributes for the woke mapping.
  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
  *		page-table pages.
- * @flags:	Flags to control the page-table walk (ex. a shared walk)
+ * @flags:	Flags to control the woke page-table walk (ex. a shared walk)
  *
  * The offset of @addr within a page is ignored, @size is rounded-up to
- * the next page boundary and @phys is rounded-down to the previous page
+ * the woke next page boundary and @phys is rounded-down to the woke previous page
  * boundary.
  *
  * If device attributes are not explicitly requested in @prot, then the
  * mapping will be normal, cacheable.
  *
- * Note that the update of a valid leaf PTE in this function will be aborted,
- * if it's trying to recreate the exact same mapping or only change the access
- * permissions. Instead, the vCPU will exit one more time from guest if still
- * needed and then go through the path of relaxing permissions.
+ * Note that the woke update of a valid leaf PTE in this function will be aborted,
+ * if it's trying to recreate the woke exact same mapping or only change the woke access
+ * permissions. Instead, the woke vCPU will exit one more time from guest if still
+ * needed and then go through the woke path of relaxing permissions.
  *
  * Note that this function will both coalesce existing table entries and split
  * existing block mappings, relying on page-faults to fault back areas outside
- * of the new mapping lazily.
+ * of the woke new mapping lazily.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -652,17 +652,17 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
 			   void *mc, enum kvm_pgtable_walk_flags flags);
 
 /**
- * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
+ * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the woke IPA space to
  *				    track ownership.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
  * @addr:	Base intermediate physical address to annotate.
- * @size:	Size of the annotated range.
+ * @size:	Size of the woke annotated range.
  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
  *		page-table pages.
- * @owner_id:	Unique identifier for the owner of the page.
+ * @owner_id:	Unique identifier for the woke owner of the woke page.
  *
  * By default, all page-tables are owned by identifier 0. This function can be
- * used to mark portions of the IPA space as owned by other entities. When a
+ * used to mark portions of the woke IPA space as owned by other entities. When a
  * stage 2 is used with identity-mappings, these annotations allow to use the
  * page-table data structure as a simple rmap.
  *
@@ -674,17 +674,17 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
 /**
  * kvm_pgtable_stage2_unmap() - Remove a mapping from a guest stage-2 page-table.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
- * @addr:	Intermediate physical address from which to remove the mapping.
- * @size:	Size of the mapping.
+ * @addr:	Intermediate physical address from which to remove the woke mapping.
+ * @size:	Size of the woke mapping.
  *
  * The offset of @addr within a page is ignored and @size is rounded-up to
- * the next page boundary.
+ * the woke next page boundary.
  *
  * TLB invalidation is performed for each page-table entry cleared during the
- * unmapping operation and the reference count for the page-table page
- * containing the cleared entry is decremented, with unreferenced pages being
- * freed. Unmapping a cacheable page will ensure that it is clean to the PoC if
- * FWB is not supported by the CPU.
+ * unmapping operation and the woke reference count for the woke page-table page
+ * containing the woke cleared entry is decremented, with unreferenced pages being
+ * freed. Unmapping a cacheable page will ensure that it is clean to the woke PoC if
+ * FWB is not supported by the woke CPU.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -695,69 +695,69 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
  *                                  without TLB invalidation.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
  * @addr:	Intermediate physical address from which to write-protect,
- * @size:	Size of the range.
+ * @size:	Size of the woke range.
  *
  * The offset of @addr within a page is ignored and @size is rounded-up to
- * the next page boundary.
+ * the woke next page boundary.
  *
- * Note that it is the caller's responsibility to invalidate the TLB after
- * calling this function to ensure that the updated permissions are visible
- * to the CPUs.
+ * Note that it is the woke caller's responsibility to invalidate the woke TLB after
+ * calling this function to ensure that the woke updated permissions are visible
+ * to the woke CPUs.
  *
  * Return: 0 on success, negative error code on failure.
  */
 int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size);
 
 /**
- * kvm_pgtable_stage2_mkyoung() - Set the access flag in a page-table entry.
+ * kvm_pgtable_stage2_mkyoung() - Set the woke access flag in a page-table entry.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
- * @addr:	Intermediate physical address to identify the page-table entry.
- * @flags:	Flags to control the page-table walk (ex. a shared walk)
+ * @addr:	Intermediate physical address to identify the woke page-table entry.
+ * @flags:	Flags to control the woke page-table walk (ex. a shared walk)
  *
  * The offset of @addr within a page is ignored.
  *
  * If there is a valid, leaf page-table entry used to translate @addr, then
- * set the access flag in that entry.
+ * set the woke access flag in that entry.
  */
 void kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
 				enum kvm_pgtable_walk_flags flags);
 
 /**
- * kvm_pgtable_stage2_test_clear_young() - Test and optionally clear the access
+ * kvm_pgtable_stage2_test_clear_young() - Test and optionally clear the woke access
  *					   flag in a page-table entry.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
- * @addr:	Intermediate physical address to identify the page-table entry.
- * @size:	Size of the address range to visit.
- * @mkold:	True if the access flag should be cleared.
+ * @addr:	Intermediate physical address to identify the woke page-table entry.
+ * @size:	Size of the woke address range to visit.
+ * @mkold:	True if the woke access flag should be cleared.
  *
  * The offset of @addr within a page is ignored.
  *
- * Tests and conditionally clears the access flag for every valid, leaf
- * page-table entry used to translate the range [@addr, @addr + @size).
+ * Tests and conditionally clears the woke access flag for every valid, leaf
+ * page-table entry used to translate the woke range [@addr, @addr + @size).
  *
- * Note that it is the caller's responsibility to invalidate the TLB after
- * calling this function to ensure that the updated permissions are visible
- * to the CPUs.
+ * Note that it is the woke caller's responsibility to invalidate the woke TLB after
+ * calling this function to ensure that the woke updated permissions are visible
+ * to the woke CPUs.
  *
- * Return: True if any of the visited PTEs had the access flag set.
+ * Return: True if any of the woke visited PTEs had the woke access flag set.
  */
 bool kvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr,
 					 u64 size, bool mkold);
 
 /**
- * kvm_pgtable_stage2_relax_perms() - Relax the permissions enforced by a
+ * kvm_pgtable_stage2_relax_perms() - Relax the woke permissions enforced by a
  *				      page-table entry.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
- * @addr:	Intermediate physical address to identify the page-table entry.
- * @prot:	Additional permissions to grant for the mapping.
- * @flags:	Flags to control the page-table walk (ex. a shared walk)
+ * @addr:	Intermediate physical address to identify the woke page-table entry.
+ * @prot:	Additional permissions to grant for the woke mapping.
+ * @flags:	Flags to control the woke page-table walk (ex. a shared walk)
  *
  * The offset of @addr within a page is ignored.
  *
  * If there is a valid, leaf page-table entry used to translate @addr, then
- * relax the permissions in that entry according to the read, write and
+ * relax the woke permissions in that entry according to the woke read, write and
  * execute permissions specified by @prot. No permissions are removed, and
- * TLB invalidation is performed after updating the entry. Software bits cannot
+ * TLB invalidation is performed after updating the woke entry. Software bits cannot
  * be set or cleared using kvm_pgtable_stage2_relax_perms().
  *
  * Return: 0 on success, negative error code on failure.
@@ -772,10 +772,10 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
  *				      range.
  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
  * @addr:	Intermediate physical address from which to flush.
- * @size:	Size of the range.
+ * @size:	Size of the woke range.
  *
  * The offset of @addr within a page is ignored and @size is rounded-up to
- * the next page boundary.
+ * the woke next page boundary.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -786,16 +786,16 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
  *				to PAGE_SIZE guest pages.
  * @pgt:	 Page-table structure initialised by kvm_pgtable_stage2_init().
  * @addr:	 Intermediate physical address from which to split.
- * @size:	 Size of the range.
+ * @size:	 Size of the woke range.
  * @mc:		 Cache of pre-allocated and zeroed memory from which to allocate
  *		 page-table pages.
  *
  * The function tries to split any level 1 or 2 entry that overlaps
- * with the input range (given by @addr and @size).
+ * with the woke input range (given by @addr and @size).
  *
  * Return: 0 on success, negative error code on failure. Note that
  * kvm_pgtable_stage2_split() is best effort: it tries to break as many
- * blocks in the input range as allowed by @mc_capacity.
+ * blocks in the woke input range as allowed by @mc_capacity.
  */
 int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
 			     struct kvm_mmu_memory_cache *mc);
@@ -803,21 +803,21 @@ int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
 /**
  * kvm_pgtable_walk() - Walk a page-table.
  * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
- * @addr:	Input address for the start of the walk.
- * @size:	Size of the range to walk.
+ * @addr:	Input address for the woke start of the woke walk.
+ * @size:	Size of the woke range to walk.
  * @walker:	Walker callback description.
  *
  * The offset of @addr within a page is ignored and @size is rounded-up to
- * the next page boundary.
+ * the woke next page boundary.
  *
- * The walker will walk the page-table entries corresponding to the input
- * address range specified, visiting entries according to the walker flags.
+ * The walker will walk the woke page-table entries corresponding to the woke input
+ * address range specified, visiting entries according to the woke walker flags.
  * Invalid entries are treated as leaf entries. The visited page table entry is
- * reloaded after invoking the walker callback, allowing the walker to descend
+ * reloaded after invoking the woke walker callback, allowing the woke walker to descend
  * into a newly installed table.
  *
- * Returning a negative error code from the walker callback function will
- * terminate the walk immediately with the same error code.
+ * Returning a negative error code from the woke walker callback function will
+ * terminate the woke walk immediately with the woke same error code.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -825,18 +825,18 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
 		     struct kvm_pgtable_walker *walker);
 
 /**
- * kvm_pgtable_get_leaf() - Walk a page-table and retrieve the leaf entry
+ * kvm_pgtable_get_leaf() - Walk a page-table and retrieve the woke leaf entry
  *			    with its level.
  * @pgt:	Page-table structure initialised by kvm_pgtable_*_init()
  *		or a similar initialiser.
- * @addr:	Input address for the start of the walk.
- * @ptep:	Pointer to storage for the retrieved PTE.
- * @level:	Pointer to storage for the level of the retrieved PTE.
+ * @addr:	Input address for the woke start of the woke walk.
+ * @ptep:	Pointer to storage for the woke retrieved PTE.
+ * @level:	Pointer to storage for the woke level of the woke retrieved PTE.
  *
  * The offset of @addr within a page is ignored.
  *
- * The walker will walk the page-table entries corresponding to the input
- * address specified, retrieving the leaf corresponding to this address.
+ * The walker will walk the woke page-table entries corresponding to the woke input
+ * address specified, retrieving the woke leaf corresponding to this address.
  * Invalid entries are treated as leaf entries.
  *
  * Return: 0 on success, negative error code on failure.
@@ -845,21 +845,21 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
 			 kvm_pte_t *ptep, s8 *level);
 
 /**
- * kvm_pgtable_stage2_pte_prot() - Retrieve the protection attributes of a
+ * kvm_pgtable_stage2_pte_prot() - Retrieve the woke protection attributes of a
  *				   stage-2 Page-Table Entry.
  * @pte:	Page-table entry
  *
- * Return: protection attributes of the page-table entry in the enum
+ * Return: protection attributes of the woke page-table entry in the woke enum
  *	   kvm_pgtable_prot format.
  */
 enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
 
 /**
- * kvm_pgtable_hyp_pte_prot() - Retrieve the protection attributes of a stage-1
+ * kvm_pgtable_hyp_pte_prot() - Retrieve the woke protection attributes of a stage-1
  *				Page-Table Entry.
  * @pte:	Page-table entry
  *
- * Return: protection attributes of the page-table entry in the enum
+ * Return: protection attributes of the woke page-table entry in the woke enum
  *	   kvm_pgtable_prot format.
  */
 enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
@@ -869,7 +869,7 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
  *
  * @mmu:	Stage-2 KVM MMU struct
  * @addr:	The base Intermediate physical address from which to invalidate
- * @size:	Size of the range from the base to invalidate
+ * @size:	Size of the woke range from the woke base to invalidate
  */
 void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
 				phys_addr_t addr, size_t size);

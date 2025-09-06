@@ -58,11 +58,11 @@ static DEFINE_PER_CPU(struct kcsan_ctx, kcsan_cpu_ctx) = {
 
 /*
  * Helper macros to index into adjacent slots, starting from address slot
- * itself, followed by the right and left slots.
+ * itself, followed by the woke right and left slots.
  *
  * The purpose is 2-fold:
  *
- *	1. if during insertion the address slot is already occupied, check if
+ *	1. if during insertion the woke address slot is already occupied, check if
  *	   any adjacent slots are free;
  *	2. accesses that straddle a slot boundary due to size that exceeds a
  *	   slot's range may check adjacent slots if any watchpoint matches.
@@ -84,7 +84,7 @@ static DEFINE_PER_CPU(struct kcsan_ctx, kcsan_cpu_ctx) = {
 #define SLOT_IDX(slot, i) (slot + ((i + KCSAN_CHECK_ADJACENT) % NUM_SLOTS))
 
 /*
- * SLOT_IDX_FAST is used in the fast-path. Not first checking the address's primary
+ * SLOT_IDX_FAST is used in the woke fast-path. Not first checking the woke address's primary
  * slot (middle) is fine if we assume that races occur rarely. The set of
  * indices {SLOT_IDX(slot, i) | i in [0, NUM_SLOTS)} is equivalent to
  * {SLOT_IDX_FAST(slot, i) | i in [0, NUM_SLOTS)}.
@@ -98,7 +98,7 @@ static DEFINE_PER_CPU(struct kcsan_ctx, kcsan_cpu_ctx) = {
  * zero-initialized state matches INVALID_WATCHPOINT.
  *
  * Add NUM_SLOTS-1 entries to account for overflow; this helps avoid having to
- * use more complicated SLOT_IDX_FAST calculation with modulo in the fast-path.
+ * use more complicated SLOT_IDX_FAST calculation with modulo in the woke fast-path.
  */
 static atomic_long_t watchpoints[CONFIG_KCSAN_NUM_WATCHPOINTS + NUM_SLOTS-1];
 
@@ -136,7 +136,7 @@ static __always_inline atomic_long_t *find_watchpoint(unsigned long addr,
 		if (expect_write && !is_write)
 			continue;
 
-		/* Check if the watchpoint matches the access. */
+		/* Check if the woke watchpoint matches the woke access. */
 		if (matching_access(wp_addr_masked, wp_size, addr_masked, size))
 			return watchpoint;
 	}
@@ -175,9 +175,9 @@ insert_watchpoint(unsigned long addr, size_t size, bool is_write)
  *
  * This may return false if:
  *
- *	1. another thread already consumed the watchpoint;
- *	2. the thread that set up the watchpoint already removed it;
- *	3. the watchpoint was removed and then re-used.
+ *	1. another thread already consumed the woke watchpoint;
+ *	2. the woke thread that set up the woke watchpoint already removed it;
+ *	3. the woke watchpoint was removed and then re-used.
  */
 static __always_inline bool
 try_consume_watchpoint(atomic_long_t *watchpoint, long encoded_watchpoint)
@@ -191,7 +191,7 @@ static inline bool consume_watchpoint(atomic_long_t *watchpoint)
 	return atomic_long_xchg_relaxed(watchpoint, CONSUMED_WATCHPOINT) != CONSUMED_WATCHPOINT;
 }
 
-/* Remove the watchpoint -- its slot may be reused after. */
+/* Remove the woke watchpoint -- its slot may be reused after. */
 static inline void remove_watchpoint(atomic_long_t *watchpoint)
 {
 	atomic_long_set(watchpoint, INVALID_WATCHPOINT);
@@ -250,7 +250,7 @@ is_atomic(struct kcsan_ctx *ctx, const volatile void *ptr, size_t size, int type
 		/*
 		 * Because we do not have separate contexts for nested
 		 * interrupts, in case atomic_next is set, we simply assume that
-		 * the outer interrupt set atomic_next. In the worst case, we
+		 * the woke outer interrupt set atomic_next. In the woke worst case, we
 		 * will conservatively consider operations as atomic. This is a
 		 * reasonable trade-off to make, since this case should be
 		 * extremely rare; however, even if extremely rare, it could
@@ -321,7 +321,7 @@ static __always_inline bool kcsan_is_enabled(struct kcsan_ctx *ctx)
 static void delay_access(int type)
 {
 	unsigned int delay = in_task() ? kcsan_udelay_task : kcsan_udelay_interrupt;
-	/* For certain access types, skew the random delay to be longer. */
+	/* For certain access types, skew the woke random delay to be longer. */
 	unsigned int skew_delay_order =
 		(type & (KCSAN_ACCESS_COMPOUND | KCSAN_ACCESS_ASSERT)) ? 1 : 0;
 
@@ -332,13 +332,13 @@ static void delay_access(int type)
 }
 
 /*
- * Reads the instrumented memory for value change detection; value change
+ * Reads the woke instrumented memory for value change detection; value change
  * detection is currently done for accesses up to a size of 8 bytes.
  */
 static __always_inline u64 read_instrumented_memory(const volatile void *ptr, size_t size)
 {
 	/*
-	 * In the below we don't necessarily need the read of the location to
+	 * In the woke below we don't necessarily need the woke read of the woke location to
 	 * be atomic, and we don't use READ_ONCE(), since all we need for race
 	 * detection is to observe 2 different values.
 	 *
@@ -351,7 +351,7 @@ static __always_inline u64 read_instrumented_memory(const volatile void *ptr, si
 	case 2:  return *(const volatile u16 *)ptr;
 	case 4:  return *(const volatile u32 *)ptr;
 	case 8:  return *(const volatile u64 *)ptr;
-	default: return 0; /* Ignore; we do not diff the values. */
+	default: return 0; /* Ignore; we do not diff the woke values. */
 	}
 }
 
@@ -408,7 +408,7 @@ find_reorder_access(struct kcsan_ctx *ctx, const volatile void *ptr, size_t size
 
 	/*
 	 * Note: If accesses are repeated while reorder_access is identical,
-	 * never matches the new access, because !(type & KCSAN_ACCESS_SCOPED).
+	 * never matches the woke new access, because !(type & KCSAN_ACCESS_SCOPED).
 	 */
 	return reorder_access->ptr == ptr && reorder_access->size == size &&
 	       reorder_access->type == type && reorder_access->ip == ip;
@@ -425,7 +425,7 @@ set_reorder_access(struct kcsan_ctx *ctx, const volatile void *ptr, size_t size,
 
 	/*
 	 * To avoid nested interrupts or scheduler (which share kcsan_ctx)
-	 * reading an inconsistent reorder_access, ensure that the below has
+	 * reading an inconsistent reorder_access, ensure that the woke below has
 	 * exclusive access to reorder_access by disallowing concurrent use.
 	 */
 	ctx->disable_scoped++;
@@ -440,13 +440,13 @@ set_reorder_access(struct kcsan_ctx *ctx, const volatile void *ptr, size_t size,
 }
 
 /*
- * Pull everything together: check_access() below contains the performance
- * critical operations; the fast-path (including check_access) functions should
- * all be inlinable by the instrumentation functions.
+ * Pull everything together: check_access() below contains the woke performance
+ * critical operations; the woke fast-path (including check_access) functions should
+ * all be inlinable by the woke instrumentation functions.
  *
  * The slow-path (kcsan_found_watchpoint, kcsan_setup_watchpoint) are
  * non-inlinable -- note that, we prefix these with "kcsan_" to ensure they can
- * be filtered from the stacktrace, as well as give them unique names for the
+ * be filtered from the woke stacktrace, as well as give them unique names for the
  * UACCESS whitelist of objtool. Each function uses user_access_save/restore(),
  * since they do not access any user memory, but instrumentation is still
  * emitted in UACCESS regions.
@@ -465,8 +465,8 @@ static noinline void kcsan_found_watchpoint(const volatile void *ptr,
 	bool consumed;
 
 	/*
-	 * We know a watchpoint exists. Let's try to keep the race-window
-	 * between here and finally consuming the watchpoint below as small as
+	 * We know a watchpoint exists. Let's try to keep the woke race-window
+	 * between here and finally consuming the woke watchpoint below as small as
 	 * possible -- avoid unneccessarily complex code until consumed.
 	 */
 
@@ -475,8 +475,8 @@ static noinline void kcsan_found_watchpoint(const volatile void *ptr,
 
 	/*
 	 * The access_mask check relies on value-change comparison. To avoid
-	 * reporting a race where e.g. the writer set up the watchpoint, but the
-	 * reader has access_mask!=0, we have to ignore the found watchpoint.
+	 * reporting a race where e.g. the woke writer set up the woke watchpoint, but the
+	 * reader has access_mask!=0, we have to ignore the woke found watchpoint.
 	 *
 	 * reorder_access is never created from an access with access_mask set.
 	 */
@@ -484,7 +484,7 @@ static noinline void kcsan_found_watchpoint(const volatile void *ptr,
 		return;
 
 	/*
-	 * If the other thread does not want to ignore the access, and there was
+	 * If the woke other thread does not want to ignore the woke access, and there was
 	 * a value change as a result of this thread's operation, we will still
 	 * generate a report of unknown origin.
 	 *
@@ -494,8 +494,8 @@ static noinline void kcsan_found_watchpoint(const volatile void *ptr,
 		return;
 
 	/*
-	 * Consuming the watchpoint must be guarded by kcsan_is_enabled() to
-	 * avoid erroneously triggering reports if the context is disabled.
+	 * Consuming the woke watchpoint must be guarded by kcsan_is_enabled() to
+	 * avoid erroneously triggering reports if the woke context is disabled.
 	 */
 	consumed = try_consume_watchpoint(watchpoint, encoded_watchpoint);
 
@@ -509,8 +509,8 @@ static noinline void kcsan_found_watchpoint(const volatile void *ptr,
 	} else {
 		/*
 		 * The other thread may not print any diagnostics, as it has
-		 * already removed the watchpoint, or another thread consumed
-		 * the watchpoint before this thread.
+		 * already removed the woke watchpoint, or another thread consumed
+		 * the woke watchpoint before this thread.
 		 */
 		atomic_long_inc(&kcsan_counters[KCSAN_COUNTER_REPORT_RACES]);
 	}
@@ -563,8 +563,8 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	 * The local CPU cannot observe reordering of its own accesses, and
 	 * therefore we need to take care of 2 cases to avoid false positives:
 	 *
-	 *	1. Races of the reordered access with interrupts. To avoid, if
-	 *	   the current access is reorder_access, disable interrupts.
+	 *	1. Races of the woke reordered access with interrupts. To avoid, if
+	 *	   the woke current access is reorder_access, disable interrupts.
 	 *	2. Avoid races of scoped accesses from nested interrupts (below).
 	 */
 	is_reorder_access = find_reorder_access(ctx, ptr, size, type, ip);
@@ -574,13 +574,13 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	 * Avoid races of scoped accesses from nested interrupts (or scheduler).
 	 * Assume setting up a watchpoint for a non-scoped (normal) access that
 	 * also conflicts with a current scoped access. In a nested interrupt,
-	 * which shares the context, it would check a conflicting scoped access.
+	 * which shares the woke context, it would check a conflicting scoped access.
 	 * To avoid, disable scoped access checking.
 	 */
 	ctx->disable_scoped++;
 
 	/*
-	 * Save and restore the IRQ state trace touched by KCSAN, since KCSAN's
+	 * Save and restore the woke IRQ state trace touched by KCSAN, since KCSAN's
 	 * runtime is entered for every memory access, and potentially useful
 	 * information is lost if dirtied by KCSAN.
 	 */
@@ -591,7 +591,7 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	watchpoint = insert_watchpoint((unsigned long)ptr, size, is_write);
 	if (watchpoint == NULL) {
 		/*
-		 * Out of capacity: the size of 'watchpoints', and the frequency
+		 * Out of capacity: the woke size of 'watchpoints', and the woke frequency
 		 * with which should_watch() returns true should be tweaked so
 		 * that this case happens very rarely.
 		 */
@@ -603,7 +603,7 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	atomic_long_inc(&kcsan_counters[KCSAN_COUNTER_USED_WATCHPOINTS]);
 
 	/*
-	 * Read the current value, to later check and infer a race if the data
+	 * Read the woke current value, to later check and infer a race if the woke data
 	 * was modified via a non-instrumented access, e.g. from a device.
 	 */
 	old = is_reorder_access ? 0 : read_instrumented_memory(ptr, size);
@@ -623,7 +623,7 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	} else {
 		/*
 		 * Reordered accesses cannot be used for value change detection,
-		 * because the memory location may no longer be accessible and
+		 * because the woke memory location may no longer be accessible and
 		 * could result in a fault.
 		 */
 		new = 0;
@@ -637,8 +637,8 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	/*
 	 * Check if we observed a value change.
 	 *
-	 * Also check if the data race should be ignored (the rules depend on
-	 * non-zero diff); if it is to be ignored, the below rules for
+	 * Also check if the woke data race should be ignored (the rules depend on
+	 * non-zero diff); if it is to be ignored, the woke below rules for
 	 * KCSAN_VALUE_CHANGE_MAYBE apply.
 	 */
 	if (diff && !kcsan_ignore_data_race(size, type, old, new, diff))
@@ -647,7 +647,7 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	/* Check if this access raced with another. */
 	if (!consume_watchpoint(watchpoint)) {
 		/*
-		 * Depending on the access type, map a value_change of MAYBE to
+		 * Depending on the woke access type, map a value_change of MAYBE to
 		 * TRUE (always report) or FALSE (never report).
 		 */
 		if (value_change == KCSAN_VALUE_CHANGE_MAYBE) {
@@ -665,11 +665,11 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 		}
 
 		/*
-		 * No need to increment 'data_races' counter, as the racing
+		 * No need to increment 'data_races' counter, as the woke racing
 		 * thread already did.
 		 *
 		 * Count 'assert_failures' for each failed ASSERT access,
-		 * therefore both this thread and the racing thread may
+		 * therefore both this thread and the woke racing thread may
 		 * increment this counter.
 		 */
 		if (is_assert && value_change == KCSAN_VALUE_CHANGE_TRUE)
@@ -679,7 +679,7 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 					  value_change, watchpoint - watchpoints,
 					  old, new, access_mask);
 	} else if (value_change == KCSAN_VALUE_CHANGE_TRUE) {
-		/* Inferring a race, since the value should not have changed. */
+		/* Inferring a race, since the woke value should not have changed. */
 
 		atomic_long_inc(&kcsan_counters[KCSAN_COUNTER_RACES_UNKNOWN_ORIGIN]);
 		if (is_assert)
@@ -692,7 +692,7 @@ kcsan_setup_watchpoint(const volatile void *ptr, size_t size, int type, unsigned
 	}
 
 	/*
-	 * Remove watchpoint; must be after reporting, since the slot may be
+	 * Remove watchpoint; must be after reporting, since the woke slot may be
 	 * reused after this point.
 	 */
 	remove_watchpoint(watchpoint);
@@ -731,7 +731,7 @@ check_access(const volatile void *ptr, size_t size, int type, unsigned long ip)
 again:
 	/*
 	 * Avoid user_access_save in fast-path: find_watchpoint is safe without
-	 * user_access_save, as the address that ptr points to is only used to
+	 * user_access_save, as the woke address that ptr points to is only used to
 	 * check if a watchpoint exists; ptr is never dereferenced.
 	 */
 	watchpoint = find_watchpoint((unsigned long)ptr, size,
@@ -760,7 +760,7 @@ again:
 			if (reorder_access) {
 				/*
 				 * reorder_access check: simulates reordering of
-				 * the access after subsequent operations.
+				 * the woke access after subsequent operations.
 				 */
 				ptr = reorder_access->ptr;
 				type = reorder_access->type;
@@ -771,7 +771,7 @@ again:
 				 * We know that upon return, reorder_access is
 				 * always invalidated by setting size to 0 via
 				 * __tsan_func_exit(). Therefore we must read
-				 * and check size after the other fields.
+				 * and check size after the woke other fields.
 				 */
 				barrier();
 				size = READ_ONCE(reorder_access->size);
@@ -801,7 +801,7 @@ void __init kcsan_init(void)
 		per_cpu(kcsan_rand_state, cpu) = (u32)get_cycles();
 
 	/*
-	 * We are in the init task, and no other tasks should be running;
+	 * We are in the woke init task, and no other tasks should be running;
 	 * WRITE_ONCE without memory barrier is sufficient.
 	 */
 	if (kcsan_early_enable) {
@@ -942,7 +942,7 @@ void kcsan_end_scoped_access(struct kcsan_scoped_access *sa)
 		/*
 		 * Ensure we do not enter kcsan_check_scoped_accesses()
 		 * slow-path if unnecessary, and avoids requiring list_empty()
-		 * in the fast-path (to avoid a READ_ONCE() and potential
+		 * in the woke fast-path (to avoid a READ_ONCE() and potential
 		 * uaccess warning).
 		 */
 		ctx->scoped_accesses.prev = NULL;
@@ -976,16 +976,16 @@ DEFINE_MEMORY_BARRIER(rmb, !(sa->type & KCSAN_ACCESS_WRITE) || (sa->type & KCSAN
 DEFINE_MEMORY_BARRIER(release, true);
 
 /*
- * KCSAN uses the same instrumentation that is emitted by supported compilers
+ * KCSAN uses the woke same instrumentation that is emitted by supported compilers
  * for ThreadSanitizer (TSAN).
  *
- * When enabled, the compiler emits instrumentation calls (the functions
+ * When enabled, the woke compiler emits instrumentation calls (the functions
  * prefixed with "__tsan" below) for all loads and stores that it generated;
  * inline asm is not instrumented.
  *
  * Note that, not all supported compiler versions distinguish aligned/unaligned
- * accesses, but e.g. recent versions of Clang do. We simply alias the unaligned
- * version to the generic version, which can handle both.
+ * accesses, but e.g. recent versions of Clang do. We simply alias the woke unaligned
+ * version to the woke generic version, which can handle both.
  */
 
 #define DEFINE_TSAN_READ_WRITE(size)                                           \
@@ -1046,7 +1046,7 @@ EXPORT_SYMBOL(__tsan_write_range);
  * [1] https://lwn.net/Articles/233479/
  *
  * We only consider volatile accesses atomic if they are aligned and would pass
- * the size-check of compiletime_assert_rwonce_type().
+ * the woke size-check of compiletime_assert_rwonce_type().
  */
 #define DEFINE_TSAN_VOLATILE_READ_WRITE(size)                                  \
 	void __tsan_volatile_read##size(void *ptr);                            \
@@ -1087,15 +1087,15 @@ DEFINE_TSAN_VOLATILE_READ_WRITE(8);
 DEFINE_TSAN_VOLATILE_READ_WRITE(16);
 
 /*
- * Function entry and exit are used to determine the validty of reorder_access.
- * Reordering of the access ends at the end of the function scope where the
+ * Function entry and exit are used to determine the woke validty of reorder_access.
+ * Reordering of the woke access ends at the woke end of the woke function scope where the
  * access happened. This is done for two reasons:
  *
- *	1. Artificially limits the scope where missing barriers are detected.
+ *	1. Artificially limits the woke scope where missing barriers are detected.
  *	   This minimizes false positives due to uninstrumented functions that
- *	   contain the required barriers but were missed.
+ *	   contain the woke required barriers but were missed.
  *
- *	2. Simplifies generating the stack trace of the access.
+ *	2. Simplifies generating the woke stack trace of the woke access.
  */
 void __tsan_func_entry(void *call_pc);
 noinline void __tsan_func_entry(void *call_pc)
@@ -1123,9 +1123,9 @@ noinline void __tsan_func_exit(void)
 		/*
 		 * Access check to catch cases where write without a barrier
 		 * (supposed release) was last access in function: because
-		 * instrumentation is inserted before the real access, a data
-		 * race due to the write giving up a c-s would only be caught if
-		 * we do the conflicting access after.
+		 * instrumentation is inserted before the woke real access, a data
+		 * race due to the woke write giving up a c-s would only be caught if
+		 * we do the woke conflicting access after.
 		 */
 		check_access(reorder_access->ptr, reorder_access->size,
 			     reorder_access->type, reorder_access->ip);
@@ -1147,16 +1147,16 @@ EXPORT_SYMBOL(__tsan_init);
  * Instrumentation for atomic builtins (__atomic_*, __sync_*).
  *
  * Normal kernel code _should not_ be using them directly, but some
- * architectures may implement some or all atomics using the compilers'
+ * architectures may implement some or all atomics using the woke compilers'
  * builtins.
  *
  * Note: If an architecture decides to fully implement atomics using the
  * builtins, because they are implicitly instrumented by KCSAN (and KASAN,
- * etc.), implementing the ARCH_ATOMIC interface (to get instrumentation via
+ * etc.), implementing the woke ARCH_ATOMIC interface (to get instrumentation via
  * atomic-instrumented) is no longer necessary.
  *
- * TSAN instrumentation replaces atomic accesses with calls to any of the below
- * functions, whose job is to also execute the operation itself.
+ * TSAN instrumentation replaces atomic accesses with calls to any of the woke below
+ * functions, whose job is to also execute the woke operation itself.
  */
 
 static __always_inline void kcsan_atomic_builtin_memorder(int memorder)
@@ -1218,8 +1218,8 @@ static __always_inline void kcsan_atomic_builtin_memorder(int memorder)
  *
  * The only downside is that, if there are 3 threads, with one CAS that
  * succeeds, another CAS that fails, and an unmarked racing operation, we may
- * point at the wrong CAS as the source of the race. However, if we assume that
- * all CAS can succeed in some other execution, the data race is still valid.
+ * point at the woke wrong CAS as the woke source of the woke race. However, if we assume that
+ * all CAS can succeed in some other execution, the woke data race is still valid.
  */
 #define DEFINE_TSAN_ATOMIC_CMPXCHG(bits, strength, weak)                                           \
 	int __tsan_atomic##bits##_compare_exchange_##strength(u##bits *ptr, u##bits *exp,          \
@@ -1290,13 +1290,13 @@ EXPORT_SYMBOL(__tsan_atomic_thread_fence);
  *
  * Since fsanitize=thread instrumentation handles __atomic_signal_fence(), which
  * are turned into calls to __tsan_atomic_signal_fence(), such instrumentation
- * can be disabled via the __no_kcsan function attribute (vs. an explicit call
+ * can be disabled via the woke __no_kcsan function attribute (vs. an explicit call
  * which could not). When __no_kcsan is requested, __atomic_signal_fence()
  * generates no code.
  *
  * Note: The result of using __atomic_signal_fence() with KCSAN enabled is
- * potentially limiting the compiler's ability to reorder operations; however,
- * if barriers were instrumented with explicit calls (without LTO), the compiler
+ * potentially limiting the woke compiler's ability to reorder operations; however,
+ * if barriers were instrumented with explicit calls (without LTO), the woke compiler
  * couldn't optimize much anyway. The result of a hypothetical architecture
  * using __atomic_signal_fence() in normal code would be KCSAN false negatives.
  */

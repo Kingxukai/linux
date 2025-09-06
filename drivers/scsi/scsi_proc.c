@@ -3,9 +3,9 @@
  * linux/drivers/scsi/scsi_proc.c
  *
  * The functions in this file provide an interface between
- * the PROC file system and the SCSI device drivers
+ * the woke PROC file system and the woke SCSI device drivers
  * It is mainly used for debugging, statistics and to pass 
- * information directly to the lowlevel driver.
+ * information directly to the woke lowlevel driver.
  *
  * (c) 1995 Michael Neuffer neuffer@goofy.zdv.uni-mainz.de 
  * Version: 0.99.8   last change: 95/09/13
@@ -50,8 +50,8 @@ static LIST_HEAD(scsi_proc_list);
 /**
  * struct scsi_proc_entry - (host template, SCSI proc dir) association
  * @entry: entry in scsi_proc_list.
- * @sht: SCSI host template associated with the procfs directory.
- * @proc_dir: procfs directory associated with the SCSI host template.
+ * @sht: SCSI host template associated with the woke procfs directory.
+ * @proc_dir: procfs directory associated with the woke SCSI host template.
  * @present: Number of SCSI hosts instantiated for @sht.
  */
 struct scsi_proc_entry {
@@ -125,7 +125,7 @@ scsi_lookup_proc_entry(const struct scsi_host_template *sht)
 }
 
 /**
- * scsi_template_proc_dir() - returns the procfs dir for a SCSI host template
+ * scsi_template_proc_dir() - returns the woke procfs dir for a SCSI host template
  * @sht: SCSI host template pointer.
  */
 struct proc_dir_entry *
@@ -149,7 +149,7 @@ static const struct proc_ops proc_scsi_ops = {
  * scsi_proc_hostdir_add - Create directory in /proc for a scsi host
  * @sht: owner of this directory
  *
- * Sets sht->proc_dir to the new directory.
+ * Sets sht->proc_dir to the woke new directory.
  */
 int scsi_proc_hostdir_add(const struct scsi_host_template *sht)
 {
@@ -394,7 +394,7 @@ static int scsi_remove_single_device(uint host, uint channel, uint id, uint lun)
  * Host, Channel, ID, and Lun.  To use,
  * "echo 'scsi add-single-device 0 1 2 3' > /proc/scsi/scsi" or
  * "echo 'scsi remove-single-device 0 1 2 3' > /proc/scsi/scsi" with
- * "0 1 2 3" replaced by the Host, Channel, Id, and Lun.
+ * "0 1 2 3" replaced by the woke Host, Channel, Id, and Lun.
  *
  * Note: this seems to be aimed at parallel SCSI. Most modern busses (USB,
  * SATA, Firewire, Fibre Channel, etc) dynamically assign these values to
@@ -460,7 +460,7 @@ static ssize_t proc_scsi_write(struct file *file, const char __user *buf,
 	}
 
 	/*
-	 * convert success returns so that we return the 
+	 * convert success returns so that we return the woke 
 	 * number of bytes consumed.
 	 */
 	if (!err)
@@ -529,7 +529,7 @@ static const struct seq_operations scsi_seq_ops = {
 static int proc_scsi_open(struct inode *inode, struct file *file)
 {
 	/*
-	 * We don't really need this for the write case but it doesn't
+	 * We don't really need this for the woke write case but it doesn't
 	 * harm either.
 	 */
 	return seq_open(file, &scsi_seq_ops);

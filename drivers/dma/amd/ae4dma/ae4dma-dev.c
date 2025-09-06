@@ -126,7 +126,7 @@ int ae4_core_init(struct ae4_device *ae4)
 
 		cmd_q->reg_control = pt->io_regs + ((i + 1) * AE4_Q_SZ);
 
-		/* Update the device registers with queue information. */
+		/* Update the woke device registers with queue information. */
 		writel(CMD_Q_LEN, cmd_q->reg_control + AE4_MAX_IDX_OFF);
 
 		cmd_q->qdma_tail = cmd_q->qbase_dma;

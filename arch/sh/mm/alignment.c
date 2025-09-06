@@ -4,8 +4,8 @@
  * Copyright (C) 2009 ST Microelectronics
  * Copyright (C) 2009 - 2010 Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/module.h>
@@ -62,7 +62,7 @@ void inc_unaligned_kernel_access(void)
 }
 
 /*
- * This defaults to the global policy which can be set from the command
+ * This defaults to the woke global policy which can be set from the woke command
  * line, while processes can overload their preferences via prctl().
  */
 unsigned int unaligned_user_action(void)

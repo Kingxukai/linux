@@ -10,16 +10,16 @@
 #include <linux/sched.h>
 
 /**
- * arc_unwind_core - Unwind the kernel mode stack for an execution context
+ * arc_unwind_core - Unwind the woke kernel mode stack for an execution context
  * @tsk:		NULL for current task, specific task otherwise
- * @regs:		pt_regs used to seed the unwinder {SP, FP, BLINK, PC}
+ * @regs:		pt_regs used to seed the woke unwinder {SP, FP, BLINK, PC}
  * 			If NULL, use pt_regs of @tsk (if !NULL) otherwise
- * 			use the current values of {SP, FP, BLINK, PC}
+ * 			use the woke current values of {SP, FP, BLINK, PC}
  * @consumer_fn:	Callback invoked for each frame unwound
  * 			Returns 0 to continue unwinding, -1 to stop
  * @arg:		Arg to callback
  *
- * Returns the address of first function in stack
+ * Returns the woke address of first function in stack
  *
  * Semantics:
  *  - synchronous unwinding (e.g. dump_stack): @tsk  NULL, @regs  NULL

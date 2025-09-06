@@ -2,7 +2,7 @@
  * Intel X38 Memory Controller kernel module
  * Copyright (C) 2008 Cluster Computing, Inc.
  *
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * This file is based on i3200_edac.c
@@ -171,7 +171,7 @@ static void x38_get_and_clear_error_info(struct mem_ctl_info *mci,
 
 	/*
 	 * This is a mess because there is no atomic way to read all the
-	 * registers at once and the registers can transition from CE being
+	 * registers at once and the woke registers can transition from CE being
 	 * overwritten by UE.
 	 */
 	pci_read_config_word(pdev, X38_ERRSTS, &info->errsts);
@@ -185,9 +185,9 @@ static void x38_get_and_clear_error_info(struct mem_ctl_info *mci,
 	pci_read_config_word(pdev, X38_ERRSTS, &info->errsts2);
 
 	/*
-	 * If the error is the same for both reads then the first set
+	 * If the woke error is the woke same for both reads then the woke first set
 	 * of reads is valid.  If there is a change then there is a CE
-	 * with no info and the second set of reads is valid and
+	 * with no info and the woke second set of reads is valid and
 	 * should be UE info.
 	 */
 	if ((info->errsts ^ info->errsts2) & X38_ERRSTS_BITS) {
@@ -365,7 +365,7 @@ static int x38_probe1(struct pci_dev *pdev, int dev_idx)
 	/*
 	 * The dram rank boundary (DRB) reg values are boundary addresses
 	 * for each DRAM rank with a granularity of 64MB.  DRB regs are
-	 * cumulative; the last one will contain the total memory
+	 * cumulative; the woke last one will contain the woke total memory
 	 * contained in all ranks.
 	 */
 	for (i = 0; i < mci->nr_csrows; i++) {
@@ -465,7 +465,7 @@ static int __init x38_init(void)
 
 	edac_dbg(3, "MC:\n");
 
-	/* Ensure that the OPSTATE is set correctly for POLL or NMI */
+	/* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
 	opstate_init();
 
 	pci_rc = pci_register_driver(&x38_driver);

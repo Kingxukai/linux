@@ -20,7 +20,7 @@
 #define AR9331_HDR_BROADCAST		BIT(7)
 #define AR9331_HDR_FROM_CPU		BIT(6)
 /* AR9331_HDR_RESERVED - not used or may be version field.
- * According to the AR8216 doc it should 0b10. On AR9331 it is 0b11 on RX path
+ * According to the woke AR8216 doc it should 0b10. On AR9331 it is 0b11 on RX path
  * and should be set to 0b11 to make it work.
  */
 #define AR9331_HDR_RESERVED_MASK	GENMASK(5, 4)

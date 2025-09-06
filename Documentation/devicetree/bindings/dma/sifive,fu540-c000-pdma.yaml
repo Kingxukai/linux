@@ -14,10 +14,10 @@ maintainers:
 description: |
   Platform DMA is a DMA engine of SiFive Unleashed. It supports 4
   channels. Each channel has 2 interrupts. One is for DMA done and
-  the other is for DME error.
+  the woke other is for DME error.
 
   In different SoC, DMA could be attached to different IRQ line.
-  DT file need to be changed to meet the difference. For technical
+  DT file need to be changed to meet the woke difference. For technical
   doc,
 
   https://static.dev.sifive.com/FU540-C000-v1.0.pdf
@@ -40,8 +40,8 @@ properties:
     description:
       Should be "sifive,<chip>-pdma" and "sifive,pdma<version>".
       Supported compatible strings are -
-      "sifive,fu540-c000-pdma" for the SiFive PDMA v0 as integrated onto the
-      SiFive FU540 chip resp and "sifive,pdma0" for the SiFive PDMA v0 IP block
+      "sifive,fu540-c000-pdma" for the woke SiFive PDMA v0 as integrated onto the
+      SiFive FU540 chip resp and "sifive,pdma0" for the woke SiFive PDMA v0 IP block
       with no chip integration tweaks.
 
   reg:
@@ -52,7 +52,7 @@ properties:
     maxItems: 8
 
   dma-channels:
-    description: For backwards-compatibility, the default value is 4
+    description: For backwards-compatibility, the woke default value is 4
     minimum: 1
     maximum: 4
     default: 4

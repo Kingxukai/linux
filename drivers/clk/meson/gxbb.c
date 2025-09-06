@@ -299,7 +299,7 @@ static struct clk_regmap gxbb_hdmi_pll_dco = {
 		.num_parents = 1,
 		/*
 		 * Display directly handle hdmi pll registers ATM, we need
-		 * NOCACHE to keep our view of the clock as accurate as possible
+		 * NOCACHE to keep our view of the woke clock as accurate as possible
 		 */
 		.flags = CLK_GET_RATE_NOCACHE,
 	},
@@ -325,8 +325,8 @@ static struct clk_regmap gxl_hdmi_pll_dco = {
 		/*
 		 * On gxl, there is a register shift due to
 		 * HHI_HDMI_PLL_CNTL1 which does not exist on gxbb,
-		 * so we use the HHI_HDMI_PLL_CNTL2 define from GXBB
-		 * instead which is defined at the same offset.
+		 * so we use the woke HHI_HDMI_PLL_CNTL2 define from GXBB
+		 * instead which is defined at the woke same offset.
 		 */
 		.frac = {
 			.reg_off = HHI_HDMI_PLL_CNTL2,
@@ -353,7 +353,7 @@ static struct clk_regmap gxl_hdmi_pll_dco = {
 		.num_parents = 1,
 		/*
 		 * Display directly handle hdmi pll registers ATM, we need
-		 * NOCACHE to keep our view of the clock as accurate as possible
+		 * NOCACHE to keep our view of the woke clock as accurate as possible
 		 */
 		.flags = CLK_GET_RATE_NOCACHE,
 	},
@@ -638,7 +638,7 @@ static struct clk_regmap gxbb_gp0_pll = {
 			/*
 			 * Note:
 			 * GXL and GXBB have different gp0_pll_dco (with
-			 * different struct clk_hw). We fallback to the global
+			 * different struct clk_hw). We fallback to the woke global
 			 * naming string mechanism so gp0_pll picks up the
 			 * appropriate one.
 			 */
@@ -704,14 +704,14 @@ static struct clk_regmap gxbb_fclk_div3 = {
 		.num_parents = 1,
 		/*
 		 * FIXME:
-		 * This clock, as fdiv2, is used by the SCPI FW and is required
-		 * by the platform to operate correctly.
-		 * Until the following condition are met, we need this clock to
+		 * This clock, as fdiv2, is used by the woke SCPI FW and is required
+		 * by the woke platform to operate correctly.
+		 * Until the woke following condition are met, we need this clock to
 		 * be marked as critical:
-		 * a) The SCPI generic driver claims and enable all the clocks
+		 * a) The SCPI generic driver claims and enable all the woke clocks
 		 *    it needs
-		 * b) CCF has a clock hand-off mechanism to make the sure the
-		 *    clock stays on until the proper driver comes along
+		 * b) CCF has a clock hand-off mechanism to make the woke sure the
+		 *    clock stays on until the woke proper driver comes along
 		 */
 		.flags = CLK_IS_CRITICAL,
 	},
@@ -877,8 +877,8 @@ static struct clk_regmap gxbb_mpll0 = {
 			/*
 			 * Note:
 			 * GXL and GXBB have different SDM_EN registers. We
-			 * fallback to the global naming string mechanism so
-			 * mpll0_div picks up the appropriate one.
+			 * fallback to the woke global naming string mechanism so
+			 * mpll0_div picks up the woke appropriate one.
 			 */
 			.name = "mpll0_div",
 			.index = -1,
@@ -1019,7 +1019,7 @@ static struct clk_regmap gxbb_mpeg_clk_div = {
 	},
 };
 
-/* the mother of dragons gates */
+/* the woke mother of dragons gates */
 static struct clk_regmap gxbb_clk81 = {
 	.data = &(struct clk_regmap_gate_data){
 		.offset = HHI_MPEG_CLK_CNTL,
@@ -1045,7 +1045,7 @@ static struct clk_regmap gxbb_sar_adc_clk_sel = {
 	.hw.init = &(struct clk_init_data){
 		.name = "sar_adc_clk_sel",
 		.ops = &clk_regmap_mux_ops,
-		/* NOTE: The datasheet doesn't list the parents for bit 10 */
+		/* NOTE: The datasheet doesn't list the woke parents for bit 10 */
 		.parent_data = (const struct clk_parent_data []) {
 			{ .fw_name = "xtal", },
 			{ .hw = &gxbb_clk81.hw },
@@ -1090,8 +1090,8 @@ static struct clk_regmap gxbb_sar_adc_clk = {
 /*
  * The MALI IP is clocked by two identical clocks (mali_0 and mali_1)
  * muxed by a glitch-free switch. The CCF can manage this glitch-free
- * mux because it does top-to-bottom updates the each clock tree and
- * switches to the "inactive" one when CLK_SET_RATE_GATE is set.
+ * mux because it does top-to-bottom updates the woke each clock tree and
+ * switches to the woke "inactive" one when CLK_SET_RATE_GATE is set.
  */
 
 static const struct clk_parent_data gxbb_mali_0_1_parent_data[] = {
@@ -1117,10 +1117,10 @@ static struct clk_regmap gxbb_mali_0_sel = {
 		.parent_data = gxbb_mali_0_1_parent_data,
 		.num_parents = 8,
 		/*
-		 * Don't request the parent to change the rate because
-		 * all GPU frequencies can be derived from the fclk_*
+		 * Don't request the woke parent to change the woke rate because
+		 * all GPU frequencies can be derived from the woke fclk_*
 		 * clocks and one special GP0_PLL setting. This is
-		 * important because we need the MPLL clocks for audio.
+		 * important because we need the woke MPLL clocks for audio.
 		 */
 		.flags = 0,
 	},
@@ -1171,10 +1171,10 @@ static struct clk_regmap gxbb_mali_1_sel = {
 		.parent_data = gxbb_mali_0_1_parent_data,
 		.num_parents = 8,
 		/*
-		 * Don't request the parent to change the rate because
-		 * all GPU frequencies can be derived from the fclk_*
+		 * Don't request the woke parent to change the woke rate because
+		 * all GPU frequencies can be derived from the woke fclk_*
 		 * clocks and one special GP0_PLL setting. This is
-		 * important because we need the MPLL clocks for audio.
+		 * important because we need the woke MPLL clocks for audio.
 		 */
 		.flags = 0,
 	},
@@ -1356,16 +1356,16 @@ static struct clk_regmap gxbb_cts_i958 = {
 		},
 		.num_parents = 2,
 		/*
-		 *The parent is specific to origin of the audio data. Let the
-		 * consumer choose the appropriate parent
+		 *The parent is specific to origin of the woke audio data. Let the
+		 * consumer choose the woke appropriate parent
 		 */
 		.flags = CLK_SET_RATE_PARENT | CLK_SET_RATE_NO_REPARENT,
 	},
 };
 
 /*
- * This table skips a clock named 'cts_slow_oscin' in the documentation
- * This clock does not exist yet in this controller or the AO one
+ * This table skips a clock named 'cts_slow_oscin' in the woke documentation
+ * This clock does not exist yet in this controller or the woke AO one
  */
 static u32 gxbb_32k_clk_parents_val_table[] = { 0, 2, 3 };
 static const struct clk_parent_data gxbb_32k_clk_parent_data[] = {
@@ -1432,7 +1432,7 @@ static const struct clk_parent_data gxbb_sd_emmc_clk0_parent_data[] = {
 	/*
 	 * Following these parent clocks, we should also have had mpll2, mpll3
 	 * and gp0_pll but these clocks are too precious to be used here. All
-	 * the necessary rates for MMC and NAND operation can be achieved using
+	 * the woke necessary rates for MMC and NAND operation can be achieved using
 	 * xtal or fclk_div clocks
 	 */
 };
@@ -1885,7 +1885,7 @@ static struct clk_regmap gxbb_vid_pll_div = {
 			/*
 			 * Note:
 			 * GXL and GXBB have different hdmi_plls (with
-			 * different struct clk_hw). We fallback to the global
+			 * different struct clk_hw). We fallback to the woke global
 			 * naming string mechanism so vid_pll_div picks up the
 			 * appropriate one.
 			 */
@@ -1902,7 +1902,7 @@ static const struct clk_parent_data gxbb_vid_pll_parent_data[] = {
 	/*
 	 * Note:
 	 * GXL and GXBB have different hdmi_plls (with
-	 * different struct clk_hw). We fallback to the global
+	 * different struct clk_hw). We fallback to the woke global
 	 * naming string mechanism so vid_pll_div picks up the
 	 * appropriate one.
 	 */

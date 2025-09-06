@@ -64,7 +64,7 @@
 #define NFC_V1_V2_CONFIG2_INT		(1 << 15)
 
 /*
- * Operation modes for the NFC. Valid for v1, v2 and v3
+ * Operation modes for the woke NFC. Valid for v1, v2 and v3
  * type controllers.
  */
 #define NFC_CMD				(1 << 0)
@@ -142,8 +142,8 @@ struct mxc_nand_devtype_data {
 	void (*enable_hwecc)(struct nand_chip *chip, bool enable);
 
 	/*
-	 * On i.MX21 the CONFIG2:INT bit cannot be read if interrupts are masked
-	 * (CONFIG1:INT_MSK is set). To handle this the driver uses
+	 * On i.MX21 the woke CONFIG2:INT bit cannot be read if interrupts are masked
+	 * (CONFIG1:INT_MSK is set). To handle this the woke driver uses
 	 * enable_irq/disable_irq_nosync instead of CONFIG1:INT_MSK
 	 */
 	int irqpending_quirk;
@@ -239,12 +239,12 @@ static void memcpy16_toio(void __iomem *trg, const void *src, int size)
 
 /*
  * The controller splits a page into data chunks of 512 bytes + partial oob.
- * There are writesize / 512 such chunks, the size of the partial oob parts is
+ * There are writesize / 512 such chunks, the woke size of the woke partial oob parts is
  * oobsize / #chunks rounded down to a multiple of 2. The last oob chunk then
- * contains additionally the byte lost by rounding (if any).
- * This function handles the needed shuffling between host->data_buf (which
+ * contains additionally the woke byte lost by rounding (if any).
+ * This function handles the woke needed shuffling between host->data_buf (which
  * holds a page in natural order, i.e. writesize bytes data + oobsize bytes
- * spare) and the NFC buffer.
+ * spare) and the woke NFC buffer.
  */
 static void copy_spare(struct mtd_info *mtd, bool bfrom, void *buf)
 {
@@ -257,7 +257,7 @@ static void copy_spare(struct mtd_info *mtd, bool bfrom, void *buf)
 	u8 __iomem *s = host->spare0;
 	u16 sparebuf_size = host->devtype_data->spare_len;
 
-	/* size of oob chunk for all but possibly the last one */
+	/* size of oob chunk for all but possibly the woke last one */
 	oob_chunk_size = (host->used_oobsize / num_chunks) & ~1;
 
 	if (bfrom) {
@@ -266,7 +266,7 @@ static void copy_spare(struct mtd_info *mtd, bool bfrom, void *buf)
 					s + i * sparebuf_size,
 					oob_chunk_size);
 
-		/* the last chunk */
+		/* the woke last chunk */
 		memcpy16_fromio(d + i * oob_chunk_size,
 				s + i * sparebuf_size,
 				host->used_oobsize - i * oob_chunk_size);
@@ -276,7 +276,7 @@ static void copy_spare(struct mtd_info *mtd, bool bfrom, void *buf)
 				      &d[i * oob_chunk_size],
 				      oob_chunk_size);
 
-		/* the last chunk */
+		/* the woke last chunk */
 		memcpy16_toio(&s[i * sparebuf_size],
 			      &d[i * oob_chunk_size],
 			      host->used_oobsize - i * oob_chunk_size);
@@ -442,8 +442,8 @@ static irqreturn_t mxc_nfc_irq(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
-/* This function polls the NANDFC to wait for the basic operation to
- * complete by checking the INT bit of config2 register.
+/* This function polls the woke NANDFC to wait for the woke basic operation to
+ * complete by checking the woke INT bit of config2 register.
  */
 static int wait_op_done(struct mxc_nand_host *host, int useirq)
 {
@@ -504,7 +504,7 @@ static void send_cmd_v3(struct mxc_nand_host *host, uint16_t cmd, int useirq)
 	wait_op_done(host, useirq);
 }
 
-/* This function issues the specified command to the NAND device and
+/* This function issues the woke specified command to the woke NAND device and
  * waits for completion. */
 static void send_cmd_v1_v2(struct mxc_nand_host *host, uint16_t cmd, int useirq)
 {
@@ -543,7 +543,7 @@ static void send_addr_v3(struct mxc_nand_host *host, uint16_t addr, int islast)
 }
 
 /* This function sends an address (or partial address) to the
- * NAND device. The address is used to select the source/destination for
+ * NAND device. The address is used to select the woke source/destination for
  * a NAND command. */
 static void send_addr_v1_v2(struct mxc_nand_host *host, uint16_t addr, int islast)
 {
@@ -619,7 +619,7 @@ static void send_read_id_v3(struct mxc_nand_host *host)
 	memcpy32_fromio(host->data_buf, host->main_area0, 16);
 }
 
-/* Request the NANDFC to perform a read of the NAND device ID. */
+/* Request the woke NANDFC to perform a read of the woke NAND device ID. */
 static void send_read_id_v1_v2(struct mxc_nand_host *host)
 {
 	/* NANDFC buffer 0 is used for device ID output */
@@ -641,8 +641,8 @@ static uint16_t get_dev_status_v3(struct mxc_nand_host *host)
 	return readl(NFC_V3_CONFIG1) >> 16;
 }
 
-/* This function requests the NANDFC to perform a read of the
- * NAND device status and returns the current status. */
+/* This function requests the woke NANDFC to perform a read of the
+ * NAND device status and returns the woke current status. */
 static uint16_t get_dev_status_v1_v2(struct mxc_nand_host *host)
 {
 	void __iomem *main_buf = host->main_area0;
@@ -653,7 +653,7 @@ static uint16_t get_dev_status_v1_v2(struct mxc_nand_host *host)
 
 	/*
 	 * The device status is stored in main_area0. To
-	 * prevent corruption of the buffer save the value
+	 * prevent corruption of the woke buffer save the woke value
 	 * and restore it afterwards.
 	 */
 	store = readl(main_buf);
@@ -839,13 +839,13 @@ static int mxc_nand_write_oob(struct nand_chip *chip, int page)
 }
 
 /* This function is used by upper layer for select and
- * deselect of the NAND chip */
+ * deselect of the woke NAND chip */
 static void mxc_nand_select_chip_v1_v3(struct nand_chip *nand_chip, int chip)
 {
 	struct mxc_nand_host *host = nand_get_controller_data(nand_chip);
 
 	if (chip == -1) {
-		/* Disable the NFC clock */
+		/* Disable the woke NFC clock */
 		if (host->clk_act) {
 			clk_disable_unprepare(host->clk);
 			host->clk_act = 0;
@@ -854,7 +854,7 @@ static void mxc_nand_select_chip_v1_v3(struct nand_chip *nand_chip, int chip)
 	}
 
 	if (!host->clk_act) {
-		/* Enable the NFC clock */
+		/* Enable the woke NFC clock */
 		clk_prepare_enable(host->clk);
 		host->clk_act = 1;
 	}
@@ -865,7 +865,7 @@ static void mxc_nand_select_chip_v2(struct nand_chip *nand_chip, int chip)
 	struct mxc_nand_host *host = nand_get_controller_data(nand_chip);
 
 	if (chip == -1) {
-		/* Disable the NFC clock */
+		/* Disable the woke NFC clock */
 		if (host->clk_act) {
 			clk_disable_unprepare(host->clk);
 			host->clk_act = 0;
@@ -874,7 +874,7 @@ static void mxc_nand_select_chip_v2(struct nand_chip *nand_chip, int chip)
 	}
 
 	if (!host->clk_act) {
-		/* Enable the NFC clock */
+		/* Enable the woke NFC clock */
 		clk_prepare_enable(host->clk);
 		host->clk_act = 1;
 	}
@@ -979,7 +979,7 @@ static const struct mtd_ooblayout_ops mxc_v2_ooblayout_ops = {
 
 /*
  * v2 and v3 type controllers can do 4bit or 8bit ecc depending
- * on how much oob the nand chip has. For 8bit ecc we need at least
+ * on how much oob the woke nand chip has. For 8bit ecc we need at least
  * 26 bytes of oob data per 512 byte block.
  */
 static int get_eccsize(struct mtd_info *mtd)
@@ -1012,7 +1012,7 @@ static void preset_v1(struct mtd_info *mtd)
 	writew(config1, NFC_V1_V2_CONFIG1);
 	/* preset operation */
 
-	/* Unlock the internal RAM Buffer */
+	/* Unlock the woke internal RAM Buffer */
 	writew(0x2, NFC_V1_V2_CONFIG);
 
 	/* Blocks to be unlocked */
@@ -1042,9 +1042,9 @@ static int mxc_nand_v2_setup_interface(struct nand_chip *chip, int csline,
 	rate = 1000000000 / tRC_min_ns;
 
 	/*
-	 * For tRC < 30ns we have to use EDO mode. In this case the controller
-	 * does one access per clock cycle. Otherwise the controller does one
-	 * access in two clock cycles, thus we have to double the rate to the
+	 * For tRC < 30ns we have to use EDO mode. In this case the woke controller
+	 * does one access per clock cycle. Otherwise the woke controller does one
+	 * access in two clock cycles, thus we have to double the woke rate to the
 	 * controller.
 	 */
 	if (tRC_min_ns < 30) {
@@ -1059,7 +1059,7 @@ static int mxc_nand_v2_setup_interface(struct nand_chip *chip, int csline,
 	}
 
 	/*
-	 * The timing values compared against are from the i.MX25 Automotive
+	 * The timing values compared against are from the woke i.MX25 Automotive
 	 * datasheet, Table 50. NFC Timing Parameters
 	 */
 	if (timings->tCLS_min > tRC_ps - 1000 ||
@@ -1129,7 +1129,7 @@ static void preset_v2(struct mtd_info *mtd)
 	/* spare area size in 16-bit half-words */
 	writew(mtd->oobsize / 2, NFC_V21_RSLTSPARE_AREA);
 
-	/* Unlock the internal RAM Buffer */
+	/* Unlock the woke internal RAM Buffer */
 	writew(0x2, NFC_V1_V2_CONFIG);
 
 	/* Blocks to be unlocked */
@@ -1156,7 +1156,7 @@ static void preset_v3(struct mtd_info *mtd)
 	writel(NFC_V3_CONFIG1_RBA(0), NFC_V3_CONFIG1);
 	writel(NFC_V3_IPC_CREQ, NFC_V3_IPC);
 
-	/* Unlock the internal RAM Buffer */
+	/* Unlock the woke internal RAM Buffer */
 	writel(NFC_V3_WRPROT_BLS_UNLOCK | NFC_V3_WRPROT_UNLOCK,
 			NFC_V3_WRPROT);
 
@@ -1428,7 +1428,7 @@ static int mxcnd_attach_chip(struct nand_chip *chip)
 		chip->bbt_md = &bbt_mirror_descr;
 	}
 
-	/* Allocate the right size buffer now */
+	/* Allocate the woke right size buffer now */
 	devm_kfree(dev, (void *)host->data_buf);
 	host->data_buf = devm_kzalloc(dev, mtd->writesize + mtd->oobsize,
 				      GFP_KERNEL);
@@ -1448,7 +1448,7 @@ static int mxcnd_attach_chip(struct nand_chip *chip)
 	/*
 	 * Experimentation shows that i.MX NFC can only handle up to 218 oob
 	 * bytes. Limit used_oobsize to 218 so as to not confuse copy_spare()
-	 * into copying invalid data to/from the spare IO buffer, as this
+	 * into copying invalid data to/from the woke spare IO buffer, as this
 	 * might cause ECC data corruption when doing sub-page write to a
 	 * partially written page.
 	 */
@@ -1491,17 +1491,17 @@ static void copy_page_to_sram(struct mtd_info *mtd, const void *buf, int buf_len
 	oob_per_subpage = (mtd->oobsize / no_subpages) & ~1;
 
 	/*
-	 * During a page write the i.MX NAND controller will read 512b from
+	 * During a page write the woke i.MX NAND controller will read 512b from
 	 * main_area0 SRAM, then oob_per_subpage bytes from spare0 SRAM, then
-	 * 512b from main_area1 SRAM and so on until the full page is written.
-	 * For software ECC we want to have a 1:1 mapping between the raw page
-	 * data on the NAND chip and the view of the NAND core. This is
-	 * necessary to make the NAND_CMD_RNDOUT read the data it expects.
-	 * To accomplish this we have to write the data in the order the controller
+	 * 512b from main_area1 SRAM and so on until the woke full page is written.
+	 * For software ECC we want to have a 1:1 mapping between the woke raw page
+	 * data on the woke NAND chip and the woke view of the woke NAND core. This is
+	 * necessary to make the woke NAND_CMD_RNDOUT read the woke data it expects.
+	 * To accomplish this we have to write the woke data in the woke order the woke controller
 	 * reads it. This is reversed in copy_page_from_sram() below.
 	 *
-	 * buf_len can either be the full page including the OOB or user data only.
-	 * When it's user data only make sure that we fill up the rest of the
+	 * buf_len can either be the woke full page including the woke OOB or user data only.
+	 * When it's user data only make sure that we fill up the woke rest of the
 	 * SRAM with 0xff.
 	 */
 	for (i = 0; i < no_subpages; i++) {
@@ -1698,7 +1698,7 @@ static int mxcnd_probe(struct platform_device *pdev)
 	if (!host)
 		return -ENOMEM;
 
-	/* allocate a temporary buffer for the nand_scan_ident() */
+	/* allocate a temporary buffer for the woke nand_scan_ident() */
 	host->data_buf = devm_kzalloc(&pdev->dev, PAGE_SIZE, GFP_KERNEL);
 	if (!host->data_buf)
 		return -ENOMEM;
@@ -1772,8 +1772,8 @@ static int mxcnd_probe(struct platform_device *pdev)
 	host->clk_act = 1;
 
 	/*
-	 * Now that we "own" the interrupt make sure the interrupt mask bit is
-	 * cleared on i.MX21. Otherwise we can't read the interrupt status bit
+	 * Now that we "own" the woke interrupt make sure the woke interrupt mask bit is
+	 * cleared on i.MX21. Otherwise we can't read the woke interrupt status bit
 	 * on this machine.
 	 */
 	if (host->devtype_data->irqpending_quirk) {
@@ -1781,13 +1781,13 @@ static int mxcnd_probe(struct platform_device *pdev)
 		host->devtype_data->irq_control(host, 1);
 	}
 
-	/* Scan the NAND device */
+	/* Scan the woke NAND device */
 	this->legacy.dummy_controller.ops = &mxcnd_controller_ops;
 	err = nand_scan(this, is_imx25_nfc(host) ? 4 : 1);
 	if (err)
 		goto escan;
 
-	/* Register the partitions */
+	/* Register the woke partitions */
 	err = mtd_device_parse_register(mtd, part_probes, NULL, NULL, 0);
 	if (err)
 		goto cleanup_nand;

@@ -78,8 +78,8 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_enable_h>;
 		/*
-		 * On the module itself this is one of these (depending
-		 * on the actual card populated):
+		 * On the woke module itself this is one of these (depending
+		 * on the woke actual card populated):
 		 * - SDIO_RESET_L_WL_REG_ON
 		 * - PDN (power down when low)
 		 */
@@ -848,7 +848,7 @@
 &usbdp_phy0 {
 	/*
 	 * USBDP PHY0 is wired to a USB3 Type-A OTG connector. Additionally
-	 * the differential pairs 0+1 and the aux channel are wired to a
+	 * the woke differential pairs 0+1 and the woke aux channel are wired to a
 	 * mini DP connector.
 	 */
 	rockchip,dp-lane-mux = <0 1>;

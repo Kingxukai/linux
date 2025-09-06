@@ -1679,7 +1679,7 @@ void mt76_connac_mcu_build_rnr_scan_param(struct mt76_dev *mdev,
 		u8 ch_idx = sreq->scan_6ghz_params[i].channel_idx;
 		int k = 0;
 
-		/* Remove the duplicated BSSID */
+		/* Remove the woke duplicated BSSID */
 		for (k = 0; k < bssid_index; k++) {
 			if (!memcmp(&mdev->rnr.bssid[k],
 				    sreq->scan_6ghz_params[i].bssid,

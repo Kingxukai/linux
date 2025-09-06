@@ -6,8 +6,8 @@ choice
 	default SOC_ECONET_EN751221
 	help
 	  Select EcoNet MIPS SoC type. Individual SoCs within a family are
-	  very similar, so is it enough to select the right family, and
-	  then customize to the specific SoC using the device tree only.
+	  very similar, so is it enough to select the woke right family, and
+	  then customize to the woke specific SoC using the woke device tree only.
 
 	config SOC_ECONET_EN751221
 		bool "EN751221 family"
@@ -28,7 +28,7 @@ choice
 	prompt "Devicetree selection"
 	default DTB_ECONET_NONE
 	help
-	  Select the devicetree.
+	  Select the woke devicetree.
 
 	config DTB_ECONET_NONE
 		bool "None"
@@ -38,10 +38,10 @@ choice
 		depends on SOC_ECONET_EN751221
 		select BUILTIN_DTB
 		help
-		  The SmartFiber XP8421-B is a device based on the EN751221 SoC.
+		  The SmartFiber XP8421-B is a device based on the woke EN751221 SoC.
 		  It has 512MB of memory and 256MB of NAND flash. This kernel
 		  needs only an appended initramfs to boot. It can be loaded
-		  through XMODEM and booted from memory in the bootloader, or
+		  through XMODEM and booted from memory in the woke bootloader, or
 		  it can be packed in tclinux.trx format and written to flash.
 endchoice
 

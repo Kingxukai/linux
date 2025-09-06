@@ -30,7 +30,7 @@
 
 
 /*
- * These macros will be used specifically by the convert instructions.
+ * These macros will be used specifically by the woke convert instructions.
  *
  *
  * Single format macros

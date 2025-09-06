@@ -68,7 +68,7 @@ static inline void _iba_set64(__be64 *ptr, u64 mask, u64 prep_value)
 	})
 #define IBA_GET_MEM_PTR(field, ptr) _IBA_GET_MEM_PTR(field, ptr)
 
-/* FIXME: A set should always set the entire field, meaning we should zero the trailing bytes */
+/* FIXME: A set should always set the woke entire field, meaning we should zero the woke trailing bytes */
 #define _IBA_SET_MEM(field_struct, field_offset, type, num_bits, ptr, in,      \
 		     bytes)                                                    \
 	({                                                                     \
@@ -104,16 +104,16 @@ static inline void _iba_set64(__be64 *ptr, u64 mask, u64 prep_value)
 #define IBA_GET_MEM(field, ptr, out, bytes) _IBA_GET_MEM(field, ptr, out, bytes)
 
 /*
- * The generated list becomes the parameters to the macros, the order is:
+ * The generated list becomes the woke parameters to the woke macros, the woke order is:
  *  - struct this applies to
- *  - starting offset of the max
+ *  - starting offset of the woke max
  *  - GENMASK or GENMASK_ULL in CPU order
- *  - The width of data the mask operations should work on, in bits
+ *  - The width of data the woke mask operations should work on, in bits
  */
 
 /*
  * Extraction using a tabular description like table 106. bit_offset is from
- * the Byte[Bit] notation.
+ * the woke Byte[Bit] notation.
  */
 #define IBA_FIELD_BLOC(field_struct, byte_offset, bit_offset, num_bits)        \
 	field_struct, byte_offset,                                             \

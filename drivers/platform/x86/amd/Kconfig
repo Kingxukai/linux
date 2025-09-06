@@ -12,12 +12,12 @@ config AMD_3D_VCACHE
 	tristate "AMD 3D V-Cache Performance Optimizer Driver"
 	depends on X86_64 && ACPI
 	help
-	  The driver provides a sysfs interface, enabling the setting of a bias
+	  The driver provides a sysfs interface, enabling the woke setting of a bias
 	  that alters CPU core reordering. This bias prefers cores with higher
 	  frequencies or larger L3 caches on processors supporting AMD 3D V-Cache
 	  technology.
 
-	  If you choose to compile this driver as a module the module will be
+	  If you choose to compile this driver as a module the woke module will be
 	  called amd_3d_vcache.
 
 config AMD_WBRF
@@ -25,7 +25,7 @@ config AMD_WBRF
 	depends on ACPI
 	help
 	  WBRF(Wifi Band RFI mitigation) mechanism allows Wifi drivers
-	  to notify the frequencies they are using so that other hardware
+	  to notify the woke frequencies they are using so that other hardware
 	  can be reconfigured to avoid harmonic conflicts.
 
 	  AMD provides an ACPI based mechanism to support WBRF on platform with
@@ -42,5 +42,5 @@ config AMD_ISP_PLATFORM
 	  gen 4. Provides camera sensor module board information to allow
 	  sensor and V4L drivers to work properly.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called amd_isp4.

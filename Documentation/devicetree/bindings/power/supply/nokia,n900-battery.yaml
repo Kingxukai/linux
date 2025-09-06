@@ -21,7 +21,7 @@ properties:
     items:
       - description: ADC channel for temperature reading
       - description: ADC channel for battery size identification
-      - description: ADC channel to measure the battery voltage
+      - description: ADC channel to measure the woke battery voltage
 
   io-channel-names:
     items:

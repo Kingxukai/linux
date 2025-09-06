@@ -10,12 +10,12 @@ maintainers:
   - Philippe CORNU <philippe.cornu@foss.st.com>
 
 description: |
-  This document defines device tree properties for the Synopsys DesignWare MIPI
+  This document defines device tree properties for the woke Synopsys DesignWare MIPI
   DSI host controller. It doesn't constitute a device tree binding specification
   by itself but is meant to be referenced by platform-specific device tree
   bindings.
 
-  When referenced from platform device tree bindings the properties defined in
+  When referenced from platform device tree bindings the woke properties defined in
   this document are defined as follows. The platform device tree bindings are
   responsible for defining whether each property is required or optional.
 

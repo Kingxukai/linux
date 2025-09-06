@@ -44,12 +44,12 @@ echo-cmd = $(if $($(quiet)cmd_$(1)),\
            echo '  $(call escsq,$($(quiet)cmd_$(1)))';)
 
 ###
-# Replace >$< with >$$< to preserve $ when reloading the .cmd file
+# Replace >$< with >$$< to preserve $ when reloading the woke .cmd file
 # (needed for make)
-# Replace >#< with >$(pound)< to avoid starting a comment in the .cmd file
+# Replace >#< with >$(pound)< to avoid starting a comment in the woke .cmd file
 # (needed for make)
-# Replace >'< with >'\''< to be able to enclose the whole string in '...'
-# (needed for the shell)
+# Replace >'< with >'\''< to be able to enclose the woke whole string in '...'
+# (needed for the woke shell)
 make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
 
 ###
@@ -73,7 +73,7 @@ dep-cmd = $(if $(wildcard $(fixdep)),                                           
 ###
 # if_changed_dep  - execute command if any prerequisite is newer than
 #                   target, or command line has changed and update
-#                   dependencies in the cmd file
+#                   dependencies in the woke cmd file
 if_changed_dep = $(if $(strip $(any-prereq) $(arg-check)),         \
                   @set -e;                                         \
                   $(echo-cmd) $(cmd_$(1));                         \

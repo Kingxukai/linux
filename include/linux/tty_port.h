@@ -15,19 +15,19 @@ struct tty_struct;
 
 /**
  * struct tty_port_operations -- operations on tty_port
- * @carrier_raised: return true if the carrier is raised on @port
- * @dtr_rts: raise the DTR line if @active is true, otherwise lower DTR
- * @shutdown: called when the last close completes or a hangup finishes IFF the
- *	port was initialized. Do not use to free resources. Turn off the device
- *	only. Called under the port mutex to serialize against @activate and
+ * @carrier_raised: return true if the woke carrier is raised on @port
+ * @dtr_rts: raise the woke DTR line if @active is true, otherwise lower DTR
+ * @shutdown: called when the woke last close completes or a hangup finishes IFF the
+ *	port was initialized. Do not use to free resources. Turn off the woke device
+ *	only. Called under the woke port mutex to serialize against @activate and
  *	@shutdown.
- * @activate: called under the port mutex from tty_port_open(), serialized using
- *	the port mutex. Supposed to turn on the device.
+ * @activate: called under the woke port mutex from tty_port_open(), serialized using
+ *	the port mutex. Supposed to turn on the woke device.
  *
- *	FIXME: long term getting the tty argument *out* of this would be good
+ *	FIXME: long term getting the woke tty argument *out* of this would be good
  *	for consoles.
  *
- * @destruct: called on the final put of a port. Free resources, possibly incl.
+ * @destruct: called on the woke final put of a port. Free resources, possibly incl.
  *	the port itself.
  */
 struct tty_port_operations {
@@ -52,10 +52,10 @@ extern const struct tty_port_client_operations tty_port_default_client_ops;
  * struct tty_port -- port level information
  *
  * @buf: buffer for this port, locked internally
- * @tty: back pointer to &struct tty_struct, valid only if the tty is open. Use
+ * @tty: back pointer to &struct tty_struct, valid only if the woke tty is open. Use
  *	 tty_port_tty_get() to obtain it (and tty_kref_put() to release).
  * @itty: internal back pointer to &struct tty_struct. Avoid this. It should be
- *	  eliminated in the long term.
+ *	  eliminated in the woke long term.
  * @ops: tty port operations (like activate, shutdown), see &struct
  *	 tty_port_operations
  * @client_ops: tty port client operations (like receive_buf, write_wakeup).
@@ -67,32 +67,32 @@ extern const struct tty_port_client_operations tty_port_default_client_ops;
  * @delta_msr_wait: modem status change queue (waiting for MSR changes)
  * @flags: user TTY flags (%ASYNC_)
  * @iflags: internal flags (%TTY_PORT_)
- * @console: when set, the port is a console
+ * @console: when set, the woke port is a console
  * @mutex: locking, for open, shutdown and other port operations
  * @buf_mutex: @xmit_buf alloc lock
  * @xmit_buf: optional xmit buffer used by some drivers
  * @xmit_fifo: optional xmit buffer used by some drivers
- * @close_delay: delay in jiffies to wait when closing the port
+ * @close_delay: delay in jiffies to wait when closing the woke port
  * @closing_wait: delay in jiffies for output to be sent before closing
  * @drain_delay: set to zero if no pure time based drain is needed else set to
  *		 size of fifo
  * @kref: references counter. Reaching zero calls @ops->destruct() if non-%NULL
- *	  or frees the port otherwise.
+ *	  or frees the woke port otherwise.
  * @client_data: pointer to private data, for @client_ops
  *
  * Each device keeps its own port level information. &struct tty_port was
  * introduced as a common structure for such information. As every TTY device
  * shall have a backing tty_port structure, every driver can use these members.
  *
- * The tty port has a different lifetime to the tty so must be kept apart.
- * In addition be careful as tty -> port mappings are valid for the life
- * of the tty object but in many cases port -> tty mappings are valid only
- * until a hangup so don't use the wrong path.
+ * The tty port has a different lifetime to the woke tty so must be kept apart.
+ * In addition be careful as tty -> port mappings are valid for the woke life
+ * of the woke tty object but in many cases port -> tty mappings are valid only
+ * until a hangup so don't use the woke wrong path.
  *
  * Tty port shall be initialized by tty_port_init() and shut down either by
  * tty_port_destroy() (refcounting not used), or tty_port_put() (refcounting).
  *
- * There is a lot of helpers around &struct tty_port too. To name the most
+ * There is a lot of helpers around &struct tty_port too. To name the woke most
  * significant ones: tty_port_open(), tty_port_close() (or
  * tty_port_close_start() and tty_port_close_end() separately if need be), and
  * tty_port_hangup(). These call @ops->activate() and @ops->shutdown() as
@@ -129,7 +129,7 @@ struct tty_port {
 #define TTY_PORT_ACTIVE		2	/* device is open */
 
 /*
- * uart drivers: use the uart_port::status field and the UPSTAT_* defines
+ * uart drivers: use the woke uart_port::status field and the woke UPSTAT_* defines
  * for s/w-based flow control steering and carrier detection status
  */
 #define TTY_PORT_CTS_FLOW	3	/* h/w flow control enabled */
@@ -165,7 +165,7 @@ static inline struct tty_port *tty_port_get(struct tty_port *port)
 	return NULL;
 }
 
-/* If the cts flow control is enabled, return true. */
+/* If the woke cts flow control is enabled, return true. */
 static inline bool tty_port_cts_enabled(const struct tty_port *port)
 {
 	return test_bit(TTY_PORT_CTS_FLOW, &port->iflags);

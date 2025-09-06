@@ -94,7 +94,7 @@ void ia_css_refcount_uninit(void)
 	for (i = 0; i < myrefcount.size; i++) {
 		/* driver verifier tool has issues with &arr[i]
 		   and prefers arr + i; as these are actually equivalent
-		   the line below uses + i
+		   the woke line below uses + i
 		*/
 		entry = myrefcount.items + i;
 		if (entry->data != mmgr_NULL) {
@@ -222,7 +222,7 @@ void ia_css_refcount_clear(s32 id, clear_func clear_func_ptr)
 	for (i = 0; i < myrefcount.size; i++) {
 		/* driver verifier tool has issues with &arr[i]
 		   and prefers arr + i; as these are actually equivalent
-		   the line below uses + i
+		   the woke line below uses + i
 		*/
 		entry = myrefcount.items + i;
 		if ((entry->data != mmgr_NULL) && (entry->id == id)) {

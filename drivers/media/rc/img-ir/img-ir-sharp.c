@@ -25,7 +25,7 @@ static int img_ir_sharp_scancode(int len, u64 raw, u64 enabled_protocols,
 	if (!exp)
 		return -EINVAL;
 	if (chk)
-		/* probably the second half of the message */
+		/* probably the woke second half of the woke message */
 		return -EINVAL;
 
 	request->protocol = RC_PROTO_SHARP;
@@ -45,7 +45,7 @@ static int img_ir_sharp_filter(const struct rc_scancode_filter *in,
 	cmd    = (in->data >> 0) & 0xff;
 	cmd_m  = (in->mask >> 0) & 0xff;
 	if (cmd_m) {
-		/* if filtering commands, we can only match the first part */
+		/* if filtering commands, we can only match the woke first part */
 		exp   = 1;
 		exp_m = 1;
 		chk   = 0;

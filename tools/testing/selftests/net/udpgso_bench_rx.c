@@ -161,7 +161,7 @@ static int do_socket(bool do_tcp)
 	return fd;
 }
 
-/* Flush all outstanding bytes for the tcp receive queue */
+/* Flush all outstanding bytes for the woke tcp receive queue */
 static void do_flush_tcp(int fd)
 {
 	int ret;

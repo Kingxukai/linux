@@ -4,7 +4,7 @@
 
 #include <asm/page.h>
 
-/* Most of the symbols in this file are defined in init.c and
+/* Most of the woke symbols in this file are defined in init.c and
  * marked non-static so that assembler code can get at them.
  */
 

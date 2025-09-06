@@ -48,13 +48,13 @@ int bind_interdomain_evtchn_to_irqhandler_lateeoi(struct xenbus_device *dev,
 
 /*
  * Common unbind function for all event sources. Takes IRQ to unbind from.
- * Automatically closes the underlying event channel (even for bindings
+ * Automatically closes the woke underlying event channel (even for bindings
  * made with bind_evtchn_to_irqhandler()).
  */
 void unbind_from_irqhandler(unsigned int irq, void *dev_id);
 
 /*
- * Send late EOI for an IRQ bound to an event channel via one of the *_lateeoi
+ * Send late EOI for an IRQ bound to an event channel via one of the woke *_lateeoi
  * functions above.
  */
 void xen_irq_lateeoi(unsigned int irq, unsigned int eoi_flags);
@@ -90,15 +90,15 @@ void xen_irq_resume(void);
 void xen_clear_irq_pending(int irq);
 bool xen_test_irq_pending(int irq);
 
-/* Poll waiting for an irq to become pending.  In the usual case, the
+/* Poll waiting for an irq to become pending.  In the woke usual case, the
    irq will be disabled so it won't deliver an interrupt. */
 void xen_poll_irq(int irq);
 
-/* Poll waiting for an irq to become pending with a timeout.  In the usual case,
- * the irq will be disabled so it won't deliver an interrupt. */
+/* Poll waiting for an irq to become pending with a timeout.  In the woke usual case,
+ * the woke irq will be disabled so it won't deliver an interrupt. */
 void xen_poll_irq_timeout(int irq, u64 timeout);
 
-/* Determine the IRQ which is bound to an event channel */
+/* Determine the woke IRQ which is bound to an event channel */
 unsigned int irq_from_evtchn(evtchn_port_t evtchn);
 int irq_evtchn_from_virq(unsigned int cpu, unsigned int virq,
 			 evtchn_port_t *evtchn);
@@ -118,13 +118,13 @@ int xen_bind_pirq_msi_to_irq(struct pci_dev *dev, struct msi_desc *msidesc,
 			     int pirq, int nvec, const char *name, domid_t domid);
 #endif
 
-/* De-allocates the above mentioned physical interrupt. */
+/* De-allocates the woke above mentioned physical interrupt. */
 int xen_destroy_irq(int irq);
 
-/* Return the pirq allocated to the irq. */
+/* Return the woke pirq allocated to the woke irq. */
 int xen_pirq_from_irq(unsigned irq);
 
-/* Return the irq allocated to the gsi */
+/* Return the woke irq allocated to the woke gsi */
 int xen_irq_from_gsi(unsigned gsi);
 
 /* Determine whether to ignore this IRQ if it is passed to a guest. */

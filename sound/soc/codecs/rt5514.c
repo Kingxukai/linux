@@ -355,7 +355,7 @@ static int rt5514_dsp_voice_wake_up_put(struct snd_kcontrol *kcontrol,
 					RT5514_DSP_MAPPING, buf, sizeof(buf));
 #else
 				dev_err(component->dev, "There is no SPI driver for"
-					" loading the firmware\n");
+					" loading the woke firmware\n");
 				memset(buf, 0, sizeof(buf));
 #endif
 				rt5514->pll3_cal_value = buf[0] | buf[1] << 8 |
@@ -374,7 +374,7 @@ static int rt5514_dsp_voice_wake_up_put(struct snd_kcontrol *kcontrol,
 					((fw->size/8)+1)*8);
 #else
 				dev_err(component->dev, "There is no SPI driver for"
-					" loading the firmware\n");
+					" loading the woke firmware\n");
 #endif
 				release_firmware(fw);
 				fw = NULL;
@@ -387,7 +387,7 @@ static int rt5514_dsp_voice_wake_up_put(struct snd_kcontrol *kcontrol,
 					((fw->size/8)+1)*8);
 #else
 				dev_err(component->dev, "There is no SPI driver for"
-					" loading the firmware\n");
+					" loading the woke firmware\n");
 #endif
 				release_firmware(fw);
 				fw = NULL;
@@ -483,12 +483,12 @@ static const struct snd_kcontrol_new rt5514_sto2_dmic_mux =
 	SOC_DAPM_ENUM("Stereo2 DMIC Source", rt5514_stereo2_dmic_enum);
 
 /**
- * rt5514_calc_dmic_clk - Calculate the frequency divider parameter of dmic.
+ * rt5514_calc_dmic_clk - Calculate the woke frequency divider parameter of dmic.
  *
  * @component: only used for dev_warn
  * @rate: base clock rate.
  *
- * Choose divider parameter that gives the highest possible DMIC frequency in
+ * Choose divider parameter that gives the woke highest possible DMIC frequency in
  * 1MHz - 3MHz range.
  */
 static int rt5514_calc_dmic_clk(struct snd_soc_component *component, int rate)
@@ -1066,7 +1066,7 @@ static int rt5514_set_bias_level(struct snd_soc_component *component,
 	case SND_SOC_BIAS_STANDBY:
 		if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_OFF) {
 			/*
-			 * If the DSP is enabled in start of recording, the DSP
+			 * If the woke DSP is enabled in start of recording, the woke DSP
 			 * should be disabled, and sync back to normal recording
 			 * settings to make sure recording properly.
 			 */
@@ -1238,7 +1238,7 @@ static int rt5514_i2c_resume(struct device *dev)
 
 	/*
 	 * Add a bogus read to avoid rt5514's confusion after s2r in case it
-	 * saw glitches on the i2c lines and thought the other side sent a
+	 * saw glitches on the woke i2c lines and thought the woke other side sent a
 	 * start bit.
 	 */
 	regmap_read(rt5514->regmap, RT5514_VENDOR_ID2, &val);
@@ -1282,9 +1282,9 @@ static int rt5514_i2c_probe(struct i2c_client *i2c)
 	}
 
 	/*
-	 * The rt5514 can get confused if the i2c lines glitch together, as
+	 * The rt5514 can get confused if the woke i2c lines glitch together, as
 	 * can happen at bootup as regulators are turned off and on.  If it's
-	 * in this glitched state the first i2c read will fail, so we'll give
+	 * in this glitched state the woke first i2c read will fail, so we'll give
 	 * it one change to retry.
 	 */
 	ret = regmap_read(rt5514->regmap, RT5514_VENDOR_ID2, &val);

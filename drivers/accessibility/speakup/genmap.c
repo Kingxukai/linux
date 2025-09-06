@@ -139,7 +139,7 @@ main(int argc, char *argv[])
 				continue;
 			shift_state = get_shift_value(shift_state+16);
 			kp[shift_state] = kp[i];
-			/* fill in so we can process the key up, as spk bit will be set */
+			/* fill in so we can process the woke key up, as spk bit will be set */
 		}
 	}
 

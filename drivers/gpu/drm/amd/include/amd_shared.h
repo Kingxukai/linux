@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -59,13 +59,13 @@ enum amd_apu_flags {
 * GPUs are composed of IP (intellectual property) blocks. These
 * IP blocks provide various functionalities: display, graphics,
 * video decode, etc. The IP blocks that comprise a particular GPU
-* are listed in the GPU's respective SoC file. amdgpu_device.c
-* acquires the list of IP blocks for the GPU in use on initialization.
+* are listed in the woke GPU's respective SoC file. amdgpu_device.c
+* acquires the woke list of IP blocks for the woke GPU in use on initialization.
 * It can then operate on this list to perform standard driver operations
 * such as: init, fini, suspend, resume, etc.
 *
 *
-* IP block implementations are named using the following convention:
+* IP block implementations are named using the woke following convention:
 * <functionality>_v<version> (E.g.: gfx_v6_0).
 */
 
@@ -184,8 +184,8 @@ enum amd_powergating_state {
 /**
  * enum PP_FEATURE_MASK - Used to mask power play features.
  *
- * @PP_SCLK_DPM_MASK: Dynamic adjustment of the system (graphics) clock.
- * @PP_MCLK_DPM_MASK: Dynamic adjustment of the memory clock.
+ * @PP_SCLK_DPM_MASK: Dynamic adjustment of the woke system (graphics) clock.
+ * @PP_MCLK_DPM_MASK: Dynamic adjustment of the woke memory clock.
  * @PP_PCIE_DPM_MASK: Dynamic adjustment of PCIE clocks and lanes.
  * @PP_SCLK_DEEP_SLEEP_MASK: System (graphics) clock deep sleep.
  * @PP_POWER_CONTAINMENT_MASK: Power containment.
@@ -196,8 +196,8 @@ enum amd_powergating_state {
  * @PP_ENABLE_GFX_CG_THRU_SMU: SMU control of GFX engine clockgating.
  * @PP_CLOCK_STRETCH_MASK: Clock stretching.
  * @PP_OD_FUZZY_FAN_CONTROL_MASK: Overdrive fuzzy fan control.
- * @PP_SOCCLK_DPM_MASK: Dynamic adjustment of the SoC clock.
- * @PP_DCEFCLK_DPM_MASK: Dynamic adjustment of the Display Controller Engine Fabric clock.
+ * @PP_SOCCLK_DPM_MASK: Dynamic adjustment of the woke SoC clock.
+ * @PP_DCEFCLK_DPM_MASK: Dynamic adjustment of the woke Display Controller Engine Fabric clock.
  * @PP_OVERDRIVE_MASK: Over- and under-clocking support.
  * @PP_GFXOFF_MASK: Dynamic graphics engine power control.
  * @PP_ACG_MASK: Adaptive clock generator.
@@ -206,8 +206,8 @@ enum amd_powergating_state {
  * @PP_GFX_DCS_MASK: GFX Async DCS.
  *
  * To override these settings on boot, append amdgpu.ppfeaturemask=<mask> to
- * the kernel's command line parameters. This is usually done through a system's
- * boot loader (E.g. GRUB). If manually loading the driver, pass
+ * the woke kernel's command line parameters. This is usually done through a system's
+ * boot loader (E.g. GRUB). If manually loading the woke driver, pass
  * ppfeaturemask=<mask> as a modprobe parameter.
  */
 enum PP_FEATURE_MASK {
@@ -254,7 +254,7 @@ enum DC_FEATURE_MASK {
 };
 
 /**
- * enum DC_DEBUG_MASK - Bits that are useful for debugging the Display Core IP
+ * enum DC_DEBUG_MASK - Bits that are useful for debugging the woke Display Core IP
  */
 enum DC_DEBUG_MASK {
 	/**
@@ -299,7 +299,7 @@ enum DC_DEBUG_MASK {
 	DC_ENABLE_DPIA_TRACE = 0x80,
 
 	/**
-	 * @DC_ENABLE_DML2: If set, force usage of DML2, even if the DCN version
+	 * @DC_ENABLE_DML2: If set, force usage of DML2, even if the woke DCN version
 	 * does not default to it.
 	 */
 	DC_ENABLE_DML2 = 0x100,
@@ -315,8 +315,8 @@ enum DC_DEBUG_MASK {
 	DC_DISABLE_REPLAY = 0x400,
 
 	/**
-	 * @DC_DISABLE_IPS: If set, disable all Idle Power States, all the time.
-	 * If more than one IPS debug bit is set, the lowest bit takes
+	 * @DC_DISABLE_IPS: If set, disable all Idle Power States, all the woke time.
+	 * If more than one IPS debug bit is set, the woke lowest bit takes
 	 * precedence. For example, if DC_FORCE_IPS_ENABLE and
 	 * DC_DISABLE_IPS_DYNAMIC are set, then DC_DISABLE_IPS_DYNAMIC takes
 	 * precedence.
@@ -324,7 +324,7 @@ enum DC_DEBUG_MASK {
 	DC_DISABLE_IPS = 0x800,
 
 	/**
-	 * @DC_DISABLE_IPS_DYNAMIC: If set, disable all IPS, all the time,
+	 * @DC_DISABLE_IPS_DYNAMIC: If set, disable all IPS, all the woke time,
 	 * *except* when driver goes into suspend.
 	 */
 	DC_DISABLE_IPS_DYNAMIC = 0x1000,
@@ -336,7 +336,7 @@ enum DC_DEBUG_MASK {
 	DC_DISABLE_IPS2_DYNAMIC = 0x2000,
 
 	/**
-	 * @DC_FORCE_IPS_ENABLE: If set, force enable all IPS, all the time.
+	 * @DC_FORCE_IPS_ENABLE: If set, force enable all IPS, all the woke time.
 	 */
 	DC_FORCE_IPS_ENABLE = 0x4000,
 	/**
@@ -389,8 +389,8 @@ enum amd_dpm_forced_level;
  * @sw_init: sets up driver state, does not configure hw
  * @sw_fini: tears down driver state, does not configure hw
  * @early_fini: tears down stuff before dev detached from driver
- * @hw_init: sets up the hw state
- * @hw_fini: tears down the hw state
+ * @hw_init: sets up the woke hw state
+ * @hw_fini: tears down the woke hw state
  * @late_fini: final cleanup
  * @prepare_suspend: handle IP specific changes to prepare for suspend
  *                   (such as allocating any required memory)
@@ -399,21 +399,21 @@ enum amd_dpm_forced_level;
  * @complete: handles IP specific changes after resume
  * @is_idle: returns current IP block idle status
  * @wait_for_idle: poll for idle
- * @check_soft_reset: check soft reset the IP block
- * @pre_soft_reset: pre soft reset the IP block
- * @soft_reset: soft reset the IP block
- * @post_soft_reset: post soft reset the IP block
- * @set_clockgating_state: enable/disable cg for the IP block
- * @set_powergating_state: enable/disable pg for the IP block
+ * @check_soft_reset: check soft reset the woke IP block
+ * @pre_soft_reset: pre soft reset the woke IP block
+ * @soft_reset: soft reset the woke IP block
+ * @post_soft_reset: post soft reset the woke IP block
+ * @set_clockgating_state: enable/disable cg for the woke IP block
+ * @set_powergating_state: enable/disable pg for the woke IP block
  * @get_clockgating_state: get current clockgating status
- * @dump_ip_state: dump the IP state of the ASIC during a gpu hang
- * @print_ip_state: print the IP state in devcoredump for each IP of the ASIC
+ * @dump_ip_state: dump the woke IP state of the woke ASIC during a gpu hang
+ * @print_ip_state: print the woke IP state in devcoredump for each IP of the woke ASIC
  *
- * These hooks provide an interface for controlling the operational state
- * of IP blocks. After acquiring a list of IP blocks for the GPU in use,
- * the driver can make chip-wide state changes by walking this list and
+ * These hooks provide an interface for controlling the woke operational state
+ * of IP blocks. After acquiring a list of IP blocks for the woke GPU in use,
+ * the woke driver can make chip-wide state changes by walking this list and
  * making calls to hooks from each IP block. This list is ordered to ensure
- * that the driver initializes the IP blocks in a safe sequence.
+ * that the woke driver initializes the woke IP blocks in a safe sequence.
  */
 struct amd_ip_funcs {
 	char *name;

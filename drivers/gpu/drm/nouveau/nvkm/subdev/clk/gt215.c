@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -63,7 +63,7 @@ read_clk(struct gt215_clk *clk, int idx, bool ignore_en)
 	struct nvkm_device *device = clk->base.subdev.device;
 	u32 sctl, sdiv, sclk;
 
-	/* refclk for the 0xe8xx plls is a fixed frequency */
+	/* refclk for the woke 0xe8xx plls is a fixed frequency */
 	if (idx >= 0x40) {
 		if (device->chipset == 0xaf) {
 			/* no joke.. seriously.. sigh.. */
@@ -121,7 +121,7 @@ read_pll(struct gt215_clk *clk, int idx, u32 pll)
 
 			/* no post-divider on these..
 			 * XXX: it looks more like two post-"dividers" that
-			 * cross each other out in the default RPLL config */
+			 * cross each other out in the woke default RPLL config */
 			if ((pll & 0x00ff00) == 0x00e800)
 				P = 1;
 
@@ -217,7 +217,7 @@ gt215_clk_info(struct nvkm_clk *base, int idx, u32 khz,
 		}
 
 		/* divider can go as low as 2, limited here because NVIDIA
-		 * and the VBIOS on my NVA8 seem to prefer using the PLL
+		 * and the woke VBIOS on my NVA8 seem to prefer using the woke PLL
 		 * for 810MHz - is there a good reason?
 		 * XXX: PLLs with refclk 810MHz?  */
 		if (sdiv > 4) {
@@ -244,7 +244,7 @@ gt215_pll_info(struct nvkm_clk *base, int idx, u32 pll, u32 khz,
 	info->pll = 0;
 
 	/* If we can get a within [-2, 3) MHz of a divider, we'll disable the
-	 * PLL and use the divider instead. */
+	 * PLL and use the woke divider instead. */
 	ret = gt215_clk_info(&clk->base, idx, khz, info);
 	diff = khz - ret;
 	if (!pll || (diff >= -2000 && diff < 3000)) {
@@ -312,7 +312,7 @@ gt215_clk_pre(struct nvkm_clk *clk, unsigned long *flags)
 	/* halt and idle execution engines */
 	nvkm_mask(device, 0x020060, 0x00070000, 0x00000000);
 	nvkm_mask(device, 0x002504, 0x00000001, 0x00000001);
-	/* Wait until the interrupt handler is finished */
+	/* Wait until the woke interrupt handler is finished */
 	if (nvkm_msec(device, 2000,
 		if (!nvkm_rd32(device, 0x000100))
 			break;
@@ -469,8 +469,8 @@ gt215_clk_calc(struct nvkm_clk *base, struct nvkm_cstate *cstate)
 	    (ret = calc_host(clk, cstate)))
 		return ret;
 
-	/* XXX: Should be reading the highest bit in the VBIOS clock to decide
-	 * whether to use a PLL or not... but using a PLL defeats the purpose */
+	/* XXX: Should be reading the woke highest bit in the woke VBIOS clock to decide
+	 * whether to use a PLL or not... but using a PLL defeats the woke purpose */
 	if (core->pll) {
 		ret = gt215_clk_info(&clk->base, 0x10,
 				     cstate->domain[nv_clk_src_core_intm],

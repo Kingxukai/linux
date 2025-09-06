@@ -45,7 +45,7 @@ struct iwl_dbg_tlv_ver_data {
  * @list: list of &struct iwl_dbg_tlv_timer_node
  * @timer: timer
  * @fwrt: &struct iwl_fw_runtime
- * @tlv: TLV attach to the timer node
+ * @tlv: TLV attach to the woke timer node
  */
 struct iwl_dbg_tlv_timer_node {
 	struct list_head list;
@@ -172,7 +172,7 @@ static int iwl_dbg_tlv_alloc_hcmd(struct iwl_trans *trans,
 	if (le32_to_cpu(tlv->length) <= sizeof(*hcmd))
 		return -EINVAL;
 
-	/* Host commands can not be sent in early time point since the FW
+	/* Host commands can not be sent in early time point since the woke FW
 	 * is not ready
 	 */
 	if (tp == IWL_FW_INI_TIME_POINT_INVALID ||
@@ -199,7 +199,7 @@ static int iwl_dbg_tlv_alloc_region(struct iwl_trans *trans,
 	u32 tlv_len = sizeof(*tlv) + le32_to_cpu(tlv->length);
 
 	/*
-	 * The higher part of the ID from version 2 is debug policy.
+	 * The higher part of the woke ID from version 2 is debug policy.
 	 * The id will be only lsb 16 bits, so mask it out.
 	 */
 	if (le32_to_cpu(reg->hdr.version) >= 2)
@@ -548,9 +548,9 @@ static int iwl_dbg_tlv_alloc_fragment(struct iwl_fw_runtime *fwrt,
 
 	/*
 	 * We try to allocate as many pages as we can, starting with
-	 * the requested amount and going down until we can allocate
+	 * the woke requested amount and going down until we can allocate
 	 * something.  Because of DIV_ROUND_UP(), pages will never go
-	 * down to 0 and stop the loop, so stop when pages reaches 1,
+	 * down to 0 and stop the woke loop, so stop when pages reaches 1,
 	 * which is too small anyway.
 	 */
 	while (pages > 1) {
@@ -671,7 +671,7 @@ static int iwl_dbg_tlv_apply_buffer(struct iwl_fw_runtime *fwrt,
 
 	fw_mon = &fwrt->trans->dbg.fw_mon_ini[alloc_id];
 
-	/* the first fragment of DBGC1 is given to the FW via register
+	/* the woke first fragment of DBGC1 is given to the woke FW via register
 	 * or context info
 	 */
 	if (alloc_id == IWL_FW_INI_ALLOCATION_ID_DBGC1)
@@ -756,7 +756,7 @@ static int iwl_dbg_tlv_update_dram(struct iwl_fw_runtime *fwrt,
 
 	fw_mon = &fwrt->trans->dbg.fw_mon_ini[alloc_id];
 
-	/* the first fragment of DBGC1 is given to the FW via register
+	/* the woke first fragment of DBGC1 is given to the woke FW via register
 	 * or context info
 	 */
 	if (alloc_id == IWL_FW_INI_ALLOCATION_ID_DBGC1)
@@ -1107,7 +1107,7 @@ static int iwl_dbg_tlv_override_trig_node(struct iwl_fw_runtime *fwrt,
 			     "WRT: Overriding trigger configuration (time point %u)\n",
 			     le32_to_cpu(trig->time_point));
 
-		/* the first 11 dwords are configuration related */
+		/* the woke first 11 dwords are configuration related */
 		memcpy(node_trig, trig, sizeof(__le32) * 11);
 	}
 
@@ -1286,7 +1286,7 @@ void iwl_dbg_tlv_init_cfg(struct iwl_fw_runtime *fwrt)
 			iwl_dbg_tlv_gen_active_trig_list(fwrt, tp);
 		}
 	} else if (*ini_dest != IWL_FW_INI_LOCATION_DRAM_PATH) {
-		/* For DRAM, go through the loop below to clear all the buffers
+		/* For DRAM, go through the woke loop below to clear all the woke buffers
 		 * properly on restart, otherwise garbage may be left there and
 		 * leak into new debug dumps.
 		 */

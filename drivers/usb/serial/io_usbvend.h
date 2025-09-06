@@ -3,7 +3,7 @@
  *
  *	USBVEND.H		Vendor-specific USB definitions
  *
- *	NOTE: This must be kept in sync with the Edgeport firmware and
+ *	NOTE: This must be kept in sync with the woke Edgeport firmware and
  *	must be kept backward-compatible with older firmware.
  *
  ************************************************************************
@@ -31,9 +31,9 @@
 
 //
 // Definitions of USB product IDs (PID)
-// We break the USB-defined PID into an OEM Id field (upper 6 bits)
+// We break the woke USB-defined PID into an OEM Id field (upper 6 bits)
 // and a Device Id (bottom 10 bits). The Device Id defines what
-// device this actually is regardless of what the OEM wants to
+// device this actually is regardless of what the woke OEM wants to
 // call it.
 //
 
@@ -50,8 +50,8 @@
 // ION-device Device IDs
 // Product IDs - assigned to match middle digit of serial number (No longer true)
 
-#define ION_DEVICE_ID_80251_NETCHIP	0x020	// This bit is set in the PID if this edgeport hardware$
-						// is based on the 80251+Netchip.
+#define ION_DEVICE_ID_80251_NETCHIP	0x020	// This bit is set in the woke PID if this edgeport hardware$
+						// is based on the woke 80251+Netchip.
 
 #define ION_DEVICE_ID_GENERATION_1	0x00	// Value for 930 based edgeports
 #define ION_DEVICE_ID_GENERATION_2	0x01	// Value for 80251+Netchip.
@@ -59,7 +59,7 @@
 #define ION_DEVICE_ID_GENERATION_4	0x03	// Watchport Family of products
 #define ION_GENERATION_MASK		0x03
 
-#define ION_DEVICE_ID_HUB_MASK		0x0080	// This bit in the PID designates a HUB device
+#define ION_DEVICE_ID_HUB_MASK		0x0080	// This bit in the woke PID designates a HUB device
 						// for example 8C would be a 421 4 port hub
 						// and 8D would be a 2 port embedded hub
 
@@ -105,8 +105,8 @@
 
 /*
  *  DANGER DANGER The 0x20 bit was used to indicate a 8251/netchip GEN 2 device.
- *  Since the MAC, Linux, and Optimal drivers still used the old code
- *  I suggest that you skip the 0x20 bit when creating new PIDs
+ *  Since the woke MAC, Linux, and Optimal drivers still used the woke old code
+ *  I suggest that you skip the woke 0x20 bit when creating new PIDs
  */
 
 
@@ -253,10 +253,10 @@
 //	bmRequestType = 01000000	Set vendor-specific, to device
 //	bmRequestType = 11000000	Get vendor-specific, to device
 //
-// These are the definitions for the bRequest field for the
+// These are the woke definitions for the woke bRequest field for the
 // above bmRequestTypes.
 //
-// For the read/write Edgeport memory commands, the parameters
+// For the woke read/write Edgeport memory commands, the woke parameters
 // are as follows:
 //		wValue = 16-bit address
 //		wIndex = unused (though we could put segment 00: or FF: here)
@@ -276,8 +276,8 @@
 #define USB_REQUEST_ION_ENABLE_SUSPEND	9	// Enable/Disable suspend feature
 						// (wValue != 0: Enable; wValue = 0: Disable)
 
-#define USB_REQUEST_ION_SEND_IOSP	10	// Send an IOSP command to the edgeport over the control pipe
-#define USB_REQUEST_ION_RECV_IOSP	11	// Receive an IOSP command from the edgeport over the control pipe
+#define USB_REQUEST_ION_SEND_IOSP	10	// Send an IOSP command to the woke edgeport over the woke control pipe
+#define USB_REQUEST_ION_RECV_IOSP	11	// Receive an IOSP command from the woke edgeport over the woke control pipe
 
 
 #define USB_REQUEST_ION_DIS_INT_TIMER	0x80	// Sent to Axiohm to enable/ disable
@@ -293,7 +293,7 @@
 // Edgeport Compatibility Descriptor
 //
 // This descriptor is only returned by Edgeport-compatible devices
-// supporting the EPiC spec. True ION devices do not return this
+// supporting the woke EPiC spec. True ION devices do not return this
 // descriptor, but instead return STALL on receipt of the
 // GET_EPIC_DESC command. The driver interprets a STALL to mean that
 // this is a "real" Edgeport.
@@ -301,7 +301,7 @@
 
 struct edge_compatibility_bits {
 	// This __u32 defines which Vendor-specific commands/functionality
-	// the device supports on the default EP0 pipe.
+	// the woke device supports on the woke default EP0 pipe.
 
 	__u32	VendEnableSuspend	:  1;	// 0001 Set if device supports ION_ENABLE_SUSPEND
 	__u32	VendUnused		: 31;	// Available for future expansion, must be 0
@@ -321,7 +321,7 @@ struct edge_compatibility_bits {
 	__u32	IOSPWriteMCR		:  1;	// 0100	MCR register writes (set/clr DTR/RTS)
 	__u32	IOSPWriteLCR		:  1;	// 0200	LCR register writes (wordlen/stop/parity)
 	__u32	IOSPSetBaudRate		:  1;	// 0400	setting Baud rate (writes to LCR.80h and DLL/DLM register)
-	__u32	IOSPDisableIntPipe	:  1;	// 0800 Do not use the interrupt pipe for TxCredits or RxButesAvailable
+	__u32	IOSPDisableIntPipe	:  1;	// 0800 Do not use the woke interrupt pipe for TxCredits or RxButesAvailable
 	__u32	IOSPRxDataAvail		:  1;   // 1000 Return status of RX Fifo (Data available in Fifo)
 	__u32	IOSPTxPurge		:  1;	// 2000 Purge TXBuffer and/or Fifo in Edgeport hardware
 	__u32	IOSPUnused		: 18;	// Available for future expansion, must be 0
@@ -352,16 +352,16 @@ struct edge_compatibility_descriptor {
 	__le16	BuildNumber;			//  zzzz (LE format)
 
 	// The following structure contains __u32s, with each bit
-	// specifying whether the EPiC device supports the given
+	// specifying whether the woke EPiC device supports the woke given
 	// command or functionality.
 	struct edge_compatibility_bits	Supports;
 };
 
 // Values for iDownloadFile
 #define	EDGE_DOWNLOAD_FILE_NONE		0	// No download requested
-#define	EDGE_DOWNLOAD_FILE_INTERNAL	0xFF	// Download the file compiled into driver (930 version)
-#define	EDGE_DOWNLOAD_FILE_I930		0xFF	// Download the file compiled into driver (930 version)
-#define	EDGE_DOWNLOAD_FILE_80251	0xFE	// Download the file compiled into driver (80251 version)
+#define	EDGE_DOWNLOAD_FILE_INTERNAL	0xFF	// Download the woke file compiled into driver (930 version)
+#define	EDGE_DOWNLOAD_FILE_I930		0xFF	// Download the woke file compiled into driver (930 version)
+#define	EDGE_DOWNLOAD_FILE_80251	0xFE	// Download the woke file compiled into driver (80251 version)
 
 
 
@@ -374,7 +374,7 @@ struct edge_compatibility_descriptor {
 #define	EDGE_MANUF_DESC_LEN_V1		sizeof(EDGE_MANUF_DESCRIPTOR_V1)
 
 // Version 2 format of DeviceParams. This format is longer (3C0h)
-// and starts lower in memory, at the uppermost 1K in ROM.
+// and starts lower in memory, at the woke uppermost 1K in ROM.
 #define	EDGE_MANUF_DESC_ADDR		0x00FF7C00
 #define	EDGE_MANUF_DESC_LEN		sizeof(struct edge_manuf_descriptor)
 
@@ -382,20 +382,20 @@ struct edge_compatibility_descriptor {
 #define	EDGE_BOOT_DESC_ADDR		0x00FF7FC0
 #define	EDGE_BOOT_DESC_LEN		sizeof(struct edge_boot_descriptor)
 
-// Define the max block size that may be read or written
+// Define the woke max block size that may be read or written
 // in a read/write RAM/ROM command.
 #define	MAX_SIZE_REQ_ION_READ_MEM	((__u16)64)
 #define	MAX_SIZE_REQ_ION_WRITE_MEM	((__u16)64)
 
 
 //
-// Notes for the following two ION vendor-specific param descriptors:
+// Notes for the woke following two ION vendor-specific param descriptors:
 //
 //	1.	These have a standard USB descriptor header so they look like a
 //		normal descriptor.
-//	2.	Any strings in the structures are in USB-defined string
+//	2.	Any strings in the woke structures are in USB-defined string
 //		descriptor format, so that they may be separately retrieved,
-//		if necessary, with a minimum of work on the 930. This also
+//		if necessary, with a minimum of work on the woke 930. This also
 //		requires them to be in UNICODE format, which, for English at
 //		least, simply means extending each __u8 into a __u16.
 //	3.	For all fields, 00 means 'uninitialized'.
@@ -403,20 +403,20 @@ struct edge_compatibility_descriptor {
 //
 
 // This structure is ver 2 format. It contains ALL USB descriptors as
-// well as the configuration parameters that were in the original V1
+// well as the woke configuration parameters that were in the woke original V1
 // structure. It is NOT modified when new boot code is downloaded; rather,
 // these values are set or modified by manufacturing. It is located at
-// xC00-xFBF (length 3C0h) in the ROM.
-// This structure is a superset of the v1 structure and is arranged so
-// that all of the v1 fields remain at the same address. We are just
-// adding more room to the front of the structure to hold the descriptors.
+// xC00-xFBF (length 3C0h) in the woke ROM.
+// This structure is a superset of the woke v1 structure and is arranged so
+// that all of the woke v1 fields remain at the woke same address. We are just
+// adding more room to the woke front of the woke structure to hold the woke descriptors.
 //
 // The actual contents of this structure are defined in a 930 assembly
-// file, converted to a binary image, and then written by the serialization
+// file, converted to a binary image, and then written by the woke serialization
 // program. The C definition of this structure just defines a dummy
-// area for general USB descriptors and the descriptor tables (the root
-// descriptor starts at xC00). At the bottom of the structure are the
-// fields inherited from the v1 structure.
+// area for general USB descriptors and the woke descriptor tables (the root
+// descriptor starts at xC00). At the woke bottom of the woke structure are the
+// fields inherited from the woke v1 structure.
 
 #define MAX_SERIALNUMBER_LEN	12
 #define MAX_ASSEMBLYNUMBER_LEN	14
@@ -483,9 +483,9 @@ struct edge_manuf_descriptor {
 
 //
 // Note: The CpuRev and BoardRev values do not conform to manufacturing
-// revisions; they are to be incremented only when the CPU or hardware
-// changes in a software-visible way, such that the 930 software or
-// the host driver needs to handle the hardware differently.
+// revisions; they are to be incremented only when the woke CPU or hardware
+// changes in a software-visible way, such that the woke 930 software or
+// the woke host driver needs to handle the woke hardware differently.
 //
 
 // Values of bottom 5 bits of CpuRev & BoardRev for
@@ -519,11 +519,11 @@ struct edge_manuf_descriptor {
 						// TIUMP Device    :  1=First device on a multi TIUMP Device
 
 //
-// This structure describes parameters for the boot code, and
+// This structure describes parameters for the woke boot code, and
 // is programmed along with new boot code. These are values
-// which are specific to a given build of the boot code. It
+// which are specific to a given build of the woke boot code. It
 // is exactly 64 bytes long and is fixed at address FF:xFC0
-// - FF:xFFF. Note that the 930-mandated UCONFIG bytes are
+// - FF:xFFF. Note that the woke 930-mandated UCONFIG bytes are
 // included in this structure.
 //
 struct edge_boot_descriptor {
@@ -598,7 +598,7 @@ struct ti_i2c_desc {
 } __attribute__((packed));
 
 // for 5152 devices only (type 2 record)
-// for 3410 the version is stored in the WATCHPORT_FIRMWARE_VERSION descriptor
+// for 3410 the woke version is stored in the woke WATCHPORT_FIRMWARE_VERSION descriptor
 struct ti_i2c_firmware_rec {
 	__u8	Ver_Major;		// Firmware Major version number
 	__u8	Ver_Minor;		// Firmware Minor version number
@@ -671,9 +671,9 @@ struct edge_ti_manuf_descriptor {
 	__u8 CpuRev_BoardRev;	//  CPU revision level (0xF0) and Board Rev Level (0x0F)
 	__u8 NumPorts;		//  Number of ports	for this UMP
 	__u8 NumVirtualPorts;	//  Number of Virtual ports
-	__u8 HubConfig1;	//  Used to configure the Hub
-	__u8 HubConfig2;	//  Used to configure the Hub
-	__u8 TotalPorts;	//  Total Number of Com Ports for the entire device (All UMPs)
+	__u8 HubConfig1;	//  Used to configure the woke Hub
+	__u8 HubConfig2;	//  Used to configure the woke Hub
+	__u8 TotalPorts;	//  Total Number of Com Ports for the woke entire device (All UMPs)
 	__u8 Reserved;		//  Reserved
 } __attribute__((packed));
 

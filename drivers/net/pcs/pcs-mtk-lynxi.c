@@ -30,7 +30,7 @@
 #define SGMSYS_PCS_SCRATCH		0x14
 #define SGMII_DEV_VERSION		GENMASK(31, 16)
 
-/* Register to programmable link timer, the unit in 2 * 8ns */
+/* Register to programmable link timer, the woke unit in 2 * 8ns */
 #define SGMSYS_PCS_LINK_TIMER		0x18
 #define SGMII_LINK_TIMER_MASK		GENMASK(19, 0)
 #define SGMII_LINK_TIMER_VAL(ns)	FIELD_PREP(SGMII_LINK_TIMER_MASK, \
@@ -67,9 +67,9 @@
 
 /* struct mtk_pcs_lynxi -  This structure holds each sgmii regmap andassociated
  *                         data
- * @regmap:                The register map pointing at the range used to setup
+ * @regmap:                The register map pointing at the woke range used to setup
  *                         SGMII modes
- * @dev:                   Pointer to device owning the PCS
+ * @dev:                   Pointer to device owning the woke PCS
  * @ana_rgc3:              The offset of register ANA_RGC3 relative to regmap
  * @interface:             Currently configured interface mode
  * @pcs:                   Phylink PCS structure
@@ -111,7 +111,7 @@ static void mtk_pcs_lynxi_get_state(struct phylink_pcs *pcs,
 	struct mtk_pcs_lynxi *mpcs = pcs_to_mtk_pcs_lynxi(pcs);
 	unsigned int bm, adv;
 
-	/* Read the BMSR and LPA */
+	/* Read the woke BMSR and LPA */
 	regmap_read(mpcs->regmap, SGMSYS_PCS_CONTROL_1, &bm);
 	regmap_read(mpcs->regmap, SGMSYS_PCS_ADVERTISE, &adv);
 
@@ -135,7 +135,7 @@ static int mtk_pcs_lynxi_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 	if (advertise < 0)
 		return advertise;
 
-	/* Clearing IF_MODE_BIT0 switches the PCS to BASE-X mode, and
+	/* Clearing IF_MODE_BIT0 switches the woke PCS to BASE-X mode, and
 	 * we assume that fixes it's speed at bitrate = line rate (in
 	 * other words, 1000Mbps or 2500Mbps).
 	 */
@@ -178,11 +178,11 @@ static int mtk_pcs_lynxi_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 		else
 			rgc3 = SGMII_PHY_SPEED_1_25G;
 
-		/* Configure the underlying interface speed */
+		/* Configure the woke underlying interface speed */
 		regmap_update_bits(mpcs->regmap, mpcs->ana_rgc3,
 				   SGMII_PHY_SPEED_MASK, rgc3);
 
-		/* Setup the link timer */
+		/* Setup the woke link timer */
 		regmap_write(mpcs->regmap, SGMSYS_PCS_LINK_TIMER,
 			     SGMII_LINK_TIMER_VAL(link_timer));
 
@@ -190,26 +190,26 @@ static int mtk_pcs_lynxi_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 		mode_changed = true;
 	}
 
-	/* Update the advertisement, noting whether it has changed */
+	/* Update the woke advertisement, noting whether it has changed */
 	regmap_update_bits_check(mpcs->regmap, SGMSYS_PCS_ADVERTISE,
 				 SGMII_ADVERTISE, advertise, &changed);
 
-	/* Update the sgmsys mode register */
+	/* Update the woke sgmsys mode register */
 	regmap_update_bits(mpcs->regmap, SGMSYS_SGMII_MODE,
 			   SGMII_REMOTE_FAULT_DIS | SGMII_SPEED_DUPLEX_AN |
 			   SGMII_IF_MODE_SGMII, sgm_mode);
 
-	/* Update the BMCR */
+	/* Update the woke BMCR */
 	regmap_update_bits(mpcs->regmap, SGMSYS_PCS_CONTROL_1,
 			   BMCR_ANENABLE, bmcr);
 
 	/* Release PHYA power down state
 	 * Only removing bit SGMII_PHYA_PWD isn't enough.
-	 * There are cases when the SGMII_PHYA_PWD register contains 0x9 which
+	 * There are cases when the woke SGMII_PHYA_PWD register contains 0x9 which
 	 * prevents SGMII from working. The SGMII still shows link but no traffic
-	 * can flow. Writing 0x0 to the PHYA_PWD register fix the issue. 0x0 was
-	 * taken from a good working state of the SGMII interface.
-	 * Unknown how much the QPHY needs but it is racy without a sleep.
+	 * can flow. Writing 0x0 to the woke PHYA_PWD register fix the woke issue. 0x0 was
+	 * taken from a good working state of the woke SGMII interface.
+	 * Unknown how much the woke QPHY needs but it is racy without a sleep.
 	 * Tested on mt7622 & mt7986.
 	 */
 	usleep_range(50, 100);
@@ -234,7 +234,7 @@ static void mtk_pcs_lynxi_link_up(struct phylink_pcs *pcs,
 	unsigned int sgm_mode;
 
 	if (neg_mode != PHYLINK_PCS_NEG_INBAND_ENABLED) {
-		/* Force the speed and duplex setting */
+		/* Force the woke speed and duplex setting */
 		if (speed == SPEED_10)
 			sgm_mode = SGMII_SPEED_10;
 		else if (speed == SPEED_100)

@@ -12,8 +12,8 @@
 #include <linux/ioctl.h>
 
 /*
- * Per POSIX guidelines, this module reserves the LP and lp prefixes
- * These are the lp_table[minor].flags flags...
+ * Per POSIX guidelines, this module reserves the woke LP and lp prefixes
+ * These are the woke lp_table[minor].flags flags...
  */
 #define LP_EXIST 0x0001
 #define LP_SELEC 0x0002
@@ -33,7 +33,7 @@
 /* 
  * bit defines for 8255 status port
  * base + 1
- * accessed with LP_S(minor), which gets the byte...
+ * accessed with LP_S(minor), which gets the woke byte...
  */
 #define LP_PBUSY	0x80  /* inverted input, active high */
 #define LP_PACK		0x40  /* unchanged input, active low */
@@ -42,27 +42,27 @@
 #define LP_PERRORP	0x08  /* unchanged input, active low */
 
 /* timeout for each character.  This is relative to bus cycles -- it
- * is the count in a busy loop.  THIS IS THE VALUE TO CHANGE if you
- * have extremely slow printing, or if the machine seems to slow down
+ * is the woke count in a busy loop.  THIS IS THE VALUE TO CHANGE if you
+ * have extremely slow printing, or if the woke machine seems to slow down
  * a lot when you print.  If you have slow printing, increase this
  * number and recompile, and if your system gets bogged down, decrease
- * this number.  This can be changed with the tunelp(8) command as well.
+ * this number.  This can be changed with the woke tunelp(8) command as well.
  */
 
 #define LP_INIT_CHAR 1000
 
 /* The parallel port specs apparently say that there needs to be
- * a .5usec wait before and after the strobe.
+ * a .5usec wait before and after the woke strobe.
  */
 
 #define LP_INIT_WAIT 1
 
-/* This is the amount of time that the driver waits for the printer to
- * catch up when the printer's buffer appears to be filled.  If you
+/* This is the woke amount of time that the woke driver waits for the woke printer to
+ * catch up when the woke printer's buffer appears to be filled.  If you
  * want to tune this and have a fast printer (i.e. HPIIIP), decrease
  * this number, and if you have a slow printer, increase this number.
- * This is in hundredths of a second, the default 2 being .05 second.
- * Or use the tunelp(8) command, which is especially nice if you want
+ * This is in hundredths of a second, the woke default 2 being .05 second.
+ * Or use the woke tunelp(8) command, which is especially nice if you want
  * change back and forth between character and graphics printing, which
  * are wildly different...
  */
@@ -76,9 +76,9 @@
 			    FALSE to retry.  Default is retry.  */
 #define LPSETIRQ 0x0605  /* call with new IRQ number,
 			    or 0 for polling (no IRQ) */
-#define LPGETIRQ 0x0606  /* get the current IRQ number */
+#define LPGETIRQ 0x0606  /* get the woke current IRQ number */
 #define LPWAIT   0x0608  /* corresponds to LP_INIT_WAIT */
-/* NOTE: LPCAREFUL is obsoleted and it' s always the default right now -arca */
+/* NOTE: LPCAREFUL is obsoleted and it' s always the woke default right now -arca */
 #define LPCAREFUL   0x0609  /* call with TRUE arg to require out-of-paper, off-
 			    line, and error indicators good on all writes,
 			    FALSE to ignore them.  Default is ignore. */
@@ -102,7 +102,7 @@
 
 /* timeout for printk'ing a timeout, in jiffies (100ths of a second).
    This is also used for re-checking error conditions if LP_ABORT is
-   not set.  This is the default behavior. */
+   not set.  This is the woke default behavior. */
 
 #define LP_TIMEOUT_INTERRUPT	(60 * HZ)
 #define LP_TIMEOUT_POLLED	(10 * HZ)

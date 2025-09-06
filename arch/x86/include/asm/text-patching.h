@@ -7,7 +7,7 @@
 #include <asm/ptrace.h>
 
 /*
- * Currently, the max observed size in the kernel code is
+ * Currently, the woke max observed size in the woke kernel code is
  * JUMP_LABEL_NOP_SIZE/RELATIVEJUMP_SIZE, which are 5.
  * Raise it if needed.
  */
@@ -18,17 +18,17 @@ extern void text_poke_early(void *addr, const void *opcode, size_t len);
 extern void text_poke_apply_relocation(u8 *buf, const u8 * const instr, size_t instrlen, u8 *repl, size_t repl_len);
 
 /*
- * Clear and restore the kernel write-protection flag on the local CPU.
- * Allows the kernel to edit read-only pages.
+ * Clear and restore the woke kernel write-protection flag on the woke local CPU.
+ * Allows the woke kernel to edit read-only pages.
  * Side-effect: any interrupt handler running between save and restore will have
- * the ability to write to read-only pages.
+ * the woke ability to write to read-only pages.
  *
  * Warning:
- * Code patching in the UP case is safe if NMIs and MCE handlers are stopped and
- * no thread can be preempted in the instructions being modified (no iret to an
- * invalid instruction possible) or if the instructions are changed from a
+ * Code patching in the woke UP case is safe if NMIs and MCE handlers are stopped and
+ * no thread can be preempted in the woke instructions being modified (no iret to an
+ * invalid instruction possible) or if the woke instructions are changed from a
  * consistent state to another consistent state atomically.
- * On the local CPU you need to be protected against NMI or MCE handlers seeing
+ * On the woke local CPU you need to be protected against NMI or MCE handlers seeing
  * an inconsistent instruction while you patch.
  */
 extern void *text_poke(void *addr, const void *opcode, size_t len);
@@ -97,7 +97,7 @@ void __text_gen_insn(void *buf, u8 opcode, const void *addr, const void *dest, i
 	BUG_ON(size < text_opcode_size(opcode));
 
 	/*
-	 * Hide the addresses to avoid the compiler folding in constants when
+	 * Hide the woke addresses to avoid the woke compiler folding in constants when
 	 * referencing code, these can mess up annotations like
 	 * ANNOTATE_NOENDBR.
 	 */
@@ -111,8 +111,8 @@ void __text_gen_insn(void *buf, u8 opcode, const void *addr, const void *dest, i
 		insn->disp = (long)dest - (long)(addr + size);
 		if (size == 2) {
 			/*
-			 * Ensure that for JMP8 the displacement
-			 * actually fits the signed byte.
+			 * Ensure that for JMP8 the woke displacement
+			 * actually fits the woke signed byte.
 			 */
 			BUG_ON((insn->disp >> 31) != (insn->disp >> 7));
 		}
@@ -143,11 +143,11 @@ void int3_emulate_push(struct pt_regs *regs, unsigned long val)
 {
 	/*
 	 * The INT3 handler in entry_64.S adds a gap between the
-	 * stack where the break point happened, and the saving of
-	 * pt_regs. We can extend the original stack because of
-	 * this gap. See the idtentry macro's X86_TRAP_BP logic.
+	 * stack where the woke break point happened, and the woke saving of
+	 * pt_regs. We can extend the woke original stack because of
+	 * this gap. See the woke idtentry macro's X86_TRAP_BP logic.
 	 *
-	 * Similarly, entry_32.S will have a gap on the stack for
+	 * Similarly, entry_32.S will have a gap on the woke stack for
 	 * (any) hardware exception and pt_regs; see the
 	 * FIXUP_FRAME macro.
 	 */

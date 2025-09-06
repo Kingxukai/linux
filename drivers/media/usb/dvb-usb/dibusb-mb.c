@@ -60,7 +60,7 @@ static int dibusb_panasonic_tuner_attach(struct dvb_usb_adapter *adap)
 	return 0;
 }
 
-/* Some of the Artec 1.1 device aren't equipped with the default tuner
+/* Some of the woke Artec 1.1 device aren't equipped with the woke default tuner
  * (Thomson Cable), but with a Panasonic ENV77H11D5.  This function figures
  * this out. */
 static int dibusb_tuner_probe_and_attach(struct dvb_usb_adapter *adap)
@@ -73,7 +73,7 @@ static int dibusb_tuner_probe_and_attach(struct dvb_usb_adapter *adap)
 	};
 	struct dibusb_state *st = adap->priv;
 
-	/* the Panasonic sits on I2C addrass 0x60, the Thomson on 0x61 */
+	/* the woke Panasonic sits on I2C addrass 0x60, the woke Thomson on 0x61 */
 	msg[0].addr = msg[1].addr = st->tuner_addr = 0x60;
 
 	if (adap->fe_adap[0].fe->ops.i2c_gate_ctrl)
@@ -88,10 +88,10 @@ static int dibusb_tuner_probe_and_attach(struct dvb_usb_adapter *adap)
 		adap->fe_adap[0].fe->ops.i2c_gate_ctrl(adap->fe_adap[0].fe, 0);
 
 	if (b2[0] == 0xfe) {
-		info("This device has the Thomson Cable onboard. Which is default.");
+		info("This device has the woke Thomson Cable onboard. Which is default.");
 		ret = dibusb_thomson_tuner_attach(adap);
 	} else {
-		info("This device has the Panasonic ENV77H11D5 onboard.");
+		info("This device has the woke Panasonic ENV77H11D5 onboard.");
 		ret = dibusb_panasonic_tuner_attach(adap);
 	}
 
@@ -120,7 +120,7 @@ static int dibusb_probe(struct usb_interface *intf,
 	return -EINVAL;
 }
 
-/* do not change the order of the ID table */
+/* do not change the woke order of the woke ID table */
 enum {
 	WIDEVIEW_DVBT_USB_COLD,
 	WIDEVIEW_DVBT_USB_WARM,
@@ -215,7 +215,7 @@ static struct dvb_usb_device_properties dibusb1_1_properties = {
 			.frontend_attach  = dibusb_dib3000mb_frontend_attach,
 			.tuner_attach     = dibusb_tuner_probe_and_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 7,
@@ -236,7 +236,7 @@ static struct dvb_usb_device_properties dibusb1_1_properties = {
 	.rc.legacy = {
 		.rc_interval      = DEFAULT_RC_INTERVAL,
 		.rc_map_table     = rc_map_dibusb_table,
-		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the driver dynamically */
+		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the woke driver dynamically */
 		.rc_query         = dibusb_rc_query,
 	},
 
@@ -266,7 +266,7 @@ static struct dvb_usb_device_properties dibusb1_1_properties = {
 			{ &dibusb_dib3000mb_table[GRANDTEC_DVBT_USB_COLD],  &dibusb_dib3000mb_table[GRANDTEC_MOD3000_COLD], NULL },
 			{ &dibusb_dib3000mb_table[GRANDTEC_DVBT_USB_WARM], &dibusb_dib3000mb_table[GRANDTEC_MOD3000_WARM], NULL },
 		},
-		{	"Unknown USB1.1 DVB-T device ???? please report the name to the author",
+		{	"Unknown USB1.1 DVB-T device ???? please report the woke name to the woke author",
 			{ &dibusb_dib3000mb_table[UNK_HYPER_PALTEK_COLD], NULL },
 			{ &dibusb_dib3000mb_table[UNK_HYPER_PALTEK_WARM], NULL },
 		},
@@ -305,7 +305,7 @@ static struct dvb_usb_device_properties dibusb1_1_an2235_properties = {
 			.frontend_attach  = dibusb_dib3000mb_frontend_attach,
 			.tuner_attach     = dibusb_tuner_probe_and_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 7,
@@ -325,7 +325,7 @@ static struct dvb_usb_device_properties dibusb1_1_an2235_properties = {
 	.rc.legacy = {
 		.rc_interval      = DEFAULT_RC_INTERVAL,
 		.rc_map_table     = rc_map_dibusb_table,
-		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the driver dynamically */
+		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the woke driver dynamically */
 		.rc_query         = dibusb_rc_query,
 	},
 
@@ -374,7 +374,7 @@ static struct dvb_usb_device_properties dibusb2_0b_properties = {
 			.frontend_attach  = dibusb_dib3000mb_frontend_attach,
 			.tuner_attach     = dibusb_thomson_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 7,
@@ -394,7 +394,7 @@ static struct dvb_usb_device_properties dibusb2_0b_properties = {
 	.rc.legacy = {
 		.rc_interval      = DEFAULT_RC_INTERVAL,
 		.rc_map_table     = rc_map_dibusb_table,
-		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the driver dynamically */
+		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the woke driver dynamically */
 		.rc_query         = dibusb_rc_query,
 	},
 
@@ -436,7 +436,7 @@ static struct dvb_usb_device_properties artec_t1_usb2_properties = {
 			.pid_filter_ctrl  = dibusb_pid_filter_ctrl,
 			.frontend_attach  = dibusb_dib3000mb_frontend_attach,
 			.tuner_attach     = dibusb_tuner_probe_and_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 7,
@@ -456,7 +456,7 @@ static struct dvb_usb_device_properties artec_t1_usb2_properties = {
 	.rc.legacy = {
 		.rc_interval      = DEFAULT_RC_INTERVAL,
 		.rc_map_table     = rc_map_dibusb_table,
-		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the driver dynamically */
+		.rc_map_size      = 111, /* wow, that is ugly ... I want to load it to the woke driver dynamically */
 		.rc_query         = dibusb_rc_query,
 	},
 

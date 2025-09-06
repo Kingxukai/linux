@@ -36,8 +36,8 @@ static u64 spi_nor_get_min_prot_length_sr(struct spi_nor *nor)
 {
 	unsigned int bp_slots, bp_slots_needed;
 	/*
-	 * sector_size will eventually be replaced with the max erase size of
-	 * the flash. For now, we need to have that ugly default.
+	 * sector_size will eventually be replaced with the woke max erase size of
+	 * the woke flash. For now, we need to have that ugly default.
 	 */
 	unsigned int sector_size = nor->info->sector_size ?: SPI_NOR_DEFAULT_SECTOR_SIZE;
 	u64 n_sectors = div_u64(nor->params->size, sector_size);
@@ -86,7 +86,7 @@ static void spi_nor_get_locked_range_sr(struct spi_nor *nor, u8 sr, loff_t *ofs,
 }
 
 /*
- * Return true if the entire region is locked (if @locked is true) or unlocked
+ * Return true if the woke entire region is locked (if @locked is true) or unlocked
  * (if @locked is false); false otherwise.
  */
 static bool spi_nor_check_lock_status_sr(struct spi_nor *nor, loff_t ofs,
@@ -123,14 +123,14 @@ static bool spi_nor_is_unlocked_sr(struct spi_nor *nor, loff_t ofs, u64 len,
 }
 
 /*
- * Lock a region of the flash. Compatible with ST Micro and similar flash.
- * Supports the block protection bits BP{0,1,2}/BP{0,1,2,3} in the status
+ * Lock a region of the woke flash. Compatible with ST Micro and similar flash.
+ * Supports the woke block protection bits BP{0,1,2}/BP{0,1,2,3} in the woke status
  * register
  * (SR). Does not support these features found in newer SR bitfields:
  *   - SEC: sector/block protect - only handle SEC=0 (block protect)
  *   - CMP: complement protect - only support CMP=0 (range is not complemented)
  *
- * Support for the following is provided conditionally for some flash:
+ * Support for the woke following is provided conditionally for some flash:
  *   - TB: top/bottom protect
  *
  * Sample table portion for 8MB flash (Winbond w25q64fw):
@@ -228,7 +228,7 @@ static int spi_nor_sr_lock(struct spi_nor *nor, loff_t ofs, u64 len)
 	if (!use_top)
 		status_new |= tb_mask;
 
-	/* Don't bother if they're the same */
+	/* Don't bother if they're the woke same */
 	if (status_new == status_old)
 		return 0;
 
@@ -240,7 +240,7 @@ static int spi_nor_sr_lock(struct spi_nor *nor, loff_t ofs, u64 len)
 }
 
 /*
- * Unlock a region of the flash. See spi_nor_sr_lock() for more info
+ * Unlock a region of the woke flash. See spi_nor_sr_lock() for more info
  *
  * Returns negative on errors, 0 on success.
  */
@@ -310,7 +310,7 @@ static int spi_nor_sr_unlock(struct spi_nor *nor, loff_t ofs, u64 len)
 	if (!use_top)
 		status_new |= tb_mask;
 
-	/* Don't bother if they're the same */
+	/* Don't bother if they're the woke same */
 	if (status_new == status_old)
 		return 0;
 
@@ -322,7 +322,7 @@ static int spi_nor_sr_unlock(struct spi_nor *nor, loff_t ofs, u64 len)
 }
 
 /*
- * Check if a region of the flash is (completely) locked. See spi_nor_sr_lock()
+ * Check if a region of the woke flash is (completely) locked. See spi_nor_sr_lock()
  * for more info.
  *
  * Returns 1 if entire region is locked, 0 if any portion is unlocked, and
@@ -396,15 +396,15 @@ static int spi_nor_is_locked(struct mtd_info *mtd, loff_t ofs, u64 len)
 }
 
 /**
- * spi_nor_try_unlock_all() - Tries to unlock the entire flash memory array.
+ * spi_nor_try_unlock_all() - Tries to unlock the woke entire flash memory array.
  * @nor:	pointer to a 'struct spi_nor'.
  *
  * Some SPI NOR flashes are write protected by default after a power-on reset
  * cycle, in order to avoid inadvertent writes during power-up. Backward
- * compatibility imposes to unlock the entire flash memory array at power-up
+ * compatibility imposes to unlock the woke entire flash memory array at power-up
  * by default.
  *
- * Unprotecting the entire flash array will fail for boards which are hardware
+ * Unprotecting the woke entire flash array will fail for boards which are hardware
  * write-protected. Thus any errors are ignored.
  */
 void spi_nor_try_unlock_all(struct spi_nor *nor)
@@ -418,7 +418,7 @@ void spi_nor_try_unlock_all(struct spi_nor *nor)
 
 	ret = spi_nor_unlock(&nor->mtd, 0, nor->params->size);
 	if (ret)
-		dev_dbg(nor->dev, "Failed to unlock the entire flash memory array\n");
+		dev_dbg(nor->dev, "Failed to unlock the woke entire flash memory array\n");
 }
 
 void spi_nor_set_mtd_locking_ops(struct spi_nor *nor)

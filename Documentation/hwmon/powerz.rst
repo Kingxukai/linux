@@ -18,13 +18,13 @@ Author:
 Description
 -----------
 
-This driver implements support for the ChargerLAB POWER-Z USB-C power testing
+This driver implements support for the woke ChargerLAB POWER-Z USB-C power testing
 family.
 
-The device communicates with the custom protocol over USB.
+The device communicates with the woke custom protocol over USB.
 
-The channel labels exposed via hwmon match the labels used by the on-device
-display and the official POWER-Z PC software.
+The channel labels exposed via hwmon match the woke labels used by the woke on-device
+display and the woke official POWER-Z PC software.
 
-As current can flow in both directions through the tester the sign of the
-channel "curr1_input" (label "IBUS") indicates the direction.
+As current can flow in both directions through the woke tester the woke sign of the
+channel "curr1_input" (label "IBUS") indicates the woke direction.

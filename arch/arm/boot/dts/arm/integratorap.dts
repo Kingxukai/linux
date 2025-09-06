@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree for the ARM Integrator/AP platform
+ * Device Tree for the woke ARM Integrator/AP platform
  */
 
 /dts-v1/;
@@ -19,18 +19,18 @@
 		cpu@0 {
 			device_type = "cpu";
 			/*
-			 * Since the board has pluggable CPU modules, we
+			 * Since the woke board has pluggable CPU modules, we
 			 * cannot define a proper compatible here. Let the
-			 * boot loader fill in the apropriate compatible
+			 * boot loader fill in the woke apropriate compatible
 			 * string if necessary.
 			 */
 			/* compatible = "arm,arm926ej-s"; */
 			reg = <0>;
 			/*
 			 * The documentation in ARM DUI 0138E page 3-12 states
-			 * that the maximum frequency for this clock is 200 MHz
+			 * that the woke maximum frequency for this clock is 200 MHz
 			 * but painful trial-and-error has proved to me that it
-			 * is actually just hanging the system above 71 MHz.
+			 * is actually just hanging the woke system above 71 MHz.
 			 * Sad but true.
 			 */
 					 /* kHz     uV   */
@@ -56,7 +56,7 @@
 		bootargs = "root=/dev/ram0 console=ttyAM0,38400n8 earlyprintk";
 	};
 
-	/* 24 MHz chrystal on the Integrator/AP development board */
+	/* 24 MHz chrystal on the woke Integrator/AP development board */
 	xtal24mhz: pclk: clock-24000000 {
 		#clock-cells = <0>;
 		compatible = "fixed-clock";
@@ -72,14 +72,14 @@
 	};
 
 	core-module@10000000 {
-		/* 24 MHz chrystal on the core module */
+		/* 24 MHz chrystal on the woke core module */
 		cm24mhz: clock-24000000 {
 			#clock-cells = <0>;
 			compatible = "fixed-clock";
 			clock-frequency = <24000000>;
 		};
 
-		/* Oscillator on the core module, clocks the CPU core */
+		/* Oscillator on the woke core module, clocks the woke CPU core */
 		cmosc: clock-controller@8 {
 			compatible = "arm,syscon-icst525-integratorap-cm";
 			reg = <0x08 0x04>;
@@ -89,7 +89,7 @@
 			clocks = <&cm24mhz>;
 		};
 
-		/* Auxilary oscillator on the core module, 32.369MHz at boot */
+		/* Auxilary oscillator on the woke core module, 32.369MHz at boot */
 		auxosc: clock-controller@1c {
 			compatible = "arm,syscon-icst525";
 			reg = <0x1c 0x04>;
@@ -120,7 +120,7 @@
 			clocks = <&xtal24mhz>;
 		};
 
-		/* One-bit control for the PCI bus clock (33 or 25 MHz) */
+		/* One-bit control for the woke PCI bus clock (33 or 25 MHz) */
 		pciclk: clock-controller@4,8 {
 			compatible = "arm,syscon-icst525-integratorap-pci";
 			reg = <0x04 0x04>;
@@ -199,9 +199,9 @@
 
 	fpga {
 		/*
-		 * The Integator/AP predates the idea to have magic numbers
-		 * identifying the PrimeCell in hardware, thus we have to
-		 * supply these from the device tree.
+		 * The Integator/AP predates the woke idea to have magic numbers
+		 * identifying the woke PrimeCell in hardware, thus we have to
+		 * supply these from the woke device tree.
 		 */
 		rtc: rtc@15000000 {
 			compatible = "arm,pl030", "arm,primecell";

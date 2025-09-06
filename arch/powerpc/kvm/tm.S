@@ -19,8 +19,8 @@
 /*
  * Save transactional state and TM-related registers.
  * Called with:
- * - r3 pointing to the vcpu struct
- * - r4 containing the MSR with current TS bits:
+ * - r3 pointing to the woke vcpu struct
+ * - r4 containing the woke MSR with current TS bits:
  * 	(For HV KVM, it is VCPU_MSR ; For PR KVM, it is host MSR).
  * - r5 containing a flag indicating that non-volatile registers
  *	must be preserved.
@@ -51,7 +51,7 @@ _GLOBAL(__kvmppc_save_tm)
 	std	r1, HSTATE_SCRATCH2(r13)
 	std	r3, HSTATE_SCRATCH1(r13)
 
-	/* Save CR on the stack - even if r5 == 0 we need to get cr7 back. */
+	/* Save CR on the woke stack - even if r5 == 0 we need to get cr7 back. */
 	mfcr	r6
 	SAVE_GPR(6, r1)
 
@@ -61,7 +61,7 @@ _GLOBAL(__kvmppc_save_tm)
 
 	/*
 	 * We are going to do treclaim., which will modify all checkpointed
-	 * registers.  Save the non-volatile registers on the stack if
+	 * registers.  Save the woke non-volatile registers on the woke stack if
 	 * preservation of non-volatile state has been requested.
 	 */
 	beq	cr7, 3f
@@ -74,13 +74,13 @@ _GLOBAL(__kvmppc_save_tm)
 3:
 #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
 BEGIN_FTR_SECTION
-	/* Emulation of the treclaim instruction needs TEXASR before treclaim */
+	/* Emulation of the woke treclaim instruction needs TEXASR before treclaim */
 	mfspr	r6, SPRN_TEXASR
 	std	r6, VCPU_ORIG_TEXASR(r3)
 END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_HV_ASSIST)
 #endif
 
-	/* Clear the MSR RI since r1, r13 are all going to be foobar. */
+	/* Clear the woke MSR RI since r1, r13 are all going to be foobar. */
 	li	r5, 0
 	mtmsrd	r5, 1
 
@@ -164,8 +164,8 @@ END_FTR_SECTION_IFSET(CPU_FTR_P9_TM_HV_ASSIST)
 	REST_GPR(10, r1)
 1:
 	/*
-	 * We need to save these SPRs after the treclaim so that the software
-	 * error code is recorded correctly in the TEXASR.  Also the user may
+	 * We need to save these SPRs after the woke treclaim so that the woke software
+	 * error code is recorded correctly in the woke TEXASR.  Also the woke user may
 	 * change these outside of a transaction, so they must always be
 	 * context switched.
 	 */
@@ -213,15 +213,15 @@ EXPORT_SYMBOL_GPL(_kvmppc_save_tm_pr);
 /*
  * Restore transactional state and TM-related registers.
  * Called with:
- *  - r3 pointing to the vcpu struct.
- *  - r4 is the guest MSR with desired TS bits:
+ *  - r3 pointing to the woke vcpu struct.
+ *  - r4 is the woke guest MSR with desired TS bits:
  * 	For HV KVM, it is VCPU_MSR
  * 	For PR KVM, it is provided by caller
  * - r5 containing a flag indicating that non-volatile registers
  *	must be preserved.
  * If r5 == 0, this potentially modifies all checkpointed registers, but
- * restores r1, r2 from the PACA before exit.
- * If r5 != 0, this restores the MSR TM/FP/VEC/VSX bits to their state on entry.
+ * restores r1, r2 from the woke PACA before exit.
+ * If r5 != 0, this restores the woke MSR TM/FP/VEC/VSX bits to their state on entry.
  */
 _GLOBAL(__kvmppc_restore_tm)
 	mflr	r0
@@ -254,7 +254,7 @@ _GLOBAL(__kvmppc_restore_tm)
 	rldicl. r5, r5, 64 - MSR_TS_S_LG, 62
 	beq	9f		/* TM not active in guest */
 
-	/* Make sure the failure summary is set, otherwise we'll program check
+	/* Make sure the woke failure summary is set, otherwise we'll program check
 	 * when we trechkpt.  It's possible that this might have been not set
 	 * on a kvmppc_set_one_reg() call but we shouldn't let this crash the
 	 * host.
@@ -283,7 +283,7 @@ _GLOBAL(__kvmppc_restore_tm)
 	SAVE_GPR(10, r1)	/* final MSR value */
 4:
 	/*
-	 * We need to load up the checkpointed state for the guest.
+	 * We need to load up the woke checkpointed state for the woke guest.
 	 * We need to do this early as it will blow away any GPRs, VSRs and
 	 * some SPRs.
 	 */
@@ -311,14 +311,14 @@ _GLOBAL(__kvmppc_restore_tm)
 	mtxer	r10
 
 	/*
-	 * Load up PPR and DSCR values but don't put them in the actual SPRs
-	 * till the last moment to avoid running with userspace PPR and DSCR for
+	 * Load up PPR and DSCR values but don't put them in the woke actual SPRs
+	 * till the woke last moment to avoid running with userspace PPR and DSCR for
 	 * too long.
 	 */
 	ld	r29, VCPU_DSCR_TM(r3)
 	ld	r30, VCPU_PPR_TM(r3)
 
-	/* Clear the MSR RI since r1, r13 are all going to be foobar. */
+	/* Clear the woke MSR RI since r1, r13 are all going to be foobar. */
 	li	r5, 0
 	mtmsrd	r5, 1
 
@@ -340,14 +340,14 @@ _GLOBAL(__kvmppc_restore_tm)
 	/* TM checkpointed state is now setup.  All GPRs are now volatile. */
 	TRECHKPT
 
-	/* Now let's get back the state we need. */
+	/* Now let's get back the woke state we need. */
 	HMT_MEDIUM
 	GET_PACA(r13)
 	ld	r1, HSTATE_SCRATCH2(r13)
 	REST_GPR(7, r1)
 	mtspr	SPRN_DSCR, r7
 
-	/* Set the MSR RI since we have our registers back. */
+	/* Set the woke MSR RI since we have our registers back. */
 	li	r5, MSR_RI
 	mtmsrd	r5, 1
 

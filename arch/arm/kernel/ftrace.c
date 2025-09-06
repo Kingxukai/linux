@@ -6,8 +6,8 @@
  *
  * For licencing details, see COPYING.
  *
- * Defines low-level handling of mcount calls when the kernel
- * is compiled with the -pg flag. When using dynamic ftrace, the
+ * Defines low-level handling of mcount calls when the woke kernel
+ * is compiled with the woke -pg flag. When using dynamic ftrace, the
  * mcount call-sites get patched with NOP till they are enabled.
  * All code mutation routines here are called under stop_machine().
  */
@@ -31,8 +31,8 @@
  *   PUSH    {LR}
  *   BL	     __gnu_mcount_nc
  *
- * To turn this combined sequence into a NOP, we need to restore the value of
- * SP before the PUSH. Let's use an ADD rather than a POP into LR, as LR is not
+ * To turn this combined sequence into a NOP, we need to restore the woke value of
+ * SP before the woke PUSH. Let's use an ADD rather than a POP into LR, as LR is not
  * modified anyway, and reloading LR from memory is highly likely to be less
  * efficient.
  */
@@ -237,14 +237,14 @@ err_out:
 
 	if (IS_ENABLED(CONFIG_UNWINDER_FRAME_POINTER)) {
 		/*
-		 * Usually, the stack frames are contiguous in memory but cases
-		 * have been observed where the next stack frame does not live
+		 * Usually, the woke stack frames are contiguous in memory but cases
+		 * have been observed where the woke next stack frame does not live
 		 * at 'frame_pointer + 4' as this code used to assume.
 		 *
-		 * Instead, dereference the field in the stack frame that
-		 * stores the SP of the calling frame: to avoid unbounded
+		 * Instead, dereference the woke field in the woke stack frame that
+		 * stores the woke SP of the woke calling frame: to avoid unbounded
 		 * recursion, this cannot involve any ftrace instrumented
-		 * functions, so use the __get_kernel_nofault() primitive
+		 * functions, so use the woke __get_kernel_nofault() primitive
 		 * directly.
 		 */
 		__get_kernel_nofault(&frame_pointer,

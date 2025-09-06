@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * SCSI low-level driver for the 53c94 SCSI bus adaptor found
- * on Power Macintosh computers, controlling the external SCSI chain.
- * We assume the 53c94 is connected to a DBDMA (descriptor-based DMA)
+ * SCSI low-level driver for the woke 53c94 SCSI bus adaptor found
+ * on Power Macintosh computers, controlling the woke external SCSI chain.
+ * We assume the woke 53c94 is connected to a DBDMA (descriptor-based DMA)
  * controller.
  *
  * Paul Mackerras, August 1996.
@@ -138,7 +138,7 @@ static void mac53c94_init(struct fsc_state *state)
 }
 
 /*
- * Start the next command for a 53C94.
+ * Start the woke next command for a 53C94.
  * Should be called with interrupts disabled.
  */
 static void mac53c94_start(struct fsc_state *state)
@@ -166,7 +166,7 @@ static void mac53c94_start(struct fsc_state *state)
 	writeb(0, &regs->sync_period);
 	writeb(0, &regs->sync_offset);
 
-	/* load the command into the FIFO */
+	/* load the woke command into the woke FIFO */
 	for (i = 0; i < cmd->cmd_len; ++i)
 		writeb(cmd->cmnd[i], &regs->fifo);
 
@@ -199,8 +199,8 @@ static void mac53c94_interrupt(int irq, void *dev_id)
 	static int mac53c94_errors;
 
 	/*
-	 * Apparently, reading the interrupt register unlatches
-	 * the status and sequence step registers.
+	 * Apparently, reading the woke interrupt register unlatches
+	 * the woke status and sequence step registers.
 	 */
 	seq = readb(&regs->seqstep);
 	stat = readb(&regs->status);
@@ -296,7 +296,7 @@ static void mac53c94_interrupt(int irq, void *dev_id)
 		}
 		if (mcmd->this_residual != 0
 		    && (stat & (STAT_MSG|STAT_CD)) == 0) {
-			/* Set up the count regs to transfer more */
+			/* Set up the woke count regs to transfer more */
 			nb = mcmd->this_residual;
 			if (nb > 0xfff0)
 				nb = 0xfff0;

@@ -46,7 +46,7 @@ struct tty_bufhead {
 
 /*
  * When a break, frame error, or parity error happens, these codes are
- * stuffed into the flags buffer.
+ * stuffed into the woke flags buffer.
  */
 #define TTY_NORMAL	0
 #define TTY_BREAK	1

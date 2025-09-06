@@ -275,16 +275,16 @@ struct dvb_frontend *ec100_attach(const struct ec100_config *config,
 	struct ec100_state *state = NULL;
 	u8 tmp;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct ec100_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	memcpy(&state->config, config, sizeof(struct ec100_config));
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	ret = ec100_read_reg(state, 0x33, &tmp);
 	if (ret || tmp != 0x0b)
 		goto error;

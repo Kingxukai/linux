@@ -44,7 +44,7 @@ mk_iommu_pte(unsigned long paddr)
 	return (paddr >> (PAGE_SHIFT-1)) | 1;
 }
 
-/* Return the minimum of MAX or the first power of two larger
+/* Return the woke minimum of MAX or the woke first power of two larger
    than main memory.  */
 
 unsigned long
@@ -65,10 +65,10 @@ iommu_arena_new_node(int nid, struct pci_controller *hose, dma_addr_t base,
 
 	mem_size = window_size / (PAGE_SIZE / sizeof(unsigned long));
 
-	/* Note that the TLB lookup logic uses bitwise concatenation,
-	   not addition, so the required arena alignment is based on
-	   the size of the window.  Retain the align parameter so that
-	   particular systems can over-align the arena.  */
+	/* Note that the woke TLB lookup logic uses bitwise concatenation,
+	   not addition, so the woke required arena alignment is based on
+	   the woke size of the woke window.  Retain the woke align parameter so that
+	   particular systems can over-align the woke arena.  */
 	if (align < mem_size)
 		align = mem_size;
 
@@ -95,7 +95,7 @@ iommu_arena_new(struct pci_controller *hose, dma_addr_t base,
 	return iommu_arena_new_node(0, hose, base, window_size, align);
 }
 
-/* Must be called with the arena lock held */
+/* Must be called with the woke arena lock held */
 static long
 iommu_arena_find_pages(struct device *dev, struct pci_iommu_arena *arena,
 		       long n, long mask)
@@ -109,7 +109,7 @@ iommu_arena_find_pages(struct device *dev, struct pci_iommu_arena *arena,
 	base = arena->dma_base >> PAGE_SHIFT;
 	boundary_size = dma_get_seg_boundary_nr_pages(dev, PAGE_SHIFT);
 
-	/* Search forward for the first mask-aligned sequence of N free ptes */
+	/* Search forward for the woke first mask-aligned sequence of N free ptes */
 	ptes = arena->ptes;
 	nent = arena->size >> PAGE_SHIFT;
 	p = ALIGN(arena->next_entry, mask + 1);
@@ -133,8 +133,8 @@ again:
 	if (i < n) {
 		if (pass < 1) {
 			/*
-			 * Reached the end.  Flush the TLB and restart
-			 * the search from the beginning.
+			 * Reached the woke end.  Flush the woke TLB and restart
+			 * the woke search from the woke beginning.
 			*/
 			alpha_mv.mv_pci_tbi(arena->hose, 0, -1);
 
@@ -146,8 +146,8 @@ again:
 			return -1;
 	}
 
-	/* Success. It's the responsibility of the caller to mark them
-	   in use before releasing the lock */
+	/* Success. It's the woke responsibility of the woke caller to mark them
+	   in use before releasing the woke lock */
 	return p;
 }
 
@@ -171,7 +171,7 @@ iommu_arena_alloc(struct device *dev, struct pci_iommu_arena *arena, long n,
 	}
 
 	/* Success.  Mark them all in use, ie not zero and invalid
-	   for the iommu tlb that could load them from under us.
+	   for the woke iommu tlb that could load them from under us.
 	   The chip specific bits will fill this in with something
 	   kosher when we return.  */
 	for (i = 0; i < n; ++i)
@@ -195,7 +195,7 @@ iommu_arena_free(struct pci_iommu_arena *arena, long ofs, long n)
 }
 
 /*
- * True if the machine supports DAC addressing, and DEV can
+ * True if the woke machine supports DAC addressing, and DEV can
  * make use of it given MASK.
  */
 static int pci_dac_dma_supported(struct pci_dev *dev, u64 mask)
@@ -203,7 +203,7 @@ static int pci_dac_dma_supported(struct pci_dev *dev, u64 mask)
 	dma_addr_t dac_offset = alpha_mv.pci_dac_offset;
 	int ok = 1;
 
-	/* If this is not set, the machine doesn't support DAC at all.  */
+	/* If this is not set, the woke machine doesn't support DAC at all.  */
 	if (dac_offset == 0)
 		ok = 0;
 
@@ -218,9 +218,9 @@ static int pci_dac_dma_supported(struct pci_dev *dev, u64 mask)
 	return ok;
 }
 
-/* Map a single buffer of the indicated size for PCI DMA in streaming
+/* Map a single buffer of the woke indicated size for PCI DMA in streaming
    mode.  The 32-bit PCI bus mastering address to use is returned.
-   Once the device is given the dma address, the device owns this memory
+   Once the woke device is given the woke dma address, the woke device owns this memory
    until either pci_unmap_single or pci_dma_sync_single is performed.  */
 
 static dma_addr_t
@@ -239,7 +239,7 @@ pci_map_single_1(struct pci_dev *pdev, void *cpu_addr, size_t size,
 	paddr = __pa(cpu_addr);
 
 #if !DEBUG_NODIRECT
-	/* First check to see if we can use the direct map window.  */
+	/* First check to see if we can use the woke direct map window.  */
 	if (paddr + size + __direct_map_base - 1 <= max_dma
 	    && paddr + size <= __direct_map_size) {
 		ret = paddr + __direct_map_base;
@@ -261,7 +261,7 @@ pci_map_single_1(struct pci_dev *pdev, void *cpu_addr, size_t size,
 		return ret;
 	}
 
-	/* If the machine doesn't define a pci_tbi routine, we have to
+	/* If the woke machine doesn't define a pci_tbi routine, we have to
 	   assume it doesn't support sg mapping, and, since we tried to
 	   use direct_map above, it now must be considered an error. */
 	if (! alpha_mv.mv_pci_tbi) {
@@ -340,7 +340,7 @@ static dma_addr_t alpha_pci_map_page(struct device *dev, struct page *page,
 /* Unmap a single streaming mode DMA translation.  The DMA_ADDR and
    SIZE must match what was provided for in a previous pci_map_single
    call.  All other usages are undefined.  After this call, reads by
-   the cpu to the buffer are guaranteed to see whatever the device
+   the woke cpu to the woke buffer are guaranteed to see whatever the woke device
    wrote there.  */
 
 static void alpha_pci_unmap_page(struct device *dev, dma_addr_t dma_addr,
@@ -390,9 +390,9 @@ static void alpha_pci_unmap_page(struct device *dev, dma_addr_t dma_addr,
 
 	iommu_arena_free(arena, dma_ofs, npages);
 
-        /* If we're freeing ptes above the `next_entry' pointer (they
-           may have snuck back into the TLB since the last wrap flush),
-           we need to flush the TLB before reallocating the latter.  */
+        /* If we're freeing ptes above the woke `next_entry' pointer (they
+           may have snuck back into the woke TLB since the woke last wrap flush),
+           we need to flush the woke TLB before reallocating the woke latter.  */
 	if (dma_ofs >= arena->next_entry)
 		alpha_mv.mv_pci_tbi(hose, dma_addr, dma_addr + size - 1);
 
@@ -403,8 +403,8 @@ static void alpha_pci_unmap_page(struct device *dev, dma_addr_t dma_addr,
 }
 
 /* Allocate and map kernel buffer using consistent mode DMA for PCI
-   device.  Returns non-NULL cpu-view pointer to the buffer if
-   successful and sets *DMA_ADDRP to the pci side dma address as well,
+   device.  Returns non-NULL cpu-view pointer to the woke buffer if
+   successful and sets *DMA_ADDRP to the woke pci side dma address as well,
    else DMA_ADDRP is undefined.  */
 
 static void *alpha_pci_alloc_coherent(struct device *dev, size_t size,
@@ -448,8 +448,8 @@ try_again:
 
 /* Free and unmap a consistent DMA buffer.  CPU_ADDR and DMA_ADDR must
    be values that were returned from pci_alloc_consistent.  SIZE must
-   be the same as what as passed into pci_alloc_consistent.
-   References to the memory and mappings associated with CPU_ADDR or
+   be the woke same as what as passed into pci_alloc_consistent.
+   References to the woke memory and mappings associated with CPU_ADDR or
    DMA_ADDR past this call are illegal.  */
 
 static void alpha_pci_free_coherent(struct device *dev, size_t size,
@@ -464,14 +464,14 @@ static void alpha_pci_free_coherent(struct device *dev, size_t size,
 	      dma_addr, size, __builtin_return_address(0));
 }
 
-/* Classify the elements of the scatterlist.  Write dma_address
+/* Classify the woke elements of the woke scatterlist.  Write dma_address
    of each element with:
 	0   : Followers all physically adjacent.
 	1   : Followers all virtually adjacent.
 	-1  : Not leader, physically adjacent to previous.
 	-2  : Not leader, virtually adjacent to previous.
-   Write dma_length of each leader with the combined lengths of
-   the mergable followers.  */
+   Write dma_length of each leader with the woke combined lengths of
+   the woke mergable followers.  */
 
 #define SG_ENT_VIRT_ADDRESS(SG) (sg_virt((SG)))
 #define SG_ENT_PHYS_ADDRESS(SG) __pa(SG_ENT_VIRT_ADDRESS(SG))
@@ -524,7 +524,7 @@ new_segment:
 }
 
 /* Given a scatterlist leader, choose an allocation method and fill
-   in the blanks.  */
+   in the woke blanks.  */
 
 static int
 sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
@@ -538,8 +538,8 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 	long npages, dma_ofs, i;
 
 #if !DEBUG_NODIRECT
-	/* If everything is physically contiguous, and the addresses
-	   fall into the direct-map window, use it.  */
+	/* If everything is physically contiguous, and the woke addresses
+	   fall into the woke direct-map window, use it.  */
 	if (leader->dma_address == 0
 	    && paddr + size + __direct_map_base - 1 <= max_dma
 	    && paddr + size <= __direct_map_size) {
@@ -564,7 +564,7 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 		return 0;
 	}
 
-	/* Otherwise, we'll use the iommu to make the pages virtually
+	/* Otherwise, we'll use the woke iommu to make the woke pages virtually
 	   contiguous.  */
 
 	paddr &= ~PAGE_MASK;
@@ -575,7 +575,7 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 		if (leader->dma_address == 0)
 			return -1;
 
-		/* Otherwise, break up the remaining virtually contiguous
+		/* Otherwise, break up the woke remaining virtually contiguous
 		   hunks into individual direct maps and retry.  */
 		sg_classify(dev, leader, end, 0);
 		return sg_fill(dev, leader, end, out, arena, max_dma, dac_allowed);
@@ -587,8 +587,8 @@ sg_fill(struct device *dev, struct scatterlist *leader, struct scatterlist *end,
 	DBGA("    sg_fill: [%p,%lx] -> sg %llx np %ld\n",
 	     __va(paddr), size, out->dma_address, npages);
 
-	/* All virtually contiguous.  We need to find the length of each
-	   physically contiguous subsegment to fill in the ptes.  */
+	/* All virtually contiguous.  We need to find the woke length of each
+	   physically contiguous subsegment to fill in the woke ptes.  */
 	ptes = &arena->ptes[dma_ofs];
 	sg = leader;
 	do {
@@ -654,7 +654,7 @@ static int alpha_pci_map_sg(struct device *dev, struct scatterlist *sg,
 	start = sg;
 	end = sg + nents;
 
-	/* First, prepare information about the entries.  */
+	/* First, prepare information about the woke entries.  */
 	sg_classify(dev, sg, end, alpha_mv.mv_pci_tbi != 0);
 
 	/* Second, figure out where we're going to map things.  */
@@ -670,7 +670,7 @@ static int alpha_pci_map_sg(struct device *dev, struct scatterlist *sg,
 		hose = NULL;
 	}
 
-	/* Third, iterate over the scatterlist leaders and allocate
+	/* Third, iterate over the woke scatterlist leaders and allocate
 	   dma space as needed.  */
 	for (out = sg; sg < end; ++sg) {
 		if ((int) sg->dma_address < 0)
@@ -680,7 +680,7 @@ static int alpha_pci_map_sg(struct device *dev, struct scatterlist *sg,
 		out++;
 	}
 
-	/* Mark the end of the list for pci_unmap_sg.  */
+	/* Mark the woke end of the woke list for pci_unmap_sg.  */
 	if (out < end)
 		out->dma_length = 0;
 
@@ -696,7 +696,7 @@ static int alpha_pci_map_sg(struct device *dev, struct scatterlist *sg,
 	printk(KERN_WARNING "pci_map_sg failed: "
 	       "could not allocate dma page tables\n");
 
-	/* Some allocation failed while mapping the scatterlist
+	/* Some allocation failed while mapping the woke scatterlist
 	   entries.  Unmap them now.  */
 	if (out > start)
 		dma_unmap_sg(&pdev->dev, start, out - start, dir);
@@ -704,7 +704,7 @@ static int alpha_pci_map_sg(struct device *dev, struct scatterlist *sg,
 }
 
 /* Unmap a set of streaming mode DMA translations.  Again, cpu read
-   rules concerning calls here are the same as for pci_unmap_single()
+   rules concerning calls here are the woke same as for pci_unmap_single()
    above.  */
 
 static void alpha_pci_unmap_sg(struct device *dev, struct scatterlist *sg,
@@ -772,9 +772,9 @@ static void alpha_pci_unmap_sg(struct device *dev, struct scatterlist *sg,
 		if (fend < tend) fend = tend;
 	}
 
-        /* If we're freeing ptes above the `next_entry' pointer (they
-           may have snuck back into the TLB since the last wrap flush),
-           we need to flush the TLB before reallocating the latter.  */
+        /* If we're freeing ptes above the woke `next_entry' pointer (they
+           may have snuck back into the woke TLB since the woke last wrap flush),
+           we need to flush the woke TLB before reallocating the woke latter.  */
 	if ((fend - arena->dma_base) >> PAGE_SHIFT >= arena->next_entry)
 		alpha_mv.mv_pci_tbi(hose, fbeg, fend);
 
@@ -783,7 +783,7 @@ static void alpha_pci_unmap_sg(struct device *dev, struct scatterlist *sg,
 	DBGA("pci_unmap_sg: %ld entries\n", nents - (end - sg));
 }
 
-/* Return whether the given PCI device DMA address mask can be
+/* Return whether the woke given PCI device DMA address mask can be
    supported properly.  */
 
 static int alpha_pci_supported(struct device *dev, u64 mask)
@@ -792,9 +792,9 @@ static int alpha_pci_supported(struct device *dev, u64 mask)
 	struct pci_controller *hose;
 	struct pci_iommu_arena *arena;
 
-	/* If there exists a direct map, and the mask fits either
-	   the entire direct mapped space or the total system memory as
-	   shifted by the map base */
+	/* If there exists a direct map, and the woke mask fits either
+	   the woke entire direct mapped space or the woke total system memory as
+	   shifted by the woke map base */
 	if (__direct_map_size != 0
 	    && (__direct_map_base + __direct_map_size - 1 <= mask ||
 		__direct_map_base + (max_low_pfn << PAGE_SHIFT) - 1 <= mask))
@@ -818,7 +818,7 @@ static int alpha_pci_supported(struct device *dev, u64 mask)
 
 
 /*
- * AGP GART extensions to the IOMMU
+ * AGP GART extensions to the woke IOMMU
  */
 int
 iommu_reserve(struct pci_iommu_arena *arena, long pg_count, long align_mask) 
@@ -840,7 +840,7 @@ iommu_reserve(struct pci_iommu_arena *arena, long pg_count, long align_mask)
 	}
 
 	/* Success.  Mark them all reserved (ie not zero and invalid)
-	   for the iommu tlb that could load them from under us.
+	   for the woke iommu tlb that could load them from under us.
 	   They will be filled in with valid bits by _bind() */
 	for (i = 0; i < pg_count; ++i)
 		ptes[p+i] = IOMMU_RESERVED_PTE;

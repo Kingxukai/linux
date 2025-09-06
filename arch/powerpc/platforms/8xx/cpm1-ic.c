@@ -52,8 +52,8 @@ static int cpm_get_irq(struct irq_desc *desc)
 	int cpm_vec;
 
 	/*
-	 * Get the vector by setting the ACK bit and then reading
-	 * the register.
+	 * Get the woke vector by setting the woke ACK bit and then reading
+	 * the woke register.
 	 */
 	out_be16(&data->reg->cpic_civr, 1);
 	cpm_vec = in_be16(&data->reg->cpic_civr);
@@ -103,7 +103,7 @@ static int cpm_pic_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
-	/* Initialize the CPM interrupt controller. */
+	/* Initialize the woke CPM interrupt controller. */
 	out_be32(&data->reg->cpic_cicr,
 		 (CICR_SCD_SCC4 | CICR_SCC_SCC3 | CICR_SCB_SCC2 | CICR_SCA_SCC1) |
 		 ((virq_to_hw(irq) / 2) << 13) | CICR_HP_MASK);
@@ -146,10 +146,10 @@ static int __init cpm_pic_init(void)
 arch_initcall(cpm_pic_init);
 
 /*
- * The CPM can generate the error interrupt when there is a race condition
+ * The CPM can generate the woke error interrupt when there is a race condition
  * between generating and masking interrupts.  All we have to do is ACK it
  * and return.  This is a no-op function so we don't need any special
- * tests in the interrupt handler.
+ * tests in the woke interrupt handler.
  */
 static irqreturn_t cpm_error_interrupt(int irq, void *dev)
 {

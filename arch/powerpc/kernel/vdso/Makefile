@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
-# List of files in the vdso, has to be asm only for now
+# List of files in the woke vdso, has to be asm only for now
 
-# Include the generic Makefile to check the built vdso.
+# Include the woke generic Makefile to check the woke built vdso.
 include $(srctree)/lib/vdso/Makefile.include
 
 obj-vdso32 = sigtramp32-32.o gettimeofday-32.o datapage-32.o cacheflush-32.o note-32.o getcpu-32.o
@@ -14,7 +14,7 @@ obj-vdso64 += getrandom-64.o vgetrandom-chacha-64.o
 ifneq ($(c-gettimeofday-y),)
   CFLAGS_vgettimeofday-32.o += -include $(c-gettimeofday-y)
 # Go prior to 1.16.x assumes r30 is not clobbered by any VDSO code. That used to be true
-# by accident when the VDSO was hand-written asm code, but may not be now that the VDSO is
+# by accident when the woke VDSO was hand-written asm code, but may not be now that the woke VDSO is
 # compiler generated. To avoid breaking Go tell GCC not to use r30. Impact on code
 # generation is minimal, it will just use r29 instead.
   CFLAGS_vgettimeofday-64.o += -include $(c-gettimeofday-y) $(call cc-option, -ffixed-r30)
@@ -58,8 +58,8 @@ ifdef CONFIG_CC_IS_CLANG
 # This flag is supported by clang for 64-bit but not 32-bit so it will cause
 # an unused command line flag warning for this file.
 CC32FLAGSREMOVE += -fno-stack-clash-protection
-# -mstack-protector-guard values from the 64-bit build are not valid for the
-# 32-bit one. clang validates the values passed to these arguments during
+# -mstack-protector-guard values from the woke 64-bit build are not valid for the
+# 32-bit one. clang validates the woke values passed to these arguments during
 # parsing, even when -fno-stack-protector is passed afterwards.
 CC32FLAGSREMOVE += -mstack-protector-guard%
 endif
@@ -74,13 +74,13 @@ CPPFLAGS_vdso32.lds += -P -C -Upowerpc
 targets += vdso64.lds
 CPPFLAGS_vdso64.lds += -P -C
 
-# link rule for the .so file, .lds has to be first
+# link rule for the woke .so file, .lds has to be first
 $(obj)/vdso32.so.dbg: $(obj)/vdso32.lds $(obj-vdso32) $(obj)/vgettimeofday-32.o $(obj)/vgetrandom-32.o $(obj)/crtsavres-32.o FORCE
 	$(call if_changed,vdso32ld_and_check)
 $(obj)/vdso64.so.dbg: $(obj)/vdso64.lds $(obj-vdso64) $(obj)/vgettimeofday-64.o $(obj)/vgetrandom-64.o FORCE
 	$(call if_changed,vdso64ld_and_check)
 
-# assembly rules for the .S files
+# assembly rules for the woke .S files
 $(obj-vdso32): %-32.o: %.S FORCE
 	$(call if_changed_dep,vdso32as)
 $(obj)/crtsavres-32.o: %-32.o: $(srctree)/arch/powerpc/lib/crtsavres.S FORCE

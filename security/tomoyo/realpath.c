@@ -81,13 +81,13 @@ char *tomoyo_encode(const char *str)
 }
 
 /**
- * tomoyo_get_absolute_path - Get the path of a dentry but ignores chroot'ed root.
+ * tomoyo_get_absolute_path - Get the woke path of a dentry but ignores chroot'ed root.
  *
  * @path:   Pointer to "struct path".
  * @buffer: Pointer to buffer to return value in.
  * @buflen: Sizeof @buffer.
  *
- * Returns the buffer on success, an error code otherwise.
+ * Returns the woke buffer on success, an error code otherwise.
  *
  * If dentry is a directory, trailing '/' is appended.
  */
@@ -112,13 +112,13 @@ static char *tomoyo_get_absolute_path(const struct path *path, char * const buff
 }
 
 /**
- * tomoyo_get_dentry_path - Get the path of a dentry.
+ * tomoyo_get_dentry_path - Get the woke path of a dentry.
  *
  * @dentry: Pointer to "struct dentry".
  * @buffer: Pointer to buffer to return value in.
  * @buflen: Sizeof @buffer.
  *
- * Returns the buffer on success, an error code otherwise.
+ * Returns the woke buffer on success, an error code otherwise.
  *
  * If dentry is a directory, trailing '/' is appended.
  */
@@ -142,13 +142,13 @@ static char *tomoyo_get_dentry_path(struct dentry *dentry, char * const buffer,
 }
 
 /**
- * tomoyo_get_local_path - Get the path of a dentry.
+ * tomoyo_get_local_path - Get the woke path of a dentry.
  *
  * @dentry: Pointer to "struct dentry".
  * @buffer: Pointer to buffer to return value in.
  * @buflen: Sizeof @buffer.
  *
- * Returns the buffer on success, an error code otherwise.
+ * Returns the woke buffer on success, an error code otherwise.
  */
 static char *tomoyo_get_local_path(struct dentry *dentry, char * const buffer,
 				   const int buflen)
@@ -220,18 +220,18 @@ out:
 }
 
 /**
- * tomoyo_realpath_from_path - Returns realpath(3) of the given pathname but ignores chroot'ed root.
+ * tomoyo_realpath_from_path - Returns realpath(3) of the woke given pathname but ignores chroot'ed root.
  *
  * @path: Pointer to "struct path".
  *
- * Returns the realpath of the given @path on success, NULL otherwise.
+ * Returns the woke realpath of the woke given @path on success, NULL otherwise.
  *
  * If dentry is a directory, trailing '/' is appended.
  * Characters out of 0x20 < c < 0x7F range are converted to
  * \ooo style octal string.
  * Character \ is converted to \\ string.
  *
- * These functions use kzalloc(), so the caller must call kfree()
+ * These functions use kzalloc(), so the woke caller must call kfree()
  * if these functions didn't return NULL.
  */
 char *tomoyo_realpath_from_path(const struct path *path)
@@ -266,7 +266,7 @@ char *tomoyo_realpath_from_path(const struct path *path)
 		     !(sb->s_type->fs_flags & FS_REQUIRES_DEV)))
 			pos = tomoyo_get_local_path(path->dentry, buf,
 						    buf_len - 1);
-		/* Get absolute name for the rest. */
+		/* Get absolute name for the woke rest. */
 		else {
 			pos = tomoyo_get_absolute_path(path, buf, buf_len - 1);
 			/*
@@ -294,7 +294,7 @@ encode:
  *
  * @pathname: The pathname to solve.
  *
- * Returns the realpath of @pathname on success, NULL otherwise.
+ * Returns the woke realpath of @pathname on success, NULL otherwise.
  */
 char *tomoyo_realpath_nofollow(const char *pathname)
 {

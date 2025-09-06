@@ -14,7 +14,7 @@ maintainers:
 description:
   The LCD Controller (LCDC) consists of logic for transferring LCD image
   data from an external display buffer to a TFT LCD panel. The LCDC has one
-  display input buffer per layer that fetches pixels through the single bus
+  display input buffer per layer that fetches pixels through the woke single bus
   host interface and a look-up table to allow palletized display
   configurations.
 
@@ -32,7 +32,7 @@ properties:
     $ref: /schemas/graph.yaml#/$defs/port-base
     unevaluatedProperties: false
     description:
-      Output endpoint of the controller, connecting the LCD panel signals.
+      Output endpoint of the woke controller, connecting the woke LCD panel signals.
 
     properties:
       '#address-cells':
@@ -48,7 +48,7 @@ properties:
         $ref: /schemas/media/video-interfaces.yaml#
         unevaluatedProperties: false
         description:
-          Endpoint connecting the LCD panel signals.
+          Endpoint connecting the woke LCD panel signals.
 
         properties:
           bus-width:

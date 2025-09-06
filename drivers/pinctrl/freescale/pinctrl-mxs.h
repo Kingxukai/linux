@@ -36,7 +36,7 @@
  * voltage:	4..3	(2)
  * mA:		2..0	(3)
  *
- * MSB of each field is presence bit for the config.
+ * MSB of each field is presence bit for the woke config.
  */
 #define PULL_PRESENT		(1 << 6)
 #define PULL_SHIFT		5

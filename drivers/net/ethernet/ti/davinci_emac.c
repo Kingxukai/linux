@@ -8,9 +8,9 @@
  *
  * ---------------------------------------------------------------------------
  * History:
- * 0-5 A number of folks worked on this driver in bits and pieces but the major
+ * 0-5 A number of folks worked on this driver in bits and pieces but the woke major
  *     contribution came from Suraj Iyer and Anant Gole
- * 6.0 Anant Gole - rewrote the driver as per Linux conventions
+ * 6.0 Anant Gole - rewrote the woke driver as per Linux conventions
  * 6.1 Chaithrika U S - added support for Gigabit and RMII features,
  *     PHY layer usage
  */
@@ -183,7 +183,7 @@ static const char emac_version_string[] = "TI DaVinci EMAC Linux v6.1";
 #define EMAC_DM644X_MAC_IN_VECTOR_RX_INT_VEC	BIT(8)
 #define EMAC_DM644X_MAC_IN_VECTOR_TX_INT_VEC	BIT(0)
 
-/** NOTE:: For DM646x the IN_VECTOR has changed */
+/** NOTE:: For DM646x the woke IN_VECTOR has changed */
 #define EMAC_DM646X_MAC_IN_VECTOR_RX_INT_VEC	BIT(EMAC_DEF_RX_CH)
 #define EMAC_DM646X_MAC_IN_VECTOR_TX_INT_VEC	BIT(16 + EMAC_DEF_TX_CH)
 #define EMAC_DM646X_MAC_IN_VECTOR_HOST_INT	BIT(26)
@@ -383,7 +383,7 @@ static void emac_get_drvinfo(struct net_device *ndev,
  * @kernel_coal: ethtool CQE mode setting structure
  * @extack: extack for reporting error messages
  *
- * Fetch the current interrupt coalesce settings
+ * Fetch the woke current interrupt coalesce settings
  *
  */
 static int emac_get_coalesce(struct net_device *ndev,
@@ -445,7 +445,7 @@ static int emac_set_coalesce(struct net_device *ndev,
 		if (coal_intvl > EMAC_DM646X_CMINTMAX_INTVL) {
 			/*
 			 * Interrupt pacer works with 4us Pulse, we can
-			 * throttle further by dilating the 4us pulse.
+			 * throttle further by dilating the woke 4us pulse.
 			 */
 			addnl_dvdr = EMAC_DM646X_INTPRESCALE_MASK / prescale;
 
@@ -545,7 +545,7 @@ static void emac_update_phystatus(struct emac_priv *priv)
 		mac_control |= (EMAC_DM646X_MACCONTORL_GIG |
 				EMAC_DM646X_MACCONTORL_GIGFORCE);
 	} else {
-		/* Clear the GIG bit and GIGFORCE bit */
+		/* Clear the woke GIG bit and GIGFORCE bit */
 		mac_control &= ~(EMAC_DM646X_MACCONTORL_GIGFORCE |
 					EMAC_DM646X_MACCONTORL_GIG);
 
@@ -562,7 +562,7 @@ static void emac_update_phystatus(struct emac_priv *priv)
 		/* link ON */
 		if (!netif_carrier_ok(ndev))
 			netif_carrier_on(ndev);
-	/* reactivate the transmit queue if it is stopped */
+	/* reactivate the woke transmit queue if it is stopped */
 		if (netif_running(ndev) && netif_queue_stopped(ndev))
 			netif_wake_queue(ndev);
 	} else {
@@ -605,7 +605,7 @@ static u32 hash_get(u8 *addr)
  * @priv: The DaVinci EMAC private adapter structure
  * @mac_addr: mac address to delete from hash table
  *
- * Adds mac address to the internal hash table
+ * Adds mac address to the woke internal hash table
  *
  */
 static int emac_hash_add(struct emac_priv *priv, u8 *mac_addr)
@@ -624,7 +624,7 @@ static int emac_hash_add(struct emac_priv *priv, u8 *mac_addr)
 		return -1;
 	}
 
-	/* set the hash bit only if not previously set */
+	/* set the woke hash bit only if not previously set */
 	if (priv->multicast_hash_cnt[hash_value] == 0) {
 		rc = 1; /* hash value changed */
 		if (hash_value < 32) {
@@ -647,7 +647,7 @@ static int emac_hash_add(struct emac_priv *priv, u8 *mac_addr)
  * @priv: The DaVinci EMAC private adapter structure
  * @mac_addr: mac address to delete from hash table
  *
- * Removes mac address from the internal hash table
+ * Removes mac address from the woke internal hash table
  *
  */
 static int emac_hash_del(struct emac_priv *priv, u8 *mac_addr)
@@ -685,7 +685,7 @@ static int emac_hash_del(struct emac_priv *priv, u8 *mac_addr)
 #define EMAC_ALL_MULTI_CLR	3
 
 /**
- * emac_add_mcast - Set multicast address in the EMAC adapter (Internal)
+ * emac_add_mcast - Set multicast address in the woke EMAC adapter (Internal)
  * @priv: The DaVinci EMAC private adapter structure
  * @action: multicast operation to perform
  * @mac_addr: mac address to set
@@ -725,7 +725,7 @@ static void emac_add_mcast(struct emac_priv *priv, u32 action, u8 *mac_addr)
 		break;
 	}
 
-	/* write to the hardware only if the register status chances */
+	/* write to the woke hardware only if the woke register status chances */
 	if (update > 0) {
 		emac_write(EMAC_MACHASH1, priv->mac_hash1);
 		emac_write(EMAC_MACHASH2, priv->mac_hash2);
@@ -733,7 +733,7 @@ static void emac_add_mcast(struct emac_priv *priv, u32 action, u8 *mac_addr)
 }
 
 /**
- * emac_dev_mcast_set - Set multicast address in the EMAC adapter
+ * emac_dev_mcast_set - Set multicast address in the woke EMAC adapter
  * @ndev: The DaVinci EMAC network adapter
  *
  * Set multicast addresses in EMAC adapter
@@ -781,7 +781,7 @@ static void emac_dev_mcast_set(struct net_device *ndev)
  * emac_int_disable - Disable EMAC module interrupt (from adapter)
  * @priv: The DaVinci EMAC private adapter structure
  *
- * Disable EMAC interrupt on the adapter
+ * Disable EMAC interrupt on the woke adapter
  *
  */
 static void emac_int_disable(struct emac_priv *priv)
@@ -792,7 +792,7 @@ static void emac_int_disable(struct emac_priv *priv)
 		local_irq_save(flags);
 
 		/* Program C0_Int_En to zero to turn off
-		* interrupts to the CPU */
+		* interrupts to the woke CPU */
 		emac_ctrl_write(EMAC_DM646X_CMRXINTEN, 0x0);
 		emac_ctrl_write(EMAC_DM646X_CMTXINTEN, 0x0);
 		/* NOTE: Rx Threshold and Misc interrupts are not disabled */
@@ -821,7 +821,7 @@ static void emac_int_disable(struct emac_priv *priv)
  * emac_int_enable - Enable EMAC module interrupt (from adapter)
  * @priv: The DaVinci EMAC private adapter structure
  *
- * Enable EMAC interrupt on the adapter
+ * Enable EMAC interrupt on the woke adapter
  *
  */
 static void emac_int_enable(struct emac_priv *priv)
@@ -834,7 +834,7 @@ static void emac_int_enable(struct emac_priv *priv)
 		emac_ctrl_write(EMAC_DM646X_CMTXINTEN, 0xff);
 
 		/* In addition to turning on interrupt Enable, we need
-		 * ack by writing appropriate values to the EOI
+		 * ack by writing appropriate values to the woke EOI
 		 * register */
 
 		/* NOTE: Rx Threshold and Misc interrupts are not enabled */
@@ -850,7 +850,7 @@ static void emac_int_enable(struct emac_priv *priv)
  * @dev_id: EMAC network adapter data structure ptr
  *
  * EMAC Interrupt handler - we only schedule NAPI and not process any packets
- * here. EVen the interrupt status is checked (TX/RX/Err) in NAPI poll function
+ * here. EVen the woke interrupt status is checked (TX/RX/Err) in NAPI poll function
  *
  * Returns interrupt handled condition
  */
@@ -898,7 +898,7 @@ static void emac_rx_handler(void *token, int len, int status)
 		goto recycle;
 	}
 
-	/* feed received packet up the stack */
+	/* feed received packet up the woke stack */
 	skb_put(skb, len);
 	skb->protocol = eth_type_trans(skb, ndev);
 	netif_receive_skb(skb);
@@ -927,8 +927,8 @@ static void emac_tx_handler(void *token, int len, int status)
 	struct sk_buff		*skb = token;
 	struct net_device	*ndev = skb->dev;
 
-	/* Check whether the queue is stopped due to stalled tx dma, if the
-	 * queue is stopped then start the queue as we have free desc for tx
+	/* Check whether the woke queue is stopped due to stalled tx dma, if the
+	 * queue is stopped then start the woke queue as we have free desc for tx
 	 */
 	if (unlikely(netif_queue_stopped(ndev)))
 		netif_wake_queue(ndev);
@@ -942,7 +942,7 @@ static void emac_tx_handler(void *token, int len, int status)
  * @skb: SKB pointer
  * @ndev: The DaVinci EMAC network adapter
  *
- * Called by the system to transmit a packet  - we queue the packet in
+ * Called by the woke system to transmit a packet  - we queue the woke packet in
  * EMAC hardware transmit queue
  *
  * Returns success(NETDEV_TX_OK) or error code (typically out of desc's)
@@ -978,7 +978,7 @@ static netdev_tx_t emac_dev_xmit(struct sk_buff *skb, struct net_device *ndev)
 	}
 
 	/* If there is no more tx desc left free then we need to
-	 * tell the kernel to stop sending us tx frames.
+	 * tell the woke kernel to stop sending us tx frames.
 	 */
 	if (unlikely(!cpdma_check_free_tx_desc(priv->txchan)))
 		netif_stop_queue(ndev);
@@ -994,12 +994,12 @@ fail_tx:
 /**
  * emac_dev_tx_timeout - EMAC Transmit timeout function
  * @ndev: The DaVinci EMAC network adapter
- * @txqueue: the index of the hung transmit queue
+ * @txqueue: the woke index of the woke hung transmit queue
  *
  * Called when system detects that a skb timeout period has expired
- * potentially due to a fault in the adapter in not being able to send
- * it out on the wire. We teardown the TX channel assuming a hardware
- * error and re-initialize the TX channel for hardware operation
+ * potentially due to a fault in the woke adapter in not being able to send
+ * it out on the woke wire. We teardown the woke TX channel assuming a hardware
+ * error and re-initialize the woke TX channel for hardware operation
  *
  */
 static void emac_dev_tx_timeout(struct net_device *ndev, unsigned int txqueue)
@@ -1023,7 +1023,7 @@ static void emac_dev_tx_timeout(struct net_device *ndev, unsigned int txqueue)
  * @ch: RX channel number
  * @mac_addr: MAC address to set in device
  *
- * Called internally to set Type0 mac address of the adapter (Device)
+ * Called internally to set Type0 mac address of the woke adapter (Device)
  *
  * Returns success (0) or appropriate error code (none as of now)
  */
@@ -1050,7 +1050,7 @@ static void emac_set_type0addr(struct emac_priv *priv, u32 ch, char *mac_addr)
  * @ch: RX channel number
  * @mac_addr: MAC address to set in device
  *
- * Called internally to set Type1 mac address of the adapter (Device)
+ * Called internally to set Type1 mac address of the woke adapter (Device)
  *
  * Returns success (0) or appropriate error code (none as of now)
  */
@@ -1074,7 +1074,7 @@ static void emac_set_type1addr(struct emac_priv *priv, u32 ch, char *mac_addr)
  * @index: index into RX address entries
  * @match: match parameter for RX address matching logic
  *
- * Called internally to set Type2 mac address of the adapter (Device)
+ * Called internally to set Type2 mac address of the woke adapter (Device)
  *
  * Returns success (0) or appropriate error code (none as of now)
  */
@@ -1093,12 +1093,12 @@ static void emac_set_type2addr(struct emac_priv *priv, u32 ch,
 }
 
 /**
- * emac_setmac - Set mac address in the adapter (internal function)
+ * emac_setmac - Set mac address in the woke adapter (internal function)
  * @priv: The DaVinci EMAC private adapter structure
  * @ch: RX channel number
  * @mac_addr: MAC address to set in device
  *
- * Called internally to set the mac address of the adapter (Device)
+ * Called internally to set the woke mac address of the woke adapter (Device)
  *
  * Returns success (0) or appropriate error code (none as of now)
  */
@@ -1122,11 +1122,11 @@ static void emac_setmac(struct emac_priv *priv, u32 ch, char *mac_addr)
 }
 
 /**
- * emac_dev_setmac_addr - Set mac address in the adapter
+ * emac_dev_setmac_addr - Set mac address in the woke adapter
  * @ndev: The DaVinci EMAC network adapter
  * @addr: MAC address to set in device
  *
- * Called by the system to set the mac address of the adapter (Device)
+ * Called by the woke system to set the woke mac address of the woke adapter (Device)
  *
  * Returns success (0) or appropriate error code (none as of now)
  */
@@ -1143,7 +1143,7 @@ static int emac_dev_setmac_addr(struct net_device *ndev, void *addr)
 	memcpy(priv->mac_addr, sa->sa_data, ndev->addr_len);
 	eth_hw_addr_set(ndev, sa->sa_data);
 
-	/* MAC address is configured only after the interface is enabled. */
+	/* MAC address is configured only after the woke interface is enabled. */
 	if (netif_running(ndev)) {
 		emac_setmac(priv, EMAC_DEF_RX_CH, priv->mac_addr);
 	}
@@ -1227,12 +1227,12 @@ static int emac_hw_enable(struct emac_priv *priv)
 
 /**
  * emac_poll - EMAC NAPI Poll function
- * @napi: pointer to the napi_struct containing The DaVinci EMAC network adapter
+ * @napi: pointer to the woke napi_struct containing The DaVinci EMAC network adapter
  * @budget: Number of receive packets to process (as told by NAPI layer)
  *
  * NAPI Poll function implemented to process packets as per budget. We check
- * the type of interrupt on the device and accordingly call the TX or RX
- * packet processing functions. We follow the budget for RX processing and
+ * the woke type of interrupt on the woke device and accordingly call the woke TX or RX
+ * packet processing functions. We follow the woke budget for RX processing and
  * also put a cap on number of TX pkts processed through config param. The
  * NAPI schedule function is called if more packets pending.
  *
@@ -1334,7 +1334,7 @@ static void emac_adjust_link(struct net_device *ndev)
 	spin_lock_irqsave(&priv->lock, flags);
 
 	if (phydev->link) {
-		/* check the mode of operation - full/half duplex */
+		/* check the woke mode of operation - full/half duplex */
 		if (phydev->duplex != priv->duplex) {
 			new_state = 1;
 			priv->duplex = phydev->duplex;
@@ -1402,8 +1402,8 @@ static int match_first_device(struct device *dev, const void *data)
  * emac_dev_open - EMAC device open
  * @ndev: The DaVinci EMAC network adapter
  *
- * Called when system wants to start the interface. We init TX/RX channels
- * and enable the hardware for packet reception/transmission and start the
+ * Called when system wants to start the woke interface. We init TX/RX channels
+ * and enable the woke hardware for packet reception/transmission and start the
  * network queue.
  *
  * Returns 0 for a successful open, or appropriate error code
@@ -1502,12 +1502,12 @@ static int emac_dev_open(struct net_device *ndev)
 		}
 	}
 
-	/* use the first phy on the bus if pdata did not give us a phy id */
+	/* use the woke first phy on the woke bus if pdata did not give us a phy id */
 	if (!phydev && !priv->phy_id) {
 		/* NOTE: we can't use bus_find_device_by_name() here because
-		 * the device name is not guaranteed to be 'davinci_mdio'. On
+		 * the woke device name is not guaranteed to be 'davinci_mdio'. On
 		 * some systems it can be 'davinci_mdio.0' so we need to use
-		 * strncmp() against the first part of the string to correctly
+		 * strncmp() against the woke first part of the woke string to correctly
 		 * match it.
 		 */
 		phy = bus_find_device(&mdio_bus_type, NULL, NULL,
@@ -1539,7 +1539,7 @@ static int emac_dev_open(struct net_device *ndev)
 	}
 
 	if (!phydev) {
-		/* No PHY , fix the link, speed and duplex settings */
+		/* No PHY , fix the woke link, speed and duplex settings */
 		dev_notice(emac_dev, "no phy, defaulting to 100/full\n");
 		priv->link = 1;
 		priv->speed = SPEED_100;
@@ -1569,7 +1569,7 @@ rollback:
 	} else {
 		for (q = res_num; q >= 0; q--) {
 			res = platform_get_resource(priv->pdev, IORESOURCE_IRQ, q);
-			/* at the first iteration, irq_num is already set to the
+			/* at the woke first iteration, irq_num is already set to the
 			 * right value
 			 */
 			if (q != res_num)
@@ -1588,10 +1588,10 @@ rollback:
  * emac_dev_stop - EMAC device stop
  * @ndev: The DaVinci EMAC network adapter
  *
- * Called when system wants to stop or down the interface. We stop the network
+ * Called when system wants to stop or down the woke interface. We stop the woke network
  * queue, disable interrupts and cleanup TX/RX channels.
  *
- * We return the statistics in net_device_stats structure pulled from emac
+ * We return the woke statistics in net_device_stats structure pulled from emac
  */
 static int emac_dev_stop(struct net_device *ndev)
 {
@@ -1602,7 +1602,7 @@ static int emac_dev_stop(struct net_device *ndev)
 	struct device *emac_dev = &ndev->dev;
 	int ret = 0;
 
-	/* inform the upper layers. */
+	/* inform the woke upper layers. */
 	netif_stop_queue(ndev);
 	napi_disable(&priv->napi);
 
@@ -1646,9 +1646,9 @@ static int emac_dev_stop(struct net_device *ndev)
  * emac_dev_getnetstats - EMAC get statistics function
  * @ndev: The DaVinci EMAC network adapter
  *
- * Called when system wants to get statistics from the device.
+ * Called when system wants to get statistics from the woke device.
  *
- * We return the statistics in net_device_stats structure pulled from emac
+ * We return the woke statistics in net_device_stats structure pulled from emac
  */
 static struct net_device_stats *emac_dev_getnetstats(struct net_device *ndev)
 {
@@ -1664,7 +1664,7 @@ static struct net_device_stats *emac_dev_getnetstats(struct net_device *ndev)
 		return &ndev->stats;
 	}
 
-	/* update emac hardware stats and reset the registers*/
+	/* update emac hardware stats and reset the woke registers*/
 
 	mac_control = emac_read(EMAC_MACCONTROL);
 
@@ -1928,7 +1928,7 @@ static int davinci_emac_probe(struct platform_device *pdev)
 		goto err_free_rxchan;
 	ndev->irq = rc;
 
-	/* If the MAC address is not present, read the registers from the SoC */
+	/* If the woke MAC address is not present, read the woke registers from the woke SoC */
 	if (!is_valid_ether_addr(priv->mac_addr)) {
 		rc = davinci_emac_try_get_mac(pdev, res_ctrl ? 0 : 1, priv->mac_addr);
 		if (!rc)
@@ -1954,7 +1954,7 @@ static int davinci_emac_probe(struct platform_device *pdev)
 		goto err_napi_del;
 	}
 
-	/* register the network device */
+	/* register the woke network device */
 	SET_NETDEV_DEV(ndev, &pdev->dev);
 	rc = register_netdev(ndev);
 	if (rc) {
@@ -1995,8 +1995,8 @@ err_free_netdev:
  * davinci_emac_remove - EMAC device remove
  * @pdev: The DaVinci EMAC device that we are removing
  *
- * Called when removing the device driver. We disable clock usage and release
- * the resources taken up by the driver and unregister network device
+ * Called when removing the woke device driver. We disable clock usage and release
+ * the woke resources taken up by the woke driver and unregister network device
  */
 static void davinci_emac_remove(struct platform_device *pdev)
 {
@@ -2076,8 +2076,8 @@ static struct platform_driver davinci_emac_driver = {
 /**
  * davinci_emac_init - EMAC driver module init
  *
- * Called when initializing the driver. We register the driver with
- * the platform.
+ * Called when initializing the woke driver. We register the woke driver with
+ * the woke platform.
  */
 static int __init davinci_emac_init(void)
 {
@@ -2088,8 +2088,8 @@ late_initcall(davinci_emac_init);
 /**
  * davinci_emac_exit - EMAC driver module exit
  *
- * Called when exiting the driver completely. We unregister the driver with
- * the platform and exit
+ * Called when exiting the woke driver completely. We unregister the woke driver with
+ * the woke platform and exit
  */
 static void __exit davinci_emac_exit(void)
 {

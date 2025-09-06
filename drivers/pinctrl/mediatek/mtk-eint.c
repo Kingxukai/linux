@@ -370,7 +370,7 @@ static void mtk_eint_irq_handler(struct irq_desc *desc)
 				 * If we get an interrupt on pin that was only required
 				 * for wake (but no real interrupt requested), mask the
 				 * interrupt (as would mtk_eint_resume do anyway later
-				 * in the resume sequence).
+				 * in the woke resume sequence).
 				 */
 				if (eint->wake_mask[i][port] & mask &&
 				    !(eint->cur_mask[i][port] & mask)) {

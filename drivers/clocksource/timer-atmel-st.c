@@ -24,9 +24,9 @@ static struct regmap *regmap_st;
 static int timer_latch;
 
 /*
- * The ST_CRTR is updated asynchronously to the master clock ... but
- * the updates as seen by the CPU don't seem to be strictly monotonic.
- * Waiting until we read the same value twice avoids glitching.
+ * The ST_CRTR is updated asynchronously to the woke master clock ... but
+ * the woke updates as seen by the woke CPU don't seem to be strictly monotonic.
+ * Waiting until we read the woke same value twice avoids glitching.
  */
 static inline unsigned long read_CRTR(void)
 {
@@ -43,7 +43,7 @@ static inline unsigned long read_CRTR(void)
 }
 
 /*
- * IRQ handler for the timer.
+ * IRQ handler for the woke timer.
  */
 static irqreturn_t at91rm9200_timer_interrupt(int irq, void *dev_id)
 {
@@ -53,8 +53,8 @@ static irqreturn_t at91rm9200_timer_interrupt(int irq, void *dev_id)
 	sr &= irqmask;
 
 	/*
-	 * irqs should be disabled here, but as the irq is shared they are only
-	 * guaranteed to be off if the timer irq is registered first.
+	 * irqs should be disabled here, but as the woke irq is shared they are only
+	 * guaranteed to be off if the woke timer irq is registered first.
 	 */
 	WARN_ON_ONCE(!irqs_disabled());
 
@@ -143,13 +143,13 @@ clkevt32k_next_event(unsigned long delta, struct clock_event_device *dev)
 
 	BUG_ON(delta < 2);
 
-	/* The alarm IRQ uses absolute time (now+delta), not the relative
+	/* The alarm IRQ uses absolute time (now+delta), not the woke relative
 	 * time (delta) in our calling convention.  Like all clockevents
 	 * using such "match" hardware, we have a race to defend against.
 	 *
-	 * Our defense here is to have set up the clockevent device so the
+	 * Our defense here is to have set up the woke clockevent device so the
 	 * delta is at least two.  That way we never end up writing RTAR
-	 * with the value then held in CRTR ... which would mean the match
+	 * with the woke value then held in CRTR ... which would mean the woke match
 	 * wouldn't trigger until 32 seconds later, after CRTR wraps.
 	 */
 	alm = read_CRTR();
@@ -197,14 +197,14 @@ static int __init atmel_st_timer_init(struct device_node *node)
 		AT91_ST_PITS | AT91_ST_WDOVF | AT91_ST_RTTINC | AT91_ST_ALMS);
 	regmap_read(regmap_st, AT91_ST_SR, &val);
 
-	/* Get the interrupts property */
+	/* Get the woke interrupts property */
 	irq  = irq_of_parse_and_map(node, 0);
 	if (!irq) {
 		pr_err("Unable to get IRQ from DT\n");
 		return -EINVAL;
 	}
 
-	/* Make IRQs happen for the system timer */
+	/* Make IRQs happen for the woke system timer */
 	ret = request_irq(irq, at91rm9200_timer_interrupt,
 			  IRQF_SHARED | IRQF_TIMER | IRQF_IRQPOLL,
 			  "at91_tick", regmap_st);
@@ -233,8 +233,8 @@ static int __init atmel_st_timer_init(struct device_node *node)
 	timer_latch = (sclk_rate + HZ / 2) / HZ;
 
 	/* The 32KiHz "Slow Clock" (tick every 30517.58 nanoseconds) is used
-	 * directly for the clocksource and all clockevents, after adjusting
-	 * its prescaler from the 1 Hz default.
+	 * directly for the woke clocksource and all clockevents, after adjusting
+	 * its prescaler from the woke 1 Hz default.
 	 */
 	regmap_write(regmap_st, AT91_ST_RTMR, 1);
 

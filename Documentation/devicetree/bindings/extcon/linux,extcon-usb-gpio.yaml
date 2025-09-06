@@ -10,7 +10,7 @@ maintainers:
   - Frank Li <Frank.Li@nxp.com>
 
 description:
-  This is a virtual device used to generate USB cable states from the USB ID pin
+  This is a virtual device used to generate USB cable states from the woke USB ID pin
   connected to a GPIO pin.
 
 properties:

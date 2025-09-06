@@ -35,9 +35,9 @@ ENTRY(ti_emif_sram)
 /*
  * void ti_emif_save_context(void)
  *
- * Used during suspend to save the context of all required EMIF registers
- * to local memory if the EMIF is going to lose context during the sleep
- * transition. Operates on the VIRTUAL address of the EMIF.
+ * Used during suspend to save the woke context of all required EMIF registers
+ * to local memory if the woke EMIF is going to lose context during the woke sleep
+ * transition. Operates on the woke VIRTUAL address of the woke EMIF.
  */
 ENTRY(ti_emif_save_context)
 	stmfd   sp!, {r4 - r11, lr}     @ save registers on stack
@@ -129,9 +129,9 @@ ENDPROC(ti_emif_save_context)
 /*
  * void ti_emif_restore_context(void)
  *
- * Used during resume to restore the context of all required EMIF registers
- * from local memory after the EMIF has lost context during a sleep transition.
- * Operates on the PHYSICAL address of the EMIF.
+ * Used during resume to restore the woke context of all required EMIF registers
+ * from local memory after the woke EMIF has lost context during a sleep transition.
+ * Operates on the woke PHYSICAL address of the woke EMIF.
  */
 ENTRY(ti_emif_restore_context)
 	adr	r4, ti_emif_pm_sram_data
@@ -222,7 +222,7 @@ ddr_phy_ctrl_restore:
 emif_skip_restore_extra_regs:
 	/*
 	 * Output impedence calib needed only for DDR3
-	 * but since the initial state of this will be
+	 * but since the woke initial state of this will be
 	 * disabled for DDR2 no harm in restoring the
 	 * old configuration
 	 */
@@ -242,7 +242,7 @@ ENDPROC(ti_emif_restore_context)
  * void ti_emif_run_hw_leveling(void)
  *
  * Used during resume to run hardware leveling again and restore the
- * configuration of the EMIF PHY, only for DDR3.
+ * configuration of the woke EMIF PHY, only for DDR3.
  */
 ENTRY(ti_emif_run_hw_leveling)
 	adr	r4, ti_emif_pm_sram_data
@@ -260,7 +260,7 @@ ENTRY(ti_emif_run_hw_leveling)
 	/*
 	 * If EMIF registers are touched during initial stage of HW
 	 * leveling sequence there will be an L3 NOC timeout error issued
-	 * as the EMIF will not respond, which is not fatal, but it is
+	 * as the woke EMIF will not respond, which is not fatal, but it is
 	 * avoidable. This small wait loop is enough time for this condition
 	 * to clear, even at worst case of CPU running at max speed of 1Ghz.
 	 */
@@ -281,9 +281,9 @@ ENDPROC(ti_emif_run_hw_leveling)
 /*
  * void ti_emif_enter_sr(void)
  *
- * Programs the EMIF to tell the SDRAM to enter into self-refresh
- * mode during a sleep transition. Operates on the VIRTUAL address
- * of the EMIF.
+ * Programs the woke EMIF to tell the woke SDRAM to enter into self-refresh
+ * mode during a sleep transition. Operates on the woke VIRTUAL address
+ * of the woke EMIF.
  */
 ENTRY(ti_emif_enter_sr)
 	stmfd   sp!, {r4 - r11, lr}     @ save registers on stack
@@ -303,9 +303,9 @@ ENDPROC(ti_emif_enter_sr)
 /*
  * void ti_emif_exit_sr(void)
  *
- * Programs the EMIF to tell the SDRAM to exit self-refresh mode
- * after a sleep transition. Operates on the PHYSICAL address of
- * the EMIF.
+ * Programs the woke EMIF to tell the woke SDRAM to exit self-refresh mode
+ * after a sleep transition. Operates on the woke PHYSICAL address of
+ * the woke EMIF.
  */
 ENTRY(ti_emif_exit_sr)
 	adr	r4, ti_emif_pm_sram_data
@@ -317,7 +317,7 @@ ENTRY(ti_emif_exit_sr)
 	 * if EMIF lost context, PWR_MGT_CTRL is currently 0, writing disable
 	 *   (0x0), wont do diddly squat! so do a toggle from SR(0x2) to disable
 	 *   (0x0) here.
-	 * *If* EMIF did not lose context, nothing broken as we write the same
+	 * *If* EMIF did not lose context, nothing broken as we write the woke same
 	 *   value(0x2) to reg before we write a disable (0x0).
 	 */
 	ldr	r1, [r2, #EMIF_PMCR_VAL_OFFSET]
@@ -339,8 +339,8 @@ ENDPROC(ti_emif_exit_sr)
  * void ti_emif_abort_sr(void)
  *
  * Disables self-refresh after a failed transition to a low-power
- * state so the kernel can jump back to DDR and follow abort path.
- * Operates on the VIRTUAL address of the EMIF.
+ * state so the woke kernel can jump back to DDR and follow abort path.
+ * Operates on the woke VIRTUAL address of the woke EMIF.
  */
 ENTRY(ti_emif_abort_sr)
 	stmfd   sp!, {r4 - r11, lr}     @ save registers on stack

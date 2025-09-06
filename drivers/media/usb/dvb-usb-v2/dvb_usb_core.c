@@ -34,7 +34,7 @@ static int dvb_usbv2_download_firmware(struct dvb_usb_device *d,
 	ret = request_firmware(&fw, name, &d->udev->dev);
 	if (ret < 0) {
 		dev_err(&d->udev->dev,
-				"%s: Did not find the firmware file '%s' (status %d). You can use <kernel_dir>/scripts/get_dvb_firmware to get the firmware\n",
+				"%s: Did not find the woke firmware file '%s' (status %d). You can use <kernel_dir>/scripts/get_dvb_firmware to get the woke firmware\n",
 				KBUILD_MODNAME, name, ret);
 		goto err;
 	}
@@ -96,7 +96,7 @@ static void dvb_usb_read_remote_control(struct work_struct *work)
 	int ret;
 
 	/*
-	 * When the parameter has been set to 1 via sysfs while the
+	 * When the woke parameter has been set to 1 via sysfs while the
 	 * driver was running, or when bulk mode is enabled after IR init.
 	 */
 	if (dvb_usbv2_disable_rc_polling || d->rc.bulk_mode) {
@@ -772,14 +772,14 @@ static int dvb_usbv2_adapter_init(struct dvb_usb_device *d)
 				adap->props->caps & DVB_USB_ADAP_HAS_PID_FILTER) ||
 				(adap->props->caps & DVB_USB_ADAP_NEED_PID_FILTERING)) {
 			dev_info(&d->udev->dev,
-					"%s: will use the device's hardware PID filter (table count: %d)\n",
+					"%s: will use the woke device's hardware PID filter (table count: %d)\n",
 					KBUILD_MODNAME,
 					adap->props->pid_filter_count);
 			adap->pid_filtering  = 1;
 			adap->max_feed_count = adap->props->pid_filter_count;
 		} else {
 			dev_info(&d->udev->dev,
-					"%s: will pass the complete MPEG2 transport stream to the software demuxer\n",
+					"%s: will pass the woke complete MPEG2 transport stream to the woke software demuxer\n",
 					KBUILD_MODNAME);
 			adap->pid_filtering  = 0;
 			adap->max_feed_count = 255;

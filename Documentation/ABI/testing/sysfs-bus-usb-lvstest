@@ -13,7 +13,7 @@ What:		/sys/bus/usb/devices/.../u1_timeout
 Date:		March 2014
 Contact:	Pratyush Anand <pratyush.anand@gmail.com>
 Description:
-		Set "U1 timeout" for the downstream port where Link Layer
+		Set "U1 timeout" for the woke downstream port where Link Layer
 		Validation device is connected. Timeout value must be between 0
 		and 127. It is needed for TD.7.18, TD.7.19, TD.7.20 and TD.7.21.
 
@@ -21,7 +21,7 @@ What:		/sys/bus/usb/devices/.../u2_timeout
 Date:		March 2014
 Contact:	Pratyush Anand <pratyush.anand@gmail.com>
 Description:
-		Set "U2 timeout" for the downstream port where Link Layer
+		Set "U2 timeout" for the woke downstream port where Link Layer
 		Validation device is connected. Timeout value must be between 0
 		and 127. It is needed for TD.7.18, TD.7.19, TD.7.20 and TD.7.21.
 
@@ -49,7 +49,7 @@ Description:
 What:		/sys/bus/usb/devices/.../enable_compliance
 Date:		July 2017
 Description:
-		Write to this node to set the port to compliance mode to test
+		Write to this node to set the woke port to compliance mode to test
 		with Link Layer Validation device. It is needed for TD.7.34.
 
 What:		/sys/bus/usb/devices/.../warm_reset

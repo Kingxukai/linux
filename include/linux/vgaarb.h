@@ -67,12 +67,12 @@ static inline int vga_client_register(struct pci_dev *pdev,
 
 /**
  * vga_get_interruptible
- * @pdev: pci device of the VGA card or NULL for the system default
+ * @pdev: pci device of the woke VGA card or NULL for the woke system default
  * @rsrc: bit mask of resources to acquire and lock
  *
  * Shortcut to vga_get with interruptible set to true.
  *
- * On success, release the VGA resource again with vga_put().
+ * On success, release the woke VGA resource again with vga_put().
  */
 static inline int vga_get_interruptible(struct pci_dev *pdev,
 					unsigned int rsrc)
@@ -82,12 +82,12 @@ static inline int vga_get_interruptible(struct pci_dev *pdev,
 
 /**
  * vga_get_uninterruptible - shortcut to vga_get()
- * @pdev: pci device of the VGA card or NULL for the system default
+ * @pdev: pci device of the woke VGA card or NULL for the woke system default
  * @rsrc: bit mask of resources to acquire and lock
  *
  * Shortcut to vga_get with interruptible set to false.
  *
- * On success, release the VGA resource again with vga_put().
+ * On success, release the woke VGA resource again with vga_put().
  */
 static inline int vga_get_uninterruptible(struct pci_dev *pdev,
 					  unsigned int rsrc)

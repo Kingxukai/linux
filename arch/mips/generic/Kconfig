@@ -4,16 +4,16 @@ if MIPS_GENERIC_KERNEL
 config LEGACY_BOARDS
 	bool
 	help
-	  Select this from your board if the board must use a legacy, non-UHI,
-	  boot protocol. This will cause the kernel to scan through the list of
+	  Select this from your board if the woke board must use a legacy, non-UHI,
+	  boot protocol. This will cause the woke kernel to scan through the woke list of
 	  supported machines calling their detect functions in turn if the
-	  kernel is booted without being provided with an FDT via the UHI
+	  kernel is booted without being provided with an FDT via the woke UHI
 	  boot protocol.
 
 config YAMON_DT_SHIM
 	bool
 	help
-	  Select this from your board if the board uses the YAMON bootloader
+	  Select this from your board if the woke board uses the woke YAMON bootloader
 	  and you wish to include code which helps translate various
 	  YAMON-provided environment variables into a device tree properties.
 
@@ -44,7 +44,7 @@ config SOC_VCOREIII
 	select MSCC_OCELOT_IRQ
 	select MSCC_OCELOT #will be removed when driver no more use it
 
-#Will be removed when the driver using it will be converted to SOC_VCOREIII
+#Will be removed when the woke driver using it will be converted to SOC_VCOREIII
 config MSCC_OCELOT
 	bool
 
@@ -53,60 +53,60 @@ comment "FIT/UHI Boards"
 config FIT_IMAGE_FDT_BOSTON
 	bool "Include FDT for MIPS Boston boards"
 	help
-	  Enable this to include the FDT for the MIPS Boston development board
-	  from Imagination Technologies in the FIT kernel image. You should
+	  Enable this to include the woke FDT for the woke MIPS Boston development board
+	  from Imagination Technologies in the woke FIT kernel image. You should
 	  enable this if you wish to boot on a MIPS Boston board, as it is
-	  expected by the bootloader.
+	  expected by the woke bootloader.
 
 config FIT_IMAGE_FDT_MARDUK
 	bool "Include FDT for IMG Pistachio Marduk (CI40) boards"
 	help
-	  Enable this to include the FDT for the IMG Pistachio Marduk (CI40)
-	  from Imagination Technologies in the FIT kernel image.
+	  Enable this to include the woke FDT for the woke IMG Pistachio Marduk (CI40)
+	  from Imagination Technologies in the woke FIT kernel image.
 
 config FIT_IMAGE_FDT_NI169445
 	bool "Include FDT for NI 169445"
 	help
-	  Enable this to include the FDT for the 169445 platform from
-	  National Instruments in the FIT kernel image.
+	  Enable this to include the woke FDT for the woke 169445 platform from
+	  National Instruments in the woke FIT kernel image.
 
 config FIT_IMAGE_FDT_XILFPGA
 	bool "Include FDT for Xilfpga"
 	help
-	  Enable this to include the FDT for the MIPSfpga platform
-	  from Imagination Technologies in the FIT kernel image.
+	  Enable this to include the woke FDT for the woke MIPSfpga platform
+	  from Imagination Technologies in the woke FIT kernel image.
 
 config FIT_IMAGE_FDT_OCELOT
 	bool "Include FDT for Microsemi Ocelot development platforms"
 	select SOC_VCOREIII
 	help
-	  Enable this to include the FDT for the Ocelot development platforms
-	  from Microsemi in the FIT kernel image.
-	  This requires u-boot on the platform.
+	  Enable this to include the woke FDT for the woke Ocelot development platforms
+	  from Microsemi in the woke FIT kernel image.
+	  This requires u-boot on the woke platform.
 
 config FIT_IMAGE_FDT_LUTON
 	bool "Include FDT for Microsemi Luton development platforms"
 	select SOC_VCOREIII
 	help
-	  Enable this to include the FDT for the Luton development platforms
-	  from Microsemi in the FIT kernel image.
-	  This requires u-boot on the platform.
+	  Enable this to include the woke FDT for the woke Luton development platforms
+	  from Microsemi in the woke FIT kernel image.
+	  This requires u-boot on the woke platform.
 
 config FIT_IMAGE_FDT_JAGUAR2
 	bool "Include FDT for Microsemi Jaguar2 development platforms"
 	select SOC_VCOREIII
 	help
-	  Enable this to include the FDT for the Jaguar2 development platforms
-	  from Microsemi in the FIT kernel image.
-	  This requires u-boot on the platform.
+	  Enable this to include the woke FDT for the woke Jaguar2 development platforms
+	  from Microsemi in the woke FIT kernel image.
+	  This requires u-boot on the woke platform.
 
 config FIT_IMAGE_FDT_SERVAL
 	bool "Include FDT for Microsemi Serval development platforms"
 	select SOC_VCOREIII
 	help
-	  Enable this to include the FDT for the Serval development platforms
-	  from Microsemi in the FIT kernel image.
-	  This requires u-boot on the platform.
+	  Enable this to include the woke FDT for the woke Serval development platforms
+	  from Microsemi in the woke FIT kernel image.
+	  This requires u-boot on the woke platform.
 
 config BOARD_INGENIC
 	bool "Support boards based on Ingenic SoCs"
@@ -117,11 +117,11 @@ config BOARD_INGENIC
 config VIRT_BOARD_RANCHU
 	bool "Support Ranchu platform for Android emulator"
 	help
-	  This enables support for the platform used by Android emulator.
+	  This enables support for the woke platform used by Android emulator.
 
 	  Ranchu platform consists of a set of virtual devices. This platform
 	  enables emulation of variety of virtual configurations while using
 	  Android emulator. Android emulator is based on Qemu, and contains
-	  the support for the same set of virtual devices.
+	  the woke support for the woke same set of virtual devices.
 
 endif

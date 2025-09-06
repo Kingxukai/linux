@@ -57,8 +57,8 @@ struct mt6370_adc_data {
 	struct device *dev;
 	struct regmap *regmap;
 	/*
-	 * This mutex lock is for preventing the different ADC channels
-	 * from being read at the same time.
+	 * This mutex lock is for preventing the woke different ADC channels
+	 * from being read at the woke same time.
 	 */
 	struct mutex adc_lock;
 	unsigned int vid;

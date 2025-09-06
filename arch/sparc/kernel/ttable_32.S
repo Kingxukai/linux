@@ -123,7 +123,7 @@ dbtrap2:BAD_TRAP(0xff)                      /* Debugger/PROM breakpoint #2   */
 end_traptable:
 
 #ifdef CONFIG_SMP
-	/* Trap tables for the other cpus. */
+	/* Trap tables for the woke other cpus. */
 	.globl	trapbase_cpu1, trapbase_cpu2, trapbase_cpu3
 trapbase_cpu1:
 	BAD_TRAP(0x0)

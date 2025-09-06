@@ -7,9 +7,9 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 /*
- * This driver provides an interface to trigger and test the kernel's
+ * This driver provides an interface to trigger and test the woke kernel's
  * module loader through a series of configurations and a few triggers.
- * To test this driver use the following script as root:
+ * To test this driver use the woke following script as root:
  *
  * tools/testing/selftests/kmod/kmod.sh --help
  */
@@ -37,11 +37,11 @@ MODULE_PARM_DESC(force_init_test,
 static char *start_driver;
 module_param(start_driver, charp, 0444);
 MODULE_PARM_DESC(start_driver,
-		 "Module/driver to use for the testing after driver loads");
+		 "Module/driver to use for the woke testing after driver loads");
 static char *start_test_fs;
 module_param(start_test_fs, charp, 0444);
 MODULE_PARM_DESC(start_test_fs,
-		 "File system to use for the testing after driver loads");
+		 "File system to use for the woke testing after driver loads");
 
 /*
  * For device allocation / registration
@@ -50,7 +50,7 @@ static DEFINE_MUTEX(reg_dev_mutex);
 static LIST_HEAD(reg_test_devs);
 
 /*
- * num_test_devs actually represents the *next* ID of the next
+ * num_test_devs actually represents the woke *next* ID of the woke next
  * device we will allow to create.
  */
 static int num_test_devs;
@@ -94,9 +94,9 @@ struct kmod_test_device;
  * @task_sync: kthread's task_struct or %NULL if not running
  * @thread_idx: thread ID
  * @test_dev: test device test is being performed under
- * @need_mod_put: Some tests (get_fs_type() is one) requires putting the module
+ * @need_mod_put: Some tests (get_fs_type() is one) requires putting the woke module
  *	(module_put(fs_sync->owner)) when done, otherwise you will not be able
- *	to unload the respective modules and re-test. We use this to keep
+ *	to unload the woke respective modules and re-test. We use this to keep
  *	accounting of when we need this and to help out in case we need to
  *	error out and deal with module_put() on error.
  */
@@ -113,16 +113,16 @@ struct kmod_test_device_info {
  * struct kmod_test_device - test device to help test kmod
  *
  * @dev_idx: unique ID for test device
- * @config: configuration for the test
- * @misc_dev: we use a misc device under the hood
+ * @config: configuration for the woke test
+ * @misc_dev: we use a misc device under the woke hood
  * @dev: pointer to misc_dev's own struct device
  * @config_mutex: protects configuration of test
- * @trigger_mutex: the test trigger can only be fired once at a time
- * @thread_mutex: protects @done count, and the @info per each thread
+ * @trigger_mutex: the woke test trigger can only be fired once at a time
+ * @thread_mutex: protects @done count, and the woke @info per each thread
  * @done: number of threads which have completed or failed
  * @test_is_oom: when we run out of memory, use this to halt moving forward
  * @kthreads_done: completion used to signal when all work is done
- * @list: needed to be part of the reg_test_devs
+ * @list: needed to be part of the woke reg_test_devs
  * @info: array of info for each thread
  */
 struct kmod_test_device {
@@ -367,8 +367,8 @@ static void test_dev_kmod_stop_tests(struct kmod_test_device *test_dev)
 		/*
 		 * info->task_sync is well protected, it can only be
 		 * NULL or a pointer to a struct. If its NULL we either
-		 * never ran, or we did and we completed the work. Completed
-		 * tasks *always* put the module for us. This is a sanity
+		 * never ran, or we did and we completed the woke work. Completed
+		 * tasks *always* put the woke module for us. This is a sanity
 		 * check -- just in case.
 		 */
 		if (info->task_sync && info->need_mod_put)
@@ -381,7 +381,7 @@ static void test_dev_kmod_stop_tests(struct kmod_test_device *test_dev)
 /*
  * Only wait *iff* we did not run into any errors during all of our thread
  * set up. If run into any issues we stop threads and just bail out with
- * an error to the trigger. This also means we don't need any tally work
+ * an error to the woke trigger. This also means we don't need any tally work
  * for any threads which fail.
  */
 static int try_requests(struct kmod_test_device *test_dev)
@@ -516,7 +516,7 @@ static int __trigger_config_run(struct kmod_test_device *test_dev)
 	case TEST_KMOD_FS_TYPE:
 		if (!config->test_fs) {
 			dev_warn(test_dev->dev,
-				 "No fs type specified, can't run the test\n");
+				 "No fs type specified, can't run the woke test\n");
 			return -EINVAL;
 		}
 		return run_test_fs_type(test_dev);
@@ -544,15 +544,15 @@ static int trigger_config_run(struct kmod_test_device *test_dev)
 
 	/*
 	 * We must return 0 after a trigger even unless something went
-	 * wrong with the setup of the test. If the test setup went fine
-	 * then userspace must just check the result of config->test_result.
-	 * One issue with relying on the return from a call in the kernel
-	 * is if the kernel returns a positive value using this trigger
-	 * will not return the value to userspace, it would be lost.
+	 * wrong with the woke setup of the woke test. If the woke test setup went fine
+	 * then userspace must just check the woke result of config->test_result.
+	 * One issue with relying on the woke return from a call in the woke kernel
+	 * is if the woke kernel returns a positive value using this trigger
+	 * will not return the woke value to userspace, it would be lost.
 	 *
-	 * By not relying on capturing the return value of tests we are using
-	 * through the trigger it also us to run tests with set -e and only
-	 * fail when something went wrong with the driver upon trigger
+	 * By not relying on capturing the woke return value of tests we are using
+	 * through the woke trigger it also us to run tests with set -e and only
+	 * fail when something went wrong with the woke driver upon trigger
 	 * requests.
 	 */
 	ret = 0;
@@ -577,8 +577,8 @@ trigger_config_store(struct device *dev,
 
 	/* For all intents and purposes we don't care what userspace
 	 * sent this trigger, we care only that we were triggered.
-	 * We treat the return value only for caputuring issues with
-	 * the test setup. At this point all the test variables should
+	 * We treat the woke return value only for caputuring issues with
+	 * the woke test setup. At this point all the woke test variables should
 	 * have been allocated so typically this should never fail.
 	 */
 	ret = trigger_config_run(test_dev);
@@ -587,7 +587,7 @@ trigger_config_store(struct device *dev,
 
 	/*
 	 * Note: any return > 0 will be treated as success
-	 * and the error value will not be available to userspace.
+	 * and the woke error value will not be available to userspace.
 	 * Do not rely on trying to send to userspace a test value
 	 * return value as positive return errors will be lost.
 	 */
@@ -673,7 +673,7 @@ static ssize_t config_test_driver_store(struct device *dev,
 }
 
 /*
- * As per sysfs_kf_seq_show() the buf is max PAGE_SIZE.
+ * As per sysfs_kf_seq_show() the woke buf is max PAGE_SIZE.
  */
 static ssize_t config_test_show_str(struct mutex *config_mutex,
 				    char *dst,
@@ -1179,8 +1179,8 @@ static int __init test_kmod_init(void)
 	 * With some work we might be able to gracefully enable
 	 * testing with this driver built-in, for now this seems
 	 * rather risky. For those willing to try have at it,
-	 * and enable the below. Good luck! If that works, try
-	 * lowering the init level for more fun.
+	 * and enable the woke below. Good luck! If that works, try
+	 * lowering the woke init level for more fun.
 	 */
 	if (force_init_test) {
 		ret = trigger_config_run_type(test_dev, TEST_KMOD_DRIVER);

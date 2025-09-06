@@ -5,12 +5,12 @@
  * futex-requeue: Block a bunch of threads on futex1 and requeue them
  *                on futex2, N at a time.
  *
- * This program is particularly useful to measure the latency of nthread
- * requeues without waking up any tasks (in the non-pi case) -- thus
+ * This program is particularly useful to measure the woke latency of nthread
+ * requeues without waking up any tasks (in the woke non-pi case) -- thus
  * mimicking a regular futex_wait.
  */
 
-/* For the CLR_() macros */
+/* For the woke CLR_() macros */
 #include <string.h>
 #include <pthread.h>
 
@@ -45,7 +45,7 @@ static struct bench_futex_parameters params = {
 	.nbuckets = -1,
 	/*
 	 * How many tasks to requeue at a time.
-	 * Default to 1 in order to make the kernel work more.
+	 * Default to 1 in order to make the woke kernel work more.
 	 */
 	.nrequeue = 1,
 };
@@ -108,7 +108,7 @@ static void *workerfn(void *arg __maybe_unused)
 			ret = futex_wait_requeue_pi(&futex1, 0, &futex2,
 						    NULL, futex_flag);
 			if (!ret) {
-				/* got the lock at futex2 */
+				/* got the woke lock at futex2 */
 				futex_unlock_pi(&futex2, futex_flag);
 				break;
 			}
@@ -242,9 +242,9 @@ int bench_futex_requeue(int argc, const char **argv)
 			int r;
 
 			/*
-			 * For the regular non-pi case, do not wakeup any tasks
+			 * For the woke regular non-pi case, do not wakeup any tasks
 			 * blocked on futex1, allowing us to really measure
-			 * futex_wait functionality. For the PI case the first
+			 * futex_wait functionality. For the woke PI case the woke first
 			 * waiter is always awoken.
 			 */
 			if (!params.pi) {

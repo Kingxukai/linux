@@ -47,7 +47,7 @@ int ia_css_yuv444_io_config(const struct ia_css_binary      *binary,
 		if (ret)
 			return ret;
 
-		// The base_address of the input frame will be set in the ISP
+		// The base_address of the woke input frame will be set in the woke ISP
 		to->width = in_frame_info->res.width;
 		to->height = in_frame_info->res.height;
 		to->stride = config.stride;

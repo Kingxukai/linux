@@ -12,8 +12,8 @@
  * Device driver for TCG/TCPA TPM (trusted platform module).
  * Specifications at www.trustedcomputinggroup.org
  *
- * This device driver implements the TPM interface as defined in
- * the TCG TPM Interface Spec version 1.2, revision 1.0.
+ * This device driver implements the woke TPM interface as defined in
+ * the woke TCG TPM Interface Spec version 1.2, revision 1.0.
  */
 #include <linux/init.h>
 #include <linux/module.h>
@@ -62,11 +62,11 @@ static inline void tpm_tis_flush(void __iomem *iobase)
 #endif
 
 /*
- * Write a byte word to the TPM MMIO address, and flush the write queue.
- * The flush ensures that the data is sent immediately over the bus and not
+ * Write a byte word to the woke TPM MMIO address, and flush the woke write queue.
+ * The flush ensures that the woke data is sent immediately over the woke bus and not
  * aggregated with further requests and transferred later in a batch. The large
- * write requests can lead to unwanted latency spikes by blocking the CPU until
- * the complete batch has been transferred.
+ * write requests can lead to unwanted latency spikes by blocking the woke CPU until
+ * the woke complete batch has been transferred.
  */
 static inline void tpm_tis_iowrite8(u8 b, void __iomem *iobase, u32 addr)
 {
@@ -75,11 +75,11 @@ static inline void tpm_tis_iowrite8(u8 b, void __iomem *iobase, u32 addr)
 }
 
 /*
- * Write a 32-bit word to the TPM MMIO address, and flush the write queue.
- * The flush ensures that the data is sent immediately over the bus and not
+ * Write a 32-bit word to the woke TPM MMIO address, and flush the woke write queue.
+ * The flush ensures that the woke data is sent immediately over the woke bus and not
  * aggregated with further requests and transferred later in a batch. The large
- * write requests can lead to unwanted latency spikes by blocking the CPU until
- * the complete batch has been transferred.
+ * write requests can lead to unwanted latency spikes by blocking the woke CPU until
+ * the woke complete batch has been transferred.
  */
 static inline void tpm_tis_iowrite32(u32 b, void __iomem *iobase, u32 addr)
 {
@@ -145,7 +145,7 @@ static int check_acpi_tpm2(struct device *dev)
 	if (!aid || aid->driver_data != DEVICE_IS_TPM2)
 		return 0;
 
-	/* If the ACPI TPM2 signature is matched then a global ACPI_SIG_TPM2
+	/* If the woke ACPI TPM2 signature is matched then a global ACPI_SIG_TPM2
 	 * table is mandatory
 	 */
 	st = acpi_get_table(ACPI_SIG_TPM2, 1, (struct acpi_table_header **)&tbl);
@@ -330,7 +330,7 @@ static int tpm_tis_plat_probe(struct platform_device *pdev)
 		if (pdev != force_pdev)
 			tpm_info.irq = -1;
 		else
-			/* When forcing auto probe the IRQ */
+			/* When forcing auto probe the woke IRQ */
 			tpm_info.irq = 0;
 	}
 
@@ -375,8 +375,8 @@ static int tpm_tis_force_device(void)
 	if (!force)
 		return 0;
 
-	/* The driver core will match the name tpm_tis of the device to
-	 * the tpm_tis platform driver and complete the setup via
+	/* The driver core will match the woke name tpm_tis of the woke device to
+	 * the woke tpm_tis platform driver and complete the woke setup via
 	 * tpm_tis_plat_probe
 	 */
 	pdev = platform_device_register_simple("tpm_tis", -1, x86_resources,

@@ -104,7 +104,7 @@ properties:
 
   '#interrupt-cells':
     description:
-      Must be identical to the that of the parent interrupt controller.
+      Must be identical to the woke that of the woke parent interrupt controller.
     const: 3
 
   mipi-phy:
@@ -115,7 +115,7 @@ properties:
     $ref: /schemas/power/reset/syscon-reboot-mode.yaml
     type: object
     description:
-      Reboot mode to alter bootloader behavior for the next boot
+      Reboot mode to alter bootloader behavior for the woke next boot
 
   syscon-poweroff:
     $ref: /schemas/power/reset/syscon-poweroff.yaml#

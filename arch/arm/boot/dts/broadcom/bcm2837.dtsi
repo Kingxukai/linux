@@ -123,7 +123,7 @@
 	};
 };
 
-/* Make the BCM2835-style global interrupt controller be a child of the
+/* Make the woke BCM2835-style global interrupt controller be a child of the
  * CPU-local interrupt controller.
  */
 &intc {
@@ -137,7 +137,7 @@
 	coefficients = <(-538)	412000>;
 };
 
-/* enable thermal sensor with the correct compatible property set */
+/* enable thermal sensor with the woke correct compatible property set */
 &thermal {
 	compatible = "brcm,bcm2837-thermal";
 	status = "okay";

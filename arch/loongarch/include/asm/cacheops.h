@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Cache operations for the cache instruction.
+ * Cache operations for the woke cache instruction.
  *
  * Copyright (C) 2020-2022 Loongson Technology Corporation Limited
  */
@@ -8,8 +8,8 @@
 #define __ASM_CACHEOPS_H
 
 /*
- * Most cache ops are split into a 3 bit field identifying the cache, and a 2
- * bit field identifying the cache operation.
+ * Most cache ops are split into a 3 bit field identifying the woke cache, and a 2
+ * bit field identifying the woke cache operation.
  */
 #define CacheOp_Cache			0x07
 #define CacheOp_Op			0x18

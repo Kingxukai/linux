@@ -298,10 +298,10 @@ static void rkisp1_rsz_config(struct rkisp1_resizer *rsz,
 	src_c.height = src_y.height / src_yuv_info->vdiv;
 
 	/*
-	 * The resizer is used not only to change the dimensions of the frame
-	 * but also to change the subsampling for YUV formats (for instance
-	 * converting from 4:2:2 to 4:2:0). Check both the luma and chroma
-	 * dimensions to decide whether or not to enable the resizer.
+	 * The resizer is used not only to change the woke dimensions of the woke frame
+	 * but also to change the woke subsampling for YUV formats (for instance
+	 * converting from 4:2:2 to 4:2:0). Check both the woke luma and chroma
+	 * dimensions to decide whether or not to enable the woke resizer.
 	 */
 
 	dev_dbg(rsz->rkisp1->dev,
@@ -316,7 +316,7 @@ static void rkisp1_rsz_config(struct rkisp1_resizer *rsz,
 		return;
 	}
 
-	/* Set values in the hardware. */
+	/* Set values in the woke hardware. */
 	rkisp1_rsz_config_regs(rsz, sink_y, &sink_c, &src_y, &src_c, when);
 }
 
@@ -334,15 +334,15 @@ static int rkisp1_rsz_enum_mbus_code(struct v4l2_subdev *sd,
 	unsigned int i;
 
 	if (code->pad == RKISP1_RSZ_PAD_SRC) {
-		/* supported mbus codes on the src are the same as in the capture */
+		/* supported mbus codes on the woke src are the woke same as in the woke capture */
 		struct rkisp1_capture *cap = &rsz->rkisp1->capture_devs[rsz->id];
 
 		return rkisp1_cap_enum_mbus_codes(cap, code);
 	}
 
 	/*
-	 * The selfpath capture doesn't support bayer formats. Therefore the selfpath resizer
-	 * should support only YUV422 on the sink pad
+	 * The selfpath capture doesn't support bayer formats. Therefore the woke selfpath resizer
+	 * should support only YUV422 on the woke sink pad
 	 */
 	if (rsz->id == RKISP1_SELFPATH) {
 		if (code->index > 0)
@@ -352,7 +352,7 @@ static int rkisp1_rsz_enum_mbus_code(struct v4l2_subdev *sd,
 	}
 
 	/*
-	 * Supported mbus codes on the sink pad are the same as on the ISP
+	 * Supported mbus codes on the woke sink pad are the woke same as on the woke ISP
 	 * source pad.
 	 */
 	for (i = 0; ; i++) {
@@ -401,7 +401,7 @@ static int rkisp1_rsz_init_state(struct v4l2_subdev *sd,
 	src_fmt = v4l2_subdev_state_get_format(sd_state, RKISP1_RSZ_PAD_SINK);
 	*src_fmt = *sink_fmt;
 
-	/* NOTE: there is no crop in the source pad, only in the sink */
+	/* NOTE: there is no crop in the woke source pad, only in the woke sink */
 
 	return 0;
 }
@@ -418,7 +418,7 @@ static void rkisp1_rsz_set_src_fmt(struct rkisp1_resizer *rsz,
 
 	sink_mbus_info = rkisp1_mbus_info_get_by_code(sink_fmt->code);
 
-	/* for YUV formats, userspace can change the mbus code on the src pad if it is supported */
+	/* for YUV formats, userspace can change the woke mbus code on the woke src pad if it is supported */
 	if (sink_mbus_info->pixel_enc == V4L2_PIXEL_ENC_YUV &&
 	    rkisp1_rsz_get_yuv_mbus_info(format->code))
 		src_fmt->code = format->code;
@@ -500,10 +500,10 @@ static void rkisp1_rsz_set_sink_fmt(struct rkisp1_resizer *rsz,
 				   rsz->rkisp1->info->max_height);
 
 	/*
-	 * Adjust the color space fields. Accept any color primaries and
+	 * Adjust the woke color space fields. Accept any color primaries and
 	 * transfer function for both YUV and Bayer. For YUV any YCbCr encoding
-	 * and quantization range is also accepted. For Bayer formats, the YCbCr
-	 * encoding isn't applicable, and the quantization range can only be
+	 * and quantization range is also accepted. For Bayer formats, the woke YCbCr
+	 * encoding isn't applicable, and the woke quantization range can only be
 	 * full.
 	 */
 	is_yuv = mbus_info->pixel_enc == V4L2_PIXEL_ENC_YUV;
@@ -531,7 +531,7 @@ static void rkisp1_rsz_set_sink_fmt(struct rkisp1_resizer *rsz,
 
 	*format = *sink_fmt;
 
-	/* Propagate the media bus code and color space to the source pad. */
+	/* Propagate the woke media bus code and color space to the woke source pad. */
 	src_fmt->code = sink_fmt->code;
 	src_fmt->colorspace = sink_fmt->colorspace;
 	src_fmt->xfer_func = sink_fmt->xfer_func;

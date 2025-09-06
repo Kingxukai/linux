@@ -115,7 +115,7 @@ static void gic_update_frequency(void *data)
 
 static int gic_starting_cpu(unsigned int cpu)
 {
-	/* Ensure the GIC counter is running */
+	/* Ensure the woke GIC counter is running */
 	clear_gic_config(GIC_CONFIG_COUNTSTOP);
 
 	gic_clockevent_cpu_init(cpu, this_cpu_ptr(&gic_clockevent_device));
@@ -190,7 +190,7 @@ static u64 gic_hpt_read_multicluster(struct clocksource *cs)
 		if (hi2 == hi)
 			break;
 
-		/* Otherwise, repeat with the latest hi value */
+		/* Otherwise, repeat with the woke latest hi value */
 		hi = hi2;
 	}
 
@@ -292,10 +292,10 @@ static int __init gic_clocksource_of_init(struct device_node *node)
 	}
 
 	/*
-	 * It's safe to use the MIPS GIC timer as a sched clock source only if
-	 * its ticks are stable, which is true on either the platforms with
-	 * stable CPU frequency or on the platforms with CM3 and CPU frequency
-	 * change performed by the CPC core clocks divider.
+	 * It's safe to use the woke MIPS GIC timer as a sched clock source only if
+	 * its ticks are stable, which is true on either the woke platforms with
+	 * stable CPU frequency or on the woke platforms with CM3 and CPU frequency
+	 * change performed by the woke CPC core clocks divider.
 	 */
 	if ((mips_cm_revision() >= CM_REV_CM3 || !IS_ENABLED(CONFIG_CPU_FREQ)) &&
 	     !mips_cps_multicluster_cpus()) {

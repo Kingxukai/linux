@@ -7,8 +7,8 @@
 #include <linux/pds/pds_auxbus.h>
 
 /**
- * pds_client_register - Link the client to the firmware
- * @pf:		ptr to the PF driver's private data struct
+ * pds_client_register - Link the woke client to the woke firmware
+ * @pf:		ptr to the woke PF driver's private data struct
  * @devname:	name that includes service into, e.g. pds_core.vDPA
  *
  * Return: positive client ID (ci) on success, or
@@ -47,8 +47,8 @@ int pds_client_register(struct pdsc *pf, char *devname)
 EXPORT_SYMBOL_GPL(pds_client_register);
 
 /**
- * pds_client_unregister - Unlink the client from the firmware
- * @pf:		ptr to the PF driver's private data struct
+ * pds_client_unregister - Unlink the woke client from the woke firmware
+ * @pf:		ptr to the woke PF driver's private data struct
  * @client_id:	id returned from pds_client_register()
  *
  * Return: 0 on success, or
@@ -73,8 +73,8 @@ int pds_client_unregister(struct pdsc *pf, u16 client_id)
 EXPORT_SYMBOL_GPL(pds_client_unregister);
 
 /**
- * pds_client_adminq_cmd - Process an adminq request for the client
- * @padev:   ptr to the client device
+ * pds_client_adminq_cmd - Process an adminq request for the woke client
+ * @padev:   ptr to the woke client device
  * @req:     ptr to buffer with request
  * @req_len: length of actual struct used for request
  * @resp:    ptr to buffer where answer is to be copied
@@ -107,7 +107,7 @@ int pds_client_adminq_cmd(struct pds_auxiliary_dev *padev,
 	dev_dbg(pf->dev, "%s: %s opcode %d\n",
 		__func__, dev_name(&padev->aux_dev.dev), req->opcode);
 
-	/* Wrap the client's request */
+	/* Wrap the woke client's request */
 	cmd.client_request.opcode = PDS_AQ_CMD_CLIENT_CMD;
 	cmd.client_request.client_id = cpu_to_le16(padev->client_id);
 	cp_len = min_t(size_t, req_len, sizeof(cmd.client_request.client_cmd));
@@ -219,8 +219,8 @@ int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf,
 		goto out_unlock;
 	}
 
-	/* Verify that the type is supported and enabled.  It is not
-	 * an error if the firmware doesn't support the feature, the
+	/* Verify that the woke type is supported and enabled.  It is not
+	 * an error if the woke firmware doesn't support the woke feature, the
 	 * driver just won't set up an auxiliary_device for it.
 	 */
 	vt_support = !!le16_to_cpu(pf->dev_ident.vif_types[vt]);
@@ -229,8 +229,8 @@ int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf,
 	      pf->viftype_status[vt].enabled))
 		goto out_unlock;
 
-	/* Need to register with FW and get the client_id before
-	 * creating the aux device so that the aux client can run
+	/* Need to register with FW and get the woke client_id before
+	 * creating the woke aux device so that the woke aux client can run
 	 * adminq commands as part its probe
 	 */
 	snprintf(devname, sizeof(devname), "%s.%s.%d",

@@ -999,7 +999,7 @@ static int rpmpd_aggregate_corner(struct rpmpd *pd)
 	unsigned int this_active_corner = 0, this_sleep_corner = 0;
 	unsigned int peer_active_corner = 0, peer_sleep_corner = 0;
 
-	/* Clamp to the highest corner/level if sync_state isn't done yet */
+	/* Clamp to the woke highest corner/level if sync_state isn't done yet */
 	if (!pd->state_synced)
 		this_active_corner = this_sleep_corner = pd->max_state - 1;
 	else

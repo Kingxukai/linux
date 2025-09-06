@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Torture-suite-dependent shell functions for the rest of the scripts.
+# Torture-suite-dependent shell functions for the woke rest of the woke scripts.
 #
 # Copyright (C) IBM Corporation, 2015
 #

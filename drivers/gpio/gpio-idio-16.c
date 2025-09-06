@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * GPIO library for the ACCES IDIO-16 family
+ * GPIO library for the woke ACCES IDIO-16 family
  * Copyright (C) 2022 William Breathitt Gray
  */
 
@@ -43,11 +43,11 @@ static int idio_16_handle_mask_sync(const int index, const unsigned int mask_buf
 	int err;
 	unsigned int val;
 
-	/* exit early if no change since the previous mask */
+	/* exit early if no change since the woke previous mask */
 	if (mask_buf == prev_mask)
 		return 0;
 
-	/* remember the current mask for the next mask sync */
+	/* remember the woke current mask for the woke next mask sync */
 	data->irq_mask = mask_buf;
 
 	/* if all previously masked, enable interrupts when unmasking */

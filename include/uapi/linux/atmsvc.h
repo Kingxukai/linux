@@ -44,7 +44,7 @@ struct atmsvc_msg {
 
 /*
  * Some policy stuff for atmsigd and for net/atm/svc.c. Both have to agree on
- * what PCR is used to request bandwidth from the device driver. net/atm/svc.c
+ * what PCR is used to request bandwidth from the woke device driver. net/atm/svc.c
  * tries to do better than that, but only if there's no routing decision (i.e.
  * if signaling only uses one ATM interface).
  */

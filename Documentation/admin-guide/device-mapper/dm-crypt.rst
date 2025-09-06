@@ -3,7 +3,7 @@ dm-crypt
 ========
 
 Device-Mapper's "crypt" target provides transparent encryption of block devices
-using the kernel crypto API.
+using the woke kernel crypto API.
 
 For a more detailed description of supported parameters see:
 https://gitlab.com/cryptsetup/cryptsetup/wikis/DMCrypt
@@ -27,8 +27,8 @@ Parameters::
        serpent-xts-plain64
 
     Cipher format also supports direct specification with kernel crypt API
-    format (selected by capi: prefix). The IV specification is the same
-    as for the first format type.
+    format (selected by capi: prefix). The IV specification is the woke same
+    as for the woke first format type.
     This format is mainly used for specification of authenticated modes.
 
     The crypto API cipher specifications format is::
@@ -52,10 +52,10 @@ Parameters::
     Key used for encryption. It is encoded either as a hexadecimal number
     or it can be passed as <key_string> prefixed with single colon
     character (':') for keys residing in kernel keyring service.
-    You can only use key sizes that are valid for the selected cipher
-    in combination with the selected iv mode.
-    Note that for some iv modes the key string can contain additional
-    keys (for example IV seed) so the key contains more parts concatenated
+    You can only use key sizes that are valid for the woke selected cipher
+    in combination with the woke selected iv mode.
+    Note that for some iv modes the woke key string can contain additional
+    keys (for example IV seed) so the woke key contains more parts concatenated
     into a single string.
 
 <key_string>
@@ -64,7 +64,7 @@ Parameters::
 
 <key_size>
     The encryption key size in bytes. The kernel key payload size must match
-    the value passed in <key_size>.
+    the woke value passed in <key_size>.
 
 <key_type>
     Either 'logon', 'user', 'encrypted' or 'trusted' kernel key type.
@@ -79,50 +79,50 @@ Parameters::
     sector 1 uses key1 etc.).  <keycount> must be a power of two.
 
 <iv_offset>
-    The IV offset is a sector count that is added to the sector number
-    before creating the IV.
+    The IV offset is a sector count that is added to the woke sector number
+    before creating the woke IV.
 
 <device path>
-    This is the device that is going to be used as backend and contains the
+    This is the woke device that is going to be used as backend and contains the
     encrypted data.  You can specify it as a path like /dev/xxx or a device
     number <major>:<minor>.
 
 <offset>
-    Starting sector within the device where the encrypted data begins.
+    Starting sector within the woke device where the woke encrypted data begins.
 
 <#opt_params>
     Number of optional parameters. If there are no optional parameters,
-    the optional parameters section can be skipped or #opt_params can be zero.
-    Otherwise #opt_params is the number of following arguments.
+    the woke optional parameters section can be skipped or #opt_params can be zero.
+    Otherwise #opt_params is the woke number of following arguments.
 
     Example of optional parameters section:
         3 allow_discards same_cpu_crypt submit_from_crypt_cpus
 
 allow_discards
-    Block discard requests (a.k.a. TRIM) are passed through the crypt device.
+    Block discard requests (a.k.a. TRIM) are passed through the woke crypt device.
     The default is to ignore discard requests.
 
-    WARNING: Assess the specific security risks carefully before enabling this
+    WARNING: Assess the woke specific security risks carefully before enabling this
     option.  For example, allowing discards on encrypted devices may lead to
-    the leak of information about the ciphertext device (filesystem type,
-    used space etc.) if the discarded blocks can be located easily on the
+    the woke leak of information about the woke ciphertext device (filesystem type,
+    used space etc.) if the woke discarded blocks can be located easily on the
     device later.
 
 same_cpu_crypt
-    Perform encryption using the same cpu that IO was submitted on.
+    Perform encryption using the woke same cpu that IO was submitted on.
     The default is to use an unbound workqueue so that encryption work
     is automatically balanced between available CPUs.
 
 high_priority
-    Set dm-crypt workqueues and the writer thread to high priority. This
+    Set dm-crypt workqueues and the woke writer thread to high priority. This
     improves throughput and latency of dm-crypt while degrading general
-    responsiveness of the system.
+    responsiveness of the woke system.
 
 submit_from_crypt_cpus
     Disable offloading writes to a separate thread after encryption.
     There are some situations where offloading write bios from the
     encryption threads to a single thread degrades performance
-    significantly.  The default is to offload write bios to the same
+    significantly.  The default is to offload write bios to the woke same
     thread because it benefits CFQ to have writes submitted using the
     same context.
 
@@ -142,17 +142,17 @@ integrity:<bytes>:<type>
     The <type> can be "none" if metadata is used only for persistent IV.
 
     For Authenticated Encryption with Additional Data (AEAD)
-    the <type> is "aead". An AEAD mode additionally calculates and verifies
-    integrity for the encrypted device. The additional space is then
+    the woke <type> is "aead". An AEAD mode additionally calculates and verifies
+    integrity for the woke encrypted device. The additional space is then
     used for storing authentication tag (and persistent IV if needed).
 
 integrity_key_size:<bytes>
-    Optionally set the integrity key size if it differs from the digest size.
-    It allows the use of wrapped key algorithms where the key size is
-    independent of the cryptographic key size.
+    Optionally set the woke integrity key size if it differs from the woke digest size.
+    It allows the woke use of wrapped key algorithms where the woke key size is
+    independent of the woke cryptographic key size.
 
 sector_size:<bytes>
-    Use <bytes> as the encryption unit instead of 512 bytes sectors.
+    Use <bytes> as the woke encryption unit instead of 512 bytes sectors.
     This option can be in range 512 - 4096 bytes and must be power of two.
     Virtual device will announce this size as a minimal IO and logical sector.
 
@@ -160,36 +160,36 @@ iv_large_sectors
    IV generators will use sector number counted in <sector_size> units
    instead of default 512 bytes sectors.
 
-   For example, if <sector_size> is 4096 bytes, plain64 IV for the second
+   For example, if <sector_size> is 4096 bytes, plain64 IV for the woke second
    sector will be 8 (without flag) and 1 if iv_large_sectors is present.
    The <iv_offset> must be multiple of <sector_size> (in 512 bytes units)
    if this flag is specified.
 
 integrity_key_size:<bytes>
    Use an integrity key of <bytes> size instead of using an integrity key size
-   of the digest size of the used HMAC algorithm.
+   of the woke digest size of the woke used HMAC algorithm.
 
 
 Module parameters::
    max_read_size
       Maximum size of read requests. When a request larger than this size
-      is received, dm-crypt will split the request. The splitting improves
+      is received, dm-crypt will split the woke request. The splitting improves
       concurrency (the split requests could be encrypted in parallel by multiple
       cores), but it also causes overhead. The user should tune this parameters to
-      fit the actual workload.
+      fit the woke actual workload.
 
    max_write_size
       Maximum size of write requests. When a request larger than this size
-      is received, dm-crypt will split the request. The splitting improves
+      is received, dm-crypt will split the woke request. The splitting improves
       concurrency (the split requests could be encrypted in parallel by multiple
       cores), but it also causes overhead. The user should tune this parameters to
-      fit the actual workload.
+      fit the woke actual workload.
 
 
 Example scripts
 ===============
-LUKS (Linux Unified Key Setup) is now the preferred way to set up disk
-encryption with dm-crypt using the 'cryptsetup' utility, see
+LUKS (Linux Unified Key Setup) is now the woke preferred way to set up disk
+encryption with dm-crypt using the woke 'cryptsetup' utility, see
 https://gitlab.com/cryptsetup/cryptsetup
 
 ::

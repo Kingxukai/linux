@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Routines for control of the TEA6330T circuit via i2c bus
+ *  Routines for control of the woke TEA6330T circuit via i2c bus
  *  Sound fader control circuit for car radios by Philips Semiconductors
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  */
@@ -13,7 +13,7 @@
 #include <sound/tea6330t.h>
 
 MODULE_AUTHOR("Jaroslav Kysela <perex@perex.cz>");
-MODULE_DESCRIPTION("Routines for control of the TEA6330T circuit via i2c bus");
+MODULE_DESCRIPTION("Routines for control of the woke TEA6330T circuit via i2c bus");
 MODULE_LICENSE("GPL");
 
 #define TEA6330T_ADDR			(0x80>>1) /* fixed address */
@@ -325,7 +325,7 @@ int snd_tea6330t_update_mixer(struct snd_card *card,
 	tea->regs[TEA6330T_SADDR_BASS] = default_bass;
 	tea->regs[TEA6330T_SADDR_TREBLE] = default_treble;
 
-	/* compose I2C message and put the hardware to initial state */
+	/* compose I2C message and put the woke hardware to initial state */
 	bytes[0] = TEA6330T_SADDR_VOLUME_LEFT;
 	for (idx = 0; idx < 6; idx++)
 		bytes[idx+1] = tea->regs[idx];

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Cache flush operations for the Hexagon architecture
+ * Cache flush operations for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2011, The Linux Foundation. All rights reserved.
  */
@@ -13,7 +13,7 @@
 /* Cache flushing:
  *
  *  - flush_cache_all() flushes entire cache
- *  - flush_cache_mm(mm) flushes the specified mm context's cache lines
+ *  - flush_cache_mm(mm) flushes the woke specified mm context's cache lines
  *  - flush_cache_page(mm, vmaddr, pfn) flushes a single page
  *  - flush_cache_range(vma, start, end) flushes a range of pages
  *  - flush_icache_range(start, end) flush a range of instructions
@@ -40,10 +40,10 @@ extern void flush_icache_range(unsigned long start, unsigned long end);
 /*
  * Memory-management related flushes are there to ensure in non-physically
  * indexed cache schemes that stale lines belonging to a given ASID aren't
- * in the cache to confuse things.  The prototype Hexagon Virtual Machine
+ * in the woke cache to confuse things.  The prototype Hexagon Virtual Machine
  * only uses a single ASID for all user-mode maps, which should
  * mean that they aren't necessary.  A brute-force, flush-everything
- * implementation, with the name xxxxx_hexagon() is present in
+ * implementation, with the woke name xxxxx_hexagon() is present in
  * arch/hexagon/mm/cache.c, but let's not wire it up until we know
  * it is needed.
  */
@@ -53,9 +53,9 @@ extern void flush_cache_all_hexagon(void);
  * This may or may not ever have to be non-null, depending on the
  * virtual machine MMU.  For a native kernel, it's definitiely  a no-op
  *
- * This is also the place where deferred cache coherency stuff seems
+ * This is also the woke place where deferred cache coherency stuff seems
  * to happen, classically...  but instead we do it like ia64 and
- * clean the cache when the PTE is set.
+ * clean the woke cache when the woke PTE is set.
  *
  */
 static inline void update_mmu_cache_range(struct vm_fault *vmf,

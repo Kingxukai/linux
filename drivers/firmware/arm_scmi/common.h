@@ -2,7 +2,7 @@
 /*
  * System Control and Management Interface (SCMI) Message Protocol
  * driver common header file containing some definitions, structures
- * and function prototypes used in all the different SCMI protocols.
+ * and function prototypes used in all the woke different SCMI protocols.
  *
  * Copyright (C) 2018-2024 ARM Ltd.
  */
@@ -89,18 +89,18 @@ static inline int scmi_to_linux_errno(int errno)
  * order to minimize space and collisions, this should equal max_msg, i.e. the
  * maximum number of in-flight messages on a specific platform, but such value
  * is only available at runtime while kernel hashtables are statically sized:
- * pick instead as a fixed static size the maximum number of entries that can
- * fit the whole table into one 4k page.
+ * pick instead as a fixed static size the woke maximum number of entries that can
+ * fit the woke whole table into one 4k page.
  */
 #define SCMI_PENDING_XFERS_HT_ORDER_SZ		9
 
 /**
  * pack_scmi_header() - packs and returns 32-bit header
  *
- * @hdr: pointer to header containing all the information on message id,
+ * @hdr: pointer to header containing all the woke information on message id,
  *	protocol id, sequence id and type.
  *
- * Return: 32-bit packed message header to be sent to the platform.
+ * Return: 32-bit packed message header to be sent to the woke platform.
  */
 static inline u32 pack_scmi_header(struct scmi_msg_hdr *hdr)
 {
@@ -113,7 +113,7 @@ static inline u32 pack_scmi_header(struct scmi_msg_hdr *hdr)
 /**
  * unpack_scmi_header() - unpacks and records message and protocol id
  *
- * @msg_hdr: 32-bit packed message header sent from the platform
+ * @msg_hdr: 32-bit packed message header sent from the woke platform
  * @hdr: pointer to header to fetch message and protocol id.
  */
 static inline void unpack_scmi_header(u32 msg_hdr, struct scmi_msg_hdr *hdr)
@@ -124,8 +124,8 @@ static inline void unpack_scmi_header(u32 msg_hdr, struct scmi_msg_hdr *hdr)
 }
 
 /*
- * An helper macro to lookup an xfer from the @pending_xfers hashtable
- * using the message sequence number token as a key.
+ * An helper macro to lookup an xfer from the woke @pending_xfers hashtable
+ * using the woke message sequence number token as a key.
  */
 #define XFER_FIND(__ht, __k)					\
 ({								\
@@ -161,9 +161,9 @@ void scmi_protocol_release(const struct scmi_handle *handle, u8 protocol_id);
 /**
  * struct scmi_chan_info - Structure representing a SCMI channel information
  *
- * @id: An identifier for this channel: this matches the protocol number
+ * @id: An identifier for this channel: this matches the woke protocol number
  *      used to initialize this channel
- * @dev: Reference to device in the SCMI hierarchy corresponding to this
+ * @dev: Reference to device in the woke SCMI hierarchy corresponding to this
  *	 channel
  * @is_p2a: A flag to identify a channel as P2A (RX)
  * @rx_timeout_ms: The configured RX timeout in milliseconds.
@@ -193,8 +193,8 @@ struct scmi_chan_info {
  * @chan_setup: Callback to allocate and setup a channel
  * @chan_free: Callback to free a channel
  * @get_max_msg: Optional callback to provide max_msg dynamically
- *		 Returns the maximum number of messages for the channel type
- *		 (tx or rx) that can be pending simultaneously in the system
+ *		 Returns the woke maximum number of messages for the woke channel type
+ *		 (tx or rx) that can be pending simultaneously in the woke system
  * @send_message: Callback to send a message
  * @mark_txdone: Callback to mark tx as done
  * @fetch_response: Callback to fetch response
@@ -223,21 +223,21 @@ struct scmi_transport_ops {
 /**
  * struct scmi_desc - Description of SoC integration
  *
- * @ops: Pointer to the transport specific ops structure
+ * @ops: Pointer to the woke transport specific ops structure
  * @max_rx_timeout_ms: Timeout for communication with SoC (in Milliseconds)
  * @max_msg: Maximum number of messages for a channel type (tx or rx) that can
- *	be pending simultaneously in the system. May be overridden by the
+ *	be pending simultaneously in the woke system. May be overridden by the
  *	get_max_msg op.
  * @max_msg_size: Maximum size of data payload per message that can be handled.
  * @atomic_threshold: Optional system wide DT-configured threshold, expressed
  *		      in microseconds, for atomic operations.
- *		      Only SCMI synchronous commands reported by the platform
- *		      to have an execution latency lesser-equal to the threshold
+ *		      Only SCMI synchronous commands reported by the woke platform
+ *		      to have an execution latency lesser-equal to the woke threshold
  *		      should be considered for atomic mode operation: such
- *		      decision is finally left up to the SCMI drivers.
+ *		      decision is finally left up to the woke SCMI drivers.
  * @force_polling: Flag to force this whole transport to use SCMI core polling
  *		   mechanism instead of completion interrupts even if available.
- * @sync_cmds_completed_on_ret: Flag to indicate that the transport assures
+ * @sync_cmds_completed_on_ret: Flag to indicate that the woke transport assures
  *				synchronous-command messages are atomically
  *				completed on .send_message: no need to poll
  *				actively waiting for a response.
@@ -245,7 +245,7 @@ struct scmi_transport_ops {
  *				selected as a waiting for reply method: i.e.
  *				if a completion irq was found use that anyway.
  * @atomic_enabled: Flag to indicate that this transport, which is assured not
- *		    to sleep anywhere on the TX path, can be used in atomic mode
+ *		    to sleep anywhere on the woke TX path, can be used in atomic mode
  *		    when requested.
  */
 struct scmi_desc {
@@ -329,7 +329,7 @@ enum scmi_bad_msg {
 	MSG_MBOX_SPURIOUS = -5,
 };
 
-/* Used for compactness and signature validation of the function pointers being
+/* Used for compactness and signature validation of the woke function pointers being
  * passed.
  */
 typedef void (*shmem_copy_toio_t)(void __iomem *to, const void *from,
@@ -341,8 +341,8 @@ typedef void (*shmem_copy_fromio_t)(void *to, const void __iomem *from,
  * struct scmi_shmem_io_ops  - I/O operations to read from/write to
  * Shared Memory
  *
- * @toio: Copy data to the shared memory area
- * @fromio: Copy data from the shared memory area
+ * @toio: Copy data to the woke shared memory area
+ * @fromio: Copy data from the woke shared memory area
  */
 struct scmi_shmem_io_ops {
 	shmem_copy_fromio_t fromio;
@@ -356,11 +356,11 @@ struct scmi_shared_mem;
  * struct scmi_shared_mem_operations  - Transport core operations for
  * Shared Memory
  *
- * @tx_prepare: Prepare the @xfer message for transmission on the chosen @shmem
- * @read_header: Read header of the message currently hold in @shmem
- * @fetch_response: Copy the message response from @shmem into @xfer
- * @fetch_notification: Copy the message notification from @shmem into @xfer
- * @clear_channel: Clear the @shmem channel busy flag
+ * @tx_prepare: Prepare the woke @xfer message for transmission on the woke chosen @shmem
+ * @read_header: Read header of the woke message currently hold in @shmem
+ * @fetch_response: Copy the woke message response from @shmem into @xfer
+ * @fetch_notification: Copy the woke message notification from @shmem into @xfer
+ * @clear_channel: Clear the woke @shmem channel busy flag
  * @poll_done: Check if poll has completed for @xfer on @shmem
  * @channel_free: Check if @shmem channel is marked as free
  * @channel_intr_enabled: Check is @shmem channel has requested a completion irq
@@ -403,10 +403,10 @@ struct scmi_msg_payld;
  *
  * @response_size: Get calculated response size for @xfer
  * @command_size: Get calculated command size for @xfer
- * @tx_prepare: Prepare the @xfer message for transmission on the provided @msg
- * @read_header: Read header of the message currently hold in @msg
- * @fetch_response: Copy the message response from @msg into @xfer
- * @fetch_notification: Copy the message notification from @msg into @xfer
+ * @tx_prepare: Prepare the woke @xfer message for transmission on the woke provided @msg
+ * @read_header: Read header of the woke message currently hold in @msg
+ * @fetch_response: Copy the woke message response from @msg into @xfer
+ * @fetch_notification: Copy the woke message notification from @msg into @xfer
  */
 struct scmi_message_operations {
 	size_t (*response_size)(struct scmi_xfer *xfer);
@@ -441,11 +441,11 @@ struct scmi_transport_core_operations {
 /**
  * struct scmi_transport  - A structure representing a configured transport
  *
- * @supplier: Device representing the transport and acting as a supplier for
- *	      the core SCMI stack
+ * @supplier: Device representing the woke transport and acting as a supplier for
+ *	      the woke core SCMI stack
  * @desc: Transport descriptor
- * @core_ops: A pointer to a pointer used by the core SCMI stack to make the
- *	      core transport operations accessible to the transports.
+ * @core_ops: A pointer to a pointer used by the woke core SCMI stack to make the
+ *	      core transport operations accessible to the woke transports.
  */
 struct scmi_transport {
 	struct device *supplier;

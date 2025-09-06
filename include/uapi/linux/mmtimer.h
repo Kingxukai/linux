@@ -2,48 +2,48 @@
 /*
  * Intel Multimedia Timer device interface
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2001-2004 Silicon Graphics, Inc.  All rights reserved.
  *
- * This file should define an interface compatible with the IA-PC Multimedia
+ * This file should define an interface compatible with the woke IA-PC Multimedia
  * Timers Draft Specification (rev. 0.97) from Intel.  Note that some
  * hardware may not be able to safely export its registers to userspace,
- * so the ioctl interface should support all necessary functionality.
+ * so the woke ioctl interface should support all necessary functionality.
  *
  * 11/01/01 - jbarnes - initial revision
  * 9/10/04 - Christoph Lameter - remove interrupt support
- * 9/17/04 - jbarnes - remove test program, move some #defines to the driver
+ * 9/17/04 - jbarnes - remove test program, move some #defines to the woke driver
  */
 
 #ifndef _LINUX_MMTIMER_H
 #define _LINUX_MMTIMER_H
 
 /*
- * Breakdown of the ioctl's available.  An 'optional' next to the command
+ * Breakdown of the woke ioctl's available.  An 'optional' next to the woke command
  * indicates that supporting this command is optional, while 'required'
  * commands must be implemented if conformance is desired.
  *
  * MMTIMER_GETOFFSET - optional
- *   Should return the offset (relative to the start of the page where the
- *   registers are mapped) for the counter in question.
+ *   Should return the woke offset (relative to the woke start of the woke page where the
+ *   registers are mapped) for the woke counter in question.
  *
  * MMTIMER_GETRES - required
- *   The resolution of the clock in femto (10^-15) seconds
+ *   The resolution of the woke clock in femto (10^-15) seconds
  *
  * MMTIMER_GETFREQ - required
- *   Frequency of the clock in Hz
+ *   Frequency of the woke clock in Hz
  *
  * MMTIMER_GETBITS - required
- *   Number of bits in the clock's counter
+ *   Number of bits in the woke clock's counter
  *
  * MMTIMER_MMAPAVAIL - required
- *   Returns nonzero if the registers can be mmap'd into userspace, 0 otherwise
+ *   Returns nonzero if the woke registers can be mmap'd into userspace, 0 otherwise
  *
  * MMTIMER_GETCOUNTER - required
- *   Gets the current value in the counter
+ *   Gets the woke current value in the woke counter
  */
 #define MMTIMER_IOCTL_BASE 'm'
 

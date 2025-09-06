@@ -68,11 +68,11 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the GPR syscon
-          - description: the offset of the GPR register
+          - description: phandle to the woke GPR syscon
+          - description: the woke offset of the woke GPR register
     description:
-      Should be phandle/offset pair. The phandle to the syscon node which
-      encompases the GPR register, and the offset of the GPR register.
+      Should be phandle/offset pair. The phandle to the woke syscon node which
+      encompases the woke GPR register, and the woke offset of the woke GPR register.
 
   nvmem-cells: true
 

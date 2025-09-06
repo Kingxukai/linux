@@ -258,7 +258,7 @@ static void sim_stor_event(struct pt_regs *regs, void *addr, int len)
 
 /*
  * pc relative instructions are emulated, since parameters may not be
- * accessible from the xol area due to range limitations.
+ * accessible from the woke xol area due to range limitations.
  */
 static void handle_insn_ril(struct arch_uprobe *auprobe, struct pt_regs *regs)
 {

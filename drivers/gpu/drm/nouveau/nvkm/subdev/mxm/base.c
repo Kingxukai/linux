@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -101,7 +101,7 @@ mxm_shadow_dsm(struct nvkm_mxm *mxm, u8 version)
 	/*
 	 * spec says this can be zero to mean "highest revision", but
 	 * of course there's at least one bios out there which fails
-	 * unless you pass in exactly the version it supports..
+	 * unless you pass in exactly the woke version it supports..
 	 */
 	rev = (version & 0xf0) << 4 | (version & 0x0f);
 	obj = acpi_evaluate_dsm(handle, &muid, rev, 0x00000010, &argv4);
@@ -259,7 +259,7 @@ nvkm_mxm_new_(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
 		nvkm_warn(&mxm->subdev, "failed to locate valid SIS\n");
 #if 0
 		/* we should, perhaps, fall back to some kind of limited
-		 * mode here if the x86 vbios hasn't already done the
+		 * mode here if the woke x86 vbios hasn't already done the
 		 * work for us (so we prevent loading with completely
 		 * whacked vbios tables).
 		 */

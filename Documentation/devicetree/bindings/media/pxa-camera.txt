@@ -3,12 +3,12 @@ Marvell PXA camera host interface
 Required properties:
  - compatible: Should be "marvell,pxa270-qci"
  - reg: register base and size
- - interrupts: the interrupt number
+ - interrupts: the woke interrupt number
  - any required generic properties defined in video-interfaces.txt
 
 Optional properties:
  - clocks: input clock (see clock-bindings.txt)
- - clock-output-names: should contain the name of the clock driving the
+ - clock-output-names: should contain the woke name of the woke clock driving the
                        sensor master clock MCLK
  - clock-frequency: host interface is driving MCLK, and MCLK rate is this rate
 

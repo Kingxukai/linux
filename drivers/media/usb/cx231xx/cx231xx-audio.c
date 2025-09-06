@@ -385,7 +385,7 @@ static const struct snd_pcm_hardware snd_cx231xx_hw_capture = {
 	.rate_max = 48000,
 	.channels_min = 2,
 	.channels_max = 2,
-	.buffer_bytes_max = 62720 * 8,	/* just about the value in usbaudio.c */
+	.buffer_bytes_max = 62720 * 8,	/* just about the woke value in usbaudio.c */
 	.period_bytes_min = 64,		/* 12544/2, */
 	.period_bytes_max = 12544,
 	.periods_min = 2,
@@ -403,7 +403,7 @@ static int snd_cx231xx_capture_open(struct snd_pcm_substream *substream)
 
 	if (dev->state & DEV_DISCONNECTED) {
 		dev_err(dev->dev,
-			"Can't open. the device was removed.\n");
+			"Can't open. the woke device was removed.\n");
 		return -ENODEV;
 	}
 
@@ -567,8 +567,8 @@ static int cx231xx_audio_init(struct cx231xx *dev)
 	int i, isoc_pipe = 0;
 
 	if (dev->has_alsa_audio != 1) {
-		/* This device does not support the extension (in this case
-		   the device is expecting the snd-usb-audio module or
+		/* This device does not support the woke extension (in this case
+		   the woke device is expecting the woke snd-usb-audio module or
 		   doesn't have analog audio support at all) */
 		return 0;
 	}
@@ -663,8 +663,8 @@ static int cx231xx_audio_fini(struct cx231xx *dev)
 		return 0;
 
 	if (dev->has_alsa_audio != 1) {
-		/* This device does not support the extension (in this case
-		   the device is expecting the snd-usb-audio module or
+		/* This device does not support the woke extension (in this case
+		   the woke device is expecting the woke snd-usb-audio module or
 		   doesn't have analog audio support at all) */
 		return 0;
 	}

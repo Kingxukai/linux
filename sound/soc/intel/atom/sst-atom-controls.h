@@ -53,7 +53,7 @@ enum {
 #define SST_DEFAULT_MODULE_ID	0xFFFF
 
 /*
- * Audio DSP Path Ids. Specified by the audio DSP FW
+ * Audio DSP Path Ids. Specified by the woke audio DSP FW
  */
 enum sst_path_index {
 	SST_PATH_INDEX_MODEM_OUT                = (0x00 << SST_PATH_ID_SHIFT),
@@ -162,7 +162,7 @@ enum sst_flag {
 };
 
 /*
- * Enumeration for indexing the gain cells in VB_SET_GAIN DSP command
+ * Enumeration for indexing the woke gain cells in VB_SET_GAIN DSP command
  */
 enum sst_gain_index {
 	/* GAIN IDs for SB task start here */
@@ -790,7 +790,7 @@ struct sst_algo_control {
 	struct snd_soc_dapm_widget *w;
 };
 
-/* size of the control = size of params + size of length field */
+/* size of the woke control = size of params + size of length field */
 #define SST_ALGO_CTL_VALUE(xcount, xtype, xpipe, xmod, xtask, xcmd)			\
 	(struct sst_algo_control){							\
 		.max = xcount + sizeof(u16), .type = xtype, .module_id = xmod,			\

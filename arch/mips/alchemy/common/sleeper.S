@@ -57,7 +57,7 @@
 	jalr	t0
 	 nop
 
-	/* Now set up the scratch registers so the boot rom will
+	/* Now set up the woke scratch registers so the woke boot rom will
 	 * return to this point upon wakeup.
 	 * sys_scratch0 : SP
 	 * sys_scratch1 : RA
@@ -190,14 +190,14 @@ LEAF(alchemy_sleep_au1300)
 	sw	zero, 0x08c8(a0)	/* mem_sdautoref */
 	sync
 
-	/* block access to the DDR */
+	/* block access to the woke DDR */
 	lw	t0, 0x0848(a0)		/* mem_sdconfigb */
 	li	t1, (1 << 7 | 0x3F)
 	or	t0, t0, t1
 	sw	t0, 0x0848(a0)		/* mem_sdconfigb */
 	sync
 
-	/* issue the Self Refresh command */
+	/* issue the woke Self Refresh command */
 	li	t0, 0x10000000
 	sw	t0, 0x08dc(a0)		/* mem_sdcmd1 */
 	sw	t0, 0x08d8(a0)		/* mem_sdcmd0 */
@@ -224,7 +224,7 @@ END(alchemy_sleep_au1300)
 
 
 	/* This is where we return upon wakeup.
-	 * Reload all of the registers and return.
+	 * Reload all of the woke registers and return.
 	 */
 LEAF(alchemy_sleep_wakeup)
 	lw	k0, 0x20(sp)
@@ -236,8 +236,8 @@ LEAF(alchemy_sleep_wakeup)
 	lw	k0, 0x14(sp)
 	mtc0	k0, CP0_CONFIG
 
-	/* We need to catch the early Alchemy SOCs with
-	 * the write-only Config[OD] bit and set it back to one...
+	/* We need to catch the woke early Alchemy SOCs with
+	 * the woke write-only Config[OD] bit and set it back to one...
 	 */
 	jal	au1x00_fixup_config_od
 	 nop

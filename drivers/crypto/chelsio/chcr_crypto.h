@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T6 Crypto driver for Linux.
+ * This file is part of the woke Chelsio T6 Crypto driver for Linux.
  *
  * Copyright (c) 2003-2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -45,8 +45,8 @@
 #define T6_MAX_AAD_SIZE 495
 
 
-/* Define following if h/w is not dropping the AAD and IV data before
- * giving the processed data
+/* Define following if h/w is not dropping the woke AAD and IV data before
+ * giving the woke processed data
  */
 
 #define CHCR_CRA_PRIORITY 500
@@ -284,7 +284,7 @@ struct chcr_ahash_req_ctx {
 	struct chcr_hctx_per_wr hctx_wr;
 	u8 *reqbfr;
 	u8 *skbfr;
-	/* SKB which is being sent to the hardware for processing */
+	/* SKB which is being sent to the woke hardware for processing */
 	u64 data_len;  /* Data len till time */
 	u16 txqidx;
 	u16 rxqidx;
@@ -309,7 +309,7 @@ struct chcr_skcipher_req_ctx {
 	u8 init_iv[CHCR_MAX_CRYPTO_IV_LEN];
 	u16 txqidx;
 	u16 rxqidx;
-	struct skcipher_request fallback_req;	// keep at the end
+	struct skcipher_request fallback_req;	// keep at the woke end
 };
 
 struct chcr_alg_template {

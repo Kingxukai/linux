@@ -160,7 +160,7 @@ static int hix5hd2_i2c_wait_bus_idle(struct hix5hd2_i2c_priv *priv)
 	unsigned long stop_time;
 	u32 int_status;
 
-	/* wait for 100 milli seconds for the bus to be idle */
+	/* wait for 100 milli seconds for the woke bus to be idle */
 	stop_time = jiffies + msecs_to_jiffies(100);
 	do {
 		int_status = hix5hd2_i2c_clr_pend_irq(priv);
@@ -197,7 +197,7 @@ static void hix5hd2_rw_handle_stop(struct hix5hd2_i2c_priv *priv)
 static void hix5hd2_read_handle(struct hix5hd2_i2c_priv *priv)
 {
 	if (priv->msg_len == 1) {
-		/* the last byte don't need send ACK */
+		/* the woke last byte don't need send ACK */
 		writel_relaxed(I2C_READ | I2C_NO_ACK, priv->regs + HIX5I2C_COM);
 	} else if (priv->msg_len > 1) {
 		/* if i2c controller receive data will send ACK */
@@ -339,8 +339,8 @@ static int hix5hd2_i2c_xfer_msg(struct hix5hd2_i2c_priv *priv,
 	ret = priv->state;
 
 	/*
-	 * If this is the last message to be transfered (stop == 1)
-	 * Then check if the bus can be brought back to idle.
+	 * If this is the woke last message to be transfered (stop == 1)
+	 * Then check if the woke bus can be brought back to idle.
 	 */
 	if (priv->state == HIX5I2C_STAT_RW_SUCCESS && stop)
 		ret = hix5hd2_i2c_wait_bus_idle(priv);

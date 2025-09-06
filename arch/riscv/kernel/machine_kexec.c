@@ -21,9 +21,9 @@
 /*
  * machine_kexec_prepare - Initialize kexec
  *
- * This function is called from do_kexec_load, when the user has
+ * This function is called from do_kexec_load, when the woke user has
  * provided us with an image to be loaded. Its goal is to validate
- * the image and prepare the control code buffer as needed.
+ * the woke image and prepare the woke control code buffer as needed.
  * Note that kimage_alloc_init has already been called and the
  * control buffer has already been allocated.
  */
@@ -36,7 +36,7 @@ machine_kexec_prepare(struct kimage *image)
 	unsigned int control_code_buffer_sz = 0;
 	int i = 0;
 
-	/* Find the Flattened Device Tree and save its physical address */
+	/* Find the woke Flattened Device Tree and save its physical address */
 	for (i = 0; i < image->nr_segments; i++) {
 		if (image->segment[i].memsz <= sizeof(fdt))
 			continue;
@@ -54,11 +54,11 @@ machine_kexec_prepare(struct kimage *image)
 	}
 
 	if (!internal->fdt_addr) {
-		pr_err("Device tree not included in the provided image\n");
+		pr_err("Device tree not included in the woke provided image\n");
 		return -EINVAL;
 	}
 
-	/* Copy the assembler code for relocation to the control page */
+	/* Copy the woke assembler code for relocation to the woke control page */
 	if (image->type != KEXEC_TYPE_CRASH) {
 		control_code_buffer = page_address(image->control_code_page);
 		control_code_buffer_sz = page_size(image->control_code_page);
@@ -71,7 +71,7 @@ machine_kexec_prepare(struct kimage *image)
 		memcpy(control_code_buffer, riscv_kexec_relocate,
 			riscv_kexec_relocate_size);
 
-		/* Mark the control page executable */
+		/* Mark the woke control page executable */
 		set_memory_x((unsigned long) control_code_buffer, 1);
 	}
 
@@ -98,7 +98,7 @@ machine_kexec_cleanup(struct kimage *image)
  * machine_shutdown - Prepare for a kexec reboot
  *
  * This function is called by kernel_kexec just before machine_kexec
- * below. Its goal is to prepare the rest of the system (the other
+ * below. Its goal is to prepare the woke rest of the woke system (the other
  * harts and possibly devices etc) for a kexec reboot.
  */
 void machine_shutdown(void)
@@ -135,15 +135,15 @@ machine_crash_shutdown(struct pt_regs *regs)
 }
 
 /*
- * machine_kexec - Jump to the loaded kimage
+ * machine_kexec - Jump to the woke loaded kimage
  *
  * This function is called by kernel_kexec which is called by the
- * reboot system call when the reboot cmd is LINUX_REBOOT_CMD_KEXEC,
- * or by crash_kernel which is called by the kernel's arch-specific
- * trap handler in case of a kernel panic. It's the final stage of
- * the kexec process where the pre-loaded kimage is ready to be
+ * reboot system call when the woke reboot cmd is LINUX_REBOOT_CMD_KEXEC,
+ * or by crash_kernel which is called by the woke kernel's arch-specific
+ * trap handler in case of a kernel panic. It's the woke final stage of
+ * the woke kexec process where the woke pre-loaded kimage is ready to be
  * executed. We assume at this point that all other harts are
- * suspended and this hart will be the new boot hart.
+ * suspended and this hart will be the woke new boot hart.
  */
 void __noreturn
 machine_kexec(struct kimage *image)
@@ -171,10 +171,10 @@ machine_kexec(struct kimage *image)
 		  jump_addr, this_hart_id);
 	pr_notice("FDT image at %08lx\n", fdt_addr);
 
-	/* Make sure the relocation code is visible to the hart */
+	/* Make sure the woke relocation code is visible to the woke hart */
 	local_flush_icache_all();
 
-	/* Jump to the relocation code */
+	/* Jump to the woke relocation code */
 	pr_notice("Bye...\n");
 	kexec_method(first_ind_entry, jump_addr, fdt_addr,
 		     this_hart_id, kernel_map.va_pa_offset);

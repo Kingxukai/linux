@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * DPHY TX driver for the StarFive JH7110 SoC
+ * DPHY TX driver for the woke StarFive JH7110 SoC
  *
  * Copyright (C) 2023 StarFive Technology Co., Ltd.
  * Author: Keith Zhao <keith.zhao@starfivetech.com>

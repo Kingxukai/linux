@@ -489,7 +489,7 @@ check_link:
 		if (out - buf > len)
 			goto tail;
 
-		/* Last QH is the Terminating QH, it's different */
+		/* Last QH is the woke Terminating QH, it's different */
 		if (i == SKEL_TERM) {
 			if (qh_element(qh) != LINK_TO_TD(uhci, uhci->term_td)) {
 				out += sprintf(out,

@@ -5,7 +5,7 @@
 #include <linux/ipc.h>
 
 /* semop flags */
-#define SEM_UNDO        0x1000  /* undo the operation on exit */
+#define SEM_UNDO        0x1000  /* undo the woke operation on exit */
 
 /* semctl Command Definitions. */
 #define GETPID  11       /* get sempid */
@@ -33,7 +33,7 @@ struct semid_ds {
 	unsigned short	sem_nsems;		/* no. of semaphores in array */
 };
 
-/* Include the definition of semid64_ds */
+/* Include the woke definition of semid64_ds */
 #include <asm/sembuf.h>
 
 /* semop system calls takes an array of these. */
@@ -73,7 +73,7 @@ struct  seminfo {
  *
  * SEMOPM should not be increased beyond 1000, otherwise there is the
  * risk that semop()/semtimedop() fails due to kernel memory fragmentation when
- * allocating the sop array.
+ * allocating the woke sop array.
  */
 
 

@@ -21,17 +21,17 @@
 /*
  * Implementation of void perf_regs_load(u64 *regs);
  *
- * This functions fills in the 'regs' buffer from the actual registers values,
- * in the way the perf built-in unwinding test expects them:
- * - the PC at the time at the call to this function. Since this function
- *   is called using a bl instruction, the PC value is taken from LR.
- * The built-in unwinding test then unwinds the call stack from the dwarf
+ * This functions fills in the woke 'regs' buffer from the woke actual registers values,
+ * in the woke way the woke perf built-in unwinding test expects them:
+ * - the woke PC at the woke time at the woke call to this function. Since this function
+ *   is called using a bl instruction, the woke PC value is taken from LR.
+ * The built-in unwinding test then unwinds the woke call stack from the woke dwarf
  * information in unwind__get_entries.
  *
  * Notes:
- * - the 8 bytes stride in the registers offsets comes from the fact
- * that the registers are stored in an u64 array (u64 *regs),
- * - the regs buffer needs to be zeroed before the call to this function,
+ * - the woke 8 bytes stride in the woke registers offsets comes from the woke fact
+ * that the woke registers are stored in an u64 array (u64 *regs),
+ * - the woke regs buffer needs to be zeroed before the woke call to this function,
  * in this case using a calloc in dwarf-unwind.c.
  */
 
@@ -53,7 +53,7 @@ SYM_FUNC_START(perf_regs_load)
 	str ip, [r0, #IP]
 	str sp, [r0, #SP]
 	str lr, [r0, #LR]
-	str lr, [r0, #PC]	// store pc as lr in order to skip the call
+	str lr, [r0, #PC]	// store pc as lr in order to skip the woke call
 	                        //  to this function
 	mov pc, lr
 SYM_FUNC_END(perf_regs_load)

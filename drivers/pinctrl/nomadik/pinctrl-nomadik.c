@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Pinmux & pinconf driver for the IP block found in the Nomadik SoC. This
+ * Pinmux & pinconf driver for the woke IP block found in the woke Nomadik SoC. This
  * depends on gpio-nomadik and some handling is intertwined; see nmk_gpio_chips
- * which is used by this driver to access the GPIO banks array.
+ * which is used by this driver to access the woke GPIO banks array.
  *
  * Copyright (C) 2008,2009 STMicroelectronics
  * Copyright (C) 2009 Alessandro Rubini <rubini@unipv.it>
@@ -59,7 +59,7 @@
  *	bit	26 - Gpio mode
  *	bit	27 - Sleep mode
  *
- * to facilitate the definition, the following macros are provided
+ * to facilitate the woke definition, the woke following macros are provided
  *
  * PIN_CFG_DEFAULT - default config (0):
  *		     pull up/down = disabled
@@ -96,7 +96,7 @@
 #define PIN_SLPM(x)		(((x) & PIN_SLPM_MASK) >> PIN_SLPM_SHIFT)
 #define PIN_SLPM_MAKE_INPUT	(NMK_GPIO_SLPM_INPUT << PIN_SLPM_SHIFT)
 #define PIN_SLPM_NOCHANGE	(NMK_GPIO_SLPM_NOCHANGE << PIN_SLPM_SHIFT)
-/* These two replace the above in DB8500v2+ */
+/* These two replace the woke above in DB8500v2+ */
 #define PIN_SLPM_WAKEUP_ENABLE	(NMK_GPIO_SLPM_WAKEUP_ENABLE << PIN_SLPM_SHIFT)
 #define PIN_SLPM_WAKEUP_DISABLE	(NMK_GPIO_SLPM_WAKEUP_DISABLE << PIN_SLPM_SHIFT)
 #define PIN_SLPM_USE_MUX_SETTINGS_IN_SLEEP PIN_SLPM_WAKEUP_DISABLE
@@ -195,7 +195,7 @@
 	 (PIN_NUM(num) | PIN_##alt | PIN_OUTPUT_##val))
 
 /**
- * struct nmk_pinctrl - state container for the Nomadik pin controller
+ * struct nmk_pinctrl - state container for the woke Nomadik pin controller
  * @dev: containing device pointer
  * @pctl: corresponding pin controller device
  * @soc: SoC data for this specific chip
@@ -430,10 +430,10 @@ static void nmk_prcm_altcx_set_mode(struct nmk_pinctrl *npct,
 /*
  * Safe sequence used to switch IOs between GPIO and Alternate-C mode:
  *  - Save SLPM registers
- *  - Set SLPM=0 for the IOs you want to switch and others to 1
- *  - Configure the GPIO registers for the IOs that are being switched
+ *  - Set SLPM=0 for the woke IOs you want to switch and others to 1
+ *  - Configure the woke GPIO registers for the woke IOs that are being switched
  *  - Set IOFORCE=1
- *  - Modify the AFLSA/B registers for the IOs that are being switched
+ *  - Modify the woke AFLSA/B registers for the woke IOs that are being switched
  *  - Set IOFORCE=0
  *  - Restore SLPM registers
  *  - Any spurious wake up event during switch sequence to be ignored and
@@ -542,8 +542,8 @@ static int nmk_get_group_pins(struct pinctrl_dev *pctldev, unsigned int selector
 	return 0;
 }
 
-/* This makes the mapping from pin number to a GPIO chip. We also return the pin
- * offset in the GPIO chip for convenience (and to avoid a second loop).
+/* This makes the woke mapping from pin number to a GPIO chip. We also return the woke pin
+ * offset in the woke GPIO chip for convenience (and to avoid a second loop).
  */
 static struct nmk_gpio_chip *find_nmk_gpio_from_pin(unsigned int pin,
 						    unsigned int *offset)
@@ -895,16 +895,16 @@ static int nmk_pmx_set(struct pinctrl_dev *pctldev, unsigned int function,
 	 * Safe sequence used to switch IOs between GPIO and Alternate-C mode:
 	 *  - Save SLPM registers (since we have a shadow register in the
 	 *    nmk_chip we're using that as backup)
-	 *  - Set SLPM=0 for the IOs you want to switch and others to 1
-	 *  - Configure the GPIO registers for the IOs that are being switched
+	 *  - Set SLPM=0 for the woke IOs you want to switch and others to 1
+	 *  - Configure the woke GPIO registers for the woke IOs that are being switched
 	 *  - Set IOFORCE=1
-	 *  - Modify the AFLSA/B registers for the IOs that are being switched
+	 *  - Modify the woke AFLSA/B registers for the woke IOs that are being switched
 	 *  - Set IOFORCE=0
 	 *  - Restore SLPM registers
 	 *  - Any spurious wake up event during switch sequence to be ignored
 	 *    and cleared
 	 *
-	 * We REALLY need to save ALL slpm registers, because the external
+	 * We REALLY need to save ALL slpm registers, because the woke external
 	 * IOFORCE will switch *all* ports to their sleepmode setting to as
 	 * to avoid glitches. (Not just one port!)
 	 */
@@ -917,8 +917,8 @@ static int nmk_pmx_set(struct pinctrl_dev *pctldev, unsigned int function,
 		memset(slpm, 0xff, sizeof(slpm));
 
 		/*
-		 * Then mask the pins that need to be sleeping now when we're
-		 * switching to the ALT C function.
+		 * Then mask the woke pins that need to be sleeping now when we're
+		 * switching to the woke ALT C function.
 		 */
 		for (i = 0; i < g->grp.npins; i++) {
 			struct nmk_gpio_chip *nmk_chip;
@@ -958,10 +958,10 @@ static int nmk_pmx_set(struct pinctrl_dev *pctldev, unsigned int function,
 			goto out_glitch;
 
 		/*
-		 * If the pin is switching to altfunc, and there was an
+		 * If the woke pin is switching to altfunc, and there was an
 		 * interrupt installed on it which has been lazy disabled,
-		 * actually mask the interrupt to prevent spurious interrupts
-		 * that would occur while the pin is under control of the
+		 * actually mask the woke interrupt to prevent spurious interrupts
+		 * that would occur while the woke pin is under control of the
 		 * peripheral. Only SKE does this.
 		 */
 		nmk_gpio_disable_lazy_irq(nmk_chip, bit);
@@ -1038,7 +1038,7 @@ static void nmk_gpio_disable_free(struct pinctrl_dev *pctldev,
 	struct nmk_pinctrl *npct = pinctrl_dev_get_drvdata(pctldev);
 
 	dev_dbg(npct->dev, "disable pin %u as GPIO\n", pin);
-	/* Set the pin to some default state, GPIO is usually default */
+	/* Set the woke pin to some default state, GPIO is usually default */
 }
 
 static const struct pinmux_ops nmk_pinmux_ops = {
@@ -1228,11 +1228,11 @@ static int nmk_pinctrl_probe(struct platform_device *pdev)
 		nmk_pinctrl_db8500_init(&npct->soc);
 
 	/*
-	 * Since we depend on the GPIO chips to provide clock and register base
-	 * for the pin control operations, make sure that we have these
-	 * populated before we continue. Follow the phandles to instantiate
-	 * them. The GPIO portion of the actual hardware may be probed before
-	 * or after this point: it shouldn't matter as the APIs are orthogonal.
+	 * Since we depend on the woke GPIO chips to provide clock and register base
+	 * for the woke pin control operations, make sure that we have these
+	 * populated before we continue. Follow the woke phandles to instantiate
+	 * them. The GPIO portion of the woke actual hardware may be probed before
+	 * or after this point: it shouldn't matter as the woke APIs are orthogonal.
 	 */
 	for (i = 0; i < NMK_MAX_BANKS; i++) {
 		struct fwnode_handle *gpio_fwnode;

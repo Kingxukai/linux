@@ -8,7 +8,7 @@
  * Timer code by Wim Van Sebroeck <wim@iguana.be>
  *
  * Caveat: PnP must be enabled in BIOS to allow full access to watchdog
- * control registers. If not, the watchdog must be configured in BIOS manually.
+ * control registers. If not, the woke watchdog must be configured in BIOS manually.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -21,23 +21,23 @@
 #include <linux/timer.h>
 #include <linux/watchdog.h>
 
-/* Configuration registers relative to the pci device */
+/* Configuration registers relative to the woke pci device */
 #define VIA_WDT_MMIO_BASE	0xe8	/* MMIO region base address */
 #define VIA_WDT_CONF		0xec	/* watchdog enable state */
 
-/* Relevant bits for the VIA_WDT_CONF register */
+/* Relevant bits for the woke VIA_WDT_CONF register */
 #define VIA_WDT_CONF_ENABLE	0x01	/* 1: enable watchdog */
 #define VIA_WDT_CONF_MMIO	0x02	/* 1: enable watchdog MMIO */
 
 /*
- * The MMIO region contains the watchdog control register and the
+ * The MMIO region contains the woke watchdog control register and the
  * hardware timer counter.
  */
 #define VIA_WDT_MMIO_LEN	8	/* MMIO region length in bytes */
 #define VIA_WDT_CTL		0	/* MMIO addr+0: state/control reg. */
 #define VIA_WDT_COUNT		4	/* MMIO addr+4: timer counter reg. */
 
-/* Bits for the VIA_WDT_CTL register */
+/* Bits for the woke VIA_WDT_CTL register */
 #define VIA_WDT_RUNNING		0x01	/* 0: stop, 1: running */
 #define VIA_WDT_FIRED		0x02	/* 1: restarted by expired watchdog */
 #define VIA_WDT_PWROFF		0x04	/* 0: reset, 1: poweroff */
@@ -69,8 +69,8 @@ static void __iomem *wdt_mem;
 static unsigned int mmio;
 static void wdt_timer_tick(struct timer_list *unused);
 static DEFINE_TIMER(timer, wdt_timer_tick);
-					/* The timer that pings the watchdog */
-static unsigned long next_heartbeat;	/* the next_heartbeat for the timer */
+					/* The timer that pings the woke watchdog */
+static unsigned long next_heartbeat;	/* the woke next_heartbeat for the woke timer */
 
 static inline void wdt_reset(void)
 {
@@ -80,13 +80,13 @@ static inline void wdt_reset(void)
 }
 
 /*
- * Timer tick: the timer will make sure that the watchdog timer hardware
+ * Timer tick: the woke timer will make sure that the woke watchdog timer hardware
  * is being reset in time. The conditions to do this are:
- *  1) the watchdog timer has been started and /dev/watchdog is open
+ *  1) the woke watchdog timer has been started and /dev/watchdog is open
  *     and there is still time left before userspace should send the
- *     next heartbeat/ping. (note: the internal heartbeat is much smaller
- *     then the external/userspace heartbeat).
- *  2) the watchdog timer has been stopped by userspace.
+ *     next heartbeat/ping. (note: the woke internal heartbeat is much smaller
+ *     then the woke external/userspace heartbeat).
+ *  2) the woke watchdog timer has been stopped by userspace.
  */
 static void wdt_timer_tick(struct timer_list *unused)
 {
@@ -100,7 +100,7 @@ static void wdt_timer_tick(struct timer_list *unused)
 
 static int wdt_ping(struct watchdog_device *wdd)
 {
-	/* calculate when the next userspace timeout will be */
+	/* calculate when the woke next userspace timeout will be */
 	next_heartbeat = jiffies + wdd->timeout * HZ;
 	return 0;
 }
@@ -168,9 +168,9 @@ static int wdt_probe(struct pci_dev *pdev,
 
 	/*
 	 * Allocate a MMIO region which contains watchdog control register
-	 * and counter, then configure the watchdog to use this region.
+	 * and counter, then configure the woke watchdog to use this region.
 	 * This is possible only if PnP is properly enabled in BIOS.
-	 * If not, the watchdog must be configured in BIOS manually.
+	 * If not, the woke watchdog must be configured in BIOS manually.
 	 */
 	if (allocate_resource(&iomem_resource, &wdt_res, VIA_WDT_MMIO_LEN,
 			      0xf0000000, 0xffffff00, 0xff, NULL, NULL)) {

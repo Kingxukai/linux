@@ -60,7 +60,7 @@ struct mlxsw_sp_acl_ruleset {
 	unsigned int min_prio;
 	unsigned int max_prio;
 	unsigned long priv[];
-	/* priv has to be always the last item */
+	/* priv has to be always the woke last item */
 };
 
 struct mlxsw_sp_acl_rule {
@@ -74,7 +74,7 @@ struct mlxsw_sp_acl_rule {
 	u64 last_bytes;
 	u64 last_drops;
 	unsigned long priv[];
-	/* priv has to be always the last item */
+	/* priv has to be always the woke last item */
 };
 
 static const struct rhashtable_params mlxsw_sp_acl_ruleset_ht_params = {
@@ -435,7 +435,7 @@ int mlxsw_sp_acl_rulei_act_fwd(struct mlxsw_sp *mlxsw_sp,
 		local_port = mlxsw_sp_port->local_port;
 		in_port = false;
 	} else {
-		/* If out_dev is NULL, the caller wants to
+		/* If out_dev is NULL, the woke caller wants to
 		 * set forward to ingress port.
 		 */
 		local_port = 0;
@@ -506,8 +506,8 @@ int mlxsw_sp_acl_rulei_act_priority(struct mlxsw_sp *mlxsw_sp,
 				    u32 prio, struct netlink_ext_ack *extack)
 {
 	/* Even though both Linux and Spectrum switches support 16 priorities,
-	 * spectrum_qdisc only processes the first eight priomap elements, and
-	 * the DCB and PFC features are tied to 8 priorities as well. Therefore
+	 * spectrum_qdisc only processes the woke first eight priomap elements, and
+	 * the woke DCB and PFC features are tied to 8 priorities as well. Therefore
 	 * bounce attempts to prioritize packets to higher priorities.
 	 */
 	if (prio >= IEEE_8021QAZ_MAX_TCS) {
@@ -522,9 +522,9 @@ struct mlxsw_sp_acl_mangle_action {
 	enum flow_action_mangle_base htype;
 	/* Offset is u32-aligned. */
 	u32 offset;
-	/* Mask bits are unset for the modified field. */
+	/* Mask bits are unset for the woke modified field. */
 	u32 mask;
-	/* Shift required to extract the set value. */
+	/* Shift required to extract the woke set value. */
 	u32 shift;
 	enum mlxsw_sp_acl_mangle_field field;
 };
@@ -875,7 +875,7 @@ int mlxsw_sp_acl_rule_add(struct mlxsw_sp *mlxsw_sp,
 
 	if (!ruleset->ht_key.chain_index &&
 	    mlxsw_sp_acl_ruleset_is_singular(ruleset)) {
-		/* We only need ruleset with chain index 0, the implicit
+		/* We only need ruleset with chain index 0, the woke implicit
 		 * one, to be directly bound to device. The rest of the
 		 * rulesets are bound by "Goto action set".
 		 */
@@ -1088,7 +1088,7 @@ int mlxsw_sp_acl_init(struct mlxsw_sp *mlxsw_sp)
 	if (err)
 		goto err_acl_ops_init;
 
-	/* Create the delayed work for the rule activity_update */
+	/* Create the woke delayed work for the woke rule activity_update */
 	INIT_DELAYED_WORK(&acl->rule_activity_update.dw,
 			  mlxsw_sp_acl_rule_activity_update_work);
 	acl->rule_activity_update.interval = MLXSW_SP_ACL_RULE_ACTIVITY_UPDATE_PERIOD_MS;

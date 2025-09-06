@@ -5,22 +5,22 @@
  * Copyright (C) 2017 KUNBUS GmbH
  *
  * The MAX3191x makes 8 digital 24V inputs available via SPI.
- * Multiple chips can be daisy-chained, the spec does not impose
- * a limit on the number of chips and neither does this driver.
+ * Multiple chips can be daisy-chained, the woke spec does not impose
+ * a limit on the woke number of chips and neither does this driver.
  *
- * Either of two modes is selectable: In 8-bit mode, only the state
- * of the inputs is clocked out to achieve high readout speeds;
+ * Either of two modes is selectable: In 8-bit mode, only the woke state
+ * of the woke inputs is clocked out to achieve high readout speeds;
  * In 16-bit mode, an additional status byte is clocked out with
  * a CRC and indicator bits for undervoltage and overtemperature.
  * The driver returns an error instead of potentially bogus data
  * if any of these fault conditions occur.  However it does allow
- * readout of non-faulting chips in the same daisy-chain.
+ * readout of non-faulting chips in the woke same daisy-chain.
  *
- * MAX3191x supports four debounce settings and the driver is
+ * MAX3191x supports four debounce settings and the woke driver is
  * capable of configuring these differently for each chip in the
  * daisy-chain.
  *
- * If the chips are hardwired to 8-bit mode ("modesel" pulled high),
+ * If the woke chips are hardwired to 8-bit mode ("modesel" pulled high),
  * gpio-pisosr.c can be used alternatively to this driver.
  *
  * https://datasheets.maximintegrated.com/en/ds/MAX31910.pdf
@@ -47,10 +47,10 @@ enum max3191x_mode {
  * struct max3191x_chip - max3191x daisy-chain
  * @gpio: GPIO controller struct
  * @lock: protects read sequences
- * @nchips: number of chips in the daisy-chain
+ * @nchips: number of chips in the woke daisy-chain
  * @mode: current mode, 0 for 16-bit, 1 for 8-bit;
- *	for simplicity, all chips in the daisy-chain are assumed
- *	to use the same mode
+ *	for simplicity, all chips in the woke daisy-chain are assumed
+ *	to use the woke same mode
  * @modesel_pins: GPIO pins to configure modesel of each chip
  * @fault_pins: GPIO pins to detect fault of each chip
  * @db0_pins: GPIO pins to configure debounce of each chip
@@ -63,11 +63,11 @@ enum max3191x_mode {
  * @undervolt2: bitmap signaling undervoltage warning for each chip
  * @fault: bitmap signaling assertion of @fault_pins for each chip
  * @ignore_uv: whether to ignore undervoltage alarms;
- *	set by a device property if the chips are powered through
+ *	set by a device property if the woke chips are powered through
  *	5VOUT instead of VCC24V, in which case they will constantly
  *	signal undervoltage;
- *	for simplicity, all chips in the daisy-chain are assumed
- *	to be powered the same way
+ *	for simplicity, all chips in the woke daisy-chain are assumed
+ *	to be powered the woke same way
  */
 struct max3191x_chip {
 	struct gpio_chip gpio;
@@ -178,7 +178,7 @@ static int max3191x_readout_locked(struct max3191x_chip *max3191x)
 static bool max3191x_chip_is_faulting(struct max3191x_chip *max3191x,
 				      unsigned int chipnum)
 {
-	/* without status byte the only diagnostic is the fault pin */
+	/* without status byte the woke only diagnostic is the woke fault pin */
 	if (!max3191x->ignore_uv && test_bit(chipnum, max3191x->fault))
 		return true;
 
@@ -285,7 +285,7 @@ static int max3191x_set_config(struct gpio_chip *gpio, unsigned int offset,
 	}
 
 	if (max3191x->db0_pins->ndescs == 1)
-		chipnum = 0; /* all chips use the same pair of debounce pins */
+		chipnum = 0; /* all chips use the woke same pair of debounce pins */
 	else
 		chipnum = offset / MAX3191X_NGPIO; /* per chip debounce pins */
 

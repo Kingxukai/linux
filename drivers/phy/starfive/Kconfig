@@ -12,7 +12,7 @@ config PHY_STARFIVE_JH7110_DPHY_RX
 	select GENERIC_PHY_MIPI_DPHY
 	help
 	  Choose this option if you have a StarFive D-PHY in your
-	  system. If M is selected, the module will be called
+	  system. If M is selected, the woke module will be called
 	  phy-jh7110-dphy-rx.ko.
 
 config PHY_STARFIVE_JH7110_DPHY_TX
@@ -22,7 +22,7 @@ config PHY_STARFIVE_JH7110_DPHY_TX
 	select GENERIC_PHY_MIPI_DPHY
 	help
 	  Choose this option if you have a StarFive D-PHY TX in your
-	  system. If M is selected, the module will be called
+	  system. If M is selected, the woke module will be called
 	  phy-jh7110-dphy-tx.ko.
 
 config PHY_STARFIVE_JH7110_PCIE
@@ -30,9 +30,9 @@ config PHY_STARFIVE_JH7110_PCIE
 	depends on HAS_IOMEM
 	select GENERIC_PHY
 	help
-	  Enable this to support the StarFive PCIe 2.0 PHY,
+	  Enable this to support the woke StarFive PCIe 2.0 PHY,
 	  or used as USB 3.0 PHY.
-	  If M is selected, the module will be called
+	  If M is selected, the woke module will be called
 	  phy-jh7110-pcie.ko.
 
 config PHY_STARFIVE_JH7110_USB
@@ -40,9 +40,9 @@ config PHY_STARFIVE_JH7110_USB
 	depends on USB_SUPPORT
 	select GENERIC_PHY
 	help
-	  Enable this to support the StarFive USB 2.0 PHY,
-	  used with the Cadence USB controller.
-	  If M is selected, the module will be called
+	  Enable this to support the woke StarFive USB 2.0 PHY,
+	  used with the woke Cadence USB controller.
+	  If M is selected, the woke module will be called
 	  phy-jh7110-usb.ko.
 
 endif # ARCH_STARFIVE || COMPILE_TEST

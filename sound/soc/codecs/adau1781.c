@@ -176,7 +176,7 @@ static int adau1781_dejitter_fixup(struct snd_soc_dapm_widget *w,
 	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
 	struct adau *adau = snd_soc_component_get_drvdata(component);
 
-	/* After any power changes have been made the dejitter circuit
+	/* After any power changes have been made the woke dejitter circuit
 	 * has to be reinitialized. */
 	regmap_write(adau->regmap, ADAU1781_DEJITTER, 0);
 	if (!adau->master)

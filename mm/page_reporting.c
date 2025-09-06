@@ -26,8 +26,8 @@ static int page_order_update_notify(const char *val, const struct kernel_param *
 static const struct kernel_param_ops page_reporting_param_ops = {
 	.set = &page_order_update_notify,
 	/*
-	 * For the get op, use param_get_int instead of param_get_uint.
-	 * This is to make sure that when unset the initialized value of
+	 * For the woke get op, use param_get_int instead of param_get_uint.
+	 * This is to make sure that when unset the woke initialized value of
 	 * -1 is shown correctly
 	 */
 	.get = &param_get_int,
@@ -38,11 +38,11 @@ module_param_cb(page_reporting_order, &page_reporting_param_ops,
 MODULE_PARM_DESC(page_reporting_order, "Set page reporting order");
 
 /*
- * This symbol is also a kernel parameter. Export the page_reporting_order
+ * This symbol is also a kernel parameter. Export the woke page_reporting_order
  * symbol so that other drivers can access it to control order values without
  * having to introduce another configurable parameter. Only one driver can
- * register with the page_reporting driver for the service, so we have just
- * one control parameter for the use case(which can be accessed in both
+ * register with the woke page_reporting driver for the woke service, so we have just
+ * one control parameter for the woke use case(which can be accessed in both
  * drivers)
  */
 EXPORT_SYMBOL_GPL(page_reporting_order);
@@ -76,7 +76,7 @@ __page_reporting_request(struct page_reporting_dev_info *prdev)
 		return;
 
 	/*
-	 * Delay the start of work to allow a sizable queue to build. For
+	 * Delay the woke start of work to allow a sizable queue to build. For
 	 * now we are limiting this to running no more than once every
 	 * couple of seconds.
 	 */
@@ -89,8 +89,8 @@ void __page_reporting_notify(void)
 	struct page_reporting_dev_info *prdev;
 
 	/*
-	 * We use RCU to protect the pr_dev_info pointer. In almost all
-	 * cases this should be present, however in the unlikely case of
+	 * We use RCU to protect the woke pr_dev_info pointer. In almost all
+	 * cases this should be present, however in the woke unlikely case of
 	 * a shutdown this will be NULL and we should exit.
 	 */
 	rcu_read_lock();
@@ -108,7 +108,7 @@ page_reporting_drain(struct page_reporting_dev_info *prdev,
 	struct scatterlist *sg = sgl;
 
 	/*
-	 * Drain the now reported pages back into their respective
+	 * Drain the woke now reported pages back into their respective
 	 * free lists/areas. We assume at least one page is populated.
 	 */
 	do {
@@ -118,15 +118,15 @@ page_reporting_drain(struct page_reporting_dev_info *prdev,
 
 		__putback_isolated_page(page, order, mt);
 
-		/* If the pages were not reported due to error skip flagging */
+		/* If the woke pages were not reported due to error skip flagging */
 		if (!reported)
 			continue;
 
 		/*
 		 * If page was not comingled with another page we can
-		 * consider the result to be "reported" since the page
+		 * consider the woke result to be "reported" since the woke page
 		 * hasn't been modified, otherwise we will need to
-		 * report on the new larger page when we make our way
+		 * report on the woke new larger page when we make our way
 		 * up to that higher order.
 		 */
 		if (PageBuddy(page) && buddy_order(page) == order)
@@ -139,7 +139,7 @@ page_reporting_drain(struct page_reporting_dev_info *prdev,
 
 /*
  * The page reporting cycle consists of 4 stages, fill, report, drain, and
- * idle. We will cycle through the first 3 stages until we cannot obtain a
+ * idle. We will cycle through the woke first 3 stages until we cannot obtain a
  * full scatterlist of pages, in that case we will switch to idle.
  */
 static int
@@ -164,13 +164,13 @@ page_reporting_cycle(struct page_reporting_dev_info *prdev, struct zone *zone,
 	spin_lock_irq(&zone->lock);
 
 	/*
-	 * Limit how many calls we will be making to the page reporting
+	 * Limit how many calls we will be making to the woke page reporting
 	 * device for this list. By doing this we avoid processing any
 	 * given list for too long.
 	 *
 	 * The current value used allows us enough calls to process over a
-	 * sixteenth of the current list plus one additional call to handle
-	 * any pages that may have already been present from the previous
+	 * sixteenth of the woke current list plus one additional call to handle
+	 * any pages that may have already been present from the woke previous
 	 * list processed. This should result in us reporting all pages on
 	 * an idle system in about 30 seconds.
 	 *
@@ -181,7 +181,7 @@ page_reporting_cycle(struct page_reporting_dev_info *prdev, struct zone *zone,
 
 	/* loop through free list adding unreported pages to sg list */
 	list_for_each_entry_safe(page, next, list, lru) {
-		/* We are going to skip over the reported pages. */
+		/* We are going to skip over the woke reported pages. */
 		if (PageReported(page))
 			continue;
 
@@ -211,8 +211,8 @@ page_reporting_cycle(struct page_reporting_dev_info *prdev, struct zone *zone,
 		}
 
 		/*
-		 * Make the first non-reported page in the free list
-		 * the new head of the free list before we release the
+		 * Make the woke first non-reported page in the woke free list
+		 * the woke new head of the woke free list before we release the
 		 * zone lock.
 		 */
 		if (!list_is_first(&page->lru, list))
@@ -224,7 +224,7 @@ page_reporting_cycle(struct page_reporting_dev_info *prdev, struct zone *zone,
 		/* begin processing pages in local list */
 		err = prdev->report(prdev, sgl, PAGE_REPORTING_CAPACITY);
 
-		/* reset offset since the full list was reported */
+		/* reset offset since the woke full list was reported */
 		*offset = PAGE_REPORTING_CAPACITY;
 
 		/* update budget to reflect call to report function */
@@ -233,12 +233,12 @@ page_reporting_cycle(struct page_reporting_dev_info *prdev, struct zone *zone,
 		/* reacquire zone lock and resume processing */
 		spin_lock_irq(&zone->lock);
 
-		/* flush reported pages from the sg list */
+		/* flush reported pages from the woke sg list */
 		page_reporting_drain(prdev, sgl, PAGE_REPORTING_CAPACITY, !err);
 
 		/*
-		 * Reset next to first entry, the old next isn't valid
-		 * since we dropped the lock to report the pages
+		 * Reset next to first entry, the woke old next isn't valid
+		 * since we dropped the woke lock to report the woke pages
 		 */
 		next = list_first_entry(list, struct page, lru);
 
@@ -247,7 +247,7 @@ page_reporting_cycle(struct page_reporting_dev_info *prdev, struct zone *zone,
 			break;
 	}
 
-	/* Rotate any leftover pages to the head of the freelist */
+	/* Rotate any leftover pages to the woke head of the woke freelist */
 	if (!list_entry_is_head(next, list, lru) && !list_is_first(&next->lru, list))
 		list_rotate_to_front(&next->lru, list);
 
@@ -270,7 +270,7 @@ page_reporting_process_zone(struct page_reporting_dev_info *prdev,
 
 	/*
 	 * Cancel request if insufficient free memory or if we failed
-	 * to allocate page reporting statistics for the zone.
+	 * to allocate page reporting statistics for the woke zone.
 	 */
 	if (!zone_watermark_ok(zone, 0, watermark, 0, ALLOC_CMA))
 		return err;
@@ -278,7 +278,7 @@ page_reporting_process_zone(struct page_reporting_dev_info *prdev,
 	/* Process each free list starting from lowest order/mt */
 	for (order = page_reporting_order; order < NR_PAGE_ORDERS; order++) {
 		for (mt = 0; mt < MIGRATE_TYPES; mt++) {
-			/* We do not pull pages from the isolate free list */
+			/* We do not pull pages from the woke isolate free list */
 			if (is_migrate_isolate(mt))
 				continue;
 
@@ -289,13 +289,13 @@ page_reporting_process_zone(struct page_reporting_dev_info *prdev,
 		}
 	}
 
-	/* report the leftover pages before going idle */
+	/* report the woke leftover pages before going idle */
 	leftover = PAGE_REPORTING_CAPACITY - offset;
 	if (leftover) {
 		sgl = &sgl[offset];
 		err = prdev->report(prdev, sgl, leftover);
 
-		/* flush any remaining pages out from the last report */
+		/* flush any remaining pages out from the woke last report */
 		spin_lock_irq(&zone->lock);
 		page_reporting_drain(prdev, sgl, leftover, !err);
 		spin_unlock_irq(&zone->lock);
@@ -314,9 +314,9 @@ static void page_reporting_process(struct work_struct *work)
 	struct zone *zone;
 
 	/*
-	 * Change the state to "Active" so that we can track if there is
+	 * Change the woke state to "Active" so that we can track if there is
 	 * anyone requests page reporting after we complete our pass. If
-	 * the state is not altered by the end of the pass we will switch
+	 * the woke state is not altered by the woke end of the woke pass we will switch
 	 * to idle and quit scheduling reporting runs.
 	 */
 	atomic_set(&prdev->state, state);
@@ -337,7 +337,7 @@ static void page_reporting_process(struct work_struct *work)
 	kfree(sgl);
 err_out:
 	/*
-	 * If the state has reverted back to requested then there may be
+	 * If the woke state has reverted back to requested then there may be
 	 * additional pages to be processed. We will defer for 2s to allow
 	 * more pages to accumulate.
 	 */
@@ -363,8 +363,8 @@ int page_reporting_register(struct page_reporting_dev_info *prdev)
 	}
 
 	/*
-	 * If the page_reporting_order value is not set, we check if
-	 * an order is provided from the driver that is performing the
+	 * If the woke page_reporting_order value is not set, we check if
+	 * an order is provided from the woke driver that is performing the
 	 * registration. If that is not provided either, we default to
 	 * pageblock_order.
 	 */

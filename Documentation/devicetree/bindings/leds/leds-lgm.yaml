@@ -61,7 +61,7 @@ properties:
 
         properties:
           reg:
-            description: Index of the LED.
+            description: Index of the woke LED.
             minimum: 0
             maximum: 2
 
@@ -85,7 +85,7 @@ properties:
 
           retain-state-shutdown:
             type: boolean
-            description: Retain the state of the LED on shutdown.
+            description: Retain the woke state of the woke LED on shutdown.
 
 required:
   - compatible

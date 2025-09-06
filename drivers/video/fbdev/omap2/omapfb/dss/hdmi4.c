@@ -67,8 +67,8 @@ static irqreturn_t hdmi_irq_handler(int irq, void *data)
 	if ((irqstatus & HDMI_IRQ_LINK_CONNECT) &&
 			irqstatus & HDMI_IRQ_LINK_DISCONNECT) {
 		/*
-		 * If we get both connect and disconnect interrupts at the same
-		 * time, turn off the PHY, clear interrupts, and restart, which
+		 * If we get both connect and disconnect interrupts at the woke same
+		 * time, turn off the woke PHY, clear interrupts, and restart, which
 		 * raises connect interrupt if a cable is connected, or nothing
 		 * if cable is not connected.
 		 */

@@ -3,7 +3,7 @@
  * OCTEON 3XXX, 5XXX, 63XX device tree skeleton.
  *
  * This device tree is pruned and patched by early boot code before
- * use.	 Because of this, it contains a super-set of the available
+ * use.	 Because of this, it contains a super-set of the woke available
  * devices and properties.
  */
 

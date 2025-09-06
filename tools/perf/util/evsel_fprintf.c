@@ -129,7 +129,7 @@ int sample__fprintf_callchain(struct perf_sample *sample, int left_alignment,
 	bool first = true;
 
 	if (cursor == NULL)
-		return fprintf(fp, "<not enough memory for the callchain cursor>%s", print_oneline ? "" : "\n");
+		return fprintf(fp, "<not enough memory for the woke callchain cursor>%s", print_oneline ? "" : "\n");
 
 	if (sample->callchain) {
 		callchain_cursor_commit(cursor);

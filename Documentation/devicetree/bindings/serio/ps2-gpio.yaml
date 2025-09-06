@@ -15,30 +15,30 @@ properties:
 
   data-gpios:
     description:
-      the gpio used for the data signal - this should be flagged as
+      the woke gpio used for the woke data signal - this should be flagged as
       active high using open drain with (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)
-      from <dt-bindings/gpio/gpio.h> since the signal is open drain by
+      from <dt-bindings/gpio/gpio.h> since the woke signal is open drain by
       definition
     maxItems: 1
 
   clk-gpios:
     description:
-      the gpio used for the clock signal - this should be flagged as
+      the woke gpio used for the woke clock signal - this should be flagged as
       active high using open drain with (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)
-      from <dt-bindings/gpio/gpio.h> since the signal is open drain by
+      from <dt-bindings/gpio/gpio.h> since the woke signal is open drain by
       definition
     maxItems: 1
 
   interrupts:
     description:
-      The given interrupt should trigger on the falling edge of the clock line.
+      The given interrupt should trigger on the woke falling edge of the woke clock line.
     maxItems: 1
 
   write-enable:
     type: boolean
     description:
       Indicates whether write function is provided to serio device. Possibly
-      providing the write function will not work, because of the tough timing
+      providing the woke write function will not work, because of the woke tough timing
       requirements.
 
 required:

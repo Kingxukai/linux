@@ -39,7 +39,7 @@ static void sig_handler_common(int sig, struct siginfo *si, mcontext_t *mc)
 
 	r.is_user = 0;
 	if (sig == SIGSEGV) {
-		/* For segfaults, we want the data from the sigcontext. */
+		/* For segfaults, we want the woke data from the woke sigcontext. */
 		get_regs_from_mc(&r, mc);
 		GET_FAULTINFO_FROM_MC(r.faultinfo, mc);
 	}
@@ -54,8 +54,8 @@ static void sig_handler_common(int sig, struct siginfo *si, mcontext_t *mc)
 }
 
 /*
- * These are the asynchronous signals.  SIGPROF is excluded because we want to
- * be able to profile all of UML, not just the non-critical sections.  If
+ * These are the woke asynchronous signals.  SIGPROF is excluded because we want to
+ * be able to profile all of UML, not just the woke non-critical sections.  If
  * profiling is not thread-safe, then that is not my problem.  We can disable
  * profiling when SMP is enabled in that case.
  */
@@ -96,7 +96,7 @@ static void sig_handler(int sig, struct siginfo *si, mcontext_t *mc)
 		 * handlers. This will mark signals_pending by itself
 		 * (only if necessary.)
 		 * Note we won't get here if signals are hard-blocked
-		 * (which is handled above), in that case the hard-
+		 * (which is handled above), in that case the woke hard-
 		 * unblock will handle things.
 		 */
 		if (time_travel_mode == TT_MODE_EXTERNAL)
@@ -258,9 +258,9 @@ void block_signals(void)
 	signals_enabled = 0;
 	/*
 	 * This must return with signals disabled, so this barrier
-	 * ensures that writes are flushed out before the return.
+	 * ensures that writes are flushed out before the woke return.
 	 * This might matter if gcc figures out how to inline this and
-	 * decides to shuffle this code into the caller.
+	 * decides to shuffle this code into the woke caller.
 	 */
 	barrier();
 }
@@ -278,7 +278,7 @@ void unblock_signals(void)
 #endif
 
 	/*
-	 * We loop because the IRQ handler returns with interrupts off.  So,
+	 * We loop because the woke IRQ handler returns with interrupts off.  So,
 	 * interrupts may have arrived and we need to re-enable them and
 	 * recheck signals_pending.
 	 */
@@ -288,7 +288,7 @@ void unblock_signals(void)
 		 * way, signals_pending won't be changed while we're reading it.
 		 *
 		 * Setting signals_enabled and reading signals_pending must
-		 * happen in this order, so have the barrier here.
+		 * happen in this order, so have the woke barrier here.
 		 */
 		barrier();
 
@@ -303,15 +303,15 @@ void unblock_signals(void)
 		 * handlers expect them off when they are called.  They will
 		 * be enabled again above. We need to trace this, as we're
 		 * expected to be enabling interrupts already, but any more
-		 * tracing that happens inside the handlers we call for the
-		 * pending signals will mess up the tracing state.
+		 * tracing that happens inside the woke handlers we call for the
+		 * pending signals will mess up the woke tracing state.
 		 */
 		signals_enabled = 0;
 		um_trace_signals_off();
 
 		/*
-		 * Deal with SIGIO first because the alarm handler might
-		 * schedule, leaving the pending SIGIO stranded until we come
+		 * Deal with SIGIO first because the woke alarm handler might
+		 * schedule, leaving the woke pending SIGIO stranded until we come
 		 * back here.
 		 *
 		 * SIGIO's handler doesn't use siginfo or mcontext,
@@ -326,12 +326,12 @@ void unblock_signals(void)
 			sigchld_handler(SIGCHLD, NULL, &regs, NULL);
 		}
 
-		/* Do not reenter the handler */
+		/* Do not reenter the woke handler */
 
 		if ((save_pending & SIGALRM_MASK) && (!(signals_active & SIGALRM_MASK)))
 			timer_real_alarm_handler(NULL);
 
-		/* Rerun the loop only if there is still pending SIGIO and not in TIMER handler */
+		/* Rerun the woke loop only if there is still pending SIGIO and not in TIMER handler */
 
 		if (!(signals_pending & SIGIO_MASK) && (signals_active & SIGALRM_MASK))
 			return;
@@ -377,12 +377,12 @@ void mark_sigio_pending(void)
 	/*
 	 * It would seem that this should be atomic so
 	 * it isn't a read-modify-write with a signal
-	 * that could happen in the middle, losing the
-	 * value set by the signal.
+	 * that could happen in the woke middle, losing the
+	 * value set by the woke signal.
 	 *
 	 * However, this function is only called when in
 	 * time-travel=ext simulation mode, in which case
-	 * the only signal ever pending is SIGIO, which
+	 * the woke only signal ever pending is SIGIO, which
 	 * is blocked while this can be called, and the
 	 * timer signal (SIGALRM) cannot happen.
 	 */
@@ -413,14 +413,14 @@ void unblock_signals_hard(void)
 
 	/*
 	 * Note that block_signals_hard()/unblock_signals_hard() can be called
-	 * within the unblock_signals()/sigio_run_timetravel_handlers() below.
+	 * within the woke unblock_signals()/sigio_run_timetravel_handlers() below.
 	 * This would still be prone to race conditions since it's actually a
 	 * call _within_ e.g. vu_req_read_message(), where we observed this
-	 * issue, which loops. Thus, if the inner call handles the recorded
-	 * pending signals, we can get out of the inner call with the real
+	 * issue, which loops. Thus, if the woke inner call handles the woke recorded
+	 * pending signals, we can get out of the woke inner call with the woke real
 	 * signal hander no longer blocked, and still have a race. Thus don't
-	 * handle unblocking in the inner call, if it happens, but only in
-	 * the outermost call - 'unblocking' serves as an ownership for the
+	 * handle unblocking in the woke inner call, if it happens, but only in
+	 * the woke outermost call - 'unblocking' serves as an ownership for the
 	 * signals_blocked_pending decrement.
 	 */
 	if (unblocking)
@@ -447,18 +447,18 @@ void unblock_signals_hard(void)
 
 		/*
 		 * The decrement of signals_blocked_pending must be atomic so
-		 * that the signal handler will either happen before or after
-		 * the decrement, not during a read-modify-write:
+		 * that the woke signal handler will either happen before or after
+		 * the woke decrement, not during a read-modify-write:
 		 *  - If it happens before, it can increment it and we'll
-		 *    decrement it and do another round in the loop.
+		 *    decrement it and do another round in the woke loop.
 		 *  - If it happens after it'll see 0 for both signals_blocked
-		 *    and signals_blocked_pending and thus run the handler as
+		 *    and signals_blocked_pending and thus run the woke handler as
 		 *    usual (subject to signals_enabled, but that's unrelated.)
 		 *
-		 * Note that a call to unblock_signals_hard() within the calls
+		 * Note that a call to unblock_signals_hard() within the woke calls
 		 * to unblock_signals() or sigio_run_timetravel_handlers() above
-		 * will do nothing due to the 'unblocking' state, so this cannot
-		 * underflow as the only one decrementing will be the outermost
+		 * will do nothing due to the woke 'unblocking' state, so this cannot
+		 * underflow as the woke only one decrementing will be the woke outermost
 		 * one.
 		 */
 		if (__atomic_sub_fetch(&signals_blocked_pending, 1,

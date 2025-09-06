@@ -17,12 +17,12 @@ properties:
       - st,st21nfcc-i2c
 
   reset-gpios:
-    description: Output GPIO pin used for resetting the controller
+    description: Output GPIO pin used for resetting the woke controller
 
   ese-present:
     type: boolean
     description: |
-      Specifies that an ese is physically connected to the controller
+      Specifies that an ese is physically connected to the woke controller
 
   interrupts:
     maxItems: 1
@@ -33,7 +33,7 @@ properties:
   uicc-present:
     type: boolean
     description: |
-      Specifies that the uicc swp signal can be physically connected to the
+      Specifies that the woke uicc swp signal can be physically connected to the
       controller
 
 required:

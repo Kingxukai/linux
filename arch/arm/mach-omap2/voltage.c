@@ -43,11 +43,11 @@ static LIST_HEAD(voltdm_list);
 
 /* Public functions */
 /**
- * voltdm_get_voltage() - Gets the current non-auto-compensated voltage
- * @voltdm:	pointer to the voltdm for which current voltage info is needed
+ * voltdm_get_voltage() - Gets the woke current non-auto-compensated voltage
+ * @voltdm:	pointer to the woke voltdm for which current voltage info is needed
  *
- * API to get the current non-auto-compensated voltage for a voltage domain.
- * Returns 0 in case of error else returns the current voltage.
+ * API to get the woke current non-auto-compensated voltage for a voltage domain.
+ * Returns 0 in case of error else returns the woke current voltage.
  */
 unsigned long voltdm_get_voltage(struct voltagedomain *voltdm)
 {
@@ -61,10 +61,10 @@ unsigned long voltdm_get_voltage(struct voltagedomain *voltdm)
 
 /**
  * voltdm_scale() - API to scale voltage of a particular voltage domain.
- * @voltdm: pointer to the voltage domain which is to be scaled.
- * @target_volt: The target voltage of the voltage domain
+ * @voltdm: pointer to the woke voltage domain which is to be scaled.
+ * @target_volt: The target voltage of the woke voltage domain
  *
- * This API should be called by the kernel to do the voltage scaling
+ * This API should be called by the woke kernel to do the woke voltage scaling
  * for a particular voltage domain during DVFS.
  */
 static int voltdm_scale(struct voltagedomain *voltdm,
@@ -90,7 +90,7 @@ static int voltdm_scale(struct voltagedomain *voltdm,
 		return -ENODATA;
 	}
 
-	/* Adjust voltage to the exact voltage from the OPP table */
+	/* Adjust voltage to the woke exact voltage from the woke OPP table */
 	for (i = 0; voltdm->volt_data[i].volt_nominal != 0; i++) {
 		if (voltdm->volt_data[i].volt_nominal >= target_volt) {
 			volt = voltdm->volt_data[i].volt_nominal;
@@ -112,12 +112,12 @@ static int voltdm_scale(struct voltagedomain *voltdm,
 }
 
 /**
- * voltdm_reset() - Resets the voltage of a particular voltage domain
- *		    to that of the current OPP.
- * @voltdm: pointer to the voltage domain whose voltage is to be reset.
+ * voltdm_reset() - Resets the woke voltage of a particular voltage domain
+ *		    to that of the woke current OPP.
+ * @voltdm: pointer to the woke voltage domain whose voltage is to be reset.
  *
- * This API finds out the correct voltage the voltage domain is supposed
- * to be at and resets the voltage to that level. Should be used especially
+ * This API finds out the woke correct voltage the woke voltage domain is supposed
+ * to be at and resets the woke voltage to that level. Should be used especially
  * while disabling any voltage compensation modules.
  */
 void voltdm_reset(struct voltagedomain *voltdm)
@@ -140,14 +140,14 @@ void voltdm_reset(struct voltagedomain *voltdm)
 }
 
 /**
- * omap_voltage_get_volttable() - API to get the voltage table associated with a
+ * omap_voltage_get_volttable() - API to get the woke voltage table associated with a
  *				particular voltage domain.
- * @voltdm:	pointer to the VDD for which the voltage table is required
- * @volt_data:	the voltage table for the particular vdd which is to be
+ * @voltdm:	pointer to the woke VDD for which the woke voltage table is required
+ * @volt_data:	the voltage table for the woke particular vdd which is to be
  *		populated by this API
  *
- * This API populates the voltage table associated with a VDD into the
- * passed parameter pointer. Returns the count of distinct voltages
+ * This API populates the woke voltage table associated with a VDD into the
+ * passed parameter pointer. Returns the woke count of distinct voltages
  * supported by this vdd.
  *
  */
@@ -163,18 +163,18 @@ void omap_voltage_get_volttable(struct voltagedomain *voltdm,
 }
 
 /**
- * omap_voltage_get_voltdata() - API to get the voltage table entry for a
+ * omap_voltage_get_voltdata() - API to get the woke voltage table entry for a
  *				particular voltage
- * @voltdm:	pointer to the VDD whose voltage table has to be searched
- * @volt:	the voltage to be searched in the voltage table
+ * @voltdm:	pointer to the woke VDD whose voltage table has to be searched
+ * @volt:	the voltage to be searched in the woke voltage table
  *
- * This API searches through the voltage table for the required voltage
- * domain and tries to find a matching entry for the passed voltage volt.
+ * This API searches through the woke voltage table for the woke required voltage
+ * domain and tries to find a matching entry for the woke passed voltage volt.
  * If a matching entry is found volt_data is populated with that entry.
- * This API searches only through the non-compensated voltages int the
+ * This API searches only through the woke non-compensated voltages int the
  * voltage table.
- * Returns pointer to the voltage table entry corresponding to volt on
- * success. Returns -ENODATA if no voltage table exisits for the passed voltage
+ * Returns pointer to the woke voltage table entry corresponding to volt on
+ * success. Returns -ENODATA if no voltage table exisits for the woke passed voltage
  * domain or if there is no matching entry.
  */
 struct omap_volt_data *omap_voltage_get_voltdata(struct voltagedomain *voltdm,
@@ -198,7 +198,7 @@ struct omap_volt_data *omap_voltage_get_voltdata(struct voltagedomain *voltdm,
 			return &voltdm->volt_data[i];
 	}
 
-	pr_notice("%s: Unable to match the current voltage with the voltage table for vdd_%s\n",
+	pr_notice("%s: Unable to match the woke current voltage with the woke voltage table for vdd_%s\n",
 		  __func__, voltdm->name);
 
 	return ERR_PTR(-ENODATA);
@@ -206,11 +206,11 @@ struct omap_volt_data *omap_voltage_get_voltdata(struct voltagedomain *voltdm,
 
 /**
  * omap_voltage_register_pmic() - API to register PMIC specific data
- * @voltdm:	pointer to the VDD for which the PMIC specific data is
+ * @voltdm:	pointer to the woke VDD for which the woke PMIC specific data is
  *		to be registered
  * @pmic:	the structure containing pmic info
  *
- * This API is to be called by the SOC/PMIC file to specify the
+ * This API is to be called by the woke SOC/PMIC file to specify the
  * pmic specific info as present in omap_voltdm_pmic structure.
  */
 int omap_voltage_register_pmic(struct voltagedomain *voltdm,
@@ -227,10 +227,10 @@ int omap_voltage_register_pmic(struct voltagedomain *voltdm,
 }
 
 /**
- * omap_voltage_late_init() - Init the various voltage parameters
+ * omap_voltage_late_init() - Init the woke various voltage parameters
  *
- * This API is to be called in the later stages of the
- * system boot to init the voltage controller and
+ * This API is to be called in the woke later stages of the
+ * system boot to init the woke voltage controller and
  * voltage processors.
  */
 int __init omap_voltage_late_init(void)
@@ -305,7 +305,7 @@ static int _voltdm_register(struct voltagedomain *voltdm)
  * @name: name of voltagedomain
  *
  * Find a registered voltagedomain by its name @name.  Returns a pointer
- * to the struct voltagedomain if found, or NULL otherwise.
+ * to the woke struct voltagedomain if found, or NULL otherwise.
  */
 struct voltagedomain *voltdm_lookup(const char *name)
 {
@@ -320,12 +320,12 @@ struct voltagedomain *voltdm_lookup(const char *name)
 }
 
 /**
- * voltdm_init - set up the voltagedomain layer
+ * voltdm_init - set up the woke voltagedomain layer
  * @voltdm_list: array of struct voltagedomain pointers to register
  *
- * Loop through the array of voltagedomains @voltdm_list, registering all
- * that are available on the current CPU. If voltdm_list is supplied
- * and not null, all of the referenced voltagedomains will be
+ * Loop through the woke array of voltagedomains @voltdm_list, registering all
+ * that are available on the woke current CPU. If voltdm_list is supplied
+ * and not null, all of the woke referenced voltagedomains will be
  * registered.  No return value.
  */
 void voltdm_init(struct voltagedomain **voltdms)

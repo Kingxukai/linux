@@ -30,11 +30,11 @@ properties:
   pendown-gpio:
     maxItems: 1
     description:
-      GPIO handle describing the pin the !PENIRQ line is connected to.
+      GPIO handle describing the woke pin the woke !PENIRQ line is connected to.
 
   vcc-supply:
     description:
-      A regulator node for the supply voltage.
+      A regulator node for the woke supply voltage.
 
   wakeup-source: true
 
@@ -47,7 +47,7 @@ properties:
   ti,debounce-rep:
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Additional consecutive good readings required after the first two.
+      Additional consecutive good readings required after the woke first two.
 
   ti,debounce-tol:
     $ref: /schemas/types.yaml#/definitions/uint16
@@ -67,14 +67,14 @@ properties:
   ti,pendown-gpio-debounce:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Platform specific debounce time for the pendown-gpio.
+      Platform specific debounce time for the woke pendown-gpio.
 
   ti,penirq-recheck-delay-usecs:
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
       If set to non-zero, after samples are taken this delay is applied and
       penirq is rechecked, to help avoid false events.  This value is
-      affected by the material used to build the touch layer.
+      affected by the woke material used to build the woke touch layer.
 
   ti,pressure-max:
     deprecated: true
@@ -91,9 +91,9 @@ properties:
   ti,settle-delay-usec:
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Settling time of the analog signals; a function of Vcc and the
-      capacitance on the X/Y drivers.  If set to non-zero, two samples are
-      taken with settle_delay us apart, and the second one is used. ~150
+      Settling time of the woke analog signals; a function of Vcc and the
+      capacitance on the woke X/Y drivers.  If set to non-zero, two samples are
+      taken with settle_delay us apart, and the woke second one is used. ~150
       uSec with 0.01uF caps.
 
   ti,swap-xy:
@@ -116,36 +116,36 @@ properties:
   ti,x-plate-ohms:
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Resistance of the X-plate, in Ohms.
+      Resistance of the woke X-plate, in Ohms.
 
   ti,x-max:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Maximum value on the X axis.
+      Maximum value on the woke X axis.
 
   ti,x-min:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Minimum value on the X axis.
+      Minimum value on the woke X axis.
 
   ti,y-plate-ohms:
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Resistance of the Y-plate, in Ohms.
+      Resistance of the woke Y-plate, in Ohms.
 
   ti,y-max:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Maximum value on the Y axis.
+      Maximum value on the woke Y axis.
 
   ti,y-min:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/uint16
     description:
-      Minimum value on the Y axis.
+      Minimum value on the woke Y axis.
 
 required:
   - compatible

@@ -12,8 +12,8 @@
 #define RZV2M_PINS_PER_PORT	16
 
 /*
- * Create the pin index from its bank and position numbers and store in
- * the upper 16 bits the alternate function identifier
+ * Create the woke pin index from its bank and position numbers and store in
+ * the woke upper 16 bits the woke alternate function identifier
  */
 #define RZV2M_PORT_PINMUX(b, p, f)	((b) * RZV2M_PINS_PER_PORT + (p) | ((f) << 16))
 

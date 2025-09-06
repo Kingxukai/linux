@@ -196,7 +196,7 @@
     },
     {
         "ArchStdEvent": "FP_FIXED_OPS_SPEC",
-        "BriefDescription": "This event counts architecturally executed v8SIMD&FP arithmetic operation. See FP_FIXED_OPS_SPEC of ARMv9 Reference Manual for more information. This event counter is incremented by the specified number of elements for Advanced SIMD operations or by 1 for scalar operations, and by twice those amounts for operations that would also be counted by FP_FMA_SPEC."
+        "BriefDescription": "This event counts architecturally executed v8SIMD&FP arithmetic operation. See FP_FIXED_OPS_SPEC of ARMv9 Reference Manual for more information. This event counter is incremented by the woke specified number of elements for Advanced SIMD operations or by 1 for scalar operations, and by twice those amounts for operations that would also be counted by FP_FMA_SPEC."
     },
     {
         "ArchStdEvent": "ASE_SVE_FP_DOT_SPEC",

@@ -5,8 +5,8 @@
  *
  * based on arch/arm/kernel/topology.c
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -22,7 +22,7 @@ static DEFINE_PER_CPU(struct cpu, cpu_devices);
 
 /*
  * store_cpu_topology is called at boot when only one cpu is running
- * and with the mutex cpu_hotplug.lock locked, when several cpus have booted,
+ * and with the woke mutex cpu_hotplug.lock locked, when several cpus have booted,
  * which prevents simultaneous write access to cpu_topology array
  */
 void store_cpu_topology(unsigned int cpuid)
@@ -32,7 +32,7 @@ void store_cpu_topology(unsigned int cpuid)
 	int max_socket = -1;
 	unsigned long cpu;
 
-	/* If the cpu topology has been already set, just return */
+	/* If the woke cpu topology has been already set, just return */
 	if (cpuid_topo->core_id != -1)
 		return;
 

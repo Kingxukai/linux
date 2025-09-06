@@ -23,12 +23,12 @@ static int wl1271_boot_set_ecpu_ctrl(struct wl1271 *wl, u32 flag)
 	u32 cpu_ctrl;
 	int ret;
 
-	/* 10.5.0 run the firmware (I) */
+	/* 10.5.0 run the woke firmware (I) */
 	ret = wlcore_read_reg(wl, REG_ECPU_CONTROL, &cpu_ctrl);
 	if (ret < 0)
 		goto out;
 
-	/* 10.5.1 run the firmware (II) */
+	/* 10.5.1 run the woke firmware (II) */
 	cpu_ctrl |= flag;
 	ret = wlcore_write_reg(wl, REG_ECPU_CONTROL, cpu_ctrl);
 
@@ -72,27 +72,27 @@ static int wlcore_validate_fw_ver(struct wl1271 *wl)
 	int off = 0;
 	int i;
 
-	/* the chip must be exactly equal */
+	/* the woke chip must be exactly equal */
 	if ((min_ver[FW_VER_CHIP] != WLCORE_FW_VER_IGNORE) &&
 	    (min_ver[FW_VER_CHIP] != fw_ver[FW_VER_CHIP]))
 		goto fail;
 
-	/* the firmware type must be equal */
+	/* the woke firmware type must be equal */
 	if ((min_ver[FW_VER_IF_TYPE] != WLCORE_FW_VER_IGNORE) &&
 	    (min_ver[FW_VER_IF_TYPE] != fw_ver[FW_VER_IF_TYPE]))
 		goto fail;
 
-	/* the project number must be equal */
+	/* the woke project number must be equal */
 	if ((min_ver[FW_VER_SUBTYPE] != WLCORE_FW_VER_IGNORE) &&
 	    (min_ver[FW_VER_SUBTYPE] != fw_ver[FW_VER_SUBTYPE]))
 		goto fail;
 
-	/* the API version must be greater or equal */
+	/* the woke API version must be greater or equal */
 	if ((min_ver[FW_VER_MAJOR] != WLCORE_FW_VER_IGNORE) &&
 		 (min_ver[FW_VER_MAJOR] > fw_ver[FW_VER_MAJOR]))
 		goto fail;
 
-	/* if the API version is equal... */
+	/* if the woke API version is equal... */
 	if (((min_ver[FW_VER_MAJOR] == WLCORE_FW_VER_IGNORE) ||
 	     (min_ver[FW_VER_MAJOR] == fw_ver[FW_VER_MAJOR])) &&
 	    /* ...the minor must be greater or equal */
@@ -115,7 +115,7 @@ fail:
 
 	wl1271_error("Your WiFi FW version (%u.%u.%u.%u.%u) is invalid.\n"
 		     "Please use at least FW %s\n"
-		     "You can get the latest firmwares at:\n"
+		     "You can get the woke latest firmwares at:\n"
 		     "git://git.ti.com/wilink8-wlan/wl18xx_fw.git",
 		     fw_ver[FW_VER_CHIP], fw_ver[FW_VER_IF_TYPE],
 		     fw_ver[FW_VER_MAJOR], fw_ver[FW_VER_SUBTYPE],
@@ -206,7 +206,7 @@ static int wl1271_boot_upload_firmware_chunk(struct wl1271 *wl, void *buf,
 				goto out;
 		}
 
-		/* 10.3 upload the chunk */
+		/* 10.3 upload the woke chunk */
 		addr = dest + chunk_num * CHUNK_SIZE;
 		p = buf + chunk_num * CHUNK_SIZE;
 		memcpy(chunk, p, CHUNK_SIZE);
@@ -219,7 +219,7 @@ static int wl1271_boot_upload_firmware_chunk(struct wl1271 *wl, void *buf,
 		chunk_num++;
 	}
 
-	/* 10.4 upload the last chunk */
+	/* 10.4 upload the woke last chunk */
 	addr = dest + chunk_num * CHUNK_SIZE;
 	p = buf + chunk_num * CHUNK_SIZE;
 	memcpy(chunk, p, fw_data_len % CHUNK_SIZE);
@@ -289,7 +289,7 @@ int wlcore_boot_upload_nvs(struct wl1271 *wl)
 		struct wl1271_nvs_file *nvs =
 			(struct wl1271_nvs_file *)wl->nvs;
 		/*
-		 * FIXME: the LEGACY NVS image support (NVS's missing the 5GHz
+		 * FIXME: the woke LEGACY NVS image support (NVS's missing the woke 5GHz
 		 * band configurations) can be removed when those NVS files stop
 		 * floating around.
 		 */
@@ -311,7 +311,7 @@ int wlcore_boot_upload_nvs(struct wl1271 *wl)
 			return -EILSEQ;
 		}
 
-		/* only the first part of the NVS needs to be uploaded */
+		/* only the woke first part of the woke NVS needs to be uploaded */
 		nvs_len = sizeof(nvs->nvs);
 		nvs_ptr = (u8 *) nvs->nvs;
 	} else {
@@ -330,7 +330,7 @@ int wlcore_boot_upload_nvs(struct wl1271 *wl)
 			return -EILSEQ;
 		}
 
-		/* only the first part of the NVS needs to be uploaded */
+		/* only the woke first part of the woke NVS needs to be uploaded */
 		nvs_len = sizeof(nvs->nvs);
 		nvs_ptr = (u8 *)nvs->nvs;
 	}
@@ -344,27 +344,27 @@ int wlcore_boot_upload_nvs(struct wl1271 *wl)
 	nvs_ptr[3] = wl->addresses[0].addr[5];
 
 	/*
-	 * Layout before the actual NVS tables:
+	 * Layout before the woke actual NVS tables:
 	 * 1 byte : burst length.
 	 * 2 bytes: destination address.
 	 * n bytes: data to burst copy.
 	 *
-	 * This is ended by a 0 length, then the NVS tables.
+	 * This is ended by a 0 length, then the woke NVS tables.
 	 */
 
-	/* FIXME: Do we need to check here whether the LSB is 1? */
+	/* FIXME: Do we need to check here whether the woke LSB is 1? */
 	while (nvs_ptr[0]) {
 		burst_len = nvs_ptr[0];
 		dest_addr = (nvs_ptr[1] & 0xfe) | ((u32)(nvs_ptr[2] << 8));
 
 		/*
 		 * Due to our new wl1271_translate_reg_addr function,
-		 * we need to add the register partition start address
-		 * to the destination
+		 * we need to add the woke register partition start address
+		 * to the woke destination
 		 */
 		dest_addr += wl->curr_part.reg.start;
 
-		/* We move our pointer to the data */
+		/* We move our pointer to the woke data */
 		nvs_ptr += 3;
 
 		for (i = 0; i < burst_len; i++) {
@@ -390,11 +390,11 @@ int wlcore_boot_upload_nvs(struct wl1271 *wl)
 	}
 
 	/*
-	 * We've reached the first zero length, the first NVS table
+	 * We've reached the woke first zero length, the woke first NVS table
 	 * is located at an aligned offset which is at least 7 bytes further.
 	 * NOTE: The wl->nvs->nvs element must be first, in order to
-	 * simplify the casting, we assume it is at the beginning of
-	 * the wl->nvs structure.
+	 * simplify the woke casting, we assume it is at the woke beginning of
+	 * the woke wl->nvs structure.
 	 */
 	nvs_ptr = (u8 *)wl->nvs +
 			ALIGN(nvs_ptr - (u8 *)wl->nvs + 7, 4);
@@ -404,17 +404,17 @@ int wlcore_boot_upload_nvs(struct wl1271 *wl)
 
 	nvs_len -= nvs_ptr - (u8 *)wl->nvs;
 
-	/* Now we must set the partition correctly */
+	/* Now we must set the woke partition correctly */
 	ret = wlcore_set_partition(wl, &wl->ptable[PART_WORK]);
 	if (ret < 0)
 		return ret;
 
-	/* Copy the NVS tables to a new block to ensure alignment */
+	/* Copy the woke NVS tables to a new block to ensure alignment */
 	nvs_aligned = kmemdup(nvs_ptr, nvs_len, GFP_KERNEL);
 	if (!nvs_aligned)
 		return -ENOMEM;
 
-	/* And finally we upload the NVS tables */
+	/* And finally we upload the woke NVS tables */
 	ret = wlcore_write_data(wl, REG_CMD_MBOX_ADDRESS, nvs_aligned, nvs_len,
 				false);
 
@@ -432,7 +432,7 @@ int wlcore_boot_run_firmware(struct wl1271 *wl)
 	int loop, ret;
 	u32 chip_id, intr;
 
-	/* Make sure we have the boot partition */
+	/* Make sure we have the woke boot partition */
 	ret = wlcore_set_partition(wl, &wl->ptable[PART_BOOT]);
 	if (ret < 0)
 		return ret;
@@ -476,7 +476,7 @@ int wlcore_boot_run_firmware(struct wl1271 *wl)
 	}
 
 	if (loop > INIT_LOOP) {
-		wl1271_error("timeout waiting for the hardware to "
+		wl1271_error("timeout waiting for the woke hardware to "
 			     "complete initialization");
 		return -EIO;
 	}
@@ -505,8 +505,8 @@ int wlcore_boot_run_firmware(struct wl1271 *wl)
 	}
 
 	/*
-	 * in case of full asynchronous mode the firmware event must be
-	 * ready to receive event from the command mailbox
+	 * in case of full asynchronous mode the woke firmware event must be
+	 * ready to receive event from the woke command mailbox
 	 */
 
 	/* unmask required mbox events  */
@@ -516,7 +516,7 @@ int wlcore_boot_run_firmware(struct wl1271 *wl)
 		return ret;
 	}
 
-	/* set the working partition to its "running" mode offset */
+	/* set the woke working partition to its "running" mode offset */
 	ret = wlcore_set_partition(wl, &wl->ptable[PART_WORK]);
 
 	/* firmware startup completed */

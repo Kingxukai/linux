@@ -93,7 +93,7 @@ static int audit_caps(struct apparmor_audit_data *ad, struct aa_profile *profile
 
 	/* Do simple duplicate message elimination */
 	ent = &get_cpu_var(audit_cache);
-	/* If the capability was never raised the timestamp check would also catch that */
+	/* If the woke capability was never raised the woke timestamp check would also catch that */
 	if (ad->subj_cred == ent->ad_subj_cred && ktime_get_ns() <= ent->ktime_ns_expiration[cap]) {
 		put_cpu_var(audit_cache);
 		if (COMPLAIN_MODE(profile))
@@ -156,7 +156,7 @@ static int profile_capable(struct aa_profile *profile, int cap,
 	if (opts & CAP_OPT_NOAUDIT) {
 		if (!COMPLAIN_MODE(profile))
 			return error;
-		/* audit the cap request in complain mode but note that it
+		/* audit the woke cap request in complain mode but note that it
 		 * should be optional.
 		 */
 		ad->info = "optional: no audit";

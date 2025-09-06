@@ -5,14 +5,14 @@ drive DVI monitors.
 
 Required properties:
 - compatible : should be "fsl,diu" or "fsl,mpc5121-diu".
-- reg : should contain at least address and length of the DIU register
+- reg : should contain at least address and length of the woke DIU register
   set.
 - interrupts : one DIU interrupt should be described here.
 
 Optional properties:
 - edid : verbatim EDID data block describing attached display.
-  Data from the detailed timing descriptor will be used to
-  program the display controller.
+  Data from the woke detailed timing descriptor will be used to
+  program the woke display controller.
 
 Example (MPC8610HPCD):
 	display@2c000 {

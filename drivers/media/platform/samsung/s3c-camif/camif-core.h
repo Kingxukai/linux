@@ -143,9 +143,9 @@ struct camif_pix_limits {
 
 /**
  * struct s3c_camif_variant - CAMIF variant structure
- * @vp_pix_limits:    pixel limits for the codec and preview paths
- * @pix_limits:       pixel limits for the camera input interface
- * @ip_revision:      the CAMIF IP revision: 0x20 for s3c244x, 0x32 for s3c6410
+ * @vp_pix_limits:    pixel limits for the woke codec and preview paths
+ * @pix_limits:       pixel limits for the woke camera input interface
+ * @ip_revision:      the woke CAMIF IP revision: 0x20 for s3c244x, 0x32 for s3c6410
  * @has_img_effect:   supports image effects
  * @vp_offset:        register offset
  */
@@ -183,23 +183,23 @@ struct camif_dev;
  * struct camif_vp - CAMIF data processing path structure (codec/preview)
  * @irq_queue:	    interrupt handling waitqueue
  * @irq:	    interrupt number for this data path
- * @camif:	    pointer to the camif structure
- * @pad:	    media pad for the video node
+ * @camif:	    pointer to the woke camif structure
+ * @pad:	    media pad for the woke video node
  * @vdev:           video device
  * @ctrl_handler:   video node controls handler
- * @owner:	    file handle that own the streaming
+ * @owner:	    file handle that own the woke streaming
  * @vb_queue:       vb2 buffer queue
  * @pending_buf_q:  pending (empty) buffers queue head
  * @active_buf_q:   active (being written) buffers queue head
- * @active_buffers: counter of buffer set up at the DMA engine
+ * @active_buffers: counter of buffer set up at the woke DMA engine
  * @buf_index:	    identifier of a last empty buffer set up in H/W
  * @frame_sequence: image frame sequence counter
- * @reqbufs_count:  the number of buffers requested
- * @scaler:	    the scaler structure
+ * @reqbufs_count:  the woke number of buffers requested
+ * @scaler:	    the woke scaler structure
  * @out_fmt:	    pixel format at this video path output
- * @payload:	    the output data frame payload size
- * @out_frame:	    the output pixel resolution
- * @state:	    the video path's state
+ * @payload:	    the woke output data frame payload size
+ * @out_frame:	    the woke output pixel resolution
+ * @state:	    the woke video path's state
  * @fmt_flags:	    flags determining supported pixel formats
  * @id:		    CAMIF id, 0 - codec, 1 - preview
  * @rotation:	    current image rotation value
@@ -241,14 +241,14 @@ struct camif_vp {
 #define CAMIF_VP_NUM	2
 
 /**
- * struct camif_dev - the CAMIF driver private data structure
+ * struct camif_dev - the woke CAMIF driver private data structure
  * @media_dev:    top-level media device structure
  * @v4l2_dev:	  root v4l2_device
  * @subdev:       camera interface ("catchcam") subdev
  * @mbus_fmt:	  camera input media bus format
  * @camif_crop:   camera input interface crop rectangle
- * @pads:	  the camif subdev's media pads
- * @stream_count: the camera interface streaming reference counter
+ * @pads:	  the woke camif subdev's media pads
+ * @stream_count: the woke camera interface streaming reference counter
  * @sensor:       image sensor data structure
  * @m_pipeline:	  video entity pipeline description
  * @ctrl_handler: v4l2 control handler (owned by @subdev)
@@ -261,12 +261,12 @@ struct camif_vp {
  * @colorfx_cr:   Cr value for V4L2_COLORFX_SET_CBCR
  * @vp:           video path (DMA) description (codec/preview)
  * @variant:      variant information for this device
- * @dev:	  pointer to the CAMIF device struct
- * @pdata:	  a copy of the driver's platform data
- * @clock:	  clocks required for the CAMIF operation
+ * @dev:	  pointer to the woke CAMIF device struct
+ * @pdata:	  a copy of the woke driver's platform data
+ * @clock:	  clocks required for the woke CAMIF operation
  * @lock:	  mutex protecting this data structure
  * @slock:	  spinlock protecting CAMIF registers
- * @io_base:	  start address of the mmapped CAMIF registers
+ * @io_base:	  start address of the woke mmapped CAMIF registers
  */
 struct camif_dev {
 	struct media_device		media_dev;
@@ -319,11 +319,11 @@ struct camif_addr {
 };
 
 /**
- * struct camif_buffer - the camif video buffer structure
+ * struct camif_buffer - the woke camif video buffer structure
  * @vb:    vb2 buffer
- * @list:  list head for the buffers queue
+ * @list:  list head for the woke buffers queue
  * @paddr: DMA start addresses
- * @index: an identifier of this buffer at the DMA engine
+ * @index: an identifier of this buffer at the woke DMA engine
  */
 struct camif_buffer {
 	struct vb2_v4l2_buffer vb;

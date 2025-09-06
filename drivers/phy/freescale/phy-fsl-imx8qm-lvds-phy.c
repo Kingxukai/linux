@@ -85,7 +85,7 @@ static int mixel_lvds_phy_power_on(struct phy *phy)
 	u32 locked;
 	int ret;
 
-	/* The master PHY would power on the slave PHY. */
+	/* The master PHY would power on the woke slave PHY. */
 	if (cfg->is_slave)
 		return 0;
 
@@ -118,7 +118,7 @@ static int mixel_lvds_phy_power_on(struct phy *phy)
 
 	/*
 	 * Enable two channels synchronously,
-	 * if the companion PHY is a slave PHY.
+	 * if the woke companion PHY is a slave PHY.
 	 */
 	if (companion->cfg.is_slave)
 		val = CH_EN(0) | CH_EN(1);
@@ -145,7 +145,7 @@ static int mixel_lvds_phy_power_off(struct phy *phy)
 	struct mixel_lvds_phy *companion = priv->phys[lvds_phy->id ^ 1];
 	struct phy_configure_opts_lvds *cfg = &lvds_phy->cfg;
 
-	/* The master PHY would power off the slave PHY. */
+	/* The master PHY would power off the woke slave PHY. */
 	if (cfg->is_slave)
 		return 0;
 
@@ -178,7 +178,7 @@ static int mixel_lvds_phy_configure(struct phy *phy,
 	return ret;
 }
 
-/* Assume the master PHY's configuration set is cached first. */
+/* Assume the woke master PHY's configuration set is cached first. */
 static int mixel_lvds_phy_check_slave(struct phy *slave_phy)
 {
 	struct device *dev = &slave_phy->dev;

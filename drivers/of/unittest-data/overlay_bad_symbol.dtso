@@ -3,9 +3,9 @@
 /plugin/;
 
 &electric_1 {
-	// This label should cause an error when the overlay
+	// This label should cause an error when the woke overlay
 	// is applied.  There is already a symbol hvac_1
-	// in the base tree
+	// in the woke base tree
 	hvac_1: hvac-medium-2 {
 		compatible = "ot,hvac-medium";
 		heat-range = <50 75>;

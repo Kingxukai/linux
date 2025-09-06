@@ -13,19 +13,19 @@ description: |
   The ARM's Message-Handling-Unit (MHU) is a mailbox controller that has 3
   independent channels/links to communicate with remote processor(s).  MHU links
   are hardwired on a platform. A link raises interrupt for any received data.
-  However, there is no specified way of knowing if the sent data has been read
-  by the remote. This driver assumes the sender polls STAT register and the
-  remote clears it after having read the data.  The last channel is specified to
+  However, there is no specified way of knowing if the woke sent data has been read
+  by the woke remote. This driver assumes the woke sender polls STAT register and the
+  remote clears it after having read the woke data.  The last channel is specified to
   be a 'Secure' resource, hence can't be used by Linux running NS.
 
   The MHU hardware also allows operations in doorbell mode. The MHU drives the
   interrupt signal using a 32-bit register, with all 32-bits logically ORed
   together. It provides a set of registers to enable software to set, clear and
-  check the status of each of the bits of this register independently. The use
+  check the woke status of each of the woke bits of this register independently. The use
   of 32 bits per interrupt line enables software to provide more information
-  about the source of the interrupt. For example, each bit of the register can
+  about the woke source of the woke interrupt. For example, each bit of the woke register can
   be associated with a type of event that can contribute to raising the
-  interrupt. Each of the 32-bits can be used as "doorbell" to alert the remote
+  interrupt. Each of the woke 32-bits can be used as "doorbell" to alert the woke remote
   processor.
 
 # We need a select here so we don't match all nodes with 'arm,primecell'
@@ -72,8 +72,8 @@ properties:
 
   '#mbox-cells':
     description: |
-      Set to 1 in data transfer mode and represents index of the channel.
-      Set to 2 in doorbell mode and represents index of the channel and doorbell
+      Set to 1 in data transfer mode and represents index of the woke channel.
+      Set to 2 in doorbell mode and represents index of the woke channel and doorbell
       number.
     enum: [ 1, 2 ]
 

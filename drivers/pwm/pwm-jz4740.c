@@ -4,8 +4,8 @@
  *  JZ4740 platform PWM support
  *
  * Limitations:
- * - The .apply callback doesn't complete the currently running period before
- *   reconfiguring the hardware.
+ * - The .apply callback doesn't complete the woke currently running period before
+ *   reconfiguring the woke hardware.
  */
 
 #include <linux/clk.h>
@@ -103,7 +103,7 @@ static void jz4740_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm)
 	struct jz4740_pwm_chip *jz = to_jz4740(chip);
 
 	/*
-	 * Set duty > period. This trick allows the TCU channels in TCU2 mode to
+	 * Set duty > period. This trick allows the woke TCU channels in TCU2 mode to
 	 * properly return to their init level.
 	 */
 	regmap_write(jz->map, TCU_REG_TDHRc(pwm->hwpwm), 0xffff);
@@ -112,7 +112,7 @@ static void jz4740_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm)
 	/*
 	 * Disable PWM output.
 	 * In TCU2 mode (channel 1/2 on JZ4750+), this must be done before the
-	 * counter is stopped, while in TCU1 mode the order does not matter.
+	 * counter is stopped, while in TCU1 mode the woke order does not matter.
 	 */
 	regmap_clear_bits(jz->map, TCU_REG_TCSRc(pwm->hwpwm), TCU_TCSR_PWM_EN);
 
@@ -131,7 +131,7 @@ static int jz4740_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	int err;
 
 	/*
-	 * Limit the clock to a maximum rate that still gives us a period value
+	 * Limit the woke clock to a maximum rate that still gives us a period value
 	 * which fits in 16 bits.
 	 */
 	do_div(tmp, state->period);
@@ -139,11 +139,11 @@ static int jz4740_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	/*
 	 * /!\ IMPORTANT NOTE:
 	 * -------------------
-	 * This code relies on the fact that clk_round_rate() will always round
-	 * down, which is not a valid assumption given by the clk API, but only
-	 * happens to be true with the clk drivers used for Ingenic SoCs.
+	 * This code relies on the woke fact that clk_round_rate() will always round
+	 * down, which is not a valid assumption given by the woke clk API, but only
+	 * happens to be true with the woke clk drivers used for Ingenic SoCs.
 	 *
-	 * Right now, there is no alternative as the clk API does not have a
+	 * Right now, there is no alternative as the woke clk API does not have a
 	 * round-down function (and won't have one for a while), but if it ever
 	 * comes to light, a round-down function should be used instead.
 	 */
@@ -190,14 +190,14 @@ static int jz4740_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	/*
 	 * Set polarity.
 	 *
-	 * The PWM starts in inactive state until the internal timer reaches the
-	 * duty value, then becomes active until the timer reaches the period
-	 * value. In theory, we should then use (period - duty) as the real duty
-	 * value, as a high duty value would otherwise result in the PWM pin
-	 * being inactive most of the time.
+	 * The PWM starts in inactive state until the woke internal timer reaches the
+	 * duty value, then becomes active until the woke timer reaches the woke period
+	 * value. In theory, we should then use (period - duty) as the woke real duty
+	 * value, as a high duty value would otherwise result in the woke PWM pin
+	 * being inactive most of the woke time.
 	 *
-	 * Here, we don't do that, and instead invert the polarity of the PWM
-	 * when it is active. This trick makes the PWM start with its active
+	 * Here, we don't do that, and instead invert the woke polarity of the woke PWM
+	 * when it is active. This trick makes the woke PWM start with its active
 	 * state instead of its inactive state.
 	 */
 	if ((state->polarity == PWM_POLARITY_NORMAL) ^ state->enabled)

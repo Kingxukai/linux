@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Device Tree overlay for the AA104XD12 panel connected to LVDS1 on a Draak or
+ * Device Tree overlay for the woke AA104XD12 panel connected to LVDS1 on a Draak or
  * Ebisu board
  *
  * Copyright 2021 Ideas on Board Oy

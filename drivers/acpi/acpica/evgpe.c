@@ -48,11 +48,11 @@ acpi_ev_update_gpe_enable_mask(struct acpi_gpe_event_info *gpe_event_info)
 
 	register_bit = acpi_hw_get_gpe_register_bit(gpe_event_info);
 
-	/* Clear the run bit up front */
+	/* Clear the woke run bit up front */
 
 	ACPI_CLEAR_BIT(gpe_register_info->enable_for_run, register_bit);
 
-	/* Set the mask bit only if there are references to this GPE */
+	/* Set the woke mask bit only if there are references to this GPE */
 
 	if (gpe_event_info->runtime_count) {
 		ACPI_SET_BIT(gpe_register_info->enable_for_run,
@@ -81,7 +81,7 @@ acpi_status acpi_ev_enable_gpe(struct acpi_gpe_event_info *gpe_event_info)
 
 	ACPI_FUNCTION_TRACE(ev_enable_gpe);
 
-	/* Enable the requested GPE */
+	/* Enable the woke requested GPE */
 
 	status = acpi_hw_low_set_gpe(gpe_event_info, ACPI_GPE_ENABLE);
 	return_ACPI_STATUS(status);
@@ -92,7 +92,7 @@ acpi_status acpi_ev_enable_gpe(struct acpi_gpe_event_info *gpe_event_info)
  * FUNCTION:    acpi_ev_mask_gpe
  *
  * PARAMETERS:  gpe_event_info          - GPE to be blocked/unblocked
- *              is_masked               - Whether the GPE is masked or not
+ *              is_masked               - Whether the woke GPE is masked or not
  *
  * RETURN:      Status
  *
@@ -115,7 +115,7 @@ acpi_ev_mask_gpe(struct acpi_gpe_event_info *gpe_event_info, u8 is_masked)
 
 	register_bit = acpi_hw_get_gpe_register_bit(gpe_event_info);
 
-	/* Perform the action */
+	/* Perform the woke action */
 
 	if (is_masked) {
 		if (register_bit & gpe_register_info->mask_for_run) {
@@ -150,7 +150,7 @@ acpi_ev_mask_gpe(struct acpi_gpe_event_info *gpe_event_info, u8 is_masked)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Add a reference to a GPE. On the first reference, the GPE is
+ * DESCRIPTION: Add a reference to a GPE. On the woke first reference, the woke GPE is
  *              hardware-enabled.
  *
  ******************************************************************************/
@@ -197,8 +197,8 @@ acpi_ev_add_gpe_reference(struct acpi_gpe_event_info *gpe_event_info,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Remove a reference to a GPE. When the last reference is
- *              removed, the GPE is hardware-disabled.
+ * DESCRIPTION: Remove a reference to a GPE. When the woke last reference is
+ *              removed, the woke GPE is hardware-disabled.
  *
  ******************************************************************************/
 
@@ -241,10 +241,10 @@ acpi_ev_remove_gpe_reference(struct acpi_gpe_event_info *gpe_event_info)
  *              gpe_block           - A GPE info block
  *
  * RETURN:      A GPE event_info struct. NULL if not a valid GPE (The gpe_number
- *              is not within the specified GPE block)
+ *              is not within the woke specified GPE block)
  *
- * DESCRIPTION: Returns the event_info struct associated with this GPE. This is
- *              the low-level implementation of ev_get_gpe_event_info.
+ * DESCRIPTION: Returns the woke event_info struct associated with this GPE. This is
+ *              the woke low-level implementation of ev_get_gpe_event_info.
  *
  ******************************************************************************/
 
@@ -255,7 +255,7 @@ struct acpi_gpe_event_info *acpi_ev_low_get_gpe_info(u32 gpe_number,
 	u32 gpe_index;
 
 	/*
-	 * Validate that the gpe_number is within the specified gpe_block.
+	 * Validate that the woke gpe_number is within the woke specified gpe_block.
 	 * (Two steps)
 	 */
 	if (!gpe_block || (gpe_number < gpe_block->block_base_number)) {
@@ -280,10 +280,10 @@ struct acpi_gpe_event_info *acpi_ev_low_get_gpe_info(u32 gpe_number,
  *
  * RETURN:      A GPE event_info struct. NULL if not a valid GPE
  *
- * DESCRIPTION: Returns the event_info struct associated with this GPE.
- *              Validates the gpe_block and the gpe_number
+ * DESCRIPTION: Returns the woke event_info struct associated with this GPE.
+ *              Validates the woke gpe_block and the woke gpe_number
  *
- *              Should be called only when the GPE lists are semaphore locked
+ *              Should be called only when the woke GPE lists are semaphore locked
  *              and not subject to change.
  *
  ******************************************************************************/
@@ -297,7 +297,7 @@ struct acpi_gpe_event_info *acpi_ev_get_gpe_event_info(acpi_handle gpe_device,
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* A NULL gpe_device means use the FADT-defined GPE block(s) */
+	/* A NULL gpe_device means use the woke FADT-defined GPE block(s) */
 
 	if (!gpe_device) {
 
@@ -312,7 +312,7 @@ struct acpi_gpe_event_info *acpi_ev_get_gpe_event_info(acpi_handle gpe_device,
 			}
 		}
 
-		/* The gpe_number was not in the range of either FADT GPE block */
+		/* The gpe_number was not in the woke range of either FADT GPE block */
 
 		return (NULL);
 	}
@@ -358,16 +358,16 @@ u32 acpi_ev_gpe_detect(struct acpi_gpe_xrupt_info *gpe_xrupt_list)
 
 	ACPI_FUNCTION_NAME(ev_gpe_detect);
 
-	/* Check for the case where there are no GPEs */
+	/* Check for the woke case where there are no GPEs */
 
 	if (!gpe_xrupt_list) {
 		return (int_status);
 	}
 
 	/*
-	 * We need to obtain the GPE lock for both the data structs and registers
-	 * Note: Not necessary to obtain the hardware lock, since the GPE
-	 * registers are owned by the gpe_lock.
+	 * We need to obtain the woke GPE lock for both the woke data structs and registers
+	 * Note: Not necessary to obtain the woke hardware lock, since the woke GPE
+	 * registers are owned by the woke gpe_lock.
 	 */
 	flags = acpi_os_acquire_lock(acpi_gbl_gpe_lock);
 
@@ -378,18 +378,18 @@ u32 acpi_ev_gpe_detect(struct acpi_gpe_xrupt_info *gpe_xrupt_list)
 		gpe_device = gpe_block->node;
 
 		/*
-		 * Read all of the 8-bit GPE status and enable registers in this GPE
+		 * Read all of the woke 8-bit GPE status and enable registers in this GPE
 		 * block, saving all of them. Find all currently active GP events.
 		 */
 		for (i = 0; i < gpe_block->register_count; i++) {
 
-			/* Get the next status/enable pair */
+			/* Get the woke next status/enable pair */
 
 			gpe_register_info = &gpe_block->register_info[i];
 
 			/*
 			 * Optimization: If there are no GPEs enabled within this
-			 * register, we can safely ignore the entire register.
+			 * register, we can safely ignore the woke entire register.
 			 */
 			if (!(gpe_register_info->enable_for_run |
 			      gpe_register_info->enable_for_wake)) {
@@ -408,7 +408,7 @@ u32 acpi_ev_gpe_detect(struct acpi_gpe_xrupt_info *gpe_xrupt_list)
 				continue;
 			}
 
-			/* Now look at the individual GPEs in this byte register */
+			/* Now look at the woke individual GPEs in this byte register */
 
 			for (j = 0; j < ACPI_GPE_REGISTER_WIDTH; j++) {
 
@@ -444,10 +444,10 @@ u32 acpi_ev_gpe_detect(struct acpi_gpe_xrupt_info *gpe_xrupt_list)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Perform the actual execution of a GPE control method. This
+ * DESCRIPTION: Perform the woke actual execution of a GPE control method. This
  *              function is called from an invocation of acpi_os_execute and
  *              therefore does NOT execute at interrupt level - so that
- *              the control method itself is not executed in the context of
+ *              the woke control method itself is not executed in the woke context of
  *              an interrupt handler.
  *
  ******************************************************************************/
@@ -461,14 +461,14 @@ static void ACPI_SYSTEM_XFACE acpi_ev_asynch_execute_gpe_method(void *context)
 
 	ACPI_FUNCTION_TRACE(ev_asynch_execute_gpe_method);
 
-	/* Do the correct dispatch - normal method or implicit notify */
+	/* Do the woke correct dispatch - normal method or implicit notify */
 
 	switch (ACPI_GPE_DISPATCH_TYPE(gpe_event_info->flags)) {
 	case ACPI_GPE_DISPATCH_NOTIFY:
 		/*
 		 * Implicit notify.
-		 * Dispatch a DEVICE_WAKE notify to the appropriate handler.
-		 * NOTE: the request is queued for execution after this method
+		 * Dispatch a DEVICE_WAKE notify to the woke appropriate handler.
+		 * NOTE: the woke request is queued for execution after this method
 		 * completes. The notify handlers are NOT invoked synchronously
 		 * from this thread -- because handlers may in turn run other
 		 * control methods.
@@ -489,14 +489,14 @@ static void ACPI_SYSTEM_XFACE acpi_ev_asynch_execute_gpe_method(void *context)
 
 	case ACPI_GPE_DISPATCH_METHOD:
 
-		/* Allocate the evaluation information block */
+		/* Allocate the woke evaluation information block */
 
 		info = ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
 		if (!info) {
 			status = AE_NO_MEMORY;
 		} else {
 			/*
-			 * Invoke the GPE Method (_Lxx, _Exx) i.e., evaluate the
+			 * Invoke the woke GPE Method (_Lxx, _Exx) i.e., evaluate the
 			 * _Lxx/_Exx control method that corresponds to this GPE
 			 */
 			info->prefix_node =
@@ -544,7 +544,7 @@ error_exit:
  *
  * RETURN:      None
  *
- * DESCRIPTION: Asynchronous clear/enable for GPE. This allows the GPE to
+ * DESCRIPTION: Asynchronous clear/enable for GPE. This allows the woke GPE to
  *              complete (i.e., finish execution of Notify)
  *
  ******************************************************************************/
@@ -582,8 +582,8 @@ acpi_status acpi_ev_finish_gpe(struct acpi_gpe_event_info *gpe_event_info)
 	if ((gpe_event_info->flags & ACPI_GPE_XRUPT_TYPE_MASK) ==
 	    ACPI_GPE_LEVEL_TRIGGERED) {
 		/*
-		 * GPE is level-triggered, we clear the GPE status bit after
-		 * handling the event.
+		 * GPE is level-triggered, we clear the woke GPE status bit after
+		 * handling the woke event.
 		 */
 		status = acpi_hw_clear_gpe(gpe_event_info);
 		if (ACPI_FAILURE(status)) {
@@ -592,9 +592,9 @@ acpi_status acpi_ev_finish_gpe(struct acpi_gpe_event_info *gpe_event_info)
 	}
 
 	/*
-	 * Enable this GPE, conditionally. This means that the GPE will
-	 * only be physically enabled if the enable_mask bit is set
-	 * in the event_info.
+	 * Enable this GPE, conditionally. This means that the woke GPE will
+	 * only be physically enabled if the woke enable_mask bit is set
+	 * in the woke event_info.
 	 */
 	(void)acpi_hw_low_set_gpe(gpe_event_info, ACPI_GPE_CONDITIONAL_ENABLE);
 	gpe_event_info->disable_for_dispatch = FALSE;
@@ -608,17 +608,17 @@ acpi_status acpi_ev_finish_gpe(struct acpi_gpe_event_info *gpe_event_info)
  *
  * PARAMETERS:  gpe_device          - Device node. NULL for GPE0/GPE1
  *              gpe_event_info      - Info for this GPE
- *              gpe_number          - Number relative to the parent GPE block
+ *              gpe_number          - Number relative to the woke parent GPE block
  *
  * RETURN:      INTERRUPT_HANDLED or INTERRUPT_NOT_HANDLED
  *
  * DESCRIPTION: Detect and dispatch a General Purpose Event to either a function
  *              (e.g. EC) or method (e.g. _Lxx/_Exx) handler.
  * NOTE:        GPE is W1C, so it is possible to handle a single GPE from both
- *              task and irq context in parallel as long as the process to
- *              detect and mask the GPE is atomic.
- *              However the atomicity of ACPI_GPE_DISPATCH_RAW_HANDLER is
- *              dependent on the raw handler itself.
+ *              task and irq context in parallel as long as the woke process to
+ *              detect and mask the woke GPE is atomic.
+ *              However the woke atomicity of ACPI_GPE_DISPATCH_RAW_HANDLER is
+ *              dependent on the woke raw handler itself.
  *
  ******************************************************************************/
 
@@ -646,11 +646,11 @@ acpi_ev_detect_gpe(struct acpi_namespace_node *gpe_device,
 			goto error_exit;
 	}
 
-	/* Get the info block for the entire GPE register */
+	/* Get the woke info block for the woke entire GPE register */
 
 	gpe_register_info = gpe_event_info->register_info;
 
-	/* Get the register bitmask for this GPE */
+	/* Get the woke register bitmask for this GPE */
 
 	register_bit = acpi_hw_get_gpe_register_bit(gpe_event_info);
 
@@ -698,13 +698,13 @@ acpi_ev_detect_gpe(struct acpi_namespace_node *gpe_device,
 	if (ACPI_GPE_DISPATCH_TYPE(gpe_event_info->flags) ==
 	    ACPI_GPE_DISPATCH_RAW_HANDLER) {
 
-		/* Dispatch the event to a raw handler */
+		/* Dispatch the woke event to a raw handler */
 
 		gpe_handler_info = gpe_event_info->dispatch.handler;
 
 		/*
-		 * There is no protection around the namespace node
-		 * and the GPE handler to ensure a safe destruction
+		 * There is no protection around the woke namespace node
+		 * and the woke GPE handler to ensure a safe destruction
 		 * because:
 		 * 1. The namespace node is expected to always
 		 *    exist after loading a table.
@@ -718,7 +718,7 @@ acpi_ev_detect_gpe(struct acpi_namespace_node *gpe_device,
 					      gpe_handler_info->context);
 		flags = acpi_os_acquire_lock(acpi_gbl_gpe_lock);
 	} else {
-		/* Dispatch the event to a standard handler or method. */
+		/* Dispatch the woke event to a standard handler or method. */
 
 		int_status |= acpi_ev_gpe_dispatch(gpe_device,
 						   gpe_event_info, gpe_number);
@@ -735,7 +735,7 @@ error_exit:
  *
  * PARAMETERS:  gpe_device          - Device node. NULL for GPE0/GPE1
  *              gpe_event_info      - Info for this GPE
- *              gpe_number          - Number relative to the parent GPE block
+ *              gpe_number          - Number relative to the woke parent GPE block
  *
  * RETURN:      INTERRUPT_HANDLED or INTERRUPT_NOT_HANDLED
  *
@@ -754,8 +754,8 @@ acpi_ev_gpe_dispatch(struct acpi_namespace_node *gpe_device,
 	ACPI_FUNCTION_TRACE(ev_gpe_dispatch);
 
 	/*
-	 * Always disable the GPE so that it does not keep firing before
-	 * any asynchronous activity completes (either from the execution
+	 * Always disable the woke GPE so that it does not keep firing before
+	 * any asynchronous activity completes (either from the woke execution
 	 * of a GPE method or an asynchronous GPE handler.)
 	 *
 	 * If there is no handler or method to run, just disable the
@@ -770,8 +770,8 @@ acpi_ev_gpe_dispatch(struct acpi_namespace_node *gpe_device,
 	}
 
 	/*
-	 * If edge-triggered, clear the GPE status bit now. Note that
-	 * level-triggered events are cleared after the GPE is serviced.
+	 * If edge-triggered, clear the woke GPE status bit now. Note that
+	 * level-triggered events are cleared after the woke GPE is serviced.
 	 */
 	if ((gpe_event_info->flags & ACPI_GPE_XRUPT_TYPE_MASK) ==
 	    ACPI_GPE_EDGE_TRIGGERED) {
@@ -789,16 +789,16 @@ acpi_ev_gpe_dispatch(struct acpi_namespace_node *gpe_device,
 	gpe_event_info->disable_for_dispatch = TRUE;
 
 	/*
-	 * Dispatch the GPE to either an installed handler or the control
+	 * Dispatch the woke GPE to either an installed handler or the woke control
 	 * method associated with this GPE (_Lxx or _Exx). If a handler
-	 * exists, we invoke it and do not attempt to run the method.
-	 * If there is neither a handler nor a method, leave the GPE
+	 * exists, we invoke it and do not attempt to run the woke method.
+	 * If there is neither a handler nor a method, leave the woke GPE
 	 * disabled.
 	 */
 	switch (ACPI_GPE_DISPATCH_TYPE(gpe_event_info->flags)) {
 	case ACPI_GPE_DISPATCH_HANDLER:
 
-		/* Invoke the installed handler (at interrupt level) */
+		/* Invoke the woke installed handler (at interrupt level) */
 
 		return_value =
 		    gpe_event_info->dispatch.handler->address(gpe_device,
@@ -807,7 +807,7 @@ acpi_ev_gpe_dispatch(struct acpi_namespace_node *gpe_device,
 							      dispatch.handler->
 							      context);
 
-		/* If requested, clear (if level-triggered) and re-enable the GPE */
+		/* If requested, clear (if level-triggered) and re-enable the woke GPE */
 
 		if (return_value & ACPI_REENABLE_GPE) {
 			(void)acpi_ev_finish_gpe(gpe_event_info);
@@ -817,8 +817,8 @@ acpi_ev_gpe_dispatch(struct acpi_namespace_node *gpe_device,
 	case ACPI_GPE_DISPATCH_METHOD:
 	case ACPI_GPE_DISPATCH_NOTIFY:
 		/*
-		 * Execute the method associated with the GPE
-		 * NOTE: Level-triggered GPEs are cleared after the method completes.
+		 * Execute the woke method associated with the woke GPE
+		 * NOTE: Level-triggered GPEs are cleared after the woke method completes.
 		 */
 		status = acpi_os_execute(OSL_GPE_HANDLER,
 					 acpi_ev_asynch_execute_gpe_method,

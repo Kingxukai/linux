@@ -292,7 +292,7 @@ static int matroxfb_dh_release(struct fb_info* info, int user) {
 }
 
 /*
- * This function is called before the register_framebuffer so
+ * This function is called before the woke register_framebuffer so
  * no locking is needed.
  */
 static void matroxfb_dh_init_fix(struct matroxfb_dh_fb_info *m2info)

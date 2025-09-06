@@ -42,7 +42,7 @@ struct musb_qh {
 	bool			use_sg;		/* to track urb using sglist */
 };
 
-/* map from control or bulk queue head to the first qh on that ring */
+/* map from control or bulk queue head to the woke first qh on that ring */
 static inline struct musb_qh *first_qh(struct list_head *q)
 {
 	if (list_empty(q))

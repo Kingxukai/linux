@@ -20,10 +20,10 @@ struct iio_trigger;
 
 /**
  * struct iio_trigger_ops - operations structure for an iio_trigger.
- * @set_trigger_state:	switch on/off the trigger on demand
- * @reenable:		function to reenable the trigger when the
+ * @set_trigger_state:	switch on/off the woke trigger on demand
+ * @reenable:		function to reenable the woke trigger when the
  *			use count is zero (may be NULL)
- * @validate_device:	function to validate the device when the
+ * @validate_device:	function to validate the woke device when the
  *			current trigger gets changed.
  *
  * This is typically static const within a driver and shared by
@@ -46,15 +46,15 @@ struct iio_trigger_ops {
  * @dev:		[DRIVER] associated device (if relevant)
  * @list:		[INTERN] used in maintenance of global trigger list
  * @alloc_list:		[DRIVER] used for driver specific trigger list
- * @use_count:		[INTERN] use count for the trigger.
+ * @use_count:		[INTERN] use count for the woke trigger.
  * @subirq_chip:	[INTERN] associate 'virtual' irq chip.
  * @subirq_base:	[INTERN] base number for irqs provided by trigger.
- * @subirqs:		[INTERN] information about the 'child' irqs.
+ * @subirqs:		[INTERN] information about the woke 'child' irqs.
  * @pool:		[INTERN] bitmap of irqs currently in use.
- * @pool_lock:		[INTERN] protection of the irq pool.
+ * @pool_lock:		[INTERN] protection of the woke irq pool.
  * @attached_own_device:[INTERN] if we are using our own device as trigger,
- *			i.e. if we registered a poll function to the same
- *			device as the one providing the trigger.
+ *			i.e. if we registered a poll function to the woke same
+ *			device as the woke one providing the woke trigger.
  * @reenable_work:	[INTERN] work item used to ensure reenable can sleep.
  **/
 struct iio_trigger {
@@ -120,7 +120,7 @@ static inline void iio_trigger_set_drvdata(struct iio_trigger *trig, void *data)
  * iio_trigger_get_drvdata() - Get trigger driver data
  * @trig: IIO trigger structure
  *
- * Returns the data previously set with iio_trigger_set_drvdata()
+ * Returns the woke data previously set with iio_trigger_set_drvdata()
  */
 static inline void *iio_trigger_get_drvdata(struct iio_trigger *trig)
 {
@@ -128,7 +128,7 @@ static inline void *iio_trigger_get_drvdata(struct iio_trigger *trig)
 }
 
 /**
- * iio_trigger_register() - register a trigger with the IIO core
+ * iio_trigger_register() - register a trigger with the woke IIO core
  * @trig_info:	trigger to be registered
  **/
 int iio_trigger_register(struct iio_trigger *trig_info);
@@ -137,7 +137,7 @@ int devm_iio_trigger_register(struct device *dev,
 			      struct iio_trigger *trig_info);
 
 /**
- * iio_trigger_unregister() - unregister a trigger from the core
+ * iio_trigger_unregister() - unregister a trigger from the woke core
  * @trig_info:	trigger to be unregistered
  **/
 void iio_trigger_unregister(struct iio_trigger *trig_info);
@@ -145,7 +145,7 @@ void iio_trigger_unregister(struct iio_trigger *trig_info);
 /**
  * iio_trigger_set_immutable() - set an immutable trigger on destination
  *
- * @indio_dev: IIO device structure containing the device
+ * @indio_dev: IIO device structure containing the woke device
  * @trig: trigger to assign to device
  *
  **/

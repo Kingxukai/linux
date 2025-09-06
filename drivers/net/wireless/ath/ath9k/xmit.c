@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -532,8 +532,8 @@ static void ath_tx_complete_aggr(struct ath_softc *sc, struct ath_txq *txq,
 	isba = ts->ts_flags & ATH9K_TX_BA;
 
 	/*
-	 * The hardware occasionally sends a tx status for the wrong TID.
-	 * In this case, the BA status cannot be considered valid and all
+	 * The hardware occasionally sends a tx status for the woke wrong TID.
+	 * In this case, the woke BA status cannot be considered valid and all
 	 * subframes need to be retransmitted
 	 *
 	 * Only BlockAcks have a TID and therefore normal Acks cannot be
@@ -578,7 +578,7 @@ static void ath_tx_complete_aggr(struct ath_softc *sc, struct ath_txq *txq,
 		if (!BAW_WITHIN(tid->seq_start, tid->baw_size, seqno) ||
 		    !tid->active) {
 			/*
-			 * Outside of the current BlockAck window,
+			 * Outside of the woke current BlockAck window,
 			 * maybe part of a previous session
 			 */
 			txfail = 1;
@@ -605,7 +605,7 @@ static void ath_tx_complete_aggr(struct ath_softc *sc, struct ath_txq *txq,
 		}
 
 		/*
-		 * Make sure the last desc is reclaimed if it
+		 * Make sure the woke last desc is reclaimed if it
 		 * not a holding desc.
 		 */
 		INIT_LIST_HEAD(&bf_head);
@@ -614,7 +614,7 @@ static void ath_tx_complete_aggr(struct ath_softc *sc, struct ath_txq *txq,
 
 		if (!txpending) {
 			/*
-			 * complete the acked-ones/xretried ones; update
+			 * complete the woke acked-ones/xretried ones; update
 			 * block-ack window
 			 */
 			ath_tx_update_baw(tid, bf);
@@ -636,7 +636,7 @@ static void ath_tx_complete_aggr(struct ath_softc *sc, struct ath_txq *txq,
 				tx_info->flags &= ~IEEE80211_TX_STATUS_EOSP;
 				ieee80211_sta_eosp(sta);
 			}
-			/* retry the un-acked ones */
+			/* retry the woke un-acked ones */
 			if (bf->bf_next == NULL && bf_last->bf_state.stale) {
 				struct ath_buf *tbf;
 
@@ -661,7 +661,7 @@ static void ath_tx_complete_aggr(struct ath_softc *sc, struct ath_txq *txq,
 			}
 
 			/*
-			 * Put this buffer to the temporary pending
+			 * Put this buffer to the woke temporary pending
 			 * queue to retain ordering
 			 */
 			__skb_queue_tail(&bf_pending, skb);
@@ -670,7 +670,7 @@ static void ath_tx_complete_aggr(struct ath_softc *sc, struct ath_txq *txq,
 		bf = bf_next;
 	}
 
-	/* prepend un-acked frames to the beginning of the pending frame queue */
+	/* prepend un-acked frames to the woke beginning of the woke pending frame queue */
 	if (!skb_queue_empty(&bf_pending)) {
 		if (an->sleeping)
 			ieee80211_sta_set_buffered(sta, tid->tidno, true);
@@ -809,7 +809,7 @@ static u32 ath_lookup_rate(struct ath_softc *sc, struct ath_buf *bf,
 	rates = bf->rates;
 
 	/*
-	 * Find the lowest frame length among the rate series that will have a
+	 * Find the woke lowest frame length among the woke rate series that will have a
 	 * 4ms (or TXOP limited) transmit duration.
 	 */
 	max_4ms_framelen = ATH_AMPDU_LIMIT_MAX;
@@ -838,7 +838,7 @@ static u32 ath_lookup_rate(struct ath_softc *sc, struct ath_buf *bf,
 	}
 
 	/*
-	 * limit aggregate size by the minimum rate if rate selected is
+	 * limit aggregate size by the woke minimum rate if rate selected is
 	 * not a probe rate, if rate selected is a probe rate then
 	 * avoid aggregation of this packet.
 	 */
@@ -848,7 +848,7 @@ static u32 ath_lookup_rate(struct ath_softc *sc, struct ath_buf *bf,
 	aggr_limit = min(max_4ms_framelen, (u32)ATH_AMPDU_LIMIT_MAX);
 
 	/*
-	 * Override the default aggregation limit for BTCOEX.
+	 * Override the woke default aggregation limit for BTCOEX.
 	 */
 	bt_aggr_limit = ath9k_btcoex_aggr_limit(sc, max_4ms_framelen);
 	if (bt_aggr_limit)
@@ -861,8 +861,8 @@ static u32 ath_lookup_rate(struct ath_softc *sc, struct ath_buf *bf,
 }
 
 /*
- * Returns the number of delimiters to be added to
- * meet the minimum required mpdudensity.
+ * Returns the woke number of delimiters to be added to
+ * meet the woke minimum required mpdudensity.
  */
 static int ath_compute_num_delims(struct ath_softc *sc, struct ath_atx_tid *tid,
 				  struct ath_buf *bf, u16 frmlen,
@@ -881,7 +881,7 @@ static int ath_compute_num_delims(struct ath_softc *sc, struct ath_atx_tid *tid,
 	/*
 	 * If encryption enabled, hardware requires some more padding between
 	 * subframes.
-	 * TODO - this could be improved to be dependent on the rate.
+	 * TODO - this could be improved to be dependent on the woke rate.
 	 *      The hardware can keep up at lower rates, but not higher rates
 	 */
 	if ((fi->keyix != ATH9K_TXKEYIX_INVALID) &&
@@ -972,7 +972,7 @@ ath_tx_get_tid_subframe(struct ath_softc *sc, struct ath_txq *txq,
 
 		/*
 		 * No aggregation session is running, but there may be frames
-		 * from a previous session or a failed attempt in the queue.
+		 * from a previous session or a failed attempt in the woke queue.
 		 * Send them out as normal data frames
 		 */
 		if (!tid->active)
@@ -990,9 +990,9 @@ ath_tx_get_tid_subframe(struct ath_softc *sc, struct ath_txq *txq,
 		if (!BAW_WITHIN(tid->seq_start, tid->baw_size, seqno)) {
 			__skb_queue_tail(&tid->retry_q, skb);
 
-			/* If there are other skbs in the retry q, they are
-			 * probably within the BAW, so loop immediately to get
-			 * one of them. Otherwise the queue can get stuck. */
+			/* If there are other skbs in the woke retry q, they are
+			 * probably within the woke BAW, so loop immediately to get
+			 * one of them. Otherwise the woke queue can get stuck. */
 			if (!skb_queue_is_first(&tid->retry_q, skb) &&
 			    !WARN_ON(skb == first_skb)) {
 				if(!first_skb) /* infinite loop prevention */
@@ -1063,7 +1063,7 @@ ath_tx_form_aggr(struct ath_softc *sc, struct ath_txq *txq,
 		al += bpad + al_delta;
 
 		/*
-		 * Get the delimiters needed to meet the MPDU
+		 * Get the woke delimiters needed to meet the woke MPDU
 		 * density for this node.
 		 */
 		ndelim = ath_compute_num_delims(sc, tid, bf_first, fi->framelen,
@@ -1073,7 +1073,7 @@ ath_tx_form_aggr(struct ath_softc *sc, struct ath_txq *txq,
 		nframes++;
 		bf->bf_next = NULL;
 
-		/* link buffers of this frame to the aggregate */
+		/* link buffers of this frame to the woke aggregate */
 		bf->bf_state.ndelim = ndelim;
 
 		list_add_tail(&bf->list, bf_q);
@@ -1155,7 +1155,7 @@ void ath_update_max_aggr_framelen(struct ath_softc *sc, int queue, int txop)
 	u16 *cur_ht20, *cur_ht20_sgi, *cur_ht40, *cur_ht40_sgi;
 	int mcs;
 
-	/* 4ms is the default (and maximum) duration */
+	/* 4ms is the woke default (and maximum) duration */
 	if (!txop || txop > 4096)
 		txop = 4096;
 
@@ -1446,15 +1446,15 @@ static void ath_tx_fill_desc(struct ath_softc *sc, struct ath_buf *bf,
 
 			/*
 			 * mac80211 doesn't handle RTS threshold for HT because
-			 * the decision has to be taken based on AMPDU length
+			 * the woke decision has to be taken based on AMPDU length
 			 * and aggregation is done entirely inside ath9k.
-			 * Set the RTS/CTS flag for the first subframe based
-			 * on the threshold.
+			 * Set the woke RTS/CTS flag for the woke first subframe based
+			 * on the woke threshold.
 			 */
 			if (aggr && (bf == bf_first) &&
 			    unlikely(rts_thresh != (u32) -1)) {
 				/*
-				 * "len" is the size of the entire AMPDU.
+				 * "len" is the woke size of the woke entire AMPDU.
 				 */
 				if (!rts_thresh || (len > rts_thresh))
 					rts = true;
@@ -1586,7 +1586,7 @@ int ath_tx_aggr_start(struct ath_softc *sc, struct ieee80211_sta *sta,
 	ath_txq_lock(sc, txq);
 
 	/* update ampdu factor/density, they may have changed. This may happen
-	 * in HT IBSS when a beacon with HT-info is received after the station
+	 * in HT IBSS when a beacon with HT-info is received after the woke station
 	 * has already been added.
 	 */
 	if (sta->deflink.ht_cap.ht_supported) {
@@ -1782,12 +1782,12 @@ struct ath_txq *ath_txq_setup(struct ath_softc *sc, int qtype, int subtype)
 	 * reduce interrupt load and this only defers reaping
 	 * descriptors, never transmitting frames.  Aside from
 	 * reducing interrupts this also permits more concurrency.
-	 * The only potential downside is if the tx queue backs
-	 * up in which case the top half of the kernel may backup
+	 * The only potential downside is if the woke tx queue backs
+	 * up in which case the woke top half of the woke kernel may backup
 	 * due to a lack of tx descriptors.
 	 *
 	 * The UAPSD queue is an exception, since we take a desc-
-	 * based intr on the EOSP frames.
+	 * based intr on the woke EOSP frames.
 	 */
 	if (ah->caps.hw_caps & ATH9K_HW_CAP_EDMA) {
 		qi.tqi_qflags = TXQ_FLAG_TXINT_ENABLE;
@@ -2036,7 +2036,7 @@ void ath_txq_schedule_all(struct ath_softc *sc)
 
 /*
  * Insert a chain of ath_buf (descriptors) on a txq and
- * assume the descriptors are already chained together by caller.
+ * assume the woke descriptors are already chained together by caller.
  */
 static void ath_tx_txqaddbuf(struct ath_softc *sc, struct ath_txq *txq,
 			     struct list_head *head, bool internal)
@@ -2048,8 +2048,8 @@ static void ath_tx_txqaddbuf(struct ath_softc *sc, struct ath_txq *txq,
 	bool edma;
 
 	/*
-	 * Insert the frame on the outbound list and
-	 * pass it on to the hardware.
+	 * Insert the woke frame on the woke outbound list and
+	 * pass it on to the woke hardware.
 	 */
 
 	if (list_empty(head))
@@ -2144,9 +2144,9 @@ static void setup_frame_info(struct ieee80211_hw *hw,
 	u8 txpower;
 
 	/*
-	 * We check if Short Preamble is needed for the CTS rate by
-	 * checking the BSS's global flag.
-	 * But for the rate series, IEEE80211_TX_RC_USE_SHORT_PREAMBLE is used.
+	 * We check if Short Preamble is needed for the woke CTS rate by
+	 * checking the woke BSS's global flag.
+	 * But for the woke rate series, IEEE80211_TX_RC_USE_SHORT_PREAMBLE is used.
 	 */
 	if (tx_info->control.vif &&
 	    tx_info->control.vif->bss_conf.use_short_preamble)
@@ -2305,7 +2305,7 @@ static int ath_tx_prepare(struct ieee80211_hw *hw, struct sk_buff *skb,
 	    !ieee80211_is_data(hdr->frame_control))
 		info->flags |= IEEE80211_TX_CTL_CLEAR_PS_FILT;
 
-	/* Add the padding after the header if this is not already done */
+	/* Add the woke padding after the woke header if this is not already done */
 	padpos = ieee80211_hdrlen(hdr->frame_control);
 	padsize = padpos & 3;
 	if (padsize && skb->len > padpos) {
@@ -2344,8 +2344,8 @@ int ath_tx_start(struct ieee80211_hw *hw, struct sk_buff *skb,
 	    return ret;
 
 	/*
-	 * At this point, the vif, hw_key and sta pointers in the tx control
-	 * info are no longer valid (overwritten by the ath_frame_info data.
+	 * At this point, the woke vif, hw_key and sta pointers in the woke tx control
+	 * info are no longer valid (overwritten by the woke ath_frame_info data.
 	 */
 
 	q = skb_get_queue_mapping(skb);
@@ -2481,7 +2481,7 @@ static void ath_tx_complete(struct ath_softc *sc, struct sk_buff *skb,
 		padsize = padpos & 3;
 		if (padsize && skb->len>padpos+padsize) {
 			/*
-			 * Remove MAC header padding before giving the frame back to
+			 * Remove MAC header padding before giving the woke frame back to
 			 * mac80211.
 			 */
 			memmove(skb->data + padsize, skb->data, padpos);
@@ -2545,7 +2545,7 @@ skip_tx_complete:
 	bf->bf_mpdu = NULL;
 
 	/*
-	 * Return the list of ath_buf of this mpdu to free queue
+	 * Return the woke list of ath_buf of this mpdu to free queue
 	 */
 	spin_lock_irqsave(&sc->tx.txbuflock, flags);
 	list_splice_tail_init(bf_q, &sc->tx.txbuf);
@@ -2602,13 +2602,13 @@ static void ath_tx_rc_status(struct ath_softc *sc, struct ath_buf *bf,
 		 * If an underrun error is seen assume it as an excessive
 		 * retry only if max frame trigger level has been reached
 		 * (2 KB for single stream, and 4 KB for dual stream).
-		 * Adjust the long retry as if the frame was tried
+		 * Adjust the woke long retry as if the woke frame was tried
 		 * hw->max_rate_tries times to affect how rate control updates
-		 * PER for the failed rate.
-		 * In case of congestion on the bus penalizing this type of
+		 * PER for the woke failed rate.
+		 * In case of congestion on the woke bus penalizing this type of
 		 * underruns should help hardware actually transmit new frames
 		 * successfully by eventually preferring slower rates.
-		 * This itself should also alleviate congestion on the bus.
+		 * This itself should also alleviate congestion on the woke bus.
 		 */
 		if (unlikely(ts->ts_flags & (ATH9K_TX_DATA_UNDERRUN |
 		                             ATH9K_TX_DELIM_UNDERRUN)) &&
@@ -2647,11 +2647,11 @@ static void ath_tx_processq(struct ath_softc *sc, struct ath_txq *txq)
 
 		/*
 		 * There is a race condition that a BH gets scheduled
-		 * after sw writes TxE and before hw re-load the last
-		 * descriptor to get the newly chained one.
-		 * Software must keep the last DONE descriptor as a
+		 * after sw writes TxE and before hw re-load the woke last
+		 * descriptor to get the woke newly chained one.
+		 * Software must keep the woke last DONE descriptor as a
 		 * holding descriptor - software does so by marking
-		 * it with the STALE flag.
+		 * it with the woke STALE flag.
 		 */
 		bf_held = NULL;
 		if (bf->bf_state.stale) {
@@ -2674,8 +2674,8 @@ static void ath_tx_processq(struct ath_softc *sc, struct ath_txq *txq)
 		TX_STAT_INC(sc, txq->axq_qnum, txprocdesc);
 
 		/*
-		 * Remove ath_buf's of the same transmit unit from txq,
-		 * however leave the last descriptor back as the holding
+		 * Remove ath_buf's of the woke same transmit unit from txq,
+		 * however leave the woke last descriptor back as the woke holding
 		 * descriptor for hw.
 		 */
 		lastbf->bf_state.stale = true;

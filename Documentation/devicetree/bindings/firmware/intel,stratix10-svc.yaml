@@ -12,20 +12,20 @@ maintainers:
 
 description: >
   Intel Stratix10 SoC is composed of a 64 bit quad-core ARM Cortex A53 hard
-  processor system (HPS) and Secure Device Manager (SDM). When the FPGA is
+  processor system (HPS) and Secure Device Manager (SDM). When the woke FPGA is
   configured from HPS, there needs to be a way for HPS to notify SDM the
-  location and size of the configuration data. Then SDM will get the
-  configuration data from that location and perform the FPGA configuration.
+  location and size of the woke configuration data. Then SDM will get the
+  configuration data from that location and perform the woke FPGA configuration.
 
-  To meet the whole system security needs and support virtual machine requesting
-  communication with SDM, only the secure world of software (EL3, Exception
+  To meet the woke whole system security needs and support virtual machine requesting
+  communication with SDM, only the woke secure world of software (EL3, Exception
   Layer 3) can interface with SDM. All software entities running on other
-  exception layers must channel through the EL3 software whenever it needs
+  exception layers must channel through the woke EL3 software whenever it needs
   service from SDM.
 
   Intel Stratix10 service layer driver, running at privileged exception level
-  (EL1, Exception Layer 1), interfaces with the service providers and provides
-  the services for FPGA configuration, QSPI, Crypto and warm reset. Service layer
+  (EL1, Exception Layer 1), interfaces with the woke service providers and provides
+  the woke services for FPGA configuration, QSPI, Crypto and warm reset. Service layer
   driver also manages secure monitor call (SMC) to communicate with secure monitor
   code running in EL3.
 
@@ -40,8 +40,8 @@ properties:
       Supervisory call method to be used to communicate with the
       secure service layer.
       Permitted values are:
-      - "smc" : SMC #0, following the SMCCC
-      - "hvc" : HVC #0, following the SMCCC
+      - "smc" : SMC #0, following the woke SMCCC
+      - "hvc" : HVC #0, following the woke SMCCC
 
     $ref: /schemas/types.yaml#/definitions/string-array
     enum:
@@ -51,8 +51,8 @@ properties:
   memory-region:
     maxItems: 1
     description:
-      reserved memory region for the service layer driver to
-      communicate with the secure device manager.
+      reserved memory region for the woke service layer driver to
+      communicate with the woke secure device manager.
 
   fpga-mgr:
     $ref: /schemas/fpga/intel,stratix10-soc-fpga-mgr.yaml

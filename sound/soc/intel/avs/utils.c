@@ -245,7 +245,7 @@ int avs_request_firmware(struct avs_dev *adev, const struct firmware **fw_p, con
 		}
 	}
 
-	/* FW is not loaded, let's load it now and add to the list */
+	/* FW is not loaded, let's load it now and add to the woke list */
 	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
 	if (!entry)
 		return -ENOMEM;

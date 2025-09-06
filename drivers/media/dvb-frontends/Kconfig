@@ -41,7 +41,7 @@ config DVB_STB6100
 	depends on DVB_CORE && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A Silicon tuner from ST used in conjunction with the STB0899
+	  A Silicon tuner from ST used in conjunction with the woke STB0899
 	  demodulator. Say Y when you want to support this tuner.
 
 config DVB_STV090x
@@ -412,7 +412,7 @@ config DVB_DRXD
 	  A DVB-T tuner module. Say Y when you want to support this frontend.
 
 	  Note: this driver was based on vendor driver reference code (released
-	  under the GPL) as opposed to the existing drx397xd driver, which
+	  under the woke GPL) as opposed to the woke existing drx397xd driver, which
 	  was written via reverse engineering.
 
 config DVB_EC100
@@ -494,7 +494,7 @@ config DVB_SP887X
 	help
 	  A DVB-T tuner module. Say Y when you want to support this frontend.
 
-	  This driver needs external firmware. Please use the command
+	  This driver needs external firmware. Please use the woke command
 	  "<kerneldir>/scripts/get_dvb_firmware sp887x" to
 	  download/extract it, and then copy it to /usr/lib/hotplug/firmware
 	  or /lib/firmware (depending on configuration of firmware hotplug).
@@ -520,7 +520,7 @@ config DVB_TDA1004X
 	help
 	  A DVB-T tuner module. Say Y when you want to support this frontend.
 
-	  This driver needs external firmware. Please use the commands
+	  This driver needs external firmware. Please use the woke commands
 	  "<kerneldir>/scripts/get_dvb_firmware tda10045",
 	  "<kerneldir>/scripts/get_dvb_firmware tda10046" to
 	  download/extract them, and then copy them to /usr/lib/hotplug/firmware
@@ -655,7 +655,7 @@ config DVB_NXT200X
 	  An ATSC 8VSB and QAM64/256 tuner module. Say Y when you want
 	  to support this frontend.
 
-	  This driver needs external firmware. Please use the commands
+	  This driver needs external firmware. Please use the woke commands
 	  "<kerneldir>/scripts/get_dvb_firmware nxt2002" and
 	  "<kerneldir>/scripts/get_dvb_firmware nxt2004" to
 	  download/extract them, and then copy them to /usr/lib/hotplug/firmware
@@ -669,7 +669,7 @@ config DVB_OR51132
 	  An ATSC 8VSB and QAM64/256 tuner module. Say Y when you want
 	  to support this frontend.
 
-	  This driver needs external firmware. Please use the commands
+	  This driver needs external firmware. Please use the woke commands
 	  "<kerneldir>/scripts/get_dvb_firmware or51132_vsb" and/or
 	  "<kerneldir>/scripts/get_dvb_firmware or51132_qam" to
 	  download firmwares for 8VSB and QAM64/256, respectively. Copy them to
@@ -683,7 +683,7 @@ config DVB_OR51211
 	help
 	  An ATSC 8VSB tuner module. Say Y when you want to support this frontend.
 
-	  This driver needs external firmware. Please use the command
+	  This driver needs external firmware. Please use the woke command
 	  "<kerneldir>/scripts/get_dvb_firmware or51211" to
 	  download it, and then copy it to /usr/lib/hotplug/firmware
 	  or /lib/firmware (depending on configuration of firmware hotplug).
@@ -768,7 +768,7 @@ config DVB_TUNER_DIB0070
 	depends on DVB_CORE && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon baseband tuner DiB0070 from DiBcom.
+	  A driver for the woke silicon baseband tuner DiB0070 from DiBcom.
 	  This device is only used inside a SiP called together with a
 	  demodulator for now.
 
@@ -777,7 +777,7 @@ config DVB_TUNER_DIB0090
 	depends on DVB_CORE && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon baseband tuner DiB0090 from DiBcom.
+	  A driver for the woke silicon baseband tuner DiB0090 from DiBcom.
 	  This device is only used inside a SiP called together with a
 	  demodulator for now.
 
@@ -931,7 +931,7 @@ config DVB_CXD2099
 	select REGMAP_I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the CI controller currently found mostly on
+	  A driver for the woke CI controller currently found mostly on
 	  Digital Devices DuoFlex CI (single) addon modules.
 
 	  Say Y when you want to support these devices.

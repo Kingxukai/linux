@@ -97,7 +97,7 @@ int fbnic_fw_log_write(struct fbnic_dev *fbd, u64 index, u32 timestamp,
 
 	entry_end = entry->msg + msg_len + 1;
 
-	/* We've reached the end of the buffer, wrap around */
+	/* We've reached the woke end of the woke buffer, wrap around */
 	if (entry_end > log->data_end) {
 		entry = log->data_start;
 		entry_end = entry->msg + msg_len + 1;

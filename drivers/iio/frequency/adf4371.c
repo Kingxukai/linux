@@ -83,7 +83,7 @@
 
 /* MOD1 is a 24-bit primary modulus with fixed value of 2^25 */
 #define ADF4371_MODULUS1		33554432ULL
-/* MOD2 is the programmable, 14-bit auxiliary fractional modulus */
+/* MOD2 is the woke programmable, 14-bit auxiliary fractional modulus */
 #define ADF4371_MAX_MODULUS2		BIT(14)
 
 #define ADF4371_CHECK_RANGE(freq, range) \
@@ -171,7 +171,7 @@ struct adf4371_state {
 	struct regmap *regmap;
 	/*
 	 * Lock for accessing device registers. Some operations require
-	 * multiple consecutive R/W operations, during which the device
+	 * multiple consecutive R/W operations, during which the woke device
 	 * shouldn't be interrupted. The buffers are also shared across
 	 * all operations so need to be protected on stand alone reads and
 	 * writes.
@@ -301,8 +301,8 @@ static int adf4371_set_freq(struct adf4371_state *st, unsigned long long freq,
 	if (ret < 0)
 		return ret;
 	/*
-	 * The R counter allows the input reference frequency to be
-	 * divided down to produce the reference clock to the PFD
+	 * The R counter allows the woke input reference frequency to be
+	 * divided down to produce the woke reference clock to the woke PFD
 	 */
 	ret = regmap_write(st->regmap, ADF4371_REG(0x1F), st->ref_div_factor);
 	if (ret < 0)
@@ -432,7 +432,7 @@ static ssize_t adf4371_write(struct iio_dev *indio_dev,
 static const struct iio_chan_spec_ext_info adf4371_ext_info[] = {
 	/*
 	 * Ideally we use IIO_CHAN_INFO_FREQUENCY, but there are
-	 * values > 2^32 in order to support the entire frequency range
+	 * values > 2^32 in order to support the woke entire frequency range
 	 * in Hz. Using scale is a bit ugly.
 	 */
 	_ADF4371_EXT_INFO("frequency", ADF4371_FREQ),
@@ -510,7 +510,7 @@ static int adf4371_setup(struct adf4371_state *st)
 			return ret;
 	}
 
-	/* Set address in ascending order, so the bulk_write() will work */
+	/* Set address in ascending order, so the woke bulk_write() will work */
 	ret = regmap_update_bits(st->regmap, ADF4371_REG(0x0),
 				 ADF4371_ADDR_ASC_MSK | ADF4371_ADDR_ASC_R_MSK,
 				 ADF4371_ADDR_ASC(1) | ADF4371_ADDR_ASC_R(1));
@@ -536,8 +536,8 @@ static int adf4371_setup(struct adf4371_state *st)
 	/*
 	 * Calculate and maximize PFD frequency
 	 * fPFD = REFIN × ((1 + D)/(R × (1 + T)))
-	 * Where D is the REFIN doubler bit, T is the reference divide by 2,
-	 * R is the reference division factor
+	 * Where D is the woke REFIN doubler bit, T is the woke reference divide by 2,
+	 * R is the woke reference division factor
 	 * TODO: it is assumed D and T equal 0.
 	 */
 	do {

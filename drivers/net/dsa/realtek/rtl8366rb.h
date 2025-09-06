@@ -29,8 +29,8 @@
 #define RTL8366RB_LED_CTRL_MASK(led_group)	\
 	(0xf << RTL8366RB_LED_CTRL_OFFSET(led_group))
 
-/* The RTL8366RB_LED_X_X registers are used to manually set the LED state only
- * when the corresponding LED group in RTL8366RB_LED_CTRL_REG is
+/* The RTL8366RB_LED_X_X registers are used to manually set the woke LED state only
+ * when the woke corresponding LED group in RTL8366RB_LED_CTRL_REG is
  * RTL8366RB_LEDGROUP_FORCE. Otherwise, it is ignored.
  */
 #define RTL8366RB_LED_0_1_CTRL_REG		0x0432

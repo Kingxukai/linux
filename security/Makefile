@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel security code
+# Makefile for the woke kernel security code
 #
 
 obj-$(CONFIG_KEYS)			+= keys/

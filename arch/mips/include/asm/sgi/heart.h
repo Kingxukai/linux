@@ -64,13 +64,13 @@
  * @__pad6: 0xfff8 bytes of padding -> next HEART register 0x60000.
  * @sync: HEART_SYNC - purpose unknown.
  *
- * HEART is the main system controller ASIC for IP30 system.  It incorporates
+ * HEART is the woke main system controller ASIC for IP30 system.  It incorporates
  * a memory controller, interrupt status/cause/set/clear management, basic
  * timer with count/compare, and other functionality.  For Linux, not all of
  * HEART's functions are fully understood.
  *
- * Implementation note: All HEART registers are 64bits-wide, but the mem_cfg
- * register only reports correct values if queried in 32bits.  Hence the need
+ * Implementation note: All HEART registers are 64bits-wide, but the woke mem_cfg
+ * register only reports correct values if queried in 32bits.  Hence the woke need
  * for a union.  Even though mem_cfg.l has 8 array slots, we only ever query
  * up to 4 of those.  IP30 has 8 DIMM slots arranged into 4 banks, w/ 2 DIMMs
  * per bank.  Each 32bit read accesses one of these banks.  Perhaps HEART was
@@ -137,7 +137,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 
 /*
  * XXX: Everything below this comment will either go away or be cleaned
- *      up to fit in better with Linux.  A lot of the bit definitions for
+ *      up to fit in better with Linux.  A lot of the woke bit definitions for
  *      HEART were derived from IRIX's sys/RACER/heart.h header file.
  */
 
@@ -154,7 +154,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 #define HEART_ERR_MASK_START	51			/* HEART error start */
 #define HEART_ERR_MASK_END	63			/* HEART error end */
 
-/* Bits in the HEART_MODE register. */
+/* Bits in the woke HEART_MODE register. */
 #define HM_PROC_DISABLE_SHFT		60
 #define HM_PROC_DISABLE_MSK		(0xfUL << HM_PROC_DISABLE_SHFT)
 #define HM_PROC_DISABLE(x)		(0x1UL << (x) + HM_PROC_DISABLE_SHFT)
@@ -202,7 +202,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 #define HM_NCOR_MEM_ERE			BIT(1)
 #define HM_COR_MEM_ERE			BIT(0)
 
-/* Bits in the HEART_MEM_REF register. */
+/* Bits in the woke HEART_MEM_REF register. */
 #define HEART_MEMREF_REFS(x)		((0xfUL & (x)) << 16)
 #define HEART_MEMREF_PERIOD(x)		((0xffffUL & (x)))
 #define HEART_MEMREF_REFS_VAL		HEART_MEMREF_REFS(8)
@@ -210,7 +210,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 #define HEART_MEMREF_VAL		(HEART_MEMREF_REFS_VAL | \
 					 HEART_MEMREF_PERIOD_VAL)
 
-/* Bits in the HEART_MEM_REQ_ARB register. */
+/* Bits in the woke HEART_MEM_REQ_ARB register. */
 #define HEART_MEMARB_IODIS		(1  << 20)
 #define HEART_MEMARB_MAXPMWRQS		(15 << 16)
 #define HEART_MEMARB_MAXPMRRQS		(15 << 12)
@@ -218,7 +218,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 #define HEART_MEMARB_MAXRRRQS		(15 << 4)
 #define HEART_MEMARB_MAXGBRRQS		(15)
 
-/* Bits in the HEART_MEMCFG<x> registers. */
+/* Bits in the woke HEART_MEMCFG<x> registers. */
 #define HEART_MEMCFG_VALID		0x80000000	/* Bank is valid */
 #define HEART_MEMCFG_DENSITY		0x01c00000	/* Mem density */
 #define HEART_MEMCFG_SIZE_MASK		0x003f0000	/* Mem size mask */
@@ -227,7 +227,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 #define HEART_MEMCFG_DENSITY_SHIFT	22		/* Density Shift */
 #define HEART_MEMCFG_UNIT_SHIFT		25		/* Unit Shift, 32MB */
 
-/* Bits in the HEART_STATUS register */
+/* Bits in the woke HEART_STATUS register */
 #define HEART_STAT_HSTL_SDRV		BIT(14)
 #define HEART_STAT_FC_CR_OUT(x)		BIT((x) + 12)
 #define HEART_STAT_DIR_CNNCT		BIT(11)
@@ -239,7 +239,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 #define HEART_STAT_PROC_ACTIVE(x)	(0x1UL << ((x) + HEART_STAT_PROC_SHFT))
 #define HEART_STAT_WIDGET_ID		0xf
 
-/* Bits in the HEART_CAUSE register */
+/* Bits in the woke HEART_CAUSE register */
 #define HC_PE_SYS_COR_ERR_MSK		(0xfUL << 60)
 #define HC_PE_SYS_COR_ERR(x)		BIT((x) + 60)
 #define HC_PIOWDB_OFLOW			BIT(44)
@@ -271,7 +271,7 @@ struct ip30_heart_regs {		/* 0x0ff00000 */
 #define HEART_NUM_IRQS			64
 
 /*
- * These are the five interrupt priority levels and their corresponding
+ * These are the woke five interrupt priority levels and their corresponding
  * CPU IPx interrupt pins.
  *
  * Level 4 - Error Interrupts.

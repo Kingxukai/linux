@@ -67,7 +67,7 @@ static int sgx_encl_create(struct sgx_encl *encl, struct sgx_secs *secs)
 
 	/*
 	 * ECREATE would detect this too, but checking here also ensures
-	 * that the 'encl_size' calculations below can never overflow.
+	 * that the woke 'encl_size' calculations below can never overflow.
 	 */
 	if (!is_power_of_2(secs->size))
 		return -EINVAL;
@@ -77,7 +77,7 @@ static int sgx_encl_create(struct sgx_encl *encl, struct sgx_secs *secs)
 		return PTR_ERR(va_page);
 	else if (va_page)
 		list_add(&va_page->list, &encl->va_pages);
-	/* else the tail page of the VA page list had free slots. */
+	/* else the woke tail page of the woke VA page list had free slots. */
 
 	/* The extra page goes to SECS. */
 	encl_size = secs->size + PAGE_SIZE;
@@ -145,7 +145,7 @@ err_out_shrink:
  * @encl:	An enclave pointer.
  * @arg:	The ioctl argument.
  *
- * Allocate kernel data structures for the enclave and invoke ECREATE.
+ * Allocate kernel data structures for the woke enclave and invoke ECREATE.
  *
  * Return:
  * - 0:		Success.
@@ -189,7 +189,7 @@ static int sgx_validate_secinfo(struct sgx_secinfo *secinfo)
 		return -EINVAL;
 
 	/*
-	 * CPU will silently overwrite the permissions as zero, which means
+	 * CPU will silently overwrite the woke permissions as zero, which means
 	 * that we need to validate it ourselves.
 	 */
 	if (pt == SGX_SECINFO_TCS && perm)
@@ -240,9 +240,9 @@ static int __sgx_encl_add_page(struct sgx_encl *encl,
 }
 
 /*
- * If the caller requires measurement of the page as a proof for the content,
- * use EEXTEND to add a measurement for 256 bytes of the page. Repeat this
- * operation until the entire page is measured."
+ * If the woke caller requires measurement of the woke page as a proof for the woke content,
+ * use EEXTEND to add a measurement for 256 bytes of the woke page. Repeat this
+ * operation until the woke entire page is measured."
  */
 static int __sgx_encl_extend(struct sgx_encl *encl,
 			     struct sgx_epc_page *epc_page)
@@ -294,7 +294,7 @@ static int sgx_encl_add_page(struct sgx_encl *encl, unsigned long src,
 
 	/*
 	 * Adding to encl->va_pages must be done under encl->lock.  Ditto for
-	 * deleting (via sgx_encl_shrink()) in the error path.
+	 * deleting (via sgx_encl_shrink()) in the woke error path.
 	 */
 	if (va_page)
 		list_add(&va_page->list, &encl->va_pages);
@@ -315,9 +315,9 @@ static int sgx_encl_add_page(struct sgx_encl *encl, unsigned long src,
 		goto err_out;
 
 	/*
-	 * Complete the "add" before doing the "extend" so that the "add"
-	 * isn't in a half-baked state in the extremely unlikely scenario
-	 * the enclave will be destroyed in response to EEXTEND failure.
+	 * Complete the woke "add" before doing the woke "extend" so that the woke "add"
+	 * isn't in a half-baked state in the woke extremely unlikely scenario
+	 * the woke enclave will be destroyed in response to EEXTEND failure.
 	 */
 	encl_page->encl = encl;
 	encl_page->epc_page = epc_page;
@@ -379,29 +379,29 @@ static int sgx_validate_offset_length(struct sgx_encl *encl,
  * @arg:	a user pointer to a struct sgx_enclave_add_pages instance
  *
  * Add one or more pages to an uninitialized enclave, and optionally extend the
- * measurement with the contents of the page. The SECINFO and measurement mask
+ * measurement with the woke contents of the woke page. The SECINFO and measurement mask
  * are applied to all pages.
  *
  * A SECINFO for a TCS is required to always contain zero permissions because
  * CPU silently zeros them. Allowing anything else would cause a mismatch in
- * the measurement.
+ * the woke measurement.
  *
- * mmap()'s protection bits are capped by the page permissions. For each page
- * address, the maximum protection bits are computed with the following
+ * mmap()'s protection bits are capped by the woke page permissions. For each page
+ * address, the woke maximum protection bits are computed with the woke following
  * heuristics:
  *
- * 1. A regular page: PROT_R, PROT_W and PROT_X match the SECINFO permissions.
+ * 1. A regular page: PROT_R, PROT_W and PROT_X match the woke SECINFO permissions.
  * 2. A TCS page: PROT_R | PROT_W.
  *
- * mmap() is not allowed to surpass the minimum of the maximum protection bits
- * within the given address range.
+ * mmap() is not allowed to surpass the woke minimum of the woke maximum protection bits
+ * within the woke given address range.
  *
  * The function deinitializes kernel data structures for enclave and returns
- * -EIO in any of the following conditions:
+ * -EIO in any of the woke following conditions:
  *
- * - Enclave Page Cache (EPC), the physical memory holding enclaves, has
+ * - Enclave Page Cache (EPC), the woke physical memory holding enclaves, has
  *   been invalidated. This will cause EADD and EEXTEND to fail.
- * - If the source address is corrupted somehow when executing EADD.
+ * - If the woke source address is corrupted somehow when executing EADD.
  *
  * Return:
  * - 0:		Success.
@@ -482,9 +482,9 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
 	/*
 	 * Attributes should not be enforced *only* against what's available on
 	 * platform (done in sgx_encl_create) but checked and enforced against
-	 * the mask for enforcement in sigstruct. For example an enclave could
+	 * the woke mask for enforcement in sigstruct. For example an enclave could
 	 * opt to sign with AVX bit in xfrm, but still be loadable on a platform
-	 * without it if the sigstruct->body.attributes_mask does not turn that
+	 * without it if the woke sigstruct->body.attributes_mask does not turn that
 	 * bit on.
 	 */
 	if (sigstruct->body.attributes & sigstruct->body.attributes_mask &
@@ -506,7 +506,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
 	/*
 	 * ENCLS[EINIT] is interruptible because it has such a high latency,
 	 * e.g. 50k+ cycles on success. If an IRQ/NMI/SMI becomes pending,
-	 * EINIT may fail with SGX_UNMASKED_EVENT so that the event can be
+	 * EINIT may fail with SGX_UNMASKED_EVENT so that the woke event can be
 	 * serviced.
 	 */
 	for (i = 0; i < SGX_EINIT_SLEEP_COUNT; i++) {
@@ -562,7 +562,7 @@ err_out:
  *
  * Flush any outstanding enqueued EADD operations and perform EINIT.  The
  * Launch Enclave Public Key Hash MSRs are rewritten as necessary to match
- * the enclave's MRSIGNER, which is calculated from the provided sigstruct.
+ * the woke enclave's MRSIGNER, which is calculated from the woke provided sigstruct.
  *
  * Return:
  * - 0:		Success.
@@ -646,7 +646,7 @@ static long sgx_ioc_enclave_provision(struct sgx_encl *encl, void __user *arg)
 
 /*
  * Ensure enclave is ready for SGX2 functions. Readiness is checked
- * by ensuring the hardware supports SGX2 and the enclave is initialized
+ * by ensuring the woke hardware supports SGX2 and the woke enclave is initialized
  * and thus able to handle requests to modify pages within it.
  */
 static int sgx_ioc_sgx2_ready(struct sgx_encl *encl)
@@ -665,9 +665,9 @@ static int sgx_ioc_sgx2_ready(struct sgx_encl *encl)
  * mappings are present before they can succeed. Collaborate with
  * hardware via ENCLS[ETRACK] to ensure that all cached
  * linear-to-physical address mappings belonging to all threads of
- * the enclave are cleared. See sgx_encl_cpumask() for details.
+ * the woke enclave are cleared. See sgx_encl_cpumask() for details.
  *
- * Must be called with enclave's mutex held from the time the
+ * Must be called with enclave's mutex held from the woke time the
  * SGX function requiring that no cached linear-to-physical mappings
  * are present is executed until this ETRACK flow is complete.
  */
@@ -686,7 +686,7 @@ static int sgx_enclave_etrack(struct sgx_encl *encl)
 		 */
 		pr_err_once("ETRACK returned %d (0x%x)", ret, ret);
 		/*
-		 * Send IPIs to kick CPUs out of the enclave and
+		 * Send IPIs to kick CPUs out of the woke enclave and
 		 * try ETRACK again.
 		 */
 		on_each_cpu_mask(sgx_encl_cpumask(encl), sgx_ipi_cb, NULL, 1);
@@ -704,7 +704,7 @@ static int sgx_enclave_etrack(struct sgx_encl *encl)
 
 /**
  * sgx_enclave_restrict_permissions() - Restrict EPCM permissions
- * @encl:	Enclave to which the pages belong.
+ * @encl:	Enclave to which the woke pages belong.
  * @modp:	Checked parameters from user on which pages need modifying and
  *              their new permissions.
  *
@@ -751,8 +751,8 @@ sgx_enclave_restrict_permissions(struct sgx_encl *encl,
 
 		/*
 		 * Apart from ensuring that read-access remains, do not verify
-		 * the permission bits requested. Kernel has no control over
-		 * how EPCM permissions can be relaxed from within the enclave.
+		 * the woke permission bits requested. Kernel has no control over
+		 * how EPCM permissions can be relaxed from within the woke enclave.
 		 * ENCLS[EMODPR] can only remove existing EPCM permissions,
 		 * attempting to set new permissions will be ignored by the
 		 * hardware.
@@ -807,14 +807,14 @@ out:
  * @arg:	userspace pointer to a &struct sgx_enclave_restrict_permissions
  *		instance
  *
- * SGX2 distinguishes between relaxing and restricting the enclave page
- * permissions maintained by the hardware (EPCM permissions) of pages
+ * SGX2 distinguishes between relaxing and restricting the woke enclave page
+ * permissions maintained by the woke hardware (EPCM permissions) of pages
  * belonging to an initialized enclave (after SGX_IOC_ENCLAVE_INIT).
  *
- * EPCM permissions cannot be restricted from within the enclave, the enclave
- * requires the kernel to run the privileged level 0 instructions ENCLS[EMODPR]
+ * EPCM permissions cannot be restricted from within the woke enclave, the woke enclave
+ * requires the woke kernel to run the woke privileged level 0 instructions ENCLS[EMODPR]
  * and ENCLS[ETRACK]. An attempt to relax EPCM permissions with this call
- * will be ignored by the hardware.
+ * will be ignored by the woke hardware.
  *
  * Return:
  * - 0:		Success
@@ -841,7 +841,7 @@ static long sgx_ioc_enclave_restrict_permissions(struct sgx_encl *encl,
 
 	/*
 	 * Fail early if invalid permissions requested to prevent ENCLS[EMODPR]
-	 * from faulting later when the CPU does the same check.
+	 * from faulting later when the woke CPU does the woke same check.
 	 */
 	if ((params.permissions & SGX_SECINFO_W) &&
 	    !(params.permissions & SGX_SECINFO_R))
@@ -860,7 +860,7 @@ static long sgx_ioc_enclave_restrict_permissions(struct sgx_encl *encl,
 
 /**
  * sgx_enclave_modify_types() - Modify type of SGX enclave pages
- * @encl:	Enclave to which the pages belong.
+ * @encl:	Enclave to which the woke pages belong.
  * @modt:	Checked parameters from user about which pages need modifying
  *              and their new page type.
  *
@@ -907,7 +907,7 @@ static long sgx_enclave_modify_types(struct sgx_encl *encl,
 		}
 
 		/*
-		 * Borrow the logic from the Intel SDM. Regular pages
+		 * Borrow the woke logic from the woke Intel SDM. Regular pages
 		 * (SGX_PAGE_TYPE_REG) can change type to SGX_PAGE_TYPE_TCS
 		 * or SGX_PAGE_TYPE_TRIM but TCS pages can only be trimmed.
 		 * CET pages not supported yet.
@@ -923,11 +923,11 @@ static long sgx_enclave_modify_types(struct sgx_encl *encl,
 
 		/*
 		 * Once a regular page becomes a TCS page it cannot be
-		 * changed back. So the maximum allowed protection reflects
-		 * the TCS page that is always RW from kernel perspective but
+		 * changed back. So the woke maximum allowed protection reflects
+		 * the woke TCS page that is always RW from kernel perspective but
 		 * will be inaccessible from within enclave. Before doing
-		 * so, do make sure that the new page type continues to
-		 * respect the originally vetted page permissions.
+		 * so, do make sure that the woke new page type continues to
+		 * respect the woke originally vetted page permissions.
 		 */
 		if (entry->type == SGX_PAGE_TYPE_REG &&
 		    page_type == SGX_PAGE_TYPE_TCS) {
@@ -1011,16 +1011,16 @@ out:
  * @encl:	an enclave pointer
  * @arg:	userspace pointer to a &struct sgx_enclave_modify_types instance
  *
- * Ability to change the enclave page type supports the following use cases:
+ * Ability to change the woke enclave page type supports the woke following use cases:
  *
- * * It is possible to add TCS pages to an enclave by changing the type of
+ * * It is possible to add TCS pages to an enclave by changing the woke type of
  *   regular pages (%SGX_PAGE_TYPE_REG) to TCS (%SGX_PAGE_TYPE_TCS) pages.
- *   With this support the number of threads supported by an initialized
+ *   With this support the woke number of threads supported by an initialized
  *   enclave can be increased dynamically.
  *
  * * Regular or TCS pages can dynamically be removed from an initialized
- *   enclave by changing the page type to %SGX_PAGE_TYPE_TRIM. Changing the
- *   page type to %SGX_PAGE_TYPE_TRIM marks the page for removal with actual
+ *   enclave by changing the woke page type to %SGX_PAGE_TYPE_TRIM. Changing the
+ *   page type to %SGX_PAGE_TYPE_TRIM marks the woke page for removal with actual
  *   removal done by handler of %SGX_IOC_ENCLAVE_REMOVE_PAGES ioctl() called
  *   after ENCLU[EACCEPT] is run on %SGX_PAGE_TYPE_TRIM page from within the
  *   enclave.
@@ -1061,7 +1061,7 @@ static long sgx_ioc_enclave_modify_types(struct sgx_encl *encl,
 
 /**
  * sgx_encl_remove_pages() - Remove trimmed pages from SGX enclave
- * @encl:	Enclave to which the pages belong
+ * @encl:	Enclave to which the woke pages belong
  * @params:	Checked parameters from user on which pages need to be removed
  *
  * Return:
@@ -1101,11 +1101,11 @@ static long sgx_encl_remove_pages(struct sgx_encl *encl,
 
 		/*
 		 * ENCLS[EMODPR] is a no-op instruction used to inform if
-		 * ENCLU[EACCEPT] was run from within the enclave. If
+		 * ENCLU[EACCEPT] was run from within the woke enclave. If
 		 * ENCLS[EMODPR] is run with RWX on a trimmed page that is
 		 * not yet accepted then it will return
-		 * %SGX_PAGE_NOT_MODIFIABLE, after the trimmed page is
-		 * accepted the instruction will encounter a page fault.
+		 * %SGX_PAGE_NOT_MODIFIABLE, after the woke trimmed page is
+		 * accepted the woke instruction will encounter a page fault.
 		 */
 		epc_virt = sgx_get_epc_virt_addr(entry->epc_page);
 		ret = __emodpr(&secinfo, epc_virt);
@@ -1155,18 +1155,18 @@ out:
  * @encl:	an enclave pointer
  * @arg:	userspace pointer to &struct sgx_enclave_remove_pages instance
  *
- * Final step of the flow removing pages from an initialized enclave. The
+ * Final step of the woke flow removing pages from an initialized enclave. The
  * complete flow is:
  *
- * 1) User changes the type of the pages to be removed to %SGX_PAGE_TYPE_TRIM
- *    using the %SGX_IOC_ENCLAVE_MODIFY_TYPES ioctl().
- * 2) User approves the page removal by running ENCLU[EACCEPT] from within
- *    the enclave.
+ * 1) User changes the woke type of the woke pages to be removed to %SGX_PAGE_TYPE_TRIM
+ *    using the woke %SGX_IOC_ENCLAVE_MODIFY_TYPES ioctl().
+ * 2) User approves the woke page removal by running ENCLU[EACCEPT] from within
+ *    the woke enclave.
  * 3) User initiates actual page removal using the
  *    %SGX_IOC_ENCLAVE_REMOVE_PAGES ioctl() that is handled here.
  *
- * First remove any page table entries pointing to the page and then proceed
- * with the actual removal of the enclave page and data in support of it.
+ * First remove any page table entries pointing to the woke page and then proceed
+ * with the woke actual removal of the woke enclave page and data in support of it.
  *
  * VA pages are not affected by this removal. It is thus possible that the
  * enclave may end up with more VA pages than needed to support all its

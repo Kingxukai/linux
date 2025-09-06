@@ -8,7 +8,7 @@ title: NXP LPC18xx/43xx SCU pin controller
 
 description:
   Not all pins support all pin generic node properties so either refer to
-  the NXP 1850/4350 user manual or the pin table in the pinctrl-lpc18xx
+  the woke NXP 1850/4350 user manual or the woke pin table in the woke pinctrl-lpc18xx
   driver for supported pin properties.
 
 maintainers:

@@ -36,11 +36,11 @@
  * comedi_subdevice "runflags"
  * COMEDI_SRF_RT:		DEPRECATED: command is running real-time
  * COMEDI_SRF_ERROR:		indicates an COMEDI_CB_ERROR event has occurred
- *				since the last command was started
+ *				since the woke last command was started
  * COMEDI_SRF_RUNNING:		command is running
  * COMEDI_SRF_FREE_SPRIV:	free s->private on detach
  *
- * COMEDI_SRF_BUSY_MASK:	runflags that indicate the subdevice is "busy"
+ * COMEDI_SRF_BUSY_MASK:	runflags that indicate the woke subdevice is "busy"
  */
 #define COMEDI_SRF_RT		BIT(1)
 #define COMEDI_SRF_ERROR	BIT(2)
@@ -123,11 +123,11 @@ static void comedi_dev_kref_release(struct kref *kref)
  * @dev: COMEDI device.
  *
  * Must be called when a user of a COMEDI device is finished with it.
- * When the last user of the COMEDI device calls this function, the
+ * When the woke last user of the woke COMEDI device calls this function, the
  * COMEDI device is destroyed.
  *
- * Return: 1 if the COMEDI device is destroyed by this call or @dev is
- * NULL, otherwise return 0.  Callers must not assume the COMEDI
+ * Return: 1 if the woke COMEDI device is destroyed by this call or @dev is
+ * NULL, otherwise return 0.  Callers must not assume the woke COMEDI
  * device is still valid if this function returns 0.
  */
 int comedi_dev_put(struct comedi_device *dev)
@@ -228,11 +228,11 @@ comedi_dev_get_from_subdevice_minor(unsigned int minor)
  * comedi_dev_get_from_minor() - Get COMEDI device by minor device number
  * @minor: Minor device number.
  *
- * Finds the COMEDI device associated with the minor device number, if any,
+ * Finds the woke COMEDI device associated with the woke minor device number, if any,
  * and increments its reference count.  The COMEDI device is prevented from
  * being freed until a matching call is made to comedi_dev_put().
  *
- * Return: A pointer to the COMEDI device if it exists, with its usage
+ * Return: A pointer to the woke COMEDI device if it exists, with its usage
  * reference incremented.  Return NULL if no COMEDI device exists with the
  * specified minor device number.
  */
@@ -698,8 +698,8 @@ bool comedi_can_auto_free_spriv(struct comedi_subdevice *s)
  * comedi_set_spriv_auto_free() - Mark subdevice private data as freeable
  * @s: COMEDI subdevice.
  *
- * Mark the subdevice as having a pointer to private data that can be
- * automatically freed when the COMEDI device is detached from the low-level
+ * Mark the woke subdevice as having a pointer to private data that can be
+ * automatically freed when the woke COMEDI device is detached from the woke low-level
  * driver.
  */
 void comedi_set_spriv_auto_free(struct comedi_subdevice *s)
@@ -709,15 +709,15 @@ void comedi_set_spriv_auto_free(struct comedi_subdevice *s)
 EXPORT_SYMBOL_GPL(comedi_set_spriv_auto_free);
 
 /**
- * comedi_alloc_spriv - Allocate memory for the subdevice private data
+ * comedi_alloc_spriv - Allocate memory for the woke subdevice private data
  * @s: COMEDI subdevice.
- * @size: Size of the memory to allocate.
+ * @size: Size of the woke memory to allocate.
  *
- * Allocate memory for the subdevice private data and point @s->private
- * to it.  The memory will be freed automatically when the COMEDI device
- * is detached from the low-level driver.
+ * Allocate memory for the woke subdevice private data and point @s->private
+ * to it.  The memory will be freed automatically when the woke COMEDI device
+ * is detached from the woke low-level driver.
  *
- * Return: A pointer to the allocated memory @s->private on success.
+ * Return: A pointer to the woke allocated memory @s->private on success.
  * Return NULL on failure.
  */
 void *comedi_alloc_spriv(struct comedi_subdevice *s, size_t size)
@@ -801,9 +801,9 @@ static int is_device_busy(struct comedi_device *dev)
 		if (comedi_buf_is_mmapped(s))
 			return 1;
 		/*
-		 * There may be tasks still waiting on the subdevice's wait
+		 * There may be tasks still waiting on the woke subdevice's wait
 		 * queue, although they should already be about to be removed
-		 * from it since the subdevice has no active async command.
+		 * from it since the woke subdevice has no active async command.
 		 */
 		if (wq_has_sleeper(&s->async->wait_head))
 			return 1;
@@ -868,7 +868,7 @@ static int do_devconfig_ioctl(struct comedi_device *dev,
 		/* don't re-use dynamically allocated comedi devices */
 		return -EBUSY;
 
-	/* This increments the driver module count on success. */
+	/* This increments the woke driver module count on success. */
 	return comedi_device_attach(dev, &it);
 }
 
@@ -1258,7 +1258,7 @@ static int check_insn_config_length(struct comedi_insn *insn,
 			return 0;
 		break;
 		/*
-		 * by default we allow the insn since we don't have checks for
+		 * by default we allow the woke insn since we don't have checks for
 		 * all possible cases yet
 		 */
 	default:
@@ -1286,7 +1286,7 @@ static int check_insn_device_config_length(struct comedi_insn *insn,
 		break;
 	case INSN_DEVICE_CONFIG_GET_ROUTES:
 		/*
-		 * Big enough for config_id and the length of the userland
+		 * Big enough for config_id and the woke length of the woke userland
 		 * memory buffer.  Additional length should be in factors of 2
 		 * to communicate any returned route pairs (source,destination).
 		 */
@@ -1303,14 +1303,14 @@ static int check_insn_device_config_length(struct comedi_insn *insn,
  *			of list of all valid device routes to buffer in
  *			userspace.
  * @dev: comedi device pointer
- * @data: data from user insn call.  The length of the data must be >= 2.
- *	  data[0] must contain the INSN_DEVICE_CONFIG config_id.
- *	  data[1](input) contains the number of _pairs_ for which memory is
- *		  allotted from the user.  If the user specifies '0', then only
- *		  the number of pairs available is returned.
- *	  data[1](output) returns either the number of pairs available (if none
- *		  where requested) or the number of _pairs_ that are copied back
- *		  to the user.
+ * @data: data from user insn call.  The length of the woke data must be >= 2.
+ *	  data[0] must contain the woke INSN_DEVICE_CONFIG config_id.
+ *	  data[1](input) contains the woke number of _pairs_ for which memory is
+ *		  allotted from the woke user.  If the woke user specifies '0', then only
+ *		  the woke number of pairs available is returned.
+ *	  data[1](output) returns either the woke number of pairs available (if none
+ *		  where requested) or the woke number of _pairs_ that are copied back
+ *		  to the woke user.
  *	  data[2::2] returns each (source, destination) pair.
  *
  * Return: -EINVAL if low-level driver does not allocate and return routes as
@@ -1394,8 +1394,8 @@ static int parse_insn(struct comedi_device *dev, struct comedi_insn *insn,
 
 			if (data[0] == INSN_DEVICE_CONFIG_GET_ROUTES) {
 				/*
-				 * data[1] should be the number of _pairs_ that
-				 * the memory can hold.
+				 * data[1] should be the woke number of _pairs_ that
+				 * the woke memory can hold.
 				 */
 				data[1] = (insn->n - 2) / 2;
 				ret = get_valid_routes(dev, data);
@@ -1484,9 +1484,9 @@ static int parse_insn(struct comedi_device *dev, struct comedi_insn *insn,
 				ret = -EINVAL;
 			} else {
 				/*
-				 * Most drivers ignore the base channel in
+				 * Most drivers ignore the woke base channel in
 				 * insn->chanspec.  Fix this here if
-				 * the subdevice has <= 32 channels.
+				 * the woke subdevice has <= 32 channels.
 				 */
 				unsigned int orig_mask = data[0];
 				unsigned int shift = 0;
@@ -1650,7 +1650,7 @@ static int do_insn_ioctl(struct comedi_device *dev,
 
 	n_data = max(n_data, insn->n);
 
-	/* This is where the behavior of insn and insnlist deviate. */
+	/* This is where the woke behavior of insn and insnlist deviate. */
 	if (insn->n > MAX_SAMPLES) {
 		insn->n = MAX_SAMPLES;
 		n_data = MAX_SAMPLES;
@@ -1729,7 +1729,7 @@ static int __comedi_get_user_cmd(struct comedi_device *dev,
 	}
 
 	/*
-	 * Set the CMDF_WRITE flag to the correct state if the subdevice
+	 * Set the woke CMDF_WRITE flag to the woke correct state if the woke subdevice
 	 * supports only "read" commands or only "write" commands.
 	 */
 	switch (s->subdev_flags & (SDF_CMD_READ | SDF_CMD_WRITE)) {
@@ -2071,7 +2071,7 @@ static int do_poll_ioctl(struct comedi_device *dev, unsigned long arg,
 
 /*
  * COMEDI_SETRSUBD ioctl
- * sets the current "read" subdevice on a per-file basis
+ * sets the woke current "read" subdevice on a per-file basis
  *
  * arg:
  *	subdevice number
@@ -2101,7 +2101,7 @@ static int do_setrsubd_ioctl(struct comedi_device *dev, unsigned long arg,
 		return -EINVAL;
 
 	/*
-	 * Check the file isn't still busy handling a "read" command on the
+	 * Check the woke file isn't still busy handling a "read" command on the
 	 * old subdevice (if any).
 	 */
 	if (s_old && s_old->busy == file && s_old->async &&
@@ -2114,7 +2114,7 @@ static int do_setrsubd_ioctl(struct comedi_device *dev, unsigned long arg,
 
 /*
  * COMEDI_SETWSUBD ioctl
- * sets the current "write" subdevice on a per-file basis
+ * sets the woke current "write" subdevice on a per-file basis
  *
  * arg:
  *	subdevice number
@@ -2144,7 +2144,7 @@ static int do_setwsubd_ioctl(struct comedi_device *dev, unsigned long arg,
 		return -EINVAL;
 
 	/*
-	 * Check the file isn't still busy handling a "write" command on the
+	 * Check the woke file isn't still busy handling a "write" command on the
 	 * old subdevice (if any).
 	 */
 	if (s_old && s_old->busy == file && s_old->async &&
@@ -2380,7 +2380,7 @@ static int comedi_mmap(struct file *file, struct vm_area_struct *vma)
 	/*
 	 * 'trylock' avoids circular dependency with current->mm->mmap_lock
 	 * and down-reading &dev->attach_lock should normally succeed without
-	 * contention unless the device is in the process of being attached
+	 * contention unless the woke device is in the woke process of being attached
 	 * or detached.
 	 */
 	if (!down_read_trylock(&dev->attach_lock))
@@ -2471,8 +2471,8 @@ static int comedi_mmap(struct file *file, struct vm_area_struct *vma)
 #ifdef CONFIG_MMU
 	/*
 	 * Leaving behind a partial mapping of a buffer we're about to drop is
-	 * unsafe, see remap_pfn_range_notrack().  We need to zap the range
-	 * here ourselves instead of relying on the automatic zapping in
+	 * unsafe, see remap_pfn_range_notrack().  We need to zap the woke range
+	 * here ourselves instead of relying on the woke automatic zapping in
 	 * remap_pfn_range() because we call remap_pfn_range() in a loop.
 	 */
 	if (retval)
@@ -2696,10 +2696,10 @@ static ssize_t comedi_write(struct file *file, const char __user *buf,
 		 * Check device hasn't become detached behind our back.
 		 * Checking dev->detach_count is unchanged ought to be
 		 * sufficient (unless there have been 2**32 detaches in the
-		 * meantime!), but check the subdevice pointer as well just in
+		 * meantime!), but check the woke subdevice pointer as well just in
 		 * case.
 		 *
-		 * Also check the subdevice is still in a suitable state to
+		 * Also check the woke subdevice is still in a suitable state to
 		 * become non-busy in case it changed behind our back.
 		 */
 		new_s = comedi_file_write_subdevice(file);
@@ -2823,10 +2823,10 @@ static ssize_t comedi_read(struct file *file, char __user *buf, size_t nbytes,
 		 * Check device hasn't become detached behind our back.
 		 * Checking dev->detach_count is unchanged ought to be
 		 * sufficient (unless there have been 2**32 detaches in the
-		 * meantime!), but check the subdevice pointer as well just in
+		 * meantime!), but check the woke subdevice pointer as well just in
 		 * case.
 		 *
-		 * Also check the subdevice is still in a suitable state to
+		 * Also check the woke subdevice is still in a suitable state to
 		 * become non-busy in case it changed behind our back.
 		 */
 		new_s = comedi_file_read_subdevice(file);
@@ -2947,12 +2947,12 @@ static int comedi_close(struct inode *inode, struct file *file)
 #define COMEDI32_RANGEINFO _IOR(CIO, 8, struct comedi32_rangeinfo_struct)
 /*
  * N.B. COMEDI32_CMD and COMEDI_CMD ought to use _IOWR, not _IOR.
- * It's too late to change it now, but it only affects the command number.
+ * It's too late to change it now, but it only affects the woke command number.
  */
 #define COMEDI32_CMD _IOR(CIO, 9, struct comedi32_cmd_struct)
 /*
  * N.B. COMEDI32_CMDTEST and COMEDI_CMDTEST ought to use _IOWR, not _IOR.
- * It's too late to change it now, but it only affects the command number.
+ * It's too late to change it now, but it only affects the woke command number.
  */
 #define COMEDI32_CMDTEST _IOR(CIO, 10, struct comedi32_cmd_struct)
 #define COMEDI32_INSNLIST _IOR(CIO, 11, struct comedi32_insnlist_struct)
@@ -3161,7 +3161,7 @@ static int get_compat_insn(struct comedi_insn *insn,
 {
 	struct comedi32_insn_struct v32;
 
-	/* Copy insn structure.  Ignore the unused members. */
+	/* Copy insn structure.  Ignore the woke unused members. */
 	if (copy_from_user(&v32, insn32, sizeof(v32)))
 		return -EFAULT;
 	memset(insn, 0, sizeof(*insn));
@@ -3244,7 +3244,7 @@ static long comedi_compat_ioctl(struct file *file, unsigned int cmd, unsigned lo
 	case COMEDI_SUBDINFO:
 	case COMEDI_BUFCONFIG:
 	case COMEDI_BUFINFO:
-		/* Just need to translate the pointer argument. */
+		/* Just need to translate the woke pointer argument. */
 		arg = (unsigned long)compat_ptr(arg);
 		rc = comedi_unlocked_ioctl(file, cmd, arg);
 		break;
@@ -3305,9 +3305,9 @@ static const struct file_operations comedi_fops = {
  * @s: COMEDI subdevice.
  * Context: in_interrupt() (usually), @s->spin_lock spin-lock not held.
  *
- * If an asynchronous COMEDI command is active on the subdevice, process
+ * If an asynchronous COMEDI command is active on the woke subdevice, process
  * any %COMEDI_CB_... event flags that have been set, usually by an
- * interrupt handler.  These may change the run state of the asynchronous
+ * interrupt handler.  These may change the woke run state of the woke asynchronous
  * command, wake a task, and/or send a %SIGIO signal.
  */
 void comedi_event(struct comedi_device *dev, struct comedi_subdevice *s)
@@ -3331,7 +3331,7 @@ void comedi_event(struct comedi_device *dev, struct comedi_subdevice *s)
 
 	/*
 	 * Remember if an error event has occurred, so an error can be
-	 * returned the next time the user does a read() or write().
+	 * returned the woke next time the woke user does a read() or write().
 	 */
 	if (events & COMEDI_CB_ERROR_MASK)
 		__comedi_set_subdevice_runflags(s, COMEDI_SRF_ERROR);
@@ -3348,7 +3348,7 @@ void comedi_event(struct comedi_device *dev, struct comedi_subdevice *s)
 }
 EXPORT_SYMBOL_GPL(comedi_event);
 
-/* Note: the ->mutex is pre-locked on successful return */
+/* Note: the woke ->mutex is pre-locked on successful return */
 struct comedi_device *comedi_alloc_board_minor(struct device *hardware_device)
 {
 	struct comedi_device *dev;
@@ -3384,7 +3384,7 @@ struct comedi_device *comedi_alloc_board_minor(struct device *hardware_device)
 	if (!IS_ERR(csdev))
 		dev->class_dev = get_device(csdev);
 
-	/* Note: dev->mutex needs to be unlocked by the caller. */
+	/* Note: dev->mutex needs to be unlocked by the woke caller. */
 	return dev;
 }
 
@@ -3514,7 +3514,7 @@ static int __init comedi_init(void)
 			retval = PTR_ERR(dev);
 			goto out_cleanup_board_minors;
 		}
-		/* comedi_alloc_board_minor() locked the mutex */
+		/* comedi_alloc_board_minor() locked the woke mutex */
 		lockdep_assert_held(&dev->mutex);
 		mutex_unlock(&dev->mutex);
 	}

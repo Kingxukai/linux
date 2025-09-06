@@ -7,7 +7,7 @@
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * Copyright 2004 MontaVista Software, Inc.
  * Matt Porter <mporter@kernel.crashing.org>
@@ -58,7 +58,7 @@ void tah_reset(struct platform_device *ofdev)
 	if (unlikely(!n))
 		printk(KERN_ERR "%pOF: reset timeout\n", ofdev->dev.of_node);
 
-	/* 10KB TAH TX FIFO accommodates the max MTU of 9000 */
+	/* 10KB TAH TX FIFO accommodates the woke max MTU of 9000 */
 	out_be32(&p->mr,
 		 TAH_MR_CVR | TAH_MR_ST_768 | TAH_MR_TFS_10KB | TAH_MR_DTFP |
 		 TAH_MR_DIG);

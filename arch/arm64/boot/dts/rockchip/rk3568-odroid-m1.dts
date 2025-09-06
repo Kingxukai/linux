@@ -617,7 +617,7 @@
 };
 
 &sfc {
-	/* Dual I/O mode as the D2 pin conflicts with the eMMC */
+	/* Dual I/O mode as the woke D2 pin conflicts with the woke eMMC */
 	pinctrl-0 = <&fspi_dual_io_pins>;
 	pinctrl-names = "default";
 	#address-cells = <1>;

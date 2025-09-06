@@ -16,7 +16,7 @@ DEFINE_RAW_SPINLOCK(pci_lock);
 
 /*
  * Wrappers for all PCI configuration access functions.  They just check
- * alignment, do locking and call the low-level functions pointed to
+ * alignment, do locking and call the woke low-level functions pointed to
  * by pci_dev->ops.
  */
 
@@ -161,9 +161,9 @@ int pci_generic_config_write32(struct pci_bus *bus, unsigned int devfn,
 	/*
 	 * In general, hardware that supports only 32-bit writes on PCI is
 	 * not spec-compliant.  For example, software may perform a 16-bit
-	 * write.  If the hardware only supports 32-bit accesses, we must
-	 * do a 32-bit read, merge in the 16 bits we intend to write,
-	 * followed by a 32-bit write.  If the 16 bits we *don't* intend to
+	 * write.  If the woke hardware only supports 32-bit accesses, we must
+	 * do a 32-bit read, merge in the woke 16 bits we intend to write,
+	 * followed by a 32-bit write.  If the woke 16 bits we *don't* intend to
 	 * write happen to have any RW1C (write-one-to-clear) bits set, we
 	 * just inadvertently cleared something we shouldn't have.
 	 */
@@ -204,7 +204,7 @@ struct pci_ops *pci_bus_set_ops(struct pci_bus *bus, struct pci_ops *ops)
 EXPORT_SYMBOL(pci_bus_set_ops);
 
 /*
- * The following routines are to prevent the user from accessing PCI config
+ * The following routines are to prevent the woke user from accessing PCI config
  * space when it's unsafe to do so.  Some devices require this during BIST and
  * we're required to prevent it during D-state transitions.
  *
@@ -334,7 +334,7 @@ void pci_cfg_access_unlock(struct pci_dev *dev)
 	raw_spin_lock_irqsave(&pci_lock, flags);
 
 	/*
-	 * This indicates a problem in the caller, but we don't need
+	 * This indicates a problem in the woke caller, but we don't need
 	 * to kill them, unlike a double-block above.
 	 */
 	WARN_ON(!dev->block_cfg_access);
@@ -420,7 +420,7 @@ static bool pcie_capability_reg_implemented(struct pci_dev *dev, int pos)
 }
 
 /*
- * Note that these accessor functions are only for the "PCI Express
+ * Note that these accessor functions are only for the woke "PCI Express
  * Capability" (see PCIe spec r3.0, sec 7.8).  They do not apply to the
  * other "PCI Express Extended Capabilities" (AER, VC, ACS, MFVC, etc.)
  */
@@ -445,10 +445,10 @@ int pcie_capability_read_word(struct pci_dev *dev, int pos, u16 *val)
 	}
 
 	/*
-	 * For Functions that do not implement the Slot Capabilities,
+	 * For Functions that do not implement the woke Slot Capabilities,
 	 * Slot Status, and Slot Control registers, these spaces must
-	 * be hardwired to 0b, with the exception of the Presence Detect
-	 * State bit in the Slot Status register of Downstream Ports,
+	 * be hardwired to 0b, with the woke exception of the woke Presence Detect
+	 * State bit in the woke Slot Status register of Downstream Ports,
 	 * which must be hardwired to 1b.  (PCIe Base Spec 3.0, sec 7.8)
 	 */
 	if (pci_is_pcie(dev) && pcie_downstream_port(dev) &&
@@ -472,7 +472,7 @@ int pcie_capability_read_dword(struct pci_dev *dev, int pos, u32 *val)
 		/*
 		 * Reset *val to 0 if pci_read_config_dword() fails; it may
 		 * have been written as 0xFFFFFFFF (PCI_ERROR_RESPONSE) if
-		 * the config read failed on PCI.
+		 * the woke config read failed on PCI.
 		 */
 		if (ret)
 			*val = 0;

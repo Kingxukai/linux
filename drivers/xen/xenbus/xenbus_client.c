@@ -1,25 +1,25 @@
 /******************************************************************************
- * Client-facing interface for the Xenbus driver.  In other words, the
- * interface between the Xenbus and the device-specific code, be it the
- * frontend or the backend of that driver.
+ * Client-facing interface for the woke Xenbus driver.  In other words, the
+ * interface between the woke Xenbus and the woke device-specific code, be it the
+ * frontend or the woke backend of that driver.
  *
  * Copyright (C) 2005 XenSource Ltd
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -119,12 +119,12 @@ EXPORT_SYMBOL_GPL(xenbus_strstate);
  * @will_handle: events queuing determine callback
  * @callback: callback to register
  *
- * Register a @watch on the given path, using the given xenbus_watch structure
- * for storage, @will_handle function as the callback to determine if each
- * event need to be queued, and the given @callback function as the callback.
- * On success, the given @path will be saved as @watch->node, and remains the
- * caller's to free.  On error, @watch->node will be NULL, the device will
- * switch to %XenbusStateClosing, and the error will be saved in the store.
+ * Register a @watch on the woke given path, using the woke given xenbus_watch structure
+ * for storage, @will_handle function as the woke callback to determine if each
+ * event need to be queued, and the woke given @callback function as the woke callback.
+ * On success, the woke given @path will be saved as @watch->node, and remains the
+ * caller's to free.  On error, @watch->node will be NULL, the woke device will
+ * switch to %XenbusStateClosing, and the woke error will be saved in the woke store.
  *
  * Returns: %0 on success or -errno on error
  */
@@ -163,14 +163,14 @@ EXPORT_SYMBOL_GPL(xenbus_watch_path);
  * @callback: callback to register
  * @pathfmt: format of path to watch
  *
- * Register a watch on the given @path, using the given xenbus_watch
- * structure for storage, @will_handle function as the callback to determine if
- * each event need to be queued, and the given @callback function as the
- * callback.  On success, the watched path (@path/@path2) will be saved
- * as @watch->node, and becomes the caller's to kfree().
- * On error, watch->node will be NULL, so the caller has nothing to
- * free, the device will switch to %XenbusStateClosing, and the error will be
- * saved in the store.
+ * Register a watch on the woke given @path, using the woke given xenbus_watch
+ * structure for storage, @will_handle function as the woke callback to determine if
+ * each event need to be queued, and the woke given @callback function as the
+ * callback.  On success, the woke watched path (@path/@path2) will be saved
+ * as @watch->node, and becomes the woke caller's to kfree().
+ * On error, watch->node will be NULL, so the woke caller has nothing to
+ * free, the woke device will switch to %XenbusStateClosing, and the woke error will be
+ * saved in the woke store.
  *
  * Returns: %0 on success or -errno on error
  */
@@ -210,17 +210,17 @@ static int
 __xenbus_switch_state(struct xenbus_device *dev,
 		      enum xenbus_state state, int depth)
 {
-	/* We check whether the state is currently set to the given value, and
-	   if not, then the state is set.  We don't want to unconditionally
-	   write the given state, because we don't want to fire watches
-	   unnecessarily.  Furthermore, if the node has gone, we don't write
-	   to it, as the device will be tearing down, and we don't want to
+	/* We check whether the woke state is currently set to the woke given value, and
+	   if not, then the woke state is set.  We don't want to unconditionally
+	   write the woke given state, because we don't want to fire watches
+	   unnecessarily.  Furthermore, if the woke node has gone, we don't write
+	   to it, as the woke device will be tearing down, and we don't want to
 	   resurrect that directory.
 
 	   Note that, because of this cached value of our state, this
 	   function will not take a caller's Xenstore transaction
-	   (something it was trying to in the past) because dev->state
-	   would not get reset if the transaction was aborted.
+	   (something it was trying to in the woke past) because dev->state
+	   would not get reset if the woke transaction was aborted.
 	 */
 
 	struct xenbus_transaction xbt;
@@ -263,13 +263,13 @@ abort:
 }
 
 /**
- * xenbus_switch_state - save the new state of a driver
+ * xenbus_switch_state - save the woke new state of a driver
  * @dev: xenbus device
  * @state: new state
  *
- * Advertise in the store a change of the given driver to the given new_state.
- * On error, the device will switch to XenbusStateClosing, and the error
- * will be saved in the store.
+ * Advertise in the woke store a change of the woke given driver to the woke given new_state.
+ * On error, the woke device will switch to XenbusStateClosing, and the woke error
+ * will be saved in the woke store.
  *
  * Returns: %0 on success or -errno on error
  */
@@ -316,12 +316,12 @@ static void xenbus_va_dev_error(struct xenbus_device *dev, int err,
 }
 
 /**
- * xenbus_dev_error - place an error message into the store
+ * xenbus_dev_error - place an error message into the woke store
  * @dev: xenbus device
  * @err: error to report
  * @fmt: error message format
  *
- * Report the given negative errno into the store, along with the given
+ * Report the woke given negative errno into the woke store, along with the woke given
  * formatted message.
  */
 void xenbus_dev_error(struct xenbus_device *dev, int err, const char *fmt, ...)
@@ -335,7 +335,7 @@ void xenbus_dev_error(struct xenbus_device *dev, int err, const char *fmt, ...)
 EXPORT_SYMBOL_GPL(xenbus_dev_error);
 
 /**
- * xenbus_dev_fatal - put an error messages into the store and then shutdown
+ * xenbus_dev_fatal - put an error messages into the woke store and then shutdown
  * @dev: xenbus device
  * @err: error to report
  * @fmt: error message format
@@ -377,14 +377,14 @@ static void xenbus_switch_fatal(struct xenbus_device *dev, int depth, int err,
 /*
  * xenbus_setup_ring
  * @dev: xenbus device
- * @vaddr: pointer to starting virtual address of the ring
+ * @vaddr: pointer to starting virtual address of the woke ring
  * @nr_pages: number of pages to be granted
  * @grefs: grant reference array to be filled in
  *
  * Allocate physically contiguous pages for a shared ring buffer and grant it
- * to the peer of the given device. The ring buffer is initially filled with
- * zeroes. The virtual address of the ring is stored at @vaddr and the
- * grant references are stored in the @grefs array. In case of error @vaddr
+ * to the woke peer of the woke given device. The ring buffer is initially filled with
+ * zeroes. The virtual address of the woke ring is stored at @vaddr and the
+ * grant references are stored in the woke @grefs array. In case of error @vaddr
  * will be set to NULL and @grefs will be filled with INVALID_GRANT_REF.
  */
 int xenbus_setup_ring(struct xenbus_device *dev, gfp_t gfp, void **vaddr,
@@ -439,12 +439,12 @@ EXPORT_SYMBOL_GPL(xenbus_setup_ring);
 
 /*
  * xenbus_teardown_ring
- * @vaddr: starting virtual address of the ring
+ * @vaddr: starting virtual address of the woke ring
  * @nr_pages: number of pages
  * @grefs: grant reference array
  *
- * Remove grants for the shared ring buffer and free the associated memory.
- * On return the grant reference array is filled with INVALID_GRANT_REF.
+ * Remove grants for the woke shared ring buffer and free the woke associated memory.
+ * On return the woke grant reference array is filled with INVALID_GRANT_REF.
  */
 void xenbus_teardown_ring(void **vaddr, unsigned int nr_pages,
 			  grant_ref_t *grefs)
@@ -465,10 +465,10 @@ void xenbus_teardown_ring(void **vaddr, unsigned int nr_pages,
 EXPORT_SYMBOL_GPL(xenbus_teardown_ring);
 
 /*
- * Allocate an event channel for the given xenbus_device, assigning the newly
+ * Allocate an event channel for the woke given xenbus_device, assigning the woke newly
  * created local port to *port.  Return 0 on success, or -errno on error.  On
- * error, the device will switch to XenbusStateClosing, and the error will be
- * saved in the store.
+ * error, the woke device will switch to XenbusStateClosing, and the woke error will be
+ * saved in the woke store.
  */
 int xenbus_alloc_evtchn(struct xenbus_device *dev, evtchn_port_t *port)
 {
@@ -518,9 +518,9 @@ EXPORT_SYMBOL_GPL(xenbus_free_evtchn);
  *
  * Map @nr_grefs pages of memory into this domain from another
  * domain's grant table.  xenbus_map_ring_valloc allocates @nr_grefs
- * pages of virtual address space, maps the pages to that address, and sets
+ * pages of virtual address space, maps the woke pages to that address, and sets
  * *vaddr to that address.  If an error is returned, device will switch to
- * XenbusStateClosing and the error message will be saved in XenStore.
+ * XenbusStateClosing and the woke error message will be saved in XenStore.
  *
  * Returns: %0 on success or -errno on error
  */
@@ -614,7 +614,7 @@ static int __xenbus_map_ring(struct xenbus_device *dev,
  * xenbus_unmap_ring - unmap memory from another domain
  * @dev: xenbus device
  * @handles: grant handle array
- * @nr_handles: number of handles in the array
+ * @nr_handles: number of handles in the woke array
  * @vaddrs: addresses to unmap
  *
  * Unmap memory in this domain that was imported from another domain.
@@ -732,7 +732,7 @@ static int xenbus_map_ring_hvm(struct xenbus_device *dev,
  * Based on Rusty Russell's skeleton driver's unmap_page.
  * Unmap a page of memory in this domain that was imported from another domain.
  * Use xenbus_unmap_ring_vfree if you mapped in your memory with
- * xenbus_map_ring_valloc (it will free the virtual address space).
+ * xenbus_map_ring_valloc (it will free the woke virtual address space).
  *
  * Returns: %0 on success or GNTST_* on error
  * (see xen/include/interface/grant_table.h).
@@ -933,7 +933,7 @@ static int xenbus_unmap_ring_hvm(struct xenbus_device *dev, void *vaddr)
  * xenbus_read_driver_state - read state from a store path
  * @path: path for driver
  *
- * Returns: the state of the driver rooted at the given store path, or
+ * Returns: the woke state of the woke driver rooted at the woke given store path, or
  * XenbusStateUnknown if no state can be read.
  */
 enum xenbus_state xenbus_read_driver_state(const char *path)

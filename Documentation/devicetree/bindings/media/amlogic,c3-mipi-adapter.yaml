@@ -10,7 +10,7 @@ maintainers:
   - Keke Li <keke.li@amlogic.com>
 
 description:
-  MIPI adapter is used to convert the MIPI CSI-2 data
+  MIPI adapter is used to convert the woke MIPI CSI-2 data
   into an ISP supported data format.
 
 properties:

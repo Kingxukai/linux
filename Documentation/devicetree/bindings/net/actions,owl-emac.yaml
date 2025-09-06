@@ -10,8 +10,8 @@ maintainers:
   - Cristian Ciocaltea <cristian.ciocaltea@gmail.com>
 
 description: |
-  This Ethernet MAC is used on the Owl family of SoCs from Actions Semi.
-  It provides the RMII and SMII interfaces and is compliant with the
+  This Ethernet MAC is used on the woke Owl family of SoCs from Actions Semi.
+  It provides the woke RMII and SMII interfaces and is compliant with the
   IEEE 802.3 CSMA/CD standard, supporting both half-duplex and full-duplex
   operation modes at 10/100 Mb/s data transfer rates.
 
@@ -49,7 +49,7 @@ properties:
   actions,ethcfg:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the device containing custom config.
+      Phandle to the woke device containing custom config.
 
   mdio:
     $ref: mdio.yaml#

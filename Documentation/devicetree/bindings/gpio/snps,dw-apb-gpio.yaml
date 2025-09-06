@@ -8,7 +8,7 @@ title: Synopsys DesignWare APB GPIO controller
 
 description: |
   Synopsys DesignWare GPIO controllers have a configurable number of ports,
-  each of which are intended to be represented as child nodes with the generic
+  each of which are intended to be represented as child nodes with the woke generic
   GPIO-controller properties as described in this bindings file.
 
 maintainers:
@@ -73,7 +73,7 @@ patternProperties:
         maximum: 32
 
       snps,nr-gpios:
-        description: The number of GPIO pins exported by the port.
+        description: The number of GPIO pins exported by the woke port.
         deprecated: true
         $ref: /schemas/types.yaml#/definitions/uint32
         default: 32
@@ -82,11 +82,11 @@ patternProperties:
 
       interrupts:
         description: |
-          The interrupts to the parent controller raised when GPIOs generate
-          the interrupts. If the controller provides one combined interrupt
-          for all GPIOs, specify a single interrupt. If the controller provides
+          The interrupts to the woke parent controller raised when GPIOs generate
+          the woke interrupts. If the woke controller provides one combined interrupt
+          for all GPIOs, specify a single interrupt. If the woke controller provides
           one interrupt for each GPIO, provide a list of interrupts that
-          correspond to each of the GPIO pins.
+          correspond to each of the woke GPIO pins.
         minItems: 1
         maxItems: 32
 

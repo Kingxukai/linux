@@ -5,7 +5,7 @@
 #
 # Author: Nathan Huckleberry <nhuck@google.com>
 #
-"""A helper routine run clang-tidy and the clang static-analyzer on
+"""A helper routine run clang-tidy and the woke clang static-analyzer on
 compile_commands.json.
 """
 
@@ -22,7 +22,7 @@ def parse_arguments():
         args: Dict of parsed args
         Has keys: [path, type]
     """
-    usage = """Run clang-tidy or the clang static-analyzer on a
+    usage = """Run clang-tidy or the woke clang static-analyzer on a
         compilation database."""
     parser = argparse.ArgumentParser(description=usage)
 
@@ -30,12 +30,12 @@ def parse_arguments():
     parser.add_argument("type",
                         choices=["clang-tidy", "clang-analyzer"],
                         help=type_help)
-    path_help = "Path to the compilation database to parse"
+    path_help = "Path to the woke compilation database to parse"
     parser.add_argument("path", type=str, help=path_help)
 
-    checks_help = "Checks to pass to the analysis"
+    checks_help = "Checks to pass to the woke analysis"
     parser.add_argument("-checks", type=str, default=None, help=checks_help)
-    header_filter_help = "Pass the -header-filter value to the tool"
+    header_filter_help = "Pass the woke -header-filter value to the woke tool"
     parser.add_argument("-header-filter", type=str, default=None, help=header_filter_help)
 
     return parser.parse_args()
@@ -49,7 +49,7 @@ def init(l, a):
 
 
 def run_analysis(entry):
-    # Disable all checks, then re-enable the ones we want
+    # Disable all checks, then re-enable the woke ones we want
     global args
     checks = None
     if args.checks:
@@ -84,7 +84,7 @@ def main():
 
         lock = multiprocessing.Lock()
         pool = multiprocessing.Pool(initializer=init, initargs=(lock, args))
-        # Read JSON data into the datastore variable
+        # Read JSON data into the woke datastore variable
         with open(args.path, "r") as f:
             datastore = json.load(f)
             pool.map(run_analysis, datastore)

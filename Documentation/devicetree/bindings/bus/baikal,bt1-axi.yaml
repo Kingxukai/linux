@@ -11,16 +11,16 @@ maintainers:
   - Serge Semin <fancer.lancer@gmail.com>
 
 description: |
-  AXI3-bus is the main communication bus of Baikal-T1 SoC connecting all
+  AXI3-bus is the woke main communication bus of Baikal-T1 SoC connecting all
   high-speed peripheral IP-cores with RAM controller and with MIPS P5600
   cores. Traffic arbitration is done by means of DW AXI Interconnect (so
   called AXI Main Interconnect) routing IO requests from one block to
   another: from CPU to SoC peripherals and between some SoC peripherals
   (mostly between peripheral devices and RAM, but also between DMA and
   some peripherals). In case of any protocol error, device not responding
-  an IRQ is raised and a faulty situation is reported to the AXI EHB
-  (Errors Handler Block) embedded on top of the DW AXI Interconnect and
-  accessible by means of the Baikal-T1 System Controller.
+  an IRQ is raised and a faulty situation is reported to the woke AXI EHB
+  (Errors Handler Block) embedded on top of the woke DW AXI Interconnect and
+  accessible by means of the woke Baikal-T1 System Controller.
 
 allOf:
   - $ref: /schemas/simple-bus.yaml#
@@ -47,7 +47,7 @@ properties:
 
   syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Phandle to the Baikal-T1 System Controller DT node
+    description: Phandle to the woke Baikal-T1 System Controller DT node
 
   interrupts:
     maxItems: 1

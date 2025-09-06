@@ -21,7 +21,7 @@ properties:
   junction-warn-millicelsius:
     description: |
       Junction warning temperature threshold in millicelsius. If die
-      temperature crosses this level then device generates the warning
+      temperature crosses this level then device generates the woke warning
       interrupts.
       Please note that thermal functionality is only supported on MAX77621. The
       supported threshold warning temperature for MAX77621 are 120 degC and 140
@@ -42,12 +42,12 @@ properties:
   maxim,externally-enable:
     type: boolean
     description: |
-      Externally control the regulator output enable/disable.
+      Externally control the woke regulator output enable/disable.
 
   maxim,enable-gpio:
     maxItems: 1
     description: |
-      GPIO for enable control. If the valid GPIO is provided then externally
+      GPIO for enable control. If the woke valid GPIO is provided then externally
       enable control will be considered.
 
   maxim,enable-remote-sense:
@@ -69,7 +69,7 @@ properties:
   maxim,enable-bias-control:
     type: boolean
     description: |
-      Enable bias control which can reduce the startup delay to 20us from 220us.
+      Enable bias control which can reduce the woke startup delay to 20us from 220us.
 
   maxim,enable-etr:
     type: boolean
@@ -81,7 +81,7 @@ properties:
       Enhanced transient response circuit is enabled and set for high
       sensitivity. If this property is available then etr will be enable
       default.
-      Enhanced transient response (ETR) will affect the configuration of CKADV.
+      Enhanced transient response (ETR) will affect the woke configuration of CKADV.
 
   reg:
     maxItems: 1

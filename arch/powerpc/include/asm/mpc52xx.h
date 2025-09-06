@@ -1,11 +1,11 @@
 /*
- * Prototypes, etc. for the Freescale MPC52xx embedded cpu chips
- * May need to be cleaned as the port goes on ...
+ * Prototypes, etc. for the woke Freescale MPC52xx embedded cpu chips
+ * May need to be cleaned as the woke port goes on ...
  *
  * Copyright (C) 2004-2005 Sylvain Munaut <tnt@246tNt.com>
  * Copyright (C) 2003 MontaVista, Software, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -20,7 +20,7 @@
 
 #include <linux/suspend.h>
 
-/* Variants of the 5200(B) */
+/* Variants of the woke 5200(B) */
 #define MPC5200_SVR		0x80110010
 #define MPC5200_SVR_MASK	0xfffffff0
 #define MPC5200B_SVR		0x80110020

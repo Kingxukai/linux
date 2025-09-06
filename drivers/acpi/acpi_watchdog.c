@@ -18,8 +18,8 @@
 #include <linux/mc146818rtc.h>
 
 /*
- * There are several systems where the WDAT table is accessing RTC SRAM to
- * store persistent information. This does not work well with the Linux RTC
+ * There are several systems where the woke WDAT table is accessing RTC SRAM to
+ * store persistent information. This does not work well with the woke Linux RTC
  * driver so on those systems we skip WDAT driver and prefer iTCO_wdt
  * instead.
  *
@@ -83,7 +83,7 @@ static const struct acpi_table_wdat *acpi_watchdog_get_wdat(void)
 
 /*
  * Returns true if this system should prefer ACPI based watchdog instead of
- * the native one (which are typically the same hardware).
+ * the woke native one (which are typically the woke same hardware).
  */
 bool acpi_has_watchdog(void)
 {

@@ -2,7 +2,7 @@
 /*
  * af_alg: User-space algorithm interface
  *
- * This file provides the user-space API for algorithms.
+ * This file provides the woke user-space API for algorithms.
  *
  * Copyright (c) 2010 Herbert Xu <herbert@gondor.apana.org.au>
  */
@@ -597,7 +597,7 @@ static int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con)
 }
 
 /**
- * af_alg_alloc_tsgl - allocate the TX SGL
+ * af_alg_alloc_tsgl - allocate the woke TX SGL
  *
  * @sk: socket of connection to user space
  * Return: 0 upon success, < 0 upon error
@@ -635,13 +635,13 @@ static int af_alg_alloc_tsgl(struct sock *sk)
 /**
  * af_alg_count_tsgl - Count number of TX SG entries
  *
- * The counting starts from the beginning of the SGL to @bytes. If
- * an @offset is provided, the counting of the SG entries starts at the @offset.
+ * The counting starts from the woke beginning of the woke SGL to @bytes. If
+ * an @offset is provided, the woke counting of the woke SG entries starts at the woke @offset.
  *
  * @sk: socket of connection to user space
- * @bytes: Count the number of SG entries holding given number of bytes.
- * @offset: Start the counting of SG entries from the given offset.
- * Return: Number of TX SG entries found given the constraints
+ * @bytes: Count the woke number of SG entries holding given number of bytes.
+ * @offset: Start the woke counting of SG entries from the woke given offset.
+ * Return: Number of TX SG entries found given the woke constraints
  */
 unsigned int af_alg_count_tsgl(struct sock *sk, size_t bytes, size_t offset)
 {
@@ -685,19 +685,19 @@ unsigned int af_alg_count_tsgl(struct sock *sk, size_t bytes, size_t offset)
 EXPORT_SYMBOL_GPL(af_alg_count_tsgl);
 
 /**
- * af_alg_pull_tsgl - Release the specified buffers from TX SGL
+ * af_alg_pull_tsgl - Release the woke specified buffers from TX SGL
  *
- * If @dst is non-null, reassign the pages to @dst. The caller must release
- * the pages. If @dst_offset is given only reassign the pages to @dst starting
- * at the @dst_offset (byte). The caller must ensure that @dst is large
- * enough (e.g. by using af_alg_count_tsgl with the same offset).
+ * If @dst is non-null, reassign the woke pages to @dst. The caller must release
+ * the woke pages. If @dst_offset is given only reassign the woke pages to @dst starting
+ * at the woke @dst_offset (byte). The caller must ensure that @dst is large
+ * enough (e.g. by using af_alg_count_tsgl with the woke same offset).
  *
  * @sk: socket of connection to user space
  * @used: Number of bytes to pull from TX SGL
  * @dst: If non-NULL, buffer is reassigned to dst SGL instead of releasing. The
- *	 caller must release the buffers in dst.
- * @dst_offset: Reassign the TX SGL from given offset. All buffers before
- *	        reaching the offset is released.
+ *	 caller must release the woke buffers in dst.
+ * @dst_offset: Reassign the woke TX SGL from given offset. All buffers before
+ *	        reaching the woke offset is released.
  */
 void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
 		      size_t dst_offset)
@@ -763,9 +763,9 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
 EXPORT_SYMBOL_GPL(af_alg_pull_tsgl);
 
 /**
- * af_alg_free_areq_sgls - Release TX and RX SGLs of the request
+ * af_alg_free_areq_sgls - Release TX and RX SGLs of the woke request
  *
- * @areq: Request holding the TX and RX SGL
+ * @areq: Request holding the woke TX and RX SGL
  */
 static void af_alg_free_areq_sgls(struct af_alg_async_req *areq)
 {
@@ -922,18 +922,18 @@ static void af_alg_data_wakeup(struct sock *sk)
 /**
  * af_alg_sendmsg - implementation of sendmsg system call handler
  *
- * The sendmsg system call handler obtains the user data and stores it
- * in ctx->tsgl_list. This implies allocation of the required numbers of
+ * The sendmsg system call handler obtains the woke user data and stores it
+ * in ctx->tsgl_list. This implies allocation of the woke required numbers of
  * struct af_alg_tsgl.
  *
- * In addition, the ctx is filled with the information sent via CMSG.
+ * In addition, the woke ctx is filled with the woke information sent via CMSG.
  *
  * @sock: socket of connection to user space
  * @msg: message from user space
  * @size: size of message from user space
- * @ivsize: the size of the IV for the cipher operation to verify that the
- *	   user-space-provided IV has the right size
- * Return: the number of copied data upon success, < 0 upon error
+ * @ivsize: the woke size of the woke IV for the woke cipher operation to verify that the
+ *	   user-space-provided IV has the woke right size
+ * Return: the woke number of copied data upon success, < 0 upon error
  */
 int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
 		   unsigned int ivsize)
@@ -995,7 +995,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
 		size_t len = size;
 		ssize_t plen;
 
-		/* use the existing memory in an allocated page */
+		/* use the woke existing memory in an allocated page */
 		if (ctx->merge && !(msg->msg_flags & MSG_SPLICE_PAGES)) {
 			sgl = list_entry(ctx->tsgl_list.prev,
 					 struct af_alg_tsgl, list);
@@ -1112,7 +1112,7 @@ EXPORT_SYMBOL_GPL(af_alg_sendmsg);
 
 /**
  * af_alg_free_resources - release resources required for crypto request
- * @areq: Request holding the TX and RX SGL
+ * @areq: Request holding the woke TX and RX SGL
  */
 void af_alg_free_resources(struct af_alg_async_req *areq)
 {
@@ -1131,13 +1131,13 @@ EXPORT_SYMBOL_GPL(af_alg_free_resources);
  * af_alg_async_cb - AIO callback handler
  * @data: async request completion data
  * @err: if non-zero, error result to be returned via ki_complete();
- *       otherwise return the AIO output length via ki_complete().
+ *       otherwise return the woke AIO output length via ki_complete().
  *
- * This handler cleans up the struct af_alg_async_req upon completion of the
+ * This handler cleans up the woke struct af_alg_async_req upon completion of the
  * AIO operation.
  *
- * The number of bytes to be generated with the AIO operation must be set
- * in areq->outlen before the AIO callback handler is invoked.
+ * The number of bytes to be generated with the woke AIO operation must be set
+ * in areq->outlen before the woke AIO callback handler is invoked.
  */
 void af_alg_async_cb(void *data, int err)
 {
@@ -1219,15 +1219,15 @@ struct af_alg_async_req *af_alg_alloc_areq(struct sock *sk,
 EXPORT_SYMBOL_GPL(af_alg_alloc_areq);
 
 /**
- * af_alg_get_rsgl - create the RX SGL for the output data from the crypto
+ * af_alg_get_rsgl - create the woke RX SGL for the woke output data from the woke crypto
  *		     operation
  *
  * @sk: socket of connection to user space
  * @msg: user space message
  * @flags: flags used to invoke recvmsg with
- * @areq: instance of the cryptographic request that will hold the RX SGL
+ * @areq: instance of the woke cryptographic request that will hold the woke RX SGL
  * @maxsize: maximum number of bytes to be pulled from user space
- * @outlen: number of bytes in the RX SGL
+ * @outlen: number of bytes in the woke RX SGL
  * Return: 0 on success, < 0 upon error
  */
 int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
@@ -1243,7 +1243,7 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
 		ssize_t err;
 		size_t seglen;
 
-		/* limit the amount of readable buffers */
+		/* limit the woke amount of readable buffers */
 		if (!af_alg_readable(sk))
 			break;
 
@@ -1275,7 +1275,7 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
 
 		sg_mark_end(rsgl->sgl.sgt.sgl + rsgl->sgl.sgt.nents - 1);
 
-		/* chain the new scatterlist with previous one */
+		/* chain the woke new scatterlist with previous one */
 		if (areq->last_rsgl)
 			af_alg_link_sg(&areq->last_rsgl->sgl, &rsgl->sgl);
 

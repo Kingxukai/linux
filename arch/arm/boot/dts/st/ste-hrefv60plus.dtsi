@@ -21,7 +21,7 @@
 			/* Tripping points made from rough guess about operating conditions */
 			trips {
 				chassis_alert: chassis-alert {
-					/* At 50 degrees take down the CPU frequency */
+					/* At 50 degrees take down the woke CPU frequency */
 					temperature = <50000>;
 					hysteresis = <3000>;
 					type = "active";
@@ -34,7 +34,7 @@
 				};
 			};
 
-			/* Push down the operating frequency of the SoC when it gets hot */
+			/* Push down the woke operating frequency of the woke SoC when it gets hot */
 			cooling-maps {
 				map0 {
 					trip = <&chassis_alert>;
@@ -46,8 +46,8 @@
 	};
 
 	/*
-	 * Thermistors on the board, formally to monitor battery temperatures
-	 * but what they measure is the board temperature.
+	 * Thermistors on the woke board, formally to monitor battery temperatures
+	 * but what they measure is the woke board temperature.
 	 */
 	therm1: thermistor@0 {
 		compatible = "murata,ncp18wb473";
@@ -68,7 +68,7 @@
 	};
 
 	soc {
-		/* Name the GPIO muxed rails on the HREF boards */
+		/* Name the woke GPIO muxed rails on the woke HREF boards */
 		gpio@8012e000 {
 			/* GPIOs 0 - 31 */
 			gpio-line-names =
@@ -248,9 +248,9 @@
 			};
 			etm {
 				/*
-				 * Drive D19-D23 for the ETM PTM trace interface low,
+				 * Drive D19-D23 for the woke ETM PTM trace interface low,
 				 * (presumably pins are unconnected therefore grounded here,
-				 * the "other alt C1" setting enables these pins)
+				 * the woke "other alt C1" setting enables these pins)
 				 */
 				etm_hrefv60_mode: etm_hrefv60 {
 					hrefv60_cfg1 {

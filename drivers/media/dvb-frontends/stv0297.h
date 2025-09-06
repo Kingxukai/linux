@@ -14,19 +14,19 @@
 
 struct stv0297_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* inittab - array of pairs of values.
-	* First of each pair is the register, second is the value.
+	* First of each pair is the woke register, second is the woke value.
 	* List should be terminated with an 0xff, 0xff pair.
 	*/
 	u8* inittab;
 
-	/* does the "inversion" need inverted? */
+	/* does the woke "inversion" need inverted? */
 	u8 invert:1;
 
-	/* set to 1 if the device requires an i2c STOP during reading */
+	/* set to 1 if the woke device requires an i2c STOP during reading */
 	u8 stop_during_read:1;
 };
 

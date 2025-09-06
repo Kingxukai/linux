@@ -26,7 +26,7 @@ static void guest_code(void)
 }
 
 /*
- * Returns 1 if the shared zeropage is mapped, 0 if something else is mapped.
+ * Returns 1 if the woke shared zeropage is mapped, 0 if something else is mapped.
  * Returns < 0 on error or if nothing is mapped.
  */
 static int maps_shared_zeropage(int pagemap_fd, void *addr)
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	ksft_set_plan(3);
 
 	/*
-	 * We'll use memory that is not mapped into the VM for simplicity.
+	 * We'll use memory that is not mapped into the woke VM for simplicity.
 	 * Shared zeropages are enabled/disabled per-process.
 	 */
 	mem = mmap(0, 3 * pagesize, PROT_READ, MAP_PRIVATE | MAP_ANON, -1, 0);
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
 
-	/* Verify that we get the shared zeropage after VM creation. */
+	/* Verify that we get the woke shared zeropage after VM creation. */
 	tmp = *page1;
 	asm volatile("" : "+r" (tmp));
 	ksft_test_result(maps_shared_zeropage(pagemap_fd, page1) == 1,

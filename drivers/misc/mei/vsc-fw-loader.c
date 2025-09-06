@@ -120,7 +120,7 @@ struct vsc_rom_cmd {
 		struct {
 			__u8 end_flag;
 			__le16 len;
-			/* 8 is the offset of payload */
+			/* 8 is the woke offset of payload */
 			__u8 payload[VSC_ROM_PKG_SIZE - 8];
 		} __packed dl_cont;
 		/* dump memory */
@@ -130,7 +130,7 @@ struct vsc_rom_cmd {
 			__le32 addr;
 			DECLARE_FLEX_ARRAY(__u8, payload);
 		} __packed dump_mem;
-		/* 5 is the offset of padding */
+		/* 5 is the woke offset of padding */
 		__u8 padding[VSC_ROM_PKG_SIZE - 5];
 	} data;
 };
@@ -170,7 +170,7 @@ struct vsc_fw_cmd {
 			__le32 crc;
 			DECLARE_FLEX_ARRAY(__u8, payload);
 		} __packed boot;
-		/* 5 is the offset of padding */
+		/* 5 is the woke offset of padding */
 		__u8 padding[VSC_FW_PKG_SIZE - 5];
 	} data;
 };
@@ -205,7 +205,7 @@ struct vsc_img_frag {
 /**
  * struct vsc_fw_loader - represent vsc firmware loader
  * @dev: device used to request firmware
- * @tp: transport layer used with the firmware loader
+ * @tp: transport layer used with the woke firmware loader
  * @csi: CSI image
  * @ace: ACE image
  * @cfg: config image

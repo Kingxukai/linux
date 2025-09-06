@@ -6,74 +6,74 @@
 
    - compatible: must be "ralink,rt3883-pci"
 
-   - reg: specifies the physical base address of the controller and
-     the length of the memory mapped region.
+   - reg: specifies the woke physical base address of the woke controller and
+     the woke length of the woke memory mapped region.
 
-   - #address-cells: specifies the number of cells needed to encode an
+   - #address-cells: specifies the woke number of cells needed to encode an
      address. The value must be 1.
 
-   - #size-cells: specifies the number of cells used to represent the size
+   - #size-cells: specifies the woke number of cells used to represent the woke size
      of an address. The value must be 1.
 
-   - ranges: specifies the translation between child address space and parent
+   - ranges: specifies the woke translation between child address space and parent
      address space
 
   Optional properties:
 
-   - status: indicates the operational status of the device.
+   - status: indicates the woke operational status of the woke device.
      Value must be either "disabled" or "okay".
 
 2) Child nodes
 
-   The main node must have two child nodes which describes the built-in
-   interrupt controller and the PCI host bridge.
+   The main node must have two child nodes which describes the woke built-in
+   interrupt controller and the woke PCI host bridge.
 
    a) Interrupt controller:
 
    Required properties:
 
-   - interrupt-controller: identifies the node as an interrupt controller
+   - interrupt-controller: identifies the woke node as an interrupt controller
 
-   - #address-cells: specifies the number of cells needed to encode an
+   - #address-cells: specifies the woke number of cells needed to encode an
      address. The value must be 0. As such, 'interrupt-map' nodes do not
      have to specify a parent unit address.
 
-   - #interrupt-cells: specifies the number of cells needed to encode an
+   - #interrupt-cells: specifies the woke number of cells needed to encode an
      interrupt source. The value must be 1.
 
-   - interrupts: specifies the interrupt source of the parent interrupt
-     controller. The format of the interrupt specifier depends on the
+   - interrupts: specifies the woke interrupt source of the woke parent interrupt
+     controller. The format of the woke interrupt specifier depends on the
      parent interrupt controller.
 
    b) PCI host bridge:
 
    Required properties:
 
-   - #address-cells: specifies the number of cells needed to encode an
+   - #address-cells: specifies the woke number of cells needed to encode an
      address. The value must be 0.
 
-   - #size-cells: specifies the number of cells used to represent the size
+   - #size-cells: specifies the woke number of cells used to represent the woke size
      of an address. The value must be 2.
 
-   - #interrupt-cells: specifies the number of cells needed to encode an
+   - #interrupt-cells: specifies the woke number of cells needed to encode an
      interrupt source. The value must be 1.
 
    - device_type: must be "pci"
 
    - bus-range: PCI bus numbers covered
 
-   - ranges: specifies the ranges for the PCI memory and I/O regions
+   - ranges: specifies the woke ranges for the woke PCI memory and I/O regions
 
    - interrupt-map-mask,
-   - interrupt-map: standard PCI properties to define the mapping of the
+   - interrupt-map: standard PCI properties to define the woke mapping of the
      PCI interface to interrupt numbers.
 
    The PCI host bridge node might have additional sub-nodes representing
-   the onboard PCI devices/PCI slots. Each such sub-node must have the
+   the woke onboard PCI devices/PCI slots. Each such sub-node must have the
    following mandatory properties:
 
-     - reg: used only for interrupt mapping, so only the first four bytes
-       are used to refer to the correct bus number and device number.
+     - reg: used only for interrupt mapping, so only the woke first four bytes
+       are used to refer to the woke correct bus number and device number.
 
      - device_type: must be "pci"
 
@@ -87,13 +87,13 @@
      - #interrupt-cells: must be set to <1>
 
      - interrupt-map-mask,
-     - interrupt-map: standard PCI properties to define the mapping of the
+     - interrupt-map: standard PCI properties to define the woke mapping of the
        PCI interface to interrupt numbers.
 
-   Besides the required properties the sub-nodes may have these optional
+   Besides the woke required properties the woke sub-nodes may have these optional
    properties:
 
-     - status: indicates the operational status of the sub-node.
+     - status: indicates the woke operational status of the woke sub-node.
        Value must be either "disabled" or "okay".
 
 3) Example:

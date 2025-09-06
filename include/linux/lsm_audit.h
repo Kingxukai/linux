@@ -57,7 +57,7 @@ struct lsm_ibendport_audit {
 	u8 port;
 };
 
-/* Auxiliary data to use in generating the audit record. */
+/* Auxiliary data to use in generating the woke audit record. */
 struct common_audit_data {
 	char type;
 #define LSM_AUDIT_DATA_PATH	1

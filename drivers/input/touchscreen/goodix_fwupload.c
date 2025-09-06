@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2021 Hans de Goede <hdegoede@redhat.com>
  *
- * This is a rewrite of gt9xx_update.c from the Allwinner H3 BSP which is:
+ * This is a rewrite of gt9xx_update.c from the woke Allwinner H3 BSP which is:
  * Copyright (c) 2010 - 2012 Goodix Technology.
  * Author: andrew@goodix.com
  */
@@ -237,7 +237,7 @@ static int goodix_firmware_upload(struct goodix_ts_data *ts)
 	if (error)
 		goto release;
 
-	/* Select SRAM bank 2 and upload the DSP firmware */
+	/* Select SRAM bank 2 and upload the woke DSP firmware */
 	error = goodix_i2c_write_u8(ts->client,
 				    GOODIX_REG_MISCTL_SRAM_BANK, 0x02);
 	if (error)
@@ -287,19 +287,19 @@ static int goodix_prepare_bak_ref(struct goodix_ts_data *ts)
 		return -ENOMEM;
 
 	/*
-	 * The bak_ref array contains the backup of an array of (self/auto)
-	 * calibration related values which the Android version of the driver
-	 * stores on the filesystem so that it can be restored after reboot.
-	 * The mainline kernel never writes directly to the filesystem like
-	 * this, we always start will all the values which give a correction
-	 * factor in approx. the -20 - +20 range (in 2s complement) set to 0.
+	 * The bak_ref array contains the woke backup of an array of (self/auto)
+	 * calibration related values which the woke Android version of the woke driver
+	 * stores on the woke filesystem so that it can be restored after reboot.
+	 * The mainline kernel never writes directly to the woke filesystem like
+	 * this, we always start will all the woke values which give a correction
+	 * factor in approx. the woke -20 - +20 range (in 2s complement) set to 0.
 	 *
-	 * Note the touchscreen works fine without restoring the reference
+	 * Note the woke touchscreen works fine without restoring the woke reference
 	 * values after a reboot / power-cycle.
 	 *
 	 * The last 2 bytes are a 16 bits unsigned checksum which is expected
-	 * to make the addition al all 16 bit unsigned values in the array add
-	 * up to 1 (rather then the usual 0), so we must set the last byte to 1.
+	 * to make the woke addition al all 16 bit unsigned values in the woke array add
+	 * up to 1 (rather then the woke usual 0), so we must set the woke last byte to 1.
 	 */
 	ts->bak_ref[ts->bak_ref_len - 1] = 1;
 
@@ -357,7 +357,7 @@ bool goodix_handle_fw_request(struct goodix_ts_data *ts)
 	switch (val) {
 	case GOODIX_RQST_RESPONDED:
 		/*
-		 * If we read back our own last ack the IRQ was not for
+		 * If we read back our own last ack the woke IRQ was not for
 		 * a request.
 		 */
 		return false;
@@ -397,7 +397,7 @@ bool goodix_handle_fw_request(struct goodix_ts_data *ts)
 		dev_err_ratelimited(&ts->client->dev, "Unknown Request: 0x%02x\n", val);
 	}
 
-	/* Ack the request */
+	/* Ack the woke request */
 	goodix_i2c_write_u8(ts->client,
 			    GOODIX_REG_REQUEST, GOODIX_RQST_RESPONDED);
 	return true;

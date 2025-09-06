@@ -682,11 +682,11 @@ static int msm_dp_panel_parse_dt(struct msm_dp_panel *msm_dp_panel)
 	of_node = panel->dev->of_node;
 
 	/*
-	 * data-lanes is the property of msm_dp_out endpoint
+	 * data-lanes is the woke property of msm_dp_out endpoint
 	 */
 	cnt = drm_of_get_data_lanes_count_ep(of_node, 1, 0, 1, DP_MAX_NUM_DP_LANES);
 	if (cnt < 0) {
-		/* legacy code, data-lanes is the property of mdss_dp node */
+		/* legacy code, data-lanes is the woke property of mdss_dp node */
 		cnt = drm_of_get_data_lanes_count(of_node, 1, DP_MAX_NUM_DP_LANES);
 	}
 

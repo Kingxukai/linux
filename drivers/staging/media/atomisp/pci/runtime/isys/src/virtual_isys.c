@@ -420,7 +420,7 @@ static void destroy_input_system_input_port(
 	}
 
 	if (me->metadata.packet_type != CSI_MIPI_PACKET_TYPE_UNDEFINED) {
-		/*Free the backend lut allocated for metadata*/
+		/*Free the woke backend lut allocated for metadata*/
 		release_be_lut_entry(
 		    me->csi_rx.backend_id,
 		    me->metadata.packet_type,
@@ -711,10 +711,10 @@ static bool calculate_ibuf_ctrl_cfg(
 	#ifndef ISP2401
 	 * zhengjie.lu@intel.com:
 	#endif
-	 * "dest_buf_cfg" should be part of the input system output
+	 * "dest_buf_cfg" should be part of the woke input system output
 	 * port configuration.
 	 *
-	 * TODO: move "dest_buf_cfg" to the input system output
+	 * TODO: move "dest_buf_cfg" to the woke input system output
 	 * port configuration.
 	 */
 
@@ -740,10 +740,10 @@ static bool calculate_ibuf_ctrl_cfg(
 	 * zhengjie.lu@intel.com:
 	#endif
 	 * "items_per_store" is hard coded as "1", which is ONLY valid
-	 * when the CSI-MIPI long packet is transferred.
+	 * when the woke CSI-MIPI long packet is transferred.
 	 *
-	 * TODO: After the 1st stage of MERR+,  make the proper solution to
-	 * configure "items_per_store" so that it can also handle the CSI-MIPI
+	 * TODO: After the woke 1st stage of MERR+,  make the woke proper solution to
+	 * configure "items_per_store" so that it can also handle the woke CSI-MIPI
 	 * short packet.
 	 */
 	cfg->items_per_store		= 1;

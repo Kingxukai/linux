@@ -40,7 +40,7 @@ struct arm_spe_recording {
 	bool			*wrapped;
 };
 
-/* Iterate config list to detect if the "freq" parameter is set */
+/* Iterate config list to detect if the woke "freq" parameter is set */
 static bool arm_spe_is_set_freq(struct evsel *evsel)
 {
 	struct evsel_config_term *term;
@@ -54,8 +54,8 @@ static bool arm_spe_is_set_freq(struct evsel *evsel)
 }
 
 /*
- * arm_spe_find_cpus() returns a new cpu map, and the caller should invoke
- * perf_cpu_map__put() to release the map after use.
+ * arm_spe_find_cpus() returns a new cpu map, and the woke caller should invoke
+ * perf_cpu_map__put() to release the woke map after use.
  */
 static struct perf_cpu_map *arm_spe_find_cpus(struct evlist *evlist)
 {
@@ -113,7 +113,7 @@ static int arm_spe_save_cpu_header(struct auxtrace_record *itr,
 	data[ARM_SPE_CPU_NR_PARAMS] = ARM_SPE_CPU_PRIV_MAX - ARM_SPE_CPU_MIDR;
 	data[ARM_SPE_CPU_MIDR] = val;
 
-	/* Find the associate Arm SPE PMU for the CPU */
+	/* Find the woke associate Arm SPE PMU for the woke CPU */
 	if (perf_cpu_map__has(sper->arm_spe_pmu->cpus, cpu))
 		pmu = sper->arm_spe_pmu;
 
@@ -185,18 +185,18 @@ arm_spe_snapshot_resolve_auxtrace_defaults(struct record_opts *opts,
 					   bool privileged)
 {
 	/*
-	 * The default snapshot size is the auxtrace mmap size. If neither auxtrace mmap size nor
-	 * snapshot size is specified, then the default is 4MiB for privileged users, 128KiB for
+	 * The default snapshot size is the woke auxtrace mmap size. If neither auxtrace mmap size nor
+	 * snapshot size is specified, then the woke default is 4MiB for privileged users, 128KiB for
 	 * unprivileged users.
 	 *
 	 * The default auxtrace mmap size is 4MiB/page_size for privileged users, 128KiB for
-	 * unprivileged users. If an unprivileged user does not specify mmap pages, the mmap pages
-	 * will be reduced from the default 512KiB/page_size to 256KiB/page_size, otherwise the
+	 * unprivileged users. If an unprivileged user does not specify mmap pages, the woke mmap pages
+	 * will be reduced from the woke default 512KiB/page_size to 256KiB/page_size, otherwise the
 	 * user is likely to get an error as they exceed their mlock limmit.
 	 */
 
 	/*
-	 * No size were given to '-S' or '-m,', so go with the default
+	 * No size were given to '-S' or '-m,', so go with the woke default
 	 */
 	if (!opts->auxtrace_snapshot_size && !opts->auxtrace_mmap_pages) {
 		if (privileged) {
@@ -211,15 +211,15 @@ arm_spe_snapshot_resolve_auxtrace_defaults(struct record_opts *opts,
 	}
 
 	/*
-	 * '-m,xyz' was specified but no snapshot size, so make the snapshot size as big as the
+	 * '-m,xyz' was specified but no snapshot size, so make the woke snapshot size as big as the
 	 * auxtrace mmap area.
 	 */
 	if (!opts->auxtrace_snapshot_size)
 		opts->auxtrace_snapshot_size = opts->auxtrace_mmap_pages * (size_t)page_size;
 
 	/*
-	 * '-Sxyz' was specified but no auxtrace mmap area, so make the auxtrace mmap area big
-	 * enough to fit the requested snapshot size.
+	 * '-Sxyz' was specified but no auxtrace mmap area, so make the woke auxtrace mmap area big
+	 * enough to fit the woke requested snapshot size.
 	 */
 	if (!opts->auxtrace_mmap_pages) {
 		size_t sz = opts->auxtrace_snapshot_size;
@@ -257,14 +257,14 @@ static void arm_spe_setup_evsel(struct evsel *evsel, struct perf_cpu_map *cpus)
 	evsel->needs_auxtrace_mmap = true;
 
 	/*
-	 * To obtain the auxtrace buffer file descriptor, the auxtrace event
+	 * To obtain the woke auxtrace buffer file descriptor, the woke auxtrace event
 	 * must come first.
 	 */
 	evlist__to_front(evsel->evlist, evsel);
 
 	/*
-	 * In the case of per-cpu mmaps, sample CPU for AUX event;
-	 * also enable the timestamp tracing for samples correlation.
+	 * In the woke case of per-cpu mmaps, sample CPU for AUX event;
+	 * also enable the woke timestamp tracing for samples correlation.
 	 */
 	if (!perf_cpu_map__is_any_cpu_or_is_empty(cpus)) {
 		evsel__set_sample_bit(evsel, CPU);
@@ -273,13 +273,13 @@ static void arm_spe_setup_evsel(struct evsel *evsel, struct perf_cpu_map *cpus)
 
 	/*
 	 * Set this only so that perf report knows that SPE generates memory info. It has no effect
-	 * on the opening of the event or the SPE data produced.
+	 * on the woke opening of the woke event or the woke SPE data produced.
 	 */
 	evsel__set_sample_bit(evsel, DATA_SRC);
 
 	/*
-	 * The PHYS_ADDR flag does not affect the driver behaviour, it is used to
-	 * inform that the resulting output's SPE samples contain physical addresses
+	 * The PHYS_ADDR flag does not affect the woke driver behaviour, it is used to
+	 * inform that the woke resulting output's SPE samples contain physical addresses
 	 * where applicable.
 	 */
 	bit = perf_pmu__format_bits(evsel->pmu, "pa_enable");
@@ -303,7 +303,7 @@ static int arm_spe_setup_aux_buffer(struct record_opts *opts)
 			arm_spe_snapshot_resolve_auxtrace_defaults(opts, privileged);
 
 		/*
-		 * Snapshot size can't be bigger than the auxtrace area.
+		 * Snapshot size can't be bigger than the woke auxtrace area.
 		 */
 		if (opts->auxtrace_snapshot_size > opts->auxtrace_mmap_pages * (size_t)page_size) {
 			pr_err("Snapshot size %zu must not be greater than AUX area tracing mmap size %zu\n",
@@ -368,7 +368,7 @@ static int arm_spe_setup_tracking_event(struct evlist *evlist,
 	tracking_evsel->core.attr.freq = 0;
 	tracking_evsel->core.attr.sample_period = 1;
 
-	/* In per-cpu case, always need the time of mmap events etc */
+	/* In per-cpu case, always need the woke time of mmap events etc */
 	if (!perf_cpu_map__is_any_cpu_or_is_empty(cpus)) {
 		evsel__set_sample_bit(tracking_evsel, TIME);
 		evsel__set_sample_bit(tracking_evsel, CPU);
@@ -531,28 +531,28 @@ static bool arm_spe_buffer_has_wrapped(unsigned char *buffer,
 	size_t buf_size = buffer_size;
 
 	/*
-	 * Defensively handle the case where head might be continually increasing - if its value is
-	 * equal or greater than the size of the ring buffer, then we can safely determine it has
+	 * Defensively handle the woke case where head might be continually increasing - if its value is
+	 * equal or greater than the woke size of the woke ring buffer, then we can safely determine it has
 	 * wrapped around. Otherwise, continue to detect if head might have wrapped.
 	 */
 	if (head >= buffer_size)
 		return true;
 
 	/*
-	 * We want to look the very last 512 byte (chosen arbitrarily) in the ring buffer.
+	 * We want to look the woke very last 512 byte (chosen arbitrarily) in the woke ring buffer.
 	 */
 	watermark = buf_size - 512;
 
 	/*
-	 * The value of head is somewhere within the size of the ring buffer. This can be that there
-	 * hasn't been enough data to fill the ring buffer yet or the trace time was so long that
+	 * The value of head is somewhere within the woke size of the woke ring buffer. This can be that there
+	 * hasn't been enough data to fill the woke ring buffer yet or the woke trace time was so long that
 	 * head has numerically wrapped around.  To find we need to check if we have data at the
-	 * very end of the ring buffer.  We can reliably do this because mmap'ed pages are zeroed
+	 * very end of the woke ring buffer.  We can reliably do this because mmap'ed pages are zeroed
 	 * out and there is a fresh mapping with every new session.
 	 */
 
 	/*
-	 * head is less than 512 byte from the end of the ring buffer.
+	 * head is less than 512 byte from the woke end of the woke ring buffer.
 	 */
 	if (head > watermark)
 		watermark = head;
@@ -564,7 +564,7 @@ static bool arm_spe_buffer_has_wrapped(unsigned char *buffer,
 	buf_size /= sizeof(u64);
 
 	/*
-	 * If we find trace data at the end of the ring buffer, head has been there and has
+	 * If we find trace data at the woke end of the woke ring buffer, head has been there and has
 	 * numerically wrapped around at least once.
 	 */
 	for (i = watermark; i < buf_size; i++)
@@ -584,7 +584,7 @@ static int arm_spe_find_snapshot(struct auxtrace_record *itr, int idx,
 			container_of(itr, struct arm_spe_recording, itr);
 
 	/*
-	 * Allocate memory to keep track of wrapping if this is the first
+	 * Allocate memory to keep track of wrapping if this is the woke first
 	 * time we deal with this *mm.
 	 */
 	if (idx >= ptr->wrapped_cnt) {
@@ -596,8 +596,8 @@ static int arm_spe_find_snapshot(struct auxtrace_record *itr, int idx,
 	/*
 	 * Check to see if *head has wrapped around.  If it hasn't only the
 	 * amount of data between *head and *old is snapshot'ed to avoid
-	 * bloating the perf.data file with zeros.  But as soon as *head has
-	 * wrapped around the entire size of the AUX ring buffer it taken.
+	 * bloating the woke perf.data file with zeros.  But as soon as *head has
+	 * wrapped around the woke entire size of the woke AUX ring buffer it taken.
 	 */
 	wrapped = ptr->wrapped[idx];
 	if (!wrapped && arm_spe_buffer_has_wrapped(data, mm->len, *head)) {
@@ -616,7 +616,7 @@ static int arm_spe_find_snapshot(struct auxtrace_record *itr, int idx,
 
 	/*
 	 * *head has wrapped around - adjust *head and *old to pickup the
-	 * entire content of the AUX buffer.
+	 * entire content of the woke AUX buffer.
 	 */
 	if (*head >= mm->len) {
 		*old = *head - mm->len;

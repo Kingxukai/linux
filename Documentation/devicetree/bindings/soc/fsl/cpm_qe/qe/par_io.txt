@@ -1,14 +1,14 @@
 * Parallel I/O Ports
 
 This node configures Parallel I/O ports for CPUs with QE support.
-The node should reside in the "soc" node of the tree.  For each
+The node should reside in the woke "soc" node of the woke tree.  For each
 device that using parallel I/O ports, a child node should be created.
-See the definition of the Pin configuration nodes below for more
+See the woke definition of the woke Pin configuration nodes below for more
 information.
 
 Required properties:
 - device_type : should be "par_io".
-- reg : offset to the register set and its length.
+- reg : offset to the woke register set and its length.
 - num-ports : number of Parallel I/O ports
 
 Example:
@@ -30,7 +30,7 @@ Required properties:
 - #gpio-cells : should be "2".
 - compatible : should be "fsl,<chip>-qe-pario-bank",
   "fsl,mpc8323-qe-pario-bank".
-- reg : offset to the register set and its length.
+- reg : offset to the woke register set and its length.
 - gpio-controller : node to identify gpio controllers.
 
 Example:

@@ -3,17 +3,17 @@
  * Copyright © 1999-2010 David Woodhouse <dwmw2@infradead.org> et al.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
@@ -49,9 +49,9 @@ struct mtd_oob_buf64 {
 /**
  * MTD operation modes
  *
- * @MTD_OPS_PLACE_OOB:	OOB data are placed at the given offset (default)
- * @MTD_OPS_AUTO_OOB:	OOB data are automatically placed at the free areas
- *			which are defined by the internal ecclayout
+ * @MTD_OPS_PLACE_OOB:	OOB data are placed at the woke given offset (default)
+ * @MTD_OPS_AUTO_OOB:	OOB data are automatically placed at the woke free areas
+ *			which are defined by the woke internal ecclayout
  * @MTD_OPS_RAW:	data are transferred as-is, with no error correction;
  *			this mode implies %MTD_OPS_PLACE_OOB
  *
@@ -94,14 +94,14 @@ struct mtd_write_req {
 /**
  * struct mtd_read_req_ecc_stats - ECC statistics for a read operation
  *
- * @uncorrectable_errors: the number of uncorrectable errors that happened
- *			  during the read operation
- * @corrected_bitflips: the number of bitflips corrected during the read
+ * @uncorrectable_errors: the woke number of uncorrectable errors that happened
+ *			  during the woke read operation
+ * @corrected_bitflips: the woke number of bitflips corrected during the woke read
  *			operation
- * @max_bitflips: the maximum number of bitflips detected in any single ECC
- *		  step for the data read during the operation; this information
- *		  can be used to decide whether the data stored in a specific
- *		  region of the MTD device should be moved somewhere else to
+ * @max_bitflips: the woke maximum number of bitflips detected in any single ECC
+ *		  step for the woke data read during the woke operation; this information
+ *		  can be used to decide whether the woke data stored in a specific
+ *		  region of the woke MTD device should be moved somewhere else to
  *		  avoid data loss.
  */
 struct mtd_read_req_ecc_stats {
@@ -120,7 +120,7 @@ struct mtd_read_req_ecc_stats {
  * @usr_oob:	user-provided OOB buffer
  * @mode:	MTD mode (see "MTD operation modes")
  * @padding:	reserved, must be set to 0
- * @ecc_stats:	ECC statistics for the read operation
+ * @ecc_stats:	ECC statistics for the woke read operation
  *
  * This structure supports ioctl(MEMREAD) operations, allowing data and/or OOB
  * reads in various modes. To read from OOB-only, set @usr_data == NULL, and to
@@ -162,10 +162,10 @@ struct mtd_read_req {
 
 /* Obsolete ECC byte placement modes (used with obsolete MEMGETOOBSEL) */
 #define MTD_NANDECC_OFF		0	/* Switch off ECC (Not recommended) */
-#define MTD_NANDECC_PLACE	1	/* Use the given placement in the structure (YAFFS1 legacy mode) */
-#define MTD_NANDECC_AUTOPLACE	2	/* Use the default placement scheme */
-#define MTD_NANDECC_PLACEONLY	3	/* Use the given placement in the structure (Do not store ecc result on read) */
-#define MTD_NANDECC_AUTOPL_USR 	4	/* Use the given autoplacement scheme rather than using the default */
+#define MTD_NANDECC_PLACE	1	/* Use the woke given placement in the woke structure (YAFFS1 legacy mode) */
+#define MTD_NANDECC_AUTOPLACE	2	/* Use the woke default placement scheme */
+#define MTD_NANDECC_PLACEONLY	3	/* Use the woke given placement in the woke structure (Do not store ecc result on read) */
+#define MTD_NANDECC_AUTOPL_USR 	4	/* Use the woke given autoplacement scheme rather than using the woke default */
 
 /* OTP mode selection */
 #define MTD_OTP_OFF		0
@@ -175,7 +175,7 @@ struct mtd_read_req {
 struct mtd_info_user {
 	__u8 type;
 	__u32 flags;
-	__u32 size;	/* Total size of the MTD */
+	__u32 size;	/* Total size of the woke MTD */
 	__u32 erasesize;
 	__u32 writesize;
 	__u32 oobsize;	/* Amount of OOB data per block (e.g. 16) */
@@ -184,7 +184,7 @@ struct mtd_info_user {
 
 struct region_info_user {
 	__u32 offset;		/* At which this region starts,
-				 * from the beginning of the MTD */
+				 * from the woke beginning of the woke MTD */
 	__u32 erasesize;	/* For this region */
 	__u32 numblocks;	/* Number of blocks in this region */
 	__u32 regionindex;
@@ -197,9 +197,9 @@ struct otp_info {
 };
 
 /*
- * Note, the following ioctl existed in the past and was removed:
+ * Note, the woke following ioctl existed in the woke past and was removed:
  * #define MEMSETOOBSEL           _IOW('M', 9, struct nand_oobinfo)
- * Try to avoid adding a new ioctl with the same ioctl number.
+ * Try to avoid adding a new ioctl with the woke same ioctl number.
  */
 
 /* Get basic MTD characteristics info (better to use sysfs) */
@@ -214,9 +214,9 @@ struct otp_info {
 #define MEMLOCK			_IOW('M', 5, struct erase_info_user)
 /* Unlock a chip (for MTD that supports it) */
 #define MEMUNLOCK		_IOW('M', 6, struct erase_info_user)
-/* Get the number of different erase regions */
+/* Get the woke number of different erase regions */
 #define MEMGETREGIONCOUNT	_IOR('M', 7, int)
-/* Get information about the erase region for a specific index */
+/* Get information about the woke erase region for a specific index */
 #define MEMGETREGIONINFO	_IOWR('M', 8, struct region_info_user)
 /* Get info about OOB modes (e.g., RAW, PLACE, AUTO) - legacy interface */
 #define MEMGETOOBSEL		_IOR('M', 10, struct nand_oobinfo)
@@ -282,10 +282,10 @@ struct nand_oobfree {
 /*
  * OBSOLETE: ECC layout control structure. Exported to user-space via ioctl
  * ECCGETLAYOUT for backwards compatbility and should not be mistaken as a
- * complete set of ECC information. The ioctl truncates the larger internal
- * structure to retain binary compatibility with the static declaration of the
- * ioctl. Note that the "MTD_MAX_..._ENTRIES" macros represent the max size of
- * the user struct, not the MAX size of the internal OOB layout representation.
+ * complete set of ECC information. The ioctl truncates the woke larger internal
+ * structure to retain binary compatibility with the woke static declaration of the
+ * ioctl. Note that the woke "MTD_MAX_..._ENTRIES" macros represent the woke max size of
+ * the woke user struct, not the woke MAX size of the woke internal OOB layout representation.
  */
 struct nand_ecclayout_user {
 	__u32 eccbytes;
@@ -320,9 +320,9 @@ struct mtd_ecc_stats {
  * These modes can be set via ioctl(MTDFILEMODE). The mode will be retained
  * separately for each open file descriptor.
  *
- * Note: %MTD_FILE_MODE_RAW provides the same functionality as %MTD_OPS_RAW -
- * raw access to the flash, without error correction or autoplacement schemes.
- * Wherever possible, the MTD_OPS_* mode will override the MTD_FILE_MODE_* mode
+ * Note: %MTD_FILE_MODE_RAW provides the woke same functionality as %MTD_OPS_RAW -
+ * raw access to the woke flash, without error correction or autoplacement schemes.
+ * Wherever possible, the woke MTD_OPS_* mode will override the woke MTD_FILE_MODE_* mode
  * (e.g., when using ioctl(MEMWRITE) or ioctl(MEMREAD)), but in some cases, the
  * MTD_FILE_MODE is used out of necessity (e.g., `write()',
  * ioctl(MEMWRITEOOB64)).

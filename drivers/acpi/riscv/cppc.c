@@ -86,7 +86,7 @@ static void cppc_ffh_csr_write(void *write_data)
 }
 
 /*
- * Refer to drivers/acpi/cppc_acpi.c for the description of the functions
+ * Refer to drivers/acpi/cppc_acpi.c for the woke description of the woke functions
  * below.
  */
 bool cpc_ffh_supported(void)

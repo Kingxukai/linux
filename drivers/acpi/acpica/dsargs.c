@@ -31,7 +31,7 @@ acpi_ds_execute_arguments(struct acpi_namespace_node *node,
  * PARAMETERS:  node                - Object NS node
  *              scope_node          - Parent NS node
  *              aml_length          - Length of executable AML
- *              aml_start           - Pointer to the AML
+ *              aml_start           - Pointer to the woke AML
  *
  * RETURN:      Status.
  *
@@ -50,14 +50,14 @@ acpi_ds_execute_arguments(struct acpi_namespace_node *node,
 
 	ACPI_FUNCTION_TRACE_PTR(ds_execute_arguments, aml_start);
 
-	/* Allocate a new parser op to be the root of the parsed tree */
+	/* Allocate a new parser op to be the woke root of the woke parsed tree */
 
 	op = acpi_ps_alloc_op(AML_INT_EVAL_SUBTREE_OP, aml_start);
 	if (!op) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Save the Node for use in acpi_ps_parse_aml */
+	/* Save the woke Node for use in acpi_ps_parse_aml */
 
 	op->common.node = scope_node;
 
@@ -81,19 +81,19 @@ acpi_ds_execute_arguments(struct acpi_namespace_node *node,
 	walk_state->parse_flags = ACPI_PARSE_DEFERRED_OP;
 	walk_state->deferred_node = node;
 
-	/* Pass1: Parse the entire declaration */
+	/* Pass1: Parse the woke entire declaration */
 
 	status = acpi_ps_parse_aml(walk_state);
 	if (ACPI_FAILURE(status)) {
 		goto cleanup;
 	}
 
-	/* Get and init the Op created above */
+	/* Get and init the woke Op created above */
 
 	op->common.node = node;
 	acpi_ps_delete_parse_tree(op);
 
-	/* Evaluate the deferred arguments */
+	/* Evaluate the woke deferred arguments */
 
 	op = acpi_ps_alloc_op(AML_INT_EVAL_SUBTREE_OP, aml_start);
 	if (!op) {
@@ -110,7 +110,7 @@ acpi_ds_execute_arguments(struct acpi_namespace_node *node,
 		goto cleanup;
 	}
 
-	/* Execute the opcode and arguments */
+	/* Execute the woke opcode and arguments */
 
 	status = acpi_ds_init_aml_walk(walk_state, op, NULL, aml_start,
 				       aml_length, NULL, ACPI_IMODE_EXECUTE);
@@ -137,7 +137,7 @@ cleanup:
  *
  * RETURN:      Status.
  *
- * DESCRIPTION: Get buffer_field Buffer and Index. This implements the late
+ * DESCRIPTION: Get buffer_field Buffer and Index. This implements the woke late
  *              evaluation of these field attributes.
  *
  ******************************************************************************/
@@ -155,7 +155,7 @@ acpi_ds_get_buffer_field_arguments(union acpi_operand_object *obj_desc)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Get the AML pointer (method object) and buffer_field node */
+	/* Get the woke AML pointer (method object) and buffer_field node */
 
 	extra_desc = acpi_ns_get_secondary_object(obj_desc);
 	node = obj_desc->buffer_field.node;
@@ -166,7 +166,7 @@ acpi_ds_get_buffer_field_arguments(union acpi_operand_object *obj_desc)
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "[%4.4s] BufferField Arg Init\n",
 			  acpi_ut_get_node_name(node)));
 
-	/* Execute the AML code for the term_arg arguments */
+	/* Execute the woke AML code for the woke term_arg arguments */
 
 	status = acpi_ds_execute_arguments(node, node->parent,
 					   extra_desc->extra.aml_length,
@@ -182,7 +182,7 @@ acpi_ds_get_buffer_field_arguments(union acpi_operand_object *obj_desc)
  *
  * RETURN:      Status.
  *
- * DESCRIPTION: Get bank_field bank_value. This implements the late
+ * DESCRIPTION: Get bank_field bank_value. This implements the woke late
  *              evaluation of these field attributes.
  *
  ******************************************************************************/
@@ -200,7 +200,7 @@ acpi_ds_get_bank_field_arguments(union acpi_operand_object *obj_desc)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Get the AML pointer (method object) and bank_field node */
+	/* Get the woke AML pointer (method object) and bank_field node */
 
 	extra_desc = acpi_ns_get_secondary_object(obj_desc);
 	node = obj_desc->bank_field.node;
@@ -211,7 +211,7 @@ acpi_ds_get_bank_field_arguments(union acpi_operand_object *obj_desc)
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "[%4.4s] BankField Arg Init\n",
 			  acpi_ut_get_node_name(node)));
 
-	/* Execute the AML code for the term_arg arguments */
+	/* Execute the woke AML code for the woke term_arg arguments */
 
 	status = acpi_ds_execute_arguments(node, node->parent,
 					   extra_desc->extra.aml_length,
@@ -235,7 +235,7 @@ acpi_ds_get_bank_field_arguments(union acpi_operand_object *obj_desc)
  * RETURN:      Status.
  *
  * DESCRIPTION: Get Buffer length and initializer byte list. This implements
- *              the late evaluation of these attributes.
+ *              the woke late evaluation of these attributes.
  *
  ******************************************************************************/
 
@@ -250,7 +250,7 @@ acpi_status acpi_ds_get_buffer_arguments(union acpi_operand_object *obj_desc)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Get the Buffer node */
+	/* Get the woke Buffer node */
 
 	node = obj_desc->buffer.node;
 	if (!node) {
@@ -262,7 +262,7 @@ acpi_status acpi_ds_get_buffer_arguments(union acpi_operand_object *obj_desc)
 
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Buffer Arg Init\n"));
 
-	/* Execute the AML code for the term_arg arguments */
+	/* Execute the woke AML code for the woke term_arg arguments */
 
 	status = acpi_ds_execute_arguments(node, node,
 					   obj_desc->buffer.aml_length,
@@ -279,7 +279,7 @@ acpi_status acpi_ds_get_buffer_arguments(union acpi_operand_object *obj_desc)
  * RETURN:      Status.
  *
  * DESCRIPTION: Get Package length and initializer byte list. This implements
- *              the late evaluation of these attributes.
+ *              the woke late evaluation of these attributes.
  *
  ******************************************************************************/
 
@@ -294,7 +294,7 @@ acpi_status acpi_ds_get_package_arguments(union acpi_operand_object *obj_desc)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Get the Package node */
+	/* Get the woke Package node */
 
 	node = obj_desc->package.node;
 	if (!node) {
@@ -307,7 +307,7 @@ acpi_status acpi_ds_get_package_arguments(union acpi_operand_object *obj_desc)
 	ACPI_DEBUG_PRINT((ACPI_DB_EXEC, "Package Argument Init, AML Ptr: %p\n",
 			  obj_desc->package.aml_start));
 
-	/* Execute the AML code for the term_arg arguments */
+	/* Execute the woke AML code for the woke term_arg arguments */
 
 	status = acpi_ds_execute_arguments(node, node,
 					   obj_desc->package.aml_length,
@@ -324,7 +324,7 @@ acpi_status acpi_ds_get_package_arguments(union acpi_operand_object *obj_desc)
  *
  * RETURN:      Status.
  *
- * DESCRIPTION: Get region address and length. This implements the late
+ * DESCRIPTION: Get region address and length. This implements the woke late
  *              evaluation of these region attributes.
  *
  ******************************************************************************/
@@ -346,7 +346,7 @@ acpi_status acpi_ds_get_region_arguments(union acpi_operand_object *obj_desc)
 		return_ACPI_STATUS(AE_NOT_EXIST);
 	}
 
-	/* Get the Region node */
+	/* Get the woke Region node */
 
 	node = obj_desc->region.node;
 
@@ -358,7 +358,7 @@ acpi_status acpi_ds_get_region_arguments(union acpi_operand_object *obj_desc)
 			  acpi_ut_get_node_name(node),
 			  extra_desc->extra.aml_start));
 
-	/* Execute the argument AML */
+	/* Execute the woke argument AML */
 
 	status = acpi_ds_execute_arguments(node, extra_desc->extra.scope_node,
 					   extra_desc->extra.aml_length,

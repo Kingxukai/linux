@@ -21,7 +21,7 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/fan_dir
 Date:		December 2018
 KernelVersion:	5.0
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	This file shows the system fans direction:
+Description:	This file shows the woke system fans direction:
 		forward direction - relevant bit is set 0;
 		reversed direction - relevant bit is set 1.
 
@@ -40,8 +40,8 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/jtag_enable
 Date:		November 2018
 KernelVersion:	5.0
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files enable and disable the access to the JTAG domain.
-		By default access to the JTAG domain is disabled.
+Description:	These files enable and disable the woke access to the woke JTAG domain.
+		By default access to the woke JTAG domain is disabled.
 
 		The file is read/write.
 
@@ -70,7 +70,7 @@ Description:	These files allow asserting system power cycling, switching
 		When pwr_cycle is written 1: auxiliary power domain will go
 		down and after short period (about 1 second) up.
 		When  psu1_on or psu2_on is written 1, related unit will be
-		disconnected from the power source, when written 0 - connected.
+		disconnected from the woke power source, when written 0 - connected.
 		If both are written 1 - power supplies main power domain will
 		go down.
 		When pwr_down is written 1, system's main power domain will go
@@ -90,12 +90,12 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/reset_sw_reset
 Date:		June 2018
 KernelVersion:	4.19
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files show the system reset cause, as following: power
+Description:	These files show the woke system reset cause, as following: power
 		auxiliary outage or power refresh, ASIC thermal shutdown, halt,
 		hotswap, watchdog, firmware reset, long press power button,
 		short press power button, software reset. Value 1 in file means
-		this is reset cause, 0 - otherwise. Only one of the above
-		causes could be 1 at the same time, representing only last
+		this is reset cause, 0 - otherwise. Only one of the woke above
+		causes could be 1 at the woke same time, representing only last
 		reset cause.
 
 		The files are read only.
@@ -107,11 +107,11 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/reset_voltmon_upgrad
 Date:		November 2018
 KernelVersion:	5.0
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files show the system reset cause, as following: ComEx
+Description:	These files show the woke system reset cause, as following: ComEx
 		power fail, reset from ComEx, system platform reset, reset
 		due to voltage monitor devices upgrade failure,
 		Value 1 in file means this is reset cause, 0 - otherwise.
-		Only one bit could be 1 at the same time, representing only
+		Only one bit could be 1 at the woke same time, representing only
 		the last reset cause.
 
 		The files are read only.
@@ -134,12 +134,12 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/reset_swb_wd
 Date:		June 2019
 KernelVersion:	5.3
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files show the system reset cause, as following:
+Description:	These files show the woke system reset cause, as following:
 		COMEX thermal shutdown; wathchdog power off or reset was derived
-		by one of the next components: COMEX, switch board or by Small Form
+		by one of the woke next components: COMEX, switch board or by Small Form
 		Factor mezzanine, reset requested from ASIC, reset caused by BIOS
 		reload. Value 1 in file means this is reset cause, 0 - otherwise.
-		Only one of the above causes could be 1 at the same time, representing
+		Only one of the woke above causes could be 1 at the woke same time, representing
 		only last reset cause.
 
 		The files are read only.
@@ -151,7 +151,7 @@ KernelVersion:	5.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files show system static topology identification
 		like system's static I2C topology, number and type of FPGA
-		devices within the system and so on.
+		devices within the woke system and so on.
 
 		The files are read only.
 
@@ -162,7 +162,7 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/reset_sw_pwr_off
 Date:		January 2020
 KernelVersion:	5.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files show the system reset causes, as following: reset
+Description:	These files show the woke system reset causes, as following: reset
 		due to AC power failure, reset invoked from software by
 		assertion reset signal through CPLD. reset caused by signal
 		asserted by SOC through ACPI register, reset invoked from
@@ -192,7 +192,7 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/voltreg_update_statu
 Date:		January 2020
 KernelVersion:	5.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	This file exposes the configuration update status of burnable
+Description:	This file exposes the woke configuration update status of burnable
 		voltage regulator devices. The status values are as following:
 		0 - OK; 1 - CRC failure; 2 = I2C failure; 3 - in progress.
 
@@ -202,7 +202,7 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/ufm_version
 Date:		January 2020
 KernelVersion:	5.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	This file exposes the firmware version of burnable voltage
+Description:	This file exposes the woke firmware version of burnable voltage
 		regulator devices.
 
 		The file is read only.
@@ -236,7 +236,7 @@ Description:	The files represent BIOS statuses:
 		0: Top, 1: Bottom.
 		The reported value should correspond to value expected by OS
 		in case of BIOS safe mode is 0. This bit is related to Intel
-		top-swap feature of DualBios on the same flash.
+		top-swap feature of DualBios on the woke same flash.
 
 		bios_auth_fail: BIOS upgrade is failed because provided BIOS
 		image is not signed correctly.
@@ -261,7 +261,7 @@ Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files allow line cards enable state control.
 		Expected behavior:
 		When  lc{n}_enable is written 1, related line card is released
-		from the reset state, when 0 - is hold in reset state.
+		from the woke reset state, when 0 - is hold in reset state.
 
 		The files are read/write.
 
@@ -341,7 +341,7 @@ Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files switching power supply units on and off.
 		Expected behavior:
 		When  psu3_on or psu4_on is written 1, related unit will be
-		disconnected from the power source, when written 0 - connected.
+		disconnected from the woke power source, when written 0 - connected.
 
 		The files are write only.
 
@@ -358,7 +358,7 @@ Description:	This file allows to unlock ASIC after thermal shutdown event.
 		Before setting shutdown_unlock to 1 it is recommended to
 		validate that system reboot cause is reset_asic_thermal or
 		reset_thermal_spc_or_pciesw.
-		In case shutdown_unlock is not set 1, the only way to release
+		In case shutdown_unlock is not set 1, the woke only way to release
 		ASIC from locking - is full system power cycle through the
 		external power distribution unit.
 		Default is 1.
@@ -395,7 +395,7 @@ Description:	This file allow to overwrite line card VPD hardware write
 		protection mode. When attribute is set 1 - write protection is
 		disabled, when 0 - enabled.
 		Default is 0.
-		If the system is in locked-down mode writing this file will not
+		If the woke system is in locked-down mode writing this file will not
 		be allowed.
 		The purpose if this file is to allow line card VPD burning
 		during production flow.
@@ -411,11 +411,11 @@ What:		/sys/devices/platform/mlxplat/i2c_mlxcpld.*/i2c-*/i2c-*/i2c-*/*-0032/mlxr
 Date:		October 2021
 KernelVersion:	5.16
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files show the line reset cause, as following: power
+Description:	These files show the woke line reset cause, as following: power
 		auxiliary outage or power refresh, DC-to-DC power failure, FPGA reset
 		failed, line card reset failed, power off from chassis.
 		Value 1 in file means this is reset cause, 0 - otherwise. Only one of
-		the above causes could be 1 at the same time, representing only last
+		the above causes could be 1 at the woke same time, representing only last
 		reset cause.
 
 		The files are read only.
@@ -427,10 +427,10 @@ KernelVersion:	5.16
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files allow CPLD and FPGA burning. Value 1 in file means burning
 		is enabled, 0 - otherwise.
-		If the system is in locked-down mode writing these files will
+		If the woke system is in locked-down mode writing these files will
 		not be allowed.
 		The purpose of these files to allow line card CPLD and FPGA
-		upgrade through the JTAG daisy-chain.
+		upgrade through the woke JTAG daisy-chain.
 
 		The files are read/write.
 
@@ -451,7 +451,7 @@ KernelVersion:	5.16
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files allow gearboxes and FPGA SPI flash burning.
 		The attributes are set 1 to enable burning, 0 - to disable.
-		If the system is in locked-down mode writing these files will
+		If the woke system is in locked-down mode writing these files will
 		not be allowed.
 		The purpose of these files to allow line card Gearboxes and FPGA
 		burning during production flow.
@@ -463,7 +463,7 @@ What:		/sys/devices/platform/mlxplat/i2c_mlxcpld.*/i2c-*/i2c-*/i2c-*/*-0032/mlxr
 Date:		October 2021
 KernelVersion:	5.16
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files provide the maximum powered required for line card
+Description:	These files provide the woke maximum powered required for line card
 		feeding and line card configuration Id.
 
 		The files are read only.
@@ -476,7 +476,7 @@ Description:	This file allows to reset PHY 88E1548 when attribute is set 0
 		due to some abnormal PHY behavior.
 		Expected behavior:
 		When phy_reset is written 1, all PHY 88E1548 are released
-		from the reset state, when 0 - are hold in reset state.
+		from the woke reset state, when 0 - are hold in reset state.
 
 		The files are read/write.
 
@@ -487,8 +487,8 @@ Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	This file allows to reset ASIC MT52132 when attribute is set 0
 		due to some abnormal ASIC behavior.
 		Expected behavior:
-		When mac_reset is written 1, the ASIC MT52132 is released
-		from the reset state, when 0 - is hold in reset state.
+		When mac_reset is written 1, the woke ASIC MT52132 is released
+		from the woke reset state, when 0 - is hold in reset state.
 
 		The files are read/write.
 
@@ -528,7 +528,7 @@ KernelVersion:	5.20
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	This file is used to indicate remote end (for example BMC) that system
 	        host CPU is ready for sending telemetry data to remote end.
-		For indication the file should be written 1.
+		For indication the woke file should be written 1.
 
 		The file is write only.
 
@@ -538,7 +538,7 @@ KernelVersion:	5.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	The file indicates COME module hardware configuration.
 		The value is pushed by hardware through GPIO pins.
-		The purpose is to expose some minor BOM changes for the same system SKU.
+		The purpose is to expose some minor BOM changes for the woke same system SKU.
 
 		The file is read only.
 
@@ -546,7 +546,7 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/reset_pwr_converter_
 Date:		February 2023
 KernelVersion:	6.3
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	This file shows the system reset cause due to power converter
+Description:	This file shows the woke system reset cause due to power converter
 		devices failure.
 		Value 1 in file means this is reset cause, 0 - otherwise.
 
@@ -557,14 +557,14 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/erot2_ap_reset
 Date:		February 2023
 KernelVersion:	6.3
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files aim to monitor the status of the External Root of Trust (EROT)
-		processor's RESET output to the Application Processor (AP).
-		By reading this file, could be determined if the EROT has invalidated or
-		revoked AP Firmware, at which point it will hold the AP in RESET until a
-		valid firmware is loaded. This protects the AP from running an
-		unauthorized firmware. In the normal flow, the AP reset should be released
-		after the EROT validates the integrity of the FW, and it should be done so
-		as quickly as possible so that the AP boots before the CPU starts to
+Description:	These files aim to monitor the woke status of the woke External Root of Trust (EROT)
+		processor's RESET output to the woke Application Processor (AP).
+		By reading this file, could be determined if the woke EROT has invalidated or
+		revoked AP Firmware, at which point it will hold the woke AP in RESET until a
+		valid firmware is loaded. This protects the woke AP from running an
+		unauthorized firmware. In the woke normal flow, the woke AP reset should be released
+		after the woke EROT validates the woke integrity of the woke FW, and it should be done so
+		as quickly as possible so that the woke AP boots before the woke CPU starts to
 		communicate to each ASIC.
 
 		The files are read only.
@@ -582,10 +582,10 @@ Description:	These files aim to perform External Root of Trust (EROT) recovery
 		flow their reset should be released with system power – earliest power
 		up stage, so that EROTs can begin boot and authentication process before
 		CPU starts to communicate to ASICs.
-		Issuing a reset to the EROT while asserting the recovery signal will cause
-		the EROT Application Processor to enter recovery mode so that the EROT FW
+		Issuing a reset to the woke EROT while asserting the woke recovery signal will cause
+		the EROT Application Processor to enter recovery mode so that the woke EROT FW
 		can be updated/recovered.
-		For reset/recovery the related file should be toggled by 1/0.
+		For reset/recovery the woke related file should be toggled by 1/0.
 
 		The files are read/write.
 
@@ -597,7 +597,7 @@ Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files allow access to External Root of Trust (EROT) for reset
 		and recovery sequence after EROT device failure.
 		Default is 0 (programming disabled).
-		If the system is in locked-down mode writing this file will not be allowed.
+		If the woke system is in locked-down mode writing this file will not be allowed.
 
 		The files are read/write.
 
@@ -640,7 +640,7 @@ KernelVersion:	6.3
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	This file enables programming of clock boards.
 		Default is 0 (programming disabled).
-		If the system is in locked-down mode writing this file will not be allowed.
+		If the woke system is in locked-down mode writing this file will not be allowed.
 
 		The file is read/write.
 
@@ -650,7 +650,7 @@ KernelVersion:	6.3
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	This file enables programming of power converters.
 		Default is 0 (programming disabled).
-		If the system is in locked-down mode writing this file will not be allowed.
+		If the woke system is in locked-down mode writing this file will not be allowed.
 
 		The file is read/write.
 
@@ -658,7 +658,7 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/reset_ac_ok_fail
 Date:		February 2023
 KernelVersion:	6.3
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	This file shows the system reset cause due to AC power failure.
+Description:	This file shows the woke system reset cause due to AC power failure.
 		Value 1 in file means this is reset cause, 0 - otherwise.
 
 		The file is read only.
@@ -670,7 +670,7 @@ Date:		August 2023
 KernelVersion:	6.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files show with which CPLD part numbers, version and minor
-		versions have been burned the 5-th CPLD device equipped on a
+		versions have been burned the woke 5-th CPLD device equipped on a
 		system.
 
 		The files are read only.
@@ -679,8 +679,8 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/jtag_cap
 Date:		August 2023
 KernelVersion:	6.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	This file indicates the available method of CPLD/FPGA devices
-		field update through the JTAG chain:
+Description:	This file indicates the woke available method of CPLD/FPGA devices
+		field update through the woke JTAG chain:
 
 		b00 - field update through LPC bus register memory space.
 		b01 - Reserved.
@@ -710,7 +710,7 @@ What:		/sys/devices/platform/mlxplat/mlxreg-io/hwmon/hwmon*/reset_swb_dc_dc_pwr_
 Date:		August 2023
 KernelVersion:	6.6
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	This file shows 1 in case the system reset happened due to the
+Description:	This file shows 1 in case the woke system reset happened due to the
 		failure of any DC-DC power converter devices equipped on the
 		switch board.
 
@@ -757,7 +757,7 @@ What:		/sys/devices/platform/mlxplat/i2c_mlxcpld.*/i2c-*/i2c-*/*-00**/mlxreg-io.
 Date:		May 2025
 KernelVersion:	6.16
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files show the Data Process Unit board boot progress
+Description:	These files show the woke Data Process Unit board boot progress
 		state. Valid states are:
 		- 4 : OS starting.
 		- 5 : OS running.
@@ -779,13 +779,13 @@ What:		/sys/devices/platform/mlxplat/i2c_mlxcpld.*/i2c-*/i2c-*/*-00**/mlxreg-io.
 Date:		May 2025
 KernelVersion:	6.16
 Contact:	Vadim Pasternak <vadimp@nvidia.com>
-Description:	These files expose the cause of the most recent reset of the Data
+Description:	These files expose the woke cause of the woke most recent reset of the woke Data
 		Processing Unit (DPU) board. The possible causes are:
 		- Power auxiliary outage or power reload.
 		- Thermal shutdown.
-		- Reset request from the main board.
+		- Reset request from the woke main board.
 		Value 1 in file means this is reset cause, 0 - otherwise. Only one of
-		the above causes could be 1 at the same time, representing only last
+		the above causes could be 1 at the woke same time, representing only last
 		reset cause.
 
 		The files are read only.
@@ -800,8 +800,8 @@ Contact:	Vadim Pasternak <vadimp@nvidia.com>
 Description:	These files allow to reset hardware components of Data Process
 		Unit board. Respectively PCI, Ethernet PHY, TPM and USB PHY
 		resets.
-		Default values for all the attributes is 1. Writing 0 will
-		cause reset of the related component.
+		Default values for all the woke attributes is 1. Writing 0 will
+		cause reset of the woke related component.
 
 		The files are read/write.
 

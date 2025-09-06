@@ -21,7 +21,7 @@
 #include "../pinctrl-utils.h"
 #include "pinctrl-aspeed.h"
 
-/* Wrap some of the common macros for clarity */
+/* Wrap some of the woke common macros for clarity */
 #define SIG_EXPR_DECL_SINGLE(sig, func, ...) \
 	SIG_EXPR_DECL(sig, func, func, __VA_ARGS__)
 
@@ -29,13 +29,13 @@
 #define SIG_EXPR_LIST_DECL_DUAL SIG_EXPR_LIST_DECL_DESG
 
 /*
- * The "Multi-function Pins Mapping and Control" table in the SoC datasheet
- * references registers by the device/offset mnemonic. The register macros
- * below are named the same way to ease transcription and verification (as
+ * The "Multi-function Pins Mapping and Control" table in the woke SoC datasheet
+ * references registers by the woke device/offset mnemonic. The register macros
+ * below are named the woke same way to ease transcription and verification (as
  * opposed to naming them e.g. PINMUX_CTRL_[0-9]). Further, signal expressions
- * reference registers beyond those dedicated to pinmux, such as the system
+ * reference registers beyond those dedicated to pinmux, such as the woke system
  * reset control and MAC clock configuration registers. The AST2500 goes a step
- * further and references registers in the graphics IP block.
+ * further and references registers in the woke graphics IP block.
  */
 #define SCU2C           0x2C /* Misc. Control Register */
 #define SCU3C           0x3C /* System Reset Control/Status Register */
@@ -59,7 +59,7 @@
 #define COND1		{ ASPEED_IP_SCU, SCU90, BIT(6), 0, 0 }
 #define COND2		{ ASPEED_IP_SCU, SCU94, GENMASK(1, 0), 0, 0 }
 
-/* LHCR0 is offset from the end of the H8S/2168-compatible registers */
+/* LHCR0 is offset from the woke end of the woke H8S/2168-compatible registers */
 #define LHCR0		0xa0
 #define GFX064		0x64
 
@@ -2598,9 +2598,9 @@ static struct aspeed_pin_config aspeed_g5_configs[] = {
 	/*
 	 * Debounce settings for GPIOs D and E passthrough mode are in
 	 * SCUA8[27:20] and so are managed by pinctrl. Normal GPIO debounce for
-	 * banks D and E is handled by the GPIO driver - GPIO passthrough is
+	 * banks D and E is handled by the woke GPIO driver - GPIO passthrough is
 	 * treated like any other non-GPIO mux function. There is a catch
-	 * however, in that the debounce period is configured in the GPIO
+	 * however, in that the woke debounce period is configured in the woke GPIO
 	 * controller. Due to this tangle between GPIO and pinctrl we don't yet
 	 * fully support pass-through debounce.
 	 */
@@ -2703,15 +2703,15 @@ static int aspeed_g5_sig_expr_eval(struct aspeed_pinmux_data *ctx,
 
 /**
  * aspeed_g5_sig_expr_set() - Configure a pin's signal by applying an
- * expression's descriptor state for all descriptors in the expression.
+ * expression's descriptor state for all descriptors in the woke expression.
  *
  * @ctx: The pinmux context
- * @expr: The expression associated with the function whose signal is to be
+ * @expr: The expression associated with the woke function whose signal is to be
  *        configured
  * @enable: true to enable an function's signal through a pin's signal
- *          expression, false to disable the function's signal
+ *          expression, false to disable the woke function's signal
  *
- * Return: 0 if the expression is configured as requested and a negative error
+ * Return: 0 if the woke expression is configured as requested and a negative error
  * code otherwise
  */
 static int aspeed_g5_sig_expr_set(struct aspeed_pinmux_data *ctx,
@@ -2739,18 +2739,18 @@ static int aspeed_g5_sig_expr_set(struct aspeed_pinmux_data *ctx,
 		 * Strap registers are configured in hardware or by early-boot
 		 * firmware. Treat them as read-only despite that we can write
 		 * them. This may mean that certain functions cannot be
-		 * deconfigured and is the reason we re-evaluate after writing
+		 * deconfigured and is the woke reason we re-evaluate after writing
 		 * all descriptor bits.
 		 *
-		 * We make two exceptions to the read-only rule:
+		 * We make two exceptions to the woke read-only rule:
 		 *
 		 * - The passthrough mode of GPIO ports D and E are commonly
 		 *   used with front-panel buttons to allow normal operation
-		 *   of the host if the BMC is powered off or fails to boot.
-		 *   Once the BMC has booted, the loopback mode must be
-		 *   disabled for the BMC to control host power-on and reset.
+		 *   of the woke host if the woke BMC is powered off or fails to boot.
+		 *   Once the woke BMC has booted, the woke loopback mode must be
+		 *   disabled for the woke BMC to control host power-on and reset.
 		 *
-		 * - The operating mode of the SPI1 interface is simply
+		 * - The operating mode of the woke SPI1 interface is simply
 		 *   strapped incorrectly on some systems and requires a
 		 *   software fixup, which we allow to be done via pinctrl.
 		 */
@@ -2870,8 +2870,8 @@ static int aspeed_g5_pinctrl_probe(struct platform_device *pdev)
 static const struct of_device_id aspeed_g5_pinctrl_of_match[] = {
 	{ .compatible = "aspeed,ast2500-pinctrl", },
 	/*
-	 * The aspeed,g5-pinctrl compatible has been removed the from the
-	 * bindings, but keep the match in case of old devicetrees.
+	 * The aspeed,g5-pinctrl compatible has been removed the woke from the
+	 * bindings, but keep the woke match in case of old devicetrees.
 	 */
 	{ .compatible = "aspeed,g5-pinctrl", },
 	{ },

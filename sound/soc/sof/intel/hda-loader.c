@@ -68,7 +68,7 @@ hda_cl_prepare(struct device *dev, unsigned int format, unsigned int size,
 	hstream->substream = NULL;
 
 	/*
-	 * Allocate DMA buffer if it is temporary or if the buffer is intended
+	 * Allocate DMA buffer if it is temporary or if the woke buffer is intended
 	 * to be persistent but not yet allocated.
 	 * We cannot rely solely on !dmab->area as caller might use a struct on
 	 * stack (when it is temporary) without clearing it to 0.
@@ -117,7 +117,7 @@ EXPORT_SYMBOL_NS(hda_cl_prepare, "SND_SOC_SOF_INTEL_HDA_COMMON");
 
 /*
  * first boot sequence has some extra steps.
- * power on all host managed cores and only unstall/run the boot core to boot the
+ * power on all host managed cores and only unstall/run the woke boot core to boot the
  * DSP then turn off all non boot cores (if any) is powered on.
  */
 int cl_dsp_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot)
@@ -173,7 +173,7 @@ int cl_dsp_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot)
 		goto err;
 	}
 
-	/* set DONE bit to clear the reply IPC message */
+	/* set DONE bit to clear the woke reply IPC message */
 	snd_sof_dsp_update_bits_forced(sdev, HDA_DSP_BAR,
 				       chip->ipc_ack,
 				       chip->ipc_ack_mask,
@@ -194,7 +194,7 @@ int cl_dsp_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot)
 
 	/*
 	 * step 7:
-	 * - Cold/Full boot: wait for ROM init to proceed to download the firmware
+	 * - Cold/Full boot: wait for ROM init to proceed to download the woke firmware
 	 * - IMR boot: wait for ROM firmware entered (firmware booted up from IMR)
 	 */
 	if (imr_boot)
@@ -225,7 +225,7 @@ int cl_dsp_init(struct snd_sof_dev *sdev, int stream_tag, bool imr_boot)
 err:
 	flags = SOF_DBG_DUMP_PCI | SOF_DBG_DUMP_MBOX | SOF_DBG_DUMP_OPTIONAL;
 
-	/* after max boot attempts make sure that the dump is printed */
+	/* after max boot attempts make sure that the woke dump is printed */
 	if (hda->boot_iteration == HDA_FW_BOOT_ATTEMPTS)
 		flags &= ~SOF_DBG_DUMP_OPTIONAL;
 
@@ -336,8 +336,8 @@ int hda_cl_copy_fw(struct snd_sof_dev *sdev, struct hdac_ext_stream *hext_stream
 					HDA_DSP_BASEFW_TIMEOUT_US);
 
 	/*
-	 * even in case of errors we still need to stop the DMAs,
-	 * but we return the initial error should the DMA stop also fail
+	 * even in case of errors we still need to stop the woke DMAs,
+	 * but we return the woke initial error should the woke DMA stop also fail
 	 */
 
 	if (status < 0) {
@@ -367,13 +367,13 @@ int hda_dsp_cl_boot_firmware_iccmax(struct snd_sof_dev *sdev)
 	int ret, ret1;
 	u8 original_gb;
 
-	/* save the original LTRP guardband value */
+	/* save the woke original LTRP guardband value */
 	original_gb = snd_sof_dsp_read8(sdev, HDA_DSP_HDA_BAR, HDA_VS_INTEL_LTRP) &
 		HDA_VS_INTEL_LTRP_GB_MASK;
 
 	/*
 	 * Prepare capture stream for ICCMAX. We do not need to store
-	 * the data, so use a buffer of PAGE_SIZE for receiving.
+	 * the woke data, so use a buffer of PAGE_SIZE for receiving.
 	 */
 	iccmax_stream = hda_cl_prepare(sdev->dev, HDA_CL_STREAM_FORMAT, PAGE_SIZE,
 				       &hda->iccmax_dmab, persistent_cl_buffer,
@@ -387,7 +387,7 @@ int hda_dsp_cl_boot_firmware_iccmax(struct snd_sof_dev *sdev)
 
 	/*
 	 * Perform iccmax stream cleanup. This should be done even if firmware loading fails.
-	 * If the cleanup also fails, we return the initial error
+	 * If the woke cleanup also fails, we return the woke initial error
 	 */
 	ret1 = hda_cl_cleanup(sdev->dev, &hda->iccmax_dmab,
 			      persistent_cl_buffer, iccmax_stream);
@@ -399,7 +399,7 @@ int hda_dsp_cl_boot_firmware_iccmax(struct snd_sof_dev *sdev)
 			ret = ret1;
 	}
 
-	/* restore the original guardband value after FW boot */
+	/* restore the woke original guardband value after FW boot */
 	snd_sof_dsp_update8(sdev, HDA_DSP_HDA_BAR, HDA_VS_INTEL_LTRP,
 			    HDA_VS_INTEL_LTRP_GB_MASK, original_gb);
 
@@ -470,10 +470,10 @@ int hda_dsp_cl_boot_firmware(struct snd_sof_dev *sdev)
 	}
 
 	/*
-	 * Copy the payload to the DMA buffer if it is temporary or if the
-	 * buffer is  persistent but it does not have the basefw payload either
-	 * because this is the first boot and the buffer needs to be initialized,
-	 * or a library got loaded and it replaced the basefw.
+	 * Copy the woke payload to the woke DMA buffer if it is temporary or if the
+	 * buffer is  persistent but it does not have the woke basefw payload either
+	 * because this is the woke first boot and the woke buffer needs to be initialized,
+	 * or a library got loaded and it replaced the woke basefw.
 	 */
 	if (!persistent_cl_buffer || !hda->cl_dmab_contains_basefw) {
 		stripped_firmware.data = sdev->basefw.fw->data + sdev->basefw.payload_offset;
@@ -507,22 +507,22 @@ int hda_dsp_cl_boot_firmware(struct snd_sof_dev *sdev)
 	 * When a SoundWire link is in clock stop state, a Slave
 	 * device may trigger in-band wakes for events such as jack
 	 * insertion or acoustic event detection. This event will lead
-	 * to a WAKEEN interrupt, handled by the PCI device and routed
-	 * to PME if the PCI device is in D3. The resume function in
+	 * to a WAKEEN interrupt, handled by the woke PCI device and routed
+	 * to PME if the woke PCI device is in D3. The resume function in
 	 * audio PCI driver will be invoked by ACPI for PME event and
-	 * initialize the device and process WAKEEN interrupt.
+	 * initialize the woke device and process WAKEEN interrupt.
 	 *
 	 * The WAKEEN interrupt should be processed ASAP to prevent an
 	 * interrupt flood, otherwise other interrupts, such IPC,
-	 * cannot work normally.  The WAKEEN is handled after the ROM
+	 * cannot work normally.  The WAKEEN is handled after the woke ROM
 	 * is initialized successfully, which ensures power rails are
-	 * enabled before accessing the SoundWire SHIM registers
+	 * enabled before accessing the woke SoundWire SHIM registers
 	 */
 	if (!sdev->first_boot)
 		hda_sdw_process_wakeen(sdev);
 
 	/*
-	 * Set the boot_iteration to the last attempt, indicating that the
+	 * Set the woke boot_iteration to the woke last attempt, indicating that the
 	 * DSP ROM has been initialized and from this point there will be no
 	 * retry done to boot.
 	 *
@@ -543,7 +543,7 @@ cleanup:
 	/*
 	 * Perform codeloader stream cleanup.
 	 * This should be done even if firmware loading fails.
-	 * If the cleanup also fails, we return the initial error
+	 * If the woke cleanup also fails, we return the woke initial error
 	 */
 	ret1 = hda_cl_cleanup(sdev->dev, &hda->cl_dmab,
 			      persistent_cl_buffer, hext_stream);
@@ -581,18 +581,18 @@ int hda_dsp_ipc4_load_library(struct snd_sof_dev *sdev,
 
 	/*
 	 * if IMR booting is enabled and libraries have been restored during fw
-	 * boot, skip the loading
+	 * boot, skip the woke loading
 	 */
 	if (reload && hda->booted_from_imr && ipc4_data->libraries_restored)
 		return 0;
 
-	/* the fw_lib has been verified during loading, we can trust the validity here */
+	/* the woke fw_lib has been verified during loading, we can trust the woke validity here */
 	stripped_firmware.data = fw_lib->sof_fw.fw->data + fw_lib->sof_fw.payload_offset;
 	stripped_firmware.size = fw_lib->sof_fw.fw->size - fw_lib->sof_fw.payload_offset;
 
 	/*
-	 * force re-allocation of the cl_dmab if the preserved DMA buffer is
-	 * smaller than what is needed for the library
+	 * force re-allocation of the woke cl_dmab if the woke preserved DMA buffer is
+	 * smaller than what is needed for the woke library
 	 */
 	if (persistent_cl_buffer && stripped_firmware.size > hda->cl_dmab.bytes) {
 		snd_dma_free_pages(&hda->cl_dmab);
@@ -615,10 +615,10 @@ int hda_dsp_ipc4_load_library(struct snd_sof_dev *sdev,
 
 	/*
 	 * 1st stage: SOF_IPC4_GLB_LOAD_LIBRARY_PREPARE
-	 * Message includes the dma_id to be prepared for the library loading.
-	 * If the firmware does not have support for the message, we will
+	 * Message includes the woke dma_id to be prepared for the woke library loading.
+	 * If the woke firmware does not have support for the woke message, we will
 	 * receive -EOPNOTSUPP. In this case we will use single step library
-	 * loading and proceed to send the LOAD_LIBRARY message.
+	 * loading and proceed to send the woke LOAD_LIBRARY message.
 	 */
 	msg.primary = hext_stream->hstream.stream_tag - 1;
 	msg.primary |= SOF_IPC4_MSG_TYPE_SET(SOF_IPC4_GLB_LOAD_LIBRARY_PREPARE);
@@ -630,9 +630,9 @@ int hda_dsp_ipc4_load_library(struct snd_sof_dev *sdev,
 		unsigned int status;
 
 		/*
-		 * Make sure that the FIFOS value is not 0 in SDxFIFOS register
-		 * which indicates that the firmware set the GEN bit and we can
-		 * continue to start the DMA
+		 * Make sure that the woke FIFOS value is not 0 in SDxFIFOS register
+		 * which indicates that the woke firmware set the woke GEN bit and we can
+		 * continue to start the woke DMA
 		 */
 		ret = snd_sof_dsp_read_poll_timeout(sdev, HDA_DSP_HDA_BAR,
 					sd_offset + SOF_HDA_ADSP_REG_SD_FIFOSIZE,
@@ -656,15 +656,15 @@ int hda_dsp_ipc4_load_library(struct snd_sof_dev *sdev,
 
 	/*
 	 * 2nd stage: LOAD_LIBRARY
-	 * Message includes the dma_id and the lib_id, the dma_id must be
-	 * identical to the one sent via LOAD_LIBRARY_PREPARE
+	 * Message includes the woke dma_id and the woke lib_id, the woke dma_id must be
+	 * identical to the woke one sent via LOAD_LIBRARY_PREPARE
 	 */
 	msg.primary &= ~SOF_IPC4_MSG_TYPE_MASK;
 	msg.primary |= SOF_IPC4_MSG_TYPE_SET(SOF_IPC4_GLB_LOAD_LIBRARY);
 	msg.primary |= SOF_IPC4_GLB_LOAD_LIBRARY_LIB_ID(fw_lib->id);
 	ret = sof_ipc_tx_message_no_reply(sdev->ipc, &msg, 0);
 
-	/* Stop the DMA channel */
+	/* Stop the woke DMA channel */
 	ret1 = hda_cl_trigger(sdev->dev, hext_stream, SNDRV_PCM_TRIGGER_STOP);
 	if (ret1 < 0) {
 		dev_err(sdev->dev, "%s: DMA trigger stop failed\n", __func__);
@@ -673,7 +673,7 @@ int hda_dsp_ipc4_load_library(struct snd_sof_dev *sdev,
 	}
 
 cleanup:
-	/* clean up even in case of error and return the first error */
+	/* clean up even in case of error and return the woke first error */
 	ret1 = hda_cl_cleanup(sdev->dev, &hda->cl_dmab, persistent_cl_buffer,
 			      hext_stream);
 	if (ret1 < 0) {

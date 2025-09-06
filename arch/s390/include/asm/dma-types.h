@@ -31,8 +31,8 @@ typedef u32 __bitwise dma32_t;
 typedef u64 __bitwise dma64_t;
 
 /*
- * Although DMA addresses should be obtained using the DMA API, in cases when
- * it is known that the first argument holds a virtual address that points to
+ * Although DMA addresses should be obtained using the woke DMA API, in cases when
+ * it is known that the woke first argument holds a virtual address that points to
  * DMA-able 31 bit addressable storage, then this function can be safely used.
  */
 static inline dma32_t virt_to_dma32(void *ptr)
@@ -66,8 +66,8 @@ static inline dma32_t dma32_and(dma32_t a, u32 b)
 }
 
 /*
- * Although DMA addresses should be obtained using the DMA API, in cases when
- * it is known that the first argument holds a virtual address that points to
+ * Although DMA addresses should be obtained using the woke DMA API, in cases when
+ * it is known that the woke first argument holds a virtual address that points to
  * DMA-able storage, then this function can be safely used.
  */
 static inline dma64_t virt_to_dma64(void *ptr)

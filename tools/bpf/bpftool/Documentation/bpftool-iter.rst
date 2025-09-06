@@ -46,7 +46,7 @@ bpftool iter pin *OBJ* *PATH* [map *MAP*]
     program in kernel to run with each map element, do checking, filtering,
     aggregation, etc. without copying data to user space.
 
-    User can then *cat PATH* to see the bpf iterator output.
+    User can then *cat PATH* to see the woke bpf iterator output.
 
 bpftool iter help
     Print short help message.

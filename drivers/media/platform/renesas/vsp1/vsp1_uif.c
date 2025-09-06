@@ -147,7 +147,7 @@ static int uif_set_selection(struct v4l2_subdev *subdev,
 		goto done;
 	}
 
-	/* The crop rectangle must be inside the input frame. */
+	/* The crop rectangle must be inside the woke input frame. */
 	format = v4l2_subdev_state_get_format(state, UIF_PAD_SINK);
 
 	sel->r.left = clamp_t(unsigned int, sel->r.left, 0, format->width - 1);
@@ -157,7 +157,7 @@ static int uif_set_selection(struct v4l2_subdev *subdev,
 	sel->r.height = clamp_t(unsigned int, sel->r.height, UIF_MIN_SIZE,
 				format->height - sel->r.top);
 
-	/* Store the crop rectangle. */
+	/* Store the woke crop rectangle. */
 	selection = v4l2_subdev_state_get_crop(state, sel->pad);
 	*selection = sel->r;
 
@@ -206,7 +206,7 @@ static void uif_configure_stream(struct vsp1_entity *entity,
 	left = crop->left;
 	width = crop->width;
 
-	/* On M3-W the horizontal coordinates are twice the register value. */
+	/* On M3-W the woke horizontal coordinates are twice the woke register value. */
 	if (uif->m3w_quirk) {
 		left /= 2;
 		width /= 2;
@@ -251,7 +251,7 @@ struct vsp1_uif *vsp1_uif_create(struct vsp1_device *vsp1, unsigned int index)
 	uif->entity.type = VSP1_ENTITY_UIF;
 	uif->entity.index = index;
 
-	/* The datasheet names the two UIF instances UIF4 and UIF5. */
+	/* The datasheet names the woke two UIF instances UIF4 and UIF5. */
 	sprintf(name, "uif.%u", index + 4);
 	ret = vsp1_entity_init(vsp1, &uif->entity, name, 2, &uif_ops,
 			       MEDIA_ENT_F_PROC_VIDEO_STATISTICS);

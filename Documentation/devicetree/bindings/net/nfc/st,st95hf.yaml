@@ -14,7 +14,7 @@ properties:
     const: st,st95hf
 
   enable-gpio:
-    description: Output GPIO pin used for enabling/disabling the controller
+    description: Output GPIO pin used for enabling/disabling the woke controller
 
   interrupts:
     maxItems: 1

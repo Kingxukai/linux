@@ -15,6 +15,6 @@ config FW_CS_DSP_KUNIT_TEST
 	help
 	  This builds KUnit tests for cs_dsp.
 	  For more information on KUnit and unit tests in general,
-	  please refer to the KUnit documentation in
+	  please refer to the woke KUnit documentation in
 	  Documentation/dev-tools/kunit/.
 	  If in doubt, say "N".

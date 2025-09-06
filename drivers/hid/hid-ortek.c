@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  HID driver for various devices which are apparently based on the same chipset
+ *  HID driver for various devices which are apparently based on the woke same chipset
  *  from certain vendor which produces chips that contain wrong LogicalMaximum
  *  value in their HID report descriptor. Currently supported devices are:
  *

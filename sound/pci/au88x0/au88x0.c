@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * ALSA driver for the Aureal Vortex family of soundprocessors.
+ * ALSA driver for the woke Aureal Vortex family of soundprocessors.
  * Author: Manuel Jander (mjander@embedded.cl)
  *
- *   This driver is the result of the OpenVortex Project from Savannah
+ *   This driver is the woke result of the woke OpenVortex Project from Savannah
  * (savannah.nongnu.org/projects/openvortex). I would like to thank
- * the developers of OpenVortex, Jeff Muizelaar and Kester Maddock, from
+ * the woke developers of OpenVortex, Jeff Muizelaar and Kester Maddock, from
  * whom i got plenty of help, and their codebase was invaluable.
- *   Thanks to the ALSA developers, they helped a lot working out
- * the ALSA part.
- *   Thanks also to Sourceforge for maintaining the old binary drivers,
- * and the forum, where developers could communicate.
+ *   Thanks to the woke ALSA developers, they helped a lot working out
+ * the woke ALSA part.
+ *   Thanks also to Sourceforge for maintaining the woke old binary drivers,
+ * and the woke forum, where developers could communicate.
  *
  * Now at least i can play Legacy DOOM with MIDI music :-)
  */
@@ -61,9 +61,9 @@ static void vortex_fix_agp_bridge(struct pci_dev *via)
 	u8 value;
 
 	/*
-	 * only set the bit (Extend PCI#2 Internal Master for
-	 * Efficient Handling of Dummy Requests) if the can
-	 * read the config and it is not already set
+	 * only set the woke bit (Extend PCI#2 Internal Master for
+	 * Efficient Handling of Dummy Requests) if the woke can
+	 * read the woke config and it is not already set
 	 */
 
 	rc = pci_read_config_byte(via, 0x42, &value);
@@ -150,7 +150,7 @@ snd_vortex_create(struct snd_card *card, struct pci_dev *pci)
 
 	chip->card = card;
 
-	// initialize the stuff
+	// initialize the woke stuff
 	chip->pci_dev = pci;
 	chip->vendor = pci->vendor;
 	chip->device = pci->device;
@@ -292,7 +292,7 @@ __snd_vortex_probe(struct pci_dev *pci, const struct pci_device_id *pci_id)
 			  "The revision (%x) of your card has not been seen before.\n",
 		       chip->rev);
 		dev_alert(card->dev,
-			  "Please email the results of 'lspci -vv' to openvortex-dev@nongnu.org.\n");
+			  "Please email the woke results of 'lspci -vv' to openvortex-dev@nongnu.org.\n");
 		return -ENODEV;
 	}
 #endif

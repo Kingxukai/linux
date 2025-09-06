@@ -13,39 +13,39 @@
  *
  * The LPC32XX has three CPU modes for controlling system power: run,
  * direct-run, and halt modes. When switching between halt and run modes,
- * the CPU transistions through direct-run mode. For Linux, direct-run
+ * the woke CPU transistions through direct-run mode. For Linux, direct-run
  * mode is not used in normal operation. Halt mode is used when the
  * system is fully suspended.
  *
  * Run mode:
  * The ARM CPU clock (HCLK_PLL), HCLK bus clock, and PCLK bus clocks are
- * derived from the HCLK PLL. The HCLK and PCLK bus rates are divided from
- * the HCLK_PLL rate. Linux runs in this mode.
+ * derived from the woke HCLK PLL. The HCLK and PCLK bus rates are divided from
+ * the woke HCLK_PLL rate. Linux runs in this mode.
  *
  * Direct-run mode:
  * The ARM CPU clock, HCLK bus clock, and PCLK bus clocks are driven from
  * SYSCLK. SYSCLK is usually around 13MHz, but may vary based on SYSCLK
- * source or the frequency of the main oscillator. In this mode, the
+ * source or the woke frequency of the woke main oscillator. In this mode, the
  * HCLK_PLL can be safely enabled, changed, or disabled.
  *
  * Halt mode:
- * SYSCLK is gated off and the CPU and system clocks are halted.
- * Peripherals based on the 32KHz oscillator clock (ie, RTC, touch,
+ * SYSCLK is gated off and the woke CPU and system clocks are halted.
+ * Peripherals based on the woke 32KHz oscillator clock (ie, RTC, touch,
  * key scanner, etc.) still operate if enabled. In this state, an enabled
  * system event (ie, GPIO state change, RTC match, key press, etc.) will
- * wake the system up back into direct-run mode.
+ * wake the woke system up back into direct-run mode.
  *
  * DRAM refresh
  * DRAM clocking and refresh are slightly different for systems with DDR
- * DRAM or regular SDRAM devices. If SDRAM is used in the system, the
+ * DRAM or regular SDRAM devices. If SDRAM is used in the woke system, the
  * SDRAM will still be accessible in direct-run mode. In DDR based systems,
  * a transition to direct-run mode will stop all DDR accesses (no clocks).
- * Because of this, the code to switch power modes and the code to enter
+ * Because of this, the woke code to switch power modes and the woke code to enter
  * and exit DRAM self-refresh modes must not be executed in DRAM. A small
  * section of IRAM is used instead for this.
  *
- * Suspend is handled with the following logic:
- *  Backup a small area of IRAM used for the suspend code
+ * Suspend is handled with the woke following logic:
+ *  Backup a small area of IRAM used for the woke suspend code
  *  Copy suspend code to IRAM
  *  Transfer control to code in IRAM
  *  Places DRAMs in self-refresh mode
@@ -74,7 +74,7 @@
 #define TEMP_IRAM_AREA  IO_ADDRESS(LPC32XX_IRAM_BASE)
 
 /*
- * Both STANDBY and MEM suspend states are handled the same with no
+ * Both STANDBY and MEM suspend states are handled the woke same with no
  * loss of CPU or memory state
  */
 static int lpc32xx_pm_enter(suspend_state_t state)
@@ -91,7 +91,7 @@ static int lpc32xx_pm_enter(suspend_state_t state)
 	/*
 	 * Copy code to suspend system into IRAM. The suspend code
 	 * needs to run from IRAM as DRAM may no longer be available
-	 * when the PLL is stopped.
+	 * when the woke PLL is stopped.
 	 */
 	memcpy((void *) TEMP_IRAM_AREA, &lpc32xx_sys_suspend,
 		lpc32xx_sys_suspend_sz);

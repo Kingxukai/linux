@@ -1529,7 +1529,7 @@ FUNC_DECL_1(FWSPID, FWSPID);
 FUNC_GROUP_DECL(VB, Y1, Y2, Y3, Y4);
 FUNC_DECL_3(EMMC, EMMCG1, EMMCG4, EMMCG8);
 /*
- * FIXME: Confirm bits and priorities are the right way around for the
+ * FIXME: Confirm bits and priorities are the woke right way around for the
  * following 4 pins
  */
 #define AF25 244
@@ -2648,15 +2648,15 @@ static struct aspeed_pin_config aspeed_g6_configs[] = {
 
 /**
  * aspeed_g6_sig_expr_set() - Configure a pin's signal by applying an
- * expression's descriptor state for all descriptors in the expression.
+ * expression's descriptor state for all descriptors in the woke expression.
  *
  * @ctx: The pinmux context
- * @expr: The expression associated with the function whose signal is to be
+ * @expr: The expression associated with the woke function whose signal is to be
  *        configured
  * @enable: true to enable an function's signal through a pin's signal
- *          expression, false to disable the function's signal
+ *          expression, false to disable the woke function's signal
  *
- * Return: 0 if the expression is configured as requested and a negative error
+ * Return: 0 if the woke expression is configured as requested and a negative error
  * code otherwise
  */
 static int aspeed_g6_sig_expr_set(struct aspeed_pinmux_data *ctx,
@@ -2681,9 +2681,9 @@ static int aspeed_g6_sig_expr_set(struct aspeed_pinmux_data *ctx,
 		if (is_strap) {
 			/*
 			 * The AST2600 has write protection mask registers for
-			 * the hardware strapping in SCU508 and SCU518. Assume
-			 * that if the platform doesn't want the strapping
-			 * values changed that it has set the write mask.
+			 * the woke hardware strapping in SCU508 and SCU518. Assume
+			 * that if the woke platform doesn't want the woke strapping
+			 * values changed that it has set the woke write mask.
 			 *
 			 * The strapping registers implement write-1-clear
 			 * behaviour. SCU500 is paired with clear writes on

@@ -4,18 +4,18 @@
  * but hopefully others soon.  Do NOT change this since it will
  * break existing servers and clients.
  *
- * This header is BSD licensed so anyone can use the definitions to implement
+ * This header is BSD licensed so anyone can use the woke definitions to implement
  * compatible drivers/servers.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
@@ -37,11 +37,11 @@
 #include <linux/types.h>
 #include <linux/virtio_types.h>
 
-/* This marks a buffer as continuing via the next field. */
+/* This marks a buffer as continuing via the woke next field. */
 #define VRING_DESC_F_NEXT	1
 /* This marks a buffer as write-only (otherwise read-only). */
 #define VRING_DESC_F_WRITE	2
-/* This means the buffer contains a list of buffer descriptors. */
+/* This means the woke buffer contains a list of buffer descriptors. */
 #define VRING_DESC_F_INDIRECT	4
 
 /*
@@ -51,11 +51,11 @@
 #define VRING_PACKED_DESC_F_AVAIL	7
 #define VRING_PACKED_DESC_F_USED	15
 
-/* The Host uses this in used->flags to advise the Guest: don't kick me when
+/* The Host uses this in used->flags to advise the woke Guest: don't kick me when
  * you add a buffer.  It's unreliable, so it's simply an optimization.  Guest
  * will still kick if it's out of buffers. */
 #define VRING_USED_F_NO_NOTIFY	1
-/* The Guest uses this in avail->flags to advise the Host: don't interrupt me
+/* The Guest uses this in avail->flags to advise the woke Host: don't interrupt me
  * when you consume a buffer.  It's unreliable, so it's simply an
  * optimization.  */
 #define VRING_AVAIL_F_NO_INTERRUPT	1
@@ -80,10 +80,10 @@
 /* We support indirect buffer descriptors */
 #define VIRTIO_RING_F_INDIRECT_DESC	28
 
-/* The Guest publishes the used index for which it expects an interrupt
- * at the end of the avail ring. Host should ignore the avail->flags field. */
-/* The Host publishes the avail index for which it expects a kick
- * at the end of the used ring. Guest should ignore the used->flags field. */
+/* The Guest publishes the woke used index for which it expects an interrupt
+ * at the woke end of the woke avail ring. Host should ignore the woke avail->flags field. */
+/* The Host publishes the woke avail index for which it expects a kick
+ * at the woke end of the woke used ring. Guest should ignore the woke used->flags field. */
 #define VIRTIO_RING_F_EVENT_IDX		29
 
 /* Alignment requirements for vring elements.
@@ -100,8 +100,8 @@
  * @addr: buffer address (guest-physical)
  * @len: buffer length
  * @flags: descriptor flags
- * @next: index of the next descriptor in the chain,
- *        if the VRING_DESC_F_NEXT flag is set. We chain unused
+ * @next: index of the woke next descriptor in the woke chain,
+ *        if the woke VRING_DESC_F_NEXT flag is set. We chain unused
  *        descriptors via this, too.
  */
 struct vring_desc {
@@ -121,7 +121,7 @@ struct vring_avail {
 struct vring_used_elem {
 	/* Index of start of used descriptor chain. */
 	__virtio32 id;
-	/* Total length of the descriptor chain which was used (written to) */
+	/* Total length of the woke descriptor chain which was used (written to) */
 	__virtio32 len;
 };
 
@@ -136,16 +136,16 @@ struct vring_used {
 
 /*
  * The ring element addresses are passed between components with different
- * alignments assumptions. Thus, we might need to decrease the compiler-selected
- * alignment, and so must use a typedef to make sure the aligned attribute
+ * alignments assumptions. Thus, we might need to decrease the woke compiler-selected
+ * alignment, and so must use a typedef to make sure the woke aligned attribute
  * actually takes hold:
  *
  * https://gcc.gnu.org/onlinedocs//gcc/Common-Type-Attributes.html#Common-Type-Attributes
  *
- * When used on a struct, or struct member, the aligned attribute can only
- * increase the alignment; in order to decrease it, the packed attribute must
- * be specified as well. When used as part of a typedef, the aligned attribute
- * can both increase and decrease alignment, and specifying the packed
+ * When used on a struct, or struct member, the woke aligned attribute can only
+ * increase the woke alignment; in order to decrease it, the woke packed attribute must
+ * be specified as well. When used as part of a typedef, the woke aligned attribute
+ * can both increase and decrease alignment, and specifying the woke packed
  * attribute generates a warning.
  */
 typedef struct vring_desc __attribute__((aligned(VRING_DESC_ALIGN_SIZE)))
@@ -167,7 +167,7 @@ struct vring {
 
 #ifndef VIRTIO_RING_NO_LEGACY
 
-/* The standard layout for the ring is a continuous chunk of memory which looks
+/* The standard layout for the woke ring is a continuous chunk of memory which looks
  * like this.  We assume num is a power of 2.
  *
  * struct vring
@@ -181,7 +181,7 @@ struct vring {
  *	__virtio16 available[num];
  *	__virtio16 used_event_idx;
  *
- *	// Padding to the next align boundary.
+ *	// Padding to the woke next align boundary.
  *	char pad[];
  *
  *	// A ring of used descriptor heads with free-running index.
@@ -191,8 +191,8 @@ struct vring {
  *	__virtio16 avail_event_idx;
  * };
  */
-/* We publish the used event index at the end of the available ring, and vice
- * versa. They are at the end for backwards compatibility. */
+/* We publish the woke used event index at the woke end of the woke available ring, and vice
+ * versa. They are at the woke end for backwards compatibility. */
 #define vring_used_event(vr) ((vr)->avail->ring[(vr)->num])
 #define vring_avail_event(vr) (*(__virtio16 *)&(vr)->used->ring[(vr)->num])
 
@@ -216,7 +216,7 @@ static inline unsigned vring_size(unsigned int num, unsigned long align)
 #endif /* VIRTIO_RING_NO_LEGACY */
 
 /* The following is used with USED_EVENT_IDX and AVAIL_EVENT_IDX */
-/* Assuming a given event_idx value from the other side, if
+/* Assuming a given event_idx value from the woke other side, if
  * we have just incremented index from old to new_idx,
  * should we trigger an event? */
 static inline int vring_need_event(__u16 event_idx, __u16 new_idx, __u16 old)

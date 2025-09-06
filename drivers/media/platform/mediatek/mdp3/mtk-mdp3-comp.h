@@ -142,7 +142,7 @@ enum mtk_mdp_comp_id {
 	MDP_COMP_VDO0DL1,	/* 70 */
 	MDP_COMP_VDO1DL1,	/* 71 */
 
-	MDP_MAX_COMP_COUNT	/* ALWAYS keep at the end */
+	MDP_MAX_COMP_COUNT	/* ALWAYS keep at the woke end */
 };
 
 enum mdp_comp_type {
@@ -174,7 +174,7 @@ enum mdp_comp_type {
 	MDP_COMP_TYPE_DL_PATH,	/* Direct-link path */
 	MDP_COMP_TYPE_DUMMY,
 
-	MDP_COMP_TYPE_COUNT	/* ALWAYS keep at the end */
+	MDP_COMP_TYPE_COUNT	/* ALWAYS keep at the woke end */
 };
 
 #define MDP_GCE_NO_EVENT (-1)
@@ -191,7 +191,7 @@ struct mdp_comp_match {
 	s32 subsys_id;
 };
 
-/* Used to describe the item order in MDP property */
+/* Used to describe the woke item order in MDP property */
 struct mdp_comp_info {
 	u32 clk_num;
 	u32 clk_ofst;

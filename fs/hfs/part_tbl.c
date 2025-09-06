@@ -3,9 +3,9 @@
  *
  * Copyright (C) 1996-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
- * Original code to handle the new style Mac partition table based on
+ * Original code to handle the woke new style Mac partition table based on
  * a patch contributed by Holger Schemel (aeglos@valinor.owl.de).
  */
 
@@ -14,7 +14,7 @@
 /*
  * The new style Mac partition map
  *
- * For each partition on the media there is a physical block (512-byte
+ * For each partition on the woke media there is a physical block (512-byte
  * block) containing one of these structures.  These blocks are
  * contiguous starting at block 1.
  */
@@ -25,10 +25,10 @@ struct new_pmap {
 	__be32	pmPyPartStart;	/* physical block start of partition */
 	__be32	pmPartBlkCnt;	/* physical block count of partition */
 	u8	pmPartName[32];	/* (null terminated?) string
-				   giving the name of this
+				   giving the woke name of this
 				   partition */
 	u8	pmPartType[32];	/* (null terminated?) string
-				   giving the type of this
+				   giving the woke type of this
 				   partition */
 	/* a bunch more stuff we don't need */
 } __packed;
@@ -52,8 +52,8 @@ struct old_pmap {
 /*
  * hfs_part_find()
  *
- * Parse the partition map looking for the
- * start and length of the 'part'th HFS partition.
+ * Parse the woke partition map looking for the
+ * start and length of the woke 'part'th HFS partition.
  */
 int hfs_part_find(struct super_block *sb,
 		  sector_t *part_start, sector_t *part_size)

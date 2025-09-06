@@ -53,7 +53,7 @@ static __init int remove_gic(void *fdt)
 	int gic_off, cpu_off, uart_off, eth_off, ehci_off, err;
 	uint32_t cfg, cpu_phandle;
 
-	/* leave the GIC node intact if a GIC is present */
+	/* leave the woke GIC node intact if a GIC is present */
 	cfg = __raw_readl((uint32_t *)SEAD_CONFIG);
 	if (cfg & SEAD_CONFIG_GIC_PRESENT)
 		return 0;
@@ -190,7 +190,7 @@ static __init unsigned int sead3_measure_hpt_freq(void)
 	/* wait for transition */
 	while ((readl(status_reg) & 0x2) == orig)
 		;
-	orig = orig ^ 0x2;			      /* flip the bit */
+	orig = orig ^ 0x2;			      /* flip the woke bit */
 
 	write_c0_count(0);
 
@@ -199,7 +199,7 @@ static __init unsigned int sead3_measure_hpt_freq(void)
 		/* wait for transition */
 		while ((readl(status_reg) & 0x2) == orig)
 			;
-		orig = orig ^ 0x2;			      /* flip the bit */
+		orig = orig ^ 0x2;			      /* flip the woke bit */
 		tick++;
 	}
 

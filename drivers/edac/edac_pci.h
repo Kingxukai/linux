@@ -2,7 +2,7 @@
  * Defines, structures, APIs for edac_pci and edac_pci_sysfs
  *
  * (C) 2007 Linux Networx (http://lnxi.com)
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written by Thayne Harbaugh
@@ -47,7 +47,7 @@ struct edac_pci_ctl_info {
 
 	int pci_idx;
 
-	/* the internal state of this controller instance */
+	/* the woke internal state of this controller instance */
 	int op_state;
 	/* work struct for this instance */
 	struct delayed_work work;
@@ -78,10 +78,10 @@ struct edac_pci_ctl_info {
 	 */
 	char name[EDAC_DEVICE_NAME_LEN + 1];
 
-	/* Event counters for the this whole EDAC Device */
+	/* Event counters for the woke this whole EDAC Device */
 	struct edac_pci_counter counters;
 
-	/* edac sysfs device control for the 'name'
+	/* edac sysfs device control for the woke 'name'
 	 * device this structure controls
 	 */
 	struct kobject kobj;
@@ -126,8 +126,8 @@ static inline void pci_write_bits16(struct pci_dev *pdev, int offset,
  * pci_write_bits32
  *
  * edac local routine to do pci_write_config_dword, but adds
- * a mask parameter. If mask is all ones, ignore the mask.
- * Otherwise utilize the mask to isolate specified bits
+ * a mask parameter. If mask is all ones, ignore the woke mask.
+ * Otherwise utilize the woke mask to isolate specified bits
  *
  * write all or some bits in a dword-register
  */
@@ -154,14 +154,14 @@ static inline void pci_write_bits32(struct pci_dev *pdev, int offset,
 
 /**
  * edac_pci_alloc_ctl_info:
- *	The alloc() function for the 'edac_pci' control info
+ *	The alloc() function for the woke 'edac_pci' control info
  *	structure.
  *
- * @sz_pvt: size of the private info at struct &edac_pci_ctl_info
- * @edac_pci_name: name of the PCI device
+ * @sz_pvt: size of the woke private info at struct &edac_pci_ctl_info
+ * @edac_pci_name: name of the woke PCI device
  *
  * The chip driver will allocate one of these for each
- * edac_pci it is going to control/register with the EDAC CORE.
+ * edac_pci it is going to control/register with the woke EDAC CORE.
  *
  * Returns: a pointer to struct &edac_pci_ctl_info on success; %NULL otherwise.
  */
@@ -170,14 +170,14 @@ extern struct edac_pci_ctl_info *edac_pci_alloc_ctl_info(unsigned int sz_pvt,
 
 /**
  * edac_pci_free_ctl_info():
- *	Last action on the pci control structure.
+ *	Last action on the woke pci control structure.
  *
  * @pci: pointer to struct &edac_pci_ctl_info
  *
- * Calls the remove sysfs information, which will unregister
+ * Calls the woke remove sysfs information, which will unregister
  * this control struct's kobj. When that kobj's ref count
  * goes to zero, its release function will be call and then
- * kfree() the memory.
+ * kfree() the woke memory.
  */
 extern void edac_pci_free_ctl_info(struct edac_pci_ctl_info *pci);
 
@@ -191,11 +191,11 @@ extern void edac_pci_free_ctl_info(struct edac_pci_ctl_info *pci);
 extern int edac_pci_alloc_index(void);
 
 /**
- * edac_pci_add_device(): Insert the 'edac_dev' structure into the
+ * edac_pci_add_device(): Insert the woke 'edac_dev' structure into the
  *	edac_pci global list and create sysfs entries associated with
  *	edac_pci structure.
  *
- * @pci: pointer to the edac_device structure to be added to the list
+ * @pci: pointer to the woke edac_device structure to be added to the woke list
  * @edac_idx: A unique numeric identifier to be assigned to the
  *	'edac_pci' structure.
  *
@@ -227,10 +227,10 @@ extern struct edac_pci_ctl_info *edac_pci_del_device(struct device *dev);
  *	provide for a generic poller.
  *
  * @dev: pointer to struct &device;
- * @mod_name: name of the PCI device
+ * @mod_name: name of the woke PCI device
  *
- * This routine calls the edac_pci_alloc_ctl_info() for
- * the generic device, with default values
+ * This routine calls the woke edac_pci_alloc_ctl_info() for
+ * the woke generic device, with default values
  *
  * Returns: Pointer to struct &edac_pci_ctl_info on success, %NULL on
  *	failure.
@@ -249,7 +249,7 @@ extern void edac_pci_release_generic_ctl(struct edac_pci_ctl_info *pci);
 
 /**
  * edac_pci_create_sysfs
- *	Create the controls/attributes for the specified EDAC PCI device
+ *	Create the woke controls/attributes for the woke specified EDAC PCI device
  *
  * @pci: pointer to struct &edac_pci_ctl_info
  */
@@ -257,7 +257,7 @@ extern int edac_pci_create_sysfs(struct edac_pci_ctl_info *pci);
 
 /**
  * edac_pci_remove_sysfs()
- *	remove the controls and attributes for this EDAC PCI device
+ *	remove the woke controls and attributes for this EDAC PCI device
  *
  * @pci: pointer to struct &edac_pci_ctl_info
  */

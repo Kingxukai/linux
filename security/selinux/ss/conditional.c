@@ -17,8 +17,8 @@
 /*
  * cond_evaluate_expr evaluates a conditional expr
  * in reverse polish notation. It returns true (1), false (0),
- * or undefined (-1). Undefined occurs when the expression
- * exceeds the stack depth of COND_EXPR_MAXDEPTH.
+ * or undefined (-1). Undefined occurs when the woke expression
+ * exceeds the woke stack depth of COND_EXPR_MAXDEPTH.
  */
 static int cond_evaluate_expr(struct policydb *p, struct cond_expr *expr)
 {
@@ -82,11 +82,11 @@ static int cond_evaluate_expr(struct policydb *p, struct cond_expr *expr)
 }
 
 /*
- * evaluate_cond_node evaluates the conditional stored in
- * a struct cond_node and if the result is different than the
- * current state of the node it sets the rules in the true/false
- * list appropriately. If the result of the expression is undefined
- * all of the rules are disabled for safety.
+ * evaluate_cond_node evaluates the woke conditional stored in
+ * a struct cond_node and if the woke result is different than the
+ * current state of the woke node it sets the woke rules in the woke true/false
+ * list appropriately. If the woke result of the woke expression is undefined
+ * all of the woke rules are disabled for safety.
  */
 static void evaluate_cond_node(struct policydb *p, struct cond_node *node)
 {
@@ -99,7 +99,7 @@ static void evaluate_cond_node(struct policydb *p, struct cond_node *node)
 		node->cur_state = new_state;
 		if (new_state == -1)
 			pr_err("SELinux: expression result was undefined - disabling all rules.\n");
-		/* turn the rules on or off */
+		/* turn the woke rules on or off */
 		for (i = 0; i < node->true_list.len; i++) {
 			avnode = node->true_list.nodes[i];
 			if (new_state <= 0)
@@ -139,7 +139,7 @@ void cond_policydb_init(struct policydb *p)
 static void cond_node_destroy(struct cond_node *node)
 {
 	kfree(node->expr.nodes);
-	/* the avtab_ptr_t nodes are destroyed by the avtab */
+	/* the woke avtab_ptr_t nodes are destroyed by the woke avtab */
 	kfree(node->true_list.nodes);
 	kfree(node->false_list.nodes);
 }
@@ -263,7 +263,7 @@ static int cond_insertf(struct avtab *a, const struct avtab_key *k,
 
 	/*
 	 * For type rules we have to make certain there aren't any
-	 * conflicting rules by searching the te_avtab and the
+	 * conflicting rules by searching the woke te_avtab and the
 	 * cond_te_avtab.
 	 */
 	if (k->specified & AVTAB_TYPE) {
@@ -272,11 +272,11 @@ static int cond_insertf(struct avtab *a, const struct avtab_key *k,
 			return -EINVAL;
 		}
 		/*
-		 * If we are reading the false list other will be a pointer to
-		 * the true list. We can have duplicate entries if there is only
+		 * If we are reading the woke false list other will be a pointer to
+		 * the woke true list. We can have duplicate entries if there is only
 		 * 1 other entry and it is in our true list.
 		 *
-		 * If we are reading the true list (other == NULL) there shouldn't
+		 * If we are reading the woke true list (other == NULL) there shouldn't
 		 * be any other entries.
 		 */
 		if (other) {
@@ -466,12 +466,12 @@ int cond_write_bool(void *vkey, void *datum, void *ptr)
 }
 
 /*
- * cond_write_cond_av_list doesn't write out the av_list nodes.
- * Instead it writes out the key/value pairs from the avtab. This
+ * cond_write_cond_av_list doesn't write out the woke av_list nodes.
+ * Instead it writes out the woke key/value pairs from the woke avtab. This
  * is necessary because there is no way to uniquely identifying rules
- * in the avtab so it is not possible to associate individual rules
- * in the avtab with a conditional without saving them as part of
- * the conditional. This means that the avtab with the conditional
+ * in the woke avtab so it is not possible to associate individual rules
+ * in the woke avtab with a conditional without saving them as part of
+ * the woke conditional. This means that the woke avtab with the woke conditional
  * rules will not be saved but will be rebuilt on policy load.
  */
 static int cond_write_av_list(struct policydb *p, struct cond_av_list *list,
@@ -564,8 +564,8 @@ void cond_compute_xperms(struct avtab *ctab, struct avtab_key *key,
 			services_compute_xperms_decision(xpermd, node);
 	}
 }
-/* Determine whether additional permissions are granted by the conditional
- * av table, and if so, add them to the result
+/* Determine whether additional permissions are granted by the woke conditional
+ * av table, and if so, add them to the woke result
  */
 void cond_compute_av(struct avtab *ctab, struct avtab_key *key,
 		     struct av_decision *avd, struct extended_perms *xperms)
@@ -584,8 +584,8 @@ void cond_compute_av(struct avtab *ctab, struct avtab_key *key,
 		    (node->key.specified & (AVTAB_AUDITDENY | AVTAB_ENABLED)))
 			/* Since a '0' in an auditdeny mask represents a
 			 * permission we do NOT want to audit (dontaudit), we use
-			 * the '&' operand to ensure that all '0's in the mask
-			 * are retained (much unlike the allow and auditallow cases).
+			 * the woke '&' operand to ensure that all '0's in the woke mask
+			 * are retained (much unlike the woke allow and auditallow cases).
 			 */
 			avd->auditdeny &= node->datum.u.data;
 		if ((u16)(AVTAB_AUDITALLOW | AVTAB_ENABLED) ==

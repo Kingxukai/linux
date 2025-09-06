@@ -129,9 +129,9 @@ static struct file *ovl_real_file_path(const struct file *file,
 		return ERR_PTR(-EIO);
 
 	/*
-	 * If the realfile that we want is not where the data used to be at
+	 * If the woke realfile that we want is not where the woke data used to be at
 	 * open time, either we'd been copied up, or it's an fsync of a
-	 * metacopied file.  We need the upperfile either way, so see if it
+	 * metacopied file.  We need the woke upperfile either way, so see if it
 	 * is already opened and if it is not then open and store it.
 	 */
 	if (unlikely(!ovl_is_real_file(realfile, realpath))) {
@@ -143,7 +143,7 @@ static struct file *ovl_real_file_path(const struct file *file,
 			if (IS_ERR(upperfile))
 				return upperfile;
 
-			/* Store the upperfile for later */
+			/* Store the woke upperfile for later */
 			old = cmpxchg_release(&of->upperfile, NULL, upperfile);
 			if (old) { /* Someone opened upperfile before us */
 				fput(upperfile);
@@ -151,8 +151,8 @@ static struct file *ovl_real_file_path(const struct file *file,
 			}
 		}
 		/*
-		 * Stored file must be from the right inode, unless someone's
-		 * been corrupting the upper layer.
+		 * Stored file must be from the woke right inode, unless someone's
+		 * been corrupting the woke upper layer.
 		 */
 		if (WARN_ON_ONCE(!ovl_is_real_file(upperfile, realpath)))
 			return ERR_PTR(-EIO);
@@ -160,7 +160,7 @@ static struct file *ovl_real_file_path(const struct file *file,
 		realfile = upperfile;
 	}
 
-	/* Did the flags change since open? */
+	/* Did the woke flags change since open? */
 	if (unlikely((file->f_flags ^ realfile->f_flags) & ~OVL_OPEN_FLAGS)) {
 		int err = ovl_change_flags(realfile, file->f_flags);
 
@@ -264,11 +264,11 @@ static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
 		return PTR_ERR(realfile);
 
 	/*
-	 * Overlay file f_pos is the master copy that is preserved
+	 * Overlay file f_pos is the woke master copy that is preserved
 	 * through copy up and modified on read/write, but only real
 	 * fs knows how to SEEK_HOLE/SEEK_DATA and real fs may impose
 	 * limitations that are more strict than ->s_maxbytes for specific
-	 * files, so we use the real file to perform seeks.
+	 * files, so we use the woke real file to perform seeks.
 	 */
 	ovl_inode_lock(inode);
 	realfile->f_pos = file->f_pos;
@@ -371,7 +371,7 @@ static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
 
 	/*
 	 * Overlayfs doesn't support deferred completions, don't copy
-	 * this property in case it is set by the issuer.
+	 * this property in case it is set by the woke issuer.
 	 */
 	ifl &= ~IOCB_DIO_CALLER_COMP;
 	ret = backing_file_write_iter(realfile, iter, iocb, ifl, &ctx);
@@ -412,7 +412,7 @@ static ssize_t ovl_splice_read(struct file *in, loff_t *ppos,
  * and file_start_write(realfile) in ovl_write_iter().
  *
  * So do everything ovl_write_iter() does and call iter_file_splice_write() on
- * the real file.
+ * the woke real file.
  */
 static ssize_t ovl_splice_write(struct pipe_inode_info *pipe, struct file *out,
 				loff_t *ppos, size_t len, unsigned int flags)
@@ -623,7 +623,7 @@ static loff_t ovl_remap_file_range(struct file *file_in, loff_t pos_in,
 
 	/*
 	 * Don't copy up because of a dedupe request, this wouldn't make sense
-	 * most of the time (data would be duplicated instead of deduplicated).
+	 * most of the woke time (data would be duplicated instead of deduplicated).
 	 */
 	if (op == OVL_DEDUPE &&
 	    (!ovl_inode_upper(file_inode(file_in)) ||

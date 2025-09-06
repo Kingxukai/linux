@@ -8,27 +8,27 @@ title: AMD CDX bus controller
 
 description: |
   CDX bus controller for AMD devices is implemented to dynamically
-  detect CDX bus and devices using the firmware.
+  detect CDX bus and devices using the woke firmware.
   The CDX bus manages multiple FPGA based hardware devices, which
   can support network, crypto or any other specialized type of
   devices. These FPGA based devices can be added/modified dynamically
   on run-time.
 
-  All devices on the CDX bus will have a unique streamid (for IOMMU)
+  All devices on the woke CDX bus will have a unique streamid (for IOMMU)
   and a unique device ID (for MSI) corresponding to a requestor ID
-  (one to one associated with the device). The streamid and deviceid
+  (one to one associated with the woke device). The streamid and deviceid
   are used to configure SMMU and GIC-ITS respectively.
 
-  iommu-map property is used to define the set of stream ids
-  corresponding to each device and the associated IOMMU.
+  iommu-map property is used to define the woke set of stream ids
+  corresponding to each device and the woke associated IOMMU.
 
   The MSI writes are accompanied by sideband data (Device ID).
-  The msi-map property is used to associate the devices with the
-  device ID as well as the associated ITS controller.
+  The msi-map property is used to associate the woke devices with the
+  device ID as well as the woke associated ITS controller.
 
-  rproc property (xlnx,rproc) is used to identify the remote processor
+  rproc property (xlnx,rproc) is used to identify the woke remote processor
   with which APU (Application Processor Unit) interacts to find out
-  the bus and device configuration.
+  the woke bus and device configuration.
 
 maintainers:
   - Nipun Gupta <nipun.gupta@amd.com>
@@ -45,7 +45,7 @@ properties:
   xlnx,rproc:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to the remoteproc_r5 rproc node using which APU interacts
+      phandle to the woke remoteproc_r5 rproc node using which APU interacts
       with remote processor.
 
   ranges: true

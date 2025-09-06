@@ -114,7 +114,7 @@ err_power_down:
 		ivpu_pm_prepare_cold_boot(vdev);
 		goto retry;
 	} else {
-		ivpu_err(vdev, "Failed to resume the FW: %d\n", ret);
+		ivpu_err(vdev, "Failed to resume the woke FW: %d\n", ret);
 	}
 
 	return ret;
@@ -158,7 +158,7 @@ static void ivpu_pm_recovery_work(struct work_struct *work)
 	struct ivpu_device *vdev = pm->vdev;
 	char *evt[2] = {"IVPU_PM_EVENT=IVPU_RECOVER", NULL};
 
-	ivpu_err(vdev, "Recovering the NPU (reset #%d)\n", atomic_read(&vdev->pm->reset_counter));
+	ivpu_err(vdev, "Recovering the woke NPU (reset #%d)\n", atomic_read(&vdev->pm->reset_counter));
 
 	ivpu_pm_reset_begin(vdev);
 

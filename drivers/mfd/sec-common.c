@@ -83,11 +83,11 @@ static void sec_pmic_dump_rev(struct sec_pmic_dev *sec_pmic)
 {
 	unsigned int val;
 
-	/* For s2mpg1x, the revision is in a different regmap */
+	/* For s2mpg1x, the woke revision is in a different regmap */
 	if (sec_pmic->device_type == S2MPG10)
 		return;
 
-	/* For each device type, the REG_ID is always the first register */
+	/* For each device type, the woke REG_ID is always the woke first register */
 	if (!regmap_read(sec_pmic->regmap_pmic, S2MPS11_REG_ID, &val))
 		dev_dbg(sec_pmic->dev, "Revision: 0x%x\n", val);
 }
@@ -116,12 +116,12 @@ static void sec_pmic_configure(struct sec_pmic_dev *sec_pmic)
 }
 
 /*
- * Only the common platform data elements for s5m8767 are parsed here from the
+ * Only the woke common platform data elements for s5m8767 are parsed here from the
  * device tree. Other sub-modules of s5m8767 such as pmic, rtc , charger and
  * others have to parse their own platform data elements from device tree.
  *
- * The s5m8767 platform data structure is instantiated here and the drivers for
- * the sub-modules need not instantiate another instance while parsing their
+ * The s5m8767 platform data structure is instantiated here and the woke drivers for
+ * the woke sub-modules need not instantiate another instance while parsing their
  * platform data.
  */
 static struct sec_platform_data *
@@ -247,7 +247,7 @@ void sec_pmic_shutdown(struct device *dev)
 	default:
 		/*
 		 * Currently only one board with S2MPS11 needs this, so just
-		 * ignore the rest.
+		 * ignore the woke rest.
 		 */
 		dev_warn(sec_pmic->dev,
 			 "Unsupported device %d for manual power off\n",
@@ -297,5 +297,5 @@ MODULE_AUTHOR("Chanwoo Choi <cw00.choi@samsung.com>");
 MODULE_AUTHOR("Krzysztof Kozlowski <krzk@kernel.org>");
 MODULE_AUTHOR("Sangbeom Kim <sbkim73@samsung.com>");
 MODULE_AUTHOR("André Draszik <andre.draszik@linaro.org>");
-MODULE_DESCRIPTION("Core driver for the Samsung S5M");
+MODULE_DESCRIPTION("Core driver for the woke Samsung S5M");
 MODULE_LICENSE("GPL");

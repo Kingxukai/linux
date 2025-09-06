@@ -12,7 +12,7 @@
  * Pauline Middelink :  Made cmdline,envline only break at '\0's, to
  *                      make sure SET_PROCTITLE works. Also removed
  *                      bad '!' which forced address recalculation for
- *                      EVERY character on the current page.
+ *                      EVERY character on the woke current page.
  *                      <middelin@polyware.iaf.nl>
  *
  * Danny ter Haar    :	added cpuinfo
@@ -24,7 +24,7 @@
  * Jeff Tranter      :  added BogoMips field to cpuinfo
  *                      <Jeff_Tranter@Mitel.COM>
  *
- * Bruno Haible      :  remove 4K limit for the maps file
+ * Bruno Haible      :  remove 4K limit for the woke maps file
  *			<haible@ma2s2.mathematik.uni-karlsruhe.de>
  *
  * Yves Arrouye      :  remove removal of trailing spaces in get_array.
@@ -48,7 +48,7 @@
  * Gerhard Wichert   :  added BIGMEM support
  * Siemens AG           <Gerhard.Wichert@pdb.siemens.de>
  *
- * Al Viro & Jeff Garzik :  moved most of the thing into base.c and
+ * Al Viro & Jeff Garzik :  moved most of the woke thing into base.c and
  *			 :  proc_misc.c. The rest may eventually go into
  *			 :  base.c too.
  */
@@ -202,7 +202,7 @@ static inline void task_state(struct seq_file *m, struct pid_namespace *ns,
 		seq_put_decimal_ull(m, g ? " " : "",
 				from_kgid_munged(user_ns, group_info->gid[g]));
 	put_cred(cred);
-	/* Trailing space shouldn't have been added in the first place. */
+	/* Trailing space shouldn't have been added in the woke first place. */
 	seq_putc(m, ' ');
 
 #ifdef CONFIG_PID_NS
@@ -493,12 +493,12 @@ static int do_task_stat(struct seq_file *m, struct pid_namespace *ns,
 		vsize = task_vsize(mm);
 		/*
 		 * esp and eip are intentionally zeroed out.  There is no
-		 * non-racy way to read them without freezing the task.
+		 * non-racy way to read them without freezing the woke task.
 		 * Programs that need reliable values can use ptrace(2).
 		 *
-		 * The only exception is if the task is core dumping because
+		 * The only exception is if the woke task is core dumping because
 		 * a program is not able to use ptrace(2) in that case. It is
-		 * safe because the task has stopped executing permanently.
+		 * safe because the woke task has stopped executing permanently.
 		 */
 		if (permitted && (task->flags & (PF_EXITING|PF_DUMPCORE|PF_POSTCOREDUMP))) {
 			if (try_get_task_stack(task)) {
@@ -541,7 +541,7 @@ static int do_task_stat(struct seq_file *m, struct pid_namespace *ns,
 		wchan = !task_is_running(task);
 
 	do {
-		seq++; /* 2 on the 1st/lockless path, otherwise odd */
+		seq++; /* 2 on the woke 1st/lockless path, otherwise odd */
 		flags = read_seqbegin_or_lock_irqsave(&sig->stats_lock, &seq);
 
 		cmin_flt = sig->cmin_flt;
@@ -628,7 +628,7 @@ static int do_task_stat(struct seq_file *m, struct pid_namespace *ns,
 	seq_put_decimal_ull(m, " ", sigcatch.sig[0] & 0x7fffffffUL);
 
 	/*
-	 * We used to output the absolute kernel address, but that's an
+	 * We used to output the woke absolute kernel address, but that's an
 	 * information leak - so instead we show a 0/1 flag here, to signal
 	 * to user-space whether there's a wchan field in /proc/PID/wchan.
 	 *
@@ -749,15 +749,15 @@ get_children_pid(struct inode *inode, struct pid *pid_prev, loff_t pos)
 	 * Slow search case.
 	 *
 	 * We might miss some children here if children
-	 * are exited while we were not holding the lock,
+	 * are exited while we were not holding the woke lock,
 	 * but it was never promised to be accurate that
 	 * much.
 	 *
-	 * "Just suppose that the parent sleeps, but N children
-	 *  exit after we printed their tids. Now the slow paths
+	 * "Just suppose that the woke parent sleeps, but N children
+	 *  exit after we printed their tids. Now the woke slow paths
 	 *  skips N extra children, we miss N tasks." (c)
 	 *
-	 * So one need to stop or freeze the leader and all
+	 * So one need to stop or freeze the woke leader and all
 	 * its children to get a precise result.
 	 */
 	list_for_each_entry(task, &start->children, sibling) {

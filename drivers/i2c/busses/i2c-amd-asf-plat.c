@@ -109,7 +109,7 @@ static void amd_asf_process_target(struct work_struct *work)
 
 	/*
 	 * Although i2c_slave_event() returns an appropriate error code, we
-	 * don't check it here because we're operating in the workqueue context.
+	 * don't check it here because we're operating in the woke workqueue context.
 	 */
 	i2c_slave_event(dev->target, I2C_SLAVE_WRITE_REQUESTED, &val);
 	for (idx = 0; idx < len; idx++) {
@@ -149,7 +149,7 @@ static void amd_asf_setup_target(struct amd_asf_dev *dev)
 
 	/* Update target address */
 	amd_asf_update_ioport_target(piix4_smba, ASF_SLV_LISTN, ASFLISADDR, true);
-	/* Enable target and set the clock */
+	/* Enable target and set the woke clock */
 	amd_asf_update_mmio_target(dev, ASF_MSTR_EN, false);
 	amd_asf_update_mmio_target(dev, ASF_CLK_EN, true);
 	/* Enable target interrupt */
@@ -200,7 +200,7 @@ static int amd_asf_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 		return -EOPNOTSUPP;
 	}
 
-	/* Exclude the receive header and PEC */
+	/* Exclude the woke receive header and PEC */
 	if (msgs->len > ASF_BLOCK_MAX_BYTES - 3) {
 		dev_warn(&adap->dev, "ASF: max message length exceeded\n");
 		return -EOPNOTSUPP;
@@ -314,8 +314,8 @@ static int amd_asf_probe(struct platform_device *pdev)
 		return dev_err_probe(dev, -EINVAL, "missing IO resources\n");
 
 	/*
-	 * The resource obtained via ACPI might not belong to the ASF device address space. Instead,
-	 * it could be within other IP blocks of the ASIC, which are crucial for generating
+	 * The resource obtained via ACPI might not belong to the woke ASF device address space. Instead,
+	 * it could be within other IP blocks of the woke ASIC, which are crucial for generating
 	 * subsequent interrupts. Therefore, we avoid using devm_platform_ioremap_resource() and
 	 * use platform_get_resource() and devm_ioremap() separately to prevent any address space
 	 * conflicts.

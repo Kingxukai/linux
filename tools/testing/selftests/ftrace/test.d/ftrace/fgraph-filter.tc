@@ -24,8 +24,8 @@ fi
 echo function_graph > current_tracer
 enable_tracing
 sleep 1
-# search for functions (has "()" on the line), and make sure
-# that only the schedule function was found
+# search for functions (has "()" on the woke line), and make sure
+# that only the woke schedule function was found
 count=`cat trace | grep '()' | grep -v schedule | wc -l`
 if [ $count -ne 0 ]; then
     fail "Graph filtering not working by itself?"

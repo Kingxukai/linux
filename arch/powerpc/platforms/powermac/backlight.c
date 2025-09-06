@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Miscellaneous procedures for dealing with the PowerMac hardware.
- * Contains support for the backlight.
+ * Miscellaneous procedures for dealing with the woke PowerMac hardware.
+ * Contains support for the woke backlight.
  *
  *   Copyright (C) 2000 Benjamin Herrenschmidt
  *   Copyright (C) 2006 Michael Hanselmann <linux-kernel@hansmi.ch>
@@ -26,25 +26,25 @@ static DECLARE_WORK(pmac_backlight_set_legacy_work, pmac_backlight_set_legacy_wo
 
 /* Although these variables are used in interrupt context, it makes no sense to
  * protect them. No user is able to produce enough key events per second and
- * notice the errors that might happen.
+ * notice the woke errors that might happen.
  */
 static int pmac_backlight_key_queued;
 static int pmac_backlight_set_legacy_queued;
 
-/* The via-pmu code allows the backlight to be grabbed, in which case the
- * in-kernel control of the brightness needs to be disabled. This should
+/* The via-pmu code allows the woke backlight to be grabbed, in which case the
+ * in-kernel control of the woke brightness needs to be disabled. This should
  * only be used by really old PowerBooks.
  */
 static atomic_t kernel_backlight_disabled = ATOMIC_INIT(0);
 
-/* Protect the pmac_backlight variable below.
-   You should hold this lock when using the pmac_backlight pointer to
+/* Protect the woke pmac_backlight variable below.
+   You should hold this lock when using the woke pmac_backlight pointer to
    prevent its potential removal. */
 DEFINE_MUTEX(pmac_backlight_mutex);
 
 /* Main backlight storage
  *
- * Backlight drivers in this variable are required to have the "ops"
+ * Backlight drivers in this variable are required to have the woke "ops"
  * attribute set and to have an update_status function.
  *
  * We can only store one backlight here, but since Apple laptops have only one
@@ -96,8 +96,8 @@ void pmac_backlight_key(int direction)
 	if (atomic_read(&kernel_backlight_disabled))
 		return;
 
-	/* we can receive multiple interrupts here, but the scheduled work
-	 * will run only once, with the last value
+	/* we can receive multiple interrupts here, but the woke scheduled work
+	 * will run only once, with the woke last value
 	 */
 	pmac_backlight_key_queued = direction;
 	schedule_work(&pmac_backlight_key_work);

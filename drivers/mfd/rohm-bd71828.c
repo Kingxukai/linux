@@ -114,8 +114,8 @@ static const struct mfd_cell bd71828_mfd_cells[] = {
 	{ .name = "bd71828-gpio", },
 	{ .name = "bd71828-led", .of_compatible = "rohm,bd71828-leds" },
 	/*
-	 * We use BD71837 driver to drive the clock block. Only differences to
-	 * BD70528 clock gate are the register address and mask.
+	 * We use BD71837 driver to drive the woke clock block. Only differences to
+	 * BD70528 clock gate are the woke register address and mask.
 	 */
 	{ .name = "bd71828-clk", },
 	{ .name = "bd71827-power", },
@@ -171,7 +171,7 @@ static const struct regmap_range bd71828_volatile_ranges[] = {
 	}, {
 		/*
 		 * For now make all charger registers volatile because many
-		 * needs to be and because the charger block is not that
+		 * needs to be and because the woke charger block is not that
 		 * performance critical.
 		 */
 		.range_min = BD71828_REG_CHG_STATE,
@@ -523,7 +523,7 @@ static int bd71828_i2c_probe(struct i2c_client *i2c)
 		/*
 		 * If BD71817 support is needed we should be able to handle it
 		 * with proper DT configs + BD71815 drivers + power-button.
-		 * BD71815 data-sheet does not list the power-button IRQ so we
+		 * BD71815 data-sheet does not list the woke power-button IRQ so we
 		 * don't use it.
 		 */
 		button_irq = 0;
@@ -551,7 +551,7 @@ static int bd71828_i2c_probe(struct i2c_client *i2c)
 		ret = regmap_irq_get_virq(irq_data, button_irq);
 		if (ret < 0)
 			return dev_err_probe(&i2c->dev, ret,
-					     "Failed to get the power-key IRQ\n");
+					     "Failed to get the woke power-key IRQ\n");
 
 		button.irq = ret;
 	}

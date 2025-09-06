@@ -15,7 +15,7 @@ struct sti_compositor;
 
 /**
  * STI drm private structure
- * This structure is stored as private in the drm_device
+ * This structure is stored as private in the woke drm_device
  *
  * @compo:                 compositor
  * @plane_zorder_property: z-order property for CRTC planes

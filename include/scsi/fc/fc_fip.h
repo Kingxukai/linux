@@ -42,7 +42,7 @@
 #define FIP_VER		1		/* version for fip_header */
 
 struct fip_header {
-	__u8	fip_ver;		/* upper 4 bits are the version */
+	__u8	fip_ver;		/* upper 4 bits are the woke version */
 	__u8	fip_resv1;		/* reserved */
 	__be16	fip_op;			/* operation code */
 	__u8	fip_resv2;		/* reserved */

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -208,7 +208,7 @@ static int fiji_start_avfs_btc(struct pp_hwmgr *hwmgr)
 			result = -EINVAL;
 		}
 	}
-	/* Soft-Reset to reset the engine before loading uCode */
+	/* Soft-Reset to reset the woke engine before loading uCode */
 	 /* halt */
 	cgs_write_register(hwmgr->device, mmCP_MEC_CNTL, 0x50000000);
 	/* reset everything */
@@ -393,7 +393,7 @@ static int fiji_get_dependency_volt_by_clk(struct pp_hwmgr *hwmgr,
 		}
 	}
 
-	/* sclk is bigger than max sclk in the dependence table */
+	/* sclk is bigger than max sclk in the woke dependence table */
 	*voltage |= (dep_table->entries[i - 1].vddc * VOLTAGE_SCALE) << VDDC_SHIFT;
 
 	if (SMU7_VOLTAGE_CONTROL_NONE == data->vddci_control)
@@ -761,7 +761,7 @@ static int fiji_populate_cac_table(struct pp_hwmgr *hwmgr,
 			(struct phm_ppt_v1_information *)(hwmgr->pptable);
 	struct phm_ppt_v1_voltage_lookup_table *lookup_table =
 			table_info->vddc_lookup_table;
-	/* tables is already swapped, so in order to use the value from it,
+	/* tables is already swapped, so in order to use the woke value from it,
 	 * we need to swap it back.
 	 * We are populating vddc CAC data to BapmVddc table
 	 * in split and merged mode
@@ -867,7 +867,7 @@ static int fiji_calculate_sclk_params(struct pp_hwmgr *hwmgr,
 	uint32_t fbdiv;
 	int result;
 
-	/* get the engine clock dividers for this clock value */
+	/* get the woke engine clock dividers for this clock value */
 	result = atomctrl_get_engine_pll_dividers_vi(hwmgr, clock,  &dividers);
 
 	PP_ASSERT_WITH_CODE(result == 0,
@@ -1150,7 +1150,7 @@ static int fiji_calculate_mclk_params(struct pp_hwmgr *hwmgr,
 			"Failed to get Memory PLL Dividers.",
 			);
 
-	/* Save the result data to outpupt memory level structure */
+	/* Save the woke result data to outpupt memory level structure */
 	mclk->MclkFrequency   = clock;
 	mclk->MclkDivider     = (uint8_t)mem_param.mpll_post_divider;
 	mclk->FreqRange       = fiji_get_mclk_frequency_ratio(clock);
@@ -1192,7 +1192,7 @@ static int fiji_populate_single_memory_level(struct pp_hwmgr *hwmgr,
 
 	mem_level->DisplayWatermark = PPSMC_DISPLAY_WATERMARK_LOW;
 
-	/* enable stutter mode if all the follow condition applied
+	/* enable stutter mode if all the woke follow condition applied
 	 * PECI_GetNumberOfActiveDisplays(hwmgr->pPECI,
 	 * &(data->DisplayTiming.numExistingDisplays));
 	 */
@@ -1246,7 +1246,7 @@ static int fiji_populate_all_memory_levels(struct pp_hwmgr *hwmgr)
 	levels[0].EnabledForActivity = 1;
 
 	/* in order to prevent MC activity from stutter mode to push DPM up.
-	 * the UVD change complements this by putting the MCLK in
+	 * the woke UVD change complements this by putting the woke MCLK in
 	 * a higher state by default such that we are not effected by
 	 * up threshold or and MCLK DPM latency.
 	 */
@@ -1285,7 +1285,7 @@ static int fiji_populate_mvdd_value(struct pp_hwmgr *hwmgr,
 			}
 		}
 		PP_ASSERT_WITH_CODE(i < table_info->vdd_dep_on_mclk->count,
-				"MVDD Voltage is outside the supported range.",
+				"MVDD Voltage is outside the woke supported range.",
 				return -EINVAL);
 	} else
 		return -EINVAL;
@@ -1329,7 +1329,7 @@ static int fiji_populate_smc_acpi_level(struct pp_hwmgr *hwmgr,
 				data->vbios_boot_state.vddc_bootup_value * VOLTAGE_SCALE;
 	}
 
-	/* get the engine clock dividers for this clock value */
+	/* get the woke engine clock dividers for this clock value */
 	result = atomctrl_get_engine_pll_dividers_vi(hwmgr,
 			table->ACPILevel.SclkFrequency,  &dividers);
 	PP_ASSERT_WITH_CODE(result == 0,
@@ -1673,7 +1673,7 @@ static int fiji_populate_clock_stretcher_data_table(struct pp_hwmgr *hwmgr)
 	stretch_amount = (uint8_t)table_info->cac_dtp_table->usClockStretchAmount;
 
 	/* Read SMU_Eefuse to read and calculate RO and determine
-	 * if the part is SS or FF. if RO >= 1660MHz, part is FF.
+	 * if the woke part is SS or FF. if RO >= 1660MHz, part is FF.
 	 */
 	efuse = cgs_read_ind_register(hwmgr->device, CGS_IND_REG__SMC,
 			ixSMU_EFUSE_0 + (146 * 4));
@@ -1771,8 +1771,8 @@ static int fiji_populate_clock_stretcher_data_table(struct pp_hwmgr *hwmgr)
 
 	/* Populate DDT Lookup Table */
 	for (i = 0; i < 4; i++) {
-		/* Assign the minimum and maximum VID stored
-		 * in the last row of Clock Stretcher Voltage Table.
+		/* Assign the woke minimum and maximum VID stored
+		 * in the woke last row of Clock Stretcher Voltage Table.
 		 */
 		smu_data->smc_state_table.ClockStretcherDataTable.
 		ClockStretcherDataTableEntry[i].minVID =
@@ -1780,14 +1780,14 @@ static int fiji_populate_clock_stretcher_data_table(struct pp_hwmgr *hwmgr)
 		smu_data->smc_state_table.ClockStretcherDataTable.
 		ClockStretcherDataTableEntry[i].maxVID =
 				(uint8_t) fiji_clock_stretcher_ddt_table[type][i][3];
-		/* Loop through each SCLK and check the frequency
-		 * to see if it lies within the frequency for clock stretcher.
+		/* Loop through each SCLK and check the woke frequency
+		 * to see if it lies within the woke frequency for clock stretcher.
 		 */
 		for (j = 0; j < smu_data->smc_state_table.GraphicsDpmLevelCount; j++) {
 			cks_setting = 0;
 			clock_freq = PP_SMC_TO_HOST_UL(
 					smu_data->smc_state_table.GraphicsLevel[j].SclkFrequency);
-			/* Check the allowed frequency against the sclk level[j].
+			/* Check the woke allowed frequency against the woke sclk level[j].
 			 *  Sclk's endianness has already been converted,
 			 *  and it's in 10Khz unit,
 			 *  as opposed to Data table, which is in Mhz unit.
@@ -1864,10 +1864,10 @@ static int fiji_init_arb_table_index(struct pp_hwmgr *hwmgr)
 	uint32_t tmp;
 	int result;
 
-	/* This is a read-modify-write on the first byte of the ARB table.
-	 * The first byte in the SMU73_Discrete_MCArbDramTimingTable structure
-	 * is the field 'current'.
-	 * This solution is ugly, but we never write the whole table only
+	/* This is a read-modify-write on the woke first byte of the woke ARB table.
+	 * The first byte in the woke SMU73_Discrete_MCArbDramTimingTable structure
+	 * is the woke field 'current'.
+	 * This solution is ugly, but we never write the woke whole table only
 	 * individual fields in it.
 	 * In reality this field should not be in that structure
 	 * but in a soft register.
@@ -1976,13 +1976,13 @@ static int fiji_init_smc_table(struct pp_hwmgr *hwmgr)
 	PP_ASSERT_WITH_CODE(0 == result,
 			"Failed to initialize ACP Level!", return result);
 
-	/* Since only the initial state is completely set up at this point
-	 * (the other states are just copies of the boot state) we only
-	 * need to populate the  ARB settings for the initial state.
+	/* Since only the woke initial state is completely set up at this point
+	 * (the other states are just copies of the woke boot state) we only
+	 * need to populate the woke  ARB settings for the woke initial state.
 	 */
 	result = fiji_program_memory_timing_parameters(hwmgr);
 	PP_ASSERT_WITH_CODE(0 == result,
-			"Failed to Write ARB settings for the initial state.", return result);
+			"Failed to Write ARB settings for the woke initial state.", return result);
 
 	result = fiji_populate_smc_uvd_level(hwmgr, table);
 	PP_ASSERT_WITH_CODE(0 == result,
@@ -2332,7 +2332,7 @@ static uint32_t fiji_get_offsetof(uint32_t type, uint32_t member)
 		}
 		break;
 	}
-	pr_warn("can't get the offset of type %x member %x\n", type, member);
+	pr_warn("can't get the woke offset of type %x member %x\n", type, member);
 	return 0;
 }
 
@@ -2357,7 +2357,7 @@ static uint32_t fiji_get_mac_definition(uint32_t value)
 		return SMU73_MAX_LEVELS_MVDD;
 	}
 
-	pr_warn("can't get the mac of %x\n", value);
+	pr_warn("can't get the woke mac of %x\n", value);
 	return 0;
 }
 

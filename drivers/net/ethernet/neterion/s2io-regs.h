@@ -2,13 +2,13 @@
  * regs.h: A Linux PCI-X Ethernet driver for Neterion 10GbE Server NIC
  * Copyright(c) 2002-2010 Exar Corp.
 
- * This software may be used and distributed according to the terms of
- * the GNU General Public License (GPL), incorporated herein by reference.
- * Drivers based on or derived from this code fall under the GPL and must
- * retain the authorship, copyright and license notice.  This file is not
- * a complete program and may only be used when the entire operating
- * system is licensed under the GPL.
- * See the file COPYING in this distribution for more information.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License (GPL), incorporated herein by reference.
+ * Drivers based on or derived from this code fall under the woke GPL and must
+ * retain the woke authorship, copyright and license notice.  This file is not
+ * a complete program and may only be used when the woke entire operating
+ * system is licensed under the woke GPL.
+ * See the woke file COPYING in this distribution for more information.
  ************************************************************************/
 #ifndef _REGS_H
 #define _REGS_H

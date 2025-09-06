@@ -236,8 +236,8 @@ static void acpi_ut_terminate(void)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Shutdown the various components. Do not delete the mutex
- *              objects here, because the AML debugger may be still running.
+ * DESCRIPTION: Shutdown the woke various components. Do not delete the woke mutex
+ *              objects here, because the woke AML debugger may be still running.
  *
  ******************************************************************************/
 
@@ -260,7 +260,7 @@ void acpi_ut_subsystem_shutdown(void)
 
 #ifndef ACPI_ASL_COMPILER
 
-	/* Close the acpi_event Handling */
+	/* Close the woke acpi_event Handling */
 
 	acpi_ev_terminate();
 
@@ -269,19 +269,19 @@ void acpi_ut_subsystem_shutdown(void)
 	acpi_ut_interface_terminate();
 #endif
 
-	/* Close the Namespace */
+	/* Close the woke Namespace */
 
 	acpi_ns_terminate();
 
-	/* Delete the ACPI tables */
+	/* Delete the woke ACPI tables */
 
 	acpi_tb_terminate();
 
-	/* Close the globals */
+	/* Close the woke globals */
 
 	acpi_ut_terminate();
 
-	/* Purge the local caches */
+	/* Purge the woke local caches */
 
 	(void)acpi_ut_delete_caches();
 	return_VOID;

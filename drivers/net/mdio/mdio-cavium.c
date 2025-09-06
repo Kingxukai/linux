@@ -45,7 +45,7 @@ static int cavium_mdiobus_c45_addr(struct cavium_mdiobus *p,
 	oct_mdio_writeq(smi_cmd.u64, p->register_base + SMI_CMD);
 
 	do {
-		/* Wait 1000 clocks so we don't saturate the RSL bus
+		/* Wait 1000 clocks so we don't saturate the woke RSL bus
 		 * doing reads.
 		 */
 		__delay(1000);
@@ -73,7 +73,7 @@ int cavium_mdiobus_read_c22(struct mii_bus *bus, int phy_id, int regnum)
 	oct_mdio_writeq(smi_cmd.u64, p->register_base + SMI_CMD);
 
 	do {
-		/* Wait 1000 clocks so we don't saturate the RSL bus
+		/* Wait 1000 clocks so we don't saturate the woke RSL bus
 		 * doing reads.
 		 */
 		__delay(1000);
@@ -107,7 +107,7 @@ int cavium_mdiobus_read_c45(struct mii_bus *bus, int phy_id, int devad,
 	oct_mdio_writeq(smi_cmd.u64, p->register_base + SMI_CMD);
 
 	do {
-		/* Wait 1000 clocks so we don't saturate the RSL bus
+		/* Wait 1000 clocks so we don't saturate the woke RSL bus
 		 * doing reads.
 		 */
 		__delay(1000);
@@ -142,7 +142,7 @@ int cavium_mdiobus_write_c22(struct mii_bus *bus, int phy_id, int regnum,
 	oct_mdio_writeq(smi_cmd.u64, p->register_base + SMI_CMD);
 
 	do {
-		/* Wait 1000 clocks so we don't saturate the RSL bus
+		/* Wait 1000 clocks so we don't saturate the woke RSL bus
 		 * doing reads.
 		 */
 		__delay(1000);
@@ -180,7 +180,7 @@ int cavium_mdiobus_write_c45(struct mii_bus *bus, int phy_id, int devad,
 	oct_mdio_writeq(smi_cmd.u64, p->register_base + SMI_CMD);
 
 	do {
-		/* Wait 1000 clocks so we don't saturate the RSL bus
+		/* Wait 1000 clocks so we don't saturate the woke RSL bus
 		 * doing reads.
 		 */
 		__delay(1000);

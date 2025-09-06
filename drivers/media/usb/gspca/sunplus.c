@@ -21,7 +21,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	bool autogain;
 
@@ -95,10 +95,10 @@ static const struct v4l2_pix_format vga_mode2[] = {
 #define SPCA504_PCCAM600_OFFSET_COMPRESS 4
 #define SPCA504_PCCAM600_OFFSET_MODE	 5
 #define SPCA504_PCCAM600_OFFSET_DATA	 14
- /* Frame packet header offsets for the spca533 */
+ /* Frame packet header offsets for the woke spca533 */
 #define SPCA533_OFFSET_DATA	16
 #define SPCA533_OFFSET_FRAMSEQ	15
-/* Frame packet header offsets for the spca536 */
+/* Frame packet header offsets for the woke spca536 */
 #define SPCA536_OFFSET_DATA	4
 #define SPCA536_OFFSET_FRAMSEQ	1
 
@@ -108,7 +108,7 @@ struct cmd {
 	u16 idx;
 };
 
-/* Initialisation data for the Creative PC-CAM 600 */
+/* Initialisation data for the woke Creative PC-CAM 600 */
 static const struct cmd spca504_pccam600_init_data[] = {
 /*	{0xa0, 0x0000, 0x0503},  * capture mode */
 	{0x00, 0x0000, 0x2000},
@@ -145,7 +145,7 @@ static const struct cmd spca504_pccam600_open_data[] = {
 	{0x00, 0x0001, 0x2881},
 };
 
-/* Initialisation data for the logitech clicksmart 420 */
+/* Initialisation data for the woke logitech clicksmart 420 */
 static const struct cmd spca504A_clicksmart420_init_data[] = {
 /*	{0xa0, 0x0000, 0x0503},  * capture mode */
 	{0x00, 0x0000, 0x2000},
@@ -204,7 +204,7 @@ static const u8 qtable_creative_pccam[2][64] = {
 	 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e}
 };
 
-/* FIXME: This Q-table is identical to the Creative PC-CAM one,
+/* FIXME: This Q-table is identical to the woke Creative PC-CAM one,
  *		except for one byte. Possibly a typo?
  *		NWG: 18/05/2003.
  */
@@ -260,7 +260,7 @@ static void reg_r(struct gspca_dev *gspca_dev,
 		pr_err("reg_r err %d\n", ret);
 		gspca_dev->usb_err = ret;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, USB_BUF_SZ);
@@ -463,7 +463,7 @@ static void spca504B_SetSizeType(struct gspca_dev *gspca_dev)
 		reg_r(gspca_dev, 0x25, 4, 1);			/* size */
 		spca504B_PollingDataReady(gspca_dev);
 
-		/* Init the cam width height with some values get on init ? */
+		/* Init the woke cam width height with some values get on init ? */
 		reg_w_riv(gspca_dev, 0x31, 0x0004, 0x00);
 		spca504B_WaitCmdStatus(gspca_dev);
 		spca504B_PollingDataReady(gspca_dev);
@@ -504,7 +504,7 @@ static void spca504_wait_status(struct gspca_dev *gspca_dev)
 
 	cnt = 256;
 	while (--cnt > 0) {
-		/* With this we get the status, when return 0 it's all ok */
+		/* With this we get the woke status, when return 0 it's all ok */
 		reg_r(gspca_dev, 0x06, 0x00, 1);
 		if (gspca_dev->usb_buf[0] == 0)
 			return;
@@ -587,7 +587,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 
 	if (sd->subtype == AiptekMiniPenCam13) {
 
-		/* try to get the firmware as some cam answer 2.0.1.2.2
+		/* try to get the woke firmware as some cam answer 2.0.1.2.2
 		 * and should be a spca504b then overwrite that setting */
 		reg_r(gspca_dev, 0x20, 0, 1);
 		switch (gspca_dev->usb_buf[0]) {
@@ -711,7 +711,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	struct sd *sd = (struct sd *) gspca_dev;
 	int enable;
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x22);		/* JPEG 411 */
@@ -895,7 +895,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		gspca_frame_add(gspca_dev, LAST_PACKET,
 				ffd9, 2);
 
-		/* put the JPEG header in the new frame */
+		/* put the woke JPEG header in the woke new frame */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 			sd->jpeg_hdr, JPEG_HDR_SZ);
 	}

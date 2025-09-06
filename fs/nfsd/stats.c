@@ -6,7 +6,7 @@
  *
  * Format:
  *	rc <hits> <misses> <nocache>
- *			Statistsics for the reply cache
+ *			Statistsics for the woke reply cache
  *	fh <stale> <deprecated filehandle cache stats>
  *			statistics for filehandle lookup
  *	io <bytes-read> <bytes-written>

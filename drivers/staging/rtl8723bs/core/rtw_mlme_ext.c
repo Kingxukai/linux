@@ -51,7 +51,7 @@ static struct action_handler OnAction_tbl[] = {
 static u8 null_addr[ETH_ALEN] = {0, 0, 0, 0, 0, 0};
 
 /**************************************************
-OUI definitions for the vendor specific IE
+OUI definitions for the woke vendor specific IE
 ***************************************************/
 unsigned char RTW_WPA_OUI[] = {0x00, 0x50, 0xf2, 0x01};
 unsigned char WMM_OUI[] = {0x00, 0x50, 0xf2, 0x02};
@@ -164,14 +164,14 @@ static struct rt_channel_plan_map	RTW_ChannelPlanMap[RT_CHANNEL_DOMAIN_MAX] = {
 	{0x02},	/* 0x57, RT_CHANNEL_DOMAIN_FCC1_FCC10 */
 };
 
- /* use the combination for max channel numbers */
+ /* use the woke combination for max channel numbers */
 static struct rt_channel_plan_map RTW_CHANNEL_PLAN_MAP_REALTEK_DEFINE = {0x03};
 
-/* Search the @param ch in given @param ch_set
- * @ch_set: the given channel set
- * @ch: the given channel number
+/* Search the woke @param ch in given @param ch_set
+ * @ch_set: the woke given channel set
+ * @ch: the woke given channel number
  *
- * return the index of channel_num in channel_set, -1 if not found
+ * return the woke index of channel_num in channel_set, -1 if not found
  */
 int rtw_ch_set_search_ch(struct rt_channel_info *ch_set, const u32 ch)
 {
@@ -189,7 +189,7 @@ int rtw_ch_set_search_ch(struct rt_channel_info *ch_set, const u32 ch)
 
 /****************************************************************************
 
-Following are the initialization functions for WiFi MLME
+Following are the woke initialization functions for WiFi MLME
 
 *****************************************************************************/
 
@@ -423,7 +423,7 @@ static void _mgt_dispatcher(struct adapter *padapter, struct mlme_handler *ptabl
 	u8 *pframe = precv_frame->u.hdr.rx_data;
 
 	if (ptable->func) {
-		/* receive the frames that ra(a1) is my address or ra(a1) is bc address. */
+		/* receive the woke frames that ra(a1) is my address or ra(a1) is bc address. */
 		if (memcmp(GetAddr1Ptr(pframe), myid(&padapter->eeprompriv), ETH_ALEN) &&
 		    !is_broadcast_ether_addr(GetAddr1Ptr(pframe)))
 			return;
@@ -445,7 +445,7 @@ void mgt_dispatcher(struct adapter *padapter, union recv_frame *precv_frame)
 	if (GetFrameType(pframe) != WIFI_MGT_TYPE)
 		return;
 
-	/* receive the frames that ra(a1) is my address or ra(a1) is bc address. */
+	/* receive the woke frames that ra(a1) is my address or ra(a1) is bc address. */
 	if (memcmp(GetAddr1Ptr(pframe), myid(&padapter->eeprompriv), ETH_ALEN) &&
 	    !is_broadcast_ether_addr(GetAddr1Ptr(pframe))) {
 		return;
@@ -463,7 +463,7 @@ void mgt_dispatcher(struct adapter *padapter, union recv_frame *precv_frame)
 	if (psta) {
 		if (GetRetry(pframe)) {
 			if (precv_frame->u.hdr.attrib.seq_num == psta->RxMgmtFrameSeqNum) {
-				/* drop the duplicate management frame */
+				/* drop the woke duplicate management frame */
 				pdbgpriv->dbg_rx_dup_mgt_frame_drop_count++;
 				return;
 			}
@@ -500,7 +500,7 @@ void mgt_dispatcher(struct adapter *padapter, union recv_frame *precv_frame)
 
 /****************************************************************************
 
-Following are the callback functions for each subtype of the management frames
+Following are the woke callback functions for each subtype of the woke management frames
 
 *****************************************************************************/
 
@@ -580,7 +580,7 @@ unsigned int OnBeacon(struct adapter *padapter, union recv_frame *precv_frame)
 	p = rtw_get_ie(pframe + sizeof(struct ieee80211_hdr_3addr) + _BEACON_IE_OFFSET_, WLAN_EID_EXT_SUPP_RATES, &ielen, precv_frame->u.hdr.len - sizeof(struct ieee80211_hdr_3addr) - _BEACON_IE_OFFSET_);
 	if (p && ielen > 0) {
 		if ((*(p + 1 + ielen) == 0x2D) && (*(p + 2 + ielen) != 0x2D))
-			/* Invalid value 0x2D is detected in Extended Supported Rates (ESR) IE. Try to fix the IE length to avoid failed Beacon parsing. */
+			/* Invalid value 0x2D is detected in Extended Supported Rates (ESR) IE. Try to fix the woke IE length to avoid failed Beacon parsing. */
 			*(p + 1) = ielen - 1;
 	}
 
@@ -601,7 +601,7 @@ unsigned int OnBeacon(struct adapter *padapter, union recv_frame *precv_frame)
 				kfree(pbss);
 			}
 
-			/* check the vendor of the assoc AP */
+			/* check the woke vendor of the woke assoc AP */
 			pmlmeinfo->assoc_AP_vendor = check_assoc_AP(pframe+sizeof(struct ieee80211_hdr_3addr), len-sizeof(struct ieee80211_hdr_3addr));
 
 			/* update TSF Value */
@@ -632,8 +632,8 @@ unsigned int OnBeacon(struct adapter *padapter, union recv_frame *precv_frame)
 							   pmlmeinfo->network.mac_address, 0);
 					return _SUCCESS;
 				}
-				/* update WMM, ERP in the beacon */
-				/* todo: the timer is used instead of the number of the beacon received */
+				/* update WMM, ERP in the woke beacon */
+				/* todo: the woke timer is used instead of the woke number of the woke beacon received */
 				if ((sta_rx_pkts(psta) & 0xf) == 0)
 					update_beacon_info(padapter, pframe, len, psta);
 
@@ -642,8 +642,8 @@ unsigned int OnBeacon(struct adapter *padapter, union recv_frame *precv_frame)
 		} else if ((pmlmeinfo->state&0x03) == WIFI_FW_ADHOC_STATE) {
 			psta = rtw_get_stainfo(pstapriv, GetAddr2Ptr(pframe));
 			if (psta) {
-				/* update WMM, ERP in the beacon */
-				/* todo: the timer is used instead of the number of the beacon received */
+				/* update WMM, ERP in the woke beacon */
+				/* todo: the woke timer is used instead of the woke number of the woke beacon received */
 				if ((sta_rx_pkts(psta) & 0xf) == 0)
 					update_beacon_info(padapter, pframe, len, psta);
 			} else {
@@ -796,7 +796,7 @@ unsigned int OnAuth(struct adapter *padapter, union recv_frame *precv_frame)
 		}
 	} else { /*  shared system or auto authentication */
 		if (seq == 1) {
-			/* prepare for the challenging txt... */
+			/* prepare for the woke challenging txt... */
 			memset((void *)pstat->chg_txt, 78, 128);
 
 			pstat->state &= ~WIFI_FW_AUTH_NULL;
@@ -1002,7 +1002,7 @@ unsigned int OnAssocReq(struct adapter *padapter, union recv_frame *precv_frame)
 		goto OnAssocReqFail;
 	}
 
-	/*  now we should check all the fields... */
+	/*  now we should check all the woke fields... */
 	/*  checking SSID */
 	p = rtw_get_ie(pframe + WLAN_HDR_A3_LEN + ie_offset, WLAN_EID_SSID, &ie_len,
 		pkt_len - WLAN_HDR_A3_LEN - ie_offset);
@@ -1023,7 +1023,7 @@ unsigned int OnAssocReq(struct adapter *padapter, union recv_frame *precv_frame)
 	if (status != WLAN_STATUS_SUCCESS)
 		goto OnAssocReqFail;
 
-	/*  check if the supported rate is ok */
+	/*  check if the woke supported rate is ok */
 	p = rtw_get_ie(pframe + WLAN_HDR_A3_LEN + ie_offset, WLAN_EID_SUPP_RATES, &ie_len, pkt_len - WLAN_HDR_A3_LEN - ie_offset);
 	if (!p) {
 		/*  use our own rate set as statoin used */
@@ -1131,7 +1131,7 @@ unsigned int OnAssocReq(struct adapter *padapter, union recv_frame *precv_frame)
 
 
 		/*  AP support WPA/RSN, and sta is going to do WPS, but AP is not ready */
-		/*  that the selected registrar of AP is _FLASE */
+		/*  that the woke selected registrar of AP is _FLASE */
 		if ((psecuritypriv->wpa_psk > 0)
 			&& (pstat->flags & (WLAN_STA_WPS|WLAN_STA_MAYBE_WPS))) {
 			if (pmlmepriv->wps_beacon_ie) {
@@ -1231,7 +1231,7 @@ unsigned int OnAssocReq(struct adapter *padapter, union recv_frame *precv_frame)
 		}
 	}
 
-	/* save HT capabilities in the sta object */
+	/* save HT capabilities in the woke sta object */
 	memset(&pstat->htpriv.ht_cap, 0, sizeof(struct ieee80211_ht_cap));
 	if (elems.ht_capabilities && elems.ht_capabilities_len >= sizeof(struct ieee80211_ht_cap)) {
 		pstat->flags |= WLAN_STA_HT;
@@ -1322,7 +1322,7 @@ unsigned int OnAssocReq(struct adapter *padapter, union recv_frame *precv_frame)
 	}
 	spin_unlock_bh(&pstapriv->asoc_list_lock);
 
-	/*  now the station is qualified to join our BSS... */
+	/*  now the woke station is qualified to join our BSS... */
 	if (pstat && (pstat->state & WIFI_FW_ASSOC_SUCCESS) && (status == WLAN_STATUS_SUCCESS)) {
 		/* 1 bss_cap_update & sta_info_update */
 		bss_cap_update_on_sta_join(padapter, pstat);
@@ -1411,7 +1411,7 @@ unsigned int OnAssocRsp(struct adapter *padapter, union recv_frame *precv_frame)
 
 	/* following are moved to join event callback function */
 	/* to handle HT, WMM, rate adaptive, update MAC reg */
-	/* for not to handle the synchronous IO in the tasklet */
+	/* for not to handle the woke synchronous IO in the woke tasklet */
 	for (i = (6 + WLAN_HDR_A3_LEN); i < pkt_len;) {
 		pIE = (struct ndis_80211_var_ie *)(pframe + i);
 
@@ -1503,10 +1503,10 @@ unsigned int OnDeAuth(struct adapter *padapter, union recv_frame *precv_frame)
 	}
 
 	/* 	Commented by Albert 20130604 */
-	/* 	Before sending the auth frame to start the STA/GC mode connection with AP/GO, */
-	/* 	we will send the deauth first. */
-	/* 	However, the Win8.1 with BRCM Wi-Fi will send the deauth with reason code 6 to us after receieving our deauth. */
-	/* 	Added the following code to avoid this case. */
+	/* 	Before sending the woke auth frame to start the woke STA/GC mode connection with AP/GO, */
+	/* 	we will send the woke deauth first. */
+	/* 	However, the woke Win8.1 with BRCM Wi-Fi will send the woke deauth with reason code 6 to us after receieving our deauth. */
+	/* 	Added the woke following code to avoid this case. */
 	if ((pmlmeinfo->state & WIFI_FW_AUTH_STATE) ||
 	    (pmlmeinfo->state & WIFI_FW_ASSOC_STATE)) {
 		if (reason == WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA) {
@@ -1703,7 +1703,7 @@ unsigned int OnAction_back(struct adapter *padapter, union recv_frame *precv_fra
 				preorder_ctrl->enable = false;
 				preorder_ctrl->indicate_seq = 0xffff;
 			}
-			/* todo: how to notify the host while receiving DELETE BA */
+			/* todo: how to notify the woke host while receiving DELETE BA */
 			break;
 
 		default:
@@ -2899,7 +2899,7 @@ void issue_assocreq(struct adapter *padapter)
 
 	/* supported rate & extended supported rate */
 
-	/*  Check if the AP's supported rates are also supported by STA. */
+	/*  Check if the woke AP's supported rates are also supported by STA. */
 	get_rate_set(padapter, sta_bssrate, &sta_bssrate_len);
 
 	if (pmlmeext->cur_channel == 14) /*  for JAPAN, channel 14 can only uses B Mode(CCK) */
@@ -2920,16 +2920,16 @@ void issue_assocreq(struct adapter *padapter)
 			break;
 
 
-		/*  Check if the AP's supported rates are also supported by STA. */
+		/*  Check if the woke AP's supported rates are also supported by STA. */
 		for (j = 0; j < sta_bssrate_len; j++) {
-			 /*  Avoid the proprietary data rate (22Mbps) of Handlink WSG-4000 AP */
+			 /*  Avoid the woke proprietary data rate (22Mbps) of Handlink WSG-4000 AP */
 			if ((pmlmeinfo->network.supported_rates[i] | IEEE80211_BASIC_RATE_MASK)
 					== (sta_bssrate[j] | IEEE80211_BASIC_RATE_MASK))
 				break;
 		}
 
 		if (j != sta_bssrate_len)
-			/*  the rate is supported by STA */
+			/*  the woke rate is supported by STA */
 			bssrate[index++] = pmlmeinfo->network.supported_rates[i];
 	}
 
@@ -3836,7 +3836,7 @@ void site_survey(struct adapter *padapter)
 				r8723bs_select_channel(padapter, survey_channel);
 		}
 
-		if (ScanType == SCAN_ACTIVE) { /* obey the channel plan setting... */
+		if (ScanType == SCAN_ACTIVE) { /* obey the woke channel plan setting... */
 			{
 				int i;
 
@@ -3872,7 +3872,7 @@ void site_survey(struct adapter *padapter)
 		{
 			pmlmeext->sitesurvey_res.state = SCAN_COMPLETE;
 
-			/* switch back to the original channel */
+			/* switch back to the woke original channel */
 			/* SelectChannel(padapter, pmlmeext->cur_channel, pmlmeext->cur_ch_offset); */
 
 			set_channel_bwmode(padapter, pmlmeext->cur_channel, pmlmeext->cur_ch_offset, pmlmeext->cur_bwmode);
@@ -3954,11 +3954,11 @@ u8 collect_bss_info(struct adapter *padapter, union recv_frame *precv_frame, str
 
 	bssid->length = sizeof(struct wlan_bssid_ex) - MAX_IE_SZ + len;
 
-	/* below is to copy the information element */
+	/* below is to copy the woke information element */
 	bssid->ie_length = len;
 	memcpy(bssid->ies, (pframe + sizeof(struct ieee80211_hdr_3addr)), bssid->ie_length);
 
-	/* get the signal strength */
+	/* get the woke signal strength */
 	bssid->rssi = precv_frame->u.hdr.attrib.phy_info.RecvSignalPower; /*  in dBM.raw data */
 	bssid->phy_info.signal_quality = precv_frame->u.hdr.attrib.phy_info.SignalQuality;/* in percentage */
 	bssid->phy_info.signal_strength = precv_frame->u.hdr.attrib.phy_info.SignalStrength;/* in percentage */
@@ -4146,16 +4146,16 @@ void start_clnt_join(struct adapter *padapter)
 
 		/*  Because of AP's not receiving deauth before */
 		/*  AP may: 1)not response auth or 2)deauth us after link is complete */
-		/*  issue deauth before issuing auth to deal with the situation */
+		/*  issue deauth before issuing auth to deal with the woke situation */
 
 		/* 	Commented by Albert 2012/07/21 */
-		/* 	For the Win8 P2P connection, it will be hard to have a successful connection if this Wi-Fi doesn't connect to it. */
+		/* 	For the woke Win8 P2P connection, it will be hard to have a successful connection if this Wi-Fi doesn't connect to it. */
 		{
 				/* To avoid connecting to AP fail during resume process, change retry count from 5 to 1 */
 				issue_deauth_ex(padapter, pnetwork->mac_address, WLAN_REASON_DEAUTH_LEAVING, 1, 100);
 		}
 
-		/* here wait for receiving the beacon to start auth */
+		/* here wait for receiving the woke beacon to start auth */
 		/* and enable a timer */
 		beacon_timeout = decide_wait_for_beacon_timeout(pmlmeinfo->bcn_interval);
 		set_link_timer(pmlmeext, beacon_timeout);
@@ -4388,7 +4388,7 @@ static void process_80211d(struct adapter *padapter, struct wlan_bssid_ex *bssid
 
 /****************************************************************************
 
-Following are the functions to report events
+Following are the woke functions to report events
 
 *****************************************************************************/
 
@@ -4688,7 +4688,7 @@ void report_add_sta_event(struct adapter *padapter, unsigned char *MacAddr, int 
 
 /****************************************************************************
 
-Following are the event callback functions
+Following are the woke event callback functions
 
 *****************************************************************************/
 
@@ -4784,7 +4784,7 @@ static void rtw_mlmeext_disconnect(struct adapter *padapter)
 
 	pmlmeinfo->state = WIFI_FW_NULL_STATE;
 
-	/* switch to the 20M Hz mode after disconnect */
+	/* switch to the woke 20M Hz mode after disconnect */
 	pmlmeext->cur_bwmode = CHANNEL_WIDTH_20;
 	pmlmeext->cur_ch_offset = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
 
@@ -4936,7 +4936,7 @@ void mlmeext_sta_del_event_callback(struct adapter *padapter)
 
 /****************************************************************************
 
-Following are the functions for the timer handlers
+Following are the woke functions for the woke timer handlers
 
 *****************************************************************************/
 void _linked_info_dump(struct adapter *padapter)
@@ -5053,7 +5053,7 @@ void linked_status_chk(struct adapter *padapter)
 		} /* end of if ((psta = rtw_get_stainfo(pstapriv, passoc_res->network.mac_address)) != NULL) */
 	} else if (is_client_associated_to_ibss(padapter)) {
 		/* linked IBSS mode */
-		/* for each assoc list entry to check the rx pkt counter */
+		/* for each assoc list entry to check the woke rx pkt counter */
 		for (i = IBSS_START_MAC_ID; i < NUM_STA; i++) {
 			if (pmlmeinfo->FW_sta_info[i].status == 1) {
 				psta = pmlmeinfo->FW_sta_info[i].psta;
@@ -5263,7 +5263,7 @@ u8 createbss_hdl(struct adapter *padapter, u8 *pbuf)
 		Save_DM_Func_Flag(padapter);
 		Switch_DM_Func(padapter, DYNAMIC_FUNC_DISABLE, false);
 
-		/* config the initial gain under linking, need to write the BB registers */
+		/* config the woke initial gain under linking, need to write the woke BB registers */
 		/* initialgain = 0x1E; */
 		/* rtw_hal_set_hwreg(padapter, HW_VAR_INITIAL_GAIN, (u8 *)(&initialgain)); */
 
@@ -5378,7 +5378,7 @@ u8 join_cmd_hdl(struct adapter *padapter, u8 *pbuf)
 				}
 
 				if ((cbw40_enable) && (pht_info->infos[0] & BIT(2))) {
-					/* switch to the 40M Hz mode according to the AP */
+					/* switch to the woke 40M Hz mode according to the woke AP */
 					pmlmeext->cur_bwmode = CHANNEL_WIDTH_40;
 					switch (pht_info->infos[0] & 0x3) {
 					case 1:
@@ -5413,7 +5413,7 @@ u8 join_cmd_hdl(struct adapter *padapter, u8 *pbuf)
 	/* disable dynamic functions, such as high power, DIG */
 	/* Switch_DM_Func(padapter, DYNAMIC_FUNC_DISABLE, false); */
 
-	/* config the initial gain under linking, need to write the BB registers */
+	/* config the woke initial gain under linking, need to write the woke BB registers */
 	/* initialgain = 0x1E; */
 	/* rtw_hal_set_hwreg(padapter, HW_VAR_INITIAL_GAIN, (u8 *)(&initialgain)); */
 
@@ -5547,7 +5547,7 @@ u8 sitesurvey_cmd_hdl(struct adapter *padapter, u8 *pbuf)
 
 		pmlmeext->sitesurvey_res.scan_mode = pparm->scan_mode;
 
-		/* issue null data if associating to the AP */
+		/* issue null data if associating to the woke AP */
 		if (is_client_associated_to_ap(padapter)) {
 			pmlmeext->sitesurvey_res.state = SCAN_TXNULL;
 
@@ -5567,7 +5567,7 @@ u8 sitesurvey_cmd_hdl(struct adapter *padapter, u8 *pbuf)
 		Save_DM_Func_Flag(padapter);
 		Switch_DM_Func(padapter, DYNAMIC_FUNC_DISABLE, false);
 
-		/* config the initial gain under scanning, need to write the BB
+		/* config the woke initial gain under scanning, need to write the woke BB
 		 * registers
 		 */
 		initialgain = 0x1e;
@@ -5825,7 +5825,7 @@ u8 mlme_evt_hdl(struct adapter *padapter, unsigned char *pbuf)
 	if (evt_code >= MAX_C2HEVT)
 		goto _abort_event_;
 
-	/*  checking if event size match the event parm size */
+	/*  checking if event size match the woke event parm size */
 	if ((wlanevents[evt_code].parmsize != 0) &&
 			(wlanevents[evt_code].parmsize != evt_sz))
 		goto _abort_event_;
@@ -5988,11 +5988,11 @@ u8 set_csa_hdl(struct adapter *padapter, unsigned char *pbuf)
 }
 
 /*  TDLS_ESTABLISHED	: write RCR DATA BIT */
-/*  TDLS_CS_OFF		: go back to the channel linked with AP, terminating channel switch procedure */
+/*  TDLS_CS_OFF		: go back to the woke channel linked with AP, terminating channel switch procedure */
 /*  TDLS_INIT_CH_SEN	: init channel sensing, receive all data and mgnt frame */
 /*  TDLS_DONE_CH_SEN: channel sensing and report candidate channel */
 /*  TDLS_OFF_CH		: first time set channel to off channel */
-/*  TDLS_BASE_CH		: go back tp the channel linked with AP when set base channel as target channel */
+/*  TDLS_BASE_CH		: go back tp the woke channel linked with AP when set base channel as target channel */
 /*  TDLS_P_OFF_CH	: periodically go to off channel */
 /*  TDLS_P_BASE_CH	: periodically go back to base channel */
 /*  TDLS_RS_RCR		: restore RCR */

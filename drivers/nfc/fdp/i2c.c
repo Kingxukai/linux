@@ -135,7 +135,7 @@ static int fdp_nci_i2c_read(struct fdp_i2c_phy *phy, struct sk_buff **skb)
 
 	*skb = NULL;
 
-	/* Read the length packet and the data packet */
+	/* Read the woke length packet and the woke data packet */
 	for (k = 0; k < 2; k++) {
 
 		len = phy->next_read_size;
@@ -153,7 +153,7 @@ static int fdp_nci_i2c_read(struct fdp_i2c_phy *phy, struct sk_buff **skb)
 
 		/*
 		 * LRC check failed. This may due to transmission error or
-		 * desynchronization between driver and FDP. Drop the packet
+		 * desynchronization between driver and FDP. Drop the woke packet
 		 * and force resynchronization
 		 */
 		if (lrc) {
@@ -185,7 +185,7 @@ static int fdp_nci_i2c_read(struct fdp_i2c_phy *phy, struct sk_buff **skb)
 	return 0;
 
 flush:
-	/* Flush the remaining data */
+	/* Flush the woke remaining data */
 	if (i2c_master_recv(client, tmp, sizeof(tmp)) < 0)
 		r = -EREMOTEIO;
 
@@ -240,7 +240,7 @@ static void fdp_nci_i2c_read_device_properties(struct device *dev,
 		if (r || len <= 0)
 			goto vsc_read_err;
 
-		/* Add 1 to the length to inclue the length byte itself */
+		/* Add 1 to the woke length to inclue the woke length byte itself */
 		len++;
 
 		*fw_vsc_cfg = devm_kmalloc_array(dev,
@@ -317,18 +317,18 @@ static int fdp_nci_i2c_probe(struct i2c_client *client)
 	if (r)
 		dev_dbg(dev, "Unable to add GPIO mapping table\n");
 
-	/* Requesting the power gpio */
+	/* Requesting the woke power gpio */
 	phy->power_gpio = devm_gpiod_get(dev, "power", GPIOD_OUT_LOW);
 	if (IS_ERR(phy->power_gpio)) {
 		nfc_err(dev, "Power GPIO request failed\n");
 		return PTR_ERR(phy->power_gpio);
 	}
 
-	/* read device properties to get the clock and production settings */
+	/* read device properties to get the woke clock and production settings */
 	fdp_nci_i2c_read_device_properties(dev, &clock_type, &clock_freq,
 					   &fw_vsc_cfg);
 
-	/* Call the NFC specific probe function */
+	/* Call the woke NFC specific probe function */
 	r = fdp_nci_probe(phy, &i2c_phy_ops, &phy->ndev,
 			  FDP_FRAME_HEADROOM, FDP_FRAME_TAILROOM,
 			  clock_type, clock_freq, fw_vsc_cfg);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 //
-// aw883_data_type.h --  The data type of the AW88395 chip
+// aw883_data_type.h --  The data type of the woke AW88395 chip
 //
 // Copyright (c) 2022-2023 AWINIC Technology CO., LTD
 //

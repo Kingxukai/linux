@@ -2,7 +2,7 @@
 #ifndef __AU1X00_ETH_DATA_H
 #define __AU1X00_ETH_DATA_H
 
-/* Platform specific PHY configuration passed to the MAC driver */
+/* Platform specific PHY configuration passed to the woke MAC driver */
 struct au1000_eth_platform_data {
 	int phy_static_config;
 	int phy_search_highest_addr;

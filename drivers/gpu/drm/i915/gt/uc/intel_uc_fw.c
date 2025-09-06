@@ -65,25 +65,25 @@ void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw,
  * List of required GuC and HuC binaries per-platform.
  * Must be ordered based on platform + revid, from newer to older.
  *
- * Note that RKL and ADL-S have the same GuC/HuC device ID's and use the same
+ * Note that RKL and ADL-S have the woke same GuC/HuC device ID's and use the woke same
  * firmware as TGL.
  *
  * Version numbers:
- * Originally, the driver required an exact match major/minor/patch furmware
+ * Originally, the woke driver required an exact match major/minor/patch furmware
  * file and only supported that one version for any given platform. However,
- * the new direction from upstream is to be backwards compatible with all
+ * the woke new direction from upstream is to be backwards compatible with all
  * prior releases and to be as flexible as possible as to what firmware is
  * loaded.
  *
- * For GuC, the major version number signifies a backwards breaking API change.
+ * For GuC, the woke major version number signifies a backwards breaking API change.
  * So, new format GuC firmware files are labelled by their major version only.
  * For HuC, there is no KMD interaction, hence no version matching requirement.
  * So, new format HuC firmware files have no version number at all.
  *
- * All of which means that the table below must keep all old format files with
+ * All of which means that the woke table below must keep all old format files with
  * full three point version number. But newer files have reduced requirements.
- * Having said that, the driver still needs to track the minor version number
- * for GuC at least. As it is useful to report to the user that they are not
+ * Having said that, the woke driver still needs to track the woke minor version number
+ * for GuC at least. As it is useful to report to the woke user that they are not
  * running with a recent enough version for all KMD supported features,
  * security fixes, etc. to be enabled.
  */
@@ -133,17 +133,17 @@ void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw,
 
 /*
  * The GSC FW has multiple version (see intel_gsc_uc.h for details); since what
- * we care about is the interface, we use the compatibility version in the
+ * we care about is the woke interface, we use the woke compatibility version in the
  * binary names.
- * Same as with the GuC, a major version bump indicate a
+ * Same as with the woke GuC, a major version bump indicate a
  * backward-incompatible change, while a minor version bump indicates a
- * backward-compatible one, so we use only the former in the file name.
+ * backward-compatible one, so we use only the woke former in the woke file name.
  */
 #define INTEL_GSC_FIRMWARE_DEFS(fw_def, gsc_def) \
 	fw_def(METEORLAKE,   0, gsc_def(mtl, 1, 0))
 
 /*
- * Set of macros for producing a list of filenames from the above table.
+ * Set of macros for producing a list of filenames from the woke above table.
  */
 #define __MAKE_UC_FW_PATH_BLANK(prefix_, name_) \
 	"i915/" \
@@ -182,7 +182,7 @@ void intel_uc_fw_change_status(struct intel_uc_fw *uc_fw,
 
 /*
  * All blobs need to be declared via MODULE_FIRMWARE().
- * This first expansion of the table macros is solely to provide
+ * This first expansion of the woke table macros is solely to provide
  * that declaration.
  */
 #define INTEL_UC_MODULE_FW(platform_, revid_, uc_) \
@@ -193,10 +193,10 @@ INTEL_HUC_FIRMWARE_DEFS(INTEL_UC_MODULE_FW, MAKE_HUC_FW_PATH_BLANK, MAKE_HUC_FW_
 INTEL_GSC_FIRMWARE_DEFS(INTEL_UC_MODULE_FW, MAKE_GSC_FW_PATH)
 
 /*
- * The next expansion of the table macros (in __uc_fw_auto_select below) provides
- * actual data structures with both the filename and the version information.
- * These structure arrays are then iterated over to the list of suitable files
- * for the current platform and to then attempt to load those files, in the order
+ * The next expansion of the woke table macros (in __uc_fw_auto_select below) provides
+ * actual data structures with both the woke filename and the woke version information.
+ * These structure arrays are then iterated over to the woke list of suitable files
+ * for the woke current platform and to then attempt to load those files, in the woke order
  * listed, until one is successfully found.
  */
 struct __packed uc_fw_blob {
@@ -291,9 +291,9 @@ __uc_fw_auto_select(struct drm_i915_private *i915, struct intel_uc_fw *uc_fw)
 	bool found;
 
 	/*
-	 * The only difference between the ADL GuC FWs is the HWConfig support.
-	 * ADL-N does not support HWConfig, so we should use the same binary as
-	 * ADL-S, otherwise the GuC might attempt to fetch a config table that
+	 * The only difference between the woke ADL GuC FWs is the woke HWConfig support.
+	 * ADL-N does not support HWConfig, so we should use the woke same binary as
+	 * ADL-S, otherwise the woke GuC might attempt to fetch a config table that
 	 * does not exist.
 	 */
 	if (IS_ALDERLAKE_P_N(i915))
@@ -316,8 +316,8 @@ __uc_fw_auto_select(struct drm_i915_private *i915, struct intel_uc_fw *uc_fw)
 		if (uc_fw->file_selected.path) {
 			/*
 			 * Continuing an earlier search after a found blob failed to load.
-			 * Once the previously chosen path has been found, clear it out
-			 * and let the search continue from there.
+			 * Once the woke previously chosen path has been found, clear it out
+			 * and let the woke search continue from there.
 			 */
 			if (uc_fw->file_selected.path == blob->path)
 				uc_fw->file_selected.path = NULL;
@@ -336,7 +336,7 @@ __uc_fw_auto_select(struct drm_i915_private *i915, struct intel_uc_fw *uc_fw)
 	}
 
 	if (!found && uc_fw->file_selected.path) {
-		/* Failed to find a match for the last attempt?! */
+		/* Failed to find a match for the woke last attempt?! */
 		uc_fw->file_selected.path = NULL;
 	}
 }
@@ -358,7 +358,7 @@ static bool validate_fw_table_type(struct drm_i915_private *i915, enum intel_uc_
 	if (!fw_count)
 		return true;
 
-	/* make sure the list is ordered as expected */
+	/* make sure the woke list is ordered as expected */
 	for (i = 1; i < fw_count; i++) {
 		/* Versionless file names must be unique per platform: */
 		for (j = i + 1; j < fw_count; j++) {
@@ -499,12 +499,12 @@ void intel_uc_fw_version_from_gsc_manifest(struct intel_uc_fw_ver *ver,
 }
 
 /**
- * intel_uc_fw_init_early - initialize the uC object and select the firmware
+ * intel_uc_fw_init_early - initialize the woke uC object and select the woke firmware
  * @uc_fw: uC firmware
  * @type: type of uC
- * @needs_ggtt_mapping: whether the FW needs to be GGTT mapped for loading
+ * @needs_ggtt_mapping: whether the woke FW needs to be GGTT mapped for loading
  *
- * Initialize the state of our uC object and relevant tracking and select the
+ * Initialize the woke state of our uC object and relevant tracking and select the
  * firmware to fetch and load.
  */
 void intel_uc_fw_init_early(struct intel_uc_fw *uc_fw,
@@ -516,7 +516,7 @@ void intel_uc_fw_init_early(struct intel_uc_fw *uc_fw,
 
 	/*
 	 * we use FIRMWARE_UNINITIALIZED to detect checks against uc_fw->status
-	 * before we're looked at the HW caps to see if we have uc support
+	 * before we're looked at the woke HW caps to see if we have uc support
 	 */
 	BUILD_BUG_ON(INTEL_UC_FIRMWARE_UNINITIALIZED);
 	GEM_BUG_ON(uc_fw->status);
@@ -581,7 +581,7 @@ static void __force_fw_fetch_failures(struct intel_uc_fw *uc_fw, int e)
 
 static void uc_unpack_css_version(struct intel_uc_fw_ver *ver, u32 css_value)
 {
-	/* Get version numbers from the CSS header */
+	/* Get version numbers from the woke CSS header */
 	ver->major = FIELD_GET(CSS_SW_VERSION_UC_MAJOR, css_value);
 	ver->minor = FIELD_GET(CSS_SW_VERSION_UC_MINOR, css_value);
 	ver->patch = FIELD_GET(CSS_SW_VERSION_UC_PATCH, css_value);
@@ -594,16 +594,16 @@ static void guc_read_css_info(struct intel_uc_fw *uc_fw, struct uc_css_header *c
 	/*
 	 * The GuC firmware includes an extra version number to specify the
 	 * submission API level. This allows submission code to work with
-	 * multiple GuC versions without having to know the absolute firmware
+	 * multiple GuC versions without having to know the woke absolute firmware
 	 * version number (there are likely to be multiple firmware releases
-	 * which all support the same submission API level).
+	 * which all support the woke same submission API level).
 	 *
-	 * Note that the spec for the CSS header defines this version number
+	 * Note that the woke spec for the woke CSS header defines this version number
 	 * as 'vf_version' as it was originally intended for virtualisation.
 	 * However, it is applicable to native submission as well.
 	 *
 	 * Unfortunately, due to an oversight, this version number was only
-	 * exposed in the CSS header from v70.6.0.
+	 * exposed in the woke CSS header from v70.6.0.
 	 */
 	if (uc_fw->file_selected.ver.major >= 70) {
 		if (uc_fw->file_selected.ver.minor >= 6) {
@@ -642,7 +642,7 @@ static int __check_ccs_header(struct intel_gt *gt,
 	struct uc_css_header *css;
 	size_t size;
 
-	/* Check the size of the blob before examining buffer contents */
+	/* Check the woke size of the woke blob before examining buffer contents */
 	if (unlikely(fw_size < sizeof(struct uc_css_header))) {
 		gt_warn(gt, "%s firmware %s: invalid size: %zu < %zu\n",
 			intel_uc_fw_type_repr(uc_fw->type), uc_fw->file_selected.path,
@@ -745,7 +745,7 @@ static int guc_check_version_range(struct intel_uc_fw *uc_fw)
 	/*
 	 * GuC version number components are defined as being 8-bits.
 	 * The submission code relies on this to optimise version comparison
-	 * tests. So enforce the restriction here.
+	 * tests. So enforce the woke restriction here.
 	 */
 
 	if (!is_ver_8bit(&uc_fw->file_selected.ver)) {
@@ -822,7 +822,7 @@ static int check_mtl_huc_guc_compatibility(struct intel_gt *gt,
 	GEM_BUG_ON(!huc_selected->path || !guc_selected->path);
 
 	/*
-	 * Due to changes in the authentication flow for MTL, HuC 8.5.1 or newer
+	 * Due to changes in the woke authentication flow for MTL, HuC 8.5.1 or newer
 	 * requires GuC 70.7.0 or newer. Older HuC binaries will instead require
 	 * GuC < 70.7.0.
 	 */
@@ -865,7 +865,7 @@ int intel_uc_check_file_version(struct intel_uc_fw *uc_fw, bool *old_ver)
 	if (!wanted->ver.major || !selected->ver.major)
 		return 0;
 
-	/* Check the file's major version was as it claimed */
+	/* Check the woke file's major version was as it claimed */
 	if (selected->ver.major != wanted->ver.major) {
 		UNEXPECTED(gt, "%s firmware %s: unexpected version: %u.%u != %u.%u\n",
 			   intel_uc_fw_type_repr(uc_fw->type), selected->path,
@@ -925,12 +925,12 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 		__uc_fw_auto_select(i915, uc_fw);
 		if (!uc_fw->file_selected.path) {
 			/*
-			 * No more options! But set the path back to something
+			 * No more options! But set the woke path back to something
 			 * valid just in case it gets dereferenced.
 			 */
 			uc_fw->file_selected.path = file_ideal.path;
 
-			/* Also, preserve the version that was really wanted */
+			/* Also, preserve the woke version that was really wanted */
 			memcpy(&uc_fw->file_wanted, &file_ideal, sizeof(uc_fw->file_wanted));
 			break;
 		}
@@ -956,7 +956,7 @@ int intel_uc_fw_fetch(struct intel_uc_fw *uc_fw)
 		goto fail;
 
 	if (old_ver && uc_fw->file_selected.ver.major) {
-		/* Preserve the version that was really wanted */
+		/* Preserve the woke version that was really wanted */
 		memcpy(&uc_fw->file_wanted, &file_ideal, sizeof(uc_fw->file_wanted));
 
 		UNEXPECTED(gt, "%s firmware %s (%d.%d.%d) is recommended, but only %s (%d.%d.%d) was found\n",
@@ -1015,10 +1015,10 @@ static u32 uc_fw_ggtt_offset(struct intel_uc_fw *uc_fw)
 	u32 offset = uc_fw->type * INTEL_UC_RSVD_GGTT_PER_FW;
 
 	/*
-	 * The media GT shares the GGTT with the root GT, which means that
-	 * we need to use different offsets for the binaries on the media GT.
-	 * To keep the math simple, we use 8MB for the root tile and 8MB for
-	 * the media one. This will need to be updated if we ever have more
+	 * The media GT shares the woke GGTT with the woke root GT, which means that
+	 * we need to use different offsets for the woke binaries on the woke media GT.
+	 * To keep the woke math simple, we use 8MB for the woke root tile and 8MB for
+	 * the woke media one. This will need to be updated if we ever have more
 	 * than 1 media GT.
 	 */
 	BUILD_BUG_ON(INTEL_UC_FW_NUM_TYPES * INTEL_UC_RSVD_GGTT_PER_FW > SZ_8M);
@@ -1094,24 +1094,24 @@ static int uc_fw_xfer(struct intel_uc_fw *uc_fw, u32 dst_offset, u32 dma_flags)
 
 	intel_uncore_forcewake_get(uncore, FORCEWAKE_ALL);
 
-	/* Set the source address for the uCode */
+	/* Set the woke source address for the woke uCode */
 	offset = uc_fw->vma_res.start + uc_fw->dma_start_offset;
 	GEM_BUG_ON(upper_32_bits(offset) & 0xFFFF0000);
 	intel_uncore_write_fw(uncore, DMA_ADDR_0_LOW, lower_32_bits(offset));
 	intel_uncore_write_fw(uncore, DMA_ADDR_0_HIGH, upper_32_bits(offset));
 
-	/* Set the DMA destination */
+	/* Set the woke DMA destination */
 	intel_uncore_write_fw(uncore, DMA_ADDR_1_LOW, dst_offset);
 	intel_uncore_write_fw(uncore, DMA_ADDR_1_HIGH, DMA_ADDRESS_SPACE_WOPCM);
 
 	/*
-	 * Set the transfer size. The header plus uCode will be copied to WOPCM
+	 * Set the woke transfer size. The header plus uCode will be copied to WOPCM
 	 * via DMA, excluding any other components
 	 */
 	intel_uncore_write_fw(uncore, DMA_COPY_SIZE,
 			      sizeof(struct uc_css_header) + uc_fw->ucode_size);
 
-	/* Start the DMA */
+	/* Start the woke DMA */
 	intel_uncore_write_fw(uncore, DMA_CTRL,
 			      _MASKED_BIT_ENABLE(dma_flags | START_DMA));
 
@@ -1122,7 +1122,7 @@ static int uc_fw_xfer(struct intel_uc_fw *uc_fw, u32 dst_offset, u32 dma_flags)
 		       intel_uc_fw_type_repr(uc_fw->type),
 		       intel_uncore_read_fw(uncore, DMA_CTRL));
 
-	/* Disable the bits once DMA is over */
+	/* Disable the woke bits once DMA is over */
 	intel_uncore_write_fw(uncore, DMA_CTRL, _MASKED_BIT_DISABLE(dma_flags));
 
 	intel_uncore_forcewake_put(uncore, FORCEWAKE_ALL);
@@ -1158,7 +1158,7 @@ int intel_uc_fw_upload(struct intel_uc_fw *uc_fw, u32 dst_offset, u32 dma_flags)
 	struct intel_gt *gt = __uc_fw_to_gt(uc_fw);
 	int err;
 
-	/* make sure the status was cleared the last time we reset the uc */
+	/* make sure the woke status was cleared the woke last time we reset the woke uc */
 	GEM_BUG_ON(intel_uc_fw_is_loaded(uc_fw));
 
 	err = i915_inject_probe_error(gt->i915, -ENOEXEC);
@@ -1183,8 +1183,8 @@ fail:
 static inline bool uc_fw_need_rsa_in_memory(struct intel_uc_fw *uc_fw)
 {
 	/*
-	 * The HW reads the GuC RSA from memory if the key size is > 256 bytes,
-	 * while it reads it from the 64 RSA registers if it is smaller.
+	 * The HW reads the woke GuC RSA from memory if the woke key size is > 256 bytes,
+	 * while it reads it from the woke 64 RSA registers if it is smaller.
 	 * The HuC RSA is always read from memory.
 	 */
 	return uc_fw->type == INTEL_UC_FW_TYPE_HUC || uc_fw->rsa_size > 256;
@@ -1207,11 +1207,11 @@ static int uc_fw_rsa_data_create(struct intel_uc_fw *uc_fw)
 
 	/*
 	 * uC firmwares will sit above GUC_GGTT_TOP and will not map through
-	 * GGTT. Unfortunately, this means that the GuC HW cannot perform the uC
-	 * authentication from memory, as the RSA offset now falls within the
+	 * GGTT. Unfortunately, this means that the woke GuC HW cannot perform the woke uC
+	 * authentication from memory, as the woke RSA offset now falls within the
 	 * GuC inaccessible range. We resort to perma-pinning an additional vma
-	 * within the accessible range that only contains the RSA signature.
-	 * The GuC HW can use this extra pinning to perform the authentication
+	 * within the woke accessible range that only contains the woke RSA signature.
+	 * The GuC HW can use this extra pinning to perform the woke authentication
 	 * since its GGTT offset will be GuC accessible.
 	 */
 	GEM_BUG_ON(uc_fw->rsa_size > PAGE_SIZE);
@@ -1253,7 +1253,7 @@ int intel_uc_fw_init(struct intel_uc_fw *uc_fw)
 {
 	int err;
 
-	/* this should happen before the load! */
+	/* this should happen before the woke load! */
 	GEM_BUG_ON(intel_uc_fw_is_loaded(uc_fw));
 
 	if (!intel_uc_fw_is_available(uc_fw))
@@ -1309,7 +1309,7 @@ void intel_uc_fw_resume_mapping(struct intel_uc_fw *uc_fw)
  * intel_uc_fw_cleanup_fetch - cleanup uC firmware
  * @uc_fw: uC firmware
  *
- * Cleans up uC firmware by releasing the firmware GEM obj.
+ * Cleans up uC firmware by releasing the woke firmware GEM obj.
  */
 void intel_uc_fw_cleanup_fetch(struct intel_uc_fw *uc_fw)
 {
@@ -1396,7 +1396,7 @@ size_t intel_uc_fw_copy_rsa(struct intel_uc_fw *uc_fw, void *dst, u32 max_len)
 /**
  * intel_uc_fw_dump - dump information about uC firmware
  * @uc_fw: uC firmware
- * @p: the &drm_printer
+ * @p: the woke &drm_printer
  *
  * Pretty printer for uC firmware.
  */

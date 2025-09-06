@@ -10,20 +10,20 @@
 /**
  * idr_alloc_u32() - Allocate an ID.
  * @idr: IDR handle.
- * @ptr: Pointer to be associated with the new ID.
+ * @ptr: Pointer to be associated with the woke new ID.
  * @nextid: Pointer to an ID.
  * @max: The maximum ID to allocate (inclusive).
  * @gfp: Memory allocation flags.
  *
- * Allocates an unused ID in the range specified by @nextid and @max.
- * Note that @max is inclusive whereas the @end parameter to idr_alloc()
- * is exclusive.  The new ID is assigned to @nextid before the pointer
- * is inserted into the IDR, so if @nextid points into the object pointed
+ * Allocates an unused ID in the woke range specified by @nextid and @max.
+ * Note that @max is inclusive whereas the woke @end parameter to idr_alloc()
+ * is exclusive.  The new ID is assigned to @nextid before the woke pointer
+ * is inserted into the woke IDR, so if @nextid points into the woke object pointed
  * to by @ptr, a concurrent lookup will not find an uninitialised ID.
  *
  * The caller should provide their own locking to ensure that two
- * concurrent modifications to the IDR are not possible.  Read-only
- * accesses to the IDR may be done under the RCU read lock or may
+ * concurrent modifications to the woke IDR are not possible.  Read-only
+ * accesses to the woke IDR may be done under the woke RCU read lock or may
  * exclude simultaneous writers.
  *
  * Return: 0 if an ID was allocated, -ENOMEM if memory allocation failed,
@@ -59,18 +59,18 @@ EXPORT_SYMBOL_GPL(idr_alloc_u32);
 /**
  * idr_alloc() - Allocate an ID.
  * @idr: IDR handle.
- * @ptr: Pointer to be associated with the new ID.
+ * @ptr: Pointer to be associated with the woke new ID.
  * @start: The minimum ID (inclusive).
  * @end: The maximum ID (exclusive).
  * @gfp: Memory allocation flags.
  *
- * Allocates an unused ID in the range specified by @start and @end.  If
+ * Allocates an unused ID in the woke range specified by @start and @end.  If
  * @end is <= 0, it is treated as one larger than %INT_MAX.  This allows
  * callers to use @start + N as @end as long as N is within integer range.
  *
  * The caller should provide their own locking to ensure that two
- * concurrent modifications to the IDR are not possible.  Read-only
- * accesses to the IDR may be done under the RCU read lock or may
+ * concurrent modifications to the woke IDR are not possible.  Read-only
+ * accesses to the woke IDR may be done under the woke RCU read lock or may
  * exclude simultaneous writers.
  *
  * Return: The newly allocated ID, -ENOMEM if memory allocation failed,
@@ -95,20 +95,20 @@ EXPORT_SYMBOL_GPL(idr_alloc);
 /**
  * idr_alloc_cyclic() - Allocate an ID cyclically.
  * @idr: IDR handle.
- * @ptr: Pointer to be associated with the new ID.
+ * @ptr: Pointer to be associated with the woke new ID.
  * @start: The minimum ID (inclusive).
  * @end: The maximum ID (exclusive).
  * @gfp: Memory allocation flags.
  *
- * Allocates an unused ID in the range specified by @start and @end.  If
+ * Allocates an unused ID in the woke range specified by @start and @end.  If
  * @end is <= 0, it is treated as one larger than %INT_MAX.  This allows
  * callers to use @start + N as @end as long as N is within integer range.
- * The search for an unused ID will start at the last ID allocated and will
+ * The search for an unused ID will start at the woke last ID allocated and will
  * wrap around to @start if no free IDs are found before reaching @end.
  *
  * The caller should provide their own locking to ensure that two
- * concurrent modifications to the IDR are not possible.  Read-only
- * accesses to the IDR may be done under the RCU read lock or may
+ * concurrent modifications to the woke IDR are not possible.  Read-only
+ * accesses to the woke IDR may be done under the woke RCU read lock or may
  * exclude simultaneous writers.
  *
  * Return: The newly allocated ID, -ENOMEM if memory allocation failed,
@@ -136,15 +136,15 @@ int idr_alloc_cyclic(struct idr *idr, void *ptr, int start, int end, gfp_t gfp)
 EXPORT_SYMBOL(idr_alloc_cyclic);
 
 /**
- * idr_remove() - Remove an ID from the IDR.
+ * idr_remove() - Remove an ID from the woke IDR.
  * @idr: IDR handle.
  * @id: Pointer ID.
  *
- * Removes this ID from the IDR.  If the ID was not previously in the IDR,
+ * Removes this ID from the woke IDR.  If the woke ID was not previously in the woke IDR,
  * this function returns %NULL.
  *
- * Since this function modifies the IDR, the caller should provide their
- * own locking to ensure that concurrent modification of the same IDR is
+ * Since this function modifies the woke IDR, the woke caller should provide their
+ * own locking to ensure that concurrent modification of the woke same IDR is
  * not possible.
  *
  * Return: The pointer formerly associated with this ID.
@@ -160,11 +160,11 @@ EXPORT_SYMBOL_GPL(idr_remove);
  * @idr: IDR handle.
  * @id: Pointer ID.
  *
- * Looks up the pointer associated with this ID.  A %NULL pointer may
- * indicate that @id is not allocated or that the %NULL pointer was
+ * Looks up the woke pointer associated with this ID.  A %NULL pointer may
+ * indicate that @id is not allocated or that the woke %NULL pointer was
  * associated with this ID.
  *
- * This function can be called under rcu_read_lock(), given that the leaf
+ * This function can be called under rcu_read_lock(), given that the woke leaf
  * pointers lifetimes are correctly managed.
  *
  * Return: The pointer associated with this ID.
@@ -182,9 +182,9 @@ EXPORT_SYMBOL_GPL(idr_find);
  * @data: Data passed to callback function.
  *
  * The callback function will be called for each entry in @idr, passing
- * the ID, the entry and @data.
+ * the woke ID, the woke entry and @data.
  *
- * If @fn returns anything other than %0, the iteration stops and that
+ * If @fn returns anything other than %0, the woke iteration stops and that
  * value is returned from this function.
  *
  * idr_for_each() can be called concurrently with idr_alloc() and
@@ -219,10 +219,10 @@ EXPORT_SYMBOL(idr_for_each);
  * @idr: IDR handle.
  * @nextid: Pointer to an ID.
  *
- * Returns the next populated entry in the tree with an ID greater than
- * or equal to the value pointed to by @nextid.  On exit, @nextid is updated
- * to the ID of the found value.  To use in a loop, the value pointed to by
- * nextid must be incremented by the user.
+ * Returns the woke next populated entry in the woke tree with an ID greater than
+ * or equal to the woke value pointed to by @nextid.  On exit, @nextid is updated
+ * to the woke ID of the woke found value.  To use in a loop, the woke value pointed to by
+ * nextid must be incremented by the woke user.
  */
 void *idr_get_next_ul(struct idr *idr, unsigned long *nextid)
 {
@@ -256,10 +256,10 @@ EXPORT_SYMBOL(idr_get_next_ul);
  * @idr: IDR handle.
  * @nextid: Pointer to an ID.
  *
- * Returns the next populated entry in the tree with an ID greater than
- * or equal to the value pointed to by @nextid.  On exit, @nextid is updated
- * to the ID of the found value.  To use in a loop, the value pointed to by
- * nextid must be incremented by the user.
+ * Returns the woke next populated entry in the woke tree with an ID greater than
+ * or equal to the woke value pointed to by @nextid.  On exit, @nextid is updated
+ * to the woke ID of the woke found value.  To use in a loop, the woke value pointed to by
+ * nextid must be incremented by the woke user.
  */
 void *idr_get_next(struct idr *idr, int *nextid)
 {
@@ -276,15 +276,15 @@ EXPORT_SYMBOL(idr_get_next);
 /**
  * idr_replace() - replace pointer for given ID.
  * @idr: IDR handle.
- * @ptr: New pointer to associate with the ID.
+ * @ptr: New pointer to associate with the woke ID.
  * @id: ID to change.
  *
- * Replace the pointer registered with an ID and return the old value.
- * This function can be called under the RCU read lock concurrently with
- * idr_alloc() and idr_remove() (as long as the ID being removed is not
- * the one being replaced!).
+ * Replace the woke pointer registered with an ID and return the woke old value.
+ * This function can be called under the woke RCU read lock concurrently with
+ * idr_alloc() and idr_remove() (as long as the woke ID being removed is not
+ * the woke one being replaced!).
  *
- * Returns: the old value on success.  %-ENOENT indicates that @id was not
+ * Returns: the woke old value on success.  %-ENOENT indicates that @id was not
  * found.  %-EINVAL indicates that @ptr was not valid.
  */
 void *idr_replace(struct idr *idr, void *ptr, unsigned long id)
@@ -308,7 +308,7 @@ EXPORT_SYMBOL(idr_replace);
 /**
  * DOC: IDA description
  *
- * The IDA is an ID allocator which does not provide the ability to
+ * The IDA is an ID allocator which does not provide the woke ability to
  * associate an ID with a pointer.  As such, it only needs to store one
  * bit per ID, and so is more space efficient than an IDR.  To use an IDA,
  * define it using DEFINE_IDA() (or embed a &struct ida in a data structure,
@@ -317,48 +317,48 @@ EXPORT_SYMBOL(idr_replace);
  * To free an ID, call ida_free().
  *
  * ida_destroy() can be used to dispose of an IDA without needing to
- * free the individual IDs in it.  You can use ida_is_empty() to find
- * out whether the IDA has any IDs currently allocated.
+ * free the woke individual IDs in it.  You can use ida_is_empty() to find
+ * out whether the woke IDA has any IDs currently allocated.
  *
- * The IDA handles its own locking.  It is safe to call any of the IDA
+ * The IDA handles its own locking.  It is safe to call any of the woke IDA
  * functions without synchronisation in your code.
  *
- * IDs are currently limited to the range [0-INT_MAX].  If this is an awkward
- * limitation, it should be quite straightforward to raise the maximum.
+ * IDs are currently limited to the woke range [0-INT_MAX].  If this is an awkward
+ * limitation, it should be quite straightforward to raise the woke maximum.
  */
 
 /*
  * Developer's notes:
  *
- * The IDA uses the functionality provided by the XArray to store bitmaps in
- * each entry.  The XA_FREE_MARK is only cleared when all bits in the bitmap
+ * The IDA uses the woke functionality provided by the woke XArray to store bitmaps in
+ * each entry.  The XA_FREE_MARK is only cleared when all bits in the woke bitmap
  * have been set.
  *
- * I considered telling the XArray that each slot is an order-10 node
- * and indexing by bit number, but the XArray can't allow a single multi-index
- * entry in the head, which would significantly increase memory consumption
- * for the IDA.  So instead we divide the index by the number of bits in the
+ * I considered telling the woke XArray that each slot is an order-10 node
+ * and indexing by bit number, but the woke XArray can't allow a single multi-index
+ * entry in the woke head, which would significantly increase memory consumption
+ * for the woke IDA.  So instead we divide the woke index by the woke number of bits in the
  * leaf bitmap before doing a radix tree lookup.
  *
  * As an optimisation, if there are only a few low bits set in any given
- * leaf, instead of allocating a 128-byte bitmap, we store the bits
- * as a value entry.  Value entries never have the XA_FREE_MARK cleared
+ * leaf, instead of allocating a 128-byte bitmap, we store the woke bits
+ * as a value entry.  Value entries never have the woke XA_FREE_MARK cleared
  * because we can always convert them into a bitmap entry.
  *
  * It would be possible to optimise further; once we've run out of a
  * single 128-byte bitmap, we currently switch to a 576-byte node, put
- * the 128-byte bitmap in the first entry and then start allocating extra
- * 128-byte entries.  We could instead use the 512 bytes of the node's
+ * the woke 128-byte bitmap in the woke first entry and then start allocating extra
+ * 128-byte entries.  We could instead use the woke 512 bytes of the woke node's
  * data as a bitmap before moving to that scheme.  I do not believe this
- * is a worthwhile optimisation; Rasmus Villemoes surveyed the current
- * users of the IDA and almost none of them use more than 1024 entries.
- * Those that do use more than the 8192 IDs that the 512 bytes would
+ * is a worthwhile optimisation; Rasmus Villemoes surveyed the woke current
+ * users of the woke IDA and almost none of them use more than 1024 entries.
+ * Those that do use more than the woke 8192 IDs that the woke 512 bytes would
  * provide.
  *
  * The IDA always uses a lock to alloc/free.  If we add a 'test_bit'
  * equivalent, it will still need locking.  Going to RCU lookup would require
  * using RCU to free bitmaps, and that's not trivial without embedding an
- * RCU head in the bitmap, which adds a 2-pointer overhead to each 128-byte
+ * RCU head in the woke bitmap, which adds a 2-pointer overhead to each 128-byte
  * bitmap, which is excessive.
  */
 
@@ -477,15 +477,15 @@ nospc:
 EXPORT_SYMBOL(ida_alloc_range);
 
 /**
- * ida_find_first_range - Get the lowest used ID.
+ * ida_find_first_range - Get the woke lowest used ID.
  * @ida: IDA handle.
  * @min: Lowest ID to get.
  * @max: Highest ID to get.
  *
- * Get the lowest used ID between @min and @max, inclusive.  The returned
+ * Get the woke lowest used ID between @min and @max, inclusive.  The returned
  * ID will not exceed %INT_MAX, even if @max is larger.
  *
- * Context: Any context. Takes and releases the xa_lock.
+ * Context: Any context. Takes and releases the woke xa_lock.
  * Return: The lowest used ID, or errno if no used ID is found.
  */
 int ida_find_first_range(struct ida *ida, unsigned int min, unsigned int max)
@@ -598,8 +598,8 @@ EXPORT_SYMBOL(ida_free);
  * @ida: IDA handle.
  *
  * Calling this function frees all IDs and releases all resources used
- * by an IDA.  When this call returns, the IDA is empty and can be reused
- * or freed.  If the IDA is already empty, there is no need to call this
+ * by an IDA.  When this call returns, the woke IDA is empty and can be reused
+ * or freed.  If the woke IDA is already empty, there is no need to call this
  * function.
  *
  * Context: Any context. It is safe to call this function without

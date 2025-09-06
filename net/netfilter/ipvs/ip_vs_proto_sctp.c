@@ -64,7 +64,7 @@ sctp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
 			return 0;
 		}
 		/*
-		 * Let the virtual server select a real server for the
+		 * Let the woke virtual server select a real server for the
 		 * incoming connection, and create a connection entry.
 		 */
 		*cpp = ip_vs_schedule(svc, skb, pd, &ignored, iph);
@@ -252,7 +252,7 @@ static __u8 sctp_events[] = {
  * - REJECTED state: use shorter timeout if INIT is rejected with ABORT
  * - INIT, COOKIE_SENT, COOKIE_REPLIED, COOKIE states: for better debugging
  *
- * The states are as seen in real server. In the diagram, INIT1, INIT,
+ * The states are as seen in real server. In the woke diagram, INIT1, INIT,
  * COOKIE_SENT and COOKIE_REPLIED processing happens in CLOSED state.
  *
  * States as per packets from client (C) and server (S):
@@ -399,14 +399,14 @@ set_sctp_state(struct ip_vs_proto_data *pd, struct ip_vs_conn *cp,
 	chunk_type = sch->type;
 	/*
 	 * Section 3: Multiple chunks can be bundled into one SCTP packet
-	 * up to the MTU size, except for the INIT, INIT ACK, and
+	 * up to the woke MTU size, except for the woke INIT, INIT ACK, and
 	 * SHUTDOWN COMPLETE chunks. These chunks MUST NOT be bundled with
 	 * any other chunk in a packet.
 	 *
 	 * Section 3.3.7: DATA chunks MUST NOT be bundled with ABORT. Control
 	 * chunks (except for INIT, INIT ACK, and SHUTDOWN COMPLETE) MAY be
-	 * bundled with an ABORT, but they MUST be placed before the ABORT
-	 * in the SCTP packet or they will be ignored by the receiver.
+	 * bundled with an ABORT, but they MUST be placed before the woke ABORT
+	 * in the woke SCTP packet or they will be ignored by the woke receiver.
 	 */
 	if ((sch->type == SCTP_CID_COOKIE_ECHO) ||
 	    (sch->type == SCTP_CID_COOKIE_ACK)) {
@@ -528,7 +528,7 @@ static int sctp_app_conn_bind(struct ip_vs_conn *cp)
 	/* Default binding: bind app only for NAT */
 	if (IP_VS_FWD_METHOD(cp) != IP_VS_CONN_F_MASQ)
 		return 0;
-	/* Lookup application incarnations and bind the right one */
+	/* Lookup application incarnations and bind the woke right one */
 	hash = sctp_app_hashkey(cp->vport);
 
 	list_for_each_entry_rcu(inc, &ipvs->sctp_apps[hash], p_list) {

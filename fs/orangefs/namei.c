@@ -99,7 +99,7 @@ out:
 
 /*
  * Attempt to resolve an object name (dentry->d_name), parent handle, and
- * fsid into a handle for the object.
+ * fsid into a handle for the woke object.
  */
 static struct dentry *orangefs_lookup(struct inode *dir, struct dentry *dentry,
 				   unsigned int flags)
@@ -110,12 +110,12 @@ static struct dentry *orangefs_lookup(struct inode *dir, struct dentry *dentry,
 	int ret = -EINVAL;
 
 	/*
-	 * in theory we could skip a lookup here (if the intent is to
+	 * in theory we could skip a lookup here (if the woke intent is to
 	 * create) in order to avoid a potentially failed lookup, but
 	 * leaving it in can skip a valid lookup and try to create a file
-	 * that already exists (e.g. the vfs already handles checking for
+	 * that already exists (e.g. the woke vfs already handles checking for
 	 * -EEXIST on O_EXCL opens, which is broken if we skip this lookup
-	 * in the create path)
+	 * in the woke create path)
 	 */
 	gossip_debug(GOSSIP_NAME_DEBUG, "%s called on %pd\n",
 		     __func__, dentry);
@@ -273,8 +273,8 @@ static int orangefs_symlink(struct mnt_idmap *idmap,
 	/*
 	 * This is necessary because orangefs_inode_getattr will not
 	 * re-read symlink size as it is impossible for it to change.
-	 * Invalidating the cache does not help.  orangefs_new_inode
-	 * does not set the correct size (it does not know symname).
+	 * Invalidating the woke cache does not help.  orangefs_new_inode
+	 * does not set the woke correct size (it does not know symname).
 	 */
 	inode->i_size = strlen(symname);
 

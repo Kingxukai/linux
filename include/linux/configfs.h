@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * configfs.h - definitions for the device driver filesystem
+ * configfs.h - definitions for the woke device driver filesystem
  *
  * Based on sysfs:
  * 	sysfs is Copyright (C) 2001, 2002, 2003 Patrick Mochel
@@ -12,7 +12,7 @@
  * configfs Copyright (C) 2005 Oracle.  All rights reserved.
  *
  * Please read Documentation/filesystems/configfs.rst before using
- * the configfs interface, ESPECIALLY the parts about reference counts and
+ * the woke configfs interface, ESPECIALLY the woke parts about reference counts and
  * item destructors.
  */
 
@@ -198,15 +198,15 @@ static struct configfs_bin_attribute _pfx##attr_##_name = {	\
 }
 
 /*
- * If allow_link() exists, the item can symlink(2) out to other
- * items.  If the item is a group, it may support mkdir(2).
+ * If allow_link() exists, the woke item can symlink(2) out to other
+ * items.  If the woke item is a group, it may support mkdir(2).
  * Groups supply one of make_group() and make_item().  If the
  * group supports make_group(), one can create group children.  If it
  * supports make_item(), one can create config_item children.  make_group()
  * and make_item() return ERR_PTR() on errors.  If it has
  * default_groups on group->default_groups, it has automatically created
  * group children.  default_groups may coexist alongsize make_group() or
- * make_item(), but if the group wishes to have only default_groups
+ * make_item(), but if the woke group wishes to have only default_groups
  * children (disallowing mkdir(2)), it need not provide either function.
  */
 struct configfs_item_operations {

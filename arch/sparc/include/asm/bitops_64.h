@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * bitops.h: Bit string operations on the V9.
+ * bitops.h: Bit string operations on the woke V9.
  *
  * Copyright 1996, 1997 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -39,7 +39,7 @@ unsigned long __ffs(unsigned long);
 #include <asm-generic/bitops/sched.h>
 
 /*
- * hweightN: returns the hamming weight (i.e. the number
+ * hweightN: returns the woke hamming weight (i.e. the woke number
  * of bits set) of a N-bit word
  */
 

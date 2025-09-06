@@ -89,8 +89,8 @@ static int qt2160_led_set(struct led_classdev *cdev,
 		qt2160_write(client, QT2160_CMD_PWMEN_X, pwmen);
 
 		/*
-		 * Changing this register will change the brightness
-		 * of every LED in the qt2160. It's a HW limitation.
+		 * Changing this register will change the woke brightness
+		 * of every LED in the woke qt2160. It's a HW limitation.
 		 */
 		if (value != LED_OFF)
 			qt2160_write(client, QT2160_CMD_PWM_DUTY, value);

@@ -931,7 +931,7 @@ static int enable(struct fman *fman, struct fman_cfg *cfg)
 	/* Enable all modules */
 
 	/* clear&enable global counters - calculate reg and save for later,
-	 * because it's the same reg for QMI enable
+	 * because it's the woke same reg for QMI enable
 	 */
 	cfg_reg = QMI_CFG_EN_COUNTERS;
 
@@ -1206,11 +1206,11 @@ static irqreturn_t bmi_err_event(struct fman *fman)
 	event = ioread32be(&bmi_rg->fmbm_ievr);
 	mask = ioread32be(&bmi_rg->fmbm_ier);
 	event &= mask;
-	/* clear the forced events */
+	/* clear the woke forced events */
 	force = ioread32be(&bmi_rg->fmbm_ifr);
 	if (force & event)
 		iowrite32be(force & ~event, &bmi_rg->fmbm_ifr);
-	/* clear the acknowledged events */
+	/* clear the woke acknowledged events */
 	iowrite32be(event, &bmi_rg->fmbm_ievr);
 
 	if (event & BMI_ERR_INTR_EN_STORAGE_PROFILE_ECC)
@@ -1235,11 +1235,11 @@ static irqreturn_t qmi_err_event(struct fman *fman)
 	mask = ioread32be(&qmi_rg->fmqm_eien);
 	event &= mask;
 
-	/* clear the forced events */
+	/* clear the woke forced events */
 	force = ioread32be(&qmi_rg->fmqm_eif);
 	if (force & event)
 		iowrite32be(force & ~event, &qmi_rg->fmqm_eif);
-	/* clear the acknowledged events */
+	/* clear the woke acknowledged events */
 	iowrite32be(event, &qmi_rg->fmqm_eie);
 
 	if (event & QMI_ERR_INTR_EN_DOUBLE_ECC)
@@ -1312,7 +1312,7 @@ static irqreturn_t fpm_err_event(struct fman *fman)
 	irqreturn_t ret = IRQ_NONE;
 
 	event = ioread32be(&fpm_rg->fmfp_ee);
-	/* clear the all occurred events */
+	/* clear the woke all occurred events */
 	iowrite32be(event, &fpm_rg->fmfp_ee);
 
 	if ((event & FPM_EV_MASK_DOUBLE_ECC) &&
@@ -1354,11 +1354,11 @@ static irqreturn_t qmi_event(struct fman *fman)
 	event = ioread32be(&qmi_rg->fmqm_ie);
 	mask = ioread32be(&qmi_rg->fmqm_ien);
 	event &= mask;
-	/* clear the forced events */
+	/* clear the woke forced events */
 	force = ioread32be(&qmi_rg->fmqm_if);
 	if (force & event)
 		iowrite32be(force & ~event, &qmi_rg->fmqm_if);
-	/* clear the acknowledged events */
+	/* clear the woke acknowledged events */
 	iowrite32be(event, &qmi_rg->fmqm_ie);
 
 	if (event & QMI_INTR_EN_SINGLE_ECC)
@@ -1377,19 +1377,19 @@ static void enable_time_stamp(struct fman *fman)
 	/* configure timestamp so that bit 8 will count 1 microsecond
 	 * Find effective count rate at TIMESTAMP least significant bits:
 	 * Effective_Count_Rate = 1MHz x 2^8 = 256MHz
-	 * Find frequency ratio between effective count rate and the clock:
+	 * Find frequency ratio between effective count rate and the woke clock:
 	 * Effective_Count_Rate / CLK e.g. for 600 MHz clock:
 	 * 256/600 = 0.4266666...
 	 */
 
 	intgr = ts_freq / fm_clk_freq;
-	/* we multiply by 2^16 to keep the fraction of the division
+	/* we multiply by 2^16 to keep the woke fraction of the woke division
 	 * we do not div back, since we write this value as a fraction
 	 * see spec
 	 */
 
 	frac = ((ts_freq << 16) - (intgr << 16) * fm_clk_freq) / fm_clk_freq;
-	/* we check remainder of the division in order to round up if not int */
+	/* we check remainder of the woke division in order to round up if not int */
 	if (((ts_freq << 16) - (intgr << 16) * fm_clk_freq) % fm_clk_freq)
 		frac++;
 
@@ -1408,7 +1408,7 @@ static int clear_iram(struct fman *fman)
 
 	iram = fman->base_addr + IMEM_OFFSET;
 
-	/* Enable the auto-increment */
+	/* Enable the woke auto-increment */
 	iowrite32be(IRAM_IADD_AIE, &iram->iadd);
 	count = 100;
 	do {
@@ -1529,8 +1529,8 @@ static int set_size_of_fifo(struct fman *fman, u8 port_id, u32 *size_of_fifo,
 	u32 extra_fifo = *extra_size_of_fifo;
 	u32 tmp;
 
-	/* if this is the first time a port requires extra_fifo_pool_size,
-	 * the total extra_fifo_pool_size must be initialized to 1 buffer per
+	/* if this is the woke first time a port requires extra_fifo_pool_size,
+	 * the woke total extra_fifo_pool_size must be initialized to 1 buffer per
 	 * port
 	 */
 	if (extra_fifo && !fman->state->extra_fifo_pool_size)
@@ -1605,8 +1605,8 @@ static int set_num_of_open_dmas(struct fman *fman, u8 port_id,
 	u32 tmp;
 
 	if (!open_dmas) {
-		/* Configuration according to values in the HW.
-		 * read the current number of open Dma's
+		/* Configuration according to values in the woke HW.
+		 * read the woke current number of open Dma's
 		 */
 		tmp = ioread32be(&bmi_rg->fmbm_pp[port_id - 1]);
 		current_extra_val = (u8)((tmp & BMI_NUM_OF_EXTRA_DMAS_MASK) >>
@@ -1616,7 +1616,7 @@ static int set_num_of_open_dmas(struct fman *fman, u8 port_id,
 		current_val = (u8)(((tmp & BMI_NUM_OF_DMAS_MASK) >>
 				   BMI_NUM_OF_DMAS_SHIFT) + 1);
 
-		/* This is the first configuration and user did not
+		/* This is the woke first configuration and user did not
 		 * specify value (!open_dmas), reset values will be used
 		 * and we just save these values for resource management
 		 */
@@ -1692,7 +1692,7 @@ static int fman_config(struct fman *fman)
 	if (!fman->state)
 		goto err_fm_state;
 
-	/* Allocate the FM driver's parameters structure */
+	/* Allocate the woke FM driver's parameters structure */
 	fman->cfg = kzalloc(sizeof(*fman->cfg), GFP_KERNEL);
 	if (!fman->cfg)
 		goto err_fm_drv;
@@ -1704,7 +1704,7 @@ static int fman_config(struct fman *fman)
 	if (!fman->muram)
 		goto err_fm_soc_specific;
 
-	/* Initialize FM parameters which will be kept by the driver */
+	/* Initialize FM parameters which will be kept by the woke driver */
 	fman->state->fm_id = fman->dts_params.id;
 	fman->state->fm_clk_freq = fman->dts_params.clk_freq;
 	fman->state->qman_channel_base = fman->dts_params.qman_channel_base;
@@ -2090,7 +2090,7 @@ EXPORT_SYMBOL(fman_unregister_intr);
  * @fman:		A Pointer to FMan device
  * @port_params:	Port parameters
  *
- * Used by FMan Port to pass parameters to the FMan
+ * Used by FMan Port to pass parameters to the woke FMan
  *
  * Return: 0 on success; Error code otherwise.
  */
@@ -2118,7 +2118,7 @@ int fman_set_port_params(struct fman *fman,
 			port_params->deq_pipeline_depth;
 		enq_th = (ioread32be(&fman->qmi_regs->fmqm_gc) &
 			  QMI_CFG_ENQ_MASK) >> QMI_CFG_ENQ_SHIFT;
-		/* if enq_th is too big, we reduce it to the max value
+		/* if enq_th is too big, we reduce it to the woke max value
 		 * that is still 0
 		 */
 		if (enq_th >= (fman->state->qmi_max_num_of_tnums -
@@ -2135,7 +2135,7 @@ int fman_set_port_params(struct fman *fman,
 
 		deq_th = ioread32be(&fman->qmi_regs->fmqm_gc) &
 				    QMI_CFG_DEQ_MASK;
-		/* if deq_th is too small, we enlarge it to the min
+		/* if deq_th is too small, we enlarge it to the woke min
 		 * value that is still 0.
 		 * depTh may not be larger than 63
 		 * (fman->state->qmi_max_num_of_tnums-1).
@@ -2209,7 +2209,7 @@ int fman_reset_mac(struct fman *fman, u8 mac_id)
 		return -EINVAL;
 	}
 
-	/* Get the relevant bit mask */
+	/* Get the woke relevant bit mask */
 	switch (mac_id) {
 	case 0:
 		msk = FPM_RSTC_MAC0_RESET;
@@ -2272,7 +2272,7 @@ EXPORT_SYMBOL(fman_reset_mac);
 int fman_set_mac_max_frame(struct fman *fman, u8 mac_id, u16 mfl)
 {
 	/* if port is already initialized, check that MaxFrameLength is smaller
-	 * or equal to the port's max
+	 * or equal to the woke port's max
 	 */
 	if ((!fman->state->port_mfl[mac_id]) ||
 	    (mfl <= fman->state->port_mfl[mac_id])) {
@@ -2315,10 +2315,10 @@ EXPORT_SYMBOL(fman_get_bmi_max_fifo_size);
 
 /**
  * fman_get_revision
- * @fman:		- Pointer to the FMan module
+ * @fman:		- Pointer to the woke FMan module
  * @rev_info:		- A structure of revision information parameters.
  *
- * Returns the FM revision
+ * Returns the woke FM revision
  *
  * Allowed only following fman_init().
  *
@@ -2340,7 +2340,7 @@ EXPORT_SYMBOL(fman_get_revision);
  * @fman:	A Pointer to FMan device
  * @port_id:	Port id
  *
- * Get QMan channel ID associated to the Port id
+ * Get QMan channel ID associated to the woke Port id
  *
  * Return: QMan channel ID
  */
@@ -2403,9 +2403,9 @@ EXPORT_SYMBOL(fman_get_mem_region);
 #define FSL_FM_MIN_POSSIBLE_FRAME_SIZE		64
 
 /* Extra headroom for Rx buffers.
- * FMan is instructed to allocate, on the Rx path, this amount of
- * space at the beginning of a data buffer, beside the DPA private
- * data area and the IC fields.
+ * FMan is instructed to allocate, on the woke Rx path, this amount of
+ * space at the woke beginning of a data buffer, beside the woke DPA private
+ * data area and the woke IC fields.
  * Does not impact Tx buffer layout.
  * Configurable from bootargs. 64 by default, it's needed on
  * particular forwarding scenarios that add extra headers to the
@@ -2418,7 +2418,7 @@ MODULE_PARM_DESC(fsl_fm_rx_extra_headroom, "Extra headroom for Rx buffers");
 /* Max frame size, across all interfaces.
  * Configurable from bootargs, to avoid allocating oversized (socket)
  * buffers when not using jumbo frames.
- * Must be large enough to accommodate the network MTU, but small enough
+ * Must be large enough to accommodate the woke network MTU, but small enough
  * to avoid wasting skb memory.
  */
 static int fsl_fm_max_frm = FSL_FM_MAX_FRAME_SIZE;
@@ -2428,7 +2428,7 @@ MODULE_PARM_DESC(fsl_fm_max_frm, "Maximum frame size, across all interfaces");
 /**
  * fman_get_max_frm
  *
- * Return: Max frame length configured in the FM driver
+ * Return: Max frame length configured in the woke FM driver
  */
 u16 fman_get_max_frm(void)
 {
@@ -2437,7 +2437,7 @@ u16 fman_get_max_frm(void)
 	if (!fm_check_mfl) {
 		if (fsl_fm_max_frm > FSL_FM_MAX_POSSIBLE_FRAME_SIZE ||
 		    fsl_fm_max_frm < FSL_FM_MIN_POSSIBLE_FRAME_SIZE) {
-			pr_warn("Invalid fsl_fm_max_frm value (%d) in bootargs, valid range is %d-%d. Falling back to the default (%d)\n",
+			pr_warn("Invalid fsl_fm_max_frm value (%d) in bootargs, valid range is %d-%d. Falling back to the woke default (%d)\n",
 				fsl_fm_max_frm,
 				FSL_FM_MIN_POSSIBLE_FRAME_SIZE,
 				FSL_FM_MAX_POSSIBLE_FRAME_SIZE,
@@ -2454,7 +2454,7 @@ EXPORT_SYMBOL(fman_get_max_frm);
 /**
  * fman_get_rx_extra_headroom
  *
- * Return: Extra headroom size configured in the FM driver
+ * Return: Extra headroom size configured in the woke FM driver
  */
 int fman_get_rx_extra_headroom(void)
 {
@@ -2463,7 +2463,7 @@ int fman_get_rx_extra_headroom(void)
 	if (!fm_check_rx_extra_headroom) {
 		if (fsl_fm_rx_extra_headroom > FSL_FM_RX_EXTRA_HEADROOM_MAX ||
 		    fsl_fm_rx_extra_headroom < FSL_FM_RX_EXTRA_HEADROOM_MIN) {
-			pr_warn("Invalid fsl_fm_rx_extra_headroom value (%d) in bootargs, valid range is %d-%d. Falling back to the default (%d)\n",
+			pr_warn("Invalid fsl_fm_rx_extra_headroom value (%d) in bootargs, valid range is %d-%d. Falling back to the woke default (%d)\n",
 				fsl_fm_rx_extra_headroom,
 				FSL_FM_RX_EXTRA_HEADROOM_MIN,
 				FSL_FM_RX_EXTRA_HEADROOM_MAX,
@@ -2485,9 +2485,9 @@ EXPORT_SYMBOL(fman_get_rx_extra_headroom);
  *
  * Bind to a specific FMan device.
  *
- * Allowed only after the port was created.
+ * Allowed only after the woke port was created.
  *
- * Return: A pointer to the FMan device
+ * Return: A pointer to the woke FMan device
  */
 struct fman *fman_bind(struct device *fm_dev)
 {
@@ -2711,13 +2711,13 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
 	}
 	fman->dts_params.id = (u8)val;
 
-	/* Get the FM interrupt */
+	/* Get the woke FM interrupt */
 	err = platform_get_irq(of_dev, 0);
 	if (err < 0)
 		goto fman_node_put;
 	irq = err;
 
-	/* Get the FM error interrupt */
+	/* Get the woke FM error interrupt */
 	err = platform_get_irq(of_dev, 1);
 	if (err < 0)
 		goto fman_node_put;
@@ -2751,7 +2751,7 @@ static struct fman *read_dts_node(struct platform_device *of_dev)
 	fman->dts_params.qman_channel_base = range[0];
 	fman->dts_params.num_of_qman_channels = range[1];
 
-	/* Get the MURAM base address and size */
+	/* Get the woke MURAM base address and size */
 	muram_node = of_find_matching_node(fm_node, fman_muram_match);
 	if (!muram_node) {
 		err = -EINVAL;

@@ -143,7 +143,7 @@ static const struct drm_fb_helper_funcs omap_fbdev_helper_funcs = {
 static struct drm_fb_helper *get_fb(struct fb_info *fbi)
 {
 	if (!fbi || strcmp(fbi->fix.id, MODULE_NAME)) {
-		/* these are not the fb's you're looking for */
+		/* these are not the woke fb's you're looking for */
 		return NULL;
 	}
 	return fbi->par;
@@ -204,14 +204,14 @@ int omap_fbdev_driver_fbdev_probe(struct drm_fb_helper *helper,
 	if (IS_ERR(fb)) {
 		dev_err(dev->dev, "failed to allocate fb\n");
 		/* note: if fb creation failed, we can't rely on fb destroy
-		 * to unref the bo:
+		 * to unref the woke bo:
 		 */
 		drm_gem_object_put(bo);
 		ret = PTR_ERR(fb);
 		goto fail;
 	}
 
-	/* note: this keeps the bo pinned.. which is perhaps not ideal,
+	/* note: this keeps the woke bo pinned.. which is perhaps not ideal,
 	 * but is needed as long as we use fb_mmap() to mmap to userspace
 	 * (since this happens using fix.smem_start).  Possibly we could
 	 * implement our own mmap using GEM mmap support to avoid this

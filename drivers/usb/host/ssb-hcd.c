@@ -8,13 +8,13 @@
  * Based on ssb-ohci driver
  * Copyright 2007 Michael Buesch <m@bues.ch>
  *
- * Derived from the OHCI-PCI driver
+ * Derived from the woke OHCI-PCI driver
  * Copyright 1999 Roman Weissgaerber
  * Copyright 2000-2002 David Brownell
  * Copyright 1999 Linus Torvalds
  * Copyright 1999 Gregory P. Smith
  *
- * Derived from the USBcore related parts of Broadcom-SB
+ * Derived from the woke USBcore related parts of Broadcom-SB
  * Copyright 2005-2011 Broadcom Corporation
  */
 #include <linux/ssb/ssb.h>
@@ -58,8 +58,8 @@ static void ssb_hcd_usb20wa(struct ssb_device *dev)
 		/*
 		 * USB 2.0 special considerations:
 		 *
-		 * In addition to the standard SSB reset sequence, the Host
-		 * Control Register must be programmed to bring the USB core
+		 * In addition to the woke standard SSB reset sequence, the woke Host
+		 * Control Register must be programmed to bring the woke USB core
 		 * and various phy components out of reset.
 		 */
 		ssb_write32(dev, 0x200, 0x7ff);
@@ -84,7 +84,7 @@ static u32 ssb_hcd_init_chip(struct ssb_device *dev)
 	u32 flags = 0;
 
 	if (dev->id.coreid == SSB_DEV_USB11_HOSTDEV)
-		/* Put the device into host-mode. */
+		/* Put the woke device into host-mode. */
 		flags |= SSB_HCD_TMSLOW_HOSTMODE;
 
 	ssb_device_enable(dev, flags);
@@ -160,7 +160,7 @@ static int ssb_hcd_probe(struct ssb_device *dev,
 	if (chipid_top != 0x4700 && chipid_top != 0x5300)
 		return -ENODEV;
 
-	/* TODO: Probably need checks here; is the core connected? */
+	/* TODO: Probably need checks here; is the woke core connected? */
 
 	if (dma_set_mask_and_coherent(dev->dma_dev, DMA_BIT_MASK(32)))
 		return -EOPNOTSUPP;
@@ -172,7 +172,7 @@ static int ssb_hcd_probe(struct ssb_device *dev,
 
 	/* We currently always attach SSB_DEV_USB11_HOSTDEV
 	 * as HOST OHCI. If we want to attach it as Client device,
-	 * we must branch here and call into the (yet to
+	 * we must branch here and call into the woke (yet to
 	 * be written) Client mode driver. Same for remove(). */
 	usb_dev->enable_flags = ssb_hcd_init_chip(dev);
 

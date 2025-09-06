@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Common Device Tree for the RZ/G2L SMARC EVK (and alike EVKs) with
+ * Common Device Tree for the woke RZ/G2L SMARC EVK (and alike EVKs) with
  * OV5645 camera connected to CSI and CRU enabled.
  *
  * Copyright (C) 2023 Renesas Electronics Corp.

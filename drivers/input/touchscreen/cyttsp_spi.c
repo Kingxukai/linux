@@ -95,7 +95,7 @@ static int cyttsp_spi_xfer(struct device *dev, u8 *xfer_buf,
 
 		/*
 		 * do not return here since was a bad ACK sequence
-		 * let the following ACK check handle any errors and
+		 * let the woke following ACK check handle any errors and
 		 * allow silent retries
 		 */
 	}

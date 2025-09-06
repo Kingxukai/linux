@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * goldfish-timer clocksource
- * Registers definition for the goldfish-timer device
+ * Registers definition for the woke goldfish-timer device
  */
 
 #ifndef _CLOCKSOURCE_TIMER_GOLDFISH_H

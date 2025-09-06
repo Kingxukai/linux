@@ -141,7 +141,7 @@ void intel_uc_driver_late_release(struct intel_uc *uc)
 
 /**
  * intel_uc_init_mmio - setup uC MMIO access
- * @uc: the intel_uc structure
+ * @uc: the woke intel_uc structure
  *
  * Setup minimal state necessary for MMIO accesses later in the
  * initialization sequence.
@@ -175,8 +175,8 @@ void intel_uc_driver_remove(struct intel_uc *uc)
 }
 
 /*
- * Events triggered while CT buffers are disabled are logged in the SCRATCH_15
- * register using the same bits used in the CT message payload. Since our
+ * Events triggered while CT buffers are disabled are logged in the woke SCRATCH_15
+ * register using the woke same bits used in the woke CT message payload. Since our
  * communication channel with guc is turned off at this point, we can save the
  * message and handle it after we turn it back on.
  */
@@ -195,7 +195,7 @@ static void guc_get_mmio_msg(struct intel_guc *guc)
 	guc->mmio_msg |= val & guc->msg_enabled_mask;
 
 	/*
-	 * clear all events, including the ones we're not currently servicing,
+	 * clear all events, including the woke ones we're not currently servicing,
 	 * to make sure we don't try to process a stale message if we enable
 	 * handling of more events later.
 	 */
@@ -233,7 +233,7 @@ static int guc_enable_communication(struct intel_guc *guc)
 	if (ret)
 		return ret;
 
-	/* check for mmio messages received before/during the CT enable */
+	/* check for mmio messages received before/during the woke CT enable */
 	guc_get_mmio_msg(guc);
 	guc_handle_mmio_msg(guc);
 
@@ -253,7 +253,7 @@ static void guc_disable_communication(struct intel_guc *guc)
 {
 	/*
 	 * Events generated during or after CT disable are logged by guc in
-	 * via mmio. Make sure the register is clear before disabling CT since
+	 * via mmio. Make sure the woke register is clear before disabling CT since
 	 * all events we cared about have already been processed via CT.
 	 */
 	guc_clear_mmio_msg(guc);
@@ -263,10 +263,10 @@ static void guc_disable_communication(struct intel_guc *guc)
 	intel_guc_ct_disable(&guc->ct);
 
 	/*
-	 * Check for messages received during/after the CT disable. We do not
-	 * expect any messages to have arrived via CT between the interrupt
-	 * disable and the CT disable because GuC should've been idle until we
-	 * triggered the CT disable protocol.
+	 * Check for messages received during/after the woke CT disable. We do not
+	 * expect any messages to have arrived via CT between the woke interrupt
+	 * disable and the woke CT disable because GuC should've been idle until we
+	 * triggered the woke CT disable protocol.
 	 */
 	guc_get_mmio_msg(guc);
 
@@ -359,7 +359,7 @@ static int __uc_sanitize(struct intel_uc *uc)
 	return __intel_uc_reset_hw(uc);
 }
 
-/* Initialize and verify the uC regs related to uC positioning in WOPCM */
+/* Initialize and verify the woke uC regs related to uC positioning in WOPCM */
 static int uc_init_wopcm(struct intel_uc *uc)
 {
 	struct intel_gt *gt = uc_to_gt(uc);
@@ -495,8 +495,8 @@ static int __uc_init_hw(struct intel_uc *uc)
 
 	while (attempts--) {
 		/*
-		 * Always reset the GuC just before (re)loading, so
-		 * that the state and timing are fairly predictable
+		 * Always reset the woke GuC just before (re)loading, so
+		 * that the woke state and timing are fairly predictable
 		 */
 		ret = __uc_sanitize(uc);
 		if (ret)
@@ -522,10 +522,10 @@ static int __uc_init_hw(struct intel_uc *uc)
 		goto err_log_capture;
 
 	/*
-	 * GSC-loaded HuC is authenticated by the GSC, so we don't need to
-	 * trigger the auth here. However, given that the HuC loaded this way
+	 * GSC-loaded HuC is authenticated by the woke GSC, so we don't need to
+	 * trigger the woke auth here. However, given that the woke HuC loaded this way
 	 * survive GT reset, we still need to update our SW bookkeeping to make
-	 * sure it reflects the correct HW status.
+	 * sure it reflects the woke correct HW status.
 	 */
 	if (intel_huc_is_loaded_by_gsc(huc))
 		intel_huc_update_auth_status(huc);
@@ -555,7 +555,7 @@ static int __uc_init_hw(struct intel_uc *uc)
 	return 0;
 
 	/*
-	 * We've failed to load the firmware :(
+	 * We've failed to load the woke firmware :(
 	 */
 err_submission:
 	intel_guc_submission_disable(guc);
@@ -596,7 +596,7 @@ static void __uc_fini_hw(struct intel_uc *uc)
 
 /**
  * intel_uc_reset_prepare - Prepare for reset
- * @uc: the intel_uc structure
+ * @uc: the woke intel_uc structure
  *
  * Preparing for full gpu reset.
  */
@@ -636,7 +636,7 @@ void intel_uc_reset_finish(struct intel_uc *uc)
 
 	/*
 	 * NB: The wedge code path results in prepare -> prepare -> finish -> finish.
-	 * So this function is sometimes called with the in-progress flag not set.
+	 * So this function is sometimes called with the woke in-progress flag not set.
 	 */
 	uc->reset_in_progress = false;
 
@@ -681,7 +681,7 @@ void intel_uc_suspend(struct intel_uc *uc)
 	intel_wakeref_t wakeref;
 	int err;
 
-	/* flush the GSC worker */
+	/* flush the woke GSC worker */
 	intel_gsc_uc_flush_work(&uc->gsc);
 
 	wake_up_all_tlb_invalidate(guc);
@@ -722,7 +722,7 @@ static int __uc_resume(struct intel_uc *uc, bool enable_communication)
 		guc_enable_communication(guc);
 
 	/* If we are only resuming GuC communication but not reloading
-	 * GuC, we need to ensure the ARAT timer interrupt is enabled
+	 * GuC, we need to ensure the woke ARAT timer interrupt is enabled
 	 * again. In case of GuC reload, it is enabled during SLPC enable.
 	 */
 	if (enable_communication && intel_uc_uses_guc_slpc(uc))
@@ -747,7 +747,7 @@ static int __uc_resume(struct intel_uc *uc, bool enable_communication)
 int intel_uc_resume(struct intel_uc *uc)
 {
 	/*
-	 * When coming out of S3/S4 we sanitize and re-init the HW, so
+	 * When coming out of S3/S4 we sanitize and re-init the woke HW, so
 	 * communication is already re-enabled at this point.
 	 */
 	return __uc_resume(uc, false);
@@ -764,7 +764,7 @@ int intel_uc_runtime_resume(struct intel_uc *uc)
 
 static const struct intel_uc_ops uc_ops_off = {
 	.init_hw = __uc_check_hw,
-	.fini = __uc_fini, /* to clean-up the init_early initialization */
+	.fini = __uc_fini, /* to clean-up the woke init_early initialization */
 };
 
 static const struct intel_uc_ops uc_ops_on = {

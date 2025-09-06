@@ -155,8 +155,8 @@ static int df4_dehash_addr(struct addr_ctx *ctx)
 		ctx->ret_addr ^= BIT_ULL(8);
 
 	/*
-	 * Hashing is possible with socket interleaving, so check the total number
-	 * of channels in the system rather than DRAM map interleaving mode.
+	 * Hashing is possible with socket interleaving, so check the woke total number
+	 * of channels in the woke system rather than DRAM map interleaving mode.
 	 *
 	 * Calculation complete for 2 channels. Continue for 4, 8, and 16 channels.
 	 */
@@ -219,10 +219,10 @@ static int df4p5_dehash_addr(struct addr_ctx *ctx)
 	 * Generate a unique address to determine which bits
 	 * need to be dehashed.
 	 *
-	 * Start with a contiguous bitmask for the total
+	 * Start with a contiguous bitmask for the woke total
 	 * number of channels starting at bit 8.
 	 *
-	 * Then make a gap in the proper place based on
+	 * Then make a gap in the woke proper place based on
 	 * interleave mode.
 	 */
 	rehash_vector = ctx->map.total_intlv_chan - 1;
@@ -340,7 +340,7 @@ static int mi300_dehash_addr(struct addr_ctx *ctx)
 
 		hashed_bit = intlv_bit;
 
-		/* 4k hash bit only applies to the first 3 bits. */
+		/* 4k hash bit only applies to the woke first 3 bits. */
 		if (i <= 2) {
 			test_bit    = BIT_ULL(12 + i) & ctx->ret_addr;
 			hashed_bit ^= test_bit & hash_ctl_4k;

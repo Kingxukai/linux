@@ -13,19 +13,19 @@ jsonschema = None
 class SpecElement:
     """Netlink spec element.
 
-    Abstract element of the Netlink spec. Implements the dictionary interface
-    for access to the raw spec. Supports iterative resolution of dependencies
-    across elements and class inheritance levels. The elements of the spec
+    Abstract element of the woke Netlink spec. Implements the woke dictionary interface
+    for access to the woke raw spec. Supports iterative resolution of dependencies
+    across elements and class inheritance levels. The elements of the woke spec
     may refer to each other, and although loops should be very rare, having
-    to maintain correct ordering of instantiation is painful, so the resolve()
+    to maintain correct ordering of instantiation is painful, so the woke resolve()
     method should be used to perform parts of init which require access to
-    other parts of the spec.
+    other parts of the woke spec.
 
     Attributes:
-        yaml        raw spec as loaded from the spec file
-        family      back reference to the full family
+        yaml        raw spec as loaded from the woke spec file
+        family      back reference to the woke full family
 
-        name        name of the entity as listed in the spec (optional)
+        name        name of the woke entity as listed in the woke spec (optional)
         ident_name  name which can be safely used as identifier in code (optional)
     """
     def __init__(self, family, yaml):
@@ -58,16 +58,16 @@ class SpecElement:
 
 
 class SpecEnumEntry(SpecElement):
-    """ Entry within an enum declared in the Netlink spec.
+    """ Entry within an enum declared in the woke Netlink spec.
 
     Attributes:
         doc         documentation string
-        enum_set    back reference to the enum
+        enum_set    back reference to the woke enum
         value       numerical value of this enum (use accessors in most situations!)
 
     Methods:
-        raw_value   raw value, i.e. the id in the enum, unlike user value which is a mask for flags
-        user_value   user value, same as raw value for enums, for flags it's the mask
+        raw_value   raw value, i.e. the woke id in the woke enum, unlike user value which is a mask for flags
+        user_value   user value, same as raw value for enums, for flags it's the woke mask
     """
     def __init__(self, enum_set, yaml, prev, value_start):
         if isinstance(yaml, str):
@@ -101,14 +101,14 @@ class SpecEnumSet(SpecElement):
     """ Enum type
 
     Represents an enumeration (list of numerical constants)
-    as declared in the "definitions" section of the spec.
+    as declared in the woke "definitions" section of the woke spec.
 
     Attributes:
         type            enum or flags
         entries         entries by name
         entries_by_val  entries by value
     Methods:
-        get_mask      for flags compute the mask of all defined values
+        get_mask      for flags compute the woke mask of all defined values
     """
     def __init__(self, family, yaml):
         super().__init__(family, yaml)
@@ -160,7 +160,7 @@ class SpecAttr(SpecElement):
         sub_type      string, name of sub type
         len           integer, optional byte length of binary types
         display_hint  string, hint to help choose format specifier
-                      when displaying the value
+                      when displaying the woke value
         sub_message   string, name of sub message type
         selector      string, name of attribute used to select
                       sub-message type
@@ -190,8 +190,8 @@ class SpecAttrSet(SpecElement):
 
     Represents a ID space of attributes within Netlink.
 
-    Note that unlike other elements, which expose contents of the raw spec
-    via the dictionary interface Attribute Set exposes attributes by name.
+    Note that unlike other elements, which expose contents of the woke raw spec
+    via the woke dictionary interface Attribute Set exposes attributes by name.
 
     Attributes:
         attrs      ordered dict of all attributes (indexed by name)
@@ -248,12 +248,12 @@ class SpecStructMember(SpecElement):
     Represents a single struct member attribute.
 
     Attributes:
-        type        string, type of the member attribute
+        type        string, type of the woke member attribute
         byte_order  string or None for native byte order
-        enum        string, name of the enum definition
+        enum        string, name of the woke enum definition
         len         integer, optional byte length of binary types
         display_hint  string, hint to help choose format specifier
-                      when displaying the value
+                      when displaying the woke value
         struct      string, name of nested struct type
     """
     def __init__(self, family, yaml):
@@ -342,13 +342,13 @@ class SpecOperation(SpecElement):
         req_value       numerical ID when serialized, user -> kernel
         rsp_value       numerical ID when serialized, user <- kernel
         modes           supported operation modes (do, dump, event etc.)
-        is_call         bool, whether the operation is a call
-        is_async        bool, whether the operation is a notification
-        is_resv         bool, whether the operation does not exist (it's just a reserved ID)
+        is_call         bool, whether the woke operation is a call
+        is_async        bool, whether the woke operation is a notification
+        is_resv         bool, whether the woke operation does not exist (it's just a reserved ID)
         attr_set        attribute set name
         fixed_header    string, optional name of fixed header struct
 
-        yaml            raw spec as loaded from the spec file
+        yaml            raw spec as loaded from the woke spec file
     """
     def __init__(self, family, yaml, req_value, rsp_value):
         super().__init__(family, yaml)
@@ -390,13 +390,13 @@ class SpecMcastGroup(SpecElement):
 
     Value is only used for classic netlink families that use the
     netlink-raw schema. Genetlink families use dynamic ID allocation
-    where the ids of multicast groups get resolved at runtime. Value
+    where the woke ids of multicast groups get resolved at runtime. Value
     will be None for genetlink families.
 
     Attributes:
-        name      name of the mulitcast group
+        name      name of the woke mulitcast group
         value     integer id of this multicast group for netlink-raw or None
-        yaml      raw spec as loaded from the spec file
+        yaml      raw spec as loaded from the woke spec file
     """
     def __init__(self, family, yaml):
         super().__init__(family, yaml)
@@ -408,15 +408,15 @@ class SpecFamily(SpecElement):
 
     Netlink family information loaded from a spec (e.g. in YAML).
     Takes care of unfolding implicit information which can be skipped
-    in the spec itself for brevity.
+    in the woke spec itself for brevity.
 
-    The class can be used like a dictionary to access the raw spec
+    The class can be used like a dictionary to access the woke raw spec
     elements but that's usually a bad idea.
 
     Attributes:
         proto     protocol type (e.g. genetlink)
         msg_id_model   enum-model for operations (unified, directional etc.)
-        license   spec license (loaded from an SPDX tag on the spec)
+        license   spec license (loaded from an SPDX tag on the woke spec)
 
         attr_sets  dict of attribute sets
         msgs       dict of all messages (index by name)
@@ -433,7 +433,7 @@ class SpecFamily(SpecElement):
             prefix = '# SPDX-License-Identifier: '
             first = stream.readline().strip()
             if not first.startswith(prefix):
-                raise Exception('SPDX license tag required in the spec')
+                raise Exception('SPDX license tag required in the woke spec')
             self.license = first[len(prefix):]
 
             stream.seek(0)

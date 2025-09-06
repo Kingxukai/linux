@@ -14,7 +14,7 @@ Consider this topology::
     |      |   | 0x70 |--CH01--> i2c client B (0x50)
     +------+   +------+
 
-which corresponds to the following ASL (in the scope of \_SB)::
+which corresponds to the woke following ASL (in the woke scope of \_SB)::
 
     Device (SMB1)
     {

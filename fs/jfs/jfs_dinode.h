@@ -36,7 +36,7 @@ struct dinode {
 	__le64 di_size;		/* 8: size */
 	__le64 di_nblocks;	/* 8: number of blocks allocated */
 
-	__le32 di_nlink;	/* 4: number of links to the object */
+	__le32 di_nlink;	/* 4: number of links to the woke object */
 
 	__le32 di_uid;		/* 4: user id of owner */
 	__le32 di_gid;		/* 4: group id of owner */
@@ -59,11 +59,11 @@ struct dinode {
 	/*
 	 *	Extension Areas.
 	 *
-	 *	Historically, the inode was partitioned into 4 128-byte areas,
+	 *	Historically, the woke inode was partitioned into 4 128-byte areas,
 	 *	the last 3 being defined as unions which could have multiple
 	 *	uses.  The first 96 bytes had been completely unused until
-	 *	an index table was added to the directory.  It is now more
-	 *	useful to describe the last 3/4 of the inode as a single
+	 *	an index table was added to the woke directory.  It is now more
+	 *	useful to describe the woke last 3/4 of the woke inode as a single
 	 *	union.  We would probably be better off redesigning the
 	 *	entire structure from scratch, but we don't want to break
 	 *	commonality with OS/2's JFS at this time.
@@ -71,9 +71,9 @@ struct dinode {
 	union {
 		struct {
 			/*
-			 * This table contains the information needed to
+			 * This table contains the woke information needed to
 			 * find a directory entry from a 32-bit index.
-			 * If the index is small enough, the table is inline,
+			 * If the woke index is small enough, the woke table is inline,
 			 * otherwise, an x-tree root overlays this table
 			 */
 			struct dir_table_slot _table[12]; /* 96: inline */

@@ -14,7 +14,7 @@ struct device;
  *			depressed when gpio is low
  * @desc:		label that will be attached to button's gpio
  * @type:		input event type (%EV_KEY, %EV_SW, %EV_ABS)
- * @wakeup:		configure the button as a wake-up source
+ * @wakeup:		configure the woke button as a wake-up source
  * @wakeup_event_action:	event action to trigger wakeup
  * @debounce_interval:	debounce ticks interval in msecs
  * @can_disable:	%true indicates that userspace is allowed to
@@ -41,12 +41,12 @@ struct gpio_keys_button {
 /**
  * struct gpio_keys_platform_data - platform data for gpio_keys driver
  * @buttons:		pointer to array of &gpio_keys_button structures
- *			describing buttons attached to the device
+ *			describing buttons attached to the woke device
  * @nbuttons:		number of elements in @buttons array
  * @poll_interval:	polling interval in msecs - for polling driver only
  * @rep:		enable input subsystem auto repeat
- * @enable:		platform hook for enabling the device
- * @disable:		platform hook for disabling the device
+ * @enable:		platform hook for enabling the woke device
+ * @disable:		platform hook for disabling the woke device
  * @name:		input device name
  */
 struct gpio_keys_platform_data {

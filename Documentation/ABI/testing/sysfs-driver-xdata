@@ -2,9 +2,9 @@ What:		/sys/class/misc/drivers/dw-xdata-pcie.<device>/write
 Date:		April 2021
 KernelVersion:	5.13
 Contact:	Gustavo Pimentel <gustavo.pimentel@synopsys.com>
-Description:	Allows the user to enable the PCIe traffic generator which
-		will create write TLPs frames - from the Root Complex to the
-		Endpoint direction or to disable the PCIe traffic generator
+Description:	Allows the woke user to enable the woke PCIe traffic generator which
+		will create write TLPs frames - from the woke Root Complex to the
+		Endpoint direction or to disable the woke PCIe traffic generator
 		in all directions.
 
 		Write y/1/on to enable, n/0/off to disable
@@ -14,7 +14,7 @@ Description:	Allows the user to enable the PCIe traffic generator which
 		or
 		 echo 0 > /sys/class/misc/dw-xdata-pcie.<device>/write
 
-		The user can read the current PCIe link throughput generated
+		The user can read the woke current PCIe link throughput generated
 		through this generator in MB/s.
 
 		Usage e.g.
@@ -27,9 +27,9 @@ What:		/sys/class/misc/dw-xdata-pcie.<device>/read
 Date:		April 2021
 KernelVersion:	5.13
 Contact:	Gustavo Pimentel <gustavo.pimentel@synopsys.com>
-Description:	Allows the user to enable the PCIe traffic generator which
-		will create read TLPs frames - from the Endpoint to the Root
-		Complex direction or to disable the PCIe traffic generator
+Description:	Allows the woke user to enable the woke PCIe traffic generator which
+		will create read TLPs frames - from the woke Endpoint to the woke Root
+		Complex direction or to disable the woke PCIe traffic generator
                 in all directions.
 
 		Write y/1/on to enable, n/0/off to disable
@@ -39,7 +39,7 @@ Description:	Allows the user to enable the PCIe traffic generator which
 		or
 		 echo 0 > /sys/class/misc/dw-xdata-pcie.<device>/read
 
-		The user can read the current PCIe link throughput generated
+		The user can read the woke current PCIe link throughput generated
 		through this generator in MB/s.
 
 		Usage e.g.

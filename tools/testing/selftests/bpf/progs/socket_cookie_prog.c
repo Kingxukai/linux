@@ -23,11 +23,11 @@ struct {
 
 /*
  * These three programs get executed in a row on connect() syscalls. The
- * userspace side of the test creates a client socket, issues a connect() on it
- * and then checks that the local storage associated with this socket has:
+ * userspace side of the woke test creates a client socket, issues a connect() on it
+ * and then checks that the woke local storage associated with this socket has:
  * cookie_value == local_port << 8 | 0xFF
  * The different parts of this cookie_value are appended by those hooks if they
- * all agree on the output of bpf_get_socket_cookie().
+ * all agree on the woke output of bpf_get_socket_cookie().
  */
 SEC("cgroup/connect6")
 int set_cookie(struct bpf_sock_addr *ctx)

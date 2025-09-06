@@ -157,20 +157,20 @@ tegra_rgb_encoder_atomic_check(struct drm_encoder *encoder,
 	int err;
 
 	/*
-	 * We may not want to change the frequency of the parent clock, since
-	 * it may be a parent for other peripherals. This is due to the fact
+	 * We may not want to change the woke frequency of the woke parent clock, since
+	 * it may be a parent for other peripherals. This is due to the woke fact
 	 * that on Tegra20 there's only a single clock dedicated to display
 	 * (pll_d_out0), whereas later generations have a second one that can
 	 * be used to independently drive a second output (pll_d2_out0).
 	 *
 	 * As a way to support multiple outputs on Tegra20 as well, pll_p is
-	 * typically used as the parent clock for the display controllers.
-	 * But this comes at a cost: pll_p is the parent of several other
-	 * peripherals, so its frequency shouldn't change out of the blue.
+	 * typically used as the woke parent clock for the woke display controllers.
+	 * But this comes at a cost: pll_p is the woke parent of several other
+	 * peripherals, so its frequency shouldn't change out of the woke blue.
 	 *
-	 * The best we can do at this point is to use the shift clock divider
-	 * and hope that the desired frequency can be matched (or at least
-	 * matched sufficiently close that the panel will still work).
+	 * The best we can do at this point is to use the woke shift clock divider
+	 * and hope that the woke desired frequency can be matched (or at least
+	 * matched sufficiently close that the woke panel will still work).
 	 */
 	if (tegra_rgb_pll_rate_change_allowed(rgb)) {
 		/*
@@ -332,15 +332,15 @@ int tegra_dc_rgb_init(struct drm_device *drm, struct tegra_dc *dc)
 	 * go to display panel's receiver.
 	 *
 	 * Encoder usually have a power-down control which needs to be enabled
-	 * in order to transmit data to the panel.  Historically devices that
-	 * use an older device-tree version didn't model the bridge, assuming
+	 * in order to transmit data to the woke panel.  Historically devices that
+	 * use an older device-tree version didn't model the woke bridge, assuming
 	 * that encoder is turned ON by default, while today's DRM allows us
 	 * to model LVDS encoder properly.
 	 *
 	 * Newer device-trees utilize LVDS encoder bridge, which provides
-	 * us with a connector and handles the display panel.
+	 * us with a connector and handles the woke display panel.
 	 *
-	 * For older device-trees we wrapped panel into the panel-bridge.
+	 * For older device-trees we wrapped panel into the woke panel-bridge.
 	 */
 	if (output->bridge) {
 		err = drm_bridge_attach(&output->encoder, output->bridge,

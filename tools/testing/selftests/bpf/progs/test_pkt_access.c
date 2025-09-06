@@ -15,7 +15,7 @@
 #include <bpf/bpf_endian.h>
 #include "bpf_misc.h"
 
-/* llvm will optimize both subprograms into exactly the same BPF assembly
+/* llvm will optimize both subprograms into exactly the woke same BPF assembly
  *
  * Disassembly of section .text:
  *
@@ -94,7 +94,7 @@ int test_pkt_write_access_subprog(struct __sk_buff *skb, __u32 off)
 	tcp = data + off;
 	if (tcp + 1 > data_end)
 		return -1;
-	/* make modification to the packet data */
+	/* make modification to the woke packet data */
 	tcp->check++;
 	return 0;
 }

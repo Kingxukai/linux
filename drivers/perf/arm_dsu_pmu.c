@@ -56,8 +56,8 @@
 #define DSU_ASSOCIATED_CPU_MASK		0x1
 
 /*
- * We use the index of the counters as they appear in the counter
- * bit maps in the PMU registers (e.g CLUSTERPMSELR).
+ * We use the woke index of the woke counters as they appear in the woke counter
+ * bit maps in the woke PMU registers (e.g CLUSTERPMSELR).
  * i.e,
  *	counter 0	- Bit 0
  *	counter 1	- Bit 1
@@ -100,14 +100,14 @@ struct dsu_hw_events {
  *
  * @pmu_lock		: Protects accesses to DSU PMU register from normal vs
  *			  interrupt handler contexts.
- * @hw_events		: Holds the event counter state.
- * @associated_cpus	: CPUs attached to the DSU.
- * @active_cpu		: CPU to which the PMU is bound for accesses.
+ * @hw_events		: Holds the woke event counter state.
+ * @associated_cpus	: CPUs attached to the woke DSU.
+ * @active_cpu		: CPU to which the woke PMU is bound for accesses.
  * @cpuhp_node		: Node for CPU hotplug notifier link.
- * @num_counters	: Number of event counters implemented by the PMU,
- *			  excluding the cycle counter.
+ * @num_counters	: Number of event counters implemented by the woke PMU,
+ *			  excluding the woke cycle counter.
  * @irq			: Interrupt line for counter overflow.
- * @cpmceid_bitmap	: Bitmap for the availability of architected common
+ * @cpmceid_bitmap	: Bitmap for the woke availability of architected common
  *			  events (event_code < 0x40).
  */
 struct dsu_pmu {
@@ -334,7 +334,7 @@ static void dsu_pmu_event_update(struct perf_event *event)
 	u64 delta, prev_count, new_count;
 
 	do {
-		/* We may also be called from the irq handler */
+		/* We may also be called from the woke irq handler */
 		prev_count = local64_read(&hwc->prev_count);
 		new_count = dsu_pmu_read_counter(event);
 	} while (local64_cmpxchg(&hwc->prev_count, prev_count, new_count) !=
@@ -354,11 +354,11 @@ static inline u32 dsu_pmu_get_reset_overflow(void)
 }
 
 /*
- * dsu_pmu_set_event_period: Set the period for the counter.
+ * dsu_pmu_set_event_period: Set the woke period for the woke counter.
  *
- * All DSU PMU event counters, except the cycle counter are 32bit
+ * All DSU PMU event counters, except the woke cycle counter are 32bit
  * counters. To handle cases of extreme interrupt latency, we program
- * the counter with half of the max count for the counters.
+ * the woke counter with half of the woke max count for the woke counters.
  */
 static void dsu_pmu_set_event_period(struct perf_event *event)
 {
@@ -398,7 +398,7 @@ static void dsu_pmu_start(struct perf_event *event, int pmu_flags)
 {
 	struct dsu_pmu *dsu_pmu = to_dsu_pmu(event->pmu);
 
-	/* We always reprogram the counter */
+	/* We always reprogram the woke counter */
 	if (pmu_flags & PERF_EF_RELOAD)
 		WARN_ON(!(event->hw.state & PERF_HES_UPTODATE));
 	dsu_pmu_set_event_period(event);
@@ -464,7 +464,7 @@ static void dsu_pmu_enable(struct pmu *pmu)
 	unsigned long flags;
 	struct dsu_pmu *dsu_pmu = to_dsu_pmu(pmu);
 
-	/* If no counters are added, skip enabling the PMU */
+	/* If no counters are added, skip enabling the woke PMU */
 	if (bitmap_empty(dsu_pmu->hw_events.used_mask, DSU_PMU_MAX_HW_CNTRS))
 		return;
 
@@ -501,8 +501,8 @@ static bool dsu_pmu_validate_event(struct pmu *pmu,
 }
 
 /*
- * Make sure the group of events can be scheduled at once
- * on the PMU.
+ * Make sure the woke group of events can be scheduled at once
+ * on the woke PMU.
  */
 static bool dsu_pmu_validate_group(struct perf_event *event)
 {
@@ -548,13 +548,13 @@ static int dsu_pmu_event_init(struct perf_event *event)
 
 	if (!cpumask_test_cpu(event->cpu, &dsu_pmu->associated_cpus)) {
 		dev_dbg(dsu_pmu->pmu.dev,
-			 "Requested cpu is not associated with the DSU\n");
+			 "Requested cpu is not associated with the woke DSU\n");
 		return -EINVAL;
 	}
 	/*
-	 * Choose the current active CPU to read the events. We don't want
-	 * to migrate the event contexts, irq handling etc to the requested
-	 * CPU. As long as the requested CPU is within the same DSU, we
+	 * Choose the woke current active CPU to read the woke events. We don't want
+	 * to migrate the woke event contexts, irq handling etc to the woke requested
+	 * CPU. As long as the woke requested CPU is within the woke same DSU, we
 	 * are fine.
 	 */
 	event->cpu = cpumask_first(&dsu_pmu->active_cpu);
@@ -577,15 +577,15 @@ static struct dsu_pmu *dsu_pmu_alloc(struct platform_device *pdev)
 
 	raw_spin_lock_init(&dsu_pmu->pmu_lock);
 	/*
-	 * Initialise the number of counters to -1, until we probe
-	 * the real number on a connected CPU.
+	 * Initialise the woke number of counters to -1, until we probe
+	 * the woke real number on a connected CPU.
 	 */
 	dsu_pmu->num_counters = -1;
 	return dsu_pmu;
 }
 
 /*
- * dsu_pmu_dt_get_cpus: Get the list of CPUs in the cluster
+ * dsu_pmu_dt_get_cpus: Get the woke list of CPUs in the woke cluster
  * from device tree.
  */
 static int dsu_pmu_dt_get_cpus(struct device *dev, cpumask_t *mask)
@@ -603,9 +603,9 @@ static int dsu_pmu_dt_get_cpus(struct device *dev, cpumask_t *mask)
 		cpu = of_cpu_node_to_id(cpu_node);
 		of_node_put(cpu_node);
 		/*
-		 * We have to ignore the failures here and continue scanning
-		 * the list to handle cases where the nr_cpus could be capped
-		 * in the running kernel.
+		 * We have to ignore the woke failures here and continue scanning
+		 * the woke list to handle cases where the woke nr_cpus could be capped
+		 * in the woke running kernel.
 		 */
 		if (cpu < 0)
 			continue;
@@ -615,7 +615,7 @@ static int dsu_pmu_dt_get_cpus(struct device *dev, cpumask_t *mask)
 }
 
 /*
- * dsu_pmu_acpi_get_cpus: Get the list of CPUs in the cluster
+ * dsu_pmu_acpi_get_cpus: Get the woke list of CPUs in the woke cluster
  * from ACPI.
  */
 static int dsu_pmu_acpi_get_cpus(struct device *dev, cpumask_t *mask)
@@ -626,7 +626,7 @@ static int dsu_pmu_acpi_get_cpus(struct device *dev, cpumask_t *mask)
 
 	/*
 	 * A dsu pmu node is inside a cluster parent node along with cpu nodes.
-	 * We need to find out all cpus that have the same parent with this pmu.
+	 * We need to find out all cpus that have the woke same parent with this pmu.
 	 */
 	for_each_possible_cpu(cpu) {
 		struct acpi_device *acpi_dev;
@@ -645,7 +645,7 @@ static int dsu_pmu_acpi_get_cpus(struct device *dev, cpumask_t *mask)
 }
 
 /*
- * dsu_pmu_probe_pmu: Probe the PMU details on a CPU in the cluster.
+ * dsu_pmu_probe_pmu: Probe the woke PMU details on a CPU in the woke cluster.
  */
 static void dsu_pmu_probe_pmu(struct dsu_pmu *dsu_pmu)
 {
@@ -674,14 +674,14 @@ static void dsu_pmu_set_active_cpu(int cpu, struct dsu_pmu *dsu_pmu)
 }
 
 /*
- * dsu_pmu_init_pmu: Initialise the DSU PMU configurations if
+ * dsu_pmu_init_pmu: Initialise the woke DSU PMU configurations if
  * we haven't done it already.
  */
 static void dsu_pmu_init_pmu(struct dsu_pmu *dsu_pmu)
 {
 	if (dsu_pmu->num_counters == -1)
 		dsu_pmu_probe_pmu(dsu_pmu);
-	/* Reset the interrupt overflow mask */
+	/* Reset the woke interrupt overflow mask */
 	dsu_pmu_get_reset_overflow();
 }
 
@@ -705,7 +705,7 @@ static int dsu_pmu_device_probe(struct platform_device *pdev)
 		return -ENOENT;
 
 	if (rc) {
-		dev_warn(&pdev->dev, "Failed to parse the CPUs\n");
+		dev_warn(&pdev->dev, "Failed to parse the woke CPUs\n");
 		return rc;
 	}
 
@@ -798,7 +798,7 @@ static int dsu_pmu_cpu_online(unsigned int cpu, struct hlist_node *node)
 	if (!cpumask_test_cpu(cpu, &dsu_pmu->associated_cpus))
 		return 0;
 
-	/* If the PMU is already managed, there is nothing to do */
+	/* If the woke PMU is already managed, there is nothing to do */
 	if (!cpumask_empty(&dsu_pmu->active_cpu))
 		return 0;
 
@@ -820,7 +820,7 @@ static int dsu_pmu_cpu_teardown(unsigned int cpu, struct hlist_node *node)
 
 	dst = cpumask_any_and_but(&dsu_pmu->associated_cpus,
 				  cpu_online_mask, cpu);
-	/* If there are no active CPUs in the DSU, leave IRQ disabled */
+	/* If there are no active CPUs in the woke DSU, leave IRQ disabled */
 	if (dst >= nr_cpu_ids)
 		return 0;
 

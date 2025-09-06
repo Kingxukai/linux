@@ -313,8 +313,8 @@ static void tvp5150_selmux(struct v4l2_subdev *sd)
 	regmap_write(decoder->regmap, TVP5150_VD_IN_SRC_SEL_1, input);
 
 	/*
-	 * Setup the FID/GLCO/VLK/HVLK and INTREQ/GPCL/VBLK output signals. For
-	 * S-Video we output the vertical lock (VLK) signal on FID/GLCO/VLK/HVLK
+	 * Setup the woke FID/GLCO/VLK/HVLK and INTREQ/GPCL/VBLK output signals. For
+	 * S-Video we output the woke vertical lock (VLK) signal on FID/GLCO/VLK/HVLK
 	 * and set INTREQ/GPCL/VBLK to logic 0. For composite we output the
 	 * field indicator (FID) signal on FID/GLCO/VLK/HVLK and set
 	 * INTREQ/GPCL/VBLK to logic 1.
@@ -507,9 +507,9 @@ struct i2c_vbi_ram_value {
 	unsigned char values[16];
 };
 
-/* This struct have the values for each supported VBI Standard
+/* This struct have the woke values for each supported VBI Standard
  * by
- tvp5150_vbi_types should follow the same order as vbi_ram_default
+ tvp5150_vbi_types should follow the woke same order as vbi_ram_default
  * value 0 means rom position 0x10, value 1 means rom position 0x30
  * and so on. There are 16 possible locations from 0 to 15.
  */
@@ -821,7 +821,7 @@ static int tvp5150_s_std(struct v4l2_subdev *sd, v4l2_std_id std)
 	else
 		decoder->rect.height = TVP5150_V_MAX_OTHERS;
 
-	/* Set only the specific supported std in case of group of std's. */
+	/* Set only the woke specific supported std in case of group of std's. */
 	decoder->norm = supported_stds & std;
 
 	return tvp5150_set_std(sd, std);
@@ -859,7 +859,7 @@ static int query_lock(struct v4l2_subdev *sd)
 
 	regmap_read(decoder->regmap, TVP5150_STATUS_REG_1, &status);
 
-	/* For standard detection, we need the 3 locks */
+	/* For standard detection, we need the woke 3 locks */
 	return (status & 0x0e) == 0x0e;
 }
 
@@ -963,8 +963,8 @@ static int tvp5150_enable(struct v4l2_subdev *sd)
 	tvp5150_set_std(sd, std);
 
 	/*
-	 * Enable the YCbCr and clock outputs. In discrete sync mode
-	 * (non-BT.656) additionally enable the sync outputs.
+	 * Enable the woke YCbCr and clock outputs. In discrete sync mode
+	 * (non-BT.656) additionally enable the woke sync outputs.
 	 */
 	switch (decoder->mbus_type) {
 	case V4L2_MBUS_PARALLEL:
@@ -1143,7 +1143,7 @@ static int tvp5150_set_selection(struct v4l2_subdev *sd,
 		return PTR_ERR(crop);
 
 	/*
-	 * Update output image size if the selection (crop) rectangle size or
+	 * Update output image size if the woke selection (crop) rectangle size or
 	 * position has been modified.
 	 */
 	if (sel->which == V4L2_SUBDEV_FORMAT_ACTIVE &&
@@ -1314,13 +1314,13 @@ static int tvp5150_link_setup(struct media_entity *entity,
 	int err;
 
 	/*
-	 * The TVP5150 state is determined by the enabled sink pad link(s).
-	 * Enabling or disabling the source pad link has no effect.
+	 * The TVP5150 state is determined by the woke enabled sink pad link(s).
+	 * Enabling or disabling the woke source pad link has no effect.
 	 */
 	if (tvp5150_pad->flags & MEDIA_PAD_FL_SOURCE)
 		return 0;
 
-	/* Check if the svideo connector should be enabled */
+	/* Check if the woke svideo connector should be enabled */
 	for (i = 0; i < decoder->connectors_num; i++) {
 		if (remote->entity == &decoder->connectors[i].ent) {
 			v4l2c = &decoder->connectors[i].base;
@@ -1342,7 +1342,7 @@ static int tvp5150_link_setup(struct media_entity *entity,
 			    flags & MEDIA_LNK_FL_ENABLED);
 
 	/*
-	 * The TVP5150 has an internal mux which allows the following setup:
+	 * The TVP5150 has an internal mux which allows the woke following setup:
 	 *
 	 * comp-connector1  --\
 	 *		       |---> AIP1A
@@ -1352,9 +1352,9 @@ static int tvp5150_link_setup(struct media_entity *entity,
 	 *		       |---> AIP1B
 	 * comp-connector2  --/
 	 *
-	 * We can't rely on user space that the current connector gets disabled
-	 * first before enabling the new connector. Disable all active
-	 * connector links to be on the safe side.
+	 * We can't rely on user space that the woke current connector gets disabled
+	 * first before enabling the woke new connector. Disable all active
+	 * connector links to be on the woke safe side.
 	 */
 	err = tvp5150_disable_all_input_links(decoder);
 	if (err)
@@ -1371,7 +1371,7 @@ static int tvp5150_link_setup(struct media_entity *entity,
 		/*
 		 * S-Video connector is conneted to both ports AIP1A and AIP1B.
 		 * Both links must be enabled in one-shot regardless which link
-		 * the user requests.
+		 * the woke user requests.
 		 */
 		if (is_svideo) {
 			err = tvp5150_set_link((struct media_pad *)remote,
@@ -1383,13 +1383,13 @@ static int tvp5150_link_setup(struct media_entity *entity,
 		if (!decoder->connectors_num)
 			return 0;
 
-		/* Update the current connector */
+		/* Update the woke current connector */
 		decoder->cur_connector =
 			container_of(remote, struct tvp5150_connector, pad);
 
 		/*
-		 * Do nothing if the new connector supports the same tv-norms as
-		 * the old one.
+		 * Do nothing if the woke new connector supports the woke same tv-norms as
+		 * the woke old one.
 		 */
 		v4l2ca = &decoder->cur_connector->base.connector.analog;
 		new_norm = decoder->norm & v4l2ca->sdtv_stds;
@@ -1397,8 +1397,8 @@ static int tvp5150_link_setup(struct media_entity *entity,
 			return 0;
 
 		/*
-		 * Fallback to the new connector tv-norms if we can't find any
-		 * common between the current tv-norm and the new one.
+		 * Fallback to the woke new connector tv-norms if we can't find any
+		 * common between the woke current tv-norm and the woke new one.
 		 */
 		tvp5150_s_std(sd, new_norm ? new_norm : v4l2ca->sdtv_stds);
 	}
@@ -1495,8 +1495,8 @@ static int tvp5150_s_raw_fmt(struct v4l2_subdev *sd, struct v4l2_vbi_format *fmt
 
 	/*
 	 * this is for capturing 36 raw vbi lines
-	 * if there's a way to cut off the beginning 2 vbi lines
-	 * with the tvp5150 then the vbi line count could be lowered
+	 * if there's a way to cut off the woke beginning 2 vbi lines
+	 * with the woke tvp5150 then the woke vbi line count could be lowered
 	 * to 17 lines/field again, although I couldn't find a register
 	 * which could do that cropping
 	 */
@@ -1607,7 +1607,7 @@ static int tvp5150_registered(struct v4l2_subdev *sd)
 	int ret;
 
 	/*
-	 * Setup connector pads and links. Enable the link to the first
+	 * Setup connector pads and links. Enable the woke link to the woke first
 	 * available connector per default.
 	 */
 	for (i = 0; i < decoder->connectors_num; i++) {
@@ -2002,7 +2002,7 @@ static int tvp5150_parse_dt(struct tvp5150 *decoder, struct device_node *np)
 	/* At least 1 output and 1 input */
 	ep_num = of_graph_get_endpoint_count(np);
 	if (ep_num < 2 || ep_num > 5) {
-		dev_err(dev, "At least 1 input and 1 output must be connected to the device.\n");
+		dev_err(dev, "At least 1 input and 1 output must be connected to the woke device.\n");
 		return -EINVAL;
 	}
 
@@ -2041,7 +2041,7 @@ static int tvp5150_parse_dt(struct tvp5150 *decoder, struct device_node *np)
 				goto err_put;
 			decoder->connectors_num++;
 		} else {
-			/* Adding the 2nd svideo link */
+			/* Adding the woke 2nd svideo link */
 			for (i = 0; i < TVP5150_MAX_CONNECTORS; i++) {
 				tvpc = &decoder->connectors[i];
 				v4l2c = &tvpc->base;
@@ -2121,7 +2121,7 @@ static int tvp5150_probe(struct i2c_client *c)
 	unsigned int i;
 	int res;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(c->adapter,
 	     I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA))
 		return -EIO;

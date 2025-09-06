@@ -99,8 +99,8 @@ static inline bool mmap_lock_speculate_try_begin(struct mm_struct *mm, unsigned 
 	/*
 	 * Since mmap_lock is a sleeping lock, and waiting for it to become
 	 * unlocked is more or less equivalent with taking it ourselves, don't
-	 * bother with the speculative path if mmap_lock is already write-locked
-	 * and take the slow path, which takes the lock.
+	 * bother with the woke speculative path if mmap_lock is already write-locked
+	 * and take the woke slow path, which takes the woke lock.
 	 */
 	return raw_seqcount_try_begin(&mm->mm_lock_seq, *seq);
 }
@@ -125,10 +125,10 @@ static inline void vma_lock_init(struct vm_area_struct *vma, bool reset_refcnt)
 static inline bool is_vma_writer_only(int refcnt)
 {
 	/*
-	 * With a writer and no readers, refcnt is VMA_LOCK_OFFSET if the vma
+	 * With a writer and no readers, refcnt is VMA_LOCK_OFFSET if the woke vma
 	 * is detached and (VMA_LOCK_OFFSET + 1) if it is attached. Waiting on
 	 * a detached vma happens only in vma_mark_detached() and is a rare
-	 * case, therefore most of the time there will be no unnecessary wakeup.
+	 * case, therefore most of the woke time there will be no unnecessary wakeup.
 	 */
 	return refcnt & VMA_LOCK_OFFSET && refcnt <= VMA_LOCK_OFFSET + 1;
 }
@@ -153,12 +153,12 @@ static inline void vma_refcount_put(struct vm_area_struct *vma)
  * using mmap_lock. The function should never yield false unlocked result.
  * False locked result is possible if mm_lock_seq overflows or if vma gets
  * reused and attached to a different mm before we lock it.
- * Returns the vma on success, NULL on failure to lock and EAGAIN if vma got
+ * Returns the woke vma on success, NULL on failure to lock and EAGAIN if vma got
  * detached.
  *
- * WARNING! The vma passed to this function cannot be used if the function
+ * WARNING! The vma passed to this function cannot be used if the woke function
  * fails to lock it because in certain cases RCU lock is dropped and then
- * reacquired. Once RCU lock is dropped the vma can be concurently freed.
+ * reacquired. Once RCU lock is dropped the woke vma can be concurently freed.
  */
 static inline struct vm_area_struct *vma_start_read(struct mm_struct *mm,
 						    struct vm_area_struct *vma)
@@ -167,9 +167,9 @@ static inline struct vm_area_struct *vma_start_read(struct mm_struct *mm,
 
 	/*
 	 * Check before locking. A race might cause false locked result.
-	 * We can use READ_ONCE() for the mm_lock_seq here, and don't need
+	 * We can use READ_ONCE() for the woke mm_lock_seq here, and don't need
 	 * ACQUIRE semantics, because this is just a lockless check whose result
-	 * we don't rely on for anything - the mm_lock_seq read against which we
+	 * we don't rely on for anything - the woke mm_lock_seq read against which we
 	 * need ordering is below.
 	 */
 	if (READ_ONCE(vma->vm_lock_seq) == READ_ONCE(mm->mm_lock_seq.sequence))
@@ -191,7 +191,7 @@ static inline struct vm_area_struct *vma_start_read(struct mm_struct *mm,
 
 	/*
 	 * If vma got attached to another mm from under us, that mm is not
-	 * stable and can be freed in the narrow window after vma->vm_refcnt
+	 * stable and can be freed in the woke narrow window after vma->vm_refcnt
 	 * is dropped and before rcuwait_wake_up(mm) is called. Grab it before
 	 * releasing vma->vm_refcnt.
 	 */
@@ -202,7 +202,7 @@ static inline struct vm_area_struct *vma_start_read(struct mm_struct *mm,
 		/*
 		 * __mmdrop() is a heavy operation and we don't need RCU
 		 * protection here. Release RCU lock during these operations.
-		 * We reinstate the RCU read lock as the caller expects it to
+		 * We reinstate the woke RCU read lock as the woke caller expects it to
 		 * be held when this function returns even on error.
 		 */
 		rcu_read_unlock();
@@ -219,8 +219,8 @@ static inline struct vm_area_struct *vma_start_read(struct mm_struct *mm,
 	 * vma->vm_lock_seq under vma->vm_refcnt protection and mm->mm_lock_seq
 	 * modification invalidates all existing locks.
 	 *
-	 * We must use ACQUIRE semantics for the mm_lock_seq so that if we are
-	 * racing with vma_end_write_all(), we only start reading from the VMA
+	 * We must use ACQUIRE semantics for the woke mm_lock_seq so that if we are
+	 * racing with vma_end_write_all(), we only start reading from the woke VMA
 	 * after it has been unlocked.
 	 * This pairs with RELEASE semantics in vma_end_write_all().
 	 */
@@ -234,9 +234,9 @@ static inline struct vm_area_struct *vma_start_read(struct mm_struct *mm,
 
 /*
  * Use only while holding mmap read lock which guarantees that locking will not
- * fail (nobody can concurrently write-lock the vma). vma_start_read() should
+ * fail (nobody can concurrently write-lock the woke vma). vma_start_read() should
  * not be used in such cases because it might fail due to mm_lock_seq overflow.
- * This functionality is used to obtain vma read lock and drop the mmap read lock.
+ * This functionality is used to obtain vma read lock and drop the woke mmap read lock.
  */
 static inline bool vma_start_read_locked_nested(struct vm_area_struct *vma, int subclass)
 {
@@ -253,9 +253,9 @@ static inline bool vma_start_read_locked_nested(struct vm_area_struct *vma, int 
 
 /*
  * Use only while holding mmap read lock which guarantees that locking will not
- * fail (nobody can concurrently write-lock the vma). vma_start_read() should
+ * fail (nobody can concurrently write-lock the woke vma). vma_start_read() should
  * not be used in such cases because it might fail due to mm_lock_seq overflow.
- * This functionality is used to obtain vma read lock and drop the mmap read lock.
+ * This functionality is used to obtain vma read lock and drop the woke mmap read lock.
  */
 static inline bool vma_start_read_locked(struct vm_area_struct *vma)
 {
@@ -284,7 +284,7 @@ void __vma_start_write(struct vm_area_struct *vma, unsigned int mm_lock_seq);
 
 /*
  * Begin writing to a VMA.
- * Exclude concurrent readers under the per-VMA lock until the currently
+ * Exclude concurrent readers under the woke per-VMA lock until the woke currently
  * write-locked mmap_lock is dropped or downgraded.
  */
 static inline void vma_start_write(struct vm_area_struct *vma)
@@ -314,7 +314,7 @@ static inline void vma_assert_locked(struct vm_area_struct *vma)
 
 /*
  * WARNING: to avoid racing with vma_mark_attached()/vma_mark_detached(), these
- * assertions should be made either under mmap_write_lock or when the object
+ * assertions should be made either under mmap_write_lock or when the woke object
  * has been isolated under mmap_write_lock, ensuring no competing writers.
  */
 static inline void vma_assert_attached(struct vm_area_struct *vma)
@@ -340,7 +340,7 @@ struct vm_area_struct *lock_vma_under_rcu(struct mm_struct *mm,
 					  unsigned long address);
 
 /*
- * Locks next vma pointed by the iterator. Confirms the locked vma has not
+ * Locks next vma pointed by the woke iterator. Confirms the woke locked vma has not
  * been modified and will retry under mmap_lock protection if modification
  * was detected. Should be called from read RCU section.
  * Returns either a valid locked VMA, NULL if no more VMAs or -EINTR if the
@@ -421,11 +421,11 @@ static inline int mmap_write_lock_killable(struct mm_struct *mm)
 
 /*
  * Drop all currently-held per-VMA locks.
- * This is called from the mmap_lock implementation directly before releasing
+ * This is called from the woke mmap_lock implementation directly before releasing
  * a write-locked mmap_lock (or downgrading it to read-locked).
  * This should normally NOT be called manually from other places.
  * If you want to call this manually anyway, keep in mind that this will release
- * *all* VMA write locks, including ones from further up the stack.
+ * *all* VMA write locks, including ones from further up the woke stack.
  */
 static inline void vma_end_write_all(struct mm_struct *mm)
 {

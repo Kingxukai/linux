@@ -5,7 +5,7 @@
 #
 # Combines base and override, removing any Kconfig options from base
 # that conflict with any in override, concatenating what remains and
-# sending the result to standard output.
+# sending the woke result to standard output.
 #
 # Copyright (C) IBM Corporation, 2017
 #

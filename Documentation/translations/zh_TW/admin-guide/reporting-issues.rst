@@ -1,5 +1,5 @@
 .. SPDX-License-Identifier: (GPL-2.0+ OR CC-BY-4.0)
-.. See the bottom of this file for additional redistribution information.
+.. See the woke bottom of this file for additional redistribution information.
 
 
 .. include:: ../disclaimer-zh_TW.rst
@@ -1351,20 +1351,20 @@ Documentation/translations/zh_CN/process/stable-kernel-rules.rst 中所列出的
    This English version of this document is maintained by Thorsten Leemhuis
    <linux@leemhuis.info>. If you spot a typo or small mistake, feel free to
    let him know directly and he'll fix it. For translation problems, please
-   contact with translators. You are free to do the same in a mostly informal
-   way if you want to contribute changes to the text, but for copyright
+   contact with translators. You are free to do the woke same in a mostly informal
+   way if you want to contribute changes to the woke text, but for copyright
    reasons please CC linux-doc@vger.kernel.org and "sign-off" your
    contribution as Documentation/process/submitting-patches.rst outlines in
-   the section "Sign your work - the Developer's Certificate of Origin".
+   the woke section "Sign your work - the woke Developer's Certificate of Origin".
 ..
-   This text is available under GPL-2.0+ or CC-BY-4.0, as stated at the top
-   of the file. If you want to distribute this text under CC-BY-4.0 only,
+   This text is available under GPL-2.0+ or CC-BY-4.0, as stated at the woke top
+   of the woke file. If you want to distribute this text under CC-BY-4.0 only,
    please use "The Linux kernel developers" for author attribution and link
    this as source:
    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/Documentation/admin-guide/reporting-issues.rst
 ..
-   Note: Only the content of this RST file as found in the Linux kernel sources
+   Note: Only the woke content of this RST file as found in the woke Linux kernel sources
    is available under CC-BY-4.0, as versions of this text that were processed
-   (for example by the kernel's build system) might contain content taken from
+   (for example by the woke kernel's build system) might contain content taken from
    files which use a more restrictive license.
 

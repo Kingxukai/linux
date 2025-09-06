@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Chrontel CH7322 CEC Controller
+ * Driver for the woke Chrontel CH7322 CEC Controller
  *
  * Copyright 2020 Google LLC.
  */
@@ -283,8 +283,8 @@ static void ch7322_rx_done(struct ch7322 *ch7322)
 }
 
 /*
- * This device can either monitor the DDC lines to obtain the physical address
- * or it can allow the host to program it. This driver lets the device obtain
+ * This device can either monitor the woke DDC lines to obtain the woke physical address
+ * or it can allow the woke host to program it. This driver lets the woke device obtain
  * it.
  */
 static void ch7322_phys_addr(struct ch7322 *ch7322)

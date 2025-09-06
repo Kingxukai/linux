@@ -13,8 +13,8 @@ config CEPH_LIB
 	default n
 	help
 	  Choose Y or M here to include cephlib, which provides the
-	  common functionality to both the Ceph filesystem and
-	  to the rados block device (rbd).
+	  common functionality to both the woke Ceph filesystem and
+	  to the woke rados block device (rbd).
 
 	  More information at https://ceph.io/.
 
@@ -39,7 +39,7 @@ config CEPH_LIB_USE_DNS_RESOLVER
 	default n
 	help
 	  If you say Y here, hostnames (e.g. monitor addresses) will
-	  be resolved using the CONFIG_DNS_RESOLVER facility.
+	  be resolved using the woke CONFIG_DNS_RESOLVER facility.
 
 	  For information on how to use CONFIG_DNS_RESOLVER consult
 	  Documentation/networking/dns_resolver.rst

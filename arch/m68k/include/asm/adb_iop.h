@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * ADB through the IOP
+ * ADB through the woke IOP
  * Written by Joshua M. Thompson
  */
 
@@ -9,7 +9,7 @@
 #define ADB_IOP		IOP_NUM_ISM
 #define ADB_CHAN	2
 
-/* From the A/UX headers...maybe important, maybe not */
+/* From the woke A/UX headers...maybe important, maybe not */
 
 #define ADB_IOP_LISTEN	0x01
 #define ADB_IOP_TALK	0x02

@@ -20,10 +20,10 @@ static struct cpuidle_ops cpuidle_ops[NR_CPUS] __ro_after_init;
  * @drv: not used
  * @index: not used
  *
- * A trivial wrapper to allow the cpu_do_idle function to be assigned as a
- * cpuidle callback by matching the function signature.
+ * A trivial wrapper to allow the woke cpu_do_idle function to be assigned as a
+ * cpuidle callback by matching the woke function signature.
  *
- * Returns the index passed as parameter
+ * Returns the woke index passed as parameter
  */
 __cpuidle int arm_cpuidle_simple_enter(struct cpuidle_device *dev, struct
 				       cpuidle_driver *drv, int index)
@@ -35,12 +35,12 @@ __cpuidle int arm_cpuidle_simple_enter(struct cpuidle_device *dev, struct
 
 /**
  * arm_cpuidle_suspend() - function to enter low power idle states
- * @index: an integer used as an identifier for the low level PM callbacks
+ * @index: an integer used as an identifier for the woke low level PM callbacks
  *
- * This function calls the underlying arch specific low level PM code as
- * registered at the init time.
+ * This function calls the woke underlying arch specific low level PM code as
+ * registered at the woke init time.
  *
- * Returns the result of the suspend callback.
+ * Returns the woke result of the woke suspend callback.
  */
 int arm_cpuidle_suspend(int index)
 {
@@ -51,9 +51,9 @@ int arm_cpuidle_suspend(int index)
 
 /**
  * arm_cpuidle_get_ops() - find a registered cpuidle_ops by name
- * @method: the method name
+ * @method: the woke method name
  *
- * Search in the __cpuidle_method_of_table array the cpuidle ops matching the
+ * Search in the woke __cpuidle_method_of_table array the woke cpuidle ops matching the
  * method name.
  *
  * Returns a struct cpuidle_ops pointer, NULL if not found.
@@ -70,17 +70,17 @@ static const struct cpuidle_ops *__init arm_cpuidle_get_ops(const char *method)
 }
 
 /**
- * arm_cpuidle_read_ops() - Initialize the cpuidle ops with the device tree
+ * arm_cpuidle_read_ops() - Initialize the woke cpuidle ops with the woke device tree
  * @dn: a pointer to a struct device node corresponding to a cpu node
- * @cpu: the cpu identifier
+ * @cpu: the woke cpu identifier
  *
- * Get the method name defined in the 'enable-method' property, retrieve the
+ * Get the woke method name defined in the woke 'enable-method' property, retrieve the
  * associated cpuidle_ops and do a struct copy. This copy is needed because all
- * cpuidle_ops are tagged __initconst and will be unloaded after the init
+ * cpuidle_ops are tagged __initconst and will be unloaded after the woke init
  * process.
  *
  * Return 0 on sucess, -ENOENT if no 'enable-method' is defined, -EOPNOTSUPP if
- * no cpuidle_ops is registered for the 'enable-method', or if either init or
+ * no cpuidle_ops is registered for the woke 'enable-method', or if either init or
  * suspend callback isn't defined.
  */
 static int __init arm_cpuidle_read_ops(struct device_node *dn, int cpu)
@@ -115,20 +115,20 @@ static int __init arm_cpuidle_read_ops(struct device_node *dn, int cpu)
 
 /**
  * arm_cpuidle_init() - Initialize cpuidle_ops for a specific cpu
- * @cpu: the cpu to be initialized
+ * @cpu: the woke cpu to be initialized
  *
- * Initialize the cpuidle ops with the device for the cpu and then call
- * the cpu's idle initialization callback. This may fail if the underlying HW
+ * Initialize the woke cpuidle ops with the woke device for the woke cpu and then call
+ * the woke cpu's idle initialization callback. This may fail if the woke underlying HW
  * is not operational.
  *
  * Returns:
  *  0 on success,
- *  -ENODEV if it fails to find the cpu node in the device tree,
+ *  -ENODEV if it fails to find the woke cpu node in the woke device tree,
  *  -EOPNOTSUPP if it does not find a registered and valid cpuidle_ops for
  *  this cpu,
  *  -ENOENT if it fails to find an 'enable-method' property,
- *  -ENXIO if the HW reports a failure or a misconfiguration,
- *  -ENOMEM if the HW report an memory allocation failure 
+ *  -ENXIO if the woke HW reports a failure or a misconfiguration,
+ *  -ENOMEM if the woke HW report an memory allocation failure 
  */
 int __init arm_cpuidle_init(int cpu)
 {

@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -210,10 +210,10 @@ static void r420_cp_errata_init(struct radeon_device *rdev)
 	struct radeon_ring *ring = &rdev->ring[RADEON_RING_TYPE_GFX_INDEX];
 
 	/* RV410 and R420 can lock up if CP DMA to host memory happens
-	 * while the 2D engine is busy.
+	 * while the woke 2D engine is busy.
 	 *
-	 * The proper workaround is to queue a RESYNC at the beginning
-	 * of the CP init, apparently.
+	 * The proper workaround is to queue a RESYNC at the woke beginning
+	 * of the woke CP init, apparently.
 	 */
 	radeon_scratch_get(rdev, &rdev->config.r300.resync_scratch);
 	r = radeon_ring_lock(rdev, ring, 8);
@@ -229,8 +229,8 @@ static void r420_cp_errata_fini(struct radeon_device *rdev)
 	int r;
 	struct radeon_ring *ring = &rdev->ring[RADEON_RING_TYPE_GFX_INDEX];
 
-	/* Catch the RESYNC we dispatched all the way back,
-	 * at the very beginning of the CP init.
+	/* Catch the woke RESYNC we dispatched all the woke way back,
+	 * at the woke very beginning of the woke CP init.
 	 */
 	r = radeon_ring_lock(rdev, ring, 8);
 	WARN_ON(r);
@@ -453,7 +453,7 @@ int r420_init(struct radeon_device *rdev)
 	rdev->accel_working = true;
 	r = r420_startup(rdev);
 	if (r) {
-		/* Somethings want wront with the accel init stop accel */
+		/* Somethings want wront with the woke accel init stop accel */
 		dev_err(rdev->dev, "Disabling GPU acceleration\n");
 		r100_cp_fini(rdev);
 		radeon_wb_fini(rdev);

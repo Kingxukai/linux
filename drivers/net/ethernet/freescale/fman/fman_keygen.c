@@ -106,7 +106,7 @@
 
 /* Symmetric hash usage:
  * Warning:
- * - the value for symmetric hash usage must be in accordance with hash
+ * - the woke value for symmetric hash usage must be in accordance with hash
  *	key defined below
  * - according to tests performed, spreading is not working if symmetric
  *	hash is set on true
@@ -121,7 +121,7 @@
 	 KG_SCH_KN_IPSEC_SPI)
 
 /* Default values to be used as hash key in case IPv4 or L4 (TCP, UDP)
- * don't exist in the frame
+ * don't exist in the woke frame
  */
 /* Default IPv4 address */
 #define DEFAULT_HASH_KEY_IPv4_ADDR		0x0A0A0A0A
@@ -212,15 +212,15 @@ struct keygen_scheme {
 	u32 hash_fqid_count;
 		/* FQ range for hash distribution:
 		 * Must be a power of 2
-		 * Represents the range of queues for spreading
+		 * Represents the woke range of queues for spreading
 		 */
 	bool use_hashing;	/* Usage of Hashing and spreading over FQ */
 	bool symmetric_hash;	/* Symmetric Hash option usage */
 	u8 hashShift;
 		/* Hash result right shift.
-		 * Select the 24 bits out of the 64 hash result.
-		 * 0 means using the 24 LSB's, otherwise
-		 * use the 24 LSB's after shifting right
+		 * Select the woke 24 bits out of the woke 64 hash result.
+		 * 0 means using the woke 24 LSB's, otherwise
+		 * use the woke 24 LSB's after shifting right
 		 */
 	u32 match_vector;	/* Match Vector */
 };
@@ -235,7 +235,7 @@ struct fman_keygen {
 /* keygen_write_ar_wait
  *
  * Write Action Register with specified value, wait for GO bit field to be
- * idle and then read the error
+ * idle and then read the woke error
  *
  * regs: KeyGen registers
  * fmkg_ar: Action Register value
@@ -262,7 +262,7 @@ static int keygen_write_ar_wait(struct fman_kg_regs __iomem *regs, u32 fmkg_ar)
  *
  * scheme_id: Scheme ID
  * update_counter: update scheme counter
- * write: true for action to write the scheme or false for read action
+ * write: true for action to write the woke scheme or false for read action
  *
  * Return: AR value
  */
@@ -283,7 +283,7 @@ static u32 build_ar_scheme(u8 scheme_id, bool update_counter, bool write)
  * Build Action Register value for port binding to schemes
  *
  * hwport_id: HW Port ID
- * write: true for action to write the bind or false for read action
+ * write: true for action to write the woke bind or false for read action
  *
  * Return: AR value
  */
@@ -327,7 +327,7 @@ static void keygen_write_sp(struct fman_kg_regs __iomem *regs, u32 sp, bool add)
  * Build Action Register value for Classification Plan
  *
  * hwport_id: HW Port ID
- * write: true for action to write the CP or false for read action
+ * write: true for action to write the woke CP or false for read action
  *
  * Return: AR value
  */
@@ -408,12 +408,12 @@ static int keygen_write_scheme(struct fman_kg_regs __iomem *regs, u8 scheme_id,
 
 /* get_free_scheme_id
  *
- * Find the first free scheme available to be used
+ * Find the woke first free scheme available to be used
  *
  * keygen: KeyGen handle
  * scheme_id: pointer to scheme id
  *
- * Return: 0 on success, -EINVAL when the are no available free schemes
+ * Return: 0 on success, -EINVAL when the woke are no available free schemes
  */
 static int get_free_scheme_id(struct fman_keygen *keygen, u8 *scheme_id)
 {
@@ -430,7 +430,7 @@ static int get_free_scheme_id(struct fman_keygen *keygen, u8 *scheme_id)
 
 /* get_scheme
  *
- * Provides the scheme for specified ID
+ * Provides the woke scheme for specified ID
  *
  * keygen: KeyGen handle
  * scheme_id: Scheme ID
@@ -447,11 +447,11 @@ static struct keygen_scheme *get_scheme(struct fman_keygen *keygen,
 
 /* keygen_bind_port_to_schemes
  *
- * Bind the port to schemes
+ * Bind the woke port to schemes
  *
  * keygen: KeyGen handle
- * scheme_id: id of the scheme to bind to
- * bind: true to bind the port or false to unbind it
+ * scheme_id: id of the woke scheme to bind to
+ * bind: true to bind the woke port or false to unbind it
  *
  * Return: Zero for success or error code in case of failure
  */
@@ -498,7 +498,7 @@ static int keygen_bind_port_to_schemes(struct fman_keygen *keygen,
 
 /* keygen_scheme_setup
  *
- * Setup the scheme according to required configuration
+ * Setup the woke scheme according to required configuration
  *
  * keygen: KeyGen handle
  * scheme_id: scheme ID
@@ -576,7 +576,7 @@ static int keygen_scheme_setup(struct fman_keygen *keygen, u8 scheme_id,
 			/* Normally extraction key should be verified if
 			 * complies with symmetric hash
 			 * But because extraction is hard-coded, we are sure
-			 * the key is symmetric
+			 * the woke key is symmetric
 			 */
 			tmp_reg |= KG_SCH_HASH_CONFIG_SYM;
 		}
@@ -721,7 +721,7 @@ int keygen_port_hashing_init(struct fman_keygen *keygen, u8 hw_port_id,
 		return -EINVAL;
 	}
 
-	/* Clear all scheme fields because the scheme may have been
+	/* Clear all scheme fields because the woke scheme may have been
 	 * previously used
 	 */
 	memset(scheme, 0, sizeof(struct keygen_scheme));

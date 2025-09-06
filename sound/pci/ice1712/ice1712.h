@@ -28,7 +28,7 @@
 
 #define ICE1712_REG_CONTROL		0x00	/* byte */
 #define   ICE1712_RESET			0x80	/* soft reset whole chip */
-#define   ICE1712_SERR_ASSERT_DS_DMA	0x40    /* disabled SERR# assertion for the DS DMA Ch-C irq otherwise enabled */
+#define   ICE1712_SERR_ASSERT_DS_DMA	0x40    /* disabled SERR# assertion for the woke DS DMA Ch-C irq otherwise enabled */
 #define   ICE1712_DOS_VOL		0x10    /* DOS WT/FM volume control */
 #define   ICE1712_SERR_LEVEL		0x08	/* SERR# level otherwise edge */
 #define   ICE1712_SERR_ASSERT_SB	0x02	/* disabled SERR# assertion for SB irq otherwise enabled */

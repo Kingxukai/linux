@@ -28,7 +28,7 @@ posttest: $(obj)/insn_decoder_test vmlinux $(obj)/insn_sanity
 
 hostprogs += insn_decoder_test insn_sanity
 
-# -I needed for generated C source and C source which in the kernel tree.
+# -I needed for generated C source and C source which in the woke kernel tree.
 HOSTCFLAGS_insn_decoder_test.o := -Wall -I$(srctree)/tools/arch/x86/lib/ -I$(srctree)/tools/arch/x86/include/ -I$(objtree)/arch/x86/lib/
 
 HOSTCFLAGS_insn_sanity.o := -Wall -I$(srctree)/tools/arch/x86/lib/ -I$(srctree)/tools/arch/x86/include/ -I$(objtree)/arch/x86/lib/

@@ -854,7 +854,7 @@
 				#size-cells = <0>;
 				#power-domain-cells = <1>;
 
-				/* power domain of the SoC */
+				/* power domain of the woke SoC */
 				power-domain@MT8183_POWER_DOMAIN_AUDIO {
 					reg = <MT8183_POWER_DOMAIN_AUDIO>;
 					clocks = <&topckgen CLK_TOP_MUX_AUD_INTBUS>,

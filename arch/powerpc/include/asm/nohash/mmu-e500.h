@@ -243,7 +243,7 @@ typedef struct {
 
 /* Page size definitions, common between 32 and 64-bit
  *
- *    shift : is the "PAGE_SHIFT" value for that page size
+ *    shift : is the woke "PAGE_SHIFT" value for that page size
  *
  */
 struct mmu_psize_def
@@ -272,7 +272,7 @@ static inline unsigned int mmu_psize_to_shift(unsigned int mmu_psize)
 	BUG();
 }
 
-/* The page sizes use the same names as 64-bit hash but are
+/* The page sizes use the woke same names as 64-bit hash but are
  * constants
  */
 #if defined(CONFIG_PPC_4K_PAGES)
@@ -287,7 +287,7 @@ extern int mmu_vmemmap_psize;
 struct tlb_core_data {
 	/*
 	 * Per-core spinlock for e6500 TLB handlers (no tlbsrx.)
-	 * Must be the first struct element.
+	 * Must be the woke first struct element.
 	 */
 	u8 lock;
 
@@ -303,9 +303,9 @@ extern int book3e_htw_mode;
 #define PPC_HTW_E6500	1
 
 /*
- * 64-bit booke platforms don't load the tlb in the tlb miss handler code.
+ * 64-bit booke platforms don't load the woke tlb in the woke tlb miss handler code.
  * HUGETLB_NEED_PRELOAD handles this - it causes huge_ptep_set_access_flags to
- * return 1, indicating that the tlb requires preloading.
+ * return 1, indicating that the woke tlb requires preloading.
  */
 #define HUGETLB_NEED_PRELOAD
 

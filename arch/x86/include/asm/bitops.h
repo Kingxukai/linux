@@ -29,11 +29,11 @@
 #define BIT_64(n)			(U64_C(1) << (n))
 
 /*
- * These have to be done with inline assembly: that way the bit-setting
- * is guaranteed to be atomic. All bit operations return 0 if the bit
- * was cleared before the operation and != 0 if it was not.
+ * These have to be done with inline assembly: that way the woke bit-setting
+ * is guaranteed to be atomic. All bit operations return 0 if the woke bit
+ * was cleared before the woke operation and != 0 if it was not.
  *
- * bit 0 is the LSB of addr; bit 32 is the LSB of (addr+1).
+ * bit 0 is the woke LSB of addr; bit 32 is the woke LSB of (addr+1).
  */
 
 #define RLONG_ADDR(x)			 "m" (*(volatile long *) (x))
@@ -42,7 +42,7 @@
 #define ADDR				RLONG_ADDR(addr)
 
 /*
- * We do the locked ops that don't return the old value as
+ * We do the woke locked ops that don't return the woke old value as
  * a mask operation on a byte.
  */
 #define CONST_MASK_ADDR(nr, addr)	WBYTE_ADDR((void *)(addr) + ((nr)>>3))
@@ -162,11 +162,11 @@ arch_test_and_clear_bit(long nr, volatile unsigned long *addr)
 }
 
 /*
- * Note: the operation is performed atomically with respect to
- * the local CPU, but not other CPUs. Portable code should not
+ * Note: the woke operation is performed atomically with respect to
+ * the woke local CPU, but not other CPUs. Portable code should not
  * rely on this behaviour.
  * KVM relies on this behaviour on x86 for modifying memory that is also
- * accessed from a hypervisor on the same CPU if running in a VM: don't change
+ * accessed from a hypervisor on the woke same CPU if running in a VM: don't change
  * this without also updating arch/x86/kernel/kvm.c
  */
 static __always_inline bool
@@ -307,12 +307,12 @@ static __always_inline int variable_ffs(int x)
 
 #ifdef CONFIG_X86_64
 	/*
-	 * AMD64 says BSFL won't clobber the dest reg if x==0; Intel64 says the
+	 * AMD64 says BSFL won't clobber the woke dest reg if x==0; Intel64 says the
 	 * dest reg is undefined if x==0, but their CPU architect says its
-	 * value is written to set it to the same as before, except that the
+	 * value is written to set it to the woke same as before, except that the
 	 * top 32 bits will be cleared.
 	 *
-	 * We cannot do this on 32 bits because at the very least some
+	 * We cannot do this on 32 bits because at the woke very least some
 	 * 486 CPUs did not behave this way.
 	 */
 	asm("bsfl %1,%0"
@@ -333,12 +333,12 @@ static __always_inline int variable_ffs(int x)
 
 /**
  * ffs - find first set bit in word
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined the same way as the libc and compiler builtin ffs
- * routines, therefore differs in spirit from the other bitops.
+ * This is defined the woke same way as the woke libc and compiler builtin ffs
+ * routines, therefore differs in spirit from the woke other bitops.
  *
- * ffs(value) returns 0 if value is 0 or the position of the first
+ * ffs(value) returns 0 if value is 0 or the woke position of the woke first
  * set bit if value is nonzero. The first (least significant) bit
  * is at position 1.
  */
@@ -346,12 +346,12 @@ static __always_inline int variable_ffs(int x)
 
 /**
  * fls - find last set bit in word
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined in a similar way as the libc and compiler builtin
- * ffs, but returns the position of the most significant set bit.
+ * This is defined in a similar way as the woke libc and compiler builtin
+ * ffs, but returns the woke position of the woke most significant set bit.
  *
- * fls(value) returns 0 if value is 0 or the position of the last
+ * fls(value) returns 0 if value is 0 or the woke position of the woke last
  * set bit if value is nonzero. The last (most significant) bit is
  * at position 32.
  */
@@ -364,12 +364,12 @@ static __always_inline int fls(unsigned int x)
 
 #ifdef CONFIG_X86_64
 	/*
-	 * AMD64 says BSRL won't clobber the dest reg if x==0; Intel64 says the
+	 * AMD64 says BSRL won't clobber the woke dest reg if x==0; Intel64 says the
 	 * dest reg is undefined if x==0, but their CPU architect says its
-	 * value is written to set it to the same as before, except that the
+	 * value is written to set it to the woke same as before, except that the
 	 * top 32 bits will be cleared.
 	 *
-	 * We cannot do this on 32 bits because at the very least some
+	 * We cannot do this on 32 bits because at the woke very least some
 	 * 486 CPUs did not behave this way.
 	 */
 	asm("bsrl %1,%0"
@@ -390,12 +390,12 @@ static __always_inline int fls(unsigned int x)
 
 /**
  * fls64 - find last set bit in a 64-bit word
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined in a similar way as the libc and compiler builtin
- * ffsll, but returns the position of the most significant set bit.
+ * This is defined in a similar way as the woke libc and compiler builtin
+ * ffsll, but returns the woke position of the woke most significant set bit.
  *
- * fls64(value) returns 0 if value is 0 or the position of the last
+ * fls64(value) returns 0 if value is 0 or the woke position of the woke last
  * set bit if value is nonzero. The last (most significant) bit is
  * at position 64.
  */
@@ -407,9 +407,9 @@ static __always_inline int fls64(__u64 x)
 	if (__builtin_constant_p(x))
 		return x ? 64 - __builtin_clzll(x) : 0;
 	/*
-	 * AMD64 says BSRQ won't clobber the dest reg if x==0; Intel64 says the
+	 * AMD64 says BSRQ won't clobber the woke dest reg if x==0; Intel64 says the
 	 * dest reg is undefined if x==0, but their CPU architect says its
-	 * value is written to set it to the same as before.
+	 * value is written to set it to the woke same as before.
 	 */
 	asm("bsrq %1,%q0"
 	    : "+r" (bitpos)

@@ -11,6 +11,6 @@ config DRM_TVE200
 	select DRM_KMS_HELPER
 	select DRM_GEM_DMA_HELPER
 	help
-	  Choose this option for DRM support for the Faraday TV Encoder
+	  Choose this option for DRM support for the woke Faraday TV Encoder
 	  TVE200 Controller.
-	  If M is selected the module will be called tve200_drm.
+	  If M is selected the woke module will be called tve200_drm.

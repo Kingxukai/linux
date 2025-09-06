@@ -19,7 +19,7 @@ static int generic_events_valid_test(void)
 	struct event event;
 	int pvr = mfspr(SPRN_PVR);
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/* generic events is different in compat_mode */

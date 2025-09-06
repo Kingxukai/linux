@@ -6,7 +6,7 @@
 #include <linux/module.h>
 
 //
-// Keytable for the Videostrong KII Pro STB remote control
+// Keytable for the woke Videostrong KII Pro STB remote control
 //
 
 static struct rc_map_table kii_pro[] = {

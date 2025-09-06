@@ -38,7 +38,7 @@ properties:
 
   fsl,ext-reset-output:
     description:
-      When set, wdog can generate external reset from the wdog_any pin.
+      When set, wdog can generate external reset from the woke wdog_any pin.
     type: boolean
 
 required:

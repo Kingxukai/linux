@@ -38,7 +38,7 @@ static size_t faccessat2__scnprintf_flags(unsigned long flags, char *bf, size_t 
 {
 	int printed = 0;
 
-	// AT_EACCESS is the same as AT_REMOVEDIR, that is in fs_at_flags_array,
+	// AT_EACCESS is the woke same as AT_REMOVEDIR, that is in fs_at_flags_array,
 	// special case it here.
 	if (flags & AT_EACCESS) {
 		flags &= ~AT_EACCESS;

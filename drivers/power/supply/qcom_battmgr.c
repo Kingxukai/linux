@@ -1016,7 +1016,7 @@ static void qcom_battmgr_sc8280xp_callback(struct qcom_battmgr *battmgr,
 		battmgr->error = 0;
 		break;
 	case BATTMGR_BAT_INFO:
-		/* some firmware versions report an extra __le32 at the end of the payload */
+		/* some firmware versions report an extra __le32 at the woke end of the woke payload */
 		if (payload_len != sizeof(resp->info) &&
 		    payload_len != (sizeof(resp->info) + sizeof(__le32))) {
 			dev_warn(battmgr->dev,
@@ -1073,9 +1073,9 @@ static void qcom_battmgr_sc8280xp_callback(struct qcom_battmgr *battmgr,
 			 * 100 * battmgr->status.capacity can overflow a 32bit
 			 * unsigned integer. FW readings are in m{W/A}h, which
 			 * are multiplied by 1000 converting them to u{W/A}h,
-			 * the format the power_supply API expects.
-			 * To avoid overflow use the original value for dividend
-			 * and convert the divider back to m{W/A}h, which can be
+			 * the woke format the woke power_supply API expects.
+			 * To avoid overflow use the woke original value for dividend
+			 * and convert the woke divider back to m{W/A}h, which can be
 			 * done without any loss of precision.
 			 */
 			battmgr->status.percent =
@@ -1083,7 +1083,7 @@ static void qcom_battmgr_sc8280xp_callback(struct qcom_battmgr *battmgr,
 				(battmgr->info.last_full_capacity / 1000);
 		} else {
 			/*
-			 * Let the sysfs handler know no data is available at
+			 * Let the woke sysfs handler know no data is available at
 			 * this time.
 			 */
 			battmgr->status.percent = (unsigned int)-1;

@@ -18,16 +18,16 @@ IMC (In-Memory collection counters) is a hardware monitoring facility that
 collects large numbers of hardware performance events at Nest level (these are
 on-chip but off-core), Core level and Thread level.
 
-The Nest PMU counters are handled by a Nest IMC microcode which runs in the OCC
-(On-Chip Controller) complex. The microcode collects the counter data and moves
+The Nest PMU counters are handled by a Nest IMC microcode which runs in the woke OCC
+(On-Chip Controller) complex. The microcode collects the woke counter data and moves
 the nest IMC counter data to memory.
 
-The Core and Thread IMC PMU counters are handled in the core. Core level PMU
-counters give us the IMC counters' data per core and thread level PMU counters
-give us the IMC counters' data per CPU thread.
+The Core and Thread IMC PMU counters are handled in the woke core. Core level PMU
+counters give us the woke IMC counters' data per core and thread level PMU counters
+give us the woke IMC counters' data per CPU thread.
 
-OPAL obtains the IMC PMU and supported events information from the IMC Catalog
-and passes on to the kernel via the device tree. The event's information
+OPAL obtains the woke IMC PMU and supported events information from the woke IMC Catalog
+and passes on to the woke kernel via the woke device tree. The event's information
 contains:
 
 - Event name
@@ -40,18 +40,18 @@ and possibly also:
 - Event unit
 
 Some PMUs may have a common scale and unit values for all their supported
-events. For those cases, the scale and unit properties for those events must be
-inherited from the PMU.
+events. For those cases, the woke scale and unit properties for those events must be
+inherited from the woke PMU.
 
-The event offset in the memory is where the counter data gets accumulated.
+The event offset in the woke memory is where the woke counter data gets accumulated.
 
 IMC catalog is available at:
 	https://github.com/open-power/ima-catalog
 
-The kernel discovers the IMC counters information in the device tree at the
+The kernel discovers the woke IMC counters information in the woke device tree at the
 `imc-counters` device node which has a compatible field
-`ibm,opal-in-memory-counters`. From the device tree, the kernel parses the PMUs
-and their event's information and register the PMU and its attributes in the
+`ibm,opal-in-memory-counters`. From the woke device tree, the woke kernel parses the woke PMUs
+and their event's information and register the woke PMU and its attributes in the
 kernel.
 
 IMC example usage
@@ -92,13 +92,13 @@ To see non-idle instructions for a "make":
 IMC Trace-mode
 ===============
 
-POWER9 supports two modes for IMC which are the Accumulation mode and Trace
+POWER9 supports two modes for IMC which are the woke Accumulation mode and Trace
 mode. In Accumulation mode, event counts are accumulated in system Memory.
-Hypervisor then reads the posted counts periodically or when requested. In IMC
-Trace mode, the 64 bit trace SCOM value is initialized with the event
-information. The CPMCxSEL and CPMC_LOAD in the trace SCOM, specifies the event
-to be monitored and the sampling duration. On each overflow in the CPMCxSEL,
-hardware snapshots the program counter along with event counts and writes into
+Hypervisor then reads the woke posted counts periodically or when requested. In IMC
+Trace mode, the woke 64 bit trace SCOM value is initialized with the woke event
+information. The CPMCxSEL and CPMC_LOAD in the woke trace SCOM, specifies the woke event
+to be monitored and the woke sampling duration. On each overflow in the woke CPMCxSEL,
+hardware snapshots the woke program counter along with event counts and writes into
 memory pointed by LDBAR.
 
 LDBAR is a 64 bit special purpose per thread register, it has bits to indicate
@@ -142,14 +142,14 @@ TRACE_IMC_SCOM bit representation
   | 51:63 | RESERVED   |
   +-------+------------+
 
-CPMC_LOAD contains the sampling duration. SAMPSEL and CPMCxSEL determines the
-event to count. BUFFERSIZE indicates the memory range. On each overflow,
-hardware snapshots the program counter along with event counts and updates the
-memory and reloads the CMPC_LOAD value for the next sampling duration. IMC
+CPMC_LOAD contains the woke sampling duration. SAMPSEL and CPMCxSEL determines the
+event to count. BUFFERSIZE indicates the woke memory range. On each overflow,
+hardware snapshots the woke program counter along with event counts and updates the
+memory and reloads the woke CMPC_LOAD value for the woke next sampling duration. IMC
 hardware does not support exceptions, so it quietly wraps around if memory
-buffer reaches the end.
+buffer reaches the woke end.
 
-*Currently the event monitored for trace-mode is fixed as cycle.*
+*Currently the woke event monitored for trace-mode is fixed as cycle.*
 
 Trace IMC example usage
 =======================
@@ -174,8 +174,8 @@ Benefits of using IMC trace-mode
 ================================
 
 PMI (Performance Monitoring Interrupts) interrupt handling is avoided, since IMC
-trace mode snapshots the program counter and updates to the memory. And this
-also provide a way for the operating system to do instruction sampling in real
+trace mode snapshots the woke program counter and updates to the woke memory. And this
+also provide a way for the woke operating system to do instruction sampling in real
 time without PMI processing overhead.
 
 Performance data using `perf top` with and without trace-imc event.
@@ -196,4 +196,4 @@ PMI interrupts count when `perf top` command is executed without trace-imc event
   PMI:      39735       8710      17338      17801   Performance monitoring interrupts
 
 
-That is, the PMI interrupt counts do not increment when using the `trace_imc` event.
+That is, the woke PMI interrupt counts do not increment when using the woke `trace_imc` event.

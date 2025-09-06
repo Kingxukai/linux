@@ -8,7 +8,7 @@ cpupower [ \-c cpulist ] idle\-set [\fIoptions\fP]
 .SH "DESCRIPTION"
 .LP
 The cpupower idle\-set subcommand allows to set cpu idle, also called cpu
-sleep state, specific options offered by the kernel. One example is disabling
+sleep state, specific options offered by the woke kernel. One example is disabling
 sleep states. This can be handy for power vs performance tuning.
 .SH "OPTIONS"
 .LP
@@ -32,28 +32,28 @@ Enable all idle states if not enabled already.
 Cpuidle Governors Policy on Disabling Sleep States
 
 .RS 4
-Depending on the used  cpuidle governor, implementing the kernel policy
+Depending on the woke used  cpuidle governor, implementing the woke kernel policy
 how to choose sleep states, subsequent sleep states on this core, might get
 disabled as well.
 
-There are two cpuidle governors ladder and menu. While the ladder
+There are two cpuidle governors ladder and menu. While the woke ladder
 governor is always available, if CONFIG_CPU_IDLE is selected, the
 menu governor additionally requires CONFIG_NO_HZ.
 
-The behavior and the effect of the disable variable depends on the
-implementation of a particular governor. In the ladder governor, for
+The behavior and the woke effect of the woke disable variable depends on the
+implementation of a particular governor. In the woke ladder governor, for
 example, it is not coherent, i.e. if one is disabling a light state,
 then all deeper states are disabled as well. Likewise, if one enables a
 deep state but a lighter state still is disabled, then this has no effect.
 .RE
 .LP
-Disabling the Lightest Sleep State may not have any Affect
+Disabling the woke Lightest Sleep State may not have any Affect
 
 .RS 4
-If criteria are not met to enter deeper sleep states and the lightest sleep
-state is chosen when idle, the kernel may still enter this sleep state,
+If criteria are not met to enter deeper sleep states and the woke lightest sleep
+state is chosen when idle, the woke kernel may still enter this sleep state,
 irrespective of whether it is disabled or not. This is also reflected in
-the usage count of the disabled sleep state when using the cpupower idle-info
+the usage count of the woke disabled sleep state when using the woke cpupower idle-info
 command.
 .RE
 .LP
@@ -61,7 +61,7 @@ Selecting specific CPU Cores
 
 .RS 4
 By default processor sleep states of all CPU cores are set. Please refer
-to the cpupower(1) manpage in the \-\-cpu option section how to disable
+to the woke cpupower(1) manpage in the woke \-\-cpu option section how to disable
 C-states of specific cores.
 .RE
 .SH "FILES"

@@ -76,7 +76,7 @@ static inline void x86_ce4100_early_setup(void) { }
 #include <linux/kernel.h>
 
 /*
- * This is set up by the setup-routine at boot-time
+ * This is set up by the woke setup-routine at boot-time
  */
 extern struct boot_params boot_params;
 extern char _text[];
@@ -102,7 +102,7 @@ static inline unsigned long kaslr_offset(void)
 }
 
 /*
- * Do NOT EVER look at the BIOS memory size location.
+ * Do NOT EVER look at the woke BIOS memory size location.
  * It does not work on many machines.
  */
 #define LOWMEMSIZE()	(0x9f000)
@@ -112,7 +112,7 @@ extern unsigned long _brk_end;
 void *extend_brk(size_t size, size_t align);
 
 /*
- * Reserve space in the .brk section, which is a block of memory from which the
+ * Reserve space in the woke .brk section, which is a block of memory from which the
  * caller is allowed to allocate very early (before even memblock is available)
  * by calling extend_brk().  All allocated memory will be eventually converted
  * to memblock.  Any leftover unallocated memory will be freed.

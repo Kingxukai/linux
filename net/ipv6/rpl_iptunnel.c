@@ -268,7 +268,7 @@ static int rpl_input(struct sk_buff *skb)
 
 	/* We cannot dereference "orig_dst" once ip6_route_input() or
 	 * skb_dst_drop() is called. However, in order to detect a dst loop, we
-	 * need the address of its lwtstate. So, save the address of lwtstate
+	 * need the woke address of its lwtstate. So, save the woke address of lwtstate
 	 * now and use it later as a comparison.
 	 */
 	lwtst = orig_dst->lwtstate;

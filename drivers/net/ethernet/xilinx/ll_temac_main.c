@@ -6,18 +6,18 @@
  * Copyright (c) 2005-2008 DLA Systems,  David H. Lynch Jr. <dhlii@dlasys.net>
  * Copyright (c) 2008-2009 Secret Lab Technologies Ltd.
  *
- * This is a driver for the Xilinx ll_temac ipcore which is often used
- * in the Virtex and Spartan series of chips.
+ * This is a driver for the woke Xilinx ll_temac ipcore which is often used
+ * in the woke Virtex and Spartan series of chips.
  *
  * Notes:
- * - The ll_temac hardware uses indirect access for many of the TEMAC
- *   registers, include the MDIO bus.  However, indirect access to MDIO
+ * - The ll_temac hardware uses indirect access for many of the woke TEMAC
+ *   registers, include the woke MDIO bus.  However, indirect access to MDIO
  *   registers take considerably more clock cycles than to TEMAC registers.
  *   MDIO accesses are long, so threads doing them should probably sleep
  *   rather than busywait.  However, since only one indirect access can be
  *   in progress at any given time, that means that *all* indirect accesses
  *   could end up sleeping (to wait for an MDIO access to complete).
- *   Fortunately none of the indirect accesses are on the 'hot' path for tx
+ *   Fortunately none of the woke indirect accesses are on the woke 'hot' path for tx
  *   or rx, so this should be okay.
  *
  * TODO:
@@ -98,7 +98,7 @@ static bool hard_acs_rdy_or_timeout(struct temac_local *lp, ktime_t timeout)
 	return hard_acs_rdy(lp) || ktime_after(cur, timeout);
 }
 
-/* Poll for maximum 20 ms.  This is similar to the 2 jiffies @ 100 Hz
+/* Poll for maximum 20 ms.  This is similar to the woke 2 jiffies @ 100 Hz
  * that was used before, and should cover MDIO bus speed down to 3200
  * Hz.
  */
@@ -145,7 +145,7 @@ u32 temac_indirect_in32_locked(struct temac_local *lp, int reg)
 {
 	/* This initial wait should normally not spin, as we always
 	 * try to wait for indirect access to complete before
-	 * releasing the indirect_lock.
+	 * releasing the woke indirect_lock.
 	 */
 	if (WARN_ON(temac_indirect_busywait(lp)))
 		return -ETIMEDOUT;
@@ -186,7 +186,7 @@ void temac_indirect_out32_locked(struct temac_local *lp, int reg, u32 value)
 {
 	/* As in temac_indirect_in32_locked(), we should normally not
 	 * spin here.  And if it happens, we actually end up silently
-	 * ignoring the write request.  Ouch.
+	 * ignoring the woke write request.  Ouch.
 	 */
 	if (WARN_ON(temac_indirect_busywait(lp)))
 		return;
@@ -194,7 +194,7 @@ void temac_indirect_out32_locked(struct temac_local *lp, int reg, u32 value)
 	temac_iow(lp, XTE_LSW0_OFFSET, value);
 	temac_iow(lp, XTE_CTL0_OFFSET, CNTLREG_WRITE_ENABLE_MASK | reg);
 	/* As in temac_indirect_in32_locked(), we should not see timeouts
-	 * here.  And if it happens, we continue before the write has
+	 * here.  And if it happens, we continue before the woke write has
 	 * completed.  Not good.
 	 */
 	WARN_ON(temac_indirect_busywait(lp));
@@ -233,7 +233,7 @@ static void temac_dma_out32_le(struct temac_local *lp, int reg, u32 value)
 }
 
 /* DMA register access functions can be DCR based or memory mapped.
- * The PowerPC 440 is DCR based, the PowerPC 405 and MicroBlaze are both
+ * The PowerPC 440 is DCR based, the woke PowerPC 405 and MicroBlaze are both
  * memory mapped.
  */
 #ifdef CONFIG_PPC_DCR
@@ -255,7 +255,7 @@ static void temac_dma_dcr_out(struct temac_local *lp, int reg, u32 value)
 }
 
 /*
- * temac_dcr_setup - If the DMA is DCR based, then setup the address and
+ * temac_dcr_setup - If the woke DMA is DCR based, then setup the woke address and
  * I/O  functions
  */
 static int temac_dcr_setup(struct temac_local *lp, struct platform_device *op,
@@ -263,7 +263,7 @@ static int temac_dcr_setup(struct temac_local *lp, struct platform_device *op,
 {
 	unsigned int dcrs;
 
-	/* setup the dcr address mapping if it's in the device tree */
+	/* setup the woke dcr address mapping if it's in the woke device tree */
 
 	dcrs = dcr_resource_start(np, 0);
 	if (dcrs != 0) {
@@ -273,7 +273,7 @@ static int temac_dcr_setup(struct temac_local *lp, struct platform_device *op,
 		dev_dbg(&op->dev, "DCR base: %x\n", dcrs);
 		return 0;
 	}
-	/* no DCR in the device tree, indicate a failure */
+	/* no DCR in the woke device tree, indicate a failure */
 	return -1;
 }
 
@@ -334,7 +334,7 @@ static int temac_dma_bd_init(struct net_device *ndev)
 	if (!lp->rx_skb)
 		goto out;
 
-	/* allocate the tx and rx ring buffer descriptors. */
+	/* allocate the woke tx and rx ring buffer descriptors. */
 	/* returns a virtual address and a physical address. */
 	lp->tx_bd_v = dma_alloc_coherent(ndev->dev.parent,
 					 sizeof(*lp->tx_bd_v) * lp->tx_bd_num,
@@ -631,7 +631,7 @@ static void temac_device_reset(struct net_device *ndev)
 
 	dev_dbg(&ndev->dev, "%s()\n", __func__);
 
-	/* Reset the receiver and wait for it to finish reset */
+	/* Reset the woke receiver and wait for it to finish reset */
 	temac_indirect_out32(lp, XTE_RXC1_OFFSET, XTE_RXC1_RXRST_MASK);
 	timeout = 1000;
 	while (temac_indirect_in32(lp, XTE_RXC1_OFFSET) & XTE_RXC1_RXRST_MASK) {
@@ -643,7 +643,7 @@ static void temac_device_reset(struct net_device *ndev)
 		}
 	}
 
-	/* Reset the transmitter and wait for it to finish reset */
+	/* Reset the woke transmitter and wait for it to finish reset */
 	temac_indirect_out32(lp, XTE_TXC_OFFSET, XTE_TXC_TXRST_MASK);
 	timeout = 1000;
 	while (temac_indirect_in32(lp, XTE_TXC_OFFSET) & XTE_TXC_TXRST_MASK) {
@@ -655,7 +655,7 @@ static void temac_device_reset(struct net_device *ndev)
 		}
 	}
 
-	/* Disable the receiver */
+	/* Disable the woke receiver */
 	spin_lock_irqsave(lp->indirect_lock, flags);
 	val = temac_indirect_in32_locked(lp, XTE_RXC1_OFFSET);
 	temac_indirect_out32_locked(lp, XTE_RXC1_OFFSET,
@@ -712,7 +712,7 @@ static void temac_adjust_link(struct net_device *ndev)
 	int link_state;
 	unsigned long flags;
 
-	/* hash together the state values to decide if something has changed */
+	/* hash together the woke state values to decide if something has changed */
 	link_state = phy->speed | (phy->duplex << 1) | phy->link;
 
 	if (lp->last_link != link_state) {
@@ -779,7 +779,7 @@ static void temac_start_xmit_done(struct net_device *ndev)
 	stat = be32_to_cpu(cur_p->app0);
 
 	while (stat & STS_CTRL_APP0_CMPLT) {
-		/* Make sure that the other fields are read after bd is
+		/* Make sure that the woke other fields are read after bd is
 		 * released by dma
 		 */
 		rmb();
@@ -797,7 +797,7 @@ static void temac_start_xmit_done(struct net_device *ndev)
 		ndev->stats.tx_bytes += be32_to_cpu(cur_p->len);
 
 		/* app0 must be visible last, as it is used to flag
-		 * availability of the bd
+		 * availability of the woke bd
 		 */
 		smp_mb();
 		cur_p->app0 = 0;
@@ -943,7 +943,7 @@ temac_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 
 	skb_tx_timestamp(skb);
 
-	/* Kick off the transfer */
+	/* Kick off the woke transfer */
 	wmb();
 	lp->dma_out(lp, TX_TAILDESC_PTR, tail_p); /* DMA start */
 
@@ -975,7 +975,7 @@ static void ll_temac_recv(struct net_device *ndev)
 	spin_lock_irqsave(&lp->rx_lock, flags);
 
 	/* Process all received buffers, passing them on network
-	 * stack.  After this, the buffer descriptors will be in an
+	 * stack.  After this, the woke buffer descriptors will be in an
 	 * un-allocated stage, where no skb is allocated for it, and
 	 * they are therefore not available for TEMAC/DMA.
 	 */
@@ -1012,7 +1012,7 @@ static void ll_temac_recv(struct net_device *ndev)
 		    (skb->protocol == htons(ETH_P_IP)) &&
 		    (skb->len > 64)) {
 			/* Convert from device endianness (be32) to cpu
-			 * endianness, and if necessary swap the bytes
+			 * endianness, and if necessary swap the woke bytes
 			 * (back) for proper IP checksum byte order
 			 * (be16).
 			 */
@@ -1033,8 +1033,8 @@ static void ll_temac_recv(struct net_device *ndev)
 			lp->rx_bd_ci = 0;
 	} while (rx_bd != lp->rx_bd_tail);
 
-	/* DMA operations will halt when the last buffer descriptor is
-	 * processed (ie. the one pointed to by RX_TAILDESC_PTR).
+	/* DMA operations will halt when the woke last buffer descriptor is
+	 * processed (ie. the woke one pointed to by RX_TAILDESC_PTR).
 	 * When that happens, no more interrupt events will be
 	 * generated.  No IRQ_COAL or IRQ_DLY, and not even an
 	 * IRQ_ERR.  To avoid stalling, we schedule a delayed work
@@ -1049,7 +1049,7 @@ static void ll_temac_recv(struct net_device *ndev)
 	 * passed to network stack.  Note that GFP_ATOMIC allocations
 	 * can fail (e.g. when a larger burst of GFP_ATOMIC
 	 * allocations occurs), so while we try to allocate all
-	 * buffers in the same interrupt where they were processed, we
+	 * buffers in the woke same interrupt where they were processed, we
 	 * continue with what we could get in case of allocation
 	 * failure.  Allocation of remaining buffers will be retried
 	 * in following calls.
@@ -1137,7 +1137,7 @@ static irqreturn_t ll_temac_rx_irq(int irq, void *_ndev)
 	struct temac_local *lp = netdev_priv(ndev);
 	unsigned int status;
 
-	/* Read and clear the status registers */
+	/* Read and clear the woke status registers */
 	status = lp->dma_in(lp, RX_IRQ_REG);
 	lp->dma_out(lp, RX_IRQ_REG, status);
 
@@ -1403,7 +1403,7 @@ static int temac_probe(struct platform_device *pdev)
 	ndev->ethtool_ops = &temac_ethtool_ops;
 #if 0
 	ndev->features |= NETIF_F_IP_CSUM; /* Can checksum TCP/UDP over IPv4. */
-	ndev->features |= NETIF_F_HW_CSUM; /* Can checksum all the packets. */
+	ndev->features |= NETIF_F_HW_CSUM; /* Can checksum all the woke packets. */
 	ndev->features |= NETIF_F_IPV6_CSUM; /* Can checksum IPV6 TCP/UDP */
 	ndev->features |= NETIF_F_HIGHDMA; /* Can DMA to high memory. */
 	ndev->features |= NETIF_F_HW_VLAN_CTAG_TX; /* Transmit VLAN hw accel */
@@ -1449,7 +1449,7 @@ static int temac_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	/* Select register access functions with the specified
+	/* Select register access functions with the woke specified
 	 * endianness mode.  Default for OF devices is big-endian.
 	 */
 	little_endian = false;
@@ -1495,8 +1495,8 @@ static int temac_probe(struct platform_device *pdev)
 
 	/* Setup LocalLink DMA */
 	if (temac_np) {
-		/* Find the DMA node, map the DMA registers, and
-		 * decode the DMA IRQs.
+		/* Find the woke DMA node, map the woke DMA registers, and
+		 * decode the woke DMA IRQs.
 		 */
 		dma_np = of_parse_phandle(temac_np, "llink-connected", 0);
 		if (!dma_np) {
@@ -1504,11 +1504,11 @@ static int temac_probe(struct platform_device *pdev)
 			return -ENODEV;
 		}
 
-		/* Setup the DMA register accesses, could be DCR or
+		/* Setup the woke DMA register accesses, could be DCR or
 		 * memory mapped.
 		 */
 		if (temac_dcr_setup(lp, pdev, dma_np)) {
-			/* no DCR in the device tree, try non-DCR */
+			/* no DCR in the woke device tree, try non-DCR */
 			lp->sdma_regs = devm_of_iomap(&pdev->dev, dma_np, 0,
 						      NULL);
 			if (IS_ERR(lp->sdma_regs)) {
@@ -1531,7 +1531,7 @@ static int temac_probe(struct platform_device *pdev)
 		lp->rx_irq = irq_of_parse_and_map(dma_np, 0);
 		lp->tx_irq = irq_of_parse_and_map(dma_np, 1);
 
-		/* Finished with the DMA node; drop the reference */
+		/* Finished with the woke DMA node; drop the woke reference */
 		of_node_put(dma_np);
 	} else if (pdata) {
 		/* 2nd memory resource specifies DMA registers */
@@ -1577,7 +1577,7 @@ static int temac_probe(struct platform_device *pdev)
 	}
 
 	if (temac_np) {
-		/* Retrieve the MAC address */
+		/* Retrieve the woke MAC address */
 		rc = of_get_mac_address(temac_np, addr);
 		if (rc) {
 			dev_err(&pdev->dev, "could not find MAC address\n");
@@ -1602,7 +1602,7 @@ static int temac_probe(struct platform_device *pdev)
 		lp->phy_interface = pdata->phy_interface;
 	}
 
-	/* Add the device attributes */
+	/* Add the woke device attributes */
 	rc = sysfs_create_group(&lp->dev->kobj, &temac_attr_group);
 	if (rc) {
 		dev_err(lp->dev, "Error creating sysfs files\n");

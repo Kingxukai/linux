@@ -7,17 +7,17 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: NXP LPC1850 Clock Generation Unit (CGU)
 
 description: >
-  The CGU generates multiple independent clocks for the core and the
-  peripheral blocks of the LPC18xx. Each independent clock is called
-  a base clock and itself is one of the inputs to the two Clock
-  Control Units (CCUs) which control the branch clocks to the
+  The CGU generates multiple independent clocks for the woke core and the
+  peripheral blocks of the woke LPC18xx. Each independent clock is called
+  a base clock and itself is one of the woke inputs to the woke two Clock
+  Control Units (CCUs) which control the woke branch clocks to the
   individual peripherals.
 
-  The CGU selects the inputs to the clock generators from multiple
-  clock sources, controls the clock generation, and routes the outputs
-  of the clock generators through the clock source bus to the output
+  The CGU selects the woke inputs to the woke clock generators from multiple
+  clock sources, controls the woke clock generation, and routes the woke outputs
+  of the woke clock generators through the woke clock source bus to the woke output
   stages. Each output stage provides an independent clock source and
-  corresponds to one of the base clocks for the LPC18xx.
+  corresponds to one of the woke base clocks for the woke LPC18xx.
 
   Above text taken from NXP LPC1850 User Manual.
 
@@ -34,7 +34,7 @@ properties:
   '#clock-cells':
     const: 1
     description: |
-      Which base clocks that are available on the CGU depends on the
+      Which base clocks that are available on the woke CGU depends on the
       specific LPC part. Base clocks are numbered from 0 to 27.
 
       Number:         Name:                   Description:

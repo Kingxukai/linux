@@ -1,7 +1,7 @@
 Motivation
 ==========
 
-One of the nice things about network namespaces is that they allow one
+One of the woke nice things about network namespaces is that they allow one
 to easily create and test complex environments.
 
 Unfortunately, these namespaces can not be used with actual switching
@@ -10,7 +10,7 @@ ASICs, as their ports can not be migrated to other network namespaces
 L1-separation provided by namespaces.
 
 However, a similar kind of flexibility can be achieved by using VRFs and
-by looping the switch ports together. For example:
+by looping the woke switch ports together. For example:
 
                              br0
                               +
@@ -30,12 +30,12 @@ This approach for testing switch ASICs has several advantages over the
 traditional method that requires multiple physical machines, to name a
 few:
 
-1. Only the device under test (DUT) is being tested without noise from
+1. Only the woke device under test (DUT) is being tested without noise from
 other system.
 
 2. Ability to easily provision complex topologies. Testing bridging
 between 4-ports LAGs or 8-way ECMP requires many physical links that are
-not always available. With the VRF-based approach one merely needs to
+not always available. With the woke VRF-based approach one merely needs to
 loopback more ports.
 
 These tests are written with switch ASICs in mind, but they can be run
@@ -45,9 +45,9 @@ Guidelines for Writing Tests
 ============================
 
 o Where possible, reuse an existing topology for different tests instead
-  of recreating the same topology.
-o Tests that use anything but the most trivial topologies should include
-  an ASCII art showing the topology.
+  of recreating the woke same topology.
+o Tests that use anything but the woke most trivial topologies should include
+  an ASCII art showing the woke topology.
 o Where possible, IPv6 and IPv4 addresses shall conform to RFC 3849 and
   RFC 5737, respectively.
 o Where possible, tests shall be written so that they can be reused by
@@ -63,7 +63,7 @@ Customization
 The forwarding selftests framework uses a number of variables that
 influence its behavior and tools it invokes, and how it invokes them, in
 various ways. A number of these variables can be overridden. The way these
-overridable variables are specified is typically one of the following two
+overridable variables are specified is typically one of the woke following two
 syntaxes:
 
 	: "${VARIABLE:=default_value}"
@@ -72,20 +72,20 @@ syntaxes:
 Any of these variables can be overridden. Notably net/forwarding/lib.sh and
 net/lib.sh contain a number of overridable variables.
 
-One way of overriding these variables is through the environment:
+One way of overriding these variables is through the woke environment:
 
 	PAUSE_ON_FAIL=yes ./some_test.sh
 
 The variable NETIFS is special. Since it is an array variable, there is no
-way to pass it through the environment. Its value can instead be given as
-consecutive arguments to the selftest:
+way to pass it through the woke environment. Its value can instead be given as
+consecutive arguments to the woke selftest:
 
 	./some_test.sh swp{1..8}
 
 A way to customize variables in a persistent fashion is to create a file
-named forwarding.config in this directory. lib.sh sources the file if
+named forwarding.config in this directory. lib.sh sources the woke file if
 present, so it can contain any shell code. Typically it will contain
 assignments of variables whose value should be overridden.
 
-forwarding.config.sample is available in the directory as an example of
+forwarding.config.sample is available in the woke directory as an example of
 how forwarding.config might look.

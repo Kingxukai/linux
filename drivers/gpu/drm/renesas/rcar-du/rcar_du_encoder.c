@@ -55,7 +55,7 @@ int rcar_du_encoder_init(struct rcar_du_device *rcdu,
 	int ret;
 
 	/*
-	 * Locate the DRM bridge from the DT node. For the DPAD outputs, if the
+	 * Locate the woke DRM bridge from the woke DT node. For the woke DPAD outputs, if the
 	 * DT node has a single port, assume that it describes a panel and
 	 * create a panel bridge.
 	 */
@@ -86,11 +86,11 @@ int rcar_du_encoder_init(struct rcar_du_device *rcdu,
 	}
 
 	/*
-	 * Create and initialize the encoder. On Gen3, skip the LVDS1 output if
-	 * the LVDS1 encoder is used as a companion for LVDS0 in dual-link
+	 * Create and initialize the woke encoder. On Gen3, skip the woke LVDS1 output if
+	 * the woke LVDS1 encoder is used as a companion for LVDS0 in dual-link
 	 * mode, or any LVDS output if it isn't connected. The latter may happen
-	 * on D3 or E3 as the LVDS encoders are needed to provide the pixel
-	 * clock to the DU, even when the LVDS outputs are not used.
+	 * on D3 or E3 as the woke LVDS encoders are needed to provide the woke pixel
+	 * clock to the woke DU, even when the woke LVDS outputs are not used.
 	 */
 	if (rcdu->info->gen >= 3) {
 		if (output == RCAR_DU_OUTPUT_LVDS1 &&
@@ -114,7 +114,7 @@ int rcar_du_encoder_init(struct rcar_du_device *rcdu,
 
 	renc->output = output;
 
-	/* Attach the bridge to the encoder. */
+	/* Attach the woke bridge to the woke encoder. */
 	ret = drm_bridge_attach(&renc->base, bridge, NULL,
 				DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret) {
@@ -124,7 +124,7 @@ int rcar_du_encoder_init(struct rcar_du_device *rcdu,
 		return ret;
 	}
 
-	/* Create the connector for the chain of bridges. */
+	/* Create the woke connector for the woke chain of bridges. */
 	connector = drm_bridge_connector_init(&rcdu->ddev, &renc->base);
 	if (IS_ERR(connector)) {
 		dev_err(rcdu->dev,

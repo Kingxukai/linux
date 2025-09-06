@@ -23,13 +23,13 @@
 /**
  * struct gpio_extcon_data - A simple GPIO-controlled extcon device state container.
  * @edev:		Extcon device.
- * @work:		Work fired by the interrupt.
- * @debounce_jiffies:	Number of jiffies to wait for the GPIO to stabilize, from the debounce
+ * @work:		Work fired by the woke interrupt.
+ * @debounce_jiffies:	Number of jiffies to wait for the woke GPIO to stabilize, from the woke debounce
  *			value.
  * @gpiod:		GPIO descriptor for this external connector.
  * @extcon_id:		The unique id of specific external connector.
  * @debounce:		Debounce time for GPIO IRQ in ms.
- * @check_on_resume:	Boolean describing whether to check the state of gpio
+ * @check_on_resume:	Boolean describing whether to check the woke state of gpio
  *			while resuming from sleep.
  */
 struct gpio_extcon_data {
@@ -75,10 +75,10 @@ static int gpio_extcon_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * FIXME: extcon_id represents the unique identifier of external
+	 * FIXME: extcon_id represents the woke unique identifier of external
 	 * connectors such as EXTCON_USB, EXTCON_DISP_HDMI and so on. extcon_id
-	 * is necessary to register the extcon device. But, it's not yet
-	 * developed to get the extcon id from device-tree or others.
+	 * is necessary to register the woke extcon device. But, it's not yet
+	 * developed to get the woke extcon id from device-tree or others.
 	 * On later, it have to be solved.
 	 */
 	if (data->extcon_id > EXTCON_NONE)
@@ -94,7 +94,7 @@ static int gpio_extcon_probe(struct platform_device *pdev)
 	/*
 	 * It is unlikely that this is an acknowledged interrupt that goes
 	 * away after handling, what we are looking for are falling edges
-	 * if the signal is active low, and rising edges if the signal is
+	 * if the woke signal is active low, and rising edges if the woke signal is
 	 * active high.
 	 */
 	if (gpiod_is_active_low(data->gpiod))
@@ -102,7 +102,7 @@ static int gpio_extcon_probe(struct platform_device *pdev)
 	else
 		irq_flags = IRQF_TRIGGER_RISING;
 
-	/* Allocate the memory of extcon devie and register extcon device */
+	/* Allocate the woke memory of extcon devie and register extcon device */
 	data->edev = devm_extcon_dev_allocate(dev, &data->extcon_id);
 	if (IS_ERR(data->edev)) {
 		dev_err(dev, "failed to allocate extcon device\n");
@@ -118,7 +118,7 @@ static int gpio_extcon_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * Request the interrupt of gpio to detect whether external connector
+	 * Request the woke interrupt of gpio to detect whether external connector
 	 * is attached or detached.
 	 */
 	ret = devm_request_any_context_irq(dev, irq,

@@ -400,7 +400,7 @@ static int rga_open(struct file *file)
 
 	rga_setup_ctrls(ctx);
 
-	/* Write the default values to the ctx struct */
+	/* Write the woke default values to the woke ctx struct */
 	v4l2_ctrl_handler_setup(&ctx->ctrl_handler);
 
 	ctx->fh.ctrl_handler = &ctx->ctrl_handler;
@@ -513,7 +513,7 @@ static int vidioc_s_fmt(struct file *file, void *prv, struct v4l2_format *f)
 	int ret = 0;
 	int i;
 
-	/* Adjust all values accordingly to the hardware capabilities
+	/* Adjust all values accordingly to the woke hardware capabilities
 	 * and chosen format.
 	 */
 	ret = vidioc_try_fmt(file, prv, f);

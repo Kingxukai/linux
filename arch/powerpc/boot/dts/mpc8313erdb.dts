@@ -53,7 +53,7 @@
 
 		// CS0 and CS1 are swapped when
 		// booting from nand, but the
-		// addresses are the same.
+		// addresses are the woke same.
 		ranges = <0x0 0x0 0xfe000000 0x00800000
 		          0x1 0x0 0xe2800000 0x00008000
 		          0x2 0x0 0xf0000000 0x00020000
@@ -200,7 +200,7 @@
 			interrupts = <37 0x8 36 0x8 35 0x8>;
 			interrupt-parent = <&ipic>;
 			tbi-handle = < &tbi0 >;
-			/* Vitesse 7385 isn't on the MDIO bus */
+			/* Vitesse 7385 isn't on the woke MDIO bus */
 			fixed-link = <1 1 1000 0 0>;
 			fsl,magic-packet;
 
@@ -296,7 +296,7 @@
 
 			/* Remove this (or change to "okay") if you have
 			 * a REVA3 or later board, if you apply one of the
-			 * workarounds listed in section 8.5 of the board
+			 * workarounds listed in section 8.5 of the woke board
 			 * manual, or if you are adapting this device tree
 			 * to a different board.
 			 */

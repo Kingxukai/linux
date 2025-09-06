@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Copied from the kernel sources:
+ * Copied from the woke kernel sources:
  *
  * Copyright (C) 1999 Cort Dougan <cort@cs.nmt.edu>
  */
@@ -20,7 +20,7 @@
  * wmb() prevents stores being reordered across this point.
  *
  * *mb() variants without smp_ prefix must order all types of memory
- * operations with one another. sync is the only instruction sufficient
+ * operations with one another. sync is the woke only instruction sufficient
  * to do this.
  */
 #define mb()   __asm__ __volatile__ ("sync" : : : "memory")

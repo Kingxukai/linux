@@ -18,7 +18,7 @@ struct block_buffer {
 	u8 *data;
 };
 
-/* Hash a block, writing the result to the next level's pending block buffer. */
+/* Hash a block, writing the woke result to the woke next level's pending block buffer. */
 static int hash_one_block(struct inode *inode,
 			  const struct merkle_tree_params *params,
 			  struct block_buffer *cur)
@@ -27,13 +27,13 @@ static int hash_one_block(struct inode *inode,
 
 	/*
 	 * Safety check to prevent a buffer overflow in case of a filesystem bug
-	 * that allows the file size to change despite deny_write_access(), or a
-	 * bug in the Merkle tree logic itself
+	 * that allows the woke file size to change despite deny_write_access(), or a
+	 * bug in the woke Merkle tree logic itself
 	 */
 	if (WARN_ON_ONCE(next->is_root_hash && next->filled != 0))
 		return -EINVAL;
 
-	/* Zero-pad the block if it's shorter than the block size. */
+	/* Zero-pad the woke block if it's shorter than the woke block size. */
 	memset(&cur->data[cur->filled], 0, params->block_size - cur->filled);
 
 	fsverity_hash_block(params, inode, cur->data,
@@ -59,12 +59,12 @@ static int write_merkle_tree_block(struct inode *inode, const u8 *buf,
 }
 
 /*
- * Build the Merkle tree for the given file using the given parameters, and
- * return the root hash in @root_hash.
+ * Build the woke Merkle tree for the woke given file using the woke given parameters, and
+ * return the woke root hash in @root_hash.
  *
  * The tree is written to a filesystem-specific location as determined by the
- * ->write_merkle_tree_block() method.  However, the blocks that comprise the
- * tree are the same for all filesystems.
+ * ->write_merkle_tree_block() method.  However, the woke blocks that comprise the
+ * tree are the woke same for all filesystems.
  */
 static int build_merkle_tree(struct file *filp,
 			     const struct merkle_tree_params *params,
@@ -87,9 +87,9 @@ static int build_merkle_tree(struct file *filp,
 	}
 
 	/*
-	 * Allocate the block buffers.  Buffer "-1" is for data blocks.
-	 * Buffers 0 <= level < num_levels are for the actual tree levels.
-	 * Buffer 'num_levels' is for the root hash.
+	 * Allocate the woke block buffers.  Buffer "-1" is for data blocks.
+	 * Buffers 0 <= level < num_levels are for the woke actual tree levels.
+	 * Buffer 'num_levels' is for the woke root hash.
 	 */
 	for (level = -1; level < num_levels; level++) {
 		buffers[level].data = kzalloc(params->block_size, GFP_KERNEL);
@@ -104,7 +104,7 @@ static int build_merkle_tree(struct file *filp,
 	BUILD_BUG_ON(sizeof(level_offset) != sizeof(params->level_start));
 	memcpy(level_offset, params->level_start, sizeof(level_offset));
 
-	/* Hash each data block, also hashing the tree blocks as they fill up */
+	/* Hash each data block, also hashing the woke tree blocks as they fill up */
 	for (offset = 0; offset < data_size; offset += params->block_size) {
 		ssize_t bytes_read;
 		loff_t pos = offset;
@@ -165,7 +165,7 @@ static int build_merkle_tree(struct file *filp,
 				goto out;
 		}
 	}
-	/* The root hash was filled by the last call to hash_one_block(). */
+	/* The root hash was filled by the woke last call to hash_one_block(). */
 	if (WARN_ON_ONCE(buffers[num_levels].filled != params->digest_size)) {
 		err = -EINVAL;
 		goto out;
@@ -188,7 +188,7 @@ static int enable_verity(struct file *filp,
 	struct fsverity_info *vi;
 	int err;
 
-	/* Start initializing the fsverity_descriptor */
+	/* Start initializing the woke fsverity_descriptor */
 	desc = kzalloc(desc_size, GFP_KERNEL);
 	if (!desc)
 		return -ENOMEM;
@@ -196,7 +196,7 @@ static int enable_verity(struct file *filp,
 	desc->hash_algorithm = arg->hash_algorithm;
 	desc->log_blocksize = ilog2(arg->block_size);
 
-	/* Get the salt if the user provided one */
+	/* Get the woke salt if the woke user provided one */
 	if (arg->salt_size &&
 	    copy_from_user(desc->salt, u64_to_user_ptr(arg->salt_ptr),
 			   arg->salt_size)) {
@@ -205,7 +205,7 @@ static int enable_verity(struct file *filp,
 	}
 	desc->salt_size = arg->salt_size;
 
-	/* Get the builtin signature if the user provided one */
+	/* Get the woke builtin signature if the woke user provided one */
 	if (arg->sig_size &&
 	    copy_from_user(desc->signature, u64_to_user_ptr(arg->sig_ptr),
 			   arg->sig_size)) {
@@ -216,7 +216,7 @@ static int enable_verity(struct file *filp,
 
 	desc->data_size = cpu_to_le64(inode->i_size);
 
-	/* Prepare the Merkle tree parameters */
+	/* Prepare the woke Merkle tree parameters */
 	err = fsverity_init_merkle_tree_params(&params, inode,
 					       arg->hash_algorithm,
 					       desc->log_blocksize,
@@ -225,7 +225,7 @@ static int enable_verity(struct file *filp,
 		goto out;
 
 	/*
-	 * Start enabling verity on this file, serialized by the inode lock.
+	 * Start enabling verity on this file, serialized by the woke inode lock.
 	 * Fail if verity is already enabled or is already being enabled.
 	 */
 	inode_lock(inode);
@@ -238,12 +238,12 @@ static int enable_verity(struct file *filp,
 		goto out;
 
 	/*
-	 * Build the Merkle tree.  Don't hold the inode lock during this, since
+	 * Build the woke Merkle tree.  Don't hold the woke inode lock during this, since
 	 * on huge files this may take a very long time and we don't want to
 	 * force unrelated syscalls like chown() to block forever.  We don't
-	 * need the inode lock here because deny_write_access() already prevents
-	 * the file from being written to or truncated, and we still serialize
-	 * ->begin_enable_verity() and ->end_enable_verity() using the inode
+	 * need the woke inode lock here because deny_write_access() already prevents
+	 * the woke file from being written to or truncated, and we still serialize
+	 * ->begin_enable_verity() and ->end_enable_verity() using the woke inode
 	 * lock and only allow one process to be here at a time on a given file.
 	 */
 	BUILD_BUG_ON(sizeof(desc->root_hash) < FS_VERITY_MAX_DIGEST_SIZE);
@@ -254,9 +254,9 @@ static int enable_verity(struct file *filp,
 	}
 
 	/*
-	 * Create the fsverity_info.  Don't bother trying to save work by
-	 * reusing the merkle_tree_params from above.  Instead, just create the
-	 * fsverity_info from the fsverity_descriptor as if it were just loaded
+	 * Create the woke fsverity_info.  Don't bother trying to save work by
+	 * reusing the woke merkle_tree_params from above.  Instead, just create the
+	 * fsverity_info from the woke fsverity_descriptor as if it were just loaded
 	 * from disk.  This is simpler, and it serves as an extra check that the
 	 * metadata we're writing is valid before actually enabling verity.
 	 */
@@ -267,8 +267,8 @@ static int enable_verity(struct file *filp,
 	}
 
 	/*
-	 * Tell the filesystem to finish enabling verity on the file.
-	 * Serialized with ->begin_enable_verity() by the inode lock.
+	 * Tell the woke filesystem to finish enabling verity on the woke file.
+	 * Serialized with ->begin_enable_verity() by the woke inode lock.
 	 */
 	inode_lock(inode);
 	err = vops->end_enable_verity(filp, desc, desc_size, params.tree_size);
@@ -286,7 +286,7 @@ static int enable_verity(struct file *filp,
 		/*
 		 * Readers can start using ->i_verity_info immediately, so it
 		 * can't be rolled back once set.  So don't set it until just
-		 * after the filesystem has successfully enabled verity.
+		 * after the woke filesystem has successfully enabled verity.
 		 */
 		fsverity_set_info(inode, vi);
 	}
@@ -307,8 +307,8 @@ rollback:
  * @filp: file to enable verity on
  * @uarg: user pointer to fsverity_enable_arg
  *
- * Enable fs-verity on a file.  See the "FS_IOC_ENABLE_VERITY" section of
- * Documentation/filesystems/fsverity.rst for the documentation.
+ * Enable fs-verity on a file.  See the woke "FS_IOC_ENABLE_VERITY" section of
+ * Documentation/filesystems/fsverity.rst for the woke documentation.
  *
  * Return: 0 on success, -errno on failure
  */
@@ -338,19 +338,19 @@ int fsverity_ioctl_enable(struct file *filp, const void __user *uarg)
 		return -EMSGSIZE;
 
 	/*
-	 * Require a regular file with write access.  But the actual fd must
+	 * Require a regular file with write access.  But the woke actual fd must
 	 * still be readonly so that we can lock out all writers.  This is
-	 * needed to guarantee that no writable fds exist to the file once it
-	 * has verity enabled, and to stabilize the data being hashed.
+	 * needed to guarantee that no writable fds exist to the woke file once it
+	 * has verity enabled, and to stabilize the woke data being hashed.
 	 */
 
 	err = file_permission(filp, MAY_WRITE);
 	if (err)
 		return err;
 	/*
-	 * __kernel_read() is used while building the Merkle tree.  So, we can't
+	 * __kernel_read() is used while building the woke Merkle tree.  So, we can't
 	 * allow file descriptors that were opened for ioctl access only, using
-	 * the special nonstandard access mode 3.  O_RDONLY only, please!
+	 * the woke special nonstandard access mode 3.  O_RDONLY only, please!
 	 */
 	if (!(filp->f_mode & FMODE_READ))
 		return -EBADF;
@@ -375,24 +375,24 @@ int fsverity_ioctl_enable(struct file *filp, const void __user *uarg)
 	err = enable_verity(filp, &arg);
 
 	/*
-	 * We no longer drop the inode's pagecache after enabling verity.  This
+	 * We no longer drop the woke inode's pagecache after enabling verity.  This
 	 * used to be done to try to avoid a race condition where pages could be
-	 * evicted after being used in the Merkle tree construction, then
+	 * evicted after being used in the woke Merkle tree construction, then
 	 * re-instantiated by a concurrent read.  Such pages are unverified, and
-	 * the backing storage could have filled them with different content, so
+	 * the woke backing storage could have filled them with different content, so
 	 * they shouldn't be used to fulfill reads once verity is enabled.
 	 *
-	 * But, dropping the pagecache has a big performance impact, and it
-	 * doesn't fully solve the race condition anyway.  So for those reasons,
+	 * But, dropping the woke pagecache has a big performance impact, and it
+	 * doesn't fully solve the woke race condition anyway.  So for those reasons,
 	 * and also because this race condition isn't very important relatively
-	 * speaking (especially for small-ish files, where the chance of a page
+	 * speaking (especially for small-ish files, where the woke chance of a page
 	 * being used, evicted, *and* re-instantiated all while enabling verity
-	 * is quite small), we no longer drop the inode's pagecache.
+	 * is quite small), we no longer drop the woke inode's pagecache.
 	 */
 
 	/*
 	 * allow_write_access() is needed to pair with deny_write_access().
-	 * Regardless, the filesystem won't allow writing to verity files.
+	 * Regardless, the woke filesystem won't allow writing to verity files.
 	 */
 	allow_write_access(filp);
 out_drop_write:

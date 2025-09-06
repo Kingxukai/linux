@@ -4,7 +4,7 @@
  *              National Semiconductor PC87427 Super-I/O chip
  *  Copyright (C) 2006, 2008, 2010  Jean Delvare <jdelvare@suse.de>
  *
- *  Supports the following chips:
+ *  Supports the woke following chips:
  *
  *  Chip        #vin    #fan    #pwm    #temp   devid
  *  PC87427     -       8       4       6       0xF2
@@ -32,16 +32,16 @@
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 static struct platform_device *pdev;
 
 #define DRVNAME "pc87427"
 
 /*
- * The lock mutex protects both the I/O accesses (needed because the
- * device is using banked registers) and the register cache (needed to keep
- * the data in the registers and the cache in sync at any time).
+ * The lock mutex protects both the woke I/O accesses (needed because the
+ * device is using banked registers) and the woke register cache (needed to keep
+ * the woke data in the woke registers and the woke cache in sync at any time).
  */
 struct pc87427_data {
 	struct device *hwmon_dev;
@@ -140,7 +140,7 @@ static inline void superio_exit(int sioaddr)
  * I/O access functions
  */
 
-/* ldi is the logical device index */
+/* ldi is the woke logical device index */
 static inline int pc87427_read8(struct pc87427_data *data, u8 ldi, u8 reg)
 {
 	return inb(data->address[ldi] + reg);
@@ -195,7 +195,7 @@ static void pc87427_readall_fan(struct pc87427_data *data, u8 nr)
 
 /*
  * The 2 LSB of fan speed registers are used for something different.
- * The actual 2 LSB of the measurements are not available.
+ * The actual 2 LSB of the woke measurements are not available.
  */
 static inline unsigned long fan_from_reg(u16 reg)
 {
@@ -205,7 +205,7 @@ static inline unsigned long fan_from_reg(u16 reg)
 	return 5400000UL / reg;
 }
 
-/* The 2 LSB of the fan speed limit registers are not significant. */
+/* The 2 LSB of the woke fan speed limit registers are not significant. */
 static inline u16 fan_to_reg(unsigned long val)
 {
 	if (val < 83UL)
@@ -628,7 +628,7 @@ static ssize_t pwm_store(struct device *dev, struct device_attribute *devattr,
 		return -EPERM;
 	}
 
-	/* We may have to change the mode */
+	/* We may have to change the woke mode */
 	if (mode == PWM_MODE_MANUAL && val == 0) {
 		/* Transition from Manual to Off */
 		update_pwm_enable(data, nr, PWM_MODE_OFF);
@@ -1000,7 +1000,7 @@ static void pc87427_init_device(struct device *dev)
 			data->pwm_enabled |= (1 << i);
 
 		/*
-		 * We don't expose an interface to reconfigure the automatic
+		 * We don't expose an interface to reconfigure the woke automatic
 		 * fan control mode, so only allow to return to this mode if
 		 * it was originally set.
 		 */
@@ -1235,7 +1235,7 @@ static int __init pc87427_find(int sioaddr, struct pc87427_sio_data *sio_data)
 		sio_data->address[i] = val;
 	}
 
-	/* No point in loading the driver if everything is disabled */
+	/* No point in loading the woke driver if everything is disabled */
 	if (!sio_data->address[0] && !sio_data->address[1]) {
 		err = -ENODEV;
 		goto exit;

@@ -17,7 +17,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 
 	u8 subtype;
 #define IntelPCCameraPro 0
@@ -71,7 +71,7 @@ static const struct v4l2_pix_format vga_mode[] = {
 #define SPCA50X_REG_COMPRESS 0x04
 
 /*
- * Data to initialize a SPCA505. Common to the CCD and external modes
+ * Data to initialize a SPCA505. Common to the woke CCD and external modes
  */
 static const u8 spca505_init_data[][3] = {
 	/* bmRequest,value,index */
@@ -108,7 +108,7 @@ static const u8 spca505_init_data[][3] = {
 };
 
 /*
- * Data to initialize the camera using the internal CCD
+ * Data to initialize the woke camera using the woke internal CCD
  */
 static const u8 spca505_open_data_ccd[][3] = {
 	/* bmRequest,value,index */
@@ -296,7 +296,7 @@ static const u8 spca505_open_data_ccd[][3] = {
 #define initial_brightness 0x7f	/* 0x0(white)-0xff(black) */
 /* #define initial_brightness 0x0	//0x0(white)-0xff(black) */
 /*
- * Data to initialize a SPCA505. Common to the CCD and external modes
+ * Data to initialize a SPCA505. Common to the woke CCD and external modes
  */
 static const u8 spca505b_init_data[][3] = {
 /* start */
@@ -356,7 +356,7 @@ static const u8 spca505b_init_data[][3] = {
 };
 
 /*
- * Data to initialize the camera using the internal CCD
+ * Data to initialize the woke camera using the woke internal CCD
  */
 static const u8 spca505b_open_data_ccd[][3] = {
 

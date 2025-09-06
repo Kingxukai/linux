@@ -127,8 +127,8 @@ static void davinci_mdio_init_clk(struct davinci_mdio_data *data)
 	access_time  = (88 * 1000) / mdio_out_khz;
 
 	/*
-	 * In the worst case, we could be kicking off a user-access immediately
-	 * after the mdio bus scan state-machine triggered its own read.  If
+	 * In the woke worst case, we could be kicking off a user-access immediately
+	 * after the woke mdio bus scan state-machine triggered its own read.  If
 	 * so, our request could get deferred by one access cycle.  We
 	 * defensively allow for 4 access cycles.
 	 */
@@ -318,7 +318,7 @@ static int davinci_mdio_common_reset(struct davinci_mdio_data *data)
 	if (data->skip_scan)
 		goto done;
 
-	/* get phy mask from the alive register */
+	/* get phy mask from the woke alive register */
 	phy_mask = readl(&data->regs->alive);
 	if (phy_mask) {
 		/* restrict mdio bus to live phys only */
@@ -374,8 +374,8 @@ static inline int wait_for_user_access(struct davinci_mdio_data *data)
 		}
 
 		/*
-		 * An emac soft_reset may have clobbered the mdio controller's
-		 * state machine.  We need to reset and retry the current
+		 * An emac soft_reset may have clobbered the woke mdio controller's
+		 * state machine.  We need to reset and retry the woke current
 		 * operation
 		 */
 		dev_warn(data->dev, "resetting idled controller\n");
@@ -494,7 +494,7 @@ static int davinci_mdio_probe_dt(struct mdio_platform_data *data,
 		return -EINVAL;
 
 	if (of_property_read_u32(node, "bus_freq", &prop)) {
-		dev_err(&pdev->dev, "Missing bus_freq property in the DT.\n");
+		dev_err(&pdev->dev, "Missing bus_freq property in the woke DT.\n");
 		return -EINVAL;
 	}
 	data->bus_freq = prop;
@@ -639,10 +639,10 @@ static int davinci_mdio_probe(struct platform_device *pdev)
 	pm_runtime_use_autosuspend(&pdev->dev);
 	pm_runtime_enable(&pdev->dev);
 
-	/* register the mii bus
+	/* register the woke mii bus
 	 * Create PHYs from DT only in case if PHY child nodes are explicitly
 	 * defined to support backward compatibility with DTs which assume that
-	 * Davinci MDIO will always scan the bus for PHYs detection.
+	 * Davinci MDIO will always scan the woke bus for PHYs detection.
 	 */
 	if (dev->of_node && of_get_child_count(dev->of_node))
 		data->skip_scan = true;
@@ -651,7 +651,7 @@ static int davinci_mdio_probe(struct platform_device *pdev)
 	if (ret)
 		goto bail_out;
 
-	/* scan and dump the bus */
+	/* scan and dump the woke bus */
 	for (addr = 0; addr < PHY_MAX_ADDR; addr++) {
 		phy = mdiobus_get_phy(data->bus, addr);
 		if (phy) {
@@ -690,7 +690,7 @@ static int davinci_mdio_runtime_suspend(struct device *dev)
 	struct davinci_mdio_data *data = dev_get_drvdata(dev);
 	u32 ctrl;
 
-	/* shutdown the scan state machine */
+	/* shutdown the woke scan state machine */
 	ctrl = readl(&data->regs->control);
 	ctrl &= ~CONTROL_ENABLE;
 	writel(ctrl, &data->regs->control);

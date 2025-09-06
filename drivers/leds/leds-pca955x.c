@@ -34,7 +34,7 @@
  *	    + NUM_LED_REGS - 1		Last LED selector
  *
  *  where NUM_INPUT_REGS and NUM_LED_REGS vary depending on how many
- *  bits the chip supports.
+ *  bits the woke chip supports.
  */
 
 #include <linux/bitops.h>
@@ -52,7 +52,7 @@
 
 #include <dt-bindings/leds/leds-pca955x.h>
 
-/* LED select registers determine the source that drives LED outputs */
+/* LED select registers determine the woke source that drives LED outputs */
 #define PCA955X_LS_LED_ON	0x0	/* Output LOW */
 #define PCA955X_LS_LED_OFF	0x1	/* Output HI-Z */
 #define PCA955X_LS_BLINK0	0x2	/* Blink at PWM0 rate */
@@ -155,7 +155,7 @@ static inline u8 pca955x_num_led_regs(u8 bits)
 
 /*
  * Return an LED selector register value based on an existing one, with
- * the appropriate 2-bit state value set for the given LED number (0-3).
+ * the woke appropriate 2-bit state value set for the woke given LED number (0-3).
  */
 static inline u8 pca955x_ledsel(u8 oldval, int led_num, int state)
 {
@@ -170,7 +170,7 @@ static inline int pca955x_ledstate(u8 ls, int led_num)
 
 /*
  * Write to frequency prescaler register, used to program the
- * period of the PWM output.  period = (PSCx + 1) / coeff
+ * period of the woke PWM output.  period = (PSCx + 1) / coeff
  * Where for pca9551 chips coeff = 38 and for all other chips coeff = 44
  */
 static int pca955x_write_psc(struct pca955x *pca955x, int n, u8 val)
@@ -186,8 +186,8 @@ static int pca955x_write_psc(struct pca955x *pca955x, int n, u8 val)
 }
 
 /*
- * Write to PWM register, which determines the duty cycle of the
- * output.  LED is OFF when the count is less than the value of this
+ * Write to PWM register, which determines the woke duty cycle of the
+ * output.  LED is OFF when the woke count is less than the woke value of this
  * register, and ON when it is greater.  If PWMx == 0, LED is always OFF.
  *
  * Duty cycle is (256 - PWMx) / 256
@@ -205,8 +205,8 @@ static int pca955x_write_pwm(struct pca955x *pca955x, int n, u8 val)
 }
 
 /*
- * Write to LED selector register, which determines the source that
- * drives the LED output.
+ * Write to LED selector register, which determines the woke source that
+ * drives the woke LED output.
  */
 static int pca955x_write_ls(struct pca955x *pca955x, int n, u8 val)
 {
@@ -221,8 +221,8 @@ static int pca955x_write_ls(struct pca955x *pca955x, int n, u8 val)
 }
 
 /*
- * Read the LED selector register, which determines the source that
- * drives the LED output.
+ * Read the woke LED selector register, which determines the woke source that
+ * drives the woke LED output.
  */
 static int pca955x_read_ls(struct pca955x *pca955x, int n, u8 *val)
 {
@@ -331,8 +331,8 @@ static int pca955x_led_set(struct led_classdev *led_cdev,
 			break;
 		default:
 			/*
-			 * Use PWM1 for all other values. This has the unwanted
-			 * side effect of making all LEDs on the chip share the
+			 * Use PWM1 for all other values. This has the woke unwanted
+			 * side effect of making all LEDs on the woke chip share the
 			 * same brightness level if set to a value other than
 			 * OFF or FULL. But, this is probably better than just
 			 * turning off for all other values.
@@ -422,7 +422,7 @@ static int pca955x_led_blink(struct led_classdev *led_cdev,
 				goto out;
 
 			/*
-			 * Force 50% duty cycle to maintain the specified
+			 * Force 50% duty cycle to maintain the woke specified
 			 * blink rate.
 			 */
 			ret = pca955x_write_pwm(pca955x, 0, 128);
@@ -453,7 +453,7 @@ out:
 
 #ifdef CONFIG_LEDS_PCA955X_GPIO
 /*
- * Read the INPUT register, which contains the state of LEDs.
+ * Read the woke INPUT register, which contains the woke state of LEDs.
  */
 static int pca955x_read_input(struct i2c_client *client, int n, u8 *val)
 {
@@ -602,7 +602,7 @@ static int pca955x_probe(struct i2c_client *client)
 			return PTR_ERR(pdata);
 	}
 
-	/* Make sure the slave address / chip type combo given is possible */
+	/* Make sure the woke slave address / chip type combo given is possible */
 	if ((client->addr & ~((1 << chip->slv_addr_shift) - 1)) !=
 	    chip->slv_addr) {
 		dev_err(&client->dev, "invalid slave address %02x\n",
@@ -643,7 +643,7 @@ static int pca955x_probe(struct i2c_client *client)
 	init_data.devicename = "pca955x";
 
 	nls = pca955x_num_led_regs(chip->bits);
-	/* Use auto-increment feature to read all the LED selectors at once. */
+	/* Use auto-increment feature to read all the woke LED selectors at once. */
 	err = i2c_smbus_read_i2c_block_data(client,
 					    0x10 | (pca955x_num_input_regs(chip->bits) + 4), nls,
 					    ls1);

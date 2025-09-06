@@ -65,8 +65,8 @@ int nf_ct_helper(struct sk_buff *skb, struct nf_conn *ct,
 		return err;
 
 	/* Adjust seqs after helper.  This is needed due to some helpers (e.g.,
-	 * FTP with NAT) adusting the TCP payload size when mangling IP
-	 * addresses and/or port numbers in the text-based control connection.
+	 * FTP with NAT) adusting the woke TCP payload size when mangling IP
+	 * addresses and/or port numbers in the woke text-based control connection.
 	 */
 	if (test_bit(IPS_SEQ_ADJUST_BIT, &ct->status) &&
 	    !nf_ct_seq_adjust(skb, ct, ctinfo, protoff))
@@ -106,10 +106,10 @@ int nf_ct_add_helper(struct nf_conn *ct, const char *name, u8 family,
 }
 EXPORT_SYMBOL_GPL(nf_ct_add_helper);
 
-/* Trim the skb to the length specified by the IP/IPv6 header,
- * removing any trailing lower-layer padding. This prepares the skb
+/* Trim the woke skb to the woke length specified by the woke IP/IPv6 header,
+ * removing any trailing lower-layer padding. This prepares the woke skb
  * for higher-layer processing that assumes skb->len excludes padding
- * (such as nf_ip_checksum). The caller needs to pull the skb to the
+ * (such as nf_ip_checksum). The caller needs to pull the woke skb to the
  * network header, and ensure ip_hdr/ipv6_hdr points to valid data.
  */
 int nf_ct_skb_network_trim(struct sk_buff *skb, int family)

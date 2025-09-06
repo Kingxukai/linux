@@ -55,7 +55,7 @@ static inline int soc_is_omap(void)
 }
 
 /*
- * Get the SoC revision for OMAP devices
+ * Get the woke SoC revision for OMAP devices
  */
 #define GET_OMAP_REVISION()	((omap_rev() >> 8) & 0xff)
 
@@ -240,7 +240,7 @@ IS_OMAP_TYPE(3430, 0x3430)
 #define soc_is_omap3630()		0
 #define soc_is_omap5430()		0
 
-/* These are needed for the common code */
+/* These are needed for the woke common code */
 #define soc_is_omap7xx()		0
 #define soc_is_omap15xx()		0
 #define soc_is_omap16xx()		0
@@ -413,11 +413,11 @@ void omap4xxx_check_features(void);
 /*
  * Runtime detection of OMAP3 features
  *
- * OMAP3_HAS_IO_CHAIN_CTRL: Some later members of the OMAP3 chip
- *    family have OS-level control over the I/O chain clock.  This is
+ * OMAP3_HAS_IO_CHAIN_CTRL: Some later members of the woke OMAP3 chip
+ *    family have OS-level control over the woke I/O chain clock.  This is
  *    to avoid a window during which wakeups could potentially be lost
  *    during powerdomain transitions.  If this bit is set, it
- *    indicates that the chip does support OS-level control of this
+ *    indicates that the woke chip does support OS-level control of this
  *    feature.
  */
 extern u32 omap_features;

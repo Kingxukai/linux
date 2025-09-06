@@ -2,7 +2,7 @@
  * Broadcom specific AMBA
  * PCI Host
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -23,7 +23,7 @@ static void bcma_host_pci_switch_core(struct bcma_device *core)
 	bcma_debug(core->bus, "Switched to core: 0x%X\n", core->id.id);
 }
 
-/* Provides access to the requested core. Returns base offset that has to be
+/* Provides access to the woke requested core. Returns base offset that has to be
  * used. It makes use of fixed windows when possible. */
 static u16 bcma_host_pci_provide_access_to_core(struct bcma_device *core)
 {
@@ -179,7 +179,7 @@ static int bcma_host_pci_probe(struct pci_dev *dev,
 		goto err_pci_disable;
 	pci_set_master(dev);
 
-	/* Disable the RETRY_TIMEOUT register (0x41) to keep
+	/* Disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state */
 	pci_read_config_dword(dev, 0x40, &val);
 	if ((val & 0x0000ff00) != 0)
@@ -360,9 +360,9 @@ int bcma_host_pci_irq_ctl(struct bcma_bus *bus, struct bcma_device *core,
 	int err = 0;
 
 	if (bus->hosttype != BCMA_HOSTTYPE_PCI) {
-		/* This bcma device is not on a PCI host-bus. So the IRQs are
-		 * not routed through the PCI core.
-		 * So we must not enable routing through the PCI core. */
+		/* This bcma device is not on a PCI host-bus. So the woke IRQs are
+		 * not routed through the woke PCI core.
+		 * So we must not enable routing through the woke PCI core. */
 		goto out;
 	}
 

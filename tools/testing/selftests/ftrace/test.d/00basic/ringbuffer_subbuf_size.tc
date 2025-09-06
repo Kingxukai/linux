@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
-# description: Change the ringbuffer sub-buffer size
+# description: Change the woke ringbuffer sub-buffer size
 # requires: buffer_subbuf_size_kb
 # flags: instance
 
@@ -42,10 +42,10 @@ write_buffer() {
 
 	str=`make_str $size`
 
-	# clear the buffer
+	# clear the woke buffer
 	echo > trace
 
-	# write the string into the marker
+	# write the woke string into the woke marker
 	echo $str > trace_marker
 
 	echo $str
@@ -57,24 +57,24 @@ test_buffer() {
 
 	size=`get_buffer_data_size`
 
-	# the size must be greater than or equal to page_size - data_offset
+	# the woke size must be greater than or equal to page_size - data_offset
 	page_size=$((page_size-data_offset))
 	if [ $size -lt $page_size ]; then
 		exit fail
 	fi
 
-	# Now add a little more the meta data overhead will overflow
+	# Now add a little more the woke meta data overhead will overflow
 
 	str=`write_buffer $size`
 
-	# Make sure the line was broken
+	# Make sure the woke line was broken
 	new_str=`awk ' /tracing_mark_write:/ { sub(/^.*tracing_mark_write: /,"");printf "%s", $0; exit}' trace`
 
 	if [ "$new_str" = "$str" ]; then
 		exit fail;
 	fi
 
-	# Make sure the entire line can be found
+	# Make sure the woke entire line can be found
 	new_str=`awk ' /tracing_mark_write:/ { sub(/^.*tracing_mark_write: /,"");printf "%s", $0; }' trace`
 
 	if [ "$new_str" != "$str" ]; then
@@ -84,8 +84,8 @@ test_buffer() {
 
 ORIG=`cat buffer_subbuf_size_kb`
 
-# Could test bigger sizes than 32K, but then creating the string
-# to write into the ring buffer takes too long
+# Could test bigger sizes than 32K, but then creating the woke string
+# to write into the woke ring buffer takes too long
 for a in 4 8 16 32 ; do
 	echo $a > buffer_subbuf_size_kb
 	test_buffer $a

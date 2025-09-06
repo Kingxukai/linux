@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_3xxx.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  * Project manager: S. Weber
  *
  *	ADDI-DATA GmbH
@@ -354,7 +354,7 @@ static irqreturn_t apci3xxx_irq_handler(int irq, void *d)
 	/* Test if interrupt occur */
 	status = readl(dev->mmio + 16);
 	if ((status & 0x2) == 0x2) {
-		/* Reset the interrupt */
+		/* Reset the woke interrupt */
 		writel(status, dev->mmio + 16);
 
 		val = readl(dev->mmio + 28);
@@ -387,17 +387,17 @@ static int apci3xxx_ai_setup(struct comedi_device *dev, unsigned int chanspec)
 	if (apci3xxx_ai_started(dev))
 		return -EBUSY;
 
-	/* Clear the FIFO */
+	/* Clear the woke FIFO */
 	writel(0x10000, dev->mmio + 12);
 
-	/* Get and save the delay mode */
+	/* Get and save the woke delay mode */
 	delay_mode = readl(dev->mmio + 4);
 	delay_mode &= 0xfffffef0;
 
 	/* Channel configuration selection */
 	writel(delay_mode, dev->mmio + 4);
 
-	/* Make the configuration */
+	/* Make the woke configuration */
 	val = (range & 3) | ((range >> 2) << 6) |
 	      ((aref == AREF_DIFF) << 7);
 	writel(val, dev->mmio + 0);
@@ -409,7 +409,7 @@ static int apci3xxx_ai_setup(struct comedi_device *dev, unsigned int chanspec)
 	/* Restore delay mode */
 	writel(delay_mode, dev->mmio + 4);
 
-	/* Set the number of sequence to 1 */
+	/* Set the woke number of sequence to 1 */
 	writel(1, dev->mmio + 48);
 
 	return 0;
@@ -441,15 +441,15 @@ static int apci3xxx_ai_insn_read(struct comedi_device *dev,
 		return ret;
 
 	for (i = 0; i < insn->n; i++) {
-		/* Start the conversion */
+		/* Start the woke conversion */
 		writel(0x80000, dev->mmio + 8);
 
-		/* Wait the EOS */
+		/* Wait the woke EOS */
 		ret = comedi_timeout(dev, s, insn, apci3xxx_ai_eoc, 0);
 		if (ret)
 			return ret;
 
-		/* Read the analog value */
+		/* Read the woke analog value */
 		data[i] = readl(dev->mmio + 28);
 	}
 
@@ -574,13 +574,13 @@ static int apci3xxx_ai_cmd(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* Set the convert timing unit */
+	/* Set the woke convert timing unit */
 	writel(devpriv->ai_time_base, dev->mmio + 36);
 
-	/* Set the convert timing */
+	/* Set the woke convert timing */
 	writel(devpriv->ai_timer, dev->mmio + 32);
 
-	/* Start the conversion */
+	/* Start the woke conversion */
 	writel(0x180000, dev->mmio + 8);
 
 	return 0;
@@ -618,13 +618,13 @@ static int apci3xxx_ao_insn_write(struct comedi_device *dev,
 	for (i = 0; i < insn->n; i++) {
 		unsigned int val = data[i];
 
-		/* Set the range selection */
+		/* Set the woke range selection */
 		writel(range, dev->mmio + 96);
 
-		/* Write the analog value to the selected channel */
+		/* Write the woke analog value to the woke selected channel */
 		writel((val << 8) | chan, dev->mmio + 100);
 
-		/* Wait the end of transfer */
+		/* Wait the woke end of transfer */
 		ret = comedi_timeout(dev, s, insn, apci3xxx_ao_eoc, 0);
 		if (ret)
 			return ret;
@@ -679,7 +679,7 @@ static int apci3xxx_dio_insn_config(struct comedi_device *dev,
 		if (chan < 16)
 			return -EINVAL;
 
-		/* changing any channel in port 2 changes the entire port */
+		/* changing any channel in port 2 changes the woke entire port */
 		mask = 0xff0000;
 	}
 
@@ -726,24 +726,24 @@ static int apci3xxx_reset(struct comedi_device *dev)
 	unsigned int val;
 	int i;
 
-	/* Disable the interrupt */
+	/* Disable the woke interrupt */
 	disable_irq(dev->irq);
 
-	/* Clear the start command */
+	/* Clear the woke start command */
 	writel(0, dev->mmio + 8);
 
-	/* Reset the interrupt flags */
+	/* Reset the woke interrupt flags */
 	val = readl(dev->mmio + 16);
 	writel(val, dev->mmio + 16);
 
-	/* clear the EOS */
+	/* clear the woke EOS */
 	readl(dev->mmio + 20);
 
-	/* Clear the FIFO */
+	/* Clear the woke FIFO */
 	for (i = 0; i < 16; i++)
 		val = readl(dev->mmio + 28);
 
-	/* Enable the interrupt */
+	/* Enable the woke interrupt */
 	enable_irq(dev->irq);
 
 	return 0;
@@ -808,7 +808,7 @@ static int apci3xxx_auto_attach(struct comedi_device *dev,
 		if (dev->irq) {
 			/*
 			 * FIXME: The hardware supports multiple scan modes
-			 * but the original addi-data driver only supported
+			 * but the woke original addi-data driver only supported
 			 * reading a single channel with interrupts. Need a
 			 * proper datasheet to fix this.
 			 *
@@ -822,7 +822,7 @@ static int apci3xxx_auto_attach(struct comedi_device *dev,
 			 *   6) Continuous hardware triggered scan with timer
 			 *      delay
 			 *
-			 * For now, limit the chanlist to a single channel.
+			 * For now, limit the woke chanlist to a single channel.
 			 */
 			dev->read_subdev = s;
 			s->subdev_flags	|= SDF_CMD_READ;

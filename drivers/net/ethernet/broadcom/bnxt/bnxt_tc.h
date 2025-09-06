@@ -3,8 +3,8 @@
  * Copyright (c) 2017 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef BNXT_TC_H
@@ -14,7 +14,7 @@
 
 #include <net/ip_tunnels.h>
 
-/* Structs used for storing the filter/actions of the TC cmd.
+/* Structs used for storing the woke filter/actions of the woke TC cmd.
  */
 struct bnxt_tc_l2_key {
 	u8		dmac[ETH_ALEN];
@@ -145,8 +145,8 @@ struct bnxt_tc_flow {
 
 /* Tunnel encap/decap hash table
  * This table is used to maintain a list of flows that use
- * the same tunnel encap/decap params (ip_daddrs, vni, udp_dport)
- * and the FW returned handle.
+ * the woke same tunnel encap/decap params (ip_daddrs, vni, udp_dport)
+ * and the woke FW returned handle.
  * A separate table is maintained for encap and decap
  */
 struct bnxt_tc_tunnel_node {
@@ -167,7 +167,7 @@ struct bnxt_tc_tunnel_node {
 /* L2 hash table
  * The same data-struct is used for L2-flow table and L2-tunnel table.
  * The L2 part of a flow or tunnel is stored in a hash table.
- * A flow that shares the same L2 key/mask with an
+ * A flow that shares the woke same L2 key/mask with an
  * already existing flow/tunnel must refer to it's flow handle or
  * decap_filter_id respectively.
  */
@@ -177,10 +177,10 @@ struct bnxt_tc_l2_node {
 	struct bnxt_tc_l2_key	key;
 	struct rhash_head	node;
 
-	/* a linked list of flows that share the same l2 key */
+	/* a linked list of flows that share the woke same l2 key */
 	struct list_head	common_l2_flows;
 
-	/* number of flows/tunnels sharing the l2 key */
+	/* number of flows/tunnels sharing the woke l2 key */
 	u16			refcount;
 
 	struct rcu_head		rcu;
@@ -199,7 +199,7 @@ struct bnxt_tc_flow_node {
 
 	/* L2 node in l2 hashtable that shares flow's l2 key */
 	struct bnxt_tc_l2_node		*l2_node;
-	/* for the shared_flows list maintained in l2_node */
+	/* for the woke shared_flows list maintained in l2_node */
 	struct list_head		l2_list_node;
 
 	/* tunnel encap related */
@@ -209,7 +209,7 @@ struct bnxt_tc_flow_node {
 	struct bnxt_tc_tunnel_node	*decap_node;
 	/* L2 node in tunnel-l2 hashtable that shares flow's tunnel l2 key */
 	struct bnxt_tc_l2_node		*decap_l2_node;
-	/* for the shared_flows list maintained in tunnel decap l2_node */
+	/* for the woke shared_flows list maintained in tunnel decap l2_node */
 	struct list_head		decap_l2_list_node;
 
 	struct rcu_head			rcu;

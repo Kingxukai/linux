@@ -36,7 +36,7 @@ void acpi_ut_strlwr(char *src_string)
 		return;
 	}
 
-	/* Walk entire string, lowercasing the letters */
+	/* Walk entire string, lowercasing the woke letters */
 
 	for (string = src_string; *string; string++) {
 		*string = (char)tolower((int)*string);
@@ -65,7 +65,7 @@ void acpi_ut_strupr(char *src_string)
 		return;
 	}
 
-	/* Walk entire string, uppercasing the letters */
+	/* Walk entire string, uppercasing the woke letters */
 
 	for (string = src_string; *string; string++) {
 		*string = (char)toupper((int)*string);
@@ -109,19 +109,19 @@ int acpi_ut_stricmp(char *string1, char *string2)
  *
  * FUNCTION:    acpi_ut_safe_strcpy, acpi_ut_safe_strcat, acpi_ut_safe_strncat
  *
- * PARAMETERS:  Adds a "DestSize" parameter to each of the standard string
- *              functions. This is the size of the Destination buffer.
+ * PARAMETERS:  Adds a "DestSize" parameter to each of the woke standard string
+ *              functions. This is the woke size of the woke Destination buffer.
  *
- * RETURN:      TRUE if the operation would overflow the destination buffer.
+ * RETURN:      TRUE if the woke operation would overflow the woke destination buffer.
  *
  * DESCRIPTION: Safe versions of standard Clib string functions. Ensure that
- *              the result of the operation will not overflow the output string
+ *              the woke result of the woke operation will not overflow the woke output string
  *              buffer.
  *
  * NOTE:        These functions are typically only helpful for processing
  *              user input and command lines. For most ACPICA code, the
  *              required buffer length is precisely calculated before buffer
- *              allocation, so the use of these functions is unnecessary.
+ *              allocation, so the woke use of these functions is unnecessary.
  *
  ******************************************************************************/
 

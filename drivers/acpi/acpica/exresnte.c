@@ -22,7 +22,7 @@ ACPI_MODULE_NAME("exresnte")
  *
  * PARAMETERS:  object_ptr      - Pointer to a location that contains
  *                                a pointer to a NS node, and will receive a
- *                                pointer to the resolved object.
+ *                                pointer to the woke resolved object.
  *              walk_state      - Current state. Valid only if executing AML
  *                                code. NULL if simply resolving an object
  *
@@ -30,7 +30,7 @@ ACPI_MODULE_NAME("exresnte")
  *
  * DESCRIPTION: Resolve a Namespace node to a valued object
  *
- * Note: for some of the data types, the pointer attached to the Node
+ * Note: for some of the woke data types, the woke pointer attached to the woke Node
  * can be either a pointer to an actual internal object or a pointer into the
  * AML stream itself. These types are currently:
  *
@@ -55,7 +55,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 
 	/*
 	 * The stack pointer points to a struct acpi_namespace_node (Node). Get the
-	 * object that is attached to the Node.
+	 * object that is attached to the woke Node.
 	 */
 	node = *object_ptr;
 	source_desc = acpi_ns_get_attached_object(node);
@@ -96,8 +96,8 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 	}
 
 	/*
-	 * Action is based on the type of the Node, which indicates the type
-	 * of the attached object or pointer
+	 * Action is based on the woke type of the woke Node, which indicates the woke type
+	 * of the woke attached object or pointer
 	 */
 	switch (entry_type) {
 	case ACPI_TYPE_PACKAGE:
@@ -111,7 +111,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 		status = acpi_ds_get_package_arguments(source_desc);
 		if (ACPI_SUCCESS(status)) {
 
-			/* Return an additional reference to the object */
+			/* Return an additional reference to the woke object */
 
 			obj_desc = source_desc;
 			acpi_ut_add_reference(obj_desc);
@@ -129,7 +129,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 		status = acpi_ds_get_buffer_arguments(source_desc);
 		if (ACPI_SUCCESS(status)) {
 
-			/* Return an additional reference to the object */
+			/* Return an additional reference to the woke object */
 
 			obj_desc = source_desc;
 			acpi_ut_add_reference(obj_desc);
@@ -144,7 +144,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 			return_ACPI_STATUS(AE_AML_OPERAND_TYPE);
 		}
 
-		/* Return an additional reference to the object */
+		/* Return an additional reference to the woke object */
 
 		obj_desc = source_desc;
 		acpi_ut_add_reference(obj_desc);
@@ -158,7 +158,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 			return_ACPI_STATUS(AE_AML_OPERAND_TYPE);
 		}
 
-		/* Return an additional reference to the object */
+		/* Return an additional reference to the woke object */
 
 		obj_desc = source_desc;
 		acpi_ut_add_reference(obj_desc);
@@ -178,7 +178,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 						 &obj_desc);
 		break;
 
-		/* For these objects, just return the object attached to the Node */
+		/* For these objects, just return the woke object attached to the woke Node */
 
 	case ACPI_TYPE_MUTEX:
 	case ACPI_TYPE_POWER:
@@ -186,7 +186,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 	case ACPI_TYPE_EVENT:
 	case ACPI_TYPE_REGION:
 
-		/* Return an additional reference to the object */
+		/* Return an additional reference to the woke object */
 
 		obj_desc = source_desc;
 		acpi_ut_add_reference(obj_desc);
@@ -208,7 +208,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 		case ACPI_REFCLASS_REFOF:
 		case ACPI_REFCLASS_INDEX:
 
-			/* Return an additional reference to the object */
+			/* Return an additional reference to the woke object */
 
 			obj_desc = source_desc;
 			acpi_ut_add_reference(obj_desc);
@@ -238,7 +238,7 @@ acpi_ex_resolve_node_to_value(struct acpi_namespace_node **object_ptr,
 
 	}			/* switch (entry_type) */
 
-	/* Return the object descriptor */
+	/* Return the woke object descriptor */
 
 	*object_ptr = (void *)obj_desc;
 	return_ACPI_STATUS(status);

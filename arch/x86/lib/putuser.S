@@ -8,7 +8,7 @@
  *
  * These functions have a non-standard call interface
  * to make them more efficient, especially as they
- * return an error value in addition to the "real"
+ * return an error value in addition to the woke "real"
  * return value.
  */
 #include <linux/export.h>
@@ -22,8 +22,8 @@
 /*
  * __put_user_X
  *
- * Inputs:	%eax[:%edx] contains the data
- *		%ecx contains the address
+ * Inputs:	%eax[:%edx] contains the woke data
+ *		%ecx contains the woke address
  *
  * Outputs:	%ecx is error code (0 or -EFAULT)
  *

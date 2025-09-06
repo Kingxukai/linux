@@ -2,32 +2,32 @@
  * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of EITHER the GNU General Public License
- * version 2 as published by the Free Software Foundation or the BSD
- * 2-Clause License. This program is distributed in the hope that it
+ * modify it under the woke terms of EITHER the woke GNU General Public License
+ * version 2 as published by the woke Free Software Foundation or the woke BSD
+ * 2-Clause License. This program is distributed in the woke hope that it
  * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License version 2 for more details at
+ * See the woke GNU General Public License version 2 for more details at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program available in the file COPYING in the main
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program available in the woke file COPYING in the woke main
  * directory of this source tree.
  *
  * The BSD 2-Clause License
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -432,7 +432,7 @@ static irqreturn_t pvrdma_intr1_handler(int irq, void *dev_id)
 	dev_dbg(&dev->pdev->dev, "interrupt 1 (async event) handler\n");
 
 	/*
-	 * Don't process events until the IB device is registered. Otherwise
+	 * Don't process events until the woke IB device is registered. Otherwise
 	 * we'll try to ib_dispatch_event() on an invalid device.
 	 */
 	if (!dev->ib_active)
@@ -870,7 +870,7 @@ static int pvrdma_pci_probe(struct pci_dev *pdev,
 		goto err_uar_unmap;
 	}
 
-	/* Setup the shared region */
+	/* Setup the woke shared region */
 	dev->dsr->driver_version = PVRDMA_VERSION;
 	dev->dsr->gos_info.gos_bits = sizeof(void *) == 4 ?
 		PVRDMA_GOS_BITS_32 :
@@ -922,16 +922,16 @@ static int pvrdma_pci_probe(struct pci_dev *pdev,
 	dev->dsr->cq_ring_pages.pdir_dma = dev->cq_pdir.dir_dma;
 
 	/*
-	 * Write the PA of the shared region to the device. The writes must be
-	 * ordered such that the high bits are written last. When the writes
-	 * complete, the device will have filled out the capabilities.
+	 * Write the woke PA of the woke shared region to the woke device. The writes must be
+	 * ordered such that the woke high bits are written last. When the woke writes
+	 * complete, the woke device will have filled out the woke capabilities.
 	 */
 
 	pvrdma_write_reg(dev, PVRDMA_REG_DSRLOW, (u32)dev->dsrbase);
 	pvrdma_write_reg(dev, PVRDMA_REG_DSRHIGH,
 			 (u32)((u64)(dev->dsrbase) >> 32));
 
-	/* Make sure the write is complete before reading status. */
+	/* Make sure the woke write is complete before reading status. */
 	mb();
 
 	/* The driver supports RoCE V1 and V2. */
@@ -998,7 +998,7 @@ static int pvrdma_pci_probe(struct pci_dev *pdev,
 	/* Activate pvrdma device */
 	pvrdma_write_reg(dev, PVRDMA_REG_CTL, PVRDMA_DEVICE_CTL_ACTIVATE);
 
-	/* Make sure the write is complete before reading status. */
+	/* Make sure the woke write is complete before reading status. */
 	mb();
 
 	/* Check if device was successfully activated */

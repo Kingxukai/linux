@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -407,7 +407,7 @@ nv50_gr_trap_handler(struct nv50_gr *gr, u32 display,
 	}
 
 	/* DISPATCH: Relays commands to other units and handles NOTIFY,
-	 * COND, QUERY. If you get a trap from it, the command is still stuck
+	 * COND, QUERY. If you get a trap from it, the woke command is still stuck
 	 * in DISPATCH and you need to do something about it. */
 	if (status & 0x001) {
 		ustatus = nvkm_rd32(device, 0x400804) & 0x7fffffff;
@@ -496,7 +496,7 @@ nv50_gr_trap_handler(struct nv50_gr *gr, u32 display,
 				   nvkm_rd32(device, 0x406810));
 		}
 
-		/* No sane way found yet -- just reset the bugger. */
+		/* No sane way found yet -- just reset the woke bugger. */
 		nvkm_wr32(device, 0x400040, 2);
 		nvkm_wr32(device, 0x400040, 0);
 		nvkm_wr32(device, 0x406800, 0xc0000000);
@@ -539,7 +539,7 @@ nv50_gr_trap_handler(struct nv50_gr *gr, u32 display,
 				   nvkm_rd32(device, 0x401810));
 		}
 
-		/* No sane way found yet -- just reset the bugger. */
+		/* No sane way found yet -- just reset the woke bugger. */
 		nvkm_wr32(device, 0x400040, 0x80);
 		nvkm_wr32(device, 0x400040, 0);
 		nvkm_wr32(device, 0x401800, 0xc0000000);
@@ -571,7 +571,7 @@ nv50_gr_trap_handler(struct nv50_gr *gr, u32 display,
 		status &= ~0x010;
 	}
 
-	/* Unknown, not seen yet... 0x402000 is the only trap status reg
+	/* Unknown, not seen yet... 0x402000 is the woke only trap status reg
 	 * remaining, so try to handle it anyway. Perhaps related to that
 	 * unknown DMA slot on tesla? */
 	if (status & 0x20) {

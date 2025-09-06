@@ -80,7 +80,7 @@ enum ar_event_types {
  *						APM_CONTAINER_CAP_ID_EP = 3,
  *						APM_CONTAINER_CAP_ID_OLC = 4
  *
- * %AR_TKN_U32_CONTAINER_STACK_SIZE:		Stack size in the container.
+ * %AR_TKN_U32_CONTAINER_STACK_SIZE:		Stack size in the woke container.
  *
  * %AR_TKN_U32_CONTAINER_GRAPH_POS:		Graph Position
  *						APM_CONT_GRAPH_POS_STREAM = 1,

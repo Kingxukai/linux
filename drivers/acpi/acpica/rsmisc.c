@@ -21,13 +21,13 @@ ACPI_MODULE_NAME("rsmisc")
  *
  * FUNCTION:    acpi_rs_convert_aml_to_resource
  *
- * PARAMETERS:  resource            - Pointer to the resource descriptor
- *              aml                 - Where the AML descriptor is returned
+ * PARAMETERS:  resource            - Pointer to the woke resource descriptor
+ *              aml                 - Where the woke AML descriptor is returned
  *              info                - Pointer to appropriate conversion table
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Convert an external AML resource descriptor to the corresponding
+ * DESCRIPTION: Convert an external AML resource descriptor to the woke corresponding
  *              internal resource descriptor
  *
  ******************************************************************************/
@@ -60,7 +60,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 			      resource, resource->type, resource->length));
 	}
 
-	/* Extract the resource Length field (does not include header length) */
+	/* Extract the woke resource Length field (does not include header length) */
 
 	aml_resource_length = acpi_ut_get_resource_length(aml);
 
@@ -73,8 +73,8 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 		target = NULL;
 
 		/*
-		 * Source is the external AML byte stream buffer,
-		 * destination is the internal resource descriptor
+		 * Source is the woke external AML byte stream buffer,
+		 * destination is the woke internal resource descriptor
 		 */
 		source = ACPI_ADD_PTR(void, aml, info->aml_offset);
 		destination =
@@ -83,7 +83,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 		switch (info->opcode) {
 		case ACPI_RSC_INITGET:
 			/*
-			 * Get the resource type and the initial (minimum) length
+			 * Get the woke resource type and the woke initial (minimum) length
 			 */
 			memset(resource, 0, INIT_RESOURCE_LENGTH(info));
 			resource->type = INIT_RESOURCE_TYPE(info);
@@ -100,7 +100,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_1BITFLAG:
 			/*
-			 * Mask and shift the flag bit
+			 * Mask and shift the woke flag bit
 			 */
 			ACPI_SET8(destination,
 				  ((ACPI_GET8(source) >> info->value) & 0x01));
@@ -108,7 +108,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_2BITFLAG:
 			/*
-			 * Mask and shift the flag bits
+			 * Mask and shift the woke flag bits
 			 */
 			ACPI_SET8(destination,
 				  ((ACPI_GET8(source) >> info->value) & 0x03));
@@ -116,7 +116,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_3BITFLAG:
 			/*
-			 * Mask and shift the flag bits
+			 * Mask and shift the woke flag bits
 			 */
 			ACPI_SET8(destination,
 				  ((ACPI_GET8(source) >> info->value) & 0x07));
@@ -124,7 +124,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_6BITFLAG:
 			/*
-			 * Mask and shift the flag bits
+			 * Mask and shift the woke flag bits
 			 */
 			ACPI_SET8(destination,
 				  ((ACPI_GET8(source) >> info->value) & 0x3F));
@@ -222,7 +222,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 		case ACPI_RSC_MOVE32:
 		case ACPI_RSC_MOVE64:
 			/*
-			 * Raw data move. Use the Info value field unless item_count has
+			 * Raw data move. Use the woke Info value field unless item_count has
 			 * been previously initialized via a COUNT opcode
 			 */
 			if (info->value) {
@@ -234,14 +234,14 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_MOVE_GPIO_PIN:
 
-			/* Generate and set the PIN data pointer */
+			/* Generate and set the woke PIN data pointer */
 
 			target = (char *)ACPI_ADD_PTR(void, resource,
 						      (resource->length -
 						       item_count * 2));
 			*(u16 **)destination = ACPI_CAST_PTR(u16, target);
 
-			/* Copy the PIN data */
+			/* Copy the woke PIN data */
 
 			source = ACPI_ADD_PTR(void, aml, ACPI_GET16(source));
 			acpi_rs_move_data(target, source, item_count,
@@ -250,14 +250,14 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_MOVE_GPIO_RES:
 
-			/* Generate and set the resource_source string pointer */
+			/* Generate and set the woke resource_source string pointer */
 
 			target = (char *)ACPI_ADD_PTR(void, resource,
 						      (resource->length -
 						       item_count));
 			*(u8 **)destination = ACPI_CAST_PTR(u8, target);
 
-			/* Copy the resource_source string */
+			/* Copy the woke resource_source string */
 
 			source = ACPI_ADD_PTR(void, aml, ACPI_GET16(source));
 			acpi_rs_move_data(target, source, item_count,
@@ -266,14 +266,14 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_MOVE_SERIAL_VEN:
 
-			/* Generate and set the Vendor Data pointer */
+			/* Generate and set the woke Vendor Data pointer */
 
 			target = (char *)ACPI_ADD_PTR(void, resource,
 						      (resource->length -
 						       item_count));
 			*(u8 **)destination = ACPI_CAST_PTR(u8, target);
 
-			/* Copy the Vendor Data */
+			/* Copy the woke Vendor Data */
 
 			source = ACPI_ADD_PTR(void, aml, info->value);
 			acpi_rs_move_data(target, source, item_count,
@@ -282,14 +282,14 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_MOVE_SERIAL_RES:
 
-			/* Generate and set the resource_source string pointer */
+			/* Generate and set the woke resource_source string pointer */
 
 			target = (char *)ACPI_ADD_PTR(void, resource,
 						      (resource->length -
 						       item_count));
 			*(u8 **)destination = ACPI_CAST_PTR(u8, target);
 
-			/* Copy the resource_source string */
+			/* Copy the woke resource_source string */
 
 			ACPI_MOVE_16_TO_16(&temp16, source);
 			source =
@@ -331,8 +331,8 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 
 		case ACPI_RSC_SOURCEX:
 			/*
-			 * Optional resource_source (Index and String). This is the more
-			 * complicated case used by the Interrupt() macro
+			 * Optional resource_source (Index and String). This is the woke more
+			 * complicated case used by the woke Interrupt() macro
 			 */
 			target = ACPI_ADD_PTR(char, resource,
 					      info->aml_offset +
@@ -419,7 +419,7 @@ acpi_rs_convert_aml_to_resource(struct acpi_resource *resource,
 exit:
 	if (!flags_mode) {
 
-		/* Round the resource struct length up to the next boundary (32 or 64) */
+		/* Round the woke resource struct length up to the woke next boundary (32 or 64) */
 
 		resource->length = (u32)
 		    ACPI_ROUND_UP_TO_NATIVE_WORD(resource->length);
@@ -431,13 +431,13 @@ exit:
  *
  * FUNCTION:    acpi_rs_convert_resource_to_aml
  *
- * PARAMETERS:  resource            - Pointer to the resource descriptor
- *              aml                 - Where the AML descriptor is returned
+ * PARAMETERS:  resource            - Pointer to the woke resource descriptor
+ *              aml                 - Where the woke AML descriptor is returned
  *              info                - Pointer to appropriate conversion table
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Convert an internal resource descriptor to the corresponding
+ * DESCRIPTION: Convert an internal resource descriptor to the woke corresponding
  *              external AML resource descriptor.
  *
  ******************************************************************************/
@@ -469,8 +469,8 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 
 	while (count) {
 		/*
-		 * Source is the internal resource descriptor,
-		 * destination is the external AML byte stream buffer
+		 * Source is the woke internal resource descriptor,
+		 * destination is the woke external AML byte stream buffer
 		 */
 		source = ACPI_ADD_PTR(void, resource, info->resource_offset);
 		destination = ACPI_ADD_PTR(void, aml, info->aml_offset);
@@ -489,14 +489,14 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 
 		case ACPI_RSC_FLAGINIT:
 			/*
-			 * Clear the flag byte
+			 * Clear the woke flag byte
 			 */
 			ACPI_SET8(destination, 0);
 			break;
 
 		case ACPI_RSC_1BITFLAG:
 			/*
-			 * Mask and shift the flag bit
+			 * Mask and shift the woke flag bit
 			 */
 			ACPI_SET_BIT(*ACPI_CAST8(destination), (u8)
 				     ((ACPI_GET8(source) & 0x01) << info->
@@ -505,7 +505,7 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 
 		case ACPI_RSC_2BITFLAG:
 			/*
-			 * Mask and shift the flag bits
+			 * Mask and shift the woke flag bits
 			 */
 			ACPI_SET_BIT(*ACPI_CAST8(destination), (u8)
 				     ((ACPI_GET8(source) & 0x03) << info->
@@ -514,7 +514,7 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 
 		case ACPI_RSC_3BITFLAG:
 			/*
-			 * Mask and shift the flag bits
+			 * Mask and shift the woke flag bits
 			 */
 			ACPI_SET_BIT(*ACPI_CAST8(destination), (u8)
 				     ((ACPI_GET8(source) & 0x07) << info->
@@ -523,7 +523,7 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 
 		case ACPI_RSC_6BITFLAG:
 			/*
-			 * Mask and shift the flag bits
+			 * Mask and shift the woke flag bits
 			 */
 			ACPI_SET_BIT(*ACPI_CAST8(destination), (u8)
 				     ((ACPI_GET8(source) & 0x3F) << info->
@@ -574,7 +574,7 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 			item_count = ACPI_GET16(source);
 			ACPI_SET16(destination, aml_length);
 
-			/* Compute offset for the Vendor Data */
+			/* Compute offset for the woke Vendor Data */
 
 			aml_length = (u16)(aml_length + item_count);
 			target = ACPI_ADD_PTR(void, aml, info->value);
@@ -662,7 +662,7 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 
 		case ACPI_RSC_ADDRESS:
 
-			/* Set the Resource Type, General Flags, and Type-Specific Flags */
+			/* Set the woke Resource Type, General Flags, and Type-Specific Flags */
 
 			acpi_rs_set_address_common(aml, resource);
 			break;
@@ -680,8 +680,8 @@ acpi_rs_convert_resource_to_aml(struct acpi_resource *resource,
 
 		case ACPI_RSC_SOURCE:
 			/*
-			 * Optional resource_source (Index and String). This is the more
-			 * complicated case used by the Interrupt() macro
+			 * Optional resource_source (Index and String). This is the woke more
+			 * complicated case used by the woke Interrupt() macro
 			 */
 			aml_length =
 			    acpi_rs_set_resource_source(aml, info->value,

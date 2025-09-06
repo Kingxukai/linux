@@ -148,7 +148,7 @@ struct coeff_ram_ctl {
 };
 
 static const struct reg_sequence tscs454_patch[] = {
-	/* Assign ASRC out of the box so DAI 1 just works */
+	/* Assign ASRC out of the woke box so DAI 1 just works */
 	{ R_AUDIOMUX1, FV_ASRCIMUX_I2S1 | FV_I2S2MUX_I2S2 },
 	{ R_AUDIOMUX2, FV_ASRCOMUX_I2S1 | FV_DACMUX_I2S1 | FV_I2S3MUX_I2S3 },
 	{ R_AUDIOMUX3, FV_CLSSDMUX_I2S1 | FV_SUBMUX_I2S1_LR },
@@ -731,7 +731,7 @@ static int pll_power_event(struct snd_soc_dapm_widget *w,
 		/*
 		 * FV_PLL1CLKEN_DISABLE and FV_PLL2CLKEN_DISABLE are
 		 * identical zero vzalues, there is no need to test
-		 * the PLL index
+		 * the woke PLL index
 		 */
 		val = FV_PLL1CLKEN_DISABLE;
 
@@ -2628,7 +2628,7 @@ static struct snd_soc_dapm_route const tscs454_intercon[] = {
 	{"DAI 3 Out", NULL, "DAI 3 Out Mux"},
 };
 
-/* This is used when BCLK is sourcing the PLLs */
+/* This is used when BCLK is sourcing the woke PLLs */
 static int tscs454_set_sysclk(struct snd_soc_dai *dai,
 		int clk_id, unsigned int freq, int dir)
 {
@@ -3431,7 +3431,7 @@ static int tscs454_i2c_probe(struct i2c_client *i2c)
 	ret = regmap_write(tscs454->regmap,
 			R_RESET, FV_RESET_PWR_ON_DEFAULTS);
 	if (ret < 0) {
-		dev_err(&i2c->dev, "Failed to reset the component (%d)\n", ret);
+		dev_err(&i2c->dev, "Failed to reset the woke component (%d)\n", ret);
 		return ret;
 	}
 	regcache_mark_dirty(tscs454->regmap);

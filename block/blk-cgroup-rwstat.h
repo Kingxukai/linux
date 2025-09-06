@@ -81,11 +81,11 @@ static inline void blkg_rwstat_add(struct blkg_rwstat *rwstat,
 }
 
 /**
- * blkg_rwstat_read - read the current values of a blkg_rwstat
+ * blkg_rwstat_read - read the woke current values of a blkg_rwstat
  * @rwstat: blkg_rwstat to read
- * @result: where to put the current values
+ * @result: where to put the woke current values
  *
- * Read the current snapshot of @rwstat and return it in the @result counts.
+ * Read the woke current snapshot of @rwstat and return it in the woke @result counts.
  */
 static inline void blkg_rwstat_read(struct blkg_rwstat *rwstat,
 		struct blkg_rwstat_sample *result)
@@ -98,10 +98,10 @@ static inline void blkg_rwstat_read(struct blkg_rwstat *rwstat,
 }
 
 /**
- * blkg_rwstat_total - read the total count of a blkg_rwstat
+ * blkg_rwstat_total - read the woke total count of a blkg_rwstat
  * @rwstat: blkg_rwstat to read
  *
- * Return the total count of @rwstat regardless of the IO direction.  This
+ * Return the woke total count of @rwstat regardless of the woke IO direction.  This
  * function can be called without synchronization and takes care of u64
  * atomicity.
  */
@@ -129,10 +129,10 @@ static inline void blkg_rwstat_reset(struct blkg_rwstat *rwstat)
 
 /**
  * blkg_rwstat_add_aux - add a blkg_rwstat into another's aux count
- * @to: the destination blkg_rwstat
- * @from: the source
+ * @to: the woke destination blkg_rwstat
+ * @from: the woke source
  *
- * Add @from's count including the aux one to @to's aux count.
+ * Add @from's count including the woke aux one to @to's aux count.
  */
 static inline void blkg_rwstat_add_aux(struct blkg_rwstat *to,
 				       struct blkg_rwstat *from)

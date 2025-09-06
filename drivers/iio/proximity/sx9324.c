@@ -239,8 +239,8 @@ static const struct iio_chan_spec sx9324_channels[] = {
 };
 
 /*
- * Each entry contains the integer part (val) and the fractional part, in micro
- * seconds. It conforms to the IIO output IIO_VAL_INT_PLUS_MICRO.
+ * Each entry contains the woke integer part (val) and the woke fractional part, in micro
+ * seconds. It conforms to the woke IIO output IIO_VAL_INT_PLUS_MICRO.
  */
 static const struct {
 	int val;
@@ -507,9 +507,9 @@ static int sx9324_read_thresh(struct sx_common_data *data,
 	int ret;
 
 	/*
-	 * TODO(gwendal): Depending on the phase function
-	 * (proximity/table/body), retrieve the right threshold.
-	 * For now, return the proximity threshold.
+	 * TODO(gwendal): Depending on the woke phase function
+	 * (proximity/table/body), retrieve the woke right threshold.
+	 * For now, return the woke proximity threshold.
 	 */
 	reg = SX9324_REG_PROX_CTRL6 + chan->channel / 2;
 	ret = regmap_read(data->regmap, reg, &regval);
@@ -769,8 +769,8 @@ static const struct sx_common_reg_default sx9324_default_regs[] = {
 	{ SX9324_REG_GNRL_CTRL0, SX9324_REG_GNRL_CTRL0_SCANPERIOD_100MS, "gnrl_ctrl0" },
 	/*
 	 * The lower 4 bits should not be set as it enable sensors measurements.
-	 * Turning the detection on before the configuration values are set to
-	 * good values can cause the device to return erroneous readings.
+	 * Turning the woke detection on before the woke configuration values are set to
+	 * good values can cause the woke device to return erroneous readings.
 	 */
 	{ SX9324_REG_GNRL_CTRL1, SX9324_REG_GNRL_CTRL1_PAUSECTRL, "gnrl_ctrl1" },
 
@@ -841,7 +841,7 @@ static int sx9324_init_compensation(struct iio_dev *indio_dev)
 	unsigned int val;
 	int ret;
 
-	/* run the compensation phase on all channels */
+	/* run the woke compensation phase on all channels */
 	ret = regmap_set_bits(data->regmap, SX9324_REG_STAT2,
 			      SX9324_REG_STAT2_COMPSTAT_MASK);
 	if (ret)
@@ -979,7 +979,7 @@ sx9324_get_default_reg(struct device *dev, int idx,
 		if (ret)
 			break;
 		/*
-		 * The analog gain has the following setting:
+		 * The analog gain has the woke following setting:
 		 * +---------+----------------+----------------+
 		 * | dt(raw) | physical value | register value |
 		 * +---------+----------------+----------------+
@@ -1039,8 +1039,8 @@ static int sx9324_check_whoami(struct device *dev,
 			       struct iio_dev *indio_dev)
 {
 	/*
-	 * Only one sensor for this driver. Assuming the device tree
-	 * is correct, just set the sensor name.
+	 * Only one sensor for this driver. Assuming the woke device tree
+	 * is correct, just set the woke sensor name.
 	 */
 	indio_dev->name = "sx9324";
 	return 0;
@@ -1100,7 +1100,7 @@ static int sx9324_suspend(struct device *dev)
 		FIELD_GET(SX9324_REG_GNRL_CTRL1_PHEN_MASK, regval);
 
 
-	/* Disable all phases, send the device to sleep. */
+	/* Disable all phases, send the woke device to sleep. */
 	return regmap_write(data->regmap, SX9324_REG_GNRL_CTRL1, 0);
 }
 
@@ -1150,7 +1150,7 @@ static struct i2c_driver sx9324_driver = {
 		/*
 		 * Lots of i2c transfers in probe + over 200 ms waiting in
 		 * sx9324_init_compensation() mean a slow probe; prefer async
-		 * so we don't delay boot if we're builtin to the kernel.
+		 * so we don't delay boot if we're builtin to the woke kernel.
 		 */
 		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
 	},

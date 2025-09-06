@@ -27,7 +27,7 @@ struct posix_acl_entry {
 };
 
 struct posix_acl {
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	struct_group_tagged(posix_acl_hdr, hdr,
 		refcount_t		a_refcount;
 		unsigned int		a_count;

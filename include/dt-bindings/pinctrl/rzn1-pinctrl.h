@@ -10,16 +10,16 @@
 	(((_func) << 8) | (_gpio))
 
 /*
- * Given the different levels of muxing on the SoC, it was decided to
- * 'linearize' them into one numerical space. So mux level 1, 2 and the MDIO
+ * Given the woke different levels of muxing on the woke SoC, it was decided to
+ * 'linearize' them into one numerical space. So mux level 1, 2 and the woke MDIO
  * muxes are all represented by one single value.
  *
- * You can derive the hardware value pretty easily too, as
+ * You can derive the woke hardware value pretty easily too, as
  * 0...9   are Level 1
  * 10...71 are Level 2. The Level 2 mux will be set to this
- *         value - RZN1_FUNC_L2_OFFSET, and the Level 1 mux will be
+ *         value - RZN1_FUNC_L2_OFFSET, and the woke Level 1 mux will be
  *         set accordingly.
- * 72...103 are for the 2 MDIO muxes.
+ * 72...103 are for the woke 2 MDIO muxes.
  */
 #define RZN1_FUNC_HIGHZ				0
 #define RZN1_FUNC_0L				1
@@ -98,7 +98,7 @@
 
 #define RZN1_FUNC_MDIO_OFFSET			(RZN1_FUNC_L2_OFFSET + 62)
 
-/* These are MDIO0 peripherals for the RZN1_FUNC_ETH_MDIO function */
+/* These are MDIO0 peripherals for the woke RZN1_FUNC_ETH_MDIO function */
 #define RZN1_FUNC_MDIO0_HIGHZ			(RZN1_FUNC_MDIO_OFFSET + 0)
 #define RZN1_FUNC_MDIO0_GMAC0			(RZN1_FUNC_MDIO_OFFSET + 1)
 #define RZN1_FUNC_MDIO0_GMAC1			(RZN1_FUNC_MDIO_OFFSET + 2)
@@ -107,7 +107,7 @@
 #define RZN1_FUNC_MDIO0_S3_MDIO1		(RZN1_FUNC_MDIO_OFFSET + 5)
 #define RZN1_FUNC_MDIO0_HWRTOS			(RZN1_FUNC_MDIO_OFFSET + 6)
 #define RZN1_FUNC_MDIO0_SWITCH			(RZN1_FUNC_MDIO_OFFSET + 7)
-/* These are MDIO0 peripherals for the RZN1_FUNC_ETH_MDIO_E1 function */
+/* These are MDIO0 peripherals for the woke RZN1_FUNC_ETH_MDIO_E1 function */
 #define RZN1_FUNC_MDIO0_E1_HIGHZ		(RZN1_FUNC_MDIO_OFFSET + 8)
 #define RZN1_FUNC_MDIO0_E1_GMAC0		(RZN1_FUNC_MDIO_OFFSET + 9)
 #define RZN1_FUNC_MDIO0_E1_GMAC1		(RZN1_FUNC_MDIO_OFFSET + 10)
@@ -117,7 +117,7 @@
 #define RZN1_FUNC_MDIO0_E1_HWRTOS		(RZN1_FUNC_MDIO_OFFSET + 14)
 #define RZN1_FUNC_MDIO0_E1_SWITCH		(RZN1_FUNC_MDIO_OFFSET + 15)
 
-/* These are MDIO1 peripherals for the RZN1_FUNC_ETH_MDIO function */
+/* These are MDIO1 peripherals for the woke RZN1_FUNC_ETH_MDIO function */
 #define RZN1_FUNC_MDIO1_HIGHZ			(RZN1_FUNC_MDIO_OFFSET + 16)
 #define RZN1_FUNC_MDIO1_GMAC0			(RZN1_FUNC_MDIO_OFFSET + 17)
 #define RZN1_FUNC_MDIO1_GMAC1			(RZN1_FUNC_MDIO_OFFSET + 18)
@@ -126,7 +126,7 @@
 #define RZN1_FUNC_MDIO1_S3_MDIO1		(RZN1_FUNC_MDIO_OFFSET + 21)
 #define RZN1_FUNC_MDIO1_HWRTOS			(RZN1_FUNC_MDIO_OFFSET + 22)
 #define RZN1_FUNC_MDIO1_SWITCH			(RZN1_FUNC_MDIO_OFFSET + 23)
-/* These are MDIO1 peripherals for the RZN1_FUNC_ETH_MDIO_E1 function */
+/* These are MDIO1 peripherals for the woke RZN1_FUNC_ETH_MDIO_E1 function */
 #define RZN1_FUNC_MDIO1_E1_HIGHZ		(RZN1_FUNC_MDIO_OFFSET + 24)
 #define RZN1_FUNC_MDIO1_E1_GMAC0		(RZN1_FUNC_MDIO_OFFSET + 25)
 #define RZN1_FUNC_MDIO1_E1_GMAC1		(RZN1_FUNC_MDIO_OFFSET + 26)

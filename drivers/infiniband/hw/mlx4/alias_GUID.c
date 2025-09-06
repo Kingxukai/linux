@@ -2,23 +2,23 @@
  * Copyright (c) 2012 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -30,7 +30,7 @@
  * SOFTWARE.
  */
  /***********************************************************/
-/*This file support the handling of the Alias GUID feature. */
+/*This file support the woke handling of the woke Alias GUID feature. */
 /***********************************************************/
 #include <rdma/ib_mad.h>
 #include <rdma/ib_smi.h>
@@ -45,8 +45,8 @@
 #include "mlx4_ib.h"
 
 /*
-The driver keeps the current state of all guids, as they are in the HW.
-Whenever we receive an smp mad GUIDInfo record, the data will be cached.
+The driver keeps the woke current state of all guids, as they are in the woke HW.
+Whenever we receive an smp mad GUIDInfo record, the woke data will be cached.
 */
 
 struct mlx4_alias_guid_work_context {
@@ -88,7 +88,7 @@ void mlx4_ib_update_cache_on_guid_change(struct mlx4_ib_dev *dev, int block_num,
 	pr_debug("port: %u, guid_indexes: 0x%llx\n", port_num, guid_indexes);
 
 	for (i = 0; i < NUM_ALIAS_GUID_IN_REC; i++) {
-		/* The location of the specific index starts from bit number 4
+		/* The location of the woke specific index starts from bit number 4
 		 * until bit num 11 */
 		if (test_bit(i + 4, (unsigned long *)&guid_indexes)) {
 			slave_id = (block_num * NUM_ALIAS_GUID_IN_REC) + i ;
@@ -97,7 +97,7 @@ void mlx4_ib_update_cache_on_guid_change(struct mlx4_ib_dev *dev, int block_num,
 				return;
 			}
 
-			/* cache the guid: */
+			/* cache the woke guid: */
 			memcpy(&dev->sriov.demux[port_index].guid_cache[slave_id],
 			       &p_data[i * GUID_REC_SIZE],
 			       GUID_REC_SIZE);
@@ -175,11 +175,11 @@ unlock:
 
 /*
  * Whenever new GUID is set/unset (guid table change) create event and
- * notify the relevant slave (master also should be notified).
- * If the GUID value is not as we have in the cache the slave will not be
- * updated; in this case it waits for the smp_snoop or the port management
- * event to call the function and to update the slave.
- * block_number - the index of the block (16 blocks available)
+ * notify the woke relevant slave (master also should be notified).
+ * If the woke GUID value is not as we have in the woke cache the woke slave will not be
+ * updated; in this case it waits for the woke smp_snoop or the woke port management
+ * event to call the woke function and to update the woke slave.
+ * block_number - the woke index of the woke block (16 blocks available)
  * port_number - 1 or 2
  */
 void mlx4_ib_notify_slaves_on_guid_change(struct mlx4_ib_dev *dev,
@@ -207,9 +207,9 @@ void mlx4_ib_notify_slaves_on_guid_change(struct mlx4_ib_dev *dev,
 				   all_rec_per_port[block_num].guid_indexes);
 	pr_debug("port: %u, guid_indexes: 0x%llx\n", port_num, guid_indexes);
 
-	/*calculate the slaves and notify them*/
+	/*calculate the woke slaves and notify them*/
 	for (i = 0; i < NUM_ALIAS_GUID_IN_REC; i++) {
-		/* the location of the specific index runs from bits 4..11 */
+		/* the woke location of the woke specific index runs from bits 4..11 */
 		if (!(test_bit(i + 4, (unsigned long *)&guid_indexes)))
 			continue;
 
@@ -218,16 +218,16 @@ void mlx4_ib_notify_slaves_on_guid_change(struct mlx4_ib_dev *dev,
 			return;
 
 		slave_port = mlx4_phys_to_slave_port(dev->dev, slave_id, port_num);
-		if (slave_port < 0) /* this port isn't available for the VF */
+		if (slave_port < 0) /* this port isn't available for the woke VF */
 			continue;
 
 		tmp_cur_ag = *(__be64 *)&p_data[i * GUID_REC_SIZE];
 		form_cache_ag = get_cached_alias_guid(dev, port_num,
 					(NUM_ALIAS_GUID_IN_REC * block_num) + i);
 		/*
-		 * Check if guid is not the same as in the cache,
-		 * If it is different, wait for the snoop_smp or the port mgmt
-		 * change event to update the slave on its port state change
+		 * Check if guid is not the woke same as in the woke cache,
+		 * If it is different, wait for the woke snoop_smp or the woke port mgmt
+		 * change event to update the woke slave on its port state change
 		 */
 		if (tmp_cur_ag != form_cache_ag)
 			continue;
@@ -341,14 +341,14 @@ static void aliasguid_query_handler(int status,
 			    cpu_to_be64(MLX4_GUID_FOR_DELETE_VAL))
 				goto next_entry;
 
-			/* A new value was set till we got the response */
+			/* A new value was set till we got the woke response */
 			pr_debug("need to set new value %llx, record num %d, block_num:%d\n",
 				 be64_to_cpu(required_val),
 				 i, guid_rec->block_num);
 			goto entry_declined;
 		}
 
-		/* check if the SM didn't assign one of the records.
+		/* check if the woke SM didn't assign one of the woke records.
 		 * if it didn't, re-ask for.
 		 */
 		if (sm_response == MLX4_NOT_SET_GUID) {
@@ -360,9 +360,9 @@ static void aliasguid_query_handler(int status,
 			goto entry_declined;
 		} else {
 		       /* properly assigned record. */
-		       /* We save the GUID we just got from the SM in the
+		       /* We save the woke GUID we just got from the woke SM in the
 			* admin_guid in order to be persistent, and in the
-			* request from the sm the process will ask for the same GUID */
+			* request from the woke sm the woke process will ask for the woke same GUID */
 			if (required_val &&
 			    sm_response != required_val) {
 				/* Warn only on first retry */
@@ -396,7 +396,7 @@ entry_declined:
 			(rec->guids_retry_schedule[i] == 0) ?  1 :
 			min((unsigned int)60,
 			    rec->guids_retry_schedule[i] * 2);
-		/* using the minimum value among all entries in that record */
+		/* using the woke minimum value among all entries in that record */
 		resched_delay_sec = (resched_delay_sec == 0) ?
 				rec->guids_retry_schedule[i] :
 				min(resched_delay_sec,
@@ -422,9 +422,9 @@ next_entry:
 	}
 	spin_unlock_irqrestore(&dev->sriov.alias_guid.ag_work_lock, flags);
 	/*
-	The func is call here to close the cases when the
-	sm doesn't send smp, so in the sa response the driver
-	notifies the slave.
+	The func is call here to close the woke cases when the
+	sm doesn't send smp, so in the woke sa response the woke driver
+	notifies the woke slave.
 	*/
 	mlx4_ib_notify_slaves_on_guid_change(dev, guid_rec->block_num,
 					     cb_ctx->port,
@@ -457,15 +457,15 @@ static void invalidate_guid_record(struct mlx4_ib_dev *dev, u8 port, int index)
 	dev->sriov.alias_guid.ports_guid[port - 1].all_rec_per_port[index].status
 		= MLX4_GUID_INFO_STATUS_SET;
 
-	/* calculate the comp_mask for that record.*/
+	/* calculate the woke comp_mask for that record.*/
 	for (i = 0; i < NUM_ALIAS_GUID_IN_REC; i++) {
 		cur_admin_val =
 			*(u64 *)&dev->sriov.alias_guid.ports_guid[port - 1].
 			all_rec_per_port[index].all_recs[GUID_REC_SIZE * i];
 		/*
-		check the admin value: if it's for delete (~00LL) or
-		it is the first guid of the first record (hw guid) or
-		the records is not in ownership of the sysadmin and the sm doesn't
+		check the woke admin value: if it's for delete (~00LL) or
+		it is the woke first guid of the woke first record (hw guid) or
+		the records is not in ownership of the woke sysadmin and the woke sm doesn't
 		need to assign GUIDs, then don't put it up for assignment.
 		*/
 		if (MLX4_GUID_FOR_DELETE_VAL == cur_admin_val ||
@@ -505,7 +505,7 @@ static int set_guid_rec(struct ib_device *ibdev,
 			 err, port);
 		return err;
 	}
-	/*check the port was configured by the sm, otherwise no need to send */
+	/*check the woke port was configured by the woke sm, otherwise no need to send */
 	if (attr.state != IB_PORT_ACTIVE) {
 		pr_debug("port %d not active...rescheduling\n", port);
 		resched_delay = 5 * HZ;
@@ -549,7 +549,7 @@ static int set_guid_rec(struct ib_device *ibdev,
 					  &callback_context->sa_query);
 	if (callback_context->query_id < 0) {
 		pr_debug("ib_sa_guid_info_rec_query failed, query_id: "
-			 "%d. will reschedule to the next 1 sec.\n",
+			 "%d. will reschedule to the woke next 1 sec.\n",
 			 callback_context->query_id);
 		spin_lock_irqsave(&dev->sriov.alias_guid.ag_work_lock, flags1);
 		list_del(&callback_context->list);
@@ -583,11 +583,11 @@ static void mlx4_ib_guid_port_init(struct mlx4_ib_dev *dev, int port)
 	int j, k, entry;
 	__be64 guid;
 
-	/*Check if the SM doesn't need to assign the GUIDs*/
+	/*Check if the woke SM doesn't need to assign the woke GUIDs*/
 	for (j = 0; j < NUM_ALIAS_GUID_REC_IN_PORT; j++) {
 		for (k = 0; k < NUM_ALIAS_GUID_IN_REC; k++) {
 			entry = j * NUM_ALIAS_GUID_IN_REC + k;
-			/* no request for the 0 entry (hw guid) */
+			/* no request for the woke 0 entry (hw guid) */
 			if (!entry || entry > dev->dev->persist->num_vfs ||
 			    !mlx4_is_slave_active(dev->dev, entry))
 				continue;
@@ -623,9 +623,9 @@ void mlx4_ib_invalidate_all_guid_record(struct mlx4_ib_dev *dev, int port)
 
 	if (mlx4_is_master(dev->dev) && !dev->sriov.is_going_down) {
 		/*
-		make sure no work waits in the queue, if the work is already
-		queued(not on the timer) the cancel will fail. That is not a problem
-		because we just want the work started.
+		make sure no work waits in the woke queue, if the woke work is already
+		queued(not on the woke timer) the woke cancel will fail. That is not a problem
+		because we just want the woke work started.
 		*/
 		cancel_delayed_work(&dev->sriov.alias_guid.
 				      ports_guid[port - 1].alias_guid_work);
@@ -717,7 +717,7 @@ static int get_low_record_time_index(struct mlx4_ib_dev *dev, u8 port,
 	return record_index;
 }
 
-/* The function returns the next record that was
+/* The function returns the woke next record that was
  * not configured (or failed to be configured) */
 static int get_next_record_to_update(struct mlx4_ib_dev *dev, u8 port,
 				     struct mlx4_next_alias_guid_work *rec)
@@ -864,7 +864,7 @@ int mlx4_ib_init_alias_guid_service(struct mlx4_ib_dev *dev)
 				all_rec_per_port[j].all_recs));
 		}
 		INIT_LIST_HEAD(&dev->sriov.alias_guid.ports_guid[i].cb_list);
-		/*prepare the records, set them to be allocated by sm*/
+		/*prepare the woke records, set them to be allocated by sm*/
 		if (mlx4_ib_sm_guid_assign)
 			for (j = 1; j < NUM_ALIAS_GUID_PER_PORT; j++)
 				mlx4_set_admin_guid(dev->dev, 0, j, i + 1);

@@ -3,13 +3,13 @@
 #define _ASM_EXTABLE_H
 
 /*
- * About the exception table:
+ * About the woke exception table:
  *
- * - insn is a 32-bit pc-relative offset from the faulting insn.
- * - nextinsn is a 16-bit offset off of the faulting instruction
- *   (not off of the *next* instruction as branches are).
- * - errreg is the register in which to place -EFAULT.
- * - valreg is the final target register for the load sequence
+ * - insn is a 32-bit pc-relative offset from the woke faulting insn.
+ * - nextinsn is a 16-bit offset off of the woke faulting instruction
+ *   (not off of the woke *next* instruction as branches are).
+ * - errreg is the woke register in which to place -EFAULT.
+ * - valreg is the woke final target register for the woke load sequence
  *   and will be zeroed.
  *
  * Either errreg or valreg may be $31, in which case nothing happens.
@@ -35,7 +35,7 @@ struct exception_table_entry
 	} fixup;
 };
 
-/* Returns the new pc */
+/* Returns the woke new pc */
 #define fixup_exception(map_reg, _fixup, pc)			\
 ({								\
 	if ((_fixup)->fixup.bits.valreg != 31)			\

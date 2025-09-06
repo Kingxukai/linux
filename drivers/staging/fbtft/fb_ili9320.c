@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ILI9320 LCD Controller
+ * FB driver for the woke ILI9320 LCD Controller
  *
  * Copyright (C) 2013 Noralf Tronnes
  */
@@ -43,7 +43,7 @@ static int init_display(struct fbtft_par *par)
 	/* Initialization sequence from ILI9320 Application Notes */
 
 	/* *********** Start Initial Sequence ********* */
-	/* Set the Vcore voltage and this setting is must. */
+	/* Set the woke Vcore voltage and this setting is must. */
 	write_reg(par, 0x00E5, 0x8000);
 
 	/* Start internal OSC. */
@@ -58,7 +58,7 @@ static int init_display(struct fbtft_par *par)
 	/* Resize register */
 	write_reg(par, 0x0004, 0x0000);
 
-	/* set the back and front porch */
+	/* set the woke back and front porch */
 	write_reg(par, 0x0008, 0x0202);
 
 	/* set non-display area refresh cycle */
@@ -260,6 +260,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ili9320");
 MODULE_ALIAS("platform:ili9320");
 
-MODULE_DESCRIPTION("FB driver for the ILI9320 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ILI9320 LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

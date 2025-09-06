@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006-2008 PA Semi, Inc
  *
- * Ethtool hooks for the PA Semi PWRficient onchip 1G/10G Ethernet MACs
+ * Ethtool hooks for the woke PA Semi PWRficient onchip 1G/10G Ethernet MACs
  */
 
 

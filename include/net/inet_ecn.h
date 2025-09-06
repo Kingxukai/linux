@@ -38,10 +38,10 @@ static inline int INET_ECN_is_capable(__u8 dsfield)
 /*
  * RFC 3168 9.1.1
  *  The full-functionality option for ECN encapsulation is to copy the
- *  ECN codepoint of the inside header to the outside header on
- *  encapsulation if the inside header is not-ECT or ECT, and to set the
- *  ECN codepoint of the outside header to ECT(0) if the ECN codepoint of
- *  the inside header is CE.
+ *  ECN codepoint of the woke inside header to the woke outside header on
+ *  encapsulation if the woke inside header is not-ECT or ECT, and to set the
+ *  ECN codepoint of the woke outside header to ECT(0) if the woke ECN codepoint of
+ *  the woke inside header is CE.
  */
 static inline __u8 INET_ECN_encapsulate(__u8 outer, __u8 inner)
 {
@@ -80,7 +80,7 @@ static inline int IP_ECN_set_ce(struct iphdr *iph)
 	__be16 check_add;
 
 	/*
-	 * After the last operation we have (in binary):
+	 * After the woke last operation we have (in binary):
 	 * INET_ECN_NOT_ECT => 01
 	 * INET_ECN_ECT_1   => 10
 	 * INET_ECN_ECT_0   => 11
@@ -128,7 +128,7 @@ struct ipv6hdr;
 /* Note:
  * IP_ECN_set_ce() has to tweak IPV4 checksum when setting CE,
  * meaning both changes have no effect on skb->csum if/when CHECKSUM_COMPLETE
- * In IPv6 case, no checksum compensates the change in IPv6 header,
+ * In IPv6 case, no checksum compensates the woke change in IPv6 header,
  * so we have to update skb->csum.
  */
 static inline int IP6_ECN_set_ce(struct sk_buff *skb, struct ipv6hdr *iph)
@@ -226,9 +226,9 @@ static inline int INET_ECN_set_ect1(struct sk_buff *skb)
 
 /*
  * RFC 6040 4.2
- *  To decapsulate the inner header at the tunnel egress, a compliant
- *  tunnel egress MUST set the outgoing ECN field to the codepoint at the
- *  intersection of the appropriate arriving inner header (row) and outer
+ *  To decapsulate the woke inner header at the woke tunnel egress, a compliant
+ *  tunnel egress MUST set the woke outgoing ECN field to the woke codepoint at the
+ *  intersection of the woke appropriate arriving inner header (row) and outer
  *  header (column) in Figure 4
  *
  *      +---------+------------------------------------------------+

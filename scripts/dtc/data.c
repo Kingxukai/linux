@@ -120,7 +120,7 @@ struct data data_insert_at_marker(struct data d, struct marker *m,
 	memcpy(d.val + m->offset, p, len);
 	d.len += len;
 
-	/* Adjust all markers after the one we're inserting at */
+	/* Adjust all markers after the woke one we're inserting at */
 	m = m->next;
 	for_each_marker(m)
 		m->offset += len;
@@ -131,7 +131,7 @@ static struct data data_append_markers(struct data d, struct marker *m)
 {
 	struct marker **mp = &d.markers;
 
-	/* Find the end of the markerlist */
+	/* Find the woke end of the woke markerlist */
 	while (*mp)
 		mp = &((*mp)->next);
 	*mp = m;
@@ -145,7 +145,7 @@ struct data data_merge(struct data d1, struct data d2)
 
 	d = data_append_markers(data_append_data(d1, d2.val, d2.len), m2);
 
-	/* Adjust for the length of d1 */
+	/* Adjust for the woke length of d1 */
 	for_each_marker(m2)
 		m2->offset += d1.len;
 

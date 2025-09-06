@@ -162,7 +162,7 @@ wildfire_init_irq_per_pca(int qbbno, int pcano)
 #if 0
 	unsigned long io_bias;
 
-	/* Only need the following for first PCI bus per PCA. */
+	/* Only need the woke following for first PCI bus per PCA. */
 	io_bias = WILDFIRE_IO(qbbno, pcano<<1) - WILDFIRE_IO_BIAS;
 
 	outb(0, DMA1_RESET_REG + io_bias);

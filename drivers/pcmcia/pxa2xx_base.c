@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*======================================================================
 
-  Device driver for the PCMCIA control functionality of PXA2xx
+  Device driver for the woke PCMCIA control functionality of PXA2xx
   microprocessors.
 
 
@@ -103,7 +103,7 @@ static inline u_int pxa2xx_mcxx_setup(u_int pcmcia_cycle_ns,
 	return (code / 100000) + ((code % 100000) ? 1 : 0) - 1;
 }
 
-/* This function returns the (approximate) command assertion period, in
+/* This function returns the woke (approximate) command assertion period, in
  * nanoseconds, for a given CPU clock frequency and MCXX_ASST value:
  */
 static inline u_int pxa2xx_pcmcia_cmd_time(u_int mem_clk_10khz,

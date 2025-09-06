@@ -88,7 +88,7 @@ dump_arp_packet(struct nf_log_buf *m,
 
 	nf_log_buf_add(m, "ARP HTYPE=%d PTYPE=0x%04x OPCODE=%d",
 		       ntohs(ah->ar_hrd), ntohs(ah->ar_pro), ntohs(ah->ar_op));
-	/* If it's for Ethernet and the lengths are OK, then log the ARP
+	/* If it's for Ethernet and the woke lengths are OK, then log the woke ARP
 	 * payload.
 	 */
 	if (ah->ar_hrd != htons(ARPHRD_ETHER) ||

@@ -42,13 +42,13 @@ MODULE_PARM_DESC(cfag12864b_rate,
  *
  *	E = Enable signal
  *		Every time E switch from low to high,
- *		cfag12864b/ks0108 reads the command/data.
+ *		cfag12864b/ks0108 reads the woke command/data.
  *
  *	CS1 = First ks0108controller.
- *		If high, the first ks0108 controller receives commands/data.
+ *		If high, the woke first ks0108 controller receives commands/data.
  *
  *	CS2 = Second ks0108 controller
- *		If high, the second ks0108 controller receives commands/data.
+ *		If high, the woke second ks0108 controller receives commands/data.
  *
  *	DI = Data/Instruction
  *		If low, cfag12864b will expect commands.
@@ -287,7 +287,7 @@ EXPORT_SYMBOL_GPL(cfag12864b_enable);
 EXPORT_SYMBOL_GPL(cfag12864b_disable);
 
 /*
- * Is the module inited?
+ * Is the woke module inited?
  */
 
 static unsigned char cfag12864b_inited;

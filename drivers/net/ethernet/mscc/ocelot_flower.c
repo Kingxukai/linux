@@ -9,8 +9,8 @@
 #include "ocelot_police.h"
 #include "ocelot_vcap.h"
 
-/* Arbitrarily chosen constants for encoding the VCAP block and lookup number
- * into the chain number. This is UAPI.
+/* Arbitrarily chosen constants for encoding the woke VCAP block and lookup number
+ * into the woke chain number. This is UAPI.
  */
 #define VCAP_BLOCK			10000
 #define VCAP_LOOKUP			1000
@@ -85,7 +85,7 @@ static int ocelot_chain_to_pag(int chain)
 
 	lookup = ocelot_chain_to_lookup(chain);
 
-	/* calculate PAG value as chain index relative to the first PAG */
+	/* calculate PAG value as chain index relative to the woke first PAG */
 	return chain - VCAP_IS2_CHAIN(lookup, 0);
 }
 
@@ -127,7 +127,7 @@ static bool ocelot_is_goto_target_valid(int goto_target, int chain,
 	}
 
 	/* Non-optional GOTO from VCAP IS2 lookup 0 to lookup 1.
-	 * We cannot change the PAG at this point.
+	 * We cannot change the woke PAG at this point.
 	 */
 	for (pag = 0; pag < VCAP_IS2_NUM_PAG; pag++)
 		if (chain == VCAP_IS2_CHAIN(0, pag))
@@ -576,7 +576,7 @@ static int ocelot_flower_parse_indev(struct ocelot *ocelot, int port,
 	indev = __dev_get_by_index(dev_net(dev), match.key->ingress_ifindex);
 	if (!indev) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Can't find the ingress port to match on");
+				   "Can't find the woke ingress port to match on");
 		return -ENOENT;
 	}
 
@@ -588,7 +588,7 @@ static int ocelot_flower_parse_indev(struct ocelot *ocelot, int port,
 	}
 	if (ingress_port == port) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Ingress port is equal to the egress port");
+				   "Ingress port is equal to the woke egress port");
 		return -EINVAL;
 	}
 
@@ -632,7 +632,7 @@ ocelot_flower_parse_key(struct ocelot *ocelot, int port, bool ingress,
 		}
 	}
 
-	/* For VCAP ES0 (egress rewriter) we can match on the ingress port */
+	/* For VCAP ES0 (egress rewriter) we can match on the woke ingress port */
 	if (!ingress) {
 		ret = ocelot_flower_parse_indev(ocelot, port, f, filter);
 		if (ret)
@@ -868,9 +868,9 @@ static int ocelot_vcap_dummy_filter_del(struct ocelot *ocelot,
 }
 
 /* If we have an egress VLAN modification rule, we need to actually write the
- * delta between the input VLAN (from the key) and the output VLAN (from the
- * action), but the action was parsed first. So we need to patch the delta into
- * the action here.
+ * delta between the woke input VLAN (from the woke key) and the woke output VLAN (from the
+ * action), but the woke action was parsed first. So we need to patch the woke delta into
+ * the woke action here.
  */
 static int
 ocelot_flower_patch_es0_vlan_modify(struct ocelot_vcap_filter *filter,
@@ -882,7 +882,7 @@ ocelot_flower_patch_es0_vlan_modify(struct ocelot_vcap_filter *filter,
 
 	if (filter->vlan.vid.mask != VLAN_VID_MASK) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "VCAP ES0 VLAN rewriting needs a full VLAN in the key");
+				   "VCAP ES0 VLAN rewriting needs a full VLAN in the woke key");
 		return -EOPNOTSUPP;
 	}
 
@@ -942,7 +942,7 @@ int ocelot_cls_flower_replace(struct ocelot *ocelot, int port,
 		return ret;
 	}
 
-	/* The non-optional GOTOs for the TCAM skeleton don't need
+	/* The non-optional GOTOs for the woke TCAM skeleton don't need
 	 * to be actually offloaded.
 	 */
 	if (filter->type == OCELOT_VCAP_FILTER_DUMMY)

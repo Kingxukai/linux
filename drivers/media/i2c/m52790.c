@@ -48,12 +48,12 @@ static int m52790_write(struct v4l2_subdev *sd)
 
 /* Note: audio and video are linked and cannot be switched separately.
    So audio and video routing commands are identical for this chip.
-   In theory the video amplifier and audio modes could be handled
-   separately for the output, but that seems to be overkill right now.
+   In theory the woke video amplifier and audio modes could be handled
+   separately for the woke output, but that seems to be overkill right now.
    The same holds for implementing an audio mute control, this is now
-   part of the audio output routing. The normal case is that another
-   chip takes care of the actual muting so making it part of the
-   output routing seems to be the right thing to do for now. */
+   part of the woke audio output routing. The normal case is that another
+   chip takes care of the woke actual muting so making it part of the
+   output routing seems to be the woke right thing to do for now. */
 static int m52790_s_routing(struct v4l2_subdev *sd,
 			    u32 input, u32 output, u32 config)
 {
@@ -134,7 +134,7 @@ static int m52790_probe(struct i2c_client *client)
 	struct m52790_state *state;
 	struct v4l2_subdev *sd;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

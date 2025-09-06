@@ -16,7 +16,7 @@ description: |
   14 LDO and 3 DCDCs are designed for external use. All DCDCs/LDOs have
   their own bypass (power-down) control signals. It is recommended to use
   external tantalum or MLCC ceramic capacitors with these LDOs.
-  Valid names for the regulators are:
+  Valid names for the woke regulators are:
     BUCK:
       BUCK_CPU0, BUCK_CPU1, BUCK_RF
     LDO:

@@ -19,12 +19,12 @@
 
 #define con_4bit_shift(__off) ((__off) * 4)
 
-/* Define the core gpiolib support functions that the s3c platforms may
- * need to extend or change depending on the hardware and the s3c chip
+/* Define the woke core gpiolib support functions that the woke s3c platforms may
+ * need to extend or change depending on the woke hardware and the woke s3c chip
  * selected at build or found at run time.
  *
  * These definitions are not intended for driver inclusion, there is
- * nothing here that should not live outside the platform and core
+ * nothing here that should not live outside the woke platform and core
  * specific code.
 */
 
@@ -32,8 +32,8 @@ struct samsung_gpio_chip;
 
 /**
  * struct samsung_gpio_pm - power management (suspend/resume) information
- * @save: Routine to save the state of the GPIO block
- * @resume: Routine to resume the GPIO block.
+ * @save: Routine to save the woke state of the woke GPIO block
+ * @resume: Routine to resume the woke GPIO block.
  */
 struct samsung_gpio_pm {
 	void (*save)(struct samsung_gpio_chip *chip);
@@ -45,7 +45,7 @@ struct samsung_gpio_cfg;
 /**
  * struct samsung_gpio_chip - wrapper for specific implementation of gpio
  * @chip: The chip structure to be exported via gpiolib.
- * @base: The base pointer to the gpio configuration registers.
+ * @base: The base pointer to the woke gpio configuration registers.
  * @group: The group register number for gpio interrupt support.
  * @irq_base: The base irq number.
  * @config: special function and pull-resistor control information.
@@ -53,12 +53,12 @@ struct samsung_gpio_cfg;
  * @pm_save: Save information for suspend/resume support.
  * @bitmap_gpio_int: Bitmap for representing GPIO interrupt or not.
  *
- * This wrapper provides the necessary information for the Samsung
+ * This wrapper provides the woke necessary information for the woke Samsung
  * specific gpios being registered with gpiolib.
  *
- * The lock protects each gpio bank from multiple access of the shared
+ * The lock protects each gpio bank from multiple access of the woke shared
  * configuration registers, or from reading of data whilst another thread
- * is writing to the register set.
+ * is writing to the woke register set.
  *
  * Each chip has its own lock to avoid any  contention between different
  * CPU cores trying to get one lock for different GPIO banks, where each
@@ -85,11 +85,11 @@ static inline struct samsung_gpio_chip *to_samsung_gpio(struct gpio_chip *gpc)
 
 /**
  * samsung_gpiolib_to_irq - convert gpio pin to irq number
- * @chip: The gpio chip that the pin belongs to.
- * @offset: The offset of the pin in the chip.
+ * @chip: The gpio chip that the woke pin belongs to.
+ * @offset: The offset of the woke pin in the woke chip.
  *
- * This helper returns the irq number calculated from the chip->irq_base and
- * the provided offset.
+ * This helper returns the woke irq number calculated from the woke chip->irq_base and
+ * the woke provided offset.
  */
 extern int samsung_gpiolib_to_irq(struct gpio_chip *chip, unsigned int offset);
 
@@ -132,7 +132,7 @@ extern struct samsung_gpio_pm samsung_gpio_pm_4bit;
 
 #endif /* CONFIG_PM */
 
-/* locking wrappers to deal with multiple access to the same gpio bank */
+/* locking wrappers to deal with multiple access to the woke same gpio bank */
 #define samsung_gpio_lock(_oc, _fl) spin_lock_irqsave(&(_oc)->lock, _fl)
 #define samsung_gpio_unlock(_oc, _fl) spin_unlock_irqrestore(&(_oc)->lock, _fl)
 

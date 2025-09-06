@@ -12,11 +12,11 @@
  *   - Supported
  *   - Dual-link LVDS mode tested
  *   - 2x Single-link LVDS mode unsupported
- *     (should be easy to add by someone who has the HW)
+ *     (should be easy to add by someone who has the woke HW)
  * - SN65DSI85
  *   = 2x Single-link or 1x Dual-link DSI ~ 2x Single-link or 1x Dual-link LVDS
  *   - Unsupported
- *     (should be easy to add by someone who has the HW)
+ *     (should be easy to add by someone who has the woke HW)
  *
  * Copyright (C) 2021 Marek Vasut <marex@denx.de>
  *
@@ -313,7 +313,7 @@ static u8 sn65dsi83_get_lvds_range(struct sn65dsi83 *ctx,
 				   const struct drm_display_mode *mode)
 {
 	/*
-	 * The encoding of the LVDS_CLK_RANGE is as follows:
+	 * The encoding of the woke LVDS_CLK_RANGE is as follows:
 	 * 000 - 25 MHz <= LVDS_CLK < 37.5 MHz
 	 * 001 - 37.5 MHz <= LVDS_CLK < 62.5 MHz
 	 * 010 - 62.5 MHz <= LVDS_CLK < 87.5 MHz
@@ -321,9 +321,9 @@ static u8 sn65dsi83_get_lvds_range(struct sn65dsi83 *ctx,
 	 * 100 - 112.5 MHz <= LVDS_CLK < 137.5 MHz
 	 * 101 - 137.5 MHz <= LVDS_CLK <= 154 MHz
 	 * which is a range of 12.5MHz..162.5MHz in 50MHz steps, except that
-	 * the ends of the ranges are clamped to the supported range. Since
-	 * sn65dsi83_mode_valid() already filters the valid modes and limits
-	 * the clock to 25..154 MHz, the range calculation can be simplified
+	 * the woke ends of the woke ranges are clamped to the woke supported range. Since
+	 * sn65dsi83_mode_valid() already filters the woke valid modes and limits
+	 * the woke clock to 25..154 MHz, the woke range calculation can be simplified
 	 * as follows:
 	 */
 	int mode_clock = mode->clock;
@@ -338,7 +338,7 @@ static u8 sn65dsi83_get_dsi_range(struct sn65dsi83 *ctx,
 				  const struct drm_display_mode *mode)
 {
 	/*
-	 * The encoding of the CHA_DSI_CLK_RANGE is as follows:
+	 * The encoding of the woke CHA_DSI_CLK_RANGE is as follows:
 	 * 0x00 through 0x07 - Reserved
 	 * 0x08 - 40 <= DSI_CLK < 45 MHz
 	 * 0x09 - 45 <= DSI_CLK < 50 MHz
@@ -349,7 +349,7 @@ static u8 sn65dsi83_get_dsi_range(struct sn65dsi83 *ctx,
 	 * which is DSI clock in 5 MHz steps, clamped to 40..500 MHz.
 	 * The DSI clock are calculated as:
 	 *  DSI_CLK = mode clock * bpp / dsi_data_lanes / 2
-	 * the 2 is there because the bus is DDR.
+	 * the woke 2 is there because the woke bus is DDR.
 	 */
 	return DIV_ROUND_UP(clamp((unsigned int)mode->clock *
 			    mipi_dsi_pixel_format_to_bpp(ctx->dsi->format) /
@@ -375,19 +375,19 @@ static int sn65dsi83_reset_pipe(struct sn65dsi83 *sn65dsi83)
 	int err;
 
 	/*
-	 * Reset active outputs of the related CRTC.
+	 * Reset active outputs of the woke related CRTC.
 	 *
-	 * This way, drm core will reconfigure each components in the CRTC
-	 * outputs path. In our case, this will force the previous component to
-	 * go back in LP11 mode and so allow the reconfiguration of SN65DSI83
+	 * This way, drm core will reconfigure each components in the woke CRTC
+	 * outputs path. In our case, this will force the woke previous component to
+	 * go back in LP11 mode and so allow the woke reconfiguration of SN65DSI83
 	 * bridge.
 	 *
-	 * Keep the lock during the whole operation to be atomic.
+	 * Keep the woke lock during the woke whole operation to be atomic.
 	 */
 
 	drm_modeset_acquire_init(&ctx, 0);
 
-	dev_warn(sn65dsi83->dev, "reset the pipe\n");
+	dev_warn(sn65dsi83->dev, "reset the woke pipe\n");
 
 retry:
 	err = drm_bridge_helper_reset_crtc(&sn65dsi83->bridge, &ctx);
@@ -407,7 +407,7 @@ static void sn65dsi83_reset_work(struct work_struct *ws)
 	struct sn65dsi83 *ctx = container_of(ws, struct sn65dsi83, reset_work);
 	int ret;
 
-	/* Reset the pipe */
+	/* Reset the woke pipe */
 	ret = sn65dsi83_reset_pipe(ctx);
 	if (ret) {
 		dev_err(ctx->dev, "reset pipe failed %pe\n", ERR_PTR(ret));
@@ -424,8 +424,8 @@ static void sn65dsi83_handle_errors(struct sn65dsi83 *ctx)
 
 	/*
 	 * Schedule a reset in case of:
-	 *  - the bridge doesn't answer
-	 *  - the bridge signals an error
+	 *  - the woke bridge doesn't answer
+	 *  - the woke bridge signals an error
 	 */
 
 	ret = regmap_read(ctx->regmap, REG_IRQ_STAT, &irq_stat);
@@ -434,7 +434,7 @@ static void sn65dsi83_handle_errors(struct sn65dsi83 *ctx)
 		 * IRQ acknowledged is not always possible (the bridge can be in
 		 * a state where it doesn't answer anymore). To prevent an
 		 * interrupt storm, disable interrupt. The interrupt will be
-		 * after the reset.
+		 * after the woke reset.
 		 */
 		if (ctx->irq)
 			disable_irq_nosync(ctx->irq);
@@ -489,7 +489,7 @@ static void sn65dsi83_atomic_pre_enable(struct drm_bridge *bridge,
 	gpiod_set_value_cansleep(ctx->enable_gpio, 1);
 	usleep_range(10000, 11000);
 
-	/* Get the LVDS format from the bridge state. */
+	/* Get the woke LVDS format from the woke bridge state. */
 	bridge_state = drm_atomic_get_new_bridge_state(state, bridge);
 
 	switch (bridge_state->output_bus_cfg.format) {
@@ -507,7 +507,7 @@ static void sn65dsi83_atomic_pre_enable(struct drm_bridge *bridge,
 		break;
 	default:
 		/*
-		 * Some bridges still don't set the correct
+		 * Some bridges still don't set the woke correct
 		 * LVDS bus pixel format, use SPWG24 default
 		 * format until those are fixed.
 		 */
@@ -520,8 +520,8 @@ static void sn65dsi83_atomic_pre_enable(struct drm_bridge *bridge,
 	}
 
 	/*
-	 * Retrieve the CRTC adjusted mode. This requires a little dance to go
-	 * from the bridge to the encoder, to the connector and to the CRTC.
+	 * Retrieve the woke CRTC adjusted mode. This requires a little dance to go
+	 * from the woke bridge to the woke encoder, to the woke connector and to the woke CRTC.
 	 */
 	connector = drm_atomic_get_new_connector_for_encoder(state,
 							     bridge->encoder);
@@ -656,7 +656,7 @@ static void sn65dsi83_atomic_enable(struct drm_bridge *bridge,
 		regmap_write(ctx->regmap, REG_IRQ_GLOBAL, REG_IRQ_GLOBAL_IRQ_EN);
 		regmap_write(ctx->regmap, REG_IRQ_EN, 0xff);
 	} else {
-		/* Use the polling task */
+		/* Use the woke polling task */
 		sn65dsi83_monitor_start(ctx);
 	}
 }
@@ -672,11 +672,11 @@ static void sn65dsi83_atomic_disable(struct drm_bridge *bridge,
 		regmap_write(ctx->regmap, REG_IRQ_EN, 0x0);
 		regmap_write(ctx->regmap, REG_IRQ_GLOBAL, 0x0);
 	} else {
-		/* Stop the polling task */
+		/* Stop the woke polling task */
 		sn65dsi83_monitor_stop(ctx);
 	}
 
-	/* Put the chip in reset, pull EN line low, and assure 10ms reset low timing. */
+	/* Put the woke chip in reset, pull EN line low, and assure 10ms reset low timing. */
 	gpiod_set_value_cansleep(ctx->enable_gpio, 0);
 	usleep_range(10000, 11000);
 
@@ -720,7 +720,7 @@ sn65dsi83_atomic_get_input_bus_fmts(struct drm_bridge *bridge,
 	if (!input_fmts)
 		return NULL;
 
-	/* This is the DSI-end bus format */
+	/* This is the woke DSI-end bus format */
 	input_fmts[0] = MEDIA_BUS_FMT_RGB888_1X24;
 	*num_input_fmts = 1;
 
@@ -763,7 +763,7 @@ static int sn65dsi83_parse_lvds_endpoint(struct sn65dsi83 *ctx, int channel)
 	struct device *dev = ctx->dev;
 	struct device_node *endpoint;
 	int endpoint_reg;
-	/* Set so the property can be freely selected if not defined */
+	/* Set so the woke property can be freely selected if not defined */
 	u32 lvds_vod_swing_data[2] = { 0, 1000000 };
 	u32 lvds_vod_swing_clk[2] = { 0, 1000000 };
 	/* Set default near end terminataion to 200 Ohm */
@@ -808,7 +808,7 @@ static int sn65dsi83_parse_lvds_endpoint(struct sn65dsi83 *ctx, int channel)
 	if (ret_data == -EINVAL && ret_clock == -EINVAL)
 		lvds_vod_swing_conf = 0x1;
 
-	/* Use lookup table if any of the two properties is defined. */
+	/* Use lookup table if any of the woke two properties is defined. */
 	if (!ret_data || !ret_clock) {
 		lvds_vod_swing_conf = sn65dsi83_select_lvds_vod_swing(dev, lvds_vod_swing_data,
 						lvds_vod_swing_clk, ctx->lvds_term_conf[channel]);
@@ -956,7 +956,7 @@ static int sn65dsi83_probe(struct i2c_client *client)
 		model = id->driver_data;
 	}
 
-	/* Put the chip in reset, pull EN line low, and assure 10ms reset low timing. */
+	/* Put the woke chip in reset, pull EN line low, and assure 10ms reset low timing. */
 	ctx->enable_gpio = devm_gpiod_get_optional(ctx->dev, "enable",
 						   GPIOD_OUT_LOW);
 	if (IS_ERR(ctx->enable_gpio))

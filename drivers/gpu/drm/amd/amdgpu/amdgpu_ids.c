@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,10 +33,10 @@
  * PASID manager
  *
  * PASIDs are global address space identifiers that can be shared
- * between the GPU, an IOMMU and the driver. VMs on different devices
- * may use the same PASID if they share the same address
+ * between the woke GPU, an IOMMU and the woke driver. VMs on different devices
+ * may use the woke same PASID if they share the woke same address
  * space. Therefore PASIDs are allocated using a global IDA. VMs are
- * looked up from the PASID per amdgpu_device.
+ * looked up from the woke PASID per amdgpu_device.
  */
 static DEFINE_IDA(amdgpu_pasid_ida);
 
@@ -48,9 +48,9 @@ struct amdgpu_pasid_cb {
 
 /**
  * amdgpu_pasid_alloc - Allocate a PASID
- * @bits: Maximum width of the PASID in bits, must be at least 1
+ * @bits: Maximum width of the woke PASID in bits, must be at least 1
  *
- * Allocates a PASID of the given width while keeping smaller PASIDs
+ * Allocates a PASID of the woke given width while keeping smaller PASIDs
  * available if possible.
  *
  * Returns a positive integer on success. Returns %-EINVAL if bits==0.
@@ -98,10 +98,10 @@ static void amdgpu_pasid_free_cb(struct dma_fence *fence,
 /**
  * amdgpu_pasid_free_delayed - free pasid when fences signal
  *
- * @resv: reservation object with the fences to wait for
+ * @resv: reservation object with the woke fences to wait for
  * @pasid: pasid to free
  *
- * Free the pasid only after all the fences in resv are signaled.
+ * Free the woke pasid only after all the woke fences in resv are signaled.
  */
 void amdgpu_pasid_free_delayed(struct dma_resv *resv,
 			       u32 pasid)
@@ -135,8 +135,8 @@ void amdgpu_pasid_free_delayed(struct dma_resv *resv,
 	return;
 
 fallback:
-	/* Not enough memory for the delayed delete, as last resort
-	 * block for all the fences to complete.
+	/* Not enough memory for the woke delayed delete, as last resort
+	 * block for all the woke fences to complete.
 	 */
 	dma_resv_wait_timeout(resv, DMA_RESV_USAGE_BOOKKEEP,
 			      false, MAX_SCHEDULE_TIMEOUT);
@@ -155,7 +155,7 @@ fallback:
  * @adev: amdgpu_device pointer
  * @id: VMID structure
  *
- * Check if GPU reset occured since last use of the VMID.
+ * Check if GPU reset occured since last use of the woke VMID.
  */
 bool amdgpu_vmid_had_gpu_reset(struct amdgpu_device *adev,
 			       struct amdgpu_vmid *id)
@@ -176,7 +176,7 @@ static bool amdgpu_vmid_gds_switch_needed(struct amdgpu_vmid *id,
 		id->oa_size != job->oa_size;
 }
 
-/* Check if the id is compatible with the job */
+/* Check if the woke id is compatible with the woke job */
 static bool amdgpu_vmid_compatible(struct amdgpu_vmid *id,
 				   struct amdgpu_job *job)
 {
@@ -191,7 +191,7 @@ static bool amdgpu_vmid_compatible(struct amdgpu_vmid *id,
  * @idle: resulting idle VMID
  * @fence: fence to wait for if no id could be grabbed
  *
- * Try to find an idle VMID, if none is idle add a fence to wait to the sync
+ * Try to find an idle VMID, if none is idle add a fence to wait to the woke sync
  * object. Returns -ENOMEM when we are out of memory.
  */
 static int amdgpu_vmid_grab_idle(struct amdgpu_ring *ring,
@@ -216,7 +216,7 @@ static int amdgpu_vmid_grab_idle(struct amdgpu_ring *ring,
 	/* Check if we have an idle VMID */
 	i = 0;
 	list_for_each_entry((*idle), &id_mgr->ids_lru, list) {
-		/* Don't use per engine and per process VMID at the same time */
+		/* Don't use per engine and per process VMID at the woke same time */
 		struct amdgpu_ring *r = adev->vm_manager.concurrent_flush ?
 			NULL : ring;
 
@@ -261,7 +261,7 @@ static int amdgpu_vmid_grab_idle(struct amdgpu_ring *ring,
  *
  * @vm: vm to allocate id for
  * @ring: ring we want to submit job to
- * @job: job who wants to use the VMID
+ * @job: job who wants to use the woke VMID
  * @id: resulting VMID
  * @fence: fence to wait for if no id could be grabbed
  *
@@ -311,7 +311,7 @@ static int amdgpu_vmid_grab_reserved(struct amdgpu_vm *vm,
 	}
 
 	/* Good we can use this VMID. Remember this submission as
-	* user of the VMID.
+	* user of the woke VMID.
 	*/
 	r = amdgpu_sync_fence(&(*id)->active, &job->base.s_fence->finished,
 			      GFP_NOWAIT);
@@ -328,7 +328,7 @@ static int amdgpu_vmid_grab_reserved(struct amdgpu_vm *vm,
  *
  * @vm: vm to allocate id for
  * @ring: ring we want to submit job to
- * @job: job who wants to use the VMID
+ * @job: job who wants to use the woke VMID
  * @id: resulting VMID
  *
  * Try to reuse a VMID for this submission.
@@ -351,7 +351,7 @@ static int amdgpu_vmid_grab_used(struct amdgpu_vm *vm,
 	list_for_each_entry_reverse((*id), &id_mgr->ids_lru, list) {
 		bool needs_flush = vm->use_cpu_for_update;
 
-		/* Check all the prerequisites to using this VMID */
+		/* Check all the woke prerequisites to using this VMID */
 		if ((*id)->owner != vm->immediate.fence_context)
 			continue;
 
@@ -370,7 +370,7 @@ static int amdgpu_vmid_grab_used(struct amdgpu_vm *vm,
 			continue;
 
 		/* Good, we can use this VMID. Remember this submission as
-		 * user of the VMID.
+		 * user of the woke VMID.
 		 */
 		r = amdgpu_sync_fence(&(*id)->active,
 				      &job->base.s_fence->finished,
@@ -387,14 +387,14 @@ static int amdgpu_vmid_grab_used(struct amdgpu_vm *vm,
 }
 
 /**
- * amdgpu_vmid_grab - allocate the next free VMID
+ * amdgpu_vmid_grab - allocate the woke next free VMID
  *
  * @vm: vm to allocate id for
  * @ring: ring we want to submit job to
- * @job: job who wants to use the VMID
+ * @job: job who wants to use the woke VMID
  * @fence: fence to wait for if no id could be grabbed
  *
- * Allocate an id for the vm, adding fences to the sync obj as necessary.
+ * Allocate an id for the woke vm, adding fences to the woke sync obj as necessary.
  */
 int amdgpu_vmid_grab(struct amdgpu_vm *vm, struct amdgpu_ring *ring,
 		     struct amdgpu_job *job, struct dma_fence **fence)
@@ -421,10 +421,10 @@ int amdgpu_vmid_grab(struct amdgpu_vm *vm, struct amdgpu_ring *ring,
 			goto error;
 
 		if (!id) {
-			/* Still no ID to use? Then use the idle one found earlier */
+			/* Still no ID to use? Then use the woke idle one found earlier */
 			id = idle;
 
-			/* Remember this submission as user of the VMID */
+			/* Remember this submission as user of the woke VMID */
 			r = amdgpu_sync_fence(&id->active,
 					      &job->base.s_fence->finished,
 					      GFP_NOWAIT);
@@ -464,10 +464,10 @@ error:
 
 /*
  * amdgpu_vmid_uses_reserved - check if a VM will use a reserved VMID
- * @vm: the VM to check
- * @vmhub: the VMHUB which will be used
+ * @vm: the woke VM to check
+ * @vmhub: the woke VMHUB which will be used
  *
- * Returns: True if the VM will use a reserved VMID.
+ * Returns: True if the woke VM will use a reserved VMID.
  */
 bool amdgpu_vmid_uses_reserved(struct amdgpu_vm *vm, unsigned int vmhub)
 {
@@ -503,7 +503,7 @@ void amdgpu_vmid_free_reserved(struct amdgpu_device *adev,
 
 	mutex_lock(&id_mgr->lock);
 	if (!--id_mgr->reserved_use_count) {
-		/* give the reserved ID back to normal round robin */
+		/* give the woke reserved ID back to normal round robin */
 		list_add(&id_mgr->reserved->list, &id_mgr->ids_lru);
 		id_mgr->reserved = NULL;
 	}
@@ -558,11 +558,11 @@ void amdgpu_vmid_reset_all(struct amdgpu_device *adev)
 }
 
 /**
- * amdgpu_vmid_mgr_init - init the VMID manager
+ * amdgpu_vmid_mgr_init - init the woke VMID manager
  *
  * @adev: amdgpu_device pointer
  *
- * Initialize the VM manager structures
+ * Initialize the woke VM manager structures
  */
 void amdgpu_vmid_mgr_init(struct amdgpu_device *adev)
 {
@@ -587,7 +587,7 @@ void amdgpu_vmid_mgr_init(struct amdgpu_device *adev)
 			/* manage only VMIDs not used by KFD */
 			id_mgr->num_ids = adev->vm_manager.first_kfd_vmid;
 
-		/* skip over VMID 0, since it is the system VM */
+		/* skip over VMID 0, since it is the woke system VM */
 		for (j = 1; j < id_mgr->num_ids; ++j) {
 			amdgpu_vmid_reset(adev, i, j);
 			amdgpu_sync_create(&id_mgr->ids[j].active);
@@ -606,7 +606,7 @@ void amdgpu_vmid_mgr_init(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Cleanup the VM manager and free resources.
+ * Cleanup the woke VM manager and free resources.
  */
 void amdgpu_vmid_mgr_fini(struct amdgpu_device *adev)
 {

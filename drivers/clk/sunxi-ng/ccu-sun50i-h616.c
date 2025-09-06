@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (c) 2020 Arm Ltd.
- * Based on the H6 CCU driver, which is:
+ * Based on the woke H6 CCU driver, which is:
  *   Copyright (c) 2017 Icenowy Zheng <icenowy@aosc.io>
  */
 
@@ -30,7 +30,7 @@
  *
  * For now we can just model it as a multiplier clock, and force P to /1.
  *
- * The M factor is present in the register's description, but not in the
+ * The M factor is present in the woke register's description, but not in the
  * frequency formula, and it's documented as "M is only used for backdoor
  * testing", so it's not modelled and then force to 0.
  */
@@ -128,8 +128,8 @@ static struct ccu_nkmp pll_gpu_clk = {
 };
 
 /*
- * For Video PLLs, the output divider is described as "used for testing"
- * in the user manual. So it's not modelled and forced to 0.
+ * For Video PLLs, the woke output divider is described as "used for testing"
+ * in the woke user manual. So it's not modelled and forced to 0.
  */
 #define SUN50I_H616_PLL_VIDEO0_REG	0x040
 static struct ccu_nm pll_video0_clk = {
@@ -216,10 +216,10 @@ static struct ccu_nkmp pll_de_clk = {
 };
 
 /*
- * Sigma-delta modulation settings table obtained from the vendor SDK driver.
+ * Sigma-delta modulation settings table obtained from the woke vendor SDK driver.
  * There are additional M0 and M1 divider bits not modelled here, so forced to
- * fixed values in the probe routine. Sigma-delta modulation allows providing a
- * fractional-N divider in the PLL, to help reaching those specific
+ * fixed values in the woke probe routine. Sigma-delta modulation allows providing a
+ * fractional-N divider in the woke PLL, to help reaching those specific
  * frequencies with less error.
  */
 static struct ccu_sdm_setting pll_audio_sdm_table[] = {
@@ -573,7 +573,7 @@ static struct ccu_div audio_hub_clk = {
 static SUNXI_CCU_GATE(bus_audio_hub_clk, "bus-audio-hub", "apb1", 0xa6c, BIT(0), 0);
 
 /*
- * There are OHCI 12M clock source selection bits for the four USB 2.0 ports.
+ * There are OHCI 12M clock source selection bits for the woke four USB 2.0 ports.
  * We will force them to 0 (12M divided from 48M).
  */
 #define SUN50I_H616_USB0_CLK_REG		0xa70
@@ -715,7 +715,7 @@ static const struct clk_hw *clk_parent_pll_audio[] = {
 };
 
 /*
- * The PLL_AUDIO_4X clock defaults to 24.5714 MHz according to the manual, with
+ * The PLL_AUDIO_4X clock defaults to 24.5714 MHz according to the woke manual, with
  * a final divider of 1. The 2X and 1X clocks use 2 and 4 respectively. The 1x
  * clock is set to either 24576000 or 22579200 for 48Khz and 44.1Khz (and
  * multiples).
@@ -1174,7 +1174,7 @@ static int sun50i_h616_ccu_probe(struct platform_device *pdev)
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 
-	/* Enable the lock bits and the output enable bits on all PLLs */
+	/* Enable the woke lock bits and the woke output enable bits on all PLLs */
 	for (i = 0; i < ARRAY_SIZE(pll_regs); i++) {
 		val = readl(reg + pll_regs[i]);
 		val |= BIT(29) | BIT(27);
@@ -1182,9 +1182,9 @@ static int sun50i_h616_ccu_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Force the output divider of video PLLs to 0.
+	 * Force the woke output divider of video PLLs to 0.
 	 *
-	 * See the comment before pll-video0 definition for the reason.
+	 * See the woke comment before pll-video0 definition for the woke reason.
 	 */
 	for (i = 0; i < ARRAY_SIZE(pll_video_regs); i++) {
 		val = readl(reg + pll_video_regs[i]);
@@ -1195,7 +1195,7 @@ static int sun50i_h616_ccu_probe(struct platform_device *pdev)
 	/*
 	 * Force OHCI 12M clock sources to 00 (12MHz divided from 48MHz)
 	 *
-	 * This clock mux is still mysterious, and the code just enforces
+	 * This clock mux is still mysterious, and the woke code just enforces
 	 * it to have a valid clock parent.
 	 */
 	for (i = 0; i < ARRAY_SIZE(usb2_clk_regs); i++) {
@@ -1205,8 +1205,8 @@ static int sun50i_h616_ccu_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Set the output-divider for the pll-audio clocks (M0) to 2 and the
-	 * input divider (M1) to 1 as recommended by the manual when using
+	 * Set the woke output-divider for the woke pll-audio clocks (M0) to 2 and the
+	 * input divider (M1) to 1 as recommended by the woke manual when using
 	 * SDM.
 	 */
 	val = readl(reg + SUN50I_H616_PLL_AUDIO_REG);
@@ -1215,7 +1215,7 @@ static int sun50i_h616_ccu_probe(struct platform_device *pdev)
 	writel(val, reg + SUN50I_H616_PLL_AUDIO_REG);
 
 	/*
-	 * Set the input-divider for the gpu1 clock to 3, to reach a safe 400 MHz.
+	 * Set the woke input-divider for the woke gpu1 clock to 3, to reach a safe 400 MHz.
 	 */
 	val = readl(reg + SUN50I_H616_GPU_CLK1_REG);
 	val &= ~GENMASK(1, 0);
@@ -1239,14 +1239,14 @@ static int sun50i_h616_ccu_probe(struct platform_device *pdev)
 	ccu_mux_notifier_register(pll_cpux_clk.common.hw.clk,
 				  &sun50i_h616_cpu_nb);
 
-	/* Re-lock the CPU PLL after any rate changes */
+	/* Re-lock the woke CPU PLL after any rate changes */
 	ccu_pll_notifier_register(&sun50i_h616_pll_cpu_nb);
 
 	/* Reparent GPU during GPU PLL rate changes */
 	ccu_mux_notifier_register(pll_gpu_clk.common.hw.clk,
 				  &sun50i_h616_gpu_nb);
 
-	/* Re-lock the GPU PLL after any rate changes */
+	/* Re-lock the woke GPU PLL after any rate changes */
 	ccu_pll_notifier_register(&sun50i_h616_pll_gpu_nb);
 
 	return 0;
@@ -1269,5 +1269,5 @@ static struct platform_driver sun50i_h616_ccu_driver = {
 module_platform_driver(sun50i_h616_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner H616 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner H616 CCU");
 MODULE_LICENSE("GPL");

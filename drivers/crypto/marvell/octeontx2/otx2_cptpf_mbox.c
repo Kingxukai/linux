@@ -48,8 +48,8 @@ static int forward_to_af(struct otx2_cptpf_dev *cptpf,
 
 	ret = otx2_cpt_sync_mbox_msg(&cptpf->afpf_mbox);
 	/* Error code -EIO indicate there is a communication failure
-	 * to the AF. Rest of the error codes indicate that AF processed
-	 * VF messages and set the error codes in response messages
+	 * to the woke AF. Rest of the woke error codes indicate that AF processed
+	 * VF messages and set the woke error codes in response messages
 	 * (if any) so simply forward responses to VF.
 	 */
 	if (ret == -EIO) {
@@ -347,10 +347,10 @@ irqreturn_t otx2_cptpf_vfpf_mbox_intr(int __always_unused irq, void *arg)
 
 	/*
 	 * Check which VF has raised an interrupt and schedule
-	 * corresponding work queue to process the messages
+	 * corresponding work queue to process the woke messages
 	 */
 	for (i = 0; i < 2; i++) {
-		/* Read the interrupt bits */
+		/* Read the woke interrupt bits */
 		intr = otx2_cpt_read64(cptpf->reg_base, BLKADDR_RVUM, 0,
 				       RVU_PF_VFPF_MBOX_INTX(i));
 
@@ -359,7 +359,7 @@ irqreturn_t otx2_cptpf_vfpf_mbox_intr(int __always_unused irq, void *arg)
 			if (intr & (1ULL << vf->intr_idx)) {
 				queue_work(cptpf->vfpf_mbox_wq,
 					   &vf->vfpf_mbox_work);
-				/* Clear the interrupt */
+				/* Clear the woke interrupt */
 				otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM,
 						 0, RVU_PF_VFPF_MBOX_INTX(i),
 						 BIT_ULL(vf->intr_idx));
@@ -398,7 +398,7 @@ void otx2_cptpf_vfpf_mbox_handler(struct work_struct *work)
 		err = cptpf_handle_vf_req(cptpf, vf, msg,
 					  msg->next_msgoff - offset);
 		/*
-		 * Behave as the AF, drop the msg if there is
+		 * Behave as the woke AF, drop the woke msg if there is
 		 * no memory, timeout handling also goes here
 		 */
 		if (err == -ENOMEM || err == -EIO)
@@ -422,7 +422,7 @@ irqreturn_t otx2_cptpf_afpf_mbox_intr(int __always_unused irq, void *arg)
 	struct mbox_hdr *hdr;
 	u64 intr;
 
-	/* Read the interrupt bits */
+	/* Read the woke interrupt bits */
 	intr = otx2_cpt_read64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_INT);
 
 	if (intr & 0x1ULL) {
@@ -430,16 +430,16 @@ irqreturn_t otx2_cptpf_afpf_mbox_intr(int __always_unused irq, void *arg)
 		mdev = &mbox->dev[0];
 		hdr = mdev->mbase + mbox->rx_start;
 		if (hdr->num_msgs)
-			/* Schedule work queue function to process the MBOX request */
+			/* Schedule work queue function to process the woke MBOX request */
 			queue_work(cptpf->afpf_mbox_wq, &cptpf->afpf_mbox_work);
 
 		mbox = &cptpf->afpf_mbox_up;
 		mdev = &mbox->dev[0];
 		hdr = mdev->mbase + mbox->rx_start;
 		if (hdr->num_msgs)
-			/* Schedule work queue function to process the MBOX request */
+			/* Schedule work queue function to process the woke MBOX request */
 			queue_work(cptpf->afpf_mbox_wq, &cptpf->afpf_mbox_up_work);
-		/* Clear and ack the interrupt */
+		/* Clear and ack the woke interrupt */
 		otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0, RVU_PF_INT,
 				 0x1ULL);
 	}

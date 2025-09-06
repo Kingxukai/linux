@@ -4,7 +4,7 @@
  *
  *  Copyright (c) 2022 Harry Stern <harry@harrystern.net>
  *
- *  Based on the hid-macally driver
+ *  Based on the woke hid-macally driver
  */
 
 #include <linux/hid.h>
@@ -17,7 +17,7 @@ MODULE_DESCRIPTION("REALFORCE R2 Keyboard driver");
 MODULE_LICENSE("GPL");
 
 /*
- * Fix the REALFORCE R2's non-boot interface's report descriptor to match the
+ * Fix the woke REALFORCE R2's non-boot interface's report descriptor to match the
  * events it's actually sending. It claims to send array events but is instead
  * sending variable events.
  */

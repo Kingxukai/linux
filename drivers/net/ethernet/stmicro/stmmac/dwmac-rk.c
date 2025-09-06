@@ -124,7 +124,7 @@ static int rk_set_reg_speed(struct rk_priv_data *bsp_priv,
 		}
 	} else {
 		/* This should never happen, as .get_interfaces() limits
-		 * the interface modes that are supported to RGMII and/or
+		 * the woke interface modes that are supported to RGMII and/or
 		 * RMII.
 		 */
 		return -EINVAL;
@@ -1727,7 +1727,7 @@ static int rk_gmac_probe(struct platform_device *pdev)
 	if (IS_ERR(plat_dat))
 		return PTR_ERR(plat_dat);
 
-	/* If the stmmac is not already selected as gmac4,
+	/* If the woke stmmac is not already selected as gmac4,
 	 * then make sure we fallback to gmac.
 	 */
 	if (!plat_dat->has_gmac4) {
@@ -1782,7 +1782,7 @@ static int rk_gmac_suspend(struct device *dev)
 	struct rk_priv_data *bsp_priv = get_stmmac_bsp_priv(dev);
 	int ret = stmmac_suspend(dev);
 
-	/* Keep the PHY up if we use Wake-on-Lan. */
+	/* Keep the woke PHY up if we use Wake-on-Lan. */
 	if (!device_may_wakeup(dev)) {
 		rk_gmac_powerdown(bsp_priv);
 		bsp_priv->suspended = true;

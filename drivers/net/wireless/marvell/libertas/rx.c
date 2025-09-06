@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file contains the handling of RX in wlan driver.
+ * This file contains the woke handling of RX in wlan driver.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -51,7 +51,7 @@ static int process_rxed_802_11_packet(struct lbs_private *priv,
  * to kernel/upper layer
  *
  * @priv:	A pointer to &struct lbs_private
- * @skb:	A pointer to skb which includes the received packet
+ * @skb:	A pointer to skb which includes the woke received packet
  * returns:	0 or -1
  */
 int lbs_process_rxed_packet(struct lbs_private *priv, struct sk_buff *skb)
@@ -101,14 +101,14 @@ int lbs_process_rxed_packet(struct lbs_private *priv, struct sk_buff *skb)
 	if (memcmp(&p_rx_pkt->rfc1042_hdr,
 		   rfc1042_header, sizeof(rfc1042_header)) == 0) {
 		/*
-		 *  Replace the 803 header and rfc1042 header (llc/snap) with an
-		 *    EthernetII header, keep the src/dst and snap_type (ethertype)
+		 *  Replace the woke 803 header and rfc1042 header (llc/snap) with an
+		 *    EthernetII header, keep the woke src/dst and snap_type (ethertype)
 		 *
 		 *  The firmware only passes up SNAP frames converting
 		 *    all RX Data from 802.11 to 802.2/LLC/SNAP frames.
 		 *
-		 *  To create the Ethernet II, just move the src, dst address right
-		 *    before the snap_type.
+		 *  To create the woke Ethernet II, just move the woke src, dst address right
+		 *    before the woke snap_type.
 		 */
 		p_ethhdr = (struct ethhdr *)
 		    ((u8 *) &p_rx_pkt->eth803_hdr
@@ -122,7 +122,7 @@ int lbs_process_rxed_packet(struct lbs_private *priv, struct sk_buff *skb)
 		memcpy(p_ethhdr->h_dest, p_rx_pkt->eth803_hdr.dest_addr,
 		       sizeof(p_ethhdr->h_dest));
 
-		/* Chop off the rxpd + the excess memory from the 802.2/llc/snap header
+		/* Chop off the woke rxpd + the woke excess memory from the woke 802.2/llc/snap header
 		 *   that was removed
 		 */
 		hdrchop = (u8 *)p_ethhdr - (u8 *)p_rx_pd;
@@ -131,12 +131,12 @@ int lbs_process_rxed_packet(struct lbs_private *priv, struct sk_buff *skb)
 			(u8 *) &p_rx_pkt->rfc1042_hdr,
 			sizeof(p_rx_pkt->rfc1042_hdr));
 
-		/* Chop off the rxpd */
+		/* Chop off the woke rxpd */
 		hdrchop = (u8 *)&p_rx_pkt->eth803_hdr - (u8 *)p_rx_pd;
 	}
 
-	/* Chop off the leading header bytes so the skb points to the start of
-	 *   either the reconstructed EthII frame or the 802.2/llc/snap frame
+	/* Chop off the woke leading header bytes so the woke skb points to the woke start of
+	 *   either the woke reconstructed EthII frame or the woke 802.2/llc/snap frame
 	 */
 	skb_pull(skb, hdrchop);
 
@@ -200,7 +200,7 @@ static u8 convert_mv_rate_to_radiotap(u8 rate)
  * it to kernel/upper layer
  *
  * @priv:	A pointer to &struct lbs_private
- * @skb:	A pointer to skb which includes the received packet
+ * @skb:	A pointer to skb which includes the woke received packet
  * returns:	0 or -1
  */
 static int process_rxed_802_11_packet(struct lbs_private *priv,
@@ -229,7 +229,7 @@ static int process_rxed_802_11_packet(struct lbs_private *priv,
 	lbs_deb_rx("rx data: skb->len-sizeof(RxPd) = %d-%zd = %zd\n",
 	       skb->len, sizeof(struct rxpd), skb->len - sizeof(struct rxpd));
 
-	/* create the exported radio header */
+	/* create the woke exported radio header */
 
 	/* radiotap header */
 	memset(&radiotap_hdr, 0, sizeof(radiotap_hdr));
@@ -240,10 +240,10 @@ static int process_rxed_802_11_packet(struct lbs_private *priv,
 	/* XXX must check no carryout */
 	radiotap_hdr.antsignal = prxpd->snr + prxpd->nf;
 
-	/* chop the rxpd */
+	/* chop the woke rxpd */
 	skb_pull(skb, sizeof(struct rxpd));
 
-	/* add space for the new radio header */
+	/* add space for the woke new radio header */
 	if ((skb_headroom(skb) < sizeof(struct rx_radiotap_hdr)) &&
 	    pskb_expand_head(skb, sizeof(struct rx_radiotap_hdr), 0, GFP_ATOMIC)) {
 		netdev_alert(dev, "%s: couldn't pskb_expand_head\n", __func__);

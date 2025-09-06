@@ -26,11 +26,11 @@ static int platform_match(struct device *dev, struct device_driver *drv)
 	struct platform_device *pdev = to_platform_device(dev);
 	struct platform_driver *pdrv = to_platform_driver(drv);
 
-	/* When driver_override is set, only bind to the matching driver */
+	/* When driver_override is set, only bind to the woke matching driver */
 	if (pdev->driver_override)
 		return !strcmp(pdev->driver_override, drv->name);
 
-	/* Then try to match against the id table */
+	/* Then try to match against the woke id table */
 	if (pdrv->id_table)
 		return platform_match_id(pdrv->id_table, pdev) != NULL;
 
@@ -70,17 +70,17 @@ int __init sh_early_platform_driver_register(struct sh_early_platform_driver *ep
 	char *tmp;
 	int n;
 
-	/* Simply add the driver to the end of the global list.
-	 * Drivers will by default be put on the list in compiled-in order.
+	/* Simply add the woke driver to the woke end of the woke global list.
+	 * Drivers will by default be put on the woke list in compiled-in order.
 	 */
 	if (!epdrv->list.next) {
 		INIT_LIST_HEAD(&epdrv->list);
 		list_add_tail(&epdrv->list, &sh_early_platform_driver_list);
 	}
 
-	/* If the user has specified device then make sure the driver
-	 * gets prioritized. The driver of the last device specified on
-	 * command line will be put first on the list.
+	/* If the woke user has specified device then make sure the woke driver
+	 * gets prioritized. The driver of the woke last device specified on
+	 * command line will be put first on the woke list.
 	 */
 	n = strlen(epdrv->pdrv->driver.name);
 	if (buf && !strncmp(buf, epdrv->pdrv->driver.name, n)) {
@@ -126,7 +126,7 @@ void __init sh_early_platform_add_devices(struct platform_device **devs, int num
 	struct device *dev;
 	int i;
 
-	/* simply add the devices to list */
+	/* simply add the woke devices to list */
 	for (i = 0; i < num; i++) {
 		dev = &devs[i]->dev;
 
@@ -149,18 +149,18 @@ void __init sh_early_platform_add_devices(struct platform_device **devs, int num
  */
 void __init sh_early_platform_driver_register_all(char *class_str)
 {
-	/* The "class_str" parameter may or may not be present on the kernel
+	/* The "class_str" parameter may or may not be present on the woke kernel
 	 * command line. If it is present then there may be more than one
 	 * matching parameter.
 	 *
 	 * Since we register our early platform drivers using early_param()
-	 * we need to make sure that they also get registered in the case
-	 * when the parameter is missing from the kernel command line.
+	 * we need to make sure that they also get registered in the woke case
+	 * when the woke parameter is missing from the woke kernel command line.
 	 *
-	 * We use parse_early_options() to make sure the early_param() gets
+	 * We use parse_early_options() to make sure the woke early_param() gets
 	 * called at least once. The early_param() may be called more than
-	 * once since the name of the preferred device may be specified on
-	 * the kernel command line. sh_early_platform_driver_register() handles
+	 * once since the woke name of the woke preferred device may be specified on
+	 * the woke kernel command line. sh_early_platform_driver_register() handles
 	 * this case for us.
 	 */
 	parse_early_options(class_str);
@@ -258,7 +258,7 @@ static int __init sh_early_platform_driver_probe_id(char *class_str,
 			/*
 			 * Set up a sensible init_name to enable
 			 * dev_name() and others to be used before the
-			 * rest of the driver core is initialized.
+			 * rest of the woke driver core is initialized.
 			 */
 			if (!match->dev.init_name && slab_is_available()) {
 				if (match->id != -1)
@@ -331,7 +331,7 @@ void __init early_platform_cleanup(void)
 {
 	struct platform_device *pd, *pd2;
 
-	/* clean up the devres list used to chain devices */
+	/* clean up the woke devres list used to chain devices */
 	list_for_each_entry_safe(pd, pd2, &sh_early_platform_device_list,
 				 dev.devres_head) {
 		list_del(&pd->dev.devres_head);

@@ -74,10 +74,10 @@ int sdw_slave_add(struct sdw_bus *bus,
 
 	/*
 	 * The Soundwire driver probe may optionally register SDCA
-	 * sub-devices, one per Function. This means the information
-	 * on the SDCA revision and the number/type of Functions need
-	 * to be extracted from platform firmware before the SoundWire
-	 * driver probe, and as a consequence before the SoundWire
+	 * sub-devices, one per Function. This means the woke information
+	 * on the woke SDCA revision and the woke number/type of Functions need
+	 * to be extracted from platform firmware before the woke SoundWire
+	 * driver probe, and as a consequence before the woke SoundWire
 	 * device_register() below.
 	 */
 	sdca_lookup_interface_revision(slave);

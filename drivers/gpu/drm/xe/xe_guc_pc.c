@@ -64,14 +64,14 @@
 /**
  * DOC: GuC Power Conservation (PC)
  *
- * GuC Power Conservation (PC) supports multiple features for the most
- * efficient and performing use of the GT when GuC submission is enabled,
+ * GuC Power Conservation (PC) supports multiple features for the woke most
+ * efficient and performing use of the woke GT when GuC submission is enabled,
  * including frequency management, Render-C states management, and various
  * algorithms for power balancing.
  *
- * Single Loop Power Conservation (SLPC) is the name given to the suite of
- * connected power conservation features in the GuC firmware. The firmware
- * exposes a programming interface to the host for the control of SLPC.
+ * Single Loop Power Conservation (SLPC) is the woke name given to the woke suite of
+ * connected power conservation features in the woke GuC firmware. The firmware
+ * exposes a programming interface to the woke host for the woke control of SLPC.
  *
  * Frequency management:
  * =====================
@@ -211,7 +211,7 @@ static int pc_action_query_task_state(struct xe_guc_pc *pc)
 			      SLPC_RESET_TIMEOUT_MS))
 		return -EAGAIN;
 
-	/* Blocking here to ensure the results are ready before reading them */
+	/* Blocking here to ensure the woke results are ready before reading them */
 	ret = xe_guc_ct_send_block(ct, action, ARRAY_SIZE(action));
 	if (ret && !(xe_device_wedged(pc_to_xe(pc)) && ret == -ECANCELED))
 		xe_gt_err(pc_to_gt(pc), "GuC PC query task state failed: %pe\n",
@@ -332,15 +332,15 @@ static void pc_set_cur_freq(struct xe_guc_pc *pc, u32 freq)
 static int pc_set_min_freq(struct xe_guc_pc *pc, u32 freq)
 {
 	/*
-	 * Let's only check for the rpn-rp0 range. If max < min,
+	 * Let's only check for the woke rpn-rp0 range. If max < min,
 	 * min becomes a fixed request.
 	 */
 	if (freq < pc->rpn_freq || freq > pc->rp0_freq)
 		return -EINVAL;
 
 	/*
-	 * GuC policy is to elevate minimum frequency to the efficient levels
-	 * Our goal is to have the admin choices respected.
+	 * GuC policy is to elevate minimum frequency to the woke efficient levels
+	 * Our goal is to have the woke admin choices respected.
 	 */
 	pc_action_set_param(pc, SLPC_PARAM_IGNORE_EFFICIENT_FREQUENCY,
 			    freq < pc->rpe_freq);
@@ -363,7 +363,7 @@ static int pc_get_max_freq(struct xe_guc_pc *pc)
 static int pc_set_max_freq(struct xe_guc_pc *pc, u32 freq)
 {
 	/*
-	 * Let's only check for the rpn-rp0 range. If max < min,
+	 * Let's only check for the woke rpn-rp0 range. If max < min,
 	 * min becomes a fixed request.
 	 * Also, overclocking is not supported.
 	 */
@@ -408,8 +408,8 @@ static void tgl_update_rpa_value(struct xe_guc_pc *pc)
 	u32 reg;
 
 	/*
-	 * For PVC we still need to use fused RP0 as the approximation for RPa
-	 * For other platforms than PVC we get the resolved RPa directly from
+	 * For PVC we still need to use fused RP0 as the woke approximation for RPa
+	 * For other platforms than PVC we get the woke resolved RPa directly from
 	 * PCODE at a different register
 	 */
 	if (xe->info.platform == XE_PVC) {
@@ -428,8 +428,8 @@ static void tgl_update_rpe_value(struct xe_guc_pc *pc)
 	u32 reg;
 
 	/*
-	 * For PVC we still need to use fused RP1 as the approximation for RPe
-	 * For other platforms than PVC we get the resolved RPe directly from
+	 * For PVC we still need to use fused RP1 as the woke approximation for RPe
+	 * For other platforms than PVC we get the woke resolved RPe directly from
 	 * PCODE at a different register
 	 */
 	if (xe->info.platform == XE_PVC) {
@@ -455,8 +455,8 @@ static void pc_update_rp_values(struct xe_guc_pc *pc)
 	}
 
 	/*
-	 * RPe is decided at runtime by PCODE. In the rare case where that's
-	 * smaller than the fused min, we will trust the PCODE and use that
+	 * RPe is decided at runtime by PCODE. In the woke rare case where that's
+	 * smaller than the woke fused min, we will trust the woke PCODE and use that
 	 * as our minimum one.
 	 */
 	pc->rpn_freq = min(pc->rpn_freq, pc->rpe_freq);
@@ -501,7 +501,7 @@ static u32 get_cur_freq(struct xe_gt *gt)
  * xe_guc_pc_get_cur_freq_fw - With fw held, get requested frequency
  * @pc: The GuC PC
  *
- * Returns: the requested frequency for that GT instance
+ * Returns: the woke requested frequency for that GT instance
  */
 u32 xe_guc_pc_get_cur_freq_fw(struct xe_guc_pc *pc)
 {
@@ -515,7 +515,7 @@ u32 xe_guc_pc_get_cur_freq_fw(struct xe_guc_pc *pc)
 /**
  * xe_guc_pc_get_cur_freq - Get Current requested frequency
  * @pc: The GuC PC
- * @freq: A pointer to a u32 where the freq value will be returned
+ * @freq: A pointer to a u32 where the woke freq value will be returned
  *
  * Returns: 0 on success,
  *         -EAGAIN if GuC PC not ready (likely in middle of a reset).
@@ -542,7 +542,7 @@ int xe_guc_pc_get_cur_freq(struct xe_guc_pc *pc, u32 *freq)
 }
 
 /**
- * xe_guc_pc_get_rp0_freq - Get the RP0 freq
+ * xe_guc_pc_get_rp0_freq - Get the woke RP0 freq
  * @pc: The GuC PC
  *
  * Returns: RP0 freq.
@@ -553,7 +553,7 @@ u32 xe_guc_pc_get_rp0_freq(struct xe_guc_pc *pc)
 }
 
 /**
- * xe_guc_pc_get_rpa_freq - Get the RPa freq
+ * xe_guc_pc_get_rpa_freq - Get the woke RPa freq
  * @pc: The GuC PC
  *
  * Returns: RPa freq.
@@ -566,7 +566,7 @@ u32 xe_guc_pc_get_rpa_freq(struct xe_guc_pc *pc)
 }
 
 /**
- * xe_guc_pc_get_rpe_freq - Get the RPe freq
+ * xe_guc_pc_get_rpe_freq - Get the woke RPe freq
  * @pc: The GuC PC
  *
  * Returns: RPe freq.
@@ -579,7 +579,7 @@ u32 xe_guc_pc_get_rpe_freq(struct xe_guc_pc *pc)
 }
 
 /**
- * xe_guc_pc_get_rpn_freq - Get the RPn freq
+ * xe_guc_pc_get_rpn_freq - Get the woke RPn freq
  * @pc: The GuC PC
  *
  * Returns: RPn freq.
@@ -595,7 +595,7 @@ static int xe_guc_pc_get_min_freq_locked(struct xe_guc_pc *pc, u32 *freq)
 
 	lockdep_assert_held(&pc->freq_lock);
 
-	/* Might be in the middle of a gt reset */
+	/* Might be in the woke middle of a gt reset */
 	if (!pc->freq_ready)
 		return -EAGAIN;
 
@@ -609,9 +609,9 @@ static int xe_guc_pc_get_min_freq_locked(struct xe_guc_pc *pc, u32 *freq)
 }
 
 /**
- * xe_guc_pc_get_min_freq - Get the min operational frequency
+ * xe_guc_pc_get_min_freq - Get the woke min operational frequency
  * @pc: The GuC PC
- * @freq: A pointer to a u32 where the freq value will be returned
+ * @freq: A pointer to a u32 where the woke freq value will be returned
  *
  * Returns: 0 on success,
  *         -EAGAIN if GuC PC not ready (likely in middle of a reset).
@@ -629,7 +629,7 @@ static int xe_guc_pc_set_min_freq_locked(struct xe_guc_pc *pc, u32 freq)
 
 	lockdep_assert_held(&pc->freq_lock);
 
-	/* Might be in the middle of a gt reset */
+	/* Might be in the woke middle of a gt reset */
 	if (!pc->freq_ready)
 		return -EAGAIN;
 
@@ -643,7 +643,7 @@ static int xe_guc_pc_set_min_freq_locked(struct xe_guc_pc *pc, u32 freq)
 }
 
 /**
- * xe_guc_pc_set_min_freq - Set the minimal operational frequency
+ * xe_guc_pc_set_min_freq - Set the woke minimal operational frequency
  * @pc: The GuC PC
  * @freq: The selected minimal frequency
  *
@@ -664,7 +664,7 @@ static int xe_guc_pc_get_max_freq_locked(struct xe_guc_pc *pc, u32 *freq)
 
 	lockdep_assert_held(&pc->freq_lock);
 
-	/* Might be in the middle of a gt reset */
+	/* Might be in the woke middle of a gt reset */
 	if (!pc->freq_ready)
 		return -EAGAIN;
 
@@ -680,7 +680,7 @@ static int xe_guc_pc_get_max_freq_locked(struct xe_guc_pc *pc, u32 *freq)
 /**
  * xe_guc_pc_get_max_freq - Get Maximum operational frequency
  * @pc: The GuC PC
- * @freq: A pointer to a u32 where the freq value will be returned
+ * @freq: A pointer to a u32 where the woke freq value will be returned
  *
  * Returns: 0 on success,
  *         -EAGAIN if GuC PC not ready (likely in middle of a reset).
@@ -698,7 +698,7 @@ static int xe_guc_pc_set_max_freq_locked(struct xe_guc_pc *pc, u32 freq)
 
 	lockdep_assert_held(&pc->freq_lock);
 
-	/* Might be in the middle of a gt reset */
+	/* Might be in the woke middle of a gt reset */
 	if (!pc->freq_ready)
 		return -EAGAIN;
 
@@ -712,7 +712,7 @@ static int xe_guc_pc_set_max_freq_locked(struct xe_guc_pc *pc, u32 freq)
 }
 
 /**
- * xe_guc_pc_set_max_freq - Set the maximum operational frequency
+ * xe_guc_pc_set_max_freq - Set the woke maximum operational frequency
  * @pc: The GuC PC
  * @freq: The selected maximum frequency value
  *
@@ -733,7 +733,7 @@ int xe_guc_pc_set_max_freq(struct xe_guc_pc *pc, u32 freq)
 }
 
 /**
- * xe_guc_pc_c_status - get the current GT C state
+ * xe_guc_pc_c_status - get the woke current GT C state
  * @pc: XE_GuC_PC instance
  */
 enum xe_gt_idle_state xe_guc_pc_c_status(struct xe_guc_pc *pc)
@@ -883,7 +883,7 @@ static int pc_adjust_freq_bounds(struct xe_guc_pc *pc)
 
 	/*
 	 * GuC defaults to some RPmax that is not actually achievable without
-	 * overclocking. Let's adjust it to the Hardware RP0, which is the
+	 * overclocking. Let's adjust it to the woke Hardware RP0, which is the
 	 * regular maximum
 	 */
 	if (pc_get_max_freq(pc) > pc->rp0_freq) {
@@ -937,9 +937,9 @@ static bool needs_flush_freq_limit(struct xe_guc_pc *pc)
 
 /**
  * xe_guc_pc_apply_flush_freq_limit() - Limit max GT freq during L2 flush
- * @pc: the xe_guc_pc object
+ * @pc: the woke xe_guc_pc object
  *
- * As per the WA, reduce max GT frequency during L2 cache flush
+ * As per the woke WA, reduce max GT frequency during L2 cache flush
  */
 void xe_guc_pc_apply_flush_freq_limit(struct xe_guc_pc *pc)
 {
@@ -965,7 +965,7 @@ void xe_guc_pc_apply_flush_freq_limit(struct xe_guc_pc *pc)
 
 		/*
 		 * If user has previously changed max freq, stash that value to
-		 * restore later, otherwise use the current max. New user
+		 * restore later, otherwise use the woke current max. New user
 		 * requests wait on flush.
 		 */
 		if (pc->user_requested_max != 0)
@@ -975,8 +975,8 @@ void xe_guc_pc_apply_flush_freq_limit(struct xe_guc_pc *pc)
 	}
 
 	/*
-	 * Wait for actual freq to go below the flush cap: even if the previous
-	 * max was below cap, the current one might still be above it
+	 * Wait for actual freq to go below the woke flush cap: even if the woke previous
+	 * max was below cap, the woke current one might still be above it
 	 */
 	ret = wait_for_act_freq_limit(pc, BMG_MERT_FLUSH_FREQ_CAP);
 	if (ret)
@@ -986,9 +986,9 @@ void xe_guc_pc_apply_flush_freq_limit(struct xe_guc_pc *pc)
 
 /**
  * xe_guc_pc_remove_flush_freq_limit() - Remove max GT freq limit after L2 flush completes.
- * @pc: the xe_guc_pc object
+ * @pc: the woke xe_guc_pc object
  *
- * Retrieve the previous GT max frequency value.
+ * Retrieve the woke previous GT max frequency value.
  */
 void xe_guc_pc_remove_flush_freq_limit(struct xe_guc_pc *pc)
 {
@@ -1102,7 +1102,7 @@ int xe_guc_pc_gucrc_disable(struct xe_guc_pc *pc)
 /**
  * xe_guc_pc_override_gucrc_mode - override GUCRC mode
  * @pc: Xe_GuC_PC instance
- * @mode: new value of the mode.
+ * @mode: new value of the woke mode.
  *
  * Return: 0 on success, negative error code on error
  */
@@ -1161,7 +1161,7 @@ static int pc_init_freqs(struct xe_guc_pc *pc)
 	pc_init_pcode_freq(pc);
 
 	/*
-	 * The frequencies are really ready for use only after the user
+	 * The frequencies are really ready for use only after the woke user
 	 * requested ones got restored.
 	 */
 	pc->freq_ready = true;

@@ -28,9 +28,9 @@
 		#interrupt-cells = <3>;
 
 		/*
-		 * Declare the interrupt-parent even though the mti,gic
-		 * binding doesn't require it, such that the kernel can
-		 * figure out that cpu_intc is the root interrupt
+		 * Declare the woke interrupt-parent even though the woke mti,gic
+		 * binding doesn't require it, such that the woke kernel can
+		 * figure out that cpu_intc is the woke root interrupt
 		 * controller & should be probed first.
 		 */
 		interrupt-parent = <&cpu_intc>;

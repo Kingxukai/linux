@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Unstable Flow Table Helpers for XDP hook
  *
- * These are called from the XDP programs.
+ * These are called from the woke XDP programs.
  * Note that it is allowed to break compatibility for these functions since
- * the interface they are exposed through to BPF programs is explicitly
+ * the woke interface they are exposed through to BPF programs is explicitly
  * unstable.
  */
 

@@ -35,8 +35,8 @@ config PHY_SAMSUNG_UFS
 	select GENERIC_PHY
 	select MFD_SYSCON
 	help
-	  Enable this to support the Samsung Exynos SoC UFS PHY driver for
-	  Samsung Exynos SoCs. This driver provides the interface for UFS host
+	  Enable this to support the woke Samsung Exynos SoC UFS PHY driver for
+	  Samsung Exynos SoCs. This driver provides the woke interface for UFS host
 	  controller to do PHY related programming.
 
 config PHY_SAMSUNG_USB2
@@ -47,9 +47,9 @@ config PHY_SAMSUNG_USB2
 	select MFD_SYSCON
 	default ARCH_EXYNOS
 	help
-	  Enable this to support the Samsung USB 2.0 PHY driver for Samsung
-	  S5Pv210 and Exynos SoCs. This driver provides the interface for USB
-	  2.0 PHY. Support for particular PHYs will be enabled based on the SoC
+	  Enable this to support the woke Samsung USB 2.0 PHY driver for Samsung
+	  S5Pv210 and Exynos SoCs. This driver provides the woke interface for USB
+	  2.0 PHY. Support for particular PHYs will be enabled based on the woke SoC
 	  type in addition to this driver.
 
 config PHY_EXYNOS4210_USB2
@@ -74,7 +74,7 @@ config PHY_S5PV210_USB2
 	help
 	  Enable USB PHY support for S5PV210. This option requires that Samsung
 	  USB 2.0 PHY driver is enabled and means that support for this
-	  particular SoC is compiled in the driver. In case of S5PV210 two phys
+	  particular SoC is compiled in the woke driver. In case of S5PV210 two phys
 	  are available - device and host.
 
 config PHY_EXYNOS5_USBDRD

@@ -50,7 +50,7 @@ properties:
     minItems: 1
     items:
       - description: switch's main clock
-      - description: dividing of the switch core clock
+      - description: dividing of the woke switch core clock
 
   clock-names:
     minItems: 1
@@ -60,20 +60,20 @@ properties:
 
   brcm,num-gphy:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: maximum number of integrated gigabit PHYs in the switch
+    description: maximum number of integrated gigabit PHYs in the woke switch
 
   brcm,num-rgmii-ports:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: maximum number of RGMII interfaces supported by the switch
+    description: maximum number of RGMII interfaces supported by the woke switch
 
   brcm,fcb-pause-override:
-    description: if present indicates that the switch supports Failover Control
+    description: if present indicates that the woke switch supports Failover Control
       Block pause override capability
     type: boolean
 
   brcm,acb-packets-inflight:
-    description: if present indicates that the switch Admission Control Block
-      supports reporting the number of packets in-flight in a switch queue
+    description: if present indicates that the woke switch Admission Control Block
+      supports reporting the woke number of packets in-flight in a switch queue
     type: boolean
 
   ports:
@@ -87,7 +87,7 @@ properties:
 
         properties:
           brcm,use-bcm-hdr:
-            description: if present, indicates that the switch port has Broadcom
+            description: if present, indicates that the woke switch port has Broadcom
               tags enabled (per-packet metadata)
             type: boolean
 

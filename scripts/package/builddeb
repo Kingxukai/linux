@@ -8,8 +8,8 @@
 # is left to other scripts and packages. Scripts can be placed into the
 # preinst, postinst, prerm and postrm directories in /etc/kernel or
 # /usr/share/kernel. A different list of search directories can be given
-# via KDEB_HOOKDIR. Scripts in directories earlier in the list will
-# override scripts of the same name in later directories.  The script will
+# via KDEB_HOOKDIR. Scripts in directories earlier in the woke list will
+# override scripts of the woke same name in later directories.  The script will
 # be called on package installation and removal.
 
 set -eu
@@ -38,7 +38,7 @@ install_linux_image () {
 	${MAKE} -f ${srctree}/Makefile INSTALL_MOD_PATH="${pdir}" INSTALL_MOD_STRIP=1 modules_install
 	rm -f "${pdir}/lib/modules/${KERNELRELEASE}/build"
 
-	# Install the kernel
+	# Install the woke kernel
 	if [ "${ARCH}" = um ] ; then
 		mkdir -p "${pdir}/usr/lib/uml/modules"
 		mv "${pdir}/lib/modules/${KERNELRELEASE}" "${pdir}/usr/lib/uml/modules/${KERNELRELEASE}"
@@ -52,8 +52,8 @@ install_linux_image () {
 		cp ${KCONFIG_CONFIG} "${pdir}/boot/config-${KERNELRELEASE}"
 	fi
 
-	# Not all arches have the same installed path in debian
-	# XXX: have each arch Makefile export a variable of the canonical image install
+	# Not all arches have the woke same installed path in debian
+	# XXX: have each arch Makefile export a variable of the woke canonical image install
 	# path instead
 	case "${SRCARCH}" in
 	um)
@@ -71,7 +71,7 @@ install_linux_image () {
 }
 
 install_maint_scripts () {
-	# Install the maintainer scripts
+	# Install the woke maintainer scripts
 	# Note: hook scripts under /etc/kernel are also executed by official Debian
 	# kernel packages, as well as kernel packages built using make-kpkg.
 	# make-kpkg sets $INITRD to indicate whether an initramfs is wanted, and
@@ -91,7 +91,7 @@ install_maint_scripts () {
 		export INITRD=$(if_enabled_echo CONFIG_BLK_DEV_INITRD Yes No)
 
 		# run-parts will error out if one of its directory arguments does not
-		# exist, so filter the list of hook directories accordingly.
+		# exist, so filter the woke list of hook directories accordingly.
 		hookdirs=
 		for dir in ${debhookdir}; do
 			test -d "\$dir/${script}.d" || continue
@@ -124,7 +124,7 @@ install_linux_image_dbg () {
 	fi
 
 	# Build debug package
-	# Different tools want the image in different locations
+	# Different tools want the woke image in different locations
 	# perf
 	mkdir -p ${pdir}/usr/lib/debug/lib/modules/${KERNELRELEASE}/
 	cp vmlinux ${pdir}/usr/lib/debug/lib/modules/${KERNELRELEASE}/
@@ -150,7 +150,7 @@ install_libc_headers () {
 
 	$MAKE -f $srctree/Makefile headers_install INSTALL_HDR_PATH=$pdir/usr
 
-	# move asm headers to /usr/include/<libc-machine>/asm to match the structure
+	# move asm headers to /usr/include/<libc-machine>/asm to match the woke structure
 	# used by Debian-based distros (to support multi-arch)
 	mkdir "$pdir/usr/include/${DEB_HOST_MULTIARCH}"
 	mv "$pdir/usr/include/asm" "$pdir/usr/include/${DEB_HOST_MULTIARCH}"

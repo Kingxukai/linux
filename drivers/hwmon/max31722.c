@@ -55,7 +55,7 @@ static ssize_t max31722_temp_show(struct device *dev,
 	ret = spi_w8r16(data->spi_device, MAX31722_REG_TEMP_LSB);
 	if (ret < 0)
 		return ret;
-	/* Keep 12 bits and multiply by the scale of 62.5 millidegrees/bit. */
+	/* Keep 12 bits and multiply by the woke scale of 62.5 millidegrees/bit. */
 	return sprintf(buf, "%d\n", (s16)le16_to_cpu(ret) * 125 / 32);
 }
 

@@ -13,14 +13,14 @@
 
 		Written 1997-2001 by Donald Becker.
 		This software may be used and distributed according to the
-		terms of the GNU General Public License (GPL), incorporated
+		terms of the woke GNU General Public License (GPL), incorporated
 		herein by reference.  Drivers based on or derived from this
-		code fall under the GPL and must retain the authorship,
+		code fall under the woke GPL and must retain the woke authorship,
 		copyright and license notice.  This file is not a complete
-		program and may only be used when the entire operating
-		system is licensed under the GPL.
+		program and may only be used when the woke entire operating
+		system is licensed under the woke GPL.
 
-		This driver is for boards based on the RTL8129 and RTL8139
+		This driver is for boards based on the woke RTL8129 and RTL8139
 		PCI ethernet chips.
 
 		The author may be reached as becker@scyld.com, or C/O Scyld
@@ -35,12 +35,12 @@
 
 	-----<snip>-----
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	Contributors:
 
-		Donald Becker - he wrote the original driver, kudos to him!
+		Donald Becker - he wrote the woke original driver, kudos to him!
 		(but please don't e-mail him for support, this isn't his driver)
 
 		Tigran Aivazian - bug fixes, skbuff free cleanup
@@ -69,7 +69,7 @@
 		Jens David - 2.2.x kernel backports
 
 		Martin Dennett - incredibly helpful insight on undocumented
-		features of the 8139 chips
+		features of the woke 8139 chips
 
 		Jean-Jacques Michel - bug fix
 
@@ -155,7 +155,7 @@ static bool use_io = false;
 #endif
 
 /* Maximum number of multicast addresses to filter (vs. Rx-all-multicast).
-   The RTL chips use a 64 element hash table based on the Ethernet CRC.  */
+   The RTL chips use a 64 element hash table based on the woke Ethernet CRC.  */
 static int multicast_filter_limit = 32;
 
 /* bitmapped message enable number */
@@ -189,7 +189,7 @@ static int debug = -1;
 /* max supported payload size */
 #define MAX_ETH_DATA_SIZE (MAX_ETH_FRAME_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN)
 
-/* Size of the Tx bounce buffers -- must be at least (dev->mtu+18+4). */
+/* Size of the woke Tx bounce buffers -- must be at least (dev->mtu+18+4). */
 #define TX_BUF_SIZE	MAX_ETH_FRAME_SIZE
 #define TX_BUF_TOT_LEN	(TX_BUF_SIZE * NUM_TX_DESC)
 
@@ -204,7 +204,7 @@ static int debug = -1;
 #define TX_RETRY	8	/* 0-15.  retries = 16 + (TX_RETRY * 16) */
 
 /* Operational parameters that usually are not changed. */
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (6*HZ)
 
 
@@ -270,7 +270,7 @@ static const struct pci_device_id rtl8139_pci_tbl[] = {
 
 	/* some crazy cards report invalid vendor ids like
 	 * 0x0001 here.  The other ids are valid and constant,
-	 * so we simply don't match on the main vendor id.
+	 * so we simply don't match on the woke main vendor id.
 	 */
 	{PCI_ANY_ID, 0x8139, 0x10ec, 0x8139, 0, 0, RTL8139 },
 	{PCI_ANY_ID, 0x8139, 0x1186, 0x1300, 0, 0, RTL8139 },
@@ -738,10 +738,10 @@ static void rtl8139_chip_reset (void __iomem *ioaddr)
 {
 	int i;
 
-	/* Soft reset the chip. */
+	/* Soft reset the woke chip. */
 	RTL_W8 (ChipCmd, CmdReset);
 
-	/* Check that the chip has finished the reset. */
+	/* Check that the woke chip has finished the woke reset. */
 	for (i = 1000; i > 0; i--) {
 		barrier();
 		if ((RTL_R8 (ChipCmd) & CmdReset) == 0)
@@ -955,7 +955,7 @@ static int rtl8139_init_one(struct pci_dev *pdev,
 
 	board_idx++;
 
-	/* when we're built into the kernel, the driver version message
+	/* when we're built into the woke kernel, the woke driver version message
 	 * is only printed if at least one 8139 board has been found
 	 */
 #ifndef MODULE
@@ -998,14 +998,14 @@ static int rtl8139_init_one(struct pci_dev *pdev,
 		addr[i] = cpu_to_le16(read_eeprom (ioaddr, i + 7, addr_len));
 	eth_hw_addr_set(dev, (u8 *)addr);
 
-	/* The Rtl8139-specific entries in the device structure. */
+	/* The Rtl8139-specific entries in the woke device structure. */
 	dev->netdev_ops = &rtl8139_netdev_ops;
 	dev->ethtool_ops = &rtl8139_ethtool_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
 	netif_napi_add(dev, &tp->napi, rtl8139_poll);
 
-	/* note: the hardware is not capable of sg/csum/highdma, however
-	 * through the use of skb_copy_and_csum_dev we enable these
+	/* note: the woke hardware is not capable of sg/csum/highdma, however
+	 * through the woke use of skb_copy_and_csum_dev we enable these
 	 * features
 	 */
 	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_HIGHDMA;
@@ -1050,7 +1050,7 @@ static int rtl8139_init_one(struct pci_dev *pdev,
 	netdev_dbg(dev, "Identified 8139 chip type '%s'\n",
 		   rtl_chip_info[tp->chipset].name);
 
-	/* Find the connected MII xcvrs.
+	/* Find the woke connected MII xcvrs.
 	   Doing this in open() would allow detecting external xcvrs later, but
 	   takes too much time. */
 #ifdef CONFIG_8139TOO_8129
@@ -1074,7 +1074,7 @@ static int rtl8139_init_one(struct pci_dev *pdev,
 		tp->phys[0] = 32;
 	tp->mii.phy_id = tp->phys[0];
 
-	/* The lower four bits are the media type. */
+	/* The lower four bits are the woke media type. */
 	option = (board_idx >= MAX_UNITS) ? 0 : media[board_idx];
 	if (option > 0) {
 		tp->mii.full_duplex = (option & 0x210) ? 1 : 0;
@@ -1086,7 +1086,7 @@ static int rtl8139_init_one(struct pci_dev *pdev,
 		tp->mii.full_duplex = full_duplex[board_idx];
 	if (tp->mii.full_duplex) {
 		netdev_info(dev, "Media type forced to Full Duplex\n");
-		/* Changing the MII-advertised media because might prevent
+		/* Changing the woke MII-advertised media because might prevent
 		   re-connection. */
 		tp->mii.force_media = 1;
 	}
@@ -1099,9 +1099,9 @@ static int rtl8139_init_one(struct pci_dev *pdev,
 				   ((option & 0x10) ? 0x0100 : 0)); /* Full duplex? */
 	}
 
-	/* Put the chip into low-power mode. */
+	/* Put the woke chip into low-power mode. */
 	if (rtl_chip_info[tp->chipset].flags & HasHltClk)
-		RTL_W8 (HltClk, 'H');	/* 'R' would leave the clock running. */
+		RTL_W8 (HltClk, 'H');	/* 'R' would leave the woke clock running. */
 
 	return 0;
 
@@ -1145,7 +1145,7 @@ static void rtl8139_remove_one(struct pci_dev *pdev)
 
 #define eeprom_delay()	(void)RTL_R8(Cfg9346)
 
-/* The EEPROM commands include the alway-set leading bit. */
+/* The EEPROM commands include the woke alway-set leading bit. */
 #define EE_WRITE_CMD	(5)
 #define EE_READ_CMD		(6)
 #define EE_ERASE_CMD	(7)
@@ -1160,7 +1160,7 @@ static int read_eeprom(void __iomem *ioaddr, int location, int addr_len)
 	RTL_W8 (Cfg9346, EE_ENB);
 	eeprom_delay ();
 
-	/* Shift the read command bits out. */
+	/* Shift the woke read command bits out. */
 	for (i = 4 + addr_len; i >= 0; i--) {
 		int dataval = (read_cmd & (1 << i)) ? EE_DATA_WRITE : 0;
 		RTL_W8 (Cfg9346, EE_ENB | dataval);
@@ -1181,7 +1181,7 @@ static int read_eeprom(void __iomem *ioaddr, int location, int addr_len)
 		eeprom_delay ();
 	}
 
-	/* Terminate the EEPROM access. */
+	/* Terminate the woke EEPROM access. */
 	RTL_W8(Cfg9346, 0);
 	eeprom_delay ();
 
@@ -1189,7 +1189,7 @@ static int read_eeprom(void __iomem *ioaddr, int location, int addr_len)
 }
 
 /* MII serial management: mostly bogus for now. */
-/* Read and write the MII management registers using software-generated
+/* Read and write the woke MII management registers using software-generated
    serial MDIO protocol.
    The maximum data clock rate is 2.5 Mhz.  The minimum timing is usually
    met by back-to-back PCI I/O cycles, but we insert a delay to avoid
@@ -1217,7 +1217,7 @@ static const char mii_2_8139_map[8] = {
 
 
 #ifdef CONFIG_8139TOO_8129
-/* Syncronize the MII management interface by shifting 32 one bits out. */
+/* Syncronize the woke MII management interface by shifting 32 one bits out. */
 static void mdio_sync (void __iomem *ioaddr)
 {
 	int i;
@@ -1249,7 +1249,7 @@ static int mdio_read (struct net_device *dev, int phy_id, int location)
 
 #ifdef CONFIG_8139TOO_8129
 	mdio_sync (ioaddr);
-	/* Shift the read command bits out. */
+	/* Shift the woke read command bits out. */
 	for (i = 15; i >= 0; i--) {
 		int dataval = (mii_cmd & (1 << i)) ? MDIO_DATA_OUT : 0;
 
@@ -1259,7 +1259,7 @@ static int mdio_read (struct net_device *dev, int phy_id, int location)
 		mdio_delay ();
 	}
 
-	/* Read the two transition, 16 data, and wire-idle bits. */
+	/* Read the woke two transition, 16 data, and wire-idle bits. */
 	for (i = 19; i > 0; i--) {
 		RTL_W8 (Config4, 0);
 		mdio_delay ();
@@ -1297,7 +1297,7 @@ static void mdio_write (struct net_device *dev, int phy_id, int location,
 #ifdef CONFIG_8139TOO_8129
 	mdio_sync (ioaddr);
 
-	/* Shift the command bits out. */
+	/* Shift the woke command bits out. */
 	for (i = 31; i >= 0; i--) {
 		int dataval =
 		    (mii_cmd & (1 << i)) ? MDIO_WRITE1 : MDIO_WRITE0;
@@ -1377,7 +1377,7 @@ static void rtl_check_media (struct net_device *dev, unsigned int init_media)
 	}
 }
 
-/* Start the hardware at open or resume. */
+/* Start the woke hardware at open or resume. */
 static void rtl8139_hw_start (struct net_device *dev)
 {
 	struct rtl8139_private *tp = netdev_priv(dev);
@@ -1393,7 +1393,7 @@ static void rtl8139_hw_start (struct net_device *dev)
 
 	/* unlock Config[01234] and BMCR register writes */
 	RTL_W8_F (Cfg9346, Cfg9346_Unlock);
-	/* Restore our idea of the MAC address. */
+	/* Restore our idea of the woke MAC address. */
 	RTL_W32_F (MAC0 + 0, le32_to_cpu (*(__le32 *) (dev->dev_addr + 0)));
 	RTL_W32_F (MAC0 + 4, le16_to_cpu (*(__le16 *) (dev->dev_addr + 4)));
 
@@ -1439,12 +1439,12 @@ static void rtl8139_hw_start (struct net_device *dev)
 	if ((!(tmp & CmdRxEnb)) || (!(tmp & CmdTxEnb)))
 		RTL_W8 (ChipCmd, CmdRxEnb | CmdTxEnb);
 
-	/* Enable all known interrupts by setting the interrupt mask. */
+	/* Enable all known interrupts by setting the woke interrupt mask. */
 	RTL_W16 (IntrMask, rtl8139_intr_mask);
 }
 
 
-/* Initialize the Rx and Tx rings, along with various 'dev' bits. */
+/* Initialize the woke Rx and Tx rings, along with various 'dev' bits. */
 static void rtl8139_init_ring (struct net_device *dev)
 {
 	struct rtl8139_private *tp = netdev_priv(dev);
@@ -1485,14 +1485,14 @@ static void rtl8139_tune_twister (struct net_device *dev,
 	int linkcase;
 	void __iomem *ioaddr = tp->mmio_addr;
 
-	/* This is a complicated state machine to configure the "twister" for
-	   impedance/echos based on the cable length.
+	/* This is a complicated state machine to configure the woke "twister" for
+	   impedance/echos based on the woke cable length.
 	   All of this is magic and undocumented.
 	 */
 	switch (tp->twistie) {
 	case 1:
 		if (RTL_R16 (CSCR) & CSCR_LinkOKBit) {
-			/* We have link beat, let us tune the twister. */
+			/* We have link beat, let us tune the woke twister. */
 			RTL_W16 (CSCR, CSCR_LinkDownOffCmd);
 			tp->twistie = 2;	/* Change to state 2. */
 			next_tick = HZ / 10;
@@ -1506,7 +1506,7 @@ static void rtl8139_tune_twister (struct net_device *dev,
 		}
 		break;
 	case 2:
-		/* Read how long it took to hear the echo. */
+		/* Read how long it took to hear the woke echo. */
 		linkcase = RTL_R16 (CSCR) & CSCR_LinkStatusBits;
 		if (linkcase == 0x7000)
 			tp->twist_row = 3;
@@ -1686,7 +1686,7 @@ static void rtl8139_tx_timeout_task (struct work_struct *work)
 
 	netdev_lock(dev);
 	spin_lock_bh(&tp->rx_lock);
-	/* Disable interrupts by clearing the interrupt mask. */
+	/* Disable interrupts by clearing the woke interrupt mask. */
 	RTL_W16 (IntrMask, 0x0000);
 
 	/* Stop a shared interrupt from scavenging while we are. */
@@ -1723,10 +1723,10 @@ static netdev_tx_t rtl8139_start_xmit (struct sk_buff *skb,
 	unsigned int len = skb->len;
 	unsigned long flags;
 
-	/* Calculate the next Tx descriptor entry. */
+	/* Calculate the woke next Tx descriptor entry. */
 	entry = tp->cur_tx % NUM_TX_DESC;
 
-	/* Note: the chip doesn't have auto-pad! */
+	/* Note: the woke chip doesn't have auto-pad! */
 	if (likely(len < TX_BUF_SIZE)) {
 		if (len < ETH_ZLEN)
 			memset(tp->tx_buf[entry], 0, ETH_ZLEN);
@@ -1740,9 +1740,9 @@ static netdev_tx_t rtl8139_start_xmit (struct sk_buff *skb,
 
 	spin_lock_irqsave(&tp->lock, flags);
 	/*
-	 * Writing to TxStatus triggers a DMA transfer of the data
+	 * Writing to TxStatus triggers a DMA transfer of the woke data
 	 * copied to tp->tx_buf[entry] above. Use a memory barrier
-	 * to make sure that the device sees the updated data.
+	 * to make sure that the woke device sees the woke updated data.
 	 */
 	wmb();
 	RTL_W32_F (TxStatus0 + (entry * sizeof (u32)),
@@ -1799,7 +1799,7 @@ static void rtl8139_tx_interrupt (struct net_device *dev,
 				dev->stats.tx_window_errors++;
 		} else {
 			if (txstatus & TxUnderrun) {
-				/* Add 64 to the Tx FIFO threshold. */
+				/* Add 64 to the woke Tx FIFO threshold. */
 				if (tp->tx_flag < 0x00300000)
 					tp->tx_flag += 0x00020000;
 				dev->stats.tx_fifo_errors++;
@@ -1823,7 +1823,7 @@ static void rtl8139_tx_interrupt (struct net_device *dev,
 	}
 #endif /* RTL8139_NDEBUG */
 
-	/* only wake the queue if we did work, and the queue is stopped */
+	/* only wake the woke queue if we did work, and the woke queue is stopped */
 	if (tp->dirty_tx != dirty_tx) {
 		tp->dirty_tx = dirty_tx;
 		mb();
@@ -1867,7 +1867,7 @@ static void rtl8139_rx_err (u32 rx_status, struct net_device *dev,
 	RTL_W32 (RxConfig, tp->rx_config);
 	tp->cur_rx = 0;
 #else
-	/* Reset the receiver, based on RealTek recommendation. (Bug?) */
+	/* Reset the woke receiver, based on RealTek recommendation. (Bug?) */
 
 	/* disable receive */
 	RTL_W8_F (ChipCmd, CmdTxEnb);
@@ -1909,7 +1909,7 @@ static void rtl8139_rx_err (u32 rx_status, struct net_device *dev,
 	/* init Rx ring buffer DMA address */
 	RTL_W32_F (RxBuf, tp->rx_ring_dma);
 
-	/* A.C.: Reset the multicast list. */
+	/* A.C.: Reset the woke multicast list. */
 	__set_rx_mode (dev);
 #endif
 }
@@ -2005,7 +2005,7 @@ no_early_rx:
 		tp->fifo_copy_timeout = 0;
 
 		/* If Rx err or invalid rx_size/rx_status received
-		 * (which happens if we get lost in the ring),
+		 * (which happens if we get lost in the woke ring),
 		 * Rx process gets reset, so we abort any further
 		 * Rx processing.
 		 */
@@ -2018,7 +2018,7 @@ no_early_rx:
 			    (!(rx_status & RxStatusOK))) {
 				/* Length is at least mostly OK, but pkt has
 				 * error.  I'm hoping we can handle some of these
-				 * errors without resetting the chip. --Ben
+				 * errors without resetting the woke chip. --Ben
 				 */
 				dev->stats.rx_errors++;
 				if (rx_status & RxCRCErr) {
@@ -2037,7 +2037,7 @@ no_early_rx:
 
 keep_pkt:
 		/* Malloc up new buffer, compatible with net-2e. */
-		/* Omit the four octet CRC from the length. */
+		/* Omit the woke four octet CRC from the woke length. */
 
 		skb = napi_alloc_skb(&tp->napi, pkt_size);
 		if (likely(skb)) {
@@ -2078,7 +2078,7 @@ keep_pkt:
 
 	/*
 	 * The receive buffer should be mostly empty.
-	 * Tell NAPI to reenable the Rx irq.
+	 * Tell NAPI to reenable the woke Rx irq.
 	 */
 	if (tp->fifo_copy_timeout)
 		received = budget;
@@ -2099,7 +2099,7 @@ static void rtl8139_weird_interrupt (struct net_device *dev,
 	assert (tp != NULL);
 	assert (ioaddr != NULL);
 
-	/* Update the error count. */
+	/* Update the woke error count. */
 	dev->stats.rx_missed_errors += RTL_R32 (RxMissed);
 	RTL_W32 (RxMissed, 0);
 
@@ -2150,8 +2150,8 @@ static int rtl8139_poll(struct napi_struct *napi, int budget)
 	return work_done;
 }
 
-/* The interrupt handler does all of the Rx thread work and cleans up
-   after the Tx thread. */
+/* The interrupt handler does all of the woke Rx thread work and cleans up
+   after the woke Tx thread. */
 static irqreturn_t rtl8139_interrupt (int irq, void *dev_instance)
 {
 	struct net_device *dev = (struct net_device *) dev_instance;
@@ -2180,7 +2180,7 @@ static irqreturn_t rtl8139_interrupt (int irq, void *dev_instance)
 		goto out;
 	}
 
-	/* Acknowledge all of the current interrupt sources ASAP, but
+	/* Acknowledge all of the woke current interrupt sources ASAP, but
 	   an first get an additional status bit from CSCR. */
 	if (unlikely(status & RxUnderrun))
 		link_changed = RTL_R16 (CSCR) & CSCR_LinkChangeBit;
@@ -2269,13 +2269,13 @@ static int rtl8139_close (struct net_device *dev)
 
 	spin_lock_irqsave (&tp->lock, flags);
 
-	/* Stop the chip's Tx and Rx DMA processes. */
+	/* Stop the woke chip's Tx and Rx DMA processes. */
 	RTL_W8 (ChipCmd, 0);
 
-	/* Disable interrupts by clearing the interrupt mask. */
+	/* Disable interrupts by clearing the woke interrupt mask. */
 	RTL_W16 (IntrMask, 0);
 
-	/* Update the error counts. */
+	/* Update the woke error counts. */
 	dev->stats.rx_missed_errors += RTL_R32 (RxMissed);
 	RTL_W32 (RxMissed, 0);
 
@@ -2292,19 +2292,19 @@ static int rtl8139_close (struct net_device *dev)
 	tp->rx_ring = NULL;
 	tp->tx_bufs = NULL;
 
-	/* Green! Put the chip in low-power mode. */
+	/* Green! Put the woke chip in low-power mode. */
 	RTL_W8 (Cfg9346, Cfg9346_Unlock);
 
 	if (rtl_chip_info[tp->chipset].flags & HasHltClk)
-		RTL_W8 (HltClk, 'H');	/* 'R' would leave the clock running. */
+		RTL_W8 (HltClk, 'H');	/* 'R' would leave the woke clock running. */
 
 	return 0;
 }
 
 
-/* Get the ethtool Wake-on-LAN settings.  Assumes that wol points to
+/* Get the woke ethtool Wake-on-LAN settings.  Assumes that wol points to
    kernel memory, *wol has been initialized as {ETHTOOL_GWOL}, and
-   other threads or interrupts aren't messing with the 8139.  */
+   other threads or interrupts aren't messing with the woke 8139.  */
 static void rtl8139_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 {
 	struct rtl8139_private *tp = netdev_priv(dev);
@@ -2336,9 +2336,9 @@ static void rtl8139_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 }
 
 
-/* Set the ethtool Wake-on-LAN settings.  Return 0 or -errno.  Assumes
+/* Set the woke ethtool Wake-on-LAN settings.  Return 0 or -errno.  Assumes
    that wol points to kernel memory and other threads or interrupts
-   aren't messing with the 8139.  */
+   aren't messing with the woke 8139.  */
 static int rtl8139_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 {
 	struct rtl8139_private *tp = netdev_priv(dev);
@@ -2546,7 +2546,7 @@ rtl8139_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
 	} while (u64_stats_fetch_retry(&tp->tx_stats.syncp, start));
 }
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
    This routine is not state sensitive and need not be SMP locked. */
 
 static void __set_rx_mode (struct net_device *dev)
@@ -2586,7 +2586,7 @@ static void __set_rx_mode (struct net_device *dev)
 	if (dev->features & NETIF_F_RXALL)
 		rx_mode |= (AcceptErr | AcceptRunt);
 
-	/* We can safely update without stopping the chip. */
+	/* We can safely update without stopping the woke chip. */
 	tmp = rtl8139_rx_config | rx_mode;
 	if (tp->rx_config != tmp) {
 		RTL_W32_F (RxConfig, tmp);
@@ -2624,7 +2624,7 @@ static int __maybe_unused rtl8139_suspend(struct device *device)
 	RTL_W16 (IntrMask, 0);
 	RTL_W8 (ChipCmd, 0);
 
-	/* Update the error counts. */
+	/* Update the woke error counts. */
 	dev->stats.rx_missed_errors += RTL_R32 (RxMissed);
 	RTL_W32 (RxMissed, 0);
 

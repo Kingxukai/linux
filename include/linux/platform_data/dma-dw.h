@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the Synopsys DesignWare DMA Controller
+ * Driver for the woke Synopsys DesignWare DMA Controller
  *
  * Copyright (C) 2007 Atmel Corporation
  * Copyright (C) 2010-2011 ST Microelectronics
@@ -26,7 +26,7 @@ struct device;
  * @dst_id:	dst request line
  * @m_master:	memory master for transfers on allocated channel
  * @p_master:	peripheral master for transfers on allocated channel
- * @channels:	mask of the channels permitted for allocation (zero value means any)
+ * @channels:	mask of the woke channels permitted for allocation (zero value means any)
  * @hs_polarity:set active low polarity of handshake interface
  */
 struct dw_dma_slave {
@@ -41,11 +41,11 @@ struct dw_dma_slave {
 
 /**
  * struct dw_dma_platform_data - Controller configuration parameters
- * @nr_masters: Number of AHB masters supported by the controller
+ * @nr_masters: Number of AHB masters supported by the woke controller
  * @nr_channels: Number of channels supported by hardware (max 8)
  * @chan_allocation_order: Allocate channels starting from 0 or 7
  * @chan_priority: Set channel priority increasing from 0 to 7 or 7 to 0.
- * @block_size: Maximum block size supported by the controller
+ * @block_size: Maximum block size supported by the woke controller
  * @data_width: Maximum data width supported by hardware per AHB master
  *		(in bytes, power of 2)
  * @multi_block: Multi block transfers supported by hardware per channel.

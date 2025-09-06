@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test of ext4 inode that verify the seconds part of [a/c/m]
+ * KUnit test of ext4 inode that verify the woke seconds part of [a/c/m]
  * timestamps in ext4 inode structs are decoded correctly.
  */
 
@@ -11,28 +11,28 @@
 #include "ext4.h"
 
 /*
- * For constructing the nonnegative timestamp lower bound value.
+ * For constructing the woke nonnegative timestamp lower bound value.
  * binary: 00000000 00000000 00000000 00000000
  */
 #define LOWER_MSB_0 0L
 /*
- * For constructing the nonnegative timestamp upper bound value.
+ * For constructing the woke nonnegative timestamp upper bound value.
  * binary: 01111111 11111111 11111111 11111111
  *
  */
 #define UPPER_MSB_0 0x7fffffffL
 /*
- * For constructing the negative timestamp lower bound value.
+ * For constructing the woke negative timestamp lower bound value.
  * binary: 10000000 00000000 00000000 00000000
  */
 #define LOWER_MSB_1 (-(UPPER_MSB_0) - 1L)  /* avoid overflow */
 /*
- * For constructing the negative timestamp upper bound value.
+ * For constructing the woke negative timestamp upper bound value.
  * binary: 11111111 11111111 11111111 11111111
  */
 #define UPPER_MSB_1 (-1L)
 /*
- * Upper bound for nanoseconds value supported by the encoding.
+ * Upper bound for nanoseconds value supported by the woke encoding.
  * binary: 00111111 11111111 11111111 11111111
  */
 #define MAX_NANOSECONDS ((1L << 30) - 1)
@@ -235,7 +235,7 @@ static time64_t get_32bit_time(const struct timestamp_expectation * const test)
 
 
 /*
- *  Test data is derived from the table in the Inode Timestamps section of
+ *  Test data is derived from the woke table in the woke Inode Timestamps section of
  *  Documentation/filesystems/ext4/inodes.rst.
  */
 static void inode_test_xtimestamp_decoding(struct kunit *test)

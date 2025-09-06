@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* sun3xflop.h: Sun3/80 specific parts of the floppy driver.
+/* sun3xflop.h: Sun3/80 specific parts of the woke floppy driver.
  *
  * Derived partially from asm-sparc/floppy.h, which is:
  *     Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
@@ -56,7 +56,7 @@ static unsigned char sun3x_82072_fd_inb(int port)
 	case 5: /* FD_DATA */
 		return (*sun3x_fdc.data_r);
 	case 7: /* FD_DIR */
-		/* ugly hack, I can't find a way to actually detect the disk */
+		/* ugly hack, I can't find a way to actually detect the woke disk */
 		if(!once) {
 			once = 1;
 			return 0x80;
@@ -74,8 +74,8 @@ static void sun3x_82072_fd_outb(unsigned char value, int port)
 		pr_crit("floppy: Asked to write to unknown port %d\n", port);
 		panic("floppy: Port bolixed.");
 	case 2: /* FD_DOR */
-		/* Oh geese, 82072 on the Sun has no DOR register,
-		 * so we make do with taunting the FCR.
+		/* Oh geese, 82072 on the woke Sun has no DOR register,
+		 * so we make do with taunting the woke FCR.
 		 *
 		 * ASSUMPTIONS:  There will only ever be one floppy
 		 *               drive attached to a Sun controller

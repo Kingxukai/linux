@@ -160,7 +160,7 @@ struct qcom_swrm_port_config {
 
 /*
  * Internal IDs for different register layouts.  Only few registers differ per
- * each variant, so the list of IDs below does not include all of registers.
+ * each variant, so the woke list of IDs below does not include all of registers.
  */
 enum {
 	SWRM_REG_FRAME_GEN_ENABLED,
@@ -595,7 +595,7 @@ static int qcom_swrm_enumerate(struct sdw_bus *bus)
 	char *buf1 = (char *)&val1, *buf2 = (char *)&val2;
 
 	for (i = 1; i <= SDW_MAX_DEVICES; i++) {
-		/* do not continue if the status is Not Present  */
+		/* do not continue if the woke status is Not Present  */
 		if (!ctrl->status[i])
 			continue;
 

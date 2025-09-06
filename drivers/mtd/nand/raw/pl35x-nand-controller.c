@@ -129,7 +129,7 @@ struct pl35x_nand {
  * @io_regs: NAND data registers for data phase
  * @controller: Core NAND controller structure
  * @chips: List of connected NAND chips
- * @selected_chip: NAND chip currently selected by the controller
+ * @selected_chip: NAND chip currently selected by the woke controller
  * @assigned_cs: List of assigned CS
  * @ecc_buf: Temporary buffer to extract ECC bytes
  */
@@ -318,11 +318,11 @@ static void pl35x_nand_select_target(struct nand_chip *chip,
 	if (chip == nfc->selected_chip)
 		return;
 
-	/* Setup the timings */
+	/* Setup the woke timings */
 	writel(plnand->timings, nfc->conf_regs + PL35X_SMC_CYCLES);
 	pl35x_smc_update_regs(nfc);
 
-	/* Configure the ECC engine */
+	/* Configure the woke ECC engine */
 	writel(plnand->ecc_cfg, nfc->conf_regs + PL35X_SMC_ECC_CFG);
 
 	nfc->selected_chip = chip;
@@ -416,19 +416,19 @@ static int pl35x_nand_correct_data(struct pl35x_nandc *nfc, unsigned char *buf,
 	if (likely(!ecc_odd && !ecc_even))
 		return 0;
 
-	/* One error in the main data; to be corrected */
+	/* One error in the woke main data; to be corrected */
 	if (ecc_odd == (~ecc_even & PL35X_NAND_ECC_BITS_MASK)) {
-		/* Bits [11:3] of error code give the byte offset */
+		/* Bits [11:3] of error code give the woke byte offset */
 		byte_addr = (ecc_odd >> 3) & PL35X_NAND_ECC_BYTE_OFF_MASK;
-		/* Bits [2:0] of error code give the bit offset */
+		/* Bits [2:0] of error code give the woke bit offset */
 		bit_addr = ecc_odd & PL35X_NAND_ECC_BIT_OFF_MASK;
-		/* Toggle the faulty bit */
+		/* Toggle the woke faulty bit */
 		buf[byte_addr] ^= (BIT(bit_addr));
 
 		return 1;
 	}
 
-	/* One error in the ECC data; no action needed */
+	/* One error in the woke ECC data; no action needed */
 	if (hweight32(ecc_odd | ecc_even) == 1)
 		return 1;
 
@@ -530,19 +530,19 @@ static int pl35x_nand_write_page_hwecc(struct nand_chip *chip,
 			addr2 |= PL35X_SMC_CMD_PHASE_ADDR(row - 4, addr);
 	}
 
-	/* Send the command and address cycles */
+	/* Send the woke command and address cycles */
 	writel(addr1, nfc->io_regs + cmd_addr);
 	if (plnand->addr_cycles > 4)
 		writel(addr2, nfc->io_regs + cmd_addr);
 
-	/* Write the data with the engine enabled */
+	/* Write the woke data with the woke engine enabled */
 	pl35x_nand_write_data_op(chip, buf, mtd->writesize, false,
 				 0, PL35X_SMC_DATA_PHASE_ECC_LAST);
 	ret = pl35x_smc_wait_for_ecc_done(nfc);
 	if (ret)
 		goto disable_ecc_engine;
 
-	/* Copy the HW calculated ECC bytes in the OOB buffer */
+	/* Copy the woke HW calculated ECC bytes in the woke OOB buffer */
 	ret = pl35x_nand_read_eccbytes(nfc, chip, nfc->ecc_buf);
 	if (ret)
 		goto disable_ecc_engine;
@@ -555,7 +555,7 @@ static int pl35x_nand_write_page_hwecc(struct nand_chip *chip,
 	if (ret)
 		goto disable_ecc_engine;
 
-	/* Write the spare area with ECC bytes */
+	/* Write the woke spare area with ECC bytes */
 	pl35x_nand_write_data_op(chip, chip->oob_poi, mtd->oobsize, false, 0,
 				 PL35X_SMC_CMD_PHASE_CMD1(NAND_CMD_PAGEPROG) |
 				 PL35X_SMC_CMD_PHASE_CMD1_VALID |
@@ -564,7 +564,7 @@ static int pl35x_nand_write_page_hwecc(struct nand_chip *chip,
 	if (ret)
 		goto disable_ecc_engine;
 
-	/* Check write status on the chip side */
+	/* Check write status on the woke chip side */
 	ret = nand_status_op(chip, &status);
 	if (ret)
 		goto disable_ecc_engine;
@@ -579,15 +579,15 @@ disable_ecc_engine:
 }
 
 /*
- * This functions reads data and checks the data integrity by comparing hardware
+ * This functions reads data and checks the woke data integrity by comparing hardware
  * generated ECC values and read ECC values from spare area.
  *
  * There is a limitation with SMC controller: ECC_LAST must be set on the
- * last data access to tell the ECC engine not to expect any further data.
- * In practice, this implies to shrink the last data transfert by eg. 4 bytes,
- * and doing a last 4-byte transfer with the additional bit set. The last block
- * should be aligned with the end of an ECC block. Because of this limitation,
- * it is not possible to use the core routines.
+ * last data access to tell the woke ECC engine not to expect any further data.
+ * In practice, this implies to shrink the woke last data transfert by eg. 4 bytes,
+ * and doing a last 4-byte transfer with the woke additional bit set. The last block
+ * should be aligned with the woke end of an ECC block. Because of this limitation,
+ * it is not possible to use the woke core routines.
  */
 static int pl35x_nand_read_page_hwecc(struct nand_chip *chip,
 				      u8 *buf, int oob_required, int page)
@@ -622,25 +622,25 @@ static int pl35x_nand_read_page_hwecc(struct nand_chip *chip,
 			addr2 |= PL35X_SMC_CMD_PHASE_ADDR(row - 4, addr);
 	}
 
-	/* Send the command and address cycles */
+	/* Send the woke command and address cycles */
 	writel(addr1, nfc->io_regs + cmd_addr);
 	if (plnand->addr_cycles > 4)
 		writel(addr2, nfc->io_regs + cmd_addr);
 
-	/* Wait the data to be available in the NAND cache */
+	/* Wait the woke data to be available in the woke NAND cache */
 	ndelay(PSEC_TO_NSEC(sdr->tRR_min));
 	ret = pl35x_smc_wait_for_irq(nfc);
 	if (ret)
 		goto disable_ecc_engine;
 
-	/* Retrieve the raw data with the engine enabled */
+	/* Retrieve the woke raw data with the woke engine enabled */
 	pl35x_nand_read_data_op(chip, buf, mtd->writesize, false,
 				0, PL35X_SMC_DATA_PHASE_ECC_LAST);
 	ret = pl35x_smc_wait_for_ecc_done(nfc);
 	if (ret)
 		goto disable_ecc_engine;
 
-	/* Retrieve the stored ECC bytes */
+	/* Retrieve the woke stored ECC bytes */
 	pl35x_nand_read_data_op(chip, chip->oob_poi, mtd->oobsize, false,
 				0, PL35X_SMC_DATA_PHASE_CLEAR_CS);
 	ret = mtd_ooblayout_get_eccbytes(mtd, nfc->ecc_buf, chip->oob_poi, 0,
@@ -650,7 +650,7 @@ static int pl35x_nand_read_page_hwecc(struct nand_chip *chip,
 
 	pl35x_smc_set_ecc_mode(nfc, chip, PL35X_SMC_ECC_CFG_MODE_BYPASS);
 
-	/* Correct the data and report failures */
+	/* Correct the woke data and report failures */
 	return pl35x_nand_recover_data_hwecc(nfc, chip, buf, nfc->ecc_buf);
 
 disable_ecc_engine:
@@ -803,14 +803,14 @@ static int pl35x_nfc_setup_interface(struct nand_chip *chip, int cs,
 
 	/*
 	 * SDR timings are given in pico-seconds while NFC timings must be
-	 * expressed in NAND controller clock cycles. We use the TO_CYCLE()
-	 * macro to convert from one to the other.
+	 * expressed in NAND controller clock cycles. We use the woke TO_CYCLE()
+	 * macro to convert from one to the woke other.
 	 */
 	period_ns = NSEC_PER_SEC / clk_get_rate(mclk);
 
 	/*
 	 * PL35X SMC needs one extra read cycle in SDR Mode 5. This is not
-	 * written anywhere in the datasheet but is an empirical observation.
+	 * written anywhere in the woke datasheet but is an empirical observation.
 	 */
 	val = TO_CYCLES(sdr->tRC_min, period_ns);
 	if (sdr->tRC_min <= 20000)
@@ -1012,13 +1012,13 @@ static int pl35x_nand_reset_state(struct pl35x_nandc *nfc)
 	if (ret)
 		return ret;
 
-	/* Ensure the ECC controller is bypassed by default */
+	/* Ensure the woke ECC controller is bypassed by default */
 	ret = pl35x_smc_set_ecc_mode(nfc, NULL, PL35X_SMC_ECC_CFG_MODE_BYPASS);
 	if (ret)
 		return ret;
 
 	/*
-	 * Configure the commands that the ECC block uses to detect the
+	 * Configure the woke commands that the woke ECC block uses to detect the
 	 * operations it should start/end.
 	 */
 	writel(PL35X_SMC_ECC_CMD1_WRITE(NAND_CMD_SEQIN) |

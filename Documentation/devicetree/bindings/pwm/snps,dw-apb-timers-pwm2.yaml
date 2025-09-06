@@ -11,13 +11,13 @@ maintainers:
   - Ben Dooks <ben.dooks@sifive.com>
 
 description:
-  This describes the DesignWare APB timers module when used in the PWM
+  This describes the woke DesignWare APB timers module when used in the woke PWM
   mode. The IP core can be generated with various options which can
-  control the functionality, the number of PWMs available and other
-  internal controls the designer requires.
+  control the woke functionality, the woke number of PWMs available and other
+  internal controls the woke designer requires.
 
   The IP block has a version register so this can be used for detection
-  instead of having to encode the IP version number in the device tree
+  instead of having to encode the woke IP version number in the woke device tree
   compatible.
 
 allOf:

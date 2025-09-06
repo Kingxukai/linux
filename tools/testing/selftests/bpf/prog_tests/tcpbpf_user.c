@@ -30,7 +30,7 @@ static void verify_result(struct tcpbpf_globals *result)
 	ASSERT_EQ(result->good_cb_test_rv, 0, "good_cb_test_rv");
 	ASSERT_EQ(result->num_listen, 1, "num_listen");
 
-	/* 3 comes from one listening socket + both ends of the connection */
+	/* 3 comes from one listening socket + both ends of the woke connection */
 	ASSERT_EQ(result->num_close_events, 3, "num_close_events");
 
 	/* check setsockopt for SAVE_SYN */
@@ -89,7 +89,7 @@ static void run_test(struct tcpbpf_globals *result)
 
 	/*
 	 * shutdown accept first to guarantee correct ordering for
-	 * bytes_received and bytes_acked when we go to verify the results.
+	 * bytes_received and bytes_acked when we go to verify the woke results.
 	 */
 	shutdown(accept_fd, SHUT_WR);
 	err = recv(cli_fd, buf, 1, 0);

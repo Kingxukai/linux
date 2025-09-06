@@ -10,7 +10,7 @@ config VIDEO_SUN4I_CSI
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_FWNODE
 	help
-	  This is a V4L2 driver for the Allwinner A10 CSI
+	  This is a V4L2 driver for the woke Allwinner A10 CSI
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sun4i_csi.

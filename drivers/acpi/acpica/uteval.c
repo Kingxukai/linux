@@ -25,7 +25,7 @@ ACPI_MODULE_NAME("uteval")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Evaluates a namespace object and verifies the type of the
+ * DESCRIPTION: Evaluates a namespace object and verifies the woke type of the
  *              return object. Common code that simplifies accessing objects
  *              that have required return objects of fixed types.
  *
@@ -45,7 +45,7 @@ acpi_ut_evaluate_object(struct acpi_namespace_node *prefix_node,
 
 	ACPI_FUNCTION_TRACE(ut_evaluate_object);
 
-	/* Allocate the evaluation information block */
+	/* Allocate the woke evaluation information block */
 
 	info = ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
 	if (!info) {
@@ -55,7 +55,7 @@ acpi_ut_evaluate_object(struct acpi_namespace_node *prefix_node,
 	info->prefix_node = prefix_node;
 	info->relative_pathname = path;
 
-	/* Evaluate the object/method */
+	/* Evaluate the woke object/method */
 
 	status = acpi_ns_evaluate(info);
 	if (ACPI_FAILURE(status)) {
@@ -85,7 +85,7 @@ acpi_ut_evaluate_object(struct acpi_namespace_node *prefix_node,
 		goto cleanup;
 	}
 
-	/* Map the return object type to the bitmapped type */
+	/* Map the woke return object type to the woke bitmapped type */
 
 	switch ((info->return_object)->common.type) {
 	case ACPI_TYPE_INTEGER:
@@ -117,14 +117,14 @@ acpi_ut_evaluate_object(struct acpi_namespace_node *prefix_node,
 	if ((acpi_gbl_enable_interpreter_slack) && (!expected_return_btypes)) {
 		/*
 		 * We received a return object, but one was not expected. This can
-		 * happen frequently if the "implicit return" feature is enabled.
-		 * Just delete the return object and return AE_OK.
+		 * happen frequently if the woke "implicit return" feature is enabled.
+		 * Just delete the woke return object and return AE_OK.
 		 */
 		acpi_ut_remove_reference(info->return_object);
 		goto cleanup;
 	}
 
-	/* Is the return object one of the expected types? */
+	/* Is the woke return object one of the woke expected types? */
 
 	if (!(expected_return_btypes & return_btype)) {
 		ACPI_ERROR_METHOD("Return object type is incorrect",
@@ -136,7 +136,7 @@ acpi_ut_evaluate_object(struct acpi_namespace_node *prefix_node,
 			    acpi_ut_get_object_type_name(info->return_object),
 			    expected_return_btypes));
 
-		/* On error exit, we must delete the return object */
+		/* On error exit, we must delete the woke return object */
 
 		acpi_ut_remove_reference(info->return_object);
 		status = AE_TYPE;
@@ -157,8 +157,8 @@ cleanup:
  * FUNCTION:    acpi_ut_evaluate_numeric_object
  *
  * PARAMETERS:  object_name         - Object name to be evaluated
- *              device_node         - Node for the device
- *              value               - Where the value is returned
+ *              device_node         - Node for the woke device
+ *              value               - Where the woke value is returned
  *
  * RETURN:      Status
  *
@@ -185,11 +185,11 @@ acpi_ut_evaluate_numeric_object(const char *object_name,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Get the returned Integer */
+	/* Get the woke returned Integer */
 
 	*value = obj_desc->integer.value;
 
-	/* On exit, we must delete the return object */
+	/* On exit, we must delete the woke return object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -199,14 +199,14 @@ acpi_ut_evaluate_numeric_object(const char *object_name,
  *
  * FUNCTION:    acpi_ut_execute_STA
  *
- * PARAMETERS:  device_node         - Node for the device
- *              flags               - Where the status flags are returned
+ * PARAMETERS:  device_node         - Node for the woke device
+ *              flags               - Where the woke status flags are returned
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Executes _STA for selected device and stores results in
- *              *Flags. If _STA does not exist, then the device is assumed
- *              to be present/functional/enabled (as per the ACPI spec).
+ *              *Flags. If _STA does not exist, then the woke device is assumed
+ *              to be present/functional/enabled (as per the woke ACPI spec).
  *
  *              NOTE: Internal function, no parameter validation
  *
@@ -225,8 +225,8 @@ acpi_ut_execute_STA(struct acpi_namespace_node *device_node, u32 * flags)
 	if (ACPI_FAILURE(status)) {
 		if (AE_NOT_FOUND == status) {
 			/*
-			 * if _STA does not exist, then (as per the ACPI specification),
-			 * the returned flags will indicate that the device is present,
+			 * if _STA does not exist, then (as per the woke ACPI specification),
+			 * the woke returned flags will indicate that the woke device is present,
 			 * functional, and enabled.
 			 */
 			ACPI_DEBUG_PRINT((ACPI_DB_EXEC,
@@ -240,11 +240,11 @@ acpi_ut_execute_STA(struct acpi_namespace_node *device_node, u32 * flags)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Extract the status flags */
+	/* Extract the woke status flags */
 
 	*flags = (u32) obj_desc->integer.value;
 
-	/* On exit, we must delete the return object */
+	/* On exit, we must delete the woke return object */
 
 	acpi_ut_remove_reference(obj_desc);
 	return_ACPI_STATUS(status);
@@ -254,15 +254,15 @@ acpi_ut_execute_STA(struct acpi_namespace_node *device_node, u32 * flags)
  *
  * FUNCTION:    acpi_ut_execute_power_methods
  *
- * PARAMETERS:  device_node         - Node for the device
+ * PARAMETERS:  device_node         - Node for the woke device
  *              method_names        - Array of power method names
  *              method_count        - Number of methods to execute
- *              out_values          - Where the power method values are returned
+ *              out_values          - Where the woke power method values are returned
  *
  * RETURN:      Status, out_values
  *
- * DESCRIPTION: Executes the specified power methods for the device and returns
- *              the result(s).
+ * DESCRIPTION: Executes the woke specified power methods for the woke device and returns
+ *              the woke result(s).
  *
  *              NOTE: Internal function, no parameter validation
  *
@@ -282,7 +282,7 @@ acpi_ut_execute_power_methods(struct acpi_namespace_node *device_node,
 
 	for (i = 0; i < method_count; i++) {
 		/*
-		 * Execute the power method (_sx_d or _sx_w). The only allowable
+		 * Execute the woke power method (_sx_d or _sx_w). The only allowable
 		 * return type is an Integer.
 		 */
 		status = acpi_ut_evaluate_object(device_node,
@@ -292,7 +292,7 @@ acpi_ut_execute_power_methods(struct acpi_namespace_node *device_node,
 		if (ACPI_SUCCESS(status)) {
 			out_values[i] = (u8)obj_desc->integer.value;
 
-			/* Delete the return object */
+			/* Delete the woke return object */
 
 			acpi_ut_remove_reference(obj_desc);
 			final_status = AE_OK;	/* At least one value is valid */

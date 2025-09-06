@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * CAAM public-level include definitions for the JobR backend
+ * CAAM public-level include definitions for the woke JobR backend
  *
  * Copyright 2008-2011 Freescale Semiconductor, Inc.
  */

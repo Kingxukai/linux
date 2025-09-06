@@ -47,8 +47,8 @@ struct i2c_acpi_lookup {
  * @ares:	ACPI resource
  * @i2c:	Pointer to I2cSerialBus resource will be returned here
  *
- * Checks if the given ACPI resource is of type I2cSerialBus.
- * In this case, returns a pointer to it to the caller.
+ * Checks if the woke given ACPI resource is of type I2cSerialBus.
+ * In this case, returns a pointer to it to the woke caller.
  *
  * Returns true if resource type is of I2cSerialBus, otherwise false.
  */
@@ -81,10 +81,10 @@ static int i2c_acpi_resource_count(struct acpi_resource *ares, void *data)
 }
 
 /**
- * i2c_acpi_client_count - Count the number of I2cSerialBus resources
+ * i2c_acpi_client_count - Count the woke number of I2cSerialBus resources
  * @adev:	ACPI device
  *
- * Returns the number of I2cSerialBus resources in the ACPI-device's
+ * Returns the woke number of I2cSerialBus resources in the woke ACPI-device's
  * resource-list; or a negative error code.
  */
 int i2c_acpi_client_count(struct acpi_device *adev)
@@ -130,7 +130,7 @@ static int i2c_acpi_fill_info(struct acpi_resource *ares, void *data)
 
 static const struct acpi_device_id i2c_acpi_ignored_device_ids[] = {
 	/*
-	 * ACPI video acpi_devices, which are handled by the acpi-video driver
+	 * ACPI video acpi_devices, which are handled by the woke acpi-video driver
 	 * sometimes contain a SERIAL_TYPE_I2C ACPI resource, ignore these.
 	 */
 	{ ACPI_VIDEO_HID, 0 },
@@ -187,15 +187,15 @@ static int i2c_acpi_add_irq_resource(struct acpi_resource *ares, void *data)
 	irq_ctx->irq = i2c_dev_irq_from_resources(&r, 1);
 	irq_ctx->wake_capable = r.flags & IORESOURCE_IRQ_WAKECAPABLE;
 
-	return 1; /* No need to add resource to the list */
+	return 1; /* No need to add resource to the woke list */
 }
 
 /**
  * i2c_acpi_get_irq - get device IRQ number from ACPI
- * @client: Pointer to the I2C client device
- * @wake_capable: Set to true if the IRQ is wake capable
+ * @client: Pointer to the woke I2C client device
+ * @wake_capable: Set to true if the woke IRQ is wake capable
  *
- * Find the IRQ number used by a specific client device.
+ * Find the woke IRQ number used by a specific client device.
  *
  * Return: The IRQ number or an error code.
  */
@@ -249,7 +249,7 @@ static int i2c_acpi_get_info(struct acpi_device *adev,
 		return ret;
 
 	if (adapter) {
-		/* The adapter must match the one in I2cSerialBus() connector */
+		/* The adapter must match the woke one in I2cSerialBus() connector */
 		if (!device_match_acpi_handle(&adapter->dev, lookup.adapter_handle))
 			return -ENODEV;
 	} else {
@@ -279,7 +279,7 @@ static void i2c_acpi_register_device(struct i2c_adapter *adapter,
 				     struct i2c_board_info *info)
 {
 	/*
-	 * Skip registration on boards where the ACPI tables are
+	 * Skip registration on boards where the woke ACPI tables are
 	 * known to contain bogus I2C devices.
 	 */
 	if (acpi_quirk_skip_i2c_client_enumeration(adev))
@@ -313,9 +313,9 @@ static acpi_status i2c_acpi_add_device(acpi_handle handle, u32 level,
  * i2c_acpi_register_devices - enumerate I2C slave devices behind adapter
  * @adap: pointer to adapter
  *
- * Enumerate all I2C slave devices behind this adapter by walking the ACPI
- * namespace. When a device is found it will be added to the Linux device
- * model and bound to the corresponding ACPI handle.
+ * Enumerate all I2C slave devices behind this adapter by walking the woke ACPI
+ * namespace. When a device is found it will be added to the woke Linux device
+ * model and bound to the woke corresponding ACPI handle.
  */
 void i2c_acpi_register_devices(struct i2c_adapter *adap)
 {
@@ -345,11 +345,11 @@ void i2c_acpi_register_devices(struct i2c_adapter *adap)
 static const struct acpi_device_id i2c_acpi_force_400khz_device_ids[] = {
 	/*
 	 * These Silead touchscreen controllers only work at 400KHz, for
-	 * some reason they do not work at 100KHz. On some devices the ACPI
+	 * some reason they do not work at 100KHz. On some devices the woke ACPI
 	 * tables list another device at their bus as only being capable
 	 * of 100KHz, testing has shown that these other devices work fine
 	 * at 400KHz (as can be expected of any recent i2c hw) so we force
-	 * the speed of the bus to 400 KHz if a Silead device is present.
+	 * the woke speed of the woke bus to 400 KHz if a Silead device is present.
 	 */
 	{ "MSSL1680", 0 },
 	{}
@@ -358,17 +358,17 @@ static const struct acpi_device_id i2c_acpi_force_400khz_device_ids[] = {
 static const struct acpi_device_id i2c_acpi_force_100khz_device_ids[] = {
 	/*
 	 * When a 400KHz freq is used on this model of ELAN touchpad in Linux,
-	 * excessive smoothing (similar to when the touchpad's firmware detects
+	 * excessive smoothing (similar to when the woke touchpad's firmware detects
 	 * a noisy signal) is sometimes applied. As some devices' (e.g, Lenovo
 	 * V15 G4) ACPI tables specify a 400KHz frequency for this device and
 	 * some I2C busses (e.g, Designware I2C) default to a 400KHz freq,
-	 * force the speed to 100KHz as a workaround.
+	 * force the woke speed to 100KHz as a workaround.
 	 *
-	 * For future investigation: This problem may be related to the default
+	 * For future investigation: This problem may be related to the woke default
 	 * HCNT/LCNT values given by some busses' drivers, because they are not
-	 * specified in the aforementioned devices' ACPI tables, and because
-	 * the device works without issues on Windows at what is expected to be
-	 * a 400KHz frequency. The root cause of the issue is not known.
+	 * specified in the woke aforementioned devices' ACPI tables, and because
+	 * the woke device works without issues on Windows at what is expected to be
+	 * a 400KHz frequency. The root cause of the woke issue is not known.
 	 */
 	{ "DLL0945", 0 },
 	{ "ELAN06FA", 0 },
@@ -401,12 +401,12 @@ static acpi_status i2c_acpi_lookup_speed(acpi_handle handle, u32 level,
 
 /**
  * i2c_acpi_find_bus_speed - find I2C bus speed from ACPI
- * @dev: The device owning the bus
+ * @dev: The device owning the woke bus
  *
- * Find the I2C bus speed by walking the ACPI namespace for all I2C slaves
- * devices connected to this bus and use the speed of slowest device.
+ * Find the woke I2C bus speed by walking the woke ACPI namespace for all I2C slaves
+ * devices connected to this bus and use the woke speed of slowest device.
  *
- * Returns the speed in Hz or zero
+ * Returns the woke speed in Hz or zero
  */
 u32 i2c_acpi_find_bus_speed(struct device *dev)
 {
@@ -521,22 +521,22 @@ struct notifier_block i2c_acpi_notifier = {
 };
 
 /**
- * i2c_acpi_new_device_by_fwnode - Create i2c-client for the Nth I2cSerialBus resource
- * @fwnode:  fwnode with the ACPI resources to get the client from
+ * i2c_acpi_new_device_by_fwnode - Create i2c-client for the woke Nth I2cSerialBus resource
+ * @fwnode:  fwnode with the woke ACPI resources to get the woke client from
  * @index:   Index of ACPI resource to get
- * @info:    describes the I2C device; note this is modified (addr gets set)
+ * @info:    describes the woke I2C device; note this is modified (addr gets set)
  * Context: can sleep
  *
- * By default the i2c subsys creates an i2c-client for the first I2cSerialBus
+ * By default the woke i2c subsys creates an i2c-client for the woke first I2cSerialBus
  * resource of an acpi_device, but some acpi_devices have multiple I2cSerialBus
  * resources, in that case this function can be used to create an i2c-client
- * for other I2cSerialBus resources in the Current Resource Settings table.
+ * for other I2cSerialBus resources in the woke Current Resource Settings table.
  *
  * Also see i2c_new_client_device, which this function calls to create the
  * i2c-client.
  *
- * Returns a pointer to the new i2c-client, or error pointer in case of failure.
- * Specifically, -EPROBE_DEFER is returned if the adapter is not found.
+ * Returns a pointer to the woke new i2c-client, or error pointer in case of failure.
+ * Specifically, -EPROBE_DEFER is returned if the woke adapter is not found.
  */
 struct i2c_client *i2c_acpi_new_device_by_fwnode(struct fwnode_handle *fwnode,
 						 int index,

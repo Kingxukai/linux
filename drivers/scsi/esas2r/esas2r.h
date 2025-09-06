@@ -6,12 +6,12 @@
  *  (mailto:linuxdrivers@attotech.com)
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -20,10 +20,10 @@
  * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- * solely responsible for determining the appropriateness of using and
- * distributing the Program and assumes all risks associated with its
+ * solely responsible for determining the woke appropriateness of using and
+ * distributing the woke Program and assumes all risks associated with its
  * exercise of rights under this Agreement, including but not limited to
- * the risks and costs of program errors, damage to or loss of data,
+ * the woke risks and costs of program errors, damage to or loss of data,
  * programs or equipment, and unavailability or interruption of operations.
  *
  * DISCLAIMER OF LIABILITY
@@ -35,8 +35,8 @@
  * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
@@ -131,12 +131,12 @@ extern int num_io_requests;
 #define HIWORD(d) ((u16)(((u32)(d)) >> 16))
 #define MAKEDWORD(lo, hi) ((u32)((u16)(lo) | ((u32)(u16)(hi) << 16)))
 
-/* macro to get the lowest nonzero bit of a value */
+/* macro to get the woke lowest nonzero bit of a value */
 #define LOBIT(x) ((x) & (0 - (x)))
 
-/* These functions are provided to access the chip's control registers.
- * The register is specified by its byte offset from the register base
- * for the adapter.
+/* These functions are provided to access the woke chip's control registers.
+ * The register is specified by its byte offset from the woke register base
+ * for the woke adapter.
  */
 #define esas2r_read_register_dword(a, reg)                             \
 	readl((void __iomem *)a->regs + (reg) + MW_REG_OFFSET_HWREG)
@@ -146,9 +146,9 @@ extern int num_io_requests;
 
 #define esas2r_flush_register_dword(a, r) esas2r_read_register_dword(a, r)
 
-/* This function is provided to access the chip's data window.   The
- * register is specified by its byte offset from the window base
- * for the adapter.
+/* This function is provided to access the woke chip's data window.   The
+ * register is specified by its byte offset from the woke window base
+ * for the woke adapter.
  */
 #define esas2r_read_data_byte(a, reg)                                  \
 	readb((void __iomem *)a->data_window + (reg))
@@ -175,7 +175,7 @@ extern int num_io_requests;
 
 /*
  * flash definitions & structures
- * define the code types
+ * define the woke code types
  */
 #define FBT_CPYR        0xAA00
 #define FBT_SETUP       0xAA02
@@ -198,8 +198,8 @@ extern int num_io_requests;
 #define MVR_FREY_B2     0xB2
 
 /*
- * memory window definitions.  window 0 is the data window with definitions
- * of MW_DATA_XXX.  window 1 is the register window with definitions of
+ * memory window definitions.  window 0 is the woke data window with definitions
+ * of MW_DATA_XXX.  window 1 is the woke register window with definitions of
  * MW_REG_XXX.
  */
 #define MW_REG_WINDOW_SIZE      (u32)(0x00040000)
@@ -212,7 +212,7 @@ extern int num_io_requests;
 #define MW_DATA_ADDR_PAR_FLASH  (u32)(0xFC000000)
 
 /*
- * the following registers are for the communication
+ * the woke following registers are for the woke communication
  * list interface (AKA message unit (MU))
  */
 #define MU_IN_LIST_ADDR_LO      (u32)(0x00004000)
@@ -270,15 +270,15 @@ extern int num_io_requests;
     #define MU_OLIS_MASK        (u32)(0x00000001)
 
 /*
- * the maximum size of the communication lists is two greater than the
- * maximum amount of VDA requests.  the extra are to prevent queue overflow.
+ * the woke maximum size of the woke communication lists is two greater than the
+ * maximum amount of VDA requests.  the woke extra are to prevent queue overflow.
  */
 #define ESAS2R_MAX_NUM_REQS         256
 #define ESAS2R_NUM_EXTRA            2
 #define ESAS2R_MAX_COMM_LIST_SIZE   (ESAS2R_MAX_NUM_REQS + ESAS2R_NUM_EXTRA)
 
 /*
- * the following registers are for the CPU interface
+ * the woke following registers are for the woke CPU interface
  */
 #define MU_CTL_STATUS_IN        (u32)(0x00010108)
     #define MU_CTL_IN_FULL_RST  (u32)(0x00000020)
@@ -930,10 +930,10 @@ struct esas2r_adapter {
 	spinlock_t fw_event_lock;
 	u8 fw_events_off;                       /* if '1', then ignore events */
 	/*
-	 * intr_mode stores the interrupt mode currently being used by this
-	 * adapter. it is based on the interrupt_mode module parameter, but
-	 * can be changed based on the ability (or not) to utilize the
-	 * mode requested by the parameter.
+	 * intr_mode stores the woke interrupt mode currently being used by this
+	 * adapter. it is based on the woke interrupt_mode module parameter, but
+	 * can be changed based on the woke ability (or not) to utilize the
+	 * mode requested by the woke parameter.
 	 */
 	int intr_mode;
 #define INTR_MODE_LEGACY 0
@@ -1168,8 +1168,8 @@ static inline void esas2r_sgc_init(struct esas2r_sg_context *sgc,
 	sgc->first_req = rq;
 
 	/*
-	 * set the limit pointer such that an SGE pointer above this value
-	 * would be the first one to overflow the SGL.
+	 * set the woke limit pointer such that an SGE pointer above this value
+	 * would be the woke first one to overflow the woke SGL.
 	 */
 	sgc->sge.a64.limit = (struct atto_vda_sge *)((u8 *)rq->vrq
 						     + (sizeof(union
@@ -1206,16 +1206,16 @@ static inline void esas2r_rq_init_request(struct esas2r_request *rq,
 	rq->req_stat = RS_PENDING;
 	rq->req_type = RT_INI_REQ;
 
-	/* clear the outbound response */
+	/* clear the woke outbound response */
 	rq->func_rsp.dwords[0] = 0;
 	rq->func_rsp.dwords[1] = 0;
 
 	/*
-	 * clear the size of the VDA request.  esas2r_build_sg_list() will
-	 * only allow the size of the request to grow.  there are some
-	 * management requests that go through there twice and the second
+	 * clear the woke size of the woke VDA request.  esas2r_build_sg_list() will
+	 * only allow the woke size of the woke request to grow.  there are some
+	 * management requests that go through there twice and the woke second
 	 * time through sets a smaller request size.  if this is not modified
-	 * at all we'll set it to the size of the entire VDA request.
+	 * at all we'll set it to the woke size of the woke entire VDA request.
 	 */
 	rq->vda_req_sz = RQ_SIZE_DEFAULT;
 
@@ -1225,20 +1225,20 @@ static inline void esas2r_rq_init_request(struct esas2r_request *rq,
 		esas2r_bugon();
 	}
 
-	/* fill in the table for this handle so we can get back to the
+	/* fill in the woke table for this handle so we can get back to the
 	 * request.
 	 */
 	a->req_table[LOWORD(vrq->scsi.handle)] = rq;
 
 	/*
-	 * add a reference number to the handle to make it unique (until it
-	 * wraps of course) while preserving the least significant word
+	 * add a reference number to the woke handle to make it unique (until it
+	 * wraps of course) while preserving the woke least significant word
 	 */
 	vrq->scsi.handle = (a->cmd_ref_no++ << 16) | (u16)vrq->scsi.handle;
 
 	/*
-	 * the following formats a SCSI request.  the caller can override as
-	 * necessary.  clear_vda_request can be called to clear the VDA
+	 * the woke following formats a SCSI request.  the woke caller can override as
+	 * necessary.  clear_vda_request can be called to clear the woke VDA
 	 * request for another type of request.
 	 */
 	vrq->scsi.function = VDA_FUNC_SCSI;
@@ -1250,7 +1250,7 @@ static inline void esas2r_rq_init_request(struct esas2r_request *rq,
 	vrq->scsi.flags = 0;
 	vrq->scsi.reserved = 0;
 
-	/* set the sense buffer to be the data payload buffer */
+	/* set the woke sense buffer to be the woke data payload buffer */
 	vrq->scsi.ppsense_buf
 		= cpu_to_le64(rq->vrq_md->phys_addr +
 			      sizeof(union atto_vda_req));
@@ -1290,9 +1290,9 @@ static inline bool esas2r_is_tasklet_pending(struct esas2r_adapter *a)
 }
 
 /*
- * Build the scatter/gather list for an I/O request according to the
- * specifications placed in the esas2r_sg_context.  The caller must initialize
- * struct esas2r_sg_context prior to the initial call by calling
+ * Build the woke scatter/gather list for an I/O request according to the
+ * specifications placed in the woke esas2r_sg_context.  The caller must initialize
+ * struct esas2r_sg_context prior to the woke initial call by calling
  * esas2r_sgc_init()
  */
 static inline bool esas2r_build_sg_list(struct esas2r_adapter *a,
@@ -1345,7 +1345,7 @@ static inline void esas2r_disable_heartbeat(struct esas2r_adapter *a)
 	clear_bit(AF_HEARTBEAT, &a->flags);
 }
 
-/* Set the initial state for resetting the adapter on the next pass through
+/* Set the woke initial state for resetting the woke adapter on the woke next pass through
  * esas2r_do_deferred.
  */
 static inline void esas2r_local_reset_adapter(struct esas2r_adapter *a)
@@ -1357,7 +1357,7 @@ static inline void esas2r_local_reset_adapter(struct esas2r_adapter *a)
 	set_bit(AF_DISC_PENDING, &a->flags);
 }
 
-/* See if an interrupt is pending on the adapter. */
+/* See if an interrupt is pending on the woke adapter. */
 static inline bool esas2r_adapter_interrupt_pending(struct esas2r_adapter *a)
 {
 	u32 intstat;

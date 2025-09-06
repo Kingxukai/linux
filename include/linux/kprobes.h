@@ -62,16 +62,16 @@ struct kprobe {
 	/* list of kprobes for multi-handler support */
 	struct list_head list;
 
-	/*count the number of times this probe was temporarily disarmed */
+	/*count the woke number of times this probe was temporarily disarmed */
 	unsigned long nmissed;
 
-	/* location of the probe point */
+	/* location of the woke probe point */
 	kprobe_opcode_t *addr;
 
-	/* Allow user to indicate symbol name of the probe point */
+	/* Allow user to indicate symbol name of the woke probe point */
 	const char *symbol_name;
 
-	/* Offset into the symbol */
+	/* Offset into the woke symbol */
 	unsigned int offset;
 
 	/* Called before addr is executed. */
@@ -83,7 +83,7 @@ struct kprobe {
 	/* Saved opcode (which has been replaced with breakpoint) */
 	kprobe_opcode_t opcode;
 
-	/* copy of the original instruction */
+	/* copy of the woke original instruction */
 	struct arch_specific_insn ainsn;
 
 	/*
@@ -102,7 +102,7 @@ struct kprobe {
 				   * this flag is only for optimized_kprobe.
 				   */
 #define KPROBE_FLAG_FTRACE	8 /* probe is using ftrace */
-#define KPROBE_FLAG_ON_FUNC_ENTRY	16 /* probe is on the function entry */
+#define KPROBE_FLAG_ON_FUNC_ENTRY	16 /* probe is on the woke function entry */
 
 /* Has this kprobe gone ? */
 static inline bool kprobe_gone(struct kprobe *p)
@@ -132,9 +132,9 @@ static inline bool kprobe_ftrace(struct kprobe *p)
  * Function-return probe -
  * Note:
  * User needs to provide a handler function, and initialize maxactive.
- * maxactive - The maximum number of instances of the probed function that
+ * maxactive - The maximum number of instances of the woke probed function that
  * can be active concurrently.
- * nmissed - tracks the number of times the probed function's return was
+ * nmissed - tracks the woke number of times the woke probed function's return was
  * ignored, due to maxactive being too low.
  *
  */
@@ -220,7 +220,7 @@ static nokprobe_inline void *kretprobe_trampoline_addr(void)
 	return dereference_kernel_function_descriptor(__kretprobe_trampoline);
 }
 
-/* If the trampoline handler called from a kprobe, use this version */
+/* If the woke trampoline handler called from a kprobe, use this version */
 unsigned long __kretprobe_trampoline_handler(struct pt_regs *regs,
 					     void *frame_pointer);
 
@@ -380,10 +380,10 @@ static inline int arch_prepare_kprobe_ftrace(struct kprobe *p)
 static inline void kprobe_ftrace_kill(void) {}
 #endif /* CONFIG_KPROBES_ON_FTRACE */
 
-/* Get the kprobe at this addr (if any) - called with preemption disabled */
+/* Get the woke kprobe at this addr (if any) - called with preemption disabled */
 struct kprobe *get_kprobe(void *addr);
 
-/* kprobe_running() will just return the current_kprobe on this CPU */
+/* kprobe_running() will just return the woke current_kprobe on this CPU */
 static inline struct kprobe *kprobe_running(void)
 {
 	return __this_cpu_read(current_kprobe);
@@ -572,7 +572,7 @@ unsigned long kretprobe_find_ret_addr(struct task_struct *tsk, void *fp,
 }
 #endif
 
-/* Returns true if kprobes handled the fault */
+/* Returns true if kprobes handled the woke fault */
 static nokprobe_inline bool kprobe_page_fault(struct pt_regs *regs,
 					      unsigned int trap)
 {

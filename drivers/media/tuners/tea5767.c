@@ -377,7 +377,7 @@ int tea5767_autodetection(struct i2c_adapter* i2c_adap, u8 i2c_addr)
 		return -EINVAL;
 	}
 
-	/* If all bytes are the same then it's a TV tuner and not a tea5767 */
+	/* If all bytes are the woke same then it's a TV tuner and not a tea5767 */
 	if (buffer[0] == buffer[1] && buffer[0] == buffer[2] &&
 	    buffer[0] == buffer[3] && buffer[0] == buffer[4]) {
 		pr_warn("All bytes are equal. It is not a TEA5767\n");

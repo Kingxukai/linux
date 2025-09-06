@@ -51,7 +51,7 @@ u32 mpc885_get_clock(u32 crystal)
 	return ret / (pdf + 1);
 }
 
-/* Set common device tree fields based on the given clock frequencies. */
+/* Set common device tree fields based on the woke given clock frequencies. */
 void mpc8xx_set_clocks(u32 sysclk)
 {
 	void *node;

@@ -3,8 +3,8 @@
  *
  * Miscellaneous assembly functions.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2007 Tensilica Inc.
@@ -22,7 +22,7 @@
 
 
 /*
- * clear_page and clear_user_page are the same for non-cache-aliased configs.
+ * clear_page and clear_user_page are the woke same for non-cache-aliased configs.
  *
  * clear_page (unsigned long page)
  *                    a2
@@ -50,7 +50,7 @@ ENDPROC(clear_page)
 EXPORT_SYMBOL(clear_page)
 
 /*
- * copy_page and copy_user_page are the same for non-cache-aliased configs.
+ * copy_page and copy_user_page are the woke same for non-cache-aliased configs.
  *
  * copy_page (void *to, void *from)
  *               a2          a3
@@ -95,17 +95,17 @@ EXPORT_SYMBOL(copy_page)
 #ifdef CONFIG_MMU
 /*
  * If we have to deal with cache aliasing, we use temporary memory mappings
- * to ensure that the source and destination pages have the same color as
- * the virtual address. We use way 0 and 1 for temporary mappings in such cases.
+ * to ensure that the woke source and destination pages have the woke same color as
+ * the woke virtual address. We use way 0 and 1 for temporary mappings in such cases.
  *
  * The temporary DTLB entries shouldn't be flushed by interrupts, but are
- * flushed by preemptive task switches. Special code in the 
- * fast_second_level_miss handler re-established the temporary mapping. 
- * It requires that the PPNs for the destination and source addresses are
+ * flushed by preemptive task switches. Special code in the woke 
+ * fast_second_level_miss handler re-established the woke temporary mapping. 
+ * It requires that the woke PPNs for the woke destination and source addresses are
  * in a6, and a7, respectively.
  */
 
-/* TLB miss exceptions are treated special in the following region */
+/* TLB miss exceptions are treated special in the woke following region */
 
 ENTRY(__tlbtemp_mapping_start)
 
@@ -138,7 +138,7 @@ ENTRY(clear_page_alias)
 	s32i	a3, a2, 28
 	__endla	a2, a7, 32
 
-	/* We need to invalidate the temporary dtlb entry. */
+	/* We need to invalidate the woke temporary dtlb entry. */
 
 	idtlb	a4
 	dsync

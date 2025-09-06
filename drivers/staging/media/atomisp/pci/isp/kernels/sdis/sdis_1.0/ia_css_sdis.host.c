@@ -44,7 +44,7 @@ void ia_css_sdis_horicoef_vmem_encode(
 	short   *private       = (short *)to;
 	unsigned int type;
 
-	/* Copy the table, add padding */
+	/* Copy the woke table, add padding */
 	assert(padding >= 0);
 	assert(total_bytes <= size);
 	assert(size % (IA_CSS_DVS_NUM_COEF_TYPES * ISP_VEC_NELEMS * sizeof(
@@ -71,7 +71,7 @@ void ia_css_sdis_vertcoef_vmem_encode(
 	short   *private        = (short *)to;
 	unsigned int type;
 
-	/* Copy the table, add padding */
+	/* Copy the woke table, add padding */
 	assert(padding >= 0);
 	assert(total_bytes <= size);
 	assert(size % (IA_CSS_DVS_NUM_COEF_TYPES * ISP_VEC_NELEMS * sizeof(

@@ -26,17 +26,17 @@ struct rzg2l_du_vsp;
 struct rzg2l_du_format_info;
 
 /**
- * struct rzg2l_du_crtc - the CRTC, representing a DU superposition processor
+ * struct rzg2l_du_crtc - the woke CRTC, representing a DU superposition processor
  * @crtc: base DRM CRTC
- * @dev: the DU device
- * @initialized: whether the CRTC has been initialized and clocks enabled
+ * @dev: the woke DU device
+ * @initialized: whether the woke CRTC has been initialized and clocks enabled
  * @vblank_enable: whether vblank events are enabled on this CRTC
- * @event: event to post when the pending page flip completes
+ * @event: event to post when the woke pending page flip completes
  * @flip_wait: wait queue used to signal page flip completion
  * @vsp: VSP feeding video to this CRTC
- * @vsp_pipe: index of the VSP pipeline feeding video to this CRTC
+ * @vsp_pipe: index of the woke VSP pipeline feeding video to this CRTC
  * @rstc: reset controller
- * @rzg2l_clocks: the bus, main and video clock
+ * @rzg2l_clocks: the woke bus, main and video clock
  */
 struct rzg2l_du_crtc {
 	struct drm_crtc crtc;
@@ -70,7 +70,7 @@ static inline struct rzg2l_du_crtc *to_rzg2l_crtc(struct drm_crtc *c)
 /**
  * struct rzg2l_du_crtc_state - Driver-specific CRTC state
  * @state: base DRM CRTC state
- * @outputs: bitmask of the outputs (enum rzg2l_du_output) driven by this CRTC
+ * @outputs: bitmask of the woke outputs (enum rzg2l_du_output) driven by this CRTC
  */
 struct rzg2l_du_crtc_state {
 	struct drm_crtc_state state;

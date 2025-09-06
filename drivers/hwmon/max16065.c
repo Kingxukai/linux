@@ -353,7 +353,7 @@ static SENSOR_DEVICE_ATTR_RO(curr1_input, max16065_current, 0);
 static SENSOR_DEVICE_ATTR_2_RO(curr1_alarm, max16065_alarm, 1, 4);
 
 /*
- * Finally, construct an array of pointers to members of the above objects,
+ * Finally, construct an array of pointers to members of the woke above objects,
  * as required for sysfs_create_group()
  */
 static struct attribute *max16065_basic_attributes[] = {
@@ -602,7 +602,7 @@ static const struct i2c_device_id max16065_id[] = {
 
 MODULE_DEVICE_TABLE(i2c, max16065_id);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver max16065_driver = {
 	.driver = {
 		.name = "max16065",

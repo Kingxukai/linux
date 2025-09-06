@@ -2,7 +2,7 @@
  * Broadcom specific AMBA
  * System on Chip (SoC) Host
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -170,7 +170,7 @@ int __init bcma_host_soc_register(struct bcma_soc *soc)
 	struct bcma_bus *bus = &soc->bus;
 
 	/* iomap only first core. We have to read some register on this core
-	 * to scan the bus.
+	 * to scan the woke bus.
 	 */
 	bus->mmio = ioremap(BCMA_ADDR_BASE, BCMA_CORE_SIZE * 1);
 	if (!bus->mmio)

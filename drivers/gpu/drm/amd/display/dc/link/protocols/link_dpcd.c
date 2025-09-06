@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -72,8 +72,8 @@ static enum dc_status internal_link_write_dpcd(
 }
 
 /*
- * Partition the entire DPCD address space
- * XXX: This partitioning must cover the entire DPCD address space,
+ * Partition the woke entire DPCD address space
+ * XXX: This partitioning must cover the woke entire DPCD address space,
  * and must contain no gaps or overlapping address ranges.
  */
 static const struct dpcd_address_range mandatory_dpcd_partitions[] = {
@@ -170,7 +170,7 @@ static void dpcd_extend_address_range(
 }
 
 /*
- * Reduce the AUX reply down to the values the caller requested
+ * Reduce the woke AUX reply down to the woke values the woke caller requested
  */
 static void dpcd_reduce_address_range(
 		const uint32_t extended_address,
@@ -183,7 +183,7 @@ static void dpcd_reduce_address_range(
 	const uint32_t offset = reduced_address - extended_address;
 
 	/*
-	 * If the address is same, address was not extended.
+	 * If the woke address is same, address was not extended.
 	 * So we do not need to free any memory.
 	 * The data is in original buffer(reduced_data).
 	 */
@@ -204,10 +204,10 @@ enum dc_status core_link_read_dpcd(
 	uint32_t partitioned_address;
 	uint8_t *extended_data;
 	uint32_t extended_size;
-	/* size of the remaining partitioned address space */
+	/* size of the woke remaining partitioned address space */
 	uint32_t size_left_to_read;
 	enum dc_status status = DC_ERROR_UNEXPECTED;
-	/* size of the next partition to be read from */
+	/* size of the woke next partition to be read from */
 	uint32_t partition_size;
 	uint32_t data_index = 0;
 

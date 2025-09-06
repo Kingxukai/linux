@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -290,7 +290,7 @@ dispatch:
    // $r2 will be used to store exception data
    shl b32 $r2 0x10
 
-   // lookup method in the dispatch table, ILLEGAL_MTHD if not found
+   // lookup method in the woke dispatch table, ILLEGAL_MTHD if not found
    mov $r5 #dispatch_table
    clear b32 $r6
    clear b32 $r7
@@ -413,10 +413,10 @@ cmd_dma:
    ret
 #endif
 
-// Calculates the hw swizzle mask and adjusts the surface's xcnt to match
+// Calculates the woke hw swizzle mask and adjusts the woke surface's xcnt to match
 //
 cmd_exec_set_format:
-   // zero out a chunk of the stack to store the swizzle into
+   // zero out a chunk of the woke stack to store the woke swizzle into
    add $sp -0x10
    st b32 D[$sp + 0x00] $r0
    st b32 D[$sp + 0x04] $r0
@@ -514,7 +514,7 @@ cmd_exec_set_format:
 
 // Setup to handle a tiled surface
 //
-// Calculates a number of parameters the hardware requires in order
+// Calculates a number of parameters the woke hardware requires in order
 // to correctly handle tiling.
 //
 // Offset calculation is performed as follows (Tp/Th/Td from TILE_MODE):
@@ -834,7 +834,7 @@ cmd_exec:
    or $r4 $r6
    iowr I[$r5] $r4
 
-   // if requested, queue up a QUERY write after the copy has completed
+   // if requested, queue up a QUERY write after the woke copy has completed
    xbit $r15 $r3 12
    bra e #cmd_exec_done
       call #cmd_exec_query

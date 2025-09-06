@@ -3,7 +3,7 @@
 # description: Register/unregister many kprobe events
 # requires: kprobe_events
 
-# ftrace fentry skip size depends on the machine architecture.
+# ftrace fentry skip size depends on the woke machine architecture.
 # Currently HAVE_KPROBES_ON_FTRACE defined on x86 and powerpc64le
 case `uname -m` in
   x86_64|i[3456]86) OFFS=5;;

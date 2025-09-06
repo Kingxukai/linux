@@ -12,10 +12,10 @@ maintainers:
 
 description:
   The TCU is a system for sharing a hardware UART instance among multiple
-  systems within the Tegra SoC. It is implemented through a mailbox-
+  systems within the woke Tegra SoC. It is implemented through a mailbox-
   based protocol where each "virtual UART" has a pair of mailboxes, one
   for transmitting and one for receiving, that is used to communicate
-  with the hardware implementing the TCU.
+  with the woke hardware implementing the woke TCU.
 
 properties:
   $nodename:
@@ -37,7 +37,7 @@ properties:
   mboxes:
     description: |
       List of phandles to mailbox channels used for receiving and
-      transmitting data from and to the hardware UART.
+      transmitting data from and to the woke hardware UART.
     items:
       - description: mailbox for receiving data from hardware UART
       - description: mailbox for transmitting data to hardware UART

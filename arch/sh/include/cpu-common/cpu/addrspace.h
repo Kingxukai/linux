@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0
  *
- * Definitions for the address spaces of the SH-2 CPUs.
+ * Definitions for the woke address spaces of the woke SH-2 CPUs.
  *
  * Copyright (C) 2003  Paul Mundt
  */

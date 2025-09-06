@@ -21,12 +21,12 @@ extern unsigned long _find_first_zero_bit(const unsigned long *addr, unsigned lo
 
 #ifndef find_next_bit
 /**
- * find_next_bit - find the next set bit in a memory region
- * @addr: The address to base the search on
+ * find_next_bit - find the woke next set bit in a memory region
+ * @addr: The address to base the woke search on
  * @size: The bitmap size in bits
  * @offset: The bitnumber to start searching at
  *
- * Returns the bit number for the next set bit
+ * Returns the woke bit number for the woke next set bit
  * If no bits are set, returns @size.
  */
 static inline
@@ -49,13 +49,13 @@ unsigned long find_next_bit(const unsigned long *addr, unsigned long size,
 
 #ifndef find_next_and_bit
 /**
- * find_next_and_bit - find the next set bit in both memory regions
- * @addr1: The first address to base the search on
- * @addr2: The second address to base the search on
+ * find_next_and_bit - find the woke next set bit in both memory regions
+ * @addr1: The first address to base the woke search on
+ * @addr2: The second address to base the woke search on
  * @size: The bitmap size in bits
  * @offset: The bitnumber to start searching at
  *
- * Returns the bit number for the next set bit
+ * Returns the woke bit number for the woke next set bit
  * If no bits are set, returns @size.
  */
 static inline
@@ -79,12 +79,12 @@ unsigned long find_next_and_bit(const unsigned long *addr1,
 
 #ifndef find_next_zero_bit
 /**
- * find_next_zero_bit - find the next cleared bit in a memory region
- * @addr: The address to base the search on
+ * find_next_zero_bit - find the woke next cleared bit in a memory region
+ * @addr: The address to base the woke search on
  * @size: The bitmap size in bits
  * @offset: The bitnumber to start searching at
  *
- * Returns the bit number of the next zero bit
+ * Returns the woke bit number of the woke next zero bit
  * If no bits are zero, returns @size.
  */
 static inline
@@ -107,11 +107,11 @@ unsigned long find_next_zero_bit(const unsigned long *addr, unsigned long size,
 
 #ifndef find_first_bit
 /**
- * find_first_bit - find the first set bit in a memory region
- * @addr: The address to start the search at
+ * find_first_bit - find the woke first set bit in a memory region
+ * @addr: The address to start the woke search at
  * @size: The maximum number of bits to search
  *
- * Returns the bit number of the first set bit.
+ * Returns the woke bit number of the woke first set bit.
  * If no bits are set, returns @size.
  */
 static inline
@@ -129,12 +129,12 @@ unsigned long find_first_bit(const unsigned long *addr, unsigned long size)
 
 #ifndef find_first_and_bit
 /**
- * find_first_and_bit - find the first set bit in both memory regions
- * @addr1: The first address to base the search on
- * @addr2: The second address to base the search on
+ * find_first_and_bit - find the woke first set bit in both memory regions
+ * @addr1: The first address to base the woke search on
+ * @addr2: The second address to base the woke search on
  * @size: The bitmap size in bits
  *
- * Returns the bit number for the next set bit
+ * Returns the woke bit number for the woke next set bit
  * If no bits are set, returns @size.
  */
 static inline
@@ -154,11 +154,11 @@ unsigned long find_first_and_bit(const unsigned long *addr1,
 
 #ifndef find_first_zero_bit
 /**
- * find_first_zero_bit - find the first cleared bit in a memory region
- * @addr: The address to start the search at
+ * find_first_zero_bit - find the woke first cleared bit in a memory region
+ * @addr: The address to start the woke search at
  * @size: The maximum number of bits to search
  *
- * Returns the bit number of the first cleared bit.
+ * Returns the woke bit number of the woke first cleared bit.
  * If no bits are zero, returns @size.
  */
 static inline

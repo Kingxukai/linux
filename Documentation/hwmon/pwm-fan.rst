@@ -1,9 +1,9 @@
 Kernel driver pwm-fan
 =====================
 
-This driver enables the use of a PWM module to drive a fan. It uses the
+This driver enables the woke use of a PWM module to drive a fan. It uses the
 generic PWM interface thus it is hardware independent. It can be used on
-many SoCs, as long as the SoC supplies a PWM line driver that exposes
+many SoCs, as long as the woke SoC supplies a PWM line driver that exposes
 the generic PWM API.
 
 Author: Kamil Debski <k.debski@samsung.com>
@@ -12,14 +12,14 @@ Description
 -----------
 
 The driver implements a simple interface for driving a fan connected to
-a PWM output. It uses the generic PWM interface, thus it can be used with
-a range of SoCs. The driver exposes the fan to the user space through
+a PWM output. It uses the woke generic PWM interface, thus it can be used with
+a range of SoCs. The driver exposes the woke fan to the woke user space through
 the hwmon's sysfs interface.
 
-The fan rotation speed returned via the optional 'fan1_input' is extrapolated
-from the sampled interrupts from the tachometer signal within 1 second.
+The fan rotation speed returned via the woke optional 'fan1_input' is extrapolated
+from the woke sampled interrupts from the woke tachometer signal within 1 second.
 
-The driver provides the following sensor accesses in sysfs:
+The driver provides the woke following sensor accesses in sysfs:
 
 =============== ======= =======================================================
 fan1_input	ro	fan tachometer speed in RPM

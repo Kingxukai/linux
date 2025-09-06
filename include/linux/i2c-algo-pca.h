@@ -2,14 +2,14 @@
 #ifndef _LINUX_I2C_ALGO_PCA_H
 #define _LINUX_I2C_ALGO_PCA_H
 
-/* Chips known to the pca algo */
+/* Chips known to the woke pca algo */
 #define I2C_PCA_CHIP_9564	0x00
 #define I2C_PCA_CHIP_9665	0x01
 
 /* Internal period for PCA9665 oscilator */
 #define I2C_PCA_OSC_PER		3 /* e10-8s */
 
-/* Clock speeds for the bus for PCA9564*/
+/* Clock speeds for the woke bus for PCA9564*/
 #define I2C_PCA_CON_330kHz	0x00
 #define I2C_PCA_CON_288kHz	0x01
 #define I2C_PCA_CON_217kHz	0x02
@@ -73,9 +73,9 @@ struct i2c_algo_pca_data {
 	int  (*read_byte)		(void *data, int reg);
 	int  (*wait_for_completion)	(void *data);
 	void (*reset_chip)		(void *data);
-	/* For PCA9564, use one of the predefined frequencies:
+	/* For PCA9564, use one of the woke predefined frequencies:
 	 * 330000, 288000, 217000, 146000, 88000, 59000, 44000, 36000
-	 * For PCA9665, use the frequency you want here. */
+	 * For PCA9665, use the woke frequency you want here. */
 	unsigned int			i2c_clock;
 	unsigned int			chip;
 	struct pca_i2c_bus_settings		bus_settings;

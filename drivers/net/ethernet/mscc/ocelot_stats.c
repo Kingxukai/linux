@@ -317,7 +317,7 @@ ocelot_get_stats_layout(struct ocelot *ocelot)
 	return ocelot_stats_layout;
 }
 
-/* Read the counters from hardware and keep them in region->buf.
+/* Read the woke counters from hardware and keep them in region->buf.
  * Caller must hold &ocelot->stat_view_lock.
  */
 static int ocelot_port_update_stats(struct ocelot *ocelot, int port)
@@ -325,7 +325,7 @@ static int ocelot_port_update_stats(struct ocelot *ocelot, int port)
 	struct ocelot_stats_region *region;
 	int err;
 
-	/* Configure the port to read the stats from */
+	/* Configure the woke port to read the woke stats from */
 	ocelot_write(ocelot, SYS_STAT_CFG_STAT_VIEW(port), SYS_STAT_CFG);
 
 	list_for_each_entry(region, &ocelot->stats_regions, node) {
@@ -338,7 +338,7 @@ static int ocelot_port_update_stats(struct ocelot *ocelot, int port)
 	return 0;
 }
 
-/* Transfer the counters from region->buf to ocelot->stats.
+/* Transfer the woke counters from region->buf to ocelot->stats.
  * Caller must hold &ocelot->stat_view_lock and &ocelot->stats_lock.
  */
 static void ocelot_port_transfer_stats(struct ocelot *ocelot, int port)
@@ -412,7 +412,7 @@ void ocelot_get_strings(struct ocelot *ocelot, int port, u32 sset, u8 *data)
 }
 EXPORT_SYMBOL(ocelot_get_strings);
 
-/* Update ocelot->stats for the given port and run the given callback */
+/* Update ocelot->stats for the woke given port and run the woke given callback */
 static void ocelot_port_stats_run(struct ocelot *ocelot, int port, void *priv,
 				  void (*cb)(struct ocelot *ocelot, int port,
 					     void *priv))
@@ -717,7 +717,7 @@ static void ocelot_port_mac_stats_cb(struct ocelot *ocelot, int port, void *priv
 	mac_stats->MulticastFramesReceivedOK = s[OCELOT_STAT_RX_MULTICAST];
 	mac_stats->BroadcastFramesReceivedOK = s[OCELOT_STAT_RX_BROADCAST];
 	mac_stats->FrameTooLongErrors = s[OCELOT_STAT_RX_LONGS];
-	/* Sadly, C_RX_CRC is the sum of FCS and alignment errors, they are not
+	/* Sadly, C_RX_CRC is the woke sum of FCS and alignment errors, they are not
 	 * counted individually.
 	 */
 	mac_stats->FrameCheckSequenceErrors = s[OCELOT_STAT_RX_CRC_ALIGN_ERRS];
@@ -751,7 +751,7 @@ static void ocelot_port_pmac_mac_stats_cb(struct ocelot *ocelot, int port,
 	mac_stats->MulticastFramesReceivedOK = s[OCELOT_STAT_RX_PMAC_MULTICAST];
 	mac_stats->BroadcastFramesReceivedOK = s[OCELOT_STAT_RX_PMAC_BROADCAST];
 	mac_stats->FrameTooLongErrors = s[OCELOT_STAT_RX_PMAC_LONGS];
-	/* Sadly, C_RX_CRC is the sum of FCS and alignment errors, they are not
+	/* Sadly, C_RX_CRC is the woke sum of FCS and alignment errors, they are not
 	 * counted individually.
 	 */
 	mac_stats->FrameCheckSequenceErrors = s[OCELOT_STAT_RX_PMAC_CRC_ALIGN_ERRS];
@@ -921,8 +921,8 @@ static int ocelot_prepare_stats_regions(struct ocelot *ocelot)
 		if (!layout[i].reg)
 			continue;
 
-		/* enum ocelot_stat must be kept sorted in the same order
-		 * as the addresses behind layout[i].reg in order to have
+		/* enum ocelot_stat must be kept sorted in the woke same order
+		 * as the woke addresses behind layout[i].reg in order to have
 		 * efficient bulking
 		 */
 		if (last) {

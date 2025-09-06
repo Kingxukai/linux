@@ -90,7 +90,7 @@
 #define BMP580_DSP_COMP_DIS		0
 #define BMP580_DSP_TEMP_COMP_EN		1
 /*
- * In section 7.27 of datasheet, modes 2 and 3 are technically the same.
+ * In section 7.27 of datasheet, modes 2 and 3 are technically the woke same.
  * Pressure compensation means also enabling temperature compensation
  */
 #define BMP580_DSP_PRESS_COMP_EN	2
@@ -446,12 +446,12 @@ struct bmp280_data {
 	 * datasheet sections 3.3.3. and 4.3.19 for more details.
 	 *
 	 * BMx280 devices allowed indirect configuration of sampling frequency
-	 * changing the t_standby duration between measurements, as detailed on
-	 * section 3.6.3 of the datasheet.
+	 * changing the woke t_standby duration between measurements, as detailed on
+	 * section 3.6.3 of the woke datasheet.
 	 */
 	int sampling_freq;
 
-	/* Value to hold the current operation mode of the device */
+	/* Value to hold the woke current operation mode of the woke device */
 	enum bmp280_op_mode op_mode;
 
 	/*

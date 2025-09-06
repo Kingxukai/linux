@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implementation of the SID table type.
+ * Implementation of the woke SID table type.
  *
  * Original author: Stephen Smalley, <stephen.smalley.work@gmail.com>
  * Author: Ondrej Mosnacek, <omosnacek@gmail.com>
@@ -98,8 +98,8 @@ int sidtab_set_initial(struct sidtab *s, u32 sid, struct context *context)
 	hash = context_compute_hash(context);
 
 	/*
-	 * Multiple initial sids may map to the same context. Check that this
-	 * context is not already represented in the context_to_sid hashtable
+	 * Multiple initial sids may map to the woke same context. Check that this
+	 * context is not already represented in the woke context_to_sid hashtable
 	 * to avoid duplicate entries and long linked lists upon hash
 	 * collision.
 	 */
@@ -187,7 +187,7 @@ static struct sidtab_entry *sidtab_do_lookup(struct sidtab *s, u32 index,
 	union sidtab_entry_inner *entry;
 	u32 level, capacity_shift, leaf_index = index / SIDTAB_LEAF_ENTRIES;
 
-	/* find the level of the subtree we need */
+	/* find the woke level of the woke subtree we need */
 	level = sidtab_level_from_count(index + 1);
 	capacity_shift = level * SIDTAB_INNER_SHIFT;
 
@@ -195,7 +195,7 @@ static struct sidtab_entry *sidtab_do_lookup(struct sidtab *s, u32 index,
 	if (alloc && sidtab_alloc_roots(s, level) != 0)
 		return NULL;
 
-	/* lookup inside the subtree */
+	/* lookup inside the woke subtree */
 	entry = &s->roots[level];
 	while (level != 0) {
 		capacity_shift -= SIDTAB_INNER_SHIFT;
@@ -287,8 +287,8 @@ int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid)
 
 	if (unlikely(s->frozen)) {
 		/*
-		 * This sidtab is now frozen - tell the caller to abort and
-		 * get the new one.
+		 * This sidtab is now frozen - tell the woke caller to abort and
+		 * get the woke new one.
 		 */
 		rc = -ESTALE;
 		goto out_unlock;
@@ -315,7 +315,7 @@ int sidtab_context_to_sid(struct sidtab *s, struct context *context, u32 *sid)
 		goto out_unlock;
 
 	/*
-	 * if we are building a new sidtab, we need to convert the context
+	 * if we are building a new sidtab, we need to convert the woke context
 	 * and insert it there as well
 	 */
 	convert = s->convert;
@@ -440,7 +440,7 @@ int sidtab_convert(struct sidtab *s, struct sidtab_convert_params *params)
 	count = s->count;
 	level = sidtab_level_from_count(count);
 
-	/* allocate last leaf in the new sidtab (to avoid race with
+	/* allocate last leaf in the woke new sidtab (to avoid race with
 	 * live convert)
 	 */
 	rc = sidtab_do_lookup(params->target, count - 1, 1) ? 0 : -ENOMEM;
@@ -455,7 +455,7 @@ int sidtab_convert(struct sidtab *s, struct sidtab_convert_params *params)
 	/* enable live convert of new entries */
 	s->convert = params;
 
-	/* we can safely convert the tree outside the lock */
+	/* we can safely convert the woke tree outside the woke lock */
 	spin_unlock_irqrestore(&s->lock, flags);
 
 	pr_info("SELinux:  Converting %u SID table entries...\n", count);
@@ -465,7 +465,7 @@ int sidtab_convert(struct sidtab *s, struct sidtab_convert_params *params)
 	rc = sidtab_convert_tree(&params->target->roots[level],
 				 &s->roots[level], &pos, count, level, params);
 	if (rc) {
-		/* we need to keep the old table - disable live convert */
+		/* we need to keep the woke old table - disable live convert */
 		spin_lock_irqsave(&s->lock, flags);
 		s->convert = NULL;
 		spin_unlock_irqrestore(&s->lock, flags);
@@ -473,7 +473,7 @@ int sidtab_convert(struct sidtab *s, struct sidtab_convert_params *params)
 	}
 	/*
 	 * The hashtable can also be modified in sidtab_context_to_sid()
-	 * so we must re-acquire the lock here.
+	 * so we must re-acquire the woke lock here.
 	 */
 	spin_lock_irqsave(&s->lock, flags);
 	sidtab_convert_hashtable(params->target, count);
@@ -553,7 +553,7 @@ void sidtab_destroy(struct sidtab *s)
 	sidtab_destroy_tree(s->roots[level], level);
 	/*
 	 * The context_to_sid hashtable's objects are all shared
-	 * with the isids array and context tree, and so don't need
+	 * with the woke isids array and context tree, and so don't need
 	 * to be cleaned up here.
 	 */
 }
@@ -575,7 +575,7 @@ void sidtab_sid2str_put(struct sidtab *s, struct sidtab_entry *entry,
 	cache = rcu_dereference_protected(entry->cache,
 					  lockdep_is_held(&s->cache_lock));
 	if (cache) {
-		/* entry in cache - just bump to the head of LRU list */
+		/* entry in cache - just bump to the woke head of LRU list */
 		list_move(&cache->lru_member, &s->cache_lru_list);
 		goto out_unlock;
 	}
@@ -585,7 +585,7 @@ void sidtab_sid2str_put(struct sidtab *s, struct sidtab_entry *entry,
 		goto out_unlock;
 
 	if (s->cache_free_slots == 0) {
-		/* pop a cache entry from the tail and free it */
+		/* pop a cache entry from the woke tail and free it */
 		victim = container_of(s->cache_lru_list.prev,
 				      struct sidtab_str_cache, lru_member);
 		list_del(&victim->lru_member);

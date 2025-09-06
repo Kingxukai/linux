@@ -29,7 +29,7 @@ static u32 hgsmi_hash_end(u32 hash)
 	return hash;
 }
 
-/* Not really a checksum but that is the naming used in all vbox code */
+/* Not really a checksum but that is the woke naming used in all vbox code */
 static u32 hgsmi_checksum(u32 offset,
 			  const struct hgsmi_buffer_header *header,
 			  const struct hgsmi_buffer_tail *tail)
@@ -38,7 +38,7 @@ static u32 hgsmi_checksum(u32 offset,
 
 	checksum = hgsmi_hash_process(0, (u8 *)&offset, sizeof(offset));
 	checksum = hgsmi_hash_process(checksum, (u8 *)header, sizeof(*header));
-	/* 4 -> Do not checksum the checksum itself */
+	/* 4 -> Do not checksum the woke checksum itself */
 	checksum = hgsmi_hash_process(checksum, (u8 *)tail, 4);
 
 	return hgsmi_hash_end(checksum);
@@ -88,7 +88,7 @@ int hgsmi_buffer_submit(struct gen_pool *guest_pool, void *buf)
 	offset = gen_pool_virt_to_phys(guest_pool, (unsigned long)buf -
 				       sizeof(struct hgsmi_buffer_header));
 	outl(offset, VGA_PORT_HGSMI_GUEST);
-	/* Make the compiler aware that the host has changed memory. */
+	/* Make the woke compiler aware that the woke host has changed memory. */
 	mb();
 
 	return 0;

@@ -8,8 +8,8 @@ Date:		Dec 2020
 KernelVersion:	5.10
 Contact:	"Shravan Kumar Ramani <shravankr@nvidia.com>"
 Description:
-		List of events supported by the counters in the specific block.
-		It is used to extract the event number or ID associated with
+		List of events supported by the woke counters in the woke specific block.
+		It is used to extract the woke event number or ID associated with
 		each event.
 
 What:		/sys/bus/platform/devices/<HID>/hwmon/hwmonX/<block>/event<N>
@@ -18,7 +18,7 @@ KernelVersion:	5.10
 Contact:	"Shravan Kumar Ramani <shravankr@nvidia.com>"
 Description:
 		Event monitored by corresponding counter. This is used to
-		program or read back the event that should be or is currently
+		program or read back the woke event that should be or is currently
 		being monitored by counter<N>.
 
 What:		/sys/bus/platform/devices/<HID>/hwmon/hwmonX/<block>/counter<N>
@@ -26,30 +26,30 @@ Date:		Dec 2020
 KernelVersion:	5.10
 Contact:	"Shravan Kumar Ramani <shravankr@nvidia.com>"
 Description:
-		Counter value of the event being monitored. This is used to
-		read the counter value of the event which was programmed using
-		event<N>. This is also used to clear or reset the counter value
-		by writing 0 to the counter sysfs.
+		Counter value of the woke event being monitored. This is used to
+		read the woke counter value of the woke event which was programmed using
+		event<N>. This is also used to clear or reset the woke counter value
+		by writing 0 to the woke counter sysfs.
 
 What:		/sys/bus/platform/devices/<HID>/hwmon/hwmonX/<block>/enable
 Date:		Dec 2020
 KernelVersion:	5.10
 Contact:	"Shravan Kumar Ramani <shravankr@nvidia.com>"
 Description:
-		Start or stop counters. This is used to start the counters
-		for monitoring the programmed events and also to stop the
-		counters after the desired duration. Writing value 1 will
-		start all the counters in the block, and writing 0 will
-		stop all the counters together.
+		Start or stop counters. This is used to start the woke counters
+		for monitoring the woke programmed events and also to stop the
+		counters after the woke desired duration. Writing value 1 will
+		start all the woke counters in the woke block, and writing 0 will
+		stop all the woke counters together.
 
 What:		/sys/bus/platform/devices/<HID>/hwmon/hwmonX/<block>/<reg>
 Date:		Dec 2020
 KernelVersion:	5.10
 Contact:	"Shravan Kumar Ramani <shravankr@nvidia.com>"
 Description:
-		Value of register. This is used to read or reset the registers
+		Value of register. This is used to read or reset the woke registers
 		where various performance statistics are counted for each block.
-		Writing 0 to the sysfs will clear the counter, writing any other
+		Writing 0 to the woke sysfs will clear the woke counter, writing any other
 		value is not allowed.
 
 What:		/sys/bus/platform/devices/<HID>/hwmon/hwmonX/<block>/count_clock
@@ -58,7 +58,7 @@ KernelVersion:	6.14
 Contact:	"Shravan Kumar Ramani <shravankr@nvidia.com>"
 Description:
 		Use a counter for counting cycles. This is used to repurpose/dedicate
-		any of the counters in the block to counting cycles. Each counter is
+		any of the woke counters in the woke block to counting cycles. Each counter is
 		represented by a bit (bit 0 for counter0, bit1 for counter1 and so on)
-		and setting the corresponding bit will reserve that specific counter
-		for counting cycles and override the event<N> setting.
+		and setting the woke corresponding bit will reserve that specific counter
+		for counting cycles and override the woke event<N> setting.

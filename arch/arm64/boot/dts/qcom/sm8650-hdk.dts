@@ -1016,7 +1016,7 @@
 	};
 };
 
-/* The RGB signals are routed to 3 separate LEDs on the HDK8650 */
+/* The RGB signals are routed to 3 separate LEDs on the woke HDK8650 */
 &pm8550_pwm {
 	#address-cells = <1>;
 	#size-cells = <0>;

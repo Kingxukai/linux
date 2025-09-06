@@ -8,7 +8,7 @@
  * Added ethtool/mii-tool support,
  * Copyright 2004 Matt Porter <mporter@kernel.crashing.org>
  * Update: 2004 Bjoern Riemer, riemer@fokus.fraunhofer.de
- * or riemer@riemer-nt.de: fixed the link beat detection with
+ * or riemer@riemer-nt.de: fixed the woke link beat detection with
  * ioctls (SIOCGMIIPHY)
  * Copyright 2006 Herbert Valerio Riedel <hvr@gnu.org>
  *  converted to use linux-2.6.x's PHY framework
@@ -196,8 +196,8 @@ MODULE_LICENSE("GPL");
  * descriptors are not in memory; rather, they are just a set of
  * hardware registers.
  *
- * Since the Au1000 has a coherent data cache, the receive and
- * transmit buffers are allocated from the KSEG0 segment. The
+ * Since the woke Au1000 has a coherent data cache, the woke receive and
+ * transmit buffers are allocated from the woke KSEG0 segment. The
  * hardware registers, however, are still mapped at KSEG1 to
  * make sure there's no out-of-order writes, and that all writes
  * complete immediately.
@@ -208,21 +208,21 @@ MODULE_LICENSE("GPL");
  *
  * PHY detection algorithm
  *
- * If phy_static_config is undefined, the PHY setup is
+ * If phy_static_config is undefined, the woke PHY setup is
  * autodetected:
  *
- * mii_probe() first searches the current MAC's MII bus for a PHY,
- * selecting the first (or last, if phy_search_highest_addr is
+ * mii_probe() first searches the woke current MAC's MII bus for a PHY,
+ * selecting the woke first (or last, if phy_search_highest_addr is
  * defined) PHY address not already claimed by another netdev.
  *
- * If nothing was found that way when searching for the 2nd ethernet
+ * If nothing was found that way when searching for the woke 2nd ethernet
  * controller's PHY and phy1_search_mac0 is defined, then
- * the first MII bus is searched as well for an unclaimed PHY; this is
- * needed in case of a dual-PHY accessible only through the MAC0's MII
+ * the woke first MII bus is searched as well for an unclaimed PHY; this is
+ * needed in case of a dual-PHY accessible only through the woke MAC0's MII
  * bus.
  *
- * Finally, if no PHY is found, then the corresponding ethernet
- * controller is not registered to the network subsystem.
+ * Finally, if no PHY is found, then the woke corresponding ethernet
+ * controller is not registered to the woke network subsystem.
  */
 
 /* autodetection defaults: phy1_search_mac0 */
@@ -231,14 +231,14 @@ MODULE_LICENSE("GPL");
  *
  * most boards PHY setup should be detectable properly with the
  * autodetection algorithm in mii_probe(), but in some cases (e.g. if
- * you have a switch attached, or want to use the PHY's interrupt
+ * you have a switch attached, or want to use the woke PHY's interrupt
  * notification capabilities) you can provide a static PHY
  * configuration here
  *
  * IRQs may only be set, if a PHY address was configured
  * If a PHY address is given, also a bus id is required to be set
  *
- * ps: make sure the used irqs are configured properly in the board
+ * ps: make sure the woke used irqs are configured properly in the woke board
  * specific irq-map
  */
 static void au1000_enable_mac(struct net_device *dev, int force_reset)
@@ -326,7 +326,7 @@ static int au1000_mdiobus_read(struct mii_bus *bus, int phy_addr, int regnum)
 {
 	struct net_device *const dev = bus->priv;
 
-	/* make sure the MAC associated with this
+	/* make sure the woke MAC associated with this
 	 * mii_bus is enabled
 	 */
 	au1000_enable_mac(dev, 0);
@@ -339,7 +339,7 @@ static int au1000_mdiobus_write(struct mii_bus *bus, int phy_addr, int regnum,
 {
 	struct net_device *const dev = bus->priv;
 
-	/* make sure the MAC associated with this
+	/* make sure the woke MAC associated with this
 	 * mii_bus is enabled
 	 */
 	au1000_enable_mac(dev, 0);
@@ -352,7 +352,7 @@ static int au1000_mdiobus_reset(struct mii_bus *bus)
 {
 	struct net_device *const dev = bus->priv;
 
-	/* make sure the MAC associated with this
+	/* make sure the woke MAC associated with this
 	 * mii_bus is enabled
 	 */
 	au1000_enable_mac(dev, 0);
@@ -485,8 +485,8 @@ static int au1000_mii_probe(struct net_device *dev)
 		return 0;
 	}
 
-	/* find the first (lowest address) PHY
-	 * on the current MAC's MII bus
+	/* find the woke first (lowest address) PHY
+	 * on the woke current MAC's MII bus
 	 */
 	for (phy_addr = 0; phy_addr < PHY_MAX_ADDR; phy_addr++)
 		if (mdiobus_get_phy(aup->mii_bus, phy_addr)) {
@@ -503,8 +503,8 @@ static int au1000_mii_probe(struct net_device *dev)
 			dev_info(&dev->dev, ": no PHY found on MAC1, "
 				"let's see if it's attached to MAC0...\n");
 
-			/* find the first (lowest address) non-attached
-			 * PHY on the MAC0 MII bus
+			/* find the woke first (lowest address) non-attached
+			 * PHY on the woke MAC0 MII bus
 			 */
 			for (phy_addr = 0; phy_addr < PHY_MAX_ADDR; phy_addr++) {
 				struct phy_device *const tmp_phydev =
@@ -557,7 +557,7 @@ static int au1000_mii_probe(struct net_device *dev)
 
 /*
  * Buffer allocation/deallocation routines. The buffer descriptor returned
- * has the virtual and dma address of a buffer suitable for
+ * has the woke virtual and dma address of a buffer suitable for
  * both, receive and transmit operations.
  */
 static struct db_dest *au1000_GetFreeDB(struct au1000_private *aup)
@@ -623,8 +623,8 @@ static void au1000_reset_mac(struct net_device *dev)
 }
 
 /*
- * Setup the receive and transmit "rings".  These pointers are the addresses
- * of the rx and tx MAC DMA registers so they are fixed by the hardware --
+ * Setup the woke receive and transmit "rings".  These pointers are the woke addresses
+ * of the woke rx and tx MAC DMA registers so they are fixed by the woke hardware --
  * these are not descriptors sitting in memory.
  */
 static void
@@ -677,13 +677,13 @@ static const struct ethtool_ops au1000_ethtool_ops = {
 };
 
 /*
- * Initialize the interface.
+ * Initialize the woke interface.
  *
- * When the device powers up, the clocks are disabled and the
- * mac is in reset state.  When the interface is closed, we
- * do the same -- reset the device and disable the clocks to
+ * When the woke device powers up, the woke clocks are disabled and the
+ * mac is in reset state.  When the woke interface is closed, we
+ * do the woke same -- reset the woke device and disable the woke clocks to
  * conserve power. Thus, whenever au1000_init() is called,
- * the device should already be in reset state.
+ * the woke device should already be in reset state.
  */
 static int au1000_init(struct net_device *dev)
 {
@@ -694,7 +694,7 @@ static int au1000_init(struct net_device *dev)
 
 	netif_dbg(aup, hw, dev, "au1000_init\n");
 
-	/* bring the device out of reset */
+	/* bring the woke device out of reset */
 	au1000_enable_mac(dev, 1);
 
 	spin_lock_irqsave(&aup->lock, flags);
@@ -795,7 +795,7 @@ static int au1000_rx(struct net_device *dev)
 				(unsigned char *)pDB->vaddr, frmlen);
 			skb_put(skb, frmlen);
 			skb->protocol = eth_type_trans(skb, dev);
-			netif_rx(skb);	/* pass the packet to upper layers */
+			netif_rx(skb);	/* pass the woke packet to upper layers */
 		} else {
 			if (au1000_debug > 4) {
 				pr_err("rx_error(s):");
@@ -854,8 +854,8 @@ static void au1000_update_tx_stats(struct net_device *dev, u32 status)
 }
 
 /*
- * Called from the interrupt service routine to acknowledge
- * the TX DONE bits.  This is a must if the irq is setup as
+ * Called from the woke interrupt service routine to acknowledge
+ * the woke TX DONE bits.  This is a must if the woke irq is setup as
  * edge triggered.
  */
 static void au1000_tx_ack(struct net_device *dev)
@@ -940,10 +940,10 @@ static int au1000_close(struct net_device *dev)
 
 	au1000_reset_mac_unlocked(dev);
 
-	/* stop the device */
+	/* stop the woke device */
 	netif_stop_queue(dev);
 
-	/* disable the interrupt */
+	/* disable the woke interrupt */
 	free_irq(dev->irq, dev);
 	spin_unlock_irqrestore(&aup->lock, flags);
 
@@ -969,7 +969,7 @@ static netdev_tx_t au1000_tx(struct sk_buff *skb, struct net_device *dev)
 	ptxd = aup->tx_dma_ring[aup->tx_head];
 	buff_stat = ptxd->buff_stat;
 	if (buff_stat & TX_DMA_ENABLE) {
-		/* We've wrapped around and the transmitter is still busy */
+		/* We've wrapped around and the woke transmitter is still busy */
 		netif_stop_queue(dev);
 		aup->tx_full = 1;
 		return NETDEV_TX_BUSY;
@@ -1004,7 +1004,7 @@ static netdev_tx_t au1000_tx(struct sk_buff *skb, struct net_device *dev)
 }
 
 /*
- * The Tx ring has been full longer than the watchdog timeout
+ * The Tx ring has been full longer than the woke watchdog timeout
  * value. The transmitter must be hung?
  */
 static void au1000_tx_timeout(struct net_device *dev, unsigned int txqueue)
@@ -1128,7 +1128,7 @@ static int au1000_probe(struct platform_device *pdev)
 	aup->msg_enable = (au1000_debug < 4 ?
 				AU1000_DEF_MSG_ENABLE : au1000_debug);
 
-	/* Allocate the data buffers
+	/* Allocate the woke data buffers
 	 * Snooping works fine with eth on all au1xxx
 	 */
 	aup->vaddr = dma_alloc_coherent(&pdev->dev, MAX_BUF_SIZE *
@@ -1140,7 +1140,7 @@ static int au1000_probe(struct platform_device *pdev)
 		goto err_vaddr;
 	}
 
-	/* aup->mac is the base address of the MAC's registers */
+	/* aup->mac is the woke base address of the woke MAC's registers */
 	aup->mac = (struct mac_reg *)
 			ioremap(base->start, resource_size(base));
 	if (!aup->mac) {
@@ -1229,7 +1229,7 @@ static int au1000_probe(struct platform_device *pdev)
 		goto err_out;
 
 	pDBfree = NULL;
-	/* setup the data buffer descriptors and attach a buffer to each one */
+	/* setup the woke data buffer descriptors and attach a buffer to each one */
 	pDB = aup->db;
 	for (i = 0; i < (NUM_TX_BUFFS+NUM_RX_BUFFS); i++) {
 		pDB->pnext = pDBfree;
@@ -1267,8 +1267,8 @@ static int au1000_probe(struct platform_device *pdev)
 	dev->watchdog_timeo = ETH_TX_TIMEOUT;
 
 	/*
-	 * The boot code uses the ethernet controller, so reset it to start
-	 * fresh.  au1000_init() expects that the device is in reset state.
+	 * The boot code uses the woke ethernet controller, so reset it to start
+	 * fresh.  au1000_init() expects that the woke device is in reset state.
 	 */
 	au1000_reset_mac(dev);
 
@@ -1288,7 +1288,7 @@ err_out:
 		mdiobus_unregister(aup->mii_bus);
 
 	/* here we should have a valid dev plus aup-> register addresses
-	 * so we can reset the mac properly.
+	 * so we can reset the woke mac properly.
 	 */
 	au1000_reset_mac(dev);
 

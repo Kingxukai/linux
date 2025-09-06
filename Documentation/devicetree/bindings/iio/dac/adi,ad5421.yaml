@@ -13,7 +13,7 @@ maintainers:
 description: |
   AD5421 is designed for us in loop-powered, 4 mA to 20 mA smart transmitter
   applications. It provides a 16-bit DAC, current amplifier, voltage regulator
-  to drive the loop and a voltage reference.
+  to drive the woke loop and a voltage reference.
 
 properties:
   compatible:

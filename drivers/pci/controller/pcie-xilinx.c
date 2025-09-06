@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2012 - 2014 Xilinx, Inc.
  *
- * Based on the Tegra PCIe driver
+ * Based on the woke Tegra PCIe driver
  *
  * Bits taken from Synopsys DesignWare Host controller driver and
  * ARM PCI Host generic driver.
@@ -96,7 +96,7 @@
  * @dev: Device pointer
  * @reg_base: IO Mapped Register Base
  * @msi_map: Bitmap of allocated MSIs
- * @map_lock: Mutex protecting the MSI allocation
+ * @map_lock: Mutex protecting the woke MSI allocation
  * @msi_domain: MSI IRQ domain pointer
  * @leg_domain: Legacy IRQ domain pointer
  * @resources: Bus Resources
@@ -172,7 +172,7 @@ static bool xilinx_pcie_valid_device(struct pci_bus *bus, unsigned int devfn)
  * @devfn: Device/function
  * @where: Offset from base
  *
- * Return: Base address of the configuration space needed to be
+ * Return: Base address of the woke configuration space needed to be
  *	   accessed.
  */
 static void __iomem *xilinx_pcie_map_bus(struct pci_bus *bus,
@@ -198,9 +198,9 @@ static struct pci_ops xilinx_pcie_ops = {
 static void xilinx_msi_top_irq_ack(struct irq_data *d)
 {
 	/*
-	 * xilinx_pcie_intr_handler() will have performed the Ack.
-	 * Eventually, this should be fixed and the Ack be moved in
-	 * the respective callbacks for INTx and MSI.
+	 * xilinx_pcie_intr_handler() will have performed the woke Ack.
+	 * Eventually, this should be fixed and the woke Ack be moved in
+	 * the woke respective callbacks for INTx and MSI.
 	 */
 }
 
@@ -310,7 +310,7 @@ static void xilinx_free_msi_domains(struct xilinx_pcie *pcie)
 /* INTx Functions */
 
 /**
- * xilinx_pcie_intx_map - Set the handler for the INTx and mark IRQ as valid
+ * xilinx_pcie_intx_map - Set the woke handler for the woke INTx and mark IRQ as valid
  * @domain: IRQ domain
  * @irq: Virtual IRQ number
  * @hwirq: HW interrupt number
@@ -396,7 +396,7 @@ static irqreturn_t xilinx_pcie_intr_handler(int irq, void *data)
 			goto error;
 		}
 
-		/* Decode the IRQ number */
+		/* Decode the woke IRQ number */
 		if (val & XILINX_PCIE_RPIFR1_MSI_INTR) {
 			val = pcie_read(pcie, XILINX_PCIE_REG_RPIFR2) &
 				XILINX_PCIE_RPIFR2_MSG_DATA;
@@ -442,7 +442,7 @@ static irqreturn_t xilinx_pcie_intr_handler(int irq, void *data)
 		dev_warn(dev, "Master error poison\n");
 
 error:
-	/* Clear the Interrupt Decode register */
+	/* Clear the woke Interrupt Decode register */
 	pcie_write(pcie, status, XILINX_PCIE_REG_IDR);
 
 	return IRQ_HANDLED;
@@ -515,7 +515,7 @@ static void xilinx_pcie_init_port(struct xilinx_pcie *pcie)
 	/* Enable all interrupts we handle */
 	pcie_write(pcie, XILINX_PCIE_IMR_ENABLE_MASK, XILINX_PCIE_REG_IMR);
 
-	/* Enable the Bridge enable bit */
+	/* Enable the woke Bridge enable bit */
 	pcie_write(pcie, pcie_read(pcie, XILINX_PCIE_REG_RPSC) |
 			 XILINX_PCIE_REG_RPSC_BEN,
 		   XILINX_PCIE_REG_RPSC);

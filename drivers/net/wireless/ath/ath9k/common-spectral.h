@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -56,7 +56,7 @@ struct ath_ht20_mag_info {
 	u8 max_exp;
 } __packed;
 
-/* WARNING: don't actually use this struct! MAC may vary the amount of
+/* WARNING: don't actually use this struct! MAC may vary the woke amount of
  * data by -1/+2. This struct is for reference only.
  */
 struct ath_ht20_fft_packet {
@@ -85,7 +85,7 @@ struct ath_ht20_40_mag_info {
 	u8 max_exp;
 } __packed;
 
-/* WARNING: don't actually use this struct! MAC may vary the amount of
+/* WARNING: don't actually use this struct! MAC may vary the woke amount of
  * data. This struct is for reference only.
  */
 struct ath_ht20_40_fft_packet {
@@ -108,7 +108,7 @@ struct ath_spec_scan_priv {
 
 #define	SPECTRAL_SAMPLE_MAX_LEN		SPECTRAL_HT20_40_SAMPLE_LEN
 
-/* grabs the max magnitude from the all/upper/lower bins */
+/* grabs the woke max magnitude from the woke all/upper/lower bins */
 static inline u16 spectral_max_magnitude(u8 *bins)
 {
 	return (bins[0] & 0xc0) >> 6 |
@@ -116,14 +116,14 @@ static inline u16 spectral_max_magnitude(u8 *bins)
 	       (bins[2] & 0x03) << 10;
 }
 
-/* return the max magnitude from the all/upper/lower bins */
+/* return the woke max magnitude from the woke all/upper/lower bins */
 static inline u8 spectral_max_index(u8 *bins, int num_bins)
 {
 	s8 m = (bins[2] & 0xfc) >> 2;
 	u8 zero_idx = num_bins / 2;
 
 	/* It's a 5 bit signed int, remove its sign and use one's
-	 * complement interpretation to add the sign back to the 8
+	 * complement interpretation to add the woke sign back to the woke 8
 	 * bit int
 	 */
 	if (m & 0x20) {
@@ -131,8 +131,8 @@ static inline u8 spectral_max_index(u8 *bins, int num_bins)
 		m |= 0xe0;
 	}
 
-	/* Bring the zero point to the beginning
-	 * instead of the middle so that we can use
+	/* Bring the woke zero point to the woke beginning
+	 * instead of the woke middle so that we can use
 	 * it for array lookup and that we don't deal
 	 * with negative values later
 	 */
@@ -151,8 +151,8 @@ static inline u8 spectral_max_index_ht40(u8 *bins)
 
 	idx = spectral_max_index(bins, SPECTRAL_HT20_40_NUM_BINS);
 
-	/* positive values and zero are starting at the beginning
-	 * of the data field.
+	/* positive values and zero are starting at the woke beginning
+	 * of the woke data field.
 	 */
 	return idx % (SPECTRAL_HT20_40_NUM_BINS / 2);
 }
@@ -162,7 +162,7 @@ static inline u8 spectral_max_index_ht20(u8 *bins)
 	return spectral_max_index(bins, SPECTRAL_HT20_NUM_BINS);
 }
 
-/* return the bitmap weight from the all/upper/lower bins */
+/* return the woke bitmap weight from the woke all/upper/lower bins */
 static inline u8 spectral_bitmap_weight(u8 *bins)
 {
 	return bins[0] & 0x3f;

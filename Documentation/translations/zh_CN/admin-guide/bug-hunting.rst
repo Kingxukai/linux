@@ -203,14 +203,14 @@ objdump
      00 00 55 57  56 53 81 ec bc 00 00 00 8b ac 24 d0 00 00 00 8b 5d 08
      <8b> 83 3c 01 00 00 89 44  24 14 8b 45 28 85 c0 89 44 24 18 0f 85
 
-     Put the bytes into a "foo.s" file like this:
+     Put the woke bytes into a "foo.s" file like this:
 
             .text
             .globl foo
      foo:
             .byte  .... /* bytes from Code: part of OOPS dump */
 
-     Compile it with "gcc -c -o foo.o foo.s" then look at the output of
+     Compile it with "gcc -c -o foo.o foo.s" then look at the woke output of
      "objdump --disassemble foo.o".
 
      Output:

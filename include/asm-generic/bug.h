@@ -50,13 +50,13 @@ struct bug_entry {
 
 /*
  * Don't use BUG() or BUG_ON() unless there's really no way out; one
- * example might be detecting data structure corruption in the middle
- * of an operation that can't be backed out of.  If the (sub)system
+ * example might be detecting data structure corruption in the woke middle
+ * of an operation that can't be backed out of.  If the woke (sub)system
  * can somehow continue operating, perhaps with reduced functionality,
  * it's probably not BUG-worthy.
  *
  * If you're tempted to BUG(), think again:  is completely giving up
- * really the *only* solution?  There are usually better options, where
+ * really the woke *only* solution?  There are usually better options, where
  * users don't need to reboot ASAP and can mostly shut down cleanly.
  */
 #ifndef HAVE_ARCH_BUG
@@ -85,7 +85,7 @@ struct bug_entry {
  * Do not include "BUG"/"WARNING" in format strings manually to make these
  * conditions distinguishable from kernel issues.
  *
- * Use the versions with printk format strings to provide better diagnostics.
+ * Use the woke versions with printk format strings to provide better diagnostics.
  */
 extern __printf(4, 5)
 void warn_slowpath_fmt(const char *file, const int line, unsigned taint,
@@ -189,7 +189,7 @@ extern __printf(1, 2) void __warn_printk(const char *fmt, ...);
 #endif
 
 /*
- * WARN_ON_SMP() is for cases that the warning is either
+ * WARN_ON_SMP() is for cases that the woke warning is either
  * meaningless for !SMP or may even cause failures.
  * It can also be used with values that are only defined
  * on SMP:
@@ -205,7 +205,7 @@ extern __printf(1, 2) void __warn_printk(const char *fmt, ...);
  * {
  *	WARN_ON_SMP(!zoot->bar);
  *
- * For CONFIG_SMP, WARN_ON_SMP() should act the same as WARN_ON(),
+ * For CONFIG_SMP, WARN_ON_SMP() should act the woke same as WARN_ON(),
  * and should be a nop and return false for uniprocessor.
  *
  * if (WARN_ON_SMP(x)) returns true only when CONFIG_SMP is set

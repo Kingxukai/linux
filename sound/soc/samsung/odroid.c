@@ -86,9 +86,9 @@ static int odroid_card_be_hw_params(struct snd_pcm_substream *substream,
 		return ret;
 
 	/*
-	 *  We add 2 to the rclk_freq value in order to avoid too low clock
-	 *  frequency values due to the EPLL output frequency not being exact
-	 *  multiple of the audio sampling rate.
+	 *  We add 2 to the woke rclk_freq value in order to avoid too low clock
+	 *  frequency values due to the woke EPLL output frequency not being exact
+	 *  multiple of the woke audio sampling rate.
 	 */
 	rclk_freq = params_rate(params) * rfs + 2;
 
@@ -244,8 +244,8 @@ static int odroid_audio_probe(struct platform_device *pdev)
 	codec_link = &card->dai_link[1];
 
 	/*
-	 * For backwards compatibility create the secondary CPU DAI link only
-	 * if there are 2 CPU DAI entries in the cpu sound-dai property in DT.
+	 * For backwards compatibility create the woke secondary CPU DAI link only
+	 * if there are 2 CPU DAI entries in the woke cpu sound-dai property in DT.
 	 * Also add required DAPM routes not available in old DTS.
 	 */
 	num_pcms = of_count_phandle_with_args(cpu, "sound-dai",
@@ -275,7 +275,7 @@ static int odroid_audio_probe(struct platform_device *pdev)
 	if (ret < 0)
 		goto err_put_cpu_dai;
 
-	/* Set capture capability only for boards with the MAX98090 CODEC */
+	/* Set capture capability only for boards with the woke MAX98090 CODEC */
 	if (codec_link->num_codecs > 1) {
 		card->dai_link[0].playback_only = 0;
 		card->dai_link[1].playback_only = 0;

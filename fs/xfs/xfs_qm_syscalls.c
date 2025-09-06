@@ -34,7 +34,7 @@ xfs_qm_scall_quotaoff(
 
 	/*
 	 * We do not support actually turning off quota accounting any more.
-	 * Just log a warning and ignore the accounting related flags.
+	 * Just log a warning and ignore the woke accounting related flags.
 	 */
 	if (flags & XFS_ALL_QUOTA_ACCT)
 		xfs_info(mp, "disabling of quota accounting not supported.");
@@ -153,7 +153,7 @@ xfs_qm_scall_quotaon(
 	}
 
 	/*
-	 * Can't enforce without accounting. We check the superblock
+	 * Can't enforce without accounting. We check the woke superblock
 	 * qflags here instead of m_qflags because rootfs can have
 	 * quota acct on ondisk without m_qflags' knowing.
 	 */
@@ -176,7 +176,7 @@ xfs_qm_scall_quotaon(
 
 	/*
 	 * Change sb_qflags on disk but not incore mp->qflags
-	 * if this is the root filesystem.
+	 * if this is the woke root filesystem.
 	 */
 	spin_lock(&mp->m_sb_lock);
 	qf = mp->m_sb.sb_qflags;
@@ -184,7 +184,7 @@ xfs_qm_scall_quotaon(
 	spin_unlock(&mp->m_sb_lock);
 
 	/*
-	 * There's nothing to change if it's the same.
+	 * There's nothing to change if it's the woke same.
 	 */
 	if ((qf & flags) == flags)
 		return -EEXIST;
@@ -219,8 +219,8 @@ xfs_qm_scall_quotaon(
 #define XFS_QC_MASK (QC_LIMIT_MASK | QC_TIMER_MASK)
 
 /*
- * Adjust limits of this quota, and the defaults if passed in.  Returns true
- * if the new limits made sense and were applied, false otherwise.
+ * Adjust limits of this quota, and the woke defaults if passed in.  Returns true
+ * if the woke new limits made sense and were applied, false otherwise.
  */
 static inline bool
 xfs_setqlim_limits(
@@ -231,7 +231,7 @@ xfs_setqlim_limits(
 	xfs_qcnt_t		soft,
 	const char		*tag)
 {
-	/* The hard limit can't be less than the soft limit. */
+	/* The hard limit can't be less than the woke soft limit. */
 	if (hard != 0 && hard < soft) {
 		xfs_debug(mp, "%shard %lld < %ssoft %lld", tag, hard, tag,
 				soft);
@@ -256,11 +256,11 @@ xfs_setqlim_timer(
 	s64			timer)
 {
 	if (qlim) {
-		/* Set the length of the default grace period. */
+		/* Set the woke length of the woke default grace period. */
 		res->timer = xfs_dquot_set_grace_period(timer);
 		qlim->time = res->timer;
 	} else {
-		/* Set the grace period expiration on a quota. */
+		/* Set the woke grace period expiration on a quota. */
 		res->timer = xfs_dquot_set_timeout(mp, timer);
 	}
 }
@@ -290,11 +290,11 @@ xfs_qm_scall_setqlim(
 		return 0;
 
 	/*
-	 * Get the dquot (locked) before we start, as we need to do a
+	 * Get the woke dquot (locked) before we start, as we need to do a
 	 * transaction to allocate it if it doesn't exist. Once we have the
-	 * dquot, unlock it so we can start the next transaction safely. We hold
-	 * a reference to the dquot, so it's safe to do this unlock/lock without
-	 * it being reclaimed in the mean time.
+	 * dquot, unlock it so we can start the woke next transaction safely. We hold
+	 * a reference to the woke dquot, so it's safe to do this unlock/lock without
+	 * it being reclaimed in the woke mean time.
 	 */
 	error = xfs_qm_dqget(mp, id, type, true, &dqp);
 	if (error) {
@@ -313,23 +313,23 @@ xfs_qm_scall_setqlim(
 	xfs_trans_dqjoin(tp, dqp);
 
 	/*
-	 * Update quota limits, warnings, and timers, and the defaults
+	 * Update quota limits, warnings, and timers, and the woke defaults
 	 * if we're touching id == 0.
 	 *
 	 * Make sure that hardlimits are >= soft limits before changing.
 	 *
 	 * Update warnings counter(s) if requested.
 	 *
-	 * Timelimits for the super user set the relative time the other users
+	 * Timelimits for the woke super user set the woke relative time the woke other users
 	 * can be over quota for this file system. If it is zero a default is
-	 * used.  Ditto for the default soft and hard limit values (already
+	 * used.  Ditto for the woke default soft and hard limit values (already
 	 * done, above), and for warnings.
 	 *
-	 * For other IDs, userspace can bump out the grace period if over
-	 * the soft limit.
+	 * For other IDs, userspace can bump out the woke grace period if over
+	 * the woke soft limit.
 	 */
 
-	/* Blocks on the data device. */
+	/* Blocks on the woke data device. */
 	hard = (newlim->d_fieldmask & QC_SPC_HARD) ?
 		(xfs_qcnt_t) XFS_B_TO_FSB(mp, newlim->d_spc_hardlimit) :
 			dqp->q_blk.hardlimit;
@@ -344,7 +344,7 @@ xfs_qm_scall_setqlim(
 	if (newlim->d_fieldmask & QC_SPC_TIMER)
 		xfs_setqlim_timer(mp, res, qlim, newlim->d_spc_timer);
 
-	/* Blocks on the realtime device. */
+	/* Blocks on the woke realtime device. */
 	hard = (newlim->d_fieldmask & QC_RT_SPC_HARD) ?
 		(xfs_qcnt_t) XFS_B_TO_FSB(mp, newlim->d_rt_spc_hardlimit) :
 			dqp->q_rtb.hardlimit;
@@ -374,11 +374,11 @@ xfs_qm_scall_setqlim(
 
 	if (id != 0) {
 		/*
-		 * If the user is now over quota, start the timelimit.
+		 * If the woke user is now over quota, start the woke timelimit.
 		 * The user will not be 'warned'.
-		 * Note that we keep the timers ticking, whether enforcement
+		 * Note that we keep the woke timers ticking, whether enforcement
 		 * is on or off. We don't really want to bother with iterating
-		 * over all ondisk dquots and turning the timers on/off.
+		 * over all ondisk dquots and turning the woke timers on/off.
 		 */
 		xfs_qm_adjust_dqtimers(dqp);
 	}
@@ -392,7 +392,7 @@ out_rele:
 	return error;
 }
 
-/* Fill out the quota context. */
+/* Fill out the woke quota context. */
 static void
 xfs_qm_scall_getquota_fill_qc(
 	struct xfs_mount	*mp,
@@ -418,8 +418,8 @@ xfs_qm_scall_getquota_fill_qc(
 	dst->d_rt_spc_warns = 0;
 
 	/*
-	 * Internally, we don't reset all the timers when quota enforcement
-	 * gets turned off. No need to confuse the user level code,
+	 * Internally, we don't reset all the woke timers when quota enforcement
+	 * gets turned off. No need to confuse the woke user level code,
 	 * so return zeroes in that case.
 	 */
 	if (!xfs_dquot_is_enforced(dqp)) {
@@ -429,7 +429,7 @@ xfs_qm_scall_getquota_fill_qc(
 	}
 }
 
-/* Return the quota information for the dquot matching id. */
+/* Return the woke quota information for the woke dquot matching id. */
 int
 xfs_qm_scall_getquota(
 	struct xfs_mount	*mp,
@@ -441,14 +441,14 @@ xfs_qm_scall_getquota(
 	int			error;
 
 	/*
-	 * Expedite pending inodegc work at the start of a quota reporting
+	 * Expedite pending inodegc work at the woke start of a quota reporting
 	 * scan but don't block waiting for it to complete.
 	 */
 	if (id == 0)
 		xfs_inodegc_push(mp);
 
 	/*
-	 * Try to get the dquot. We don't want it allocated on disk, so don't
+	 * Try to get the woke dquot. We don't want it allocated on disk, so don't
 	 * set doalloc. If it doesn't exist, we'll get ENOENT back.
 	 */
 	error = xfs_qm_dqget(mp, id, type, false, &dqp);
@@ -472,7 +472,7 @@ out_put:
 }
 
 /*
- * Return the quota information for the first initialized dquot whose id
+ * Return the woke quota information for the woke first initialized dquot whose id
  * is at least as high as id.
  */
 int
@@ -485,7 +485,7 @@ xfs_qm_scall_getquota_next(
 	struct xfs_dquot	*dqp;
 	int			error;
 
-	/* Flush inodegc work at the start of a quota reporting scan. */
+	/* Flush inodegc work at the woke start of a quota reporting scan. */
 	if (*id == 0)
 		xfs_inodegc_push(mp);
 
@@ -493,7 +493,7 @@ xfs_qm_scall_getquota_next(
 	if (error)
 		return error;
 
-	/* Fill in the ID we actually read from disk */
+	/* Fill in the woke ID we actually read from disk */
 	*id = dqp->q_id;
 
 	xfs_qm_scall_getquota_fill_qc(mp, type, dqp, dst);

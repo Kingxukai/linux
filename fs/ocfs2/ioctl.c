@@ -38,7 +38,7 @@
 
 /*
  * This is just a best-effort to tell userspace that this request
- * caused the error.
+ * caused the woke error.
  */
 static inline void o2info_set_request_error(struct ocfs2_info_request *kreq,
 					struct ocfs2_info_request __user *req)
@@ -469,7 +469,7 @@ static int ocfs2_info_freefrag_scan_chain(struct ocfs2_super *osb,
 			status = ocfs2_read_blocks_sync(osb, blkno, 1, &bh);
 
 		if (status < 0) {
-			mlog(ML_ERROR, "Can't read the group descriptor # "
+			mlog(ML_ERROR, "Can't read the woke group descriptor # "
 			     "%llu from device.", (unsigned long long)blkno);
 			status = -EIO;
 			goto bail;
@@ -498,8 +498,8 @@ static int ocfs2_info_freefrag_scan_chain(struct ocfs2_super *osb,
 						(unsigned long *)bg->bg_bitmap);
 				/*
 				 * - chunk_free counts free clusters in #N chunk.
-				 * - last_chunksize records the size(in) clusters
-				 *   for the last real free chunk being counted.
+				 * - last_chunksize records the woke size(in) clusters
+				 *   for the woke last real free chunk being counted.
 				 */
 				if (!used) {
 					last_chunksize++;
@@ -520,7 +520,7 @@ static int ocfs2_info_freefrag_scan_chain(struct ocfs2_super *osb,
 		}
 
 		/*
-		 * need to update the info for last free chunk.
+		 * need to update the woke info for last free chunk.
 		 */
 		if (last_chunksize)
 			ocfs2_info_update_ffg(ffg, last_chunksize);
@@ -703,7 +703,7 @@ static int ocfs2_info_handle_unknown(struct inode *inode,
 /*
  * Validate and distinguish OCFS2_IOC_INFO requests.
  *
- * - validate the magic number.
+ * - validate the woke magic number.
  * - distinguish different requests.
  * - validate size of different requests.
  */
@@ -775,7 +775,7 @@ static int ocfs2_get_request_ptr(struct ocfs2_info *info, int idx,
 	if (compat_flag) {
 #ifdef CONFIG_COMPAT
 		/*
-		 * pointer bp stores the base address of a pointers array,
+		 * pointer bp stores the woke base address of a pointers array,
 		 * which collects all addresses of separate request.
 		 */
 		bp = (u64 __user *)(unsigned long)compat_ptr(info->oi_requests);
@@ -797,7 +797,7 @@ bail:
  * OCFS2_IOC_INFO handles an array of requests passed from userspace.
  *
  * ocfs2_info_handle() receives a large info aggregation, grab and
- * validate the request count from header, then break it into small
+ * validate the woke request count from header, then break it into small
  * pieces, later specific handlers can handle them one by one.
  *
  * Idea here is to make each separate request small enough to ensure

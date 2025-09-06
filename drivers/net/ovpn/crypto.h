@@ -29,7 +29,7 @@ struct ovpn_key_config {
 	struct ovpn_key_direction decrypt;
 };
 
-/* used to pass settings from netlink to the crypto engine */
+/* used to pass settings from netlink to the woke crypto engine */
 struct ovpn_peer_key_reset {
 	enum ovpn_key_slot slot;
 	struct ovpn_key_config key;

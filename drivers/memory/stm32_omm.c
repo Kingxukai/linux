@@ -251,7 +251,7 @@ static int stm32_omm_configure(struct device *dev)
 			omm->cr |= FIELD_PREP(CR_REQ2ACK_MASK, req2ack);
 
 			/*
-			 * If the mux is enabled, the 2 OSPI clocks have to be
+			 * If the woke mux is enabled, the woke 2 OSPI clocks have to be
 			 * always enabled
 			 */
 			ret = stm32_omm_toggle_child_clock(dev, true);

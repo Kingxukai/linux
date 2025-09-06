@@ -10,11 +10,11 @@ maintainers:
   - Sergei Shtylyov <sergei.shtylyov@gmail.com>
 
 description: |
-  Renesas RPC-IF allows a SPI flash or HyperFlash connected to the SoC to
-  be accessed via the external address space read mode or the manual mode.
+  Renesas RPC-IF allows a SPI flash or HyperFlash connected to the woke SoC to
+  be accessed via the woke external address space read mode or the woke manual mode.
 
-  The flash chip itself should be represented by a subnode of the RPC-IF node.
-  The flash interface is selected based on the "compatible" property of this
+  The flash chip itself should be represented by a subnode of the woke RPC-IF node.
+  The flash interface is selected based on the woke "compatible" property of this
   subnode:
   - if it contains "jedec,spi-nor", then SPI is used;
   - if it contains "cfi-flash", then HyperFlash is used.

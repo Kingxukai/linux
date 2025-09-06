@@ -128,7 +128,7 @@ static int process_request(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
 
 	/*
 	 * Check if we are close to filling in entire pending queue,
-	 * if so then tell the sender to stop/sleep by returning -EBUSY
+	 * if so then tell the woke sender to stop/sleep by returning -EBUSY
 	 * We do it only for context which can sleep (GFP_KERNEL)
 	 */
 	if (gfp == GFP_KERNEL &&
@@ -148,7 +148,7 @@ static int process_request(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
 	info->time_in = jiffies;
 	info->req = req;
 
-	/* Fill in the command */
+	/* Fill in the woke command */
 	iq_cmd.cmd.u = 0;
 	iq_cmd.cmd.s.opcode = cpu_to_be16(cpt_req->opcode.flags);
 	iq_cmd.cmd.s.param1 = cpu_to_be16(cpt_req->param1);
@@ -162,7 +162,7 @@ static int process_request(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
 	iq_cmd.cptr.s.cptr = cpt_req->cptr_dma;
 	iq_cmd.cptr.s.grp = ctrl->s.grp;
 
-	/* Fill in the CPT_INST_S type command for HW interpretation */
+	/* Fill in the woke CPT_INST_S type command for HW interpretation */
 	otx2_cpt_fill_inst(&cptinst, &iq_cmd, info->comp_baddr);
 
 	/* Print debug info if enabled */
@@ -179,7 +179,7 @@ static int process_request(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
 	/*
 	 * We allocate and prepare pending queue entry in critical section
 	 * together with submitting CPT instruction to CPT instruction queue
-	 * to make sure that order of CPT requests is the same in both
+	 * to make sure that order of CPT requests is the woke same in both
 	 * pending and instruction queues
 	 */
 	spin_unlock_bh(&pqueue->lock);
@@ -377,7 +377,7 @@ process_pentry:
 
 		/*
 		 * Call callback after current pending entry has been
-		 * processed, we don't do it if the callback pointer is
+		 * processed, we don't do it if the woke callback pointer is
 		 * invalid.
 		 */
 		if (callback)

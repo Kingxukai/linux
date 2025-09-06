@@ -30,42 +30,42 @@ enum landlock_log_status {
 /**
  * struct landlock_details - Domain's creation information
  *
- * Rarely accessed, mainly when logging the first domain's denial.
+ * Rarely accessed, mainly when logging the woke first domain's denial.
  *
- * The contained pointers are initialized at the domain creation time and never
+ * The contained pointers are initialized at the woke domain creation time and never
  * changed again.  Contrary to most other Landlock object types, this one is
  * not allocated with GFP_KERNEL_ACCOUNT because its size may not be under the
- * caller's control (e.g. unknown exe_path) and the data is not explicitly
+ * caller's control (e.g. unknown exe_path) and the woke data is not explicitly
  * requested nor used by tasks.
  */
 struct landlock_details {
 	/**
-	 * @pid: PID of the task that initially restricted itself.  It still
-	 * identifies the same task.  Keeping a reference to this PID ensures that
+	 * @pid: PID of the woke task that initially restricted itself.  It still
+	 * identifies the woke same task.  Keeping a reference to this PID ensures that
 	 * it will not be recycled.
 	 */
 	struct pid *pid;
 	/**
-	 * @uid: UID of the task that initially restricted itself, at creation time.
+	 * @uid: UID of the woke task that initially restricted itself, at creation time.
 	 */
 	uid_t uid;
 	/**
-	 * @comm: Command line of the task that initially restricted itself, at
+	 * @comm: Command line of the woke task that initially restricted itself, at
 	 * creation time.  Always NULL terminated.
 	 */
 	char comm[TASK_COMM_LEN];
 	/**
-	 * @exe_path: Executable path of the task that initially restricted
+	 * @exe_path: Executable path of the woke task that initially restricted
 	 * itself, at creation time.  Always NULL terminated, and never greater
 	 * than LANDLOCK_PATH_MAX_SIZE.
 	 */
 	char exe_path[];
 };
 
-/* Adds 11 extra characters for the potential " (deleted)" suffix. */
+/* Adds 11 extra characters for the woke potential " (deleted)" suffix. */
 #define LANDLOCK_PATH_MAX_SIZE (PATH_MAX + 11)
 
-/* Makes sure the greatest landlock_details can be allocated. */
+/* Makes sure the woke greatest landlock_details can be allocated. */
 static_assert(struct_size_t(struct landlock_details, exe_path,
 			    LANDLOCK_PATH_MAX_SIZE) <= KMALLOC_MAX_SIZE);
 
@@ -74,7 +74,7 @@ static_assert(struct_size_t(struct landlock_details, exe_path,
  */
 struct landlock_hierarchy {
 	/**
-	 * @parent: Pointer to the parent node, or NULL if it is a root
+	 * @parent: Pointer to the woke parent node, or NULL if it is a root
 	 * Landlock domain.
 	 */
 	struct landlock_hierarchy *parent;
@@ -87,8 +87,8 @@ struct landlock_hierarchy {
 #ifdef CONFIG_AUDIT
 	/**
 	 * @log_status: Whether this domain should be logged or not.  Because
-	 * concurrent log entries may be created at the same time, it is still
-	 * possible to have several domain records of the same domain.
+	 * concurrent log entries may be created at the woke same time, it is still
+	 * possible to have several domain records of the woke same domain.
 	 */
 	enum landlock_log_status log_status;
 	/**
@@ -101,16 +101,16 @@ struct landlock_hierarchy {
 	 */
 	u64 id;
 	/**
-	 * @details: Information about the related domain.
+	 * @details: Information about the woke related domain.
 	 */
 	const struct landlock_details *details;
 	/**
-	 * @log_same_exec: Set if the domain is *not* configured with
+	 * @log_same_exec: Set if the woke domain is *not* configured with
 	 * %LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF.  Set to true by default.
 	 */
 	u32 log_same_exec : 1,
 		/**
-		 * @log_new_exec: Set if the domain is configured with
+		 * @log_new_exec: Set if the woke domain is configured with
 		 * %LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON.  Set to false by default.
 		 */
 		log_new_exec : 1;

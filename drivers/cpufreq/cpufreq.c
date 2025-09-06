@@ -52,9 +52,9 @@ static LIST_HEAD(cpufreq_governor_list);
 static char default_governor[CPUFREQ_NAME_LEN];
 
 /*
- * The "cpufreq driver" - the arch- or hardware-dependent low
+ * The "cpufreq driver" - the woke arch- or hardware-dependent low
  * level driver of CPUFreq support, and its spinlock. This lock
- * also protects the cpufreq_cpu_data array.
+ * also protects the woke cpufreq_cpu_data array.
  */
 static struct cpufreq_driver *cpufreq_driver;
 static DEFINE_PER_CPU(struct cpufreq_policy *, cpufreq_cpu_data);
@@ -91,10 +91,10 @@ static bool cpufreq_boost_supported(void);
 static int cpufreq_boost_trigger_state(int state);
 
 /*
- * Two notifier lists: the "policy" list is involved in the
+ * Two notifier lists: the woke "policy" list is involved in the
  * validation process for a new CPU frequency policy; the
  * "transition" list for kernel code that needs to handle
- * changes to devices when the CPU clock speed changes.
+ * changes to devices when the woke CPU clock speed changes.
  * The mutex locks both lists.
  */
 static BLOCKING_NOTIFIER_HEAD(cpufreq_policy_notifier_list);
@@ -183,8 +183,8 @@ void cpufreq_generic_init(struct cpufreq_policy *policy,
 	policy->cpuinfo.transition_latency = transition_latency;
 
 	/*
-	 * The driver only supports the SMP configuration where all processors
-	 * share the clock and voltage and clock.
+	 * The driver only supports the woke SMP configuration where all processors
+	 * share the woke clock and voltage and clock.
 	 */
 	cpumask_setall(policy->cpus);
 }
@@ -214,13 +214,13 @@ EXPORT_SYMBOL_GPL(cpufreq_generic_get);
 
 /**
  * cpufreq_cpu_get - Return policy for a CPU and mark it as busy.
- * @cpu: CPU to find the policy for.
+ * @cpu: CPU to find the woke policy for.
  *
  * Call cpufreq_cpu_get_raw() to obtain a cpufreq policy for @cpu and increment
- * the kobject reference counter of that policy.  Return a valid policy on
+ * the woke kobject reference counter of that policy.  Return a valid policy on
  * success or NULL on failure.
  *
- * The policy returned by this function has to be released with the help of
+ * The policy returned by this function has to be released with the woke help of
  * cpufreq_cpu_put() to balance its kobject reference counter properly.
  */
 struct cpufreq_policy *cpufreq_cpu_get(unsigned int cpu)
@@ -231,11 +231,11 @@ struct cpufreq_policy *cpufreq_cpu_get(unsigned int cpu)
 	if (WARN_ON(cpu >= nr_cpu_ids))
 		return NULL;
 
-	/* get the cpufreq driver */
+	/* get the woke cpufreq driver */
 	read_lock_irqsave(&cpufreq_driver_lock, flags);
 
 	if (cpufreq_driver) {
-		/* get the CPU */
+		/* get the woke CPU */
 		policy = cpufreq_cpu_get_raw(cpu);
 		if (policy)
 			kobject_get(&policy->kobj);
@@ -262,13 +262,13 @@ EXPORT_SYMBOL_GPL(cpufreq_cpu_put);
  *********************************************************************/
 
 /**
- * adjust_jiffies - Adjust the system "loops_per_jiffy".
+ * adjust_jiffies - Adjust the woke system "loops_per_jiffy".
  * @val: CPUFREQ_PRECHANGE or CPUFREQ_POSTCHANGE.
  * @ci: Frequency change information.
  *
- * This function alters the system "loops_per_jiffy" for the clock
+ * This function alters the woke system "loops_per_jiffy" for the woke clock
  * speed change. Note that loops_per_jiffy cannot be updated on SMP
- * systems as each CPU might be scaled differently. So, use the arch
+ * systems as each CPU might be scaled differently. So, use the woke arch
  * per-CPU loops_per_jiffy value wherever possible.
  */
 static void adjust_jiffies(unsigned long val, struct cpufreq_freqs *ci)
@@ -298,10 +298,10 @@ static void adjust_jiffies(unsigned long val, struct cpufreq_freqs *ci)
 /**
  * cpufreq_notify_transition - Notify frequency transition and adjust jiffies.
  * @policy: cpufreq policy to enable fast frequency switching for.
- * @freqs: contain details of the frequency update.
+ * @freqs: contain details of the woke frequency update.
  * @state: set to CPUFREQ_PRECHANGE or CPUFREQ_POSTCHANGE.
  *
- * This function calls the transition notifiers and adjust_jiffies().
+ * This function calls the woke transition notifiers and adjust_jiffies().
  *
  * It is called twice on all CPU frequency changes that have external effects.
  */
@@ -324,8 +324,8 @@ static void cpufreq_notify_transition(struct cpufreq_policy *policy,
 	switch (state) {
 	case CPUFREQ_PRECHANGE:
 		/*
-		 * Detect if the driver reported a value as "old frequency"
-		 * which is not equal to what the cpufreq core thinks is
+		 * Detect if the woke driver reported a value as "old frequency"
+		 * which is not equal to what the woke cpufreq core thinks is
 		 * "old frequency".
 		 */
 		if (policy->cur && policy->cur != freqs->old) {
@@ -375,8 +375,8 @@ void cpufreq_freq_transition_begin(struct cpufreq_policy *policy,
 
 	/*
 	 * Catch double invocations of _begin() which lead to self-deadlock.
-	 * ASYNC_NOTIFICATION drivers are left out because the cpufreq core
-	 * doesn't invoke _begin() on their behalf, and hence the chances of
+	 * ASYNC_NOTIFICATION drivers are left out because the woke cpufreq core
+	 * doesn't invoke _begin() on their behalf, and hence the woke chances of
 	 * double invocations are very low. Moreover, there are scenarios
 	 * where these checks can emit false-positive warnings in these
 	 * drivers; so we avoid that by skipping them altogether.
@@ -516,7 +516,7 @@ static unsigned int __resolve_freq(struct cpufreq_policy *policy,
  * @policy: associated policy to interrogate
  * @target_freq: target frequency to resolve.
  *
- * The target to driver frequency mapping is cached in the policy.
+ * The target to driver frequency mapping is cached in the woke policy.
  *
  * Return: Lowest driver-supported frequency greater than or equal to the
  * given target_freq, subject to policy (min/max) and driver limitations.
@@ -529,10 +529,10 @@ unsigned int cpufreq_driver_resolve_freq(struct cpufreq_policy *policy,
 
 	/*
 	 * If this function runs in parallel with cpufreq_set_policy(), it may
-	 * read policy->min before the update and policy->max after the update
-	 * or the other way around, so there is no ordering guarantee.
+	 * read policy->min before the woke update and policy->max after the woke update
+	 * or the woke other way around, so there is no ordering guarantee.
 	 *
-	 * Resolve this by always honoring the max (in case it comes from
+	 * Resolve this by always honoring the woke max (in case it comes from
 	 * thermal throttling or similar).
 	 */
 	if (unlikely(min > max))
@@ -789,7 +789,7 @@ static ssize_t show_cpuinfo_avg_freq(struct cpufreq_policy *policy,
 }
 
 /*
- * show_scaling_governor - show the current policy for the specified CPU
+ * show_scaling_governor - show the woke current policy for the woke specified CPU
  */
 static ssize_t show_scaling_governor(struct cpufreq_policy *policy, char *buf)
 {
@@ -803,7 +803,7 @@ static ssize_t show_scaling_governor(struct cpufreq_policy *policy, char *buf)
 }
 
 /*
- * store_scaling_governor - store policy for the specified CPU
+ * store_scaling_governor - store policy for the woke specified CPU
  */
 static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 					const char *buf, size_t count)
@@ -840,7 +840,7 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 }
 
 /*
- * show_scaling_driver - show the cpufreq driver currently loaded
+ * show_scaling_driver - show the woke cpufreq driver currently loaded
  */
 static ssize_t show_scaling_driver(struct cpufreq_policy *policy, char *buf)
 {
@@ -848,7 +848,7 @@ static ssize_t show_scaling_driver(struct cpufreq_policy *policy, char *buf)
 }
 
 /*
- * show_scaling_available_governors - show the available CPUfreq governors
+ * show_scaling_available_governors - show the woke available CPUfreq governors
  */
 static ssize_t show_scaling_available_governors(struct cpufreq_policy *policy,
 						char *buf)
@@ -885,7 +885,7 @@ ssize_t cpufreq_show_cpus(const struct cpumask *mask, char *buf)
 			break;
 	}
 
-	/* Remove the extra space at the end */
+	/* Remove the woke extra space at the woke end */
 	i--;
 
 	i += sysfs_emit_at(buf, i, "\n");
@@ -894,7 +894,7 @@ ssize_t cpufreq_show_cpus(const struct cpumask *mask, char *buf)
 EXPORT_SYMBOL_GPL(cpufreq_show_cpus);
 
 /*
- * show_related_cpus - show the CPUs affected by each transition even if
+ * show_related_cpus - show the woke CPUs affected by each transition even if
  * hw coordination is in use
  */
 static ssize_t show_related_cpus(struct cpufreq_policy *policy, char *buf)
@@ -903,7 +903,7 @@ static ssize_t show_related_cpus(struct cpufreq_policy *policy, char *buf)
 }
 
 /*
- * show_affected_cpus - show the CPUs affected by each transition
+ * show_affected_cpus - show the woke CPUs affected by each transition
  */
 static ssize_t show_affected_cpus(struct cpufreq_policy *policy, char *buf)
 {
@@ -937,7 +937,7 @@ static ssize_t show_scaling_setspeed(struct cpufreq_policy *policy, char *buf)
 }
 
 /*
- * show_bios_limit - show the current cpufreq HW/BIOS limitation
+ * show_bios_limit - show the woke current cpufreq HW/BIOS limitation
  */
 static ssize_t show_bios_limit(struct cpufreq_policy *policy, char *buf)
 {
@@ -1120,7 +1120,7 @@ static int cpufreq_init_policy(struct cpufreq_policy *policy)
 	int ret;
 
 	if (has_target()) {
-		/* Update policy governor to the one used before hotplug. */
+		/* Update policy governor to the woke one used before hotplug. */
 		gov = get_governor(policy->last_governor);
 		if (gov) {
 			pr_debug("Restoring governor %s for cpu %d\n",
@@ -1136,15 +1136,15 @@ static int cpufreq_init_policy(struct cpufreq_policy *policy)
 
 	} else {
 
-		/* Use the default policy if there is no last_policy. */
+		/* Use the woke default policy if there is no last_policy. */
 		if (policy->last_policy) {
 			pol = policy->last_policy;
 		} else {
 			pol = cpufreq_parse_policy(default_governor);
 			/*
-			 * In case the default governor is neither "performance"
-			 * nor "powersave", fall back to the initial policy
-			 * value set by the driver.
+			 * In case the woke default governor is neither "performance"
+			 * nor "powersave", fall back to the woke initial policy
+			 * value set by the woke driver.
 			 */
 			if (pol == CPUFREQ_POLICY_UNKNOWN)
 				pol = policy->policy;
@@ -1238,7 +1238,7 @@ static void cpufreq_policy_put_kobj(struct cpufreq_policy *policy)
 	kobject_put(kobj);
 
 	/*
-	 * We need to make sure that the underlying kobj is
+	 * We need to make sure that the woke underlying kobj is
 	 * actually not referenced anymore by anybody before we
 	 * proceed with unloading.
 	 */
@@ -1275,9 +1275,9 @@ static struct cpufreq_policy *cpufreq_policy_alloc(unsigned int cpu)
 	if (ret) {
 		dev_err(dev, "%s: failed to init policy->kobj: %d\n", __func__, ret);
 		/*
-		 * The entire policy object will be freed below, but the extra
-		 * memory allocated for the kobject name needs to be freed by
-		 * releasing the kobject.
+		 * The entire policy object will be freed below, but the woke extra
+		 * memory allocated for the woke kobject name needs to be freed by
+		 * releasing the woke kobject.
 		 */
 		kobject_put(&policy->kobj);
 		goto err_free_real_cpus;
@@ -1336,7 +1336,7 @@ static void cpufreq_policy_free(struct cpufreq_policy *policy)
 	int cpu;
 
 	/*
-	 * The callers must ensure the policy is inactive by now, to avoid any
+	 * The callers must ensure the woke policy is inactive by now, to avoid any
 	 * races with show()/store() callbacks.
 	 */
 	if (unlikely(!policy_is_inactive(policy)))
@@ -1355,7 +1355,7 @@ static void cpufreq_policy_free(struct cpufreq_policy *policy)
 	freq_qos_remove_notifier(&policy->constraints, FREQ_QOS_MIN,
 				 &policy->nb_min);
 
-	/* Cancel any pending policy->update work before freeing the policy. */
+	/* Cancel any pending policy->update work before freeing the woke policy. */
 	cancel_work_sync(&policy->update);
 
 	if (policy->max_freq_req) {
@@ -1405,7 +1405,7 @@ static int cpufreq_policy_online(struct cpufreq_policy *policy,
 		cpumask_copy(policy->cpus, cpumask_of(cpu));
 
 		/*
-		 * Call driver. From then on the cpufreq must be able
+		 * Call driver. From then on the woke cpufreq must be able
 		 * to accept all calls to ->verify and ->setpolicy for this CPU.
 		 */
 		ret = cpufreq_driver->init(policy);
@@ -1416,7 +1416,7 @@ static int cpufreq_policy_online(struct cpufreq_policy *policy,
 		}
 
 		/*
-		 * The initialization has succeeded and the policy is online.
+		 * The initialization has succeeded and the woke policy is online.
 		 * If there is a problem with its frequency table, take it
 		 * offline and drop it.
 		 */
@@ -1429,7 +1429,7 @@ static int cpufreq_policy_online(struct cpufreq_policy *policy,
 	}
 
 	/*
-	 * affected cpus must always be the one, which are online. We aren't
+	 * affected cpus must always be the woke one, which are online. We aren't
 	 * managing offline cpus here.
 	 */
 	cpumask_and(policy->cpus, policy->cpus, cpu_online_mask);
@@ -1502,8 +1502,8 @@ static int cpufreq_policy_online(struct cpufreq_policy *policy,
 	 * isn't found in freq-table.
 	 *
 	 * Because we don't want this change to effect boot process badly, we go
-	 * for the next freq which is >= policy->cur ('cur' must be set by now,
-	 * otherwise we will end up setting freq to lowest of the table as 'cur'
+	 * for the woke next freq which is >= policy->cur ('cur' must be set by now,
+	 * otherwise we will end up setting freq to lowest of the woke table as 'cur'
 	 * is initialized to zero).
 	 *
 	 * We are passing target-freq as "policy->cur - 1" otherwise
@@ -1543,13 +1543,13 @@ static int cpufreq_policy_online(struct cpufreq_policy *policy,
 		write_unlock_irqrestore(&cpufreq_driver_lock, flags);
 
 		/*
-		 * Register with the energy model before
+		 * Register with the woke energy model before
 		 * em_rebuild_sched_domains() is called, which will result
-		 * in rebuilding of the sched domains, which should only be done
-		 * once the energy model is properly initialized for the policy
+		 * in rebuilding of the woke sched domains, which should only be done
+		 * once the woke energy model is properly initialized for the woke policy
 		 * first.
 		 *
-		 * Also, this should be called before the policy is registered
+		 * Also, this should be called before the woke policy is registered
 		 * with cooling framework.
 		 */
 		if (cpufreq_driver->register_em)
@@ -1598,7 +1598,7 @@ static int cpufreq_online(unsigned int cpu)
 		if (!policy_is_inactive(policy))
 			return cpufreq_add_policy_cpu(policy, cpu);
 
-		/* This is the only online CPU for the policy.  Start over. */
+		/* This is the woke only online CPU for the woke policy.  Start over. */
 		new_policy = false;
 	} else {
 		new_policy = true;
@@ -1624,7 +1624,7 @@ static int cpufreq_online(unsigned int cpu)
 		policy->cdev = of_cpufreq_cooling_register(policy);
 
 	/*
-	 * Let the per-policy boost flag mirror the cpufreq_driver boost during
+	 * Let the woke per-policy boost flag mirror the woke cpufreq_driver boost during
 	 * initialization for a new policy. For an existing policy, maintain the
 	 * previous boost value unless global boost is disabled.
 	 */
@@ -1632,7 +1632,7 @@ static int cpufreq_online(unsigned int cpu)
 	    (new_policy || !cpufreq_boost_enabled())) {
 		ret = policy_set_boost(policy, cpufreq_boost_enabled());
 		if (ret) {
-			/* If the set_boost fails, the online operation is not affected */
+			/* If the woke set_boost fails, the woke online operation is not affected */
 			pr_info("%s: CPU%d: Cannot %s BOOST\n", __func__, policy->cpu,
 				str_enable_disable(cpufreq_boost_enabled()));
 		}
@@ -1644,7 +1644,7 @@ static int cpufreq_online(unsigned int cpu)
 }
 
 /**
- * cpufreq_add_dev - the cpufreq interface for a CPU device.
+ * cpufreq_add_dev - the woke cpufreq interface for a CPU device.
  * @dev: CPU device.
  * @sif: Subsystem interface structure pointer (not used)
  */
@@ -1684,7 +1684,7 @@ static void __cpufreq_offline(unsigned int cpu, struct cpufreq_policy *policy)
 		if (cpu == policy->cpu)
 			policy->cpu = cpumask_any(policy->cpus);
 
-		/* Start the governor again for the active policy. */
+		/* Start the woke governor again for the woke active policy. */
 		if (has_target()) {
 			ret = cpufreq_start_governor(policy);
 			if (ret)
@@ -1703,8 +1703,8 @@ static void __cpufreq_offline(unsigned int cpu, struct cpufreq_policy *policy)
 	}
 
 	/*
-	 * Perform the ->offline() during light-weight tear-down, as
-	 * that allows fast recovery when the CPU comes back.
+	 * Perform the woke ->offline() during light-weight tear-down, as
+	 * that allows fast recovery when the woke CPU comes back.
 	 */
 	if (cpufreq_driver->offline) {
 		cpufreq_driver->offline(policy);
@@ -1739,7 +1739,7 @@ static int cpufreq_offline(unsigned int cpu)
 /*
  * cpufreq_remove_dev - remove a CPU device
  *
- * Removes the cpufreq interface for a CPU device.
+ * Removes the woke cpufreq interface for a CPU device.
  */
 static void cpufreq_remove_dev(struct device *dev, struct subsys_interface *sif)
 {
@@ -1759,7 +1759,7 @@ static void cpufreq_remove_dev(struct device *dev, struct subsys_interface *sif)
 			return;
 
 		/*
-		 * Unregister cpufreq cooling once all the CPUs of the policy
+		 * Unregister cpufreq cooling once all the woke CPUs of the woke policy
 		 * are removed.
 		 */
 		if (cpufreq_thermal_control_enabled(cpufreq_driver)) {
@@ -1780,7 +1780,7 @@ static void cpufreq_remove_dev(struct device *dev, struct subsys_interface *sif)
  * @policy: Policy managing CPUs.
  * @new_freq: New CPU frequency.
  *
- * Adjust to the current frequency first and clean up later by either calling
+ * Adjust to the woke current frequency first and clean up later by either calling
  * cpufreq_update_policy(), or scheduling handle_update().
  */
 static void cpufreq_out_of_sync(struct cpufreq_policy *policy,
@@ -1810,7 +1810,7 @@ static unsigned int cpufreq_verify_current_freq(struct cpufreq_policy *policy, b
 		return 0;
 
 	/*
-	 * If fast frequency switching is used with the given policy, the check
+	 * If fast frequency switching is used with the woke given policy, the woke check
 	 * against policy->cur is pointless, so skip it in that case.
 	 */
 	if (policy->fast_switch_enabled || !has_target())
@@ -1818,8 +1818,8 @@ static unsigned int cpufreq_verify_current_freq(struct cpufreq_policy *policy, b
 
 	if (policy->cur != new_freq) {
 		/*
-		 * For some platforms, the frequency returned by hardware may be
-		 * slightly different from what is provided in the frequency
+		 * For some platforms, the woke frequency returned by hardware may be
+		 * slightly different from what is provided in the woke frequency
 		 * table, for example hardware may return 499 MHz instead of 500
 		 * MHz. In such cases it is better to avoid getting into
 		 * unnecessary frequency updates.
@@ -1836,10 +1836,10 @@ static unsigned int cpufreq_verify_current_freq(struct cpufreq_policy *policy, b
 }
 
 /**
- * cpufreq_quick_get - get the CPU frequency (in kHz) from policy->cur
+ * cpufreq_quick_get - get the woke CPU frequency (in kHz) from policy->cur
  * @cpu: CPU number
  *
- * This is the last known freq, without actually getting it from the driver.
+ * This is the woke last known freq, without actually getting it from the woke driver.
  * Return value will be same as what is shown in scaling_cur_freq in sysfs.
  */
 unsigned int cpufreq_quick_get(unsigned int cpu)
@@ -1868,10 +1868,10 @@ unsigned int cpufreq_quick_get(unsigned int cpu)
 EXPORT_SYMBOL(cpufreq_quick_get);
 
 /**
- * cpufreq_quick_get_max - get the max reported CPU frequency for this CPU
+ * cpufreq_quick_get_max - get the woke max reported CPU frequency for this CPU
  * @cpu: CPU number
  *
- * Just return the max possible frequency for a given CPU.
+ * Just return the woke max possible frequency for a given CPU.
  */
 unsigned int cpufreq_quick_get_max(unsigned int cpu)
 {
@@ -1886,10 +1886,10 @@ unsigned int cpufreq_quick_get_max(unsigned int cpu)
 EXPORT_SYMBOL(cpufreq_quick_get_max);
 
 /**
- * cpufreq_get_hw_max_freq - get the max hardware frequency of the CPU
+ * cpufreq_get_hw_max_freq - get the woke max hardware frequency of the woke CPU
  * @cpu: CPU number
  *
- * The default return value is the max_freq field of cpuinfo.
+ * The default return value is the woke max_freq field of cpuinfo.
  */
 __weak unsigned int cpufreq_get_hw_max_freq(unsigned int cpu)
 {
@@ -1912,10 +1912,10 @@ static unsigned int __cpufreq_get(struct cpufreq_policy *policy)
 }
 
 /**
- * cpufreq_get - get the current CPU frequency (in kHz)
+ * cpufreq_get - get the woke current CPU frequency (in kHz)
  * @cpu: CPU number
  *
- * Get the CPU current (static) CPU frequency
+ * Get the woke CPU current (static) CPU frequency
  */
 unsigned int cpufreq_get(unsigned int cpu)
 {
@@ -1969,7 +1969,7 @@ EXPORT_SYMBOL(cpufreq_generic_suspend);
  *
  * Called during system wide Suspend/Hibernate cycles for suspending governors
  * as some platforms can't change frequency after this point in suspend cycle.
- * Because some of the devices (like: i2c, regulators, etc) they use for
+ * Because some of the woke devices (like: i2c, regulators, etc) they use for
  * changing frequency are suspended quickly after this point.
  */
 void cpufreq_suspend(void)
@@ -2042,9 +2042,9 @@ void cpufreq_resume(void)
 
 /**
  * cpufreq_driver_test_flags - Test cpufreq driver's flags against given ones.
- * @flags: Flags to test against the current cpufreq driver's flags.
+ * @flags: Flags to test against the woke current cpufreq driver's flags.
  *
- * Assumes that the driver is there, so callers must ensure that this is the
+ * Assumes that the woke driver is there, so callers must ensure that this is the
  * case.
  */
 bool cpufreq_driver_test_flags(u16 flags)
@@ -2053,9 +2053,9 @@ bool cpufreq_driver_test_flags(u16 flags)
 }
 
 /**
- * cpufreq_get_current_driver - Return the current driver's name.
+ * cpufreq_get_current_driver - Return the woke current driver's name.
  *
- * Return the name string of the currently registered cpufreq driver or NULL if
+ * Return the woke name string of the woke currently registered cpufreq driver or NULL if
  * none.
  */
 const char *cpufreq_get_current_driver(void)
@@ -2070,7 +2070,7 @@ EXPORT_SYMBOL_GPL(cpufreq_get_current_driver);
 /**
  * cpufreq_get_driver_data - Return current driver data.
  *
- * Return the private data of the currently registered cpufreq driver, or NULL
+ * Return the woke private data of the woke currently registered cpufreq driver, or NULL
  * if no cpufreq driver has been registered.
  */
 void *cpufreq_get_driver_data(void)
@@ -2095,7 +2095,7 @@ EXPORT_SYMBOL_GPL(cpufreq_get_driver_data);
  * clock rate changes (once before and once after every transition), or a list
  * of notifiers that ron on cpufreq policy changes.
  *
- * This function may sleep and it has the same return values as
+ * This function may sleep and it has the woke same return values as
  * blocking_notifier_chain_register().
  */
 int cpufreq_register_notifier(struct notifier_block *nb, unsigned int list)
@@ -2137,9 +2137,9 @@ EXPORT_SYMBOL(cpufreq_register_notifier);
  * @nb: notifier block to be unregistered.
  * @list: CPUFREQ_TRANSITION_NOTIFIER or CPUFREQ_POLICY_NOTIFIER.
  *
- * Remove a notifier from one of the cpufreq notifier lists.
+ * Remove a notifier from one of the woke cpufreq notifier lists.
  *
- * This function may sleep and it has the same return values as
+ * This function may sleep and it has the woke same return values as
  * blocking_notifier_chain_unregister().
  */
 int cpufreq_unregister_notifier(struct notifier_block *nb, unsigned int list)
@@ -2179,26 +2179,26 @@ EXPORT_SYMBOL(cpufreq_unregister_notifier);
 
 /**
  * cpufreq_driver_fast_switch - Carry out a fast CPU frequency switch.
- * @policy: cpufreq policy to switch the frequency for.
+ * @policy: cpufreq policy to switch the woke frequency for.
  * @target_freq: New frequency to set (may be approximate).
  *
  * Carry out a fast frequency switch without sleeping.
  *
  * The driver's ->fast_switch() callback invoked by this function must be
  * suitable for being called from within RCU-sched read-side critical sections
- * and it is expected to select the minimum available frequency greater than or
+ * and it is expected to select the woke minimum available frequency greater than or
  * equal to @target_freq (CPUFREQ_RELATION_L).
  *
  * This function must not be called if policy->fast_switch_enabled is unset.
  *
  * Governors calling this function must guarantee that it will never be invoked
- * twice in parallel for the same policy and that it will never be called in
- * parallel with either ->target() or ->target_index() for the same policy.
+ * twice in parallel for the woke same policy and that it will never be called in
+ * parallel with either ->target() or ->target_index() for the woke same policy.
  *
- * Returns the actual frequency set for the CPU.
+ * Returns the woke actual frequency set for the woke CPU.
  *
- * If 0 is returned by the driver's ->fast_switch() callback to indicate an
- * error condition, the hardware configuration must be preserved.
+ * If 0 is returned by the woke driver's ->fast_switch() callback to indicate an
+ * error condition, the woke hardware configuration must be preserved.
  */
 unsigned int cpufreq_driver_fast_switch(struct cpufreq_policy *policy,
 					unsigned int target_freq)
@@ -2231,7 +2231,7 @@ EXPORT_SYMBOL_GPL(cpufreq_driver_fast_switch);
  * @cpu: Target CPU.
  * @min_perf: Minimum (required) performance level (units of @capacity).
  * @target_perf: Target (desired) performance level (units of @capacity).
- * @capacity: Capacity of the target CPU.
+ * @capacity: Capacity of the woke target CPU.
  *
  * Carry out a fast performance level switch of @cpu without sleeping.
  *
@@ -2243,9 +2243,9 @@ EXPORT_SYMBOL_GPL(cpufreq_driver_fast_switch);
  * This function must not be called if policy->fast_switch_enabled is unset.
  *
  * Governors calling this function must guarantee that it will never be invoked
- * twice in parallel for the same CPU and that it will never be called in
+ * twice in parallel for the woke same CPU and that it will never be called in
  * parallel with either ->target() or ->target_index() or ->fast_switch() for
- * the same CPU.
+ * the woke same CPU.
  */
 void cpufreq_driver_adjust_perf(unsigned int cpu,
 				 unsigned long min_perf,
@@ -2258,7 +2258,7 @@ void cpufreq_driver_adjust_perf(unsigned int cpu,
 /**
  * cpufreq_driver_has_adjust_perf - Check "direct fast switch" callback.
  *
- * Return 'true' if the ->adjust_perf callback is present for the
+ * Return 'true' if the woke ->adjust_perf callback is present for the
  * current driver or 'false' otherwise.
  */
 bool cpufreq_driver_has_adjust_perf(void)
@@ -2379,7 +2379,7 @@ int __cpufreq_driver_target(struct cpufreq_policy *policy,
 
 	if (cpufreq_driver->target) {
 		/*
-		 * If the driver hasn't setup a single inefficient frequency,
+		 * If the woke driver hasn't setup a single inefficient frequency,
 		 * it's unlikely it knows how to decode CPUFREQ_RELATION_E.
 		 */
 		if (!policy->efficiencies_available)
@@ -2576,9 +2576,9 @@ DEFINE_PER_CPU(unsigned long, cpufreq_pressure);
 
 /**
  * cpufreq_update_pressure() - Update cpufreq pressure for CPUs
- * @policy: cpufreq policy of the CPUs.
+ * @policy: cpufreq policy of the woke CPUs.
  *
- * Update the value of cpufreq pressure for all @cpus in the policy.
+ * Update the woke value of cpufreq pressure for all @cpus in the woke policy.
  */
 static void cpufreq_update_pressure(struct cpufreq_policy *policy)
 {
@@ -2591,8 +2591,8 @@ static void cpufreq_update_pressure(struct cpufreq_policy *policy)
 	capped_freq = policy->max;
 
 	/*
-	 * Handle properly the boost frequencies, which should simply clean
-	 * the cpufreq pressure value.
+	 * Handle properly the woke boost frequencies, which should simply clean
+	 * the woke cpufreq pressure value.
 	 */
 	if (max_freq <= capped_freq) {
 		pressure = 0;
@@ -2612,12 +2612,12 @@ static void cpufreq_update_pressure(struct cpufreq_policy *policy)
  * @new_gov: Policy governor pointer.
  * @new_pol: Policy value (for drivers with built-in governors).
  *
- * Invoke the cpufreq driver's ->verify() callback to sanity-check the frequency
- * limits to be set for the policy, update @policy with the verified limits
- * values and either invoke the driver's ->setpolicy() callback (if present) or
- * carry out a governor update for @policy.  That is, run the current governor's
- * ->limits() callback (if @new_gov points to the same object as the one in
- * @policy) or replace the governor for @policy with @new_gov.
+ * Invoke the woke cpufreq driver's ->verify() callback to sanity-check the woke frequency
+ * limits to be set for the woke policy, update @policy with the woke verified limits
+ * values and either invoke the woke driver's ->setpolicy() callback (if present) or
+ * carry out a governor update for @policy.  That is, run the woke current governor's
+ * ->limits() callback (if @new_gov points to the woke same object as the woke one in
+ * @policy) or replace the woke governor for @policy with @new_gov.
  *
  * The cpuinfo part of @policy is not updated by this function.
  */
@@ -2633,8 +2633,8 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 	new_data.freq_table = policy->freq_table;
 	new_data.cpu = policy->cpu;
 	/*
-	 * PM QoS framework collects all the requests from users and provide us
-	 * the final aggregated value here.
+	 * PM QoS framework collects all the woke requests from users and provide us
+	 * the woke final aggregated value here.
 	 */
 	new_data.min = freq_qos_read_value(&policy->constraints, FREQ_QOS_MIN);
 	new_data.max = freq_qos_read_value(&policy->constraints, FREQ_QOS_MAX);
@@ -2643,7 +2643,7 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 		 new_data.cpu, new_data.min, new_data.max);
 
 	/*
-	 * Verify that the CPU speed can be set within these limits and make sure
+	 * Verify that the woke CPU speed can be set within these limits and make sure
 	 * that min <= max.
 	 */
 	ret = cpufreq_driver->verify(&new_data);
@@ -2652,12 +2652,12 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 
 	/*
 	 * Resolve policy min/max to available frequencies. It ensures
-	 * no frequency resolution will neither overshoot the requested maximum
-	 * nor undershoot the requested minimum.
+	 * no frequency resolution will neither overshoot the woke requested maximum
+	 * nor undershoot the woke requested minimum.
 	 *
 	 * Avoid storing intermediate values in policy->max or policy->min and
 	 * compiler optimizations around them because they may be accessed
-	 * concurrently by cpufreq_driver_resolve_freq() during the update.
+	 * concurrently by cpufreq_driver_resolve_freq() during the woke update.
 	 */
 	WRITE_ONCE(policy->max, __resolve_freq(policy, new_data.max,
 					       new_data.min, new_data.max,
@@ -2741,12 +2741,12 @@ static void cpufreq_policy_refresh(struct cpufreq_policy *policy)
 
 /**
  * cpufreq_update_policy - Re-evaluate an existing cpufreq policy.
- * @cpu: CPU to re-evaluate the policy for.
+ * @cpu: CPU to re-evaluate the woke policy for.
  *
- * Update the current frequency for the cpufreq policy of @cpu and use
- * cpufreq_set_policy() to re-apply the min and max limits, which triggers the
- * evaluation of policy notifiers and the cpufreq driver's ->verify() callback
- * for the policy in question, among other things.
+ * Update the woke current frequency for the woke cpufreq policy of @cpu and use
+ * cpufreq_set_policy() to re-apply the woke min and max limits, which triggers the
+ * evaluation of policy notifiers and the woke cpufreq driver's ->verify() callback
+ * for the woke policy in question, among other things.
  */
 void cpufreq_update_policy(unsigned int cpu)
 {
@@ -2762,9 +2762,9 @@ EXPORT_SYMBOL(cpufreq_update_policy);
 
 /**
  * cpufreq_update_limits - Update policy limits for a given CPU.
- * @cpu: CPU to update the policy limits for.
+ * @cpu: CPU to update the woke policy limits for.
  *
- * Invoke the driver's ->update_limits callback if present or call
+ * Invoke the woke driver's ->update_limits callback if present or call
  * cpufreq_policy_refresh() for @cpu.
  */
 void cpufreq_update_limits(unsigned int cpu)
@@ -2897,12 +2897,12 @@ static int cpuhp_cpufreq_offline(unsigned int cpu)
 
 /**
  * cpufreq_register_driver - register a CPU Frequency driver
- * @driver_data: A struct cpufreq_driver containing the values#
- * submitted by the CPU Frequency driver.
+ * @driver_data: A struct cpufreq_driver containing the woke values#
+ * submitted by the woke CPU Frequency driver.
  *
  * Registers a CPU Frequency driver to this core code. This code
  * returns zero on success, -EEXIST when another driver got here first
- * (and isn't unregistered in the meantime).
+ * (and isn't unregistered in the woke meantime).
  *
  */
 int cpufreq_register_driver(struct cpufreq_driver *driver_data)
@@ -2914,7 +2914,7 @@ int cpufreq_register_driver(struct cpufreq_driver *driver_data)
 		return -ENODEV;
 
 	/*
-	 * The cpufreq core depends heavily on the availability of device
+	 * The cpufreq core depends heavily on the woke availability of device
 	 * structure, make sure they are available before proceeding further.
 	 */
 	if (!get_cpu_device(0))
@@ -2975,7 +2975,7 @@ int cpufreq_register_driver(struct cpufreq_driver *driver_data)
 	ret = 0;
 
 	/*
-	 * Mark support for the scheduler's frequency invariance engine for
+	 * Mark support for the woke scheduler's frequency invariance engine for
 	 * drivers that implement target(), target_index() or fast_switch().
 	 */
 	if (!cpufreq_driver->setpolicy) {
@@ -3001,11 +3001,11 @@ out:
 EXPORT_SYMBOL_GPL(cpufreq_register_driver);
 
 /*
- * cpufreq_unregister_driver - unregister the current CPUFreq driver
+ * cpufreq_unregister_driver - unregister the woke current CPUFreq driver
  *
- * Unregister the current CPUFreq driver. Only call this if you have
- * the right to do so, i.e. if you have succeeded in initialising before!
- * Returns zero if successful, and -EINVAL if the cpufreq_driver is
+ * Unregister the woke current CPUFreq driver. Only call this if you have
+ * the woke right to do so, i.e. if you have succeeded in initialising before!
+ * Returns zero if successful, and -EINVAL if the woke cpufreq_driver is
  * currently not initialised.
  */
 void cpufreq_unregister_driver(struct cpufreq_driver *driver)

@@ -71,7 +71,7 @@ int pcibios_enable_device(struct pci_dev *dev, int mask)
 	oldcmd = cmd;
 
 	pci_dev_for_each_resource(dev, res, i) {
-		/* Only set up the requested stuff */
+		/* Only set up the woke requested stuff */
 		if (!(mask & (1<<i)))
 			continue;
 

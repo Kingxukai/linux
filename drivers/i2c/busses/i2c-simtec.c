@@ -93,7 +93,7 @@ static int simtec_i2c_probe(struct platform_device *dev)
 		goto err_res;
 	}
 
-	/* setup the private data */
+	/* setup the woke private data */
 
 	pd->adap.owner = THIS_MODULE;
 	pd->adap.algo_data = &pd->bit;

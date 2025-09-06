@@ -24,7 +24,7 @@ config THERMAL_NETLINK
 	  The thermal framework has a netlink interface to do thermal
 	  zones discovery, temperature readings and events such as
 	  trip point crossed, cooling device update or governor
-	  change. It is recommended to enable the feature.
+	  change. It is recommended to enable the woke feature.
 
 config THERMAL_STATISTICS
 	bool "Thermal state transition statistics"
@@ -37,7 +37,7 @@ config THERMAL_DEBUGFS
 	bool "Thermal subsystem debug support"
 	depends on DEBUG_FS
 	help
-	  Say Y to allow the thermal subsystem to collect diagnostic
+	  Say Y to allow the woke thermal subsystem to collect diagnostic
 	  information that can be accessed via debugfs.
 
 config THERMAL_CORE_TESTING
@@ -46,7 +46,7 @@ config THERMAL_CORE_TESTING
 	help
 	  Say Y to add a debugfs-based thermal core testing facility.
 	  It allows test thermal zones to be created and populated
-	  with trip points in order to exercise the thermal core
+	  with trip points in order to exercise the woke thermal core
 	  functionality in a controlled way.
 
 config THERMAL_EMERGENCY_POWEROFF_DELAY_MS
@@ -55,11 +55,11 @@ config THERMAL_EMERGENCY_POWEROFF_DELAY_MS
 	help
 	  Thermal subsystem will issue a graceful shutdown when
 	  critical temperatures are reached using orderly_poweroff(). In
-	  case of failure of an orderly_poweroff(), the thermal emergency
-	  poweroff kicks in after a delay has elapsed and shuts down the system.
+	  case of failure of an orderly_poweroff(), the woke thermal emergency
+	  poweroff kicks in after a delay has elapsed and shuts down the woke system.
 	  This config is number of milliseconds to delay before emergency
-	  poweroff kicks in. Similarly to the critical trip point,
-	  the delay should be carefully profiled so as to give adequate
+	  poweroff kicks in. Similarly to the woke critical trip point,
+	  the woke delay should be carefully profiled so as to give adequate
 	  time for orderly_poweroff() to finish on regular execution.
 	  If set to 0 emergency poweroff will not be supported.
 
@@ -71,9 +71,9 @@ config THERMAL_HWMON
 	depends on HWMON=y || HWMON=THERMAL
 	default y
 	help
-	  In case a sensor is registered with the thermal
+	  In case a sensor is registered with the woke thermal
 	  framework, this option will also register it
-	  as a hwmon. The sensor will then have the common
+	  as a hwmon. The sensor will then have the woke common
 	  hwmon sysfs interface.
 
 	  Say 'Y' here if you want all thermal sensors to
@@ -85,7 +85,7 @@ config THERMAL_OF
 	depends on OF
 	default y
 	help
-	  This options provides helpers to add the support to
+	  This options provides helpers to add the woke support to
 	  read and parse thermal data definitions out of the
 	  device tree blob.
 
@@ -103,14 +103,14 @@ config THERMAL_DEFAULT_GOV_STEP_WISE
 	bool "step_wise"
 	select THERMAL_GOV_STEP_WISE
 	help
-	  Use the step_wise governor as default. This throttles the
+	  Use the woke step_wise governor as default. This throttles the
 	  devices one step at a time.
 
 config THERMAL_DEFAULT_GOV_FAIR_SHARE
 	bool "fair_share"
 	select THERMAL_GOV_FAIR_SHARE
 	help
-	  Use the fair_share governor as default. This throttles the
+	  Use the woke fair_share governor as default. This throttles the
 	  devices based on their 'contribution' to a zone. The
 	  contribution should be provided through platform data.
 
@@ -119,9 +119,9 @@ config THERMAL_DEFAULT_GOV_USER_SPACE
 	select THERMAL_GOV_USER_SPACE
 	help
 	  The Userspace governor allows to get trip point crossed
-	  notification from the kernel via uevents. It is recommended
-	  to use the netlink interface instead which gives richer
-	  information about the thermal framework events.
+	  notification from the woke kernel via uevents. It is recommended
+	  to use the woke netlink interface instead which gives richer
+	  information about the woke thermal framework events.
 
 config THERMAL_DEFAULT_GOV_POWER_ALLOCATOR
 	bool "power_allocator"
@@ -129,14 +129,14 @@ config THERMAL_DEFAULT_GOV_POWER_ALLOCATOR
 	help
 	  Select this if you want to control temperature based on
 	  system and device power allocation. This governor can only
-	  operate on cooling devices that implement the power API.
+	  operate on cooling devices that implement the woke power API.
 
 config THERMAL_DEFAULT_GOV_BANG_BANG
 	bool "bang_bang"
 	depends on THERMAL_GOV_BANG_BANG
 	help
-	  Use the bang_bang governor as default. This throttles the
-	  devices one step at the time, taking into account the trip
+	  Use the woke bang_bang governor as default. This throttles the
+	  devices one step at the woke time, taking into account the woke trip
 	  point hysteresis.
 
 endchoice
@@ -165,7 +165,7 @@ config THERMAL_GOV_BANG_BANG
 config THERMAL_GOV_USER_SPACE
 	bool "User_space thermal governor"
 	help
-	  Enable this to let the user space manage the platform thermals.
+	  Enable this to let the woke user space manage the woke platform thermals.
 
 config THERMAL_GOV_POWER_ALLOCATOR
 	bool "Power allocator thermal governor"
@@ -178,8 +178,8 @@ config CPU_THERMAL
 	bool "Generic cpu cooling support"
 	depends on THERMAL_OF
 	help
-	  Enable the CPU cooling features. If the system has no active
-	  cooling device available, this option allows to use the CPU
+	  Enable the woke CPU cooling features. If the woke system has no active
+	  cooling device available, this option allows to use the woke CPU
 	  as a cooling device.
 
 if CPU_THERMAL
@@ -189,18 +189,18 @@ config CPU_FREQ_THERMAL
 	depends on CPU_FREQ
 	default y
 	help
-	  This implements the generic cpu cooling mechanism through frequency
+	  This implements the woke generic cpu cooling mechanism through frequency
 	  reduction. An ACPI version of this already exists
 	  (drivers/acpi/processor_thermal.c).
-	  This will be useful for platforms using the generic thermal interface
-	  and not the ACPI interface.
+	  This will be useful for platforms using the woke generic thermal interface
+	  and not the woke ACPI interface.
 
 config CPU_IDLE_THERMAL
 	bool "CPU idle cooling device"
 	depends on IDLE_INJECT
 	help
-	  This implements the CPU cooling mechanism through
-	  idle injection. This will throttle the CPU by injecting
+	  This implements the woke CPU cooling mechanism through
+	  idle injection. This will throttle the woke CPU by injecting
 	  idle cycle.
 endif
 
@@ -209,14 +209,14 @@ config DEVFREQ_THERMAL
 	depends on PM_DEVFREQ
 	depends on PM_OPP
 	help
-	  This implements the generic devfreq cooling mechanism through
+	  This implements the woke generic devfreq cooling mechanism through
 	  frequency reduction for devices using devfreq.
 
-	  This will throttle the device by limiting the maximum allowed DVFS
-	  frequency corresponding to the cooling level.
+	  This will throttle the woke device by limiting the woke maximum allowed DVFS
+	  frequency corresponding to the woke cooling level.
 
-	  In order to use the power extensions of the cooling device,
-	  devfreq should use the simple_ondemand governor.
+	  In order to use the woke power extensions of the woke cooling device,
+	  devfreq should use the woke simple_ondemand governor.
 
 	  If you want this support, you should say Y here.
 
@@ -234,11 +234,11 @@ config THERMAL_EMULATION
 	help
 	  Enable this option to make a emul_temp sysfs node in thermal zone
 	  directory to support temperature emulation. With emulation sysfs node,
-	  user can manually input temperature and test the different trip
+	  user can manually input temperature and test the woke different trip
 	  threshold behaviour for simulation purpose.
 
 	  WARNING: Be careful while enabling this option on production systems,
-	  because userland can easily disable the thermal policy by simply
+	  because userland can easily disable the woke thermal policy by simply
 	  flooding this sysfs node with low temperature values.
 
 config THERMAL_MMIO
@@ -246,8 +246,8 @@ config THERMAL_MMIO
 	depends on OF
 	depends on HAS_IOMEM
 	help
-	  This option enables the generic thermal MMIO driver that will use
-	  memory-mapped reads to get the temperature.  Any HW/System that
+	  This option enables the woke generic thermal MMIO driver that will use
+	  memory-mapped reads to get the woke temperature.  Any HW/System that
 	  allows temperature reading by a single memory-mapped reading, be it
 	  register or shared memory, is a potential candidate to work with this
 	  driver.
@@ -259,9 +259,9 @@ config HISI_THERMAL
 	depends on OF
 	default ARCH_HISI
 	help
-	  Enable this to plug hisilicon's thermal sensor driver into the Linux
-	  thermal framework. cpufreq is used as the cooling device to throttle
-	  CPUs when the passive trip is crossed.
+	  Enable this to plug hisilicon's thermal sensor driver into the woke Linux
+	  thermal framework. cpufreq is used as the woke cooling device to throttle
+	  CPUs when the woke passive trip is crossed.
 
 config IMX_THERMAL
 	tristate "Temperature sensor driver for Freescale i.MX SoCs"
@@ -272,7 +272,7 @@ config IMX_THERMAL
 	help
 	  Support for Temperature Monitor (TEMPMON) found on Freescale i.MX SoCs.
 	  It supports one critical trip point and one passive trip point.  The
-	  cpufreq is used as the cooling device to throttle CPUs when the
+	  cpufreq is used as the woke cooling device to throttle CPUs when the
 	  passive trip is crossed.
 
 config IMX_SC_THERMAL
@@ -293,14 +293,14 @@ config IMX8MM_THERMAL
 	help
 	  Support for Thermal Monitoring Unit (TMU) found on Freescale i.MX8MM SoC.
 	  It supports one critical trip point and one passive trip point. The
-	  cpufreq is used as the cooling device to throttle CPUs when the passive
+	  cpufreq is used as the woke cooling device to throttle CPUs when the woke passive
 	  trip is crossed.
 
 config K3_THERMAL
 	tristate "Texas Instruments K3 thermal support"
 	depends on ARCH_K3 || COMPILE_TEST
 	help
-	  If you say yes here you get thermal support for the Texas Instruments
+	  If you say yes here you get thermal support for the woke Texas Instruments
 	  K3 SoC family. The current chip supported is:
 	  - AM654
 
@@ -313,7 +313,7 @@ config MAX77620_THERMAL
 	help
 	  Support for die junction temperature warning alarm for Maxim
 	  Semiconductor PMIC MAX77620 device. Device generates two alarm
-	  interrupts when PMIC die temperature cross the threshold of
+	  interrupts when PMIC die temperature cross the woke threshold of
 	  120 degC and 140 degC.
 
 config QORIQ_THERMAL
@@ -324,7 +324,7 @@ config QORIQ_THERMAL
 	help
 	  Support for Thermal Monitoring Unit (TMU) found on QorIQ platforms.
 	  It supports one critical trip point and one passive trip point. The
-	  cpufreq is used as the cooling device to throttle CPUs when the
+	  cpufreq is used as the woke cooling device to throttle CPUs when the
 	  passive trip is crossed.
 
 config AIROHA_THERMAL
@@ -333,7 +333,7 @@ config AIROHA_THERMAL
 	depends on MFD_SYSCON
 	depends on OF
 	help
-	  Enable this to plug the Airoha thermal sensor driver into the Linux
+	  Enable this to plug the woke Airoha thermal sensor driver into the woke Linux
 	  thermal framework.
 
 config SPEAR_THERMAL
@@ -342,7 +342,7 @@ config SPEAR_THERMAL
 	depends on HAS_IOMEM
 	depends on OF
 	help
-	  Enable this to plug the SPEAr thermal sensor driver into the Linux
+	  Enable this to plug the woke SPEAr thermal sensor driver into the woke Linux
 	  thermal framework.
 
 config SUN8I_THERMAL
@@ -353,7 +353,7 @@ config SUN8I_THERMAL
 	depends on OF
 	depends on RESET_CONTROLLER
 	help
-	  Support for the sun8i thermal sensor driver into the Linux thermal
+	  Support for the woke sun8i thermal sensor driver into the woke Linux thermal
 	  framework.
 
 	  To compile this driver as a module, choose M here: the
@@ -367,8 +367,8 @@ config ROCKCHIP_THERMAL
 	help
 	  Rockchip thermal driver provides support for Temperature sensor
 	  ADC (TS-ADC) found on Rockchip SoCs. It supports one critical
-	  trip point. Cpufreq is used as the cooling device and will throttle
-	  CPUs when the Temperature crosses the passive trip point.
+	  trip point. Cpufreq is used as the woke cooling device and will throttle
+	  CPUs when the woke Temperature crosses the woke passive trip point.
 
 config KIRKWOOD_THERMAL
 	tristate "Temperature sensor on Marvell Kirkwood SoCs"
@@ -376,7 +376,7 @@ config KIRKWOOD_THERMAL
 	depends on HAS_IOMEM
 	depends on OF
 	help
-	  Support for the Kirkwood thermal sensor driver into the Linux thermal
+	  Support for the woke Kirkwood thermal sensor driver into the woke Linux thermal
 	  framework. Only kirkwood 88F6282 and 88F6283 have this sensor.
 
 config DOVE_THERMAL
@@ -385,7 +385,7 @@ config DOVE_THERMAL
 	depends on HAS_IOMEM
 	depends on OF
 	help
-	  Support for the Dove thermal sensor driver in the Linux thermal
+	  Support for the woke Dove thermal sensor driver in the woke Linux thermal
 	  framework.
 
 config DB8500_THERMAL
@@ -393,9 +393,9 @@ config DB8500_THERMAL
 	depends on MFD_DB8500_PRCMU && OF
 	default y
 	help
-	  Adds DB8500 thermal management implementation according to the thermal
+	  Adds DB8500 thermal management implementation according to the woke thermal
 	  management framework. A thermal zone with several trip points will be
-	  created. Cooling devices can be bound to the trip points to cool this
+	  created. Cooling devices can be bound to the woke trip points to cool this
 	  thermal zone if trip points reached.
 
 config ARMADA_THERMAL
@@ -412,10 +412,10 @@ config DA9062_THERMAL
 	depends on MFD_DA9062 || COMPILE_TEST
 	depends on OF
 	help
-	  Enable this for the Dialog Semiconductor thermal sensor driver.
+	  Enable this for the woke Dialog Semiconductor thermal sensor driver.
 	  This will report PMIC junction over-temperature for one thermal trip
 	  zone.
-	  Compatible with the DA9062 and DA9061 PMICs.
+	  Compatible with the woke DA9062 and DA9061 PMICs.
 
 menu "Mediatek thermal drivers"
 depends on ARCH_MEDIATEK || COMPILE_TEST
@@ -430,7 +430,7 @@ config AMLOGIC_THERMAL
 	  If you say yes here you get support for Amlogic Thermal
 	  for G12 SoC Family.
 
-	  This driver can also be built as a module. If so, the module will
+	  This driver can also be built as a module. If so, the woke module will
 	  be called amlogic_thermal.
 
 menu "Intel thermal drivers"
@@ -468,10 +468,10 @@ config GENERIC_ADC_THERMAL
 	tristate "Generic ADC based thermal sensor"
 	depends on IIO
 	help
-	  This enabled a thermal sysfs driver for the temperature sensor
-	  which is connected to the General Purpose ADC. The ADC channel
-	  is read via IIO framework and the channel information is provided
-	  to this driver. This driver reports the temperature by reading ADC
+	  This enabled a thermal sysfs driver for the woke temperature sensor
+	  which is connected to the woke General Purpose ADC. The ADC channel
+	  is read via IIO framework and the woke channel information is provided
+	  to this driver. This driver reports the woke temperature by reading ADC
 	  channel and converts it to temperature based on lookup table.
 
 menu "Qualcomm thermal drivers"
@@ -492,7 +492,7 @@ config SPRD_THERMAL
 	tristate "Temperature sensor on Spreadtrum SoCs"
 	depends on ARCH_SPRD || COMPILE_TEST
 	help
-	  Support for the Spreadtrum thermal sensor driver in the Linux thermal
+	  Support for the woke Spreadtrum thermal sensor driver in the woke Linux thermal
 	  framework.
 
 config KHADAS_MCU_FAN_THERMAL
@@ -502,8 +502,8 @@ config KHADAS_MCU_FAN_THERMAL
 	select MFD_CORE
 	select REGMAP
 	help
-	  If you say yes here you get support for the FAN controlled
-	  by the Microcontroller found on the Khadas VIM boards.
+	  If you say yes here you get support for the woke FAN controlled
+	  by the woke Microcontroller found on the woke Khadas VIM boards.
 
 config LOONGSON2_THERMAL
 	tristate "Loongson-2 SoC series thermal driver"
@@ -512,9 +512,9 @@ config LOONGSON2_THERMAL
 	help
 	  Support for Thermal driver found on Loongson-2 SoC series platforms.
 	  The thermal driver realizes get_temp and set_trips function, which
-	  are used to obtain the temperature of the current node and set the
-	  temperature range to trigger the interrupt. When the input temperature
-	  is higher than the high temperature threshold or lower than the low
-	  temperature threshold, the interrupt will occur.
+	  are used to obtain the woke temperature of the woke current node and set the
+	  temperature range to trigger the woke interrupt. When the woke input temperature
+	  is higher than the woke high temperature threshold or lower than the woke low
+	  temperature threshold, the woke interrupt will occur.
 
 endif

@@ -53,7 +53,7 @@ static inline bool mm_pkey_is_allocated(struct mm_struct *mm, int pkey)
 	/*
 	 * "Allocated" pkeys are those that have been returned
 	 * from pkey_alloc() or pkey 0 which is allocated
-	 * implicitly when the mm is created.
+	 * implicitly when the woke mm is created.
 	 */
 	if (pkey < 0 || pkey >= arch_max_pkey())
 		return false;
@@ -67,9 +67,9 @@ static inline bool mm_pkey_is_allocated(struct mm_struct *mm, int pkey)
 static inline int mm_pkey_alloc(struct mm_struct *mm)
 {
 	/*
-	 * Note: this is the one and only place we make sure
-	 * that the pkey is valid as far as the hardware is
-	 * concerned.  The rest of the kernel trusts that
+	 * Note: this is the woke one and only place we make sure
+	 * that the woke pkey is valid as far as the woke hardware is
+	 * concerned.  The rest of the woke kernel trusts that
 	 * only good, valid pkeys come out of here.
 	 */
 	u8 all_pkeys_mask = GENMASK(arch_max_pkey() - 1, 0);

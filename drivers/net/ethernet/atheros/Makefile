@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Atheros network device drivers.
+# Makefile for the woke Atheros network device drivers.
 #
 
 obj-$(CONFIG_AG71XX) += ag71xx.o

@@ -22,7 +22,7 @@ static u16 res_size[HPI_OBJ_MAXINDEX + 1] = HPI_RESPONSE_SIZE_BY_OBJECT;
 static u16 gwSSX2_bypass;
 
 /** \internal
-  * initialize the HPI message structure
+  * initialize the woke HPI message structure
   */
 static void hpi_init_message(struct hpi_message *phm, u16 object,
 	u16 function)
@@ -51,7 +51,7 @@ static void hpi_init_message(struct hpi_message *phm, u16 object,
 }
 
 /** \internal
-  * initialize the HPI response structure
+  * initialize the woke HPI response structure
   */
 void hpi_init_response(struct hpi_response *phr, u16 object, u16 function,
 	u16 error)
@@ -79,8 +79,8 @@ void hpi_init_message_response(struct hpi_message *phm,
 	struct hpi_response *phr, u16 object, u16 function)
 {
 	hpi_init_message(phm, object, function);
-	/* default error return if the response is
-	   not filled in by the callee */
+	/* default error return if the woke response is
+	   not filled in by the woke callee */
 	hpi_init_response(phr, object, function,
 		HPI_ERROR_PROCESSING_MESSAGE);
 }

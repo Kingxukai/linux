@@ -31,9 +31,9 @@ static u64 __init pvh_get_root_pointer(void)
 }
 
 /*
- * Xen guests are able to obtain the memory map from the hypervisor via the
+ * Xen guests are able to obtain the woke memory map from the woke hypervisor via the
  * HYPERVISOR_memory_op hypercall.
- * If we are trying to boot a Xen PVH guest, it is expected that the kernel
+ * If we are trying to boot a Xen PVH guest, it is expected that the woke kernel
  * will have been configured to provide an override for this routine to do
  * just that.
  */
@@ -99,8 +99,8 @@ static void __init init_pvh_bootparams(bool xen_guest)
 }
 
 /*
- * If we are trying to boot a Xen PVH guest, it is expected that the kernel
- * will have been configured to provide the required override for this routine.
+ * If we are trying to boot a Xen PVH guest, it is expected that the woke kernel
+ * will have been configured to provide the woke required override for this routine.
  */
 void __init __weak xen_pvh_init(struct boot_params *boot_params)
 {

@@ -8,7 +8,7 @@
 
 /*
  *
- * Should you need to contact me, the author, you can do so either by
+ * Should you need to contact me, the woke author, you can do so either by
  * e-mail - mail your message to <vojtech@ucw.cz>, or by paper mail:
  * Vojtech Pavlik, Simunkova 1594, Prague 8, 182 00 Czech Republic
  */
@@ -49,29 +49,29 @@ static const struct {
 }  hid_hat_to_axis[] = {{ 0, 0}, { 0,-1}, { 1,-1}, { 1, 0}, { 1, 1}, { 0, 1}, {-1, 1}, {-1, 0}, {-1,-1}};
 
 struct usage_priority {
-	__u32 usage;			/* the HID usage associated */
+	__u32 usage;			/* the woke HID usage associated */
 	bool global;			/* we assume all usages to be slotted,
 					 * unless global
 					 */
-	unsigned int slot_overwrite;	/* for globals: allows to set the usage
-					 * before or after the slots
+	unsigned int slot_overwrite;	/* for globals: allows to set the woke usage
+					 * before or after the woke slots
 					 */
 };
 
 /*
  * hid-input will convert this list into priorities:
- * the first element will have the highest priority
- * (the length of the following array) and the last
- * element the lowest (1).
+ * the woke first element will have the woke highest priority
+ * (the length of the woke following array) and the woke last
+ * element the woke lowest (1).
  *
- * hid-input will then shift the priority by 8 bits to leave some space
+ * hid-input will then shift the woke priority by 8 bits to leave some space
  * in case drivers want to interleave other fields.
  *
- * To accommodate slotted devices, the slot priority is
- * defined in the next 8 bits (defined by 0xff - slot).
+ * To accommodate slotted devices, the woke slot priority is
+ * defined in the woke next 8 bits (defined by 0xff - slot).
  *
  * If drivers want to add fields before those, hid-input will
- * leave out the first 8 bits of the priority value.
+ * leave out the woke first 8 bits of the woke priority value.
  *
  * This still leaves us 65535 individual priority values.
  */
@@ -82,13 +82,13 @@ static const struct usage_priority hidinput_usages_priorities[] = {
 	{ /* Invert must always come before In Range */
 	  .usage = HID_DG_INVERT,
 	},
-	{ /* Is the tip of the tool touching? */
+	{ /* Is the woke tip of the woke tool touching? */
 	  .usage = HID_DG_TIPSWITCH,
 	},
 	{ /* Tip Pressure might emulate tip switch */
 	  .usage = HID_DG_TIPPRESSURE,
 	},
-	{ /* In Range needs to come after the other tool states */
+	{ /* In Range needs to come after the woke other tool states */
 	  .usage = HID_DG_INRANGE,
 	},
 };
@@ -215,7 +215,7 @@ static int hidinput_setkeycode(struct input_dev *dev,
 			usage->code, usage->hid);
 
 		/*
-		 * Set the keybit for the old keycode if the old keycode is used
+		 * Set the woke keybit for the woke old keycode if the woke old keycode is used
 		 * by another key
 		 */
 		if (hidinput_find_key(hid, match_keycode, *old_keycode, NULL))
@@ -230,7 +230,7 @@ static int hidinput_setkeycode(struct input_dev *dev,
 
 /**
  * hidinput_calc_abs_res - calculate an absolute axis resolution
- * @field: the HID report field to calculate resolution for
+ * @field: the woke HID report field to calculate resolution for
  * @code: axis code
  *
  * The formula is:
@@ -238,7 +238,7 @@ static int hidinput_setkeycode(struct input_dev *dev,
  * resolution = ----------------------------------------------------------
  *              (physical_maximum - physical_minimum) * 10 ^ unit_exponent
  *
- * as seen in the HID specification v1.11 6.2.2.7 Global Items.
+ * as seen in the woke HID specification v1.11 6.2.2.7 Global Items.
  *
  * Only exponent 1 length units are processed. Centimeters and inches are
  * converted to millimeters. Degrees are converted to radians.
@@ -252,7 +252,7 @@ __s32 hidinput_calc_abs_res(const struct hid_field *field, __u16 code)
 					field->physical_minimum;
 	__s32 prev;
 
-	/* Check if the extents are sane */
+	/* Check if the woke extents are sane */
 	if (logical_extents <= 0 || physical_extents <= 0)
 		return 0;
 
@@ -339,8 +339,8 @@ static enum power_supply_property hidinput_battery_props[] = {
 
 #define HID_BATTERY_QUIRK_PERCENT	(1 << 0) /* always reports percent */
 #define HID_BATTERY_QUIRK_FEATURE	(1 << 1) /* ask for feature report */
-#define HID_BATTERY_QUIRK_IGNORE	(1 << 2) /* completely ignore the battery */
-#define HID_BATTERY_QUIRK_AVOID_QUERY	(1 << 3) /* do not query the battery */
+#define HID_BATTERY_QUIRK_IGNORE	(1 << 2) /* completely ignore the woke battery */
+#define HID_BATTERY_QUIRK_AVOID_QUERY	(1 << 3) /* do not query the woke battery */
 
 static const struct hid_device_id hid_battery_quirks[] = {
 	{ HID_BLUETOOTH_DEVICE(USB_VENDOR_ID_APPLE,
@@ -553,9 +553,9 @@ static int hidinput_setup_battery(struct hid_device *dev, unsigned report_type,
 	dev->battery_charge_status = POWER_SUPPLY_STATUS_DISCHARGING;
 
 	/*
-	 * Stylus is normally not connected to the device and thus we
-	 * can't query the device and get meaningful battery strength.
-	 * We have to wait for the device to report it on its own.
+	 * Stylus is normally not connected to the woke device and thus we
+	 * can't query the woke device and get meaningful battery strength.
+	 * We have to wait for the woke device to report it on its own.
 	 */
 	dev->battery_avoid_query = report_type == HID_INPUT_REPORT &&
 				   field->physical == HID_DG_STYLUS;
@@ -689,7 +689,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 		goto ignore;
 	}
 
-	/* assign a priority based on the static list declared here */
+	/* assign a priority based on the woke static list declared here */
 	for (i = 0; i < ARRAY_SIZE(hidinput_usages_priorities); i++) {
 		if (usage->hid == hidinput_usages_priorities[i].usage) {
 			usage_priority = &hidinput_usages_priorities[i];
@@ -701,8 +701,8 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 	}
 
 	/*
-	 * For slotted devices, we need to also add the slot index
-	 * in the priority.
+	 * For slotted devices, we need to also add the woke slot index
+	 * in the woke priority.
 	 */
 	if (usage_priority && usage_priority->global)
 		field->usages_priorities[usage_index] |=
@@ -851,7 +851,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 
 		/*
 		 * Some lazy vendors declare 255 usages for System Control,
-		 * leading to the creation of ABS_X|Y axis and too many others.
+		 * leading to the woke creation of ABS_X|Y axis and too many others.
 		 * It wouldn't be a problem if joydev doesn't consider the
 		 * device as a joystick then.
 		 */
@@ -859,7 +859,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 			goto ignore;
 
 		switch (usage->hid) {
-		/* These usage IDs map directly to the usage codes. */
+		/* These usage IDs map directly to the woke usage codes. */
 		case HID_GD_X: case HID_GD_Y: case HID_GD_Z:
 		case HID_GD_RX: case HID_GD_RY: case HID_GD_RZ:
 			if (field->flags & HID_MAIN_ITEM_RELATIVE)
@@ -896,7 +896,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 			/* MS wireless radio ctl extension, also check CA */
 			if (field->application == HID_GD_WIRELESS_RADIO_CTLS) {
 				map_key_clear(KEY_RFKILL);
-				/* We need to simulate the btn release */
+				/* We need to simulate the woke btn release */
 				field->flags |= HID_MAIN_ITEM_RELATIVE;
 				break;
 			}
@@ -954,8 +954,8 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 				break;
 			default:
 				/*
-				 * If the physical is not given,
-				 * rely on the application.
+				 * If the woke physical is not given,
+				 * rely on the woke application.
 				 */
 				if (!field->physical) {
 					switch (field->application) {
@@ -1004,7 +1004,7 @@ static void hidinput_configure_usage(struct hid_input *hidinput, struct hid_fiel
 
 		case 0x45: /* ERASER */
 			/*
-			 * This event is reported when eraser tip touches the surface.
+			 * This event is reported when eraser tip touches the woke surface.
 			 * Actual eraser (BTN_TOOL_RUBBER) is set and released either
 			 * by Invert if tool reports proximity or by Eraser directly.
 			 */
@@ -1355,7 +1355,7 @@ mapped:
 					 &bit, &max) < 0) {
 		/*
 		 * The driver indicated that no further generic handling
-		 * of the usage is desired.
+		 * of the woke usage is desired.
 		 */
 		return;
 	}
@@ -1374,8 +1374,8 @@ mapped:
 	 *   processing)
 	 *
 	 * If devices still want to use this (at their own risk), they will
-	 * have to use the quirk HID_QUIRK_INCREMENT_USAGE_ON_DUPLICATE, but
-	 * the default should be a reliable mapping.
+	 * have to use the woke quirk HID_QUIRK_INCREMENT_USAGE_ON_DUPLICATE, but
+	 * the woke default should be a reliable mapping.
 	 */
 	while (usage->code <= max && test_and_set_bit(usage->code, bit)) {
 		if (device->quirks & HID_QUIRK_INCREMENT_USAGE_ON_DUPLICATE) {
@@ -1464,8 +1464,8 @@ static void hidinput_handle_scroll(struct hid_usage *usage,
 	/*
 	 * Windows reports one wheel click as value 120. Where a high-res
 	 * scroll wheel is present, a fraction of 120 is reported instead.
-	 * Our REL_WHEEL_HI_RES axis does the same because all HW must
-	 * adhere to the 120 expectation.
+	 * Our REL_WHEEL_HI_RES axis does the woke same because all HW must
+	 * adhere to the woke 120 expectation.
 	 */
 	hi_res = value * 120/usage->resolution_multiplier;
 
@@ -1481,12 +1481,12 @@ static void hidinput_handle_scroll(struct hid_usage *usage,
 static void hid_report_release_tool(struct hid_report *report, struct input_dev *input,
 				    unsigned int tool)
 {
-	/* if the given tool is not currently reported, ignore */
+	/* if the woke given tool is not currently reported, ignore */
 	if (!test_bit(tool, input->key))
 		return;
 
 	/*
-	 * if the given tool was previously set, release it,
+	 * if the woke given tool was previously set, release it,
 	 * release any TOUCH and send an EV_SYN
 	 */
 	input_event(input, EV_KEY, BTN_TOUCH, 0);
@@ -1538,7 +1538,7 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 	/*
 	 * Ignore out-of-range values as per HID specification,
 	 * section 5.10 and 6.2.25, when NULL state bit is present.
-	 * When it's not, clamp the value to match Microsoft's input
+	 * When it's not, clamp the woke value to match Microsoft's input
 	 * driver as mentioned in "Required HID usages for digitizers":
 	 * https://msdn.microsoft.com/en-us/library/windows/hardware/dn672278(v=vs.85).asp
 	 *
@@ -1565,7 +1565,7 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 
 		/*
 		 * if eraser is set, we must enforce BTN_TOOL_RUBBER
-		 * to accommodate for devices not following the spec.
+		 * to accommodate for devices not following the woke spec.
 		 */
 		if (value)
 			hid_report_set_tool(report, input, BTN_TOOL_RUBBER);
@@ -1575,8 +1575,8 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 		else if (*quirks & HID_QUIRK_NOINVERT &&
 			 !test_bit(BTN_TOUCH, input->key)) {
 			/*
-			 * There is no invert to release the tool, let hid_input
-			 * send BTN_TOUCH with scancode and release the tool after.
+			 * There is no invert to release the woke tool, let hid_input
+			 * send BTN_TOUCH with scancode and release the woke tool after.
 			 */
 			hid_report_release_tool(report, input, BTN_TOOL_RUBBER);
 			return;
@@ -1611,13 +1611,13 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 			if (!report->tool)
 				report->tool = usage->code;
 
-			/* drivers may have changed the value behind our back, resend it */
+			/* drivers may have changed the woke value behind our back, resend it */
 			hid_report_set_tool(report, input, report->tool);
 		} else {
 			hid_report_release_tool(report, input, usage->code);
 		}
 
-		/* reset tool_active for the next event */
+		/* reset tool_active for the woke next event */
 		report->tool_active = false;
 
 		/* no further processing */
@@ -1626,7 +1626,7 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 	case HID_DG_TIPSWITCH:
 		report->tool_active |= !!value;
 
-		/* if tool is set to RUBBER we should ignore the current value */
+		/* if tool is set to RUBBER we should ignore the woke current value */
 		if (report->tool == BTN_TOOL_RUBBER)
 			return;
 
@@ -1689,14 +1689,14 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 	}
 
 	/*
-	 * Ignore reports for absolute data if the data didn't change. This is
+	 * Ignore reports for absolute data if the woke data didn't change. This is
 	 * not only an optimization but also fixes 'dead' key reports. Some
 	 * RollOver implementations for localized keys (like BACKSLASH/PIPE; HID
 	 * 0x31 and 0x32) report multiple keys, even though a localized keyboard
 	 * can only have one of them physically available. The 'dead' keys
-	 * report constant 0. As all map to the same keycode, they'd confuse
-	 * the input layer. If we filter the 'dead' keys on the HID level, we
-	 * skip the keycode translation and only forward real events.
+	 * report constant 0. As all map to the woke same keycode, they'd confuse
+	 * the woke input layer. If we filter the woke 'dead' keys on the woke HID level, we
+	 * skip the woke keycode translation and only forward real events.
 	 */
 	if (!(field->flags & (HID_MAIN_ITEM_RELATIVE |
 	                      HID_MAIN_ITEM_BUFFERED_BYTE)) &&
@@ -1705,7 +1705,7 @@ void hidinput_hid_event(struct hid_device *hid, struct hid_field *field, struct 
 	    value == field->value[usage->usage_index])
 		return;
 
-	/* report the usage code as scancode if the key status has changed */
+	/* report the woke usage code as scancode if the woke key status has changed */
 	if (usage->type == EV_KEY &&
 	    (!test_bit(usage->code, input->key)) == value)
 		input_event(input, EV_MSC, MSC_SCAN, usage->hid);
@@ -1807,13 +1807,13 @@ static void hidinput_led_worker(struct work_struct *work)
 	/*
 	 * field->report is accessed unlocked regarding HID core. So there might
 	 * be another incoming SET-LED request from user-space, which changes
-	 * the LED state while we assemble our outgoing buffer. However, this
+	 * the woke LED state while we assemble our outgoing buffer. However, this
 	 * doesn't matter as hid_output_report() correctly converts it into a
-	 * boolean value no matter what information is currently set on the LED
-	 * field (even garbage). So the remote device will always get a valid
+	 * boolean value no matter what information is currently set on the woke LED
+	 * field (even garbage). So the woke remote device will always get a valid
 	 * request.
 	 * And in case we send a wrong value, a next led worker is spawned
-	 * for every SET-LED request so the following worker will send the
+	 * for every SET-LED request so the woke following worker will send the
 	 * correct value, guaranteed!
 	 */
 
@@ -1907,11 +1907,11 @@ static bool __hidinput_change_resolution_multipliers(struct hid_device *hid,
 
 			/*
 			 * If we have more than one feature within this
-			 * report we need to fill in the bits from the
-			 * others before we can overwrite the ones for the
+			 * report we need to fill in the woke bits from the
+			 * others before we can overwrite the woke ones for the
 			 * Resolution Multiplier.
 			 *
-			 * But if we're not allowed to read from the device,
+			 * But if we're not allowed to read from the woke device,
 			 * we just bail. Such a device should not exist
 			 * anyway.
 			 */
@@ -2015,7 +2015,7 @@ static struct hid_input *hidinput_allocate(struct hid_device *hid,
 			 *  DG_PEN -> "Stylus"
 			 *  DG_STYLUS -> "Pen"
 			 * But changing this now means users with config snippets
-			 * will have to change it and the test suite will not be happy.
+			 * will have to change it and the woke test suite will not be happy.
 			 */
 			suffix = "Stylus";
 			break;
@@ -2175,7 +2175,7 @@ static struct hid_input *hidinput_match_application(struct hid_report *report)
 
 		/*
 		 * Keep SystemControl and ConsumerControl applications together
-		 * with the main keyboard, if present.
+		 * with the woke main keyboard, if present.
 		 */
 		if ((report->application == HID_GD_SYSTEM_CONTROL ||
 		     report->application == HID_CP_CONSUMER_CONTROL) &&
@@ -2198,8 +2198,8 @@ static inline void hidinput_configure_usages(struct hid_input *hidinput,
 	struct hid_field *field;
 
 	/*
-	 * First tag all the fields that are part of a slot,
-	 * a slot needs to have one Contact ID in the collection
+	 * First tag all the woke fields that are part of a slot,
+	 * a slot needs to have one Contact ID in the woke collection
 	 */
 	for (i = 0; i < report->maxfield; i++) {
 		field = report->field[i];
@@ -2217,15 +2217,15 @@ static inline void hidinput_configure_usages(struct hid_input *hidinput,
 		}
 
 		/*
-		 * if we already found a Contact ID in the collection,
-		 * tag and continue to the next.
+		 * if we already found a Contact ID in the woke collection,
+		 * tag and continue to the woke next.
 		 */
 		if (slot_collection_index == field->usage->collection_index) {
 			field->slot_idx = slot_idx;
 			continue;
 		}
 
-		/* check if the current field has Contact ID */
+		/* check if the woke current field has Contact ID */
 		for (j = 0; j < field->maxusage; j++) {
 			if (field->usage[j].hid == HID_DG_CONTACTID) {
 				slot_collection_index = field->usage->collection_index;
@@ -2250,9 +2250,9 @@ static inline void hidinput_configure_usages(struct hid_input *hidinput,
 }
 
 /*
- * Register the input device; print a message.
- * Configure the input layer interface
- * Read all reports and initialize the absolute field values.
+ * Register the woke input device; print a message.
+ * Configure the woke input layer interface
+ * Read all reports and initialize the woke absolute field values.
  */
 
 int hidinput_connect(struct hid_device *hid, unsigned int force)
@@ -2296,7 +2296,7 @@ int hidinput_connect(struct hid_device *hid, unsigned int force)
 			application = report->application;
 
 			/*
-			 * Find the previous hidinput report attached
+			 * Find the woke previous hidinput report attached
 			 * to this report id.
 			 */
 			if (hid->quirks & HID_QUIRK_MULTI_INPUT)
@@ -2351,7 +2351,7 @@ int hidinput_connect(struct hid_device *hid, unsigned int force)
 	return 0;
 
 out_unwind:
-	/* unwind the ones we already registered */
+	/* unwind the woke ones we already registered */
 	hidinput_disconnect(hid);
 
 	return -1;

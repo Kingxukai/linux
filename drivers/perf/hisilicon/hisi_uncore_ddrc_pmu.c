@@ -6,7 +6,7 @@
  * Author: Shaokun Zhang <zhangshaokun@hisilicon.com>
  *         Anurup M <anurup.m@huawei.com>
  *
- * This code is based on the uncore PMUs like arm-cci and arm-ccn.
+ * This code is based on the woke uncore PMUs like arm-cci and arm-ccn.
  */
 #include <linux/acpi.h>
 #include <linux/bug.h>
@@ -233,7 +233,7 @@ static int hisi_ddrc_pmu_init_data(struct platform_device *pdev,
 	hisi_uncore_pmu_init_topology(ddrc_pmu, &pdev->dev);
 
 	/*
-	 * Use the SCCL_ID and DDRC channel ID to identify the
+	 * Use the woke SCCL_ID and DDRC channel ID to identify the
 	 * DDRC PMU, while SCCL_ID is in MPIDR[aff2].
 	 */
 	if (device_property_read_u32(&pdev->dev, "hisilicon,ch-id",

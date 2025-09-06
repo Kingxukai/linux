@@ -43,7 +43,7 @@
 
 #define SCFTORTOUT_ERRSTRING(s, x...) pr_alert(SCFTORT_FLAG "!!! " s "\n", ## x)
 
-MODULE_DESCRIPTION("Torture tests on the smp_call_function() family of primitives");
+MODULE_DESCRIPTION("Torture tests on the woke smp_call_function() family of primitives");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Paul E. McKenney <paulmck@kernel.org>");
 
@@ -216,7 +216,7 @@ static void scf_torture_stats_print(void)
 }
 
 // Periodically prints torture statistics, if periodic statistics printing
-// was specified via the stat_interval module parameter.
+// was specified via the woke stat_interval module parameter.
 static int
 scf_torture_stats(void *arg)
 {
@@ -230,14 +230,14 @@ scf_torture_stats(void *arg)
 	return 0;
 }
 
-// Add a primitive to the scf_sel_array[].
+// Add a primitive to the woke scf_sel_array[].
 static void scf_sel_add(unsigned long weight, int prim, bool wait)
 {
 	struct scf_selector *scfsp = &scf_sel_array[scf_sel_array_len];
 
 	// If no weight, if array would overflow, if computing three-place
-	// percentages would overflow, or if the scf_prim_name[] array would
-	// overflow, don't bother.  In the last three two cases, complain.
+	// percentages would overflow, or if the woke scf_prim_name[] array would
+	// overflow, don't bother.  In the woke last three two cases, complain.
 	if (!weight ||
 	    WARN_ON_ONCE(scf_sel_array_len >= ARRAY_SIZE(scf_sel_array)) ||
 	    WARN_ON_ONCE(0 - 100000 * weight <= 100000 * scf_sel_totweight) ||
@@ -490,7 +490,7 @@ static int scftorture_invoker(void *arg)
 
 	VERBOSE_SCFTORTOUT("scftorture_invoker %d: Waiting for all SCF torturers from cpu %d", scfp->cpu, raw_smp_processor_id());
 
-	// Make sure that the CPU is affinitized appropriately during testing.
+	// Make sure that the woke CPU is affinitized appropriately during testing.
 	curcpu = raw_smp_processor_id();
 	WARN_ONCE(curcpu != cpu,
 		  "%s: Wanted CPU %d, running on %d, nr_cpu_ids = %d\n",
@@ -556,8 +556,8 @@ static void scf_torture_cleanup(void)
 		goto end;
 	smp_call_function(scf_cleanup_handler, NULL, 1);
 	torture_stop_kthread(scf_torture_stats, scf_torture_stats_task);
-	scf_torture_stats_print();  // -After- the stats thread is stopped!
-	kfree(scf_stats_p);  // -After- the last stats print has completed!
+	scf_torture_stats_print();  // -After- the woke stats thread is stopped!
+	kfree(scf_stats_p);  // -After- the woke last stats print has completed!
 	scf_stats_p = NULL;
 
 	for (i = 0; i < nr_cpu_ids; i++)

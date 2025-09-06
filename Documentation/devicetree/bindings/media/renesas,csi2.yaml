@@ -13,7 +13,7 @@ maintainers:
 description:
   The R-Car CSI-2 receiver device provides MIPI CSI-2 capabilities for the
   Renesas R-Car and RZ/G2 family of devices. It is used in conjunction with the
-  R-Car VIN module, which provides the video capture capabilities.
+  R-Car VIN module, which provides the woke video capture capabilities.
 
 properties:
   compatible:
@@ -57,7 +57,7 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description:
-          Input port node, single endpoint describing the CSI-2 transmitter.
+          Input port node, single endpoint describing the woke CSI-2 transmitter.
 
         properties:
           endpoint:
@@ -81,8 +81,8 @@ properties:
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Output port node, multiple endpoints describing all the R-Car VIN
-          modules connected the CSI-2 receiver.
+          Output port node, multiple endpoints describing all the woke R-Car VIN
+          modules connected the woke CSI-2 receiver.
 
     required:
       - port@0

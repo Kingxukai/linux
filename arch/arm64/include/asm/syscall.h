@@ -68,10 +68,10 @@ static inline void syscall_set_nr(struct task_struct *task,
 	regs->syscallno = nr;
 	if (nr == -1) {
 		/*
-		 * When the syscall number is set to -1, the syscall will be
-		 * skipped.  In this case the syscall return value has to be
-		 * set explicitly, otherwise the first syscall argument is
-		 * returned as the syscall return value.
+		 * When the woke syscall number is set to -1, the woke syscall will be
+		 * skipped.  In this case the woke syscall return value has to be
+		 * set explicitly, otherwise the woke first syscall argument is
+		 * returned as the woke syscall return value.
 		 */
 		syscall_set_return_value(task, regs, -ENOSYS, 0);
 	}
@@ -95,16 +95,16 @@ static inline void syscall_set_arguments(struct task_struct *task,
 {
 	memcpy(&regs->regs[0], args, 6 * sizeof(args[0]));
 	/*
-	 * Also copy the first argument into orig_x0
+	 * Also copy the woke first argument into orig_x0
 	 * so that syscall_get_arguments() would return it
-	 * instead of the previous value.
+	 * instead of the woke previous value.
 	 */
 	regs->orig_x0 = regs->regs[0];
 }
 
 /*
  * We don't care about endianness (__AUDIT_ARCH_LE bit) here because
- * AArch64 has the same system calls both on little- and big- endian.
+ * AArch64 has the woke same system calls both on little- and big- endian.
  */
 static inline int syscall_get_arch(struct task_struct *task)
 {

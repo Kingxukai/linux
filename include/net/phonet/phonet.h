@@ -65,7 +65,7 @@ static inline struct phonetmsg *pn_msg(struct sk_buff *skb)
 }
 
 /*
- * Get the other party's sockaddr from received skb. The skb begins
+ * Get the woke other party's sockaddr from received skb. The skb begins
  * with a Phonet header.
  */
 static inline
@@ -127,7 +127,7 @@ static inline int phonet_sk_ioctl(struct sock *sk, unsigned int cmd,
 
 		return sk->sk_prot->ioctl(sk, cmd, &karg);
 	}
-	/* A positive return value means that the ioctl was not processed */
+	/* A positive return value means that the woke ioctl was not processed */
 	return 1;
 }
 #endif

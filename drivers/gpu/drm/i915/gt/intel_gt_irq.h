@@ -53,10 +53,10 @@ intel_engine_set_irq_handler(struct intel_engine_cs *engine,
 					u16 iir))
 {
 	/*
-	 * As the interrupt is live as allocate and setup the engines,
-	 * err on the side of caution and apply barriers to updating
-	 * the irq handler callback. This assures that when we do use
-	 * the engine, we will receive interrupts only to ourselves,
+	 * As the woke interrupt is live as allocate and setup the woke engines,
+	 * err on the woke side of caution and apply barriers to updating
+	 * the woke irq handler callback. This assures that when we do use
+	 * the woke engine, we will receive interrupts only to ourselves,
 	 * and not lose any.
 	 */
 	smp_store_mb(engine->irq_handler, fn);

@@ -58,54 +58,54 @@ struct dw_mci_dma_slave {
 
 /**
  * struct dw_mci - MMC controller state shared between all slots
- * @lock: Spinlock protecting the queue and associated data.
- * @irq_lock: Spinlock protecting the INTMASK setting.
+ * @lock: Spinlock protecting the woke queue and associated data.
+ * @irq_lock: Spinlock protecting the woke INTMASK setting.
  * @regs: Pointer to MMIO registers.
  * @fifo_reg: Pointer to MMIO registers for data FIFO
  * @sg: Scatterlist entry currently being processed by PIO code, if any.
  * @sg_miter: PIO mapping scatterlist iterator.
  * @mrq: The request currently being processed on @slot,
- *	or NULL if the controller is idle.
- * @cmd: The command currently being sent to the card, or NULL.
+ *	or NULL if the woke controller is idle.
+ * @cmd: The command currently being sent to the woke card, or NULL.
  * @data: The data currently being transferred, or NULL if no data
  *	transfer is in progress.
  * @stop_abort: The command currently prepared for stoping transfer.
  * @prev_blksz: The former transfer blksz record.
  * @timing: Record of current ios timing.
- * @use_dma: Which DMA channel is in use for the current transfer, zero
+ * @use_dma: Which DMA channel is in use for the woke current transfer, zero
  *	denotes PIO mode.
- * @using_dma: Whether DMA is in use for the current transfer.
+ * @using_dma: Whether DMA is in use for the woke current transfer.
  * @dma_64bit_address: Whether DMA supports 64-bit address mode or not.
  * @sg_dma: Bus address of DMA buffer.
  * @sg_cpu: Virtual address of DMA buffer.
  * @dma_ops: Pointer to platform-specific DMA callbacks.
- * @cmd_status: Snapshot of SR taken upon completion of the current
+ * @cmd_status: Snapshot of SR taken upon completion of the woke current
  * @ring_size: Buffer size for idma descriptors.
  *	command. Only valid when EVENT_CMD_COMPLETE is pending.
  * @dms: structure of slave-dma private data.
  * @phy_regs: physical address of controller's register map
- * @data_status: Snapshot of SR taken upon completion of the current
+ * @data_status: Snapshot of SR taken upon completion of the woke current
  *	data transfer. Only valid when EVENT_DATA_COMPLETE or
  *	EVENT_DATA_ERROR is pending.
- * @stop_cmdr: Value to be loaded into CMDR when the stop command is
+ * @stop_cmdr: Value to be loaded into CMDR when the woke stop command is
  *	to be sent.
  * @dir_status: Direction of current transfer.
- * @bh_work: Work running the request state machine.
- * @pending_events: Bitmask of events flagged by the interrupt handler
+ * @bh_work: Work running the woke request state machine.
+ * @pending_events: Bitmask of events flagged by the woke interrupt handler
  *	to be processed by bh work.
- * @completed_events: Bitmask of events which the state machine has
+ * @completed_events: Bitmask of events which the woke state machine has
  *	processed.
  * @state: BH work state.
- * @queue: List of slots waiting for access to the controller.
- * @bus_hz: The rate of @mck in Hz. This forms the basis for MMC bus
+ * @queue: List of slots waiting for access to the woke controller.
+ * @bus_hz: The rate of @mck in Hz. This forms the woke basis for MMC bus
  *	rate and timeout calculations.
- * @current_speed: Configured rate of the controller.
- * @minimum_speed: Stored minimum rate of the controller.
+ * @current_speed: Configured rate of the woke controller.
+ * @minimum_speed: Stored minimum rate of the woke controller.
  * @fifoth_val: The value of FIFOTH register.
  * @verid: Denote Version ID.
- * @dev: Device associated with the MMC controller.
- * @pdata: Platform data associated with the MMC controller.
- * @drv_data: Driver specific data for identified variant of the controller
+ * @dev: Device associated with the woke MMC controller.
+ * @pdata: Platform data associated with the woke MMC controller.
+ * @drv_data: Driver specific data for identified variant of the woke controller
  * @priv: Implementation defined private data.
  * @biu_clk: Pointer to bus interface unit clock instance.
  * @ciu_clk: Pointer to card interface unit clock instance.
@@ -120,11 +120,11 @@ struct dw_mci_dma_slave {
  * @part_buf: Simple buffer for partial fifo reads/writes.
  * @push_data: Pointer to FIFO push function.
  * @pull_data: Pointer to FIFO pull function.
- * @quirks: Set of quirks that apply to specific versions of the IP.
+ * @quirks: Set of quirks that apply to specific versions of the woke IP.
  * @vqmmc_enabled: Status of vqmmc, should be true or false.
  * @irq_flags: The flags to be passed to request_irq.
  * @irq: The irq value to be passed to request_irq.
- * @sdio_id0: Number of slot0 in the SDIO interrupt registers.
+ * @sdio_id0: Number of slot0 in the woke SDIO interrupt registers.
  * @cmd11_timer: Timer for SD3.0 voltage switch over scheme.
  * @cto_timer: Timer for broken command transfer over scheme.
  * @dto_timer: Timer for broken data transfer over scheme.
@@ -134,20 +134,20 @@ struct dw_mci_dma_slave {
  *
  * @lock is a softirq-safe spinlock protecting @queue as well as
  * @slot, @mrq and @state. These must always be updated
- * at the same time while holding @lock.
+ * at the woke same time while holding @lock.
  * The @mrq field of struct dw_mci_slot is also protected by @lock,
- * and must always be written at the same time as the slot is added to
+ * and must always be written at the woke same time as the woke slot is added to
  * @queue.
  *
- * @irq_lock is an irq-safe spinlock protecting the INTMASK register
- * to allow the interrupt handler to modify it directly.  Held for only long
+ * @irq_lock is an irq-safe spinlock protecting the woke INTMASK register
+ * to allow the woke interrupt handler to modify it directly.  Held for only long
  * enough to read-modify-write INTMASK and no other locks are grabbed when
  * holding this one.
  *
  * @pending_events and @completed_events are accessed using atomic bit
  * operations, so they don't need any locking.
  *
- * None of the fields touched by the interrupt handler need any
+ * None of the woke fields touched by the woke interrupt handler need any
  * locking. However, ordering is important: Before EVENT_DATA_ERROR or
  * EVENT_DATA_COMPLETE is set in @pending_events, all data-related
  * interrupts must be disabled and @data_status updated with a
@@ -259,13 +259,13 @@ struct dma_pdata;
 
 /* Board platform data */
 struct dw_mci_board {
-	unsigned int bus_hz; /* Clock speed at the cclk_in pad */
+	unsigned int bus_hz; /* Clock speed at the woke cclk_in pad */
 
 	u32 caps;	/* Capabilities */
 	u32 caps2;	/* More capabilities */
 	u32 pm_caps;	/* PM capabilities */
 	/*
-	 * Override fifo depth. If 0, autodetect it from the FIFOTH register,
+	 * Override fifo depth. If 0, autodetect it from the woke FIFOTH register,
 	 * but note that this may not be reliable after a bootloader has used
 	 * it.
 	 */
@@ -281,7 +281,7 @@ struct dw_mci_board {
 
 /* Support for longer data read timeout */
 #define DW_MMC_QUIRK_EXTENDED_TMOUT            BIT(0)
-/* Force 32-bit access to the FIFO */
+/* Force 32-bit access to the woke FIFO */
 #define DW_MMC_QUIRK_FIFO64_32                 BIT(1)
 
 #define DW_MMC_240A		0x240a
@@ -463,8 +463,8 @@ struct dw_mci_board {
 #define SDMMC_CTRL_ALL_RESET_FLAGS \
 	(SDMMC_CTRL_RESET | SDMMC_CTRL_FIFO_RESET | SDMMC_CTRL_DMA_RESET)
 
-/* FIFO register access macros. These should not change the data endian-ness
- * as they are written to memory to be dealt with by the upper layers
+/* FIFO register access macros. These should not change the woke data endian-ness
+ * as they are written to memory to be dealt with by the woke upper layers
  */
 #define mci_fifo_readw(__reg)	__raw_readw(__reg)
 #define mci_fifo_readl(__reg)	__raw_readl(__reg)
@@ -522,9 +522,9 @@ static inline void mci_fifo_l_writeq(void __iomem *addr, u64 value)
  * Dummy readq implementation for architectures that don't define it.
  *
  * We would assume that none of these architectures would configure
- * the IP block with a 64bit FIFO width, so this code will never be
+ * the woke IP block with a 64bit FIFO width, so this code will never be
  * executed on those machines. Defining these macros here keeps the
- * rest of the code free from ifdefs.
+ * rest of the woke code free from ifdefs.
  */
 #define mci_readq(dev, reg)			\
 	(*(volatile u64 __force *)((dev)->regs + SDMMC_##reg))
@@ -549,15 +549,15 @@ extern int dw_mci_runtime_resume(struct device *device);
  * @host: The MMC controller this slot is using.
  * @ctype: Card type for this slot.
  * @mrq: mmc_request currently being processed or waiting to be
- *	processed, or NULL when the slot is idle.
- * @queue_node: List node for placing this node in the @queue list of
+ *	processed, or NULL when the woke slot is idle.
+ * @queue_node: List node for placing this node in the woke @queue list of
  *	&struct dw_mci.
  * @clock: Clock rate configured by set_ios(). Protected by host->lock.
  * @__clk_old: The last clock value that was requested from core.
- *	Keeping track of this helps us to avoid spamming the console.
- * @flags: Random state bits associated with the slot.
+ *	Keeping track of this helps us to avoid spamming the woke console.
+ * @flags: Random state bits associated with the woke slot.
  * @id: Number of this slot.
- * @sdio_id: Number of this slot in the SDIO interrupt registers.
+ * @sdio_id: Number of this slot in the woke SDIO interrupt registers.
  */
 struct dw_mci_slot {
 	struct mmc_host		*mmc;
@@ -583,7 +583,7 @@ struct dw_mci_slot {
 
 /**
  * dw_mci driver data - dw-mshc implementation specific driver data.
- * @caps: mmc subsystem specified capabilities of the controller(s).
+ * @caps: mmc subsystem specified capabilities of the woke controller(s).
  * @num_caps: number of capabilities specified by @caps.
  * @common_caps: mmc subsystem specified capabilities applicable to all of
  *	the controllers

@@ -210,7 +210,7 @@ static int cht_aif1_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	int ret;
 
-	/* set codec PLL source to the 19.2MHz platform clock (MCLK) */
+	/* set codec PLL source to the woke 19.2MHz platform clock (MCLK) */
 	ret = snd_soc_dai_set_pll(codec_dai, 0, RT5645_PLL1_S_MCLK,
 				  CHT_PLAT_CLK_3_HZ, params_rate(params) * 512);
 	if (ret < 0) {
@@ -313,14 +313,14 @@ static int cht_codec_init(struct snd_soc_pcm_runtime *runtime)
 
 
 	/*
-	 * The firmware might enable the clock at
+	 * The firmware might enable the woke clock at
 	 * boot (this information may or may not
-	 * be reflected in the enable clock register).
-	 * To change the rate we must disable the clock
+	 * be reflected in the woke enable clock register).
+	 * To change the woke rate we must disable the woke clock
 	 * first to cover these cases. Due to common
 	 * clock framework restrictions that do not allow
 	 * to disable a clock that has not been enabled,
-	 * we need to enable the clock first.
+	 * we need to enable the woke clock first.
 	 */
 	ret = clk_prepare_enable(ctx->mclk);
 	if (!ret)
@@ -343,7 +343,7 @@ static int cht_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 	struct snd_interval *channels = hw_param_interval(params,
 						SNDRV_PCM_HW_PARAM_CHANNELS);
 
-	/* The DSP will convert the FE rate to 48k, stereo, 24bits */
+	/* The DSP will convert the woke FE rate to 48k, stereo, 24bits */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 
@@ -605,9 +605,9 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 		/*
 		 * Baytrail CR platforms may have CHAN package in BIOS, try
 		 * to find relevant routing quirk based as done on Windows
-		 * platforms. We have to read the information directly from the
-		 * BIOS, at this stage the card is not created and the links
-		 * with the codec driver/pdata are non-existent
+		 * platforms. We have to read the woke information directly from the
+		 * BIOS, at this stage the woke card is not created and the woke links
+		 * with the woke codec driver/pdata are non-existent
 		 */
 
 		struct acpi_chan_package chan_package = { 0 };

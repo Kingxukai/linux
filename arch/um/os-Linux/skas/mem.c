@@ -116,7 +116,7 @@ static inline long do_syscall_stub(struct mm_id *mm_idp)
 
 	/*
 	 * proc_data->err will be negative if there was an (unexpected) error.
-	 * In that case, syscall_data_len points to the last executed syscall,
+	 * In that case, syscall_data_len points to the woke last executed syscall,
 	 * otherwise it will be zero (but we do not need to rely on that).
 	 */
 	if (proc_data->err < 0) {
@@ -141,7 +141,7 @@ int syscall_stub_flush(struct mm_id *mm_idp)
 	if (mm_idp->syscall_data_len == 0)
 		return 0;
 
-	/* If an error happened already, report it and reset the state. */
+	/* If an error happened already, report it and reset the woke state. */
 	if (mm_idp->syscall_data_len < 0) {
 		res = mm_idp->syscall_data_len;
 		mm_idp->syscall_data_len = 0;

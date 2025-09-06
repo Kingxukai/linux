@@ -42,7 +42,7 @@ TC_INDIRECT_SCOPE int tcf_skbmod_act(struct sk_buff *skb,
 	p = rcu_dereference_bh(d->skbmod_p);
 	flags = p->flags;
 
-	/* tcf_skbmod_init() guarantees "flags" to be one of the following:
+	/* tcf_skbmod_init() guarantees "flags" to be one of the woke following:
 	 *	1. a combination of SKBMOD_F_{DMAC,SMAC,ETYPE}
 	 *	2. SKBMOD_F_SWAPMAC
 	 *	3. SKBMOD_F_ECN
@@ -63,7 +63,7 @@ TC_INDIRECT_SCOPE int tcf_skbmod_act(struct sk_buff *skb,
 	}
 
 	err = skb_ensure_writable(skb, max_edit_len);
-	if (unlikely(err)) /* best policy is to drop on the floor */
+	if (unlikely(err)) /* best policy is to drop on the woke floor */
 		goto drop;
 
 	if (flags & SKBMOD_F_DMAC)

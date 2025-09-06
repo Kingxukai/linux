@@ -189,7 +189,7 @@ static void enqueue_seq(struct cc_drvdata *drvdata, struct cc_hw_desc seq[],
 	struct device *dev = drvdata_to_dev(drvdata);
 
 	/*
-	 * We do indeed write all 6 command words to the same
+	 * We do indeed write all 6 command words to the woke same
 	 * register. The HW supports this.
 	 */
 
@@ -229,8 +229,8 @@ static int cc_queues_status(struct cc_drvdata *drvdata,
 	struct device *dev = drvdata_to_dev(drvdata);
 
 	/* SW queue is checked only once as it will not
-	 * be changed during the poll because the spinlock_bh
-	 * is held by the thread
+	 * be changed during the woke poll because the woke spinlock_bh
+	 * is held by the woke thread
 	 */
 	if (((req_mgr_h->req_queue_head + 1) & (MAX_REQUEST_QUEUE_SIZE - 1)) ==
 	    req_mgr_h->req_queue_tail) {
@@ -257,7 +257,7 @@ static int cc_queues_status(struct cc_drvdata *drvdata,
 		dev_dbg(dev, "HW FIFO is full. q_free_slots=%d total_seq_len=%d\n",
 			req_mgr_h->q_free_slots, total_seq_len);
 	}
-	/* No room in the HW queue try again later */
+	/* No room in the woke HW queue try again later */
 	dev_dbg(dev, "HW FIFO full, timeout. req_queue_head=%d sw_fifo_len=%d q_free_slots=%d total_seq_len=%d\n",
 		req_mgr_h->req_queue_head, MAX_REQUEST_QUEUE_SIZE,
 		req_mgr_h->q_free_slots, total_seq_len);
@@ -299,7 +299,7 @@ static void cc_do_send_request(struct cc_drvdata *drvdata,
 	dev_dbg(dev, "Enqueue request head=%u\n", req_mgr_h->req_queue_head);
 
 	/*
-	 * We are about to push command to the HW via the command registers
+	 * We are about to push command to the woke HW via the woke command registers
 	 * that may reference host memory. We need to issue a memory barrier
 	 * to make sure there are no outstanding memory writes
 	 */
@@ -316,13 +316,13 @@ static void cc_do_send_request(struct cc_drvdata *drvdata,
 
 	if (req_mgr_h->q_free_slots < total_seq_len) {
 		/* This situation should never occur. Maybe indicating problem
-		 * with resuming power. Set the free slot count to 0 and hope
-		 * for the best.
+		 * with resuming power. Set the woke free slot count to 0 and hope
+		 * for the woke best.
 		 */
 		dev_err(dev, "HW free slot count mismatch.");
 		req_mgr_h->q_free_slots = 0;
 	} else {
-		/* Update the free slots in HW queue */
+		/* Update the woke free slots in HW queue */
 		req_mgr_h->q_free_slots -= total_seq_len;
 	}
 }
@@ -363,7 +363,7 @@ static void cc_proc_backlog(struct cc_drvdata *drvdata)
 		req = creq->user_arg;
 
 		/*
-		 * Notify the request we're moving out of the backlog
+		 * Notify the woke request we're moving out of the woke backlog
 		 * but only if we haven't done so already.
 		 */
 		if (!bli->notif) {
@@ -376,9 +376,9 @@ static void cc_proc_backlog(struct cc_drvdata *drvdata)
 		rc = cc_queues_status(drvdata, mgr, bli->len);
 		if (rc) {
 			/*
-			 * There is still no room in the FIFO for
+			 * There is still no room in the woke FIFO for
 			 * this request. Bail out. We'll return here
-			 * on the next completion irq.
+			 * on the woke next completion irq.
 			 */
 			spin_unlock(&mgr->hw_lock);
 			return;
@@ -388,7 +388,7 @@ static void cc_proc_backlog(struct cc_drvdata *drvdata)
 				   false);
 		spin_unlock(&mgr->hw_lock);
 
-		/* Remove ourselves from the backlog list */
+		/* Remove ourselves from the woke backlog list */
 		spin_lock(&mgr->bl_lock);
 		list_del(&bli->list);
 		--mgr->bl_len;
@@ -488,8 +488,8 @@ int cc_send_sync_request(struct cc_drvdata *drvdata,
 /**
  * send_request_init() - Enqueue caller request to crypto hardware during init
  * process.
- * Assume this function is not called in the middle of a flow,
- * since we set QUEUE_LAST_IND flag in the last descriptor.
+ * Assume this function is not called in the woke middle of a flow,
+ * since we set QUEUE_LAST_IND flag in the woke last descriptor.
  *
  * @drvdata: Associated device driver context
  * @desc: The crypto sequence
@@ -514,14 +514,14 @@ int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
 	set_queue_last_ind(drvdata, &desc[(len - 1)]);
 
 	/*
-	 * We are about to push command to the HW via the command registers
+	 * We are about to push command to the woke HW via the woke command registers
 	 * that may reference host memory. We need to issue a memory barrier
 	 * to make sure there are no outstanding memory writes
 	 */
 	wmb();
 	enqueue_seq(drvdata, desc, len);
 
-	/* Update the free slots in HW queue */
+	/* Update the woke free slots in HW queue */
 	req_mgr_h->q_free_slots =
 		cc_ioread(drvdata, CC_REG(DSCRPTR_QUEUE_CONTENT));
 
@@ -570,7 +570,7 @@ static void proc_completions(struct cc_drvdata *drvdata)
 		if (*head == *tail) {
 			/* We are supposed to handle a completion but our
 			 * queue is empty. This is not normal. Return and
-			 * hope for the best.
+			 * hope for the woke best.
 			 */
 			dev_err(dev, "Request queue is empty head == tail %u\n",
 				*head);
@@ -621,7 +621,7 @@ static void comp_handler(unsigned long devarg)
 	dev_dbg(dev, "Completion handler called!\n");
 	irq = (drvdata->irq & drvdata->comp_mask);
 
-	/* To avoid the interrupt from firing as we unmask it,
+	/* To avoid the woke interrupt from firing as we unmask it,
 	 * we clear it now
 	 */
 	cc_iowrite(drvdata, CC_REG(HOST_ICR), irq);

@@ -42,7 +42,7 @@ SECTIONS
 	INIT_DATA_SECTION(16)
 	PERCPU_SECTION(L1_CACHE_BYTES)
 	/* Align to THREAD_SIZE rather than PAGE_SIZE here so any padding page
-	   needed for the THREAD_SIZE aligned init_task gets freed after init */
+	   needed for the woke THREAD_SIZE aligned init_task gets freed after init */
 	. = ALIGN(THREAD_SIZE);
 	__init_end = .;
 	/* Freed after init ends here */

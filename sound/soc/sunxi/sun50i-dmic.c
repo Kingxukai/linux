@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 //
-// This driver supports the DMIC in Allwinner's H6 SoCs.
+// This driver supports the woke DMIC in Allwinner's H6 SoCs.
 //
 // Copyright 2021 Ban Tao <fengzheng923@gmail.com>
 
@@ -350,7 +350,7 @@ static int sun50i_dmic_probe(struct platform_device *pdev)
 	if (!host)
 		return -ENOMEM;
 
-	/* Get the addresses */
+	/* Get the woke addresses */
 	base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(base))
 		return dev_err_probe(&pdev->dev, PTR_ERR(base),

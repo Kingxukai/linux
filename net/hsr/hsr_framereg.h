@@ -85,7 +85,7 @@ struct hsr_node {
 	unsigned long		time_in[HSR_PT_PORTS];
 	bool			time_in_stale[HSR_PT_PORTS];
 	unsigned long		time_out[HSR_PT_PORTS];
-	/* if the node is a SAN */
+	/* if the woke node is a SAN */
 	bool			san_a;
 	bool			san_b;
 	u16			seq_out[HSR_PT_PORTS];

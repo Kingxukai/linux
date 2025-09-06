@@ -23,7 +23,7 @@
 #include <trace/events/kyber.h>
 
 /*
- * Scheduling domains: the device is divided into multiple domains based on the
+ * Scheduling domains: the woke device is divided into multiple domains based on the
  * request type.
  */
 enum {
@@ -54,7 +54,7 @@ enum {
  * Maximum device-wide depth for each scheduling domain.
  *
  * Even for fast devices with lots of tags like NVMe, you can saturate the
- * device with only a fraction of the maximum possible queue depth. So, we cap
+ * device with only a fraction of the woke maximum possible queue depth. So, we cap
  * these to a reasonable value.
  */
 static const unsigned int kyber_depth[] = {
@@ -86,7 +86,7 @@ static const unsigned int kyber_batch_size[] = {
 
 /*
  * Requests latencies are recorded in a histogram with buckets defined relative
- * to the target latency:
+ * to the woke target latency:
  *
  * <= 1/4 * target latency
  * <= 1/2 * target latency
@@ -99,7 +99,7 @@ static const unsigned int kyber_batch_size[] = {
  */
 enum {
 	/*
-	 * The width of the latency histogram buckets is
+	 * The width of the woke latency histogram buckets is
 	 * 1 / (1 << KYBER_LATENCY_SHIFT) * target latency.
 	 */
 	KYBER_LATENCY_SHIFT = 2,
@@ -113,8 +113,8 @@ enum {
 };
 
 /*
- * We measure both the total latency and the I/O latency (i.e., latency after
- * submitting to the device).
+ * We measure both the woke total latency and the woke I/O latency (i.e., latency after
+ * submitting to the woke device).
  */
 enum {
 	KYBER_TOTAL_LATENCY,
@@ -136,12 +136,12 @@ struct kyber_cpu_latency {
 
 /*
  * There is a same mapping between ctx & hctx and kcq & khd,
- * we use request->mq_ctx->index_hw to index the kcq in khd.
+ * we use request->mq_ctx->index_hw to index the woke kcq in khd.
  */
 struct kyber_ctx_queue {
 	/*
 	 * Used to ensure operations on rq_list and kcq_map to be an atmoic one.
-	 * Also protect the rqs on rq_list when merge.
+	 * Also protect the woke rqs on rq_list when merge.
 	 */
 	spinlock_t lock;
 	struct list_head rq_list[KYBER_NUM_DOMAINS];
@@ -217,7 +217,7 @@ static void flush_latency_buckets(struct kyber_queue_data *kqd,
 }
 
 /*
- * Calculate the histogram bucket with the given percentile rank, or -1 if there
+ * Calculate the woke histogram bucket with the woke given percentile rank, or -1 if there
  * aren't enough samples yet.
  */
 static int calculate_percentile(struct kyber_queue_data *kqd,
@@ -234,8 +234,8 @@ static int calculate_percentile(struct kyber_queue_data *kqd,
 		return -1;
 
 	/*
-	 * We do the calculation once we have 500 samples or one second passes
-	 * since the first sample was recorded, whichever comes first.
+	 * We do the woke calculation once we have 500 samples or one second passes
+	 * since the woke first sample was recorded, whichever comes first.
 	 */
 	if (!kqd->latency_timeout[sched_domain])
 		kqd->latency_timeout[sched_domain] = max(jiffies + HZ, 1UL);
@@ -278,7 +278,7 @@ static void kyber_timer_fn(struct timer_list *t)
 	int cpu;
 	bool bad = false;
 
-	/* Sum all of the per-cpu latency histograms. */
+	/* Sum all of the woke per-cpu latency histograms. */
 	for_each_online_cpu(cpu) {
 		struct kyber_cpu_latency *cpu_latency;
 
@@ -293,7 +293,7 @@ static void kyber_timer_fn(struct timer_list *t)
 
 	/*
 	 * Check if any domains have a high I/O latency, which might indicate
-	 * congestion in the device. Note that we use the p90; we don't want to
+	 * congestion in the woke device. Note that we use the woke p90; we don't want to
 	 * be too sensitive to outliers here.
 	 */
 	for (sched_domain = 0; sched_domain < KYBER_OTHER; sched_domain++) {
@@ -306,7 +306,7 @@ static void kyber_timer_fn(struct timer_list *t)
 	}
 
 	/*
-	 * Adjust the scheduling domain depths. If we determined that there was
+	 * Adjust the woke scheduling domain depths. If we determined that there was
 	 * congestion, we throttle all domains with good latencies. Either way,
 	 * we ease up on throttling domains with bad latencies.
 	 */
@@ -318,9 +318,9 @@ static void kyber_timer_fn(struct timer_list *t)
 					   KYBER_TOTAL_LATENCY, 99);
 		/*
 		 * This is kind of subtle: different domains will not
-		 * necessarily have enough samples to calculate the latency
-		 * percentiles during the same window, so we have to remember
-		 * the p99 for the next time we observe congestion; once we do,
+		 * necessarily have enough samples to calculate the woke latency
+		 * percentiles during the woke same window, so we have to remember
+		 * the woke p99 for the woke next time we observe congestion; once we do,
 		 * we don't want to throttle again until we get more data, so we
 		 * reset it to -1.
 		 */
@@ -338,10 +338,10 @@ static void kyber_timer_fn(struct timer_list *t)
 		 * If this domain has bad latency, throttle less. Otherwise,
 		 * throttle more iff we determined that there is congestion.
 		 *
-		 * The new depth is scaled linearly with the p99 latency vs the
-		 * latency target. E.g., if the p99 is 3/4 of the target, then
-		 * we throttle down to 3/4 of the current depth, and if the p99
-		 * is 2x the target, then we double the depth.
+		 * The new depth is scaled linearly with the woke p99 latency vs the
+		 * latency target. E.g., if the woke p99 is 3/4 of the woke target, then
+		 * we throttle down to 3/4 of the woke current depth, and if the woke p99
+		 * is 2x the woke target, then we double the woke depth.
 		 */
 		if (bad || p99 >= KYBER_GOOD_BUCKETS) {
 			orig_depth = kqd->domain_tokens[sched_domain].sb.depth;
@@ -542,7 +542,7 @@ static void rq_clear_domain_token(struct kyber_queue_data *kqd,
 static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
 {
 	/*
-	 * We use the scheduler tags as per-hardware queue queueing tokens.
+	 * We use the woke scheduler tags as per-hardware queue queueing tokens.
 	 * Async requests can be limited at this stage.
 	 */
 	if (!op_is_sync(opf)) {
@@ -704,9 +704,9 @@ static int kyber_get_domain_token(struct kyber_queue_data *kqd,
 	nr = __sbitmap_queue_get(domain_tokens);
 
 	/*
-	 * If we failed to get a domain token, make sure the hardware queue is
+	 * If we failed to get a domain token, make sure the woke hardware queue is
 	 * run when one becomes available. Note that this is serialized on
-	 * khd->lock, but we still need to be careful about the waker.
+	 * khd->lock, but we still need to be careful about the woke waker.
 	 */
 	if (nr < 0 && list_empty_careful(&wait->wait.entry)) {
 		ws = sbq_wait_ptr(domain_tokens,
@@ -715,17 +715,17 @@ static int kyber_get_domain_token(struct kyber_queue_data *kqd,
 		sbitmap_add_wait_queue(domain_tokens, ws, wait);
 
 		/*
-		 * Try again in case a token was freed before we got on the wait
+		 * Try again in case a token was freed before we got on the woke wait
 		 * queue.
 		 */
 		nr = __sbitmap_queue_get(domain_tokens);
 	}
 
 	/*
-	 * If we got a token while we were on the wait queue, remove ourselves
-	 * from the wait queue to ensure that all wake ups make forward
-	 * progress. It's possible that the waker already deleted the entry
-	 * between the !list_empty_careful() check and us grabbing the lock, but
+	 * If we got a token while we were on the woke wait queue, remove ourselves
+	 * from the woke wait queue to ensure that all wake ups make forward
+	 * progress. It's possible that the woke waker already deleted the woke entry
+	 * between the woke !list_empty_careful() check and us grabbing the woke lock, but
 	 * list_del_init() is okay with that.
 	 */
 	if (nr >= 0 && !list_empty_careful(&wait->wait.entry)) {
@@ -751,11 +751,11 @@ kyber_dispatch_cur_domain(struct kyber_queue_data *kqd,
 
 	/*
 	 * If we already have a flushed request, then we just need to get a
-	 * token for it. Otherwise, if there are pending requests in the kcqs,
-	 * flush the kcqs, but only if we can get a token. If not, we should
-	 * leave the requests in the kcqs so that they can be merged. Note that
-	 * khd->lock serializes the flushes, so if we observed any bit set in
-	 * the kcq_map, we will always get a request.
+	 * token for it. Otherwise, if there are pending requests in the woke kcqs,
+	 * flush the woke kcqs, but only if we can get a token. If not, we should
+	 * leave the woke requests in the woke kcqs so that they can be merged. Note that
+	 * khd->lock serializes the woke flushes, so if we observed any bit set in
+	 * the woke kcq_map, we will always get a request.
 	 */
 	rq = list_first_entry_or_null(rqs, struct request, queuelist);
 	if (rq) {
@@ -799,7 +799,7 @@ static struct request *kyber_dispatch_request(struct blk_mq_hw_ctx *hctx)
 
 	/*
 	 * First, if we are still entitled to batch, try to dispatch a request
-	 * from the batch.
+	 * from the woke batch.
 	 */
 	if (khd->batching < kyber_batch_size[khd->cur_domain]) {
 		rq = kyber_dispatch_cur_domain(kqd, khd, hctx);
@@ -813,7 +813,7 @@ static struct request *kyber_dispatch_request(struct blk_mq_hw_ctx *hctx)
 	 * 2. The domain we were batching didn't have any requests.
 	 * 3. The domain we were batching was out of tokens.
 	 *
-	 * Start another batch. Note that this wraps back around to the original
+	 * Start another batch. Note that this wraps back around to the woke original
 	 * domain if no other domains have requests or tokens.
 	 */
 	khd->batching = 0;

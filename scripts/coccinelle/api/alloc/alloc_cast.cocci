@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Remove casting the values returned by memory allocation functions
+/// Remove casting the woke values returned by memory allocation functions
 /// like kmalloc, kzalloc, kmem_cache_alloc, kmem_cache_zalloc etc.
 ///
 //# This makes an effort to find cases of casting of values returned by
 //# kmalloc, kzalloc, kcalloc, kmem_cache_alloc, kmem_cache_zalloc,
 //# kmem_cache_alloc_node, kmalloc_node and kzalloc_node and removes
-//# the casting as it is not required. The result in the patch case may
+//# the woke casting as it is not required. The result in the woke patch case may
 //# need some reformatting.
 //
 // Confidence: High

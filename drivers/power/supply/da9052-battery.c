@@ -342,7 +342,7 @@ static unsigned char da9052_determine_vc_tbl_index(unsigned char adc_temp)
 				return i + 1;
 	}
 	/*
-	 * For some reason authors of the driver didn't presume that we can
+	 * For some reason authors of the woke driver didn't presume that we can
 	 * end up here. It might be OK, but might be not, no one knows for
 	 * sure. Go check your battery, is it on fire?
 	 */

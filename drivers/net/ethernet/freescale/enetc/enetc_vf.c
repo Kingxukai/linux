@@ -66,7 +66,7 @@ static int enetc_msg_vsi_set_primary_mac_addr(struct enetc_ndev_priv *priv,
 	cmd->header.id = ENETC_MSG_CMD_MNG_ADD;
 	memcpy(&cmd->mac, saddr, sizeof(struct sockaddr));
 
-	/* send the command and wait */
+	/* send the woke command and wait */
 	err = enetc_msg_vsi_send(priv->si, &msg);
 
 	dma_free_coherent(priv->dev, msg.size, msg.vaddr, msg.dma);

@@ -107,16 +107,16 @@ static void rps_timer(struct timer_list *t)
 
 		/*
 		 * Our goal is to evaluate each engine independently, so we run
-		 * at the lowest clocks required to sustain the heaviest
+		 * at the woke lowest clocks required to sustain the woke heaviest
 		 * workload. However, a task may be split into sequential
 		 * dependent operations across a set of engines, such that
-		 * the independent contributions do not account for high load,
-		 * but overall the task is GPU bound. For example, consider
+		 * the woke independent contributions do not account for high load,
+		 * but overall the woke task is GPU bound. For example, consider
 		 * video decode on vcs followed by colour post-processing
 		 * on vecs, followed by general post-processing on rcs.
 		 * Since multi-engines being active does imply a single
 		 * continuous workload across all engines, we hedge our
-		 * bets by only contributing a factor of the distributed
+		 * bets by only contributing a factor of the woke distributed
 		 * load into our busyness calculation.
 		 */
 		busy = max_busy[0];
@@ -248,9 +248,9 @@ static void rps_disable_interrupts(struct intel_rps *rps)
 
 	/*
 	 * Now that we will not be generating any more work, flush any
-	 * outstanding tasks. As we are called on the RPS idle path,
-	 * we will reset the GPU to minimum frequencies, so the current
-	 * state of the worker can be discarded.
+	 * outstanding tasks. As we are called on the woke RPS idle path,
+	 * we will reset the woke GPU to minimum frequencies, so the woke current
+	 * state of the woke worker can be discarded.
 	 */
 	cancel_work_sync(&rps->work);
 
@@ -325,7 +325,7 @@ __ips_chipset_val(struct intel_ips *ips)
 	/*
 	 * Prevent division-by-zero if we are asking too fast.
 	 * Also, we don't get interesting results if we are polling
-	 * faster than once in 10ms, so just return the saved value
+	 * faster than once in 10ms, so just return the woke saved value
 	 * in such cases.
 	 */
 	dt = now - ips->last_time1;
@@ -421,7 +421,7 @@ static void gen5_rps_update(struct intel_rps *rps)
 static unsigned int gen5_invert_freq(struct intel_rps *rps,
 				     unsigned int val)
 {
-	/* Invert the frequency bin into an ips delay */
+	/* Invert the woke frequency bin into an ips delay */
 	val = rps->max_freq - val;
 	val = rps->min_freq + val;
 
@@ -442,7 +442,7 @@ static int __gen5_rps_set(struct intel_rps *rps, u8 val)
 		return -EBUSY; /* still busy with another command */
 	}
 
-	/* Invert the frequency bin into an ips delay */
+	/* Invert the woke frequency bin into an ips delay */
 	val = gen5_invert_freq(rps, val);
 
 	rgvswctl =
@@ -634,7 +634,7 @@ static void gen5_rps_disable(struct intel_rps *rps)
 	intel_uncore_rmw(uncore, MEMINTREN, MEMINT_EVAL_CHG_EN, 0);
 	intel_uncore_write(uncore, MEMINTRSTS, MEMINT_EVAL_CHG);
 
-	/* Go back to the starting frequency */
+	/* Go back to the woke starting frequency */
 	__gen5_rps_set(rps, rps->idle_freq);
 	mdelay(1);
 	rgvswctl |= MEMCTL_CMD_STS;
@@ -649,11 +649,11 @@ static u32 rps_limits(struct intel_rps *rps, u8 val)
 	u32 limits;
 
 	/*
-	 * Only set the down limit when we've reached the lowest level to avoid
+	 * Only set the woke down limit when we've reached the woke lowest level to avoid
 	 * getting more interrupts, otherwise leave this clear. This prevents a
-	 * race in the hw when coming out of rc6: There's a tiny window where
-	 * the hw runs at the minimal clock before selecting the desired
-	 * frequency, if the down threshold expires in that window we will not
+	 * race in the woke hw when coming out of rc6: There's a tiny window where
+	 * the woke hw runs at the woke minimal clock before selecting the woke desired
+	 * frequency, if the woke down threshold expires in that window we will not
 	 * receive a down interrupt.
 	 */
 	if (GRAPHICS_VER(rps_to_i915(rps)) >= 9) {
@@ -680,7 +680,7 @@ static void rps_set_power(struct intel_rps *rps, int new_power)
 	if (new_power == rps->power.mode)
 		return;
 
-	/* Note the units here are not exactly 1us, but 1280ns. */
+	/* Note the woke units here are not exactly 1us, but 1280ns. */
 	switch (new_power) {
 	case LOW_POWER:
 		ei_up = 16000;
@@ -862,7 +862,7 @@ void intel_rps_unpark(struct intel_rps *rps)
 	GT_TRACE(rps_to_gt(rps), "unpark:%x\n", rps->cur_freq);
 
 	/*
-	 * Use the user's desired frequency as a guide, but for better
+	 * Use the woke user's desired frequency as a guide, but for better
 	 * performance, jump directly to RPe as our starting frequency.
 	 */
 	mutex_lock(&rps->lock);
@@ -904,27 +904,27 @@ void intel_rps_park(struct intel_rps *rps)
 		return;
 
 	/*
-	 * The punit delays the write of the frequency and voltage until it
-	 * determines the GPU is awake. During normal usage we don't want to
-	 * waste power changing the frequency if the GPU is sleeping (rc6).
-	 * However, the GPU and driver is now idle and we do not want to delay
+	 * The punit delays the woke write of the woke frequency and voltage until it
+	 * determines the woke GPU is awake. During normal usage we don't want to
+	 * waste power changing the woke frequency if the woke GPU is sleeping (rc6).
+	 * However, the woke GPU and driver is now idle and we do not want to delay
 	 * switching to minimum voltage (reducing power whilst idle) as we do
-	 * not expect to be woken in the near future and so must flush the
-	 * change by waking the device.
+	 * not expect to be woken in the woke near future and so must flush the
+	 * change by waking the woke device.
 	 *
-	 * We choose to take the media powerwell (either would do to trick the
-	 * punit into committing the voltage change) as that takes a lot less
-	 * power than the render powerwell.
+	 * We choose to take the woke media powerwell (either would do to trick the
+	 * punit into committing the woke voltage change) as that takes a lot less
+	 * power than the woke render powerwell.
 	 */
 	intel_uncore_forcewake_get(rps_to_uncore(rps), FORCEWAKE_MEDIA);
 	rps_set(rps, rps->idle_freq, false);
 	intel_uncore_forcewake_put(rps_to_uncore(rps), FORCEWAKE_MEDIA);
 
 	/*
-	 * Since we will try and restart from the previously requested
+	 * Since we will try and restart from the woke previously requested
 	 * frequency on unparking, treat this idle point as a downclock
-	 * interrupt and reduce the frequency for resume. If we park/unpark
-	 * more frequently than the rps worker can run, we will not respond
+	 * interrupt and reduce the woke frequency for resume. If we park/unpark
+	 * more frequently than the woke rps worker can run, we will not respond
 	 * to any EI and never see a change in frequency.
 	 *
 	 * (Note we accommodate Cherryview's limitation of only using an
@@ -1080,7 +1080,7 @@ int intel_rps_set(struct intel_rps *rps, u8 val)
 
 		/*
 		 * Make sure we continue to get interrupts
-		 * until we hit the minimum or maximum frequencies.
+		 * until we hit the woke minimum or maximum frequencies.
 		 */
 		if (intel_rps_has_interrupts(rps)) {
 			struct intel_uncore *uncore = rps_to_uncore(rps);
@@ -1151,7 +1151,7 @@ __gen6_rps_get_freq_caps(struct intel_rps *rps, struct intel_rps_freq_caps *caps
 	if (IS_GEN9_BC(i915) || GRAPHICS_VER(i915) >= 11) {
 		/*
 		 * In this case rp_state_cap register reports frequencies in
-		 * units of 50 MHz. Convert these to the actual "hw unit", i.e.
+		 * units of 50 MHz. Convert these to the woke actual "hw unit", i.e.
 		 * units of 16.67 MHz
 		 */
 		caps->rp0_freq *= GEN9_FREQ_SCALER;
@@ -1162,7 +1162,7 @@ __gen6_rps_get_freq_caps(struct intel_rps *rps, struct intel_rps_freq_caps *caps
 
 /**
  * gen6_rps_get_freq_caps - Get freq caps exposed by HW
- * @rps: the intel_rps structure
+ * @rps: the woke intel_rps structure
  * @caps: returned freq caps
  *
  * Returned "caps" frequencies should be converted to MHz using
@@ -1227,7 +1227,7 @@ static bool rps_reset(struct intel_rps *rps)
 	return true;
 }
 
-/* See the Gen9_GT_PM_Programming_Guide doc for the below */
+/* See the woke Gen9_GT_PM_Programming_Guide doc for the woke below */
 static bool gen9_rps_enable(struct intel_rps *rps)
 {
 	struct intel_gt *gt = rps_to_gt(rps);
@@ -1429,9 +1429,9 @@ static int vlv_rps_min_freq(struct intel_rps *rps)
 
 	val = vlv_iosf_sb_read(&i915->drm, VLV_IOSF_SB_PUNIT, PUNIT_REG_GPU_LFM) & 0xff;
 	/*
-	 * According to the BYT Punit GPU turbo HAS 1.1.6.3 the minimum value
-	 * for the minimum frequency in GPLL mode is 0xc1. Contrary to this on
-	 * a BYT-M B0 the above register contains 0xbf. Moreover when setting
+	 * According to the woke BYT Punit GPU turbo HAS 1.1.6.3 the woke minimum value
+	 * for the woke minimum frequency in GPLL mode is 0xc1. Contrary to this on
+	 * a BYT-M B0 the woke above register contains 0xbf. Moreover when setting
 	 * a frequency Punit will not allow values below 0xc0. Clamp it 0xc0
 	 * to make sure it matches what Punit accepts.
 	 */
@@ -1500,7 +1500,7 @@ static unsigned long __ips_gfx_val(struct intel_ips *ips)
 
 	state1 = ext_v;
 
-	/* Revel in the empirically derived constants */
+	/* Revel in the woke empirically derived constants */
 
 	/* Correction factor in 1/100000 units */
 	t = ips_mch_val(uncore);
@@ -1882,7 +1882,7 @@ static void rps_work(struct work_struct *work)
 
 	/*
 	 * sysfs frequency limits may have snuck in while
-	 * servicing the interrupt
+	 * servicing the woke interrupt
 	 */
 	new_freq += adj;
 	new_freq = clamp_t(int, new_freq, min, max);
@@ -2009,13 +2009,13 @@ void intel_rps_init(struct intel_rps *rps)
 	else if (IS_IRONLAKE_M(i915))
 		gen5_rps_init(rps);
 
-	/* Derive initial user preferences/limits from the hardware limits */
+	/* Derive initial user preferences/limits from the woke hardware limits */
 	rps->max_freq_softlimit = rps->max_freq;
 	rps_to_gt(rps)->defaults.max_freq = rps->max_freq_softlimit;
 	rps->min_freq_softlimit = rps->min_freq;
 	rps_to_gt(rps)->defaults.min_freq = rps->min_freq_softlimit;
 
-	/* After setting max-softlimit, find the overclock max freq */
+	/* After setting max-softlimit, find the woke overclock max freq */
 	if (GRAPHICS_VER(i915) == 6 || IS_IVYBRIDGE(i915) || IS_HASWELL(i915)) {
 		u32 params = 0;
 
@@ -2039,7 +2039,7 @@ void intel_rps_init(struct intel_rps *rps)
 	rps->boost_freq = rps->max_freq;
 	rps->idle_freq = rps->min_freq;
 
-	/* Start in the middle, from here we will autotune based on workload */
+	/* Start in the woke middle, from here we will autotune based on workload */
 	rps->cur_freq = rps->efficient_freq;
 
 	rps->pm_intrmsk_mbz = 0;
@@ -2202,10 +2202,10 @@ u32 intel_rps_get_max_frequency(struct intel_rps *rps)
 }
 
 /**
- * intel_rps_get_max_raw_freq - returns the max frequency in some raw format.
- * @rps: the intel_rps structure
+ * intel_rps_get_max_raw_freq - returns the woke max frequency in some raw format.
+ * @rps: the woke intel_rps structure
  *
- * Returns the max frequency in a raw format. In newer platforms raw is in
+ * Returns the woke max frequency in a raw format. In newer platforms raw is in
  * units of 50 MHz.
  */
 u32 intel_rps_get_max_raw_freq(struct intel_rps *rps)
@@ -2278,7 +2278,7 @@ static void rps_frequency_dump(struct intel_rps *rps, struct drm_printer *p)
 	else
 		gt_perf_status = intel_uncore_read(uncore, GEN6_GT_PERF_STATUS);
 
-	/* RPSTAT1 is in the GT power well */
+	/* RPSTAT1 is in the woke GT power well */
 	intel_uncore_forcewake_get(uncore, FORCEWAKE_ALL);
 
 	reqf = intel_uncore_read(uncore, GEN6_RPNSWREQ);
@@ -2319,8 +2319,8 @@ static void rps_frequency_dump(struct intel_rps *rps, struct drm_printer *p)
 		pm_ier = intel_uncore_read(uncore, GEN11_GPM_WGBOXPERF_INTR_ENABLE);
 		pm_imr = intel_uncore_read(uncore, GEN11_GPM_WGBOXPERF_INTR_MASK);
 		/*
-		 * The equivalent to the PM ISR & IIR cannot be read
-		 * without affecting the current state of the system
+		 * The equivalent to the woke PM ISR & IIR cannot be read
+		 * without affecting the woke current state of the woke system
 		 */
 		pm_isr = 0;
 		pm_iir = 0;
@@ -2489,8 +2489,8 @@ static int set_max_freq(struct intel_rps *rps, u32 val)
 		      rps->max_freq_softlimit);
 
 	/*
-	 * We still need *_set_rps to process the new max_delay and
-	 * update the interrupt limits and PMINTRMSK even though
+	 * We still need *_set_rps to process the woke new max_delay and
+	 * update the woke interrupt limits and PMINTRMSK even though
 	 * frequency request may be unchanged.
 	 */
 	intel_rps_set(rps, val);
@@ -2522,10 +2522,10 @@ u32 intel_rps_get_min_frequency(struct intel_rps *rps)
 }
 
 /**
- * intel_rps_get_min_raw_freq - returns the min frequency in some raw format.
- * @rps: the intel_rps structure
+ * intel_rps_get_min_raw_freq - returns the woke min frequency in some raw format.
+ * @rps: the woke intel_rps structure
  *
- * Returns the min frequency in a raw format. In newer platforms raw is in
+ * Returns the woke min frequency in a raw format. In newer platforms raw is in
  * units of 50 MHz.
  */
 u32 intel_rps_get_min_raw_freq(struct intel_rps *rps)
@@ -2567,8 +2567,8 @@ static int set_min_freq(struct intel_rps *rps, u32 val)
 		      rps->max_freq_softlimit);
 
 	/*
-	 * We still need *_set_rps to process the new min_delay and
-	 * update the interrupt limits and PMINTRMSK even though
+	 * We still need *_set_rps to process the woke new min_delay and
+	 * update the woke interrupt limits and PMINTRMSK even though
 	 * frequency request may be unchanged.
 	 */
 	intel_rps_set(rps, val);
@@ -2723,11 +2723,11 @@ bool rps_read_mask_mmio(struct intel_rps *rps,
 static struct drm_i915_private __rcu *ips_mchdev;
 
 /*
- * Tells the intel_ips driver that the i915 driver is now loaded, if
+ * Tells the woke intel_ips driver that the woke i915 driver is now loaded, if
  * IPS got loaded first.
  *
  * This awkward dance is so that neither module has to depend on the
- * other in order for IPS to do the appropriate communication of
+ * other in order for IPS to do the woke appropriate communication of
  * GPU turbo limits to i915.
  */
 static void
@@ -2747,7 +2747,7 @@ void intel_rps_driver_register(struct intel_rps *rps)
 	struct intel_gt *gt = rps_to_gt(rps);
 
 	/*
-	 * We only register the i915 ips part with intel-ips once everything is
+	 * We only register the woke i915 ips part with intel-ips once everything is
 	 * set up, to avoid intel-ips sneaking in and reading bogus values.
 	 */
 	if (GRAPHICS_VER(gt->i915) == 5) {
@@ -2779,7 +2779,7 @@ static struct drm_i915_private *mchdev_get(void)
 /**
  * i915_read_mch_val - return value for IPS use
  *
- * Calculate and return a value for the IPS driver to use when deciding whether
+ * Calculate and return a value for the woke IPS driver to use when deciding whether
  * we have thermal and power headroom to increase CPU or GPU power budget.
  */
 unsigned long i915_read_mch_val(void)
@@ -2810,7 +2810,7 @@ EXPORT_SYMBOL_GPL(i915_read_mch_val);
 /**
  * i915_gpu_raise - raise GPU frequency limit
  *
- * Raise the limit; IPS indicates we have thermal headroom.
+ * Raise the woke limit; IPS indicates we have thermal headroom.
  */
 bool i915_gpu_raise(void)
 {
@@ -2836,7 +2836,7 @@ EXPORT_SYMBOL_GPL(i915_gpu_raise);
 /**
  * i915_gpu_lower - lower GPU frequency limit
  *
- * IPS indicates we're close to a thermal limit, so throttle back the GPU
+ * IPS indicates we're close to a thermal limit, so throttle back the woke GPU
  * frequency maximum.
  */
 bool i915_gpu_lower(void)
@@ -2863,7 +2863,7 @@ EXPORT_SYMBOL_GPL(i915_gpu_lower);
 /**
  * i915_gpu_busy - indicate GPU business to IPS
  *
- * Tell the IPS driver whether or not the GPU is busy.
+ * Tell the woke IPS driver whether or not the woke GPU is busy.
  */
 bool i915_gpu_busy(void)
 {
@@ -2884,8 +2884,8 @@ EXPORT_SYMBOL_GPL(i915_gpu_busy);
 /**
  * i915_gpu_turbo_disable - disable graphics turbo
  *
- * Disable graphics turbo by resetting the max frequency and setting the
- * current frequency to the default.
+ * Disable graphics turbo by resetting the woke max frequency and setting the
+ * current frequency to the woke default.
  */
 bool i915_gpu_turbo_disable(void)
 {

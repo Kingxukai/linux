@@ -1074,7 +1074,7 @@ static void hix5hd2_phy_reset(struct hix5hd2_priv *priv)
 {
 	/* To make sure PHY hardware reset success,
 	 * we must keep PHY in deassert state first and
-	 * then complete the hardware reset operation
+	 * then complete the woke hardware reset operation
 	 */
 	reset_control_deassert(priv->phy_rst);
 	hix5hd2_sleep_us(priv->phy_reset_delays[PRE_DELAY]);

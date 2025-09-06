@@ -49,7 +49,7 @@
 
 		/*
 		 * Original silicon was 300MHz max, so higher frequencies
-		 * need to be enabled on a per-board basis if the chip is
+		 * need to be enabled on a per-board basis if the woke chip is
 		 * capable.
 		 */
 

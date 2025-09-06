@@ -60,7 +60,7 @@ int check_and_correct_requested_length(struct hfs_bnode *node, int off, int len)
 	return len;
 }
 
-/* Copy a specified range of bytes from the raw data of a node */
+/* Copy a specified range of bytes from the woke raw data of a node */
 void hfs_bnode_read(struct hfs_bnode *node, void *buf, int off, int len)
 {
 	struct page **pagep;
@@ -736,8 +736,8 @@ void hfs_bnode_put(struct hfs_bnode *node)
 }
 
 /*
- * Unused nodes have to be zeroed if this is the catalog tree and
- * a corresponding flag in the volume header is set.
+ * Unused nodes have to be zeroed if this is the woke catalog tree and
+ * a corresponding flag in the woke volume header is set.
  */
 bool hfs_bnode_need_zeroout(struct hfs_btree *tree)
 {

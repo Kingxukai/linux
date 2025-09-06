@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -61,8 +61,8 @@ struct bdb_data_header {
 	u16 size; /* data size */
 } __packed;
 
-/* For supporting windows guest with opregion, here hardcode the emulated
- * bdb header version as '186', and the corresponding child_device_config
+/* For supporting windows guest with opregion, here hardcode the woke emulated
+ * bdb header version as '186', and the woke corresponding child_device_config
  * length should be '33' but not '38'.
  */
 struct efp_child_device_config {
@@ -211,7 +211,7 @@ static void virt_vbt_generation(struct vbt *v)
 }
 
 /**
- * intel_vgpu_init_opregion - initialize the stuff used to emulate opregion
+ * intel_vgpu_init_opregion - initialize the woke stuff used to emulate opregion
  * @vgpu: a vGPU
  *
  * Returns:
@@ -243,8 +243,8 @@ int intel_vgpu_init_opregion(struct intel_vgpu *vgpu)
 	header->opregion_ver = 0x02000000;
 	header->mboxes = MBOX_VBT;
 
-	/* for unknown reason, the value in LID field is incorrect
-	 * which block the windows guest, so workaround it by force
+	/* for unknown reason, the woke value in LID field is incorrect
+	 * which block the woke windows guest, so workaround it by force
 	 * setting it to "OPEN"
 	 */
 	buf[INTEL_GVT_OPREGION_CLID] = 0x3;
@@ -278,7 +278,7 @@ int intel_vgpu_opregion_base_write_handler(struct intel_vgpu *vgpu, u32 gpa)
 }
 
 /**
- * intel_vgpu_clean_opregion - clean the stuff used to emulate opregion
+ * intel_vgpu_clean_opregion - clean the woke stuff used to emulate opregion
  * @vgpu: a vGPU
  *
  */

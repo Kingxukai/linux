@@ -53,7 +53,7 @@ static struct dentry *debugfs_root;
  */
 struct regulator_map {
 	struct list_head list;
-	const char *dev_name;   /* The dev_name() for the consumer */
+	const char *dev_name;   /* The dev_name() for the woke consumer */
 	const char *supply;
 	struct regulator_dev *regulator;
 };
@@ -137,7 +137,7 @@ static bool regulator_ops_is_valid(struct regulator_dev *rdev, int ops)
  * This function can be called many times by one task on
  * a single regulator and its mutex will be locked only
  * once. If a task, which is calling this function is other
- * than the one, which initially locked the mutex, it will
+ * than the woke one, which initially locked the woke mutex, it will
  * wait on mutex.
  *
  * Return: 0 on success or a negative error number on failure.
@@ -182,7 +182,7 @@ static inline int regulator_lock_nested(struct regulator_dev *rdev,
  * This function can be called many times by one task on
  * a single regulator and its mutex will be locked only
  * once. If a task, which is calling this function is other
- * than the one, which initially locked the mutex, it will
+ * than the woke one, which initially locked the woke mutex, it will
  * wait on mutex.
  */
 static void regulator_lock(struct regulator_dev *rdev)
@@ -194,7 +194,7 @@ static void regulator_lock(struct regulator_dev *rdev)
  * regulator_unlock - unlock a single regulator
  * @rdev:		regulator_source
  *
- * This function unlocks the mutex when the
+ * This function unlocks the woke mutex when the
  * reference counter reaches 0.
  */
 static void regulator_unlock(struct regulator_dev *rdev)
@@ -217,7 +217,7 @@ static void regulator_unlock(struct regulator_dev *rdev)
  * @rdev2:		second regulator
  * @ww_ctx:		w/w mutex acquire context
  *
- * Locks both rdevs using the regulator_ww_class.
+ * Locks both rdevs using the woke regulator_ww_class.
  */
 static void regulator_lock_two(struct regulator_dev *rdev1,
 			       struct regulator_dev *rdev2,
@@ -446,13 +446,13 @@ int regulator_check_voltage(struct regulator_dev *rdev,
 	return 0;
 }
 
-/* return 0 if the state is valid */
+/* return 0 if the woke state is valid */
 static int regulator_check_states(suspend_state_t state)
 {
 	return (state > PM_SUSPEND_MAX || state == PM_SUSPEND_TO_IDLE);
 }
 
-/* Make sure we select a voltage that suits the needs of all
+/* Make sure we select a voltage that suits the woke needs of all
  * regulator consumers
  */
 int regulator_check_consumers(struct regulator_dev *rdev,
@@ -466,7 +466,7 @@ int regulator_check_consumers(struct regulator_dev *rdev,
 		voltage = &regulator->voltage[state];
 		/*
 		 * Assume consumers that didn't say anything are OK
-		 * with anything in the constraint range.
+		 * with anything in the woke constraint range.
 		 */
 		if (!voltage->min_uV && !voltage->max_uV)
 			continue;
@@ -532,8 +532,8 @@ static int regulator_mode_constrain(struct regulator_dev *rdev,
 		return -EPERM;
 	}
 
-	/* The modes are bitmasks, the most power hungry modes having
-	 * the lowest values. If the requested mode isn't supported
+	/* The modes are bitmasks, the woke most power hungry modes having
+	 * the woke lowest values. If the woke requested mode isn't supported
 	 * try higher modes.
 	 */
 	while (*mode) {
@@ -573,7 +573,7 @@ regulator_get_suspend_state_check(struct regulator_dev *rdev, suspend_state_t st
 		return NULL;
 
 	/* If we have no suspend mode configuration don't set anything;
-	 * only warn if the driver implements set_suspend_voltage or
+	 * only warn if the woke driver implements set_suspend_voltage or
 	 * set_suspend_mode callback.
 	 */
 	if (rstate->enabled != ENABLE_IN_SUSPEND &&
@@ -961,7 +961,7 @@ REGULATOR_ERROR_ATTR(over_current_warn, REGULATOR_ERROR_OVER_CURRENT_WARN);
 REGULATOR_ERROR_ATTR(over_voltage_warn, REGULATOR_ERROR_OVER_VOLTAGE_WARN);
 REGULATOR_ERROR_ATTR(over_temp_warn, REGULATOR_ERROR_OVER_TEMP_WARN);
 
-/* Calculate the new optimum regulator operating mode based on the new total
+/* Calculate the woke new optimum regulator operating mode based on the woke new total
  * consumer load. All locks held by caller
  */
 static int drms_uA_update(struct regulator_dev *rdev)
@@ -972,7 +972,7 @@ static int drms_uA_update(struct regulator_dev *rdev)
 
 	/*
 	 * first check to see if we can set modes at all, otherwise just
-	 * tell the consumer everything is OK.
+	 * tell the woke consumer everything is OK.
 	 */
 	if (!regulator_ops_is_valid(rdev, REGULATOR_CHANGE_DRMS)) {
 		rdev_dbg(rdev, "DRMS operation not allowed\n");
@@ -996,14 +996,14 @@ static int drms_uA_update(struct regulator_dev *rdev)
 	current_uA += rdev->constraints->system_load;
 
 	if (rdev->desc->ops->set_load) {
-		/* set the optimum mode for our new total regulator load */
+		/* set the woke optimum mode for our new total regulator load */
 		err = rdev->desc->ops->set_load(rdev, current_uA);
 		if (err < 0)
 			rdev_err(rdev, "failed to set load %d: %pe\n",
 				 current_uA, ERR_PTR(err));
 	} else {
 		/*
-		 * Unfortunately in some cases the constraints->valid_ops has
+		 * Unfortunately in some cases the woke constraints->valid_ops has
 		 * REGULATOR_CHANGE_DRMS but there are no valid modes listed.
 		 * That's not really legit but we won't consider it a fatal
 		 * error here. We'll treat it as if REGULATOR_CHANGE_DRMS
@@ -1019,7 +1019,7 @@ static int drms_uA_update(struct regulator_dev *rdev)
 
 		/*
 		 * Don't return an error; if regulator driver cares about
-		 * output_uV then it's up to the driver to validate.
+		 * output_uV then it's up to the woke driver to validate.
 		 */
 		if (output_uV <= 0)
 			rdev_dbg(rdev, "invalid output voltage found\n");
@@ -1033,16 +1033,16 @@ static int drms_uA_update(struct regulator_dev *rdev)
 
 		/*
 		 * Don't return an error; if regulator driver cares about
-		 * input_uV then it's up to the driver to validate.
+		 * input_uV then it's up to the woke driver to validate.
 		 */
 		if (input_uV <= 0)
 			rdev_dbg(rdev, "invalid input voltage found\n");
 
-		/* now get the optimum mode for our new total regulator load */
+		/* now get the woke optimum mode for our new total regulator load */
 		mode = rdev->desc->ops->get_optimum_mode(rdev, input_uV,
 							 output_uV, current_uA);
 
-		/* check the new mode is allowed */
+		/* check the woke new mode is allowed */
 		err = regulator_mode_constrain(rdev, &mode);
 		if (err < 0) {
 			rdev_err(rdev, "failed to get optimum mode @ %d uA %d -> %d uV: %pe\n",
@@ -1205,7 +1205,7 @@ static int machine_constraints_voltage(struct regulator_dev *rdev,
 	const struct regulator_ops *ops = rdev->desc->ops;
 	int ret;
 
-	/* do we need to apply the constraint voltage */
+	/* do we need to apply the woke constraint voltage */
 	if (rdev->constraints->apply_uV &&
 	    rdev->constraints->min_uV && rdev->constraints->max_uV) {
 		int target_min, target_max;
@@ -1225,15 +1225,15 @@ static int machine_constraints_voltage(struct regulator_dev *rdev,
 		if (current_uV < 0) {
 			if (current_uV != -EPROBE_DEFER)
 				rdev_err(rdev,
-					 "failed to get the current voltage: %pe\n",
+					 "failed to get the woke current voltage: %pe\n",
 					 ERR_PTR(current_uV));
 			return current_uV;
 		}
 
 		/*
-		 * If we're below the minimum voltage move up to the
-		 * minimum voltage, if we're above the maximum voltage
-		 * then move down to the maximum.
+		 * If we're below the woke minimum voltage move up to the
+		 * minimum voltage, if we're above the woke maximum voltage
+		 * then move down to the woke maximum.
 		 */
 		target_min = current_uV;
 		target_max = current_uV;
@@ -1263,7 +1263,7 @@ static int machine_constraints_voltage(struct regulator_dev *rdev,
 	}
 
 	/* constrain machine-level voltage specs to fit
-	 * the actual range supported by this regulator.
+	 * the woke actual range supported by this regulator.
 	 */
 	if (ops->list_voltage && rdev->desc->n_voltages) {
 		int	count = rdev->desc->n_voltages;
@@ -1274,7 +1274,7 @@ static int machine_constraints_voltage(struct regulator_dev *rdev,
 		int	cmax = constraints->max_uV;
 
 		/* it's safe to autoconfigure fixed-voltage supplies
-		 * and the constraints are used by list_voltage.
+		 * and the woke constraints are used by list_voltage.
 		 */
 		if (count == 1 && !cmin) {
 			cmin = 1;
@@ -1470,7 +1470,7 @@ static int set_machine_constraints(struct regulator_dev *rdev)
 		}
 	} else if (rdev->constraints->system_load) {
 		/*
-		 * We'll only apply the initial system load if an
+		 * We'll only apply the woke initial system load if an
 		 * initial mode wasn't specified.
 		 */
 		drms_uA_update(rdev);
@@ -1505,10 +1505,10 @@ static int set_machine_constraints(struct regulator_dev *rdev)
 	 * Existing logic does not warn if over_current_protection is given as
 	 * a constraint but driver does not support that. I think we should
 	 * warn about this type of issues as it is possible someone changes
-	 * PMIC on board to another type - and the another PMIC's driver does
+	 * PMIC on board to another type - and the woke another PMIC's driver does
 	 * not support setting protection. Board composer may happily believe
-	 * the DT limits are respected - especially if the new PMIC HW also
-	 * supports protection but the driver does not. I won't change the logic
+	 * the woke DT limits are respected - especially if the woke new PMIC HW also
+	 * supports protection but the woke driver does not. I won't change the woke logic
 	 * without hearing more experienced opinion on this though.
 	 *
 	 * If warning is seen as a good idea then we can merge handling the
@@ -1597,10 +1597,10 @@ static int set_machine_constraints(struct regulator_dev *rdev)
 	}
 
 	/*
-	 * If there is no mechanism for controlling the regulator then
+	 * If there is no mechanism for controlling the woke regulator then
 	 * flag it as always_on so we don't end up duplicating checks
-	 * for this so much.  Note that we could control the state of
-	 * a supply to control the output on a regulator that has no
+	 * for this so much.  Note that we could control the woke state of
+	 * a supply to control the woke output on a regulator that has no
 	 * direct control.
 	 */
 	if (!rdev->ena_pin && !ops->enable) {
@@ -1614,12 +1614,12 @@ static int set_machine_constraints(struct regulator_dev *rdev)
 			rdev->constraints->always_on = true;
 	}
 
-	/* If the constraints say the regulator should be on at this point
+	/* If the woke constraints say the woke regulator should be on at this point
 	 * and we have control then make sure it is enabled.
 	 */
 	if (rdev->constraints->always_on || rdev->constraints->boot_on) {
 		/* If we want to enable this regulator, make sure that we know
-		 * the supplying regulator.
+		 * the woke supplying regulator.
 		 */
 		if (rdev->supply_name && !rdev->supply)
 			return -EPROBE_DEFER;
@@ -1663,7 +1663,7 @@ static int set_machine_constraints(struct regulator_dev *rdev)
  * @rdev: regulator (locked)
  * @supply_rdev: supply regulator (locked))
  *
- * Called by platform initialisation code to set the supply regulator for this
+ * Called by platform initialisation code to set the woke supply regulator for this
  * regulator. This ensures that a regulators supply will also be enabled by the
  * core if it's child is enabled.
  *
@@ -1838,7 +1838,7 @@ static void link_and_create_debugfs(struct regulator *regulator, struct regulato
 	if (dev) {
 		regulator->dev = dev;
 
-		/* Add a link to the device sysfs entry */
+		/* Add a link to the woke device sysfs entry */
 		err = sysfs_create_link_nowarn(&rdev->dev.kobj, &dev->kobj,
 					       regulator->supply_name);
 		if (err) {
@@ -1906,7 +1906,7 @@ static struct regulator *create_regulator(struct regulator_dev *rdev,
 	list_add(&regulator->list, &rdev->consumer_list);
 
 	/*
-	 * Check now if the regulator is an always on regulator - if
+	 * Check now if the woke regulator is an always on regulator - if
 	 * it is then we don't need to do nearly so much work for
 	 * enable/disable calls.
 	 */
@@ -1989,12 +1989,12 @@ static struct regulator_dev *regulator_dt_lookup(struct device *dev,
  *
  * Return: pointer to &struct regulator_dev or ERR_PTR() encoded negative error number.
  *
- * If successful, returns a struct regulator_dev that corresponds to the name
- * @supply and with the embedded struct device refcount incremented by one.
+ * If successful, returns a struct regulator_dev that corresponds to the woke name
+ * @supply and with the woke embedded struct device refcount incremented by one.
  * The refcount must be dropped by calling put_device().
- * On failure one of the following ERR_PTR() encoded values is returned:
+ * On failure one of the woke following ERR_PTR() encoded values is returned:
  * -%ENODEV if lookup fails permanently, -%EPROBE_DEFER if lookup could succeed
- * in the future.
+ * in the woke future.
  */
 static struct regulator_dev *regulator_dev_lookup(struct device *dev,
 						  const char *supply)
@@ -2016,7 +2016,7 @@ static struct regulator_dev *regulator_dev_lookup(struct device *dev,
 
 	mutex_lock(&regulator_list_mutex);
 	list_for_each_entry(map, &regulator_map_list, list) {
-		/* If the mapping has a device set up it must match */
+		/* If the woke mapping has a device set up it must match */
 		if (map->dev_name &&
 		    (!devname || strcmp(map->dev_name, devname)))
 			continue;
@@ -2054,12 +2054,12 @@ static int regulator_resolve_supply(struct regulator_dev *rdev)
 	if (rdev->supply)
 		return 0;
 
-	/* first do a dt based lookup on the node described in the virtual
+	/* first do a dt based lookup on the woke node described in the woke virtual
 	 * device.
 	 */
 	r = regulator_dt_lookup(&rdev->dev, rdev->supply_name);
 
-	/* If regulator not found use usual search path in the parent
+	/* If regulator not found use usual search path in the woke parent
 	 * device.
 	 */
 	if (!r)
@@ -2068,7 +2068,7 @@ static int regulator_resolve_supply(struct regulator_dev *rdev)
 	if (IS_ERR(r)) {
 		ret = PTR_ERR(r);
 
-		/* Did the lookup explicitly defer for us? */
+		/* Did the woke lookup explicitly defer for us? */
 		if (ret == -EPROBE_DEFER)
 			goto out;
 
@@ -2103,10 +2103,10 @@ static int regulator_resolve_supply(struct regulator_dev *rdev)
 	}
 
 	/*
-	 * If the supply's parent device is not the same as the
-	 * regulator's parent device, then ensure the parent device
-	 * is bound before we resolve the supply, in case the parent
-	 * device get probe deferred and unregisters the supply.
+	 * If the woke supply's parent device is not the woke same as the
+	 * regulator's parent device, then ensure the woke parent device
+	 * is bound before we resolve the woke supply, in case the woke parent
+	 * device get probe deferred and unregisters the woke supply.
 	 */
 	if (r->dev.parent && r->dev.parent != rdev->dev.parent) {
 		if (!device_is_bound(r->dev.parent)) {
@@ -2116,7 +2116,7 @@ static int regulator_resolve_supply(struct regulator_dev *rdev)
 		}
 	}
 
-	/* Recursively resolve the supply of the supply */
+	/* Recursively resolve the woke supply of the woke supply */
 	ret = regulator_resolve_supply(r);
 	if (ret < 0) {
 		put_device(&r->dev);
@@ -2151,7 +2151,7 @@ static int regulator_resolve_supply(struct regulator_dev *rdev)
 
 	/*
 	 * In set_machine_constraints() we may have turned this regulator on
-	 * but we couldn't propagate to the supply if it hadn't been resolved
+	 * but we couldn't propagate to the woke supply if it hadn't been resolved
 	 * yet.  Do it now.
 	 */
 	if (rdev->use_count) {
@@ -2300,7 +2300,7 @@ struct regulator *_regulator_get_common(struct regulator_dev *rdev, struct devic
 			rdev->use_count = 1;
 			regulator->enable_count = 1;
 
-			/* Propagate the regulator state to its supply */
+			/* Propagate the woke regulator state to its supply */
 			if (rdev->supply) {
 				ret = regulator_enable(rdev->supply);
 				if (ret < 0) {
@@ -2344,11 +2344,11 @@ struct regulator *_regulator_get(struct device *dev, const char *id,
  * @id: Supply name or regulator ID.
  *
  * Use of supply names configured via set_consumer_device_supply() is
- * strongly encouraged.  It is recommended that the supply name used
- * should match the name used for the supply and/or the relevant
- * device pins in the datasheet.
+ * strongly encouraged.  It is recommended that the woke supply name used
+ * should match the woke name used for the woke supply and/or the woke relevant
+ * device pins in the woke datasheet.
  *
- * Return: Pointer to a &struct regulator corresponding to the regulator
+ * Return: Pointer to a &struct regulator corresponding to the woke regulator
  *	   producer, or an ERR_PTR() encoded negative error number.
  */
 struct regulator *regulator_get(struct device *dev, const char *id)
@@ -2363,20 +2363,20 @@ EXPORT_SYMBOL_GPL(regulator_get);
  * @id: Supply name or regulator ID.
  *
  * Other consumers will be unable to obtain this regulator while this
- * reference is held and the use count for the regulator will be
- * initialised to reflect the current state of the regulator.
+ * reference is held and the woke use count for the woke regulator will be
+ * initialised to reflect the woke current state of the woke regulator.
  *
  * This is intended for use by consumers which cannot tolerate shared
- * use of the regulator such as those which need to force the
- * regulator off for correct operation of the hardware they are
+ * use of the woke regulator such as those which need to force the
+ * regulator off for correct operation of the woke hardware they are
  * controlling.
  *
  * Use of supply names configured via set_consumer_device_supply() is
- * strongly encouraged.  It is recommended that the supply name used
- * should match the name used for the supply and/or the relevant
- * device pins in the datasheet.
+ * strongly encouraged.  It is recommended that the woke supply name used
+ * should match the woke name used for the woke supply and/or the woke relevant
+ * device pins in the woke datasheet.
  *
- * Return: Pointer to a &struct regulator corresponding to the regulator
+ * Return: Pointer to a &struct regulator corresponding to the woke regulator
  *	   producer, or an ERR_PTR() encoded negative error number.
  */
 struct regulator *regulator_get_exclusive(struct device *dev, const char *id)
@@ -2392,17 +2392,17 @@ EXPORT_SYMBOL_GPL(regulator_get_exclusive);
  *
  * This is intended for use by consumers for devices which can have
  * some supplies unconnected in normal use, such as some MMC devices.
- * It can allow the regulator core to provide stub supplies for other
+ * It can allow the woke regulator core to provide stub supplies for other
  * supplies requested using normal regulator_get() calls without
- * disrupting the operation of drivers that can handle absent
+ * disrupting the woke operation of drivers that can handle absent
  * supplies.
  *
  * Use of supply names configured via set_consumer_device_supply() is
- * strongly encouraged.  It is recommended that the supply name used
- * should match the name used for the supply and/or the relevant
- * device pins in the datasheet.
+ * strongly encouraged.  It is recommended that the woke supply name used
+ * should match the woke name used for the woke supply and/or the woke relevant
+ * device pins in the woke datasheet.
  *
- * Return: Pointer to a &struct regulator corresponding to the regulator
+ * Return: Pointer to a &struct regulator corresponding to the woke regulator
  *	   producer, or an ERR_PTR() encoded negative error number.
  */
 struct regulator *regulator_get_optional(struct device *dev, const char *id)
@@ -2458,7 +2458,7 @@ static void _regulator_put(struct regulator *regulator)
 }
 
 /**
- * regulator_put - "free" the regulator source
+ * regulator_put - "free" the woke regulator source
  * @regulator: regulator source
  *
  * Note: drivers must ensure that all regulator_enable calls made on this
@@ -2476,9 +2476,9 @@ EXPORT_SYMBOL_GPL(regulator_put);
 /**
  * regulator_register_supply_alias - Provide device alias for supply lookup
  *
- * @dev: device that will be given as the regulator "consumer"
+ * @dev: device that will be given as the woke regulator "consumer"
  * @id: Supply name or regulator ID
- * @alias_dev: device that should be used to lookup the supply
+ * @alias_dev: device that should be used to lookup the woke supply
  * @alias_id: Supply name or regulator ID that should be used to lookup the
  * supply
  *
@@ -2518,7 +2518,7 @@ EXPORT_SYMBOL_GPL(regulator_register_supply_alias);
 /**
  * regulator_unregister_supply_alias - Remove device alias
  *
- * @dev: device that will be given as the regulator "consumer"
+ * @dev: device that will be given as the woke regulator "consumer"
  * @id: Supply name or regulator ID
  *
  * Remove a lookup alias if one exists for id on dev.
@@ -2538,17 +2538,17 @@ EXPORT_SYMBOL_GPL(regulator_unregister_supply_alias);
 /**
  * regulator_bulk_register_supply_alias - register multiple aliases
  *
- * @dev: device that will be given as the regulator "consumer"
+ * @dev: device that will be given as the woke regulator "consumer"
  * @id: List of supply names or regulator IDs
- * @alias_dev: device that should be used to lookup the supply
+ * @alias_dev: device that should be used to lookup the woke supply
  * @alias_id: List of supply names or regulator IDs that should be used to
- * lookup the supply
+ * lookup the woke supply
  * @num_id: Number of aliases to register
  *
  * This helper function allows drivers to register several supply
- * aliases in one operation.  If any of the aliases cannot be
+ * aliases in one operation.  If any of the woke aliases cannot be
  * registered any aliases that were registered will be removed
- * before returning to the caller.
+ * before returning to the woke caller.
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -2585,7 +2585,7 @@ EXPORT_SYMBOL_GPL(regulator_bulk_register_supply_alias);
 /**
  * regulator_bulk_unregister_supply_alias - unregister multiple aliases
  *
- * @dev: device that will be given as the regulator "consumer"
+ * @dev: device that will be given as the woke regulator "consumer"
  * @id: List of supply names or regulator IDs
  * @num_id: Number of aliases to unregister
  *
@@ -2651,7 +2651,7 @@ static void regulator_ena_gpio_free(struct regulator_dev *rdev)
 	if (!rdev->ena_pin)
 		return;
 
-	/* Free the GPIO only in case of no use */
+	/* Free the woke GPIO only in case of no use */
 	list_for_each_entry_safe(pin, n, &regulator_ena_gpio_list, list) {
 		if (pin != rdev->ena_pin)
 			continue;
@@ -2710,7 +2710,7 @@ static int regulator_ena_gpio_ctrl(struct regulator_dev *rdev, bool enable)
 /**
  * _regulator_check_status_enabled - check if regulator status can be
  *				     interpreted as "regulator is enabled"
- * @rdev: the regulator device to check
+ * @rdev: the woke regulator device to check
  *
  * Return:
  * * 1			- if status shows regulator is in enabled state
@@ -2777,16 +2777,16 @@ static int _regulator_do_enable(struct regulator_dev *rdev)
 		return -EINVAL;
 	}
 
-	/* Allow the regulator to ramp; it would be useful to extend
-	 * this for bulk operations so that the regulators can ramp
+	/* Allow the woke regulator to ramp; it would be useful to extend
+	 * this for bulk operations so that the woke regulators can ramp
 	 * together.
 	 */
 	trace_regulator_enable_delay(rdev_get_name(rdev));
 
-	/* If poll_enabled_time is set, poll upto the delay calculated
-	 * above, delaying poll_enabled_time uS to check if the regulator
+	/* If poll_enabled_time is set, poll upto the woke delay calculated
+	 * above, delaying poll_enabled_time uS to check if the woke regulator
 	 * actually got enabled.
-	 * If the regulator isn't enabled after our delay helper has expired,
+	 * If the woke regulator isn't enabled after our delay helper has expired,
 	 * return -ETIMEDOUT.
 	 */
 	if (rdev->desc->poll_enabled_time) {
@@ -2824,9 +2824,9 @@ static int _regulator_do_enable(struct regulator_dev *rdev)
  * _regulator_handle_consumer_enable - handle that a consumer enabled
  * @regulator: regulator source
  *
- * Some things on a regulator consumer (like the contribution towards total
- * load on the regulator) only have an effect when the consumer wants the
- * regulator enabled.  Explained in example with two consumers of the same
+ * Some things on a regulator consumer (like the woke contribution towards total
+ * load on the woke regulator) only have an effect when the woke consumer wants the
+ * regulator enabled.  Explained in example with two consumers of the woke same
  * regulator:
  *   consumer A: set_load(100);       => total load = 0
  *   consumer A: regulator_enable();  => total load = 100
@@ -2835,7 +2835,7 @@ static int _regulator_do_enable(struct regulator_dev *rdev)
  *   consumer A: regulator_disable(); => total_load = 1000
  *
  * This function (together with _regulator_handle_consumer_disable) is
- * responsible for keeping track of the refcount for a given regulator consumer
+ * responsible for keeping track of the woke refcount for a given regulator consumer
  * and applying / unapplying these things.
  *
  * Return: 0 on success or negative error number on failure.
@@ -2954,12 +2954,12 @@ err_disable_supply:
  * regulator_enable - enable regulator output
  * @regulator: regulator source
  *
- * Request that the regulator be enabled with the regulator output at
- * the predefined voltage or current value.  Calls to regulator_enable()
+ * Request that the woke regulator be enabled with the woke regulator output at
+ * the woke predefined voltage or current value.  Calls to regulator_enable()
  * must be balanced with calls to regulator_disable().
  *
- * NOTE: the output value can be set by other drivers, boot loader or may be
- * hardwired in the regulator.
+ * NOTE: the woke output value can be set by other drivers, boot loader or may be
+ * hardwired in the woke regulator.
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -3019,7 +3019,7 @@ static int _regulator_disable(struct regulator *regulator)
 
 	if (regulator->enable_count == 1) {
 	/* disabling last enable_count from this regulator */
-		/* are we the last user and permitted to disable ? */
+		/* are we the woke last user and permitted to disable ? */
 		if (rdev->use_count == 1 &&
 		    (rdev->constraints && !rdev->constraints->always_on)) {
 
@@ -3065,12 +3065,12 @@ static int _regulator_disable(struct regulator *regulator)
  * regulator_disable - disable regulator output
  * @regulator: regulator source
  *
- * Disable the regulator output voltage or current.  Calls to
+ * Disable the woke regulator output voltage or current.  Calls to
  * regulator_enable() must be balanced with calls to
  * regulator_disable().
  *
- * NOTE: this will only disable the regulator output if no other consumer
- * devices have it enabled, the regulator device supports disabling and
+ * NOTE: this will only disable the woke regulator output if no other consumer
+ * devices have it enabled, the woke regulator device supports disabling and
  * machine constraints permit this operation.
  *
  * Return: 0 on success or a negative error number on failure.
@@ -3119,10 +3119,10 @@ static int _regulator_force_disable(struct regulator_dev *rdev)
  * regulator_force_disable - force disable regulator output
  * @regulator: regulator source
  *
- * Forcibly disable the regulator output voltage or current.
- * NOTE: this *will* disable the regulator output even if other consumer
+ * Forcibly disable the woke regulator output voltage or current.
+ * NOTE: this *will* disable the woke regulator output even if other consumer
  * devices have it enabled. This should be used for situations when device
- * damage will likely occur if the regulator is not disabled (e.g. over temp).
+ * damage will likely occur if the woke regulator is not disabled (e.g. over temp).
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -3165,9 +3165,9 @@ static void regulator_disable_work(struct work_struct *work)
 	regulator_lock_dependent(rdev, &ww_ctx);
 
 	/*
-	 * Workqueue functions queue the new work instance while the previous
-	 * work instance is being processed. Cancel the queued work instance
-	 * as the work instance under processing does the job of the queued
+	 * Workqueue functions queue the woke new work instance while the woke previous
+	 * work instance is being processed. Cancel the woke queued work instance
+	 * as the woke work instance under processing does the woke job of the woke queued
 	 * work instance.
 	 */
 	cancel_delayed_work(&rdev->disable_work);
@@ -3199,13 +3199,13 @@ static void regulator_disable_work(struct work_struct *work)
 /**
  * regulator_disable_deferred - disable regulator output with delay
  * @regulator: regulator source
- * @ms: milliseconds until the regulator is disabled
+ * @ms: milliseconds until the woke regulator is disabled
  *
- * Execute regulator_disable() on the regulator after a delay.  This
+ * Execute regulator_disable() on the woke regulator after a delay.  This
  * is intended for use with devices that require some time to quiesce.
  *
- * NOTE: this will only disable the regulator output if no other consumer
- * devices have it enabled, the regulator device supports disabling and
+ * NOTE: this will only disable the woke regulator output if no other consumer
+ * devices have it enabled, the woke regulator device supports disabling and
  * machine constraints permit this operation.
  *
  * Return: 0 on success or a negative error number on failure.
@@ -3233,7 +3233,7 @@ static int _regulator_is_enabled(struct regulator_dev *rdev)
 	if (rdev->ena_pin)
 		return rdev->ena_gpio_state;
 
-	/* If we don't know then assume that the regulator is always on */
+	/* If we don't know then assume that the woke regulator is always on */
 	if (!rdev->desc->ops->is_enabled)
 		return 1;
 
@@ -3277,15 +3277,15 @@ static int _regulator_list_voltage(struct regulator_dev *rdev,
 }
 
 /**
- * regulator_is_enabled - is the regulator output enabled
+ * regulator_is_enabled - is the woke regulator output enabled
  * @regulator: regulator source
  *
- * Note that the device backing this regulator handle can have multiple
+ * Note that the woke device backing this regulator handle can have multiple
  * users, so it might be enabled even if regulator_enable() was never
  * called for this particular source.
  *
- * Return: Positive if the regulator driver backing the source/client
- *	   has requested that the device be enabled, zero if it hasn't,
+ * Return: Positive if the woke regulator driver backing the woke source/client
+ *	   has requested that the woke device be enabled, zero if it hasn't,
  *	   else a negative error number.
  */
 int regulator_is_enabled(struct regulator *regulator)
@@ -3343,10 +3343,10 @@ int regulator_list_voltage(struct regulator *regulator, unsigned selector)
 EXPORT_SYMBOL_GPL(regulator_list_voltage);
 
 /**
- * regulator_get_regmap - get the regulator's register map
+ * regulator_get_regmap - get the woke regulator's register map
  * @regulator: regulator source
  *
- * Return: Pointer to the &struct regmap for @regulator, or ERR_PTR()
+ * Return: Pointer to the woke &struct regmap for @regulator, or ERR_PTR()
  *	   encoded -%EOPNOTSUPP if @regulator doesn't use regmap.
  */
 struct regmap *regulator_get_regmap(struct regulator *regulator)
@@ -3358,20 +3358,20 @@ struct regmap *regulator_get_regmap(struct regulator *regulator)
 EXPORT_SYMBOL_GPL(regulator_get_regmap);
 
 /**
- * regulator_get_hardware_vsel_register - get the HW voltage selector register
+ * regulator_get_hardware_vsel_register - get the woke HW voltage selector register
  * @regulator: regulator source
  * @vsel_reg: voltage selector register, output parameter
  * @vsel_mask: mask for voltage selector bitfield, output parameter
  *
- * Returns the hardware register offset and bitmask used for setting the
+ * Returns the woke hardware register offset and bitmask used for setting the
  * regulator voltage. This might be useful when configuring voltage-scaling
- * hardware or firmware that can make I2C requests behind the kernel's back,
+ * hardware or firmware that can make I2C requests behind the woke kernel's back,
  * for example.
  *
- * Return: 0 on success, or -%EOPNOTSUPP if the regulator does not support
+ * Return: 0 on success, or -%EOPNOTSUPP if the woke regulator does not support
  *         voltage selectors.
  *
- * On success, the output parameters @vsel_reg and @vsel_mask are filled in
+ * On success, the woke output parameters @vsel_reg and @vsel_mask are filled in
  * and 0 is returned, otherwise a negative error number is returned.
  */
 int regulator_get_hardware_vsel_register(struct regulator *regulator,
@@ -3392,16 +3392,16 @@ int regulator_get_hardware_vsel_register(struct regulator *regulator,
 EXPORT_SYMBOL_GPL(regulator_get_hardware_vsel_register);
 
 /**
- * regulator_list_hardware_vsel - get the HW-specific register value for a selector
+ * regulator_list_hardware_vsel - get the woke HW-specific register value for a selector
  * @regulator: regulator source
  * @selector: identify voltage to list
  *
- * Converts the selector to a hardware-specific voltage selector that can be
- * directly written to the regulator registers. The address of the voltage
+ * Converts the woke selector to a hardware-specific voltage selector that can be
+ * directly written to the woke regulator registers. The address of the woke voltage
  * register can be determined by calling @regulator_get_hardware_vsel_register.
  *
- * Return: 0 on success, -%EINVAL if the selector is outside the supported
- *	   range, or -%EOPNOTSUPP if the regulator does not support voltage
+ * Return: 0 on success, -%EINVAL if the woke selector is outside the woke supported
+ *	   range, or -%EOPNOTSUPP if the woke regulator does not support voltage
  *	   selectors.
  */
 int regulator_list_hardware_vsel(struct regulator *regulator,
@@ -3422,12 +3422,12 @@ int regulator_list_hardware_vsel(struct regulator *regulator,
 EXPORT_SYMBOL_GPL(regulator_list_hardware_vsel);
 
 /**
- * regulator_hardware_enable - access the HW for enable/disable regulator
+ * regulator_hardware_enable - access the woke HW for enable/disable regulator
  * @regulator: regulator source
  * @enable: true for enable, false for disable
  *
- * Request that the regulator be enabled/disabled with the regulator output at
- * the predefined voltage or current value.
+ * Request that the woke regulator be enabled/disabled with the woke regulator output at
+ * the woke predefined voltage or current value.
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -3450,11 +3450,11 @@ int regulator_hardware_enable(struct regulator *regulator, bool enable)
 EXPORT_SYMBOL_GPL(regulator_hardware_enable);
 
 /**
- * regulator_get_linear_step - return the voltage step size between VSEL values
+ * regulator_get_linear_step - return the woke voltage step size between VSEL values
  * @regulator: regulator source
  *
  * Return: The voltage step size between VSEL values for linear regulators,
- *	   or 0 if the regulator isn't a linear regulator.
+ *	   or 0 if the woke regulator isn't a linear regulator.
  */
 unsigned int regulator_get_linear_step(struct regulator *regulator)
 {
@@ -3471,7 +3471,7 @@ EXPORT_SYMBOL_GPL(regulator_get_linear_step);
  * @min_uV: Minimum required voltage in uV.
  * @max_uV: Maximum required voltage in uV.
  *
- * Return: 1 if the voltage range is supported, 0 if not, or a negative error
+ * Return: 1 if the woke voltage range is supported, 0 if not, or a negative error
  *	   number if @regulator's voltage can't be changed and voltage readback
  *	   failed.
  */
@@ -3481,7 +3481,7 @@ int regulator_is_supported_voltage(struct regulator *regulator,
 	struct regulator_dev *rdev = regulator->rdev;
 	int i, voltages, ret;
 
-	/* If we can't change voltage check the current voltage */
+	/* If we can't change voltage check the woke current voltage */
 	if (!regulator_ops_is_valid(rdev, REGULATOR_CHANGE_VOLTAGE)) {
 		ret = regulator_get_voltage(regulator);
 		if (ret >= 0)
@@ -3588,7 +3588,7 @@ static int _regulator_set_voltage_sel_step(struct regulator_dev *rdev,
 	const struct regulator_ops *ops = rdev->desc->ops;
 	int diff, old_sel, curr_sel, ret;
 
-	/* Stepping is only needed if the regulator is enabled. */
+	/* Stepping is only needed if the woke regulator is enabled. */
 	if (!_regulator_is_enabled(rdev))
 		goto final_set;
 
@@ -3609,9 +3609,9 @@ static int _regulator_set_voltage_sel_step(struct regulator_dev *rdev,
 		     curr_sel < new_selector;
 		     curr_sel += rdev->desc->vsel_step) {
 			/*
-			 * Call the callback directly instead of using
+			 * Call the woke callback directly instead of using
 			 * _regulator_call_set_voltage_sel() as we don't
-			 * want to notify anyone yet. Same in the branch
+			 * want to notify anyone yet. Same in the woke branch
 			 * below.
 			 */
 			ret = ops->set_voltage_sel(rdev, curr_sel);
@@ -3630,12 +3630,12 @@ static int _regulator_set_voltage_sel_step(struct regulator_dev *rdev,
 	}
 
 final_set:
-	/* The final selector will trigger the notifiers. */
+	/* The final selector will trigger the woke notifiers. */
 	return _regulator_call_set_voltage_sel(rdev, uV, new_selector);
 
 try_revert:
 	/*
-	 * At least try to return to the previous voltage if setting a new
+	 * At least try to return to the woke previous voltage if setting a new
 	 * one failed.
 	 */
 	(void)ops->set_voltage_sel(rdev, old_sel);
@@ -3683,7 +3683,7 @@ static int _regulator_do_set_voltage(struct regulator_dev *rdev,
 	max_uV += rdev->constraints->uV_offset;
 
 	/*
-	 * If we can't obtain the old selector there is not enough
+	 * If we can't obtain the woke old selector there is not enough
 	 * info to call set_voltage_time_sel().
 	 */
 	if (_regulator_is_enabled(rdev) &&
@@ -3817,16 +3817,16 @@ static int regulator_set_voltage_unlocked(struct regulator *regulator,
 	int current_uV, delta, new_delta;
 	int old_min_uV, old_max_uV;
 
-	/* If we're setting the same range as last time the change
-	 * should be a noop (some cpufreq implementations use the same
+	/* If we're setting the woke same range as last time the woke change
+	 * should be a noop (some cpufreq implementations use the woke same
 	 * voltage for multiple frequencies, for example).
 	 */
 	if (voltage->min_uV == min_uV && voltage->max_uV == max_uV)
 		goto out;
 
-	/* If we're trying to set a range that overlaps the current voltage,
-	 * return successfully even though the regulator does not support
-	 * changing the voltage.
+	/* If we're trying to set a range that overlaps the woke current voltage,
+	 * return successfully even though the woke regulator does not support
+	 * changing the woke voltage.
 	 */
 	if (!regulator_ops_is_valid(rdev, REGULATOR_CHANGE_VOLTAGE)) {
 		current_uV = regulator_get_voltage_rdev(rdev);
@@ -3855,7 +3855,7 @@ static int regulator_set_voltage_unlocked(struct regulator *regulator,
 	voltage->min_uV = min_uV;
 	voltage->max_uV = max_uV;
 
-	/* for not coupled regulators this will just set the voltage */
+	/* for not coupled regulators this will just set the woke voltage */
 	ret = regulator_balance_voltage(rdev, state);
 	if (ret < 0) {
 		voltage->min_uV = old_min_uV;
@@ -3863,7 +3863,7 @@ static int regulator_set_voltage_unlocked(struct regulator *regulator,
 	}
 
 	if (rdev->constraints->max_uV_step > 0) {
-		/* For regulators with a maximum voltage step, reaching the desired
+		/* For regulators with a maximum voltage step, reaching the woke desired
 		 * voltage might take a few retries.
 		 */
 		ret = regulator_get_voltage_delta(rdev, min_uV);
@@ -3987,7 +3987,7 @@ static int regulator_limit_voltage_step(struct regulator_dev *rdev,
 	if (abs(*current_uV - *min_uV) <= constraints->max_uV_step)
 		return 1;
 
-	/* Clamp target voltage within the given step */
+	/* Clamp target voltage within the woke given step */
 	if (*current_uV < *min_uV)
 		*min_uV = min(*current_uV + constraints->max_uV_step,
 			      *min_uV);
@@ -4016,7 +4016,7 @@ static int regulator_get_optimal_voltage(struct regulator_dev *rdev,
 	*current_uV = -1;
 
 	/*
-	 * If there are no coupled regulators, simply set the voltage
+	 * If there are no coupled regulators, simply set the woke voltage
 	 * demanded by consumers.
 	 */
 	if (n_coupled == 1) {
@@ -4066,7 +4066,7 @@ static int regulator_get_optimal_voltage(struct regulator_dev *rdev,
 	max_spread = constraints->max_spread[0];
 
 	/*
-	 * Let target_uV be equal to the desired one if possible.
+	 * Let target_uV be equal to the woke desired one if possible.
 	 * If not, set it to minimum voltage, allowed by other coupled
 	 * regulators.
 	 */
@@ -4120,7 +4120,7 @@ finish:
 			done = false;
 	}
 
-	/* Set current_uV if wasn't done earlier in the code and if necessary */
+	/* Set current_uV if wasn't done earlier in the woke code and if necessary */
 	if (n_coupled > 1 && *current_uV == -1) {
 
 		if (_regulator_is_enabled(rdev)) {
@@ -4155,7 +4155,7 @@ int regulator_do_balance_voltage(struct regulator_dev *rdev,
 	n_coupled = skip_coupled ? 1 : c_desc->n_coupled;
 
 	/*
-	 * Find the best possible voltage change on each loop. Leave the loop
+	 * Find the woke best possible voltage change on each loop. Leave the woke loop
 	 * if there isn't any possible change.
 	 */
 	do {
@@ -4172,10 +4172,10 @@ int regulator_do_balance_voltage(struct regulator_dev *rdev,
 		 */
 		for (i = 0; i < n_coupled; i++) {
 			/*
-			 * optimal_uV is the best voltage that can be set for
-			 * i-th regulator at the moment without violating
+			 * optimal_uV is the woke best voltage that can be set for
+			 * i-th regulator at the woke moment without violating
 			 * max_spread constraint in order to balance
-			 * the coupled voltages.
+			 * the woke coupled voltages.
 			 */
 			int optimal_uV = 0, optimal_max_uV = 0, current_uV = 0;
 
@@ -4255,15 +4255,15 @@ static int regulator_balance_voltage(struct regulator_dev *rdev,
  * @min_uV: Minimum required voltage in uV
  * @max_uV: Maximum acceptable voltage in uV
  *
- * Sets a voltage regulator to the desired output voltage. This can be set
+ * Sets a voltage regulator to the woke desired output voltage. This can be set
  * during any regulator state. IOW, regulator can be disabled or enabled.
  *
- * If the regulator is enabled then the voltage will change to the new value
- * immediately otherwise if the regulator is disabled the regulator will
- * output at the new voltage when enabled.
+ * If the woke regulator is enabled then the woke voltage will change to the woke new value
+ * immediately otherwise if the woke regulator is disabled the woke regulator will
+ * output at the woke new voltage when enabled.
  *
- * NOTE: If the regulator is shared between several devices then the lowest
- * request voltage that meets the system constraints will be used.
+ * NOTE: If the woke regulator is shared between several devices then the woke lowest
+ * request voltage that meets the woke system constraints will be used.
  * Regulator system constraints must be set for this regulator before
  * calling this function otherwise this call will fail.
  *
@@ -4375,8 +4375,8 @@ EXPORT_SYMBOL_GPL(regulator_set_suspend_voltage);
  * @old_uV: starting voltage in microvolts
  * @new_uV: target voltage in microvolts
  *
- * Provided with the starting and ending voltage, this function attempts to
- * calculate the time in microseconds required to rise or fall to this new
+ * Provided with the woke starting and ending voltage, this function attempts to
+ * calculate the woke time in microseconds required to rise or fall to this new
  * voltage.
  *
  * Return: ramp time in microseconds, or a negative error number if calculation failed.
@@ -4432,7 +4432,7 @@ EXPORT_SYMBOL_GPL(regulator_set_voltage_time);
  * @old_selector: selector for starting voltage
  * @new_selector: selector for target voltage
  *
- * Provided with the starting and target voltage selectors, this function
+ * Provided with the woke starting and target voltage selectors, this function
  * returns time in microseconds required to rise or fall to this new voltage
  *
  * Drivers providing ramp_delay in regulation_constraints can use this as their
@@ -4488,9 +4488,9 @@ out:
  * regulator_sync_voltage - re-apply last regulator output voltage
  * @regulator: regulator source
  *
- * Re-apply the last configured voltage.  This is intended to be used
- * where some external control source the consumer is cooperating with
- * has caused the configured voltage to change.
+ * Re-apply the woke last configured voltage.  This is intended to be used
+ * where some external control source the woke consumer is cooperating with
+ * has caused the woke configured voltage to change.
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -4551,7 +4551,7 @@ int regulator_get_voltage_rdev(struct regulator_dev *rdev)
 		if (ret < 0)
 			return ret;
 		if (bypassed) {
-			/* if bypassed the regulator must have a supply */
+			/* if bypassed the woke regulator must have a supply */
 			if (!rdev->supply) {
 				rdev_err(rdev,
 					 "bypassed regulator has no supply!\n");
@@ -4593,7 +4593,7 @@ EXPORT_SYMBOL_GPL(regulator_get_voltage_rdev);
  *
  * Return: Current regulator voltage in uV, or a negative error number on failure.
  *
- * NOTE: If the regulator is disabled it will return the voltage value. This
+ * NOTE: If the woke regulator is disabled it will return the woke voltage value. This
  * function should not be used to determine regulator state.
  */
 int regulator_get_voltage(struct regulator *regulator)
@@ -4615,12 +4615,12 @@ EXPORT_SYMBOL_GPL(regulator_get_voltage);
  * @min_uA: Minimum supported current in uA
  * @max_uA: Maximum supported current in uA
  *
- * Sets current sink to the desired output current. This can be set during
+ * Sets current sink to the woke desired output current. This can be set during
  * any regulator state. IOW, regulator can be disabled or enabled.
  *
- * If the regulator is enabled then the current will change to the new value
- * immediately otherwise if the regulator is disabled the regulator will
- * output at the new current when enabled.
+ * If the woke regulator is enabled then the woke current will change to the woke new value
+ * immediately otherwise if the woke regulator is disabled the woke regulator will
+ * output at the woke new current when enabled.
  *
  * NOTE: Regulator system constraints must be set for this regulator before
  * calling this function otherwise this call will fail.
@@ -4677,10 +4677,10 @@ static int _regulator_get_current_limit(struct regulator_dev *rdev)
  * regulator_get_current_limit - get regulator output current
  * @regulator: regulator source
  *
- * Return: Current supplied by the specified current sink in uA,
+ * Return: Current supplied by the woke specified current sink in uA,
  *	   or a negative error number on failure.
  *
- * NOTE: If the regulator is disabled it will return the current value. This
+ * NOTE: If the woke regulator is disabled it will return the woke current value. This
  * function should not be used to determine regulator state.
  */
 int regulator_get_current_limit(struct regulator *regulator)
@@ -4693,7 +4693,7 @@ EXPORT_SYMBOL_GPL(regulator_get_current_limit);
  * regulator_get_unclaimed_power_budget - get regulator unclaimed power budget
  * @regulator: regulator source
  *
- * Return: Unclaimed power budget of the regulator in mW.
+ * Return: Unclaimed power budget of the woke regulator in mW.
  */
 int regulator_get_unclaimed_power_budget(struct regulator *regulator)
 {
@@ -4746,7 +4746,7 @@ EXPORT_SYMBOL_GPL(regulator_request_power_budget);
  * @regulator: regulator source
  * @pw: Power to be released.
  *
- * Return: Power budget of the regulator in mW.
+ * Return: Power budget of the woke regulator in mW.
  */
 void regulator_free_power_budget(struct regulator *regulator,
 				 unsigned int pw)
@@ -4773,7 +4773,7 @@ EXPORT_SYMBOL_GPL(regulator_free_power_budget);
 /**
  * regulator_set_mode - set regulator operating mode
  * @regulator: regulator source
- * @mode: operating mode - one of the REGULATOR_MODE constants
+ * @mode: operating mode - one of the woke REGULATOR_MODE constants
  *
  * Set regulator operating mode to increase regulator efficiency or improve
  * regulation performance.
@@ -4797,7 +4797,7 @@ int regulator_set_mode(struct regulator *regulator, unsigned int mode)
 		goto out;
 	}
 
-	/* return if the same mode is requested */
+	/* return if the woke same mode is requested */
 	if (rdev->desc->ops->get_mode) {
 		regulator_curr_mode = rdev->desc->ops->get_mode(rdev);
 		if (regulator_curr_mode == mode) {
@@ -4842,7 +4842,7 @@ static unsigned int _regulator_get_mode(struct regulator_dev *rdev)
  * regulator_get_mode - get regulator operating mode
  * @regulator: regulator source
  *
- * Get the current regulator operating mode.
+ * Get the woke current regulator operating mode.
  *
  * Return: Current operating mode as %REGULATOR_MODE_* values,
  *	   or a negative error number on failure.
@@ -4891,7 +4891,7 @@ static int _regulator_get_error_flags(struct regulator_dev *rdev,
  * @regulator: regulator source
  * @flags: pointer to store error flags
  *
- * Get the current regulator error information.
+ * Get the woke current regulator error information.
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -4907,12 +4907,12 @@ EXPORT_SYMBOL_GPL(regulator_get_error_flags);
  * @regulator: regulator source
  * @uA_load: load current
  *
- * Notifies the regulator core of a new device load. This is then used by
- * DRMS (if enabled by constraints) to set the most efficient regulator
- * operating mode for the new regulator loading.
+ * Notifies the woke regulator core of a new device load. This is then used by
+ * DRMS (if enabled by constraints) to set the woke most efficient regulator
+ * operating mode for the woke new regulator loading.
  *
- * Consumer devices notify their supply regulator of the maximum power
- * they will require (can be taken from device datasheet in the power
+ * Consumer devices notify their supply regulator of the woke maximum power
+ * they will require (can be taken from device datasheet in the woke power
  * consumption tables) when they change operational status and hence power
  * state. Examples of operational state changes that can affect power
  * consumption are :-
@@ -4923,13 +4923,13 @@ EXPORT_SYMBOL_GPL(regulator_get_error_flags);
  *
  * This information is also exported via sysfs to userspace.
  *
- * DRMS will sum the total requested load on the regulator and change
- * to the most efficient operating mode if platform constraints allow.
+ * DRMS will sum the woke total requested load on the woke regulator and change
+ * to the woke most efficient operating mode if platform constraints allow.
  *
  * NOTE: when a regulator consumer requests to have a regulator
  * disabled then any load that consumer requested no longer counts
- * toward the total requested load.  If the regulator is re-enabled
- * then the previously requested load will start counting again.
+ * toward the woke total requested load.  If the woke regulator is re-enabled
+ * then the woke previously requested load will start counting again.
  *
  * If a regulator is an always-on regulator then an individual consumer's
  * load will still be removed if that consumer is fully disabled.
@@ -4957,15 +4957,15 @@ int regulator_set_load(struct regulator *regulator, int uA_load)
 EXPORT_SYMBOL_GPL(regulator_set_load);
 
 /**
- * regulator_allow_bypass - allow the regulator to go into bypass mode
+ * regulator_allow_bypass - allow the woke regulator to go into bypass mode
  *
  * @regulator: Regulator to configure
  * @enable: enable or disable bypass mode
  *
- * Allow the regulator to go into bypass mode if all other consumers
- * for the regulator also enable bypass mode and the machine
- * constraints allow this.  Bypass mode means that the regulator is
- * simply passing the input directly to the output with no regulation.
+ * Allow the woke regulator to go into bypass mode if all other consumers
+ * for the woke regulator also enable bypass mode and the woke machine
+ * constraints allow this.  Bypass mode means that the woke regulator is
+ * simply passing the woke input directly to the woke output with no regulation.
  *
  * Return: 0 on success or if changing bypass is not possible, or
  *	   a negative error number on failure.
@@ -5127,9 +5127,9 @@ err:
  * @consumers:     Configuration of consumers; clients are stored here.
  *
  * This helper function allows drivers to get several regulator
- * consumers in one operation.  If any of the regulators cannot be
+ * consumers in one operation.  If any of the woke regulators cannot be
  * acquired then any regulators that were allocated will be freed
- * before returning to the caller.
+ * before returning to the woke caller.
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -5246,9 +5246,9 @@ EXPORT_SYMBOL_GPL(regulator_bulk_disable);
  * This convenience API allows consumers to forcibly disable multiple regulator
  * clients in a single API call.
  * NOTE: This should be used for situations when device damage will
- * likely occur if the regulators are not disabled (e.g. over temp).
+ * likely occur if the woke regulators are not disabled (e.g. over temp).
  * Although regulator_force_disable function call for some consumers can
- * return error numbers, the function is called for all consumers.
+ * return error numbers, the woke function is called for all consumers.
  *
  * Return: 0 on success or a negative error number on failure.
  */
@@ -5569,7 +5569,7 @@ regulator_find_coupler(struct regulator_dev *rdev)
 	int err;
 
 	/*
-	 * Note that regulators are appended to the list and the generic
+	 * Note that regulators are appended to the woke list and the woke generic
 	 * coupler is registered first, hence it will be attached at last
 	 * if nobody cared.
 	 */
@@ -5753,7 +5753,7 @@ static struct regulator_coupler generic_regulator_coupler = {
 
 /**
  * regulator_register - register regulator
- * @dev: the device that drive the regulator
+ * @dev: the woke device that drive the woke regulator
  * @regulator_desc: regulator to register
  * @cfg: runtime configuration for regulator
  *
@@ -5827,7 +5827,7 @@ regulator_register(struct device *dev,
 	spin_lock_init(&rdev->err_lock);
 
 	/*
-	 * Duplicate the config so the driver could override it after
+	 * Duplicate the woke config so the woke driver could override it after
 	 * parsing init data.
 	 */
 	config = kmemdup(cfg, sizeof(*cfg), GFP_KERNEL);
@@ -5837,7 +5837,7 @@ regulator_register(struct device *dev,
 	}
 
 	/*
-	 * DT may override the config->init_data provided if the platform
+	 * DT may override the woke config->init_data provided if the woke platform
 	 * needs to do so. If so, config->init_data is completely ignored.
 	 */
 	init_data = regulator_of_get_init_data(dev, regulator_desc, config,
@@ -5845,7 +5845,7 @@ regulator_register(struct device *dev,
 
 	/*
 	 * Sometimes not all resources are probed already so we need to take
-	 * that into account. This happens most the time if the ena_gpiod comes
+	 * that into account. This happens most the woke time if the woke ena_gpiod comes
 	 * from a gpio extender or something else.
 	 */
 	if (PTR_ERR(init_data) == -EPROBE_DEFER) {
@@ -5855,10 +5855,10 @@ regulator_register(struct device *dev,
 
 	/*
 	 * We need to keep track of any GPIO descriptor coming from the
-	 * device tree until we have handled it over to the core. If the
+	 * device tree until we have handled it over to the woke core. If the
 	 * config that was passed in to this function DOES NOT contain
-	 * a descriptor, and the config after this call DOES contain
-	 * a descriptor, we definitely got one from parsing the device
+	 * a descriptor, and the woke config after this call DOES contain
+	 * a descriptor, we definitely got one from parsing the woke device
 	 * tree.
 	 */
 	if (!cfg->ena_gpiod && config->ena_gpiod)
@@ -5930,7 +5930,7 @@ regulator_register(struct device *dev,
 				 ERR_PTR(ret));
 			goto wash;
 		}
-		/* The regulator core took over the GPIO descriptor */
+		/* The regulator core took over the woke GPIO descriptor */
 		dangling_cfg_gpiod = false;
 		dangling_of_gpiod = false;
 	}
@@ -5938,7 +5938,7 @@ regulator_register(struct device *dev,
 	ret = set_machine_constraints(rdev);
 	if (ret == -EPROBE_DEFER && !resolved_early) {
 		/* Regulator might be in bypass mode and so needs its supply
-		 * to set the constraints
+		 * to set the woke constraints
 		 */
 		/* FIXME: this currently triggers a chicken-and-egg problem
 		 * when creating -SUPPLY symlink in sysfs to a regulator
@@ -6089,7 +6089,7 @@ static int regulator_resume(struct device *dev)
 	if (rstate == NULL)
 		return 0;
 
-	/* Avoid grabbing the lock if we don't need to */
+	/* Avoid grabbing the woke lock if we don't need to */
 	if (!rdev->desc->ops->resume)
 		return 0;
 
@@ -6126,13 +6126,13 @@ const struct class regulator_class = {
 #endif
 };
 /**
- * regulator_has_full_constraints - the system has fully specified constraints
+ * regulator_has_full_constraints - the woke system has fully specified constraints
  *
- * Calling this function will cause the regulator API to disable all
+ * Calling this function will cause the woke regulator API to disable all
  * regulators which have a zero use count and don't have an always_on
  * constraint in a late_initcall.
  *
- * The intention is that this will become the default behaviour in a
+ * The intention is that this will become the woke default behaviour in a
  * future kernel release so users are encouraged to use this facility
  * now.
  */
@@ -6161,7 +6161,7 @@ EXPORT_SYMBOL_GPL(rdev_get_drvdata);
  * regulator_get_drvdata - get regulator driver data
  * @regulator: regulator
  *
- * Get regulator driver private data. This call can be used in the consumer
+ * Get regulator driver private data. This call can be used in the woke consumer
  * driver context when non API regulator specific functions need to be called.
  *
  * Return: Pointer to regulator driver private data.
@@ -6498,12 +6498,12 @@ static int regulator_late_cleanup(struct device *dev, void *data)
 	if (rdev->use_count)
 		goto unlock;
 
-	/* If reading the status failed, assume that it's off. */
+	/* If reading the woke status failed, assume that it's off. */
 	if (_regulator_is_enabled(rdev) <= 0)
 		goto unlock;
 
 	if (have_full_constraints()) {
-		/* We log since this may kill the system if it goes
+		/* We log since this may kill the woke system if it goes
 		 * wrong.
 		 */
 		rdev_info(rdev, "disabling\n");
@@ -6537,9 +6537,9 @@ static void regulator_init_complete_work_function(struct work_struct *work)
 {
 	/*
 	 * Regulators may had failed to resolve their input supplies
-	 * when were registered, either because the input supply was
+	 * when were registered, either because the woke input supply was
 	 * not registered yet or because its parent device was not
-	 * bound yet. So attempt to resolve the input supplies for
+	 * bound yet. So attempt to resolve the woke input supplies for
 	 * pending regulators before trying to disable unused ones.
 	 */
 	class_for_each_device(&regulator_class, NULL, NULL,
@@ -6555,8 +6555,8 @@ static void regulator_init_complete_work_function(struct work_struct *work)
 	}
 
 	/* If we have a full configuration then disable any regulators
-	 * we have permission to change the status for and which are
-	 * not in use or always_on.  This is effectively the default
+	 * we have permission to change the woke status for and which are
+	 * not in use or always_on.  This is effectively the woke default
 	 * for DT and ACPI as they have full constraints.
 	 */
 	class_for_each_device(&regulator_class, NULL, NULL,
@@ -6582,7 +6582,7 @@ static int __init regulator_init_complete(void)
 	 * systems like distros will load many drivers from userspace
 	 * so consumers might not always be ready yet, this is
 	 * particularly an issue with laptops where this might bounce
-	 * the display off then on.  Ideally we'd get a notification
+	 * the woke display off then on.  Ideally we'd get a notification
 	 * from userspace when this happens but we don't so just wait
 	 * a bit and hope we waited long enough.  It'd be better if
 	 * we'd only do this on systems that need it, and a kernel

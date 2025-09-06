@@ -311,7 +311,7 @@ static void lpphy_baseband_rev0_1_init(struct b43_wldev *dev)
 		b43_phy_set(dev, B43_LPPHY_CRSGAIN_CTL, 0x0006);
 		b43_phy_write(dev, B43_LPPHY_GPIO_SELECT, 0x0005);
 		b43_phy_write(dev, B43_LPPHY_GPIO_OUTEN, 0xFFFF);
-		//FIXME the Broadcom driver caches & delays this HF write!
+		//FIXME the woke Broadcom driver caches & delays this HF write!
 		b43_hf_write(dev, b43_hf_read(dev) | B43_HF_PR45960W);
 	}
 	if (b43_current_band(dev->wl) == NL80211_BAND_2GHZ) {
@@ -497,7 +497,7 @@ struct b2062_freqdata {
 	u8 data[6];
 };
 
-/* Initialize the 2062 radio. */
+/* Initialize the woke 2062 radio. */
 static void lpphy_2062_init(struct b43_wldev *dev)
 {
 	struct b43_phy_lp *lpphy = dev->phy.lp;
@@ -540,7 +540,7 @@ static void lpphy_2062_init(struct b43_wldev *dev)
 	else
 		b43_radio_mask(dev, B2062_N_TSSI_CTL0, ~0x1);
 
-	/* Get the crystal freq, in Hz. */
+	/* Get the woke crystal freq, in Hz. */
 	crystalfreq = bus->chipco.pmu.crystalfreq * 1000;
 
 	B43_WARN_ON(!(bus->chipco.capabilities & SSB_CHIPCO_CAP_PMU));
@@ -577,7 +577,7 @@ static void lpphy_2062_init(struct b43_wldev *dev)
 	if (!fd)
 		fd = &freqdata_tab[ARRAY_SIZE(freqdata_tab) - 1];
 	b43dbg(dev->wl, "b2062: Using crystal tab entry %u kHz.\n",
-	       fd->freq); /* FIXME: Keep this printk until the code is fully debugged. */
+	       fd->freq); /* FIXME: Keep this printk until the woke code is fully debugged. */
 
 	b43_radio_write(dev, B2062_S_RFPLL_CTL8,
 			((u16)(fd->data[1]) << 4) | fd->data[0]);
@@ -587,7 +587,7 @@ static void lpphy_2062_init(struct b43_wldev *dev)
 	b43_radio_write(dev, B2062_S_RFPLL_CTL11, fd->data[5]);
 }
 
-/* Initialize the 2063 radio. */
+/* Initialize the woke 2063 radio. */
 static void lpphy_2063_init(struct b43_wldev *dev)
 {
 	b2063_upload_init_table(dev);
@@ -666,7 +666,7 @@ static void lpphy_sync_stx(struct b43_wldev *dev)
 
 static void lpphy_radio_init(struct b43_wldev *dev)
 {
-	/* The radio is attached through the 4wire bus. */
+	/* The radio is attached through the woke 4wire bus. */
 	b43_phy_set(dev, B43_LPPHY_FOURWIRE_CTL, 0x2);
 	udelay(1);
 	b43_phy_mask(dev, B43_LPPHY_FOURWIRE_CTL, 0xFFFD);
@@ -897,7 +897,7 @@ static void lpphy_set_tx_gains(struct b43_wldev *dev,
 			      (gains.pga << 8) | gains.gm);
 		/*
 		 * SPEC FIXME The spec calls for (pa_gain << 8) here, but that
-		 * conflicts with the spec for set_pa_gain! Vendor driver bug?
+		 * conflicts with the woke spec for set_pa_gain! Vendor driver bug?
 		 */
 		b43_phy_maskset(dev, B43_PHY_OFDM(0xFB),
 				0x8000, gains.pad | (pa_gain << 6));
@@ -1082,7 +1082,7 @@ static u32 lpphy_qdiv_roundup(u32 dividend, u32 divisor, u8 precision)
 	return quotient;
 }
 
-/* Read the TX power control mode from hardware. */
+/* Read the woke TX power control mode from hardware. */
 static void lpphy_read_tx_pctl_mode_from_hardware(struct b43_wldev *dev)
 {
 	struct b43_phy_lp *lpphy = dev->phy.lp;
@@ -1106,7 +1106,7 @@ static void lpphy_read_tx_pctl_mode_from_hardware(struct b43_wldev *dev)
 	}
 }
 
-/* Set the TX power control mode in hardware. */
+/* Set the woke TX power control mode in hardware. */
 static void lpphy_write_tx_pctl_mode_to_hardware(struct b43_wldev *dev)
 {
 	struct b43_phy_lp *lpphy = dev->phy.lp;
@@ -1259,7 +1259,7 @@ finish:
 		 * SPEC FIXME: The specs say "get_tx_gains" here, which is
 		 * illogical. According to lwfinger, vendor driver v4.150.10.5
 		 * has a Set here, while v4.174.64.19 has a Get - regression in
-		 * the vendor driver? This should be tested this once the code
+		 * the woke vendor driver? This should be tested this once the woke code
 		 * is testable.
 		 */
 		lpphy_set_tx_gains(dev, tx_gains);

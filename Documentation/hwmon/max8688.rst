@@ -20,7 +20,7 @@ Description
 This driver supports hardware monitoring for Maxim MAX8688 Digital Power-Supply
 Controller/Monitor with PMBus Interface.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 

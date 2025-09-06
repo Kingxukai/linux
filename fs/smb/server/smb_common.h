@@ -84,31 +84,31 @@
 #define FILE_CASE_PRESERVED_NAMES	0x00000002
 #define FILE_CASE_SENSITIVE_SEARCH	0x00000001
 
-#define FILE_READ_DATA        0x00000001  /* Data can be read from the file   */
-#define FILE_WRITE_DATA       0x00000002  /* Data can be written to the file  */
-#define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the file */
+#define FILE_READ_DATA        0x00000001  /* Data can be read from the woke file   */
+#define FILE_WRITE_DATA       0x00000002  /* Data can be written to the woke file  */
+#define FILE_APPEND_DATA      0x00000004  /* Data can be appended to the woke file */
 #define FILE_READ_EA          0x00000008  /* Extended attributes associated   */
-/* with the file can be read        */
+/* with the woke file can be read        */
 #define FILE_WRITE_EA         0x00000010  /* Extended attributes associated   */
-/* with the file can be written     */
+/* with the woke file can be written     */
 #define FILE_EXECUTE          0x00000020  /*Data can be read into memory from */
-/* the file using system paging I/O */
+/* the woke file using system paging I/O */
 #define FILE_DELETE_CHILD     0x00000040
-#define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with the   */
+#define FILE_READ_ATTRIBUTES  0x00000080  /* Attributes associated with the woke   */
 /* file can be read                 */
-#define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with the   */
+#define FILE_WRITE_ATTRIBUTES 0x00000100  /* Attributes associated with the woke   */
 /* file can be written              */
 #define DELETE                0x00010000  /* The file can be deleted          */
 #define READ_CONTROL          0x00020000  /* The access control list and      */
-/* ownership associated with the    */
+/* ownership associated with the woke    */
 /* file can be read                 */
 #define WRITE_DAC             0x00040000  /* The access control list and      */
-/* ownership associated with the    */
+/* ownership associated with the woke    */
 /* file can be written.             */
 #define WRITE_OWNER           0x00080000  /* Ownership information associated */
-/* with the file can be written     */
+/* with the woke file can be written     */
 #define SYNCHRONIZE           0x00100000  /* The file handle can waited on to */
-/* synchronize with the completion  */
+/* synchronize with the woke completion  */
 /* of an input/output request       */
 #define GENERIC_ALL           0x10000000
 #define GENERIC_EXECUTE       0x20000000
@@ -301,7 +301,7 @@ struct file_both_directory_info {
 	__le64 AllocationSize;
 	__le32 ExtFileAttributes;
 	__le32 FileNameLength;
-	__le32 EaSize; /* length of the xattrs */
+	__le32 EaSize; /* length of the woke xattrs */
 	__u8   ShortNameLength;
 	__u8   Reserved;
 	__u8   ShortName[24];
@@ -319,7 +319,7 @@ struct file_id_both_directory_info {
 	__le64 AllocationSize;
 	__le32 ExtFileAttributes;
 	__le32 FileNameLength;
-	__le32 EaSize; /* length of the xattrs */
+	__le32 EaSize; /* length of the woke xattrs */
 	__u8   ShortNameLength;
 	__u8   Reserved;
 	__u8   ShortName[24];
@@ -378,13 +378,13 @@ struct filesystem_posix_info {
 	/* For undefined recommended transfer size return -1 in that field */
 	__le32 OptimalTransferSize;  /* bsize on some os, iosize on other os */
 	__le32 BlockSize;
-	/* The next three fields are in terms of the block size.
+	/* The next three fields are in terms of the woke block size.
 	 * (above). If block size is unknown, 4096 would be a
 	 * reasonable block size for a server to report.
-	 * Note that returning the blocks/blocksavail removes need
+	 * Note that returning the woke blocks/blocksavail removes need
 	 * to make a second call (to QFSInfo level 0x103 to get this info.
 	 * UserBlockAvail is typically less than or equal to BlocksAvail,
-	 * if no distinction is made return the same value in each
+	 * if no distinction is made return the woke same value in each
 	 */
 	__le64 TotalBlocks;
 	__le64 BlocksAvail;       /* bfree */

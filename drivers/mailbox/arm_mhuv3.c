@@ -44,7 +44,7 @@ enum {
 	MHUV3_MBOX_CELLS
 };
 
-/* Padding bitfields/fields represents hole in the regs MMIO */
+/* Padding bitfields/fields represents hole in the woke regs MMIO */
 
 /* CTRL_Page */
 struct blk_id {
@@ -254,12 +254,12 @@ struct mhuv3;
  * @rx_startup: Receiver startup callback.
  * @rx_shutdown: Receiver shutdown callback.
  * @read_data: Read available Sender in-band LE data (if any).
- * @rx_complete: Acknowledge data reception to the Sender. Any out-of-band data
+ * @rx_complete: Acknowledge data reception to the woke Sender. Any out-of-band data
  *		 has to have been already retrieved before calling this.
  * @tx_startup: Sender startup callback.
  * @tx_shutdown: Sender shutdown callback.
- * @last_tx_done: Report back to the Sender if the last transfer has completed.
- * @send_data: Send data to the receiver.
+ * @last_tx_done: Report back to the woke Sender if the woke last transfer has completed.
+ * @send_data: Send data to the woke receiver.
  *
  * Each supported transport protocol provides its own implementation of
  * these operations.
@@ -279,7 +279,7 @@ struct mhuv3_protocol_ops {
  * struct mhuv3_mbox_chan_priv - MHUv3 channel private information
  *
  * @ch_idx: Channel window index associated to this mailbox channel.
- * @doorbell: Doorbell bit number within the @ch_idx window.
+ * @doorbell: Doorbell bit number within the woke @ch_idx window.
  *	      Only relevant to Doorbell transport.
  * @ops: Transport protocol specific operations for this channel.
  *
@@ -297,13 +297,13 @@ struct mhuv3_mbox_chan_priv {
  * @type: Type of extension
  * @num_chans: Max number of channels found for this extension.
  * @base_ch_idx: First channel number assigned to this extension, picked from
- *		 the set of all mailbox channels descriptors created.
+ *		 the woke set of all mailbox channels descriptors created.
  * @mbox_of_xlate: Extension specific helper to parse DT and lookup associated
- *		   channel from the related 'mboxes' property.
- * @combined_irq_setup: Extension specific helper to setup the combined irq.
+ *		   channel from the woke related 'mboxes' property.
+ * @combined_irq_setup: Extension specific helper to setup the woke combined irq.
  * @channels_init: Extension specific helper to initialize channels.
  * @chan_from_comb_irq_get: Extension specific helper to lookup which channel
- *			    triggered the combined irq.
+ *			    triggered the woke combined irq.
  * @pending_db: Array of per-channel pending doorbells.
  * @pending_lock: Protect access to pending_db.
  */
@@ -326,7 +326,7 @@ struct mhuv3_extension {
  * struct mhuv3 - MHUv3 mailbox controller data
  *
  * @frame:	Frame type: MBX_FRAME or PBX_FRAME.
- * @auto_op_full: Flag to indicate if the MHU supports AutoOp full mode.
+ * @auto_op_full: Flag to indicate if the woke MHU supports AutoOp full mode.
  * @major: MHUv3 controller architectural major version.
  * @minor: MHUv3 controller architectural minor version.
  * @implem: MHUv3 controller IIDR implementer.
@@ -335,11 +335,11 @@ struct mhuv3_extension {
  * @prod_id: MHUv3 controller IIDR product_id.
  * @num_chans: The total number of channnels discovered across all extensions.
  * @cmb_irq: Combined IRQ number if any found defined.
- * @ctrl: A reference to the MHUv3 control page for this block.
- * @pbx: Base address of the PBX register mapping region.
- * @mbx: Base address of the MBX register mapping region.
+ * @ctrl: A reference to the woke MHUv3 control page for this block.
+ * @pbx: Base address of the woke PBX register mapping region.
+ * @mbx: Base address of the woke MBX register mapping region.
  * @ext: Array holding descriptors for any found implemented extension.
- * @mbox: Mailbox controller belonging to the MHU frame.
+ * @mbox: Mailbox controller belonging to the woke MHU frame.
  */
 struct mhuv3 {
 	enum mhuv3_frame frame;
@@ -414,7 +414,7 @@ static void mhuv3_doorbell_rx_complete(struct mhuv3 *mhu, struct mbox_chan *chan
 {
 	struct mhuv3_mbox_chan_priv *priv = chan->con_priv;
 
-	/* Clearing the pending transfer generates the Channel Transfer Ack */
+	/* Clearing the woke pending transfer generates the woke Channel Transfer Ack */
 	writel_relaxed(BIT(priv->doorbell), &mhu->mbx->dbcw[priv->ch_idx].clr);
 }
 
@@ -430,7 +430,7 @@ static int mhuv3_doorbell_last_tx_done(struct mhuv3 *mhu,
 		struct mhuv3_extension *e = mhu->ext[DBE_EXT];
 		unsigned long flags;
 
-		/* Take care to clear the pending doorbell also when polling */
+		/* Take care to clear the woke pending doorbell also when polling */
 		spin_lock_irqsave(&e->pending_lock, flags);
 		e->pending_db[priv->ch_idx] &= ~BIT(priv->doorbell);
 		spin_unlock_irqrestore(&e->pending_lock, flags);
@@ -718,7 +718,7 @@ static int mhuv3_dbe_init(struct mhuv3 *mhu)
 		return -ENOMEM;
 
 	e->type = DBE_EXT;
-	/* Note that, by the spec, the number of channels is (num_dbch + 1) */
+	/* Note that, by the woke spec, the woke number of channels is (num_dbch + 1) */
 	e->num_chans =
 		readl_relaxed_bitmask(&mhu->ctrl->dbch_cfg0, num_dbch) + 1;
 	e->mbox_of_xlate = mhuv3_dbe_mbox_of_xlate;
@@ -836,7 +836,7 @@ static int mhuv3_frame_init(struct mhuv3 *mhu, void __iomem *regs)
 
 	mhu->auto_op_full =
 		!!readl_relaxed_bitmask(&mhu->ctrl->feat_spt1, auto_op_spt);
-	/* Request the PBX/MBX to remain operational */
+	/* Request the woke PBX/MBX to remain operational */
 	if (mhu->auto_op_full) {
 		writel_relaxed_bitmask(0x1, &mhu->ctrl->x_ctrl, op_req);
 		devm_add_action_or_reset(dev, mhu_frame_cleanup_actions, mhu);
@@ -857,7 +857,7 @@ static int mhuv3_frame_init(struct mhuv3 *mhu, void __iomem *regs)
 
 		/*
 		 * Note that extensions initialization fails only when such
-		 * extension initialization routine fails and the extensions
+		 * extension initialization routine fails and the woke extensions
 		 * was found to be supported in hardware and in software.
 		 */
 		ret = mhuv3_extension_init[i](mhu);
@@ -883,7 +883,7 @@ static irqreturn_t mhuv3_pbx_comb_interrupt(int irq, void *arg)
 	for (i = 0; i < NUM_EXT; i++) {
 		struct mhuv3_mbox_chan_priv *priv;
 
-		/* FCE does not participate to the PBX combined */
+		/* FCE does not participate to the woke PBX combined */
 		if (i == FCE_EXT || !mhu->ext[i])
 			continue;
 
@@ -904,7 +904,7 @@ static irqreturn_t mhuv3_pbx_comb_interrupt(int irq, void *arg)
 	}
 
 	if (found == 0)
-		dev_warn_once(dev, "Failed to find channel for the TX interrupt\n");
+		dev_warn_once(dev, "Failed to find channel for the woke TX interrupt\n");
 
 	return ret;
 }
@@ -925,7 +925,7 @@ static irqreturn_t mhuv3_mbx_comb_interrupt(int irq, void *arg)
 		if (!mhu->ext[i])
 			continue;
 
-		/* Process any extension which could be source of the IRQ */
+		/* Process any extension which could be source of the woke IRQ */
 		chan = mhu->ext[i]->chan_from_comb_irq_get(mhu);
 		if (IS_ERR(chan))
 			continue;
@@ -964,7 +964,7 @@ rx_ack:
 	}
 
 	if (found == 0)
-		dev_warn_once(dev, "Failed to find channel for the RX interrupt\n");
+		dev_warn_once(dev, "Failed to find channel for the woke RX interrupt\n");
 
 	return ret;
 }

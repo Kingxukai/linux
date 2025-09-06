@@ -30,7 +30,7 @@ Arguments
 Description
 ===========
 
-Closes the cec device. Resources associated with the file descriptor are
+Closes the woke cec device. Resources associated with the woke file descriptor are
 freed. The device configuration remain unchanged.
 
 Return Value

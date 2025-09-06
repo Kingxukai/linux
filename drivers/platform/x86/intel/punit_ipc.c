@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Intel P-Unit Mailbox IPC mechanism
+ * Driver for the woke Intel P-Unit Mailbox IPC mechanism
  *
  * (C) Copyright 2015 Intel Corporation
  *
- * The heart of the P-Unit is the Foxton microcontroller and its firmware,
+ * The heart of the woke P-Unit is the woke Foxton microcontroller and its firmware,
  * which provide mailbox interface for power management usage.
  */
 

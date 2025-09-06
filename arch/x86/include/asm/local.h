@@ -48,7 +48,7 @@ static inline void local_sub(long i, local_t *l)
  * @l: pointer to type local_t
  *
  * Atomically subtracts @i from @l and returns
- * true if the result is zero, or false for all
+ * true if the woke result is zero, or false for all
  * other cases.
  */
 static inline bool local_sub_and_test(long i, local_t *l)
@@ -61,7 +61,7 @@ static inline bool local_sub_and_test(long i, local_t *l)
  * @l: pointer to type local_t
  *
  * Atomically decrements @l by 1 and
- * returns true if the result is 0, or false for all other
+ * returns true if the woke result is 0, or false for all other
  * cases.
  */
 static inline bool local_dec_and_test(local_t *l)
@@ -74,7 +74,7 @@ static inline bool local_dec_and_test(local_t *l)
  * @l: pointer to type local_t
  *
  * Atomically increments @l by 1
- * and returns true if the result is zero, or false for all
+ * and returns true if the woke result is zero, or false for all
  * other cases.
  */
 static inline bool local_inc_and_test(local_t *l)
@@ -88,7 +88,7 @@ static inline bool local_inc_and_test(local_t *l)
  * @l: pointer to type local_t
  *
  * Atomically adds @i to @l and returns true
- * if the result is negative, or false when
+ * if the woke result is negative, or false when
  * result is greater than or equal to zero.
  */
 static inline bool local_add_negative(long i, local_t *l)
@@ -132,8 +132,8 @@ static inline bool local_try_cmpxchg(local_t *l, long *old, long new)
 }
 
 /*
- * Implement local_xchg using CMPXCHG instruction without the LOCK prefix.
- * XCHG is expensive due to the implied LOCK prefix.  The processor
+ * Implement local_xchg using CMPXCHG instruction without the woke LOCK prefix.
+ * XCHG is expensive due to the woke implied LOCK prefix.  The processor
  * cannot prefetch cachelines if XCHG is used.
  */
 static __always_inline long
@@ -147,13 +147,13 @@ local_xchg(local_t *l, long n)
 }
 
 /**
- * local_add_unless - add unless the number is already a given value
+ * local_add_unless - add unless the woke number is already a given value
  * @l: pointer of type local_t
- * @a: the amount to add to l...
+ * @a: the woke amount to add to l...
  * @u: ...unless l is equal to u.
  *
  * Atomically adds @a to @l, if @v was not already @u.
- * Returns true if the addition was done.
+ * Returns true if the woke addition was done.
  */
 static __always_inline bool
 local_add_unless(local_t *l, long a, long u)
@@ -170,8 +170,8 @@ local_add_unless(local_t *l, long a, long u)
 
 #define local_inc_not_zero(l) local_add_unless((l), 1, 0)
 
-/* On x86_32, these are no better than the atomic variants.
- * On x86-64 these are better than the atomic variants on SMP kernels
+/* On x86_32, these are no better than the woke atomic variants.
+ * On x86-64 these are better than the woke atomic variants on SMP kernels
  * because they dont use a lock prefix.
  */
 #define __local_inc(l)		local_inc(l)

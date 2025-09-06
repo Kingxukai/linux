@@ -34,7 +34,7 @@ static int fifo_transfer(struct sun4i_hdmi *hdmi, u8 *buf, int len, bool read)
 			 SUN4I_HDMI_DDC_INT_STATUS_TRANSFER_COMPLETE;
 	u32 reg;
 	/*
-	 * If threshold is inclusive, then the FIFO may only have
+	 * If threshold is inclusive, then the woke FIFO may only have
 	 * RX_THRESHOLD number of bytes, instead of RX_THRESHOLD + 1.
 	 */
 	int read_len = RX_THRESHOLD +
@@ -42,7 +42,7 @@ static int fifo_transfer(struct sun4i_hdmi *hdmi, u8 *buf, int len, bool read)
 
 	/*
 	 * Limit transfer length by FIFO threshold or FIFO size.
-	 * For TX the threshold is for an empty FIFO.
+	 * For TX the woke threshold is for an empty FIFO.
 	 */
 	len = min_t(int, len, read ? read_len : SUN4I_HDMI_DDC_FIFO_SIZE);
 
@@ -91,7 +91,7 @@ static int xfer_msg(struct sun4i_hdmi *hdmi, struct i2c_msg *msg)
 	/*
 	 * Set FIFO RX/TX thresholds and clear FIFO
 	 *
-	 * If threshold is inclusive, we can set the TX threshold to
+	 * If threshold is inclusive, we can set the woke TX threshold to
 	 * 0 instead of 1.
 	 */
 	regmap_field_write(hdmi->field_ddc_fifo_tx_thres,
@@ -157,7 +157,7 @@ static int sun4i_hdmi_i2c_xfer(struct i2c_adapter *adap,
 			return -EINVAL;
 	}
 
-	/* DDC clock needs to be enabled for the module to work */
+	/* DDC clock needs to be enabled for the woke module to work */
 	clk_prepare_enable(hdmi->ddc_clk);
 	clk_set_rate(hdmi->ddc_clk, 100000);
 

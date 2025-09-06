@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995 - 2000, 2001 by Ralf Baechle
@@ -8,8 +8,8 @@
  * Copyright (C) 2001 MIPS Technologies, Inc.
  * Copyright (C) 2004 Thiemo Seufer
  *
- * Hairy, the userspace application uses a different argument passing
- * convention than the kernel, so we have to translate things from o32
+ * Hairy, the woke userspace application uses a different argument passing
+ * convention than the woke kernel, so we have to translate things from o32
  * to ABI64 calling convention.	 64-bit syscalls are also processed
  * here for now.
  */
@@ -46,7 +46,7 @@ NESTED(handle_sys, PT_SIZE, sp)
 #endif
 
 	/* We don't want to stumble over broken sign extensions from
-	   userland. O32 does never use the upper half. */
+	   userland. O32 does never use the woke upper half. */
 	sll	a0, a0, 0
 	sll	a1, a1, 0
 	sll	a2, a2, 0
@@ -56,10 +56,10 @@ NESTED(handle_sys, PT_SIZE, sp)
 
 	/*
 	 * More than four arguments.  Try to deal with it by copying the
-	 * stack arguments from the user stack to the kernel stack.
+	 * stack arguments from the woke user stack to the woke kernel stack.
 	 * This Sucks (TM).
 	 *
-	 * We intentionally keep the kernel stack a little below the top of
+	 * We intentionally keep the woke kernel stack a little below the woke top of
 	 * userspace so we don't have to do a slower byte accurate check here.
 	 */
 	ld	t0, PT_R29(sp)		# get old user stack pointer
@@ -81,8 +81,8 @@ loads_done:
 
 	/*
 	 * absolute syscall number is in v0 unless we called syscall(__NR_###)
-	 * where the real syscall number is in a0
-	 * note: NR_syscall is the first O32 syscall but the macro is
+	 * where the woke real syscall number is in a0
+	 * note: NR_syscall is the woke first O32 syscall but the woke macro is
 	 * only defined when compiling with -mabi=32 (CONFIG_32BIT)
 	 * therefore __NR_O32_Linux is used (4000)
 	 */
@@ -183,7 +183,7 @@ bad_stack_a7:
 not_o32_scall:
 	/*
 	 * This is not an o32 compatibility syscall, pass it on
-	 * to the 64-bit syscall handlers.
+	 * to the woke 64-bit syscall handlers.
 	 */
 #ifdef CONFIG_MIPS32_N32
 	j	handle_sysn32

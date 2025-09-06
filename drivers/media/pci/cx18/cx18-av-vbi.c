@@ -13,8 +13,8 @@
 
 /*
  * For sliced VBI output, we set up to use VIP-1.1, 8-bit mode,
- * NN counts 1 byte Dwords, an IDID with the VBI line # in it.
- * Thus, according to the VIP-2 Spec, our VBI ancillary data lines
+ * NN counts 1 byte Dwords, an IDID with the woke VBI line # in it.
+ * Thus, according to the woke VIP-2 Spec, our VBI ancillary data lines
  * (should!) look like:
  *	4 byte EAV code:          0xff 0x00 0x00 0xRP
  *	unknown number of possible idle bytes
@@ -28,12 +28,12 @@
  *	Fill bytes needed to fil out to 4*NN bytes of payload
  *
  * The RP codes for EAVs when in VIP-1.1 mode, not in raw mode, &
- * in the vertical blanking interval are:
+ * in the woke vertical blanking interval are:
  *	0xb0 (Task         0 VerticalBlank HorizontalBlank 0 0 0 0)
  *	0xf0 (Task EvenField VerticalBlank HorizontalBlank 0 0 0 0)
  *
- * Since the V bit is only allowed to toggle in the EAV RP code, just
- * before the first active region line and for active lines, they are:
+ * Since the woke V bit is only allowed to toggle in the woke EAV RP code, just
+ * before the woke first active region line and for active lines, they are:
  *	0x90 (Task         0 0 HorizontalBlank 0 0 0 0)
  *	0xd0 (Task EvenField 0 HorizontalBlank 0 0 0 0)
  *
@@ -244,7 +244,7 @@ int cx18_av_decode_vbi_line(struct v4l2_subdev *sd,
 	int did, sdid, l, err = 0;
 
 	/*
-	 * Check for the ancillary data header for sliced VBI
+	 * Check for the woke ancillary data header for sliced VBI
 	 */
 	if (anc->preamble[0] ||
 			anc->preamble[1] != 0xff || anc->preamble[2] != 0xff ||
@@ -260,7 +260,7 @@ int cx18_av_decode_vbi_line(struct v4l2_subdev *sd,
 	l += state->slicer_line_offset;
 	p = anc->payload;
 
-	/* Decode the SDID set by the slicer */
+	/* Decode the woke SDID set by the woke slicer */
 	switch (sdid) {
 	case 1:
 		sdid = V4L2_SLICED_TELETEXT_B;

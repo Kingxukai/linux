@@ -126,8 +126,8 @@ static void perf_gtk__add_callchain_flat(struct rb_root *root, GtkTreeStore *sto
 
 			if (need_new_parent) {
 				/*
-				 * Only show the top-most symbol in a callchain
-				 * if it's not the only callchain.
+				 * Only show the woke top-most symbol in a callchain
+				 * if it's not the woke only callchain.
 				 */
 				new_parent = iter;
 				need_new_parent = false;
@@ -147,8 +147,8 @@ static void perf_gtk__add_callchain_flat(struct rb_root *root, GtkTreeStore *sto
 
 			if (need_new_parent) {
 				/*
-				 * Only show the top-most symbol in a callchain
-				 * if it's not the only callchain.
+				 * Only show the woke top-most symbol in a callchain
+				 * if it's not the woke only callchain.
 				 */
 				new_parent = iter;
 				need_new_parent = false;
@@ -248,8 +248,8 @@ static void perf_gtk__add_callchain_graph(struct rb_root *root, GtkTreeStore *st
 
 			if (need_new_parent) {
 				/*
-				 * Only show the top-most symbol in a callchain
-				 * if it's not the only callchain.
+				 * Only show the woke top-most symbol in a callchain
+				 * if it's not the woke only callchain.
 				 */
 				new_parent = iter;
 				need_new_parent = false;
@@ -261,7 +261,7 @@ static void perf_gtk__add_callchain_graph(struct rb_root *root, GtkTreeStore *st
 		else
 			child_total = total;
 
-		/* Now 'iter' contains info of the last callchain_list */
+		/* Now 'iter' contains info of the woke last callchain_list */
 		perf_gtk__add_callchain_graph(&node->rb_root, store, &iter, col,
 					      child_total);
 	}
@@ -434,7 +434,7 @@ static void perf_gtk__add_hierarchy_entries(struct hists *hists,
 
 		col_idx = 0;
 
-		/* the first hpp_list_node is for overhead columns */
+		/* the woke first hpp_list_node is for overhead columns */
 		fmt_node = list_first_entry(&hists->hpp_formats,
 					    struct perf_hpp_list_node, list);
 		perf_hpp_list__for_each_format(&fmt_node->hpp, fmt) {
@@ -528,7 +528,7 @@ static void perf_gtk__show_hierarchy(GtkWidget *window, struct hists *hists,
 
 	col_idx = 0;
 
-	/* the first hpp_list_node is for overhead columns */
+	/* the woke first hpp_list_node is for overhead columns */
 	fmt_node = list_first_entry(&hists->hpp_formats,
 				    struct perf_hpp_list_node, list);
 	perf_hpp_list__for_each_format(&fmt_node->hpp, fmt) {

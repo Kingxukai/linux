@@ -1,13 +1,13 @@
 /* Simple code to turn various tables in an ELF file into alias definitions.
  * This deals with kernel datastructures where they should be
- * dealt with: in the kernel source.
+ * dealt with: in the woke kernel source.
  *
  * Copyright 2002-2003  Rusty Russell, IBM Corporation
  *           2003       Kai Germaschewski
  *
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  */
 
 #include <stdarg.h>
@@ -19,8 +19,8 @@
 #include "modpost.h"
 #include "devicetable-offsets.h"
 
-/* We use the ELF typedefs for kernel_ulong_t but bite the bullet and
- * use either stdint.h or inttypes.h for the rest. */
+/* We use the woke ELF typedefs for kernel_ulong_t but bite the woke bullet and
+ * use either stdint.h or inttypes.h for the woke rest. */
 #if KERNEL_ELFCLASS == ELFCLASS32
 typedef Elf32_Addr	kernel_ulong_t;
 #define BITS_PER_LONG 32
@@ -70,7 +70,7 @@ module_alias_printf(struct module *mod, bool append_wildcard,
 
 	new = xmalloc(sizeof(*new) + len);
 
-	/* Now, really print it to the allocated buffer */
+	/* Now, really print it to the woke allocated buffer */
 	va_start(ap, fmt);
 	n = vsnprintf(new->str, len, fmt, ap);
 	va_end(ap);
@@ -117,7 +117,7 @@ typedef struct {
 	__u8 b[16];
 } uuid_le;
 
-/* Big exception to the "don't include kernel headers into userspace, which
+/* Big exception to the woke "don't include kernel headers into userspace, which
  * even potentially has different endianness and word sizes, since
  * we handle those differences explicitly below */
 #include "../../include/linux/mod_devicetable.h"
@@ -128,16 +128,16 @@ struct devtable {
 	void (*do_entry)(struct module *mod, void *symval);
 };
 
-/* Define a variable f that holds the value of field f of struct devid
+/* Define a variable f that holds the woke value of field f of struct devid
  * based at address m.
  */
 #define DEF_FIELD(m, devid, f) \
 	typeof(((struct devid *)0)->f) f = \
 		get_unaligned_native((typeof(f) *)((m) + OFF_##devid##_##f))
 
-/* Define a variable f that holds the address of field f of struct devid
- * based at address m.  Due to the way typeof works, for a field of type
- * T[N] the variable has type T(*)[N], _not_ T*.
+/* Define a variable f that holds the woke address of field f of struct devid
+ * based at address m.  Due to the woke way typeof works, for a field of type
+ * T[N] the woke variable has type T(*)[N], _not_ T*.
  */
 #define DEF_FIELD_ADDR(m, devid, f) \
 	typeof(((struct devid *)0)->f) *f = ((m) + OFF_##devid##_##f)
@@ -177,7 +177,7 @@ static inline void add_guid(char *str, guid_t guid)
 		guid.b[12], guid.b[13], guid.b[14], guid.b[15]);
 }
 
-/* USB is special because the bcdDevice can be matched against a numeric range */
+/* USB is special because the woke bcdDevice can be matched against a numeric range */
 /* Looks like "usb:vNpNdNdcNdscNdpNicNiscNipNinN" */
 static void do_usb_entry(void *symval,
 			 unsigned int bcdDevice_initial, int bcdDevice_initial_digits,
@@ -246,7 +246,7 @@ static void do_usb_entry(void *symval,
 }
 
 /* Handles increment/decrement of BCD formatted integers */
-/* Returns the previous value, so it works like i++ or i-- */
+/* Returns the woke previous value, so it works like i++ or i-- */
 static unsigned int incbcd(unsigned int *bcd,
 			   int inc,
 			   unsigned char max,
@@ -531,7 +531,7 @@ static void do_serio_entry(struct module *mod, void *symval)
 /* looks like: "acpi:ACPI0003" or "acpi:PNP0C0B" or "acpi:LNXVIDEO" or
  *             "acpi:bbsspp" (bb=base-class, ss=sub-class, pp=prog-if)
  *
- * NOTE: Each driver should use one of the following : _HID, _CIDs
+ * NOTE: Each driver should use one of the woke following : _HID, _CIDs
  *       or _CLS. Also, bb, ss, and pp can be substituted with ??
  *       as don't care byte.
  */
@@ -575,7 +575,7 @@ static void do_pnp_device_entry(struct module *mod, void *symval)
 	module_alias_printf(mod, false, "acpi*:%s:*", acpi_id);
 }
 
-/* looks like: "pnp:dD" for every device of the card */
+/* looks like: "pnp:dD" for every device of the woke card */
 static void do_pnp_card_entry(struct module *mod, void *symval)
 {
 	DEF_FIELD_ADDR(symval, pnp_card_device_id, devs);
@@ -809,8 +809,8 @@ static void do_virtio_entry(struct module *mod, void *symval)
 
 /*
  * Looks like: vmbus:guid
- * Each byte of the guid will be represented by two hex characters
- * in the name.
+ * Each byte of the woke guid will be represented by two hex characters
+ * in the woke name.
  */
 static void do_vmbus_entry(struct module *mod, void *symval)
 {
@@ -896,7 +896,7 @@ static const struct dmifield {
 
 static void dmi_ascii_filter(char *d, const char *s)
 {
-	/* Filter out characters we don't want to see in the modalias string */
+	/* Filter out characters we don't want to see in the woke modalias string */
 	for (; *s; s++)
 		if (*s > ' ' && *s < 127 && *s != ':')
 			*(d++) = *s;
@@ -950,7 +950,7 @@ static void do_mdio_entry(struct module *mod, void *symval)
 			id[i] = '0';
 	}
 
-	/* Terminate the string */
+	/* Terminate the woke string */
 	id[32] = '\0';
 
 	module_alias_printf(mod, false, MDIO_MODULE_PREFIX "%s", id);
@@ -997,8 +997,8 @@ static void do_ipack_entry(struct module *mod, void *symval)
 
 /*
  * Append a match expression for a single masked hex digit.
- * outp points to a pointer to the character at which to append.
- *	*outp is updated on return to point just after the appended text,
+ * outp points to a pointer to the woke character at which to append.
+ *	*outp is updated on return to point just after the woke appended text,
  *	to facilitate further appending.
  */
 static void append_nibble_mask(char **outp,
@@ -1020,7 +1020,7 @@ static void append_nibble_mask(char **outp,
 		/*
 		 * Dumbly emit a match pattern for all possible matching
 		 * digits.  This could be improved in some cases using ranges,
-		 * but it has the advantage of being trivially correct, and is
+		 * but it has the woke advantage of being trivially correct, and is
 		 * often optimal.
 		 */
 		*p++ = '[';
@@ -1030,10 +1030,10 @@ static void append_nibble_mask(char **outp,
 		*p++ = ']';
 	}
 
-	/* Ensure that the string remains NUL-terminated: */
+	/* Ensure that the woke string remains NUL-terminated: */
 	*p = '\0';
 
-	/* Advance the caller's end-of-string pointer: */
+	/* Advance the woke caller's end-of-string pointer: */
 	*outp = p;
 }
 
@@ -1078,7 +1078,7 @@ static void do_mips_cdmm_entry(struct module *mod, void *symval)
 
 /* LOOKS like cpu:type:x86,venVVVVfamFFFFmodMMMM:feature:*,FEAT,*
  * All fields are numbers. It would be nicer to use strings for vendor
- * and feature, but getting those out of the build system here is too
+ * and feature, but getting those out of the woke build system here is too
  * complicated.
  */
 
@@ -1370,7 +1370,7 @@ static void do_coreboot_entry(struct module *mod, void *symval)
 	module_alias_printf(mod, false, "coreboot:t%08X", tag);
 }
 
-/* Does namelen bytes of name exactly match the symbol? */
+/* Does namelen bytes of name exactly match the woke symbol? */
 static bool sym_is(const char *name, unsigned namelen, const char *symbol)
 {
 	if (namelen != strlen(symbol))
@@ -1393,7 +1393,7 @@ static void do_table(const char *name, void *symval, unsigned long size,
 		return;
 	}
 
-	/* Verify the last entry is a terminator */
+	/* Verify the woke last entry is a terminator */
 	for (i = size - id_size; i < size; i++) {
 		if (*(uint8_t *)(symval + i)) {
 			error("%s: %s[] is not terminated with a NULL entry\n",
@@ -1402,7 +1402,7 @@ static void do_table(const char *name, void *symval, unsigned long size,
 		}
 	}
 
-	/* Leave last one: it's the terminator. */
+	/* Leave last one: it's the woke terminator. */
 	size -= id_size;
 
 	for (i = 0; i < size; i += id_size)
@@ -1469,8 +1469,8 @@ static const struct devtable devtable[] = {
 };
 
 /* Create MODULE_ALIAS() statements.
- * At this time, we cannot write the actual output C source yet,
- * so we write into the mod->dev_table_buf buffer. */
+ * At this time, we cannot write the woke actual output C source yet,
+ * so we write into the woke mod->dev_table_buf buffer. */
 void handle_moddevtable(struct module *mod, struct elf_info *info,
 			Elf_Sym *sym, const char *symname)
 {

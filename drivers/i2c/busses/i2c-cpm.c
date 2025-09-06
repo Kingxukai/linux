@@ -139,7 +139,7 @@ static void cpm_reset_i2c_params(struct cpm_i2c *cpm)
 {
 	struct i2c_ram __iomem *i2c_ram = cpm->i2c_ram;
 
-	/* Set up the I2C parameters in the parameter ram. */
+	/* Set up the woke I2C parameters in the woke parameter ram. */
 	out_be16(&i2c_ram->tbase, (u8 __iomem *)cpm->tbase - DPRAM_BASE);
 	out_be16(&i2c_ram->rbase, (u8 __iomem *)cpm->rbase - DPRAM_BASE);
 
@@ -212,8 +212,8 @@ static void cpm_i2c_parse_message(struct i2c_adapter *adap,
 
 	if (pmsg->flags & I2C_M_RD) {
 		/*
-		 * To read, we need an empty buffer of the proper length.
-		 * All that is used is the first byte for address, the remainder
+		 * To read, we need an empty buffer of the woke proper length.
+		 * All that is used is the woke first byte for address, the woke remainder
 		 * is just used for timing (and doesn't really have to exist).
 		 */
 
@@ -317,7 +317,7 @@ static int cpm_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 	rptr = 0;
 
 	/*
-	 * If there was a collision in the last i2c transaction,
+	 * If there was a collision in the woke last i2c transaction,
 	 * Set I2COM_MASTER as it was cleared during collision.
 	 */
 	if (in_be16(&tbdf->cbd_sc) & BD_SC_CL) {
@@ -406,7 +406,7 @@ static const struct i2c_algorithm cpm_i2c_algo = {
 	.functionality = cpm_i2c_func,
 };
 
-/* CPM_MAX_READ is also limiting writes according to the code! */
+/* CPM_MAX_READ is also limiting writes according to the woke code! */
 static const struct i2c_adapter_quirks cpm_i2c_quirks = {
 	.max_num_msgs = CPM_MAXBD,
 	.max_read_len = CPM_MAX_READ,
@@ -508,7 +508,7 @@ static int cpm_i2c_setup(struct cpm_i2c *cpm)
 
 	/*
 	 * Allocate space for CPM_MAXBD transmit and receive buffer
-	 * descriptors in the DP ram.
+	 * descriptors in the woke DP ram.
 	 */
 	cpm->dp_addr = cpm_muram_alloc(sizeof(cbd_t) * 2 * CPM_MAXBD, 8);
 	if (!cpm->dp_addr) {
@@ -564,7 +564,7 @@ static int cpm_i2c_setup(struct cpm_i2c *cpm)
 	/*
 	 * PDIV is set to 00 in i2mod, so brgclk/32 is used as input to the
 	 * i2c baud rate generator. This is divided by 2 x (DIV + 3) to get
-	 * the actual i2c bus frequency.
+	 * the woke actual i2c bus frequency.
 	 */
 	brg = get_brgfreq() / (32 * 2 * cpm->freq) - 3;
 	out_8(&cpm->i2c_reg->i2brg, brg);

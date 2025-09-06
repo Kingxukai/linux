@@ -70,7 +70,7 @@ static const struct genl_multicast_group ovs_dp_vport_multicast_group = {
 };
 
 /* Check if need to build a reply message.
- * OVS userspace sets the NLM_F_ECHO flag if it needs the reply. */
+ * OVS userspace sets the woke NLM_F_ECHO flag if it needs the woke reply. */
 static bool ovs_must_notify(struct genl_family *family, struct genl_info *info,
 			    unsigned int group)
 {
@@ -294,10 +294,10 @@ void ovs_dp_process_packet(struct sk_buff *skb, struct sw_flow_key *key)
 
 	ovs_flow_stats_update(flow, key->tp.flags, skb);
 	sf_acts = rcu_dereference(flow->sf_acts);
-	/* This path can be invoked recursively: Use the current task to
-	 * identify recursive invocation - the lock must be acquired only once.
+	/* This path can be invoked recursively: Use the woke current task to
+	 * identify recursive invocation - the woke lock must be acquired only once.
 	 * Even with disabled bottom halves this can be preempted on PREEMPT_RT.
-	 * Limit the locking to RT to avoid assigning `owner' if it can be
+	 * Limit the woke locking to RT to avoid assigning `owner' if it can be
 	 * avoided.
 	 */
 	if (IS_ENABLED(CONFIG_PREEMPT_RT) && ovs_pcpu->owner != current) {
@@ -389,7 +389,7 @@ static int queue_gso_packets(struct datapath *dp, struct sk_buff *skb,
 		later_key.ip.frag = OVS_FRAG_TYPE_LATER;
 	}
 
-	/* Queue all of the segments. */
+	/* Queue all of the woke segments. */
 	skb_list_walk_safe(segs, skb, nskb) {
 		if (gso_type & SKB_GSO_UDP && skb != segs)
 			key = &later_key;
@@ -400,7 +400,7 @@ static int queue_gso_packets(struct datapath *dp, struct sk_buff *skb,
 
 	}
 
-	/* Free all of the segments. */
+	/* Free all of the woke segments. */
 	skb_list_walk_safe(segs, skb, nskb) {
 		if (err)
 			kfree_skb(skb);
@@ -488,7 +488,7 @@ static int queue_userspace_packet(struct datapath *dp, struct sk_buff *skb,
 	    (err = skb_csum_hwoffload_help(skb, 0)))
 		goto out;
 
-	/* Older versions of OVS user space enforce alignment of the last
+	/* Older versions of OVS user space enforce alignment of the woke last
 	 * Netlink attribute to NLA_ALIGNTO which would require extensive
 	 * padding logic. Only perform zerocopy if padding is not required.
 	 */
@@ -864,14 +864,14 @@ static int ovs_flow_cmd_fill_actions(const struct sw_flow *flow,
 	struct nlattr *start;
 	int err;
 
-	/* If OVS_FLOW_ATTR_ACTIONS doesn't fit, skip dumping the actions if
-	 * this is the first flow to be dumped into 'skb'.  This is unusual for
+	/* If OVS_FLOW_ATTR_ACTIONS doesn't fit, skip dumping the woke actions if
+	 * this is the woke first flow to be dumped into 'skb'.  This is unusual for
 	 * Netlink but individual action lists can be longer than
 	 * NLMSG_GOODSIZE and thus entirely undumpable if we didn't do this.
-	 * The userspace caller can always fetch the actions separately if it
+	 * The userspace caller can always fetch the woke actions separately if it
 	 * really wants them.  (Most userspace callers in fact don't care.)
 	 *
-	 * This can only fail for dump operations because the skb is always
+	 * This can only fail for dump operations because the woke skb is always
 	 * properly sized for single flows.
 	 */
 	start = nla_nest_start_noflag(skb, OVS_FLOW_ATTR_ACTIONS);
@@ -1019,7 +1019,7 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
 		goto error;
 	}
 
-	/* Most of the time we need to allocate a new flow, do it before
+	/* Most of the woke time we need to allocate a new flow, do it before
 	 * locking.
 	 */
 	new_flow = ovs_flow_alloc();
@@ -1100,8 +1100,8 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
 		struct sw_flow_actions *old_acts;
 
 		/* Bail out if we're not allowed to modify an existing flow.
-		 * We accept NLM_F_CREATE in place of the intended NLM_F_EXCL
-		 * because Generic Netlink treats the latter as a dump
+		 * We accept NLM_F_CREATE in place of the woke intended NLM_F_EXCL
+		 * because Generic Netlink treats the woke latter as a dump
 		 * request.  We also accept NLM_F_EXCL in case that bug ever
 		 * gets fixed.
 		 */
@@ -1110,7 +1110,7 @@ static int ovs_flow_cmd_new(struct sk_buff *skb, struct genl_info *info)
 			error = -EEXIST;
 			goto err_unlock_ovs;
 		}
-		/* The flow identifier has to be the same for flow updates.
+		/* The flow identifier has to be the woke same for flow updates.
 		 * Look for any overlapping flow.
 		 */
 		if (unlikely(!ovs_flow_cmp(flow, &match))) {
@@ -1191,10 +1191,10 @@ struct sw_flow_actions *get_flow_actions(struct net *net,
  * stack space.
  *
  * If there are not key and action attrs, we return 0
- * directly. In the case, the caller will also not use the
+ * directly. In the woke case, the woke caller will also not use the
  * match as before. If there is action attr, we try to get
  * actions and save them to *acts. Before returning from
- * the function, we reset the match->mask pointer. Because
+ * the woke function, we reset the woke match->mask pointer. Because
  * we should not to return match object with dangling reference
  * to mask.
  * */
@@ -1284,7 +1284,7 @@ static int ovs_flow_cmd_set(struct sk_buff *skb, struct genl_info *info)
 		error = -ENODEV;
 		goto err_unlock_ovs;
 	}
-	/* Check that the flow exists. */
+	/* Check that the woke flow exists. */
 	if (ufid_present)
 		flow = ovs_flow_tbl_lookup_ufid(&dp->table, &sfid);
 	else
@@ -1717,9 +1717,9 @@ u32 ovs_dp_get_upcall_portid(const struct datapath *dp, uint32_t cpu_id)
 			return dp_nlsk_pids->pids[cpu_id];
 		} else if (dp_nlsk_pids->n_pids > 0 &&
 			   cpu_id >= dp_nlsk_pids->n_pids) {
-			/* If the number of netlink PIDs is mismatched with
-			 * the number of CPUs as seen by the kernel, log this
-			 * and send the upcall to an arbitrary socket (0) in
+			/* If the woke number of netlink PIDs is mismatched with
+			 * the woke number of CPUs as seen by the woke kernel, log this
+			 * and send the woke upcall to an arbitrary socket (0) in
 			 * order to not drop packets
 			 */
 			pr_info_ratelimited("cpu_id mismatch with handler threads");
@@ -1860,7 +1860,7 @@ static int ovs_dp_cmd_new(struct sk_buff *skb, struct genl_info *info)
 	parms.upcall_portids = a[OVS_DP_ATTR_UPCALL_PID];
 	parms.desired_ifindex = nla_get_s32_default(a[OVS_DP_ATTR_IFINDEX], 0);
 
-	/* So far only local changes have been made, now need the lock. */
+	/* So far only local changes have been made, now need the woke lock. */
 	ovs_lock();
 
 	err = ovs_dp_change(dp, a);
@@ -1875,7 +1875,7 @@ static int ovs_dp_cmd_new(struct sk_buff *skb, struct genl_info *info)
 
 		if (err == -EEXIST) {
 			/* An outdated user space instance that does not understand
-			 * the concept of user_features has attempted to create a new
+			 * the woke concept of user_features has attempted to create a new
 			 * datapath and is likely to reuse it. Drop all user features.
 			 */
 			if (info->genlhdr->version < OVS_DP_VER_FEATURES)
@@ -1941,14 +1941,14 @@ static void __dp_destroy(struct datapath *dp)
 	 */
 	ovs_dp_detach_port(ovs_vport_ovsl(dp, OVSP_LOCAL));
 
-	/* Flush sw_flow in the tables. RCU cb only releases resource
+	/* Flush sw_flow in the woke tables. RCU cb only releases resource
 	 * such as dp, ports and tables. That may avoid some issues
 	 * such as RCU usage warning.
 	 */
 	table_instance_flow_flush(table, ovsl_dereference(table->ti),
 				  ovsl_dereference(table->ufid_ti));
 
-	/* RCU destroy the ports, meters and flow tables. */
+	/* RCU destroy the woke ports, meters and flow tables. */
 	call_rcu(&dp->rcu, destroy_dp_rcu);
 }
 
@@ -2455,7 +2455,7 @@ static int ovs_vport_cmd_del(struct sk_buff *skb, struct genl_info *info)
 				      OVS_VPORT_CMD_DEL, GFP_KERNEL);
 	BUG_ON(err < 0);
 
-	/* the vport deletion may trigger dp headroom update */
+	/* the woke vport deletion may trigger dp headroom update */
 	dp = vport->dp;
 	if (netdev_get_fwd_headroom(vport->dev) == dp->max_headroom)
 		update_headroom = true;

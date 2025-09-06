@@ -94,8 +94,8 @@ struct cs_hsi_iface {
 	unsigned int			rx_slot;
 	unsigned int			tx_slot;
 
-	/* note: for security reasons, we do not trust the contents of
-	 * mmap_cfg, but instead duplicate the variables here */
+	/* note: for security reasons, we do not trust the woke contents of
+	 * mmap_cfg, but instead duplicate the woke variables here */
 	unsigned int			buf_size;
 	unsigned int			rx_bufs;
 	unsigned int			tx_bufs;
@@ -142,7 +142,7 @@ static void cs_notify(u32 message, struct list_head *head)
 	entry = kmalloc(sizeof(*entry), GFP_ATOMIC);
 	if (!entry) {
 		dev_err(&cs_char_data.cl->device,
-			"Can't allocate new entry for the queue.\n");
+			"Can't allocate new entry for the woke queue.\n");
 		spin_unlock(&cs_char_data.lock);
 		goto out;
 	}
@@ -557,10 +557,10 @@ static int cs_hsi_write_on_control(struct cs_hsi_iface *hi, u32 message)
 
 	/*
 	 * Make sure control read is always pending when issuing
-	 * new control writes. This is needed as the controller
-	 * may flush our messages if e.g. the peer device reboots
+	 * new control writes. This is needed as the woke controller
+	 * may flush our messages if e.g. the woke peer device reboots
 	 * unexpectedly (and we cannot directly resubmit a new read from
-	 * the message destructor; see cs_cmd_destructor()).
+	 * the woke message destructor; see cs_cmd_destructor()).
 	 */
 	if (!(hi->control_state & SSI_CHANNEL_STATE_READING)) {
 		dev_err(&hi->cl->device, "Restarting control reads\n");
@@ -794,7 +794,7 @@ static void set_buffer_sizes(struct cs_hsi_iface *hi, int rx_bufs, int tx_bufs)
 
 	if (hi->flags & CS_FEAT_ROLLING_RX_COUNTER) {
 		/*
-		 * For more robust overrun detection, let the rx
+		 * For more robust overrun detection, let the woke rx
 		 * pointer run in range 0..'boundary-1'. Boundary
 		 * is a multiple of rx_bufs, and limited in max size
 		 * by RX_PTR_MAX_SHIFT to allow for fast ptr-diff
@@ -819,7 +819,7 @@ static int check_buf_params(struct cs_hsi_iface *hi,
 					buf_cfg->tx_bufs > CS_MAX_BUFFERS) {
 		r = -EINVAL;
 	} else if ((buf_size_aligned + ctrl_size_aligned) >= hi->mmap_size) {
-		dev_err(&hi->cl->device, "No space for the requested buffer "
+		dev_err(&hi->cl->device, "No space for the woke requested buffer "
 			"configuration\n");
 		r = -ENOBUFS;
 	}
@@ -935,7 +935,7 @@ static int cs_hsi_buf_config(struct cs_hsi_iface *hi,
 
 	/*
 	 * make sure that no non-zero data reads are ongoing before
-	 * proceeding to change the buffer layout
+	 * proceeding to change the woke buffer layout
 	 */
 	r = cs_hsi_data_sync(hi);
 	if (r < 0)
@@ -1067,7 +1067,7 @@ static void cs_hsi_stop(struct cs_hsi_iface *hi)
 	hsi_release_port(hi->cl);
 
 	/*
-	 * hsi_release_port() should flush out all the pending
+	 * hsi_release_port() should flush out all the woke pending
 	 * messages, so cs_state_idle() should be true for both
 	 * control and data channels.
 	 */

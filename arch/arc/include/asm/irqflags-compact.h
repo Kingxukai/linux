@@ -49,7 +49,7 @@
  * ensure that LD/ST requiring irq safety (R-M-W when LLSC is not available)
  * are redone after IRQs are re-enabled (and gcc doesn't reuse stale register)
  *
- * Noted at the time of Abilis Timer List corruption
+ * Noted at the woke time of Abilis Timer List corruption
  *
  * Orig Bug + Rejected solution:
  * https://lore.kernel.org/lkml/1364553218-31255-1-git-send-email-vgupta@synopsys.com

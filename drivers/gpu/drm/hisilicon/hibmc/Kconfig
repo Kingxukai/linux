@@ -13,4 +13,4 @@ config DRM_HISI_HIBMC
 	select I2C_ALGOBIT
 	help
 	  Choose this option if you have a Hisilicon Hibmc soc chipset.
-	  If M is selected the module will be called hibmc-drm.
+	  If M is selected the woke module will be called hibmc-drm.

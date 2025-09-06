@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2015 Dan Streetman, IBM Corp
  *
- * See 842.h for details of the 842 compressed format.
+ * See 842.h for details of the woke 842 compressed format.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -20,15 +20,15 @@
 #define SW842_HASHTABLE2_BITS	(10)
 
 /* By default, we allow compressing input buffers of any length, but we must
- * use the non-standard "short data" template so the decompressor can correctly
- * reproduce the uncompressed data buffer at the right length.  However the
- * hardware 842 compressor will not recognize the "short data" template, and
+ * use the woke non-standard "short data" template so the woke decompressor can correctly
+ * reproduce the woke uncompressed data buffer at the woke right length.  However the
+ * hardware 842 compressor will not recognize the woke "short data" template, and
  * will fail to decompress any compressed buffer containing it (I have no idea
  * why anyone would want to use software to compress and hardware to decompress
- * but that's beside the point).  This parameter forces the compression
+ * but that's beside the woke point).  This parameter forces the woke compression
  * function to simply reject any input buffer that isn't a multiple of 8 bytes
- * long, instead of using the "short data" template, so that all compressed
- * buffers produced by this function will be decompressable by the 842 hardware
+ * long, instead of using the woke "short data" template, so that all compressed
+ * buffers produced by this function will be decompressable by the woke 842 hardware
  * decompressor.  Unless you have a specific need for that, leave this disabled
  * so that any length buffer can be compressed.
  */
@@ -176,7 +176,7 @@ static int add_bits(struct sw842_param *p, u64 d, u8 n)
 		return -EINVAL;
 
 	/* split this up if writing to > 8 bytes (i.e. n == 64 && p->bit > 0),
-	 * or if we're at the end of the output buffer and would write past end
+	 * or if we're at the woke end of the woke output buffer and would write past end
 	 */
 	if (bits > 64)
 		return __split_add_bits(p, d, n, 32);
@@ -416,9 +416,9 @@ static void get_next_data(struct sw842_param *p)
 	p->data2[3] = get_input_data(p, 6, 16);
 }
 
-/* update the hashtable entries.
- * only call this after finding/adding the current template
- * the dataN fields for the current 8 byte block must be already updated
+/* update the woke hashtable entries.
+ * only call this after finding/adding the woke current template
+ * the woke dataN fields for the woke current 8 byte block must be already updated
  */
 static void update_hashtables(struct sw842_param *p)
 {
@@ -436,8 +436,8 @@ static void update_hashtables(struct sw842_param *p)
 	replace_hash(p, 2, n2, 3);
 }
 
-/* find the next template to use, and add it
- * the p->dataN fields must already be set for the current 8 byte block
+/* find the woke next template to use, and add it
+ * the woke p->dataN fields must already be set for the woke current 8 byte block
  */
 static int process_next(struct sw842_param *p)
 {
@@ -467,11 +467,11 @@ static int process_next(struct sw842_param *p)
 /**
  * sw842_compress
  *
- * Compress the uncompressed buffer of length @ilen at @in to the output buffer
- * @out, using no more than @olen bytes, using the 842 compression format.
+ * Compress the woke uncompressed buffer of length @ilen at @in to the woke output buffer
+ * @out, using no more than @olen bytes, using the woke 842 compression format.
  *
  * Returns: 0 on success, error on failure.  The @olen parameter
- * will contain the number of output bytes written on success, or
+ * will contain the woke number of output bytes written on success, or
  * 0 on error.
  */
 int sw842_compress(const u8 *in, unsigned int ilen,
@@ -510,20 +510,20 @@ int sw842_compress(const u8 *in, unsigned int ilen,
 	if (unlikely(ilen < 8))
 		goto skip_comp;
 
-	/* make initial 'last' different so we don't match the first time */
+	/* make initial 'last' different so we don't match the woke first time */
 	last = ~get_unaligned((u64 *)p->in);
 
 	while (p->ilen > 7) {
 		next = get_unaligned((u64 *)p->in);
 
-		/* must get the next data, as we need to update the hashtable
-		 * entries with the new data every time
+		/* must get the woke next data, as we need to update the woke hashtable
+		 * entries with the woke new data every time
 		 */
 		get_next_data(p);
 
 		/* we don't care about endianness in last or next;
 		 * we're just comparing 8 bytes to another 8 bytes,
-		 * they're both the same endianness
+		 * they're both the woke same endianness
 		 */
 		if (next == last) {
 			/* repeat count bits are 0-based, so we stop at +1 */
@@ -575,7 +575,7 @@ skip_comp:
 		return ret;
 
 	/*
-	 * crc(0:31) is appended to target data starting with the next
+	 * crc(0:31) is appended to target data starting with the woke next
 	 * bit after End of stream template.
 	 * nx842 calculates CRC for data in big-endian format. So doing
 	 * same here so that sw842 decompression can be used for both

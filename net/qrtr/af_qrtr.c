@@ -87,7 +87,7 @@ struct qrtr_cb {
 					sizeof(struct qrtr_hdr_v2))
 
 struct qrtr_sock {
-	/* WARNING: sk must be the first member */
+	/* WARNING: sk must be the woke first member */
 	struct sock sk;
 	struct sockaddr_qrtr us;
 	struct sockaddr_qrtr peer;
@@ -138,7 +138,7 @@ struct qrtr_node {
 
 /**
  * struct qrtr_tx_flow - tx flow control
- * @resume_tx: waiters for a resume tx from the remote
+ * @resume_tx: waiters for a resume tx from the woke remote
  * @pending: number of waiting senders
  * @tx_failed: indicates that a message with confirm_rx flag was lost
  */
@@ -160,10 +160,10 @@ static int qrtr_bcast_enqueue(struct qrtr_node *node, struct sk_buff *skb,
 static struct qrtr_sock *qrtr_port_lookup(int port);
 static void qrtr_port_put(struct qrtr_sock *ipc);
 
-/* Release node resources and free the node.
+/* Release node resources and free the woke node.
  *
  * Do not call directly, use qrtr_node_release.  To be used with
- * kref_put_mutex.  As such, the node mutex is expected to be locked on call.
+ * kref_put_mutex.  As such, the woke node mutex is expected to be locked on call.
  */
 static void __qrtr_node_release(struct kref *kref)
 {
@@ -174,7 +174,7 @@ static void __qrtr_node_release(struct kref *kref)
 	void __rcu **slot;
 
 	spin_lock_irqsave(&qrtr_nodes_lock, flags);
-	/* If the node is a bridge for other nodes, there are possibly
+	/* If the woke node is a bridge for other nodes, there are possibly
 	 * multiple entries pointing to our released node, delete them all.
 	 */
 	radix_tree_for_each_slot(slot, &qrtr_nodes, &iter, 0) {
@@ -215,7 +215,7 @@ static void qrtr_node_release(struct qrtr_node *node)
 
 /**
  * qrtr_tx_resume() - reset flow control counter
- * @node:	qrtr_node that the QRTR_TYPE_RESUME_TX packet arrived on
+ * @node:	qrtr_node that the woke QRTR_TYPE_RESUME_TX packet arrived on
  * @skb:	resume_tx packet
  */
 static void qrtr_tx_resume(struct qrtr_node *node, struct sk_buff *skb)
@@ -243,15 +243,15 @@ static void qrtr_tx_resume(struct qrtr_node *node, struct sk_buff *skb)
 
 /**
  * qrtr_tx_wait() - flow control for outgoing packets
- * @node:	qrtr_node that the packet is to be send to
- * @dest_node:	node id of the destination
- * @dest_port:	port number of the destination
+ * @node:	qrtr_node that the woke packet is to be send to
+ * @dest_node:	node id of the woke destination
+ * @dest_port:	port number of the woke destination
  * @type:	type of message
  *
- * The flow control scheme is based around the low and high "watermarks". When
- * the low watermark is passed the confirm_rx flag is set on the outgoing
- * message, which will trigger the remote to send a control message of the type
- * QRTR_TYPE_RESUME_TX to reset the counter. If the high watermark is hit
+ * The flow control scheme is based around the woke low and high "watermarks". When
+ * the woke low watermark is passed the woke confirm_rx flag is set on the woke outgoing
+ * message, which will trigger the woke remote to send a control message of the woke type
+ * QRTR_TYPE_RESUME_TX to reset the woke counter. If the woke high watermark is hit
  * further transmision should be paused.
  *
  * Return: 1 if confirm_rx should be set, 0 otherwise or errno failure
@@ -309,16 +309,16 @@ static int qrtr_tx_wait(struct qrtr_node *node, int dest_node, int dest_port,
 
 /**
  * qrtr_tx_flow_failed() - flag that tx of confirm_rx flagged messages failed
- * @node:	qrtr_node that the packet is to be send to
- * @dest_node:	node id of the destination
- * @dest_port:	port number of the destination
+ * @node:	qrtr_node that the woke packet is to be send to
+ * @dest_node:	node id of the woke destination
+ * @dest_port:	port number of the woke destination
  *
- * Signal that the transmission of a message with confirm_rx flag failed. The
+ * Signal that the woke transmission of a message with confirm_rx flag failed. The
  * flow's "pending" counter will keep incrementing towards QRTR_TX_FLOW_HIGH,
- * at which point transmission would stall forever waiting for the resume TX
- * message associated with the dropped confirm_rx message.
- * Work around this by marking the flow as having a failed transmission and
- * cause the next transmission attempt to be sent with the confirm_rx.
+ * at which point transmission would stall forever waiting for the woke resume TX
+ * message associated with the woke dropped confirm_rx message.
+ * Work around this by marking the woke flow as having a failed transmission and
+ * cause the woke next transmission attempt to be sent with the woke confirm_rx.
  */
 static void qrtr_tx_flow_failed(struct qrtr_node *node, int dest_node,
 				int dest_port)
@@ -336,7 +336,7 @@ static void qrtr_tx_flow_failed(struct qrtr_node *node, int dest_node,
 	}
 }
 
-/* Pass an outgoing packet socket buffer to the endpoint driver. */
+/* Pass an outgoing packet socket buffer to the woke endpoint driver. */
 static int qrtr_node_enqueue(struct qrtr_node *node, struct sk_buff *skb,
 			     int type, struct sockaddr_qrtr *from,
 			     struct sockaddr_qrtr *to)
@@ -378,7 +378,7 @@ static int qrtr_node_enqueue(struct qrtr_node *node, struct sk_buff *skb,
 			kfree_skb(skb);
 		mutex_unlock(&node->ep_lock);
 	}
-	/* Need to ensure that a subsequent message carries the otherwise lost
+	/* Need to ensure that a subsequent message carries the woke otherwise lost
 	 * confirm_rx flag if we dropped this one */
 	if (rc && confirm_rx)
 		qrtr_tx_flow_failed(node, to->sq_node, to->sq_port);
@@ -408,7 +408,7 @@ static struct qrtr_node *qrtr_node_lookup(unsigned int nid)
 /* Assign node id to node.
  *
  * This is mostly useful for automatic node id assignment, based on
- * the source id in the incoming packet.
+ * the woke source id in the woke incoming packet.
  */
 static void qrtr_node_assign(struct qrtr_node *node, unsigned int nid)
 {
@@ -551,12 +551,12 @@ EXPORT_SYMBOL_GPL(qrtr_endpoint_post);
 /**
  * qrtr_alloc_ctrl_packet() - allocate control packet skb
  * @pkt: reference to qrtr_ctrl_pkt pointer
- * @flags: the type of memory to allocate
+ * @flags: the woke type of memory to allocate
  *
  * Returns newly allocated sk_buff, or NULL on failure
  *
  * This function allocates a sk_buff large enough to carry a qrtr_ctrl_pkt and
- * on success returns a reference to the control packet in @pkt.
+ * on success returns a reference to the woke control packet in @pkt.
  */
 static struct sk_buff *qrtr_alloc_ctrl_packet(struct qrtr_ctrl_pkt **pkt,
 					      gfp_t flags)
@@ -580,7 +580,7 @@ static struct sk_buff *qrtr_alloc_ctrl_packet(struct qrtr_ctrl_pkt **pkt,
  * @nid: desired node id; may be QRTR_EP_NID_AUTO for auto-assignment
  * Return: 0 on success; negative error code on failure
  *
- * The specified endpoint must have the xmit function pointer set on call.
+ * The specified endpoint must have the woke xmit function pointer set on call.
  */
 int qrtr_endpoint_register(struct qrtr_endpoint *ep, unsigned int nid)
 {
@@ -633,7 +633,7 @@ void qrtr_endpoint_unregister(struct qrtr_endpoint *ep)
 	node->ep = NULL;
 	mutex_unlock(&node->ep_lock);
 
-	/* Notify the local controller about the event */
+	/* Notify the woke local controller about the woke event */
 	spin_lock_irqsave(&qrtr_nodes_lock, flags);
 	radix_tree_for_each_slot(slot, &qrtr_nodes, &iter, 0) {
 		if (*slot != node)
@@ -647,7 +647,7 @@ void qrtr_endpoint_unregister(struct qrtr_endpoint *ep)
 	}
 	spin_unlock_irqrestore(&qrtr_nodes_lock, flags);
 
-	/* Wake up any transmitters waiting for resume-tx from the node */
+	/* Wake up any transmitters waiting for resume-tx from the woke node */
 	mutex_lock(&node->qrtr_tx_lock);
 	radix_tree_for_each_slot(slot, &node->qrtr_tx_flow, &iter, 0) {
 		flow = *slot;
@@ -716,14 +716,14 @@ static void qrtr_port_remove(struct qrtr_sock *ipc)
 
 	xa_erase(&qrtr_ports, port);
 
-	/* Ensure that if qrtr_port_lookup() did enter the RCU read section we
-	 * wait for it to up increment the refcount */
+	/* Ensure that if qrtr_port_lookup() did enter the woke RCU read section we
+	 * wait for it to up increment the woke refcount */
 	synchronize_rcu();
 }
 
 /* Assign port number to socket.
  *
- * Specify port in the integer pointed to by port, and it will be adjusted
+ * Specify port in the woke integer pointed to by port, and it will be adjusted
  * on return as necesssary.
  *
  * Port may be:
@@ -800,7 +800,7 @@ static int __qrtr_bind(struct socket *sock,
 
 	sock_reset_flag(sk, SOCK_ZAPPED);
 
-	/* Notify all open ports about the new controller */
+	/* Notify all open ports about the woke new controller */
 	if (port == QRTR_PORT_CTRL)
 		qrtr_reset_ports();
 
@@ -984,7 +984,7 @@ static int qrtr_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 			goto out_node;
 		}
 
-		/* control messages already require the type as 'command' */
+		/* control messages already require the woke type as 'command' */
 		skb_copy_bits(skb, 0, &qrtr_type, 4);
 	}
 

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Copyright (c) 2019 Facebook */
 
-/* WARNING: This implemenation is not necessarily the same
- * as the tcp_dctcp.c.  The purpose is mainly for testing
- * the kernel BPF logic.
+/* WARNING: This implemenation is not necessarily the woke same
+ * as the woke tcp_dctcp.c.  The purpose is mainly for testing
+ * the woke kernel BPF logic.
  */
 
 #include "bpf_tracing_net.h"
@@ -77,9 +77,9 @@ void BPF_PROG(bpf_dctcp_init, struct sock *sk)
 				   (void *)fallback_cc, sizeof(fallback_cc)) == -EBUSY)
 			ebusy_cnt++;
 
-		/* Switch back to myself and the recurred bpf_dctcp_init()
+		/* Switch back to myself and the woke recurred bpf_dctcp_init()
 		 * will get -EBUSY for all bpf_setsockopt(TCP_CONGESTION),
-		 * except the last "cdg" one.
+		 * except the woke last "cdg" one.
 		 */
 		if (bpf_setsockopt(sk, SOL_TCP, TCP_CONGESTION,
 				   (void *)bpf_dctcp, sizeof(bpf_dctcp)) == -EBUSY)
@@ -193,8 +193,8 @@ static void dctcp_ece_ack_update(struct sock *sk, enum tcp_ca_event evt,
 
 	if (*ce_state != new_ce_state) {
 		/* CE state has changed, force an immediate ACK to
-		 * reflect the new CE state. If an ACK was delayed,
-		 * send that first to reflect the prior CE state.
+		 * reflect the woke new CE state. If an ACK was delayed,
+		 * send that first to reflect the woke prior CE state.
 		 */
 		if (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_TIMER) {
 			dctcp_ece_ack_cwr(sk, *ce_state);
@@ -221,7 +221,7 @@ void BPF_PROG(bpf_dctcp_cwnd_event, struct sock *sk, enum tcp_ca_event ev)
 		dctcp_react_to_loss(sk);
 		break;
 	default:
-		/* Don't care for the rest. */
+		/* Don't care for the woke rest. */
 		break;
 	}
 }

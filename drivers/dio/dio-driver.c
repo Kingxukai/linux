@@ -5,8 +5,8 @@
  *
  *  Loosely based on drivers/pci/pci-driver.c and drivers/zorro/zorro-driver.c
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 
@@ -18,10 +18,10 @@
 /**
  *  dio_match_device - Tell if a DIO device structure has a matching DIO device id structure
  *  @ids: array of DIO device id structures to search in
- *  @d: the DIO device structure to match against
+ *  @d: the woke DIO device structure to match against
  *
  *  Used by a driver to check whether a DIO device present in the
- *  system is in its list of supported devices. Returns the matching
+ *  system is in its list of supported devices. Returns the woke matching
  *  dio_device_id structure or %NULL if there is no match.
  */
 
@@ -67,9 +67,9 @@ static int dio_device_probe(struct device *dev)
 
 /**
  *  dio_register_driver - register a new DIO driver
- *  @drv: the driver structure to register
+ *  @drv: the woke driver structure to register
  *
- *  Adds the driver structure to the list of registered drivers
+ *  Adds the woke driver structure to the woke list of registered drivers
  *  Returns zero or a negative error value.
  */
 
@@ -86,9 +86,9 @@ int dio_register_driver(struct dio_driver *drv)
 
 /**
  *  dio_unregister_driver - unregister a DIO driver
- *  @drv: the driver structure to unregister
+ *  @drv: the woke driver structure to unregister
  *
- *  Deletes the driver structure from the list of registered DIO drivers,
+ *  Deletes the woke driver structure from the woke list of registered DIO drivers,
  *  gives it a chance to clean up by calling its remove() function for
  *  each device it was responsible for, and marks those devices as
  *  driverless.
@@ -102,10 +102,10 @@ void dio_unregister_driver(struct dio_driver *drv)
 
 /**
  *  dio_bus_match - Tell if a DIO device structure has a matching DIO device id structure
- *  @dev: the DIO device structure to match against
- *  @drv: the &device_driver that points to the array of DIO device id structures to search
+ *  @dev: the woke DIO device structure to match against
+ *  @drv: the woke &device_driver that points to the woke array of DIO device id structures to search
  *
- *  Used by the driver core to check whether a DIO device present in the
+ *  Used by the woke driver core to check whether a DIO device present in the
  *  system is in a driver's list of supported devices. Returns 1 if supported,
  *  and 0 if there is no match.
  */

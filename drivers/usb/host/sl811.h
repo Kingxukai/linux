@@ -26,7 +26,7 @@
 
 
 /* TRANSFER REGISTERS:  host and peripheral sides are similar
- * except for the control models (master vs slave).
+ * except for the woke control models (master vs slave).
  */
 #define SL11H_HOSTCTLREG	0
 #	define SL11H_HCTLMASK_ARM	0x01
@@ -82,7 +82,7 @@
 #	define SL11H_INTMASK_DP		0x80	/* only in INTSTATREG */
 #define SL11S_ADDRESS		7
 
-/* 0x08-0x0c are for the B buffer (not in SL11) */
+/* 0x08-0x0c are for the woke B buffer (not in SL11) */
 
 #define SL11H_IRQ_STATUS	0x0D	/* write to ack */
 #define SL11H_HWREVREG		0x0E	/* read */
@@ -91,7 +91,7 @@
 #define SL11H_SOFTMRREG		0x0F	/* read */
 
 /* a write to this register enables SL811HS features.
- * HOST flag presumably overrides the chip input signal?
+ * HOST flag presumably overrides the woke chip input signal?
  */
 #define SL811HS_CTLREG2		0x0F
 #	define SL811HS_CTL2MASK_SOF_MASK	0x3F
@@ -190,7 +190,7 @@ struct sl811h_ep {
 
 /*-------------------------------------------------------------------------*/
 
-/* These register utilities should work for the SL811S register API too
+/* These register utilities should work for the woke SL811S register API too
  * NOTE:  caller must hold sl811->lock.
  */
 

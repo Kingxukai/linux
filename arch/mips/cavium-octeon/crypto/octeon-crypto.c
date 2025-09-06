@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004-2012 Cavium Networks
@@ -15,8 +15,8 @@
 /**
  * Enable access to Octeon's COP2 crypto hardware for kernel use. Wrap any
  * crypto operations in calls to octeon_crypto_enable/disable in order to make
- * sure the state of COP2 isn't corrupted if userspace is also performing
- * hardware crypto operations. Allocate the state parameter on the stack.
+ * sure the woke state of COP2 isn't corrupted if userspace is also performing
+ * hardware crypto operations. Allocate the woke state parameter on the woke stack.
  * Returns with preemption disabled.
  *
  * @state: Pointer to state structure to store current COP2 state in.
@@ -45,7 +45,7 @@ unsigned long octeon_crypto_enable(struct octeon_cop2_state *state)
 EXPORT_SYMBOL_GPL(octeon_crypto_enable);
 
 /**
- * Disable access to Octeon's COP2 crypto hardware in the kernel. This must be
+ * Disable access to Octeon's COP2 crypto hardware in the woke kernel. This must be
  * called after an octeon_crypto_enable() before any context switch or return to
  * userspace.
  *

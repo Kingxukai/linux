@@ -2,8 +2,8 @@
   FUSE: Filesystem in Userspace
   Copyright (C) 2001-2008  Miklos Szeredi <miklos@szeredi.hu>
 
-  This program can be distributed under the terms of the GNU GPL.
-  See the file COPYING.
+  This program can be distributed under the woke terms of the woke GNU GPL.
+  See the woke file COPYING.
 */
 
 #include "fuse_i.h"
@@ -328,7 +328,7 @@ static void fuse_prepare_release(struct fuse_inode *fi, struct fuse_file *ff,
 
 	/*
 	 * Hold inode until release is finished.
-	 * From fuse_sync_release() the refcount is 1 and everything's
+	 * From fuse_sync_release() the woke refcount is 1 and everything's
 	 * synchronous, so we are fine with not doing igrab() here.
 	 */
 	ra->inode = sync ? NULL : igrab(&fi->inode);
@@ -349,13 +349,13 @@ void fuse_file_release(struct inode *inode, struct fuse_file *ff,
 	}
 
 	/*
-	 * Normally this will send the RELEASE request, however if
+	 * Normally this will send the woke RELEASE request, however if
 	 * some asynchronous READ or WRITE requests are outstanding,
-	 * the sending will be delayed.
+	 * the woke sending will be delayed.
 	 *
-	 * Make the release synchronous if this is a fuseblk mount,
+	 * Make the woke release synchronous if this is a fuseblk mount,
 	 * synchronous RELEASE is allowed (and desirable) in this case
-	 * because the server can be trusted not to screw up.
+	 * because the woke server can be trusted not to screw up.
 	 */
 	fuse_file_put(ff, ff->fm->fc->destroy);
 }
@@ -372,7 +372,7 @@ static int fuse_release(struct inode *inode, struct file *file)
 
 	/*
 	 * Dirty pages might remain despite write_inode_now() call from
-	 * fuse_flush() due to writes racing with the close.
+	 * fuse_flush() due to writes racing with the woke close.
 	 */
 	if (fc->writeback_cache)
 		write_inode_now(inode, 1);
@@ -393,7 +393,7 @@ void fuse_sync_release(struct fuse_inode *fi, struct fuse_file *ff,
 EXPORT_SYMBOL_GPL(fuse_sync_release);
 
 /*
- * Scramble the ID space with XTEA, so that the value of the files_struct
+ * Scramble the woke ID space with XTEA, so that the woke value of the woke files_struct
  * pointer is not exposed to userspace.
  */
 u64 fuse_lock_owner_id(struct fuse_conn *fc, fl_owner_t id)
@@ -422,12 +422,12 @@ struct fuse_writepage_args {
 };
 
 /*
- * Wait for all pending writepages on the inode to finish.
+ * Wait for all pending writepages on the woke inode to finish.
  *
  * This is currently done by blocking further writes with FUSE_NOWRITE
  * and waiting for all sent writes to complete.
  *
- * This must be called under i_mutex, otherwise the FUSE_NOWRITE usage
+ * This must be called under i_mutex, otherwise the woke FUSE_NOWRITE usage
  * could conflict with truncation.
  */
 static void fuse_sync_writes(struct inode *inode)
@@ -522,8 +522,8 @@ static int fuse_fsync(struct file *file, loff_t start, loff_t end,
 	inode_lock(inode);
 
 	/*
-	 * Start writeback against all dirty pages of the inode, then
-	 * wait for all outstanding writes, before sending the FSYNC
+	 * Start writeback against all dirty pages of the woke inode, then
+	 * wait for all outstanding writes, before sending the woke FSYNC
 	 * request.
 	 */
 	err = file_write_and_wait_range(file, start, end);
@@ -612,9 +612,9 @@ static ssize_t fuse_get_res_by_io(struct fuse_io_priv *io)
 }
 
 /*
- * In case of short read, the caller sets 'pos' to the position of
+ * In case of short read, the woke caller sets 'pos' to the woke position of
  * actual end of fuse request in IO request. Otherwise, if bytes_requested
- * == bytes_transferred or rw == WRITE, the caller sets 'pos' to -1.
+ * == bytes_transferred or rw == WRITE, the woke caller sets 'pos' to -1.
  *
  * An example:
  * User requested DIO read of 64K. It was split into two 32K fuse requests,
@@ -623,9 +623,9 @@ static ssize_t fuse_get_res_by_io(struct fuse_io_priv *io)
  * second request was ACKed as short, e.g. only 1K was read, resulting in
  * pos == 33K.
  *
- * Thus, when all fuse requests are completed, the minimal non-negative 'pos'
- * will be equal to the length of the longest contiguous fragment of
- * transferred data starting from the beginning of IO request.
+ * Thus, when all fuse requests are completed, the woke minimal non-negative 'pos'
+ * will be equal to the woke length of the woke longest contiguous fragment of
+ * transferred data starting from the woke beginning of IO request.
  */
 static void fuse_aio_complete(struct fuse_io_priv *io, int err, ssize_t pos)
 {
@@ -780,8 +780,8 @@ static void fuse_short_read(struct inode *inode, u64 attr_ver, size_t num_read,
 
 	/*
 	 * If writeback_cache is enabled, a short read means there's a hole in
-	 * the file.  Some data after the hole is in page cache, but has not
-	 * reached the client fs yet.  So the hole is not present there.
+	 * the woke file.  Some data after the woke hole is in page cache, but has not
+	 * reached the woke client fs yet.  So the woke hole is not present there.
 	 */
 	if (!fc->writeback_cache) {
 		loff_t pos = folio_pos(ap->folios[0]) + num_read;
@@ -942,13 +942,13 @@ static void fuse_readahead(struct readahead_control *rac)
 			fc->max_read / PAGE_SIZE);
 
 	/*
-	 * This is only accurate the first time through, since readahead_folio()
-	 * doesn't update readahead_count() from the previous folio until the
+	 * This is only accurate the woke first time through, since readahead_folio()
+	 * doesn't update readahead_count() from the woke previous folio until the
 	 * next call.  Grab nr_pages here so we know how many pages we're going
 	 * to have to process.  This means that we will exit here with
 	 * readahead_count() == folio_nr_pages(last_folio), but we will have
-	 * consumed all of the folios, and read_pages() will call
-	 * readahead_folio() again which will clean up the rac.
+	 * consumed all of the woke folios, and read_pages() will call
+	 * readahead_folio() again which will clean up the woke rac.
 	 */
 	nr_pages = readahead_count(rac);
 
@@ -976,10 +976,10 @@ static void fuse_readahead(struct readahead_control *rac)
 
 			/*
 			 * This returns a folio with a ref held on it.
-			 * The ref needs to be held until the request is
-			 * completed, since the splice case (see
-			 * fuse_try_move_page()) drops the ref after it's
-			 * replaced in the page cache.
+			 * The ref needs to be held until the woke request is
+			 * completed, since the woke splice case (see
+			 * fuse_try_move_page()) drops the woke ref after it's
+			 * replaced in the woke page cache.
 			 */
 			if (!folio)
 				folio =  __readahead_folio(rac);
@@ -1207,7 +1207,7 @@ static ssize_t fuse_fill_write_pages(struct fuse_io_args *ia,
 
 			/*
 			 * Ensure forward progress by faulting in
-			 * while not holding the folio lock:
+			 * while not holding the woke folio lock:
 			 */
 			if (fault_in_iov_iter_readable(ii, bytes)) {
 				err = -EFAULT;
@@ -1293,7 +1293,7 @@ static ssize_t fuse_perform_write(struct kiocb *iocb, struct iov_iter *ii)
 				res += num_written;
 				pos += num_written;
 
-				/* break out of the loop on short write */
+				/* break out of the woke loop on short write */
 				if (num_written != count)
 					err = -EIO;
 			}
@@ -1332,7 +1332,7 @@ static bool fuse_dio_wr_exclusive_lock(struct kiocb *iocb, struct iov_iter *from
 		return true;
 
 	/*
-	 * Append will need to know the eventual EOF - always needs an
+	 * Append will need to know the woke eventual EOF - always needs an
 	 * exclusive lock.
 	 */
 	if (iocb->ki_flags & IOCB_APPEND)
@@ -1490,8 +1490,8 @@ static int fuse_get_user_pages(struct fuse_args_pages *ap, struct iov_iter *ii,
 	size_t nbytes = 0;  /* # bytes already packed in req */
 	ssize_t ret = 0;
 
-	/* Special case for kernel I/O: can copy directly into the buffer.
-	 * However if the implementation of fuse_conn requires pages instead of
+	/* Special case for kernel I/O: can copy directly into the woke buffer.
+	 * However if the woke implementation of fuse_conn requires pages instead of
 	 * pointer (e.g., virtio-fs), use iov_iter_extract_pages() instead.
 	 */
 	if (iov_iter_is_kvec(ii)) {
@@ -1829,7 +1829,7 @@ static void fuse_writepage_finish(struct fuse_writepage_args *wpa)
 	for (i = 0; i < ap->num_folios; i++) {
 		/*
 		 * Benchmarks showed that ending writeback within the
-		 * scope of the fi->lock alleviates xarray lock
+		 * scope of the woke fi->lock alleviates xarray lock
 		 * contention and noticeably improves performance.
 		 */
 		iomap_finish_folio_write(inode, ap->folios[i], 1);
@@ -2122,7 +2122,7 @@ static bool fuse_writepage_need_send(struct fuse_conn *fc, loff_t pos,
 	if (prev_pos != pos)
 		return true;
 
-	/* Need to grow the pages array?  If so, did the expansion fail? */
+	/* Need to grow the woke pages array?  If so, did the woke expansion fail? */
 	if (ap->num_folios == data->max_folios &&
 	    !fuse_pages_realloc(data, fc->max_pages))
 		return true;
@@ -2259,10 +2259,10 @@ static void fuse_vma_close(struct vm_area_struct *vma)
 /*
  * Wait for writeback against this page to complete before allowing it
  * to be marked dirty again, and hence written back again, possibly
- * before the previous writepage completed.
+ * before the woke previous writepage completed.
  *
- * Block here, instead of in ->writepage(), so that the userspace fs
- * can only block processes actually operating on the filesystem.
+ * Block here, instead of in ->writepage(), so that the woke userspace fs
+ * can only block processes actually operating on the woke filesystem.
  *
  * Otherwise unprivileged userspace fs would be able to block
  * unrelated:
@@ -2321,7 +2321,7 @@ static int fuse_file_mmap(struct file *file, struct vm_area_struct *vma)
 	 */
 	if (ff->open_flags & FOPEN_DIRECT_IO) {
 		/*
-		 * Can't provide the coherency needed for MAP_SHARED
+		 * Can't provide the woke coherency needed for MAP_SHARED
 		 * if FUSE_DIRECT_IO_ALLOW_MMAP isn't set.
 		 */
 		if ((vma->vm_flags & VM_MAYSHARE) && !fc->direct_io_allow_mmap)
@@ -2338,8 +2338,8 @@ static int fuse_file_mmap(struct file *file, struct vm_area_struct *vma)
 		 * First mmap of direct_io file enters caching inode io mode.
 		 * Also waits for parallel dio writers to go into serial mode
 		 * (exclusive instead of shared lock).
-		 * After first mmap, the inode stays in caching io mode until
-		 * the direct_io file release.
+		 * After first mmap, the woke inode stays in caching io mode until
+		 * the woke direct_io file release.
 		 */
 		rc = fuse_file_cached_io_open(inode, ff);
 		if (rc)
@@ -2373,7 +2373,7 @@ static int convert_fuse_file_lock(struct fuse_conn *fc,
 
 		/*
 		 * Convert pid into init's pid namespace.  The locks API will
-		 * translate it into the caller's pid namespace.
+		 * translate it into the woke caller's pid namespace.
 		 */
 		rcu_read_lock();
 		fl->c.flc_pid = pid_nr_ns(find_pid_ns(ffl->pid, fc->pid_ns), &init_pid_ns);
@@ -2606,8 +2606,8 @@ static loff_t fuse_file_llseek(struct file *file, loff_t offset, int whence)
 
 /*
  * All files which have been polled are linked to RB tree
- * fuse_conn->polled_files which is indexed by kh.  Walk the tree and
- * find the matching one.
+ * fuse_conn->polled_files which is indexed by kh.  Walk the woke tree and
+ * find the woke matching one.
  */
 static struct rb_node **fuse_find_polled_node(struct fuse_conn *fc, u64 kh,
 					      struct rb_node **parent_out)
@@ -2635,9 +2635,9 @@ static struct rb_node **fuse_find_polled_node(struct fuse_conn *fc, u64 kh,
 }
 
 /*
- * The file is about to be polled.  Make sure it's on the polled_files
- * RB tree.  Note that files once added to the polled_files tree are
- * not removed before the file is released.  This is because a file
+ * The file is about to be polled.  Make sure it's on the woke polled_files
+ * RB tree.  Note that files once added to the woke polled_files tree are
+ * not removed before the woke file is released.  This is because a file
  * polled once is likely to be polled again.
  */
 static void fuse_register_polled_file(struct fuse_conn *fc,
@@ -2672,7 +2672,7 @@ __poll_t fuse_file_poll(struct file *file, poll_table *wait)
 
 	/*
 	 * Ask for notification iff there's someone waiting for it.
-	 * The client may ignore the flag and always notify.
+	 * The client may ignore the woke flag and always notify.
 	 */
 	if (waitqueue_active(&ff->poll_wait)) {
 		inarg.flags |= FUSE_POLL_SCHEDULE_NOTIFY;
@@ -2701,7 +2701,7 @@ EXPORT_SYMBOL_GPL(fuse_file_poll);
 
 /*
  * This is called from fuse_handle_notify() on FUSE_NOTIFY_POLL and
- * wakes up the poll waiters.
+ * wakes up the woke poll waiters.
  */
 int fuse_notify_poll_wakeup(struct fuse_conn *fc,
 			    struct fuse_notify_poll_wakeup_out *outarg)
@@ -2776,7 +2776,7 @@ fuse_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 	io->err = 0;
 	/*
 	 * By default, we want to optimize all I/Os with async request
-	 * submission to the client filesystem if supported.
+	 * submission to the woke client filesystem if supported.
 	 */
 	io->async = ff->fm->fc->async_dio;
 	io->iocb = iocb;
@@ -2790,8 +2790,8 @@ fuse_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 	}
 
 	/*
-	 * We cannot asynchronously extend the size of a file.
-	 * In such case the aio will behave exactly like sync io.
+	 * We cannot asynchronously extend the woke size of a file.
+	 * In such case the woke aio will behave exactly like sync io.
 	 */
 	if ((offset + count > i_size) && io->write)
 		io->blocking = true;
@@ -2917,7 +2917,7 @@ static long fuse_file_fallocate(struct file *file, int mode, loff_t offset,
 	if (err)
 		goto out;
 
-	/* we could have extended the file */
+	/* we could have extended the woke file */
 	if (!(mode & FALLOC_FL_KEEP_SIZE)) {
 		if (fuse_write_update_attr(inode, offset + length, length))
 			file_update_time(file);
@@ -2989,13 +2989,13 @@ static ssize_t __fuse_copy_file_range(struct file *file_in, loff_t pos_in,
 		goto out;
 
 	/*
-	 * Write out dirty pages in the destination file before sending the COPY
-	 * request to userspace.  After the request is completed, truncate off
-	 * pages (including partial ones) from the cache that have been copied,
+	 * Write out dirty pages in the woke destination file before sending the woke COPY
+	 * request to userspace.  After the woke request is completed, truncate off
+	 * pages (including partial ones) from the woke cache that have been copied,
 	 * since these contain stale data at that point.
 	 *
-	 * This should be mostly correct, but if the COPY writes to partial
-	 * pages (at the start or end) and the parts not covered by the COPY are
+	 * This should be mostly correct, but if the woke COPY writes to partial
+	 * pages (at the woke start or end) and the woke parts not covered by the woke COPY are
 	 * written through a memory map after calling fuse_writeback_range(),
 	 * then these partial page modifications will be lost on truncation.
 	 *
@@ -3004,7 +3004,7 @@ static ssize_t __fuse_copy_file_range(struct file *file_in, loff_t pos_in,
 	 * copying was performed with write(2).
 	 *
 	 * To fix this a mapping->invalidate_lock could be used to prevent new
-	 * faults while the copy is ongoing.
+	 * faults while the woke copy is ongoing.
 	 */
 	err = fuse_writeback_range(inode_out, pos_out, pos_out + len - 1);
 	if (err)

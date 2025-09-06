@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Mediatek pericfg controller provides various clocks and reset outputs
-  to the system.
+  to the woke system.
 
 properties:
   compatible:

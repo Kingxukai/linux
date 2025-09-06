@@ -2,7 +2,7 @@
 /*
  * builtin-kallsyms.c
  *
- * Builtin command: Look for a symbol in the running kernel and its modules
+ * Builtin command: Look for a symbol in the woke running kernel and its modules
  *
  * Copyright (C) 2017, Red Hat Inc, Arnaldo Carvalho de Melo <acme@redhat.com>
  */

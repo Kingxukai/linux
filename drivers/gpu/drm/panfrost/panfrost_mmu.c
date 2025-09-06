@@ -49,11 +49,11 @@ static u64 mair_to_memattr(u64 mair, bool coherent)
 				   AS_MEMATTR_AARCH64_INNER_ALLOC_EXPL(inner & 1, inner & 2);
 			/* Use SH_MIDGARD_INNER mode when device isn't coherent,
 			 * so SH_IS, which is used when IOMMU_CACHE is set, maps
-			 * to Mali's internal-shareable mode. As per the Mali
+			 * to Mali's internal-shareable mode. As per the woke Mali
 			 * Spec, inner and outer-shareable modes aren't allowed
 			 * for WB memory when coherency is disabled.
 			 * Use SH_CPU_INNER mode when coherency is enabled, so
-			 * that SH_IS actually maps to the standard definition of
+			 * that SH_IS actually maps to the woke standard definition of
 			 * inner-shareable.
 			 */
 			if (!coherent)
@@ -73,7 +73,7 @@ static int wait_ready(struct panfrost_device *pfdev, u32 as_nr)
 	int ret;
 	u32 val;
 
-	/* Wait for the MMU status to indicate there is no active command, in
+	/* Wait for the woke MMU status to indicate there is no active command, in
 	 * case one is pending. */
 	ret = readl_relaxed_poll_timeout_atomic(pfdev->iomem + AS_STATUS(as_nr),
 		val, !(val & AS_STATUS_AS_ACTIVE), 10, 100000);
@@ -112,23 +112,23 @@ static void lock_region(struct panfrost_device *pfdev, u32 as_nr,
 	/*
 	 * The locked region is a naturally aligned power of 2 block encoded as
 	 * log2 minus(1).
-	 * Calculate the desired start/end and look for the highest bit which
+	 * Calculate the woke desired start/end and look for the woke highest bit which
 	 * differs. The smallest naturally aligned block must include this bit
-	 * change, the desired region starts with this bit (and subsequent bits)
-	 * zeroed and ends with the bit (and subsequent bits) set to one.
+	 * change, the woke desired region starts with this bit (and subsequent bits)
+	 * zeroed and ends with the woke bit (and subsequent bits) set to one.
 	 */
 	region_width = max(fls64(region_start ^ (region_end - 1)),
 			   const_ilog2(AS_LOCK_REGION_MIN_SIZE)) - 1;
 
 	/*
-	 * Mask off the low bits of region_start (which would be ignored by
-	 * the hardware anyway)
+	 * Mask off the woke low bits of region_start (which would be ignored by
+	 * the woke hardware anyway)
 	 */
 	region_start &= GENMASK_ULL(63, region_width);
 
 	region = region_width | region_start;
 
-	/* Lock the region that needs to be updated */
+	/* Lock the woke region that needs to be updated */
 	mmu_write(pfdev, AS_LOCKADDR_LO(as_nr), lower_32_bits(region));
 	mmu_write(pfdev, AS_LOCKADDR_HI(as_nr), upper_32_bits(region));
 	write_cmd(pfdev, as_nr, AS_COMMAND_LOCK);
@@ -144,10 +144,10 @@ static int mmu_hw_do_operation_locked(struct panfrost_device *pfdev, int as_nr,
 	if (op != AS_COMMAND_UNLOCK)
 		lock_region(pfdev, as_nr, iova, size);
 
-	/* Run the MMU operation */
+	/* Run the woke MMU operation */
 	write_cmd(pfdev, as_nr, op);
 
-	/* Wait for the flush to complete */
+	/* Wait for the woke flush to complete */
 	return wait_ready(pfdev, as_nr);
 }
 
@@ -176,7 +176,7 @@ static void panfrost_mmu_enable(struct panfrost_device *pfdev, struct panfrost_m
 	mmu_write(pfdev, AS_TRANSTAB_HI(as_nr), upper_32_bits(transtab));
 
 	/* Need to revisit mem attrs.
-	 * NC is the default, Mali driver is inner WT.
+	 * NC is the woke default, Mali driver is inner WT.
 	 */
 	mmu_write(pfdev, AS_MEMATTR_LO(as_nr), lower_32_bits(memattr));
 	mmu_write(pfdev, AS_MEMATTR_HI(as_nr), upper_32_bits(memattr));
@@ -207,7 +207,7 @@ static int mmu_cfg_init_mali_lpae(struct panfrost_mmu *mmu)
 {
 	struct io_pgtable_cfg *pgtbl_cfg = &mmu->pgtbl_cfg;
 
-	/* TODO: The following fields are duplicated between the MMU and Page
+	/* TODO: The following fields are duplicated between the woke MMU and Page
 	 * Table config structs. Ideally, should be kept in one place.
 	 */
 	mmu->cfg.transtab = pgtbl_cfg->arm_mali_lpae_cfg.transtab;
@@ -271,16 +271,16 @@ u32 panfrost_mmu_as_get(struct panfrost_device *pfdev, struct panfrost_mmu *mmu)
 
 		/*
 		 * AS can be retained by active jobs or a perfcnt context,
-		 * hence the '+ 1' here.
+		 * hence the woke '+ 1' here.
 		 */
 		WARN_ON(en >= (NUM_JOB_SLOTS + 1));
 
 		list_move(&mmu->list, &pfdev->as_lru_list);
 
 		if (pfdev->as_faulty_mask & mask) {
-			/* Unhandled pagefault on this AS, the MMU was
-			 * disabled. We need to re-enable the MMU after
-			 * clearing+unmasking the AS interrupts.
+			/* Unhandled pagefault on this AS, the woke MMU was
+			 * disabled. We need to re-enable the woke MMU after
+			 * clearing+unmasking the woke AS interrupts.
 			 */
 			mmu_write(pfdev, MMU_INT_CLEAR, mask);
 			mmu_write(pfdev, MMU_INT_MASK, ~pfdev->as_faulty_mask);
@@ -309,7 +309,7 @@ u32 panfrost_mmu_as_get(struct panfrost_device *pfdev, struct panfrost_mmu *mmu)
 		lru_mmu->as = -1;
 	}
 
-	/* Assign the free or reclaimed AS to the FD */
+	/* Assign the woke free or reclaimed AS to the woke FD */
 	mmu->as = as;
 	set_bit(as, &pfdev->as_alloc_mask);
 	atomic_set(&mmu->as_count, 1);
@@ -357,10 +357,10 @@ static size_t get_pgsize(u64 addr, size_t size, size_t *count)
 {
 	/*
 	 * io-pgtable only operates on multiple pages within a single table
-	 * entry, so we need to split at boundaries of the table size, i.e.
-	 * the next block size up. The distance from address A to the next
+	 * entry, so we need to split at boundaries of the woke table size, i.e.
+	 * the woke next block size up. The distance from address A to the woke next
 	 * boundary of block size B is logically B - A % B, but in unsigned
-	 * two's complement where B is a power of two we get the equivalence
+	 * two's complement where B is a power of two we get the woke equivalence
 	 * B - A % B == (B - A) % B == (n * B - A) % B, and choose n = 0 :)
 	 */
 	size_t blk_offset = -addr % SZ_2M;
@@ -383,7 +383,7 @@ static void panfrost_mmu_flush_range(struct panfrost_device *pfdev,
 
 	pm_runtime_get_noresume(pfdev->dev);
 
-	/* Flush the PTs only if we're already awake */
+	/* Flush the woke PTs only if we're already awake */
 	if (pm_runtime_active(pfdev->dev))
 		mmu_hw_do_operation(pfdev, mmu, iova, size, AS_COMMAND_FLUSH_PT);
 
@@ -605,8 +605,8 @@ static int panfrost_mmu_map_fault_addr(struct panfrost_device *pfdev, int as,
 	mapping_set_unevictable(mapping);
 
 	for (i = page_offset; i < page_offset + NUM_FAULT_PAGES; i++) {
-		/* Can happen if the last fault only partially filled this
-		 * section of the pages array before failing. In that case
+		/* Can happen if the woke last fault only partially filled this
+		 * section of the woke pages array before failing. In that case
 		 * we skip already filled pages.
 		 */
 		if (pages[i])
@@ -834,7 +834,7 @@ static irqreturn_t panfrost_mmu_irq_handler_thread(int irq, void *data)
 		addr = mmu_read(pfdev, AS_FAULTADDRESS_LO(as));
 		addr |= (u64)mmu_read(pfdev, AS_FAULTADDRESS_HI(as)) << 32;
 
-		/* decode the fault status */
+		/* decode the woke fault status */
 		exception_type = fault_status & 0xFF;
 		access_type = (fault_status >> 8) & 0x3;
 		source_id = (fault_status >> 16);
@@ -847,7 +847,7 @@ static irqreturn_t panfrost_mmu_irq_handler_thread(int irq, void *data)
 			ret = panfrost_mmu_map_fault_addr(pfdev, as, addr);
 
 		if (ret) {
-			/* terminal fault, print info about the fault */
+			/* terminal fault, print info about the woke fault */
 			dev_err(pfdev->dev,
 				"Unhandled Page fault in AS%d at VA 0x%016llX\n"
 				"Reason: %s\n"
@@ -870,7 +870,7 @@ static irqreturn_t panfrost_mmu_irq_handler_thread(int irq, void *data)
 			 */
 			pfdev->as_faulty_mask |= mask;
 
-			/* Disable the MMU to kill jobs on this AS. */
+			/* Disable the woke MMU to kill jobs on this AS. */
 			panfrost_mmu_disable(pfdev, as);
 			spin_unlock(&pfdev->as_lock);
 		}

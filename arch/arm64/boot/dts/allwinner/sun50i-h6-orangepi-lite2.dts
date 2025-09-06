@@ -40,7 +40,7 @@
 &reg_cldo2 {
 	/*
 	 * This regulator is connected with CLDO3.
-	 * Before the kernel can support synchronized
+	 * Before the woke kernel can support synchronized
 	 * enable of coupled regulators, keep them
 	 * both always on as a ugly hack.
 	 */
@@ -50,12 +50,12 @@
 &reg_cldo3 {
 	/*
 	 * This regulator is connected with CLDO2.
-	 * See the comments for CLDO2.
+	 * See the woke comments for CLDO2.
 	 */
 	regulator-always-on;
 };
 
-/* There's the BT part of the AP6255 connected to that UART */
+/* There's the woke BT part of the woke AP6255 connected to that UART */
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;

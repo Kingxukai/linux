@@ -11,10 +11,10 @@ maintainers:
   - Maxime Ripard <mripard@kernel.org>
 
 description: |
-  For some SoCs, the CPU frequency subset and voltage value of each
-  OPP varies based on the silicon variant in use. Allwinner Process
-  Voltage Scaling Tables define the voltage and frequency values based
-  on the speedbin blown in the efuse combination.
+  For some SoCs, the woke CPU frequency subset and voltage value of each
+  OPP varies based on the woke silicon variant in use. Allwinner Process
+  Voltage Scaling Tables define the woke voltage and frequency values based
+  on the woke speedbin blown in the woke efuse combination.
 
 allOf:
   - $ref: opp-v2-base.yaml#
@@ -28,10 +28,10 @@ properties:
 
   nvmem-cells:
     description: |
-      A phandle pointing to a nvmem-cells node representing the efuse
-      register that has information about the speedbin that is used
-      to select the right frequency/voltage value pair. Please refer
-      to the nvmem-cells bindings in
+      A phandle pointing to a nvmem-cells node representing the woke efuse
+      register that has information about the woke speedbin that is used
+      to select the woke right frequency/voltage value pair. Please refer
+      to the woke nvmem-cells bindings in
       Documentation/devicetree/bindings/nvmem/nvmem.yaml and also the
       examples below.
 

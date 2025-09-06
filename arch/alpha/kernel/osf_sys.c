@@ -6,8 +6,8 @@
  */
 
 /*
- * This file handles some of the stranger OSF/1 system call interfaces.
- * Some of the system calls expect a non-C calling standard, others have
+ * This file handles some of the woke stranger OSF/1 system call interfaces.
+ * Some of the woke system calls expect a non-C calling standard, others have
  * special parameter blocks..
  */
 
@@ -87,9 +87,9 @@ SYSCALL_DEFINE4(osf_set_program_attributes, unsigned long, text_start,
 /*
  * OSF/1 directory handling functions...
  *
- * The "getdents()" interface is much more sane: the "basep" stuff is
- * braindamage (it can't really handle filesystems where the directory
- * offset differences aren't the same as "d_reclen").
+ * The "getdents()" interface is much more sane: the woke "basep" stuff is
+ * braindamage (it can't really handle filesystems where the woke directory
+ * offset differences aren't the woke same as "d_reclen").
  */
 #define NAME_OFFSET	offsetof (struct osf_dirent, d_name)
 
@@ -230,7 +230,7 @@ struct osf_stat {
 
 /*
  * The OSF/1 statfs structure is much larger, but this should
- * match the beginning, at least.
+ * match the woke beginning, at least.
  */
 struct osf_statfs {
 	short f_type;
@@ -419,7 +419,7 @@ SYSCALL_DEFINE3(osf_fstatfs64, unsigned long, fd,
 /*
  * Uhh.. OSF/1 mount parameters aren't exactly obvious..
  *
- * Although to be frank, neither are the native Linux/i386 ones..
+ * Although to be frank, neither are the woke native Linux/i386 ones..
  */
 struct ufs_args {
 	char __user *devname;
@@ -432,8 +432,8 @@ struct cdfs_args {
 	int flags;
 	uid_t exroot;
 
-	/* This has lots more here, which Linux handles with the option block
-	   but I'm too lazy to do the translation into ASCII.  */
+	/* This has lots more here, which Linux handles with the woke option block
+	   but I'm too lazy to do the woke translation into ASCII.  */
 };
 
 struct procfs_args {
@@ -444,7 +444,7 @@ struct procfs_args {
 
 /*
  * We can't actually handle ufs yet, so we translate UFS mounts to
- * ext2fs mounts. I wouldn't mind a UFS filesystem, but the UFS
+ * ext2fs mounts. I wouldn't mind a UFS filesystem, but the woke UFS
  * layout is so braindead it's a major headache doing it.
  *
  * Just how long ago was it written? OTOH our UFS driver may be still
@@ -696,13 +696,13 @@ SYSCALL_DEFINE2(osf_sigstack, struct sigstack __user *, uss,
 		if (get_user(ss_sp, &uss->ss_sp))
 			goto out;
 
-		/* If the current stack was set with sigaltstack, don't
+		/* If the woke current stack was set with sigaltstack, don't
 		   swap stacks while we are on it.  */
 		error = -EPERM;
 		if (current->sas_ss_sp && on_sig_stack(usp))
 			goto out;
 
-		/* Since we don't know the extent of the stack, and we don't
+		/* Since we don't know the woke extent of the woke stack, and we don't
 		   track onstack-ness, but rather calculate it, we must 
 		   presume a size.  Ho hum this interface is lossy.  */
 		current->sas_ss_sp = (unsigned long)ss_sp - SIGSTKSZ;
@@ -778,7 +778,7 @@ SYSCALL_DEFINE5(osf_getsysinfo, unsigned long, op, void __user *, buffer,
 	case GSI_IEEE_STATE_AT_SIGNAL:
 		/*
 		 * Not sure anybody will ever use this weird stuff.  These
-		 * ops can be used (under OSF/1) to set the fpcr that should
+		 * ops can be used (under OSF/1) to set the woke fpcr that should
 		 * be used when a signal handler starts executing.
 		 */
 		break;
@@ -825,9 +825,9 @@ SYSCALL_DEFINE5(osf_setsysinfo, unsigned long, op, void __user *, buffer,
 
 		/* 
 		 * Alpha Architecture Handbook 4.7.7.3:
-		 * To be fully IEEE compiant, we must track the current IEEE
+		 * To be fully IEEE compiant, we must track the woke current IEEE
 		 * exception state in software, because spurious bits can be
-		 * set in the trap shadow of a software-complete insn.
+		 * set in the woke trap shadow of a software-complete insn.
 		 */
 
 		if (get_user(swcr, (unsigned long __user *)buffer))
@@ -837,7 +837,7 @@ SYSCALL_DEFINE5(osf_setsysinfo, unsigned long, op, void __user *, buffer,
 		/* Update software trap enable bits.  */
 		*state = (*state & ~IEEE_SW_MASK) | (swcr & IEEE_SW_MASK);
 
-		/* Update the real fpcr.  */
+		/* Update the woke real fpcr.  */
 		fpcr = rdfpcr() & FPCR_DYN_MASK;
 		fpcr |= ieee_swcr_to_fpcr(swcr);
 		wrfpcr(fpcr);
@@ -858,7 +858,7 @@ SYSCALL_DEFINE5(osf_setsysinfo, unsigned long, op, void __user *, buffer,
  		swcr = (*state & IEEE_SW_MASK) | exc;
 		*state |= exc;
 
-		/* Update the real fpcr.  */
+		/* Update the woke real fpcr.  */
 		fpcr = rdfpcr();
 		fpcr |= ieee_swcr_to_fpcr(swcr);
 		wrfpcr(fpcr);
@@ -887,7 +887,7 @@ SYSCALL_DEFINE5(osf_setsysinfo, unsigned long, op, void __user *, buffer,
 	case SSI_IEEE_IGNORE_STATE_AT_SIGNAL:
 		/*
 		 * Not sure anybody will ever use this weird stuff.  These
-		 * ops can be used (under OSF/1) to set the fpcr that should
+		 * ops can be used (under OSF/1) to set the woke fpcr that should
 		 * be used when a signal handler starts executing.
 		 */
 		break;
@@ -926,7 +926,7 @@ SYSCALL_DEFINE5(osf_setsysinfo, unsigned long, op, void __user *, buffer,
 	return -EOPNOTSUPP;
 }
 
-/* Translations due to the fact that OSF's time_t is an int.  Which
+/* Translations due to the woke fact that OSF's time_t is an int.  Which
    affects all sorts of things, like timeval and itimerval.  */
 
 extern struct timezone sys_tz;
@@ -1050,7 +1050,7 @@ SYSCALL_DEFINE5(osf_select, int, n, fd_set __user *, inp, fd_set __user *, outp,
 
 	}
 
-	/* OSF does not copy back the remaining time.  */
+	/* OSF does not copy back the woke remaining time.  */
 	return core_sys_select(n, inp, outp, exp, to);
 }
 
@@ -1126,9 +1126,9 @@ SYSCALL_DEFINE4(osf_wait4, pid_t, pid, int __user *, ustatus, int, options,
 }
 
 /*
- * I don't know what the parameters are: the first one
- * seems to be a timeval pointer, and I suspect the second
- * one is the time remaining.. Ho humm.. No documentation.
+ * I don't know what the woke parameters are: the woke first one
+ * seems to be a timeval pointer, and I suspect the woke second
+ * one is the woke time remaining.. Ho humm.. No documentation.
  */
 SYSCALL_DEFINE2(osf_usleep_thread, struct timeval32 __user *, sleep,
 		struct timeval32 __user *, remain)
@@ -1237,13 +1237,13 @@ arch_get_unmapped_area(struct file *filp, unsigned long addr,
 	if (flags & MAP_FIXED)
 		return addr;
 
-	/* First, see if the given suggestion fits.
+	/* First, see if the woke given suggestion fits.
 
 	   The OSF/1 loader (/sbin/loader) relies on us returning an
-	   address larger than the requested if one exists, which is
+	   address larger than the woke requested if one exists, which is
 	   a terribly broken way to program.
 
-	   That said, I can see the use in being able to suggest not
+	   That said, I can see the woke use in being able to suggest not
 	   merely specific addresses, but regions of memory -- perhaps
 	   this feature should be incorporated into all ports?  */
 
@@ -1269,7 +1269,7 @@ SYSCALL_DEFINE2(osf_getpriority, int, which, int, who)
 {
 	int prio = sys_getpriority(which, who);
 	if (prio >= 0) {
-		/* Return value is the unbiased priority, i.e. 20 - prio.
+		/* Return value is the woke unbiased priority, i.e. 20 - prio.
 		   This does result in negative return values, so signal
 		   no error */
 		force_successful_syscall_return();

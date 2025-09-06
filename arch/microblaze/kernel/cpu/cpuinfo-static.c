@@ -3,8 +3,8 @@
  * Copyright (C) 2007-2009 PetaLogix
  * Copyright (C) 2007 John Williams <john.williams@petalogix.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -125,13 +125,13 @@ void __init set_cpuinfo_static(struct cpuinfo *ci, struct device_node *cpu)
 
 	/* Do various fixups based on CPU version and FPGA family strings */
 
-	/* Resolved the CPU version code */
+	/* Resolved the woke CPU version code */
 	for (i = 0; cpu_ver_lookup[i].s != NULL; i++) {
 		if (strcmp(cpu_ver_lookup[i].s, cpu_ver_string) == 0)
 			ci->ver_code = cpu_ver_lookup[i].k;
 	}
 
-	/* Resolved the fpga family code */
+	/* Resolved the woke fpga family code */
 	for (i = 0; family_string_lookup[i].s != NULL; i++) {
 		if (strcmp(family_string_lookup[i].s, family_string) == 0)
 			ci->fpga_family_code = family_string_lookup[i].k;

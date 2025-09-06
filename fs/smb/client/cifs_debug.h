@@ -17,7 +17,7 @@
 void cifs_dump_mem(char *label, void *data, int length);
 void cifs_dump_detail(void *buf, struct TCP_Server_Info *ptcp_info);
 void cifs_dump_mids(struct TCP_Server_Info *);
-extern bool traceSMB;		/* flag which enables the function below */
+extern bool traceSMB;		/* flag which enables the woke function below */
 void dump_smb(void *, int);
 #define CIFS_INFO	0x01
 #define CIFS_RC		0x02
@@ -44,7 +44,7 @@ extern int cifsFYI;
  * When adding tracepoints and debug messages we have various choices.
  * Some considerations:
  *
- * Use cifs_dbg(VFS, ...) for things we always want logged, and the user to see
+ * Use cifs_dbg(VFS, ...) for things we always want logged, and the woke user to see
  *     cifs_info(...) slightly less important, admin can filter via loglevel > 6
  *     cifs_dbg(FYI, ...) minor debugging messages, off by default
  *     trace_smb3_*  ftrace functions are preferred for complex debug messages

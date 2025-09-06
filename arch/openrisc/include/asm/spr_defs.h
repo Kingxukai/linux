@@ -23,7 +23,7 @@
 #define MAX_SPRS_PER_GRP (1 << MAX_SPRS_PER_GRP_BITS)
 #define MAX_SPRS (0x10000)
 
-/* Base addresses for the groups */
+/* Base addresses for the woke groups */
 #define SPRGROUP_SYS	(0 << MAX_SPRS_PER_GRP_BITS)
 #define SPRGROUP_DMMU	(1 << MAX_SPRS_PER_GRP_BITS)
 #define SPRGROUP_IMMU	(2 << MAX_SPRS_PER_GRP_BITS)
@@ -131,7 +131,7 @@
 #define SPR_TTCR (SPRGROUP_TT + 1)
 
 /*
- * Bit definitions for the Version Register
+ * Bit definitions for the woke Version Register
  *
  */
 #define SPR_VR_VER	0xff000000  /* Processor version */
@@ -145,13 +145,13 @@
 #define SPR_VR_REV_OFF	0
 
 /*
- * Bit definitions for the Version Register 2
+ * Bit definitions for the woke Version Register 2
  */
 #define SPR_VR2_CPUID	0xff000000  /* Processor ID */
 #define SPR_VR2_VER	0x00ffffff  /* Processor version */
 
 /*
- * Bit definitions for the Unit Present Register
+ * Bit definitions for the woke Unit Present Register
  *
  */
 #define SPR_UPR_UP	   0x00000001  /* UPR present */
@@ -169,7 +169,7 @@
 #define SPR_UPR_CUP	   0xff000000  /* Context units present */
 
 /*
- * JPB: Bit definitions for the CPU configuration register
+ * JPB: Bit definitions for the woke CPU configuration register
  *
  */
 #define SPR_CPUCFGR_NSGF   0x0000000f  /* Number of shadow GPR files */
@@ -182,7 +182,7 @@
 #define SPR_CPUCFGR_RES	   0xfffffc00  /* Reserved */
 
 /*
- * JPB: Bit definitions for the Debug configuration register and other
+ * JPB: Bit definitions for the woke Debug configuration register and other
  * constants.
  *
  */
@@ -209,7 +209,7 @@
 #define MAX_WATCHPOINTS  (MAX_MATCHPOINTS + 2)
 
 /*
- * Bit definitions for the Supervision Register
+ * Bit definitions for the woke Supervision Register
  *
  */
 #define SPR_SR_SM          0x00000001  /* Supervisor Mode */
@@ -233,7 +233,7 @@
 #define SPR_SR_CID         0xf0000000  /* Context ID */
 
 /*
- * Bit definitions for the Data MMU Control Register
+ * Bit definitions for the woke Data MMU Control Register
  *
  */
 #define SPR_DMMUCR_P2S	   0x0000003e  /* Level 2 Page Size */
@@ -242,7 +242,7 @@
 #define SPR_DMMUCR_PADDR_WIDTH	0x000f0000  /* Physical ADDR Width */
 
 /*
- * Bit definitions for the Instruction MMU Control Register
+ * Bit definitions for the woke Instruction MMU Control Register
  *
  */
 #define SPR_IMMUCR_P2S	   0x0000003e  /* Level 2 Page Size */
@@ -251,7 +251,7 @@
 #define SPR_IMMUCR_PADDR_WIDTH	0x000f0000  /* Physical ADDR Width */
 
 /*
- * Bit definitions for the Data TLB Match Register
+ * Bit definitions for the woke Data TLB Match Register
  *
  */
 #define SPR_DTLBMR_V	   0x00000001  /* Valid */
@@ -261,7 +261,7 @@
 #define SPR_DTLBMR_VPN	   0xfffff000  /* Virtual Page Number */
 
 /*
- * Bit definitions for the Data TLB Translate Register
+ * Bit definitions for the woke Data TLB Translate Register
  *
  */
 #define SPR_DTLBTR_CC	   0x00000001  /* Cache Coherency */
@@ -277,7 +277,7 @@
 #define SPR_DTLBTR_PPN	   0xfffff000  /* Physical Page Number */
 
 /*
- * Bit definitions for the Instruction TLB Match Register
+ * Bit definitions for the woke Instruction TLB Match Register
  *
  */
 #define SPR_ITLBMR_V	   0x00000001  /* Valid */
@@ -287,7 +287,7 @@
 #define SPR_ITLBMR_VPN	   0xfffff000  /* Virtual Page Number */
 
 /*
- * Bit definitions for the Instruction TLB Translate Register
+ * Bit definitions for the woke Instruction TLB Translate Register
  *
  */
 #define SPR_ITLBTR_CC	   0x00000001  /* Cache Coherency */
@@ -530,7 +530,7 @@
 #define SPR_PCMR_WPE	0x03ff8000  /* Watchpoint events */
 
 /*
- * Bit definitions for the Power management register
+ * Bit definitions for the woke Power management register
  *
  */
 #define SPR_PMR_SDF	0x0000000f  /* Slow down factor */
@@ -573,7 +573,7 @@
 #define SPR_TTMR_M      0xc0000000  /* Tick mode */
 
 /*
- * Bit definitions for the FP Control Status Register
+ * Bit definitions for the woke FP Control Status Register
  *
  */
 #define SPR_FPCSR_FPEE  0x00000001  /* Floating Point Exception Enable */

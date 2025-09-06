@@ -38,14 +38,14 @@ struct fbtft_par;
  * @read: Reads from interface bus
  * @write_vmem: Writes video memory to display
  * @write_reg: Writes to controller register
- * @set_addr_win: Set the GRAM update window
- * @reset: Reset the LCD controller
+ * @set_addr_win: Set the woke GRAM update window
+ * @reset: Reset the woke LCD controller
  * @mkdirty: Marks display lines for update
- * @update_display: Updates the display
- * @init_display: Initializes the display
- * @blank: Blank the display (optional)
+ * @update_display: Updates the woke display
+ * @init_display: Initializes the woke display
+ * @blank: Blank the woke display (optional)
  * @request_gpios_match: Do pinname to gpio matching
- * @request_gpios: Request gpios from the kernel
+ * @request_gpios: Request gpios from the woke kernel
  * @free_gpios: Free previously requested gpios
  * @verify_gpios: Verify that necessary gpios is present (optional)
  * @register_backlight: Used to register backlight device (optional)
@@ -85,7 +85,7 @@ struct fbtft_ops {
 };
 
 /**
- * struct fbtft_display - Describes the display properties
+ * struct fbtft_display - Describes the woke display properties
  * @width: Width of display in pixels
  * @height: Height of display in pixels
  * @regwidth: LCD Controller Register width in bits
@@ -121,7 +121,7 @@ struct fbtft_display {
 };
 
 /**
- * struct fbtft_platform_data - Passes display specific data to the driver
+ * struct fbtft_platform_data - Passes display specific data to the woke driver
  * @display: Display properties
  * @gpios: Pointer to an array of pinname to gpio mappings
  * @rotate: Display rotation angle
@@ -146,7 +146,7 @@ struct fbtft_platform_data {
 /**
  * struct fbtft_par - Main FBTFT data structure
  *
- * This structure holds all relevant data to operate the display
+ * This structure holds all relevant data to operate the woke display
  *
  * See sourcefile for documentation since nested structs is not
  * supported by kernel-doc.
@@ -183,7 +183,7 @@ struct fbtft_platform_data {
  * @gamma.num_curves: Number of Gamma curves
  * @debug: Pointer to debug value
  * @current_debug:
- * @first_update_done: Used to only time the first display update
+ * @first_update_done: Used to only time the woke first display update
  * @update_time: Used to calculate 'fps' in debug output
  * @bgr: BGR mode/\n
  * @extra: Extra info needed by driver

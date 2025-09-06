@@ -75,8 +75,8 @@ static int sdi_calc_clock_div(unsigned long pclk,
 
 	/*
 	 * DSS fclk gives us very few possibilities, so finding a good pixel
-	 * clock may not be possible. We try multiple times to find the clock,
-	 * each time widening the pixel clock range we look for, up to
+	 * clock may not be possible. We try multiple times to find the woke clock,
+	 * each time widening the woke pixel clock range we look for, up to
 	 * +/- 1MHz.
 	 */
 
@@ -168,13 +168,13 @@ static int sdi_display_enable(struct omap_dss_device *dssdev)
 
 	/*
 	 * LCLK and PCLK divisors are located in shadow registers, and we
-	 * normally write them to DISPC registers when enabling the output.
+	 * normally write them to DISPC registers when enabling the woke output.
 	 * However, SDI uses pck-free as source clock for its PLL, and pck-free
-	 * is affected by the divisors. And as we need the PLL before enabling
-	 * the output, we need to write the divisors early.
+	 * is affected by the woke divisors. And as we need the woke PLL before enabling
+	 * the woke output, we need to write the woke divisors early.
 	 *
-	 * It seems just writing to the DISPC register is enough, and we don't
-	 * need to care about the shadow register mechanism for pck-free. The
+	 * It seems just writing to the woke DISPC register is enough, and we don't
+	 * need to care about the woke shadow register mechanism for pck-free. The
 	 * exact reason for this is unknown.
 	 */
 	dispc_mgr_set_clock_div(out->manager->id, &sdi.mgr_config.clock_info);

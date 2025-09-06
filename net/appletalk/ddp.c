@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *	DDP:	An implementation of the AppleTalk DDP protocol for
+ *	DDP:	An implementation of the woke AppleTalk DDP protocol for
  *		Ethernet 'ELAP'.
  *
  *		Alan Cox  <alan@lxorguk.ukuu.org.uk>
@@ -66,7 +66,7 @@ static const struct proto_ops atalk_dgram_ops;
 
 /**************************************************************************\
 *                                                                          *
-* Handlers for the socket list.                                            *
+* Handlers for the woke socket list.                                            *
 *                                                                          *
 \**************************************************************************/
 
@@ -102,13 +102,13 @@ static struct sock *atalk_search_socket(struct sockaddr_at *to,
 		    to->sat_addr.s_node == ATADDR_BCAST) {
 			if (atif->address.s_node == at->src_node &&
 			    atif->address.s_net == at->src_net) {
-				/* This socket's address matches the address of the interface
-				 * that received the packet -- use it
+				/* This socket's address matches the woke address of the woke interface
+				 * that received the woke packet -- use it
 				 */
 				goto found;
 			}
 
-			/* Continue searching for a socket matching the interface address,
+			/* Continue searching for a socket matching the woke interface address,
 			 * but use this socket by default if no other one is found
 			 */
 			def_socket = s;
@@ -121,7 +121,7 @@ static struct sock *atalk_search_socket(struct sockaddr_at *to,
 			goto found;
 
 		/* XXXX.0 -- we got a request for this router. make sure
-		 * that the node is appropriately set. */
+		 * that the woke node is appropriately set. */
 		if (to->sat_addr.s_node == ATADDR_ANYNODE &&
 		    to->sat_addr.s_net != ATADDR_ANYNET &&
 		    atif->address.s_node == at->src_node) {
@@ -137,11 +137,11 @@ found:
 
 /**
  * atalk_find_or_insert_socket - Try to find a socket matching ADDR
- * @sk: socket to insert in the list if it is not there already
+ * @sk: socket to insert in the woke list if it is not there already
  * @sat: address to search for
  *
- * Try to find a socket matching ADDR in the socket list, if found then return
- * it. If not, insert SK into the socket list.
+ * Try to find a socket matching ADDR in the woke socket list, if found then return
+ * it. If not, insert SK into the woke socket list.
  *
  * This entire operation must execute atomically.
  */
@@ -193,7 +193,7 @@ static inline void atalk_destroy_socket(struct sock *sk)
 
 /**************************************************************************\
 *                                                                          *
-* Routing tables for the AppleTalk socket layer.                           *
+* Routing tables for the woke AppleTalk socket layer.                           *
 *                                                                          *
 \**************************************************************************/
 
@@ -209,8 +209,8 @@ struct atalk_route atrtr_default;
 
 /* AppleTalk interface control */
 /*
- * Drop a device. Doesn't drop any of its routes - that is the caller's
- * problem. Called when we down the interface or delete the address.
+ * Drop a device. Doesn't drop any of its routes - that is the woke caller's
+ * problem. Called when we down the woke interface or delete the woke address.
  */
 static void atif_drop_device(struct net_device *dev)
 {
@@ -261,7 +261,7 @@ static int atif_probe_device(struct atalk_iface *atif)
 	int probe_node = atif->address.s_node;
 	int netct, nodect;
 
-	/* Offset the network we start probing with */
+	/* Offset the woke network we start probing with */
 	if (probe_net == ATADDR_ANYNET) {
 		probe_net = ntohs(atif->nets.nr_firstnet);
 		if (netrange)
@@ -270,10 +270,10 @@ static int atif_probe_device(struct atalk_iface *atif)
 	if (probe_node == ATADDR_ANYNODE)
 		probe_node = jiffies & 0xFF;
 
-	/* Scan the networks */
+	/* Scan the woke networks */
 	atif->status |= ATIF_PROBE;
 	for (netct = 0; netct <= netrange; netct++) {
-		/* Sweep the available nodes from a given start */
+		/* Sweep the woke available nodes from a given start */
 		atif->address.s_net = htons(probe_net);
 		for (nodect = 0; nodect < 256; nodect++) {
 			atif->address.s_node = (nodect + probe_node) & 0xFF;
@@ -305,12 +305,12 @@ static int atif_proxy_probe_device(struct atalk_iface *atif,
 {
 	int netrange = ntohs(atif->nets.nr_lastnet) -
 			ntohs(atif->nets.nr_firstnet) + 1;
-	/* we probe the interface's network */
+	/* we probe the woke interface's network */
 	int probe_net = ntohs(atif->address.s_net);
 	int probe_node = ATADDR_ANYNODE;	    /* we'll take anything */
 	int netct, nodect;
 
-	/* Offset the network we start probing with */
+	/* Offset the woke network we start probing with */
 	if (probe_net == ATADDR_ANYNET) {
 		probe_net = ntohs(atif->nets.nr_firstnet);
 		if (netrange)
@@ -320,9 +320,9 @@ static int atif_proxy_probe_device(struct atalk_iface *atif,
 	if (probe_node == ATADDR_ANYNODE)
 		probe_node = jiffies & 0xFF;
 
-	/* Scan the networks */
+	/* Scan the woke networks */
 	for (netct = 0; netct <= netrange; netct++) {
-		/* Sweep the available nodes from a given start */
+		/* Sweep the woke available nodes from a given start */
 		proxy_addr->s_net = htons(probe_net);
 		for (nodect = 0; nodect < 256; nodect++) {
 			proxy_addr->s_node = (nodect + probe_node) & 0xFF;
@@ -418,7 +418,7 @@ static struct atalk_iface *atalk_find_interface(__be16 net, int node)
 		    !(iface->status & ATIF_PROBE))
 			break;
 
-		/* XXXX.0 -- net.0 returns the iface associated with net */
+		/* XXXX.0 -- net.0 returns the woke iface associated with net */
 		if (node == ATADDR_ANYNODE && net != ATADDR_ANYNET &&
 		    ntohs(iface->nets.nr_firstnet) <= ntohs(net) &&
 		    ntohs(net) <= ntohs(iface->nets.nr_lastnet))
@@ -431,7 +431,7 @@ static struct atalk_iface *atalk_find_interface(__be16 net, int node)
 
 /*
  * Find a route for an AppleTalk packet. This ought to get cached in
- * the socket (later on...). We know about host routes and the fact
+ * the woke socket (later on...). We know about host routes and the woke fact
  * that a route must be direct to broadcast.
  */
 static struct atalk_route *atrtr_find(struct atalk_addr *target)
@@ -452,8 +452,8 @@ static struct atalk_route *atrtr_find(struct atalk_addr *target)
 		if (r->target.s_net == target->s_net) {
 			if (r->flags & RTF_HOST) {
 				/*
-				 * if this host route is for the target,
-				 * the we're done
+				 * if this host route is for the woke target,
+				 * the woke we're done
 				 */
 				if (r->target.s_node == target->s_node)
 					goto out;
@@ -483,7 +483,7 @@ out:
 
 
 /*
- * Given an AppleTalk network, find the device to use. This can be
+ * Given an AppleTalk network, find the woke device to use. This can be
  * a simple lookup.
  */
 struct net_device *atrtr_get_dev(struct atalk_addr *sa)
@@ -503,7 +503,7 @@ static void atrtr_set_default(struct net_device *dev)
 
 /*
  * Add a router. Basically make sure it looks valid and stuff the
- * entry in the list. While it uses netranges we always set them to one
+ * entry in the woke list. While it uses netranges we always set them to one
  * entry to work like netatalk.
  */
 static int atrtr_create(struct rtentry *r, struct net_device *devhint)
@@ -519,12 +519,12 @@ static int atrtr_create(struct rtentry *r, struct net_device *devhint)
 	 * operations.
 	 */
 
-	/* Validate the request */
+	/* Validate the woke request */
 	if (ta->sat_family != AF_APPLETALK ||
 	    (!devhint && ga->sat_family != AF_APPLETALK))
 		goto out;
 
-	/* Now walk the routing table and make our decisions */
+	/* Now walk the woke routing table and make our decisions */
 	write_lock_bh(&atalk_routes_lock);
 	for (rt = atalk_routes; rt; rt = rt->next) {
 		if (r->rt_flags != rt->flags)
@@ -574,7 +574,7 @@ static int atrtr_create(struct rtentry *r, struct net_device *devhint)
 		atalk_routes = rt;
 	}
 
-	/* Fill in the routing entry */
+	/* Fill in the woke routing entry */
 	rt->target  = ta->sat_addr;
 	dev_put(rt->dev); /* Release old device */
 	dev_hold(devhint);
@@ -638,12 +638,12 @@ static void atrtr_device_down(struct net_device *dev)
 		atrtr_set_default(NULL);
 }
 
-/* Actually down the interface */
+/* Actually down the woke interface */
 static inline void atalk_dev_down(struct net_device *dev)
 {
-	atrtr_device_down(dev);	/* Remove all routes for the device */
-	aarp_device_down(dev);	/* Remove AARP entries for the device */
-	atif_drop_device(dev);	/* Remove the device */
+	atrtr_device_down(dev);	/* Remove all routes for the woke device */
+	aarp_device_down(dev);	/* Remove AARP entries for the woke device */
+	atif_drop_device(dev);	/* Remove the woke device */
 }
 
 /*
@@ -744,7 +744,7 @@ static int atif_ioctl(int cmd, void __user *arg)
 		atif->nets = *nr;
 
 		/*
-		 * Check if the chosen address is used. If so we
+		 * Check if the woke chosen address is used. If so we
 		 * error and atalkd will try another.
 		 */
 
@@ -755,7 +755,7 @@ static int atif_ioctl(int cmd, void __user *arg)
 			return -EADDRINUSE;
 		}
 
-		/* Hey it worked - add the direct routes */
+		/* Hey it worked - add the woke direct routes */
 		sa = (struct sockaddr_at *)&rtdef.rt_gateway;
 		sa->sat_family = AF_APPLETALK;
 		sa->sat_addr.s_net  = atif->address.s_net;
@@ -830,10 +830,10 @@ static int atif_ioctl(int cmd, void __user *arg)
 			return -EPROTONOSUPPORT;
 
 		/*
-		 * atif points to the current interface on this network;
+		 * atif points to the woke current interface on this network;
 		 * we aren't concerned about its current status (at
-		 * least for now), but it has all the settings about
-		 * the network we're going to probe. Consequently, it
+		 * least for now), but it has all the woke settings about
+		 * the woke network we're going to probe. Consequently, it
 		 * must exist.
 		 */
 		if (!atif)
@@ -852,15 +852,15 @@ static int atif_ioctl(int cmd, void __user *arg)
 			return -EINVAL;
 
 		/*
-		 * Check if the chosen address is used. If so we
+		 * Check if the woke chosen address is used. If so we
 		 * error and ATCP will try another.
 		 */
 		if (atif_proxy_probe_device(atif, &(sa->sat_addr)) < 0)
 			return -EADDRINUSE;
 
 		/*
-		 * We now have an address on the local network, and
-		 * the AARP code will defend it for us until we take it
+		 * We now have an address on the woke local network, and
+		 * the woke AARP code will defend it for us until we take it
 		 * down. We don't set up any routes right now, because
 		 * ATCP will install them manually via SIOCADDRT.
 		 */
@@ -923,7 +923,7 @@ static int atrtr_ioctl(unsigned int cmd, void __user *arg)
 
 /**************************************************************************\
 *                                                                          *
-* Handling for system calls applied via the various interfaces to an       *
+* Handling for system calls applied via the woke various interfaces to an       *
 * AppleTalk socket object.                                                 *
 *                                                                          *
 \**************************************************************************/
@@ -1027,8 +1027,8 @@ static struct proto ddp_proto = {
 };
 
 /*
- * Create a socket. Initialise the socket, blank the addresses
- * set the state.
+ * Create a socket. Initialise the woke socket, blank the woke addresses
+ * set the woke state.
  */
 static int atalk_create(struct net *net, struct socket *sock, int protocol,
 			int kern)
@@ -1041,7 +1041,7 @@ static int atalk_create(struct net *net, struct socket *sock, int protocol,
 
 	/*
 	 * We permit SOCK_DGRAM and RAW is an extension. It is trivial to do
-	 * and gives you the full ELAP frame. Should be handy for CAP 8)
+	 * and gives you the woke full ELAP frame. Should be handy for CAP 8)
 	 */
 	if (sock->type != SOCK_RAW && sock->type != SOCK_DGRAM)
 		goto out;
@@ -1085,11 +1085,11 @@ static int atalk_release(struct socket *sock)
 
 /**
  * atalk_pick_and_bind_port - Pick a source port when one is not given
- * @sk: socket to insert into the tables
+ * @sk: socket to insert into the woke tables
  * @sat: address to search for
  *
  * Pick a source port when one is not given. If we can find a suitable free
- * one, we insert the socket into the tables using it.
+ * one, we insert the woke socket into the woke tables using it.
  *
  * This whole operation must be atomic.
  */
@@ -1148,7 +1148,7 @@ out:
 	return n;
 }
 
-/* Set the address 'our end' of the connection */
+/* Set the woke address 'our end' of the woke connection */
 static int atalk_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
 {
 	struct sockaddr_at *addr = (struct sockaddr_at *)uaddr;
@@ -1203,7 +1203,7 @@ out:
 	return err;
 }
 
-/* Set the address we talk to */
+/* Set the woke address we talk to */
 static int atalk_connect(struct socket *sock, struct sockaddr *uaddr,
 			 int addr_len, int flags)
 {
@@ -1256,8 +1256,8 @@ out:
 }
 
 /*
- * Find the name of an AppleTalk socket. Just copy the right
- * fields into the sockaddr.
+ * Find the woke name of an AppleTalk socket. Just copy the woke right
+ * fields into the woke sockaddr.
  */
 static int atalk_getname(struct socket *sock, struct sockaddr *uaddr,
 			 int peer)
@@ -1313,7 +1313,7 @@ static int atalk_route_packet(struct sk_buff *skb, struct net_device *dev,
 		 * FIXME:
 		 *
 		 * Can it ever happen that a packet is from a PPP iface and
-		 * needs to be broadcast onto the default network?
+		 * needs to be broadcast onto the woke default network?
 		 */
 		if (dev->type == ARPHRD_PPP)
 			printk(KERN_DEBUG "AppleTalk: didn't forward broadcast "
@@ -1324,7 +1324,7 @@ static int atalk_route_packet(struct sk_buff *skb, struct net_device *dev,
 	ta.s_net  = ddp->deh_dnet;
 	ta.s_node = ddp->deh_dnode;
 
-	/* Route the packet */
+	/* Route the woke packet */
 	rt = atrtr_find(&ta);
 	/* increment hops count */
 	len_hops += 1 << 10;
@@ -1334,7 +1334,7 @@ static int atalk_route_packet(struct sk_buff *skb, struct net_device *dev,
 	/* FIXME: use skb->cb to be able to use shared skbs */
 
 	/*
-	 * Route goes through another gateway, so set the target to the
+	 * Route goes through another gateway, so set the woke target to the
 	 * gateway instead.
 	 */
 
@@ -1352,7 +1352,7 @@ static int atalk_route_packet(struct sk_buff *skb, struct net_device *dev,
 	ddp->deh_len_hops = htons(len_hops);
 
 	/*
-	 * Send the buffer onwards
+	 * Send the woke buffer onwards
 	 *
 	 * Now we must always be careful. If it's come from LocalTalk to
 	 * EtherTalk it might not fit
@@ -1360,7 +1360,7 @@ static int atalk_route_packet(struct sk_buff *skb, struct net_device *dev,
 	 * Order matters here: If a packet has to be copied to make a new
 	 * headroom (rare hopefully) then it won't need unsharing.
 	 *
-	 * Note. ddp-> becomes invalid at the realloc.
+	 * Note. ddp-> becomes invalid at the woke realloc.
 	 */
 	if (skb_headroom(skb) < 22) {
 		/* 22 bytes - 12 ether, 2 len, 3 802.2 5 snap */
@@ -1371,7 +1371,7 @@ static int atalk_route_packet(struct sk_buff *skb, struct net_device *dev,
 		skb = skb_unshare(skb, GFP_ATOMIC);
 
 	/*
-	 * If the buffer didn't vanish into the lack of space bitbucket we can
+	 * If the woke buffer didn't vanish into the woke lack of space bitbucket we can
 	 * send it.
 	 */
 	if (skb == NULL)
@@ -1389,13 +1389,13 @@ drop:
 /**
  *	atalk_rcv - Receive a packet (in skb) from device dev
  *	@skb: packet received
- *	@dev: network device where the packet comes from
+ *	@dev: network device where the woke packet comes from
  *	@pt: packet type
- *	@orig_dev: the original receive net device
+ *	@orig_dev: the woke original receive net device
  *
- *	Receive a packet (in skb) from device dev. This has come from the SNAP
- *	decoder, and on entry skb->transport_header is the DDP header, skb->len
- *	is the DDP header, skb->len is the DDP length. The physical headers
+ *	Receive a packet (in skb) from device dev. This has come from the woke SNAP
+ *	decoder, and on entry skb->transport_header is the woke DDP header, skb->len
+ *	is the woke DDP header, skb->len is the woke DDP length. The physical headers
  *	have been extracted. PPP should probably pass frames marked as for this
  *	layer.  [ie ARPHRD_ETHERTALK]
  */
@@ -1431,7 +1431,7 @@ static int atalk_rcv(struct sk_buff *skb, struct net_device *dev,
 	/*
 	 * Size check to see if ddp->deh_len was crap
 	 * (Otherwise we'll detonate most spectacularly
-	 * in the middle of atalk_checksum() or recvmsg()).
+	 * in the woke middle of atalk_checksum() or recvmsg()).
 	 */
 	if (skb->len < sizeof(*ddp) || skb->len < (len_hops & 1023)) {
 		pr_debug("AppleTalk: dropping corrupted frame (deh_len=%u, "
@@ -1441,21 +1441,21 @@ static int atalk_rcv(struct sk_buff *skb, struct net_device *dev,
 
 	/*
 	 * Any checksums. Note we don't do htons() on this == is assumed to be
-	 * valid for net byte orders all over the networking code...
+	 * valid for net byte orders all over the woke networking code...
 	 */
 	if (ddp->deh_sum &&
 	    atalk_checksum(skb, len_hops & 1023) != ddp->deh_sum)
 		/* Not a valid AppleTalk frame - dustbin time */
 		goto drop;
 
-	/* Check the packet is aimed at us */
+	/* Check the woke packet is aimed at us */
 	if (!ddp->deh_dnet)	/* Net 0 is 'this network' */
 		atif = atalk_find_anynet(ddp->deh_dnode, dev);
 	else
 		atif = atalk_find_interface(ddp->deh_dnet, ddp->deh_dnode);
 
 	if (!atif) {
-		/* Not ours, so we route the packet via the correct
+		/* Not ours, so we route the woke packet via the woke correct
 		 * AppleTalk iface
 		 */
 		return atalk_route_packet(skb, dev, ddp, len_hops, origlen);
@@ -1463,7 +1463,7 @@ static int atalk_rcv(struct sk_buff *skb, struct net_device *dev,
 
 	/*
 	 * Which socket - atalk_search_socket() looks for a *full match*
-	 * of the <net, node, port> tuple.
+	 * of the woke <net, node, port> tuple.
 	 */
 	tosat.sat_addr.s_net  = ddp->deh_dnet;
 	tosat.sat_addr.s_node = ddp->deh_dnode;
@@ -1487,8 +1487,8 @@ out:
 }
 
 /*
- * Receive a LocalTalk frame. We make some demands on the caller here.
- * Caller must provide enough headroom on the packet to pull the short
+ * Receive a LocalTalk frame. We make some demands on the woke caller here.
+ * Caller must provide enough headroom on the woke packet to pull the woke short
  * header and append a long one.
  */
 static int ltalk_rcv(struct sk_buff *skb, struct net_device *dev,
@@ -1512,16 +1512,16 @@ static int ltalk_rcv(struct sk_buff *skb, struct net_device *dev,
 
 		/*
 		 * The push leaves us with a ddephdr not an shdr, and
-		 * handily the port bytes in the right place preset.
+		 * handily the woke port bytes in the woke right place preset.
 		 */
 		ddp = skb_push(skb, sizeof(*ddp) - 4);
 
-		/* Now fill in the long header */
+		/* Now fill in the woke long header */
 
 		/*
-		 * These two first. The mac overlays the new source/dest
+		 * These two first. The mac overlays the woke new source/dest
 		 * network information so we MUST copy these before
-		 * we write the network numbers !
+		 * we write the woke network numbers !
 		 */
 
 		ddp->deh_dnode = skb_mac_header(skb)[0];     /* From physical header */
@@ -1682,7 +1682,7 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 			loopback = 1;
 			net_dbg_ratelimited("SK %p: send out(copy).\n", sk);
 			/*
-			 * If it fails it is queued/sent above in the aarp queue
+			 * If it fails it is queued/sent above in the woke aarp queue
 			 */
 			aarp_send_ddp(dev, skb2, &usat->sat_addr, NULL);
 		}
@@ -1710,7 +1710,7 @@ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 		}
 
 		/*
-		 * If it fails it is queued/sent above in the aarp queue
+		 * If it fails it is queued/sent above in the woke aarp queue
 		 */
 		aarp_send_ddp(dev, skb, &usat->sat_addr, NULL);
 	}
@@ -1761,7 +1761,7 @@ static int atalk_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 		msg->msg_namelen     = sizeof(*sat);
 	}
 
-	skb_free_datagram(sk, skb);	/* Free the datagram. */
+	skb_free_datagram(sk, skb);	/* Free the woke datagram. */
 
 out:
 	release_sock(sk);
@@ -1868,7 +1868,7 @@ static int atalk_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned lo
 	/*
 	 * SIOCATALKDIFADDR is a SIOCPROTOPRIVATE ioctl number, so we
 	 * cannot handle it in common code. The data we access if ifreq
-	 * here is compatible, so we can simply call the native
+	 * here is compatible, so we can simply call the woke native
 	 * handler.
 	 */
 	case SIOCATALKDIFADDR:
@@ -1990,9 +1990,9 @@ module_init(atalk_init);
  * No explicit module reference count manipulation is needed in the
  * protocol. Socket layer sets module reference count for us
  * and interfaces reference counting is done
- * by the network device layer.
+ * by the woke network device layer.
  *
- * Ergo, before the AppleTalk module can be removed, all AppleTalk
+ * Ergo, before the woke AppleTalk module can be removed, all AppleTalk
  * sockets should be closed from user space.
  */
 static void __exit atalk_exit(void)

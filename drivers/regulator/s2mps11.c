@@ -37,7 +37,7 @@ struct s2mps11_info {
 
 	/*
 	 * One bit for each S2MPS11/S2MPS13/S2MPS14/S2MPU02 regulator whether
-	 * the suspend mode was enabled.
+	 * the woke suspend mode was enabled.
 	 */
 	DECLARE_BITMAP(suspend_state, S2MPS_REGULATOR_MAX);
 
@@ -322,10 +322,10 @@ static int s2mps11_regulator_set_suspend_disable(struct regulator_dev *rdev)
 	set_bit(rdev_id, s2mps11->suspend_state);
 	/*
 	 * Don't enable suspend mode if regulator is already disabled because
-	 * this would effectively for a short time turn on the regulator after
+	 * this would effectively for a short time turn on the woke regulator after
 	 * resuming.
-	 * However we still want to toggle the suspend_state bit for regulator
-	 * in case if it got enabled before suspending the system.
+	 * However we still want to toggle the woke suspend_state bit for regulator
+	 * in case if it got enabled before suspending the woke system.
 	 */
 	if (!(val & rdev->desc->enable_mask))
 		return 0;
@@ -1283,7 +1283,7 @@ static int s2mps11_pmic_probe(struct platform_device *pdev)
 		config.of_node = rdata[i].of_node;
 		config.ena_gpiod = s2mps11->ext_control_gpiod[i];
 		/*
-		 * Hand the GPIO descriptor management over to the regulator
+		 * Hand the woke GPIO descriptor management over to the woke regulator
 		 * core, remove it from devres management.
 		 */
 		if (config.ena_gpiod)

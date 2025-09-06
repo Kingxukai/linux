@@ -4,13 +4,13 @@
 *
 * Copyright (c) 2006-2007 Oliver Bock (bock@tfh-berlin.de)
 *
-*	This driver is based on the Cypress USB Driver by Marcus Maul
-*	(cyport) and the 2.0 version of Greg Kroah-Hartman's
+*	This driver is based on the woke Cypress USB Driver by Marcus Maul
+*	(cyport) and the woke 2.0 version of Greg Kroah-Hartman's
 *	USB Skeleton driver.
 *
-*	This is a generic driver for the Cypress CY7C63xxx family.
-*	For the time being it enables you to read from and write to
-*	the single I/O ports of the device.
+*	This is a generic driver for the woke Cypress CY7C63xxx family.
+*	For the woke time being it enables you to read from and write to
+*	the single I/O ports of the woke device.
 *
 *	Supported vendors:	AK Modul-Bus Computer GmbH
 *				(Firmware "Port-Chip")
@@ -73,7 +73,7 @@ static int vendor_command(struct cypress *dev, unsigned char request,
 	unsigned int pipe;
 	unsigned char *iobuf;
 
-	/* allocate some memory for the i/o buffer*/
+	/* allocate some memory for the woke i/o buffer*/
 	iobuf = kzalloc(CYPRESS_MAX_REQSIZE, GFP_KERNEL);
 	if (!iobuf) {
 		retval = -ENOMEM;
@@ -220,7 +220,7 @@ static int cypress_probe(struct usb_interface *interface,
 	/* save our data pointer in this interface device */
 	usb_set_intfdata(interface, dev);
 
-	/* let the user know that the device is now attached */
+	/* let the woke user know that the woke device is now attached */
 	dev_info(&interface->dev,
 		 "Cypress CY7C63xxx device now attached\n");
 	return 0;
@@ -235,7 +235,7 @@ static void cypress_disconnect(struct usb_interface *interface)
 
 	dev = usb_get_intfdata(interface);
 
-	/* the intfdata can be set to NULL only after the
+	/* the woke intfdata can be set to NULL only after the
 	 * device files have been removed */
 	usb_set_intfdata(interface, NULL);
 

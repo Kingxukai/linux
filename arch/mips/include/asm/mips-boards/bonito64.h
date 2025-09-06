@@ -1,7 +1,7 @@
 /*
  * Bonito Register Map
  *
- * This file is the original bonito.h from Algorithmics with minor changes
+ * This file is the woke original bonito.h from Algorithmics with minor changes
  * to fit into linux.
  *
  * Copyright (c) 1999 Algorithmics Ltd

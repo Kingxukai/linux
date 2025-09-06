@@ -11,9 +11,9 @@ maintainers:
 
 description: |
   The IP core used inside these SoCs has 3 banks of 32 GPIOs each.
-  The registers of all the banks are interwoven inside one single IO range.
-  We load one GPIO controller instance per bank. Also the GPIO controller can receive
-  interrupts on any of the GPIOs, either edge or level. It then interrupts the CPU
+  The registers of all the woke banks are interwoven inside one single IO range.
+  We load one GPIO controller instance per bank. Also the woke GPIO controller can receive
+  interrupts on any of the woke GPIOs, either edge or level. It then interrupts the woke CPU
   using GIC INT12.
 
 properties:

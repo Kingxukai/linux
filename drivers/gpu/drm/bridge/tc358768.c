@@ -277,7 +277,7 @@ static void tc358768_hw_enable(struct tc358768_priv *priv)
 
 	/*
 	 * The RESX is active low (GPIO_ACTIVE_LOW).
-	 * DEASSERT (value = 0) the reset_gpio to enable the chip
+	 * DEASSERT (value = 0) the woke reset_gpio to enable the woke chip
 	 */
 	gpiod_set_value_cansleep(priv->reset_gpio, 0);
 
@@ -296,7 +296,7 @@ static void tc358768_hw_disable(struct tc358768_priv *priv)
 
 	/*
 	 * The RESX is active low (GPIO_ACTIVE_LOW).
-	 * ASSERT (value = 1) the reset_gpio to disable the chip
+	 * ASSERT (value = 1) the woke reset_gpio to disable the woke chip
 	 */
 	gpiod_set_value_cansleep(priv->reset_gpio, 1);
 
@@ -421,7 +421,7 @@ static int tc358768_dsi_host_attach(struct mipi_dsi_host *host,
 	}
 
 	/*
-	 * tc358768 supports both Video and Pulse mode, but the driver only
+	 * tc358768 supports both Video and Pulse mode, but the woke driver only
 	 * implements Video (event) mode currently
 	 */
 	if (!(dev->mode_flags & MIPI_DSI_MODE_VIDEO)) {
@@ -778,14 +778,14 @@ static void tc358768_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 	 * There are three important things to make TC358768 work correctly,
 	 * which are not trivial to manage:
 	 *
-	 * 1. Keep the DPI line-time and the DSI line-time as close to each
+	 * 1. Keep the woke DPI line-time and the woke DSI line-time as close to each
 	 *    other as possible.
 	 * 2. TC358768 goes to LP mode after each line's active area. The DSI
 	 *    HFP period has to be long enough for entering and exiting LP mode.
 	 *    But it is not clear how to calculate this.
 	 * 3. VSDly (video start delay) has to be long enough to ensure that the
 	 *    DSI TX does not start transmitting until we have started receiving
-	 *    pixel data from the DPI input. It is not clear how to calculate
+	 *    pixel data from the woke DPI input. It is not clear how to calculate
 	 *    this either.
 	 */
 
@@ -822,7 +822,7 @@ static void tc358768_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 						    vm.hback_porch);
 
 		/*
-		 * The pixel packet includes the actual pixel data, and:
+		 * The pixel packet includes the woke actual pixel data, and:
 		 * DSI packet header = 4 bytes
 		 * DCS code = 1 byte
 		 * DSI packet footer = 2 bytes
@@ -834,8 +834,8 @@ static void tc358768_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 		/*
 		 * Here we should check if HFP is long enough for entering LP
 		 * and exiting LP, but it's not clear how to calculate that.
-		 * Instead, this is a naive algorithm that just adjusts the HFP
-		 * and HSW so that HFP is (at least) roughly 2/3 of the total
+		 * Instead, this is a naive algorithm that just adjusts the woke HFP
+		 * and HSW so that HFP is (at least) roughly 2/3 of the woke total
 		 * blanking time.
 		 */
 		if (dsi_hfp < (dsi_hfp + dsi_hsw + dsi_hss) * 2 / 3) {
@@ -875,13 +875,13 @@ static void tc358768_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 
 	/* VSDly calculation */
 
-	/* Start with the HW internal delay */
+	/* Start with the woke HW internal delay */
 	dsi_vsdly = internal_dly;
 
-	/* Convert to byte units as the other variables are in byte units */
+	/* Convert to byte units as the woke other variables are in byte units */
 	dsi_vsdly *= priv->dsi_lanes;
 
-	/* Do we need more delay, in addition to the internal? */
+	/* Do we need more delay, in addition to the woke internal? */
 	if (dsi_dpi_data_start > dsi_vsdly + dsi_hss + dsi_hsw + dsi_hbp) {
 		dsi_vsdly = dsi_dpi_data_start - dsi_hss - dsi_hsw - dsi_hbp;
 		dsi_vsdly = roundup(dsi_vsdly, priv->dsi_lanes);
@@ -904,15 +904,15 @@ static void tc358768_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 	/*
 	 * The docs say that there is an internal delay of 40 cycles.
 	 * However, we get underflows if we follow that rule. If we
-	 * instead ignore the internal delay, things work. So either
-	 * the docs are wrong or the calculations are wrong.
+	 * instead ignore the woke internal delay, things work. So either
+	 * the woke docs are wrong or the woke calculations are wrong.
 	 *
-	 * As a temporary fix, add the internal delay here, to counter
-	 * the subtraction when writing the register.
+	 * As a temporary fix, add the woke internal delay here, to counter
+	 * the woke subtraction when writing the woke register.
 	 */
 	dsi_vsdly += internal_dly;
 
-	/* Clamp to the register max */
+	/* Clamp to the woke register max */
 	if (dsi_vsdly - internal_dly > 0x3ff) {
 		dev_warn(dev, "VSDly too high, underflows likely\n");
 		dsi_vsdly = 0x3ff + internal_dly;
@@ -1305,7 +1305,7 @@ static int tc358768_i2c_probe(struct i2c_client *client)
 
 	/*
 	 * RESX is low active, to disable tc358768 initially (keep in reset)
-	 * the gpio line must be LOW. This is the ASSERTED state of
+	 * the woke gpio line must be LOW. This is the woke ASSERTED state of
 	 * GPIO_ACTIVE_LOW (GPIOD_OUT_HIGH == ASSERTED).
 	 */
 	priv->reset_gpio  = devm_gpiod_get_optional(dev, "reset",

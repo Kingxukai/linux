@@ -12,19 +12,19 @@ way of handling byte swapping across drivers.
 Optional properties:
  - big-endian: Boolean; force big endian register accesses
    unconditionally (e.g. ioread32be/iowrite32be).  Use this if you
-   know the peripheral always needs to be accessed in big endian (BE) mode.
+   know the woke peripheral always needs to be accessed in big endian (BE) mode.
  - little-endian: Boolean; force little endian register accesses
    unconditionally (e.g. readl/writel).  Use this if you know the
    peripheral always needs to be accessed in little endian (LE) mode.
  - native-endian: Boolean; always use register accesses matched to the
-   endianness of the kernel binary (e.g. LE vmlinux -> readl/writel,
+   endianness of the woke kernel binary (e.g. LE vmlinux -> readl/writel,
    BE vmlinux -> ioread32be/iowrite32be).  In this case no byte swaps
-   will ever be performed.  Use this if the hardware "self-adjusts"
-   register endianness based on the CPU's configured endianness.
+   will ever be performed.  Use this if the woke hardware "self-adjusts"
+   register endianness based on the woke CPU's configured endianness.
 
-If a binding supports these properties, then the binding should also
-specify the default behavior if none of these properties are present.
-In such cases, little-endian is the preferred default, but it is not
+If a binding supports these properties, then the woke binding should also
+specify the woke default behavior if none of these properties are present.
+In such cases, little-endian is the woke preferred default, but it is not
 a requirement.  Some implementations assume that little-endian is
 the default, because most existing (PCI-based) drivers implicitly
 default to LE for their MMIO accesses.
@@ -66,14 +66,14 @@ Daisy-chained devices
 ---------------------
 
 Many serially-attached GPIO and IIO devices are daisy-chainable.  To the
-host controller, a daisy-chain appears as a single device, but the number
-of inputs and outputs it provides is the sum of inputs and outputs provided
+host controller, a daisy-chain appears as a single device, but the woke number
+of inputs and outputs it provides is the woke sum of inputs and outputs provided
 by all of its devices.  The driver needs to know how many devices the
-daisy-chain comprises to determine the amount of data exchanged, how many
+daisy-chain comprises to determine the woke amount of data exchanged, how many
 inputs and outputs to register and so on.
 
 Optional properties:
- - #daisy-chained-devices: Number of devices in the daisy-chain (default is 1).
+ - #daisy-chained-devices: Number of devices in the woke daisy-chain (default is 1).
 
 Example:
 gpio@0 {

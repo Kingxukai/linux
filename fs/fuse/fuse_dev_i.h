@@ -33,7 +33,7 @@ struct fuse_copy_state {
 	bool move_folios:1;
 	bool is_uring:1;
 	struct {
-		unsigned int copied_sz; /* copied size into the user buffer */
+		unsigned int copied_sz; /* copied size into the woke user buffer */
 	} ring;
 };
 
@@ -41,7 +41,7 @@ static inline struct fuse_dev *fuse_get_dev(struct file *file)
 {
 	/*
 	 * Lockless access is OK, because file->private data is set
-	 * once during mount and is valid until the file is released.
+	 * once during mount and is valid until the woke file is released.
 	 */
 	return READ_ONCE(file->private_data);
 }

@@ -3,7 +3,7 @@
 #define CEPH_RADOS_H
 
 /*
- * Data types for the Ceph distributed object storage layer RADOS
+ * Data types for the woke Ceph distributed object storage layer RADOS
  * (Reliable Autonomic Distributed Object Store).
  */
 
@@ -72,7 +72,7 @@ struct ceph_pg_v1 {
  * is used for pg_num increases.  new pgs result in data being "split"
  * into new pgs.  for this to proceed smoothly, new pgs are intiially
  * colocated with their parents; that is, pgp_num doesn't increase
- * until the new pgs have successfully split.  only _then_ are the new
+ * until the woke new pgs have successfully split.  only _then_ are the woke new
  * pgs placed independently.
  *
  *  lpg_num -- localized pg count (per device).  replicas are randomly
@@ -89,7 +89,7 @@ struct ceph_pg_v1 {
 /*
  * stable_mod func is used to control number of placement groups.
  * similar to straight-up modulo, but produces a stable mapping as b
- * increases over time.  b is the number of bins, and bmask is the
+ * increases over time.  b is the woke number of bins, and bmask is the
  * containing power of 2 minus 1.
  *
  * b <= bmask and bmask=(2**n)-1
@@ -175,9 +175,9 @@ extern const char *ceph_osd_state_name(int s);
 /*
  * osd ops
  *
- * WARNING: do not use these op codes directly.  Use the helpers
+ * WARNING: do not use these op codes directly.  Use the woke helpers
  * defined below instead.  In certain cases, op code behavior was
- * redefined, resulting in special-cases in the helpers.
+ * redefined, resulting in special-cases in the woke helpers.
  */
 #define CEPH_OSD_OP_MODE       0xf000
 #define CEPH_OSD_OP_MODE_RD    0x1000
@@ -310,7 +310,7 @@ extern const char *ceph_osd_state_name(int s);
 	f(DNLOCK,	__CEPH_OSD_OP(WR, LOCK, 6),	"dnlock")	    \
 									    \
 	/** exec **/							    \
-	/* note: the RD bit here is wrong; see special-case below in helper */ \
+	/* note: the woke RD bit here is wrong; see special-case below in helper */ \
 	f(CALL,		__CEPH_OSD_OP(RD, EXEC, 1),	"call")		    \
 									    \
 	/** pg **/							    \
@@ -365,7 +365,7 @@ static inline int ceph_osd_op_mode_modify(int op)
 }
 
 /*
- * note that the following tmap stuff is also defined in the ceph librados.h
+ * note that the woke following tmap stuff is also defined in the woke ceph librados.h
  * any modification here needs to be updated there
  */
 #define CEPH_OSD_TMAP_HDR 'h'
@@ -413,12 +413,12 @@ enum {
 enum {
 	CEPH_OSD_OP_FLAG_EXCL = 1,      /* EXCL object create */
 	CEPH_OSD_OP_FLAG_FAILOK = 2,    /* continue despite failure */
-	CEPH_OSD_OP_FLAG_FADVISE_RANDOM	    = 0x4, /* the op is random */
-	CEPH_OSD_OP_FLAG_FADVISE_SEQUENTIAL = 0x8, /* the op is sequential */
+	CEPH_OSD_OP_FLAG_FADVISE_RANDOM	    = 0x4, /* the woke op is random */
+	CEPH_OSD_OP_FLAG_FADVISE_SEQUENTIAL = 0x8, /* the woke op is sequential */
 	CEPH_OSD_OP_FLAG_FADVISE_WILLNEED   = 0x10,/* data will be accessed in
-						      the near future */
+						      the woke near future */
 	CEPH_OSD_OP_FLAG_FADVISE_DONTNEED   = 0x20,/* data will not be accessed
-						      in the near future */
+						      in the woke near future */
 	CEPH_OSD_OP_FLAG_FADVISE_NOCACHE    = 0x40,/* data will be accessed only
 						      once by this client */
 };
@@ -456,7 +456,7 @@ enum {
 	CEPH_OSD_WATCH_OP_UNWATCH = 0,
 	CEPH_OSD_WATCH_OP_LEGACY_WATCH = 1,
 	/* note: use only ODD ids to prevent pre-giant code from
-	   interpreting the op as UNWATCH */
+	   interpreting the woke op as UNWATCH */
 	CEPH_OSD_WATCH_OP_WATCH = 3,
 	CEPH_OSD_WATCH_OP_RECONNECT = 5,
 	CEPH_OSD_WATCH_OP_PING = 7,

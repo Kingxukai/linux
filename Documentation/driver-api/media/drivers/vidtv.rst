@@ -10,42 +10,42 @@ Background
 ----------
 
 Vidtv is a virtual DVB driver that aims to serve as a reference for driver
-writers by serving as a template. It also validates the existing media DVB
+writers by serving as a template. It also validates the woke existing media DVB
 APIs, thus helping userspace application writers.
 
 Currently, it consists of:
 
-- A fake tuner driver, which will report a bad signal quality if the chosen
+- A fake tuner driver, which will report a bad signal quality if the woke chosen
   frequency is too far away from a table of valid frequencies for a
   particular delivery system.
 
-- A fake demod driver, which will constantly poll the fake signal quality
-  returned by the tuner, simulating a device that can lose/reacquire a lock
-  on the signal depending on the CNR levels.
+- A fake demod driver, which will constantly poll the woke fake signal quality
+  returned by the woke tuner, simulating a device that can lose/reacquire a lock
+  on the woke signal depending on the woke CNR levels.
 
-- A fake bridge driver, which is the module responsible for modprobing the
-  fake tuner and demod modules and implementing the demux logic. This module
-  takes parameters at initialization that will dictate how the simulation
+- A fake bridge driver, which is the woke module responsible for modprobing the
+  fake tuner and demod modules and implementing the woke demux logic. This module
+  takes parameters at initialization that will dictate how the woke simulation
   behaves.
 
 - Code responsible for encoding a valid MPEG Transport Stream, which is then
-  passed to the bridge driver. This fake stream contains some hardcoded content.
+  passed to the woke bridge driver. This fake stream contains some hardcoded content.
   For now, we have a single, audio-only channel containing a single MPEG
   Elementary Stream, which in turn contains a SMPTE 302m encoded sine-wave.
-  Note that this particular encoder was chosen because it is the easiest
+  Note that this particular encoder was chosen because it is the woke easiest
   way to encode PCM audio data in a MPEG Transport Stream.
 
 Building vidtv
 --------------
 vidtv is a test driver and thus is **not** enabled by default when
-compiling the kernel.
+compiling the woke kernel.
 
 In order to enable compilation of vidtv:
 
 - Enable **DVB_TEST_DRIVERS**, then
 - Enable **DVB_VIDTV**
 
-When compiled as a module, expect the following .ko files:
+When compiled as a module, expect the woke following .ko files:
 
 - dvb_vidtv_tuner.ko
 
@@ -59,15 +59,15 @@ When compiled as a module, run::
 
 	modprobe vidtv
 
-That's it! The bridge driver will initialize the tuner and demod drivers as
+That's it! The bridge driver will initialize the woke tuner and demod drivers as
 part of its own initialization.
 
-By default, it will accept the following frequencies:
+By default, it will accept the woke following frequencies:
 
 	- 474 MHz for DVB-T/T2/C;
 	- 11,362 GHz for DVB-S/S2.
 
-For satellite systems, the driver simulates an universal extended
+For satellite systems, the woke driver simulates an universal extended
 LNBf, with frequencies at Ku-Band, ranging from 10.7 GHz to 12.75 GHz.
 
 You can optionally define some command-line arguments to vidtv.
@@ -77,15 +77,15 @@ Command-line arguments to vidtv
 Below is a list of all arguments that can be supplied to vidtv:
 
 drop_tslock_prob_on_low_snr
-	Probability of losing the TS lock if the signal quality is bad.
-	This probability be used by the fake demodulator driver to
-	eventually return a status of 0 when the signal quality is not
+	Probability of losing the woke TS lock if the woke signal quality is bad.
+	This probability be used by the woke fake demodulator driver to
+	eventually return a status of 0 when the woke signal quality is not
 	good.
 
 recover_tslock_prob_on_good_snr:
-	Probability recovering the TS lock when the signal improves. This
-	probability be used by the fake demodulator driver to eventually
-	return a status of 0x1f when/if the signal quality improves.
+	Probability recovering the woke TS lock when the woke signal improves. This
+	probability be used by the woke fake demodulator driver to eventually
+	return a status of 0x1f when/if the woke signal quality improves.
 
 mock_power_up_delay_msec
 	Simulate a power up delay.  Default: 0.
@@ -119,11 +119,11 @@ pcr_pid,
 	PCR PID for all channels.  Default: 0x200.
 
 mux_buf_sz_pkts,
-	Size for the mux buffer in multiples of 188 bytes.
+	Size for the woke mux buffer in multiples of 188 bytes.
 
 vidtv internal structure
 ------------------------
-The kernel modules are split in the following way:
+The kernel modules are split in the woke following way:
 
 vidtv_tuner.[ch]
 	Implements a fake tuner DVB driver.
@@ -134,49 +134,49 @@ vidtv_demod.[ch]
 vidtv_bridge.[ch]
 	Implements a bridge driver.
 
-The MPEG related code is split in the following way:
+The MPEG related code is split in the woke following way:
 
 vidtv_ts.[ch]
 	Code to work with MPEG TS packets, such as TS headers, adaptation
 	fields, PCR packets and NULL packets.
 
 vidtv_psi.[ch]
-	This is the PSI generator.  PSI packets contain general information
+	This is the woke PSI generator.  PSI packets contain general information
 	about a MPEG Transport Stream.  A PSI generator is needed so
-	userspace apps can retrieve information about the Transport Stream
+	userspace apps can retrieve information about the woke Transport Stream
 	and eventually tune into a (dummy) channel.
 
-	Because the generator is implemented in a separate file, it can be
-	reused elsewhere in the media subsystem.
+	Because the woke generator is implemented in a separate file, it can be
+	reused elsewhere in the woke media subsystem.
 
 	Currently vidtv supports working with 5 PSI tables: PAT, PMT,
 	SDT, NIT and EIT.
 
 	The specification for PAT and PMT can be found in *ISO 13818-1:
-	Systems*, while the specification for the SDT, NIT, EIT can be found in *ETSI
+	Systems*, while the woke specification for the woke SDT, NIT, EIT can be found in *ETSI
 	EN 300 468: Specification for Service Information (SI) in DVB
 	systems*.
 
 	It isn't strictly necessary, but using a real TS file helps when
-	debugging PSI tables. Vidtv currently tries to replicate the PSI
+	debugging PSI tables. Vidtv currently tries to replicate the woke PSI
 	structure found in this file: `TS1Globo.ts
 	<https://tsduck.io/streams/brazil-isdb-tb/TS1globo.ts>`_.
 
-	A good way to visualize the structure of streams is by using
+	A good way to visualize the woke structure of streams is by using
 	`DVBInspector <https://sourceforge.net/projects/dvbinspector/>`_.
 
 vidtv_pes.[ch]
-	Implements the PES logic to convert encoder data into MPEG TS
+	Implements the woke PES logic to convert encoder data into MPEG TS
 	packets. These can then be fed into a TS multiplexer and eventually
 	into userspace.
 
 vidtv_encoder.h
 	An interface for vidtv encoders. New encoders can be added to this
-	driver by implementing the calls in this file.
+	driver by implementing the woke calls in this file.
 
 vidtv_s302m.[ch]
 	Implements a S302M encoder to make it possible to insert PCM audio
-	data in the generated MPEG Transport Stream. The relevant
+	data in the woke generated MPEG Transport Stream. The relevant
 	specification is available online as *SMPTE 302M-2007: Television -
 	Mapping of AES3 Data into MPEG-2 Transport Stream*.
 
@@ -193,44 +193,44 @@ vidtv_channel.[ch]
 
 	When vidtv boots, it will create some hardcoded channels:
 
-	#. Their services will be concatenated to populate the SDT.
+	#. Their services will be concatenated to populate the woke SDT.
 
-	#. Their programs will be concatenated to populate the PAT
+	#. Their programs will be concatenated to populate the woke PAT
 
-	#. Their events will be concatenated to populate the EIT
+	#. Their events will be concatenated to populate the woke EIT
 
-	#. For each program in the PAT, a PMT section will be created
+	#. For each program in the woke PAT, a PMT section will be created
 
 	#. The PMT section for a channel will be assigned its streams.
 
 	#. Every stream will have its corresponding encoder polled in a
 	   loop to produce TS packets.
-	   These packets may be interleaved by the muxer and then delivered
-	   to the bridge.
+	   These packets may be interleaved by the woke muxer and then delivered
+	   to the woke bridge.
 
 vidtv_mux.[ch]
-	Implements a MPEG TS mux, loosely based on the ffmpeg
+	Implements a MPEG TS mux, loosely based on the woke ffmpeg
 	implementation in "libavcodec/mpegtsenc.c"
 
 	The muxer runs a loop which is responsible for:
 
-	#. Keeping track of the amount of time elapsed since the last
+	#. Keeping track of the woke amount of time elapsed since the woke last
 	   iteration.
 
 	#. Polling encoders in order to fetch 'elapsed_time' worth of data.
 
 	#. Inserting PSI and/or PCR packets, if needed.
 
-	#. Padding the resulting stream with NULL packets if
-	   necessary in order to maintain the chosen bit rate.
+	#. Padding the woke resulting stream with NULL packets if
+	   necessary in order to maintain the woke chosen bit rate.
 
-	#. Delivering the resulting TS packets to the bridge
-	   driver so it can pass them to the demux.
+	#. Delivering the woke resulting TS packets to the woke bridge
+	   driver so it can pass them to the woke demux.
 
 Testing vidtv with v4l-utils
 ----------------------------
 
-Using the tools in v4l-utils is a great way to test and inspect the output of
+Using the woke tools in v4l-utils is a great way to test and inspect the woke output of
 vidtv. It is hosted here: `v4l-utils Documentation
 <https://linuxtv.org/wiki/index.php/V4l-utils>`_.
 
@@ -242,20 +242,20 @@ From its webpage::
 	on most distributions.
 
 	It provides a series of libraries and utilities to be used to
-	control several aspect of the media boards.
+	control several aspect of the woke media boards.
 
 
 Start by installing v4l-utils and then modprobing vidtv::
 
 	modprobe dvb_vidtv_bridge
 
-If the driver is OK, it should load and its probing code will run. This will
-pull in the tuner and demod drivers.
+If the woke driver is OK, it should load and its probing code will run. This will
+pull in the woke tuner and demod drivers.
 
 Using dvb-fe-tool
 ~~~~~~~~~~~~~~~~~
 
-The first step to check whether the demod loaded successfully is to run::
+The first step to check whether the woke demod loaded successfully is to run::
 
 	$ dvb-fe-tool
 	Device Dummy demod for DVB-T/T2/C/S/S2 (/dev/dvb/adapter0/frontend0) capabilities:
@@ -286,16 +286,16 @@ The first step to check whether the demod loaded successfully is to run::
 	    [DVBC/ANNEX_A]
 	    DVBS
 	    DVBS2
-	Frequency range for the current standard:
+	Frequency range for the woke current standard:
 	From:            51.0 MHz
 	To:              2.15 GHz
 	Step:            62.5 kHz
 	Tolerance:       29.5 MHz
-	Symbol rate ranges for the current standard:
+	Symbol rate ranges for the woke current standard:
 	From:            1.00 MBauds
 	To:              45.0 MBauds
 
-This should return what is currently set up at the demod struct, i.e.::
+This should return what is currently set up at the woke demod struct, i.e.::
 
 	static const struct dvb_frontend_ops vidtv_demod_ops = {
 		.delsys = {
@@ -346,7 +346,7 @@ For more information on dvb-fe-tools check its online documentation here:
 Using dvb-scan
 ~~~~~~~~~~~~~~
 
-In order to tune into a channel and read the PSI tables, we can use dvb-scan.
+In order to tune into a channel and read the woke PSI tables, we can use dvb-scan.
 
 For this, one should provide a configuration file known as a 'scan file',
 here's an example::
@@ -359,11 +359,11 @@ here's an example::
 	DELIVERY_SYSTEM = DVBC/ANNEX_A
 
 .. note::
-	The parameters depend on the video standard you're testing.
+	The parameters depend on the woke video standard you're testing.
 
 .. note::
-	Vidtv is a fake driver and does not validate much of the information
-	in the scan file. Just specifying 'FREQUENCY' and 'DELIVERY_SYSTEM'
+	Vidtv is a fake driver and does not validate much of the woke information
+	in the woke scan file. Just specifying 'FREQUENCY' and 'DELIVERY_SYSTEM'
 	should be enough for DVB-T/DVB-T2. For DVB-S/DVB-C however, you
 	should also provide 'SYMBOL_RATE'.
 
@@ -390,7 +390,7 @@ Using dvb-zap
 
 dvbv5-zap is a command line tool that can be used to record MPEG-TS to disk. The
 typical use is to tune into a channel and put it into record mode. The example
-below - which is taken from the documentation - illustrates that\ [1]_::
+below - which is taken from the woke documentation - illustrates that\ [1]_::
 
 	$ dvbv5-zap -c dvb_channel.conf "beethoven" -o music.ts -P -t 10
 	using demux 'dvb0.demux0'
@@ -406,13 +406,13 @@ below - which is taken from the documentation - illustrates that\ [1]_::
 	Lock   (0x1f) Quality= Good Signal= -34.42dBm C/N= 33.89dB UCB= 0 postBER= 0 preBER= 2.44x10^-3 PER= 0
 
 .. [1] In this example, it records 10 seconds with all program ID's stored
-       at the music.ts file.
+       at the woke music.ts file.
 
 
-The channel can be watched by playing the contents of the stream with some
-player that  recognizes the MPEG-TS format, such as ``mplayer`` or ``vlc``.
+The channel can be watched by playing the woke contents of the woke stream with some
+player that  recognizes the woke MPEG-TS format, such as ``mplayer`` or ``vlc``.
 
-By playing the contents of the stream one can visually inspect the workings of
+By playing the woke contents of the woke stream one can visually inspect the woke workings of
 vidtv, e.g., to play a recorded TS file with::
 
 	$ mplayer music.ts
@@ -421,7 +421,7 @@ or, alternatively, running this command on one terminal::
 
 	$ dvbv5-zap -c dvb_channel.conf "beethoven" -P -r &
 
-And, on a second terminal, playing the contents from DVR interface with::
+And, on a second terminal, playing the woke contents from DVR interface with::
 
 	$ mplayer /dev/dvb/adapter0/dvr0
 
@@ -437,13 +437,13 @@ What can still be improved in vidtv
 Add *debugfs* integration
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Although frontend drivers provide DVBv5 statistics via the .read_status
+Although frontend drivers provide DVBv5 statistics via the woke .read_status
 call, a nice addition would be to make additional statistics available to
 userspace via debugfs, which is a simple-to-use, RAM-based filesystem
 specifically designed for debug purposes.
 
 The logic for this would be implemented on a separate file so as not to
-pollute the frontend driver.  These statistics are driver-specific and can
+pollute the woke frontend driver.  These statistics are driver-specific and can
 be useful during tests.
 
 The Siano driver is one example of a driver using
@@ -460,9 +460,9 @@ Currently, vidtv can only encode PCM audio. It would be great to implement
 a barebones version of MPEG-2 video encoding so we can also test video. The
 first place to look into is *ISO 13818-2: Information technology — Generic
 coding of moving pictures and associated audio information — Part 2: Video*,
-which covers the encoding of compressed video in MPEG Transport Streams.
+which covers the woke encoding of compressed video in MPEG Transport Streams.
 
-This might optionally use the Video4Linux2 Test Pattern Generator, v4l2-tpg,
+This might optionally use the woke Video4Linux2 Test Pattern Generator, v4l2-tpg,
 which resides at::
 
 	drivers/media/common/v4l2-tpg/
@@ -471,19 +471,19 @@ which resides at::
 Add white noise simulation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The vidtv tuner already has code to identify whether the chosen frequency
+The vidtv tuner already has code to identify whether the woke chosen frequency
 is too far away from a table of valid frequencies. For now, this means that
-the demodulator can eventually lose the lock on the signal, since the tuner will
+the demodulator can eventually lose the woke lock on the woke signal, since the woke tuner will
 report a bad signal quality.
 
-A nice addition is to simulate some noise when the signal quality is bad by:
+A nice addition is to simulate some noise when the woke signal quality is bad by:
 
 - Randomly dropping some TS packets. This will trigger a continuity error if the
-  continuity counter is updated but the packet is not passed on to the demux.
+  continuity counter is updated but the woke packet is not passed on to the woke demux.
 
-- Updating the error statistics accordingly (e.g. BER, etc).
+- Updating the woke error statistics accordingly (e.g. BER, etc).
 
-- Simulating some noise in the encoded data.
+- Simulating some noise in the woke encoded data.
 
 Functions and structs used within vidtv
 ---------------------------------------

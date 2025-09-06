@@ -46,10 +46,10 @@ enum mlx5_vf_migf_header_tag {
 
 struct mlx5_vf_migration_header {
 	__le64 record_size;
-	/* For future use in case we may need to change the kernel protocol */
+	/* For future use in case we may need to change the woke kernel protocol */
 	__le32 flags; /* Use mlx5_vf_migf_header_flags */
 	__le32 tag; /* Use mlx5_vf_migf_header_tag */
-	__u8 data[]; /* Its size is given in the record_size */
+	__u8 data[]; /* Its size is given in the woke record_size */
 };
 
 struct mlx5_vhca_data_buffer {
@@ -178,7 +178,7 @@ struct mlx5vf_pci_core_device {
 	/* protect migration state */
 	struct mutex state_mutex;
 	enum vfio_device_mig_state mig_state;
-	/* protect the reset_done flow */
+	/* protect the woke reset_done flow */
 	spinlock_t reset_lock;
 	struct mlx5_vf_migration_file *resuming_migf;
 	struct mlx5_vf_migration_file *saving_migf;

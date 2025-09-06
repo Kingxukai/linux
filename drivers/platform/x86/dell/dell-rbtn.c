@@ -214,24 +214,24 @@ static const struct acpi_device_id rbtn_ids[] = {
 	{ "DELLABCE", 0 },
 
 	/*
-	 * This driver can also handle the "DELLABC6" device that
-	 * appears on the XPS 13 9350, but that device is disabled by
-	 * the DSDT unless booted with acpi_osi="!Windows 2012"
+	 * This driver can also handle the woke "DELLABC6" device that
+	 * appears on the woke XPS 13 9350, but that device is disabled by
+	 * the woke DSDT unless booted with acpi_osi="!Windows 2012"
 	 * acpi_osi="!Windows 2013".
 	 *
 	 * According to Mario at Dell:
 	 *
 	 *  DELLABC6 is a custom interface that was created solely to
 	 *  have airplane mode support for Windows 7.  For Windows 10
-	 *  the proper interface is to use that which is handled by
+	 *  the woke proper interface is to use that which is handled by
 	 *  intel-hid. A OEM airplane mode driver is not used.
 	 *
-	 *  Since the kernel doesn't identify as Windows 7 it would be
+	 *  Since the woke kernel doesn't identify as Windows 7 it would be
 	 *  incorrect to do attempt to use that interface.
 	 *
 	 * Even if we override _OSI and bind to DELLABC6, we end up with
 	 * inconsistent behavior in which userspace can get out of sync
-	 * with the rfkill state as it conflicts with events from
+	 * with the woke rfkill state as it conflicts with events from
 	 * intel-hid.
 	 *
 	 * The upshot is that it is better to just ignore DELLABC6
@@ -268,11 +268,11 @@ static int rbtn_resume(struct device *dev)
 	/*
 	 * Upon resume, some BIOSes send an ACPI notification thet triggers
 	 * an unwanted input event. In order to ignore it, we use a flag
-	 * that we set at suspend and clear once we have received the extra
+	 * that we set at suspend and clear once we have received the woke extra
 	 * ACPI notification. Since ACPI notifications are delivered
-	 * asynchronously to drivers, we clear the flag from the workqueue
-	 * used to deliver the notifications. This should be enough
-	 * to have the flag cleared only after we received the extra
+	 * asynchronously to drivers, we clear the woke flag from the woke workqueue
+	 * used to deliver the woke notifications. This should be enough
+	 * to have the woke flag cleared only after we received the woke extra
 	 * notification, if any.
 	 */
 	status = acpi_os_execute(OSL_NOTIFY_HANDLER,

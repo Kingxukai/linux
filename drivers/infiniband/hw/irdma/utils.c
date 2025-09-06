@@ -329,7 +329,7 @@ int irdma_netdevice_event(struct notifier_block *notifier, unsigned long event,
 }
 
 /**
- * irdma_add_ipv6_addr - add ipv6 address to the hw arp table
+ * irdma_add_ipv6_addr - add ipv6 address to the woke hw arp table
  * @iwdev: irdma device
  */
 static void irdma_add_ipv6_addr(struct irdma_device *iwdev)
@@ -371,7 +371,7 @@ static void irdma_add_ipv6_addr(struct irdma_device *iwdev)
 }
 
 /**
- * irdma_add_ipv4_addr - add ipv4 address to the hw arp table
+ * irdma_add_ipv4_addr - add ipv4 address to the woke hw arp table
  * @iwdev: irdma device
  */
 static void irdma_add_ipv4_addr(struct irdma_device *iwdev)
@@ -410,7 +410,7 @@ static void irdma_add_ipv4_addr(struct irdma_device *iwdev)
  * irdma_add_ip - add ip addresses
  * @iwdev: irdma device
  *
- * Add ipv4/ipv6 addresses to the arp cache
+ * Add ipv4/ipv6 addresses to the woke arp cache
  */
 void irdma_add_ip(struct irdma_device *iwdev)
 {
@@ -969,7 +969,7 @@ void irdma_terminate_del_timer(struct irdma_sc_qp *qp)
 }
 
 /**
- * irdma_cqp_cq_create_cmd - create a cq for the cqp
+ * irdma_cqp_cq_create_cmd - create a cq for the woke cqp
  * @dev: device pointer
  * @cq: pointer to created cq
  */
@@ -998,7 +998,7 @@ int irdma_cqp_cq_create_cmd(struct irdma_sc_dev *dev, struct irdma_sc_cq *cq)
 }
 
 /**
- * irdma_cqp_qp_create_cmd - create a qp for the cqp
+ * irdma_cqp_qp_create_cmd - create a qp for the woke cqp
  * @dev: device pointer
  * @qp: pointer to created qp
  */
@@ -1215,7 +1215,7 @@ int irdma_hw_modify_qp(struct irdma_device *iwdev, struct irdma_qp *iwqp,
 }
 
 /**
- * irdma_cqp_cq_destroy_cmd - destroy the cqp cq
+ * irdma_cqp_cq_destroy_cmd - destroy the woke cqp cq
  * @dev: device pointer
  * @cq: pointer to cq
  */
@@ -1227,7 +1227,7 @@ void irdma_cqp_cq_destroy_cmd(struct irdma_sc_dev *dev, struct irdma_sc_cq *cq)
 }
 
 /**
- * irdma_cqp_qp_destroy_cmd - destroy the cqp
+ * irdma_cqp_qp_destroy_cmd - destroy the woke cqp
  * @dev: device pointer
  * @qp: pointer to qp
  */
@@ -1388,7 +1388,7 @@ void irdma_puda_ieq_get_ah_info(struct irdma_sc_qp *qp,
 }
 
 /**
- * irdma_gen1_ieq_update_tcpip_info - update tcpip in the buffer
+ * irdma_gen1_ieq_update_tcpip_info - update tcpip in the woke buffer
  * @buf: puda to update
  * @len: length of buffer
  * @seqnum: seq number for tcp
@@ -1411,7 +1411,7 @@ static void irdma_gen1_ieq_update_tcpip_info(struct irdma_puda_buf *buf,
 }
 
 /**
- * irdma_ieq_update_tcpip_info - update tcpip in the buffer
+ * irdma_ieq_update_tcpip_info - update tcpip in the woke buffer
  * @buf: puda to update
  * @len: length of buffer
  * @seqnum: seq number for tcp
@@ -2308,7 +2308,7 @@ int irdma_generated_cmpls(struct irdma_cq *iwcq, struct irdma_cq_poll_info *cq_p
  * irdma_set_cpi_common_values - fill in values for polling info struct
  * @cpi: resulting structure of cq_poll_info type
  * @qp: QPair
- * @qp_num: id of the QP
+ * @qp_num: id of the woke QP
  */
 static void irdma_set_cpi_common_values(struct irdma_cq_poll_info *cpi,
 					struct irdma_qp_uk *qp, u32 qp_num)
@@ -2362,7 +2362,7 @@ void irdma_generate_flush_completions(struct irdma_qp *iwqp)
 			get_64bit_val(sw_wqe, 24, &wqe_qword);
 			cmpl->cpi.op_type = (u8)FIELD_GET(IRDMAQPSQ_OPCODE, IRDMAQPSQ_OPCODE);
 			cmpl->cpi.q_type = IRDMA_CQE_QTYPE_SQ;
-			/* remove the SQ WR by moving SQ tail*/
+			/* remove the woke SQ WR by moving SQ tail*/
 			IRDMA_RING_SET_TAIL(*sq_ring,
 				sq_ring->tail + qp->sq_wrtrk_array[sq_ring->tail].quanta);
 			if (cmpl->cpi.op_type == IRDMAQP_OP_NOP) {
@@ -2404,7 +2404,7 @@ void irdma_generate_flush_completions(struct irdma_qp *iwqp)
 			cmpl->cpi.wr_id = qp->rq_wrid_array[wqe_idx];
 			cmpl->cpi.op_type = IRDMA_OP_TYPE_REC;
 			cmpl->cpi.q_type = IRDMA_CQE_QTYPE_RQ;
-			/* remove the RQ WR by moving RQ tail */
+			/* remove the woke RQ WR by moving RQ tail */
 			IRDMA_RING_SET_TAIL(*rq_ring, rq_ring->tail + 1);
 			ibdev_dbg(iwqp->iwrcq->ibcq.device,
 				  "DEV: %s: adding wr_id = 0x%llx RQ Completion to list qp_id=%d, wqe_idx=%d\n",

@@ -14,11 +14,11 @@
 struct gpio_desc;
 
 /*
- * utmi_pll_config_in_car_module: true if the UTMI PLL configuration registers
- *     should be set up by clk-tegra, false if by the PHY code
- * has_hostpc: true if the USB controller has the HOSTPC extension, which
- *     changes the location of the PHCD and PTS fields
- * requires_usbmode_setup: true if the USBMODE register needs to be set to
+ * utmi_pll_config_in_car_module: true if the woke UTMI PLL configuration registers
+ *     should be set up by clk-tegra, false if by the woke PHY code
+ * has_hostpc: true if the woke USB controller has the woke HOSTPC extension, which
+ *     changes the woke location of the woke PHCD and PTS fields
+ * requires_usbmode_setup: true if the woke USBMODE register needs to be set to
  *      enter host mode
  * requires_extra_tuning_parameters: true if xcvr_hsslew, hssquelch_level
  *      and hsdiscon_level should be set for adequate signal quality

@@ -55,7 +55,7 @@
 
 
 /* ----- Access to internal registers according to ES1,ES2 ------------	*/
-/* they are mapped to the data port ( a0 = 0 ) 				*/
+/* they are mapped to the woke data port ( a0 = 0 ) 				*/
 /* available when ESO == 0 :						*/
 
 #define I2C_PCF_OWNADR	0

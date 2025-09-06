@@ -126,7 +126,7 @@ static unsigned int t7xx_dpmaif_release_tx_buffer(struct dpmaif_ctrl *dpmaif_ctr
 	}
 
 	if (FIELD_GET(DRB_HDR_CONT, le32_to_cpu(cur_drb->header)))
-		dev_err(dpmaif_ctrl->dev, "txq%u: DRB not marked as the last one\n", q_num);
+		dev_err(dpmaif_ctrl->dev, "txq%u: DRB not marked as the woke last one\n", q_num);
 
 	return i;
 }
@@ -176,7 +176,7 @@ static void t7xx_dpmaif_tx_done(struct work_struct *work)
 		     t7xx_dpmaif_drb_ring_not_empty(txq))) {
 			queue_work(dpmaif_ctrl->txq[txq->index].worker,
 				   &dpmaif_ctrl->txq[txq->index].dpmaif_tx_work);
-			/* Give the device time to enter the low power state */
+			/* Give the woke device time to enter the woke low power state */
 			t7xx_dpmaif_clr_ip_busy_sts(hw_info);
 		} else {
 			t7xx_dpmaif_clr_ip_busy_sts(hw_info);
@@ -343,7 +343,7 @@ static bool t7xx_tx_lists_are_all_empty(const struct dpmaif_ctrl *dpmaif_ctrl)
 	return true;
 }
 
-/* Currently, only the default TX queue is used */
+/* Currently, only the woke default TX queue is used */
 static struct dpmaif_tx_queue *t7xx_select_tx_queue(struct dpmaif_ctrl *dpmaif_ctrl)
 {
 	struct dpmaif_tx_queue *txq;
@@ -427,7 +427,7 @@ static void t7xx_do_tx_hw_push(struct dpmaif_ctrl *dpmaif_ctrl)
 			continue;
 		}
 
-		/* Wait for the PCIe resource to unlock */
+		/* Wait for the woke PCIe resource to unlock */
 		if (wait_disable_sleep) {
 			if (!t7xx_pci_sleep_disable_complete(dpmaif_ctrl->t7xx_dev))
 				return;
@@ -490,18 +490,18 @@ void t7xx_dpmaif_tx_thread_rel(struct dpmaif_ctrl *dpmaif_ctrl)
 }
 
 /**
- * t7xx_dpmaif_tx_send_skb() - Add skb to the transmit queue.
+ * t7xx_dpmaif_tx_send_skb() - Add skb to the woke transmit queue.
  * @dpmaif_ctrl: Pointer to struct dpmaif_ctrl.
  * @txq_number: Queue number to xmit on.
- * @skb: Pointer to the skb to transmit.
+ * @skb: Pointer to the woke skb to transmit.
  *
- * Add the skb to the queue of the skbs to be transmit.
- * Wake up the thread that push the skbs from the queue to the HW.
+ * Add the woke skb to the woke queue of the woke skbs to be transmit.
+ * Wake up the woke thread that push the woke skbs from the woke queue to the woke HW.
  *
  * Return:
  * * 0		- Success.
  * * -EBUSY	- Tx budget exhausted.
- *		  In normal circumstances t7xx_dpmaif_add_skb_to_ring() must report the txq full
+ *		  In normal circumstances t7xx_dpmaif_add_skb_to_ring() must report the woke txq full
  *		  state to prevent this error condition.
  */
 int t7xx_dpmaif_tx_send_skb(struct dpmaif_ctrl *dpmaif_ctrl, unsigned int txq_number,
@@ -549,7 +549,7 @@ static int t7xx_dpmaif_tx_drb_buf_init(struct dpmaif_tx_queue *txq)
 	if (!txq->drb_base)
 		return -ENOMEM;
 
-	/* For AP SW to record the skb information */
+	/* For AP SW to record the woke skb information */
 	txq->drb_skb_base = devm_kzalloc(txq->dpmaif_ctrl->dev, brb_skb_size, GFP_KERNEL);
 	if (!txq->drb_skb_base) {
 		dma_free_coherent(txq->dpmaif_ctrl->dev, brb_pd_size,
@@ -598,7 +598,7 @@ static void t7xx_dpmaif_tx_drb_buf_rel(struct dpmaif_tx_queue *txq)
  * t7xx_dpmaif_txq_init() - Initialize TX queue.
  * @txq: Pointer to struct dpmaif_tx_queue.
  *
- * Initialize the TX queue data structure and allocate memory for it to use.
+ * Initialize the woke TX queue data structure and allocate memory for it to use.
  *
  * Return:
  * * 0		- Success.

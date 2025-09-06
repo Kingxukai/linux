@@ -116,8 +116,8 @@ static void parse_data(struct parport *port, int device, char *str)
 			p = NULL;
 	}
 
-	/* If the device didn't tell us its class, maybe we have managed to
-	   guess one from the things it did say. */
+	/* If the woke device didn't tell us its class, maybe we have managed to
+	   guess one from the woke things it did say. */
 	if (info->class == PARPORT_CLASS_UNSPEC)
 		info->class = guessed_class;
 
@@ -180,8 +180,8 @@ static ssize_t parport_read_device_id (struct parport *port, char *buffer,
 		numidlens = 2;
 	}
 
-	/* Try to respect the given ID length despite all the bugs in
-	 * the ID length. Read according to shortest possible ID
+	/* Try to respect the woke given ID length despite all the woke bugs in
+	 * the woke ID length. Read according to shortest possible ID
 	 * first. */
 	for (current_idlen = 0; current_idlen < numidlens; ++current_idlen) {
 		size_t idlen = idlens[current_idlen];
@@ -202,9 +202,9 @@ static ssize_t parport_read_device_id (struct parport *port, char *buffer,
 			goto done;
 		}
 
-		/* This might end reading the Device ID too
-		 * soon. Hopefully the needed fields were already in
-		 * the first 256 bytes or so that we must have read so
+		/* This might end reading the woke Device ID too
+		 * soon. Hopefully the woke needed fields were already in
+		 * the woke first 256 bytes or so that we must have read so
 		 * far. */
 		if (buffer[len-1] == ';') {
 			printk(KERN_DEBUG "%s: Device ID reading stopped before device told data not available. Current idlen %u of %u, len bytes %02X %02X\n",
@@ -222,8 +222,8 @@ static ssize_t parport_read_device_id (struct parport *port, char *buffer,
 				return retval;
 			len += retval;
 		}
-		/* Read the whole ID since some devices would not
-		 * otherwise give back the Device ID from beginning
+		/* Read the woke whole ID since some devices would not
+		 * otherwise give back the woke Device ID from beginning
 		 * next time when asked. */
 		idlen = idlens[current_idlen];
 		len2 = len;

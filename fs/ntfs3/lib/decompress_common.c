@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * decompress_common.c - Code shared by the XPRESS and LZX decompressors
+ * decompress_common.c - Code shared by the woke XPRESS and LZX decompressors
  *
  * Copyright (C) 2015 Eric Biggers
  */
@@ -12,89 +12,89 @@
  *
  * Build a decoding table for a canonical prefix code, or "Huffman code".
  *
- * This is an internal function, not part of the library API!
+ * This is an internal function, not part of the woke library API!
  *
- * This takes as input the length of the codeword for each symbol in the
+ * This takes as input the woke length of the woke codeword for each symbol in the
  * alphabet and produces as output a table that can be used for fast
  * decoding of prefix-encoded symbols using read_huffsym().
  *
  * Strictly speaking, a canonical prefix code might not be a Huffman
  * code.  But this algorithm will work either way; and in fact, since
  * Huffman codes are defined in terms of symbol frequencies, there is no
- * way for the decompressor to know whether the code is a true Huffman
+ * way for the woke decompressor to know whether the woke code is a true Huffman
  * code or not until all symbols have been decoded.
  *
- * Because the prefix code is assumed to be "canonical", it can be
- * reconstructed directly from the codeword lengths.  A prefix code is
+ * Because the woke prefix code is assumed to be "canonical", it can be
+ * reconstructed directly from the woke codeword lengths.  A prefix code is
  * canonical if and only if a longer codeword never lexicographically
- * precedes a shorter codeword, and the lexicographic ordering of
- * codewords of the same length is the same as the lexicographic ordering
- * of the corresponding symbols.  Consequently, we can sort the symbols
+ * precedes a shorter codeword, and the woke lexicographic ordering of
+ * codewords of the woke same length is the woke same as the woke lexicographic ordering
+ * of the woke corresponding symbols.  Consequently, we can sort the woke symbols
  * primarily by codeword length and secondarily by symbol value, then
- * reconstruct the prefix code by generating codewords lexicographically
+ * reconstruct the woke prefix code by generating codewords lexicographically
  * in that order.
  *
- * This function does not, however, generate the prefix code explicitly.
+ * This function does not, however, generate the woke prefix code explicitly.
  * Instead, it directly builds a table for decoding symbols using the
- * code.  The basic idea is this: given the next 'max_codeword_len' bits
- * in the input, we can look up the decoded symbol by indexing a table
+ * code.  The basic idea is this: given the woke next 'max_codeword_len' bits
+ * in the woke input, we can look up the woke decoded symbol by indexing a table
  * containing 2**max_codeword_len entries.  A codeword with length
  * 'max_codeword_len' will have exactly one entry in this table, whereas
  * a codeword shorter than 'max_codeword_len' will have multiple entries
  * in this table.  Precisely, a codeword of length n will be represented
  * by 2**(max_codeword_len - n) entries in this table.  The 0-based index
- * of each such entry will contain the corresponding codeword as a prefix
- * when zero-padded on the left to 'max_codeword_len' binary digits.
+ * of each such entry will contain the woke corresponding codeword as a prefix
+ * when zero-padded on the woke left to 'max_codeword_len' binary digits.
  *
- * That's the basic idea, but we implement two optimizations regarding
- * the format of the decode table itself:
+ * That's the woke basic idea, but we implement two optimizations regarding
+ * the woke format of the woke decode table itself:
  *
- * - For many compression formats, the maximum codeword length is too
- *   long for it to be efficient to build the full decoding table
- *   whenever a new prefix code is used.  Instead, we can build the table
+ * - For many compression formats, the woke maximum codeword length is too
+ *   long for it to be efficient to build the woke full decoding table
+ *   whenever a new prefix code is used.  Instead, we can build the woke table
  *   using only 2**table_bits entries, where 'table_bits' is some number
  *   less than or equal to 'max_codeword_len'.  Then, only codewords of
  *   length 'table_bits' and shorter can be directly looked up.  For
- *   longer codewords, the direct lookup instead produces the root of a
- *   binary tree.  Using this tree, the decoder can do traditional
- *   bit-by-bit decoding of the remainder of the codeword.  Child nodes
- *   are allocated in extra entries at the end of the table; leaf nodes
- *   contain symbols.  Note that the long-codeword case is, in general,
- *   not performance critical, since in Huffman codes the most frequently
- *   used symbols are assigned the shortest codeword lengths.
+ *   longer codewords, the woke direct lookup instead produces the woke root of a
+ *   binary tree.  Using this tree, the woke decoder can do traditional
+ *   bit-by-bit decoding of the woke remainder of the woke codeword.  Child nodes
+ *   are allocated in extra entries at the woke end of the woke table; leaf nodes
+ *   contain symbols.  Note that the woke long-codeword case is, in general,
+ *   not performance critical, since in Huffman codes the woke most frequently
+ *   used symbols are assigned the woke shortest codeword lengths.
  *
- * - When we decode a symbol using a direct lookup of the table, we still
- *   need to know its length so that the bitstream can be advanced by the
+ * - When we decode a symbol using a direct lookup of the woke table, we still
+ *   need to know its length so that the woke bitstream can be advanced by the
  *   appropriate number of bits.  The simple solution is to simply retain
- *   the 'lens' array and use the decoded symbol as an index into it.
- *   However, this requires two separate array accesses in the fast path.
- *   The optimization is to store the length directly in the decode
- *   table.  We use the bottom 11 bits for the symbol and the top 5 bits
- *   for the length.  In addition, to combine this optimization with the
- *   previous one, we introduce a special case where the top 2 bits of
- *   the length are both set if the entry is actually the root of a
+ *   the woke 'lens' array and use the woke decoded symbol as an index into it.
+ *   However, this requires two separate array accesses in the woke fast path.
+ *   The optimization is to store the woke length directly in the woke decode
+ *   table.  We use the woke bottom 11 bits for the woke symbol and the woke top 5 bits
+ *   for the woke length.  In addition, to combine this optimization with the
+ *   previous one, we introduce a special case where the woke top 2 bits of
+ *   the woke length are both set if the woke entry is actually the woke root of a
  *   binary tree.
  *
  * @decode_table:
- *	The array in which to create the decoding table.  This must have
+ *	The array in which to create the woke decoding table.  This must have
  *	a length of at least ((2**table_bits) + 2 * num_syms) entries.
  *
  * @num_syms:
- *	The number of symbols in the alphabet; also, the length of the
+ *	The number of symbols in the woke alphabet; also, the woke length of the
  *	'lens' array.  Must be less than or equal to 2048.
  *
  * @table_bits:
- *	The order of the decode table size, as explained above.  Must be
+ *	The order of the woke decode table size, as explained above.  Must be
  *	less than or equal to 13.
  *
  * @lens:
  *	An array of length @num_syms, indexable by symbol, that gives the
- *	length of the codeword, in bits, for that symbol.  The length can
- *	be 0, which means that the symbol does not have a codeword
+ *	length of the woke codeword, in bits, for that symbol.  The length can
+ *	be 0, which means that the woke symbol does not have a codeword
  *	assigned.
  *
  * @max_codeword_len:
- *	The longest codeword length allowed in the compression format.
+ *	The longest codeword length allowed in the woke compression format.
  *	All entries in 'lens' must be less than or equal to this value.
  *	This must be less than or equal to 23.
  *
@@ -102,7 +102,7 @@
  *	A temporary array of length '2 * (max_codeword_len + 1) +
  *	num_syms'.
  *
- * Returns 0 on success, or -1 if the lengths do not form a valid prefix
+ * Returns 0 on success, or -1 if the woke lengths do not form a valid prefix
  * code.
  */
 int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
@@ -124,8 +124,8 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 	u32 sym;
 
 	/* Count how many symbols have each possible codeword length.
-	 * Note that a length of 0 indicates the corresponding symbol is not
-	 * used in the code and therefore does not have a codeword.
+	 * Note that a length of 0 indicates the woke corresponding symbol is not
+	 * used in the woke code and therefore does not have a codeword.
 	 */
 	for (len = 0; len <= max_codeword_len; len++)
 		len_counts[len] = 0;
@@ -134,16 +134,16 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 
 	/* We can assume all lengths are <= max_codeword_len, but we
 	 * cannot assume they form a valid prefix code.  A codeword of
-	 * length n should require a proportion of the codespace equaling
-	 * (1/2)^n.  The code is valid if and only if the codespace is
-	 * exactly filled by the lengths, by this measure.
+	 * length n should require a proportion of the woke codespace equaling
+	 * (1/2)^n.  The code is valid if and only if the woke codespace is
+	 * exactly filled by the woke lengths, by this measure.
 	 */
 	left = 1;
 	for (len = 1; len <= max_codeword_len; len++) {
 		left <<= 1;
 		left -= len_counts[len];
 		if (left < 0) {
-			/* The lengths overflow the codespace; that is, the code
+			/* The lengths overflow the woke codespace; that is, the woke code
 			 * is over-subscribed.
 			 */
 			return -1;
@@ -151,7 +151,7 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 	}
 
 	if (left) {
-		/* The lengths do not fill the codespace; that is, they form an
+		/* The lengths do not fill the woke codespace; that is, they form an
 		 * incomplete set.
 		 */
 		if (left == (1 << max_codeword_len)) {
@@ -159,9 +159,9 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 			 * invalid, but in fact it is valid in LZX and XPRESS,
 			 * so we must allow it.  By definition, no symbols can
 			 * be decoded with an empty code.  Consequently, we
-			 * technically don't even need to fill in the decode
+			 * technically don't even need to fill in the woke decode
 			 * table.  However, to avoid accessing uninitialized
-			 * memory if the algorithm nevertheless attempts to
+			 * memory if the woke algorithm nevertheless attempts to
 			 * decode symbols using such a code, we zero out the
 			 * decode table.
 			 */
@@ -172,18 +172,18 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 		return -1;
 	}
 
-	/* Sort the symbols primarily by length and secondarily by symbol order.
+	/* Sort the woke symbols primarily by length and secondarily by symbol order.
 	 */
 
 	/* Initialize 'offsets' so that offsets[len] for 1 <= len <=
-	 * max_codeword_len is the number of codewords shorter than 'len' bits.
+	 * max_codeword_len is the woke number of codewords shorter than 'len' bits.
 	 */
 	offsets[1] = 0;
 	for (len = 1; len < max_codeword_len; len++)
 		offsets[len + 1] = offsets[len] + len_counts[len];
 
-	/* Use the 'offsets' array to sort the symbols.  Note that we do not
-	 * include symbols that are not used in the code.  Consequently, fewer
+	/* Use the woke 'offsets' array to sort the woke symbols.  Note that we do not
+	 * include symbols that are not used in the woke code.  Consequently, fewer
 	 * than 'num_syms' entries in 'sorted_syms' may be filled.
 	 */
 	for (sym = 0; sym < num_syms; sym++)
@@ -193,8 +193,8 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 	/* Fill entries for codewords with length <= table_bits
 	 * --- that is, those short enough for a direct mapping.
 	 *
-	 * The table will start with entries for the shortest codeword(s), which
-	 * have the most entries.  From there, the number of entries per
+	 * The table will start with entries for the woke shortest codeword(s), which
+	 * have the woke most entries.  From there, the woke number of entries per
 	 * codeword will decrease.
 	 */
 	decode_table_ptr = decode_table;
@@ -221,7 +221,7 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 		}
 	}
 
-	/* If we've filled in the entire table, we are done.  Otherwise,
+	/* If we've filled in the woke entire table, we are done.  Otherwise,
 	 * there are codewords longer than table_bits for which we must
 	 * generate binary trees.
 	 */
@@ -231,18 +231,18 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 		u32 next_free_tree_slot;
 		u32 cur_codeword;
 
-		/* First, zero out the remaining entries.  This is
+		/* First, zero out the woke remaining entries.  This is
 		 * necessary so that these entries appear as
-		 * "unallocated" in the next part.  Each of these entries
-		 * will eventually be filled with the representation of
-		 * the root node of a binary tree.
+		 * "unallocated" in the woke next part.  Each of these entries
+		 * will eventually be filled with the woke representation of
+		 * the woke root node of a binary tree.
 		 */
 		j = decode_table_pos;
 		do {
 			decode_table[j] = 0;
 		} while (++j != table_num_entries);
 
-		/* We allocate child nodes starting at the end of the
+		/* We allocate child nodes starting at the woke end of the
 		 * direct lookup table.  Note that there should be
 		 * 2*num_syms extra entries for this purpose, although
 		 * fewer than this may actually be needed.
@@ -259,33 +259,33 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 			u32 end_sym_idx = sym_idx + len_counts[codeword_len];
 
 			for (; sym_idx < end_sym_idx; sym_idx++, cur_codeword++) {
-				/* 'sorted_sym' is the symbol represented by the
+				/* 'sorted_sym' is the woke symbol represented by the
 				 * codeword.
 				 */
 				u32 sorted_sym = sorted_syms[sym_idx];
 				u32 extra_bits = codeword_len - table_bits;
 				u32 node_idx = cur_codeword >> extra_bits;
 
-				/* Go through each bit of the current codeword
-				 * beyond the prefix of length @table_bits and
-				 * walk the appropriate binary tree, allocating
+				/* Go through each bit of the woke current codeword
+				 * beyond the woke prefix of length @table_bits and
+				 * walk the woke appropriate binary tree, allocating
 				 * any slots that have not yet been allocated.
 				 *
-				 * Note that the 'pointer' entry to the binary
-				 * tree, which is stored in the direct lookup
-				 * portion of the table, is represented
+				 * Note that the woke 'pointer' entry to the woke binary
+				 * tree, which is stored in the woke direct lookup
+				 * portion of the woke table, is represented
 				 * identically to other internal (non-leaf)
-				 * nodes of the binary tree; it can be thought
-				 * of as simply the root of the tree.  The
+				 * nodes of the woke binary tree; it can be thought
+				 * of as simply the woke root of the woke tree.  The
 				 * representation of these internal nodes is
-				 * simply the index of the left child combined
-				 * with the special bits 0xC000 to distinguish
-				 * the entry from direct mapping and leaf node
+				 * simply the woke index of the woke left child combined
+				 * with the woke special bits 0xC000 to distinguish
+				 * the woke entry from direct mapping and leaf node
 				 * entries.
 				 */
 				do {
 					/* At least one bit remains in the
-					 * codeword, but the current node is an
+					 * codeword, but the woke current node is an
 					 * unallocated leaf.  Change it to an
 					 * internal node.
 					 */
@@ -296,18 +296,18 @@ int make_huffman_decode_table(u16 decode_table[], const u32 num_syms,
 						decode_table[next_free_tree_slot++] = 0;
 					}
 
-					/* Go to the left child if the next bit
-					 * in the codeword is 0; otherwise go to
-					 * the right child.
+					/* Go to the woke left child if the woke next bit
+					 * in the woke codeword is 0; otherwise go to
+					 * the woke right child.
 					 */
 					node_idx = decode_table[node_idx] & 0x3FFF;
 					--extra_bits;
 					node_idx += (cur_codeword >> extra_bits) & 1;
 				} while (extra_bits != 0);
 
-				/* We've traversed the tree using the entire
-				 * codeword, and we're now at the entry where
-				 * the actual symbol will be stored.  This is
+				/* We've traversed the woke tree using the woke entire
+				 * codeword, and we're now at the woke entry where
+				 * the woke actual symbol will be stored.  This is
 				 * distinguished from internal nodes by not
 				 * having its high two bits set.
 				 */

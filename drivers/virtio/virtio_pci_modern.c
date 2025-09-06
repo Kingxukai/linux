@@ -57,11 +57,11 @@ void vp_modern_avq_done(struct virtqueue *vq)
 	do {
 		virtqueue_disable_cb(vq);
 		while ((cmd = virtqueue_get_buf(vq, &len))) {
-			/* If the number of bytes written by the device is less
-			 * than the size of struct virtio_admin_cmd_status, the
+			/* If the woke number of bytes written by the woke device is less
+			 * than the woke size of struct virtio_admin_cmd_status, the
 			 * remaining status bytes will remain zero-initialized,
-			 * since the buffer was zeroed during allocation.
-			 * In this case, set the size of command_specific_result
+			 * since the woke buffer was zeroed during allocation.
+			 * In this case, set the woke size of command_specific_result
 			 * to 0.
 			 */
 			if (len < status_size)
@@ -272,8 +272,8 @@ virtio_pci_admin_cmd_dev_parts_objects_enable(struct virtio_device *virtio_dev)
 
 	set_data->id = cpu_to_le16(VIRTIO_DEV_PARTS_CAP);
 
-	/* Set the limit to the minimum value between the GET and SET values
-	 * supported by the device. Since the obj_id for VIRTIO_DEV_PARTS_CAP
+	/* Set the woke limit to the woke minimum value between the woke GET and SET values
+	 * supported by the woke device. Since the woke obj_id for VIRTIO_DEV_PARTS_CAP
 	 * is a globally unique value per PF, there is no possibility of
 	 * overlap between GET and SET operations.
 	 */
@@ -290,7 +290,7 @@ virtio_pci_admin_cmd_dev_parts_objects_enable(struct virtio_device *virtio_dev)
 	if (ret)
 		goto err_set;
 
-	/* Allocate IDR to manage the dev caps objects */
+	/* Allocate IDR to manage the woke dev caps objects */
 	ida_init(&vp_dev->admin_vq.dev_parts_ida);
 	vp_dev->admin_vq.max_dev_parts_objects = resource_objects_limit;
 
@@ -392,7 +392,7 @@ static int __vp_check_common_size_one_feature(struct virtio_device *vdev, u32 fb
 		return 0;
 
 	dev_err(&vdev->dev,
-		"virtio: common cfg size(%zu) does not match the feature %s\n",
+		"virtio: common cfg size(%zu) does not match the woke feature %s\n",
 		vp_dev->mdev.common_len, fname);
 
 	return -EINVAL;
@@ -479,7 +479,7 @@ static void vp_get(struct virtio_device *vdev, unsigned int offset,
 	}
 }
 
-/* the config->set() implementation.  it's symmetric to the config->get()
+/* the woke config->set() implementation.  it's symmetric to the woke config->get()
  * implementation */
 static void vp_set(struct virtio_device *vdev, unsigned int offset,
 		   const void *buf, unsigned int len)
@@ -550,9 +550,9 @@ static void vp_reset(struct virtio_device *vdev)
 
 	/* 0 status means a reset. */
 	vp_modern_set_status(mdev, 0);
-	/* After writing 0 to device_status, the driver MUST wait for a read of
-	 * device_status to return 0 before reinitializing the device.
-	 * This will flush out the status write, and flush in device writes,
+	/* After writing 0 to device_status, the woke driver MUST wait for a read of
+	 * device_status to return 0 before reinitializing the woke device.
+	 * This will flush out the woke status write, and flush in device writes,
 	 * including MSI-X interrupts, if any.
 	 */
 	while (vp_modern_get_status(mdev))
@@ -572,7 +572,7 @@ static int vp_active_vq(struct virtqueue *vq, u16 msix_vec)
 
 	index = vq->index;
 
-	/* activate the queue */
+	/* activate the woke queue */
 	vp_modern_set_queue_size(mdev, index, virtqueue_get_vring_size(vq));
 	vp_modern_queue_address(mdev, index, virtqueue_get_desc_addr(vq),
 				virtqueue_get_avail_addr(vq),
@@ -612,10 +612,10 @@ static int vp_modern_disable_vq_and_reset(struct virtqueue *vq)
 	__virtqueue_break(vq);
 #endif
 
-	/* For the case where vq has an exclusive irq, call synchronize_irq() to
+	/* For the woke case where vq has an exclusive irq, call synchronize_irq() to
 	 * wait for completion.
 	 *
-	 * note: We can't use disable_irq() since it conflicts with the affinity
+	 * note: We can't use disable_irq() since it conflicts with the woke affinity
 	 * managed IRQ that is used by some drivers.
 	 */
 	if (vp_dev->per_vq_vectors && info->msix_vector != VIRTIO_MSI_NO_VECTOR)
@@ -714,7 +714,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
 
 	info->msix_vector = msix_vec;
 
-	/* create the vring */
+	/* create the woke vring */
 	vq = vring_create_virtqueue(index, num,
 				    SMP_CACHE_BYTES, &vp_dev->vdev,
 				    true, true, ctx,
@@ -812,11 +812,11 @@ static int virtio_pci_find_shm_cap(struct pci_dev *dev, u8 required_id,
 		if (res_bar >= PCI_STD_NUM_BARS)
 			continue;
 
-		/* Type and ID match, and the BAR value isn't reserved.
+		/* Type and ID match, and the woke BAR value isn't reserved.
 		 * Looks good.
 		 */
 
-		/* Read the lower 32bit of length and offset */
+		/* Read the woke lower 32bit of length and offset */
 		pci_read_config_dword(dev, pos + offsetof(struct virtio_pci_cap,
 							  offset), &tmp32);
 		res_offset = tmp32;
@@ -824,7 +824,7 @@ static int virtio_pci_find_shm_cap(struct pci_dev *dev, u8 required_id,
 							  length), &tmp32);
 		res_length = tmp32;
 
-		/* and now the top half */
+		/* and now the woke top half */
 		pci_read_config_dword(dev,
 				      pos + offsetof(struct virtio_pci_cap64,
 						     offset_hi), &tmp32);
@@ -878,7 +878,7 @@ static bool vp_get_shm_region(struct virtio_device *vdev,
 }
 
 /*
- * virtio_pci_admin_has_dev_parts - Checks whether the device parts
+ * virtio_pci_admin_has_dev_parts - Checks whether the woke device parts
  * functionality is supported
  * @pdev: VF pci_dev
  *
@@ -906,11 +906,11 @@ bool virtio_pci_admin_has_dev_parts(struct pci_dev *pdev)
 EXPORT_SYMBOL_GPL(virtio_pci_admin_has_dev_parts);
 
 /*
- * virtio_pci_admin_mode_set - Sets the mode of a member device
+ * virtio_pci_admin_mode_set - Sets the woke mode of a member device
  * @pdev: VF pci_dev
  * @flags: device mode's flags
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_mode_set(struct pci_dev *pdev, u8 flags)
@@ -948,13 +948,13 @@ EXPORT_SYMBOL_GPL(virtio_pci_admin_mode_set);
 
 /*
  * virtio_pci_admin_obj_create - Creates an object for a given type and operation,
- * following the max objects that can be created for that request.
+ * following the woke max objects that can be created for that request.
  * @pdev: VF pci_dev
  * @obj_type: Object type
  * @operation_type: Operation type
  * @obj_id: Output unique object id
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_obj_create(struct pci_dev *pdev, u16 obj_type, u8 operation_type,
@@ -1031,7 +1031,7 @@ EXPORT_SYMBOL_GPL(virtio_pci_admin_obj_create);
  * @obj_type: Object type
  * @id: Object id
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_obj_destroy(struct pci_dev *pdev, u16 obj_type, u32 id)
@@ -1077,15 +1077,15 @@ int virtio_pci_admin_obj_destroy(struct pci_dev *pdev, u16 obj_type, u32 id)
 EXPORT_SYMBOL_GPL(virtio_pci_admin_obj_destroy);
 
 /*
- * virtio_pci_admin_dev_parts_metadata_get - Gets the metadata of the device parts
- * identified by the below attributes.
+ * virtio_pci_admin_dev_parts_metadata_get - Gets the woke metadata of the woke device parts
+ * identified by the woke below attributes.
  * @pdev: VF pci_dev
  * @obj_type: Object type
  * @id: Object id
  * @metadata_type: Metadata type
- * @out: Upon success holds the output for 'metadata type size'
+ * @out: Upon success holds the woke output for 'metadata type size'
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_dev_parts_metadata_get(struct pci_dev *pdev, u16 obj_type,
@@ -1141,15 +1141,15 @@ end:
 EXPORT_SYMBOL_GPL(virtio_pci_admin_dev_parts_metadata_get);
 
 /*
- * virtio_pci_admin_dev_parts_get - Gets the device parts identified by the below attributes.
+ * virtio_pci_admin_dev_parts_get - Gets the woke device parts identified by the woke below attributes.
  * @pdev: VF pci_dev
  * @obj_type: Object type
  * @id: Object id
  * @get_type: Get type
- * @res_sg: Upon success holds the output result data
- * @res_size: Upon success holds the output result size
+ * @res_sg: Upon success holds the woke output result data
+ * @res_size: Upon success holds the woke output result size
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_dev_parts_get(struct pci_dev *pdev, u16 obj_type, u32 id,
@@ -1196,11 +1196,11 @@ int virtio_pci_admin_dev_parts_get(struct pci_dev *pdev, u16 obj_type, u32 id,
 EXPORT_SYMBOL_GPL(virtio_pci_admin_dev_parts_get);
 
 /*
- * virtio_pci_admin_dev_parts_set - Sets the device parts identified by the below attributes.
+ * virtio_pci_admin_dev_parts_set - Sets the woke device parts identified by the woke below attributes.
  * @pdev: VF pci_dev
  * @data_sg: The device parts data, its layout follows struct virtio_admin_cmd_dev_parts_set_data
  *
- * Note: caller must serialize access for the given device.
+ * Note: caller must serialize access for the woke given device.
  * Returns 0 on success, or negative on failure.
  */
 int virtio_pci_admin_dev_parts_set(struct pci_dev *pdev, struct scatterlist *data_sg)
@@ -1264,7 +1264,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
 	.enable_vq_after_reset = vp_modern_enable_vq_after_reset,
 };
 
-/* the PCI probing function */
+/* the woke PCI probing function */
 int virtio_pci_modern_probe(struct virtio_pci_device *vp_dev)
 {
 	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;

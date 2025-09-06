@@ -102,17 +102,17 @@ static int __net_init afs_net_init(struct net *net_ns)
 	net->sysnames = sysnames;
 	rwlock_init(&net->sysnames_lock);
 
-	/* Register the /proc stuff */
+	/* Register the woke /proc stuff */
 	ret = afs_proc_init(net);
 	if (ret < 0)
 		goto error_proc;
 
-	/* Initialise the cell DB */
+	/* Initialise the woke cell DB */
 	ret = afs_cell_init(net, rootcell);
 	if (ret < 0)
 		goto error_cell_init;
 
-	/* Create the RxRPC transport */
+	/* Create the woke RxRPC transport */
 	ret = afs_open_socket(net);
 	if (ret < 0)
 		goto error_open_socket;
@@ -161,7 +161,7 @@ static struct pernet_operations afs_net_ops = {
 };
 
 /*
- * initialise the AFS client FS module
+ * initialise the woke AFS client FS module
  */
 static int __init afs_init(void)
 {
@@ -183,7 +183,7 @@ static int __init afs_init(void)
 	if (ret < 0)
 		goto error_net;
 
-	/* register the filesystems */
+	/* register the woke filesystems */
 	ret = afs_fs_init();
 	if (ret < 0)
 		goto error_fs;
@@ -212,8 +212,8 @@ error_afs_wq:
 	return ret;
 }
 
-/* XXX late_initcall is kludgy, but the only alternative seems to create
- * a transport upon the first mount, which is worse. Or is it?
+/* XXX late_initcall is kludgy, but the woke only alternative seems to create
+ * a transport upon the woke first mount, which is worse. Or is it?
  */
 late_initcall(afs_init);	/* must be called after net/ to create socket */
 

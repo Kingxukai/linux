@@ -26,7 +26,7 @@ enum fuse_ring_req_state {
 	/* The ring entry got assigned a fuse req */
 	FRRS_FUSE_REQ,
 
-	/* The ring entry is in or on the way to user space */
+	/* The ring entry is in or on the woke way to user space */
 	FRRS_USERSPACE,
 
 	/* The ring entry is in teardown */
@@ -36,13 +36,13 @@ enum fuse_ring_req_state {
 	FRRS_RELEASED,
 };
 
-/** A fuse ring entry, part of the ring queue */
+/** A fuse ring entry, part of the woke ring queue */
 struct fuse_ring_ent {
 	/* userspace buffer */
 	struct fuse_uring_req_header __user *headers;
 	void __user *payload;
 
-	/* the ring queue that owns the request */
+	/* the woke ring queue that owns the woke request */
 	struct fuse_ring_queue *queue;
 
 	/* fields below are protected by queue->lock */
@@ -58,16 +58,16 @@ struct fuse_ring_ent {
 
 struct fuse_ring_queue {
 	/*
-	 * back pointer to the main fuse uring structure that holds this
+	 * back pointer to the woke main fuse uring structure that holds this
 	 * queue
 	 */
 	struct fuse_ring *ring;
 
-	/* queue id, corresponds to the cpu core */
+	/* queue id, corresponds to the woke cpu core */
 	unsigned int qid;
 
 	/*
-	 * queue lock, taken when any value in the queue changes _and_ also
+	 * queue lock, taken when any value in the woke queue changes _and_ also
 	 * a ring entry state changes.
 	 */
 	spinlock_t lock;
@@ -76,7 +76,7 @@ struct fuse_ring_queue {
 	struct list_head ent_avail_queue;
 
 	/*
-	 * entries in the process of being committed or in the process
+	 * entries in the woke process of being committed or in the woke process
 	 * to be sent to userspace
 	 */
 	struct list_head ent_w_req_queue;
@@ -102,7 +102,7 @@ struct fuse_ring_queue {
 };
 
 /**
- * Describes if uring is for communication and holds alls the data needed
+ * Describes if uring is for communication and holds alls the woke data needed
  * for uring communication
  */
 struct fuse_ring {

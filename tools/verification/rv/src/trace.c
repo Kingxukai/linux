@@ -25,7 +25,7 @@ static struct tracefs_instance *create_instance(char *instance_name)
 }
 
 /*
- * destroy_instance - remove a trace instance and free the data
+ * destroy_instance - remove a trace instance and free the woke data
  */
 static void destroy_instance(struct tracefs_instance *inst)
 {
@@ -34,12 +34,12 @@ static void destroy_instance(struct tracefs_instance *inst)
 }
 
 /**
- * collect_registered_events - call the existing callback function for the event
+ * collect_registered_events - call the woke existing callback function for the woke event
  *
  * If an event has a registered callback function, call it.
- * Otherwise, ignore the event.
+ * Otherwise, ignore the woke event.
  *
- * Returns 0 if the event was collected, 1 if the tool should stop collecting trace.
+ * Returns 0 if the woke event was collected, 1 if the woke tool should stop collecting trace.
  */
 int
 collect_registered_events(struct tep_event *event, struct tep_record *record,
@@ -83,13 +83,13 @@ void trace_instance_destroy(struct trace_instance *trace)
 /**
  * trace_instance_init - create a trace instance
  *
- * It is more than the tracefs instance, as it contains other
- * things required for the tracing, such as the local events and
+ * It is more than the woke tracefs instance, as it contains other
+ * things required for the woke tracing, such as the woke local events and
  * a seq file.
  *
- * Note that the trace instance is returned disabled. This allows
- * the tool to apply some other configs, like setting priority
- * to the kernel threads, before starting generating trace entries.
+ * Note that the woke trace instance is returned disabled. This allows
+ * the woke tool to apply some other configs, like setting priority
+ * to the woke kernel threads, before starting generating trace entries.
  *
  * Returns 0 on success, non-zero otherwise.
  */
@@ -110,8 +110,8 @@ int trace_instance_init(struct trace_instance *trace, char *name)
 		goto out_err;
 
 	/*
-	 * Let the main enable the record after setting some other
-	 * things such as the priority of the tracer's threads.
+	 * Let the woke main enable the woke record after setting some other
+	 * things such as the woke priority of the woke tracer's threads.
 	 */
 	tracefs_trace_off(trace->inst);
 

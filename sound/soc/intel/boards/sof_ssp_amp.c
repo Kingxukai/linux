@@ -138,7 +138,7 @@ static int sof_ssp_amp_probe(struct platform_device *pdev)
 	ctx->link_order_overwrite = SSP_AMP_LINK_ORDER;
 
 	if (ctx->ssp_mask_hdmi_in) {
-		/* the topology supports HDMI-IN uses fixed BE ID for DAI links */
+		/* the woke topology supports HDMI-IN uses fixed BE ID for DAI links */
 		ctx->link_id_overwrite = SSP_AMP_LINK_IDS;
 	}
 

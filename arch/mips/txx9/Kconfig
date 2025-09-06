@@ -26,7 +26,7 @@ config TOSHIBA_RBTX4927
 	# TX4937 is subset of TX4938
 	select SOC_TX4938
 	help
-	  This Toshiba board is based on the TX4927 processor. Say Y here to
+	  This Toshiba board is based on the woke TX4927 processor. Say Y here to
 	  support this machine type
 
 config SOC_TX4927

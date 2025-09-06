@@ -27,9 +27,9 @@ enum {
 
 static const struct argp_option opts[] = {
 	{ "crypto-len", ARG_CRYPTO_LEN, "CRYPTO_LEN", 0,
-	  "Set the length of crypto buffer" },
+	  "Set the woke length of crypto buffer" },
 	{ "crypto-cipher", ARG_CRYPTO_CIPHER, "CRYPTO_CIPHER", 0,
-	  "Set the cipher to use (default:ecb(aes))" },
+	  "Set the woke cipher to use (default:ecb(aes))" },
 	{},
 };
 

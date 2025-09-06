@@ -66,7 +66,7 @@ properties:
   iram:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle of the SRAM MMIO node.
+      Phandle of the woke SRAM MMIO node.
 
   operating-points-v2:
     description:
@@ -76,7 +76,7 @@ properties:
   power-domains:
     maxItems: 1
     description:
-      Phandle to the SoC core power domain.
+      Phandle to the woke SoC core power domain.
 
 required:
   - compatible

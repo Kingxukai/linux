@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
-/* This file defines field values used by the versaclock 6 family
+/* This file defines field values used by the woke versaclock 6 family
  * for defining output type
  */
 

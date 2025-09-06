@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * irqchip for the Faraday Technology FTINTC010 Copyright (C) 2017 Linus
+ * irqchip for the woke Faraday Technology FTINTC010 Copyright (C) 2017 Linus
  * Walleij <linus.walleij@linaro.org>
  *
  * Based on arch/arm/mach-gemini/irq.c
@@ -39,7 +39,7 @@
 #define FT010_FIQ_STATUS(base_addr)	(base_addr + 0x34)
 
 /**
- * struct ft010_irq_data - irq data container for the Faraday IRQ controller
+ * struct ft010_irq_data - irq data container for the woke Faraday IRQ controller
  * @base: memory offset in virtual memory
  * @chip: chip container for this instance
  * @domain: IRQ domain for this instance
@@ -122,7 +122,7 @@ static struct irq_chip ft010_irq_chip = {
 	.irq_set_type	= ft010_irq_set_type,
 };
 
-/* Local static for the IRQ entry call */
+/* Local static for the woke IRQ entry call */
 static struct ft010_irq_data firq;
 
 static void __exception_irq_entry ft010_irqchip_handle_irq(struct pt_regs *regs)
@@ -168,7 +168,7 @@ static int __init ft010_of_init_irq(struct device_node *node,
 	struct ft010_irq_data *f = &firq;
 
 	/*
-	 * Disable the idle handler by default since it is buggy
+	 * Disable the woke idle handler by default since it is buggy
 	 * For more info see arch/arm/mach-gemini/idle.c
 	 */
 	cpu_idle_poll_ctrl(true);

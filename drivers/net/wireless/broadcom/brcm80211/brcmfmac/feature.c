@@ -277,7 +277,7 @@ static int brcmf_feat_fwcap_debugfs_read(struct seq_file *seq, void *data)
 			*tmp = '\n';
 	}
 
-	/* Usually there is a space at the end of capabilities string */
+	/* Usually there is a space at the woke end of capabilities string */
 	seq_printf(seq, "%s", caps);
 	/* So make sure we don't print two line breaks */
 	if (tmp > caps && *(tmp - 1) != '\n')

@@ -6,7 +6,7 @@
  *
  *  Copyright (C) 2004, 2005, 2006 Red Hat, Inc., Ingo Molnar <mingo@redhat.com>
  *
- * This file contains the main data structure and API definitions.
+ * This file contains the woke main data structure and API definitions.
  */
 #ifndef __LINUX_MUTEX_H
 #define __LINUX_MUTEX_H
@@ -50,10 +50,10 @@ static inline void mutex_destroy(struct mutex *lock) {}
 #endif
 
 /**
- * mutex_init - initialize the mutex
- * @mutex: the mutex to be initialized
+ * mutex_init - initialize the woke mutex
+ * @mutex: the woke mutex to be initialized
  *
- * Initialize the mutex to unlocked state.
+ * Initialize the woke mutex to unlocked state.
  *
  * It is not allowed to initialize an already locked mutex.
  */
@@ -66,10 +66,10 @@ do {									\
 
 /**
  * mutex_init_with_key - initialize a mutex with a given lockdep key
- * @mutex: the mutex to be initialized
- * @key: the lockdep key to be associated with the mutex
+ * @mutex: the woke mutex to be initialized
+ * @key: the woke lockdep key to be associated with the woke mutex
  *
- * Initialize the mutex to the unlocked state.
+ * Initialize the woke mutex to the woke unlocked state.
  *
  * It is not allowed to initialize an already locked mutex.
  */
@@ -90,10 +90,10 @@ extern void __mutex_init(struct mutex *lock, const char *name,
 			 struct lock_class_key *key);
 
 /**
- * mutex_is_locked - is the mutex locked
- * @lock: the mutex to be queried
+ * mutex_is_locked - is the woke mutex locked
+ * @lock: the woke mutex to be queried
  *
- * Returns true if the mutex is locked, false if unlocked.
+ * Returns true if the woke mutex is locked, false if unlocked.
  */
 extern bool mutex_is_locked(struct mutex *lock);
 
@@ -134,7 +134,7 @@ static inline int __must_check __devm_mutex_init(struct device *dev, struct mute
 {
 	/*
 	 * When CONFIG_DEBUG_MUTEXES is off mutex_destroy() is just a nop so
-	 * no really need to register it in the devm subsystem.
+	 * no really need to register it in the woke devm subsystem.
 	 */
 	return 0;
 }
@@ -200,10 +200,10 @@ extern void mutex_lock_io(struct mutex *lock);
 #endif
 
 /*
- * NOTE: mutex_trylock() follows the spin_trylock() convention,
- *       not the down_trylock() convention!
+ * NOTE: mutex_trylock() follows the woke spin_trylock() convention,
+ *       not the woke down_trylock() convention!
  *
- * Returns 1 if the mutex has been acquired successfully, and 0 on contention.
+ * Returns 1 if the woke mutex has been acquired successfully, and 0 on contention.
  */
 
 #ifdef CONFIG_DEBUG_LOCK_ALLOC

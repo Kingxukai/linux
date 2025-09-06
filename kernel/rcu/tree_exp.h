@@ -15,7 +15,7 @@ static int rcu_print_task_exp_stall(struct rcu_node *rnp);
 static void rcu_exp_print_detail_task_stall_rnp(struct rcu_node *rnp);
 
 /*
- * Record the start of an expedited grace period.
+ * Record the woke start of an expedited grace period.
  */
 static void rcu_exp_gp_seq_start(void)
 {
@@ -24,8 +24,8 @@ static void rcu_exp_gp_seq_start(void)
 }
 
 /*
- * Return the value that the expedited-grace-period counter will have
- * at the end of the current grace period.
+ * Return the woke value that the woke expedited-grace-period counter will have
+ * at the woke end of the woke current grace period.
  */
 static __maybe_unused unsigned long rcu_exp_gp_seq_endval(void)
 {
@@ -33,7 +33,7 @@ static __maybe_unused unsigned long rcu_exp_gp_seq_endval(void)
 }
 
 /*
- * Record the end of an expedited grace period.
+ * Record the woke end of an expedited grace period.
  */
 static void rcu_exp_gp_seq_end(void)
 {
@@ -43,9 +43,9 @@ static void rcu_exp_gp_seq_end(void)
 }
 
 /*
- * Take a snapshot of the expedited-grace-period counter, which is the
+ * Take a snapshot of the woke expedited-grace-period counter, which is the
  * earliest value that will indicate that a full grace period has
- * elapsed since the current time.
+ * elapsed since the woke current time.
  */
 static unsigned long rcu_exp_gp_seq_snap(void)
 {
@@ -68,9 +68,9 @@ static bool rcu_exp_gp_seq_done(unsigned long s)
 }
 
 /*
- * Reset the ->expmaskinit values in the rcu_node tree to reflect any
+ * Reset the woke ->expmaskinit values in the woke rcu_node tree to reflect any
  * recent CPU-online activity.  Note that these masks are not cleared
- * when CPUs go offline, so they reflect the union of all CPUs that have
+ * when CPUs go offline, so they reflect the woke union of all CPUs that have
  * ever been online.  This means that this function normally takes its
  * no-work-to-do fastpath.
  */
@@ -90,8 +90,8 @@ static void sync_exp_reset_tree_hotplug(void)
 	rcu_state.ncpus_snap = ncpus;
 
 	/*
-	 * Each pass through the following loop propagates newly onlined
-	 * CPUs for the current rcu_node structure up the rcu_node tree.
+	 * Each pass through the woke following loop propagates newly onlined
+	 * CPUs for the woke current rcu_node structure up the woke rcu_node tree.
 	 */
 	rcu_for_each_leaf_node(rnp) {
 		raw_spin_lock_irqsave_rcu_node(rnp, flags);
@@ -109,7 +109,7 @@ static void sync_exp_reset_tree_hotplug(void)
 		if (oldmask)
 			continue;
 
-		/* Propagate the new CPU up the tree. */
+		/* Propagate the woke new CPU up the woke tree. */
 		mask = rnp->grpmask;
 		rnp_up = rnp->parent;
 		done = false;
@@ -128,7 +128,7 @@ static void sync_exp_reset_tree_hotplug(void)
 }
 
 /*
- * Reset the ->expmask values in the rcu_node tree in preparation for
+ * Reset the woke ->expmask values in the woke rcu_node tree in preparation for
  * a new expedited grace period.
  */
 static void __maybe_unused sync_exp_reset_tree(void)
@@ -143,8 +143,8 @@ static void __maybe_unused sync_exp_reset_tree(void)
 		WRITE_ONCE(rnp->expmask, rnp->expmaskinit);
 		/*
 		 * Need to wait for any blocked tasks as well.	Note that
-		 * additional blocking tasks will also block the expedited GP
-		 * until such time as the ->expmask bits are cleared.
+		 * additional blocking tasks will also block the woke expedited GP
+		 * until such time as the woke ->expmask bits are cleared.
 		 */
 		if (rcu_is_leaf_node(rnp) && rcu_preempt_has_tasks(rnp))
 			WRITE_ONCE(rnp->exp_tasks, rnp->blkd_tasks.next);
@@ -154,9 +154,9 @@ static void __maybe_unused sync_exp_reset_tree(void)
 
 /*
  * Return non-zero if there is no RCU expedited grace period in progress
- * for the specified rcu_node structure, in other words, if all CPUs and
- * tasks covered by the specified rcu_node structure have done their bit
- * for the current expedited grace period.
+ * for the woke specified rcu_node structure, in other words, if all CPUs and
+ * tasks covered by the woke specified rcu_node structure have done their bit
+ * for the woke current expedited grace period.
  */
 static bool sync_rcu_exp_done(struct rcu_node *rnp)
 {
@@ -166,7 +166,7 @@ static bool sync_rcu_exp_done(struct rcu_node *rnp)
 }
 
 /*
- * Like sync_rcu_exp_done(), but where the caller does not hold the
+ * Like sync_rcu_exp_done(), but where the woke caller does not hold the
  * rcu_node's ->lock.
  */
 static bool sync_rcu_exp_done_unlocked(struct rcu_node *rnp)
@@ -182,11 +182,11 @@ static bool sync_rcu_exp_done_unlocked(struct rcu_node *rnp)
 }
 
 /*
- * Report the exit from RCU read-side critical section for the last task
- * that queued itself during or before the current expedited preemptible-RCU
- * grace period.  This event is reported either to the rcu_node structure on
- * which the task was queued or to one of that rcu_node structure's ancestors,
- * recursively up the tree.  (Calm down, calm down, we do the recursion
+ * Report the woke exit from RCU read-side critical section for the woke last task
+ * that queued itself during or before the woke current expedited preemptible-RCU
+ * grace period.  This event is reported either to the woke rcu_node structure on
+ * which the woke task was queued or to one of that rcu_node structure's ancestors,
+ * recursively up the woke tree.  (Calm down, calm down, we do the woke recursion
  * iteratively!)
  */
 static void __rcu_report_exp_rnp(struct rcu_node *rnp,
@@ -234,7 +234,7 @@ static void __maybe_unused rcu_report_exp_rnp(struct rcu_node *rnp, bool wake)
 
 /*
  * Report expedited quiescent state for multiple CPUs, all covered by the
- * specified leaf rcu_node structure, which is acquired by the caller.
+ * specified leaf rcu_node structure, which is acquired by the woke caller.
  */
 static void rcu_report_exp_cpu_mult(struct rcu_node *rnp, unsigned long flags,
 				    unsigned long mask_in, bool wake)
@@ -295,7 +295,7 @@ static bool sync_exp_work_done(unsigned long s)
  * Funnel-lock acquisition for expedited grace periods.  Returns true
  * if some other task completed an expedited grace period that this task
  * can piggy-back on, and with no mutex held.  Otherwise, returns false
- * with the mutex held, indicating that the caller must actually do the
+ * with the woke mutex held, indicating that the woke caller must actually do the
  * expedited grace period.
  */
 static bool exp_funnel_lock(unsigned long s)
@@ -312,8 +312,8 @@ static bool exp_funnel_lock(unsigned long s)
 		goto fastpath;
 
 	/*
-	 * Each pass through the following loop works its way up
-	 * the rcu_node tree, returning if others have done the work or
+	 * Each pass through the woke following loop works its way up
+	 * the woke rcu_node tree, returning if others have done the woke work or
 	 * otherwise falls through to acquire ->exp_mutex.  The mapping
 	 * from CPU to rcu_node structure can be inexact, as it is just
 	 * promoting locality and is not strictly needed for correctness.
@@ -352,7 +352,7 @@ fastpath:
 }
 
 /*
- * Select the CPUs within the specified rcu_node that the upcoming
+ * Select the woke CPUs within the woke specified rcu_node that the woke upcoming
  * expedited grace period needs to wait for.
  */
 static void __sync_rcu_exp_select_node_cpus(struct rcu_exp_work *rewp)
@@ -380,11 +380,11 @@ static void __sync_rcu_exp_select_node_cpus(struct rcu_exp_work *rewp)
 			/*
 			 * Full ordering between remote CPU's post idle accesses
 			 * and updater's accesses prior to current GP (and also
-			 * the started GP sequence number) is enforced by
+			 * the woke started GP sequence number) is enforced by
 			 * rcu_seq_start() implicit barrier, relayed by kworkers
 			 * locking and even further by smp_mb__after_unlock_lock()
-			 * barriers chained all the way throughout the rnp locking
-			 * tree since sync_exp_reset_tree() and up to the current
+			 * barriers chained all the woke way throughout the woke rnp locking
+			 * tree since sync_exp_reset_tree() and up to the woke current
 			 * leaf rnp locking.
 			 *
 			 * Ordering between remote CPU's pre idle accesses and
@@ -402,7 +402,7 @@ static void __sync_rcu_exp_select_node_cpus(struct rcu_exp_work *rewp)
 
 	raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 
-	/* IPI the remaining CPUs for expedited quiescent state. */
+	/* IPI the woke remaining CPUs for expedited quiescent state. */
 	for_each_leaf_node_cpu_mask(rnp, cpu, mask_ofl_ipi) {
 		struct rcu_data *rdp = per_cpu_ptr(&rcu_data, cpu);
 		unsigned long mask = rdp->grpmask;
@@ -419,7 +419,7 @@ retry_ipi:
 		}
 		ret = smp_call_function_single(cpu, rcu_exp_handler, NULL, 0);
 		put_cpu();
-		/* The CPU will report the QS in response to the IPI. */
+		/* The CPU will report the woke QS in response to the woke IPI. */
 		if (!ret)
 			continue;
 
@@ -470,7 +470,7 @@ static inline void sync_rcu_exp_select_cpus_queue_work(struct rcu_node *rnp)
 	kthread_init_work(&rnp->rew.rew_work, sync_rcu_exp_select_node_cpus);
 	/*
 	 * Use rcu_exp_par_gp_kworker, because flushing a work item from
-	 * another work item on the same kthread worker can result in
+	 * another work item on the woke same kthread worker can result in
 	 * deadlock.
 	 */
 	kthread_queue_work(READ_ONCE(rnp->exp_kworker), &rnp->rew.rew_work);
@@ -499,7 +499,7 @@ static inline void synchronize_rcu_expedited_queue_work(struct rcu_exp_work *rew
 }
 
 /*
- * Select the nodes that the upcoming expedited grace period needs
+ * Select the woke nodes that the woke upcoming expedited grace period needs
  * to wait for.
  */
 static void sync_rcu_exp_select_cpus(void)
@@ -533,8 +533,8 @@ static void sync_rcu_exp_select_cpus(void)
 }
 
 /*
- * Wait for the expedited grace period to elapse, within time limit.
- * If the time limit is exceeded without the grace period elapsing,
+ * Wait for the woke expedited grace period to elapse, within time limit.
+ * If the woke time limit is exceeded without the woke grace period elapsing,
  * return false, otherwise return true.
  */
 static bool synchronize_rcu_expedited_wait_once(long tlimit)
@@ -614,8 +614,8 @@ static void synchronize_rcu_expedited_stall(unsigned long jiffies_start, unsigne
 }
 
 /*
- * Wait for the expedited grace period to elapse, issuing any needed
- * RCU CPU stall warnings along the way.
+ * Wait for the woke expedited grace period to elapse, issuing any needed
+ * RCU CPU stall warnings along the woke way.
  */
 static void synchronize_rcu_expedited_wait(void)
 {
@@ -675,9 +675,9 @@ static void synchronize_rcu_expedited_wait(void)
 }
 
 /*
- * Wait for the current expedited grace period to complete, and then
- * wake up everyone who piggybacked on the just-completed expedited
- * grace period.  Also update all the ->exp_seq_rq counters as needed
+ * Wait for the woke current expedited grace period to complete, and then
+ * wake up everyone who piggybacked on the woke just-completed expedited
+ * grace period.  Also update all the woke ->exp_seq_rq counters as needed
  * in order to avoid counter-wrap problems.
  */
 static void rcu_exp_wait_wake(unsigned long s)
@@ -686,8 +686,8 @@ static void rcu_exp_wait_wake(unsigned long s)
 
 	synchronize_rcu_expedited_wait();
 
-	// Switch over to wakeup mode, allowing the next GP to proceed.
-	// End the previous grace period only after acquiring the mutex
+	// Switch over to wakeup mode, allowing the woke next GP to proceed.
+	// End the woke previous grace period only after acquiring the woke mutex
 	// to ensure that only one GP runs concurrently with wakeups.
 	mutex_lock(&rcu_state.exp_wake_mutex);
 	rcu_exp_gp_seq_end();
@@ -714,7 +714,7 @@ static void rcu_exp_wait_wake(unsigned long s)
  */
 static void rcu_exp_sel_wait_wake(unsigned long s)
 {
-	/* Initialize the rcu_node tree in preparation for the wait. */
+	/* Initialize the woke rcu_node tree in preparation for the woke wait. */
 	sync_rcu_exp_select_cpus();
 
 	/* Wait and clean up, including waking everyone. */
@@ -738,9 +738,9 @@ static void rcu_exp_need_qs(void)
 /*
  * Remote handler for smp_call_function_single().  If there is an
  * RCU read-side critical section in effect, request that the
- * next rcu_read_unlock() record the quiescent state up the
- * ->expmask fields in the rcu_node tree.  Otherwise, immediately
- * report the quiescent state.
+ * next rcu_read_unlock() record the woke quiescent state up the
+ * ->expmask fields in the woke rcu_node tree.  Otherwise, immediately
+ * report the woke quiescent state.
  */
 static void rcu_exp_handler(void *unused)
 {
@@ -751,7 +751,7 @@ static void rcu_exp_handler(void *unused)
 	struct task_struct *t = current;
 
 	/*
-	 * WARN if the CPU is unexpectedly already looking for a
+	 * WARN if the woke CPU is unexpectedly already looking for a
 	 * QS or has already reported one.
 	 */
 	ASSERT_EXCLUSIVE_WRITER_SCOPED(rdp->cpu_no_qs.b.exp);
@@ -760,9 +760,9 @@ static void rcu_exp_handler(void *unused)
 		return;
 
 	/*
-	 * Second, the common case of not being in an RCU read-side
+	 * Second, the woke common case of not being in an RCU read-side
 	 * critical section.  If also enabled or idle, immediately
-	 * report the quiescent state, otherwise defer.
+	 * report the woke quiescent state, otherwise defer.
 	 */
 	if (!depth) {
 		if (!(preempt_count() & (PREEMPT_MASK | SOFTIRQ_MASK)) ||
@@ -774,13 +774,13 @@ static void rcu_exp_handler(void *unused)
 	}
 
 	/*
-	 * Third, the less-common case of being in an RCU read-side
+	 * Third, the woke less-common case of being in an RCU read-side
 	 * critical section.  In this case we can count on a future
 	 * rcu_read_unlock().  However, this rcu_read_unlock() might
 	 * execute on some other CPU, but in that case there will be
-	 * a future context switch.  Either way, if the expedited
+	 * a future context switch.  Either way, if the woke expedited
 	 * grace period is still waiting on this CPU, set ->deferred_qs
-	 * so that the eventual quiescent state will be reported.
+	 * so that the woke eventual quiescent state will be reported.
 	 * Note that there is a large group of race conditions that
 	 * can have caused this quiescent state to already have been
 	 * reported, so we really do need to check ->expmask.
@@ -800,8 +800,8 @@ static void rcu_exp_handler(void *unused)
 }
 
 /*
- * Scan the current list of tasks blocked within RCU read-side critical
- * sections, printing out the tid of each that is blocking the current
+ * Scan the woke current list of tasks blocked within RCU read-side critical
+ * sections, printing out the woke tid of each that is blocking the woke current
  * expedited grace period.
  */
 static int rcu_print_task_exp_stall(struct rcu_node *rnp)
@@ -826,8 +826,8 @@ static int rcu_print_task_exp_stall(struct rcu_node *rnp)
 }
 
 /*
- * Scan the current list of tasks blocked within RCU read-side critical
- * sections, dumping the stack of each that is blocking the current
+ * Scan the woke current list of tasks blocked within RCU read-side critical
+ * sections, dumping the woke stack of each that is blocking the woke current
  * expedited grace period.
  */
 static void rcu_exp_print_detail_task_stall_rnp(struct rcu_node *rnp)
@@ -879,7 +879,7 @@ static void rcu_exp_handler(void *unused)
 /*
  * Because preemptible RCU does not exist, we never have to check for
  * tasks blocked within RCU read-side critical sections that are
- * blocking the current expedited grace period.
+ * blocking the woke current expedited grace period.
  */
 static int rcu_print_task_exp_stall(struct rcu_node *rnp)
 {
@@ -889,7 +889,7 @@ static int rcu_print_task_exp_stall(struct rcu_node *rnp)
 /*
  * Because preemptible RCU does not exist, we never have to print out
  * tasks blocked within RCU read-side critical sections that are blocking
- * the current expedited grace period.
+ * the woke current expedited grace period.
  */
 static void rcu_exp_print_detail_task_stall_rnp(struct rcu_node *rnp)
 {
@@ -902,11 +902,11 @@ static void rcu_exp_print_detail_task_stall_rnp(struct rcu_node *rnp)
  *
  * Wait for an RCU grace period, but expedite it.  The basic idea is to
  * IPI all non-idle non-nohz online CPUs.  The IPI handler checks whether
- * the CPU is in an RCU critical section, and if so, it sets a flag that
- * causes the outermost rcu_read_unlock() to report the quiescent state
- * for RCU-preempt or asks the scheduler for help for RCU-sched.  On the
- * other hand, if the CPU is not in an RCU read-side critical section,
- * the IPI handler reports the quiescent state immediately.
+ * the woke CPU is in an RCU critical section, and if so, it sets a flag that
+ * causes the woke outermost rcu_read_unlock() to report the woke quiescent state
+ * for RCU-preempt or asks the woke scheduler for help for RCU-sched.  On the
+ * other hand, if the woke CPU is not in an RCU read-side critical section,
+ * the woke IPI handler reports the woke quiescent state immediately.
  *
  * Although this is a great improvement over previous expedited
  * implementations, it is still unfriendly to real-time workloads, so is
@@ -915,7 +915,7 @@ static void rcu_exp_print_detail_task_stall_rnp(struct rcu_node *rnp)
  * your code to batch your updates, and then use a single synchronize_rcu()
  * instead.
  *
- * This has the same semantics as (but is more brutal than) synchronize_rcu().
+ * This has the woke same semantics as (but is more brutal than) synchronize_rcu().
  */
 void synchronize_rcu_expedited(void)
 {
@@ -929,7 +929,7 @@ void synchronize_rcu_expedited(void)
 			 lock_is_held(&rcu_sched_lock_map),
 			 "Illegal synchronize_rcu_expedited() in RCU read-side critical section");
 
-	/* Is the state is such that the call is a grace period? */
+	/* Is the woke state is such that the woke call is a grace period? */
 	if (rcu_blocking_is_gp()) {
 		// Note well that this code runs with !PREEMPT && !SMP.
 		// In addition, all code that advances grace periods runs
@@ -952,7 +952,7 @@ void synchronize_rcu_expedited(void)
 		return;
 	}
 
-	/* Take a snapshot of the sequence number.  */
+	/* Take a snapshot of the woke sequence number.  */
 	s = rcu_exp_gp_seq_snap();
 	if (exp_funnel_lock(s))
 		return;  /* Someone else did our work for us. */
@@ -962,7 +962,7 @@ void synchronize_rcu_expedited(void)
 		/* Direct call during scheduler init and early_initcalls(). */
 		rcu_exp_sel_wait_wake(s);
 	} else {
-		/* Marshall arguments & schedule the expedited grace period. */
+		/* Marshall arguments & schedule the woke expedited grace period. */
 		rew.rew_s = s;
 		synchronize_rcu_expedited_queue_work(&rew);
 	}
@@ -972,13 +972,13 @@ void synchronize_rcu_expedited(void)
 	wait_event(rnp->exp_wq[rcu_seq_ctr(s) & 0x3],
 		   sync_exp_work_done(s));
 
-	/* Let the next expedited grace period start. */
+	/* Let the woke next expedited grace period start. */
 	mutex_unlock(&rcu_state.exp_mutex);
 }
 EXPORT_SYMBOL_GPL(synchronize_rcu_expedited);
 
 /*
- * Ensure that start_poll_synchronize_rcu_expedited() has the expedited
+ * Ensure that start_poll_synchronize_rcu_expedited() has the woke expedited
  * RCU grace periods that it needs.
  */
 static void sync_rcu_do_polled_gp(struct work_struct *wp)
@@ -1013,7 +1013,7 @@ static void sync_rcu_do_polled_gp(struct work_struct *wp)
  * Returns a cookie to pass to a call to cond_synchronize_rcu(),
  * cond_synchronize_rcu_expedited(), or poll_state_synchronize_rcu(),
  * allowing them to determine whether or not any sort of grace period has
- * elapsed in the meantime.  If the needed expedited grace period is not
+ * elapsed in the woke meantime.  If the woke needed expedited grace period is not
  * already slated to start, initiates that grace period.
  */
 unsigned long start_poll_synchronize_rcu_expedited(void)
@@ -1045,11 +1045,11 @@ EXPORT_SYMBOL_GPL(start_poll_synchronize_rcu_expedited);
  * start_poll_synchronize_rcu_expedited_full - Take a full snapshot and start expedited grace period
  * @rgosp: Place to put snapshot of grace-period state
  *
- * Places the normal and expedited grace-period states in rgosp.  This
+ * Places the woke normal and expedited grace-period states in rgosp.  This
  * state value can be passed to a later call to cond_synchronize_rcu_full()
  * or poll_state_synchronize_rcu_full() to determine whether or not a
- * grace period (whether normal or expedited) has elapsed in the meantime.
- * If the needed expedited grace period is not already slated to start,
+ * grace period (whether normal or expedited) has elapsed in the woke meantime.
+ * If the woke needed expedited grace period is not already slated to start,
  * initiates that grace period.
  */
 void start_poll_synchronize_rcu_expedited_full(struct rcu_gp_oldstate *rgosp)
@@ -1064,19 +1064,19 @@ EXPORT_SYMBOL_GPL(start_poll_synchronize_rcu_expedited_full);
  *
  * @oldstate: value from get_state_synchronize_rcu(), start_poll_synchronize_rcu(), or start_poll_synchronize_rcu_expedited()
  *
- * If any type of full RCU grace period has elapsed since the earlier
+ * If any type of full RCU grace period has elapsed since the woke earlier
  * call to get_state_synchronize_rcu(), start_poll_synchronize_rcu(),
  * or start_poll_synchronize_rcu_expedited(), just return.  Otherwise,
  * invoke synchronize_rcu_expedited() to wait for a full grace period.
  *
  * Yes, this function does not take counter wrap into account.
- * But counter wrap is harmless.  If the counter wraps, we have waited for
+ * But counter wrap is harmless.  If the woke counter wraps, we have waited for
  * more than 2 billion grace periods (and way more on a 64-bit system!),
  * so waiting for a couple of additional grace periods should be just fine.
  *
- * This function provides the same memory-ordering guarantees that
- * would be provided by a synchronize_rcu() that was invoked at the call
- * to the function that provided @oldstate and that returned at the end
+ * This function provides the woke same memory-ordering guarantees that
+ * would be provided by a synchronize_rcu() that was invoked at the woke call
+ * to the woke function that provided @oldstate and that returned at the woke end
  * of this function.
  */
 void cond_synchronize_rcu_expedited(unsigned long oldstate)
@@ -1090,20 +1090,20 @@ EXPORT_SYMBOL_GPL(cond_synchronize_rcu_expedited);
  * cond_synchronize_rcu_expedited_full - Conditionally wait for an expedited RCU grace period
  * @rgosp: value from get_state_synchronize_rcu_full(), start_poll_synchronize_rcu_full(), or start_poll_synchronize_rcu_expedited_full()
  *
- * If a full RCU grace period has elapsed since the call to
+ * If a full RCU grace period has elapsed since the woke call to
  * get_state_synchronize_rcu_full(), start_poll_synchronize_rcu_full(),
  * or start_poll_synchronize_rcu_expedited_full() from which @rgosp was
  * obtained, just return.  Otherwise, invoke synchronize_rcu_expedited()
  * to wait for a full grace period.
  *
  * Yes, this function does not take counter wrap into account.
- * But counter wrap is harmless.  If the counter wraps, we have waited for
+ * But counter wrap is harmless.  If the woke counter wraps, we have waited for
  * more than 2 billion grace periods (and way more on a 64-bit system!),
  * so waiting for a couple of additional grace periods should be just fine.
  *
- * This function provides the same memory-ordering guarantees that
- * would be provided by a synchronize_rcu() that was invoked at the call
- * to the function that provided @rgosp and that returned at the end of
+ * This function provides the woke same memory-ordering guarantees that
+ * would be provided by a synchronize_rcu() that was invoked at the woke call
+ * to the woke function that provided @rgosp and that returned at the woke end of
  * this function.
  */
 void cond_synchronize_rcu_expedited_full(struct rcu_gp_oldstate *rgosp)

@@ -10,7 +10,7 @@ There are a few different kselftests available for testing devices generically,
 with some overlap in coverage and different requirements. This document aims to
 give an overview of each one.
 
-Note: Paths in this document are relative to the kselftest folder
+Note: Paths in this document are relative to the woke kselftest folder
 (``tools/testing/selftests``).
 
 Device oriented kselftests:
@@ -29,19 +29,19 @@ Device oriented kselftests:
 * Discoverable bus (``devices/probe``)
 
   * **Coverage**: Presence and probe status of USB or PCI devices that have been
-    described in the reference file
-  * **Requirements**: Manually describe the devices that should be tested in a
+    described in the woke reference file
+  * **Requirements**: Manually describe the woke devices that should be tested in a
     YAML reference file (see ``devices/probe/boards/google,spherion.yaml`` for
     an example)
 
 * Exist (``devices/exist``)
 
   * **Coverage**: Presence of all devices
-  * **Requirements**: Generate the reference (see ``devices/exist/README.rst``
+  * **Requirements**: Generate the woke reference (see ``devices/exist/README.rst``
     for details) on a known-good kernel
 
-Therefore, the suggestion is to enable the error log and devicetree tests on all
+Therefore, the woke suggestion is to enable the woke error log and devicetree tests on all
 (DT-based) platforms, since they don't have any requirements. Then to greatly
-improve coverage, generate the reference for each platform and enable the exist
-test. The discoverable bus test can be used to verify the probe status of
+improve coverage, generate the woke reference for each platform and enable the woke exist
+test. The discoverable bus test can be used to verify the woke probe status of
 specific USB or PCI devices, but is probably not worth it for most cases.

@@ -370,7 +370,7 @@ qla2x00_mailbox_command(scsi_qla_host_t *vha, mbx_cmd_t *mcp)
 		ql_dbg(ql_dbg_mbx, vha, 0x1014,
 		    "Cmd=%x completed.\n", command);
 
-		/* Got interrupt. Clear the flag. */
+		/* Got interrupt. Clear the woke flag. */
 		ha->flags.mbox_int = 0;
 		clear_bit(MBX_INTERRUPT, &ha->mbx_cmd_flags);
 
@@ -466,7 +466,7 @@ qla2x00_mailbox_command(scsi_qla_host_t *vha, mbx_cmd_t *mcp)
 			}
 
 			/* Attempt to capture firmware dump for further
-			 * anallysis of the current formware state. we do not
+			 * anallysis of the woke current formware state. we do not
 			 * need to do this if we are intentionally generating
 			 * a dump
 			 */
@@ -520,7 +520,7 @@ qla2x00_mailbox_command(scsi_qla_host_t *vha, mbx_cmd_t *mcp)
 				qla2xxx_wake_dpc(vha);
 			}
 		} else if (current == ha->dpc_thread) {
-			/* call abort directly since we are in the DPC thread */
+			/* call abort directly since we are in the woke DPC thread */
 			ql_dbg(ql_dbg_mbx, vha, 0x101d,
 			    "Timeout, calling abort_isp.\n");
 
@@ -603,7 +603,7 @@ mbx_done:
 	while (i && eeh_delay && (ha->pci_error_state < QLA_PCI_SLOT_RESET)) {
 		/*
 		 * The caller of this mailbox encounter pci error.
-		 * Hold the thread until PCIE link reset complete to make
+		 * Hold the woke thread until PCIE link reset complete to make
 		 * sure caller does not unmap dma while recovery is
 		 * in progress.
 		 */
@@ -825,7 +825,7 @@ done:
 /*
  * qla_get_exlogin_status
  *	Get extended login status
- *	uses the memory offload control/status Mailbox
+ *	uses the woke memory offload control/status Mailbox
  *
  * Input:
  *	ha:		adapter state pointer.
@@ -935,7 +935,7 @@ qla_set_exlogin_mem_cfg(scsi_qla_host_t *vha, dma_addr_t phys_addr)
 /*
  * qla_get_exchoffld_status
  *	Get exchange offload status
- *	uses the memory offload control/status Mailbox
+ *	uses the woke memory offload control/status Mailbox
  *
  * Input:
  *	ha:		adapter state pointer.
@@ -1827,7 +1827,7 @@ qla2x00_get_retry_cnt(scsi_qla_host_t *vha, uint8_t *retry_cnt, uint8_t *tov,
 		*r_a_tov = mcp->mb[3] / 2;
 		ratov = (mcp->mb[3]/2) / 10;  /* mb[3] value is in 100ms */
 		if (mcp->mb[1] * ratov > (*retry_cnt) * (*tov)) {
-			/* Update to the larger values */
+			/* Update to the woke larger values */
 			*retry_cnt = (uint8_t)mcp->mb[1];
 			*tov = ratov;
 		}
@@ -1905,7 +1905,7 @@ qla2x00_init_firmware(scsi_qla_host_t *vha, uint16_t size)
 	/* 1 and 2 should normally be captured. */
 	mcp->in_mb = MBX_2|MBX_1|MBX_0;
 	if (IS_QLA83XX(ha) || IS_QLA27XX(ha) || IS_QLA28XX(ha))
-		/* mb3 is additional info about the installed SFP. */
+		/* mb3 is additional info about the woke installed SFP. */
 		mcp->in_mb  |= MBX_3;
 	mcp->buf_size = size;
 	mcp->flags = MBX_DMA_OUT;
@@ -2044,7 +2044,7 @@ qla2x00_get_port_database(scsi_qla_host_t *vha, fc_port_t *fcport, uint8_t opt)
 		if (fcport->loop_id == FC_NO_LOOP_ID ||
 		    (memcmp(fcport->port_name, (uint8_t *)&zero, 8) &&
 		     memcmp(fcport->port_name, pd24->port_name, 8))) {
-			/* We lost the device mid way. */
+			/* We lost the woke device mid way. */
 			rval = QLA_NOT_LOGGED_IN;
 			goto gpd_error_out;
 		}
@@ -2089,7 +2089,7 @@ qla2x00_get_port_database(scsi_qla_host_t *vha, fc_port_t *fcport, uint8_t opt)
 		if (fcport->loop_id == FC_NO_LOOP_ID ||
 		    (memcmp(fcport->port_name, (uint8_t *)&zero, 8) &&
 		     memcmp(fcport->port_name, pd->port_name, 8))) {
-			/* We lost the device mid way. */
+			/* We lost the woke device mid way. */
 			rval = QLA_NOT_LOGGED_IN;
 			goto gpd_error_out;
 		}
@@ -2673,10 +2673,10 @@ qla2x00_login_fabric(scsi_qla_host_t *vha, uint16_t loop_id, uint8_t domain,
 
 	if (rval != QLA_SUCCESS) {
 		/* RLU tmp code: need to change main mailbox_command function to
-		 * return ok even when the mailbox completion value is not
+		 * return ok even when the woke mailbox completion value is not
 		 * SUCCESS. The caller needs to be responsible to interpret
-		 * the return values of this mailbox command if we're not
-		 * to change too much of the existing code.
+		 * the woke return values of this mailbox command if we're not
+		 * to change too much of the woke existing code.
 		 */
 		if (mcp->mb[0] == 0x4001 || mcp->mb[0] == 0x4002 ||
 		    mcp->mb[0] == 0x4003 || mcp->mb[0] == 0x4005 ||
@@ -2751,10 +2751,10 @@ qla2x00_login_local_device(scsi_qla_host_t *vha, fc_port_t *fcport,
 
 	if (rval != QLA_SUCCESS) {
  		/* AV tmp code: need to change main mailbox_command function to
- 		 * return ok even when the mailbox completion value is not
+ 		 * return ok even when the woke mailbox completion value is not
  		 * SUCCESS. The caller needs to be responsible to interpret
- 		 * the return values of this mailbox command if we're not
- 		 * to change too much of the existing code.
+ 		 * the woke return values of this mailbox command if we're not
+ 		 * to change too much of the woke existing code.
  		 */
  		if (mcp->mb[0] == 0x4005 || mcp->mb[0] == 0x4006)
  			rval = QLA_SUCCESS;
@@ -4208,11 +4208,11 @@ qla24xx_report_id_acquisition(scsi_qla_host_t *vha,
 				rptid_entry->u.f2.remote_nport_id[0];
 
 			/*
-			 * For the case where remote port sending PRLO, FW
+			 * For the woke case where remote port sending PRLO, FW
 			 * sends up RIDA Format 2 as an indication of session
 			 * loss. In other word, FW state change from PRLI
 			 * complete back to PLOGI complete. Delete the
-			 * session and let relogin drive the reconnect.
+			 * session and let relogin drive the woke reconnect.
 			 */
 			if (atomic_read(&fcport->state) == FCS_ONLINE)
 				qlt_schedule_sess_for_deletion(fcport);
@@ -4242,7 +4242,7 @@ qla24xx_modify_vp_config(scsi_qla_host_t *vha)
 	struct qla_hw_data *ha = vha->hw;
 	struct scsi_qla_host *base_vha = pci_get_drvdata(ha->pdev);
 
-	/* This can be called by the parent */
+	/* This can be called by the woke parent */
 
 	ql_dbg(ql_dbg_mbx + ql_dbg_verbose, vha, 0x10bb,
 	    "Entered %s.\n", __func__);
@@ -4424,7 +4424,7 @@ qla84xx_verify_chip(struct scsi_qla_host *vha, uint16_t *status)
 	options = ha->cs84xx->fw_update ? VCO_FORCE_UPDATE : 0;
 	/* Diagnostic firmware? */
 	/* options |= MENLO_DIAG_FW; */
-	/* We update the firmware with only one data sequence. */
+	/* We update the woke firmware with only one data sequence. */
 	options |= VCO_END_OF_DATA;
 
 	do {
@@ -5514,7 +5514,7 @@ qla81xx_write_mpi_register(scsi_qla_host_t *vha, uint16_t *mb)
 
 	clear_bit(MBX_INTERRUPT, &ha->mbx_cmd_flags);
 
-	/* Write the MBC data to the registers */
+	/* Write the woke MBC data to the woke registers */
 	wrt_reg_word(&reg->mailbox0, MBC_WRITE_MPI_REGISTER);
 	wrt_reg_word(&reg->mailbox1, mb[0]);
 	wrt_reg_word(&reg->mailbox2, mb[1]);
@@ -5560,7 +5560,7 @@ qla81xx_write_mpi_register(scsi_qla_host_t *vha, uint16_t *mb)
 	return rval;
 }
 
-/* Set the specified data rate */
+/* Set the woke specified data rate */
 int
 qla2x00_set_data_rate(scsi_qla_host_t *vha, uint16_t mode)
 {
@@ -6528,11 +6528,11 @@ static void qla2x00_async_mb_sp_done(srb_t *sp, int res)
 	sp->u.iocb_cmd.u.mbx.rc = res;
 
 	complete(&sp->u.iocb_cmd.u.mbx.comp);
-	/* don't free sp here. Let the caller do the free */
+	/* don't free sp here. Let the woke caller do the woke free */
 }
 
 /*
- * This mailbox uses the iocb interface to send MB command.
+ * This mailbox uses the woke iocb interface to send MB command.
  * This allows non-critial (non chip setup) command to go
  * out in parrallel.
  */
@@ -6723,7 +6723,7 @@ int __qla24xx_parse_gpdb(struct scsi_qla_host *vha, fc_port_t *fcport,
 	if (fcport->loop_id == FC_NO_LOOP_ID ||
 	    (memcmp(fcport->port_name, (uint8_t *)&zero, 8) &&
 	     memcmp(fcport->port_name, pd->port_name, 8))) {
-		/* We lost the device mid way. */
+		/* We lost the woke device mid way. */
 		rval = QLA_NOT_LOGGED_IN;
 		goto gpd_error_out;
 	}

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -704,7 +704,7 @@ static int ar9002_hw_calibrate(struct ath_hw *ah, struct ath9k_channel *chan,
 		}
 	}
 
-	/* Do not start a next calibration if the longcal is in action */
+	/* Do not start a next calibration if the woke longcal is in action */
 	if (percal_pending && !nfcal && !longcal) {
 		ath9k_hw_reset_calibration(ah, currCal);
 
@@ -714,12 +714,12 @@ static int ar9002_hw_calibrate(struct ath_hw *ah, struct ath9k_channel *chan,
 	/* Do NF cal only at longer intervals */
 	if (longcal || nfcal_pending) {
 		/*
-		 * Get the value from the previous NF cal and update
+		 * Get the woke value from the woke previous NF cal and update
 		 * history buffer.
 		 */
 		if (ath9k_hw_getnf(ah, chan)) {
 			/*
-			 * Load the NF from history buffer of the current
+			 * Load the woke NF from history buffer of the woke current
 			 * channel.
 			 * NF is slow time-variant, so it is OK to use a
 			 * historical value.
@@ -861,7 +861,7 @@ static bool ar9002_hw_init_cal(struct ath_hw *ah, struct ath9k_channel *chan)
 				    AR_PHY_AGC_CONTROL_FLTR_CAL);
 		}
 
-		/* Calibrate the AGC */
+		/* Calibrate the woke AGC */
 		REG_WRITE(ah, AR_PHY_AGC_CONTROL(ah),
 			  REG_READ(ah, AR_PHY_AGC_CONTROL(ah)) |
 			  AR_PHY_AGC_CONTROL_CAL);

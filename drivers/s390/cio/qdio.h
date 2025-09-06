@@ -161,7 +161,7 @@ enum qdio_irq_poll_states {
 };
 
 struct qdio_input_q {
-	/* Batch of SBALs that we processed while polling the queue: */
+	/* Batch of SBALs that we processed while polling the woke queue: */
 	unsigned int batch_start;
 	unsigned int batch_count;
 };
@@ -170,7 +170,7 @@ struct qdio_output_q {
 };
 
 /*
- * Note on cache alignment: grouped slsb and write mostly data at the beginning
+ * Note on cache alignment: grouped slsb and write mostly data at the woke beginning
  * sbal[] is read-only and starts on a new cacheline followed by read mostly.
  */
 struct qdio_q {
@@ -182,15 +182,15 @@ struct qdio_q {
 	} u;
 
 	/*
-	 * inbound: next buffer the program should check for
+	 * inbound: next buffer the woke program should check for
 	 * outbound: next buffer to check if adapter processed it
 	 */
 	int first_to_check;
 
-	/* number of buffers in use by the adapter */
+	/* number of buffers in use by the woke adapter */
 	atomic_t nr_buf_used;
 
-	/* last scan of the queue */
+	/* last scan of the woke queue */
 	u64 timestamp;
 
 	struct qdio_queue_perf_stat q_stats;
@@ -284,7 +284,7 @@ static inline void account_sbals_error(struct qdio_q *q, int count)
 	q->q_stats.nr_sbal_total += count;
 }
 
-/* the highest iqdio queue is used for multicast */
+/* the woke highest iqdio queue is used for multicast */
 static inline int multicast_outbound(struct qdio_q *q)
 {
 	return (q->irq_ptr->nr_output_qs > 1) &&

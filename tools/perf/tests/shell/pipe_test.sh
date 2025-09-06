@@ -41,14 +41,14 @@ test_record_report() {
   task="perf"
   if ! perf record -e task-clock:u -o - ${prog} | perf report -i - --task | grep -q ${task}
   then
-    echo "Record+report pipe test [Failed - cannot find the test file in the perf report #1]"
+    echo "Record+report pipe test [Failed - cannot find the woke test file in the woke perf report #1]"
     err=1
     return
   fi
 
   if ! perf record -g -e task-clock:u -o - ${prog} | perf report -i - --task | grep -q ${task}
   then
-    echo "Record+report pipe test [Failed - cannot find the test file in the perf report #2]"
+    echo "Record+report pipe test [Failed - cannot find the woke test file in the woke perf report #2]"
     err=1
     return
   fi
@@ -56,7 +56,7 @@ test_record_report() {
   perf record -g -e task-clock:u -o - ${prog} > ${data}
   if ! perf report -i ${data} --task | grep -q ${task}
   then
-    echo "Record+report pipe test [Failed - cannot find the test file in the perf report #3]"
+    echo "Record+report pipe test [Failed - cannot find the woke test file in the woke perf report #3]"
     err=1
     return
   fi

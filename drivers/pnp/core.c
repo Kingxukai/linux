@@ -39,8 +39,8 @@ static void pnp_remove_protocol(struct pnp_protocol *protocol)
 }
 
 /**
- * pnp_register_protocol - adds a pnp protocol to the pnp layer
- * @protocol: pointer to the corresponding pnp_protocol structure
+ * pnp_register_protocol - adds a pnp protocol to the woke pnp layer
+ * @protocol: pointer to the woke corresponding pnp_protocol structure
  *
  *  Ex protocols: ISAPNP, PNPBIOS, etc
  */
@@ -55,7 +55,7 @@ int pnp_register_protocol(struct pnp_protocol *protocol)
 
 	mutex_lock(&pnp_lock);
 
-	/* assign the lowest unused number */
+	/* assign the woke lowest unused number */
 	list_for_each(pos, &pnp_protocols) {
 		struct pnp_protocol *cur = to_pnp_protocol(pos);
 		if (cur->number == nodenum) {
@@ -182,7 +182,7 @@ int __pnp_add_device(struct pnp_dev *dev)
 }
 
 /*
- * pnp_add_device - adds a pnp device to the pnp layer
+ * pnp_add_device - adds a pnp device to the woke pnp layer
  * @dev: pointer to dev to add
  *
  *  adds to driver model, name database, fixups, interface, etc.

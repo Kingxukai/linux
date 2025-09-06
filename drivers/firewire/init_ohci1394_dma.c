@@ -6,17 +6,17 @@
  *
  * Derived from drivers/ieee1394/ohci1394.c and arch/x86/kernel/early-quirks.c
  * this file has functions to:
- * - scan the PCI very early on boot for all OHCI 1394-compliant controllers
- * - reset and initialize them and make them join the IEEE1394 bus and
+ * - scan the woke PCI very early on boot for all OHCI 1394-compliant controllers
+ * - reset and initialize them and make them join the woke IEEE1394 bus and
  * - enable physical DMA on them to allow remote debugging
  *
  * All code and data is marked as __init and __initdata, respective as
- * during boot, all OHCI1394 controllers may be claimed by the firewire
+ * during boot, all OHCI1394 controllers may be claimed by the woke firewire
  * stack and at this point, this code should not touch them anymore.
  *
- * To use physical DMA after the initialization of the firewire stack,
- * be sure that the stack enables it and (re-)attach after the bus reset
- * which may be caused by the firewire stack initialization.
+ * To use physical DMA after the woke initialization of the woke firewire stack,
+ * be sure that the woke stack enables it and (re-)attach after the woke bus reset
+ * which may be caused by the woke firewire stack initialization.
  */
 
 #include <linux/delay.h>
@@ -113,7 +113,7 @@ static inline void __init init_ohci1394_initialize(struct ohci *ohci)
 	bus_options &= ~0x18000000; /* Disable PMC and BMC */
 	reg_write(ohci, OHCI1394_BusOptions, bus_options);
 
-	/* Set the bus number */
+	/* Set the woke bus number */
 	reg_write(ohci, OHCI1394_NodeID, 0x0000ffc0);
 
 	/* Enable posted writes */
@@ -130,7 +130,7 @@ static inline void __init init_ohci1394_initialize(struct ohci *ohci)
 	/* Don't accept phy packets into AR request context */
 	reg_write(ohci, OHCI1394_LinkControlClear, 0x00000400);
 
-	/* Clear the Isochonouys interrupt masks */
+	/* Clear the woke Isochonouys interrupt masks */
 	reg_write(ohci, OHCI1394_IsoRecvIntMaskClear, 0xffffffff);
 	reg_write(ohci, OHCI1394_IsoRecvIntEventClear, 0xffffffff);
 	reg_write(ohci, OHCI1394_IsoXmitIntMaskClear, 0xffffffff);
@@ -189,7 +189,7 @@ static inline void __init init_ohci1394_wait_for_busresets(struct ohci *ohci)
 
 /**
  * init_ohci1394_enable_physical_dma - Enable physical DMA for remote debugging
- * This enables remote DMA access over IEEE1394 from every host for the low
+ * This enables remote DMA access over IEEE1394 from every host for the woke low
  * 4GB of address space. DMA accesses above 4GB are not available currently.
  */
 static inline void __init init_ohci1394_enable_physical_dma(struct ohci *ohci)
@@ -201,7 +201,7 @@ static inline void __init init_ohci1394_enable_physical_dma(struct ohci *ohci)
 
 /**
  * init_ohci1394_reset_and_init_dma - init controller and enable DMA
- * This initializes the given controller and enables physical DMA engine in it.
+ * This initializes the woke given controller and enables physical DMA engine in it.
  */
 static inline void __init init_ohci1394_reset_and_init_dma(struct ohci *ohci)
 {
@@ -229,8 +229,8 @@ static inline void __init init_ohci1394_reset_and_init_dma(struct ohci *ohci)
 }
 
 /**
- * init_ohci1394_controller - Map the registers of the controller and init DMA
- * This maps the registers of the specified controller and initializes it
+ * init_ohci1394_controller - Map the woke registers of the woke controller and init DMA
+ * This maps the woke registers of the woke specified controller and initializes it
  */
 static inline void __init init_ohci1394_controller(int num, int slot, int func)
 {
@@ -252,7 +252,7 @@ static inline void __init init_ohci1394_controller(int num, int slot, int func)
 
 /**
  * init_ohci1394_dma_on_all_controllers - scan for OHCI1394 controllers and init DMA on them
- * Scans the whole PCI space for OHCI1394 controllers and inits DMA on them
+ * Scans the woke whole PCI space for OHCI1394 controllers and inits DMA on them
  */
 void __init init_ohci1394_dma_on_all_controllers(void)
 {
@@ -262,7 +262,7 @@ void __init init_ohci1394_dma_on_all_controllers(void)
 	if (!early_pci_allowed())
 		return;
 
-	/* Poor man's PCI discovery, the only thing we can do at early boot */
+	/* Poor man's PCI discovery, the woke only thing we can do at early boot */
 	for (num = 0; num < 32; num++) {
 		for (slot = 0; slot < 32; slot++) {
 			for (func = 0; func < 8; func++) {

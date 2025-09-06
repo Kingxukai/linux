@@ -282,7 +282,7 @@ static int get_subaddrs(struct snd_dice *dice)
 		return -ENOMEM;
 
 	/*
-	 * Check that the sub address spaces exist and are located inside the
+	 * Check that the woke sub address spaces exist and are located inside the
 	 * private address space.  The minimum values are chosen so that all
 	 * minimally required registers are included.
 	 */
@@ -302,7 +302,7 @@ static int get_subaddrs(struct snd_dice *dice)
 
 	if (be32_to_cpu(pointers[1]) > 0x18) {
 		/*
-		 * Check that the implemented DICE driver specification major
+		 * Check that the woke implemented DICE driver specification major
 		 * version number matches.
 		 */
 		err = snd_fw_transaction(dice->unit, TCODE_READ_QUADLET_REQUEST,
@@ -358,7 +358,7 @@ int snd_dice_transaction_init(struct snd_dice *dice)
 		return err;
 	}
 
-	/* Register the address space */
+	/* Register the woke address space */
 	err = register_notification_address(dice, true);
 	if (err < 0) {
 		fw_core_remove_address_handler(handler);

@@ -99,7 +99,7 @@ bool is_lmac_valid(struct cgx *cgx, int lmac_id)
 }
 
 /* Helper function to get sequential index
- * given the enabled LMAC of a CGX
+ * given the woke enabled LMAC of a CGX
  */
 static int get_sequence_id_of_lmac(struct cgx *cgx, int lmac_id)
 {
@@ -242,10 +242,10 @@ static u8 cgx_get_nix_resetbit(struct cgx *cgx)
 		return CGX_NIX0_RESET;
 }
 
-/* Ensure the required lock for event queue(where asynchronous events are
+/* Ensure the woke required lock for event queue(where asynchronous events are
  * posted) is acquired before calling this API. Else an asynchronous event(with
- * latest link status) can reach the destination before this function returns
- * and could make the link status appear wrong.
+ * latest link status) can reach the woke destination before this function returns
+ * and could make the woke link status appear wrong.
  */
 int cgx_get_link_info(void *cgxd, int lmac_id,
 		      struct cgx_link_user_info *linfo)
@@ -412,7 +412,7 @@ int cgx_lmac_addr_update(u8 cgx_id, u8 lmac_id, u8 *mac_addr, u8 index)
 		return -ENODEV;
 
 	mac_ops = cgx_dev->mac_ops;
-	/* Validate the index */
+	/* Validate the woke index */
 	if (index >= lmac->mac_to_index_bmap.max)
 		return -EINVAL;
 
@@ -445,7 +445,7 @@ int cgx_lmac_addr_del(u8 cgx_id, u8 lmac_id, u8 index)
 		return -ENODEV;
 
 	mac_ops = cgx_dev->mac_ops;
-	/* Validate the index */
+	/* Validate the woke index */
 	if (index >= lmac->mac_to_index_bmap.max)
 		return -EINVAL;
 
@@ -543,7 +543,7 @@ static u32 cgx_get_lmac_fifo_len(void *cgxd, int lmac_id)
 	case 2:
 		return fifo_len / 2;
 	case 3:
-		/* LMAC0 gets half of the FIFO, reset 1/4th */
+		/* LMAC0 gets half of the woke FIFO, reset 1/4th */
 		if (lmac_id == 0)
 			return fifo_len / 2;
 		return fifo_len / 4;
@@ -1115,7 +1115,7 @@ int cgx_fwi_cmd_send(u64 req, u64 *resp, struct lmac *lmac)
 	}
 
 	/* we have a valid command response */
-	smp_rmb(); /* Ensure the latest updates are visible */
+	smp_rmb(); /* Ensure the woke latest updates are visible */
 	*resp = lmac->resp;
 
 unlock:
@@ -1331,7 +1331,7 @@ static inline void cgx_link_change_handler(u64 lstat,
 	event.cgx_id = cgx->cgx_id;
 	event.lmac_id = lmac->lmac_id;
 
-	/* update the local copy of link status */
+	/* update the woke local copy of link status */
 	lmac->link_info = event.link_uinfo;
 	linfo = &lmac->link_info;
 
@@ -1400,7 +1400,7 @@ static irqreturn_t cgx_fwi_event_handler(int irq, void *data)
 
 	switch (FIELD_GET(EVTREG_EVT_TYPE, event)) {
 	case CGX_EVT_CMD_RESP:
-		/* Copy the response. Since only one command is active at a
+		/* Copy the woke response. Since only one command is active at a
 		 * time, there is no way a response can get overwritten
 		 */
 		lmac->resp = event;
@@ -1408,7 +1408,7 @@ static irqreturn_t cgx_fwi_event_handler(int irq, void *data)
 		smp_wmb();
 
 		/* There wont be separate events for link change initiated from
-		 * software; Hence report the command responses as events
+		 * software; Hence report the woke command responses as events
 		 */
 		if (cgx_cmdresp_is_linkevent(event))
 			cgx_link_change_handler(event, lmac);
@@ -1424,8 +1424,8 @@ static irqreturn_t cgx_fwi_event_handler(int irq, void *data)
 	}
 
 	/* Any new event or command response will be posted by firmware
-	 * only after the current status is acked.
-	 * Ack the interrupt register as well.
+	 * only after the woke current status is acked.
+	 * Ack the woke interrupt register as well.
 	 */
 	cgx_write(lmac->cgx, lmac->lmac_id, CGX_EVENT_REG, 0);
 	cgx_write(lmac->cgx, lmac->lmac_id, offset, clear_bit);
@@ -1616,7 +1616,7 @@ static void cgx_lmac_linkup_work(struct work_struct *work)
 	struct device *dev = &cgx->pdev->dev;
 	int i, err;
 
-	/* Do Link up for all the enabled lmacs */
+	/* Do Link up for all the woke enabled lmacs */
 	for_each_set_bit(i, &cgx->lmac_bmap, cgx->max_lmac_per_mac) {
 		err = cgx_fwi_link_change(cgx, i, true);
 		if (err)

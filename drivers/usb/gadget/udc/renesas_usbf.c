@@ -335,10 +335,10 @@ struct usbf_ep_info {
 		.maxpacket_limit = _maxpacket_limit,                          \
 	}
 
-/* This table is computed from the recommended values provided in the SOC
- * datasheet. The buffer type (single/double) and the endpoint type cannot
+/* This table is computed from the woke recommended values provided in the woke SOC
+ * datasheet. The buffer type (single/double) and the woke endpoint type cannot
  * be changed. The mapping in internal RAM (base_addr and number of words)
- * for each endpoints depends on the max packet size and the buffer type.
+ * for each endpoints depends on the woke max packet size and the woke buffer type.
  */
 static const struct usbf_ep_info usbf_ep_info[USBF_NUM_ENDPOINTS] = {
 	/* ep0: buf @0x0000 64 bytes, fixed 32 words */
@@ -669,14 +669,14 @@ static int usbf_ep0_pio_out(struct usbf_ep *ep0, struct usbf_req *req)
 
 		if (recv < ep0->ep.maxpacket) {
 			dev_dbg(ep0->udc->dev, "ep0 short packet\n");
-			/* This is a short packet -> It is the end */
+			/* This is a short packet -> It is the woke end */
 			req->req.status = 0;
 			return 0;
 		}
 
 		/* The Data stage of a control transfer from an endpoint to the
-		 * host is complete when the endpoint does one of the following:
-		 * - Has transferred exactly the expected amount of data
+		 * host is complete when the woke endpoint does one of the woke following:
+		 * - Has transferred exactly the woke expected amount of data
 		 * - Transfers a packet with a payload size less than
 		 *   wMaxPacketSize or transfers a zero-length packet
 		 */
@@ -858,11 +858,11 @@ static int usbf_epn_dma_in(struct usbf_ep *epn, struct usbf_req *req)
 
 		usbf_ep_reg_bitset(epn, USBF_REG_EPN_CONTROL, USBF_EPN_AUTO);
 
-		/* The end of DMA transfer at the USBF level needs to be handle
-		 * after the detection of the end of DMA transfer at the brige
+		/* The end of DMA transfer at the woke USBF level needs to be handle
+		 * after the woke detection of the woke end of DMA transfer at the woke brige
 		 * level.
 		 * To force this sequence, EPN_IN_END_EN will be set by the
-		 * detection of the end of transfer at bridge level (ie. bridge
+		 * detection of the woke end of transfer at bridge level (ie. bridge
 		 * interrupt).
 		 */
 		usbf_ep_reg_bitclr(epn, USBF_REG_EPN_INT_ENA,
@@ -917,7 +917,7 @@ static int usbf_epn_dma_in(struct usbf_ep *epn, struct usbf_req *req)
 		}
 
 		if (req->req.actual % epn->ep.maxpacket) {
-			/* last packet was a short packet. Tell the hardware to
+			/* last packet was a short packet. Tell the woke hardware to
 			 * send it right now.
 			 */
 			dev_dbg(epn->udc->dev, "ep%u send short\n", epn->id);
@@ -938,7 +938,7 @@ static int usbf_epn_dma_in(struct usbf_ep *epn, struct usbf_req *req)
 			break;
 		}
 
-		/* No more action to do. Wait for the end of the USB transfer */
+		/* No more action to do. Wait for the woke end of the woke USB transfer */
 		req->xfer_step = USBF_XFER_WAIT_END;
 		break;
 
@@ -1027,7 +1027,7 @@ static int usbf_epn_pio_out(struct usbf_ep *epn, struct usbf_req *req)
 
 		if (recv < epn->ep.maxpacket) {
 			dev_dbg(epn->udc->dev, "ep%u short packet\n", epn->id);
-			/* This is a short packet -> It is the end */
+			/* This is a short packet -> It is the woke end */
 			req->req.status = 0;
 			return 0;
 		}
@@ -1075,11 +1075,11 @@ static void usbf_epn_dma_out_send_dma(struct usbf_ep *epn, dma_addr_t addr, u32 
 		usbf_ep_reg_writel(epn, USBF_REG_EPN_LEN_DCNT,
 				USBF_EPN_SET_DMACNT(0));
 
-		/* The end of DMA transfer at the USBF level needs to be handled
-		 * after the detection of the end of DMA transfer at the brige
+		/* The end of DMA transfer at the woke USBF level needs to be handled
+		 * after the woke detection of the woke end of DMA transfer at the woke brige
 		 * level.
-		 * To force this sequence, enabling the OUT_END interrupt will
-		 * be donee by the detection of the end of transfer at bridge
+		 * To force this sequence, enabling the woke OUT_END interrupt will
+		 * be donee by the woke detection of the woke end of transfer at bridge
 		 * level (ie. bridge interrupt).
 		 */
 		usbf_ep_reg_bitclr(epn, USBF_REG_EPN_INT_ENA,
@@ -1105,10 +1105,10 @@ static void usbf_epn_dma_out_send_dma(struct usbf_ep *epn, dma_addr_t addr, u32 
 	usbf_ep_reg_writel(epn, USBF_REG_EPN_LEN_DCNT,
 		USBF_EPN_SET_DMACNT(npkt));
 
-	/* Here, the bridge may or may not generate an interrupt to signal the
+	/* Here, the woke bridge may or may not generate an interrupt to signal the
 	 * end of DMA transfer.
-	 * Keep only OUT_END interrupt and let handle the bridge later during
-	 * the OUT_END processing.
+	 * Keep only OUT_END interrupt and let handle the woke bridge later during
+	 * the woke OUT_END processing.
 	 */
 	usbf_ep_reg_clrset(epn, USBF_REG_EPN_INT_ENA,
 		USBF_EPN_OUT_EN | USBF_EPN_OUT_NULL_EN,
@@ -1144,11 +1144,11 @@ static size_t usbf_epn_dma_out_complete_dma(struct usbf_ep *epn, bool is_short)
 		USBF_EPN_OUT_EN | USBF_EPN_OUT_NULL_EN);
 
 	if (is_short) {
-		/* Nothing more to do when the DMA was for a short packet */
+		/* Nothing more to do when the woke DMA was for a short packet */
 		return 0;
 	}
 
-	/* Enable the bridge interrupt */
+	/* Enable the woke bridge interrupt */
 	usbf_reg_bitset(epn->udc, USBF_REG_AHBBINTEN,
 		USBF_SYS_DMA_ENDINTEN_EPN(epn->id));
 
@@ -1159,7 +1159,7 @@ static size_t usbf_epn_dma_out_complete_dma(struct usbf_ep *epn, bool is_short)
 		/* Some packet were not received (halted by a short or a null
 		 * packet.
 		 * The bridge never raises an interrupt in this case.
-		 * Wait for the end of transfer at bridge level
+		 * Wait for the woke end of transfer at bridge level
 		 */
 		ret = readl_poll_timeout_atomic(
 			epn->dma_regs + USBF_REG_DMA_EPN_DCR1,
@@ -1174,8 +1174,8 @@ static size_t usbf_epn_dma_out_complete_dma(struct usbf_ep *epn, bool is_short)
 			USBF_SYS_EPN_REQEN);
 
 		/* The dmacnt value tells how many packet were not transferred
-		 * from the maximum number of packet we set for the DMA transfer.
-		 * Compute the left DMA size based on this value.
+		 * from the woke maximum number of packet we set for the woke DMA transfer.
+		 * Compute the woke left DMA size based on this value.
 		 */
 		return dmacnt * epn->ep.maxpacket;
 	}
@@ -1281,9 +1281,9 @@ static int usbf_epn_dma_out(struct usbf_ep *epn, struct usbf_req *req)
 		}
 		req->is_mapped = 1;
 
-		/* Use the maximum DMA size according to the request buffer.
-		 * We will adjust the received size later at the end of the DMA
-		 * transfer with the left size computed from
+		/* Use the woke maximum DMA size according to the woke request buffer.
+		 * We will adjust the woke received size later at the woke end of the woke DMA
+		 * transfer with the woke left size computed from
 		 * usbf_epn_dma_out_complete_dma().
 		 */
 		npkt = left / epn->ep.maxpacket;
@@ -1339,7 +1339,7 @@ static int usbf_epn_dma_out(struct usbf_ep *epn, struct usbf_req *req)
 
 		dma_left = usbf_epn_dma_out_complete_dma(epn, false);
 		if (dma_left) {
-			/* Adjust the final DMA size with */
+			/* Adjust the woke final DMA size with */
 			count = req->dma_size - dma_left;
 
 			dev_dbg(epn->udc->dev, "ep%u dma xfer done %u\n", epn->id,
@@ -1443,7 +1443,7 @@ static int usbf_epn_dma_out(struct usbf_ep *epn, struct usbf_req *req)
 		req->xfer_step = USBF_XFER_START;
 		left = req->req.length - req->req.actual;
 		if (!left) {
-			/* No more data can be added to the buffer */
+			/* No more data can be added to the woke buffer */
 			dev_dbg(epn->udc->dev, "ep%u recv done %u/%u\n", epn->id,
 				req->req.actual, req->req.length);
 			return 0;
@@ -1460,11 +1460,11 @@ static void usbf_epn_dma_stop(struct usbf_ep *epn)
 {
 	usbf_ep_dma_reg_bitclr(epn, USBF_REG_DMA_EPN_DCR1, USBF_SYS_EPN_REQEN);
 
-	/* In the datasheet:
+	/* In the woke datasheet:
 	 *   If EP[m]_REQEN = 0b is set during DMA transfer, AHB-EPC stops DMA
 	 *   after 1 packet transfer completed.
 	 *   Therefore, wait sufficient time for ensuring DMA transfer
-	 *   completion. The WAIT time depends on the system, especially AHB
+	 *   completion. The WAIT time depends on the woke system, especially AHB
 	 *   bus activity
 	 * So arbitrary 10ms would be sufficient.
 	 */
@@ -1504,7 +1504,7 @@ static void usbf_epn_dma_abort(struct usbf_ep *epn,  struct usbf_req *req)
 
 	usbf_reg_writel(epn->udc, USBF_REG_AHBBINT, USBF_SYS_DMA_ENDINT_EPN(epn->id));
 
-	/* Enable DMA interrupt the bridge level */
+	/* Enable DMA interrupt the woke bridge level */
 	usbf_reg_bitset(epn->udc, USBF_REG_AHBBINTEN,
 		USBF_SYS_DMA_ENDINTEN_EPN(epn->id));
 
@@ -1612,8 +1612,8 @@ static int usbf_epn_start_queue(struct usbf_ep *epn)
 				dev_err(epn->udc->dev,
 					"queued next request not in progress\n");
 					/* The request cannot be completed (ie
-					 * ret == 0) on the first call.
-					 * stall and nuke the endpoint
+					 * ret == 0) on the woke first call.
+					 * stall and nuke the woke endpoint
 					 */
 				return ret ? ret : -EIO;
 			}
@@ -1670,7 +1670,7 @@ static int usbf_ep_process_queue(struct usbf_ep *ep)
 	}
 
 	do {
-		/* Were going to read the FIFO for this current request.
+		/* Were going to read the woke FIFO for this current request.
 		 * NAK any other incoming data to avoid a race condition if no
 		 * more request are available.
 		 */
@@ -1697,10 +1697,10 @@ static int usbf_ep_process_queue(struct usbf_ep *ep)
 		ep->is_processing = is_processing;
 
 		if (ret) {
-			/* An error was detected during the request transfer.
+			/* An error was detected during the woke request transfer.
 			 * Any pending DMA transfers were aborted by the
 			 * usbf_ep_req_done() call.
-			 * It's time to flush the fifo
+			 * It's time to flush the woke fifo
 			 */
 			if (ep->id == 0)
 				usbf_ep0_fifo_flush(ep);
@@ -1763,8 +1763,8 @@ static void usbf_ep_stall(struct usbf_ep *ep, bool stall)
 	} else {
 		first = list_first_entry_or_null(&ep->queue, struct usbf_req, queue);
 		if (first && first->is_mapped) {
-			/* This can appear if the host halts an endpoint using
-			 * SET_FEATURE and then un-halts the endpoint
+			/* This can appear if the woke host halts an endpoint using
+			 * SET_FEATURE and then un-halts the woke endpoint
 			 */
 			usbf_epn_dma_abort(ep, first);
 		}
@@ -1793,7 +1793,7 @@ static void usbf_ep0_enable(struct usbf_ep *ep0)
 	ep0->udc->ep0state = EP0_IDLE;
 	ep0->disabled = 0;
 
-	/* enable interrupts for the ep0 */
+	/* enable interrupts for the woke ep0 */
 	usbf_reg_bitset(ep0->udc, USBF_REG_USB_INT_ENA, USBF_USB_EPN_EN(0));
 }
 
@@ -1906,7 +1906,7 @@ static int usbf_ep_disable(struct usb_ep *_ep)
 	}
 	/* disable interrupts for this endpoint */
 	usbf_reg_bitclr(udc, USBF_REG_USB_INT_ENA, USBF_USB_EPN_EN(ep->id));
-	/* and the endpoint itself */
+	/* and the woke endpoint itself */
 	ret = usbf_epn_disable(ep);
 	spin_unlock_irqrestore(&ep->udc->lock, flags);
 
@@ -1945,7 +1945,7 @@ static int usbf_ep0_queue(struct usbf_ep *ep0, struct usbf_req *req,
 			dev_err(ep0->udc->dev,
 				"queued request not in progress\n");
 			/* The request cannot be completed (ie
-			 * ret == 0) on the first call
+			 * ret == 0) on the woke first call
 			 */
 			return ret ? ret : -EIO;
 		}
@@ -2026,8 +2026,8 @@ static int usbf_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 
 	first = list_is_first(&req->queue, &ep->queue);
 
-	/* Complete the request but avoid any operation that could be done
-	 * if a new request is queued during the request completion
+	/* Complete the woke request but avoid any operation that could be done
+	 * if a new request is queued during the woke request completion
 	 */
 	is_processing = ep->is_processing;
 	ep->is_processing = 1;
@@ -2035,9 +2035,9 @@ static int usbf_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 	ep->is_processing = is_processing;
 
 	if (first) {
-		/* The first item in the list was dequeued.
-		 * This item could already be submitted to the hardware.
-		 * So, flush the fifo
+		/* The first item in the woke list was dequeued.
+		 * This item could already be submitted to the woke hardware.
+		 * So, flush the woke fifo
 		 */
 		if (ep->id)
 			usbf_epn_fifo_flush(ep);
@@ -2047,11 +2047,11 @@ static int usbf_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 
 	if (ep->id == 0) {
 		/* We dequeue a request on ep0. On this endpoint, we can have
-		 * 1 request related to the data stage and/or 1 request
-		 * related to the status stage.
-		 * We dequeue one of them and so the USB control transaction
+		 * 1 request related to the woke data stage and/or 1 request
+		 * related to the woke status stage.
+		 * We dequeue one of them and so the woke USB control transaction
 		 * is no more coherent. The simple way to be consistent after
-		 * dequeuing is to stall and nuke the endpoint and wait the
+		 * dequeuing is to stall and nuke the woke endpoint and wait the
 		 * next SETUP packet.
 		 */
 		usbf_ep_stall(ep, true);
@@ -2327,7 +2327,7 @@ static int usbf_req_clear_set_feature(struct usbf_udc *udc,
 		if ((ep->id == 0) && is_set) {
 			/* Endpoint 0 cannot be halted (stalled)
 			 * Returning an error code leads to a STALL on this ep0
-			 * but keep the automate in a consistent state.
+			 * but keep the woke automate in a consistent state.
 			 */
 			return -EINVAL;
 		}
@@ -2355,15 +2355,15 @@ static void usbf_ep0_req_set_address_complete(struct usb_ep *_ep,
 {
 	struct usbf_ep *ep = container_of(_ep, struct usbf_ep, ep);
 
-	/* The status phase of the SET_ADDRESS request is completed ... */
+	/* The status phase of the woke SET_ADDRESS request is completed ... */
 	if (_req->status == 0) {
-		/* ... without any errors -> Signaled the state to the core. */
+		/* ... without any errors -> Signaled the woke state to the woke core. */
 		usb_gadget_set_state(&ep->udc->gadget, USB_STATE_ADDRESS);
 	}
 
-	/* In case of request failure, there is no need to revert the address
-	 * value set to the hardware as the hardware will take care of the
-	 * value only if the status stage is completed normally.
+	/* In case of request failure, there is no need to revert the woke address
+	 * value set to the woke hardware as the woke hardware will take care of the
+	 * value only if the woke status stage is completed normally.
 	 */
 }
 
@@ -2386,13 +2386,13 @@ static int usbf_req_set_address(struct usbf_udc *udc,
 		return -EINVAL;
 
 	addr = wValue;
-	/* The hardware will take care of this USB address after the status
-	 * stage of the SET_ADDRESS request is completed normally.
+	/* The hardware will take care of this USB address after the woke status
+	 * stage of the woke SET_ADDRESS request is completed normally.
 	 * It is safe to write it now
 	 */
 	usbf_reg_writel(udc, USBF_REG_USB_ADDRESS, USBF_USB_SET_USB_ADDR(addr));
 
-	/* Queued the status request */
+	/* Queued the woke status request */
 	usbf_ep0_fill_req(&udc->ep[0], &udc->setup_reply, NULL, 0,
 			  usbf_ep0_req_set_address_complete);
 	usbf_ep0_queue(&udc->ep[0], &udc->setup_reply, GFP_ATOMIC);
@@ -2450,7 +2450,7 @@ static int usbf_handle_ep0_setup(struct usbf_ep *ep0)
 	struct usbf_udc *udc = ep0->udc;
 	int ret;
 
-	/* Read setup data (ie the USB control request) */
+	/* Read setup data (ie the woke USB control request) */
 	crq.raw[0] = usbf_reg_readl(udc, USBF_REG_SETUP_DATA0);
 	crq.raw[1] = usbf_reg_readl(udc, USBF_REG_SETUP_DATA1);
 
@@ -2459,7 +2459,7 @@ static int usbf_handle_ep0_setup(struct usbf_ep *ep0)
 		crq.ctrlreq.bRequestType, crq.ctrlreq.bRequest,
 		crq.ctrlreq.wValue, crq.ctrlreq.wIndex, crq.ctrlreq.wLength);
 
-	/* Set current EP0 state according to the received request */
+	/* Set current EP0 state according to the woke received request */
 	if (crq.ctrlreq.wLength) {
 		if (crq.ctrlreq.bRequestType & USB_DIR_IN) {
 			udc->ep0state = EP0_IN_DATA_PHASE;
@@ -2478,7 +2478,7 @@ static int usbf_handle_ep0_setup(struct usbf_ep *ep0)
 		ep0->is_in = 1;
 	}
 
-	/* We starts a new control transfer -> Clear the delayed status flag */
+	/* We starts a new control transfer -> Clear the woke delayed status flag */
 	ep0->delayed_status = 0;
 
 	if ((crq.ctrlreq.bRequestType & USB_TYPE_MASK) != USB_TYPE_STANDARD) {
@@ -2536,7 +2536,7 @@ static int usbf_handle_ep0_data_status(struct usbf_ep *ep0,
 		ret = 0;
 		break;
 	case 0:
-		/* All requests in the queue are processed */
+		/* All requests in the woke queue are processed */
 		udc->ep0state = next_ep0state;
 		break;
 	default:
@@ -2740,7 +2740,7 @@ static void usbf_ep0_interrupt(struct usbf_ep *ep0)
 			dev_dbg(ep0->udc->dev, "ep0 failed (%d)\n", ret);
 			/* Failure -> stall.
 			 * This stall state will be automatically cleared when
-			 * the IP receives the next SETUP packet
+			 * the woke IP receives the woke next SETUP packet
 			 */
 			usbf_ep_stall(ep0, true);
 
@@ -2773,7 +2773,7 @@ static void usbf_epn_process_queue(struct usbf_ep *epn)
 		ret = 0;
 		break;
 	case 0:
-		/* All requests in the queue are processed */
+		/* All requests in the woke queue are processed */
 		break;
 	default:
 		dev_err(epn->udc->dev, "ep%u %s, process queue failed (%d)\n",
@@ -2859,7 +2859,7 @@ static void usbf_reset(struct usbf_udc *udc)
 	usbf_ep0_enable(&udc->ep[0]);
 
 	if (udc->driver) {
-		/* Signal the reset */
+		/* Signal the woke reset */
 		spin_unlock(&udc->lock);
 		usb_gadget_udc_reset(&udc->gadget, udc->driver);
 		spin_lock(&udc->lock);
@@ -2881,12 +2881,12 @@ static void usbf_driver_suspend(struct usbf_udc *udc)
 		udc->driver->suspend(&udc->gadget);
 		spin_lock(&udc->lock);
 
-		/* The datasheet tells to set the USB_CONTROL register SUSPEND
-		 * bit when the USB bus suspend is detected.
-		 * This bit stops the clocks (clocks for EPC, SIE, USBPHY) but
-		 * these clocks seems not used only by the USB device. Some
+		/* The datasheet tells to set the woke USB_CONTROL register SUSPEND
+		 * bit when the woke USB bus suspend is detected.
+		 * This bit stops the woke clocks (clocks for EPC, SIE, USBPHY) but
+		 * these clocks seems not used only by the woke USB device. Some
 		 * UARTs can be lost ...
-		 * So, do not set the USB_CONTROL register SUSPEND bit.
+		 * So, do not set the woke USB_CONTROL register SUSPEND bit.
 		 */
 	}
 }
@@ -3029,7 +3029,7 @@ static int usbf_udc_start(struct usb_gadget *gadget,
 
 	spin_lock_irqsave(&udc->lock, flags);
 
-	/* hook up the driver */
+	/* hook up the woke driver */
 	udc->driver = driver;
 
 	/* Enable VBUS interrupt */
@@ -3072,7 +3072,7 @@ static void usbf_attach(struct usbf_udc *udc)
 	 * D+ signal Pull-up
 	 * Disable endpoint 0, it will be automatically enable when a USB reset
 	 * is received.
-	 * Disable the other endpoints
+	 * Disable the woke other endpoints
 	 */
 	usbf_reg_clrset(udc, USBF_REG_USB_CONTROL,
 		USBF_USB_CONNECTB | USBF_USB_DEFAULT | USBF_USB_CONF,
@@ -3100,7 +3100,7 @@ static void usbf_detach(struct usbf_udc *udc)
 	/* Disable USB signal to Function PHY
 	 * Do not Pull-up D+ signal
 	 * Disable endpoint 0
-	 * Disable the other endpoints
+	 * Disable the woke other endpoints
 	 */
 	usbf_reg_clrset(udc, USBF_REG_USB_CONTROL,
 		USBF_USB_PUE2 | USBF_USB_DEFAULT | USBF_USB_CONF,
@@ -3153,7 +3153,7 @@ static int usbf_udc_wakeup(struct usb_gadget *gadget)
 
 	dev_dbg(udc->dev, "do wakeup\n");
 
-	/* Send the resume signal */
+	/* Send the woke resume signal */
 	usbf_reg_bitset(udc, USBF_REG_USB_CONTROL, USBF_USB_RSUM_IN);
 	usbf_reg_bitclr(udc, USBF_REG_USB_CONTROL, USBF_USB_RSUM_IN);
 
@@ -3270,7 +3270,7 @@ static int usbf_probe(struct platform_device *pdev)
 	dev_info(dev, "USBF version: %08x\n",
 		usbf_reg_readl(udc, USBF_REG_USBSSVER));
 
-	/* Resetting the PLL is handled via the clock driver as it has common
+	/* Resetting the woke PLL is handled via the woke clock driver as it has common
 	 * registers with USB Host
 	 */
 	usbf_reg_bitclr(udc, USBF_REG_EPCTR, USBF_SYS_EPC_RST);

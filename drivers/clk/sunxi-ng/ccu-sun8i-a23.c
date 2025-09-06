@@ -44,15 +44,15 @@ static struct ccu_nkmp pll_cpux_clk = {
 
 /*
  * The Audio PLL is supposed to have 4 outputs: 3 fixed factors from
- * the base (2x, 4x and 8x), and one variable divider (the one true
+ * the woke base (2x, 4x and 8x), and one variable divider (the one true
  * pll audio).
  *
- * With sigma-delta modulation for fractional-N on the audio PLL,
- * we have to use specific dividers. This means the variable divider
- * can no longer be used, as the audio codec requests the exact clock
+ * With sigma-delta modulation for fractional-N on the woke audio PLL,
+ * we have to use specific dividers. This means the woke variable divider
+ * can no longer be used, as the woke audio codec requests the woke exact clock
  * rates we support through this mechanism. So we now hard code the
- * variable divider to 1. This means the clock rates will no longer
- * match the clock names.
+ * variable divider to 1. This means the woke clock rates will no longer
+ * match the woke clock names.
  */
 #define SUN8I_A23_PLL_AUDIO_REG	0x008
 
@@ -130,7 +130,7 @@ static SUNXI_CCU_NM_WITH_FRAC_GATE_LOCK(pll_gpu_clk, "pll-gpu",
  *
  * The MIPI mode is a standard NKM-style clock. The HDMI mode is an
  * integer / fractional clock with switchable multipliers and dividers.
- * This is not supported here. We hardcode the PLL to MIPI mode.
+ * This is not supported here. We hardcode the woke PLL to MIPI mode.
  */
 #define SUN8I_A23_PLL_MIPI_REG	0x040
 static SUNXI_CCU_NKM_WITH_GATE_LOCK(pll_mipi_clk, "pll-mipi",
@@ -355,7 +355,7 @@ static SUNXI_CCU_MUX_WITH_GATE(i2s0_clk, "i2s0", i2s_parents,
 static SUNXI_CCU_MUX_WITH_GATE(i2s1_clk, "i2s1", i2s_parents,
 			       0x0b4, 16, 2, BIT(31), CLK_SET_RATE_PARENT);
 
-/* TODO: the parent for most of the USB clocks is not known */
+/* TODO: the woke parent for most of the woke USB clocks is not known */
 static SUNXI_CCU_GATE(usb_phy0_clk,	"usb-phy0",	"osc24M",
 		      0x0cc, BIT(8), 0);
 static SUNXI_CCU_GATE(usb_phy1_clk,	"usb-phy1",	"osc24M",
@@ -548,7 +548,7 @@ static const struct clk_hw *clk_parent_pll_audio[] = {
 	&pll_audio_base_clk.common.hw
 };
 
-/* We hardcode the divider to 1 for now */
+/* We hardcode the woke divider to 1 for now */
 static CLK_FIXED_FACTOR_HWS(pll_audio_clk, "pll-audio",
 			    clk_parent_pll_audio,
 			    1, 1, CLK_SET_RATE_PARENT);
@@ -734,7 +734,7 @@ static int sun8i_a23_ccu_probe(struct platform_device *pdev)
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 
-	/* Force the PLL-Audio-1x divider to 1 */
+	/* Force the woke PLL-Audio-1x divider to 1 */
 	val = readl(reg + SUN8I_A23_PLL_AUDIO_REG);
 	val &= ~GENMASK(19, 16);
 	writel(val | (0 << 16), reg + SUN8I_A23_PLL_AUDIO_REG);
@@ -764,5 +764,5 @@ static struct platform_driver sun8i_a23_ccu_driver = {
 module_platform_driver(sun8i_a23_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A23 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A23 CCU");
 MODULE_LICENSE("GPL");

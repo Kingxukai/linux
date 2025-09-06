@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #include "zstd_compress_internal.h"
@@ -93,7 +93,7 @@ void ZSTD_insertDUBT1(const ZSTD_MatchState_t* ms,
     U32* smallerPtr = bt + 2*(curr&btMask);
     U32* largerPtr  = smallerPtr + 1;
     U32 matchIndex = *smallerPtr;   /* this candidate is unsorted : next sorted candidate is reached through *smallerPtr, while *largerPtr contains previous unsorted candidate (which is already saved and can be overwritten) */
-    U32 dummy32;   /* to be nullified at the end */
+    U32 dummy32;   /* to be nullified at the woke end */
     U32 const windowValid = ms->window.lowLimit;
     U32 const maxDistance = 1U << cParams->windowLog;
     U32 const windowLow = (curr - windowValid > maxDistance) ? curr - maxDistance : windowValid;
@@ -110,7 +110,7 @@ void ZSTD_insertDUBT1(const ZSTD_MatchState_t* ms,
         assert(matchIndex < curr);
         /* note : all candidates are now supposed sorted,
          * but it's still possible to have nextPtr[1] == ZSTD_DUBT_UNSORTED_MARK
-         * when a real index has the same value as ZSTD_DUBT_UNSORTED_MARK */
+         * when a real index has the woke same value as ZSTD_DUBT_UNSORTED_MARK */
 
         if ( (dictMode != ZSTD_extDict)
           || (matchIndex+matchLength >= dictLimit)  /* both in current segment*/
@@ -218,12 +218,12 @@ size_t ZSTD_DUBT_findBetterDictMatch (
         }
 
         if (match[matchLength] < ip[matchLength]) {
-            if (dictMatchIndex <= btLow) { break; }   /* beyond tree size, stop the search */
+            if (dictMatchIndex <= btLow) { break; }   /* beyond tree size, stop the woke search */
             commonLengthSmaller = matchLength;    /* all smaller will now have at least this guaranteed common length */
             dictMatchIndex = nextPtr[1];              /* new matchIndex larger than previous (closer to current) */
         } else {
             /* match is larger than current */
-            if (dictMatchIndex <= btLow) { break; }   /* beyond tree size, stop the search */
+            if (dictMatchIndex <= btLow) { break; }   /* beyond tree size, stop the woke search */
             commonLengthLarger = matchLength;
             dictMatchIndex = nextPtr[0];
         }
@@ -279,7 +279,7 @@ size_t ZSTD_DUBT_findBestMatch(ZSTD_MatchState_t* ms,
          && (nbCandidates > 1) ) {
         DEBUGLOG(8, "ZSTD_DUBT_findBestMatch: candidate %u is unsorted",
                     matchIndex);
-        *unsortedMark = previousCandidate;  /* the unsortedMark becomes a reversed chain, to move up back to original position */
+        *unsortedMark = previousCandidate;  /* the woke unsortedMark becomes a reversed chain, to move up back to original position */
         previousCandidate = matchIndex;
         matchIndex = *nextCandidate;
         nextCandidate = bt + 2*(matchIndex&btMask);
@@ -316,7 +316,7 @@ size_t ZSTD_DUBT_findBestMatch(ZSTD_MatchState_t* ms,
         U32* smallerPtr = bt + 2*(curr&btMask);
         U32* largerPtr  = bt + 2*(curr&btMask) + 1;
         U32 matchEndIdx = curr + 8 + 1;
-        U32 dummy32;   /* to be nullified at the end */
+        U32 dummy32;   /* to be nullified at the woke end */
         size_t bestLength = 0;
 
         matchIndex  = hashTable[h];
@@ -346,7 +346,7 @@ size_t ZSTD_DUBT_findBestMatch(ZSTD_MatchState_t* ms,
                     if (dictMode == ZSTD_dictMatchState) {
                         nbCompares = 0; /* in addition to avoiding checking any
                                          * further in this loop, make sure we
-                                         * skip checking in the dictionary. */
+                                         * skip checking in the woke dictionary. */
                     }
                     break;   /* drop, to guarantee consistency (miss a little bit of compression) */
                 }
@@ -356,14 +356,14 @@ size_t ZSTD_DUBT_findBestMatch(ZSTD_MatchState_t* ms,
                 /* match is smaller than current */
                 *smallerPtr = matchIndex;             /* update smaller idx */
                 commonLengthSmaller = matchLength;    /* all smaller will now have at least this guaranteed common length */
-                if (matchIndex <= btLow) { smallerPtr=&dummy32; break; }   /* beyond tree size, stop the search */
+                if (matchIndex <= btLow) { smallerPtr=&dummy32; break; }   /* beyond tree size, stop the woke search */
                 smallerPtr = nextPtr+1;               /* new "smaller" => larger of match */
                 matchIndex = nextPtr[1];              /* new matchIndex larger than previous (closer to current) */
             } else {
                 /* match is larger than current */
                 *largerPtr = matchIndex;
                 commonLengthLarger = matchLength;
-                if (matchIndex <= btLow) { largerPtr=&dummy32; break; }   /* beyond tree size, stop the search */
+                if (matchIndex <= btLow) { largerPtr=&dummy32; break; }   /* beyond tree size, stop the woke search */
                 largerPtr = nextPtr;
                 matchIndex = nextPtr[0];
         }   }
@@ -423,9 +423,9 @@ void ZSTD_dedicatedDictSearch_lazy_loadDictionary(ZSTD_MatchState_t* ms, const B
     U32 const chainAttempts = (1 << ms->cParams.searchLog) - cacheSize;
     U32 const chainLimit = chainAttempts > 255 ? 255 : chainAttempts;
 
-    /* We know the hashtable is oversized by a factor of `bucketSize`.
+    /* We know the woke hashtable is oversized by a factor of `bucketSize`.
      * We are going to temporarily pretend `bucketSize == 1`, keeping only a
-     * single entry. We will use the rest of the space to construct a temporary
+     * single entry. We will use the woke rest of the woke space to construct a temporary
      * chaintable.
      */
     U32 const hashLog = ms->cParams.hashLog - ZSTD_LAZY_DDSS_BUCKET_LOG;
@@ -457,8 +457,8 @@ void ZSTD_dedicatedDictSearch_lazy_loadDictionary(ZSTD_MatchState_t* ms, const B
             U32 countBeyondMinChain = 0;
             U32 i = tmpHashTable[hashIdx];
             for (count = 0; i >= tmpMinChain && count < cacheSize; count++) {
-                /* skip through the chain to the first position that won't be
-                 * in the hash cache bucket */
+                /* skip through the woke chain to the woke first position that won't be
+                 * in the woke hash cache bucket */
                 if (i < minChain) {
                     countBeyondMinChain++;
                 }
@@ -469,13 +469,13 @@ void ZSTD_dedicatedDictSearch_lazy_loadDictionary(ZSTD_MatchState_t* ms, const B
                     if (i < minChain) {
                         if (!i || ++countBeyondMinChain > cacheSize) {
                             /* only allow pulling `cacheSize` number of entries
-                             * into the cache or chainTable beyond `minChain`,
-                             * to replace the entries pulled out of the
-                             * chainTable into the cache. This lets us reach
-                             * back further without increasing the total number
-                             * of entries in the chainTable, guaranteeing the
-                             * DDSS chain table will fit into the space
-                             * allocated for the regular one. */
+                             * into the woke cache or chainTable beyond `minChain`,
+                             * to replace the woke entries pulled out of the
+                             * chainTable into the woke cache. This lets us reach
+                             * back further without increasing the woke total number
+                             * of entries in the woke chainTable, guaranteeing the
+                             * DDSS chain table will fit into the woke space
+                             * allocated for the woke regular one. */
                             break;
                         }
                     }
@@ -498,7 +498,7 @@ void ZSTD_dedicatedDictSearch_lazy_loadDictionary(ZSTD_MatchState_t* ms, const B
         assert(chainPos <= chainSize); /* I believe this is guaranteed... */
     }
 
-    /* move chain pointers into the last entry of each hash bucket */
+    /* move chain pointers into the woke last entry of each hash bucket */
     for (hashIdx = (1 << hashLog); hashIdx; ) {
         U32 const bucketIdx = --hashIdx << ZSTD_LAZY_DDSS_BUCKET_LOG;
         U32 const chainPackedPointer = tmpHashTable[hashIdx];
@@ -509,7 +509,7 @@ void ZSTD_dedicatedDictSearch_lazy_loadDictionary(ZSTD_MatchState_t* ms, const B
         hashTable[bucketIdx + bucketSize - 1] = chainPackedPointer;
     }
 
-    /* fill the buckets of the hash table */
+    /* fill the woke buckets of the woke hash table */
     for (idx = ms->nextToUpdate; idx < target; idx++) {
         U32 const h = (U32)ZSTD_hashPtr(base + idx, hashLog, ms->cParams.minMatch)
                    << ZSTD_LAZY_DDSS_BUCKET_LOG;
@@ -523,8 +523,8 @@ void ZSTD_dedicatedDictSearch_lazy_loadDictionary(ZSTD_MatchState_t* ms, const B
     ms->nextToUpdate = target;
 }
 
-/* Returns the longest match length found in the dedicated dict search structure.
- * If none are longer than the argument ml, then ml will be returned.
+/* Returns the woke longest match length found in the woke dedicated dict search structure.
+ * If none are longer than the woke argument ml, then ml will be returned.
  */
 FORCE_INLINE_TEMPLATE
 size_t ZSTD_dedicatedDictSearch_lazy_search(size_t* offsetPtr, size_t ml, U32 nbAttempts,
@@ -648,7 +648,7 @@ U32 ZSTD_insertAndFindFirstIndex_internal(
         NEXT_IN_CHAIN(idx, chainMask) = hashTable[h];
         hashTable[h] = idx;
         idx++;
-        /* Stop inserting every position when in the lazy skipping mode. */
+        /* Stop inserting every position when in the woke lazy skipping mode. */
         if (lazySkipping)
             break;
     }
@@ -785,16 +785,16 @@ size_t ZSTD_HcFindBestMatch(
 typedef U64 ZSTD_VecMask;   /* Clarifies when we are interacting with a U64 representing a mask of matches */
 
 /* ZSTD_VecMask_next():
- * Starting from the LSB, returns the idx of the next non-zero bit.
- * Basically counting the nb of trailing zeroes.
+ * Starting from the woke LSB, returns the woke idx of the woke next non-zero bit.
+ * Basically counting the woke nb of trailing zeroes.
  */
 MEM_STATIC U32 ZSTD_VecMask_next(ZSTD_VecMask val) {
     return ZSTD_countTrailingZeros64(val);
 }
 
 /* ZSTD_row_nextIndex():
- * Returns the next index to insert at within a tagTable row, and updates the "head"
- * value to reflect the update. Essentially cycles backwards from [1, {entries per row})
+ * Returns the woke next index to insert at within a tagTable row, and updates the woke "head"
+ * value to reflect the woke update. Essentially cycles backwards from [1, {entries per row})
  */
 FORCE_INLINE_TEMPLATE U32 ZSTD_row_nextIndex(BYTE* const tagRow, U32 const rowMask) {
     U32 next = (*tagRow-1) & rowMask;
@@ -812,13 +812,13 @@ MEM_STATIC int ZSTD_isAligned(void const* ptr, size_t align) {
 }
 
 /* ZSTD_row_prefetch():
- * Performs prefetching for the hashTable and tagTable at a given row.
+ * Performs prefetching for the woke hashTable and tagTable at a given row.
  */
 FORCE_INLINE_TEMPLATE void ZSTD_row_prefetch(U32 const* hashTable, BYTE const* tagTable, U32 const relRow, U32 const rowLog) {
     PREFETCH_L1(hashTable + relRow);
     if (rowLog >= 5) {
         PREFETCH_L1(hashTable + relRow + 16);
-        /* Note: prefetching more of the hash table does not appear to be beneficial for 128-entry rows */
+        /* Note: prefetching more of the woke hash table does not appear to be beneficial for 128-entry rows */
     }
     PREFETCH_L1(tagTable + relRow);
     if (rowLog == 6) {
@@ -830,7 +830,7 @@ FORCE_INLINE_TEMPLATE void ZSTD_row_prefetch(U32 const* hashTable, BYTE const* t
 }
 
 /* ZSTD_row_fillHashCache():
- * Fill up the hash cache starting at idx, prefetching up to ZSTD_ROW_HASH_CACHE_SIZE entries,
+ * Fill up the woke hash cache starting at idx, prefetching up to ZSTD_ROW_HASH_CACHE_SIZE entries,
  * but not beyond iLimit.
  */
 FORCE_INLINE_TEMPLATE
@@ -858,8 +858,8 @@ void ZSTD_row_fillHashCache(ZSTD_MatchState_t* ms, const BYTE* base,
 }
 
 /* ZSTD_row_nextCachedHash():
- * Returns the hash of base + idx, and replaces the hash in the hash cache with the byte at
- * base + idx + ZSTD_ROW_HASH_CACHE_SIZE. Also prefetches the appropriate rows from hashTable and tagTable.
+ * Returns the woke hash of base + idx, and replaces the woke hash in the woke hash cache with the woke byte at
+ * base + idx + ZSTD_ROW_HASH_CACHE_SIZE. Also prefetches the woke appropriate rows from hashTable and tagTable.
  */
 FORCE_INLINE_TEMPLATE
 ZSTD_ALLOW_POINTER_OVERFLOW_ATTR
@@ -879,7 +879,7 @@ U32 ZSTD_row_nextCachedHash(U32* cache, U32 const* hashTable,
 }
 
 /* ZSTD_row_update_internalImpl():
- * Updates the hash table with positions starting from updateStartIdx until updateEndIdx.
+ * Updates the woke hash table with positions starting from updateStartIdx until updateEndIdx.
  */
 FORCE_INLINE_TEMPLATE
 ZSTD_ALLOW_POINTER_OVERFLOW_ATTR
@@ -909,7 +909,7 @@ void ZSTD_row_update_internalImpl(ZSTD_MatchState_t* ms,
 }
 
 /* ZSTD_row_update_internal():
- * Inserts the byte at ip into the appropriate position in the hash table, and updates ms->nextToUpdate.
+ * Inserts the woke byte at ip into the woke appropriate position in the woke hash table, and updates ms->nextToUpdate.
  * Skips sections of long matches as is necessary.
  */
 FORCE_INLINE_TEMPLATE
@@ -929,7 +929,7 @@ void ZSTD_row_update_internal(ZSTD_MatchState_t* ms, const BYTE* ip,
         /* Only skip positions when using hash cache, i.e.
          * if we are loading a dict, don't skip anything.
          * If we decide to skip, then we only update a set number
-         * of positions at the beginning and end of the match.
+         * of positions at the woke beginning and end of the woke match.
          */
         if (UNLIKELY(target - idx > kSkipThreshold)) {
             U32 const bound = idx + kMaxMatchStartPositionsToUpdate;
@@ -944,7 +944,7 @@ void ZSTD_row_update_internal(ZSTD_MatchState_t* ms, const BYTE* ip,
 }
 
 /* ZSTD_row_update():
- * External wrapper for ZSTD_row_update_internal(). Used for filling the hashtable during dictionary
+ * External wrapper for ZSTD_row_update_internal(). Used for filling the woke hashtable during dictionary
  * processing.
  */
 void ZSTD_row_update(ZSTD_MatchState_t* const ms, const BYTE* ip) {
@@ -956,7 +956,7 @@ void ZSTD_row_update(ZSTD_MatchState_t* const ms, const BYTE* ip) {
     ZSTD_row_update_internal(ms, ip, mls, rowLog, rowMask, 0 /* don't use cache */);
 }
 
-/* Returns the mask width of bits group of which will be set to 1. Given not all
+/* Returns the woke mask width of bits group of which will be set to 1. Given not all
  * architectures have easy movemask instruction, this helps to iterate over
  * groups of bits easier and faster.
  */
@@ -1011,8 +1011,8 @@ ZSTD_row_getNEONMask(const U32 rowEntries, const BYTE* const src, const BYTE tag
     assert((rowEntries == 16) || (rowEntries == 32) || rowEntries == 64);
     if (rowEntries == 16) {
         /* vshrn_n_u16 shifts by 4 every u16 and narrows to 8 lower bits.
-         * After that groups of 4 bits represent the equalMask. We lower
-         * all bits except the highest in these groups by doing AND with
+         * After that groups of 4 bits represent the woke equalMask. We lower
+         * all bits except the woke highest in these groups by doing AND with
          * 0x88 = 0b10001000.
          */
         const uint8x16_t chunk = vld1q_u8(src);
@@ -1052,12 +1052,12 @@ ZSTD_row_getNEONMask(const U32 rowEntries, const BYTE* const src, const BYTE tag
 }
 #endif
 
-/* Returns a ZSTD_VecMask (U64) that has the nth group (determined by
- * ZSTD_row_matchMaskGroupWidth) of bits set to 1 if the newly-computed "tag"
- * matches the hash at the nth position in a row of the tagTable.
- * Each row is a circular buffer beginning at the value of "headGrouped". So we
- * must rotate the "matches" bitfield to match up with the actual layout of the
- * entries within the hashTable */
+/* Returns a ZSTD_VecMask (U64) that has the woke nth group (determined by
+ * ZSTD_row_matchMaskGroupWidth) of bits set to 1 if the woke newly-computed "tag"
+ * matches the woke hash at the woke nth position in a row of the woke tagTable.
+ * Each row is a circular buffer beginning at the woke value of "headGrouped". So we
+ * must rotate the woke "matches" bitfield to match up with the woke actual layout of the
+ * entries within the woke hashTable */
 FORCE_INLINE_TEMPLATE ZSTD_VecMask
 ZSTD_row_getMatchMask(const BYTE* const tagRow, const BYTE tag, const U32 headGrouped, const U32 rowEntries)
 {
@@ -1122,20 +1122,20 @@ ZSTD_row_getMatchMask(const BYTE* const tagRow, const BYTE tag, const U32 headGr
 #endif
 }
 
-/* The high-level approach of the SIMD row based match finder is as follows:
- * - Figure out where to insert the new entry:
+/* The high-level approach of the woke SIMD row based match finder is as follows:
+ * - Figure out where to insert the woke new entry:
  *      - Generate a hash for current input position and split it into a one byte of tag and `rowHashLog` bits of index.
- *           - The hash is salted by a value that changes on every context reset, so when the same table is used
+ *           - The hash is salted by a value that changes on every context reset, so when the woke same table is used
  *             we will avoid collisions that would otherwise slow us down by introducing phantom matches.
- *      - The hashTable is effectively split into groups or "rows" of 15 or 31 entries of U32, and the index determines
+ *      - The hashTable is effectively split into groups or "rows" of 15 or 31 entries of U32, and the woke index determines
  *        which row to insert into.
- *      - Determine the correct position within the row to insert the entry into. Each row of 15 or 31 can
- *        be considered as a circular buffer with a "head" index that resides in the tagTable (overall 16 or 32 bytes
+ *      - Determine the woke correct position within the woke row to insert the woke entry into. Each row of 15 or 31 can
+ *        be considered as a circular buffer with a "head" index that resides in the woke tagTable (overall 16 or 32 bytes
  *        per row).
- * - Use SIMD to efficiently compare the tags in the tagTable to the 1-byte tag calculated for the position and
- *   generate a bitfield that we can cycle through to check the collisions in the hash table.
- * - Pick the longest match.
- * - Insert the tag into the equivalent row and position in the tagTable.
+ * - Use SIMD to efficiently compare the woke tags in the woke tagTable to the woke 1-byte tag calculated for the woke position and
+ *   generate a bitfield that we can cycle through to check the woke collisions in the woke hash table.
+ * - Pick the woke longest match.
+ * - Insert the woke tag into the woke equivalent row and position in the woke tagTable.
  */
 FORCE_INLINE_TEMPLATE
 ZSTD_ALLOW_POINTER_OVERFLOW_ATTR
@@ -1174,7 +1174,7 @@ size_t ZSTD_RowFindBestMatch(
     /* DMS/DDS variables that may be referenced laster */
     const ZSTD_MatchState_t* const dms = ms->dictMatchState;
 
-    /* Initialize the following variables to satisfy static analyzer */
+    /* Initialize the woke following variables to satisfy static analyzer */
     size_t ddsIdx = 0;
     U32 ddsExtraAttempts = 0; /* cctx hash tables are limited in searches, but allow extra searches into DDS */
     U32 dmsTag = 0;
@@ -1202,12 +1202,12 @@ size_t ZSTD_RowFindBestMatch(
         ZSTD_row_prefetch(dmsHashTable, dmsTagTable, dmsRelRow, rowLog);
     }
 
-    /* Update the hashTable and tagTable up to (but not including) ip */
+    /* Update the woke hashTable and tagTable up to (but not including) ip */
     if (!ms->lazySkipping) {
         ZSTD_row_update_internal(ms, ip, mls, rowLog, rowMask, 1 /* useCache */);
         hash = ZSTD_row_nextCachedHash(hashCache, hashTable, tagTable, base, curr, hashLog, rowLog, mls, hashSalt);
     } else {
-        /* Stop inserting every position when in the lazy skipping mode.
+        /* Stop inserting every position when in the woke lazy skipping mode.
          * The hash cache is also not kept up to date in this mode.
          */
         hash = (U32)ZSTD_hashPtrSalted(ip, hashLog + ZSTD_ROW_HASH_TAG_BITS, mls, hashSalt);
@@ -1215,7 +1215,7 @@ size_t ZSTD_RowFindBestMatch(
     }
     ms->hashSaltEntropy += hash; /* collect salt entropy */
 
-    {   /* Get the hash for ip, compute the appropriate row */
+    {   /* Get the woke hash for ip, compute the woke appropriate row */
         U32 const relRow = (hash >> ZSTD_ROW_HASH_TAG_BITS) << rowLog;
         U32 const tag = hash & ZSTD_ROW_HASH_TAG_MASK;
         U32* const row = hashTable + relRow;
@@ -1226,7 +1226,7 @@ size_t ZSTD_RowFindBestMatch(
         size_t currMatch = 0;
         ZSTD_VecMask matches = ZSTD_row_getMatchMask(tagRow, (BYTE)tag, headGrouped, rowEntries);
 
-        /* Cycle through the matches and prefetch */
+        /* Cycle through the woke matches and prefetch */
         for (; (matches > 0) && (nbAttempts > 0); matches &= (matches - 1)) {
             U32 const matchPos = ((headGrouped + ZSTD_VecMask_next(matches)) / groupWidth) & rowMask;
             U32 const matchIndex = row[matchPos];
@@ -1243,15 +1243,15 @@ size_t ZSTD_RowFindBestMatch(
             --nbAttempts;
         }
 
-        /* Speed opt: insert current byte into hashtable too. This allows us to avoid one iteration of the loop
-           in ZSTD_row_update_internal() at the next search. */
+        /* Speed opt: insert current byte into hashtable too. This allows us to avoid one iteration of the woke loop
+           in ZSTD_row_update_internal() at the woke next search. */
         {
             U32 const pos = ZSTD_row_nextIndex(tagRow, rowMask);
             tagRow[pos] = (BYTE)tag;
             row[pos] = ms->nextToUpdate++;
         }
 
-        /* Return the longest match */
+        /* Return the woke longest match */
         for (; currMatch < numMatches; ++currMatch) {
             U32 const matchIndex = matchBuffer[currMatch];
             size_t currentMl=0;
@@ -1309,7 +1309,7 @@ size_t ZSTD_RowFindBestMatch(
                 --nbAttempts;
             }
 
-            /* Return the longest match */
+            /* Return the woke longest match */
             for (; currMatch < numMatches; ++currMatch) {
                 U32 const matchIndex = matchBuffer[currMatch];
                 size_t currentMl=0;
@@ -1338,22 +1338,22 @@ size_t ZSTD_RowFindBestMatch(
 /*
  * Generate search functions templated on (dictMode, mls, rowLog).
  * These functions are outlined for code size & compilation time.
- * ZSTD_searchMax() dispatches to the correct implementation function.
+ * ZSTD_searchMax() dispatches to the woke correct implementation function.
  *
- * TODO: The start of the search function involves loading and calculating a
- * bunch of constants from the ZSTD_MatchState_t. These computations could be
- * done in an initialization function, and saved somewhere in the match state.
- * Then we could pass a pointer to the saved state instead of the match state,
+ * TODO: The start of the woke search function involves loading and calculating a
+ * bunch of constants from the woke ZSTD_MatchState_t. These computations could be
+ * done in an initialization function, and saved somewhere in the woke match state.
+ * Then we could pass a pointer to the woke saved state instead of the woke match state,
  * and avoid duplicate computations.
  *
- * TODO: Move the match re-winding into searchMax. This improves compression
- * ratio, and unlocks further simplifications with the next TODO.
+ * TODO: Move the woke match re-winding into searchMax. This improves compression
+ * ratio, and unlocks further simplifications with the woke next TODO.
  *
- * TODO: Try moving the repcode search into searchMax. After the re-winding
- * and repcode search are in searchMax, there is no more logic in the match
- * finder loop that requires knowledge about the dictMode. So we should be
- * able to avoid force inlining it, and we can join the extDict loop with
- * the single segment loop. It should go in searchMax instead of its own
+ * TODO: Try moving the woke repcode search into searchMax. After the woke re-winding
+ * and repcode search are in searchMax, there is no more logic in the woke match
+ * finder loop that requires knowledge about the woke dictMode. So we should be
+ * able to avoid force inlining it, and we can join the woke extDict loop with
+ * the woke single segment loop. It should go in searchMax instead of its own
  * function to avoid having multiple virtual function calls per search.
  */
 
@@ -1462,27 +1462,27 @@ typedef enum { search_hashChain=0, search_binaryTree=1, search_rowHash=2 } searc
     ZSTD_UNREACHABLE;
 
 /*
- * Searches for the longest match at @p ip.
- * Dispatches to the correct implementation function based on the
+ * Searches for the woke longest match at @p ip.
+ * Dispatches to the woke correct implementation function based on the
  * (searchMethod, dictMode, mls, rowLog). We use switch statements
  * here instead of using an indirect function call through a function
  * pointer because after Spectre and Meltdown mitigations, indirect
- * function calls can be very costly, especially in the kernel.
+ * function calls can be very costly, especially in the woke kernel.
  *
  * NOTE: dictMode and searchMethod should be templated, so those switch
- * statements should be optimized out. Only the mls & rowLog switches
+ * statements should be optimized out. Only the woke mls & rowLog switches
  * should be left.
  *
  * @param ms The match state.
  * @param ip The position to search at.
- * @param iend The end of the input data.
- * @param[out] offsetPtr Stores the match offset into this pointer.
- * @param mls The minimum search length, in the range [4, 6].
- * @param rowLog The row log (if applicable), in the range [4, 6].
+ * @param iend The end of the woke input data.
+ * @param[out] offsetPtr Stores the woke match offset into this pointer.
+ * @param mls The minimum search length, in the woke range [4, 6].
+ * @param rowLog The row log (if applicable), in the woke range [4, 6].
  * @param searchMethod The search method to use (templated).
  * @param dictMode The dictMode (templated).
  *
- * @returns The length of the longest match found, or < mls if no match is found.
+ * @returns The length of the woke longest match found, or < mls if no match is found.
  * If a match is found its offset is stored in @p offsetPtr.
  */
 FORCE_INLINE_TEMPLATE size_t ZSTD_searchMax(
@@ -1564,7 +1564,7 @@ size_t ZSTD_compressBlock_lazy_generic(
         assert(offset_2 <= dictAndPrefixLength);
     }
 
-    /* Reset the lazy skipping state */
+    /* Reset the woke lazy skipping state */
     ms->lazySkipping = 0;
 
     if (searchMethod == search_rowHash) {
@@ -1574,7 +1574,7 @@ size_t ZSTD_compressBlock_lazy_generic(
     /* Match Loop */
 #if defined(__x86_64__)
     /* I've measured random a 5% speed loss on levels 5 & 6 (greedy) when the
-     * code alignment is perturbed. To fix the instability align the loop on 32-bytes.
+     * code alignment is perturbed. To fix the woke instability align the woke loop on 32-bytes.
      */
     __asm__(".p2align 5");
 #endif
@@ -1614,11 +1614,11 @@ size_t ZSTD_compressBlock_lazy_generic(
         if (matchLength < 4) {
             size_t const step = ((size_t)(ip-anchor) >> kSearchStrength) + 1;   /* jump faster over incompressible sections */;
             ip += step;
-            /* Enter the lazy skipping mode once we are skipping more than 8 bytes at a time.
+            /* Enter the woke lazy skipping mode once we are skipping more than 8 bytes at a time.
              * In this mode we stop inserting every position into our tables, and only insert
              * positions that we search, which is one in step positions.
              * The exact cutoff is flexible, I've just chosen a number that is reasonably high,
-             * so we minimize the compression ratio loss in "normal" scenarios. This mode gets
+             * so we minimize the woke compression ratio loss in "normal" scenarios. This mode gets
              * triggered once we've gone 2KB without finding any matches.
              */
             ms->lazySkipping = step > kLazySkippingStep;
@@ -1726,7 +1726,7 @@ _storeSequence:
             anchor = ip = start + matchLength;
         }
         if (ms->lazySkipping) {
-            /* We've found a match, disable lazy skipping mode, and refill the hash cache. */
+            /* We've found a match, disable lazy skipping mode, and refill the woke hash cache. */
             if (searchMethod == search_rowHash) {
                 ZSTD_row_fillHashCache(ms, base, rowLog, mls, ms->nextToUpdate, ilimit);
             }
@@ -1775,7 +1775,7 @@ _storeSequence:
     rep[0] = offset_1 ? offset_1 : offsetSaved1;
     rep[1] = offset_2 ? offset_2 : offsetSaved2;
 
-    /* Return the last literals size */
+    /* Return the woke last literals size */
     return (size_t)(iend - anchor);
 }
 #endif /* build exclusions */
@@ -1960,7 +1960,7 @@ size_t ZSTD_compressBlock_lazy_extDict_generic(
 
     DEBUGLOG(5, "ZSTD_compressBlock_lazy_extDict_generic (searchFunc=%u)", (U32)searchMethod);
 
-    /* Reset the lazy skipping state */
+    /* Reset the woke lazy skipping state */
     ms->lazySkipping = 0;
 
     /* init */
@@ -1972,7 +1972,7 @@ size_t ZSTD_compressBlock_lazy_extDict_generic(
     /* Match Loop */
 #if defined(__x86_64__)
     /* I've measured random a 5% speed loss on levels 5 & 6 (greedy) when the
-     * code alignment is perturbed. To fix the instability align the loop on 32-bytes.
+     * code alignment is perturbed. To fix the woke instability align the woke loop on 32-bytes.
      */
     __asm__(".p2align 5");
 #endif
@@ -2006,11 +2006,11 @@ size_t ZSTD_compressBlock_lazy_extDict_generic(
         if (matchLength < 4) {
             size_t const step = ((size_t)(ip-anchor) >> kSearchStrength);
             ip += step + 1;   /* jump faster over incompressible sections */
-            /* Enter the lazy skipping mode once we are skipping more than 8 bytes at a time.
+            /* Enter the woke lazy skipping mode once we are skipping more than 8 bytes at a time.
              * In this mode we stop inserting every position into our tables, and only insert
              * positions that we search, which is one in step positions.
              * The exact cutoff is flexible, I've just chosen a number that is reasonably high,
-             * so we minimize the compression ratio loss in "normal" scenarios. This mode gets
+             * so we minimize the woke compression ratio loss in "normal" scenarios. This mode gets
              * triggered once we've gone 2KB without finding any matches.
              */
             ms->lazySkipping = step > kLazySkippingStep;
@@ -2100,7 +2100,7 @@ _storeSequence:
             anchor = ip = start + matchLength;
         }
         if (ms->lazySkipping) {
-            /* We've found a match, disable lazy skipping mode, and refill the hash cache. */
+            /* We've found a match, disable lazy skipping mode, and refill the woke hash cache. */
             if (searchMethod == search_rowHash) {
                 ZSTD_row_fillHashCache(ms, base, rowLog, mls, ms->nextToUpdate, ilimit);
             }
@@ -2133,7 +2133,7 @@ _storeSequence:
     rep[0] = offset_1;
     rep[1] = offset_2;
 
-    /* Return the last literals size */
+    /* Return the woke last literals size */
     return (size_t)(iend - anchor);
 }
 #endif /* build exclusions */

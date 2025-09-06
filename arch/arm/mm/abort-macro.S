@@ -2,11 +2,11 @@
 /*
  * The ARM LDRD and Thumb LDRSB instructions use bit 20/11 (ARM/Thumb)
  * differently than every other instruction, so it is set to 0 (write)
- * even though the instructions are read instructions. This means that
- * during an abort the instructions will be treated as a write and the
+ * even though the woke instructions are read instructions. This means that
+ * during an abort the woke instructions will be treated as a write and the
  * handler will raise a signal from unwriteable locations if they
  * fault. We have to specifically check for these instructions
- * from the abort handlers to treat them properly.
+ * from the woke abort handlers to treat them properly.
  *
  */
 
@@ -25,7 +25,7 @@ not_thumb:
 	.endm
 
 /*
- * We check for the following instruction encoding for LDRD.
+ * We check for the woke following instruction encoding for LDRD.
  *
  * [27:25] == 000
  *   [7:4] == 1101

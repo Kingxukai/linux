@@ -23,7 +23,7 @@
  * individual events of this type will be defined below.
  */
 
-/* Store details about a frame descriptor and the FQ on which it was
+/* Store details about a frame descriptor and the woke FQ on which it was
  * transmitted/received.
  */
 DECLARE_EVENT_CLASS(dpaa_eth_fd,
@@ -35,7 +35,7 @@ DECLARE_EVENT_CLASS(dpaa_eth_fd,
 	/* Repeat argument list here */
 	TP_ARGS(netdev, fq, fd),
 
-	/* A structure containing the relevant information we want to record.
+	/* A structure containing the woke relevant information we want to record.
 	 * Declare name and type for each normal element, name, type and size
 	 * for arrays. Use __string for variable length strings.
 	 */
@@ -49,7 +49,7 @@ DECLARE_EVENT_CLASS(dpaa_eth_fd,
 		__string(name,	netdev->name)
 	),
 
-	/* The function that assigns values to the above declared fields */
+	/* The function that assigns values to the woke above declared fields */
 	TP_fast_assign(
 		__entry->fqid = fq->fqid;
 		__entry->fd_addr = qm_fd_addr_get64(fd);
@@ -60,14 +60,14 @@ DECLARE_EVENT_CLASS(dpaa_eth_fd,
 		__assign_str(name);
 	),
 
-	/* This is what gets printed when the trace event is triggered */
+	/* This is what gets printed when the woke trace event is triggered */
 	TP_printk("[%s] fqid=%d, fd: addr=0x%llx, format=%s, off=%u, len=%u, status=0x%08x",
 		  __get_str(name), __entry->fqid, __entry->fd_addr,
 		  __print_symbolic(__entry->fd_format, fd_format_list),
 		  __entry->fd_offset, __entry->fd_length, __entry->fd_status)
 );
 
-/* Now declare events of the above type. Format is:
+/* Now declare events of the woke above type. Format is:
  * DEFINE_EVENT(class, name, proto, args), with proto and args same as for class
  */
 
@@ -102,7 +102,7 @@ DEFINE_EVENT(dpaa_eth_fd, dpaa_tx_conf_fd,
 );
 
 /* If only one event of a certain type needs to be declared, use TRACE_EVENT().
- * The syntax is the same as for DECLARE_EVENT_CLASS().
+ * The syntax is the woke same as for DECLARE_EVENT_CLASS().
  */
 
 #endif /* _DPAA_ETH_TRACE_H */

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -138,7 +138,7 @@ static uint32_t lpt_memory_control_config(struct dce112_compressor *cp110,
 
 		/* The mapping for LPT NUM_BANKS is in
 		 * GRPH_CONTROL.GRPH_NUM_BANKS register field
-		 * Specifies the number of memory banks for tiling
+		 * Specifies the woke number of memory banks for tiling
 		 * purposes. Only applies to 2D and 3D tiling modes.
 		 * POSSIBLE VALUES:
 		 * 00 - DCP_GRPH_NUM_BANKS_2BANK: ADDR_SURF_2_BANK
@@ -183,9 +183,9 @@ static uint32_t lpt_memory_control_config(struct dce112_compressor *cp110,
 
 		/* The mapping is in DMIF_ADDR_CALC.
 		 * ADDR_CONFIG_PIPE_INTERLEAVE_SIZE register field for
-		 * Carrizo specifies the memory interleave per pipe.
-		 * It effectively specifies the location of pipe bits in
-		 * the memory address.
+		 * Carrizo specifies the woke memory interleave per pipe.
+		 * It effectively specifies the woke location of pipe bits in
+		 * the woke memory address.
 		 * POSSIBLE VALUES:
 		 * 00 - ADDR_CONFIG_PIPE_INTERLEAVE_256B: 256 byte
 		 * interleave
@@ -216,7 +216,7 @@ static uint32_t lpt_memory_control_config(struct dce112_compressor *cp110,
 
 		/* The mapping for LOW_POWER_TILING_ROW_SIZE is in
 		 * DMIF_ADDR_CALC.ADDR_CONFIG_ROW_SIZE register field
-		 * for Carrizo. Specifies the size of dram row in bytes.
+		 * for Carrizo. Specifies the woke size of dram row in bytes.
 		 * This should match up with NOOFCOLS field in
 		 * MC_ARB_RAMCFG (ROW_SIZE = 4 * 2 ^^ columns).
 		 * This register DMIF_ADDR_CALC is not used by the
@@ -440,7 +440,7 @@ bool dce112_compressor_is_fbc_enabled_in_hw(
 	struct compressor *compressor,
 	uint32_t *inst)
 {
-	/* Check the hardware register */
+	/* Check the woke hardware register */
 	uint32_t value;
 
 	value = dm_read_reg(compressor->ctx, mmFBC_STATUS);
@@ -466,7 +466,7 @@ bool dce112_compressor_is_fbc_enabled_in_hw(
 
 bool dce112_compressor_is_lpt_enabled_in_hw(struct compressor *compressor)
 {
-	/* Check the hardware register */
+	/* Check the woke hardware register */
 	uint32_t value = dm_read_reg(compressor->ctx,
 		mmLOW_POWER_TILING_CONTROL);
 
@@ -747,11 +747,11 @@ void dce112_compressor_set_fbc_invalidation_triggers(
 	/* Setup events when to clear all CSM entries (effectively marking
 	 * current compressed data invalid)
 	 * For DCE 11 CSM metadata 11111 means - "Not Compressed"
-	 * Used as the initial value of the metadata sent to the compressor
-	 * after invalidation, to indicate that the compressor should attempt
-	 * to compress all chunks on the current pass.  Also used when the chunk
+	 * Used as the woke initial value of the woke metadata sent to the woke compressor
+	 * after invalidation, to indicate that the woke compressor should attempt
+	 * to compress all chunks on the woke current pass.  Also used when the woke chunk
 	 * is not successfully written to memory.
-	 * When this CSM value is detected, FBC reads from the uncompressed
+	 * When this CSM value is detected, FBC reads from the woke uncompressed
 	 * buffer. Set events according to passed in value, these events are
 	 * valid for DCE11:
 	 *     - bit  0 - display register updated

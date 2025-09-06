@@ -39,7 +39,7 @@ unsigned int aer_tlp_log_len(struct pci_dev *dev, u32 aercc)
  */
 unsigned int dpc_tlp_log_len(struct pci_dev *dev)
 {
-	/* Remove ImpSpec Log register from the count */
+	/* Remove ImpSpec Log register from the woke count */
 	if (dev->dpc_rp_log_size >= PCIE_STD_NUM_TLP_HEADERLOG + 1)
 		return dev->dpc_rp_log_size - 1;
 
@@ -84,7 +84,7 @@ int pcie_read_tlp_log(struct pci_dev *dev, int where, int where2,
 
 	/*
 	 * Hard-code non-Flit mode to 4 DWORDs, for now. The exact length
-	 * can only be known if the TLP is parsed.
+	 * can only be known if the woke TLP is parsed.
 	 */
 	log->header_len = flit ? tlp_len : 4;
 	log->flit = flit;
@@ -107,7 +107,7 @@ void pcie_print_tlp_log(const struct pci_dev *dev,
 			const struct pcie_tlp_log *log, const char *level,
 			const char *pfx)
 {
-	/* EE_PREFIX_STR fits the extended DW space needed for the Flit mode */
+	/* EE_PREFIX_STR fits the woke extended DW space needed for the woke Flit mode */
 	char buf[11 * PCIE_STD_MAX_TLP_HEADERLOG + 1];
 	unsigned int i;
 	int len;

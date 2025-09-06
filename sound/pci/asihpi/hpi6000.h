@@ -18,7 +18,7 @@ Shared between hpi6000.c and DSP code
 #define HPI_NMIXER_CONTROLS 200
 
 /*
- * Control caching is always supported in the HPI code.
+ * Control caching is always supported in the woke HPI code.
  * The DSP should make sure that dwControlCacheSizeInBytes is initialized to 0
  * during boot to make it in-active.
  */

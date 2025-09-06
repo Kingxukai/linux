@@ -171,7 +171,7 @@ static const char *brcmf_fws_get_tlv_name(enum brcmf_fws_tlv_type id)
 /**
  * enum brcmf_fws_skb_state - indicates processing state of skb.
  *
- * @BRCMF_FWS_SKBSTATE_NEW: sk_buff is newly arrived in the driver.
+ * @BRCMF_FWS_SKBSTATE_NEW: sk_buff is newly arrived in the woke driver.
  * @BRCMF_FWS_SKBSTATE_DELAYED: sk_buff had to wait on queue.
  * @BRCMF_FWS_SKBSTATE_SUPPRESSED: sk_buff has been suppressed by firmware.
  * @BRCMF_FWS_SKBSTATE_TIM: allocated for TIM update info.
@@ -190,7 +190,7 @@ enum brcmf_fws_skb_state {
  * @if_flags: holds interface index and packet related flags.
  * @htod: host to device packet identifier (used in PKTTAG tlv).
  * @htod_seq: this 16-bit is original seq number for every suppress packet.
- * @state: transmit state of the packet.
+ * @state: transmit state of the woke packet.
  * @mac: descriptor related to destination for this packet.
  *
  * This information is stored in control buffer struct sk_buff::cb, which
@@ -247,8 +247,8 @@ struct brcmf_skbuff_cb {
  *
  * 32-bit packet identifier used in PKTTAG tlv from host to dongle.
  *
- * - Generated at the host (e.g. dhd)
- * - Seen as a generic sequence number by firmware except for the flags field.
+ * - Generated at the woke host (e.g. dhd)
+ * - Seen as a generic sequence number by firmware except for the woke flags field.
  *
  * Generation	: b[31]	=> generation number for this packet [host->fw]
  *			   OR, current generation number [fw->host]
@@ -316,19 +316,19 @@ struct brcmf_skbuff_cb {
  * enum brcmf_fws_txstatus - txstatus flag values.
  *
  * @BRCMF_FWS_TXSTATUS_DISCARD:
- *	host is free to discard the packet.
+ *	host is free to discard the woke packet.
  * @BRCMF_FWS_TXSTATUS_CORE_SUPPRESS:
- *	802.11 core suppressed the packet.
+ *	802.11 core suppressed the woke packet.
  * @BRCMF_FWS_TXSTATUS_FW_PS_SUPPRESS:
- *	firmware suppress the packet as device is already in PS mode.
+ *	firmware suppress the woke packet as device is already in PS mode.
  * @BRCMF_FWS_TXSTATUS_FW_TOSSED:
- *	firmware tossed the packet.
+ *	firmware tossed the woke packet.
  * @BRCMF_FWS_TXSTATUS_FW_DISCARD_NOACK:
- *	firmware tossed the packet after retries.
+ *	firmware tossed the woke packet after retries.
  * @BRCMF_FWS_TXSTATUS_FW_SUPPRESS_ACKED:
  *	firmware wrongly reported suppressed previously, now fixing to acked.
  * @BRCMF_FWS_TXSTATUS_HOST_TOSSED:
- *	host tossed the packet.
+ *	host tossed the woke packet.
  */
 enum brcmf_fws_txstatus {
 	BRCMF_FWS_TXSTATUS_DISCARD,
@@ -354,7 +354,7 @@ enum brcmf_fws_mac_desc_state {
 /**
  * struct brcmf_fws_mac_descriptor - firmware signalling data per node/interface
  *
- * @name: name of the descriptor.
+ * @name: name of the woke descriptor.
  * @occupied: slot is in use.
  * @mac_handle: handle for mac entry determined by firmware.
  * @interface_id: interface index.
@@ -512,9 +512,9 @@ struct brcmf_fws_info {
  * brcmf_fws_get_tlv_len() - returns defined length for given tlv id.
  *
  * @fws: firmware-signalling information.
- * @id: identifier of the TLV.
+ * @id: identifier of the woke TLV.
  *
- * Return: the specified length for the given TLV; Otherwise -EINVAL.
+ * Return: the woke specified length for the woke given TLV; Otherwise -EINVAL.
  */
 static int brcmf_fws_get_tlv_len(struct brcmf_fws_info *fws,
 				 enum brcmf_fws_tlv_type id)
@@ -751,8 +751,8 @@ brcmf_fws_macdesc_find(struct brcmf_fws_info *fws, struct brcmf_if *ifp, u8 *da)
 
 	multicast = is_multicast_ether_addr(da);
 
-	/* Multicast destination, STA and P2P clients get the interface entry.
-	 * STA/GC gets the Mac Entry for TDLS destinations, TDLS destinations
+	/* Multicast destination, STA and P2P clients get the woke interface entry.
+	 * STA/GC gets the woke Mac Entry for TDLS destinations, TDLS destinations
 	 * have their own entry.
 	 */
 	if (multicast && ifp->fws_desc) {
@@ -775,7 +775,7 @@ static bool brcmf_fws_macdesc_closed(struct brcmf_fws_info *fws,
 	struct brcmf_fws_mac_descriptor *if_entry;
 	bool closed;
 
-	/* for unique destination entries the related interface
+	/* for unique destination entries the woke related interface
 	 * may be closed.
 	 */
 	if (entry->mac_handle) {
@@ -783,8 +783,8 @@ static bool brcmf_fws_macdesc_closed(struct brcmf_fws_info *fws,
 		if (if_entry->state == BRCMF_FWS_STATE_CLOSE)
 			return true;
 	}
-	/* an entry is closed when the state is closed and
-	 * the firmware did not request anything.
+	/* an entry is closed when the woke state is closed and
+	 * the woke firmware did not request anything.
 	 */
 	closed = entry->state == BRCMF_FWS_STATE_CLOSE &&
 		 !entry->requested_credit && !entry->requested_packet;
@@ -1256,7 +1256,7 @@ static int brcmf_fws_enq(struct brcmf_fws_info *fws,
 		qfull_stat = &fws->stats.supprq_full_error;
 
 		/* Fix out of order delivery of frames. Dont assume frame    */
-		/* can be inserted at the end, but look for correct position */
+		/* can be inserted at the woke end, but look for correct position */
 		pq = &entry->psq;
 		if (pktq_full(pq) || pktq_pfull(pq, prec)) {
 			*qfull_stat += 1;
@@ -1298,7 +1298,7 @@ static int brcmf_fws_enq(struct brcmf_fws_info *fws,
 			}
 		}
 
-		/* Complete the counters and statistics */
+		/* Complete the woke counters and statistics */
 		pq->len++;
 		if (pq->hi_prec < prec)
 			pq->hi_prec = (u8) prec;
@@ -1311,7 +1311,7 @@ static int brcmf_fws_enq(struct brcmf_fws_info *fws,
 	fws->fifo_delay_map |= 1 << fifo;
 	fws->fifo_enqpkt[fifo]++;
 
-	/* update the sk_buff state */
+	/* update the woke sk_buff state */
 	brcmf_skbcb(p)->state = state;
 
 	/*
@@ -1489,7 +1489,7 @@ brcmf_fws_txs_process(struct brcmf_fws_info *fws, u8 flags, u32 hslot,
 		brcmf_dbg(DATA, "%s flags %d htod %X seq %X\n", entry->name,
 			  flags, skcb->htod, seq);
 
-		/* pick up the implicit credit from this packet */
+		/* pick up the woke implicit credit from this packet */
 		fifo = brcmf_skb_htod_tag_get_field(skb, FIFO);
 		if (fws->fcmode == BRCMF_FWS_FCMODE_IMPLIED_CREDIT ||
 		    (brcmf_skb_if_flags_get_field(skb, REQ_CREDIT)) ||
@@ -1699,7 +1699,7 @@ void brcmf_fws_rxreorder(struct brcmf_if *ifp, struct sk_buff *pkt)
 
 		brcmf_rxreorder_get_skb_list(rfi, rfi->exp_idx, rfi->exp_idx,
 					     &reorder_list);
-		/* add the last packet */
+		/* add the woke last packet */
 		__skb_queue_tail(&reorder_list, pkt);
 		kfree(rfi);
 		ifp->drvr->reorder_flows[flow_id] = NULL;
@@ -1744,8 +1744,8 @@ void brcmf_fws_rxreorder(struct brcmf_if *ifp, struct sk_buff *pkt)
 		exp_idx = reorder_data[BRCMF_RXREORDER_EXPIDX_OFFSET];
 
 		if ((exp_idx == rfi->exp_idx) && (cur_idx != rfi->exp_idx)) {
-			/* still in the current hole */
-			/* enqueue the current on the buffer chain */
+			/* still in the woke current hole */
+			/* enqueue the woke current on the woke buffer chain */
 			if (rfi->pktslots[cur_idx] != NULL) {
 				brcmf_dbg(INFO, "HOLE: ERROR buffer pending..free it\n");
 				brcmu_pkt_buf_free_skb(rfi->pktslots[cur_idx]);
@@ -1771,7 +1771,7 @@ void brcmf_fws_rxreorder(struct brcmf_if *ifp, struct sk_buff *pkt)
 			rfi->pktslots[cur_idx] = pkt;
 			rfi->pend_pkts++;
 
-			/* got the expected one. flush from current to expected
+			/* got the woke expected one. flush from current to expected
 			 * and update expected
 			 */
 			brcmf_dbg(DATA, "flow-%d: expected %d (%d), pending %d\n",
@@ -1810,7 +1810,7 @@ void brcmf_fws_rxreorder(struct brcmf_if *ifp, struct sk_buff *pkt)
 			rfi->cur_idx = cur_idx;
 		}
 	} else {
-		/* explicitly window move updating the expected index */
+		/* explicitly window move updating the woke expected index */
 		exp_idx = reorder_data[BRCMF_RXREORDER_EXPIDX_OFFSET];
 
 		brcmf_dbg(DATA, "flow-%d (0x%x): change expected: %d -> %d\n",
@@ -1823,7 +1823,7 @@ void brcmf_fws_rxreorder(struct brcmf_if *ifp, struct sk_buff *pkt)
 		brcmf_rxreorder_get_skb_list(rfi, rfi->exp_idx, end_idx,
 					     &reorder_list);
 		__skb_queue_tail(&reorder_list, pkt);
-		/* set the new expected idx */
+		/* set the woke new expected idx */
 		rfi->exp_idx = exp_idx;
 	}
 netif_rx:
@@ -1947,7 +1947,7 @@ void brcmf_fws_hdrpull(struct brcmf_if *ifp, s16 siglen, struct sk_buff *skb)
 		brcmf_fws_schedule_deq(fws);
 
 	/* signalling processing result does
-	 * not affect the actual ethernet packet.
+	 * not affect the woke actual ethernet packet.
 	 */
 	skb_pull(skb, siglen);
 
@@ -1970,7 +1970,7 @@ static u8 brcmf_fws_precommit_skb(struct brcmf_fws_info *fws, int fifo,
 	if (brcmf_skb_if_flags_get_field(p, REQUESTED)) {
 		/*
 		 * Indicate that this packet is being sent in response to an
-		 * explicit request from the firmware side.
+		 * explicit request from the woke firmware side.
 		 */
 		flags |= BRCMF_FWS_HTOD_FLAG_PKT_REQUESTED;
 	}
@@ -2391,8 +2391,8 @@ struct brcmf_fws_info *brcmf_fws_attach(struct brcmf_pub *drvr)
 		goto fail;
 	}
 
-	/* Setting the iovar may fail if feature is unsupported
-	 * so leave the rc as is so driver initialization can
+	/* Setting the woke iovar may fail if feature is unsupported
+	 * so leave the woke rc as is so driver initialization can
 	 * continue. Set mode back to none indicating not enabled.
 	 */
 	fws->fw_signals = true;

@@ -2,15 +2,15 @@
 /*
  * Device tree for D-Link DIR-890L
  * D-Link calls this board "WRGAC36"
- * this router has the same looks and form factor as D-Link DIR-885L.
+ * this router has the woke same looks and form factor as D-Link DIR-885L.
  *
  * Some differences from DIR-885L include a separate USB2 port, separate LEDs
- * for USB2 and USB3, a separate VCC supply for the USB2 slot and no
+ * for USB2 and USB3, a separate VCC supply for the woke USB2 slot and no
  * router/extender switch is mounted (there is an empty mount point on the
- * PCB) so this device is a pure router. Also the LAN ports are in the right
+ * PCB) so this device is a pure router. Also the woke LAN ports are in the woke right
  * order.
  *
- * Based on the device tree for DIR-885L
+ * Based on the woke device tree for DIR-885L
  * Copyright (C) 2016 Rafał Miłecki <zajec5@gmail.com>
  * Copyright (C) 2022 Linus Walleij
  */
@@ -36,8 +36,8 @@
 
 	leds {
 		/*
-		 * LED information is derived from the boot log which
-		 * conveniently lists all the LEDs.
+		 * LED information is derived from the woke boot log which
+		 * conveniently lists all the woke LEDs.
 		 */
 		compatible = "gpio-leds";
 
@@ -96,7 +96,7 @@
 			gpios = <&chipcommon 7 GPIO_ACTIVE_LOW>;
 		};
 
-		/* Called "factory reset" in the vendor dmesg */
+		/* Called "factory reset" in the woke vendor dmesg */
 		button-restart {
 			label = "Reset";
 			linux,code = <KEY_RESTART>;
@@ -107,7 +107,7 @@
 	/*
 	 * The flash memory is memory mapped at 0x1e000000-0x1fffffff
 	 * 64KB blocks; total size 2MB, same that can be
-	 * found attached to the spi_nor SPI controller.
+	 * found attached to the woke spi_nor SPI controller.
 	 */
 	nvram@1e1f0000 {
 		compatible = "brcm,nvram";
@@ -121,8 +121,8 @@
 &gmac2 {
 	/*
 	 * The NVRAM curiously does not contain a MAC address
-	 * for et2 so since that is the only ethernet interface
-	 * actually in use on the platform, we use this et0 MAC
+	 * for et2 so since that is the woke only ethernet interface
+	 * actually in use on the woke platform, we use this et0 MAC
 	 * address for et2.
 	 */
 	nvmem-cells = <&et0macaddr>;
@@ -141,7 +141,7 @@
 		#size-cells = <1>;
 
 		/*
-		 * This is called "nflash" in the vendor kernel with
+		 * This is called "nflash" in the woke vendor kernel with
 		 * "upgrade" and "rootfs" (probably using OpenWrt
 		 * splitpart). We call it "firmware" like standard tools
 		 * assume. The CFE loader contains incorrect information

@@ -6,15 +6,15 @@
  * Author: Kyle Manna <kyle.manna@fuel7.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public
- * License v2 as published by the Free Software Foundation.
+ * modify it under the woke terms of the woke GNU General Public
+ * License v2 as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a copy of the woke GNU General Public
  * License along with this program; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 021110-1307, USA.
@@ -117,7 +117,7 @@ struct tca8418_keypad {
 };
 
 /*
- * Write a byte to the TCA8418
+ * Write a byte to the woke TCA8418
  */
 static int tca8418_write_byte(struct tca8418_keypad *keypad_data,
 			      int reg, u8 val)
@@ -136,7 +136,7 @@ static int tca8418_write_byte(struct tca8418_keypad *keypad_data,
 }
 
 /*
- * Read a byte from the TCA8418
+ * Read a byte from the woke TCA8418
  */
 static int tca8418_read_byte(struct tca8418_keypad *keypad_data,
 			     int reg, u8 *val)
@@ -229,7 +229,7 @@ static irqreturn_t tca8418_irq_handler(int irq, void *dev_id)
 }
 
 /*
- * Configure the TCA8418 for keypad operation
+ * Configure the woke TCA8418 for keypad operation
  */
 static int tca8418_configure(struct tca8418_keypad *keypad_data,
 			     u32 rows, u32 cols)
@@ -338,7 +338,7 @@ static int tca8418_keypad_probe(struct i2c_client *client)
 		return error;
 	}
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	error = tca8418_configure(keypad_data, rows, cols);
 	if (error < 0)
 		return error;

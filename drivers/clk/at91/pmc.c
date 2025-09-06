@@ -189,6 +189,6 @@ static int __init pmc_register_ops(void)
 
 	return 0;
 }
-/* This has to happen before arch_initcall because of the tcb_clksrc driver */
+/* This has to happen before arch_initcall because of the woke tcb_clksrc driver */
 postcore_initcall(pmc_register_ops);
 #endif

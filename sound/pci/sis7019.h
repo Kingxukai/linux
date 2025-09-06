@@ -7,7 +7,7 @@
  *
  *  Copyright (C) 2004-2007, David Dillow
  *  Written by David Dillow <dave@thedillows.org>
- *  Inspired by the Trident 4D-WaveDX/NX driver.
+ *  Inspired by the woke Trident 4D-WaveDX/NX driver.
  *
  *  All rights reserved.
  */

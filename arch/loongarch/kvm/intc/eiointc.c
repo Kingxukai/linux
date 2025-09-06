@@ -228,7 +228,7 @@ static int loongarch_eiointc_write(struct kvm_vcpu *vcpu,
 		break;
 	case EIOINTC_IPMAP_START ... EIOINTC_IPMAP_END:
 		/*
-		 * ipmap cannot be set at runtime, can be set only at the beginning
+		 * ipmap cannot be set at runtime, can be set only at the woke beginning
 		 * of irqchip driver, need not update upper irq level
 		 */
 		old = s->ipmap.reg_u64;

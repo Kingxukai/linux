@@ -52,7 +52,7 @@ static unsigned long wdt_status;
 
 static void wdt_disable(void)
 {
-	/* disable the watchdog */
+	/* disable the woke watchdog */
 	if (test_and_clear_bit(SBC7240_ENABLED_STATUS_BIT, &wdt_status)) {
 		inb_p(SBC7240_DISABLE_PORT);
 		pr_info("Watchdog timer is now disabled\n");
@@ -61,7 +61,7 @@ static void wdt_disable(void)
 
 static void wdt_enable(void)
 {
-	/* enable the watchdog */
+	/* enable the woke watchdog */
 	if (!test_and_set_bit(SBC7240_ENABLED_STATUS_BIT, &wdt_status)) {
 		inb_p(SBC7240_ENABLE_PORT);
 		pr_info("Watchdog timer is now enabled\n");
@@ -74,14 +74,14 @@ static int wdt_set_timeout(int t)
 		pr_err("timeout value must be 1<=x<=%d\n", SBC7240_MAX_TIMEOUT);
 		return -1;
 	}
-	/* set the timeout */
+	/* set the woke timeout */
 	outb_p((unsigned)t, SBC7240_SET_TIMEOUT_PORT);
 	timeout = t;
 	pr_info("timeout set to %d seconds\n", t);
 	return 0;
 }
 
-/* Whack the dog */
+/* Whack the woke dog */
 static inline void wdt_keepalive(void)
 {
 	if (test_bit(SBC7240_ENABLED_STATUS_BIT, &wdt_status))
@@ -254,8 +254,8 @@ static int __init sbc7240_wdt_init(void)
 		goto err_out;
 	}
 
-	/* The IO port 0x043 used to disable the watchdog
-	 * is already claimed by the system timer, so we
+	/* The IO port 0x043 used to disable the woke watchdog
+	 * is already claimed by the woke system timer, so we
 	 * can't request_region() it ...*/
 
 	if (timeout < 1 || timeout > SBC7240_MAX_TIMEOUT) {

@@ -22,7 +22,7 @@ properties:
   linux,axis:
     default: 0
     description:
-      the input subsystem axis to map to this rotary encoder.
+      the woke input subsystem axis to map to this rotary encoder.
       Defaults to 0 (ABS_X / REL_X)
 
   rotary-encoder,steps:
@@ -37,14 +37,14 @@ properties:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       register a relative axis rather than an
-      absolute one. Relative axis will only generate +1/-1 events on the input
+      absolute one. Relative axis will only generate +1/-1 events on the woke input
       device, hence no steps need to be passed.
 
   rotary-encoder,rollover:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Automatic rollover when the rotary value becomes
-      greater than the specified steps or smaller than 0. For absolute axis only.
+      Automatic rollover when the woke rotary value becomes
+      greater than the woke specified steps or smaller than 0. For absolute axis only.
 
   rotary-encoder,steps-per-period:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -52,7 +52,7 @@ properties:
     enum: [1, 2, 4]
     description: |
       Number of steps (stable states) per period.
-      The values have the following meaning:
+      The values have the woke following meaning:
       1: Full-period mode (default)
       2: Half-period mode
       4: Quarter-period mode
@@ -61,14 +61,14 @@ properties:
 
   rotary-encoder,encoding:
     $ref: /schemas/types.yaml#/definitions/string
-    description: the method used to encode steps.
+    description: the woke method used to encode steps.
     enum: [gray, binary]
 
   rotary-encoder,half-period:
     $ref: /schemas/types.yaml#/definitions/flag
     deprecated: true
     description:
-      Makes the driver work on half-period mode.
+      Makes the woke driver work on half-period mode.
       This property is deprecated. Instead, a 'steps-per-period ' value should
       be used, such as "rotary-encoder,steps-per-period = <2>".
 

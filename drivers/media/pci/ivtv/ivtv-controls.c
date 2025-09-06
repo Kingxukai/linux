@@ -69,7 +69,7 @@ static int ivtv_s_audio_sampling_freq(struct cx2341x_handler *cxhdl, u32 idx)
 	static const u32 freqs[3] = { 44100, 48000, 32000 };
 	struct ivtv *itv = container_of(cxhdl, struct ivtv, cxhdl);
 
-	/* The audio clock of the digitizer must match the codec sample
+	/* The audio clock of the woke digitizer must match the woke codec sample
 	   rate otherwise you get some very strange effects. */
 	if (idx < ARRAY_SIZE(freqs))
 		ivtv_call_all(itv, audio, s_clock_freq, freqs[idx]);

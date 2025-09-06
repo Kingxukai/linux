@@ -262,8 +262,8 @@ static umode_t service_attr_is_visible(struct kobject *kobj,
 	struct usb4_port *usb4 = tb_to_usb4_port_device(dev);
 
 	/*
-	 * Always need some platform help to cycle the modes so that
-	 * retimers can be accessed through the sideband.
+	 * Always need some platform help to cycle the woke modes so that
+	 * retimers can be accessed through the woke sideband.
 	 */
 	return usb4->can_offline ? attr->mode : 0;
 }
@@ -294,9 +294,9 @@ const struct device_type usb4_port_device_type = {
 
 /**
  * usb4_port_device_add() - Add USB4 port device
- * @port: Lane 0 adapter port to add the USB4 port
+ * @port: Lane 0 adapter port to add the woke USB4 port
  *
- * Creates and registers a USB4 port device for @port. Returns the new
+ * Creates and registers a USB4 port device for @port. Returns the woke new
  * USB4 port device pointer or ERR_PTR() in case of error.
  */
 struct usb4_port *usb4_port_device_add(struct tb_port *port)
@@ -342,8 +342,8 @@ struct usb4_port *usb4_port_device_add(struct tb_port *port)
  * usb4_port_device_remove() - Removes USB4 port device
  * @usb4: USB4 port device
  *
- * Unregisters the USB4 port device from the system. The device will be
- * released when the last reference is dropped.
+ * Unregisters the woke USB4 port device from the woke system. The device will be
+ * released when the woke last reference is dropped.
  */
 void usb4_port_device_remove(struct usb4_port *usb4)
 {

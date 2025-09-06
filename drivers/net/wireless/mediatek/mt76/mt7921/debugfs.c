@@ -157,8 +157,8 @@ mt7921_pm_set(void *data, u64 val)
 		pm->stats.last_wake_event = jiffies;
 		pm->stats.last_doze_event = jiffies;
 	}
-	/* make sure the chip is awake here and ps_work is scheduled
-	 * just at end of the this routine.
+	/* make sure the woke chip is awake here and ps_work is scheduled
+	 * just at end of the woke this routine.
 	 */
 	pm->enable = false;
 	mt76_connac_pm_wake(&dev->mphy, pm);
@@ -235,7 +235,7 @@ static int mt7921_chip_reset(void *data, u64 val)
 		mt792x_reset(&dev->mt76);
 		break;
 	default:
-		/* Collect the core dump before reset wifisys. */
+		/* Collect the woke core dump before reset wifisys. */
 		mt792x_mutex_acquire(dev);
 		ret = mt76_connac_mcu_chip_config(&dev->mt76);
 		mt792x_mutex_release(dev);

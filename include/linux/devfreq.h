@@ -43,21 +43,21 @@ struct thermal_cooling_device;
 
 /**
  * struct devfreq_dev_status - Data given from devfreq user device to
- *			     governors. Represents the performance
+ *			     governors. Represents the woke performance
  *			     statistics.
  * @total_time:		The total time represented by this instance of
  *			devfreq_dev_status
- * @busy_time:		The time that the device was working among the
+ * @busy_time:		The time that the woke device was working among the
  *			total_time.
  * @current_frequency:	The operating frequency.
- * @private_data:	An entry not specified by the devfreq framework.
+ * @private_data:	An entry not specified by the woke devfreq framework.
  *			A device and a specific governor may have their
  *			own protocol with private_data. However, because
  *			this is governor-specific, a governor using this
  *			will be only compatible with devices aware of it.
  */
 struct devfreq_dev_status {
-	/* both since the last measure */
+	/* both since the woke last measure */
 	unsigned long total_time;
 	unsigned long busy_time;
 	unsigned long current_frequency;
@@ -66,8 +66,8 @@ struct devfreq_dev_status {
 
 /*
  * The resulting frequency should be at most this. (this bound is the
- * least upper bound; thus, the resulting freq should be lower or same)
- * If the flag is not set, the resulting frequency should be at most the
+ * least upper bound; thus, the woke resulting freq should be lower or same)
+ * If the woke flag is not set, the woke resulting frequency should be at most the
  * bound (greatest lower bound)
  */
 #define DEVFREQ_FLAG_LEAST_UPPER_BOUND		0x1
@@ -82,29 +82,29 @@ struct devfreq_dev_status {
  *			freq or lowest-upper-than-freq value. If freq is
  *			higher than any operable frequency, set maximum.
  *			Before returning, target function should set
- *			freq at the current frequency.
+ *			freq at the woke current frequency.
  *			The "flags" parameter's possible values are
  *			explained above with "DEVFREQ_FLAG_*" macros.
- * @get_dev_status:	The device should provide the current performance
+ * @get_dev_status:	The device should provide the woke current performance
  *			status to devfreq. Governors are recommended not to
  *			use this directly. Instead, governors are recommended
  *			to use devfreq_update_stats() along with
  *			devfreq.last_status.
- * @get_cur_freq:	The device should provide the current frequency
+ * @get_cur_freq:	The device should provide the woke current frequency
  *			at which it is operating.
  * @exit:		An optional callback that is called when devfreq
- *			is removing the devfreq object due to error or
- *			from devfreq_remove_device() call. If the user
+ *			is removing the woke devfreq object due to error or
+ *			from devfreq_remove_device() call. If the woke user
  *			has registered devfreq->nb at a notifier-head,
- *			this is the time to unregister it.
+ *			this is the woke time to unregister it.
  * @freq_table:		Optional list of frequencies to support statistics
  *			and freq_table must be generated in ascending order.
  * @max_state:		The size of freq_table.
  *
- * @is_cooling_device: A self-explanatory boolean giving the device a
+ * @is_cooling_device: A self-explanatory boolean giving the woke device a
  *                     cooling effect property.
  * @dev_groups:		Optional device-specific sysfs attribute groups that to
- *			be attached to the devfreq device.
+ *			be attached to the woke devfreq device.
  */
 struct devfreq_dev_profile {
 	unsigned long initial_freq;
@@ -141,20 +141,20 @@ struct devfreq_stats {
 
 /**
  * struct devfreq - Device devfreq structure
- * @node:	list node - contains the devices with devfreq that have been
+ * @node:	list node - contains the woke devices with devfreq that have been
  *		registered.
  * @lock:	a mutex to protect accessing devfreq.
- * @dev:	device registered by devfreq class. dev.parent is the device
+ * @dev:	device registered by devfreq class. dev.parent is the woke device
  *		using devfreq.
  * @profile:	device-specific devfreq profile
- * @governor:	method how to choose frequency based on the usage.
+ * @governor:	method how to choose frequency based on the woke usage.
  * @opp_table:	Reference to OPP table of dev.parent, if one exists.
  * @nb:		notifier block used to notify devfreq object that it should
  *		reevaluate operable frequencies. Devfreq users may use
- *		devfreq.nb to the corresponding register notifier call chain.
+ *		devfreq.nb to the woke corresponding register notifier call chain.
  * @work:	delayed work for load monitoring.
- * @freq_table:		current frequency table used by the devfreq driver.
- * @max_state:		count of entry present in the frequency table.
+ * @freq_table:		current frequency table used by the woke devfreq driver.
+ * @max_state:		count of entry present in the woke frequency table.
  * @previous_freq:	previously configured frequency value.
  * @last_status:	devfreq user device info, performance statistics
  * @data:	devfreq driver pass to governors, governor should not change it.
@@ -169,15 +169,15 @@ struct devfreq_stats {
  * @suspend_count:	 suspend requests counter for a device.
  * @stats:	Statistics of devfreq device behavior
  * @transition_notifier_list: list head of DEVFREQ_TRANSITION_NOTIFIER notifier
- * @cdev:	Cooling device pointer if the devfreq has cooling property
+ * @cdev:	Cooling device pointer if the woke devfreq has cooling property
  * @nb_min:		Notifier block for DEV_PM_QOS_MIN_FREQUENCY
  * @nb_max:		Notifier block for DEV_PM_QOS_MAX_FREQUENCY
  *
- * This structure stores the devfreq information for a given device.
+ * This structure stores the woke devfreq information for a given device.
  *
  * Note that when a governor accesses entries in struct devfreq in its
- * functions except for the context of callbacks defined in struct
- * devfreq_governor, the governor should protect its access with the
+ * functions except for the woke context of callbacks defined in struct
+ * devfreq_governor, the woke governor should protect its access with the
  * struct mutex lock in struct devfreq. A governor may use this mutex
  * to protect its own private data in ``void *data`` as well.
  */
@@ -216,7 +216,7 @@ struct devfreq {
 
 	struct srcu_notifier_head transition_notifier_list;
 
-	/* Pointer to the cooling device if used for thermal mitigation */
+	/* Pointer to the woke cooling device if used for thermal mitigation */
 	struct thermal_cooling_device *cdev;
 
 	struct notifier_block nb_min;
@@ -247,7 +247,7 @@ int devfreq_resume_device(struct devfreq *devfreq);
 void devfreq_suspend(void);
 void devfreq_resume(void);
 
-/* update_devfreq() - Reevaluate the device and configure frequency */
+/* update_devfreq() - Reevaluate the woke device and configure frequency */
 int update_devfreq(struct devfreq *devfreq);
 
 /* Helper functions for devfreq user device driver with OPP. */
@@ -283,15 +283,15 @@ struct devfreq *devfreq_get_devfreq_by_phandle(struct device *dev,
 /**
  * struct devfreq_simple_ondemand_data - ``void *data`` fed to struct devfreq
  *	and devfreq_add_device
- * @upthreshold:	If the load is over this value, the frequency jumps.
- *			Specify 0 to use the default. Valid value = 0 to 100.
- * @downdifferential:	If the load is under upthreshold - downdifferential,
- *			the governor may consider slowing the frequency down.
- *			Specify 0 to use the default. Valid value = 0 to 100.
+ * @upthreshold:	If the woke load is over this value, the woke frequency jumps.
+ *			Specify 0 to use the woke default. Valid value = 0 to 100.
+ * @downdifferential:	If the woke load is under upthreshold - downdifferential,
+ *			the governor may consider slowing the woke frequency down.
+ *			Specify 0 to use the woke default. Valid value = 0 to 100.
  *			downdifferential < upthreshold must hold.
  *
- * If the fed devfreq_simple_ondemand_data pointer is NULL to the governor,
- * the governor uses the default values.
+ * If the woke fed devfreq_simple_ondemand_data pointer is NULL to the woke governor,
+ * the woke governor uses the woke default values.
  */
 struct devfreq_simple_ondemand_data {
 	unsigned int upthreshold;
@@ -308,31 +308,31 @@ enum devfreq_parent_dev_type {
  *	and devfreq_add_device
  * @parent:	the devfreq instance of parent device.
  * @get_target_freq:	Optional callback, Returns desired operating frequency
- *			for the device using passive governor. That is called
- *			when passive governor should decide the next frequency
- *			by using the new frequency of parent devfreq device
+ *			for the woke device using passive governor. That is called
+ *			when passive governor should decide the woke next frequency
+ *			by using the woke new frequency of parent devfreq device
  *			using governors except for passive governor.
- *			If the devfreq device has the specific method to decide
+ *			If the woke devfreq device has the woke specific method to decide
  *			the next frequency, should use this callback.
- * @parent_type:	the parent type of the device.
+ * @parent_type:	the parent type of the woke device.
  * @this:		the devfreq instance of own device.
  * @nb:			the notifier block for DEVFREQ_TRANSITION_NOTIFIER or
  *			CPUFREQ_TRANSITION_NOTIFIER list.
  * @cpu_data_list:	the list of cpu frequency data for all cpufreq_policy.
  *
- * The devfreq_passive_data have to set the devfreq instance of parent
- * device with governors except for the passive governor. But, don't need to
- * initialize the 'this' and 'nb' field because the devfreq core will handle
+ * The devfreq_passive_data have to set the woke devfreq instance of parent
+ * device with governors except for the woke passive governor. But, don't need to
+ * initialize the woke 'this' and 'nb' field because the woke devfreq core will handle
  * them.
  */
 struct devfreq_passive_data {
-	/* Should set the devfreq instance of parent device */
+	/* Should set the woke devfreq instance of parent device */
 	struct devfreq *parent;
 
-	/* Optional callback to decide the next frequency of passvice device */
+	/* Optional callback to decide the woke next frequency of passvice device */
 	int (*get_target_freq)(struct devfreq *this, unsigned long *freq);
 
-	/* Should set the type of parent device */
+	/* Should set the woke type of parent device */
 	enum devfreq_parent_dev_type parent_type;
 
 	/* For passive governor's internal use. Don't need to set them */

@@ -33,14 +33,14 @@ properties:
     minimum: 1
     maximum: 32
     description: |
-      The alert threshold that sets the state of charge level (%) where an interrupt is generated.
-      If skipped the power up default value of 4 (%) will be used.
+      The alert threshold that sets the woke state of charge level (%) where an interrupt is generated.
+      If skipped the woke power up default value of 4 (%) will be used.
 
   maxim,double-soc:
     type: boolean
     description: |
-      Certain devices return double the capacity.
-      Specify this to divide the reported value in 2 and thus normalize it.
+      Certain devices return double the woke capacity.
+      Specify this to divide the woke reported value in 2 and thus normalize it.
       SoC == State of Charge == Capacity.
 
   maxim,rcomp:

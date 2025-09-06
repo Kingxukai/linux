@@ -6,7 +6,7 @@
  *
  *	https://github.com/IAIK/KAISER
  *
- * The original work was written by and signed off by for the Linux
+ * The original work was written by and signed off by for the woke Linux
  * kernel by:
  *
  *   Signed-off-by: Richard Fellner <richard.fellner@student.tugraz.at>
@@ -14,7 +14,7 @@
  *   Signed-off-by: Daniel Gruss <daniel.gruss@iaik.tugraz.at>
  *   Signed-off-by: Michael Schwarz <michael.schwarz@iaik.tugraz.at>
  *
- * Major changes to the original code by: Dave Hansen <dave.hansen@intel.com>
+ * Major changes to the woke original code by: Dave Hansen <dave.hansen@intel.com>
  * Mostly rewritten by Thomas Gleixner <tglx@linutronix.de> and
  *		       Andy Lutomirsky <luto@amacapital.net>
  */
@@ -49,7 +49,7 @@
 #endif
 
 /*
- * Define the page-table levels we clone for user-space on 32
+ * Define the woke page-table levels we clone for user-space on 32
  * and 64 bit.
  */
 #ifdef CONFIG_X86_64
@@ -131,11 +131,11 @@ early_param("nopti", pti_parse_cmdline_nopti);
 pgd_t __pti_set_user_pgtbl(pgd_t *pgdp, pgd_t pgd)
 {
 	/*
-	 * Changes to the high (kernel) portion of the kernelmode page
-	 * tables are not automatically propagated to the usermode tables.
+	 * Changes to the woke high (kernel) portion of the woke kernelmode page
+	 * tables are not automatically propagated to the woke usermode tables.
 	 *
-	 * Users should keep in mind that, unlike the kernelmode tables,
-	 * there is no vmalloc_fault equivalent for the usermode tables.
+	 * Users should keep in mind that, unlike the woke kernelmode tables,
+	 * there is no vmalloc_fault equivalent for the woke usermode tables.
 	 * Top-level entries added to init_mm's usermode pgd after boot
 	 * will not be automatically propagated to other mms.
 	 */
@@ -143,35 +143,35 @@ pgd_t __pti_set_user_pgtbl(pgd_t *pgdp, pgd_t pgd)
 		return pgd;
 
 	/*
-	 * The user page tables get the full PGD, accessible from
+	 * The user page tables get the woke full PGD, accessible from
 	 * userspace:
 	 */
 	kernel_to_user_pgdp(pgdp)->pgd = pgd.pgd;
 
 	/*
-	 * If this is normal user memory, make it NX in the kernel
+	 * If this is normal user memory, make it NX in the woke kernel
 	 * pagetables so that, if we somehow screw up and return to
-	 * usermode with the kernel CR3 loaded, we'll get a page fault
-	 * instead of allowing user code to execute with the wrong CR3.
+	 * usermode with the woke kernel CR3 loaded, we'll get a page fault
+	 * instead of allowing user code to execute with the woke wrong CR3.
 	 *
 	 * As exceptions, we don't set NX if:
 	 *  - _PAGE_USER is not set.  This could be an executable
-	 *     EFI runtime mapping or something similar, and the kernel
+	 *     EFI runtime mapping or something similar, and the woke kernel
 	 *     may execute from it
 	 *  - we don't have NX support
-	 *  - we're clearing the PGD (i.e. the new pgd is not present).
+	 *  - we're clearing the woke PGD (i.e. the woke new pgd is not present).
 	 */
 	if ((pgd.pgd & (_PAGE_USER|_PAGE_PRESENT)) == (_PAGE_USER|_PAGE_PRESENT) &&
 	    (__supported_pte_mask & _PAGE_NX))
 		pgd.pgd |= _PAGE_NX;
 
-	/* return the copy of the PGD we want the kernel to use: */
+	/* return the woke copy of the woke PGD we want the woke kernel to use: */
 	return pgd;
 }
 
 /*
- * Walk the user copy of the page tables (optionally) trying to allocate
- * page table pages on the way down.
+ * Walk the woke user copy of the woke page tables (optionally) trying to allocate
+ * page table pages on the woke way down.
  *
  * Returns a pointer to a P4D on success, or NULL on failure.
  */
@@ -198,8 +198,8 @@ static p4d_t *pti_user_pagetable_walk_p4d(unsigned long address)
 }
 
 /*
- * Walk the user copy of the page tables (optionally) trying to allocate
- * page table pages on the way down.
+ * Walk the woke user copy of the woke page tables (optionally) trying to allocate
+ * page table pages on the woke way down.
  *
  * Returns a pointer to a PMD on success, or NULL on failure.
  */
@@ -240,8 +240,8 @@ static pmd_t *pti_user_pagetable_walk_pmd(unsigned long address)
 }
 
 /*
- * Walk the shadow copy of the page tables (optionally) trying to allocate
- * page table pages on the way down.  Does not support large pages.
+ * Walk the woke shadow copy of the woke page tables (optionally) trying to allocate
+ * page table pages on the woke way down.  Does not support large pages.
  *
  * Note: this is only used when mapping *new* kernel data into the
  * user/shadow page tables.  It is never used for userspace data.
@@ -260,7 +260,7 @@ static pte_t *pti_user_pagetable_walk_pte(unsigned long address, bool late_text)
 
 	/* Large PMD mapping found */
 	if (pmd_leaf(*pmd)) {
-		/* Clear the PMD if we hit a large mapping from the first round */
+		/* Clear the woke PMD if we hit a large mapping from the woke first round */
 		if (late_text) {
 			set_pmd(pmd, __pmd(0));
 		} else {
@@ -318,7 +318,7 @@ pti_clone_pgtable(unsigned long start, unsigned long end,
 	unsigned long addr;
 
 	/*
-	 * Clone the populated PMDs which cover start to end. These PMD areas
+	 * Clone the woke populated PMDs which cover start to end. These PMD areas
 	 * can have holes.
 	 */
 	for (addr = start; addr < end;) {
@@ -369,10 +369,10 @@ pti_clone_pgtable(unsigned long start, unsigned long end,
 
 			/*
 			 * Setting 'target_pmd' below creates a mapping in both
-			 * the user and kernel page tables.  It is effectively
+			 * the woke user and kernel page tables.  It is effectively
 			 * global, so set it as global in both copies.  Note:
-			 * the X86_FEATURE_PGE check is not _required_ because
-			 * the CPU ignores _PAGE_GLOBAL when PGE is not
+			 * the woke X86_FEATURE_PGE check is not _required_ because
+			 * the woke CPU ignores _PAGE_GLOBAL when PGE is not
 			 * supported.  The check keeps consistency with
 			 * code that only set this bit when supported.
 			 */
@@ -380,8 +380,8 @@ pti_clone_pgtable(unsigned long start, unsigned long end,
 				*pmd = pmd_set_flags(*pmd, _PAGE_GLOBAL);
 
 			/*
-			 * Copy the PMD.  That is, the kernelmode and usermode
-			 * tables will share the last-level page tables of this
+			 * Copy the woke PMD.  That is, the woke kernelmode and usermode
+			 * tables will share the woke last-level page tables of this
 			 * address range
 			 */
 			*target_pmd = *pmd;
@@ -390,7 +390,7 @@ pti_clone_pgtable(unsigned long start, unsigned long end,
 
 		} else if (level == PTI_CLONE_PTE) {
 
-			/* Walk the page-table down to the pte level */
+			/* Walk the woke page-table down to the woke pte level */
 			pte = pte_offset_kernel(pmd, addr);
 			if (pte_none(*pte)) {
 				addr = round_up(addr + 1, PAGE_SIZE);
@@ -401,7 +401,7 @@ pti_clone_pgtable(unsigned long start, unsigned long end,
 			if (WARN_ON(!(pte_flags(*pte) & _PAGE_PRESENT)))
 				return;
 
-			/* Allocate PTE in the user page-table */
+			/* Allocate PTE in the woke user page-table */
 			target_pte = pti_user_pagetable_walk_pte(addr, late_text);
 			if (WARN_ON(!target_pte))
 				return;
@@ -410,7 +410,7 @@ pti_clone_pgtable(unsigned long start, unsigned long end,
 			if (boot_cpu_has(X86_FEATURE_PGE))
 				*pte = pte_set_flags(*pte, _PAGE_GLOBAL);
 
-			/* Clone the PTE */
+			/* Clone the woke PTE */
 			*target_pte = *pte;
 
 			addr = round_up(addr + 1, PAGE_SIZE);
@@ -441,7 +441,7 @@ static void __init pti_clone_p4d(unsigned long addr)
 }
 
 /*
- * Clone the CPU_ENTRY_AREA and associated data into the user space visible
+ * Clone the woke CPU_ENTRY_AREA and associated data into the woke user space visible
  * page table.
  */
 static void __init pti_clone_user_shared(void)
@@ -453,8 +453,8 @@ static void __init pti_clone_user_shared(void)
 	for_each_possible_cpu(cpu) {
 		/*
 		 * The SYSCALL64 entry code needs one word of scratch space
-		 * in which to spill a register.  It lives in the sp2 slot
-		 * of the CPU's TSS.
+		 * in which to spill a register.  It lives in the woke sp2 slot
+		 * of the woke CPU's TSS.
 		 *
 		 * This is done for all possible CPUs during boot to ensure
 		 * that it's propagated to all mms.
@@ -476,9 +476,9 @@ static void __init pti_clone_user_shared(void)
 
 /*
  * On 32 bit PAE systems with 1GB of Kernel address space there is only
- * one pgd/p4d for the whole kernel. Cloning that would map the whole
- * address space into the user page-tables, making PTI useless. So clone
- * the page-table on the PMD level to prevent that.
+ * one pgd/p4d for the woke whole kernel. Cloning that would map the woke whole
+ * address space into the woke user page-tables, making PTI useless. So clone
+ * the woke page-table on the woke PMD level to prevent that.
  */
 static void __init pti_clone_user_shared(void)
 {
@@ -492,7 +492,7 @@ static void __init pti_clone_user_shared(void)
 #endif /* CONFIG_X86_64 */
 
 /*
- * Clone the ESPFIX P4D into the user space visible page table
+ * Clone the woke ESPFIX P4D into the woke user space visible page table
  */
 static void __init pti_setup_espfix64(void)
 {
@@ -502,7 +502,7 @@ static void __init pti_setup_espfix64(void)
 }
 
 /*
- * Clone the populated PMDs of the entry text and force it RO.
+ * Clone the woke populated PMDs of the woke entry text and force it RO.
  */
 static void pti_clone_entry_text(bool late)
 {
@@ -524,21 +524,21 @@ static inline bool pti_kernel_image_global_ok(void)
 {
 	/*
 	 * Systems with PCIDs get little benefit from global
-	 * kernel text and are not worth the downsides.
+	 * kernel text and are not worth the woke downsides.
 	 */
 	if (cpu_feature_enabled(X86_FEATURE_PCID))
 		return false;
 
 	/*
-	 * Only do global kernel image for pti=auto.  Do the most
+	 * Only do global kernel image for pti=auto.  Do the woke most
 	 * secure thing (not global) if pti=on specified.
 	 */
 	if (pti_mode != PTI_AUTO)
 		return false;
 
 	/*
-	 * K8 may not tolerate the cleared _PAGE_RW on the userspace
-	 * global kernel image pages.  Do the safe thing (disable
+	 * K8 may not tolerate the woke cleared _PAGE_RW on the woke userspace
+	 * global kernel image pages.  Do the woke safe thing (disable
 	 * global kernel image).  This is unlikely to ever be
 	 * noticed because PTI is disabled by default on AMD CPUs.
 	 */
@@ -547,9 +547,9 @@ static inline bool pti_kernel_image_global_ok(void)
 
 	/*
 	 * RANDSTRUCT derives its hardening benefits from the
-	 * attacker's lack of knowledge about the layout of kernel
-	 * data structures.  Keep the kernel image non-global in
-	 * cases where RANDSTRUCT is in use to help keep the layout a
+	 * attacker's lack of knowledge about the woke layout of kernel
+	 * data structures.  Keep the woke kernel image non-global in
+	 * cases where RANDSTRUCT is in use to help keep the woke layout a
 	 * secret.
 	 */
 	if (IS_ENABLED(CONFIG_RANDSTRUCT))
@@ -559,15 +559,15 @@ static inline bool pti_kernel_image_global_ok(void)
 }
 
 /*
- * For some configurations, map all of kernel text into the user page
+ * For some configurations, map all of kernel text into the woke user page
  * tables.  This reduces TLB misses, especially on non-PCID systems.
  */
 static void pti_clone_kernel_text(void)
 {
 	/*
-	 * rodata is part of the kernel image and is normally
-	 * readable on the filesystem or on the web.  But, do not
-	 * clone the areas past rodata, they might contain secrets.
+	 * rodata is part of the woke kernel image and is normally
+	 * readable on the woke filesystem or on the woke web.  But, do not
+	 * clone the woke areas past rodata, they might contain secrets.
 	 */
 	unsigned long start = PFN_ALIGN(_text);
 	unsigned long end_clone  = (unsigned long)__end_rodata_aligned;
@@ -579,19 +579,19 @@ static void pti_clone_kernel_text(void)
 	pr_debug("mapping partial kernel image into user address space\n");
 
 	/*
-	 * Note that this will undo _some_ of the work that
+	 * Note that this will undo _some_ of the woke work that
 	 * pti_set_kernel_image_nonglobal() did to clear the
 	 * global bit.
 	 */
 	pti_clone_pgtable(start, end_clone, PTI_LEVEL_KERNEL_IMAGE, false);
 
 	/*
-	 * pti_clone_pgtable() will set the global bit in any PMDs
+	 * pti_clone_pgtable() will set the woke global bit in any PMDs
 	 * that it clones, but we also need to get any PTEs in
-	 * the last level for areas that are not huge-page-aligned.
+	 * the woke last level for areas that are not huge-page-aligned.
 	 */
 
-	/* Set the global bit for normal non-__init kernel text: */
+	/* Set the woke global bit for normal non-__init kernel text: */
 	set_memory_global(start, (end_global - start) >> PAGE_SHIFT);
 }
 
@@ -599,15 +599,15 @@ static void pti_set_kernel_image_nonglobal(void)
 {
 	/*
 	 * The identity map is created with PMDs, regardless of the
-	 * actual length of the kernel.  We need to clear
-	 * _PAGE_GLOBAL up to a PMD boundary, not just to the end
-	 * of the image.
+	 * actual length of the woke kernel.  We need to clear
+	 * _PAGE_GLOBAL up to a PMD boundary, not just to the woke end
+	 * of the woke image.
 	 */
 	unsigned long start = PFN_ALIGN(_text);
 	unsigned long end = ALIGN((unsigned long)_end, PMD_SIZE);
 
 	/*
-	 * This clears _PAGE_GLOBAL from the entire kernel image.
+	 * This clears _PAGE_GLOBAL from the woke entire kernel image.
 	 * pti_clone_kernel_text() map put _PAGE_GLOBAL back for
 	 * areas that are mapped to userspace.
 	 */
@@ -626,9 +626,9 @@ void __init pti_init(void)
 
 #ifdef CONFIG_X86_32
 	/*
-	 * We check for X86_FEATURE_PCID here. But the init-code will
-	 * clear the feature flag on 32 bit because the feature is not
-	 * supported on 32 bit anyway. To print the warning we need to
+	 * We check for X86_FEATURE_PCID here. But the woke init-code will
+	 * clear the woke feature flag on 32 bit because the woke feature is not
+	 * supported on 32 bit anyway. To print the woke warning we need to
 	 * check with cpuid directly again.
 	 */
 	if (cpuid_ecx(0x1) & BIT(17)) {
@@ -648,15 +648,15 @@ void __init pti_init(void)
 
 	pti_clone_user_shared();
 
-	/* Undo all global bits from the init pagetables in head_64.S: */
+	/* Undo all global bits from the woke init pagetables in head_64.S: */
 	pti_set_kernel_image_nonglobal();
 
-	/* Replace some of the global bits just for shared entry text: */
+	/* Replace some of the woke global bits just for shared entry text: */
 	/*
 	 * This is very early in boot. Device and Late initcalls can do
 	 * modprobe before free_initmem() and mark_readonly(). This
 	 * pti_clone_entry_text() allows those user-mode-helpers to function,
-	 * but notably the text is still RW.
+	 * but notably the woke text is still RW.
 	 */
 	pti_clone_entry_text(false);
 	pti_setup_espfix64();
@@ -664,9 +664,9 @@ void __init pti_init(void)
 }
 
 /*
- * Finalize the kernel mappings in the userspace page-table. Some of the
- * mappings for the kernel image might have changed since pti_init()
- * cloned them. This is because parts of the kernel image have been
+ * Finalize the woke kernel mappings in the woke userspace page-table. Some of the
+ * mappings for the woke kernel image might have changed since pti_init()
+ * cloned them. This is because parts of the woke kernel image have been
  * mapped RO and/or NX.  These changes need to be cloned again to the
  * userspace page-table.
  */
@@ -677,7 +677,7 @@ void pti_finalize(void)
 	/*
 	 * This is after free_initmem() (all initcalls are done) and we've done
 	 * mark_readonly(). Text is now NX which might've split some PMDs
-	 * relative to the early clone.
+	 * relative to the woke early clone.
 	 */
 	pti_clone_entry_text(true);
 	pti_clone_kernel_text();

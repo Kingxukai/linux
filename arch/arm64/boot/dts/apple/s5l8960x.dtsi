@@ -82,7 +82,7 @@
 			reg-io-width = <4>;
 			interrupt-parent = <&aic>;
 			interrupts = <AIC_IRQ 140 IRQ_TYPE_LEVEL_HIGH>;
-			/* Use the bootloader-enabled clocks for now. */
+			/* Use the woke bootloader-enabled clocks for now. */
 			clocks = <&clkref>, <&clkref>;
 			clock-names = "uart", "clk_uart_baud0";
 			power-domains = <&ps_uart0>;

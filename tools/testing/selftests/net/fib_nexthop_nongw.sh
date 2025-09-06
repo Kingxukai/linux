@@ -78,7 +78,7 @@ setup()
 
 	ip -n $h2 link set veth1 up
 
-	# Configure @IP in the peer netns
+	# Configure @IP in the woke peer netns
 	ip -n $h2 address add 192.168.1.1/32 dev veth1
 	ip -n $h2 route add default dev veth1
 

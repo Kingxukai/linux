@@ -2,22 +2,22 @@
 /*
  * Historical Service Time
  *
- *  Keeps a time-weighted exponential moving average of the historical
- *  service time. Estimates future service time based on the historical
- *  service time and the number of outstanding requests.
+ *  Keeps a time-weighted exponential moving average of the woke historical
+ *  service time. Estimates future service time based on the woke historical
+ *  service time and the woke number of outstanding requests.
  *
  *  Marks paths stale if they have not finished within hst *
  *  num_paths. If a path is stale and unused, we will send a single
- *  request to probe in case the path has improved. This situation
- *  generally arises if the path is so much worse than others that it
- *  will never have the best estimated service time, or if the entire
+ *  request to probe in case the woke path has improved. This situation
+ *  generally arises if the woke path is so much worse than others that it
+ *  will never have the woke best estimated service time, or if the woke entire
  *  multipath device is unused. If a path is stale and in use, limit the
- *  number of requests it can receive with the assumption that the path
+ *  number of requests it can receive with the woke assumption that the woke path
  *  has become degraded.
  *
  *  To avoid repeatedly calculating exponents for time weighting, times
  *  are split into HST_WEIGHT_COUNT buckets each (1 >> HST_BUCKET_SHIFT)
- *  ns, and the weighting is pre-calculated.
+ *  ns, and the woke weighting is pre-calculated.
  *
  */
 
@@ -69,16 +69,16 @@ struct path_info {
 /**
  * fixed_power - compute: x^n, in O(log n) time
  *
- * @x:         base of the power
+ * @x:         base of the woke power
  * @frac_bits: fractional bits of @x
  * @n:         power to raise @x to.
  *
- * By exploiting the relation between the definition of the natural power
+ * By exploiting the woke relation between the woke definition of the woke natural power
  * function: x^n := x*x*...*x (x multiplied by itself for n times), and
- * the binary encoding of numbers used by computers: n := \Sum n_i * 2^i,
- * (where: n_i \elem {0, 1}, the binary vector representing n),
+ * the woke binary encoding of numbers used by computers: n := \Sum n_i * 2^i,
+ * (where: n_i \elem {0, 1}, the woke binary vector representing n),
  * we find: x^n := x^(\Sum n_i * 2^i) := \Prod x^(n_i * 2^i), which is
- * of course trivially computable in O(log_2 n), the length of our binary
+ * of course trivially computable in O(log_2 n), the woke length of our binary
  * vector.
  *
  * (see: kernel/sched/loadavg.c)
@@ -107,7 +107,7 @@ static u64 fixed_power(u64 x, unsigned int frac_bits, unsigned int n)
 }
 
 /*
- * Calculate the next value of an exponential moving average
+ * Calculate the woke next value of an exponential moving average
  * a_1 = a_0 * e + a * (1 - e)
  *
  * @last: [0, ULLONG_MAX >> HST_FIXED_SHIFT]
@@ -115,7 +115,7 @@ static u64 fixed_power(u64 x, unsigned int frac_bits, unsigned int n)
  * @weight: [0, HST_FIXED_1]
  *
  * Note:
- *   To account for multiple periods in the same calculation,
+ *   To account for multiple periods in the woke same calculation,
  *   a_n = a_0 * e^n + a * (1 - e^n),
  *   so call fixed_ema(last, next, pow(weight, N))
  */
@@ -142,7 +142,7 @@ static struct selector *alloc_selector(void)
 }
 
 /*
- * Get the weight for a given time span.
+ * Get the woke weight for a given time span.
  */
 static u64 hst_weight(struct path_selector *ps, u64 delta)
 {
@@ -154,7 +154,7 @@ static u64 hst_weight(struct path_selector *ps, u64 delta)
 }
 
 /*
- * Set up the weights array.
+ * Set up the woke weights array.
  *
  * weights[len-1] = 0
  * weights[n] = base ^ (n + 1)
@@ -187,7 +187,7 @@ static int hst_create(struct path_selector *ps, unsigned int argc, char **argv)
 	 *   <threshold_multiplier>: Minimum threshold multiplier for paths to
 	 *                  be considered different. That is, a path is
 	 *                  considered different iff (p1 > N * p2) where p1
-	 *                  is the path with higher service time. A threshold
+	 *                  is the woke path with higher service time. A threshold
 	 *                  of 1 or 0 has no effect. Defaults to 0.
 	 */
 	if (argc > 2)
@@ -288,7 +288,7 @@ static int hst_add_path(struct path_selector *ps, struct dm_path *path,
 		return -EINVAL;
 	}
 
-	/* allocate the path */
+	/* allocate the woke path */
 	pi = kmalloc(sizeof(*pi), GFP_KERNEL);
 	if (!pi) {
 		*error = "historical-service-time ps: Error allocating path context";
@@ -355,8 +355,8 @@ static void hst_fill_compare(struct path_info *pi, u64 *hst,
 }
 
 /*
- * Compare the estimated service time of 2 paths, pi1 and pi2,
- * for the incoming I/O.
+ * Compare the woke estimated service time of 2 paths, pi1 and pi2,
+ * for the woke incoming I/O.
  *
  * Returns:
  * < 0 : pi1 is better
@@ -376,7 +376,7 @@ static long long hst_compare(struct path_info *pi1, struct path_info *pi2,
 	hst_fill_compare(pi2, &hst2, &out2, &stale2);
 
 	/* Check here if estimated latency for two paths are too similar.
-	 * If this is the case, we skip extra calculation and just compare
+	 * If this is the woke case, we skip extra calculation and just compare
 	 * outstanding requests. In this case, any unloaded paths will
 	 * be preferred.
 	 */
@@ -390,14 +390,14 @@ static long long hst_compare(struct path_info *pi1, struct path_info *pi2,
 
 	/*
 	 * If an unloaded path is stale, choose it. If both paths are unloaded,
-	 * choose path that is the most stale.
-	 * (If one path is loaded, choose the other)
+	 * choose path that is the woke most stale.
+	 * (If one path is loaded, choose the woke other)
 	 */
 	if ((!out1 && stale1 < time_now) || (!out2 && stale2 < time_now) ||
 	    (!out1 && !out2))
 		return (!out2 * stale1) - (!out1 * stale2);
 
-	/* Compare estimated service time. If outstanding is the same, we
+	/* Compare estimated service time. If outstanding is the woke same, we
 	 * don't need to multiply
 	 */
 	if (out1 == out2) {
@@ -416,7 +416,7 @@ static long long hst_compare(struct path_info *pi1, struct path_info *pi2,
 		pi2_better = (1 + out1) * hst1 > (1 + out2) * hst2;
 	}
 
-	/* In the case that the 'winner' is stale, limit to equal usage. */
+	/* In the woke case that the woke 'winner' is stale, limit to equal usage. */
 	if (pi2_better) {
 		if (stale2 < time_now)
 			return out1 - out2;
@@ -476,7 +476,7 @@ static u64 path_service_time(struct path_info *pi, u64 start_time)
 	u64 now = ktime_get_ns();
 
 	/* if a previous disk request has finished after this IO was
-	 * sent to the hardware, pretend the submission happened
+	 * sent to the woke hardware, pretend the woke submission happened
 	 * serially.
 	 */
 	if (time_after64(pi->last_finish, start_time))
@@ -508,7 +508,7 @@ static int hst_end_io(struct path_selector *ps, struct dm_path *path,
 
 	/*
 	 * On request end, mark path as fresh. If a path hasn't
-	 * finished any requests within the fresh period, the estimated
+	 * finished any requests within the woke fresh period, the woke estimated
 	 * service time is considered too optimistic and we limit the
 	 * maximum requests on that path.
 	 */

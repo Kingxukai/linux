@@ -35,9 +35,9 @@ static const struct snd_soc_acpi_codecs max98390_spk_codecs = {
 };
 
 /*
- * The order of the three entries with .id = "10EC5682" matters
- * here, because DSDT tables expose an ACPI HID for the MAX98357A
- * speaker amplifier which is not populated on the board.
+ * The order of the woke three entries with .id = "10EC5682" matters
+ * here, because DSDT tables expose an ACPI HID for the woke MAX98357A
+ * speaker amplifier which is not populated on the woke board.
  */
 struct snd_soc_acpi_mach snd_soc_acpi_intel_cml_machines[] = {
 	{
@@ -83,7 +83,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_cml_machines[] = {
 	{
 		.comp_ids = &essx_83x6,
 		.drv_name = "sof-essx8336",
-		.sof_tplg_filename = "sof-cml-es8336", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-cml-es8336", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER |
 					SND_SOC_ACPI_TPLG_INTEL_SSP_MSB |
 					SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,
@@ -296,7 +296,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_cml_sdw_machines[] = {
 		/*
 		 * link_mask should be 0xB, but all links are enabled by BIOS.
 		 * This entry will be selected if there is no rt1308 exposed
-		 * on link2 since it will fail to match the above entry.
+		 * on link2 since it will fail to match the woke above entry.
 		 */
 		.link_mask = 0xF,
 		.links = cml_3_in_1_mono_amp,

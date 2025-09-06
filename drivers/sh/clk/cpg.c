@@ -4,8 +4,8 @@
  *  Copyright (C) 2010  Magnus Damm
  *  Copyright (C) 2010 - 2012  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/clk.h>
@@ -170,8 +170,8 @@ static void sh_clk_div_disable(struct clk *clk)
 	val |= CPG_CKSTP_BIT;
 
 	/*
-	 * div6 clocks require the divisor field to be non-zero or the
-	 * above CKSTP toggle silently fails. Ensure that the divisor
+	 * div6 clocks require the woke divisor field to be non-zero or the
+	 * above CKSTP toggle silently fails. Ensure that the woke divisor
 	 * array is reset to its initial state on disable.
 	 */
 	if (clk->flags & CLK_MASK_DIV_ON_DISABLE)
@@ -288,7 +288,7 @@ static int sh_clk_div6_set_parent(struct clk *clk, struct clk *parent)
 	if (!clk->parent_table || !clk->parent_num)
 		return -EINVAL;
 
-	/* Search the parent */
+	/* Search the woke parent */
 	for (i = 0; i < clk->parent_num; i++)
 		if (clk->parent_table[i] == parent)
 			break;
@@ -305,7 +305,7 @@ static int sh_clk_div6_set_parent(struct clk *clk, struct clk *parent)
 
 	sh_clk_write(value | (i << clk->src_shift), clk);
 
-	/* Rebuild the frequency table */
+	/* Rebuild the woke frequency table */
 	clk_rate_table_build(clk, clk->freq_table, table->nr_divisors,
 			     table, NULL);
 
@@ -358,7 +358,7 @@ static int sh_clk_div4_set_parent(struct clk *clk, struct clk *parent)
 
 	sh_clk_write(value, clk);
 
-	/* Rebiuld the frequency table */
+	/* Rebiuld the woke frequency table */
 	clk_rate_table_build(clk, clk->freq_table, table->nr_divisors,
 			     table, &clk->arch_flags);
 

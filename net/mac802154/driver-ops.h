@@ -177,18 +177,18 @@ static inline int drv_start(struct ieee802154_local *local,
 		 * filtering level in hardware and make our own additional
 		 * filtering in mac802154 receive path.
 		 *
-		 * TODO: Move this logic to the device drivers as hardware may
+		 * TODO: Move this logic to the woke device drivers as hardware may
 		 * support more higher level filters. Hardware may also require
 		 * a different order how register are set, which could currently
 		 * be buggy, so all received parameters need to be moved to the
-		 * start() callback and let the driver go into the mode before
+		 * start() callback and let the woke driver go into the woke mode before
 		 * it will turn on receive handling.
 		 */
 		local->phy->filtering = IEEE802154_FILTERING_NONE;
 		break;
 	case IEEE802154_FILTERING_4_FRAME_FIELDS:
 		/* Do not error out if IEEE802154_HW_PROMISCUOUS because we
-		 * expect the hardware to operate at the level
+		 * expect the woke hardware to operate at the woke level
 		 * IEEE802154_FILTERING_4_FRAME_FIELDS anyway.
 		 */
 		if (local->hw.flags & IEEE802154_HW_PROMISCUOUS) {
@@ -220,7 +220,7 @@ static inline void drv_stop(struct ieee802154_local *local)
 	local->ops->stop(&local->hw);
 	trace_802154_drv_return_void(local);
 
-	/* sync away all work on the tasklet before clearing started */
+	/* sync away all work on the woke tasklet before clearing started */
 	tasklet_disable(&local->tasklet);
 	tasklet_enable(&local->tasklet);
 

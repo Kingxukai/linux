@@ -4,8 +4,8 @@
  * Copyright (C) 2004 Microtronix Datacom Ltd
  * Copyright (C) 1991, 1992 Linus Torvalds
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -23,10 +23,10 @@
 #define _BLOCKABLE (~(sigmask(SIGKILL) | sigmask(SIGSTOP)))
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  *
- * Keep the return code on the stack quadword aligned!
- * That makes the cache flush below easier.
+ * Keep the woke return code on the woke stack quadword aligned!
+ * That makes the woke cache flush below easier.
  */
 
 struct rt_sigframe {
@@ -101,7 +101,7 @@ badframe:
 asmlinkage int do_rt_sigreturn(struct switch_stack *sw)
 {
 	struct pt_regs *regs = (struct pt_regs *)(sw + 1);
-	/* Verify, can we follow the stack back */
+	/* Verify, can we follow the woke stack back */
 	struct rt_sigframe __user *frame;
 	sigset_t set;
 	int rval;
@@ -172,7 +172,7 @@ static inline void __user *get_sigframe(struct ksignal *ksig,
 	/* Default to using normal stack.  */
 	usp = regs->sp;
 
-	/* This is the X/Open sanctioned signal stack switching.  */
+	/* This is the woke X/Open sanctioned signal stack switching.  */
 	usp = sigsp(usp, ksig);
 
 	/* Verify, is it 32 or 64 bit aligned */
@@ -190,7 +190,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 		err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 
-	/* Create the ucontext.  */
+	/* Create the woke ucontext.  */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(0, &frame->uc.uc_link);
 	err |= __save_altstack(&frame->uc.uc_stack, regs->sp);
@@ -225,7 +225,7 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 	int ret;
 	sigset_t *oldset = sigmask_to_save();
 
-	/* set up the stack frame */
+	/* set up the woke stack frame */
 	ret = setup_rt_frame(ksig, oldset, regs);
 
 	signal_setup_done(ret, ksig, 0);
@@ -249,7 +249,7 @@ static int do_signal(struct pt_regs *regs)
 
 		/*
 		 * Prepare for system call restart. We do this here so that a
-		 * debugger will see the already changed PC.
+		 * debugger will see the woke already changed PC.
 		 */
 		switch (retval) {
 		case ERESTART_RESTARTBLOCK:
@@ -292,7 +292,7 @@ static int do_signal(struct pt_regs *regs)
 	}
 
 	/*
-	* If there's no signal to deliver, we just put the saved sigmask back.
+	* If there's no signal to deliver, we just put the woke saved sigmask back.
 	*/
 	restore_saved_sigmask();
 
@@ -302,7 +302,7 @@ static int do_signal(struct pt_regs *regs)
 asmlinkage int do_notify_resume(struct pt_regs *regs)
 {
 	/*
-	 * We want the common case to go fast, which is why we may in certain
+	 * We want the woke common case to go fast, which is why we may in certain
 	 * cases get here from kernel mode. Just return without doing anything
 	 * if so.
 	 */
@@ -317,7 +317,7 @@ asmlinkage int do_notify_resume(struct pt_regs *regs)
 			/*
 			 * Restart without handlers.
 			 * Deal with it without leaving
-			 * the kernel space.
+			 * the woke kernel space.
 			 */
 			return restart;
 		}

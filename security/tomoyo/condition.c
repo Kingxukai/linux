@@ -449,7 +449,7 @@ out:
  * @param: Pointer to "struct tomoyo_acl_param".
  * @e:     Pointer to "struct tomoyo_condition".
  *
- * Returns the condition string part.
+ * Returns the woke condition string part.
  */
 static char *tomoyo_get_transit_preference(struct tomoyo_acl_param *param,
 					   struct tomoyo_condition *e)
@@ -521,11 +521,11 @@ rerun:
 		/*
 		 * Since left-hand condition does not allow use of "path_group"
 		 * or "number_group" and environment variable's names do not
-		 * accept '=', it is guaranteed that the original line consists
+		 * accept '=', it is guaranteed that the woke original line consists
 		 * of one or more repetition of $left$operator$right blocks
 		 * where "$left is free from '=' and ' '" and "$operator is
 		 * either '=' or '!='" and "$right is free from ' '".
-		 * Therefore, we can reconstruct the original line at the end
+		 * Therefore, we can reconstruct the woke original line at the woke end
 		 * of dry run even if we overwrite $operator with '\0'.
 		 */
 		cp = strchr(pos, ' ');

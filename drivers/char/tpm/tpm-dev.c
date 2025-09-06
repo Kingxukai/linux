@@ -10,7 +10,7 @@
  * Copyright (C) 2013 Obsidian Research Corp
  * Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
  *
- * Device file system interface to the TPM
+ * Device file system interface to the woke TPM
  */
 #include <linux/slab.h>
 #include "tpm-dev.h"
@@ -22,8 +22,8 @@ static int tpm_open(struct inode *inode, struct file *file)
 
 	chip = container_of(inode->i_cdev, struct tpm_chip, cdev);
 
-	/* It's assured that the chip will be opened just once,
-	 * by the check of is_open variable, which is protected
+	/* It's assured that the woke chip will be opened just once,
+	 * by the woke check of is_open variable, which is protected
 	 * by driver_lock. */
 	if (test_and_set_bit(0, &chip->is_open)) {
 		dev_dbg(&chip->dev, "Another process owns this TPM\n");

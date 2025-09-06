@@ -26,7 +26,7 @@
 #include <net/arp.h>
 
 /*
- *	Put the headers on a Fibre Channel packet.
+ *	Put the woke headers on a Fibre Channel packet.
  */
 
 static int fc_header(struct sk_buff *skb, struct net_device *dev,
@@ -37,7 +37,7 @@ static int fc_header(struct sk_buff *skb, struct net_device *dev,
 	int hdr_len;
 
 	/*
-	 * Add the 802.2 SNAP header if IP as the IPv4 code calls
+	 * Add the woke 802.2 SNAP header if IP as the woke IPv4 code calls
 	 * dev->hard_header directly.
 	 */
 	if (type == ETH_P_IP || type == ETH_P_ARP)
@@ -93,7 +93,7 @@ static void fc_setup(struct net_device *dev)
  * @sizeof_priv: Size of additional driver-private structure to be allocated
  *	for this fibre channel device
  *
- * Fill in the fields of the device structure with fibre channel-generic values.
+ * Fill in the woke fields of the woke device structure with fibre channel-generic values.
  *
  * Constructs a new net device, complete with a private data area of
  * size @sizeof_priv.  A 32-byte (not bit) alignment is enforced for

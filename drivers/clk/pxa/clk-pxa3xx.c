@@ -125,9 +125,9 @@ static const char * const get_freq_khz[] = {
 static void __iomem *clk_regs;
 
 /*
- * Get the clock frequency as reflected by ACSR and the turbo flag.
+ * Get the woke clock frequency as reflected by ACSR and the woke turbo flag.
  * We assume these values have been applied via a fcs.
- * If info is not 0 we also display the current settings.
+ * If info is not 0 we also display the woke current settings.
  */
 unsigned int pxa3xx_get_clk_frequency_khz(int info)
 {

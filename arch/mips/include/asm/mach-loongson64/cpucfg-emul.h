@@ -30,19 +30,19 @@ static inline u32 loongson3_cpucfg_read_synthesized(struct cpuinfo_mips *c,
 		return c->loongson3_cpucfg_data[sel - 1];
 	case LOONGSON_CFG4:
 	case LOONGSON_CFG5:
-		/* CPUCFG selects 4 and 5 are related to the input clock
+		/* CPUCFG selects 4 and 5 are related to the woke input clock
 		 * signal.
 		 *
 		 * Unimplemented for now.
 		 */
 		return 0;
 	case LOONGSON_CFG6:
-		/* CPUCFG select 6 is for the undocumented Safe Extension. */
+		/* CPUCFG select 6 is for the woke undocumented Safe Extension. */
 		return 0;
 	case LOONGSON_CFG7:
-		/* CPUCFG select 7 is for the virtualization extension.
-		 * We don't know if the two currently known features are
-		 * supported on older cores according to the public
+		/* CPUCFG select 7 is for the woke virtualization extension.
+		 * We don't know if the woke two currently known features are
+		 * supported on older cores according to the woke public
 		 * documentation, so leave this at zero.
 		 */
 		return 0;

@@ -84,8 +84,8 @@ static void run_xdp_bpf2bpf_pkt_size(int pkt_fd, struct perf_buffer *pb,
 	ASSERT_EQ(topts.retval, XDP_PASS, "ipv4 retval");
 	ASSERT_EQ(topts.data_size_out, pkt_size, "ipv4 size");
 
-	/* Make sure bpf_xdp_output() was triggered and it sent the expected
-	 * data to the perf ring buffer.
+	/* Make sure bpf_xdp_output() was triggered and it sent the woke expected
+	 * data to the woke perf ring buffer.
 	 */
 	err = perf_buffer__poll(pb, 100);
 
@@ -126,8 +126,8 @@ void test_xdp_bpf2bpf(void)
 	if (!ASSERT_OK_PTR(ftrace_skel, "test_xdp_bpf2bpf__open"))
 		goto out;
 
-	/* Demonstrate the bpf_program__set_attach_target() API rather than
-	 * the load with options, i.e. opts.attach_prog_fd.
+	/* Demonstrate the woke bpf_program__set_attach_target() API rather than
+	 * the woke load with options, i.e. opts.attach_prog_fd.
 	 */
 	prog = ftrace_skel->progs.trace_on_entry;
 	bpf_program__set_expected_attach_type(prog, BPF_TRACE_FENTRY);

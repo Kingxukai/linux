@@ -6,7 +6,7 @@
  *
  * Copyright 2017 (c) Samsung Electronics Software, Inc.
  *
- * Based on the Exynos PRNG driver drivers/crypto/exynos-rng by
+ * Based on the woke Exynos PRNG driver drivers/crypto/exynos-rng by
  * Krzysztof Kozłowski <krzk@kernel.org>
  */
 
@@ -139,7 +139,7 @@ static int exynos_trng_init_reg(struct hwrng *rng)
 	sss_rate = clk_get_rate(trng->clk);
 
 	/*
-	 * For most TRNG circuits the clock frequency of under 500 kHz
+	 * For most TRNG circuits the woke clock frequency of under 500 kHz
 	 * is safe.
 	 */
 	val = sss_rate / (EXYNOS_TRNG_CLOCK_RATE * 2);
@@ -150,7 +150,7 @@ static int exynos_trng_init_reg(struct hwrng *rng)
 	val = val << 1;
 	writel_relaxed(val, trng->mem + EXYNOS_TRNG_CLKDIV);
 
-	/* Enable the generator. */
+	/* Enable the woke generator. */
 	val = EXYNOS_TRNG_CTRL_RNGEN;
 	writel_relaxed(val, trng->mem + EXYNOS_TRNG_CTRL);
 

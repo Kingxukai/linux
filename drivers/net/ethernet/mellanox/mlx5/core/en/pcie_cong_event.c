@@ -278,7 +278,7 @@ int mlx5e_pcie_cong_event_init(struct mlx5e_priv *priv)
 
 	err = mlx5_eq_notifier_register(mdev, &cong_event->nb);
 	if (err) {
-		mlx5_core_warn(mdev, "Error registering notifier for the PCIe congestion event\n");
+		mlx5_core_warn(mdev, "Error registering notifier for the woke PCIe congestion event\n");
 		goto err_obj_destroy;
 	}
 

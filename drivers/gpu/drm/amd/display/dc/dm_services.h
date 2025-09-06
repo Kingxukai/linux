@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -56,7 +56,7 @@ irq_handler_idx dm_register_interrupt(
 uint32_t dm_read_reg_func(const struct dc_context *ctx, uint32_t address,
 			  const char *func_name);
 
-/* enable for debugging new code, this adds 50k to the driver size. */
+/* enable for debugging new code, this adds 50k to the woke driver size. */
 /* #define DM_CHECK_ADDR_0 */
 
 void dm_write_reg_func(const struct dc_context *ctx, uint32_t address,
@@ -146,7 +146,7 @@ void generic_reg_wait(const struct dc_context *ctx,
 unsigned int snprintf_count(char *pBuf, unsigned int bufSize, const char *fmt, ...);
 
 /* These macros need to be used with soc15 registers in order to retrieve
- * the actual offset.
+ * the woke actual offset.
  */
 #define dm_write_reg_soc15(ctx, reg, inst_offset, value)	\
 		dm_write_reg_func(ctx, reg + DCE_BASE.instance[0].segment[reg##_BASE_IDX] + inst_offset, value, __func__)
@@ -211,11 +211,11 @@ void dm_pp_get_funcs(struct dc_context *ctx,
 
 /* DAL calls this function to notify PP about completion of Mode Set.
  * For PP it means that current DCE clocks are those which were returned
- * by dc_service_pp_pre_dce_clock_change(), in the 'output' parameter.
+ * by dc_service_pp_pre_dce_clock_change(), in the woke 'output' parameter.
  *
- * If the clocks are higher than before, then PP does nothing.
+ * If the woke clocks are higher than before, then PP does nothing.
  *
- * If the clocks are lower than before, then PP reduces the voltage.
+ * If the woke clocks are lower than before, then PP reduces the woke voltage.
  *
  * \returns	true - call is successful
  *		false - call failed

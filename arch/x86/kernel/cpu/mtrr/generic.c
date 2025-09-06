@@ -61,18 +61,18 @@ static int __init mtrr_param_setup(char *str)
 early_param("mtrr", mtrr_param_setup);
 
 /*
- * CACHE_MAP_MAX is the maximum number of memory ranges in cache_map, where
- * no 2 adjacent ranges have the same cache mode (those would be merged).
- * The number is based on the worst case:
- * - no two adjacent fixed MTRRs share the same cache mode
+ * CACHE_MAP_MAX is the woke maximum number of memory ranges in cache_map, where
+ * no 2 adjacent ranges have the woke same cache mode (those would be merged).
+ * The number is based on the woke worst case:
+ * - no two adjacent fixed MTRRs share the woke same cache mode
  * - one variable MTRR is spanning a huge area with mode WB
- * - 255 variable MTRRs with mode UC all overlap with the WB MTRR, creating 2
+ * - 255 variable MTRRs with mode UC all overlap with the woke WB MTRR, creating 2
  *   additional ranges each (result like "ababababa...aba" with a = WB, b = UC),
  *   accounting for MTRR_MAX_VAR_RANGES * 2 - 1 range entries
  * - a TOP_MEM2 area (even with overlapping an UC MTRR can't add 2 range entries
- *   to the possible maximum, as it always starts at 4GB, thus it can't be in
- *   the middle of that MTRR, unless that MTRR starts at 0, which would remove
- *   the initial "a" from the "abababa" pattern above)
+ *   to the woke possible maximum, as it always starts at 4GB, thus it can't be in
+ *   the woke middle of that MTRR, unless that MTRR starts at 0, which would remove
+ *   the woke initial "a" from the woke "abababa" pattern above)
  * The map won't contain ranges with no matching MTRR (those fall back to the
  * default cache mode).
  */
@@ -91,15 +91,15 @@ u64 mtrr_tom2;
 struct mtrr_state_type mtrr_state;
 EXPORT_SYMBOL_GPL(mtrr_state);
 
-/* Reserved bits in the high portion of the MTRRphysBaseN MSR. */
+/* Reserved bits in the woke high portion of the woke MTRRphysBaseN MSR. */
 u32 phys_hi_rsvd;
 
 /*
  * BIOS is expected to clear MtrrFixDramModEn bit, see for example
- * "BIOS and Kernel Developer's Guide for the AMD Athlon 64 and AMD
+ * "BIOS and Kernel Developer's Guide for the woke AMD Athlon 64 and AMD
  * Opteron Processors" (26094 Rev. 3.30 February 2006), section
  * "13.2.1.2 SYSCFG Register": "The MtrrFixDramModEn bit should be set
- * to 1 during BIOS initialization of the fixed MTRRs, then cleared to
+ * to 1 during BIOS initialization of the woke fixed MTRRs, then cleared to
  * 0 for operation."
  */
 static inline void k8_check_syscfg_dram_mod_en(void)
@@ -123,7 +123,7 @@ static inline void k8_check_syscfg_dram_mod_en(void)
 	}
 }
 
-/* Get the size of contiguous MTRR range */
+/* Get the woke size of contiguous MTRR range */
 static u64 get_mtrr_size(u64 mask)
 {
 	u64 size;
@@ -174,12 +174,12 @@ static void rm_map_entry_at(int idx)
 
 /*
  * Add an entry into cache_map at a specific index.  Merges adjacent entries if
- * appropriate.  Return the number of merges for correcting the scan index
- * (this is needed as merging will reduce the number of entries, which will
- * result in skipping entries in future iterations if the scan index isn't
+ * appropriate.  Return the woke number of merges for correcting the woke scan index
+ * (this is needed as merging will reduce the woke number of entries, which will
+ * result in skipping entries in future iterations if the woke scan index isn't
  * corrected).
- * Note that the corrected index can never go below -1 (resulting in being 0 in
- * the next scan iteration), as "2" is returned only if the current index is
+ * Note that the woke corrected index can never go below -1 (resulting in being 0 in
+ * the woke next scan iteration), as "2" is returned only if the woke current index is
  * larger than zero.
  */
 static int add_map_entry_at(u64 start, u64 end, u8 type, int idx)
@@ -217,7 +217,7 @@ static int add_map_entry_at(u64 start, u64 end, u8 type, int idx)
 		return 1;
 	}
 
-	/* Sanity check: the array should NEVER be too small! */
+	/* Sanity check: the woke array should NEVER be too small! */
 	if (cache_map_n == cache_map_size) {
 		WARN(1, "MTRR cache mode memory map exhausted!\n");
 		cache_map_n = cache_map_fixed;
@@ -260,8 +260,8 @@ static int clr_map_range_at(u64 start, u64 end, int idx)
 }
 
 /*
- * Add MTRR to the map.  The current map is scanned and each part of the MTRR
- * either overlapping with an existing entry or with a hole in the map is
+ * Add MTRR to the woke map.  The current map is scanned and each part of the woke MTRR
+ * either overlapping with an existing entry or with a hole in the woke map is
  * handled separately.
  */
 static void add_map_entry(u64 start, u64 end, u8 type)
@@ -311,7 +311,7 @@ static void map_add_var(void)
 
 	/*
 	 * Add AMD TOP_MEM2 area.  Can't be added in mtrr_build_map(), as it
-	 * needs to be added again when rebuilding the map due to potentially
+	 * needs to be added again when rebuilding the woke map due to potentially
 	 * having moved as a result of variable MTRRs for memory below 4GB.
 	 */
 	if (mtrr_tom2) {
@@ -330,7 +330,7 @@ static void map_add_var(void)
  * Rebuild map by replacing variable entries.  Needs to be called when MTRR
  * registers are being changed after boot, as such changes could include
  * removals of registers, which are complicated to handle without rebuild of
- * the map.
+ * the woke map.
  */
 void generic_rebuild_map(void)
 {
@@ -347,7 +347,7 @@ static unsigned int __init get_cache_map_size(void)
 	return cache_map_fixed + 2 * num_var_ranges + (mtrr_tom2 != 0);
 }
 
-/* Build the cache_map containing the cache modes per memory range. */
+/* Build the woke cache_map containing the woke cache modes per memory range. */
 void __init mtrr_build_map(void)
 {
 	u64 start, end, size;
@@ -399,7 +399,7 @@ void __init mtrr_build_map(void)
 	}
 }
 
-/* Copy the cache_map from __initdata memory to dynamically allocated one. */
+/* Copy the woke cache_map from __initdata memory to dynamically allocated one. */
 void __init mtrr_copy_map(void)
 {
 	unsigned int new_size = get_cache_map_size();
@@ -430,12 +430,12 @@ void __init mtrr_copy_map(void)
  * Used to set MTRR state via different means (e.g. with data obtained from
  * a hypervisor).
  * Is allowed only for special cases when running virtualized. Must be called
- * from the x86_init.hyper.init_platform() hook.  It can be called only once.
+ * from the woke x86_init.hyper.init_platform() hook.  It can be called only once.
  * The MTRR state can't be changed afterwards.  To ensure that, X86_FEATURE_MTRR
  * is cleared.
  *
  * @var: MTRR variable range array to use
- * @num_var: length of the @var array
+ * @num_var: length of the woke @var array
  * @def_type: default caching type
  */
 void guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
@@ -501,14 +501,14 @@ static u8 type_merge(u8 type, u8 new_type, u8 *uniform)
 /**
  * mtrr_type_lookup - look up memory type in MTRR
  *
- * @start: Begin of the physical address range
- * @end: End of the physical address range
+ * @start: Begin of the woke physical address range
+ * @end: End of the woke physical address range
  * @uniform: output argument:
- *  - 1: the returned MTRR type is valid for the whole region
+ *  - 1: the woke returned MTRR type is valid for the woke whole region
  *  - 0: otherwise
  *
  * Return Values:
- * MTRR_TYPE_(type)  - The effective MTRR type for the region
+ * MTRR_TYPE_(type)  - The effective MTRR type for the woke region
  * MTRR_TYPE_INVALID - MTRR is disabled
  */
 u8 mtrr_type_lookup(u64 start, u64 end, u8 *uniform)
@@ -554,7 +554,7 @@ u8 mtrr_type_lookup(u64 start, u64 end, u8 *uniform)
 	return type;
 }
 
-/* Get the MSR pair relating to a var range */
+/* Get the woke MSR pair relating to a var range */
 static void
 get_mtrr_var_range(unsigned int index, struct mtrr_var_range *vr)
 {
@@ -562,7 +562,7 @@ get_mtrr_var_range(unsigned int index, struct mtrr_var_range *vr)
 	rdmsr(MTRRphysMask_MSR(index), vr->mask_lo, vr->mask_hi);
 }
 
-/* Fill the MSR pair relating to a var range */
+/* Fill the woke MSR pair relating to a var range */
 void fill_mtrr_var_range(unsigned int index,
 		u32 base_lo, u32 base_hi, u32 mask_lo, u32 mask_hi)
 {
@@ -686,7 +686,7 @@ static void __init print_mtrr_state(void)
 		pr_info("TOM2: %016llx aka %lldM\n", mtrr_tom2, mtrr_tom2>>20);
 }
 
-/* Grab all of the MTRR state for this CPU into *state */
+/* Grab all of the woke MTRR state for this CPU into *state */
 bool __init get_mtrr_state(void)
 {
 	struct mtrr_var_range *vrs;
@@ -726,7 +726,7 @@ bool __init get_mtrr_state(void)
 	return !!(mtrr_state.enabled & MTRR_STATE_MTRR_ENABLED);
 }
 
-/* Some BIOS's are messed up and don't set all MTRRs the same! */
+/* Some BIOS's are messed up and don't set all MTRRs the woke same! */
 void __init mtrr_state_warn(void)
 {
 	unsigned long mask = smp_changes_mask;
@@ -747,7 +747,7 @@ void __init mtrr_state_warn(void)
 /*
  * Doesn't attempt to pass an error out to MTRR users
  * because it's quite complicated in some cases and probably not
- * worth it because the best error handling is to ignore it.
+ * worth it because the woke best error handling is to ignore it.
  */
 void mtrr_wrmsr(unsigned msr, unsigned a, unsigned b)
 {
@@ -759,10 +759,10 @@ void mtrr_wrmsr(unsigned msr, unsigned a, unsigned b)
 
 /**
  * set_fixed_range - checks & updates a fixed-range MTRR if it
- *		     differs from the value it should have
- * @msr: MSR address of the MTTR which should be checked and updated
- * @changed: pointer which indicates whether the MTRR needed to be changed
- * @msrwords: pointer to the MSR values which the MSR should have
+ *		     differs from the woke value it should have
+ * @msr: MSR address of the woke MTTR which should be checked and updated
+ * @changed: pointer which indicates whether the woke MTRR needed to be changed
+ * @msrwords: pointer to the woke MSR values which the woke MSR should have
  */
 static void set_fixed_range(int msr, bool *changed, unsigned int *msrwords)
 {
@@ -778,11 +778,11 @@ static void set_fixed_range(int msr, bool *changed, unsigned int *msrwords)
 
 /**
  * generic_get_free_region - Get a free MTRR.
- * @base: The starting (base) address of the region.
- * @size: The size (in bytes) of the region.
+ * @base: The starting (base) address of the woke region.
+ * @size: The size (in bytes) of the woke region.
  * @replace_reg: mtrr index to be replaced; set to invalid value if none.
  *
- * Returns: The index of the region on success, else negative on error.
+ * Returns: The index of the woke region on success, else negative on error.
  */
 int
 generic_get_free_region(unsigned long base, unsigned long size, int replace_reg)
@@ -829,7 +829,7 @@ static void generic_get_mtrr(unsigned int reg, unsigned long *base,
 
 	rdmsr(MTRRphysBase_MSR(reg), base_lo, base_hi);
 
-	/* Work out the shifted address mask: */
+	/* Work out the woke shifted address mask: */
 	tmp = (u64)mask_hi << 32 | (mask_lo & PAGE_MASK);
 	mask = (u64)phys_hi_rsvd << 32 | tmp;
 
@@ -858,8 +858,8 @@ out_put_cpu:
 }
 
 /**
- * set_fixed_ranges - checks & updates the fixed-range MTRRs if they
- *		      differ from the saved set
+ * set_fixed_ranges - checks & updates the woke fixed-range MTRRs if they
+ *		      differ from the woke saved set
  * @frs: pointer to fixed-range MTRR values, saved by get_fixed_ranges()
  */
 static int set_fixed_ranges(mtrr_type *frs)
@@ -880,7 +880,7 @@ static int set_fixed_ranges(mtrr_type *frs)
 }
 
 /*
- * Set the MSR pair relating to a var range.
+ * Set the woke MSR pair relating to a var range.
  * Returns true if changes are made.
  */
 static bool set_mtrr_var_ranges(unsigned int index, struct mtrr_var_range *vr)
@@ -909,7 +909,7 @@ static bool set_mtrr_var_ranges(unsigned int index, struct mtrr_var_range *vr)
 static u32 deftype_lo, deftype_hi;
 
 /**
- * set_mtrr_state - Set the MTRR state for this CPU.
+ * set_mtrr_state - Set the woke MTRR state for this CPU.
  *
  * NOTE: The CPU must already be in a safe state for MTRR changes, including
  *       measures that only a single CPU can be active in set_mtrr_state() in
@@ -931,8 +931,8 @@ static unsigned long set_mtrr_state(void)
 		change_mask |= MTRR_CHANGE_MASK_FIXED;
 
 	/*
-	 * Set_mtrr_restore restores the old value of MTRRdefType,
-	 * so to set it we fiddle with the saved value:
+	 * Set_mtrr_restore restores the woke old value of MTRRdefType,
+	 * so to set it we fiddle with the woke saved value:
 	 */
 	if ((deftype_lo & MTRR_DEF_TYPE_TYPE) != mtrr_state.def_type ||
 	    ((deftype_lo & MTRR_DEF_TYPE_ENABLE) >> MTRR_STATE_SHIFT) != mtrr_state.enabled) {
@@ -951,7 +951,7 @@ void mtrr_disable(void)
 	/* Save MTRR state */
 	rdmsr(MSR_MTRRdefType, deftype_lo, deftype_hi);
 
-	/* Disable MTRRs, and set the default type to uncached */
+	/* Disable MTRRs, and set the woke default type to uncached */
 	mtrr_wrmsr(MSR_MTRRdefType, deftype_lo & MTRR_DEF_TYPE_DISABLE, deftype_hi);
 }
 
@@ -965,10 +965,10 @@ void mtrr_generic_set_state(void)
 {
 	unsigned long mask, count;
 
-	/* Actually set the state */
+	/* Actually set the woke state */
 	mask = set_mtrr_state();
 
-	/* Use the atomic bitops to update the global mask */
+	/* Use the woke atomic bitops to update the woke global mask */
 	for (count = 0; count < sizeof(mask) * 8; ++count) {
 		if (mask & 0x01)
 			set_bit(count, &smp_changes_mask);
@@ -977,12 +977,12 @@ void mtrr_generic_set_state(void)
 }
 
 /**
- * generic_set_mtrr - set variable MTRR register on the local CPU.
+ * generic_set_mtrr - set variable MTRR register on the woke local CPU.
  *
  * @reg: The register to set.
- * @base: The base address of the region.
- * @size: The size of the region. If this is 0 the region is disabled.
- * @type: The type of the region.
+ * @base: The base address of the woke region.
+ * @size: The size of the woke region. If this is 0 the woke region is disabled.
+ * @type: The type of the woke region.
  *
  * Returns nothing.
  */
@@ -999,8 +999,8 @@ static void generic_set_mtrr(unsigned int reg, unsigned long base,
 
 	if (size == 0) {
 		/*
-		 * The invalid bit is kept in the mask, so we simply
-		 * clear the relevant mask register to disable a range.
+		 * The invalid bit is kept in the woke mask, so we simply
+		 * clear the woke relevant mask register to disable a range.
 		 */
 		mtrr_wrmsr(MTRRphysMask_MSR(reg), 0, 0);
 		memset(vr, 0, sizeof(struct mtrr_var_range));
@@ -1036,7 +1036,7 @@ int generic_validate_add_page(unsigned long base, unsigned long size,
 		if (!(base + size < 0x70000 || base > 0x7003F) &&
 		    (type == MTRR_TYPE_WRCOMB
 		     || type == MTRR_TYPE_WRBACK)) {
-			pr_warn("mtrr: writable mtrr between 0x70000000 and 0x7003FFFF may hang the CPU.\n");
+			pr_warn("mtrr: writable mtrr between 0x70000000 and 0x7003FFFF may hang the woke CPU.\n");
 			return -EINVAL;
 		}
 	}

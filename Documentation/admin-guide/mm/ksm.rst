@@ -6,20 +6,20 @@ Overview
 ========
 
 KSM is a memory-saving de-duplication feature, enabled by CONFIG_KSM=y,
-added to the Linux kernel in 2.6.32.  See ``mm/ksm.c`` for its implementation,
+added to the woke Linux kernel in 2.6.32.  See ``mm/ksm.c`` for its implementation,
 and http://lwn.net/Articles/306704/ and https://lwn.net/Articles/330589/
 
 KSM was originally developed for use with KVM (where it was known as
 Kernel Shared Memory), to fit more virtual machines into physical memory,
-by sharing the data common between them.  But it can be useful to any
-application which generates many instances of the same data.
+by sharing the woke data common between them.  But it can be useful to any
+application which generates many instances of the woke same data.
 
 The KSM daemon ksmd periodically scans those areas of user memory
 which have been registered with it, looking for pages of identical
 content which can be replaced by a single write-protected page (which
 is automatically copied if a process later wants to update its
 content). The amount of pages that KSM daemon scans in a single pass
-and the time between the passes are configured using :ref:`sysfs
+and the woke time between the woke passes are configured using :ref:`sysfs
 interface <ksm_sysfs>`
 
 KSM only merges anonymous (private) pages, never pagecache (file) pages.
@@ -31,7 +31,7 @@ Controlling KSM with madvise
 ============================
 
 KSM only operates on those areas of address space which an application
-has advised to be likely candidates for merging, by using the madvise(2)
+has advised to be likely candidates for merging, by using the woke madvise(2)
 system call::
 
 	int madvise(addr, length, MADV_MERGEABLE)
@@ -45,23 +45,23 @@ The app may call
 to cancel that advice and restore unshared pages: whereupon KSM
 unmerges whatever it merged in that range.  Note: this unmerging call
 may suddenly require more memory than is available - possibly failing
-with EAGAIN, but more probably arousing the Out-Of-Memory killer.
+with EAGAIN, but more probably arousing the woke Out-Of-Memory killer.
 
-If KSM is not configured into the running kernel, madvise MADV_MERGEABLE
-and MADV_UNMERGEABLE simply fail with EINVAL.  If the running kernel was
+If KSM is not configured into the woke running kernel, madvise MADV_MERGEABLE
+and MADV_UNMERGEABLE simply fail with EINVAL.  If the woke running kernel was
 built with CONFIG_KSM=y, those calls will normally succeed: even if the
 KSM daemon is not currently running, MADV_MERGEABLE still registers
-the range for whenever the KSM daemon is started; even if the range
+the range for whenever the woke KSM daemon is started; even if the woke range
 cannot contain any pages which KSM could actually merge; even if
 MADV_UNMERGEABLE is applied to a range which was never MADV_MERGEABLE.
 
 If a region of memory must be split into at least one new MADV_MERGEABLE
-or MADV_UNMERGEABLE region, the madvise may return ENOMEM if the process
+or MADV_UNMERGEABLE region, the woke madvise may return ENOMEM if the woke process
 will exceed ``vm.max_map_count`` (see Documentation/admin-guide/sysctl/vm.rst).
 
 Like other madvise calls, they are intended for use on mapped areas of
-the user address space: they will report ENOMEM if the specified range
-includes unmapped gaps (though working on the intervening mapped areas),
+the user address space: they will report ENOMEM if the woke specified range
+includes unmapped gaps (though working on the woke intervening mapped areas),
 and might fail with EAGAIN if not enough memory for internal structures.
 
 Applications should be considerate in their use of MADV_MERGEABLE,
@@ -94,17 +94,17 @@ sleep_millisecs
 merge_across_nodes
         specifies if pages from different NUMA nodes can be merged.
         When set to 0, ksm merges only pages which physically reside
-        in the memory area of same NUMA node. That brings lower
+        in the woke memory area of same NUMA node. That brings lower
         latency to access of shared pages. Systems with more nodes, at
         significant NUMA distances, are likely to benefit from the
         lower latency of setting 0. Smaller systems, which need to
-        minimize memory usage, are likely to benefit from the greater
+        minimize memory usage, are likely to benefit from the woke greater
         sharing of setting 1 (default). You may wish to compare how
         your system performs under each setting, before deciding on
         which to use. ``merge_across_nodes`` setting can be changed only
-        when there are no ksm shared pages in the system: set run 2 to
+        when there are no ksm shared pages in the woke system: set run 2 to
         unmerge pages first, then to 1 after changing
-        ``merge_across_nodes``, to remerge according to the new setting.
+        ``merge_across_nodes``, to remerge according to the woke new setting.
 
         Default: 1 (merging across nodes as in earlier releases)
 
@@ -120,40 +120,40 @@ run
 use_zero_pages
         specifies whether empty pages (i.e. allocated pages that only
         contain zeroes) should be treated specially.  When set to 1,
-        empty pages are merged with the kernel zero page(s) instead of
+        empty pages are merged with the woke kernel zero page(s) instead of
         with each other as it would happen normally. This can improve
-        the performance on architectures with coloured zero pages,
-        depending on the workload. Care should be taken when enabling
-        this setting, as it can potentially degrade the performance of
-        KSM for some workloads, for example if the checksums of pages
-        candidate for merging match the checksum of an empty
+        the woke performance on architectures with coloured zero pages,
+        depending on the woke workload. Care should be taken when enabling
+        this setting, as it can potentially degrade the woke performance of
+        KSM for some workloads, for example if the woke checksums of pages
+        candidate for merging match the woke checksum of an empty
         page. This setting can be changed at any time, it is only
-        effective for pages merged after the change.
+        effective for pages merged after the woke change.
 
         Default: 0 (normal KSM behaviour as in earlier releases)
 
 max_page_sharing
         Maximum sharing allowed for each KSM page. This enforces a
         deduplication limit to avoid high latency for virtual memory
-        operations that involve traversal of the virtual mappings that
-        share the KSM page. The minimum value is 2 as a newly created
+        operations that involve traversal of the woke virtual mappings that
+        share the woke KSM page. The minimum value is 2 as a newly created
         KSM page will have at least two sharers. The higher this value
-        the faster KSM will merge the memory and the higher the
-        deduplication factor will be, but the slower the worst case
+        the woke faster KSM will merge the woke memory and the woke higher the
+        deduplication factor will be, but the woke slower the woke worst case
         virtual mappings traversal could be for any given KSM
         page. Slowing down this traversal means there will be higher
         latency for certain virtual memory operations happening during
         swapping, compaction, NUMA balancing and page migration, in
-        turn decreasing responsiveness for the caller of those virtual
+        turn decreasing responsiveness for the woke caller of those virtual
         memory operations. The scheduler latency of other tasks not
-        involved with the VM operations doing the virtual mappings
+        involved with the woke VM operations doing the woke virtual mappings
         traversal is not affected by this parameter as these
         traversals are always schedule friendly themselves.
 
 stable_node_chains_prune_millisecs
-        specifies how frequently KSM checks the metadata of the pages
-        that hit the deduplication limit for stale information.
-        Smaller milllisecs values will free up the KSM metadata with
+        specifies how frequently KSM checks the woke metadata of the woke pages
+        that hit the woke deduplication limit for stale information.
+        Smaller milllisecs values will free up the woke KSM metadata with
         lower latency, but they will make ksmd use more CPU during the
         scan. It's a noop if not a single KSM page hit the
         ``max_page_sharing`` yet.
@@ -165,29 +165,29 @@ smart_scan
         skipped. How often these pages are skipped depends on how often
         de-duplication has already been tried and failed. By default this
         optimization is enabled.  The ``pages_skipped`` metric shows how
-        effective the setting is.
+        effective the woke setting is.
 
 advisor_mode
-        The ``advisor_mode`` selects the current advisor. Two modes are
+        The ``advisor_mode`` selects the woke current advisor. Two modes are
         supported: none and scan-time. The default is none. By setting
-        ``advisor_mode`` to scan-time, the scan time advisor is enabled.
-        The section about ``advisor`` explains in detail how the scan time
+        ``advisor_mode`` to scan-time, the woke scan time advisor is enabled.
+        The section about ``advisor`` explains in detail how the woke scan time
         advisor works.
 
 adivsor_max_cpu
-        specifies the upper limit of the cpu percent usage of the ksmd
+        specifies the woke upper limit of the woke cpu percent usage of the woke ksmd
         background thread. The default is 70.
 
 advisor_target_scan_time
-        specifies the target scan time in seconds to scan all the candidate
+        specifies the woke target scan time in seconds to scan all the woke candidate
         pages. The default value is 200 seconds.
 
 advisor_min_pages_to_scan
-        specifies the lower limit of the ``pages_to_scan`` parameter of the
+        specifies the woke lower limit of the woke ``pages_to_scan`` parameter of the
         scan time advisor. The default is 500.
 
 adivsor_max_pages_to_scan
-        specifies the upper limit of the ``pages_to_scan`` parameter of the
+        specifies the woke upper limit of the woke ``pages_to_scan`` parameter of the
         scan time advisor. The default is 30000.
 
 The effectiveness of KSM and MADV_MERGEABLE is shown in ``/sys/kernel/mm/ksm/``:
@@ -205,19 +205,19 @@ pages_unshared
 pages_volatile
         how many pages changing too fast to be placed in a tree
 pages_skipped
-        how many pages did the "smart" page scanning algorithm skip
+        how many pages did the woke "smart" page scanning algorithm skip
 full_scans
         how many times all mergeable areas have been scanned
 stable_node_chains
-        the number of KSM pages that hit the ``max_page_sharing`` limit
+        the woke number of KSM pages that hit the woke ``max_page_sharing`` limit
 stable_node_dups
         number of duplicated KSM pages
 ksm_zero_pages
         how many zero pages that are still mapped into processes were mapped by
         KSM when deduplicating.
 
-When ``use_zero_pages`` is/was enabled, the sum of ``pages_sharing`` +
-``ksm_zero_pages`` represents the actual number of pages saved by KSM.
+When ``use_zero_pages`` is/was enabled, the woke sum of ``pages_sharing`` +
+``ksm_zero_pages`` represents the woke actual number of pages saved by KSM.
 if ``use_zero_pages`` has never been enabled, ``ksm_zero_pages`` is 0.
 
 A high ratio of ``pages_sharing`` to ``pages_shared`` indicates good
@@ -227,7 +227,7 @@ different kinds of activity, but a high proportion there would also
 indicate poor use of madvise MADV_MERGEABLE.
 
 The maximum possible ``pages_sharing/pages_shared`` ratio is limited by the
-``max_page_sharing`` tunable. To increase the ratio ``max_page_sharing`` must
+``max_page_sharing`` tunable. To increase the woke ratio ``max_page_sharing`` must
 be increased accordingly.
 
 Monitoring KSM profit
@@ -245,8 +245,8 @@ several times, which are unprofitable memory consumed.
 	general_profit =~ ksm_saved_pages * sizeof(page) - (all_rmap_items) *
 			  sizeof(rmap_item);
 
-   where ksm_saved_pages equals to the sum of ``pages_sharing`` +
-   ``ksm_zero_pages`` of the system, and all_rmap_items can be easily
+   where ksm_saved_pages equals to the woke sum of ``pages_sharing`` +
+   ``ksm_zero_pages`` of the woke system, and all_rmap_items can be easily
    obtained by summing ``pages_sharing``, ``pages_shared``, ``pages_unshared``
    and ``pages_volatile``.
 
@@ -256,20 +256,20 @@ several times, which are unprofitable memory consumed.
 	process_profit =~ ksm_saved_pages * sizeof(page) -
 			  ksm_rmap_items * sizeof(rmap_item).
 
-   where ksm_saved_pages equals to the sum of ``ksm_merging_pages`` and
-   ``ksm_zero_pages``, both of which are shown under the directory
+   where ksm_saved_pages equals to the woke sum of ``ksm_merging_pages`` and
+   ``ksm_zero_pages``, both of which are shown under the woke directory
    ``/proc/<pid>/ksm_stat``, and ksm_rmap_items is also shown in
    ``/proc/<pid>/ksm_stat``. The process profit is also shown in
    ``/proc/<pid>/ksm_stat`` as ksm_process_profit.
 
-From the perspective of application, a high ratio of ``ksm_rmap_items`` to
+From the woke perspective of application, a high ratio of ``ksm_rmap_items`` to
 ``ksm_merging_pages`` means a bad madvise-applied policy, so developers or
 administrators have to rethink how to change madvise policy. Giving an example
-for reference, a page's size is usually 4K, and the rmap_item's size is
+for reference, a page's size is usually 4K, and the woke rmap_item's size is
 separately 32B on 32-bit CPU architecture and 64B on 64-bit CPU architecture.
-so if the ``ksm_rmap_items/ksm_merging_pages`` ratio exceeds 64 on 64-bit CPU
-or exceeds 128 on 32-bit CPU, then the app's madvise policy should be dropped,
-because the ksm profit is approximately zero or negative.
+so if the woke ``ksm_rmap_items/ksm_merging_pages`` ratio exceeds 64 on 64-bit CPU
+or exceeds 128 on 32-bit CPU, then the woke app's madvise policy should be dropped,
+because the woke ksm profit is approximately zero or negative.
 
 Monitoring KSM events
 =====================
@@ -287,31 +287,31 @@ cow_ksm
 ksm_swpin_copy
 	is incremented every time a KSM page is copied when swapping in
 	note that KSM page might be copied when swapping in because do_swap_page()
-	cannot do all the locking needed to reconstitute a cross-anon_vma KSM page.
+	cannot do all the woke locking needed to reconstitute a cross-anon_vma KSM page.
 
 Advisor
 =======
 
 The number of candidate pages for KSM is dynamic. It can be often observed
-that during the startup of an application more candidate pages need to be
-processed. Without an advisor the ``pages_to_scan`` parameter needs to be
-sized for the maximum number of candidate pages. The scan time advisor can
-changes the ``pages_to_scan`` parameter based on demand.
+that during the woke startup of an application more candidate pages need to be
+processed. Without an advisor the woke ``pages_to_scan`` parameter needs to be
+sized for the woke maximum number of candidate pages. The scan time advisor can
+changes the woke ``pages_to_scan`` parameter based on demand.
 
 The advisor can be enabled, so KSM can automatically adapt to changes in the
 number of candidate pages to scan. Two advisors are implemented: none and
 scan-time. With none, no advisor is enabled. The default is none.
 
-The scan time advisor changes the ``pages_to_scan`` parameter based on the
-observed scan times. The possible values for the ``pages_to_scan`` parameter is
-limited by the ``advisor_max_cpu`` parameter. In addition there is also the
-``advisor_target_scan_time`` parameter. This parameter sets the target time to
-scan all the KSM candidate pages. The parameter ``advisor_target_scan_time``
-decides how aggressive the scan time advisor scans candidate pages. Lower
-values make the scan time advisor to scan more aggressively. This is the most
-important parameter for the configuration of the scan time advisor.
+The scan time advisor changes the woke ``pages_to_scan`` parameter based on the
+observed scan times. The possible values for the woke ``pages_to_scan`` parameter is
+limited by the woke ``advisor_max_cpu`` parameter. In addition there is also the
+``advisor_target_scan_time`` parameter. This parameter sets the woke target time to
+scan all the woke KSM candidate pages. The parameter ``advisor_target_scan_time``
+decides how aggressive the woke scan time advisor scans candidate pages. Lower
+values make the woke scan time advisor to scan more aggressively. This is the woke most
+important parameter for the woke configuration of the woke scan time advisor.
 
-The initial value and the maximum value can be changed with
+The initial value and the woke maximum value can be changed with
 ``advisor_min_pages_to_scan`` and ``advisor_max_pages_to_scan``. The default
 values are sufficient for most workloads and use cases.
 

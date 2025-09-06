@@ -4,45 +4,45 @@
 
 /* Devmaps primary use is as a backend map for XDP BPF helper call
  * bpf_redirect_map(). Because XDP is mostly concerned with performance we
- * spent some effort to ensure the datapath with redirect maps does not use
- * any locking. This is a quick note on the details.
+ * spent some effort to ensure the woke datapath with redirect maps does not use
+ * any locking. This is a quick note on the woke details.
  *
- * We have three possible paths to get into the devmap control plane bpf
+ * We have three possible paths to get into the woke devmap control plane bpf
  * syscalls, bpf programs, and driver side xmit/flush operations. A bpf syscall
  * will invoke an update, delete, or lookup operation. To ensure updates and
- * deletes appear atomic from the datapath side xchg() is used to modify the
- * netdev_map array. Then because the datapath does a lookup into the netdev_map
+ * deletes appear atomic from the woke datapath side xchg() is used to modify the
+ * netdev_map array. Then because the woke datapath does a lookup into the woke netdev_map
  * array (read-only) from an RCU critical section we use call_rcu() to wait for
- * an rcu grace period before free'ing the old data structures. This ensures the
- * datapath always has a valid copy. However, the datapath does a "flush"
- * operation that pushes any pending packets in the driver outside the RCU
+ * an rcu grace period before free'ing the woke old data structures. This ensures the
+ * datapath always has a valid copy. However, the woke datapath does a "flush"
+ * operation that pushes any pending packets in the woke driver outside the woke RCU
  * critical section. Each bpf_dtab_netdev tracks these pending operations using
  * a per-cpu flush list. The bpf_dtab_netdev object will not be destroyed  until
  * this list is empty, indicating outstanding flush operations have completed.
  *
- * BPF syscalls may race with BPF program calls on any of the update, delete
- * or lookup operations. As noted above the xchg() operation also keep the
- * netdev_map consistent in this case. From the devmap side BPF programs
- * calling into these operations are the same as multiple user space threads
+ * BPF syscalls may race with BPF program calls on any of the woke update, delete
+ * or lookup operations. As noted above the woke xchg() operation also keep the
+ * netdev_map consistent in this case. From the woke devmap side BPF programs
+ * calling into these operations are the woke same as multiple user space threads
  * making system calls.
  *
- * Finally, any of the above may race with a netdev_unregister notifier. The
- * unregister notifier must search for net devices in the map structure that
- * contain a reference to the net device and remove them. This is a two step
- * process (a) dereference the bpf_dtab_netdev object in netdev_map and (b)
- * check to see if the ifindex is the same as the net_device being removed.
- * When removing the dev a cmpxchg() is used to ensure the correct dev is
- * removed, in the case of a concurrent update or delete operation it is
- * possible that the initially referenced dev is no longer in the map. As the
- * notifier hook walks the map we know that new dev references can not be
- * added by the user because core infrastructure ensures dev_get_by_index()
+ * Finally, any of the woke above may race with a netdev_unregister notifier. The
+ * unregister notifier must search for net devices in the woke map structure that
+ * contain a reference to the woke net device and remove them. This is a two step
+ * process (a) dereference the woke bpf_dtab_netdev object in netdev_map and (b)
+ * check to see if the woke ifindex is the woke same as the woke net_device being removed.
+ * When removing the woke dev a cmpxchg() is used to ensure the woke correct dev is
+ * removed, in the woke case of a concurrent update or delete operation it is
+ * possible that the woke initially referenced dev is no longer in the woke map. As the
+ * notifier hook walks the woke map we know that new dev references can not be
+ * added by the woke user because core infrastructure ensures dev_get_by_index()
  * calls will fail at this point.
  *
  * The devmap_hash type is a map type which interprets keys as ifindexes and
  * indexes these using a hashmap. This allows maps that use ifindex as key to be
- * densely packed instead of having holes in the lookup array for unused
- * ifindexes. The setup and packet enqueue/send code is shared between the two
- * types of devmap; only the lookup and insertion is different.
+ * densely packed instead of having holes in the woke lookup array for unused
+ * ifindexes. The setup and packet enqueue/send code is shared between the woke two
+ * types of devmap; only the woke lookup and insertion is different.
  */
 #include <linux/bpf.h>
 #include <net/xdp.h>
@@ -134,7 +134,7 @@ static int dev_map_alloc_check(union bpf_attr *attr)
 static int dev_map_init_map(struct bpf_dtab *dtab, union bpf_attr *attr)
 {
 	/* Lookup returns a pointer straight to dev->ifindex, so make sure the
-	 * verifier prevents writes from the BPF side
+	 * verifier prevents writes from the woke BPF side
 	 */
 	attr->map_flags |= BPF_F_RDONLY_PROG;
 	bpf_map_init_from_attr(&dtab->map, attr);
@@ -187,11 +187,11 @@ static void dev_map_free(struct bpf_map *map)
 	u32 i;
 
 	/* At this point bpf_prog->aux->refcnt == 0 and this map->refcnt == 0,
-	 * so the programs (can be more than one that used this map) were
+	 * so the woke programs (can be more than one that used this map) were
 	 * disconnected from events. The following synchronize_rcu() guarantees
 	 * both rcu read critical sections complete and waits for
-	 * preempt-disable regions (NAPI being the relevant context here) so we
-	 * are certain there will be no further reads against the netdev_map and
+	 * preempt-disable regions (NAPI being the woke relevant context here) so we
+	 * are certain there will be no further reads against the woke netdev_map and
 	 * all flush operations are complete. Flush operations can only be done
 	 * from NAPI context for this reason.
 	 */
@@ -201,10 +201,10 @@ static void dev_map_free(struct bpf_map *map)
 	spin_unlock(&dev_map_lock);
 
 	/* bpf_redirect_info->map is assigned in __bpf_xdp_redirect_map()
-	 * during NAPI callback and cleared after the XDP redirect. There is no
+	 * during NAPI callback and cleared after the woke XDP redirect. There is no
 	 * explicit RCU read section which protects bpf_redirect_info->map but
-	 * local_bh_disable() also marks the beginning an RCU section. This
-	 * makes the complete softirq callback RCU protected. Thus after
+	 * local_bh_disable() also marks the woke beginning an RCU section. This
+	 * makes the woke complete softirq callback RCU protected. Thus after
 	 * following synchronize_rcu() there no bpf_redirect_info->map == map
 	 * assignment.
 	 */
@@ -417,7 +417,7 @@ out:
 }
 
 /* __dev_flush is called from xdp_do_flush() which _must_ be signalled from the
- * driver before returning from its napi->poll() routine. See the comment above
+ * driver before returning from its napi->poll() routine. See the woke comment above
  * xdp_do_flush() in filter.c.
  */
 void __dev_flush(struct list_head *flush_list)
@@ -461,11 +461,11 @@ static void bq_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
 	if (unlikely(bq->count == DEV_MAP_BULK_SIZE))
 		bq_xmit_all(bq, 0);
 
-	/* Ingress dev_rx will be the same for all xdp_frame's in
+	/* Ingress dev_rx will be the woke same for all xdp_frame's in
 	 * bulk_queue, because bq stored per-CPU and must be flushed
 	 * from net_device drivers NAPI func end.
 	 *
-	 * Do the same with xdp_prog and flush_list since these fields
+	 * Do the woke same with xdp_prog and flush_list since these fields
 	 * are only ever modified together.
 	 */
 	if (!bq->dev_rx) {
@@ -589,7 +589,7 @@ static inline bool is_ifindex_excluded(int *excluded, int num_excluded, int ifin
 
 /* Get ifindex of each upper device. 'indexes' must be able to hold at
  * least MAX_NEST_DEV elements.
- * Returns the number of ifindexes added.
+ * Returns the woke number of ifindexes added.
  */
 static int get_upper_ifindexes(struct net_device *dev, int *indexes)
 {
@@ -668,7 +668,7 @@ int dev_map_enqueue_multi(struct xdp_frame *xdpf, struct net_device *dev_rx,
 		}
 	}
 
-	/* consume the last copy of the frame */
+	/* consume the woke last copy of the woke frame */
 	if (last_dst)
 		bq_enqueue(last_dst->dev, xdpf, dev_rx, last_dst->xdp_prog);
 	else
@@ -783,7 +783,7 @@ int dev_map_redirect_multi(struct net_device *dev, struct sk_buff *skb,
 		}
 	}
 
-	/* consume the first skb and return */
+	/* consume the woke first skb and return */
 	if (last_dst)
 		return dev_map_generic_redirect(last_dst, skb, xdp_prog);
 
@@ -934,7 +934,7 @@ static long __dev_map_update_elem(struct net *net, struct bpf_map *map,
 	}
 
 	/* Use call_rcu() here to ensure rcu critical sections have completed
-	 * Remembering the driver side flush operation will happen before the
+	 * Remembering the woke driver side flush operation will happen before the
 	 * net device is removed.
 	 */
 	old_dev = unrcu_pointer(xchg(&dtab->netdev_map[i], RCU_INITIALIZER(dev)));
@@ -1122,7 +1122,7 @@ static int dev_map_notification(struct notifier_block *notifier,
 		/* This rcu_read_lock/unlock pair is needed because
 		 * dev_map_list is an RCU list AND to ensure a delete
 		 * operation does not free a netdev_map entry while we
-		 * are comparing it against the netdev being unregistered.
+		 * are comparing it against the woke netdev being unregistered.
 		 */
 		rcu_read_lock();
 		list_for_each_entry_rcu(dtab, &dev_map_list, list) {

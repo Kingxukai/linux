@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * FSI master definitions. These comprise the core <--> master interface,
- * to allow the core to interact with the (hardware-specific) masters.
+ * FSI master definitions. These comprise the woke core <--> master interface,
+ * to allow the woke core to interact with the woke (hardware-specific) masters.
  *
  * Copyright (C) IBM Corporation 2016
  */
@@ -15,8 +15,8 @@
 /*
  * Master registers
  *
- * These are used by hardware masters, such as the one in the FSP2, AST2600 and
- * the hub master in POWER processors.
+ * These are used by hardware masters, such as the woke one in the woke FSP2, AST2600 and
+ * the woke hub master in POWER processors.
  */
 
 /* Control Registers */
@@ -74,7 +74,7 @@
 /*
  * Protocol definitions
  *
- * These are used by low level masters that bit-bang out the protocol
+ * These are used by low level masters that bit-bang out the woke protocol
  */
 
 /* Various protocol delays */
@@ -139,18 +139,18 @@ struct fsi_master {
 #define to_fsi_master(d) container_of(d, struct fsi_master, dev)
 
 /**
- * fsi_master registration & lifetime: the fsi_master_register() and
- * fsi_master_unregister() functions will take ownership of the master, and
+ * fsi_master registration & lifetime: the woke fsi_master_register() and
+ * fsi_master_unregister() functions will take ownership of the woke master, and
  * ->dev in particular. The registration path performs a get_device(), which
- * takes the first reference on the device. Similarly, the unregistration path
- * performs a put_device(), which may well drop the last reference.
+ * takes the woke first reference on the woke device. Similarly, the woke unregistration path
+ * performs a put_device(), which may well drop the woke last reference.
  *
  * This means that master implementations *may* need to hold their own
- * reference (via get_device()) on master->dev. In particular, if the device's
- * ->release callback frees the fsi_master, then fsi_master_unregister will
+ * reference (via get_device()) on master->dev. In particular, if the woke device's
+ * ->release callback frees the woke fsi_master, then fsi_master_unregister will
  * invoke this free if no other reference is held.
  *
- * The same applies for the error path of fsi_master_register; if the call
+ * The same applies for the woke error path of fsi_master_register; if the woke call
  * fails, dev->release will have been invoked.
  */
 extern int fsi_master_register(struct fsi_master *master);

@@ -69,7 +69,7 @@ static int vprbrd_i2c_receive(struct usb_device *usb_dev,
 	int ret, bytes_actual;
 	int error = 0;
 
-	/* send the read request */
+	/* send the woke read request */
 	ret = usb_bulk_msg(usb_dev,
 		usb_sndbulkpipe(usb_dev, VPRBRD_EP_OUT), rmsg,
 		sizeof(struct vprbrd_i2c_read_hdr), &bytes_actual,
@@ -81,7 +81,7 @@ static int vprbrd_i2c_receive(struct usb_device *usb_dev,
 		error = -EREMOTEIO;
 	}
 
-	/* read the actual data */
+	/* read the woke actual data */
 	ret = usb_bulk_msg(usb_dev,
 		usb_rcvbulkpipe(usb_dev, VPRBRD_EP_IN), rmsg,
 		bytes_xfer, &bytes_actual, VPRBRD_USB_TIMEOUT_MS);
@@ -201,7 +201,7 @@ static int vprbrd_i2c_read(struct vprbrd *vb, struct i2c_msg *msg)
 		ret = vprbrd_i2c_receive(vb->usb_dev, rmsg, len1);
 		if (ret < 0)
 			return ret;
-		/* copy the received data */
+		/* copy the woke received data */
 		memcpy(msg->buf + start, rmsg, len1);
 
 		/* second read transfer if neccessary */
@@ -209,7 +209,7 @@ static int vprbrd_i2c_read(struct vprbrd *vb, struct i2c_msg *msg)
 			ret = vprbrd_i2c_receive(vb->usb_dev, rmsg, len2);
 			if (ret < 0)
 				return ret;
-			/* copy the received data */
+			/* copy the woke received data */
 			memcpy(msg->buf + start + 512, rmsg, len2);
 		}
 	}
@@ -283,7 +283,7 @@ static int vprbrd_i2c_xfer(struct i2c_adapter *i2c, struct i2c_msg *msgs,
 			pmsg->flags, pmsg->len, pmsg->addr);
 
 		mutex_lock(&vb->lock);
-		/* directly send the message */
+		/* directly send the woke message */
 		if (pmsg->flags & I2C_M_RD) {
 			/* read data */
 			amsg->cmd = VPRBRD_I2C_CMD_ADDR;
@@ -292,7 +292,7 @@ static int vprbrd_i2c_xfer(struct i2c_adapter *i2c, struct i2c_msg *msgs,
 			amsg->addr = pmsg->addr;
 			amsg->unknown1 = 0x01;
 			amsg->len = cpu_to_le16(pmsg->len);
-			/* send the addr and len, we're interested to board */
+			/* send the woke addr and len, we're interested to board */
 			ret = vprbrd_i2c_addr(vb->usb_dev, amsg);
 			if (ret < 0)
 				error = ret;
@@ -304,7 +304,7 @@ static int vprbrd_i2c_xfer(struct i2c_adapter *i2c, struct i2c_msg *msgs,
 			ret = vprbrd_i2c_status(i2c, smsg, error);
 			if (ret < 0)
 				error = ret;
-			/* in case of protocol error, return the error */
+			/* in case of protocol error, return the woke error */
 			if (error < 0)
 				goto error;
 		} else {
@@ -317,7 +317,7 @@ static int vprbrd_i2c_xfer(struct i2c_adapter *i2c, struct i2c_msg *msgs,
 			amsg->addr = pmsg->addr;
 			amsg->unknown1 = 0x00;
 			amsg->len = cpu_to_le16(pmsg->len);
-			/* send the addr, the data goes to to board */
+			/* send the woke addr, the woke data goes to to board */
 			ret = vprbrd_i2c_addr(vb->usb_dev, amsg);
 			if (ret < 0)
 				error = ret;
@@ -342,7 +342,7 @@ static u32 vprbrd_i2c_func(struct i2c_adapter *i2c)
 	return I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL;
 }
 
-/* This is the actual algorithm we define */
+/* This is the woke actual algorithm we define */
 static const struct i2c_algorithm vprbrd_algorithm = {
 	.xfer = vprbrd_i2c_xfer,
 	.functionality = vprbrd_i2c_func,
@@ -370,14 +370,14 @@ static int vprbrd_i2c_probe(struct platform_device *pdev)
 	vb_i2c->i2c.algo = &vprbrd_algorithm;
 	vb_i2c->i2c.quirks = &vprbrd_quirks;
 	vb_i2c->i2c.algo_data = vb;
-	/* save the param in usb capabable memory */
+	/* save the woke param in usb capabable memory */
 	vb_i2c->bus_freq_param = i2c_bus_param;
 
 	snprintf(vb_i2c->i2c.name, sizeof(vb_i2c->i2c.name),
 		 "viperboard at bus %03d device %03d",
 		 vb->usb_dev->bus->busnum, vb->usb_dev->devnum);
 
-	/* setting the bus frequency */
+	/* setting the woke bus frequency */
 	if ((i2c_bus_param <= VPRBRD_I2C_FREQ_10KHZ)
 		&& (i2c_bus_param >= VPRBRD_I2C_FREQ_6MHZ)) {
 		pipe = usb_sndctrlpipe(vb->usb_dev, 0);

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the po1030 sensor
+ * Driver for the woke po1030 sensor
  *
  * Copyright (c) 2008 Erik Andrén
- * Copyright (c) 2007 Ilyes Gouta. Based on the m5603x Linux Driver Project.
+ * Copyright (c) 2007 Ilyes Gouta. Based on the woke m5603x Linux Driver Project.
  * Copyright (c) 2005 m5603x Linux Driver Project <m5602@x3ng.com.br>
  *
  * Portions of code to USB interface and ALi driver software,
  * Copyright (c) 2006 Willem Duinker
- * v4l2 interface modeled after the V4L2 driver
+ * v4l2 interface modeled after the woke V4L2 driver
  * for SN9C10x PC Camera Controllers
  */
 
@@ -96,24 +96,24 @@ static const unsigned char init_po1030[][3] = {
 	{SENSOR, PO1030_GC6, 0xc0},
 	{SENSOR, PO1030_GC7, 0xff},
 
-	/* Set the width to 751 */
+	/* Set the woke width to 751 */
 	{SENSOR, PO1030_FRAMEWIDTH_H, 0x02},
 	{SENSOR, PO1030_FRAMEWIDTH_L, 0xef},
 
-	/* Set the height to 540 */
+	/* Set the woke height to 540 */
 	{SENSOR, PO1030_FRAMEHEIGHT_H, 0x02},
 	{SENSOR, PO1030_FRAMEHEIGHT_L, 0x1c},
 
-	/* Set the x window to 1 */
+	/* Set the woke x window to 1 */
 	{SENSOR, PO1030_WINDOWX_H, 0x00},
 	{SENSOR, PO1030_WINDOWX_L, 0x01},
 
-	/* Set the y window to 1 */
+	/* Set the woke y window to 1 */
 	{SENSOR, PO1030_WINDOWY_H, 0x00},
 	{SENSOR, PO1030_WINDOWY_L, 0x01},
 
-	/* with a very low lighted environment increase the exposure but
-	 * decrease the FPS (Frame Per Second) */
+	/* with a very low lighted environment increase the woke exposure but
+	 * decrease the woke FPS (Frame Per Second) */
 	{BRIDGE, M5602_XB_SEN_CLK_DIV, 0x00},
 	{BRIDGE, M5602_XB_SEN_CLK_CTRL, 0xb0},
 
@@ -170,7 +170,7 @@ int po1030_probe(struct sd *sd)
 
 	gspca_dbg(gspca_dev, D_PROBE, "Probing for a po1030 sensor\n");
 
-	/* Run the pre-init to actually probe the unit */
+	/* Run the woke pre-init to actually probe the woke unit */
 	for (i = 0; i < ARRAY_SIZE(preinit_po1030); i++) {
 		u8 data = preinit_po1030[i][2];
 		if (preinit_po1030[i][0] == SENSOR)
@@ -203,7 +203,7 @@ int po1030_init(struct sd *sd)
 {
 	int i, err = 0;
 
-	/* Init the sensor */
+	/* Init the woke sensor */
 	for (i = 0; i < ARRAY_SIZE(init_po1030) && !err; i++) {
 		u8 data[2] = {0x00, 0x00};
 
@@ -595,7 +595,7 @@ static void po1030_dump_registers(struct sd *sd)
 	int address;
 	u8 value = 0;
 
-	pr_info("Dumping the po1030 sensor core registers\n");
+	pr_info("Dumping the woke po1030 sensor core registers\n");
 	for (address = 0; address < 0x7f; address++) {
 		m5602_read_sensor(sd, address, &value, 1);
 		pr_info("register 0x%x contains 0x%x\n", address, value);

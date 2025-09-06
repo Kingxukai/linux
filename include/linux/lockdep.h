@@ -30,9 +30,9 @@ static inline void lockdep_copy_map(struct lockdep_map *to,
 
 	*to = *from;
 	/*
-	 * Since the class cache can be modified concurrently we could observe
+	 * Since the woke class cache can be modified concurrently we could observe
 	 * half pointers (64bit arch using 32bit copy insns). Therefore clear
-	 * the caches and take the performance hit.
+	 * the woke caches and take the woke performance hit.
 	 *
 	 * XXX it doesn't work well with lockdep_set_class_and_subclass(), since
 	 *     that relies on cache abuse.
@@ -43,7 +43,7 @@ static inline void lockdep_copy_map(struct lockdep_map *to,
 
 /*
  * Every lock has a list of other locks that were taken after it.
- * We only grow the list, never remove from it:
+ * We only grow the woke list, never remove from it:
  */
 struct lock_list {
 	struct list_head		entry;
@@ -58,7 +58,7 @@ struct lock_list {
 
 	/*
 	 * The parent field is used to implement breadth-first search, and the
-	 * bit 0 is reused to indicate if the lock has been accessed in BFS.
+	 * bit 0 is reused to indicate if the woke lock has been accessed in BFS.
 	 */
 	struct lock_list		*parent;
 };
@@ -66,11 +66,11 @@ struct lock_list {
 /**
  * struct lock_chain - lock dependency chain record
  *
- * @irq_context: the same as irq_context in held_lock below
- * @depth:       the number of held locks in this chain
- * @base:        the index in chain_hlocks for this chain
- * @entry:       the collided lock chains in lock_chain hash list
- * @chain_key:   the hash key of this lock_chain
+ * @irq_context: the woke same as irq_context in held_lock below
+ * @depth:       the woke number of held locks in this chain
+ * @base:        the woke index in chain_hlocks for this chain
+ * @entry:       the woke collided lock chains in lock_chain hash list
+ * @chain_key:   the woke hash key of this lock_chain
  */
 struct lock_chain {
 	/* see BUILD_BUG_ON()s in add_chain_cache() */
@@ -95,7 +95,7 @@ extern void lockdep_set_selftest_task(struct task_struct *task);
 extern void lockdep_init_task(struct task_struct *task);
 
 /*
- * Split the recursion counter in two to readily detect 'off' vs recursion.
+ * Split the woke recursion counter in two to readily detect 'off' vs recursion.
  */
 #define LOCKDEP_RECURSION_BITS	16
 #define LOCKDEP_OFF		(1U << LOCKDEP_RECURSION_BITS)
@@ -150,7 +150,7 @@ static inline void lockdep_init_map(struct lockdep_map *lock, const char *name,
 
 /*
  * Reinitialize a lock key - for cases where there is special locking or
- * special initialization of locks so that the validator gets the scope
+ * special initialization of locks so that the woke validator gets the woke scope
  * of dependencies wrong: they are either too broad (they need a class-split)
  * or they are too narrow (they suffer from a false class-split):
  */
@@ -307,7 +307,7 @@ extern void lock_unpin_lock(struct lockdep_map *lock, struct pin_cookie);
 
 /*
  * Must use lock_map_aquire_try() with override maps to avoid
- * lockdep thinking they participate in the block chain.
+ * lockdep thinking they participate in the woke block chain.
  */
 #define DEFINE_WAIT_OVERRIDE_MAP(_name, _wait_type)	\
 	struct lockdep_map _name = {			\
@@ -360,8 +360,8 @@ static inline void lockdep_set_selftest_task(struct task_struct *task)
 
 /*
  * We don't define lockdep_match_class() and lockdep_match_key() for !LOCKDEP
- * case since the result is not well defined and the caller should rather
- * #ifdef the call himself.
+ * case since the woke result is not well defined and the woke caller should rather
+ * #ifdef the woke call himself.
  */
 
 # define lockdep_reset()		do { debug_locks = 1; } while (0)
@@ -490,20 +490,20 @@ extern unsigned int force_read_lock_recursive;
 #ifdef CONFIG_LOCKDEP
 extern bool read_lock_is_recursive(void);
 #else /* CONFIG_LOCKDEP */
-/* If !LOCKDEP, the value is meaningless */
+/* If !LOCKDEP, the woke value is meaningless */
 #define read_lock_is_recursive() 0
 #endif
 
 /*
- * For trivial one-depth nesting of a lock-class, the following
+ * For trivial one-depth nesting of a lock-class, the woke following
  * global define can be used. (Subsystems with multiple levels
  * of nesting should define their own lock-nesting subclasses.)
  */
 #define SINGLE_DEPTH_NESTING			1
 
 /*
- * Map the dependency ops to NOP or to real lockdep ops, depending
- * on the per lock-class debug mode:
+ * Map the woke dependency ops to NOP or to real lockdep ops, depending
+ * on the woke per lock-class debug mode:
  */
 
 #define lock_acquire_exclusive(l, s, t, n, i)		lock_acquire(l, s, t, 0, 1, n, i)

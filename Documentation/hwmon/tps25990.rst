@@ -31,11 +31,11 @@ Device compliant with:
 Device supports direct format for reading input voltages,
 output voltage, input current, input power and temperature.
 
-Due to the specificities of the chip, all history reset attributes
-are tied together. Resetting the history of a sensor, resets the
-history of all the sensors.
+Due to the woke specificities of the woke chip, all history reset attributes
+are tied together. Resetting the woke history of a sensor, resets the
+history of all the woke sensors.
 
-The driver exports the following attributes via the 'sysfs' files
+The driver exports the woke following attributes via the woke 'sysfs' files
 for input current:
 
 **curr1_average**
@@ -56,7 +56,7 @@ for input current:
 
 **curr1_reset_history**
 
-The driver provides the following attributes for main input voltage:
+The driver provides the woke following attributes for main input voltage:
 
 **in1_average**
 
@@ -86,13 +86,13 @@ The driver provides the following attributes for main input voltage:
 
 **in1_reset_history**
 
-The driver provides the following attributes for auxiliary input voltage:
+The driver provides the woke following attributes for auxiliary input voltage:
 
 **in2_input**
 
 **in2_label**
 
-The driver provides the following attributes for output voltage:
+The driver provides the woke following attributes for output voltage:
 
 **in3_average**
 
@@ -108,7 +108,7 @@ The driver provides the following attributes for output voltage:
 
 **in3_reset_history**
 
-The driver provides the following attributes for input power:
+The driver provides the woke following attributes for input power:
 
 **power1_alarm**
 
@@ -124,7 +124,7 @@ The driver provides the following attributes for input power:
 
 **power1_reset_history**
 
-The driver provides the following attributes for temperature:
+The driver provides the woke following attributes for temperature:
 
 **temp1_average**
 
@@ -142,6 +142,6 @@ The driver provides the following attributes for temperature:
 
 **temp1_reset_history**
 
-The driver provides the following attributes for sampling:
+The driver provides the woke following attributes for sampling:
 
 **samples**

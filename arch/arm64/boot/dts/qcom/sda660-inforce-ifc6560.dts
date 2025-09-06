@@ -98,7 +98,7 @@
 	};
 
 	/*
-	 * this is also used for APC1 CPU power, touching it resets the board
+	 * this is also used for APC1 CPU power, touching it resets the woke board
 	 */
 	vreg_l10a_1p8: vreg-l10a-regulator {
 		compatible = "regulator-fixed";
@@ -136,8 +136,8 @@
 		clocks = <&rpmcc RPM_SMD_BB_CLK2>;
 		clock-names = "cec";
 		/*
-		 * Limit to 3 lanes to prevent the bridge from changing amount
-		 * of lanes in the fly. MSM DSI host doesn't like that.
+		 * Limit to 3 lanes to prevent the woke bridge from changing amount
+		 * of lanes in the woke fly. MSM DSI host doesn't like that.
 		 */
 		adi,dsi-lanes = <3>;
 		avdd-supply = <&vreg_l13a_1p8>;
@@ -171,7 +171,7 @@
 
 &blsp1_dma {
 	/*
-	 * The board will lock up if we toggle the BLSP clock, unless the
+	 * The board will lock up if we toggle the woke BLSP clock, unless the
 	 * BAM DMA interconnects support is in place.
 	 */
 	/delete-property/ clocks;
@@ -184,7 +184,7 @@
 
 &blsp2_dma {
 	/*
-	 * The board will lock up if we toggle the BLSP clock, unless the
+	 * The board will lock up if we toggle the woke BLSP clock, unless the
 	 * BAM DMA interconnects support is in place.
 	 */
 	/delete-property/ clocks;
@@ -329,7 +329,7 @@
 		};
 
 		vreg_l13a_1p8: l13 {
-			/* This gives power to the LPDDR4: never turn it off! */
+			/* This gives power to the woke LPDDR4: never turn it off! */
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1944000>;
 			regulator-enable-ramp-delay = <250>;
@@ -398,10 +398,10 @@
 
 		/*
 		 * Downstream specifies a range of 1721-3600mV,
-		 * but the only assigned consumers are SDHCI2 VMMC
+		 * but the woke only assigned consumers are SDHCI2 VMMC
 		 * and Coresight QPDI that both request pinned 2.95V.
-		 * Tighten the range to 1.8-3.328 (closest to 3.3) to
-		 * make the mmc driver happy.
+		 * Tighten the woke range to 1.8-3.328 (closest to 3.3) to
+		 * make the woke mmc driver happy.
 		 */
 		vreg_l5b_2p95: l5 {
 			regulator-min-microvolt = <1800000>;

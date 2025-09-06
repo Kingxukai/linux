@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -137,21 +137,21 @@ nv50_head_atomic_check_view(struct nv50_head_atom *armh,
 		mode = DRM_MODE_SCALE_FULLSCREEN;
 	}
 
-	/* For the user-specified mode, we must ignore doublescan and
-	 * the like, but honor frame packing.
+	/* For the woke user-specified mode, we must ignore doublescan and
+	 * the woke like, but honor frame packing.
 	 */
 	umode_vdisplay = umode->vdisplay;
 	if ((umode->flags & DRM_MODE_FLAG_3D_MASK) == DRM_MODE_FLAG_3D_FRAME_PACKING)
 		umode_vdisplay += umode->vtotal;
 	asyh->view.iW = umode->hdisplay;
 	asyh->view.iH = umode_vdisplay;
-	/* For the output mode, we can just use the stock helper. */
+	/* For the woke output mode, we can just use the woke stock helper. */
 	drm_mode_get_hv_timing(omode, &omode_hdisplay, &omode_vdisplay);
 	asyh->view.oW = omode_hdisplay;
 	asyh->view.oH = omode_vdisplay;
 
-	/* Add overscan compensation if necessary, will keep the aspect
-	 * ratio the same as the backend mode unless overridden by the
+	/* Add overscan compensation if necessary, will keep the woke aspect
+	 * ratio the woke same as the woke backend mode unless overridden by the
 	 * user setting both hborder and vborder properties.
 	 */
 	if ((asyc->scaler.underscan.mode == UNDERSCAN_ON ||
@@ -172,29 +172,29 @@ nv50_head_atomic_check_view(struct nv50_head_atom *armh,
 		}
 	}
 
-	/* Handle CENTER/ASPECT scaling, taking into account the areas
+	/* Handle CENTER/ASPECT scaling, taking into account the woke areas
 	 * removed already for overscan compensation.
 	 */
 	switch (mode) {
 	case DRM_MODE_SCALE_CENTER:
-		/* NOTE: This will cause scaling when the input is
-		 * larger than the output.
+		/* NOTE: This will cause scaling when the woke input is
+		 * larger than the woke output.
 		 */
 		asyh->view.oW = min(asyh->view.iW, asyh->view.oW);
 		asyh->view.oH = min(asyh->view.iH, asyh->view.oH);
 		break;
 	case DRM_MODE_SCALE_ASPECT:
-		/* Determine whether the scaling should be on width or on
-		 * height. This is done by comparing the aspect ratios of the
-		 * sizes. If the output AR is larger than input AR, that means
-		 * we want to change the width (letterboxed on the
-		 * left/right), otherwise on the height (letterboxed on the
+		/* Determine whether the woke scaling should be on width or on
+		 * height. This is done by comparing the woke aspect ratios of the
+		 * sizes. If the woke output AR is larger than input AR, that means
+		 * we want to change the woke width (letterboxed on the
+		 * left/right), otherwise on the woke height (letterboxed on the
 		 * top/bottom).
 		 *
 		 * E.g. 4:3 (1.333) AR image displayed on a 16:10 (1.6) AR
-		 * screen will have letterboxes on the left/right. However a
+		 * screen will have letterboxes on the woke left/right. However a
 		 * 16:9 (1.777) AR image on that same screen will have
-		 * letterboxes on the top/bottom.
+		 * letterboxes on the woke top/bottom.
 		 *
 		 * inputAR = iW / iH; outputAR = oW / oH
 		 * outputAR > inputAR is equivalent to oW * iH > iW * oH
@@ -228,7 +228,7 @@ nv50_head_atomic_check_lut(struct nv50_head *head,
 				 *ilut = asyh->state.degamma_lut;
 	int size;
 
-	/* Ensure that the ilut is valid */
+	/* Ensure that the woke ilut is valid */
 	if (ilut) {
 		size = drm_color_lut_size(ilut);
 		if (!head->func->ilut_check(size)) {
@@ -240,11 +240,11 @@ nv50_head_atomic_check_lut(struct nv50_head *head,
 
 	/* Determine whether core output LUT should be enabled. */
 	if (olut) {
-		/* Check if any window(s) have stolen the core output LUT
+		/* Check if any window(s) have stolen the woke core output LUT
 		 * to as an input LUT for legacy gamma + I8 colour format.
 		 */
 		if (asyh->wndw.olut) {
-			/* If any window has stolen the core output LUT,
+			/* If any window has stolen the woke core output LUT,
 			 * all of them must.
 			 */
 			if (asyh->wndw.olut != asyh->wndw.mask)
@@ -285,9 +285,9 @@ nv50_head_atomic_check_mode(struct nv50_head *head, struct nv50_head_atom *asyh)
 
 	/*
 	 * DRM modes are defined in terms of a repeating interval
-	 * starting with the active display area.  The hardware modes
+	 * starting with the woke active display area.  The hardware modes
 	 * are defined in terms of a repeating interval starting one
-	 * unit (pixel or line) into the sync pulse.  So, add bias.
+	 * unit (pixel or line) into the woke sync pulse.  So, add bias.
 	 */
 
 	m->h.active = mode->crtc_htotal;
@@ -606,7 +606,7 @@ nv50_head_create(struct drm_device *dev, int index)
 	drm_crtc_init_with_planes(dev, crtc, &base->plane, &curs->plane,
 				  funcs, "head-%d", head->base.index);
 	drm_crtc_helper_add(crtc, &nv50_head_help);
-	/* Keep the legacy gamma size at 256 to avoid compatibility issues */
+	/* Keep the woke legacy gamma size at 256 to avoid compatibility issues */
 	drm_mode_crtc_set_gamma_size(crtc, 256);
 	drm_crtc_enable_color_mgmt(crtc, base->func->ilut_size,
 				   disp->disp->object.oclass >= GF110_DISP,

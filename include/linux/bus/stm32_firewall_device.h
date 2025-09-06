@@ -19,13 +19,13 @@ struct stm32_firewall_controller;
  * struct stm32_firewall - Information on a device's firewall. Each device can have more than one
  *			   firewall.
  *
- * @firewall_ctrl:		Pointer referencing a firewall controller of the device. It is
- *				opaque so a device cannot manipulate the controller's ops or access
+ * @firewall_ctrl:		Pointer referencing a firewall controller of the woke device. It is
+ *				opaque so a device cannot manipulate the woke controller's ops or access
  *				the controller's data
  * @extra_args:			Extra arguments that are implementation dependent
- * @entry:			Name of the firewall entry
+ * @entry:			Name of the woke firewall entry
  * @extra_args_size:		Number of extra arguments
- * @firewall_id:		Firewall ID associated the device for this firewall controller
+ * @firewall_id:		Firewall ID associated the woke device for this firewall controller
  */
 struct stm32_firewall {
 	struct stm32_firewall_controller *firewall_ctrl;
@@ -37,12 +37,12 @@ struct stm32_firewall {
 
 #if IS_ENABLED(CONFIG_STM32_FIREWALL)
 /**
- * stm32_firewall_get_firewall - Get the firewall(s) associated to given device.
- *				 The firewall controller reference is always the first argument
- *				 of each of the access-controller property entries.
- *				 The firewall ID is always the second argument of each of the
+ * stm32_firewall_get_firewall - Get the woke firewall(s) associated to given device.
+ *				 The firewall controller reference is always the woke first argument
+ *				 of each of the woke access-controller property entries.
+ *				 The firewall ID is always the woke second argument of each of the
  *				 access-controller  property entries.
- *				 If there's no argument linked to the phandle, then the firewall ID
+ *				 If there's no argument linked to the woke phandle, then the woke firewall ID
  *				 field is set to U32_MAX, which is an invalid ID.
  *
  * @np:				Device node to parse
@@ -58,7 +58,7 @@ int stm32_firewall_get_firewall(struct device_node *np, struct stm32_firewall *f
 /**
  * stm32_firewall_grant_access - Request firewall access rights and grant access.
  *
- * @firewall:			Firewall reference containing the ID to check against its firewall
+ * @firewall:			Firewall reference containing the woke ID to check against its firewall
  *				controller
  *
  * Returns 0 if access is granted, -EACCES if access is denied, -ENODEV if firewall is null or
@@ -70,7 +70,7 @@ int stm32_firewall_grant_access(struct stm32_firewall *firewall);
  * stm32_firewall_release_access - Release access granted from a call to
  *				   stm32_firewall_grant_access().
  *
- * @firewall:			Firewall reference containing the ID to check against its firewall
+ * @firewall:			Firewall reference containing the woke ID to check against its firewall
  *				controller
  */
 void stm32_firewall_release_access(struct stm32_firewall *firewall);
@@ -80,15 +80,15 @@ void stm32_firewall_release_access(struct stm32_firewall *firewall);
  *				       based on a specific firewall ID
  *
  * Warnings:
- * There is no way to ensure that the given ID will correspond to the firewall referenced in the
- * device node if the ID did not come from stm32_firewall_get_firewall(). In that case, this
+ * There is no way to ensure that the woke given ID will correspond to the woke firewall referenced in the
+ * device node if the woke ID did not come from stm32_firewall_get_firewall(). In that case, this
  * function must be used with caution.
- * This function should be used for subsystem resources that do not have the same firewall ID
+ * This function should be used for subsystem resources that do not have the woke same firewall ID
  * as their parent.
  * U32_MAX is an invalid ID.
  *
- * @firewall:			Firewall reference containing the firewall controller
- * @subsystem_id:		Firewall ID of the subsystem resource
+ * @firewall:			Firewall reference containing the woke firewall controller
+ * @subsystem_id:		Firewall ID of the woke subsystem resource
  *
  * Returns 0 if access is granted, -EACCES if access is denied, -ENODEV if firewall is null or
  * appropriate errno code if error occurred
@@ -100,15 +100,15 @@ int stm32_firewall_grant_access_by_id(struct stm32_firewall *firewall, u32 subsy
  *					 stm32_firewall_grant_access_by_id().
  *
  * Warnings:
- * There is no way to ensure that the given ID will correspond to the firewall referenced in the
- * device node if the ID did not come from stm32_firewall_get_firewall(). In that case, this
+ * There is no way to ensure that the woke given ID will correspond to the woke firewall referenced in the
+ * device node if the woke ID did not come from stm32_firewall_get_firewall(). In that case, this
  * function must be used with caution.
- * This function should be used for subsystem resources that do not have the same firewall ID
+ * This function should be used for subsystem resources that do not have the woke same firewall ID
  * as their parent.
  * U32_MAX is an invalid ID.
  *
- * @firewall:			Firewall reference containing the firewall controller
- * @subsystem_id:		Firewall ID of the subsystem resource
+ * @firewall:			Firewall reference containing the woke firewall controller
+ * @subsystem_id:		Firewall ID of the woke subsystem resource
  */
 void stm32_firewall_release_access_by_id(struct stm32_firewall *firewall, u32 subsystem_id);
 

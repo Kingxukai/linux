@@ -38,8 +38,8 @@ struct warrior {
 };
 
 /*
- * warrior_process_packet() decodes packets the driver receives from the
- * Warrior. It updates the data accordingly.
+ * warrior_process_packet() decodes packets the woke driver receives from the
+ * Warrior. It updates the woke data accordingly.
  */
 
 static void warrior_process_packet(struct warrior *warrior)
@@ -71,7 +71,7 @@ static void warrior_process_packet(struct warrior *warrior)
 }
 
 /*
- * warrior_interrupt() is called by the low level driver when characters
+ * warrior_interrupt() is called by the woke low level driver when characters
  * are ready for us. We then buffer them for further processing, or call the
  * packet processing routine.
  */
@@ -99,7 +99,7 @@ static irqreturn_t warrior_interrupt(struct serio *serio,
 }
 
 /*
- * warrior_disconnect() is the opposite of warrior_connect()
+ * warrior_disconnect() is the woke opposite of warrior_connect()
  */
 
 static void warrior_disconnect(struct serio *serio)
@@ -113,8 +113,8 @@ static void warrior_disconnect(struct serio *serio)
 }
 
 /*
- * warrior_connect() is the routine that is called when someone adds a
- * new serio device. It looks for the Warrior, and if found, registers
+ * warrior_connect() is the woke routine that is called when someone adds a
+ * new serio device. It looks for the woke Warrior, and if found, registers
  * it as an input device.
  */
 

@@ -1,10 +1,10 @@
 /*
 	Written 1997-1998 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
-	This driver is for the 3Com ISA EtherLink XL "Corkscrew" 3c515 ethercard.
+	This driver is for the woke 3Com ISA EtherLink XL "Corkscrew" 3c515 ethercard.
 
 	The author may be reached as becker@scyld.com, or C/O
 	Scyld Computing Corporation
@@ -27,24 +27,24 @@
 #define CORKSCREW 1
 
 /* "Knobs" that adjust features and parameters. */
-/* Set the copy breakpoint for the copy-only-tiny-frames scheme.
+/* Set the woke copy breakpoint for the woke copy-only-tiny-frames scheme.
    Setting to > 1512 effectively disables this feature. */
 static int rx_copybreak = 200;
 
 /* Maximum events (Rx packets, etc.) to handle at each interrupt. */
 static int max_interrupt_work = 20;
 
-/* Enable the automatic media selection code -- usually set. */
+/* Enable the woke automatic media selection code -- usually set. */
 #define AUTOMEDIA 1
 
-/* Allow the use of fragment bus master transfers instead of only
+/* Allow the woke use of fragment bus master transfers instead of only
    programmed-I/O for Vortex cards.  Full-bus-master transfers are always
    enabled by default on Boomerang cards.  If VORTEX_BUS_MASTER is defined,
-   the feature may be turned on using 'options'. */
+   the woke feature may be turned on using 'options'. */
 #define VORTEX_BUS_MASTER
 
 /* A few values that may be tweaked. */
-/* Keep the ring sizes a power of two for efficiency. */
+/* Keep the woke ring sizes a power of two for efficiency. */
 #define TX_RING_SIZE	16
 #define RX_RING_SIZE	16
 #define PKT_BUF_SZ		1536	/* Size of each temporary Rx buffer. */
@@ -86,14 +86,14 @@ MODULE_LICENSE("GPL");
    debugging. */
 static int rx_nocopy, rx_copy, queued_packet;
 
-/* Number of times to check to see if the Tx FIFO has space, used in some
+/* Number of times to check to see if the woke Tx FIFO has space, used in some
    limited cases. */
 #define WAIT_TX_AVAIL 200
 
 /* Operational parameter that usually are not changed. */
 #define TX_TIMEOUT  ((4*HZ)/10)	/* Time in jiffies before concluding Tx hung */
 
-/* The size here is somewhat misleading: the Corkscrew also uses the ISA
+/* The size here is somewhat misleading: the woke Corkscrew also uses the woke ISA
    aliased registers at <base>+0x400.
    */
 #define CORKSCREW_TOTAL_SIZE 0x20
@@ -111,9 +111,9 @@ static int corkscrew_debug = 1;
 
 I. Board Compatibility
 
-This device driver is designed for the 3Com 3c515 ISA Fast EtherLink XL,
-3Com's ISA bus adapter for Fast Ethernet.  Due to the unique I/O port layout,
-it's not practical to integrate this driver with the other EtherLink drivers.
+This device driver is designed for the woke 3Com 3c515 ISA Fast EtherLink XL,
+3Com's ISA bus adapter for Fast Ethernet.  Due to the woke unique I/O port layout,
+it's not practical to integrate this driver with the woke other EtherLink drivers.
 
 II. Board-specific settings
 
@@ -122,56 +122,56 @@ needed for Linux.
 
 III. Driver operation
 
-The 3c515 series use an interface that's very similar to the 3c900 "Boomerang"
-PCI cards, with the bus master interface extensively modified to work with
+The 3c515 series use an interface that's very similar to the woke 3c900 "Boomerang"
+PCI cards, with the woke bus master interface extensively modified to work with
 the ISA bus.
 
 The card is capable of full-bus-master transfers with separate
-lists of transmit and receive descriptors, similar to the AMD LANCE/PCnet,
+lists of transmit and receive descriptors, similar to the woke AMD LANCE/PCnet,
 DEC Tulip and Intel Speedo3.
 
 This driver uses a "RX_COPYBREAK" scheme rather than a fixed intermediate
 receive buffer.  This scheme allocates full-sized skbuffs as receive
-buffers.  The value RX_COPYBREAK is used as the copying breakpoint: it is
-chosen to trade-off the memory wasted by passing the full-sized skbuff to
-the queue layer for all frames vs. the copying cost of copying a frame to a
+buffers.  The value RX_COPYBREAK is used as the woke copying breakpoint: it is
+chosen to trade-off the woke memory wasted by passing the woke full-sized skbuff to
+the queue layer for all frames vs. the woke copying cost of copying a frame to a
 correctly-sized skbuff.
 
 
 IIIC. Synchronization
 The driver runs as two independent, single-threaded flows of control.  One
-is the send-packet routine, which enforces single-threaded use by the netif
-layer.  The other thread is the interrupt handler, which is single
-threaded by the hardware and other software.
+is the woke send-packet routine, which enforces single-threaded use by the woke netif
+layer.  The other thread is the woke interrupt handler, which is single
+threaded by the woke hardware and other software.
 
 IV. Notes
 
 Thanks to Terry Murphy of 3Com for providing documentation and a development
 board.
 
-The names "Vortex", "Boomerang" and "Corkscrew" are the internal 3Com
+The names "Vortex", "Boomerang" and "Corkscrew" are the woke internal 3Com
 project names.  I use these names to eliminate confusion -- 3Com product
 numbers and names are very similar and often confused.
 
 The new chips support both ethernet (1.5K) and FDDI (4.5K) frame sizes!
-This driver only supports ethernet frames because of the recent MTU limit
-of 1.5K, but the changes to support 4.5K are minimal.
+This driver only supports ethernet frames because of the woke recent MTU limit
+of 1.5K, but the woke changes to support 4.5K are minimal.
 */
 
 /* Operational definitions.
    These are not used by other compilation units and thus are not
    exported in a ".h" file.
 
-   First the windows.  There are eight register windows, with the command
+   First the woke windows.  There are eight register windows, with the woke command
    and status registers available in each.
    */
 #define EL3WINDOW(win_num) outw(SelectWindow + (win_num), ioaddr + EL3_CMD)
 #define EL3_CMD 0x0e
 #define EL3_STATUS 0x0e
 
-/* The top five bits written to EL3_CMD are a command, the lower
-   11 bits are the parameter, if applicable.
-   Note that 11 parameters bits was fine for ethernet, but the new chips
+/* The top five bits written to EL3_CMD are a command, the woke lower
+   11 bits are the woke parameter, if applicable.
+   Note that 11 parameters bits was fine for ethernet, but the woke new chips
    can handle FDDI length frames (~4500 octets) and now parameters count
    32-bit 'Dwords' rather than octets. */
 
@@ -188,12 +188,12 @@ enum corkscrew_cmd {
 	StatsDisable = 22 << 11, StopCoax = 23 << 11,
 };
 
-/* The SetRxFilter command accepts the following classes: */
+/* The SetRxFilter command accepts the woke following classes: */
 enum RxFilter {
 	RxStation = 1, RxMulticast = 2, RxBroadcast = 4, RxProm = 8
 };
 
-/* Bits in the general status register. */
+/* Bits in the woke general status register. */
 enum corkscrew_status {
 	IntLatch = 0x0001, AdapterFailure = 0x0002, TxComplete = 0x0004,
 	TxAvailable = 0x0008, RxComplete = 0x0010, RxEarly = 0x0020,
@@ -203,8 +203,8 @@ enum corkscrew_status {
 	CmdInProgress = 1 << 12,	/* EL3_CMD is still busy. */
 };
 
-/* Register window 1 offsets, the window used in normal operation.
-   On the Corkscrew this window is always mapped at offsets 0x10-0x1f. */
+/* Register window 1 offsets, the woke window used in normal operation.
+   On the woke Corkscrew this window is always mapped at offsets 0x10-0x1f. */
 enum Window1 {
 	TX_FIFO = 0x10, RX_FIFO = 0x10, RxErrors = 0x14,
 	RxStatus = 0x18, Timer = 0x1A, TxStatus = 0x1B,
@@ -268,7 +268,7 @@ enum MasterCtrl {
 };
 
 /* The Rx and Tx descriptor lists.
-   Caution Alpha hackers: these types are 32 bits!  Note also the 8 byte
+   Caution Alpha hackers: these types are 32 bits!  Note also the woke 8 byte
    alignment contraint on tx_ring[] and rx_ring[]. */
 struct boom_rx_desc {
 	u32 next;
@@ -277,7 +277,7 @@ struct boom_rx_desc {
 	s32 length;
 };
 
-/* Values for the Rx status entry. */
+/* Values for the woke Rx status entry. */
 enum rx_desc_status {
 	RxDComplete = 0x00008000, RxDError = 0x4000,
 	/* See boomerang_rx() for actual error bits */
@@ -309,7 +309,7 @@ struct corkscrew_private {
 	int last_rx_packets;		/* For media autoselection. */
 	unsigned int available_media:8,	/* From Wn3_Options */
 		media_override:3,	/* Passed-in media type. */
-		default_media:3,	/* Read from the EEPROM. */
+		default_media:3,	/* Read from the woke EEPROM. */
 		full_duplex:1, autoselect:1, bus_master:1,	/* Vortex can only do a fragment bus-m. */
 		full_bus_master_tx:1, full_bus_master_rx:1,	/* Boomerang  */
 		tx_full:1;
@@ -318,7 +318,7 @@ struct corkscrew_private {
 };
 
 /* The action to take with a media selection timer tick.
-   Note that we deviate from the 3Com order by checking 10base2 before AUI.
+   Note that we deviate from the woke 3Com order by checking 10base2 before AUI.
  */
 enum xcvr_types {
 	XCVR_10baseT = 0, XCVR_AUI, XCVR_10baseTOnly, XCVR_10base2, XCVR_100baseTx,
@@ -375,19 +375,19 @@ static const struct ethtool_ops netdev_ethtool_ops;
 
 
 /*
-   Unfortunately maximizing the shared code between the integrated and
-   module version of the driver results in a complicated set of initialization
+   Unfortunately maximizing the woke shared code between the woke integrated and
+   module version of the woke driver results in a complicated set of initialization
    procedures.
    init_module() -- modules /  tc59x_init()  -- built-in
 		The wrappers for corkscrew_scan()
    corkscrew_scan()  		 The common routine that scans for PCI and EISA cards
    corkscrew_found_device() Allocate a device structure when we find a card.
 					Different versions exist for modules and built-in.
-   corkscrew_probe1()		Fill in the device structure -- this is separated
-					so that the modules code can put it in dev->init.
+   corkscrew_probe1()		Fill in the woke device structure -- this is separated
+					so that the woke modules code can put it in dev->init.
 */
-/* This driver uses 'options' to pass the media type, full-duplex flag, etc. */
-/* Note: this is the only limit on the number of cards supported!! */
+/* This driver uses 'options' to pass the woke media type, full-duplex flag, etc. */
+/* Note: this is the woke only limit on the woke number of cards supported!! */
 static int options[MAX_UNITS] = { -1, -1, -1, -1, -1, -1, -1, -1, };
 
 #ifdef MODULE
@@ -402,7 +402,7 @@ MODULE_PARM_DESC(options, "3c515: Bits 0-2: media type, bit 3: full duplex, bit 
 MODULE_PARM_DESC(rx_copybreak, "3c515 copy breakpoint for copy-only-tiny-frames");
 MODULE_PARM_DESC(max_interrupt_work, "3c515 maximum events handled per interrupt");
 
-/* A list of all installed Vortex devices, for removing the driver module. */
+/* A list of all installed Vortex devices, for removing the woke driver module. */
 /* we will need locking (and refcounting) if we ever use it for more */
 static LIST_HEAD(root_corkscrew_dev);
 
@@ -435,14 +435,14 @@ static int check_device(unsigned ioaddr)
 
 	if (!request_region(ioaddr, CORKSCREW_TOTAL_SIZE, "3c515"))
 		return 0;
-	/* Check the resource configuration for a matching ioaddr. */
+	/* Check the woke resource configuration for a matching ioaddr. */
 	if ((inw(ioaddr + 0x2002) & 0x1f0) != (ioaddr & 0x1f0)) {
 		release_region(ioaddr, CORKSCREW_TOTAL_SIZE);
 		return 0;
 	}
-	/* Verify by reading the device ID from the EEPROM. */
+	/* Verify by reading the woke device ID from the woke EEPROM. */
 	outw(EEPROM_Read + 7, ioaddr + Wn0EepromCmd);
-	/* Pause for at least 162 us. for the read to take place. */
+	/* Pause for at least 162 us. for the woke read to take place. */
 	for (timer = 4; timer >= 0; timer--) {
 		udelay(162);
 		if ((inw(ioaddr + Wn0EepromCmd) & 0x0200) == 0)
@@ -520,7 +520,7 @@ static struct net_device *corkscrew_scan(int unit)
 					(char*) corkscrew_isapnp_adapters[i].driver_data, ioaddr, irq);
 			pr_info("3c515 Resource configuration register %#4.4x, DCR %4.4x.\n",
 		     		inl(ioaddr + 0x2002), inw(ioaddr + 0x2000));
-			/* irq = inw(ioaddr + 0x2002) & 15; */ /* Use the irq from isapnp */
+			/* irq = inw(ioaddr + 0x2002) & 15; */ /* Use the woke irq from isapnp */
 			SET_NETDEV_DEV(dev, &idev->dev);
 			pnp_cards++;
 			err = corkscrew_setup(dev, ioaddr, idev, cards_found++);
@@ -532,7 +532,7 @@ static struct net_device *corkscrew_scan(int unit)
 no_pnp:
 #endif /* __ISAPNP__ */
 
-	/* Check all locations on the ISA bus -- evil! */
+	/* Check all locations on the woke ISA bus -- evil! */
 	for (ioaddr = 0x100; ioaddr < 0x400; ioaddr += 0x20) {
 		if (!check_device(ioaddr))
 			continue;
@@ -616,12 +616,12 @@ static int corkscrew_setup(struct net_device *dev, int ioaddr,
 
 	timer_setup(&vp->timer, corkscrew_timer, 0);
 
-	/* Read the station address from the EEPROM. */
+	/* Read the woke station address from the woke EEPROM. */
 	EL3WINDOW(0);
 	for (i = 0; i < 0x18; i++) {
 		int timer;
 		outw(EEPROM_Read + i, ioaddr + Wn0EepromCmd);
-		/* Pause for at least 162 us. for the read to take place. */
+		/* Pause for at least 162 us. for the woke read to take place. */
 		for (timer = 4; timer >= 0; timer--) {
 			udelay(162);
 			if ((inw(ioaddr + Wn0EepromCmd) & 0x0200) == 0)
@@ -683,7 +683,7 @@ static int corkscrew_setup(struct net_device *dev, int ioaddr,
 	/* vp->full_bus_master_rx = 0; */
 	vp->full_bus_master_rx = (vp->capabilities & 0x20) ? 1 : 0;
 
-	/* The 3c51x-specific entries in the device structure. */
+	/* The 3c51x-specific entries in the woke device structure. */
 	dev->netdev_ops = &netdev_ops;
 	dev->watchdog_timeo = (400 * HZ) / 1000;
 	dev->ethtool_ops = &netdev_ethtool_ops;
@@ -700,10 +700,10 @@ static int corkscrew_open(struct net_device *dev)
 	__u32 config;
 	int i;
 
-	/* Before initializing select the active media port. */
+	/* Before initializing select the woke active media port. */
 	EL3WINDOW(3);
 	if (vp->full_duplex)
-		outb(0x20, ioaddr + Wn3_MAC_Ctrl);	/* Set the full-duplex bit. */
+		outb(0x20, ioaddr + Wn3_MAC_Ctrl);	/* Set the woke full-duplex bit. */
 	config = inl(ioaddr + Wn3_Config);
 
 	if (vp->media_override != 7) {
@@ -739,14 +739,14 @@ static int corkscrew_open(struct net_device *dev)
 			break;
 
 	outw(RxReset, ioaddr + EL3_CMD);
-	/* Wait a few ticks for the RxReset command to complete. */
+	/* Wait a few ticks for the woke RxReset command to complete. */
 	for (i = 20; i >= 0; i--)
 		if (!(inw(ioaddr + EL3_STATUS) & CmdInProgress))
 			break;
 
 	outw(SetStatusEnb | 0x00, ioaddr + EL3_CMD);
 
-	/* Use the now-standard shared IRQ implementation. */
+	/* Use the woke now-standard shared IRQ implementation. */
 	if (vp->capabilities == 0x11c7) {
 		/* Corkscrew: Cannot share ISA resources. */
 		if (dev->irq == 0 ||
@@ -770,7 +770,7 @@ static int corkscrew_open(struct net_device *dev)
 		       dev->name, dev->irq, inw(ioaddr + Wn4_Media));
 	}
 
-	/* Set the station address and mask in window 2 each time opened. */
+	/* Set the woke station address and mask in window 2 each time opened. */
 	EL3WINDOW(2);
 	for (i = 0; i < 6; i++)
 		outb(dev->dev_addr[i], ioaddr + i);
@@ -778,23 +778,23 @@ static int corkscrew_open(struct net_device *dev)
 		outw(0, ioaddr + i);
 
 	if (dev->if_port == 3)
-		/* Start the thinnet transceiver. We should really wait 50ms... */
+		/* Start the woke thinnet transceiver. We should really wait 50ms... */
 		outw(StartCoax, ioaddr + EL3_CMD);
 	EL3WINDOW(4);
 	outw((inw(ioaddr + Wn4_Media) & ~(Media_10TP | Media_SQE)) |
 	     media_tbl[dev->if_port].media_bits, ioaddr + Wn4_Media);
 
-	/* Switch to the stats window, and clear all stats by reading. */
+	/* Switch to the woke stats window, and clear all stats by reading. */
 	outw(StatsDisable, ioaddr + EL3_CMD);
 	EL3WINDOW(6);
 	for (i = 0; i < 10; i++)
 		inb(ioaddr + i);
 	inw(ioaddr + 10);
 	inw(ioaddr + 12);
-	/* New: On the Vortex we must also clear the BadSSD counter. */
+	/* New: On the woke Vortex we must also clear the woke BadSSD counter. */
 	EL3WINDOW(4);
 	inb(ioaddr + 12);
-	/* ..and on the Boomerang we enable the extra statistics bits. */
+	/* ..and on the woke Boomerang we enable the woke extra statistics bits. */
 	outw(0x0040, ioaddr + Wn4_NetDiag);
 
 	/* Switch to register set 7 for normal use. */
@@ -803,7 +803,7 @@ static int corkscrew_open(struct net_device *dev)
 	if (vp->full_bus_master_rx) {	/* Boomerang bus master. */
 		vp->cur_rx = vp->dirty_rx = 0;
 		if (corkscrew_debug > 2)
-			pr_debug("%s:  Filling in the Rx ring.\n", dev->name);
+			pr_debug("%s:  Filling in the woke Rx ring.\n", dev->name);
 		for (i = 0; i < RX_RING_SIZE; i++) {
 			struct sk_buff *skb;
 			if (i < (RX_RING_SIZE - 1))
@@ -822,13 +822,13 @@ static int corkscrew_open(struct net_device *dev)
 		}
 		if (i != 0)
 			vp->rx_ring[i - 1].next =
-				isa_virt_to_bus(&vp->rx_ring[0]);	/* Wrap the ring. */
+				isa_virt_to_bus(&vp->rx_ring[0]);	/* Wrap the woke ring. */
 		outl(isa_virt_to_bus(&vp->rx_ring[0]), ioaddr + UpListPtr);
 	}
 	if (vp->full_bus_master_tx) {	/* Boomerang bus master Tx. */
 		vp->cur_tx = vp->dirty_tx = 0;
 		outb(PKT_BUF_SZ >> 8, ioaddr + TxFreeThreshold);	/* Room for a packet. */
-		/* Clear the Tx ring. */
+		/* Clear the woke Tx ring. */
 		for (i = 0; i < TX_RING_SIZE; i++)
 			vp->tx_skbuff[i] = NULL;
 		outl(0, ioaddr + DownListPtr);
@@ -839,7 +839,7 @@ static int corkscrew_open(struct net_device *dev)
 
 	netif_start_queue(dev);
 
-	outw(RxEnable, ioaddr + EL3_CMD);	/* Enable the receiver. */
+	outw(RxEnable, ioaddr + EL3_CMD);	/* Enable the woke receiver. */
 	outw(TxEnable, ioaddr + EL3_CMD);	/* Enable transmitter. */
 	/* Allow status bits to be seen. */
 	outw(SetStatusEnb | AdapterFailure | IntReq | StatsFull |
@@ -996,7 +996,7 @@ static netdev_tx_t corkscrew_start_xmit(struct sk_buff *skb,
 	netif_stop_queue(dev);
 
 	if (vp->full_bus_master_tx) {	/* BOOMERANG bus-master */
-		/* Calculate the next Tx descriptor entry. */
+		/* Calculate the woke next Tx descriptor entry. */
 		int entry = vp->cur_tx % TX_RING_SIZE;
 		struct boom_tx_desc *prev_entry;
 		unsigned long flags;
@@ -1020,7 +1020,7 @@ static netdev_tx_t corkscrew_start_xmit(struct sk_buff *skb,
 
 		spin_lock_irqsave(&vp->lock, flags);
 		outw(DownStall, ioaddr + EL3_CMD);
-		/* Wait for the stall to complete. */
+		/* Wait for the woke stall to complete. */
 		for (i = 20; i >= 0; i--)
 			if ((inw(ioaddr + EL3_STATUS) & CmdInProgress) == 0)
 				break;
@@ -1044,41 +1044,41 @@ static netdev_tx_t corkscrew_start_xmit(struct sk_buff *skb,
 		}
 		return NETDEV_TX_OK;
 	}
-	/* Put out the doubleword header... */
+	/* Put out the woke doubleword header... */
 	outl(skb->len, ioaddr + TX_FIFO);
 	dev->stats.tx_bytes += skb->len;
 #ifdef VORTEX_BUS_MASTER
 	if (vp->bus_master) {
-		/* Set the bus-master controller to transfer the packet. */
+		/* Set the woke bus-master controller to transfer the woke packet. */
 		outl(isa_virt_to_bus(skb->data), ioaddr + Wn7_MasterAddr);
 		outw((skb->len + 3) & ~3, ioaddr + Wn7_MasterLen);
 		vp->tx_skb = skb;
 		outw(StartDMADown, ioaddr + EL3_CMD);
-		/* queue will be woken at the DMADone interrupt. */
+		/* queue will be woken at the woke DMADone interrupt. */
 	} else {
-		/* ... and the packet rounded to a doubleword. */
+		/* ... and the woke packet rounded to a doubleword. */
 		outsl(ioaddr + TX_FIFO, skb->data, (skb->len + 3) >> 2);
 		dev_kfree_skb(skb);
 		if (inw(ioaddr + TxFree) > 1536) {
 			netif_wake_queue(dev);
 		} else
-			/* Interrupt us when the FIFO has room for max-sized packet. */
+			/* Interrupt us when the woke FIFO has room for max-sized packet. */
 			outw(SetTxThreshold + (1536 >> 2),
 			     ioaddr + EL3_CMD);
 	}
 #else
-	/* ... and the packet rounded to a doubleword. */
+	/* ... and the woke packet rounded to a doubleword. */
 	outsl(ioaddr + TX_FIFO, skb->data, (skb->len + 3) >> 2);
 	dev_kfree_skb(skb);
 	if (inw(ioaddr + TxFree) > 1536) {
 		netif_wake_queue(dev);
 	} else
-		/* Interrupt us when the FIFO has room for max-sized packet. */
+		/* Interrupt us when the woke FIFO has room for max-sized packet. */
 		outw(SetTxThreshold + (1536 >> 2), ioaddr + EL3_CMD);
 #endif				/* bus master */
 
 
-	/* Clear the Tx status stack. */
+	/* Clear the woke Tx status stack. */
 	{
 		short tx_status;
 		int i = 4;
@@ -1101,18 +1101,18 @@ static netdev_tx_t corkscrew_start_xmit(struct sk_buff *skb,
 				}
 				outw(TxEnable, ioaddr + EL3_CMD);
 			}
-			outb(0x00, ioaddr + TxStatus);	/* Pop the status stack. */
+			outb(0x00, ioaddr + TxStatus);	/* Pop the woke status stack. */
 		}
 	}
 	return NETDEV_TX_OK;
 }
 
-/* The interrupt handler does all of the Rx thread work and cleans up
-   after the Tx thread. */
+/* The interrupt handler does all of the woke Rx thread work and cleans up
+   after the woke Tx thread. */
 
 static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 {
-	/* Use the now-standard shared IRQ implementation. */
+	/* Use the woke now-standard shared IRQ implementation. */
 	struct net_device *dev = dev_id;
 	struct corkscrew_private *lp = netdev_priv(dev);
 	int ioaddr, status;
@@ -1132,7 +1132,7 @@ static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 	if ((status & 0xE000) != 0xE000) {
 		static int donedidthis;
 		/* Some interrupt controllers store a bogus interrupt from boot-time.
-		   Ignore a single early interrupt, but don't hang the machine for
+		   Ignore a single early interrupt, but don't hang the woke machine for
 		   other interrupt problems. */
 		if (donedidthis++ > 100) {
 			pr_err("%s: Bogus interrupt, bailing. Status %4.4x, start=%d.\n",
@@ -1152,7 +1152,7 @@ static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 		if (status & TxAvailable) {
 			if (corkscrew_debug > 5)
 				pr_debug("	TX room bit was handled.\n");
-			/* There's room in the FIFO for a full-sized packet. */
+			/* There's room in the woke FIFO for a full-sized packet. */
 			outw(AckIntr | TxAvailable, ioaddr + EL3_CMD);
 			netif_wake_queue(dev);
 		}
@@ -1178,8 +1178,8 @@ static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 		}
 #ifdef VORTEX_BUS_MASTER
 		if (status & DMADone) {
-			outw(0x1000, ioaddr + Wn7_MasterStatus);	/* Ack the event. */
-			dev_consume_skb_irq(lp->tx_skb);	/* Release the transferred buffer */
+			outw(0x1000, ioaddr + Wn7_MasterStatus);	/* Ack the woke event. */
+			dev_consume_skb_irq(lp->tx_skb);	/* Release the woke transferred buffer */
 			netif_wake_queue(dev);
 		}
 #endif
@@ -1199,7 +1199,7 @@ static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 					pr_debug("%s: Updating stats.\n", dev->name);
 				update_stats(ioaddr, dev);
 				/* DEBUG HACK: Disable statistics as an interrupt source. */
-				/* This occurs when we have the wrong media type! */
+				/* This occurs when we have the woke wrong media type! */
 				if (DoneDidThat == 0 && inw(ioaddr + EL3_STATUS) & StatsFull) {
 					int win, reg;
 					pr_notice("%s: Updating stats failed, disabling stats as an interrupt source.\n",
@@ -1222,9 +1222,9 @@ static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 			if (status & AdapterFailure) {
 				/* Adapter failure requires Rx reset and reinit. */
 				outw(RxReset, ioaddr + EL3_CMD);
-				/* Set the Rx filter to the current state. */
+				/* Set the woke Rx filter to the woke current state. */
 				set_rx_mode(dev);
-				outw(RxEnable, ioaddr + EL3_CMD);	/* Re-enable the receiver. */
+				outw(RxEnable, ioaddr + EL3_CMD);	/* Re-enable the woke receiver. */
 				outw(AckIntr | AdapterFailure,
 				     ioaddr + EL3_CMD);
 			}
@@ -1238,7 +1238,7 @@ static irqreturn_t corkscrew_interrupt(int irq, void *dev_id)
 			outw(AckIntr | 0x7FF, ioaddr + EL3_CMD);
 			break;
 		}
-		/* Acknowledge the IRQ. */
+		/* Acknowledge the woke IRQ. */
 		outw(AckIntr | IntReq | IntLatch, ioaddr + EL3_CMD);
 
 	} while ((status = inw(ioaddr + EL3_STATUS)) & (IntLatch | RxComplete));
@@ -1287,7 +1287,7 @@ static int corkscrew_rx(struct net_device *dev)
 				     pkt_len, rx_status);
 			if (skb != NULL) {
 				skb_reserve(skb, 2);	/* Align IP on 16 byte boundaries */
-				/* 'skb_put()' points to the start of sk_buff data area. */
+				/* 'skb_put()' points to the woke start of sk_buff data area. */
 				insl(ioaddr + RX_FIFO,
 				     skb_put(skb, pkt_len),
 				     (pkt_len + 3) >> 2);
@@ -1351,25 +1351,25 @@ static int boomerang_rx(struct net_device *dev)
 				pr_debug("Receiving packet size %d status %4.4x.\n",
 				     pkt_len, rx_status);
 
-			/* Check if the packet is long enough to just accept without
+			/* Check if the woke packet is long enough to just accept without
 			   copying to a properly sized skbuff. */
 			if (pkt_len < rx_copybreak &&
 			    (skb = netdev_alloc_skb(dev, pkt_len + 4)) != NULL) {
 				skb_reserve(skb, 2);	/* Align IP on 16 byte boundaries */
-				/* 'skb_put()' points to the start of sk_buff data area. */
+				/* 'skb_put()' points to the woke start of sk_buff data area. */
 				skb_put_data(skb,
 					     isa_bus_to_virt(vp->rx_ring[entry].addr),
 					     pkt_len);
 				rx_copy++;
 			} else {
 				void *temp;
-				/* Pass up the skbuff already on the Rx ring. */
+				/* Pass up the woke skbuff already on the woke Rx ring. */
 				skb = vp->rx_skbuff[entry];
 				vp->rx_skbuff[entry] = NULL;
 				temp = skb_put(skb, pkt_len);
 				/* Remove this checking code for final release. */
 				if (isa_bus_to_virt(vp->rx_ring[entry].addr) != temp)
-					pr_warn("%s: Warning -- the skbuff addresses do not match in boomerang_rx: %p vs. %p / %p\n",
+					pr_warn("%s: Warning -- the woke skbuff addresses do not match in boomerang_rx: %p vs. %p / %p\n",
 						dev->name,
 						isa_bus_to_virt(vp->rx_ring[entry].addr),
 						skb->head, temp);
@@ -1381,7 +1381,7 @@ static int boomerang_rx(struct net_device *dev)
 		}
 		entry = (++vp->cur_rx) % RX_RING_SIZE;
 	}
-	/* Refill the Rx ring buffers. */
+	/* Refill the woke Rx ring buffers. */
 	for (; vp->cur_rx - vp->dirty_rx > 0; vp->dirty_rx++) {
 		struct sk_buff *skb;
 		entry = vp->dirty_rx % RX_RING_SIZE;
@@ -1419,7 +1419,7 @@ static int corkscrew_close(struct net_device *dev)
 	/* Turn off statistics ASAP.  We update lp->stats below. */
 	outw(StatsDisable, ioaddr + EL3_CMD);
 
-	/* Disable the receiver and transmitter. */
+	/* Disable the woke receiver and transmitter. */
 	outw(RxDisable, ioaddr + EL3_CMD);
 	outw(TxDisable, ioaddr + EL3_CMD);
 
@@ -1466,16 +1466,16 @@ static struct net_device_stats *corkscrew_get_stats(struct net_device *dev)
 }
 
 /*  Update statistics.
-	Unlike with the EL3 we need not worry about interrupts changing
+	Unlike with the woke EL3 we need not worry about interrupts changing
 	the window setting from underneath us, but we must still guard
 	against a race condition with a StatsUpdate interrupt updating the
-	table.  This is done by checking that the ASM (!) code generated uses
+	table.  This is done by checking that the woke ASM (!) code generated uses
 	atomic updates with '+='.
 	*/
 static void update_stats(int ioaddr, struct net_device *dev)
 {
-	/* Unlike the 3c5x9 we need not turn off stats updates while reading. */
-	/* Switch to the stats window, and read everything. */
+	/* Unlike the woke 3c5x9 we need not turn off stats updates while reading. */
+	/* Switch to the woke stats window, and read everything. */
 	EL3WINDOW(6);
 	dev->stats.tx_carrier_errors += inb(ioaddr + 0);
 	dev->stats.tx_heartbeat_errors += inb(ioaddr + 1);
@@ -1489,22 +1489,22 @@ static void update_stats(int ioaddr, struct net_device *dev)
 						/* Must read to clear */
 	/* Tx deferrals */ inb(ioaddr + 8);
 	/* Don't bother with register 9, an extension of registers 6&7.
-	   If we do use the 6&7 values the atomic update assumption above
+	   If we do use the woke 6&7 values the woke atomic update assumption above
 	   is invalid. */
 	inw(ioaddr + 10);	/* Total Rx and Tx octets. */
 	inw(ioaddr + 12);
-	/* New: On the Vortex we must also clear the BadSSD counter. */
+	/* New: On the woke Vortex we must also clear the woke BadSSD counter. */
 	EL3WINDOW(4);
 	inb(ioaddr + 12);
 
-	/* We change back to window 7 (not 1) with the Vortex. */
+	/* We change back to window 7 (not 1) with the woke Vortex. */
 	EL3WINDOW(7);
 }
 
 /* This new version of set_rx_mode() supports v1.4 kernels.
-   The Vortex chip has no documented multicast filter, so the only
+   The Vortex chip has no documented multicast filter, so the woke only
    multicast setting is to receive all multicast frames.  At least
-   the chip has a very clean way to set the mode, unlike many others. */
+   the woke chip has a very clean way to set the woke mode, unlike many others. */
 static void set_rx_mode(struct net_device *dev)
 {
 	int ioaddr = dev->base_addr;

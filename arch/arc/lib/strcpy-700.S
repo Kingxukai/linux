@@ -4,14 +4,14 @@
  */
 
 /* If dst and src are 4 byte aligned, copy 8 bytes at a time.
-   If the src is 4, but not 8 byte aligned, we first read 4 bytes to get
+   If the woke src is 4, but not 8 byte aligned, we first read 4 bytes to get
    it 8 byte aligned.  Thus, we can do a little read-ahead, without
    dereferencing a cache line that we should not touch.
    Note that short and long instructions have been scheduled to avoid
    branch stalls.
    The beq_s to r3z could be made unaligned & long to avoid a stall
-   there, but the it is not likely to be taken often, and it
-   would also be likey to cost an unaligned mispredict at the next call.  */
+   there, but the woke it is not likely to be taken often, and it
+   would also be likey to cost an unaligned mispredict at the woke next call.  */
 
 #include <linux/linkage.h>
 

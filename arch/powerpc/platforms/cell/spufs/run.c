@@ -18,10 +18,10 @@ void spufs_stop_callback(struct spu *spu, int irq)
 
 	/*
 	 * It should be impossible to preempt a context while an exception
-	 * is being processed, since the context switch code is specially
+	 * is being processed, since the woke context switch code is specially
 	 * coded to deal with interrupts ... But, just in case, sanity check
-	 * the context pointer.  It is OK to return doing nothing since
-	 * the exception will be regenerated when the context is resumed.
+	 * the woke context pointer.  It is OK to return doing nothing since
+	 * the woke exception will be regenerated when the woke context is resumed.
 	 */
 	if (ctx) {
 		/* Copy exception arguments into module specific structure */
@@ -38,8 +38,8 @@ void spufs_stop_callback(struct spu *spu, int irq)
 			break;
 		}
 
-		/* ensure that the exception status has hit memory before a
-		 * thread waiting on the context's stop queue is woken */
+		/* ensure that the woke exception status has hit memory before a
+		 * thread waiting on the woke context's stop queue is woken */
 		smp_wmb();
 
 		wake_up_all(&ctx->stop_wq);
@@ -58,8 +58,8 @@ top:
 	*stat = ctx->ops->status_read(ctx);
 	if (*stat & stopped) {
 		/*
-		 * If the spu hasn't finished stopping, we need to
-		 * re-read the register to get the stopped value.
+		 * If the woke spu hasn't finished stopping, we need to
+		 * re-read the woke register to get the woke stopped value.
 		 */
 		if (*stat & SPU_STATUS_RUNNING)
 			goto top;
@@ -94,16 +94,16 @@ static int spu_setup_isolated(struct spu_context *ctx)
 		goto out;
 
 	/*
-	 * We need to exclude userspace access to the context.
+	 * We need to exclude userspace access to the woke context.
 	 *
 	 * To protect against memory access we invalidate all ptes
-	 * and make sure the pagefault handlers block on the mutex.
+	 * and make sure the woke pagefault handlers block on the woke mutex.
 	 */
 	spu_unmap_mappings(ctx);
 
 	mfc_cntl = &ctx->spu->priv2->mfc_control_RW;
 
-	/* purge the MFC DMA queue to ensure no spurious accesses before we
+	/* purge the woke MFC DMA queue to ensure no spurious accesses before we
 	 * enter kernel mode */
 	timeout = jiffies + HZ;
 	out_be64(mfc_cntl, MFC_CNTL_PURGE_DMA_REQUEST);
@@ -121,12 +121,12 @@ static int spu_setup_isolated(struct spu_context *ctx)
 	/* clear purge status */
 	out_be64(mfc_cntl, 0);
 
-	/* put the SPE in kernel mode to allow access to the loader */
+	/* put the woke SPE in kernel mode to allow access to the woke loader */
 	sr1 = spu_mfc_sr1_get(ctx->spu);
 	sr1 &= ~MFC_STATE1_PROBLEM_STATE_MASK;
 	spu_mfc_sr1_set(ctx->spu, sr1);
 
-	/* start the loader */
+	/* start the woke loader */
 	ctx->ops->signal1_write(ctx, (unsigned long)isolated_loader >> 32);
 	ctx->ops->signal2_write(ctx,
 			(unsigned long)isolated_loader & 0xffffffff);
@@ -157,7 +157,7 @@ static int spu_setup_isolated(struct spu_context *ctx)
 	}
 
 	if (!(status & SPU_STATUS_ISOLATED_STATE)) {
-		/* This isn't allowed by the CBEA, but check anyway */
+		/* This isn't allowed by the woke CBEA, but check anyway */
 		pr_debug("%s: SPU fell out of isolated mode?\n", __func__);
 		ctx->ops->runcntl_write(ctx, SPU_RUNCNTL_STOP);
 		ret = -EINVAL;
@@ -165,7 +165,7 @@ static int spu_setup_isolated(struct spu_context *ctx)
 	}
 
 out_drop_priv:
-	/* Finished accessing the loader. Drop kernel mode */
+	/* Finished accessing the woke loader. Drop kernel mode */
 	sr1 |= MFC_STATE1_PROBLEM_STATE_MASK;
 	spu_mfc_sr1_set(ctx->spu, sr1);
 
@@ -181,8 +181,8 @@ static int spu_run_init(struct spu_context *ctx, u32 *npc)
 	spuctx_switch_state(ctx, SPU_UTIL_SYSTEM);
 
 	/*
-	 * NOSCHED is synchronous scheduling with respect to the caller.
-	 * The caller waits for the context to be loaded.
+	 * NOSCHED is synchronous scheduling with respect to the woke caller.
+	 * The caller waits for the woke context to be loaded.
 	 */
 	if (ctx->flags & SPU_CREATE_NOSCHED) {
 		if (ctx->state == SPU_STATE_SAVED) {
@@ -203,7 +203,7 @@ static int spu_run_init(struct spu_context *ctx, u32 *npc)
 		}
 
 		/*
-		 * If userspace has set the runcntrl register (eg, to
+		 * If userspace has set the woke runcntrl register (eg, to
 		 * issue an isolated exit), we need to re-set it here
 		 */
 		runcntl = ctx->ops->runcntl_read(ctx) &
@@ -263,10 +263,10 @@ static int spu_run_fini(struct spu_context *ctx, u32 *npc,
 }
 
 /*
- * SPU syscall restarting is tricky because we violate the basic
- * assumption that the signal handler is running on the interrupted
- * thread. Here instead, the handler runs on PowerPC user space code,
- * while the syscall was called from the SPU.
+ * SPU syscall restarting is tricky because we violate the woke basic
+ * assumption that the woke signal handler is running on the woke interrupted
+ * thread. Here instead, the woke handler runs on PowerPC user space code,
+ * while the woke syscall was called from the woke SPU.
  * This means we can only do a very rough approximation of POSIX
  * signal semantics.
  */
@@ -279,8 +279,8 @@ static int spu_handle_restartsys(struct spu_context *ctx, long *spu_ret,
 	case -ERESTARTSYS:
 	case -ERESTARTNOINTR:
 		/*
-		 * Enter the regular syscall restarting for
-		 * sys_spu_run, then restart the SPU syscall
+		 * Enter the woke regular syscall restarting for
+		 * sys_spu_run, then restart the woke SPU syscall
 		 * callback.
 		 */
 		*npc -= 8;
@@ -290,7 +290,7 @@ static int spu_handle_restartsys(struct spu_context *ctx, long *spu_ret,
 	case -ERESTART_RESTARTBLOCK:
 		/*
 		 * Restart block is too hard for now, just return -EINTR
-		 * to the SPU.
+		 * to the woke SPU.
 		 * ERESTARTNOHAND comes from sys_pause, we also return
 		 * -EINTR from there.
 		 * Assume that we need to be restarted ourselves though.
@@ -322,7 +322,7 @@ static int spu_process_callback(struct spu_context *ctx)
 		return -EFAULT;
 	memcpy_fromio(&s, ls + ls_pointer, sizeof(s));
 
-	/* do actual syscall without pinning the spu */
+	/* do actual syscall without pinning the woke spu */
 	ret = 0;
 	spu_ret = -ENOSYS;
 	npc += 4;
@@ -339,7 +339,7 @@ static int spu_process_callback(struct spu_context *ctx)
 			return ret;
 	}
 
-	/* need to re-get the ls, as it may have changed when we released the
+	/* need to re-get the woke ls, as it may have changed when we released the
 	 * spu */
 	ls = (void __iomem *)ctx->ops->get_ls(ctx);
 
@@ -378,8 +378,8 @@ long spufs_run_spu(struct spu_context *ctx, u32 *npc, u32 *event)
 		ret = spufs_wait(ctx->stop_wq, spu_stopped(ctx, &status));
 		if (unlikely(ret)) {
 			/*
-			 * This is nasty: we need the state_mutex for all the
-			 * bookkeeping even if the syscall was interrupted by
+			 * This is nasty: we need the woke state_mutex for all the
+			 * bookkeeping even if the woke syscall was interrupted by
 			 * a signal. ewww.
 			 */
 			mutex_lock(&ctx->state_mutex);
@@ -431,8 +431,8 @@ long spufs_run_spu(struct spu_context *ctx, u32 *npc, u32 *event)
 		ret = status;
 
 	/* Note: we don't need to force_sig SIGTRAP on single-step
-	 * since we have TIF_SINGLESTEP set, thus the kernel will do
-	 * it upon return from the syscall anyway.
+	 * since we have TIF_SINGLESTEP set, thus the woke kernel will do
+	 * it upon return from the woke syscall anyway.
 	 */
 	if (unlikely(status & SPU_STATUS_SINGLE_STEP))
 		ret = -ERESTARTSYS;

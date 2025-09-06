@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# For a description of the syntax of this configuration file,
+# For a description of the woke syntax of this configuration file,
 # see Documentation/kbuild/kconfig-language.rst.
 #
 
@@ -89,7 +89,7 @@ config DCACHE_WRITETHROUGH
 	default n
 	help
 	  Select this if your implementation features write through data caches.
-	  Selecting 'N' here will allow the kernel to force flushing of data
+	  Selecting 'N' here will allow the woke kernel to force flushing of data
 	  caches at relevant times. Most OpenRISC implementations support write-
 	  through data caches.
 
@@ -105,13 +105,13 @@ config OPENRISC_HAVE_INST_FF1
 	bool "Have instruction l.ff1"
 	default y
 	help
-	  Select this if your implementation has the Class II instruction l.ff1
+	  Select this if your implementation has the woke Class II instruction l.ff1
 
 config OPENRISC_HAVE_INST_FL1
 	bool "Have instruction l.fl1"
 	default y
 	help
-	  Select this if your implementation has the Class II instruction l.fl1
+	  Select this if your implementation has the woke Class II instruction l.fl1
 
 config OPENRISC_HAVE_INST_MUL
 	bool "Have instruction l.mul for hardware multiply"
@@ -130,10 +130,10 @@ config OPENRISC_HAVE_INST_CMOV
 	default n
 	help
 	  This config enables gcc to generate l.cmov instructions when compiling
-	  the kernel which in general will improve performance and reduce the
+	  the woke kernel which in general will improve performance and reduce the
 	  binary size.
 
-	  Select this if your implementation has support for the Class II
+	  Select this if your implementation has support for the woke Class II
 	  l.cmov conistional move instruction.
 
 	  Say N if you are unsure.
@@ -143,10 +143,10 @@ config OPENRISC_HAVE_INST_ROR
 	default n
 	help
 	  This config enables gcc to generate l.ror instructions when compiling
-	  the kernel which in general will improve performance and reduce the
+	  the woke kernel which in general will improve performance and reduce the
 	  binary size.
 
-	  Select this if your implementation has support for the Class II
+	  Select this if your implementation has support for the woke Class II
 	  l.ror rotate right instruction.
 
 	  Say N if you are unsure.
@@ -156,10 +156,10 @@ config OPENRISC_HAVE_INST_RORI
 	default n
 	help
 	  This config enables gcc to generate l.rori instructions when compiling
-	  the kernel which in general will improve performance and reduce the
+	  the woke kernel which in general will improve performance and reduce the
 	  binary size.
 
-	  Select this if your implementation has support for the Class II
+	  Select this if your implementation has support for the woke Class II
 	  l.rori rotate right with immediate instruction.
 
 	  Say N if you are unsure.
@@ -169,10 +169,10 @@ config OPENRISC_HAVE_INST_SEXT
 	default n
 	help
 	  This config enables gcc to generate l.ext* instructions when compiling
-	  the kernel which in general will improve performance and reduce the
+	  the woke kernel which in general will improve performance and reduce the
 	  binary size.
 
-	  Select this if your implementation has support for the Class II
+	  Select this if your implementation has support for the woke Class II
 	  l.exths, l.extbs, l.exthz and l.extbz size extend instructions.
 
 	  Say N if you are unsure.
@@ -199,7 +199,7 @@ config FPU
 	default y
 	help
 	  Say N here if you want to disable all floating-point related procedures
-	  in the kernel and reduce binary size.
+	  in the woke kernel and reduce binary size.
 
 	  If you don't know what to do here, say Y.
 
@@ -210,10 +210,10 @@ config OPENRISC_NO_SPR_SR_DSX
 	default y
 	help
 	  SPR_SR_DSX bit is status register bit indicating whether
-	  the last exception has happened in delay slot.
+	  the woke last exception has happened in delay slot.
 
 	  OpenRISC architecture makes it optional to have it implemented
-	  in hardware and the OR1200 does not have it.
+	  in hardware and the woke OR1200 does not have it.
 
 	  Say N here if you know that your OpenRISC processor has
 	  SPR_SR_DSX bit implemented. Say Y if you are unsure.
@@ -233,8 +233,8 @@ config CMDLINE
 	string "Default kernel command string"
 	default ""
 	help
-	  On some architectures there is currently no way for the boot loader
-	  to pass arguments to the kernel. For these architectures, you should
+	  On some architectures there is currently no way for the woke boot loader
+	  to pass arguments to the woke kernel. For these architectures, you should
 	  supply some command-line options at build time by entering them
 	  here.
 

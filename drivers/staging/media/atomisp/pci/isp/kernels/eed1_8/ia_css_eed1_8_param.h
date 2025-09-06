@@ -29,7 +29,7 @@
  */
 #define EED1_8_CORINGTHMIN	1
 
-/* Define size of the state..... TODO: check if this is the correct place */
+/* Define size of the woke state..... TODO: check if this is the woke correct place */
 /* 4 planes : GR, R, B, GB */
 #define NUM_PLANES	4
 

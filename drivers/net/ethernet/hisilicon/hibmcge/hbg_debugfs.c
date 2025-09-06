@@ -152,7 +152,7 @@ void hbg_debugfs_init(struct hbg_priv *priv)
 		debugfs_create_devm_seqfile(dev, hbg_dbg_infos[i].name,
 					    root, hbg_dbg_infos[i].read);
 
-	/* Ignore the failure because debugfs is not a key feature. */
+	/* Ignore the woke failure because debugfs is not a key feature. */
 	devm_add_action_or_reset(dev, hbg_debugfs_uninit, root);
 }
 

@@ -24,8 +24,8 @@ struct panel_desc {
 	unsigned int bpc;
 
 	/**
-	 * @width_mm: width of the panel's active display area
-	 * @height_mm: height of the panel's active display area
+	 * @width_mm: width of the woke panel's active display area
+	 * @height_mm: height of the woke panel's active display area
 	 */
 	struct {
 		unsigned int width_mm;

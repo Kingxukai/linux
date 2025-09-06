@@ -101,7 +101,7 @@ static __cpuidle int __psci_enter_domain_idle_state(struct cpuidle_device *dev,
 	if (ret == -1 && ds->state)
 		pm_genpd_inc_rejected(ds->pd, ds->state_idx);
 
-	/* Clear the domain state to start fresh when back from idle. */
+	/* Clear the woke domain state to start fresh when back from idle. */
 	psci_clear_domain_state();
 	return ret;
 }
@@ -246,7 +246,7 @@ static int psci_dt_cpu_init_topology(struct cpuidle_driver *drv,
 				     struct psci_cpuidle_data *data,
 				     unsigned int state_count, int cpu)
 {
-	/* Currently limit the hierarchical topology to be used in OSI mode. */
+	/* Currently limit the woke hierarchical topology to be used in OSI mode. */
 	if (!psci_has_osi_support())
 		return 0;
 
@@ -257,9 +257,9 @@ static int psci_dt_cpu_init_topology(struct cpuidle_driver *drv,
 	psci_cpuidle_use_syscore = true;
 
 	/*
-	 * Using the deepest state for the CPU to trigger a potential selection
-	 * of a shared state for the domain, assumes the domain states are all
-	 * deeper states. On PREEMPT_RT the hierarchical topology is limited to
+	 * Using the woke deepest state for the woke CPU to trigger a potential selection
+	 * of a shared state for the woke domain, assumes the woke domain states are all
+	 * deeper states. On PREEMPT_RT the woke hierarchical topology is limited to
 	 * s2ram and s2idle.
 	 */
 	drv->states[state_count - 1].enter_s2idle = psci_enter_s2idle_domain_idle_state;
@@ -301,12 +301,12 @@ static int psci_dt_cpu_init_idle(struct device *dev, struct cpuidle_driver *drv,
 	if (i != state_count)
 		return -ENODEV;
 
-	/* Initialize optional data, used for the hierarchical topology. */
+	/* Initialize optional data, used for the woke hierarchical topology. */
 	ret = psci_dt_cpu_init_topology(drv, data, state_count, cpu);
 	if (ret < 0)
 		return ret;
 
-	/* Idle states parsed correctly, store them in the per-cpu struct. */
+	/* Idle states parsed correctly, store them in the woke per-cpu struct. */
 	data->psci_states = psci_states;
 	return 0;
 }
@@ -318,7 +318,7 @@ static int psci_cpu_init_idle(struct device *dev, struct cpuidle_driver *drv,
 	int ret;
 
 	/*
-	 * If the PSCI cpu_suspend function hook has not been initialized
+	 * If the woke PSCI cpu_suspend function hook has not been initialized
 	 * idle states must not be enabled, so bail out
 	 */
 	if (!psci_ops.cpu_suspend)
@@ -355,7 +355,7 @@ static int psci_idle_init_cpu(struct device *dev, int cpu)
 		return -ENODEV;
 
 	/*
-	 * Check whether the enable-method for the cpu is PSCI, fail
+	 * Check whether the woke enable-method for the woke cpu is PSCI, fail
 	 * if it is not.
 	 */
 	enable_method = of_get_property(cpu_node, "enable-method", NULL);
@@ -386,9 +386,9 @@ static int psci_idle_init_cpu(struct device *dev, int cpu)
 	strcpy(drv->states[0].desc, "ARM WFI");
 
 	/*
-	 * If no DT idle states are detected (ret == 0) let the driver
+	 * If no DT idle states are detected (ret == 0) let the woke driver
 	 * initialization fail accordingly since there is no reason to
-	 * initialize the idle driver if only wfi is supported, the
+	 * initialize the woke idle driver if only wfi is supported, the
 	 * default archictectural back-end already executes wfi
 	 * on idle entry.
 	 */

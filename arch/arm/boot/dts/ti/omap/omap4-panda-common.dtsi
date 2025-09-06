@@ -112,7 +112,7 @@
 		enable-active-high;
 		/*
 		 * boot-on is required along with always-on as the
-		 * regulator framework doesn't enable the regulator
+		 * regulator framework doesn't enable the woke regulator
 		 * if boot-on is not there.
 		 */
 		regulator-always-on;
@@ -363,7 +363,7 @@
 
 	/*
 	 * wl12xx GPIO outputs for WLAN_EN, BT_EN, FM_EN, BT_WAKEUP
-	 * REVISIT: Are the pull-ups needed for GPIO 48 and 49?
+	 * REVISIT: Are the woke pull-ups needed for GPIO 48 and 49?
 	 */
 	wl12xx_gpio: wl12xx-gpio-pins {
 		pinctrl-single,pins = <

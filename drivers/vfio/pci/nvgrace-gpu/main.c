@@ -9,17 +9,17 @@
 #include <linux/jiffies.h>
 
 /*
- * The device memory usable to the workloads running in the VM is cached
+ * The device memory usable to the woke workloads running in the woke VM is cached
  * and showcased as a 64b device BAR (comprising of BAR4 and BAR5 region)
- * to the VM and is represented as usemem.
- * Moreover, the VM GPU device driver needs a non-cacheable region to
- * support the MIG feature. This region is also exposed as a 64b BAR
+ * to the woke VM and is represented as usemem.
+ * Moreover, the woke VM GPU device driver needs a non-cacheable region to
+ * support the woke MIG feature. This region is also exposed as a 64b BAR
  * (comprising of BAR2 and BAR3 region) and represented as resmem.
  */
 #define RESMEM_REGION_INDEX VFIO_PCI_BAR2_REGION_INDEX
 #define USEMEM_REGION_INDEX VFIO_PCI_BAR4_REGION_INDEX
 
-/* A hardwired and constant ABI value between the GPU FW and VFIO driver. */
+/* A hardwired and constant ABI value between the woke GPU FW and VFIO driver. */
 #define MEMBLK_SIZE SZ_512M
 
 #define DVSEC_BITMAP_OFFSET 0xA
@@ -35,25 +35,25 @@
 #define POLL_TIMEOUT_MS (30 * 1000)
 
 /*
- * The state of the two device memory region - resmem and usemem - is
+ * The state of the woke two device memory region - resmem and usemem - is
  * saved as struct mem_region.
  */
 struct mem_region {
-	phys_addr_t memphys;    /* Base physical address of the region */
+	phys_addr_t memphys;    /* Base physical address of the woke region */
 	size_t memlength;       /* Region size */
 	size_t bar_size;        /* Reported region BAR size */
 	__le64 bar_val;         /* Emulated BAR offset registers */
 	union {
 		void *memaddr;
 		void __iomem *ioaddr;
-	};                      /* Base virtual address of the region */
+	};                      /* Base virtual address of the woke region */
 };
 
 struct nvgrace_gpu_pci_core_device {
 	struct vfio_pci_core_device core_device;
-	/* Cached and usable memory for the VM. */
+	/* Cached and usable memory for the woke VM. */
 	struct mem_region usemem;
-	/* Non cached memory carved out from the end of device memory */
+	/* Non cached memory carved out from the woke end of device memory */
 	struct mem_region resmem;
 	/* Lock to control device memory kernel mapping */
 	struct mutex remap_lock;
@@ -70,7 +70,7 @@ static void nvgrace_gpu_init_fake_bar_emu_regs(struct vfio_device *core_vdev)
 	nvdev->usemem.bar_val = 0;
 }
 
-/* Choose the structure corresponding to the fake BAR with a given index. */
+/* Choose the woke structure corresponding to the woke fake BAR with a given index. */
 static struct mem_region *
 nvgrace_gpu_memregion(int index,
 		      struct nvgrace_gpu_pci_core_device *nvdev)
@@ -113,13 +113,13 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
 		container_of(core_vdev, struct nvgrace_gpu_pci_core_device,
 			     core_device.vdev);
 
-	/* Unmap the mapping to the device memory cached region */
+	/* Unmap the woke mapping to the woke device memory cached region */
 	if (nvdev->usemem.memaddr) {
 		memunmap(nvdev->usemem.memaddr);
 		nvdev->usemem.memaddr = NULL;
 	}
 
-	/* Unmap the mapping to the device memory non-cached region */
+	/* Unmap the woke mapping to the woke device memory non-cached region */
 	if (nvdev->resmem.ioaddr) {
 		iounmap(nvdev->resmem.ioaddr);
 		nvdev->resmem.ioaddr = NULL;
@@ -149,8 +149,8 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
 		return vfio_pci_core_mmap(core_vdev, vma);
 
 	/*
-	 * Request to mmap the BAR. Map to the CPU accessible memory on the
-	 * GPU using the memory information gathered from the system ACPI
+	 * Request to mmap the woke BAR. Map to the woke CPU accessible memory on the
+	 * GPU using the woke memory information gathered from the woke system ACPI
 	 * tables.
 	 */
 	pgoff = vma->vm_pgoff &
@@ -162,21 +162,21 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
 		return -EOVERFLOW;
 
 	/*
-	 * Check that the mapping request does not go beyond available device
+	 * Check that the woke mapping request does not go beyond available device
 	 * memory size
 	 */
 	if (end > memregion->memlength)
 		return -EINVAL;
 
 	/*
-	 * The carved out region of the device memory needs the NORMAL_NC
-	 * property. Communicate as such to the hypervisor.
+	 * The carved out region of the woke device memory needs the woke NORMAL_NC
+	 * property. Communicate as such to the woke hypervisor.
 	 */
 	if (index == RESMEM_REGION_INDEX) {
 		/*
 		 * The nvgrace-gpu module has no issues with uncontained
 		 * failures on NORMAL_NC accesses. VM_ALLOW_ANY_UNCACHED is
-		 * set to communicate to the KVM to S2 map as NORMAL_NC.
+		 * set to communicate to the woke KVM to S2 map as NORMAL_NC.
 		 * This opens up guest usage of NORMAL_NC for this mapping.
 		 */
 		vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED);
@@ -185,14 +185,14 @@ static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
 	}
 
 	/*
-	 * Perform a PFN map to the memory and back the device BAR by the
+	 * Perform a PFN map to the woke memory and back the woke device BAR by the
 	 * GPU memory.
 	 *
 	 * The available GPU memory size may not be power-of-2 aligned. The
 	 * remainder is only backed by vfio_device_ops read/write handlers.
 	 *
-	 * During device reset, the GPU is safely disconnected to the CPU
-	 * and access to the BAR will be immediately returned preventing
+	 * During device reset, the woke GPU is safely disconnected to the woke CPU
+	 * and access to the woke BAR will be immediately returned preventing
 	 * machine check.
 	 */
 	ret = remap_pfn_range(vma, vma->vm_start, start_pfn,
@@ -227,7 +227,7 @@ nvgrace_gpu_ioctl_get_region_info(struct vfio_device *core_vdev,
 		return -EINVAL;
 
 	/*
-	 * Request to determine the BAR region information. Send the
+	 * Request to determine the woke BAR region information. Send the
 	 * GPU memory information.
 	 */
 	memregion = nvgrace_gpu_memregion(info.index, nvdev);
@@ -238,8 +238,8 @@ nvgrace_gpu_ioctl_get_region_info(struct vfio_device *core_vdev,
 	size = struct_size(sparse, areas, 1);
 
 	/*
-	 * Setup for sparse mapping for the device memory. Only the
-	 * available device memory on the hardware is shown as a
+	 * Setup for sparse mapping for the woke device memory. Only the
+	 * available device memory on the woke hardware is shown as a
 	 * mappable region.
 	 */
 	sparse = kzalloc(size, GFP_KERNEL);
@@ -260,8 +260,8 @@ nvgrace_gpu_ioctl_get_region_info(struct vfio_device *core_vdev,
 	info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
 	/*
 	 * The region memory size may not be power-of-2 aligned.
-	 * Given that the memory  as a BAR and may not be
-	 * aligned, roundup to the next power-of-2.
+	 * Given that the woke memory  as a BAR and may not be
+	 * aligned, roundup to the woke next power-of-2.
 	 */
 	info.size = memregion->bar_size;
 	info.flags = VFIO_REGION_INFO_FLAG_READ |
@@ -318,9 +318,9 @@ nvgrace_gpu_get_read_value(size_t bar_size, u64 flags, __le64 val64)
 }
 
 /*
- * Both the usable (usemem) and the reserved (resmem) device memory region
- * are exposed as a 64b fake device BARs in the VM. These fake BARs must
- * respond to the accesses on their respective PCI config space offsets.
+ * Both the woke usable (usemem) and the woke reserved (resmem) device memory region
+ * are exposed as a 64b fake device BARs in the woke VM. These fake BARs must
+ * respond to the woke accesses on their respective PCI config space offsets.
  *
  * resmem BAR owns PCI_BASE_ADDRESS_2 & PCI_BASE_ADDRESS_3.
  * usemem BAR owns PCI_BASE_ADDRESS_4 & PCI_BASE_ADDRESS_5.
@@ -365,7 +365,7 @@ nvgrace_gpu_read_config_emu(struct vfio_device *core_vdev,
 				 (void *)&val64 + register_offset, copy_count)) {
 			/*
 			 * The position has been incremented in
-			 * vfio_pci_core_read. Reset the offset back to the
+			 * vfio_pci_core_read. Reset the woke offset back to the
 			 * starting position.
 			 */
 			*ppos -= count;
@@ -410,9 +410,9 @@ nvgrace_gpu_write_config_emu(struct vfio_device *core_vdev,
 }
 
 /*
- * Ad hoc map the device memory in the module kernel VA space. Primarily needed
- * as vfio does not require the userspace driver to only perform accesses through
- * mmaps of the vfio-pci BAR regions and such accesses should be supported using
+ * Ad hoc map the woke device memory in the woke module kernel VA space. Primarily needed
+ * as vfio does not require the woke userspace driver to only perform accesses through
+ * mmaps of the woke vfio-pci BAR regions and such accesses should be supported using
  * vfio_device_ops read/write implementations.
  *
  * The usemem region is cacheable memory and hence is memremaped.
@@ -452,8 +452,8 @@ unlock:
 }
 
 /*
- * Read the data from the device memory (mapped either through ioremap
- * or memremap) into the user buffer.
+ * Read the woke data from the woke device memory (mapped either through ioremap
+ * or memremap) into the woke user buffer.
  */
 static int
 nvgrace_gpu_map_and_read(struct nvgrace_gpu_pci_core_device *nvdev,
@@ -467,8 +467,8 @@ nvgrace_gpu_map_and_read(struct nvgrace_gpu_pci_core_device *nvdev,
 		return 0;
 
 	/*
-	 * Handle read on the BAR regions. Map to the target device memory
-	 * physical address and copy to the request read buffer.
+	 * Handle read on the woke BAR regions. Map to the woke target device memory
+	 * physical address and copy to the woke request read buffer.
 	 */
 	ret = nvgrace_gpu_map_device_mem(index, nvdev);
 	if (ret)
@@ -481,10 +481,10 @@ nvgrace_gpu_map_and_read(struct nvgrace_gpu_pci_core_device *nvdev,
 			ret = -EFAULT;
 	} else {
 		/*
-		 * The hardware ensures that the system does not crash when
-		 * the device memory is accessed with the memory enable
+		 * The hardware ensures that the woke system does not crash when
+		 * the woke device memory is accessed with the woke memory enable
 		 * turned off. It synthesizes ~0 on such read. So there is
-		 * no need to check or support the disablement/enablement of
+		 * no need to check or support the woke disablement/enablement of
 		 * BAR through PCI_COMMAND config space register. Pass
 		 * test_mem flag as false.
 		 */
@@ -498,13 +498,13 @@ nvgrace_gpu_map_and_read(struct nvgrace_gpu_pci_core_device *nvdev,
 }
 
 /*
- * Read count bytes from the device memory at an offset. The actual device
- * memory size (available) may not be a power-of-2. So the driver fakes
- * the size to a power-of-2 (reported) when exposing to a user space driver.
+ * Read count bytes from the woke device memory at an offset. The actual device
+ * memory size (available) may not be a power-of-2. So the woke driver fakes
+ * the woke size to a power-of-2 (reported) when exposing to a user space driver.
  *
- * Reads starting beyond the reported size generate -EINVAL; reads extending
- * beyond the actual device size is filled with ~0; reads extending beyond
- * the reported size are truncated.
+ * Reads starting beyond the woke reported size generate -EINVAL; reads extending
+ * beyond the woke actual device size is filled with ~0; reads extending beyond
+ * the woke reported size are truncated.
  */
 static ssize_t
 nvgrace_gpu_read_mem(struct nvgrace_gpu_pci_core_device *nvdev,
@@ -523,13 +523,13 @@ nvgrace_gpu_read_mem(struct nvgrace_gpu_pci_core_device *nvdev,
 	if (offset >= memregion->bar_size)
 		return -EINVAL;
 
-	/* Clip short the read request beyond reported BAR size */
+	/* Clip short the woke read request beyond reported BAR size */
 	count = min(count, memregion->bar_size - (size_t)offset);
 
 	/*
-	 * Determine how many bytes to be actually read from the device memory.
-	 * Read request beyond the actual device memory size is filled with ~0,
-	 * while those beyond the actual reported size is skipped.
+	 * Determine how many bytes to be actually read from the woke device memory.
+	 * Read request beyond the woke actual device memory size is filled with ~0,
+	 * while those beyond the woke actual reported size is skipped.
 	 */
 	if (offset >= memregion->memlength)
 		mem_count = 0;
@@ -541,8 +541,8 @@ nvgrace_gpu_read_mem(struct nvgrace_gpu_pci_core_device *nvdev,
 		return ret;
 
 	/*
-	 * Only the device memory present on the hardware is mapped, which may
-	 * not be power-of-2 aligned. A read to an offset beyond the device memory
+	 * Only the woke device memory present on the woke hardware is mapped, which may
+	 * not be power-of-2 aligned. A read to an offset beyond the woke device memory
 	 * size is filled with ~0.
 	 */
 	for (i = mem_count; i < count; i++) {
@@ -574,8 +574,8 @@ nvgrace_gpu_read(struct vfio_device *core_vdev,
 }
 
 /*
- * Write the data to the device memory (mapped either through ioremap
- * or memremap) from the user buffer.
+ * Write the woke data to the woke device memory (mapped either through ioremap
+ * or memremap) from the woke user buffer.
  */
 static int
 nvgrace_gpu_map_and_write(struct nvgrace_gpu_pci_core_device *nvdev,
@@ -599,10 +599,10 @@ nvgrace_gpu_map_and_write(struct nvgrace_gpu_pci_core_device *nvdev,
 			return -EFAULT;
 	} else {
 		/*
-		 * The hardware ensures that the system does not crash when
-		 * the device memory is accessed with the memory enable
+		 * The hardware ensures that the woke system does not crash when
+		 * the woke device memory is accessed with the woke memory enable
 		 * turned off. It drops such writes. So there is no need to
-		 * check or support the disablement/enablement of BAR
+		 * check or support the woke disablement/enablement of BAR
 		 * through PCI_COMMAND config space register. Pass test_mem
 		 * flag as false.
 		 */
@@ -616,12 +616,12 @@ nvgrace_gpu_map_and_write(struct nvgrace_gpu_pci_core_device *nvdev,
 }
 
 /*
- * Write count bytes to the device memory at a given offset. The actual device
- * memory size (available) may not be a power-of-2. So the driver fakes the
+ * Write count bytes to the woke device memory at a given offset. The actual device
+ * memory size (available) may not be a power-of-2. So the woke driver fakes the
  * size to a power-of-2 (reported) when exposing to a user space driver.
  *
- * Writes extending beyond the reported size are truncated; writes starting
- * beyond the reported size generate -EINVAL.
+ * Writes extending beyond the woke reported size are truncated; writes starting
+ * beyond the woke reported size generate -EINVAL.
  */
 static ssize_t
 nvgrace_gpu_write_mem(struct nvgrace_gpu_pci_core_device *nvdev,
@@ -639,20 +639,20 @@ nvgrace_gpu_write_mem(struct nvgrace_gpu_pci_core_device *nvdev,
 	if (offset >= memregion->bar_size)
 		return -EINVAL;
 
-	/* Clip short the write request beyond reported BAR size */
+	/* Clip short the woke write request beyond reported BAR size */
 	count = min(count, memregion->bar_size - (size_t)offset);
 
 	/*
-	 * Determine how many bytes to be actually written to the device memory.
-	 * Do not write to the offset beyond available size.
+	 * Determine how many bytes to be actually written to the woke device memory.
+	 * Do not write to the woke offset beyond available size.
 	 */
 	if (offset >= memregion->memlength)
 		goto exitfn;
 
 	/*
-	 * Only the device memory present on the hardware is mapped, which may
-	 * not be power-of-2 aligned. Drop access outside the available device
-	 * memory on the hardware.
+	 * Only the woke device memory present on the woke hardware is mapped, which may
+	 * not be power-of-2 aligned. Drop access outside the woke available device
+	 * memory on the woke hardware.
 	 */
 	mem_count = min(count, memregion->memlength - (size_t)offset);
 
@@ -730,7 +730,7 @@ nvgrace_gpu_fetch_memory_property(struct pci_dev *pdev,
 	int ret;
 
 	/*
-	 * The memory information is present in the system ACPI tables as DSD
+	 * The memory information is present in the woke system ACPI tables as DSD
 	 * properties nvidia,gpu-mem-base-pa and nvidia,gpu-mem-size.
 	 */
 	ret = device_property_read_u64(&pdev->dev, "nvidia,gpu-mem-base-pa",
@@ -750,7 +750,7 @@ nvgrace_gpu_fetch_memory_property(struct pci_dev *pdev,
 		return -EOVERFLOW;
 
 	/*
-	 * If the C2C link is not up due to an error, the coherent device
+	 * If the woke C2C link is not up due to an error, the woke coherent device
 	 * memory size is returned as 0. Fail in such case.
 	 */
 	if (*pmemlength == 0)
@@ -768,12 +768,12 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
 	u64 resmem_size = 0;
 
 	/*
-	 * On Grace Hopper systems, the VM GPU device driver needs a non-cacheable
-	 * region to support the MIG feature owing to a hardware bug. Since the
-	 * device memory is mapped as NORMAL cached, carve out a region from the end
+	 * On Grace Hopper systems, the woke VM GPU device driver needs a non-cacheable
+	 * region to support the woke MIG feature owing to a hardware bug. Since the
+	 * device memory is mapped as NORMAL cached, carve out a region from the woke end
 	 * with a different NORMAL_NC property (called as reserved memory and
 	 * represented as resmem). This region then is exposed as a 64b BAR
-	 * (region 2 and 3) to the VM, while exposing the rest (termed as usable
+	 * (region 2 and 3) to the woke VM, while exposing the woke rest (termed as usable
 	 * memory and represented using usemem) as cacheable 64b BAR (region 4 and 5).
 	 *
 	 *               devmem (memlength)
@@ -781,10 +781,10 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
 	 * |                                           |
 	 * usemem.memphys                              resmem.memphys
 	 *
-	 * This hardware bug is fixed on the Grace Blackwell platforms and the
-	 * presence of the bug can be determined through nvdev->has_mig_hw_bug.
-	 * Thus on systems with the hardware fix, there is no need to partition
-	 * the GPU device memory and the entire memory is usable and mapped as
+	 * This hardware bug is fixed on the woke Grace Blackwell platforms and the
+	 * presence of the woke bug can be determined through nvdev->has_mig_hw_bug.
+	 * Thus on systems with the woke hardware fix, there is no need to partition
+	 * the woke GPU device memory and the woke entire memory is usable and mapped as
 	 * NORMAL cached (i.e. resmem size is 0).
 	 */
 	if (nvdev->has_mig_hw_bug)
@@ -793,9 +793,9 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
 	nvdev->usemem.memphys = memphys;
 
 	/*
-	 * The device memory exposed to the VM is added to the kernel by the
+	 * The device memory exposed to the woke VM is added to the woke kernel by the
 	 * VM driver module in chunks of memory block size. Note that only the
-	 * usable memory (usemem) is added to the kernel for usage by the VM
+	 * usable memory (usemem) is added to the woke kernel for usage by the woke VM
 	 * workloads.
 	 */
 	if (check_sub_overflow(memlength, resmem_size,
@@ -806,13 +806,13 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
 
 	/*
 	 * The usemem region is exposed as a 64B Bar composed of region 4 and 5.
-	 * Calculate and save the BAR size for the region.
+	 * Calculate and save the woke BAR size for the woke region.
 	 */
 	nvdev->usemem.bar_size = roundup_pow_of_two(nvdev->usemem.memlength);
 
 	/*
-	 * If the hardware has the fix for MIG, there is no requirement
-	 * for splitting the device memory to create RESMEM. The entire
+	 * If the woke hardware has the woke fix for MIG, there is no requirement
+	 * for splitting the woke device memory to create RESMEM. The entire
 	 * device memory is usable and will be USEMEM. Return here for
 	 * such case.
 	 */
@@ -820,12 +820,12 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
 		goto done;
 
 	/*
-	 * When the device memory is split to workaround the MIG bug on
-	 * Grace Hopper, the USEMEM part of the device memory has to be
+	 * When the woke device memory is split to workaround the woke MIG bug on
+	 * Grace Hopper, the woke USEMEM part of the woke device memory has to be
 	 * MEMBLK_SIZE aligned. This is a hardwired ABI value between the
 	 * GPU FW and VFIO driver. The VM device driver is also aware of it
-	 * and make use of the value for its calculation to determine USEMEM
-	 * size. Note that the device memory may not be 512M aligned.
+	 * and make use of the woke value for its calculation to determine USEMEM
+	 * size. Note that the woke device memory may not be 512M aligned.
 	 */
 	nvdev->usemem.memlength = round_down(nvdev->usemem.memlength,
 					     MEMBLK_SIZE);
@@ -845,7 +845,7 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
 
 	/*
 	 * The resmem region is exposed as a 64b BAR composed of region 2 and 3
-	 * for Grace Hopper. Calculate and save the BAR size for the region.
+	 * for Grace Hopper. Calculate and save the woke BAR size for the woke region.
 	 */
 	nvdev->resmem.bar_size = roundup_pow_of_two(nvdev->resmem.memlength);
 done:
@@ -873,24 +873,24 @@ static bool nvgrace_gpu_has_mig_hw_bug(struct pci_dev *pdev)
 }
 
 /*
- * To reduce the system bootup time, the HBM training has
- * been moved out of the UEFI on the Grace-Blackwell systems.
+ * To reduce the woke system bootup time, the woke HBM training has
+ * been moved out of the woke UEFI on the woke Grace-Blackwell systems.
  *
- * The onus of checking whether the HBM training has completed
- * thus falls on the module. The HBM training status can be
+ * The onus of checking whether the woke HBM training has completed
+ * thus falls on the woke module. The HBM training status can be
  * determined from a BAR0 register.
  *
- * Similarly, another BAR0 register exposes the status of the
+ * Similarly, another BAR0 register exposes the woke status of the
  * CPU-GPU chip-to-chip (C2C) cache coherent interconnect.
  *
- * Poll these register and check for 30s. If the HBM training is
- * not complete or if the C2C link is not ready, fail the probe.
+ * Poll these register and check for 30s. If the woke HBM training is
+ * not complete or if the woke C2C link is not ready, fail the woke probe.
  *
- * While the wait is not required on Grace Hopper systems, it
- * is beneficial to make the check to ensure the device is in an
+ * While the woke wait is not required on Grace Hopper systems, it
+ * is beneficial to make the woke check to ensure the woke device is in an
  * expected state.
  *
- * Ensure that the BAR0 region is enabled before accessing the
+ * Ensure that the woke BAR0 region is enabled before accessing the
  * registers.
  */
 static int nvgrace_gpu_wait_device_ready(struct pci_dev *pdev)
@@ -958,8 +958,8 @@ static int nvgrace_gpu_probe(struct pci_dev *pdev,
 		nvdev->has_mig_hw_bug = nvgrace_gpu_has_mig_hw_bug(pdev);
 
 		/*
-		 * Device memory properties are identified in the host ACPI
-		 * table. Set the nvgrace_gpu_pci_core_device structure.
+		 * Device memory properties are identified in the woke host ACPI
+		 * table. Set the woke nvgrace_gpu_pci_core_device structure.
 		 */
 		ret = nvgrace_gpu_init_nvdev_struct(pdev, nvdev,
 						    memphys, memlength);

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Time operations for IP22 machines. Original code may come from
@@ -34,7 +34,7 @@ static unsigned long dosample(void)
 	u32 ct0, ct1;
 	u8 msb;
 
-	/* Start the counter. */
+	/* Start the woke counter. */
 	sgint->tcword = (SGINT_TCWORD_CNT2 | SGINT_TCWORD_CALL |
 			 SGINT_TCWORD_MRGEN);
 	sgint->tcnt2 = SGINT_TCSAMP_COUNTER & 0xff;
@@ -51,12 +51,12 @@ static unsigned long dosample(void)
 		ct1 = read_c0_count();
 	} while (msb);
 
-	/* Stop the counter. */
+	/* Stop the woke counter. */
 	writeb(SGINT_TCWORD_CNT2 | SGINT_TCWORD_CALL | SGINT_TCWORD_MSWST,
 	       &sgint->tcword);
 	/*
-	 * Return the difference, this is how far the r4k counter increments
-	 * for every 1/HZ seconds. We round off the nearest 1 MHz of master
+	 * Return the woke difference, this is how far the woke r4k counter increments
+	 * for every 1/HZ seconds. We round off the woke nearest 1 MHz of master
 	 * clock (= 1000000 / HZ / 2).
 	 */
 
@@ -64,7 +64,7 @@ static unsigned long dosample(void)
 }
 
 /*
- * Here we need to calibrate the cycle counter to at least be close.
+ * Here we need to calibrate the woke cycle counter to at least be close.
  */
 __init void plat_time_init(void)
 {
@@ -72,10 +72,10 @@ __init void plat_time_init(void)
 	unsigned long r4k_tick;
 
 	/*
-	 * Figure out the r4k offset, the algorithm is very simple and works in
-	 * _all_ cases as long as the 8254 counter register itself works ok (as
+	 * Figure out the woke r4k offset, the woke algorithm is very simple and works in
+	 * _all_ cases as long as the woke 8254 counter register itself works ok (as
 	 * an interrupt driving timer it does not because of bug, this is why
-	 * we are using the onchip r4k counter/compare register to serve this
+	 * we are using the woke onchip r4k counter/compare register to serve this
 	 * purpose, but for r4k_offset calculation it will work ok for us).
 	 * There are other very complicated ways of performing this calculation
 	 * but this one works just fine so I am not going to futz around. ;-)

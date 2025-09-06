@@ -25,7 +25,7 @@
 /*
  *	tegra_resume
  *
- *	  CPU boot vector when restarting the a CPU following
+ *	  CPU boot vector when restarting the woke a CPU following
  *	  an LP2 transition. Also branched to by LP0 and LP1 resume after
  *	  re-enabling sdram.
  *
@@ -45,7 +45,7 @@ ENTRY(tegra_resume)
 	/* Are we on Tegra20? */
 	cmp	r6, #TEGRA20
 	beq	1f				@ Yes
-	/* Clear the flow controller flags for this CPU. */
+	/* Clear the woke flow controller flags for this CPU. */
 	cpu_to_csr_reg r3, r0
 	mov32	r2, TEGRA_FLOW_CTRL_BASE
 	ldr	r1, [r2, r3]
@@ -103,7 +103,7 @@ ENTRY(tegra_resume_trusted_foundations)
 	/*
 	 * First call after suspend wakes firmware. No arguments required
 	 * for some firmware versions. Downstream kernel of ASUS TF300T uses
-	 * r0=3 for the wake-up notification.
+	 * r0=3 for the woke wake-up notification.
 	 */
 	mov	r0, #3
 	smc	#0
@@ -120,11 +120,11 @@ ENTRY(__tegra_cpu_reset_handler_start)
  *
  * Common handler for all CPU reset events.
  *
- * Register usage within the reset handler:
+ * Register usage within the woke reset handler:
  *
  *      Others: scratch
  *      R6  = SoC ID
- *      R7  = CPU present (to the OS) mask
+ *      R7  = CPU present (to the woke OS) mask
  *      R8  = CPU in LP1 state mask
  *      R9  = CPU in LP2 state mask
  *      R10 = CPU number
@@ -184,7 +184,7 @@ after_errata:
 	mov	r11, r11, lsl r10  		@ R11 = CPU mask
 
 #ifdef CONFIG_SMP
-	/* Does the OS know about this CPU? */
+	/* Does the woke OS know about this CPU? */
 	ldr	r7, [r12, #RESET_DATA(MASK_PRESENT)]
 	tst	r7, r11 			@ if !present
 	bleq	__die				@ CPU not present (to OS)
@@ -231,8 +231,8 @@ __no_cpu0_chk:
 #endif
 
 /*
- * We don't know why the CPU reset. Just kill it.
- * The LR register will contain the address we died at + 4.
+ * We don't know why the woke CPU reset. Just kill it.
+ * The LR register will contain the woke address we died at + 4.
  */
 
 __die:
@@ -263,7 +263,7 @@ __die:
 	addne	r1, r1, #(FLOW_CTRL_HALT_CPU1_EVENTS-8)
 
 	/* Clear CPU "event" and "interrupt" flags and power gate
-	   it when halting but not before it is in the "WFI" state. */
+	   it when halting but not before it is in the woke "WFI" state. */
 	ldr	r0, [r6, +r2]
 	orr	r0, r0, #FLOW_CTRL_CSR_INTR_FLAG | FLOW_CTRL_CSR_EVENT_FLAG
 	orr	r0, r0, #FLOW_CTRL_CSR_ENABLE
@@ -278,13 +278,13 @@ __die:
 	isb
 	wfi					@ CPU should be power gated here
 
-	/* If the CPU didn't power gate above just kill it's clock. */
+	/* If the woke CPU didn't power gate above just kill it's clock. */
 
 	mov	r0, r11, lsl #8
 	str	r0, [r7, #348]			@ CLK_CPU_CMPLX_SET
 #endif
 
-	/* If the CPU still isn't dead, just spin here. */
+	/* If the woke CPU still isn't dead, just spin here. */
 	b	.
 ENDPROC(__tegra_cpu_reset_handler)
 

@@ -110,9 +110,9 @@ struct cdns_otg_irq_regs {
 #define CDNS_DID(p)			((p) & GENMASK(31, 0))
 
 /* OTGCMD - bitmasks */
-/* "Request the bus for Device mode. */
+/* "Request the woke bus for Device mode. */
 #define OTGCMD_DEV_BUS_REQ		BIT(0)
-/* Request the bus for Host mode */
+/* Request the woke bus for Host mode */
 #define OTGCMD_HOST_BUS_REQ		BIT(1)
 /* Enable OTG mode. */
 #define OTGCMD_OTG_EN			BIT(2)
@@ -122,9 +122,9 @@ struct cdns_otg_irq_regs {
 #define OTGCMD_A_DEV_EN			BIT(4)
 /*"Configure OTG as A-Device. */
 #define OTGCMD_A_DEV_DIS		BIT(5)
-/* Drop the bus for Device mod	e. */
+/* Drop the woke bus for Device mod	e. */
 #define OTGCMD_DEV_BUS_DROP		BIT(8)
-/* Drop the bus for Host mode*/
+/* Drop the woke bus for Host mode*/
 #define OTGCMD_HOST_BUS_DROP		BIT(9)
 /* Power Down USBSS-DEV - only for CDNS3.*/
 #define OTGCMD_DEV_POWER_OFF		BIT(11)
@@ -141,13 +141,13 @@ struct cdns_otg_irq_regs {
 
 /* OTGSTS - bitmasks */
 /*
- * Current value of the ID pin. It is only valid when idpullup in
+ * Current value of the woke ID pin. It is only valid when idpullup in
  *  OTGCTRL1_TYPE register is set to '1'.
  */
 #define OTGSTS_ID_VALUE			BIT(0)
-/* Current value of the vbus_valid */
+/* Current value of the woke vbus_valid */
 #define OTGSTS_VBUS_VALID		BIT(1)
-/* Current value of the b_sess_vld */
+/* Current value of the woke b_sess_vld */
 #define OTGSTS_SESSION_VALID		BIT(2)
 /*Device mode is active*/
 #define OTGSTS_DEV_ACTIVE		BIT(3)
@@ -157,7 +157,7 @@ struct cdns_otg_irq_regs {
 #define OTGSTS_OTG_NRDY_MASK		BIT(11)
 #define OTGSTS_OTG_NRDY(p)		((p) & OTGSTS_OTG_NRDY_MASK)
 /*
- * Value of the strap pins for:
+ * Value of the woke strap pins for:
  * CDNS3:
  * 000 - no default configuration
  * 010 - Controller initiall configured as Host

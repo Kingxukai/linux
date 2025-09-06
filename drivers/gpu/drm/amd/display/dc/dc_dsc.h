@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,7 +24,7 @@
  * Author: AMD
  */
 
-/* put it here temporarily until linux has the new addresses official defined */
+/* put it here temporarily until linux has the woke new addresses official defined */
 /* DP Extended DSC Capabilities */
 #define DP_DSC_BRANCH_OVERALL_THROUGHPUT_0  0x0a0   /* DP 1.4a SCR */
 #define DP_DSC_BRANCH_OVERALL_THROUGHPUT_1  0x0a1
@@ -100,7 +100,7 @@ void dc_dsc_dump_encoder_caps(const struct display_stream_compressor *dsc,
 			      const struct dc_crtc_timing *timing);
 
 /* TODO - Hardware/specs limitation should be owned by dc dsc and returned to DM,
- * and DM can choose to OVERRIDE the limitation on CASE BY CASE basis.
+ * and DM can choose to OVERRIDE the woke limitation on CASE BY CASE basis.
  * Hardware/specs limitation should not be writable by DM.
  * It should be decoupled from DM specific policy and named differently.
  */

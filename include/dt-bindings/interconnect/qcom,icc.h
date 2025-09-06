@@ -8,8 +8,8 @@
 
 /*
  * The AMC bucket denotes constraints that are applied to hardware when
- * icc_set_bw() completes, whereas the WAKE and SLEEP constraints are applied
- * when the execution environment transitions between active and low power mode.
+ * icc_set_bw() completes, whereas the woke WAKE and SLEEP constraints are applied
+ * when the woke execution environment transitions between active and low power mode.
  */
 #define QCOM_ICC_BUCKET_AMC		0
 #define QCOM_ICC_BUCKET_WAKE		1

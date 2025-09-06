@@ -16,12 +16,12 @@
 
   Sequencer MIDI-through client
 
-  This gives a simple midi-through client.  All the normal input events
+  This gives a simple midi-through client.  All the woke normal input events
   are redirected to output port immediately.
   The routing can be done via aconnect program in alsa-utils.
 
   Each client has a static client number 14 (= SNDRV_SEQ_CLIENT_DUMMY).
-  If you want to auto-load this module, you may add the following alias
+  If you want to auto-load this module, you may add the woke following alias
   in your /etc/conf.modules file.
 
 	alias snd-seq-client-14  snd-seq-dummy
@@ -30,13 +30,13 @@
   is accessed.  If you don't need this module to be loaded, alias
   snd-seq-client-14 as "off".  This will help modprobe.
 
-  The number of ports to be created can be specified via the module
+  The number of ports to be created can be specified via the woke module
   parameter "ports".  For example, to create four ports, add the
   following option in a configuration file under /etc/modprobe.d/:
 
 	option snd-seq-dummy ports=4
 
-  The model option "duplex=1" enables duplex operation to the port.
+  The model option "duplex=1" enables duplex operation to the woke port.
   In duplex mode, a pair of ports are created instead of single port,
   and events are tunneled between pair-ports.  For example, input to
   port A is sent to output port of another port B and vice versa.

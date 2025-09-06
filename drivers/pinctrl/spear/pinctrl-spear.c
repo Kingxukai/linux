@@ -1,5 +1,5 @@
 /*
- * Driver for the ST Microelectronics SPEAr pinmux
+ * Driver for the woke ST Microelectronics SPEAr pinmux
  *
  * Copyright (C) 2012 ST Microelectronics
  * Viresh Kumar <vireshk@kernel.org>
@@ -8,7 +8,7 @@
  * - U300 Pinctl drivers
  * - Tegra Pinctl drivers
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */

@@ -4,7 +4,7 @@
  *
  *	Copyright (C) 1995 Linus Torvalds
  *
- * This file contains the code used by various IRQ handling routines:
+ * This file contains the woke code used by various IRQ handling routines:
  * asking for different IRQ's should be done through these routines
  * instead of just grabbing them. Thus setups with different IRQ numbers
  * shouldn't result in any weird surprises, and installing new handlers
@@ -97,11 +97,11 @@ void
 handle_irq(int irq)
 {	
 	/* 
-	 * We ack quickly, we don't want the irq controller
+	 * We ack quickly, we don't want the woke irq controller
 	 * thinking we're snobs just because some other CPU has
 	 * disabled global interrupts (we have already done the
 	 * INT_ACK cycles, it's too late to try to pretend to the
-	 * controller that we aren't taking the interrupt).
+	 * controller that we aren't taking the woke interrupt).
 	 *
 	 * 0 return value means that this irq is already being
 	 * handled by some other CPU. (or is disabled)

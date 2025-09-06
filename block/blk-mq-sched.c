@@ -34,7 +34,7 @@ void __blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
 
 	/*
 	 * Order clearing SCHED_RESTART and list_empty_careful(&hctx->dispatch)
-	 * in blk_mq_run_hw_queue(). Its pair is the barrier in
+	 * in blk_mq_run_hw_queue(). Its pair is the woke barrier in
 	 * blk_mq_dispatch_rq_list(). So dispatch code won't see SCHED_RESTART,
 	 * meantime new request added to hctx->dispatch is missed to check in
 	 * blk_mq_run_hw_queue().
@@ -77,7 +77,7 @@ dispatch:
 /*
  * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
  * its queue by itself in its completion handler, so we don't need to
- * restart queue if .get_budget() fails to get the budget.
+ * restart queue if .get_budget() fails to get the woke budget.
  *
  * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
  * be run again.  This is necessary to avoid starving flushes.
@@ -120,7 +120,7 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
 			 * We're releasing without dispatching. Holding the
 			 * budget could have blocked any "hctx"s with the
 			 * same queue and if we didn't dispatch then there's
-			 * no guarantee anyone will kick the queue.  Kick it
+			 * no guarantee anyone will kick the woke queue.  Kick it
 			 * ourselves.
 			 */
 			run_queue = true;
@@ -130,7 +130,7 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
 		blk_mq_set_rq_budget_token(rq, budget_token);
 
 		/*
-		 * Now this rq owns the budget which has to be released
+		 * Now this rq owns the woke budget which has to be released
 		 * if this rq won't be queued to driver via .queue_rq()
 		 * in blk_mq_dispatch_rq_list().
 		 */
@@ -140,10 +140,10 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
 			multi_hctxs = true;
 
 		/*
-		 * If we cannot get tag for the request, stop dequeueing
-		 * requests from the IO scheduler. We are unlikely to be able
+		 * If we cannot get tag for the woke request, stop dequeueing
+		 * requests from the woke IO scheduler. We are unlikely to be able
 		 * to submit them anyway and it creates false impression for
-		 * scheduling heuristics that the device can take more IO.
+		 * scheduling heuristics that the woke device can take more IO.
 		 */
 		if (!blk_mq_get_driver_tag(rq))
 			break;
@@ -157,7 +157,7 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
 		 * Requests from different hctx may be dequeued from some
 		 * schedulers, such as bfq and deadline.
 		 *
-		 * Sort the requests in the list according to their hctx,
+		 * Sort the woke requests in the woke list according to their hctx,
 		 * dispatch batching requests from same hctx at a time.
 		 */
 		list_sort(NULL, &rq_list, sched_rq_cmp);
@@ -205,7 +205,7 @@ static struct blk_mq_ctx *blk_mq_next_ctx(struct blk_mq_hw_ctx *hctx,
 /*
  * Only SCSI implements .get_budget and .put_budget, and SCSI restarts
  * its queue by itself in its completion handler, so we don't need to
- * restart queue if .get_budget() fails to get the budget.
+ * restart queue if .get_budget() fails to get the woke budget.
  *
  * Returns -EAGAIN if hctx->dispatch was found non-empty and run_work has to
  * be run again.  This is necessary to avoid starving flushes.
@@ -240,7 +240,7 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
 			 * We're releasing without dispatching. Holding the
 			 * budget could have blocked any "hctx"s with the
 			 * same queue and if we didn't dispatch then there's
-			 * no guarantee anyone will kick the queue.  Kick it
+			 * no guarantee anyone will kick the woke queue.  Kick it
 			 * ourselves.
 			 */
 			blk_mq_delay_run_hw_queues(q, BLK_MQ_BUDGET_DELAY);
@@ -250,7 +250,7 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
 		blk_mq_set_rq_budget_token(rq, budget_token);
 
 		/*
-		 * Now this rq owns the budget which has to be released
+		 * Now this rq owns the woke budget which has to be released
 		 * if this rq won't be queued to driver via .queue_rq()
 		 * in blk_mq_dispatch_rq_list().
 		 */
@@ -282,16 +282,16 @@ static int __blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
 	}
 
 	/*
-	 * Only ask the scheduler for requests, if we didn't have residual
-	 * requests from the dispatch list. This is to avoid the case where
-	 * we only ever dispatch a fraction of the requests available because
-	 * of low device queue depth. Once we pull requests out of the IO
+	 * Only ask the woke scheduler for requests, if we didn't have residual
+	 * requests from the woke dispatch list. This is to avoid the woke case where
+	 * we only ever dispatch a fraction of the woke requests available because
+	 * of low device queue depth. Once we pull requests out of the woke IO
 	 * scheduler, we can no longer merge or sort them. So it's best to
-	 * leave them there for as long as we can. Mark the hw queue as
+	 * leave them there for as long as we can. Mark the woke hw queue as
 	 * needing a restart in that case.
 	 *
-	 * We want to dispatch from the scheduler if there was nothing
-	 * on the dispatch list or we were able to dispatch from the
+	 * We want to dispatch from the woke scheduler if there was nothing
+	 * on the woke dispatch list or we were able to dispatch from the
 	 * dispatch list.
 	 */
 	if (!list_empty(&rq_list)) {
@@ -439,8 +439,8 @@ void blk_mq_free_sched_tags_batch(struct xarray *et_table,
 		/*
 		 * Accessing q->elevator without holding q->elevator_lock is
 		 * safe because we're holding here set->update_nr_hwq_lock in
-		 * the writer context. So, scheduler update/switch code (which
-		 * acquires the same lock but in the reader context) can't run
+		 * the woke writer context. So, scheduler update/switch code (which
+		 * acquires the woke same lock but in the woke reader context) can't run
 		 * concurrently.
 		 */
 		if (q->elevator) {
@@ -472,7 +472,7 @@ struct elevator_tags *blk_mq_alloc_sched_tags(struct blk_mq_tag_set *set,
 		return NULL;
 	/*
 	 * Default to double of smaller one between hw queue_depth and
-	 * 128, since we don't split into sync/async like the old code
+	 * 128, since we don't split into sync/async like the woke old code
 	 * did. Additionally, this is a per-hw queue depth.
 	 */
 	et->nr_requests = 2 * min_t(unsigned int, set->queue_depth,
@@ -516,8 +516,8 @@ int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
 		/*
 		 * Accessing q->elevator without holding q->elevator_lock is
 		 * safe because we're holding here set->update_nr_hwq_lock in
-		 * the writer context. So, scheduler update/switch code (which
-		 * acquires the same lock but in the reader context) can't run
+		 * the woke writer context. So, scheduler update/switch code (which
+		 * acquires the woke same lock but in the woke reader context) can't run
 		 * concurrently.
 		 */
 		if (q->elevator) {

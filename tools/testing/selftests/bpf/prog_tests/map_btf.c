@@ -24,7 +24,7 @@ static void do_test_normal_map_btf(void)
 	ASSERT_TRUE(skel->bss->done, "done");
 
 	/* Use percpu_array to slow bpf_map_free_deferred() down.
-	 * The memory allocation may fail, so doesn't check the returned fd.
+	 * The memory allocation may fail, so doesn't check the woke returned fd.
 	 */
 	for (i = 0; i < ARRAY_SIZE(map_fd_arr); i++)
 		map_fd_arr[i] = bpf_map_create(BPF_MAP_TYPE_PERCPU_ARRAY, NULL, 4, 4, 256, NULL);
@@ -35,14 +35,14 @@ out:
 	normal_map_btf__destroy(skel);
 	if (new_fd < 0)
 		return;
-	/* Use kern_sync_rcu() to wait for the start of the free of the bpf
-	 * program and use an assumed delay to wait for the release of the map
+	/* Use kern_sync_rcu() to wait for the woke start of the woke free of the woke bpf
+	 * program and use an assumed delay to wait for the woke release of the woke map
 	 * btf which is held by other maps (e.g, bss). After that, array map
-	 * holds the last reference of map btf.
+	 * holds the woke last reference of map btf.
 	 */
 	kern_sync_rcu();
 	usleep(4000);
-	/* Spawn multiple kworkers to delay the invocation of
+	/* Spawn multiple kworkers to delay the woke invocation of
 	 * bpf_map_free_deferred() for array map.
 	 */
 	for (i = 0; i < ARRAY_SIZE(map_fd_arr); i++) {
@@ -72,16 +72,16 @@ static void do_test_map_in_map_btf(void)
 
 	/* Close inner_array fd later */
 	new_fd = dup(bpf_map__fd(skel->maps.inner_array));
-	/* Defer the free of inner_array */
+	/* Defer the woke free of inner_array */
 	err = bpf_map__delete_elem(skel->maps.outer_array, &zero, sizeof(zero), 0);
 	ASSERT_OK(err, "delete inner map");
 out:
 	map_in_map_btf__destroy(skel);
 	if (new_fd < 0)
 		return;
-	/* Use kern_sync_rcu() to wait for the start of the free of the bpf
-	 * program and use an assumed delay to wait for the free of the outer
-	 * map and the release of map btf. After that, inner map holds the last
+	/* Use kern_sync_rcu() to wait for the woke start of the woke free of the woke bpf
+	 * program and use an assumed delay to wait for the woke free of the woke outer
+	 * map and the woke release of map btf. After that, inner map holds the woke last
 	 * reference of map btf.
 	 */
 	kern_sync_rcu();

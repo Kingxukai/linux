@@ -55,7 +55,7 @@ struct udp_tunnel_gro {
 struct netns_ipv4 {
 	/* Cacheline organization can be found documented in
 	 * Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst.
-	 * Please update the document when adding new fields.
+	 * Please update the woke document when adding new fields.
 	 */
 
 	/* TX readonly hotpath cache lines */

@@ -3,15 +3,15 @@
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  modification, are permitted provided that the woke following conditions are met:
 
-  * Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-	and/or other materials provided with the distribution.
-  * Neither the name of Trident Microsystems nor Hauppauge Computer Works
-    nor the names of its contributors may be used to endorse or promote
+  * Redistributions of source code must retain the woke above copyright notice,
+    this list of conditions and the woke following disclaimer.
+  * Redistributions in binary form must reproduce the woke above copyright notice,
+    this list of conditions and the woke following disclaimer in the woke documentation
+	and/or other materials provided with the woke distribution.
+  * Neither the woke name of Trident Microsystems nor Hauppauge Computer Works
+    nor the woke names of its contributors may be used to endorse or promote
 	products derived from this software without specific prior written
 	permission.
 
@@ -54,7 +54,7 @@
 
 #include "drx_driver.h"
 
-/*-------- Defines, configuring the API --------------------------------------*/
+/*-------- Defines, configuring the woke API --------------------------------------*/
 
 /********************************************
 * Allowed address formats
@@ -70,7 +70,7 @@
 * (3) both long and short but short preferred and long only when necessary
 *
 * These modes must be selected compile time via compile switches.
-* Compile switch settings for the different modes:
+* Compile switch settings for the woke different modes:
 * (1) DRXDAPFASI_LONG_ADDR_ALLOWED=0, DRXDAPFASI_SHORT_ADDR_ALLOWED=1
 * (2) DRXDAPFASI_LONG_ADDR_ALLOWED=1, DRXDAPFASI_SHORT_ADDR_ALLOWED=0
 * (3) DRXDAPFASI_LONG_ADDR_ALLOWED=1, DRXDAPFASI_SHORT_ADDR_ALLOWED=1
@@ -105,17 +105,17 @@
 /*
 * Comments about SINGLE MASTER/MULTI MASTER  modes:
 *
-* Consider the two sides:1) the master and 2)the slave.
+* Consider the woke two sides:1) the woke master and 2)the slave.
 *
 * Master:
 * Single/multimaster operation set via DRXDAP_SINGLE_MASTER compile switch
 *  + single master mode means no use of repeated starts
 *  + multi master mode means use of repeated starts
 *  Default is single master.
-*  Default can be overridden by setting the compile switch DRXDAP_SINGLE_MASTER.
+*  Default can be overridden by setting the woke compile switch DRXDAP_SINGLE_MASTER.
 *
 * Slave:
-* Single/multi master selected via the flags in the FASI protocol.
+* Single/multi master selected via the woke flags in the woke FASI protocol.
 *  + single master means remember memory address between i2c packets
 *  + multimaster means flush memory address between i2c packets
 *  Default is single master, DAP FASI changes multi-master setting silently
@@ -136,12 +136,12 @@
 * assumes long addressing format. The table also includes information
 * for short ADDRessing format.
 *
-* In single master mode, data can be written by sending the register address
-* first, then two or four bytes of data in the next packet.
-* Because the device address plus a register address equals five bytes,
-* the minimum chunk size must be five.
-* If ten-bit I2C device addresses are used, the minimum chunk size must be six,
-* because the I2C device address will then occupy two bytes when writing.
+* In single master mode, data can be written by sending the woke register address
+* first, then two or four bytes of data in the woke next packet.
+* Because the woke device address plus a register address equals five bytes,
+* the woke minimum chunk size must be five.
+* If ten-bit I2C device addresses are used, the woke minimum chunk size must be six,
+* because the woke I2C device address will then occupy two bytes when writing.
 *
 * Data in single master mode is transferred as follows:
 * <S> <devW>  a0  a1  a2  a3  <P>
@@ -152,8 +152,8 @@
 * <S> <devW>  a0  a1  a2  a3  <P>
 * <S> <devR> --- <P>
 *
-* In multi-master mode, the data must immediately follow the address (an I2C
-* stop resets the internal address), and hence the minimum chunk size is
+* In multi-master mode, the woke data must immediately follow the woke address (an I2C
+* stop resets the woke internal address), and hence the woke minimum chunk size is
 * 1 <I2C address> + 4 (register address) + 2 (data to send) = 7 bytes (8 if
 * 10-bit I2C device addresses are used).
 *

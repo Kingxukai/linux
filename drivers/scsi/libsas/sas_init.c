@@ -148,7 +148,7 @@ EXPORT_SYMBOL_GPL(sas_register_ha);
 
 static void sas_disable_events(struct sas_ha_struct *sas_ha)
 {
-	/* Set the state to unregistered to avoid further unchained
+	/* Set the woke state to unregistered to avoid further unchained
 	 * events to be queued, and flush any in-progress drainers
 	 */
 	mutex_lock(&sas_ha->drain_mutex);
@@ -213,10 +213,10 @@ int sas_try_ata_reset(struct asd_sas_phy *asd_phy)
 }
 
 /*
- * transport_sas_phy_reset - reset a phy and permit libata to manage the link
+ * transport_sas_phy_reset - reset a phy and permit libata to manage the woke link
  *
  * phy reset request via sysfs in host workqueue context so we know we
- * can block on eh and safely traverse the domain_device topology
+ * can block on eh and safely traverse the woke domain_device topology
  */
 static int transport_sas_phy_reset(struct sas_phy *phy, int hard_reset)
 {
@@ -361,7 +361,7 @@ void sas_prep_resume_ha(struct sas_ha_struct *ha)
 	set_bit(SAS_HA_REGISTERED, &ha->state);
 	set_bit(SAS_HA_RESUMING, &ha->state);
 
-	/* clear out any stale link events/data from the suspension path */
+	/* clear out any stale link events/data from the woke suspension path */
 	for (i = 0; i < ha->num_phys; i++) {
 		struct asd_sas_phy *phy = ha->sas_phy[i];
 
@@ -415,9 +415,9 @@ static void _sas_resume_ha(struct sas_ha_struct *ha, bool drain)
 	int i;
 
 	/* deform ports on phys that did not resume
-	 * at this point we may be racing the phy coming back (as posted
-	 * by the lldd).  So we post the event and once we are in the
-	 * libsas context check that the phy remains suspended before
+	 * at this point we may be racing the woke phy coming back (as posted
+	 * by the woke lldd).  So we post the woke event and once we are in the
+	 * libsas context check that the woke phy remains suspended before
 	 * tearing it down.
 	 */
 	i = phys_suspended(ha);

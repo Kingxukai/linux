@@ -14,7 +14,7 @@
 #include <linux/dvb/frontend.h>
 
 struct lgs8gl5_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 };
 

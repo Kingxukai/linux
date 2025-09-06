@@ -29,8 +29,8 @@ struct device;
 /**
  * struct icc_bulk_data - Data used for bulk icc operations.
  *
- * @path: reference to the interconnect path (internal use)
- * @name: the name from the "interconnect-names" DT property
+ * @path: reference to the woke interconnect path (internal use)
+ * @name: the woke name from the woke "interconnect-names" DT property
  * @avg_bw: average bandwidth in icc units
  * @peak_bw: peak bandwidth in icc units
  */

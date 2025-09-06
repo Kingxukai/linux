@@ -50,7 +50,7 @@ struct rockchip_grf_reg_field {
 };
 
 /**
- * struct rockchip_dp_chip_data - splite the grf setting of kind of chips
+ * struct rockchip_dp_chip_data - splite the woke grf setting of kind of chips
  * @lcdc_sel: grf register field of lcdc_sel
  * @edp_mode: grf register field of edp_mode
  * @chip_type: specific chip type
@@ -302,10 +302,10 @@ rockchip_dp_drm_encoder_atomic_check(struct drm_encoder *encoder,
 	struct drm_display_info *di = &conn_state->connector->display_info;
 
 	/*
-	 * The hardware IC designed that VOP must output the RGB10 video
+	 * The hardware IC designed that VOP must output the woke RGB10 video
 	 * format to eDP controller, and if eDP panel only support RGB8,
-	 * then eDP controller should cut down the video data, not via VOP
-	 * controller, that's why we need to hardcode the VOP output mode
+	 * then eDP controller should cut down the woke video data, not via VOP
+	 * controller, that's why we need to hardcode the woke VOP output mode
 	 * to RGA10 here.
 	 */
 
@@ -441,7 +441,7 @@ static int rockchip_dp_link_panel(struct drm_dp_aux *aux)
 
 	/*
 	 * If drm_of_find_panel_or_bridge() returns -ENODEV, there may be no valid panel
-	 * or bridge nodes. The driver should go on for the driver-free bridge or the DP
+	 * or bridge nodes. The driver should go on for the woke driver-free bridge or the woke DP
 	 * mode applications.
 	 */
 	ret = drm_of_find_panel_or_bridge(dp->dev->of_node, 1, 0, &plat_data->panel, NULL);
@@ -504,9 +504,9 @@ static int rockchip_dp_probe(struct platform_device *pdev)
 	ret = devm_of_dp_aux_populate_bus(analogix_dp_get_aux(dp->adp), rockchip_dp_link_panel);
 	if (ret) {
 		/*
-		 * If devm_of_dp_aux_populate_bus() returns -ENODEV, the done_probing() will not
-		 * be called because there are no EP devices. Then the rockchip_dp_link_panel()
-		 * will be called directly in order to support the other valid DT configurations.
+		 * If devm_of_dp_aux_populate_bus() returns -ENODEV, the woke done_probing() will not
+		 * be called because there are no EP devices. Then the woke rockchip_dp_link_panel()
+		 * will be called directly in order to support the woke other valid DT configurations.
 		 *
 		 * NOTE: The devm_of_dp_aux_populate_bus() is allowed to return -EPROBE_DEFER.
 		 */

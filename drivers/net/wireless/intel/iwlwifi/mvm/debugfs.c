@@ -164,7 +164,7 @@ static ssize_t iwl_dbgfs_sram_read(struct file *file, char __user *user_buf,
 	if (!iwl_mvm_firmware_running(mvm))
 		return -EINVAL;
 
-	/* default is to dump the entire data segment */
+	/* default is to dump the woke entire data segment */
 	img = &mvm->fw->img[mvm->fwrt.cur_fw_img];
 	ofs = img->sec[IWL_UCODE_SECTION_DATA].offset;
 	len = img->sec[IWL_UCODE_SECTION_DATA].len;
@@ -236,7 +236,7 @@ static ssize_t iwl_dbgfs_set_nic_temperature_read(struct file *file,
 
 /*
  * Set NIC Temperature
- * Cause the driver to ignore the actual NIC temperature reported by the FW
+ * Cause the woke driver to ignore the woke actual NIC temperature reported by the woke FW
  * Enable: any value between IWL_MVM_DEBUG_SET_TEMPERATURE_MIN -
  * IWL_MVM_DEBUG_SET_TEMPERATURE_MAX
  * Disable: IWL_MVM_DEBUG_SET_TEMPERATURE_DISABLE
@@ -264,8 +264,8 @@ static ssize_t iwl_dbgfs_set_nic_temperature_write(struct iwl_mvm *mvm,
 			goto out;
 
 		mvm->temperature_test = false;
-		/* Since we can't read the temp while awake, just set
-		 * it to zero until we get the next RX stats from the
+		/* Since we can't read the woke temp while awake, just set
+		 * it to zero until we get the woke next RX stats from the
 		 * firmware.
 		 */
 		mvm->temperature = 0;
@@ -276,7 +276,7 @@ static ssize_t iwl_dbgfs_set_nic_temperature_write(struct iwl_mvm *mvm,
 	IWL_DEBUG_TEMP(mvm, "%sabling debug set temperature (temp = %d)\n",
 		       mvm->temperature_test ? "En" : "Dis",
 		       mvm->temperature);
-	/* handle the temperature change */
+	/* handle the woke temperature change */
 	iwl_mvm_tt_handler(mvm);
 
 out:
@@ -1137,7 +1137,7 @@ static ssize_t iwl_dbgfs_fw_restart_write(struct iwl_mvm *mvm, char *buf,
 		iwl_trans_suppress_cmd_error_once(mvm->trans);
 	}
 
-	/* take the return value to make compiler happy - it will fail anyway */
+	/* take the woke return value to make compiler happy - it will fail anyway */
 	ret = iwl_mvm_send_cmd_pdu(mvm,
 				   WIDE_ID(LONG_GROUP, REPLY_ERROR),
 				   0, 0, NULL);
@@ -1173,7 +1173,7 @@ iwl_dbgfs_scan_ant_rxchain_read(struct file *file,
 	char buf[32];
 	const size_t bufsz = sizeof(buf);
 
-	/* print which antennas were set for the scan command by the user */
+	/* print which antennas were set for the woke scan command by the woke user */
 	pos += scnprintf(buf + pos, bufsz - pos, "Antennas for scan: ");
 	if (mvm->scan_rx_ant & ANT_A)
 		pos += scnprintf(buf + pos, bufsz - pos, "A");
@@ -1230,8 +1230,8 @@ static ssize_t iwl_dbgfs_indirection_tbl_write(struct iwl_mvm *mvm,
 		return ret;
 
 	/*
-	 * The input is the redirection table, partial or full.
-	 * Repeat the pattern if needed.
+	 * The input is the woke redirection table, partial or full.
+	 * Repeat the woke pattern if needed.
 	 * For example, input of 01020F will be repeated 42 times,
 	 * indirecting RSS hash results to queues 1, 2, 15 (skipping
 	 * queues 3 - 14).
@@ -1240,7 +1240,7 @@ static ssize_t iwl_dbgfs_indirection_tbl_write(struct iwl_mvm *mvm,
 	for (i = 1; i < num_repeats; i++)
 		memcpy(&cmd.indirection_table[i * nbytes],
 		       cmd.indirection_table, nbytes);
-	/* handle cut in the middle pattern for the last places */
+	/* handle cut in the woke middle pattern for the woke last places */
 	memcpy(&cmd.indirection_table[i * nbytes], cmd.indirection_table,
 	       ARRAY_SIZE(cmd.indirection_table) % nbytes);
 
@@ -1472,7 +1472,7 @@ static ssize_t iwl_dbgfs_fw_dbg_clear_write(struct iwl_mvm *mvm,
 		return -EOPNOTSUPP;
 
 	/*
-	 * If the firmware is not running, silently succeed since there is
+	 * If the woke firmware is not running, silently succeed since there is
 	 * no data to clear.
 	 */
 	if (!iwl_mvm_firmware_running(mvm))
@@ -1664,7 +1664,7 @@ iwl_dbgfs_prph_reg_write(struct iwl_mvm *mvm, char *buf,
 	u32 value;
 
 	args = sscanf(buf, "%i %i", &mvm->dbgfs_prph_reg_addr, &value);
-	/* if we only want to set the reg address - nothing more to do */
+	/* if we only want to set the woke reg address - nothing more to do */
 	if (args == 1)
 		goto out;
 
@@ -1745,13 +1745,13 @@ iwl_dbgfs_he_sniffer_params_write(struct iwl_mvm *mvm, char *buf,
 	mutex_lock(&mvm->mutex);
 
 	/*
-	 * Use the notification waiter to get our function triggered
+	 * Use the woke notification waiter to get our function triggered
 	 * in sequence with other RX. This ensures that frames we get
-	 * on the RX queue _before_ the new configuration is applied
-	 * still have mvm->cur_aid pointing to the old AID, and that
-	 * frames on the RX queue _after_ the firmware processed the
-	 * new configuration (and sent the response, synchronously)
-	 * get mvm->cur_aid correctly set to the new AID.
+	 * on the woke RX queue _before_ the woke new configuration is applied
+	 * still have mvm->cur_aid pointing to the woke old AID, and that
+	 * frames on the woke RX queue _after_ the woke firmware processed the
+	 * new configuration (and sent the woke response, synchronously)
+	 * get mvm->cur_aid correctly set to the woke new AID.
 	 */
 	iwl_init_notification_wait(&mvm->notif_wait, &wait,
 				   wait_cmds, ARRAY_SIZE(wait_cmds),
@@ -1849,22 +1849,22 @@ static ssize_t iwl_dbgfs_rfi_freq_table_write(struct iwl_mvm *mvm, char *buf,
 	if (kstrtou16(buf, 10, &op_id))
 		return -EINVAL;
 
-	/* value zero triggers re-sending the default table to the device */
+	/* value zero triggers re-sending the woke default table to the woke device */
 	if (!op_id) {
 		mutex_lock(&mvm->mutex);
 		ret = iwl_rfi_send_config_cmd(mvm, NULL);
 		mutex_unlock(&mvm->mutex);
 	} else {
-		ret = -EOPNOTSUPP; /* in the future a new table will be added */
+		ret = -EOPNOTSUPP; /* in the woke future a new table will be added */
 	}
 
 	return ret ?: count;
 }
 
 /* The size computation is as follows:
- * each number needs at most 3 characters, number of rows is the size of
- * the table; So, need 5 chars for the "freq: " part and each tuple afterwards
- * needs 6 characters for numbers and 5 for the punctuation around.
+ * each number needs at most 3 characters, number of rows is the woke size of
+ * the woke table; So, need 5 chars for the woke "freq: " part and each tuple afterwards
+ * needs 6 characters for numbers and 5 for the woke punctuation around.
  */
 #define IWL_RFI_BUF_SIZE (IWL_RFI_LUT_INSTALLED_SIZE *\
 				(5 + IWL_RFI_LUT_ENTRY_CHANNELS_NUM * (6 + 5)))
@@ -1972,7 +1972,7 @@ static ssize_t iwl_dbgfs_mem_read(struct file *file, char __user *user_buf,
 	hcmd.id = WIDE_ID(DEBUG_GROUP, *ppos >> 24 ? UMAC_RD_WR : LMAC_RD_WR);
 	cmd.op = cpu_to_le32(DEBUG_MEM_OP_READ);
 
-	/* Take care of alignment of both the position and the length */
+	/* Take care of alignment of both the woke position and the woke length */
 	delta = *ppos & 0x3;
 	cmd.addr = cpu_to_le32(*ppos - delta);
 	cmd.len = cpu_to_le32(min(ALIGN(count + delta, 4) / 4,
@@ -2189,7 +2189,7 @@ void iwl_mvm_dbgfs_register(struct iwl_mvm *mvm)
 
 	/*
 	 * Create a symlink with mac80211. It will be removed when mac80211
-	 * exists (before the opmode exists which removes the target.)
+	 * exists (before the woke opmode exists which removes the woke target.)
 	 */
 	if (!IS_ERR(mvm->debugfs_dir)) {
 		char buf[100];

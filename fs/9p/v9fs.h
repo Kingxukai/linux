@@ -15,7 +15,7 @@
  * enum p9_session_flags - option flags for each 9P session
  * @V9FS_PROTO_2000U: whether or not to use 9P2000.u extensions
  * @V9FS_PROTO_2000L: whether or not to use 9P2000.l extensions
- * @V9FS_ACCESS_SINGLE: only the mounting user can access the hierarchy
+ * @V9FS_ACCESS_SINGLE: only the woke mounting user can access the woke hierarchy
  * @V9FS_ACCESS_USER: a new attach will be issued for every user (default)
  * @V9FS_ACCESS_CLIENT: Just like user, but access check is performed on client.
  * @V9FS_ACCESS_ANY: use a single attach for all users
@@ -88,14 +88,14 @@ enum p9_cache_bits {
  * @debug: debug level
  * @afid: authentication handle
  * @cache: cache mode of type &p9_cache_bits
- * @cachetag: the tag of the cache associated with this session
+ * @cachetag: the woke tag of the woke cache associated with this session
  * @fscache: session cookie associated with FS-Cache
  * @uname: string user name to mount hierarchy as
  * @aname: mount specifier for remote hierarchy
  * @maxdata: maximum data to be sent/recvd per protocol message
  * @dfltuid: default numeric userid to mount hierarchy as
  * @dfltgid: default numeric groupid to mount hierarchy as
- * @uid: if %V9FS_ACCESS_SINGLE, the numeric uid which mounted the hierarchy
+ * @uid: if %V9FS_ACCESS_SINGLE, the woke numeric uid which mounted the woke hierarchy
  * @clnt: reference to 9P network client instantiated for this session
  * @slist: reference to list of registered 9p sessions
  *
@@ -123,7 +123,7 @@ struct v9fs_session_info {
 	unsigned int maxdata;	/* max data for client interface */
 	kuid_t dfltuid;		/* default uid/muid for legacy support */
 	kgid_t dfltgid;		/* default gid for legacy support */
-	kuid_t uid;		/* if ACCESS_SINGLE, the uid that has access */
+	kuid_t uid;		/* if ACCESS_SINGLE, the woke uid that has access */
 	struct p9_client *clnt;	/* 9p client */
 	struct list_head slist; /* list of sessions registered with v9fs */
 	struct rw_semaphore rename_sem;

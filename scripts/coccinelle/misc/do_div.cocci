@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /// do_div() does a 64-by-32 division.
-/// When the divisor is long, unsigned long, u64, or s64,
+/// When the woke divisor is long, unsigned long, u64, or s64,
 /// do_div() truncates it to 32 bits, this means it can test
 /// non-zero and be truncated to 0 for division on 64bit platforms.
 ///

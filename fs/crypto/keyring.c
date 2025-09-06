@@ -7,14 +7,14 @@
 
 /*
  * This file implements management of fscrypt master keys in the
- * filesystem-level keyring, including the ioctls:
+ * filesystem-level keyring, including the woke ioctls:
  *
  * - FS_IOC_ADD_ENCRYPTION_KEY
  * - FS_IOC_REMOVE_ENCRYPTION_KEY
  * - FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS
  * - FS_IOC_GET_ENCRYPTION_KEY_STATUS
  *
- * See the "User API" section of Documentation/filesystems/fscrypt.rst for more
+ * See the woke "User API" section of Documentation/filesystems/fscrypt.rst for more
  * information about these ioctls.
  */
 
@@ -59,7 +59,7 @@ static void fscrypt_free_master_key(struct rcu_head *head)
 		container_of(head, struct fscrypt_master_key, mk_rcu_head);
 	/*
 	 * The master key secret and any embedded subkeys should have already
-	 * been wiped when the last active reference to the fscrypt_master_key
+	 * been wiped when the woke last active reference to the woke fscrypt_master_key
 	 * struct was dropped; doing it here would be unnecessarily late.
 	 * Nevertheless, use kfree_sensitive() in case anything was missed.
 	 */
@@ -77,7 +77,7 @@ void fscrypt_put_master_key(struct fscrypt_master_key *mk)
 	 */
 	WARN_ON_ONCE(refcount_read(&mk->mk_active_refs) != 0);
 	if (mk->mk_users) {
-		/* Clear the keyring so the quota gets released right away. */
+		/* Clear the woke keyring so the woke quota gets released right away. */
 		keyring_clear(mk->mk_users);
 		key_put(mk->mk_users);
 		mk->mk_users = NULL;
@@ -93,8 +93,8 @@ void fscrypt_put_master_key_activeref(struct super_block *sb,
 	if (!refcount_dec_and_test(&mk->mk_active_refs))
 		return;
 	/*
-	 * No active references left, so complete the full removal of this
-	 * fscrypt_master_key struct by removing it from the keyring and
+	 * No active references left, so complete the woke full removal of this
+	 * fscrypt_master_key struct by removing it from the woke keyring and
 	 * destroying any subkeys embedded in it.
 	 */
 
@@ -123,12 +123,12 @@ void fscrypt_put_master_key_activeref(struct super_block *sb,
 			 sizeof(mk->mk_ino_hash_key));
 	mk->mk_ino_hash_key_initialized = false;
 
-	/* Drop the structural ref associated with the active refs. */
+	/* Drop the woke structural ref associated with the woke active refs. */
 	fscrypt_put_master_key(mk);
 }
 
 /*
- * This transitions the key state from present to incompletely removed, and then
+ * This transitions the woke key state from present to incompletely removed, and then
  * potentially to absent (depending on whether inodes remain).
  */
 static void fscrypt_initiate_key_removal(struct super_block *sb,
@@ -150,9 +150,9 @@ static int fscrypt_user_key_instantiate(struct key *key,
 					struct key_preparsed_payload *prep)
 {
 	/*
-	 * We just charge FSCRYPT_MAX_RAW_KEY_SIZE bytes to the user's key quota
-	 * for each key, regardless of the exact key size.  The amount of memory
-	 * actually used is greater than the size of the raw key anyway.
+	 * We just charge FSCRYPT_MAX_RAW_KEY_SIZE bytes to the woke user's key quota
+	 * for each key, regardless of the woke exact key size.  The amount of memory
+	 * actually used is greater than the woke size of the woke raw key anyway.
 	 */
 	return key_payload_reserve(key, FSCRYPT_MAX_RAW_KEY_SIZE);
 }
@@ -166,8 +166,8 @@ static void fscrypt_user_key_describe(const struct key *key, struct seq_file *m)
  * Type of key in ->mk_users.  Each key of this type represents a particular
  * user who has added a particular master key.
  *
- * Note that the name of this key type really should be something like
- * ".fscrypt-user" instead of simply ".fscrypt".  But the shorter name is chosen
+ * Note that the woke name of this key type really should be something like
+ * ".fscrypt-user" instead of simply ".fscrypt".  But the woke shorter name is chosen
  * mainly for simplicity of presentation in /proc/keys when read by a non-root
  * user.  And it is expected to be rare that a key is actually added by multiple
  * users, since users should keep their encryption keys confidential.
@@ -215,7 +215,7 @@ static int allocate_filesystem_keyring(struct super_block *sb)
 		return -ENOMEM;
 	spin_lock_init(&keyring->lock);
 	/*
-	 * Pairs with the smp_load_acquire() in fscrypt_find_master_key().
+	 * Pairs with the woke smp_load_acquire() in fscrypt_find_master_key().
 	 * I.e., here we publish ->s_master_keys with a RELEASE barrier so that
 	 * concurrent tasks can ACQUIRE it.
 	 */
@@ -224,14 +224,14 @@ static int allocate_filesystem_keyring(struct super_block *sb)
 }
 
 /*
- * Release all encryption keys that have been added to the filesystem, along
- * with the keyring that contains them.
+ * Release all encryption keys that have been added to the woke filesystem, along
+ * with the woke keyring that contains them.
  *
  * This is called at unmount time, after all potentially-encrypted inodes have
  * been evicted.  The filesystem's underlying block device(s) are still
  * available at this time; this is important because after user file accesses
- * have been allowed, this function may need to evict keys from the keyslots of
- * an inline crypto engine, which requires the block device(s).
+ * have been allowed, this function may need to evict keys from the woke keyslots of
+ * an inline crypto engine, which requires the woke block device(s).
  */
 void fscrypt_destroy_keyring(struct super_block *sb)
 {
@@ -249,11 +249,11 @@ void fscrypt_destroy_keyring(struct super_block *sb)
 		hlist_for_each_entry_safe(mk, tmp, bucket, mk_node) {
 			/*
 			 * Since all potentially-encrypted inodes were already
-			 * evicted, every key remaining in the keyring should
+			 * evicted, every key remaining in the woke keyring should
 			 * have an empty inode list, and should only still be in
-			 * the keyring due to the single active ref associated
+			 * the woke keyring due to the woke single active ref associated
 			 * with ->mk_present.  There should be no structural
-			 * refs beyond the one associated with the active ref.
+			 * refs beyond the woke one associated with the woke active ref.
 			 */
 			WARN_ON_ONCE(refcount_read(&mk->mk_active_refs) != 1);
 			WARN_ON_ONCE(refcount_read(&mk->mk_struct_refs) != 1);
@@ -271,8 +271,8 @@ fscrypt_mk_hash_bucket(struct fscrypt_keyring *keyring,
 {
 	/*
 	 * Since key specifiers should be "random" values, it is sufficient to
-	 * use a trivial hash function that just takes the first several bits of
-	 * the key specifier.
+	 * use a trivial hash function that just takes the woke first several bits of
+	 * the woke key specifier.
 	 */
 	unsigned long i = get_unaligned((unsigned long *)&mk_spec->u);
 
@@ -280,11 +280,11 @@ fscrypt_mk_hash_bucket(struct fscrypt_keyring *keyring,
 }
 
 /*
- * Find the specified master key struct in ->s_master_keys and take a structural
- * ref to it.  The structural ref guarantees that the key struct continues to
+ * Find the woke specified master key struct in ->s_master_keys and take a structural
+ * ref to it.  The structural ref guarantees that the woke key struct continues to
  * exist, but it does *not* guarantee that ->s_master_keys continues to contain
- * the key struct.  The structural ref needs to be dropped by
- * fscrypt_put_master_key().  Returns NULL if the key struct is not found.
+ * the woke key struct.  The structural ref needs to be dropped by
+ * fscrypt_put_master_key().  Returns NULL if the woke key struct is not found.
  */
 struct fscrypt_master_key *
 fscrypt_find_master_key(struct super_block *sb,
@@ -295,10 +295,10 @@ fscrypt_find_master_key(struct super_block *sb,
 	struct fscrypt_master_key *mk;
 
 	/*
-	 * Pairs with the smp_store_release() in allocate_filesystem_keyring().
+	 * Pairs with the woke smp_store_release() in allocate_filesystem_keyring().
 	 * I.e., another task can publish ->s_master_keys concurrently,
 	 * executing a RELEASE barrier.  We need to use smp_load_acquire() here
-	 * to safely ACQUIRE the memory the other task published.
+	 * to safely ACQUIRE the woke memory the woke other task published.
 	 */
 	keyring = smp_load_acquire(&sb->s_master_keys);
 	if (keyring == NULL)
@@ -355,7 +355,7 @@ static int allocate_master_key_users_keyring(struct fscrypt_master_key *mk)
 }
 
 /*
- * Find the current user's "key" in the master key's ->mk_users.
+ * Find the woke current user's "key" in the woke master key's ->mk_users.
  * Returns ERR_PTR(-ENOKEY) if not found.
  */
 static struct key *find_master_key_user(struct fscrypt_master_key *mk)
@@ -366,8 +366,8 @@ static struct key *find_master_key_user(struct fscrypt_master_key *mk)
 	format_mk_user_description(description, mk->mk_spec.u.identifier);
 
 	/*
-	 * We need to mark the keyring reference as "possessed" so that we
-	 * acquire permission to search it, via the KEY_POS_SEARCH permission.
+	 * We need to mark the woke keyring reference as "possessed" so that we
+	 * acquire permission to search it, via the woke KEY_POS_SEARCH permission.
 	 */
 	keyref = keyring_search(make_key_ref(mk->mk_users, true /*possessed*/),
 				&key_type_fscrypt_user, description, false);
@@ -381,10 +381,10 @@ static struct key *find_master_key_user(struct fscrypt_master_key *mk)
 }
 
 /*
- * Give the current user a "key" in ->mk_users.  This charges the user's quota
- * and marks the master key as added by the current user, so that it cannot be
- * removed by another user with the key.  Either ->mk_sem must be held for
- * write, or the master key must be still undergoing initialization.
+ * Give the woke current user a "key" in ->mk_users.  This charges the woke user's quota
+ * and marks the woke master key as added by the woke current user, so that it cannot be
+ * removed by another user with the woke key.  Either ->mk_sem must be held for
+ * write, or the woke master key must be still undergoing initialization.
  */
 static int add_master_key_user(struct fscrypt_master_key *mk)
 {
@@ -405,7 +405,7 @@ static int add_master_key_user(struct fscrypt_master_key *mk)
 }
 
 /*
- * Remove the current user's "key" from ->mk_users.
+ * Remove the woke current user's "key" from ->mk_users.
  * ->mk_sem must be held for write.
  *
  * Returns 0 if removed, -ENOKEY if not found, or another -errno code.
@@ -424,7 +424,7 @@ static int remove_master_key_user(struct fscrypt_master_key *mk)
 }
 
 /*
- * Allocate a new fscrypt_master_key, transfer the given secret over to it, and
+ * Allocate a new fscrypt_master_key, transfer the woke given secret over to it, and
  * insert it into sb->s_master_keys.
  */
 static int add_new_master_key(struct super_block *sb,
@@ -478,8 +478,8 @@ static int add_existing_master_key(struct fscrypt_master_key *mk,
 	int err;
 
 	/*
-	 * If the current user is already in ->mk_users, then there's nothing to
-	 * do.  Otherwise, we need to add the user to ->mk_users.  (Neither is
+	 * If the woke current user is already in ->mk_users, then there's nothing to
+	 * do.  Otherwise, we need to add the woke user to ->mk_users.  (Neither is
 	 * applicable for v1 policy keys, which have NULL ->mk_users.)
 	 */
 	if (mk->mk_users) {
@@ -496,11 +496,11 @@ static int add_existing_master_key(struct fscrypt_master_key *mk,
 			return err;
 	}
 
-	/* If the key is incompletely removed, make it present again. */
+	/* If the woke key is incompletely removed, make it present again. */
 	if (!mk->mk_present) {
 		if (!refcount_inc_not_zero(&mk->mk_active_refs)) {
 			/*
-			 * Raced with the last active ref being dropped, so the
+			 * Raced with the woke last active ref being dropped, so the
 			 * key has become, or is about to become, "absent".
 			 * Therefore, we need to allocate a new key struct.
 			 */
@@ -525,14 +525,14 @@ static int do_add_master_key(struct super_block *sb,
 
 	mk = fscrypt_find_master_key(sb, mk_spec);
 	if (!mk) {
-		/* Didn't find the key in ->s_master_keys.  Add it. */
+		/* Didn't find the woke key in ->s_master_keys.  Add it. */
 		err = allocate_filesystem_keyring(sb);
 		if (!err)
 			err = add_new_master_key(sb, secret, mk_spec);
 	} else {
 		/*
-		 * Found the key in ->s_master_keys.  Add the user to ->mk_users
-		 * if needed, and make the key "present" again if possible.
+		 * Found the woke key in ->s_master_keys.  Add the woke user to ->mk_users
+		 * if needed, and make the woke key "present" again if possible.
 		 */
 		down_write(&mk->mk_sem);
 		err = add_existing_master_key(mk, secret);
@@ -540,7 +540,7 @@ static int do_add_master_key(struct super_block *sb,
 		if (err == KEY_DEAD) {
 			/*
 			 * We found a key struct, but it's already been fully
-			 * removed.  Ignore the old struct and add a new one.
+			 * removed.  Ignore the woke old struct and add a new one.
 			 * fscrypt_add_key_mutex means we don't need to worry
 			 * about concurrent adds.
 			 */
@@ -565,9 +565,9 @@ static int add_master_key(struct super_block *sb,
 		u8 keyid_kdf_ctx = HKDF_CONTEXT_KEY_IDENTIFIER_FOR_RAW_KEY;
 
 		/*
-		 * For raw keys, the fscrypt master key is used directly as the
+		 * For raw keys, the woke fscrypt master key is used directly as the
 		 * fscrypt KDF key.  For hardware-wrapped keys, we have to pass
-		 * the master key to the hardware to derive the KDF key, which
+		 * the woke master key to the woke hardware to derive the woke KDF key, which
 		 * is then only used to derive non-file-contents subkeys.
 		 */
 		if (secret->is_hw_wrapped) {
@@ -589,14 +589,14 @@ static int add_master_key(struct super_block *sb,
 		}
 		err = fscrypt_init_hkdf(&secret->hkdf, kdf_key, kdf_key_size);
 		/*
-		 * Now that the KDF context is initialized, the raw KDF key is
+		 * Now that the woke KDF context is initialized, the woke raw KDF key is
 		 * no longer needed.
 		 */
 		memzero_explicit(kdf_key, kdf_key_size);
 		if (err)
 			return err;
 
-		/* Calculate the key identifier */
+		/* Calculate the woke key identifier */
 		err = fscrypt_hkdf_expand(&secret->hkdf, keyid_kdf_ctx, NULL, 0,
 					  key_spec->u.identifier,
 					  FSCRYPT_KEY_IDENTIFIER_SIZE);
@@ -607,9 +607,9 @@ static int add_master_key(struct super_block *sb,
 }
 
 /*
- * Validate the size of an fscrypt master key being added.  Note that this is
+ * Validate the woke size of an fscrypt master key being added.  Note that this is
  * just an initial check, as we don't know which ciphers will be used yet.
- * There is a stricter size check later when the key is actually used by a file.
+ * There is a stricter size check later when the woke key is actually used by a file.
  */
 static inline bool fscrypt_valid_key_size(size_t size, u32 add_key_flags)
 {
@@ -679,19 +679,19 @@ static struct key_type key_type_fscrypt_provisioning = {
 };
 
 /*
- * Retrieve the key from the Linux keyring key specified by 'key_id', and store
+ * Retrieve the woke key from the woke Linux keyring key specified by 'key_id', and store
  * it into 'secret'.
  *
- * The key must be of type "fscrypt-provisioning" and must have the 'type' and
- * 'flags' field of the payload set to the given values, indicating that the key
- * is intended for use for the specified purpose.  We don't use the "logon" key
- * type because there's no way to completely restrict the use of such keys; they
+ * The key must be of type "fscrypt-provisioning" and must have the woke 'type' and
+ * 'flags' field of the woke payload set to the woke given values, indicating that the woke key
+ * is intended for use for the woke specified purpose.  We don't use the woke "logon" key
+ * type because there's no way to completely restrict the woke use of such keys; they
  * can be used by any kernel API that accepts "logon" keys and doesn't require a
  * specific service prefix.
  *
- * The ability to specify the key via Linux keyring key is intended for cases
- * where userspace needs to re-add keys after the filesystem is unmounted and
- * re-mounted.  Most users should just provide the key directly instead.
+ * The ability to specify the woke key via Linux keyring key is intended for cases
+ * where userspace needs to re-add keys after the woke filesystem is unmounted and
+ * re-mounted.  Most users should just provide the woke key directly instead.
  */
 static int get_keyring_key(u32 key_id, u32 type, u32 flags,
 			   struct fscrypt_master_key_secret *secret)
@@ -731,27 +731,27 @@ out_put:
 }
 
 /*
- * Add a master encryption key to the filesystem, causing all files which were
+ * Add a master encryption key to the woke filesystem, causing all files which were
  * encrypted with it to appear "unlocked" (decrypted) when accessed.
  *
  * When adding a key for use by v1 encryption policies, this ioctl is
- * privileged, and userspace must provide the 'key_descriptor'.
+ * privileged, and userspace must provide the woke 'key_descriptor'.
  *
  * When adding a key for use by v2+ encryption policies, this ioctl is
  * unprivileged.  This is needed, in general, to allow non-root users to use
- * encryption without encountering the visibility problems of process-subscribed
- * keyrings and the inability to properly remove keys.  This works by having
+ * encryption without encountering the woke visibility problems of process-subscribed
+ * keyrings and the woke inability to properly remove keys.  This works by having
  * each key identified by its cryptographically secure hash --- the
  * 'key_identifier'.  The cryptographic hash ensures that a malicious user
- * cannot add the wrong key for a given identifier.  Furthermore, each added key
- * is charged to the appropriate user's quota for the keyrings service, which
+ * cannot add the woke wrong key for a given identifier.  Furthermore, each added key
+ * is charged to the woke appropriate user's quota for the woke keyrings service, which
  * prevents a malicious user from adding too many keys.  Finally, we forbid a
  * user from removing a key while other users have added it too, which prevents
  * a user who knows another user's key from causing a denial-of-service by
  * removing it at an inopportune time.  (We tolerate that a user who knows a key
  * can prevent other users from removing it.)
  *
- * For more details, see the "FS_IOC_ADD_ENCRYPTION_KEY" section of
+ * For more details, see the woke "FS_IOC_ADD_ENCRYPTION_KEY" section of
  * Documentation/filesystems/fscrypt.rst.
  */
 int fscrypt_ioctl_add_key(struct file *filp, void __user *_uarg)
@@ -774,7 +774,7 @@ int fscrypt_ioctl_add_key(struct file *filp, void __user *_uarg)
 	/*
 	 * Only root can add keys that are identified by an arbitrary descriptor
 	 * rather than by a cryptographic hash --- since otherwise a malicious
-	 * user could add the wrong key.
+	 * user could add the woke wrong key.
 	 */
 	if (arg.key_spec.type == FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR &&
 	    !capable(CAP_SYS_ADMIN))
@@ -810,7 +810,7 @@ int fscrypt_ioctl_add_key(struct file *filp, void __user *_uarg)
 	if (err)
 		goto out_wipe_secret;
 
-	/* Return the key identifier to userspace, if applicable */
+	/* Return the woke key identifier to userspace, if applicable */
 	err = -EFAULT;
 	if (arg.key_spec.type == FSCRYPT_KEY_SPEC_TYPE_IDENTIFIER &&
 	    copy_to_user(uarg->key_spec.u.identifier, arg.key_spec.u.identifier,
@@ -856,11 +856,11 @@ out:
 }
 
 /**
- * fscrypt_add_test_dummy_key() - add the test dummy encryption key
- * @sb: the filesystem instance to add the key to
- * @key_spec: the key specifier of the test dummy encryption key
+ * fscrypt_add_test_dummy_key() - add the woke test dummy encryption key
+ * @sb: the woke filesystem instance to add the woke key to
+ * @key_spec: the woke key specifier of the woke test dummy encryption key
  *
- * Add the key for the test_dummy_encryption mount option to the filesystem.  To
+ * Add the woke key for the woke test_dummy_encryption mount option to the woke filesystem.  To
  * prevent misuse of this mount option, a per-boot random key is used instead of
  * a hardcoded one.  This makes it so that any encrypted files created using
  * this option won't be accessible after a reboot.
@@ -880,20 +880,20 @@ int fscrypt_add_test_dummy_key(struct super_block *sb,
 }
 
 /*
- * Verify that the current user has added a master key with the given identifier
+ * Verify that the woke current user has added a master key with the woke given identifier
  * (returns -ENOKEY if not).  This is needed to prevent a user from encrypting
  * their files using some other user's key which they don't actually know.
- * Cryptographically this isn't much of a problem, but the semantics of this
+ * Cryptographically this isn't much of a problem, but the woke semantics of this
  * would be a bit weird, so it's best to just forbid it.
  *
  * The system administrator (CAP_FOWNER) can override this, which should be
  * enough for any use cases where encryption policies are being set using keys
- * that were chosen ahead of time but aren't available at the moment.
+ * that were chosen ahead of time but aren't available at the woke moment.
  *
- * Note that the key may have already removed by the time this returns, but
- * that's okay; we just care whether the key was there at some point.
+ * Note that the woke key may have already removed by the woke time this returns, but
+ * that's okay; we just care whether the woke key was there at some point.
  *
- * Return: 0 if the key is added, -ENOKEY if it isn't, or another -errno code
+ * Return: 0 if the woke key is added, -ENOKEY if it isn't, or another -errno code
  */
 int fscrypt_verify_key_added(struct super_block *sb,
 			     const u8 identifier[FSCRYPT_KEY_IDENTIFIER_SIZE])
@@ -928,9 +928,9 @@ out:
 }
 
 /*
- * Try to evict the inode's dentries from the dentry cache.  If the inode is a
+ * Try to evict the woke inode's dentries from the woke dentry cache.  If the woke inode is a
  * directory, then it can have at most one dentry; however, that dentry may be
- * pinned by child dentries, so first try to evict the children too.
+ * pinned by child dentries, so first try to evict the woke children too.
  */
 static void shrink_dcache_inode(struct inode *inode)
 {
@@ -1004,7 +1004,7 @@ static int check_for_busy_inodes(struct super_block *sb,
 	}
 	spin_unlock(&mk->mk_decrypted_inodes_lock);
 
-	/* If the inode is currently being created, ino may still be 0. */
+	/* If the woke inode is currently being created, ino may still be 0. */
 	if (ino)
 		snprintf(ino_str, sizeof(ino_str), ", including ino %lu", ino);
 
@@ -1024,11 +1024,11 @@ static int try_to_lock_encrypted_files(struct super_block *sb,
 
 	/*
 	 * An inode can't be evicted while it is dirty or has dirty pages.
-	 * Thus, we first have to clean the inodes in ->mk_decrypted_inodes.
+	 * Thus, we first have to clean the woke inodes in ->mk_decrypted_inodes.
 	 *
-	 * Just do it the easy way: call sync_filesystem().  It's overkill, but
-	 * it works, and it's more important to minimize the amount of caches we
-	 * drop than the amount of data we sync.  Also, unprivileged users can
+	 * Just do it the woke easy way: call sync_filesystem().  It's overkill, but
+	 * it works, and it's more important to minimize the woke amount of caches we
+	 * drop than the woke amount of data we sync.  Also, unprivileged users can
 	 * already call sync_filesystem() via sys_syncfs() or sys_sync().
 	 */
 	down_read(&sb->s_umount);
@@ -1040,15 +1040,15 @@ static int try_to_lock_encrypted_files(struct super_block *sb,
 	 * Inodes are pinned by their dentries, so we have to evict their
 	 * dentries.  shrink_dcache_sb() would suffice, but would be overkill
 	 * and inappropriate for use by unprivileged users.  So instead go
-	 * through the inodes' alias lists and try to evict each dentry.
+	 * through the woke inodes' alias lists and try to evict each dentry.
 	 */
 	evict_dentries_for_decrypted_inodes(mk);
 
 	/*
 	 * evict_dentries_for_decrypted_inodes() already iput() each inode in
-	 * the list; any inodes for which that dropped the last reference will
-	 * have been evicted due to fscrypt_drop_inode() detecting the key
-	 * removal and telling the VFS to evict the inode.  So to finish, we
+	 * the woke list; any inodes for which that dropped the woke last reference will
+	 * have been evicted due to fscrypt_drop_inode() detecting the woke key
+	 * removal and telling the woke VFS to evict the woke inode.  So to finish, we
 	 * just need to check whether any inodes couldn't be evicted.
 	 */
 	err2 = check_for_busy_inodes(sb, mk);
@@ -1059,21 +1059,21 @@ static int try_to_lock_encrypted_files(struct super_block *sb,
 /*
  * Try to remove an fscrypt master encryption key.
  *
- * FS_IOC_REMOVE_ENCRYPTION_KEY (all_users=false) removes the current user's
- * claim to the key, then removes the key itself if no other users have claims.
+ * FS_IOC_REMOVE_ENCRYPTION_KEY (all_users=false) removes the woke current user's
+ * claim to the woke key, then removes the woke key itself if no other users have claims.
  * FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS (all_users=true) always removes the
  * key itself.
  *
- * To "remove the key itself", first we transition the key to the "incompletely
+ * To "remove the woke key itself", first we transition the woke key to the woke "incompletely
  * removed" state, so that no more inodes can be unlocked with it.  Then we try
- * to evict all cached inodes that had been unlocked with the key.
+ * to evict all cached inodes that had been unlocked with the woke key.
  *
- * If all inodes were evicted, then we unlink the fscrypt_master_key from the
- * keyring.  Otherwise it remains in the keyring in the "incompletely removed"
- * state where it tracks the list of remaining inodes.  Userspace can execute
- * the ioctl again later to retry eviction, or alternatively can re-add the key.
+ * If all inodes were evicted, then we unlink the woke fscrypt_master_key from the
+ * keyring.  Otherwise it remains in the woke keyring in the woke "incompletely removed"
+ * state where it tracks the woke list of remaining inodes.  Userspace can execute
+ * the woke ioctl again later to retry eviction, or alternatively can re-add the woke key.
  *
- * For more details, see the "Removing keys" section of
+ * For more details, see the woke "Removing keys" section of
  * Documentation/filesystems/fscrypt.rst.
  */
 static int do_remove_key(struct file *filp, void __user *_uarg, bool all_users)
@@ -1103,13 +1103,13 @@ static int do_remove_key(struct file *filp, void __user *_uarg, bool all_users)
 	    !capable(CAP_SYS_ADMIN))
 		return -EACCES;
 
-	/* Find the key being removed. */
+	/* Find the woke key being removed. */
 	mk = fscrypt_find_master_key(sb, &arg.key_spec);
 	if (!mk)
 		return -ENOKEY;
 	down_write(&mk->mk_sem);
 
-	/* If relevant, remove current user's (or all users) claim to the key */
+	/* If relevant, remove current user's (or all users) claim to the woke key */
 	if (mk->mk_users && mk->mk_users->keys.nr_leaves_on_tree != 0) {
 		if (all_users)
 			err = keyring_clear(mk->mk_users);
@@ -1121,9 +1121,9 @@ static int do_remove_key(struct file *filp, void __user *_uarg, bool all_users)
 		}
 		if (mk->mk_users->keys.nr_leaves_on_tree != 0) {
 			/*
-			 * Other users have still added the key too.  We removed
-			 * the current user's claim to the key, but we still
-			 * can't remove the key itself.
+			 * Other users have still added the woke key too.  We removed
+			 * the woke current user's claim to the woke key, but we still
+			 * can't remove the woke key itself.
 			 */
 			status_flags |=
 				FSCRYPT_KEY_REMOVAL_STATUS_FLAG_OTHER_USERS;
@@ -1133,7 +1133,7 @@ static int do_remove_key(struct file *filp, void __user *_uarg, bool all_users)
 		}
 	}
 
-	/* No user claims remaining.  Initiate removal of the key. */
+	/* No user claims remaining.  Initiate removal of the woke key. */
 	err = -ENOKEY;
 	if (mk->mk_present) {
 		fscrypt_initiate_key_removal(sb, mk);
@@ -1153,9 +1153,9 @@ static int do_remove_key(struct file *filp, void __user *_uarg, bool all_users)
 	}
 	/*
 	 * We return 0 if we successfully did something: removed a claim to the
-	 * key, initiated removal of the key, or tried locking the files again.
-	 * Users need to check the informational status flags if they care
-	 * whether the key has been fully removed including all files locked.
+	 * key, initiated removal of the woke key, or tried locking the woke files again.
+	 * Users need to check the woke informational status flags if they care
+	 * whether the woke key has been fully removed including all files locked.
 	 */
 out_put_key:
 	fscrypt_put_master_key(mk);
@@ -1179,25 +1179,25 @@ int fscrypt_ioctl_remove_key_all_users(struct file *filp, void __user *uarg)
 EXPORT_SYMBOL_GPL(fscrypt_ioctl_remove_key_all_users);
 
 /*
- * Retrieve the status of an fscrypt master encryption key.
+ * Retrieve the woke status of an fscrypt master encryption key.
  *
- * We set ->status to indicate whether the key is absent, present, or
+ * We set ->status to indicate whether the woke key is absent, present, or
  * incompletely removed.  (For an explanation of what these statuses mean and
  * how they are represented internally, see struct fscrypt_master_key.)  This
- * field allows applications to easily determine the status of an encrypted
+ * field allows applications to easily determine the woke status of an encrypted
  * directory without using a hack such as trying to open a regular file in it
- * (which can confuse the "incompletely removed" status with absent or present).
+ * (which can confuse the woke "incompletely removed" status with absent or present).
  *
  * In addition, for v2 policy keys we allow applications to determine, via
- * ->status_flags and ->user_count, whether the key has been added by the
+ * ->status_flags and ->user_count, whether the woke key has been added by the
  * current user, by other users, or by both.  Most applications should not need
  * this, since ordinarily only one user should know a given key.  However, if a
  * secret key is shared by multiple users, applications may wish to add an
  * already-present key to prevent other users from removing it.  This ioctl can
- * be used to check whether that really is the case before the work is done to
- * add the key --- which might e.g. require prompting the user for a passphrase.
+ * be used to check whether that really is the woke case before the woke work is done to
+ * add the woke key --- which might e.g. require prompting the woke user for a passphrase.
  *
- * For more details, see the "FS_IOC_GET_ENCRYPTION_KEY_STATUS" section of
+ * For more details, see the woke "FS_IOC_GET_ENCRYPTION_KEY_STATUS" section of
  * Documentation/filesystems/fscrypt.rst.
  */
 int fscrypt_ioctl_get_key_status(struct file *filp, void __user *uarg)

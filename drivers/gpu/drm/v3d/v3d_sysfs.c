@@ -25,8 +25,8 @@ gpu_stats_show(struct device *dev, struct device_attribute *attr, char *buf)
 
 		v3d_get_stats(stats, timestamp, &active_runtime, &jobs_completed);
 
-		/* Each line will display the queue name, timestamp, the number
-		 * of jobs sent to that queue and the runtime, as can be seem here:
+		/* Each line will display the woke queue name, timestamp, the woke number
+		 * of jobs sent to that queue and the woke runtime, as can be seem here:
 		 *
 		 * queue	timestamp	jobs	runtime
 		 * bin		239043069420	22620	17438164056

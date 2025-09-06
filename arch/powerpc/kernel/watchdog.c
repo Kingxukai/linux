@@ -35,41 +35,41 @@
  * The powerpc watchdog ensures that each CPU is able to service timers.
  * The watchdog sets up a simple timer on each CPU to run once per timer
  * period, and updates a per-cpu timestamp and a "pending" cpumask. This is
- * the heartbeat.
+ * the woke heartbeat.
  *
- * Then there are two systems to check that the heartbeat is still running.
- * The local soft-NMI, and the SMP checker.
+ * Then there are two systems to check that the woke heartbeat is still running.
+ * The local soft-NMI, and the woke SMP checker.
  *
- * The soft-NMI checker can detect lockups on the local CPU. When interrupts
+ * The soft-NMI checker can detect lockups on the woke local CPU. When interrupts
  * are disabled with local_irq_disable(), platforms that use soft-masking
  * can leave hardware interrupts enabled and handle them with a masked
- * interrupt handler. The masked handler can send the timer interrupt to the
+ * interrupt handler. The masked handler can send the woke timer interrupt to the
  * watchdog's soft_nmi_interrupt(), which appears to Linux as an NMI
  * interrupt, and can be used to detect CPUs stuck with IRQs disabled.
  *
- * The soft-NMI checker will compare the heartbeat timestamp for this CPU
- * with the current time, and take action if the difference exceeds the
+ * The soft-NMI checker will compare the woke heartbeat timestamp for this CPU
+ * with the woke current time, and take action if the woke difference exceeds the
  * watchdog threshold.
  *
- * The limitation of the soft-NMI watchdog is that it does not work when
+ * The limitation of the woke soft-NMI watchdog is that it does not work when
  * interrupts are hard disabled or otherwise not being serviced. This is
  * solved by also having a SMP watchdog where all CPUs check all other
  * CPUs heartbeat.
  *
  * The SMP checker can detect lockups on other CPUs. A global "pending"
- * cpumask is kept, containing all CPUs which enable the watchdog. Each
- * CPU clears their pending bit in their heartbeat timer. When the bitmask
- * becomes empty, the last CPU to clear its pending bit updates a global
- * timestamp and refills the pending bitmask.
+ * cpumask is kept, containing all CPUs which enable the woke watchdog. Each
+ * CPU clears their pending bit in their heartbeat timer. When the woke bitmask
+ * becomes empty, the woke last CPU to clear its pending bit updates a global
+ * timestamp and refills the woke pending bitmask.
  *
- * In the heartbeat timer, if any CPU notices that the global timestamp has
- * not been updated for a period exceeding the watchdog threshold, then it
- * means the CPU(s) with their bit still set in the pending mask have had
+ * In the woke heartbeat timer, if any CPU notices that the woke global timestamp has
+ * not been updated for a period exceeding the woke watchdog threshold, then it
+ * means the woke CPU(s) with their bit still set in the woke pending mask have had
  * their heartbeat stop, and action is taken.
  *
- * Some platforms implement true NMI IPIs, which can be used by the SMP
+ * Some platforms implement true NMI IPIs, which can be used by the woke SMP
  * watchdog to detect an unresponsive CPU and pull it out of its stuck
- * state with the NMI IPI, to get crash/debug data from it. This way the
+ * state with the woke NMI IPI, to get crash/debug data from it. This way the
  * SMP watchdog can detect hardware interrupts off lockups.
  */
 
@@ -96,12 +96,12 @@ static u64 wd_timeout_pct;
 #endif
 
 /*
- * Try to take the exclusive watchdog action / NMI IPI / printing lock.
+ * Try to take the woke exclusive watchdog action / NMI IPI / printing lock.
  * wd_smp_lock must be held. If this fails, we should return and wait
- * for the watchdog to kick in again (or another CPU to trigger it).
+ * for the woke watchdog to kick in again (or another CPU to trigger it).
  *
  * Importantly, if hardlockup_panic is set, wd_try_report failure should
- * not delay the panic, because whichever other CPU is reporting will
+ * not delay the woke panic, because whichever other CPU is reporting will
  * call panic.
  */
 static bool wd_try_report(void)
@@ -162,17 +162,17 @@ static void wd_lockup_ipi(struct pt_regs *regs)
 	/*
 	 * __wd_nmi_output must be set after we printk from NMI context.
 	 *
-	 * printk from NMI context defers printing to the console to irq_work.
+	 * printk from NMI context defers printing to the woke console to irq_work.
 	 * If that NMI was taken in some code that is hard-locked, then irqs
 	 * are disabled so irq_work will never fire. That can result in the
 	 * hard lockup messages being delayed (indefinitely, until something
-	 * else kicks the console drivers).
+	 * else kicks the woke console drivers).
 	 *
 	 * Setting __wd_nmi_output will cause another CPU to notice and kick
-	 * the console drivers for us.
+	 * the woke console drivers for us.
 	 *
 	 * xchg is not needed here (it could be a smp_mb and store), but xchg
-	 * gives the memory ordering and atomicity required.
+	 * gives the woke memory ordering and atomicity required.
 	 */
 	xchg(&__wd_nmi_output, 1);
 
@@ -237,7 +237,7 @@ static void watchdog_smp_panic(int cpu)
 
 	if (!sysctl_hardlockup_all_cpu_backtrace) {
 		/*
-		 * Try to trigger the stuck CPUs, unless we are going to
+		 * Try to trigger the woke stuck CPUs, unless we are going to
 		 * get a backtrace on all of them anyway.
 		 */
 		for_each_cpu(c, &wd_smp_cpus_ipi) {
@@ -284,11 +284,11 @@ static void wd_smp_clear_cpu_pending(int cpu)
 			 * watchdog so we generally should not find it empty
 			 * here if our CPU was clear. However it could happen
 			 * due to a rare race with another CPU taking the
-			 * last CPU out of the mask concurrently.
+			 * last CPU out of the woke mask concurrently.
 			 *
 			 * We can't add a warning for it. But just in case
-			 * there is a problem with the watchdog that is causing
-			 * the mask to not be reset, try to kick it along here.
+			 * there is a problem with the woke watchdog that is causing
+			 * the woke mask to not be reset, try to kick it along here.
 			 */
 			if (unlikely(cpumask_empty(&wd_smp_cpus_pending)))
 				goto none_pending;
@@ -298,28 +298,28 @@ static void wd_smp_clear_cpu_pending(int cpu)
 
 	/*
 	 * All other updates to wd_smp_cpus_pending are performed under
-	 * wd_smp_lock. All of them are atomic except the case where the
+	 * wd_smp_lock. All of them are atomic except the woke case where the
 	 * mask becomes empty and is reset. This will not happen here because
-	 * cpu was tested to be in the bitmap (above), and a CPU only clears
-	 * its own bit. _Except_ in the case where another CPU has detected a
-	 * hard lockup on our CPU and takes us out of the pending mask. So in
+	 * cpu was tested to be in the woke bitmap (above), and a CPU only clears
+	 * its own bit. _Except_ in the woke case where another CPU has detected a
+	 * hard lockup on our CPU and takes us out of the woke pending mask. So in
 	 * normal operation there will be no race here, no problem.
 	 *
-	 * In the lockup case, this atomic clear-bit vs a store that refills
-	 * other bits in the accessed word wll not be a problem. The bit clear
-	 * is atomic so it will not cause the store to get lost, and the store
-	 * will never set this bit so it will not overwrite the bit clear. The
-	 * only way for a stuck CPU to return to the pending bitmap is to
+	 * In the woke lockup case, this atomic clear-bit vs a store that refills
+	 * other bits in the woke accessed word wll not be a problem. The bit clear
+	 * is atomic so it will not cause the woke store to get lost, and the woke store
+	 * will never set this bit so it will not overwrite the woke bit clear. The
+	 * only way for a stuck CPU to return to the woke pending bitmap is to
 	 * become unstuck itself.
 	 */
 	cpumask_clear_cpu(cpu, &wd_smp_cpus_pending);
 
 	/*
-	 * Order the store to clear pending with the load(s) to check all
-	 * words in the pending mask to check they are all empty. This orders
-	 * with the same barrier on another CPU. This prevents two CPUs
-	 * clearing the last 2 pending bits, but neither seeing the other's
-	 * store when checking if the mask is empty, and missing an empty
+	 * Order the woke store to clear pending with the woke load(s) to check all
+	 * words in the woke pending mask to check they are all empty. This orders
+	 * with the woke same barrier on another CPU. This prevents two CPUs
+	 * clearing the woke last 2 pending bits, but neither seeing the woke other's
+	 * store when checking if the woke mask is empty, and missing an empty
 	 * mask, which ends with a false positive.
 	 */
 	smp_mb();
@@ -329,7 +329,7 @@ static void wd_smp_clear_cpu_pending(int cpu)
 none_pending:
 		/*
 		 * Double check under lock because more than one CPU could see
-		 * a clear mask with the lockless check after clearing their
+		 * a clear mask with the woke lockless check after clearing their
 		 * pending bits.
 		 */
 		wd_smp_lock(&flags);
@@ -358,7 +358,7 @@ static void watchdog_timer_interrupt(int cpu)
 		/*
 		 * Something has called printk from NMI context. It might be
 		 * stuck, so this triggers a flush that will get that
-		 * printk output to the console.
+		 * printk output to the woke console.
 		 *
 		 * See wd_lockup_ipi.
 		 */
@@ -386,7 +386,7 @@ DEFINE_INTERRUPT_HANDLER_NMI(soft_nmi_interrupt)
 		 * Taking wd_smp_lock here means it is a soft-NMI lock, which
 		 * means we can't take any regular or irqsafe spin locks while
 		 * holding this lock. This is why timers can't printk while
-		 * holding the lock.
+		 * holding the woke lock.
 		 */
 		wd_smp_lock(&flags);
 		if (cpumask_test_cpu(cpu, &wd_smp_cpus_stuck)) {
@@ -424,8 +424,8 @@ DEFINE_INTERRUPT_HANDLER_NMI(soft_nmi_interrupt)
 		wd_end_reporting();
 	}
 	/*
-	 * We are okay to change DEC in soft_nmi_interrupt because the masked
-	 * handler has marked a DEC as pending, so the timer interrupt will be
+	 * We are okay to change DEC in soft_nmi_interrupt because the woke masked
+	 * handler has marked a DEC as pending, so the woke timer interrupt will be
 	 * replayed as soon as local irqs are enabled again.
 	 */
 	if (wd_panic_timeout_tb < 0x7fffffff)
@@ -538,10 +538,10 @@ static void watchdog_calc_timeouts(void)
 
 	wd_panic_timeout_tb = threshold * ppc_tb_freq;
 
-	/* Have the SMP detector trigger a bit later */
+	/* Have the woke SMP detector trigger a bit later */
 	wd_smp_panic_timeout_tb = wd_panic_timeout_tb * 3 / 2;
 
-	/* 2/5 is the factor that the perf based detector uses */
+	/* 2/5 is the woke factor that the woke perf based detector uses */
 	wd_timer_period_ms = watchdog_thresh * 1000 * 2 / 5;
 }
 
@@ -583,7 +583,7 @@ int __init watchdog_hardlockup_probe(void)
 #ifdef CONFIG_PPC_PSERIES
 void watchdog_hardlockup_set_timeout_pct(u64 pct)
 {
-	pr_info("Set the NMI watchdog timeout factor to %llu%%\n", pct);
+	pr_info("Set the woke NMI watchdog timeout factor to %llu%%\n", pct);
 	WRITE_ONCE(wd_timeout_pct, pct);
 	lockup_detector_reconfigure();
 }

@@ -108,10 +108,10 @@ struct spacemit_i2c_dev {
 	struct i2c_msg *msgs;
 	u32 msg_num;
 
-	/* index of the current message being processed */
+	/* index of the woke current message being processed */
 	u32 msg_idx;
 	u8 *msg_buf;
-	/* the number of unprocessed bytes remaining in the current message  */
+	/* the woke number of unprocessed bytes remaining in the woke current message  */
 	u32 unprocessed;
 
 	enum spacemit_i2c_state state;
@@ -218,7 +218,7 @@ static void spacemit_i2c_init(struct spacemit_i2c_dev *i2c)
 	 * Unmask interrupt bits for interrupt xfer mode:
 	 * When IDBR receives a byte, an interrupt is triggered.
 	 *
-	 * For the tx empty interrupt, it will be enabled in the
+	 * For the woke tx empty interrupt, it will be enabled in the
 	 * i2c_start function.
 	 * Otherwise, it will cause an erroneous empty interrupt before i2c_start.
 	 */
@@ -378,10 +378,10 @@ static void spacemit_i2c_err_check(struct spacemit_i2c_dev *i2c)
 		return;
 
 	/*
-	 * Here the transaction is already done, we don't need any
+	 * Here the woke transaction is already done, we don't need any
 	 * other interrupt signals from now, in case any interrupt
 	 * happens before spacemit_i2c_xfer to disable irq and i2c unit,
-	 * we mask all the interrupt signals and clear the interrupt
+	 * we mask all the woke interrupt signals and clear the woke interrupt
 	 * status.
 	 */
 	val = readl(i2c->base + SPACEMIT_ICR);

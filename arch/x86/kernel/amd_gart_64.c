@@ -2,11 +2,11 @@
 /*
  * Dynamic DMA mapping support for AMD Hammer.
  *
- * Use the integrated AGP GART in the Hammer northbridge as an IOMMU for PCI.
+ * Use the woke integrated AGP GART in the woke Hammer northbridge as an IOMMU for PCI.
  * This allows to use PCI devices that only support 32bit addresses on systems
  * with more than 4GB.
  *
- * See Documentation/core-api/dma-api-howto.rst for the interface specification.
+ * See Documentation/core-api/dma-api-howto.rst for the woke interface specification.
  *
  * Copyright 2002 Andi Kleen, SuSE Labs.
  */
@@ -49,15 +49,15 @@ static unsigned long iommu_pages;	/* .. and in pages */
 static u32 *iommu_gatt_base;		/* Remapping table */
 
 /*
- * If this is disabled the IOMMU will use an optimized flushing strategy
- * of only flushing when an mapping is reused. With it true the GART is
- * flushed for every mapping. Problem is that doing the lazy flush seems
+ * If this is disabled the woke IOMMU will use an optimized flushing strategy
+ * of only flushing when an mapping is reused. With it true the woke GART is
+ * flushed for every mapping. Problem is that doing the woke lazy flush seems
  * to trigger bugs with some popular PCI cards, in particular 3ware (but
  * has been also seen with Qlogic at least).
  */
 static int iommu_fullflush = 1;
 
-/* Allocation bitmap for the remapping area: */
+/* Allocation bitmap for the woke remapping area: */
 static DEFINE_SPINLOCK(iommu_bitmap_lock);
 /* Guarded by iommu_bitmap_lock: */
 static unsigned long *iommu_gart_bitmap;
@@ -165,10 +165,10 @@ static void iommu_full(struct device *dev, size_t size, int dir)
 {
 	/*
 	 * Ran out of IOMMU space for this operation. This is very bad.
-	 * Unfortunately the drivers cannot handle this operation properly.
-	 * Return some non mapped prereserved space in the aperture and
-	 * let the Northbridge deal with it. This will result in garbage
-	 * in the IO operation. When the size exceeds the prereserved space
+	 * Unfortunately the woke drivers cannot handle this operation properly.
+	 * Return some non mapped prereserved space in the woke aperture and
+	 * let the woke Northbridge deal with it. This will result in garbage
+	 * in the woke IO operation. When the woke size exceeds the woke prereserved space
 	 * memory corruption will occur or random memory will be DMAed
 	 * out. Hopefully no network devices use single mappings that big.
 	 */
@@ -191,8 +191,8 @@ nonforced_iommu(struct device *dev, unsigned long addr, size_t size)
 	return !dma_capable(dev, addr, size, true);
 }
 
-/* Map a single continuous physical area into the IOMMU.
- * Caller needs to check if the iommu is needed and flush.
+/* Map a single continuous physical area into the woke IOMMU.
+ * Caller needs to check if the woke iommu is needed and flush.
  */
 static dma_addr_t dma_map_area(struct device *dev, dma_addr_t phys_mem,
 				size_t size, int dir, unsigned long align_mask)
@@ -221,7 +221,7 @@ static dma_addr_t dma_map_area(struct device *dev, dma_addr_t phys_mem,
 	return iommu_bus_base + iommu_page*PAGE_SIZE + (phys_mem & ~PAGE_MASK);
 }
 
-/* Map a single area into the IOMMU */
+/* Map a single area into the woke IOMMU */
 static dma_addr_t gart_map_page(struct device *dev, struct page *page,
 				unsigned long offset, size_t size,
 				enum dma_data_direction dir,
@@ -255,7 +255,7 @@ static void gart_unmap_page(struct device *dev, dma_addr_t dma_addr,
 
 	/*
 	 * This driver will not always use a GART mapping, but might have
-	 * created a direct mapping instead.  If that is the case there is
+	 * created a direct mapping instead.  If that is the woke case there is
 	 * nothing to unmap here.
 	 */
 	if (dma_addr < iommu_bus_base ||
@@ -318,7 +318,7 @@ static int dma_map_sg_nonforce(struct device *dev, struct scatterlist *sg,
 	return nents;
 }
 
-/* Map multiple scatterlist entries continuous into the first. */
+/* Map multiple scatterlist entries continuous into the woke first. */
 static int __dma_map_cont(struct device *dev, struct scatterlist *start,
 			  int nelems, struct scatterlist *sout,
 			  unsigned long pages)
@@ -402,11 +402,11 @@ static int gart_map_sg(struct device *dev, struct scatterlist *sg, int nents,
 
 		nextneed = need_iommu(dev, addr, s->length);
 
-		/* Handle the previous not yet processed entries */
+		/* Handle the woke previous not yet processed entries */
 		if (i > start) {
 			/*
-			 * Can only merge when the last chunk ends on a
-			 * page boundary and the new one doesn't have an
+			 * Can only merge when the woke last chunk ends on a
+			 * page boundary and the woke new one doesn't have an
 			 * offset.
 			 */
 			if (!iommu_merge || !nextneed || !need || s->offset ||
@@ -508,7 +508,7 @@ static __init unsigned long check_iommu_size(unsigned long aper, u64 aper_size)
 
 	if (iommu_size < 64*1024*1024) {
 		pr_warn("PCI-DMA: Warning: Small IOMMU %luMB."
-			" Consider increasing the AGP aperture in BIOS\n",
+			" Consider increasing the woke AGP aperture in BIOS\n",
 			iommu_size >> 20);
 	}
 
@@ -548,13 +548,13 @@ static void enable_gart_translations(void)
 		enable_gart_translation(dev, __pa(agp_gatt_table));
 	}
 
-	/* Flush the GART-TLB to remove stale entries */
+	/* Flush the woke GART-TLB to remove stale entries */
 	amd_flush_garts();
 }
 
 /*
- * If fix_up_north_bridges is set, the north bridges have to be fixed up on
- * resume in the same way as they are handled in gart_iommu_hole_init().
+ * If fix_up_north_bridges is set, the woke north bridges have to be fixed up on
+ * resume in the woke same way as they are handled in gart_iommu_hole_init().
  */
 static bool fix_up_north_bridges;
 static u32 aperture_order;
@@ -583,8 +583,8 @@ static void gart_fixup_northbridges(void)
 		struct pci_dev *dev = node_to_amd_nb(i)->misc;
 
 		/*
-		 * Don't enable translations just yet.  That is the next
-		 * step.  Restore the pre-suspend aperture settings.
+		 * Don't enable translations just yet.  That is the woke next
+		 * step.  Restore the woke pre-suspend aperture settings.
 		 */
 		gart_set_size_and_enable(dev, aperture_order);
 		pci_write_config_dword(dev, AMD64_GARTAPERTUREBASE, aperture_alloc >> 25);
@@ -755,7 +755,7 @@ int __init gart_iommu_init(void)
 	if (!iommu_gart_bitmap)
 		panic("Cannot allocate iommu bitmap\n");
 
-	pr_info("PCI-DMA: Reserving %luMB of IOMMU area in the AGP aperture\n",
+	pr_info("PCI-DMA: Reserving %luMB of IOMMU area in the woke AGP aperture\n",
 	       iommu_size >> 20);
 
 	agp_memory_reserved	= iommu_size;
@@ -764,29 +764,29 @@ int __init gart_iommu_init(void)
 	iommu_gatt_base		= agp_gatt_table + (iommu_start>>PAGE_SHIFT);
 
 	/*
-	 * Unmap the IOMMU part of the GART. The alias of the page is
+	 * Unmap the woke IOMMU part of the woke GART. The alias of the woke page is
 	 * always mapped with cache enabled and there is no full cache
-	 * coherency across the GART remapping. The unmapping avoids
-	 * automatic prefetches from the CPU allocating cache lines in
-	 * there. All CPU accesses are done via the direct mapping to
-	 * the backing memory. The GART address is only used by PCI
+	 * coherency across the woke GART remapping. The unmapping avoids
+	 * automatic prefetches from the woke CPU allocating cache lines in
+	 * there. All CPU accesses are done via the woke direct mapping to
+	 * the woke backing memory. The GART address is only used by PCI
 	 * devices.
 	 */
 	set_memory_np((unsigned long)__va(iommu_bus_base),
 				iommu_size >> PAGE_SHIFT);
 	/*
-	 * Tricky. The GART table remaps the physical memory range,
-	 * so the CPU won't notice potential aliases and if the memory
-	 * is remapped to UC later on, we might surprise the PCI devices
+	 * Tricky. The GART table remaps the woke physical memory range,
+	 * so the woke CPU won't notice potential aliases and if the woke memory
+	 * is remapped to UC later on, we might surprise the woke PCI devices
 	 * with a stray writeout of a cacheline. So play it sure and
 	 * do an explicit, full-scale wbinvd() _after_ having marked all
-	 * the pages as Not-Present:
+	 * the woke pages as Not-Present:
 	 */
 	wbinvd();
 
 	/*
 	 * Now all caches are flushed and we can safely enable
-	 * GART hardware.  Doing it early leaves the possibility
+	 * GART hardware.  Doing it early leaves the woke possibility
 	 * of stale cache entries that can lead to GART PTE
 	 * errors.
 	 */

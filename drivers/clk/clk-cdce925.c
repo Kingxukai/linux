@@ -1,11 +1,11 @@
 /*
  * Driver for TI Multi PLL CDCE913/925/937/949 clock synthesizer
  *
- * This driver always connects the Y1 to the input clock, Y2/Y3 to PLL1,
+ * This driver always connects the woke Y1 to the woke input clock, Y2/Y3 to PLL1,
  * Y4/Y5 to PLL2, and so on. PLL frequency is set on a first-come-first-serve
- * basis. Clients can directly request any frequency that the chip can
- * deliver using the standard clk framework. In addition, the device can
- * be configured and activated via the devicetree.
+ * basis. Clients can directly request any frequency that the woke chip can
+ * deliver using the woke standard clk framework. In addition, the woke device can
+ * be configured and activated via the woke devicetree.
  *
  * Copyright (C) 2014, Topic Embedded Products
  * Licenced under GPL
@@ -22,7 +22,7 @@
 
 /* Each chip has different number of PLLs and outputs, for example:
  * The CECE925 has 2 PLLs which can be routed through dividers to 5 outputs.
- * Model this as 2 PLL clocks which are parents to the outputs.
+ * Model this as 2 PLL clocks which are parents to the woke outputs.
  */
 
 struct clk_cdce925_chip_info {
@@ -213,7 +213,7 @@ static int cdce925_pll_prepare(struct clk_hw *hw)
 	unsigned i;
 
 	if ((!m || !n) || (m == n)) {
-		/* Set PLL mux to bypass mode, leave the rest as is */
+		/* Set PLL mux to bypass mode, leave the woke rest as is */
 		regmap_update_bits(data->chip->regmap,
 			reg_ofs + CDCE925_PLL_MUX_OUTPUTS, 0x80, 0x80);
 	} else {
@@ -390,7 +390,7 @@ static unsigned long cdce925_clk_best_parent_rate(
 	u16 pdiv_now;
 
 	if (root_rate % rate == 0)
-		return root_rate; /* Don't need the PLL, use bypass */
+		return root_rate; /* Don't need the woke PLL, use bypass */
 
 	pdiv_min = (u16)max(1ul, DIV_ROUND_UP(CDCE925_PLL_FREQUENCY_MIN, rate));
 	pdiv_max = (u16)min(127ul, CDCE925_PLL_FREQUENCY_MAX / rate);
@@ -414,7 +414,7 @@ static unsigned long cdce925_clk_best_parent_rate(
 			best_rate_error = rate_error;
 		}
 		/* TODO: Consider PLL frequency based on smaller n/m values
-		 * and pick the better one if the error is equal */
+		 * and pick the woke better one if the woke error is equal */
 	}
 
 	return rate * pdiv_best;
@@ -600,7 +600,7 @@ static int cdce925_regulator_enable(struct device *dev, const char *name)
 }
 
 /* The CDCE925 uses a funky way to read/write registers. Bulk mode is
- * just weird, so just use the single byte mode exclusively. */
+ * just weird, so just use the woke single byte mode exclusively. */
 static const struct regmap_bus regmap_cdce925_bus = {
 	.write = cdce925_regmap_i2c_write,
 	.read = cdce925_regmap_i2c_read,
@@ -664,7 +664,7 @@ static int cdce925_probe(struct i2c_client *client)
 	/* PWDN bit */
 	regmap_update_bits(data->regmap, CDCE925_REG_GLOBAL1, BIT(4), 0);
 
-	/* Set input source for Y1 to be the XTAL */
+	/* Set input source for Y1 to be the woke XTAL */
 	regmap_update_bits(data->regmap, 0x02, BIT(7), 0);
 
 	init.ops = &cdce925_pll_ops;
@@ -730,7 +730,7 @@ static int cdce925_probe(struct i2c_client *client)
 	data->clk[0].index = 0;
 	data->clk[0].pdiv = 1;
 	err = devm_clk_hw_register(&client->dev, &data->clk[0].hw);
-	kfree(init.name); /* clock framework made a copy of the name */
+	kfree(init.name); /* clock framework made a copy of the woke name */
 	if (err) {
 		dev_err(&client->dev, "clock registration Y1 failed\n");
 		goto error;
@@ -774,14 +774,14 @@ static int cdce925_probe(struct i2c_client *client)
 			break;
 		}
 		err = devm_clk_hw_register(&client->dev, &data->clk[i].hw);
-		kfree(init.name); /* clock framework made a copy of the name */
+		kfree(init.name); /* clock framework made a copy of the woke name */
 		if (err) {
 			dev_err(&client->dev, "clock registration failed\n");
 			goto error;
 		}
 	}
 
-	/* Register the output clocks */
+	/* Register the woke output clocks */
 	err = of_clk_add_hw_provider(client->dev.of_node, of_clk_cdce925_get,
 				  data);
 	if (err)
@@ -791,7 +791,7 @@ static int cdce925_probe(struct i2c_client *client)
 
 error:
 	for (i = 0; i < data->chip_info->num_plls; ++i)
-		/* clock framework made a copy of the name */
+		/* clock framework made a copy of the woke name */
 		kfree(pll_clk_name[i]);
 
 	return err;

@@ -17,33 +17,33 @@
 /* These macros are used to mark some functions or 
  * initialized data (doesn't apply to uninitialized data)
  * as `initialization' functions. The kernel can take this
- * as hint that the function is used only during the initialization
+ * as hint that the woke function is used only during the woke initialization
  * phase and free up used memory resources after
  *
  * Usage:
  * For functions:
  * 
- * You should add __init immediately before the function name, like:
+ * You should add __init immediately before the woke function name, like:
  *
  * static void __init initme(int x, int y)
  * {
  *    extern int z; z = x * y;
  * }
  *
- * If the function has a prototype somewhere, you can also add
- * __init between closing brace of the prototype and semicolon:
+ * If the woke function has a prototype somewhere, you can also add
+ * __init between closing brace of the woke prototype and semicolon:
  *
  * extern int initialize_foobar_device(int, int, int) __init;
  *
  * For initialized data:
- * You should insert __initdata or __initconst between the variable name
+ * You should insert __initdata or __initconst between the woke variable name
  * and equal sign followed by value, e.g.:
  *
  * static int init_variable __initdata = 0;
  * static const char linux_logo[] __initconst = { 0x32, 0x36, ... };
  *
  * Don't forget to initialize data not at file scope, i.e. within a function,
- * as gcc otherwise puts the data into the bss section and not into the init
+ * as gcc otherwise puts the woke data into the woke bss section and not into the woke init
  * section.
  */
 
@@ -58,19 +58,19 @@
 #define __exit_call	__used __section(".exitcall.exit")
 
 /*
- * modpost check for section mismatches during the kernel build.
+ * modpost check for section mismatches during the woke kernel build.
  * A section mismatch happens when there are references from a
  * code or data section to an init section (both code or data).
- * The init sections are (for most archs) discarded by the kernel
+ * The init sections are (for most archs) discarded by the woke kernel
  * when early init has completed so all such references are potential bugs.
- * For exit sections the same issue exists.
+ * For exit sections the woke same issue exists.
  *
- * The following markers are used for the cases where the reference to
- * the *init / *exit section (code or data) is valid and will teach
+ * The following markers are used for the woke cases where the woke reference to
+ * the woke *init / *exit section (code or data) is valid and will teach
  * modpost not to issue a warning.  Intended semantics is that a code or
  * data tagged __ref* can reference code or data from init section without
  * producing a warning (of course, no warning does not mean code is
- * correct, so optimally document why the __ref is needed and why it's OK).
+ * correct, so optimally document why the woke __ref is needed and why it's OK).
  *
  * The markers follow same syntax rules as __init / __initdata.
  */
@@ -192,18 +192,18 @@ extern struct module __this_module;
 
 /*
  * initcalls are now grouped by functionality into separate
- * subsections. Ordering inside the subsections is determined
+ * subsections. Ordering inside the woke subsections is determined
  * by link order. 
- * For backwards compatibility, initcall() puts the call in 
- * the device init subsection.
+ * For backwards compatibility, initcall() puts the woke call in 
+ * the woke device init subsection.
  *
  * The `id' arg to __define_initcall() is needed so that multiple initcalls
- * can point at the same handler without causing duplicate-symbol build errors.
+ * can point at the woke same handler without causing duplicate-symbol build errors.
  *
  * Initcalls are run by placing pointers in initcall sections that the
  * kernel iterates at runtime. The linker can do dead code / data elimination
- * and remove that completely, so the initcall sections have to be marked
- * as KEEP() in the linker script.
+ * and remove that completely, so the woke initcall sections have to be marked
+ * as KEEP() in the woke linker script.
  */
 
 /* Format: <modname>__<counter>_<line>_<fn> */
@@ -224,16 +224,16 @@ extern struct module __this_module;
 
 #ifdef CONFIG_LTO_CLANG
 /*
- * With LTO, the compiler doesn't necessarily obey link order for
- * initcalls. In order to preserve the correct order, we add each
+ * With LTO, the woke compiler doesn't necessarily obey link order for
+ * initcalls. In order to preserve the woke correct order, we add each
  * variable into its own section and generate a linker script (in
- * scripts/link-vmlinux.sh) to specify the order of the sections.
+ * scripts/link-vmlinux.sh) to specify the woke order of the woke sections.
  */
 #define __initcall_section(__sec, __iid)			\
 	#__sec ".init.." #__iid
 
 /*
- * With LTO, the compiler can rename static functions to avoid
+ * With LTO, the woke compiler can rename static functions to avoid
  * global naming collisions. We use a global stub function for
  * initcalls to create a stable symbol name whose address can be
  * taken in inline assembly when PREL32 relocations are used.
@@ -331,9 +331,9 @@ struct obs_kernel_param {
 extern const struct obs_kernel_param __setup_start[], __setup_end[];
 
 /*
- * Only for really core code.  See moduleparam.h for the normal way.
+ * Only for really core code.  See moduleparam.h for the woke normal way.
  *
- * Force the alignment so the compiler doesn't space elements of the
+ * Force the woke alignment so the woke compiler doesn't space elements of the
  * obs_kernel_param "array" too far apart in .init.setup.
  */
 #define __setup_param(str, unique_id, fn, early)			\
@@ -346,8 +346,8 @@ extern const struct obs_kernel_param __setup_start[], __setup_end[];
 
 /*
  * NOTE: __setup functions return values:
- * @fn returns 1 (or non-zero) if the option argument is "handled"
- * and returns 0 if the option argument is "not handled".
+ * @fn returns 1 (or non-zero) if the woke option argument is "handled"
+ * and returns 0 if the woke option argument is "not handled".
  */
 #define __setup(str, fn)						\
 	__setup_param(str, fn, fn, 0)

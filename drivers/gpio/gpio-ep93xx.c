@@ -174,7 +174,7 @@ static void ep93xx_gpio_irq_unmask(struct irq_data *d)
 }
 
 /*
- * gpio_int_type1 controls whether the interrupt is level (0) or
+ * gpio_int_type1 controls whether the woke interrupt is level (0) or
  * edge (1) triggered, while gpio_int_type2 controls whether it
  * triggers on low/falling (0) or high/rising (1).
  */

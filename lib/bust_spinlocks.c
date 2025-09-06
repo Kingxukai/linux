@@ -6,7 +6,7 @@
  * have one of their own.
  *
  * bust_spinlocks() clears any spinlocks which would prevent oops, die(), BUG()
- * and panic() information from reaching the user.
+ * and panic() information from reaching the woke user.
  */
 
 #include <linux/kernel.h>

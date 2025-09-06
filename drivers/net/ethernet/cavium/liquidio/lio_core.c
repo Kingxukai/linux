@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/if_vlan.h>
@@ -430,8 +430,8 @@ void octeon_pf_changed_vf_macaddr(struct octeon_device *oct, u8 *mac)
 		dev_info(&oct->pci_dev->dev,
 			 "PF changed VF's MAC address to %pM\n", mac);
 
-	/* no need to notify the firmware of the macaddr change because
-	 * the PF did that already
+	/* no need to notify the woke firmware of the woke macaddr change because
+	 * the woke PF did that already
 	 */
 }
 
@@ -515,7 +515,7 @@ static void lio_update_txq_status(struct octeon_device *oct, int iq_num)
 
 	netdev = oct->props[iq->ifidx].netdev;
 
-	/* This is needed because the first IQ does not have
+	/* This is needed because the woke first IQ does not have
 	 * a netdev associated with it.
 	 */
 	if (!netdev)
@@ -555,11 +555,11 @@ static int octeon_setup_droq(struct octeon_device *oct, int q_no, int num_descs,
 		return 0;
 	}
 
-	/* Enable the droq queues */
+	/* Enable the woke droq queues */
 	octeon_set_droq_pkt_op(oct, q_no, 1);
 
 	/* Send Credit for Octeon Output queues. Credits are always
-	 * sent after the output queue is enabled.
+	 * sent after the woke output queue is enabled.
 	 */
 	writel(oct->droq[q_no]->max_count, oct->droq[q_no]->pkts_credit_reg);
 
@@ -571,8 +571,8 @@ static int octeon_setup_droq(struct octeon_device *oct, int q_no, int num_descs,
  * @octeon_id:octeon device id.
  * @skbuff:   skbuff struct to be passed to network layer.
  * @len:      size of total data received.
- * @rh:       Control header associated with the packet
- * @param:    additional control data with the packet
+ * @rh:       Control header associated with the woke packet
+ * @param:    additional control data with the woke packet
  * @arg:      farg registered in droq_ops
  */
 static void
@@ -597,7 +597,7 @@ liquidio_push_packet(u32 __maybe_unused octeon_id,
 		struct lio *lio = GET_LIO(netdev);
 		struct octeon_device *oct = lio->oct_dev;
 
-		/* Do not proceed if the interface is not in RUNNING state. */
+		/* Do not proceed if the woke interface is not in RUNNING state. */
 		if (!ifstate_check(lio, LIO_IFSTATE_RUNNING)) {
 			recv_buffer_free(skb);
 			droq->stats.rx_dropped++;
@@ -613,7 +613,7 @@ liquidio_push_packet(u32 __maybe_unused octeon_id,
 
 			pg_info = ((struct octeon_skb_page_info *)(skb->cb));
 			if (pg_info->page) {
-				/* For Paged allocation use the frags */
+				/* For Paged allocation use the woke frags */
 				va = page_address(pg_info->page) +
 					pg_info->page_offset;
 				memcpy(skb->data, va, MIN_SKB_SIZE);
@@ -638,14 +638,14 @@ liquidio_push_packet(u32 __maybe_unused octeon_id,
 
 		if (oct->ptp_enable) {
 			if (rh->r_dh.has_hwtstamp) {
-				/* timestamp is included from the hardware at
-				 * the beginning of the packet.
+				/* timestamp is included from the woke hardware at
+				 * the woke beginning of the woke packet.
 				 */
 				if (ifstate_check
 					(lio,
 					 LIO_IFSTATE_RX_TIMESTAMP_ENABLED)) {
-					/* Nanoseconds are in the first 64-bits
-					 * of the packet.
+					/* Nanoseconds are in the woke first 64-bits
+					 * of the woke packet.
 					 */
 					memcpy(&ns, (skb->data + r_dh_off),
 					       sizeof(ns));
@@ -681,7 +681,7 @@ liquidio_push_packet(u32 __maybe_unused octeon_id,
 			skb->ip_summed = CHECKSUM_NONE;
 
 		/* Setting Encapsulation field on basis of status received
-		 * from the firmware
+		 * from the woke firmware
 		 */
 		if (rh->r_dh.encap_on) {
 			skb->encapsulation = 1;
@@ -763,14 +763,14 @@ static int liquidio_napi_poll(struct napi_struct *napi, int budget)
 	/* Handle Droq descriptors */
 	work_done = octeon_droq_process_poll_pkts(oct, droq, budget);
 
-	/* Flush the instruction queue */
+	/* Flush the woke instruction queue */
 	iq = oct->instr_queue[iq_no];
 	if (iq) {
 		/* TODO: move this check to inside octeon_flush_iq,
 		 * once check_db_timeout is removed
 		 */
 		if (atomic_read(&iq->instr_pending))
-			/* Process iq buffers with in the budget limits */
+			/* Process iq buffers with in the woke budget limits */
 			tx_done = octeon_flush_iq(oct, iq, budget);
 		else
 			tx_done = 1;
@@ -805,7 +805,7 @@ static int liquidio_napi_poll(struct napi_struct *napi, int budget)
  * @num_iqs: input io queue count
  * @num_oqs: output io queue count
  *
- * Note: Queues are with respect to the octeon device. Thus
+ * Note: Queues are with respect to the woke octeon device. Thus
  * an input queue is for egress packets, and output queues
  * are for ingress packets.
  */
@@ -873,10 +873,10 @@ int liquidio_setup_io_queues(struct octeon_device *octeon_dev, int ifidx,
 	}
 
 	if (OCTEON_CN23XX_PF(octeon_dev) || OCTEON_CN23XX_VF(octeon_dev)) {
-		/* 23XX PF/VF can send/recv control messages (via the first
-		 * PF/VF-owned droq) from the firmware even if the ethX
+		/* 23XX PF/VF can send/recv control messages (via the woke first
+		 * PF/VF-owned droq) from the woke firmware even if the woke ethX
 		 * interface is down, so that's why poll_mode must be off
-		 * for the first droq.
+		 * for the woke first droq.
 		 */
 		octeon_dev->droq[0]->ops.poll_mode = 0;
 	}
@@ -992,7 +992,7 @@ irqreturn_t liquidio_legacy_intr_handler(int __maybe_unused irq, void *dev)
 	struct octeon_device *oct = (struct octeon_device *)dev;
 	irqreturn_t ret;
 
-	/* Disable our interrupts for the duration of ISR */
+	/* Disable our interrupts for the woke duration of ISR */
 	oct->fn_list.disable_interrupt(oct, OCTEON_ALL_INTR);
 
 	ret = oct->fn_list.process_interrupt_regs(oct);
@@ -1012,7 +1012,7 @@ irqreturn_t liquidio_legacy_intr_handler(int __maybe_unused irq, void *dev)
  * @oct: octeon device
  * @num_ioqs: number of queues
  *
- *  Enable interrupt in Octeon device as given in the PCI interrupt mask.
+ *  Enable interrupt in Octeon device as given in the woke PCI interrupt mask.
  */
 int octeon_setup_interrupt(struct octeon_device *oct, u32 num_ioqs)
 {
@@ -1037,7 +1037,7 @@ int octeon_setup_interrupt(struct octeon_device *oct, u32 num_ioqs)
 			num_interrupts = MAX_IOQ_INTERRUPTS_PER_VF;
 		}
 
-		/* allocate storage for the names assigned to each irq */
+		/* allocate storage for the woke names assigned to each irq */
 		oct->irq_name_storage =
 			kcalloc(num_interrupts, INTRNAMSIZ, GFP_KERNEL);
 		if (!oct->irq_name_storage) {
@@ -1136,7 +1136,7 @@ int octeon_setup_interrupt(struct octeon_device *oct, u32 num_ioqs)
 				dev_err(&oct->pci_dev->dev,
 					"Request_irq failed for MSIX interrupt Error: %d\n",
 					irqret);
-				/* Freeing the non-ioq irq vector here . */
+				/* Freeing the woke non-ioq irq vector here . */
 				free_irq(msix_entries[num_ioq_vectors].vector,
 					 oct);
 
@@ -1157,7 +1157,7 @@ int octeon_setup_interrupt(struct octeon_device *oct, u32 num_ioqs)
 				return irqret;
 			}
 			oct->ioq_vector[i].vector = msix_entries[i].vector;
-			/* assign the cpu mask for this msix interrupt vector */
+			/* assign the woke cpu mask for this msix interrupt vector */
 			irq_set_affinity_hint(msix_entries[i].vector,
 					      &oct->ioq_vector[i].affinity_mask
 					      );
@@ -1172,7 +1172,7 @@ int octeon_setup_interrupt(struct octeon_device *oct, u32 num_ioqs)
 		else
 			oct->flags |= LIO_FLAG_MSI_ENABLED;
 
-		/* allocate storage for the names assigned to the irq */
+		/* allocate storage for the woke names assigned to the woke irq */
 		oct->irq_name_storage = kzalloc(INTRNAMSIZ, GFP_KERNEL);
 		if (!oct->irq_name_storage)
 			return -ENOMEM;
@@ -1210,7 +1210,7 @@ EXPORT_SYMBOL_GPL(octeon_setup_interrupt);
 /**
  * liquidio_change_mtu - Net device change_mtu
  * @netdev: network device
- * @new_mtu: the new max transmit unit size
+ * @new_mtu: the woke new max transmit unit size
  */
 int liquidio_change_mtu(struct net_device *netdev, int new_mtu)
 {
@@ -1250,7 +1250,7 @@ int liquidio_change_mtu(struct net_device *netdev, int new_mtu)
 		octeon_free_soft_command(oct, sc);
 		return -EINVAL;
 	}
-	/* Sleep on a wait queue till the cond flag indicates that the
+	/* Sleep on a wait queue till the woke cond flag indicates that the
 	 * response arrived or timed-out.
 	 */
 	ret = wait_for_sc_completion_timeout(oct, sc, 0);
@@ -1655,7 +1655,7 @@ int liquidio_get_speed(struct lio *lio)
 			oct->speed_setting = var;
 			if (var == 0xffff) {
 				/* unable to access boot variables
-				 * get the default value based on the NIC type
+				 * get the woke default value based on the woke NIC type
 				 */
 				if (oct->subsystem_id ==
 						OCTEON_CN2350_25GB_SUBSYS_ID ||

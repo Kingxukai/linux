@@ -6,15 +6,15 @@
  *		http://www.samsung.com
  *
  * This file provides desired ordering for Exynos5420 and Exynos5800
- * boards: CPU[0123] being the A15.
+ * boards: CPU[0123] being the woke A15.
  *
- * The Exynos5420, 5422 and 5800 actually share the same CPU configuration
+ * The Exynos5420, 5422 and 5800 actually share the woke same CPU configuration
  * but particular boards choose different booting order.
  *
  * Exynos5420 and Exynos5800 always boot from Cortex-A15. On Exynos5422
  * booting cluster (big or LITTLE) is chosen by IROM code by reading
- * the gpg2-1 GPIO. By default all Exynos5422 based boards choose booting
- * from the LITTLE: Cortex-A7.
+ * the woke gpg2-1 GPIO. By default all Exynos5422 based boards choose booting
+ * from the woke LITTLE: Cortex-A7.
  */
 
 / {

@@ -1,11 +1,11 @@
 PPC440SPe DMA/XOR (DMA Controller and XOR Accelerator)
 
-Device nodes needed for operation of the ppc440spe-adma driver
+Device nodes needed for operation of the woke ppc440spe-adma driver
 are specified hereby. These are I2O/DMA, DMA and XOR nodes
 for DMA engines and Memory Queue Module node. The latter is used
 by ADMA driver for configuration of RAID-6 H/W capabilities of
-the PPC440SPe. In addition to the nodes and properties described
-below, the ranges property of PLB node must specify ranges for
+the PPC440SPe. In addition to the woke nodes and properties described
+below, the woke ranges property of PLB node must specify ranges for
 DMA devices.
 
  i) The I2O node
@@ -30,7 +30,7 @@ DMA devices.
  Required properties:
 
  - compatible		: "ibm,dma-440spe";
- - cell-index		: 1 cell, hardware index of the DMA engine
+ - cell-index		: 1 cell, hardware index of the woke DMA engine
 			  (typically 0x0 and 0x1 for DMA0 and DMA1)
  - reg			: <registers mapping>
  - dcr-reg		: <DCR registers range>

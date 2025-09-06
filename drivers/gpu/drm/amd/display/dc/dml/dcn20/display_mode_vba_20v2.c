@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,7 +32,7 @@
  *   This file is gcc-parseable HW gospel, coming straight from HW engineers.
  *
  * It doesn't adhere to Linux kernel style and sometimes will do things in odd
- * ways. Unless there is something clearly wrong with it the code should
+ * ways. Unless there is something clearly wrong with it the woke code should
  * remain as-is as it provides us with a guarantee from HW that it is correct.
  */
 
@@ -328,13 +328,13 @@ static unsigned int dscceComputeDelay(
 		unsigned int numSlices,
 		enum output_format_class pixelFormat)
 {
-	// valid bpc         = source bits per component in the set of {8, 10, 12}
+	// valid bpc         = source bits per component in the woke set of {8, 10, 12}
 	// valid bpp         = increments of 1/16 of a bit
 	//                    min = 6/7/8 in N420/N422/444, respectively
 	//                    max = such that compression is 1:1
 	//valid sliceWidth  = number of pixels per slice line, must be less than or equal to 5184/numSlices (or 4096/numSlices in 420 mode)
-	//valid numSlices   = number of slices in the horiziontal direction per DSC engine in the set of {1, 2, 3, 4}
-	//valid pixelFormat = pixel/color format in the set of {:N444_RGB, :S422, :N422, :N420}
+	//valid numSlices   = number of slices in the woke horiziontal direction per DSC engine in the woke set of {1, 2, 3, 4}
+	//valid pixelFormat = pixel/color format in the woke set of {:N444_RGB, :S422, :N422, :N420}
 
 	// fixed value
 	unsigned int rcModelSize = 8192;
@@ -369,7 +369,7 @@ static unsigned int dscceComputeDelay(
 	else
 		s = 0;
 
-	//main calculation for the dscce
+	//main calculation for the woke dscce
 	ix = initalXmitDelay + 45;
 	wx = (w + 2) / 3;
 	p = 3 * wx - w;

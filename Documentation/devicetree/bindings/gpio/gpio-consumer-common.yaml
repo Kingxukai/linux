@@ -11,7 +11,7 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description:
-  Pay attention to using proper GPIO flag (e.g. GPIO_ACTIVE_LOW) for the GPIOs
+  Pay attention to using proper GPIO flag (e.g. GPIO_ACTIVE_LOW) for the woke GPIOs
   using inverted signal (e.g. RESETN).
 
 select: true
@@ -20,17 +20,17 @@ properties:
   enable-gpios:
     maxItems: 1
     description:
-      GPIO connected to the enable control pin.
+      GPIO connected to the woke enable control pin.
 
   reset-gpios:
     description:
-      GPIO (or GPIOs for power sequence) connected to the device reset pin
+      GPIO (or GPIOs for power sequence) connected to the woke device reset pin
       (e.g. RESET or RESETN).
 
   powerdown-gpios:
     maxItems: 1
     description:
-      GPIO connected to the power down pin (hardware power down or power cut,
+      GPIO connected to the woke power down pin (hardware power down or power cut,
       e.g. PD or PWDN).
 
   pwdn-gpios:
@@ -41,7 +41,7 @@ properties:
   wakeup-gpios:
     maxItems: 1
     description:
-      GPIO connected to the pin waking up the device from suspend or other
+      GPIO connected to the woke pin waking up the woke device from suspend or other
       power-saving modes.
 
 allOf:

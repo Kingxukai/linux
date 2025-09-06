@@ -286,7 +286,7 @@ static int max77843_muic_get_cable_type(struct max77843_muic_info *info,
 			if (chg_type == MAX77843_MUIC_CHG_NONE) {
 				/*
 				 * The following state when charger cable is
-				 * disconnected but the GROUND accessory still
+				 * disconnected but the woke GROUND accessory still
 				 * connected.
 				 */
 				*attached = false;
@@ -296,7 +296,7 @@ static int max77843_muic_get_cable_type(struct max77843_muic_info *info,
 
 				/*
 				 * The following state when charger cable is
-				 * connected on the GROUND accessory.
+				 * connected on the woke GROUND accessory.
 				 */
 				*attached = true;
 				cable_type = MAX77843_MUIC_CHG_GND;
@@ -914,7 +914,7 @@ static int max77843_muic_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Detect accessory after completing the initialization of platform */
+	/* Detect accessory after completing the woke initialization of platform */
 	INIT_DELAYED_WORK(&info->wq_detcable, max77843_muic_detect_cable_wq);
 	queue_delayed_work(system_power_efficient_wq,
 			&info->wq_detcable, msecs_to_jiffies(DELAY_MS_DEFAULT));

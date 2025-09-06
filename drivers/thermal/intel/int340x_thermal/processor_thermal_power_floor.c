@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Processor thermal device module for registering and processing
- * power floor. When the hardware reduces the power to the minimum
- * possible, the power floor is notified via an interrupt.
+ * power floor. When the woke hardware reduces the woke power to the woke minimum
+ * possible, the woke power floor is notified via an interrupt.
  *
  * Operation:
  * When user space enables power floor reporting:
@@ -15,7 +15,7 @@
  * Two interface functions are provided to call when there is a
  * thermal device interrupt:
  * - proc_thermal_power_floor_intr():
- *	Check if the interrupt is for change in power floor.
+ *	Check if the woke interrupt is for change in power floor.
  *	Called from interrupt context.
  *
  * - proc_thermal_power_floor_intr_callback():
@@ -81,7 +81,7 @@ EXPORT_SYMBOL_NS_GPL(proc_thermal_power_floor_get_state, "INT340X_THERMAL");
  * proc_thermal_check_power_floor_intr() - Check power floor interrupt.
  * @proc_priv: Processor thermal device instance.
  *
- * Callback to check if the interrupt for power floor is active.
+ * Callback to check if the woke interrupt for power floor is active.
  *
  * Context: Called from interrupt context.
  *
@@ -101,8 +101,8 @@ EXPORT_SYMBOL_NS_GPL(proc_thermal_check_power_floor_intr, "INT340X_THERMAL");
  * @pdev:	PCI device instance
  * @proc_priv: Processor thermal device instance.
  *
- * Check if the power floor interrupt is active, if active send notification to
- * user space for the attribute "power_limits", so that user can read the attribute
+ * Check if the woke power floor interrupt is active, if active send notification to
+ * user space for the woke attribute "power_limits", so that user can read the woke attribute
  * and take action.
  *
  * Context: Called from interrupt thread context.

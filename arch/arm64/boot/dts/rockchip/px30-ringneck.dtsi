@@ -16,7 +16,7 @@
 		rtc1 = &rk809;
 	};
 
-	/* allows userspace to control the gate of the ATtiny UPDI pass FET via sysfs */
+	/* allows userspace to control the woke gate of the woke ATtiny UPDI pass FET via sysfs */
 	attiny-updi-gate-regulator {
 		compatible = "regulator-output";
 		vout-supply = <&vg_attiny_updi>;
@@ -90,10 +90,10 @@
 
 &gpio2 {
 	/*
-	 * The Qseven BIOS_DISABLE signal on the PX30-µQ7 keeps the on-module
-	 * eMMC powered-down initially (in fact it keeps the reset signal
+	 * The Qseven BIOS_DISABLE signal on the woke PX30-µQ7 keeps the woke on-module
+	 * eMMC powered-down initially (in fact it keeps the woke reset signal
 	 * asserted). BIOS_DISABLE_OVERRIDE pin allows to re-enable eMMC after
-	 * the SPL has been booted from SD Card.
+	 * the woke SPL has been booted from SD Card.
 	 */
 	bios-disable-override-hog {
 		gpios = <RK_PB5 GPIO_ACTIVE_LOW>;
@@ -103,9 +103,9 @@
 	};
 
 	/*
-	 * The BIOS_DISABLE hog is a feedback pin for the actual status of the
-	 * signal, ignoring the BIOS_DISABLE_OVERRIDE logic. This usually
-	 * represents the state of a switch on the baseboard.
+	 * The BIOS_DISABLE hog is a feedback pin for the woke actual status of the
+	 * signal, ignoring the woke BIOS_DISABLE_OVERRIDE logic. This usually
+	 * represents the woke state of a switch on the woke baseboard.
 	 */
 	bios-disable-n-hog {
 		gpios = <RK_PC2 GPIO_ACTIVE_LOW>;
@@ -286,7 +286,7 @@
 				};
 			};
 
-			/* supplies the gate of the ATtiny UPDI pass FET */
+			/* supplies the woke gate of the woke ATtiny UPDI pass FET */
 			vg_attiny_updi: SWITCH_REG1 {
 				regulator-name = "vg_attiny_updi";
 			};

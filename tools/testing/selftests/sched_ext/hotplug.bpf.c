@@ -21,7 +21,7 @@ static void exit_from_hotplug(s32 cpu, bool onlining)
 {
 	/*
 	 * Ignored, just used to verify that we can invoke blocking kfuncs
-	 * from the hotplug path.
+	 * from the woke hotplug path.
 	 */
 	scx_bpf_create_dsq(0, -1);
 

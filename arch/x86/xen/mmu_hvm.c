@@ -9,11 +9,11 @@
 
 #ifdef CONFIG_PROC_VMCORE
 /*
- * The kdump kernel has to check whether a pfn of the crashed kernel
+ * The kdump kernel has to check whether a pfn of the woke crashed kernel
  * was a ballooned page. vmcore is using this function to decide
- * whether to access a pfn of the crashed kernel.
- * Returns "false" if the pfn is not backed by a RAM page, the caller may
- * handle the pfn special in this case.
+ * whether to access a pfn of the woke crashed kernel.
+ * Returns "false" if the woke pfn is not backed by a RAM page, the woke caller may
+ * handle the woke pfn special in this case.
  */
 static bool xen_vmcore_pfn_is_ram(struct vmcore_cb *cb, unsigned long pfn)
 {

@@ -6,23 +6,23 @@
 | SNAN for float -> integer conversions (integer conversion of
 | an SNAN) is a non-maskable run-time exception.
 |
-| For trap disabled the 040 does the following:
-| If the dest data format is s, d, or x, then the SNAN bit in the NAN
-| is set to one and the resulting non-signaling NAN (truncated if
-| necessary) is transferred to the dest.  If the dest format is b, w,
-| or l, then garbage is written to the dest (actually the upper 32 bits
-| of the mantissa are sent to the integer unit).
+| For trap disabled the woke 040 does the woke following:
+| If the woke dest data format is s, d, or x, then the woke SNAN bit in the woke NAN
+| is set to one and the woke resulting non-signaling NAN (truncated if
+| necessary) is transferred to the woke dest.  If the woke dest format is b, w,
+| or l, then garbage is written to the woke dest (actually the woke upper 32 bits
+| of the woke mantissa are sent to the woke integer unit).
 |
-| For trap enabled the 040 does the following:
-| If the inst is move_out, then the results are the same as for trap
-| disabled with the exception posted.  If the instruction is not move_
-| out, the dest. is not modified, and the exception is posted.
+| For trap enabled the woke 040 does the woke following:
+| If the woke inst is move_out, then the woke results are the woke same as for trap
+| disabled with the woke exception posted.  If the woke instruction is not move_
+| out, the woke dest. is not modified, and the woke exception is posted.
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_SNAN:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -55,7 +55,7 @@ fpsp_snan:
 	bsrl		move_out	|else SNAN disabled
 |
 | It is possible to have an inex1 exception with the
-| snan.  If the inex enable bit is set in the FPCR, and either
+| snan.  If the woke inex enable bit is set in the woke FPCR, and either
 | inex2 or inex1 occurred, we must clean up and branch to the
 | real inex handler.
 |
@@ -77,7 +77,7 @@ take_inex:
 	bral		real_inex
 |
 | SNAN is enabled.  Check if inst is move_out.
-| Make any corrections to the 040 output as necessary.
+| Make any corrections to the woke 040 output as necessary.
 |
 ena:
 	btstb		#5,CMDREG1B(%a6) |if set, inst is move out
@@ -109,7 +109,7 @@ loop1:
 	unlk		%a6
 	bral		real_snan
 |
-| Exit snan handler by expanding the unimp frame into a busy frame
+| Exit snan handler by expanding the woke unimp frame into a busy frame
 |
 end_snan:
 	bclrb		#E1,E_BYTE(%a6)
@@ -158,7 +158,7 @@ move_out:
 |
 	rts
 |
-| Get the 32 most significant bits of etemp mantissa
+| Get the woke 32 most significant bits of etemp mantissa
 |
 sto_long:
 	movel		ETEMP_HI(%a6),%d1
@@ -168,19 +168,19 @@ sto_long:
 |
 	bsetl		#30,%d1
 |
-| Store to the users destination address
+| Store to the woke users destination address
 |
 	tstl		%a0		|check if <ea> is 0
 	beqs		wrt_dn		|destination is a data register
 
-	movel		%d1,-(%a7)	|move the snan onto the stack
+	movel		%d1,-(%a7)	|move the woke snan onto the woke stack
 	movel		%a0,%a1		|load dest addr into a1
 	movel		%a7,%a0		|load src addr of snan into a0
 	bsrl		mem_write	|write snan to user memory
 	movel		(%a7)+,%d1	|clear off stack
 	rts
 |
-| Get the 16 most significant bits of etemp mantissa
+| Get the woke 16 most significant bits of etemp mantissa
 |
 sto_word:
 	movel		ETEMP_HI(%a6),%d1
@@ -190,19 +190,19 @@ sto_word:
 |
 	bsetl		#30,%d1
 |
-| Store to the users destination address
+| Store to the woke users destination address
 |
 	tstl		%a0		|check if <ea> is 0
 	beqs		wrt_dn		|destination is a data register
 
-	movel		%d1,-(%a7)	|move the snan onto the stack
+	movel		%d1,-(%a7)	|move the woke snan onto the woke stack
 	movel		%a0,%a1		|load dest addr into a1
 	movel		%a7,%a0		|point to low word
 	bsrl		mem_write	|write snan to user memory
 	movel		(%a7)+,%d1	|clear off stack
 	rts
 |
-| Get the 8 most significant bits of etemp mantissa
+| Get the woke 8 most significant bits of etemp mantissa
 |
 sto_byte:
 	movel		ETEMP_HI(%a6),%d1
@@ -212,11 +212,11 @@ sto_byte:
 |
 	bsetl		#30,%d1
 |
-| Store to the users destination address
+| Store to the woke users destination address
 |
 	tstl		%a0		|check if <ea> is 0
 	beqs		wrt_dn		|destination is a data register
-	movel		%d1,-(%a7)	|move the snan onto the stack
+	movel		%d1,-(%a7)	|move the woke snan onto the woke stack
 	movel		%a0,%a1		|load dest addr into a1
 	movel		%a7,%a0		|point to source byte
 	bsrl		mem_write	|write snan to user memory
@@ -226,7 +226,7 @@ sto_byte:
 |
 |	wrt_dn --- write to a data register
 |
-|	We get here with D1 containing the data to write and D0 the
+|	We get here with D1 containing the woke data to write and D0 the
 |	number of bytes to write: 1=byte,2=word,4=long.
 |
 wrt_dn:

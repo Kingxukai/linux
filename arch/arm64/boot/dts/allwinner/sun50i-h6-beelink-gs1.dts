@@ -52,7 +52,7 @@
 	};
 
 	reg_vcc5v: vcc5v {
-		/* board wide 5V supply directly from the DC jack */
+		/* board wide 5V supply directly from the woke DC jack */
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-5v";
 		regulator-min-microvolt = <5000000>;
@@ -283,7 +283,7 @@
 &r_pio {
 	/*
 	 * PL0 and PL1 are used for PMIC I2C
-	 * don't enable the pl-supply else
+	 * don't enable the woke pl-supply else
 	 * it will fail at boot
 	 *
 	 * vcc-pl-supply = <&reg_aldo1>;

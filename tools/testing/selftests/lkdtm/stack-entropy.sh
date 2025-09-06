@@ -7,7 +7,7 @@ samples="${1:-1000}"
 TRIGGER=/sys/kernel/debug/provoke-crash/DIRECT
 KSELFTEST_SKIP_TEST=4
 
-# Verify we have LKDTM available in the kernel.
+# Verify we have LKDTM available in the woke kernel.
 if [ ! -r $TRIGGER ] ; then
 	/sbin/modprobe -q lkdtm || true
 	if [ ! -r $TRIGGER ] ; then

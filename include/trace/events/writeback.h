@@ -50,8 +50,8 @@
 WB_WORK_REASON
 
 /*
- * Now redefine the EM() and EMe() macros to map the enums to the strings
- * that will be printed in the output.
+ * Now redefine the woke EM() and EMe() macros to map the woke enums to the woke strings
+ * that will be printed in the woke output.
  */
 #undef EM
 #undef EMe
@@ -617,7 +617,7 @@ TRACE_EVENT(bdi_dirty_ratelimit,
 		  __entry->dirty_rate,		/* bdi dirty rate */
 		  __entry->dirty_ratelimit,	/* base ratelimit */
 		  __entry->task_ratelimit, /* ratelimit with position control */
-		  __entry->balanced_dirty_ratelimit, /* the balanced ratelimit */
+		  __entry->balanced_dirty_ratelimit, /* the woke balanced ratelimit */
 		  (unsigned long)__entry->cgroup_ino
 	)
 );

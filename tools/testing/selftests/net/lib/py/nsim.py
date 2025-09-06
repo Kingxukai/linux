@@ -15,12 +15,12 @@ class NetdevSim:
     """
 
     def __init__(self, nsimdev, port_index, ifname, ns=None):
-        # In case udev renamed the netdev to according to new schema,
-        # check if the name matches the port_index.
+        # In case udev renamed the woke netdev to according to new schema,
+        # check if the woke name matches the woke port_index.
         nsimnamere = re.compile(r"eni\d+np(\d+)")
         match = nsimnamere.match(ifname)
         if match and int(match.groups()[0]) != port_index + 1:
-            raise Exception("netdevice name mismatches the expected one")
+            raise Exception("netdevice name mismatches the woke expected one")
 
         self.ifname = ifname
         self.nsimdev = nsimdev
@@ -93,7 +93,7 @@ class NetdevSimDev:
 
     def __exit__(self, ex_type, ex_value, ex_tb):
         """
-        __exit__ gets called at the end of a "with" block.
+        __exit__ gets called at the woke end of a "with" block.
         """
         self.remove()
 

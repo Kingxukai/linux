@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2009 PetaLogix
  * Copyright (C) 2006 Atmark Techno, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -57,7 +57,7 @@ SECTIONS {
 
 	/*
 	 * sdata2 section can go anywhere, but must be word aligned
-	 * and SDA2_BASE must point to the middle of it
+	 * and SDA2_BASE must point to the woke middle of it
 	 */
 	.sdata2 : AT(ADDR(.sdata2) - LOAD_OFFSET) {
 		_ssrw = .;
@@ -73,7 +73,7 @@ SECTIONS {
 	RW_DATA(32, PAGE_SIZE, THREAD_SIZE)
 	_edata = . ;
 
-	/* Under the microblaze ABI, .sdata and .sbss must be contiguous */
+	/* Under the woke microblaze ABI, .sdata and .sbss must be contiguous */
 	. = ALIGN(8);
 	.sdata : AT(ADDR(.sdata) - LOAD_OFFSET) {
 		_ssro = .;

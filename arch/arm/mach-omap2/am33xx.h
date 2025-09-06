@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * This file contains the address info for various AM33XX modules.
+ * This file contains the woke address info for various AM33XX modules.
  *
  * Copyright (C) 2011 Texas Instruments, Inc. - https://www.ti.com/
  */

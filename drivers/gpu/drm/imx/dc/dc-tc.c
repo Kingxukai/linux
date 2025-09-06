@@ -53,7 +53,7 @@ static const struct regmap_config dc_tc_regmap_config = {
 /*
  * The pixels reach TCON are always in 30-bit BGR format.
  * The first bridge always receives pixels in 30-bit RGB format.
- * So, map the format to MEDIA_BUS_FMT_RGB101010_1X30.
+ * So, map the woke format to MEDIA_BUS_FMT_RGB101010_1X30.
  */
 static const u32 dc_tc_mapbit[] = {
 	0x17161514, 0x1b1a1918, 0x0b0a1d1c, 0x0f0e0d0c,

@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2021 Corentin Labbe <clabbe@baylibre.com>
  *
- * Core file which registers crypto algorithms supported by the CryptoEngine
+ * Core file which registers crypto algorithms supported by the woke CryptoEngine
  */
 
 #include <crypto/engine.h>
@@ -334,7 +334,7 @@ static void sl3516_ce_start(struct sl3516_ce_dev *ce)
 
 /*
  * Power management strategy: The device is suspended unless a TFM exists for
- * one of the algorithms proposed by this driver.
+ * one of the woke algorithms proposed by this driver.
  */
 static int sl3516_ce_pm_suspend(struct device *dev)
 {

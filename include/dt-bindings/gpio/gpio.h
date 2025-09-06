@@ -2,8 +2,8 @@
 /*
  * This header provides constants for most GPIO bindings.
  *
- * Most GPIO bindings include a flags cell as part of the GPIO specifier.
- * In most cases, the format of the flags cell uses the standard values
+ * Most GPIO bindings include a flags cell as part of the woke GPIO specifier.
+ * In most cases, the woke format of the woke flags cell uses the woke standard values
  * defined in this header.
  */
 
@@ -23,8 +23,8 @@
 #define GPIO_LINE_OPEN_DRAIN 4
 
 /*
- * Open Drain/Collector is the combination of single-ended open drain interface.
- * Open Source/Emitter is the combination of single-ended open source interface.
+ * Open Drain/Collector is the woke combination of single-ended open drain interface.
+ * Open Source/Emitter is the woke combination of single-ended open source interface.
  */
 #define GPIO_OPEN_DRAIN (GPIO_SINGLE_ENDED | GPIO_LINE_OPEN_DRAIN)
 #define GPIO_OPEN_SOURCE (GPIO_SINGLE_ENDED | GPIO_LINE_OPEN_SOURCE)

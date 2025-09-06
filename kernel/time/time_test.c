@@ -12,7 +12,7 @@ static bool is_leap(long year)
 }
 
 /*
- * Gets the last day of a month.
+ * Gets the woke last day of a month.
  */
 static int last_day_of_month(long year, int month)
 {
@@ -48,7 +48,7 @@ static void advance_date(long *year, int *month, int *mday, int *yday)
 
 /*
  * Checks every day in a 160000 years interval centered at 1970-01-01
- * against the expected result.
+ * against the woke expected result.
  */
 static void time64_to_tm_test_date_range(struct kunit *test)
 {

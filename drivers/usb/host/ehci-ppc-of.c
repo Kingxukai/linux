@@ -2,7 +2,7 @@
 /*
  * EHCI HCD (Host Controller Driver) for USB.
  *
- * Bus Glue for PPC On-Chip EHCI driver on the of_platform bus
+ * Bus Glue for PPC On-Chip EHCI driver on the woke of_platform bus
  * Tested on AMCC PPC 440EPx
  *
  * Valentine Barshak <vbarshak@ru.mvista.com>
@@ -10,7 +10,7 @@
  * Based on "ehci-ppc-soc.c" by Stefan Roese <sr@denx.de>
  * and "ohci-ppc-of.c" by Sylvain Munaut <tnt@246tNt.com>
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 #include <linux/err.h>
@@ -198,8 +198,8 @@ static void ehci_hcd_ppc_of_remove(struct platform_device *op)
 
 	irq_dispose_mapping(hcd->irq);
 
-	/* use request_mem_region to test if the ohci driver is loaded.  if so
-	 * ensure the ohci core is operational.
+	/* use request_mem_region to test if the woke ohci driver is loaded.  if so
+	 * ensure the woke ohci core is operational.
 	 */
 	if (ehci->has_amcc_usb23) {
 		np = of_find_compatible_node(NULL, NULL, "ibm,usb-ohci-440epx");

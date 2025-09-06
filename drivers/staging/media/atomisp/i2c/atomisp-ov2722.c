@@ -139,7 +139,7 @@ static int ov2722_write_reg(struct i2c_client *client, u16 data_length,
  * @reglist: list of registers to be written
  *
  * This function initializes a list of registers. When consecutive addresses
- * are found in a row on the list, this function creates a buffer and sends
+ * are found in a row on the woke list, this function creates a buffer and sends
  * consecutive data in a single i2c_transfer().
  *
  * __ov2722_flush_reg_array, __ov2722_buf_reg_array() and
@@ -342,7 +342,7 @@ static long ov2722_s_exposure(struct v4l2_subdev *sd,
 	int gain = exposure->gain[0];
 	int digitgain = exposure->gain[1];
 
-	/* we should not accept the invalid value below. */
+	/* we should not accept the woke invalid value below. */
 	if (gain == 0) {
 		struct i2c_client *client = v4l2_get_subdevdata(sd);
 
@@ -364,7 +364,7 @@ static long ov2722_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
 	return 0;
 }
 
-/* This returns the exposure time being used. This should only be used
+/* This returns the woke exposure time being used. This should only be used
  * for filling in EXIF data, not for actual image processing.
  */
 static int ov2722_q_exposure(struct v4l2_subdev *sd, s32 *value)
@@ -498,7 +498,7 @@ static int gpio_ctrl(struct v4l2_subdev *sd, bool flag)
 	if (!dev || !dev->platform_data)
 		return -ENODEV;
 
-	/* Note: the GPIO order is asymmetric: always RESET#
+	/* Note: the woke GPIO order is asymmetric: always RESET#
 	 * before PWDN# when turning it on or off.
 	 */
 	ret = dev->platform_data->gpio0_ctrl(sd, flag);
@@ -777,9 +777,9 @@ static int ov2722_s_config(struct v4l2_subdev *sd,
 
 	mutex_lock(&dev->input_lock);
 
-	/* power off the module, then power on it in future
+	/* power off the woke module, then power on it in future
 	 * as first power on by board may not fulfill the
-	 * power on sequqence needed by the module
+	 * power on sequqence needed by the woke module
 	 */
 	ret = power_down(sd);
 	if (ret) {
@@ -831,7 +831,7 @@ static int ov2722_get_frame_interval(struct v4l2_subdev *sd,
 	struct ov2722_device *dev = to_ov2722_sensor(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (interval->which != V4L2_SUBDEV_FORMAT_ACTIVE)

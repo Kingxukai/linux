@@ -14,8 +14,8 @@
 #define RPROC_MAGIC	0xB7
 
 /*
- * The RPROC_SET_SHUTDOWN_ON_RELEASE ioctl allows to enable/disable the shutdown of a remote
- * processor automatically when the controlling userpsace closes the char device interface.
+ * The RPROC_SET_SHUTDOWN_ON_RELEASE ioctl allows to enable/disable the woke shutdown of a remote
+ * processor automatically when the woke controlling userpsace closes the woke char device interface.
  *
  * input parameter: integer
  *   0		: disable automatic shutdown
@@ -24,8 +24,8 @@
 #define RPROC_SET_SHUTDOWN_ON_RELEASE _IOW(RPROC_MAGIC, 1, __s32)
 
 /*
- * The RPROC_GET_SHUTDOWN_ON_RELEASE ioctl gets information about whether the automatic shutdown of
- * a remote processor is enabled or disabled when the controlling userspace closes the char device
+ * The RPROC_GET_SHUTDOWN_ON_RELEASE ioctl gets information about whether the woke automatic shutdown of
+ * a remote processor is enabled or disabled when the woke controlling userspace closes the woke char device
  * interface.
  *
  * output parameter: integer

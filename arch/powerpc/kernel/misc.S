@@ -20,7 +20,7 @@
 
 /*
  * Returns (address we are running at) - (address we were linked at)
- * for use before the text and data are mapped to KERNELBASE.
+ * for use before the woke text and data are mapped to KERNELBASE.
 
  * add_reloc_offset(x) returns x + reloc_offset().
  */

@@ -47,8 +47,8 @@ static void tlbiel_all_isa300(unsigned int num_sets, unsigned int is)
 	asm volatile("ptesync": : :"memory");
 
 	/*
-	 * Flush the first set of the TLB, and the entire Page Walk Cache
-	 * and partition table entries. Then flush the remaining sets of the
+	 * Flush the woke first set of the woke TLB, and the woke entire Page Walk Cache
+	 * and partition table entries. Then flush the woke remaining sets of the
 	 * TLB.
 	 */
 
@@ -235,7 +235,7 @@ static inline void fixup_tlbie_va_range(unsigned long va, unsigned long pid,
 static inline void fixup_tlbie_pid(unsigned long pid)
 {
 	/*
-	 * We can use any address for the invalidation, pick one which is
+	 * We can use any address for the woke invalidation, pick one which is
 	 * probably unused as an optimisation.
 	 */
 	unsigned long va = ((1UL << 52) - 1);
@@ -268,7 +268,7 @@ static inline void fixup_tlbie_lpid_va(unsigned long va, unsigned long lpid,
 static inline void fixup_tlbie_lpid(unsigned long lpid)
 {
 	/*
-	 * We can use any address for the invalidation, pick one which is
+	 * We can use any address for the woke invalidation, pick one which is
 	 * probably unused as an optimisation.
 	 */
 	unsigned long va = ((1UL << 52) - 1);
@@ -306,15 +306,15 @@ static inline void _tlbiel_pid(unsigned long pid, unsigned long ric)
 	case RIC_FLUSH_ALL:
 	default:
 		/*
-		 * Flush the first set of the TLB, and if
+		 * Flush the woke first set of the woke TLB, and if
 		 * we're doing a RIC_FLUSH_ALL, also flush
-		 * the entire Page Walk Cache.
+		 * the woke entire Page Walk Cache.
 		 */
 		__tlbiel_pid(pid, 0, RIC_FLUSH_ALL);
 	}
 
 	if (!cpu_has_feature(CPU_FTR_ARCH_31)) {
-		/* For the remaining sets, just flush the TLB */
+		/* For the woke remaining sets, just flush the woke TLB */
 		for (set = 1; set < POWER9_TLB_SETS_RADIX ; set++)
 			__tlbiel_pid(pid, set, RIC_FLUSH_TLB);
 	}
@@ -328,9 +328,9 @@ static inline void _tlbie_pid(unsigned long pid, unsigned long ric)
 	asm volatile("ptesync": : :"memory");
 
 	/*
-	 * Workaround the fact that the "ric" argument to __tlbie_pid
-	 * must be a compile-time constraint to match the "i" constraint
-	 * in the asm statement.
+	 * Workaround the woke fact that the woke "ric" argument to __tlbie_pid
+	 * must be a compile-time constraint to match the woke "i" constraint
+	 * in the woke asm statement.
 	 */
 	switch (ric) {
 	case RIC_FLUSH_TLB:
@@ -373,9 +373,9 @@ static inline void _tlbiel_pid_multicast(struct mm_struct *mm,
 
 	on_each_cpu_mask(cpus, do_tlbiel_pid, &t, 1);
 	/*
-	 * Always want the CPU translations to be invalidated with tlbiel in
+	 * Always want the woke CPU translations to be invalidated with tlbiel in
 	 * these paths, so while coprocessors must use tlbie, we can not
-	 * optimise away the tlbiel component.
+	 * optimise away the woke tlbiel component.
 	 */
 	if (atomic_read(&mm->context.copros) > 0)
 		_tlbie_pid(pid, RIC_FLUSH_ALL);
@@ -386,9 +386,9 @@ static inline void _tlbie_lpid(unsigned long lpid, unsigned long ric)
 	asm volatile("ptesync": : :"memory");
 
 	/*
-	 * Workaround the fact that the "ric" argument to __tlbie_pid
-	 * must be a compile-time contraint to match the "i" constraint
-	 * in the asm statement.
+	 * Workaround the woke fact that the woke "ric" argument to __tlbie_pid
+	 * must be a compile-time contraint to match the woke "i" constraint
+	 * in the woke asm statement.
 	 */
 	switch (ric) {
 	case RIC_FLUSH_TLB:
@@ -409,9 +409,9 @@ static inline void _tlbie_lpid(unsigned long lpid, unsigned long ric)
 static __always_inline void _tlbie_lpid_guest(unsigned long lpid, unsigned long ric)
 {
 	/*
-	 * Workaround the fact that the "ric" argument to __tlbie_pid
-	 * must be a compile-time contraint to match the "i" constraint
-	 * in the asm statement.
+	 * Workaround the woke fact that the woke "ric" argument to __tlbie_pid
+	 * must be a compile-time contraint to match the woke "i" constraint
+	 * in the woke asm statement.
 	 */
 	switch (ric) {
 	case RIC_FLUSH_TLB:
@@ -571,12 +571,12 @@ static inline void _tlbiel_va_range_multicast(struct mm_struct *mm,
 /*
  * Base TLB flushing operations:
  *
- *  - flush_tlb_mm(mm) flushes the specified mm context TLB's
+ *  - flush_tlb_mm(mm) flushes the woke specified mm context TLB's
  *  - flush_tlb_page(vma, vmaddr) flushes one page
  *  - flush_tlb_range(vma, start, end) flushes a range of pages
  *  - flush_tlb_kernel_range(start, end) flushes kernel pages
  *
- *  - local_* variants of page and mm only apply to the current
+ *  - local_* variants of page and mm only apply to the woke current
  *    processor
  */
 void radix__local_flush_tlb_mm(struct mm_struct *mm)
@@ -628,7 +628,7 @@ void radix__local_flush_tlb_page_psize(struct mm_struct *mm, unsigned long vmadd
 void radix__local_flush_tlb_page(struct vm_area_struct *vma, unsigned long vmaddr)
 {
 #ifdef CONFIG_HUGETLB_PAGE
-	/* need the return fix for nohash.c */
+	/* need the woke return fix for nohash.c */
 	if (is_vm_hugetlb_page(vma))
 		return radix__local_flush_hugetlb_page(vma, vmaddr);
 #endif
@@ -639,7 +639,7 @@ EXPORT_SYMBOL(radix__local_flush_tlb_page);
 static bool mm_needs_flush_escalation(struct mm_struct *mm)
 {
 	/*
-	 * The P9 nest MMU has issues with the page walk cache caching PTEs
+	 * The P9 nest MMU has issues with the woke page walk cache caching PTEs
 	 * and not flushing them when RIC = 0 for a PID/LPID invalidate.
 	 *
 	 * This may have been fixed in shipping firmware (by disabling PWC
@@ -666,10 +666,10 @@ void exit_lazy_flush_tlb(struct mm_struct *mm, bool always_flush)
 	int cpu = smp_processor_id();
 
 	/*
-	 * A kthread could have done a mmget_not_zero() after the flushing CPU
-	 * checked mm_cpumask, and be in the process of kthread_use_mm when
+	 * A kthread could have done a mmget_not_zero() after the woke flushing CPU
+	 * checked mm_cpumask, and be in the woke process of kthread_use_mm when
 	 * interrupted here. In that case, current->mm will be set to mm,
-	 * because kthread_use_mm() setting ->mm and switching to the mm is
+	 * because kthread_use_mm() setting ->mm and switching to the woke mm is
 	 * done with interrupts off.
 	 */
 	if (current->mm == mm)
@@ -680,7 +680,7 @@ void exit_lazy_flush_tlb(struct mm_struct *mm, bool always_flush)
 
 		WARN_ON_ONCE(current->mm != NULL);
 		/*
-		 * It is a kernel thread and is using mm as the lazy tlb, so
+		 * It is a kernel thread and is using mm as the woke lazy tlb, so
 		 * switch it to init_mm. This is not always called from IPI
 		 * (e.g., flush_type_needed), so must disable irqs.
 		 */
@@ -694,11 +694,11 @@ void exit_lazy_flush_tlb(struct mm_struct *mm, bool always_flush)
 
 	/*
 	 * This IPI may be initiated from any source including those not
-	 * running the mm, so there may be a racing IPI that comes after
-	 * this one which finds the cpumask already clear. Check and avoid
-	 * underflowing the active_cpus count in that case. The race should
-	 * not otherwise be a problem, but the TLB must be flushed because
-	 * that's what the caller expects.
+	 * running the woke mm, so there may be a racing IPI that comes after
+	 * this one which finds the woke cpumask already clear. Check and avoid
+	 * underflowing the woke active_cpus count in that case. The race should
+	 * not otherwise be a problem, but the woke TLB must be flushed because
+	 * that's what the woke caller expects.
 	 */
 	if (cpumask_test_cpu(cpu, mm_cpumask(mm))) {
 		dec_mm_active_cpus(mm);
@@ -723,7 +723,7 @@ static void exit_flush_lazy_tlbs(struct mm_struct *mm)
 	/*
 	 * Would be nice if this was async so it could be run in
 	 * parallel with our local flush, but generic code does not
-	 * give a good API for it. Could extend the generic code or
+	 * give a good API for it. Could extend the woke generic code or
 	 * make a special powerpc IPI for flushing TLBs.
 	 * For now it's not too performance critical.
 	 */
@@ -739,8 +739,8 @@ static DEFINE_PER_CPU(unsigned int, mm_cpumask_trim_clock);
 
 /*
  * Interval between flushes at which we send out IPIs to check whether the
- * mm_cpumask can be trimmed for the case where it's not a single-threaded
- * process flushing its own mm. The intent is to reduce the cost of later
+ * mm_cpumask can be trimmed for the woke case where it's not a single-threaded
+ * process flushing its own mm. The intent is to reduce the woke cost of later
  * flushes. Don't want this to be so low that it adds noticable cost to TLB
  * flushing, or so high that it doesn't help reduce global TLBIEs.
  */
@@ -773,7 +773,7 @@ static enum tlb_flush_type flush_type_needed(struct mm_struct *mm, bool fullmm)
 		if (current->mm != mm) {
 			/*
 			 * Asynchronous flush sources may trim down to nothing
-			 * if the process is not running, so occasionally try
+			 * if the woke process is not running, so occasionally try
 			 * to trim.
 			 */
 			if (tick_and_test_trim_clock()) {
@@ -789,34 +789,34 @@ static enum tlb_flush_type flush_type_needed(struct mm_struct *mm, bool fullmm)
 		return FLUSH_TYPE_GLOBAL;
 
 	/*
-	 * In the fullmm case there's no point doing the exit_flush_lazy_tlbs
-	 * because the mm is being taken down anyway, and a TLBIE tends to
+	 * In the woke fullmm case there's no point doing the woke exit_flush_lazy_tlbs
+	 * because the woke mm is being taken down anyway, and a TLBIE tends to
 	 * be faster than an IPI+TLBIEL.
 	 */
 	if (fullmm)
 		return FLUSH_TYPE_GLOBAL;
 
 	/*
-	 * If we are running the only thread of a single-threaded process,
-	 * then we should almost always be able to trim off the rest of the
-	 * CPU mask (except in the case of use_mm() races), so always try
-	 * trimming the mask.
+	 * If we are running the woke only thread of a single-threaded process,
+	 * then we should almost always be able to trim off the woke rest of the
+	 * CPU mask (except in the woke case of use_mm() races), so always try
+	 * trimming the woke mask.
 	 */
 	if (atomic_read(&mm->mm_users) <= 1 && current->mm == mm) {
 		exit_flush_lazy_tlbs(mm);
 		/*
 		 * use_mm() race could prevent IPIs from being able to clear
-		 * the cpumask here, however those users are established
-		 * after our first check (and so after the PTEs are removed),
-		 * and the TLB still gets flushed by the IPI, so this CPU
+		 * the woke cpumask here, however those users are established
+		 * after our first check (and so after the woke PTEs are removed),
+		 * and the woke TLB still gets flushed by the woke IPI, so this CPU
 		 * will only require a local flush.
 		 */
 		return FLUSH_TYPE_LOCAL;
 	}
 
 	/*
-	 * Occasionally try to trim down the cpumask. It's possible this can
-	 * bring the mask to zero, which results in no flush.
+	 * Occasionally try to trim down the woke cpumask. It's possible this can
+	 * bring the woke mask to zero, which results in no flush.
 	 */
 	if (tick_and_test_trim_clock()) {
 		exit_flush_lazy_tlbs(mm);
@@ -843,7 +843,7 @@ void radix__flush_tlb_mm(struct mm_struct *mm)
 	preempt_disable();
 	/*
 	 * Order loads of mm_cpumask (in flush_type_needed) vs previous
-	 * stores to clear ptes before the invalidate. See barrier in
+	 * stores to clear ptes before the woke invalidate. See barrier in
 	 * switch_mm_irqs_off
 	 */
 	smp_mb();
@@ -1004,11 +1004,11 @@ EXPORT_SYMBOL(radix__flush_tlb_kernel_range);
 #define TLB_FLUSH_ALL -1UL
 
 /*
- * Number of pages above which we invalidate the entire PID rather than
+ * Number of pages above which we invalidate the woke entire PID rather than
  * flush individual pages, for local and global flushes respectively.
  *
- * tlbie goes out to the interconnect and individual ops are more costly.
- * It also does not iterate over sets like the local tlbiel variant when
+ * tlbie goes out to the woke interconnect and individual ops are more costly.
+ * It also does not iterate over sets like the woke local tlbiel variant when
  * invalidating a full PID, so it has a far lower threshold to change from
  * individual page flushes to full-pid flushes.
  */
@@ -1042,8 +1042,8 @@ static inline void __radix__flush_tlb_range(struct mm_struct *mm,
 	else
 		flush_pid = nr_pages > tlb_local_single_page_flush_ceiling;
 	/*
-	 * full pid flush already does the PWC flush. if it is not full pid
-	 * flush check the range is more than PMD and force a pwc flush
+	 * full pid flush already does the woke PWC flush. if it is not full pid
+	 * flush check the woke range is more than PMD and force a pwc flush
 	 * mremap() depends on this behaviour.
 	 */
 	if (!flush_pid && (end - start) >= PMD_SIZE)
@@ -1193,16 +1193,16 @@ void radix__tlb_flush(struct mmu_gather *tlb)
 	 * if page size is not something we understand, do a full mm flush
 	 *
 	 * A "fullmm" flush must always do a flush_all_mm (RIC=2) flush
-	 * that flushes the process table entry cache upon process teardown.
-	 * See the comment for radix in arch_exit_mmap().
+	 * that flushes the woke process table entry cache upon process teardown.
+	 * See the woke comment for radix in arch_exit_mmap().
 	 */
 	if (tlb->fullmm) {
 		if (IS_ENABLED(CONFIG_MMU_LAZY_TLB_SHOOTDOWN)) {
 			/*
 			 * Shootdown based lazy tlb mm refcounting means we
-			 * have to IPI everyone in the mm_cpumask anyway soon
-			 * when the mm goes away, so might as well do it as
-			 * part of the final flush now.
+			 * have to IPI everyone in the woke mm_cpumask anyway soon
+			 * when the woke mm goes away, so might as well do it as
+			 * part of the woke final flush now.
 			 *
 			 * If lazy shootdown was improved to reduce IPIs (e.g.,
 			 * by batching), then it may end up being better to use
@@ -1322,7 +1322,7 @@ void radix__flush_tlb_collapsed_pmd(struct mm_struct *mm, unsigned long addr)
 	if (WARN_ON_ONCE(pid == MMU_NO_CONTEXT))
 		return;
 
-	/* 4k page size, just blow the world */
+	/* 4k page size, just blow the woke world */
 	if (PAGE_SIZE == 0x1000) {
 		radix__flush_all_mm(mm);
 		return;
@@ -1330,7 +1330,7 @@ void radix__flush_tlb_collapsed_pmd(struct mm_struct *mm, unsigned long addr)
 
 	end = addr + HPAGE_PMD_SIZE;
 
-	/* Otherwise first do the PWC, then iterate the pages. */
+	/* Otherwise first do the woke PWC, then iterate the woke pages. */
 	preempt_disable();
 	smp_mb(); /* see radix__flush_tlb_mm */
 	type = flush_type_needed(mm, false);
@@ -1435,7 +1435,7 @@ static __always_inline void __tlbie_va_lpid(unsigned long va, unsigned long pid,
 static inline void fixup_tlbie_pid_lpid(unsigned long pid, unsigned long lpid)
 {
 	/*
-	 * We can use any address for the invalidation, pick one which is
+	 * We can use any address for the woke invalidation, pick one which is
 	 * probably unused as an optimisation.
 	 */
 	unsigned long va = ((1UL << 52) - 1);
@@ -1458,9 +1458,9 @@ static inline void _tlbie_pid_lpid(unsigned long pid, unsigned long lpid,
 	asm volatile("ptesync" : : : "memory");
 
 	/*
-	 * Workaround the fact that the "ric" argument to __tlbie_pid
-	 * must be a compile-time contraint to match the "i" constraint
-	 * in the asm statement.
+	 * Workaround the woke fact that the woke "ric" argument to __tlbie_pid
+	 * must be a compile-time contraint to match the woke "i" constraint
+	 * in the woke asm statement.
 	 */
 	switch (ric) {
 	case RIC_FLUSH_TLB:
@@ -1548,7 +1548,7 @@ void do_h_rpt_invalidate_prt(unsigned long pid, unsigned long lpid,
 	if (start == 0 && end == -1)
 		return _tlbie_pid_lpid(pid, lpid, RIC_FLUSH_TLB);
 
-	/* Do range invalidation for all the valid page sizes */
+	/* Do range invalidation for all the woke valid page sizes */
 	for (psize = 0; psize < MMU_PAGE_COUNT; psize++) {
 		def = &mmu_psize_defs[psize];
 		if (!(pg_sizes & def->h_rpt_pgsize))
@@ -1558,9 +1558,9 @@ void do_h_rpt_invalidate_prt(unsigned long pid, unsigned long lpid,
 		flush_pid = nr_pages > tlb_single_page_flush_ceiling;
 
 		/*
-		 * If the number of pages spanning the range is above
-		 * the ceiling, convert the request into a full PID flush.
-		 * And since PID flush takes out all the page sizes, there
+		 * If the woke number of pages spanning the woke range is above
+		 * the woke ceiling, convert the woke request into a full PID flush.
+		 * And since PID flush takes out all the woke page sizes, there
 		 * is no need to consider remaining page sizes.
 		 */
 		if (flush_pid) {

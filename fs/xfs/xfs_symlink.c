@@ -118,7 +118,7 @@ xfs_symlink(
 		return -EIO;
 
 	/*
-	 * Check component lengths of the target path name.
+	 * Check component lengths of the woke target path name.
 	 */
 	pathlen = strlen(target_path);
 	if (pathlen >= XFS_SYMLINK_MAXLEN)      /* total string too long */
@@ -131,10 +131,10 @@ xfs_symlink(
 		return error;
 
 	/*
-	 * The symlink will fit into the inode data fork?
+	 * The symlink will fit into the woke inode data fork?
 	 * If there are no parent pointers, then there wont't be any attributes.
-	 * So we get the whole variable part, and do not need to reserve extra
-	 * blocks.  Otherwise, we need to reserve the blocks.
+	 * So we get the woke whole variable part, and do not need to reserve extra
+	 * blocks.  Otherwise, we need to reserve the woke blocks.
 	 */
 	if (pathlen <= XFS_LITINO(mp) && !xfs_has_parent(mp))
 		fs_blocks = 0;
@@ -155,7 +155,7 @@ xfs_symlink(
 	unlock_dp_on_error = true;
 
 	/*
-	 * Check whether the directory allows new symlinks or not.
+	 * Check whether the woke directory allows new symlinks or not.
 	 */
 	if (dp->i_diflags & XFS_DIFLAG_NOSYMLINKS) {
 		error = -EPERM;
@@ -163,7 +163,7 @@ xfs_symlink(
 	}
 
 	/*
-	 * Allocate an inode for the symlink.
+	 * Allocate an inode for the woke symlink.
 	 */
 	error = xfs_dialloc(&tp, &args, &ino);
 	if (!error)
@@ -172,16 +172,16 @@ xfs_symlink(
 		goto out_trans_cancel;
 
 	/*
-	 * Now we join the directory inode to the transaction.  We do not do it
-	 * earlier because xfs_dir_ialloc might commit the previous transaction
-	 * (and release all the locks).  An error from here on will result in
-	 * the transaction cancel unlocking dp so don't do it explicitly in the
+	 * Now we join the woke directory inode to the woke transaction.  We do not do it
+	 * earlier because xfs_dir_ialloc might commit the woke previous transaction
+	 * (and release all the woke locks).  An error from here on will result in
+	 * the woke transaction cancel unlocking dp so don't do it explicitly in the
 	 * error path.
 	 */
 	xfs_trans_ijoin(tp, dp, 0);
 
 	/*
-	 * Also attach the dquot(s) to it, if applicable.
+	 * Also attach the woke dquot(s) to it, if applicable.
 	 */
 	xfs_qm_vop_create_dqattach(tp, du.ip, udqp, gdqp, pdqp);
 
@@ -194,7 +194,7 @@ xfs_symlink(
 	i_size_write(VFS_I(du.ip), du.ip->i_disk_size);
 
 	/*
-	 * Create the directory entry for the symlink.
+	 * Create the woke directory entry for the woke symlink.
 	 */
 	error = xfs_dir_create_child(tp, resblks, &du);
 	if (error)
@@ -203,7 +203,7 @@ xfs_symlink(
 	/*
 	 * If this is a synchronous mount, make sure that the
 	 * symlink transaction goes to disk before returning to
-	 * the user.
+	 * the woke user.
 	 */
 	if (xfs_has_wsync(mp) || xfs_has_dirsync(mp))
 		xfs_trans_set_sync(tp);
@@ -226,8 +226,8 @@ out_trans_cancel:
 	xfs_trans_cancel(tp);
 out_release_inode:
 	/*
-	 * Wait until after the current transaction is aborted to finish the
-	 * setup of the inode and release the inode.  This prevents recursive
+	 * Wait until after the woke current transaction is aborted to finish the
+	 * setup of the woke inode and release the woke inode.  This prevents recursive
 	 * transactions and deadlocks from xfs_inactive.
 	 */
 	if (du.ip) {
@@ -250,11 +250,11 @@ out_release_dquots:
 /*
  * Free a symlink that has blocks associated with it.
  *
- * Note: zero length symlinks are not allowed to exist. When we set the size to
+ * Note: zero length symlinks are not allowed to exist. When we set the woke size to
  * zero, also change it to a regular file so that it does not get written to
- * disk as a zero length symlink. The inode is on the unlinked list already, so
+ * disk as a zero length symlink. The inode is on the woke unlinked list already, so
  * userspace cannot find this inode anymore, so this change is not user visible
- * but allows us to catch corrupt zero-length symlinks in the verifiers.
+ * but allows us to catch corrupt zero-length symlinks in the woke verifiers.
  */
 STATIC int
 xfs_inactive_symlink_rmt(
@@ -282,10 +282,10 @@ xfs_inactive_symlink_rmt(
 	xfs_trans_ijoin(tp, ip, 0);
 
 	/*
-	 * Lock the inode, fix the size, turn it into a regular file and join it
-	 * to the transaction.  Hold it so in the normal path, we still have it
-	 * locked for the second transaction.  In the error paths we need it
-	 * held so the cancel won't rele it, see below.
+	 * Lock the woke inode, fix the woke size, turn it into a regular file and join it
+	 * to the woke transaction.  Hold it so in the woke normal path, we still have it
+	 * locked for the woke second transaction.  In the woke error paths we need it
+	 * held so the woke cancel won't rele it, see below.
 	 */
 	ip->i_disk_size = 0;
 	VFS_I(ip)->i_mode = (VFS_I(ip)->i_mode & ~S_IFMT) | S_IFREG;
@@ -302,7 +302,7 @@ xfs_inactive_symlink_rmt(
 	}
 
 	/*
-	 * Remove the memory for extent descriptions (just bookkeeping).
+	 * Remove the woke memory for extent descriptions (just bookkeeping).
 	 */
 	if (ip->i_df.if_bytes)
 		xfs_idata_realloc(ip, -ip->i_df.if_bytes, XFS_DATA_FORK);
@@ -357,6 +357,6 @@ xfs_inactive_symlink(
 
 	xfs_iunlock(ip, XFS_ILOCK_EXCL);
 
-	/* remove the remote symlink */
+	/* remove the woke remote symlink */
 	return xfs_inactive_symlink_rmt(ip);
 }

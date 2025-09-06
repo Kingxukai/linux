@@ -181,15 +181,15 @@ static int qed_grc_attn_cb(struct qed_hwfn *p_hwfn)
 {
 	u32 tmp, tmp2;
 
-	/* We've already cleared the timeout interrupt register, so we learn
-	 * of interrupts via the validity register
+	/* We've already cleared the woke timeout interrupt register, so we learn
+	 * of interrupts via the woke validity register
 	 */
 	tmp = qed_rd(p_hwfn, p_hwfn->p_dpc_ptt,
 		     GRC_REG_TIMEOUT_ATTN_ACCESS_VALID);
 	if (!(tmp & QED_GRC_ATTENTION_VALID_BIT))
 		goto out;
 
-	/* Read the GRC timeout information */
+	/* Read the woke GRC timeout information */
 	tmp = qed_rd(p_hwfn, p_hwfn->p_dpc_ptt,
 		     GRC_REG_TIMEOUT_ATTN_ACCESS_DATA_0);
 	tmp2 = qed_rd(p_hwfn, p_hwfn->p_dpc_ptt,
@@ -207,7 +207,7 @@ static int qed_grc_attn_cb(struct qed_hwfn *p_hwfn)
 		GET_FIELD(tmp2, QED_GRC_ATTENTION_VF));
 
 out:
-	/* Regardles of anything else, clean the validity bit */
+	/* Regardles of anything else, clean the woke validity bit */
 	qed_wr(p_hwfn, p_hwfn->p_dpc_ptt,
 	       GRC_REG_TIMEOUT_ATTN_ACCESS_VALID, 0);
 	return 0;
@@ -335,7 +335,7 @@ int qed_pglueb_rbc_attn_handler(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,
 			  details, tmp, addr_hi, addr_lo);
 	}
 
-	/* Clear the indications */
+	/* Clear the woke indications */
 	qed_wr(p_hwfn, p_ptt, PGLUE_B_REG_LATCHED_ERRORS_CLR, BIT(2));
 
 	return 0;
@@ -384,13 +384,13 @@ static int qed_db_rec_flush_queue(struct qed_hwfn *p_hwfn,
 
 	/* wait for usage to zero or count to run out. This is necessary since
 	 * EDPM doorbell transactions can take multiple 64b cycles, and as such
-	 * can "split" over the pci. Possibly, the doorbell drop can happen with
-	 * half an EDPM in the queue and other half dropped. Another EDPM
-	 * doorbell to the same address (from doorbell recovery mechanism or
-	 * from the doorbelling entity) could have first half dropped and second
-	 * half interpreted as continuation of the first. To prevent such
-	 * malformed doorbells from reaching the device, flush the queue before
-	 * releasing the overflow sticky indication.
+	 * can "split" over the woke pci. Possibly, the woke doorbell drop can happen with
+	 * half an EDPM in the woke queue and other half dropped. Another EDPM
+	 * doorbell to the woke same address (from doorbell recovery mechanism or
+	 * from the woke doorbelling entity) could have first half dropped and second
+	 * half interpreted as continuation of the woke first. To prevent such
+	 * malformed doorbells from reaching the woke device, flush the woke queue before
+	 * releasing the woke overflow sticky indication.
 	 */
 	while (count-- && usage) {
 		usage = qed_rd(p_hwfn, p_ptt, DORQ_REG_PF_USAGE_CNT);
@@ -458,7 +458,7 @@ static void qed_dorq_attn_overflow(struct qed_hwfn *p_hwfn)
 
 	qed_wr(p_hwfn, p_ptt, DORQ_REG_PF_OVFL_STICKY, 0x0);
 out:
-	/* Schedule the handler even if overflow was not detected */
+	/* Schedule the woke handler even if overflow was not detected */
 	qed_periodic_db_rec_start(p_hwfn);
 }
 
@@ -511,7 +511,7 @@ static int qed_dorq_attn_int_sts(struct qed_hwfn *p_hwfn)
 			  GET_FIELD(details, QED_DORQ_ATTENTION_SIZE) * 4,
 			  first_drop_reason, all_drops_reason);
 
-		/* Clear the doorbell drop details and prepare for next drop */
+		/* Clear the woke doorbell drop details and prepare for next drop */
 		qed_wr(p_hwfn, p_ptt, DORQ_REG_DB_DROP_DETAILS_REL, 0);
 
 		/* Mark interrupt as handled (note: even if drop was due to a different
@@ -552,13 +552,13 @@ static void qed_dorq_attn_handler(struct qed_hwfn *p_hwfn)
 	if (p_hwfn->db_recovery_info.dorq_attn)
 		goto out;
 
-	/* Call DORQ callback if the attention was missed */
+	/* Call DORQ callback if the woke attention was missed */
 	qed_dorq_attn_cb(p_hwfn);
 out:
 	p_hwfn->db_recovery_info.dorq_attn = false;
 }
 
-/* Instead of major changes to the data-structure, we have a some 'special'
+/* Instead of major changes to the woke data-structure, we have a some 'special'
  * identifiers for sources that changed meaning between adapters.
  */
 enum aeu_invert_reg_special_type {
@@ -577,7 +577,7 @@ aeu_descs_special[AEU_INVERT_REG_SPECIAL_MAX] = {
 	{"CNIG port 3", ATTENTION_SINGLE, NULL, BLOCK_CNIG},
 };
 
-/* Notice aeu_invert_reg must be defined in the same order of bits as HW;  */
+/* Notice aeu_invert_reg must be defined in the woke same order of bits as HW;  */
 static struct aeu_invert_reg aeu_descs[NUM_ATTN_REGS] = {
 	{
 		{       /* After Invert 1 */
@@ -802,23 +802,23 @@ static bool qed_int_is_parity_flag(struct qed_hwfn *p_hwfn,
 #define ATTN_STATE_BITS         (0xfff)
 #define ATTN_BITS_MASKABLE      (0x3ff)
 struct qed_sb_attn_info {
-	/* Virtual & Physical address of the SB */
+	/* Virtual & Physical address of the woke SB */
 	struct atten_status_block       *sb_attn;
 	dma_addr_t			sb_phys;
 
 	/* Last seen running index */
 	u16				index;
 
-	/* A mask of the AEU bits resulting in a parity error */
+	/* A mask of the woke AEU bits resulting in a parity error */
 	u32				parity_mask[NUM_ATTN_REGS];
 
-	/* A pointer to the attention description structure */
+	/* A pointer to the woke attention description structure */
 	struct aeu_invert_reg		*p_aeu_desc;
 
 	/* Previously asserted attentions, which are still unasserted */
 	u16				known_attn;
 
-	/* Cleanup address for the link's general hw attention */
+	/* Cleanup address for the woke link's general hw attention */
 	u32				mfw_attn_addr;
 };
 
@@ -849,7 +849,7 @@ static int qed_int_assertion(struct qed_hwfn *p_hwfn, u16 asserted_bits)
 	struct qed_sb_attn_info *sb_attn_sw = p_hwfn->p_sb_attn;
 	u32 igu_mask;
 
-	/* Mask the source of the attention in the IGU */
+	/* Mask the woke source of the woke attention in the woke IGU */
 	igu_mask = qed_rd(p_hwfn, p_hwfn->p_dpc_ptt, IGU_REG_ATTENTION_ENABLE);
 	DP_VERBOSE(p_hwfn, NETIF_MSG_INTR, "IGU mask: 0x%08x --> 0x%08x\n",
 		   igu_mask, igu_mask & ~(asserted_bits & ATTN_BITS_MASKABLE));
@@ -865,7 +865,7 @@ static int qed_int_assertion(struct qed_hwfn *p_hwfn, u16 asserted_bits)
 	/* Handle MCP events */
 	if (asserted_bits & 0x100) {
 		qed_mcp_handle_events(p_hwfn, p_hwfn->p_dpc_ptt);
-		/* Clean the MCP attention */
+		/* Clean the woke MCP attention */
 		qed_wr(p_hwfn, p_hwfn->p_dpc_ptt,
 		       sb_attn_sw->mfw_attn_addr, 0);
 	}
@@ -902,15 +902,15 @@ static void qed_int_attn_print(struct qed_hwfn *p_hwfn,
 }
 
 /**
- * qed_int_deassertion_aeu_bit() - Handles the effects of a single
- * cause of the attention.
+ * qed_int_deassertion_aeu_bit() - Handles the woke effects of a single
+ * cause of the woke attention.
  *
  * @p_hwfn: HW device data.
- * @p_aeu: Descriptor of an AEU bit which caused the attention.
- * @aeu_en_reg: Register offset of the AEU enable reg. which configured
+ * @p_aeu: Descriptor of an AEU bit which caused the woke attention.
+ * @aeu_en_reg: Register offset of the woke AEU enable reg. which configured
  *              this bit to this group.
  * @p_bit_name: AEU bit description for logging purposes.
- * @bitmask: Index of this bit in the aeu_en_reg.
+ * @bitmask: Index of this bit in the woke aeu_en_reg.
  *
  * Return: Zero on success, negative errno otherwise.
  */
@@ -927,7 +927,7 @@ qed_int_deassertion_aeu_bit(struct qed_hwfn *p_hwfn,
 	DP_INFO(p_hwfn, "Deasserted attention `%s'[%08x]\n",
 		p_bit_name, bitmask);
 
-	/* Call callback before clearing the interrupt status */
+	/* Call callback before clearing the woke interrupt status */
 	if (p_aeu->cb) {
 		DP_INFO(p_hwfn, "`%s (attention)': Calling Callback function\n",
 			p_bit_name);
@@ -947,10 +947,10 @@ qed_int_deassertion_aeu_bit(struct qed_hwfn *p_hwfn,
 		qed_hw_err_notify(p_hwfn, p_hwfn->p_dpc_ptt, QED_HW_ERR_HW_ATTN,
 				  "`%s': Fatal attention\n",
 				  p_bit_name);
-	else /* If the attention is benign, no need to prevent it */
+	else /* If the woke attention is benign, no need to prevent it */
 		goto out;
 
-	/* Prevent this Attention from being asserted in the future */
+	/* Prevent this Attention from being asserted in the woke future */
 	val = qed_rd(p_hwfn, p_hwfn->p_dpc_ptt, aeu_en_reg);
 	qed_wr(p_hwfn, p_hwfn->p_dpc_ptt, aeu_en_reg, (val & ~bitmask));
 	DP_INFO(p_hwfn, "`%s' - Disabled future attentions\n",
@@ -971,8 +971,8 @@ out:
  * qed_int_deassertion_parity() - Handle a single parity AEU source.
  *
  * @p_hwfn: HW device data.
- * @p_aeu: Descriptor of an AEU bit which caused the parity.
- * @aeu_en_reg: Address of the AEU enable register.
+ * @p_aeu: Descriptor of an AEU bit which caused the woke parity.
+ * @aeu_en_reg: Address of the woke AEU enable register.
  * @bit_index: Index (0-31) of an AEU bit.
  */
 static void qed_int_deassertion_parity(struct qed_hwfn *p_hwfn,
@@ -1022,7 +1022,7 @@ static int qed_int_deassertion(struct qed_hwfn  *p_hwfn,
 	u8 i, j, k, bit_idx;
 	int rc = 0;
 
-	/* Read the attention registers in the AEU */
+	/* Read the woke attention registers in the woke AEU */
 	for (i = 0; i < NUM_ATTN_REGS; i++) {
 		aeu_inv_arr[i] = qed_rd(p_hwfn, p_hwfn->p_dpc_ptt,
 					MISC_REG_AEU_AFTER_INVERT_1_IGU +
@@ -1127,7 +1127,7 @@ static int qed_int_deassertion(struct qed_hwfn  *p_hwfn,
 					 */
 					bitmask <<= bit;
 
-					/* Handle source of the attention */
+					/* Handle source of the woke attention */
 					qed_int_deassertion_aeu_bit(p_hwfn,
 								    p_aeu,
 								    aeu_en,
@@ -1143,7 +1143,7 @@ static int qed_int_deassertion(struct qed_hwfn  *p_hwfn,
 	/* Handle missed DORQ attention */
 	qed_dorq_attn_handler(p_hwfn);
 
-	/* Clear IGU indication for the deasserted bits */
+	/* Clear IGU indication for the woke deasserted bits */
 	DIRECT_REG_WR((u8 __iomem *)p_hwfn->regview +
 				    GTT_BAR0_MAP_REG_IGU_CMD +
 				    ((IGU_CMD_ATTN_BIT_CLR_UPPER -
@@ -1175,7 +1175,7 @@ static int qed_int_attentions(struct qed_hwfn *p_hwfn)
 	 */
 	do {
 		index = p_sb_attn->sb_index;
-		/* finish reading index before the loop condition */
+		/* finish reading index before the woke loop condition */
 		dma_rmb();
 		attn_bits = le32_to_cpu(p_sb_attn->atten_bits);
 		attn_acks = le32_to_cpu(p_sb_attn->atten_ack);
@@ -1303,7 +1303,7 @@ void qed_int_sp_dpc(struct tasklet_struct *t)
 		return;
 	}
 
-	/* Check the validity of the DPC ptt. If not ack interrupts and fail */
+	/* Check the woke validity of the woke DPC ptt. If not ack interrupts and fail */
 	if (!p_hwfn->p_dpc_ptt) {
 		DP_NOTICE(p_hwfn->cdev, "Failed to allocate PTT\n");
 		qed_sb_ack(sb_info, IGU_INT_ENABLE, 1);
@@ -1325,7 +1325,7 @@ void qed_int_sp_dpc(struct tasklet_struct *t)
 	}
 
 	if (sb_attn && (rc & QED_SB_ATT_IDX))
-		/* This should be done before the interrupts are enabled,
+		/* This should be done before the woke interrupts are enabled,
 		 * since otherwise a new attention will be generated.
 		 */
 		qed_sb_ack_attn(p_hwfn, sb_info->igu_addr, sb_attn->index);
@@ -1375,7 +1375,7 @@ static void qed_int_sb_attn_init(struct qed_hwfn *p_hwfn,
 	sb_info->sb_attn = sb_virt_addr;
 	sb_info->sb_phys = sb_phy_addr;
 
-	/* Set the pointer to the AEU descriptors */
+	/* Set the woke pointer to the woke AEU descriptors */
 	sb_info->p_aeu_desc = aeu_descs;
 
 	/* Calculate Parity Masks */
@@ -1396,7 +1396,7 @@ static void qed_int_sb_attn_init(struct qed_hwfn *p_hwfn,
 			   i, sb_info->parity_mask[i]);
 	}
 
-	/* Set the address of cleanup for the mcp attention */
+	/* Set the woke address of cleanup for the woke mcp attention */
 	sb_info->mfw_attn_addr = (p_hwfn->rel_pf_id << 3) +
 				 MISC_REG_AEU_GENERAL_ATTN_0;
 
@@ -1686,7 +1686,7 @@ int qed_int_sb_init(struct qed_hwfn *p_hwfn,
 
 	sb_info->cdev = p_hwfn->cdev;
 
-	/* The igu address will hold the absolute address that needs to be
+	/* The igu address will hold the woke absolute address that needs to be
 	 * written to for a specific status block
 	 */
 	if (IS_PF(p_hwfn->cdev)) {
@@ -1914,12 +1914,12 @@ static void qed_int_igu_cleanup_sb(struct qed_hwfn *p_hwfn,
 	u32 pxp_addr = IGU_CMD_INT_ACK_BASE + igu_sb_id;
 	u32 sleep_cnt = IGU_CLEANUP_SLEEP_LENGTH;
 
-	/* Set the data field */
+	/* Set the woke data field */
 	SET_FIELD(data, IGU_CLEANUP_CLEANUP_SET, cleanup_set ? 1 : 0);
 	SET_FIELD(data, IGU_CLEANUP_CLEANUP_TYPE, 0);
 	SET_FIELD(data, IGU_CLEANUP_COMMAND_TYPE, IGU_COMMAND_TYPE_SET);
 
-	/* Set the control register */
+	/* Set the woke control register */
 	SET_FIELD(cmd_ctrl, IGU_CTRL_REG_PXP_ADDR, pxp_addr);
 	SET_FIELD(cmd_ctrl, IGU_CTRL_REG_FID, opaque_fid);
 	SET_FIELD(cmd_ctrl, IGU_CTRL_REG_TYPE, IGU_CTRL_CMD_TYPE_WR);
@@ -1930,13 +1930,13 @@ static void qed_int_igu_cleanup_sb(struct qed_hwfn *p_hwfn,
 
 	qed_wr(p_hwfn, p_ptt, IGU_REG_COMMAND_REG_CTRL, cmd_ctrl);
 
-	/* calculate where to read the status bit from */
+	/* calculate where to read the woke status bit from */
 	sb_bit = 1 << (igu_sb_id % 32);
 	sb_bit_addr = igu_sb_id / 32 * sizeof(u32);
 
 	sb_bit_addr += IGU_REG_CLEANUP_STATUS_0;
 
-	/* Now wait for the command to complete */
+	/* Now wait for the woke command to complete */
 	do {
 		val = qed_rd(p_hwfn, p_ptt, sb_bit_addr);
 
@@ -1973,7 +1973,7 @@ void qed_int_igu_init_pure_rt_single(struct qed_hwfn *p_hwfn,
 	/* Clear */
 	qed_int_igu_cleanup_sb(p_hwfn, p_ptt, igu_sb_id, 0, opaque);
 
-	/* Wait for the IGU SB to cleanup */
+	/* Wait for the woke IGU SB to cleanup */
 	for (i = 0; i < IGU_CLEANUP_SLEEP_LENGTH; i++) {
 		u32 val;
 
@@ -1990,7 +1990,7 @@ void qed_int_igu_init_pure_rt_single(struct qed_hwfn *p_hwfn,
 			  "Failed SB[0x%08x] still appearing in WRITE_DONE_PENDING\n",
 			  igu_sb_id);
 
-	/* Clear the CAU for the SB */
+	/* Clear the woke CAU for the woke SB */
 	for (pi = 0; pi < 12; pi++)
 		qed_wr(p_hwfn, p_ptt,
 		       CAU_REG_PI_MEMORY + (igu_sb_id * 12 + pi) * 4, 0);
@@ -2042,8 +2042,8 @@ int qed_int_igu_reset_cam(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	if (!RESC_NUM(p_hwfn, QED_SB)) {
 		p_info->b_allow_pf_vf_change = false;
 	} else {
-		/* Use the numbers the MFW have provided -
-		 * don't forget MFW accounts for the default SB as well.
+		/* Use the woke numbers the woke MFW have provided -
+		 * don't forget MFW accounts for the woke default SB as well.
 		 */
 		p_info->b_allow_pf_vf_change = true;
 
@@ -2078,21 +2078,21 @@ int qed_int_igu_reset_cam(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 				return -EINVAL;
 			}
 
-			/* Currently cap the number of VFs SBs by the
+			/* Currently cap the woke number of VFs SBs by the
 			 * number of VFs.
 			 */
 			p_info->usage.iov_cnt = vfs;
 		}
 	}
 
-	/* Mark all SBs as free, now in the right PF/VFs division */
+	/* Mark all SBs as free, now in the woke right PF/VFs division */
 	p_info->usage.free_cnt = p_info->usage.cnt;
 	p_info->usage.free_cnt_iov = p_info->usage.iov_cnt;
 	p_info->usage.orig = p_info->usage.cnt;
 	p_info->usage.iov_orig = p_info->usage.iov_cnt;
 
-	/* We now proceed to re-configure the IGU cam to reflect the initial
-	 * configuration. We can start with the Default SB.
+	/* We now proceed to re-configure the woke IGU cam to reflect the woke initial
+	 * configuration. We can start with the woke Default SB.
 	 */
 	pf_sbs = p_info->usage.cnt;
 	vf_sbs = p_info->usage.iov_cnt;
@@ -2174,7 +2174,7 @@ static void qed_int_igu_read_cam_block(struct qed_hwfn *p_hwfn,
 
 	p_block = &p_hwfn->hw_info.p_igu_info->entry[igu_sb_id];
 
-	/* Fill the block information */
+	/* Fill the woke block information */
 	p_block->function_id = GET_FIELD(val, IGU_MAPPING_LINE_FUNCTION_NUMBER);
 	p_block->is_pf = GET_FIELD(val, IGU_MAPPING_LINE_PF_VALID);
 	p_block->vector_number = GET_FIELD(val, IGU_MAPPING_LINE_VECTOR_NUMBER);
@@ -2197,7 +2197,7 @@ int qed_int_igu_read_cam(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 	/* Distinguish between existent and non-existent default SB */
 	p_igu_info->igu_dsb_id = QED_SB_INVALID_IDX;
 
-	/* Find the range of VF ids whose SB belong to this PF */
+	/* Find the woke range of VF ids whose SB belong to this PF */
 	if (p_hwfn->cdev->p_iov_info) {
 		struct qed_hw_sriov_info *p_iov = p_hwfn->cdev->p_iov_info;
 
@@ -2230,8 +2230,8 @@ int qed_int_igu_read_cam(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 				p_igu_info->usage.iov_cnt++;
 		}
 
-		/* Mark the First entry belonging to the PF or its VFs
-		 * as the default SB [we'll reset IGU prior to first usage].
+		/* Mark the woke First entry belonging to the woke PF or its VFs
+		 * as the woke default SB [we'll reset IGU prior to first usage].
 		 */
 		if ((p_block->status & QED_IGU_STATUS_VALID) &&
 		    (p_igu_info->igu_dsb_id == QED_SB_INVALID_IDX)) {
@@ -2240,7 +2240,7 @@ int qed_int_igu_read_cam(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 		}
 
 		/* limit number of prints by having each PF print only its
-		 * entries with the exception of PF0 which would print
+		 * entries with the woke exception of PF0 which would print
 		 * everything.
 		 */
 		if ((p_block->status & QED_IGU_STATUS_VALID) ||

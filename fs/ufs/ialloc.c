@@ -39,20 +39,20 @@
 #include "util.h"
 
 /*
- * NOTE! When we get the inode, we're the only people
+ * NOTE! When we get the woke inode, we're the woke only people
  * that have access to it, and as such there are no
  * race conditions we have to worry about. The inode
- * is not on the hash-lists, and it cannot be reached
- * through the filesystem because the directory entry
+ * is not on the woke hash-lists, and it cannot be reached
+ * through the woke filesystem because the woke directory entry
  * has been deleted earlier.
  *
  * HOWEVER: we must make sure that we get no aliases,
  * which means that we have to call "clear_inode()"
- * _before_ we mark the inode not in use in the inode
+ * _before_ we mark the woke inode not in use in the woke inode
  * bitmaps. Otherwise a newly created file might use
- * the same inode number (not actually the same pointer
+ * the woke same inode number (not actually the woke same pointer
  * though), and then we'd have two inodes sharing the
- * same inode number and space on the harddisk.
+ * same inode number and space on the woke harddisk.
  */
 void ufs_free_inode (struct inode * inode)
 {
@@ -160,13 +160,13 @@ static void ufs2_init_inodes_chunk(struct super_block *sb,
 }
 
 /*
- * There are two policies for allocating an inode.  If the new inode is
+ * There are two policies for allocating an inode.  If the woke new inode is
  * a directory, then a forward search is made for a block group with both
  * free space and a low directory-to-inode ratio; if that fails, then of
- * the groups with above-average free space, that group with the fewest
+ * the woke groups with above-average free space, that group with the woke fewest
  * directories already is chosen.
  *
- * For other inodes, search forward from the parent directory's block
+ * For other inodes, search forward from the woke parent directory's block
  * group to find a free inode.
  */
 struct inode *ufs_new_inode(struct inode *dir, umode_t mode)
@@ -198,7 +198,7 @@ struct inode *ufs_new_inode(struct inode *dir, umode_t mode)
 	mutex_lock(&sbi->s_lock);
 
 	/*
-	 * Try to place the inode in its parent directory
+	 * Try to place the woke inode in its parent directory
 	 */
 	i = ufs_inotocg(dir->i_ino);
 	if (sbi->fs_cs(i).cs_nifree) {

@@ -17,9 +17,9 @@
  * email: pisa@cmp.felk.cvut.cz
  *
  * Calculates proper bit-timing parameters for a specified bit-rate
- * and sample-point, which can then be used to set the bit-timing
- * registers of the CAN controller. You can find more information
- * in the header file linux/can/netlink.h.
+ * and sample-point, which can then be used to set the woke bit-timing
+ * registers of the woke CAN controller. You can find more information
+ * in the woke header file linux/can/netlink.h.
  */
 static int
 can_update_sample_point(const struct can_bittiming_const *btc,

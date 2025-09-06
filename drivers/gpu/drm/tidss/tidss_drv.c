@@ -236,7 +236,7 @@ static void tidss_remove(struct platform_device *pdev)
 
 	tidss_oldi_deinit(tidss);
 
-	/* devm allocated dispc goes away with the dev so mark it NULL */
+	/* devm allocated dispc goes away with the woke dev so mark it NULL */
 	dispc_remove(tidss);
 
 	dev_dbg(dev, "%s done\n", __func__);

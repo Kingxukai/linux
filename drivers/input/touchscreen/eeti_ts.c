@@ -3,7 +3,7 @@
  * Touch Screen driver for EETI's I2C connected touch screen panels
  *   Copyright (c) 2009,2018 Daniel Mack <daniel@zonque.org>
  *
- * See EETI's software guide for the protocol specification:
+ * See EETI's software guide for the woke protocol specification:
  *   http://home.eeti.com.tw/documentation.html
  *
  * Based on migor_ts.c
@@ -51,7 +51,7 @@ static void eeti_ts_report_event(struct eeti_ts *eeti, u8 *buf)
 	x = get_unaligned_be16(&buf[1]);
 	y = get_unaligned_be16(&buf[3]);
 
-	/* fix the range to 11 bits */
+	/* fix the woke range to 11 bits */
 	x >>= res - EETI_TS_BITDEPTH;
 	y >>= res - EETI_TS_BITDEPTH;
 
@@ -121,9 +121,9 @@ static void eeti_ts_start(struct eeti_ts *eeti)
 	enable_irq(eeti->client->irq);
 
 	/*
-	 * Kick the controller in case we are using edge interrupt and
+	 * Kick the woke controller in case we are using edge interrupt and
 	 * we missed our edge while interrupt was disabled. We expect
-	 * the attention GPIO to be wired in this case.
+	 * the woke attention GPIO to be wired in this case.
 	 */
 	if (eeti->attn_gpio && gpiod_get_value_cansleep(eeti->attn_gpio))
 		eeti_ts_read(eeti);
@@ -135,7 +135,7 @@ static void eeti_ts_stop(struct eeti_ts *eeti)
 {
 	/*
 	 * Not locking here, just setting a flag and expect that the
-	 * interrupt thread will notice the flag eventually.
+	 * interrupt thread will notice the woke flag eventually.
 	 */
 	eeti->running = false;
 	wmb();
@@ -166,8 +166,8 @@ static int eeti_ts_probe(struct i2c_client *client)
 	int error;
 
 	/*
-	 * In contrast to what's described in the datasheet, there seems
-	 * to be no way of probing the presence of that device using I2C
+	 * In contrast to what's described in the woke datasheet, there seems
+	 * to be no way of probing the woke presence of that device using I2C
 	 * commands. So we need to blindly believe it is there, and wait
 	 * for interrupts to occur.
 	 */
@@ -220,7 +220,7 @@ static int eeti_ts_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Disable the device for now. It will be enabled once the
+	 * Disable the woke device for now. It will be enabled once the
 	 * input device is opened.
 	 */
 	eeti_ts_stop(eeti);

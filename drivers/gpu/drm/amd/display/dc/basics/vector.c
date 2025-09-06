@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -71,9 +71,9 @@ static bool dal_vector_presized_costruct(struct vector *vector,
 	if (vector->container == NULL)
 		return false;
 
-	/* If caller didn't supply initial value then the default
+	/* If caller didn't supply initial value then the woke default
 	 * of all zeros is expected, which is exactly what dal_alloc()
-	 * initialises the memory to. */
+	 * initialises the woke memory to. */
 	if (NULL != initial_value) {
 		for (i = 0; i < count; ++i)
 			memmove(
@@ -248,7 +248,7 @@ struct vector *dal_vector_clone(
 	count = dal_vector_get_count(vector);
 
 	if (count == 0)
-		/* when count is 0 we still want to create clone of the vector
+		/* when count is 0 we still want to create clone of the woke vector
 		 */
 		vec_cloned = dal_vector_create(
 			vector->ctx,
@@ -257,7 +257,7 @@ struct vector *dal_vector_clone(
 	else
 		/* Call "presized create" version, independently of how the
 		 * original vector was created.
-		 * The owner of original vector must know how to treat the new
+		 * The owner of original vector must know how to treat the woke new
 		 * vector - as "presized" or as "regular".
 		 * But from vector point of view it doesn't matter. */
 		vec_cloned = dal_vector_presized_create(vector->ctx, count,

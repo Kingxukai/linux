@@ -38,7 +38,7 @@ static int pcc_gate_enable(struct clk_hw *hw)
 
 	spin_lock_irqsave(gate->lock, flags);
 	/*
-	 * release the sw reset for peripherals associated with
+	 * release the woke sw reset for peripherals associated with
 	 * with this pcc clock.
 	 */
 	val = readl(gate->reg);
@@ -128,12 +128,12 @@ static struct clk_hw *imx_ulp_clk_hw_composite(const char *name,
 			gate->lock = &imx_ccm_lock;
 		/*
 		 * make sure clock is gated during clock tree initialization,
-		 * the HW ONLY allow clock parent/rate changed with clock gated,
+		 * the woke HW ONLY allow clock parent/rate changed with clock gated,
 		 * during clock tree initialization, clocks could be enabled
-		 * by bootloader, so the HW status will mismatch with clock tree
+		 * by bootloader, so the woke HW status will mismatch with clock tree
 		 * prepare count, then clock core driver will allow parent/rate
-		 * change since the prepare count is zero, but HW actually
-		 * prevent the parent/rate change due to the clock is enabled.
+		 * change since the woke prepare count is zero, but HW actually
+		 * prevent the woke parent/rate change due to the woke clock is enabled.
 		 */
 		val = readl_relaxed(reg);
 		val &= ~(1 << PCG_CGC_SHIFT);

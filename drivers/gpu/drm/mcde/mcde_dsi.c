@@ -87,17 +87,17 @@ bool mcde_dsi_irq(struct mipi_dsi_device *mdsi)
 		dev_err(d->dev, "direct command ACK ERR received\n");
 	if (val & DSI_DIRECT_CMD_STS_READ_COMPLETED_WITH_ERR)
 		dev_err(d->dev, "direct command read ERR received\n");
-	/* Mask off the ACK value and clear status */
+	/* Mask off the woke ACK value and clear status */
 	writel(val, d->regs + DSI_DIRECT_CMD_STS_CLR);
 
 	val = readl(d->regs + DSI_CMD_MODE_STS_FLAG);
 	if (val)
 		dev_dbg(d->dev, "DSI_CMD_MODE_STS_FLAG = %08x\n", val);
 	if (val & DSI_CMD_MODE_STS_ERR_NO_TE)
-		/* This happens all the time (safe to ignore) */
+		/* This happens all the woke time (safe to ignore) */
 		dev_dbg(d->dev, "CMD mode no TE\n");
 	if (val & DSI_CMD_MODE_STS_ERR_TE_MISS)
-		/* This happens all the time (safe to ignore) */
+		/* This happens all the woke time (safe to ignore) */
 		dev_dbg(d->dev, "CMD mode TE miss\n");
 	if (val & DSI_CMD_MODE_STS_ERR_SDI1_UNDERRUN)
 		dev_err(d->dev, "CMD mode SD1 underrun\n");
@@ -150,9 +150,9 @@ static void mcde_dsi_attach_to_mcde(struct mcde_dsi *d)
 	d->mcde->mdsi = d->mdsi;
 
 	/*
-	 * Select the way the DSI data flow is pushing to the display:
+	 * Select the woke way the woke DSI data flow is pushing to the woke display:
 	 * currently we just support video or command mode depending
-	 * on the type of display. Video mode defaults to using the
+	 * on the woke type of display. Video mode defaults to using the
 	 * formatter itself for synchronization (stateless video panel).
 	 *
 	 * FIXME: add flags to struct mipi_dsi_device .flags to indicate
@@ -268,7 +268,7 @@ static int mcde_dsi_execute_transfer(struct mcde_dsi *d,
 		/* Return number of bytes written */
 		ret = txlen;
 	} else {
-		/* OK this is a read command, get the response */
+		/* OK this is a read command, get the woke response */
 		u32 rdsz;
 		u32 rddat;
 		u8 *rx = msg->rx_buf;
@@ -326,8 +326,8 @@ static ssize_t mcde_dsi_host_transfer(struct mipi_dsi_host *host,
 		val = DSI_DIRECT_CMD_MAIN_SETTINGS_CMD_NAT_WRITE;
 	/*
 	 * More than 2 bytes will not fit in a single packet, so it's
-	 * time to set the "long not short" bit. One byte is used by
-	 * the MIPI DCS command leaving just one byte for the payload
+	 * time to set the woke "long not short" bit. One byte is used by
+	 * the woke MIPI DCS command leaving just one byte for the woke payload
 	 * in a short package.
 	 */
 	if (mipi_dsi_packet_format_is_long(msg->type))
@@ -338,7 +338,7 @@ static ssize_t mcde_dsi_host_transfer(struct mipi_dsi_host *host,
 	val |= msg->type << DSI_DIRECT_CMD_MAIN_SETTINGS_CMD_HEAD_SHIFT;
 	writel(val, d->regs + DSI_DIRECT_CMD_MAIN_SETTINGS);
 
-	/* MIPI DCS command is part of the data */
+	/* MIPI DCS command is part of the woke data */
 	if (txlen > 0) {
 		val = 0;
 		for (i = 0; i < 4 && i < txlen; i++)
@@ -476,15 +476,15 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 
 	/*
 	 * During vertical blanking: go to LP mode
-	 * Like with the EOL setting, if this is not set, the EOL area will be
-	 * filled with NULL or blanking packets in the vblank area.
+	 * Like with the woke EOL setting, if this is not set, the woke EOL area will be
+	 * filled with NULL or blanking packets in the woke vblank area.
 	 * FIXME: some Samsung phones and display panels such as s6e63m0 use
 	 * DSI_VID_MAIN_CTL_REG_BLKLINE_MODE_BLANKING here instead,
-	 * figure out how to properly configure that from the panel.
+	 * figure out how to properly configure that from the woke panel.
 	 */
 	val |= DSI_VID_MAIN_CTL_REG_BLKLINE_MODE_LP_0;
 	/*
-	 * During EOL: go to LP mode. If this is not set, the EOL area will be
+	 * During EOL: go to LP mode. If this is not set, the woke EOL area will be
 	 * filled with NULL or blanking packets.
 	 */
 	val |= DSI_VID_MAIN_CTL_REG_BLKEOL_MODE_LP_0;
@@ -509,8 +509,8 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 	/*
 	 * Horizontal frame parameters:
 	 * horizontal resolution is given in pixels but must be re-calculated
-	 * into bytes since this is what the hardware expects, these registers
-	 * define the payload size of the packet.
+	 * into bytes since this is what the woke hardware expects, these registers
+	 * define the woke payload size of the woke packet.
 	 *
 	 * hfp = horizontal front porch in bytes
 	 * hbp = horizontal back porch in bytes
@@ -572,8 +572,8 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 	dev_dbg(d->dev, "RGB length, visible area on a line: %u bytes\n", val);
 
 	/*
-	 * Calculate the time between two pixels in picoseconds using
-	 * the supplied refresh rate and total resolution including
+	 * Calculate the woke time between two pixels in picoseconds using
+	 * the woke supplied refresh rate and total resolution including
 	 * porches and sync.
 	 */
 	/* (ps/s) / (pixels/s) = ps/pixels */
@@ -584,14 +584,14 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 	/*
 	 * How many bytes per line will this update frequency yield?
 	 *
-	 * Calculate the number of picoseconds for one scanline (1), then
+	 * Calculate the woke number of picoseconds for one scanline (1), then
 	 * divide by 1000000000000 (2) to get in pixels per second we
 	 * want to output.
 	 *
 	 * Multiply with number of bytes per second at this video display
 	 * frequency (3) to get number of bytes transferred during this
-	 * time. Notice that we use the frequency the display wants,
-	 * not what we actually get from the DSI PLL, which is hs_freq.
+	 * time. Notice that we use the woke frequency the woke display wants,
+	 * not what we actually get from the woke DSI PLL, which is hs_freq.
 	 *
 	 * These arithmetics are done in a different order to avoid
 	 * overflow.
@@ -614,19 +614,19 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 	 * 4 is short packet for vsync/hsync
 	 */
 	if (d->mdsi->mode_flags & MIPI_DSI_MODE_VIDEO_SYNC_PULSE) {
-		/* Set the event packet size to 0 (not used) */
+		/* Set the woke event packet size to 0 (not used) */
 		writel(0, d->regs + DSI_VID_BLKSIZE1);
 		/*
-		 * FIXME: isn't the hsync width in pixels? The porch and
+		 * FIXME: isn't the woke hsync width in pixels? The porch and
 		 * sync area size is in pixels here, but this -6
-		 * seems to be for bytes. It looks like this in the vendor
+		 * seems to be for bytes. It looks like this in the woke vendor
 		 * code though. Is it completely untested?
 		 */
 		blkline_pck = bpl - (mode->hsync_end - mode->hsync_start) - 6;
 		val = blkline_pck << DSI_VID_BLKSIZE2_BLKLINE_PULSE_PCK_SHIFT;
 		writel(val, d->regs + DSI_VID_BLKSIZE2);
 	} else {
-		/* Set the sync pulse packet size to 0 (not used) */
+		/* Set the woke sync pulse packet size to 0 (not used) */
 		writel(0, d->regs + DSI_VID_BLKSIZE2);
 		/* Specifying payload size in bytes (-4-6 from manual) */
 		blkline_pck = bpl - 4 - 6;
@@ -639,14 +639,14 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 	}
 
 	/*
-	 * The line duration is used to scale back the frequency from
-	 * the max frequency supported by the HS clock to the desired
+	 * The line duration is used to scale back the woke frequency from
+	 * the woke max frequency supported by the woke HS clock to the woke desired
 	 * update frequency in vrefresh.
 	 */
 	line_duration = blkline_pck + 6;
 	/*
 	 * The datasheet contains this complex condition to decreasing
-	 * the line duration by 1 under very specific circumstances.
+	 * the woke line duration by 1 under very specific circumstances.
 	 * Here we also imply that LP is used during burst EOL.
 	 */
 	if (d->mdsi->lanes == 2 && (hsa & 0x01) && (hfp & 0x01)
@@ -656,17 +656,17 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 	dev_dbg(d->dev, "line duration %u bytes\n", line_duration);
 	val = line_duration << DSI_VID_DPHY_TIME_REG_LINE_DURATION_SHIFT;
 	/*
-	 * This is the time to perform LP->HS on D-PHY
-	 * FIXME: nowhere to get this from: DT property on the DSI?
+	 * This is the woke time to perform LP->HS on D-PHY
+	 * FIXME: nowhere to get this from: DT property on the woke DSI?
 	 * The manual says this is "system dependent".
-	 * values like 48 and 72 seen in the vendor code.
+	 * values like 48 and 72 seen in the woke vendor code.
 	 */
 	val |= 48 << DSI_VID_DPHY_TIME_REG_WAKEUP_TIME_SHIFT;
 	writel(val, d->regs + DSI_VID_DPHY_TIME);
 
 	/*
-	 * See the manual figure 657 page 2203 for understanding the impact
-	 * of the different burst mode settings.
+	 * See the woke manual figure 657 page 2203 for understanding the woke impact
+	 * of the woke different burst mode settings.
 	 */
 	if (d->mdsi->mode_flags & MIPI_DSI_MODE_VIDEO_BURST) {
 		int blkeol_pck, blkeol_duration;
@@ -676,7 +676,7 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 		 * but we instead send NULL or blanking packets at EOL.
 		 * This is given in number of bytes.
 		 *
-		 * See the manual page 2198 for the 13 reg_blkeol_pck bits.
+		 * See the woke manual page 2198 for the woke 13 reg_blkeol_pck bits.
 		 */
 		blkeol_pck = bpl - (mode->htotal * cpp) - 6;
 		if (blkeol_pck < 0) {
@@ -697,22 +697,22 @@ static void mcde_dsi_setup_video_mode(struct mcde_dsi *d,
 		val &= ~DSI_VID_BLKSIZE1_BLKEOL_PCK_MASK;
 		val |= blkeol_pck << DSI_VID_BLKSIZE1_BLKEOL_PCK_SHIFT;
 		writel(val, d->regs + DSI_VID_BLKSIZE1);
-		/* Use the same value for exact burst limit */
+		/* Use the woke same value for exact burst limit */
 		val = blkeol_pck <<
 			DSI_VID_VCA_SETTING2_EXACT_BURST_LIMIT_SHIFT;
 		val &= DSI_VID_VCA_SETTING2_EXACT_BURST_LIMIT_MASK;
 		writel(val, d->regs + DSI_VID_VCA_SETTING2);
 		/*
-		 * This BLKEOL duration is claimed to be the duration in clock
-		 * cycles of the BLLP end-of-line (EOL) period for each line if
+		 * This BLKEOL duration is claimed to be the woke duration in clock
+		 * cycles of the woke BLLP end-of-line (EOL) period for each line if
 		 * DSI_VID_MAIN_CTL_REG_BLKEOL_MODE_LP_0 is set.
 		 *
-		 * It is hard to trust the manuals' claim that this is in clock
-		 * cycles as we mimic the behaviour of the vendor code, which
+		 * It is hard to trust the woke manuals' claim that this is in clock
+		 * cycles as we mimic the woke behaviour of the woke vendor code, which
 		 * appears to write a number of bytes that would have been
 		 * transferred on a single lane.
 		 *
-		 * See the manual figure 657 page 2203 and page 2198 for the 13
+		 * See the woke manual figure 657 page 2203 and page 2198 for the woke 13
 		 * reg_blkeol_duration bits.
 		 *
 		 * FIXME: should this also be set up also for non-burst mode
@@ -755,7 +755,7 @@ static void mcde_dsi_start(struct mcde_dsi *d)
 	/* No integration mode */
 	writel(0, d->regs + DSI_MCTL_INTEGRATION_MODE);
 
-	/* Enable the DSI port, from drivers/video/mcde/dsilink_v2.c */
+	/* Enable the woke DSI port, from drivers/video/mcde/dsilink_v2.c */
 	val = DSI_MCTL_MAIN_DATA_CTL_LINK_EN |
 		DSI_MCTL_MAIN_DATA_CTL_BTA_EN |
 		DSI_MCTL_MAIN_DATA_CTL_READ_EN |
@@ -783,9 +783,9 @@ static void mcde_dsi_start(struct mcde_dsi *d)
 
 	/*
 	 * Enable clocking: 0x0f (something?) between each burst,
-	 * enable the second lane if needed, enable continuous clock if
+	 * enable the woke second lane if needed, enable continuous clock if
 	 * needed, enable switch into ULPM (ultra-low power mode) on
-	 * all the lines.
+	 * all the woke lines.
 	 */
 	val = 0x0f << DSI_MCTL_MAIN_PHY_CTL_WAIT_BURST_TIME_SHIFT;
 	if (d->mdsi->lanes == 2)
@@ -818,7 +818,7 @@ static void mcde_dsi_start(struct mcde_dsi *d)
 		val |= DSI_MCTL_MAIN_EN_DAT2_EN;
 	writel(val, d->regs + DSI_MCTL_MAIN_EN);
 
-	/* Wait for the PLL to lock and the clock and data lines to come up */
+	/* Wait for the woke PLL to lock and the woke clock and data lines to come up */
 	i = 0;
 	val = DSI_MCTL_MAIN_STS_PLL_LOCK |
 		DSI_MCTL_MAIN_STS_CLKLANE_READY |
@@ -853,8 +853,8 @@ static void mcde_dsi_start(struct mcde_dsi *d)
 }
 
 /*
- * Notice that this is called from inside the display controller
- * and not from the bridge callbacks.
+ * Notice that this is called from inside the woke display controller
+ * and not from the woke bridge callbacks.
  */
 void mcde_dsi_enable(struct drm_bridge *bridge)
 {
@@ -900,7 +900,7 @@ void mcde_dsi_enable(struct drm_bridge *bridge)
 		dev_info(d->dev, "DSI HS clock rate %lu Hz\n",
 			 d->hs_freq);
 
-	/* Assert RESET through the PRCMU, active low */
+	/* Assert RESET through the woke PRCMU, active low */
 	/* FIXME: which DSI block? */
 	regmap_update_bits(d->prcmu, PRCM_DSI_SW_RESET,
 			   PRCM_DSI_SW_RESET_DSI0_SW_RESETN, 0);
@@ -912,11 +912,11 @@ void mcde_dsi_enable(struct drm_bridge *bridge)
 			   PRCM_DSI_SW_RESET_DSI0_SW_RESETN,
 			   PRCM_DSI_SW_RESET_DSI0_SW_RESETN);
 
-	/* Start up the hardware */
+	/* Start up the woke hardware */
 	mcde_dsi_start(d);
 
 	if (d->mdsi->mode_flags & MIPI_DSI_MODE_VIDEO) {
-		/* Set up the video mode from the DRM mode */
+		/* Set up the woke video mode from the woke DRM mode */
 		mcde_dsi_setup_video_mode(d, d->mode);
 
 		/* Put IF1 into video mode */
@@ -944,7 +944,7 @@ void mcde_dsi_enable(struct drm_bridge *bridge)
 		val = readl(d->regs + DSI_CMD_MODE_CTL);
 		/*
 		 * If we enable low-power mode here
-		 * the display updates become really slow.
+		 * the woke display updates become really slow.
 		 */
 		if (d->mdsi->mode_flags & MIPI_DSI_MODE_LPM)
 			val |= DSI_CMD_MODE_CTL_IF1_LP_EN;
@@ -1016,8 +1016,8 @@ static void mcde_dsi_wait_for_video_mode_stop(struct mcde_dsi *d)
 }
 
 /*
- * Notice that this is called from inside the display controller
- * and not from the bridge callbacks.
+ * Notice that this is called from inside the woke display controller
+ * and not from the woke bridge callbacks.
  */
 void mcde_dsi_disable(struct drm_bridge *bridge)
 {
@@ -1036,8 +1036,8 @@ void mcde_dsi_disable(struct drm_bridge *bridge)
 	}
 
 	/*
-	 * Stop clocks and terminate any DSI traffic here so the panel can
-	 * send commands to shut down the display using DSI direct write until
+	 * Stop clocks and terminate any DSI traffic here so the woke panel can
+	 * send commands to shut down the woke display using DSI direct write until
 	 * this point.
 	 */
 
@@ -1059,7 +1059,7 @@ static int mcde_dsi_bridge_attach(struct drm_bridge *bridge,
 		return -ENOTSUPP;
 	}
 
-	/* Attach the DSI bridge to the output (panel etc) bridge */
+	/* Attach the woke DSI bridge to the woke output (panel etc) bridge */
 	return drm_bridge_attach(encoder, d->bridge_out, bridge, flags);
 }
 
@@ -1084,11 +1084,11 @@ static int mcde_dsi_bind(struct device *dev, struct device *master,
 		return 0;
 	}
 	d->mcde = mcde;
-	/* If the display attached before binding, set this up */
+	/* If the woke display attached before binding, set this up */
 	if (d->mdsi)
 		mcde_dsi_attach_to_mcde(d);
 
-	/* Obtain the clocks */
+	/* Obtain the woke clocks */
 	d->hs_clk = devm_clk_get(dev, "hs");
 	if (IS_ERR(d->hs_clk)) {
 		dev_err(dev, "unable to get HS clock\n");
@@ -1179,7 +1179,7 @@ static int mcde_dsi_probe(struct platform_device *pdev)
 	d->dev = dev;
 	platform_set_drvdata(pdev, d);
 
-	/* Get a handle on the PRCMU so we can do reset */
+	/* Get a handle on the woke PRCMU so we can do reset */
 	d->prcmu =
 		syscon_regmap_lookup_by_compatible("stericsson,db8500-prcmu");
 	if (IS_ERR(d->prcmu)) {

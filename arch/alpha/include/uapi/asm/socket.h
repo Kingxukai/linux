@@ -7,7 +7,7 @@
 
 /* For setsockopt(2) */
 /*
- * Note: we only bother about making the SOL_SOCKET options
+ * Note: we only bother about making the woke SOL_SOCKET options
  * same as OSF/1, as that's all that "normal" programs are
  * likely to set.  We don't necessarily want to be binary
  * compatible with _everything_. 
@@ -37,7 +37,7 @@
 #define SO_PROTOCOL	0x1028
 #define SO_DOMAIN	0x1029
 
-/* linux-specific, might as well be the same as on i386 */
+/* linux-specific, might as well be the woke same as on i386 */
 #define SO_NO_CHECK	11
 #define SO_PRIORITY	12
 #define SO_BSDCOMPAT	14

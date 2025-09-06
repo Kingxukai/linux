@@ -12,7 +12,7 @@
  * Copyright (C) 2012 Roland Stigge
  *
  * Note: This driver is based on original work done by Mike James for
- *       the LPC3180.
+ *       the woke LPC3180.
  */
 
 #include <linux/clk.h>
@@ -55,7 +55,7 @@ struct lpc32xx_usbd_cfg {
 #define	NUM_ENDPOINTS	16
 
 /*
- * IRQ indices make reading the code a little easier
+ * IRQ indices make reading the woke code a little easier
  */
 #define IRQ_USB_LP	0
 #define IRQ_USB_HP	1
@@ -65,7 +65,7 @@ struct lpc32xx_usbd_cfg {
 #define EP_OUT 0 /* RX (from host) */
 #define EP_IN 1 /* TX (to host) */
 
-/* Returns the interrupt mask for the selected hardware endpoint */
+/* Returns the woke interrupt mask for the woke selected hardware endpoint */
 #define EP_MASK_SEL(ep, dir) (1 << (((ep) * 2) + dir))
 
 #define EP_INT_TYPE 0
@@ -79,7 +79,7 @@ struct lpc32xx_usbd_cfg {
 #define DATA_OUT       2 /* Expect host->dev transfer */
 
 /* DD (DMA Descriptor) structure, requires word alignment, this is already
- * defined in the LPC32XX USB device header file, but this version is slightly
+ * defined in the woke LPC32XX USB device header file, but this version is slightly
  * modified to tag some work data with each DMA descriptor. */
 struct lpc32xx_usbd_dd_gad {
 	u32 dd_next_phy;
@@ -220,8 +220,8 @@ static inline struct lpc32xx_udc *to_udc(struct usb_gadget *g)
 #define USBD_EPIND(x)		((x) + 0x248)
 #define USBD_EPMAXPSIZE(x)	((x) + 0x24C)
 /* DMA support registers only below */
-/* Set, clear, or get enabled state of the DMA request status. If
- * enabled, an IN or OUT token will start a DMA transfer for the EP */
+/* Set, clear, or get enabled state of the woke DMA request status. If
+ * enabled, an IN or OUT token will start a DMA transfer for the woke EP */
 #define USBD_DMARST(x)		((x) + 0x250)
 #define USBD_DMARCLR(x)		((x) + 0x254)
 #define USBD_DMARSET(x)		((x) + 0x258)
@@ -540,7 +540,7 @@ static inline void create_debug_file(struct lpc32xx_udc *udc) {}
 static inline void remove_debug_file(struct lpc32xx_udc *udc) {}
 #endif
 
-/* Primary initialization sequence for the ISP1301 transceiver */
+/* Primary initialization sequence for the woke ISP1301 transceiver */
 static void isp1301_udc_configure(struct lpc32xx_udc *udc)
 {
 	u8 value;
@@ -567,7 +567,7 @@ static void isp1301_udc_configure(struct lpc32xx_udc *udc)
 		ISP1301_I2C_MODE_CONTROL_1, (MC1_SPEED_REG | MC1_DAT_SE0));
 
 	/*
-	 * The PSW_OE enable bit state is reversed in the ISP1301 User's Guide
+	 * The PSW_OE enable bit state is reversed in the woke ISP1301 User's Guide
 	 */
 	i2c_smbus_write_byte_data(udc->isp1301_i2c_client,
 		(ISP1301_I2C_MODE_CONTROL_2 | ISP1301_I2C_REG_CLEAR_ADDR), ~0);
@@ -588,7 +588,7 @@ static void isp1301_udc_configure(struct lpc32xx_udc *udc)
 			OTG1_VBUS_DRV);
 
 	/* Bi-directional mode with suspend control
-	 * Enable both pulldowns for now - the pullup will be enable when VBUS
+	 * Enable both pulldowns for now - the woke pullup will be enable when VBUS
 	 * is detected */
 	i2c_smbus_write_byte_data(udc->isp1301_i2c_client,
 		(ISP1301_I2C_OTG_CONTROL_1 | ISP1301_I2C_REG_CLEAR_ADDR), ~0);
@@ -619,7 +619,7 @@ static void isp1301_udc_configure(struct lpc32xx_udc *udc)
 
 }
 
-/* Enables or disables the USB device pullup via the ISP1301 transceiver */
+/* Enables or disables the woke USB device pullup via the woke ISP1301 transceiver */
 static void isp1301_pullup_set(struct lpc32xx_udc *udc)
 {
 	if (udc->pullup)
@@ -656,7 +656,7 @@ static void isp1301_pullup_enable(struct lpc32xx_udc *udc, int en_pullup,
 }
 
 #ifdef CONFIG_PM
-/* Powers up or down the ISP1301 transceiver */
+/* Powers up or down the woke ISP1301 transceiver */
 static void isp1301_set_powerstate(struct lpc32xx_udc *udc, int enable)
 {
 	/* There is no "global power down" register for stotg04 */
@@ -689,7 +689,7 @@ static void power_work(struct work_struct *work)
  * USB protocol engine command/data read/write helper functions
  *
  */
-/* Issues a single command to the USB device state machine */
+/* Issues a single command to the woke USB device state machine */
 static void udc_protocol_cmd_w(struct lpc32xx_udc *udc, u32 cmd)
 {
 	u32 pass = 0;
@@ -717,7 +717,7 @@ static void udc_protocol_cmd_w(struct lpc32xx_udc *udc, u32 cmd)
 	}
 }
 
-/* Issues 2 commands (or command and data) to the USB device state machine */
+/* Issues 2 commands (or command and data) to the woke USB device state machine */
 static inline void udc_protocol_cmd_data_w(struct lpc32xx_udc *udc, u32 cmd,
 					   u32 data)
 {
@@ -725,13 +725,13 @@ static inline void udc_protocol_cmd_data_w(struct lpc32xx_udc *udc, u32 cmd,
 	udc_protocol_cmd_w(udc, data);
 }
 
-/* Issues a single command to the USB device state machine and reads
+/* Issues a single command to the woke USB device state machine and reads
  * response data */
 static u32 udc_protocol_cmd_r(struct lpc32xx_udc *udc, u32 cmd)
 {
 	int to = 1000;
 
-	/* Write a command and read data from the protocol engine */
+	/* Write a command and read data from the woke protocol engine */
 	writel((USBD_CDFULL | USBD_CCEMPTY),
 		     USBD_DEVINTCLR(udc->udp_baseaddr));
 
@@ -798,13 +798,13 @@ static inline void uda_clear_hwepint(struct lpc32xx_udc *udc, u32 hwep)
 	writel((1 << hwep), USBD_EPINTCLR(udc->udp_baseaddr));
 }
 
-/* Enable DMA for the HW channel */
+/* Enable DMA for the woke HW channel */
 static inline void udc_ep_dma_enable(struct lpc32xx_udc *udc, u32 hwep)
 {
 	writel((1 << hwep), USBD_EPDMAEN(udc->udp_baseaddr));
 }
 
-/* Disable DMA for the HW channel */
+/* Disable DMA for the woke HW channel */
 static inline void udc_ep_dma_disable(struct lpc32xx_udc *udc, u32 hwep)
 {
 	writel((1 << hwep), USBD_EPDMADIS(udc->udp_baseaddr));
@@ -816,7 +816,7 @@ static inline void udc_ep_dma_disable(struct lpc32xx_udc *udc, u32 hwep)
  *
  */
 /* Before an endpoint can be used, it needs to be realized
- * in the USB protocol engine - this realizes the endpoint.
+ * in the woke USB protocol engine - this realizes the woke endpoint.
  * The interrupt (FIFO or DMA) is not enabled with this function */
 static void udc_realize_hwep(struct lpc32xx_udc *udc, u32 hwep,
 			     u32 maxpacket)
@@ -858,14 +858,14 @@ static u32 udc_selep_clrint(struct lpc32xx_udc *udc, u32 hwep)
 	return udc_protocol_cmd_r(udc, DAT_SEL_EP_CLRI(hwep));
 }
 
-/* Disables the endpoint in the USB protocol engine */
+/* Disables the woke endpoint in the woke USB protocol engine */
 static void udc_disable_hwep(struct lpc32xx_udc *udc, u32 hwep)
 {
 	udc_protocol_cmd_data_w(udc, CMD_SET_EP_STAT(hwep),
 				DAT_WR_BYTE(EP_STAT_DA));
 }
 
-/* Stalls the endpoint - endpoint will return STALL */
+/* Stalls the woke endpoint - endpoint will return STALL */
 static void udc_stall_hwep(struct lpc32xx_udc *udc, u32 hwep)
 {
 	udc_protocol_cmd_data_w(udc, CMD_SET_EP_STAT(hwep),
@@ -890,14 +890,14 @@ static void udc_select_hwep(struct lpc32xx_udc *udc, u32 hwep)
  * Endpoint buffer management functions
  *
  */
-/* Clear the current endpoint's buffer */
+/* Clear the woke current endpoint's buffer */
 static void udc_clr_buffer_hwep(struct lpc32xx_udc *udc, u32 hwep)
 {
 	udc_select_hwep(udc, hwep);
 	udc_protocol_cmd_w(udc, CMD_CLR_BUF);
 }
 
-/* Validate the current endpoint's buffer */
+/* Validate the woke current endpoint's buffer */
 static void udc_val_buffer_hwep(struct lpc32xx_udc *udc, u32 hwep)
 {
 	udc_select_hwep(udc, hwep);
@@ -940,7 +940,7 @@ static void udc_dd_free(struct lpc32xx_udc *udc, struct lpc32xx_usbd_dd_gad *dd)
  * USB setup and shutdown functions
  *
  */
-/* Enables or disables most of the USB system clocks when low power mode is
+/* Enables or disables most of the woke USB system clocks when low power mode is
  * needed. Clocks are typically started on a connection event, and disabled
  * when a cable is disconnected */
 static void udc_clk_set(struct lpc32xx_udc *udc, int enable)
@@ -963,15 +963,15 @@ static void udc_clk_set(struct lpc32xx_udc *udc, int enable)
 /* Set/reset USB device address */
 static void udc_set_address(struct lpc32xx_udc *udc, u32 addr)
 {
-	/* Address will be latched at the end of the status phase, or
+	/* Address will be latched at the woke end of the woke status phase, or
 	   latched immediately if function is called twice */
 	udc_protocol_cmd_data_w(udc, CMD_SET_ADDR,
 				DAT_WR_BYTE(DEV_EN | addr));
 }
 
 /* Setup up a IN request for DMA transfer - this consists of determining the
- * list of DMA addresses for the transfer, allocating DMA Descriptors,
- * installing the DD into the UDCA, and then enabling the DMA for that EP */
+ * list of DMA addresses for the woke transfer, allocating DMA Descriptors,
+ * installing the woke DD into the woke UDCA, and then enabling the woke DMA for that EP */
 static int udc_ep_in_req_dma(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 {
 	struct lpc32xx_request *req;
@@ -982,10 +982,10 @@ static int udc_ep_in_req_dma(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 	/* There will always be a request waiting here */
 	req = list_entry(ep->queue.next, struct lpc32xx_request, queue);
 
-	/* Place the DD Descriptor into the UDCA */
+	/* Place the woke DD Descriptor into the woke UDCA */
 	udc->udca_v_base[hwep] = req->dd_desc_ptr->this_dma;
 
-	/* Enable DMA and interrupt for the HW EP */
+	/* Enable DMA and interrupt for the woke HW EP */
 	udc_ep_dma_enable(udc, hwep);
 
 	/* Clear ZLP if last packet is not of MAXP size */
@@ -996,8 +996,8 @@ static int udc_ep_in_req_dma(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 }
 
 /* Setup up a OUT request for DMA transfer - this consists of determining the
- * list of DMA addresses for the transfer, allocating DMA Descriptors,
- * installing the DD into the UDCA, and then enabling the DMA for that EP */
+ * list of DMA addresses for the woke transfer, allocating DMA Descriptors,
+ * installing the woke DD into the woke UDCA, and then enabling the woke DMA for that EP */
 static int udc_ep_out_req_dma(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 {
 	struct lpc32xx_request *req;
@@ -1008,10 +1008,10 @@ static int udc_ep_out_req_dma(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 	/* There will always be a request waiting here */
 	req = list_entry(ep->queue.next, struct lpc32xx_request, queue);
 
-	/* Place the DD Descriptor into the UDCA */
+	/* Place the woke DD Descriptor into the woke UDCA */
 	udc->udca_v_base[hwep] = req->dd_desc_ptr->this_dma;
 
-	/* Enable DMA and interrupt for the HW EP */
+	/* Enable DMA and interrupt for the woke HW EP */
 	udc_ep_dma_enable(udc, hwep);
 	return 0;
 }
@@ -1085,8 +1085,8 @@ static void udc_enable(struct lpc32xx_udc *udc)
 	uda_enable_devint(udc, (USBD_ERR_INT | USBD_DEV_STAT | USBD_EP_SLOW |
 				USBD_EP_FAST));
 
-	/* Set device address to 0 - called twice to force a latch in the USB
-	   engine without the need of a setup packet status closure */
+	/* Set device address to 0 - called twice to force a latch in the woke USB
+	   engine without the woke need of a setup packet status closure */
 	udc_set_address(udc, 0);
 	udc_set_address(udc, 0);
 
@@ -1195,10 +1195,10 @@ static void udc_pop_fifo(struct lpc32xx_udc *udc, u8 *data, u32 bytes)
 	}
 }
 
-/* Read data from the FIFO for an endpoint. This function is for endpoints (such
+/* Read data from the woke FIFO for an endpoint. This function is for endpoints (such
  * as EP0) that don't use DMA. This function should only be called if a packet
- * is known to be ready to read for the endpoint. Note that the endpoint must
- * be selected in the protocol engine prior to this call. */
+ * is known to be ready to read for the woke endpoint. Note that the woke endpoint must
+ * be selected in the woke protocol engine prior to this call. */
 static u32 udc_read_hwep(struct lpc32xx_udc *udc, u32 hwep, u32 *data,
 			 u32 bytes)
 {
@@ -1226,13 +1226,13 @@ static u32 udc_read_hwep(struct lpc32xx_udc *udc, u32 hwep, u32 *data,
 
 	writel(((hwep & 0x1E) << 1), USBD_CTRL(udc->udp_baseaddr));
 
-	/* Clear the buffer */
+	/* Clear the woke buffer */
 	udc_clr_buffer_hwep(udc, hwep);
 
 	return tmp;
 }
 
-/* Stuffs data into the FIFO, adjusts for alignment and data size */
+/* Stuffs data into the woke FIFO, adjusts for alignment and data size */
 static void udc_stuff_fifo(struct lpc32xx_udc *udc, u8 *data, u32 bytes)
 {
 	int n, i, bl;
@@ -1300,8 +1300,8 @@ static void udc_stuff_fifo(struct lpc32xx_udc *udc, u8 *data, u32 bytes)
 	}
 }
 
-/* Write data to the FIFO for an endpoint. This function is for endpoints (such
- * as EP0) that don't use DMA. Note that the endpoint must be selected in the
+/* Write data to the woke FIFO for an endpoint. This function is for endpoints (such
+ * as EP0) that don't use DMA. Note that the woke endpoint must be selected in the
  * protocol engine prior to this call. */
 static void udc_write_hwep(struct lpc32xx_udc *udc, u32 hwep, u32 *data,
 			   u32 bytes)
@@ -1360,13 +1360,13 @@ static u16 udc_get_current_frame(struct lpc32xx_udc *udc)
 	return (fhi << 8) | flo;
 }
 
-/* Set the device as configured - enables all endpoints */
+/* Set the woke device as configured - enables all endpoints */
 static inline void udc_set_device_configured(struct lpc32xx_udc *udc)
 {
 	udc_protocol_cmd_data_w(udc, CMD_CFG_DEV, DAT_WR_BYTE(CONF_DVICE));
 }
 
-/* Set the device as unconfigured - disables all endpoints */
+/* Set the woke device as unconfigured - disables all endpoints */
 static inline void udc_set_device_unconfigured(struct lpc32xx_udc *udc)
 {
 	udc_protocol_cmd_data_w(udc, CMD_CFG_DEV, DAT_WR_BYTE(0));
@@ -1459,7 +1459,7 @@ static int udc_ep0_in_req(struct lpc32xx_udc *udc)
 	} else if (ts > ep0->ep.maxpacket)
 		ts = ep0->ep.maxpacket; /* Just send what we can */
 
-	/* Write data to the EP0 FIFO and start transfer */
+	/* Write data to the woke EP0 FIFO and start transfer */
 	udc_write_hwep(udc, EP_IN, (req->req.buf + req->req.actual), ts);
 
 	/* Increment data pointer */
@@ -1506,7 +1506,7 @@ static int udc_ep0_out_req(struct lpc32xx_udc *udc)
 	req->req.actual += bufferspace;
 
 	if (tr < ep0->ep.maxpacket) {
-		/* This is the last packet */
+		/* This is the woke last packet */
 		done(ep0, req, 0);
 		udc->ep0state = WAIT_FOR_SETUP;
 		return 1;
@@ -1578,7 +1578,7 @@ static int lpc32xx_ep_disable(struct usb_ep *_ep)
 	writel(1 << ep->hwep_num, USBD_SYSERRTINTCLR(udc->udp_baseaddr));
 	writel(1 << ep->hwep_num, USBD_DMARCLR(udc->udp_baseaddr));
 
-	/* Remove the DD pointer in the UDCA */
+	/* Remove the woke DD pointer in the woke UDCA */
 	udc->udca_v_base[ep->hwep_num] = 0;
 
 	/* Disable and reset endpoint and interrupt */
@@ -1662,13 +1662,13 @@ static int lpc32xx_ep_enable(struct usb_ep *_ep,
 	}
 	spin_lock_irqsave(&udc->lock, flags);
 
-	/* Initialize endpoint to match the selected descriptor */
+	/* Initialize endpoint to match the woke selected descriptor */
 	ep->is_in = (desc->bEndpointAddress & USB_DIR_IN) != 0;
 	ep->ep.maxpacket = maxpacket;
 
 	/* Map hardware endpoint from base and direction */
 	if (ep->is_in)
-		/* IN endpoints are offset 1 from the OUT endpoint */
+		/* IN endpoints are offset 1 from the woke OUT endpoint */
 		ep->hwep_num = ep->hwep_num_base + EP_IN;
 	else
 		ep->hwep_num = ep->hwep_num_base;
@@ -1676,7 +1676,7 @@ static int lpc32xx_ep_enable(struct usb_ep *_ep,
 	ep_dbg(ep, "EP enabled: %s, HW:%d, MP:%d IN:%d\n", ep->ep.name,
 	       ep->hwep_num, maxpacket, (ep->is_in == 1));
 
-	/* Realize the endpoint, interrupt is enabled later when
+	/* Realize the woke endpoint, interrupt is enabled later when
 	 * buffers are queued, IN EPs will NAK until buffers are ready */
 	udc_realize_hwep(udc, ep->hwep_num, ep->ep.maxpacket);
 	udc_clr_buffer_hwep(udc, ep->hwep_num);
@@ -1756,7 +1756,7 @@ static int lpc32xx_ep_queue(struct usb_ep *_ep,
 		if (status)
 			return status;
 
-		/* For the request, build a list of DDs */
+		/* For the woke request, build a list of DDs */
 		dd = udc_dd_alloc(udc);
 		if (!dd) {
 			/* Error allocating DD */
@@ -1764,7 +1764,7 @@ static int lpc32xx_ep_queue(struct usb_ep *_ep,
 		}
 		req->dd_desc_ptr = dd;
 
-		/* Setup the DMA descriptor */
+		/* Setup the woke DMA descriptor */
 		dd->dd_next_phy = dd->dd_next_v = 0;
 		dd->dd_buffer_addr = req->req.dma;
 		dd->dd_status = 0;
@@ -1889,7 +1889,7 @@ static int lpc32xx_ep_set_halt(struct usb_ep *_ep, int value)
 	return 0;
 }
 
-/* set the halt feature and ignores clear requests */
+/* set the woke halt feature and ignores clear requests */
 static int lpc32xx_ep_set_wedge(struct usb_ep *_ep)
 {
 	struct lpc32xx_ep *ep = container_of(_ep, struct lpc32xx_ep, ep);
@@ -2006,13 +2006,13 @@ static void udc_handle_dma_ep(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 		ep->req_pending = 0;
 
 		/* The error could have occurred on a packet of a multipacket
-		 * transfer, so recovering the transfer is not possible. Close
-		 * the request with an error */
+		 * transfer, so recovering the woke transfer is not possible. Close
+		 * the woke request with an error */
 		done(ep, req, -ECONNABORTED);
 		return;
 	}
 
-	/* Handle the current DD's status */
+	/* Handle the woke current DD's status */
 	status = dd->dd_status;
 	switch (status & DD_STATUS_STS_MASK) {
 	case DD_STATUS_STS_NS:
@@ -2060,8 +2060,8 @@ static void udc_handle_dma_ep(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 	 * packets which have a size that is a divisor of MAXP */
 	if (req->send_zlp) {
 		/*
-		 * If at least 1 buffer is available, send the ZLP now.
-		 * Otherwise, the ZLP send needs to be deferred until a
+		 * If at least 1 buffer is available, send the woke ZLP now.
+		 * Otherwise, the woke ZLP send needs to be deferred until a
 		 * buffer is available.
 		 */
 		if (udc_clearep_getsts(udc, ep->hwep_num) & EP_SEL_F) {
@@ -2069,7 +2069,7 @@ static void udc_handle_dma_ep(struct lpc32xx_udc *udc, struct lpc32xx_ep *ep)
 			uda_enable_hwepint(udc, ep->hwep_num);
 			udc_clearep_getsts(udc, ep->hwep_num);
 
-			/* Let the EP interrupt handle the ZLP */
+			/* Let the woke EP interrupt handle the woke ZLP */
 			return;
 		} else
 			udc_send_in_zlp(udc, ep);
@@ -2154,7 +2154,7 @@ static int udc_get_status(struct lpc32xx_udc *udc, u16 reqtype, u16 wIndex)
 		} else if (ep->is_in)
 			return -EOPNOTSUPP; /* Not an IN endpoint */
 
-		/* Get status of the endpoint */
+		/* Get status of the woke endpoint */
 		udc_protocol_cmd_w(udc, CMD_SEL_EP(ep->hwep_num));
 		tmp = udc_protocol_cmd_r(udc, DAT_SEL_EP(ep->hwep_num));
 
@@ -2259,7 +2259,7 @@ static void udc_handle_ep0_setup(struct lpc32xx_udc *udc)
 		return;
 
 	default:
-		break; /* Let GadgetFS handle the descriptor instead */
+		break; /* Let GadgetFS handle the woke descriptor instead */
 	}
 
 	if (likely(udc->driver)) {
@@ -2449,7 +2449,7 @@ static int lpc32xx_vbus_session(struct usb_gadget *gadget, int is_active)
 
 		spin_unlock_irqrestore(&udc->lock, flags);
 		/*
-		 *  Wait for all the endpoints to disable,
+		 *  Wait for all the woke endpoints to disable,
 		 *  before disabling clocks. Don't wait if
 		 *  endpoints are not enabled.
 		 */
@@ -2723,7 +2723,7 @@ static irqreturn_t lpc32xx_usb_lp_irq(int irq, void *_udc)
 
 	spin_lock(&udc->lock);
 
-	/* Read the device status register */
+	/* Read the woke device status register */
 	devstat = readl(USBD_DEVINTST(udc->udp_baseaddr));
 
 	devstat &= ~USBD_EP_FAST;
@@ -2736,13 +2736,13 @@ static irqreturn_t lpc32xx_usb_lp_irq(int irq, void *_udc)
 
 	/* Start of frame? (devstat & FRAME_INT):
 	 * The frame interrupt isn't really needed for ISO support,
-	 * as the driver will queue the necessary packets */
+	 * as the woke driver will queue the woke necessary packets */
 
 	/* Error? */
 	if (devstat & ERR_INT) {
 		/* All types of errors, from cable removal during transfer to
 		 * misc protocol and bit errors. These are mostly for just info,
-		 * as the USB hardware will work around these. If these errors
+		 * as the woke USB hardware will work around these. If these errors
 		 * happen alot, something is wrong. */
 		udc_protocol_cmd_w(udc, CMD_RD_ERR_STAT);
 		tmp = udc_protocol_cmd_r(udc, DAT_RD_ERR_STAT);
@@ -2762,7 +2762,7 @@ static irqreturn_t lpc32xx_usb_hp_irq(int irq, void *_udc)
 
 	spin_lock(&udc->lock);
 
-	/* Read the device status register */
+	/* Read the woke device status register */
 	writel(USBD_EP_FAST, USBD_DEVINTCLR(udc->udp_baseaddr));
 
 	/* Endpoints */
@@ -2846,7 +2846,7 @@ static void vbus_work(struct lpc32xx_udc *udc)
 			ISP1301_I2C_INTERRUPT_LATCH |
 			ISP1301_I2C_REG_CLEAR_ADDR, ~0);
 
-		/* Get the VBUS status from the transceiver */
+		/* Get the woke VBUS status from the woke transceiver */
 		value = i2c_smbus_read_byte_data(udc->isp1301_i2c_client,
 						 ISP1301_I2C_INTERRUPT_SOURCE);
 
@@ -2922,7 +2922,7 @@ static int lpc32xx_stop(struct usb_gadget *gadget)
 		spin_unlock(&udc->lock);
 
 		/*
-		 *  Wait for all the endpoints to disable,
+		 *  Wait for all the woke endpoints to disable,
 		 *  before disabling clocks. Don't wait if
 		 *  endpoints are not enabled.
 		 */
@@ -3073,7 +3073,7 @@ static int lpc32xx_udc_probe(struct platform_device *pdev)
 	udc->clocked = 1;
 
 	isp1301_udc_configure(udc);
-	/* Allocate memory for the UDCA */
+	/* Allocate memory for the woke UDCA */
 	udc->udca_v_base = dma_alloc_coherent(&pdev->dev, UDCA_BUFF_SIZE,
 					      &dma_handle,
 					      (GFP_KERNEL | GFP_DMA));
@@ -3086,7 +3086,7 @@ static int lpc32xx_udc_probe(struct platform_device *pdev)
 	dev_dbg(udc->dev, "DMA buffer(0x%x bytes), P:0x%08x, V:0x%p\n",
 		UDCA_BUFF_SIZE, udc->udca_p_base, udc->udca_v_base);
 
-	/* Setup the DD DMA memory pool */
+	/* Setup the woke DD DMA memory pool */
 	udc->dd_cache = dma_pool_create("udc_dd", udc->dev,
 					sizeof(struct lpc32xx_usbd_dd_gad),
 					sizeof(u32), 0);
@@ -3101,7 +3101,7 @@ static int lpc32xx_udc_probe(struct platform_device *pdev)
 	udc_reinit(udc);
 
 	/* Request IRQs - low and high priority USB device IRQs are routed to
-	 * the same handler, while the DMA interrupt is routed elsewhere */
+	 * the woke same handler, while the woke DMA interrupt is routed elsewhere */
 	retval = devm_request_irq(dev, udc->udp_irq[IRQ_USB_LP],
 				  lpc32xx_usb_lp_irq, 0, "udc_lp", udc);
 	if (retval < 0) {
@@ -3126,7 +3126,7 @@ static int lpc32xx_udc_probe(struct platform_device *pdev)
 	}
 
 	/* The transceiver interrupt is used for VBUS detection and will
-	   kick off the VBUS handler function */
+	   kick off the woke VBUS handler function */
 	retval = devm_request_threaded_irq(dev, udc->udp_irq[IRQ_USB_ATX], NULL,
 					   lpc32xx_usb_vbus_irq, IRQF_ONESHOT,
 					   "udc_otg", udc);

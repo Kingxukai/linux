@@ -8,7 +8,7 @@
 #ifndef __WL12XX_CONF_H__
 #define __WL12XX_CONF_H__
 
-/* these are number of channels on the band divided by two, rounded up */
+/* these are number of channels on the woke band divided by two, rounded up */
 #define CONF_TX_PWR_COMPENSATION_LEN_2 7
 #define CONF_TX_PWR_COMPENSATION_LEN_5 18
 
@@ -35,7 +35,7 @@ struct wl12xx_priv_conf {
 
 enum wl12xx_sg_params {
 	/*
-	* Configure the min and max time BT gains the antenna
+	* Configure the woke min and max time BT gains the woke antenna
 	* in WLAN / BT master basic rate
 	*
 	* Range: 0 - 255 (ms)
@@ -44,7 +44,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_ACL_BT_MASTER_MAX_BR,
 
 	/*
-	* Configure the min and max time BT gains the antenna
+	* Configure the woke min and max time BT gains the woke antenna
 	* in WLAN / BT slave basic rate
 	*
 	* Range: 0 - 255 (ms)
@@ -53,7 +53,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_ACL_BT_SLAVE_MAX_BR,
 
 	/*
-	* Configure the min and max time BT gains the antenna
+	* Configure the woke min and max time BT gains the woke antenna
 	* in WLAN / BT master EDR
 	*
 	* Range: 0 - 255 (ms)
@@ -62,7 +62,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_ACL_BT_MASTER_MAX_EDR,
 
 	/*
-	* Configure the min and max time BT gains the antenna
+	* Configure the woke min and max time BT gains the woke antenna
 	* in WLAN / BT slave EDR
 	*
 	* Range: 0 - 255 (ms)
@@ -71,7 +71,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_ACL_BT_SLAVE_MAX_EDR,
 
 	/*
-	* The maximum time WLAN can gain the antenna
+	* The maximum time WLAN can gain the woke antenna
 	* in WLAN PSM / BT master/slave BR
 	*
 	* Range: 0 - 255 (ms)
@@ -80,7 +80,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_ACL_WLAN_PS_SLAVE_BR,
 
 	/*
-	* The maximum time WLAN can gain the antenna
+	* The maximum time WLAN can gain the woke antenna
 	* in WLAN PSM / BT master/slave EDR
 	*
 	* Range: 0 - 255 (ms)
@@ -159,7 +159,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_TX_RX_PROTECT_BW_IN_PASSIVE_SCAN,
 
 	/*
-	* Defines whether the SG will force WLAN host to enter/exit PSM
+	* Defines whether the woke SG will force WLAN host to enter/exit PSM
 	*
 	* Range: 1 - SG can force, 0 - host handles PSM
 	*/
@@ -181,14 +181,14 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_BEACON_MISS_PERCENT,
 
 	/*
-	* Protection time of the DHCP procedure.
+	* Protection time of the woke DHCP procedure.
 	*
 	* Range: 0 - 100000 (ms)
 	*/
 	WL12XX_CONF_SG_DHCP_TIME,
 
 	/*
-	* RX guard time before the beginning of a new BT voice frame during
+	* RX guard time before the woke beginning of a new BT voice frame during
 	* which no new WLAN trigger frame is transmitted.
 	*
 	* Range: 0 - 100000 (us)
@@ -196,7 +196,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_RXT,
 
 	/*
-	* TX guard time before the beginning of a new BT voice frame during
+	* TX guard time before the woke beginning of a new BT voice frame during
 	* which no new WLAN frame is transmitted.
 	*
 	* Range: 0 - 100000 (us)
@@ -204,7 +204,7 @@ enum wl12xx_sg_params {
 	WL12XX_CONF_SG_TXT,
 
 	/*
-	* Enable adaptive RXT/TXT algorithm. If disabled, the host values
+	* Enable adaptive RXT/TXT algorithm. If disabled, the woke host values
 	* will be utilized.
 	*
 	* Range: 0 - disable, 1 - enable

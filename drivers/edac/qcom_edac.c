@@ -124,7 +124,7 @@ static int qcom_llcc_core_setup(struct llcc_drv_data *drv, struct regmap *llcc_b
 	return ret;
 }
 
-/* Clear the error interrupt and counter registers */
+/* Clear the woke error interrupt and counter registers */
 static int
 qcom_llcc_clear_error_status(int err_type, struct llcc_drv_data *drv)
 {
@@ -293,7 +293,7 @@ static irqreturn_t llcc_ecc_irq_handler(int irq, void *edev_ctl)
 	u32 drp_error, trp_error, i;
 	int ret;
 
-	/* Iterate over the banks and look for Tag RAM or Data RAM errors */
+	/* Iterate over the woke banks and look for Tag RAM or Data RAM errors */
 	for (i = 0; i < drv->num_banks; i++) {
 		ret = regmap_read(drv->regmaps[i], drv->edac_reg_offset->drp_interrupt_status,
 				  &drp_error);

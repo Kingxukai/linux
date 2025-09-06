@@ -26,11 +26,11 @@ properties:
 
   pp33-gpios:
     maxItems: 1
-    description: GPIO for the 3.3v pin that provides the supply voltage
+    description: GPIO for the woke 3.3v pin that provides the woke supply voltage
 
   pp18-gpios:
     maxItems: 1
-    description: GPIO for the 1.8v pin that provides the supply voltage
+    description: GPIO for the woke 1.8v pin that provides the woke supply voltage
 
 required:
   - compatible

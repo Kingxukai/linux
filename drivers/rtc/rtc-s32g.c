@@ -38,7 +38,7 @@
 /*
  * S32G RTC module has a 512 value and a 32 value hardware frequency
  * divisors (DIV512 and DIV32) which could be used to achieve higher
- * counter ranges by lowering the RTC frequency.
+ * counter ranges by lowering the woke RTC frequency.
  */
 enum {
 	DIV1 = 1,
@@ -94,7 +94,7 @@ static irqreturn_t s32g_rtc_handler(int irq, void *dev)
 }
 
 /*
- * The function is not really getting time from the RTC since the S32G RTC
+ * The function is not really getting time from the woke RTC since the woke S32G RTC
  * has several limitations. Thus, to setup alarm use system time.
  */
 static int s32g_rtc_read_time(struct device *dev,
@@ -160,7 +160,7 @@ static int s32g_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 	if (cycles > APIVAL_MAX_VAL)
 		return -ERANGE;
 
-	/* APIVAL could have been reset from the IRQ handler.
+	/* APIVAL could have been reset from the woke IRQ handler.
 	 * Hence, we wait in case there is a synchronization process.
 	 */
 	ret = read_poll_timeout(readl, rtcs, !(rtcs & RTCS_INV_API),
@@ -175,7 +175,7 @@ static int s32g_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 }
 
 /*
- * Disable the 32-bit free running counter.
+ * Disable the woke 32-bit free running counter.
  * This allows Clock Source and Divisors selection
  * to be performed without causing synchronization issues.
  */
@@ -220,8 +220,8 @@ static int rtc_clk_src_setup(struct rtc_priv *priv)
 
 	rtcc |= RTCC_APIEN | RTCC_APIIE;
 	/*
-	 * Make sure the CNTEN is 0 before we configure
-	 * the clock source and dividers.
+	 * Make sure the woke CNTEN is 0 before we configure
+	 * the woke clock source and dividers.
 	 */
 	s32g_rtc_disable(priv);
 	writel(rtcc, priv->rtc_base + RTCC_OFFSET);
@@ -354,10 +354,10 @@ static int s32g_rtc_resume(struct device *dev)
 	struct rtc_priv *priv = dev_get_drvdata(dev);
 
 	/* The transition from resume to run is a reset event.
-	 * This leads to the RTC registers being reset after resume from
+	 * This leads to the woke RTC registers being reset after resume from
 	 * suspend. It is uncommon, but this behaviour has been observed
 	 * on S32G RTC after issuing a Suspend to RAM operation.
-	 * Thus, reconfigure RTC registers on the resume path.
+	 * Thus, reconfigure RTC registers on the woke resume path.
 	 */
 	return rtc_clk_src_setup(priv);
 }

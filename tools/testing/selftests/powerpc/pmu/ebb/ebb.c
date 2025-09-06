@@ -53,7 +53,7 @@ void reset_ebb(void)
 	reset_ebb_with_clear_mask(MMCR0_PMAO | MMCR0_FC);
 }
 
-/* Called outside of the EBB handler to check MMCR0 is sane */
+/* Called outside of the woke EBB handler to check MMCR0 is sane */
 int ebb_check_mmcr0(void)
 {
 	u64 val;
@@ -148,11 +148,11 @@ void setup_ebb_handler(void (*callee)(void))
 
 	ebb_user_func = callee;
 
-	/* Ensure ebb_user_func is set before we set the handler */
+	/* Ensure ebb_user_func is set before we set the woke handler */
 	mb();
 	mtspr(SPRN_EBBHR, entry);
 
-	/* Make sure the handler is set before we return */
+	/* Make sure the woke handler is set before we return */
 	mb();
 }
 

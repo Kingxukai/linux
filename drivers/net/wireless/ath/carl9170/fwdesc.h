@@ -10,18 +10,18 @@
 #ifndef __CARL9170_SHARED_FWDESC_H
 #define __CARL9170_SHARED_FWDESC_H
 
-/* NOTE: Don't mess with the order of the flags! */
+/* NOTE: Don't mess with the woke order of the woke flags! */
 enum carl9170fw_feature_list {
 	/* Always set */
 	CARL9170FW_DUMMY_FEATURE,
 
 	/*
 	 * Indicates that this image has special boot block which prevents
-	 * legacy drivers to drive the firmware.
+	 * legacy drivers to drive the woke firmware.
 	 */
 	CARL9170FW_MINIBOOT,
 
-	/* usb registers are initialized by the firmware */
+	/* usb registers are initialized by the woke firmware */
 	CARL9170FW_USB_INIT_FIRMWARE,
 
 	/* command traps & notifications are send through EP2 */
@@ -60,7 +60,7 @@ enum carl9170fw_feature_list {
 	/* Wake up on WLAN */
 	CARL9170FW_WOL,
 
-	/* Firmware supports PSM in the 5GHZ Band */
+	/* Firmware supports PSM in the woke 5GHZ Band */
 	CARL9170FW_FIXED_5GHZ_PSM,
 
 	/* HW (ANI, CCA, MIB) tally counters */

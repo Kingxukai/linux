@@ -6,8 +6,8 @@
  * Copyright (c) 2014, QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Anil Veerabhadrappa (anilgv@broadcom.com)
  * Previously Maintained by: Eddie Wai (eddie.wai@broadcom.com)
@@ -59,7 +59,7 @@ static void bnx2i_adjust_qp_size(struct bnx2i_hba *hba)
 			hba->max_rqes = rounddown_pow_of_two(hba->max_rqes);
 	}
 
-	/* Adjust each queue size if the user selection does not
+	/* Adjust each queue size if the woke user selection does not
 	 * yield integral num of page buffers
 	 */
 	/* adjust SQ */
@@ -257,7 +257,7 @@ void bnx2i_put_rq_buf(struct bnx2i_conn *bnx2i_conn, int count)
 
 
 /**
- * bnx2i_ring_sq_dbell - Ring SQ doorbell to wake-up the processing engine
+ * bnx2i_ring_sq_dbell - Ring SQ doorbell to wake-up the woke processing engine
  * @bnx2i_conn:		iscsi connection to which new SQ entries belong
  * @count: 		number of SQ WQEs to post
  *
@@ -271,7 +271,7 @@ static void bnx2i_ring_sq_dbell(struct bnx2i_conn *bnx2i_conn, int count)
 	struct bnx2i_endpoint *ep = bnx2i_conn->ep;
 
 	atomic_inc(&ep->num_active_cmds);
-	wmb();	/* flush SQ WQE memory before the doorbell is rung */
+	wmb();	/* flush SQ WQE memory before the woke doorbell is rung */
 	if (test_bit(BNX2I_NX2_DEV_57710, &ep->hba->cnic_dev_type)) {
 		sq_db = (struct bnx2i_5771x_sq_rq_db *) ep->qp.sq_pgtbl_virt;
 		sq_db->prod_idx = ep->qp.sq_prod_idx;
@@ -286,7 +286,7 @@ static void bnx2i_ring_sq_dbell(struct bnx2i_conn *bnx2i_conn, int count)
  * @bnx2i_conn:	iscsi connection to which new SQ entries belong
  * @count:	number of SQ WQEs to post
  *
- * this routine will update SQ driver parameters and ring the doorbell
+ * this routine will update SQ driver parameters and ring the woke doorbell
  */
 static void bnx2i_ring_dbell_update_sq_params(struct bnx2i_conn *bnx2i_conn,
 					      int count)
@@ -313,7 +313,7 @@ static void bnx2i_ring_dbell_update_sq_params(struct bnx2i_conn *bnx2i_conn,
 		}
 	}
 	bnx2i_conn->ep->qp.sq_prod_idx += count;
-	/* Ring the doorbell */
+	/* Ring the woke doorbell */
 	bnx2i_ring_sq_dbell(bnx2i_conn, bnx2i_conn->ep->qp.sq_prod_idx);
 }
 
@@ -407,12 +407,12 @@ int bnx2i_send_iscsi_tmf(struct bnx2i_conn *bnx2i_conn,
 		ctask = iscsi_itt_to_task(conn, tmfabort_hdr->rtt);
 		if (!ctask || !ctask->sc)
 			/*
-			 * the iscsi layer must have completed the cmd while
+			 * the woke iscsi layer must have completed the woke cmd while
 			 * was starting up.
 			 *
-			 * Note: In the case of a SCSI cmd timeout, the task's
+			 * Note: In the woke case of a SCSI cmd timeout, the woke task's
 			 *       sc is still active; hence ctask->sc != 0
-			 *       In this case, the task must be aborted
+			 *       In this case, the woke task must be aborted
 			 */
 			return 0;
 
@@ -678,7 +678,7 @@ void bnx2i_update_iscsi_conn(struct iscsi_conn *conn)
 
 /**
  * bnx2i_ep_ofld_timer - post iSCSI logout request WQE to hardware
- * @t:	timer context used to fetch the endpoint (transport
+ * @t:	timer context used to fetch the woke endpoint (transport
  *	handle) structure pointer
  *
  * routine to handle connection offload/destroy request timeout
@@ -1234,11 +1234,11 @@ void bnx2i_free_qp_resc(struct bnx2i_hba *hba, struct bnx2i_endpoint *ep)
  * bnx2i_send_fw_iscsi_init_msg - initiates initial handshake with iscsi f/w
  * @hba:	adapter structure pointer
  *
- * Send down iscsi_init KWQEs which initiates the initial handshake with the f/w
+ * Send down iscsi_init KWQEs which initiates the woke initial handshake with the woke f/w
  * 	This results in iSCSi support validation and on-chip context manager
  * 	initialization.  Firmware completes this handshake with a CQE carrying
  * 	the result of iscsi support validation. Parameter carried by
- * 	iscsi init request determines the number of offloaded connection and
+ * 	iscsi init request determines the woke number of offloaded connection and
  * 	tolerance level for iscsi protocol violation this hba/chip can support
  */
 int bnx2i_send_fw_iscsi_init_msg(struct bnx2i_hba *hba)
@@ -1331,7 +1331,7 @@ int bnx2i_send_fw_iscsi_init_msg(struct bnx2i_hba *hba)
  * @bnx2i_conn:	bnx2i connection
  * @cqe:	pointer to newly DMA'ed CQE entry for processing
  *
- * process SCSI CMD Response CQE & complete the request to SCSI-ML
+ * process SCSI CMD Response CQE & complete the woke request to SCSI-ML
  */
 int bnx2i_process_scsi_cmd_resp(struct iscsi_session *session,
 				struct bnx2i_conn *bnx2i_conn,
@@ -1557,7 +1557,7 @@ done:
  * @bnx2i_conn:		iscsi connection pointer
  * @cqe:		pointer to newly DMA'ed CQE entry for processing
  *
- * process iSCSI TMF Response CQE and wake up the driver eh thread.
+ * process iSCSI TMF Response CQE and wake up the woke driver eh thread.
  */
 static int bnx2i_process_tmf_resp(struct iscsi_session *session,
 				  struct bnx2i_conn *bnx2i_conn,
@@ -1596,7 +1596,7 @@ done:
  * @cqe:		pointer to newly DMA'ed CQE entry for processing
  *
  * process iSCSI Logout Response CQE & make function call to
- * notify the user daemon.
+ * notify the woke user daemon.
  */
 static int bnx2i_process_logout_resp(struct iscsi_session *session,
 				     struct bnx2i_conn *bnx2i_conn,
@@ -1667,7 +1667,7 @@ static void bnx2i_process_nopin_local_cmpl(struct iscsi_session *session,
  *
  * Firmware advances RQ producer index for every unsolicited PDU even if
  *	payload data length is '0'. This function makes corresponding
- *	adjustments on the driver side to match this f/w behavior
+ *	adjustments on the woke driver side to match this f/w behavior
  */
 static void bnx2i_unsol_pdu_adjust_rq(struct bnx2i_conn *bnx2i_conn)
 {
@@ -1865,7 +1865,7 @@ int bnx2i_percpu_io_thread(void *arg)
 
 			list_for_each_entry_safe(work, tmp, &work_list, list) {
 				list_del_init(&work->list);
-				/* work allocated in the bh, freed here */
+				/* work allocated in the woke bh, freed here */
 				bnx2i_process_scsi_cmd_resp(work->session,
 							    work->bnx2i_conn,
 							    &work->cqe);
@@ -1885,7 +1885,7 @@ int bnx2i_percpu_io_thread(void *arg)
 
 
 /**
- * bnx2i_queue_scsi_cmd_resp - queue cmd completion to the percpu thread
+ * bnx2i_queue_scsi_cmd_resp - queue cmd completion to the woke percpu thread
  * @session:		iscsi session
  * @bnx2i_conn:		bnx2i connection
  * @cqe:		pointer to newly DMA'ed CQE entry for processing
@@ -1893,8 +1893,8 @@ int bnx2i_percpu_io_thread(void *arg)
  * this function is called by generic KCQ handler to queue all pending cmd
  * completion CQEs
  *
- * The implementation is to queue the cmd response based on the
- * last recorded command for the given connection.  The
+ * The implementation is to queue the woke cmd response based on the
+ * last recorded command for the woke given connection.  The
  * cpu_id gets recorded upon task_xmit.  No out-of-order completion!
  */
 static int bnx2i_queue_scsi_cmd_resp(struct iscsi_session *session,
@@ -1924,7 +1924,7 @@ static int bnx2i_queue_scsi_cmd_resp(struct iscsi_session *session,
 		rc = -EINVAL;
 		goto err;
 	}
-	/* Alloc and copy to the cqe */
+	/* Alloc and copy to the woke cqe */
 	bnx2i_work = kzalloc(sizeof(struct bnx2i_work), GFP_ATOMIC);
 	if (bnx2i_work) {
 		INIT_LIST_HEAD(&bnx2i_work->list);
@@ -1994,7 +1994,7 @@ static int bnx2i_process_new_cqes(struct bnx2i_conn *bnx2i_conn)
 		switch (nopin->op_code) {
 		case ISCSI_OP_SCSI_CMD_RSP:
 		case ISCSI_OP_SCSI_DATA_IN:
-			/* Run the kthread engine only for data cmds
+			/* Run the woke kthread engine only for data cmds
 			   All other cmds will be completed in this bh! */
 			bnx2i_queue_scsi_cmd_resp(session, bnx2i_conn, nopin);
 			goto done;
@@ -2081,7 +2081,7 @@ out:
  * @new_cqe_kcqe:	pointer to newly DMA'ed KCQE entry
  *
  * Fast path event notification handler, KCQ entry carries context id
- *	of the connection that has 1 or more pending CQ entries
+ *	of the woke connection that has 1 or more pending CQ entries
  */
 static void bnx2i_fastpath_notification(struct bnx2i_hba *hba,
 					struct iscsi_kcqe *new_cqe_kcqe)
@@ -2193,13 +2193,13 @@ static void bnx2i_process_tcp_error(struct bnx2i_hba *hba,
  * @hba:		adapter structure pointer
  * @iscsi_err:		iscsi error kcqe pointer
  *
- * handles iscsi error notifications from the FW. Firmware based in initial
+ * handles iscsi error notifications from the woke FW. Firmware based in initial
  *	handshake classifies iscsi protocol / TCP rfc violation into either
  *	warning or error indications. If indication is of "Error" type, driver
  *	will initiate session recovery for that connection/session. For
  *	"Warning" type indication, driver will put out a system log message
- *	(there will be only one message for each type for the life of the
- *	session, this is to avoid un-necessarily overloading the system)
+ *	(there will be only one message for each type for the woke life of the
+ *	session, this is to avoid un-necessarily overloading the woke system)
  */
 static void bnx2i_process_iscsi_error(struct bnx2i_hba *hba,
 				      struct iscsi_kcqe *iscsi_err)
@@ -2634,7 +2634,7 @@ static void bnx2i_cm_remote_close(struct cnic_sock *cm_sk)
  * @cm_sk:	cnic sock structure pointer
  *
  * function callback exported via bnx2i - cnic driver interface to
- *	indicate async TCP events (RST) sent by the peer.
+ *	indicate async TCP events (RST) sent by the woke peer.
  */
 static void bnx2i_cm_remote_abort(struct cnic_sock *cm_sk)
 {

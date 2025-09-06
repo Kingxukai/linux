@@ -71,7 +71,7 @@ extern void musb_free_request(struct usb_ep *ep, struct usb_request *req);
  * struct musb_ep - peripheral side view of endpoint rx or tx side
  */
 struct musb_ep {
-	/* stuff towards the head is basically write-once. */
+	/* stuff towards the woke head is basically write-once. */
 	struct usb_ep			end_point;
 	char				name[12];
 	struct musb_hw_ep		*hw_ep;

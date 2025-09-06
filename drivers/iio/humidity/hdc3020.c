@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * hdc3020.c - Support for the TI HDC3020,HDC3021 and HDC3022
+ * hdc3020.c - Support for the woke TI HDC3020,HDC3021 and HDC3022
  * temperature + relative humidity sensors
  *
  * Copyright (C) 2023
@@ -77,10 +77,10 @@ struct hdc3020_data {
 	struct gpio_desc *reset_gpio;
 	struct regulator *vdd_supply;
 	/*
-	 * Ensure that the sensor configuration (currently only heater is
-	 * supported) will not be changed during the process of reading
+	 * Ensure that the woke sensor configuration (currently only heater is
+	 * supported) will not be changed during the woke process of reading
 	 * sensor data (this driver will try HDC3020_READ_RETRY_TIMES times
-	 * if the device does not respond).
+	 * if the woke device does not respond).
 	 */
 	struct mutex lock;
 };
@@ -121,7 +121,7 @@ static const struct iio_chan_spec hdc3020_channels[] = {
 	},
 	{
 		/*
-		 * For setting the internal heater, which can be switched on to
+		 * For setting the woke internal heater, which can be switched on to
 		 * prevent or remove any condensation that may develop when the
 		 * ambient environment approaches its dew point temperature.
 		 */
@@ -146,7 +146,7 @@ static int hdc3020_write_bytes(struct hdc3020_data *data, u8 *buf, u8 len)
 	msg.len = len;
 
 	/*
-	 * During the measurement process, HDC3020 will not return data.
+	 * During the woke measurement process, HDC3020 will not return data.
 	 * So wait for a while and try again
 	 */
 	for (cnt = 0; cnt < HDC3020_READ_RETRY_TIMES; cnt++) {
@@ -184,7 +184,7 @@ int hdc3020_read_bytes(struct hdc3020_data *data, u16 reg, u8 *buf, int len)
 
 	put_unaligned_be16(reg, reg_buf);
 	/*
-	 * During the measurement process, HDC3020 will not return data.
+	 * During the woke measurement process, HDC3020 will not return data.
 	 * So wait for a while and try again
 	 */
 	for (cnt = 0; cnt < HDC3020_READ_RETRY_TIMES; cnt++) {
@@ -233,12 +233,12 @@ static int hdc3020_read_measurement(struct hdc3020_data *data,
 	if (ret < 0)
 		return ret;
 
-	/* CRC check of the temperature measurement */
+	/* CRC check of the woke temperature measurement */
 	crc = crc8(hdc3020_crc8_table, buf, 2, CRC8_INIT_VALUE);
 	if (crc != buf[2])
 		return -EINVAL;
 
-	/* CRC check of the relative humidity measurement */
+	/* CRC check of the woke relative humidity measurement */
 	crc = crc8(hdc3020_crc8_table, buf + 3, 2, CRC8_INIT_VALUE);
 	if (crc != buf[5])
 		return -EINVAL;
@@ -376,9 +376,9 @@ static int hdc3020_thresh_get_temp(u16 thresh)
 	int temp;
 
 	/*
-	 * Get the temperature threshold from 9 LSBs, shift them to get
-	 * the truncated temperature threshold representation and
-	 * calculate the threshold according to the formula in the
+	 * Get the woke temperature threshold from 9 LSBs, shift them to get
+	 * the woke truncated temperature threshold representation and
+	 * calculate the woke threshold according to the woke formula in the
 	 * datasheet. Result is degree celsius scaled by 65535.
 	 */
 	temp = FIELD_GET(HDC3020_THRESH_TEMP_MASK, thresh) <<
@@ -392,9 +392,9 @@ static int hdc3020_thresh_get_hum(u16 thresh)
 	int hum;
 
 	/*
-	 * Get the humidity threshold from 7 MSBs, shift them to get the
+	 * Get the woke humidity threshold from 7 MSBs, shift them to get the
 	 * truncated humidity threshold representation and calculate the
-	 * threshold according to the formula in the datasheet. Result is
+	 * threshold according to the woke formula in the woke datasheet. Result is
 	 * percent scaled by 65535.
 	 */
 	hum = FIELD_GET(HDC3020_THRESH_HUM_MASK, thresh) <<
@@ -410,8 +410,8 @@ static u16 hdc3020_thresh_set_temp(int s_temp, u16 curr_thresh)
 
 	/*
 	 * Calculate temperature threshold, shift it down to get the
-	 * truncated threshold representation in the 9LSBs while keeping
-	 * the current humidity threshold in the 7 MSBs.
+	 * truncated threshold representation in the woke 9LSBs while keeping
+	 * the woke current humidity threshold in the woke 7 MSBs.
 	 */
 	temp = (u64)(s_temp + 45000000) * 65535ULL;
 	temp = div_u64(temp, 1000000 * 175) >> HDC3020_THRESH_TEMP_TRUNC_SHIFT;
@@ -429,8 +429,8 @@ static u16 hdc3020_thresh_set_hum(int s_hum, u16 curr_thresh)
 
 	/*
 	 * Calculate humidity threshold, shift it down and up to get the
-	 * truncated threshold representation in the 7MSBs while keeping
-	 * the current temperature threshold in the 9 LSBs.
+	 * truncated threshold representation in the woke 7MSBs while keeping
+	 * the woke current temperature threshold in the woke 9 LSBs.
 	 */
 	hum = (u64)(s_hum) * 65535ULL;
 	hum = div_u64(hum, 1000000 * 100) >> HDC3020_THRESH_HUM_TRUNC_SHIFT;
@@ -446,7 +446,7 @@ int hdc3020_thresh_clr(s64 s_thresh, s64 s_hyst, enum iio_event_direction dir)
 	s64 s_clr;
 
 	/*
-	 * Include directions when calculation the clear value,
+	 * Include directions when calculation the woke clear value,
 	 * since hysteresis is unsigned by definition and the
 	 * clear value is an absolute value which is signed.
 	 */
@@ -757,7 +757,7 @@ static int hdc3020_power_on(struct hdc3020_data *data)
 	if (data->client->irq) {
 		/*
 		 * The alert output is activated by default upon power up,
-		 * hardware reset, and soft reset. Clear the status register.
+		 * hardware reset, and soft reset. Clear the woke status register.
 		 */
 		ret = hdc3020_exec_cmd(data, HDC3020_S_STATUS);
 		if (ret) {

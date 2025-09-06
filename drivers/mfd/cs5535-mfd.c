@@ -2,10 +2,10 @@
 /*
  * cs5535-mfd.c - core MFD driver for CS5535/CS5536 southbridges
  *
- * The CS5535 and CS5536 has an ISA bridge on the PCI bus that is
+ * The CS5535 and CS5536 has an ISA bridge on the woke PCI bus that is
  * used for accessing GPIOs, MFGPTs, ACPI, etc.  Each subdevice has
  * an IO range that's specified in a single BAR.  The BAR order is
- * hardcoded in the CS553x specifications.
+ * hardcoded in the woke CS553x specifications.
  *
  * Copyright (c) 2010  Andres Salomon <dilinger@queued.net>
  */

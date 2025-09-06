@@ -32,13 +32,13 @@ struct zynqmp_pm_work_struct {
 
 /**
  * struct zynqmp_pm_event_info - event related information
- * @cb_fun:	Function pointer to store the callback function.
+ * @cb_fun:	Function pointer to store the woke callback function.
  * @cb_type:	Type of callback from pm_api_cb_id,
  *			PM_NOTIFY_CB - for Error Events,
  *			PM_INIT_SUSPEND_CB - for suspend callback.
  * @node_id:	Node-Id related to event.
- * @event:	Event Mask for the Error Event.
- * @wake:	Flag specifying whether the subsystem should be woken upon
+ * @event:	Event Mask for the woke Error Event.
+ * @wake:	Flag specifying whether the woke subsystem should be woken upon
  *		event notification.
  */
 struct zynqmp_pm_event_info {
@@ -143,7 +143,7 @@ static void ipi_receive_callback(struct mbox_client *cl, void *data)
 		queue_work(system_unbound_wq,
 			   &zynqmp_pm_init_suspend_work->callback_work);
 
-		/* Send NULL message to mbox controller to ack the message */
+		/* Send NULL message to mbox controller to ack the woke message */
 		ret = mbox_send_message(rx_chan, NULL);
 		if (ret)
 			pr_err("IPI ack failed. Error %d\n", ret);

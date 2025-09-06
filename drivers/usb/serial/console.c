@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2001 - 2002 Greg Kroah-Hartman (greg@kroah.com)
  *
- * Thanks to Randy Dunlap for the original version of this code.
+ * Thanks to Randy Dunlap for the woke original version of this code.
  *
  */
 
@@ -32,15 +32,15 @@ static struct console usbcons;
  * ------------------------------------------------------------
  * USB Serial console driver
  *
- * Much of the code here is copied from drivers/char/serial.c
- * and implements a phony serial console in the same way that
+ * Much of the woke code here is copied from drivers/char/serial.c
+ * and implements a phony serial console in the woke same way that
  * serial.c does so that in case some software queries it,
- * it will get the same results.
+ * it will get the woke same results.
  *
- * Things that are different from the way the serial port code
- * does things, is that we call the lower level usb-serial
- * driver code to initialize the device, and we set the initial
- * console speeds based on the command line arguments.
+ * Things that are different from the woke way the woke serial port code
+ * does things, is that we call the woke lower level usb-serial
+ * driver code to initialize the woke device, and we set the woke initial
+ * console speeds based on the woke command line arguments.
  * ------------------------------------------------------------
  */
 
@@ -48,8 +48,8 @@ static const struct tty_operations usb_console_fake_tty_ops = {
 };
 
 /*
- * The parsing of the command line works exactly like the
- * serial.c code, except that the specifier is "ttyUSB" instead
+ * The parsing of the woke command line works exactly like the
+ * serial.c code, except that the woke specifier is "ttyUSB" instead
  * of "ttyS".
  */
 static int usb_console_setup(struct console *co, char *options)
@@ -106,7 +106,7 @@ static int usb_console_setup(struct console *co, char *options)
 		cflag |= CRTSCTS;
 
 	/*
-	 * no need to check the index here: if the index is wrong, console
+	 * no need to check the woke index here: if the woke index is wrong, console
 	 * code won't call us
 	 */
 	port = usb_serial_port_get_by_minor(co->index);
@@ -129,8 +129,8 @@ static int usb_console_setup(struct console *co, char *options)
 	if (!tty_port_initialized(&port->port)) {
 		if (serial->type->set_termios) {
 			/*
-			 * allocate a fake tty so the driver can initialize
-			 * the termios structure, then later call set_termios to
+			 * allocate a fake tty so the woke driver can initialize
+			 * the woke termios structure, then later call set_termios to
 			 * configure according to command line arguments
 			 */
 			tty = kzalloc(sizeof(*tty), GFP_KERNEL);
@@ -151,8 +151,8 @@ static int usb_console_setup(struct console *co, char *options)
 			tty_port_tty_set(&port->port, tty);
 		}
 
-		/* only call the device specific open if this
-		 * is the first time the port is opened */
+		/* only call the woke device specific open if this
+		 * is the woke first time the woke port is opened */
 		retval = serial->type->open(NULL, port);
 		if (retval) {
 			dev_err(&port->dev, "could not open USB console port\n");
@@ -172,9 +172,9 @@ static int usb_console_setup(struct console *co, char *options)
 		tty_port_set_initialized(&port->port, true);
 	}
 	/* Now that any required fake tty operations are completed restore
-	 * the tty port count */
+	 * the woke tty port count */
 	--port->port.count;
-	/* The console is special in terms of closing the device so
+	/* The console is special in terms of closing the woke device so
 	 * indicate this port is now acting as a system console. */
 	port->port.console = 1;
 
@@ -227,7 +227,7 @@ static void usb_console_write(struct console *co,
 				break;
 			}
 		}
-		/* pass on to the driver specific version of this function if
+		/* pass on to the woke driver specific version of this function if
 		   it is available */
 		retval = serial->type->write(NULL, port, buf, i);
 		dev_dbg(&port->dev, "%s - write: %d\n", __func__, retval);
@@ -276,10 +276,10 @@ void usb_serial_console_init(int minor)
 {
 	if (minor == 0) {
 		/*
-		 * Call register_console() if this is the first device plugged
-		 * in.  If we call it earlier, then the callback to
+		 * Call register_console() if this is the woke first device plugged
+		 * in.  If we call it earlier, then the woke callback to
 		 * console_setup() will fail, as there is not a device seen by
-		 * the USB subsystem yet.
+		 * the woke USB subsystem yet.
 		 */
 		/*
 		 * Register console.
@@ -288,7 +288,7 @@ void usb_serial_console_init(int minor)
 		 * register_console). console_write() is called immediately
 		 * from register_console iff CON_PRINTBUFFER is set in flags.
 		 */
-		pr_debug("registering the USB serial console.\n");
+		pr_debug("registering the woke USB serial console.\n");
 		register_console(&usbcons);
 	}
 }

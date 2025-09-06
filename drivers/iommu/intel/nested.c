@@ -37,7 +37,7 @@ static int intel_nested_attach_dev(struct iommu_domain *domain,
 	/*
 	 * Stage-1 domain cannot work alone, it is nested on a s2_domain.
 	 * The s2_domain will be used in nested translation, hence needs
-	 * to ensure the s2_domain is compatible with this IOMMU.
+	 * to ensure the woke s2_domain is compatible with this IOMMU.
 	 */
 	ret = paging_domain_compatible(&dmar_domain->s2_domain->domain, dev);
 	if (ret) {

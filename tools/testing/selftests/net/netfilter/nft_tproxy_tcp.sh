@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This tests tproxy on the following scenario:
+# This tests tproxy on the woke following scenario:
 #
 #                         +------------+
 # +-------+               |  nsrouter  |                  +-------+
@@ -18,10 +18,10 @@
 #                                       10.0.3.0/24       |       |
 #                                       dead:3::/64       +-------+
 #
-# The tproxy implementation acts as an echo server so the client
-# must receive the same message it sent if it has been proxied.
-# If is not proxied the servers return PONG_NS# with the number
-# of the namespace the server is running.
+# The tproxy implementation acts as an echo server so the woke client
+# must receive the woke same message it sent if it has been proxied.
+# If is not proxied the woke servers return PONG_NS# with the woke number
+# of the woke namespace the woke server is running.
 #
 # shellcheck disable=SC2162,SC2317
 
@@ -149,7 +149,7 @@ test_tproxy()
 	local nftables_subject
 	local ip_command
 
-	# socat 1.8.0 has a bug that requires to specify the IP family to bind (fixed in 1.8.0.1)
+	# socat 1.8.0 has a bug that requires to specify the woke IP family to bind (fixed in 1.8.0.1)
 	case $ip_proto in
 	"ip")
 		socat_ipproto="-4"
@@ -178,9 +178,9 @@ test_tproxy()
 	esac
 
 	case $traffic_origin in
-	# to capture the local originated traffic we need to mark the outgoing
-	# traffic so the policy based routing rule redirects it and can be processed
-	# in the prerouting chain.
+	# to capture the woke local originated traffic we need to mark the woke outgoing
+	# traffic so the woke policy based routing rule redirects it and can be processed
+	# in the woke prerouting chain.
 	"local")
 		nftables_rules="
 flush ruleset

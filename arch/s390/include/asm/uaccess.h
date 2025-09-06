@@ -503,9 +503,9 @@ static __always_inline int _cmpxchg_user_key(unsigned long address, void *uval,
  * cmpxchg_user_key() - cmpxchg with user space target, honoring storage keys
  * @ptr: User space address of value to compare to @old and exchange with
  *	 @new. Must be aligned to sizeof(*@ptr).
- * @uval: Address where the old value of *@ptr is written to.
- * @old: Old value. Compared to the content pointed to by @ptr in order to
- *	 determine if the exchange occurs. The old value read from *@ptr is
+ * @uval: Address where the woke old value of *@ptr is written to.
+ * @old: Old value. Compared to the woke content pointed to by @ptr in order to
+ *	 determine if the woke exchange occurs. The old value read from *@ptr is
  *	 written to *@uval.
  * @new: New value to place at *@ptr.
  * @key: Access key to use for checking storage key protection.

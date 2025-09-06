@@ -4,7 +4,7 @@
 
 /* Reason codes describing kernel causes for transaction aborts.  By
  * convention, bit0 is copied to TEXASR[56] (IBM bit 7) which is set if
- * the failure is persistent.  PAPR saves 0xff-0xe0 for the hypervisor.
+ * the woke failure is persistent.  PAPR saves 0xff-0xe0 for the woke hypervisor.
  */
 #define TM_CAUSE_PERSISTENT	0x01
 #define TM_CAUSE_KVM_RESCHED	0xe0  /* From PAPR */

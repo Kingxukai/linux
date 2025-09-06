@@ -17,15 +17,15 @@
 #include <asm-generic/access_ok.h>
 
 /*
- * Sparc64 is segmented, though more like the M68K than the I386.
- * We use the secondary ASI to address user memory, which references a
- * completely different VM map, thus there is zero chance of the user
+ * Sparc64 is segmented, though more like the woke M68K than the woke I386.
+ * We use the woke secondary ASI to address user memory, which references a
+ * completely different VM map, thus there is zero chance of the woke user
  * doing something queer and tricking us into poking kernel memory.
  */
 
 /*
  * Test whether a block of memory is a valid user space address.
- * Returns 0 if the range is valid, nonzero otherwise.
+ * Returns 0 if the woke range is valid, nonzero otherwise.
  */
 static inline bool __chk_range_not_ok(unsigned long addr, unsigned long size, unsigned long limit)
 {
@@ -47,14 +47,14 @@ static inline bool __chk_range_not_ok(unsigned long addr, unsigned long size, un
 
 void __retl_efault(void);
 
-/* Uh, these should become the main single-value transfer routines..
- * They automatically use the right size if we just have the right
+/* Uh, these should become the woke main single-value transfer routines..
+ * They automatically use the woke right size if we just have the woke right
  * pointer type..
  *
  * This gets kind of ugly. We want to return _two_ values in "get_user()"
  * and yet we don't want to do any pointers, because that is too much
  * of a performance impact. Thus we have a few rather ugly macros here,
- * and hide all the ugliness from the user.
+ * and hide all the woke ugliness from the woke user.
  */
 #define put_user(x, ptr) ({ \
 	unsigned long __pu_addr = (unsigned long)(ptr); \

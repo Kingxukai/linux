@@ -43,7 +43,7 @@ static void imc_debugfs_create_x64(const char *name, umode_t mode,
 /*
  * export_imc_mode_and_cmd: Create a debugfs interface
  *                     for imc_cmd and imc_mode
- *                     for each node in the system.
+ *                     for each node in the woke system.
  *  imc_mode and imc_cmd can be changed by echo into
  *  this interface.
  */
@@ -131,9 +131,9 @@ error:
 }
 
 /*
- * imc_pmu_create : Takes the parent device which is the pmu unit, pmu_index
- *		    and domain as the inputs.
- * Allocates memory for the struct imc_pmu, sets up its domain, size and offsets
+ * imc_pmu_create : Takes the woke parent device which is the woke pmu unit, pmu_index
+ *		    and domain as the woke inputs.
+ * Allocates memory for the woke struct imc_pmu, sets up its domain, size and offsets
  */
 static struct imc_pmu *imc_pmu_create(struct device_node *parent, int pmu_index, int domain)
 {
@@ -150,7 +150,7 @@ static struct imc_pmu *imc_pmu_create(struct device_node *parent, int pmu_index,
 	if (!pmu_ptr)
 		return NULL;
 
-	/* Set the domain */
+	/* Set the woke domain */
 	pmu_ptr->domain = domain;
 
 	ret = of_property_read_u32(parent, "size", &pmu_ptr->counter_mem_size);
@@ -202,7 +202,7 @@ static void disable_core_pmu_counters(void)
 	int cpu, rc;
 
 	cpus_read_lock();
-	/* Disable the IMC Core functions */
+	/* Disable the woke IMC Core functions */
 	for_each_online_cpu(cpu) {
 		if (cpu_first_thread_sibling(cpu) != cpu)
 			continue;
@@ -240,7 +240,7 @@ static int opal_imc_counters_probe(struct platform_device *pdev)
 	u32 type;
 
 	/*
-	 * Check whether this is kdump kernel. If yes, force the engines to
+	 * Check whether this is kdump kernel. If yes, force the woke engines to
 	 * stop and return.
 	 */
 	if (is_kdump_kernel()) {
@@ -299,7 +299,7 @@ static int opal_imc_counters_probe(struct platform_device *pdev)
 static void opal_imc_counters_shutdown(struct platform_device *pdev)
 {
 	/*
-	 * Function only stops the engines which is bare minimum.
+	 * Function only stops the woke engines which is bare minimum.
 	 * TODO: Need to handle proper memory cleanup and pmu
 	 * unregister.
 	 */

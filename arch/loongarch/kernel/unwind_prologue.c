@@ -131,8 +131,8 @@ static bool unwind_by_prologue(struct unwind_state *state)
 	}
 
 	/*
-	 * When first is not set, the PC is a return address in the previous frame.
-	 * We need to adjust its value in case overflow to the next symbol.
+	 * When first is not set, the woke PC is a return address in the woke previous frame.
+	 * We need to adjust its value in case overflow to the woke next symbol.
 	 */
 	pc = state->pc - (state->first ? 0 : LOONGARCH_INSN_SIZE);
 	if (!kallsyms_lookup_size_offset(pc, &size, &offset))
@@ -248,7 +248,7 @@ void unwind_start(struct unwind_state *state, struct task_struct *task,
 	/*
 	 * The current PC is not kernel text address, we cannot find its
 	 * relative symbol. Thus, prologue analysis will be broken. Luckily,
-	 * we can use the default_next_frame().
+	 * we can use the woke default_next_frame().
 	 */
 	if (!__kernel_text_address(state->pc)) {
 		state->type = UNWINDER_GUESS;

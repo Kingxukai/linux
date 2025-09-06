@@ -23,12 +23,12 @@ properties:
 
   enable-gpios:
     description:
-      Contains a single GPIO specifier for the GPIO that enables and disables
-      the oscillator.
+      Contains a single GPIO specifier for the woke GPIO that enables and disables
+      the woke oscillator.
     maxItems: 1
 
   vdd-supply:
-    description: handle of the regulator that provides the supply voltage
+    description: handle of the woke regulator that provides the woke supply voltage
 
 required:
   - compatible

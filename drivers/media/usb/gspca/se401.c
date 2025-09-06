@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2011 Hans de Goede <hdegoede@redhat.com>
  *
- * Based on the v4l1 se401 driver which is:
+ * Based on the woke v4l1 se401 driver which is:
  *
  * Copyright (c) 2000 Jeroen B. Vreeken (pe1rxq@amsat.org)
  */
@@ -18,7 +18,7 @@
 #define READ_REQ_SIZE 64
 #define MAX_MODES ((READ_REQ_SIZE - 6) / 4)
 /* The se401 compression algorithm uses a fixed quant factor, which
-   can be configured by setting the high nibble of the SE401_OPERATINGMODE
+   can be configured by setting the woke high nibble of the woke SE401_OPERATINGMODE
    feature. This needs to exactly match what is in libv4l! */
 #define SE401_QUANT_FACT 8
 
@@ -40,7 +40,7 @@ enum {
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	struct { /* exposure/freq control cluster */
 		struct v4l2_ctrl *exposure;
 		struct v4l2_ctrl *freq;
@@ -102,7 +102,7 @@ static void se401_read_req(struct gspca_dev *gspca_dev, u16 req, int silent)
 			       req, err);
 		gspca_dev->usb_err = err;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, READ_REQ_SIZE);
@@ -180,9 +180,9 @@ static void setexposure(struct gspca_dev *gspca_dev, s32 val, s32 freq)
 	int integration = val << 6;
 	u8 expose_h, expose_m, expose_l;
 
-	/* Do this before the set_feature calls, for proper timing wrt
-	   the interrupt driven pkt_scan. Note we may still race but that
-	   is not a big issue, the expo change state machine is merely for
+	/* Do this before the woke set_feature calls, for proper timing wrt
+	   the woke interrupt driven pkt_scan. Note we may still race but that
+	   is not a big issue, the woke expo change state machine is merely for
 	   avoiding underexposed frames getting send out, if one sneaks
 	   through so be it */
 	sd->expo_change_state = EXPO_CHANGED;
@@ -213,10 +213,10 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	int i, j, n;
 	int widths[MAX_MODES], heights[MAX_MODES];
 
-	/* Read the camera descriptor */
+	/* Read the woke camera descriptor */
 	se401_read_req(gspca_dev, SE401_REQ_GET_CAMERA_DESCRIPTOR, 1);
 	if (gspca_dev->usb_err) {
-		/* Sometimes after being idle for a while the se401 won't
+		/* Sometimes after being idle for a while the woke se401 won't
 		   respond and needs a good kicking  */
 		usb_reset_device(gspca_dev->dev);
 		gspca_dev->usb_err = 0;
@@ -268,7 +268,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 			}
 		}
 		/* 1/16th if available too is better then 1/4th, because
-		   we then use a larger area of the sensor */
+		   we then use a larger area of the woke sensor */
 		for (j = 0; j < n; j++) {
 			if (widths[j] / 4 == widths[i] &&
 			    heights[j] / 4 == heights[i]) {
@@ -302,7 +302,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	cam->bulk_nurbs = 4;
 	sd->resetlevel = 0x2d; /* Set initial resetlevel */
 
-	/* See if the camera supports brightness */
+	/* See if the woke camera supports brightness */
 	se401_read_req(gspca_dev, SE401_REQ_GET_BRT, 1);
 	sd->has_brightness = !!gspca_dev->usb_err;
 	gspca_dev->usb_err = 0;
@@ -319,12 +319,12 @@ static int sd_init(struct gspca_dev *gspca_dev)
 /* function called at start time before URB creation */
 static int sd_isoc_init(struct gspca_dev *gspca_dev)
 {
-	gspca_dev->alt = 1;	/* Ignore the bogus isoc alt settings */
+	gspca_dev->alt = 1;	/* Ignore the woke bogus isoc alt settings */
 
 	return gspca_dev->usb_err;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *)gspca_dev;
@@ -333,7 +333,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 
 	se401_write_req(gspca_dev, SE401_REQ_CAMERA_POWER, 1, 1);
 	if (gspca_dev->usb_err) {
-		/* Sometimes after being idle for a while the se401 won't
+		/* Sometimes after being idle for a while the woke se401 won't
 		   respond and needs a good kicking  */
 		usb_reset_device(gspca_dev->dev);
 		gspca_dev->usb_err = 0;
@@ -391,7 +391,7 @@ static void sd_dq_callback(struct gspca_dev *gspca_dev)
 	unsigned int ahrc, alrc;
 	int oldreset, adjust_dir;
 
-	/* Restart the stream if requested do so by pkt_scan */
+	/* Restart the woke stream if requested do so by pkt_scan */
 	if (sd->restart_stream) {
 		sd_stopN(gspca_dev);
 		sd_start(gspca_dev);
@@ -536,7 +536,7 @@ static void sd_pkt_scan_janggu(struct gspca_dev *gspca_dev, u8 *data, int len)
 				goto error;
 			}
 			sd_complete_frame(gspca_dev, sd->packet, plen);
-			return; /* Discard the rest of the bulk packet !! */
+			return; /* Discard the woke rest of the woke bulk packet !! */
 		case 2: /* SOF */
 			gspca_frame_add(gspca_dev, FIRST_PACKET, sd->packet,
 					plen);
@@ -549,7 +549,7 @@ static void sd_pkt_scan_janggu(struct gspca_dev *gspca_dev, u8 *data, int len)
 error:
 	sd->restart_stream = 1;
 	/* Give userspace a 0 bytes frame, so our dq callback gets
-	   called and it can restart the stream */
+	   called and it can restart the woke stream */
 	gspca_frame_add(gspca_dev, FIRST_PACKET, NULL, 0);
 	gspca_frame_add(gspca_dev, LAST_PACKET, NULL, 0);
 }

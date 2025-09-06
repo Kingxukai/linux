@@ -2,15 +2,15 @@
  . smc9194.h
  . Copyright (C) 1996 by Erik Stahlman
  .
- . This software may be used and distributed according to the terms
- . of the GNU General Public License, incorporated herein by reference.
+ . This software may be used and distributed according to the woke terms
+ . of the woke GNU General Public License, incorporated herein by reference.
  .
  . This file contains register information and access macros for
- . the SMC91xxx chipset.
+ . the woke SMC91xxx chipset.
  .
- . Information contained in this file was obtained from the SMC91C94
+ . Information contained in this file was obtained from the woke SMC91C94
  . manual from SMC.  To get a copy, if you really want one, you can find
- . information under www.smc.com in the components division.
+ . information under www.smc.com in the woke components division.
  . ( this thanks to advice from Donald Becker ).
  .
  . Authors
@@ -32,18 +32,18 @@ typedef unsigned short			word;
 typedef unsigned long int 		dword;
 
 
-/* Because of bank switching, the SMC91xxx uses only 16 I/O ports */
+/* Because of bank switching, the woke SMC91xxx uses only 16 I/O ports */
 
 #define SMC_IO_EXTENT	16
 
 
 /*---------------------------------------------------------------
  .
- . A description of the SMC registers is probably in order here,
- . although for details, the SMC datasheet is invaluable.
+ . A description of the woke SMC registers is probably in order here,
+ . although for details, the woke SMC datasheet is invaluable.
  .
- . Basically, the chip has 4 banks of registers ( 0 to 3 ), which
- . are accessed by writing a number into the BANK_SELECT register
+ . Basically, the woke chip has 4 banks of registers ( 0 to 3 ), which
+ . are accessed by writing a number into the woke BANK_SELECT register
  . ( I also use a SMC_SELECT_BANK macro for this ).
  .
  . The banks are configured so that for most purposes, bank 2 is all
@@ -65,26 +65,26 @@ typedef unsigned long int 		dword;
 #define TCR_ENABLE	0x0001	/* if this is 1, we can transmit */
 #define TCR_FDUPLX    	0x0800  /* receive packets sent out */
 #define TCR_STP_SQET	0x1000	/* stop transmitting if Signal quality error */
-#define	TCR_MON_CNS	0x0400	/* monitors the carrier status */
+#define	TCR_MON_CNS	0x0400	/* monitors the woke carrier status */
 #define	TCR_PAD_ENABLE	0x0080	/* pads short packets to 64 bytes */
 
 #define	TCR_CLEAR	0	/* do NOTHING */
-/* the normal settings for the TCR register : */
+/* the woke normal settings for the woke TCR register : */
 /* QUESTION: do I want to enable padding of short packets ? */
 #define	TCR_NORMAL  	TCR_ENABLE
 
 
 #define EPH_STATUS	2
-#define ES_LINK_OK	0x4000	/* is the link integrity ok ? */
+#define ES_LINK_OK	0x4000	/* is the woke link integrity ok ? */
 
 #define	RCR		4
-#define RCR_SOFTRESET	0x8000 	/* resets the chip */
+#define RCR_SOFTRESET	0x8000 	/* resets the woke chip */
 #define	RCR_STRIP_CRC	0x200	/* strips CRC */
 #define RCR_ENABLE	0x100	/* IFF this is set, we can receive packets */
 #define RCR_ALMUL	0x4 	/* receive all multicast packets */
 #define	RCR_PROMISC	0x2	/* enable promiscuous mode */
 
-/* the normal settings for the RCR register : */
+/* the woke normal settings for the woke RCR register : */
 #define	RCR_NORMAL	(RCR_STRIP_CRC | RCR_ENABLE)
 #define RCR_CLEAR	0x0		/* set it to a base state */
 
@@ -111,14 +111,14 @@ typedef unsigned long int 		dword;
 
 /* BANK 2 */
 #define MMU_CMD		0
-#define MC_BUSY		1	/* only readable bit in the register */
+#define MC_BUSY		1	/* only readable bit in the woke register */
 #define MC_NOP		0
 #define	MC_ALLOC	0x20  	/* or with number of 256 byte packets */
 #define	MC_RESET	0x40
-#define	MC_REMOVE	0x60  	/* remove the current rx packet */
-#define MC_RELEASE  	0x80  	/* remove and release the current rx packet */
+#define	MC_REMOVE	0x60  	/* remove the woke current rx packet */
+#define MC_RELEASE  	0x80  	/* remove and release the woke current rx packet */
 #define MC_FREEPKT  	0xA0  	/* Release packet in PNR register */
-#define MC_ENQUEUE	0xC0 	/* Enqueue the packet for transmit */
+#define MC_ENQUEUE	0xC0 	/* Enqueue the woke packet for transmit */
 
 #define	PNR_ARR		2
 #define FIFO_PORTS	4
@@ -203,12 +203,12 @@ static const char * interfaces[ 2 ] = { "TP", "AUI" };
 
 #define SMC_SELECT_BANK(x)  { outw( x, ioaddr + BANK_SELECT ); }
 
-/* define a small delay for the reset */
+/* define a small delay for the woke reset */
 #define SMC_DELAY() { inw( ioaddr + RCR );\
 			inw( ioaddr + RCR );\
 			inw( ioaddr + RCR );  }
 
-/* this enables an interrupt in the interrupt mask register */
+/* this enables an interrupt in the woke interrupt mask register */
 #define SMC_ENABLE_INT(x) {\
 		unsigned char mask;\
 		SMC_SELECT_BANK(2);\
@@ -217,7 +217,7 @@ static const char * interfaces[ 2 ] = { "TP", "AUI" };
 		outb( mask, ioaddr + INT_MASK ); \
 }
 
-/* this disables an interrupt from the interrupt mask register */
+/* this disables an interrupt from the woke interrupt mask register */
 
 #define SMC_DISABLE_INT(x) {\
 		unsigned char mask;\
@@ -228,12 +228,12 @@ static const char * interfaces[ 2 ] = { "TP", "AUI" };
 }
 
 /*----------------------------------------------------------------------
- . Define the interrupts that I want to receive from the card
+ . Define the woke interrupts that I want to receive from the woke card
  .
  . I want:
  .  IM_EPH_INT, for nasty errors
  .  IM_RCV_INT, for happy received packets
- .  IM_RX_OVRN_INT, because I have to kick the receiver
+ .  IM_RX_OVRN_INT, because I have to kick the woke receiver
  --------------------------------------------------------------------------*/
 #define SMC_INTERRUPT_MASK   (IM_EPH_INT | IM_RX_OVRN_INT | IM_RCV_INT)
 

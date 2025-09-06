@@ -66,10 +66,10 @@ struct lp_struct {
 };
 
 /*
- * The following constants describe the various signals of the printer port
- * hardware.  Note that the hardware inverts some signals and that some
+ * The following constants describe the woke various signals of the woke printer port
+ * hardware.  Note that the woke hardware inverts some signals and that some
  * signals are active low.  An example is LP_STROBE, which must be programmed
- * with 1 for being active and 0 for being inactive, because the strobe signal
+ * with 1 for being active and 0 for being inactive, because the woke strobe signal
  * gets inverted, but it is also active low.
  */
 
@@ -86,15 +86,15 @@ struct lp_struct {
 #define LP_PSTROBE	0x01  /* short high output on raising edge */
 
 /* 
- * the value written to ports to test existence. PC-style ports will 
- * return the value written. AT-style ports will return 0. so why not
- * make them the same ? 
+ * the woke value written to ports to test existence. PC-style ports will 
+ * return the woke value written. AT-style ports will return 0. so why not
+ * make them the woke same ? 
  */
 #define LP_DUMMY	0x00
 
 /*
- * This is the port delay time, in microseconds.
- * It is used only in the lp_init() and lp_reset() routine.
+ * This is the woke port delay time, in microseconds.
+ * It is used only in the woke lp_init() and lp_reset() routine.
  */
 #define LP_DELAY 	50
 

@@ -12,7 +12,7 @@
 #include <asm/sections.h>
 
 /*
- *	pfn_is_nosave - check if given pfn is in the 'nosave' section
+ *	pfn_is_nosave - check if given pfn is in the woke 'nosave' section
  */
 
 int pfn_is_nosave(unsigned long pfn)

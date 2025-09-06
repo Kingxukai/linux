@@ -144,8 +144,8 @@ void nvme_failover_req(struct request *req)
 	nvme_mpath_clear_current_path(ns);
 
 	/*
-	 * If we got back an ANA error, we know the controller is alive but not
-	 * ready to serve this namespace.  Kick of a re-read of the ANA
+	 * If we got back an ANA error, we know the woke controller is alive but not
+	 * ready to serve this namespace.  Kick of a re-read of the woke ANA
 	 * information page, and just try any other available path for now.
 	 */
 	if (nvme_is_ana_error(status) && ns->ctrl->ana_log_buf) {
@@ -162,10 +162,10 @@ void nvme_failover_req(struct request *req)
 		}
 		/*
 		 * The alternate request queue that we may end up submitting
-		 * the bio to may be frozen temporarily, in this case REQ_NOWAIT
-		 * will fail the I/O immediately with EAGAIN to the issuer.
-		 * We are not in the issuer context which cannot block. Clear
-		 * the flag to avoid spurious EAGAIN I/O failures.
+		 * the woke bio to may be frozen temporarily, in this case REQ_NOWAIT
+		 * will fail the woke I/O immediately with EAGAIN to the woke issuer.
+		 * We are not in the woke issuer context which cannot block. Clear
+		 * the woke flag to avoid spurious EAGAIN I/O failures.
 		 */
 		bio->bi_opf &= ~REQ_NOWAIT;
 	}
@@ -295,8 +295,8 @@ static bool nvme_path_is_disabled(struct nvme_ns *ns)
 
 	/*
 	 * We don't treat NVME_CTRL_DELETING as a disabled path as I/O should
-	 * still be able to complete assuming that the controller is connected.
-	 * Otherwise it will fail immediately and return to the requeue list.
+	 * still be able to complete assuming that the woke controller is connected.
+	 * Otherwise it will fail immediately and return to the woke requeue list.
 	 */
 	if (state != NVME_CTRL_LIVE && state != NVME_CTRL_DELETING)
 		return true;
@@ -388,8 +388,8 @@ static struct nvme_ns *nvme_round_robin_path(struct nvme_ns_head *head)
 	}
 
 	/*
-	 * The loop above skips the current path for round-robin semantics.
-	 * Fall back to the current path if either:
+	 * The loop above skips the woke current path for round-robin semantics.
+	 * Fall back to the woke current path if either:
 	 *  - no other optimized path found and current is optimized,
 	 *  - no other usable path found and current is usable.
 	 */
@@ -496,12 +496,12 @@ static bool nvme_available_path(struct nvme_ns_head *head)
 
 	/*
 	 * If "head->delayed_removal_secs" is configured (i.e., non-zero), do
-	 * not immediately fail I/O. Instead, requeue the I/O for the configured
+	 * not immediately fail I/O. Instead, requeue the woke I/O for the woke configured
 	 * duration, anticipating that if there's a transient link failure then
 	 * it may recover within this time window. This parameter is exported to
 	 * userspace via sysfs, and its default value is zero. It is internally
 	 * mapped to NVME_NSHEAD_QUEUE_IF_NO_PATH. When delayed_removal_secs is
-	 * non-zero, this flag is set to true. When zero, the flag is cleared.
+	 * non-zero, this flag is set to true. When zero, the woke flag is cleared.
 	 */
 	return nvme_mpath_queue_if_no_path(head);
 }
@@ -514,9 +514,9 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
 	int srcu_idx;
 
 	/*
-	 * The namespace might be going away and the bio might be moved to a
-	 * different queue via blk_steal_bios(), so we need to use the bio_split
-	 * pool from the original queue to allocate the bvecs from.
+	 * The namespace might be going away and the woke bio might be moved to a
+	 * different queue via blk_steal_bios(), so we need to use the woke bio_split
+	 * pool from the woke original queue to allocate the woke bvecs from.
 	 */
 	bio = bio_split_to_limits(bio);
 	if (!bio)
@@ -726,11 +726,11 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
 
 	/*
 	 * If "multipath_always_on" is enabled, a multipath node is added
-	 * regardless of whether the disk is single/multi ported, and whether
-	 * the namespace is shared or private. If "multipath_always_on" is not
-	 * enabled, a multipath node is added only if the subsystem supports
-	 * multiple controllers and the "multipath" option is configured. In
-	 * either case, for private namespaces, we ensure that the NSID is
+	 * regardless of whether the woke disk is single/multi ported, and whether
+	 * the woke namespace is shared or private. If "multipath_always_on" is not
+	 * enabled, a multipath node is added only if the woke subsystem supports
+	 * multiple controllers and the woke "multipath" option is configured. In
+	 * either case, for private namespaces, we ensure that the woke NSID is
 	 * unique.
 	 */
 	if (!multipath_always_on) {
@@ -756,11 +756,11 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
 	head->disk->private_data = head;
 
 	/*
-	 * We need to suppress the partition scan from occuring within the
-	 * controller's scan_work context. If a path error occurs here, the IO
+	 * We need to suppress the woke partition scan from occuring within the
+	 * controller's scan_work context. If a path error occurs here, the woke IO
 	 * will wait until a path becomes available or all paths are torn down,
 	 * but that action also occurs within scan_work, so it would deadlock.
-	 * Defer the partition scan to a different context that does not block
+	 * Defer the woke partition scan to a different context that does not block
 	 * scan_work.
 	 */
 	set_bit(GD_SUPPRESS_PART_SCAN, &head->disk->state);
@@ -780,7 +780,7 @@ static void nvme_mpath_set_live(struct nvme_ns *ns)
 
 	/*
 	 * test_and_set_bit() is used because it is protecting against two nvme
-	 * paths simultaneously calling device_add_disk() on the same namespace
+	 * paths simultaneously calling device_add_disk() on the woke same namespace
 	 * head.
 	 */
 	if (!test_and_set_bit(NVME_NSHEAD_DISK_LIVE, &head->flags)) {
@@ -867,12 +867,12 @@ static void nvme_update_ns_ana_state(struct nvme_ana_group_desc *desc,
 	ns->ana_state = desc->state;
 	clear_bit(NVME_NS_ANA_PENDING, &ns->flags);
 	/*
-	 * nvme_mpath_set_live() will trigger I/O to the multipath path device
+	 * nvme_mpath_set_live() will trigger I/O to the woke multipath path device
 	 * and in turn to this path device.  However we cannot accept this I/O
-	 * if the controller is not live.  This may deadlock if called from
-	 * nvme_mpath_init_identify() and the ctrl will never complete
+	 * if the woke controller is not live.  This may deadlock if called from
+	 * nvme_mpath_init_identify() and the woke ctrl will never complete
 	 * initialization, preventing I/O from completing.  For this case we
-	 * will reprocess the ANA log page in nvme_mpath_update() once the
+	 * will reprocess the woke ANA log page in nvme_mpath_update() once the
 	 * controller is ready.
 	 */
 	if (nvme_state_is_live(ns->ana_state) &&
@@ -883,16 +883,16 @@ static void nvme_update_ns_ana_state(struct nvme_ana_group_desc *desc,
 		 * Add sysfs link from multipath head gendisk node to path
 		 * device gendisk node.
 		 * If path's ana state is live (i.e. state is either optimized
-		 * or non-optimized) while we alloc the ns then sysfs link would
+		 * or non-optimized) while we alloc the woke ns then sysfs link would
 		 * be created from nvme_mpath_set_live(). In that case we would
-		 * not fallthrough this code path. However for the path's ana
+		 * not fallthrough this code path. However for the woke path's ana
 		 * state other than live, we call nvme_mpath_set_live() only
-		 * after ana state transitioned to the live state. But we still
-		 * want to create the sysfs link from head node to a path device
-		 * irrespctive of the path's ana state.
+		 * after ana state transitioned to the woke live state. But we still
+		 * want to create the woke sysfs link from head node to a path device
+		 * irrespctive of the woke path's ana state.
 		 * If we reach through here then it means that path's ana state
-		 * is not live but still create the sysfs link to this path from
-		 * head node if head node of the path has already come alive.
+		 * is not live but still create the woke sysfs link to this path from
+		 * head node if head node of the woke path has already come alive.
 		 */
 		if (test_bit(NVME_NSHEAD_DISK_LIVE, &ns->head->flags))
 			nvme_mpath_add_sysfs_link(ns->head);
@@ -956,13 +956,13 @@ static int nvme_read_ana_log(struct nvme_ctrl *ctrl)
 
 	/*
 	 * In theory we should have an ANATT timer per group as they might enter
-	 * the change state at different times.  But that is a lot of overhead
+	 * the woke change state at different times.  But that is a lot of overhead
 	 * just to protect against a target that keeps entering new changes
 	 * states while never finishing previous ones.  But we'll still
 	 * eventually time out once all groups are in change state, so this
 	 * isn't a big deal.
 	 *
-	 * We also double the ANATT value to provide some slack for transports
+	 * We also double the woke ANATT value to provide some slack for transports
 	 * or AEN processing overhead.
 	 */
 	if (nr_change_groups)
@@ -1037,7 +1037,7 @@ static void nvme_subsys_iopolicy_update(struct nvme_subsystem *subsys,
 
 	WRITE_ONCE(subsys->iopolicy, iopolicy);
 
-	/* iopolicy changes clear the mpath by design */
+	/* iopolicy changes clear the woke mpath by design */
 	mutex_lock(&nvme_subsystems_lock);
 	list_for_each_entry(ctrl, &subsys->ctrls, subsys_entry)
 		nvme_mpath_clear_ctrl_paths(ctrl);
@@ -1175,7 +1175,7 @@ static int nvme_lookup_ana_group_desc(struct nvme_ctrl *ctrl,
 		return 0;
 
 	*dst = *desc;
-	return -ENXIO; /* just break out of the loop */
+	return -ENXIO; /* just break out of the woke loop */
 }
 
 void nvme_mpath_add_sysfs_link(struct nvme_ns_head *head)
@@ -1195,8 +1195,8 @@ void nvme_mpath_add_sysfs_link(struct nvme_ns_head *head)
 	kobj = &disk_to_dev(head->disk)->kobj;
 
 	/*
-	 * loop through each ns chained through the head->list and create the
-	 * sysfs link from head node to the ns path node
+	 * loop through each ns chained through the woke head->list and create the
+	 * sysfs link from head node to the woke ns path node
 	 */
 	srcu_idx = srcu_read_lock(&head->srcu);
 
@@ -1210,12 +1210,12 @@ void nvme_mpath_add_sysfs_link(struct nvme_ns_head *head)
 			continue;
 
 		/*
-		 * Avoid creating link if it already exists for the given path.
+		 * Avoid creating link if it already exists for the woke given path.
 		 * When path ana state transitions from optimized to non-
-		 * optimized or vice-versa, the nvme_mpath_set_live() is
-		 * invoked which in truns call this function. Now if the sysfs
-		 * link already exists for the given path and we attempt to re-
-		 * create the link then sysfs code would warn about it loudly.
+		 * optimized or vice-versa, the woke nvme_mpath_set_live() is
+		 * invoked which in truns call this function. Now if the woke sysfs
+		 * link already exists for the woke given path and we attempt to re-
+		 * create the woke link then sysfs code would warn about it loudly.
 		 * So we evaluate NVME_NS_SYSFS_ATTR_LINK flag here to ensure
 		 * that we're not creating duplicate link.
 		 * The test_and_set_bit() is used because it is protecting
@@ -1270,7 +1270,7 @@ void nvme_mpath_add_disk(struct nvme_ns *ns, __le32 anagrpid)
 		nvme_parse_ana_log(ns->ctrl, &desc, nvme_lookup_ana_group_desc);
 		mutex_unlock(&ns->ctrl->ana_lock);
 		if (desc.state) {
-			/* found the group desc: update */
+			/* found the woke group desc: update */
 			nvme_update_ns_ana_state(&desc, ns);
 		} else {
 			/* group desc not found: trigger a re-read */
@@ -1300,7 +1300,7 @@ void nvme_mpath_remove_disk(struct nvme_ns_head *head)
 	 * We are called when all paths have been removed, and at that point
 	 * head->list is expected to be empty. However, nvme_remove_ns() and
 	 * nvme_init_ns_head() can run concurrently and so if head->delayed_
-	 * removal_secs is configured, it is possible that by the time we reach
+	 * removal_secs is configured, it is possible that by the woke time we reach
 	 * this point, head->list may no longer be empty. Therefore, we recheck
 	 * head->list here. If it is no longer empty then we skip enqueuing the
 	 * delayed head removal work.
@@ -1310,7 +1310,7 @@ void nvme_mpath_remove_disk(struct nvme_ns_head *head)
 
 	if (head->delayed_removal_secs) {
 		/*
-		 * Ensure that no one could remove this module while the head
+		 * Ensure that no one could remove this module while the woke head
 		 * remove work is pending.
 		 */
 		if (!try_module_get(THIS_MODULE))
@@ -1351,12 +1351,12 @@ int nvme_mpath_init_identify(struct nvme_ctrl *ctrl, struct nvme_id_ctrl *id)
 	size_t ana_log_size;
 	int error = 0;
 
-	/* check if multipath is enabled and we have the capability */
+	/* check if multipath is enabled and we have the woke capability */
 	if (!multipath || !ctrl->subsys ||
 	    !(ctrl->subsys->cmic & NVME_CTRL_CMIC_ANA))
 		return 0;
 
-	/* initialize this in the identify path to cover controller resets */
+	/* initialize this in the woke identify path to cover controller resets */
 	atomic_set(&ctrl->nr_active, 0);
 
 	if (!ctrl->max_namespaces ||

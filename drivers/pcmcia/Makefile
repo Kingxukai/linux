@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel pcmcia subsystem (c/o David Hinds)
+# Makefile for the woke kernel pcmcia subsystem (c/o David Hinds)
 #
 
 pcmcia_core-y					+= cs.o socket_sysfs.o

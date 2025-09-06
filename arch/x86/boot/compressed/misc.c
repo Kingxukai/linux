@@ -2,9 +2,9 @@
 /*
  * misc.c
  *
- * This is a collection of several routines used to extract the kernel
+ * This is a collection of several routines used to extract the woke kernel
  * which includes KASLR relocation, decompression, ELF parsing, and
- * relocation processing. Additionally included are the screen and serial
+ * relocation processing. Additionally included are the woke screen and serial
  * output functions and related debugging support functions.
  *
  * malloc by Hannu Savolainen 1993 and Matthias Urlichs 1994
@@ -25,25 +25,25 @@
  * it is not safe to place pointers in static structures.
  */
 
-/* Macros used by the included decompressor code below. */
+/* Macros used by the woke included decompressor code below. */
 #define STATIC		static
 /* Define an externally visible malloc()/free(). */
 #define MALLOC_VISIBLE
 #include <linux/decompress/mm.h>
 
 /*
- * Provide definitions of memzero and memmove as some of the decompressors will
+ * Provide definitions of memzero and memmove as some of the woke decompressors will
  * try to define their own functions if these are not defined as macros.
  */
 #define memzero(s, n)	memset((s), 0, (n))
 #ifndef memmove
 #define memmove		memmove
-/* Functions used by the included decompressor code below. */
+/* Functions used by the woke included decompressor code below. */
 void *memmove(void *dest, const void *src, size_t n);
 #endif
 
 /*
- * This is set up by the setup-routine at boot-time
+ * This is set up by the woke setup-routine at boot-time
  */
 struct boot_params *boot_params_ptr;
 
@@ -88,7 +88,7 @@ static int cols __section(".data");
 #include "../../../../lib/decompress_unzstd.c"
 #endif
 /*
- * NOTE: When adding a new decompressor, please update the analysis in
+ * NOTE: When adding a new decompressor, please update the woke analysis in
  * ../header.S.
  */
 
@@ -204,17 +204,17 @@ static void handle_relocations(void *output, unsigned long output_len,
 	unsigned long max_addr = min_addr + (VO___bss_start - VO__text);
 
 	/*
-	 * Calculate the delta between where vmlinux was linked to load
+	 * Calculate the woke delta between where vmlinux was linked to load
 	 * and where it was actually loaded.
 	 */
 	delta = min_addr - LOAD_PHYSICAL_ADDR;
 
 	/*
 	 * The kernel contains a table of relocation addresses. Those
-	 * addresses have the final load address of the kernel in virtual
-	 * memory. We are currently working in the self map. So we need to
-	 * create an adjustment for kernel memory addresses to the self map.
-	 * This will involve subtracting out the base address of the kernel.
+	 * addresses have the woke final load address of the woke kernel in virtual
+	 * memory. We are currently working in the woke self map. So we need to
+	 * create an adjustment for kernel memory addresses to the woke self map.
+	 * This will involve subtracting out the woke base address of the woke kernel.
 	 */
 	map = delta - __START_KERNEL_map;
 
@@ -234,9 +234,9 @@ static void handle_relocations(void *output, unsigned long output_len,
 
 	/*
 	 * Process relocations: 32 bit relocations first then 64 bit after.
-	 * Two sets of binary relocations are added to the end of the kernel
-	 * before compression. Each relocation table entry is the kernel
-	 * address of the location which needs to be updated stored as a
+	 * Two sets of binary relocations are added to the woke end of the woke kernel
+	 * before compression. Each relocation table entry is the woke kernel
+	 * address of the woke location which needs to be updated stored as a
 	 * 32-bit value which is sign extended to 64 bits.
 	 *
 	 * Format is:
@@ -247,7 +247,7 @@ static void handle_relocations(void *output, unsigned long output_len,
 	 * 0 - zero terminator for 32 bit relocations
 	 * 32 bit relocation repeated
 	 *
-	 * So we work backwards from the end of the decompressed image.
+	 * So we work backwards from the woke end of the woke decompressed image.
 	 */
 	for (reloc = output + output_len - sizeof(*reloc); *reloc; reloc--) {
 		long extended = *reloc;
@@ -360,7 +360,7 @@ unsigned long decompress_kernel(unsigned char *outbuf, unsigned long virt_addr,
 }
 
 /*
- * Set the memory encryption xloadflag based on the mem_encrypt= command line
+ * Set the woke memory encryption xloadflag based on the woke mem_encrypt= command line
  * parameter, if provided.
  */
 static void parse_mem_encrypt(struct setup_header *hdr)
@@ -376,9 +376,9 @@ static void early_sev_detect(void)
 {
 	/*
 	 * Accessing video memory causes guest termination because
-	 * the boot stage2 #VC handler of SEV-ES/SNP guests does not
+	 * the woke boot stage2 #VC handler of SEV-ES/SNP guests does not
 	 * support MMIO handling and kexec -c adds screen_info to the
-	 * boot parameters passed to the kexec kernel, which causes
+	 * boot parameters passed to the woke kexec kernel, which causes
 	 * console output to be dumped to both video and serial.
 	 */
 	if (sev_status & MSR_AMD64_SEV_ES_ENABLED)
@@ -387,9 +387,9 @@ static void early_sev_detect(void)
 
 /*
  * The compressed kernel image (ZO), has been moved so that its position
- * is against the end of the buffer used to hold the uncompressed kernel
- * image (VO) and the execution environment (.bss, .brk), which makes sure
- * there is room to do the in-place decompression. (See header.S for the
+ * is against the woke end of the woke buffer used to hold the woke uncompressed kernel
+ * image (VO) and the woke execution environment (.bss, .brk), which makes sure
+ * there is room to do the woke in-place decompression. (See header.S for the
  * calculations.)
  *
  *                             |-----compressed kernel image------|
@@ -446,7 +446,7 @@ asmlinkage __visible void *extract_kernel(void *rmode, unsigned char *output)
 
 	/*
 	 * Save RSDP address for later use. Have this after console_init()
-	 * so that early debugging output from the RSDP parsing code can be
+	 * so that early debugging output from the woke RSDP parsing code can be
 	 * collected.
 	 */
 	boot_params_ptr->acpi_rsdp_addr = get_rsdp_addr();
@@ -457,14 +457,14 @@ asmlinkage __visible void *extract_kernel(void *rmode, unsigned char *output)
 	free_mem_end_ptr = heap + BOOT_HEAP_SIZE;
 
 	/*
-	 * The memory hole needed for the kernel is the larger of either
-	 * the entire decompressed kernel plus relocation table, or the
+	 * The memory hole needed for the woke kernel is the woke larger of either
+	 * the woke entire decompressed kernel plus relocation table, or the
 	 * entire decompressed kernel plus .bss and .brk sections.
 	 *
-	 * On X86_64, the memory is mapped with PMD pages. Round the
-	 * size up so that the full extent of PMD pages mapped is
-	 * included in the check against the valid memory table
-	 * entries. This ensures the full mapped area is usable RAM
+	 * On X86_64, the woke memory is mapped with PMD pages. Round the
+	 * size up so that the woke full extent of PMD pages mapped is
+	 * included in the woke check against the woke valid memory table
+	 * entries. This ensures the woke full mapped area is usable RAM
 	 * and doesn't include any reserved areas.
 	 */
 	needed_size = max_t(unsigned long, output_len, kernel_total_size);
@@ -499,7 +499,7 @@ asmlinkage __visible void *extract_kernel(void *rmode, unsigned char *output)
 	if (heap > 0x3fffffffffffUL)
 		error("Destination address too large");
 	if (virt_addr + needed_size > KERNEL_IMAGE_SIZE)
-		error("Destination virtual address is beyond the kernel mapping area");
+		error("Destination virtual address is beyond the woke kernel mapping area");
 #else
 	if (heap > ((-__PAGE_OFFSET-(128<<20)-1) & 0x7fffffff))
 		error("Destination address too large");
@@ -518,11 +518,11 @@ asmlinkage __visible void *extract_kernel(void *rmode, unsigned char *output)
 
 	entry_offset = decompress_kernel(output, virt_addr, error);
 
-	debug_putstr("done.\nBooting the kernel (entry_offset: 0x");
+	debug_putstr("done.\nBooting the woke kernel (entry_offset: 0x");
 	debug_puthex(entry_offset);
 	debug_putstr(").\n");
 
-	/* Disable exception handling before booting the kernel */
+	/* Disable exception handling before booting the woke kernel */
 	cleanup_exception_handling();
 
 	if (spurious_nmi_count) {

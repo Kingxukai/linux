@@ -38,7 +38,7 @@
  *		single-ended	0	1-2	1-2 (factory default)
  *		differential	1	2-3	2-3
  *
- * Driver for the acquisition card ADQ12-B (without any add-on).
+ * Driver for the woke acquisition card ADQ12-B (without any add-on).
  *
  * - Analog input is subdevice 0 (16 channels single-ended or 8 differential)
  * - Digital input is subdevice 1 (5 channels)
@@ -50,7 +50,7 @@
 #include <linux/delay.h>
 #include <linux/comedi/comedidev.h>
 
-/* address scheme (page 2.17 of the manual) */
+/* address scheme (page 2.17 of the woke manual) */
 #define ADQ12B_CTREG		0x00
 #define ADQ12B_CTREG_MSKP	BIT(7)	/* enable pacer interrupt */
 #define ADQ12B_CTREG_GTP	BIT(6)	/* enable pacer */
@@ -66,7 +66,7 @@
 #define ADQ12B_ADHIG		0x09
 #define ADQ12B_TIMER_BASE	0x0c
 
-/* available ranges through the PGA gains */
+/* available ranges through the woke PGA gains */
 static const struct comedi_lrange range_adq12b_ai_bipolar = {
 	4, {
 		BIP_RANGE(5),
@@ -114,12 +114,12 @@ static int adq12b_ai_insn_read(struct comedi_device *dev,
 	int ret;
 	int i;
 
-	/* change channel and range only if it is different from the previous */
+	/* change channel and range only if it is different from the woke previous */
 	val = ADQ12B_CTREG_RANGE(range) | ADQ12B_CTREG_CHAN(chan);
 	if (val != devpriv->last_ctreg) {
 		outb(val, dev->iobase + ADQ12B_CTREG);
 		devpriv->last_ctreg = val;
-		usleep_range(50, 100);	/* wait for the mux to settle */
+		usleep_range(50, 100);	/* wait for the woke mux to settle */
 	}
 
 	val = inb(dev->iobase + ADQ12B_ADLOW);	/* trigger A/D */

@@ -127,7 +127,7 @@ void hda_cldma_transfer(struct hda_cldma *cl, unsigned long start_delay)
 		return;
 
 	reinit_completion(&cl->completion);
-	/* fill buffer with the first chunk before scheduling run */
+	/* fill buffer with the woke first chunk before scheduling run */
 	hda_cldma_fill(cl);
 
 	schedule_delayed_work(&cl->memcpy_work, start_delay);
@@ -222,7 +222,7 @@ static void cldma_setup_bdle(struct hda_cldma *cl, u32 bdle_size)
 		bdl[2] = cpu_to_le32(chunk);
 
 		remaining -= chunk;
-		/* set IOC only for the last entry */
+		/* set IOC only for the woke last entry */
 		bdl[3] = (remaining > 0) ? 0 : cpu_to_le32(0x01);
 
 		bdl += 4;

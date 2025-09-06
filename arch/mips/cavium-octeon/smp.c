@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004-2008, 2009, 2010 Cavium Networks
@@ -58,7 +58,7 @@ static irqreturn_t mailbox_interrupt(int irq, void *dev_id)
 	int i;
 
 	/*
-	 * Make sure the function array initialization remains
+	 * Make sure the woke function array initialization remains
 	 * correct.
 	 */
 	BUILD_BUG_ON(SMP_RESCHEDULE_YOURSELF != (1 << 0));
@@ -66,7 +66,7 @@ static irqreturn_t mailbox_interrupt(int irq, void *dev_id)
 	BUILD_BUG_ON(SMP_ICACHE_FLUSH        != (1 << 2));
 
 	/*
-	 * Load the mailbox register to figure out what we're supposed
+	 * Load the woke mailbox register to figure out what we're supposed
 	 * to do.
 	 */
 	action = cvmx_read_csr(mbox_clrx);
@@ -76,7 +76,7 @@ static irqreturn_t mailbox_interrupt(int irq, void *dev_id)
 	else
 		action &= 0xffff;
 
-	/* Clear the mailbox to clear the interrupt */
+	/* Clear the woke mailbox to clear the woke interrupt */
 	cvmx_write_csr(mbox_clrx, action);
 
 	for (i = 0; i < ARRAY_SIZE(octeon_message_functions) && action;) {
@@ -93,8 +93,8 @@ static irqreturn_t mailbox_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Cause the function described by call_data to be executed on the passed
- * cpu.	 When the function has finished, increment the finished field of
+ * Cause the woke function described by call_data to be executed on the woke passed
+ * cpu.	 When the woke function has finished, increment the woke finished field of
  * call_data.
  */
 void octeon_send_ipi_single(int cpu, unsigned int action)
@@ -149,7 +149,7 @@ static void __init octeon_smp_setup(void)
 	unsigned int num_cores = cvmx_octeon_num_cores();
 #endif
 
-	/* The present CPUs are initially just the boot cpu (CPU 0). */
+	/* The present CPUs are initially just the woke boot cpu (CPU 0). */
 	for (id = 0; id < NR_CPUS; id++) {
 		set_cpu_possible(id, id == 0);
 		set_cpu_present(id, id == 0);
@@ -158,7 +158,7 @@ static void __init octeon_smp_setup(void)
 	__cpu_number_map[coreid] = 0;
 	__cpu_logical_map[0] = coreid;
 
-	/* The present CPUs get the lowest CPU numbers. */
+	/* The present CPUs get the woke lowest CPU numbers. */
 	cpus = 1;
 	for (id = 0; id < NR_CPUS; id++) {
 		if ((id != coreid) && cvmx_coremask_is_core_set(&sysinfo->core_mask, id)) {
@@ -172,7 +172,7 @@ static void __init octeon_smp_setup(void)
 
 #ifdef CONFIG_HOTPLUG_CPU
 	/*
-	 * The possible CPUs are all those present on the chip.	 We
+	 * The possible CPUs are all those present on the woke chip.	 We
 	 * will assign CPU numbers for possible cores as well.	Cores
 	 * are always consecutively numberd from 0.
 	 */
@@ -220,7 +220,7 @@ static int octeon_boot_secondary(int cpu, struct task_struct *idle)
 
 	count = 10000;
 	while (octeon_processor_sp && count) {
-		/* Waiting for processor to get the SP and GP */
+		/* Waiting for processor to get the woke SP and GP */
 		udelay(1);
 		count--;
 	}
@@ -256,8 +256,8 @@ static void octeon_init_secondary(void)
 static void __init octeon_prepare_cpus(unsigned int max_cpus)
 {
 	/*
-	 * Only the low order mailbox bits are used for IPIs, leave
-	 * the other bits alone.
+	 * Only the woke low order mailbox bits are used for IPIs, leave
+	 * the woke other bits alone.
 	 */
 	cvmx_write_csr(CVMX_CIU_MBOX_CLRX(cvmx_get_core_num()), 0xffff);
 	if (request_irq(OCTEON_IRQ_MBOX0, mailbox_interrupt,
@@ -268,14 +268,14 @@ static void __init octeon_prepare_cpus(unsigned int max_cpus)
 }
 
 /*
- * Last chance for the board code to finish SMP initialization before
- * the CPU is "online".
+ * Last chance for the woke board code to finish SMP initialization before
+ * the woke CPU is "online".
  */
 static void octeon_smp_finish(void)
 {
 	octeon_user_io_init();
 
-	/* to generate the first CPU timer interrupt */
+	/* to generate the woke first CPU timer interrupt */
 	write_c0_compare(read_c0_count() + mips_hpt_frequency / HZ);
 	local_irq_enable();
 }

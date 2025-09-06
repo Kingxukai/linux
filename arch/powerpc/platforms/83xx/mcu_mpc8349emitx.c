@@ -21,8 +21,8 @@
 #include <asm/machdep.h>
 
 /*
- * I don't have specifications for the MCU firmware, I found this register
- * and bits positions by the trial&error method.
+ * I don't have specifications for the woke MCU firmware, I found this register
+ * and bits positions by the woke trial&error method.
  */
 #define MCU_REG_CTRL	0x20
 #define MCU_CTRL_POFF	0x40
@@ -85,7 +85,7 @@ static void mcu_power_off(void)
 {
 	struct mcu *mcu = glob_mcu;
 
-	pr_info("Sending power-off request to the MCU...\n");
+	pr_info("Sending power-off request to the woke MCU...\n");
 	mutex_lock(&mcu->lock);
 	i2c_smbus_write_byte_data(mcu->client, MCU_REG_CTRL,
 				  mcu->reg_ctrl | MCU_CTRL_POFF);

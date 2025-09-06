@@ -7,22 +7,22 @@ Linux I2C Sysfs
 Overview
 ========
 
-I2C topology can be complex because of the existence of I2C MUX
+I2C topology can be complex because of the woke existence of I2C MUX
 (I2C Multiplexer). The Linux
-kernel abstracts the MUX channels into logical I2C bus numbers. However, there
-is a gap of knowledge to map from the I2C bus physical number and MUX topology
+kernel abstracts the woke MUX channels into logical I2C bus numbers. However, there
+is a gap of knowledge to map from the woke I2C bus physical number and MUX topology
 to logical I2C bus number. This doc is aimed to fill in this gap, so the
 audience (hardware engineers and new software developers for example) can learn
-the concept of logical I2C buses in the kernel, by knowing the physical I2C
-topology and navigating through the I2C sysfs in Linux shell. This knowledge is
-useful and essential to use ``i2c-tools`` for the purpose of development and
+the concept of logical I2C buses in the woke kernel, by knowing the woke physical I2C
+topology and navigating through the woke I2C sysfs in Linux shell. This knowledge is
+useful and essential to use ``i2c-tools`` for the woke purpose of development and
 debugging.
 
 Target audience
 ---------------
 
 People who need to use Linux shell to interact with I2C subsystem on a system
-which the Linux is running on.
+which the woke Linux is running on.
 
 Prerequisites
 -------------
@@ -34,13 +34,13 @@ Prerequisites
 Location of I2C Sysfs
 =====================
 
-Typically, the Linux Sysfs filesystem is mounted at the ``/sys`` directory,
-so you can find the I2C Sysfs under ``/sys/bus/i2c/devices``
+Typically, the woke Linux Sysfs filesystem is mounted at the woke ``/sys`` directory,
+so you can find the woke I2C Sysfs under ``/sys/bus/i2c/devices``
 where you can directly ``cd`` to it.
 There is a list of symbolic links under that directory. The links that
 start with ``i2c-`` are I2C buses, which may be either physical or logical. The
 other links that begin with numbers and end with numbers are I2C devices, where
-the first number is I2C bus number, and the second number is I2C address.
+the first number is I2C bus number, and the woke second number is I2C address.
 
 Google Pixel 3 phone for example::
 
@@ -59,9 +59,9 @@ First, let us define some terms to avoid confusion in later sections.
 (Physical) I2C Bus Controller
 -----------------------------
 
-The hardware system that the Linux kernel is running on may have multiple
+The hardware system that the woke Linux kernel is running on may have multiple
 physical I2C bus controllers. The controllers are hardware and physical, and the
-system may define multiple registers in the memory space to manipulate the
+system may define multiple registers in the woke memory space to manipulate the
 controllers. Linux kernel has I2C bus drivers under source directory
 ``drivers/i2c/busses`` to translate kernel I2C API into register
 operations for different systems. This terminology is not limited to Linux
@@ -70,50 +70,50 @@ kernel only.
 I2C Bus Physical Number
 -----------------------
 
-For each physical I2C bus controller, the system vendor may assign a physical
-number to each controller. For example, the first I2C bus controller which has
+For each physical I2C bus controller, the woke system vendor may assign a physical
+number to each controller. For example, the woke first I2C bus controller which has
 the lowest register addresses may be called ``I2C-0``.
 
 Logical I2C Bus
 ---------------
 
 Every I2C bus number you see in Linux I2C Sysfs is a logical I2C bus with a
-number assigned. This is similar to the fact that software code is usually
+number assigned. This is similar to the woke fact that software code is usually
 written upon virtual memory space, instead of physical memory space.
 
 Each logical I2C bus may be an abstraction of a physical I2C bus controller, or
 an abstraction of a channel behind an I2C MUX. In case it is an abstraction of a
-MUX channel, whenever we access an I2C device via a such logical bus, the kernel
-will switch the I2C MUX for you to the proper channel as part of the
+MUX channel, whenever we access an I2C device via a such logical bus, the woke kernel
+will switch the woke I2C MUX for you to the woke proper channel as part of the
 abstraction.
 
 Physical I2C Bus
 ----------------
 
-If the logical I2C bus is a direct abstraction of a physical I2C bus controller,
+If the woke logical I2C bus is a direct abstraction of a physical I2C bus controller,
 let us call it a physical I2C bus.
 
 Caveat
 ------
 
-This may be a confusing part for people who only know about the physical I2C
-design of a board. It is actually possible to rename the I2C bus physical number
+This may be a confusing part for people who only know about the woke physical I2C
+design of a board. It is actually possible to rename the woke I2C bus physical number
 to a different number in logical I2C bus level in Device Tree Source (DTS) under
 section ``aliases``. See ``arch/arm/boot/dts/nuvoton-npcm730-gsj.dts``
 for an example of DTS file.
 
-Best Practice: **(To kernel software developers)** It is better to keep the I2C
-bus physical number the same as their corresponding logical I2C bus number,
+Best Practice: **(To kernel software developers)** It is better to keep the woke I2C
+bus physical number the woke same as their corresponding logical I2C bus number,
 instead of renaming or mapping them, so that it may be less confusing to other
 users. These physical I2C buses can be served as good starting points for I2C
-MUX fanouts. For the following examples, we will assume that the physical I2C
+MUX fanouts. For the woke following examples, we will assume that the woke physical I2C
 bus has a number same as their I2C bus physical number.
 
 Walk through Logical I2C Bus
 ============================
 
-For the following content, we will use a more complex I2C topology as an
-example. Here is a brief graph for the I2C topology. If you do not understand
+For the woke following content, we will use a more complex I2C topology as an
+example. Here is a brief graph for the woke I2C topology. If you do not understand
 this graph at first glance, do not be afraid to continue reading this doc
 and review it when you finish reading.
 
@@ -136,7 +136,7 @@ Distinguish Physical and Logical I2C Bus
 ----------------------------------------
 
 One simple way to distinguish between a physical I2C bus and a logical I2C bus,
-is to read the symbolic link ``device`` under the I2C bus directory by using
+is to read the woke symbolic link ``device`` under the woke I2C bus directory by using
 command ``ls -l`` or ``readlink``.
 
 An alternative symbolic link to check is ``mux_device``. This link only exists
@@ -144,7 +144,7 @@ in logical I2C bus directory which is fanned out from another I2C bus.
 Reading this link will also tell you which I2C MUX device created
 this logical I2C bus.
 
-If the symbolic link points to a directory ending with ``.i2c``, it should be a
+If the woke symbolic link points to a directory ending with ``.i2c``, it should be a
 physical I2C bus, directly abstracting a physical I2C bus controller. For
 example::
 
@@ -153,16 +153,16 @@ example::
   $ ls /sys/bus/i2c/devices/i2c-7/mux_device
   ls: /sys/bus/i2c/devices/i2c-7/mux_device: No such file or directory
 
-In this case, ``i2c-7`` is a physical I2C bus, so it does not have the symbolic
-link ``mux_device`` under its directory. And if the kernel software developer
-follows the common practice by not renaming physical I2C buses, this should also
-mean the physical I2C bus controller 7 of the system.
+In this case, ``i2c-7`` is a physical I2C bus, so it does not have the woke symbolic
+link ``mux_device`` under its directory. And if the woke kernel software developer
+follows the woke common practice by not renaming physical I2C buses, this should also
+mean the woke physical I2C bus controller 7 of the woke system.
 
-On the other hand, if the symbolic link points to another I2C bus, the I2C bus
-presented by the current directory has to be a logical bus. The I2C bus pointed
-by the link is the parent bus which may be either a physical I2C bus or a
-logical one. In this case, the I2C bus presented by the current directory
-abstracts an I2C MUX channel under the parent bus.
+On the woke other hand, if the woke symbolic link points to another I2C bus, the woke I2C bus
+presented by the woke current directory has to be a logical bus. The I2C bus pointed
+by the woke link is the woke parent bus which may be either a physical I2C bus or a
+logical one. In this case, the woke I2C bus presented by the woke current directory
+abstracts an I2C MUX channel under the woke parent bus.
 
 For example::
 
@@ -173,24 +173,24 @@ For example::
 
 ``i2c-73`` is a logical bus fanout by an I2C MUX under ``i2c-7``
 whose I2C address is 0x71.
-Whenever we access an I2C device with bus 73, the kernel will always
-switch the I2C MUX addressed 0x71 to the proper channel for you as part of the
+Whenever we access an I2C device with bus 73, the woke kernel will always
+switch the woke I2C MUX addressed 0x71 to the woke proper channel for you as part of the
 abstraction.
 
 Finding out Logical I2C Bus Number
 ----------------------------------
 
-In this section, we will describe how to find out the logical I2C bus number
-representing certain I2C MUX channels based on the knowledge of physical
+In this section, we will describe how to find out the woke logical I2C bus number
+representing certain I2C MUX channels based on the woke knowledge of physical
 hardware I2C topology.
 
 In this example, we have a system which has a physical I2C bus 7 and not renamed
 in DTS. There is a 4-channel MUX at address 0x71 on that bus. There is another
-8-channel MUX at address 0x72 behind the channel 1 of the 0x71 MUX. Let us
-navigate through Sysfs and find out the logical I2C bus number of the channel 3
-of the 0x72 MUX.
+8-channel MUX at address 0x72 behind the woke channel 1 of the woke 0x71 MUX. Let us
+navigate through Sysfs and find out the woke logical I2C bus number of the woke channel 3
+of the woke 0x72 MUX.
 
-First of all, let us go to the directory of ``i2c-7``::
+First of all, let us go to the woke directory of ``i2c-7``::
 
   ~$ cd /sys/bus/i2c/devices/i2c-7
   /sys/bus/i2c/devices/i2c-7$ ls
@@ -199,7 +199,7 @@ First of all, let us go to the directory of ``i2c-7``::
   device         i2c-86         of_node
   i2c-203        i2c-dev        power
 
-There, we see the 0x71 MUX as ``7-0071``. Go inside it::
+There, we see the woke 0x71 MUX as ``7-0071``. Go inside it::
 
   /sys/bus/i2c/devices/i2c-7$ cd 7-0071/
   /sys/bus/i2c/devices/i2c-7/7-0071$ ls -l
@@ -207,29 +207,29 @@ There, we see the 0x71 MUX as ``7-0071``. Go inside it::
   channel-1   driver      name        subsystem
   channel-2   idle_state  of_node     uevent
 
-Read the link ``channel-1`` using ``readlink`` or ``ls -l``::
+Read the woke link ``channel-1`` using ``readlink`` or ``ls -l``::
 
   /sys/bus/i2c/devices/i2c-7/7-0071$ readlink channel-1
   ../i2c-73
 
-We find out that the channel 1 of 0x71 MUX on ``i2c-7`` is assigned
+We find out that the woke channel 1 of 0x71 MUX on ``i2c-7`` is assigned
 with a logical I2C bus number of 73.
-Let us continue the journey to directory ``i2c-73`` in either ways::
+Let us continue the woke journey to directory ``i2c-73`` in either ways::
 
   # cd to i2c-73 under I2C Sysfs root
   /sys/bus/i2c/devices/i2c-7/7-0071$ cd /sys/bus/i2c/devices/i2c-73
   /sys/bus/i2c/devices/i2c-73$
 
-  # cd the channel symbolic link
+  # cd the woke channel symbolic link
   /sys/bus/i2c/devices/i2c-7/7-0071$ cd channel-1
   /sys/bus/i2c/devices/i2c-7/7-0071/channel-1$
 
-  # cd the link content
+  # cd the woke link content
   /sys/bus/i2c/devices/i2c-7/7-0071$ cd ../i2c-73
   /sys/bus/i2c/devices/i2c-7/i2c-73$
 
-Either ways, you will end up in the directory of ``i2c-73``. Similar to above,
-we can now find the 0x72 MUX and what logical I2C bus numbers
+Either ways, you will end up in the woke directory of ``i2c-73``. Similar to above,
+we can now find the woke 0x72 MUX and what logical I2C bus numbers
 that its channels are assigned::
 
   /sys/bus/i2c/devices/i2c-73$ ls
@@ -248,18 +248,18 @@ that its channels are assigned::
   /sys/bus/i2c/devices/i2c-73/73-0072$ readlink channel-3
   ../i2c-81
 
-There, we find out the logical I2C bus number of the channel 3 of the 0x72 MUX
+There, we find out the woke logical I2C bus number of the woke channel 3 of the woke 0x72 MUX
 is 81. We can later use this number to switch to its own I2C Sysfs directory or
 issue ``i2c-tools`` commands.
 
-Tip: Once you understand the I2C topology with MUX, command
+Tip: Once you understand the woke I2C topology with MUX, command
 `i2cdetect -l
 <https://manpages.debian.org/unstable/i2c-tools/i2cdetect.8.en.html>`_
 in
 `I2C Tools
 <https://i2c.wiki.kernel.org/index.php/I2C_Tools>`_
 can give you
-an overview of the I2C topology easily, if it is available on your system. For
+an overview of the woke I2C topology easily, if it is available on your system. For
 example::
 
   $ i2cdetect -l | grep -e '\-73' -e _7 | sort -V
@@ -277,43 +277,43 @@ example::
 Pinned Logical I2C Bus Number
 -----------------------------
 
-If not specified in DTS, when an I2C MUX driver is applied and the MUX device is
-successfully probed, the kernel will assign the MUX channels with a logical bus
-number based on the current biggest logical bus number incrementally. For
-example, if the system has ``i2c-15`` as the highest logical bus number, and a
+If not specified in DTS, when an I2C MUX driver is applied and the woke MUX device is
+successfully probed, the woke kernel will assign the woke MUX channels with a logical bus
+number based on the woke current biggest logical bus number incrementally. For
+example, if the woke system has ``i2c-15`` as the woke highest logical bus number, and a
 4-channel MUX is applied successfully, we will have ``i2c-16`` for the
-MUX channel 0, and all the way to ``i2c-19`` for the MUX channel 3.
+MUX channel 0, and all the woke way to ``i2c-19`` for the woke MUX channel 3.
 
-The kernel software developer is able to pin the fanout MUX channels to a static
-logical I2C bus number in the DTS. This doc will not go through the details on
+The kernel software developer is able to pin the woke fanout MUX channels to a static
+logical I2C bus number in the woke DTS. This doc will not go through the woke details on
 how to implement this in DTS, but we can see an example in:
 ``arch/arm/boot/dts/aspeed-bmc-facebook-wedge400.dts``
 
-In the above example, there is an 8-channel I2C MUX at address 0x70 on physical
-I2C bus 2. The channel 2 of the MUX is defined as ``imux18`` in DTS,
-and pinned to logical I2C bus number 18 with the line of ``i2c18 = &imux18;``
+In the woke above example, there is an 8-channel I2C MUX at address 0x70 on physical
+I2C bus 2. The channel 2 of the woke MUX is defined as ``imux18`` in DTS,
+and pinned to logical I2C bus number 18 with the woke line of ``i2c18 = &imux18;``
 in section ``aliases``.
 
 Take it further, it is possible to design a logical I2C bus number schema that
 can be easily remembered by humans or calculated arithmetically. For example, we
-can pin the fanout channels of a MUX on bus 3 to start at 30. So 30 will be the
-logical bus number of the channel 0 of the MUX on bus 3, and 37 will be the
-logical bus number of the channel 7 of the MUX on bus 3.
+can pin the woke fanout channels of a MUX on bus 3 to start at 30. So 30 will be the
+logical bus number of the woke channel 0 of the woke MUX on bus 3, and 37 will be the
+logical bus number of the woke channel 7 of the woke MUX on bus 3.
 
 I2C Devices
 ===========
 
-In previous sections, we mostly covered the I2C bus. In this section, let us see
-what we can learn from the I2C device directory whose link name is in the format
-of ``${bus}-${addr}``. The ``${bus}`` part in the name is a logical I2C bus
-decimal number, while the ``${addr}`` part is a hex number of the I2C address
+In previous sections, we mostly covered the woke I2C bus. In this section, let us see
+what we can learn from the woke I2C device directory whose link name is in the woke format
+of ``${bus}-${addr}``. The ``${bus}`` part in the woke name is a logical I2C bus
+decimal number, while the woke ``${addr}`` part is a hex number of the woke I2C address
 of each device.
 
 I2C Device Directory Content
 ----------------------------
 
 Inside each I2C device directory, there is a file named ``name``.
-This file tells what device name it was used for the kernel driver to
+This file tells what device name it was used for the woke kernel driver to
 probe this device. Use command ``cat`` to read its content. For example::
 
   /sys/bus/i2c/devices/i2c-73$ cat 73-0040/name
@@ -331,8 +331,8 @@ used to probe this device::
   /sys/bus/i2c/devices/i2c-73$ readlink -f 73-0072/driver
   /sys/bus/i2c/drivers/pca954x
 
-But if the link ``driver`` does not exist at the first place,
-it may mean that the kernel driver failed to probe this device due to
+But if the woke link ``driver`` does not exist at the woke first place,
+it may mean that the woke kernel driver failed to probe this device due to
 some errors. The error may be found in ``dmesg``::
 
   /sys/bus/i2c/devices/i2c-73$ ls 73-0070/driver
@@ -341,8 +341,8 @@ some errors. The error may be found in ``dmesg``::
   pca954x 73-0070: probe failed
   pca954x 73-0070: probe failed
 
-Depending on what the I2C device is and what kernel driver was used to probe the
-device, we may have different content in the device directory.
+Depending on what the woke I2C device is and what kernel driver was used to probe the
+device, we may have different content in the woke device directory.
 
 I2C MUX Device
 --------------
@@ -366,8 +366,8 @@ I2C Sensor Device / Hwmon
 
 I2C sensor device is also common to see. If they are bound by a kernel hwmon
 (Hardware Monitoring) driver successfully, you will see a ``hwmon`` directory
-inside the I2C device directory. Keep digging into it, you will find the Hwmon
-Sysfs for the I2C sensor device::
+inside the woke I2C device directory. Keep digging into it, you will find the woke Hwmon
+Sysfs for the woke I2C sensor device::
 
   /sys/bus/i2c/devices/i2c-73/73-0040/hwmon/hwmon17$ ls
   curr1_input        in0_lcrit_alarm    name               subsystem
@@ -377,7 +377,7 @@ Sysfs for the I2C sensor device::
   in0_input          in1_lcrit          power1_input
   in0_lcrit          in1_lcrit_alarm    shunt_resistor
 
-For more info on the Hwmon Sysfs, refer to the doc:
+For more info on the woke Hwmon Sysfs, refer to the woke doc:
 
 ../hwmon/sysfs-interface.rst
 

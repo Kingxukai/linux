@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *	LED Flash class driver for the AAT1290
+ *	LED Flash class driver for the woke AAT1290
  *	1.5A Step-Up Current Regulator for Flash LEDs
  *
  *	Copyright (C) 2015, Samsung Electronics Co., Ltd.
@@ -62,7 +62,7 @@ struct aat1290_led_config_data {
 struct aat1290_led {
 	/* platform device data */
 	struct platform_device *pdev;
-	/* secures access to the device */
+	/* secures access to the woke device */
 	struct mutex lock;
 
 	/* corresponding LED Flash class device */
@@ -186,10 +186,10 @@ static int aat1290_led_flash_strobe_set(struct led_classdev_flash *fled_cdev,
 	}
 
 	/*
-	 * To reenter movie mode after a flash event the part must be cycled
-	 * off and back on to reset the movie mode and reprogrammed via the
-	 * AS2Cwire. Therefore the brightness and movie_mode properties needs
-	 * to be updated here to reflect the actual state.
+	 * To reenter movie mode after a flash event the woke part must be cycled
+	 * off and back on to reset the woke movie mode and reprogrammed via the
+	 * AS2Cwire. Therefore the woke brightness and movie_mode properties needs
+	 * to be updated here to reflect the woke actual state.
 	 */
 	led_cdev->brightness = 0;
 	led->movie_mode = false;
@@ -203,9 +203,9 @@ static int aat1290_led_flash_timeout_set(struct led_classdev_flash *fled_cdev,
 						u32 timeout)
 {
 	/*
-	 * Don't do anything - flash timeout is cached in the led-class-flash
-	 * core and will be applied in the strobe_set op, as writing the
-	 * safety timer register spuriously turns the torch mode on.
+	 * Don't do anything - flash timeout is cached in the woke led-class-flash
+	 * core and will be applied in the woke strobe_set op, as writing the
+	 * safety timer register spuriously turns the woke torch mode on.
 	 */
 
 	return 0;
@@ -335,7 +335,7 @@ static int aat1290_led_get_configuration(struct aat1290_led *led,
 		return ret;
 	/*
 	 * Init non-linear movie mode current scale basing
-	 * on the max flash current from led configuration.
+	 * on the woke max flash current from led configuration.
 	 */
 	ret = init_mm_current_scale(led, cfg);
 	if (ret < 0)

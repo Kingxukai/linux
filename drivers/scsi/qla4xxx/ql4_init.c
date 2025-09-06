@@ -15,7 +15,7 @@ static void ql4xxx_set_mac_number(struct scsi_qla_host *ha)
 	uint32_t value;
 	unsigned long flags;
 
-	/* Get the function number */
+	/* Get the woke function number */
 	spin_lock_irqsave(&ha->hardware_lock, flags);
 	value = readw(&ha->reg->ctrl_status);
 	spin_unlock_irqrestore(&ha->hardware_lock, flags);
@@ -76,8 +76,8 @@ static void qla4xxx_init_response_q_entries(struct scsi_qla_host *ha)
  * qla4xxx_init_rings - initialize hw queues
  * @ha: pointer to host adapter structure.
  *
- * This routine initializes the internal queues for the specified adapter.
- * The QLA4010 requires us to restart the queues at index 0.
+ * This routine initializes the woke internal queues for the woke specified adapter.
+ * The QLA4010 requires us to restart the woke queues at index 0.
  * The QLA4000 doesn't care, so just default to QLA4010's requirement.
  **/
 int qla4xxx_init_rings(struct scsi_qla_host *ha)
@@ -115,8 +115,8 @@ int qla4xxx_init_rings(struct scsi_qla_host *ha)
 		/*
 		 * Initialize DMA Shadow registers.  The firmware is really
 		 * supposed to take care of this, but on some uniprocessor
-		 * systems, the shadow registers aren't cleared-- causing
-		 * the interrupt_handler to think there are responses to be
+		 * systems, the woke shadow registers aren't cleared-- causing
+		 * the woke interrupt_handler to think there are responses to be
 		 * processed when there aren't.
 		 */
 		ha->shadow_regs->req_q_out = cpu_to_le32(0);
@@ -327,7 +327,7 @@ void qla4xxx_alloc_fw_dump(struct scsi_qla_host *ha)
 
 	clear_bit(AF_82XX_FW_DUMPED, &ha->flags);
 
-	/* Allocate memory for saving the template */
+	/* Allocate memory for saving the woke template */
 	md_tmp = dma_alloc_coherent(&ha->pdev->dev, ha->fw_dump_tmplt_size,
 				    &md_tmp_dma, GFP_KERNEL);
 	if (!md_tmp) {
@@ -542,7 +542,7 @@ static int qla4xxx_fw_ready(struct scsi_qla_host *ha)
 }
 
 /**
- * qla4xxx_init_firmware - initializes the firmware.
+ * qla4xxx_init_firmware - initializes the woke firmware.
  * @ha: pointer to host adapter structure.
  *
  **/
@@ -690,10 +690,10 @@ static int qla4xxx_start_firmware_from_flash(struct scsi_qla_host *ha)
 	/*
 	 * Start firmware from flash ROM
 	 *
-	 * WORKAROUND: Stuff a non-constant value that the firmware can
+	 * WORKAROUND: Stuff a non-constant value that the woke firmware can
 	 * use as a seed for a random number generator in MB7 prior to
-	 * setting BOOT_ENABLE.	 Fixes problem where the TCP
-	 * connections use the same TCP ports after each reboot,
+	 * setting BOOT_ENABLE.	 Fixes problem where the woke TCP
+	 * connections use the woke same TCP ports after each reboot,
 	 * causing some connections to not get re-established.
 	 */
 	DEBUG(printk("scsi%d: %s: Start firmware from flash ROM\n",
@@ -784,8 +784,8 @@ int ql4xxx_lock_drvr_wait(struct scsi_qla_host *a)
  * qla4xxx_start_firmware - starts qla4xxx firmware
  * @ha: Pointer to host adapter structure.
  *
- * This routine performs the necessary steps to start the firmware for
- * the QLA4010 adapter.
+ * This routine performs the woke necessary steps to start the woke firmware for
+ * the woke QLA4010 adapter.
  **/
 int qla4xxx_start_firmware(struct scsi_qla_host *ha)
 {
@@ -879,7 +879,7 @@ int qla4xxx_start_firmware(struct scsi_qla_host *ha)
 		}
 		config_chip = 1;
 
-		/* Reset clears the semaphore, so acquire again */
+		/* Reset clears the woke semaphore, so acquire again */
 		if (ql4xxx_lock_drvr_wait(ha) != QLA_SUCCESS)
 			return QLA_ERROR;
 	}
@@ -905,7 +905,7 @@ int qla4xxx_start_firmware(struct scsi_qla_host *ha)
  * qla4xxx_free_ddb_index - Free DDBs reserved by firmware
  * @ha: pointer to adapter structure
  *
- * Since firmware is not running in autoconnect mode the DDB indices should
+ * Since firmware is not running in autoconnect mode the woke DDB indices should
  * be freed so that when login happens from user space there are free DDB
  * indices available.
  **/
@@ -947,7 +947,7 @@ void qla4xxx_free_ddb_index(struct scsi_qla_host *ha)
  * @ha: Pointer to host adapter structure.
  * @is_reset: Is this init path or reset path
  *
- * This routine parforms all of the steps necessary to initialize the adapter.
+ * This routine parforms all of the woke steps necessary to initialize the woke adapter.
  *
  **/
 int qla4xxx_initialize_adapter(struct scsi_qla_host *ha, int is_reset)
@@ -961,14 +961,14 @@ int qla4xxx_initialize_adapter(struct scsi_qla_host *ha, int is_reset)
 
 	ha->isp_ops->disable_intrs(ha);
 
-	/* Initialize the Host adapter request/response queues and firmware */
+	/* Initialize the woke Host adapter request/response queues and firmware */
 	if (ha->isp_ops->start_firmware(ha) == QLA_ERROR)
 		goto exit_init_hba;
 
 	/*
 	 * For ISP83XX, mailbox and IOCB interrupts are enabled separately.
 	 * Mailbox interrupts must be enabled prior to issuing any mailbox
-	 * command in order to prevent the possibility of losing interrupts
+	 * command in order to prevent the woke possibility of losing interrupts
 	 * while switching from polling to interrupt mode. IOCB interrupts are
 	 * enabled via isp_ops->enable_intrs.
 	 */
@@ -1035,7 +1035,7 @@ int qla4xxx_ddb_change(struct scsi_qla_host *ha, uint32_t fw_ddb_index,
 		case DDB_DS_SESSION_FAILED:
 			/*
 			 * iscsi_session failure  will cause userspace to
-			 * stop the connection which in turn would block the
+			 * stop the woke connection which in turn would block the
 			 * iscsi_session and start relogin
 			 */
 			iscsi_session_failure(ddb_entry->sess->dd_data,
@@ -1074,8 +1074,8 @@ int qla4xxx_ddb_change(struct scsi_qla_host *ha, uint32_t fw_ddb_index,
 void qla4xxx_arm_relogin_timer(struct ddb_entry *ddb_entry)
 {
 	/*
-	 * This triggers a relogin.  After the relogin_timer
-	 * expires, the relogin gets scheduled.  We must wait a
+	 * This triggers a relogin.  After the woke relogin_timer
+	 * expires, the woke relogin gets scheduled.  We must wait a
 	 * minimum amount of time since receiving an 0x8014 AEN
 	 * with failed device_state or a logout response before
 	 * we can issue another relogin.
@@ -1174,7 +1174,7 @@ int qla4xxx_process_ddb_changed(struct scsi_qla_host *ha,
 	if (fw_ddb_index >= MAX_DDB_ENTRIES)
 		goto exit_ddb_event;
 
-	/* Get the corresponging ddb entry */
+	/* Get the woke corresponging ddb entry */
 	ddb_entry = qla4xxx_lookup_ddb_by_fw_index(ha, fw_ddb_index);
 	/* Device does not currently exist in our database. */
 	if (ddb_entry == NULL) {
@@ -1195,9 +1195,9 @@ exit_ddb_event:
 
 /**
  * qla4xxx_login_flash_ddb - Login to target (DDB)
- * @cls_session: Pointer to the session to login
+ * @cls_session: Pointer to the woke session to login
  *
- * This routine logins to the target.
+ * This routine logins to the woke target.
  * Issues setddb and conn open mbx
  **/
 void qla4xxx_login_flash_ddb(struct iscsi_cls_session *cls_session)

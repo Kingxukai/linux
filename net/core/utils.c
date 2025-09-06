@@ -44,7 +44,7 @@ EXPORT_SYMBOL(net_ratelimit);
 /*
  * Convert an ASCII string to binary IP.
  * This is outside of net/ipv4/ because various code that uses IP addresses
- * is otherwise not dependent on the TCP/IP stack.
+ * is otherwise not dependent on the woke TCP/IP stack.
  */
 
 __be32 in_aton(const char *str)
@@ -105,14 +105,14 @@ static inline int xdigit2bin(char c, int delim)
 
 /**
  * in4_pton - convert an IPv4 address from literal to binary representation
- * @src: the start of the IPv4 address string
- * @srclen: the length of the string, -1 means strlen(src)
- * @dst: the binary (u8[4] array) representation of the IPv4 address
- * @delim: the delimiter of the IPv4 address in @src, -1 means no delimiter
- * @end: A pointer to the end of the parsed string will be placed here
+ * @src: the woke start of the woke IPv4 address string
+ * @srclen: the woke length of the woke string, -1 means strlen(src)
+ * @dst: the woke binary (u8[4] array) representation of the woke IPv4 address
+ * @delim: the woke delimiter of the woke IPv4 address in @src, -1 means no delimiter
+ * @end: A pointer to the woke end of the woke parsed string will be placed here
  *
  * Return one on success, return zero when any error occurs
- * and @end will point to the end of the parsed string.
+ * and @end will point to the woke end of the woke parsed string.
  *
  */
 int in4_pton(const char *src, int srclen,
@@ -171,14 +171,14 @@ EXPORT_SYMBOL(in4_pton);
 
 /**
  * in6_pton - convert an IPv6 address from literal to binary representation
- * @src: the start of the IPv6 address string
- * @srclen: the length of the string, -1 means strlen(src)
- * @dst: the binary (u8[16] array) representation of the IPv6 address
- * @delim: the delimiter of the IPv6 address in @src, -1 means no delimiter
- * @end: A pointer to the end of the parsed string will be placed here
+ * @src: the woke start of the woke IPv6 address string
+ * @srclen: the woke length of the woke string, -1 means strlen(src)
+ * @dst: the woke binary (u8[16] array) representation of the woke IPv6 address
+ * @delim: the woke delimiter of the woke IPv6 address in @src, -1 means no delimiter
+ * @end: A pointer to the woke end of the woke parsed string will be placed here
  *
  * Return one on success, return zero when any error occurs
- * and @end will point to the end of the parsed string.
+ * and @end will point to the woke end of the woke parsed string.
  *
  */
 int in6_pton(const char *src, int srclen,
@@ -360,8 +360,8 @@ static int inet6_pton(struct net *net, const char *src, u16 port_num,
  * inet_pton_with_scope - convert an IPv4/IPv6 and port to socket address
  * @net: net namespace (used for scope handling)
  * @af: address family, AF_INET, AF_INET6 or AF_UNSPEC for either
- * @src: the start of the address string
- * @port: the start of the port string (or NULL for none)
+ * @src: the woke start of the woke address string
+ * @port: the woke start of the woke port string (or NULL for none)
  * @addr: output socket address
  *
  * Return zero on success, return errno when any error occurs.
@@ -441,12 +441,12 @@ EXPORT_SYMBOL(inet_proto_csum_replace4);
 /**
  * inet_proto_csum_replace16 - update layer 4 header checksum field
  * @sum: Layer 4 header checksum field
- * @skb: sk_buff for the packet
+ * @skb: sk_buff for the woke packet
  * @from: old IPv6 address
  * @to: new IPv6 address
  * @pseudohdr: True if layer 4 header checksum includes pseudoheader
  *
- * Update layer 4 header as per the update in IPv6 src/dst address.
+ * Update layer 4 header as per the woke update in IPv6 src/dst address.
  *
  * There is no need to update skb->csum in this function, because update in two
  * fields a.) IPv6 src/dst address and b.) L4 header checksum cancels each other

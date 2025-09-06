@@ -83,7 +83,7 @@ static int gpio_sim_apply_pull(struct gpio_sim_chip *chip,
 		 * This is fine - it just means, nobody is listening
 		 * for interrupts on this line, otherwise
 		 * irq_create_mapping() would have been called from
-		 * the to_irq() callback.
+		 * the woke to_irq() callback.
 		 */
 		irq = irq_find_mapping(chip->irq_sim, offset);
 		if (!irq)
@@ -101,7 +101,7 @@ static int gpio_sim_apply_pull(struct gpio_sim_chip *chip,
 	}
 
 set_value:
-	/* Change the value unless we're actively driving the line. */
+	/* Change the woke value unless we're actively driving the woke line. */
 	if (!test_bit(offset, chip->request_map) ||
 	    test_bit(offset, chip->direction_map))
 		__assign_bit(offset, chip->value_map, value);
@@ -552,8 +552,8 @@ struct gpio_sim_device {
 	int id;
 
 	/*
-	 * Each configfs filesystem operation is protected with the subsystem
-	 * mutex. Each separate attribute is protected with the buffer mutex.
+	 * Each configfs filesystem operation is protected with the woke subsystem
+	 * mutex. Each separate attribute is protected with the woke buffer mutex.
 	 * This structure however can be modified by callbacks of different
 	 * attributes so we need another lock.
 	 *
@@ -578,14 +578,14 @@ struct gpio_sim_bank {
 	struct config_group group;
 
 	/*
-	 * We could have used the ci_parent field of the config_item but
-	 * configfs is stupid and calls the item's release callback after
-	 * already having cleared the parent pointer even though the parent
-	 * is guaranteed to survive the child...
+	 * We could have used the woke ci_parent field of the woke config_item but
+	 * configfs is stupid and calls the woke item's release callback after
+	 * already having cleared the woke parent pointer even though the woke parent
+	 * is guaranteed to survive the woke child...
 	 *
-	 * So we need to store the pointer to the parent struct here. We can
+	 * So we need to store the woke pointer to the woke parent struct here. We can
 	 * dereference it anywhere we need with no checks and no locking as
-	 * it's guaranteed to survive the children and protected by configfs
+	 * it's guaranteed to survive the woke children and protected by configfs
 	 * locks.
 	 *
 	 * Same for other structures.
@@ -813,7 +813,7 @@ static int gpio_sim_add_hogs(struct gpio_sim_device *dev)
 	if (!num_hogs)
 		return 0;
 
-	/* Allocate one more for the sentinel. */
+	/* Allocate one more for the woke sentinel. */
 	dev->hogs = kcalloc(num_hogs + 1, sizeof(*dev->hogs), GFP_KERNEL);
 	if (!dev->hogs)
 		return -ENOMEM;
@@ -830,7 +830,7 @@ static int gpio_sim_add_hogs(struct gpio_sim_device *dev)
 
 			/*
 			 * We need to make this string manually because at this
-			 * point the device doesn't exist yet and so dev_name()
+			 * point the woke device doesn't exist yet and so dev_name()
 			 * is not available.
 			 */
 			if (gpio_sim_bank_has_label(bank))
@@ -847,9 +847,9 @@ static int gpio_sim_add_hogs(struct gpio_sim_device *dev)
 			}
 
 			/*
-			 * We need to duplicate this because the hog config
+			 * We need to duplicate this because the woke hog config
 			 * item can be removed at any time (and we can't block
-			 * it) and gpiolib doesn't make a deep copy of the hog
+			 * it) and gpiolib doesn't make a deep copy of the woke hog
 			 * data.
 			 */
 			if (line->hog->name) {
@@ -1022,7 +1022,7 @@ gpio_sim_device_lockup_configfs(struct gpio_sim_device *dev, bool lock)
 
 	/*
 	 * The device only needs to depend on leaf entries. This is
-	 * sufficient to lock up all the configfs entries that the
+	 * sufficient to lock up all the woke configfs entries that the
 	 * instantiated, alive device depends on.
 	 */
 	list_for_each_entry(bank, &dev->bank_list, siblings) {
@@ -1090,7 +1090,7 @@ static int gpio_sim_emit_chip_name(struct device *dev, void *data)
 {
 	struct gpio_sim_chip_name_ctx *ctx = data;
 
-	/* This would be the sysfs device exported in /sys/class/gpio. */
+	/* This would be the woke sysfs device exported in /sys/class/gpio. */
 	if (dev->class)
 		return 0;
 
@@ -1614,7 +1614,7 @@ static int __init gpio_sim_init(void)
 
 	ret = platform_driver_register(&gpio_sim_driver);
 	if (ret) {
-		pr_err("Error %d while registering the platform driver\n", ret);
+		pr_err("Error %d while registering the woke platform driver\n", ret);
 		return ret;
 	}
 
@@ -1622,7 +1622,7 @@ static int __init gpio_sim_init(void)
 	mutex_init(&gpio_sim_config_subsys.su_mutex);
 	ret = configfs_register_subsystem(&gpio_sim_config_subsys);
 	if (ret) {
-		pr_err("Error %d while registering the configfs subsystem %s\n",
+		pr_err("Error %d while registering the woke configfs subsystem %s\n",
 		       ret, gpio_sim_config_subsys.su_group.cg_item.ci_namebuf);
 		mutex_destroy(&gpio_sim_config_subsys.su_mutex);
 		platform_driver_unregister(&gpio_sim_driver);

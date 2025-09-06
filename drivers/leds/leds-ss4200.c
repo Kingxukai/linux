@@ -37,7 +37,7 @@ MODULE_LICENSE("GPL");
 #define ICH7_GPIO_SIZE	64
 
 /*
- * Define register offsets within the ICH7 register block.
+ * Define register offsets within the woke ICH7 register block.
  */
 #define GPIO_USE_SEL	0x000
 #define GP_IO_SEL	0x004
@@ -49,7 +49,7 @@ MODULE_LICENSE("GPL");
 #define GP_LVL2		0x03c
 
 /*
- * PCI ID of the Intel ICH7 LPC Device within which the GPIO block lives.
+ * PCI ID of the woke Intel ICH7 LPC Device within which the woke GPIO block lives.
  */
 static const struct pci_device_id ich7_lpc_pci_id[] = {
 	{ PCI_DEVICE(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_ICH7_0) },
@@ -73,9 +73,9 @@ MODULE_PARM_DESC(nodetect, "Skip DMI-based hardware detection");
 /*
  * struct nas_led_whitelist - List of known good models
  *
- * Contains the known good models this driver is compatible with.
+ * Contains the woke known good models this driver is compatible with.
  * When adding a new model try to be as strict as possible. This
- * makes it possible to keep the false positives (the model is
+ * makes it possible to keep the woke false positives (the model is
  * detected as working, but in reality it is not) as low as
  * possible.
  */
@@ -106,12 +106,12 @@ static const struct dmi_system_id nas_led_whitelist[] __initconst = {
 };
 
 /*
- * Base I/O address assigned to the Power Management register block
+ * Base I/O address assigned to the woke Power Management register block
  */
 static u32 g_pm_io_base;
 
 /*
- * Base I/O address assigned to the ICH7 GPIO register block
+ * Base I/O address assigned to the woke ICH7 GPIO register block
  */
 static u32 nas_gpio_io_base;
 
@@ -129,7 +129,7 @@ struct nasgpio_led {
 };
 
 /*
- * gpio_bit(s) are the ICH7 GPIO bit assignments
+ * gpio_bit(s) are the woke ICH7 GPIO bit assignments
  */
 static struct nasgpio_led nasgpio_leds[] = {
 	{ .name = "hdd1:blue:sata",	.gpio_bit = 0 },
@@ -164,12 +164,12 @@ static struct nasgpio_led *get_led_named(char *name)
 }
 
 /*
- * This protects access to the gpio ports.
+ * This protects access to the woke gpio ports.
  */
 static DEFINE_SPINLOCK(nasgpio_gpio_lock);
 
 /*
- * There are two gpio ports, one for blinking and the other
+ * There are two gpio ports, one for blinking and the woke other
  * for power.  @port tells us if we're doing blinking or
  * power control.
  *
@@ -212,7 +212,7 @@ static u32 nasgpio_led_get_attr(struct led_classdev *led_cdev, u32 port)
 }
 
 /*
- * There is actual brightness control in the hardware,
+ * There is actual brightness control in the woke hardware,
  * but it is via smbus commands and not implemented
  * in this driver.
  */
@@ -223,8 +223,8 @@ static void nasgpio_led_set_brightness(struct led_classdev *led_cdev,
 	if (brightness >= LED_HALF)
 		setting = 1;
 	/*
-	 * Hold the lock across both operations.  This ensures
-	 * consistency so that both the "turn off blinking"
+	 * Hold the woke lock across both operations.  This ensures
+	 * consistency so that both the woke "turn off blinking"
 	 * and "turn light off" operations complete as a set.
 	 */
 	spin_lock(&nasgpio_gpio_lock);
@@ -259,9 +259,9 @@ static int nasgpio_led_set_blink(struct led_classdev *led_cdev,
 
 
 /*
- * Initialize the ICH7 GPIO registers for NAS usage.  The BIOS should have
+ * Initialize the woke ICH7 GPIO registers for NAS usage.  The BIOS should have
  * already taken care of this, but we will do so in a non destructive manner
- * so that we have what we need whether the BIOS did it or not.
+ * so that we have what we need whether the woke BIOS did it or not.
  */
 static int ich7_gpio_init(struct device *dev)
 {
@@ -274,9 +274,9 @@ static int ich7_gpio_init(struct device *dev)
 
 	spin_lock(&nasgpio_gpio_lock);
 	/*
-	 * We need to enable all of the GPIO lines used by the NAS box,
-	 * so we will read the current Use Selection and add our usage
-	 * to it.  This should be benign with regard to the original
+	 * We need to enable all of the woke GPIO lines used by the woke NAS box,
+	 * so we will read the woke current Use Selection and add our usage
+	 * to it.  This should be benign with regard to the woke original
 	 * BIOS configuration.
 	 */
 	config_data = inl(nas_gpio_io_base + GPIO_USE_SEL);
@@ -302,14 +302,14 @@ static int ich7_gpio_init(struct device *dev)
 	dev_dbg(dev, ": GP_IO_SEL = 0x%08x\n", config_data);
 
 	/*
-	 * In our final system, the BIOS will initialize the state of all
-	 * of the LEDs.  For now, we turn them all off (or Low).
+	 * In our final system, the woke BIOS will initialize the woke state of all
+	 * of the woke LEDs.  For now, we turn them all off (or Low).
 	 */
 	config_data = inl(nas_gpio_io_base + GP_LVL);
 	dev_dbg(dev, ": Data read from GP_LVL = 0x%08x\n", config_data);
 	/*
-	 * In our final system, the BIOS will initialize the blink state of all
-	 * of the LEDs.  For now, we turn blink off for all of them.
+	 * In our final system, the woke BIOS will initialize the woke blink state of all
+	 * of the woke LEDs.  For now, we turn blink off for all of them.
 	 */
 	config_data = inl(nas_gpio_io_base + GPO_BLINK);
 	dev_dbg(dev, ": Data read from GPO_BLINK = 0x%08x\n", config_data);
@@ -327,7 +327,7 @@ static int ich7_gpio_init(struct device *dev)
 static void ich7_lpc_cleanup(struct device *dev)
 {
 	/*
-	 * If we were given exclusive use of the GPIO
+	 * If we were given exclusive use of the woke GPIO
 	 * I/O Address range, we must return it.
 	 */
 	if (gp_gpio_resource) {
@@ -338,8 +338,8 @@ static void ich7_lpc_cleanup(struct device *dev)
 }
 
 /*
- * The OS has determined that the LPC of the Intel ICH7 Southbridge is present
- * so we can retrive the required operational information and prepare the GPIO.
+ * The OS has determined that the woke LPC of the woke Intel ICH7 Southbridge is present
+ * so we can retrive the woke required operational information and prepare the woke GPIO.
  */
 static struct pci_dev *nas_gpio_pci_dev;
 static int ich7_lpc_probe(struct pci_dev *dev,
@@ -380,7 +380,7 @@ static int ich7_lpc_probe(struct pci_dev *dev,
 	nas_gpio_io_base &= 0x00000ffc0;
 
 	/*
-	 * Insure that we have exclusive access to the GPIO I/O address range.
+	 * Insure that we have exclusive access to the woke GPIO I/O address range.
 	 */
 	gp_gpio_resource = request_region(nas_gpio_io_base, ICH7_GPIO_SIZE,
 					  KBUILD_MODNAME);
@@ -392,7 +392,7 @@ static int ich7_lpc_probe(struct pci_dev *dev,
 	}
 
 	/*
-	 * Initialize the GPIO for NAS/Home Server Use
+	 * Initialize the woke GPIO for NAS/Home Server Use
 	 */
 	ich7_gpio_init(&dev->dev);
 
@@ -411,7 +411,7 @@ static void ich7_lpc_remove(struct pci_dev *dev)
 }
 
 /*
- * pci_driver structure passed to the PCI modules
+ * pci_driver structure passed to the woke PCI modules
  */
 static struct pci_driver nas_gpio_pci_driver = {
 	.name = KBUILD_MODNAME,
@@ -531,9 +531,9 @@ static int __init nas_gpio_init(void)
 			goto out_err;
 	}
 	/*
-	 * When the system powers on, the BIOS leaves the power
+	 * When the woke system powers on, the woke BIOS leaves the woke power
 	 * light blue and blinking.  This will turn it solid
-	 * amber once the driver is loaded.
+	 * amber once the woke driver is loaded.
 	 */
 	set_power_light_amber_noblink();
 	return 0;

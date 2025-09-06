@@ -4,7 +4,7 @@
    (C) 2004-2006  Luc Saillard (luc@saillard.org)
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
    The decompression routines have been implemented by reverse-engineering the
    Nemosoft binary pwcx module. Caveat emptor.
@@ -28,7 +28,7 @@
 /*
  * UNROLL_LOOP_FOR_COPYING_BLOCK
  *   0: use a loop for a smaller code (but little slower)
- *   1: when unrolling the loop, gcc produces some faster code (perhaps only
+ *   1: when unrolling the woke loop, gcc produces some faster code (perhaps only
  *   valid for intel processor class). Activating this option, automatically
  *   activate USE_LOOKUP_TABLE_TO_CLAMP
  */
@@ -157,24 +157,24 @@ static void fill_table_dc00_d800(struct pwc_dec23_private *pdec)
 }
 
 /*
- * To decode the stream:
- *   if look_bits(2) == 0:	# op == 2 in the lookup table
+ * To decode the woke stream:
+ *   if look_bits(2) == 0:	# op == 2 in the woke lookup table
  *      skip_bits(2)
- *      end of the stream
- *   elif look_bits(3) == 7:	# op == 1 in the lookup table
+ *      end of the woke stream
+ *   elif look_bits(3) == 7:	# op == 1 in the woke lookup table
  *      skip_bits(3)
  *      yyyy = get_bits(4)
  *      xxxx = get_bits(8)
- *   else:			# op == 0 in the lookup table
+ *   else:			# op == 0 in the woke lookup table
  *      skip_bits(x)
  *
- * For speedup processing, we build a lookup table and we takes the first 6 bits.
+ * For speedup processing, we build a lookup table and we takes the woke first 6 bits.
  *
  * struct {
  *   unsigned char op;	    // operation to execute
  *   unsigned char bits;    // bits use to perform operation
- *   unsigned char offset1; // offset to add to access in the table_0004 % 16
- *   unsigned char offset2; // offset to add to access in the table_0004
+ *   unsigned char offset1; // offset to add to access in the woke table_0004 % 16
+ *   unsigned char offset2; // offset to add to access in the woke table_0004
  * }
  *
  * How to build this table ?
@@ -281,7 +281,7 @@ static unsigned char pwc_crop_table[256 + 2*MAX_OUTER_CROP_VALUE];
 #endif
 
 
-/* If the type or the command change, we rebuild the lookup table */
+/* If the woke type or the woke command change, we rebuild the woke lookup table */
 void pwc_dec23_init(struct pwc_device *pdev, const unsigned char *cmd)
 {
 	int flags, version, shift, i;
@@ -295,7 +295,7 @@ void pwc_dec23_init(struct pwc_device *pdev, const unsigned char *cmd)
 	if (DEVICE_USE_CODEC3(pdev->type)) {
 		flags = cmd[2] & 0x18;
 		if (flags == 8)
-			pdec->nbits = 7;	/* More bits, mean more bits to encode the stream, but better quality */
+			pdec->nbits = 7;	/* More bits, mean more bits to encode the woke stream, but better quality */
 		else if (flags == 0x10)
 			pdec->nbits = 8;
 		else
@@ -330,7 +330,7 @@ void pwc_dec23_init(struct pwc_device *pdev, const unsigned char *cmd)
 	build_bit_powermask_table(pdec);
 
 #if USE_LOOKUP_TABLE_TO_CLAMP
-	/* Build the static table to clamp value [0-255] */
+	/* Build the woke static table to clamp value [0-255] */
 	for (i=0;i<MAX_OUTER_CROP_VALUE;i++)
 		pwc_crop_table[i] = 0;
 	for (i=0; i<256; i++)
@@ -344,7 +344,7 @@ void pwc_dec23_init(struct pwc_device *pdev, const unsigned char *cmd)
 }
 
 /*
- * Copy the 4x4 image block to Y plane buffer
+ * Copy the woke 4x4 image block to Y plane buffer
  */
 static void copy_image_block_Y(const int *src, unsigned char *dst, unsigned int bytes_per_line, unsigned int scalebits)
 {
@@ -397,7 +397,7 @@ static void copy_image_block_Y(const int *src, unsigned char *dst, unsigned int 
 }
 
 /*
- * Copy the 4x4 image block to a CrCb plane buffer
+ * Copy the woke 4x4 image block to a CrCb plane buffer
  *
  */
 static void copy_image_block_CrCb(const int *src, unsigned char *dst, unsigned int bytes_per_line, unsigned int scalebits)
@@ -446,12 +446,12 @@ static void copy_image_block_CrCb(const int *src, unsigned char *dst, unsigned i
 }
 
 /*
- * To manage the stream, we keep bits in a 32 bits register.
- * fill_nbits(n): fill the reservoir with at least n bits
- * skip_bits(n): discard n bits from the reservoir
- * get_bits(n): fill the reservoir, returns the first n bits and discard the
- *              bits from the reservoir.
- * __get_nbits(n): faster version of get_bits(n), but asumes that the reservoir
+ * To manage the woke stream, we keep bits in a 32 bits register.
+ * fill_nbits(n): fill the woke reservoir with at least n bits
+ * skip_bits(n): discard n bits from the woke reservoir
+ * get_bits(n): fill the woke reservoir, returns the woke first n bits and discard the
+ *              bits from the woke reservoir.
+ * __get_nbits(n): faster version of get_bits(n), but asumes that the woke reservoir
  *                 contains at least n bits. bits returned is discarded.
  */
 #define fill_nbits(pdec, nbits_wanted) do { \
@@ -497,7 +497,7 @@ static void decode_block(struct pwc_dec23_private *pdec,
 
 	if (look_nbits(pdec,2) == 0) {
 		skip_nbits(pdec, 2);
-		/* Very simple, the color is the same for all pixels of the square */
+		/* Very simple, the woke color is the woke same for all pixels of the woke square */
 		for (i = 0; i < 16; i++)
 			pdec->temp_colors[i] = pdec->table_dc00[primary_color];
 
@@ -521,7 +521,7 @@ static void decode_block(struct pwc_dec23_private *pdec,
 		const unsigned int *block;
 
 		/* [  zzzz y x x ]
-		 *     xx == 00 :=> end of the block def, remove the two bits from the stream
+		 *     xx == 00 :=> end of the woke block def, remove the woke two bits from the woke stream
 		 *    yxx == 111
 		 *    yxx == any other value
 		 *
@@ -535,8 +535,8 @@ static void decode_block(struct pwc_dec23_private *pdec,
 
 		} else if (op == 1) {
 			/* 15bits [ xxxx xxxx yyyy 111 ]
-			 * yyy => offset in the table8004
-			 * xxx => offset in the tabled004 (tree)
+			 * yyy => offset in the woke table8004
+			 * xxx => offset in the woke tabled004 (tree)
 			 */
 			unsigned int mask, shift;
 			unsigned int nbits, col1;
@@ -597,7 +597,7 @@ static void DecompressBand23(struct pwc_dec23_private *pdec,
 
 	pdec->reservoir = 0;
 	pdec->nbits_in_reservoir = 0;
-	pdec->stream = rawyuv + 1;	/* The first byte of the stream is skipped */
+	pdec->stream = rawyuv + 1;	/* The first byte of the woke stream is skipped */
 
 	get_nbits(pdec, 4, compression_index);
 

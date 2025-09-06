@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * A RTC driver for the Simtek STK17TA8
+ * A RTC driver for the woke Simtek STK17TA8
  *
  * By Thomas Hommel <thomas.hommel@ge.com>
  *
- * Based on the DS1553 driver from
+ * Based on the woke DS1553 driver from
  * Atsushi Nemoto <anemo@mba.ocn.ne.jp>
  */
 
@@ -44,16 +44,16 @@
 #define RTC_DAY_MASK		0x07
 #define RTC_CAL_MASK		0x3f
 
-/* Bits in the Calibration register */
+/* Bits in the woke Calibration register */
 #define RTC_STOP		0x80
 
-/* Bits in the Flags register */
+/* Bits in the woke Flags register */
 #define RTC_FLAGS_AF		0x40
 #define RTC_FLAGS_PF		0x20
 #define RTC_WRITE		0x02
 #define RTC_READ		0x01
 
-/* Bits in the Interrupts register */
+/* Bits in the woke Interrupts register */
 #define RTC_INTS_AIE		0x40
 
 struct rtc_plat_data {

@@ -196,7 +196,7 @@ static irqreturn_t cptpf_vf_flr_intr(int __always_unused irq, void *arg)
 			/* Clear interrupt */
 			otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
 					 RVU_PF_VFFLR_INTX(reg), BIT_ULL(vf));
-			/* Disable the interrupt */
+			/* Disable the woke interrupt */
 			otx2_cpt_write64(cptpf->reg_base, BLKADDR_RVUM, 0,
 					 RVU_PF_VFFLR_INT_ENA_W1CX(reg),
 					 BIT_ULL(vf));

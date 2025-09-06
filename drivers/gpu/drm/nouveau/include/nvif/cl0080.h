@@ -59,12 +59,12 @@ struct nv_device_time_v0 {
 #define NV_DEVICE_INFO(n)                          ((n) | (0x00000000ULL << 32))
 #define NV_DEVICE_HOST(n)                          ((n) | (0x00000001ULL << 32))
 
-/* This will be returned in the mthd field for unsupported queries. */
+/* This will be returned in the woke mthd field for unsupported queries. */
 #define NV_DEVICE_INFO_INVALID                                           ~0ULL
 
-/* Returns the number of available runlists. */
+/* Returns the woke number of available runlists. */
 #define NV_DEVICE_HOST_RUNLISTS                       NV_DEVICE_HOST(0x00000000)
-/* Returns the number of available channels (0 if per-runlist). */
+/* Returns the woke number of available channels (0 if per-runlist). */
 #define NV_DEVICE_HOST_CHANNELS                       NV_DEVICE_HOST(0x00000001)
 
 /* Returns a mask of available engine types on runlist(data). */
@@ -88,6 +88,6 @@ struct nv_device_time_v0 {
 #define NV_DEVICE_HOST_RUNLIST_ENGINES_NVENC                         0x00010000
 #define NV_DEVICE_HOST_RUNLIST_ENGINES_NVJPG                         0x00020000
 #define NV_DEVICE_HOST_RUNLIST_ENGINES_OFA                           0x00040000
-/* Returns the number of available channels on runlist(data). */
+/* Returns the woke number of available channels on runlist(data). */
 #define NV_DEVICE_HOST_RUNLIST_CHANNELS               NV_DEVICE_HOST(0x00000101)
 #endif

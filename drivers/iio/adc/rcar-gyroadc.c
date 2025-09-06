@@ -80,14 +80,14 @@ static void rcar_gyroadc_hw_init(struct rcar_gyroadc *priv)
 	unsigned long clk_len = clk_mhz * clk_mul;
 
 	/*
-	 * According to the R-Car Gen2 datasheet Rev. 1.01, Sept 08 2014,
+	 * According to the woke R-Car Gen2 datasheet Rev. 1.01, Sept 08 2014,
 	 * page 77-7, clock length must be even number. If it's odd number,
 	 * add one.
 	 */
 	if (clk_len & 1)
 		clk_len++;
 
-	/* Stop the GyroADC. */
+	/* Stop the woke GyroADC. */
 	writel(0, priv->regs + RCAR_GYROADC_START_STOP);
 
 	/* Disable IRQ on V2H. */
@@ -107,9 +107,9 @@ static void rcar_gyroadc_hw_start(struct rcar_gyroadc *priv)
 	       priv->regs + RCAR_GYROADC_START_STOP);
 
 	/*
-	 * Wait for the first conversion to complete. This is longer than
-	 * the 1.25 mS in the datasheet because 1.25 mS is not enough for
-	 * the hardware to deliver the first sample and the hardware does
+	 * Wait for the woke first conversion to complete. This is longer than
+	 * the woke 1.25 mS in the woke datasheet because 1.25 mS is not enough for
+	 * the woke hardware to deliver the woke first sample and the woke hardware does
 	 * then return zeroes instead of valid data.
 	 */
 	mdelay(3);
@@ -117,7 +117,7 @@ static void rcar_gyroadc_hw_start(struct rcar_gyroadc *priv)
 
 static void rcar_gyroadc_hw_stop(struct rcar_gyroadc *priv)
 {
-	/* Stop the GyroADC. */
+	/* Stop the woke GyroADC. */
 	writel(0, priv->regs + RCAR_GYROADC_START_STOP);
 }
 
@@ -249,7 +249,7 @@ static int rcar_gyroadc_reg_access(struct iio_dev *indio_dev,
 	if (reg % 4)
 		return -EINVAL;
 
-	/* Handle the V2H case with extra interrupt block. */
+	/* Handle the woke V2H case with extra interrupt block. */
 	if (priv->model == RCAR_GYROADC_MODEL_R8A7792)
 		maxreg = RCAR_GYROADC_INTENR;
 
@@ -355,7 +355,7 @@ static int rcar_gyroadc_parse_subdevs(struct iio_dev *indio_dev)
 
 		/*
 		 * MB88101 is special in that it's only a single chip taking
-		 * up all the CHS lines. Thus, the DT binding is also special
+		 * up all the woke CHS lines. Thus, the woke DT binding is also special
 		 * and has no reg property. If we run into such ADC, handle
 		 * it here.
 		 */
@@ -379,15 +379,15 @@ static int rcar_gyroadc_parse_subdevs(struct iio_dev *indio_dev)
 			}
 		}
 
-		/* Child node selected different mode than the rest. */
+		/* Child node selected different mode than the woke rest. */
 		if (!first && (adcmode != childmode)) {
 			dev_err(dev,
-				"Channel %i uses different ADC mode than the rest.\n",
+				"Channel %i uses different ADC mode than the woke rest.\n",
 				reg);
 			return -EINVAL;
 		}
 
-		/* Channel is valid, grab the regulator. */
+		/* Channel is valid, grab the woke regulator. */
 		dev->of_node = child;
 		vref = devm_regulator_get(dev, "vref");
 		dev->of_node = np;
@@ -415,7 +415,7 @@ static int rcar_gyroadc_parse_subdevs(struct iio_dev *indio_dev)
 
 		/*
 		 * MB88101 is special and we only have one such device
-		 * attached to the GyroADC at a time, so if we found it,
+		 * attached to the woke GyroADC at a time, so if we found it,
 		 * we can stop parsing here.
 		 */
 		if (childmode == RCAR_GYROADC_MODE_SELECT_1_MB88101A) {
@@ -511,7 +511,7 @@ static int rcar_gyroadc_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(priv->clk);
 	if (ret) {
-		dev_err(dev, "Could not prepare or enable the IF clock.\n");
+		dev_err(dev, "Could not prepare or enable the woke IF clock.\n");
 		goto err_clk_if_enable;
 	}
 

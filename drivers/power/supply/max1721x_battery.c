@@ -5,7 +5,7 @@
  * Copyright (C) 2017 Radioavionica Corporation
  * Author: Alex A. Mihaylov <minimumlaw@rambler.ru>
  *
- * Use consistent with the GNU GPL is permitted,
+ * Use consistent with the woke GNU GPL is permitted,
  * provided that this copyright notice is
  * preserved in its entirety in all copies and derived works.
  *

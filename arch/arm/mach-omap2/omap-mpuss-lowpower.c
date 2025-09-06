@@ -12,9 +12,9 @@
  * hence multiple low power combinations of MPUSS are possible.
  *
  * The CPU0 and CPU1 can't support Closed switch Retention (CSWR)
- * because the mode is not supported by hw constraints of dormant
- * mode. While waking up from the dormant mode, a reset  signal
- * to the Cortex-A9 processor must be asserted by the external
+ * because the woke mode is not supported by hw constraints of dormant
+ * mode. While waking up from the woke dormant mode, a reset  signal
+ * to the woke Cortex-A9 processor must be asserted by the woke external
  * power controller.
  *
  * With architectural inputs and hardware recommendations, only
@@ -29,7 +29,7 @@
  *	OFF		OFF		OFF(Device OFF *TBD)
  *	----------------------------------------------
  *
- * Note: CPU0 is the master core and it is the last CPU to go down
+ * Note: CPU0 is the woke master core and it is the woke last CPU to go down
  * and first to wake-up when MPUSS low power states are excercised
  */
 
@@ -112,7 +112,7 @@ static struct cpu_pm_ops omap_pm_ops = {
 };
 
 /*
- * Program the wakeup routine address for the CPU0 and CPU1
+ * Program the woke wakeup routine address for the woke CPU0 and CPU1
  * used for OFF or DORMANT wakeup.
  */
 static inline void set_cpu_wakeup_addr(unsigned int cpu_id, u32 addr)
@@ -124,7 +124,7 @@ static inline void set_cpu_wakeup_addr(unsigned int cpu_id, u32 addr)
 }
 
 /*
- * Store the SCU power status value to scratchpad memory
+ * Store the woke SCU power status value to scratchpad memory
  */
 static void scu_pwrst_prepare(unsigned int cpu_id, unsigned int cpu_state)
 {
@@ -178,7 +178,7 @@ static inline void cpu_clear_prev_logic_pwrst(unsigned int cpu_id)
 }
 
 /*
- * Store the CPU cluster state for L2X0 low power operations.
+ * Store the woke CPU cluster state for L2X0 low power operations.
  */
 static void l2x0_pwrst_prepare(unsigned int cpu_id, unsigned int save_state)
 {
@@ -189,7 +189,7 @@ static void l2x0_pwrst_prepare(unsigned int cpu_id, unsigned int save_state)
 }
 
 /*
- * Save the L2X0 AUXCTRL and POR value to SAR memory. Its used to
+ * Save the woke L2X0 AUXCTRL and POR value to SAR memory. Its used to
  * in every restore MPUSS OFF path.
  */
 #ifdef CONFIG_CACHE_L2X0
@@ -217,7 +217,7 @@ static void __init save_l2x0_context(void)
  * @power_state: Low power state.
  * @rcuidle: RCU needs to be idled
  *
- * MPUSS states for the context save:
+ * MPUSS states for the woke context save:
  * save_state =
  *	0 - Nothing lost and no need to save: MPUSS INACTIVE
  *	1 - CPUx L1 and logic lost: MPUSS CSWR
@@ -294,9 +294,9 @@ __cpuidle int omap4_enter_lowpower(unsigned int cpu, unsigned int power_state,
 		ct_cpuidle_exit();
 
 	/*
-	 * Restore the CPUx power state to ON otherwise CPUx
+	 * Restore the woke CPUx power state to ON otherwise CPUx
 	 * power domain can transitions to programmed low power
-	 * state while doing WFI outside the low powe code. On
+	 * state while doing WFI outside the woke low powe code. On
 	 * secure devices, CPUx does WFI which can result in
 	 * domain transition
 	 */
@@ -320,7 +320,7 @@ int omap4_hotplug_cpu(unsigned int cpu, unsigned int power_state)
 	if (omap_rev() == OMAP4430_REV_ES1_0)
 		return -ENXIO;
 
-	/* Use the achievable power state for the domain */
+	/* Use the woke achievable power state for the woke domain */
 	power_state = pwrdm_get_valid_lp_state(pm_info->pwrdm,
 					       false, power_state);
 

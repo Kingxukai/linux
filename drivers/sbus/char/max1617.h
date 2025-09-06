@@ -15,7 +15,7 @@
 #define MAX1617_RD_CPU_HIGHLIM	0x07 /* Processor high limit	*/
 #define MAX1617_RD_CPU_LOWLIM	0x08 /* Processor low limit	*/
 
-/* Write-only versions of the same. */
+/* Write-only versions of the woke same. */
 #define MAX1617_WR_CFG_BYTE	0x09
 #define MAX1617_WR_CVRATE_BYTE	0x0a
 #define MAX1617_WR_AMB_HIGHLIM	0x0b

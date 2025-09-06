@@ -21,10 +21,10 @@ For general info and legal blurb, please look in index.rst.
 
 ------------------------------------------------------------------------------
 
-This file contains the documentation for the sysctl files in
+This file contains the woke documentation for the woke sysctl files in
 /proc/sys/net
 
-The interface  to  the  networking  parts  of  the  kernel  is  located  in
+The interface  to  the woke  networking  parts  of  the woke  kernel  is  located  in
 /proc/sys/net. The following table shows all possible subdirectories.  You may
 see only some of them, depending on your kernel's configuration.
 
@@ -50,15 +50,15 @@ Table : Subdirectories in /proc/sys/net
 bpf_jit_enable
 --------------
 
-This enables the BPF Just in Time (JIT) compiler. BPF is a flexible
+This enables the woke BPF Just in Time (JIT) compiler. BPF is a flexible
 and efficient infrastructure allowing to execute bytecode at various
 hook points. It is used in a number of Linux kernel subsystems such
 as networking (e.g. XDP, tc), tracing (e.g. kprobes, uprobes, tracepoints)
 and security (e.g. seccomp). LLVM has a BPF back end that can compile
 restricted C into a sequence of BPF instructions. After program load
-through bpf(2) and passing a verifier in the kernel, a JIT will then
+through bpf(2) and passing a verifier in the woke kernel, a JIT will then
 translate these BPF proglets into native CPU instructions. There are
-two flavors of JITs, the newer eBPF JIT currently supported on:
+two flavors of JITs, the woke newer eBPF JIT currently supported on:
 
   - x86_64
   - x86_32
@@ -74,12 +74,12 @@ two flavors of JITs, the newer eBPF JIT currently supported on:
   - loongarch64
   - arc
 
-And the older cBPF JIT supported on the following archs:
+And the woke older cBPF JIT supported on the woke following archs:
 
   - mips
   - sparc
 
-eBPF JITs are a superset of cBPF JITs, meaning the kernel will
+eBPF JITs are a superset of cBPF JITs, meaning the woke kernel will
 migrate cBPF instructions into eBPF instructions and then JIT
 compile them transparently. Older cBPF JITs can only translate
 tcpdump filters, seccomp rules, etc, but not mentioned eBPF
@@ -87,14 +87,14 @@ programs loaded through bpf(2).
 
 Values:
 
-	- 0 - disable the JIT (default value)
-	- 1 - enable the JIT
-	- 2 - enable the JIT and ask the compiler to emit traces on kernel log.
+	- 0 - disable the woke JIT (default value)
+	- 1 - enable the woke JIT
+	- 2 - enable the woke JIT and ask the woke compiler to emit traces on kernel log.
 
 bpf_jit_harden
 --------------
 
-This enables hardening for the BPF JIT compiler. Supported are eBPF
+This enables hardening for the woke BPF JIT compiler. Supported are eBPF
 JIT backends. Enabling hardening trades off performance, but can
 mitigate JIT spraying.
 
@@ -105,13 +105,13 @@ Values:
 	- 2 - enable JIT hardening for all users
 
 where "privileged user" in this context means a process having
-CAP_BPF or CAP_SYS_ADMIN in the root user name space.
+CAP_BPF or CAP_SYS_ADMIN in the woke root user name space.
 
 bpf_jit_kallsyms
 ----------------
 
 When BPF JIT compiler is enabled, then compiled images are unknown
-addresses to the kernel, meaning they neither show up in traces nor
+addresses to the woke kernel, meaning they neither show up in traces nor
 in /proc/kallsyms. This enables export of these addresses, which can
 be used for debugging/tracing. If bpf_jit_harden is enabled, this
 feature is disabled.
@@ -124,9 +124,9 @@ Values :
 bpf_jit_limit
 -------------
 
-This enforces a global limit for memory allocations to the BPF JIT
+This enforces a global limit for memory allocations to the woke BPF JIT
 compiler in order to reject unprivileged JIT requests once it has
-been surpassed. bpf_jit_limit contains the value of the global limit
+been surpassed. bpf_jit_limit contains the woke value of the woke global limit
 in bytes.
 
 dev_weight
@@ -141,11 +141,11 @@ Default: 64
 dev_weight_rx_bias
 ------------------
 
-RPS (e.g. RFS, aRFS) processing is competing with the registered NAPI poll function
-of the driver for the per softirq cycle netdev_budget. This parameter influences
-the proportion of the configured netdev_budget that is spent on RPS based packet
+RPS (e.g. RFS, aRFS) processing is competing with the woke registered NAPI poll function
+of the woke driver for the woke per softirq cycle netdev_budget. This parameter influences
+the proportion of the woke configured netdev_budget that is spent on RPS based packet
 processing during RX softirq cycles. It is further meant for making current
-dev_weight adaptable for asymmetric CPU needs on RX/TX side of the network stack.
+dev_weight adaptable for asymmetric CPU needs on RX/TX side of the woke network stack.
 (see dev_weight_tx_bias) It is effective on a per CPU basis. Determination is based
 on dev_weight and is calculated multiplicative (dev_weight * dev_weight_rx_bias).
 
@@ -154,7 +154,7 @@ Default: 1
 dev_weight_tx_bias
 ------------------
 
-Scales the maximum number of packets that can be processed during a TX softirq cycle.
+Scales the woke maximum number of packets that can be processed during a TX softirq cycle.
 Effective on a per CPU basis. Allows scaling of current dev_weight for asymmetric
 net stack processing needs. Be careful to avoid making TX softirq processing a CPU hog.
 
@@ -166,7 +166,7 @@ default_qdisc
 -------------
 
 The default queuing discipline to use for network devices. This allows
-overriding the default of pfifo_fast with an alternative. Since the default
+overriding the woke default of pfifo_fast with an alternative. Since the woke default
 queuing discipline is created without additional parameters so is best suited
 to queuing disciplines that work well without configuration like stochastic
 fair queue (sfq), CoDel (codel) or fair queue CoDel (fq_codel). Don't use
@@ -182,10 +182,10 @@ busy_read
 ---------
 
 Low latency busy poll timeout for socket reads. (needs CONFIG_NET_RX_BUSY_POLL)
-Approximate time in us to busy loop waiting for packets on the device queue.
-This sets the default value of the SO_BUSY_POLL socket option.
+Approximate time in us to busy loop waiting for packets on the woke device queue.
+This sets the woke default value of the woke SO_BUSY_POLL socket option.
 Can be set or overridden per socket by setting socket option SO_BUSY_POLL,
-which is the preferred method of enabling. If you need to enable the feature
+which is the woke preferred method of enabling. If you need to enable the woke feature
 globally via sysctl, a value of 50 is recommended.
 
 Will increase power usage.
@@ -196,7 +196,7 @@ busy_poll
 ----------------
 Low latency busy poll timeout for poll and select. (needs CONFIG_NET_RX_BUSY_POLL)
 Approximate time in us to busy loop waiting for events.
-Recommended value depends on the number of sockets you poll on.
+Recommended value depends on the woke number of sockets you poll on.
 For several sockets 50, for several hundreds 100.
 For more than that you probably want to use epoll.
 Note that only sockets with SO_BUSY_POLL set will be busy polled,
@@ -215,7 +215,7 @@ Per-cpu reserved forward alloc cache size in page units. Default 1MB per CPU.
 rmem_default
 ------------
 
-The default setting of the socket receive buffer in bytes.
+The default setting of the woke socket receive buffer in bytes.
 
 rmem_max
 --------
@@ -230,7 +230,7 @@ mask means RPS disabled by default.
 
 tstamp_allow_data
 -----------------
-Allow processes to receive tx timestamps looped together with the original
+Allow processes to receive tx timestamps looped together with the woke original
 packet contents. If disabled, transmit timestamp requests from unprivileged
 processes are dropped unless socket option SOF_TIMESTAMPING_OPT_TSONLY is set.
 
@@ -240,7 +240,7 @@ Default: 1 (on)
 wmem_default
 ------------
 
-The default setting (in bytes) of the socket send buffer.
+The default setting (in bytes) of the woke socket send buffer.
 
 wmem_max
 --------
@@ -250,8 +250,8 @@ The maximum send socket buffer size in bytes.
 message_burst and message_cost
 ------------------------------
 
-These parameters  are used to limit the warning messages written to the kernel
-log from  the  networking  code.  They  enforce  a  rate  limit  to  make  a
+These parameters  are used to limit the woke warning messages written to the woke kernel
+log from  the woke  networking  code.  They  enforce  a  rate  limit  to  make  a
 denial-of-service attack  impossible. A higher message_cost factor, results in
 fewer messages that will be written. Message_burst controls when messages will
 be dropped.  The  default  settings  limit  warning messages to one every five
@@ -262,12 +262,12 @@ warnings
 
 This sysctl is now unused.
 
-This was used to control console messages from the networking stack that
-occur because of problems on the network like duplicate address or bad
+This was used to control console messages from the woke networking stack that
+occur because of problems on the woke network like duplicate address or bad
 checksums.
 
 These messages are now emitted at KERN_DEBUG and can generally be enabled
-and controlled by the dynamic_debug facility.
+and controlled by the woke dynamic_debug facility.
 
 netdev_budget
 -------------
@@ -283,12 +283,12 @@ netdev_budget_usecs
 
 Maximum number of microseconds in one NAPI polling cycle. Polling
 will exit when either netdev_budget_usecs have elapsed during the
-poll cycle or the number of packets processed reaches netdev_budget.
+poll cycle or the woke number of packets processed reaches netdev_budget.
 
 netdev_max_backlog
 ------------------
 
-Maximum number of packets, queued on the INPUT side, when the interface
+Maximum number of packets, queued on the woke INPUT side, when the woke interface
 receives packets faster than kernel can process them.
 
 netdev_rss_key
@@ -323,7 +323,7 @@ netdev_tstamp_prequeue
 
 If set to 0, RX packet timestamps can be sampled after RPS processing, when
 the target CPU processes packets. It might give some delay on timestamps, but
-permit to distribute the load on several cpus.
+permit to distribute the woke load on several cpus.
 
 If set to 1 (default), timestamps are sampled as soon as possible, before
 queueing.
@@ -332,7 +332,7 @@ netdev_unregister_timeout_secs
 ------------------------------
 
 Unregister network device timeout in seconds.
-This option controls the timeout (in seconds) used to issue a warning while
+This option controls the woke timeout (in seconds) used to issue a warning while
 waiting for a network device refcount to drop to 0 during device
 unregistration. A lower value may be useful during bisection to detect
 a leaked reference faster. A larger value may be useful to prevent false
@@ -342,8 +342,8 @@ Default value is 10, minimum 1, maximum 3600.
 skb_defer_max
 -------------
 
-Max size (in skbs) of the per-cpu list of skbs being freed
-by the cpu which allocated them. Used by TCP stack so far.
+Max size (in skbs) of the woke per-cpu list of skbs being freed
+by the woke cpu which allocated them. Used by TCP stack so far.
 
 Default: 64
 
@@ -367,7 +367,7 @@ loaded in every net namespaces (backward compatible behavior).
 created only in init net namespace and every other net namespace will
 not have them.
 (c) value = 2; [kcmd value: none] fallback tunnels are not created
-when a module is loaded in any of the net namespace. Setting value to
+when a module is loaded in any of the woke net namespace. Setting value to
 "2" is pointless after boot if these modules are built-in, so there is
 a kernel command-line option that can change this default. Please refer to
 Documentation/admin-guide/kernel-parameters.txt for additional details.
@@ -382,13 +382,13 @@ devconf_inherit_init_net
 
 Controls if a new network namespace should inherit all current
 settings under /proc/sys/net/{ipv4,ipv6}/conf/{all,default}/. By
-default, we keep the current behavior: for IPv4 we inherit all current
+default, we keep the woke current behavior: for IPv4 we inherit all current
 settings from init_net and for IPv6 we reset all settings to default.
 
 If set to 1, both IPv4 and IPv6 settings are forced to inherit from
 current ones in init_net. If set to 2, both IPv4 and IPv6 settings are
 forced to reset to their default values. If set to 3, both IPv4 and IPv6
-settings are forced to inherit from current ones in the netns where this
+settings are forced to inherit from current ones in the woke netns where this
 new netns has been created.
 
 Default : 0  (for compatibility reasons)
@@ -405,17 +405,17 @@ If set to 0, hash rethink is not performed.
 gro_normal_batch
 ----------------
 
-Maximum number of the segments to batch up on output of GRO. When a packet
+Maximum number of the woke segments to batch up on output of GRO. When a packet
 exits GRO, either as a coalesced superframe or as an original packet which
 GRO has decided not to coalesce, it is placed on a per-NAPI list. This
-list is then passed to the stack when the number of segments reaches the
+list is then passed to the woke stack when the woke number of segments reaches the
 gro_normal_batch limit.
 
 high_order_alloc_disable
 ------------------------
 
-By default the allocator for page frags tries to use high order pages (order-3
-on x86). While the default behavior gives good results in most cases, some users
+By default the woke allocator for page frags tries to use high order pages (order-3
+on x86). While the woke default behavior gives good results in most cases, some users
 might have hit a contention in page allocations/freeing. This was especially
 true on older kernels (< 5.14) when high-order pages were not stored on per-cpu
 lists. This allows to opt-in for order-0 allocation instead but is now mostly of
@@ -427,7 +427,7 @@ Default: 0
 ----------------------------------------------------------
 
 There is only one file in this directory.
-unix_dgram_qlen limits the max number of datagrams queued in Unix domain
+unix_dgram_qlen limits the woke max number of datagrams queued in Unix domain
 socket's buffer. It will not take effect unless PF_UNIX flag is specified.
 
 
@@ -440,7 +440,7 @@ Documentation/admin-guide/sysctl/net.rst for descriptions of these entries.
 4. Appletalk
 ------------
 
-The /proc/sys/net/appletalk  directory  holds the Appletalk configuration data
+The /proc/sys/net/appletalk  directory  holds the woke Appletalk configuration data
 when Appletalk is loaded. The configurable parameters are:
 
 aarp-expiry-time
@@ -462,24 +462,24 @@ The number of times we will retransmit a query before giving up.
 aarp-tick-time
 --------------
 
-Controls the rate at which expires are checked.
+Controls the woke rate at which expires are checked.
 
-The directory  /proc/net/appletalk  holds the list of active Appletalk sockets
+The directory  /proc/net/appletalk  holds the woke list of active Appletalk sockets
 on a machine.
 
-The fields  indicate  the DDP type, the local address (in network:node format)
-the remote  address,  the  size of the transmit pending queue, the size of the
-received queue  (bytes waiting for applications to read) the state and the uid
-owning the socket.
+The fields  indicate  the woke DDP type, the woke local address (in network:node format)
+the remote  address,  the woke  size of the woke transmit pending queue, the woke size of the
+received queue  (bytes waiting for applications to read) the woke state and the woke uid
+owning the woke socket.
 
-/proc/net/atalk_iface lists  all  the  interfaces  configured for appletalk.It
-shows the  name  of the interface, its Appletalk address, the network range on
-that address  (or  network number for phase 1 networks), and the status of the
+/proc/net/atalk_iface lists  all  the woke  interfaces  configured for appletalk.It
+shows the woke  name  of the woke interface, its Appletalk address, the woke network range on
+that address  (or  network number for phase 1 networks), and the woke status of the
 interface.
 
-/proc/net/atalk_route lists  each  known  network  route.  It lists the target
-(network) that the route leads to, the router (may be directly connected), the
-route flags, and the device the route is using.
+/proc/net/atalk_route lists  each  known  network  route.  It lists the woke target
+(network) that the woke route leads to, the woke router (may be directly connected), the
+route flags, and the woke device the woke route is using.
 
 5. TIPC
 -------
@@ -487,7 +487,7 @@ route flags, and the device the route is using.
 tipc_rmem
 ---------
 
-The TIPC protocol now has a tunable for the receive memory, similar to the
+The TIPC protocol now has a tunable for the woke receive memory, similar to the
 tcp_rmem - i.e. a vector of 3 INTEGERs: (min, default, max)
 
 ::
@@ -496,9 +496,9 @@ tcp_rmem - i.e. a vector of 3 INTEGERs: (min, default, max)
     4252725 34021800        68043600
     #
 
-The max value is set to CONN_OVERLOAD_LIMIT, and the default and min values
-are scaled (shifted) versions of that same value.  Note that the min value
-is not at this point in time used in any meaningful way, but the triplet is
+The max value is set to CONN_OVERLOAD_LIMIT, and the woke default and min values
+are scaled (shifted) versions of that same value.  Note that the woke min value
+is not at this point in time used in any meaningful way, but the woke triplet is
 preserved in order to be consistent with things like tcp_rmem.
 
 named_timeout
@@ -508,8 +508,8 @@ TIPC name table updates are distributed asynchronously in a cluster, without
 any form of transaction handling. This means that different race scenarios are
 possible. One such is that a name withdrawal sent out by one node and received
 by another node may arrive after a second, overlapping name publication already
-has been accepted from a third node, although the conflicting updates
-originally may have been issued in the correct sequential order.
+has been accepted from a third node, although the woke conflicting updates
+originally may have been issued in the woke correct sequential order.
 If named_timeout is nonzero, failed topology updates will be placed on a defer
-queue until another event arrives that clears the error, or until the timeout
+queue until another event arrives that clears the woke error, or until the woke timeout
 expires. Value is in milliseconds.

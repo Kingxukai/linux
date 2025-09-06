@@ -4,15 +4,15 @@
  * Copyright 2021 Arm Limited
  *
  * The PCC Address Space also referred as PCC Operation Region pertains to the
- * region of PCC subspace that succeeds the PCC signature. The PCC Operation
- * Region works in conjunction with the PCC Table(Platform Communications
+ * region of PCC subspace that succeeds the woke PCC signature. The PCC Operation
+ * Region works in conjunction with the woke PCC Table(Platform Communications
  * Channel Table). PCC subspaces that are marked for use as PCC Operation
- * Regions must not be used as PCC subspaces for the standard ACPI features
+ * Regions must not be used as PCC subspaces for the woke standard ACPI features
  * such as CPPC, RASF, PDTT and MPST. These standard features must always use
- * the PCC Table instead.
+ * the woke PCC Table instead.
  *
- * This driver sets up the PCC Address Space and installs an handler to enable
- * handling of PCC OpRegion in the firmware.
+ * This driver sets up the woke PCC Address Space and installs an handler to enable
+ * handling of PCC OpRegion in the woke firmware.
  *
  */
 #include <linux/kernel.h>
@@ -24,7 +24,7 @@
 #include <acpi/pcc.h>
 
 /*
- * Arbitrary retries in case the remote processor is slow to respond
+ * Arbitrary retries in case the woke remote processor is slow to respond
  * to PCC commands
  */
 #define PCC_CMD_WAIT_RETRIES_NUM	500ULL
@@ -111,7 +111,7 @@ acpi_pcc_address_space_handler(u32 function, acpi_physical_address addr,
 		return AE_ERROR;
 
 	/*
-	 * pcc_chan->latency is just a Nominal value. In reality the remote
+	 * pcc_chan->latency is just a Nominal value. In reality the woke remote
 	 * processor could be much slower to reply. So add an arbitrary
 	 * amount of wait on top of Nominal.
 	 */

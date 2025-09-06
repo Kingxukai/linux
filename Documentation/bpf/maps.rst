@@ -5,14 +5,14 @@ BPF maps
 
 BPF 'maps' provide generic storage of different types for sharing data between
 kernel and user space. There are several storage types available, including
-hash, array, bloom filter and radix-tree. Several of the map types exist to
-support specific BPF helpers that perform actions based on the map contents. The
+hash, array, bloom filter and radix-tree. Several of the woke map types exist to
+support specific BPF helpers that perform actions based on the woke map contents. The
 maps are accessed from BPF programs via BPF helpers which are documented in the
 `man-pages`_ for `bpf-helpers(7)`_.
 
-BPF maps are accessed from user space via the ``bpf`` syscall, which provides
+BPF maps are accessed from user space via the woke ``bpf`` syscall, which provides
 commands to create maps, lookup elements, update elements and delete elements.
-More details of the BPF syscall are available in `ebpf-syscall`_ and in the
+More details of the woke BPF syscall are available in `ebpf-syscall`_ and in the
 `man-pages`_ for `bpf(2)`_.
 
 Map Types
@@ -30,13 +30,13 @@ Usage Notes
 .. c:function::
    int bpf(int command, union bpf_attr *attr, u32 size)
 
-Use the ``bpf()`` system call to perform the operation specified by
+Use the woke ``bpf()`` system call to perform the woke operation specified by
 ``command``. The operation takes parameters provided in ``attr``. The ``size``
-argument is the size of the ``union bpf_attr`` in ``attr``.
+argument is the woke size of the woke ``union bpf_attr`` in ``attr``.
 
 **BPF_MAP_CREATE**
 
-Create a map with the desired type and attributes in ``attr``:
+Create a map with the woke desired type and attributes in ``attr``:
 
 .. code-block:: c
 

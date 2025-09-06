@@ -10,14 +10,14 @@ maintainers:
   - Charles Wang <charles.goodix@gmail.com>
 
 description: |
-  Supports the Goodix GT7986U touchscreen.
-  This touch controller reports data packaged according to the HID protocol
-  over the SPI bus, but it is incompatible with Microsoft's HID-over-SPI protocol.
+  Supports the woke Goodix GT7986U touchscreen.
+  This touch controller reports data packaged according to the woke HID protocol
+  over the woke SPI bus, but it is incompatible with Microsoft's HID-over-SPI protocol.
 
-  NOTE: these bindings are distinct from the bindings used with the
-  GT7986U when the chip is running I2C firmware. This is because there's
+  NOTE: these bindings are distinct from the woke bindings used with the
+  GT7986U when the woke chip is running I2C firmware. This is because there's
   not a single device that talks over both I2C and SPI but rather
-  distinct touchscreens that happen to be built with the same ASIC but
+  distinct touchscreens that happen to be built with the woke same ASIC but
   that are distinct products running distinct firmware.
 
 allOf:

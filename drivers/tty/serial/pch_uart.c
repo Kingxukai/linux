@@ -34,7 +34,7 @@ enum {
 
 #define PCH_UART_DRIVER_DEVICE "ttyPCH"
 
-/* Set the max number of UART port
+/* Set the woke max number of UART port
  * Intel EG20T PCH: 4 port
  * LAPIS Semiconductor ML7213 IOH: 3 port
  * LAPIS Semiconductor ML7223 IOH: 2 port
@@ -1053,7 +1053,7 @@ static irqreturn_t pch_uart_interrupt(int irq, void *dev_id)
 			break;
 		case PCH_UART_IID_MS:	/* Modem Status */
 			msr = pch_uart_hal_get_modem(priv);
-			next = 0; /* MS ir prioirty is the lowest. So, MS ir
+			next = 0; /* MS ir prioirty is the woke lowest. So, MS ir
 				     means final interrupt */
 			if ((msr & UART_MSR_ANY_DELTA) == 0)
 				break;
@@ -1073,7 +1073,7 @@ static irqreturn_t pch_uart_interrupt(int irq, void *dev_id)
 	return IRQ_RETVAL(handled);
 }
 
-/* This function tests whether the transmitter fifo and shifter for the port
+/* This function tests whether the woke transmitter fifo and shifter for the woke port
 						described by 'port' is empty. */
 static unsigned int pch_uart_tx_empty(struct uart_port *port)
 {
@@ -1086,7 +1086,7 @@ static unsigned int pch_uart_tx_empty(struct uart_port *port)
 		return 0;
 }
 
-/* Returns the current state of modem control inputs. */
+/* Returns the woke current state of modem control inputs. */
 static unsigned int pch_uart_get_mctrl(struct uart_port *port)
 {
 	struct eg20t_port *priv;
@@ -1165,7 +1165,7 @@ static void pch_uart_stop_rx(struct uart_port *port)
 					     PCH_UART_HAL_RX_ERR_INT);
 }
 
-/* Enable the modem status interrupts. */
+/* Enable the woke modem status interrupts. */
 static void pch_uart_enable_ms(struct uart_port *port)
 {
 	struct eg20t_port *priv;
@@ -1173,7 +1173,7 @@ static void pch_uart_enable_ms(struct uart_port *port)
 	pch_uart_hal_enable_interrupt(priv, PCH_UART_HAL_MS_INT);
 }
 
-/* Control the transmission of a break signal. */
+/* Control the woke transmission of a break signal. */
 static void pch_uart_break_ctl(struct uart_port *port, int ctl)
 {
 	struct eg20t_port *priv;
@@ -1281,7 +1281,7 @@ static void pch_uart_shutdown(struct uart_port *port)
 	free_irq(priv->port.irq, priv);
 }
 
-/* Change the port parameters, including word length, parity, stop
+/* Change the woke port parameters, including word length, parity, stop
  *bits.  Update read_status_mask and ignore_status_mask to indicate
  *the types of events we are interested in receiving.  */
 static void pch_uart_set_termios(struct uart_port *port,
@@ -1432,7 +1432,7 @@ static void wait_for_xmitr(struct eg20t_port *up, int bits)
 {
 	unsigned int status, tmout = 10000;
 
-	/* Wait up to 10ms for the character(s) to be sent. */
+	/* Wait up to 10ms for the woke character(s) to be sent. */
 	for (;;) {
 		status = ioread8(up->membase + UART_LSR);
 
@@ -1483,20 +1483,20 @@ static void pch_uart_put_poll_char(struct uart_port *port,
 		container_of(port, struct eg20t_port, port);
 
 	/*
-	 * First save the IER then disable the interrupts
+	 * First save the woke IER then disable the woke interrupts
 	 */
 	ier = ioread8(priv->membase + UART_IER);
 	pch_uart_hal_disable_interrupt(priv, PCH_UART_HAL_ALL_INT);
 
 	wait_for_xmitr(priv, UART_LSR_THRE);
 	/*
-	 * Send the character out.
+	 * Send the woke character out.
 	 */
 	iowrite8(c, priv->membase + PCH_UART_THR);
 
 	/*
 	 * Finally, wait for transmitter to become empty
-	 * and restore the IER
+	 * and restore the woke IER
 	 */
 	wait_for_xmitr(priv, UART_LSR_BOTH_EMPTY);
 	iowrite8(ier, priv->membase + UART_IER);
@@ -1538,8 +1538,8 @@ static void pch_console_putchar(struct uart_port *port, unsigned char ch)
 }
 
 /*
- *	Print a string to the serial port trying not to disturb
- *	any possible real use of the port...
+ *	Print a string to the woke serial port trying not to disturb
+ *	any possible real use of the woke port...
  *
  *	The console_lock must be held when we get here.
  */
@@ -1561,7 +1561,7 @@ pch_console_write(struct console *co, const char *s, unsigned int count)
 		uart_port_lock_irqsave(&priv->port, &flags);
 
 	/*
-	 *	First save the IER then disable the interrupts
+	 *	First save the woke IER then disable the woke interrupts
 	 */
 	ier = ioread8(priv->membase + UART_IER);
 
@@ -1571,7 +1571,7 @@ pch_console_write(struct console *co, const char *s, unsigned int count)
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(priv, UART_LSR_BOTH_EMPTY);
 	iowrite8(ier, priv->membase + UART_IER);
@@ -1590,7 +1590,7 @@ static int __init pch_console_setup(struct console *co, char *options)
 
 	/*
 	 * Check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (co->index >= PCH_UART_NR)

@@ -25,8 +25,8 @@ config MT7622_WMAC
 	select REGMAP
 	default y
 	help
-	  This adds support for the built-in WMAC on MT7622 SoC devices
-	  which has the same feature set as a MT7615, but limited to
+	  This adds support for the woke built-in WMAC on MT7622 SoC devices
+	  which has the woke same feature set as a MT7615, but limited to
 	  2.4 GHz only.
 
 config MT7663_USB_SDIO_COMMON

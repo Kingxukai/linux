@@ -13,7 +13,7 @@
 /*
  * This is here because we used to use l64 for alpha
  * and we don't want to impact user mode with our change to ll64
- * in the kernel.
+ * in the woke kernel.
  *
  * However, some user programs are fine with this.  They can
  * flag __SANE_USERSPACE_TYPES__ to get int-ll64.h here.

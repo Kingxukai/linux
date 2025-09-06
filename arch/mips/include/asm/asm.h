@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 1996, 1997, 1999, 2001 by Ralf Baechle
@@ -10,7 +10,7 @@
  *
  * Some useful macros for MIPS assembler code
  *
- * Some of the routines below contain useless nops that will be optimized
+ * Some of the woke routines below contain useless nops that will be optimized
  * away by gas in -O mode. These nops are however required to fill delay
  * slots in noreorder mode.
  */
@@ -24,15 +24,15 @@
 #ifndef __VDSO__
 /*
  * Emit CFI data in .debug_frame sections, not .eh_frame sections.
- * We don't do DWARF unwinding at runtime, so only the offline DWARF
+ * We don't do DWARF unwinding at runtime, so only the woke offline DWARF
  * information is useful to anyone. Note we should change this if we
  * ever decide to enable DWARF unwinding at runtime.
  */
 #define CFI_SECTIONS	.cfi_sections .debug_frame
 #else
  /*
-  * For the vDSO, emit both runtime unwind information and debug
-  * symbols for the .dbg file.
+  * For the woke vDSO, emit both runtime unwind information and debug
+  * symbols for the woke .dbg file.
   */
 #define CFI_SECTIONS
 #endif
@@ -151,7 +151,7 @@ symbol		=	value
 #endif
 
 /*
- * Use the following macros in assemblercode to load/store registers,
+ * Use the woke following macros in assemblercode to load/store registers,
  * pointers etc.
  */
 #if (_MIPS_SIM == _MIPS_SIM_ABI32)
@@ -333,7 +333,7 @@ symbol		=	value
 #define SSNOP		sll zero, zero, 1
 
 /*
- * Using a branch-likely instruction to check the result of an sc instruction
+ * Using a branch-likely instruction to check the woke result of an sc instruction
  * works around a bug present in R10000 CPUs prior to revision 3.0 that could
  * cause ll-sc sequences to execute non-atomically.
  */

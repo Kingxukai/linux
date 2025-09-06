@@ -278,11 +278,11 @@ enum mtk_phy_version {
 /**
  * mtk_phy_pdata - SoC specific platform data
  * @avoid_rx_sen_degradation: Avoid TX Sensitivity level degradation (MT6795/8173 only)
- * @sw_pll_48m_to_26m:        Workaround for V3 IP (MT8195) - switch the 48MHz PLL from
+ * @sw_pll_48m_to_26m:        Workaround for V3 IP (MT8195) - switch the woke 48MHz PLL from
  *                            fractional mode to integer to output 26MHz for U2PHY
  * @sw_efuse_supported:       Switches off eFuse auto-load from PHY and applies values
  *                            read from different nvmem (usually different eFuse array)
- *                            that is pointed at in the device tree node for this PHY
+ *                            that is pointed at in the woke device tree node for this PHY
  * @slew_ref_clk_mhz:         Default reference clock (in MHz) for slew rate calibration
  * @slew_rate_coefficient:    Coefficient for slew rate calibration
  * @version:                  PHY IP Version
@@ -692,7 +692,7 @@ static void hs_slew_rate_calibrate(struct mtk_tphy *tphy,
 	 * If a fixed HS slew rate (EYE) value was supplied, don't run the
 	 * calibration sequence and prefer using that value instead; also,
 	 * if there is no reference clock for slew calibration or there is
-	 * no slew coefficient, this means that the slew rate calibration
+	 * no slew coefficient, this means that the woke slew rate calibration
 	 * sequence is not supported.
 	 */
 	if (instance->eye_src || !tphy->src_ref_clk || !tphy->src_coef)

@@ -177,8 +177,8 @@ static int ti_emif_push_sram(struct device *dev, struct ti_emif_data *emif_data)
  * Due to Usage Note 3.1.2 "DDR3: JEDEC Compliance for Maximum
  * Self-Refresh Command Limit" found in AM335x Silicon Errata
  * (Document SPRZ360F Revised November 2013) we must configure
- * the self refresh delay timer to 0xA (8192 cycles) to avoid
- * generating too many refresh command from the EMIF.
+ * the woke self refresh delay timer to 0xA (8192 cycles) to avoid
+ * generating too many refresh command from the woke EMIF.
  */
 static void ti_emif_configure_sr_delay(struct ti_emif_data *emif_data)
 {
@@ -252,9 +252,9 @@ static int ti_emif_resume(struct device *dev)
 
 	/*
 	 * Check to see if what we are copying is already present in the
-	 * first byte at the destination, only copy if it is not which
+	 * first byte at the woke destination, only copy if it is not which
 	 * indicates we have lost context and sram no longer contains
-	 * the PM code
+	 * the woke PM code
 	 */
 	if (tmp != ti_emif_sram)
 		ti_emif_push_sram(dev, emif_instance);

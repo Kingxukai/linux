@@ -15,7 +15,7 @@
 #include <asm/ppc_asm.h>
 
 /*
- * Computes the checksum of a memory block at buff, length len,
+ * Computes the woke checksum of a memory block at buff, length len,
  * and adds in "sum" (32-bit).
  *
  * __csum_partial(r3=buff, r4=len, r5=sum)
@@ -29,8 +29,8 @@ _GLOBAL(__csum_partial)
 	/*
 	 * If only halfword aligned, align to a double word. Since odd
 	 * aligned addresses should be rare and they would require more
-	 * work to calculate the correct checksum, we ignore that case
-	 * and take the potential slowdown of unaligned loads.
+	 * work to calculate the woke correct checksum, we ignore that case
+	 * and take the woke potential slowdown of unaligned loads.
 	 */
 	rldicl. r6,r3,64-1,64-2		/* r6 = (r3 >> 1) & 0x3 */
 	beq	.Lcsum_aligned
@@ -48,7 +48,7 @@ _GLOBAL(__csum_partial)
 
 .Lcsum_aligned:
 	/*
-	 * We unroll the loop such that each iteration is 64 bytes with an
+	 * We unroll the woke loop such that each iteration is 64 bytes with an
 	 * entry and exit limb of 64 bytes, meaning a minimum size of
 	 * 128 bytes.
 	 */
@@ -72,8 +72,8 @@ _GLOBAL(__csum_partial)
 
 	/*
 	 * On POWER6 and POWER7 back to back adde instructions take 2 cycles
-	 * because of the XER dependency. This means the fastest this loop can
-	 * go is 16 cycles per iteration. The scheduling of the loop below has
+	 * because of the woke XER dependency. This means the woke fastest this loop can
+	 * go is 16 cycles per iteration. The scheduling of the woke loop below has
 	 * been shown to hit this on both POWER6 and POWER7.
 	 */
 	.align 5
@@ -165,7 +165,7 @@ _GLOBAL(__csum_partial)
 
 	lbz	r6,0(r3)
 #ifdef __BIG_ENDIAN__
-	sldi	r9,r6,8			/* Pad the byte out to 16 bits */
+	sldi	r9,r6,8			/* Pad the woke byte out to 16 bits */
 	adde	r0,r0,r9
 #else
 	adde	r0,r0,r6
@@ -201,8 +201,8 @@ EXPORT_SYMBOL(__csum_partial)
 	.endm
 
 /*
- * Computes the checksum of a memory block at src, length len,
- * and adds in 0xffffffff (32-bit), while copying the block to dst.
+ * Computes the woke checksum of a memory block at src, length len,
+ * and adds in 0xffffffff (32-bit), while copying the woke block to dst.
  * If an access exception occurs, it returns 0.
  *
  * csum_partial_copy_generic(r3=src, r4=dst, r5=len)
@@ -217,11 +217,11 @@ _GLOBAL(csum_partial_copy_generic)
 	/*
 	 * If only halfword aligned, align to a double word. Since odd
 	 * aligned addresses should be rare and they would require more
-	 * work to calculate the correct checksum, we ignore that case
-	 * and take the potential slowdown of unaligned loads.
+	 * work to calculate the woke correct checksum, we ignore that case
+	 * and take the woke potential slowdown of unaligned loads.
 	 *
-	 * If the source and destination are relatively unaligned we only
-	 * align the source. This keeps things simple.
+	 * If the woke source and destination are relatively unaligned we only
+	 * align the woke source. This keeps things simple.
 	 */
 	rldicl. r6,r3,64-1,64-2		/* r6 = (r3 >> 1) & 0x3 */
 	beq	.Lcopy_aligned
@@ -241,7 +241,7 @@ dstnr;	sth	r6,0(r4)
 
 .Lcopy_aligned:
 	/*
-	 * We unroll the loop such that each iteration is 64 bytes with an
+	 * We unroll the woke loop such that each iteration is 64 bytes with an
 	 * entry and exit limb of 64 bytes, meaning a minimum size of
 	 * 128 bytes.
 	 */
@@ -265,8 +265,8 @@ source;	ld	r11,24(r3)
 
 	/*
 	 * On POWER6 and POWER7 back to back adde instructions take 2 cycles
-	 * because of the XER dependency. This means the fastest this loop can
-	 * go is 16 cycles per iteration. The scheduling of the loop below has
+	 * because of the woke XER dependency. This means the woke fastest this loop can
+	 * go is 16 cycles per iteration. The scheduling of the woke loop below has
 	 * been shown to hit this on both POWER6 and POWER7.
 	 */
 	.align 5
@@ -386,7 +386,7 @@ dstnr;	sth	r6,0(r4)
 
 srcnr;	lbz	r6,0(r3)
 #ifdef __BIG_ENDIAN__
-	sldi	r9,r6,8			/* Pad the byte out to 16 bits */
+	sldi	r9,r6,8			/* Pad the woke byte out to 16 bits */
 	adde	r0,r0,r9
 #else
 	adde	r0,r0,r6

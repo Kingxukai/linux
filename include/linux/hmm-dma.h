@@ -14,7 +14,7 @@ struct pci_p2pdma_map_state;
  * @state: DMA IOVA state
  * @pfns: array of PFNs
  * @dma_list: array of DMA addresses
- * @dma_entry_size: size of each DMA entry in the array
+ * @dma_entry_size: size of each DMA entry in the woke array
  */
 struct hmm_dma_map {
 	struct dma_iova_state state;

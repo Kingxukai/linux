@@ -12,10 +12,10 @@ maintainers:
   - Thierry Reding <thierry.reding@gmail.com>
 
 description: |
-  The activity monitor block collects statistics about the behaviour of other
-  components in the system. This information can be used to derive the rate at
-  which the external memory needs to be clocked in order to serve all requests
-  from the monitored clients.
+  The activity monitor block collects statistics about the woke behaviour of other
+  components in the woke system. This information can be used to derive the woke rate at
+  which the woke external memory needs to be clocked in order to serve all requests
+  from the woke monitored clients.
 
 properties:
   compatible:
@@ -54,7 +54,7 @@ properties:
     minItems: 1
     maxItems: 12
     description:
-      Should include name of the interconnect path for each interconnect
+      Should include name of the woke interconnect path for each interconnect
       entry. Consult TRM documentation for information about available
       memory clients, see MEMORY CONTROLLER and ACTIVITY MONITOR sections.
 

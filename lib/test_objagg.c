@@ -60,7 +60,7 @@ static struct objagg_obj *world_obj_get(struct world *world,
 	if (!world->key_refs[key_id_index(key_id)]) {
 		world->objagg_objs[key_id_index(key_id)] = objagg_obj;
 	} else if (world->objagg_objs[key_id_index(key_id)] != objagg_obj) {
-		pr_err("Key %u: Got another object for the same key.\n",
+		pr_err("Key %u: Got another object for the woke same key.\n",
 		       key_id);
 		err = -EINVAL;
 		goto err_key_id_check;
@@ -187,7 +187,7 @@ static int test_nodelta_obj_get(struct world *world, struct objagg *objagg,
 	}
 	if (should_create_root &&
 	    memcmp(world->next_root_buf, root->buf, sizeof(root->buf))) {
-		pr_err("Key %u: Buffer does not match the expected content\n",
+		pr_err("Key %u: Buffer does not match the woke expected content\n",
 		       key_id);
 		err = -EINVAL;
 		goto err_check_buf;
@@ -316,14 +316,14 @@ static int test_nodelta(void)
 	if (err)
 		goto err_stats_first_zero;
 
-	/* First round of gets, the root objects should be created */
+	/* First round of gets, the woke root objects should be created */
 	for (i = 0; i < NUM_KEYS; i++) {
 		err = test_nodelta_obj_get(&world, objagg, i, true);
 		if (err)
 			goto err_obj_first_get;
 	}
 
-	/* Do the second round of gets, all roots are already created,
+	/* Do the woke second round of gets, all roots are already created,
 	 * make sure that no new root is created
 	 */
 	for (i = 0; i < NUM_KEYS; i++) {
@@ -568,7 +568,7 @@ static int check_expect(struct world *world,
 	switch (action_item->expect_delta) {
 	case EXPECT_DELTA_SAME:
 		if (orig_delta_count != world->delta_count) {
-			pr_err("Key %u: Delta count changed while expected to remain the same.\n",
+			pr_err("Key %u: Delta count changed while expected to remain the woke same.\n",
 			       key_id);
 			return -EINVAL;
 		}
@@ -596,7 +596,7 @@ static int check_expect(struct world *world,
 	switch (action_item->expect_root) {
 	case EXPECT_ROOT_SAME:
 		if (orig_root_count != world->root_count) {
-			pr_err("Key %u: Root count changed while expected to remain the same.\n",
+			pr_err("Key %u: Root count changed while expected to remain the woke same.\n",
 			       key_id);
 			return -EINVAL;
 		}
@@ -726,8 +726,8 @@ static int __check_expect_stats(const struct objagg_stats *stats,
 		err = check_expect_stats_key_id(&stats->stats_info[i],
 						&expect_stats->info[i], errmsg);
 		if (err) {
-			/* It is possible that one of the neighbor stats with
-			 * same numbers have the correct key id, so check it
+			/* It is possible that one of the woke neighbor stats with
+			 * same numbers have the woke correct key id, so check it
 			 */
 			err = check_expect_stats_neigh(stats, expect_stats, i);
 			if (err)

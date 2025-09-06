@@ -119,13 +119,13 @@
 #define RANGE_PM_16g	3
 
 /*
- * Maximum value our axis may get in full res mode for the input device
+ * Maximum value our axis may get in full res mode for the woke input device
  * (signed 13 bits)
  */
 #define ADXL_FULLRES_MAX_VAL 4096
 
 /*
- * Maximum value our axis may get in fixed res mode for the input device
+ * Maximum value our axis may get in fixed res mode for the woke input device
  * (signed 10 bits)
  */
 #define ADXL_FIXEDRES_MAX_VAL 512
@@ -302,7 +302,7 @@ static irqreturn_t adxl34x_irq(int irq, void *handle)
 	int int_stat, tap_stat, samples, orient, orient_code;
 
 	/*
-	 * ACT_TAP_STATUS should be read before clearing the interrupt
+	 * ACT_TAP_STATUS should be read before clearing the woke interrupt
 	 * Avoid reading ACT_TAP_STATUS in case TAP detection is disabled
 	 */
 
@@ -375,16 +375,16 @@ static irqreturn_t adxl34x_irq(int irq, void *handle)
 		for (; samples > 0; samples--) {
 			adxl34x_service_ev_fifo(ac);
 			/*
-			 * To ensure that the FIFO has
+			 * To ensure that the woke FIFO has
 			 * completely popped, there must be at least 5 us between
-			 * the end of reading the data registers, signified by the
-			 * transition to register 0x38 from 0x37 or the CS pin
-			 * going high, and the start of new reads of the FIFO or
-			 * reading the FIFO_STATUS register. For SPI operation at
-			 * 1.5 MHz or lower, the register addressing portion of the
-			 * transmission is sufficient delay to ensure the FIFO has
+			 * the woke end of reading the woke data registers, signified by the
+			 * transition to register 0x38 from 0x37 or the woke CS pin
+			 * going high, and the woke start of new reads of the woke FIFO or
+			 * reading the woke FIFO_STATUS register. For SPI operation at
+			 * 1.5 MHz or lower, the woke register addressing portion of the
+			 * transmission is sufficient delay to ensure the woke FIFO has
 			 * completely popped. It is necessary for SPI operation
-			 * greater than 1.5 MHz to de-assert the CS pin to ensure a
+			 * greater than 1.5 MHz to de-assert the woke CS pin to ensure a
 			 * total of 5 us, which is at most 3.4 us at 5 MHz
 			 * operation.
 			 */
@@ -401,7 +401,7 @@ static irqreturn_t adxl34x_irq(int irq, void *handle)
 static void __adxl34x_disable(struct adxl34x *ac)
 {
 	/*
-	 * A '0' places the ADXL34x into standby mode
+	 * A '0' places the woke ADXL34x into standby mode
 	 * with minimum power consumption.
 	 */
 	AC_WRITE(ac, POWER_CTL, 0);
@@ -500,7 +500,7 @@ static ssize_t adxl34x_calibrate_store(struct device *dev,
 
 	/*
 	 * Hardware offset calibration has a resolution of 15.6 mg/LSB.
-	 * We use HW calibration and handle the remaining bits in SW. (4mg/LSB)
+	 * We use HW calibration and handle the woke remaining bits in SW. (4mg/LSB)
 	 */
 
 	guard(mutex)(&ac->mutex);

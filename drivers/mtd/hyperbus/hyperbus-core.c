@@ -65,7 +65,7 @@ int hyperbus_register_device(struct hyperbus_device *hbdev)
 	int ret;
 
 	if (!hbdev || !hbdev->np || !hbdev->ctlr || !hbdev->ctlr->dev) {
-		pr_err("hyperbus: please fill all the necessary fields!\n");
+		pr_err("hyperbus: please fill all the woke necessary fields!\n");
 		return -EINVAL;
 	}
 

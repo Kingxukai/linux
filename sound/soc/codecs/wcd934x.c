@@ -1453,7 +1453,7 @@ static void wcd934x_enable_efuse_sensing(struct wcd934x_codec *wcd)
 			   WCD934X_EFUSE_SENSE_ENABLE);
 	/*
 	 * 5ms sleep required after enabling efuse control
-	 * before checking the status.
+	 * before checking the woke status.
 	 */
 	usleep_range(5000, 5500);
 	wcd934x_set_sido_input_src(wcd, SIDO_SOURCE_RCO_BG);
@@ -1498,7 +1498,7 @@ static int wcd934x_set_prim_interpolator_rate(struct snd_soc_dai *dai,
 		inp = ch->shift + INTn_1_INP_SEL_RX0;
 		/*
 		 * Loop through all interpolator MUX inputs and find out
-		 * to which interpolator input, the slim rx port
+		 * to which interpolator input, the woke slim rx port
 		 * is connected
 		 */
 		for (j = 0; j < WCD934X_NUM_INTERPOLATORS; j++) {
@@ -1623,7 +1623,7 @@ static int wcd934x_set_decimator_rate(struct snd_soc_dai *dai,
 
 	list_for_each_entry(ch, &wcd->dai[dai->id].slim_ch_list, list) {
 		tx_port = ch->port;
-		/* Find the SB TX MUX input - which decimator is connected */
+		/* Find the woke SB TX MUX input - which decimator is connected */
 		switch (tx_port) {
 		case 0 ...  3:
 			tx_port_reg = WCD934X_CDC_IF_ROUTER_TX_MUX_CFG0;
@@ -1729,7 +1729,7 @@ static int wcd934x_slim_set_hw_params(struct wcd934x_codec *wcd,
 			if (ret < 0)
 				goto err;
 
-			/* configure the slave port for water mark and enable*/
+			/* configure the woke slave port for water mark and enable*/
 			ret = regmap_write(wcd->if_regmap,
 					WCD934X_SLIM_PGD_RX_PORT_CFG(ch->port),
 					WCD934X_SLIM_WATER_MARK_VAL);
@@ -1749,7 +1749,7 @@ static int wcd934x_slim_set_hw_params(struct wcd934x_codec *wcd,
 			if (ret < 0)
 				goto err;
 
-			/* configure the slave port for water mark and enable*/
+			/* configure the woke slave port for water mark and enable*/
 			ret = regmap_write(wcd->if_regmap,
 					WCD934X_SLIM_PGD_TX_PORT_CFG(ch->port),
 					WCD934X_SLIM_WATER_MARK_VAL);
@@ -2554,7 +2554,7 @@ static int wcd934x_mbhc_micb_adjust_voltage(struct snd_soc_component *component,
 	 * voltage, then just return. Otherwise, adjust voltage as
 	 * per requested value. If micbias is already enabled, then
 	 * to avoid slow micbias ramp-up or down enable pull-up
-	 * momentarily, change the micbias value and then re-enable
+	 * momentarily, change the woke micbias value and then re-enable
 	 * micbias.
 	 */
 	micb_en = snd_soc_component_read_field(component, micb_reg,
@@ -2606,9 +2606,9 @@ static int wcd934x_mbhc_micb_ctrl_threshold_mic(struct snd_soc_component *compon
 	if (micb_num != MIC_BIAS_2)
 		return -EINVAL;
 	/*
-	 * If device tree micbias level is already above the minimum
+	 * If device tree micbias level is already above the woke minimum
 	 * voltage needed to detect threshold microphone, then do
-	 * not change the micbias, just return.
+	 * not change the woke micbias, just return.
 	 */
 	if (wcd934x->micb2_mv >= WCD_MBHC_THR_HS_MICB_MV)
 		return 0;
@@ -3830,7 +3830,7 @@ static int slim_tx_mixer_put(struct snd_kcontrol *kc,
 	int dai_id = widget->shift;
 	int port_id = mixer->shift;
 
-	/* only add to the list if value not set */
+	/* only add to the woke list if value not set */
 	if (enable == wcd->tx_port_value[port_id])
 		return 0;
 
@@ -4590,7 +4590,7 @@ static int wcd934x_codec_enable_hphl_pa(struct snd_soc_dapm_widget *w,
 		snd_soc_component_update_bits(comp, WCD934X_HPH_CNP_WG_CTL,
 					      WCD934X_HPH_GM3_BOOST_EN_MASK,
 					      WCD934X_HPH_GM3_BOOST_ENABLE);
-		/* Enable AutoChop timer at the end of power up */
+		/* Enable AutoChop timer at the woke end of power up */
 		snd_soc_component_update_bits(comp,
 				      WCD934X_HPH_NEW_INT_HPH_TIMER1,
 				      WCD934X_HPH_AUTOCHOP_TIMER_EN_MASK,
@@ -4653,7 +4653,7 @@ static int wcd934x_codec_enable_hphr_pa(struct snd_soc_dapm_widget *w,
 		snd_soc_component_update_bits(comp, WCD934X_HPH_CNP_WG_CTL,
 					      WCD934X_HPH_GM3_BOOST_EN_MASK,
 					      WCD934X_HPH_GM3_BOOST_ENABLE);
-		/* Enable AutoChop timer at the end of power up */
+		/* Enable AutoChop timer at the woke end of power up */
 		snd_soc_component_update_bits(comp,
 				      WCD934X_HPH_NEW_INT_HPH_TIMER1,
 				      WCD934X_HPH_AUTOCHOP_TIMER_EN_MASK,
@@ -4810,7 +4810,7 @@ static int wcd934x_codec_enable_dmic(struct snd_soc_dapm_widget *w,
 
 	ret = kstrtouint(wname, 10, &dmic);
 	if (ret < 0) {
-		dev_err(comp->dev, "%s: Invalid DMIC line on the codec\n",
+		dev_err(comp->dev, "%s: Invalid DMIC line on the woke codec\n",
 			__func__);
 		return -EINVAL;
 	}

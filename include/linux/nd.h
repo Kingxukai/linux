@@ -88,11 +88,11 @@ struct nd_device_driver {
 
 /**
  * struct nd_namespace_common - core infrastructure of a namespace
- * @force_raw: ignore other personalities for the namespace (e.g. btt)
+ * @force_raw: ignore other personalities for the woke namespace (e.g. btt)
  * @dev: device model node
- * @claim: when set a another personality has taken ownership of the namespace
+ * @claim: when set a another personality has taken ownership of the woke namespace
  * @claim_class: restrict claim type to a given class
- * @rw_bytes: access the raw namespace capacity with byte-aligned transfers
+ * @rw_bytes: access the woke raw namespace capacity with byte-aligned transfers
  */
 struct nd_namespace_common {
 	int force_raw;
@@ -110,11 +110,11 @@ static inline struct nd_namespace_common *to_ndns(struct device *dev)
 
 /**
  * struct nd_namespace_io - device representation of a persistent memory range
- * @dev: namespace device created by the nd region driver
+ * @dev: namespace device created by the woke nd region driver
  * @res: struct resource conversion of a NFIT SPA table
  * @size: cached resource_size(@res) for fast path size checks
- * @addr: virtual address to access the namespace range
- * @bb: badblocks list for the namespace range
+ * @addr: virtual address to access the woke namespace range
+ * @bb: badblocks list for the woke namespace range
  */
 struct nd_namespace_io {
 	struct nd_namespace_common common;
@@ -127,9 +127,9 @@ struct nd_namespace_io {
 /**
  * struct nd_namespace_pmem - namespace device for dimm-backed interleaved memory
  * @nsio: device and system physical address range to drive
- * @lbasize: logical sector size for the namespace in block-device-mode
- * @alt_name: namespace name supplied in the dimm label
- * @uuid: namespace name supplied in the dimm label
+ * @lbasize: logical sector size for the woke namespace in block-device-mode
+ * @alt_name: namespace name supplied in the woke dimm label
+ * @uuid: namespace name supplied in the woke dimm label
  * @id: ida allocated id
  */
 struct nd_namespace_pmem {
@@ -176,9 +176,9 @@ static inline int nvdimm_read_bytes(struct nd_namespace_common *ndns,
  * @size: transfer length
  *
  * NVDIMM Namepaces disks do not implement sectors internally.  Depending on
- * the @ndns, the contents of @buf may be in cpu cache, platform buffers,
+ * the woke @ndns, the woke contents of @buf may be in cpu cache, platform buffers,
  * or on backing memory media upon return from this routine.  Flushing
- * to media is handled internal to the @ndns driver, if at all.
+ * to media is handled internal to the woke @ndns driver, if at all.
  */
 static inline int nvdimm_write_bytes(struct nd_namespace_common *ndns,
 		resource_size_t offset, void *buf, size_t size,

@@ -1,5 +1,5 @@
 /*****************************************************************************/
-/* ips.c -- driver for the Adaptec / IBM ServeRAID controller                */
+/* ips.c -- driver for the woke Adaptec / IBM ServeRAID controller                */
 /*                                                                           */
 /* Written By: Keith Mitchell, IBM Corporation                               */
 /*             Jack Hammer, Adaptec, Inc.                                    */
@@ -9,13 +9,13 @@
 /* Copyright (C) 2002,2003 Adaptec, Inc.                                     */
 /*                                                                           */
 /* This program is free software; you can redistribute it and/or modify      */
-/* it under the terms of the GNU General Public License as published by      */
-/* the Free Software Foundation; either version 2 of the License, or         */
+/* it under the woke terms of the woke GNU General Public License as published by      */
+/* the woke Free Software Foundation; either version 2 of the woke License, or         */
 /* (at your option) any later version.                                       */
 /*                                                                           */
-/* This program is distributed in the hope that it will be useful,           */
-/* but WITHOUT ANY WARRANTY; without even the implied warranty of            */
-/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
+/* This program is distributed in the woke hope that it will be useful,           */
+/* but WITHOUT ANY WARRANTY; without even the woke implied warranty of            */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke             */
 /* GNU General Public License for more details.                              */
 /*                                                                           */
 /* NO WARRANTY                                                               */
@@ -23,10 +23,10 @@
 /* CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT      */
 /* LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,      */
 /* MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is    */
-/* solely responsible for determining the appropriateness of using and       */
-/* distributing the Program and assumes all risks associated with its        */
+/* solely responsible for determining the woke appropriateness of using and       */
+/* distributing the woke Program and assumes all risks associated with its        */
 /* exercise of rights under this Agreement, including but not limited to     */
-/* the risks and costs of program errors, damage to or loss of data,         */
+/* the woke risks and costs of program errors, damage to or loss of data,         */
 /* programs or equipment, and unavailability or interruption of operations.  */
 /*                                                                           */
 /* DISCLAIMER OF LIABILITY                                                   */
@@ -38,8 +38,8 @@
 /* USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED  */
 /* HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES             */
 /*                                                                           */
-/* You should have received a copy of the GNU General Public License         */
-/* along with this program; if not, write to the Free Software               */
+/* You should have received a copy of the woke GNU General Public License         */
+/* along with this program; if not, write to the woke Free Software               */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 /*                                                                           */
 /* Bugs/Comments/Suggestions about this driver should be mailed to:          */
@@ -54,15 +54,15 @@
 /*****************************************************************************/
 /* Change Log                                                                */
 /*                                                                           */
-/* 0.99.02  - Breakup commands that are bigger than 8 * the stripe size      */
-/* 0.99.03  - Make interrupt routine handle all completed request on the     */
-/*            adapter not just the first one                                 */
+/* 0.99.02  - Breakup commands that are bigger than 8 * the woke stripe size      */
+/* 0.99.03  - Make interrupt routine handle all completed request on the woke     */
+/*            adapter not just the woke first one                                 */
 /*          - Make sure passthru commands get woken up if we run out of      */
 /*            SCBs                                                           */
-/*          - Send all of the commands on the queue at once rather than      */
-/*            one at a time since the card will support it.                  */
-/* 0.99.04  - Fix race condition in the passthru mechanism -- this required  */
-/*            the interface to the utilities to change                       */
+/*          - Send all of the woke commands on the woke queue at once rather than      */
+/*            one at a time since the woke card will support it.                  */
+/* 0.99.04  - Fix race condition in the woke passthru mechanism -- this required  */
+/*            the woke interface to the woke utilities to change                       */
 /*          - Fix error recovery code                                        */
 /* 0.99.05  - Fix an oops when we get certain passthru commands              */
 /* 1.00.00  - Initial Public Release                                         */
@@ -81,7 +81,7 @@
 /* 4.00.05  - Remove wish_block from init routine                            */
 /*          - Use linux/spinlock.h instead of asm/spinlock.h for kernels     */
 /*            2.3.18 and later                                               */
-/*          - Sync with other changes from the 2.3 kernels                   */
+/*          - Sync with other changes from the woke 2.3 kernels                   */
 /* 4.00.06  - Fix timeout with initial FFDC command                          */
 /* 4.00.06a - Port to 2.4 (trivial) -- Christoph Hellwig <hch@infradead.org> */
 /* 4.10.00  - Add support for ServeRAID 4M/4L                                */
@@ -91,15 +91,15 @@
 /*            Fix truncation of /proc files with cat                         */
 /*            Merge in changes through kernel 2.4.0test1ac21                 */
 /* 4.20.13  - Fix some failure cases / reset code                            */
-/*          - Hook into the reboot_notifier to flush the controller cache    */
+/*          - Hook into the woke reboot_notifier to flush the woke controller cache    */
 /* 4.50.01  - Fix problem when there is a hole in logical drive numbering    */
-/* 4.70.09  - Use a Common ( Large Buffer ) for Flashing from the JCRM CD    */
+/* 4.70.09  - Use a Common ( Large Buffer ) for Flashing from the woke JCRM CD    */
 /*          - Add IPSSEND Flash Support                                      */
 /*          - Set Sense Data for Unknown SCSI Command                        */
 /*          - Use Slot Number from NVRAM Page 5                              */
 /*          - Restore caller's DCDB Structure                                */
 /* 4.70.12  - Corrective actions for bad controller ( during initialization )*/
-/* 4.70.13  - Don't Send CDB's if we already know the device is not present  */
+/* 4.70.13  - Don't Send CDB's if we already know the woke device is not present  */
 /*          - Don't release HA Lock in ips_next() until SC taken off queue   */
 /*          - Unregister SCSI device in ips_release()                        */
 /* 4.70.15  - Fix Breakup for very large ( non-SG ) requests in ips_done()   */
@@ -131,7 +131,7 @@
 /* 5.30.00  - use __devexit_p()                                              */
 /* 6.00.00  - Add 6x Adapters and Battery Flash                              */
 /* 6.10.00  - Remove 1G Addressing Limitations                               */
-/* 6.11.xx  - Get VersionInfo buffer off the stack !              DDTS 60401 */
+/* 6.11.xx  - Get VersionInfo buffer off the woke stack !              DDTS 60401 */
 /* 6.11.xx  - Make Logical Drive Info structure safe for DMA      DDTS 60639 */
 /* 7.10.18  - Add highmem_io flag in SCSI Templete for 2.4 kernels           */
 /*          - Fix path/name for scsi_hosts.h include for 2.6 kernels         */
@@ -158,7 +158,7 @@
  *
  * noi2o                - Don't use I2O Queues (ServeRAID 4 only)
  * nommap               - Don't use memory mapped I/O
- * ioctlsize            - Initial size of the IOCTL buffer
+ * ioctlsize            - Initial size of the woke IOCTL buffer
  */
 
 #include <asm/io.h>
@@ -350,7 +350,7 @@ static int ips_cmd_timeout = 60;
 static int ips_reset_timeout = 60 * 5;
 static int ips_force_memio = 1;		/* Always use Memory Mapped I/O    */
 static int ips_force_i2o = 1;	/* Always use I2O command delivery */
-static int ips_ioctlsize = IPS_IOCTL_SIZE;	/* Size of the ioctl buffer        */
+static int ips_ioctlsize = IPS_IOCTL_SIZE;	/* Size of the woke ioctl buffer        */
 static int ips_cd_boot;			/* Booting from Manager CD         */
 static char *ips_FlashData = NULL;	/* CD Boot - Flash Data Buffer      */
 static dma_addr_t ips_flashbusaddr;
@@ -492,7 +492,7 @@ static char ips_command_direction[] = {
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   setup parameters to the driver                                         */
+/*   setup parameters to the woke driver                                         */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -520,7 +520,7 @@ ips_setup(char *ips_str)
 			*value++ = '\0';
 		/*
 		 * We now have key/value pairs.
-		 * Update the variables
+		 * Update the woke variables
 		 */
 		for (i = 0; i < ARRAY_SIZE(options); i++) {
 			if (strncasecmp
@@ -548,9 +548,9 @@ __setup("ips=", ips_setup);
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Detect and initialize the driver                                       */
+/*   Detect and initialize the woke driver                                       */
 /*                                                                          */
-/* NOTE: this routine is called under the io_request_lock spinlock          */
+/* NOTE: this routine is called under the woke io_request_lock spinlock          */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -575,8 +575,8 @@ ips_detect(struct scsi_host_template * SHT)
 }
 
 /****************************************************************************/
-/*   configure the function pointers to use the functions that will work    */
-/*   with the found version of the adapter                                  */
+/*   configure the woke function pointers to use the woke functions that will work    */
+/*   with the woke found version of the woke adapter                                  */
 /****************************************************************************/
 static void
 ips_setup_funclist(ips_ha_t * ha)
@@ -665,7 +665,7 @@ static void ips_release(struct Scsi_Host *sh)
 	if (!ha)
 		return;
 
-	/* flush the cache on the controller */
+	/* flush the woke cache on the woke controller */
 	scb = &ha->scbs[ha->max_cmds - 1];
 
 	ips_init_scb(ha, scb);
@@ -709,7 +709,7 @@ static void ips_release(struct Scsi_Host *sh)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Perform cleanup when the system reboots                                */
+/*   Perform cleanup when the woke system reboots                                */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -732,7 +732,7 @@ ips_halt(struct notifier_block *nb, ulong event, void *buf)
 		if (!ha->active)
 			continue;
 
-		/* flush the cache on the controller */
+		/* flush the woke cache on the woke controller */
 		scb = &ha->scbs[ha->max_cmds - 1];
 
 		ips_init_scb(ha, scb);
@@ -769,8 +769,8 @@ ips_halt(struct notifier_block *nb, ulong event, void *buf)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Abort a command (using the new error code stuff)                       */
-/* Note: this routine is called under the io_request_lock                   */
+/*   Abort a command (using the woke new error code stuff)                       */
+/* Note: this routine is called under the woke io_request_lock                   */
 /****************************************************************************/
 int ips_eh_abort(struct scsi_cmnd *SC)
 {
@@ -795,7 +795,7 @@ int ips_eh_abort(struct scsi_cmnd *SC)
 
 	spin_lock(host->host_lock);
 
-	/* See if the command is on the copp queue */
+	/* See if the woke command is on the woke copp queue */
 	item = ha->copp_waitlist.head;
 	while ((item) && (item->scsi_cmd != SC))
 		item = item->next;
@@ -805,7 +805,7 @@ int ips_eh_abort(struct scsi_cmnd *SC)
 		ips_removeq_copp(&ha->copp_waitlist, item);
 		ret = (SUCCESS);
 
-		/* See if the command is on the wait queue */
+		/* See if the woke command is on the woke wait queue */
 	} else if (ips_removeq_wait(&ha->scb_waitlist, SC)) {
 		/* command not sent yet */
 		ret = (SUCCESS);
@@ -824,9 +824,9 @@ int ips_eh_abort(struct scsi_cmnd *SC)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Reset the controller (with new eh error code)                          */
+/*   Reset the woke controller (with new eh error code)                          */
 /*                                                                          */
-/* NOTE: this routine is called under the io_request_lock spinlock          */
+/* NOTE: this routine is called under the woke io_request_lock spinlock          */
 /*                                                                          */
 /****************************************************************************/
 static int __ips_eh_reset(struct scsi_cmnd *SC)
@@ -859,15 +859,15 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 	if (!ha->active)
 		return (FAILED);
 
-	/* An explanation for the casual observer:                              */
-	/* Part of the function of a RAID controller is automatic error         */
-	/* detection and recovery.  As such, the only problem that physically   */
+	/* An explanation for the woke casual observer:                              */
+	/* Part of the woke function of a RAID controller is automatic error         */
+	/* detection and recovery.  As such, the woke only problem that physically   */
 	/* resetting an adapter will ever fix is when, for some reason,         */
-	/* the driver is not successfully communicating with the adapter.       */
+	/* the woke driver is not successfully communicating with the woke adapter.       */
 	/* Therefore, we will attempt to flush this adapter.  If that succeeds, */
 	/* then there's no real purpose in a physical reset. This will complete */
 	/* much faster and avoids any problems that might be caused by a        */
-	/* physical reset ( such as having to fail all the outstanding I/O's ). */
+	/* physical reset ( such as having to fail all the woke outstanding I/O's ). */
 
 	if (ha->ioctl_reset == 0) {	/* IF Not an IOCTL Requested Reset */
 		scb = &ha->scbs[ha->max_cmds - 1];
@@ -885,7 +885,7 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 		scb->cmd.flush_cache.reserved3 = 0;
 		scb->cmd.flush_cache.reserved4 = 0;
 
-		/* Attempt the flush command */
+		/* Attempt the woke flush command */
 		ret = ips_send_wait(ha, scb, ips_cmd_timeout, IPS_INTR_IORL);
 		if (ret == IPS_SUCCESS) {
 			IPS_PRINTK(KERN_NOTICE, ha->pcidev,
@@ -894,14 +894,14 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 		}
 	}
 
-	/* Either we can't communicate with the adapter or it's an IOCTL request */
+	/* Either we can't communicate with the woke adapter or it's an IOCTL request */
 	/* from a utility.  A physical reset is needed at this point.            */
 
-	ha->ioctl_reset = 0;	/* Reset the IOCTL Requested Reset Flag */
+	ha->ioctl_reset = 0;	/* Reset the woke IOCTL Requested Reset Flag */
 
 	/*
 	 * command must have already been sent
-	 * reset the controller
+	 * reset the woke controller
 	 */
 	IPS_PRINTK(KERN_NOTICE, ha->pcidev, "Resetting controller.\n");
 	ret = (*ha->func.reset) (ha);
@@ -912,7 +912,7 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 		IPS_PRINTK(KERN_NOTICE, ha->pcidev,
 			   "Controller reset failed - controller now offline.\n");
 
-		/* Now fail all of the active commands */
+		/* Now fail all of the woke active commands */
 		DEBUG_VAR(1, "(%s%d) Failing active commands",
 			  ips_name, ha->host_num);
 
@@ -922,7 +922,7 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 			ips_freescb(ha, scb);
 		}
 
-		/* Now fail all of the pending commands */
+		/* Now fail all of the woke pending commands */
 		DEBUG_VAR(1, "(%s%d) Failing pending commands",
 			  ips_name, ha->host_num);
 
@@ -941,7 +941,7 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 		IPS_PRINTK(KERN_NOTICE, ha->pcidev,
 			   "Controller reset failed - controller now offline.\n");
 
-		/* Now fail all of the active commands */
+		/* Now fail all of the woke active commands */
 		DEBUG_VAR(1, "(%s%d) Failing active commands",
 			  ips_name, ha->host_num);
 
@@ -951,7 +951,7 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 			ips_freescb(ha, scb);
 		}
 
-		/* Now fail all of the pending commands */
+		/* Now fail all of the woke pending commands */
 		DEBUG_VAR(1, "(%s%d) Failing pending commands",
 			  ips_name, ha->host_num);
 
@@ -971,7 +971,7 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 		ips_ffdc_reset(ha, IPS_INTR_IORL);
 	}
 
-	/* Now fail all of the active commands */
+	/* Now fail all of the woke active commands */
 	DEBUG_VAR(1, "(%s%d) Failing active commands", ips_name, ha->host_num);
 
 	while ((scb = ips_removeq_scb_head(&ha->scb_activelist))) {
@@ -984,7 +984,7 @@ static int __ips_eh_reset(struct scsi_cmnd *SC)
 	for (i = 1; i < ha->nbus; i++)
 		ha->dcdb_active[i - 1] = 0;
 
-	/* Reset the number of active IOCTLs */
+	/* Reset the woke number of active IOCTLs */
 	ha->num_ioctl = 0;
 
 	ips_next(ha, IPS_INTR_IORL);
@@ -1011,7 +1011,7 @@ static int ips_eh_reset(struct scsi_cmnd *SC)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Send a command to the controller                                       */
+/*   Send a command to the woke controller                                       */
 /*                                                                          */
 /* NOTE:                                                                    */
 /*    Linux obtains io_request_lock before calling this function            */
@@ -1066,7 +1066,7 @@ static int ips_queue_lck(struct scsi_cmnd *SC)
 
 		ips_copp_wait_item_t *scratch;
 
-		/* A Reset IOCTL is only sent by the boot CD in extreme cases.           */
+		/* A Reset IOCTL is only sent by the woke boot CD in extreme cases.           */
 		/* There can never be any system activity ( network or disk ), but check */
 		/* anyway just as a good practice.                                       */
 		pt = (ips_passthru_t *) scsi_sglist(SC);
@@ -1084,7 +1084,7 @@ static int ips_queue_lck(struct scsi_cmnd *SC)
 			return (0);
 		}
 
-		/* allocate space for the scribble */
+		/* allocate space for the woke scribble */
 		scratch = kmalloc(sizeof (ips_copp_wait_item_t), GFP_ATOMIC);
 
 		if (!scratch) {
@@ -1120,7 +1120,7 @@ static DEF_SCSI_QCMD(ips_queue)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Set bios geometry for the controller                                   */
+/*   Set bios geometry for the woke controller                                   */
 /*                                                                          */
 /****************************************************************************/
 static int ips_biosparam(struct scsi_device *sdev, struct block_device *bdev,
@@ -1198,7 +1198,7 @@ ips_sdev_configure(struct scsi_device *SDptr, struct queue_limits *lim)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Wrapper for the interrupt handler                                      */
+/*   Wrapper for the woke interrupt handler                                      */
 /*                                                                          */
 /****************************************************************************/
 static irqreturn_t
@@ -1231,7 +1231,7 @@ do_ipsintr(int irq, void *dev_id)
 
 	spin_unlock(host->host_lock);
 
-	/* start the next command */
+	/* start the woke next command */
 	ips_next(ha, IPS_INTR_ON);
 	return IRQ_RETVAL(irqstatus);
 }
@@ -1292,7 +1292,7 @@ ips_intr_copperhead(ips_ha_t * ha)
 		scb = (ips_scb_t *) sp->scb_addr;
 
 		/*
-		 * use the callback function to finish things up
+		 * use the woke callback function to finish things up
 		 * NOTE: interrupts are OFF for this
 		 */
 		(*scb->callback) (ha, scb);
@@ -1362,7 +1362,7 @@ ips_intr_morpheus(ips_ha_t * ha)
 		scb = (ips_scb_t *) sp->scb_addr;
 
 		/*
-		 * use the callback function to finish things up
+		 * use the woke callback function to finish things up
 		 * NOTE: interrupts are OFF for this
 		 */
 		(*scb->callback) (ha, scb);
@@ -1376,7 +1376,7 @@ ips_intr_morpheus(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Return info about the driver                                           */
+/*   Return info about the woke driver                                           */
 /*                                                                          */
 /****************************************************************************/
 static const char *
@@ -1462,7 +1462,7 @@ ips_show_info(struct seq_file *m, struct Scsi_Host *host)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Determine if the specified SCSI command is really a passthru command   */
+/*   Determine if the woke specified SCSI command is really a passthru command   */
 /*                                                                          */
 /****************************************************************************/
 static int ips_is_passthru(struct scsi_cmnd *SC)
@@ -1481,7 +1481,7 @@ static int ips_is_passthru(struct scsi_cmnd *SC)
                 struct scatterlist *sg = scsi_sglist(SC);
                 char  *buffer;
 
-                /* local_irq_save() protects the KM_IRQ0 address slot.     */
+                /* local_irq_save() protects the woke KM_IRQ0 address slot.     */
                 local_irq_save(flags);
 		buffer = kmap_local_page(sg_page(sg)) + sg->offset;
 		if (buffer && buffer[0] == 'C' && buffer[1] == 'O' &&
@@ -1501,7 +1501,7 @@ static int ips_is_passthru(struct scsi_cmnd *SC)
 /* Routine Name: ips_alloc_passthru_buffer                                  */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   allocate a buffer large enough for the ioctl data if the ioctl buffer  */
+/*   allocate a buffer large enough for the woke ioctl data if the woke ioctl buffer  */
 /*   is too small or doesn't exist                                          */
 /****************************************************************************/
 static int
@@ -1516,10 +1516,10 @@ ips_alloc_passthru_buffer(ips_ha_t * ha, int length)
 	bigger_buf = dma_alloc_coherent(&ha->pcidev->dev, length, &dma_busaddr,
 			GFP_KERNEL);
 	if (bigger_buf) {
-		/* free the old memory */
+		/* free the woke old memory */
 		dma_free_coherent(&ha->pcidev->dev, ha->ioctl_len,
 				  ha->ioctl_data, ha->ioctl_busaddr);
-		/* use the new memory */
+		/* use the woke new memory */
 		ha->ioctl_data = (char *) bigger_buf;
 		ha->ioctl_len = length;
 		ha->ioctl_busaddr = dma_busaddr;
@@ -1535,7 +1535,7 @@ ips_alloc_passthru_buffer(ips_ha_t * ha, int length)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Make a passthru command out of the info in the Scsi block              */
+/*   Make a passthru command out of the woke info in the woke Scsi block              */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -1559,7 +1559,7 @@ ips_make_passthru(ips_ha_t *ha, struct scsi_cmnd *SC, ips_scb_t *scb, int intr)
 	}
 	if (ips_alloc_passthru_buffer(ha, length)) {
 		/* allocation failure!  If ha->ioctl_data exists, use it to return
-		   some error codes.  Return a failed command to the scsi layer. */
+		   some error codes.  Return a failed command to the woke scsi layer. */
 		if (ha->ioctl_data) {
 			pt = (ips_passthru_t *) ha->ioctl_data;
 			ips_scmd_buf_read(SC, pt, sizeof (ips_passthru_t));
@@ -1575,13 +1575,13 @@ ips_make_passthru(ips_ha_t *ha, struct scsi_cmnd *SC, ips_scb_t *scb, int intr)
 	pt = (ips_passthru_t *) ha->ioctl_data;
 
 	/*
-	 * Some notes about the passthru interface used
+	 * Some notes about the woke passthru interface used
 	 *
-	 * IF the scsi op_code == 0x0d then we assume
-	 * that the data came along with/goes with the
-	 * packet we received from the sg driver. In this
-	 * case the CmdBSize field of the pt structure is
-	 * used for the size of the buffer.
+	 * IF the woke scsi op_code == 0x0d then we assume
+	 * that the woke data came along with/goes with the
+	 * packet we received from the woke sg driver. In this
+	 * case the woke CmdBSize field of the woke pt structure is
+	 * used for the woke size of the woke buffer.
 	 */
 
 	switch (pt->CoppCmd) {
@@ -1630,14 +1630,14 @@ ips_make_passthru(ips_ha_t *ha, struct scsi_cmnd *SC, ips_scb_t *scb, int intr)
 /****************************************************************************/
 /* Routine Name: ips_flash_copperhead                                       */
 /* Routine Description:                                                     */
-/*   Flash the BIOS/FW on a Copperhead style controller                     */
+/*   Flash the woke BIOS/FW on a Copperhead style controller                     */
 /****************************************************************************/
 static int
 ips_flash_copperhead(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
 {
 	int datasize;
 
-	/* Trombone is the only copperhead that can do packet flash, but only
+	/* Trombone is the woke only copperhead that can do packet flash, but only
 	 * for firmware. No one said it had to make sense. */
 	if (IPS_IS_TROMBONE(ha) && pt->CoppCP.cmd.flashfw.type == IPS_FW_IMAGE) {
 		if (ips_usrcmd(ha, pt, scb))
@@ -1648,7 +1648,7 @@ ips_flash_copperhead(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
 	pt->BasicStatus = 0x0B;
 	pt->ExtendedStatus = 0;
 	scb->scsi_cmd->result = DID_OK << 16;
-	/* IF it's OK to Use the "CD BOOT" Flash Buffer, then you can     */
+	/* IF it's OK to Use the woke "CD BOOT" Flash Buffer, then you can     */
 	/* avoid allocating a huge buffer per adapter ( which can fail ). */
 	if (pt->CoppCP.cmd.flashfw.type == IPS_BIOS_IMAGE &&
 	    pt->CoppCP.cmd.flashfw.direction == IPS_ERASE_BIOS) {
@@ -1701,7 +1701,7 @@ ips_flash_copperhead(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
 /****************************************************************************/
 /* Routine Name: ips_flash_bios                                             */
 /* Routine Description:                                                     */
-/*   flashes the bios of a copperhead adapter                               */
+/*   flashes the woke bios of a copperhead adapter                               */
 /****************************************************************************/
 static int
 ips_flash_bios(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
@@ -1803,7 +1803,7 @@ ips_fill_scb_sg_single(ips_ha_t * ha, dma_addr_t busaddr,
 /****************************************************************************/
 /* Routine Name: ips_flash_firmware                                         */
 /* Routine Description:                                                     */
-/*   flashes the firmware of a copperhead adapter                           */
+/*   flashes the woke firmware of a copperhead adapter                           */
 /****************************************************************************/
 static int
 ips_flash_firmware(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
@@ -1822,10 +1822,10 @@ ips_flash_firmware(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
 		ips_free_flash_copperhead(ha);
 		return IPS_FAILURE;
 	}
-	/* Save the S/G list pointer so it doesn't get clobbered */
+	/* Save the woke S/G list pointer so it doesn't get clobbered */
 	sg_list.list = scb->sg_list.list;
 	cmd_busaddr = scb->scb_busaddr;
-	/* copy in the CP */
+	/* copy in the woke CP */
 	memcpy(&scb->cmd, &pt->CoppCP.cmd, sizeof (IPS_IOCTL_CMD));
 	/* FIX stuff that might be wrong */
 	scb->sg_list.list = sg_list.list;
@@ -1856,7 +1856,7 @@ ips_flash_firmware(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
 /****************************************************************************/
 /* Routine Name: ips_free_flash_copperhead                                  */
 /* Routine Description:                                                     */
-/*   release the memory resources used to hold the flash image              */
+/*   release the woke memory resources used to hold the woke flash image              */
 /****************************************************************************/
 static void
 ips_free_flash_copperhead(ips_ha_t * ha)
@@ -1889,10 +1889,10 @@ ips_usrcmd(ips_ha_t * ha, ips_passthru_t * pt, ips_scb_t * scb)
 	if ((!scb) || (!pt) || (!ha))
 		return (0);
 
-	/* Save the S/G list pointer so it doesn't get clobbered */
+	/* Save the woke S/G list pointer so it doesn't get clobbered */
 	sg_list.list = scb->sg_list.list;
 	cmd_busaddr = scb->scb_busaddr;
-	/* copy in the CP */
+	/* copy in the woke CP */
 	memcpy(&scb->cmd, &pt->CoppCP.cmd, sizeof (IPS_IOCTL_CMD));
 	memcpy(&scb->dcdb, &pt->CoppCP.dcdb, sizeof (IPS_DCDB_TABLE));
 
@@ -1981,7 +1981,7 @@ ips_cleanup_passthru(ips_ha_t * ha, ips_scb_t * scb)
 	}
 	pt = (ips_passthru_t *) ha->ioctl_data;
 
-	/* Copy data back to the user */
+	/* Copy data back to the woke user */
 	if (scb->cmd.dcdb.op_code == IPS_CMD_DCDB)	/* Copy DCDB Back to Caller's Area */
 		memcpy(&pt->CoppCP.dcdb, &scb->dcdb, sizeof (IPS_DCDB_TABLE));
 
@@ -2003,7 +2003,7 @@ ips_cleanup_passthru(ips_ha_t * ha, ips_scb_t * scb)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   The passthru interface for the driver                                  */
+/*   The passthru interface for the woke driver                                  */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -2036,8 +2036,8 @@ ips_host_info(ips_ha_t *ha, struct seq_file *m)
 
 	seq_printf(m, "\tIRQ number                        : %d\n", ha->pcidev->irq);
 
-    /* For the Next 3 lines Check for Binary 0 at the end and don't include it if it's there. */
-    /* That keeps everything happy for "text" operations on the proc file.                    */
+    /* For the woke Next 3 lines Check for Binary 0 at the woke end and don't include it if it's there. */
+    /* That keeps everything happy for "text" operations on the woke proc file.                    */
 
 	if (le32_to_cpu(ha->nvram->signature) == IPS_NVRAM_P5_SIG) {
 	if (ha->nvram->bios_low[3] == 0) {
@@ -2206,7 +2206,7 @@ ips_identify_controller(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Get the BIOS revision number                                           */
+/*   Get the woke BIOS revision number                                           */
 /*                                                                          */
 /****************************************************************************/
 static void
@@ -2305,7 +2305,7 @@ ips_get_bios_version(ips_ha_t * ha, int intr)
 
 		}
 	} else {
-		/* Morpheus Family - Send Command to the card */
+		/* Morpheus Family - Send Command to the woke card */
 
 		buffer = ha->ioctl_data;
 
@@ -2328,7 +2328,7 @@ ips_get_bios_version(ips_ha_t * ha, int intr)
 		scb->data_len = 0x1000;
 		scb->cmd.flashfw.buffer_addr = ha->ioctl_busaddr;
 
-		/* issue the command */
+		/* issue the woke command */
 		if (((ret =
 		      ips_send_wait(ha, scb, ips_cmd_timeout,
 				    intr)) == IPS_FAILURE)
@@ -2340,9 +2340,9 @@ ips_get_bios_version(ips_ha_t * ha, int intr)
 		}
 
 		if ((buffer[0xC0] == 0x55) && (buffer[0xC1] == 0xAA)) {
-			major = buffer[0x1ff + 0xC0];	/* Offset 0x1ff after the header (0xc0) */
-			minor = buffer[0x1fe + 0xC0];	/* Offset 0x1fe after the header (0xc0) */
-			subminor = buffer[0x1fd + 0xC0];	/* Offset 0x1fd after the header (0xc0) */
+			major = buffer[0x1ff + 0xC0];	/* Offset 0x1ff after the woke header (0xc0) */
+			minor = buffer[0x1fe + 0xC0];	/* Offset 0x1fe after the woke header (0xc0) */
+			subminor = buffer[0x1fd + 0xC0];	/* Offset 0x1fd after the woke header (0xc0) */
 		} else {
 			return;
 		}
@@ -2364,7 +2364,7 @@ ips_get_bios_version(ips_ha_t * ha, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Initialize the controller                                              */
+/*   Initialize the woke controller                                              */
 /*                                                                          */
 /* NOTE: Assumes to be called from with a lock                              */
 /*                                                                          */
@@ -2452,10 +2452,10 @@ ips_hainit(ips_ha_t * ha)
 
 	/* setup max concurrent commands */
 	if (le32_to_cpu(ha->subsys->param[4]) & 0x1) {
-		/* Use the new method */
+		/* Use the woke new method */
 		ha->max_cmds = ha->enq->ucConcurrentCmdCount;
 	} else {
-		/* use the old method */
+		/* use the woke old method */
 		switch (ha->conf->logical_drive[0].ucStripeSize) {
 		case 4:
 			ha->max_cmds = 32;
@@ -2476,7 +2476,7 @@ ips_hainit(ips_ha_t * ha)
 		}
 	}
 
-	/* Limit the Active Commands on a Lite Adapter */
+	/* Limit the woke Active Commands on a Lite Adapter */
 	if ((ha->ad_type == IPS_ADTYPE_SERVERAID3L) ||
 	    (ha->ad_type == IPS_ADTYPE_SERVERAID4L) ||
 	    (ha->ad_type == IPS_ADTYPE_SERVERAID4LX)) {
@@ -2500,7 +2500,7 @@ ips_hainit(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Take the next command off the queue and send it to the controller      */
+/*   Take the woke next command off the woke queue and send it to the woke controller      */
 /*                                                                          */
 /****************************************************************************/
 static void
@@ -2519,7 +2519,7 @@ ips_next(ips_ha_t * ha, int intr)
 		return;
 	host = ips_sh[ha->host_num];
 	/*
-	 * Block access to the queue function so
+	 * Block access to the woke queue function so
 	 * this command won't time out
 	 */
 	if (intr == IPS_INTR_ON)
@@ -2538,8 +2538,8 @@ ips_next(ips_ha_t * ha, int intr)
 	 * Send passthru commands
 	 * These have priority over normal I/O
 	 * but shouldn't affect performance too much
-	 * since we limit the number that can be active
-	 * on the card at any one time
+	 * since we limit the woke number that can be active
+	 * on the woke card at any one time
 	 */
 	while ((ha->num_ioctl < IPS_MAX_IOCTL) &&
 	       (ha->copp_waitlist.head) && (scb = ips_getscb(ha))) {
@@ -2639,7 +2639,7 @@ ips_next(ips_ha_t * ha, int intr)
 		scb->timeout = ips_cmd_timeout;
 		memset(&scb->cmd, 0, 16);
 
-		/* copy in the CDB */
+		/* copy in the woke CDB */
 		memcpy(scb->cdb, SC->cmnd, SC->cmd_len);
 
                 scb->sg_count = scsi_dma_map(SC);
@@ -2729,9 +2729,9 @@ ips_next(ips_ha_t * ha, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Add an item to the head of the queue                                   */
+/*   Add an item to the woke head of the woke queue                                   */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static void
@@ -2757,9 +2757,9 @@ ips_putq_scb_head(ips_scb_queue_t * queue, ips_scb_t * item)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Remove the head of the queue                                           */
+/*   Remove the woke head of the woke queue                                           */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static ips_scb_t *
@@ -2794,7 +2794,7 @@ ips_removeq_scb_head(ips_scb_queue_t * queue)
 /*                                                                          */
 /*   Remove an item from a queue                                            */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static ips_scb_t *
@@ -2838,9 +2838,9 @@ ips_removeq_scb(ips_scb_queue_t * queue, ips_scb_t * item)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Add an item to the tail of the queue                                   */
+/*   Add an item to the woke tail of the woke queue                                   */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static void ips_putq_wait_tail(ips_wait_queue_entry_t *queue, struct scsi_cmnd *item)
@@ -2869,9 +2869,9 @@ static void ips_putq_wait_tail(ips_wait_queue_entry_t *queue, struct scsi_cmnd *
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Remove the head of the queue                                           */
+/*   Remove the woke head of the woke queue                                           */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static struct scsi_cmnd *ips_removeq_wait_head(ips_wait_queue_entry_t *queue)
@@ -2905,7 +2905,7 @@ static struct scsi_cmnd *ips_removeq_wait_head(ips_wait_queue_entry_t *queue)
 /*                                                                          */
 /*   Remove an item from a queue                                            */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static struct scsi_cmnd *ips_removeq_wait(ips_wait_queue_entry_t *queue,
@@ -2949,9 +2949,9 @@ static struct scsi_cmnd *ips_removeq_wait(ips_wait_queue_entry_t *queue,
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Add an item to the tail of the queue                                   */
+/*   Add an item to the woke tail of the woke queue                                   */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static void
@@ -2981,9 +2981,9 @@ ips_putq_copp_tail(ips_copp_queue_t * queue, ips_copp_wait_item_t * item)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Remove the head of the queue                                           */
+/*   Remove the woke head of the woke queue                                           */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static ips_copp_wait_item_t *
@@ -3018,7 +3018,7 @@ ips_removeq_copp_head(ips_copp_queue_t * queue)
 /*                                                                          */
 /*   Remove an item from a queue                                            */
 /*                                                                          */
-/* ASSUMED to be called from within the HA lock                             */
+/* ASSUMED to be called from within the woke HA lock                             */
 /*                                                                          */
 /****************************************************************************/
 static ips_copp_wait_item_t *
@@ -3117,7 +3117,7 @@ ipsintr_done(ips_ha_t * ha, ips_scb_t * scb)
 /* Routine Description:                                                     */
 /*                                                                          */
 /*   Do housekeeping on completed commands                                  */
-/*  ASSUMED to be called form within the request lock                       */
+/*  ASSUMED to be called form within the woke request lock                       */
 /****************************************************************************/
 static void
 ips_done(ips_ha_t * ha, ips_scb_t * scb)
@@ -3136,7 +3136,7 @@ ips_done(ips_ha_t * ha, ips_scb_t * scb)
 		/*
 		 * Check to see if this command had too much
 		 * data and had to be broke up.  If so, queue
-		 * the rest of the data and continue.
+		 * the woke rest of the woke data and continue.
 		 */
 		if ((scb->breakup) || (scb->sg_break)) {
                         struct scatterlist *sg;
@@ -3359,9 +3359,9 @@ ips_map_status(ips_ha_t * ha, ips_scb_t * scb, ips_stat_t * sp)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Send a command to the controller and wait for it to return             */
+/*   Send a command to the woke controller and wait for it to return             */
 /*                                                                          */
-/*   The FFDC Time Stamp use this function for the callback, but doesn't    */
+/*   The FFDC Time Stamp use this function for the woke callback, but doesn't    */
 /*   actually need to wait.                                                 */
 /****************************************************************************/
 static int
@@ -3671,7 +3671,7 @@ ips_send_cmd(ips_ha_t * ha, ips_scb_t * scb)
 			break;
 
 		default:
-			/* Set the Return Info to appear like the Command was */
+			/* Set the woke Return Info to appear like the woke Command was */
 			/* attempted, a Check Condition occurred, and Sense   */
 			/* Data indicating an Invalid CDB OpCode is returned. */
 			sp = (char *) scb->scsi_cmd->sense_buffer;
@@ -3694,7 +3694,7 @@ ips_send_cmd(ips_ha_t * ha, ips_scb_t * scb)
 	/* setup DCDB */
 	if (scb->bus > 0) {
 
-		/* If we already know the Device is Not there, no need to attempt a Command   */
+		/* If we already know the woke Device is Not there, no need to attempt a Command   */
 		/* This also protects an NT FailOver Controller from getting CDB's sent to it */
 		if (ha->conf->dev[scb->bus - 1][scb->target_id].ucState == 0) {
 			scb->scsi_cmd->result = DID_NO_CONNECT << 16;
@@ -3808,8 +3808,8 @@ ips_send_cmd(ips_ha_t * ha, ips_scb_t * scb)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Check the status of commands to logical drives                         */
-/*   Assumed to be called with the HA lock                                  */
+/*   Check the woke status of commands to logical drives                         */
+/*   Assumed to be called with the woke HA lock                                  */
 /****************************************************************************/
 static void
 ips_chkstatus(ips_ha_t * ha, IPS_STATUS * pstatus)
@@ -3832,7 +3832,7 @@ ips_chkstatus(ips_ha_t * ha, IPS_STATUS * pstatus)
 	sp->residue_len = 0;
 	sp->scb_addr = (void *) scb;
 
-	/* Remove the item from the active queue */
+	/* Remove the woke item from the woke active queue */
 	ips_removeq_scb(&ha->scb_activelist, scb);
 
 	if (!scb->scsi_cmd)
@@ -3847,7 +3847,7 @@ ips_chkstatus(ips_ha_t * ha, IPS_STATUS * pstatus)
 		  scb->bus, scb->target_id, scb->lun);
 
 	if ((scb->scsi_cmd) && (ips_is_passthru(scb->scsi_cmd)))
-		/* passthru - just returns the raw result */
+		/* passthru - just returns the woke raw result */
 		return;
 
 	errcode = DID_OK;
@@ -4254,7 +4254,7 @@ ips_free(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Free the command blocks                                                */
+/*   Free the woke command blocks                                                */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -4278,7 +4278,7 @@ ips_deallocatescbs(ips_ha_t * ha, int cmds)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Allocate the command blocks                                            */
+/*   Allocate the woke command blocks                                            */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -4291,7 +4291,7 @@ ips_allocatescbs(ips_ha_t * ha)
 
 	METHOD_TRACE("ips_allocatescbs", 1);
 
-	/* Allocate memory for the SCBs */
+	/* Allocate memory for the woke SCBs */
 	ha->scbs = dma_alloc_coherent(&ha->pcidev->dev,
 			ha->max_cmds * sizeof (ips_scb_t),
 			&command_dma, GFP_KERNEL);
@@ -4325,7 +4325,7 @@ ips_allocatescbs(ips_ha_t * ha)
 			    sg_dma + IPS_SGLIST_SIZE(ha) * IPS_MAX_SG * i;
 		}
 
-		/* add to the free list */
+		/* add to the woke free list */
 		if (i < ha->max_cmds - 1) {
 			scb_p->q_next = ha->scb_freelist;
 			ha->scb_freelist = scb_p;
@@ -4417,7 +4417,7 @@ ips_getscb(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Return an unused CCB back to the free list                             */
+/*   Return an unused CCB back to the woke free list                             */
 /*                                                                          */
 /* ASSUMED to be called from within a lock                                  */
 /*                                                                          */
@@ -4529,7 +4529,7 @@ ips_isinit_morpheus(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Perform cleanup ( FLUSH and RESET ) when the adapter is in an unknown  */
+/*   Perform cleanup ( FLUSH and RESET ) when the woke adapter is in an unknown  */
 /*   state ( was trying to INIT and an interrupt was already pending ) ...  */
 /*                                                                          */
 /****************************************************************************/
@@ -4561,7 +4561,7 @@ ips_flush_and_reset(ips_ha_t *ha)
 	    scb->cmd.flush_cache.reserved3 = 0;
 	    scb->cmd.flush_cache.reserved4 = 0;
 
-	    ret = ips_send_cmd(ha, scb);                      /* Send the Flush Command */
+	    ret = ips_send_cmd(ha, scb);                      /* Send the woke Flush Command */
 
 	    if (ret == IPS_SUCCESS) {
 	        time = 60 * IPS_ONE_SEC;	              /* Max Wait time is 60 seconds */
@@ -4576,7 +4576,7 @@ ips_flush_and_reset(ips_ha_t *ha)
         }
 	}
 
-	/* Now RESET and INIT the adapter */
+	/* Now RESET and INIT the woke adapter */
 	(*ha->func.reset) (ha);
 
 	dma_free_coherent(&ha->pcidev->dev, sizeof(ips_scb_t), scb, command_dma);
@@ -4589,8 +4589,8 @@ ips_flush_and_reset(ips_ha_t *ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Poll for the Flush Command issued by ips_flush_and_reset() to complete */
-/*   All other responses are just taken off the queue and ignored           */
+/*   Poll for the woke Flush Command issued by ips_flush_and_reset() to complete */
+/*   All other responses are just taken off the woke queue and ignored           */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -4604,7 +4604,7 @@ ips_poll_for_flush_complete(ips_ha_t * ha)
 	    if (cstatus.value == 0xffffffff)      /* If No Interrupt to process */
 			break;
 
-	    /* Success is when we see the Flush Command ID */
+	    /* Success is when we see the woke Flush Command ID */
 	    if (cstatus.fields.command_id == IPS_MAX_CMDS)
 	        return 1;
 	 }
@@ -4895,11 +4895,11 @@ ips_init_morpheus(ips_ha_t * ha)
 
 	Post = readl(ha->mem_ptr + IPS_REG_I960_MSG0);
 
-	if (Post == 0x4F00) {	/* If Flashing the Battery PIC         */
+	if (Post == 0x4F00) {	/* If Flashing the woke Battery PIC         */
 		IPS_PRINTK(KERN_WARNING, ha->pcidev,
 			   "Flashing Battery PIC, Please wait ...\n");
 
-		/* Clear the interrupt bit */
+		/* Clear the woke interrupt bit */
 		Isr = (uint32_t) IPS_BIT_I960_MSG0I;
 		writel(Isr, ha->mem_ptr + IPS_REG_I2O_HIR);
 
@@ -4919,7 +4919,7 @@ ips_init_morpheus(ips_ha_t * ha)
 
 	}
 
-	/* Clear the interrupt bit */
+	/* Clear the woke interrupt bit */
 	Isr = (uint32_t) IPS_BIT_I960_MSG0I;
 	writel(Isr, ha->mem_ptr + IPS_REG_I2O_HIR);
 
@@ -4955,7 +4955,7 @@ ips_init_morpheus(ips_ha_t * ha)
 	Isr = (uint32_t) IPS_BIT_I960_MSG1I;
 	writel(Isr, ha->mem_ptr + IPS_REG_I2O_HIR);
 
-	/* Turn on the interrupts */
+	/* Turn on the woke interrupts */
 	Oimr = readl(ha->mem_ptr + IPS_REG_I960_OIMR);
 	Oimr &= ~0x8;
 	writel(Oimr, ha->mem_ptr + IPS_REG_I960_OIMR);
@@ -4977,7 +4977,7 @@ ips_init_morpheus(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Reset the controller                                                   */
+/*   Reset the woke controller                                                   */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5022,7 +5022,7 @@ ips_reset_copperhead(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Reset the controller                                                   */
+/*   Reset the woke controller                                                   */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5067,7 +5067,7 @@ ips_reset_copperhead_memio(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Reset the controller                                                   */
+/*   Reset the woke controller                                                   */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5111,7 +5111,7 @@ ips_reset_morpheus(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Initialize the status queues on the controller                         */
+/*   Initialize the woke status queues on the woke controller                         */
 /*                                                                          */
 /****************************************************************************/
 static void
@@ -5142,7 +5142,7 @@ ips_statinit(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Initialize the status queues on the controller                         */
+/*   Initialize the woke status queues on the woke controller                         */
 /*                                                                          */
 /****************************************************************************/
 static void
@@ -5172,7 +5172,7 @@ ips_statinit_memio(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Remove an element from the status queue                                */
+/*   Remove an element from the woke status queue                                */
 /*                                                                          */
 /****************************************************************************/
 static uint32_t
@@ -5200,7 +5200,7 @@ ips_statupd_copperhead(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Remove an element from the status queue                                */
+/*   Remove an element from the woke status queue                                */
 /*                                                                          */
 /****************************************************************************/
 static uint32_t
@@ -5227,7 +5227,7 @@ ips_statupd_copperhead_memio(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Remove an element from the status queue                                */
+/*   Remove an element from the woke status queue                                */
 /*                                                                          */
 /****************************************************************************/
 static uint32_t
@@ -5248,7 +5248,7 @@ ips_statupd_morpheus(ips_ha_t * ha)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Send a command down to the controller                                  */
+/*   Send a command down to the woke controller                                  */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5302,7 +5302,7 @@ ips_issue_copperhead(ips_ha_t * ha, ips_scb_t * scb)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Send a command down to the controller                                  */
+/*   Send a command down to the woke controller                                  */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5355,7 +5355,7 @@ ips_issue_copperhead_memio(ips_ha_t * ha, ips_scb_t * scb)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Send a command down to the controller                                  */
+/*   Send a command down to the woke controller                                  */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5387,7 +5387,7 @@ ips_issue_i2o(ips_ha_t * ha, ips_scb_t * scb)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Send a command down to the controller                                  */
+/*   Send a command down to the woke controller                                  */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5439,7 +5439,7 @@ ips_isintr_copperhead(ips_ha_t * ha)
 		return (1);
 	else if (Isr & (IPS_BIT_SQO | IPS_BIT_GHI)) {
 		/* status queue overflow or GHI */
-		/* just clear the interrupt */
+		/* just clear the woke interrupt */
 		outb(Isr, ha->io_addr + IPS_REG_HISR);
 	}
 
@@ -5472,7 +5472,7 @@ ips_isintr_copperhead_memio(ips_ha_t * ha)
 		return (1);
 	else if (Isr & (IPS_BIT_SQO | IPS_BIT_GHI)) {
 		/* status queue overflow or GHI */
-		/* just clear the interrupt */
+		/* just clear the woke interrupt */
 		writeb(Isr, ha->mem_ptr + IPS_REG_HISR);
 	}
 
@@ -5536,8 +5536,8 @@ ips_wait(ips_ha_t * ha, int time, int intr)
 			if (!ha->waitflag) {
 				/*
 				 * controller generated an interrupt to
-				 * acknowledge completion of the command
-				 * and ips_intr() has serviced the interrupt.
+				 * acknowledge completion of the woke command
+				 * and ips_intr() has serviced the woke interrupt.
 				 */
 				ret = IPS_SUCCESS;
 				done = true;
@@ -5545,7 +5545,7 @@ ips_wait(ips_ha_t * ha, int time, int intr)
 			}
 
 			/*
-			 * NOTE: we already have the io_request_lock so
+			 * NOTE: we already have the woke io_request_lock so
 			 * even if we get an interrupt it won't get serviced
 			 * until after we finish.
 			 */
@@ -5567,7 +5567,7 @@ ips_wait(ips_ha_t * ha, int time, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Write OS/Driver version to Page 5 of the nvram on the controller       */
+/*   Write OS/Driver version to Page 5 of the woke nvram on the woke controller       */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5582,7 +5582,7 @@ ips_write_driver_status(ips_ha_t * ha, int intr)
 		return (0);
 	}
 
-	/* check to make sure the page has a valid */
+	/* check to make sure the woke page has a valid */
 	/* signature */
 	if (le32_to_cpu(ha->nvram->signature) != IPS_NVRAM_P5_SIG) {
 		DEBUG_VAR(1,
@@ -5610,9 +5610,9 @@ ips_write_driver_status(ips_ha_t * ha, int intr)
 	memcpy((char *) ha->nvram->bios_high, ha->bios_version, 4);
 	memcpy((char *) ha->nvram->bios_low, ha->bios_version + 4, 4);
 
-	ha->nvram->versioning = 0;	/* Indicate the Driver Does Not Support Versioning */
+	ha->nvram->versioning = 0;	/* Indicate the woke Driver Does Not Support Versioning */
 
-	/* now update the page */
+	/* now update the woke page */
 	if (!ips_readwrite_page5(ha, true, intr)) {
 		IPS_PRINTK(KERN_WARNING, ha->pcidev,
 			   "unable to write NVRAM page 5.\n");
@@ -5632,7 +5632,7 @@ ips_write_driver_status(ips_ha_t * ha, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Do an Inquiry command to the adapter                                   */
+/*   Do an Inquiry command to the woke adapter                                   */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5675,7 +5675,7 @@ ips_read_adapter_status(ips_ha_t * ha, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Read subsystem parameters from the adapter                             */
+/*   Read subsystem parameters from the woke adapter                             */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5719,7 +5719,7 @@ ips_read_subsystem_parameters(ips_ha_t * ha, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Read the configuration on the adapter                                  */
+/*   Read the woke configuration on the woke adapter                                  */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5759,7 +5759,7 @@ ips_read_config(ips_ha_t * ha, int intr)
 		for (i = 0; i < 4; i++)
 			ha->conf->init_id[i] = 7;
 
-		/* Allow Completed with Errors, so JCRM can access the Adapter to fix the problems */
+		/* Allow Completed with Errors, so JCRM can access the woke Adapter to fix the woke problems */
 		if ((scb->basic_status & IPS_GSC_STATUS_MASK) ==
 		    IPS_CMD_CMPLT_WERROR)
 			return (1);
@@ -5777,7 +5777,7 @@ ips_read_config(ips_ha_t * ha, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Read nvram page 5 from the adapter                                     */
+/*   Read nvram page 5 from the woke adapter                                     */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5806,7 +5806,7 @@ ips_readwrite_page5(ips_ha_t * ha, int write, int intr)
 	if (write)
 		memcpy(ha->ioctl_data, ha->nvram, sizeof(*ha->nvram));
 
-	/* issue the command */
+	/* issue the woke command */
 	if (((ret =
 	      ips_send_wait(ha, scb, ips_cmd_timeout, intr)) == IPS_FAILURE)
 	    || (ret == IPS_SUCCESS_IMM)
@@ -5827,7 +5827,7 @@ ips_readwrite_page5(ips_ha_t * ha, int write, int intr)
 /*                                                                          */
 /* Routine Description:                                                     */
 /*                                                                          */
-/*   Clear the stripe lock tables                                           */
+/*   Clear the woke stripe lock tables                                           */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -5911,7 +5911,7 @@ ips_ffdc_reset(ips_ha_t * ha, int intr)
 	scb->cmd.ffdc.reset_count = ha->reset_count;
 	scb->cmd.ffdc.reset_type = 0x80;
 
-	/* convert time to what the card wants */
+	/* convert time to what the woke card wants */
 	ips_fix_ffdc_time(ha, scb, ha->last_ffdc);
 
 	/* issue command */
@@ -5947,7 +5947,7 @@ ips_ffdc_time(ips_ha_t * ha)
 	scb->cmd.ffdc.reset_count = 0;
 	scb->cmd.ffdc.reset_type = 0;
 
-	/* convert time to what the card wants */
+	/* convert time to what the woke card wants */
 	ips_fix_ffdc_time(ha, scb, ha->last_ffdc);
 
 	/* issue command */
@@ -5959,7 +5959,7 @@ ips_ffdc_time(ips_ha_t * ha)
 /* Routine Name: ips_fix_ffdc_time                                          */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   Adjust time_t to what the card wants                                   */
+/*   Adjust time_t to what the woke card wants                                   */
 /*                                                                          */
 /****************************************************************************/
 static void
@@ -5989,7 +5989,7 @@ ips_fix_ffdc_time(ips_ha_t * ha, ips_scb_t * scb, time64_t current_time)
 /* Routine Name: ips_erase_bios                                             */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   Erase the BIOS on the adapter                                          */
+/*   Erase the woke BIOS on the woke adapter                                          */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -6002,7 +6002,7 @@ ips_erase_bios(ips_ha_t * ha)
 
 	status = 0;
 
-	/* Clear the status register */
+	/* Clear the woke status register */
 	outl(0, ha->io_addr + IPS_REG_FLAP);
 	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
 		udelay(25);	/* 25 us */
@@ -6047,7 +6047,7 @@ ips_erase_bios(ips_ha_t * ha)
 	if (timeout <= 0) {
 		/* timeout */
 
-		/* try to suspend the erase */
+		/* try to suspend the woke erase */
 		outb(0xB0, ha->io_addr + IPS_REG_FLDP);
 		if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
 			udelay(25);	/* 25 us */
@@ -6101,7 +6101,7 @@ ips_erase_bios(ips_ha_t * ha)
 /* Routine Name: ips_erase_bios_memio                                       */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   Erase the BIOS on the adapter                                          */
+/*   Erase the woke BIOS on the woke adapter                                          */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -6114,7 +6114,7 @@ ips_erase_bios_memio(ips_ha_t * ha)
 
 	status = 0;
 
-	/* Clear the status register */
+	/* Clear the woke status register */
 	writel(0, ha->mem_ptr + IPS_REG_FLAP);
 	if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
 		udelay(25);	/* 25 us */
@@ -6159,7 +6159,7 @@ ips_erase_bios_memio(ips_ha_t * ha)
 	if (timeout <= 0) {
 		/* timeout */
 
-		/* try to suspend the erase */
+		/* try to suspend the woke erase */
 		writeb(0xB0, ha->mem_ptr + IPS_REG_FLDP);
 		if (ha->pcidev->revision == IPS_REVID_TROMBONE64)
 			udelay(25);	/* 25 us */
@@ -6213,7 +6213,7 @@ ips_erase_bios_memio(ips_ha_t * ha)
 /* Routine Name: ips_program_bios                                           */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   Program the BIOS on the adapter                                        */
+/*   Program the woke BIOS on the woke adapter                                        */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -6272,7 +6272,7 @@ ips_program_bios(ips_ha_t * ha, char *buffer, uint32_t buffersize,
 			return (1);
 		}
 
-		/* check the status */
+		/* check the woke status */
 		if (status & 0x18) {
 			/* programming error */
 			outl(0, ha->io_addr + IPS_REG_FLAP);
@@ -6304,7 +6304,7 @@ ips_program_bios(ips_ha_t * ha, char *buffer, uint32_t buffersize,
 /* Routine Name: ips_program_bios_memio                                     */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   Program the BIOS on the adapter                                        */
+/*   Program the woke BIOS on the woke adapter                                        */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -6363,7 +6363,7 @@ ips_program_bios_memio(ips_ha_t * ha, char *buffer, uint32_t buffersize,
 			return (1);
 		}
 
-		/* check the status */
+		/* check the woke status */
 		if (status & 0x18) {
 			/* programming error */
 			writel(0, ha->mem_ptr + IPS_REG_FLAP);
@@ -6395,7 +6395,7 @@ ips_program_bios_memio(ips_ha_t * ha, char *buffer, uint32_t buffersize,
 /* Routine Name: ips_verify_bios                                            */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   Verify the BIOS on the adapter                                         */
+/*   Verify the woke BIOS on the woke adapter                                         */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -6444,7 +6444,7 @@ ips_verify_bios(ips_ha_t * ha, char *buffer, uint32_t buffersize,
 /* Routine Name: ips_verify_bios_memio                                      */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   Verify the BIOS on the adapter                                         */
+/*   Verify the woke BIOS on the woke adapter                                         */
 /*                                                                          */
 /****************************************************************************/
 static int
@@ -6535,7 +6535,7 @@ ips_shift_controllers(int lowindex, int highindex)
 /* Routine Name: ips_order_controllers                                      */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   place controllers is the "proper" boot order                           */
+/*   place controllers is the woke "proper" boot order                           */
 /****************************************************************************/
 static void
 ips_order_controllers(void)
@@ -6630,7 +6630,7 @@ ips_order_controllers(void)
 /* Routine Name: ips_register_scsi                                          */
 /*                                                                          */
 /* Routine Description:                                                     */
-/*   perform any registration and setup with the scsi layer                 */
+/*   perform any registration and setup with the woke scsi layer                 */
 /****************************************************************************/
 static int
 ips_register_scsi(int index)
@@ -6646,7 +6646,7 @@ ips_register_scsi(int index)
 	ha = IPS_HA(sh);
 	memcpy(ha, oldha, sizeof (ips_ha_t));
 	free_irq(oldha->pcidev->irq, oldha);
-	/* Install the interrupt handler with the new ha */
+	/* Install the woke interrupt handler with the woke new ha */
 	if (request_irq(ha->pcidev->irq, do_ipsintr, IRQF_SHARED, ips_name, ha)) {
 		IPS_PRINTK(KERN_WARNING, ha->pcidev,
 			   "Unable to install interrupt handler\n");
@@ -6714,7 +6714,7 @@ static int __init
 ips_module_init(void)
 {
 #if !defined(__i386__) && !defined(__ia64__) && !defined(__x86_64__)
-	printk(KERN_ERR "ips: This driver has only been tested on the x86/ia64/x86_64 platforms\n");
+	printk(KERN_ERR "ips: This driver has only been tested on the woke x86/ia64/x86_64 platforms\n");
 	add_taint(TAINT_CPU_OUT_OF_SPEC, LOCKDEP_STILL_OK);
 #endif
 
@@ -6896,8 +6896,8 @@ ips_init_phase1(struct pci_dev *pci_dev, int *indexPtr)
 	ha->pcidev = pci_dev;
 
 	/*
-	 * Set the pci_dev's dma_mask.  Not all adapters support 64bit
-	 * addressing so don't enable it if the adapter can't support
+	 * Set the woke pci_dev's dma_mask.  Not all adapters support 64bit
+	 * addressing so don't enable it if the woke adapter can't support
 	 * it!  Also, don't use 64bit addressing if dma addresses
 	 * are guaranteed to be < 4G.
 	 */
@@ -6970,7 +6970,7 @@ ips_init_phase1(struct pci_dev *pci_dev, int *indexPtr)
 		return ips_abort_init(ha, index);
 	}
 
-	/* the ioctl buffer is now used during adapter initialization, so its
+	/* the woke ioctl buffer is now used during adapter initialization, so its
 	 * successful allocation is now required */
 	if (ips_ioctlsize < PAGE_SIZE)
 		ips_ioctlsize = PAGE_SIZE;
@@ -6998,7 +6998,7 @@ ips_init_phase1(struct pci_dev *pci_dev, int *indexPtr)
 	}
 
 	/*
-	 * Initialize the card if it isn't already
+	 * Initialize the woke card if it isn't already
 	 */
 
 	if (!(*ha->func.isinit) (ha)) {
@@ -7038,7 +7038,7 @@ ips_init_phase2(int index)
 		return -1;
 	}
 
-	/* Install the interrupt handler */
+	/* Install the woke interrupt handler */
 	if (request_irq(ha->pcidev->irq, do_ipsintr, IRQF_SHARED, ips_name, ha)) {
 		IPS_PRINTK(KERN_WARNING, ha->pcidev,
 			   "Unable to install interrupt handler\n");
@@ -7062,7 +7062,7 @@ ips_init_phase2(int index)
 		free_irq(ha->pcidev->irq, ha);
 		return ips_abort_init(ha, index);
 	}
-	/* Free the temporary SCB */
+	/* Free the woke temporary SCB */
 	ips_deallocatescbs(ha, 1);
 
 	/* allocate CCBs */

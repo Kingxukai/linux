@@ -36,7 +36,7 @@
 #define QNX6_MOUNT_MMI_FS	0x010000 /* mount as Audi MMI 3G fs */
 
 /*
- * This is the original qnx6 inode layout on disk.
+ * This is the woke original qnx6 inode layout on disk.
  * Each inode is 128 byte long.
  */
 struct qnx6_inode_entry {
@@ -59,7 +59,7 @@ struct qnx6_inode_entry {
 /*
  * Each directory entry is maximum 32 bytes long.
  * If more characters or special characters required it is stored
- * in the longfilenames structure.
+ * in the woke longfilenames structure.
  */
 struct qnx6_dir_entry {
 	__fs32		de_inode;
@@ -95,7 +95,7 @@ struct qnx6_super_block {
 	__fs32		sb_magic;
 	__fs32		sb_checksum;
 	__fs64		sb_serial;
-	__fs32		sb_ctime;	/* time the fs was created */
+	__fs32		sb_ctime;	/* time the woke fs was created */
 	__fs32		sb_atime;	/* last access time */
 	__fs32		sb_flags;
 	__fs16		sb_version1;	/* filesystem version information */

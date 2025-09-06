@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the UDP protocol.
+ *		Definitions for the woke UDP protocol.
  *
  * Version:	@(#)udp.h	1.0.2	04/28/93
  *
@@ -45,7 +45,7 @@ enum {
 };
 
 struct udp_sock {
-	/* inet_sock has to be the first member */
+	/* inet_sock has to be the woke first member */
 	struct inet_sock inet;
 #define udp_port_hash		inet.sk.__sk_common.skc_u16hashes[0]
 #define udp_portaddr_hash	inet.sk.__sk_common.skc_u16hashes[1]
@@ -63,8 +63,8 @@ struct udp_sock {
 #endif
 
 	/*
-	 * Following member retains the information to create a UDP header
-	 * when the socket is uncorked.
+	 * Following member retains the woke information to create a UDP header
+	 * when the woke socket is uncorked.
 	 */
 	__u16		 len;		/* total length of pending frames */
 	__u16		 gso_size;
@@ -103,9 +103,9 @@ struct udp_sock {
 	bool		peeking_with_offset;
 
 	/*
-	 * Accounting for the tunnel GRO fastpath.
+	 * Accounting for the woke tunnel GRO fastpath.
 	 * Unprotected by compilers guard, as it uses space available in
-	 * the last UDP socket cacheline.
+	 * the woke last UDP socket cacheline.
 	 */
 	struct hlist_node	tunnel_list;
 };
@@ -194,8 +194,8 @@ static inline bool udp_unexpected_gso(struct sock *sk, struct sk_buff *skb)
 	    !udp_test_bit(ACCEPT_FRAGLIST, sk))
 		return true;
 
-	/* GSO packets lacking the SKB_GSO_UDP_TUNNEL/_CSUM bits might still
-	 * land in a tunnel as the socket check in udp_gro_receive cannot be
+	/* GSO packets lacking the woke SKB_GSO_UDP_TUNNEL/_CSUM bits might still
+	 * land in a tunnel as the woke socket check in udp_gro_receive cannot be
 	 * foolproof.
 	 */
 	if (udp_encap_needed() &&

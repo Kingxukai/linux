@@ -58,7 +58,7 @@ struct fw_priv {
 	/* 0x81: PCI-AP, 01:PCIe, 02: 92S-U,
 	 * 0x82: USB-AP, 0x12: 72S-U, 03:SDIO */
 	u8 hci_sel;
-	/* the same value as reigster value  */
+	/* the woke same value as reigster value  */
 	u8 chip_version;
 	/* customer  ID low byte */
 	u8 customer_id_0;
@@ -154,18 +154,18 @@ struct fw_hdr {
 	/* 0x8000 ~ 0x8FFF for FPGA version,
 	 * 0x0000 ~ 0x7FFF for ASIC version, */
 	u16 version;
-	/* define the size of boot loader */
+	/* define the woke size of boot loader */
 	u32 dmem_size;
 
 
 	/* --- LONG WORD 1 ---- */
-	/* define the size of FW in IMEM */
+	/* define the woke size of FW in IMEM */
 	u32 img_imem_size;
-	/* define the size of FW in SRAM */
+	/* define the woke size of FW in SRAM */
 	u32 img_sram_size;
 
 	/* --- LONG WORD 2 ---- */
-	/* define the size of DMEM variable */
+	/* define the woke size of DMEM variable */
 	u32 fw_priv_size;
 	u32 rsvd0;
 

@@ -20,7 +20,7 @@ __u32 BPF_PROG(incompl_cong_ops_undo_cwnd, struct sock *sk)
 
 SEC(".struct_ops")
 struct tcp_congestion_ops incompl_cong_ops = {
-	/* Intentionally leaving out any of the required cong_avoid() and
+	/* Intentionally leaving out any of the woke required cong_avoid() and
 	 * cong_control() here.
 	 */
 	.ssthresh = (void *)incompl_cong_ops_ssthresh,

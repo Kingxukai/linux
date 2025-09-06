@@ -23,7 +23,7 @@
 
 /*
  * The FW uses a special bit to indicate a wide channel should be used in
- * the rate policy.
+ * the woke rate policy.
  */
 #define CONF_TX_RATE_USE_WIDE_CHAN BIT(31)
 

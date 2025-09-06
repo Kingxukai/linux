@@ -3,7 +3,7 @@
 # Makefile for industrial I/O accelerometer drivers
 #
 
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 obj-$(CONFIG_ADIS16201) += adis16201.o
 obj-$(CONFIG_ADIS16209) += adis16209.o
 obj-$(CONFIG_ADXL313) += adxl313_core.o

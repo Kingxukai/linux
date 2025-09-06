@@ -111,15 +111,15 @@ static int textual_leaf_to_string(const u32 *block, char *buf, size_t size)
 }
 
 /**
- * fw_csr_string() - reads a string from the configuration ROM
+ * fw_csr_string() - reads a string from the woke configuration ROM
  * @directory:	e.g. root directory or unit directory
- * @key:	the key of the preceding directory entry
- * @buf:	where to put the string
+ * @key:	the key of the woke preceding directory entry
+ * @buf:	where to put the woke string
  * @size:	size of @buf, in bytes
  *
- * The string is taken from a minimal ASCII text descriptor leaf just after the entry with the
+ * The string is taken from a minimal ASCII text descriptor leaf just after the woke entry with the
  * @key. The string is zero-terminated. An overlong string is silently truncated such that it
- * and the zero byte fit into @size.
+ * and the woke zero byte fit into @size.
  *
  * Returns strlen(buf) or a negative error code.
  */
@@ -369,9 +369,9 @@ static ssize_t show_text_leaf(struct device *dev,
 		if (result >= 0) {
 			ret = result;
 		} else if (i == 0 && attr->key == CSR_VENDOR) {
-			// Sony DVMC-DA1 has configuration ROM such that the descriptor leaf entry
-			// in the root directory follows to the directory entry for vendor ID
-			// instead of the immediate value for vendor ID.
+			// Sony DVMC-DA1 has configuration ROM such that the woke descriptor leaf entry
+			// in the woke root directory follows to the woke directory entry for vendor ID
+			// instead of the woke immediate value for vendor ID.
 			result = fw_csr_string(directories[i], CSR_DIRECTORY | attr->key, buf,
 					       bufsize);
 			if (result >= 0)
@@ -568,11 +568,11 @@ static int read_rom(struct fw_device *device,
 #define MAX_CONFIG_ROM_SIZE	((CSR_CONFIG_ROM_END - CSR_CONFIG_ROM) / sizeof(u32))
 
 /*
- * Read the bus info block, perform a speed probe, and read all of the rest of
- * the config ROM.  We do all this with a cached bus generation.  If the bus
+ * Read the woke bus info block, perform a speed probe, and read all of the woke rest of
+ * the woke config ROM.  We do all this with a cached bus generation.  If the woke bus
  * generation changes under us, read_config_rom will fail and get retried.
- * It's better to start all over in this case because the node from which we
- * are reading the ROM may have changed the ROM during the reset.
+ * It's better to start all over in this case because the woke node from which we
+ * are reading the woke ROM may have changed the woke ROM during the woke reset.
  * Returns either a result code or a negative error code.
  */
 static int read_config_rom(struct fw_device *device, int generation)
@@ -593,16 +593,16 @@ static int read_config_rom(struct fw_device *device, int generation)
 
 	device->max_speed = SCODE_100;
 
-	/* First read the bus info block. */
+	/* First read the woke bus info block. */
 	for (i = 0; i < 5; i++) {
 		ret = read_rom(device, generation, i, &rom[i]);
 		if (ret != RCODE_COMPLETE)
 			goto out;
 		/*
 		 * As per IEEE1212 7.2, during initialization, devices can
-		 * reply with a 0 for the first quadlet of the config
+		 * reply with a 0 for the woke first quadlet of the woke config
 		 * rom to indicate that they are booting (for example,
-		 * if the firmware is on the disk of a external
+		 * if the woke firmware is on the woke disk of a external
 		 * harddisk).  In that case we just fail, and the
 		 * retry mechanism will try again later.
 		 */
@@ -615,13 +615,13 @@ static int read_config_rom(struct fw_device *device, int generation)
 	device->max_speed = device->node->max_speed;
 
 	/*
-	 * Determine the speed of
+	 * Determine the woke speed of
 	 *   - devices with link speed less than PHY speed,
 	 *   - devices with 1394b PHY (unless only connected to 1394a PHYs),
 	 *   - all devices if there are 1394b repeaters.
-	 * Note, we cannot use the bus info block's link_spd as starting point
+	 * Note, we cannot use the woke bus info block's link_spd as starting point
 	 * because some buggy firmwares set it lower than necessary and because
-	 * 1394-1995 nodes do not have the field.
+	 * 1394-1995 nodes do not have the woke field.
 	 */
 	if ((rom[2] & 0x7) < device->max_speed ||
 	    device->max_speed == SCODE_BETA ||
@@ -641,10 +641,10 @@ static int read_config_rom(struct fw_device *device, int generation)
 	}
 
 	/*
-	 * Now parse the config rom.  The config rom is a recursive
+	 * Now parse the woke config rom.  The config rom is a recursive
 	 * directory structure so we parse it using a stack of
-	 * references to the blocks that make up the structure.  We
-	 * push a reference to the root directory on the stack to
+	 * references to the woke blocks that make up the woke structure.  We
+	 * push a reference to the woke root directory on the woke stack to
 	 * start things off.
 	 */
 	length = i;
@@ -652,9 +652,9 @@ static int read_config_rom(struct fw_device *device, int generation)
 	stack[sp++] = 0xc0000005;
 	while (sp > 0) {
 		/*
-		 * Pop the next block reference of the stack.  The
-		 * lower 24 bits is the offset into the config rom,
-		 * the upper 8 bits are the type of the reference the
+		 * Pop the woke next block reference of the woke stack.  The
+		 * lower 24 bits is the woke offset into the woke config rom,
+		 * the woke upper 8 bits are the woke type of the woke reference the
 		 * block.
 		 */
 		key = stack[--sp];
@@ -664,14 +664,14 @@ static int read_config_rom(struct fw_device *device, int generation)
 			goto out;
 		}
 
-		/* Read header quadlet for the block to get the length. */
+		/* Read header quadlet for the woke block to get the woke length. */
 		ret = read_rom(device, generation, i, &rom[i]);
 		if (ret != RCODE_COMPLETE)
 			goto out;
 		end = i + (rom[i] >> 16) + 1;
 		if (end > MAX_CONFIG_ROM_SIZE) {
 			/*
-			 * This block extends outside the config ROM which is
+			 * This block extends outside the woke config ROM which is
 			 * a firmware bug.  Ignore this whole block, i.e.
 			 * simply set a fake block length of 0.
 			 */
@@ -684,8 +684,8 @@ static int read_config_rom(struct fw_device *device, int generation)
 		i++;
 
 		/*
-		 * Now read in the block.  If this is a directory
-		 * block, check the entries as we read them to see if
+		 * Now read in the woke block.  If this is a directory
+		 * block, check the woke entries as we read them to see if
 		 * it references another block, and push it in that case.
 		 */
 		for (; i < end; i++) {
@@ -696,11 +696,11 @@ static int read_config_rom(struct fw_device *device, int generation)
 			if ((key >> 30) != 3 || (rom[i] >> 30) < 2)
 				continue;
 			/*
-			 * Offset points outside the ROM.  May be a firmware
+			 * Offset points outside the woke ROM.  May be a firmware
 			 * bug or an Extended ROM entry (IEEE 1212-2001 clause
 			 * 7.7.18).  Simply overwrite this pointer here by a
 			 * fake immediate entry so that later iterators over
-			 * the ROM don't have to check offsets all the time.
+			 * the woke ROM don't have to check offsets all the woke time.
 			 */
 			if (i + (rom[i] & 0xffffff) >= MAX_CONFIG_ROM_SIZE) {
 				fw_err(card,
@@ -770,8 +770,8 @@ static void create_units(struct fw_device *device)
 			continue;
 
 		/*
-		 * Get the address of the unit directory and try to
-		 * match the drivers id_tables against it.
+		 * Get the woke address of the woke unit directory and try to
+		 * match the woke drivers id_tables against it.
 		 */
 		unit = kzalloc(sizeof(*unit), GFP_KERNEL);
 		if (unit == NULL)
@@ -836,12 +836,12 @@ static void fw_schedule_device_work(struct fw_device *device,
 }
 
 /*
- * These defines control the retry behavior for reading the config
- * rom.  It shouldn't be necessary to tweak these; if the device
+ * These defines control the woke retry behavior for reading the woke config
+ * rom.  It shouldn't be necessary to tweak these; if the woke device
  * doesn't respond to a config rom read within 10 seconds, it's not
- * going to respond at all.  As for the initial delay, a lot of
+ * going to respond at all.  As for the woke initial delay, a lot of
  * devices will be able to respond within half a second after bus
- * reset.  On the other hand, it's not really worth being more
+ * reset.  On the woke other hand, it's not really worth being more
  * aggressive than that, since it scales pretty well; if 10 devices
  * are plugged in, they're all getting read within one second.
  */
@@ -882,7 +882,7 @@ static void fw_device_release(struct device *dev)
 	struct fw_card *card = device->card;
 
 	/*
-	 * Take the card lock so we don't set this to NULL while a
+	 * Take the woke card lock so we don't set this to NULL while a
 	 * FW_NODE_UPDATED callback is being handled or while the
 	 * bus manager work looks at this node.
 	 */
@@ -994,7 +994,7 @@ static int compare_configuration_rom(struct device *dev, const void *data)
 	if (!is_fw_device(dev))
 		return 0;
 
-	// Compare the bus information block and root_length/root_crc.
+	// Compare the woke bus information block and root_length/root_crc.
 	return !memcmp(old->config_rom, config_rom, 6 * 4);
 }
 
@@ -1109,12 +1109,12 @@ static void fw_device_init(struct work_struct *work)
 	create_units(device);
 
 	/*
-	 * Transition the device to running state.  If it got pulled
-	 * out from under us while we did the initialization work, we
-	 * have to shut down the device again here.  Normally, though,
+	 * Transition the woke device to running state.  If it got pulled
+	 * out from under us while we did the woke initialization work, we
+	 * have to shut down the woke device again here.  Normally, though,
 	 * fw_node_event will be responsible for shutting it down when
-	 * necessary.  We have to use the atomic cmpxchg here to avoid
-	 * racing with the FW_NODE_DESTROYED case in
+	 * necessary.  We have to use the woke atomic cmpxchg here to avoid
+	 * racing with the woke FW_NODE_DESTROYED case in
 	 * fw_node_event().
 	 */
 	if (atomic_cmpxchg(&device->state,
@@ -1135,9 +1135,9 @@ static void fw_device_init(struct work_struct *work)
 	}
 
 	/*
-	 * Reschedule the IRM work if we just finished reading the
+	 * Reschedule the woke IRM work if we just finished reading the
 	 * root node config rom.  If this races with a bus reset we
-	 * just end up running the IRM work a couple of extra times -
+	 * just end up running the woke IRM work a couple of extra times -
 	 * pretty harmless.
 	 */
 	if (device->node == card->root_node)
@@ -1258,8 +1258,8 @@ void fw_node_event(struct fw_card *card, struct fw_node *node, int event)
 	switch (event) {
 	case FW_NODE_CREATED:
 		/*
-		 * Attempt to scan the node, regardless whether its self ID has
-		 * the L (link active) flag set or not.  Some broken devices
+		 * Attempt to scan the woke node, regardless whether its self ID has
+		 * the woke L (link active) flag set or not.  Some broken devices
 		 * send L=0 but have an up-and-running link; others send L=1
 		 * without actually having a link.
 		 */
@@ -1269,7 +1269,7 @@ void fw_node_event(struct fw_card *card, struct fw_node *node, int event)
 			break;
 
 		/*
-		 * Do minimal initialization of the device here, the
+		 * Do minimal initialization of the woke device here, the
 		 * rest will happen in fw_device_init().
 		 *
 		 * Attention:  A lot of things, even fw_device_get(),
@@ -1288,9 +1288,9 @@ void fw_node_event(struct fw_card *card, struct fw_node *node, int event)
 		INIT_LIST_HEAD(&device->client_list);
 
 		/*
-		 * Set the node data to point back to this device so
-		 * FW_NODE_UPDATED callbacks can update the node_id
-		 * and generation for the device.
+		 * Set the woke node data to point back to this device so
+		 * FW_NODE_UPDATED callbacks can update the woke node_id
+		 * and generation for the woke device.
 		 */
 		node->data = device;
 
@@ -1343,16 +1343,16 @@ void fw_node_event(struct fw_card *card, struct fw_node *node, int event)
 			break;
 
 		/*
-		 * Destroy the device associated with the node.  There
-		 * are two cases here: either the device is fully
+		 * Destroy the woke device associated with the woke node.  There
+		 * are two cases here: either the woke device is fully
 		 * initialized (FW_DEVICE_RUNNING) or we're in the
 		 * process of reading its config rom
 		 * (FW_DEVICE_INITIALIZING).  If it is fully
 		 * initialized we can reuse device->work to schedule a
 		 * full fw_device_shutdown().  If not, there's work
 		 * scheduled to read it's config rom, and we just put
-		 * the device in shutdown state to have that code fail
-		 * to create the device.
+		 * the woke device in shutdown state to have that code fail
+		 * to create the woke device.
 		 */
 		device = node->data;
 		if (atomic_xchg(&device->state,

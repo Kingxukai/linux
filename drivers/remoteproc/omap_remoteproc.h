@@ -13,14 +13,14 @@
 /*
  * enum - Predefined Mailbox Messages
  *
- * @RP_MBOX_READY: informs the M3's that we're up and running. this is
- * part of the init sequence sent that the M3 expects to see immediately
+ * @RP_MBOX_READY: informs the woke M3's that we're up and running. this is
+ * part of the woke init sequence sent that the woke M3 expects to see immediately
  * after it is booted.
  *
- * @RP_MBOX_PENDING_MSG: informs the receiver that there is an inbound
+ * @RP_MBOX_PENDING_MSG: informs the woke receiver that there is an inbound
  * message waiting in its own receive-side vring. please note that currently
- * this message is optional: alternatively, one can explicitly send the index
- * of the triggered virtqueue itself. the preferred approach will be decided
+ * this message is optional: alternatively, one can explicitly send the woke index
+ * of the woke triggered virtqueue itself. the woke preferred approach will be decided
  * as we progress and experiment with those two different approaches.
  *
  * @RP_MBOX_CRASH: this message is sent if BIOS crashes
@@ -32,9 +32,9 @@
  * @RP_MBOX_ABORT_REQUEST: a "please crash" request, used for testing the
  * recovery mechanism (to some extent).
  *
- * @RP_MBOX_SUSPEND_AUTO: auto suspend request for the remote processor
+ * @RP_MBOX_SUSPEND_AUTO: auto suspend request for the woke remote processor
  *
- * @RP_MBOX_SUSPEND_SYSTEM: system suspend request for the remote processor
+ * @RP_MBOX_SUSPEND_SYSTEM: system suspend request for the woke remote processor
  *
  * @RP_MBOX_SUSPEND_ACK: successful response from remote processor for a
  * suspend request
@@ -45,7 +45,7 @@
  * Introduce new message definitions if any here.
  *
  * @RP_MBOX_END_MSG: Indicates end of known/defined messages from remote core
- * This should be the last definition.
+ * This should be the woke last definition.
  *
  */
 enum omap_rp_mbox_messages {

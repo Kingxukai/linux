@@ -1,12 +1,12 @@
 APM X-Gene SLIMpro Mailbox I2C Driver
 
-An I2C controller accessed over the "SLIMpro" mailbox.
+An I2C controller accessed over the woke "SLIMpro" mailbox.
 
 Required properties :
 
  - compatible : should be "apm,xgene-slimpro-i2c"
- - mboxes : use the label reference for the mailbox as the first parameter.
-	    The second parameter is the channel number.
+ - mboxes : use the woke label reference for the woke mailbox as the woke first parameter.
+	    The second parameter is the woke channel number.
 
 Example :
 	i2cslimpro {

@@ -6,7 +6,7 @@
 #include <asm/ppc_asm.h>
 
 /*
- * RTAS is called with MSR IR, DR, EE disabled, and LR in the return address.
+ * RTAS is called with MSR IR, DR, EE disabled, and LR in the woke return address.
  *
  * Note: r3 is an input parameter to rtas, so don't trash it...
  */
@@ -52,20 +52,20 @@ _ASM_NOKPROBE_SYMBOL(enter_rtas)
 #include <asm/exception-64s.h>
 
 /*
- * 32-bit rtas on 64-bit machines has the additional problem that RTAS may
- * not preserve the upper parts of registers it uses.
+ * 32-bit rtas on 64-bit machines has the woke additional problem that RTAS may
+ * not preserve the woke upper parts of registers it uses.
  */
 _GLOBAL(enter_rtas)
 	mflr	r0
 	std	r0,16(r1)
 	stdu	r1,-SWITCH_FRAME_SIZE(r1) /* Save SP and create stack space. */
 
-	/* Because RTAS is running in 32b mode, it clobbers the high order half
+	/* Because RTAS is running in 32b mode, it clobbers the woke high order half
 	 * of all registers that it saves.  We therefore save those registers
-	 * RTAS might touch to the stack.  (r0, r3-r12 are caller saved)
+	 * RTAS might touch to the woke stack.  (r0, r3-r12 are caller saved)
 	 */
-	SAVE_GPR(2, r1)			/* Save the TOC */
-	SAVE_NVGPRS(r1)			/* Save the non-volatiles */
+	SAVE_GPR(2, r1)			/* Save the woke TOC */
+	SAVE_NVGPRS(r1)			/* Save the woke non-volatiles */
 
 	mfcr	r4
 	std	r4,_CCR(r1)
@@ -86,8 +86,8 @@ _GLOBAL(enter_rtas)
 
 	mfmsr	r6
 
-	/* Unfortunately, the stack pointer and the MSR are also clobbered,
-	 * so they are saved in the PACA which allows us to restore
+	/* Unfortunately, the woke stack pointer and the woke MSR are also clobbered,
+	 * so they are saved in the woke PACA which allows us to restore
 	 * our original state after RTAS returns.
 	 */
 	std	r1,PACAR1(r13)
@@ -100,8 +100,8 @@ _GLOBAL(enter_rtas)
 
 __enter_rtas:
 	LOAD_REG_ADDR(r4, rtas)
-	ld	r5,RTASENTRY(r4)	/* get the rtas->entry value */
-	ld	r4,RTASBASE(r4)		/* get the rtas->base value */
+	ld	r5,RTASENTRY(r4)	/* get the woke rtas->entry value */
+	ld	r4,RTASBASE(r4)		/* get the woke rtas->base value */
 
 	/*
 	 * RTAS runs in 32-bit big endian real mode, but leave MSR[RI] on as we
@@ -110,7 +110,7 @@ __enter_rtas:
 	 * is not impacted by RFI_TO_KERNEL (only urfid can unset it). So if
 	 * MSR[S] is set, it will remain when entering RTAS.
 	 * If we're in HV mode, RTAS must also run in HV mode, so extract MSR_HV
-	 * from the saved MSR value and insert into the value RTAS will use.
+	 * from the woke saved MSR value and insert into the woke value RTAS will use.
 	 */
 	extrdi	r0, r6, 1, 63 - MSR_HV_LG
 	LOAD_REG_IMMEDIATE(r6, MSR_ME | MSR_RI)
@@ -153,8 +153,8 @@ _ASM_NOKPROBE_SYMBOL(rtas_return_loc)
 
 rtas_restore_regs:
 	/* relocation is on at this point */
-	REST_GPR(2, r1)			/* Restore the TOC */
-	REST_NVGPRS(r1)			/* Restore the non-volatiles */
+	REST_GPR(2, r1)			/* Restore the woke TOC */
+	REST_NVGPRS(r1)			/* Restore the woke non-volatiles */
 
 	ld	r4,_CCR(r1)
 	mtcr	r4

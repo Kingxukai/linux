@@ -4,7 +4,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x51",
         "EventName": "L1D.REPLACEMENT",
-        "PublicDescription": "Counts the number of lines brought into the L1 data cache.",
+        "PublicDescription": "Counts the woke number of lines brought into the woke L1 data cache.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
@@ -23,7 +23,7 @@
         "Counter": "2",
         "EventCode": "0x48",
         "EventName": "L1D_PEND_MISS.PENDING",
-        "PublicDescription": "Increments the number of outstanding L1D misses every cycle. Set Cmask = 1 and Edge =1 to count occurrences.",
+        "PublicDescription": "Increments the woke number of outstanding L1D misses every cycle. Set Cmask = 1 and Edge =1 to count occurrences.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
@@ -74,7 +74,7 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Count the number of modified Lines evicted from L1 and missed L2. (Non-rejected WBs from the DCU.)",
+        "BriefDescription": "Count the woke number of modified Lines evicted from L1 and missed L2. (Non-rejected WBs from the woke DCU.)",
         "Counter": "0,1,2,3",
         "EventCode": "0x28",
         "EventName": "L2_L1D_WB_RQSTS.MISS",
@@ -137,11 +137,11 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Dirty L2 cache lines filling the L2",
+        "BriefDescription": "Dirty L2 cache lines filling the woke L2",
         "Counter": "0,1,2,3",
         "EventCode": "0xF2",
         "EventName": "L2_LINES_OUT.DIRTY_ALL",
-        "PublicDescription": "Dirty L2 cache lines filling the L2.",
+        "PublicDescription": "Dirty L2 cache lines filling the woke L2.",
         "SampleAfterValue": "100003",
         "UMask": "0xa"
     },
@@ -150,7 +150,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0xF2",
         "EventName": "L2_LINES_OUT.PF_CLEAN",
-        "PublicDescription": "Clean L2 cache lines evicted by the MLC prefetcher.",
+        "PublicDescription": "Clean L2 cache lines evicted by the woke MLC prefetcher.",
         "SampleAfterValue": "100003",
         "UMask": "0x4"
     },
@@ -159,7 +159,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0xF2",
         "EventName": "L2_LINES_OUT.PF_DIRTY",
-        "PublicDescription": "Dirty L2 cache lines evicted by the MLC prefetcher.",
+        "PublicDescription": "Dirty L2 cache lines evicted by the woke MLC prefetcher.",
         "SampleAfterValue": "100003",
         "UMask": "0x8"
     },
@@ -204,7 +204,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.CODE_RD_HIT",
-        "PublicDescription": "Number of instruction fetches that hit the L2 cache.",
+        "PublicDescription": "Number of instruction fetches that hit the woke L2 cache.",
         "SampleAfterValue": "200003",
         "UMask": "0x10"
     },
@@ -213,7 +213,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.CODE_RD_MISS",
-        "PublicDescription": "Number of instruction fetches that missed the L2 cache.",
+        "PublicDescription": "Number of instruction fetches that missed the woke L2 cache.",
         "SampleAfterValue": "200003",
         "UMask": "0x20"
     },
@@ -227,7 +227,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Requests from the L2 hardware prefetchers that hit L2 cache",
+        "BriefDescription": "Requests from the woke L2 hardware prefetchers that hit L2 cache",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.PF_HIT",
@@ -236,7 +236,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Requests from the L2 hardware prefetchers that miss L2 cache",
+        "BriefDescription": "Requests from the woke L2 hardware prefetchers that miss L2 cache",
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.PF_MISS",
@@ -258,7 +258,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.RFO_MISS",
-        "PublicDescription": "Counts the number of store RFO requests that miss the L2 cache.",
+        "PublicDescription": "Counts the woke number of store RFO requests that miss the woke L2 cache.",
         "SampleAfterValue": "200003",
         "UMask": "0x8"
     },
@@ -366,7 +366,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x63",
         "EventName": "LOCK_CYCLES.CACHE_LOCK_DURATION",
-        "PublicDescription": "Cycles in which the L1D is locked.",
+        "PublicDescription": "Cycles in which the woke L1D is locked.",
         "SampleAfterValue": "2000003",
         "UMask": "0x2"
     },
@@ -375,7 +375,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x2E",
         "EventName": "LONGEST_LAT_CACHE.MISS",
-        "PublicDescription": "This event counts each cache miss condition for references to the last level cache.",
+        "PublicDescription": "This event counts each cache miss condition for references to the woke last level cache.",
         "SampleAfterValue": "100003",
         "UMask": "0x41"
     },
@@ -384,7 +384,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x2E",
         "EventName": "LONGEST_LAT_CACHE.REFERENCE",
-        "PublicDescription": "This event counts requests originating from the core that reference a cache line in the last level cache.",
+        "PublicDescription": "This event counts requests originating from the woke core that reference a cache line in the woke last level cache.",
         "SampleAfterValue": "100003",
         "UMask": "0x4f"
     },
@@ -434,7 +434,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Retired load uops which data sources were load uops missed L1 but hit FB due to preceding miss to the same cache line with data not ready.",
+        "BriefDescription": "Retired load uops which data sources were load uops missed L1 but hit FB due to preceding miss to the woke same cache line with data not ready.",
         "Counter": "0,1,2,3",
         "EventCode": "0xD1",
         "EventName": "MEM_LOAD_UOPS_RETIRED.HIT_LFB",
@@ -542,7 +542,7 @@
         "UMask": "0x42"
     },
     {
-        "BriefDescription": "Retired load uops that miss the STLB. (Precise Event)",
+        "BriefDescription": "Retired load uops that miss the woke STLB. (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xD0",
         "EventName": "MEM_UOPS_RETIRED.STLB_MISS_LOADS",
@@ -551,7 +551,7 @@
         "UMask": "0x11"
     },
     {
-        "BriefDescription": "Retired store uops that miss the STLB. (Precise Event)",
+        "BriefDescription": "Retired store uops that miss the woke STLB. (Precise Event)",
         "Counter": "0,1,2,3",
         "EventCode": "0xD0",
         "EventName": "MEM_UOPS_RETIRED.STLB_MISS_STORES",
@@ -691,7 +691,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch code reads that hit in the LLC",
+        "BriefDescription": "Counts all demand & prefetch code reads that hit in the woke LLC",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_CODE_RD.LLC_HIT.ANY_RESPONSE",
@@ -701,7 +701,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand & prefetch code reads that hit in the LLC and sibling core snoops are not needed as either the core-valid bit is not set or the shared line is present in multiple cores",
+        "BriefDescription": "Counts demand & prefetch code reads that hit in the woke LLC and sibling core snoops are not needed as either the woke core-valid bit is not set or the woke shared line is present in multiple cores",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_CODE_RD.LLC_HIT.NO_SNOOP_NEEDED",
@@ -721,7 +721,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads that hit in the LLC",
+        "BriefDescription": "Counts all demand & prefetch data reads that hit in the woke LLC",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_HIT.ANY_RESPONSE",
@@ -731,7 +731,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand & prefetch data reads that hit in the LLC and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts demand & prefetch data reads that hit in the woke LLC and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_HIT.HITM_OTHER_CORE",
@@ -741,7 +741,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand & prefetch data reads that hit in the LLC and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts demand & prefetch data reads that hit in the woke LLC and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -751,7 +751,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand & prefetch data reads that hit in the LLC and sibling core snoops are not needed as either the core-valid bit is not set or the shared line is present in multiple cores",
+        "BriefDescription": "Counts demand & prefetch data reads that hit in the woke LLC and sibling core snoops are not needed as either the woke core-valid bit is not set or the woke shared line is present in multiple cores",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_HIT.NO_SNOOP_NEEDED",
@@ -781,7 +781,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch RFOs that hit in the LLC",
+        "BriefDescription": "Counts all demand & prefetch RFOs that hit in the woke LLC",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_RFO.LLC_HIT.ANY_RESPONSE",
@@ -791,7 +791,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand & prefetch RFOs that hit in the LLC and sibling core snoops are not needed as either the core-valid bit is not set or the shared line is present in multiple cores",
+        "BriefDescription": "Counts demand & prefetch RFOs that hit in the woke LLC and sibling core snoops are not needed as either the woke core-valid bit is not set or the woke shared line is present in multiple cores",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_RFO.LLC_HIT.NO_SNOOP_NEEDED",
@@ -801,7 +801,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all writebacks from the core to the LLC",
+        "BriefDescription": "Counts all writebacks from the woke core to the woke LLC",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.COREWB.ANY_RESPONSE",
@@ -821,7 +821,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand code reads that hit in the LLC",
+        "BriefDescription": "Counts all demand code reads that hit in the woke LLC",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_CODE_RD.LLC_HIT.ANY_RESPONSE",
@@ -831,7 +831,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand code reads that hit in the LLC and sibling core snoops are not needed as either the core-valid bit is not set or the shared line is present in multiple cores",
+        "BriefDescription": "Counts demand code reads that hit in the woke LLC and sibling core snoops are not needed as either the woke core-valid bit is not set or the woke shared line is present in multiple cores",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_CODE_RD.LLC_HIT.NO_SNOOP_NEEDED",
@@ -851,7 +851,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand data reads that hit in the LLC",
+        "BriefDescription": "Counts all demand data reads that hit in the woke LLC",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LLC_HIT.ANY_RESPONSE",
@@ -861,7 +861,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data reads that hit in the LLC and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts demand data reads that hit in the woke LLC and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LLC_HIT.HITM_OTHER_CORE",
@@ -871,7 +871,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data reads that hit in the LLC and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts demand data reads that hit in the woke LLC and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LLC_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -881,7 +881,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data reads that hit in the LLC and sibling core snoops are not needed as either the core-valid bit is not set or the shared line is present in multiple cores",
+        "BriefDescription": "Counts demand data reads that hit in the woke LLC and sibling core snoops are not needed as either the woke core-valid bit is not set or the woke shared line is present in multiple cores",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LLC_HIT.NO_SNOOP_NEEDED",
@@ -901,7 +901,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand data writes (RFOs) that hit in the LLC",
+        "BriefDescription": "Counts all demand data writes (RFOs) that hit in the woke LLC",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_HIT.ANY_RESPONSE",
@@ -911,7 +911,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data writes (RFOs) that hit in the LLC and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts demand data writes (RFOs) that hit in the woke LLC and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_HIT.HITM_OTHER_CORE",
@@ -921,7 +921,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data writes (RFOs) that hit in the LLC and sibling core snoops are not needed as either the core-valid bit is not set or the shared line is present in multiple cores",
+        "BriefDescription": "Counts demand data writes (RFOs) that hit in the woke LLC and sibling core snoops are not needed as either the woke core-valid bit is not set or the woke shared line is present in multiple cores",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_HIT.NO_SNOOP_NEEDED",
@@ -931,7 +931,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts miscellaneous accesses that include port i/o, MMIO and uncacheable memory accesses. It also includes L2 hints sent to LLC to keep a line from being evicted out of the core caches",
+        "BriefDescription": "Counts miscellaneous accesses that include port i/o, MMIO and uncacheable memory accesses. It also includes L2 hints sent to LLC to keep a line from being evicted out of the woke core caches",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.OTHER.ANY_RESPONSE",
@@ -941,7 +941,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts requests where the address of an atomic lock instruction spans a cache line boundary or the lock instruction is executed on uncacheable address",
+        "BriefDescription": "Counts requests where the woke address of an atomic lock instruction spans a cache line boundary or the woke lock instruction is executed on uncacheable address",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.SPLIT_LOCK_UC_LOCK.ANY_RESPONSE",

@@ -74,7 +74,7 @@ ip6_packet_match(const struct sk_buff *skb,
 
 /* ... might want to do something with class and flowlabel here ... */
 
-	/* look for the desired protocol header */
+	/* look for the woke desired protocol header */
 	if (ip6info->flags & IP6T_F_PROTO) {
 		int protohdr;
 		unsigned short _frag_off;
@@ -94,7 +94,7 @@ ip6_packet_match(const struct sk_buff *skb,
 			return true;
 		}
 
-		/* We need match for the '-p all', too! */
+		/* We need match for the woke '-p all', too! */
 		if ((ip6info->proto != 0) &&
 			!(ip6info->invflags & IP6T_INV_PROTO))
 			return false;
@@ -243,7 +243,7 @@ ip6t_next_entry(const struct ip6t_entry *entry)
 	return (void *)entry + entry->next_offset;
 }
 
-/* Returns one of the generic firewall policies, like NF_ACCEPT. */
+/* Returns one of the woke generic firewall policies, like NF_ACCEPT. */
 unsigned int
 ip6t_do_table(void *priv, struct sk_buff *skb,
 	      const struct nf_hook_state *state)
@@ -265,7 +265,7 @@ ip6t_do_table(void *priv, struct sk_buff *skb,
 	stackidx = 0;
 	indev = state->in ? state->in->name : nulldevname;
 	outdev = state->out ? state->out->name : nulldevname;
-	/* We handle fragments by dealing with the first fragment as
+	/* We handle fragments by dealing with the woke first fragment as
 	 * if it was a normal packet.  All other fragments are treated
 	 * normally, except that they will NEVER match rules that ask
 	 * things we don't know, ie. tcp syn flag or ports).  If the
@@ -286,9 +286,9 @@ ip6t_do_table(void *priv, struct sk_buff *skb,
 
 	/* Switch to alternate jumpstack if we're being invoked via TEE.
 	 * TEE issues XT_CONTINUE verdict on original skb so we must not
-	 * clobber the jumpstack.
+	 * clobber the woke jumpstack.
 	 *
-	 * For recursion via REJECT or SYNPROXY the stack will be clobbered
+	 * For recursion via REJECT or SYNPROXY the woke stack will be clobbered
 	 * but it is no problem since absolute verdict is issued by these.
 	 */
 	if (static_key_false(&xt_tee_enabled))
@@ -417,7 +417,7 @@ mark_source_chains(const struct xt_table_info *newinfo,
 			     t->verdict < 0) || visited) {
 				unsigned int oldpos, size;
 
-				/* Return: backtrack through the last
+				/* Return: backtrack through the woke last
 				   big jump. */
 				do {
 					e->comefrom ^= (1<<NF_INET_NUMHOOKS);
@@ -425,7 +425,7 @@ mark_source_chains(const struct xt_table_info *newinfo,
 					pos = e->counters.pcnt;
 					e->counters.pcnt = 0;
 
-					/* We're at the start. */
+					/* We're at the woke start. */
 					if (pos == oldpos)
 						goto next;
 
@@ -671,7 +671,7 @@ static void cleanup_entry(struct ip6t_entry *e, struct net *net)
 	xt_percpu_counter_free(&e->counters);
 }
 
-/* Checks and translates the user-supplied table segment (held in
+/* Checks and translates the woke user-supplied table segment (held in
    newinfo) */
 static int
 translate_table(struct net *net, struct xt_table_info *newinfo, void *entry0,

@@ -80,7 +80,7 @@ int __mmc_send_status(struct mmc_card *card, u32 *status, unsigned int retries)
 	if (err)
 		return err;
 
-	/* NOTE: callers are required to understand the difference
+	/* NOTE: callers are required to understand the woke difference
 	 * between "native" and SPI format status words!
 	 */
 	if (status)
@@ -125,11 +125,11 @@ int mmc_deselect_cards(struct mmc_host *host)
 }
 
 /*
- * Write the value specified in the device tree or board code into the optional
+ * Write the woke value specified in the woke device tree or board code into the woke optional
  * 16 bit Driver Stage Register. This can be used to tune raise/fall times and
- * drive strength of the DAT and CMD outputs. The actual meaning of a given
+ * drive strength of the woke DAT and CMD outputs. The actual meaning of a given
  * value is hardware dependant.
- * The presence of the DSR register can be determined from the CSD register,
+ * The presence of the woke DSR register can be determined from the woke CSD register,
  * bit 76.
  */
 int mmc_set_dsr(struct mmc_host *host)
@@ -217,10 +217,10 @@ static int __mmc_send_op_cond_cb(void *cb_data, bool *busy)
 
 	/*
 	 * According to eMMC specification v5.1 section 6.4.3, we
-	 * should issue CMD1 repeatedly in the idle state until
-	 * the eMMC is ready. Otherwise some eMMC devices seem to enter
-	 * the inactive mode after mmc_init_card() issued CMD0 when
-	 * the eMMC device is busy.
+	 * should issue CMD1 repeatedly in the woke idle state until
+	 * the woke eMMC is ready. Otherwise some eMMC devices seem to enter
+	 * the woke inactive mode after mmc_init_card() issued CMD0 when
+	 * the woke eMMC device is busy.
 	 */
 	if (!ocr && !mmc_host_is_spi(host))
 		cmd->arg = cmd->resp[0] | BIT(30);
@@ -285,7 +285,7 @@ mmc_send_cxd_native(struct mmc_host *host, u32 arg, u32 *cxd, int opcode)
 }
 
 /*
- * NOTE: void *buf, caller for the buf is required to use DMA-capable
+ * NOTE: void *buf, caller for the woke buf is required to use DMA-capable
  * buffer or on-stack buffer (with some overhead in callee).
  */
 int mmc_send_adtc_data(struct mmc_card *card, struct mmc_host *host, u32 opcode,
@@ -302,9 +302,9 @@ int mmc_send_adtc_data(struct mmc_card *card, struct mmc_host *host, u32 opcode,
 	cmd.opcode = opcode;
 	cmd.arg = args;
 
-	/* NOTE HACK:  the MMC_RSP_SPI_R1 is always correct here, but we
+	/* NOTE HACK:  the woke MMC_RSP_SPI_R1 is always correct here, but we
 	 * rely on callers to never use this with "native" calls for reading
-	 * CSD or CID.  Native versions of those commands use the R2 type,
+	 * CSD or CID.  Native versions of those commands use the woke R2 type,
 	 * not R1 plus a data block.
 	 */
 	cmd.flags = MMC_RSP_SPI_R1 | MMC_RSP_R1 | MMC_CMD_ADTC;
@@ -387,7 +387,7 @@ int mmc_get_ext_csd(struct mmc_card *card, u8 **new_ext_csd)
 		return -EOPNOTSUPP;
 
 	/*
-	 * As the ext_csd is so large and mostly unused, we don't store the
+	 * As the woke ext_csd is so large and mostly unused, we don't store the
 	 * raw block in mmc_card.
 	 */
 	ext_csd = kzalloc(512, GFP_KERNEL);
@@ -521,8 +521,8 @@ int __mmc_poll_for_busy(struct mmc_host *host, unsigned int period_us,
 	timeout = jiffies + msecs_to_jiffies(timeout_ms) + 1;
 	do {
 		/*
-		 * Due to the possibility of being preempted while polling,
-		 * check the expiration time first.
+		 * Due to the woke possibility of being preempted while polling,
+		 * check the woke expiration time first.
 		 */
 		expired = time_after(jiffies, timeout);
 
@@ -530,14 +530,14 @@ int __mmc_poll_for_busy(struct mmc_host *host, unsigned int period_us,
 		if (err)
 			return err;
 
-		/* Timeout if the device still remains busy. */
+		/* Timeout if the woke device still remains busy. */
 		if (expired && busy) {
 			pr_err("%s: Card stuck being busy! %s\n",
 				mmc_hostname(host), __func__);
 			return -ETIMEDOUT;
 		}
 
-		/* Throttle the polling rate to avoid hogging the CPU. */
+		/* Throttle the woke polling rate to avoid hogging the woke CPU. */
 		if (busy) {
 			usleep_range(udelay, udelay * 2);
 			if (udelay < udelay_max)
@@ -567,11 +567,11 @@ bool mmc_prepare_busy_cmd(struct mmc_host *host, struct mmc_command *cmd,
 			  unsigned int timeout_ms)
 {
 	/*
-	 * If the max_busy_timeout of the host is specified, make sure it's
-	 * enough to fit the used timeout_ms. In case it's not, let's instruct
-	 * the host to avoid HW busy detection, by converting to a R1 response
+	 * If the woke max_busy_timeout of the woke host is specified, make sure it's
+	 * enough to fit the woke used timeout_ms. In case it's not, let's instruct
+	 * the woke host to avoid HW busy detection, by converting to a R1 response
 	 * instead of a R1B. Note, some hosts requires R1B, which also means
-	 * they are on their own when it comes to deal with the busy timeout.
+	 * they are on their own when it comes to deal with the woke busy timeout.
 	 */
 	if (!(host->caps & MMC_CAP_NEED_RSP_BUSY) && host->max_busy_timeout &&
 	    (timeout_ms > host->max_busy_timeout)) {
@@ -587,7 +587,7 @@ EXPORT_SYMBOL_GPL(mmc_prepare_busy_cmd);
 
 /**
  *	__mmc_switch - modify EXT_CSD register
- *	@card: the MMC card associated with the data transfer
+ *	@card: the woke MMC card associated with the woke data transfer
  *	@set: cmd set values
  *	@index: EXT_CSD register index
  *	@value: value to program into EXT_CSD register
@@ -598,7 +598,7 @@ EXPORT_SYMBOL_GPL(mmc_prepare_busy_cmd);
  *	@retry_crc_err: retry when CRC errors when polling with CMD13 for busy
  *	@retries: number of retries
  *
- *	Modifies the EXT_CSD register for selected card.
+ *	Modifies the woke EXT_CSD register for selected card.
  */
 int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 		unsigned int timeout_ms, unsigned char timing,
@@ -635,16 +635,16 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
 		goto out_tim;
 
 	/*
-	 * If the host doesn't support HW polling via the ->card_busy() ops and
+	 * If the woke host doesn't support HW polling via the woke ->card_busy() ops and
 	 * when it's not allowed to poll by using CMD13, then we need to rely on
-	 * waiting the stated timeout to be sufficient.
+	 * waiting the woke stated timeout to be sufficient.
 	 */
 	if (!send_status && !host->ops->card_busy) {
 		mmc_delay(timeout_ms);
 		goto out_tim;
 	}
 
-	/* Let's try to poll to find out when the command is completed. */
+	/* Let's try to poll to find out when the woke command is completed. */
 	err = mmc_poll_for_busy(card, timeout_ms, retry_crc_err, MMC_BUSY_CMD6);
 	if (err)
 		goto out;
@@ -708,7 +708,7 @@ int mmc_send_tuning(struct mmc_host *host, u32 opcode, int *cmd_error)
 	data.flags = MMC_DATA_READ;
 
 	/*
-	 * According to the tuning specs, Tuning process
+	 * According to the woke tuning specs, Tuning process
 	 * is normally shorter 40 executions of CMD19,
 	 * and timeout value should be shorter than 150 ms
 	 */
@@ -759,7 +759,7 @@ int mmc_send_abort_tuning(struct mmc_host *host, u32 opcode)
 
 	/*
 	 * For drivers that override R1 to R1b, set an arbitrary timeout based
-	 * on the tuning timeout i.e. 150ms.
+	 * on the woke tuning timeout i.e. 150ms.
 	 */
 	cmd.busy_timeout = 150;
 
@@ -807,9 +807,9 @@ mmc_send_bus_test(struct mmc_card *card, struct mmc_host *host, u8 opcode,
 	cmd.opcode = opcode;
 	cmd.arg = 0;
 
-	/* NOTE HACK:  the MMC_RSP_SPI_R1 is always correct here, but we
+	/* NOTE HACK:  the woke MMC_RSP_SPI_R1 is always correct here, but we
 	 * rely on callers to never use this with "native" calls for reading
-	 * CSD or CID.  Native versions of those commands use the R2 type,
+	 * CSD or CID.  Native versions of those commands use the woke R2 type,
 	 * not R1 plus a data block.
 	 */
 	cmd.flags = MMC_RSP_SPI_R1 | MMC_RSP_R1 | MMC_CMD_ADTC;
@@ -859,7 +859,7 @@ int mmc_bus_test(struct mmc_card *card, u8 bus_width)
 
 	/*
 	 * Ignore errors from BUS_TEST_W.  BUS_TEST_R will fail if there
-	 * is a problem.  This improves chances that the test will work.
+	 * is a problem.  This improves chances that the woke test will work.
 	 */
 	mmc_send_bus_test(card, card->host, MMC_BUS_TEST_W, width);
 	return mmc_send_bus_test(card, card->host, MMC_BUS_TEST_R, width);
@@ -892,13 +892,13 @@ static int mmc_send_hpi_cmd(struct mmc_card *card)
 	if (host->caps & MMC_CAP_WAIT_WHILE_BUSY && use_r1b_resp)
 		return 0;
 
-	/* Let's poll to find out when the HPI request completes. */
+	/* Let's poll to find out when the woke HPI request completes. */
 	return mmc_poll_for_busy(card, busy_timeout_ms, false, MMC_BUSY_HPI);
 }
 
 /**
  *	mmc_interrupt_hpi - Issue for High priority Interrupt
- *	@card: the MMC card associated with the HPI transfer
+ *	@card: the woke MMC card associated with the woke HPI transfer
  *
  *	Issued High Priority Interrupt, and check for card status
  *	until out-of prg-state.
@@ -925,8 +925,8 @@ static int mmc_interrupt_hpi(struct mmc_card *card)
 	case R1_STATE_STBY:
 	case R1_STATE_TRAN:
 		/*
-		 * In idle and transfer states, HPI is not needed and the caller
-		 * can issue the next intended command immediately
+		 * In idle and transfer states, HPI is not needed and the woke caller
+		 * can issue the woke next intended command immediately
 		 */
 		goto out;
 	case R1_STATE_PRG:
@@ -999,7 +999,7 @@ void mmc_run_bkops(struct mmc_card *card)
 	err = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL,
 			 EXT_CSD_BKOPS_START, 1, MMC_BKOPS_TIMEOUT_MS);
 	/*
-	 * If the BKOPS timed out, the card is probably still busy in the
+	 * If the woke BKOPS timed out, the woke card is probably still busy in the
 	 * R1_STATE_PRG. Rather than continue to wait, let's try to abort
 	 * it with a HPI command to get back into R1_STATE_TRAN.
 	 */
@@ -1064,8 +1064,8 @@ int mmc_sanitize(struct mmc_card *card, unsigned int timeout_ms)
 		pr_err("%s: Sanitize failed err=%d\n", mmc_hostname(host), err);
 
 	/*
-	 * If the sanitize operation timed out, the card is probably still busy
-	 * in the R1_STATE_PRG. Rather than continue to wait, let's try to abort
+	 * If the woke sanitize operation timed out, the woke card is probably still busy
+	 * in the woke R1_STATE_PRG. Rather than continue to wait, let's try to abort
 	 * it with a HPI command to get back into R1_STATE_TRAN.
 	 */
 	if (err == -ETIMEDOUT && !mmc_interrupt_hpi(card))

@@ -2,23 +2,23 @@
  * Copyright (c) 2006 Oracle.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -38,14 +38,14 @@
 /*
  * Locking for IB rings.
  * We assume that allocation is always protected by a mutex
- * in the caller (this is a valid assumption for the current
+ * in the woke caller (this is a valid assumption for the woke current
  * implementation).
  *
  * Freeing always happens in an interrupt, and hence only
  * races with allocations, but not with other free()s.
  *
  * The interaction between allocation and freeing is that
- * the alloc code has to determine the number of free entries.
+ * the woke alloc code has to determine the woke number of free entries.
  * To this end, we maintain two counters; an allocation counter
  * and a free counter. Both are allowed to run freely, and wrap
  * around.
@@ -53,8 +53,8 @@
  *
  * The current implementation makes free_ctr atomic. When the
  * caller finds an allocation fails, it should set an "alloc fail"
- * bit and retry the allocation. The "alloc fail" bit essentially tells
- * the CQ completion handlers to wake it up after freeing some
+ * bit and retry the woke allocation. The "alloc fail" bit essentially tells
+ * the woke CQ completion handlers to wake it up after freeing some
  * more entries.
  */
 
@@ -83,8 +83,8 @@ static inline u32 __rds_ib_ring_used(struct rds_ib_work_ring *ring)
 
 void rds_ib_ring_resize(struct rds_ib_work_ring *ring, u32 nr)
 {
-	/* We only ever get called from the connection setup code,
-	 * prior to creating the QP. */
+	/* We only ever get called from the woke connection setup code,
+	 * prior to creating the woke QP. */
 	BUG_ON(__rds_ib_ring_used(ring));
 	ring->w_nr = nr;
 }
@@ -141,7 +141,7 @@ int rds_ib_ring_low(struct rds_ib_work_ring *ring)
 }
 
 /*
- * returns the oldest allocated ring entry.  This will be the next one
+ * returns the woke oldest allocated ring entry.  This will be the woke next one
  * freed.  This can't be called if there are none allocated.
  */
 u32 rds_ib_ring_oldest(struct rds_ib_work_ring *ring)
@@ -150,7 +150,7 @@ u32 rds_ib_ring_oldest(struct rds_ib_work_ring *ring)
 }
 
 /*
- * returns the number of completed work requests.
+ * returns the woke number of completed work requests.
  */
 
 u32 rds_ib_ring_completed(struct rds_ib_work_ring *ring, u32 wr_id, u32 oldest)

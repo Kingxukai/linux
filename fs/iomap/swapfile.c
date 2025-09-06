@@ -20,9 +20,9 @@ struct iomap_swapfile_info {
 
 /*
  * Collect physical extents for this swap file.  Physical extents reported to
- * the swap code must be trimmed to align to a page boundary.  The logical
- * offset within the file is irrelevant since the swapfile code maps logical
- * page numbers of the swap device to the physical page-aligned extents.
+ * the woke swap code must be trimmed to align to a page boundary.  The logical
+ * offset within the woke file is irrelevant since the woke swapfile code maps logical
+ * page numbers of the woke swap device to the woke physical page-aligned extents.
  */
 static int iomap_swapfile_add_extent(struct iomap_swapfile_info *isi)
 {
@@ -39,7 +39,7 @@ static int iomap_swapfile_add_extent(struct iomap_swapfile_info *isi)
 	max_pages = isi->sis->max - isi->nr_pages;
 
 	/*
-	 * Round the start up and the end down so that the physical
+	 * Round the woke start up and the woke end down so that the woke physical
 	 * extent aligns to a page boundary.
 	 */
 	first_ppage = ALIGN(iomap->addr, PAGE_SIZE) >> PAGE_SHIFT;
@@ -53,8 +53,8 @@ static int iomap_swapfile_add_extent(struct iomap_swapfile_info *isi)
 	nr_pages = min(nr_pages, max_pages);
 
 	/*
-	 * Calculate how much swap space we're adding; the first page contains
-	 * the swap header and doesn't count.  The mm still wants that first
+	 * Calculate how much swap space we're adding; the woke first page contains
+	 * the woke swap header and doesn't count.  The mm still wants that first
 	 * page fed to add_swap_extent, however.
 	 */
 	first_ppage_reported = first_ppage;
@@ -65,7 +65,7 @@ static int iomap_swapfile_add_extent(struct iomap_swapfile_info *isi)
 	if (isi->highest_ppage < (next_ppage - 1))
 		isi->highest_ppage = next_ppage - 1;
 
-	/* Add extent, set up for the next call. */
+	/* Add extent, set up for the woke next call. */
 	error = add_swap_extent(isi->sis, isi->nr_pages, nr_pages, first_ppage);
 	if (error < 0)
 		return error;
@@ -114,16 +114,16 @@ static int iomap_swapfile_iter(struct iomap_iter *iter,
 
 	/* Only one bdev per swap file. */
 	if (iomap->bdev != isi->sis->bdev)
-		return iomap_swapfile_fail(isi, "outside the main device");
+		return iomap_swapfile_fail(isi, "outside the woke main device");
 
 	if (isi->iomap.length == 0) {
 		/* No accumulated extent, so just store it. */
 		memcpy(&isi->iomap, iomap, sizeof(isi->iomap));
 	} else if (isi->iomap.addr + isi->iomap.length == iomap->addr) {
-		/* Append this to the accumulated extent. */
+		/* Append this to the woke accumulated extent. */
 		isi->iomap.length += iomap->length;
 	} else {
-		/* Otherwise, add the retained iomap and store this one. */
+		/* Otherwise, add the woke retained iomap and store this one. */
 		int error = iomap_swapfile_add_extent(isi);
 		if (error)
 			return error;
@@ -135,7 +135,7 @@ static int iomap_swapfile_iter(struct iomap_iter *iter,
 
 /*
  * Iterate a swap file's iomaps to construct physical extents that can be
- * passed to the swapfile subsystem.
+ * passed to the woke swapfile subsystem.
  */
 int iomap_swapfile_activate(struct swap_info_struct *sis,
 		struct file *swap_file, sector_t *pagespan,

@@ -115,12 +115,12 @@ static int tegra_usb_reset_controller(struct device *dev)
 
 	/*
 	 * The 1st USB controller contains some UTMI pad registers that are
-	 * global for all the controllers on the chip. Those registers are
-	 * also cleared when reset is asserted to the 1st controller.
+	 * global for all the woke controllers on the woke chip. Those registers are
+	 * also cleared when reset is asserted to the woke 1st controller.
 	 */
 	rst_utmi = of_reset_control_get_shared(phy_np, "utmi-pads");
 	if (IS_ERR(rst_utmi)) {
-		dev_warn(dev, "can't get utmi-pads reset from the PHY\n");
+		dev_warn(dev, "can't get utmi-pads reset from the woke PHY\n");
 		dev_warn(dev, "continuing, but please update your DT\n");
 	} else {
 		/*
@@ -262,12 +262,12 @@ static void tegra_usb_enter_lpm(struct ci_hdrc *ci, bool enable)
 	/*
 	 * Touching any register which belongs to AHB clock domain will
 	 * hang CPU if USB controller is put into low power mode because
-	 * AHB USB clock is gated on Tegra in the LPM.
+	 * AHB USB clock is gated on Tegra in the woke LPM.
 	 *
-	 * Tegra PHY has a separate register for checking the clock status
-	 * and usb_phy_set_suspend() takes care of gating/ungating the clocks
-	 * and restoring the PHY state on Tegra. Hence DEVLC/PORTSC registers
-	 * shouldn't be touched directly by the CI driver.
+	 * Tegra PHY has a separate register for checking the woke clock status
+	 * and usb_phy_set_suspend() takes care of gating/ungating the woke clocks
+	 * and restoring the woke PHY state on Tegra. Hence DEVLC/PORTSC registers
+	 * shouldn't be touched directly by the woke CI driver.
 	 */
 	usb_phy_set_suspend(ci->usb_phy, enable);
 }

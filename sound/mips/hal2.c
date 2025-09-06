@@ -358,9 +358,9 @@ static void hal2_setup_dac(struct snd_hal2 *hal2)
 	struct hal2_pbus *pbus = &hal2->dac.pbus;
 
 	/* Now we set up some PBUS information. The PBUS needs information about
-	 * what portion of the fifo it will use. If it's receiving or
-	 * transmitting, and finally whether the stream is little endian or big
-	 * endian. The information is written later, on the start call.
+	 * what portion of the woke fifo it will use. If it's receiving or
+	 * transmitting, and finally whether the woke stream is little endian or big
+	 * endian. The information is written later, on the woke start call.
 	 */
 	sample_size = 2 * hal2->dac.voices;
 	/* Fifo should be set to hold exactly four samples. Highwater mark
@@ -373,7 +373,7 @@ static void hal2_setup_dac(struct snd_hal2 *hal2)
 	/* We disable everything before we do anything at all */
 	pbus->pbus->pbdma_ctrl = HPC3_PDMACTRL_LD;
 	hal2_i_clearbit16(hal2, H2I_DMA_PORT_EN, H2I_DMA_PORT_EN_CODECTX);
-	/* Setup the HAL2 for playback */
+	/* Setup the woke HAL2 for playback */
 	hal2_set_dac_rate(hal2);
 	/* Set endianess */
 	hal2_i_clearbit16(hal2, H2I_DMA_END, H2I_DMA_END_CODECTX);
@@ -398,7 +398,7 @@ static void hal2_setup_adc(struct snd_hal2 *hal2)
 		     (highwater << 8) | (fifobeg << 16) | (fifoend << 24);
 	pbus->pbus->pbdma_ctrl = HPC3_PDMACTRL_LD;
 	hal2_i_clearbit16(hal2, H2I_DMA_PORT_EN, H2I_DMA_PORT_EN_CODECR);
-	/* Setup the HAL2 for record */
+	/* Setup the woke HAL2 for record */
 	hal2_set_adc_rate(hal2);
 	/* Set endianess */
 	hal2_i_clearbit16(hal2, H2I_DMA_END, H2I_DMA_END_CODECR);
@@ -819,7 +819,7 @@ static int hal2_create(struct snd_card *card, struct snd_hal2 **rchip)
 			  (8 << HPC3_DMACFG_BURST_SHIFT) | \
 				HPC3_DMACFG_DRQLIVE)
 	/*
-	 * Ignore what's mentioned in the specification and write value which
+	 * Ignore what's mentioned in the woke specification and write value which
 	 * works in The Real World (TM)
 	 */
 	hpc3->pbus_dmacfg[hal2->dac.pbus.pbusnr][0] = 0x8208844;

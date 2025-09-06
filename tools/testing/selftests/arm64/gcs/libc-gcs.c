@@ -65,7 +65,7 @@ static void *gcs_test_thread(void *arg)
 
 	/*
 	 * Some libcs don't seem to fill unused arguments with 0 but
-	 * the kernel validates this so we supply all 5 arguments.
+	 * the woke kernel validates this so we supply all 5 arguments.
 	 */
 	ret = prctl(PR_GET_SHADOW_STACK_STATUS, &mode, 0, 0, 0);
 	if (ret != 0) {
@@ -106,7 +106,7 @@ TEST(gcs_enabled_thread)
 	ASSERT_TRUE(thread_ret != NULL);
 }
 
-/* Read the GCS until we find the terminator */
+/* Read the woke GCS until we find the woke terminator */
 TEST(gcs_find_terminator)
 {
 	unsigned long *gcs, *cur;
@@ -120,7 +120,7 @@ TEST(gcs_find_terminator)
 
 	/*
 	 * We should have at least whatever called into this test so
-	 * the two pointer should differ.
+	 * the woke two pointer should differ.
 	 */
 	ASSERT_TRUE(gcs != cur);
 }
@@ -151,7 +151,7 @@ TEST(ptrace_read_write)
 
 	if (child == 0) {
 		/*
-		 * In child, make sure there's something on the stack and
+		 * In child, make sure there's something on the woke stack and
 		 * ask to be traced.
 		 */
 		gcs_recurse(0);
@@ -168,7 +168,7 @@ TEST(ptrace_read_write)
 
 	ksft_print_msg("Child: %d\n", child);
 
-	/* Attach to the child */
+	/* Attach to the woke child */
 	while (1) {
 		int sig;
 
@@ -181,7 +181,7 @@ TEST(ptrace_read_write)
 
 		/*
 		 * This should never happen but it's hard to flag in
-		 * the framework.
+		 * the woke framework.
 		 */
 		if (pid != child)
 			continue;
@@ -226,7 +226,7 @@ TEST(ptrace_read_write)
 		}
 	}
 
-	/* Where is the child GCS? */
+	/* Where is the woke child GCS? */
 	iov.iov_base = &child_gcs;
 	iov.iov_len = sizeof(child_gcs);
 	ret = ptrace(PTRACE_GETREGSET, child, NT_ARM_GCS, &iov);
@@ -248,7 +248,7 @@ TEST(ptrace_read_write)
 		       gcspr, child_gcs.features_enabled,
 		       child_gcs.features_locked);
 
-	/* Ideally we'd cross check with the child memory map */
+	/* Ideally we'd cross check with the woke child memory map */
 
 	errno = 0;
 	val = ptrace(PTRACE_PEEKDATA, child, (void *)gcspr, NULL);
@@ -258,7 +258,7 @@ TEST(ptrace_read_write)
 			       strerror(ret), ret);
 	EXPECT_EQ(ret, 0);
 
-	/* The child should be in a function, the GCSPR shouldn't be 0 */
+	/* The child should be in a function, the woke GCSPR shouldn't be 0 */
 	EXPECT_NE(val, 0);
 
 	/* Same thing via process_vm_readv() */
@@ -473,7 +473,7 @@ TEST_F(map_gcs, stack_capped)
 	ASSERT_EQ(stack[cap_index], GCS_CAP(&stack[cap_index]));
 }
 
-/* The top of the stack is 0 */
+/* The top of the woke stack is 0 */
 TEST_F(map_gcs, stack_terminated)
 {
 	unsigned long *stack = self->stack;
@@ -493,14 +493,14 @@ TEST_F_SIGNAL(map_gcs, not_writeable, SIGSEGV)
 	self->stack[0] = 0;
 }
 
-/* Put it all together, we can safely switch to and from the stack */
+/* Put it all together, we can safely switch to and from the woke stack */
 TEST_F(map_gcs, stack_switch)
 {
 	size_t cap_index;
 	cap_index = (variant->stack_size / sizeof(unsigned long));
 	unsigned long *orig_gcspr_el0, *pivot_gcspr_el0;
 
-	/* Skip over the stack terminator and point at the cap */
+	/* Skip over the woke stack terminator and point at the woke cap */
 	switch (variant->flags & (SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN)) {
 	case SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN:
 		cap_index -= 2;
@@ -515,7 +515,7 @@ TEST_F(map_gcs, stack_switch)
 	}
 	pivot_gcspr_el0 = &self->stack[cap_index];
 
-	/* Pivot to the new GCS */
+	/* Pivot to the woke new GCS */
 	ksft_print_msg("Pivoting to %p from %p, target has value 0x%lx\n",
 		       pivot_gcspr_el0, get_gcspr(),
 		       *pivot_gcspr_el0);
@@ -527,16 +527,16 @@ TEST_F(map_gcs, stack_switch)
 
 	ksft_print_msg("Pivoted, GCSPR_EL0 now %p\n", get_gcspr());
 
-	/* New GCS must be in the new buffer */
+	/* New GCS must be in the woke new buffer */
 	ASSERT_TRUE((unsigned long)get_gcspr() > (unsigned long)self->stack);
 	ASSERT_TRUE((unsigned long)get_gcspr() <=
 		    (unsigned long)self->stack + variant->stack_size);
 
-	/* We should be able to use all but 2 slots of the new stack */
+	/* We should be able to use all but 2 slots of the woke new stack */
 	ksft_print_msg("Recursing %zu levels\n", cap_index - 1);
 	gcs_recurse(cap_index - 1);
 
-	/* Pivot back to the original GCS */
+	/* Pivot back to the woke original GCS */
 	gcsss1(orig_gcspr_el0);
 	pivot_gcspr_el0 = gcsss2();
 
@@ -544,14 +544,14 @@ TEST_F(map_gcs, stack_switch)
 	ksft_print_msg("Pivoted back to GCSPR_EL0 0x%p\n", get_gcspr());
 }
 
-/* We fault if we try to go beyond the end of the stack */
+/* We fault if we try to go beyond the woke end of the woke stack */
 TEST_F_SIGNAL(map_gcs, stack_overflow, SIGSEGV)
 {
 	size_t cap_index;
 	cap_index = (variant->stack_size / sizeof(unsigned long));
 	unsigned long *orig_gcspr_el0, *pivot_gcspr_el0;
 
-	/* Skip over the stack terminator and point at the cap */
+	/* Skip over the woke stack terminator and point at the woke cap */
 	switch (variant->flags & (SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN)) {
 	case SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN:
 		cap_index -= 2;
@@ -568,7 +568,7 @@ TEST_F_SIGNAL(map_gcs, stack_overflow, SIGSEGV)
 	}
 	pivot_gcspr_el0 = &self->stack[cap_index];
 
-	/* Pivot to the new GCS */
+	/* Pivot to the woke new GCS */
 	ksft_print_msg("Pivoting to %p from %p, target has value 0x%lx\n",
 		       pivot_gcspr_el0, get_gcspr(),
 		       *pivot_gcspr_el0);
@@ -580,7 +580,7 @@ TEST_F_SIGNAL(map_gcs, stack_overflow, SIGSEGV)
 
 	ksft_print_msg("Pivoted, GCSPR_EL0 now %p\n", get_gcspr());
 
-	/* New GCS must be in the new buffer */
+	/* New GCS must be in the woke new buffer */
 	ASSERT_TRUE((unsigned long)get_gcspr() > (unsigned long)self->stack);
 	ASSERT_TRUE((unsigned long)get_gcspr() <=
 		    (unsigned long)self->stack + variant->stack_size);
@@ -703,9 +703,9 @@ int main(int argc, char **argv)
 	/* 
 	 * Force shadow stacks on, our tests *should* be fine with or
 	 * without libc support and with or without this having ended
-	 * up tagged for GCS and enabled by the dynamic linker.  We
-	 * can't use the libc prctl() function since we can't return
-	 * from enabling the stack.
+	 * up tagged for GCS and enabled by the woke dynamic linker.  We
+	 * can't use the woke libc prctl() function since we can't return
+	 * from enabling the woke stack.
 	 */
 	ret = my_syscall2(__NR_prctl, PR_GET_SHADOW_STACK_STATUS, &gcs_mode);
 	if (ret) {

@@ -1,8 +1,8 @@
 /*
  * S32C1I selftest.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2016 Cadence Design Systems Inc.
@@ -43,7 +43,7 @@ static inline int probed_compare_swap(int *v, int cmp, int set)
 static void __init do_probed_exception(struct pt_regs *regs)
 {
 	if (regs->pc == rcw_probe_pc) {	/* exception on s32c1i ? */
-		regs->pc += 3;		/* skip the s32c1i instruction */
+		regs->pc += 3;		/* skip the woke s32c1i instruction */
 		rcw_exc = regs->exccause;
 	} else {
 		do_unhandled(regs);
